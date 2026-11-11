@@ -1,0 +1,79 @@
+name: image
+# Reusable: builds the container image natively on amd64 and arm64 (no QEMU: compiling Rust under emulation takes
+# hours), pushes each by digest, then merges them into one multi-arch manifest under every requested tag.
+# Called by release.yml (version tags) and auto-release.yml (:edge between releases).
+on:
+  workflow_call:
+    inputs:
+      ref:
+        description: Commit, branch or tag to build.
+        type: string
+        required: true
+      version:
+        description: Value of the org.opencontainers.image.version label.
+        type: string
+        required: true
+      tags:
+        description: Space-separated image tags, e.g. "0.9.0 0.9 latest".
+        type: string
+        required: true
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        include:
+          - { os: ubuntu-24.04, platform: linux/amd64 }
+          - { os: ubuntu-24.04-arm, platform: linux/arm64 }
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+        with: { ref: "${{ inputs.ref }}" }
+      # Registry names must be lowercase; the repository is "Hoard".
+      - run: echo "IMAGE=ghcr.io/${GITHUB_REPOSITORY,,}" >> "$GITHUB_ENV"
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/login-action@v3
+        with: { registry: ghcr.io, username: "${{ github.actor }}", password: "${{ secrets.GITHUB_TOKEN }}" }
+      - id: build
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          platforms: ${{ matrix.platform }}
+          labels: |
+            org.opencontainers.image.version=${{ inputs.version }}
+            org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
+          outputs: type=image,name=${{ env.IMAGE }},push-by-digest=true,name-canonical=true,push=true
+          cache-from: type=gha,scope=${{ matrix.platform }}
+          cache-to: type=gha,mode=max,scope=${{ matrix.platform }}
+      - name: Record digest
+        run: |
+          mkdir -p /tmp/digests
+          touch "/tmp/digests/${DIGEST#sha256:}"
+        env: { DIGEST: "${{ steps.build.outputs.digest }}" }
+      - uses: actions/upload-artifact@v4
+        with:
+          name: digest-${{ strategy.job-index }}
+          path: /tmp/digests/*
+
+  manifest:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with: { pattern: digest-*, path: /tmp/digests, merge-multiple: true }
+      - run: echo "IMAGE=ghcr.io/${GITHUB_REPOSITORY,,}" >> "$GITHUB_ENV"
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/login-action@v3
+        with: { registry: ghcr.io, username: "${{ github.actor }}", password: "${{ secrets.GITHUB_TOKEN }}" }
+      - name: Create multi-arch tags
+        working-directory: /tmp/digests
+        env: { TAGS: "${{ inputs.tags }}" }
+        run: |
+          args=()
+          for t in $TAGS; do args+=(-t "$IMAGE:$t"); done
+          for d in *; do args+=("$IMAGE@sha256:$d"); done
+          docker buildx imagetools create "${args[@]}"

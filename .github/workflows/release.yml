@@ -1,39 +1,59 @@
 name: release
-# Runs when a version tag is pushed (scripts/release.sh creates them). Builds binaries and a multi-arch container
-# image, and publishes a GitHub release with the changelog section as its notes.
+# Builds binaries and a multi-arch container image, and publishes a GitHub release with the changelog section as
+# its notes. Runs two ways:
+#   - auto-release.yml calls it after ci passes on main and it has cut and tagged a version (the usual path);
+#   - pushing a v*.*.* tag yourself (scripts/release.sh, then git push origin main vX.Y.Z).
 on:
   push:
     tags: ["v*.*.*"]
+  workflow_call:
+    inputs:
+      tag:
+        description: The vX.Y.Z tag to release.
+        type: string
+        required: true
+      edge:
+        description: Also move :edge and add :sha-<short> (the tag is main's tip).
+        type: boolean
+        default: false
 
 permissions:
   contents: write
   packages: write
 
 env:
-  IMAGE: ghcr.io/${{ github.repository }}
+  TAG: ${{ inputs.tag || github.ref_name }}
 
 jobs:
   check-version:
     runs-on: ubuntu-latest
     outputs:
       version: ${{ steps.v.outputs.version }}
+      image-tags: ${{ steps.v.outputs.image-tags }}
     steps:
       - uses: actions/checkout@v4
+        with: { ref: "refs/tags/${{ env.TAG }}" }
       - id: v
         name: Tag matches Cargo.toml
+        env: { EDGE: "${{ inputs.edge }}" }
         run: |
-          tag="${GITHUB_REF_NAME#v}"
+          v="${TAG#v}"
           cargo_version="$(sed -n '/^\[workspace.package\]/,/^\[/ s/^version = "\(.*\)"/\1/p' Cargo.toml | head -1)"
-          if [ "$tag" != "$cargo_version" ]; then
-            echo "::error::tag $GITHUB_REF_NAME doesn't match Cargo.toml version $cargo_version"; exit 1
+          if [ "$v" != "$cargo_version" ]; then
+            echo "::error::tag $TAG doesn't match Cargo.toml version $cargo_version"; exit 1
           fi
-          echo "version=$tag" >> "$GITHUB_OUTPUT"
+          # Pre-releases get only their exact tag; releases also move :<major>.<minor> and :latest.
+          if [[ "$v" == *-* ]]; then tags="$v"; else tags="$v ${v%.*} latest"; fi
+          [ "$EDGE" = "true" ] && tags="$tags edge sha-$(git rev-parse --short=7 HEAD)"
+          echo "version=$v" >> "$GITHUB_OUTPUT"
+          echo "image-tags=$tags" >> "$GITHUB_OUTPUT"
 
   web:
     needs: check-version
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with: { ref: "refs/tags/${{ env.TAG }}" }
       - uses: actions/setup-node@v4
         with: { node-version: 24, cache: npm, cache-dependency-path: web/package-lock.json }
       - run: npm ci && npm run build
@@ -54,6 +74,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
+        with: { ref: "refs/tags/${{ env.TAG }}" }
       - name: Toolchain from rust-toolchain.toml
         run: rustup show active-toolchain || rustup toolchain install
       - uses: Swatinem/rust-cache@v2
@@ -80,81 +101,30 @@ jobs:
           name: bin-${{ matrix.target }}
           path: hoard-*.*z*
 
-  # One native build per architecture (no QEMU: compiling Rust under emulation takes hours), pushed by digest,
-  # then merged into one multi-arch tag.
   image:
     needs: check-version
-    strategy:
-      matrix:
-        include:
-          - { os: ubuntu-24.04, platform: linux/amd64 }
-          - { os: ubuntu-24.04-arm, platform: linux/arm64 }
-    runs-on: ${{ matrix.os }}
-    steps:
-      - uses: actions/checkout@v4
-      - uses: docker/setup-buildx-action@v3
-      - uses: docker/login-action@v3
-        with: { registry: ghcr.io, username: "${{ github.actor }}", password: "${{ secrets.GITHUB_TOKEN }}" }
-      - id: build
-        uses: docker/build-push-action@v6
-        with:
-          context: .
-          platforms: ${{ matrix.platform }}
-          labels: |
-            org.opencontainers.image.version=${{ needs.check-version.outputs.version }}
-            org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
-          outputs: type=image,name=${{ env.IMAGE }},push-by-digest=true,name-canonical=true,push=true
-          cache-from: type=gha,scope=${{ matrix.platform }}
-          cache-to: type=gha,mode=max,scope=${{ matrix.platform }}
-      - name: Record digest
-        run: |
-          mkdir -p /tmp/digests
-          touch "/tmp/digests/${DIGEST#sha256:}"
-        env: { DIGEST: "${{ steps.build.outputs.digest }}" }
-      - uses: actions/upload-artifact@v4
-        with:
-          name: digest-${{ strategy.job-index }}
-          path: /tmp/digests/*
-
-  image-manifest:
-    needs: [check-version, image]
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/download-artifact@v4
-        with: { pattern: digest-*, path: /tmp/digests, merge-multiple: true }
-      - uses: docker/setup-buildx-action@v3
-      - uses: docker/login-action@v3
-        with: { registry: ghcr.io, username: "${{ github.actor }}", password: "${{ secrets.GITHUB_TOKEN }}" }
-      - id: meta
-        uses: docker/metadata-action@v5
-        with:
-          images: ${{ env.IMAGE }}
-          tags: |
-            type=semver,pattern={{version}}
-            type=semver,pattern={{major}}.{{minor}}
-            type=raw,value=latest,enable=${{ !contains(github.ref_name, '-') }}
-      - name: Create multi-arch tags
-        working-directory: /tmp/digests
-        run: |
-          docker buildx imagetools create \
-            $(jq -cr '.tags | map("-t " + .) | join(" ")' <<< "$DOCKER_METADATA_OUTPUT_JSON") \
-            $(printf '${{ env.IMAGE }}@sha256:%s ' *)
+    uses: ./.github/workflows/image.yml
+    with:
+      ref: refs/tags/${{ inputs.tag || github.ref_name }}
+      version: ${{ needs.check-version.outputs.version }}
+      tags: ${{ needs.check-version.outputs.image-tags }}
 
   publish:
-    needs: [check-version, binaries, image-manifest]
+    needs: [check-version, binaries, image]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with: { ref: "refs/tags/${{ env.TAG }}" }
       - uses: actions/download-artifact@v4
         with: { pattern: bin-*, path: dist, merge-multiple: true }
       - name: Release notes from CHANGELOG.md
         run: |
           v="${{ needs.check-version.outputs.version }}"
           awk -v v="$v" '$0 ~ "^## \\[" v "\\]" {on=1; next} /^## \[/ {on=0} on' CHANGELOG.md > notes.md
-          printf '\n### Container image\n\n```sh\ndocker pull %s:%s\n```\n' "${{ env.IMAGE }}" "$v" >> notes.md
+          printf '\n### Container image\n\n```sh\ndocker pull ghcr.io/%s:%s\n```\n' "${GITHUB_REPOSITORY,,}" "$v" >> notes.md
           (cd dist && sha256sum * > SHA256SUMS)
       - name: Create GitHub release
         env: { GH_TOKEN: "${{ github.token }}" }
         run: |
-          prerelease=""; [[ "$GITHUB_REF_NAME" == *-* ]] && prerelease="--prerelease"
-          gh release create "$GITHUB_REF_NAME" dist/* --title "Hoard ${GITHUB_REF_NAME#v}" --notes-file notes.md $prerelease
+          prerelease=""; [[ "$TAG" == *-* ]] && prerelease="--prerelease"
+          gh release create "$TAG" dist/* --title "Hoard ${TAG#v}" --notes-file notes.md $prerelease

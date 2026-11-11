@@ -1,0 +1,110 @@
+name: auto-release
+# After ci passes on a push to main:
+#   - CHANGELOG.md has entries under [Unreleased]  ->  bump, commit, tag and release (release.yml), moving :edge;
+#   - it doesn't                                   ->  just publish ghcr.io/<owner>/hoard:edge and :sha-<short>.
+# The bump is patch by default; "#minor" or "#major" in any commit message since the last tag overrides it.
+#
+# The release commit and tag are pushed with GITHUB_TOKEN, which deliberately doesn't trigger workflows: no ci run
+# on the bump commit (ci already passed on its parent) and no second release.yml run from the tag push.
+on:
+  workflow_run:
+    workflows: [ci]
+    types: [completed]
+    branches: [main]
+
+# One at a time, never cancelled mid-push. A newer push's run waits and then sees the newer main.
+concurrency:
+  group: auto-release
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+  packages: write
+
+jobs:
+  plan:
+    if: >-
+      github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.event == 'push' &&
+      github.event.workflow_run.head_repository.full_name == github.repository
+    runs-on: ubuntu-latest
+    permissions: { contents: read }
+    outputs:
+      tip: ${{ steps.plan.outputs.tip }}
+      short: ${{ steps.plan.outputs.short }}
+      release: ${{ steps.plan.outputs.release }}
+      version: ${{ steps.plan.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+        with: { ref: main, fetch-depth: 0 }
+      - id: plan
+        env: { SHA: "${{ github.event.workflow_run.head_sha }}" }
+        run: |
+          # Only act on main's tip: if main has moved on, the newer push's ci run will get here too.
+          if [ "$(git rev-parse HEAD)" != "$SHA" ]; then
+            echo "main has moved past $SHA; skipping"
+            echo "tip=false" >> "$GITHUB_OUTPUT"; exit 0
+          fi
+          echo "tip=true" >> "$GITHUB_OUTPUT"
+          echo "short=$(git rev-parse --short=7 HEAD)" >> "$GITHUB_OUTPUT"
+
+          entries="$(awk '/^## \[Unreleased\]/{on=1; next} /^## \[/{on=0} on' CHANGELOG.md | grep -c '[^[:space:]]' || true)"
+          if [ "$entries" = "0" ]; then
+            echo "Nothing under [Unreleased]; publishing :edge only"
+            echo "release=false" >> "$GITHUB_OUTPUT"; exit 0
+          fi
+
+          current="$(sed -n '/^\[workspace.package\]/,/^\[/ s/^version = "\(.*\)"/\1/p' Cargo.toml | head -1)"
+          last="$(git describe --tags --abbrev=0 --match 'v*' 2>/dev/null || true)"
+          log="$(git log --format=%B ${last:+$last..}HEAD)"
+          IFS=. read -r major minor patch <<< "${current%%-*}"
+          if grep -qi '#major' <<< "$log"; then version="$((major + 1)).0.0"
+          elif grep -qi '#minor' <<< "$log"; then version="$major.$((minor + 1)).0"
+          elif [[ "$current" == *-* ]]; then version="${current%%-*}"   # 0.9.0-rc.1 -> 0.9.0
+          else version="$major.$minor.$((patch + 1))"; fi
+
+          echo "Releasing $current -> $version (commits since ${last:-the start})"
+          echo "release=true" >> "$GITHUB_OUTPUT"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+
+  cut:
+    needs: plan
+    if: needs.plan.outputs.tip == 'true' && needs.plan.outputs.release == 'true'
+    runs-on: ubuntu-latest
+    permissions: { contents: write }
+    steps:
+      - uses: actions/checkout@v4
+        with: { ref: main, fetch-depth: 0 }
+      - uses: actions/setup-node@v4
+        with: { node-version: 24 }
+      - name: Toolchain from rust-toolchain.toml
+        run: rustup show active-toolchain || rustup toolchain install
+      - name: Bump, date the changelog, commit and tag
+        env: { VERSION: "${{ needs.plan.outputs.version }}" }
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          # ci already ran fmt/clippy/tests/web build on this commit; the bump only touches versions and the changelog.
+          bash scripts/release.sh "$VERSION" --skip-checks
+      - name: Push
+        env: { VERSION: "${{ needs.plan.outputs.version }}" }
+        # Atomic: if main moved since plan, neither the commit nor the tag lands.
+        run: git push --atomic origin HEAD:main "v$VERSION"
+
+  release:
+    needs: [plan, cut]
+    uses: ./.github/workflows/release.yml
+    permissions: { contents: write, packages: write }
+    with:
+      tag: v${{ needs.plan.outputs.version }}
+      edge: true
+
+  edge:
+    needs: plan
+    if: needs.plan.outputs.tip == 'true' && needs.plan.outputs.release != 'true'
+    uses: ./.github/workflows/image.yml
+    permissions: { contents: read, packages: write }
+    with:
+      ref: ${{ github.event.workflow_run.head_sha }}
+      version: edge-${{ needs.plan.outputs.short }}
+      tags: edge sha-${{ needs.plan.outputs.short }}

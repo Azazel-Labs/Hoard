@@ -1,0 +1,75 @@
+# Topology P: everything on the NAS, reachable from anywhere over Cloudflare's private network routing
+# (Cloudflare One / WARP). No public hostname, no open ports on your router: only devices enrolled in your
+# Zero Trust org, running the Cloudflare One client, can reach it. See docs/DEPLOYMENT.md, "Private access".
+#   cp deploy/.env.example deploy/.env && edit; edit deploy/garage.toml secrets
+#   docker compose -f deploy/compose.private.yml --env-file deploy/.env up -d
+services:
+  garage:
+    image: dxflrs/garage:v2.5.0
+    command: ["/garage", "server", "--single-node", "--default-bucket"]
+    restart: unless-stopped
+    environment:
+      - GARAGE_DEFAULT_BUCKET
+      - GARAGE_DEFAULT_ACCESS_KEY
+      - GARAGE_DEFAULT_SECRET_KEY
+    volumes:
+      - ./garage.toml:/etc/garage.toml:ro
+      - /volume1/hoard/garage/meta:/var/lib/garage/meta     # adjust to your NAS paths
+      - /volume1/hoard/garage/data:/var/lib/garage/data
+
+  hoard:
+    build: ..
+    restart: unless-stopped
+    depends_on: [garage]
+    environment:
+      HOARD_STORAGE: s3
+      HOARD_S3_ENDPOINT: http://garage:3900
+      HOARD_S3_REGION: garage
+      HOARD_S3_BUCKET: ${GARAGE_DEFAULT_BUCKET}
+      HOARD_S3_ACCESS_KEY: ${GARAGE_DEFAULT_ACCESS_KEY}
+      HOARD_S3_SECRET_KEY: ${GARAGE_DEFAULT_SECRET_KEY}
+      HOARD_TOKEN: ${HOARD_TOKEN}
+      HOARD_PUBLIC_URL: ${HOARD_PUBLIC_URL:-}          # e.g. http://192.168.50.10:7878, for MCP links
+      HOARD_LLM_URL: ${HOARD_LLM_URL:-}
+      HOARD_LLM_MODEL: ${HOARD_LLM_MODEL:-}
+      HOARD_LLM_VISION: ${HOARD_LLM_VISION:-false}
+      HOARD_LLM_BATCH: ${HOARD_LLM_BATCH:-40}
+      HOARD_BLENDER: ${HOARD_BLENDER:-}
+      HOARD_UNREAL_CONVERT: ${HOARD_UNREAL_CONVERT:-keep}
+      # HTTPS gives browsers HTTP/2 (one connection for the whole thumbnail grid). Self-signed is fine on a private
+      # network: accept the warning once. HTTP/3 additionally needs the UDP port below.
+      HOARD_TLS_SELF_SIGNED: ${HOARD_TLS_SELF_SIGNED:-true}
+      HOARD_TLS_NAMES: ${HOARD_TLS_NAMES:-}
+      HOARD_HTTP3: ${HOARD_HTTP3:-false}
+    volumes:
+      - /volume1/hoard/meta:/data
+    ports:
+      # LAN only. Don't forward this port on your router: remote access goes through the tunnel.
+      - "7878:7878"
+      - "7878:7878/udp"   # HTTP/3 (QUIC), only used with HOARD_HTTP3=true
+
+  # Optional local model for the LLM tagger: `docker compose --profile llm ... up -d`. Download one first with
+  # `cargo xtask models fetch` (any machine) and copy models/<id>/ to the NAS path below. Then set
+  # HOARD_LLM_URL=http://llm:8080/v1 and HOARD_LLM_MODEL=<id> in deploy/.env. CPU-only; a 2B model tags a pack of
+  # a few hundred files in minutes on a recent NAS CPU, slower on low-power ones.
+  llm:
+    image: ghcr.io/ggml-org/llama.cpp:server
+    profiles: [llm]
+    restart: unless-stopped
+    volumes:
+      - /volume1/hoard/models:/models:ro
+    command: >-
+      -m /models/${HOARD_LOCAL_MODEL:-qwen3.5-2b}/model.gguf
+      --mmproj /models/${HOARD_LOCAL_MODEL:-qwen3.5-2b}/mmproj.gguf
+      --host 0.0.0.0 --port 8080 -c 16384 --alias ${HOARD_LOCAL_MODEL:-qwen3.5-2b}
+      ${HOARD_LOCAL_MODEL_ARGS---reasoning-budget 0}
+
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    command: tunnel --no-autoupdate run
+    restart: unless-stopped
+    environment:
+      TUNNEL_TOKEN: ${CLOUDFLARE_TUNNEL_TOKEN}
+    # The tunnel needs no public hostnames. In the dashboard, add a private network route (CIDR) for the
+    # NAS's LAN address, e.g. 192.168.50.10/32. cloudflared then forwards WARP traffic for that address
+    # onto your LAN, where the port above answers.

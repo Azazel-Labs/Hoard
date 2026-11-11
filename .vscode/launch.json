@@ -1,0 +1,70 @@
+{
+  // Debug the server, the CLI, xtask and tests with CodeLLDB, and the portal with the browser debugger.
+  // "hoardd + local model" starts llama.cpp first (task "llm: serve") and reads its settings from .vscode/llm.env.
+  // "portal (browser)" needs hoardd running; "full stack" starts both.
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "hoardd",
+      "type": "lldb",
+      "request": "launch",
+      "cargo": { "args": ["build", "-p", "hoardd", "--bin", "hoardd"], "filter": { "kind": "bin" } },
+      "cwd": "${workspaceFolder}",
+      "env": { "RUST_LOG": "hoardd=debug,tower_http=info", "RUST_BACKTRACE": "1" }
+    },
+    {
+      "name": "hoardd + local model",
+      "type": "lldb",
+      "request": "launch",
+      "cargo": { "args": ["build", "-p", "hoardd", "--bin", "hoardd"], "filter": { "kind": "bin" } },
+      "cwd": "${workspaceFolder}",
+      "preLaunchTask": "llm: serve",
+      "envFile": "${workspaceFolder}/.vscode/llm.env",
+      "env": { "RUST_LOG": "hoardd=debug,tower_http=info" }
+    },
+    {
+      "name": "hoardd unit tests",
+      "type": "lldb",
+      "request": "launch",
+      "cargo": { "args": ["test", "--no-run", "-p", "hoardd", "--bin", "hoardd"], "filter": { "kind": "bin" } },
+      "args": "${input:testFilter}",
+      "cwd": "${workspaceFolder}"
+    },
+    {
+      "name": "hoard CLI",
+      "type": "lldb",
+      "request": "launch",
+      "cargo": { "args": ["build", "-p", "hoard", "--bin", "hoard"], "filter": { "kind": "bin" } },
+      "args": "${input:cliArgs}",
+      "cwd": "${workspaceFolder}"
+    },
+    {
+      "name": "xtask",
+      "type": "lldb",
+      "request": "launch",
+      "cargo": { "args": ["build", "-p", "xtask"], "filter": { "kind": "bin" } },
+      "args": "${input:xtaskArgs}",
+      "cwd": "${workspaceFolder}"
+    },
+    {
+      "name": "portal (browser)",
+      "type": "chrome",
+      "request": "launch",
+      "url": "http://127.0.0.1:5173",
+      "webRoot": "${workspaceFolder}/web",
+      "preLaunchTask": "web: vite"
+    }
+  ],
+  "compounds": [
+    {
+      "name": "full stack: hoardd + portal",
+      "configurations": ["hoardd", "portal (browser)"],
+      "stopAll": true
+    }
+  ],
+  "inputs": [
+    { "id": "testFilter", "type": "promptString", "description": "Test name filter (empty runs all)", "default": "" },
+    { "id": "cliArgs", "type": "promptString", "description": "hoard arguments", "default": "search crate" },
+    { "id": "xtaskArgs", "type": "promptString", "description": "xtask arguments", "default": "models list" }
+  ]
+}

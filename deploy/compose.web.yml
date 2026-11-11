@@ -1,0 +1,40 @@
+# Topology B, cloud half: a small VPS runs Hoard (portal, API, MCP, metadata DB, ingest) and reaches the
+# NAS's Garage over Tailscale. Downloads are proxied NAS -> VPS -> client; put Cloudflare in front of the
+# VPS and cache /api/blobs/* so popular files are served from the edge.
+#   docker compose -f deploy/compose.web.yml --env-file deploy/.env up -d
+services:
+  tailscale:
+    image: tailscale/tailscale:latest
+    hostname: hoard-web
+    restart: unless-stopped
+    environment:
+      TS_AUTHKEY: ${TS_AUTHKEY}
+      TS_STATE_DIR: /var/lib/tailscale
+      TS_USERSPACE: "false"
+    volumes:
+      - ts-web:/var/lib/tailscale
+    devices:
+      - /dev/net/tun:/dev/net/tun
+    cap_add: [net_admin]
+    ports:
+      - "7878:7878"
+
+  hoard:
+    build: ..
+    restart: unless-stopped
+    network_mode: service:tailscale
+    environment:
+      HOARD_STORAGE: s3
+      HOARD_S3_ENDPOINT: http://hoard-nas:3900       # MagicDNS name of the NAS node
+      HOARD_S3_REGION: garage
+      HOARD_S3_BUCKET: ${GARAGE_DEFAULT_BUCKET}
+      HOARD_S3_ACCESS_KEY: ${GARAGE_DEFAULT_ACCESS_KEY}
+      HOARD_S3_SECRET_KEY: ${GARAGE_DEFAULT_SECRET_KEY}
+      HOARD_TOKEN: ${HOARD_TOKEN}
+      HOARD_PUBLIC_URL: https://hoard.example.com
+    volumes:
+      - hoard-meta:/data
+
+volumes:
+  ts-web:
+  hoard-meta:

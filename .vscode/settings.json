@@ -1,0 +1,48 @@
+{
+  // Rust: clippy with the workspace lints on save, in its own target dir so it doesn't block `cargo build`.
+  "rust-analyzer.check.command": "clippy",
+  "rust-analyzer.check.allTargets": true,
+  "rust-analyzer.cargo.targetDir": true,
+  "rust-analyzer.imports.granularity.group": "module",
+  "rust-analyzer.imports.prefix": "crate",
+  "rust-analyzer.lens.run.enable": true,
+  "rust-analyzer.testExplorer": true,
+  "[rust]": {
+    "editor.defaultFormatter": "rust-lang.rust-analyzer",
+    "editor.formatOnSave": true,
+    "editor.rulers": [120]
+  },
+
+  // Web: the workspace's TypeScript (for vue-tsc parity), 2-space indent.
+  "typescript.tsdk": "web/node_modules/typescript/lib",
+  "typescript.enablePromptUseWorkspaceTsdk": true,
+  "[vue][typescript][javascript][json][jsonc][css][html]": {
+    "editor.tabSize": 2,
+    "editor.rulers": [120]
+  },
+  "[toml]": { "editor.defaultFormatter": "tamasfe.even-better-toml", "editor.rulers": [120] },
+  "evenBetterToml.formatter.columnWidth": 120,
+  "[markdown]": { "editor.rulers": [120], "editor.wordWrap": "off" },
+  "[yaml]": { "editor.tabSize": 2 },
+
+  "files.trimTrailingWhitespace": true,
+  "files.insertFinalNewline": true,
+  "files.exclude": { "**/target": true, "web/node_modules": true },
+  "search.exclude": {
+    "**/target": true,
+    "web/node_modules": true,
+    "web/dist": true,
+    "hoard-data": true,
+    "models": true,
+    "Cargo.lock": true,
+    "web/package-lock.json": true
+  },
+  "files.watcherExclude": { "**/target/**": true, "hoard-data/**": true, "models/**": true },
+  "yaml.schemas": {
+    "https://json.schemastore.org/github-workflow.json": ".github/workflows/*.yml",
+    "https://raw.githubusercontent.com/compose-spec/compose-spec/master/schema/compose-spec.json": "deploy/compose.*.yml"
+  },
+  "terminal.integrated.env.linux": { "RUST_BACKTRACE": "1" },
+  "terminal.integrated.env.osx": { "RUST_BACKTRACE": "1" },
+  "terminal.integrated.env.windows": { "RUST_BACKTRACE": "1" }
+}

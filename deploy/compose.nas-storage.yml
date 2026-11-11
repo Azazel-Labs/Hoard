@@ -1,0 +1,34 @@
+# Topology B, home half: the NAS runs only Garage, reachable from your tailnet as hoard-nas:3900.
+# Pair with compose.web.yml on a VPS. Bytes never leave home except when someone downloads them.
+#   docker compose -f deploy/compose.nas-storage.yml --env-file deploy/.env up -d
+services:
+  tailscale:
+    image: tailscale/tailscale:latest
+    hostname: hoard-nas
+    restart: unless-stopped
+    environment:
+      TS_AUTHKEY: ${TS_AUTHKEY}
+      TS_STATE_DIR: /var/lib/tailscale
+      TS_USERSPACE: "false"
+    volumes:
+      - ts-nas:/var/lib/tailscale
+    devices:
+      - /dev/net/tun:/dev/net/tun
+    cap_add: [net_admin]
+
+  garage:
+    image: dxflrs/garage:v2.5.0
+    command: ["/garage", "server", "--single-node", "--default-bucket"]
+    restart: unless-stopped
+    network_mode: service:tailscale        # S3 API is only reachable over the tailnet
+    environment:
+      - GARAGE_DEFAULT_BUCKET
+      - GARAGE_DEFAULT_ACCESS_KEY
+      - GARAGE_DEFAULT_SECRET_KEY
+    volumes:
+      - ./garage.toml:/etc/garage.toml:ro
+      - /volume1/hoard/garage/meta:/var/lib/garage/meta
+      - /volume1/hoard/garage/data:/var/lib/garage/data
+
+volumes:
+  ts-nas:

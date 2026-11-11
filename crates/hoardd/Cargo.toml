@@ -1,0 +1,79 @@
+[package]
+name = "hoardd"
+description = "Hoard asset server"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+hoard-core.workspace = true
+hoard-render.workspace = true
+hoard-unreal.workspace = true
+anyhow.workspace = true
+blake3.workspace = true
+clap.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+tokio.workspace = true
+tracing.workspace = true
+tracing-subscriber.workspace = true
+reqwest.workspace = true
+axum = { version = "0.8", features = ["multipart", "http2"] }
+tower-http = { version = "0.7", features = ["fs", "cors", "trace", "compression-gzip", "compression-br", "compression-zstd", "set-header"] }
+rusqlite = { version = "0.41", features = ["bundled"] }
+r2d2 = "0.8"
+r2d2_sqlite = "0.36"
+uuid = { version = "1.29", features = ["v7"] }
+zip = { version = "9", default-features = false, features = ["deflate", "deflate64", "bzip2", "lzma", "zstd", "time"] }
+tar = "0.4"
+flate2 = "1.1"
+infer = "0.22"
+mime_guess = "2"
+image = { version = "0.25", default-features = false, features = ["png", "jpeg", "gif", "bmp", "tga", "webp", "tiff", "hdr", "exr"] }
+zstd = "0.14"
+# TLS, HTTP/2 and HTTP/3. All on rustls with the `ring` provider (no C toolchain needed).
+axum-server = { version = "0.9", features = ["tls-rustls-ring"] }
+rustls = { version = "0.23", default-features = false, features = ["ring", "std", "tls12", "logging"] }
+rustls-pki-types = { version = "1", features = ["std"] }
+rcgen = "0.14"
+quinn = { version = "0.11", default-features = false, features = ["runtime-tokio", "rustls-ring"] }
+h3 = "0.0.8"
+h3-quinn = "0.0.10"
+http = "1"
+lofty = "0.25"
+flacenc = { version = "0.5", default-features = false }
+rusty_mp3 = "1"
+opus-pure = "0.2"
+allsorts = { version = "0.17", default-features = false, features = ["flate2_rust"] }
+brotli = "9"
+basisu = "0.1"
+xmrs = "0.15"
+xmrsplayer = "0.15"
+midly = "0.5"
+rustysynth = "1"
+fbxcel = { version = "0.9", features = ["tree", "writer"] }
+ddsfile = "0.6"
+texture2ddecoder = "0.1"
+ktx2 = "0.5"
+resvg = { version = "0.50", default-features = false, features = ["svgz", "text", "system-fonts"] }
+asefile = "0.3"
+ttf-parser = "0.25"
+ab_glyph = "0.2"
+base64 = "0.22"
+futures-util = "0.3"
+tokio-util = { version = "0.7", features = ["io"] }
+time = { version = "0.3", features = ["formatting", "macros"] }
+regex = "1"
+object_store = { version = "0.14", features = ["aws"] }
+bytes = "1"
+tower = { version = "0.5", features = ["util"] }
+symphonia = { version = "0.6", default-features = false, features = ["wav", "pcm", "ogg", "vorbis", "flac", "mp3", "aiff", "adpcm"] }
+tempfile = "3.27.0"
+sha2 = "0.11"
+
+[target.'cfg(target_os = "linux")'.dependencies]
+rustix = { version = "1", features = ["process", "thread"] }

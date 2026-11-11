@@ -1,0 +1,15 @@
+{
+  // Suggested when you open the folder. Rust, the Vue portal, debugging, TOML/YAML, CI and containers.
+  "recommendations": [
+    "rust-lang.rust-analyzer",
+    "vadimcn.vscode-lldb",
+    "vue.volar",
+    "tamasfe.even-better-toml",
+    "fill-labs.dependi",
+    "redhat.vscode-yaml",
+    "github.vscode-github-actions",
+    "ms-azuretools.vscode-containers",
+    "editorconfig.editorconfig"
+  ],
+  "unwantedRecommendations": ["octref.vetur"]
+}

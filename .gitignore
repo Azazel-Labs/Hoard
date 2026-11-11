@@ -1,0 +1,8 @@
+/hoard-data
+/models
+/target
+/web/dist
+/web/node_modules
+deploy/.env
+/.vscode/llm.env
+__pycache__/

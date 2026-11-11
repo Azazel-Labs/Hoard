@@ -1,0 +1,45 @@
+# Topology A: everything on the NAS. Hoard + Garage (blobs) at home, published through a Cloudflare Tunnel.
+# Put Cloudflare Access in front of the hostname for login, and a cache rule for /api/blobs/* and
+# /api/assets/*/thumb (immutable, content-addressed) so repeat downloads don't touch your uplink.
+#   cp deploy/.env.example deploy/.env && edit; edit deploy/garage.toml secrets
+#   docker compose -f deploy/compose.all-in-one.yml --env-file deploy/.env up -d
+services:
+  garage:
+    image: dxflrs/garage:v2.5.0
+    command: ["/garage", "server", "--single-node", "--default-bucket"]
+    restart: unless-stopped
+    environment:
+      - GARAGE_DEFAULT_BUCKET
+      - GARAGE_DEFAULT_ACCESS_KEY
+      - GARAGE_DEFAULT_SECRET_KEY
+    volumes:
+      - ./garage.toml:/etc/garage.toml:ro
+      - /volume1/hoard/garage/meta:/var/lib/garage/meta     # adjust to your NAS paths
+      - /volume1/hoard/garage/data:/var/lib/garage/data
+
+  hoard:
+    build: ..
+    restart: unless-stopped
+    depends_on: [garage]
+    environment:
+      HOARD_STORAGE: s3
+      HOARD_S3_ENDPOINT: http://garage:3900
+      HOARD_S3_REGION: garage
+      HOARD_S3_BUCKET: ${GARAGE_DEFAULT_BUCKET}
+      HOARD_S3_ACCESS_KEY: ${GARAGE_DEFAULT_ACCESS_KEY}
+      HOARD_S3_SECRET_KEY: ${GARAGE_DEFAULT_SECRET_KEY}
+      HOARD_TOKEN: ${HOARD_TOKEN}
+      HOARD_LLM_URL: ${HOARD_LLM_URL:-}
+      HOARD_LLM_MODEL: ${HOARD_LLM_MODEL:-}
+    volumes:
+      - /volume1/hoard/meta:/data          # SQLite DB, staging, backups (small)
+    ports:
+      - "7878:7878"                        # LAN access; drop this if you only use the tunnel
+
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    command: tunnel --no-autoupdate run
+    restart: unless-stopped
+    environment:
+      TUNNEL_TOKEN: ${CLOUDFLARE_TUNNEL_TOKEN}
+    # In the tunnel's public hostname settings, point hoard.example.com at http://hoard:7878

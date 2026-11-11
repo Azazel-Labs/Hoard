@@ -1,0 +1,109 @@
+{
+  // Everything goes through `cargo xtask` so the terminal and the editor do the same thing.
+  // Ctrl+Shift+B runs "dev"; "Tasks: Run Task" lists the rest.
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "dev",
+      "detail": "hoardd + Vite with hot reload (http://127.0.0.1:5173)",
+      "type": "shell",
+      "command": "cargo xtask dev",
+      "isBackground": true,
+      "group": { "kind": "build", "isDefault": true },
+      "problemMatcher": ["$rustc"],
+      "presentation": { "panel": "dedicated", "clear": true }
+    },
+    {
+      "label": "dev + local model",
+      "detail": "Also serves the default local model and points the LLM tagger at it",
+      "type": "shell",
+      "command": "cargo xtask dev --llm",
+      "isBackground": true,
+      "problemMatcher": ["$rustc"],
+      "presentation": { "panel": "dedicated", "clear": true }
+    },
+    {
+      "label": "ci",
+      "detail": "fmt, clippy -D warnings, tests, web build",
+      "type": "shell",
+      "command": "cargo xtask ci",
+      "group": "test",
+      "problemMatcher": ["$rustc"]
+    },
+    {
+      "label": "test",
+      "type": "shell",
+      "command": "cargo test --workspace",
+      "group": { "kind": "test", "isDefault": true },
+      "problemMatcher": ["$rustc"]
+    },
+    {
+      "label": "web: build",
+      "type": "shell",
+      "command": "cargo xtask web",
+      "problemMatcher": ["$tsc"]
+    },
+    {
+      "label": "web: vite",
+      "detail": "Vite dev server only (for the browser debug configuration)",
+      "type": "npm",
+      "script": "dev",
+      "path": "web",
+      "isBackground": true,
+      "problemMatcher": {
+        "owner": "vite",
+        "pattern": { "regexp": "^__never_matches__$" },
+        "background": { "activeBegins": true, "beginsPattern": "VITE", "endsPattern": "Local:" }
+      }
+    },
+    {
+      "label": "models: list",
+      "type": "shell",
+      "command": "cargo xtask models list",
+      "problemMatcher": []
+    },
+    {
+      "label": "models: fetch",
+      "detail": "Download a small local model for the LLM tagger",
+      "type": "shell",
+      "command": "cargo xtask models fetch ${input:model}",
+      "problemMatcher": []
+    },
+    {
+      "label": "llm: serve",
+      "detail": "Serve a local model with llama.cpp; writes .vscode/llm.env for the debugger",
+      "type": "shell",
+      "command": "cargo xtask llm serve ${input:model} --env-file .vscode/llm.env",
+      "isBackground": true,
+      "problemMatcher": {
+        "owner": "llama",
+        "pattern": { "regexp": "^__never_matches__$" },
+        "background": { "activeBegins": true, "beginsPattern": "Starting|Looking up", "endsPattern": "is ready" }
+      },
+      "presentation": { "panel": "dedicated" }
+    },
+    {
+      "label": "sample: upload",
+      "detail": "Generate the sample pack and upload it to the running server",
+      "type": "shell",
+      "command": "cargo xtask sample --upload",
+      "problemMatcher": []
+    },
+    {
+      "label": "build: hoardd",
+      "type": "cargo",
+      "command": "build",
+      "args": ["-p", "hoardd"],
+      "problemMatcher": ["$rustc"]
+    }
+  ],
+  "inputs": [
+    {
+      "id": "model",
+      "type": "pickString",
+      "description": "Local model (see `cargo xtask models list`)",
+      "options": ["qwen3.5-2b", "qwen3.5-4b", "qwen3-vl-2b", "gemma4-e2b", "lfm2.5-vl-1.6b"],
+      "default": "qwen3.5-2b"
+    }
+  ]
+}

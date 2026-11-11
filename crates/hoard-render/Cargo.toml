@@ -1,0 +1,19 @@
+[package]
+name = "hoard-render"
+description = "Headless wgpu renderer for model thumbnails (glTF/GLB in, PNG out)"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+anyhow.workspace = true
+wgpu = "30"
+gltf = { version = "1.4", features = ["utils", "import", "KHR_materials_emissive_strength"] }
+glam = { version = "0.34", features = ["bytemuck"] }
+bytemuck = { version = "1", features = ["derive"] }
+pollster = "1"
+image = { version = "0.25", default-features = false, features = ["png", "jpeg"] }

@@ -1,0 +1,116 @@
+/* Hoard: a slate workbench. Kind colors carry meaning (every asset is labeled like a storage bin);
+   everything else stays neutral so thumbnails are the brightest thing on screen. */
+
+:root {
+  /* Each color is light-dark(light, dark); `color-scheme` picks, from `data-scheme` (see theme.ts). */
+  color-scheme: dark;
+  --bg: light-dark(#eef1f5, #1b212d);
+  --panel: light-dark(#f7f8fa, #222a39);
+  --raised: light-dark(#ffffff, #2a3446);
+  --line: light-dark(#d2d8e2, #36425a);
+  --text: light-dark(#1c2330, #e4e8ef);
+  --muted: light-dark(#566176, #95a0b5);
+  --faint: light-dark(#7f899c, #66728a);
+  --danger: light-dark(#b93a3a, #ef7b7b);
+  --ok: light-dark(#2f7d36, #8fd18b);
+
+  /* Kind colors, darker on light so text in them stays readable. */
+  --k-texture: light-dark(#26806f, #5fb3a1);
+  --k-audio: light-dark(#8549b8, #c792ea);
+  --k-model: light-dark(#9a6c0c, #e6b450);
+  --k-animation: light-dark(#9c6230, #d9a679);
+  --k-font: light-dark(#2f6fae, #7fb4e6);
+  --k-shader: light-dark(#b8445f, #ef8fa6);
+  --k-material: light-dark(#4f8a2a, #9fcf7a);
+  --k-video: light-dark(#b5512f, #e98a6b);
+  --k-document: light-dark(#5f6a7e, #a7b1c4);
+  --k-data: light-dark(#5f6a7e, #a7b1c4);
+  --k-other: light-dark(#667189, #8f9ab0);
+
+  --check-a: light-dark(#e3e7ed, #2b3445);
+  --check-b: light-dark(#f2f4f7, #323c4f);
+
+  --shadow: light-dark(rgb(28 38 56 / 0.16), rgb(0 0 0 / 0.35));
+  --scrim: light-dark(rgb(28 38 56 / 0.3), rgb(10 14 20 / 0.55));
+
+  --font: 'Recursive Variable', ui-sans-serif, system-ui, sans-serif;
+  --step--1: 0.8125rem;
+  --step-0: 0.9375rem;
+  --step-1: 1.125rem;
+  --step-2: 1.5rem;
+  --r-tile: 6px;
+  --r-chip: 4px;
+
+  font-family: var(--font);
+  font-size: 16px;
+  font-variation-settings: 'CASL' 0, 'MONO' 0;
+  line-height: 1.45;
+  color: var(--text);
+  background: var(--bg);
+  -webkit-font-smoothing: antialiased;
+}
+
+:root[data-scheme='light'] { color-scheme: light; }
+
+* { box-sizing: border-box; }
+body { margin: 0; min-height: 100vh; }
+button, input, select, textarea { font: inherit; color: inherit; }
+
+.mono { font-variation-settings: 'MONO' 1, 'CASL' 0; font-size: 0.92em; }
+
+:focus-visible { outline: 2px solid var(--k-font); outline-offset: 2px; }
+
+/* Transparency checkerboard: the vernacular of every image editor. */
+.checker {
+  background-color: var(--check-a);
+  background-image:
+    conic-gradient(var(--check-b) 25%, transparent 0 50%, var(--check-b) 0 75%, transparent 0);
+  background-size: 16px 16px;
+}
+
+.btn {
+  display: inline-flex; align-items: center; gap: 0.4em;
+  padding: 0.45em 0.9em;
+  border: 1px solid var(--line); border-radius: var(--r-chip);
+  background: var(--raised); cursor: pointer; color: var(--text);
+  font-size: var(--step--1); font-weight: 500;
+  text-decoration: none;
+}
+.btn:hover { border-color: var(--muted); }
+.btn.primary { background: var(--text); color: var(--bg); border-color: var(--text); font-weight: 650; }
+.btn.primary:hover { background: color-mix(in srgb, var(--text) 82%, var(--bg)); }
+.btn.ghost { background: transparent; }
+.btn.danger { color: var(--danger); }
+.btn:disabled { opacity: 0.5; cursor: default; }
+
+.chip {
+  display: inline-flex; align-items: baseline; gap: 0.25em;
+  padding: 0.12em 0.5em;
+  border: 1px solid var(--line); border-radius: var(--r-chip);
+  font-size: var(--step--1); line-height: 1.5; white-space: nowrap;
+  background: transparent;
+}
+.chip .ns { color: var(--faint); }
+.chip.src-human { background: var(--raised); border-color: var(--muted); }
+.chip.src-llm { border-style: dashed; }
+.chip.src-meta { color: var(--muted); }
+
+input.field, select.field, textarea.field {
+  width: 100%;
+  padding: 0.5em 0.7em;
+  border: 1px solid var(--line); border-radius: var(--r-chip);
+  background: var(--bg);
+}
+input.field:focus, textarea.field:focus { border-color: var(--muted); outline: none; }
+
+.visually-hidden {
+  position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition: none !important; animation: none !important; }
+}
+
+/* Font specimens (anything marked .glyphs) are drawn by the server as light glyphs on transparency: white text on
+   the dark theme's dark checkerboard as they are, inverted to dark text on the light theme. */
+:root[data-scheme='light'] img.glyphs { filter: invert(1); }

@@ -13,12 +13,11 @@
 use std::io::{BufRead, Read, Write};
 use std::path::{Path, PathBuf};
 use std::process::Stdio;
-use std::sync::RwLock;
 use std::time::{Duration, Instant};
 
 use anyhow::{Context, Result, bail, ensure};
-use futures_util::StreamExt;
-use sha2::Digest;
+
+use crate::tools::{self, Slot, Status};
 
 /// What ffmpeg can do here.
 #[derive(Clone, Debug)]
@@ -31,27 +30,11 @@ pub(crate) struct Tool {
     opus: bool,
 }
 
-#[derive(Clone, Debug)]
-enum Status {
-    Off,
-    Looking,
-    Downloading,
-    Ready(Tool),
-    Unavailable(String),
-}
-
-static STATUS: RwLock<Status> = RwLock::new(Status::Looking);
-
-fn set(status: Status) {
-    *STATUS.write().unwrap_or_else(std::sync::PoisonError::into_inner) = status;
-}
+static SLOT: Slot<Tool> = Slot::new();
 
 /// The ffmpeg to use, if one is ready. Never waits.
 pub(crate) fn tool() -> Option<Tool> {
-    match &*STATUS.read().unwrap_or_else(std::sync::PoisonError::into_inner) {
-        Status::Ready(t) => Some(t.clone()),
-        _ => None,
-    }
+    SLOT.ready()
 }
 
 /// Whether ffmpeg is ready to encode this format with its reference encoder.
@@ -67,40 +50,43 @@ pub(crate) fn encodes(format: &str) -> bool {
 
 /// One line for the status page.
 pub(crate) fn describe() -> String {
-    match &*STATUS.read().unwrap_or_else(std::sync::PoisonError::into_inner) {
-        Status::Off => "off".into(),
-        Status::Looking => "looking".into(),
-        Status::Downloading => "downloading".into(),
-        Status::Ready(t) => t.version.clone(),
-        Status::Unavailable(why) => format!("unavailable: {why}"),
-    }
+    SLOT.describe(|t| t.version.clone())
 }
 
-/// Find or fetch ffmpeg in the background. `setting` is `auto`, `off` or a path.
+/// Whether there's a static build to download for this machine.
+pub(crate) fn can_download() -> bool {
+    source().is_some()
+}
+
+/// Find or fetch ffmpeg in the background. `setting` is `auto`, `off` or a path. Calling it again (the setting
+/// changed in the portal) drops whatever the last call was doing.
 pub(crate) fn start(setting: &str, tools_dir: PathBuf) {
     let setting = setting.trim().to_owned();
-    if matches!(setting.to_ascii_lowercase().as_str(), "off" | "false" | "0" | "none" | "no") {
-        set(Status::Off);
+    if tools::is_off(&setting) {
+        SLOT.restart(Status::Off);
         return;
     }
+    let generation = SLOT.restart(Status::Looking);
     tokio::spawn(async move {
-        if setting.is_empty() || setting.eq_ignore_ascii_case("auto") {
-            auto(&tools_dir).await;
+        if tools::is_auto(&setting) {
+            auto(generation, &tools_dir).await;
         } else {
             match probe(Path::new(&setting)).await {
-                Ok(t) => ready(t),
+                Ok(t) => ready(generation, t),
                 Err(e) => {
-                    tracing::warn!(path = %setting, error = %format!("{e:#}"), "HOARD_FFMPEG isn't usable");
-                    set(Status::Unavailable(format!("{setting}: {e:#}")));
+                    tracing::warn!(path = %setting, error = %format!("{e:#}"), "the ffmpeg setting isn't usable");
+                    SLOT.set(generation, Status::Unavailable(format!("{setting}: {e:#}")));
                 }
             }
         }
     });
 }
 
-fn ready(t: Tool) {
-    tracing::info!(path = %t.path.display(), version = %t.version, mp3 = t.mp3, vorbis = t.vorbis, opus = t.opus, "ffmpeg ready");
-    set(Status::Ready(t));
+fn ready(generation: u64, t: Tool) {
+    let (path, version, mp3, vorbis, opus) = (t.path.display().to_string(), t.version.clone(), t.mp3, t.vorbis, t.opus);
+    if SLOT.set(generation, Status::Ready(t)) {
+        tracing::info!(%path, %version, mp3, vorbis, opus, "ffmpeg ready");
+    }
 }
 
 fn exe_name() -> &'static str {
@@ -108,34 +94,39 @@ fn exe_name() -> &'static str {
 }
 
 /// A downloaded ffmpeg, then a complete system one, then download (retrying hourly while offline).
-async fn auto(tools_dir: &Path) {
+async fn auto(generation: u64, tools_dir: &Path) {
     let ours = tools_dir.join("ffmpeg").join(exe_name());
     if ours.is_file()
         && let Ok(t) = probe(&ours).await
     {
-        return ready(t);
+        return ready(generation, t);
     }
     if let Ok(t) = probe(Path::new(exe_name())).await {
         if t.mp3 && t.vorbis && t.opus {
-            return ready(t);
+            return ready(generation, t);
         }
         tracing::info!(version = %t.version, "system ffmpeg lacks LAME, libvorbis or libopus; downloading a full build");
     }
     loop {
-        set(Status::Downloading);
-        match download(tools_dir).await {
+        if !SLOT.set(generation, Status::Downloading) {
+            return;
+        }
+        match download(generation, tools_dir).await {
             Ok(path) => match probe(&path).await {
-                Ok(t) => return ready(t),
+                Ok(t) => return ready(generation, t),
                 Err(e) => {
                     tracing::warn!(error = %format!("{e:#}"), "downloaded ffmpeg doesn't run");
-                    set(Status::Unavailable(format!("downloaded ffmpeg doesn't run: {e:#}")));
+                    SLOT.set(generation, Status::Unavailable(format!("downloaded ffmpeg doesn't run: {e:#}")));
                     return;
                 }
             },
             Err(e) => {
+                if !SLOT.current(generation) {
+                    return;
+                }
                 let msg = format!("{e:#}");
                 tracing::warn!(error = %msg, "couldn't download ffmpeg; using built-in encoders, retrying in an hour");
-                set(Status::Unavailable(msg));
+                SLOT.set(generation, Status::Unavailable(msg));
             }
         }
         tokio::time::sleep(Duration::from_secs(3600)).await;
@@ -216,55 +207,29 @@ fn source() -> Option<Source> {
 /// Builds are 30–200 MB; anything bigger isn't what we asked for.
 const MAX_DOWNLOAD: u64 = 400 * 1024 * 1024;
 
-async fn download(tools_dir: &Path) -> Result<PathBuf> {
+async fn download(generation: u64, tools_dir: &Path) -> Result<PathBuf> {
     let src = source().with_context(|| {
         format!(
-            "no ffmpeg build to download for {}/{}; install ffmpeg or set HOARD_FFMPEG",
+            "no ffmpeg build to download for {}/{}; install ffmpeg and give its path in Settings",
             std::env::consts::OS,
             std::env::consts::ARCH
         )
     })?;
-    download_from(&src, tools_dir).await
+    download_from(&src, tools_dir, &|| !SLOT.current(generation)).await
 }
 
-async fn download_from(src: &Source, tools_dir: &Path) -> Result<PathBuf> {
-    let http = reqwest::Client::builder()
-        .connect_timeout(Duration::from_secs(30))
-        .read_timeout(Duration::from_secs(120))
-        .user_agent(concat!("hoard/", env!("CARGO_PKG_VERSION")))
-        .build()?;
+async fn download_from(src: &Source, tools_dir: &Path, cancelled: &(dyn Fn() -> bool + Sync)) -> Result<PathBuf> {
+    let http = tools::client()?;
     tokio::fs::create_dir_all(tools_dir).await?;
     tracing::info!(url = %src.url, "downloading ffmpeg");
-    let resp = http.get(&src.url).send().await?.error_for_status()?;
-    let final_url = resp.url().clone();
-    ensure!(resp.content_length().is_none_or(|n| n <= MAX_DOWNLOAD), "ffmpeg download is unexpectedly large");
     let zip_path = tools_dir.join(format!("ffmpeg-download-{}.zip", std::process::id()));
-    let mut file = tokio::fs::File::create(&zip_path).await?;
-    let mut hasher = sha2::Sha256::new();
-    let mut size = 0u64;
-    let expected_len = resp.content_length();
     let activity = crate::activity::start("ffmpeg", "Downloading ffmpeg for audio conversions", None);
-    let mut stream = resp.bytes_stream();
-    let result: Result<()> = async {
-        while let Some(chunk) = stream.next().await {
-            let chunk = chunk?;
-            size += chunk.len() as u64;
-            ensure!(size <= MAX_DOWNLOAD, "ffmpeg download is unexpectedly large");
-            hasher.update(&chunk);
-            if let Some(len) = expected_len.filter(|&l| l > 0) {
-                activity.progress(size as f32 / len as f32);
-            }
-            tokio::io::AsyncWriteExt::write_all(&mut file, &chunk).await?;
-        }
-        tokio::io::AsyncWriteExt::flush(&mut file).await?;
-        Ok(())
-    }
-    .await;
-    drop(file);
+    let fetched = tools::fetch(&http, &src.url, &zip_path, MAX_DOWNLOAD, &activity, cancelled)
+        .await
+        .context("ffmpeg download")?;
     activity.detail("checking and unpacking");
     let finish = async {
-        result?;
-        let got = hex(&hasher.finalize());
+        let final_url = &fetched.final_url;
         let expected = match &src.checksum {
             Checksum::Sibling => {
                 let text = http.get(format!("{final_url}.sha256")).send().await?.error_for_status()?.text().await?;
@@ -272,21 +237,17 @@ async fn download_from(src: &Source, tools_dir: &Path) -> Result<PathBuf> {
             }
             Checksum::List { url, name } => {
                 let text = http.get(url).send().await?.error_for_status()?.text().await?;
-                text.lines()
-                    .find(|l| l.split_whitespace().nth(1).is_some_and(|n| n.trim_start_matches('*') == name.as_str()))
-                    .and_then(|l| l.split_whitespace().next())
-                    .unwrap_or_default()
-                    .to_ascii_lowercase()
+                tools::sum_for(&text, name).unwrap_or_default()
             }
         };
         ensure!(expected.len() == 64, "the ffmpeg checksum couldn't be read");
-        ensure!(got == expected, "the ffmpeg download doesn't match its published SHA-256");
+        ensure!(fetched.sha256 == expected, "the ffmpeg download doesn't match its published SHA-256");
         let dest = tools_dir.join("ffmpeg");
         let zip = zip_path.clone();
         let exe = crate::heavy::run("ffmpeg-unpack", move || unpack(&zip, &dest)).await??;
         tokio::fs::write(
             tools_dir.join("ffmpeg").join("SOURCE"),
-            format!("{final_url}\nsha256 {got}\nfetched {}\n", crate::db::now()),
+            format!("{final_url}\nsha256 {}\nfetched {}\n", fetched.sha256, crate::db::now()),
         )
         .await
         .ok();
@@ -295,14 +256,6 @@ async fn download_from(src: &Source, tools_dir: &Path) -> Result<PathBuf> {
     let out = finish.await;
     tokio::fs::remove_file(&zip_path).await.ok();
     out
-}
-
-fn hex(bytes: &[u8]) -> String {
-    use std::fmt::Write as _;
-    bytes.iter().fold(String::with_capacity(bytes.len() * 2), |mut s, b| {
-        write!(s, "{b:02x}").ok();
-        s
-    })
 }
 
 /// Take the ffmpeg executable out of the build's zip, wherever it sits inside.
@@ -567,6 +520,7 @@ mod tests {
     async fn downloads_verifies_and_unpacks() {
         use axum::response::{IntoResponse, Redirect};
         use axum::routing::get;
+        use sha2::Digest;
         let mut zip_bytes = Vec::new();
         {
             let mut w = zip::ZipWriter::new(std::io::Cursor::new(&mut zip_bytes));
@@ -574,7 +528,7 @@ mod tests {
             w.write_all(b"pretend ffmpeg").unwrap();
             w.finish().unwrap();
         }
-        let sum = hex(&sha2::Sha256::digest(&zip_bytes));
+        let sum = tools::hex(&sha2::Sha256::digest(&zip_bytes));
         let (z1, z2, s1, s2, s3) = (zip_bytes.clone(), zip_bytes.clone(), sum.clone(), sum.clone(), sum.clone());
         let app = axum::Router::new()
             .route("/latest.zip", get(|| async { Redirect::temporary("/builds/9/ffmpeg.zip") }))
@@ -590,7 +544,7 @@ mod tests {
 
         let dir = tempfile::tempdir().unwrap();
         let sibling = Source { url: format!("{base}/latest.zip"), checksum: Checksum::Sibling };
-        let exe = download_from(&sibling, dir.path()).await.unwrap();
+        let exe = download_from(&sibling, dir.path(), &|| false).await.unwrap();
         assert_eq!(std::fs::read(&exe).unwrap(), b"pretend ffmpeg");
         let source = std::fs::read_to_string(dir.path().join("ffmpeg/SOURCE")).unwrap();
         assert!(source.contains(&format!("sha256 {sum}")) && source.contains("/builds/9/"), "{source}");
@@ -600,11 +554,11 @@ mod tests {
             url: format!("{base}/win.zip"),
             checksum: Checksum::List { url: format!("{base}/sums"), name: "win.zip".into() },
         };
-        assert!(download_from(&list, dir.path()).await.is_ok());
+        assert!(download_from(&list, dir.path(), &|| false).await.is_ok());
 
         let dir = tempfile::tempdir().unwrap();
         let bad = Source { url: format!("{base}/bad.zip"), checksum: Checksum::Sibling };
-        let err = download_from(&bad, dir.path()).await.unwrap_err();
+        let err = download_from(&bad, dir.path(), &|| false).await.unwrap_err();
         assert!(format!("{err:#}").contains("SHA-256"), "{err:#}");
         assert_eq!(std::fs::read_dir(dir.path()).unwrap().count(), 0, "the bad download is cleaned up");
     }

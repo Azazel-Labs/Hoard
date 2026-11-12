@@ -589,6 +589,9 @@ pub struct Stats {
     /// ffmpeg's state: its version line, `downloading`, `off` or `unavailable: <why>`.
     #[serde(default)]
     pub ffmpeg: String,
+    /// Blender's state, for model conversion: its version, `looking`, `downloading`, `off` or `unavailable: <why>`.
+    #[serde(default)]
+    pub blender: String,
     /// A newer Hoard release than this server, if the daily check found one (`HOARD_UPDATE_CHECK`).
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub update: Option<UpdateInfo>,

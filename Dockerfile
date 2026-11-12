@@ -1,6 +1,8 @@
 # syntax=docker/dockerfile:1
 # One image with the server, the CLI, the built portal, and Mesa's lavapipe so model thumbnails render
-# without a GPU. Build: docker build -t hoard .   (add --build-arg WITH_BLENDER=1 for .blend/.fbx conversion)
+# without a GPU. Build: docker build -t hoard .
+# Blender and ffmpeg aren't in the image: switch them on in the portal's Settings and Hoard downloads them into the
+# data volume. The X and GL libraries below are what Blender's official Linux build needs, even run headless.
 
 FROM node:24-slim AS web
 WORKDIR /web
@@ -20,10 +22,9 @@ COPY tools/unreal_export.py ./tools/unreal_export.py
 RUN cargo build --release --locked -p hoardd -p hoard
 
 FROM debian:trixie-slim
-ARG WITH_BLENDER=0
 RUN apt-get update \
  && apt-get install -y --no-install-recommends ca-certificates mesa-vulkan-drivers libvulkan1 fonts-dejavu-core timgm6mb-soundfont \
- && if [ "$WITH_BLENDER" = "1" ]; then apt-get install -y --no-install-recommends blender; fi \
+    libx11-6 libxi6 libxxf86vm1 libxfixes3 libxrender1 libxext6 libxkbcommon0 libsm6 libice6 libgl1 libegl1 \
  && rm -rf /var/lib/apt/lists/* \
  && useradd --system --uid 10001 --home /data hoard && mkdir -p /data && chown hoard /data
 COPY --from=build /src/target/release/hoardd /src/target/release/hoard /usr/local/bin/

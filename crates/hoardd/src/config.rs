@@ -10,7 +10,8 @@ pub(crate) enum StorageKind {
 }
 
 /// What to do with Unreal packages after ingest.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, ValueEnum)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, ValueEnum, serde::Serialize, serde::Deserialize)]
+#[serde(rename_all = "lowercase")]
 pub(crate) enum UnrealConvert {
     /// Leave .uasset files as they are (convert from the portal or API on demand).
     Off,
@@ -85,10 +86,12 @@ pub(crate) struct Config {
     #[arg(long, env = "HOARD_RENDER", default_value_t = true, action = clap::ArgAction::Set)]
     pub(crate) render: bool,
 
-    /// Blender executable. When set, .blend/.fbx/.dae/.usd/.ply/.stl/.3ds models are converted to .glb in the
-    /// background (stored next to the original), which gives them thumbnails and a browser preview.
-    #[arg(long, env = "HOARD_BLENDER")]
-    pub(crate) blender: Option<PathBuf>,
+    /// Blender, for converting .blend/.fbx/.dae/.usd/.ply/.stl/.3ds models to .glb in the background (stored next to
+    /// the original), which gives them thumbnails and a browser preview: `auto` uses an installed Blender, otherwise
+    /// downloads Blender 4.5 LTS into `<data dir>/tools` (Linux and Windows x64); a path uses that binary; `off`
+    /// never runs it. Can be changed in the portal's Settings, which wins over this.
+    #[arg(long, env = "HOARD_BLENDER", default_value = "off")]
+    pub(crate) blender: String,
 
     /// Convert Unreal packages to common formats after ingest: textures to PNG/EXR, sounds to WAV, materials to
     /// JSON, all with Hoard's own reader. Meshes and animations wait for `hoard unreal-worker` (Unreal Editor).
@@ -102,7 +105,8 @@ pub(crate) struct Config {
 
     /// ffmpeg, for MP3/OGG/Opus encoding and for reading audio Hoard can't decode itself (AAC/M4A, Opus, WMA, …):
     /// `auto` uses a system ffmpeg that has LAME, libopus and libvorbis, otherwise downloads a static build into
-    /// `<data dir>/tools` in the background; a path uses that binary; `off` never runs ffmpeg.
+    /// `<data dir>/tools` in the background; a path uses that binary; `off` never runs ffmpeg. Can be changed in the
+    /// portal's Settings.
     #[arg(long, env = "HOARD_FFMPEG", default_value = "auto")]
     pub(crate) ffmpeg: String,
 
@@ -144,12 +148,14 @@ pub(crate) struct Config {
     pub(crate) s3_headers: Vec<String>,
 
     /// OpenAI-compatible base URL for the LLM tagger, e.g. `https://api.openai.com/v1` or
-    /// `http://localhost:11434/v1` (Ollama). Leave unset to run fully offline with the rule tagger only.
-    #[arg(long, env = "HOARD_LLM_URL", requires = "llm_model")]
+    /// `http://localhost:11434/v1` (Ollama). Leave unset (or empty) to run fully offline with the rule tagger only.
+    /// Can be changed in the portal's Settings.
+    #[arg(long, env = "HOARD_LLM_URL")]
     pub(crate) llm_url: Option<String>,
 
-    /// Model name for the LLM tagger, as the endpoint knows it (required with `--llm-url`).
-    #[arg(long, env = "HOARD_LLM_MODEL", requires = "llm_url")]
+    /// Model name for the LLM tagger, as the endpoint knows it (needed with `--llm-url`; without it the tagger
+    /// stays off).
+    #[arg(long, env = "HOARD_LLM_MODEL")]
     pub(crate) llm_model: Option<String>,
 
     #[arg(long, env = "HOARD_LLM_API_KEY", hide_env_values = true)]
@@ -182,8 +188,5 @@ impl Config {
     }
     pub(crate) fn db_path(&self) -> PathBuf {
         self.data_dir.join("hoard.db")
-    }
-    pub(crate) fn llm_enabled(&self) -> bool {
-        self.llm_url.is_some()
     }
 }

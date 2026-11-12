@@ -4,6 +4,7 @@ mod activity;
 mod analyze;
 mod api;
 mod audio;
+mod blender;
 mod blobs;
 mod bundle;
 mod config;
@@ -25,10 +26,12 @@ mod mcp;
 mod meshes;
 mod music;
 mod server;
+mod settings;
 mod sheet;
 mod sources;
 mod tagger;
 mod textures;
+mod tools;
 mod updates;
 mod uploads;
 
@@ -61,6 +64,8 @@ pub(crate) struct Inner {
     /// Upload files currently being written (one writer per file).
     pub(crate) uploads_in_flight: std::sync::Mutex<std::collections::HashSet<String>>,
     pub(crate) http: reqwest::Client,
+    /// Settings changed from the portal, over `cfg`. Read these, not `cfg`, for anything listed in [`settings::Saved`].
+    pub(crate) settings: settings::Store,
 }
 
 pub(crate) type AppState = Arc<Inner>;
@@ -74,7 +79,6 @@ async fn main() -> Result<()> {
         .init();
 
     let cfg = Config::parse();
-    analyze::set_render_enabled(cfg.render, cfg.llm_vision && cfg.llm_enabled());
     music::configure(cfg.soundfont.clone());
     for dir in [cfg.data_dir.clone(), cfg.staging_dir(), cfg.tmp_dir()] {
         std::fs::create_dir_all(&dir).with_context(|| format!("create {}", dir.display()))?;
@@ -82,27 +86,39 @@ async fn main() -> Result<()> {
     let pool = db::open(&cfg.db_path(), &cfg.backups_dir())?;
     let blobs = BlobStore::from_config(&cfg)?;
     let requeued = db::requeue_stale_jobs(&*pool.get()?)?;
+    let settings = settings::Store::load(&cfg, &*pool.get()?)?;
+    let effective = settings.get();
+    analyze::set_render_enabled(cfg.render, effective.llm_vision && effective.llm_enabled());
     let http = reqwest::Client::builder().timeout(Duration::from_secs(180)).build()?;
 
     tracing::info!(
         listen = %cfg.listen,
         data = %cfg.data_dir.display(),
         storage = blobs.label(),
-        llm = cfg.llm_url.as_deref().unwrap_or("off"),
+        llm = effective.llm_url.as_deref().unwrap_or("off"),
         auth = cfg.token.is_some(),
-        blender = cfg.blender.as_ref().map_or_else(|| "off".into(), |p| p.display().to_string()),
+        blender = %effective.blender,
+        ffmpeg = %effective.ffmpeg,
         requeued,
         "starting hoardd"
     );
 
-    let state: AppState =
-        Arc::new(Inner { cfg, pool, blobs, wake: Notify::new(), uploads_in_flight: std::sync::Mutex::default(), http });
+    let state: AppState = Arc::new(Inner {
+        cfg,
+        pool,
+        blobs,
+        wake: Notify::new(),
+        uploads_in_flight: std::sync::Mutex::default(),
+        http,
+        settings,
+    });
     match uploads::sweep_stale(&state) {
         Ok(0) => {}
         Ok(n) => tracing::info!(removed = n, "removed abandoned upload sessions"),
         Err(e) => tracing::warn!(error = %e, "could not sweep old upload sessions"),
     }
-    ffmpeg::start(&state.cfg.ffmpeg, state.cfg.tools_dir());
+    ffmpeg::start(&effective.ffmpeg, state.cfg.tools_dir());
+    convert::start_blender(&state, false);
     updates::start(state.cfg.update_check);
     analyze::warm_renderer();
     jobs::spawn_workers(&state);

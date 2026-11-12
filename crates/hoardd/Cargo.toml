@@ -75,6 +75,10 @@ tower = { version = "0.5", features = ["util"] }
 symphonia = { version = "0.6", default-features = false, features = ["wav", "pcm", "ogg", "vorbis", "flac", "mp3", "aiff", "adpcm"] }
 tempfile = "3.27.0"
 sha2 = "0.11"
+lzma-rust2 = { version = "0.25", default-features = false, features = ["std", "xz"] }
+
+[dev-dependencies]
+lzma-rust2 = { version = "0.25", default-features = false, features = ["std", "xz", "encoder"] }
 
 [target.'cfg(target_os = "linux")'.dependencies]
 rustix = { version = "1", features = ["process", "thread"] }

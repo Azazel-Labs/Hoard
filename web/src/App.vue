@@ -17,6 +17,7 @@ import TagChip from './components/TagChip.vue'
 import UiLayer from './components/UiLayer.vue'
 import CommandPalette from './components/CommandPalette.vue'
 import ShortcutsDialog from './components/ShortcutsDialog.vue'
+import SettingsDialog from './components/SettingsDialog.vue'
 import { showError, showOk, swipeToClose, useTween, withTransition, type Command } from './ui'
 
 type View = 'library' | 'packs'
@@ -613,6 +614,7 @@ const firstLoad = computed(() => loading.value && !items.value.length)
 
 const paletteOpen = ref(false)
 const shortcutsOpen = ref(false)
+const settingsOpen = ref(false)
 const mod = /Mac|iPhone|iPad/.test(navigator.platform) ? '⌘' : 'Ctrl+'
 const commands = computed<Command[]>(() => {
   const out: Command[] = [
@@ -632,6 +634,7 @@ const commands = computed<Command[]>(() => {
     keywords: 'normal maps roughness masks', run: () => (prefs.showSupporting = !prefs.showSupporting),
   })
   if (stats.value?.auth_required) out.push({ id: 'act:token', group: 'Actions', label: getToken() ? 'Change the token' : 'Set the token', keywords: 'auth password', run: () => (showToken.value = true) })
+  out.push({ id: 'act:settings', group: 'Actions', label: 'Settings', keywords: 'blender ffmpeg llm ai tagging unreal admin tools preferences', run: () => (settingsOpen.value = true) })
   out.push({ id: 'act:keys', group: 'Actions', label: 'Keyboard shortcuts', hint: '?', keywords: 'help keys', run: () => (shortcutsOpen.value = true) })
   for (const t of THEMES) {
     out.push({ id: `theme:${t.value}`, group: 'Theme', label: t.label, hint: prefs.theme === t.value ? 'current' : undefined, keywords: 'theme appearance mode', run: () => setTheme(t.value) })
@@ -737,6 +740,13 @@ const commands = computed<Command[]>(() => {
         </div>
         <button v-if="stats?.auth_required" type="button" class="btn ghost" @click="showToken = !showToken">
           {{ getToken() ? 'Token set' : 'Set token' }}
+        </button>
+        <button type="button" class="btn ghost settings-btn" title="Settings" aria-label="Settings" @click="settingsOpen = true">
+          <svg viewBox="0 0 16 16" width="15" height="15" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+            <path d="M2.5 4.5h6M11.5 4.5h2M2.5 11.5h2M7.5 11.5h6" />
+            <circle cx="10" cy="4.5" r="1.6" />
+            <circle cx="6" cy="11.5" r="1.6" />
+          </svg>
         </button>
         <button type="button" class="btn ghost cmdk" :title="`Command palette (${mod}K)`" @click="paletteOpen = true">
           <kbd>{{ mod.replace('+', '') }}</kbd><kbd>K</kbd>
@@ -1025,6 +1035,7 @@ const commands = computed<Command[]>(() => {
     <UploadQueue ref="queue" @created="onCreated" @unauthorized="showToken = true" />
     <CommandPalette v-if="paletteOpen" :commands="commands" @close="paletteOpen = false" @open="openAsset" />
     <ShortcutsDialog v-if="shortcutsOpen" @close="shortcutsOpen = false" />
+    <SettingsDialog v-if="settingsOpen" @close="settingsOpen = false" @unauthorized="showToken = true" />
     <UiLayer />
   </div>
 </template>
@@ -1080,6 +1091,7 @@ const commands = computed<Command[]>(() => {
 .pulse { position: absolute; top: 0.35em; right: 0.3em; width: 6px; height: 6px; border-radius: 50%; background: var(--k-model); animation: blink 1.2s infinite; }
 @keyframes blink { 50% { opacity: 0.25; } }
 .actions { display: flex; gap: 0.5rem; margin-left: auto; }
+.settings-btn { padding-inline: 0.55em; color: var(--muted); }
 .cmdk { gap: 0.2rem; padding-inline: 0.55em; color: var(--muted); }
 .cmdk kbd {
   min-width: 1.5em; padding: 0 0.3em; border: 1px solid var(--line); border-bottom-width: 2px; border-radius: 4px;

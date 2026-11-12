@@ -18,7 +18,9 @@ pub(crate) const SCRUB: &str = "scrub";
 pub(crate) const CONVERT: &str = "convert";
 pub(crate) const UNREAL: &str = "unreal_convert";
 
-const MAX_LLM_ATTEMPTS: i64 = 4;
+/// With the backoff below, the last try comes about 15 minutes after the first: long enough for a local model
+/// that's still downloading on the first start of the compose stack.
+const MAX_LLM_ATTEMPTS: i64 = 5;
 
 pub(crate) fn spawn_workers(state: &AppState) {
     for n in 0..state.cfg.workers.max(1) {
@@ -116,9 +118,10 @@ async fn run(state: &AppState, job: db::JobRow) {
             let msg = format!("{e:#}");
             tracing::error!(id = job.id, kind = %job.kind, error = %msg, "job failed");
             match job.kind.as_str() {
-                // LLM endpoints flake (rate limits, cold local models): back off and retry, and if it keeps
-                // failing, the pack is still usable with rule tags, so mark it ready with a note.
-                LLM_TAG if job.attempts < MAX_LLM_ATTEMPTS => (Some(msg), Some(30 * job.attempts), None),
+                // LLM endpoints flake (rate limits, cold or still-downloading local models): back off (30 s, 2 min,
+                // 4.5 min, 8 min) and retry, and if it keeps failing, the pack is still usable with rule tags, so
+                // mark it ready with a note.
+                LLM_TAG if job.attempts < MAX_LLM_ATTEMPTS => (Some(msg), Some(30 * job.attempts * job.attempts), None),
                 LLM_TAG => (Some(msg.clone()), None, Some((PackStatus::Ready, format!("LLM tagging gave up: {msg}")))),
                 // Ingest moves files out of staging as it goes, so it isn't safely re-runnable.
                 INGEST | RETAG => (Some(msg.clone()), None, Some((PackStatus::Failed, msg))),

@@ -1753,6 +1753,7 @@ dependencies = [
  "infer",
  "ktx2",
  "lofty",
+ "lzma-rust2",
  "midly",
  "mime_guess",
  "object_store",

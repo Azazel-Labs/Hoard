@@ -200,21 +200,44 @@ docker compose -f deploy/compose.yml -f deploy/compose.gpu-dri.yml --env-file de
 
 If the host has no `render` group, use the group that owns the device: `stat -c %g /dev/dri/renderD128`.
 
-**The local LLM.** Both overlays also move the bundled tagger model (`--profile llm` in `compose.private.yml`) onto
-the GPU. NVIDIA swaps in the llama.cpp `server-cuda` image and Intel or AMD the `server-vulkan` image, and both
+**The local LLM.** Both overlays also move the bundled tagger model (the `llm` service) onto the GPU. NVIDIA swaps in the llama.cpp `server-cuda` image and Intel or AMD the `server-vulkan` image, and both
 offload every layer:
 
 ```sh
-docker compose -f deploy/compose.private.yml -f deploy/compose.gpu-nvidia.yml --profile llm --env-file deploy/.env up -d
+docker compose -f deploy/compose.private.yml -f deploy/compose.gpu-nvidia.yml --env-file deploy/.env up -d
 ```
 
 Docker Desktop on Windows passes NVIDIA GPUs through via WSL 2, so the NVIDIA overlay works there. On macOS Docker
 can't reach the GPU, so run `hoardd` natively instead, where it uses Metal.
 
+## AI tagging
+
+Every compose file runs an `llm` service next to Hoard: llama.cpp's server image, which downloads a small vision model
+(`qwen3.5-2b`, about 2 GB) from Hugging Face into the `llm-models` volume on its first start and then serves it on
+the compose network. Hoard sends it each asset's name, path and thumbnail and gets back tags (and, with vision, what's
+in the picture). Until the download finishes, tagging jobs wait and retry. It needs about 3 GB of RAM; on a CPU it
+tags a few assets a minute, and the GPU overlays above make it much faster.
+
+To run a different model, set these in `deploy/.env` (the README's table lists the ones Hoard is tuned for):
+
+```sh
+HOARD_LOCAL_MODEL_HF=Qwen/Qwen3-VL-2B-Instruct-GGUF:Q4_K_M   # Hugging Face repo:quant
+HOARD_LOCAL_MODEL=qwen3-vl-2b                                # the name it's served under
+HOARD_LLM_MODEL=qwen3-vl-2b                                  # the name Hoard asks for (same)
+HOARD_LOCAL_MODEL_ARGS=                                      # empty for models without a thinking mode
+```
+
+To use a hosted model or your own Ollama instead, open **Settings** in the portal and change the address, model and
+key; that takes effect at once. To go without AI tagging, delete the `llm` service from your compose file and set
+`HOARD_LLM_URL=` (empty) in `deploy/.env`, or turn it off in Settings.
+
 ## Model conversion with Blender
 
-Set `HOARD_BLENDER=/usr/bin/blender` (or build the image with `--build-arg WITH_BLENDER=1`). After each ingest, a
-`convert` job exports .blend/.fbx/.dae/.usd*/.ply/.stl/.3ds/.abc/.x3d to GLB with the asset's linked textures laid out
+Open **Settings** in the portal and set Blender to **Automatic**: Hoard uses a Blender already on the PATH, or
+downloads Blender 4.5 LTS from Blender's mirrors into `<data>/tools/blender` (about 350 MB, checksum verified), and
+queues conversion for packs ingested before it was on. **This program** points at a Blender you installed yourself.
+`HOARD_BLENDER` (`off`, `auto` or a path) sets the same thing at startup. Blender 4.5 is used because Blender 5 dropped
+Collada (.dae) import. After each ingest, a `convert` job exports .blend/.fbx/.dae/.usd*/.ply/.stl/.3ds/.abc/.x3d to GLB with the asset's linked textures laid out
 beside it, stores the GLB as a derivative, and renders a thumbnail from it. Conversion runs with a 3-minute timeout per
 file, and failures are logged without blocking anything. The originals are never modified.
 

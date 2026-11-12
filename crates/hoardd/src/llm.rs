@@ -168,11 +168,11 @@ fn load_rows(conn: &rusqlite::Connection, pack_id: &str) -> Result<Vec<Row>> {
 }
 
 async fn chat(state: &AppState, messages: Value) -> Result<Reply> {
-    let cfg = &state.cfg;
+    let cfg = state.settings.get();
     let base = cfg.llm_url.as_deref().context("LLM not configured")?.trim_end_matches('/');
     let url = format!("{base}/chat/completions");
     let mut body = json!({
-        "model": cfg.llm_model.as_deref().context("HOARD_LLM_MODEL is not set")?,
+        "model": cfg.llm_model.as_deref().context("no LLM model is set")?,
         "messages": messages,
         "temperature": 0.2,
         "response_format": { "type": "json_object" },
@@ -321,7 +321,7 @@ pub(crate) async fn tag_pack(state: &AppState, pack_id: &str) -> Result<()> {
         }
 
         let mut content = vec![json!({ "type": "text", "text": listing })];
-        if state.cfg.llm_vision
+        if state.settings.get().llm_vision
             && let Some(url) = batch_sheet(state, batch).await
         {
             content.push(json!({ "type": "image_url", "image_url": { "url": url } }));

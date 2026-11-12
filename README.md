@@ -96,8 +96,7 @@ echo "RENDER_GID=$(getent group render | cut -d: -f3)" >> .env
 docker compose -f compose.yml -f compose.gpu-dri.yml up -d
 ```
 
-Get both overlays from [deploy/](deploy/). They also put the optional local LLM tagger on the GPU (`--profile llm`
-with [compose.private.yml](deploy/compose.private.yml)). Files on a NAS, S3 storage, remote access through Cloudflare
+Get both overlays from [deploy/](deploy/). They also put the bundled local model (AI tagging) on the GPU. Files on a NAS, S3 storage, remote access through Cloudflare
 or Tailscale, and backups are covered in [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md).
 
 ## Build from source
@@ -152,8 +151,20 @@ cargo xtask llm serve qwen3.5-4b      # runs llama.cpp and prints the HOARD_LLM_
 Models land in `models/<id>/model.gguf` and `mmproj.gguf` (`HOARD_MODELS_DIR` to put them elsewhere).
 Serving needs llama.cpp: `curl -LsSf https://llama.app/install.sh | sh`, `brew install llama.cpp` or
 `winget install llama.cpp`. Thinking models are started with reasoning off, since tagging wants a quick JSON answer.
-For the NAS, `deploy/compose.private.yml` has an optional `llm` service (`--profile llm`) that serves a downloaded
-model with llama.cpp's container image.
+With Docker you don't need any of this: every compose file in [deploy/](deploy/) includes an `llm` service (llama.cpp's
+container image) that downloads `qwen3.5-2b` from Hugging Face on its first start and serves it to Hoard. To run
+another model from the table, set its Hugging Face reference and name in `deploy/.env`:
+
+| Model | `HOARD_LOCAL_MODEL_HF` | `HOARD_LOCAL_MODEL_ARGS` |
+|---|---|---|
+| `qwen3.5-2b` | `unsloth/Qwen3.5-2B-GGUF:Q4_K_M` | (default) |
+| `qwen3.5-4b` | `unsloth/Qwen3.5-4B-GGUF:Q4_K_M` | (default) |
+| `qwen3-vl-2b` | `Qwen/Qwen3-VL-2B-Instruct-GGUF:Q4_K_M` | empty |
+| `gemma4-e2b` | `unsloth/gemma-4-E2B-it-GGUF:Q4_K_M` | empty |
+| `lfm2.5-vl-1.6b` | `LiquidAI/LFM2.5-VL-1.6B-GGUF:Q4_0` | empty |
+
+with `HOARD_LOCAL_MODEL` and `HOARD_LLM_MODEL` both set to the model's name. A hosted model (OpenAI, OpenRouter, …)
+or your own Ollama can be set in the portal's **Settings** instead, without a restart.
 
 ### Bulk imports
 
@@ -245,8 +256,8 @@ software rasterizer (`apt install mesa-vulkan-drivers`). Without any adapter, ev
    `HOARD_LLM_VISION`, each batch also gets one numbered contact sheet of its thumbnails (one image instead of
    sixteen), and models appear as a 2x2 sheet rendered from four directions. It only adds; it never removes rule tags, never overrides anything a
    person edited, and can't flatten a specific category into a vaguer one.
-7. **Convert (optional).** With `HOARD_BLENDER` set, .blend/.fbx/.dae/.usd/.ply/.stl/.3ds files are exported to GLB by
-   headless Blender, with their linked textures laid out beside them. The GLB is stored as a derivative that feeds
+7. **Convert (optional).** With Blender switched on (Settings, or `HOARD_BLENDER`), .blend/.fbx/.dae/.usd/.ply/.stl/.3ds
+   files are exported to GLB by headless Blender, with their linked textures laid out beside them. The GLB is stored as a derivative that feeds
    thumbnails, the browser preview and downloads.
 
 Tags carry their source (`meta`, `rule`, `llm`, `human`). Human tags always win, and re-running the offline
@@ -274,7 +285,7 @@ and Opus use ffmpeg's reference encoders (LAME, libvorbis, libopus), as do sourc
 | OBJ (with MTL and textures), binary FBX, STL, PLY, MagicaVoxel | GLB with textures embedded |
 | TTF/OTF | WOFF2, WOFF |
 | WOFF, WOFF2 | TTF/OTF and each other |
-| anything else Blender converted (`HOARD_BLENDER`) | GLB |
+| anything else Blender converted (Settings → Blender) | GLB |
 
 `GET /api/assets/{id}/as/{format}[?max=1024]`; the asset detail lists the formats on offer. 16-bit images stay
 16-bit; HDR going into an 8-bit format is tone-mapped rather than clipped.
@@ -466,7 +477,9 @@ cached as immutable, and blob downloads carry ETags and Range support.
 
 ## Configuration
 
-Every flag has an env var; `hoardd --help` lists them all.
+Every flag has an env var; `hoardd --help` lists them all. Blender, ffmpeg, the LLM tagger and Unreal conversion can
+also be changed while the server runs, from **Settings** in the portal header (behind the write token). A setting saved
+there wins over its flag or env var until you clear it, and survives restarts and backups.
 
 | Env | Default | |
 |---|---|---|
@@ -480,11 +493,11 @@ Every flag has an env var; `hoardd --help` lists them all.
 | `HOARD_STORAGE` | `local` | `local` or `s3` |
 | `HOARD_S3_ENDPOINT` / `_BUCKET` / `_REGION` / `_ACCESS_KEY` / `_SECRET_KEY` / `_HEADERS` | – | S3 backend |
 | `HOARD_RENDER` | `true` | wgpu model thumbnails |
-| `HOARD_BLENDER` | – | path to Blender for format conversion |
+| `HOARD_BLENDER` | `off` | Blender for model conversion: `off`, `auto` (installed, else download 4.5 LTS), or a path |
 | `HOARD_SOUNDFONT` | system GM SoundFont | `.sf2` used to render MIDI |
 | `HOARD_FFMPEG` | `auto` | `auto` (system ffmpeg, else download one), a path, or `off` |
 | `HOARD_UNREAL_CONVERT` | `keep` | after ingest, convert Unreal packages: `off`, `keep` (keep the .uasset too) or `replace` |
-| `HOARD_LLM_URL` / `_MODEL` / `_API_KEY` / `_VISION` / `_BATCH` | – | LLM tagger (URL and model go together) |
+| `HOARD_LLM_URL` / `_MODEL` / `_API_KEY` / `_VISION` / `_BATCH` | – | LLM tagger (on when URL and model are both set) |
 | `HOARD_PUBLIC_URL` | Host header | absolute links for MCP |
 | `HOARD_MAX_UPLOAD_MB` / `_MAX_EXPAND_MB` / `_MAX_FILES` | 16 GiB / 64 GiB / 200k | upload and zip-bomb limits |
 | `HOARD_WORKERS` | `2` | background job workers |

@@ -24,7 +24,10 @@ const BASELINE_VERSION: i64 = 8;
 /// **Append only.** Never edit, reorder or remove a step once it has shipped: databases out there have run it.
 /// And don't change [`BASELINE`] either; a new table, column or index is a new step here. A step can be any SQL
 /// SQLite accepts in a transaction, e.g. `ALTER TABLE packs ADD COLUMN notes TEXT;` or a table rebuild.
-const MIGRATIONS: &[&str] = &[];
+const MIGRATIONS: &[&str] = &[
+    // 9: settings changed from the portal (see `settings.rs`).
+    "CREATE TABLE settings (key TEXT PRIMARY KEY, value TEXT NOT NULL) WITHOUT ROWID;",
+];
 
 /// How many automatic pre-upgrade backups to keep in `<data dir>/backups`.
 const KEEP_UPGRADE_BACKUPS: usize = 5;
@@ -1087,6 +1090,8 @@ mod tests {
         assert_eq!(user_version(&conn).unwrap(), SCHEMA_VERSION);
         let name: String = conn.query_row("SELECT name FROM packs WHERE id = 'p1'", [], |r| r.get(0)).unwrap();
         assert_eq!(name, "Forest");
+        let settings: i64 = conn.query_row("SELECT COUNT(*) FROM settings", [], |r| r.get(0)).unwrap();
+        assert_eq!(settings, 0);
     }
 
     #[test]

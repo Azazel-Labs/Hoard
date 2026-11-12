@@ -33,11 +33,14 @@ services:
       HOARD_S3_SECRET_KEY: ${GARAGE_DEFAULT_SECRET_KEY}
       HOARD_TOKEN: ${HOARD_TOKEN}
       HOARD_PUBLIC_URL: ${HOARD_PUBLIC_URL:-}          # e.g. http://192.168.50.10:7878, for MCP links
-      HOARD_LLM_URL: ${HOARD_LLM_URL:-}
-      HOARD_LLM_MODEL: ${HOARD_LLM_MODEL:-}
-      HOARD_LLM_VISION: ${HOARD_LLM_VISION:-false}
-      HOARD_LLM_BATCH: ${HOARD_LLM_BATCH:-40}
-      HOARD_BLENDER: ${HOARD_BLENDER:-}
+      # The bundled model below. Settings in the portal can point Hoard elsewhere or turn AI tagging off.
+      HOARD_LLM_URL: ${HOARD_LLM_URL-http://llm:8080/v1}
+      HOARD_LLM_MODEL: ${HOARD_LLM_MODEL-qwen3.5-2b}
+      HOARD_LLM_VISION: ${HOARD_LLM_VISION:-true}
+      HOARD_LLM_BATCH: ${HOARD_LLM_BATCH:-12}         # assets per request; small models do better with fewer
+      # Blender and ffmpeg: off, auto (find or download) or a path. Also switchable in the portal's Settings.
+      HOARD_BLENDER: ${HOARD_BLENDER:-off}
+      HOARD_FFMPEG: ${HOARD_FFMPEG:-auto}
       HOARD_UNREAL_CONVERT: ${HOARD_UNREAL_CONVERT:-keep}
       # HTTPS gives browsers HTTP/2 (one connection for the whole thumbnail grid). Self-signed is fine on a private
       # network: accept the warning once. HTTP/3 additionally needs the UDP port below.
@@ -51,21 +54,25 @@ services:
       - "7878:7878"
       - "7878:7878/udp"   # HTTP/3 (QUIC), only used with HOARD_HTTP3=true
 
-  # Optional local model for the LLM tagger: `docker compose --profile llm ... up -d`. Download one first with
-  # `cargo xtask models fetch` (any machine) and copy models/<id>/ to the NAS path below. Then set
-  # HOARD_LLM_URL=http://llm:8080/v1 and HOARD_LLM_MODEL=<id> in deploy/.env. CPU-only; a 2B model tags a pack of
-  # a few hundred files in minutes on a recent NAS CPU, slower on low-power ones.
+  # A small local vision model for AI tagging and descriptions, served by llama.cpp. It downloads the model from
+  # Hugging Face on first start (about 2 GB, kept in the volume below) and runs on the CPU in about 3 GB of RAM;
+  # a GPU overlay (compose.gpu-*.yml) moves it onto the GPU. Other models: docs/DEPLOYMENT.md, "AI tagging". Don't want
+  # it? Delete this service and set HOARD_LLM_URL= (empty), or point Hoard at another endpoint in Settings.
   llm:
     image: ghcr.io/ggml-org/llama.cpp:server
-    profiles: [llm]
     restart: unless-stopped
+    environment:
+      LLAMA_CACHE: /models
+      # `<Hugging Face repo>:<quantization>`; the vision projector (mmproj) comes along automatically.
+      LLAMA_ARG_HF_REPO: ${HOARD_LOCAL_MODEL_HF:-unsloth/Qwen3.5-2B-GGUF:Q4_K_M}
+      LLAMA_ARG_ALIAS: ${HOARD_LOCAL_MODEL:-qwen3.5-2b}
+      LLAMA_ARG_CTX_SIZE: "16384"
+      LLAMA_ARG_HOST: 0.0.0.0
+      LLAMA_ARG_PORT: "8080"
+    # Thinking models answer straight away: tagging wants quick JSON, not a chain of thought.
+    command: ${HOARD_LOCAL_MODEL_ARGS---reasoning-budget 0}
     volumes:
-      - /volume1/hoard/models:/models:ro
-    command: >-
-      -m /models/${HOARD_LOCAL_MODEL:-qwen3.5-2b}/model.gguf
-      --mmproj /models/${HOARD_LOCAL_MODEL:-qwen3.5-2b}/mmproj.gguf
-      --host 0.0.0.0 --port 8080 -c 16384 --alias ${HOARD_LOCAL_MODEL:-qwen3.5-2b}
-      ${HOARD_LOCAL_MODEL_ARGS---reasoning-budget 0}
+      - /volume1/hoard/models:/models
 
   cloudflared:
     image: cloudflare/cloudflared:latest

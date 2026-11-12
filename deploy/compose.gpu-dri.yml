@@ -1,5 +1,5 @@
 # Intel or AMD GPU (including the integrated graphics in most NAS and mini-PC CPUs) for Hoard's model thumbnails and
-# the optional local LLM, both over Vulkan with Mesa's drivers (already in the images). Layer it on any compose file:
+# the local model, both over Vulkan with Mesa's drivers (already in the images). Layer it on any compose file:
 #   RENDER_GID=$(getent group render | cut -d: -f3) \
 #     docker compose -f deploy/compose.yml -f deploy/compose.gpu-dri.yml up -d
 # The host needs /dev/dri (ls /dev/dri should show renderD128). Hoard runs as an unprivileged user, so it joins the
@@ -12,9 +12,8 @@ services:
     group_add:
       - "${RENDER_GID:?set RENDER_GID to the host's render group id: getent group render | cut -d: -f3}"
 
-  # Only started with `--profile llm` (compose.private.yml defines the model it serves).
+  # The local model (the compose file you layer this on defines which one).
   llm:
-    profiles: [llm]
     image: ghcr.io/ggml-org/llama.cpp:server-vulkan
     environment:
       LLAMA_ARG_N_GPU_LAYERS: "999"   # put the whole model on the GPU

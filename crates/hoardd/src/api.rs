@@ -43,6 +43,7 @@ pub(crate) fn router(state: &AppState) -> Router<AppState> {
         .route("/api/admin/scrub", post(admin_scrub))
         .route("/api/admin/gc", post(admin_gc))
         .route("/api/admin/backup", post(admin_backup))
+        .route("/api/admin/settings", get(get_settings).put(put_settings))
         .merge(crate::uploads::router())
         .route_layer(middleware::from_fn_with_state(std::sync::Arc::clone(state), require_token));
 
@@ -100,7 +101,7 @@ async fn require_token(State(state): State<AppState>, req: Request, next: Next) 
 // Stats / packs
 
 async fn stats(State(state): State<AppState>) -> ApiResult<Json<Stats>> {
-    let llm_enabled = state.cfg.llm_enabled();
+    let llm_enabled = state.settings.get().llm_enabled();
     let storage = state.blobs.label().to_owned();
     let auth_required = state.cfg.token.is_some();
     let s = db::call(&state.pool, move |c| {
@@ -126,6 +127,7 @@ async fn stats(State(state): State<AppState>) -> ApiResult<Json<Stats>> {
             )?,
             version: env!("CARGO_PKG_VERSION").to_owned(),
             ffmpeg: crate::ffmpeg::describe(),
+            blender: crate::blender::describe(),
             update: crate::updates::available(),
             renderer: crate::analyze::describe_renderer(),
         })
@@ -305,7 +307,8 @@ async fn retag_pack(
     body: Option<Json<RetagBody>>,
 ) -> ApiResult<StatusCode> {
     let body = body.map_or(RetagBody { rules: true, llm: None }, |Json(b)| b);
-    let llm = body.llm.unwrap_or(state.cfg.llm_enabled()) && state.cfg.llm_enabled();
+    let llm_on = state.settings.get().llm_enabled();
+    let llm = body.llm.unwrap_or(llm_on) && llm_on;
     if !body.rules && !llm {
         return Err(AppError::bad_request("nothing to do: rules=false and LLM is off"));
     }
@@ -1328,6 +1331,92 @@ async fn admin_backup(State(state): State<AppState>) -> ApiResult<Json<Value>> {
     })
     .await?;
     Ok(Json(json!({ "path": path })))
+}
+
+// ---------------------------------------------------------------------------------------------
+// Settings
+
+/// A tool's line in the settings panel. `describe` is its `tools::Slot::describe` text.
+fn tool_setting(value: &str, flag: &str, saved: bool, describe: &str, can_download: bool) -> Value {
+    let (state, detail) = match describe {
+        "off" | "looking" | "downloading" => (describe, ""),
+        s => s.strip_prefix("unavailable: ").map_or(("ready", s), |why| ("unavailable", why)),
+    };
+    json!({
+        "value": value,
+        "default": flag,
+        "saved": saved,
+        "state": state,
+        "detail": detail,
+        "can_download": can_download,
+    })
+}
+
+fn settings_json(state: &AppState) -> Value {
+    let cfg = &state.cfg;
+    let saved = state.settings.saved();
+    let now = state.settings.get();
+    json!({
+        "blender": tool_setting(
+            &now.blender, &cfg.blender, saved.blender.is_some(), &crate::blender::describe(), crate::blender::can_download(),
+        ),
+        "ffmpeg": tool_setting(
+            &now.ffmpeg, &cfg.ffmpeg, saved.ffmpeg.is_some(), &crate::ffmpeg::describe(), crate::ffmpeg::can_download(),
+        ),
+        "unreal_convert": {
+            "value": now.unreal_convert,
+            "default": cfg.unreal_convert,
+            "saved": saved.unreal_convert.is_some(),
+        },
+        // The key is never sent back, only whether there is one.
+        "llm": {
+            "url": now.llm_url.as_deref().unwrap_or(""),
+            "model": now.llm_model.as_deref().unwrap_or(""),
+            "has_key": now.llm_api_key.is_some(),
+            "vision": now.llm_vision,
+            "enabled": now.llm_enabled(),
+            "saved": saved.llm_url.is_some() || saved.llm_model.is_some() || saved.llm_api_key.is_some()
+                || saved.llm_vision.is_some(),
+            "default": {
+                "url": cfg.llm_url.as_deref().unwrap_or(""),
+                "model": cfg.llm_model.as_deref().unwrap_or(""),
+                "has_key": cfg.llm_api_key.is_some(),
+                "vision": cfg.llm_vision,
+            },
+        },
+    })
+}
+
+async fn get_settings(State(state): State<AppState>) -> Json<Value> {
+    Json(settings_json(&state))
+}
+
+/// Change settings: a JSON object of the ones to change, `null` to go back to the server's flag. Whatever changed
+/// takes effect at once (a tool switched on starts looking for, or downloading, its program).
+async fn put_settings(State(state): State<AppState>, Json(patch): Json<Value>) -> ApiResult<Json<Value>> {
+    let st = std::sync::Arc::clone(&state);
+    let (before, after) = db::call(&state.pool, move |c| match st.settings.update(&st.cfg, c, &patch) {
+        Ok(v) => Ok(Ok(v)),
+        Err(Ok(msg)) => Ok(Err(msg)),
+        Err(Err(e)) => Err(e),
+    })
+    .await?
+    .map_err(AppError::bad_request)?;
+    if before.blender != after.blender {
+        crate::convert::start_blender(&state, true);
+    }
+    if before.ffmpeg != after.ffmpeg {
+        crate::ffmpeg::start(&after.ffmpeg, state.cfg.tools_dir());
+    }
+    crate::analyze::set_render_enabled(state.cfg.render, after.llm_vision && after.llm_enabled());
+    tracing::info!(
+        blender = %after.blender,
+        ffmpeg = %after.ffmpeg,
+        unreal = ?after.unreal_convert,
+        llm = after.llm_url.as_deref().unwrap_or("off"),
+        "settings changed"
+    );
+    Ok(Json(settings_json(&state)))
 }
 
 #[cfg(test)]

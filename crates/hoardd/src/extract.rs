@@ -39,7 +39,7 @@ pub(crate) struct Request {
 /// After ingest: queue conversion if the pack has Unreal packages and conversion is on. Returns whether it did;
 /// the conversion job then finishes the ingest pipeline.
 pub(crate) fn maybe_enqueue(state: &AppState, conn: &Connection, pack_id: &str) -> Result<bool> {
-    let mode = state.cfg.unreal_convert;
+    let mode = state.settings.get().unreal_convert;
     if mode == UnrealConvert::Off || count_packages(conn, pack_id)? == 0 {
         return Ok(false);
     }

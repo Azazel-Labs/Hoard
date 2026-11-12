@@ -633,7 +633,7 @@ pub(crate) fn finish_rules_stage(
     pack_id: &str,
     want_llm: bool,
 ) -> Result<()> {
-    if want_llm && state.cfg.llm_enabled() {
+    if want_llm && state.settings.get().llm_enabled() {
         db::set_pack_status(conn, pack_id, PackStatus::Analyzing, None)?;
         db::enqueue(conn, "llm_tag", Some(pack_id), &serde_json::json!({}))?;
         state.wake.notify_one();

@@ -165,10 +165,53 @@ export interface Stats {
   version: string
   /** ffmpeg: its version line, `downloading`, `looking`, `off` or `unavailable: …`. */
   ffmpeg?: string
+  /** Blender, for model conversion: its version, `downloading`, `looking`, `off` or `unavailable: …`. */
+  blender?: string
   /** A newer Hoard release, when the server's daily check found one (`HOARD_UPDATE_CHECK`). */
   update?: { version: string; url: string }
   /** Model thumbnails: `gpu: <adapter> (<api>)`, `cpu: …` (software), `starting`, `off` or `unavailable: …`. */
   renderer?: string
+}
+
+/** An outside program Hoard can use, as the Settings dialog shows it. */
+export interface ToolSetting {
+  /** `off`, `auto` or a path. */
+  value: string
+  /** What the server was started with (`HOARD_*`), used when nothing is saved. */
+  default: string
+  saved: boolean
+  state: 'off' | 'looking' | 'downloading' | 'ready' | 'unavailable'
+  /** The version when ready, why when unavailable. */
+  detail: string
+  can_download: boolean
+}
+
+export type UnrealConvert = 'off' | 'keep' | 'replace'
+
+export interface Settings {
+  blender: ToolSetting
+  ffmpeg: ToolSetting
+  unreal_convert: { value: UnrealConvert; default: UnrealConvert; saved: boolean }
+  llm: {
+    url: string
+    model: string
+    has_key: boolean
+    vision: boolean
+    enabled: boolean
+    saved: boolean
+    default: { url: string; model: string; has_key: boolean; vision: boolean }
+  }
+}
+
+/** Settings to change; `null` goes back to the server's default. */
+export interface SettingsPatch {
+  blender?: string | null
+  ffmpeg?: string | null
+  unreal_convert?: UnrealConvert | null
+  llm_url?: string | null
+  llm_model?: string | null
+  llm_api_key?: string | null
+  llm_vision?: boolean | null
 }
 
 export interface SearchParams {
@@ -305,6 +348,13 @@ export const api = {
     }),
   tags: (prefix: string) => request<Facet[]>(`/api/tags?prefix=${encodeURIComponent(prefix)}&limit=12`),
   activity: () => request<{ items: ActivityItem[] }>('/api/activity'),
+  settings: () => request<Settings>('/api/admin/settings'),
+  saveSettings: (patch: SettingsPatch) =>
+    request<Settings>('/api/admin/settings', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(patch),
+    }),
   /** Start or look in on a "download as" conversion; answers when it moves on, or after `wait` seconds. */
   asStatus: (a: { id: string }, format: string, max?: number, wait = 5) =>
     request<ConversionStatus>(`/api/assets/${a.id}/as/${format}/status?wait=${wait}${max ? `&max=${max}` : ''}`),

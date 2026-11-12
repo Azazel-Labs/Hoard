@@ -1,4 +1,4 @@
-# NVIDIA GPU for Hoard (model thumbnails over Vulkan) and the optional local LLM (CUDA). Layer it on any of the
+# NVIDIA GPU for Hoard (model thumbnails over Vulkan) and the local model (CUDA). Layer it on any of the
 # compose files here:
 #   docker compose -f deploy/compose.yml -f deploy/compose.gpu-nvidia.yml up -d
 # Needs the NVIDIA driver and the NVIDIA Container Toolkit on the host (`nvidia-ctk runtime configure --runtime=docker`,
@@ -16,9 +16,8 @@ services:
               count: all
               capabilities: [gpu, graphics, compute, utility]
 
-  # Only started with `--profile llm` (compose.private.yml defines the model it serves).
+  # The local model (the compose file you layer this on defines which one).
   llm:
-    profiles: [llm]
     image: ghcr.io/ggml-org/llama.cpp:server-cuda
     environment:
       LLAMA_ARG_N_GPU_LAYERS: "999"   # put the whole model on the GPU

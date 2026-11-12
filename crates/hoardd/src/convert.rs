@@ -41,9 +41,53 @@ else:
 bpy.ops.export_scene.gltf(filepath=dst, export_format="GLB", export_animations=True, export_apply=True)
 "#;
 
-/// After ingest: queue a conversion job if Blender is configured and the pack has convertible files.
+/// Find or fetch Blender for the current setting. When it becomes ready because the setting was just changed
+/// (`changed`) or because it was just downloaded, packs that were ingested without it get their conversions queued.
+/// A plain restart doesn't: those packs were either converted already or failed for reasons a rerun won't fix.
+pub(crate) fn start_blender(state: &AppState, changed: bool) {
+    let st = std::sync::Arc::clone(state);
+    let setting = state.settings.get().blender.clone();
+    crate::blender::start(&setting, state.cfg.tools_dir(), move |downloaded| {
+        if !(changed || downloaded) {
+            return;
+        }
+        tokio::spawn(async move {
+            match db::call(&st.pool, |c| backfill(c)).await {
+                Ok(0) => {}
+                Ok(n) => {
+                    tracing::info!(packs = n, "queued Blender conversions for packs that waited for it");
+                    st.wake.notify_one();
+                }
+                Err(e) => tracing::warn!(error = %format!("{e:#}"), "could not queue Blender conversions"),
+            }
+        });
+    });
+}
+
+/// Queue a conversion for every ready pack with a convertible file that has no GLB yet and no conversion pending.
+fn backfill(conn: &Connection) -> Result<usize> {
+    let placeholders = vec!["?"; CONVERTIBLE.len()].join(",");
+    let args: Vec<&dyn rusqlite::ToSql> = CONVERTIBLE.iter().map(|e| e as &dyn rusqlite::ToSql).collect();
+    let packs: Vec<String> = conn
+        .prepare(&format!(
+            "SELECT DISTINCT a.pack_id FROM assets a JOIN packs p ON p.id = a.pack_id
+              WHERE p.status = 'ready' AND a.ext IN ({placeholders})
+                AND NOT EXISTS (SELECT 1 FROM derivatives d WHERE d.asset_id = a.id AND d.kind = 'glb')
+                AND NOT EXISTS (SELECT 1 FROM jobs j WHERE j.pack_id = a.pack_id AND j.kind = '{kind}'
+                                  AND j.status IN ('queued', 'running'))",
+            kind = jobs::CONVERT,
+        ))?
+        .query_map(args.as_slice(), |r| r.get(0))?
+        .collect::<rusqlite::Result<_>>()?;
+    for p in &packs {
+        db::enqueue(conn, jobs::CONVERT, Some(p), &serde_json::json!({}))?;
+    }
+    Ok(packs.len())
+}
+
+/// After ingest: queue a conversion job if Blender is ready and the pack has convertible files.
 pub(crate) fn maybe_enqueue(state: &AppState, conn: &Connection, pack_id: &str) -> Result<()> {
-    if state.cfg.blender.is_none() {
+    if crate::blender::tool().is_none() {
         return Ok(());
     }
     let placeholders = vec!["?"; CONVERTIBLE.len()].join(",");
@@ -69,7 +113,7 @@ struct Todo {
 }
 
 pub(crate) async fn convert_pack(state: &AppState, pack_id: &str) -> Result<()> {
-    let blender = state.cfg.blender.clone().context("HOARD_BLENDER is not set")?;
+    let blender = crate::blender::tool().context("Blender isn't available; turn it on in Settings")?.path;
     let pid = pack_id.to_owned();
     let todo: Vec<Todo> = db::call(&state.pool, move |c| {
         let mut stmt = c.prepare(

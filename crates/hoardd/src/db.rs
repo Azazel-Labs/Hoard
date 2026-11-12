@@ -128,6 +128,21 @@ const MIGRATIONS: &[&str] = &[
     // 19: tags merged into others. Tagging maps the old name to the new one, so a merged tag stays merged when the
     // taggers run again (see `merge_tags`).
     "CREATE TABLE tag_aliases (tag TEXT PRIMARY KEY, into_tag TEXT NOT NULL) WITHOUT ROWID;",
+    // 20: search by look (see `looks`): a palette, visual descriptor and perceptual hash per thumbnail, and image
+    // embeddings from an optional model. Keyed by the thumbnail's blob, so a new thumbnail is simply a new row.
+    "CREATE TABLE looks (
+       thumb_hash TEXT PRIMARY KEY,
+       version    INTEGER NOT NULL,
+       palette    BLOB NOT NULL,
+       descriptor BLOB NOT NULL,
+       phash      INTEGER NOT NULL
+     ) WITHOUT ROWID;
+     CREATE TABLE look_embeddings (
+       thumb_hash TEXT NOT NULL,
+       model      TEXT NOT NULL,
+       vector     BLOB NOT NULL,
+       PRIMARY KEY (thumb_hash, model)
+     ) WITHOUT ROWID;",
 ];
 
 /// How many automatic pre-upgrade backups to keep in `<data dir>/backups`.
@@ -692,6 +707,7 @@ fn asset_from_row(r: &Row<'_>) -> rusqlite::Result<Asset> {
         origin: None,
         unreal: None,
         formats: Vec::new(),
+        palette: Vec::new(),
     })
 }
 
@@ -769,6 +785,10 @@ pub(crate) fn get_asset(conn: &Connection, id: &str) -> Result<Option<Asset>> {
         .collect::<rusqlite::Result<_>>()?;
     asset.origin = crate::extract::origin_of(conn, &asset.id)?;
     asset.unreal = crate::extract::status_of(conn, &asset.id)?;
+    let thumb: Option<String> = conn.query_row("SELECT thumb_hash FROM assets WHERE id = ?1", [id], |r| r.get(0))?;
+    if let Some(thumb) = thumb {
+        asset.palette = crate::looks::palette_of(conn, &thumb)?;
+    }
     Ok(Some(asset))
 }
 
@@ -1160,14 +1180,45 @@ struct Filter {
     ranked: bool,
 }
 
-fn build_filter(q: &SearchQuery, include_kind: bool) -> Filter {
+/// Assets ranked by how they look (see `looks`): thumbnail hashes with a score, best first.
+#[derive(Debug, Default)]
+pub(crate) struct LookRank {
+    pub(crate) scores: Vec<(String, f32)>,
+    /// Leave this asset out (the one "more like this" started from).
+    pub(crate) exclude: Option<String>,
+    /// With a text query: match either the words or the look, and rank by both (text-to-image search). Without
+    /// it, only assets in `scores` match.
+    pub(crate) blend: bool,
+}
+
+const FTS_JOIN: &str = "JOIN (SELECT asset_id, bm25(assets_fts, 0.0, 8.0, 4.0, 3.0, 1.0, 5.0) AS rank
+          FROM assets_fts WHERE assets_fts MATCH ?) f ON f.asset_id = a.id";
+const LOOK_JOIN: &str = "JOIN temp.look_rank lr ON lr.hash = a.thumb_hash";
+
+fn build_filter(q: &SearchQuery, include_kind: bool, look: Option<&LookRank>) -> Filter {
     let mut f = Filter { join: String::new(), clauses: Vec::new(), params: Vec::new(), ranked: false };
-    if let Some(fts) = q.q.as_deref().and_then(fts_query) {
-        "JOIN (SELECT asset_id, bm25(assets_fts, 0.0, 8.0, 4.0, 3.0, 1.0, 5.0) AS rank
-          FROM assets_fts WHERE assets_fts MATCH ?) f ON f.asset_id = a.id"
-            .clone_into(&mut f.join);
-        f.params.push(SqlValue::Text(fts));
-        f.ranked = true;
+    let fts = q.q.as_deref().and_then(fts_query);
+    match (fts, look) {
+        (Some(fts), Some(look)) if look.blend => {
+            f.join = format!("LEFT {FTS_JOIN} LEFT {LOOK_JOIN}");
+            f.clauses.push("(f.asset_id IS NOT NULL OR lr.hash IS NOT NULL)".to_owned());
+            f.params.push(SqlValue::Text(fts));
+            f.ranked = true;
+        }
+        (fts, look) => {
+            if let Some(fts) = fts {
+                FTS_JOIN.clone_into(&mut f.join);
+                f.params.push(SqlValue::Text(fts));
+                f.ranked = true;
+            }
+            if look.is_some() {
+                f.join = format!("{} {LOOK_JOIN}", f.join);
+            }
+        }
+    }
+    if let Some(id) = look.and_then(|l| l.exclude.as_deref()) {
+        f.clauses.push("a.id != ?".to_owned());
+        f.params.push(SqlValue::Text(id.to_owned()));
     }
     if include_kind && let Some(kind) = q.kind.as_deref().filter(|k| !k.is_empty()) {
         f.clauses.push("a.kind = ?".to_owned());
@@ -1237,9 +1288,30 @@ pub(crate) struct SearchPage {
 }
 
 pub(crate) fn search(conn: &Connection, q: &SearchQuery, with_facets: bool) -> Result<SearchPage> {
+    search_ranked(conn, q, with_facets, None)
+}
+
+/// [`search`], optionally ranked by look: only assets whose thumbnail is in `look` match (or, blended, those and the
+/// text matches), best first unless another order is asked for.
+pub(crate) fn search_ranked(
+    conn: &Connection,
+    q: &SearchQuery,
+    with_facets: bool,
+    look: Option<&LookRank>,
+) -> Result<SearchPage> {
     let limit = i64::from(q.limit.unwrap_or(60).clamp(1, 5000));
     let offset = i64::from(q.offset.unwrap_or(0));
-    let f = build_filter(q, true);
+    if let Some(look) = look {
+        conn.execute_batch(
+            "CREATE TEMP TABLE IF NOT EXISTS look_rank (hash TEXT PRIMARY KEY, score REAL NOT NULL) WITHOUT ROWID;
+             DELETE FROM temp.look_rank;",
+        )?;
+        let mut insert = conn.prepare_cached("INSERT OR REPLACE INTO temp.look_rank (hash, score) VALUES (?1, ?2)")?;
+        for (hash, score) in &look.scores {
+            insert.execute(params![hash, f64::from(*score)])?;
+        }
+    }
+    let f = build_filter(q, true, look);
     let where_sql = f.where_sql();
     let base = format!(
         "FROM assets a JOIN packs p ON p.id = a.pack_id JOIN blobs b ON b.hash = a.blob_hash {} {where_sql}",
@@ -1250,6 +1322,12 @@ pub(crate) fn search(conn: &Connection, q: &SearchQuery, with_facets: bool) -> R
         Some("name") => "a.name COLLATE NOCASE ASC",
         Some("size") => "b.size DESC",
         Some("old") => "a.created_at ASC, a.path ASC",
+        Some("new") => "a.created_at DESC, a.path ASC",
+        // A word match counts about as much as a fairly close look.
+        _ if look.is_some_and(|l| l.blend) && f.ranked => {
+            "(CASE WHEN f.asset_id IS NULL THEN 0.0 ELSE 0.25 END + COALESCE(lr.score, 0.0)) DESC, a.id"
+        }
+        _ if look.is_some() => "lr.score DESC, a.id",
         _ if f.ranked => "f.rank ASC",
         _ => "a.created_at DESC, a.path ASC",
     };
@@ -1257,7 +1335,7 @@ pub(crate) fn search(conn: &Connection, q: &SearchQuery, with_facets: bool) -> R
     let total: i64 = conn.query_row(&format!("SELECT COUNT(*) {base}"), params_from_iter(&f.params), |r| r.get(0))?;
     let supporting_hidden: i64 = if q.hide_supporting {
         let shown = SearchQuery { hide_supporting: false, ..q.clone() };
-        let fs = build_filter(&shown, true);
+        let fs = build_filter(&shown, true, look);
         let mut clauses = fs.clauses.clone();
         clauses.push(SUPPORTING.to_owned());
         conn.query_row(
@@ -1280,7 +1358,7 @@ pub(crate) fn search(conn: &Connection, q: &SearchQuery, with_facets: bool) -> R
     let (mut kinds, mut tags) = (Vec::new(), Vec::new());
     if with_facets {
         // Kind facet ignores the kind filter so the sidebar can show "switch to audio (42)".
-        let fk = build_filter(q, false);
+        let fk = build_filter(q, false, look);
         let mut stmt = conn.prepare(&format!(
             "SELECT a.kind, COUNT(*) FROM assets a {} {} GROUP BY a.kind ORDER BY 2 DESC",
             fk.join,
@@ -1633,6 +1711,41 @@ mod tests {
         );
         let q = SearchQuery { q: Some("rock".into()), ..Default::default() };
         assert_eq!(search(&conn, &q, false).unwrap().total, 2, "search finds the new name");
+    }
+
+    #[test]
+    fn look_ranked_search_keeps_filters_and_order() {
+        let dir = tempfile::tempdir().unwrap();
+        let pool = open(&dir.path().join("hoard.db"), &dir.path().join("backups")).unwrap();
+        let conn = pool.get().unwrap();
+        conn.execute_batch(
+            "INSERT INTO blobs (hash, size, created_at) VALUES ('h1', 1, 'x'), ('h2', 1, 'x'), ('h3', 1, 'x');
+             INSERT INTO packs (id, name, status, tags, created_at) VALUES ('p1', 'Rocks', 'ready', '[]', 'x');
+             INSERT INTO assets (id, pack_id, blob_hash, path, name, ext, kind, thumb_hash, created_at, updated_at) VALUES
+               ('a1', 'p1', 'h1', 'grey rock.png', 'grey rock', 'png', 'texture', 't1', 'x', 'x'),
+               ('a2', 'p1', 'h2', 'mossy rock.png', 'mossy rock', 'png', 'texture', 't2', 'x', 'x'),
+               ('a3', 'p1', 'h3', 'rock.glb', 'rock', 'glb', 'model', 't3', 'x', 'x');
+             INSERT INTO assets_fts (asset_id, name) VALUES ('a1', 'grey rock'), ('a2', 'mossy rock'), ('a3', 'rock');",
+        )
+        .unwrap();
+        let ids = |page: SearchPage| page.items.into_iter().map(|a| a.id).collect::<Vec<_>>();
+        let rank = LookRank {
+            scores: vec![("t3".into(), 0.9), ("t2".into(), 0.8), ("t1".into(), 0.7)],
+            exclude: Some("a1".into()),
+            blend: false,
+        };
+        let q = SearchQuery::default();
+        assert_eq!(ids(search_ranked(&conn, &q, true, Some(&rank)).unwrap()), ["a3", "a2"], "best first, minus a1");
+        let q = SearchQuery { kind: Some("texture".into()), ..Default::default() };
+        let page = search_ranked(&conn, &q, true, Some(&rank)).unwrap();
+        assert_eq!(page.kinds.len(), 2, "the kind facet counts the ranked set");
+        assert_eq!(ids(page), ["a2"]);
+
+        // Blended (text-to-image): word matches and look matches both count.
+        let rank = LookRank { scores: vec![("t3".into(), 0.2)], exclude: None, blend: true };
+        let q = SearchQuery { q: Some("mossy".into()), ..Default::default() };
+        assert_eq!(ids(search_ranked(&conn, &q, false, Some(&rank)).unwrap()), ["a2", "a3"]);
+        assert_eq!(ids(search(&conn, &q, false).unwrap()), ["a2"], "a plain search is unchanged");
     }
 
     #[test]

@@ -53,7 +53,20 @@ const settingsSection = ref(initial.section || 'appearance')
 type Named = { id: string; name: string }
 const filters = reactive({
   q: '', kind: '', tags: [] as string[], pack: null as Named | null, collection: null as Named | null, sort: '',
+  /** Assets that look like this one, most alike first. */
+  similar: null as Named | null,
+  /** Assets with much of this colour (hex), most of it first. */
+  color: '',
 })
+/** Colours to search by in one click; the picker beside them does any other. */
+const COLOR_PRESETS: { hex: string; name: string }[] = [
+  { hex: '#b8322a', name: 'Red' }, { hex: '#e07b28', name: 'Orange' }, { hex: '#e8c234', name: 'Yellow' },
+  { hex: '#4f8a2e', name: 'Green' }, { hex: '#2a9d8f', name: 'Teal' }, { hex: '#2f6fd0', name: 'Blue' },
+  { hex: '#7b4bb3', name: 'Purple' }, { hex: '#d9599a', name: 'Pink' }, { hex: '#7a5230', name: 'Brown' },
+  { hex: '#d6c09a', name: 'Sand' }, { hex: '#8a8a8a', name: 'Grey' }, { hex: '#4a5560', name: 'Slate' },
+  { hex: '#1c1c1c', name: 'Black' }, { hex: '#f2f2f0', name: 'White' },
+]
+
 const collections = ref<Collection[]>([])
 const items = ref<Asset[]>([])
 const total = ref(0)
@@ -106,6 +119,8 @@ async function runSearch(append = false) {
       pack: filters.pack?.id,
       collection: filters.collection?.id,
       sort: filters.sort || undefined,
+      similar: filters.similar?.id,
+      color: filters.color || undefined,
       limit: PAGE,
       offset: append ? items.value.length : 0,
       hide_supporting: !prefs.showSupporting,
@@ -140,7 +155,10 @@ watch(() => filters.q, () => {
   clearTimeout(debounce)
   debounce = setTimeout(() => runSearch(), 200)
 })
-watch(() => [filters.kind, filters.tags.join(','), filters.pack?.id, filters.collection?.id, filters.sort, prefs.showSupporting], () => {
+watch(() => [
+  filters.kind, filters.tags.join(','), filters.pack?.id, filters.collection?.id, filters.sort, filters.similar?.id,
+  filters.color, prefs.showSupporting,
+], () => {
   checked.value = []
   runSearch()
 })
@@ -197,12 +215,14 @@ function setView(v: View) {
   void withTransition(() => (view.value = v), 'view')
 }
 function browsePack(p: Named) {
-  Object.assign(filters, { pack: { id: p.id, name: p.name }, collection: null, kind: '', tags: [], q: '' })
+  Object.assign(filters, { pack: { id: p.id, name: p.name }, collection: null, kind: '', tags: [], q: '', similar: null, color: '' })
   setView('library')
 }
 function browseCollection(c: Collection | Named) {
   const same = filters.collection?.id === c.id
-  Object.assign(filters, { collection: same ? null : { id: c.id, name: c.name }, pack: null, kind: '', tags: [], q: '' })
+  Object.assign(filters, {
+    collection: same ? null : { id: c.id, name: c.name }, pack: null, kind: '', tags: [], q: '', similar: null, color: '',
+  })
   setView('library')
   showFilters.value = false
 }
@@ -221,9 +241,32 @@ function goHome() {
   mainEl.value?.scrollTo({ top: 0, behavior: 'smooth' })
 }
 function clearFilters() {
-  Object.assign(filters, { q: '', kind: '', tags: [], pack: null, collection: null })
+  Object.assign(filters, { q: '', kind: '', tags: [], pack: null, collection: null, similar: null, color: '' })
 }
-const hasFilters = computed(() => !!(filters.q || filters.kind || filters.tags.length || filters.pack || filters.collection))
+const hasFilters = computed(
+  () => !!(filters.q || filters.kind || filters.tags.length || filters.pack || filters.collection || filters.similar || filters.color),
+)
+/** "More like this": everything that looks like an asset, across every pack, most alike first. */
+function findSimilar(a: Asset) {
+  Object.assign(filters, {
+    similar: { id: a.id, name: a.name }, color: '', q: '', kind: '', tags: [], pack: null, collection: null, sort: '',
+  })
+  setView('library')
+  mainEl.value?.scrollTo({ top: 0 })
+}
+/** A colour from an asset's palette: everything with much of it, across the library. */
+function findColor(hex: string) {
+  Object.assign(filters, { color: hex, similar: null, q: '', kind: '', tags: [], pack: null, collection: null, sort: '' })
+  setView('library')
+  mainEl.value?.scrollTo({ top: 0 })
+}
+/** A colour from the sidebar: added to the filters already set, or taken off when it's the one set. */
+function pickColor(hex: string) {
+  filters.color = filters.color === hex ? '' : hex
+}
+const rankLabel = computed(() =>
+  filters.similar ? 'Most alike' : filters.color ? 'Most of the colour' : filters.q ? 'Best match' : 'Newest',
+)
 
 // ------------------------------------------------------------------ collections
 
@@ -644,6 +687,10 @@ function readUrl() {
   filters.pack = pack ? { id: pack, name: u.get('pack_name') ?? 'pack' } : null
   const col = u.get('collection')
   filters.collection = col ? { id: col, name: u.get('collection_name') ?? 'collection' } : null
+  const like = u.get('similar')
+  filters.similar = like ? { id: like, name: u.get('similar_name') ?? 'asset' } : null
+  const color = u.get('color') ?? ''
+  filters.color = /^#[0-9a-f]{6}$/i.test(color) ? color.toLowerCase() : ''
 }
 /** What a history entry is: going somewhere new adds an entry; refining where you are rewrites it. */
 function urlState() {
@@ -651,7 +698,10 @@ function urlState() {
     view: view.value,
     section: view.value === 'settings' ? settingsSection.value : '',
     asset: selected.value?.id ?? '',
-    place: [filters.kind, filters.tags.join(','), filters.sort, filters.pack?.id, filters.collection?.id].join('|'),
+    place: [
+      filters.kind, filters.tags.join(','), filters.sort, filters.pack?.id, filters.collection?.id, filters.similar?.id,
+      filters.color,
+    ].join('|'),
   }
 }
 let lastState = urlState()
@@ -672,6 +722,11 @@ function writeUrl() {
     u.set('collection', filters.collection.id)
     u.set('collection_name', filters.collection.name)
   }
+  if (filters.similar) {
+    u.set('similar', filters.similar.id)
+    u.set('similar_name', filters.similar.name)
+  }
+  if (filters.color) u.set('color', filters.color)
   const qs = u.toString()
   const hash =
     view.value === 'packs' ? '#packs'
@@ -700,6 +755,8 @@ watch(
     () => filters.sort,
     () => filters.pack?.id,
     () => filters.collection?.id,
+    () => filters.similar?.id,
+    () => filters.color,
   ],
   writeUrl,
 )
@@ -992,6 +1049,26 @@ const commands = computed<Command[]>(() => {
             </li>
           </ul>
         </section>
+        <section class="colors">
+          <h3>Colour</h3>
+          <div class="swatches">
+            <button
+              v-for="c in COLOR_PRESETS"
+              :key="c.hex"
+              type="button"
+              class="sw"
+              :style="{ background: c.hex }"
+              :aria-pressed="filters.color === c.hex"
+              :aria-label="`${c.name}: assets with much ${c.name.toLowerCase()} in them`"
+              :title="c.name"
+              @click="pickColor(c.hex)"
+            />
+            <label class="sw pick" :class="{ on: filters.color && !COLOR_PRESETS.some((c) => c.hex === filters.color) }" title="Any colour">
+              <span class="visually-hidden">Pick any colour</span>
+              <input type="color" :value="filters.color || '#808080'" @change="filters.color = ($event.target as HTMLInputElement).value" />
+            </label>
+          </div>
+        </section>
         <p v-if="!kindFacets.length && !loading" class="side-empty">No filters for this search.</p>
         <section v-if="kindFacets.length">
           <h3>Kind</h3>
@@ -1062,6 +1139,8 @@ const commands = computed<Command[]>(() => {
             </span>
             <TagChip v-if="filters.pack" :tag="`pack:${filters.pack.name}`" removable @remove="filters.pack = null" />
             <TagChip v-if="filters.collection" :tag="`collection:${filters.collection.name}`" removable @remove="filters.collection = null" />
+            <TagChip v-if="filters.similar" :tag="`like:${filters.similar.name}`" removable @remove="filters.similar = null" />
+            <TagChip v-if="filters.color" :tag="`colour:${filters.color}`" :swatch="filters.color" removable @remove="filters.color = ''" />
             <TagChip v-if="filters.kind" :tag="`kind:${filters.kind}`" removable @remove="filters.kind = ''" />
             <TagChip v-for="t in filters.tags" :key="t" :tag="t" removable @remove="toggleTag(t)" />
             <button v-if="hasFilters" type="button" class="linkbtn" @click="clearFilters">Clear all</button>
@@ -1089,7 +1168,8 @@ const commands = computed<Command[]>(() => {
           <label class="sort">
             <span class="visually-hidden">Sort</span>
             <select v-model="filters.sort" class="field">
-              <option value="">{{ filters.q ? 'Best match' : 'Newest' }}</option>
+              <option value="">{{ rankLabel }}</option>
+              <option v-if="filters.similar || filters.color" value="new">Newest</option>
               <option value="name">Name</option>
               <option value="size">Largest</option>
               <option value="old">Oldest</option>
@@ -1143,7 +1223,10 @@ const commands = computed<Command[]>(() => {
               <path d="m96.5 56.5 13 13" stroke="var(--muted)" stroke-width="5.5" stroke-linecap="round" />
             </g>
           </svg>
-          <p>Nothing matches{{ filters.q ? ` “${filters.q.trim()}”` : '' }}{{ hasFilters && (filters.tags.length || filters.kind || filters.pack) ? ' with these filters' : '' }}.</p>
+          <p v-if="filters.similar && !filters.q && !filters.kind && !filters.tags.length && !filters.color">
+            Nothing else looks much like {{ filters.similar.name }} yet.
+          </p>
+          <p v-else>Nothing matches{{ filters.q ? ` “${filters.q.trim()}”` : '' }}{{ hasFilters && (filters.tags.length || filters.kind || filters.pack) ? ' with these filters' : '' }}.</p>
           <button v-if="hasFilters" type="button" class="btn" @click="clearFilters">Clear search and filters</button>
         </div>
 
@@ -1161,6 +1244,7 @@ const commands = computed<Command[]>(() => {
             :selecting="selecting"
             @open="onTileOpen(a, $event)"
             @check="toggleCheck(a, $event)"
+            @similar="findSimilar(a)"
           />
         </div>
         <!-- The next page loads well before the end comes into view; these stand in while it does. -->
@@ -1189,6 +1273,8 @@ const commands = computed<Command[]>(() => {
         @open="openAsset"
         @step="step"
         @archive="archiveSelected"
+        @similar="findSimilar(selected!)"
+        @color="findColor"
       />
 
       <Transition name="rise">
@@ -1355,6 +1441,20 @@ const commands = computed<Command[]>(() => {
 .cname { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .side section + section { margin-top: 1rem; }
 .side h3 { margin: 0 0 0.4rem; font-size: 0.75rem; font-weight: 650; color: var(--faint); }
+.colors + .side-empty { margin-top: 1rem; }
+.swatches { display: grid; grid-template-columns: repeat(auto-fill, minmax(1.45rem, 1fr)); gap: 0.3rem; }
+.sw {
+  position: relative; aspect-ratio: 1; border: 0; padding: 0; border-radius: 50%; cursor: pointer;
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--text) 18%, transparent);
+  transition: scale var(--dur-2) var(--ease-pop), box-shadow var(--dur-1);
+}
+.sw:hover { scale: 1.12; }
+.sw[aria-pressed='true'], .sw.on { box-shadow: 0 0 0 2px var(--bg), 0 0 0 3.5px var(--text); }
+.sw.pick {
+  display: block; overflow: hidden;
+  background: conic-gradient(from 90deg, #e04040, #e0c040, #40c060, #40b0e0, #6050e0, #d040b0, #e04040);
+}
+.sw.pick input { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; border: 0; padding: 0; }
 .group-head {
   display: flex; align-items: center; gap: 0.35rem; width: 100%; padding: 0; border: 0; background: none; cursor: pointer;
   font: inherit; color: inherit; text-align: left;

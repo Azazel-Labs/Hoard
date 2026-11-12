@@ -59,7 +59,11 @@ export interface Asset {
   unreal?: UnrealStatus | null
   /** Other formats the server can convert this asset to on download. */
   formats?: FormatOption[]
+  /** Dominant colours of the thumbnail, most of the picture first. */
+  palette?: Swatch[]
 }
+
+export interface Swatch { hex: string; share: number }
 
 export interface FormatOption { format: string; label: string; resizable: boolean }
 
@@ -540,6 +544,10 @@ export interface SearchParams {
   collection?: string
   /** Search the archive instead of the library. */
   archived?: boolean
+  /** "More like this": an asset id. */
+  similar?: string
+  /** `#rrggbb`: assets with much of this colour. */
+  color?: string
 }
 
 /** Packs and assets to archive, restore or delete for good. */
@@ -634,6 +642,8 @@ export const api = {
     if (p.hide_supporting) qs.set('hide_supporting', 'true')
     if (p.collection) qs.set('collection', p.collection)
     if (p.archived) qs.set('archived', 'true')
+    if (p.similar) qs.set('similar', p.similar)
+    if (p.color) qs.set('color', p.color)
     return request<SearchResult>(`/api/assets?${qs}`).then((r) => ({ ...r, items: r.items.map(normalize) }))
   },
   asset: (id: string) => request<Asset>(`/api/assets/${id}`).then(normalize),
@@ -902,3 +912,8 @@ export const KIND_LABEL: Record<AssetKind, string> = {
   data: 'Data',
   other: 'Other',
 }
+
+/** Kinds whose thumbnails are pictures of the thing itself, so "looks like" means something (mirrors the server). */
+const LOOK_KINDS = new Set<AssetKind>(['texture', 'model', 'material', 'animation', 'video', 'other'])
+/** Whether "More like this" can find anything for an asset. */
+export const looksAlike = (a: Asset) => a.has_thumb && LOOK_KINDS.has(a.kind)

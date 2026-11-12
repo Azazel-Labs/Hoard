@@ -25,7 +25,9 @@ const META_VERSION: &str = "io.modelcontextprotocol/protocolVersion";
 
 const INSTRUCTIONS: &str = "Hoard is a library of game assets (textures, sprites, audio, music, 3D models, fonts). \
 Use search_assets to find things by words, kind and tags (tags look like `sfx`, `material:stone`, `style:pixel-art`, \
-`map:normal`, `license:cc0`). Use get_asset for full details, including linked textures/animations. To actually \
+`map:normal`, `license:cc0`). Use get_asset for full details, including linked textures/animations and the thumbnail's colours. find_similar finds \
+assets that look like one you have (textures, models, sprites, across every pack) and find_by_color finds assets with \
+much of a colour in them. To actually \
 fetch files, use get_bundle: it returns direct download URLs for an asset and every file it depends on, plus a zip URL. \
 To describe and tag assets nothing has described yet, loop next_to_tag → save_tags (the tag_pack prompt explains how).";
 
@@ -191,6 +193,40 @@ fn tool_list() -> Value {
                     "limit": { "type": "integer", "minimum": 1, "maximum": 100, "default": 20 },
                     "include_previews": { "type": "boolean", "default": false, "description": "Also return the first 8 thumbnails as images, so you can see what you found." }
                 }
+            },
+            "annotations": read
+        },
+        {
+            "name": "find_similar",
+            "title": "Find assets that look alike",
+            "description": "Assets whose thumbnail looks like this asset's (colours, surface grain, edges, layout), across every pack, most alike first: other rocks for a rock texture, near-copies at other sizes, renders of similar models. Same result shape as search_assets.",
+            "inputSchema": {
+                "type": "object",
+                "properties": {
+                    "id": { "type": "string", "description": "The asset to match." },
+                    "kind": { "type": "string", "enum": ["texture", "model", "material", "animation", "video", "other"] },
+                    "query": { "type": "string", "description": "Optional words the matches must also have." },
+                    "limit": { "type": "integer", "minimum": 1, "maximum": 100, "default": 20 },
+                    "include_previews": { "type": "boolean", "default": false, "description": "Also return the first 8 thumbnails as images." }
+                },
+                "required": ["id"]
+            },
+            "annotations": read
+        },
+        {
+            "name": "find_by_color",
+            "title": "Find assets by colour",
+            "description": "Assets with much of a colour in their thumbnail, those covered most by it first (colours are compared perceptually, so a slightly different shade still matches). Same result shape as search_assets.",
+            "inputSchema": {
+                "type": "object",
+                "properties": {
+                    "color": { "type": "string", "description": "Hex colour, e.g. '#3a7d2c'." },
+                    "kind": { "type": "string", "enum": ["texture", "model", "material", "animation", "video", "other"] },
+                    "query": { "type": "string", "description": "Optional words the matches must also have." },
+                    "limit": { "type": "integer", "minimum": 1, "maximum": 100, "default": 20 },
+                    "include_previews": { "type": "boolean", "default": false, "description": "Also return the first 8 thumbnails as images." }
+                },
+                "required": ["color"]
             },
             "annotations": read
         },
@@ -516,40 +552,56 @@ async fn tagging_call(state: &AppState, name: &str, args: &Value) -> Result<Valu
     }
 }
 
+/// `search_assets`, `find_similar` and `find_by_color`: one search with different required arguments.
+async fn search_call(state: &AppState, name: &str, args: &Value, base: &str) -> Result<Value, ToolError> {
+    let similar = (name == "find_similar")
+        .then(|| str_arg(args, "id").ok_or_else(|| ToolError::Failed("`id` is required".into())))
+        .transpose()?;
+    let color = (name == "find_by_color")
+        .then(|| match str_arg(args, "color") {
+            Some(c) if crate::looks::parse_hex(&c).is_some() => Ok(c),
+            _ => Err(ToolError::Failed("`color` must be a hex colour like '#3a7d2c'".into())),
+        })
+        .transpose()?;
+    let q = SearchQuery {
+        q: str_arg(args, "query"),
+        kind: str_arg(args, "kind"),
+        tags: str_list(args, "tags").iter().filter_map(|t| hoard_core::normalize_tag(t)).collect(),
+        pack: str_arg(args, "pack_id"),
+        collection: str_arg(args, "collection"),
+        limit: Some(args.get("limit").and_then(Value::as_u64).unwrap_or(20).clamp(1, 100) as u32),
+        similar,
+        color,
+        ..Default::default()
+    };
+    let page = crate::looks::search(state, q, false).await?;
+    let mut out = json!({
+        "total": page.total,
+        "returned": page.items.len(),
+        "assets": page.items.iter().map(|a| summarize(base, a)).collect::<Vec<_>>(),
+    });
+    if args.get("include_previews").and_then(Value::as_bool) == Some(true) {
+        let ids: Vec<Value> = page
+            .items
+            .iter()
+            .filter(|a| a.has_thumb)
+            .take(MAX_PREVIEWS)
+            .map(|a| json!({ "id": a.id, "name": a.name }))
+            .collect();
+        out[PREVIEWS_KEY] = Value::Array(ids);
+    }
+    Ok(out)
+}
+
 async fn call_tool(state: &AppState, name: &str, args: Value, base: &str) -> Result<Value, ToolError> {
+    if matches!(name, "search_assets" | "find_similar" | "find_by_color") {
+        return search_call(state, name, &args, base).await;
+    }
     if matches!(name, "next_to_tag" | "save_tags") {
         return tagging_call(state, name, &args).await;
     }
     let base = base.to_owned();
     match name {
-        "search_assets" => {
-            let q = SearchQuery {
-                q: str_arg(&args, "query"),
-                kind: str_arg(&args, "kind"),
-                tags: str_list(&args, "tags").iter().filter_map(|t| hoard_core::normalize_tag(t)).collect(),
-                pack: str_arg(&args, "pack_id"),
-                collection: str_arg(&args, "collection"),
-                limit: Some(args.get("limit").and_then(Value::as_u64).unwrap_or(20).clamp(1, 100) as u32),
-                ..Default::default()
-            };
-            let page = db::call(&state.pool, move |c| db::search(c, &q, false)).await?;
-            let mut out = json!({
-                "total": page.total,
-                "returned": page.items.len(),
-                "assets": page.items.iter().map(|a| summarize(&base, a)).collect::<Vec<_>>(),
-            });
-            if args.get("include_previews").and_then(Value::as_bool) == Some(true) {
-                let ids: Vec<Value> = page
-                    .items
-                    .iter()
-                    .filter(|a| a.has_thumb)
-                    .take(MAX_PREVIEWS)
-                    .map(|a| json!({ "id": a.id, "name": a.name }))
-                    .collect();
-                out[PREVIEWS_KEY] = Value::Array(ids);
-            }
-            Ok(out)
-        }
         "get_asset" => {
             let id = str_arg(&args, "id").ok_or_else(|| ToolError::Failed("`id` is required".into()))?;
             let asset = db::call(&state.pool, move |c| db::get_asset(c, &id)).await?;
@@ -565,6 +617,9 @@ async fn call_tool(state: &AppState, name: &str, args: Value, base: &str) -> Res
             }
             if !a.duplicates.is_empty() {
                 v["identical_copies"] = json!(a.duplicates);
+            }
+            if !a.palette.is_empty() {
+                v["colors"] = json!(a.palette);
             }
             Ok(v)
         }

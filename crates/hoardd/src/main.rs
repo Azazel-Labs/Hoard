@@ -27,6 +27,7 @@ mod links;
 mod llm;
 mod local_llm;
 mod locations;
+mod looks;
 mod maintenance;
 mod mcp;
 mod meshes;
@@ -76,6 +77,8 @@ pub(crate) struct Inner {
     pub(crate) http: reqwest::Client,
     /// Settings changed from the portal, over `cfg`. Read these, not `cfg`, for anything listed in [`settings::Saved`].
     pub(crate) settings: settings::Store,
+    /// Every thumbnail's look, for "find by colour" and "more like this".
+    pub(crate) looks: looks::Index,
 }
 
 pub(crate) type AppState = Arc<Inner>;
@@ -142,6 +145,7 @@ async fn main() -> Result<()> {
         uploads_in_flight: std::sync::Mutex::default(),
         http,
         settings,
+        looks: looks::Index::default(),
     });
     match uploads::sweep_stale(&state) {
         Ok(0) => {}
@@ -154,6 +158,10 @@ async fn main() -> Result<()> {
     updates::start_auto_update(&state);
     analyze::warm_renderer();
     jobs::spawn_workers(&state);
+    {
+        let st = Arc::clone(&state);
+        tokio::spawn(async move { looks::schedule(&st).await });
+    }
     {
         let st = Arc::clone(&state);
         tokio::spawn(async move { formats::log_trim(&st).await });

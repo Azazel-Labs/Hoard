@@ -174,6 +174,9 @@ async fn execute(state: &AppState, t: &'static Task, run: i64) -> Result<String>
         GC => gc(state).await,
         other => Err(anyhow::anyhow!("no maintenance task {other}")),
     };
+    if t.id == SHRINK_THUMBS {
+        crate::looks::schedule(state).await;
+    }
     let (ok, summary) = match &result {
         Ok(s) => (true, s.clone()),
         Err(e) => (false, format!("{e:#}")),

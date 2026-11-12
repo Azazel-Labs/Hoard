@@ -15,7 +15,9 @@ import CollectionPicker from './components/CollectionPicker.vue'
 import PacksView from './components/PacksView.vue'
 import TagChip from './components/TagChip.vue'
 import UiLayer from './components/UiLayer.vue'
-import { showError, showOk, useTween, withTransition } from './ui'
+import CommandPalette from './components/CommandPalette.vue'
+import ShortcutsDialog from './components/ShortcutsDialog.vue'
+import { showError, showOk, useTween, withTransition, type Command } from './ui'
 
 type View = 'library' | 'packs'
 const PAGE = 60
@@ -472,13 +474,28 @@ function moveFocus(key: string) {
 function onKey(e: KeyboardEvent) {
   const target = e.target instanceof HTMLElement ? e.target : null
   const typing = target?.closest('input, textarea, select, [contenteditable]')
+  // The palette opens from anywhere, even mid-typing, and the same keys close it.
+  if ((e.metaKey || e.ctrlKey) && !e.altKey && e.key.toLowerCase() === 'k') {
+    e.preventDefault()
+    if (paletteOpen.value) document.querySelector<HTMLDialogElement>('dialog.palette')?.close()
+    else paletteOpen.value = true
+    return
+  }
+  // A modal (palette, shortcuts, confirm, inspector) has the keyboard to itself.
+  if (target?.closest('dialog[open]')) return
   if (e.key === 'Escape') {
     if (showFilters.value) showFilters.value = false
     else if (checked.value.length) checked.value = []
     else if (selected.value) closeDetail()
     return
   }
-  if (typing || view.value !== 'library' || e.altKey) return
+  if (typing || e.altKey) return
+  if (e.key === '?') {
+    e.preventDefault()
+    shortcutsOpen.value = true
+    return
+  }
+  if (view.value !== 'library') return
   if (e.key === '/') {
     e.preventDefault()
     searchInput.value?.focus()
@@ -498,7 +515,7 @@ function onKey(e: KeyboardEvent) {
     return
   }
   const focused = items.value.find((a) => a.id === target?.dataset.id) ?? selected.value
-  if (e.key === ' ' && focused) {
+  if (e.key === ' ' && focused && !target?.closest('.detail-pane')) {
     // Space previews a sound instead of "clicking" the tile.
     if (canPreview(focused)) {
       e.preventDefault()
@@ -570,9 +587,11 @@ const busyPacks = computed(() => packs.value.filter(busy))
 const shownTotal = useTween(() => total.value)
 
 /** Change the theme with the new one spreading out in a circle from the button that was pressed. */
-function setTheme(value: typeof prefs.theme, e: MouseEvent) {
+function setTheme(value: typeof prefs.theme, e?: MouseEvent) {
   if (prefs.theme === value) return
-  const r = (e.currentTarget as HTMLElement).getBoundingClientRect()
+  // From the palette there's no button: spread from the theme switcher's current button instead.
+  const from = (e?.currentTarget as HTMLElement | undefined) ?? document.querySelector('.theme [aria-pressed="true"]')
+  const r = from?.getBoundingClientRect() ?? new DOMRect(innerWidth / 2, innerHeight / 2, 0, 0)
   const x = r.left + r.width / 2
   const y = r.top + r.height / 2
   const reach = Math.hypot(Math.max(x, innerWidth - x), Math.max(y, innerHeight - y))
@@ -584,6 +603,45 @@ function setTheme(value: typeof prefs.theme, e: MouseEvent) {
   })
 }
 const firstLoad = computed(() => loading.value && !items.value.length)
+
+// ------------------------------------------------------------------ command palette
+
+const paletteOpen = ref(false)
+const shortcutsOpen = ref(false)
+const mod = /Mac|iPhone|iPad/.test(navigator.platform) ? '⌘' : 'Ctrl+'
+const commands = computed<Command[]>(() => {
+  const out: Command[] = [
+    { id: 'go:library', group: 'Go to', label: 'Library', keywords: 'assets grid home', run: () => setView('library') },
+    { id: 'go:packs', group: 'Go to', label: 'Packs', hint: busyPacks.value.length ? `${busyPacks.value.length} working` : undefined, run: () => setView('packs') },
+    { id: 'go:search', group: 'Go to', label: 'Search', hint: '/', run: () => { setView('library'); void nextTick(() => searchInput.value?.focus()) } },
+    { id: 'act:add', group: 'Actions', label: 'Add files…', keywords: 'upload import', run: () => fileInput.value?.click() },
+    { id: 'act:folder', group: 'Actions', label: 'Import a folder…', keywords: 'upload pack', run: () => folderInput.value?.click() },
+  ]
+  if (view.value === 'library' && items.value.length) {
+    out.push({ id: 'act:all', group: 'Actions', label: `Select all ${items.value.length} shown`, hint: `${mod}A`, keywords: 'check', run: () => (checked.value = items.value.map((a) => a.id)) })
+  }
+  if (checked.value.length) out.push({ id: 'act:none', group: 'Actions', label: 'Clear the selection', hint: 'Esc', run: () => (checked.value = []) })
+  if (hasFilters.value) out.push({ id: 'act:clear', group: 'Actions', label: 'Clear filters', keywords: 'reset', run: clearFilters })
+  out.push({
+    id: 'act:supporting', group: 'Actions', label: prefs.showSupporting ? 'Hide supporting files' : 'Show supporting files',
+    keywords: 'normal maps roughness masks', run: () => (prefs.showSupporting = !prefs.showSupporting),
+  })
+  if (stats.value?.auth_required) out.push({ id: 'act:token', group: 'Actions', label: getToken() ? 'Change the token' : 'Set the token', keywords: 'auth password', run: () => (showToken.value = true) })
+  out.push({ id: 'act:keys', group: 'Actions', label: 'Keyboard shortcuts', hint: '?', keywords: 'help keys', run: () => (shortcutsOpen.value = true) })
+  for (const t of THEMES) {
+    out.push({ id: `theme:${t.value}`, group: 'Theme', label: t.label, hint: prefs.theme === t.value ? 'current' : undefined, keywords: 'theme appearance mode', run: () => setTheme(t.value) })
+  }
+  for (const k of kindFacets.value) {
+    const label = KIND_LABEL[k.value as AssetKind] ?? k.value
+    out.push({
+      id: `kind:${k.value}`, group: 'Kinds', label: filters.kind === k.value ? `All kinds (stop showing only ${label.toLowerCase()})` : `Only ${label.toLowerCase()}`,
+      hint: k.count.toLocaleString(), keywords: label, run: () => { setView('library'); setKind(k.value) },
+    })
+  }
+  for (const p of packs.value) out.push({ id: `pack:${p.id}`, group: 'Packs', label: p.name, run: () => browsePack(p) })
+  for (const c of collections.value) out.push({ id: `col:${c.id}`, group: 'Collections', label: c.name, run: () => browseCollection(c) })
+  return out
+})
 </script>
 
 <template>
@@ -674,6 +732,9 @@ const firstLoad = computed(() => loading.value && !items.value.length)
         </div>
         <button v-if="stats?.auth_required" type="button" class="btn ghost" @click="showToken = !showToken">
           {{ getToken() ? 'Token set' : 'Set token' }}
+        </button>
+        <button type="button" class="btn ghost cmdk" :title="`Command palette (${mod}K)`" @click="paletteOpen = true">
+          <kbd>{{ mod.replace('+', '') }}</kbd><kbd>K</kbd>
         </button>
         <button type="button" class="btn import-folder" @click="folderInput?.click()">Import folder</button>
         <button type="button" class="btn primary" @click="fileInput?.click()">
@@ -937,6 +998,8 @@ const firstLoad = computed(() => loading.value && !items.value.length)
     </Transition>
 
     <UploadQueue ref="queue" @created="onCreated" @unauthorized="showToken = true" />
+    <CommandPalette v-if="paletteOpen" :commands="commands" @close="paletteOpen = false" @open="openAsset" />
+    <ShortcutsDialog v-if="shortcutsOpen" @close="shortcutsOpen = false" />
     <UiLayer />
   </div>
 </template>
@@ -984,6 +1047,11 @@ const firstLoad = computed(() => loading.value && !items.value.length)
 .pulse { position: absolute; top: 0.35em; right: 0.3em; width: 6px; height: 6px; border-radius: 50%; background: var(--k-model); animation: blink 1.2s infinite; }
 @keyframes blink { 50% { opacity: 0.25; } }
 .actions { display: flex; gap: 0.5rem; margin-left: auto; }
+.cmdk { gap: 0.2rem; padding-inline: 0.55em; color: var(--muted); }
+.cmdk kbd {
+  min-width: 1.5em; padding: 0 0.3em; border: 1px solid var(--line); border-bottom-width: 2px; border-radius: 4px;
+  font: inherit; font-size: 0.72rem; line-height: 1.5; text-align: center;
+}
 .update { color: var(--ok); text-decoration: none; white-space: nowrap; }
 .update .dot { width: 0.5em; height: 0.5em; border-radius: 50%; background: currentColor; }
 .narrow-only { display: none; }
@@ -1133,7 +1201,7 @@ const firstLoad = computed(() => loading.value && !items.value.length)
   .brand span { display: inline; }
   .views { margin-left: auto; }
   .actions { margin-left: 0; }
-  .import-folder { display: none; }
+  .import-folder, .cmdk { display: none; }
   .side {
     position: fixed; inset: 0 auto 0 0; z-index: 12; width: min(320px, 86vw);
     background: var(--panel); transform: translateX(-102%); transition: transform 0.18s ease-out;

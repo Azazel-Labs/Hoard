@@ -213,3 +213,16 @@ export function useTween(source: () => number, ms = 450) {
   })
   return out
 }
+
+/** An entry in the command palette (Ctrl/Cmd-K). */
+export interface Command {
+  id: string
+  label: string
+  /** The section it's listed under: "Go to", "Actions", "Packs"… */
+  group: string
+  /** Shown on the right, dim: a shortcut, a count. */
+  hint?: string
+  /** Extra words it should match on but doesn't show. */
+  keywords?: string
+  run: () => void
+}

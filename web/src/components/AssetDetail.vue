@@ -1,22 +1,23 @@
 <script setup lang="ts">
-import { computed, defineAsyncComponent, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import {
   api, asUrl, bundleUrl, fileUrl, formatDuration, humanBytes, originalUrl, RESIZABLE_AS_ITSELF, thumbUrl,
   type Asset, type AssetLink, type Collection, type CollectionRef, type ConversionStatus, type Facet, type LinkRel,
 } from '../api'
 import CollectionPicker from './CollectionPicker.vue'
-import ImageViewer from './ImageViewer.vue'
 import { playableUrl, player, sourceExt, sourceUrl, stop as stopPreview } from '../player'
 import KindGlyph from './KindGlyph.vue'
 import TagChip from './TagChip.vue'
 import { copyText, showOk, swipeToClose } from '../ui'
+import { lazy } from '../lazy'
 import { isModelAsset, isTextAsset, takeViewRequest, viewRequest, viewerFor, type ViewerKind } from '../viewers'
 
 // three.js is big; only load it when someone opens a model.
-const ModelViewer = defineAsyncComponent(() => import('./ModelViewer.vue'))
-const ModelInspector = defineAsyncComponent(() => import('./ModelInspector.vue'))
-const TextPreview = defineAsyncComponent(() => import('./TextPreview.vue'))
-const TextViewer = defineAsyncComponent(() => import('./TextViewer.vue'))
+const ModelViewer = lazy(() => import('./ModelViewer.vue'), 'the 3D viewer', 'model-slot')
+const ModelInspector = lazy(() => import('./ModelInspector.vue'), 'the 3D viewer', 'overlay')
+const TextPreview = lazy(() => import('./TextPreview.vue'), 'the text')
+const TextViewer = lazy(() => import('./TextViewer.vue'), 'the text viewer', 'overlay')
+const ImageViewer = lazy(() => import('./ImageViewer.vue'), 'the image viewer', 'overlay')
 
 const props = defineProps<{
   asset: Asset

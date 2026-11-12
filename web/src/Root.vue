@@ -3,8 +3,10 @@
 import { onMounted } from 'vue'
 import App from './App.vue'
 import SignIn from './components/SignIn.vue'
-import ConnectApp from './components/ConnectApp.vue'
 import { auth, canBrowse, refreshAuth } from './auth'
+import { lazy } from './lazy'
+
+const ConnectApp = lazy(() => import('./components/ConnectApp.vue'), 'the app connection')
 
 /** An app signing in over OAuth (see `oauth.rs`): sign in if need be, then allow or cancel. */
 const connecting = location.pathname === '/oauth/authorize'

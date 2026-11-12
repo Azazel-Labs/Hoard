@@ -4,7 +4,8 @@
 // against different backgrounds, with its clips.
 import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import type { Asset } from '../api'
-import { BACKGROUNDS, ModelStage, type Background, type StageInfo } from '../modelStage'
+// Types only: the scene (and three.js with it) loads once the dialog is open, so it shows straight away.
+import type { Background, ModelStage, StageInfo } from '../modelStage'
 
 const props = defineProps<{ asset: Asset }>()
 const emit = defineEmits<{ close: [] }>()
@@ -12,10 +13,11 @@ const emit = defineEmits<{ close: [] }>()
 const BG_LABEL: Record<Background, string> = {
   checker: 'Checker', dark: 'Dark', grey: 'Grey', light: 'Light', env: 'Environment',
 }
+const BACKGROUNDS = Object.keys(BG_LABEL) as Background[]
 
 const dlg = ref<HTMLDialogElement | null>(null)
 const host = ref<HTMLDivElement | null>(null)
-const status = ref<'loading' | 'ready' | 'error'>('loading')
+const status = ref<'viewer' | 'loading' | 'ready' | 'error'>('viewer')
 const error = ref('')
 const info = ref<StageInfo | null>(null)
 const missing = ref<string[]>([])
@@ -31,7 +33,16 @@ let stage: ModelStage | null = null
 
 onMounted(async () => {
   dlg.value?.showModal()
-  if (!host.value) return
+  let ModelStage: typeof import('../modelStage').ModelStage
+  try {
+    ;({ ModelStage } = await import('../modelStage'))
+  } catch (e) {
+    status.value = 'error'
+    error.value = `the 3D viewer didn't load (${(e as Error).message}); reloading the page may help`
+    return
+  }
+  if (!host.value || closed) return
+  status.value = 'loading'
   const s = new ModelStage(host.value)
   stage = s
   s.onMissing = (names) => (missing.value = names)
@@ -47,7 +58,11 @@ onMounted(async () => {
     error.value = (e as Error).message
   }
 })
-onBeforeUnmount(() => stage?.dispose())
+let closed = false
+onBeforeUnmount(() => {
+  closed = true
+  stage?.dispose()
+})
 
 watch(wireframe, (on) => stage?.setWireframe(on))
 watch(textures, (on) => stage?.setTextures(on))
@@ -167,7 +182,8 @@ function onKey(e: KeyboardEvent) {
 
     <div class="stage" :class="[`bg-${bg}`, { checker: bg === 'checker' }]">
       <div ref="host" class="canvas" @dblclick="stage?.frame()" />
-      <p v-if="status === 'loading'" class="msg">Loading model…</p>
+      <p v-if="status === 'viewer'" class="msg">Loading the 3D viewer…</p>
+      <p v-else-if="status === 'loading'" class="msg">Loading model…</p>
       <p v-else-if="status === 'error'" class="msg err">Couldn't show this model: {{ error }}</p>
       <p v-if="missing.length" class="note" :title="missing.join('\n')">
         {{ missing.length === 1 ? `Texture not found: ${missing[0]}` : `${missing.length} textures not found: ${missing.slice(0, 3).join(', ')}${missing.length > 3 ? '…' : ''}` }}

@@ -18,13 +18,16 @@ import PacksView from './components/PacksView.vue'
 import TagChip from './components/TagChip.vue'
 import UiLayer from './components/UiLayer.vue'
 import CommandPalette from './components/CommandPalette.vue'
-import ShortcutsDialog from './components/ShortcutsDialog.vue'
-import SettingsPage from './components/SettingsPage.vue'
-import SetupWizard from './components/SetupWizard.vue'
-import ArchiveView from './components/ArchiveView.vue'
 import { archiveWithUndo, countText } from './archive'
 import { showError, showOk, swipeToClose, useTween, withTransition, type Command } from './ui'
 import { useVirtualGrid } from './virtualGrid'
+import { lazy } from './lazy'
+
+// Opened now and then, so they load when first shown.
+const SettingsPage = lazy(() => import('./components/SettingsPage.vue'), 'settings')
+const ArchiveView = lazy(() => import('./components/ArchiveView.vue'), 'the archive')
+const ShortcutsDialog = lazy(() => import('./components/ShortcutsDialog.vue'), 'the shortcuts', 'overlay')
+const SetupWizard = lazy(() => import('./components/SetupWizard.vue'), 'setup', 'overlay')
 
 type View = 'library' | 'packs' | 'settings' | 'archive'
 const PAGE = 60

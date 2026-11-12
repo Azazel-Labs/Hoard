@@ -1,9 +1,10 @@
 <script setup lang="ts">
 // The side panel's 3D preview: orbit and zoom in place, pick a clip, and the expand button (or a double-click)
-// opens the full-screen viewer. The scene itself is ModelStage, shared with that viewer.
+// opens the full-screen viewer. The scene itself is ModelStage, shared with that viewer; it brings three.js, so it
+// loads the first time a model is shown, behind the same "Loading" as the model.
 import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import type { Asset } from '../api'
-import { ModelStage, type StageInfo } from '../modelStage'
+import type { ModelStage, StageInfo } from '../modelStage'
 
 const props = defineProps<{ asset: Asset; paused?: boolean }>()
 const emit = defineEmits<{ expand: [] }>()
@@ -23,6 +24,16 @@ async function setup() {
   missing.value = []
   activeClip.value = ''
   if (!host.value) return
+  const id = props.asset.id
+  let ModelStage: typeof import('../modelStage').ModelStage
+  try {
+    ;({ ModelStage } = await import('../modelStage'))
+  } catch (e) {
+    status.value = 'error'
+    error.value = `the 3D viewer didn't load (${(e as Error).message}); reloading the page may help`
+    return
+  }
+  if (!host.value || props.asset.id !== id || stage) return
   const s = new ModelStage(host.value)
   stage = s
   s.onMissing = (names) => (missing.value = names)

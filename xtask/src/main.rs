@@ -176,10 +176,10 @@ fn dev(llm: bool, no_web: bool, serve: &ServeArgs) -> Result<()> {
     }
     guard.0.push(("hoardd", hoardd.spawn().context("start hoardd")?));
     if no_web {
-        eprintln!("\nhoardd: http://127.0.0.1:7878 (serving web/dist)");
+        eprintln!("\nhoardd: http://127.0.0.1:4627 (serving web/dist)");
     } else {
         guard.0.push(("vite", npm().current_dir(root.join("web")).args(["run", "dev"]).spawn().context("start vite")?));
-        eprintln!("\nPortal with hot reload: http://127.0.0.1:5173 (API on :7878)");
+        eprintln!("\nPortal with hot reload: http://127.0.0.1:5173 (API on :4627)");
     }
 
     // Run until any of them stops; the guard stops the rest.

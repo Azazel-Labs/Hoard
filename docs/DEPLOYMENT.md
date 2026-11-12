@@ -27,7 +27,7 @@ Any of them works. Hoard only needs PUT, GET (with Range), HEAD and DELETE.
 `deploy/compose.private.yml`: Hoard + Garage + `cloudflared`, with **no public hostname**.
 
 ```
-laptop (Cloudflare One client) ──> Cloudflare ──tunnel──> cloudflared ──LAN──> hoard :7878 ──> garage
+laptop (Cloudflare One client) ──> Cloudflare ──tunnel──> cloudflared ──LAN──> hoard :4627 ──> garage
 ```
 
 Hoard never appears on the public internet. Your devices reach the NAS's LAN address from anywhere, as if they were
@@ -48,9 +48,9 @@ Cloudflare's docs don't say this explicitly, so try one upload over 100 MB once 
    don't use.
 5. **Enroll your devices.** Allow your email under device enrollment, install the Cloudflare One client (formerly
    WARP), and log in to your team. Optionally add a Gateway network policy so only your identity can reach
-   `192.168.50.10:7878`.
+   `192.168.50.10:4627`.
 6. **Start it:** `docker compose -f deploy/compose.private.yml --env-file deploy/.env up -d`, then open
-   `https://192.168.50.10:7878` from anywhere with the client connected. The compose file turns on a self-signed
+   `https://192.168.50.10:4627` from anywhere with the client connected. The compose file turns on a self-signed
    certificate (change `HOARD_TLS_NAMES` in it to the address you type), so the browser warns once; accept it and you get
    HTTP/2. For the `hoard` CLI, copy `tls/self-signed.crt` from Hoard's data folder and pass it with
    `--ca-cert` (or `HOARD_CA_CERT`). Point `hoard sync` (`server = ...`) and MCP
@@ -59,7 +59,7 @@ Cloudflare's docs don't say this explicitly, so try one upload over 100 MB once 
 Keep `HOARD_TOKEN` set even here. The network is private, but the token keeps other devices on your LAN or
 Zero Trust org read-only.
 
-**HTTP/3.** `HOARD_HTTP3: "true"` in the compose file adds QUIC on UDP 7878 and advertises it with `Alt-Svc`; browsers switch after the
+**HTTP/3.** `HOARD_HTTP3: "true"` in the compose file adds QUIC on UDP 4627 and advertises it with `Alt-Svc`; browsers switch after the
 first page load. Cloudflare's private routing carries UDP as well as TCP, but if HTTP/3 never kicks in over the
 tunnel, HTTP/2 is doing the work and nothing is lost. Browsers only use HTTP/3 when they trust the certificate, so
 with a self-signed one, expect HTTP/2 unless you install the certificate on the device.
@@ -76,7 +76,7 @@ so for multi-GB source files Tailscale is often faster. Use whichever you alread
 browser ──https──> Cloudflare edge ──tunnel──> cloudflared ─> hoard ─> garage   (all on the NAS)
 ```
 
-1. Create a tunnel in Cloudflare Zero Trust, add a public hostname `hoard.example.com → http://hoard:7878`, and put
+1. Create a tunnel in Cloudflare Zero Trust, add a public hostname `hoard.example.com → http://hoard:4627`, and put
    the token in `deploy/.env`.
 2. Protect the hostname with a Cloudflare Access application (email OTP or your IdP). For MCP clients and
    `hoard sync` from CI, add an Access **service token** and send its two headers.

@@ -68,3 +68,8 @@ cast_possible_truncation = "allow"
 
 [profile.release]
 lto = "thin"
+
+# Debug builds still optimize dependencies: image decoding, PNG encoding, zip inflate and hashing are 10-50x slower
+# without it, which makes ingest crawl. Hoard's own code stays quick to build and debuggable.
+[profile.dev.package."*"]
+opt-level = 3

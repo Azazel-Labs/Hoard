@@ -30,7 +30,7 @@ pub(crate) enum UnrealConvert {
 #[expect(clippy::struct_excessive_bools, reason = "each bool is an independent command-line switch")]
 pub(crate) struct Config {
     /// Address to listen on.
-    #[arg(long, env = "HOARD_LISTEN", default_value = "127.0.0.1:7878")]
+    #[arg(long, env = "HOARD_LISTEN", default_value = "127.0.0.1:4627")]
     pub(crate) listen: SocketAddr,
 
     /// The database (with Settings), its backups and the self-signed TLS certificate: small, and the one to back up.

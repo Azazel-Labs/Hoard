@@ -5,3 +5,5 @@ web/dist
 .git
 models
 .vscode
+deploy/*.yml
+deploy/*.toml

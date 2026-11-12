@@ -175,7 +175,7 @@ struct LockEntry {
 const STARTER: &str = r#"# Hoard project config. `hoard sync` makes `out_dir` match these selections and writes hoard.lock.
 # Commit both files; teammates run `hoard sync` to get identical, hash-verified assets.
 
-server = "http://127.0.0.1:7878"
+server = "http://127.0.0.1:4627"
 out_dir = "assets/hoard"        # Godot: a folder under res://, Unity: "Assets/Hoard", Bevy: "assets/hoard"
 layout = "category"             # category | pack | flat
 sidecars = true                 # write <file>.hoard.json with tags/provenance for import scripts
@@ -319,7 +319,7 @@ async fn main() -> Result<()> {
         let pem = std::fs::read(path).with_context(|| format!("read CA certificate {}", path.display()))?;
         EXTRA_CA.set(pem).ok();
     }
-    let server = cli.server.clone().unwrap_or_else(|| "http://127.0.0.1:7878".into());
+    let server = cli.server.clone().unwrap_or_else(|| "http://127.0.0.1:4627".into());
     match cli.cmd {
         Cmd::Search { query, kind, tags, pack, limit, json } => {
             let client = Client::new(&server, cli.token)?;
@@ -464,7 +464,7 @@ async fn sync(server: Option<String>, token: Option<String>, config: &Path, dry_
         Ok(s) => serde_json::from_str(&s).context("parse hoard.lock")?,
         Err(_) => Lockfile::default(),
     };
-    let server = server.or(cfg.server.clone()).unwrap_or_else(|| "http://127.0.0.1:7878".into());
+    let server = server.or(cfg.server.clone()).unwrap_or_else(|| "http://127.0.0.1:4627".into());
     let client = Client::new(&server, token)?;
 
     // 1. Resolve selections -> desired files.

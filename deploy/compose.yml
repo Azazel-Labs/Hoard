@@ -1,11 +1,12 @@
 # Hoard on one machine: the server, its files on a local volume, and automatic updates.
-#   HOARD_TOKEN=$(openssl rand -hex 32) docker compose -f deploy/compose.yml up -d     # then open http://<host>:7878
+#   HOARD_TOKEN=$(openssl rand -hex 32) docker compose -f deploy/compose.yml up -d     # then open http://<host>:4627
 # It includes a local model server for AI tagging (pick a model in the portal's Settings), and Blender and ffmpeg can
 # be switched on there too.
 # GPU for model thumbnails and the local model: add -f deploy/compose.gpu-nvidia.yml or -f deploy/compose.gpu-dri.yml.
 # Bigger setups (files on a NAS, remote access) are in docs/DEPLOYMENT.md.
 services:
   hoard:
+    container_name: hoard
     image: ghcr.io/azazel-labs/hoard:latest   # or :0.8 (patch releases only), :0.8.1 (pinned), :edge (every main commit)
     restart: unless-stopped
     environment:
@@ -17,7 +18,7 @@ services:
       - hoard-library:/library    # your files: big, put it on the disk with room
       - hoard-cache:/cache        # thumbnails, uploads in progress, Blender/ffmpeg: fast disk, can be rebuilt
     ports:
-      - "7878:7878"
+      - "4627:4627"
     labels:
       # Watchtower below updates only containers with these labels.
       com.centurylinklabs.watchtower.enable: "true"
@@ -28,6 +29,7 @@ services:
   # below, and switches or deletes them later. The suggested ones run on the CPU in 3-6 GB of RAM; a GPU overlay
   # (compose.gpu-*.yml) moves them onto the GPU. Don't want it? Delete this service (Settings can use a hosted one).
   llm:
+    container_name: hoard-llm
     image: ghcr.io/ggml-org/llama.cpp:server
     restart: unless-stopped
     environment:
@@ -48,6 +50,7 @@ services:
   # then in Settings choose "Ollama" (http://ollama:11434/v1) and the model. NVIDIA GPU: give it the `deploy:` block
   # the vllm service below has. (With a GPU overlay, also delete the overlay's `llm` section once `llm` is gone.)
   # ollama:
+  #   container_name: hoard-ollama
   #   image: ollama/ollama:latest
   #   restart: unless-stopped
   #   environment:
@@ -60,6 +63,7 @@ services:
   # model, downloaded from Hugging Face on first start. In Settings choose "Custom": http://vllm:8000/v1 and the
   # served model name below.
   # vllm:
+  #   container_name: hoard-vllm
   #   image: vllm/vllm-openai:latest
   #   restart: unless-stopped
   #   ipc: host
@@ -79,6 +83,7 @@ services:
   # Pulls new Hoard images daily and restarts the container; the database upgrades itself on start (backed up
   # first). Pin the image tag (e.g. :0.8) to take only patch releases, or remove this service to update by hand.
   watchtower:
+    container_name: hoard-watchtower
     image: ghcr.io/nicholas-fedor/watchtower:1.21
     restart: unless-stopped
     volumes:

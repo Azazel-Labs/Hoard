@@ -5,6 +5,7 @@
 #   docker compose -f deploy/compose.private.yml --env-file deploy/.env up -d
 services:
   garage:
+    container_name: hoard-garage
     image: dxflrs/garage:v2.5.0
     command: ["/garage", "server", "--single-node", "--default-bucket"]
     restart: unless-stopped
@@ -18,6 +19,7 @@ services:
       - /volume1/hoard/garage/data:/var/lib/garage/data
 
   hoard:
+    container_name: hoard
     image: ghcr.io/azazel-labs/hoard:latest   # or `build: ..` to build from this checkout
     labels:
       com.centurylinklabs.watchtower.enable: "true"
@@ -43,14 +45,15 @@ services:
       - /volume1/hoard/cache:/cache        # thumbnails, uploads in progress, Blender/ffmpeg: can be rebuilt
     ports:
       # LAN only. Don't forward this port on your router: remote access goes through the tunnel.
-      - "7878:7878"
-      - "7878:7878/udp"   # HTTP/3 (QUIC), only used with HOARD_HTTP3 "true"
+      - "4627:4627"
+      - "4627:4627/udp"   # HTTP/3 (QUIC), only used with HOARD_HTTP3 "true"
 
   # The local model server for AI tagging and descriptions (llama.cpp). It starts empty: in the portal, Settings →
   # AI tagging → Local model lists suggested models, downloads the one you pick from Hugging Face into the volume
   # below, and switches or deletes them later. The suggested ones run on the CPU in 3-6 GB of RAM; a GPU overlay
   # (compose.gpu-*.yml) moves them onto the GPU. Don't want it? Delete this service (Settings can use a hosted one).
   llm:
+    container_name: hoard-llm
     image: ghcr.io/ggml-org/llama.cpp:server
     restart: unless-stopped
     environment:
@@ -62,6 +65,7 @@ services:
       - /volume1/hoard/models:/models
 
   cloudflared:
+    container_name: hoard-cloudflared
     image: cloudflare/cloudflared:latest
     command: tunnel --no-autoupdate run
     restart: unless-stopped
@@ -74,6 +78,7 @@ services:
   # Pulls new Hoard images daily and restarts it; the database upgrades itself on start (backed up first).
   # Pin the image tag (e.g. :0.8) to take only patch releases, or remove this service to update by hand.
   watchtower:
+    container_name: hoard-watchtower
     image: ghcr.io/nicholas-fedor/watchtower:1.21
     restart: unless-stopped
     volumes:

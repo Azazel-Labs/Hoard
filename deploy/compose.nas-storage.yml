@@ -3,6 +3,7 @@
 #   docker compose -f deploy/compose.nas-storage.yml --env-file deploy/.env up -d
 services:
   tailscale:
+    container_name: hoard-tailscale
     image: tailscale/tailscale:latest
     hostname: hoard-nas
     restart: unless-stopped
@@ -17,6 +18,7 @@ services:
     cap_add: [net_admin]
 
   garage:
+    container_name: hoard-garage
     image: dxflrs/garage:v2.5.0
     command: ["/garage", "server", "--single-node", "--default-bucket"]
     restart: unless-stopped

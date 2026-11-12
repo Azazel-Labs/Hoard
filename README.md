@@ -38,6 +38,7 @@ Hoard ships as one image for amd64 and arm64: `ghcr.io/azazel-labs/hoard`. Save 
 ```yaml
 services:
   hoard:
+    container_name: hoard
     image: ghcr.io/azazel-labs/hoard:latest
     restart: unless-stopped
     environment:
@@ -47,13 +48,14 @@ services:
       - hoard-library:/library    # your files: big, put it on the disk with room
       - hoard-cache:/cache        # thumbnails, uploads in progress, Blender/ffmpeg: fast disk, can be rebuilt
     ports:
-      - "7878:7878"
+      - "4627:4627"
     labels:
       com.centurylinklabs.watchtower.enable: "true"
       com.centurylinklabs.watchtower.scope: hoard
 
   # Keeps Hoard up to date: pulls new images at 04:00 and restarts it.
   watchtower:
+    container_name: hoard-watchtower
     image: ghcr.io/nicholas-fedor/watchtower:1.21
     restart: unless-stopped
     volumes:
@@ -73,13 +75,14 @@ volumes:
 ```
 
 Each volume can be a folder on whichever disk suits it instead: `/mnt/big/hoard:/library` puts your files on the big
-disk, while the database stays small and easy to back up.
+disk, while the database stays small and easy to back up. Folders you mount need no chown: Hoard takes over
+`/config` and `/cache` and runs as whoever owns `/library` (set `PUID` and `PGID` to pick a user yourself).
 
 Then start it:
 
 ```sh
 echo "HOARD_TOKEN=$(openssl rand -hex 32)" > .env    # the portal asks for this once before uploads and edits
-docker compose up -d                                 # open http://<host>:7878
+docker compose up -d                                 # open http://<host>:4627
 ```
 
 There's no setup wizard: the library starts empty, so drop a pack onto the portal.
@@ -111,7 +114,7 @@ or Tailscale, and backups are covered in [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md
 # Server (Rust 1.99.1 is pinned in rust-toolchain.toml; rustup installs it automatically)
 cargo build --release
 (cd web && npm ci && npm run build)
-./target/release/hoardd                      # http://127.0.0.1:7878
+./target/release/hoardd                      # http://127.0.0.1:4627
 
 # Try it with a generated sample pack (textures, PBR set, sprites, audio, glTF/OBJ/GLB models, CC0 license)
 python3 tools/make_sample_pack.py /tmp/sample       # needs Pillow + numpy; ffmpeg optional
@@ -332,7 +335,7 @@ hoard sync        # downloads, verifies BLAKE3, writes hoard.lock; run again and
 ```
 
 ```toml
-server = "http://nas.local:7878"
+server = "http://nas.local:4627"
 out_dir = "assets/hoard"        # Godot: a folder under res://, Unity: Assets/Hoard, Bevy: assets/hoard
 layout = "category"             # category | pack | flat
 sidecars = true                 # <file>.hoard.json with tags, category, provenance for import scripts
@@ -486,7 +489,7 @@ Set before starting (these need a restart):
 
 | Env | Default | |
 |---|---|---|
-| `HOARD_LISTEN` | `127.0.0.1:7878` | bind address |
+| `HOARD_LISTEN` | `127.0.0.1:4627` | bind address |
 | `HOARD_DATA_DIR` | `./hoard-data` | the database (with Settings), its backups, the self-signed certificate |
 | `HOARD_FILES_DIR` | `<data dir>/blobs` | your files, with `HOARD_STORAGE=local` |
 | `HOARD_CACHE_DIR` | `<data dir>` | thumbnails and previews, uploads in progress, scratch space, downloaded Blender/ffmpeg |
@@ -627,9 +630,7 @@ HTTPS with HTTP/2 and HTTP/3 in Chrome (page, thumbnails and uploads over h3); W
 families, duplicate detection, pack context with store-page fetching, contact sheets and multi-view renders against
 a mock LLM; and MCP inline previews.
 
-Next ideas: embeddings for "find more like this" and near-duplicates (CLAP for audio, SigLIP 2 for images, or a
-multimodal embedding API), BPM and key detection for music (Essentia), previews for more source
-formats (GIMP, Substance), and an Unreal-friendly export layout.
+What's planned next is in [docs/roadmap.md](docs/roadmap.md).
 
 ## License
 

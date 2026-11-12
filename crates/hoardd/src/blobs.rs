@@ -14,9 +14,10 @@
 //! (`put_cache_bytes`): they're small, read constantly, and re-analyzing a pack makes them again. Reads look there
 //! first, then in the managed locations (local before remote), then in the watched ones.
 
+use std::collections::{HashMap, HashSet};
 use std::fmt;
 use std::path::{Path as FsPath, PathBuf};
-use std::sync::{Arc, PoisonError, RwLock};
+use std::sync::{Arc, Mutex, PoisonError, RwLock};
 
 use anyhow::{Context, Result, bail};
 use bytes::Bytes;
@@ -44,6 +45,7 @@ pub(crate) struct BlobStore {
     /// For reading watched files by their absolute paths.
     fs: Arc<LocalFileSystem>,
     libs: Arc<RwLock<Arc<Libraries>>>,
+    traffic: Arc<Mutex<Traffic>>,
     cfg: Arc<Config>,
     pool: db::Pool,
 }
@@ -52,6 +54,16 @@ impl fmt::Debug for BlobStore {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_struct("BlobStore").field("locations", &self.label()).finish_non_exhaustive()
     }
+}
+
+/// Which managed locations new files may go to, and which are being written to. One lock covers both, so a
+/// location being emptied can wait out the writes that chose it before it started.
+#[derive(Default)]
+struct Traffic {
+    /// Managed locations being emptied: new files don't go to them.
+    draining: HashSet<i64>,
+    /// Writes under way, by location.
+    writing: HashMap<i64, usize>,
 }
 
 /// The open stores of the library locations, swapped whole when they change.
@@ -74,12 +86,13 @@ pub(crate) struct Managed {
 impl Libraries {
     /// Where a new file of this kind goes: the first location that takes the kind, else the catch-all, else the
     /// first managed location there is.
-    fn target(&self, kind: AssetKind) -> Option<&Managed> {
-        self.managed
-            .iter()
+    /// Locations in `skip` (ones being emptied) are left out.
+    fn target(&self, kind: AssetKind, skip: &HashSet<i64>) -> Option<&Managed> {
+        let mut open = self.managed.iter().filter(|m| !skip.contains(&m.id));
+        open.clone()
             .find(|m| m.kinds.iter().any(|k| k == kind.as_str()))
-            .or_else(|| self.managed.iter().find(|m| m.catch_all))
-            .or_else(|| self.managed.first())
+            .or_else(|| open.clone().find(|m| m.catch_all))
+            .or_else(|| open.next())
     }
 
     /// Managed stores in read order: local disks before buckets.
@@ -187,6 +200,7 @@ impl BlobStore {
             cache,
             fs: Arc::new(LocalFileSystem::new()),
             libs: Arc::default(),
+            traffic: Arc::default(),
             cfg: Arc::new(cfg.clone()),
             pool,
         };
@@ -220,6 +234,37 @@ impl BlobStore {
         Ok(())
     }
 
+    /// [`reload`](Self::reload) off the async threads: it opens folders, which can stall on a sleeping share.
+    pub(crate) async fn refresh(&self) -> Result<()> {
+        let me = self.clone();
+        tokio::task::spawn_blocking(move || me.reload()).await?
+    }
+
+    fn traffic(&self) -> std::sync::MutexGuard<'_, Traffic> {
+        self.traffic.lock().unwrap_or_else(PoisonError::into_inner)
+    }
+
+    /// Stop sending new files to a managed location while it's emptied, until the guard is dropped.
+    pub(crate) fn drain(&self, id: i64) -> Draining {
+        self.traffic().draining.insert(id);
+        Draining { traffic: Arc::clone(&self.traffic), id }
+    }
+
+    /// Wait until the writes to a location that started before it was drained have finished.
+    pub(crate) async fn writes_done(&self, id: i64) {
+        while self.traffic().writing.get(&id).is_some_and(|n| *n > 0) {
+            tokio::time::sleep(std::time::Duration::from_millis(250)).await;
+        }
+    }
+
+    /// Pick where a new file of this kind goes and count the write against it until the guard is dropped.
+    fn claim<'a>(&self, libs: &'a Libraries, kind: AssetKind) -> Option<(&'a Managed, Writing)> {
+        let mut t = self.traffic();
+        let m = libs.target(kind, &t.draining)?;
+        *t.writing.entry(m.id).or_default() += 1;
+        Some((m, Writing { traffic: Arc::clone(&self.traffic), id: m.id }))
+    }
+
     fn libs(&self) -> Arc<Libraries> {
         Arc::clone(&self.libs.read().unwrap_or_else(PoisonError::into_inner))
     }
@@ -242,6 +287,18 @@ impl BlobStore {
         self.libs().managed.iter().find(|m| m.id == id).map(|m| Arc::clone(&m.store))
     }
 
+    /// The open managed locations, as (id, store), in the order they were added.
+    pub(crate) fn managed_stores(&self) -> Vec<(i64, Arc<dyn ObjectStore>)> {
+        self.libs().managed.iter().map(|m| (m.id, Arc::clone(&m.store))).collect()
+    }
+
+    /// Where a file of this kind belongs, leaving out the location `skip`: (id, store).
+    pub(crate) fn route(&self, kind: AssetKind, skip: Option<i64>) -> Option<(i64, Arc<dyn ObjectStore>)> {
+        let mut skip_all = self.traffic().draining.clone();
+        skip_all.extend(skip);
+        self.libs().target(kind, &skip_all).map(|m| (m.id, Arc::clone(&m.store)))
+    }
+
     /// Hash a local file without storing it.
     pub(crate) fn hash_file(path: &FsPath) -> Result<StoredBlob> {
         let mut hasher = blake3::Hasher::new();
@@ -257,7 +314,7 @@ impl BlobStore {
         if libs.holds(&blob.hash).await? {
             return Ok(());
         }
-        let target = libs.target(kind).context(NO_LIBRARY)?;
+        let (target, _writing) = self.claim(&libs, kind).context(NO_LIBRARY)?;
         write_file(&target.store, path, &key(&blob.hash)).await
     }
 
@@ -268,20 +325,14 @@ impl BlobStore {
         let size = bytes.len() as u64;
         let libs = self.libs();
         if !libs.holds(&hash).await? {
-            match libs.target(kind) {
-                Some(m) => {
+            match self.claim(&libs, kind) {
+                Some((m, _writing)) => {
                     m.store.put(&key(&hash), PutPayload::from(bytes)).await?;
                 }
                 None => return self.put_cache_bytes(bytes).await,
             }
         }
         Ok(StoredBlob { hash, size })
-    }
-
-    /// Whether Hoard holds a copy of this blob itself (in the cache or a managed location), as opposed to only
-    /// finding it in a watched folder.
-    pub(crate) async fn stored(&self, hash: &str) -> Result<bool> {
-        Ok(exists_in(&*self.cache, hash).await? || self.libs().holds(hash).await?)
     }
 
     /// Store a thumbnail, model views or an audio preview in the local cache store rather than with the files.
@@ -399,6 +450,45 @@ impl BlobStore {
     }
 }
 
+/// While held, new files aren't routed to the location being emptied.
+pub(crate) struct Draining {
+    traffic: Arc<Mutex<Traffic>>,
+    id: i64,
+}
+
+impl Drop for Draining {
+    fn drop(&mut self) {
+        self.traffic.lock().unwrap_or_else(PoisonError::into_inner).draining.remove(&self.id);
+    }
+}
+
+/// A write under way to a managed location.
+struct Writing {
+    traffic: Arc<Mutex<Traffic>>,
+    id: i64,
+}
+
+impl Drop for Writing {
+    fn drop(&mut self) {
+        let mut t = self.traffic.lock().unwrap_or_else(PoisonError::into_inner);
+        if let Some(n) = t.writing.get_mut(&self.id) {
+            *n = n.saturating_sub(1);
+        }
+    }
+}
+
+/// Whether a store holds any of Hoard's files. Anything else in it (a `Thumbs.db`, other objects in a shared bucket)
+/// doesn't count, so it doesn't stop a location from being removed.
+pub(crate) async fn holds_any(store: &dyn ObjectStore) -> Result<bool> {
+    let mut list = store.list(None);
+    while let Some(meta) = list.next().await {
+        if meta?.location.filename().is_some_and(is_valid_hash) {
+            return Ok(true);
+        }
+    }
+    Ok(false)
+}
+
 fn blob_read(res: object_store::GetResult) -> BlobRead {
     let total_size = res.meta.size;
     let range = res.range.clone();
@@ -456,7 +546,7 @@ pub(crate) mod tests {
         locations::insert(&pool.get().unwrap(), &new).unwrap().id
     }
 
-    fn on_disk(dir: &FsPath, root: &str, h: &str) -> bool {
+    pub(crate) fn on_disk(dir: &FsPath, root: &str, h: &str) -> bool {
         dir.join(root).join(&h[0..2]).join(&h[2..4]).join(h).is_file()
     }
 

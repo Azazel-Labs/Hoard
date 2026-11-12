@@ -5,13 +5,15 @@ isn't yet.
 
 ## Library locations: what's left
 
-The first-run setup and library locations are in: a server can keep files in several managed locations, routed by
-asset kind, and index watched folders in place. Still to come:
+The first-run setup and library locations are in. A server can keep files in several managed locations, routed by
+asset kind, and move stored files between them. It can also index watched folders in place. Still to come:
 
-- Moving files between managed locations, so a location can be emptied and removed, or its kinds changed for files
-  already stored.
 - Watched files edited in place: a rescan picks up new and removed folders and files, but a file changed where it sits
   keeps its old hash and preview until the pack is re-analyzed.
+- Renamed watched folders: a renamed folder is a new pack, and the old one (with its tags and notes) goes three days
+  later. Matching the two by their files would carry the curation over.
+- Cheaper rescans: every 15 minutes, each watched pack's whole tree is walked. A big library on a slow share could
+  check folder modification times first.
 
 ## Store details looked up automatically
 

@@ -58,6 +58,20 @@ const MIGRATIONS: &[&str] = &[
      ALTER TABLE packs ADD COLUMN location_id INTEGER REFERENCES locations(id);
      ALTER TABLE packs ADD COLUMN folder TEXT;
      CREATE INDEX packs_location ON packs(location_id) WHERE location_id IS NOT NULL;",
+    // 14: watched folders. What was deleted for good from one stays deleted when it's rescanned (the files are
+    // still there: Hoard never deletes them), and a pack whose folder went missing waits a while before it's
+    // dropped, in case the folder is only offline.
+    "CREATE TABLE skipped_files (
+       pack_id TEXT NOT NULL REFERENCES packs(id) ON DELETE CASCADE,
+       path    TEXT NOT NULL,
+       PRIMARY KEY (pack_id, path)
+     ) WITHOUT ROWID;
+     CREATE TABLE skipped_folders (
+       location_id INTEGER NOT NULL REFERENCES locations(id) ON DELETE CASCADE,
+       folder      TEXT NOT NULL,
+       PRIMARY KEY (location_id, folder)
+     ) WITHOUT ROWID;
+     ALTER TABLE packs ADD COLUMN missing_since TEXT;",
 ];
 
 /// How many automatic pre-upgrade backups to keep in `<data dir>/backups`.
@@ -440,6 +454,35 @@ pub(crate) fn delete_pack(conn: &mut Connection, id: &str) -> Result<bool> {
 }
 
 // ---------------------------------------------------------------------------------------------
+// Watched folders
+
+/// Remember that an asset of a watched pack was deleted for good, so a rescan doesn't add its file back: its path,
+/// and the path of the file it was converted from. Does nothing for a pack Hoard keeps itself.
+pub(crate) fn skip_on_rescan(c: &Connection, asset_id: &str) -> Result<()> {
+    c.execute(
+        "INSERT OR IGNORE INTO skipped_files (pack_id, path)
+         SELECT a.pack_id, a.path FROM assets a JOIN packs p ON p.id = a.pack_id
+          WHERE a.id = ?1 AND p.folder IS NOT NULL
+         UNION
+         SELECT a.pack_id, o.path FROM asset_origin o JOIN assets a ON a.id = o.asset_id JOIN packs p ON p.id = a.pack_id
+          WHERE o.asset_id = ?1 AND p.folder IS NOT NULL",
+        [asset_id],
+    )?;
+    Ok(())
+}
+
+/// The files of a pack's folder Hoard already accounts for: its assets' paths, the files assets were converted
+/// from, and files deleted for good.
+pub(crate) fn known_paths(c: &Connection, pack_id: &str) -> Result<std::collections::HashSet<String>> {
+    let mut stmt = c.prepare(
+        "SELECT path FROM assets WHERE pack_id = ?1
+         UNION SELECT o.path FROM asset_origin o JOIN assets a ON a.id = o.asset_id WHERE a.pack_id = ?1
+         UNION SELECT path FROM skipped_files WHERE pack_id = ?1",
+    )?;
+    Ok(stmt.query_map([pack_id], |r| r.get(0))?.collect::<rusqlite::Result<_>>()?)
+}
+
+// ---------------------------------------------------------------------------------------------
 // Archive
 
 /// What an archive request touched.
@@ -509,15 +552,25 @@ pub(crate) fn purge_archived(
         }
         tx.execute("DELETE FROM assets_fts WHERE asset_id IN (SELECT id FROM assets WHERE pack_id = ?1)", [id])?;
         tx.execute("DELETE FROM jobs WHERE pack_id = ?1 AND status IN ('queued', 'failed')", [id])?;
+        tx.execute(
+            "INSERT OR IGNORE INTO skipped_folders (location_id, folder)
+             SELECT location_id, folder FROM packs WHERE id = ?1 AND location_id IS NOT NULL AND folder IS NOT NULL",
+            [id],
+        )?;
         n.packs += tx.execute("DELETE FROM packs WHERE id = ?1", [id])? as u64;
         gone.push(id.clone());
     }
     for id in &asset_ids {
-        tx.execute(
-            "DELETE FROM assets_fts WHERE asset_id = ?1 AND EXISTS
-               (SELECT 1 FROM assets WHERE id = ?1 AND archived_at IS NOT NULL)",
+        let archived: bool = tx.query_row(
+            "SELECT EXISTS (SELECT 1 FROM assets WHERE id = ?1 AND archived_at IS NOT NULL)",
             [id],
+            |r| r.get(0),
         )?;
+        if !archived {
+            continue;
+        }
+        skip_on_rescan(&tx, id)?;
+        tx.execute("DELETE FROM assets_fts WHERE asset_id = ?1", [id])?;
         n.assets += tx.execute("DELETE FROM assets WHERE id = ?1 AND archived_at IS NOT NULL", [id])? as u64;
     }
     tx.commit()?;
@@ -1130,6 +1183,27 @@ pub(crate) fn tag_counts(conn: &Connection, prefix: &str, limit: u32) -> Result<
 
 // ---------------------------------------------------------------------------------------------
 // Jobs
+
+/// Whether a job of this kind (for this pack, if given) is waiting or running, optionally only one whose payload
+/// has `field` set to `value`.
+pub(crate) fn job_pending(
+    conn: &Connection,
+    kind: &str,
+    pack_id: Option<&str>,
+    field: Option<(&str, i64)>,
+) -> Result<bool> {
+    let (path, value) = match field {
+        Some((f, v)) => (Some(format!("$.{f}")), Some(v)),
+        None => (None, None),
+    };
+    Ok(conn.query_row(
+        "SELECT EXISTS (SELECT 1 FROM jobs WHERE kind = ?1 AND status IN ('queued', 'running')
+                          AND (?2 IS NULL OR pack_id = ?2)
+                          AND (?3 IS NULL OR json_extract(payload, ?3) = ?4))",
+        params![kind, pack_id, path, value],
+        |r| r.get(0),
+    )?)
+}
 
 pub(crate) fn enqueue(
     conn: &Connection,

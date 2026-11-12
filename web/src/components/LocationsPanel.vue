@@ -3,6 +3,7 @@
 import { computed, onMounted, reactive, ref } from 'vue'
 import { api, ApiError, KIND_LABEL, type AssetKind, type LibraryLocation, type LocationList } from '../api'
 import { confirmDialog, showError, showOk } from '../ui'
+import KindChips from './KindChips.vue'
 import LocationForm from './LocationForm.vue'
 
 const emit = defineEmits<{ unauthorized: []; changed: [] }>()
@@ -41,9 +42,6 @@ function edit(l: LibraryLocation) {
   editing.value = l.id
   Object.assign(draft, { name: l.name, kinds: [...l.kinds], catch_all: l.catch_all })
 }
-function toggleKind(k: AssetKind) {
-  draft.kinds = draft.kinds.includes(k) ? draft.kinds.filter((x) => x !== k) : [...draft.kinds, k]
-}
 
 async function save(l: LibraryLocation) {
   busy.value = true
@@ -60,8 +58,10 @@ async function save(l: LibraryLocation) {
 }
 
 async function remove(l: LibraryLocation) {
+  const watchedLoc = l.mode === 'watched'
+  const others = managed.value.filter((m) => m.id !== l.id).length
   const ok = await confirmDialog(
-    l.mode === 'watched'
+    watchedLoc
       ? {
           title: `Stop watching ${l.name}?`,
           body: l.packs
@@ -72,7 +72,9 @@ async function remove(l: LibraryLocation) {
         }
       : {
           title: `Remove ${l.name}?`,
-          body: 'Only an empty location can be removed. New files go to the other locations from now on.',
+          body: others
+            ? 'Any files in it move to the other locations first, by kind; it goes once it’s empty. Nothing is lost.'
+            : 'If it holds files, add another location for them to move to first.',
           confirm: 'Remove',
           danger: true,
         },
@@ -80,12 +82,46 @@ async function remove(l: LibraryLocation) {
   if (!ok) return
   busy.value = true
   try {
-    await api.deleteLocation(l.id)
-    showOk(`Removed ${l.name}`)
+    try {
+      await api.deleteLocation(l.id)
+      showOk(`Removed ${l.name}`)
+    } catch (e) {
+      if (!(e instanceof ApiError) || watchedLoc) throw e
+      if (e.status === 409 && others) {
+        // It still holds files: move them out, and it's removed when that's done.
+        await api.emptyLocation(l.id)
+        showOk(`Moving the files out of ${l.name}; it's removed when that's done`)
+      } else if (e.status === 503) {
+        // Its disk can't be reached, so its files can't be moved.
+        const anyway = await confirmDialog({
+          title: `${l.name} can't be reached`,
+          body: 'Its files can’t be moved out while it’s offline. Remove it anyway? Any files still on it will show as missing.',
+          confirm: 'Remove anyway',
+          danger: true,
+        })
+        if (!anyway) return
+        await api.deleteLocation(l.id, true)
+        showOk(`Removed ${l.name}`)
+      } else {
+        throw e
+      }
+    }
     await load()
     emit('changed')
   } catch (e) {
     failed(e, `Couldn't remove ${l.name}`)
+  } finally {
+    busy.value = false
+  }
+}
+
+async function rebalance() {
+  busy.value = true
+  try {
+    await api.rebalance()
+    showOk('Moving stored files to the locations that take their kind')
+  } catch (e) {
+    failed(e, "Couldn't move the files")
   } finally {
     busy.value = false
   }
@@ -106,9 +142,14 @@ async function scanNow(l: LibraryLocation) {
   scanning.value = l.id
   try {
     await api.scanLocation(l.id)
-    // A scan takes a moment; new folders then ingest in the background and show up in the library as they finish.
-    await new Promise((r) => setTimeout(r, 1500))
-    await load()
+    // Wait for the scan to finish (up to half a minute); new folders then ingest in the background and show up in
+    // the library as they're done.
+    const before = l.scanned_at
+    for (let i = 0; i < 30; i++) {
+      await new Promise((r) => setTimeout(r, 1000))
+      await load()
+      if (data.value?.locations.find((x) => x.id === l.id)?.scanned_at !== before) break
+    }
     emit('changed')
   } catch (e) {
     failed(e, `Couldn't scan ${l.name}`)
@@ -146,8 +187,7 @@ async function created(l: LibraryLocation) {
                   <small class="mono">{{ l.path }}</small>
                   <small>
                     <template v-if="l.mode === 'managed'">{{ takes(l) }}</template>
-                    <template v-if="l.mode === 'managed'"> · </template>{{ l.packs }} pack{{ l.packs === 1 ? '' : 's' }}
-                    <template v-if="l.mode === 'watched'"> · {{ scannedAgo(l.scanned_at) }}</template>
+                    <template v-else>{{ l.packs }} pack{{ l.packs === 1 ? '' : 's' }} · {{ scannedAgo(l.scanned_at) }}</template>
                     <template v-if="!l.online"> · <span class="off">can’t be reached</span></template>
                   </small>
                 </div>
@@ -165,14 +205,11 @@ async function created(l: LibraryLocation) {
                 <template v-if="l.mode === 'managed'">
                   <span class="lbl">Files that go here</span>
                   <div>
-                    <div class="kinds" role="group" aria-label="Asset kinds">
-                      <label v-for="k in data.kinds" :key="k" class="kind" :class="{ on: draft.kinds.includes(k) }">
-                        <input type="checkbox" :checked="draft.kinds.includes(k)" @change="toggleKind(k)" />
-                        {{ KIND_LABEL[k] }}
-                      </label>
-                    </div>
-                    <label class="check"><input v-model="draft.catch_all" type="checkbox" /> Also everything no other location takes</label>
-                    <p class="hint">Applies to files added from now on; what's already here stays put.</p>
+                    <KindChips v-model="draft.kinds" :kinds="data.kinds" />
+                    <label class="check" :title="l.catch_all ? 'To change this, make another location the catch-all' : undefined">
+                      <input v-model="draft.catch_all" type="checkbox" :disabled="l.catch_all" /> Also everything no other location takes
+                    </label>
+                    <p class="hint">Applies to files added from now on. To move what's stored already, use <em>Move stored files to match</em> below.</p>
                   </div>
                 </template>
                 <span />
@@ -183,6 +220,10 @@ async function created(l: LibraryLocation) {
               </form>
             </li>
           </ul>
+          <div v-if="group.id === 'managed' && managed.length > 1" class="rebal">
+            <button type="button" class="btn" :disabled="busy" @click="rebalance">Move stored files to match</button>
+            <small>After changing what a location takes: files already stored move to the location their kind goes to now.</small>
+          </div>
         </template>
       </section>
 
@@ -233,16 +274,9 @@ h3 { margin: 0; font-size: 0.7rem; font-weight: 650; letter-spacing: 0.04em; tex
 .edit .hint { margin: 0.4rem 0 0; }
 .lbl { color: var(--muted); }
 .eacts { display: flex; gap: 0.5rem; }
-.kinds { display: flex; flex-wrap: wrap; gap: 0.35rem; margin-bottom: 0.5rem; }
-.kind {
-  display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.25em 0.65em; border: 1px solid var(--line); border-radius: 999px;
-  cursor: pointer; user-select: none; transition: border-color var(--dur-1), background-color var(--dur-1), color var(--dur-1);
-}
-.kind input { position: absolute; opacity: 0; pointer-events: none; }
-.kind:hover { border-color: var(--muted); }
-.kind.on { background: var(--text); color: var(--bg); border-color: var(--text); font-weight: 600; }
-.kind:has(:focus-visible) { outline: 2px solid var(--accent); outline-offset: 2px; }
 .check { display: inline-flex; gap: 0.45rem; align-items: center; }
+.rebal { display: flex; gap: 0.7rem; align-items: center; margin-top: 0.6rem; }
+.rebal small { color: var(--muted); font-size: var(--step--1); line-height: 1.4; }
 @media (max-width: 30rem) {
   .top { flex-wrap: wrap; }
   .acts { width: 100%; justify-content: flex-end; }

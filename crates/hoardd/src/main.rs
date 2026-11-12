@@ -27,6 +27,7 @@ mod locations;
 mod mcp;
 mod meshes;
 mod music;
+mod relocate;
 mod scan;
 mod server;
 mod settings;
@@ -150,8 +151,6 @@ async fn main() -> Result<()> {
     Ok(())
 }
 
-/// Refuse to start on an empty files dir while the files are still where they used to be (`<data-dir>/blobs`):
-/// that's a compose file updated to separate volumes without moving the files, and every asset would look gone.
 /// Compress text (JSON, JS, CSS, HTML, SVG), never media or binary downloads: they're already compressed, and
 /// on-the-fly compression would drop `Content-Length` and break `Range` requests on multi-GB files.
 fn compressible() -> impl Predicate {

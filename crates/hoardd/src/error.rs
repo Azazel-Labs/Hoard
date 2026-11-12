@@ -22,6 +22,9 @@ impl AppError {
     pub(crate) fn conflict(msg: impl std::fmt::Display) -> Self {
         Self { status: StatusCode::CONFLICT, err: anyhow::anyhow!("{msg}") }
     }
+    pub(crate) fn unavailable(msg: impl std::fmt::Display) -> Self {
+        Self { status: StatusCode::SERVICE_UNAVAILABLE, err: anyhow::anyhow!("{msg}") }
+    }
     pub(crate) fn unprocessable(msg: impl std::fmt::Display) -> Self {
         Self { status: StatusCode::UNPROCESSABLE_ENTITY, err: anyhow::anyhow!("{msg}") }
     }

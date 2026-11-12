@@ -723,10 +723,7 @@ pub(crate) fn ingest_pack(state: &AppState, rt: &Handle, pack_id: &str, auto_nam
     files.sort();
     let license = detect_pack_license(&root, &files);
     let readme = context::read_readmes(&root, &files);
-    let known: HashSet<String> = {
-        let mut stmt = conn.prepare("SELECT path FROM assets WHERE pack_id = ?1")?;
-        stmt.query_map([pack_id], |r| r.get(0))?.collect::<rusqlite::Result<_>>()?
-    };
+    let known = db::known_paths(&conn, pack_id)?;
     let first = known.is_empty();
     files.retain(|f| !known.contains(&rel_of(&root, f)));
     drop(known);

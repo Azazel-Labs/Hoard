@@ -541,8 +541,12 @@ export const api = {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(patch),
     }),
-  deleteLocation: (id: number) => request<void>(`/api/admin/locations/${id}`, { method: 'DELETE' }),
+  /** `force` removes a managed location that can't be reached; files still on it go missing. */
+  deleteLocation: (id: number, force = false) =>
+    request<void>(`/api/admin/locations/${id}${force ? '?force=true' : ''}`, { method: 'DELETE' }),
   scanLocation: (id: number) => request<void>(`/api/admin/locations/${id}/scan`, { method: 'POST' }),
+  emptyLocation: (id: number) => request<void>(`/api/admin/locations/${id}/empty`, { method: 'POST' }),
+  rebalance: () => request<void>('/api/admin/locations/rebalance', { method: 'POST' }),
   /** The folders in `path` on the server; an empty path lists the drives or `/`. */
   browse: (path = '') => request<FolderListing>(`/api/admin/fs?path=${encodeURIComponent(path)}`),
   /** Start or look in on a "download as" conversion; answers when it moves on, or after `wait` seconds. */

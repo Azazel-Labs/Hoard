@@ -274,7 +274,13 @@ pub(crate) async fn convert_pack(state: &AppState, pack_id: &str, mut req: Reque
             }
             Outcome::Unsupported(why) if req.drop_unsupported => {
                 tracing::info!(asset = %path, reason = %why, "dropping package with no common format");
-                db::call(&state.pool, move |c| Ok(c.execute("DELETE FROM assets WHERE id = ?1", [&id2])?)).await?;
+                db::call(&state.pool, move |c| {
+                    // A watched folder still has the file: remember it's dropped, or the next rescan adds it back.
+                    db::skip_on_rescan(c, &id2)?;
+                    c.execute("DELETE FROM assets_fts WHERE asset_id = ?1", [&id2])?;
+                    Ok(c.execute("DELETE FROM assets WHERE id = ?1", [&id2])?)
+                })
+                .await?;
                 sum.dropped += 1;
             }
             other => {

@@ -89,12 +89,17 @@ The first visit opens a short setup that asks where your library lives. It sugge
 it and drop a pack onto the portal. More locations come later, from **Settings → Library locations**:
 
 - **A library Hoard keeps** gets copies of what you upload or import. Each one ticks the kinds of files it takes
-  (audio on one disk, models on another), and one is the catch-all for the rest.
+  (audio on one disk, models on another), and one is the catch-all for the rest. Changing what a location takes
+  applies to new files; **Move stored files to match** moves what's already stored. **Remove** moves a location's
+  files to the others first, by kind, and removes it once it's empty. Each file is checked against its hash before
+  the old copy is deleted. A location whose disk is gone can be removed anyway, and its files then show as missing.
 - **A watched folder** is a folder of packs you already have. Each folder inside it becomes a pack, indexed where it
   sits. Hoard never changes, moves or deletes anything there. Mount it read-only if you like. Hoard looks through it
   at startup and every 15 minutes after (or when you press **Scan now**), picking up new folders, files added to or
   removed from a pack, and packs whose folder is gone. A folder that's suddenly empty or unreachable is taken for a
-  disk that isn't mounted, and its packs are kept.
+  disk that isn't mounted, and its packs are kept. A pack whose folder is missing is kept for three days, with its
+  tags and notes, in case the folder comes back. Anything you delete for good from a watched pack stays deleted when
+  the folder is rescanned, even though its files are still there.
 
 A location is any folder the server can see, so in Docker, mount it into the container first.
 
@@ -598,7 +603,9 @@ when a token is set; those are marked 🔒.
 | GET | `/api/admin/jobs` | the job queue |
 | GET 🔒, PUT 🔒 | `/api/admin/settings` | Settings: read, or change some (`null` goes back to the flag) |
 | GET 🔒, POST 🔒 | `/api/admin/locations` | library locations (with whether each is reachable and its pack count), or add one: `{mode, path, kinds, catch_all, name?}` |
-| PATCH 🔒, DELETE 🔒 | `/api/admin/locations/{id}` | rename one, change its kinds or make it the catch-all; or remove it (a managed one must be empty) |
+| PATCH 🔒, DELETE 🔒 | `/api/admin/locations/{id}` | rename one, change its kinds or make it the catch-all; or remove it. A managed one must be empty (409 otherwise), and one that can't be reached is refused with 503 unless `?force=true` |
+| POST 🔒 | `/api/admin/locations/{id}/empty` | move a managed location's files to the other locations by kind, then remove it; returns 202 and runs as a job |
+| POST 🔒 | `/api/admin/locations/rebalance` | move every stored file to the location its kind goes to now; returns 202 and runs as a job |
 | POST 🔒 | `/api/admin/locations/{id}/scan` | look through a watched folder now; returns 202 and the scan runs as a job |
 | GET 🔒 | `/api/admin/fs?path=` | the folders in a folder on the server, for picking a location |
 | POST 🔒 | `/api/admin/llm/models` | `{url, api_key?}`: the models an AI service offers (also a connection test) |

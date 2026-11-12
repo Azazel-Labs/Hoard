@@ -59,14 +59,22 @@ pub(crate) struct Location {
 const COLUMNS: &str = "id, name, mode, path, kinds, catch_all, scanned_at, created_at";
 
 fn from_row(r: &rusqlite::Row<'_>) -> rusqlite::Result<Location> {
-    let mode: String = r.get(2)?;
+    let bad = |col: usize, e: Box<dyn std::error::Error + Send + Sync>| {
+        rusqlite::Error::FromSqlConversionFailure(col, rusqlite::types::Type::Text, e)
+    };
+    // A location read wrong could be written to, or be emptied by a rebalance: refuse what isn't understood.
+    let mode = match r.get::<_, String>(2)?.as_str() {
+        "managed" => Mode::Managed,
+        "watched" => Mode::Watched,
+        other => return Err(bad(2, format!("unknown location mode {other:?}").into())),
+    };
     let kinds: String = r.get(4)?;
     Ok(Location {
         id: r.get(0)?,
         name: r.get(1)?,
-        mode: if mode == "watched" { Mode::Watched } else { Mode::Managed },
+        mode,
         path: r.get(3)?,
-        kinds: serde_json::from_str(&kinds).unwrap_or_default(),
+        kinds: serde_json::from_str(&kinds).map_err(|e| bad(4, e.into()))?,
         catch_all: r.get::<_, i64>(5)? != 0,
         scanned_at: r.get(6)?,
         created_at: r.get(7)?,
@@ -146,7 +154,8 @@ fn normalize(path: &str) -> String {
 }
 
 /// Add a location. The first managed one becomes the catch-all, and a new catch-all takes over from the old.
-pub(crate) fn insert(c: &Connection, new: &NewLocation) -> Result<Location> {
+pub(crate) fn insert(conn: &Connection, new: &NewLocation) -> Result<Location> {
+    let c = conn.unchecked_transaction()?;
     let managed = new.mode == Mode::Managed;
     let has_catch_all: bool =
         c.query_row("SELECT EXISTS (SELECT 1 FROM locations WHERE mode = 'managed' AND catch_all = 1)", [], |r| {
@@ -169,7 +178,9 @@ pub(crate) fn insert(c: &Connection, new: &NewLocation) -> Result<Location> {
         "INSERT INTO locations (name, mode, path, kinds, catch_all, created_at) VALUES (?1, ?2, ?3, ?4, ?5, ?6)",
         params![name, new.mode.as_str(), new.path, kinds, catch_all, db::now()],
     )?;
-    get(c, c.last_insert_rowid())?.context("location just added is gone")
+    let loc = get(&c, c.last_insert_rowid())?.context("location just added is gone")?;
+    c.commit()?;
+    Ok(loc)
 }
 
 /// An install from before library locations keeps its files where they are: they become its one managed
@@ -180,12 +191,29 @@ pub(crate) fn adopt_existing(c: &Connection, cfg: &Config) -> Result<Option<Loca
         return Ok(None);
     }
     let path = match cfg.storage {
-        StorageKind::Local => std::path::absolute(cfg.blobs_dir())?.display().to_string(),
+        StorageKind::Local => std::path::absolute(legacy_files_dir(cfg))?.display().to_string(),
         StorageKind::S3 => format!("s3://{}", cfg.s3_bucket.as_deref().context("HOARD_S3_BUCKET is required for s3")?),
     };
     let new =
         NewLocation { name: Some("Library".to_owned()), mode: Mode::Managed, path, kinds: vec![], catch_all: true };
     insert(c, &new).map(Some)
+}
+
+/// Where an install from before library locations has its files: `HOARD_FILES_DIR`, unless that's empty and they're
+/// still in `<data-dir>/blobs` (a compose file changed to a separate volume without moving them).
+fn legacy_files_dir(cfg: &Config) -> PathBuf {
+    let has_files = |p: &Path| std::fs::read_dir(p).is_ok_and(|mut d| d.next().is_some());
+    let configured = cfg.blobs_dir();
+    let old = cfg.data_dir.join("blobs");
+    if configured != old && !has_files(&configured) && has_files(&old) {
+        tracing::warn!(
+            files_dir = %configured.display(),
+            "HOARD_FILES_DIR is empty but the files are still in {}; using that",
+            old.display()
+        );
+        return old;
+    }
+    configured
 }
 
 /// Where the setup suggests the first library goes: the bucket with `HOARD_STORAGE=s3`, else `HOARD_FILES_DIR`
@@ -216,6 +244,7 @@ async fn probe(state: &AppState, new: &NewLocation, others: &[Location]) -> Resu
             return Err(AppError::bad_request("give the folder's full path"));
         }
         let mode = new.mode;
+        let path = path.clone();
         tokio::task::spawn_blocking(move || -> Result<()> {
             let dir = Path::new(&path);
             match mode {
@@ -235,18 +264,43 @@ async fn probe(state: &AppState, new: &NewLocation, others: &[Location]) -> Resu
         .map_err(anyhow::Error::from)?
         .map_err(|e| AppError::bad_request(format!("{e:#}")))?;
     }
-    let mine = Path::new(&new.path);
+    let (others, cfg) = (others.to_vec(), state.cfg.clone());
+    tokio::task::spawn_blocking(move || overlaps(&path, &others, &cfg))
+        .await
+        .map_err(anyhow::Error::from)?
+        .map_or(Ok(()), |msg| Err(AppError::conflict(msg)))
+}
+
+/// What a new location's folder would overlap, if anything. Folders are compared as they really are (`..`, links and
+/// letter case resolved), so the same folder typed two ways is still caught.
+fn overlaps(path: &str, others: &[Location], cfg: &Config) -> Option<String> {
+    let real = |p: &Path| std::fs::canonicalize(p).or_else(|_| std::path::absolute(p)).unwrap_or_else(|_| p.to_owned());
+    let nests = |a: &Path, b: &Path| a.starts_with(b) || b.starts_with(a);
+    let is_bucket = crate::blobs::s3_bucket(path).is_some();
+    let mine = real(Path::new(path));
     for o in others {
-        let theirs = Path::new(&o.path);
-        if o.path == new.path || mine.starts_with(theirs) || theirs.starts_with(mine) {
-            return Err(AppError::conflict(format!("that overlaps the location {:?} ({})", o.name, o.path)));
+        let clash = if is_bucket || crate::blobs::s3_bucket(&o.path).is_some() {
+            o.path == path
+        } else {
+            nests(&mine, &real(Path::new(&o.path)))
+        };
+        if clash {
+            return Some(format!("that overlaps the location {:?} ({})", o.name, o.path));
         }
     }
-    let data = std::path::absolute(&state.cfg.data_dir).unwrap_or_else(|_| state.cfg.data_dir.clone());
-    if mine.is_absolute() && (data.starts_with(mine) || mine.starts_with(&data)) && mine != data.join("library") {
-        return Err(AppError::conflict(format!("that overlaps Hoard's data folder ({})", data.display())));
+    if is_bucket {
+        return None;
     }
-    Ok(())
+    let data = real(&cfg.data_dir);
+    if nests(&mine, &data) && mine != data.join("library") {
+        return Some(format!("that overlaps Hoard's data folder ({})", cfg.data_dir.display()));
+    }
+    for dir in [cfg.thumbs_dir(), cfg.staging_dir(), cfg.tmp_dir()] {
+        if nests(&mine, &real(&dir)) {
+            return Some(format!("that overlaps Hoard's cache folder ({})", dir.display()));
+        }
+    }
+    None
 }
 
 /// `GET /api/admin/locations`: the locations, with whether each can be reached, and what the setup suggests.
@@ -258,12 +312,23 @@ pub(crate) async fn list_locations(State(state): State<AppState>) -> ApiResult<J
         Ok((list(c)?, packs))
     })
     .await?;
+    // A disk mounted since the server started is picked up when someone looks.
+    if locations.iter().any(|l| l.mode == Mode::Managed && state.blobs.managed_store(l.id).is_none()) {
+        state.blobs.refresh().await?;
+    }
+    let watched: Vec<(i64, String)> =
+        locations.iter().filter(|l| l.mode == Mode::Watched).map(|l| (l.id, l.path.clone())).collect();
+    let readable: std::collections::HashSet<i64> = tokio::task::spawn_blocking(move || {
+        watched.into_iter().filter(|(_, p)| Path::new(p).is_dir()).map(|(id, _)| id).collect()
+    })
+    .await
+    .map_err(anyhow::Error::from)?;
     let rows: Vec<Value> = locations
         .into_iter()
         .map(|l| {
             let online = match l.mode {
                 Mode::Managed => state.blobs.managed_store(l.id).is_some(),
-                Mode::Watched => Path::new(&l.path).is_dir(),
+                Mode::Watched => readable.contains(&l.id),
             };
             let mut v = serde_json::to_value(&l).unwrap_or_default();
             v["online"] = json!(online);
@@ -288,7 +353,7 @@ pub(crate) async fn create_location(
     let others = db::call(&state.pool, |c| list(c)).await?;
     probe(&state, &new, &others).await?;
     let loc = db::call(&state.pool, move |c| insert(c, &new)).await?;
-    state.blobs.reload()?;
+    state.blobs.refresh().await?;
     tracing::info!(name = %loc.name, path = %loc.path, mode = loc.mode.as_str(), "library location added");
     if loc.mode == Mode::Watched {
         let (s, id) = (std::sync::Arc::clone(&state), loc.id);
@@ -318,6 +383,15 @@ pub(crate) async fn patch_location(
     Json(patch): Json<LocationPatch>,
 ) -> ApiResult<Json<Location>> {
     let kinds = patch.kinds.as_deref().map(check_kinds).transpose()?;
+    let current = db::call(&state.pool, move |c| get(c, id))
+        .await?
+        .ok_or_else(|| AppError::not_found(format!("location {id}")))?;
+    if current.mode == Mode::Watched && (kinds.is_some() || patch.catch_all.is_some()) {
+        return Err(AppError::bad_request("a watched folder doesn't take new files, so it has no kinds to change"));
+    }
+    if current.catch_all && patch.catch_all == Some(false) {
+        return Err(AppError::bad_request("make another location the catch-all instead"));
+    }
     let loc = db::call(&state.pool, move |c| {
         let Some(loc) = get(c, id)? else { return Ok(None) };
         let tx = c.unchecked_transaction()?;
@@ -340,40 +414,106 @@ pub(crate) async fn patch_location(
     })
     .await?
     .ok_or_else(|| AppError::not_found(format!("location {id}")))?;
-    state.blobs.reload()?;
+    state.blobs.refresh().await?;
     Ok(Json(loc))
 }
 
-/// `DELETE /api/admin/locations/{id}`: a watched location goes with its packs (the folder itself is left alone);
-/// a managed one only once its files have been moved out.
-pub(crate) async fn delete_location(State(state): State<AppState>, UrlPath(id): UrlPath<i64>) -> ApiResult<StatusCode> {
+#[derive(Debug, Default, Deserialize)]
+pub(crate) struct DeleteQuery {
+    /// Remove a managed location that can't be reached anyway (a dead disk): files still on it go missing.
+    #[serde(default)]
+    force: bool,
+}
+
+/// `DELETE /api/admin/locations/{id}[?force=true]`: a watched location goes with its packs (the folder itself is
+/// left alone); a managed one once its files have been moved out (409 while it holds any). One that can't be reached
+/// is refused with 503, since Hoard can't tell what's on it, unless forced.
+pub(crate) async fn delete_location(
+    State(state): State<AppState>,
+    UrlPath(id): UrlPath<i64>,
+    Query(q): Query<DeleteQuery>,
+) -> ApiResult<StatusCode> {
     let loc = db::call(&state.pool, move |c| get(c, id))
         .await?
         .ok_or_else(|| AppError::not_found(format!("location {id}")))?;
-    if loc.mode == Mode::Managed
-        && let Some(store) = state.blobs.managed_store(id)
-        && store.list(None).next().await.is_some()
-    {
-        return Err(AppError::conflict(format!(
-            "{} still holds files: move them to another location before removing it",
-            loc.name
-        )));
-    }
-    db::call(&state.pool, move |c| {
-        let packs: Vec<String> = c
-            .prepare("SELECT id FROM packs WHERE location_id = ?1")?
-            .query_map([id], |r| r.get(0))?
-            .collect::<rusqlite::Result<_>>()?;
-        for p in &packs {
-            db::delete_pack(c, p)?;
+    if loc.mode == Mode::Managed {
+        match state.blobs.managed_store(id) {
+            Some(store) => {
+                if crate::blobs::holds_any(&*store).await? {
+                    return Err(AppError::conflict(format!(
+                        "{} still holds files: move them to the other locations first (POST /api/admin/locations/{id}/empty)",
+                        loc.name
+                    )));
+                }
+            }
+            None if q.force => {
+                tracing::warn!(name = %loc.name, path = %loc.path, "removing a library location that can't be reached; files on it are missing now");
+            }
+            None => {
+                return Err(AppError::unavailable(format!(
+                    "{} can't be reached, so Hoard can't tell whether it still holds files",
+                    loc.name
+                )));
+            }
         }
-        c.execute("DELETE FROM locations WHERE id = ?1", [id])?;
-        Ok(())
-    })
-    .await?;
-    state.blobs.reload()?;
+    }
+    db::call(&state.pool, move |c| remove(c, id)).await?;
+    state.blobs.refresh().await?;
     tracing::info!(name = %loc.name, path = %loc.path, "library location removed");
     Ok(StatusCode::NO_CONTENT)
+}
+
+/// Queue moving stored files between managed locations, unless a move is already waiting or running.
+async fn queue_relocate(state: &AppState, req: crate::relocate::Request) -> ApiResult<()> {
+    let queued = db::call(&state.pool, move |c| {
+        let waiting = db::job_pending(c, crate::jobs::RELOCATE, None, None)?;
+        if !waiting {
+            db::enqueue(c, crate::jobs::RELOCATE, None, &serde_json::to_value(req)?)?;
+        }
+        Ok(!waiting)
+    })
+    .await?;
+    if !queued {
+        return Err(AppError::conflict("files are already being moved between locations; try again when that's done"));
+    }
+    state.wake.notify_one();
+    Ok(())
+}
+
+/// `POST /api/admin/locations/{id}/empty`: move a managed location's files to where they'd go without it, then
+/// remove it. Runs as a job.
+pub(crate) async fn empty_location(State(state): State<AppState>, UrlPath(id): UrlPath<i64>) -> ApiResult<StatusCode> {
+    let loc = db::call(&state.pool, move |c| get(c, id))
+        .await?
+        .ok_or_else(|| AppError::not_found(format!("location {id}")))?;
+    if loc.mode != Mode::Managed {
+        return Err(AppError::bad_request(format!("{} is a watched folder: Hoard doesn't move its files", loc.name)));
+    }
+    let others = state.blobs.managed_stores().iter().filter(|(i, _)| *i != id).count();
+    if others == 0 {
+        return Err(AppError::conflict("there's no other library location to move the files to: add one first"));
+    }
+    queue_relocate(&state, crate::relocate::Request { from: Some(id), remove: true }).await?;
+    Ok(StatusCode::ACCEPTED)
+}
+
+/// `POST /api/admin/locations/rebalance`: move stored files to the locations their kinds go to now. Runs as a job.
+pub(crate) async fn rebalance(State(state): State<AppState>) -> ApiResult<StatusCode> {
+    queue_relocate(&state, crate::relocate::Request::default()).await?;
+    Ok(StatusCode::ACCEPTED)
+}
+
+/// Remove a location's row, with the packs of a watched one. A managed one's files must have been moved out first.
+pub(crate) fn remove(c: &mut Connection, id: i64) -> Result<()> {
+    let packs: Vec<String> = c
+        .prepare("SELECT id FROM packs WHERE location_id = ?1")?
+        .query_map([id], |r| r.get(0))?
+        .collect::<rusqlite::Result<_>>()?;
+    for p in &packs {
+        db::delete_pack(c, p)?;
+    }
+    c.execute("DELETE FROM locations WHERE id = ?1", [id])?;
+    Ok(())
 }
 
 #[derive(Debug, Deserialize)]

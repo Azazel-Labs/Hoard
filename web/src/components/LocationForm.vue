@@ -1,8 +1,9 @@
 <script setup lang="ts">
 // Adding a library location: what kind, where, and which files go there.
 import { computed, ref, watch } from 'vue'
-import { api, ApiError, KIND_LABEL, type AssetKind, type LibraryLocation, type LocationMode } from '../api'
+import { api, ApiError, type AssetKind, type LibraryLocation, type LocationMode } from '../api'
 import FolderPicker from './FolderPicker.vue'
+import KindChips from './KindChips.vue'
 
 const props = defineProps<{
   /** Where the server suggests a first location goes. */
@@ -33,10 +34,6 @@ watch(mode, (m, old) => {
 
 const folderName = computed(() => path.value.trim().replace(/[\\/]+$/, '').split(/[\\/]/).pop() || '')
 const ready = computed(() => !!path.value.trim() && (mode.value === 'watched' || props.first || catchAll.value || picked.value.length > 0))
-
-function toggleKind(k: AssetKind) {
-  picked.value = picked.value.includes(k) ? picked.value.filter((x) => x !== k) : [...picked.value, k]
-}
 
 async function submit() {
   if (!ready.value || busy.value) return
@@ -100,12 +97,7 @@ async function submit() {
       <template v-if="mode === 'managed' && !first">
         <span class="lbl">Files that go here</span>
         <div>
-          <div class="kinds" role="group" aria-label="Asset kinds">
-            <label v-for="k in kinds" :key="k" class="kind" :class="{ on: picked.includes(k) }">
-              <input type="checkbox" :checked="picked.includes(k)" @change="toggleKind(k)" />
-              {{ KIND_LABEL[k] }}
-            </label>
-          </div>
+          <KindChips v-model="picked" :kinds="kinds" />
           <label class="check">
             <input v-model="catchAll" type="checkbox" />
             Also everything no other location takes
@@ -151,15 +143,6 @@ legend.lbl { margin-bottom: 0.45rem; padding: 0; }
 .hint { margin: 0.4rem 0 0; color: var(--muted); line-height: 1.45; }
 .hint.flat { margin: 0; }
 .note { margin: 0; }
-.kinds { display: flex; flex-wrap: wrap; gap: 0.35rem; margin-bottom: 0.5rem; }
-.kind {
-  display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.25em 0.65em; border: 1px solid var(--line); border-radius: 999px;
-  cursor: pointer; user-select: none; transition: border-color var(--dur-1), background-color var(--dur-1), color var(--dur-1);
-}
-.kind input { position: absolute; opacity: 0; pointer-events: none; }
-.kind:hover { border-color: var(--muted); }
-.kind.on { background: var(--text); color: var(--bg); border-color: var(--text); font-weight: 600; }
-.kind:has(:focus-visible) { outline: 2px solid var(--accent); outline-offset: 2px; }
 .check { display: inline-flex; gap: 0.45rem; align-items: center; }
 .err { margin: 0; color: var(--danger); overflow-wrap: anywhere; }
 .acts { display: flex; gap: 0.5rem; }

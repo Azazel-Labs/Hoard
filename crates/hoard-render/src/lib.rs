@@ -1,9 +1,11 @@
-//! Headless wgpu renderer for model thumbnails: glTF/GLB in, RGBA image out.
+//! Headless wgpu renderer for model thumbnails: glTF/GLB in, RGBA image out. (Other formats reach it as a GLB
+//! the server makes.)
 //!
-//! Deliberately small: bakes every mesh primitive of the default scene into world space, frames the bounding
-//! sphere from a 3/4 angle, and shades with base color (factor × texture) plus a key light and a sky/ground
-//! hemisphere. No skinning or morph targets (meshes render in bind pose). Good enough to recognise a crate
-//! from a barrel in a grid of 300 assets, which is the job.
+//! Deliberately small: bakes every mesh primitive of the default scene into world space, frames the model tightly
+//! from a 3/4 angle, and shades with base color (factor × texture, with alpha cut-outs and blending) under a soft
+//! sky/ground light and a key light over the camera's shoulder, tone mapped like the browser viewer (Khronos PBR
+//! Neutral), so a thumbnail looks like the model does when opened. No skinning or morph targets (meshes render in
+//! bind pose).
 //!
 //! On machines without a GPU it runs on Mesa's lavapipe (software Vulkan) or any other adapter wgpu finds,
 //! including the fallback adapter.
@@ -19,8 +21,12 @@ const SAMPLES: u32 = 4;
 const COLOR_FORMAT: wgpu::TextureFormat = wgpu::TextureFormat::Rgba8UnormSrgb;
 const DEPTH_FORMAT: wgpu::TextureFormat = wgpu::TextureFormat::Depth32Float;
 
+/// How much of the frame the model fills, edge to edge, along its longer side.
+const FILL: f32 = 0.9;
+
 const SHADER: &str = "
 struct Globals { view_proj: mat4x4<f32>, light_dir: vec4<f32> };
+// flags: x = has a texture, y = alpha cut-off (0 for none), z = blended.
 struct Material { color: vec4<f32>, flags: vec4<f32> };
 
 @group(0) @binding(0) var<uniform> g: Globals;
@@ -43,16 +49,36 @@ fn vs(@location(0) p: vec3<f32>, @location(1) n: vec3<f32>, @location(2) uv: vec
     return o;
 }
 
+// Khronos PBR Neutral, the browser viewer's tone mapping: colours stay as painted, highlights roll off.
+fn neutral(v: vec3<f32>) -> vec3<f32> {
+    let start = 0.76;
+    let x = min(v.r, min(v.g, v.b));
+    let offset = select(0.04, x - 6.25 * x * x, x < 0.08);
+    var c = v - offset;
+    let peak = max(c.r, max(c.g, c.b));
+    if (peak < start) { return c; }
+    let d = 1.0 - start;
+    let new_peak = 1.0 - d * d / (peak + d - start);
+    c = c * (new_peak / peak);
+    let k = 1.0 - 1.0 / (0.15 * (peak - new_peak) + 1.0);
+    return mix(c, vec3<f32>(new_peak), k);
+}
+
 @fragment
-fn fs(i: VOut) -> @location(0) vec4<f32> {
+fn fs(i: VOut, @builtin(front_facing) front: bool) -> @location(0) vec4<f32> {
     let sampled = textureSample(tex, samp, i.uv);
     let base = m.color * select(vec4<f32>(1.0), sampled, m.flags.x > 0.5);
-    let n = normalize(i.n);
-    let key = max(dot(n, normalize(g.light_dir.xyz)), 0.0);
-    let rim = pow(1.0 - abs(n.z), 3.0) * 0.15;
-    let hemi = mix(0.35, 0.75, 0.5 + 0.5 * n.y);
-    let light = 0.15 + 0.7 * key + 0.45 * hemi + rim;
-    return vec4<f32>(base.rgb * light, 1.0);
+    if (m.flags.y > 0.0 && base.a < m.flags.y) { discard; }
+    // Both sides of a face are drawn; the back lights as if it faced the camera.
+    let n = normalize(select(-i.n, i.n, front));
+    let key = max(dot(n, g.light_dir.xyz), 0.0);
+    // A soft room, bright overhead and darker toward the floor so no side goes black (the browser's environment
+    // light), plus the key light.
+    let room = mix(0.5, 0.95, 0.5 + 0.5 * n.y);
+    let rgb = neutral(base.rgb * (room + 0.6 * key));
+    // Premultiplied, so blended surfaces and antialiased edges composite right; undone on readback.
+    let a = select(1.0, base.a, m.flags.z > 0.5);
+    return vec4<f32>(rgb * a, a);
 }
 ";
 
@@ -78,7 +104,15 @@ struct MaterialUniform {
     flags: [f32; 4],
 }
 
-mod obj;
+/// How a surface's alpha counts, as glTF's `alphaMode` says.
+#[derive(Debug, Clone, Copy, PartialEq)]
+enum Alpha {
+    Opaque,
+    /// Cut out below this alpha (leaves, fences).
+    Mask(f32),
+    /// See-through (glass, water): drawn after everything solid, back to front.
+    Blend,
+}
 
 /// One draw call's worth of baked geometry.
 #[derive(Debug)]
@@ -87,6 +121,7 @@ struct Draw {
     indices: Vec<u32>,
     color: [f32; 4],
     texture: Option<usize>,
+    alpha: Alpha,
 }
 
 /// GPU buffers for one draw.
@@ -109,6 +144,8 @@ pub struct Renderer {
     device: wgpu::Device,
     queue: wgpu::Queue,
     pipeline: wgpu::RenderPipeline,
+    /// The same, blending over what's drawn and leaving the depth buffer alone, for see-through surfaces.
+    blend_pipeline: wgpu::RenderPipeline,
     globals_layout: wgpu::BindGroupLayout,
     material_layout: wgpu::BindGroupLayout,
     sampler: wgpu::Sampler,
@@ -203,41 +240,45 @@ impl Renderer {
             bind_group_layouts: &[Some(&globals_layout), Some(&material_layout)],
             immediate_size: 0,
         });
-        let pipeline = device.create_render_pipeline(&wgpu::RenderPipelineDescriptor {
-            label: Some("hoard-render pipeline"),
-            layout: Some(&layout),
-            vertex: wgpu::VertexState {
-                module: &shader,
-                entry_point: Some("vs"),
-                compilation_options: wgpu::PipelineCompilationOptions::default(),
-                buffers: &[Some(wgpu::VertexBufferLayout {
-                    array_stride: size_of::<Vertex>() as u64,
-                    step_mode: wgpu::VertexStepMode::Vertex,
-                    attributes: &wgpu::vertex_attr_array![0 => Float32x3, 1 => Float32x3, 2 => Float32x2],
-                })],
-            },
-            primitive: wgpu::PrimitiveState { cull_mode: None, ..Default::default() },
-            depth_stencil: Some(wgpu::DepthStencilState {
-                format: DEPTH_FORMAT,
-                depth_write_enabled: Some(true),
-                depth_compare: Some(wgpu::CompareFunction::Less),
-                stencil: wgpu::StencilState::default(),
-                bias: wgpu::DepthBiasState::default(),
-            }),
-            multisample: wgpu::MultisampleState { count: SAMPLES, ..Default::default() },
-            fragment: Some(wgpu::FragmentState {
-                module: &shader,
-                entry_point: Some("fs"),
-                compilation_options: wgpu::PipelineCompilationOptions::default(),
-                targets: &[Some(wgpu::ColorTargetState {
-                    format: COLOR_FORMAT,
-                    blend: None,
-                    write_mask: wgpu::ColorWrites::ALL,
-                })],
-            }),
-            multiview_mask: None,
-            cache: None,
-        });
+        let make_pipeline = |blend: bool| {
+            device.create_render_pipeline(&wgpu::RenderPipelineDescriptor {
+                label: Some(if blend { "hoard-render blend pipeline" } else { "hoard-render pipeline" }),
+                layout: Some(&layout),
+                vertex: wgpu::VertexState {
+                    module: &shader,
+                    entry_point: Some("vs"),
+                    compilation_options: wgpu::PipelineCompilationOptions::default(),
+                    buffers: &[Some(wgpu::VertexBufferLayout {
+                        array_stride: size_of::<Vertex>() as u64,
+                        step_mode: wgpu::VertexStepMode::Vertex,
+                        attributes: &wgpu::vertex_attr_array![0 => Float32x3, 1 => Float32x3, 2 => Float32x2],
+                    })],
+                },
+                primitive: wgpu::PrimitiveState { cull_mode: None, ..Default::default() },
+                depth_stencil: Some(wgpu::DepthStencilState {
+                    format: DEPTH_FORMAT,
+                    depth_write_enabled: Some(!blend),
+                    depth_compare: Some(wgpu::CompareFunction::Less),
+                    stencil: wgpu::StencilState::default(),
+                    bias: wgpu::DepthBiasState::default(),
+                }),
+                multisample: wgpu::MultisampleState { count: SAMPLES, ..Default::default() },
+                fragment: Some(wgpu::FragmentState {
+                    module: &shader,
+                    entry_point: Some("fs"),
+                    compilation_options: wgpu::PipelineCompilationOptions::default(),
+                    targets: &[Some(wgpu::ColorTargetState {
+                        format: COLOR_FORMAT,
+                        blend: blend.then_some(wgpu::BlendState::PREMULTIPLIED_ALPHA_BLENDING),
+                        write_mask: wgpu::ColorWrites::ALL,
+                    })],
+                }),
+                multiview_mask: None,
+                cache: None,
+            })
+        };
+        let pipeline = make_pipeline(false);
+        let blend_pipeline = make_pipeline(true);
         let sampler = device.create_sampler(&wgpu::SamplerDescriptor {
             address_mode_u: wgpu::AddressMode::Repeat,
             address_mode_v: wgpu::AddressMode::Repeat,
@@ -250,6 +291,7 @@ impl Renderer {
             device,
             queue,
             pipeline,
+            blend_pipeline,
             globals_layout,
             material_layout,
             sampler,
@@ -277,11 +319,6 @@ impl Renderer {
 
     /// Render a .gltf/.glb file; external buffers and images resolve relative to its folder.
     pub fn render_file(&self, path: &Path, size: u32) -> Result<image::RgbaImage> {
-        let ext = path.extension().and_then(|e| e.to_str()).unwrap_or("").to_ascii_lowercase();
-        if ext == "obj" {
-            let (draws, images) = obj::load(path)?;
-            return self.render(&draws, &images, size, THREE_QUARTER);
-        }
         let (doc, buffers, images) = gltf::import(path).with_context(|| format!("load {}", path.display()))?;
         self.render(&bake(&doc, &buffers), &gltf_images(&images), size, THREE_QUARTER)
     }
@@ -289,13 +326,8 @@ impl Renderer {
     /// Render a model from four directions (front 3/4, back 3/4, side, top) into a 2x2 sheet of `cell`-sized
     /// tiles. One image a vision model can read in place of four, in the spirit of `Cap3D`'s multi-view captions.
     pub fn render_views_file(&self, path: &Path, cell: u32) -> Result<image::RgbaImage> {
-        let ext = path.extension().and_then(|e| e.to_str()).unwrap_or("").to_ascii_lowercase();
-        let (draws, images) = if ext == "obj" {
-            obj::load(path)?
-        } else {
-            let (doc, buffers, images) = gltf::import(path).with_context(|| format!("load {}", path.display()))?;
-            (bake(&doc, &buffers), gltf_images(&images))
-        };
+        let (doc, buffers, images) = gltf::import(path).with_context(|| format!("load {}", path.display()))?;
+        let (draws, images) = (bake(&doc, &buffers), gltf_images(&images));
         let mut sheet = image::RgbaImage::new(cell * 2, cell * 2);
         for (i, dir) in VIEWS.iter().enumerate() {
             let tile = self.render(&draws, &images, cell, *dir)?;
@@ -311,6 +343,7 @@ impl Renderer {
         self.render(&bake(&doc, &buffers), &gltf_images(&images), size, THREE_QUARTER)
     }
 
+    #[expect(clippy::too_many_lines, reason = "one linear setup of the frame, its passes and the readback")]
     fn render(
         &self,
         draws: &[Draw],
@@ -321,9 +354,7 @@ impl Renderer {
         if draws.is_empty() {
             bail!("model has no triangle geometry");
         }
-        let (center, radius) = bounds(draws).context("model has no vertices")?;
-
-        let globals = camera(center, radius, dir);
+        let (globals, eye) = camera(draws, dir).context("model has no vertices")?;
 
         let d = &self.device;
         let globals_buf = d.create_buffer_init(&wgpu::util::BufferInitDescriptor {
@@ -344,6 +375,17 @@ impl Renderer {
                 && textures.get(i).is_some_and(Option::is_none)
                 && let Some(Some(img)) = images.get(i)
             {
+                // No mipmaps here, and the GPU may take no more than 2048 px: a big texture is scaled down first, which
+                // also keeps it from shimmering into noise at thumbnail size.
+                let small;
+                let img = if img.width().max(img.height()) > MAX_TEXTURE {
+                    let k = f64::from(MAX_TEXTURE) / f64::from(img.width().max(img.height()));
+                    let (w, h) = (scaled(img.width(), k), scaled(img.height(), k));
+                    small = image::imageops::resize(img, w, h, image::imageops::FilterType::Triangle);
+                    &small
+                } else {
+                    img
+                };
                 textures[i] = Some(upload_rgba(d, &self.queue, img.width(), img.height(), img.as_raw()));
             }
         }
@@ -352,8 +394,16 @@ impl Renderer {
             .iter()
             .map(|draw| {
                 let tex = draw.texture.and_then(|i| textures[i].as_ref());
-                let mat =
-                    MaterialUniform { color: draw.color, flags: [f32::from(u8::from(tex.is_some())), 0.0, 0.0, 0.0] };
+                let (cutoff, blend) = match draw.alpha {
+                    Alpha::Opaque => (0.0, 0.0),
+                    Alpha::Mask(c) => (c.max(0.001), 0.0),
+                    // Nearly clear texels of a blended surface draw nothing (and so hide nothing behind them).
+                    Alpha::Blend => (0.02, 1.0),
+                };
+                let mat = MaterialUniform {
+                    color: draw.color,
+                    flags: [f32::from(u8::from(tex.is_some())), cutoff, blend, 0.0],
+                };
                 let mat_buf = d.create_buffer_init(&wgpu::util::BufferInitDescriptor {
                     label: Some("material"),
                     contents: bytemuck::bytes_of(&mat),
@@ -440,13 +490,21 @@ impl Renderer {
                 }),
                 ..Default::default()
             });
-            pass.set_pipeline(&self.pipeline);
             pass.set_bind_group(0, &globals_bg, &[]);
-            for g in &gpu {
-                pass.set_bind_group(1, &g.bg, &[]);
-                pass.set_vertex_buffer(0, g.vb.slice(..));
-                pass.set_index_buffer(g.ib.slice(..), wgpu::IndexFormat::Uint32);
-                pass.draw_indexed(0..g.count, 0, 0..1);
+            // Solid surfaces first, then see-through ones, farthest first.
+            let (solid, mut clear): (Vec<usize>, Vec<usize>) =
+                (0..draws.len()).partition(|&i| draws[i].alpha != Alpha::Blend);
+            let nearness = |i: usize| -(centroid(&draws[i]) - eye).length_squared();
+            clear.sort_by(|&a, &b| nearness(a).total_cmp(&nearness(b)));
+            for (pipeline, list) in [(&self.pipeline, &solid), (&self.blend_pipeline, &clear)] {
+                pass.set_pipeline(pipeline);
+                for &i in list {
+                    let g = &gpu[i];
+                    pass.set_bind_group(1, &g.bg, &[]);
+                    pass.set_vertex_buffer(0, g.vb.slice(..));
+                    pass.set_index_buffer(g.ib.slice(..), wgpu::IndexFormat::Uint32);
+                    pass.draw_indexed(0..g.count, 0, 0..1);
+                }
             }
         }
         enc.copy_texture_to_buffer(
@@ -470,24 +528,71 @@ impl Renderer {
         readback.unmap();
 
         let img = image::RgbaImage::from_raw(RENDER_SIZE, RENDER_SIZE, pixels).context("readback size mismatch")?;
-        Ok(image::imageops::resize(&img, size, size, image::imageops::FilterType::Triangle))
+        // Scale down while still premultiplied (so clear pixels lend no colour to the edges), then undo it.
+        let mut img = image::imageops::resize(&img, size, size, image::imageops::FilterType::Triangle);
+        for p in img.pixels_mut() {
+            let a = u32::from(p[3]);
+            if a > 0 && a < 255 {
+                for c in &mut p.0[..3] {
+                    *c = u8::try_from((u32::from(*c) * 255 + a / 2) / a).unwrap_or(255);
+                }
+            }
+        }
+        Ok(img)
     }
 }
 
-/// View-projection and key light for a camera looking at the bounding sphere from `dir`.
-fn camera(center: Vec3, radius: f32, dir: Vec3) -> Globals {
+fn centroid(d: &Draw) -> Vec3 {
+    let sum: Vec3 = d.vertices.iter().map(|v| Vec3::from(v.pos)).sum();
+    sum / d.vertices.len().max(1) as f32
+}
+
+/// View-projection and key light for a camera looking from `dir`, close enough that the model fills [`FILL`] of
+/// the frame (its silhouette from there, not its bounding sphere), and where the camera is.
+///
+/// The browser takes the same picture when it upgrades a thumbnail (`snapshot` in `modelStage.ts`); keep the two
+/// in step.
+fn camera(draws: &[Draw], dir: Vec3) -> Option<(Globals, Vec3)> {
+    let (center, radius) = bounds(draws)?;
     let dir = dir.normalize();
     let fov = 35f32.to_radians();
-    let dist = radius / (fov / 2.0).sin() * 1.05;
     // Straight-down views need a different up vector.
     let up = if dir.y.abs() > 0.95 { Vec3::NEG_Z } else { Vec3::Y };
-    let view = glam::camera::rh::view::look_at_mat4(center + dir * dist, center, up);
-    // Key light over the camera's shoulder, so every view is lit from the front.
     let right = up.cross(dir).normalize_or_zero();
-    let light = (dir * 0.7 + up * 0.6 + right * 0.3).normalize();
+    let up = dir.cross(right);
+    // Each vertex in the camera's axes, about the bounding box centre: across, up, and toward the camera.
+    let local = || draws.iter().flat_map(|d| &d.vertices).map(|v| Vec3::from(v.pos) - center);
+    let (mut lo, mut hi) = (Vec3::splat(f32::INFINITY), Vec3::splat(f32::NEG_INFINITY));
+    for p in local() {
+        let q = Vec3::new(p.dot(right), p.dot(up), p.dot(dir));
+        lo = lo.min(q);
+        hi = hi.max(q);
+    }
+    // Aim at the middle of the silhouette, then back off until every vertex is inside the frame.
+    let (mx, my) = (f32::midpoint(lo.x, hi.x), f32::midpoint(lo.y, hi.y));
+    let target = center + right * mx + up * my;
+    let t = (fov / 2.0).tan() * FILL;
+    let mut dist = hi.z + radius * 0.02;
+    for p in local() {
+        let (x, y, z) = (p.dot(right) - mx, p.dot(up) - my, p.dot(dir));
+        dist = dist.max(z + x.abs().max(y.abs()) / t);
+    }
+    let eye = target + dir * dist;
+    let view = glam::camera::rh::view::look_at_mat4(eye, target, up);
+    // Key light over the camera's right shoulder, as the browser viewer's rides with its camera.
+    let light = (right * 1.2 + up * 1.6 + dir * 2.6).normalize();
     // wgpu clip space is Z in [0, 1], Y up: the "directx" convention.
-    let proj = glam::camera::rh::proj::directx::perspective(fov, 1.0, dist * 0.01, dist + radius * 4.0);
-    Globals { view_proj: (proj * view).to_cols_array_2d(), light_dir: [light.x, light.y, light.z, 0.0] }
+    let near = (dist - hi.z).max(radius * 0.001) * 0.5;
+    let proj = glam::camera::rh::proj::directx::perspective(fov, 1.0, near, dist - lo.z + radius);
+    Some((Globals { view_proj: (proj * view).to_cols_array_2d(), light_dir: [light.x, light.y, light.z, 0.0] }, eye))
+}
+
+/// The largest texture side uploaded for a render.
+const MAX_TEXTURE: u32 = 1024;
+
+#[expect(clippy::cast_possible_truncation, clippy::cast_sign_loss, reason = "a scaled-down side, between 1 and 1024")]
+fn scaled(side: u32, k: f64) -> u32 {
+    ((f64::from(side) * k).round() as u32).max(1)
 }
 
 fn upload_rgba(device: &wgpu::Device, queue: &wgpu::Queue, w: u32, h: u32, rgba: &[u8]) -> wgpu::TextureView {
@@ -593,12 +698,18 @@ fn bake_mesh(mesh: &gltf::Mesh<'_>, world: Mat4, buffers: &[gltf::buffer::Data],
                 uv: uvs.get(i).copied().unwrap_or([0.0, 0.0]),
             })
             .collect();
-        let pbr = prim.material().pbr_metallic_roughness();
+        let material = prim.material();
+        let pbr = material.pbr_metallic_roughness();
         out.push(Draw {
             vertices,
             indices,
             color: pbr.base_color_factor(),
             texture: pbr.base_color_texture().map(|t| t.texture().source().index()),
+            alpha: match material.alpha_mode() {
+                gltf::material::AlphaMode::Opaque => Alpha::Opaque,
+                gltf::material::AlphaMode::Mask => Alpha::Mask(material.alpha_cutoff().unwrap_or(0.5)),
+                gltf::material::AlphaMode::Blend => Alpha::Blend,
+            },
         });
     }
 }

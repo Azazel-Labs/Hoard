@@ -49,6 +49,11 @@ pub(crate) fn router(state: &AppState) -> Router<AppState> {
         .route("/api/collections/{id}", axum::routing::patch(patch_collection).delete(delete_collection))
         .route("/api/collections/{id}/assets", post(collection_members))
         .route("/api/assets/{id}", axum::routing::patch(patch_asset))
+        .route(
+            "/api/assets/{id}/thumb",
+            axum::routing::put(crate::previews::put_thumb)
+                .layer(DefaultBodyLimit::max(crate::previews::MAX_DRAWN_BYTES)),
+        )
         .route("/api/assets/bulk", post(bulk_assets))
         .route("/api/archive", post(archive))
         .route("/api/archive/restore", post(restore))
@@ -90,6 +95,7 @@ pub(crate) fn router(state: &AppState) -> Router<AppState> {
         .route("/api/assets/{id}", get(get_asset))
         .route("/api/assets/{id}/file", get(asset_file))
         .route("/api/assets/{id}/thumb", get(asset_thumb))
+        .route("/api/assets/{id}/lite", get(crate::previews::asset_lite))
         .route("/api/blobs/{hash}", get(blob))
         .route("/api/tags", get(tags))
         .route("/api/manifest", post(manifest))
@@ -784,7 +790,19 @@ async fn asset_file(
     serve_blob(&state, &hash, &headers, &mime, disposition).await
 }
 
-async fn asset_thumb(State(state): State<AppState>, Path(id): Path<String>, headers: HeaderMap) -> ApiResult<Response> {
+#[derive(Debug, Deserialize)]
+struct ThumbQuery {
+    /// The thumbnail's revision (`Asset::thumb_rev`). With it the URL names one picture, cached for good; without
+    /// it the picture may change, so browsers check again.
+    v: Option<String>,
+}
+
+async fn asset_thumb(
+    State(state): State<AppState>,
+    Path(id): Path<String>,
+    Query(q): Query<ThumbQuery>,
+    headers: HeaderMap,
+) -> ApiResult<Response> {
     let id2 = id.clone();
     let hash = db::call(&state.pool, move |c| db::asset_thumb(c, &id2))
         .await?
@@ -797,7 +815,8 @@ async fn asset_thumb(State(state): State<AppState>, Path(id): Path<String>, head
     } else {
         crate::analyze::thumb_mime(&state.blobs.head(&hash, 4).await.unwrap_or_default())
     };
-    serve_blob(&state, &hash, &headers, mime, None).await
+    let resp = serve_blob(&state, &hash, &headers, mime, None).await?;
+    Ok(if q.v.is_some() { resp } else { crate::previews::unversioned(resp) })
 }
 
 async fn blob(State(state): State<AppState>, Path(hash): Path<String>, headers: HeaderMap) -> ApiResult<Response> {
@@ -827,7 +846,7 @@ fn parse_range(headers: &HeaderMap) -> Option<GetRange> {
 /// Stream a blob from storage to the client. This is the proxy path: when blobs live on a NAS, bytes flow
 /// NAS -> this server -> client. Blobs are immutable, so anything in front (Cloudflare, nginx, the browser)
 /// may cache them forever, which keeps repeat downloads off your home uplink.
-async fn serve_blob(
+pub(crate) async fn serve_blob(
     state: &AppState,
     hash: &str,
     headers: &HeaderMap,

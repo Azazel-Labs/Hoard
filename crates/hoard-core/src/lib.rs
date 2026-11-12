@@ -168,6 +168,14 @@ pub struct Asset {
     pub hash: String,
     pub size: u64,
     pub has_thumb: bool,
+    /// Changes whenever the thumbnail does, so its URL can too (`/thumb?v=…`): thumbnails are cached for good.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub thumb_rev: Option<String>,
+    /// Where the thumbnail came from when it wasn't drawn by the server: `browser` (a signed-in person's browser
+    /// drew the model with all its textures, as the 3D viewer shows it) or `browser-partial` (some textures were
+    /// missing). Re-analysis keeps these; a better one replaces a worse one, never the other way.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub thumb_source: Option<String>,
     pub meta: Value,
     pub tags: Vec<Tag>,
     pub created_at: String,
@@ -415,6 +423,9 @@ pub struct AssetLink {
     pub kind: AssetKind,
     pub rel: LinkRel,
     pub has_thumb: bool,
+    /// File size in bytes.
+    #[serde(default)]
+    pub size: u64,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]

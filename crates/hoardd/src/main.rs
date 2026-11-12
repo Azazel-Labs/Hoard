@@ -31,6 +31,7 @@ mod mcp;
 mod meshes;
 mod music;
 mod oauth;
+mod previews;
 mod relocate;
 mod scan;
 mod server;

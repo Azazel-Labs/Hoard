@@ -175,7 +175,7 @@ pub(crate) fn convert(
     }
 }
 
-fn load_image(path: &Path, ext: &str) -> Result<DynamicImage> {
+pub(crate) fn load_image(path: &Path, ext: &str) -> Result<DynamicImage> {
     Ok(match ext {
         "psd" | "psb" => sources::psd_composite(path)?,
         "kra" | "ora" => sources::read_layered_zip(path)?.composite.context("no flattened image inside")?,

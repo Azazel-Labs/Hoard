@@ -128,6 +128,9 @@ const MIGRATIONS: &[&str] = &[
     // 19: tags merged into others. Tagging maps the old name to the new one, so a merged tag stays merged when the
     // taggers run again (see `merge_tags`).
     "CREATE TABLE tag_aliases (tag TEXT PRIMARY KEY, into_tag TEXT NOT NULL) WITHOUT ROWID;",
+    // 20: where an asset's thumbnail came from, when not the server's analysis: `browser` or `browser-partial`
+    // (see `Asset::thumb_source`). NULL is the server's own.
+    "ALTER TABLE assets ADD COLUMN thumb_source TEXT;",
 ];
 
 /// How many automatic pre-upgrade backups to keep in `<data dir>/backups`.
@@ -655,7 +658,7 @@ pub(crate) fn purge_archived(
 
 const ASSET_COLS: &str = "a.id, a.pack_id, p.name, a.name, a.path, a.ext, a.kind, a.category, a.description,
     a.blob_hash, b.size, a.thumb_hash IS NOT NULL, a.meta, a.created_at, a.updated_at, a.source_description,
-    a.ai_description, COALESCE(a.archived_at, p.archived_at)";
+    a.ai_description, COALESCE(a.archived_at, p.archived_at), substr(a.thumb_hash, 1, 12), a.thumb_source";
 
 fn asset_from_row(r: &Row<'_>) -> rusqlite::Result<Asset> {
     let meta: String = r.get(12)?;
@@ -674,6 +677,8 @@ fn asset_from_row(r: &Row<'_>) -> rusqlite::Result<Asset> {
         hash: r.get(9)?,
         size: r.get::<_, i64>(10)? as u64,
         has_thumb: r.get(11)?,
+        thumb_rev: r.get(18)?,
+        thumb_source: r.get(19)?,
         meta: serde_json::from_str(&meta).unwrap_or_default(),
         tags: Vec::new(),
         created_at: r.get(13)?,
@@ -777,7 +782,8 @@ pub(crate) fn family(conn: &Connection, id: &str) -> Result<Option<hoard_core::F
     };
     let size: i64 = conn.query_row("SELECT COUNT(*) FROM asset_family WHERE family_key = ?1", [&key], |r| r.get(0))?;
     let mut stmt = conn.prepare(
-        "SELECT a.id, a.name, a.path, a.kind, a.thumb_hash IS NOT NULL FROM asset_family f JOIN assets a ON a.id = f.asset_id
+        "SELECT a.id, a.name, a.path, a.kind, a.thumb_hash IS NOT NULL, b.size FROM asset_family f
+         JOIN assets a ON a.id = f.asset_id JOIN blobs b ON b.hash = a.blob_hash
          WHERE f.family_key = ?1 AND a.id != ?2 ORDER BY a.path LIMIT 60",
     )?;
     let members = stmt
@@ -789,6 +795,7 @@ pub(crate) fn family(conn: &Connection, id: &str) -> Result<Option<hoard_core::F
                 kind: AssetKind::parse(&r.get::<_, String>(3)?).unwrap_or(AssetKind::Other),
                 rel: LinkRel::Variant,
                 has_thumb: r.get(4)?,
+                size: r.get::<_, i64>(5)? as u64,
             })
         })?
         .collect::<rusqlite::Result<Vec<_>>>()?;
@@ -902,18 +909,19 @@ pub(crate) fn asset_links(conn: &Connection, id: &str) -> Result<(Vec<AssetLink>
                     kind: AssetKind::parse(&r.get::<_, String>(3)?).unwrap_or(AssetKind::Other),
                     rel: LinkRel::parse(&r.get::<_, String>(4)?).unwrap_or(LinkRel::Guess),
                     has_thumb: r.get(5)?,
+                    size: r.get::<_, i64>(6)? as u64,
                 })
             })?
             .collect::<rusqlite::Result<Vec<_>>>()?;
         Ok(rows)
     };
     let out = query(
-        "SELECT a.id, a.name, a.path, a.kind, l.rel, a.thumb_hash IS NOT NULL
-         FROM asset_links l JOIN assets a ON a.id = l.to_id WHERE l.from_id = ?1 ORDER BY l.rel, a.path",
+        "SELECT a.id, a.name, a.path, a.kind, l.rel, a.thumb_hash IS NOT NULL, b.size
+         FROM asset_links l JOIN assets a ON a.id = l.to_id JOIN blobs b ON b.hash = a.blob_hash WHERE l.from_id = ?1 ORDER BY l.rel, a.path",
     )?;
     let inc = query(
-        "SELECT a.id, a.name, a.path, a.kind, l.rel, a.thumb_hash IS NOT NULL
-         FROM asset_links l JOIN assets a ON a.id = l.from_id WHERE l.to_id = ?1 ORDER BY l.rel, a.path",
+        "SELECT a.id, a.name, a.path, a.kind, l.rel, a.thumb_hash IS NOT NULL, b.size
+         FROM asset_links l JOIN assets a ON a.id = l.from_id JOIN blobs b ON b.hash = a.blob_hash WHERE l.to_id = ?1 ORDER BY l.rel, a.path",
     )?;
     Ok((out, inc))
 }

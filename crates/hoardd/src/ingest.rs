@@ -459,20 +459,22 @@ fn upload_all(state: &AppState, rt: &Handle, items: &[Item]) -> Result<Vec<Previ
             .await?;
         let thumbs = stream::iter(items.iter())
             .map(|it| async move {
-                let put = |png: &Option<Vec<u8>>| {
-                    let png = png.clone();
+                // Thumbnails, views and previews go to the cache store; a recovered source file is content.
+                let put = |bytes: &Option<Vec<u8>>, cache: bool| {
+                    let bytes = bytes.clone();
                     async move {
-                        match png {
-                            Some(png) => blobs.put_bytes(png).await.map(Some),
+                        match bytes {
+                            Some(b) if cache => blobs.put_cache_bytes(b).await.map(Some),
+                            Some(b) => blobs.put_bytes(b).await.map(Some),
                             None => Ok(None),
                         }
                     }
                 };
                 Ok::<_, anyhow::Error>(Previews {
-                    thumb: put(&it.analysis.thumb_png).await?,
-                    views: put(&it.analysis.views_png).await?,
-                    source: put(&it.analysis.source.as_ref().map(|s| s.bytes.clone())).await?,
-                    preview: put(&it.analysis.preview_mp3).await?,
+                    thumb: put(&it.analysis.thumb_png, true).await?,
+                    views: put(&it.analysis.views_png, true).await?,
+                    source: put(&it.analysis.source.as_ref().map(|s| s.bytes.clone()), false).await?,
+                    preview: put(&it.analysis.preview_mp3, true).await?,
                 })
             })
             .buffered(8)

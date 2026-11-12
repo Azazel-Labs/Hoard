@@ -30,9 +30,19 @@ pub(crate) struct Config {
     #[arg(long, env = "HOARD_LISTEN", default_value = "127.0.0.1:7878")]
     pub(crate) listen: SocketAddr,
 
-    /// Where blobs, the database, staging and backups live.
+    /// The database (with Settings), its backups and the self-signed TLS certificate: small, and the one to back up.
     #[arg(long, env = "HOARD_DATA_DIR", default_value = "./hoard-data")]
     pub(crate) data_dir: PathBuf,
+
+    /// Your files, with `--storage local` (default `<data-dir>/blobs`). The big one: put it on the disk with room.
+    #[arg(long, env = "HOARD_FILES_DIR")]
+    pub(crate) files_dir: Option<PathBuf>,
+
+    /// Thumbnails and previews, uploads in progress, scratch space for conversions, and the Blender and ffmpeg
+    /// that Hoard downloads (default `<data-dir>`). Fast local disk is best; re-analyzing a pack remakes its
+    /// thumbnails if this is lost.
+    #[arg(long, env = "HOARD_CACHE_DIR")]
+    pub(crate) cache_dir: Option<PathBuf>,
 
     /// Built web portal to serve at `/` (the `web/dist` folder). Skipped if it doesn't exist.
     #[arg(long, env = "HOARD_WEB_DIR", default_value = "./web/dist")]
@@ -171,17 +181,28 @@ pub(crate) struct Config {
 }
 
 impl Config {
+    /// Where files live with `--storage local`.
     pub(crate) fn blobs_dir(&self) -> PathBuf {
+        self.files_dir.clone().unwrap_or_else(|| self.legacy_blobs_dir())
+    }
+    /// Where files lived before `--files-dir` existed, and still do by default.
+    pub(crate) fn legacy_blobs_dir(&self) -> PathBuf {
         self.data_dir.join("blobs")
     }
+    fn cache_root(&self) -> &std::path::Path {
+        self.cache_dir.as_deref().unwrap_or(&self.data_dir)
+    }
+    pub(crate) fn thumbs_dir(&self) -> PathBuf {
+        self.cache_root().join("thumbs")
+    }
     pub(crate) fn staging_dir(&self) -> PathBuf {
-        self.data_dir.join("staging")
+        self.cache_root().join("staging")
     }
     pub(crate) fn tmp_dir(&self) -> PathBuf {
-        self.data_dir.join("tmp")
+        self.cache_root().join("tmp")
     }
     pub(crate) fn tools_dir(&self) -> PathBuf {
-        self.data_dir.join("tools")
+        self.cache_root().join("tools")
     }
     pub(crate) fn backups_dir(&self) -> PathBuf {
         self.data_dir.join("backups")

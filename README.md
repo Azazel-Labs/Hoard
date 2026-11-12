@@ -43,8 +43,12 @@ services:
     environment:
       HOARD_TOKEN: ${HOARD_TOKEN:?set HOARD_TOKEN, e.g. HOARD_TOKEN=$(openssl rand -hex 32)}
       HOARD_PUBLIC_URL: ${HOARD_PUBLIC_URL:-}
+      HOARD_FILES_DIR: /files
+      HOARD_CACHE_DIR: /cache
     volumes:
-      - hoard-data:/data          # database, files, thumbnails, backups
+      - hoard-data:/data          # database, Settings, backups: small, back it up
+      - hoard-files:/files        # your files: big, put it on the disk with room
+      - hoard-cache:/cache        # thumbnails, uploads in progress, Blender/ffmpeg: fast disk, can be rebuilt
     ports:
       - "7878:7878"
     labels:
@@ -67,7 +71,12 @@ services:
 
 volumes:
   hoard-data:
+  hoard-files:
+  hoard-cache:
 ```
+
+Each volume can be a folder on whichever disk suits it instead: `/mnt/big/hoard:/files` puts your files on the big
+disk, while the database stays small and easy to back up.
 
 Then start it:
 
@@ -481,7 +490,9 @@ Set before starting (these need a restart):
 | Env | Default | |
 |---|---|---|
 | `HOARD_LISTEN` | `127.0.0.1:7878` | bind address |
-| `HOARD_DATA_DIR` | `./hoard-data` | SQLite DB, staging, temp, backups (and blobs when local) |
+| `HOARD_DATA_DIR` | `./hoard-data` | the database (with Settings), its backups, the self-signed certificate |
+| `HOARD_FILES_DIR` | `<data dir>/blobs` | your files, with `HOARD_STORAGE=local` |
+| `HOARD_CACHE_DIR` | `<data dir>` | thumbnails and previews, uploads in progress, scratch space, downloaded Blender/ffmpeg |
 | `HOARD_WEB_DIR` | `./web/dist` | built portal |
 | `HOARD_TLS_CERT` / `_KEY` | – | serve HTTPS (HTTP/2) with this PEM chain and key |
 | `HOARD_TLS_SELF_SIGNED` / `HOARD_TLS_NAMES` | `false` / – | HTTPS with a generated certificate for these names |

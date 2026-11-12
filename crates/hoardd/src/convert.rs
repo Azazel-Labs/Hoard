@@ -193,7 +193,7 @@ async fn convert_one(state: &AppState, blender: &Path, t: &Todo) -> Result<()> {
         };
         let glb_blob = state.blobs.put_bytes(glb).await?;
         let thumb_blob = match thumb {
-            Some(png) => Some(state.blobs.put_bytes(png).await?),
+            Some(png) => Some(state.blobs.put_cache_bytes(png).await?),
             None => None,
         };
         let id = t.id.clone();

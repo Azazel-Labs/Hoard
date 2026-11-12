@@ -32,8 +32,11 @@ services:
       HOARD_S3_ACCESS_KEY: ${GARAGE_DEFAULT_ACCESS_KEY}
       HOARD_S3_SECRET_KEY: ${GARAGE_DEFAULT_SECRET_KEY}
       HOARD_TOKEN: ${HOARD_TOKEN}
+      HOARD_CACHE_DIR: /cache
     volumes:
-      - /volume1/hoard/meta:/data          # SQLite DB, staging, backups (small)
+      # Your files are in Garage's data folder above; these are the other two.
+      - /volume1/hoard/meta:/data          # database, Settings, backups: small, back it up
+      - /volume1/hoard/cache:/cache        # thumbnails, uploads in progress, Blender/ffmpeg: can be rebuilt
     ports:
       - "7878:7878"                        # LAN access; drop this if you only use the tunnel
 

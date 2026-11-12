@@ -35,8 +35,11 @@ services:
       HOARD_S3_SECRET_KEY: ${GARAGE_DEFAULT_SECRET_KEY}
       HOARD_TOKEN: ${HOARD_TOKEN}
       HOARD_PUBLIC_URL: https://hoard.example.com
+      HOARD_CACHE_DIR: /cache
     volumes:
-      - hoard-meta:/data
+      # Your files stay at home in the NAS bucket; these are the other two.
+      - hoard-meta:/data          # database, Settings, backups: small, back it up
+      - hoard-cache:/cache        # thumbnails served from the VPS, uploads in progress: can be rebuilt
 
   # Pulls new Hoard images daily and restarts it; the database upgrades itself on start (backed up first).
   # Pin HOARD_VERSION (e.g. 0.8) to take only patch releases, or remove this service to update by hand.
@@ -56,3 +59,4 @@ services:
 volumes:
   ts-web:
   hoard-meta:
+  hoard-cache:

@@ -168,6 +168,29 @@ since the upgrade is lost), and start the older image.
 When a newer release exists, the portal header shows a green badge linking to its release notes. In `GET /api/stats`
 it's the `update` field.
 
+**Three volumes.** Hoard keeps three kinds of data apart, so each can live on the disk that suits it:
+
+| Volume | Holds | Size | Lose it and |
+|---|---|---|---|
+| `/data` (`HOARD_DATA_DIR`) | the database with Settings, its backups, the self-signed certificate | small | you lose your library: back this one up |
+| `/files` (`HOARD_FILES_DIR`) | your files, with local storage (S3 setups keep them in the bucket) | big | you lose your files |
+| `/cache` (`HOARD_CACHE_DIR`) | thumbnails and previews, uploads in progress, scratch space, downloaded Blender/ffmpeg | medium | **Re-analyze** a pack remakes its thumbnails; tools download again |
+
+Installs from before v1.0.3 used one volume for all three. They keep working unchanged: Watchtower doesn't edit your
+compose file, and without `HOARD_FILES_DIR` and `HOARD_CACHE_DIR` Hoard uses the old places. To split an existing
+install, stop it, add the two variables and volumes from [deploy/compose.yml](../deploy/compose.yml), and move the
+files across once:
+
+```sh
+docker compose stop hoard
+docker compose run --rm --no-deps --entrypoint sh hoard -c 'mv /data/blobs/* /files/ && rmdir /data/blobs'
+docker compose up -d
+```
+
+Thumbnails made before the split stay where they are (with the files) and still show; new ones go to `/cache`. If
+`HOARD_FILES_DIR` points at an empty folder while `/data/blobs` still has files, Hoard refuses to start and says so,
+rather than show an empty library.
+
 ## GPU
 
 Hoard uses a GPU for 3D model thumbnails (wgpu over Vulkan) when the container can see one. Otherwise it falls back

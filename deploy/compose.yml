@@ -12,8 +12,13 @@ services:
       # Uploads, edits and admin calls need this token (the portal asks for it once); browsing doesn't.
       HOARD_TOKEN: ${HOARD_TOKEN:?set HOARD_TOKEN, e.g. HOARD_TOKEN=$(openssl rand -hex 32)}
       HOARD_PUBLIC_URL: ${HOARD_PUBLIC_URL:-}
+      HOARD_FILES_DIR: /files
+      HOARD_CACHE_DIR: /cache
     volumes:
-      - hoard-data:/data          # database, files, thumbnails, backups
+      # Three volumes, so each can live where it fits (swap a name for a host path, e.g. /mnt/big/hoard:/files):
+      - hoard-data:/data          # database, Settings, backups: small, back it up
+      - hoard-files:/files        # your files: big, put it on the disk with room
+      - hoard-cache:/cache        # thumbnails, uploads in progress, Blender/ffmpeg: fast disk, can be rebuilt
     ports:
       - "7878:7878"
     labels:
@@ -91,6 +96,8 @@ services:
 
 volumes:
   hoard-data:
+  hoard-files:
+  hoard-cache:
   llm-models:
   # ollama-models:
   # vllm-models:

@@ -42,8 +42,11 @@ services:
       HOARD_TLS_SELF_SIGNED: ${HOARD_TLS_SELF_SIGNED:-true}
       HOARD_TLS_NAMES: ${HOARD_TLS_NAMES:-}
       HOARD_HTTP3: ${HOARD_HTTP3:-false}
+      HOARD_CACHE_DIR: /cache
     volumes:
-      - /volume1/hoard/meta:/data
+      # Your files are in Garage's data folder above; these are the other two.
+      - /volume1/hoard/meta:/data          # database, Settings, backups: small, back it up
+      - /volume1/hoard/cache:/cache        # thumbnails, uploads in progress, Blender/ffmpeg: can be rebuilt
     ports:
       # LAN only. Don't forward this port on your router: remote access goes through the tunnel.
       - "7878:7878"

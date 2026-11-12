@@ -28,7 +28,7 @@ RUN apt-get update \
  && apt-get install -y --no-install-recommends ca-certificates mesa-vulkan-drivers libvulkan1 fonts-dejavu-core timgm6mb-soundfont \
     libx11-6 libxi6 libxxf86vm1 libxfixes3 libxrender1 libxext6 libxkbcommon0 libsm6 libice6 libgl1 libegl1 \
  && rm -rf /var/lib/apt/lists/* \
- && useradd --system --uid 10001 --home /data hoard && mkdir -p /data && chown hoard /data
+ && useradd --system --uid 10001 --home /data hoard && mkdir -p /data /files /cache && chown hoard /data /files /cache
 COPY --from=build /src/target/release/hoardd /src/target/release/hoard /usr/local/bin/
 COPY --from=web /web/dist /srv/hoard/web
 ENV HOARD_LISTEN=0.0.0.0:7878 \

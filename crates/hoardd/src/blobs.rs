@@ -9,6 +9,10 @@
 //! - `local`: a directory on this machine.
 //! - `s3`:    any S3-compatible server. The intended setup is a bucket on a home NAS (Garage, `RustFS`,
 //!   `SeaweedFS`, `VersityGW`), reached over Tailscale or a Cloudflare Tunnel, while this server runs wherever.
+//!
+//! Thumbnails, model views and audio previews go to a second store, always a local directory in the cache dir
+//! (`put_cache_bytes`): they're small, read constantly, and re-analyzing a pack makes them again. Reads look there
+//! first and then in the main store, which is where installs from before the split keep theirs.
 
 use std::fmt;
 use std::path::Path as FsPath;
@@ -30,6 +34,7 @@ use crate::config::{Config, StorageKind};
 #[derive(Clone)]
 pub(crate) struct BlobStore {
     store: Arc<dyn ObjectStore>,
+    cache: Arc<dyn ObjectStore>,
     label: String,
 }
 
@@ -106,7 +111,10 @@ impl BlobStore {
                 (Arc::new(b.build()?), label)
             }
         };
-        Ok(Self { store, label })
+        let thumbs = cfg.thumbs_dir();
+        std::fs::create_dir_all(&thumbs).with_context(|| format!("create {}", thumbs.display()))?;
+        let cache = Arc::new(LocalFileSystem::new_with_prefix(&thumbs)?);
+        Ok(Self { store, cache, label })
     }
 
     pub(crate) fn label(&self) -> &str {
@@ -121,12 +129,8 @@ impl BlobStore {
         Ok(StoredBlob { hash: hasher.finalize().to_hex().to_string(), size })
     }
 
-    pub(crate) async fn exists(&self, hash: &str) -> Result<bool> {
-        match self.store.head(&key(hash)).await {
-            Ok(_) => Ok(true),
-            Err(object_store::Error::NotFound { .. }) => Ok(false),
-            Err(e) => Err(e.into()),
-        }
+    async fn exists(&self, hash: &str) -> Result<bool> {
+        exists_in(&*self.store, hash).await
     }
 
     /// Upload a local file (streamed, multipart for big files). Skips the upload if the blob already exists,
@@ -158,9 +162,28 @@ impl BlobStore {
         Ok(StoredBlob { hash, size })
     }
 
+    /// Store a thumbnail, model views or an audio preview in the local cache store rather than with the files.
+    pub(crate) async fn put_cache_bytes(&self, bytes: Vec<u8>) -> Result<StoredBlob> {
+        let hash = blake3::hash(&bytes).to_hex().to_string();
+        let size = bytes.len() as u64;
+        if !exists_in(&*self.cache, &hash).await? {
+            self.cache.put(&key(&hash), PutPayload::from(bytes)).await?;
+        }
+        Ok(StoredBlob { hash, size })
+    }
+
     /// Open a blob for streaming, optionally a byte range (for HTTP `Range`, so audio/video can seek).
     pub(crate) async fn read(&self, hash: &str, range: Option<GetRange>) -> Result<Option<BlobRead>> {
         let opts = GetOptions { range, ..Default::default() };
+        match self.cache.get_opts(&key(hash), opts.clone()).await {
+            Ok(res) => {
+                let total_size = res.meta.size;
+                let range = res.range.clone();
+                return Ok(Some(BlobRead { total_size, range, stream: res.into_stream() }));
+            }
+            Err(object_store::Error::NotFound { .. }) => {}
+            Err(e) => tracing::warn!(hash, error = %e, "could not read the cache store; trying the main one"),
+        }
         match self.store.get_opts(&key(hash), opts).await {
             Ok(res) => {
                 let total_size = res.meta.size;
@@ -173,6 +196,9 @@ impl BlobStore {
     }
 
     pub(crate) async fn read_all(&self, hash: &str) -> Result<Bytes> {
+        if let Ok(res) = self.cache.get(&key(hash)).await {
+            return Ok(res.bytes().await?);
+        }
         Ok(self.store.get(&key(hash)).await?.bytes().await?)
     }
 
@@ -197,10 +223,60 @@ impl BlobStore {
         Ok(Some(hasher.finalize().to_hex().as_str() == hash))
     }
 
+    /// Delete a blob from both stores.
     pub(crate) async fn delete(&self, hash: &str) -> Result<()> {
-        match self.store.delete(&key(hash)).await {
-            Ok(()) | Err(object_store::Error::NotFound { .. }) => Ok(()),
-            Err(e) => Err(e.into()),
+        for store in [&self.cache, &self.store] {
+            match store.delete(&key(hash)).await {
+                Ok(()) | Err(object_store::Error::NotFound { .. }) => {}
+                Err(e) => return Err(e.into()),
+            }
         }
+        Ok(())
+    }
+}
+
+async fn exists_in(store: &dyn ObjectStore, hash: &str) -> Result<bool> {
+    match store.head(&key(hash)).await {
+        Ok(_) => Ok(true),
+        Err(object_store::Error::NotFound { .. }) => Ok(false),
+        Err(e) => Err(e.into()),
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use clap::Parser;
+
+    use super::*;
+
+    #[tokio::test]
+    async fn thumbnails_go_to_the_cache_dir_and_files_to_the_files_dir() {
+        let dir = tempfile::tempdir().unwrap();
+        let arg = |p: &str| dir.path().join(p).to_str().unwrap().to_owned();
+        let cfg = Config::parse_from([
+            "hoardd",
+            "--data-dir",
+            &arg("data"),
+            "--files-dir",
+            &arg("files"),
+            "--cache-dir",
+            &arg("cache"),
+        ]);
+        let blobs = BlobStore::from_config(&cfg).unwrap();
+        let file = blobs.put_bytes(b"a file".to_vec()).await.unwrap();
+        let thumb = blobs.put_cache_bytes(b"a thumbnail".to_vec()).await.unwrap();
+        let on_disk = |root: &str, h: &str| dir.path().join(root).join(&h[0..2]).join(&h[2..4]).join(h).is_file();
+        assert!(on_disk("files", &file.hash) && !on_disk("cache/thumbs", &file.hash));
+        assert!(on_disk("cache/thumbs", &thumb.hash) && !on_disk("files", &thumb.hash));
+        assert!(!dir.path().join("data/blobs").exists());
+
+        // Reads find either, wherever it is.
+        assert_eq!(&blobs.read_all(&file.hash).await.unwrap()[..], b"a file");
+        assert_eq!(&blobs.read_all(&thumb.hash).await.unwrap()[..], b"a thumbnail");
+        assert_eq!(blobs.verify(&thumb.hash).await.unwrap(), Some(true));
+        assert_eq!(blobs.verify(&file.hash).await.unwrap(), Some(true));
+
+        blobs.delete(&thumb.hash).await.unwrap();
+        assert_eq!(blobs.verify(&thumb.hash).await.unwrap(), None);
     }
 }

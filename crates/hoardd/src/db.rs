@@ -72,6 +72,15 @@ const MIGRATIONS: &[&str] = &[
        PRIMARY KEY (location_id, folder)
      ) WITHOUT ROWID;
      ALTER TABLE packs ADD COLUMN missing_since TEXT;",
+    // 15: Settings → Maintenance keeps a history of its runs (see `maintenance.rs`).
+    "CREATE TABLE maintenance_runs (
+       id          INTEGER PRIMARY KEY AUTOINCREMENT,
+       task        TEXT NOT NULL,
+       started_at  TEXT NOT NULL,
+       finished_at TEXT,
+       ok          INTEGER,
+       summary     TEXT
+     );",
 ];
 
 /// How many automatic pre-upgrade backups to keep in `<data dir>/backups`.

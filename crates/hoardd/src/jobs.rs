@@ -14,7 +14,6 @@ use crate::{db, ingest, llm};
 pub(crate) const INGEST: &str = "ingest";
 pub(crate) const RETAG: &str = "retag";
 pub(crate) const LLM_TAG: &str = "llm_tag";
-pub(crate) const SCRUB: &str = "scrub";
 pub(crate) const CONVERT: &str = "convert";
 pub(crate) const UNREAL: &str = "unreal_convert";
 pub(crate) const SCAN: &str = "scan_location";
@@ -64,7 +63,6 @@ pub(crate) fn job_label(kind: &str, pack: &str) -> String {
         INGEST => format!("Ingesting {pack}"),
         RETAG => format!("Re-tagging {pack}"),
         LLM_TAG => format!("Tagging {pack} with AI"),
-        SCRUB => "Checking stored files for damage".to_owned(),
         CONVERT => format!("Converting {pack} with Blender"),
         UNREAL => format!("Converting Unreal packages in {pack}"),
         SCAN => "Scanning a watched folder".to_owned(),
@@ -88,7 +86,6 @@ async fn run(state: &AppState, job: db::JobRow) {
         INGEST => INGEST,
         RETAG => RETAG,
         LLM_TAG => LLM_TAG,
-        SCRUB => SCRUB,
         CONVERT => CONVERT,
         UNREAL => UNREAL,
         SCAN => SCAN,
@@ -120,7 +117,6 @@ async fn run(state: &AppState, job: db::JobRow) {
             .await
         }
         LLM_TAG => llm::tag_pack(state, &pack_id).await,
-        SCRUB => scrub(state).await,
         CONVERT => crate::convert::convert_pack(state, &pack_id).await,
         UNREAL => {
             let req = serde_json::from_value(job.payload.clone()).unwrap_or_default();
@@ -177,8 +173,17 @@ where
     crate::heavy::run("job", move || f(&state, &rt)).await?
 }
 
+/// What a scrub found.
+pub(crate) struct Scrubbed {
+    pub(crate) total: usize,
+    pub(crate) corrupt: usize,
+    pub(crate) missing: usize,
+    pub(crate) unreachable: usize,
+}
+
 /// Re-hash every blob in storage and record the result. Detects bit rot and missing files on the NAS.
-async fn scrub(state: &AppState) -> Result<()> {
+/// `progress` is told (checked, total) as it goes.
+pub(crate) async fn scrub(state: &AppState, progress: &(dyn Fn(usize, usize) + Sync)) -> Result<Scrubbed> {
     let hashes: Vec<String> = db::call(&state.pool, |c| {
         let mut stmt = c.prepare("SELECT hash FROM blobs ORDER BY verified_at IS NOT NULL, verified_at")?;
         let rows = stmt.query_map([], |r| r.get(0))?.collect::<rusqlite::Result<Vec<_>>>()?;
@@ -191,7 +196,7 @@ async fn scrub(state: &AppState) -> Result<()> {
     let results: Vec<(String, &'static str)> = stream::iter(hashes)
         .map(|h| async move {
             let n = checked.fetch_add(1, std::sync::atomic::Ordering::Relaxed) + 1;
-            crate::activity::job_progress(SCRUB, None, n, total, "files");
+            progress(n, total);
             let status = match state.blobs.verify(&h).await {
                 Ok(Some(true)) => "ok",
                 Ok(Some(false)) => "corrupt",
@@ -206,7 +211,9 @@ async fn scrub(state: &AppState) -> Result<()> {
         .buffer_unordered(4)
         .collect()
         .await;
-    let bad = results.iter().filter(|(_, s)| *s != "ok").count();
+    let count = |status: &str| results.iter().filter(|(_, s)| *s == status).count();
+    let found =
+        Scrubbed { total, corrupt: count("corrupt"), missing: count("missing"), unreachable: count("unreachable") };
     db::call(&state.pool, move |c| {
         let now = db::now();
         let tx = c.transaction()?;
@@ -220,8 +227,14 @@ async fn scrub(state: &AppState) -> Result<()> {
         Ok(())
     })
     .await?;
-    tracing::info!(total, bad, "scrub complete");
-    Ok(())
+    tracing::info!(
+        total,
+        corrupt = found.corrupt,
+        missing = found.missing,
+        unreachable = found.unreachable,
+        "scrub complete"
+    );
+    Ok(found)
 }
 
 /// Delete blobs no asset or thumbnail points at. Returns (count, bytes).
@@ -238,8 +251,13 @@ pub(crate) async fn gc(state: &AppState) -> Result<(u64, u64)> {
         Ok(rows)
     })
     .await?;
+    delete_unused(state, orphans).await
+}
+
+/// Delete these blobs (hash, size) where nothing points at them any more. Returns (count, bytes).
+pub(crate) async fn delete_unused(state: &AppState, blobs: Vec<(String, i64)>) -> Result<(u64, u64)> {
     let (mut count, mut bytes) = (0u64, 0u64);
-    for (hash, size) in orphans {
+    for (hash, size) in blobs {
         let h = hash.clone();
         // Drop the row first, re-checking references under the write, and only then the bytes.
         let deleted = db::call(&state.pool, move |c| {
@@ -255,7 +273,7 @@ pub(crate) async fn gc(state: &AppState) -> Result<(u64, u64)> {
         if deleted > 0 {
             state.blobs.delete(&hash).await?;
             count += 1;
-            bytes += size as u64;
+            bytes += u64::try_from(size).unwrap_or(0);
         }
     }
     Ok((count, bytes))

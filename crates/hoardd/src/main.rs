@@ -25,6 +25,7 @@ mod links;
 mod llm;
 mod local_llm;
 mod locations;
+mod maintenance;
 mod mcp;
 mod meshes;
 mod music;
@@ -95,6 +96,7 @@ async fn main() -> Result<()> {
     }
     let blobs = BlobStore::open(&cfg, pool.clone())?;
     let requeued = db::requeue_stale_jobs(&*pool.get()?)?;
+    maintenance::mark_interrupted(&*pool.get()?)?;
     let settings = settings::Store::load(&cfg, &*pool.get()?)?;
     let effective = settings.get();
     analyze::set_render_enabled(effective.render, effective.llm_vision && effective.llm_enabled());

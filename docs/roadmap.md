@@ -25,12 +25,6 @@ pick from. Still to come:
 - The Unity Asset Store and Humble Bundle only get search links: one searches in the page's script, the other turns
   away non-browser clients.
 
-## Settings → Maintenance
-
-One place for the jobs that look after a library: back up now, scrub (re-hash every file), re-run analysis across
-all packs, rebuild thumbnails, clear the cache, and remove files nothing refers to any more. Most of these exist as
-API calls already; this gives them buttons, progress and a history.
-
 ## AI tagging with a Claude subscription
 
 A ChatGPT plan can already be used for tagging ("Sign in with ChatGPT", see

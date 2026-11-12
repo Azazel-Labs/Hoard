@@ -244,6 +244,30 @@ export interface NewLocation {
   catch_all: boolean
 }
 
+/** A finished (or interrupted) run of a maintenance task. */
+export interface MaintenanceRun {
+  id: number
+  task: string
+  started_at: string
+  finished_at: string | null
+  ok: boolean | null
+  summary: string | null
+}
+
+export interface MaintenanceTask {
+  id: string
+  label: string
+  blurb: string
+  running: { run: number; started_at: string; progress?: number; detail?: string } | null
+  last: MaintenanceRun | null
+}
+
+/** Settings → Maintenance (`GET /api/admin/maintenance`). */
+export interface Maintenance {
+  tasks: MaintenanceTask[]
+  history: MaintenanceRun[]
+}
+
 /** A folder on the server and the folders in it (`GET /api/admin/fs`). */
 export interface FolderListing {
   path: string
@@ -587,6 +611,9 @@ export const api = {
     }),
   chatgptSignOut: () => request<ChatGptStatus>('/api/admin/chatgpt/sign-out', { method: 'POST' }),
   chatgptModels: () => request<{ models: ModelInfo[] }>('/api/admin/chatgpt/models'),
+  maintenance: () => request<Maintenance>('/api/admin/maintenance'),
+  runMaintenance: (task: string) =>
+    request<{ run: number }>(`/api/admin/maintenance/${task}`, { method: 'POST' }),
   locations: () => request<LocationList>('/api/admin/locations'),
   addLocation: (loc: NewLocation) =>
     request<LibraryLocation>('/api/admin/locations', {

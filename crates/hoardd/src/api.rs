@@ -53,6 +53,8 @@ pub(crate) fn router(state: &AppState) -> Router<AppState> {
         .route("/api/admin/scrub", post(admin_scrub))
         .route("/api/admin/gc", post(admin_gc))
         .route("/api/admin/backup", post(admin_backup))
+        .route("/api/admin/maintenance", get(crate::maintenance::overview))
+        .route("/api/admin/maintenance/{task}", post(crate::maintenance::start_route))
         .route("/api/admin/settings", get(get_settings).put(put_settings))
         .route("/api/admin/locations", get(locations::list_locations).post(locations::create_location))
         .route(
@@ -1589,29 +1591,22 @@ async fn admin_jobs(State(state): State<AppState>) -> ApiResult<Json<Value>> {
     Ok(Json(json!(rows)))
 }
 
+// The scriptable maintenance endpoints (for cron); they're recorded in Settings → Maintenance like a run from there.
+
 async fn admin_scrub(State(state): State<AppState>) -> ApiResult<StatusCode> {
-    db::call(&state.pool, |c| db::enqueue(c, jobs::SCRUB, None, &json!({}))).await?;
-    state.wake.notify_one();
+    crate::maintenance::start(&state, crate::maintenance::SCRUB).await?;
     Ok(StatusCode::ACCEPTED)
 }
 
 async fn admin_gc(State(state): State<AppState>) -> ApiResult<Json<Value>> {
-    let (count, bytes) = jobs::gc(&state).await?;
-    Ok(Json(json!({ "deleted_blobs": count, "freed_bytes": bytes })))
+    let summary = crate::maintenance::run_now(&state, crate::maintenance::GC).await?;
+    Ok(Json(json!({ "summary": summary })))
 }
 
 /// Consistent snapshot of the metadata DB. Blobs are immutable, so back those up with any file/S3 sync.
 async fn admin_backup(State(state): State<AppState>) -> ApiResult<Json<Value>> {
-    let dir = state.cfg.backups_dir();
-    tokio::fs::create_dir_all(&dir).await?;
-    let path = dir.join(format!("hoard-{}.db", db::now().replace([':', '-'], "").replace('T', "-")));
-    let p = path.to_string_lossy().into_owned();
-    db::call(&state.pool, move |c| {
-        c.execute("VACUUM INTO ?1", [&p])?;
-        Ok(())
-    })
-    .await?;
-    Ok(Json(json!({ "path": path })))
+    let summary = crate::maintenance::run_now(&state, crate::maintenance::BACKUP).await?;
+    Ok(Json(json!({ "summary": summary })))
 }
 
 // ---------------------------------------------------------------------------------------------

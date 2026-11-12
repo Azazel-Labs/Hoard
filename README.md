@@ -521,11 +521,18 @@ Set before starting (these need a restart):
 
 ## Keeping it safe
 
+**Settings → Maintenance** has a button for each job that looks after the library, with progress while it runs and a history of past runs:
+back up the database, check files for damage, re-analyze every pack (thumbnails, previews and rule tags made afresh;
+your edits stay, the AI isn't asked again), clear cached "Download as" conversions and leftovers, and delete unused
+files. One of each runs at a time. Backup, scrub and gc can also be run from cron (below) and show up in the
+history the same way.
+
 - Content addressing: every byte is verifiable. `POST /api/admin/scrub` re-hashes all blobs (local or S3) and flags
-  corrupt or missing ones; the portal shows the count.
+  corrupt or missing ones; the portal shows the count. It answers 202 and runs in the background.
 - Write-once blobs (read-only on disk), fsync before rename on local storage.
-- `POST /api/admin/backup` writes a consistent SQLite snapshot (`VACUUM INTO`). Back up that file plus the blob
-  store; blobs never change, so incremental sync is trivial.
+- `POST /api/admin/backup` writes a consistent SQLite snapshot (`VACUUM INTO`) to `backups/` next to the database
+  and answers `{"summary": "Saved <path> (<size>)"}`. Back up that file plus the blob store; blobs never change, so
+  incremental sync is trivial.
 - `POST /api/admin/gc` deletes blobs no asset, thumbnail, derivative or kept original references (after deleting
   packs).
 - Uploads: path traversal rejected, archive expansion capped, symlinks in tarballs ignored.
@@ -614,6 +621,8 @@ when a token is set; those are marked 🔒.
 | POST 🔒 | `/api/admin/scrub` | re-hash every blob |
 | POST 🔒 | `/api/admin/gc` | delete blobs nothing uses |
 | POST 🔒 | `/api/admin/backup` | snapshot the database |
+| GET 🔒 | `/api/admin/maintenance` | maintenance tasks, what's running, past runs |
+| POST 🔒 | `/api/admin/maintenance/{task}` | start `backup`, `scrub`, `reanalyze`, `clear_cache` or `gc` |
 | POST | `/mcp` | MCP over streamable HTTP (writes need the token) |
 
 ## Repository layout

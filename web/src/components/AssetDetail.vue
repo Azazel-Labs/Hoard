@@ -23,6 +23,8 @@ const props = defineProps<{
 }>()
 const emit = defineEmits<{
   close: []; updated: [Asset]; tag: [string]; error: [string]; open: [string]; step: [number]
+  /** Move it to the archive (out of search until it's restored or deleted for good). */
+  archive: []
   /** Add to a collection by id, or (with a name) create one first. */
   collect: [id: string, create?: string]
   uncollect: [id: string]
@@ -822,11 +824,13 @@ onBeforeUnmount(() => unswipe())
       <button class="btn" type="button" @click="copy(tomlSnippet, 'toml')">Copy hoard.toml entry</button>
       <button class="btn ghost" type="button" @click="copy(asset.id, 'id')">Copy ID</button>
       <span class="copied" role="status">{{ copied ? `Copied ${copied}` : '' }}</span>
+      <button v-if="!asset.archived_at" class="btn danger archive" type="button" title="Out of search until it's restored or deleted for good, from the Archive" @click="emit('archive')">Archive</button>
     </footer>
   </aside>
 </template>
 
 <style scoped>
+.archive { margin-left: auto; }
 .detail {
   display: flex; flex-direction: column; gap: 1rem;
   padding: 1.1rem 1.2rem 1.4rem;

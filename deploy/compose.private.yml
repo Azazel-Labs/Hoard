@@ -18,7 +18,7 @@ services:
       - /volume1/hoard/garage/data:/var/lib/garage/data
 
   hoard:
-    image: ghcr.io/azazel-labs/hoard:${HOARD_VERSION:-latest}   # or `build: ..` to build from this checkout
+    image: ghcr.io/azazel-labs/hoard:latest   # or `build: ..` to build from this checkout
     labels:
       com.centurylinklabs.watchtower.enable: "true"
       com.centurylinklabs.watchtower.scope: hoard
@@ -32,25 +32,19 @@ services:
       HOARD_S3_ACCESS_KEY: ${GARAGE_DEFAULT_ACCESS_KEY}
       HOARD_S3_SECRET_KEY: ${GARAGE_DEFAULT_SECRET_KEY}
       HOARD_TOKEN: ${HOARD_TOKEN}
-      HOARD_PUBLIC_URL: ${HOARD_PUBLIC_URL:-}          # e.g. http://192.168.50.10:7878, for MCP links
-      # Blender and ffmpeg: off, auto (find or download) or a path. Also switchable in the portal's Settings.
-      HOARD_BLENDER: ${HOARD_BLENDER:-off}
-      HOARD_FFMPEG: ${HOARD_FFMPEG:-auto}
-      HOARD_UNREAL_CONVERT: ${HOARD_UNREAL_CONVERT:-keep}
       # HTTPS gives browsers HTTP/2 (one connection for the whole thumbnail grid). Self-signed is fine on a private
       # network: accept the warning once. HTTP/3 additionally needs the UDP port below.
-      HOARD_TLS_SELF_SIGNED: ${HOARD_TLS_SELF_SIGNED:-true}
-      HOARD_TLS_NAMES: ${HOARD_TLS_NAMES:-}
-      HOARD_HTTP3: ${HOARD_HTTP3:-false}
-      HOARD_CACHE_DIR: /cache
+      HOARD_TLS_SELF_SIGNED: "true"
+      HOARD_TLS_NAMES: 192.168.50.10,nas.local   # the addresses you type into the browser
+      HOARD_HTTP3: "false"
     volumes:
       # Your files are in Garage's data folder above; these are the other two.
-      - /volume1/hoard/meta:/data          # database, Settings, backups: small, back it up
+      - /volume1/hoard/config:/config      # database, Settings, backups: small, back it up
       - /volume1/hoard/cache:/cache        # thumbnails, uploads in progress, Blender/ffmpeg: can be rebuilt
     ports:
       # LAN only. Don't forward this port on your router: remote access goes through the tunnel.
       - "7878:7878"
-      - "7878:7878/udp"   # HTTP/3 (QUIC), only used with HOARD_HTTP3=true
+      - "7878:7878/udp"   # HTTP/3 (QUIC), only used with HOARD_HTTP3 "true"
 
   # The local model server for AI tagging and descriptions (llama.cpp). It starts empty: in the portal, Settings →
   # AI tagging → Local model lists suggested models, downloads the one you pick from Hugging Face into the volume
@@ -78,7 +72,7 @@ services:
     # onto your LAN, where the port above answers.
 
   # Pulls new Hoard images daily and restarts it; the database upgrades itself on start (backed up first).
-  # Pin HOARD_VERSION (e.g. 0.8) to take only patch releases, or remove this service to update by hand.
+  # Pin the image tag (e.g. :0.8) to take only patch releases, or remove this service to update by hand.
   watchtower:
     image: ghcr.io/nicholas-fedor/watchtower:1.21
     restart: unless-stopped
@@ -88,6 +82,6 @@ services:
       WATCHTOWER_LABEL_ENABLE: "true"
       WATCHTOWER_SCOPE: hoard
       WATCHTOWER_CLEANUP: "true"
-      WATCHTOWER_SCHEDULE: "${HOARD_UPDATE_SCHEDULE:-0 0 4 * * *}"   # seconds-first cron: 04:00 daily
+      WATCHTOWER_SCHEDULE: "0 0 4 * * *"   # seconds-first cron: 04:00 daily
     labels:
       com.centurylinklabs.watchtower.scope: hoard

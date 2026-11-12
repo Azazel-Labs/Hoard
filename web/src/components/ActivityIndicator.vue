@@ -139,12 +139,12 @@ const pct = (p: number) => `${Math.round(p * 100)}%`
   cursor: pointer;
 }
 .trigger:hover, .trigger[aria-expanded='true'] { color: var(--text); border-color: var(--muted); }
-.trigger.busy { color: var(--k-font); }
+.trigger.busy { color: var(--accent); }
 .trigger.busy svg path { stroke-dasharray: 34; animation: trace 1.6s linear infinite; }
 @keyframes trace { from { stroke-dashoffset: 68; } to { stroke-dashoffset: 0; } }
 .count {
   position: absolute; top: -0.45rem; right: -0.45rem; min-width: 1.1rem; height: 1.1rem; padding: 0 0.25rem;
-  border-radius: 999px; background: var(--k-font); color: var(--bg);
+  border-radius: 999px; background: var(--accent); color: var(--bg);
   font-size: 0.6875rem; font-weight: 700; line-height: 1.1rem; text-align: center; font-variant-numeric: tabular-nums;
 }
 .badge-enter-active { animation: hop var(--dur-3) var(--ease-pop); }
@@ -174,7 +174,7 @@ li.queued .what { color: var(--muted); }
 .when { color: var(--muted); white-space: nowrap; font-variant-numeric: tabular-nums; }
 .detail { margin-top: 0.2rem; color: var(--faint); }
 .bar { position: relative; height: 4px; margin-top: 0.4rem; border-radius: 2px; background: var(--raised); overflow: hidden; }
-.bar span { position: absolute; inset: 0 auto 0 0; border-radius: 2px; background: var(--k-font); transition: width 0.4s ease; }
+.bar span { position: absolute; inset: 0 auto 0 0; border-radius: 2px; background: var(--accent); transition: width 0.4s ease; }
 .bar.unknown span { width: 30%; animation: sweep 1.4s ease-in-out infinite; }
 @keyframes sweep { from { left: -30%; } to { left: 100%; } }
 

@@ -6,11 +6,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="color-scheme" content="light dark" />
     <script>
-      // Apply the saved theme before first paint (theme.ts keeps it in sync afterwards).
+      // Apply the saved theme before first paint (theme.ts keeps it in sync afterwards). Unknown theme names
+      // match no rule in styles.css, which leaves the defaults.
       try {
-        var t = JSON.parse(localStorage.getItem('hoard.prefs') || '{}').theme || 'system'
-        var s = t === 'light' || t === 'dark' ? t : matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark'
-        document.documentElement.dataset.scheme = s
+        var p = JSON.parse(localStorage.getItem('hoard.prefs') || '{}')
+        var t = p.theme || 'system'
+        var d = document.documentElement.dataset
+        d.scheme = t === 'light' || t === 'dark' ? t : matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark'
+        if (typeof p.lightTheme === 'string') d.light = p.lightTheme
+        if (typeof p.darkTheme === 'string') d.dark = p.darkTheme
       } catch (e) {}
     </script>
     <title>Hoard</title>

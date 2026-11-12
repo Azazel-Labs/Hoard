@@ -13,7 +13,7 @@ use serde_json::Value;
 
 use crate::config::{Config, UnrealConvert};
 
-/// Most background workers the Settings dialog can ask for (`HOARD_WORKERS` can't go past it either).
+/// Most background workers the Settings dialog can ask for .
 pub(crate) const MAX_WORKERS: usize = 16;
 
 /// What's been saved from the portal. `None` means "use the flag".
@@ -28,12 +28,12 @@ pub(crate) struct Saved {
     pub(crate) ffmpeg: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub(crate) unreal_convert: Option<UnrealConvert>,
-    /// Empty turns the LLM tagger off even when `HOARD_LLM_URL` is set.
+    /// Empty turns the LLM tagger off.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub(crate) llm_url: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub(crate) llm_model: Option<String>,
-    /// Empty means "no key", even when `HOARD_LLM_API_KEY` is set.
+    /// Empty means "no key".
     #[serde(skip_serializing_if = "Option::is_none")]
     pub(crate) llm_api_key: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -54,10 +54,16 @@ pub(crate) struct Saved {
     pub(crate) max_upload_mb: Option<u64>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub(crate) max_expand_mb: Option<u64>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub(crate) max_files: Option<usize>,
+    /// Retired: packs have no file limit any more. Still read, so a settings file that has it loads.
+    #[serde(skip_serializing, rename = "max_files", deserialize_with = "ignore")]
+    pub(crate) retired_max_files: (),
     #[serde(skip_serializing_if = "Option::is_none")]
     pub(crate) workers: Option<usize>,
+}
+
+/// Reads a retired setting and throws it away.
+fn ignore<'de, D: serde::Deserializer<'de>>(d: D) -> Result<(), D::Error> {
+    serde::de::IgnoredAny::deserialize(d).map(drop)
 }
 
 /// The settings in effect: saved ones over the flags.
@@ -77,7 +83,6 @@ pub(crate) struct Effective {
     pub(crate) public_url: Option<String>,
     pub(crate) max_upload_mb: u64,
     pub(crate) max_expand_mb: u64,
-    pub(crate) max_files: usize,
     pub(crate) workers: usize,
 }
 
@@ -124,7 +129,6 @@ impl Saved {
             public_url: pick(&self.public_url, &cfg.public_url),
             max_upload_mb: self.max_upload_mb.unwrap_or(cfg.max_upload_mb),
             max_expand_mb: self.max_expand_mb.unwrap_or(cfg.max_expand_mb),
-            max_files: self.max_files.unwrap_or(cfg.max_files),
             workers: self.workers.unwrap_or(cfg.workers).clamp(1, MAX_WORKERS),
         }
     }
@@ -163,7 +167,7 @@ impl Saved {
         if self.llm_batch.is_some_and(|n| !(1..=200).contains(&n)) {
             return Err("Assets per AI request: between 1 and 200".into());
         }
-        if self.max_upload_mb == Some(0) || self.max_expand_mb == Some(0) || self.max_files == Some(0) {
+        if self.max_upload_mb == Some(0) || self.max_expand_mb == Some(0) {
             return Err("Limits can't be zero".into());
         }
         Ok(())
@@ -269,8 +273,10 @@ mod tests {
     }
 
     #[test]
-    fn saved_settings_win_and_clearing_goes_back_to_the_flag() {
-        let cfg = cfg(&["--llm-url", "http://env/v1", "--llm-model", "envmodel"]);
+    fn saved_settings_win_and_clearing_goes_back_to_the_default() {
+        let mut cfg = cfg(&[]);
+        cfg.llm_url = Some("http://env/v1".into());
+        cfg.llm_model = Some("envmodel".into());
         let c = db();
         let store = Store::load(&cfg, &c).unwrap();
         assert_eq!(store.get().blender, "off");
@@ -315,7 +321,8 @@ mod tests {
 
     #[test]
     fn server_options_change_without_a_restart() {
-        let cfg = cfg(&["--workers", "2", "--public-url", "https://env.example"]);
+        let mut cfg = cfg(&[]);
+        cfg.public_url = Some("https://env.example".into());
         let c = db();
         let store = Store::load(&cfg, &c).unwrap();
         assert_eq!(store.get().workers, 2);
@@ -335,7 +342,7 @@ mod tests {
         };
         assert!(msg(json!({ "workers": 0 })).contains("workers"));
         assert!(msg(json!({ "workers": 99 })).contains("workers"));
-        assert!(msg(json!({ "max_files": 0 })).contains("zero"));
+        assert!(msg(json!({ "max_expand_mb": 0 })).contains("zero"));
         assert!(msg(json!({ "public_url": "hoard.example" })).contains("http"));
         assert!(msg(json!({ "soundfont": "/no/such/font.sf2" })).contains("SoundFont"));
         assert!(msg(json!({ "llm_batch": 0 })).contains("AI request"));

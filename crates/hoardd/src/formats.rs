@@ -4,7 +4,7 @@
 //! Images go through `image` (plus Hoard's PSD/Krita/OpenRaster composites), fonts, meshes and glTF through Hoard's
 //! own code. Audio Hoard decodes itself becomes WAV or FLAC here; MP3, OGG Vorbis and Opus use ffmpeg's reference
 //! encoders when ffmpeg is ready (pure-Rust MP3 and Opus otherwise), and formats only ffmpeg reads (AAC/M4A, Opus,
-//! WMA, …) are offered once it is. Models Blender converted (`HOARD_BLENDER`) also offer that GLB.
+//! WMA, …) are offered once it is. Models Blender converted also offer that GLB.
 
 use std::io::{Cursor, Write};
 use std::path::Path;

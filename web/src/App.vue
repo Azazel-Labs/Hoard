@@ -2,10 +2,11 @@
 import { computed, nextTick, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue'
 import {
   api, filesFromDrop, getToken, KIND_LABEL, selectionZipUrl, setToken,
-  type Asset, type AssetKind, type Collection, type Facet, type Pack, type Stats, type UploadFile,
+  type Asset, type AssetKind, type BulkEdit, type Collection, type Facet, type Pack, type Stats, type UploadFile,
 } from './api'
 import { canPreview, stop as stopPreview, toggle as togglePreview } from './player'
 import { prefs, toggleIn } from './prefs'
+import { DARK_THEMES, LIGHT_THEMES, themeFor } from './theme'
 import ActivityIndicator from './components/ActivityIndicator.vue'
 import { looksLikeFolderOfPacks, splitPerSubfolder } from './uploader'
 import UploadQueue from './components/UploadQueue.vue'
@@ -17,10 +18,12 @@ import TagChip from './components/TagChip.vue'
 import UiLayer from './components/UiLayer.vue'
 import CommandPalette from './components/CommandPalette.vue'
 import ShortcutsDialog from './components/ShortcutsDialog.vue'
-import SettingsDialog from './components/SettingsDialog.vue'
+import SettingsPage from './components/SettingsPage.vue'
+import ArchiveView from './components/ArchiveView.vue'
+import { archiveWithUndo, countText } from './archive'
 import { showError, showOk, swipeToClose, useTween, withTransition, type Command } from './ui'
 
-type View = 'library' | 'packs'
+type View = 'library' | 'packs' | 'settings' | 'archive'
 const PAGE = 60
 const THEMES = [
   { value: 'system', label: 'Match system theme' },
@@ -30,7 +33,19 @@ const THEMES = [
 /** Values shown per filter group before "more". */
 const FACET_PREVIEW = 8
 
-const view = ref<View>(location.hash === '#packs' ? 'packs' : 'library')
+/** The view in the address: #packs, #archive, #settings/<page>; anything else is the library. */
+function viewFromHash(): { view: View; section: string } {
+  const h = location.hash
+  if (h === '#packs') return { view: 'packs', section: '' }
+  if (h === '#archive') return { view: 'archive', section: '' }
+  const m = h.match(/^#settings(?:\/([\w-]+))?$/)
+  if (m) return { view: 'settings', section: m[1] ?? 'appearance' }
+  return { view: 'library', section: '' }
+}
+const initial = viewFromHash()
+const view = ref<View>(initial.view)
+/** The open page of Settings. */
+const settingsSection = ref(initial.section || 'appearance')
 type Named = { id: string; name: string }
 const filters = reactive({
   q: '', kind: '', tags: [] as string[], pack: null as Named | null, collection: null as Named | null, sort: '',
@@ -154,12 +169,12 @@ function toggleTag(tag: string) {
 function setKind(kind: string) {
   filters.kind = filters.kind === kind ? '' : kind
 }
-/** Switch between the library and the packs list with a short cross-fade. */
+/** Switch views (library, packs, archive, settings) with a short cross-fade. */
 function setView(v: View) {
   if (view.value === v) return
   void withTransition(() => (view.value = v), 'view')
 }
-function browsePack(p: Pack) {
+function browsePack(p: Named) {
   Object.assign(filters, { pack: { id: p.id, name: p.name }, collection: null, kind: '', tags: [], q: '' })
   setView('library')
 }
@@ -272,7 +287,7 @@ function toggleCheck(a: Asset, e?: MouseEvent | KeyboardEvent) {
 
 /** Plain click opens; Ctrl/Cmd-click or Shift-click selects; while selecting, any click selects. */
 function onTileOpen(a: Asset, e: MouseEvent | KeyboardEvent) {
-  if (e.metaKey || e.ctrlKey || e.shiftKey || checked.value.length) {
+  if (e.metaKey || e.ctrlKey || e.shiftKey || selecting.value) {
     toggleCheck(a, e)
     return
   }
@@ -280,43 +295,100 @@ function onTileOpen(a: Asset, e: MouseEvent | KeyboardEvent) {
 }
 
 const bulkTag = ref('')
+const bulkCategory = ref('')
 const bulkBusy = ref(false)
-const bulkDone = ref(0)
-/** Patch many assets a few at a time, counting progress in `bulkDone`. Returns the ids that failed. */
-async function patchMany(ids: string[], body: Parameters<typeof api.patchAsset>[1]): Promise<string[]> {
-  const failed: string[] = []
-  const queue = [...ids]
-  bulkDone.value = 0
-  const worker = async () => {
-    for (let id = queue.shift(); id; id = queue.shift()) {
-      try {
-        onUpdated(await api.patchAsset(id, body))
-      } catch {
-        failed.push(id)
-      }
-      bulkDone.value++
+/** Selecting without anything picked yet (the Select button); tiles then check instead of opening. */
+const selectMode = ref(false)
+const selecting = computed(() => selectMode.value || checked.value.length > 0)
+watch(view, () => (selectMode.value = false))
+
+/** Show a bulk edit on the tiles that are loaded (and the open asset) without searching again. */
+function patchLoaded(ids: string[], edit: Omit<BulkEdit, 'ids'>) {
+  const set = new Set(ids)
+  const patch = (a: Asset): Asset => {
+    if (!set.has(a.id)) return a
+    let tags = a.tags
+    if (edit.remove_tags?.length) tags = tags.filter((t) => !edit.remove_tags!.includes(t.tag))
+    for (const tag of edit.add_tags ?? []) {
+      if (!tags.some((t) => t.tag === tag)) tags = [...tags, { tag, source: 'human', confidence: 1 }]
     }
+    const category = edit.category === undefined ? a.category : edit.category.trim() || null
+    return { ...a, tags, category }
   }
-  await Promise.all(Array.from({ length: Math.min(6, ids.length) }, worker))
-  return failed
+  items.value = items.value.map(patch)
+  if (selected.value && set.has(selected.value.id)) selected.value = patch(selected.value)
 }
-async function applyBulkTag() {
-  const tag = bulkTag.value.trim()
+/** One edit to many assets in one go. False if it failed. */
+async function bulkEdit(ids: string[], edit: Omit<BulkEdit, 'ids'>): Promise<boolean> {
+  if (!ids.length) return true
+  bulkBusy.value = true
+  try {
+    await api.bulkAssets({ ids, ...edit })
+  } catch (e) {
+    showError(`Couldn't change ${ids.length === 1 ? 'that asset' : `those ${ids.length} assets`}: ${(e as Error).message}`)
+    return false
+  } finally {
+    bulkBusy.value = false
+  }
+  patchLoaded(ids, edit)
+  return true
+}
+const plural = (n: number) => `${n.toLocaleString()} ${n === 1 ? 'asset' : 'assets'}`
+async function bulkTagEdit(remove: boolean) {
+  const tag = bulkTag.value.trim().toLowerCase()
   const ids = [...checked.value]
   if (!tag || !ids.length) return
-  bulkBusy.value = true
-  // Undo only strips the tag from assets that didn't already have it.
-  const fresh = ids.filter((id) => !items.value.find((a) => a.id === id)?.tags.some((t) => t.tag === tag))
-  const failed = await patchMany(ids, { add_tags: [tag] })
-  bulkBusy.value = false
+  // Undo only touches the assets this changed.
+  const has = (id: string) => !!items.value.find((a) => a.id === id)?.tags.some((t) => t.tag === tag)
+  const touched = ids.filter((id) => has(id) === remove)
+  if (!(await bulkEdit(ids, remove ? { remove_tags: [tag] } : { add_tags: [tag] }))) return
   bulkTag.value = ''
-  const n = ids.length
-  if (failed.length) showError(`Couldn't tag ${failed.length} of ${n} assets. Is the token set?`)
-  else
-    showOk(`Tagged ${n} ${n === 1 ? 'asset' : 'assets'} with ${tag}`, {
-      label: 'Undo',
-      run: () => void patchMany(fresh, { remove_tags: [tag] }),
-    })
+  const undo = remove ? { add_tags: [tag] } : { remove_tags: [tag] }
+  showOk(remove ? `Took ${tag} off ${plural(touched.length)}` : `Tagged ${plural(ids.length)} with ${tag}`, {
+    label: 'Undo',
+    run: () => void bulkEdit(touched, undo),
+  })
+}
+async function bulkSetCategory() {
+  const category = bulkCategory.value.trim()
+  const ids = [...checked.value]
+  if (!ids.length) return
+  // Remember each one's old category so Undo can put them back.
+  const before = new Map<string, string[]>()
+  for (const id of ids) {
+    const c = items.value.find((a) => a.id === id)?.category ?? ''
+    before.set(c, [...(before.get(c) ?? []), id])
+  }
+  if (!(await bulkEdit(ids, { category }))) return
+  bulkCategory.value = ''
+  showOk(category ? `Set the category of ${plural(ids.length)} to ${category}` : `Cleared the category of ${plural(ids.length)}`, {
+    label: 'Undo',
+    run: () => {
+      for (const [c, group] of before) void bulkEdit(group, { category: c })
+    },
+  })
+}
+/** Archive what's selected: gone from the grid at once, with Undo on the toast. */
+async function archiveChecked() {
+  const ids = [...checked.value]
+  if (!ids.length) return
+  const ok = await archiveWithUndo(`Archived ${plural(ids.length)}`, { assets: ids }, onArchiveChanged)
+  if (!ok) return
+  checked.value = []
+  selectMode.value = false
+  if (selected.value && ids.includes(selected.value.id)) selected.value = null
+}
+/** Archive the open asset and close it. */
+async function archiveSelected() {
+  const a = selected.value
+  if (!a) return
+  const ok = await archiveWithUndo(`Archived ${a.name}`, { assets: [a.id] }, onArchiveChanged)
+  if (ok && selected.value?.id === a.id) closeDetail()
+}
+/** Something went into or came out of the archive: the grid, counts and packs change. */
+function onArchiveChanged() {
+  runSearch()
+  refreshPacks()
 }
 // Unreal assets with a recovered WAV/PNG can go into the zip as that file instead of the .uasset.
 const preferSources = ref(true)
@@ -489,7 +561,10 @@ function onKey(e: KeyboardEvent) {
   if (target?.closest('dialog[open]')) return
   if (e.key === 'Escape') {
     if (showFilters.value) showFilters.value = false
-    else if (checked.value.length) checked.value = []
+    else if (selecting.value) {
+      checked.value = []
+      selectMode.value = false
+    }
     else if (selected.value) closeDetail()
     return
   }
@@ -535,7 +610,7 @@ function onKey(e: KeyboardEvent) {
 // ------------------------------------------------------------------ URL
 
 // Filters live in the query string (bookmarkable searches); the hash holds the view or an open asset
-// (#packs, #asset=<id>; MCP links use the latter).
+// (#packs, #archive, #settings/<page>, #asset=<id>; MCP links use the last).
 function readUrl() {
   const u = new URLSearchParams(location.search)
   filters.q = u.get('q') ?? ''
@@ -547,7 +622,20 @@ function readUrl() {
   const col = u.get('collection')
   filters.collection = col ? { id: col, name: u.get('collection_name') ?? 'collection' } : null
 }
+/** What a history entry is: going somewhere new adds an entry; refining where you are rewrites it. */
+function urlState() {
+  return {
+    view: view.value,
+    section: view.value === 'settings' ? settingsSection.value : '',
+    asset: selected.value?.id ?? '',
+    place: [filters.kind, filters.tags.join(','), filters.sort, filters.pack?.id, filters.collection?.id].join('|'),
+  }
+}
+let lastState = urlState()
+/** Set while Back/Forward is being followed, so following it doesn't write history of its own. */
+let restoring = false
 function writeUrl() {
+  if (restoring) return
   const u = new URLSearchParams()
   if (filters.q.trim()) u.set('q', filters.q.trim())
   if (filters.kind) u.set('kind', filters.kind)
@@ -562,10 +650,36 @@ function writeUrl() {
     u.set('collection_name', filters.collection.name)
   }
   const qs = u.toString()
-  const hash = view.value === 'packs' ? '#packs' : selected.value ? `#asset=${selected.value.id}` : ''
-  history.replaceState(null, '', `${location.pathname}${qs ? `?${qs}` : ''}${hash}`)
+  const hash =
+    view.value === 'packs' ? '#packs'
+    : view.value === 'archive' ? '#archive'
+    : view.value === 'settings' ? `#settings/${settingsSection.value}`
+    : selected.value ? `#asset=${selected.value.id}` : ''
+  const url = `${location.pathname}${qs ? `?${qs}` : ''}${hash}`
+  const was = lastState
+  const now = (lastState = urlState())
+  if (url === location.pathname + location.search + location.hash) return
+  // A new view, Settings page, filter, or opening or closing an asset is somewhere Back should return from.
+  // Typing a search, or stepping from one open asset to the next, only rewrites where you are.
+  const moved =
+    now.view !== was.view || now.section !== was.section || now.place !== was.place || !now.asset !== !was.asset
+  if (moved) history.pushState(null, '', url)
+  else history.replaceState(null, '', url)
 }
-watch([view, () => selected.value?.id, () => filters.q, () => filters.kind, () => filters.tags.join(','), () => filters.sort, () => filters.pack?.id, () => filters.collection?.id], writeUrl)
+watch(
+  [
+    view,
+    settingsSection,
+    () => selected.value?.id,
+    () => filters.q,
+    () => filters.kind,
+    () => filters.tags.join(','),
+    () => filters.sort,
+    () => filters.pack?.id,
+    () => filters.collection?.id,
+  ],
+  writeUrl,
+)
 
 watch(view, (v) => {
   if (v !== 'library') stopPreview()
@@ -576,10 +690,12 @@ onMounted(() => {
   readUrl()
   const deep = location.hash.match(/^#asset=([\w-]+)/)
   if (deep) openAsset(deep[1])
+  lastState = urlState()
   runSearch()
   refreshPacks()
   schedulePoll()
   window.addEventListener('keydown', onKey)
+  window.addEventListener('popstate', onHistory)
   if (sideEl.value) unswipeSide = swipeToClose(sideEl.value, -1, () => (showFilters.value = false))
 })
 onBeforeUnmount(() => {
@@ -587,7 +703,29 @@ onBeforeUnmount(() => {
   clearInterval(poll)
   observer?.disconnect()
   window.removeEventListener('keydown', onKey)
+  window.removeEventListener('popstate', onHistory)
 })
+/** Back/Forward or a typed address: put the page back the way the address says. */
+async function onHistory() {
+  restoring = true
+  try {
+    readUrl()
+    const next = viewFromHash()
+    if (next.section) settingsSection.value = next.section
+    const deep = location.hash.match(/^#asset=([\w-]+)/)
+    if (deep) {
+      if (selected.value?.id !== deep[1]) await openAsset(deep[1])
+    } else {
+      if (selected.value) closeDetail()
+      setView(next.view)
+    }
+    // Let the watchers see the restored state before history is written again.
+    await new Promise((r) => setTimeout(r))
+  } finally {
+    restoring = false
+    lastState = urlState()
+  }
+}
 
 const busyPacks = computed(() => packs.value.filter(busy))
 const shownTotal = useTween(() => total.value)
@@ -614,12 +752,18 @@ const firstLoad = computed(() => loading.value && !items.value.length)
 
 const paletteOpen = ref(false)
 const shortcutsOpen = ref(false)
-const settingsOpen = ref(false)
+const archivedCount = computed(() => (stats.value?.archived_packs ?? 0) + (stats.value?.archived_assets ?? 0))
+function openSettings(section?: string) {
+  if (section) settingsSection.value = section
+  setView('settings')
+}
 const mod = /Mac|iPhone|iPad/.test(navigator.platform) ? '⌘' : 'Ctrl+'
 const commands = computed<Command[]>(() => {
   const out: Command[] = [
     { id: 'go:library', group: 'Go to', label: 'Library', keywords: 'assets grid home', run: () => setView('library') },
     { id: 'go:packs', group: 'Go to', label: 'Packs', hint: busyPacks.value.length ? `${busyPacks.value.length} working` : undefined, run: () => setView('packs') },
+    { id: 'go:archive', group: 'Go to', label: 'Archive', hint: archivedCount.value ? archivedCount.value.toLocaleString() : undefined, keywords: 'trash recycle bin deleted restore', run: () => setView('archive') },
+    { id: 'go:stats', group: 'Go to', label: 'Library stats', keywords: 'statistics numbers size disk space count', run: () => openSettings('library') },
     { id: 'go:search', group: 'Go to', label: 'Search', hint: '/', run: () => { setView('library'); void nextTick(() => searchInput.value?.focus()) } },
     { id: 'act:add', group: 'Actions', label: 'Add files…', keywords: 'upload import', run: () => fileInput.value?.click() },
     { id: 'act:folder', group: 'Actions', label: 'Import a folder…', keywords: 'upload pack', run: () => folderInput.value?.click() },
@@ -627,6 +771,8 @@ const commands = computed<Command[]>(() => {
   if (view.value === 'library' && items.value.length) {
     out.push({ id: 'act:all', group: 'Actions', label: `Select all ${items.value.length} shown`, hint: `${mod}A`, keywords: 'check', run: () => (checked.value = items.value.map((a) => a.id)) })
   }
+  if (view.value === 'library' && !selecting.value) out.push({ id: 'act:select', group: 'Actions', label: 'Select several…', hint: 'X', keywords: 'bulk multiple tag archive', run: () => (selectMode.value = true) })
+  if (checked.value.length) out.push({ id: 'act:archive', group: 'Actions', label: `Archive the ${checked.value.length} selected`, keywords: 'delete remove trash', run: archiveChecked })
   if (checked.value.length) out.push({ id: 'act:none', group: 'Actions', label: 'Clear the selection', hint: 'Esc', run: () => (checked.value = []) })
   if (hasFilters.value) out.push({ id: 'act:clear', group: 'Actions', label: 'Clear filters', keywords: 'reset', run: clearFilters })
   out.push({
@@ -634,10 +780,16 @@ const commands = computed<Command[]>(() => {
     keywords: 'normal maps roughness masks', run: () => (prefs.showSupporting = !prefs.showSupporting),
   })
   if (stats.value?.auth_required) out.push({ id: 'act:token', group: 'Actions', label: getToken() ? 'Change the token' : 'Set the token', keywords: 'auth password', run: () => (showToken.value = true) })
-  out.push({ id: 'act:settings', group: 'Actions', label: 'Settings', keywords: 'blender ffmpeg llm ai tagging unreal admin tools preferences', run: () => (settingsOpen.value = true) })
+  out.push({ id: 'act:settings', group: 'Actions', label: 'Settings', keywords: 'blender ffmpeg llm ai tagging unreal admin tools preferences', run: () => openSettings() })
   out.push({ id: 'act:keys', group: 'Actions', label: 'Keyboard shortcuts', hint: '?', keywords: 'help keys', run: () => (shortcutsOpen.value = true) })
   for (const t of THEMES) {
     out.push({ id: `theme:${t.value}`, group: 'Theme', label: t.label, hint: prefs.theme === t.value ? 'current' : undefined, keywords: 'theme appearance mode', run: () => setTheme(t.value) })
+  }
+  for (const t of LIGHT_THEMES) {
+    out.push({ id: `light:${t.id}`, group: 'Theme', label: `Light theme: ${t.name}`, hint: themeFor('light').id === t.id ? 'current' : undefined, keywords: `appearance color ${t.blurb}`, run: () => (prefs.lightTheme = t.id) })
+  }
+  for (const t of DARK_THEMES) {
+    out.push({ id: `dark:${t.id}`, group: 'Theme', label: `Dark theme: ${t.name}`, hint: themeFor('dark').id === t.id ? 'current' : undefined, keywords: `appearance color ${t.blurb}`, run: () => (prefs.darkTheme = t.id) })
   }
   for (const k of kindFacets.value) {
     const label = KIND_LABEL[k.value as AssetKind] ?? k.value
@@ -741,7 +893,29 @@ const commands = computed<Command[]>(() => {
         <button v-if="stats?.auth_required" type="button" class="btn ghost" @click="showToken = !showToken">
           {{ getToken() ? 'Token set' : 'Set token' }}
         </button>
-        <button type="button" class="btn ghost settings-btn" title="Settings" aria-label="Settings" @click="settingsOpen = true">
+        <button
+          v-if="archivedCount || view === 'archive'"
+          type="button"
+          class="btn ghost archive-btn"
+          :aria-pressed="view === 'archive'"
+          :title="`Archive: ${countText(stats?.archived_packs ?? 0, stats?.archived_assets ?? 0)}`"
+          aria-label="Archive"
+          @click="setView(view === 'archive' ? 'library' : 'archive')"
+        >
+          <svg viewBox="0 0 16 16" width="15" height="15" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="1.8" y="2.5" width="12.4" height="3.3" rx="0.8" />
+            <path d="M3 5.8v6.9a.8.8 0 0 0 .8.8h8.4a.8.8 0 0 0 .8-.8V5.8M6.5 8.6h3" />
+          </svg>
+          <span v-if="archivedCount" class="acount">{{ archivedCount > 999 ? '999+' : archivedCount }}</span>
+        </button>
+        <button
+          type="button"
+          class="btn ghost settings-btn"
+          title="Settings"
+          aria-label="Settings"
+          :aria-pressed="view === 'settings'"
+          @click="view === 'settings' ? setView('library') : openSettings()"
+        >
           <svg viewBox="0 0 16 16" width="15" height="15" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
             <path d="M2.5 4.5h6M11.5 4.5h2M2.5 11.5h2M7.5 11.5h6" />
             <circle cx="10" cy="4.5" r="1.6" />
@@ -868,6 +1042,20 @@ const commands = computed<Command[]>(() => {
             <TagChip v-for="t in filters.tags" :key="t" :tag="t" removable @remove="toggleTag(t)" />
             <button v-if="hasFilters" type="button" class="linkbtn" @click="clearFilters">Clear all</button>
           </div>
+          <button
+            v-if="items.length"
+            type="button"
+            class="btn ghost select-btn"
+            :aria-pressed="selecting"
+            title="Pick several assets to tag, categorize, collect, download or archive together (X, or Ctrl-click)"
+            @click="selecting ? ((checked = []), (selectMode = false)) : (selectMode = true)"
+          >
+            <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="2" y="2" width="12" height="12" rx="2.5" />
+              <path d="m5.2 8.2 2 2 3.8-4.2" />
+            </svg>
+            <span>{{ selecting ? 'Done' : 'Select' }}</span>
+          </button>
           <label class="size" title="Tile size">
             <span class="visually-hidden">Tile size</span>
             <svg viewBox="0 0 16 16" width="12" height="12" aria-hidden="true"><rect x="2" y="2" width="5" height="5" rx="1" fill="currentColor" /><rect x="9" y="2" width="5" height="5" rx="1" fill="currentColor" /><rect x="2" y="9" width="5" height="5" rx="1" fill="currentColor" /><rect x="9" y="9" width="5" height="5" rx="1" fill="currentColor" /></svg>
@@ -946,7 +1134,7 @@ const commands = computed<Command[]>(() => {
             :asset="a"
             :selected="selected?.id === a.id"
             :checked="checkedSet.has(a.id)"
-            :selecting="checked.length > 0"
+            :selecting="selecting"
             @open="onTileOpen(a, $event)"
             @check="toggleCheck(a, $event)"
           />
@@ -976,36 +1164,64 @@ const commands = computed<Command[]>(() => {
         @error="showError"
         @open="openAsset"
         @step="step"
+        @archive="archiveSelected"
       />
 
       <Transition name="rise">
-      <div v-if="checked.length" class="selbar" role="region" aria-label="Selected assets">
-        <strong>{{ checked.length }} selected</strong>
-        <a class="btn primary" :href="selectionUrl" download>Download zip</a>
+      <div v-if="selecting" class="selbar" role="region" aria-label="Selected assets">
+        <strong>{{ checked.length ? `${checked.length.toLocaleString()} selected` : 'Pick assets' }}</strong>
+        <a v-if="checked.length" class="btn primary" :href="selectionUrl" download>Download zip</a>
         <label v-if="checkedWithSource" class="srccheck" title="Unreal SoundWaves and textures whose original file Hoard recovered">
           <input v-model="preferSources" type="checkbox" /> Recovered WAV/PNG instead of .uasset ({{ checkedWithSource }})
         </label>
-        <form class="bulktag" @submit.prevent="applyBulkTag">
-          <label class="visually-hidden" for="bulk-tag">Tag to add to the selected assets</label>
-          <input id="bulk-tag" v-model="bulkTag" class="field" placeholder="Add a tag to all" autocomplete="off" :disabled="bulkBusy" />
-          <button class="btn" type="submit" :disabled="!bulkTag.trim() || bulkBusy" :aria-busy="bulkBusy">
-            {{ bulkBusy ? `Tagging ${bulkDone}/${checked.length}` : 'Tag' }}
+        <form class="bulktag" @submit.prevent="bulkTagEdit(false)">
+          <label class="visually-hidden" for="bulk-tag">A tag to add to, or take off, the selected assets</label>
+          <input id="bulk-tag" v-model="bulkTag" class="field" placeholder="Tag" autocomplete="off" :disabled="bulkBusy || !checked.length" />
+          <button class="btn" type="submit" :disabled="!bulkTag.trim() || bulkBusy" :aria-busy="bulkBusy" title="Add this tag to every selected asset">Add</button>
+          <button class="btn" type="button" :disabled="!bulkTag.trim() || bulkBusy" title="Take this tag off every selected asset" @click="bulkTagEdit(true)">Remove</button>
+        </form>
+        <form class="bulktag" @submit.prevent="bulkSetCategory">
+          <label class="visually-hidden" for="bulk-cat">Category for the selected assets (empty clears it)</label>
+          <input id="bulk-cat" v-model="bulkCategory" class="field cat" placeholder="Category" autocomplete="off" :disabled="bulkBusy || !checked.length" />
+          <button class="btn" type="submit" :disabled="bulkBusy || !checked.length" :title="bulkCategory.trim() ? 'Set the category of every selected asset' : 'Clear the category of every selected asset'">
+            {{ bulkCategory.trim() ? 'Set' : 'Clear' }}
           </button>
         </form>
         <CollectionPicker
+          v-if="checked.length"
           :collections="collections"
           up
           @add="(id) => addToCollection(checked, { id })"
           @create="(name) => addToCollection(checked, { create: name })"
         />
-        <button v-if="filters.collection" type="button" class="btn" @click="removeFromCollection(checked, filters.collection.id)">
+        <button v-if="filters.collection && checked.length" type="button" class="btn" @click="removeFromCollection(checked, filters.collection.id)">
           Remove from {{ filters.collection.name }}
         </button>
         <button type="button" class="linkbtn" @click="checked = items.map((a) => a.id)">Select all {{ items.length }}</button>
-        <button type="button" class="btn ghost" @click="checked = []">Clear</button>
+        <button type="button" class="btn danger" :disabled="!checked.length || bulkBusy" title="Out of search until they're restored or deleted for good, from the Archive" @click="archiveChecked">Archive</button>
+        <button type="button" class="btn ghost" @click="checked = []; selectMode = false">Done</button>
       </div>
       </Transition>
     </template>
+
+    <SettingsPage
+      v-else-if="view === 'settings'"
+      v-model:section="settingsSection"
+      class="settings-pane"
+      :stats="stats"
+      @unauthorized="showToken = true"
+      @tag="(t) => { Object.assign(filters, { tags: [], kind: '', pack: null, collection: null, q: '' }); toggleTag(t) }"
+      @pack="browsePack"
+      @open="openAsset"
+      @archive="setView('archive')"
+    />
+
+    <ArchiveView
+      v-else-if="view === 'archive'"
+      class="archive-pane"
+      @changed="onArchiveChanged"
+      @error="showError"
+    />
 
     <PacksView
       v-else
@@ -1035,7 +1251,6 @@ const commands = computed<Command[]>(() => {
     <UploadQueue ref="queue" @created="onCreated" @unauthorized="showToken = true" />
     <CommandPalette v-if="paletteOpen" :commands="commands" @close="paletteOpen = false" @open="openAsset" />
     <ShortcutsDialog v-if="shortcutsOpen" @close="shortcutsOpen = false" />
-    <SettingsDialog v-if="settingsOpen" @close="settingsOpen = false" @unauthorized="showToken = true" />
     <UiLayer />
   </div>
 </template>
@@ -1050,7 +1265,8 @@ const commands = computed<Command[]>(() => {
   height: 100dvh;
 }
 .app.with-detail { grid-template-columns: 240px minmax(0, 1fr) minmax(340px, 420px); grid-template-areas: 'top top top' 'token token token' 'side main detail'; }
-.packs-pane { grid-row: 3; grid-column: 1 / -1; overflow-y: auto; }
+.packs-pane, .archive-pane { grid-row: 3; grid-column: 1 / -1; overflow-y: auto; }
+.settings-pane { grid-row: 3; grid-column: 1 / -1; }
 
 .top {
   grid-area: top;
@@ -1058,9 +1274,7 @@ const commands = computed<Command[]>(() => {
   padding: 0.6rem 1rem; border-bottom: 1px solid var(--line); background: var(--panel);
 }
 .brand { display: flex; align-items: center; gap: 0.5rem; font-weight: 750; font-size: var(--step-1); font-variation-settings: 'CASL' 1; cursor: default; }
-/* Hover the logo and the bins jostle while the wordmark leans from casual to slanted (Recursive's own axes). */
-.brand span { font-variation-settings: 'CASL' 1, 'slnt' 0; transition: font-variation-settings var(--dur-3) var(--ease-out); }
-.brand:hover span { font-variation-settings: 'CASL' 0, 'slnt' -15; }
+/* Hover the logo and the bins jostle; the wordmark stays put. */
 .brand rect { transform-box: fill-box; transform-origin: center; transition: rotate var(--dur-3) var(--ease-pop), scale var(--dur-3) var(--ease-pop), translate var(--dur-3) var(--ease-pop); }
 .brand:hover rect:nth-of-type(1) { rotate: -10deg; translate: -1px -1px; }
 .brand:hover rect:nth-of-type(2) { rotate: 8deg; scale: 1.08; transition-delay: 30ms; }

@@ -5,6 +5,7 @@ import {
   type UnrealPackStatus,
 } from '../api'
 import { confirmDialog, undoable } from '../ui'
+import { archiveWithUndo } from '../archive'
 
 const props = defineProps<{ packs: Pack[]; stats: Stats | null; collections: Collection[] }>()
 
@@ -51,20 +52,6 @@ const visibleCollections = computed(() => props.collections.filter((c) => !hidde
 
 const query = ref('')
 /** Audio conversions use ffmpeg; say so while it's being fetched, or why it can't be. */
-const ffmpegNote = computed(() => {
-  const f = props.stats?.ffmpeg ?? ''
-  if (f === 'downloading' || f === 'looking') return 'Fetching ffmpeg for audio conversions.'
-  if (f.startsWith('unavailable')) return `ffmpeg ${f}; MP3 and Opus use the built-in encoders.`
-  return ''
-})
-/** Whether model thumbnails render on a GPU, in software, or not at all. */
-const gpuNote = computed(() => {
-  const r = props.stats?.renderer ?? ''
-  if (r.startsWith('gpu: ')) return { ok: true, text: `GPU: ${r.slice(5)}.` }
-  if (r.startsWith('cpu: ')) return { ok: false, text: `No GPU found: model thumbnails render in software (${r.slice(5)}).` }
-  if (r.startsWith('unavailable')) return { ok: false, text: 'No GPU or software renderer found, so models get no thumbnails.' }
-  return null
-})
 const shown = computed(() => {
   const q = query.value.trim().toLowerCase()
   if (!q) return visiblePacks.value
@@ -114,15 +101,6 @@ const statusText: Record<Pack['status'], string> = {
   analyzing: 'LLM is tagging',
   ready: 'Ready',
   failed: 'Failed',
-}
-
-function summary(s: Stats): string {
-  const plural = (n: number, w: string) => `${n.toLocaleString()} ${w}${n === 1 ? '' : 's'}`
-  const saved = s.logical_bytes - s.stored_bytes
-  // Thumbnails also count as stored bytes, so only mention savings when dedup clearly won.
-  const dedup = saved > 0 ? `, ${humanBytes(saved)} saved by deduplication` : ''
-  const dupes = s.duplicate_assets ? ` ${plural(s.duplicate_assets, 'file')} appear in more than one pack.` : ''
-  return `${plural(s.packs, 'pack')} and ${plural(s.assets, 'asset')} in ${humanBytes(s.stored_bytes)} of storage${dedup}.${dupes}`
 }
 
 function progress(p: Pack): number {
@@ -220,31 +198,21 @@ function unrealFact(p: Pack): string {
   return `${done.toLocaleString()} converted from Unreal, ${left.toLocaleString()} still packages`
 }
 
-function remove(p: Pack) {
-  undoable(`Deleted ${p.name} and its ${p.asset_count.toLocaleString()} assets`, {
-    apply: () => hidden.add(p.id),
-    revert: () => hidden.delete(p.id),
-    commit: async () => {
-      try {
-        await api.deletePack(p.id)
-        emit('changed')
-      } catch (e) {
-        hidden.delete(p.id)
-        emit('error', `Couldn't delete: ${(e as Error).message}`)
-      }
-    },
+/** To the archive (Undo on the toast brings it back); it's deleted for good from there. */
+async function archive(p: Pack) {
+  hidden.add(p.id)
+  const ok = await archiveWithUndo(`Archived ${p.name} and its ${p.asset_count.toLocaleString()} assets`, { packs: [p.id] }, () => {
+    hidden.delete(p.id)
+    emit('changed')
   })
+  if (!ok) hidden.delete(p.id)
 }
 </script>
 
 <template>
   <div class="packs">
-    <p v-if="stats" class="summary">
-      {{ summary(stats) }} Files live in <span class="mono">{{ stats.storage }}</span>.
-      <span v-if="stats.version">Hoard {{ stats.version }}.</span>
-      <span v-if="ffmpegNote">{{ ffmpegNote }}</span>
-      <span v-if="gpuNote" :class="{ gpu: gpuNote.ok }" :title="stats.renderer">{{ gpuNote.text }}</span>
-      <strong v-if="stats.blobs_bad" class="bad">{{ stats.blobs_bad }} files failed their last integrity check.</strong>
+    <p v-if="stats?.blobs_bad" class="summary">
+      <strong class="bad">{{ stats.blobs_bad }} files failed their last integrity check.</strong>
     </p>
 
     <section v-if="visibleCollections.length" class="colsec" aria-label="Collections">
@@ -352,7 +320,7 @@ function remove(p: Pack) {
               <button v-if="p.unreal_packages || p.unreal_converted" type="button" @click="openUnreal(p)">
                 Convert Unreal content…
               </button>
-              <button type="button" class="danger" @click="remove(p)">Delete pack</button>
+              <button type="button" class="danger" @click="archive(p)">Archive pack</button>
             </div>
           </details>
         </div>
@@ -430,7 +398,6 @@ function remove(p: Pack) {
 .packs { padding: 1.25rem 1.5rem 3rem; max-width: 900px; }
 .summary { margin: 0 0 1.25rem; color: var(--muted); font-size: var(--step--1); max-width: 75ch; }
 .bad { color: var(--danger); }
-.gpu { color: var(--ok); }
 .empty { color: var(--muted); }
 ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
 li { padding: 1rem 0; border-top: 1px solid var(--line); display: flex; gap: 1rem; align-items: flex-start; }

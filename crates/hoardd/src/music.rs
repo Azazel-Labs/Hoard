@@ -2,7 +2,7 @@
 //! waveform thumbnail, a playable preview and "download as" WAV/FLAC/MP3/OGG/Opus, plus facts about the song.
 //!
 //! Modules play through `xmrsplayer` (pure Rust). MIDI renders with `rustysynth` (pure Rust) and a General MIDI
-//! SoundFont: `HOARD_SOUNDFONT`, or one found in the usual system places. Without a SoundFont a small built-in
+//! SoundFont: the one picked in Settings, or one found in the usual system places. Without a SoundFont a small built-in
 //! synthesizer gives a rough but recognizable preview.
 
 use std::collections::HashMap;
@@ -17,7 +17,7 @@ use crate::audio::Audio;
 pub(crate) const EXTS: &[&str] = &["mod", "xm", "s3m", "it", "mid", "midi"];
 const RATE: u32 = 44_100;
 
-/// Where to look for a General MIDI SoundFont when `HOARD_SOUNDFONT` isn't set (Debian/Ubuntu packages, macOS
+/// Where to look for a General MIDI SoundFont when Settings doesn't name one (Debian/Ubuntu packages, macOS
 /// Homebrew's fluid-synth, a user folder).
 const SOUNDFONT_PATHS: &[&str] = &[
     "/usr/share/sounds/sf2/default-GM.sf2",
@@ -39,7 +39,7 @@ struct FontSlot {
 
 static FONT: Mutex<FontSlot> = Mutex::new(FontSlot { path: None, font: None });
 
-/// Use this SoundFont (from Settings or `HOARD_SOUNDFONT`); `None` searches the usual paths. Can be called again
+/// Use this SoundFont (from Settings); `None` searches the usual paths. Can be called again
 /// when the setting changes: the next MIDI render loads the new font.
 pub(crate) fn configure(path: Option<PathBuf>) {
     let mut slot = FONT.lock().unwrap_or_else(PoisonError::into_inner);
@@ -389,7 +389,7 @@ fn midi(data: &[u8], path: &Path, max_secs: f32) -> Result<Rendered> {
         (l, r, format!("SoundFont: {name}"))
     } else {
         let mono = builtin_synth(&notes, frames);
-        (mono.clone(), mono, "built-in synth (set HOARD_SOUNDFONT for real instruments)".to_owned())
+        (mono.clone(), mono, "built-in synth (pick a SoundFont in Settings for real instruments)".to_owned())
     };
     facts.insert("preview_synth".into(), json!(synth));
     // Normalize: SoundFont output levels vary a lot between files and fonts.

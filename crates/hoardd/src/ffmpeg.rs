@@ -2,7 +2,7 @@
 //! reference encoders (LAME, libvorbis, libopus), and reading formats Hoard's own decoder doesn't (AAC/M4A, Opus,
 //! WMA, CAF, `WavPack`, …).
 //!
-//! Nothing waits for it. At startup a background task finds a usable ffmpeg (`HOARD_FFMPEG`, one downloaded
+//! Nothing waits for it. At startup a background task finds a usable ffmpeg (the one in Settings, one downloaded
 //! earlier, or a system one with the right encoders) or downloads a static build into `<data dir>/tools`, checking
 //! its SHA-256 against the publisher's. Until it's ready, or if it never is (offline, `off`), MP3 and Opus fall back
 //! to the built-in pure-Rust encoders and the formats only ffmpeg can read aren't offered.

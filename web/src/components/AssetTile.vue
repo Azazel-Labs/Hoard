@@ -114,7 +114,7 @@ function onLongPress(e: MouseEvent) {
   border-radius: var(--r-tile);
 }
 .hit:focus-visible { outline: none; }
-.hit:focus-visible .art { outline: 2px solid var(--k-font); outline-offset: 2px; }
+.hit:focus-visible .art { outline: 2px solid var(--accent); outline-offset: 2px; }
 .art {
   --ring: 0 0 #0000;
   --lift: 0 0 #0000;

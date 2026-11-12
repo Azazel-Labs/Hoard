@@ -249,7 +249,7 @@ onMounted(() => {
 }
 .inputrow input::placeholder { color: var(--faint); }
 .spinner {
-  width: 14px; height: 14px; border-radius: 50%; border: 2px solid var(--line); border-top-color: var(--k-font);
+  width: 14px; height: 14px; border-radius: 50%; border: 2px solid var(--line); border-top-color: var(--accent);
   animation: spin 0.7s linear infinite;
 }
 @keyframes spin { to { rotate: 1turn; } }
@@ -262,9 +262,9 @@ onMounted(() => {
   display: flex; align-items: center; gap: 0.6rem; min-height: 2.25rem; padding: 0.3rem 0.6rem; border-radius: 6px;
   cursor: pointer; font-size: var(--step-0); transition: background-color var(--dur-1);
 }
-.row[aria-selected='true'] { background: var(--raised); box-shadow: inset 2px 0 0 var(--k-font), var(--elev-1); }
+.row[aria-selected='true'] { background: var(--raised); box-shadow: inset 2px 0 0 var(--accent), var(--elev-1); }
 .label { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-mark { background: none; color: inherit; font-weight: 700; text-decoration: underline 2px color-mix(in srgb, var(--k-font) 60%, transparent); text-underline-offset: 3px; }
+mark { background: none; color: inherit; font-weight: 700; text-decoration: underline 2px color-mix(in srgb, var(--accent) 60%, transparent); text-underline-offset: 3px; }
 .hint { max-width: 40%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: var(--step--1); color: var(--faint); }
 .enter { flex: none; color: var(--muted); opacity: 0; translate: -4px 0; transition: opacity var(--dur-1), translate var(--dur-2) var(--ease-out); }
 .row[aria-selected='true'] .enter { opacity: 1; translate: 0 0; }

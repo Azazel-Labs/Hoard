@@ -441,7 +441,7 @@ async fn call_tool(
             }))
         }
         "list_packs" => {
-            let packs = db::call(&state.pool, |c| db::list_packs(c)).await?;
+            let packs = db::call(&state.pool, |c| db::list_packs(c, false)).await?;
             Ok(json!({ "packs": packs }))
         }
         "list_collections" => {

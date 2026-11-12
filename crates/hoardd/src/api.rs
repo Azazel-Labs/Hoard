@@ -45,6 +45,10 @@ pub(crate) fn router(state: &AppState) -> Router<AppState> {
         .route("/api/collections/{id}", axum::routing::patch(patch_collection).delete(delete_collection))
         .route("/api/collections/{id}/assets", post(collection_members))
         .route("/api/assets/{id}", axum::routing::patch(patch_asset))
+        .route("/api/assets/bulk", post(bulk_assets))
+        .route("/api/archive", post(archive))
+        .route("/api/archive/restore", post(restore))
+        .route("/api/archive/purge", post(purge))
         .route("/api/admin/scrub", post(admin_scrub))
         .route("/api/admin/gc", post(admin_gc))
         .route("/api/admin/backup", post(admin_backup))
@@ -57,6 +61,7 @@ pub(crate) fn router(state: &AppState) -> Router<AppState> {
     Router::new()
         .route("/api/health", get(|| async { Json(json!({ "ok": true })) }))
         .route("/api/stats", get(stats))
+        .route("/api/stats/library", get(library_stats))
         .route("/api/packs", get(list_packs))
         .route("/api/packs/{id}", get(get_pack))
         .route("/api/packs/{id}/context", get(get_pack_context))
@@ -128,13 +133,21 @@ async fn stats(State(state): State<AppState>) -> ApiResult<Json<Stats>> {
     let auth_required = state.cfg.token.is_some();
     let s = db::call(&state.pool, move |c| {
         let one = |sql: &str| -> anyhow::Result<u64> { Ok(c.query_row(sql, [], |r| r.get::<_, i64>(0))? as u64) };
-        let mut stmt = c.prepare("SELECT kind, COUNT(*) FROM assets GROUP BY kind ORDER BY 2 DESC")?;
+        // Counts are of the library; the archive has its own two.
+        let live = db::LIVE;
+        let mut stmt =
+            c.prepare(&format!("SELECT a.kind, COUNT(*) FROM assets a WHERE {live} GROUP BY a.kind ORDER BY 2 DESC"))?;
         let kinds = stmt
             .query_map([], |r| Ok(hoard_core::Facet { value: r.get(0)?, count: r.get::<_, i64>(1)? as u64 }))?
             .collect::<rusqlite::Result<Vec<_>>>()?;
         Ok(Stats {
-            assets: one("SELECT COUNT(*) FROM assets")?,
-            packs: one("SELECT COUNT(*) FROM packs")?,
+            assets: one(&format!("SELECT COUNT(*) FROM assets a WHERE {live}"))?,
+            packs: one("SELECT COUNT(*) FROM packs WHERE archived_at IS NULL")?,
+            archived_packs: one("SELECT COUNT(*) FROM packs WHERE archived_at IS NOT NULL")?,
+            archived_assets: one(
+                "SELECT COUNT(*) FROM assets a WHERE a.archived_at IS NOT NULL
+                   AND a.pack_id NOT IN (SELECT id FROM packs WHERE archived_at IS NOT NULL)",
+            )?,
             blobs: one("SELECT COUNT(*) FROM blobs")?,
             blobs_bad: one("SELECT COUNT(*) FROM blobs WHERE status != 'ok'")?,
             stored_bytes: one("SELECT COALESCE(SUM(size), 0) FROM blobs")?,
@@ -156,6 +169,105 @@ async fn stats(State(state): State<AppState>) -> ApiResult<Json<Stats>> {
     })
     .await?;
     Ok(Json(s))
+}
+
+/// The library in numbers, for Settings' Library page: what kinds and file types take the space, how tagged and
+/// described things are, the biggest packs and files, and how it grew. Archived things aren't counted.
+async fn library_stats(State(state): State<AppState>) -> ApiResult<Json<Value>> {
+    let v = db::call(&state.pool, move |c| {
+        let live = db::LIVE;
+        let one = |sql: &str| -> anyhow::Result<u64> { Ok(c.query_row(sql, [], |r| r.get::<_, i64>(0))? as u64) };
+        // Rows of (text, count, number), as JSON objects with the given keys for the text and the number.
+        let rows = |sql: &str, key: &str, third: &str| -> anyhow::Result<Vec<Value>> {
+            let mut stmt = c.prepare(sql)?;
+            let out = stmt
+                .query_map([], |r| {
+                    Ok(json!({
+                        key: r.get::<_, Option<String>>(0)?.unwrap_or_default(),
+                        "count": r.get::<_, i64>(1)?,
+                        third: r.get::<_, i64>(2)?,
+                    }))
+                })?
+                .collect::<rusqlite::Result<Vec<_>>>()?;
+            Ok(out)
+        };
+        let from = format!("FROM assets a JOIN blobs b ON b.hash = a.blob_hash WHERE {live}");
+        let kinds = rows(&format!("SELECT a.kind, COUNT(*), SUM(b.size) {from} GROUP BY a.kind ORDER BY 3 DESC"), "value", "bytes")?;
+        let exts = rows(
+            &format!("SELECT a.ext, COUNT(*), SUM(b.size) {from} GROUP BY a.ext ORDER BY 3 DESC LIMIT 12"),
+            "value",
+            "bytes",
+        )?;
+        let months = rows(
+            &format!(
+                "SELECT substr(a.created_at, 1, 7) AS m, COUNT(*), SUM(b.size) {from}
+                   GROUP BY m ORDER BY m DESC LIMIT 12"
+            ),
+            "month",
+            "bytes",
+        )?;
+        let tag_sources = rows(
+            &format!(
+                "SELECT t.source, COUNT(*), COUNT(DISTINCT t.tag) FROM asset_tags t
+                   WHERE t.asset_id IN (SELECT a.id FROM assets a WHERE {live}) GROUP BY t.source ORDER BY 2 DESC"
+            ),
+            "value",
+            "tags",
+        )?;
+        let mut stmt = c.prepare(&format!(
+            "SELECT t.tag, COUNT(*) FROM asset_tags t WHERE t.asset_id IN (SELECT a.id FROM assets a WHERE {live})
+               GROUP BY t.tag ORDER BY 2 DESC, 1 LIMIT 30"
+        ))?;
+        let top_tags = stmt
+            .query_map([], |r| Ok(json!({ "value": r.get::<_, String>(0)?, "count": r.get::<_, i64>(1)? })))?
+            .collect::<rusqlite::Result<Vec<_>>>()?;
+        let mut stmt = c.prepare(&format!(
+            "SELECT p.id, p.name, COUNT(*), SUM(b.size) FROM assets a JOIN packs p ON p.id = a.pack_id
+               JOIN blobs b ON b.hash = a.blob_hash WHERE {live} GROUP BY p.id ORDER BY 4 DESC LIMIT 8"
+        ))?;
+        let packs = stmt
+            .query_map([], |r| {
+                Ok(json!({
+                    "id": r.get::<_, String>(0)?, "name": r.get::<_, String>(1)?,
+                    "count": r.get::<_, i64>(2)?, "bytes": r.get::<_, i64>(3)?,
+                }))
+            })?
+            .collect::<rusqlite::Result<Vec<_>>>()?;
+        let mut stmt = c.prepare(&format!(
+            "SELECT a.id, a.name, a.kind, p.name, b.size FROM assets a JOIN packs p ON p.id = a.pack_id
+               JOIN blobs b ON b.hash = a.blob_hash WHERE {live} ORDER BY b.size DESC LIMIT 8"
+        ))?;
+        let largest = stmt
+            .query_map([], |r| {
+                Ok(json!({
+                    "id": r.get::<_, String>(0)?, "name": r.get::<_, String>(1)?, "kind": r.get::<_, String>(2)?,
+                    "pack_name": r.get::<_, String>(3)?, "bytes": r.get::<_, i64>(4)?,
+                }))
+            })?
+            .collect::<rusqlite::Result<Vec<_>>>()?;
+        Ok(json!({
+            "kinds": kinds,
+            "extensions": exts,
+            "months": months,
+            "tag_sources": tag_sources,
+            "top_tags": top_tags,
+            "packs": packs,
+            "largest": largest,
+            "distinct_tags": one(&format!(
+                "SELECT COUNT(DISTINCT tag) FROM asset_tags WHERE asset_id IN (SELECT a.id FROM assets a WHERE {live})"
+            ))?,
+            "untagged": one(&format!(
+                "SELECT COUNT(*) FROM assets a WHERE {live} AND NOT EXISTS (SELECT 1 FROM asset_tags t WHERE t.asset_id = a.id)"
+            ))?,
+            "described": one(&format!(
+                "SELECT COUNT(*) FROM assets a WHERE {live}
+                   AND COALESCE(a.description, a.source_description, a.ai_description) IS NOT NULL"
+            ))?,
+            "human_edited": one(&format!("SELECT COUNT(*) FROM assets a WHERE {live} AND a.human_edited = 1"))?,
+        }))
+    })
+    .await?;
+    Ok(Json(v))
 }
 
 async fn get_pack_context(State(state): State<AppState>, Path(id): Path<String>) -> ApiResult<Json<PackContext>> {
@@ -208,8 +320,16 @@ async fn put_pack_context(
     saved.map(Json).ok_or_else(|| AppError::not_found(format!("pack {id}")))
 }
 
-async fn list_packs(State(state): State<AppState>) -> ApiResult<Json<Vec<Pack>>> {
-    Ok(Json(db::call(&state.pool, |c| db::list_packs(c)).await?))
+#[derive(Debug, Deserialize)]
+struct PacksParams {
+    /// The archive's packs instead of the library's.
+    #[serde(default)]
+    archived: Option<bool>,
+}
+
+async fn list_packs(State(state): State<AppState>, Query(p): Query<PacksParams>) -> ApiResult<Json<Vec<Pack>>> {
+    let archived = p.archived.unwrap_or(false);
+    Ok(Json(db::call(&state.pool, move |c| db::list_packs(c, archived)).await?))
 }
 
 async fn get_pack(State(state): State<AppState>, Path(id): Path<String>) -> ApiResult<Json<Pack>> {
@@ -376,6 +496,9 @@ struct AssetsParams {
     hide_supporting: Option<bool>,
     #[serde(default)]
     collection: Option<String>,
+    /// Search the archive instead of the library.
+    #[serde(default)]
+    archived: Option<bool>,
 }
 
 impl From<AssetsParams> for SearchQuery {
@@ -391,6 +514,7 @@ impl From<AssetsParams> for SearchQuery {
             offset: p.offset,
             hide_supporting: p.hide_supporting.unwrap_or(false),
             collection: p.collection,
+            archived: p.archived.unwrap_or(false),
         }
     }
 }
@@ -473,6 +597,118 @@ async fn patch_asset(
     })
     .await?;
     asset.map(Json).ok_or_else(|| AppError::not_found(format!("asset {id}")))
+}
+
+/// The same edit to many assets at once, in one transaction: tags in and out, and a category.
+#[derive(Debug, Deserialize)]
+struct BulkEdit {
+    ids: Vec<String>,
+    #[serde(default)]
+    add_tags: Vec<String>,
+    #[serde(default)]
+    remove_tags: Vec<String>,
+    /// Set the category; an empty one clears it.
+    #[serde(default)]
+    category: Option<String>,
+}
+
+async fn bulk_assets(State(state): State<AppState>, Json(edit): Json<BulkEdit>) -> ApiResult<Json<Value>> {
+    if edit.ids.len() > 50_000 {
+        return Err(AppError::bad_request("too many assets in one request"));
+    }
+    let add: Vec<String> = edit.add_tags.iter().filter_map(|t| hoard_core::normalize_tag(t)).collect();
+    let remove: Vec<String> = edit.remove_tags.iter().filter_map(|t| hoard_core::normalize_tag(t)).collect();
+    let category = edit.category.map(|c| c.trim().to_owned());
+    let updated = db::call(&state.pool, move |c| {
+        let tx = c.transaction()?;
+        let now = db::now();
+        let mut n = 0u64;
+        for id in &edit.ids {
+            let exists: bool =
+                tx.query_row("SELECT EXISTS (SELECT 1 FROM assets WHERE id = ?1)", [id], |r| r.get(0))?;
+            if !exists {
+                continue;
+            }
+            for t in &add {
+                db::upsert_tag(&tx, id, t, TagSource::Human, 1.0)?;
+            }
+            for t in &remove {
+                tx.execute("DELETE FROM asset_tags WHERE asset_id = ?1 AND tag = ?2", params![id, t])?;
+            }
+            if let Some(cat) = &category {
+                tx.execute(
+                    "UPDATE assets SET category = NULLIF(?2, ''), human_edited = 1, updated_at = ?3 WHERE id = ?1",
+                    params![id, cat, now],
+                )?;
+            } else {
+                tx.execute("UPDATE assets SET updated_at = ?2 WHERE id = ?1", params![id, now])?;
+            }
+            db::reindex_asset(&tx, id)?;
+            n += 1;
+        }
+        tx.commit()?;
+        Ok(n)
+    })
+    .await?;
+    Ok(Json(json!({ "updated": updated })))
+}
+
+// ---------------------------------------------------------------------------------------------
+// Archive
+
+/// Packs and assets to archive, restore or delete for good. `all` (purge only) empties the whole archive.
+#[derive(Debug, Deserialize)]
+struct ArchiveItems {
+    #[serde(default)]
+    packs: Vec<String>,
+    #[serde(default)]
+    assets: Vec<String>,
+    #[serde(default)]
+    all: bool,
+}
+
+impl ArchiveItems {
+    fn check(&self) -> ApiResult<()> {
+        if self.packs.len() + self.assets.len() > 50_000 {
+            return Err(AppError::bad_request("too many items in one request"));
+        }
+        Ok(())
+    }
+}
+
+async fn archive(State(state): State<AppState>, Json(items): Json<ArchiveItems>) -> ApiResult<Json<db::ArchiveCount>> {
+    items.check()?;
+    let n = db::call(&state.pool, move |c| db::set_archived(c, &items.packs, &items.assets, true)).await?;
+    tracing::info!(packs = n.packs, assets = n.assets, "archived");
+    Ok(Json(n))
+}
+
+async fn restore(State(state): State<AppState>, Json(items): Json<ArchiveItems>) -> ApiResult<Json<db::ArchiveCount>> {
+    items.check()?;
+    let n = db::call(&state.pool, move |c| db::set_archived(c, &items.packs, &items.assets, false)).await?;
+    tracing::info!(packs = n.packs, assets = n.assets, "restored from the archive");
+    Ok(Json(n))
+}
+
+/// Delete for good. Only what's in the archive goes; bytes nothing else uses are freed right after.
+async fn purge(State(state): State<AppState>, Json(items): Json<ArchiveItems>) -> ApiResult<Json<db::ArchiveCount>> {
+    items.check()?;
+    let (n, gone) =
+        db::call(&state.pool, move |c| db::purge_archived(c, &items.packs, &items.assets, items.all)).await?;
+    tracing::info!(packs = n.packs, assets = n.assets, "deleted from the archive");
+    for id in &gone {
+        tokio::fs::remove_dir_all(state.cfg.staging_dir().join(id)).await.ok();
+    }
+    if n.packs + n.assets > 0 {
+        let state = std::sync::Arc::clone(&state);
+        tokio::spawn(async move {
+            match jobs::gc(&state).await {
+                Ok((count, bytes)) => tracing::info!(count, bytes, "freed the archive's files"),
+                Err(e) => tracing::warn!(error = %e, "could not free the archive's files"),
+            }
+        });
+    }
+    Ok(Json(n))
 }
 
 #[derive(Debug, Deserialize)]
@@ -1401,8 +1637,8 @@ fn settings_json(state: &AppState) -> Value {
             "vision": now.llm_vision,
             "batch": option(now.llm_batch, cfg.llm_batch, saved.llm_batch.is_some()),
             "enabled": now.llm_enabled(),
-            // Where the compose files' local model server listens.
-            "local_url": crate::local_llm::DEFAULT_URL,
+            // Where the local model server listens.
+            "local_url": cfg.local_llm_url,
             "saved": saved.llm_url.is_some() || saved.llm_model.is_some() || saved.llm_api_key.is_some()
                 || saved.llm_vision.is_some(),
             "default": {
@@ -1417,7 +1653,6 @@ fn settings_json(state: &AppState) -> Value {
             "workers": option(now.workers, cfg.workers, saved.workers.is_some()),
             "max_upload_mb": option(now.max_upload_mb, cfg.max_upload_mb, saved.max_upload_mb.is_some()),
             "max_expand_mb": option(now.max_expand_mb, cfg.max_expand_mb, saved.max_expand_mb.is_some()),
-            "max_files": option(now.max_files, cfg.max_files, saved.max_files.is_some()),
             "render": option(now.render, cfg.render, saved.render.is_some()),
             "update_check": option(now.update_check, cfg.update_check, saved.update_check.is_some()),
             "public_url": option(

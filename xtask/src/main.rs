@@ -30,7 +30,7 @@ enum Cmd {
     Llm {
         #[command(flatten)]
         serve: ServeArgs,
-        #[arg(long, value_name = "PATH", help = "Also write the HOARD_LLM_URL setting to this file once ready")]
+        #[arg(long, value_name = "PATH", help = "Also write the HOARD_LOCAL_LLM_URL variable to this file once ready")]
         env_file: Option<PathBuf>,
         /// Extra llama.cpp arguments, after `--`.
         #[arg(last = true)]

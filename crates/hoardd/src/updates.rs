@@ -1,7 +1,7 @@
 //! Tells the portal when a newer Hoard release is out. Once a day the server asks GitHub for the latest release
 //! (pre-releases and drafts excluded); if it's newer than this build, `GET /api/stats` carries it as `update` and
 //! the portal shows a link to its notes. Nothing is installed: updating is pulling the new image (or binary), and
-//! the database migrates itself on the next start. Settings (or `HOARD_UPDATE_CHECK=false`) turns the check off.
+//! the database migrates itself on the next start. Settings turns the check off.
 
 use std::sync::RwLock;
 use std::sync::atomic::{AtomicBool, Ordering};

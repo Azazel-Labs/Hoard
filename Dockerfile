@@ -28,14 +28,16 @@ RUN apt-get update \
  && apt-get install -y --no-install-recommends ca-certificates mesa-vulkan-drivers libvulkan1 fonts-dejavu-core timgm6mb-soundfont \
     libx11-6 libxi6 libxxf86vm1 libxfixes3 libxrender1 libxext6 libxkbcommon0 libsm6 libice6 libgl1 libegl1 \
  && rm -rf /var/lib/apt/lists/* \
- && useradd --system --uid 10001 --home /data hoard && mkdir -p /data /files /cache && chown hoard /data /files /cache
+ && useradd --system --uid 10001 --home /config hoard && mkdir -p /config /library /cache && chown hoard /config /library /cache
 COPY --from=build /src/target/release/hoardd /src/target/release/hoard /usr/local/bin/
 COPY --from=web /web/dist /srv/hoard/web
 ENV HOARD_LISTEN=0.0.0.0:7878 \
-    HOARD_DATA_DIR=/data \
+    HOARD_DATA_DIR=/config \
+    HOARD_FILES_DIR=/library \
+    HOARD_CACHE_DIR=/cache \
     HOARD_WEB_DIR=/srv/hoard/web
 USER hoard
-VOLUME /data
+VOLUME /config
 EXPOSE 7878
 HEALTHCHECK CMD ["sh", "-c", "exec 3<>/dev/tcp/127.0.0.1/7878"]
 CMD ["hoardd"]

@@ -6,18 +6,15 @@
 # Bigger setups (files on a NAS, remote access) are in docs/DEPLOYMENT.md.
 services:
   hoard:
-    image: ghcr.io/azazel-labs/hoard:${HOARD_VERSION:-latest}
+    image: ghcr.io/azazel-labs/hoard:latest   # or :0.8 (patch releases only), :0.8.1 (pinned), :edge (every main commit)
     restart: unless-stopped
     environment:
       # Uploads, edits and admin calls need this token (the portal asks for it once); browsing doesn't.
       HOARD_TOKEN: ${HOARD_TOKEN:?set HOARD_TOKEN, e.g. HOARD_TOKEN=$(openssl rand -hex 32)}
-      HOARD_PUBLIC_URL: ${HOARD_PUBLIC_URL:-}
-      HOARD_FILES_DIR: /files
-      HOARD_CACHE_DIR: /cache
     volumes:
-      # Three volumes, so each can live where it fits (swap a name for a host path, e.g. /mnt/big/hoard:/files):
-      - hoard-data:/data          # database, Settings, backups: small, back it up
-      - hoard-files:/files        # your files: big, put it on the disk with room
+      # Three volumes, so each can live where it fits (swap a name for a host path, e.g. /mnt/big/hoard:/library):
+      - hoard-config:/config      # database, Settings, backups: small, back it up
+      - hoard-library:/library    # your files: big, put it on the disk with room
       - hoard-cache:/cache        # thumbnails, uploads in progress, Blender/ffmpeg: fast disk, can be rebuilt
     ports:
       - "7878:7878"
@@ -80,7 +77,7 @@ services:
   #             capabilities: [gpu]
 
   # Pulls new Hoard images daily and restarts the container; the database upgrades itself on start (backed up
-  # first). Pin HOARD_VERSION (e.g. 0.8) to take only patch releases, or remove this service to update by hand.
+  # first). Pin the image tag (e.g. :0.8) to take only patch releases, or remove this service to update by hand.
   watchtower:
     image: ghcr.io/nicholas-fedor/watchtower:1.21
     restart: unless-stopped
@@ -90,13 +87,13 @@ services:
       WATCHTOWER_LABEL_ENABLE: "true"
       WATCHTOWER_SCOPE: hoard
       WATCHTOWER_CLEANUP: "true"
-      WATCHTOWER_SCHEDULE: "${HOARD_UPDATE_SCHEDULE:-0 0 4 * * *}"   # seconds-first cron: 04:00 daily
+      WATCHTOWER_SCHEDULE: "0 0 4 * * *"   # seconds-first cron: 04:00 daily
     labels:
       com.centurylinklabs.watchtower.scope: hoard
 
 volumes:
-  hoard-data:
-  hoard-files:
+  hoard-config:
+  hoard-library:
   hoard-cache:
   llm-models:
   # ollama-models:

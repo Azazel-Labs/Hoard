@@ -1,6 +1,6 @@
 //! Blender, for converting authoring formats to GLB (see `convert.rs`).
 //!
-//! Like ffmpeg, nothing waits for it. Switched on (`auto`, from Settings in the portal or `HOARD_BLENDER`), a
+//! Like ffmpeg, nothing waits for it. Switched on (`auto`, from Settings in the portal), a
 //! background task uses a Blender downloaded earlier, then an installed one, and otherwise downloads the newest
 //! Blender 4.5 LTS build from Blender's official mirrors into `<data dir>/tools/blender`. The build is checked
 //! against the SHA-256 list Blender publishes, read from a different mirror than the build came from. A path uses

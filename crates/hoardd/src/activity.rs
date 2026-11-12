@@ -103,6 +103,16 @@ pub(crate) fn job_progress(kind: &str, pack_id: Option<&str>, done: usize, total
     });
 }
 
+/// A job's progress as words alone, for work whose total isn't known yet ("unpacked 2,000 files").
+pub(crate) fn job_note(kind: &str, pack_id: Option<&str>, detail: &str) {
+    with(|m| {
+        if let Some(e) = m.values_mut().find(|e| e.kind == kind && e.pack_id.as_deref() == pack_id) {
+            e.progress = None;
+            e.detail = Some(detail.to_owned());
+        }
+    });
+}
+
 /// Everything registered now, oldest first.
 pub(crate) fn snapshot() -> Vec<Entry> {
     with(|m| m.values().cloned().collect())

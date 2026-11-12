@@ -97,5 +97,5 @@ pub(crate) fn wait_ready(opts: &Serve, child: &mut Child, timeout: Duration) -> 
 /// Environment that tells hoardd where the server is. The model is picked in Settings, so AI tagging stays off until
 /// then.
 pub(crate) fn hoard_env(opts: &Serve) -> Vec<(&'static str, String)> {
-    vec![("HOARD_LLM_URL", format!("{}/v1", opts.base_url()))]
+    vec![("HOARD_LOCAL_LLM_URL", format!("{}/v1", opts.base_url()))]
 }

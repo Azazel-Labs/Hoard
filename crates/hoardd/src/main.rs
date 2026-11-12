@@ -80,6 +80,7 @@ async fn main() -> Result<()> {
         .init();
 
     let cfg = Config::parse();
+    config::warn_retired_env();
     check_files_dir(&cfg)?;
     for dir in [cfg.data_dir.clone(), cfg.staging_dir(), cfg.tmp_dir()] {
         std::fs::create_dir_all(&dir).with_context(|| format!("create {}", dir.display()))?;

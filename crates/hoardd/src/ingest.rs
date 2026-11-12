@@ -4,12 +4,11 @@
 
 use std::collections::HashMap;
 use std::fs::{self, File};
-use std::io::{self, BufReader, Read};
+use std::io::{self, BufReader, Read, Write};
 use std::path::{Path, PathBuf};
-use std::sync::Mutex;
-use std::sync::atomic::{AtomicU64, AtomicUsize, Ordering};
+use std::sync::atomic::{AtomicBool, AtomicU64, AtomicUsize, Ordering};
 
-use anyhow::{Context, Result, bail};
+use anyhow::{Context, Result};
 use futures_util::{StreamExt, TryStreamExt, stream};
 use hoard_core::{AssetKind, PackStatus, TagSource};
 use rusqlite::params;
@@ -85,32 +84,55 @@ fn archive_stem(name: &str) -> Option<&str> {
     None
 }
 
+/// What an upload may still unpack to, shared by the unpacking threads, plus a running file count for progress.
 #[derive(Debug)]
 struct Budget {
-    bytes_left: u64,
-    files_left: usize,
+    bytes_left: AtomicU64,
+    files: AtomicUsize,
+    pack_id: String,
 }
 
 impl Budget {
-    fn take_file(&mut self) -> Result<()> {
-        if self.files_left == 0 {
-            bail!("pack has too many files (raise HOARD_MAX_FILES)");
-        }
-        self.files_left -= 1;
-        Ok(())
+    fn new(bytes: u64, pack_id: &str) -> Self {
+        Self { bytes_left: AtomicU64::new(bytes), files: AtomicUsize::new(0), pack_id: pack_id.to_owned() }
     }
-    fn copy_limited(&mut self, src: &mut impl Read, dest: &Path) -> Result<()> {
+
+    fn reserve(&self, n: u64) -> Result<()> {
+        self.bytes_left
+            .try_update(Ordering::Relaxed, Ordering::Relaxed, |left| left.checked_sub(n))
+            .map(drop)
+            .map_err(|_| anyhow::anyhow!("archive expands past the size limit (raise Largest pack in Settings)"))
+    }
+
+    /// Stream `src` to `dest`, a buffer at a time, charging every byte before it's written: a zip bomb stops at
+    /// the limit, however many threads are unpacking.
+    fn copy_limited(&self, src: &mut impl Read, dest: &Path) -> Result<()> {
         if let Some(parent) = dest.parent() {
             fs::create_dir_all(parent)?;
         }
         let mut out = File::create(dest)?;
-        let written = io::copy(&mut src.take(self.bytes_left + 1), &mut out)?;
-        if written > self.bytes_left {
-            bail!("archive expands past the size limit (raise HOARD_MAX_EXPAND_MB)");
+        let mut buf = vec![0u8; 64 * 1024];
+        loop {
+            let n = match src.read(&mut buf) {
+                Ok(0) => break,
+                Ok(n) => n,
+                Err(e) if e.kind() == io::ErrorKind::Interrupted => continue,
+                Err(e) => return Err(e.into()),
+            };
+            self.reserve(n as u64)?;
+            out.write_all(&buf[..n])?;
         }
-        self.bytes_left -= written;
+        let n = self.files.fetch_add(1, Ordering::Relaxed) + 1;
+        if n.is_multiple_of(250) {
+            crate::activity::job_note(crate::jobs::INGEST, Some(&self.pack_id), &format!("unpacked {n} files"));
+        }
         Ok(())
     }
+}
+
+/// Threads for per-file work: every core, up to 8.
+fn workers() -> usize {
+    std::thread::available_parallelism().map_or(2, std::num::NonZero::get).min(8)
 }
 
 fn walk_files(dir: &Path, out: &mut Vec<PathBuf>) -> Result<()> {
@@ -135,7 +157,7 @@ fn rel_of(root: &Path, path: &Path) -> String {
         .join("/")
 }
 
-fn expand_archives(dir: &Path, budget: &mut Budget, depth: u32) -> Result<()> {
+fn expand_archives(dir: &Path, budget: &Budget, depth: u32) -> Result<()> {
     if depth > MAX_ARCHIVE_DEPTH {
         return Ok(());
     }
@@ -162,32 +184,69 @@ fn expand_archives(dir: &Path, budget: &mut Budget, depth: u32) -> Result<()> {
             }
             // A corrupt nested archive is kept as a plain file instead of failing the whole pack,
             // but limit violations must abort.
-            Err(e) if e.to_string().contains("limit") || e.to_string().contains("too many") => return Err(e),
+            Err(e) if e.to_string().contains("size limit") => return Err(e),
             Err(e) => tracing::warn!(archive = %file.display(), error = %e, "could not unpack; keeping as a file"),
         }
     }
     Ok(())
 }
 
-fn extract_zip(path: &Path, target: &Path, budget: &mut Budget) -> Result<()> {
-    let mut zip = zip::ZipArchive::new(BufReader::new(File::open(path)?)).context("read zip")?;
-    for i in 0..zip.len() {
-        let mut entry = zip.by_index(i)?;
-        if entry.is_dir() {
-            continue;
-        }
-        // `enclosed_name` is the zip crate's zip-slip guard; `safe_rel_path` normalizes on top.
-        let Some(rel) = entry.enclosed_name().and_then(|p| safe_rel_path(&p.to_string_lossy())) else { continue };
-        if is_junk(&rel) {
-            continue;
-        }
-        budget.take_file()?;
-        budget.copy_limited(&mut entry, &target.join(rel))?;
+/// Unpack a zip on several threads, each with its own handle on the file: an all-in-one pack can hold 100,000
+/// small files, and creating them one at a time is what takes the time.
+fn extract_zip(path: &Path, target: &Path, budget: &Budget) -> Result<()> {
+    let open = || zip::ZipArchive::new(BufReader::new(File::open(path)?)).context("read zip");
+    let first = open()?;
+    let count = first.len();
+    let threads = workers().min(count.div_ceil(256)).max(1);
+    let mut archives = vec![first];
+    for _ in 1..threads {
+        archives.push(open()?);
     }
-    Ok(())
+    let next = AtomicUsize::new(0);
+    let failed = AtomicBool::new(false);
+    std::thread::scope(|s| {
+        let handles: Vec<_> = archives
+            .into_iter()
+            .map(|mut zip| {
+                let (next, failed) = (&next, &failed);
+                s.spawn(move || -> Result<()> {
+                    crate::heavy::lower_priority();
+                    while !failed.load(Ordering::Relaxed) {
+                        let i = next.fetch_add(1, Ordering::Relaxed);
+                        if i >= count {
+                            break;
+                        }
+                        let res = (|| -> Result<()> {
+                            let mut entry = zip.by_index(i)?;
+                            if entry.is_dir() {
+                                return Ok(());
+                            }
+                            // `enclosed_name` is the zip crate's zip-slip guard; `safe_rel_path` normalizes on top.
+                            let Some(rel) = entry.enclosed_name().and_then(|p| safe_rel_path(&p.to_string_lossy()))
+                            else {
+                                return Ok(());
+                            };
+                            if !is_junk(&rel) {
+                                budget.copy_limited(&mut entry, &target.join(rel))?;
+                            }
+                            Ok(())
+                        })();
+                        if res.is_err() {
+                            failed.store(true, Ordering::Relaxed);
+                            return res;
+                        }
+                    }
+                    Ok(())
+                })
+            })
+            .collect();
+        handles
+            .into_iter()
+            .try_for_each(|h| h.join().unwrap_or_else(|_| Err(anyhow::anyhow!("an unpacking thread panicked"))))
+    })
 }
 
-fn extract_tar(path: &Path, target: &Path, budget: &mut Budget, gz: bool) -> Result<()> {
+fn extract_tar(path: &Path, target: &Path, budget: &Budget, gz: bool) -> Result<()> {
     let file = BufReader::new(File::open(path)?);
     let reader: Box<dyn Read> = if gz { Box::new(flate2::read::GzDecoder::new(file)) } else { Box::new(file) };
     let mut ar = tar::Archive::new(reader);
@@ -200,7 +259,6 @@ fn extract_tar(path: &Path, target: &Path, budget: &mut Budget, gz: bool) -> Res
         if is_junk(&rel) {
             continue;
         }
-        budget.take_file()?;
         budget.copy_limited(&mut entry, &target.join(rel))?;
     }
     Ok(())
@@ -208,7 +266,7 @@ fn extract_tar(path: &Path, target: &Path, budget: &mut Budget, gz: bool) -> Res
 
 /// A Unity package: a gzipped tar of `<guid>/asset` (the file), `<guid>/pathname` (where it lived, `Assets/…`),
 /// `<guid>/asset.meta` and an optional `<guid>/preview.png`. Rebuilds the original tree, `.meta` files included.
-fn extract_unitypackage(path: &Path, target: &Path, budget: &mut Budget) -> Result<()> {
+fn extract_unitypackage(path: &Path, target: &Path, budget: &Budget) -> Result<()> {
     let scratch = target.with_file_name(format!(
         "{}.unity-unpack",
         target.file_name().map(|n| n.to_string_lossy().into_owned()).unwrap_or_default()
@@ -327,38 +385,58 @@ fn carry_origin(item: &mut Item, o: &crate::extract::OriginFacts) {
     tagger::meta_tags(item.kind, &item.ext, &item.analysis.meta, &mut item.tags);
 }
 
-/// Cross-file rules that need the whole pack: PBR map sets, license, categories.
-pub(crate) fn pack_pass(items: &mut [Item], license: Option<&str>) {
-    let mut groups: HashMap<(String, String), Vec<(usize, tagger::MapHit)>> = HashMap::new();
-    for (i, it) in items.iter().enumerate() {
-        if it.kind != AssetKind::Texture {
-            continue;
-        }
-        if let Some(hit) = tagger::map_suffix(stem_of(&it.rel)) {
-            let dir = it.rel.rsplit_once('/').map_or("", |(d, _)| d).to_owned();
-            groups.entry((dir, hit.base.clone())).or_default().push((i, hit));
-        }
-    }
-    for ((dir, base), members) in groups {
-        let distinct: std::collections::BTreeSet<&str> = members.iter().map(|(_, h)| h.map).collect();
-        let is_set = distinct.len() >= 2;
-        for (i, hit) in &members {
-            // Unreal's T_Name_N convention makes one-letter suffixes trustworthy on their own.
-            let unreal_texture = items[*i].ext == "uasset" && stem_of(&items[*i].rel).starts_with("T_");
-            if !is_set && !hit.strong && !unreal_texture {
-                continue;
+/// Which textures form PBR map sets (`Rock_Albedo` + `Rock_Normal` + ...), worked out from paths alone before
+/// any file is read, so a pack can be tagged a batch at a time and never held in memory whole.
+pub(crate) struct MapSets(HashMap<String, (tagger::MapHit, bool)>);
+
+/// Whether a file might be a texture, judging by its path: an image, or an Unreal package (whose class is only
+/// known once it's read).
+fn could_be_texture(rel: &str) -> bool {
+    let ext = ext_of(rel);
+    ext == "uasset" || AssetKind::from_ext(&ext) == AssetKind::Texture
+}
+
+impl MapSets {
+    pub(crate) fn new<'a>(texture_paths: impl IntoIterator<Item = &'a str>) -> Self {
+        let mut groups: HashMap<(&str, String), Vec<(&str, tagger::MapHit)>> = HashMap::new();
+        for rel in texture_paths {
+            if let Some(hit) = tagger::map_suffix(stem_of(rel)) {
+                let dir = rel.rsplit_once('/').map_or("", |(d, _)| d);
+                groups.entry((dir, hit.base.clone())).or_default().push((rel, hit));
             }
-            let it = &mut items[*i];
+        }
+        let mut out = HashMap::new();
+        for members in groups.into_values() {
+            let distinct: std::collections::BTreeSet<&str> = members.iter().map(|(_, h)| h.map).collect();
+            let is_set = distinct.len() >= 2;
+            for (rel, hit) in members {
+                out.insert(rel.to_owned(), (hit, is_set));
+            }
+        }
+        Self(out)
+    }
+}
+
+/// Rules that need the rest of the pack: PBR map sets, the pack's license, then the category.
+pub(crate) fn apply_pack_rules(it: &mut Item, sets: &MapSets, license: Option<&str>) {
+    if it.kind == AssetKind::Texture
+        && let Some((hit, is_set)) = sets.0.get(&it.rel)
+    {
+        let is_set = *is_set;
+        // Unreal's T_Name_N convention makes one-letter suffixes trustworthy on their own.
+        let unreal_texture = it.ext == "uasset" && stem_of(&it.rel).starts_with("T_");
+        if is_set || hit.strong || unreal_texture {
             it.tags.add(&format!("map:{}", hit.map), TagSource::Rule, if is_set { 0.95 } else { 0.8 });
             if is_set {
-                it.tags.add(&format!("set:{base}"), TagSource::Rule, 0.9);
+                it.tags.add(&format!("set:{}", hit.base), TagSource::Rule, 0.9);
                 it.tags.add("pbr", TagSource::Rule, 0.85);
             }
             // "Rock_Metallic.png" is a map, not a metal rock: drop vocab tags that only came from the suffix.
+            let dir = it.rel.rsplit_once('/').map_or("", |(d, _)| d);
             let mut from_suffix = TagSet::default();
             tagger::vocab_tags(&hit.suffix, it.kind, &mut from_suffix);
             let mut from_base = TagSet::default();
-            tagger::vocab_tags(&format!("{dir}/{base}"), it.kind, &mut from_base);
+            tagger::vocab_tags(&format!("{dir}/{}", hit.base), it.kind, &mut from_base);
             for s in from_suffix.into_vec() {
                 if !from_base.has(&s.tag) {
                     it.tags.remove(&s.tag);
@@ -366,81 +444,97 @@ pub(crate) fn pack_pass(items: &mut [Item], license: Option<&str>) {
             }
         }
     }
-    for it in items.iter_mut() {
-        let data_map = [
-            "map:normal",
-            "map:roughness",
-            "map:metallic",
-            "map:ao",
-            "map:height",
-            "map:orm",
-            "map:specular",
-            "map:opacity",
-        ]
-        .iter()
-        .any(|m| it.tags.has(m));
-        if data_map {
-            it.tags.remove_prefix("color:");
-        }
-        if let Some(l) = license {
-            it.tags.add(&format!("license:{l}"), TagSource::Rule, 0.9);
-        }
-        it.category = tagger::categorize(it.kind, &it.tags);
+    let data_map = [
+        "map:normal",
+        "map:roughness",
+        "map:metallic",
+        "map:ao",
+        "map:height",
+        "map:orm",
+        "map:specular",
+        "map:opacity",
+    ]
+    .iter()
+    .any(|m| it.tags.has(m));
+    if data_map {
+        it.tags.remove_prefix("color:");
     }
+    if let Some(l) = license {
+        it.tags.add(&format!("license:{l}"), TagSource::Rule, 0.9);
+    }
+    it.category = tagger::categorize(it.kind, &it.tags);
 }
 
 fn detect_pack_license(root: &Path, files: &[PathBuf]) -> Option<&'static str> {
-    files.iter().filter(|f| tagger::is_license_file(&rel_of(root, f))).find_map(|f| {
+    license_in(files.iter().filter(|f| tagger::is_license_file(&rel_of(root, f))))
+}
+
+/// The first license recognised in these files (only their first few KB are read).
+fn license_in<'a>(files: impl IntoIterator<Item = &'a PathBuf>) -> Option<&'static str> {
+    files.into_iter().find_map(|f| {
         let mut text = String::new();
         File::open(f).ok()?.take(LICENSE_SCAN_BYTES).read_to_string(&mut text).ok()?;
         tagger::detect_license(&text)
     })
 }
 
-/// Analyze many files across all cores, reporting progress into `packs.files_done`.
-fn analyze_parallel(state: &AppState, pack_id: &str, root: &Path, files: &[PathBuf]) -> Vec<Item> {
-    let threads = std::thread::available_parallelism().map_or(2, std::num::NonZero::get).min(8);
+/// Files analyzed per database write: enough to batch the writes, few enough that a batch (thumbnails included)
+/// is a few MB and its transaction holds the write lock only briefly.
+const BATCH: usize = 128;
+
+/// Run `make` over `jobs` on low-priority worker threads and hand the results to `flush` a batch at a time, with
+/// how many jobs are done so far. The queue between them is bounded, so however big the pack, only about two
+/// batches are ever in memory. A job that fails is logged and skipped; a `flush` that fails stops the lot.
+fn pipeline<J: Sync>(
+    pack_id: &str,
+    jobs: &[J],
+    make: impl Fn(&J) -> Result<Item> + Sync,
+    mut flush: impl FnMut(Vec<Item>, usize) -> Result<()>,
+) -> Result<()> {
     let next = AtomicUsize::new(0);
-    let done = AtomicU64::new(0);
-    let results = Mutex::new(Vec::with_capacity(files.len()));
-    let errors = Mutex::new(Vec::new());
+    let done = AtomicUsize::new(0);
+    let (tx, rx) = std::sync::mpsc::sync_channel::<Item>(BATCH);
     std::thread::scope(|s| {
-        for _ in 0..threads {
-            s.spawn(|| {
-                loop {
-                    let i = next.fetch_add(1, Ordering::Relaxed);
-                    let Some(path) = files.get(i) else { break };
-                    let rel = rel_of(root, path);
-                    match analyze_one(path.clone(), rel.clone(), None) {
-                        Ok(item) => results.lock().unwrap_or_else(std::sync::PoisonError::into_inner).push(item),
-                        Err(e) => errors
-                            .lock()
-                            .unwrap_or_else(std::sync::PoisonError::into_inner)
-                            .push(format!("{rel}: {e:#}")),
-                    }
+        for _ in 0..workers() {
+            let tx = tx.clone();
+            let (next, done, make) = (&next, &done, &make);
+            s.spawn(move || {
+                crate::heavy::lower_priority();
+                while let Some(job) = jobs.get(next.fetch_add(1, Ordering::Relaxed)) {
+                    let item = make(job);
                     let n = done.fetch_add(1, Ordering::Relaxed) + 1;
-                    let n_files = usize::try_from(n).unwrap_or(usize::MAX);
                     for kind in [crate::jobs::INGEST, crate::jobs::RETAG] {
-                        crate::activity::job_progress(kind, Some(pack_id), n_files, files.len(), "files");
+                        crate::activity::job_progress(kind, Some(pack_id), n, jobs.len(), "files");
                     }
-                    if n.is_multiple_of(50)
-                        && let Ok(conn) = state.pool.get()
-                    {
-                        conn.execute("UPDATE packs SET files_done = ?2 WHERE id = ?1", params![pack_id, n as i64]).ok();
+                    match item {
+                        // The receiver is gone only when a flush failed: stop.
+                        Ok(item) => {
+                            if tx.send(item).is_err() {
+                                break;
+                            }
+                        }
+                        Err(e) => tracing::warn!(pack = pack_id, "skipped file: {e:#}"),
                     }
                 }
             });
         }
-    });
-    for e in errors.into_inner().unwrap_or_default() {
-        tracing::warn!(pack = pack_id, "skipped file: {e}");
-    }
-    let mut items = results.into_inner().unwrap_or_default();
-    items.sort_by(|a, b| a.rel.cmp(&b.rel));
-    items
+        drop(tx);
+        // Moved in here so an early return drops it, which stops the workers before the scope waits for them.
+        let rx = rx;
+        let mut batch = Vec::with_capacity(BATCH);
+        for item in &rx {
+            batch.push(item);
+            if batch.len() == BATCH {
+                flush(std::mem::replace(&mut batch, Vec::with_capacity(BATCH)), done.load(Ordering::Relaxed))?;
+            }
+        }
+        if !batch.is_empty() {
+            flush(batch, done.load(Ordering::Relaxed))?;
+        }
+        Ok(())
+    })
 }
 
-/// Upload originals and thumbnails to the blob store. Returns thumbnail blobs by item index.
 /// Previews stored alongside an asset: its thumbnail and (for models, when vision tagging is on) a multi-view sheet.
 struct Previews {
     thumb: Option<StoredBlob>,
@@ -451,36 +545,36 @@ struct Previews {
     preview: Option<StoredBlob>,
 }
 
-fn upload_all(state: &AppState, rt: &Handle, items: &[Item]) -> Result<Vec<Previews>> {
+/// Upload a batch's originals and previews to the blob store. The preview bytes are moved out of the items, not
+/// copied. Returns the previews by item index.
+fn upload_all(state: &AppState, rt: &Handle, items: &mut [Item]) -> Result<Vec<Previews>> {
     let blobs = &state.blobs;
     rt.block_on(async {
         stream::iter(items.iter().map(Ok::<_, anyhow::Error>))
             .try_for_each_concurrent(8, |it| async move { blobs.put_file(&it.local, &it.blob).await })
             .await?;
-        let thumbs = stream::iter(items.iter())
+        stream::iter(items.iter_mut())
             .map(|it| async move {
+                let a = &mut it.analysis;
                 // Thumbnails, views and previews go to the cache store; a recovered source file is content.
-                let put = |bytes: &Option<Vec<u8>>, cache: bool| {
-                    let bytes = bytes.clone();
-                    async move {
-                        match bytes {
-                            Some(b) if cache => blobs.put_cache_bytes(b).await.map(Some),
-                            Some(b) => blobs.put_bytes(b).await.map(Some),
-                            None => Ok(None),
-                        }
-                    }
-                };
                 Ok::<_, anyhow::Error>(Previews {
-                    thumb: put(&it.analysis.thumb_png, true).await?,
-                    views: put(&it.analysis.views_png, true).await?,
-                    source: put(&it.analysis.source.as_ref().map(|s| s.bytes.clone()), false).await?,
-                    preview: put(&it.analysis.preview_mp3, true).await?,
+                    thumb: put(blobs, a.thumb_png.take(), true).await?,
+                    views: put(blobs, a.views_png.take(), true).await?,
+                    source: put(blobs, a.source.take().map(|s| s.bytes), false).await?,
+                    preview: put(blobs, a.preview_mp3.take(), true).await?,
                 })
             })
             .buffered(8)
             .try_collect::<Vec<_>>()
-            .await?;
-        Ok(thumbs)
+            .await
+    })
+}
+
+async fn put(blobs: &BlobStore, bytes: Option<Vec<u8>>, cache: bool) -> Result<Option<StoredBlob>> {
+    Ok(match bytes {
+        Some(b) if cache => Some(blobs.put_cache_bytes(b).await?),
+        Some(b) => Some(blobs.put_bytes(b).await?),
+        None => None,
     })
 }
 
@@ -529,15 +623,69 @@ fn write_tags(tx: &rusqlite::Transaction<'_>, asset_id: &str, tags: TagSet) -> R
     Ok(())
 }
 
+/// Insert one analyzed file. A path the pack already has (written by an earlier run that was interrupted) is left
+/// as it is, so an ingest can be run again and carry on.
+fn insert_asset(
+    tx: &rusqlite::Transaction<'_>,
+    pack_id: &str,
+    item: Item,
+    previews: Previews,
+    now: &str,
+    refs: &mut HashMap<String, Vec<links::Ref>>,
+) -> Result<()> {
+    let Previews { thumb, views, source, preview } = previews;
+    insert_blob(tx, &item.blob, now)?;
+    if let Some(t) = &thumb {
+        insert_blob(tx, t, now)?;
+    }
+    let id = uuid::Uuid::now_v7().to_string();
+    let added = tx.execute(
+        "INSERT INTO assets (id, pack_id, blob_hash, path, name, ext, kind, category, meta, words, thumb_hash,
+                             created_at, updated_at, source_description)
+         VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?12, ?13)
+         ON CONFLICT (pack_id, path) DO NOTHING",
+        params![
+            id,
+            pack_id,
+            item.blob.hash,
+            item.rel,
+            item.analysis.title.clone().unwrap_or_else(|| tagger::display_name(&tagger::name_stem(&item.rel))),
+            item.ext,
+            item.kind.as_str(),
+            item.category,
+            serde_json::Value::Object(item.analysis.meta).to_string(),
+            tagger::fts_words(&item.rel),
+            thumb.as_ref().map(|t| t.hash.clone()),
+            now,
+            item.analysis.description,
+        ],
+    )?;
+    if added == 0 {
+        return Ok(());
+    }
+    write_tags(tx, &id, item.tags)?;
+    db::reindex_asset(tx, &id)?;
+    store_derivative(tx, &id, "views", views.as_ref(), now)?;
+    store_derivative(tx, &id, "source", source.as_ref(), now)?;
+    store_derivative(tx, &id, "preview", preview.as_ref(), now)?;
+    if !item.refs.is_empty() {
+        refs.insert(id, item.refs);
+    }
+    Ok(())
+}
+
+/// Unpack an upload and add its files to the pack. Files are analyzed, stored and written a batch at a time, so
+/// memory stays flat however many files a pack has, and the database is never locked for more than a moment.
 pub(crate) fn ingest_pack(state: &AppState, rt: &Handle, pack_id: &str, auto_name: bool) -> Result<()> {
     let staging = state.cfg.staging_dir().join(pack_id);
     anyhow::ensure!(staging.is_dir(), "staging folder for pack {pack_id} is gone");
-    let conn = state.pool.get()?;
+    let mut conn = state.pool.get()?;
     db::set_pack_status(&conn, pack_id, PackStatus::Ingesting, None)?;
+    // The file count isn't known until it's unpacked: no total shows as busy rather than stuck at 0 of 1.
+    conn.execute("UPDATE packs SET files_total = 0, files_done = 0 WHERE id = ?1", [pack_id])?;
 
-    let limits = state.settings.get();
-    let mut budget = Budget { bytes_left: limits.max_expand_mb.saturating_mul(1 << 20), files_left: limits.max_files };
-    expand_archives(&staging, &mut budget, 0)?;
+    let budget = Budget::new(state.settings.get().max_expand_mb.saturating_mul(1 << 20), pack_id);
+    expand_archives(&staging, &budget, 0)?;
     let (root, wrapper_name) = find_root(&staging)?;
 
     let mut files = Vec::new();
@@ -545,7 +693,7 @@ pub(crate) fn ingest_pack(state: &AppState, rt: &Handle, pack_id: &str, auto_nam
     files.retain(|f| !is_junk(&rel_of(&root, f)));
     let guids = harvest_unity_guids(&root, &files);
     files.retain(|f| !is_sidecar(&rel_of(&root, f)));
-    anyhow::ensure!(files.len() <= limits.max_files, "pack has too many files (raise the limit in Settings)");
+    files.sort();
     conn.execute(
         "UPDATE packs SET files_total = ?2, files_done = 0 WHERE id = ?1",
         params![pack_id, files.len() as i64],
@@ -556,12 +704,38 @@ pub(crate) fn ingest_pack(state: &AppState, rt: &Handle, pack_id: &str, auto_nam
 
     let license = detect_pack_license(&root, &files);
     let readme = context::read_readmes(&root, &files);
-    let mut items = analyze_parallel(state, pack_id, &root, &files);
-    pack_pass(&mut items, license);
-    let thumbs = upload_all(state, rt, &items)?;
+    let jobs: Vec<(PathBuf, String)> = files
+        .into_iter()
+        .map(|f| {
+            let rel = rel_of(&root, &f);
+            (f, rel)
+        })
+        .collect();
+    let sets = MapSets::new(jobs.iter().map(|(_, rel)| rel.as_str()).filter(|rel| could_be_texture(rel)));
 
-    let mut conn = conn;
-    let now = db::now();
+    // All that's kept of a file once its batch is written: its references, to link up at the end.
+    let mut refs = HashMap::new();
+    pipeline(
+        pack_id,
+        &jobs,
+        |(local, rel)| analyze_one(local.clone(), rel.clone(), None).with_context(|| rel.clone()),
+        |mut batch, done| {
+            for it in &mut batch {
+                apply_pack_rules(it, &sets, license);
+            }
+            let previews = upload_all(state, rt, &mut batch)?;
+            let now = db::now();
+            let tx = conn.transaction()?;
+            for (item, p) in batch.into_iter().zip(previews) {
+                insert_asset(&tx, pack_id, item, p, &now, &mut refs)?;
+            }
+            tx.execute("UPDATE packs SET files_done = ?2 WHERE id = ?1", params![pack_id, done as i64])?;
+            tx.commit()?;
+            Ok(())
+        },
+    )?;
+    drop(jobs);
+
     let tx = conn.transaction()?;
     if let Some(l) = license {
         tx.execute("UPDATE packs SET license = ?2 WHERE id = ?1", params![pack_id, l])?;
@@ -574,43 +748,6 @@ pub(crate) fn ingest_pack(state: &AppState, rt: &Handle, pack_id: &str, auto_nam
             "INSERT INTO unity_guids (pack_id, guid, path) VALUES (?1, ?2, ?3) ON CONFLICT DO NOTHING",
             params![pack_id, guid, path],
         )?;
-    }
-    let mut refs = HashMap::new();
-    for (item, Previews { thumb, views, source, preview }) in items.into_iter().zip(thumbs) {
-        insert_blob(&tx, &item.blob, &now)?;
-        if let Some(t) = &thumb {
-            insert_blob(&tx, t, &now)?;
-        }
-        let id = uuid::Uuid::now_v7().to_string();
-        tx.execute(
-            "INSERT INTO assets (id, pack_id, blob_hash, path, name, ext, kind, category, meta, words, thumb_hash,
-                                 created_at, updated_at, source_description)
-             VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?12, ?13)
-             ON CONFLICT (pack_id, path) DO NOTHING",
-            params![
-                id,
-                pack_id,
-                item.blob.hash,
-                item.rel,
-                item.analysis.title.clone().unwrap_or_else(|| tagger::display_name(&tagger::name_stem(&item.rel))),
-                item.ext,
-                item.kind.as_str(),
-                item.category,
-                serde_json::Value::Object(item.analysis.meta).to_string(),
-                tagger::fts_words(&item.rel),
-                thumb.as_ref().map(|t| t.hash.clone()),
-                now,
-                item.analysis.description,
-            ],
-        )?;
-        write_tags(&tx, &id, item.tags)?;
-        db::reindex_asset(&tx, &id)?;
-        store_derivative(&tx, &id, "views", views.as_ref(), &now)?;
-        store_derivative(&tx, &id, "source", source.as_ref(), &now)?;
-        store_derivative(&tx, &id, "preview", preview.as_ref(), &now)?;
-        if !item.refs.is_empty() {
-            refs.insert(id, item.refs);
-        }
     }
     let n_links = links::link_pack(&tx, pack_id, &refs)?;
     let n_families = links::assign_families(&tx, pack_id)?;
@@ -646,13 +783,24 @@ pub(crate) fn finish_rules_stage(
 }
 
 /// Re-run the offline tagger over an existing pack (after vocabulary improvements, say).
-/// Replaces `rule`/`meta` tags; leaves `human` and `llm` tags alone.
+/// Replaces `rule`/`meta` tags; leaves `human` and `llm` tags alone. Like ingest, it works a batch at a time:
+/// each file is fetched, analyzed, written and deleted again before the queue moves far past it.
 pub(crate) fn retag_pack(state: &AppState, rt: &Handle, pack_id: &str) -> Result<()> {
+    struct Row {
+        id: String,
+        rel: String,
+        hash: String,
+        human: bool,
+        kind: String,
+    }
     let mut conn = state.pool.get()?;
-    let rows: Vec<(String, String, String, i64)> = {
-        let mut stmt = conn.prepare("SELECT id, path, blob_hash, human_edited FROM assets WHERE pack_id = ?1")?;
-        stmt.query_map([pack_id], |r| Ok((r.get(0)?, r.get(1)?, r.get(2)?, r.get(3)?)))?
-            .collect::<rusqlite::Result<_>>()?
+    let rows: Vec<Row> = {
+        let mut stmt = conn
+            .prepare("SELECT id, path, blob_hash, human_edited, kind FROM assets WHERE pack_id = ?1 ORDER BY path")?;
+        stmt.query_map([pack_id], |r| {
+            Ok(Row { id: r.get(0)?, rel: r.get(1)?, hash: r.get(2)?, human: r.get::<_, i64>(3)? != 0, kind: r.get(4)? })
+        })?
+        .collect::<rusqlite::Result<_>>()?
     };
     let work = state.cfg.tmp_dir().join(format!("retag-{pack_id}"));
     fs::create_dir_all(&work)?;
@@ -662,66 +810,91 @@ pub(crate) fn retag_pack(state: &AppState, rt: &Handle, pack_id: &str) -> Result
     )?;
 
     let origins = crate::extract::pack_origins(&conn, pack_id)?;
-    let mut items = Vec::with_capacity(rows.len());
-    let mut human = HashMap::new();
-    let mut license_text_files = Vec::new();
-    for (n, (id, rel, hash, edited)) in rows.into_iter().enumerate() {
-        let local = work.join(format!("{n}.{}", ext_of(&rel)));
-        rt.block_on(state.blobs.download_to(&hash, &local))?;
-        if tagger::is_license_file(&rel) {
-            license_text_files.push(local.clone());
+    // The license comes first, from just the license files: every file's tags carry it.
+    let license = {
+        let mut texts = Vec::new();
+        for (n, r) in rows.iter().filter(|r| tagger::is_license_file(&r.rel)).enumerate() {
+            let local = work.join(format!("license-{n}.txt"));
+            rt.block_on(state.blobs.download_to(&r.hash, &local))?;
+            texts.push(local);
         }
-        let blob = StoredBlob { hash, size: fs::metadata(&local)?.len() };
-        let mut item = analyze_one(local, rel, Some(blob))?;
-        if let Some(o) = origins.get(&id) {
-            carry_origin(&mut item, o);
+        let found = license_in(&texts);
+        for t in &texts {
+            fs::remove_file(t).ok();
         }
-        item.asset_id = Some(id.clone());
-        human.insert(id, edited != 0);
-        items.push(item);
-        if n % 50 == 0 {
-            conn.execute("UPDATE packs SET files_done = ?2 WHERE id = ?1", params![pack_id, n as i64])?;
-        }
-    }
-    let license = detect_pack_license(&work, &license_text_files);
-    pack_pass(&mut items, license);
-    let thumbs = upload_all(state, rt, &items)?;
+        found
+    };
+    let sets = MapSets::new(
+        rows.iter()
+            .filter(|r| r.kind == AssetKind::Texture.as_str() || could_be_texture(&r.rel))
+            .map(|r| r.rel.as_str()),
+    );
+    let human: std::collections::HashSet<&str> = rows.iter().filter(|r| r.human).map(|r| r.id.as_str()).collect();
 
-    let now = db::now();
+    let mut refs = HashMap::new();
+    pipeline(
+        pack_id,
+        &rows,
+        |r| {
+            let local = work.join(format!("{}.{}", r.id, ext_of(&r.rel)));
+            rt.block_on(state.blobs.download_to(&r.hash, &local)).with_context(|| r.rel.clone())?;
+            let blob = StoredBlob { hash: r.hash.clone(), size: fs::metadata(&local)?.len() };
+            let mut item = analyze_one(local, r.rel.clone(), Some(blob)).with_context(|| r.rel.clone())?;
+            if let Some(o) = origins.get(&r.id) {
+                carry_origin(&mut item, o);
+            }
+            item.asset_id = Some(r.id.clone());
+            Ok(item)
+        },
+        |mut batch, done| {
+            for it in &mut batch {
+                apply_pack_rules(it, &sets, license);
+            }
+            let previews = upload_all(state, rt, &mut batch)?;
+            let locals: Vec<PathBuf> = batch.iter().map(|it| it.local.clone()).collect();
+            let now = db::now();
+            let tx = conn.transaction()?;
+            for (item, Previews { thumb, views, source, preview }) in batch.into_iter().zip(previews) {
+                let id = item.asset_id.clone().unwrap_or_default();
+                if let Some(t) = &thumb {
+                    insert_blob(&tx, t, &now)?;
+                }
+                tx.execute("DELETE FROM asset_tags WHERE asset_id = ?1 AND source IN ('rule', 'meta')", [&id])?;
+                tx.execute(
+                    "UPDATE assets SET meta = ?2, kind = ?3, thumb_hash = COALESCE(?4, thumb_hash), words = ?5,
+                            category = CASE WHEN ?6 THEN category ELSE ?7 END, updated_at = ?8
+                     WHERE id = ?1",
+                    params![
+                        id,
+                        serde_json::Value::Object(item.analysis.meta).to_string(),
+                        item.kind.as_str(),
+                        thumb.as_ref().map(|t| t.hash.clone()),
+                        tagger::fts_words(&item.rel),
+                        human.contains(id.as_str()),
+                        item.category,
+                        now,
+                    ],
+                )?;
+                write_tags(&tx, &id, item.tags)?;
+                db::reindex_asset(&tx, &id)?;
+                store_derivative(&tx, &id, "views", views.as_ref(), &now)?;
+                store_derivative(&tx, &id, "source", source.as_ref(), &now)?;
+                store_derivative(&tx, &id, "preview", preview.as_ref(), &now)?;
+                if !item.refs.is_empty() {
+                    refs.insert(id, item.refs);
+                }
+            }
+            tx.execute("UPDATE packs SET files_done = ?2 WHERE id = ?1", params![pack_id, done as i64])?;
+            tx.commit()?;
+            for l in locals {
+                fs::remove_file(l).ok();
+            }
+            Ok(())
+        },
+    )?;
+
     let tx = conn.transaction()?;
     tx.execute("DELETE FROM asset_links WHERE from_id IN (SELECT id FROM assets WHERE pack_id = ?1)", [pack_id])?;
-    let mut refs = HashMap::new();
-    for (item, Previews { thumb, views, source, preview }) in items.into_iter().zip(thumbs) {
-        let id = item.asset_id.clone().unwrap_or_default();
-        if let Some(t) = &thumb {
-            insert_blob(&tx, t, &now)?;
-        }
-        tx.execute("DELETE FROM asset_tags WHERE asset_id = ?1 AND source IN ('rule', 'meta')", [&id])?;
-        let keep_category = human.get(&id).copied().unwrap_or(false);
-        tx.execute(
-            "UPDATE assets SET meta = ?2, kind = ?3, thumb_hash = COALESCE(?4, thumb_hash), words = ?5,
-                    category = CASE WHEN ?6 THEN category ELSE ?7 END, updated_at = ?8
-             WHERE id = ?1",
-            params![
-                id,
-                serde_json::Value::Object(item.analysis.meta).to_string(),
-                item.kind.as_str(),
-                thumb.as_ref().map(|t| t.hash.clone()),
-                tagger::fts_words(&item.rel),
-                keep_category,
-                item.category,
-                now,
-            ],
-        )?;
-        write_tags(&tx, &id, item.tags)?;
-        db::reindex_asset(&tx, &id)?;
-        store_derivative(&tx, &id, "views", views.as_ref(), &now)?;
-        store_derivative(&tx, &id, "source", source.as_ref(), &now)?;
-        store_derivative(&tx, &id, "preview", preview.as_ref(), &now)?;
-        if !item.refs.is_empty() {
-            refs.insert(id, item.refs);
-        }
-    }
     links::link_pack(&tx, pack_id, &refs)?;
     links::assign_families(&tx, pack_id)?;
     if let Some(l) = license {

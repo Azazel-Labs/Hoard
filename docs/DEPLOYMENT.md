@@ -51,15 +51,15 @@ Cloudflare's docs don't say this explicitly, so try one upload over 100 MB once 
    `192.168.50.10:7878`.
 6. **Start it:** `docker compose -f deploy/compose.private.yml --env-file deploy/.env up -d`, then open
    `https://192.168.50.10:7878` from anywhere with the client connected. The compose file turns on a self-signed
-   certificate (set `HOARD_TLS_NAMES` to the address you type), so the browser warns once; accept it and you get
+   certificate (change `HOARD_TLS_NAMES` in it to the address you type), so the browser warns once; accept it and you get
    HTTP/2. For the `hoard` CLI, copy `tls/self-signed.crt` from Hoard's data folder and pass it with
    `--ca-cert` (or `HOARD_CA_CERT`). Point `hoard sync` (`server = ...`) and MCP
-   clients at the same address, and set `HOARD_PUBLIC_URL` to it so MCP links resolve.
+   clients at the same address, and set it as the public address in Settings → Server so MCP links resolve.
 
 Keep `HOARD_TOKEN` set even here. The network is private, but the token keeps other devices on your LAN or
 Zero Trust org read-only.
 
-**HTTP/3.** `HOARD_HTTP3=true` adds QUIC on UDP 7878 and advertises it with `Alt-Svc`; browsers switch after the
+**HTTP/3.** `HOARD_HTTP3: "true"` in the compose file adds QUIC on UDP 7878 and advertises it with `Alt-Svc`; browsers switch after the
 first page load. Cloudflare's private routing carries UDP as well as TCP, but if HTTP/3 never kicks in over the
 tunnel, HTTP/2 is doing the work and nothing is lost. Browsers only use HTTP/3 when they trust the certificate, so
 with a self-signed one, expect HTTP/2 unless you install the certificate on the device.
@@ -100,7 +100,7 @@ browser ─> (Cloudflare) ─> VPS: hoard + SQLite ──tailscale──> NAS: g
 - Garage's S3 port is only reachable on the tailnet (`network_mode: service:tailscale`).
 - Uploads land on the VPS and are pushed to the NAS. Size the VPS disk for the largest pack you'll upload at once
   (staging), not for the library.
-- Back up the VPS's `/data/hoard.db` with `POST /api/admin/backup` (cron + `curl`), and the NAS bucket with the NAS's
+- Back up the VPS's `/config/hoard.db` with `POST /api/admin/backup` (cron + `curl`), and the NAS bucket with the NAS's
   own snapshots.
 
 Instead of Tailscale you can publish Garage through a Cloudflare Tunnel too (`s3.example.com → http://garage:3900`),
@@ -146,14 +146,16 @@ in 2025; this fork is maintained and works the same way.) Watchtower checks for 
 replaces the Hoard container, and removes the old image. It only touches containers labelled with the `hoard` scope,
 so other containers on the host are left alone.
 
-| Setting (in `.env`) | Effect |
+| In the compose file | Effect |
 |---|---|
-| `HOARD_VERSION=latest` (default) | every release |
-| `HOARD_VERSION=0.8` | patch releases of 0.8 only; change it by hand for 0.9 |
-| `HOARD_VERSION=0.8.1` | exactly that version: Watchtower never changes it |
-| `HOARD_VERSION=edge` | every green commit on `main`, between releases |
-| `HOARD_UPDATE_SCHEDULE=0 30 3 * * 0` | when Watchtower checks (cron with a leading seconds field) |
-| `HOARD_UPDATE_CHECK=false` | stop the server from asking GitHub once a day whether a newer release exists (also a switch in Settings) |
+| `image: ghcr.io/azazel-labs/hoard:latest` (as shipped) | every release |
+| `…/hoard:0.8` | patch releases of 0.8 only; change it by hand for 0.9 |
+| `…/hoard:0.8.1` | exactly that version: Watchtower never changes it |
+| `…/hoard:edge` | every green commit on `main`, between releases |
+| `WATCHTOWER_SCHEDULE: "0 30 3 * * 0"` | when Watchtower checks (cron with a leading seconds field) |
+
+The server also asks GitHub once a day whether a newer release exists, for the badge in the header; switch that off
+in Settings → Server.
 
 To update by hand instead, delete the `watchtower` service and run `docker compose pull && docker compose up -d`.
 If you build from a checkout, replace the `image:` line with `build: ..`.
@@ -172,24 +174,9 @@ it's the `update` field.
 
 | Volume | Holds | Size | Lose it and |
 |---|---|---|---|
-| `/data` (`HOARD_DATA_DIR`) | the database with Settings, its backups, the self-signed certificate | small | you lose your library: back this one up |
-| `/files` (`HOARD_FILES_DIR`) | your files, with local storage (S3 setups keep them in the bucket) | big | you lose your files |
+| `/config` (`HOARD_DATA_DIR`) | the database with Settings, its backups, the self-signed certificate | small | you lose your library: back this one up |
+| `/library` (`HOARD_FILES_DIR`) | your files, with local storage (S3 setups keep them in the bucket) | big | you lose your files |
 | `/cache` (`HOARD_CACHE_DIR`) | thumbnails and previews, uploads in progress, scratch space, downloaded Blender/ffmpeg | medium | **Re-analyze** a pack remakes its thumbnails; tools download again |
-
-Installs from before v1.0.3 used one volume for all three. They keep working unchanged: Watchtower doesn't edit your
-compose file, and without `HOARD_FILES_DIR` and `HOARD_CACHE_DIR` Hoard uses the old places. To split an existing
-install, stop it, add the two variables and volumes from [deploy/compose.yml](../deploy/compose.yml), and move the
-files across once:
-
-```sh
-docker compose stop hoard
-docker compose run --rm --no-deps --entrypoint sh hoard -c 'mv /data/blobs/* /files/ && rmdir /data/blobs'
-docker compose up -d
-```
-
-Thumbnails made before the split stay where they are (with the files) and still show; new ones go to `/cache`. If
-`HOARD_FILES_DIR` points at an empty folder while `/data/blobs` still has files, Hoard refuses to start and says so,
-rather than show an empty library.
 
 ## GPU
 
@@ -268,17 +255,17 @@ your compose file to free its memory. To go without AI tagging at all, choose **
 Open **Settings** in the portal and set Blender to **Automatic**: Hoard uses a Blender already on the PATH, or
 downloads Blender 4.5 LTS from Blender's mirrors into `<data>/tools/blender` (about 350 MB, checksum verified), and
 queues conversion for packs ingested before it was on. **This program** points at a Blender you installed yourself.
-`HOARD_BLENDER` (`off`, `auto` or a path) sets the same thing at startup. Blender 4.5 is used because Blender 5 dropped
+Blender 4.5 is used because Blender 5 dropped
 Collada (.dae) import. After each ingest, a `convert` job exports .blend/.fbx/.dae/.usd*/.ply/.stl/.3ds/.abc/.x3d to GLB with the asset's linked textures laid out
 beside it, stores the GLB as a derivative, and renders a thumbnail from it. Conversion runs with a 3-minute timeout per
 file, and failures are logged without blocking anything. The originals are never modified.
 
 ## Unreal content
 
-Packs of `.uasset` files are converted after ingest by default (`HOARD_UNREAL_CONVERT=keep`): textures become
+Packs of `.uasset` files are converted after ingest by default (Settings → Unreal packages): textures become
 PNG/EXR, sounds WAV, materials and data tables JSON, read by Hoard's own code with nothing extra installed. The
-original packages stay downloadable; set `HOARD_UNREAL_CONVERT=replace` to discard them once converted and save the
-space, or `off` to convert only when asked from the pack page.
+original packages stay downloadable; choose to discard them once converted to save the space, or to convert only
+when asked from the pack page.
 
 Meshes, animations and textures imported from uncompressed formats (which UE5 stores Oodle-compressed) wait for
 Unreal Editor. Run `hoard unreal-worker --editor <UnrealEditor-Cmd>` on a

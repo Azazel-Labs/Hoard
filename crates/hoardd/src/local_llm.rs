@@ -11,9 +11,6 @@ use anyhow::{Context, Result, bail};
 use serde::Serialize;
 use serde_json::{Value, json};
 
-/// Where the compose files' `llm` service listens, as seen from the Hoard container.
-pub(crate) const DEFAULT_URL: &str = "http://llm:8080/v1";
-
 /// Models Hoard is tuned for: all take images, run on a CPU, and fit in a few gigabytes.
 #[derive(Debug, Serialize)]
 pub(crate) struct Suggested {

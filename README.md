@@ -38,16 +38,13 @@ Hoard ships as one image for amd64 and arm64: `ghcr.io/azazel-labs/hoard`. Save 
 ```yaml
 services:
   hoard:
-    image: ghcr.io/azazel-labs/hoard:${HOARD_VERSION:-latest}
+    image: ghcr.io/azazel-labs/hoard:latest
     restart: unless-stopped
     environment:
       HOARD_TOKEN: ${HOARD_TOKEN:?set HOARD_TOKEN, e.g. HOARD_TOKEN=$(openssl rand -hex 32)}
-      HOARD_PUBLIC_URL: ${HOARD_PUBLIC_URL:-}
-      HOARD_FILES_DIR: /files
-      HOARD_CACHE_DIR: /cache
     volumes:
-      - hoard-data:/data          # database, Settings, backups: small, back it up
-      - hoard-files:/files        # your files: big, put it on the disk with room
+      - hoard-config:/config      # database, Settings, backups: small, back it up
+      - hoard-library:/library    # your files: big, put it on the disk with room
       - hoard-cache:/cache        # thumbnails, uploads in progress, Blender/ffmpeg: fast disk, can be rebuilt
     ports:
       - "7878:7878"
@@ -65,17 +62,17 @@ services:
       WATCHTOWER_LABEL_ENABLE: "true"
       WATCHTOWER_SCOPE: hoard
       WATCHTOWER_CLEANUP: "true"
-      WATCHTOWER_SCHEDULE: "${HOARD_UPDATE_SCHEDULE:-0 0 4 * * *}"
+      WATCHTOWER_SCHEDULE: "0 0 4 * * *"
     labels:
       com.centurylinklabs.watchtower.scope: hoard
 
 volumes:
-  hoard-data:
-  hoard-files:
+  hoard-config:
+  hoard-library:
   hoard-cache:
 ```
 
-Each volume can be a folder on whichever disk suits it instead: `/mnt/big/hoard:/files` puts your files on the big
+Each volume can be a folder on whichever disk suits it instead: `/mnt/big/hoard:/library` puts your files on the big
 disk, while the database stays small and easy to back up.
 
 Then start it:
@@ -88,7 +85,7 @@ docker compose up -d                                 # open http://<host>:7878
 There's no setup wizard: the library starts empty, so drop a pack onto the portal.
 
 **Updates are automatic.** Watchtower pulls each new release, and Hoard upgrades its database on start, saving a copy
-in `/data/backups` first. Set `HOARD_VERSION=0.8` in `.env` to get patch releases only, or delete the `watchtower`
+in `/config/backups` first. Change the image tag to `:0.8` to get patch releases only, or delete the `watchtower`
 service to update by hand (`docker compose pull && docker compose up -d`). The header shows a badge when a newer
 release exists.
 
@@ -209,7 +206,7 @@ software rasterizer (`apt install mesa-vulkan-drivers`). Without any adapter, ev
    - Music: tracker modules (MOD, XM, S3M, IT) and MIDI are rendered to audio, so they get a waveform, a duration and
      an MP3 preview that plays in the grid like any other sound. Modules list their title, channels, patterns and
      instruments; MIDI lists tempo, tracks and General MIDI instruments. MIDI plays through a SoundFont
-     (`HOARD_SOUNDFONT`, or a GM SoundFont found in the usual system places), falling back to a simple built-in synth.
+     (the one picked in Settings, or a GM SoundFont found in the usual system places), falling back to a simple built-in synth.
    - Metadata inside WAVs, as sound libraries ship it: BWF `bext` descriptions, `LIST/INFO` titles and keywords, iXML
      from Soundminer/BaseHead with Universal Category System (UCS) category, subcategory and CatID, `smpl` loop
      points, ACID tempo, root note and one-shot flag, cue markers, and RF64 for files over 4 GB. Embedded titles
@@ -253,13 +250,13 @@ software rasterizer (`apt install mesa-vulkan-drivers`). Without any adapter, ev
    gets the pack context, paths, metadata and rule tags, and returns names, a description of one to three
    sentences (for music: mood, instruments, tempo and where it fits), extra tags, UCS subcategories and
    categories. Each variant family is sent once and the answer applies to every take. With
-   `HOARD_LLM_VISION`, each batch also gets one numbered contact sheet of its thumbnails (one image instead of
+   thumbnails switched on in Settings, each batch also gets one numbered contact sheet of its thumbnails (one image instead of
    sixteen), and models appear as a 2x2 sheet rendered from four directions. It only adds; it never removes rule tags, never overrides anything a
    person edited, and can't flatten a specific category into a vaguer one.
    - **Descriptions.** Each kind is kept apart: a person's own (written in the asset panel or over MCP), the AI's,
      the file's embedded one and the pack's store page. Search covers all of them, and re-running the AI updates
      its description without touching yours.
-7. **Convert (optional).** With Blender switched on (Settings, or `HOARD_BLENDER`), .blend/.fbx/.dae/.usd/.ply/.stl/.3ds
+7. **Convert (optional).** With Blender switched on (in Settings), .blend/.fbx/.dae/.usd/.ply/.stl/.3ds
    files are exported to GLB by headless Blender, with their linked textures laid out beside them. The GLB is stored as a derivative that feeds
    thumbnails, the browser preview and downloads.
 
@@ -299,10 +296,10 @@ the conversion carries on even if the client leaves. Requests for the same conve
 `GET /api/assets/{id}/as/{format}/status` starts or checks one without downloading (the portal shows its progress
 on the button).
 
-**ffmpeg** is fetched by the server itself: with `HOARD_FFMPEG=auto` (the default) Hoard uses a system ffmpeg that
+**ffmpeg** is fetched by the server itself: set to Automatic in Settings (the default) Hoard uses a system ffmpeg that
 has LAME, libvorbis and libopus, or else downloads a static build in the background into `<data dir>/tools/ffmpeg`
 (Martin Riedl's builds for Linux and macOS, BtbN's for Windows), checks it against the publisher's SHA-256, and uses
-it from then on. Set a path to use a specific binary, or `off` to never run it. Until it's ready, or without it
+it from then on. Pick a specific binary there, or turn it off. Until it's ready, or without it
 (offline), MP3 and Opus use built-in pure-Rust encoders, and OGG and ffmpeg-only sources aren't offered. ffmpeg only
 ever reads uploads with their format forced (no playlists or concat scripts), local files only, under a time
 limit. The packs page shows its state.
@@ -384,7 +381,7 @@ and WAV. Hoard reads editor packages from UE 4.x through 5.7 directly, without U
 ### Converting to common formats
 
 Hoard can take the content out of the packages and keep it as ordinary files, so a Fab pack ends up as PNGs, WAVs
-and FBX like any other pack. It runs after every ingest (`HOARD_UNREAL_CONVERT`, default `keep`) or on demand from
+and FBX like any other pack. It runs after every ingest (Settings → Unreal packages, default keep the originals) or on demand from
 the pack page (More → Convert Unreal content) and `POST /api/packs/{id}/unreal/convert`.
 
 | Package | Becomes | Done by |
@@ -453,7 +450,7 @@ both connect.
 | `tag_asset`, `update_asset` | edits, recorded as human; need `Authorization: Bearer $HOARD_TOKEN` if a token is set |
 
 Point any MCP client at `https://your-host/mcp` (add the bearer header for write tools). Browser-originated requests
-from other origins are rejected (DNS-rebinding guard). Set `HOARD_PUBLIC_URL` so returned links are absolute.
+from other origins are rejected (DNS-rebinding guard). Set the public address in Settings → Server so returned links are absolute.
 
 ## Storage, and splitting it from the web server
 
@@ -480,10 +477,10 @@ cached as immutable, and blob downloads carry ETags and Range support.
 
 ## Configuration
 
-Every flag has an env var; `hoardd --help` lists them all. Most of them can also be changed while the server runs, from
-**Settings** in the portal header (behind the write token), and take effect at once. A setting saved there wins over
-its flag or env var until you put it back to the default, and survives restarts and backups. For those the env var is
-just the starting value.
+Where the server keeps things, how it listens and how it's protected are set when it starts, with a flag or env var
+(`hoardd --help` lists them). Everything else (AI tagging, Blender, ffmpeg, Unreal conversion, thumbnails, the
+update check, workers, limits, the public address, the SoundFont) is changed in **Settings** in the portal header
+(behind the write token), takes effect at once, and is kept in the database, so it survives restarts and backups.
 
 Set before starting (these need a restart):
 
@@ -499,23 +496,8 @@ Set before starting (these need a restart):
 | `HOARD_HTTP3` | `false` | also serve HTTP/3 (needs TLS) |
 | `HOARD_TOKEN` | – | bearer token for uploads, edits, Settings, admin and MCP writes; reads stay open |
 | `HOARD_STORAGE` | `local` | `local` or `s3` |
+| `HOARD_LOCAL_LLM_URL` | `http://llm:8080/v1` | where the local model server listens (Settings → AI tagging → Local model) |
 | `HOARD_S3_ENDPOINT` / `_BUCKET` / `_REGION` / `_ACCESS_KEY` / `_SECRET_KEY` / `_HEADERS` | – | S3 backend |
-
-Also in Settings:
-
-| Env | Default | |
-|---|---|---|
-| `HOARD_BLENDER` | `off` | Blender for model conversion: `off`, `auto` (installed, else download 4.5 LTS), or a path |
-| `HOARD_FFMPEG` | `auto` | `auto` (system ffmpeg, else download one), a path, or `off` |
-| `HOARD_UNREAL_CONVERT` | `keep` | after ingest, convert Unreal packages: `off`, `keep` (keep the .uasset too) or `replace` |
-| `HOARD_LLM_URL` / `_MODEL` / `_API_KEY` / `_VISION` | – | AI tagger (on when URL and model are both set); set in Settings, which has the local model server, OpenRouter, OpenAI, Anthropic, Gemini and Ollama |
-| `HOARD_LLM_BATCH` | `40` | assets per AI request |
-| `HOARD_RENDER` | `true` | wgpu model thumbnails |
-| `HOARD_UPDATE_CHECK` | `true` | check GitHub once a day for a newer release |
-| `HOARD_SOUNDFONT` | system GM SoundFont | `.sf2` used to render MIDI |
-| `HOARD_PUBLIC_URL` | Host header | absolute links for MCP |
-| `HOARD_MAX_UPLOAD_MB` / `_MAX_EXPAND_MB` / `_MAX_FILES` | 16 GiB / 64 GiB / 200k | upload and zip-bomb limits |
-| `HOARD_WORKERS` | `2` | background job workers (up to 16) |
 
 ## Keeping it safe
 

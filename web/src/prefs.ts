@@ -13,10 +13,14 @@ export interface Prefs {
   expanded: string[]
   /** Color theme: follow the system, or always light or dark. */
   theme: 'system' | 'light' | 'dark'
+  /** Theme worn when light, by id (see LIGHT_THEMES in theme.ts). */
+  lightTheme: string
+  /** Theme worn when dark, by id (see DARK_THEMES in theme.ts). */
+  darkTheme: string
 }
 
 const KEY = 'hoard.prefs'
-const DEFAULTS: Prefs = { tile: 156, showSupporting: false, collapsed: ['license', 'format', 'blender'], expanded: [], theme: 'system' }
+const DEFAULTS: Prefs = { tile: 156, showSupporting: false, collapsed: ['license', 'format', 'blender'], expanded: [], theme: 'system', lightTheme: 'slate', darkTheme: 'graphite' }
 
 function load(): Prefs {
   try {

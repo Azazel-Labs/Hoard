@@ -41,6 +41,8 @@ export interface Asset {
   tags: Tag[]
   created_at: string
   updated_at: string
+  /** When it went to the archive (its own, or its pack's). */
+  archived_at?: string | null
   /** Detail view only. */
   links: AssetLink[]
   linked_from: AssetLink[]
@@ -141,6 +143,8 @@ export interface Pack {
   /** Unreal packages still in package form, and assets converted from them. */
   unreal_packages?: number
   unreal_converted?: number
+  /** When it went to the archive. */
+  archived_at?: string | null
 }
 
 export interface Facet { value: string; count: number }
@@ -166,23 +170,43 @@ export interface Stats {
   storage: string
   auth_required: boolean
   kinds: Facet[]
+  /** What's in the archive: whole packs, and assets archived on their own. */
+  archived_packs?: number
+  archived_assets?: number
   duplicate_assets: number
   version: string
   /** ffmpeg: its version line, `downloading`, `looking`, `off` or `unavailable: …`. */
   ffmpeg?: string
   /** Blender, for model conversion: its version, `downloading`, `looking`, `off` or `unavailable: …`. */
   blender?: string
-  /** A newer Hoard release, when the server's daily check found one (`HOARD_UPDATE_CHECK`). */
+  /** A newer Hoard release, when the server's daily check found one. */
   update?: { version: string; url: string }
   /** Model thumbnails: `gpu: <adapter> (<api>)`, `cpu: …` (software), `starting`, `off` or `unavailable: …`. */
   renderer?: string
 }
 
-/** An outside program Hoard can use, as the Settings dialog shows it. */
+/** The library in numbers (`GET /api/stats/library`); archived things aren't counted. */
+export interface LibraryStats {
+  kinds: { value: string; count: number; bytes: number }[]
+  extensions: { value: string; count: number; bytes: number }[]
+  /** Newest first: `YYYY-MM`. */
+  months: { month: string; count: number; bytes: number }[]
+  /** Tag rows by who added them; `tags` is how many different tags. */
+  tag_sources: { value: TagSource; count: number; tags: number }[]
+  top_tags: Facet[]
+  packs: { id: string; name: string; count: number; bytes: number }[]
+  largest: { id: string; name: string; kind: AssetKind; pack_name: string; bytes: number }[]
+  distinct_tags: number
+  untagged: number
+  described: number
+  human_edited: number
+}
+
+/** An outside program Hoard can use, as the Settings page shows it. */
 export interface ToolSetting {
   /** `off`, `auto` or a path. */
   value: string
-  /** What the server was started with (`HOARD_*`), used when nothing is saved. */
+  /** The built-in default, used when nothing is saved. */
   default: string
   saved: boolean
   state: 'off' | 'looking' | 'downloading' | 'ready' | 'unavailable'
@@ -256,7 +280,6 @@ export interface Settings {
     workers: OptionSetting<number>
     max_upload_mb: OptionSetting<number>
     max_expand_mb: OptionSetting<number>
-    max_files: OptionSetting<number>
     render: OptionSetting<boolean>
     update_check: OptionSetting<boolean>
     /** Empty: from the request's Host header. */
@@ -280,7 +303,6 @@ export interface SettingsPatch {
   workers?: number | null
   max_upload_mb?: number | null
   max_expand_mb?: number | null
-  max_files?: number | null
   render?: boolean | null
   update_check?: boolean | null
   public_url?: string | null
@@ -297,7 +319,16 @@ export interface SearchParams {
   offset?: number
   hide_supporting?: boolean
   collection?: string
+  /** Search the archive instead of the library. */
+  archived?: boolean
 }
+
+/** Packs and assets to archive, restore or delete for good. */
+export interface ArchiveItems { packs?: string[]; assets?: string[] }
+export interface ArchiveCount { packs: number; assets: number }
+
+/** One edit to many assets at once. */
+export interface BulkEdit { ids: string[]; add_tags?: string[]; remove_tags?: string[]; category?: string }
 
 /** The server omits empty link/derivative lists; give the UI arrays to work with. */
 function normalize(a: Asset): Asset {
@@ -352,9 +383,19 @@ async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
   return res.json() as Promise<T>
 }
 
+function post<T>(path: string, body: unknown): Promise<T> {
+  return request<T>(path, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
+}
+
 export const api = {
   stats: () => request<Stats>('/api/stats'),
-  packs: () => request<Pack[]>('/api/packs'),
+  libraryStats: () => request<LibraryStats>('/api/stats/library'),
+  packs: (archived = false) => request<Pack[]>(`/api/packs${archived ? '?archived=true' : ''}`),
+  archive: (items: ArchiveItems) => post<ArchiveCount>('/api/archive', items),
+  restore: (items: ArchiveItems) => post<ArchiveCount>('/api/archive/restore', items),
+  /** Delete for good: these, or with `all` everything in the archive. Only archived things are deleted. */
+  purge: (items: ArchiveItems & { all?: boolean }) => post<ArchiveCount>('/api/archive/purge', items),
+  bulkAssets: (edit: BulkEdit) => post<{ updated: number }>('/api/assets/bulk', edit),
   deletePack: (id: string) => request<void>(`/api/packs/${id}`, { method: 'DELETE', keepalive: true }),
   retagPack: (id: string, body: { rules?: boolean; llm?: boolean }) =>
     request<void>(`/api/packs/${id}/retag`, {
@@ -373,6 +414,7 @@ export const api = {
     if (p.offset) qs.set('offset', String(p.offset))
     if (p.hide_supporting) qs.set('hide_supporting', 'true')
     if (p.collection) qs.set('collection', p.collection)
+    if (p.archived) qs.set('archived', 'true')
     return request<SearchResult>(`/api/assets?${qs}`).then((r) => ({ ...r, items: r.items.map(normalize) }))
   },
   asset: (id: string) => request<Asset>(`/api/assets/${id}`).then(normalize),

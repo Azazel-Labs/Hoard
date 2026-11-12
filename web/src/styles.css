@@ -1,16 +1,89 @@
-/* Hoard: a slate workbench. Kind colors carry meaning (every asset is labeled like a storage bin);
+/* Hoard: a workbench. Kind colors carry meaning (every asset is labeled like a storage bin);
    everything else stays neutral so thumbnails are the brightest thing on screen. */
+
+/* Themes. Each sets the room around the thumbnails: --l-* for light, --d-* for dark. <html> carries the chosen ones
+   as data-light / data-dark (theme.ts); the first of each list is the default, and an unknown name falls back to it.
+   The selectors aren't tied to :root so a swatch in Settings can wear any theme by carrying the same attribute.
+   Keep the lists in theme.ts in step with these. */
+:root, [data-light='slate'] {
+  --l-bg: #eef1f5; --l-panel: #f7f8fa; --l-raised: #ffffff; --l-line: #d2d8e2;
+  --l-text: #1c2330; --l-muted: #566176; --l-faint: #7f899c; --l-accent: #2f6fae;
+  --l-check-a: #e3e7ed; --l-check-b: #f2f4f7;
+}
+[data-light='paper'] {
+  --l-bg: #f1f1f2; --l-panel: #f9f9fa; --l-raised: #ffffff; --l-line: #d9d9de;
+  --l-text: #1d1d20; --l-muted: #5e5e66; --l-faint: #8a8a93; --l-accent: #5b5bd6;
+  --l-check-a: #e6e6e9; --l-check-b: #f4f4f5;
+}
+[data-light='linen'] {
+  --l-bg: #f3eee6; --l-panel: #faf6f0; --l-raised: #fffdf9; --l-line: #e0d6c7;
+  --l-text: #2a241c; --l-muted: #6b5f50; --l-faint: #978a78; --l-accent: #a65f0a;
+  --l-check-a: #ebe3d6; --l-check-b: #f6f1e9;
+}
+[data-light='sage'] {
+  --l-bg: #ecf1ed; --l-panel: #f6f9f6; --l-raised: #ffffff; --l-line: #d3ddd5;
+  --l-text: #1c2620; --l-muted: #56665b; --l-faint: #819086; --l-accent: #2c7a52;
+  --l-check-a: #e1e8e2; --l-check-b: #f1f5f1;
+}
+[data-light='lilac'] {
+  --l-bg: #f1eef5; --l-panel: #f8f6fb; --l-raised: #ffffff; --l-line: #dcd5e6;
+  --l-text: #231d2b; --l-muted: #625a70; --l-faint: #8d859b; --l-accent: #7a4fc4;
+  --l-check-a: #e7e2ef; --l-check-b: #f4f1f8;
+}
+[data-light='blush'] {
+  --l-bg: #f5eeef; --l-panel: #fbf7f7; --l-raised: #ffffff; --l-line: #e6d6d8;
+  --l-text: #2b1e20; --l-muted: #6e5a5d; --l-faint: #9a8689; --l-accent: #b8455a;
+  --l-check-a: #eee2e4; --l-check-b: #f8f1f2;
+}
+
+:root, [data-dark='graphite'] {
+  --d-bg: #161618; --d-panel: #1c1c1f; --d-raised: #26262a; --d-line: #323236;
+  --d-text: #ececee; --d-muted: #a1a1a8; --d-faint: #6c6c74; --d-accent: #a5a6f6;
+  --d-check-a: #26262a; --d-check-b: #2d2d32;
+}
+[data-dark='slate'] {
+  --d-bg: #1b212d; --d-panel: #222a39; --d-raised: #2a3446; --d-line: #36425a;
+  --d-text: #e4e8ef; --d-muted: #95a0b5; --d-faint: #66728a; --d-accent: #7fb4e6;
+  --d-check-a: #2b3445; --d-check-b: #323c4f;
+}
+[data-dark='obsidian'] {
+  --d-bg: #09090a; --d-panel: #101011; --d-raised: #19191b; --d-line: #242426;
+  --d-text: #f3f2ef; --d-muted: #9c9b97; --d-faint: #5f5e5b; --d-accent: #f0dcae;
+  --d-check-a: #161617; --d-check-b: #1d1d1f;
+}
+[data-dark='ember'] {
+  --d-bg: #1a1612; --d-panel: #211c17; --d-raised: #2b251f; --d-line: #3a3229;
+  --d-text: #efe7dc; --d-muted: #b1a594; --d-faint: #7b7062; --d-accent: #eaa64d;
+  --d-check-a: #2a241e; --d-check-b: #312a23;
+}
+[data-dark='moss'] {
+  --d-bg: #111613; --d-panel: #161d19; --d-raised: #1e2722; --d-line: #2b3730;
+  --d-text: #e2ebe5; --d-muted: #97a99d; --d-faint: #637268; --d-accent: #79d6a3;
+  --d-check-a: #1d2621; --d-check-b: #232d27;
+}
+[data-dark='aubergine'] {
+  --d-bg: #16121b; --d-panel: #1c1723; --d-raised: #251e2e; --d-line: #342b40;
+  --d-text: #ece6f2; --d-muted: #aa9fb8; --d-faint: #746a82; --d-accent: #c3a3ff;
+  --d-check-a: #241d2d; --d-check-b: #2a2234;
+}
+[data-dark='oxblood'] {
+  --d-bg: #181113; --d-panel: #1f1618; --d-raised: #2a1e21; --d-line: #3b2a2e;
+  --d-text: #f1e6e7; --d-muted: #b59ea2; --d-faint: #7e676b; --d-accent: #ff8f80;
+  --d-check-a: #271c1f; --d-check-b: #2e2225;
+}
 
 :root {
   /* Each color is light-dark(light, dark); `color-scheme` picks, from `data-scheme` (see theme.ts). */
   color-scheme: dark;
-  --bg: light-dark(#eef1f5, #1b212d);
-  --panel: light-dark(#f7f8fa, #222a39);
-  --raised: light-dark(#ffffff, #2a3446);
-  --line: light-dark(#d2d8e2, #36425a);
-  --text: light-dark(#1c2330, #e4e8ef);
-  --muted: light-dark(#566176, #95a0b5);
-  --faint: light-dark(#7f899c, #66728a);
+  --bg: light-dark(var(--l-bg), var(--d-bg));
+  --panel: light-dark(var(--l-panel), var(--d-panel));
+  --raised: light-dark(var(--l-raised), var(--d-raised));
+  --line: light-dark(var(--l-line), var(--d-line));
+  --text: light-dark(var(--l-text), var(--d-text));
+  --muted: light-dark(var(--l-muted), var(--d-muted));
+  --faint: light-dark(var(--l-faint), var(--d-faint));
+  /* Focus rings, selection, links and progress. */
+  --accent: light-dark(var(--l-accent), var(--d-accent));
   --danger: light-dark(#b93a3a, #ef7b7b);
   --ok: light-dark(#2f7d36, #8fd18b);
 
@@ -27,8 +100,8 @@
   --k-data: light-dark(#5f6a7e, #a7b1c4);
   --k-other: light-dark(#667189, #8f9ab0);
 
-  --check-a: light-dark(#e3e7ed, #2b3445);
-  --check-b: light-dark(#f2f4f7, #323c4f);
+  --check-a: light-dark(var(--l-check-a), var(--d-check-a));
+  --check-b: light-dark(var(--l-check-b), var(--d-check-b));
 
   --shadow: light-dark(rgb(28 38 56 / 0.16), rgb(0 0 0 / 0.35));
   --scrim: light-dark(rgb(28 38 56 / 0.3), rgb(10 14 20 / 0.55));
@@ -65,10 +138,10 @@
 :root[data-scheme='light'] { color-scheme: light; }
 
 :root {
-  accent-color: var(--k-font);
+  accent-color: var(--accent);
   scrollbar-color: color-mix(in srgb, var(--muted) 45%, transparent) transparent;
 }
-::selection { background: color-mix(in srgb, var(--k-font) 32%, transparent); }
+::selection { background: color-mix(in srgb, var(--accent) 32%, transparent); }
 
 * { box-sizing: border-box; }
 body { margin: 0; min-height: 100vh; }
@@ -76,7 +149,7 @@ button, input, select, textarea { font: inherit; color: inherit; }
 
 .mono { font-variation-settings: 'MONO' 1, 'CASL' 0; font-size: 0.92em; }
 
-:focus-visible { outline: 2px solid var(--k-font); outline-offset: 2px; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 /* The focus ring settles in from a little further out, so keyboard moves read as motion. */
 :where(button, a, input, select, textarea, summary):focus-visible { animation: focus-in var(--dur-2) var(--ease-out); }
 @keyframes focus-in { from { outline-offset: 5px; outline-color: transparent; } }
@@ -136,8 +209,8 @@ input.field, select.field, textarea.field {
 }
 input.field:hover, select.field:hover, textarea.field:hover { border-color: color-mix(in srgb, var(--muted) 60%, var(--line)); }
 input.field:focus, textarea.field:focus {
-  border-color: var(--k-font); outline: none;
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--k-font) 22%, transparent);
+  border-color: var(--accent); outline: none;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 22%, transparent);
 }
 
 .visually-hidden {
@@ -157,6 +230,11 @@ html[data-vt='view']::view-transition-old(root) { animation: vt-out var(--dur-1)
 html[data-vt='view']::view-transition-new(root) { animation: vt-in var(--dur-3) var(--ease-out) both; }
 @keyframes vt-out { to { opacity: 0; } }
 @keyframes vt-in { from { opacity: 0; translate: 0 8px; } }
+/* The top bar is the same in every view: it's lifted out of the page's fade-and-rise so it doesn't jump, and only
+   its changed bits (the current view's pill) cross-fade. */
+html[data-vt='view'] .top { view-transition-name: top; }
+html[data-vt='view']::view-transition-group(top) { animation: none; }
+html[data-vt='view']::view-transition-old(top), html[data-vt='view']::view-transition-new(top) { animation-duration: var(--dur-1); }
 /* The detail panel slides in from the right and back out while the grid cross-fades into its new width. */
 html[data-vt='detail'] .detail-pane { view-transition-name: detail; }
 html[data-vt='detail']::view-transition-old(root),

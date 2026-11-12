@@ -172,6 +172,10 @@ pub struct Asset {
     pub tags: Vec<Tag>,
     pub created_at: String,
     pub updated_at: String,
+    /// When this asset, or the pack it's in, went to the archive. Archived assets are left out of searches; the
+    /// archive is where they're restored or deleted for good.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub archived_at: Option<String>,
     /// Files this asset needs (textures, buffers, materials) or goes with (animations). Detail view only.
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub links: Vec<AssetLink>,
@@ -479,6 +483,9 @@ pub struct Pack {
     /// Assets converted from Unreal packages.
     #[serde(default)]
     pub unreal_converted: u64,
+    /// When the pack went to the archive. Its assets are left out of searches until it's restored.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub archived_at: Option<String>,
 }
 
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
@@ -509,6 +516,10 @@ pub struct SearchQuery {
     /// Only assets in this collection (id or name).
     #[serde(default)]
     pub collection: Option<String>,
+    /// Search the archive instead of the library: assets archived one by one, or with `pack`, everything archived
+    /// from that pack.
+    #[serde(default)]
+    pub archived: bool,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -602,6 +613,12 @@ pub struct Stats {
     pub storage: String,
     pub auth_required: bool,
     pub kinds: Vec<Facet>,
+    /// Packs in the archive.
+    #[serde(default)]
+    pub archived_packs: u64,
+    /// Assets archived one by one (not counting the ones in archived packs).
+    #[serde(default)]
+    pub archived_assets: u64,
     /// Assets whose bytes are identical to an earlier asset (same file shipped in several packs).
     #[serde(default)]
     pub duplicate_assets: u64,
@@ -614,7 +631,7 @@ pub struct Stats {
     /// Blender's state, for model conversion: its version, `looking`, `downloading`, `off` or `unavailable: <why>`.
     #[serde(default)]
     pub blender: String,
-    /// A newer Hoard release than this server, if the daily check found one (`HOARD_UPDATE_CHECK`).
+    /// A newer Hoard release than this server, if the daily check found one.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub update: Option<UpdateInfo>,
     /// What model thumbnails render on: `gpu: <adapter> (<api>)`, `cpu: <adapter> (<api>)` (software, no GPU

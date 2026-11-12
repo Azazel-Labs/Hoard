@@ -37,10 +37,16 @@ mime_guess = "2"
 image = { version = "0.25", default-features = false, features = ["png", "jpeg", "gif", "bmp", "tga", "webp", "tiff", "hdr", "exr"] }
 zstd = "0.14"
 # TLS, HTTP/2 and HTTP/3. All on rustls with the `ring` provider (no C toolchain needed).
-axum-server = { version = "0.9", features = ["tls-rustls-ring"] }
+hyper = { version = "1", features = ["server", "http1", "http2"] }
+hyper-util = { version = "0.1", features = ["server-auto", "server-graceful", "service", "tokio"] }
+tokio-rustls = { version = "0.26", default-features = false, features = ["ring", "tls12", "logging"] }
 rustls = { version = "0.23", default-features = false, features = ["ring", "std", "tls12", "logging"] }
 rustls-pki-types = { version = "1", features = ["std"] }
-rcgen = "0.14"
+rcgen = { version = "0.14", features = ["x509-parser"] }
+x509-parser = "0.18"
+# Settings → HTTPS: the addresses Hoard's own certificate covers.
+if-addrs = "0.15"
+gethostname = "1"
 quinn = { version = "0.11", default-features = false, features = ["runtime-tokio", "rustls-ring"] }
 h3 = "0.0.8"
 h3-quinn = "0.0.10"

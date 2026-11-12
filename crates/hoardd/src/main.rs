@@ -20,6 +20,7 @@ mod ffmpeg;
 mod fonts;
 mod formats;
 mod heavy;
+mod https;
 mod ingest;
 mod jobs;
 mod links;
@@ -101,6 +102,14 @@ async fn main() -> Result<()> {
         }
         return Ok(());
     }
+    if cfg.https_off {
+        https::turn_off(&*pool.get()?)?;
+        #[expect(clippy::print_stdout, reason = "the command's output")]
+        {
+            println!("HTTPS is off. Start Hoard again and set it up in Settings → HTTPS.");
+        }
+        return Ok(());
+    }
     if let Some(loc) = locations::adopt_existing(&*pool.get()?, &cfg)? {
         tracing::info!(path = %loc.path, "your files stay where they are, as the library location \"Library\"");
     }
@@ -159,13 +168,13 @@ async fn main() -> Result<()> {
     } else {
         tracing::warn!(dir = %web.display(), "web portal not built; serving API only (run `npm run build` in web/)");
     }
-    let alt_svc = state.cfg.http3.then(|| server::alt_svc(state.cfg.listen.port()));
     let app = app
-        .layer(middleware::from_fn(move |req, next| cache_and_alt_svc(req, next, alt_svc.clone())))
+        .layer(middleware::from_fn(cache_headers))
         .layer(CompressionLayer::new().br(true).zstd(true).gzip(true).compress_when(compressible()))
         .layer(TraceLayer::new_for_http())
         .with_state(Arc::clone(&state));
 
+    https::init(&state)?;
     server::serve(&state.cfg, app).await?;
     Ok(())
 }
@@ -181,19 +190,16 @@ fn compressible() -> impl Predicate {
         .and(NotForContentType::const_new("video/"))
 }
 
-/// Cache headers for the portal's own files, and `Alt-Svc` when HTTP/3 is on.
+/// Cache headers for the portal's own files.
 /// Vite puts a content hash in every file name under `/assets/`, so those never change; `index.html` must always be
 /// revalidated so a new release is picked up.
-async fn cache_and_alt_svc(req: Request, next: Next, alt_svc: Option<String>) -> Response {
+async fn cache_headers(req: Request, next: Next) -> Response {
     let path = req.uri().path().to_owned();
     let mut resp = next.run(req).await;
     let headers = resp.headers_mut();
     if !path.starts_with("/api/") && !path.starts_with("/mcp") && !headers.contains_key(header::CACHE_CONTROL) {
         let value = if path.starts_with("/assets/") { "public, max-age=31536000, immutable" } else { "no-cache" };
         headers.insert(header::CACHE_CONTROL, HeaderValue::from_static(value));
-    }
-    if let Some(v) = alt_svc.as_deref().and_then(|v| HeaderValue::from_str(v).ok()) {
-        headers.insert(header::ALT_SVC, v);
     }
     resp
 }

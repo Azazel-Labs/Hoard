@@ -32,7 +32,11 @@ use crate::AppState;
 use crate::error::{ApiResult, AppError};
 use crate::{db, tools};
 
-pub(crate) const COOKIE: &str = "hoard_session";
+/// The session cookie over plain `http://`.
+const COOKIE: &str = "hoard_session";
+/// The session cookie over HTTPS. A different name, because a browser won't let a plain `http://` page replace a
+/// `Secure` cookie: with one name, signing in over `http://` after HTTPS was turned off would silently fail.
+const SECURE_COOKIE: &str = "__Host-hoard_session";
 /// Sent by the portal with every request. Another site's page can't add a header to a request here (there is no
 /// CORS), so a request that carries the session cookie without it didn't come from the portal.
 pub(crate) const CSRF_HEADER: &str = "x-hoard";
@@ -81,13 +85,21 @@ fn credential(headers: &HeaderMap) -> Option<Credential> {
     }
 }
 
+/// The session from the cookie: over HTTPS the secure one if it's there, else the plain one (also sent over HTTPS).
 fn session_token(headers: &HeaderMap) -> Option<String> {
+    over_https(headers)
+        .then(|| cookie_value(headers, SECURE_COOKIE))
+        .flatten()
+        .or_else(|| cookie_value(headers, COOKIE))
+}
+
+fn cookie_value(headers: &HeaderMap, name: &str) -> Option<String> {
     headers
         .get_all(header::COOKIE)
         .iter()
         .filter_map(|v| v.to_str().ok())
         .flat_map(|v| v.split(';'))
-        .find_map(|kv| kv.trim().strip_prefix(COOKIE)?.strip_prefix('='))
+        .find_map(|kv| kv.trim().strip_prefix(name)?.strip_prefix('='))
         .filter(|v| !v.is_empty())
         .map(str::to_owned)
 }
@@ -289,21 +301,21 @@ fn check_password(password: &str) -> ApiResult<()> {
     Ok(())
 }
 
-/// Whether to mark the cookie `Secure`: when this request came over HTTPS, directly or through a proxy that says so.
-/// (Not from the public address alone: someone on plain `http://` at home would never get the cookie back.)
-fn over_https(state: &AppState, headers: &HeaderMap) -> bool {
-    state.cfg.tls_cert.is_some()
-        || state.cfg.tls_self_signed
-        || headers
-            .get("x-forwarded-proto")
-            .and_then(|v| v.to_str().ok())
-            .is_some_and(|p| p.eq_ignore_ascii_case("https"))
+/// Whether to mark the cookie `Secure`: when this request came over HTTPS, directly (the server says so in the same
+/// header) or through a proxy that says so. (Not from the public address alone: someone on plain `http://` at home
+/// would never get the cookie back.)
+fn over_https(headers: &HeaderMap) -> bool {
+    headers.get("x-forwarded-proto").and_then(|v| v.to_str().ok()).is_some_and(|p| p.eq_ignore_ascii_case("https"))
 }
 
 /// The cookie lasts as long as browsers allow; the session itself ends after [`SESSION_DAYS`] unused.
-fn cookie(state: &AppState, headers: &HeaderMap, token: &str, max_age: i64) -> Result<HeaderValue> {
-    let secure = if over_https(state, headers) { "; Secure" } else { "" };
-    Ok(HeaderValue::from_str(&format!("{COOKIE}={token}; Path=/; HttpOnly; SameSite=Lax; Max-Age={max_age}{secure}"))?)
+fn cookie(headers: &HeaderMap, token: &str, max_age: i64) -> Result<HeaderValue> {
+    set_cookie(over_https(headers), token, max_age)
+}
+
+fn set_cookie(secure: bool, token: &str, max_age: i64) -> Result<HeaderValue> {
+    let (name, flag) = if secure { (SECURE_COOKIE, "; Secure") } else { (COOKIE, "") };
+    Ok(HeaderValue::from_str(&format!("{name}={token}; Path=/; HttpOnly; SameSite=Lax; Max-Age={max_age}{flag}"))?)
 }
 
 fn new_session(c: &Connection, user_id: i64) -> Result<String> {
@@ -316,8 +328,8 @@ fn new_session(c: &Connection, user_id: i64) -> Result<String> {
     Ok(token)
 }
 
-fn signed_in(state: &AppState, headers: &HeaderMap, token: &str, name: &str) -> ApiResult<Response> {
-    let set = cookie(state, headers, token, 400 * 86_400)?;
+fn signed_in(headers: &HeaderMap, token: &str, name: &str) -> ApiResult<Response> {
+    let set = cookie(headers, token, 400 * 86_400)?;
     Ok(([(header::SET_COOKIE, set)], Json(json!({ "user": { "name": name, "kind": "user" } }))).into_response())
 }
 
@@ -344,7 +356,7 @@ async fn setup(
     .await?
     .ok_or_else(|| AppError::conflict("There's already an account: sign in"))?;
     tracing::info!(user = %name, "first account made");
-    signed_in(&state, &headers, &token, &name)
+    signed_in(&headers, &token, &name)
 }
 
 async fn login(
@@ -376,16 +388,30 @@ async fn login(
         tracing::info!(user = %name, "failed sign-in");
         return Err(AppError { status: StatusCode::UNAUTHORIZED, err: anyhow!("That name and password don't match") });
     };
-    signed_in(&state, &headers, &token, &username)
+    signed_in(&headers, &token, &username)
 }
 
 async fn logout(State(state): State<AppState>, headers: HeaderMap) -> ApiResult<Response> {
-    if let Some(token) = session_token(&headers) {
-        db::call(&state.pool, move |c| Ok(c.execute("DELETE FROM sessions WHERE token_hash = ?1", [digest(&token)])?))
-            .await?;
+    // Over HTTPS the browser may hold both cookies (from before and after HTTPS was turned on): end both.
+    let secure = over_https(&headers);
+    let tokens: Vec<String> =
+        [secure.then(|| cookie_value(&headers, SECURE_COOKIE)).flatten(), cookie_value(&headers, COOKIE)]
+            .into_iter()
+            .flatten()
+            .collect();
+    db::call(&state.pool, move |c| {
+        for token in &tokens {
+            c.execute("DELETE FROM sessions WHERE token_hash = ?1", [digest(token)])?;
+        }
+        Ok(())
+    })
+    .await?;
+    let mut res = StatusCode::NO_CONTENT.into_response();
+    res.headers_mut().append(header::SET_COOKIE, set_cookie(false, "", 0)?);
+    if secure {
+        res.headers_mut().append(header::SET_COOKIE, set_cookie(true, "", 0)?);
     }
-    let gone = cookie(&state, &headers, "", 0)?;
-    Ok(([(header::SET_COOKIE, gone)], StatusCode::NO_CONTENT).into_response())
+    Ok(res)
 }
 
 #[derive(Deserialize)]
@@ -582,6 +608,13 @@ mod tests {
         let mut h = HeaderMap::new();
         h.insert(header::COOKIE, HeaderValue::from_static("hoard_session_old=1; hoard_session="));
         assert_eq!(session_token(&h), None);
+        // Over HTTPS the secure cookie wins; over http:// it's never read.
+        let mut h = HeaderMap::new();
+        h.insert(header::COOKIE, HeaderValue::from_static("hoard_session=plain; __Host-hoard_session=secure"));
+        assert_eq!(session_token(&h).as_deref(), Some("plain"));
+        h.insert("x-forwarded-proto", HeaderValue::from_static("https"));
+        assert_eq!(session_token(&h).as_deref(), Some("secure"));
+        assert!(cookie(&h, "t", 1).unwrap().to_str().unwrap().starts_with("__Host-hoard_session=t; Path=/;"));
     }
 
     #[test]

@@ -1,0 +1,26 @@
+/* Colours for the text viewers' highlighting (text.ts) and the JSON tree: muted enough to read for a long time,
+   distinct enough to tell a key from a value at a glance. Each is light-dark(on light, on dark). */
+.tk-c { color: light-dark(#78808e, #7d828d); font-style: italic; }
+.tk-s { color: light-dark(#2d7a33, #98c379); }
+.tk-n { color: light-dark(#ae5700, #d8a06a); }
+.tk-k { color: light-dark(#8436b3, #c88ae0); }
+.tk-t { color: light-dark(#0b7686, #5cbcc8); }
+.tk-key { color: light-dark(#2a5ca6, #73b2f0); }
+.tk-p { color: var(--faint); }
+.tk-col0 { color: var(--text); }
+.tk-col1 { color: light-dark(#2a5ca6, #73b2f0); }
+.tk-col2 { color: light-dark(#2d7a33, #98c379); }
+.tk-col3 { color: light-dark(#ae5700, #d8a06a); }
+.tk-col4 { color: light-dark(#8436b3, #c88ae0); }
+
+/* Lines with their numbers, numbered by a CSS counter so the numbers stay out of a copied selection. */
+.code-lines {
+  margin: 0; counter-reset: ln var(--ln-start, 0); font-variation-settings: 'MONO' 1, 'CASL' 0;
+  font-size: 0.8rem; line-height: 1.55; tab-size: 4; white-space: pre; color: var(--text);
+}
+.code-lines.wrap { white-space: pre-wrap; overflow-wrap: anywhere; }
+.code-lines .l { display: block; position: relative; min-height: 1.55em; padding-left: calc(var(--gutter, 3ch) + 1.4ch); }
+.code-lines .l::before {
+  counter-increment: ln; content: counter(ln); position: absolute; left: 0; width: var(--gutter, 3ch);
+  text-align: right; color: var(--faint); opacity: 0.7; user-select: none;
+}

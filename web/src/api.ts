@@ -206,6 +206,11 @@ export interface Stats {
   renderer?: string
   /** No library location yet: the first-run setup should open. */
   setup_needed?: boolean
+  /** Space cached "Download as" conversions take, and the most they may. */
+  conversion_cache_bytes?: number
+  conversion_cache_limit?: number
+  /** Space thumbnails, model views and audio previews take. */
+  preview_bytes?: number
 }
 
 /** Where a library keeps files: managed (Hoard copies files in) or watched (indexed where they sit). */
@@ -413,6 +418,9 @@ export interface Settings {
     render: OptionSetting<boolean>
     update_check: OptionSetting<boolean>
     guest_browsing: OptionSetting<boolean>
+    thumb_quality: OptionSetting<ThumbQuality>
+    /** Most space cached "Download as" conversions may take, in MiB. */
+    conversion_cache_mb: OptionSetting<number>
     /** Empty: from the request's Host header. */
     public_url: OptionSetting<string>
     /** Empty: look in the usual places. */
@@ -420,6 +428,9 @@ export interface Settings {
   }
   max_workers: number
 }
+
+/** How thumbnails are stored: JPEG at three qualities, or PNG. Transparent ones and pixel art are always PNG. */
+export type ThumbQuality = 'small' | 'balanced' | 'sharp' | 'lossless'
 
 /** Settings to change; `null` goes back to the server's default. */
 export interface SettingsPatch {
@@ -438,6 +449,8 @@ export interface SettingsPatch {
   render?: boolean | null
   update_check?: boolean | null
   guest_browsing?: boolean | null
+  thumb_quality?: ThumbQuality | null
+  conversion_cache_mb?: number | null
   public_url?: string | null
   soundfont?: string | null
 }

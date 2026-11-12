@@ -299,7 +299,8 @@ Whole packs download as one zip too, and so does any selection: Ctrl/Cmd-click, 
 streamed as they're written, so even a multi-gigabyte pack starts downloading at once.
 
 **Download as.** The detail panel's "Download as" converts on request (the first download makes and caches it, so
-later ones are instant). Images, models, fonts, WAV/FLAC and music rendering are Hoard's own code; MP3, OGG Vorbis
+later ones are instant). Cached conversions are kept up to a limit (Settings → Server → Converted downloads, 10 GB
+unless you change it); past that, the least recently downloaded go first, never one handed out in the last hour. Images, models, fonts, WAV/FLAC and music rendering are Hoard's own code; MP3, OGG Vorbis
 and Opus use ffmpeg's reference encoders (LAME, libvorbis, libopus), as do sources only ffmpeg reads:
 
 | From | To |
@@ -530,9 +531,15 @@ Set before starting (these need a restart):
 
 **Settings → Maintenance** has a button for each job that looks after the library, with progress while it runs and a history of past runs:
 back up the database, check files for damage, re-analyze every pack (thumbnails, previews and rule tags made afresh;
-your edits stay, the AI isn't asked again), clear cached "Download as" conversions and leftovers, and delete unused
-files. One of each runs at a time. Backup, scrub and gc can also be run from cron (below) and show up in the
+your edits stay, the AI isn't asked again), shrink thumbnails, clear cached "Download as" conversions and leftovers,
+and delete unused files. One of each runs at a time. Backup, scrub and gc can also be run from cron (below) and show up in the
 history the same way.
+
+**Thumbnails.** Settings → Server → Thumbnails picks how thumbnails and model views are stored: Smaller, Balanced
+(the default) or Sharper JPEG, or Lossless PNG. Anything with transparency (model renders, waveforms, font
+specimens, cut-out sprites) and pixel art always stays PNG, and so does a picture whose PNG is about as small as the
+JPEG would be. For photo-like textures Balanced is roughly an eighth of the PNG. Changing it affects new thumbnails;
+Maintenance → Shrink thumbnails re-stores the existing PNG ones.
 
 - Content addressing: every byte is verifiable. `POST /api/admin/scrub` re-hashes all blobs (local or S3) and flags
   corrupt or missing ones; the portal shows the count. It answers 202 and runs in the background.
@@ -651,7 +658,7 @@ Requests that change something are marked 🔒: guests can't make them. A browse
 | POST 🔒 | `/api/admin/gc` | delete blobs nothing uses |
 | POST 🔒 | `/api/admin/backup` | snapshot the database |
 | GET 🔒 | `/api/admin/maintenance` | maintenance tasks, what's running, past runs |
-| POST 🔒 | `/api/admin/maintenance/{task}` | start `backup`, `scrub`, `reanalyze`, `clear_cache` or `gc` |
+| POST 🔒 | `/api/admin/maintenance/{task}` | start `backup`, `scrub`, `reanalyze`, `shrink_thumbs`, `clear_cache` or `gc` |
 | POST | `/mcp` | MCP over streamable HTTP (writes need the token) |
 
 ## Repository layout

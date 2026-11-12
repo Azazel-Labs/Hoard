@@ -416,6 +416,18 @@ impl BlobStore {
         Ok(out.into())
     }
 
+    /// A blob's first `n` bytes (fewer if it's shorter).
+    pub(crate) async fn head(&self, hash: &str, n: u64) -> Result<Vec<u8>> {
+        let Some(mut read) = self.read(hash, Some(GetRange::Bounded(0..n))).await? else {
+            bail!("blob {hash} missing from storage")
+        };
+        let mut out = Vec::new();
+        while let Some(chunk) = read.stream.next().await {
+            out.extend_from_slice(&chunk?);
+        }
+        Ok(out)
+    }
+
     /// Copy a blob into a local file (used when re-analyzing an asset).
     pub(crate) async fn download_to(&self, hash: &str, dest: &FsPath) -> Result<()> {
         let Some(mut read) = self.read(hash, None).await? else { bail!("blob {hash} missing from storage") };

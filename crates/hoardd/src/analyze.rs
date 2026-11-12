@@ -3,15 +3,15 @@
 //! Each analyzer is best-effort: a file it can't parse still becomes an asset, just with less metadata.
 
 use std::fs::File;
-use std::io::{BufRead, BufReader, Cursor, Read};
+use std::io::{BufRead, BufReader, Read};
 use std::path::Path;
-use std::sync::atomic::{AtomicBool, Ordering};
+use std::sync::atomic::{AtomicBool, AtomicU8, Ordering};
 use std::sync::{Mutex, OnceLock};
 
 use anyhow::Context as _;
 use hoard_core::AssetKind;
 use image::imageops::FilterType;
-use image::{DynamicImage, GenericImageView, ImageFormat, ImageReader};
+use image::{DynamicImage, GenericImageView, ImageReader};
 use serde_json::{Map, Value, json};
 
 use crate::sources;
@@ -74,10 +74,51 @@ pub(crate) fn describe_renderer() -> String {
     RENDERER_STATUS.get().cloned().unwrap_or_else(|| "starting".into())
 }
 
+/// JPEG quality for thumbnails and model views; 0 keeps them as PNG. See [`crate::settings::ThumbQuality`].
+static THUMB_JPEG_QUALITY: AtomicU8 = AtomicU8::new(82);
+
+pub(crate) fn set_thumb_quality(q: crate::settings::ThumbQuality) {
+    THUMB_JPEG_QUALITY.store(q.jpeg_quality().unwrap_or(0), Ordering::Relaxed);
+}
+
+/// PNG at the strongest compression, and without the alpha channel when every pixel is opaque.
 pub(crate) fn png_bytes(img: image::RgbaImage) -> anyhow::Result<Vec<u8>> {
+    use image::ImageEncoder as _;
+    use image::codecs::png::{CompressionType, FilterType as PngFilter, PngEncoder};
     let mut png = Vec::new();
-    DynamicImage::ImageRgba8(img).write_to(&mut Cursor::new(&mut png), ImageFormat::Png)?;
+    let enc = PngEncoder::new_with_quality(&mut png, CompressionType::Best, PngFilter::Adaptive);
+    let (w, h) = img.dimensions();
+    if is_opaque(&img) {
+        let rgb = DynamicImage::ImageRgba8(img).to_rgb8();
+        enc.write_image(rgb.as_raw(), w, h, image::ExtendedColorType::Rgb8)?;
+    } else {
+        enc.write_image(img.as_raw(), w, h, image::ExtendedColorType::Rgba8)?;
+    }
     Ok(png)
+}
+
+fn is_opaque(img: &image::RgbaImage) -> bool {
+    img.pixels().all(|p| p[3] == 255)
+}
+
+/// Encode a thumbnail or model view sheet the way Settings → Server → Thumbnails asks. PNG when it has any
+/// transparency (JPEG has none), when it's pixel art (`exact`: JPEG would smear its hard edges), or when the setting
+/// is Lossless. Otherwise JPEG, unless PNG is about as small anyway (flat colors, line art), since then it's exact.
+pub(crate) fn thumb_bytes(img: image::RgbaImage, exact: bool) -> anyhow::Result<Vec<u8>> {
+    let q = THUMB_JPEG_QUALITY.load(Ordering::Relaxed);
+    if q == 0 || exact || !is_opaque(&img) {
+        return png_bytes(img);
+    }
+    let mut jpeg = Vec::new();
+    image::codecs::jpeg::JpegEncoder::new_with_quality(&mut jpeg, q)
+        .encode_image(&DynamicImage::ImageRgba8(img.clone()).to_rgb8())?;
+    let png = png_bytes(img)?;
+    Ok(if jpeg.len() * 10 < png.len() * 8 { jpeg } else { png })
+}
+
+/// The content type of a stored thumbnail, from its first bytes.
+pub(crate) fn thumb_mime(bytes: &[u8]) -> &'static str {
+    if bytes.starts_with(&[0xFF, 0xD8, 0xFF]) { "image/jpeg" } else { "image/png" }
 }
 
 /// Thumbnail, plus the multi-view sheet when enabled.
@@ -88,9 +129,9 @@ fn render_model_thumb(path: &Path) -> (Option<Vec<u8>>, Option<Vec<u8>>) {
         Ok(img) => {
             let views = VIEWS_ENABLED
                 .load(Ordering::Relaxed)
-                .then(|| guard.render_views_file(path, THUMB_SIZE).ok().and_then(|v| png_bytes(v).ok()))
+                .then(|| guard.render_views_file(path, THUMB_SIZE).ok().and_then(|v| thumb_bytes(v, false).ok()))
                 .flatten();
-            (png_bytes(img).ok(), views)
+            (thumb_bytes(img, false).ok(), views)
         }
         Err(e) => {
             tracing::debug!(path = %path.display(), error = %format!("{e:#}"), "no model thumbnail");
@@ -106,13 +147,13 @@ const THUMB_SIZE: u32 = 256;
 #[derive(Debug, Default)]
 pub(crate) struct Analysis {
     pub(crate) meta: Map<String, Value>,
-    pub(crate) thumb_png: Option<Vec<u8>>,
+    pub(crate) thumb: Option<Vec<u8>>,
     /// A better display name than the file stem, when the file carries one (WAV `INAM`, iXML `FXNAME`, ID3 title).
     pub(crate) title: Option<String>,
     /// A description embedded in the file (BWF `bext`, `ICMT`, iXML `DESCRIPTION`).
     pub(crate) description: Option<String>,
     /// Multi-view render sheet for models (2x2: front, side, back, top), used for LLM vision.
-    pub(crate) views_png: Option<Vec<u8>>,
+    pub(crate) views: Option<Vec<u8>>,
     /// The kind, when the file says better than its extension (an Unreal package holding a `StaticMesh`).
     pub(crate) kind: Option<AssetKind>,
     /// A source file recovered from inside a container (the WAV inside an Unreal `SoundWave`), stored as the
@@ -163,14 +204,14 @@ pub(crate) fn analyze(path: &Path, kind: AssetKind, ext: &str) -> Analysis {
         AssetKind::Font if crate::fonts::EXTS.contains(&ext) => crate::fonts::analyze(path, ext, THUMB_SIZE).map(|f| {
             a.meta.extend(f.facts);
             a.title = f.title;
-            a.thumb_png = f.thumb.and_then(|t| png_bytes(t).ok());
+            a.thumb = f.thumb.and_then(|t| thumb_bytes(t, false).ok());
         }),
         AssetKind::Model if matches!(ext, "stl" | "ply" | "vox") => analyze_mesh(path, ext, &mut a),
         AssetKind::Model | AssetKind::Animation => analyze_model(path, ext, &mut a.meta).map(|()| {
             // Animation-only glTF clips have no meshes to draw.
             let has_mesh = a.meta.get("meshes").and_then(Value::as_u64).is_none_or(|n| n > 0);
             if matches!(ext, "gltf" | "glb" | "obj") && has_mesh {
-                (a.thumb_png, a.views_png) = render_model_thumb(path);
+                (a.thumb, a.views) = render_model_thumb(path);
             } else if ext == "fbx" {
                 // Hoard reads binary FBX itself: render a thumbnail from the GLB it makes.
                 if let Err(e) = mesh_thumb(path, ext, &mut a) {
@@ -226,7 +267,7 @@ fn analyze_music(path: &Path, ext: &str, a: &mut Analysis) -> anyhow::Result<()>
     let wav = dir.path().join("render.wav");
     std::fs::write(&wav, crate::audio::write_wav(&audio))?;
     if let Ok((png, levels)) = waveform_png(&wav, secs) {
-        a.thumb_png = Some(png);
+        a.thumb = Some(png);
         let db = |v: f64| if v > 0.0 { (20.0 * v.log10() * 10.0).round() / 10.0 } else { -120.0 };
         a.meta.insert("peak_dbfs".into(), json!(db(f64::from(levels.peak))));
     }
@@ -267,7 +308,7 @@ fn analyze_sound(path: &Path, ext: &str, a: &mut Analysis) -> anyhow::Result<()>
     let wave = waveform_png(path, secs).or_else(|e| via_ffmpeg().map_or(Err(e), |wav| waveform_png(&wav, secs)));
     match wave {
         Ok((png, levels)) => {
-            a.thumb_png = Some(png);
+            a.thumb = Some(png);
             let db = |v: f64| if v > 0.0 { (20.0 * v.log10() * 10.0).round() / 10.0 } else { -120.0 };
             a.meta.insert("peak_dbfs".into(), json!(db(f64::from(levels.peak))));
             let rms = (levels.sum_sq / levels.samples.max(1) as f64).sqrt();
@@ -317,7 +358,7 @@ fn render_mesh(mesh: &crate::meshes::Mesh, path: &Path, ext: &str, a: &mut Analy
     let glb = crate::meshes::to_glb(mesh)?;
     let tmp = path.with_extension(format!("{ext}.hoard-preview.glb"));
     std::fs::write(&tmp, glb)?;
-    (a.thumb_png, a.views_png) = render_model_thumb(&tmp);
+    (a.thumb, a.views) = render_model_thumb(&tmp);
     std::fs::remove_file(&tmp).ok();
     Ok(())
 }
@@ -382,7 +423,7 @@ fn analyze_pixels(img: &DynamicImage, a: &mut Analysis, full: bool) -> anyhow::R
         img.thumbnail(THUMB_SIZE, THUMB_SIZE)
     };
     let rgba = thumb.to_rgba8();
-    a.thumb_png = Some(png_bytes(rgba.clone())?);
+    a.thumb = Some(thumb_bytes(rgba.clone(), pixel_art)?);
 
     let has_alpha = img.color().has_alpha() && rgba.pixels().any(|p| p[3] < 250);
     a.meta.insert("alpha".into(), json!(has_alpha));
@@ -456,7 +497,7 @@ fn analyze_blend(path: &Path, a: &mut Analysis) -> anyhow::Result<()> {
         a.meta.insert("compression".into(), json!(c));
     }
     match info.thumbnail {
-        Some(t) => a.thumb_png = Some(png_bytes(t)?),
+        Some(t) => a.thumb = Some(thumb_bytes(t, false)?),
         None => {
             a.meta.insert("note".into(), json!("saved without a preview"));
         }
@@ -697,7 +738,7 @@ fn analyze_unreal(path: &Path, ext: &str, a: &mut Analysis) -> anyhow::Result<()
         && let Ok(img) = image::load_from_memory(thumb)
     {
         let img = img.thumbnail(THUMB_SIZE, THUMB_SIZE).to_rgba8();
-        a.thumb_png = png_bytes(img).ok();
+        a.thumb = thumb_bytes(img, false).ok();
     }
 
     // The original file, if the package kept it.
@@ -713,8 +754,8 @@ fn analyze_unreal(path: &Path, ext: &str, a: &mut Analysis) -> anyhow::Result<()
             for (k, v) in inner.meta {
                 a.meta.insert(k, v);
             }
-            if inner.thumb_png.is_some() {
-                a.thumb_png = inner.thumb_png;
+            if inner.thumb.is_some() {
+                a.thumb = inner.thumb;
             }
             a.title = inner.title.or(a.title.take());
             a.description = inner.description.or(a.description.take());
@@ -1000,9 +1041,7 @@ fn draw_waveform(bars: &[Bar]) -> anyhow::Result<Vec<u8>> {
             }
         }
     }
-    let mut png = Vec::new();
-    DynamicImage::ImageRgba8(img).write_to(&mut Cursor::new(&mut png), ImageFormat::Png)?;
-    Ok(png)
+    png_bytes(img)
 }
 
 // ---------------------------------------------------------------------------------------------
@@ -1108,6 +1147,37 @@ fn fbx_stats(path: &Path, meta: &mut Map<String, Value>) -> anyhow::Result<()> {
 mod tests {
     use super::*;
 
+    #[test]
+    fn thumbnails_are_jpeg_only_when_opaque_and_not_pixel_art() {
+        // Like a photo or a rendered texture: smooth shading with grain, which is what JPEG is for.
+        let mut seed = 0x2545_f491_u32;
+        let photo = image::RgbaImage::from_fn(256, 256, |x, y| {
+            seed ^= seed << 13;
+            seed ^= seed >> 17;
+            seed ^= seed << 5;
+            let grain = (seed % 24) as f32 - 12.0;
+            let (fx, fy) = (x as f32 / 40.0, y as f32 / 33.0);
+            let c = |phase: f32| (128.0 + 90.0 * (fx + phase).sin() * fy.cos() + grain).clamp(0.0, 255.0) as u8;
+            image::Rgba([c(0.0), c(1.3), c(2.6), 255])
+        });
+        let jpeg = thumb_bytes(photo.clone(), false).unwrap();
+        assert_eq!(thumb_mime(&jpeg), "image/jpeg");
+        let png = thumb_bytes(photo.clone(), true).unwrap();
+        assert_eq!(thumb_mime(&png), "image/png", "pixel art stays PNG");
+        assert!(jpeg.len() * 3 < png.len(), "JPEG {} vs PNG {}", jpeg.len(), png.len());
+
+        // Flat colors: PNG is as small and exact.
+        let flat =
+            image::RgbaImage::from_fn(256, 256, |x, _| image::Rgba([if x < 128 { 200 } else { 30 }, 90, 60, 255]));
+        assert_eq!(thumb_mime(&thumb_bytes(flat, false).unwrap()), "image/png");
+
+        let mut cutout = photo;
+        cutout.put_pixel(0, 0, image::Rgba([0, 0, 0, 0]));
+        let kept = thumb_bytes(cutout, false).unwrap();
+        assert_eq!(thumb_mime(&kept), "image/png", "transparency stays PNG");
+        assert!(image::load_from_memory(&kept).unwrap().color().has_alpha());
+    }
+
     fn wav_of(samples: &[f32], rate: u32) -> std::path::PathBuf {
         let audio = crate::audio::Audio {
             samples: samples.iter().map(|s| (s * 32767.0) as i32).collect(),
@@ -1210,7 +1280,7 @@ mod tests {
         let a = analyze(&p, AssetKind::Texture, "exr");
         assert_eq!(a.meta.get("hdr"), Some(&json!(true)));
         assert_eq!(a.meta.get("width"), Some(&json!(64)));
-        let thumb = image::load_from_memory(&a.thumb_png.expect("thumbnail")).unwrap().to_rgba8();
+        let thumb = image::load_from_memory(&a.thumb.expect("thumbnail")).unwrap().to_rgba8();
         let (dark, bright) = (thumb.get_pixel(1, 1)[0], thumb.get_pixel(thumb.width() - 2, 1)[0]);
         assert!(dark < bright && bright < 255 && bright > 100, "dark={dark} bright={bright}");
     }

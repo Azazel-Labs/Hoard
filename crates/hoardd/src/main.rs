@@ -109,6 +109,7 @@ async fn main() -> Result<()> {
     let settings = settings::Store::load(&cfg, &*pool.get()?)?;
     let effective = settings.get();
     analyze::set_render_enabled(effective.render, effective.llm_vision && effective.llm_enabled());
+    analyze::set_thumb_quality(effective.thumb_quality);
     music::configure(effective.soundfont.clone());
     let http = reqwest::Client::builder().timeout(Duration::from_secs(180)).build()?;
 
@@ -143,6 +144,10 @@ async fn main() -> Result<()> {
     updates::start_auto_update(&state);
     analyze::warm_renderer();
     jobs::spawn_workers(&state);
+    {
+        let st = Arc::clone(&state);
+        tokio::spawn(async move { formats::log_trim(&st).await });
+    }
     scan::spawn_rescans(&state);
 
     let mut app = api::router(&state);

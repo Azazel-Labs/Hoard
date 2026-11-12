@@ -103,6 +103,9 @@ const MIGRATIONS: &[&str] = &[
        created_at   TEXT NOT NULL,
        last_used_at TEXT
      );",
+    // 17: when a cached "download as" conversion was last handed out, so the cache can drop the least recently used
+    // when it outgrows its limit (see `formats::trim_conversions`).
+    "ALTER TABLE derivatives ADD COLUMN used_at TEXT;",
 ];
 
 /// How many automatic pre-upgrade backups to keep in `<data dir>/backups`.

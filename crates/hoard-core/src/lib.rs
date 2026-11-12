@@ -640,6 +640,14 @@ pub struct Stats {
     /// No library location yet: the portal opens its first-run setup.
     #[serde(default)]
     pub setup_needed: bool,
+    /// Space taken by cached "download as" conversions, and the most they may take.
+    #[serde(default)]
+    pub conversion_cache_bytes: u64,
+    #[serde(default)]
+    pub conversion_cache_limit: u64,
+    /// Space taken by thumbnails, model views and audio previews (the local cache).
+    #[serde(default)]
+    pub preview_bytes: u64,
 }
 
 /// A Hoard release newer than the running server.

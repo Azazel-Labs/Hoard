@@ -15,8 +15,10 @@ import {
   type Settings,
   type SettingsPatch,
   type Stats,
+  type ThumbQuality,
   type ToolSetting,
   type UnrealConvert,
+  humanBytes,
 } from '../api'
 import { prefs } from '../prefs'
 import { formatMiB } from '../sizes'
@@ -467,13 +469,14 @@ function downloadOther() {
 const modelLabel = (m: ModelInfo) => [m.name, m.vision ? 'takes images' : ''].filter(Boolean).join(' · ')
 
 // Server options: each saves on its own when it's entered (Enter, or leaving the field); switches at once.
-const opts = reactive({ workers: 1, max_upload_mb: 1, max_expand_mb: 1, public_url: '', soundfont: '' })
+const opts = reactive({ workers: 1, max_upload_mb: 1, max_expand_mb: 1, conversion_cache_mb: 1, public_url: '', soundfont: '' })
 type OptKey = keyof typeof opts
 const OPT_KEYS = Object.keys(opts) as OptKey[]
 const OPT_LABEL: Record<OptKey, string> = {
   workers: 'Background workers',
   max_upload_mb: 'Largest upload',
   max_expand_mb: 'Largest pack',
+  conversion_cache_mb: 'Converted downloads',
   public_url: 'Public address',
   soundfont: 'MIDI SoundFont',
 }
@@ -508,7 +511,7 @@ function saveOpt(k: OptKey) {
   }
   if (v === was) return
   const shown =
-    k === 'max_upload_mb' || k === 'max_expand_mb'
+    k === 'max_upload_mb' || k === 'max_expand_mb' || k === 'conversion_cache_mb'
       ? formatMiB(v as number)
       : typeof v === 'number'
         ? v.toLocaleString()
@@ -562,6 +565,8 @@ async function save(patch: SettingsPatch, done?: string) {
   try {
     take(await api.saveSettings(patch))
     if (done) showOk(done)
+    // A smaller cache limit trims in the background; show what's left once it has.
+    if ('conversion_cache_mb' in patch) setTimeout(loadUsage, 1500)
   } catch (e) {
     if (e instanceof ApiError && e.status === 401) emit('unauthorized')
     showError((e as Error).message)
@@ -665,6 +670,23 @@ function statusText(t: ToolSetting): string {
   }
 }
 const defaultText = (v: string) => (modeOf(v) === 'off' ? 'off' : modeOf(v) === 'auto' ? 'automatic' : v)
+
+const THUMBS: { value: ThumbQuality; label: string; hint: string }[] = [
+  { value: 'small', label: 'Smaller', hint: 'JPEG, quality 70. Fine in the grid; a little soft up close.' },
+  { value: 'balanced', label: 'Balanced', hint: 'JPEG, quality 82. Hard to tell from the original at thumbnail size.' },
+  { value: 'sharp', label: 'Sharper', hint: 'JPEG, quality 92. About twice the size of Balanced.' },
+  { value: 'lossless', label: 'Lossless', hint: 'PNG, exactly as made. Several times larger.' },
+]
+// How much the server keeps around for previews and conversions, fetched fresh when the Server page opens.
+const usage = ref<Stats | null>(null)
+async function loadUsage() {
+  try {
+    usage.value = await api.stats()
+  } catch {
+    usage.value = null
+  }
+}
+watch(current, (c) => { if (c === 'server') void loadUsage() }, { immediate: true })
 
 const UNREAL: { value: UnrealConvert; label: string; hint: string }[] = [
   { value: 'off', label: 'Leave as is', hint: 'Convert from a pack’s page when you want to.' },
@@ -1086,6 +1108,35 @@ onBeforeUnmount(() => {
             </section>
 
             <section>
+              <div class="sh">
+                <h3>Thumbnails</h3>
+                <ResetButton
+                  v-if="changed('thumb_quality')"
+                  :to="THUMBS.find((t) => t.value === s!.options.thumb_quality.default)?.label ?? s.options.thumb_quality.default"
+                  :disabled="busy"
+                  @reset="resetOpt('thumb_quality')"
+                />
+              </div>
+              <p class="what">
+                How new thumbnails and model views are stored. Ones with transparency, and pixel art, are always PNG.
+                To shrink the ones you already have, run Shrink thumbnails in Maintenance.
+                <template v-if="usage?.preview_bytes !== undefined">Previews take {{ humanBytes(usage.preview_bytes) }} now.</template>
+              </p>
+              <div class="choices" role="radiogroup" aria-label="Thumbnails">
+                <label v-for="t in THUMBS" :key="t.value" :class="{ on: s.options.thumb_quality.value === t.value }">
+                  <input
+                    type="radio"
+                    name="thumbs"
+                    :checked="s.options.thumb_quality.value === t.value"
+                    :disabled="busy"
+                    @change="save({ thumb_quality: t.value }, `Thumbnails: ${t.label}`)"
+                  />
+                  <span><strong>{{ t.label }}</strong><small>{{ t.hint }}</small></span>
+                </label>
+              </div>
+            </section>
+
+            <section>
               <div class="sh"><h3>Limits and work</h3></div>
               <p class="what">Each one saves when you leave the field or press Enter. Sizes take units: 100 GB, 512 MB, 1.5 TB; a plain number is GB.</p>
               <div class="llm opts">
@@ -1116,6 +1167,14 @@ onBeforeUnmount(() => {
                   <SizeInput id="opt-expand" v-model="opts.max_expand_mb" class="num" :disabled="busy" @update:model-value="saveOpt('max_expand_mb')" />
                   <span class="unit">once unpacked</span>
                   <ResetButton v-if="changed('max_expand_mb')" :to="formatMiB(s.options.max_expand_mb.default)" :disabled="busy" @reset="resetOpt('max_expand_mb')" />
+                </div>
+                <label for="opt-conv">Converted downloads</label>
+                <div class="key">
+                  <SizeInput id="opt-conv" v-model="opts.conversion_cache_mb" class="num" :disabled="busy" @update:model-value="saveOpt('conversion_cache_mb')" />
+                  <span class="unit">
+                    kept at most{{ usage?.conversion_cache_bytes !== undefined ? `, ${humanBytes(usage.conversion_cache_bytes)} now` : '' }}; the least recently used go first
+                  </span>
+                  <ResetButton v-if="changed('conversion_cache_mb')" :to="formatMiB(s.options.conversion_cache_mb.default)" :disabled="busy" @reset="resetOpt('conversion_cache_mb')" />
                 </div>
                 <label for="opt-public">Public address</label>
                 <div class="key">

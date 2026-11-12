@@ -16,6 +16,35 @@ use crate::config::{Config, UnrealConvert};
 /// Most background workers the Settings dialog can ask for .
 pub(crate) const MAX_WORKERS: usize = 16;
 
+/// How much space converted downloads (a texture as PNG, a model as FBX) may take before the least recently used go.
+pub(crate) const DEFAULT_CONVERSION_CACHE_MB: u64 = 10 << 10;
+
+/// How thumbnails and model views are stored. Pictures with transparency, and pixel art, are always PNG.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "lowercase")]
+pub(crate) enum ThumbQuality {
+    /// JPEG at 70: about a fifth of a PNG.
+    Small,
+    /// JPEG at 82.
+    #[default]
+    Balanced,
+    /// JPEG at 92.
+    Sharp,
+    /// PNG.
+    Lossless,
+}
+
+impl ThumbQuality {
+    pub(crate) fn jpeg_quality(self) -> Option<u8> {
+        match self {
+            Self::Small => Some(70),
+            Self::Balanced => Some(82),
+            Self::Sharp => Some(92),
+            Self::Lossless => None,
+        }
+    }
+}
+
 /// What's been saved from the portal. `None` means "use the flag".
 #[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(default, deny_unknown_fields)]
@@ -65,6 +94,10 @@ pub(crate) struct Saved {
     /// Let people who aren't signed in look around (search, preview, download). Changes still need an account.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub(crate) guest_browsing: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub(crate) thumb_quality: Option<ThumbQuality>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub(crate) conversion_cache_mb: Option<u64>,
 }
 
 /// Reads a retired setting and throws it away.
@@ -93,6 +126,8 @@ pub(crate) struct Effective {
     pub(crate) max_expand_mb: u64,
     pub(crate) workers: usize,
     pub(crate) guest_browsing: bool,
+    pub(crate) thumb_quality: ThumbQuality,
+    pub(crate) conversion_cache_mb: u64,
 }
 
 impl Effective {
@@ -111,6 +146,10 @@ impl Effective {
 
     pub(crate) fn max_upload_bytes(&self) -> u64 {
         self.max_upload_mb.saturating_mul(1 << 20)
+    }
+
+    pub(crate) fn conversion_cache_bytes(&self) -> u64 {
+        self.conversion_cache_mb.saturating_mul(1 << 20)
     }
 }
 
@@ -150,6 +189,8 @@ impl Saved {
             max_expand_mb: self.max_expand_mb.unwrap_or(cfg.max_expand_mb),
             workers: self.workers.unwrap_or(cfg.workers).clamp(1, MAX_WORKERS),
             guest_browsing: self.guest_browsing.unwrap_or(false),
+            thumb_quality: self.thumb_quality.unwrap_or_default(),
+            conversion_cache_mb: self.conversion_cache_mb.unwrap_or(DEFAULT_CONVERSION_CACHE_MB),
         }
     }
 
@@ -186,6 +227,9 @@ impl Saved {
         }
         if self.llm_batch.is_some_and(|n| !(1..=200).contains(&n)) {
             return Err("Assets per AI request: between 1 and 200".into());
+        }
+        if self.conversion_cache_mb.is_some_and(|n| n < 100) {
+            return Err("Converted downloads: at least 100 MB".into());
         }
         if self.max_upload_mb == Some(0) || self.max_expand_mb == Some(0) {
             return Err("Limits can't be zero".into());

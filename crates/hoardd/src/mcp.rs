@@ -351,7 +351,7 @@ async fn preview_blocks(state: &AppState, wanted: Vec<Value>) -> Vec<Value> {
         out.push(json!({
             "type": "image",
             "data": base64::engine::general_purpose::STANDARD.encode(&bytes),
-            "mimeType": "image/png",
+            "mimeType": crate::analyze::thumb_mime(&bytes),
         }));
     }
     out

@@ -28,6 +28,7 @@ pub(crate) const BACKUP: &str = "backup";
 pub(crate) const SCRUB: &str = "scrub";
 pub(crate) const REANALYZE: &str = "reanalyze";
 pub(crate) const CLEAR_CACHE: &str = "clear_cache";
+pub(crate) const SHRINK_THUMBS: &str = "shrink_thumbs";
 pub(crate) const GC: &str = "gc";
 
 pub(crate) const TASKS: &[Task] = &[
@@ -55,6 +56,12 @@ pub(crate) const TASKS: &[Task] = &[
         label: "Clear cached conversions",
         blurb: "Drops the files kept from “Download as” conversions (they're made again when next asked for) and \
                 what interrupted work left behind.",
+    },
+    Task {
+        id: SHRINK_THUMBS,
+        label: "Shrink thumbnails",
+        blurb: "Stores the thumbnails and model views kept as PNG the way Settings → Server → Thumbnails asks, which \
+                usually makes them several times smaller. Ones with transparency, and pixel art, stay PNG.",
     },
     Task {
         id: GC,
@@ -163,6 +170,7 @@ async fn execute(state: &AppState, t: &'static Task, run: i64) -> Result<String>
         SCRUB => scrub(state, &report).await,
         REANALYZE => reanalyze(state, &report).await,
         CLEAR_CACHE => clear_cache(state).await,
+        SHRINK_THUMBS => shrink_thumbs(state, &report).await,
         GC => gc(state).await,
         other => Err(anyhow::anyhow!("no maintenance task {other}")),
     };
@@ -390,6 +398,69 @@ async fn clear_cache(state: &AppState) -> Result<String> {
             plural(usize::try_from(conversions).unwrap_or(usize::MAX), "conversion", "conversions"),
             plural(leftovers, "leftover", "leftovers"),
         )
+    })
+}
+
+/// Re-encode the PNG thumbnails and model views with the current Thumbnails setting, keeping each new one only when
+/// it's clearly smaller.
+async fn shrink_thumbs(state: &AppState, report: &Report) -> Result<String> {
+    // (hash, size, pixel art). A thumbnail shared by several assets is done once.
+    let rows: Vec<(String, i64, bool)> = db::call(&state.pool, |c| {
+        let rows = c
+            .prepare(
+                "SELECT b.hash, b.size, MAX(COALESCE(json_extract(a.meta, '$.\"pixel-art-likely\"'), 0))
+                   FROM blobs b JOIN assets a ON a.thumb_hash = b.hash GROUP BY b.hash
+                 UNION
+                 SELECT b.hash, b.size, 0 FROM blobs b JOIN derivatives d ON d.blob_hash = b.hash
+                  WHERE d.kind = 'views'",
+            )?
+            .query_map([], |r| Ok((r.get(0)?, r.get(1)?, r.get::<_, i64>(2)? != 0)))?
+            .collect::<rusqlite::Result<Vec<_>>>()?;
+        Ok(rows)
+    })
+    .await?;
+    let total = rows.len();
+    let (mut shrunk, mut saved) = (0usize, 0u64);
+    for (i, (old, size, pixel_art)) in rows.into_iter().enumerate() {
+        report.progress(i, total, ("thumbnail", "thumbnails"));
+        if pixel_art {
+            continue;
+        }
+        let Ok(bytes) = state.blobs.read_all(&old).await else { continue };
+        if !bytes.starts_with(b"\x89PNG") {
+            continue;
+        }
+        let smaller = crate::heavy::run("shrink-thumb", move || -> Result<Option<Vec<u8>>> {
+            let img = image::load_from_memory(&bytes)?.to_rgba8();
+            let out = crate::analyze::thumb_bytes(img, false)?;
+            // A PNG made smaller by the stronger compression counts too.
+            // Not worth swapping for less than a tenth.
+            Ok((out.len() * 10 < bytes.len() * 9).then_some(out))
+        })
+        .await;
+        let Ok(Ok(Some(out))) = smaller else { continue };
+        let blob = state.blobs.put_cache_bytes(out).await?;
+        let (o, n, new_size) = (old.clone(), blob.hash.clone(), i64::try_from(blob.size).unwrap_or(i64::MAX));
+        db::call(&state.pool, move |c| {
+            let tx = c.transaction()?;
+            tx.execute(
+                "INSERT INTO blobs (hash, size, created_at) VALUES (?1, ?2, ?3) ON CONFLICT (hash) DO NOTHING",
+                params![n, new_size, db::now()],
+            )?;
+            tx.execute("UPDATE assets SET thumb_hash = ?2 WHERE thumb_hash = ?1", [&o, &n])?;
+            tx.execute("UPDATE derivatives SET blob_hash = ?2 WHERE blob_hash = ?1 AND kind = 'views'", [&o, &n])?;
+            tx.commit()?;
+            Ok(())
+        })
+        .await?;
+        jobs::delete_unused(state, vec![(old, size)]).await?;
+        shrunk += 1;
+        saved += u64::try_from(size - new_size).unwrap_or(0);
+    }
+    report.progress(total, total, ("thumbnail", "thumbnails"));
+    Ok(match shrunk {
+        0 => "Nothing to shrink".to_owned(),
+        n => format!("Shrank {}, saving {}", plural(n, "thumbnail", "thumbnails"), human_bytes(saved)),
     })
 }
 

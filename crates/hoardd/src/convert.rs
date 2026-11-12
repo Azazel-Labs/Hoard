@@ -187,13 +187,13 @@ async fn convert_one(state: &AppState, blender: &Path, t: &Todo) -> Result<()> {
             crate::heavy::run("thumbnail", move || -> Option<Vec<u8>> {
                 let r = analyze::renderer()?;
                 let img = r.lock().unwrap_or_else(std::sync::PoisonError::into_inner).render_slice(&bytes, 256).ok()?;
-                analyze::png_bytes(img).ok()
+                analyze::thumb_bytes(img, false).ok()
             })
             .await?
         };
         let glb_blob = state.blobs.put_bytes(glb, hoard_core::AssetKind::Model).await?;
         let thumb_blob = match thumb {
-            Some(png) => Some(state.blobs.put_cache_bytes(png).await?),
+            Some(bytes) => Some(state.blobs.put_cache_bytes(bytes).await?),
             None => None,
         };
         let id = t.id.clone();

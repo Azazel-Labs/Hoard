@@ -574,8 +574,8 @@ fn upload_all(state: &AppState, rt: &Handle, items: &mut [Item], store_originals
                 let a = &mut it.analysis;
                 // Thumbnails, views and previews go to the cache store; a recovered source file is content.
                 Ok::<_, anyhow::Error>(Previews {
-                    thumb: cached(blobs, a.thumb_png.take()).await?,
-                    views: cached(blobs, a.views_png.take()).await?,
+                    thumb: cached(blobs, a.thumb.take()).await?,
+                    views: cached(blobs, a.views.take()).await?,
                     source: match a.source.take() {
                         Some(s) => Some(blobs.put_bytes(s.bytes, AssetKind::from_ext(s.ext)).await?),
                         None => None,

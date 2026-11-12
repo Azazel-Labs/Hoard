@@ -137,6 +137,7 @@ async fn limit_upload(State(state): State<AppState>, req: Request, next: Next) -
 
 async fn stats(State(state): State<AppState>) -> ApiResult<Json<Stats>> {
     let llm_enabled = state.settings.get().llm_enabled();
+    let conversion_cache_limit = state.settings.get().conversion_cache_bytes();
     let storage = state.blobs.label();
     let s = db::call(&state.pool, move |c| {
         let one = |sql: &str| -> anyhow::Result<u64> { Ok(c.query_row(sql, [], |r| r.get::<_, i64>(0))? as u64) };
@@ -172,6 +173,13 @@ async fn stats(State(state): State<AppState>) -> ApiResult<Json<Stats>> {
             update: crate::updates::available(),
             renderer: crate::analyze::describe_renderer(),
             setup_needed: one("SELECT COUNT(*) FROM locations")? == 0,
+            conversion_cache_bytes: crate::formats::conversion_cache_bytes(c)?,
+            conversion_cache_limit,
+            preview_bytes: one(
+                "SELECT COALESCE(SUM(size), 0) FROM blobs WHERE hash IN (
+                   SELECT thumb_hash FROM assets WHERE thumb_hash IS NOT NULL
+                   UNION SELECT blob_hash FROM derivatives WHERE kind IN ('views', 'preview'))",
+            )?,
         })
     })
     .await?;
@@ -750,7 +758,15 @@ async fn asset_thumb(State(state): State<AppState>, Path(id): Path<String>, head
     let hash = db::call(&state.pool, move |c| db::asset_thumb(c, &id2))
         .await?
         .ok_or_else(|| AppError::not_found(format!("thumbnail for {id}")))?;
-    serve_blob(&state, &hash, &headers, "image/png", None).await
+    // Thumbnails are JPEG or PNG; the first bytes say which. A browser revalidating its copy gets a 304 without them.
+    let revalidating =
+        headers.get(header::IF_NONE_MATCH).is_some_and(|v| v.as_bytes() == format!("\"{hash}\"").as_bytes());
+    let mime = if revalidating {
+        "image/png"
+    } else {
+        crate::analyze::thumb_mime(&state.blobs.head(&hash, 4).await.unwrap_or_default())
+    };
+    serve_blob(&state, &hash, &headers, mime, None).await
 }
 
 async fn blob(State(state): State<AppState>, Path(hash): Path<String>, headers: HeaderMap) -> ApiResult<Response> {
@@ -1661,6 +1677,16 @@ fn settings_json(state: &AppState) -> Value {
             "render": option(now.render, cfg.render, saved.render.is_some()),
             "update_check": option(now.update_check, cfg.update_check, saved.update_check.is_some()),
             "guest_browsing": option(now.guest_browsing, false, saved.guest_browsing.is_some()),
+            "thumb_quality": option(
+                now.thumb_quality,
+                crate::settings::ThumbQuality::default(),
+                saved.thumb_quality.is_some(),
+            ),
+            "conversion_cache_mb": option(
+                now.conversion_cache_mb,
+                crate::settings::DEFAULT_CONVERSION_CACHE_MB,
+                saved.conversion_cache_mb.is_some(),
+            ),
             "public_url": option(
                 now.public_url.as_deref().unwrap_or(""),
                 cfg.public_url.as_deref().unwrap_or(""),
@@ -1767,6 +1793,11 @@ async fn put_settings(State(state): State<AppState>, Json(patch): Json<Value>) -
         crate::ffmpeg::start(&after.ffmpeg, state.cfg.tools_dir());
     }
     crate::analyze::set_render_enabled(after.render, after.llm_vision && after.llm_enabled());
+    crate::analyze::set_thumb_quality(after.thumb_quality);
+    if after.conversion_cache_mb < before.conversion_cache_mb {
+        let st = std::sync::Arc::clone(&state);
+        tokio::spawn(async move { crate::formats::log_trim(&st).await });
+    }
     crate::updates::set_enabled(after.update_check);
     crate::music::configure(after.soundfont.clone());
     if after.workers > before.workers {

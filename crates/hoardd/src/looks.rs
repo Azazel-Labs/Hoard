@@ -572,6 +572,8 @@ pub(crate) fn palette_of(conn: &rusqlite::Connection, thumb_hash: &str) -> Resul
 /// "More like this" keeps at most this many matches, and only those scoring at least the floor.
 const SIMILAR_MAX: usize = 1000;
 const SIMILAR_FLOOR: f32 = 0.55;
+/// How much what a picture shows counts in "more like this", against how it looks, when image search is on.
+const MEANING_WEIGHT: f32 = 0.7;
 /// "Find by colour" keeps assets with at least about this share of the picture near the colour.
 const COLOR_MAX: usize = 3000;
 const COLOR_FLOOR: f32 = 0.08;
@@ -660,11 +662,22 @@ impl Index {
         });
     }
 
-    /// Thumbnails that look like `hash`'s, best first.
-    fn similar(&self, hash: &str) -> Vec<(String, f32)> {
+    /// Thumbnails that look like `hash`'s, best first. With image search's scores (`meaning`, by what the pictures
+    /// show), those count most where a thumbnail has one; colours and grain decide the rest.
+    fn similar(&self, hash: &str, meaning: Option<&HashMap<String, f32>>) -> Vec<(String, f32)> {
         self.read(|m| {
             let Some(target) = m.get(hash) else { return Vec::new() };
-            let scored = m.iter().filter(|(h, _)| h.as_str() != hash).map(|(h, e)| (h, similarity(target, e)));
+            let scored = m.iter().filter(|(h, _)| h.as_str() != hash).map(|(h, e)| {
+                let look = similarity(target, e);
+                let score = match meaning.and_then(|s| s.get(h)) {
+                    // Rescaled so the same floor applies: a close look alone still gets in.
+                    Some(&clip) => {
+                        MEANING_WEIGHT * (SIMILAR_FLOOR + (1.0 - SIMILAR_FLOOR) * clip) + (1.0 - MEANING_WEIGHT) * look
+                    }
+                    None => look,
+                };
+                (h, score)
+            });
             top(scored, SIMILAR_FLOOR, SIMILAR_MAX)
         })
         .unwrap_or_default()
@@ -720,7 +733,19 @@ async fn rank(state: &AppState, q: &SearchQuery) -> Result<Option<db::LookRank>>
     let similar = q.similar.clone().filter(|s| !s.is_empty());
     let color = q.color.as_deref().filter(|c| !c.is_empty()).map(parse_hex);
     if similar.is_none() && color.is_none() {
-        return Ok(None);
+        // Words alone: with image search on, pictures that show them match too, beside names that have them.
+        let text = q.q.as_deref().unwrap_or("").trim();
+        if text.is_empty() {
+            return Ok(None);
+        }
+        let hits = match crate::clip::search_text(state, text).await {
+            Ok(hits) => hits,
+            Err(e) => {
+                tracing::warn!(error = %format!("{e:#}"), "image search failed; searching names only");
+                Vec::new()
+            }
+        };
+        return Ok((!hits.is_empty()).then_some(db::LookRank { scores: hits, exclude: None, blend: true }));
     }
     state.looks.ensure(state).await?;
     let mut scores: Option<Vec<(String, f32)>> = None;
@@ -730,7 +755,13 @@ async fn rank(state: &AppState, q: &SearchQuery) -> Result<Option<db::LookRank>>
             Ok(c.query_row("SELECT thumb_hash FROM assets WHERE id = ?1", [id], |r| r.get(0)).optional()?.flatten())
         })
         .await?;
-        scores = Some(thumb.map(|h| state.looks.similar(&h)).unwrap_or_default());
+        scores = Some(match thumb {
+            Some(h) => {
+                let meaning = crate::clip::similar(state, &h).await;
+                state.looks.similar(&h, meaning.as_ref())
+            }
+            None => Vec::new(),
+        });
     }
     if let Some(color) = color {
         // A colour that doesn't parse matches nothing rather than everything.
@@ -783,6 +814,7 @@ pub(crate) async fn schedule(state: &AppState) {
         Ok(false) => {}
         Err(e) => tracing::warn!(error = ?e, "could not queue the looks job"),
     }
+    crate::clip::schedule(state).await;
 }
 
 /// Thumbnails done per round (read, analyzed, written).

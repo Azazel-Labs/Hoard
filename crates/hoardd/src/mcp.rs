@@ -293,7 +293,7 @@ fn search_tools() -> Value {
         {
             "name": "search_assets",
             "title": "Search assets",
-            "description": "Full-text search over asset names, paths, categories, descriptions and tags, with filters. Returns up to `limit` matches with thumbnails and download URLs.",
+            "description": "Full-text search over asset names, paths, categories, descriptions and tags, with filters. When image search is on (Settings), pictures that show the words match too, so 'mossy rock' finds mossy rocks whatever they're called. Returns up to `limit` matches with thumbnails and download URLs.",
             "inputSchema": {
                 "type": "object",
                 "properties": {
@@ -311,7 +311,7 @@ fn search_tools() -> Value {
         {
             "name": "find_similar",
             "title": "Find assets that look alike",
-            "description": "Assets whose thumbnail looks like this asset's (colours, surface grain, edges, layout), across every pack, most alike first: other rocks for a rock texture, near-copies at other sizes, renders of similar models. Same result shape as search_assets.",
+            "description": "Assets whose thumbnail looks like this asset's (colours, surface grain, edges, layout, and, when image search is on, what it shows), across every pack, most alike first: other rocks for a rock texture, near-copies at other sizes, renders of similar models. Same result shape as search_assets.",
             "inputSchema": {
                 "type": "object",
                 "properties": {

@@ -1787,7 +1787,34 @@ fn tool_setting(value: &str, flag: &str, saved: bool, describe: &str, can_downlo
     })
 }
 
-fn settings_json(state: &AppState) -> Value {
+/// Image search's switch, where its model is (off, downloading, ready…), and how many pictures it has learned.
+async fn clip_json(state: &AppState) -> Value {
+    let saved = state.settings.saved();
+    let describe = crate::clip::describe();
+    let (status, detail) = match describe.as_str() {
+        s @ ("off" | "looking" | "downloading" | "ready") => (s, ""),
+        s => s.strip_prefix("unavailable: ").map_or(("ready", s), |why| ("unavailable", why)),
+    };
+    let (done, total) = db::call(&state.pool, |c| crate::clip::progress(c)).await.unwrap_or((0, 0));
+    json!({
+        "value": state.settings.get().clip,
+        "default": false,
+        "saved": saved.clip.is_some(),
+        "state": status,
+        "detail": detail,
+        "download_bytes": crate::clip::DOWNLOAD_BYTES,
+        "done": done,
+        "total": total,
+    })
+}
+
+async fn settings_json(state: &AppState) -> Value {
+    let mut out = settings_json_sync(state);
+    out["clip"] = clip_json(state).await;
+    out
+}
+
+fn settings_json_sync(state: &AppState) -> Value {
     let cfg = &state.cfg;
     let saved = state.settings.saved();
     let now = state.settings.get();
@@ -1928,7 +1955,7 @@ fn option(value: impl serde::Serialize, default: impl serde::Serialize, saved: b
 }
 
 async fn get_settings(State(state): State<AppState>) -> Json<Value> {
-    Json(settings_json(&state))
+    Json(settings_json(&state).await)
 }
 
 /// Change settings: a JSON object of the ones to change, `null` to go back to the server's flag. Whatever changed
@@ -1955,6 +1982,12 @@ async fn put_settings(State(state): State<AppState>, Json(patch): Json<Value>) -
         tokio::spawn(async move { crate::formats::log_trim(&st).await });
     }
     crate::updates::set_enabled(after.update_check);
+    if before.clip != after.clip {
+        crate::clip::start(&state, after.clip);
+        if !after.clip {
+            crate::clip::remove_files(&state).await;
+        }
+    }
     if after.store_lookup && !before.store_lookup {
         crate::store_lookup::start(&state).await;
     }
@@ -1969,7 +2002,7 @@ async fn put_settings(State(state): State<AppState>, Json(patch): Json<Value>) -
         llm = after.llm_label(),
         "settings changed"
     );
-    Ok(Json(settings_json(&state)))
+    Ok(Json(settings_json(&state).await))
 }
 
 #[cfg(test)]

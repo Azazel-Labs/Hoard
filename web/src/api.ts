@@ -560,6 +560,21 @@ export interface Settings {
     soundfont: OptionSetting<string>
   }
   max_workers: number
+  clip: ImageSearchSetting
+}
+
+/** Image search (CLIP): its switch, its model, and how many pictures it has learned. */
+export interface ImageSearchSetting {
+  value: boolean
+  default: boolean
+  saved: boolean
+  state: 'off' | 'looking' | 'downloading' | 'ready' | 'unavailable'
+  /** Why, when unavailable. */
+  detail: string
+  download_bytes: number
+  /** Pictures with an embedding, of all that could have one. */
+  done: number
+  total: number
 }
 
 /** How thumbnails are stored: JPEG at three qualities, or PNG. Transparent ones and pixel art are always PNG. */
@@ -587,6 +602,7 @@ export interface SettingsPatch {
   conversion_cache_mb?: number | null
   public_url?: string | null
   soundfont?: string | null
+  clip?: boolean | null
 }
 
 export interface SearchParams {

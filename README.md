@@ -545,7 +545,7 @@ collection = "Forest level"
 dest = "levels/forest"
 ```
 
-## Search by colour, and More like this
+## Search by colour, by what pictures show, and More like this
 
 Hoard looks at the thumbnail of every texture, model, material, animation, video and sprite, and works out its main
 colours and what its surface looks like. A background job does this for new packs and, once, for everything already
@@ -564,8 +564,26 @@ in the library. Activity shows it as "Working out colours and looks".
 What counts as alike is the colours (a colour histogram), the grain and edges of the surface (edge directions,
 contrast and local binary patterns, measured in a way that ignores which way a texture is turned), and a perceptual
 hash that catches near-copies. It is all computed on the server from the thumbnail, needs no model download and works
-offline. Nothing in it knows what a picture shows. Two brown, rough textures can count as alike even when one is bark
-and the other is rock. Fonts, audio, documents and shaders take no part.
+offline. On its own, nothing in it knows what a picture shows. Two brown, rough textures can count as alike even when
+one is bark and the other is rock. Fonts, audio, documents and shaders take no part.
+
+### Image search
+
+Settings → Image search adds a model that does know what pictures show (OpenAI's CLIP, ViT-B/32). It's off until an
+admin turns it on, because the model is a 605 MB download (from Hugging Face, pinned to one revision and checked
+against its SHA-256, into the cache folder's `models`). It runs on the server's processor, and nothing leaves the
+server. A background job, "Learning what pictures show", then works through every thumbnail at low priority, at
+roughly 5–10 pictures a second, and keeps up with new packs. Settings shows how far it has got.
+
+- **Words.** The main search box finds pictures that show what you typed ("mossy rock", "brick wall", "ceiling
+  lamp") beside the assets whose names, tags or descriptions have the words. A name match still ranks above a weak
+  picture match. Words with nothing to show return only the name matches.
+- **More like this** weighs what the pictures show above their colours and grain, so a barrel brings up barrels
+  rather than anything brown.
+
+The model takes 300–600 MB of memory while it works: the picture half during the job, the words half from the first
+search until 15 minutes after the last. Turning image search off deletes the model and keeps what it learned, so
+turning it back on only downloads the model again.
 
 ## Credits
 

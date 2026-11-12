@@ -237,6 +237,9 @@ impl Config {
     pub(crate) fn tmp_dir(&self) -> PathBuf {
         self.cache_root().join("tmp")
     }
+    pub(crate) fn models_dir(&self) -> PathBuf {
+        self.cache_root().join("models")
+    }
     pub(crate) fn tools_dir(&self) -> PathBuf {
         self.cache_root().join("tools")
     }

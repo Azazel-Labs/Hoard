@@ -169,6 +169,12 @@ const MIGRATIONS: &[&str] = &[
      ALTER TABLE pack_context ADD COLUMN store_auto TEXT;
      ALTER TABLE pack_context ADD COLUMN store_matches TEXT;
      ALTER TABLE pack_context ADD COLUMN store_lookup_at TEXT;",
+    // 24: image search: each thumbnail's CLIP embedding (512 signed bytes; empty when it isn't a readable picture).
+    "CREATE TABLE embeddings (
+       thumb_hash TEXT PRIMARY KEY,
+       model      TEXT NOT NULL,
+       vector     BLOB NOT NULL
+     ) WITHOUT ROWID;",
 ];
 
 /// How many automatic pre-upgrade backups to keep in `<data dir>/backups`.
@@ -1368,7 +1374,7 @@ pub(crate) fn search_ranked(
         Some("new") => "a.created_at DESC, a.path ASC",
         // A word match counts about as much as a fairly close look.
         _ if look.is_some_and(|l| l.blend) && f.ranked => {
-            "(CASE WHEN f.asset_id IS NULL THEN 0.0 ELSE 0.25 END + COALESCE(lr.score, 0.0)) DESC, a.id"
+            "(CASE WHEN f.asset_id IS NULL THEN 0.0 ELSE 0.25 END + COALESCE(lr.score, 0.0)) DESC, f.rank IS NULL, f.rank, a.id"
         }
         _ if look.is_some() => "lr.score DESC, a.id",
         _ if f.ranked => "f.rank ASC",

@@ -16,6 +16,7 @@ import {
   type SettingsPatch,
   type Stats,
   type ThumbQuality,
+  type ImageSearchSetting,
   type ToolSetting,
   type UnrealConvert,
   humanBytes,
@@ -54,6 +55,7 @@ const PAGES = [
   { id: 'locations', label: 'Library locations', blurb: 'The folders on the server that hold the library: ones Hoard keeps files in, and folders of packs it indexes where they are.' },
   { id: 'tools', label: 'Tools', blurb: 'Outside programs Hoard uses to convert and read files.' },
   { id: 'ai', label: 'AI tagging', blurb: 'An AI model names, describes and tags new packs, on top of the built-in rules. Its tags are marked as suggested.' },
+  { id: 'search', label: 'Image search', blurb: 'Search pictures by what they show, not only by their names, and find things that are alike in kind, not only in colour.' },
   { id: 'unreal', label: 'Unreal packages', blurb: 'What to do with .uasset files when a pack is added.' },
   { id: 'account', label: 'Account', blurb: 'Your password, the other people who can sign in, and access tokens for scripts and other programs.' },
   { id: 'https', label: 'HTTPS', blurb: 'Serve the portal over https://, with a certificate Hoard makes or one you have. Some browser features only work over HTTPS.' },
@@ -580,6 +582,8 @@ async function save(patch: SettingsPatch, done?: string) {
   }
 }
 
+const toggleClip = (on: boolean) => save({ clip: on }, on ? 'Image search: on' : 'Image search: off')
+
 function pick(k: ToolKey, m: Mode) {
   chosen[k] = m
   if (m === 'off') void save({ [k]: 'off' })
@@ -635,12 +639,14 @@ let timer: number | undefined
 function schedulePoll() {
   window.clearTimeout(timer)
   const v = s.value
-  if (v && [v.blender, v.ffmpeg].some((t) => t.state === 'looking' || t.state === 'downloading')) {
+  const busyTool = v && [v.blender, v.ffmpeg, v.clip].some((t) => t.state === 'looking' || t.state === 'downloading')
+  const learning = v?.clip.state === 'ready' && v.clip.done < v.clip.total
+  if (busyTool || learning) {
     timer = window.setTimeout(async () => {
       try {
         const next = await api.settings()
         // Don't clobber a path or AI setting someone is typing.
-        if (s.value) s.value = { ...s.value, blender: next.blender, ffmpeg: next.ffmpeg }
+        if (s.value) s.value = { ...s.value, blender: next.blender, ffmpeg: next.ffmpeg, clip: next.clip }
       } catch {
         // Try again on the next tick.
       }
@@ -663,6 +669,19 @@ const TOOLS: { key: ToolKey; title: string; what: string; download: string }[] =
     download: 'Uses a system ffmpeg with the right encoders, or downloads a static build (about 80 MB).',
   },
 ]
+
+function clipStatus(c: ImageSearchSetting): string {
+  switch (c.state) {
+    case 'off': return 'Off'
+    case 'looking': return 'Looking for the model…'
+    case 'downloading': return 'Downloading the model… progress is in the activity indicator'
+    case 'ready':
+      if (!c.total) return 'Ready. Pictures are learned as packs are added.'
+      if (c.done >= c.total) return `Ready: knows all ${c.total.toLocaleString()} pictures`
+      return `Ready: learning pictures, ${c.done.toLocaleString()} of ${c.total.toLocaleString()} so far`
+    case 'unavailable': return `Couldn’t get the model: ${c.detail}. Trying again every hour.`
+  }
+}
 
 function statusText(t: ToolSetting): string {
   switch (t.state) {
@@ -843,6 +862,42 @@ onBeforeUnmount(() => {
               </p>
             </section>
           </template>
+
+          <section v-else-if="current === 'search'">
+            <div class="sh">
+              <h3>Search by what pictures show</h3>
+              <ResetButton v-if="s.clip.saved" :to="onOff(s.clip.default)" :disabled="busy" @reset="save({ clip: null }, 'Image search: back to the default')" />
+            </div>
+            <p class="what">
+              Type what you’re after (“mossy rock”, “sci-fi door”, “wooden barrel”) and pictures that show it turn up beside
+              names that have the words. “More like this” finds things of the same kind, not only the same colours.
+            </p>
+            <div class="switches">
+              <div class="opt-row">
+                <label class="check">
+                  <input
+                    type="checkbox"
+                    data-testid="clip-toggle"
+                    :checked="s.clip.value"
+                    :disabled="busy"
+                    @change="toggleClip(($event.target as HTMLInputElement).checked)"
+                  />
+                  Turn on image search
+                </label>
+              </div>
+            </div>
+            <p class="hint">
+              Uses OpenAI’s CLIP model, run on this server’s processor: nothing leaves it. Turning it on downloads the model
+              ({{ Math.round(s.clip.download_bytes / 1e6) }} MB) from Hugging Face, then learns every picture in the background
+              at low priority. It takes 300 to 600 MB of memory while it works or someone searches. Turning it off deletes
+              the model and keeps what it learned, for next time.
+            </p>
+            <p class="status" :data-state="s.clip.state" role="status" data-testid="clip-status">
+              <span class="dot" aria-hidden="true" />
+              <span class="text">{{ clipStatus(s.clip) }}</span>
+            </p>
+            <progress v-if="s.clip.state === 'ready' && s.clip.total && s.clip.done < s.clip.total" class="learn" :value="s.clip.done" :max="s.clip.total" />
+          </section>
 
           <section v-else-if="current === 'ai'">
             <div class="sh">
@@ -1327,6 +1382,7 @@ h3 { margin: 0; font-size: 0.7rem; font-weight: 650; letter-spacing: 0.04em; tex
 .mlist small { color: var(--muted); font-size: inherit; overflow-wrap: anywhere; }
 .mlist .status { margin: 0.1rem 0 0; }
 .mlist progress { width: 100%; height: 0.35rem; accent-color: var(--accent); }
+progress.learn { display: block; width: 100%; max-width: 28rem; height: 0.35rem; accent-color: var(--accent); }
 .mlist .acts { display: flex; gap: 0.4rem; flex: none; }
 @media (max-width: 30rem) { .mlist li { flex-direction: column; align-items: stretch; } }
 .switches { display: grid; gap: 0.35rem; margin-bottom: 0.8rem; font-size: var(--step--1); }

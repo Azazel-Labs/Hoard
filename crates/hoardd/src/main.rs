@@ -9,6 +9,7 @@ mod blender;
 mod blobs;
 mod bundle;
 mod chatgpt;
+mod clip;
 mod config;
 mod context;
 mod convert;
@@ -84,6 +85,8 @@ pub(crate) struct Inner {
     pub(crate) settings: settings::Store,
     /// Every thumbnail's look, for "find by colour" and "more like this".
     pub(crate) looks: looks::Index,
+    /// Every thumbnail's CLIP embedding, for image search.
+    pub(crate) clip: clip::Index,
 }
 
 pub(crate) type AppState = Arc<Inner>;
@@ -151,6 +154,7 @@ async fn main() -> Result<()> {
         http,
         settings,
         looks: looks::Index::default(),
+        clip: clip::Index::default(),
     });
     match uploads::sweep_stale(&state) {
         Ok(0) => {}
@@ -158,6 +162,7 @@ async fn main() -> Result<()> {
         Err(e) => tracing::warn!(error = %e, "could not sweep old upload sessions"),
     }
     ffmpeg::start(&effective.ffmpeg, state.cfg.tools_dir());
+    clip::start(&state, effective.clip);
     convert::start_blender(&state, false);
     updates::start(effective.update_check);
     updates::start_auto_update(&state);

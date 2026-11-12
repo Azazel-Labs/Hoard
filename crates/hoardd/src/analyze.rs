@@ -125,23 +125,30 @@ pub(crate) fn thumb_mime(bytes: &[u8]) -> &'static str {
 fn render_model_thumb(path: &Path) -> (Option<Vec<u8>>, Option<Vec<u8>>) {
     let Some(r) = renderer() else { return (None, None) };
     let guard = r.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
-    match guard.render_file(path, THUMB_SIZE) {
-        Ok(img) => {
-            let views = VIEWS_ENABLED
-                .load(Ordering::Relaxed)
-                .then(|| guard.render_views_file(path, THUMB_SIZE).ok().and_then(|v| thumb_bytes(v, false).ok()))
-                .flatten();
-            (thumb_bytes(img, false).ok(), views)
-        }
-        Err(e) => {
+    // wgpu panics on what it finds invalid; that costs this model its thumbnail, not the whole pack its ingest.
+    let drawn = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
+        let img = guard.render_file(path, THUMB_SIZE)?;
+        let views = VIEWS_ENABLED
+            .load(Ordering::Relaxed)
+            .then(|| guard.render_views_file(path, THUMB_SIZE).ok().and_then(|v| thumb_bytes(v, false).ok()))
+            .flatten();
+        anyhow::Ok((thumb_bytes(img, false).ok(), views))
+    }));
+    match drawn {
+        Ok(Ok(out)) => out,
+        Ok(Err(e)) => {
             tracing::debug!(path = %path.display(), error = %format!("{e:#}"), "no model thumbnail");
+            (None, None)
+        }
+        Err(_) => {
+            tracing::warn!(path = %path.display(), "the renderer failed on this model; it has no thumbnail");
             (None, None)
         }
     }
 }
 
 /// Don't try to decode images bigger than this on disk (thumbnails of 30k² PSD exports aren't worth it).
-const MAX_IMAGE_DECODE_BYTES: u64 = 256 << 20;
+pub(crate) const MAX_IMAGE_DECODE_BYTES: u64 = 256 << 20;
 const THUMB_SIZE: u32 = 256;
 
 #[derive(Debug, Default)]
@@ -162,6 +169,9 @@ pub(crate) struct Analysis {
     /// A playable MP3 rendering of audio browsers can't play (MIDI, tracker modules), stored as the `preview`
     /// derivative.
     pub(crate) preview_mp3: Option<Vec<u8>>,
+    /// A light preview of an image too big or too foreign for browsers to show as it is, stored as the `lite`
+    /// derivative.
+    pub(crate) lite: Option<Vec<u8>>,
 }
 
 /// Overall level of decoded audio.
@@ -189,7 +199,8 @@ pub(crate) fn detect_kind(path: &Path, ext: &str) -> AssetKind {
     }
 }
 
-pub(crate) fn analyze(path: &Path, kind: AssetKind, ext: &str) -> Analysis {
+/// `root` is the folder laid out like the pack that holds `path`, where a model's textures are looked for.
+pub(crate) fn analyze(path: &Path, root: &Path, kind: AssetKind, ext: &str) -> Analysis {
     let mut a = Analysis::default();
     let result = match kind {
         _ if matches!(ext, "uasset" | "umap") => analyze_unreal(path, ext, &mut a),
@@ -198,7 +209,7 @@ pub(crate) fn analyze(path: &Path, kind: AssetKind, ext: &str) -> Analysis {
         AssetKind::Texture if matches!(ext, "kra" | "ora") => analyze_layered_zip(path, &mut a),
         AssetKind::Model if ext == "blend" => analyze_blend(path, &mut a),
         AssetKind::Texture if crate::textures::EXTS.contains(&ext) => analyze_decoded(path, ext, &mut a),
-        AssetKind::Texture => analyze_image(path, &mut a),
+        AssetKind::Texture => analyze_image(path, ext, &mut a),
         AssetKind::Audio if crate::music::EXTS.contains(&ext) => analyze_music(path, ext, &mut a),
         AssetKind::Audio => analyze_sound(path, ext, &mut a),
         AssetKind::Font if crate::fonts::EXTS.contains(&ext) => crate::fonts::analyze(path, ext, THUMB_SIZE).map(|f| {
@@ -206,16 +217,17 @@ pub(crate) fn analyze(path: &Path, kind: AssetKind, ext: &str) -> Analysis {
             a.title = f.title;
             a.thumb = f.thumb.and_then(|t| thumb_bytes(t, false).ok());
         }),
-        AssetKind::Model if matches!(ext, "stl" | "ply" | "vox") => analyze_mesh(path, ext, &mut a),
+        AssetKind::Model if matches!(ext, "stl" | "ply" | "vox") => analyze_mesh(path, root, ext, &mut a),
         AssetKind::Model | AssetKind::Animation => analyze_model(path, ext, &mut a.meta).map(|()| {
             // Animation-only glTF clips have no meshes to draw.
             let has_mesh = a.meta.get("meshes").and_then(Value::as_u64).is_none_or(|n| n > 0);
-            if matches!(ext, "gltf" | "glb" | "obj") && has_mesh {
+            if matches!(ext, "gltf" | "glb") && has_mesh {
                 (a.thumb, a.views) = render_model_thumb(path);
-            } else if ext == "fbx" {
-                // Hoard reads binary FBX itself: render a thumbnail from the GLB it makes.
-                if let Err(e) = mesh_thumb(path, ext, &mut a) {
-                    tracing::debug!(path = %path.display(), error = %format!("{e:#}"), "no FBX thumbnail");
+            } else if matches!(ext, "obj" | "fbx") {
+                // Hoard reads OBJ (with its MTL) and binary FBX itself, finding their textures in the pack: render
+                // a thumbnail from the GLB it makes.
+                if let Err(e) = mesh_thumb(path, root, ext, &mut a) {
+                    tracing::debug!(path = %path.display(), error = %format!("{e:#}"), "no model thumbnail");
                 }
             }
         }),
@@ -230,7 +242,7 @@ pub(crate) fn analyze(path: &Path, kind: AssetKind, ext: &str) -> Analysis {
 // ---------------------------------------------------------------------------------------------
 // Images
 
-fn analyze_image(path: &Path, a: &mut Analysis) -> anyhow::Result<()> {
+fn analyze_image(path: &Path, ext: &str, a: &mut Analysis) -> anyhow::Result<()> {
     let size = std::fs::metadata(path)?.len();
     let reader = ImageReader::open(path)?.with_guessed_format()?;
     if size > MAX_IMAGE_DECODE_BYTES {
@@ -244,6 +256,9 @@ fn analyze_image(path: &Path, a: &mut Analysis) -> anyhow::Result<()> {
     a.meta.insert("width".into(), json!(w));
     a.meta.insert("height".into(), json!(h));
     a.meta.insert("color_type".into(), json!(format!("{:?}", img.color())));
+    if crate::previews::wants_lite(ext, w, h) {
+        a.lite = crate::previews::lite_bytes(&img).ok();
+    }
     let img = if is_float(&img) {
         a.meta.insert("hdr".into(), json!(true));
         tonemap(&img.thumbnail(1024, 1024))
@@ -338,16 +353,16 @@ fn preview_mp3(wav: &Path, audio: &crate::audio::Audio, secs: f64) -> anyhow::Re
 }
 
 /// STL, PLY and `MagicaVoxel`: facts, and a thumbnail rendered from a GLB made on the spot.
-fn analyze_mesh(path: &Path, ext: &str, a: &mut Analysis) -> anyhow::Result<()> {
-    let (mesh, facts) = crate::meshes::load(path, ext, path.parent().unwrap_or(path))?;
+fn analyze_mesh(path: &Path, root: &Path, ext: &str, a: &mut Analysis) -> anyhow::Result<()> {
+    let (mesh, facts) = crate::meshes::load(path, ext, root)?;
     a.meta.extend(facts);
     let Some(mesh) = mesh else { return Ok(()) };
     render_mesh(&mesh, path, ext, a)
 }
 
-/// Thumbnail for a model Hoard converts itself (FBX), keeping the facts the stats pass found.
-fn mesh_thumb(path: &Path, ext: &str, a: &mut Analysis) -> anyhow::Result<()> {
-    let (mesh, _) = crate::meshes::load(path, ext, path.parent().unwrap_or(path))?;
+/// Thumbnail for a model Hoard converts itself (OBJ, FBX), keeping the facts the stats pass found.
+fn mesh_thumb(path: &Path, root: &Path, ext: &str, a: &mut Analysis) -> anyhow::Result<()> {
+    let (mesh, _) = crate::meshes::load(path, ext, root)?;
     match mesh {
         Some(m) => render_mesh(&m, path, ext, a),
         None => Ok(()),
@@ -377,6 +392,9 @@ fn analyze_decoded(path: &Path, ext: &str, a: &mut Analysis) -> anyhow::Result<(
         if !k.starts_with("svg_") {
             a.meta.insert(k, v);
         }
+    }
+    if !vector && crate::previews::wants_lite(ext, d.image.width(), d.image.height()) {
+        a.lite = crate::previews::lite_bytes(&d.image).ok();
     }
     let img = if is_float(&d.image) {
         a.meta.insert("hdr".into(), json!(true));
@@ -749,7 +767,7 @@ fn analyze_unreal(path: &Path, ext: &str, a: &mut Analysis) -> anyhow::Result<()
             let tmp = tempfile::Builder::new().suffix(&format!(".{}", src.ext)).tempfile()?;
             std::fs::write(tmp.path(), &src.bytes)?;
             let kind = if src.ext == "wav" { AssetKind::Audio } else { AssetKind::Texture };
-            let inner = analyze(tmp.path(), kind, src.ext);
+            let inner = analyze(tmp.path(), tmp.path().parent().unwrap_or(tmp.path()), kind, src.ext);
             // Measured facts from the real file win over registry guesses; so does its thumbnail.
             for (k, v) in inner.meta {
                 a.meta.insert(k, v);
@@ -1277,7 +1295,7 @@ mod tests {
         std::fs::create_dir_all(&dir).unwrap();
         let p = dir.join("sky.exr");
         DynamicImage::ImageRgb32F(img).save(&p).unwrap();
-        let a = analyze(&p, AssetKind::Texture, "exr");
+        let a = analyze(&p, &dir, AssetKind::Texture, "exr");
         assert_eq!(a.meta.get("hdr"), Some(&json!(true)));
         assert_eq!(a.meta.get("width"), Some(&json!(64)));
         let thumb = image::load_from_memory(&a.thumb.expect("thumbnail")).unwrap().to_rgba8();

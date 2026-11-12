@@ -6,7 +6,7 @@ import * as THREE from 'three/webgpu'
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js'
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js'
 import { TGALoader } from 'three/addons/loaders/TGALoader.js'
-import { api, asUrl, packFileUrl, thumbUrl, type Asset, type AssetLink } from './api'
+import { api, asUrl, liteUrl, packFileUrl, thumbUrl, type Asset, type AssetLink } from './api'
 import { applyToModel } from './materialMaps'
 
 export type Background = 'checker' | 'dark' | 'grey' | 'light' | 'env'
@@ -22,6 +22,12 @@ export interface StageInfo {
   missing: string[]
   /** Textures picked by name ("Barrel_Albedo.png" for "Barrel.fbx") for a model that names none. */
   guessed: number
+}
+
+export interface StageOptions {
+  /** Textures as their files are, however big. Otherwise each comes as its light preview (at most 2048 px, see
+   *  `liteUrl`), which loads far faster and looks the same at viewer sizes. */
+  fullTextures?: boolean
 }
 
 type Loaded = {
@@ -45,10 +51,12 @@ const extOf = (p: string) => p.split(/[\\/]/).pop()!.split('.').pop()!.toLowerCa
 const nameOf = (p: string) => p.split(/[\\/]/).pop()!.toLowerCase()
 const stemOf = (p: string) => nameOf(p).replace(/\.[^.]+$/, '')
 
-/** Where a texture's pixels come from: the file itself when the browser can read it, else a PNG the server makes
- *  (cached after the first time), else the 256 px thumbnail. */
-function textureUrl(t: AssetLink, packId: string): string {
+/** Where a texture's pixels come from. Light: its light preview, which the browser always reads. Full: the file
+ *  itself when the browser can read it, else a PNG the server makes (cached after the first time). Anything else:
+ *  the 256 px thumbnail. */
+function textureUrl(t: AssetLink, packId: string, full = true): string {
   const ext = extOf(t.path)
+  if (!full && IMAGE_EXTS.has(ext)) return liteUrl(t)
   if (BROWSER_IMAGES.has(ext) || ext === 'tga') return packFileUrl(packId, t.path)
   if (SERVER_IMAGES.has(ext)) return `${asUrl(t, 'png', 2048)}&download=0&wait=60`
   return thumbUrl(t)
@@ -217,8 +225,33 @@ function roleOf(name: string): MapSlot | 'skip' | null {
   return null
 }
 
+/** The loader for files asked for as `.tga`. Loaders pick it by the name they ask for, before the URL is
+ *  rewritten; the rewritten URL may be a light preview (JPEG or WebP) rather than a TGA, which the image loader reads. */
+class TgaOrImageLoader extends THREE.Loader<THREE.Texture> {
+  private tga: TGALoader
+  private image: THREE.TextureLoader
+  constructor(manager: THREE.LoadingManager) {
+    super(manager)
+    this.tga = new TGALoader(manager)
+    this.image = new THREE.TextureLoader(manager)
+  }
+  load(url: string, onLoad?: (t: THREE.Texture) => void, onProgress?: (e: ProgressEvent) => void, onError?: (e: unknown) => void) {
+    // A rewritten URL comes through the modifier unchanged a second time, so the inner loader may resolve it again.
+    const resolved = this.manager.resolveURL((this.path || '') + url)
+    const loader = extOf(resolved.split(/[?#]/)[0]) === 'tga' ? this.tga : this.image
+    loader.setPath('')
+    return loader.load(resolved, onLoad, onProgress, onError)
+  }
+}
+
 export class ModelStage {
   readonly host: HTMLElement
+  /** See `StageOptions.fullTextures`. */
+  readonly fullTextures: boolean
+  /** Files the loaders are still fetching; textures go on loading after the model is up. */
+  private pending = 0
+  private loaded = false
+  private settledWaiters: (() => void)[] = []
   private renderer: THREE.WebGPURenderer | null = null
   private scene = new THREE.Scene()
   private camera = new THREE.PerspectiveCamera(35, 1, 0.01, 1000)
@@ -246,8 +279,25 @@ export class ModelStage {
   /** Textures go on loading after the model is up; this hears about the ones that fail. */
   onMissing: ((names: string[]) => void) | null = null
 
-  constructor(host: HTMLElement) {
+  constructor(host: HTMLElement, options: StageOptions = {}) {
     this.host = host
+    this.fullTextures = !!options.fullTextures
+  }
+
+  /** Resolves once the model is up and every texture it asked for has loaded or failed. */
+  texturesSettled(): Promise<void> {
+    if (this.loaded && !this.pending) return Promise.resolve()
+    return new Promise((resolve) => this.settledWaiters.push(resolve))
+  }
+
+  private checkSettled() {
+    if (!this.loaded || this.pending) return
+    for (const w of this.settledWaiters.splice(0)) w()
+  }
+
+  /** Image files the model asked for that couldn't be found or loaded, so far. */
+  get missingTextures(): string[] {
+    return [...this.missing]
   }
 
   /** Set up the renderer and load the asset. Resolves once the first frame can draw. */
@@ -317,8 +367,13 @@ export class ModelStage {
       const inPack = path.startsWith(packFiles) ? path.slice(packFiles.length).replace(/\\/g, '/') : ''
       const hit = byPath.get(inPack.toLowerCase()) ?? byName.get(nameOf(path)) ?? byStem.get(stemOf(path))
       // The loader was picked by the extension asked for: a TGA standing in for a PNG goes through the server.
-      const tgaForOther = hit && extOf(hit.path) === 'tga' && extOf(path) !== 'tga'
-      const out = !hit ? url : tgaForOther ? `${asUrl(hit, 'png', 2048)}&download=0&wait=60` : textureUrl(hit, asset.pack_id)
+      // (Light previews are never TGA.)
+      const tgaForOther = this.fullTextures && hit && extOf(hit.path) === 'tga' && extOf(path) !== 'tga'
+      const out = !hit
+        ? url
+        : tgaForOther
+          ? `${asUrl(hit, 'png', 2048)}&download=0&wait=60`
+          : textureUrl(hit, asset.pack_id, this.fullTextures)
       askedAs.set(out, path.split(/[\\/]/).pop()!)
       return out
     })
@@ -329,7 +384,18 @@ export class ModelStage {
         this.onMissing?.([...this.missing])
       }
     }
-    manager.addHandler(/\.tga$/i, new TGALoader(manager))
+    manager.addHandler(/\.tga$/i, new TgaOrImageLoader(manager))
+    const itemStart = manager.itemStart.bind(manager)
+    const itemEnd = manager.itemEnd.bind(manager)
+    manager.itemStart = (url) => {
+      this.pending++
+      itemStart(url)
+    }
+    manager.itemEnd = (url) => {
+      itemEnd(url)
+      this.pending = Math.max(0, this.pending - 1)
+      this.checkSettled()
+    }
 
     const src = sourceFor(full, full.pack_id, full.derivatives)
     const { object, animations, linearColors } = await loadModel(src.url, src.ext, manager)
@@ -406,6 +472,8 @@ export class ModelStage {
     this.resizeObs.observe(el)
     this.resize()
     this.start()
+    this.loaded = true
+    this.checkSettled()
 
     return {
       triangles: Math.round(triangles),
@@ -441,8 +509,8 @@ export class ModelStage {
     const tga = new TGALoader(manager)
     const textures = new Map<MapSlot, THREE.Texture>()
     for (const [role, link] of roles) {
-      const url = textureUrl(link, packId)
-      const t: THREE.Texture = extOf(link.path) === 'tga' ? tga.load(url) : image.load(url)
+      const url = textureUrl(link, packId, this.fullTextures)
+      const t: THREE.Texture = this.fullTextures && extOf(link.path) === 'tga' ? tga.load(url) : image.load(url)
       // TGA comes back as pixel data the loader has already turned the right way up.
       if (!(t as THREE.DataTexture).isDataTexture) t.flipY = flipY
       if (role === 'map' || role === 'emissiveMap') t.colorSpace = THREE.SRGBColorSpace
@@ -605,6 +673,66 @@ export class ModelStage {
     return this.texturesOn
   }
 
+  /** The model as its thumbnail: a square PNG taken from the angle the server draws thumbnails from (`camera` in
+   *  hoard-render), framed as tightly, lit by the studio room and the key light, on a clear background, with textures
+   *  on, wireframe and grid off. The view on screen is put back afterwards. */
+  async snapshot(size = 256): Promise<Blob> {
+    const renderer = this.renderer
+    const object = this.object
+    if (!renderer || !object) throw new Error('no model loaded')
+    const view = snapshotView(object, new THREE.Vector3(0.75, 0.55, 1))
+    const cam = this.camera
+    const saved = {
+      position: cam.position.clone(), up: cam.up.clone(), quaternion: cam.quaternion.clone(),
+      fov: cam.fov, aspect: cam.aspect, near: cam.near, far: cam.far,
+      size: renderer.getSize(new THREE.Vector2()), ratio: renderer.getPixelRatio(),
+      background: this.scene.background, grid: this.grid?.visible ?? false, env: this.envOn, textures: this.texturesOn,
+      wireframe: [...this.materials.keys()].some((m) => m.wireframe),
+    }
+    if (!this.envOn) this.setEnvironment(true)
+    if (!this.texturesOn) this.setTextures(true)
+    if (saved.wireframe) this.setWireframe(false)
+    this.scene.background = null
+    if (this.grid) this.grid.visible = false
+    cam.up.copy(view.up)
+    cam.position.copy(view.eye)
+    cam.lookAt(view.target)
+    cam.fov = 35
+    cam.aspect = 1
+    cam.near = view.near
+    cam.far = view.far
+    cam.updateProjectionMatrix()
+    // Drawn at twice the size and scaled down, for smooth edges. Everything from here to the copy happens in one go:
+    // the canvas shows only what's drawn last, and the picture is read before the browser puts it on screen.
+    const out = document.createElement('canvas')
+    out.width = out.height = size
+    try {
+      renderer.setPixelRatio(1)
+      renderer.setSize(size * 2, size * 2, false)
+      renderer.render(this.scene, cam)
+      const ctx = out.getContext('2d')!
+      ctx.imageSmoothingQuality = 'high'
+      ctx.drawImage(renderer.domElement, 0, 0, size, size)
+    } finally {
+      cam.position.copy(saved.position)
+      cam.up.copy(saved.up)
+      cam.quaternion.copy(saved.quaternion)
+      Object.assign(cam, { fov: saved.fov, aspect: saved.aspect, near: saved.near, far: saved.far })
+      cam.updateProjectionMatrix()
+      renderer.setPixelRatio(saved.ratio)
+      renderer.setSize(saved.size.x, saved.size.y, false)
+      this.scene.background = saved.background
+      if (this.grid) this.grid.visible = saved.grid
+      if (!saved.env) this.setEnvironment(false)
+      if (!saved.textures) this.setTextures(false)
+      if (saved.wireframe) this.setWireframe(true)
+      this.renderOnce()
+    }
+    return new Promise((resolve, reject) =>
+      out.toBlob((b) => (b ? resolve(b) : reject(new Error("the picture couldn't be made"))), 'image/png'),
+    )
+  }
+
   private start() {
     if (!this.renderer || this.paused || this.disposed) return
     this.timer.reset()
@@ -656,6 +784,64 @@ export class ModelStage {
       this.renderer.dispose()
       this.renderer = null
     }
+  }
+}
+
+/** Where the thumbnail camera stands: looking from `dir`, close enough that the model's silhouette from there fills
+ *  90% of the frame. The same sums as `camera` in hoard-render, so a browser's thumbnail and the server's match. */
+function snapshotView(object: THREE.Object3D, dir: THREE.Vector3) {
+  const FILL = 0.9
+  const fov = (35 * Math.PI) / 180
+  dir = dir.clone().normalize()
+  object.updateWorldMatrix(true, true)
+  const box = new THREE.Box3().setFromObject(object, true)
+  const center = box.getCenter(new THREE.Vector3())
+  const radius = Math.max(box.getSize(new THREE.Vector3()).length() / 2, 1e-6)
+  const up0 = Math.abs(dir.y) > 0.95 ? new THREE.Vector3(0, 0, -1) : new THREE.Vector3(0, 1, 0)
+  const right = up0.clone().cross(dir).normalize()
+  const up = dir.clone().cross(right)
+  // Every vertex where it stands now (skinned and morphed), about the box centre, in the camera's axes. Big meshes
+  // are sampled: the frame's margin covers what a sample misses.
+  const local: number[] = []
+  const v = new THREE.Vector3()
+  let total = 0
+  object.traverse((o) => {
+    const g = (o as THREE.Mesh).geometry
+    if ((o as THREE.Mesh).isMesh && g?.attributes.position) total += g.attributes.position.count
+  })
+  const step = Math.max(1, Math.ceil(total / 200_000))
+  object.traverse((o) => {
+    const mesh = o as THREE.Mesh
+    const pos = mesh.isMesh ? mesh.geometry?.attributes.position : undefined
+    if (!pos) return
+    for (let i = 0; i < pos.count; i += step) {
+      mesh.getVertexPosition(i, v).applyMatrix4(mesh.matrixWorld).sub(center)
+      local.push(v.dot(right), v.dot(up), v.dot(dir))
+    }
+  })
+  if (!local.length) local.push(0, 0, 0)
+  let [lx, ly, lz, hx, hy, hz] = [Infinity, Infinity, Infinity, -Infinity, -Infinity, -Infinity]
+  for (let i = 0; i < local.length; i += 3) {
+    lx = Math.min(lx, local[i]); hx = Math.max(hx, local[i])
+    ly = Math.min(ly, local[i + 1]); hy = Math.max(hy, local[i + 1])
+    lz = Math.min(lz, local[i + 2]); hz = Math.max(hz, local[i + 2])
+  }
+  const mx = (lx + hx) / 2
+  const my = (ly + hy) / 2
+  const target = center.clone().addScaledVector(right, mx).addScaledVector(up, my)
+  const t = Math.tan(fov / 2) * FILL
+  let dist = hz + radius * 0.02
+  for (let i = 0; i < local.length; i += 3) {
+    const x = local[i] - mx
+    const y = local[i + 1] - my
+    dist = Math.max(dist, local[i + 2] + Math.max(Math.abs(x), Math.abs(y)) / t)
+  }
+  return {
+    eye: target.clone().addScaledVector(dir, dist),
+    target,
+    up,
+    near: Math.max(dist - hz, radius * 0.001) * 0.5,
+    far: dist - lz + radius,
   }
 }
 

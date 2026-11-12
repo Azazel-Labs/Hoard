@@ -6,6 +6,7 @@ import {
 } from '../api'
 import { confirmDialog, undoable } from '../ui'
 import { archiveWithUndo } from '../archive'
+import { canDrawThumbs, cancelThumbRun, makePackThumbs, thumbRun } from '../browserThumbs'
 
 const props = defineProps<{ packs: Pack[]; stats: Stats | null; collections: Collection[] }>()
 
@@ -448,6 +449,28 @@ async function archive(p: Pack) {
         >
           <span :style="{ width: `${progress(p)}%` }" />
         </div>
+        <div v-if="thumbRun.packId === p.id" class="thumbrun" role="status">
+          <template v-if="thumbRun.running">
+            <span>
+              Drawing thumbnails in this browser<template v-if="thumbRun.total">: {{ thumbRun.done }} of {{ thumbRun.total }}</template>…
+              <span v-if="thumbRun.current" class="dim">{{ thumbRun.current }}</span>
+            </span>
+            <button class="btn ghost" type="button" @click="cancelThumbRun">Cancel</button>
+            <div class="bar" :class="{ indeterminate: !thumbRun.total }" role="progressbar" aria-valuemin="0" aria-valuemax="100"
+              :aria-valuenow="thumbRun.total ? Math.round((thumbRun.done / thumbRun.total) * 100) : undefined">
+              <span :style="{ width: `${thumbRun.total ? (thumbRun.done / thumbRun.total) * 100 : 0}%` }" />
+            </div>
+          </template>
+          <template v-else>
+            <span v-if="thumbRun.error" class="bad">Stopped: {{ thumbRun.error }}</span>
+            <span v-else-if="!thumbRun.total">Every model here already has a thumbnail drawn with all its textures.</span>
+            <span v-else>
+              {{ thumbRun.done < thumbRun.total ? `Cancelled after ${thumbRun.done} of ${thumbRun.total}` : `Drew ${thumbRun.total} ${thumbRun.total === 1 ? 'model' : 'models'}` }}:
+              {{ thumbRun.improved }} {{ thumbRun.improved === 1 ? 'thumbnail' : 'thumbnails' }} replaced<template v-if="thumbRun.failed">, {{ thumbRun.failed }} couldn't be drawn</template>.
+            </span>
+            <button class="btn ghost" type="button" @click="thumbRun.packId = ''">Dismiss</button>
+          </template>
+        </div>
         <p v-if="p.description" class="desc">{{ p.description }}</p>
         <p v-if="p.error" class="error">{{ p.error }}</p>
         <div class="facts">
@@ -473,6 +496,15 @@ async function archive(p: Pack) {
               </button>
               <button v-if="stats?.llm_enabled" type="button" :disabled="p.status !== 'ready'" @click="retag(p, true)">
                 Re-run LLM tagger
+              </button>
+              <button
+                v-if="canDrawThumbs() && (!p.kinds || p.kinds.model || p.kinds.animation)"
+                type="button"
+                :disabled="thumbRun.running || p.status !== 'ready'"
+                title="Open each model in a 3D viewer out of sight, one at a time, and use its picture as the thumbnail where that's better than the server's"
+                @click="makePackThumbs(p.id, p.name)"
+              >
+                Make thumbnails in this browser
               </button>
               <button v-if="p.unreal_packages || p.unreal_converted" type="button" @click="openUnreal(p)">
                 Convert Unreal content…
@@ -705,6 +737,14 @@ li.flash .status { animation: ready-pop var(--dur-3) var(--ease-pop); }
 .desc { margin: 0; color: var(--muted); max-width: 70ch; }
 .error { margin: 0; color: var(--danger); font-size: var(--step--1); }
 .facts { display: flex; flex-wrap: wrap; gap: 0.25rem 1.25rem; font-size: var(--step--1); color: var(--muted); }
+.thumbrun {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 0.35rem 0.75rem; padding: 0.45rem 0.6rem;
+  border: 1px solid var(--line); border-radius: var(--r-chip); background: var(--raised); font-size: var(--step--1);
+}
+.thumbrun > span { flex: 1; min-width: 0; }
+.thumbrun .dim { display: block; color: var(--faint); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.thumbrun .bar { flex-basis: 100%; }
+.thumbrun .bad { color: var(--danger); }
 .actions { display: flex; flex-wrap: wrap; gap: 0.4rem; }
 .facts a { color: inherit; }
 .context {

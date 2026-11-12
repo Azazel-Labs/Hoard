@@ -1,26 +1,28 @@
 <script setup lang="ts">
-import { computed, defineAsyncComponent, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import {
   api, asUrl, bundleUrl, fileUrl, formatDuration, humanBytes, looksAlike, originalUrl, RESIZABLE_AS_ITSELF, thumbUrl,
   type Asset, type AssetLink, type Collection, type CollectionRef, type ConversionStatus, type Facet, type LinkRel,
   type MaterialInfo,
 } from '../api'
 import CollectionPicker from './CollectionPicker.vue'
-import ImageViewer from './ImageViewer.vue'
 import { playableUrl, player, sourceExt, sourceUrl, stop as stopPreview } from '../player'
 import KindGlyph from './KindGlyph.vue'
 import TagChip from './TagChip.vue'
 import { copyText, showOk, swipeToClose } from '../ui'
+import { lazy } from '../lazy'
 import { isModelAsset, isTextAsset, takeViewRequest, viewRequest, viewerFor, type ViewerKind } from '../viewers'
 import { isMaterialAsset, resolutions, ROLE_LABEL, sizeLabel } from '../materials'
+import { withThumb } from '../browserThumbs'
 
 // three.js is big; only load it when someone opens a model.
-const ModelViewer = defineAsyncComponent(() => import('./ModelViewer.vue'))
-const ModelInspector = defineAsyncComponent(() => import('./ModelInspector.vue'))
-const TextPreview = defineAsyncComponent(() => import('./TextPreview.vue'))
-const TextViewer = defineAsyncComponent(() => import('./TextViewer.vue'))
-const MaterialPreview = defineAsyncComponent(() => import('./MaterialPreview.vue'))
-const MaterialViewer = defineAsyncComponent(() => import('./MaterialViewer.vue'))
+const ModelViewer = lazy(() => import('./ModelViewer.vue'), 'the 3D viewer', 'model-slot')
+const ModelInspector = lazy(() => import('./ModelInspector.vue'), 'the 3D viewer', 'overlay')
+const TextPreview = lazy(() => import('./TextPreview.vue'), 'the text')
+const TextViewer = lazy(() => import('./TextViewer.vue'), 'the text viewer', 'overlay')
+const ImageViewer = lazy(() => import('./ImageViewer.vue'), 'the image viewer', 'overlay')
+const MaterialPreview = lazy(() => import('./MaterialPreview.vue'), 'the material preview', 'model-slot')
+const MaterialViewer = lazy(() => import('./MaterialViewer.vue'), 'the material viewer', 'overlay')
 
 const props = defineProps<{
   asset: Asset
@@ -94,6 +96,17 @@ const linkedCount = computed(() => {
   const viaMaterial = partOf.value.filter((m) => needs.value.some((l) => l.id === m.id))
   const files = needs.value.length - viaMaterial.length + viaMaterial.reduce((n, m) => n + m.maps.length, 0)
   return files + (withAnimations.value ? anims.value.length : 0)
+})
+/** What the zip holds before compression: this file and each linked one once (sizes the server didn't give count 0). A
+ * material counts as its maps. */
+const bundleBytes = computed(() => {
+  const seen = new Map<string, number>()
+  for (const l of [...needs.value, ...(withAnimations.value ? anims.value : [])]) seen.set(l.id, l.size ?? 0)
+  for (const m of partOf.value) {
+    if (!seen.delete(m.id)) continue
+    for (const x of m.maps) seen.set(x.id, x.size)
+  }
+  return props.asset.size + [...seen.values()].reduce((s, n) => s + n, 0)
 })
 
 // Variant families: tag edits can fan out to every take.
@@ -582,7 +595,13 @@ onBeforeUnmount(() => unswipe())
     <div v-if="isModel && showViews" class="preview checker">
       <img :src="`/api/assets/${asset.id}/derivative/views`" alt="The model from four directions" />
     </div>
-    <ModelViewer v-else-if="isModel" :asset="asset" :paused="inspecting === 'model'" @expand="inspecting = 'model'" />
+    <ModelViewer
+      v-else-if="isModel"
+      :asset="asset"
+      :paused="inspecting === 'model'"
+      @expand="inspecting = 'model'"
+      @thumb="(r) => emit('updated', withThumb(asset, r))"
+    />
     <MaterialPreview
       v-else-if="isMaterial && material"
       :asset="asset"
@@ -817,7 +836,7 @@ onBeforeUnmount(() => unswipe())
               <KindGlyph v-else :kind="l.kind" :size="22" />
             </span>
             <span class="lname">{{ l.name }}</span>
-            <span class="lrel">{{ linkLabel(l) }}</span>
+            <span class="lrel">{{ linkLabel(l) }}<template v-if="l.size != null"> · {{ humanBytes(l.size) }}</template></span>
           </button>
         </li>
       </ul>
@@ -929,14 +948,19 @@ onBeforeUnmount(() => unswipe())
 
     <footer>
       <template v-if="isMaterial && needs.length">
-        <a class="btn primary" :href="bundleUrl(asset)">Download all {{ needs.length }} {{ needs.length === 1 ? 'map' : 'maps' }} (.zip)</a>
+        <a class="btn primary" :href="bundleUrl(asset)">Download all {{ needs.length }} {{ needs.length === 1 ? 'map' : 'maps' }} (.zip)
+          <span class="bytes">{{ humanBytes(bundleBytes) }}</span>
+        </a>
       </template>
       <template v-else-if="needs.length || anims.length">
-        <a class="btn primary" :href="bundleUrl(asset, withAnimations)">Download with {{ linkedCount }} linked {{ linkedCount === 1 ? 'file' : 'files' }} (.zip)</a>
+        <a class="btn primary" :href="bundleUrl(asset, withAnimations)">
+          Download with {{ linkedCount }} linked {{ linkedCount === 1 ? 'file' : 'files' }} (.zip)
+          <span class="bytes">{{ humanBytes(bundleBytes) }}</span>
+        </a>
         <label v-if="anims.length" class="animcheck"><input v-model="withAnimations" type="checkbox" /> Include animations</label>
-        <a class="btn" :href="fileUrl(asset, true)">This file only</a>
+        <a class="btn" :href="fileUrl(asset, true)">This file only <span class="bytes">{{ humanBytes(asset.size) }}</span></a>
       </template>
-      <a v-else class="btn primary" :href="fileUrl(asset, true)">Download</a>
+      <a v-else class="btn primary" :href="fileUrl(asset, true)">Download <span class="bytes">{{ humanBytes(asset.size) }}</span></a>
       <div v-if="showAs" class="asrow">
         <label for="as-format">Download as</label>
         <select id="as-format" v-model="asFormat" class="field">
@@ -1070,6 +1094,7 @@ dt { color: var(--muted); }
 dd { margin: 0; min-width: 0; }
 .path { word-break: break-all; }
 .linkish { border: 0; background: none; padding: 0; cursor: pointer; color: var(--text); text-decoration: underline dotted var(--faint); font: inherit; }
+.btn .bytes { font-weight: 400; opacity: 0.75; font-variant-numeric: tabular-nums; }
 /* The download actions stay in reach while the panel scrolls. */
 footer {
   position: sticky; bottom: -1.4rem; z-index: 1; display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center;

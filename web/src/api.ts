@@ -17,6 +17,8 @@ export interface AssetLink {
   kind: AssetKind
   rel: LinkRel
   has_thumb: boolean
+  /** File size in bytes. */
+  size?: number
 }
 
 export interface Asset {
@@ -37,6 +39,12 @@ export interface Asset {
   hash: string
   size: number
   has_thumb: boolean
+  /** Who made the thumbnail of a model: null for the server, `browser` for a browser's 3D viewer with every
+   *  texture, `browser-partial` for one with some missing. A better one is never replaced by a worse one. */
+  thumb_source?: ThumbSource | null
+  /** Changes whenever the thumbnail does; `thumbUrl` puts it in the URL so a new thumbnail isn't hidden behind the
+   *  browser's cached copy of the old one. */
+  thumb_rev?: string | null
   meta: Record<string, unknown>
   tags: Tag[]
   created_at: string
@@ -98,6 +106,8 @@ export interface MaterialMap {
 }
 
 export interface Swatch { hex: string; share: number }
+
+export type ThumbSource = 'browser' | 'browser-partial'
 
 export interface FormatOption { format: string; label: string; resizable: boolean }
 
@@ -642,7 +652,16 @@ function post<T>(path: string, body: unknown): Promise<T> {
   return request<T>(path, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
 }
 
+export interface ThumbUpload { replaced: boolean; thumb_source: ThumbSource | null; thumb_rev?: string }
+
 export const api = {
+  /** A model's thumbnail as this browser's 3D viewer drew it; kept unless the one there came from a better source. */
+  putThumb: (id: string, png: Blob, source: ThumbSource) =>
+    request<ThumbUpload>(`/api/assets/${id}/thumb?source=${source}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': png.type || 'image/png' },
+      body: png,
+    }),
   stats: () => request<Stats>('/api/stats'),
   libraryStats: () => request<LibraryStats>('/api/stats/library'),
   packs: (archived = false) => request<Pack[]>(`/api/packs${archived ? '?archived=true' : ''}`),
@@ -864,7 +883,10 @@ export const RESIZABLE_AS_ITSELF: Record<string, string> = {
 }
 /** The original file of a converted asset (the .uasset), when it was kept. */
 export const originalUrl = (a: { id: string }) => `/api/assets/${a.id}/original`
-export const thumbUrl = (a: { id: string }) => `/api/assets/${a.id}/thumb`
+export const thumbUrl = (a: { id: string; thumb_rev?: string | null }) =>
+  `/api/assets/${a.id}/thumb${a.thumb_rev ? `?v=${a.thumb_rev}` : ''}`
+/** An image at most 2048 px on its longer side (the image itself when it's that small and browsers read it). */
+export const liteUrl = (a: { id: string }) => `/api/assets/${a.id}/lite`
 export const bundleUrl = (a: Asset, animations = false) => `/api/assets/${a.id}/bundle.zip${animations ? '?animations=1' : ''}`
 export const packZipUrl = (packId: string) => `/api/packs/${packId}/bundle.zip`
 export const collectionZipUrl = (id: string, sources = false) =>

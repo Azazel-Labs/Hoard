@@ -361,15 +361,16 @@ fn stem_of(rel: &str) -> &str {
     file.rsplit_once('.').map_or(file, |(s, _)| s)
 }
 
-/// Hash + analyze + rule-tag one local file.
-pub(crate) fn analyze_one(local: PathBuf, rel: String, blob: Option<StoredBlob>) -> Result<Item> {
+/// Hash + analyze + rule-tag one local file. `root` holds it at `rel`, with the pack's other files around it (or
+/// those it depends on), where a model's textures are found.
+pub(crate) fn analyze_one(local: PathBuf, root: &Path, rel: String, blob: Option<StoredBlob>) -> Result<Item> {
     let blob = match blob {
         Some(b) => b,
         None => BlobStore::hash_file(&local)?,
     };
     let ext = ext_of(&rel);
     let kind = analyze::detect_kind(&local, &ext);
-    let analysis = analyze::analyze(&local, kind, &ext);
+    let analysis = analyze::analyze(&local, root, kind, &ext);
     let kind = analysis.kind.unwrap_or(kind);
     let mut tags = TagSet::default();
     tags.add(&format!("kind:{}", kind.as_str()), TagSource::Meta, 1.0);
@@ -556,6 +557,8 @@ struct Previews {
     source: Option<StoredBlob>,
     /// A playable rendering (MIDI, tracker modules → MP3).
     preview: Option<StoredBlob>,
+    /// A light preview of a big image.
+    lite: Option<StoredBlob>,
 }
 
 /// Upload a batch's originals and previews to the blob store. The preview bytes are moved out of the items, not
@@ -581,6 +584,7 @@ fn upload_all(state: &AppState, rt: &Handle, items: &mut [Item], store_originals
                         None => None,
                     },
                     preview: cached(blobs, a.preview_mp3.take()).await?,
+                    lite: cached(blobs, a.lite.take()).await?,
                 })
             })
             .buffered(8)
@@ -651,7 +655,7 @@ fn insert_asset(
     now: &str,
     refs: &mut HashMap<String, Vec<links::Ref>>,
 ) -> Result<()> {
-    let Previews { thumb, views, source, preview } = previews;
+    let Previews { thumb, views, source, preview, lite } = previews;
     insert_blob(tx, &item.blob, now)?;
     if let Some(t) = &thumb {
         insert_blob(tx, t, now)?;
@@ -686,6 +690,7 @@ fn insert_asset(
     store_derivative(tx, &id, "views", views.as_ref(), now)?;
     store_derivative(tx, &id, "source", source.as_ref(), now)?;
     store_derivative(tx, &id, "preview", preview.as_ref(), now)?;
+    store_derivative(tx, &id, crate::previews::LITE, lite.as_ref(), now)?;
     if !item.refs.is_empty() {
         refs.insert(id, item.refs);
     }
@@ -749,7 +754,7 @@ pub(crate) fn ingest_pack(state: &AppState, rt: &Handle, pack_id: &str, auto_nam
     pipeline(
         pack_id,
         &jobs,
-        |(local, rel)| analyze_one(local.clone(), rel.clone(), None).with_context(|| rel.clone()),
+        |(local, rel)| analyze_one(local.clone(), &root, rel.clone(), None).with_context(|| rel.clone()),
         |mut batch, done| {
             for it in &mut batch {
                 apply_pack_rules(it, &sets, license);
@@ -880,10 +885,32 @@ pub(crate) fn retag_pack(state: &AppState, rt: &Handle, pack_id: &str) -> Result
         pack_id,
         &rows,
         |r| {
-            let local = work.join(format!("{}.{}", r.id, ext_of(&r.rel)));
+            // Each file is fetched into a folder of its own at its place in the pack; a model brings the files it
+            // depends on (its MTL, its textures), so the thumbnail is drawn with them.
+            let dir = work.join(&r.id);
+            let rel = safe_rel_path(&r.rel).with_context(|| format!("unsafe path in pack: {}", r.rel))?;
+            let local = dir.join(&rel);
+            if matches!(ext_of(&r.rel).as_str(), "obj" | "fbx" | "gltf") {
+                let deps = {
+                    let conn = state.pool.get()?;
+                    let ids = db::dependency_closure(&conn, &r.id, false)?;
+                    db::bundle_files(&conn, &ids)?
+                };
+                for f in deps.iter().filter(|f| f.id != r.id) {
+                    let Some(p) = safe_rel_path(&f.path) else { continue };
+                    let dest = dir.join(p);
+                    if let Some(parent) = dest.parent() {
+                        fs::create_dir_all(parent)?;
+                    }
+                    rt.block_on(state.blobs.download_to(&f.hash, &dest)).with_context(|| f.path.clone())?;
+                }
+            }
+            if let Some(parent) = local.parent() {
+                fs::create_dir_all(parent)?;
+            }
             rt.block_on(state.blobs.download_to(&r.hash, &local)).with_context(|| r.rel.clone())?;
             let blob = StoredBlob { hash: r.hash.clone(), size: fs::metadata(&local)?.len() };
-            let mut item = analyze_one(local, r.rel.clone(), Some(blob)).with_context(|| r.rel.clone())?;
+            let mut item = analyze_one(local, &dir, r.rel.clone(), Some(blob)).with_context(|| r.rel.clone())?;
             if let Some(o) = origins.get(&r.id) {
                 carry_origin(&mut item, o);
             }
@@ -895,17 +922,21 @@ pub(crate) fn retag_pack(state: &AppState, rt: &Handle, pack_id: &str) -> Result
                 apply_pack_rules(it, &sets, license);
             }
             let previews = upload_all(state, rt, &mut batch, !watched)?;
-            let locals: Vec<PathBuf> = batch.iter().map(|it| it.local.clone()).collect();
+            let dirs: Vec<PathBuf> =
+                batch.iter().filter_map(|it| it.asset_id.as_ref()).map(|id| work.join(id)).collect();
             let now = db::now();
             let tx = conn.transaction()?;
-            for (item, Previews { thumb, views, source, preview }) in batch.into_iter().zip(previews) {
+            for (item, Previews { thumb, views, source, preview, lite }) in batch.into_iter().zip(previews) {
                 let id = item.asset_id.clone().unwrap_or_default();
                 if let Some(t) = &thumb {
                     insert_blob(&tx, t, &now)?;
                 }
                 tx.execute("DELETE FROM asset_tags WHERE asset_id = ?1 AND source IN ('rule', 'meta')", [&id])?;
                 tx.execute(
-                    "UPDATE assets SET meta = ?2, kind = ?3, thumb_hash = COALESCE(?4, thumb_hash), words = ?5,
+                    // A thumbnail a browser drew stays: it shows the model as the viewer does.
+                    "UPDATE assets SET meta = ?2, kind = ?3,
+                            thumb_hash = CASE WHEN thumb_source IS NULL THEN COALESCE(?4, thumb_hash) ELSE thumb_hash END,
+                            words = ?5,
                             category = CASE WHEN ?6 THEN category ELSE ?7 END, updated_at = ?8
                      WHERE id = ?1",
                     params![
@@ -924,14 +955,15 @@ pub(crate) fn retag_pack(state: &AppState, rt: &Handle, pack_id: &str) -> Result
                 store_derivative(&tx, &id, "views", views.as_ref(), &now)?;
                 store_derivative(&tx, &id, "source", source.as_ref(), &now)?;
                 store_derivative(&tx, &id, "preview", preview.as_ref(), &now)?;
+                store_derivative(&tx, &id, crate::previews::LITE, lite.as_ref(), &now)?;
                 if !item.refs.is_empty() {
                     refs.insert(id, item.refs);
                 }
             }
             tx.execute("UPDATE packs SET files_done = ?2 WHERE id = ?1", params![pack_id, done as i64])?;
             tx.commit()?;
-            for l in locals {
-                fs::remove_file(l).ok();
+            for d in dirs {
+                fs::remove_dir_all(d).ok();
             }
             Ok(())
         },

@@ -74,14 +74,140 @@ pub(crate) fn load(path: &Path, ext: &str, root: &Path) -> Result<(Option<Mesh>,
         "stl" => stl(&std::fs::read(path)?).map(counts),
         "ply" => ply(&std::fs::read(path)?),
         "vox" => vox(&std::fs::read(path)?),
-        "obj" => obj(path, root).map(counts),
-        "fbx" => crate::fbx::load(path, root).map(counts),
+        "obj" | "fbx" => {
+            let mut mesh = if ext == "obj" { obj(path, root)? } else { crate::fbx::load(path, root)? };
+            if !linear_colors(path, ext) {
+                for m in &mut mesh.materials {
+                    for c in &mut m.color[..3] {
+                        *c = srgb_to_linear(*c);
+                    }
+                }
+            }
+            guess_color_texture(&mut mesh, path, root);
+            Ok(counts(mesh))
+        }
         _ => bail!("not a mesh format handled here: .{ext}"),
     }
 }
 
+/// Whether the file's material colours are linear values (Blender's OBJ and FBX exporters write them so) rather
+/// than the sRGB other tools write. The browser viewer makes the same call.
+fn linear_colors(path: &Path, ext: &str) -> bool {
+    use std::io::Read as _;
+    let mut head = Vec::new();
+    let Ok(f) = std::fs::File::open(path) else { return false };
+    if f.take(65_536).read_to_end(&mut head).is_err() {
+        return false;
+    }
+    if ext == "obj" {
+        let text: String = String::from_utf8_lossy(&head).chars().take(500).collect();
+        text.lines().any(|l| l.starts_with("# Blender"))
+    } else {
+        head.windows(7).any(|w| w == b"Blender")
+    }
+}
+
+fn srgb_to_linear(c: f32) -> f32 {
+    if c <= 0.040_45 { c / 12.92 } else { ((c + 0.055) / 1.055).powf(2.4) }
+}
+
+/// A model that names no colour texture takes one by name, as the browser viewer does: `Barrel.png` or
+/// `Barrel_Albedo.png` for `Barrel.obj`, from anywhere in the pack. Its colour then shows as painted.
+fn guess_color_texture(mesh: &mut Mesh, path: &Path, root: &Path) {
+    let has_uvs = mesh.prims.iter().any(|p| !p.uvs.is_empty());
+    if !has_uvs || mesh.materials.iter().any(|m| m.color_image.is_some()) {
+        return;
+    }
+    let Some(stem) = path.file_stem().map(|s| s.to_string_lossy().to_lowercase()) else { return };
+    if stem.len() < 3 || stem.contains('@') {
+        return;
+    }
+    // A name that says it's the colour wins; one that says nothing ("Barrel.png") will do.
+    let mut plain = None;
+    let mut colour = None;
+    walk_images(root, |p, file_stem| {
+        let Some(rest) = file_stem.strip_prefix(&stem) else { return false };
+        if !(rest.is_empty() || rest.starts_with(['_', '-', ' ', '.'])) {
+            return false;
+        }
+        match texture_role(file_stem) {
+            Some(Role::Color) if colour.is_none() => colour = Some(p.to_path_buf()),
+            None if plain.is_none() => plain = Some(p.to_path_buf()),
+            _ => {}
+        }
+        colour.is_some()
+    });
+    let Some(img) = colour.or(plain).and_then(|p| load_image(&p)) else { return };
+    mesh.images.push(img);
+    let i = mesh.images.len() - 1;
+    for (n, m) in mesh.materials.iter_mut().enumerate() {
+        if mesh.prims.iter().any(|p| p.material == n && !p.uvs.is_empty()) {
+            m.color_image = Some(i);
+            m.color[..3].copy_from_slice(&[1.0, 1.0, 1.0]);
+        }
+    }
+}
+
+#[derive(Debug, PartialEq, Eq)]
+enum Role {
+    Color,
+    Other,
+}
+
+/// What a texture's name says it holds, by the browser viewer's rules: `None` when it says nothing.
+fn texture_role(stem: &str) -> Option<Role> {
+    let tail = stem.rsplit(['-', '_', '.', ' ']).next().unwrap_or(stem);
+    let split = tail.len() < stem.len();
+    let ends = |list: &[&str]| split && list.contains(&tail);
+    let has = |list: &[&str]| list.iter().any(|w| stem.contains(w));
+    if has(&["normal", "nrm", "emissi", "emit", "glow", "rough", "metal", "occlusion", "height", "disp", "bump"])
+        || has(&["mask", "opacity", "alpha", "spec", "gloss", "smooth"])
+        || ends(&["n", "nor", "norm", "e", "r", "m", "mt", "ao", "occ", "h", "orm", "arm", "mra", "rma", "s", "g"])
+    {
+        return Some(Role::Other);
+    }
+    if has(&["albedo", "basecolor", "base_color", "base color", "basecolour", "diffuse"])
+        || ends(&["diff", "dif", "col", "color", "colour", "d", "bc", "a", "c"])
+    {
+        return Some(Role::Color);
+    }
+    None
+}
+
+const IMAGE_EXTS: &[&str] = &["png", "jpg", "jpeg", "tga", "bmp", "webp", "gif", "tif", "tiff", "dds", "psd"];
+
+/// Visit the image files under `root` (at most 20 000 entries), with their lowercased stems, until `visit` says
+/// stop.
+fn walk_images(root: &Path, mut visit: impl FnMut(&Path, &str) -> bool) {
+    let mut stack = vec![root.to_path_buf()];
+    let mut seen = 0;
+    while let Some(dir) = stack.pop() {
+        let Ok(entries) = std::fs::read_dir(&dir) else { continue };
+        for e in entries.flatten() {
+            seen += 1;
+            if seen > 20_000 {
+                return;
+            }
+            let p = e.path();
+            if p.is_dir() {
+                stack.push(p);
+                continue;
+            }
+            let ext = p.extension().map(|x| x.to_string_lossy().to_lowercase()).unwrap_or_default();
+            if !IMAGE_EXTS.contains(&ext.as_str()) {
+                continue;
+            }
+            let stem = p.file_stem().map(|x| x.to_string_lossy().to_lowercase()).unwrap_or_default();
+            if visit(&p, &stem) {
+                return;
+            }
+        }
+    }
+}
+
 /// Find a texture a model refers to: next to it, relative to it, or anywhere under `root` by file name (artists'
-/// absolute paths like `C:\Users\me\tex\rock.tga` survive only as names).
+/// absolute paths like `C:\Users\me\tex\rock.tga` survive only as names). Failing that, an image with the same
+/// name in another format (`rock.png` for `rock.tga`, as packs often ship), preferring PNG and JPEG.
 pub(crate) fn find_texture(reference: &str, model_dir: &Path, root: &Path) -> Option<std::path::PathBuf> {
     let cleaned = reference.trim().replace('\\', "/");
     if cleaned.is_empty() {
@@ -108,7 +234,23 @@ pub(crate) fn find_texture(reference: &str, model_dir: &Path, root: &Path) -> Op
             }
         }
     }
-    None
+    let is_image = name.rsplit_once('.').is_some_and(|(_, e)| IMAGE_EXTS.contains(&e));
+    let stem = name.rsplit_once('.').map_or(name.as_str(), |(s, _)| s);
+    if !is_image {
+        return None;
+    }
+    let mut best: Option<(u8, std::path::PathBuf)> = None;
+    walk_images(root, |p, s| {
+        if s == stem {
+            let ext = p.extension().map(|x| x.to_string_lossy().to_lowercase()).unwrap_or_default();
+            let rank = u8::from(!matches!(ext.as_str(), "png" | "jpg" | "jpeg"));
+            if best.as_ref().is_none_or(|(r, _)| rank < *r) {
+                best = Some((rank, p.to_path_buf()));
+            }
+        }
+        best.as_ref().is_some_and(|(r, _)| *r == 0)
+    });
+    best.map(|(_, p)| p)
 }
 
 /// Load a texture file for embedding: PNG and JPEG as they are, anything else Hoard can decode (TGA, BMP, DDS,
@@ -890,6 +1032,63 @@ mod tests {
 #[cfg(test)]
 mod obj_tests {
     use super::*;
+
+    fn png(rgb: [u8; 3]) -> Vec<u8> {
+        let mut png = Vec::new();
+        image::RgbImage::from_pixel(2, 2, image::Rgb(rgb))
+            .write_to(&mut std::io::Cursor::new(&mut png), image::ImageFormat::Png)
+            .unwrap();
+        png
+    }
+
+    const QUAD: &str = "v 0 0 0\nv 1 0 0\nv 1 1 0\nv 0 1 0\nvt 0 0\nvt 1 0\nvt 1 1\nvt 0 1\n";
+
+    #[test]
+    fn obj_texture_in_another_format_and_colour_space() {
+        let dir = tempfile::tempdir().unwrap();
+        // The MTL names a TGA; the pack ships it as PNG.
+        std::fs::write(dir.path().join("rock.png"), png([10, 20, 30])).unwrap();
+        std::fs::write(
+            dir.path().join("a.mtl"),
+            "newmtl Rock\nKd 0.5 0.5 0.5\nmap_Kd rock.tga\nnewmtl Plain\nKd 0.5 0.5 0.5\n",
+        )
+        .unwrap();
+        let obj = format!("mtllib a.mtl\n{QUAD}usemtl Rock\nf 1/1 2/2 3/3\nusemtl Plain\nf 1 3 4\n");
+        std::fs::write(dir.path().join("a.obj"), &obj).unwrap();
+        let (m, _) = load(&dir.path().join("a.obj"), "obj", dir.path()).unwrap();
+        let m = m.unwrap();
+        let rock = m.materials.iter().find(|x| x.name == "Rock").unwrap();
+        assert_eq!(rock.color_image, Some(0));
+        // sRGB 0.5 → linear ~0.214 for the glTF factor.
+        let plain = m.materials.iter().find(|x| x.name == "Plain").unwrap();
+        assert!((plain.color[0] - 0.214).abs() < 0.01, "{:?}", plain.color);
+
+        // Blender writes linear values: kept as they are.
+        std::fs::write(dir.path().join("a.obj"), format!("# Blender 4.2\n{obj}")).unwrap();
+        let (m, _) = load(&dir.path().join("a.obj"), "obj", dir.path()).unwrap();
+        let plain = m.unwrap().materials.into_iter().find(|x| x.name == "Plain").unwrap();
+        assert!((plain.color[0] - 0.5).abs() < 1e-6);
+    }
+
+    #[test]
+    fn obj_without_textures_takes_one_by_name() {
+        let dir = tempfile::tempdir().unwrap();
+        std::fs::create_dir_all(dir.path().join("Textures")).unwrap();
+        std::fs::write(dir.path().join("Textures/Barrel_Normal.png"), png([128, 128, 255])).unwrap();
+        std::fs::write(dir.path().join("Textures/Barrel_Albedo.png"), png([200, 100, 50])).unwrap();
+        std::fs::write(dir.path().join("Textures/Barrels.png"), png([0, 0, 0])).unwrap();
+        std::fs::write(dir.path().join("Barrel.obj"), format!("{QUAD}f 1/1 2/2 3/3 4/4\n")).unwrap();
+        let (m, _) = load(&dir.path().join("Barrel.obj"), "obj", dir.path()).unwrap();
+        let m = m.unwrap();
+        assert_eq!(m.images.len(), 1);
+        assert_eq!(m.materials[0].color_image, Some(0));
+        assert_eq!(m.materials[0].color, [1.0, 1.0, 1.0, 1.0]);
+        let px = image::load_from_memory(&m.images[0].bytes).unwrap().to_rgb8();
+        assert_eq!(px.get_pixel(0, 0).0, [200, 100, 50]);
+        assert_eq!(texture_role("barrel_normal"), Some(Role::Other));
+        assert_eq!(texture_role("barrel_d"), Some(Role::Color));
+        assert_eq!(texture_role("barrel"), None);
+    }
 
     #[test]
     fn obj_with_mtl_and_texture() {

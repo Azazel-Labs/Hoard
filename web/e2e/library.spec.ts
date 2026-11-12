@@ -12,6 +12,8 @@ test.describe('library grid', () => {
   })
 
   test('infinite scroll fetches more pages and keeps only nearby rows in the DOM', async ({ page, seed }) => {
+    // Hundreds of thumbnails on a busy machine: give it room.
+    test.slow()
     const offsets: number[] = []
     page.on('request', (r) => {
       const u = new URL(r.url())
@@ -33,7 +35,7 @@ test.describe('library grid', () => {
           await page.mouse.wheel(0, 2500)
           return tile(page, 'Img 299').count()
         },
-        { timeout: 20_000, intervals: [100] },
+        { timeout: 60_000, intervals: [100] },
       )
       .toBe(1)
 

@@ -618,7 +618,7 @@ async fn call_tool(state: &AppState, name: &str, args: Value, base: &str) -> Res
         "list_tags" => {
             let prefix = str_arg(&args, "prefix").unwrap_or_default().to_lowercase();
             let limit = args.get("limit").and_then(Value::as_u64).unwrap_or(50).clamp(1, 200) as u32;
-            let tags = db::call(&state.pool, move |c| db::tag_counts(c, &prefix, limit)).await?;
+            let tags = db::call(&state.pool, move |c| db::tag_counts(c, &prefix, false, limit)).await?;
             Ok(json!({ "tags": tags }))
         }
         "tag_asset" | "update_asset" => {

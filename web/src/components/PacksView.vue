@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue'
 import {
-  api, collectionZipUrl, humanBytes, packZipUrl, thumbUrl, type Collection, type Pack, type PackContext, type Stats,
-  type StoreMatch, type StoreMatches, type UnrealPackStatus,
+  api, collectionZipUrl, humanBytes, KIND_LABEL, packZipUrl, thumbUrl, type AssetKind, type Collection, type Pack,
+  type PackContext, type Stats, type StoreMatch, type StoreMatches, type UnrealPackStatus,
 } from '../api'
 import { confirmDialog, undoable } from '../ui'
 import { archiveWithUndo } from '../archive'
@@ -50,15 +50,93 @@ watch(() => props.packs, (list) => {
 const visiblePacks = computed(() => props.packs.filter((p) => !hidden.has(p.id)))
 const visibleCollections = computed(() => props.collections.filter((c) => !hidden.has(c.id)))
 
+// ---- finding packs: words, what's in them, where they're at, where they came from, and an order.
 const query = ref('')
-/** Audio conversions use ffmpeg; say so while it's being fetched, or why it can't be. */
-const shown = computed(() => {
-  const q = query.value.trim().toLowerCase()
-  if (!q) return visiblePacks.value
-  return visiblePacks.value.filter((p) =>
-    [p.name, p.store, p.license, p.description, ...p.tags].some((s) => s?.toLowerCase().includes(q)),
-  )
+const kind = ref<AssetKind | ''>('')
+const state = ref<'' | 'working' | 'failed' | 'untagged'>('')
+/** A store's name, `none` for packs with no store page, or empty for any. */
+const store = ref('')
+const sort = ref<'new' | 'old' | 'name' | 'size' | 'assets'>('new')
+const working = (p: Pack) => p.status === 'uploading' || p.status === 'ingesting' || p.status === 'analyzing'
+
+/** Kinds some pack has, most common first, for the kind chips. */
+const kindsPresent = computed(() => {
+  const n = new Map<AssetKind, number>()
+  for (const p of visiblePacks.value) {
+    for (const [k, c] of Object.entries(p.kinds ?? {})) if (c) n.set(k as AssetKind, (n.get(k as AssetKind) ?? 0) + 1)
+  }
+  return [...n.entries()].sort((a, b) => b[1] - a[1]).map(([k]) => k)
 })
+const stores = computed(() => [...new Set(visiblePacks.value.map((p) => p.store).filter((s): s is string => !!s))].sort())
+const filtering = computed(() => !!(query.value.trim() || kind.value || state.value || store.value))
+function clearFinding() {
+  query.value = ''
+  kind.value = ''
+  state.value = ''
+  store.value = ''
+}
+
+const shown = computed(() => {
+  // Every word has to turn up somewhere: the name, store, license, description or tags.
+  const words = query.value.trim().toLowerCase().split(/\s+/).filter(Boolean)
+  const list = visiblePacks.value.filter((p) => {
+    if (kind.value && !p.kinds?.[kind.value]) return false
+    if (state.value === 'working' && !working(p)) return false
+    if (state.value === 'failed' && p.status !== 'failed') return false
+    if (state.value === 'untagged' && (p.description || p.tags.length)) return false
+    if (store.value === 'none' ? !!p.store_url : store.value && p.store !== store.value) return false
+    if (!words.length) return true
+    const hay = [p.name, p.store, p.license, p.license_tier, p.description, ...p.tags].filter(Boolean).join(' ').toLowerCase()
+    return words.every((w) => hay.includes(w))
+  })
+  const by: Record<typeof sort.value, (a: Pack, b: Pack) => number> = {
+    new: (a, b) => b.created_at.localeCompare(a.created_at),
+    old: (a, b) => a.created_at.localeCompare(b.created_at),
+    name: (a, b) => a.name.localeCompare(b.name, undefined, { numeric: true, sensitivity: 'base' }),
+    size: (a, b) => b.total_bytes - a.total_bytes,
+    assets: (a, b) => b.asset_count - a.asset_count,
+  }
+  return list.sort(by[sort.value])
+})
+
+// Rows go into the page a batch at a time as the list scrolls, so a library of thousands of packs opens at once.
+const BATCH = 40
+const limit = ref(BATCH)
+watch([query, kind, state, store, sort], () => (limit.value = BATCH))
+const rendered = computed(() => shown.value.slice(0, limit.value))
+const moreEl = ref<HTMLElement | null>(null)
+let moreObserver: IntersectionObserver | undefined
+watch(moreEl, (el) => {
+  moreObserver?.disconnect()
+  if (!el) return
+  moreObserver = new IntersectionObserver((entries) => {
+    if (entries.some((e) => e.isIntersecting)) limit.value += BATCH
+  }, { rootMargin: '1200px 0px' })
+  moreObserver.observe(el)
+})
+onBeforeUnmount(() => moreObserver?.disconnect())
+
+/** `v-focus`: take the keyboard when shown (the rename box). */
+const vFocus = { mounted: (el: HTMLInputElement) => el.select() }
+
+// Renaming a pack: searches, links and collections refer to it by id, so nothing else changes.
+const renamingPack = ref<string | null>(null)
+const packName = ref('')
+function startPackRename(p: Pack) {
+  renamingPack.value = p.id
+  packName.value = p.name
+}
+async function savePackRename(p: Pack) {
+  const name = packName.value.trim()
+  renamingPack.value = null
+  if (!name || name === p.name) return
+  try {
+    await api.renamePack(p.id, name)
+    emit('changed')
+  } catch (e) {
+    emit('error', `Couldn't rename: ${(e as Error).message}`)
+  }
+}
 const emit = defineEmits<{ browse: [Pack]; browseCollection: [Collection]; changed: []; error: [string] }>()
 
 // Collections: rename inline, delete with a confirmation.
@@ -289,14 +367,54 @@ async function archive(p: Pack) {
     </section>
 
     <p v-if="visiblePacks.length === 0" class="empty">No packs yet. Drop a zip or a folder anywhere on this page to add one.</p>
-    <div v-else-if="visiblePacks.length > 5" class="find">
-      <label class="visually-hidden" for="pack-q">Find a pack</label>
-      <input id="pack-q" v-model="query" class="field" type="search" placeholder="Find a pack by name, store, license or tag" />
-      <span v-if="query" class="muted">{{ shown.length }} of {{ visiblePacks.length }}</span>
+    <div v-else class="finder" role="search">
+      <div class="find">
+        <label class="visually-hidden" for="pack-q">Find a pack</label>
+        <input id="pack-q" v-model="query" class="field" type="search" placeholder="Find a pack by name, store, license or tag" />
+        <label class="visually-hidden" for="pack-sort">Order</label>
+        <select id="pack-sort" v-model="sort" class="field narrow">
+          <option value="new">Newest first</option>
+          <option value="old">Oldest first</option>
+          <option value="name">By name</option>
+          <option value="size">Biggest first</option>
+          <option value="assets">Most assets first</option>
+        </select>
+      </div>
+      <div class="filters">
+        <div v-if="kindsPresent.length > 1" class="chips" role="group" aria-label="Packs with">
+          <button
+            v-for="k in kindsPresent"
+            :key="k"
+            type="button"
+            class="chip"
+            :style="{ '--kind': `var(--k-${k})` }"
+            :aria-pressed="kind === k"
+            @click="kind = kind === k ? '' : k"
+          >{{ KIND_LABEL[k] }}</button>
+        </div>
+        <label class="visually-hidden" for="pack-state">Status</label>
+        <select id="pack-state" v-model="state" class="field narrow">
+          <option value="">Any status</option>
+          <option value="working">Working on</option>
+          <option value="failed">Failed</option>
+          <option value="untagged">Not described yet</option>
+        </select>
+        <label class="visually-hidden" for="pack-store">Store</label>
+        <select id="pack-store" v-model="store" class="field narrow">
+          <option value="">Any store</option>
+          <option v-for="s in stores" :key="s" :value="s">From {{ s }}</option>
+          <option value="none">No store page</option>
+        </select>
+        <span v-if="filtering" class="muted">{{ shown.length.toLocaleString() }} of {{ visiblePacks.length.toLocaleString() }}</span>
+        <button v-if="filtering" type="button" class="btn ghost" @click="clearFinding">Clear</button>
+      </div>
     </div>
+    <p v-if="visiblePacks.length && !shown.length" class="empty">
+      No packs match. <button type="button" class="linkish" @click="clearFinding">Clear the search and filters</button>
+    </p>
 
     <ul>
-      <li v-for="p in shown" :key="p.id" :class="[`st-${p.status}`, { flash: justReady.has(p.id) }]">
+      <li v-for="p in rendered" :key="p.id" :class="[`st-${p.status}`, { flash: justReady.has(p.id) }]">
         <button type="button" class="cover checker" :aria-label="`Browse ${p.name}`" tabindex="-1" @click="$emit('browse', p)">
           <img
               v-for="(id, i) in p.preview"
@@ -309,7 +427,13 @@ async function archive(p: Pack) {
           <span v-if="!p.preview.length" class="cover-empty">{{ p.name.slice(0, 1) }}</span>
         </button>
         <div class="body">
-        <div class="head">
+        <form v-if="renamingPack === p.id" class="rename" @submit.prevent="savePackRename(p)">
+          <label class="visually-hidden" :for="`prename-${p.id}`">Pack name</label>
+          <input :id="`prename-${p.id}`" v-model="packName" v-focus class="field" maxlength="200" @keydown.esc="renamingPack = null" />
+          <button class="btn primary" type="submit">Save</button>
+          <button class="btn ghost" type="button" @click="renamingPack = null">Cancel</button>
+        </form>
+        <div v-else class="head">
           <button type="button" class="name" @click="$emit('browse', p)">{{ p.name }}</button>
           <span class="status">{{ statusText[p.status] }}</span>
         </div>
@@ -343,6 +467,7 @@ async function archive(p: Pack) {
           <details class="menu">
             <summary class="btn ghost" :aria-label="`More actions for ${p.name}`">More</summary>
             <div class="menu-items" @click="($event.currentTarget as HTMLElement).closest('details')?.removeAttribute('open')">
+              <button type="button" @click="startPackRename(p)">Rename…</button>
               <button type="button" :disabled="p.status !== 'ready' && p.status !== 'failed'" @click="retag(p, false)">
                 Re-run offline tagger
               </button>
@@ -469,6 +594,7 @@ async function archive(p: Pack) {
         </div>
       </li>
     </ul>
+    <div v-if="rendered.length < shown.length" ref="moreEl" class="loading-more" aria-hidden="true" />
   </div>
 </template>
 
@@ -518,8 +644,24 @@ li { padding: 1rem 0; border-top: 1px solid var(--line); display: flex; gap: 1re
 .menu-items button:hover:not(:disabled) { background: var(--panel); }
 .menu-items button:disabled { opacity: 0.5; cursor: default; }
 .menu-items .danger { color: var(--danger); }
-.find { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem; }
-.find .field { max-width: 26rem; }
+.finder { display: grid; gap: 0.6rem; margin-bottom: 1rem; }
+.finder .find { margin: 0; flex-wrap: nowrap; }
+.finder .find .field { flex: 1 1 auto; max-width: 30rem; }
+.finder .find .narrow, .filters .narrow { flex: none; width: auto; }
+.filters { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; }
+.chips { display: flex; flex-wrap: wrap; gap: 0.35rem; }
+.chip {
+  padding: 0.2rem 0.65rem; border: 1px solid var(--line); border-radius: 999px; background: none; cursor: pointer;
+  font-size: var(--step--1); color: var(--muted);
+}
+.chip::before {
+  content: ''; display: inline-block; width: 0.5rem; height: 0.5rem; margin-right: 0.4rem; border-radius: 50%;
+  background: var(--kind); vertical-align: 0.05em;
+}
+.chip:hover { border-color: var(--muted); color: var(--text); }
+.chip[aria-pressed='true'] { border-color: var(--kind); color: var(--text); background: color-mix(in srgb, var(--kind) 14%, transparent); }
+.linkish { border: 0; background: none; padding: 0; color: var(--accent); cursor: pointer; text-decoration: underline; font: inherit; }
+.loading-more { height: 1px; }
 .muted { color: var(--muted); font-size: var(--step--1); white-space: nowrap; }
 @media (max-width: 560px) {
   .packs { padding: 1rem 0.75rem 3rem; }

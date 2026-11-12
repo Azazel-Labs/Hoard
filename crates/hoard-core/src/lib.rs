@@ -486,6 +486,9 @@ pub struct Pack {
     /// When the pack went to the archive. Its assets are left out of searches until it's restored.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub archived_at: Option<String>,
+    /// How many assets of each kind it holds (`model`, `texture`, …), for filtering the list of packs.
+    #[serde(default)]
+    pub kinds: std::collections::BTreeMap<String, u64>,
 }
 
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]

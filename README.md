@@ -290,6 +290,17 @@ software rasterizer (`apt install mesa-vulkan-drivers`). Without any adapter, ev
 Tags carry their source (`meta`, `rule`, `ai`, `human`). Human tags always win, and re-running the offline
 tagger after improving the vocabulary (`POST /api/packs/{id}/retag`) replaces only `rule`/`meta` tags.
 
+**Tidying tags.** Settings → Tags lists every tag with its count. Pick tags that mean the same thing and merge
+them, or pick one to rename it (a rename that leaves off the prefix keeps it, so renaming `set:rock-000` to
+"granite" gives `set:granite`). The old names are remembered: when a tagger comes up with one later, the asset gets
+the new name instead. "Allow the old name again" undoes that.
+
+**Renaming packs.** More → Rename on the packs page. Filters, links and collections refer to a pack by its id and
+rescans match it by its folder, so only the name you see changes.
+
+**Finding packs.** The packs page searches names, stores, licenses, descriptions and tags (every word has to
+match), filters by what a pack holds, its status and its store, and sorts by date, name, size or asset count.
+
 ## Getting assets into an engine
 
 **Bundles.** Every asset with links has a "Download with N linked files (.zip)" button, built on the fly, that keeps
@@ -618,7 +629,9 @@ Requests that change something are marked 🔒: guests can't make them. A browse
 | GET | `/api/bundle.zip?ids=a,b,c` | a selection as one zip (`&deps=0`, `&sources=1`) |
 | POST | `/api/manifest` | a flat file list (hash, path, URL) for `ids` or a search, with `include_deps`; what engine tools pull from |
 | GET | `/api/blobs/{hash}` | raw content by BLAKE3 hash |
-| GET | `/api/tags?prefix=` | tag autocomplete |
+| GET | `/api/tags?prefix=` | tag autocomplete (`anywhere=true` matches inside names, for Settings → Tags) |
+| POST 🔒 | `/api/tags/merge` | `{from: [...], into}`: retag those assets and remember the old names |
+| GET, DELETE 🔒 | `/api/tags/aliases` | merged-away names; `DELETE ?tag=` allows one again |
 
 **Packs**
 
@@ -627,6 +640,7 @@ Requests that change something are marked 🔒: guests can't make them. A browse
 | GET | `/api/packs` | all packs |
 | POST 🔒 | `/api/packs` | upload a pack in one request (multipart) |
 | GET | `/api/packs/{id}` | one pack and its status |
+| PATCH 🔒 | `/api/packs/{id}` | rename it (`{name}`) |
 | DELETE 🔒 | `/api/packs/{id}` | delete it (blobs go at the next `gc`) |
 | POST 🔒 | `/api/packs/{id}/retag` | run the tagger again |
 | GET, PUT 🔒 | `/api/packs/{id}/context` | store link, README and notes the tagger reads |

@@ -28,6 +28,7 @@ import LibraryStats from './LibraryStats.vue'
 import LocationsPanel from './LocationsPanel.vue'
 import MaintenancePanel from './MaintenancePanel.vue'
 import AccountPanel from './AccountPanel.vue'
+import TagsPanel from './TagsPanel.vue'
 import ResetButton from './ResetButton.vue'
 import SizeInput from './SizeInput.vue'
 
@@ -48,6 +49,7 @@ const s = ref<Settings | null>(null)
 const PAGES = [
   { id: 'appearance', label: 'Appearance', blurb: 'The themes this browser wears when it’s light and when it’s dark. Saved in this browser only.' },
   { id: 'library', label: 'Library', blurb: 'What’s in the hoard: how big it is, what it’s made of, how it grew and how well it’s tagged. Archived things aren’t counted.' },
+  { id: 'tags', label: 'Tags', blurb: 'Every tag in the library. Merge ones that mean the same thing, or rename one; the taggers use the new name from then on.' },
   { id: 'locations', label: 'Library locations', blurb: 'The folders on the server that hold the library: ones Hoard keeps files in, and folders of packs it indexes where they are.' },
   { id: 'tools', label: 'Tools', blurb: 'Outside programs Hoard uses to convert and read files.' },
   { id: 'ai', label: 'AI tagging', blurb: 'An AI model names, describes and tags new packs, on top of the built-in rules. Its tags are marked as suggested.' },
@@ -787,6 +789,7 @@ onBeforeUnmount(() => {
         <LocationsPanel v-else-if="current === 'locations'" @unauthorized="emit('unauthorized')" @changed="emit('changed')" />
         <MaintenancePanel v-else-if="current === 'maintenance'" @unauthorized="emit('unauthorized')" />
         <AccountPanel v-else-if="current === 'account'" />
+        <TagsPanel v-else-if="current === 'tags'" @tag="(t) => emit('tag', t)" @changed="emit('changed')" />
 
         <p v-else-if="!s" class="loading">Loading…</p>
 

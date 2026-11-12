@@ -125,6 +125,9 @@ const MIGRATIONS: &[&str] = &[
        created_at        TEXT NOT NULL,
        last_used_at      TEXT
      );",
+    // 19: tags merged into others. Tagging maps the old name to the new one, so a merged tag stays merged when the
+    // taggers run again (see `merge_tags`).
+    "CREATE TABLE tag_aliases (tag TEXT PRIMARY KEY, into_tag TEXT NOT NULL) WITHOUT ROWID;",
 ];
 
 /// How many automatic pre-upgrade backups to keep in `<data dir>/backups`.
@@ -453,7 +456,19 @@ fn pack_from_row(r: &Row<'_>) -> rusqlite::Result<Pack> {
         unreal_packages: r.get::<_, i64>(17)? as u64,
         unreal_converted: r.get::<_, i64>(18)? as u64,
         archived_at: r.get(19)?,
+        kinds: std::collections::BTreeMap::new(),
     })
+}
+
+/// Fill in each pack's count of assets by kind.
+fn fill_kinds(conn: &Connection, packs: &mut [Pack]) -> Result<()> {
+    let mut stmt = conn.prepare("SELECT kind, COUNT(*) FROM assets WHERE pack_id = ?1 GROUP BY kind")?;
+    for p in packs {
+        p.kinds = stmt
+            .query_map([&p.id], |r| Ok((r.get::<_, String>(0)?, r.get::<_, i64>(1)? as u64)))?
+            .collect::<rusqlite::Result<_>>()?;
+    }
+    Ok(())
 }
 
 /// The packs in the library, newest first, or with `archived` the ones in the archive, most recently archived first.
@@ -479,17 +494,22 @@ pub(crate) fn list_packs(conn: &Connection, archived: bool) -> Result<Vec<Pack>>
             cover.query_map([&p.id], |r| Ok((r.get(0)?, r.get(1)?)))?.collect::<rusqlite::Result<_>>()?;
         (p.preview, p.preview_kinds) = cover.into_iter().unzip();
     }
+    fill_kinds(conn, &mut rows)?;
     Ok(rows)
 }
 
 pub(crate) fn get_pack(conn: &Connection, id: &str) -> Result<Option<Pack>> {
-    Ok(conn
+    let mut pack = conn
         .query_row(
             &format!("SELECT {PACK_COLS} FROM packs p LEFT JOIN pack_context c ON c.pack_id = p.id WHERE p.id = ?1"),
             [id],
             pack_from_row,
         )
-        .optional()?)
+        .optional()?;
+    if let Some(p) = &mut pack {
+        fill_kinds(conn, std::slice::from_mut(p))?;
+    }
+    Ok(pack)
 }
 
 pub(crate) fn set_pack_status(conn: &Connection, id: &str, status: PackStatus, error: Option<&str>) -> Result<()> {
@@ -1044,14 +1064,79 @@ pub(crate) fn upsert_tag(
     source: TagSource,
     confidence: f32,
 ) -> Result<()> {
+    // A tag merged into another lands on the one it was merged into.
+    let alias: Option<String> =
+        conn.query_row("SELECT into_tag FROM tag_aliases WHERE tag = ?1", [tag], |r| r.get(0)).optional()?;
+    let tag = alias.as_deref().unwrap_or(tag);
     // Never let a machine overwrite a human tag; otherwise keep the most confident source.
     conn.execute(
-        "INSERT INTO asset_tags (asset_id, tag, source, confidence) VALUES (?1, ?2, ?3, ?4)
-         ON CONFLICT (asset_id, tag) DO UPDATE SET source = excluded.source, confidence = excluded.confidence
-         WHERE asset_tags.source != 'human' AND (excluded.source = 'human' OR excluded.confidence > asset_tags.confidence)",
+        &format!("INSERT INTO asset_tags (asset_id, tag, source, confidence) VALUES (?1, ?2, ?3, ?4) {KEEP_BEST_TAG}"),
         params![asset_id, tag, source.as_str(), f64::from(confidence)],
     )?;
     Ok(())
+}
+
+/// When an asset gets a tag it already has: a person's tag stands; otherwise the more confident one wins.
+const KEEP_BEST_TAG: &str =
+    "ON CONFLICT (asset_id, tag) DO UPDATE SET source = excluded.source, confidence = excluded.confidence
+     WHERE asset_tags.source != 'human' AND (excluded.source = 'human' OR excluded.confidence > asset_tags.confidence)";
+
+/// Fold tags into one: every asset with any of `from` gets `into` instead (keeping a person's tag over a machine's),
+/// packs' tags follow, and the old names become aliases so the taggers don't bring them back. Merging a single tag
+/// into a new name renames it. Returns how many assets changed.
+pub(crate) fn merge_tags(conn: &mut Connection, from: &[String], into: &str) -> Result<usize> {
+    let tx = conn.transaction()?;
+    let mut touched = std::collections::BTreeSet::new();
+    for old in from.iter().filter(|t| t.as_str() != into) {
+        let mut stmt = tx.prepare("SELECT asset_id FROM asset_tags WHERE tag = ?1")?;
+        touched.extend(stmt.query_map([old], |r| r.get::<_, String>(0))?.collect::<rusqlite::Result<Vec<_>>>()?);
+        drop(stmt);
+        tx.execute(
+            &format!(
+                "INSERT INTO asset_tags (asset_id, tag, source, confidence)
+                 SELECT asset_id, ?2, source, confidence FROM asset_tags WHERE tag = ?1 AND true {KEEP_BEST_TAG}"
+            ),
+            params![old, into],
+        )?;
+        tx.execute("DELETE FROM asset_tags WHERE tag = ?1", [old])?;
+        // Aliases that pointed at the old name follow it; one from the new name back to an old one would loop.
+        tx.execute("UPDATE tag_aliases SET into_tag = ?2 WHERE into_tag = ?1", params![old, into])?;
+        tx.execute(
+            "INSERT INTO tag_aliases (tag, into_tag) VALUES (?1, ?2) ON CONFLICT (tag) DO UPDATE SET into_tag = excluded.into_tag",
+            params![old, into],
+        )?;
+    }
+    tx.execute("DELETE FROM tag_aliases WHERE tag = ?1", [into])?;
+    // Packs keep their (AI-given) tags as a JSON list.
+    let packs: Vec<(String, String)> = {
+        let mut stmt = tx.prepare("SELECT id, tags FROM packs WHERE tags != '[]'")?;
+        stmt.query_map([], |r| Ok((r.get(0)?, r.get(1)?)))?.collect::<rusqlite::Result<_>>()?
+    };
+    for (id, json) in packs {
+        let tags: Vec<String> = serde_json::from_str(&json).unwrap_or_default();
+        if !tags.iter().any(|t| from.contains(t)) {
+            continue;
+        }
+        let mut merged: Vec<String> = Vec::new();
+        for t in tags {
+            let t = if from.contains(&t) { into.to_owned() } else { t };
+            if !merged.contains(&t) {
+                merged.push(t);
+            }
+        }
+        tx.execute("UPDATE packs SET tags = ?2 WHERE id = ?1", params![id, serde_json::to_string(&merged)?])?;
+    }
+    for id in &touched {
+        reindex_asset(&tx, id)?;
+    }
+    tx.commit()?;
+    Ok(touched.len())
+}
+
+/// Tags merged into others: (old name, the tag it became).
+pub(crate) fn tag_aliases(conn: &Connection) -> Result<Vec<(String, String)>> {
+    let mut stmt = conn.prepare("SELECT tag, into_tag FROM tag_aliases ORDER BY tag")?;
+    Ok(stmt.query_map([], |r| Ok((r.get(0)?, r.get(1)?)))?.collect::<rusqlite::Result<_>>()?)
 }
 
 /// Turn free text into a safe FTS5 query: every term becomes a quoted prefix match, and all must match.
@@ -1219,9 +1304,12 @@ pub(crate) fn search(conn: &Connection, q: &SearchQuery, with_facets: bool) -> R
     Ok(SearchPage { items, total: total as u64, kinds, tags, supporting_hidden: supporting_hidden as u64 })
 }
 
-pub(crate) fn tag_counts(conn: &Connection, prefix: &str, limit: u32) -> Result<Vec<Facet>> {
+/// Tags in use and how many assets have each, most used first: those starting with `prefix`, or with `anywhere`
+/// those containing it.
+pub(crate) fn tag_counts(conn: &Connection, prefix: &str, anywhere: bool, limit: u32) -> Result<Vec<Facet>> {
+    let lead = if anywhere { "'%' || " } else { "" };
     let mut stmt = conn.prepare(&format!(
-        "SELECT tag, COUNT(*) FROM asset_tags WHERE tag LIKE ?1 || '%' ESCAPE '\\'
+        "SELECT tag, COUNT(*) FROM asset_tags WHERE tag LIKE {lead}?1 || '%' ESCAPE '\\'
            AND asset_id IN (SELECT a.id FROM assets a WHERE {LIVE})
          GROUP BY tag ORDER BY 2 DESC, 1 LIMIT ?2",
     ))?;
@@ -1481,7 +1569,7 @@ mod tests {
         assert_eq!(search(&conn, &q, false).unwrap().total, 1, "an archived pack's assets open from the archive");
         assert_eq!(list_packs(&conn, false).unwrap().iter().map(|p| p.id.clone()).collect::<Vec<_>>(), s(&["p1"]));
         assert!(
-            tag_counts(&conn, "", 100).unwrap().iter().all(|f| f.value != "stone"),
+            tag_counts(&conn, "", false, 100).unwrap().iter().all(|f| f.value != "stone"),
             "archived tags leave the tag list"
         );
 
@@ -1504,6 +1592,43 @@ mod tests {
         assert_eq!((n.packs, gone), (1, s(&["p2"])));
         assert_eq!(ids(&conn, false), s(&["a2"]));
         assert_eq!(ids(&conn, true), Vec::<String>::new());
+    }
+
+    #[test]
+    fn merged_tags_stay_merged() {
+        let dir = tempfile::tempdir().unwrap();
+        let pool = open(&dir.path().join("hoard.db"), &dir.path().join("backups")).unwrap();
+        let mut conn = pool.get().unwrap();
+        conn.execute_batch(
+            "INSERT INTO blobs (hash, size, created_at) VALUES ('h1', 1, 'x'), ('h2', 1, 'x');
+             INSERT INTO packs (id, name, status, tags, created_at) VALUES ('p1', 'Forest', 'ready', '[\"rock\",\"stone\"]', 'x');
+             INSERT INTO assets (id, pack_id, blob_hash, path, name, ext, kind, created_at, updated_at) VALUES
+               ('a1', 'p1', 'h1', 'a1.png', 'a1', 'png', 'texture', 'x', 'x'),
+               ('a2', 'p1', 'h2', 'a2.png', 'a2', 'png', 'texture', 'x', 'x');
+             INSERT INTO asset_tags (asset_id, tag, source, confidence) VALUES
+               ('a1', 'rock', 'rule', 0.8), ('a1', 'stone', 'human', 1.0), ('a2', 'rocks', 'ai', 0.6);",
+        )
+        .unwrap();
+        let s = |v: &[&str]| v.iter().map(ToString::to_string).collect::<Vec<_>>();
+        assert_eq!(merge_tags(&mut conn, &s(&["rock", "rocks"]), "stone").unwrap(), 2);
+        let tags = |id: &str| {
+            get_asset(&conn, id).unwrap().unwrap().tags.into_iter().map(|t| (t.tag, t.source)).collect::<Vec<_>>()
+        };
+        assert_eq!(tags("a1"), vec![("stone".to_owned(), TagSource::Human)], "a person's tag wins");
+        assert_eq!(tags("a2"), vec![("stone".to_owned(), TagSource::Ai)]);
+        assert_eq!(get_pack(&conn, "p1").unwrap().unwrap().tags, s(&["stone"]));
+        assert_eq!(get_pack(&conn, "p1").unwrap().unwrap().kinds.get("texture"), Some(&2));
+
+        // The taggers' old name lands on the new one, and renaming again carries the aliases along.
+        upsert_tag(&conn, "a2", "rock", TagSource::Rule, 0.9).unwrap();
+        assert_eq!(tags("a2"), vec![("stone".to_owned(), TagSource::Rule)]);
+        merge_tags(&mut conn, &s(&["stone"]), "rock").unwrap();
+        assert_eq!(
+            tag_aliases(&conn).unwrap(),
+            vec![("rocks".to_owned(), "rock".to_owned()), ("stone".to_owned(), "rock".to_owned())]
+        );
+        let q = SearchQuery { q: Some("rock".into()), ..Default::default() };
+        assert_eq!(search(&conn, &q, false).unwrap().total, 2, "search finds the new name");
     }
 
     #[test]

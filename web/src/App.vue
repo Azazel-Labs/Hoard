@@ -24,6 +24,7 @@ import SetupWizard from './components/SetupWizard.vue'
 import ArchiveView from './components/ArchiveView.vue'
 import { archiveWithUndo, countText } from './archive'
 import { showError, showOk, swipeToClose, useTween, withTransition, type Command } from './ui'
+import { useVirtualGrid } from './virtualGrid'
 
 type View = 'library' | 'packs' | 'settings' | 'archive'
 const PAGE = 60
@@ -109,6 +110,8 @@ async function runSearch(append = false) {
       hide_supporting: !prefs.showSupporting,
     })
     if (seq !== searchSeq) return
+    // Only a new page's tiles rise in; tiles scrolled back into view just appear.
+    fresh.value = append ? items.value.length : 0
     items.value = append ? [...items.value, ...res.items] : res.items
     total.value = res.total
     supportingHidden.value = res.supporting_hidden ?? 0
@@ -119,7 +122,15 @@ async function runSearch(append = false) {
   } catch (e) {
     showError(`Search failed: ${(e as Error).message}`, { label: 'Retry', run: () => runSearch(append) })
   } finally {
-    if (seq === searchSeq) loading.value = false
+    if (seq === searchSeq) {
+      loading.value = false
+      // Observing again reports where the end is now: still in range (a short page, a tall window) loads another.
+      await nextTick()
+      if (sentinel.value && observer) {
+        observer.unobserve(sentinel.value)
+        observer.observe(sentinel.value)
+      }
+    }
   }
 }
 
@@ -166,7 +177,7 @@ watch(sentinel, (el) => {
   if (!el) return
   observer = new IntersectionObserver((entries) => {
     if (entries.some((e) => e.isIntersecting) && !loading.value && items.value.length < total.value) runSearch(true)
-  }, { rootMargin: '600px' })
+  }, { root: mainEl.value, rootMargin: '1500px 0px' })
   observer.observe(el)
 })
 
@@ -195,6 +206,12 @@ function browseCollection(c: Collection | Named) {
   showFilters.value = false
 }
 const mainEl = ref<HTMLElement | null>(null)
+/** Index of the first tile of the newest page, the ones that animate in. */
+const fresh = ref(0)
+const win = useVirtualGrid({ scroller: mainEl, grid: gridEl, count: () => items.value.length })
+const windowed = computed(() =>
+  items.value.slice(win.start.value, win.end.value).map((a, n) => ({ a, i: win.start.value + n })),
+)
 /** The logo: back to the whole library, nothing filtered or open, at the top. */
 function goHome() {
   clearFilters()
@@ -528,36 +545,28 @@ function onUpdated(a: Asset) {
 
 // ------------------------------------------------------------------ keyboard
 
-const tileButtons = () => [...(gridEl.value?.querySelectorAll<HTMLButtonElement>('.hit') ?? [])]
-
 function focusTile(id: string) {
-  nextTick(() => {
-    const el = gridEl.value?.querySelector<HTMLButtonElement>(`.hit[data-id="${id}"]`)
-    el?.focus({ preventScroll: true })
-    el?.scrollIntoView({ block: 'nearest' })
-  })
+  const i = items.value.findIndex((a) => a.id === id)
+  if (i < 0) return
+  // Its row may be scrolled out of the page: bring it in first, then focus it once it's rendered.
+  win.reveal(i)
+  nextTick(() => gridEl.value?.querySelector<HTMLButtonElement>(`.hit[data-id="${id}"]`)?.focus({ preventScroll: true }))
 }
 
 /** Move focus through the grid like a file browser; with the detail open, it follows. */
 function moveFocus(key: string) {
-  const tiles = tileButtons()
-  if (!tiles.length) return
-  const current = tiles.indexOf(document.activeElement as HTMLButtonElement)
+  const count = items.value.length
+  if (!count) return
+  const focusedId = (document.activeElement as HTMLElement | null)?.closest<HTMLElement>('.grid .hit')?.dataset.id
+  const current = focusedId ? items.value.findIndex((a) => a.id === focusedId) : -1
   const from = current >= 0 ? current : Math.max(0, items.value.findIndex((a) => a.id === selected.value?.id))
-  const top = tiles[0].getBoundingClientRect().top
-  // The first tile that starts a new row tells how many fit across (-1: everything fits on one row).
-  const rowBreak = tiles.findIndex((t) => Math.abs(t.getBoundingClientRect().top - top) > 4)
-  const perRow = rowBreak > 0 ? rowBreak : tiles.length
+  const perRow = win.columns.value
   const delta = { ArrowRight: 1, ArrowLeft: -1, ArrowDown: perRow, ArrowUp: -perRow, j: 1, k: -1 }[key] ?? 0
-  const next = current < 0 ? from : Math.min(tiles.length - 1, Math.max(0, from + delta))
-  const id = tiles[next].dataset.id
-  if (!id) return
+  const next = current < 0 ? from : Math.min(count - 1, Math.max(0, from + delta))
+  const id = items.value[next].id
   focusTile(id)
-  if (selected.value && selected.value.id !== id) {
-    const a = items.value.find((x) => x.id === id)
-    if (a) openAsset(a)
-  }
-  if (next >= tiles.length - perRow && items.value.length < total.value && !loading.value) runSearch(true)
+  if (selected.value && selected.value.id !== id) openAsset(items.value[next])
+  if (next >= count - perRow && count < total.value && !loading.value) runSearch(true)
 }
 
 function onKey(e: KeyboardEvent) {
@@ -1136,14 +1145,14 @@ const commands = computed<Command[]>(() => {
           <button v-if="hasFilters" type="button" class="btn" @click="clearFilters">Clear search and filters</button>
         </div>
 
-        <div ref="gridEl" class="grid" :class="{ selecting: checked.length > 0 }">
+        <div ref="gridEl" class="grid" :class="{ selecting: checked.length > 0 }" :style="win.padding.value">
           <template v-if="firstLoad">
             <div v-for="n in 18" :key="`s${n}`" class="skeleton" :style="{ '--i': n }" aria-hidden="true"><span /><i /><b /></div>
           </template>
           <AssetTile
-            v-for="(a, i) in items"
+            v-for="{ a, i } in windowed"
             :key="a.id"
-            :style="{ '--i': i % PAGE }"
+            :style="i >= fresh ? { '--i': i - fresh } : { animation: 'none' }"
             :asset="a"
             :selected="selected?.id === a.id"
             :checked="checkedSet.has(a.id)"
@@ -1152,11 +1161,11 @@ const commands = computed<Command[]>(() => {
             @check="toggleCheck(a, $event)"
           />
         </div>
-        <div v-if="items.length < total" ref="sentinel" class="more">
-          <button type="button" class="btn ghost" :disabled="loading" @click="runSearch(true)">
-            {{ loading ? 'Loading…' : `Show more (${(total - items.length).toLocaleString()} left)` }}
-          </button>
+        <!-- The next page loads well before the end comes into view; these stand in while it does. -->
+        <div v-if="items.length < total" ref="sentinel" class="grid more" aria-hidden="true">
+          <div v-for="n in win.columns.value * 2" :key="`m${n}`" class="skeleton" :style="{ '--i': n }"><span /><i /><b /></div>
         </div>
+        <p v-if="items.length < total" class="visually-hidden" aria-live="polite">{{ loading ? 'Loading more' : '' }}</p>
         <p v-if="items.length && !checked.length" class="hint">
           Arrow keys move, Enter opens, Space plays a sound, X or Ctrl-click selects several (long-press on touch).
         </p>
@@ -1406,7 +1415,7 @@ const commands = computed<Command[]>(() => {
 .supporting { margin: -0.25rem 0 0.9rem; font-size: 0.78rem; color: var(--faint); }
 .supporting .linkbtn { font-size: inherit; color: var(--muted); }
 .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(var(--tile), 1fr)); gap: 1.1rem 0.9rem; }
-.more { display: flex; justify-content: center; margin-top: 1.5rem; }
+.grid.more { margin-top: 1.1rem; }
 .none { color: var(--muted); padding: 3rem 0; display: flex; flex-direction: column; align-items: center; text-align: center; }
 .art { display: block; margin-bottom: 1rem; overflow: visible; }
 .welcome .art { margin-bottom: 1.25rem; }

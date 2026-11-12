@@ -36,7 +36,9 @@ pub(crate) fn router(state: &AppState) -> Router<AppState> {
     };
     let writes = Router::new()
         .route("/api/packs", post(upload_pack).layer(upload_limit()))
-        .route("/api/packs/{id}", axum::routing::delete(delete_pack))
+        .route("/api/packs/{id}", axum::routing::delete(delete_pack).patch(patch_pack))
+        .route("/api/tags/merge", post(merge_tags))
+        .route("/api/tags/aliases", get(tag_aliases).delete(drop_tag_alias))
         .route("/api/packs/{id}/retag", post(retag_pack))
         .route("/api/packs/{id}/context", axum::routing::put(put_pack_context))
         .route("/api/packs/{id}/store-matches", get(crate::store_search::store_matches))
@@ -355,6 +357,33 @@ async fn get_pack(State(state): State<AppState>, Path(id): Path<String>) -> ApiR
         .await?
         .map(Json)
         .ok_or_else(|| AppError::not_found(format!("pack {id}")))
+}
+
+#[derive(Deserialize)]
+struct PackPatch {
+    name: Option<String>,
+}
+
+/// Rename a pack. Everything refers to packs by id, so searches, links and collections carry on as they were.
+async fn patch_pack(
+    State(state): State<AppState>,
+    Path(id): Path<String>,
+    Json(patch): Json<PackPatch>,
+) -> ApiResult<Json<Pack>> {
+    let name = patch.name.map(|n| n.trim().chars().take(200).collect::<String>());
+    if name.as_deref() == Some("") {
+        return Err(AppError::bad_request("a pack needs a name"));
+    }
+    let id2 = id.clone();
+    db::call(&state.pool, move |c| {
+        if let Some(name) = &name {
+            c.execute("UPDATE packs SET name = ?2 WHERE id = ?1", params![id2, name])?;
+        }
+        db::get_pack(c, &id2)
+    })
+    .await?
+    .map(Json)
+    .ok_or_else(|| AppError::not_found(format!("pack {id}")))
 }
 
 async fn delete_pack(State(state): State<AppState>, Path(id): Path<String>) -> ApiResult<StatusCode> {
@@ -843,13 +872,53 @@ async fn serve_blob(
 struct TagParams {
     #[serde(default)]
     prefix: String,
+    /// Match `prefix` anywhere in the tag, not only at the start.
+    #[serde(default)]
+    anywhere: bool,
     limit: Option<u32>,
 }
 
 async fn tags(State(state): State<AppState>, Query(p): Query<TagParams>) -> ApiResult<Json<Value>> {
-    let limit = p.limit.unwrap_or(30).min(500);
-    let rows = db::call(&state.pool, move |c| db::tag_counts(c, &p.prefix.to_lowercase(), limit)).await?;
+    let limit = p.limit.unwrap_or(30).min(5000);
+    let rows = db::call(&state.pool, move |c| db::tag_counts(c, &p.prefix.to_lowercase(), p.anywhere, limit)).await?;
     Ok(Json(json!(rows)))
+}
+
+#[derive(Deserialize)]
+struct MergeTags {
+    from: Vec<String>,
+    into: String,
+}
+
+/// Merge tags into one (or rename one: a single tag into a new name).
+async fn merge_tags(State(state): State<AppState>, Json(m): Json<MergeTags>) -> ApiResult<Json<Value>> {
+    let into = hoard_core::normalize_tag(&m.into).ok_or_else(|| AppError::bad_request("into must be a tag"))?;
+    let from: Vec<String> =
+        m.from.iter().map(|t| t.trim().to_lowercase()).filter(|t| !t.is_empty() && *t != into).collect();
+    if from.is_empty() {
+        return Err(AppError::bad_request("nothing to merge"));
+    }
+    let (into2, from2) = (into.clone(), from.clone());
+    let assets = db::call(&state.pool, move |c| db::merge_tags(c, &from2, &into2)).await?;
+    tracing::info!(?from, into, assets, "tags merged");
+    Ok(Json(json!({ "into": into, "assets": assets })))
+}
+
+async fn tag_aliases(State(state): State<AppState>) -> ApiResult<Json<Value>> {
+    let rows = db::call(&state.pool, |c| db::tag_aliases(c)).await?;
+    Ok(Json(json!(rows.into_iter().map(|(tag, into)| json!({ "tag": tag, "into": into })).collect::<Vec<_>>())))
+}
+
+#[derive(Deserialize)]
+struct AliasParams {
+    tag: String,
+}
+
+/// Stop mapping a merged tag's old name: the taggers may use it again.
+async fn drop_tag_alias(State(state): State<AppState>, Query(p): Query<AliasParams>) -> ApiResult<StatusCode> {
+    db::call(&state.pool, move |c| Ok(c.execute("DELETE FROM tag_aliases WHERE tag = ?1", [&p.tag]).map(drop)?))
+        .await?;
+    Ok(StatusCode::NO_CONTENT)
 }
 
 /// Flatten a selection (explicit ids and/or a search) into an engine-friendly list of files.

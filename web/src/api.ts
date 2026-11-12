@@ -167,6 +167,8 @@ export interface Pack {
   unreal_converted?: number
   /** When it went to the archive. */
   archived_at?: string | null
+  /** Assets of each kind in it. */
+  kinds?: Partial<Record<AssetKind, number>>
 }
 
 export interface Facet { value: string; count: number }
@@ -546,6 +548,12 @@ export const api = {
   purge: (items: ArchiveItems & { all?: boolean }) => post<ArchiveCount>('/api/archive/purge', items),
   bulkAssets: (edit: BulkEdit) => post<{ updated: number }>('/api/assets/bulk', edit),
   deletePack: (id: string) => request<void>(`/api/packs/${id}`, { method: 'DELETE', keepalive: true }),
+  renamePack: (id: string, name: string) =>
+    request<Pack>(`/api/packs/${id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name }),
+    }),
   retagPack: (id: string, body: { rules?: boolean; llm?: boolean }) =>
     request<void>(`/api/packs/${id}/retag`, {
       method: 'POST',
@@ -614,6 +622,13 @@ export const api = {
       body: JSON.stringify(opts),
     }),
   tags: (prefix: string) => request<Facet[]>(`/api/tags?prefix=${encodeURIComponent(prefix)}&limit=12`),
+  /** Every tag in use containing `q`, most used first. */
+  allTags: (q: string, limit = 2000) =>
+    request<Facet[]>(`/api/tags?prefix=${encodeURIComponent(q)}&anywhere=true&limit=${limit}`),
+  /** Fold tags into one; a single tag into a new name renames it. */
+  mergeTags: (from: string[], into: string) => post<{ into: string; assets: number }>('/api/tags/merge', { from, into }),
+  tagAliases: () => request<{ tag: string; into: string }[]>('/api/tags/aliases'),
+  dropTagAlias: (tag: string) => request<void>(`/api/tags/aliases?tag=${encodeURIComponent(tag)}`, { method: 'DELETE' }),
   activity: () => request<{ items: ActivityItem[] }>('/api/activity'),
   settings: () => request<Settings>('/api/admin/settings'),
   saveSettings: (patch: SettingsPatch) =>

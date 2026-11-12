@@ -58,6 +58,7 @@ pub(crate) fn router(state: &AppState) -> Router<AppState> {
             "/api/admin/locations/{id}",
             axum::routing::patch(locations::patch_location).delete(locations::delete_location),
         )
+        .route("/api/admin/locations/{id}/scan", post(locations::scan_location))
         .route("/api/admin/fs", get(locations::browse))
         .route("/api/admin/llm/models", post(llm_models))
         .route("/api/admin/llm/local", post(llm_local))

@@ -43,8 +43,9 @@ pub(crate) fn maybe_enqueue(state: &AppState, conn: &Connection, pack_id: &str) 
     if mode == UnrealConvert::Off || count_packages(conn, pack_id)? == 0 {
         return Ok(false);
     }
-    let req =
-        Request { discard_originals: mode == UnrealConvert::Replace, drop_unsupported: false, then_llm: Some(true) };
+    // A watched folder's packages stay: they're files Hoard doesn't own, and a rescan would only find them again.
+    let discard = mode == UnrealConvert::Replace && crate::locations::watched_root(conn, pack_id)?.is_none();
+    let req = Request { discard_originals: discard, drop_unsupported: false, then_llm: Some(true) };
     db::enqueue(conn, jobs::UNREAL, Some(pack_id), &serde_json::to_value(req)?)?;
     state.wake.notify_one();
     Ok(true)
@@ -212,8 +213,13 @@ pub(crate) struct Summary {
     pub(crate) failed: usize,
 }
 
-pub(crate) async fn convert_pack(state: &AppState, pack_id: &str, req: Request) -> Result<Summary> {
+pub(crate) async fn convert_pack(state: &AppState, pack_id: &str, mut req: Request) -> Result<Summary> {
     let pid = pack_id.to_owned();
+    if req.discard_originals {
+        let pid = pid.clone();
+        req.discard_originals =
+            db::call(&state.pool, move |c| crate::locations::watched_root(c, &pid)).await?.is_none();
+    }
     let todo: Vec<(String, String, String)> = db::call(&state.pool, move |c| {
         let mut stmt =
             c.prepare("SELECT id, path, blob_hash FROM assets WHERE pack_id = ?1 AND ext IN ('uasset', 'umap')")?;

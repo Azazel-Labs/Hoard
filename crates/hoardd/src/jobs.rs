@@ -17,6 +17,7 @@ pub(crate) const LLM_TAG: &str = "llm_tag";
 pub(crate) const SCRUB: &str = "scrub";
 pub(crate) const CONVERT: &str = "convert";
 pub(crate) const UNREAL: &str = "unreal_convert";
+pub(crate) const SCAN: &str = "scan_location";
 
 /// With the backoff below, the last try comes about 15 minutes after the first: long enough for a local model
 /// that's still downloading on the first start of the compose stack.
@@ -65,6 +66,7 @@ pub(crate) fn job_label(kind: &str, pack: &str) -> String {
         SCRUB => "Checking stored files for damage".to_owned(),
         CONVERT => format!("Converting {pack} with Blender"),
         UNREAL => format!("Converting Unreal packages in {pack}"),
+        SCAN => "Scanning a watched folder".to_owned(),
         other => format!("{other} {pack}"),
     }
 }
@@ -87,6 +89,7 @@ async fn run(state: &AppState, job: db::JobRow) {
         SCRUB => SCRUB,
         CONVERT => CONVERT,
         UNREAL => UNREAL,
+        SCAN => SCAN,
         _ => "job",
     };
     let _activity = crate::activity::start(
@@ -120,6 +123,10 @@ async fn run(state: &AppState, job: db::JobRow) {
             let req = serde_json::from_value(job.payload.clone()).unwrap_or_default();
             crate::extract::convert_pack(state, &pack_id, req).await.map(|_| ())
         }
+        SCAN => match job.payload.get("location").and_then(serde_json::Value::as_i64) {
+            Some(loc) => blocking(state, move |s, rt| crate::scan::scan(s, rt, loc).map(|_| ())).await,
+            None => Err(anyhow::anyhow!("scan job without a location")),
+        },
         other => Err(anyhow::anyhow!("unknown job kind {other}")),
     };
 

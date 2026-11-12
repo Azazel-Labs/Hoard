@@ -278,6 +278,12 @@ impl BlobStore {
         Ok(StoredBlob { hash, size })
     }
 
+    /// Whether Hoard holds a copy of this blob itself (in the cache or a managed location), as opposed to only
+    /// finding it in a watched folder.
+    pub(crate) async fn stored(&self, hash: &str) -> Result<bool> {
+        Ok(exists_in(&*self.cache, hash).await? || self.libs().holds(hash).await?)
+    }
+
     /// Store a thumbnail, model views or an audio preview in the local cache store rather than with the files.
     pub(crate) async fn put_cache_bytes(&self, bytes: Vec<u8>) -> Result<StoredBlob> {
         let hash = blake3::hash(&bytes).to_hex().to_string();

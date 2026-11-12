@@ -92,6 +92,17 @@ pub(crate) fn watched_path(root: &str, folder: Option<&str>, rel: &str) -> PathB
     p
 }
 
+/// The folder a watched pack is read from, or `None` for a pack Hoard keeps itself.
+pub(crate) fn watched_root(c: &Connection, pack_id: &str) -> Result<Option<PathBuf>> {
+    Ok(c.query_row(
+        "SELECT l.path, p.folder FROM packs p JOIN locations l ON l.id = p.location_id
+          WHERE p.id = ?1 AND l.mode = 'watched'",
+        [pack_id],
+        |r| Ok(watched_path(&r.get::<_, String>(0)?, r.get::<_, Option<String>>(1)?.as_deref(), "")),
+    )
+    .optional()?)
+}
+
 #[derive(Debug, Clone, Deserialize)]
 pub(crate) struct NewLocation {
     #[serde(default)]
@@ -279,7 +290,24 @@ pub(crate) async fn create_location(
     let loc = db::call(&state.pool, move |c| insert(c, &new)).await?;
     state.blobs.reload()?;
     tracing::info!(name = %loc.name, path = %loc.path, mode = loc.mode.as_str(), "library location added");
+    if loc.mode == Mode::Watched {
+        let (s, id) = (std::sync::Arc::clone(&state), loc.id);
+        db::call(&state.pool, move |c| crate::scan::enqueue(c, &s, id)).await?;
+    }
     Ok((StatusCode::CREATED, Json(loc)))
+}
+
+/// `POST /api/admin/locations/{id}/scan`: look through a watched folder now rather than at the next rescan.
+pub(crate) async fn scan_location(State(state): State<AppState>, UrlPath(id): UrlPath<i64>) -> ApiResult<StatusCode> {
+    let loc = db::call(&state.pool, move |c| get(c, id))
+        .await?
+        .ok_or_else(|| AppError::not_found(format!("location {id}")))?;
+    if loc.mode != Mode::Watched {
+        return Err(AppError::bad_request(format!("{} isn't a watched folder", loc.name)));
+    }
+    let s = std::sync::Arc::clone(&state);
+    db::call(&state.pool, move |c| crate::scan::enqueue(c, &s, id)).await?;
+    Ok(StatusCode::ACCEPTED)
 }
 
 /// `PATCH /api/admin/locations/{id}`: rename, change the kinds it takes, or make it the catch-all. Where a

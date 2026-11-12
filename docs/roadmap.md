@@ -3,23 +3,15 @@
 What's planned or being weighed, roughly in order. Nothing here is promised; each item says what's settled and what
 isn't yet.
 
-## Library locations and a first-run setup
+## Library locations: what's left
 
-Today all files go into one content-addressed store (`/library` in the container, `--files-dir` otherwise). The
-plan is to make storage work the way other library apps do:
+The first-run setup and library locations are in: a server can keep files in several managed locations, routed by
+asset kind, and index watched folders in place. Still to come:
 
-- The first visit to a new server opens a short setup that asks where your first library lives. There's no fixed
-  location in the image any more; you mount folders and add them in the app.
-- A server can have several library locations, each on whichever disk suits it. Each is one of two kinds:
-  - **Managed:** Hoard copies uploads and imports into it, as the single store does today.
-  - **Watched:** an existing folder of packs that Hoard indexes where it sits and keeps scanning for new ones, as
-    Plex does with media folders. Hoard never moves or changes files there.
-- Each location ticks the asset kinds it takes (audio, music, models, textures, animations, Unreal, other). A new
-  pack's files go to the managed location that takes their kind, and one location is the catch-all.
-- Locations can be added, emptied and removed from Settings later, with Hoard moving files between managed ones.
-
-Still to decide: how watched folders map to packs (one subfolder per pack is the likely rule), what happens when a
-watched file changes or disappears, and S3 storage as one more kind of managed location.
+- Moving files between managed locations, so a location can be emptied and removed, or its kinds changed for files
+  already stored.
+- Watched files edited in place: a rescan picks up new and removed folders and files, but a file changed where it sits
+  keeps its old hash and preview until the pack is re-analyzed.
 
 ## Store details looked up automatically
 

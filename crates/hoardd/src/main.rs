@@ -27,6 +27,7 @@ mod locations;
 mod mcp;
 mod meshes;
 mod music;
+mod scan;
 mod server;
 mod settings;
 mod sheet;
@@ -128,6 +129,7 @@ async fn main() -> Result<()> {
     updates::start(effective.update_check);
     analyze::warm_renderer();
     jobs::spawn_workers(&state);
+    scan::spawn_rescans(&state);
 
     let mut app = api::router(&state);
     let web = &state.cfg.web_dir;

@@ -2,7 +2,7 @@
 //!
 //! Runs on a blocking thread (see `jobs`). Storage calls are async, so they go through `rt.block_on`.
 
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 use std::fs::{self, File};
 use std::io::{self, BufReader, Read, Write};
 use std::path::{Path, PathBuf};
@@ -146,6 +146,19 @@ fn walk_files(dir: &Path, out: &mut Vec<PathBuf>) -> Result<()> {
         }
     }
     Ok(())
+}
+
+/// Every file under a pack's root but junk (OS litter, VCS folders); Unity sidecars are still in.
+fn listed(root: &Path) -> Result<Vec<PathBuf>> {
+    let mut files = Vec::new();
+    walk_files(root, &mut files)?;
+    files.retain(|f| !is_junk(&rel_of(root, f)));
+    Ok(files)
+}
+
+/// The relative paths a pack folder would give its assets: what a rescan compares the pack against.
+pub(crate) fn pack_rels(root: &Path) -> Result<HashSet<String>> {
+    Ok(listed(root)?.iter().map(|f| rel_of(root, f)).filter(|rel| !is_sidecar(rel)).collect())
 }
 
 fn rel_of(root: &Path, path: &Path) -> String {
@@ -547,12 +560,15 @@ struct Previews {
 
 /// Upload a batch's originals and previews to the blob store. The preview bytes are moved out of the items, not
 /// copied. Returns the previews by item index.
-fn upload_all(state: &AppState, rt: &Handle, items: &mut [Item]) -> Result<Vec<Previews>> {
+/// A watched folder's files stay where they are (`store_originals` false); only their previews are stored.
+fn upload_all(state: &AppState, rt: &Handle, items: &mut [Item], store_originals: bool) -> Result<Vec<Previews>> {
     let blobs = &state.blobs;
     rt.block_on(async {
-        stream::iter(items.iter().map(Ok::<_, anyhow::Error>))
-            .try_for_each_concurrent(8, |it| async move { blobs.put_file(&it.local, &it.blob, it.kind).await })
-            .await?;
+        if store_originals {
+            stream::iter(items.iter().map(Ok::<_, anyhow::Error>))
+                .try_for_each_concurrent(8, |it| async move { blobs.put_file(&it.local, &it.blob, it.kind).await })
+                .await?;
+        }
         stream::iter(items.iter_mut())
             .map(|it| async move {
                 let a = &mut it.analysis;
@@ -678,24 +694,42 @@ fn insert_asset(
 
 /// Unpack an upload and add its files to the pack. Files are analyzed, stored and written a batch at a time, so
 /// memory stays flat however many files a pack has, and the database is never locked for more than a moment.
+///
+/// A pack in a watched folder is read where it sits instead: nothing is unpacked, copied or cleaned up. Files the
+/// pack already has (from an interrupted run, or a watched pack being rescanned) are skipped.
 pub(crate) fn ingest_pack(state: &AppState, rt: &Handle, pack_id: &str, auto_name: bool) -> Result<()> {
-    let staging = state.cfg.staging_dir().join(pack_id);
-    anyhow::ensure!(staging.is_dir(), "staging folder for pack {pack_id} is gone");
     let mut conn = state.pool.get()?;
+    let watched = crate::locations::watched_root(&conn, pack_id)?;
+    let staging = state.cfg.staging_dir().join(pack_id);
+    match &watched {
+        Some(root) => anyhow::ensure!(root.is_dir(), "{} can't be read", root.display()),
+        None => anyhow::ensure!(staging.is_dir(), "staging folder for pack {pack_id} is gone"),
+    }
     db::set_pack_status(&conn, pack_id, PackStatus::Ingesting, None)?;
     // The file count isn't known until it's unpacked: no total shows as busy rather than stuck at 0 of 1.
     conn.execute("UPDATE packs SET files_total = 0, files_done = 0 WHERE id = ?1", [pack_id])?;
 
-    let budget = Budget::new(state.settings.get().max_expand_mb.saturating_mul(1 << 20), pack_id);
-    expand_archives(&staging, &budget, 0)?;
-    let (root, wrapper_name) = find_root(&staging)?;
+    let (root, wrapper_name) = if let Some(root) = &watched {
+        (root.clone(), None)
+    } else {
+        let budget = Budget::new(state.settings.get().max_expand_mb.saturating_mul(1 << 20), pack_id);
+        expand_archives(&staging, &budget, 0)?;
+        find_root(&staging)?
+    };
 
-    let mut files = Vec::new();
-    walk_files(&root, &mut files)?;
-    files.retain(|f| !is_junk(&rel_of(&root, f)));
+    let mut files = listed(&root)?;
     let guids = harvest_unity_guids(&root, &files);
     files.retain(|f| !is_sidecar(&rel_of(&root, f)));
     files.sort();
+    let license = detect_pack_license(&root, &files);
+    let readme = context::read_readmes(&root, &files);
+    let known: HashSet<String> = {
+        let mut stmt = conn.prepare("SELECT path FROM assets WHERE pack_id = ?1")?;
+        stmt.query_map([pack_id], |r| r.get(0))?.collect::<rusqlite::Result<_>>()?
+    };
+    let first = known.is_empty();
+    files.retain(|f| !known.contains(&rel_of(&root, f)));
+    drop(known);
     conn.execute(
         "UPDATE packs SET files_total = ?2, files_done = 0 WHERE id = ?1",
         params![pack_id, files.len() as i64],
@@ -704,8 +738,6 @@ pub(crate) fn ingest_pack(state: &AppState, rt: &Handle, pack_id: &str, auto_nam
         conn.execute("UPDATE packs SET name = ?2 WHERE id = ?1", params![pack_id, name])?;
     }
 
-    let license = detect_pack_license(&root, &files);
-    let readme = context::read_readmes(&root, &files);
     let jobs: Vec<(PathBuf, String)> = files
         .into_iter()
         .map(|f| {
@@ -725,7 +757,7 @@ pub(crate) fn ingest_pack(state: &AppState, rt: &Handle, pack_id: &str, auto_nam
             for it in &mut batch {
                 apply_pack_rules(it, &sets, license);
             }
-            let previews = upload_all(state, rt, &mut batch)?;
+            let previews = upload_all(state, rt, &mut batch, watched.is_none())?;
             let now = db::now();
             let tx = conn.transaction()?;
             for (item, p) in batch.into_iter().zip(previews) {
@@ -757,7 +789,14 @@ pub(crate) fn ingest_pack(state: &AppState, rt: &Handle, pack_id: &str, auto_nam
     tx.commit()?;
     tracing::info!(pack = pack_id, links = n_links, families = n_families, "pack ingested");
 
-    fs::remove_dir_all(&staging).ok();
+    if watched.is_none() {
+        fs::remove_dir_all(&staging).ok();
+    } else if !first {
+        // A rescan that found a few new files: they're tagged by the rules; the pack's conversions and AI tagging
+        // aren't run over the whole pack again.
+        db::set_pack_status(&conn, pack_id, PackStatus::Ready, None)?;
+        return Ok(());
+    }
     convert::maybe_enqueue(state, &conn, pack_id)?;
     if crate::extract::maybe_enqueue(state, &conn, pack_id)? {
         // The conversion job retags what it converted and carries on from there.
@@ -796,6 +835,8 @@ pub(crate) fn retag_pack(state: &AppState, rt: &Handle, pack_id: &str) -> Result
         kind: String,
     }
     let mut conn = state.pool.get()?;
+    // A watched pack's files are read from its folder; they're never copied in.
+    let watched = crate::locations::watched_root(&conn, pack_id)?.is_some();
     let rows: Vec<Row> = {
         let mut stmt = conn
             .prepare("SELECT id, path, blob_hash, human_edited, kind FROM assets WHERE pack_id = ?1 ORDER BY path")?;
@@ -831,7 +872,7 @@ pub(crate) fn retag_pack(state: &AppState, rt: &Handle, pack_id: &str) -> Result
             .filter(|r| r.kind == AssetKind::Texture.as_str() || could_be_texture(&r.rel))
             .map(|r| r.rel.as_str()),
     );
-    let human: std::collections::HashSet<&str> = rows.iter().filter(|r| r.human).map(|r| r.id.as_str()).collect();
+    let human: HashSet<&str> = rows.iter().filter(|r| r.human).map(|r| r.id.as_str()).collect();
 
     let mut refs = HashMap::new();
     pipeline(
@@ -852,7 +893,7 @@ pub(crate) fn retag_pack(state: &AppState, rt: &Handle, pack_id: &str) -> Result
             for it in &mut batch {
                 apply_pack_rules(it, &sets, license);
             }
-            let previews = upload_all(state, rt, &mut batch)?;
+            let previews = upload_all(state, rt, &mut batch, !watched)?;
             let locals: Vec<PathBuf> = batch.iter().map(|it| it.local.clone()).collect();
             let now = db::now();
             let tx = conn.transaction()?;

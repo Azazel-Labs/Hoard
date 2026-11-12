@@ -91,7 +91,10 @@ it and drop a pack onto the portal. More locations come later, from **Settings �
 - **A library Hoard keeps** gets copies of what you upload or import. Each one ticks the kinds of files it takes
   (audio on one disk, models on another), and one is the catch-all for the rest.
 - **A watched folder** is a folder of packs you already have. Each folder inside it becomes a pack, indexed where it
-  sits. Hoard never changes, moves or deletes anything there. Mount it read-only if you like.
+  sits. Hoard never changes, moves or deletes anything there. Mount it read-only if you like. Hoard looks through it
+  at startup and every 15 minutes after (or when you press **Scan now**), picking up new folders, files added to or
+  removed from a pack, and packs whose folder is gone. A folder that's suddenly empty or unreachable is taken for a
+  disk that isn't mounted, and its packs are kept.
 
 A location is any folder the server can see, so in Docker, mount it into the container first.
 
@@ -596,6 +599,7 @@ when a token is set; those are marked 🔒.
 | GET 🔒, PUT 🔒 | `/api/admin/settings` | Settings: read, or change some (`null` goes back to the flag) |
 | GET 🔒, POST 🔒 | `/api/admin/locations` | library locations (with whether each is reachable and its pack count), or add one: `{mode, path, kinds, catch_all, name?}` |
 | PATCH 🔒, DELETE 🔒 | `/api/admin/locations/{id}` | rename one, change its kinds or make it the catch-all; or remove it (a managed one must be empty) |
+| POST 🔒 | `/api/admin/locations/{id}/scan` | look through a watched folder now; returns 202 and the scan runs as a job |
 | GET 🔒 | `/api/admin/fs?path=` | the folders in a folder on the server, for picking a location |
 | POST 🔒 | `/api/admin/llm/models` | `{url, api_key?}`: the models an AI service offers (also a connection test) |
 | POST 🔒 | `/api/admin/scrub` | re-hash every blob |

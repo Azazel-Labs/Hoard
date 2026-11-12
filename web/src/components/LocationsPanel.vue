@@ -91,6 +91,32 @@ async function remove(l: LibraryLocation) {
   }
 }
 
+function scannedAgo(iso?: string | null): string {
+  if (!iso) return 'not scanned yet'
+  const mins = Math.floor((Date.now() - new Date(iso).getTime()) / 60_000)
+  if (mins < 1) return 'scanned just now'
+  if (mins < 60) return `scanned ${mins} min ago`
+  const hours = Math.floor(mins / 60)
+  if (hours < 24) return `scanned ${hours} h ago`
+  return `scanned ${new Date(iso).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}`
+}
+
+const scanning = ref<number | null>(null)
+async function scanNow(l: LibraryLocation) {
+  scanning.value = l.id
+  try {
+    await api.scanLocation(l.id)
+    // A scan takes a moment; new folders then ingest in the background and show up in the library as they finish.
+    await new Promise((r) => setTimeout(r, 1500))
+    await load()
+    emit('changed')
+  } catch (e) {
+    failed(e, `Couldn't scan ${l.name}`)
+  } finally {
+    scanning.value = null
+  }
+}
+
 async function created(l: LibraryLocation) {
   adding.value = false
   showOk(l.mode === 'watched' ? `Watching ${l.name}` : `Added ${l.name}`)
@@ -109,7 +135,7 @@ async function created(l: LibraryLocation) {
           <p v-if="group.id === 'managed'" class="hint">
             Uploads and imports are copied in here. Each location takes the kinds it ticks; the catch-all takes the rest.
           </p>
-          <p v-else class="hint">Folders of packs indexed where they are. Hoard never changes the files in them.</p>
+          <p v-else class="hint">Folders of packs indexed where they are. Hoard never changes the files in them, and looks for new and removed folders every 15 minutes.</p>
           <p v-if="!group.list.length" class="hint empty">None yet, so there's nowhere to put an upload. Add one below.</p>
           <ul class="list">
             <li v-for="l in group.list" :key="l.id" :class="{ open: editing === l.id }">
@@ -121,10 +147,14 @@ async function created(l: LibraryLocation) {
                   <small>
                     <template v-if="l.mode === 'managed'">{{ takes(l) }}</template>
                     <template v-if="l.mode === 'managed'"> · </template>{{ l.packs }} pack{{ l.packs === 1 ? '' : 's' }}
+                    <template v-if="l.mode === 'watched'"> · {{ scannedAgo(l.scanned_at) }}</template>
                     <template v-if="!l.online"> · <span class="off">can’t be reached</span></template>
                   </small>
                 </div>
                 <div v-if="editing !== l.id" class="acts">
+                  <button v-if="l.mode === 'watched'" type="button" class="btn ghost" :disabled="busy || scanning === l.id" @click="scanNow(l)">
+                    {{ scanning === l.id ? 'Scanning…' : 'Scan now' }}
+                  </button>
                   <button type="button" class="btn ghost" :disabled="busy" @click="edit(l)">Edit</button>
                   <button type="button" class="btn ghost danger" :disabled="busy" @click="remove(l)">Remove</button>
                 </div>

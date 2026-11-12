@@ -21,6 +21,7 @@ mod fbx;
 mod ffmpeg;
 mod fonts;
 mod formats;
+mod gpu_hint;
 mod heavy;
 mod https;
 mod ingest;

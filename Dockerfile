@@ -47,6 +47,11 @@ RUN apt-get update \
     libx11-6 libxi6 libxxf86vm1 libxfixes3 libxrender1 libxext6 libxkbcommon0 libsm6 libice6 libgl1 libegl1 \
  && rm -rf /var/lib/apt/lists/* \
  && mkdir -p /config /library /cache
+# NVIDIA's Vulkan and EGL manifests. The NVIDIA Container Toolkit mounts the driver's libraries but copies these from
+# the host, and many hosts (Unraid, headless servers without a Vulkan loader) have none, which leaves the GPU unused.
+# With no NVIDIA GPU passed in, the libraries they name aren't there and the loaders skip them.
+COPY deploy/nvidia/nvidia_icd.json /usr/share/vulkan/icd.d/nvidia_icd.json
+COPY deploy/nvidia/10_nvidia.json /usr/share/glvnd/egl_vendor.d/10_nvidia.json
 COPY --from=build /src/target/release/hoardd /src/target/release/hoard /usr/local/bin/
 COPY --from=web /web/dist /srv/hoard/web
 # Fixes up the mounted folders' owners, then runs hoardd as an ordinary user (see the script).

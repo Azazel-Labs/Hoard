@@ -192,9 +192,9 @@ it's the `update` field.
 
 Hoard uses a GPU for 3D model thumbnails (wgpu over Vulkan) when the container can see one. Otherwise it falls back
 to Mesa's software renderer (lavapipe), which is already in the image, so a GPU is optional and only makes model
-thumbnails faster. The packs page shows what Hoard found: `GPU: <adapter> (vulkan)`, `No GPU found: model thumbnails
-render in software`, or no renderer at all. The same text is in `GET /api/stats` (`renderer`) and in the startup
-log.
+thumbnails faster. Settings → Server shows what Hoard found under "3D thumbnails": `On the GPU: <adapter>
+(vulkan)`, `No GPU found, so in software`, or no renderer at all. The same is in `GET /api/stats` (`renderer`) and
+in the startup log.
 
 Layer the overlay for your hardware on any compose file that runs `hoard`:
 
@@ -208,7 +208,13 @@ docker compose -f deploy/compose.yml -f deploy/compose.gpu-nvidia.yml up -d
 
 The overlay asks for the `graphics` driver capability as well as `compute`. Without it the toolkit doesn't mount the
 Vulkan driver, and Hoard falls back to software rendering even though `nvidia-smi` works. `runtime: nvidia` on the
-`hoard` service works too: the image sets `NVIDIA_VISIBLE_DEVICES=all` and that capability list itself.
+`hoard` service works too: the image sets `NVIDIA_VISIBLE_DEVICES=all` and that capability list itself. The image
+also brings NVIDIA's Vulkan manifest (`/usr/share/vulkan/icd.d/nvidia_icd.json`), which the toolkit copies from the
+host only when the host has one, and many (Unraid, headless servers) don't.
+
+When a GPU is passed in but Hoard still renders in software, Settings → Server says what the container is missing
+under "3D thumbnails" (and the startup log has the same line): the graphics capability, the Vulkan manifest, or
+driver libraries an older toolkit leaves out.
 
 Hoard's own GPU use is only model thumbnails. AI tagging runs in the `llm` service, so for that the model server
 needs the GPU: the overlay swaps in the `server-cuda` image (below); with `runtime: nvidia` by hand, change

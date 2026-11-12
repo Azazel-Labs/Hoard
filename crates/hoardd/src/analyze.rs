@@ -29,6 +29,8 @@ pub(crate) fn set_render_enabled(on: bool, views: bool) {
 
 /// What the renderer runs on, for `GET /api/stats`; set once the renderer has been created (or failed to be).
 static RENDERER_STATUS: OnceLock<String> = OnceLock::new();
+/// Why there's no GPU when one seems to be there; set with [`RENDERER_STATUS`].
+static RENDERER_HINT: OnceLock<Option<String>> = OnceLock::new();
 
 /// The shared headless renderer, created on first use. `None` if disabled or no adapter exists.
 pub(crate) fn renderer() -> Option<&'static Mutex<hoard_render::Renderer>> {
@@ -41,7 +43,15 @@ pub(crate) fn renderer() -> Option<&'static Mutex<hoard_render::Renderer>> {
                 let kind = if r.is_hardware() { "gpu" } else { "cpu" };
                 tracing::info!(adapter = r.adapter_name(), backend = r.backend(), kind, "model thumbnails enabled");
                 if !r.is_hardware() {
-                    tracing::info!("no GPU visible: model thumbnails render in software (see docs/DEPLOYMENT.md, GPU)");
+                    let hint = crate::gpu_hint::why_no_gpu();
+                    if let Some(h) = &hint {
+                        tracing::warn!("a GPU is there but model thumbnails render in software: {h}");
+                    } else {
+                        tracing::info!(
+                            "no GPU visible: model thumbnails render in software (see docs/DEPLOYMENT.md, GPU)"
+                        );
+                    }
+                    let _ = RENDERER_HINT.set(hint);
                 }
                 let _ = RENDERER_STATUS.set(format!("{kind}: {} ({})", r.adapter_name(), r.backend()));
                 Some(Mutex::new(r))
@@ -72,6 +82,11 @@ pub(crate) fn describe_renderer() -> String {
         return "off".into();
     }
     RENDERER_STATUS.get().cloned().unwrap_or_else(|| "starting".into())
+}
+
+/// What's missing when a GPU seems to be there but the renderer runs in software.
+pub(crate) fn renderer_hint() -> Option<String> {
+    RENDERER_HINT.get().cloned().flatten()
 }
 
 /// JPEG quality for thumbnails and model views; 0 keeps them as PNG. See [`crate::settings::ThumbQuality`].

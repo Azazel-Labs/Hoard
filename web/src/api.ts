@@ -270,6 +270,8 @@ export interface Stats {
   update?: { version: string; url: string }
   /** Model thumbnails: `gpu: <adapter> (<api>)`, `cpu: …` (software), `starting`, `off` or `unavailable: …`. */
   renderer?: string
+  /** When thumbnails render in software although a GPU seems to be there: what the container is missing. */
+  renderer_hint?: string
   /** No library location yet: the first-run setup should open. */
   setup_needed?: boolean
   /** Space cached "Download as" conversions take, and the most they may. */

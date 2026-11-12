@@ -746,6 +746,9 @@ pub struct Stats {
     /// visible), `starting`, `off` or `unavailable: <why>`.
     #[serde(default)]
     pub renderer: String,
+    /// When the renderer fell back to software although a GPU seems to be there: what's missing, in a sentence.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub renderer_hint: Option<String>,
     /// No library location yet: the portal opens its first-run setup.
     #[serde(default)]
     pub setup_needed: bool,

@@ -1148,7 +1148,10 @@ onBeforeUnmount(() => {
               <dl>
                 <template v-if="stats.version"><dt>Version</dt><dd>Hoard {{ stats.version }}</dd></template>
                 <dt>Files</dt><dd class="mono">{{ stats.storage }}</dd>
-                <template v-if="gpuNote"><dt>3D thumbnails</dt><dd :class="{ ok: gpuNote.ok }" :title="stats.renderer">{{ gpuNote.text }}</dd></template>
+                <template v-if="gpuNote"><dt>3D thumbnails</dt><dd :class="{ ok: gpuNote.ok }" :title="stats.renderer">
+                  {{ gpuNote.text }}
+                  <small v-if="stats.renderer_hint" class="hint" data-testid="gpu-hint">{{ stats.renderer_hint }}</small>
+                </dd></template>
                 <template v-if="ffmpegNote"><dt>ffmpeg</dt><dd>{{ ffmpegNote }}</dd></template>
               </dl>
             </section>
@@ -1339,6 +1342,7 @@ h3 { margin: 0; font-size: 0.7rem; font-weight: 650; letter-spacing: 0.04em; tex
 .about dt { color: var(--muted); }
 .about dd { margin: 0; overflow-wrap: anywhere; }
 .about dd.ok { color: var(--ok); }
+.about dd .hint { display: block; margin-top: 0.25rem; color: var(--muted); line-height: 1.45; }
 .mono { font-family: var(--mono, ui-monospace, monospace); font-size: 0.95em; }
 .opt-row { display: flex; align-items: center; gap: 0.4rem; min-height: 1.75rem; }
 

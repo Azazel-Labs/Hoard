@@ -2,7 +2,8 @@
 # compose files here:
 #   docker compose -f deploy/compose.yml -f deploy/compose.gpu-nvidia.yml up -d
 # Needs the NVIDIA driver and the NVIDIA Container Toolkit on the host (`nvidia-ctk runtime configure --runtime=docker`,
-# then restart Docker). Check: the packs page says "GPU: NVIDIA ...", or `docker compose logs hoard | grep thumbnails`.
+# then restart Docker). Check: Settings → Server says "On the GPU: NVIDIA ...", or `docker compose logs hoard | grep thumbnails`;
+# if a GPU is passed in but not used, the same place says what the container is missing.
 services:
   hoard:
     environment:

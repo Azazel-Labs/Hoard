@@ -193,6 +193,7 @@ async fn stats(State(state): State<AppState>) -> ApiResult<Json<Stats>> {
             blender: crate::blender::describe(),
             update: crate::updates::available(),
             renderer: crate::analyze::describe_renderer(),
+            renderer_hint: crate::analyze::renderer_hint(),
             setup_needed: one("SELECT COUNT(*) FROM locations")? == 0,
             conversion_cache_bytes: crate::formats::conversion_cache_bytes(c)?,
             conversion_cache_limit,

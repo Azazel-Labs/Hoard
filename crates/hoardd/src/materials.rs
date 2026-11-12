@@ -515,8 +515,18 @@ fn name_from_sidecars(
 }
 
 /// Find the pack's materials and bring the library in line: new ones added, changed ones updated (keeping their
-/// id, tags people gave them and collections), ones whose maps are gone removed. Returns how many it has.
+/// id, tags people gave them and collections), ones whose maps are gone removed; then the thumbnails of models that
+/// wear one redrawn with it on. Returns how many materials it has.
 pub(crate) fn detect_pack(state: &AppState, rt: &Handle, conn: &mut Connection, pack_id: &str) -> Result<usize> {
+    let n = find_materials(state, rt, conn, pack_id)?;
+    if let Err(e) = dress_models(state, rt, conn, pack_id) {
+        tracing::warn!(pack = pack_id, error = %format!("{e:#}"), "could not put materials on model thumbnails");
+    }
+    Ok(n)
+}
+
+/// The materials in a pack's textures, made into assets, and the models that use them linked.
+fn find_materials(state: &AppState, rt: &Handle, conn: &mut Connection, pack_id: &str) -> Result<usize> {
     crate::issues::clear(
         conn,
         &[crate::issues::MATERIALS, crate::issues::MATERIAL_THUMB],
@@ -673,6 +683,91 @@ pub(crate) fn detect_pack(state: &AppState, rt: &Handle, conn: &mut Connection, 
     links::assign_families(&tx, pack_id)?;
     tx.commit()?;
     Ok(made.len())
+}
+
+/// Models whose file names no textures but which wear a material (by name, or through its maps beside them) get a
+/// white thumbnail when they're read, before the material is found. Render them again with the material's colour map on, as the 3D viewers show them. A thumbnail
+/// a browser drew is left alone, and one already dressed isn't redone.
+fn dress_models(state: &AppState, rt: &Handle, conn: &Connection, pack_id: &str) -> Result<usize> {
+    let todo: Vec<(String, String, String, String)> = conn
+        .prepare(
+            "SELECT o.id, o.blob_hash, o.ext, MAX(t.thumb_hash) FROM assets o
+               JOIN material_maps m ON m.role = 'base_color' AND EXISTS (
+                    SELECT 1 FROM asset_links l WHERE l.from_id = o.id
+                       AND ((l.rel = 'material' AND l.to_id = m.material_id)
+                            OR l.to_id IN (SELECT x.texture_id FROM material_maps x WHERE x.material_id = m.material_id)))
+               JOIN assets t ON t.id = m.texture_id AND t.thumb_hash IS NOT NULL
+              WHERE o.pack_id = ?1 AND o.kind = 'model' AND o.ext IN ('fbx', 'obj')
+                AND o.thumb_source IS NULL AND o.thumb_hash IS NOT NULL
+                AND o.thumb_hash IS NOT json_extract(o.meta, '$.thumb_dressed')
+              GROUP BY o.id",
+        )?
+        .query_map([pack_id], |r| Ok((r.get(0)?, r.get(1)?, r.get(2)?, r.get(3)?)))?
+        .collect::<rusqlite::Result<_>>()?;
+    if todo.is_empty() || crate::analyze::renderer().is_none() {
+        return Ok(0);
+    }
+    std::fs::create_dir_all(state.cfg.tmp_dir())?;
+    let work = tempfile::Builder::new().prefix("dress-").tempdir_in(state.cfg.tmp_dir())?;
+    let mut done = 0;
+    for (id, blob, ext, color) in todo {
+        let file = work.path().join(format!("model.{ext}"));
+        let dressed = (|| -> Result<Option<Vec<u8>>> {
+            rt.block_on(state.blobs.download_to(&blob, &file))?;
+            let (Some(mut mesh), _) = crate::meshes::load(&file, &ext, work.path())? else { return Ok(None) };
+            // Textures of its own after all: what it shows already is right.
+            if mesh.materials.iter().any(|m| m.color_image.is_some()) {
+                return Ok(None);
+            }
+            let bytes = rt.block_on(state.blobs.read_all(&color))?.to_vec();
+            let mime = crate::analyze::thumb_mime(&bytes);
+            mesh.images.push(crate::meshes::Image { bytes, mime });
+            let image = mesh.images.len() - 1;
+            if mesh.materials.is_empty() {
+                mesh.materials.push(crate::meshes::Material::plain("material", [1.0; 4]));
+            }
+            for m in &mut mesh.materials {
+                m.color_image = Some(image);
+                m.color = [1.0, 1.0, 1.0, m.color[3]];
+            }
+            crate::analyze::mesh_thumb_bytes(&mesh, &file)
+        })();
+        std::fs::remove_file(&file).ok();
+        let thumb = match dressed {
+            Ok(Some(t)) => t,
+            Ok(None) => continue,
+            Err(e) => {
+                tracing::debug!(asset = %id, error = %format!("{e:#}"), "model thumbnail kept undressed");
+                continue;
+            }
+        };
+        let stored = rt.block_on(state.blobs.put_cache_bytes(thumb))?;
+        let old: Option<String> = conn.query_row("SELECT thumb_hash FROM assets WHERE id = ?1", [&id], |r| r.get(0))?;
+        conn.execute(
+            "INSERT INTO blobs (hash, size, created_at) VALUES (?1, ?2, ?3) ON CONFLICT (hash) DO NOTHING",
+            params![stored.hash, stored.size as i64, db::now()],
+        )?;
+        // A browser may have sent its own meanwhile; that one stays.
+        let n = conn.execute(
+            "UPDATE assets SET thumb_hash = ?2, meta = json_set(meta, '$.thumb_dressed', ?2)
+              WHERE id = ?1 AND thumb_source IS NULL",
+            params![id, stored.hash],
+        )?;
+        if n > 0 {
+            done += 1;
+            if let Some(old) = old.filter(|o| *o != stored.hash) {
+                let size: Option<i64> =
+                    conn.query_row("SELECT size FROM blobs WHERE hash = ?1", [&old], |r| r.get(0)).optional()?;
+                if let Some(size) = size {
+                    rt.block_on(crate::jobs::delete_unused(state, vec![(old, size)])).ok();
+                }
+            }
+        }
+    }
+    if done > 0 {
+        tracing::info!(pack = pack_id, models = done, "model thumbnails redrawn with their materials");
+    }
+    Ok(done)
 }
 
 /// `8K` → 8192, for sorting.

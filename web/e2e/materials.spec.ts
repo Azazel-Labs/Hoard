@@ -1,6 +1,7 @@
 import { MEGASCANS } from './support/seed'
 import { MEGASCANS_FOLDER } from './support/files'
 import type { Page } from '@playwright/test'
+import { assetsOf, signedIn } from './support/api'
 import { doubleClick, expect, openPack, test } from './support/test'
 
 // The Megascans pack's four maps make one material, named after the listing like its model. Only the model wears it,
@@ -70,5 +71,14 @@ test.describe('materials', () => {
     // Its own file name isn't what it's called any more.
     await expect(panel.getByRole('heading', { name: MEGASCANS })).toBeVisible()
     await expect(panel.getByText(MEGASCANS_FOLDER.replaceAll('_', ' '), { exact: true })).toHaveCount(0)
+  })
+
+  test("the server's thumbnail of the model has the material's colour map on", async ({ seed, baseURL }) => {
+    const api = await signedIn(baseURL!)
+    const stats = (await (await api.get('/api/stats')).json()) as { renderer?: string }
+    test.skip(!/^(gpu|cpu):/.test(stats.renderer ?? ''), `no model renderer here (${stats.renderer})`)
+    const model = (await assetsOf(api, seed.packs[MEGASCANS])).find((a) => a.kind === 'model')!
+    const full = (await (await api.get(`/api/assets/${model.id}`)).json()) as { meta: { thumb_dressed?: string } }
+    expect(full.meta.thumb_dressed).toBeTruthy()
   })
 })

@@ -384,6 +384,14 @@ fn mesh_thumb(path: &Path, root: &Path, ext: &str, a: &mut Analysis) -> anyhow::
     }
 }
 
+/// A thumbnail of a mesh put together elsewhere, made like any model's; `path` names a scratch file beside which
+/// the GLB is written for a moment.
+pub(crate) fn mesh_thumb_bytes(mesh: &crate::meshes::Mesh, path: &Path) -> anyhow::Result<Option<Vec<u8>>> {
+    let mut a = Analysis::default();
+    render_mesh(mesh, path, "mesh", &mut a)?;
+    Ok(a.thumb)
+}
+
 fn render_mesh(mesh: &crate::meshes::Mesh, path: &Path, ext: &str, a: &mut Analysis) -> anyhow::Result<()> {
     let glb = crate::meshes::to_glb(mesh)?;
     let tmp = path.with_extension(format!("{ext}.hoard-preview.glb"));

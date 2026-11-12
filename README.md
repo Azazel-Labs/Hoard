@@ -356,6 +356,8 @@ one material. It takes a colour map plus one more, or two other kinds of map.
   repeats, how far the height map pushes, each map switched off and on, the environment light and the background.
 - **Models** that use a material's maps, by naming them or by sharing its name (`Rock_A.fbx` next to the `Rock_…`
   maps), show the material in their panel. On a model that names no textures, the 3D viewers put its maps on by kind.
+  A material only one model wears (or only that model's LODs, `Rock_LOD0` … `Rock_LOD3`) is part of it: it leaves the
+  grid like its maps and opens from the model's panel. A material several models share stays a tile of its own.
 - **Downloading** a material gives a zip of all its maps. A model that uses one brings the maps along.
 
 New packs are looked through as they come in, and packs already in the library once after an upgrade. A rescan or

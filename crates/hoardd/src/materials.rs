@@ -669,6 +669,7 @@ pub(crate) fn detect_pack(state: &AppState, rt: &Handle, conn: &mut Connection, 
         }
     }
     link_models(&tx, pack_id)?;
+    mark_owned(&tx, pack_id)?;
     links::assign_families(&tx, pack_id)?;
     tx.commit()?;
     Ok(made.len())
@@ -766,6 +767,58 @@ fn link_models(tx: &Connection, pack_id: &str) -> Result<()> {
             if !uses_maps {
                 insert.execute(params![model_id, mat_id])?;
             }
+        }
+    }
+    Ok(())
+}
+
+/// The object a model is of: its folder and name without an LOD number, so `Rock_LOD0.fbx` and `Rock_LOD3.fbx` are
+/// one rock.
+fn object_key(path: &str) -> String {
+    let mut words: Vec<String> = tokens(stem_of(path)).into_iter().map(|t| t.text).collect();
+    if words.len() > 2 && words[words.len() - 2] == "lod" && words[words.len() - 1].bytes().all(|b| b.is_ascii_digit())
+    {
+        words.truncate(words.len() - 2);
+    }
+    format!("{}/{}", dir_key(dir_of(path)), words.join(" "))
+}
+
+/// A material only one object uses (a model, or that model's LODs) is part of it, as its maps are part of the
+/// material: it goes out of the grid ([`db::SUPPORTING`]), and the model shows it. `owned_by` in its meta names the
+/// model, its most detailed LOD. A material several objects share, or none, stays in the grid as itself.
+fn mark_owned(tx: &Connection, pack_id: &str) -> Result<()> {
+    let users: Vec<(String, String, String)> = {
+        let mut stmt = tx.prepare(&format!(
+            "SELECT a.id, o.id, o.path FROM assets a
+               JOIN asset_links l ON l.to_id = a.id AND l.rel = 'material'
+               JOIN assets o ON o.id = l.from_id AND o.kind = 'model'
+              WHERE a.pack_id = ?1 AND {IS_MATERIAL}
+             UNION
+             SELECT a.id, o.id, o.path FROM assets a
+               JOIN material_maps m ON m.material_id = a.id
+               JOIN asset_links l ON l.to_id = m.texture_id
+               JOIN assets o ON o.id = l.from_id AND o.kind = 'model'
+              WHERE a.pack_id = ?1 AND {IS_MATERIAL}
+             ORDER BY 3"
+        ))?;
+        stmt.query_map([pack_id], |r| Ok((r.get(0)?, r.get(1)?, r.get(2)?)))?.collect::<rusqlite::Result<_>>()?
+    };
+    // Each material's objects, and the first model of each by path (LOD0 before LOD1).
+    let mut objects: HashMap<&str, BTreeMap<String, &str>> = HashMap::new();
+    for (material, model, path) in &users {
+        objects.entry(material).or_default().entry(object_key(path)).or_insert(model);
+    }
+    tx.execute(
+        &format!(
+            "UPDATE assets AS a SET meta = json_remove(a.meta, '$.owned_by')
+              WHERE a.pack_id = ?1 AND {IS_MATERIAL} AND json_extract(a.meta, '$.owned_by') IS NOT NULL"
+        ),
+        [pack_id],
+    )?;
+    let mut own = tx.prepare_cached("UPDATE assets SET meta = json_set(meta, '$.owned_by', ?2) WHERE id = ?1")?;
+    for (material, by) in &objects {
+        if let [(_, model)] = by.iter().collect::<Vec<_>>()[..] {
+            own.execute(params![material, model])?;
         }
     }
     Ok(())
@@ -1067,5 +1120,45 @@ mod tests {
     #[test]
     fn never_takes_a_real_files_path() {
         assert_eq!(found(&["Rock_Color.png", "Rock_Normal.png", "Rock.material"]).len(), 0);
+    }
+
+    #[test]
+    fn lods_are_one_object() {
+        assert_eq!(object_key("Rocks/Rock_LOD0.fbx"), object_key("Rocks/Rock_LOD3.fbx"));
+        assert_ne!(object_key("Rocks/Rock_LOD0.fbx"), object_key("Rocks/Cliff_LOD0.fbx"));
+        assert_ne!(object_key("a/Rock.fbx"), object_key("b/Rock.fbx"));
+        // Only a trailing LOD number goes.
+        assert_ne!(object_key("Rock_LOD0_Base.fbx"), object_key("Rock_LOD0_Top.fbx"));
+    }
+
+    #[test]
+    fn a_material_one_object_wears_is_part_of_it() {
+        let c = Connection::open_in_memory().unwrap();
+        c.execute_batch(
+            r#"CREATE TABLE assets (id TEXT PRIMARY KEY, pack_id TEXT, path TEXT, ext TEXT, kind TEXT, meta TEXT);
+               CREATE TABLE asset_links (from_id TEXT, to_id TEXT, rel TEXT);
+               CREATE TABLE material_maps (material_id TEXT, texture_id TEXT);
+               INSERT INTO assets VALUES
+                 ('rockmat', 'p', 'Rock.material', 'material', 'material', '{"material_maps":1}'),
+                 ('sharedmat', 'p', 'Moss.material', 'material', 'material', '{"material_maps":1}'),
+                 ('lonemat', 'p', 'Sand.material', 'material', 'material', '{"material_maps":1,"owned_by":"gone"}'),
+                 ('rock_tex', 'p', 'Rock_BaseColor.png', 'png', 'texture', '{}'),
+                 ('lod1', 'p', 'Rock_LOD1.fbx', 'fbx', 'model', '{}'),
+                 ('lod0', 'p', 'Rock_LOD0.fbx', 'fbx', 'model', '{}'),
+                 ('cliff', 'p', 'Cliff.fbx', 'fbx', 'model', '{}');
+               INSERT INTO material_maps VALUES ('rockmat', 'rock_tex');
+               INSERT INTO asset_links VALUES
+                 ('lod0', 'rock_tex', 'texture'), ('lod1', 'rockmat', 'material'),
+                 ('lod0', 'sharedmat', 'material'), ('cliff', 'sharedmat', 'material');"#,
+        )
+        .unwrap();
+        mark_owned(&c, "p").unwrap();
+        let owner = |id: &str| -> Option<String> {
+            c.query_row("SELECT json_extract(meta, '$.owned_by') FROM assets WHERE id = ?1", [id], |r| r.get(0))
+                .unwrap()
+        };
+        assert_eq!(owner("rockmat").as_deref(), Some("lod0"), "the rock's LODs are one object; LOD0 owns it");
+        assert_eq!(owner("sharedmat"), None, "two objects share it");
+        assert_eq!(owner("lonemat"), None, "nothing uses it any more");
     }
 }

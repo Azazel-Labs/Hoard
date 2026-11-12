@@ -63,6 +63,8 @@ interface Want {
   max: number
   /** Image top at v = 1 (three's own shapes, OBJ, FBX); glTF has it at v = 0. */
   flipY: boolean
+  /** Hears each full-size map start loading, and calls back whether it loaded: so a viewer can wait for them all. */
+  track?: (name: string) => (ok: boolean) => void
 }
 
 /** Decode a map for one slot. Colour maps keep their colour profile; data maps are read as raw numbers. */
@@ -167,6 +169,8 @@ export function loadMaps(
     const full = mapUrl(j.map, packId, want.max)
     const small = j.map.has_thumb && mapPx(j.map) > 256 ? thumbUrl(j.map) : ''
     const load = async (url: string, isFull: boolean) => {
+      const end = isFull ? want.track?.(j.map.name) : undefined
+      let ok = false
       try {
         const tex = await decode(await fetchImage(url, abort.signal), j.role, want)
         if (abort.signal.aborted || (!isFull && done.has(key))) {
@@ -175,8 +179,11 @@ export function loadMaps(
         }
         if (isFull) done.add(key)
         put(j.slots, tex)
+        ok = true
       } catch {
         // A thumbnail that fails is no loss; a full map that fails leaves its thumbnail, if any.
+      } finally {
+        end?.(ok || abort.signal.aborted)
       }
     }
     if (small) void load(small, false)
@@ -195,9 +202,10 @@ export function applyToModel(
   flipY: boolean,
   tracked: Map<THREE.Material, Partial<Record<string, THREE.Texture | null>>>,
   onChange?: () => void,
+  track?: Want['track'],
 ): { count: number; stop: () => void } {
   const roles = new Set<Slot>()
-  const stop = loadMaps(info, packId, { max: 2048, flipY }, (set, replaced) => {
+  const stop = loadMaps(info, packId, { max: 2048, flipY, track }, (set, replaced) => {
     for (const [m, maps] of tracked) {
       const mat = m as THREE.MeshStandardMaterial & Record<string, unknown>
       for (const [slot, tex] of Object.entries(set.textures) as [Slot, THREE.Texture][]) {

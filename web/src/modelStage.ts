@@ -491,11 +491,29 @@ export class ModelStage {
     // Or a material made from maps that share its name: its maps by role.
     const material = textured.any ? undefined : full.materials?.[0]
     if (material) {
-      const applied = applyToModel(material, asset.pack_id, this.flipY, this.materials, () => {
-        // A view built from the maps that were there shows the new ones only once built again.
-        if (this.views) this.buildViews()
-        this.onTexturesChanged?.()
-      })
+      const applied = applyToModel(
+        material,
+        asset.pack_id,
+        this.flipY,
+        this.materials,
+        () => {
+          // A view built from the maps that were there shows the new ones only once built again.
+          if (this.views) this.buildViews()
+          this.onTexturesChanged?.()
+        },
+        // The material's maps count as the model's textures: a thumbnail waits for them, and one that fails is missing.
+        (name) => {
+          this.pending++
+          return (ok) => {
+            this.pending = Math.max(0, this.pending - 1)
+            if (!ok && !this.missing.includes(name)) {
+              this.missing.push(name)
+              this.onMissing?.([...this.missing])
+            }
+            this.checkSettled()
+          }
+        },
+      )
       this.stopMaps = applied.stop
       guessed = applied.count
     } else if (!textured.any && guesses.length) guessed = this.applyGuesses(guesses, asset.pack_id, this.flipY, manager)

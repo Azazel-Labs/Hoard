@@ -1,25 +1,35 @@
 import { MEGASCANS } from './support/seed'
 import { MEGASCANS_FOLDER } from './support/files'
+import type { Page } from '@playwright/test'
 import { doubleClick, expect, openPack, test } from './support/test'
 
-// The Megascans pack's four maps make one material, named after the listing like its model.
+// The Megascans pack's four maps make one material, named after the listing like its model. Only the model wears it,
+// so it's part of the model: one tile, and the material opens from the model.
 test.describe('materials', () => {
-  test('a texture set shows as one material tile, its maps hidden behind it', async ({ page, seed }) => {
+  /** Opens the pack, the model, then the material it wears; returns the side panel. */
+  async function openMaterial(page: Page, packId: string) {
+    await openPack(page, packId, MEGASCANS, '&sort=name')
+    await page.locator('.grid button.hit[aria-label*=" tris"]').click()
+    const panel = page.getByRole('complementary', { name: 'Asset details' })
+    const worn = panel.locator('section', { has: page.getByRole('heading', { name: 'Material', exact: true }) })
+    await worn.getByRole('button', { name: new RegExp(MEGASCANS) }).click()
+    await expect(panel.locator('section', { has: page.getByRole('heading', { name: 'Maps' }) })).toBeVisible()
+    return panel
+  }
+
+  test('a model and the one material it wears show as one tile, the maps hidden behind it', async ({ page, seed }) => {
     await openPack(page, seed.packs[MEGASCANS], MEGASCANS, '&sort=name')
     const grid = page.locator('.grid button.hit')
-    await expect(grid).toHaveCount(2)
-    await expect(page.locator(`.grid button.hit[aria-label^="${MEGASCANS},"]`)).toHaveCount(2)
-    await expect(page.locator('.grid button.hit[aria-label*=" maps"]')).toHaveCount(1)
-    // The maps (and the store's JSON) are there when asked for.
-    await expect(page.getByText(/5 supporting files? hidden/)).toBeVisible()
+    await expect(grid).toHaveCount(1)
+    await expect(page.locator(`.grid button.hit[aria-label^="${MEGASCANS},"][aria-label*=" tris"]`)).toHaveCount(1)
+    // The material, its maps (and the store's JSON) are there when asked for.
+    await expect(page.getByText(/6 supporting files hidden/)).toBeVisible()
   })
 
   test('the material opens with a live preview, its maps by role, and a full-screen viewer', async ({ page, seed }) => {
     // A WebGL material on a busy runner: give it room.
     test.slow()
-    await openPack(page, seed.packs[MEGASCANS], MEGASCANS, '&sort=name')
-    await page.locator('.grid button.hit[aria-label*=" maps"]').click()
-    const panel = page.getByRole('complementary', { name: 'Asset details' })
+    const panel = await openMaterial(page, seed.packs[MEGASCANS])
     await expect(panel.getByRole('heading', { name: MEGASCANS })).toBeVisible()
     const maps = panel.locator('section', { has: page.getByRole('heading', { name: 'Maps' }) })
     for (const role of ['Colour', 'Normal', 'Roughness', 'Ambient occlusion']) {
@@ -44,7 +54,9 @@ test.describe('materials', () => {
   test('double-clicking the material tile opens its viewer', async ({ page, seed }) => {
     // The side panel's live preview and the viewer both start WebGL, slow on a runner without a GPU.
     test.slow()
+    // Shown as itself once supporting files are.
     await openPack(page, seed.packs[MEGASCANS], MEGASCANS, '&sort=name')
+    await page.locator('.supporting').getByRole('button', { name: 'Show' }).click()
     await doubleClick(page, page.locator('.grid button.hit[aria-label*=" maps"]'))
     await expect(page.getByRole('dialog', { name: `View the material ${MEGASCANS}` })).toBeVisible({ timeout: 45_000 })
   })

@@ -193,6 +193,16 @@ const MIGRATIONS: &[&str] = &[
      CREATE INDEX issues_pack ON issues(pack_id) WHERE pack_id IS NOT NULL;
      CREATE INDEX assets_analysis_error ON assets(updated_at) WHERE json_extract(meta, '$.analysis_error') IS NOT NULL;
      CREATE INDEX assets_thumb_error ON assets(updated_at) WHERE json_extract(meta, '$.thumb_error') IS NOT NULL;",
+    // 26: a material only one model uses becomes part of it (`materials::mark_owned`), worked out by looking at each
+    // pack's materials again. A browser drawing of a model that wears a material may have been taken before the
+    // material's maps arrived (all white): it's drawn again when the model is next opened.
+    "UPDATE assets SET thumb_source = 'browser-partial'
+       WHERE thumb_source = 'browser' AND id IN (SELECT from_id FROM asset_links WHERE rel = 'material');
+     INSERT INTO jobs (kind, pack_id, payload, run_after, created_at, updated_at)
+       SELECT 'materials', p.id, '{}', strftime('%Y-%m-%dT%H:%M:%SZ', 'now'), strftime('%Y-%m-%dT%H:%M:%SZ', 'now'),
+              strftime('%Y-%m-%dT%H:%M:%SZ', 'now')
+       FROM packs p WHERE p.status = 'ready'
+        AND EXISTS (SELECT 1 FROM assets a WHERE a.pack_id = p.id AND a.ext = 'material');",
 ];
 
 /// How many automatic pre-upgrade backups to keep in `<data dir>/backups`.
@@ -1335,10 +1345,12 @@ pub(crate) const LIVE: &str =
 
 /// An asset another asset needs as raw data (a glTF's .bin, an OBJ's .mtl), the store's file describing a model
 /// (a Megascans `<id>.json`) or a map of a material (its roughness
-/// map, say): not something you'd browse for. The material is, and it shows its maps.
+/// map, say): not something you'd browse for. The material is, and it shows its maps, unless it's the material of
+/// one object only (`owned_by`, see `materials::mark_owned`): then it's part of that model, which shows it.
 pub(crate) const SUPPORTING: &str = "(EXISTS (SELECT 1 FROM asset_links l WHERE l.to_id = a.id
      AND (l.rel IN ('buffer', 'sidecar') OR (l.rel = 'material' AND a.ext = 'mtl')))
-     OR EXISTS (SELECT 1 FROM material_maps m WHERE m.texture_id = a.id))";
+     OR EXISTS (SELECT 1 FROM material_maps m WHERE m.texture_id = a.id)
+     OR (a.ext = 'material' AND EXISTS (SELECT 1 FROM assets o WHERE o.id = json_extract(a.meta, '$.owned_by'))))";
 
 impl Filter {
     fn where_sql(&self) -> String {

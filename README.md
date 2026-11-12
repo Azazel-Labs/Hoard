@@ -7,31 +7,38 @@ animations, and makes all of it searchable from a web portal, a CLI, an MCP endp
 
 Think of it as an asset store with no checkout.
 
-```
- ┌────────────── web portal (Vue 3 + Vite) ─────────────┐   ┌──── hoard CLI ────┐   ┌── MCP clients ──┐
- │ drop packs · search · facets · 3D/audio preview ·    │   │ search · upload · │   │ search, inspect, │
- │ tag editing · linked assets · bundle downloads       │   │ sync + hoard.lock │   │ bundle links     │
- └───────────────────────────┬──────────────────────────┘   └─────────┬─────────┘   └────────┬────────┘
-                             │  REST /api/*                            │                      │ POST /mcp
- ┌───────────────────────────▼──────────────────────────────────────────▼──────────────────────▼────────┐
- │ hoardd (Rust, axum)                                                                                  │
- │  ingest: unpack (zip-slip/bomb guards) → analyze (image, audio, glTF/OBJ/FBX) → tag → link → store  │
- │  jobs:   durable SQLite queue · rule tagger · LLM tagger · Blender convert · integrity scrub        │
- │  render: headless wgpu thumbnails for glTF/GLB/OBJ (GPU or Mesa lavapipe)                           │
- ├───────────────────────────────┬──────────────────────────────────────────────────────────────────────┤
- │ metadata: SQLite (WAL) + FTS5 │ blobs: content-addressed (BLAKE3) on local disk or any S3 bucket     │
- └───────────────────────────────┴──────────────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TB
+    web["<b>Web portal</b> (Vue 3 + Vite)<br/>drop packs · search · facets · 3D/audio preview<br/>tag editing · linked assets · bundle downloads"]
+    cli["<b>hoard CLI</b><br/>search · upload · sync + hoard.lock"]
+    mcp["<b>MCP clients</b><br/>search · inspect · bundle links"]
+
+    subgraph hoardd["hoardd (Rust, axum)"]
+        direction TB
+        ingest["<b>ingest</b><br/>unpack (zip-slip/bomb guards) → analyze (image, audio, glTF/OBJ/FBX) → tag → link → store"]
+        jobs["<b>jobs</b><br/>durable SQLite queue · rule tagger · LLM tagger · Blender convert · integrity scrub"]
+        render["<b>render</b><br/>headless wgpu thumbnails for glTF/GLB/OBJ (GPU or Mesa lavapipe)"]
+    end
+
+    db[("<b>metadata</b><br/>SQLite (WAL) + FTS5")]
+    blobs[("<b>blobs</b><br/>content-addressed (BLAKE3)<br/>local disk or any S3 bucket")]
+
+    web -- "REST /api/*" --> hoardd
+    cli -- "REST /api/*" --> hoardd
+    mcp -- "POST /mcp" --> hoardd
+    hoardd --> db
+    hoardd --> blobs
 ```
 
 ## Install with Docker
 
-Hoard ships as one image for amd64 and arm64: `ghcr.io/nickdarnell/hoard`. Save this as `compose.yml` (it's
+Hoard ships as one image for amd64 and arm64: `ghcr.io/azazel-labs/hoard`. Save this as `compose.yml` (it's
 [deploy/compose.yml](deploy/compose.yml)):
 
 ```yaml
 services:
   hoard:
-    image: ghcr.io/nickdarnell/hoard:${HOARD_VERSION:-latest}
+    image: ghcr.io/azazel-labs/hoard:${HOARD_VERSION:-latest}
     restart: unless-stopped
     environment:
       HOARD_TOKEN: ${HOARD_TOKEN:?set HOARD_TOKEN, e.g. HOARD_TOKEN=$(openssl rand -hex 32)}
@@ -548,3 +555,8 @@ a mock LLM; and MCP inline previews.
 Next ideas: embeddings for "find more like this" and near-duplicates (CLAP for audio, SigLIP 2 for images, or a
 multimodal embedding API), BPM and key detection for music (Essentia), previews for more source
 formats (GIMP, Substance), and an Unreal-friendly export layout.
+
+## License
+
+[MIT No Attribution](LICENSE) (MIT-0): use, copy, modify and redistribute Hoard for any purpose, with no need to
+keep the copyright notice. The asset packs you store in Hoard keep their own licenses.

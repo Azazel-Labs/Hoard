@@ -4,7 +4,7 @@
 # Bigger setups (files on a NAS, remote access) are in docs/DEPLOYMENT.md.
 services:
   hoard:
-    image: ghcr.io/nickdarnell/hoard:${HOARD_VERSION:-latest}
+    image: ghcr.io/azazel-labs/hoard:${HOARD_VERSION:-latest}
     restart: unless-stopped
     environment:
       # Uploads, edits and admin calls need this token (the portal asks for it once); browsing doesn't.

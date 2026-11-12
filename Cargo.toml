@@ -6,7 +6,8 @@ members = ["crates/hoard-core", "crates/hoard-unreal", "crates/hoardd", "crates/
 version = "0.8.0"
 edition = "2024"
 rust-version = "1.99"
-license = "MIT OR Apache-2.0"
+license = "MIT-0"
+repository = "https://github.com/Azazel-Labs/Hoard"
 
 [workspace.dependencies]
 hoard-core = { path = "crates/hoard-core" }

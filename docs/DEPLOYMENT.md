@@ -140,7 +140,7 @@ code; C removes the VPS. Pick B now and move to C if the VPS starts to feel like
 
 ## Updating
 
-Every compose file here runs the published image `ghcr.io/nickdarnell/hoard` and a
+Every compose file here runs the published image `ghcr.io/azazel-labs/hoard` and a
 [Watchtower](https://github.com/nicholas-fedor/watchtower) container. (The original containrrr/watchtower was archived
 in 2025; this fork is maintained and works the same way.) Watchtower checks for a new image at 04:00 every day,
 replaces the Hoard container, and removes the old image. It only touches containers labelled with the `hoard` scope,

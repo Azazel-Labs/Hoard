@@ -20,7 +20,7 @@ services:
       - "7878:7878"
 
   hoard:
-    image: ghcr.io/nickdarnell/hoard:${HOARD_VERSION:-latest}   # or `build: ..` to build from this checkout
+    image: ghcr.io/azazel-labs/hoard:${HOARD_VERSION:-latest}   # or `build: ..` to build from this checkout
     labels:
       com.centurylinklabs.watchtower.enable: "true"
       com.centurylinklabs.watchtower.scope: hoard

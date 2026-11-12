@@ -18,7 +18,7 @@ services:
       - /volume1/hoard/garage/data:/var/lib/garage/data
 
   hoard:
-    image: ghcr.io/nickdarnell/hoard:${HOARD_VERSION:-latest}   # or `build: ..` to build from this checkout
+    image: ghcr.io/azazel-labs/hoard:${HOARD_VERSION:-latest}   # or `build: ..` to build from this checkout
     labels:
       com.centurylinklabs.watchtower.enable: "true"
       com.centurylinklabs.watchtower.scope: hoard

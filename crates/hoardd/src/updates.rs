@@ -9,7 +9,7 @@ use std::time::Duration;
 use anyhow::{Context, Result};
 use hoard_core::UpdateInfo;
 
-const LATEST_RELEASE: &str = "https://api.github.com/repos/nickdarnell/Hoard/releases/latest";
+const LATEST_RELEASE: &str = "https://api.github.com/repos/Azazel-Labs/Hoard/releases/latest";
 const FIRST_CHECK: Duration = Duration::from_secs(60);
 const INTERVAL: Duration = Duration::from_hours(24);
 

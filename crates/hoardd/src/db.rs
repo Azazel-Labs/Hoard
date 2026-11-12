@@ -10,7 +10,7 @@ use anyhow::{Context, Result};
 use hoard_core::{Asset, AssetKind, AssetLink, Facet, LinkRel, Pack, PackStatus, SearchQuery, Tag, TagSource};
 use r2d2_sqlite::SqliteConnectionManager;
 use rusqlite::types::Value as SqlValue;
-use rusqlite::{Connection, OptionalExtension, Row, params, params_from_iter};
+use rusqlite::{Connection, OptionalExtension, Row, TransactionBehavior, params, params_from_iter};
 
 pub(crate) type Pool = r2d2::Pool<SqliteConnectionManager>;
 pub(crate) type Conn = r2d2::PooledConnection<SqliteConnectionManager>;
@@ -320,6 +320,10 @@ pub(crate) fn open(path: &Path, backups: &Path) -> Result<Pool> {
         .and_then(|c| c.execute_batch("PRAGMA journal_mode = WAL;"))
         .with_context(|| format!("open {}", path.display()))?;
     let manager = SqliteConnectionManager::file(path).with_init(|c| {
+        // Transactions take the write lock when they begin. A deferred one that reads and then writes can't wait for
+        // another writer (SQLite would deadlock), so it fails at once with "database is locked", busy_timeout or not:
+        // two tag edits at the same moment did.
+        c.set_transaction_behavior(TransactionBehavior::Immediate);
         // busy_timeout first: switching to WAL takes a lock, and connections opened at once must wait for it
         // rather than fail with "database is locked".
         c.execute_batch(

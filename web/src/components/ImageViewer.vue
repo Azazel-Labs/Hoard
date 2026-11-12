@@ -1,8 +1,9 @@
 <script setup lang="ts">
 // Full-screen texture inspector: zoom around the cursor, drag or pinch to pan, see it at 1:1, tiled 3×3 to check
-// the seams, against different backgrounds, or one channel at a time.
-import { computed, onBeforeUnmount, onMounted, reactive, ref } from 'vue'
-import { fileUrl, thumbUrl, type Asset } from '../api'
+// the seams, against different backgrounds, or one channel at a time. A big image opens as its light preview (at most
+// 2048 px) and swaps to the file itself once zoomed in past the preview's pixels, or on "Full resolution".
+import { computed, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue'
+import { asUrl, fileUrl, humanBytes, liteUrl, thumbUrl, type Asset } from '../api'
 
 const props = defineProps<{ asset: Asset; pixelated?: boolean }>()
 const emit = defineEmits<{ close: [] }>()
@@ -10,7 +11,10 @@ const emit = defineEmits<{ close: [] }>()
 /** Formats every browser draws itself; anything else (TGA, DDS, EXR, PSD…) shows the server's preview. */
 const NATIVE = new Set(['png', 'jpg', 'jpeg', 'gif', 'webp', 'avif', 'bmp', 'svg', 'ico'])
 const native = computed(() => NATIVE.has(props.asset.ext.toLowerCase()))
-const src = computed(() => (native.value ? fileUrl(props.asset) : thumbUrl(props.asset)))
+/** The picture at full size: the file itself, or for other formats a PNG the server makes from it. */
+const fullUrl = computed(() => (native.value ? fileUrl(props.asset) : `${asUrl(props.asset, 'png')}?download=0&wait=60`))
+/** What's on screen: the light preview, then the full picture. */
+const src = ref('')
 
 const BACKGROUNDS = ['checker', 'black', 'grey', 'white'] as const
 const CHANNELS = [
@@ -23,8 +27,15 @@ type Channel = (typeof CHANNELS)[number]['key'] | ''
 
 const dlg = ref<HTMLDialogElement | null>(null)
 const stage = ref<HTMLElement | null>(null)
+/** The picture's full size. The view is laid out in its pixels whichever image is showing, so the swap doesn't move it. */
 const size = reactive({ w: 0, h: 0 })
+/** The light preview as loaded: its pixels and bytes. */
+const lite = reactive({ w: 0, h: 0, bytes: 0 })
+const full = ref<'' | 'loading' | 'shown' | 'failed'>('')
+/** The preview has fewer pixels than the picture. */
+const smaller = computed(() => lite.w > 0 && size.w > lite.w)
 const failed = ref(false)
+let liteObject = ''
 const view = reactive({ x: 0, y: 0, s: 1 })
 const tiled = ref(false)
 const bg = ref<(typeof BACKGROUNDS)[number]>('checker')
@@ -41,16 +52,72 @@ const fitScale = computed(() => {
 const pct = computed(() => `${Math.round(view.s * 100)}%`)
 const crisp = computed(() => props.pixelated || view.s >= 2)
 
-function load() {
+function decoded(url: string): Promise<HTMLImageElement> {
   const img = new Image()
-  img.onload = () => {
-    size.w = img.naturalWidth || 512
-    size.h = img.naturalHeight || 512
-    fit(false)
-  }
-  img.onerror = () => (failed.value = true)
-  img.src = src.value
+  img.src = url
+  return img.decode().then(() => img)
 }
+
+function metaDim(key: string): number {
+  const v = props.asset.meta?.[key]
+  return typeof v === 'number' && v > 0 ? v : 0
+}
+
+async function load() {
+  try {
+    // Fetched rather than pointed at, for its size in bytes.
+    const r = await fetch(liteUrl(props.asset))
+    if (!r.ok) throw new Error(r.statusText)
+    const blob = await r.blob()
+    liteObject = URL.createObjectURL(blob)
+    const img = await decoded(liteObject)
+    lite.w = img.naturalWidth || 512
+    lite.h = img.naturalHeight || 512
+    lite.bytes = blob.size
+    const [w, h] = [metaDim('width'), metaDim('height')]
+    // The analysis's dimensions, when they describe the same picture.
+    const same = w && h && Math.abs(w / h - lite.w / lite.h) < 0.02
+    size.w = same ? w : lite.w
+    size.h = same ? h : lite.h
+    src.value = liteObject
+    fit(false)
+  } catch {
+    // No preview (too big for the server to read): the file itself, or the thumbnail.
+    try {
+      const url = native.value ? fileUrl(props.asset) : thumbUrl(props.asset)
+      const img = await decoded(url)
+      size.w = img.naturalWidth || 512
+      size.h = img.naturalHeight || 512
+      src.value = url
+      fit(false)
+    } catch {
+      failed.value = true
+    }
+  }
+}
+
+async function showFull() {
+  if (!smaller.value || full.value === 'loading' || full.value === 'shown') return
+  full.value = 'loading'
+  try {
+    const img = await decoded(fullUrl.value)
+    // If it's a different size than thought, keep it the same size on screen.
+    if (img.naturalWidth && img.naturalWidth !== size.w) {
+      view.s *= size.w / img.naturalWidth
+      size.w = img.naturalWidth
+      size.h = img.naturalHeight
+    }
+    src.value = fullUrl.value
+    full.value = 'shown'
+  } catch {
+    full.value = 'failed'
+  }
+}
+
+// Zoomed in past the preview's own pixels: time for the real ones.
+watch(() => view.s, (s) => {
+  if (smaller.value && !full.value && (s * size.w) / lite.w > 1) void showFull()
+})
 
 function place(s: number, cx?: number, cy?: number, glide = true) {
   const el = stage.value
@@ -132,7 +199,7 @@ function onKey(e: KeyboardEvent) {
   const k = e.key.toLowerCase()
   const act: Record<string, () => void> = {
     '+': () => place(view.s * 1.5), '=': () => place(view.s * 1.5), '-': () => place(view.s / 1.5),
-    '0': () => fit(), '1': () => actual(), t: toggleTile,
+    '0': () => fit(), '1': () => actual(), t: toggleTile, f: () => void showFull(),
     k: () => (bg.value = BACKGROUNDS[(BACKGROUNDS.indexOf(bg.value) + 1) % BACKGROUNDS.length]),
     r: () => setChannel('r'), g: () => setChannel('g'), b: () => setChannel('b'), a: () => setChannel('a'),
     arrowleft: () => (view.x += 60), arrowright: () => (view.x -= 60), arrowup: () => (view.y += 60), arrowdown: () => (view.y -= 60),
@@ -155,7 +222,10 @@ onMounted(() => {
   load()
   window.addEventListener('resize', onResize)
 })
-onBeforeUnmount(() => window.removeEventListener('resize', onResize))
+onBeforeUnmount(() => {
+  window.removeEventListener('resize', onResize)
+  if (liteObject) URL.revokeObjectURL(liteObject)
+})
 
 const contentStyle = computed(() => ({
   width: `${size.w * tiles.value}px`,
@@ -180,7 +250,21 @@ const contentStyle = computed(() => ({
     <header class="tools">
       <div class="title">
         <strong>{{ asset.name }}</strong>
-        <span v-if="size.w" class="mono dim">{{ size.w }}×{{ size.h }}{{ native ? '' : ' preview' }}</span>
+        <span v-if="size.w" class="mono dim">
+          {{ size.w }}×{{ size.h }} · {{ humanBytes(asset.size) }}
+          <template v-if="smaller && full !== 'shown'"> · preview {{ lite.w }}×{{ lite.h }}, {{ humanBytes(lite.bytes) }}</template>
+          <template v-else-if="!native && !smaller && !lite.w"> · preview</template>
+        </span>
+      </div>
+      <div v-if="smaller && full !== 'shown'" class="group" role="group" aria-label="Resolution">
+        <button
+          type="button"
+          :title="`Load the full ${size.w}×${size.h} picture (F); zooming in past the preview does too`"
+          :disabled="full === 'loading'"
+          @click="showFull"
+        >
+          {{ full === 'loading' ? 'Loading full resolution…' : full === 'failed' ? "Full resolution didn't load: retry" : 'Full resolution' }}
+        </button>
       </div>
       <div class="group" role="group" aria-label="Zoom">
         <button type="button" title="Zoom out (−)" aria-label="Zoom out" @click="place(view.s / 1.5)">
@@ -252,7 +336,7 @@ const contentStyle = computed(() => ({
       <p v-else class="msg">Loading…</p>
     </div>
     <footer class="keys" aria-hidden="true">
-      Scroll or pinch to zoom · drag to pan · double-click to zoom in or fit · <kbd>T</kbd> tile · <kbd>K</kbd> background · <kbd>R</kbd><kbd>G</kbd><kbd>B</kbd><kbd>A</kbd> channels
+      Scroll or pinch to zoom · drag to pan · double-click to zoom in or fit · <kbd>T</kbd> tile · <kbd>K</kbd> background<template v-if="smaller"> · <kbd>F</kbd> full resolution</template> · <kbd>R</kbd><kbd>G</kbd><kbd>B</kbd><kbd>A</kbd> channels
     </footer>
   </dialog>
 </template>
@@ -272,8 +356,8 @@ const contentStyle = computed(() => ({
   border-bottom: 1px solid var(--line); background: var(--panel); font-size: var(--step--1);
 }
 .title { display: flex; align-items: baseline; gap: 0.6rem; min-width: 0; flex: 1; }
-.title strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.dim { color: var(--muted); font-size: 0.75rem; white-space: nowrap; }
+.title strong { min-width: 8ch; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.dim { min-width: 0; color: var(--muted); font-size: 0.75rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .group { display: inline-flex; align-items: center; gap: 2px; padding: 2px; border: 1px solid var(--line); border-radius: var(--r-chip); }
 .group button, .close {
   display: inline-flex; align-items: center; gap: 0.3rem; height: 1.75rem; min-width: 1.75rem; padding: 0 0.45rem;

@@ -1,7 +1,8 @@
 <script setup lang="ts">
 // Full-screen 3D viewer, the model counterpart of the image inspector: orbit, frame and reset, and the switches that
 // answer "what is this model made of" (wireframe, textures off, lighting without the environment, a floor grid),
-// against different backgrounds, with its clips.
+// against different backgrounds, with its clips. Textures come as light previews (at most 2048 px) unless
+// "Full-resolution textures" is on.
 import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import type { Asset } from '../api'
 // Types only: the scene (and three.js with it) loads once the dialog is open, so it shows straight away.
@@ -29,10 +30,11 @@ const spin = ref(false)
 const bg = ref<Background>('checker')
 const clip = ref('')
 const playing = ref(true)
+const fullTextures = ref(false)
 let stage: ModelStage | null = null
 
-onMounted(async () => {
-  dlg.value?.showModal()
+/** Load the model into a new stage; switching texture resolution starts over, keeping the switches as they were. */
+async function open() {
   let ModelStage: typeof import('../modelStage').ModelStage
   try {
     ;({ ModelStage } = await import('../modelStage'))
@@ -42,27 +44,48 @@ onMounted(async () => {
     return
   }
   if (!host.value || closed) return
+  stage?.dispose()
+  host.value.replaceChildren()
+  const again = !!info.value
   status.value = 'loading'
-  const s = new ModelStage(host.value)
+  const s = new ModelStage(host.value, { fullTextures: fullTextures.value })
   stage = s
   s.onMissing = (names) => (missing.value = names)
   try {
     const i = await s.load(props.asset)
+    if (stage !== s) return
     info.value = i
     missing.value = i.missing
-    clip.value = i.clips[0] ?? ''
+    if (again) {
+      s.setWireframe(wireframe.value)
+      s.setTextures(textures.value)
+      s.setEnvironment(environment.value)
+      s.setGrid(grid.value)
+      s.setAutoRotate(spin.value)
+      s.setBackground(bg.value)
+      s.setPlaying(playing.value)
+      if (clip.value) s.playClip(clip.value)
+    } else {
+      clip.value = i.clips[0] ?? ''
+    }
     status.value = 'ready'
   } catch (e) {
-    if ((e as Error).message === 'closed') return
+    if ((e as Error).message === 'closed' || stage !== s) return
     status.value = 'error'
     error.value = (e as Error).message
   }
+}
+
+onMounted(() => {
+  dlg.value?.showModal()
+  void open()
 })
 let closed = false
 onBeforeUnmount(() => {
   closed = true
   stage?.dispose()
 })
+watch(fullTextures, () => void open())
 
 watch(wireframe, (on) => stage?.setWireframe(on))
 watch(textures, (on) => stage?.setTextures(on))
@@ -91,6 +114,7 @@ function onKey(e: KeyboardEvent) {
     t: () => (textures.value = !textures.value),
     e: () => (environment.value = !environment.value),
     g: () => (grid.value = !grid.value),
+    h: () => (fullTextures.value = !fullTextures.value),
     a: () => (spin.value = !spin.value),
     k: cycleBg,
     ' ': () => (playing.value = !playing.value),
@@ -135,6 +159,16 @@ function onKey(e: KeyboardEvent) {
         <button type="button" title="Textures (T)" :aria-pressed="textures" :disabled="status !== 'ready'" @click="textures = !textures">
           <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><rect x="2" y="2" width="12" height="12" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.5" /><path d="M2 8h12M8 2v12" stroke="currentColor" stroke-width="1.2" /><rect x="2.8" y="2.8" width="5.2" height="5.2" fill="currentColor" opacity=".55" /><rect x="8" y="8" width="5.2" height="5.2" fill="currentColor" opacity=".55" /></svg>
           <span class="wide">Textures</span>
+        </button>
+        <button
+          type="button"
+          title="Full-resolution textures (H): each texture file as it is, however big; off, light previews of at most 2048 px"
+          :aria-pressed="fullTextures"
+          :disabled="status !== 'ready'"
+          @click="fullTextures = !fullTextures"
+        >
+          <span class="hd">HD</span>
+          <span class="wide">Full-res</span>
         </button>
         <button type="button" title="Environment light (E)" :aria-pressed="environment" :disabled="status !== 'ready'" @click="environment = !environment">
           <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><circle cx="8" cy="8" r="2.8" fill="currentColor" /><path d="M8 1.5v1.8M8 12.7v1.8M1.5 8h1.8M12.7 8h1.8M3.4 3.4l1.3 1.3M11.3 11.3l1.3 1.3M3.4 12.6l1.3-1.3M11.3 4.7l1.3-1.3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" /></svg>
@@ -192,7 +226,7 @@ function onKey(e: KeyboardEvent) {
     </div>
     <footer class="keys" aria-hidden="true">
       Drag to orbit · right-drag to pan · scroll to zoom · double-click to frame · <kbd>F</kbd> frame · <kbd>R</kbd> reset ·
-      <kbd>W</kbd> wireframe · <kbd>T</kbd> textures · <kbd>E</kbd> light · <kbd>G</kbd> grid · <kbd>K</kbd> background<template v-if="info?.clips.length"> · <kbd>Space</kbd> play</template>
+      <kbd>W</kbd> wireframe · <kbd>T</kbd> textures · <kbd>H</kbd> full-res textures · <kbd>E</kbd> light · <kbd>G</kbd> grid · <kbd>K</kbd> background<template v-if="info?.clips.length"> · <kbd>Space</kbd> play</template>
     </footer>
   </dialog>
 </template>
@@ -207,6 +241,7 @@ function onKey(e: KeyboardEvent) {
 .swatch.grey::after { background: #808080; }
 .swatch.light::after { background: #e8e9ed; }
 .swatch.env::after { background: radial-gradient(circle at 35% 30%, #fff, #9a9aa0 55%, #4a4a50); }
+.hd { font-size: 0.62rem; font-weight: 700; letter-spacing: 0.02em; border: 1.4px solid currentColor; border-radius: 3px; padding: 0 2px; line-height: 1.25; }
 .canvas { position: absolute; inset: 0; cursor: grab; touch-action: none; }
 .canvas:active { cursor: grabbing; }
 .canvas :deep(canvas) { display: block; width: 100%; height: 100%; }

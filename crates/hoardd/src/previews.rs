@@ -80,12 +80,17 @@ struct ImageRow {
 }
 
 /// `GET /api/assets/{id}/lite`: the image's light preview, made now if it has none yet (the image itself, when it's
-/// small enough and browsers read it).
+/// small enough and browsers read it). The URL stays the same when the asset's file changes, so browsers check back
+/// (a 304 by hash) rather than keep it for good.
 pub(crate) async fn asset_lite(
     State(state): State<AppState>,
     Path(id): Path<String>,
     headers: HeaderMap,
 ) -> ApiResult<Response> {
+    lite_response(state, id, headers).await.map(unversioned)
+}
+
+async fn lite_response(state: AppState, id: String, headers: HeaderMap) -> ApiResult<Response> {
     let id2 = id.clone();
     let row = db::call(&state.pool, move |c| {
         Ok(c.query_row(

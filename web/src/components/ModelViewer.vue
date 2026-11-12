@@ -1,13 +1,15 @@
 <script setup lang="ts">
 // The side panel's 3D preview: orbit and zoom in place, pick a clip, and the expand button (or a double-click)
 // opens the full-screen viewer. The scene itself is ModelStage, shared with that viewer; it brings three.js, so it
-// loads the first time a model is shown, behind the same "Loading" as the model.
+// loads the first time a model is shown, behind the same "Loading" as the model. For a signed-in account, once the
+// model and its textures are up, its picture becomes the asset's thumbnail when that improves on the one it has.
 import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
-import type { Asset } from '../api'
+import type { Asset, ThumbUpload } from '../api'
+import { drawThumb, wantsBrowserThumb } from '../browserThumbs'
 import type { ModelStage, StageInfo } from '../modelStage'
 
 const props = defineProps<{ asset: Asset; paused?: boolean }>()
-const emit = defineEmits<{ expand: [] }>()
+const emit = defineEmits<{ expand: []; thumb: [ThumbUpload] }>()
 
 const host = ref<HTMLDivElement | null>(null)
 const status = ref<'loading' | 'ready' | 'error'>('loading')
@@ -45,10 +47,20 @@ async function setup() {
     activeClip.value = i.clips[0] ?? ''
     s.setPaused(!!props.paused)
     status.value = 'ready'
+    if (wantsBrowserThumb(props.asset)) void offerThumb(s, props.asset)
   } catch (e) {
     if (stage !== s) return
     status.value = 'error'
     error.value = (e as Error).message
+  }
+}
+
+async function offerThumb(s: ModelStage, a: Asset) {
+  try {
+    const r = await drawThumb(s, a)
+    if (r?.replaced && stage === s) emit('thumb', r)
+  } catch {
+    // The server's thumbnail stays; nothing the person asked for failed.
   }
 }
 

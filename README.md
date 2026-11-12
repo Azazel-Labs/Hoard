@@ -214,7 +214,9 @@ software rasterizer (`apt install mesa-vulkan-drivers`). Without any adapter, ev
    corruption is detectable, and blobs never change (cache them forever, back them up with any sync tool).
 3. **Analyze.**
    - Images: dimensions, alpha, a thumbnail, dominant color, seamless tiling on each axis (edge-continuity test),
-     pixel-art detection (few colors, small, upscaled crisply), tangent-space normal map detection.
+     pixel-art detection (few colors, small, upscaled crisply), tangent-space normal map detection. Images over
+     2048 px, and any format browsers can't draw (TGA, DDS, EXR, PSD…), also get a light preview of at most 2048 px
+     (JPEG, or lossless WebP when there's transparency) for the image and 3D viewers.
    - GPU textures, decoded in pure Rust: DDS (BC1-7, raw RGBA/BGRA, float, legacy DXT and bitmask formats) and KTX2
      (BCn, ETC2/EAC, ASTC, raw, with zstd or zlib supercompression), with their GPU format and mip count. Basis
      Universal (KTX2 with BasisLZ/ETC1S or UASTC, and `.basis` files) is transcoded in pure Rust too. SVGs render
@@ -238,7 +240,9 @@ software rasterizer (`apt install mesa-vulkan-drivers`). Without any adapter, ev
      become the asset's name, and embedded descriptions show as "From the file".
    - Models: glTF/GLB mesh, material, animation and skin counts, vertex/triangle counts; OBJ counts; FBX version
      plus skin and animation detection; a wgpu-rendered thumbnail for glTF/GLB/OBJ/FBX, and for STL, PLY and
-     MagicaVoxel `.vox`, which Hoard reads itself (voxels keep their palette colors). Binary FBX geometry, node
+     MagicaVoxel `.vox`, which Hoard reads itself (voxels keep their palette colors). Thumbnails are drawn the way the
+     3D viewer shows the model: textures from the file, an OBJ's MTL, or found in the pack by name; tone mapping;
+     cut-outs and see-through surfaces; framed tightly from the same angle every time. Binary FBX geometry, node
      transforms, materials and embedded or nearby textures are read natively (axis and unit settings become glTF's
      Y-up meters); ASCII FBX needs Blender.
    - Unreal packages (`.uasset`, `.umap`), read without Unreal: see [Unreal packs](#unreal-packs).
@@ -305,6 +309,17 @@ rescans match it by its folder, so only the name you see changes.
 
 **Finding packs.** The packs page searches names, stores, licenses, descriptions and tags (every word has to
 match), filters by what a pack holds, its status and its store, and sorts by date, name, size or asset count.
+
+**Model thumbnails from the browser.** The 3D viewer sometimes finds textures the server's renderer can't. When you're
+signed in and open a model, once it's shown with its textures, the viewer's picture (same angle and framing as the
+server's) becomes the asset's thumbnail. A picture with every texture is never replaced by one with some missing,
+and neither is replaced by the server's, including when the pack is re-analyzed. For a whole pack, More → Make
+thumbnails in this browser opens each model out of sight, one at a time, with progress and Cancel.
+
+**Big textures.** The image viewer opens a big texture as its light preview and shows both sizes (pixels and bytes).
+Zooming in past the preview's pixels, Full resolution or F loads the file itself. The 3D viewers load light previews
+of textures too; the full-screen viewer's Full-res switch (H) loads every texture file as it is. The detail panel
+shows the size of each linked file and of each download.
 
 ## Getting assets into an engine
 
@@ -625,7 +640,9 @@ Requests that change something are marked 🔒: guests can't make them. A browse
 | GET | `/api/assets/{id}` | one asset, with tags, metadata and dependencies |
 | PATCH 🔒 | `/api/assets/{id}` | rename, recategorize, describe, tag; `apply_to_family` for a whole variant family |
 | GET | `/api/assets/{id}/file` | the file (`?download=1` to save it) |
-| GET | `/api/assets/{id}/thumb` | thumbnail |
+| GET | `/api/assets/{id}/thumb` | thumbnail (`?v=` its `thumb_rev`, for a URL that's cached for good) |
+| PUT 🔒 | `/api/assets/{id}/thumb` | a model's thumbnail drawn by a browser (PNG/JPEG/WebP body, `?source=browser` or `browser-partial`); kept only if it's no worse than the one there |
+| GET | `/api/assets/{id}/lite` | a texture's light preview (at most 2048 px), made on first request if it has none |
 | GET | `/api/assets/{id}/original` | the file as it came in, when it was converted on ingest |
 | GET | `/api/assets/{id}/derivative/{kind}` | `glb`, `views`, or `source` (a recovered WAV/PNG) |
 | GET | `/api/assets/{id}/as/{format}` | download converted (`?max=` size, `?wait=` seconds); `/status` to follow a slow one |
@@ -741,7 +758,8 @@ specifically, Cloudflare Tunnel/Access, the viewer's WebGPU path on real hardwar
 Also exercised: resumable browser and CLI imports of 1.1 GB with an interrupted, resumed run and duplicate refusal;
 HTTPS with HTTP/2 and HTTP/3 in Chrome (page, thumbnails and uploads over h3); WAV library metadata, variant
 families, duplicate detection, pack context with store-page fetching, contact sheets and multi-view renders against
-a mock LLM; and MCP inline previews.
+a mock LLM; MCP inline previews; and browser-drawn model thumbnails, light previews and the full-resolution swap in
+headless Chromium.
 
 What's planned next is in [docs/roadmap.md](docs/roadmap.md).
 

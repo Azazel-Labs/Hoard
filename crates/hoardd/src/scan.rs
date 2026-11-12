@@ -15,7 +15,7 @@ use time::format_description::well_known::Rfc3339;
 
 use crate::AppState;
 use crate::locations::{self, Mode};
-use crate::{db, ingest, jobs};
+use crate::{db, ingest, issues, jobs};
 
 /// How often every watched folder is looked at again. Folder-change notifications don't reach a container
 /// through most network shares, so this is a plain timer.
@@ -112,6 +112,12 @@ fn sweep(conn: &mut Connection, location: i64) -> Result<Changes> {
         // Offline (a disk that isn't mounted, a NAS that's asleep): its packs stay as they are until it's back.
         Err(e) => {
             tracing::warn!(location = %loc.name, path = %loc.path, "watched folder can't be read: {e}");
+            issues::note(
+                conn,
+                issues::FOLDER,
+                issues::At::location(location),
+                &format!("{} can’t be read: {e}", loc.path),
+            );
             return Ok(Changes::default());
         }
     };
@@ -128,8 +134,11 @@ fn sweep(conn: &mut Connection, location: i64) -> Result<Changes> {
     // emptied: leave its packs alone.
     if folders.is_empty() && !existing.is_empty() {
         tracing::warn!(location = %loc.name, path = %loc.path, "watched folder is empty; keeping its packs");
+        let why = format!("{} is empty, but it had packs: it may not be mounted.", loc.path);
+        issues::note(conn, issues::FOLDER, issues::At::location(location), &why);
         return Ok(Changes::default());
     }
+    issues::clear(conn, &[issues::FOLDER], issues::At::location(location));
     // Folders whose pack was deleted for good stay out.
     let skipped: Vec<String> = {
         let mut stmt = conn.prepare("SELECT folder FROM skipped_folders WHERE location_id = ?1")?;

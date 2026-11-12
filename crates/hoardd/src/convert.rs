@@ -12,7 +12,7 @@ use std::time::Duration;
 use anyhow::{Context, Result, bail};
 use rusqlite::{Connection, params};
 
-use crate::{AppState, analyze, db, jobs};
+use crate::{AppState, analyze, db, issues, jobs};
 
 /// Extensions worth sending through Blender.
 pub(crate) const CONVERTIBLE: &[&str] =
@@ -134,14 +134,24 @@ pub(crate) async fn convert_pack(state: &AppState, pack_id: &str) -> Result<()> 
     })
     .await?;
 
-    let mut failures = 0usize;
+    let mut failures = Vec::new();
     for (n, t) in todo.iter().enumerate() {
         crate::activity::job_progress(jobs::CONVERT, Some(pack_id), n, todo.len(), "models");
         if let Err(e) = convert_one(state, &blender, t).await {
-            failures += 1;
             tracing::warn!(asset = %t.path, error = %format!("{e:#}"), "Blender conversion failed");
+            failures.push((t.path.clone(), format!("{e:#}")));
         }
     }
+    let (pid, n_failed) = (pack_id.to_owned(), failures.len());
+    db::call(&state.pool, move |c| {
+        issues::clear(c, &[issues::CONVERT], issues::At::pack(&pid));
+        for (path, why) in &failures {
+            issues::note(c, issues::CONVERT, issues::At::file(&pid, path), why);
+        }
+        Ok(())
+    })
+    .await?;
+    let failures = n_failed;
     tracing::info!(pack = pack_id, converted = todo.len() - failures, failures, "conversion finished");
     Ok(())
 }

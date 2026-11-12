@@ -372,6 +372,44 @@ export interface Maintenance {
   history: MaintenanceRun[]
 }
 
+/** Something that went wrong opening or processing the library, in Settings → Issues. */
+export interface Issue {
+  /** Opaque: pass it back to retry or dismiss. */
+  id: string
+  title: string
+  message: string
+  pack_id: string | null
+  pack_name: string | null
+  asset_id: string | null
+  path: string | null
+  location_id: number | null
+  location_name: string | null
+  /** How many times it's happened. */
+  count: number
+  at: string | null
+  retry: boolean
+}
+
+/** One kind of issue. `retry` is the retry button's label, when it has one; at most 200 `items` of `total`. */
+export interface IssueGroup {
+  kind: string
+  title: string
+  blurb: string
+  retry: string | null
+  dismiss: boolean
+  total: number
+  items: Issue[]
+}
+
+/** `GET /api/admin/issues`: only groups that have issues, most serious first. */
+export interface Issues {
+  total: number
+  groups: IssueGroup[]
+}
+
+/** Which issues an action is for: some, or a whole group. */
+export type IssuePick = { ids: string[] } | { kind: string }
+
 /** A folder on the server and the folders in it (`GET /api/admin/fs`). */
 export interface FolderListing {
   path: string
@@ -858,6 +896,9 @@ export const api = {
   oauthApprove: (params: Record<string, string>, allow: boolean) =>
     post<{ redirect: string }>('/api/oauth/approve', { ...params, allow }),
   maintenance: () => request<Maintenance>('/api/admin/maintenance'),
+  issues: () => request<Issues>('/api/admin/issues'),
+  retryIssues: (pick: IssuePick) => post<{ started: number }>('/api/admin/issues/retry', pick),
+  dismissIssues: (pick: IssuePick) => post<{ dismissed: number }>('/api/admin/issues/dismiss', pick),
   runMaintenance: (task: string) =>
     request<{ run: number }>(`/api/admin/maintenance/${task}`, { method: 'POST' }),
   locations: () => request<LocationList>('/api/admin/locations'),

@@ -175,6 +175,24 @@ const MIGRATIONS: &[&str] = &[
        model      TEXT NOT NULL,
        vector     BLOB NOT NULL
      ) WITHOUT ROWID;",
+    // 25: Settings → Issues (see `issues.rs`): problems that aren't kept anywhere else, and quick ways to the files
+    // whose analysis failed.
+    "CREATE TABLE issues (
+       id          INTEGER PRIMARY KEY AUTOINCREMENT,
+       key         TEXT NOT NULL UNIQUE,
+       kind        TEXT NOT NULL,
+       pack_id     TEXT REFERENCES packs(id) ON DELETE CASCADE,
+       location_id INTEGER REFERENCES locations(id) ON DELETE CASCADE,
+       subject     TEXT NOT NULL DEFAULT '',
+       message     TEXT NOT NULL,
+       count       INTEGER NOT NULL DEFAULT 1,
+       first_at    TEXT NOT NULL,
+       last_at     TEXT NOT NULL
+     );
+     CREATE INDEX issues_kind ON issues(kind, last_at);
+     CREATE INDEX issues_pack ON issues(pack_id) WHERE pack_id IS NOT NULL;
+     CREATE INDEX assets_analysis_error ON assets(updated_at) WHERE json_extract(meta, '$.analysis_error') IS NOT NULL;
+     CREATE INDEX assets_thumb_error ON assets(updated_at) WHERE json_extract(meta, '$.thumb_error') IS NOT NULL;",
 ];
 
 /// How many automatic pre-upgrade backups to keep in `<data dir>/backups`.

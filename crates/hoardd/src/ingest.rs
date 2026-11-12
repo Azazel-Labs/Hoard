@@ -19,7 +19,7 @@ use crate::analyze::{self, Analysis};
 use crate::blobs::{BlobStore, StoredBlob};
 use crate::db;
 use crate::tagger::{self, TagSet};
-use crate::{context, convert, links};
+use crate::{context, convert, issues, links};
 
 const MAX_ARCHIVE_DEPTH: u32 = 3;
 const LICENSE_SCAN_BYTES: u64 = 256 << 10;
@@ -90,11 +90,18 @@ struct Budget {
     bytes_left: AtomicU64,
     files: AtomicUsize,
     pack_id: String,
+    /// Archives that wouldn't unpack, and why: they're kept as plain files, and listed in Settings → Issues.
+    unpack_failures: std::sync::Mutex<Vec<(PathBuf, String)>>,
 }
 
 impl Budget {
     fn new(bytes: u64, pack_id: &str) -> Self {
-        Self { bytes_left: AtomicU64::new(bytes), files: AtomicUsize::new(0), pack_id: pack_id.to_owned() }
+        Self {
+            bytes_left: AtomicU64::new(bytes),
+            files: AtomicUsize::new(0),
+            pack_id: pack_id.to_owned(),
+            unpack_failures: std::sync::Mutex::default(),
+        }
     }
 
     fn reserve(&self, n: u64) -> Result<()> {
@@ -198,7 +205,14 @@ fn expand_archives(dir: &Path, budget: &Budget, depth: u32) -> Result<()> {
             // A corrupt nested archive is kept as a plain file instead of failing the whole pack,
             // but limit violations must abort.
             Err(e) if e.to_string().contains("size limit") => return Err(e),
-            Err(e) => tracing::warn!(archive = %file.display(), error = %e, "could not unpack; keeping as a file"),
+            Err(e) => {
+                tracing::warn!(archive = %file.display(), error = %e, "could not unpack; keeping as a file");
+                budget
+                    .unpack_failures
+                    .lock()
+                    .unwrap_or_else(std::sync::PoisonError::into_inner)
+                    .push((file.clone(), format!("{e:#}")));
+            }
         }
     }
     Ok(())
@@ -498,20 +512,23 @@ const BATCH: usize = 128;
 
 /// Run `make` over `jobs` on low-priority worker threads and hand the results to `flush` a batch at a time, with
 /// how many jobs are done so far. The queue between them is bounded, so however big the pack, only about two
-/// batches are ever in memory. A job that fails is logged and skipped; a `flush` that fails stops the lot.
+/// batches are ever in memory. A job that fails is skipped, and its file and why come back in the list returned;
+/// a `flush` that fails stops the lot.
 fn pipeline<J: Sync>(
     pack_id: &str,
     jobs: &[J],
+    rel: impl Fn(&J) -> &str + Sync,
     make: impl Fn(&J) -> Result<Item> + Sync,
     mut flush: impl FnMut(Vec<Item>, usize) -> Result<()>,
-) -> Result<()> {
+) -> Result<Vec<(String, String)>> {
+    let failed: std::sync::Mutex<Vec<(String, String)>> = std::sync::Mutex::default();
     let next = AtomicUsize::new(0);
     let done = AtomicUsize::new(0);
     let (tx, rx) = std::sync::mpsc::sync_channel::<Item>(BATCH);
     std::thread::scope(|s| {
         for _ in 0..workers() {
             let tx = tx.clone();
-            let (next, done, make) = (&next, &done, &make);
+            let (next, done, make, rel, failed) = (&next, &done, &make, &rel, &failed);
             s.spawn(move || {
                 crate::heavy::lower_priority();
                 while let Some(job) = jobs.get(next.fetch_add(1, Ordering::Relaxed)) {
@@ -527,7 +544,17 @@ fn pipeline<J: Sync>(
                                 break;
                             }
                         }
-                        Err(e) => tracing::warn!(pack = pack_id, "skipped file: {e:#}"),
+                        Err(e) => {
+                            tracing::warn!(pack = pack_id, "skipped file: {e:#}");
+                            let path = rel(job);
+                            let msg = format!("{e:#}");
+                            // The error names the file already, as its outermost context.
+                            let msg = msg.strip_prefix(&format!("{path}: ")).map_or(msg.clone(), str::to_owned);
+                            failed
+                                .lock()
+                                .unwrap_or_else(std::sync::PoisonError::into_inner)
+                                .push((path.to_owned(), msg));
+                        }
                     }
                 }
             });
@@ -545,8 +572,9 @@ fn pipeline<J: Sync>(
         if !batch.is_empty() {
             flush(batch, done.load(Ordering::Relaxed))?;
         }
-        Ok(())
-    })
+        anyhow::Ok(())
+    })?;
+    Ok(failed.into_inner().unwrap_or_else(std::sync::PoisonError::into_inner))
 }
 
 /// Previews stored alongside an asset: its thumbnail and (for models, when vision tagging is on) a multi-view sheet.
@@ -713,13 +741,20 @@ pub(crate) fn ingest_pack(state: &AppState, rt: &Handle, pack_id: &str, auto_nam
     db::set_pack_status(&conn, pack_id, PackStatus::Ingesting, None)?;
     // The file count isn't known until it's unpacked: no total shows as busy rather than stuck at 0 of 1.
     conn.execute("UPDATE packs SET files_total = 0, files_done = 0 WHERE id = ?1", [pack_id])?;
+    // Files left out last time are tried again (a watched pack's are, at least: an upload's went with it).
+    issues::clear(&conn, &[issues::FILE, issues::UNPACK], issues::At::pack(pack_id));
 
     let (root, wrapper_name) = if let Some(root) = &watched {
         (root.clone(), None)
     } else {
         let budget = Budget::new(state.settings.get().max_expand_mb.saturating_mul(1 << 20), pack_id);
         expand_archives(&staging, &budget, 0)?;
-        find_root(&staging)?
+        let (root, wrapper) = find_root(&staging)?;
+        for (file, why) in budget.unpack_failures.into_inner().unwrap_or_else(std::sync::PoisonError::into_inner) {
+            let rel = rel_of(if file.starts_with(&root) { &root } else { &staging }, &file);
+            issues::note(&conn, issues::UNPACK, issues::At::file(pack_id, &rel), &why);
+        }
+        (root, wrapper)
     };
 
     let mut files = listed(&root)?;
@@ -751,9 +786,10 @@ pub(crate) fn ingest_pack(state: &AppState, rt: &Handle, pack_id: &str, auto_nam
 
     // All that's kept of a file once its batch is written: its references, to link up at the end.
     let mut refs = HashMap::new();
-    pipeline(
+    let left_out = pipeline(
         pack_id,
         &jobs,
+        |(_, rel)| rel,
         |(local, rel)| analyze_one(local.clone(), &root, rel.clone(), None).with_context(|| rel.clone()),
         |mut batch, done| {
             for it in &mut batch {
@@ -771,6 +807,9 @@ pub(crate) fn ingest_pack(state: &AppState, rt: &Handle, pack_id: &str, auto_nam
         },
     )?;
     drop(jobs);
+    for (rel, why) in &left_out {
+        issues::note(&conn, issues::FILE, issues::At::file(pack_id, rel), why);
+    }
 
     let tx = conn.transaction()?;
     if let Some(l) = license {
@@ -882,9 +921,10 @@ pub(crate) fn retag_pack(state: &AppState, rt: &Handle, pack_id: &str) -> Result
     let human: HashSet<&str> = rows.iter().filter(|r| r.human).map(|r| r.id.as_str()).collect();
 
     let mut refs = HashMap::new();
-    pipeline(
+    let unread = pipeline(
         pack_id,
         &rows,
+        |r| &r.rel,
         |r| {
             // Each file is fetched into a folder of its own at its place in the pack; a model brings the files it
             // depends on (its MTL, its textures), so the thumbnail is drawn with them.
@@ -970,6 +1010,7 @@ pub(crate) fn retag_pack(state: &AppState, rt: &Handle, pack_id: &str) -> Result
         },
     )?;
 
+    issues::read_again(&conn, pack_id, &unread)?;
     let tx = conn.transaction()?;
     tx.execute("DELETE FROM asset_links WHERE from_id IN (SELECT id FROM assets WHERE pack_id = ?1)", [pack_id])?;
     links::link_pack(&tx, pack_id, &refs)?;
@@ -993,8 +1034,13 @@ fn read_pack_files(state: &AppState, rt: &Handle, pack_id: &str, auto_name: bool
             tracing::info!(pack = pack_id, files = a.files, renamed = ?a.renamed, "read the pack's store files");
         }
         Ok(_) => {}
-        Err(e) => tracing::warn!(pack = pack_id, error = %format!("{e:#}"), "could not read the pack's store files"),
+        Err(e) => {
+            tracing::warn!(pack = pack_id, error = %format!("{e:#}"), "could not read the pack's store files");
+            issues::note_in(state, issues::STORE_FILES, issues::At::pack(pack_id), &format!("{e:#}"));
+            return;
+        }
     }
+    issues::clear_in(state, &[issues::STORE_FILES], issues::At::pack(pack_id));
 }
 
 #[cfg(test)]

@@ -729,6 +729,14 @@ your edits stay, the AI isn't asked again), shrink thumbnails, clear cached "Dow
 and delete unused files. One of each runs at a time. Backup, scrub and gc can also be run from cron (below) and show up in the
 history the same way.
 
+**Settings → Issues** lists what went wrong opening or processing files, most serious first: packs that failed to
+ingest, damaged or missing files, watched folders that can't be read or have vanished (an unmounted drive), jobs that
+gave up, archives that wouldn't unpack, files that couldn't be opened or made sense of, models the thumbnail renderer
+failed on, failed conversions and Unreal packages, material detection and store files that couldn't be read. Each
+links to its pack or file, and says how often it happened and when. Fix the cause, then try it again from there
+(scan the folder again, re-analyze the pack, retry the job), one at a time or a whole kind at once, or dismiss it.
+An issue that's fixed by the next scan or analysis goes away on its own. `GET /api/admin/issues` has the same list.
+
 **Thumbnails.** Settings → Server → Thumbnails picks how thumbnails and model views are stored: Smaller, Balanced
 (the default) or Sharper JPEG, or Lossless PNG. Anything with transparency (model renders, waveforms, font
 specimens, cut-out sprites) and pixel art always stays PNG, and so does a picture whose PNG is about as small as the

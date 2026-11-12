@@ -28,6 +28,7 @@ import { confirmDialog, showError, showOk } from '../ui'
 import LibraryStats from './LibraryStats.vue'
 import LocationsPanel from './LocationsPanel.vue'
 import MaintenancePanel from './MaintenancePanel.vue'
+import IssuesPanel from './IssuesPanel.vue'
 import AccountPanel from './AccountPanel.vue'
 import HttpsPanel from './HttpsPanel.vue'
 import TagsPanel from './TagsPanel.vue'
@@ -60,6 +61,7 @@ const PAGES = [
   { id: 'account', label: 'Account', blurb: 'Your password, the other people who can sign in, and access tokens for scripts and other programs.' },
   { id: 'https', label: 'HTTPS', blurb: 'Serve the portal over https://, with a certificate Hoard makes or one you have. Some browser features only work over HTTPS.' },
   { id: 'server', label: 'Server', blurb: 'The server’s switches and limits, saved on the server.' },
+  { id: 'issues', label: 'Issues', blurb: 'What went wrong opening or processing files: archives that wouldn’t unpack, files that couldn’t be read, jobs that failed. Try them again once the cause is fixed, or dismiss them.' },
   { id: 'maintenance', label: 'Maintenance', blurb: 'Back up, check for damage and tidy up. One of each runs at a time, and you can leave this page while they do.' },
 ] as const
 const current = computed(() => (PAGES.some((p) => p.id === props.section) ? props.section : 'appearance'))
@@ -809,6 +811,13 @@ onBeforeUnmount(() => {
 
         <LocationsPanel v-else-if="current === 'locations'" @unauthorized="emit('unauthorized')" @changed="emit('changed')" />
         <MaintenancePanel v-else-if="current === 'maintenance'" @unauthorized="emit('unauthorized')" />
+        <IssuesPanel
+          v-else-if="current === 'issues'"
+          @unauthorized="emit('unauthorized')"
+          @pack="(p) => emit('pack', p)"
+          @open="(id) => emit('open', id)"
+          @section="go"
+        />
         <AccountPanel v-else-if="current === 'account'" />
         <HttpsPanel v-else-if="current === 'https'" />
         <TagsPanel v-else-if="current === 'tags'" @tag="(t) => emit('tag', t)" @changed="emit('changed')" />

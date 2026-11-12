@@ -24,6 +24,7 @@ mod formats;
 mod heavy;
 mod https;
 mod ingest;
+mod issues;
 mod jobs;
 mod links;
 mod llm;

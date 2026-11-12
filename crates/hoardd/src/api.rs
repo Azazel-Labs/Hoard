@@ -65,6 +65,9 @@ pub(crate) fn router(state: &AppState) -> Router<AppState> {
         .route("/api/admin/backup", post(admin_backup))
         .route("/api/admin/maintenance", get(crate::maintenance::overview))
         .route("/api/admin/maintenance/{task}", post(crate::maintenance::start_route))
+        .route("/api/admin/issues", get(crate::issues::list))
+        .route("/api/admin/issues/retry", post(crate::issues::retry))
+        .route("/api/admin/issues/dismiss", post(crate::issues::dismiss))
         .route("/api/admin/settings", get(get_settings).put(put_settings))
         .route("/api/admin/locations", get(locations::list_locations).post(locations::create_location))
         .route(

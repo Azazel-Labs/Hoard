@@ -517,6 +517,11 @@ fn name_from_sidecars(
 /// Find the pack's materials and bring the library in line: new ones added, changed ones updated (keeping their
 /// id, tags people gave them and collections), ones whose maps are gone removed. Returns how many it has.
 pub(crate) fn detect_pack(state: &AppState, rt: &Handle, conn: &mut Connection, pack_id: &str) -> Result<usize> {
+    crate::issues::clear(
+        conn,
+        &[crate::issues::MATERIALS, crate::issues::MATERIAL_THUMB],
+        crate::issues::At::pack(pack_id),
+    );
     let textures: Vec<Texture> = {
         let mut stmt = conn.prepare(
             "SELECT a.id, a.path, a.blob_hash, a.thumb_hash,
@@ -583,6 +588,8 @@ pub(crate) fn detect_pack(state: &AppState, rt: &Handle, conn: &mut Connection, 
             Ok(None) => None,
             Err(e) => {
                 tracing::warn!(material = %f.path, error = %format!("{e:#}"), "no material thumbnail");
+                let at = crate::issues::At::file(pack_id, &f.path);
+                crate::issues::note(conn, crate::issues::MATERIAL_THUMB, at, &format!("{e:#}"));
                 None
             }
         };
@@ -888,7 +895,10 @@ pub(crate) fn detect_logged(state: &AppState, rt: &Handle, conn: &mut Connection
     match detect_pack(state, rt, conn, pack_id) {
         Ok(0) => {}
         Ok(n) => tracing::info!(pack = pack_id, materials = n, "materials found"),
-        Err(e) => tracing::warn!(pack = pack_id, error = %format!("{e:#}"), "could not look for materials"),
+        Err(e) => {
+            tracing::warn!(pack = pack_id, error = %format!("{e:#}"), "could not look for materials");
+            crate::issues::note(conn, crate::issues::MATERIALS, crate::issues::At::pack(pack_id), &format!("{e:#}"));
+        }
     }
 }
 

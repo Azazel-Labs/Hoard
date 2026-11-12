@@ -121,9 +121,10 @@ pub(crate) fn thumb_mime(bytes: &[u8]) -> &'static str {
     if bytes.starts_with(&[0xFF, 0xD8, 0xFF]) { "image/jpeg" } else { "image/png" }
 }
 
-/// Thumbnail, plus the multi-view sheet when enabled.
-fn render_model_thumb(path: &Path) -> (Option<Vec<u8>>, Option<Vec<u8>>) {
-    let Some(r) = renderer() else { return (None, None) };
+/// Thumbnail, plus the multi-view sheet when enabled. A model that crashes the renderer gets a `thumb_error` in
+/// its facts, which Settings → Issues lists.
+fn render_model_thumb(path: &Path, a: &mut Analysis) {
+    let Some(r) = renderer() else { return };
     let guard = r.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
     // wgpu panics on what it finds invalid; that costs this model its thumbnail, not the whole pack its ingest.
     let drawn = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
@@ -135,14 +136,13 @@ fn render_model_thumb(path: &Path) -> (Option<Vec<u8>>, Option<Vec<u8>>) {
         anyhow::Ok((thumb_bytes(img, false).ok(), views))
     }));
     match drawn {
-        Ok(Ok(out)) => out,
+        Ok(Ok(out)) => (a.thumb, a.views) = out,
         Ok(Err(e)) => {
             tracing::debug!(path = %path.display(), error = %format!("{e:#}"), "no model thumbnail");
-            (None, None)
         }
         Err(_) => {
             tracing::warn!(path = %path.display(), "the renderer failed on this model; it has no thumbnail");
-            (None, None)
+            a.meta.insert("thumb_error".into(), json!("The thumbnail renderer crashed on this model."));
         }
     }
 }
@@ -222,7 +222,7 @@ pub(crate) fn analyze(path: &Path, root: &Path, kind: AssetKind, ext: &str) -> A
             // Animation-only glTF clips have no meshes to draw.
             let has_mesh = a.meta.get("meshes").and_then(Value::as_u64).is_none_or(|n| n > 0);
             if matches!(ext, "gltf" | "glb") && has_mesh {
-                (a.thumb, a.views) = render_model_thumb(path);
+                render_model_thumb(path, &mut a);
             } else if matches!(ext, "obj" | "fbx") {
                 // Hoard reads OBJ (with its MTL) and binary FBX itself, finding their textures in the pack: render
                 // a thumbnail from the GLB it makes.
@@ -373,7 +373,7 @@ fn render_mesh(mesh: &crate::meshes::Mesh, path: &Path, ext: &str, a: &mut Analy
     let glb = crate::meshes::to_glb(mesh)?;
     let tmp = path.with_extension(format!("{ext}.hoard-preview.glb"));
     std::fs::write(&tmp, glb)?;
-    (a.thumb, a.views) = render_model_thumb(&tmp);
+    render_model_thumb(&tmp, a);
     std::fs::remove_file(&tmp).ok();
     Ok(())
 }

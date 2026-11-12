@@ -42,9 +42,11 @@ test.describe('materials', () => {
   })
 
   test('double-clicking the material tile opens its viewer', async ({ page, seed }) => {
+    // The side panel's live preview and the viewer both start WebGL, slow on a runner without a GPU.
+    test.slow()
     await openPack(page, seed.packs[MEGASCANS], MEGASCANS, '&sort=name')
     await doubleClick(page, page.locator('.grid button.hit[aria-label*=" maps"]'))
-    await expect(page.getByRole('dialog', { name: `View the material ${MEGASCANS}` })).toBeVisible()
+    await expect(page.getByRole('dialog', { name: `View the material ${MEGASCANS}` })).toBeVisible({ timeout: 45_000 })
   })
 
   test('the model shows the material it wears', async ({ page, seed }) => {

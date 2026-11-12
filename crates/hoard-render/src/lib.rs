@@ -7,6 +7,8 @@
 //!
 //! On machines without a GPU it runs on Mesa's lavapipe (software Vulkan) or any other adapter wgpu finds,
 //! including the fallback adapter.
+//!
+//! [`sphere`] renders material swatches on the CPU, with no GPU at all.
 
 use std::path::Path;
 
@@ -79,6 +81,7 @@ struct MaterialUniform {
 }
 
 mod obj;
+pub mod sphere;
 
 /// One draw call's worth of baked geometry.
 #[derive(Debug)]

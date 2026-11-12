@@ -3,6 +3,7 @@ import { computed, defineAsyncComponent, nextTick, onBeforeUnmount, onMounted, r
 import {
   api, asUrl, bundleUrl, fileUrl, formatDuration, humanBytes, looksAlike, originalUrl, RESIZABLE_AS_ITSELF, thumbUrl,
   type Asset, type AssetLink, type Collection, type CollectionRef, type ConversionStatus, type Facet, type LinkRel,
+  type MaterialInfo,
 } from '../api'
 import CollectionPicker from './CollectionPicker.vue'
 import ImageViewer from './ImageViewer.vue'
@@ -11,12 +12,15 @@ import KindGlyph from './KindGlyph.vue'
 import TagChip from './TagChip.vue'
 import { copyText, showOk, swipeToClose } from '../ui'
 import { isModelAsset, isTextAsset, takeViewRequest, viewRequest, viewerFor, type ViewerKind } from '../viewers'
+import { isMaterialAsset, resolutions, ROLE_LABEL, sizeLabel } from '../materials'
 
 // three.js is big; only load it when someone opens a model.
 const ModelViewer = defineAsyncComponent(() => import('./ModelViewer.vue'))
 const ModelInspector = defineAsyncComponent(() => import('./ModelInspector.vue'))
 const TextPreview = defineAsyncComponent(() => import('./TextPreview.vue'))
 const TextViewer = defineAsyncComponent(() => import('./TextViewer.vue'))
+const MaterialPreview = defineAsyncComponent(() => import('./MaterialPreview.vue'))
+const MaterialViewer = defineAsyncComponent(() => import('./MaterialViewer.vue'))
 
 const props = defineProps<{
   asset: Asset
@@ -55,11 +59,22 @@ const REL_LABEL: Record<LinkRel, string> = {
   library: 'linked file', guess: 'probably goes with', variant: 'variant',
 }
 const needs = computed(() => props.asset.links.filter((l) => l.rel !== 'animation'))
+// A material made from texture maps lists its maps by role instead of as "Needs"; a texture or model that belongs
+// to one names it.
+const isMaterial = computed(() => isMaterialAsset(props.asset))
+const material = computed(() => props.asset.material ?? null)
+const partOf = computed(() => props.asset.materials ?? [])
+const roleOfHere = (m: MaterialInfo) => {
+  const own = m.maps.find((x) => x.id === props.asset.id)
+  return own ? `${ROLE_LABEL[own.role].toLowerCase()} map` : `${m.maps.length} maps`
+}
+const mapsBytes = computed(() => material.value?.maps.reduce((n, m) => n + m.size, 0) ?? 0)
 const anims = computed(() => props.asset.links.filter((l) => l.rel === 'animation'))
-const usedBy = computed(() => props.asset.linked_from)
+// The materials it belongs to have a section of their own.
+const usedBy = computed(() => props.asset.linked_from.filter((l) => !partOf.value.some((m) => m.id === l.id)))
 const linkGroups = computed(() =>
   [
-    { title: 'Needs', items: needs.value },
+    { title: 'Needs', items: isMaterial.value ? [] : needs.value.filter((l) => !partOf.value.some((m) => m.id === l.id)) },
     { title: 'Animations', items: anims.value },
     { title: 'Used by', items: usedBy.value },
   ].filter((g) => g.items.length),
@@ -74,7 +89,12 @@ function peek<T>(key: string, items: T[]): T[] {
   return unfolded.value.has(key) || items.length <= LIST_PEEK + 2 ? items : items.slice(0, LIST_PEEK)
 }
 const unfold = (key: string) => (unfolded.value = new Set(unfolded.value).add(key))
-const linkedCount = computed(() => needs.value.length + (withAnimations.value ? anims.value.length : 0))
+// A material made from maps comes as its maps, not as a file of its own.
+const linkedCount = computed(() => {
+  const viaMaterial = partOf.value.filter((m) => needs.value.some((l) => l.id === m.id))
+  const files = needs.value.length - viaMaterial.length + viaMaterial.reduce((n, m) => n + m.maps.length, 0)
+  return files + (withAnimations.value ? anims.value.length : 0)
+})
 
 // Variant families: tag edits can fan out to every take.
 const family = computed(() => props.asset.family ?? null)
@@ -237,6 +257,11 @@ const metaRows = computed(() => {
   if (m.large_document === true) rows.push(['Format', 'Large document (PSB)'])
   if (typeof m.compression === 'string') rows.push(['Compression', m.compression as string])
   if (typeof m.note === 'string') rows.push(['Note', m.note as string])
+  if (material.value) {
+    rows.push(['Maps', String(material.value.maps.length)])
+    const sizes = resolutions(material.value)
+    if (sizes.length) rows.push([sizes.length === 1 ? 'Size' : 'Sizes', sizes.map(sizeLabel).join(', ')])
+  }
   if (num('triangles') !== undefined) rows.push(['Triangles', num('triangles')!.toLocaleString()])
   if (num('vertices') !== undefined) rows.push(['Vertices', num('vertices')!.toLocaleString()])
   for (const k of ['meshes', 'materials', 'animations', 'skins']) {
@@ -558,6 +583,13 @@ onBeforeUnmount(() => unswipe())
       <img :src="`/api/assets/${asset.id}/derivative/views`" alt="The model from four directions" />
     </div>
     <ModelViewer v-else-if="isModel" :asset="asset" :paused="inspecting === 'model'" @expand="inspecting = 'model'" />
+    <MaterialPreview
+      v-else-if="isMaterial && material"
+      :asset="asset"
+      :material="material"
+      :paused="inspecting === 'material'"
+      @expand="inspecting = 'material'"
+    />
     <button
       v-else-if="isImage"
       type="button"
@@ -627,6 +659,7 @@ onBeforeUnmount(() => unswipe())
     <ImageViewer v-if="inspecting === 'image'" :asset="asset" :pixelated="pixelated" @close="inspecting = ''" />
     <ModelInspector v-else-if="inspecting === 'model'" :asset="asset" @close="inspecting = ''" />
     <TextViewer v-else-if="inspecting === 'text'" :asset="asset" @close="inspecting = ''" />
+    <MaterialViewer v-else-if="inspecting === 'material' && material" :asset="asset" :material="material" @close="inspecting = ''" />
     <label v-if="isModel && hasViews" class="animcheck">
       <input v-model="showViews" type="checkbox" /> Show the four-view sheet the tagger saw
     </label>
@@ -739,6 +772,41 @@ onBeforeUnmount(() => unswipe())
       </div>
     </section>
 
+    <section v-if="material">
+      <h3>Maps</h3>
+      <ul class="links">
+        <li v-for="m in peek('maps', material.maps)" :key="m.id">
+          <button type="button" class="link" style="--kind: var(--k-texture)" :title="m.path" @click="$emit('open', m.id)">
+            <span class="lthumb checker">
+              <img v-if="m.has_thumb" :src="thumbUrl(m)" alt="" loading="lazy" />
+              <KindGlyph v-else kind="texture" :size="22" />
+            </span>
+            <span class="lname">{{ ROLE_LABEL[m.role] }}</span>
+            <span class="lrel mono">{{ m.resolution ? sizeLabel(m.resolution) : (m.width ? `${m.width}×${m.height}` : m.ext) }}</span>
+          </button>
+        </li>
+      </ul>
+      <button v-if="peek('maps', material.maps).length < material.maps.length" type="button" class="linkish small showmore" @click="unfold('maps')">
+        Show {{ material.maps.length - LIST_PEEK }} more
+      </button>
+    </section>
+
+    <section v-if="partOf.length">
+      <h3>{{ partOf.length === 1 ? 'Material' : 'Materials' }}</h3>
+      <ul class="links">
+        <li v-for="m in partOf" :key="m.id">
+          <button type="button" class="link" style="--kind: var(--k-material)" @click="$emit('open', m.id)">
+            <span class="lthumb checker">
+              <img v-if="m.has_thumb" :src="thumbUrl(m)" alt="" loading="lazy" />
+              <KindGlyph v-else kind="material" :size="22" />
+            </span>
+            <span class="lname">{{ m.name }}</span>
+            <span class="lrel">{{ roleOfHere(m) }}</span>
+          </button>
+        </li>
+      </ul>
+    </section>
+
     <section v-for="g in linkGroups" :key="g.title">
       <h3>{{ g.title }}</h3>
       <ul class="links">
@@ -843,7 +911,7 @@ onBeforeUnmount(() => unswipe())
           <dd>{{ v }}</dd>
         </template>
         <dt>Bytes</dt>
-        <dd>{{ humanBytes(asset.size) }}</dd>
+        <dd>{{ humanBytes(material ? mapsBytes : asset.size) }}</dd>
       </dl>
     </section>
 
@@ -860,7 +928,10 @@ onBeforeUnmount(() => unswipe())
     </section>
 
     <footer>
-      <template v-if="needs.length || anims.length">
+      <template v-if="isMaterial && needs.length">
+        <a class="btn primary" :href="bundleUrl(asset)">Download all {{ needs.length }} {{ needs.length === 1 ? 'map' : 'maps' }} (.zip)</a>
+      </template>
+      <template v-else-if="needs.length || anims.length">
         <a class="btn primary" :href="bundleUrl(asset, withAnimations)">Download with {{ linkedCount }} linked {{ linkedCount === 1 ? 'file' : 'files' }} (.zip)</a>
         <label v-if="anims.length" class="animcheck"><input v-model="withAnimations" type="checkbox" /> Include animations</label>
         <a class="btn" :href="fileUrl(asset, true)">This file only</a>

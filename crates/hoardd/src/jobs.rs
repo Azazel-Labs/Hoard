@@ -19,6 +19,7 @@ pub(crate) const UNREAL: &str = "unreal_convert";
 pub(crate) const SCAN: &str = "scan_location";
 pub(crate) const RELOCATE: &str = "relocate";
 pub(crate) const LOOKS: &str = "looks";
+pub(crate) const MATERIALS: &str = "materials";
 
 /// With the backoff below, the last try comes about 15 minutes after the first: long enough for a local model
 /// that's still downloading on the first start of the compose stack.
@@ -69,6 +70,7 @@ pub(crate) fn job_label(kind: &str, pack: &str) -> String {
         SCAN => "Scanning a watched folder".to_owned(),
         RELOCATE => "Moving files between library locations".to_owned(),
         LOOKS => "Working out colours and looks".to_owned(),
+        MATERIALS => format!("Finding materials in {pack}"),
         other => format!("{other} {pack}"),
     }
 }
@@ -93,6 +95,7 @@ async fn run(state: &AppState, job: db::JobRow) {
         SCAN => SCAN,
         RELOCATE => RELOCATE,
         LOOKS => LOOKS,
+        MATERIALS => MATERIALS,
         _ => "job",
     };
     let _activity = crate::activity::start(
@@ -131,6 +134,7 @@ async fn run(state: &AppState, job: db::JobRow) {
         },
         RELOCATE => crate::relocate::run(state, serde_json::from_value(job.payload.clone()).unwrap_or_default()).await,
         LOOKS => crate::looks::run_job(state).await,
+        MATERIALS => blocking(state, move |s, rt| crate::materials::run_job(s, rt, &pack_id)).await,
         other => Err(anyhow::anyhow!("unknown job kind {other}")),
     };
 
@@ -166,7 +170,7 @@ async fn run(state: &AppState, job: db::JobRow) {
     }
     tracing::info!(id = job.id, kind = %job.kind, ok = result.is_ok(), secs = started.elapsed().as_secs_f32(), "job finished");
     // New or changed thumbnails get their colours and look worked out.
-    if result.is_ok() && matches!(job.kind.as_str(), INGEST | RETAG | CONVERT | UNREAL | SCAN) {
+    if result.is_ok() && matches!(job.kind.as_str(), INGEST | RETAG | CONVERT | UNREAL | SCAN | MATERIALS) {
         crate::looks::schedule(state).await;
     }
 }

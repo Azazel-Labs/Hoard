@@ -61,6 +61,40 @@ export interface Asset {
   formats?: FormatOption[]
   /** Dominant colours of the thumbnail, most of the picture first. */
   palette?: Swatch[]
+  /** For a material made from texture maps: its maps. */
+  material?: MaterialInfo | null
+  /** Materials made from texture maps that this texture is one of, or this model uses. */
+  materials?: MaterialInfo[]
+}
+
+/** A material made from texture maps that share a name (Rock_BaseColor.png, Rock_Normal.png, …). */
+export interface MaterialInfo {
+  id: string
+  name: string
+  path: string
+  has_thumb: boolean
+  /** By role (colour first), each role's largest first. */
+  maps: MaterialMap[]
+}
+
+export type MapRole =
+  | 'base_color' | 'normal' | 'normal_dx' | 'roughness' | 'gloss' | 'metalness' | 'ao' | 'orm' | 'mra' | 'rma'
+  | 'height' | 'bump' | 'cavity' | 'specular' | 'opacity' | 'emissive' | 'translucency'
+
+/** One texture of a material and what it's for. */
+export interface MaterialMap {
+  /** The texture's asset id. */
+  id: string
+  name: string
+  path: string
+  ext: string
+  role: MapRole
+  /** "2K", "512": a set that comes in several sizes has the same role more than once. */
+  resolution: string | null
+  width: number | null
+  height: number | null
+  has_thumb: boolean
+  size: number
 }
 
 export interface Swatch { hex: string; share: number }

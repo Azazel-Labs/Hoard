@@ -326,6 +326,27 @@ rescans match it by its folder, so only the name you see changes.
 **Finding packs.** The packs page searches names, stores, licenses, descriptions and tags (every word has to
 match), filters by what a pack holds, its status and its store, and sorts by date, name, size or asset count.
 
+### Materials from texture maps
+
+Texture maps that share a name in one folder become a material: `Rock_BaseColor.png`, `Rock_Normal.png` and
+`Rock_Roughness.png` are one "Rock" tile in the grid, with a lit sphere as its thumbnail. Hoard reads the naming of
+Megascans, Poly Haven, ambientCG, Substance and Unreal (`T_Rock_N`), and knows base colour, normal (OpenGL or
+DirectX), roughness, gloss, metalness, ambient occlusion, height, bump, cavity, specular, opacity, emissive and packed
+maps (ORM, ARM, MRA, RMA). The same set in several sizes (`Rock_2K_…`, `Rock_4K_…`, or `2K/` and `4K/` folders) is
+one material. It takes a colour map plus one more, or two other kinds of map.
+
+- **In the grid**, a material searches, filters, tags and collects like any asset. Its maps are hidden; "Show" next
+  to "supporting files hidden" brings them back.
+- **In the detail panel**, the material turns in a live preview, with its maps listed by kind and size. Click one to
+  open it. Double-click the tile (or the preview) for the full-screen viewer: sphere, cube or plane, how often it
+  repeats, how far the height map pushes, each map switched off and on, the environment light and the background.
+- **Models** that use a material's maps, by naming them or by sharing its name (`Rock_A.fbx` next to the `Rock_…`
+  maps), show the material in their panel. On a model that names no textures, the 3D viewers put its maps on by kind.
+- **Downloading** a material gives a zip of all its maps. A model that uses one brings the maps along.
+
+New packs are looked through as they come in, and packs already in the library once after an upgrade. A rescan or
+"Re-run offline tagger" (packs page, More) looks again.
+
 ## Getting assets into an engine
 
 **Bundles.** Every asset with links has a "Download with N linked files (.zip)" button, built on the fly, that keeps

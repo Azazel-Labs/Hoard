@@ -1,8 +1,9 @@
 // Which full-screen viewer suits an asset, and a way for the grid to ask the detail panel to open one.
 import { reactive } from 'vue'
 import { VIEWABLE_EXTS, type Asset } from './api'
+import { isMaterialAsset } from './materials'
 
-export type ViewerKind = 'image' | 'model' | 'text'
+export type ViewerKind = 'image' | 'model' | 'text' | 'material'
 
 /** Files that read as text, by extension. The server's kinds are too coarse (`data` covers binary `.uasset`, `document`
  *  covers PDF), so this is what decides; a file that turns out to be binary says so in the viewer. */
@@ -32,6 +33,7 @@ export function isTextAsset(a: Asset): boolean {
 /** The viewer a double-click opens, or null when the side panel is all there is. */
 export function viewerFor(a: Asset): ViewerKind | null {
   if (a.kind === 'texture' && a.has_thumb) return 'image'
+  if (isMaterialAsset(a)) return 'material'
   // A .gltf is JSON too, but the model viewer is what anyone wants.
   if (isModelAsset(a)) return 'model'
   if (isTextAsset(a)) return 'text'

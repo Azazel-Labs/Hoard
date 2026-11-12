@@ -9,7 +9,7 @@ import ImageViewer from './ImageViewer.vue'
 import { playableUrl, player, sourceExt, sourceUrl, stop as stopPreview } from '../player'
 import KindGlyph from './KindGlyph.vue'
 import TagChip from './TagChip.vue'
-import { showOk, swipeToClose } from '../ui'
+import { copyText, showOk, swipeToClose } from '../ui'
 import { isModelAsset, isTextAsset, takeViewRequest, viewRequest, viewerFor, type ViewerKind } from '../viewers'
 
 // three.js is big; only load it when someone opens a model.
@@ -250,12 +250,11 @@ const tomlSnippet = computed(
 )
 
 async function copy(text: string, what: string) {
-  try {
-    await navigator.clipboard.writeText(text)
+  if (await copyText(text)) {
     copied.value = what
     setTimeout(() => (copied.value = ''), 1500)
-  } catch {
-    emit('error', 'Copy failed: the browser blocked clipboard access')
+  } else {
+    emit('error', 'Couldn’t copy: the browser blocked it')
   }
 }
 

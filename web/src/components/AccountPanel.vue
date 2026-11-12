@@ -4,7 +4,7 @@
 import { computed, onMounted, reactive, ref } from 'vue'
 import { api, type AccessToken, type Account, type Connection } from '../api'
 import { auth, refreshAuth, signOut } from '../auth'
-import { confirmDialog, showError, showOk } from '../ui'
+import { confirmDialog, copyText, showError, showOk } from '../ui'
 
 const accounts = ref<Account[] | null>(null)
 const tokens = ref<AccessToken[] | null>(null)
@@ -89,12 +89,8 @@ async function makeToken() {
 }
 async function copyToken() {
   if (!made.value) return
-  try {
-    await navigator.clipboard.writeText(made.value.token)
-    showOk('Copied')
-  } catch {
-    showError('Couldn’t copy: select the token and copy it yourself')
-  }
+  if (await copyText(made.value.token)) showOk('Copied')
+  else showError('Couldn’t copy: select the token and copy it yourself')
 }
 async function revoke(t: AccessToken) {
   const ok = await confirmDialog({
@@ -114,12 +110,8 @@ const mcpUrl = computed(() => `${origin.value}/mcp`)
 const claudeCode = computed(() => `claude mcp add --transport http --scope user hoard ${mcpUrl.value}`)
 const local = computed(() => /^http:\/\/|\/\/(localhost|127\.|10\.|192\.168\.|172\.(1[6-9]|2\d|3[01])\.)/.test(origin.value))
 async function copy(text: string) {
-  try {
-    await navigator.clipboard.writeText(text)
-    showOk('Copied')
-  } catch {
-    showError('Couldn’t copy: select it and copy it yourself')
-  }
+  if (await copyText(text)) showOk('Copied')
+  else showError('Couldn’t copy: select it and copy it yourself')
 }
 async function disconnect(c: Connection) {
   const ok = await confirmDialog({

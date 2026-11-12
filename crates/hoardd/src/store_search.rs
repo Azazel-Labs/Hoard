@@ -32,6 +32,8 @@ const MAX_QUERY: usize = 120;
 const FAB_QUERIES: usize = 4;
 const OTHER_QUERIES: usize = 2;
 /// Files read for clues.
+/// The largest JSON file read for clues; Megascans' run to about 30 KB.
+const SIDECAR_BYTES: i64 = 256 * 1024;
 const MAX_PATHS: i64 = 50_000;
 
 /// Words in pack names that say where a pack is from or what it's for, not what it is.
@@ -221,6 +223,8 @@ pub(crate) struct MatchQuery {
 /// What a pack's own files say about where it came from.
 #[derive(Debug, Default, PartialEq)]
 pub(crate) struct Clues {
+    /// The product's exact title, from a file the store ships with it (a Megascans `<id>.json`), and that file.
+    title: Option<(String, &'static str)>,
     /// Product names besides the pack's: folders like `Content/MedievalVillage`, "Thank you for purchasing X".
     names: Vec<String>,
     /// Seller names, and where each was seen.
@@ -235,7 +239,8 @@ pub(crate) struct Clues {
 
 impl Clues {
     fn describe(&self) -> Vec<String> {
-        let mut out: Vec<String> = self.names.iter().map(|n| format!("Product: {n}")).collect();
+        let mut out: Vec<String> = self.title.iter().map(|(t, from)| format!("Title: {t} ({from})")).collect();
+        out.extend(self.names.iter().map(|n| format!("Product: {n}")));
         out.extend(self.sellers.iter().map(|(s, from)| format!("Seller: {s} ({from})")));
         out.extend(self.links.iter().map(|(store, _)| format!("The README links to {store}")));
         if let Some(e) = self.engine {
@@ -362,7 +367,7 @@ pub(crate) fn clues(pack_name: &str, readme: Option<&str>, paths: &[String], kin
     let mut pubs: Vec<(&str, usize)> = publishers.into_iter().filter(|(_, n)| *n >= floor).collect();
     pubs.sort_by(|a, b| b.1.cmp(&a.1).then(a.0.cmp(b.0)));
     if let Some((p, _)) = pubs.first() {
-        c.sellers.push((search_terms(p), "folder"));
+        c.sellers.push((search_terms(p), "folders"));
     }
 
     if let Some(text) = readme {
@@ -436,6 +441,34 @@ pub(crate) fn clues(pack_name: &str, readme: Option<&str>, paths: &[String], kin
     c
 }
 
+impl Clues {
+    /// Read a JSON file that came with the pack. Megascans assets (from Fab or Bridge) carry `<id>.json` with the
+    /// listing's exact title under `semanticTags`; the pack's own name is usually the file name, with the id and
+    /// "Raw" in it, which finds nothing.
+    pub(crate) fn read_sidecar(&mut self, json: &str) {
+        let Ok(v) = serde_json::from_str::<Value>(json) else { return };
+        let tags = &v["semanticTags"];
+        let title = tags["name_formats"]["title"].as_str().or_else(|| tags["name"].as_str()).map(str::trim);
+        if let Some(t) = title.filter(|t| !t.is_empty() && t.len() <= 120)
+            && self.title.is_none()
+        {
+            self.title = Some((t.split_whitespace().collect::<Vec<_>>().join(" "), "Megascans file"));
+            if !self.sellers.iter().any(|(s, _)| s == "Quixel Megascans") {
+                self.sellers.insert(0, ("Quixel Megascans".to_owned(), "Megascans file"));
+            }
+        }
+    }
+}
+
+/// Words and numbers, ignoring case and punctuation: "Stand Wood Old 05" and `stand_wood_old_05` are the same title.
+fn same_title(a: &str, b: &str) -> bool {
+    let w = |s: &str| {
+        s.split(|c: char| !c.is_alphanumeric()).filter(|w| !w.is_empty()).map(str::to_lowercase).collect::<Vec<_>>()
+    };
+    let a = w(a);
+    !a.is_empty() && a == w(b)
+}
+
 /// What to search for: the name, the product names from the files, and shorter pieces of the name (a listing
 /// called "Medieval Village" doesn't come up for "Medieval Village Props").
 fn queries(primary: &str, typed: bool, clues: &Clues) -> Vec<String> {
@@ -476,15 +509,29 @@ pub(crate) async fn store_matches(
         let paths = stmt
             .query_map(rusqlite::params![id2, MAX_PATHS], |r| r.get::<_, String>(0))?
             .collect::<Result<Vec<_>, _>>()?;
-        Ok(Some((pack, readme, paths)))
+        // Small JSON files a store ships beside the art, which may name the product exactly.
+        let mut stmt = c.prepare(
+            "SELECT a.blob_hash FROM assets a JOIN blobs b ON b.hash = a.blob_hash
+             WHERE a.pack_id = ?1 AND lower(a.path) LIKE '%.json' AND b.size <= ?2 ORDER BY b.size DESC LIMIT 3",
+        )?;
+        let sidecars = stmt
+            .query_map(rusqlite::params![id2, SIDECAR_BYTES], |r| r.get::<_, String>(0))?
+            .collect::<Result<Vec<_>, _>>()?;
+        Ok(Some((pack, readme, paths, sidecars)))
     })
     .await?;
-    let (pack, readme, paths) = found.ok_or_else(|| AppError::not_found(format!("pack {id}")))?;
-    let clues = clues(&pack.name, readme.as_deref(), &paths, &pack.kinds);
+    let (pack, readme, paths, sidecars) = found.ok_or_else(|| AppError::not_found(format!("pack {id}")))?;
+    let mut clues = clues(&pack.name, readme.as_deref(), &paths, &pack.kinds);
+    for hash in sidecars {
+        if let Ok(bytes) = state.blobs.read_all(&hash).await {
+            clues.read_sidecar(&String::from_utf8_lossy(&bytes));
+        }
+    }
     let typed = mq.q.as_deref().map(str::trim).filter(|q| !q.is_empty());
-    let query: String = match typed {
-        Some(q) => q.split_whitespace().collect::<Vec<_>>().join(" "),
-        None => search_terms(&pack.name),
+    let query: String = match (typed, &clues.title) {
+        (Some(q), _) => q.split_whitespace().collect::<Vec<_>>().join(" "),
+        (None, Some((title, _))) => title.clone(),
+        (None, None) => search_terms(&pack.name),
     }
     .chars()
     .take(MAX_QUERY)
@@ -492,7 +539,12 @@ pub(crate) async fn store_matches(
     if query.is_empty() {
         return Err(AppError::bad_request("nothing to search for; type the pack's name"));
     }
-    let all = queries(&query, typed.is_some(), &clues);
+    let mut all = queries(&query, typed.is_some(), &clues);
+    // With an exact title in hand the pack's name is the fallback, searched second.
+    let named = search_terms(&pack.name);
+    if typed.is_none() && clues.title.is_some() && !named.is_empty() && !all.iter().any(|q| same_title(q, &named)) {
+        all.insert(1, named);
+    }
 
     let http = &state.http;
     let fab = join_all(all.iter().take(FAB_QUERIES).enumerate().map(|(i, q)| search_fab(http, q, i == 0)));
@@ -736,6 +788,12 @@ fn rank(query: &str, clues: &Clues, matches: Vec<StoreMatch>) -> Vec<StoreMatch>
         if m.why.iter().any(|w| w.starts_with("Linked")) {
             s = 1.0;
         }
+        if let Some((title, from)) = &clues.title
+            && same_title(title, &m.title)
+        {
+            s = 1.0;
+            m.why.push(format!("Same title as the pack's {from}"));
+        }
         if let Some(author) = m.author.as_deref().map(squash).filter(|a| a.len() >= 3)
             && let Some((seller, from)) = clues.sellers.iter().find(|(s, _)| {
                 let s = squash(s);
@@ -743,11 +801,7 @@ fn rank(query: &str, clues: &Clues, matches: Vec<StoreMatch>) -> Vec<StoreMatch>
             })
         {
             s += 0.35;
-            m.why.push(format!(
-                "By {}, named in the pack's {}",
-                m.author.as_deref().unwrap_or(seller),
-                if *from == "README" { "README" } else { "folders" }
-            ));
+            m.why.push(format!("By {}, named in the pack's {from}", m.author.as_deref().unwrap_or(seller)));
         }
         if let Some(specs) = m.specs.as_deref() {
             if clues.meshes >= 5 && spec_count(specs, "mesh").is_some_and(|n| about(n, clues.meshes)) {
@@ -768,6 +822,13 @@ fn rank(query: &str, clues: &Clues, matches: Vec<StoreMatch>) -> Vec<StoreMatch>
         }
         if by_name <= 0.0 && m.why.is_empty() {
             continue;
+        }
+        // Knowing the exact title, a listing with another one (the same scan's "Old 04") is a near miss at best.
+        if let Some((title, _)) = &clues.title
+            && !same_title(title, &m.title)
+            && !m.why.iter().any(|w| w.starts_with("Linked"))
+        {
+            s = s.min(0.85);
         }
         m.score = (s.clamp(0.0, 1.0) * 100.0).round() / 100.0;
         kept.push(m);
@@ -992,6 +1053,47 @@ mod tests {
     }
 
     #[test]
+    fn megascans_files_name_the_listing() {
+        let paths: Vec<String> = [
+            "Historic_Miscellaneous_Stand_Wood_Old_05_xeokah0_Raw.fbx",
+            "Historic_Miscellaneous_Stand_Wood_Old_05_xeokah0_Raw_8K_BaseColor.jpg",
+            "xeokah0.json",
+        ]
+        .map(String::from)
+        .to_vec();
+        let mut c = clues("historic_miscellaneous_stand_wood_old_05_xeokah0_raw", None, &paths, &BTreeMap::new());
+        c.read_sidecar(
+            r#"{"semanticTags":{"name":"Historic Miscellaneous Stand Wood Old 05","name_formats":
+            {"title":"Historic Miscellaneous Stand Wood Old 05"}},"tags":["table"]}"#,
+        );
+        c.read_sidecar("not json");
+        assert_eq!(c.title, Some(("Historic Miscellaneous Stand Wood Old 05".to_owned(), "Megascans file")));
+        assert_eq!(c.sellers[0].0, "Quixel Megascans");
+        assert!(c.describe()[0].starts_with("Title: Historic Miscellaneous Stand Wood Old 05"));
+
+        let m = |title: &str, author: &str| {
+            let mut m = found("Fab", title, format!("https://www.fab.com/listings/{}", squash(title))).unwrap();
+            m.author = Some(author.to_owned());
+            m
+        };
+        let ranked = rank(
+            "Historic Miscellaneous Stand Wood Old 05",
+            &c,
+            vec![
+                m("Historic Miscellaneous Door Wood Old 01", "Quixel Megascans"),
+                m("Old Styled Wooden Info Stand", "Incg5764"),
+                m("Historic Miscellaneous Stand Wood Old 04", "Quixel Megascans"),
+                m("Historic Miscellaneous Stand Wood Old 05", "Quixel Megascans"),
+            ],
+        );
+        assert_eq!(ranked[0].title, "Historic Miscellaneous Stand Wood Old 05");
+        assert!((ranked[0].score - 1.0).abs() < f32::EPSILON);
+        assert!(ranked[0].why.iter().any(|w| w == "Same title as the pack's Megascans file"));
+        assert!(ranked[1].score < 1.0, "a different number isn't the same listing");
+        assert!(same_title("stand_wood_old_05", "Stand Wood Old 05") && !same_title("Old 05", "Old 04"));
+    }
+
+    #[test]
     fn ranks_by_shared_words() {
         let m = |store, title: &str| found(store, title, format!("https://example.com/{}", squash(title))).unwrap();
         let ranked = rank(
@@ -1093,7 +1195,7 @@ mod tests {
             (0..6).map(|i| format!("Assets/Synty/PolygonFantasyKingdom/Models/m{i}.fbx")).collect();
         let c = clues("pack_2023", None, &unity, &BTreeMap::new());
         assert_eq!(c.names, ["Polygon Fantasy Kingdom"]);
-        assert_eq!(c.sellers, [("Synty".to_owned(), "folder")]);
+        assert_eq!(c.sellers, [("Synty".to_owned(), "folders")]);
         assert_eq!(c.engine, None);
     }
 

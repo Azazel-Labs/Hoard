@@ -4,6 +4,7 @@
 import { computed, onMounted, provide, ref } from 'vue'
 import { fileUrl, humanBytes, type Asset } from '../api'
 import { LANG_LABEL, fetchText, highlightLines, langOf, reflowJson, type TextFile } from '../text'
+import { copyText, showError } from '../ui'
 import JsonTree from './JsonTree.vue'
 
 const props = defineProps<{ asset: Asset }>()
@@ -65,19 +66,9 @@ const html = computed(() =>
 )
 
 async function copy() {
-  const text = shownText.value
-  try {
-    await navigator.clipboard.writeText(text)
-  } catch {
-    // Plain-http servers on a LAN have no Clipboard API; the old way still works from a click.
-    const ta = document.createElement('textarea')
-    ta.value = text
-    ta.style.position = 'fixed'
-    ta.style.opacity = '0'
-    dlg.value?.appendChild(ta)
-    ta.select()
-    document.execCommand('copy')
-    ta.remove()
+  if (!(await copyText(shownText.value))) {
+    showError('Couldn’t copy: the browser blocked it')
+    return
   }
   copied.value = true
   setTimeout(() => (copied.value = false), 1400)

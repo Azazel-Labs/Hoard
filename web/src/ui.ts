@@ -289,3 +289,38 @@ export function swipeToClose(el: HTMLElement, dir: 1 | -1, close: () => void, le
     el.removeEventListener('pointercancel', up)
   }
 }
+
+/**
+ * Put text on the clipboard. Browsers only offer the Clipboard API on https and localhost, so a server reached over
+ * plain http on the LAN (http://192.168.x.x) falls back to selecting a hidden textarea and copying it, which still
+ * works from a click. The textarea goes inside an open modal dialog if there is one, since a modal makes the rest of
+ * the page inert.
+ */
+export async function copyText(text: string): Promise<boolean> {
+  if (window.isSecureContext && navigator.clipboard) {
+    try {
+      await navigator.clipboard.writeText(text)
+      return true
+    } catch {
+      // fall through to the old way
+    }
+  }
+  const host = [...document.querySelectorAll('dialog[open]')].pop() ?? document.body
+  const ta = document.createElement('textarea')
+  ta.value = text
+  ta.setAttribute('readonly', '')
+  ta.style.cssText = 'position:fixed;top:0;left:0;width:1px;height:1px;opacity:0'
+  host.appendChild(ta)
+  const had = document.activeElement as HTMLElement | null
+  ta.select()
+  ta.setSelectionRange(0, text.length)
+  let ok = false
+  try {
+    ok = document.execCommand('copy')
+  } catch {
+    ok = false
+  }
+  ta.remove()
+  had?.focus?.()
+  return ok
+}

@@ -267,8 +267,9 @@ software rasterizer (`apt install mesa-vulkan-drivers`). Without any adapter, ev
      Kenney and OpenGameArt and lists likely matches; "Use" fills in the form. Plain names ("Medieval Village" has
      dozens of listings) get help from the pack's files: the README's store links, seller ("Created by", "©") and
      product name ("Thank you for purchasing …"), product folders (`Content/<Product>`, `Assets/<Publisher>/<Product>`),
-     the engine, and the mesh and texture counts, which are checked against Fab's technical details. Pieces of the
-     name are searched too, and each match says which clues it fits. Whenever a pack has
+     the engine, and the mesh and texture counts, which are checked against Fab's technical details. A Megascans
+     asset's `<id>.json` gives its exact listing title, which beats a file name like `…_Old_05_xeokah0_Raw`. Pieces of
+     the name are searched too, and each match says which clues it fits. Whenever a pack has
      a store link and no text, from either place, Hoard fetches the page's title and description; the asset panel
      shows it as "From the <store> page".
 5. **Link.** glTF buffers/images, OBJ → MTL → textures, FBX texture paths (absolute artist paths are matched by file

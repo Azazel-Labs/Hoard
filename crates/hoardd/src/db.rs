@@ -128,6 +128,20 @@ const MIGRATIONS: &[&str] = &[
     // 19: tags merged into others. Tagging maps the old name to the new one, so a merged tag stays merged when the
     // taggers run again (see `merge_tags`).
     "CREATE TABLE tag_aliases (tag TEXT PRIMARY KEY, into_tag TEXT NOT NULL) WITHOUT ROWID;",
+    // 20: materials made from texture maps (see `materials.rs`): which textures each one uses, and as what. Every
+    // pack gets a look for them.
+    "CREATE TABLE material_maps (
+       material_id TEXT NOT NULL REFERENCES assets(id) ON DELETE CASCADE,
+       texture_id  TEXT NOT NULL REFERENCES assets(id) ON DELETE CASCADE,
+       role        TEXT NOT NULL,
+       resolution  TEXT,
+       PRIMARY KEY (material_id, texture_id)
+     ) WITHOUT ROWID;
+     CREATE INDEX material_maps_texture ON material_maps(texture_id);
+     INSERT INTO jobs (kind, pack_id, payload, run_after, created_at, updated_at)
+       SELECT 'materials', id, '{}', strftime('%Y-%m-%dT%H:%M:%SZ', 'now'), strftime('%Y-%m-%dT%H:%M:%SZ', 'now'),
+              strftime('%Y-%m-%dT%H:%M:%SZ', 'now')
+       FROM packs WHERE status = 'ready';",
 ];
 
 /// How many automatic pre-upgrade backups to keep in `<data dir>/backups`.
@@ -688,6 +702,8 @@ fn asset_from_row(r: &Row<'_>) -> rusqlite::Result<Asset> {
         origin: None,
         unreal: None,
         formats: Vec::new(),
+        material: None,
+        materials: Vec::new(),
     })
 }
 
@@ -764,6 +780,7 @@ pub(crate) fn get_asset(conn: &Connection, id: &str) -> Result<Option<Asset>> {
         .query_map([&asset.id], |r| Ok(hoard_core::CollectionRef { id: r.get(0)?, name: r.get(1)? }))?
         .collect::<rusqlite::Result<_>>()?;
     asset.origin = crate::extract::origin_of(conn, &asset.id)?;
+    crate::materials::attach(conn, &mut asset)?;
     asset.unreal = crate::extract::status_of(conn, &asset.id)?;
     Ok(Some(asset))
 }
@@ -975,7 +992,8 @@ pub(crate) fn prefer_sources(conn: &Connection, files: &mut [BundleFile]) -> Res
 pub(crate) fn bundle_files(conn: &Connection, ids: &[String]) -> Result<Vec<BundleFile>> {
     let mut stmt = conn.prepare(
         "SELECT a.id, a.path, a.blob_hash, b.size, u.guid FROM assets a JOIN blobs b ON b.hash = a.blob_hash
-         LEFT JOIN unity_guids u ON u.pack_id = a.pack_id AND u.path = a.path WHERE a.id = ?1",
+         LEFT JOIN unity_guids u ON u.pack_id = a.pack_id AND u.path = a.path
+         WHERE a.id = ?1 AND NOT EXISTS (SELECT 1 FROM material_maps m WHERE m.material_id = a.id)",
     )?;
     let mut out = Vec::with_capacity(ids.len());
     for id in ids {
@@ -1182,7 +1200,7 @@ fn build_filter(q: &SearchQuery, include_kind: bool) -> Filter {
         f.params.push(SqlValue::Text(tag.clone()));
     }
     if q.hide_supporting {
-        f.clauses.push(SUPPORTING.replace("EXISTS", "NOT EXISTS"));
+        f.clauses.push(format!("NOT {SUPPORTING}"));
     }
     f.clauses.push(
         match (q.archived, q.pack.as_deref().is_some_and(|p| !p.is_empty())) {
@@ -1214,9 +1232,11 @@ fn build_filter(q: &SearchQuery, include_kind: bool) -> Filter {
 pub(crate) const LIVE: &str =
     "a.archived_at IS NULL AND a.pack_id NOT IN (SELECT id FROM packs WHERE archived_at IS NOT NULL)";
 
-/// An asset another asset needs as raw data (a glTF's .bin, an OBJ's .mtl): not something you'd browse for.
-pub(crate) const SUPPORTING: &str = "EXISTS (SELECT 1 FROM asset_links l WHERE l.to_id = a.id
-     AND (l.rel = 'buffer' OR (l.rel = 'material' AND a.ext = 'mtl')))";
+/// An asset another asset needs as raw data (a glTF's .bin, an OBJ's .mtl) or a map of a material (its roughness
+/// map, say): not something you'd browse for. The material is, and it shows its maps.
+pub(crate) const SUPPORTING: &str = "(EXISTS (SELECT 1 FROM asset_links l WHERE l.to_id = a.id
+     AND (l.rel = 'buffer' OR (l.rel = 'material' AND a.ext = 'mtl')))
+     OR EXISTS (SELECT 1 FROM material_maps m WHERE m.texture_id = a.id))";
 
 impl Filter {
     fn where_sql(&self) -> String {

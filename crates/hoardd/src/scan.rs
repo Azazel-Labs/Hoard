@@ -223,10 +223,11 @@ fn catch_up(c: &Connection, pack_id: &str, dir: &Path) -> Result<bool> {
     // An asset converted from one of the pack's files (an Unreal package's texture, say) has no file of its own in
     // the folder: it stays as long as the file it came from does.
     let assets: Vec<(String, String, Option<String>)> = {
-        let mut stmt = c.prepare(
+        let mut stmt = c.prepare(&format!(
             "SELECT a.id, a.path, o.path FROM assets a LEFT JOIN asset_origin o ON o.asset_id = a.id
-              WHERE a.pack_id = ?1",
-        )?;
+                  WHERE a.pack_id = ?1 AND NOT {}",
+            crate::materials::IS_MATERIAL
+        ))?;
         stmt.query_map([pack_id], |r| Ok((r.get(0)?, r.get(1)?, r.get(2)?)))?.collect::<rusqlite::Result<_>>()?
     };
     let gone: Vec<&str> = assets
@@ -242,6 +243,9 @@ fn catch_up(c: &Connection, pack_id: &str, dir: &Path) -> Result<bool> {
     }
     if added {
         db::enqueue(c, jobs::INGEST, Some(pack_id), &json!({ "auto_name": false }))?;
+    } else if !gone.is_empty() {
+        // Ingesting looks again for materials; with nothing to ingest, a material may have lost a map.
+        db::enqueue(c, jobs::MATERIALS, Some(pack_id), &json!({}))?;
     }
     Ok(added || !gone.is_empty())
 }

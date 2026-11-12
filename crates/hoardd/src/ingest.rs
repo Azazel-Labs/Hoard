@@ -785,6 +785,7 @@ pub(crate) fn ingest_pack(state: &AppState, rt: &Handle, pack_id: &str, auto_nam
     tx.execute("UPDATE packs SET files_done = files_total WHERE id = ?1", [pack_id])?;
     tx.commit()?;
     tracing::info!(pack = pack_id, links = n_links, families = n_families, "pack ingested");
+    crate::materials::detect_logged(state, rt, &mut conn, pack_id);
 
     if watched.is_none() {
         fs::remove_dir_all(&staging).ok();
@@ -835,8 +836,11 @@ pub(crate) fn retag_pack(state: &AppState, rt: &Handle, pack_id: &str) -> Result
     // A watched pack's files are read from its folder; they're never copied in.
     let watched = crate::locations::watched_root(&conn, pack_id)?.is_some();
     let rows: Vec<Row> = {
-        let mut stmt = conn
-            .prepare("SELECT id, path, blob_hash, human_edited, kind FROM assets WHERE pack_id = ?1 ORDER BY path")?;
+        let mut stmt = conn.prepare(&format!(
+            "SELECT id, path, blob_hash, human_edited, kind FROM assets a WHERE pack_id = ?1 AND NOT {}
+                 ORDER BY path",
+            crate::materials::IS_MATERIAL
+        ))?;
         stmt.query_map([pack_id], |r| {
             Ok(Row { id: r.get(0)?, rel: r.get(1)?, hash: r.get(2)?, human: r.get::<_, i64>(3)? != 0, kind: r.get(4)? })
         })?
@@ -943,6 +947,7 @@ pub(crate) fn retag_pack(state: &AppState, rt: &Handle, pack_id: &str) -> Result
     tx.execute("UPDATE packs SET files_done = files_total WHERE id = ?1", [pack_id])?;
     tx.commit()?;
     fs::remove_dir_all(&work).ok();
+    crate::materials::detect_logged(state, rt, &mut conn, pack_id);
     Ok(())
 }
 

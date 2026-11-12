@@ -203,6 +203,43 @@ pub struct Asset {
     /// Other formats this asset can be downloaded as (`GET /api/assets/{id}/as/{format}`). Detail view only.
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub formats: Vec<FormatOption>,
+    /// For a material made from texture maps: its maps. Detail view only.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub material: Option<MaterialInfo>,
+    /// Materials made from texture maps that this texture is one of, or this model uses. Detail view only.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub materials: Vec<MaterialInfo>,
+}
+
+/// A material made from texture maps that share a name (`Rock_BaseColor.png`, `Rock_Normal.png`, …).
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct MaterialInfo {
+    pub id: String,
+    pub name: String,
+    pub path: String,
+    pub has_thumb: bool,
+    /// By role (colour first), each role's largest first.
+    pub maps: Vec<MaterialMap>,
+}
+
+/// One texture of a material and what it's for.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct MaterialMap {
+    /// The texture's asset id.
+    pub id: String,
+    pub name: String,
+    pub path: String,
+    pub ext: String,
+    /// `base_color`, `normal` (OpenGL style), `normal_dx` (DirectX style), `roughness`, `gloss` (inverted roughness),
+    /// `metalness`, `ao`, `orm` (occlusion, roughness, metalness in R, G, B; also called ARM), `mra`, `rma`,
+    /// `height`, `bump`, `cavity`, `specular`, `opacity`, `emissive` or `translucency`.
+    pub role: String,
+    /// `2K`, `512`: the set comes in more than one size when the same role appears more than once.
+    pub resolution: Option<String>,
+    pub width: Option<u32>,
+    pub height: Option<u32>,
+    pub has_thumb: bool,
+    pub size: u64,
 }
 
 /// A format an asset can be converted to on download.

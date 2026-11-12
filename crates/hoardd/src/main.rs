@@ -27,6 +27,7 @@ mod llm;
 mod local_llm;
 mod locations;
 mod maintenance;
+mod materials;
 mod mcp;
 mod meshes;
 mod music;

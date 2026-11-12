@@ -2,7 +2,7 @@
 import { computed, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue'
 import {
   api, collectionZipUrl, humanBytes, packZipUrl, thumbUrl, type Collection, type Pack, type PackContext, type Stats,
-  type UnrealPackStatus,
+  type StoreMatch, type StoreMatches, type UnrealPackStatus,
 } from '../api'
 import { confirmDialog, undoable } from '../ui'
 import { archiveWithUndo } from '../archive'
@@ -129,9 +129,41 @@ async function editContext(p: Pack) {
   try {
     Object.assign(draft, await api.packContext(p.id))
     editing.value = p.id
+    Object.assign(lookup, { q: '', result: null, error: '', open: !draft.store_url })
+    // No store page yet: look for one straight away.
+    if (!draft.store_url) findInStores(p)
   } catch (e) {
     emit('error', `Couldn't load the pack's store details: ${(e as Error).message}`)
   }
+}
+
+// Store lookup: the pack's name searched in the stores, best matches first.
+const lookup = reactive({ q: '', loading: false, open: false, error: '', result: null as StoreMatches | null })
+let lookupAsked = 0
+
+async function findInStores(p: Pack, q?: string) {
+  const n = ++lookupAsked
+  lookup.loading = true
+  lookup.open = true
+  lookup.error = ''
+  try {
+    const r = await api.storeMatches(p.id, q?.trim() || undefined)
+    if (n !== lookupAsked || editing.value !== p.id) return
+    lookup.result = r
+    if (!lookup.q) lookup.q = r.query
+  } catch (e) {
+    if (n === lookupAsked) lookup.error = (e as Error).message
+  } finally {
+    if (n === lookupAsked) lookup.loading = false
+  }
+}
+
+/** Fill the form from a match; Save fetches the page's description. */
+function useMatch(m: StoreMatch) {
+  draft.store = m.store
+  draft.store_url = m.url
+  draft.store_text = null
+  lookup.open = false
 }
 
 async function saveContext(p: Pack, thenRetag: boolean) {
@@ -366,6 +398,51 @@ async function archive(p: Pack) {
             Where the pack came from and what the seller says about it. The LLM tagger reads this with every file,
             so a store blurb like "120 ice and fire spells" helps it name <span class="mono">spell35.wav</span>.
           </p>
+          <section v-if="lookup.open" class="lookup" :aria-busy="lookup.loading">
+            <div class="find">
+              <input
+                v-model="lookup.q"
+                class="field"
+                type="search"
+                aria-label="Search the stores for"
+                placeholder="The pack's name in the store"
+                @keydown.enter.prevent="findInStores(p, lookup.q)"
+              />
+              <button class="btn" type="button" :disabled="lookup.loading" @click="findInStores(p, lookup.q)">
+                {{ lookup.loading ? 'Searching…' : 'Search stores' }}
+              </button>
+              <button class="btn ghost" type="button" @click="lookup.open = false">Hide</button>
+            </div>
+            <p v-if="lookup.error" class="err">{{ lookup.error }}</p>
+            <template v-else-if="lookup.result">
+              <p v-if="!lookup.result.matches.length" class="hint">
+                Nothing on Fab, itch.io, Kenney or OpenGameArt looks like it. Try fewer or different words.
+              </p>
+              <ul v-else class="matches">
+                <li v-for="m in lookup.result.matches" :key="m.url">
+                  <img v-if="m.thumb" :src="m.thumb" alt="" loading="lazy" referrerpolicy="no-referrer" />
+                  <span v-else class="noimg" aria-hidden="true" />
+                  <div class="what">
+                    <a :href="m.url" target="_blank" rel="noopener noreferrer" class="title">{{ m.title }}</a>
+                    <span class="meta">{{ [m.store, m.author, m.price].filter(Boolean).join(' · ') }}</span>
+                    <span v-if="m.summary" class="meta clamp">{{ m.summary }}</span>
+                  </div>
+                  <button class="btn" type="button" @click="useMatch(m)">Use</button>
+                </li>
+              </ul>
+              <p class="hint">
+                <template v-if="lookup.result.failed.length">Couldn't reach {{ lookup.result.failed.join(', ') }} this time. </template>
+                Also look on
+                <template v-for="(l, i) in lookup.result.links" :key="l.store">
+                  <a :href="l.url" target="_blank" rel="noopener noreferrer">{{ l.store }}</a>{{ i < lookup.result.links.length - 1 ? ' and ' : '' }}
+                </template>
+                (they can only be searched in your browser); paste the page's address below.
+              </p>
+            </template>
+          </section>
+          <button v-else class="btn ghost find-again" type="button" @click="lookup.result ? (lookup.open = true) : findInStores(p)">
+            Find in stores…
+          </button>
           <div class="row">
             <label>Store <input v-model="draft.store" class="field" placeholder="Fab, itch.io, Humble Bundle…" /></label>
             <label>License tier <input v-model="draft.license_tier" class="field" placeholder="Personal, Professional…" /></label>
@@ -376,6 +453,7 @@ async function archive(p: Pack) {
           <label>Description from the store
             <textarea v-model="draft.store_text" class="field" rows="5" placeholder="Paste the listing text, or leave empty to fetch it from the store page." />
           </label>
+          <p v-if="draft.store_url && !draft.store_text" class="hint">Saving fetches the description from the store page.</p>
           <details v-if="draft.readme">
             <summary>README found in the pack</summary>
             <pre>{{ draft.readme }}</pre>
@@ -493,6 +571,23 @@ li.flash .status { animation: ready-pop var(--dur-3) var(--ease-pop); }
 .context pre { white-space: pre-wrap; font-size: 0.8rem; max-height: 14rem; overflow: auto; margin: 0.4rem 0 0; color: var(--muted); }
 .context summary { cursor: pointer; font-size: var(--step--1); color: var(--muted); }
 @media (max-width: 560px) { .context .row { grid-template-columns: 1fr; } }
+.lookup { display: grid; gap: 0.5rem; padding: 0.7rem; border: 1px solid var(--line); border-radius: var(--r-tile); background: var(--bg); }
+.lookup[aria-busy='true'] .matches { opacity: 0.6; }
+.find { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+.find .field { flex: 1 1 14rem; min-width: 0; }
+.lookup .err { margin: 0; color: var(--danger); font-size: var(--step--1); }
+.lookup .hint { margin: 0; }
+.matches { gap: 0; max-height: 24rem; overflow-y: auto; }
+.matches li { padding: 0.5rem 0; gap: 0.7rem; align-items: center; }
+.matches li:first-child { border-top: 0; }
+.matches img, .matches .noimg {
+  flex: none; width: 64px; height: 40px; object-fit: cover; border-radius: var(--r-chip); background: var(--raised);
+}
+.matches .what { display: flex; flex-direction: column; gap: 0.1rem; flex: 1; min-width: 0; }
+.matches .title { color: var(--text); font-size: var(--step--1); font-weight: 600; overflow-wrap: anywhere; }
+.matches .meta { color: var(--muted); font-size: 0.75rem; overflow-wrap: anywhere; }
+.matches .clamp { display: -webkit-box; -webkit-line-clamp: 1; line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; }
+.find-again { align-self: flex-start; }
 .ustats { flex-direction: row; flex-wrap: wrap; gap: 0.3rem 1.25rem; font-size: var(--step--1); color: var(--muted); }
 .ustats li, .reasons li { padding: 0; border: 0; display: block; }
 .ustats strong { color: var(--text); font-variant-numeric: tabular-nums; }

@@ -216,11 +216,15 @@ fn legacy_files_dir(cfg: &Config) -> PathBuf {
     configured
 }
 
-/// Where the setup suggests the first library goes: the bucket with `HOARD_STORAGE=s3`, else `HOARD_FILES_DIR`
-/// (`/library` in the container image), else a `library` folder next to the data.
+/// Where the setup suggests the first library goes: the bucket with `HOARD_STORAGE=s3`; in the container image its
+/// `/library` volume, whatever an old compose file sets `HOARD_FILES_DIR` to; else `HOARD_FILES_DIR`, else a
+/// `library` folder next to the data.
 pub(crate) fn suggested_path(cfg: &Config) -> String {
     if let (StorageKind::S3, Some(bucket)) = (cfg.storage, cfg.s3_bucket.as_deref()) {
         return format!("s3://{bucket}");
+    }
+    if cfg!(unix) && Path::new("/library").is_dir() {
+        return "/library".to_owned();
     }
     let p = cfg.files_dir.clone().unwrap_or_else(|| cfg.data_dir.join("library"));
     std::path::absolute(&p).unwrap_or(p).display().to_string()

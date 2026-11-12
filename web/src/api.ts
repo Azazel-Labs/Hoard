@@ -107,6 +107,28 @@ export interface Collection {
 export interface CollectionRef { id: string; name: string }
 
 /** What the seller says about a pack; fed to the LLM tagger with every file. */
+/** A store page that may be where a pack came from (`GET /api/packs/{id}/store-matches`). */
+export interface StoreMatch {
+  store: string
+  title: string
+  url: string
+  author?: string
+  summary?: string
+  thumb?: string
+  price?: string
+  /** 0 to 1: how well the title matches the search. */
+  score: number
+}
+
+export interface StoreMatches {
+  query: string
+  matches: StoreMatch[]
+  /** Stores that can only be searched in the browser. */
+  links: { store: string; url: string }[]
+  /** Stores whose search failed this time. */
+  failed: string[]
+}
+
 export interface PackContext {
   store: string | null
   store_url: string | null
@@ -489,6 +511,9 @@ export const api = {
       body: JSON.stringify(patch),
     }).then(normalize),
   packContext: (id: string) => request<PackContext>(`/api/packs/${id}/context`),
+  /** Likely store pages for a pack, searched by `q` or else by its name. */
+  storeMatches: (id: string, q?: string) =>
+    request<StoreMatches>(`/api/packs/${id}/store-matches${q ? `?q=${encodeURIComponent(q)}` : ''}`),
   setPackContext: (id: string, ctx: Omit<PackContext, 'readme'>) =>
     request<PackContext>(`/api/packs/${id}/context`, {
       method: 'PUT',

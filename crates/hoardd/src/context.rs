@@ -142,9 +142,14 @@ pub(crate) async fn fill_store_text(state: &crate::AppState, pack_id: &str) {
 
 /// Fetch a store page and pull out its title and description (`<title>`, `description`, `og:description`).
 pub(crate) async fn fetch_store_text(http: &reqwest::Client, url: &str) -> Result<Option<String>> {
+    Ok(page_summary(&fetch_page(http, url, "text/html").await?))
+}
+
+/// A web page's text (the first 2 MB), fetched as Hoard.
+pub(crate) async fn fetch_page(http: &reqwest::Client, url: &str, accept: &str) -> Result<String> {
     let resp = http
         .get(url)
-        .header(reqwest::header::ACCEPT, "text/html")
+        .header(reqwest::header::ACCEPT, accept)
         .header(reqwest::header::USER_AGENT, hoard_core::user_agent())
         .timeout(FETCH_TIMEOUT)
         .send()
@@ -153,12 +158,12 @@ pub(crate) async fn fetch_store_text(http: &reqwest::Client, url: &str) -> Resul
     let mut body = Vec::new();
     let mut stream = resp.bytes_stream();
     while let Some(chunk) = stream.next().await {
-        body.extend_from_slice(&chunk.context("read store page")?);
+        body.extend_from_slice(&chunk.context("read the page")?);
         if body.len() >= MAX_PAGE_BYTES {
             break;
         }
     }
-    Ok(page_summary(&String::from_utf8_lossy(&body)))
+    Ok(String::from_utf8_lossy(&body).into_owned())
 }
 
 /// Title and description of an HTML page as plain text.
@@ -195,7 +200,7 @@ fn between<'a>(s: &'a str, open: &str, close: &str) -> Option<&'a str> {
     s.get(a..b)
 }
 
-fn attr(tag: &str, name: &str) -> Option<String> {
+pub(crate) fn attr(tag: &str, name: &str) -> Option<String> {
     let lower = tag.to_ascii_lowercase();
     let mut from = 0;
     while let Some(i) = lower[from..].find(name) {
@@ -217,7 +222,7 @@ fn attr(tag: &str, name: &str) -> Option<String> {
     None
 }
 
-fn decode_entities(s: &str) -> String {
+pub(crate) fn decode_entities(s: &str) -> String {
     let mut out = String::with_capacity(s.len());
     let mut rest = s;
     while let Some(i) = rest.find('&') {

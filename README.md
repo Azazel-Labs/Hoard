@@ -257,8 +257,10 @@ software rasterizer (`apt install mesa-vulkan-drivers`). Without any adapter, ev
      listed under "Identical copies".
    - **Pack context.** README text is kept with the pack, and a store link inside it (Fab, itch.io, Humble Bundle,
      Unity Asset Store, Kenney, …) fills in where the pack came from. "Store details" on the packs page takes the
-     store page URL, license tier and listing text. Whenever a pack has a store link and no text, from either
-     place, Hoard fetches the page's title and description; the asset panel shows it as "From the <store> page".
+     store page URL, license tier and listing text. For a pack without a store link it first searches Fab, itch.io,
+     Kenney and OpenGameArt by the pack's name and lists likely matches; "Use" fills in the form. Whenever a pack has
+     a store link and no text, from either place, Hoard fetches the page's title and description; the asset panel
+     shows it as "From the <store> page".
 5. **Link.** glTF buffers/images, OBJ → MTL → textures, FBX texture paths (absolute artist paths are matched by file
    name), DAE images, `.blend` external textures and linked libraries (`//` paths resolved relative to the file),
    `Model@Clip.fbx` animation clips, and name-based guesses for models that reference nothing. Game-engine and

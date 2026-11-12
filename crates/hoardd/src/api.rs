@@ -38,6 +38,7 @@ pub(crate) fn router(state: &AppState) -> Router<AppState> {
         .route("/api/packs/{id}", axum::routing::delete(delete_pack))
         .route("/api/packs/{id}/retag", post(retag_pack))
         .route("/api/packs/{id}/context", axum::routing::put(put_pack_context))
+        .route("/api/packs/{id}/store-matches", get(crate::store_search::store_matches))
         .route("/api/packs/{id}/unreal/convert", post(unreal_convert))
         .route("/api/packs/{id}/unreal/finish", post(unreal_finish))
         .route("/api/assets/{id}/replace", post(replace_asset).layer(upload_limit()))

@@ -15,13 +15,15 @@ asset kind, and move stored files between them. It can also index watched folder
 - Cheaper rescans: every 15 minutes, each watched pack's whole tree is walked. A big library on a slow share could
   check folder modification times first.
 
-## Store details looked up automatically
+## Store details filled in without asking
 
-When a pack is added, search a few well-known stores by the pack's name (Fab, the Unity Asset Store, itch.io,
-Humble Bundle, Kenney, OpenGameArt and so on) and prefill the pack's store details: store, store page, license tier
-and description. It builds on the store-page fetching that already reads a store page once you've given its link.
-The open question is how sure a match has to be before it's filled in without asking; a list of likely matches to
-pick from is the safe start.
+"Store details" already searches Fab, itch.io, Kenney and OpenGameArt by the pack's name and lists likely matches to
+pick from. Still to come:
+
+- Filling them in when a pack is added, once a match is sure enough: an exact title from the seller named in the
+  README, say. How sure is sure enough is the open question.
+- The Unity Asset Store and Humble Bundle only get search links: one searches in the page's script, the other turns
+  away non-browser clients.
 
 ## Settings → Maintenance
 

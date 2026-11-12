@@ -34,6 +34,7 @@ mod server;
 mod settings;
 mod sheet;
 mod sources;
+mod store_search;
 mod tagger;
 mod textures;
 mod tools;

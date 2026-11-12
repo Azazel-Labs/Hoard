@@ -194,6 +194,14 @@ function browseCollection(c: Collection | Named) {
   setView('library')
   showFilters.value = false
 }
+const mainEl = ref<HTMLElement | null>(null)
+/** The logo: back to the whole library, nothing filtered or open, at the top. */
+function goHome() {
+  clearFilters()
+  selected.value = null
+  setView('library')
+  mainEl.value?.scrollTo({ top: 0, behavior: 'smooth' })
+}
 function clearFilters() {
   Object.assign(filters, { q: '', kind: '', tags: [], pack: null, collection: null })
 }
@@ -826,7 +834,7 @@ const commands = computed<Command[]>(() => {
     @drop.prevent="onDrop"
   >
     <header class="top">
-      <div class="brand" :title="stats?.version ? `Hoard ${stats.version}` : undefined">
+      <a href="#" class="brand" :title="stats?.version ? `Hoard ${stats.version} — back to the library` : 'Back to the library'" @click.prevent="goHome">
         <svg viewBox="0 0 32 32" width="24" height="24" aria-hidden="true">
           <rect x="3" y="3" width="12" height="12" rx="2.5" fill="var(--k-texture)" />
           <rect x="17" y="3" width="12" height="12" rx="2.5" fill="var(--k-audio)" />
@@ -834,7 +842,7 @@ const commands = computed<Command[]>(() => {
           <rect x="17" y="17" width="12" height="12" rx="2.5" fill="var(--k-font)" />
         </svg>
         <span>Hoard</span>
-      </div>
+      </a>
 
       <div class="search">
         <label for="q" class="visually-hidden">Search assets</label>
@@ -1025,7 +1033,7 @@ const commands = computed<Command[]>(() => {
         </section>
       </aside>
 
-      <main class="main">
+      <main ref="mainEl" class="main">
         <div class="bar">
           <button
             type="button"
@@ -1280,7 +1288,11 @@ const commands = computed<Command[]>(() => {
   display: flex; align-items: center; gap: 1rem;
   padding: 0.6rem 1rem; border-bottom: 1px solid var(--line); background: var(--panel);
 }
-.brand { display: flex; align-items: center; gap: 0.5rem; font-weight: 750; font-size: var(--step-1); font-variation-settings: 'CASL' 1; cursor: default; }
+.brand {
+  display: flex; align-items: center; gap: 0.5rem; font-weight: 750; font-size: var(--step-1); font-variation-settings: 'CASL' 1;
+  color: inherit; text-decoration: none; border-radius: 6px;
+}
+.brand:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
 /* Hover the logo and the bins jostle; the wordmark stays put. */
 .brand rect { transform-box: fill-box; transform-origin: center; transition: rotate var(--dur-3) var(--ease-pop), scale var(--dur-3) var(--ease-pop), translate var(--dur-3) var(--ease-pop); }
 .brand:hover rect:nth-of-type(1) { rotate: -10deg; translate: -1px -1px; }

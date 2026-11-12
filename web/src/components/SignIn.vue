@@ -15,6 +15,10 @@ const error = ref('')
 const nameEl = ref<HTMLInputElement | null>(null)
 
 const setup = computed(() => props.mode === 'setup')
+// Password managers (1Password, Bitwarden, browsers) tell a sign-up form from a sign-in one by its field names, ids
+// and button words as much as by `autocomplete`, so the account-making form uses sign-up words throughout: that's
+// what makes them offer a new strong password instead of filling a saved one.
+const f = computed(() => (setup.value ? 'signup' : 'signin'))
 const mismatch = computed(() => setup.value && again.value !== '' && again.value !== password.value)
 const ready = computed(
   () => username.value.trim() !== '' && password.value !== '' && (!setup.value || (password.value.length >= 8 && again.value === password.value)),
@@ -40,10 +44,10 @@ async function submit() {
 </script>
 
 <template>
-  <div class="signin" :class="{ overlay }" role="dialog" aria-modal="true" aria-labelledby="signin-title" @keydown.esc="overlay && emit('close')">
-    <form class="card" @submit.prevent="submit">
+  <div class="signin" :class="{ overlay }" role="dialog" aria-modal="true" :aria-labelledby="`${f}-title`" @keydown.esc="overlay && emit('close')">
+    <form :id="`${f}-form`" :name="f" class="card" method="post" :action="setup ? '/api/auth/setup' : '/api/auth/login'" @submit.prevent="submit">
       <p class="brand">Hoard</p>
-      <h1 id="signin-title">{{ setup ? 'Make your account' : 'Sign in' }}</h1>
+      <h1 :id="`${f}-title`">{{ setup ? 'Create your account' : 'Sign in' }}</h1>
       <p class="lede">
         <template v-if="setup">
           This server doesn’t have an account yet. The one you make here can do everything; add accounts for other people from Settings → Account
@@ -52,10 +56,11 @@ async function submit() {
         <template v-else-if="overlay">Browsing is open to everyone here, but changes need an account.</template>
       </p>
 
-      <label for="signin-name">Name</label>
+      <label :for="`${f}-username`">{{ setup ? 'Username' : 'Name' }}</label>
       <input
-        id="signin-name"
+        :id="`${f}-username`"
         ref="nameEl"
+        name="username"
         v-model="username"
         class="field"
         autocomplete="username"
@@ -64,38 +69,40 @@ async function submit() {
         maxlength="64"
         required
       />
-      <label for="signin-password">Password</label>
+      <label :for="setup ? 'new-password' : 'current-password'">{{ setup ? 'New password' : 'Password' }}</label>
       <input
-        id="signin-password"
+        :id="setup ? 'new-password' : 'current-password'"
+        :name="setup ? 'new-password' : 'password'"
         v-model="password"
         class="field"
         type="password"
         :autocomplete="setup ? 'new-password' : 'current-password'"
         :minlength="setup ? 8 : undefined"
         required
-        :aria-describedby="setup ? 'signin-rule' : undefined"
+        :aria-describedby="setup ? 'signup-rule' : undefined"
       />
       <template v-if="setup">
-        <small id="signin-rule" class="rule">At least 8 characters.</small>
-        <label for="signin-again">Password again</label>
+        <small id="signup-rule" class="rule">At least 8 characters.</small>
+        <label for="confirm-password">Confirm password</label>
         <input
-          id="signin-again"
+          id="confirm-password"
+          name="confirm-password"
           v-model="again"
           class="field"
           type="password"
           autocomplete="new-password"
           required
           :aria-invalid="mismatch"
-          :aria-describedby="mismatch ? 'signin-mismatch' : undefined"
+          :aria-describedby="mismatch ? 'signup-mismatch' : undefined"
         />
-        <small v-if="mismatch" id="signin-mismatch" class="rule bad">The two passwords don’t match.</small>
+        <small v-if="mismatch" id="signup-mismatch" class="rule bad">The two passwords don’t match.</small>
       </template>
 
       <p v-if="error" class="err" role="alert">{{ error }}</p>
 
       <div class="actions">
         <button type="submit" class="btn primary" :disabled="!ready || busy">
-          {{ busy ? (setup ? 'Making it…' : 'Signing in…') : setup ? 'Make the account' : 'Sign in' }}
+          {{ busy ? (setup ? 'Creating…' : 'Signing in…') : setup ? 'Create account' : 'Sign in' }}
         </button>
         <button v-if="overlay" type="button" class="btn ghost" @click="emit('close')">Keep browsing</button>
       </div>

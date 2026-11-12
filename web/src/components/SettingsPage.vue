@@ -672,7 +672,10 @@ const LOOKS = [
   { scheme: 'light' as const, label: 'Light', list: LIGHT_THEMES },
   { scheme: 'dark' as const, label: 'Dark', list: DARK_THEMES },
 ]
-/** Pick a theme and wear it at once, even when it's for the scheme not in use (see `previewScheme`). */
+/**
+ * Pick a theme and wear it at once, even when it's for the scheme not in use (see `previewScheme`). Runs on click,
+ * not change: clicking the theme that's already picked (back to light while previewing dark) has to work too.
+ */
 function setLook(scheme: 'light' | 'dark', id: string) {
   if (scheme === 'light') prefs.lightTheme = id
   else prefs.darkTheme = id
@@ -728,7 +731,7 @@ onBeforeUnmount(() => {
                   v-bind="{ [`data-${g.scheme}`]: t.id }"
                   :title="t.blurb"
                 >
-                  <input type="radio" :name="`theme-${g.scheme}`" :checked="themeFor(g.scheme).id === t.id" @change="setLook(g.scheme, t.id)" />
+                  <input type="radio" :name="`theme-${g.scheme}`" :checked="themeFor(g.scheme).id === t.id" @click="setLook(g.scheme, t.id)" />
                   <span class="mini" aria-hidden="true">
                     <span class="bar" /><span class="ln" /><span class="ln short" /><span class="dot" />
                   </span>

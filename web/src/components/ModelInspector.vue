@@ -1,12 +1,13 @@
 <script setup lang="ts">
 // Full-screen 3D viewer, the model counterpart of the image inspector: orbit, frame and reset, and the switches that
 // answer "what is this model made of" (wireframe, textures off, lighting without the environment, a floor grid),
-// against different backgrounds, with its clips. Textures come as light previews (at most 2048 px) unless
-// "Full-resolution textures" is on.
-import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
+// against different backgrounds, with its clips. A menu on the left shows it other ways: plainly lit, one map at a
+// time, as clay, with a UV checker or each mesh in its own colour, and the scene's counts and size. Textures come as
+// light previews (at most 2048 px) unless "Full-resolution textures" is on.
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import type { Asset } from '../api'
 // Types only: the scene (and three.js with it) loads once the dialog is open, so it shows straight away.
-import type { Background, ModelStage, StageInfo } from '../modelStage'
+import type { Background, MapMode, ModelStage, SceneStats, StageInfo, ViewMode } from '../modelStage'
 
 const props = defineProps<{ asset: Asset }>()
 const emit = defineEmits<{ close: [] }>()
@@ -15,6 +16,21 @@ const BG_LABEL: Record<Background, string> = {
   checker: 'Checker', dark: 'Dark', grey: 'Grey', light: 'Light', env: 'Environment',
 }
 const BACKGROUNDS = Object.keys(BG_LABEL) as Background[]
+
+/** The view modes, in menu order, with their keys: 1 to 9, then 0. */
+const MODES: { mode: ViewMode; label: string; key: string }[] = [
+  { mode: 'final', label: 'Final render', key: '1' },
+  { mode: 'raw', label: 'Raw render', key: '2' },
+  { mode: 'color', label: 'Base color', key: '3' },
+  { mode: 'roughness', label: 'Roughness', key: '4' },
+  { mode: 'metalness', label: 'Metalness', key: '5' },
+  { mode: 'normal', label: 'Normal', key: '6' },
+  { mode: 'ao', label: 'Occlusion', key: '7' },
+  { mode: 'matcap', label: 'Matcap', key: '8' },
+  { mode: 'uv', label: 'UV checker', key: '9' },
+  { mode: 'geometry', label: 'Geometries', key: '0' },
+]
+const MAP_MODES = new Set<ViewMode>(['color', 'roughness', 'metalness', 'normal', 'ao'])
 
 const dlg = ref<HTMLDialogElement | null>(null)
 const host = ref<HTMLDivElement | null>(null)
@@ -31,7 +47,32 @@ const bg = ref<Background>('checker')
 const clip = ref('')
 const playing = ref(true)
 const fullTextures = ref(false)
+const mode = ref<ViewMode>('final')
+const stats = ref<SceneStats | null>(null)
+const showInfo = ref(false)
+// Folded away on a narrow screen, where it would cover the model.
+const menuOpen = ref(!matchMedia('(max-width: 700px)').matches)
 let stage: ModelStage | null = null
+
+/** A map's view is offered only when some material has that map. */
+const available = (m: ViewMode) => !MAP_MODES.has(m) || !!stats.value?.maps.includes(m as MapMode)
+const menu = computed(() => [
+  { label: 'Render', modes: MODES.slice(0, 2) },
+  { label: 'Maps', modes: MODES.slice(2, 7).filter((m) => available(m.mode)) },
+  { label: 'Inspect', modes: MODES.slice(7) },
+].filter((g) => g.modes.length))
+const modeLabel = computed(() => MODES.find((m) => m.mode === mode.value)!.label)
+// The textures switch means something only with the model's own materials, the light switch only in the final render.
+const ownMaterials = computed(() => mode.value === 'final' || mode.value === 'raw')
+
+/** A length as people say it, to three figures: metres for glTF (in cm or mm when small), else plain units. */
+function length(n: number, metres: boolean): string {
+  const fig = (v: number) => v.toLocaleString(undefined, { maximumSignificantDigits: 3 })
+  if (!metres) return `${fig(n)} ${n === 1 ? 'unit' : 'units'}`
+  if (n >= 1 || n === 0) return `${fig(n)} m`
+  if (n >= 0.01) return `${fig(n * 100)} cm`
+  return `${fig(n * 1000)} mm`
+}
 
 /** Load the model into a new stage; switching texture resolution starts over, keeping the switches as they were. */
 async function open() {
@@ -50,12 +91,23 @@ async function open() {
   status.value = 'loading'
   const s = new ModelStage(host.value, { fullTextures: fullTextures.value })
   stage = s
-  s.onMissing = (names) => (missing.value = names)
+  const count = () => {
+    if (stage === s) stats.value = s.sceneStats()
+  }
+  s.onMissing = (names) => {
+    missing.value = names
+    count()
+  }
+  s.onTexturesChanged = count
   try {
     const i = await s.load(props.asset)
     if (stage !== s) return
     info.value = i
     missing.value = i.missing
+    count()
+    void s.texturesSettled().then(count)
+    if (!available(mode.value)) mode.value = 'final'
+    s.setMode(mode.value)
     if (again) {
       s.setWireframe(wireframe.value)
       s.setTextures(textures.value)
@@ -98,6 +150,20 @@ watch(spin, (on) => stage?.setAutoRotate(on))
 watch(bg, (b) => stage?.setBackground(b))
 watch(clip, (name) => stage?.playClip(name))
 watch(playing, (on) => stage?.setPlaying(on))
+watch(mode, (m) => stage?.setMode(m))
+
+const foldBtn = ref<HTMLButtonElement | null>(null)
+const infoBtn = ref<HTMLButtonElement | null>(null)
+
+/** Closing the panel from its own button would leave focus nowhere, and the viewer's keys with it. */
+function closeInfo() {
+  showInfo.value = false
+  ;(infoBtn.value ?? foldBtn.value)?.focus()
+}
+
+function pickMode(m: ViewMode) {
+  if (available(m)) mode.value = m
+}
 
 const cycleBg = () => (bg.value = BACKGROUNDS[(BACKGROUNDS.indexOf(bg.value) + 1) % BACKGROUNDS.length])
 
@@ -111,8 +177,10 @@ function onKey(e: KeyboardEvent) {
     f: () => stage?.frame(),
     r: () => stage?.reset(),
     w: () => (wireframe.value = !wireframe.value),
-    t: () => (textures.value = !textures.value),
-    e: () => (environment.value = !environment.value),
+    t: () => ownMaterials.value && (textures.value = !textures.value),
+    e: () => mode.value === 'final' && (environment.value = !environment.value),
+    i: () => (showInfo.value = !showInfo.value),
+    ...Object.fromEntries(MODES.map((m) => [m.key, () => pickMode(m.mode)])),
     g: () => (grid.value = !grid.value),
     h: () => (fullTextures.value = !fullTextures.value),
     a: () => (spin.value = !spin.value),
@@ -152,11 +220,7 @@ function onKey(e: KeyboardEvent) {
         </button>
       </div>
       <div class="group" role="group" aria-label="Shading">
-        <button type="button" title="Wireframe (W)" :aria-pressed="wireframe" :disabled="status !== 'ready'" @click="wireframe = !wireframe">
-          <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M8 1.8 13.6 5v6L8 14.2 2.4 11V5zM8 1.8v12.4M2.4 5l11.2 6M13.6 5 2.4 11" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round" /></svg>
-          <span class="wide">Wire</span>
-        </button>
-        <button type="button" title="Textures (T)" :aria-pressed="textures" :disabled="status !== 'ready'" @click="textures = !textures">
+        <button type="button" title="Textures (T)" :aria-pressed="textures" :disabled="status !== 'ready' || !ownMaterials" @click="textures = !textures">
           <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><rect x="2" y="2" width="12" height="12" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.5" /><path d="M2 8h12M8 2v12" stroke="currentColor" stroke-width="1.2" /><rect x="2.8" y="2.8" width="5.2" height="5.2" fill="currentColor" opacity=".55" /><rect x="8" y="8" width="5.2" height="5.2" fill="currentColor" opacity=".55" /></svg>
           <span class="wide">Textures</span>
         </button>
@@ -170,7 +234,7 @@ function onKey(e: KeyboardEvent) {
           <span class="hd">HD</span>
           <span class="wide">Full-res</span>
         </button>
-        <button type="button" title="Environment light (E)" :aria-pressed="environment" :disabled="status !== 'ready'" @click="environment = !environment">
+        <button type="button" title="Environment light (E)" :aria-pressed="environment" :disabled="status !== 'ready' || mode !== 'final'" @click="environment = !environment">
           <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><circle cx="8" cy="8" r="2.8" fill="currentColor" /><path d="M8 1.5v1.8M8 12.7v1.8M1.5 8h1.8M12.7 8h1.8M3.4 3.4l1.3 1.3M11.3 11.3l1.3 1.3M3.4 12.6l1.3-1.3M11.3 4.7l1.3-1.3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" /></svg>
           <span class="wide">Light</span>
         </button>
@@ -216,6 +280,55 @@ function onKey(e: KeyboardEvent) {
 
     <div class="stage" :class="[`bg-${bg}`, { checker: bg === 'checker' }]">
       <div ref="host" class="canvas" @dblclick="stage?.frame()" />
+      <nav v-if="status === 'ready'" class="modes" aria-label="View">
+        <button ref="foldBtn" type="button" class="fold" :aria-expanded="menuOpen" :title="menuOpen ? 'Fold the menu away' : 'Show the menu'" @click="menuOpen = !menuOpen">
+          <span><span class="visually-hidden">View: </span>{{ modeLabel }}</span>
+          <svg viewBox="0 0 16 16" width="12" height="12" aria-hidden="true"><path :d="menuOpen ? 'm4 10 4-4 4 4' : 'm4 6 4 4 4-4'" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" /></svg>
+        </button>
+        <template v-if="menuOpen">
+          <div v-for="g in menu" :key="g.label" class="section" role="group" :aria-label="g.label">
+            <span class="label" aria-hidden="true">{{ g.label }}</span>
+            <button
+              v-for="m in g.modes"
+              :key="m.mode"
+              type="button"
+              :title="`${m.label} (${m.key})`"
+              :aria-pressed="mode === m.mode"
+              @click="mode = m.mode"
+            >
+              <span>{{ m.label }}</span><kbd aria-hidden="true">{{ m.key }}</kbd>
+            </button>
+          </div>
+          <div class="section" role="group" aria-label="Show">
+            <button type="button" title="Wireframe (W), over any view" :aria-pressed="wireframe" @click="wireframe = !wireframe">
+              <span>Wireframe</span><kbd aria-hidden="true">W</kbd>
+            </button>
+            <button ref="infoBtn" type="button" title="Scene information (I)" :aria-pressed="showInfo" @click="showInfo = !showInfo">
+              <span>Scene information</span><kbd aria-hidden="true">I</kbd>
+            </button>
+          </div>
+        </template>
+      </nav>
+      <section v-if="status === 'ready' && showInfo && stats" class="scene-info" aria-labelledby="scene-info-title">
+        <header>
+          <h2 id="scene-info-title">Scene information</h2>
+          <button type="button" class="x" aria-label="Close scene information" title="Close (I)" @click="closeInfo">
+            <svg viewBox="0 0 16 16" width="12" height="12" aria-hidden="true"><path d="m4 4 8 8M12 4l-8 8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" /></svg>
+          </button>
+        </header>
+        <dl>
+          <div><dt>Geometries</dt><dd>{{ stats.meshes.toLocaleString() }}</dd></div>
+          <div><dt>Materials</dt><dd>{{ stats.materials.toLocaleString() }}</dd></div>
+          <div><dt>Textures</dt><dd>{{ stats.textures.toLocaleString() }}</dd></div>
+          <div><dt>Triangles</dt><dd>{{ stats.triangles.toLocaleString() }}</dd></div>
+          <div><dt>Vertices</dt><dd>{{ stats.vertices.toLocaleString() }}</dd></div>
+        </dl>
+        <dl class="size" :title="stats.metres ? 'glTF is in metres' : 'This format doesn’t say what its units are'">
+          <div><dt>Height</dt><dd>{{ length(stats.size.y, stats.metres) }}</dd></div>
+          <div><dt>Length</dt><dd>{{ length(stats.size.z, stats.metres) }}</dd></div>
+          <div><dt>Width</dt><dd>{{ length(stats.size.x, stats.metres) }}</dd></div>
+        </dl>
+      </section>
       <p v-if="status === 'viewer'" class="msg">Loading the 3D viewer…</p>
       <p v-else-if="status === 'loading'" class="msg">Loading model…</p>
       <p v-else-if="status === 'error'" class="msg err">Couldn't show this model: {{ error }}</p>
@@ -226,7 +339,7 @@ function onKey(e: KeyboardEvent) {
     </div>
     <footer class="keys" aria-hidden="true">
       Drag to orbit · right-drag to pan · scroll to zoom · double-click to frame · <kbd>F</kbd> frame · <kbd>R</kbd> reset ·
-      <kbd>W</kbd> wireframe · <kbd>T</kbd> textures · <kbd>H</kbd> full-res textures · <kbd>E</kbd> light · <kbd>G</kbd> grid · <kbd>K</kbd> background<template v-if="info?.clips.length"> · <kbd>Space</kbd> play</template>
+      <kbd>1</kbd>–<kbd>0</kbd> view · <kbd>W</kbd> wireframe · <kbd>I</kbd> scene information · <kbd>T</kbd> textures · <kbd>H</kbd> full-res textures · <kbd>E</kbd> light · <kbd>G</kbd> grid · <kbd>K</kbd> background<template v-if="info?.clips.length"> · <kbd>Space</kbd> play</template>
     </footer>
   </dialog>
 </template>
@@ -247,6 +360,47 @@ function onKey(e: KeyboardEvent) {
 .canvas :deep(canvas) { display: block; width: 100%; height: 100%; }
 .msg { pointer-events: none; }
 .err { color: var(--danger); }
+.modes {
+  position: absolute; left: 0.75rem; top: 0.75rem; display: flex; flex-direction: column; width: 11.5rem;
+  max-height: calc(100% - 1.5rem); overflow-y: auto; padding: 3px; border: 1px solid var(--line);
+  border-radius: var(--r-chip); background: var(--panel); box-shadow: var(--elev-1); font-size: var(--step--1);
+}
+.modes button {
+  display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; width: 100%; min-height: 1.75rem;
+  padding: 0 0.5rem; border: 0; border-radius: 3px; background: none; color: var(--muted); font: inherit;
+  text-align: left; cursor: pointer; transition: background-color var(--dur-1), color var(--dur-1);
+}
+.modes button:hover { color: var(--text); background: var(--raised); }
+.modes button[aria-pressed='true'] { color: var(--text); background: var(--raised); box-shadow: inset 0 0 0 1px var(--line); }
+.modes button[aria-pressed='true'] span::before {
+  content: ''; display: inline-block; width: 0.4rem; height: 0.4rem; margin-right: 0.4rem; border-radius: 50%;
+  background: var(--k-model); vertical-align: 0.1em;
+}
+.modes .fold { color: var(--text); font-weight: 600; }
+.modes kbd { color: var(--faint); font-size: 0.68rem; line-height: 1.3; }
+.section { display: flex; flex-direction: column; gap: 1px; padding-top: 0.3rem; margin-top: 0.3rem; border-top: 1px solid var(--line); }
+.label { padding: 0 0.5rem 0.15rem; color: var(--faint); font-size: 0.68rem; letter-spacing: 0.04em; text-transform: uppercase; }
+.scene-info {
+  position: absolute; right: 0.75rem; top: 0.75rem; width: 13rem; padding: 0.5rem 0.7rem 0.6rem;
+  border: 1px solid var(--line); border-radius: var(--r-chip); background: var(--panel); box-shadow: var(--elev-1);
+  font-size: var(--step--1);
+}
+.scene-info header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.35rem; }
+.scene-info h2 { margin: 0; font-size: inherit; font-weight: 600; }
+.scene-info .x {
+  display: inline-grid; place-items: center; width: 1.4rem; height: 1.4rem; padding: 0; border: 0; border-radius: 3px;
+  background: none; color: var(--muted); cursor: pointer;
+}
+.scene-info .x:hover { color: var(--text); background: var(--raised); }
+.scene-info dl { margin: 0; display: grid; gap: 0.15rem; }
+.scene-info dl div { display: flex; justify-content: space-between; gap: 1rem; }
+.scene-info dt { color: var(--muted); }
+.scene-info dd { margin: 0; font-variant-numeric: tabular-nums; }
+.scene-info .size { margin-top: 0.4rem; padding-top: 0.4rem; border-top: 1px solid var(--line); }
+@media (max-width: 700px) {
+  .modes { width: 10rem; }
+  .scene-info { top: auto; bottom: 0.75rem; }
+}
 .note {
   position: absolute; left: 50%; bottom: 0.75rem; translate: -50% 0; max-width: calc(100% - 2rem); margin: 0;
   padding: 0.3rem 0.7rem; border: 1px solid var(--line); border-radius: var(--r-chip); background: var(--panel);

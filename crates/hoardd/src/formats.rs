@@ -703,7 +703,7 @@ impl Job {
             })
             .await??;
             let out_ext = out.ext;
-            let blob = state.blobs.put_bytes(out.bytes).await?;
+            let blob = state.blobs.put_bytes(out.bytes, hoard_core::AssetKind::from_ext(&self.ext)).await?;
             let (id, k, h) = (self.asset_id.clone(), format!("{}:{out_ext}", self.key), blob.hash.clone());
             db::call(&state.pool, move |c| {
                 let now = db::now();

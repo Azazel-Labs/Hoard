@@ -551,17 +551,20 @@ fn upload_all(state: &AppState, rt: &Handle, items: &mut [Item]) -> Result<Vec<P
     let blobs = &state.blobs;
     rt.block_on(async {
         stream::iter(items.iter().map(Ok::<_, anyhow::Error>))
-            .try_for_each_concurrent(8, |it| async move { blobs.put_file(&it.local, &it.blob).await })
+            .try_for_each_concurrent(8, |it| async move { blobs.put_file(&it.local, &it.blob, it.kind).await })
             .await?;
         stream::iter(items.iter_mut())
             .map(|it| async move {
                 let a = &mut it.analysis;
                 // Thumbnails, views and previews go to the cache store; a recovered source file is content.
                 Ok::<_, anyhow::Error>(Previews {
-                    thumb: put(blobs, a.thumb_png.take(), true).await?,
-                    views: put(blobs, a.views_png.take(), true).await?,
-                    source: put(blobs, a.source.take().map(|s| s.bytes), false).await?,
-                    preview: put(blobs, a.preview_mp3.take(), true).await?,
+                    thumb: cached(blobs, a.thumb_png.take()).await?,
+                    views: cached(blobs, a.views_png.take()).await?,
+                    source: match a.source.take() {
+                        Some(s) => Some(blobs.put_bytes(s.bytes, AssetKind::from_ext(s.ext)).await?),
+                        None => None,
+                    },
+                    preview: cached(blobs, a.preview_mp3.take()).await?,
                 })
             })
             .buffered(8)
@@ -570,10 +573,9 @@ fn upload_all(state: &AppState, rt: &Handle, items: &mut [Item]) -> Result<Vec<P
     })
 }
 
-async fn put(blobs: &BlobStore, bytes: Option<Vec<u8>>, cache: bool) -> Result<Option<StoredBlob>> {
+async fn cached(blobs: &BlobStore, bytes: Option<Vec<u8>>) -> Result<Option<StoredBlob>> {
     Ok(match bytes {
-        Some(b) if cache => Some(blobs.put_cache_bytes(b).await?),
-        Some(b) => Some(blobs.put_bytes(b).await?),
+        Some(b) => Some(blobs.put_cache_bytes(b).await?),
         None => None,
     })
 }

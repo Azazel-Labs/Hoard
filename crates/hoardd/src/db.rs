@@ -43,6 +43,21 @@ const MIGRATIONS: &[&str] = &[
     "ALTER TABLE packs ADD COLUMN archived_at TEXT;
      ALTER TABLE assets ADD COLUMN archived_at TEXT;
      CREATE INDEX assets_archived ON assets(archived_at) WHERE archived_at IS NOT NULL;",
+    // 13: library locations (see `locations.rs`). A pack found in a watched folder records which one and the
+    // folder it is, since its files are read from there.
+    "CREATE TABLE locations (
+       id         INTEGER PRIMARY KEY,
+       name       TEXT NOT NULL,
+       mode       TEXT NOT NULL,
+       path       TEXT NOT NULL,
+       kinds      TEXT NOT NULL DEFAULT '[]',
+       catch_all  INTEGER NOT NULL DEFAULT 0,
+       scanned_at TEXT,
+       created_at TEXT NOT NULL
+     );
+     ALTER TABLE packs ADD COLUMN location_id INTEGER REFERENCES locations(id);
+     ALTER TABLE packs ADD COLUMN folder TEXT;
+     CREATE INDEX packs_location ON packs(location_id) WHERE location_id IS NOT NULL;",
 ];
 
 /// How many automatic pre-upgrade backups to keep in `<data dir>/backups`.

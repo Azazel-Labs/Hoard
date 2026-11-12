@@ -191,7 +191,7 @@ async fn convert_one(state: &AppState, blender: &Path, t: &Todo) -> Result<()> {
             })
             .await?
         };
-        let glb_blob = state.blobs.put_bytes(glb).await?;
+        let glb_blob = state.blobs.put_bytes(glb, hoard_core::AssetKind::Model).await?;
         let thumb_blob = match thumb {
             Some(png) => Some(state.blobs.put_cache_bytes(png).await?),
             None => None,

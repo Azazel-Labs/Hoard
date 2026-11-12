@@ -638,6 +638,9 @@ pub struct Stats {
     /// visible), `starting`, `off` or `unavailable: <why>`.
     #[serde(default)]
     pub renderer: String,
+    /// No library location yet: the portal opens its first-run setup.
+    #[serde(default)]
+    pub setup_needed: bool,
 }
 
 /// A Hoard release newer than the running server.

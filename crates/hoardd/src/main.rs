@@ -23,6 +23,7 @@ mod jobs;
 mod links;
 mod llm;
 mod local_llm;
+mod locations;
 mod mcp;
 mod meshes;
 mod music;
@@ -81,12 +82,14 @@ async fn main() -> Result<()> {
 
     let cfg = Config::parse();
     config::warn_retired_env();
-    check_files_dir(&cfg)?;
     for dir in [cfg.data_dir.clone(), cfg.staging_dir(), cfg.tmp_dir()] {
         std::fs::create_dir_all(&dir).with_context(|| format!("create {}", dir.display()))?;
     }
     let pool = db::open(&cfg.db_path(), &cfg.backups_dir())?;
-    let blobs = BlobStore::from_config(&cfg)?;
+    if let Some(loc) = locations::adopt_existing(&*pool.get()?, &cfg)? {
+        tracing::info!(path = %loc.path, "your files stay where they are, as the library location \"Library\"");
+    }
+    let blobs = BlobStore::open(&cfg, pool.clone())?;
     let requeued = db::requeue_stale_jobs(&*pool.get()?)?;
     let settings = settings::Store::load(&cfg, &*pool.get()?)?;
     let effective = settings.get();
@@ -97,7 +100,7 @@ async fn main() -> Result<()> {
     tracing::info!(
         listen = %cfg.listen,
         data = %cfg.data_dir.display(),
-        storage = blobs.label(),
+        storage = %blobs.label(),
         llm = effective.llm_url.as_deref().unwrap_or("off"),
         auth = cfg.token.is_some(),
         blender = %effective.blender,
@@ -147,21 +150,6 @@ async fn main() -> Result<()> {
 
 /// Refuse to start on an empty files dir while the files are still where they used to be (`<data-dir>/blobs`):
 /// that's a compose file updated to separate volumes without moving the files, and every asset would look gone.
-fn check_files_dir(cfg: &Config) -> Result<()> {
-    let (Some(files), config::StorageKind::Local) = (&cfg.files_dir, cfg.storage) else { return Ok(()) };
-    let old = cfg.legacy_blobs_dir();
-    let has_entries = |p: &std::path::Path| std::fs::read_dir(p).is_ok_and(|mut d| d.next().is_some());
-    if files != &old && has_entries(&old) && !has_entries(files) {
-        anyhow::bail!(
-            "HOARD_FILES_DIR ({}) is empty, but your files are still in {}. Move them there first (the folders \
-             inside `blobs`, not `blobs` itself), or unset HOARD_FILES_DIR to keep using the old place.",
-            files.display(),
-            old.display()
-        );
-    }
-    Ok(())
-}
-
 /// Compress text (JSON, JS, CSS, HTML, SVG), never media or binary downloads: they're already compressed, and
 /// on-the-fly compression would drop `Content-Length` and break `Range` requests on multi-GB files.
 fn compressible() -> impl Predicate {

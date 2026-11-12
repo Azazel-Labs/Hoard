@@ -250,7 +250,7 @@ pub(crate) async fn convert_pack(state: &AppState, pack_id: &str, req: Request) 
         let id2 = id.clone();
         match outcome {
             Outcome::Converted { file, notes } => {
-                let blob = state.blobs.put_bytes(file.bytes).await?;
+                let blob = state.blobs.put_bytes(file.bytes, AssetKind::from_ext(file.ext)).await?;
                 origin.notes = notes;
                 let ext = file.ext;
                 let replaced = db::call(&state.pool, move |c| {

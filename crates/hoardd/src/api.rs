@@ -24,7 +24,7 @@ use crate::AppState;
 use crate::blobs::is_valid_hash;
 use crate::error::{ApiResult, AppError};
 use crate::ingest::safe_rel_path;
-use crate::{context, db, jobs};
+use crate::{context, db, jobs, locations};
 
 pub(crate) fn router(state: &AppState) -> Router<AppState> {
     // The upload limit is a setting that can change while the server runs, so it's checked per request.
@@ -53,6 +53,12 @@ pub(crate) fn router(state: &AppState) -> Router<AppState> {
         .route("/api/admin/gc", post(admin_gc))
         .route("/api/admin/backup", post(admin_backup))
         .route("/api/admin/settings", get(get_settings).put(put_settings))
+        .route("/api/admin/locations", get(locations::list_locations).post(locations::create_location))
+        .route(
+            "/api/admin/locations/{id}",
+            axum::routing::patch(locations::patch_location).delete(locations::delete_location),
+        )
+        .route("/api/admin/fs", get(locations::browse))
         .route("/api/admin/llm/models", post(llm_models))
         .route("/api/admin/llm/local", post(llm_local))
         .merge(crate::uploads::router())
@@ -129,7 +135,7 @@ async fn limit_upload(State(state): State<AppState>, req: Request, next: Next) -
 
 async fn stats(State(state): State<AppState>) -> ApiResult<Json<Stats>> {
     let llm_enabled = state.settings.get().llm_enabled();
-    let storage = state.blobs.label().to_owned();
+    let storage = state.blobs.label();
     let auth_required = state.cfg.token.is_some();
     let s = db::call(&state.pool, move |c| {
         let one = |sql: &str| -> anyhow::Result<u64> { Ok(c.query_row(sql, [], |r| r.get::<_, i64>(0))? as u64) };
@@ -165,6 +171,7 @@ async fn stats(State(state): State<AppState>) -> ApiResult<Json<Stats>> {
             blender: crate::blender::describe(),
             update: crate::updates::available(),
             renderer: crate::analyze::describe_renderer(),
+            setup_needed: one("SELECT COUNT(*) FROM locations")? == 0,
         })
     })
     .await?;
@@ -355,6 +362,9 @@ async fn delete_pack(State(state): State<AppState>, Path(id): Path<String>) -> A
 /// - for each file: optional `relpath` text field, then a `file` field. Without `relpath`, the part's
 ///   filename is used. Archives (.zip/.tar/.tar.gz) are unpacked server-side, nested ones too.
 async fn upload_pack(State(state): State<AppState>, mut multipart: Multipart) -> ApiResult<(StatusCode, Json<Pack>)> {
+    if !state.blobs.can_store() {
+        return Err(AppError::conflict(crate::blobs::NO_LIBRARY));
+    }
     let id = uuid::Uuid::now_v7().to_string();
     let staging = state.cfg.staging_dir().join(&id);
     tokio::fs::create_dir_all(&staging).await?;
@@ -1430,7 +1440,7 @@ async fn replace_asset(
     })
     .await?
     .ok_or_else(|| AppError::not_found(format!("asset {id}")))?;
-    let blob = state.blobs.put_bytes(body.to_vec()).await?;
+    let blob = state.blobs.put_bytes(body.to_vec(), hoard_core::AssetKind::from_ext(&ext)).await?;
     let origin = crate::extract::Origin {
         class,
         engine: None,

@@ -160,15 +160,16 @@ fn write_zip(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use clap::Parser;
 
     #[tokio::test(flavor = "multi_thread")]
     async fn streamed_zip_unzips() {
         let dir = tempfile::tempdir().unwrap();
-        let cfg = crate::config::Config::parse_from(["hoardd", "--data-dir", dir.path().to_str().unwrap()]);
-        let blobs = crate::blobs::BlobStore::from_config(&cfg).unwrap();
-        let text = blobs.put_bytes(b"hello hello hello hello".repeat(1000)).await.unwrap();
-        let png = blobs.put_bytes(vec![7u8; 300_000]).await.unwrap();
+        let (cfg, pool) = crate::blobs::tests::setup(dir.path());
+        crate::blobs::tests::add(&pool, dir.path(), "library", &[], true);
+        let blobs = crate::blobs::BlobStore::open(&cfg, pool).unwrap();
+        let text =
+            blobs.put_bytes(b"hello hello hello hello".repeat(1000), hoard_core::AssetKind::Document).await.unwrap();
+        let png = blobs.put_bytes(vec![7u8; 300_000], hoard_core::AssetKind::Texture).await.unwrap();
         let entries = vec![
             Entry { name: "root/a.txt".into(), hash: text.hash.clone(), size: 23_000, unity_guid: Some("abc".into()) },
             Entry { name: "root/img/b.png".into(), hash: png.hash.clone(), size: 300_000, unity_guid: None },

@@ -37,7 +37,9 @@ pub(crate) struct Config {
     #[arg(long, env = "HOARD_DATA_DIR", default_value = "./hoard-data")]
     pub(crate) data_dir: PathBuf,
 
-    /// Your files, with `--storage local` (default `<data-dir>/blobs`). The big one: put it on the disk with room.
+    /// Where the first-run setup suggests putting your library (`/library` in the container image). Library
+    /// locations are added in the portal; this is only the suggestion, and where an install from before them kept
+    /// its files.
     #[arg(long, env = "HOARD_FILES_DIR")]
     pub(crate) files_dir: Option<PathBuf>,
 
@@ -127,8 +129,9 @@ pub(crate) struct Config {
     #[arg(skip = 2_usize)]
     pub(crate) workers: usize,
 
-    /// Where file bytes live: `local` (under `--data-dir/blobs`) or `s3` (any S3-compatible bucket,
-    /// e.g. Garage or `RustFS` on a home NAS). Metadata always stays in this server's SQLite database.
+    /// Where an install from before library locations kept its files: `local` or `s3`. New libraries are set up in
+    /// the portal, where a managed location can be a folder or an `s3://bucket` (any S3-compatible server, e.g.
+    /// Garage or `RustFS` on a home NAS, reached with the settings below).
     #[arg(long, env = "HOARD_STORAGE", value_enum, default_value_t = StorageKind::Local)]
     pub(crate) storage: StorageKind,
 
@@ -210,13 +213,9 @@ pub(crate) fn warn_retired_env() {
 }
 
 impl Config {
-    /// Where files live with `--storage local`.
+    /// Where an install from before library locations kept its files with `--storage local`.
     pub(crate) fn blobs_dir(&self) -> PathBuf {
-        self.files_dir.clone().unwrap_or_else(|| self.legacy_blobs_dir())
-    }
-    /// Where files lived before `--files-dir` existed, and still do by default.
-    pub(crate) fn legacy_blobs_dir(&self) -> PathBuf {
-        self.data_dir.join("blobs")
+        self.files_dir.clone().unwrap_or_else(|| self.data_dir.join("blobs"))
     }
     fn cache_root(&self) -> &std::path::Path {
         self.cache_dir.as_deref().unwrap_or(&self.data_dir)

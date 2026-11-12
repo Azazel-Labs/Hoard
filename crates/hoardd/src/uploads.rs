@@ -139,6 +139,9 @@ async fn create(State(state): State<AppState>, Json(body): Json<CreateBody>) -> 
     if body.files.is_empty() {
         return Err(AppError::bad_request("no files"));
     }
+    if !state.blobs.can_store() {
+        return Err(AppError::conflict(crate::blobs::NO_LIBRARY));
+    }
     let mut seen = HashSet::new();
     let mut files = Vec::with_capacity(body.files.len());
     for f in body.files {

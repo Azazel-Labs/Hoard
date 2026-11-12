@@ -463,6 +463,50 @@ struct Texture {
     size_px: Option<u32>,
 }
 
+/// The title in a JSON file that came with the maps: Megascans' `<id>.json` names the surface ("Metal Plate") where
+/// the file names only carry its id.
+fn sidecar_title(json: &[u8]) -> Option<String> {
+    let v: serde_json::Value = serde_json::from_slice(json).ok()?;
+    let tags = &v["semanticTags"];
+    let title =
+        tags["name_formats"]["title"].as_str().or_else(|| tags["name"].as_str()).or_else(|| v["name"].as_str())?;
+    let title = title.split_whitespace().collect::<Vec<_>>().join(" ");
+    (!title.is_empty() && title.len() <= 120).then_some(title)
+}
+
+/// Name materials after a `<name>.json` beside them, when there is one with a title in it.
+fn name_from_sidecars(
+    state: &AppState,
+    rt: &Handle,
+    conn: &Connection,
+    pack_id: &str,
+    found: &mut [Found],
+) -> Result<()> {
+    let sidecars: HashMap<String, String> = {
+        let mut stmt = conn.prepare(
+            "SELECT lower(a.path), a.blob_hash FROM assets a JOIN blobs b ON b.hash = a.blob_hash
+             WHERE a.pack_id = ?1 AND lower(a.ext) = 'json' AND b.size < 1000000",
+        )?;
+        stmt.query_map([pack_id], |r| Ok((r.get(0)?, r.get(1)?)))?.collect::<rusqlite::Result<_>>()?
+    };
+    if sidecars.is_empty() {
+        return Ok(());
+    }
+    for f in found {
+        let json = format!("{}.json", f.path.strip_suffix(".material").unwrap_or(&f.path)).to_lowercase();
+        let Some(hash) = sidecars.get(&json) else { continue };
+        match rt.block_on(state.blobs.read_all(hash)) {
+            Ok(bytes) => {
+                if let Some(title) = sidecar_title(&bytes) {
+                    f.name = title;
+                }
+            }
+            Err(e) => tracing::debug!(file = %json, error = %format!("{e:#}"), "couldn't read a material's JSON"),
+        }
+    }
+    Ok(())
+}
+
 /// Find the pack's materials and bring the library in line: new ones added, changed ones updated (keeping their
 /// id, tags people gave them and collections), ones whose maps are gone removed. Returns how many it has.
 pub(crate) fn detect_pack(state: &AppState, rt: &Handle, conn: &mut Connection, pack_id: &str) -> Result<usize> {
@@ -485,7 +529,8 @@ pub(crate) fn detect_pack(state: &AppState, rt: &Handle, conn: &mut Connection, 
     };
     let candidates: Vec<Candidate<'_>> =
         textures.iter().map(|t| Candidate { path: &t.path, size_px: t.size_px }).collect();
-    let found = find(&candidates);
+    let mut found = find(&candidates);
+    name_from_sidecars(state, rt, conn, pack_id, &mut found)?;
     let existing: HashMap<String, (String, String, bool, bool)> = {
         let mut stmt = conn.prepare(&format!(
             "SELECT a.path, a.id, a.blob_hash, a.thumb_hash IS NOT NULL, {IS_MATERIAL} FROM assets a WHERE a.pack_id = ?1
@@ -851,6 +896,16 @@ pub(crate) fn run_job(state: &AppState, rt: &Handle, pack_id: &str) -> Result<()
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn titles_from_json_beside_the_maps() {
+        let megascans = br#"{"id": "tkxmfcwa", "semanticTags": {"name": "metal plate", "name_formats": {"title": "Metal  Plate"}}}"#;
+        assert_eq!(sidecar_title(megascans).as_deref(), Some("Metal Plate"));
+        assert_eq!(sidecar_title(br#"{"semanticTags": {"name": "Rusty Iron"}}"#).as_deref(), Some("Rusty Iron"));
+        assert_eq!(sidecar_title(br#"{"name": "Metal Plate", "id": "tkxmfcwa"}"#).as_deref(), Some("Metal Plate"));
+        assert_eq!(sidecar_title(br#"{"name": "  "}"#), None);
+        assert_eq!(sidecar_title(b"not json"), None);
+    }
 
     fn role(stem: &str) -> Option<(String, Role, Option<String>)> {
         parse_map(stem).map(|m| (m.base, m.role, m.resolution))

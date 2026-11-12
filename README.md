@@ -479,6 +479,28 @@ collection = "Forest level"
 dest = "levels/forest"
 ```
 
+## Search by colour, and More like this
+
+Hoard looks at the thumbnail of every texture, model, material, animation, video and sprite, and works out its main
+colours and what its surface looks like. A background job does this for new packs and, once, for everything already
+in the library. Activity shows it as "Working out colours and looks".
+
+- **Colour.** The Colour swatches in the filter sidebar (or the picker beside them, for any colour) show assets with
+  much of that colour, the ones it covers most first. A slightly different shade still counts, because colours are
+  compared the way eyes see them (in OKLab). Colour works together with words, kind, tags, pack and collection. An
+  asset's detail panel shows its colours as a strip sized by how much of the picture each covers. Click one to search
+  the whole library for it.
+- **More like this.** The button in the detail panel, or the overlapping squares on a tile's corner, shows assets that
+  look like this one, across every pack, most alike first. You might get other rocks for a rock texture, the same
+  texture at another size, or renders of similar models. The results are an ordinary search, so you can scroll, select
+  and narrow them by kind, tags or words. "Newest" in the sort menu sets the ranking aside.
+
+What counts as alike is the colours (a colour histogram), the grain and edges of the surface (edge directions,
+contrast and local binary patterns, measured in a way that ignores which way a texture is turned), and a perceptual
+hash that catches near-copies. It is all computed on the server from the thumbnail, needs no model download and works
+offline. Nothing in it knows what a picture shows. Two brown, rough textures can count as alike even when one is bark
+and the other is rock. Fonts, audio, documents and shaders take no part.
+
 ## MCP for agents
 
 `POST /mcp` is a stateless Streamable HTTP MCP endpoint. It speaks both the 2026-07-28 protocol (per-request `_meta`,
@@ -488,7 +510,9 @@ both connect.
 | Tool | What it does |
 |---|---|
 | `search_assets` | full-text + kind/tag/pack filters, with thumbnail and download URLs; `include_previews` returns the first 8 thumbnails as images |
-| `get_asset` | full detail: metadata, tags with sources, links, what uses it, variants, identical copies |
+| `find_similar` | assets that look like a given one (colours, surface, near-copies), across every pack; same result shape as `search_assets` |
+| `find_by_color` | assets with much of a hex colour in them, most of it first |
+| `get_asset` | full detail: metadata, tags with sources, links, what uses it, variants, identical copies, the thumbnail's colours |
 | `get_bundle` | download URLs and save-as paths for an asset and everything it needs, plus a zip URL |
 | `list_packs`, `list_tags`, `list_collections` | browse the library, its tag vocabulary and collections (`search_assets` takes `collection` too) |
 | `tag_asset`, `update_asset` | edits, recorded as human |
@@ -621,7 +645,7 @@ Requests that change something are marked 🔒: guests can't make them. A browse
 
 | Method | Path | |
 |---|---|---|
-| GET | `/api/assets` | search: `q`, `kind`, `tags=a,b`, `pack`, `collection`, `ext`, `sort`, `limit`, `offset`, `hide_supporting`; results plus kind/tag facets |
+| GET | `/api/assets` | search: `q`, `kind`, `tags=a,b`, `pack`, `collection`, `ext`, `similar=<asset id>`, `color=<hex>`, `sort`, `limit`, `offset`, `hide_supporting`; results plus kind/tag facets |
 | GET | `/api/assets/{id}` | one asset, with tags, metadata and dependencies |
 | PATCH 🔒 | `/api/assets/{id}` | rename, recategorize, describe, tag; `apply_to_family` for a whole variant family |
 | GET | `/api/assets/{id}/file` | the file (`?download=1` to save it) |

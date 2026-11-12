@@ -548,6 +548,12 @@ struct AssetsParams {
     /// Search the archive instead of the library.
     #[serde(default)]
     archived: Option<bool>,
+    /// "More like this": an asset id.
+    #[serde(default)]
+    similar: Option<String>,
+    /// `#rrggbb`: assets with much of this colour.
+    #[serde(default)]
+    color: Option<String>,
 }
 
 impl From<AssetsParams> for SearchQuery {
@@ -564,6 +570,8 @@ impl From<AssetsParams> for SearchQuery {
             hide_supporting: p.hide_supporting.unwrap_or(false),
             collection: p.collection,
             archived: p.archived.unwrap_or(false),
+            similar: p.similar,
+            color: p.color,
         }
     }
 }
@@ -571,7 +579,7 @@ impl From<AssetsParams> for SearchQuery {
 async fn search_assets(State(state): State<AppState>, Query(p): Query<AssetsParams>) -> ApiResult<Json<SearchResult>> {
     let facets = p.facets.unwrap_or(true);
     let q: SearchQuery = p.into();
-    let page = db::call(&state.pool, move |c| db::search(c, &q, facets)).await?;
+    let page = crate::looks::search(&state, q, facets).await?;
     Ok(Json(SearchResult {
         items: page.items,
         total: page.total,

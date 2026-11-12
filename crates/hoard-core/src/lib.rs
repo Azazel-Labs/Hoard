@@ -203,6 +203,18 @@ pub struct Asset {
     /// Other formats this asset can be downloaded as (`GET /api/assets/{id}/as/{format}`). Detail view only.
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub formats: Vec<FormatOption>,
+    /// Dominant colours of the thumbnail, most of the picture first. Detail view only.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub palette: Vec<Swatch>,
+}
+
+/// One colour of an asset's palette.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct Swatch {
+    /// `#rrggbb`.
+    pub hex: String,
+    /// Share of the picture (its opaque part), 0..=1.
+    pub share: f32,
 }
 
 /// A format an asset can be converted to on download.
@@ -505,7 +517,8 @@ pub struct SearchQuery {
     pub pack: Option<String>,
     #[serde(default)]
     pub ext: Option<String>,
-    /// "new" (default), "name", "size"
+    /// Best match first (default; newest first without a text, colour or similar query), or "new", "old", "name",
+    /// "size".
     #[serde(default)]
     pub sort: Option<String>,
     #[serde(default)]
@@ -523,6 +536,12 @@ pub struct SearchQuery {
     /// from that pack.
     #[serde(default)]
     pub archived: bool,
+    /// "More like this": assets that look like this one (an asset id), most alike first.
+    #[serde(default)]
+    pub similar: Option<String>,
+    /// Assets with much of this colour (`#rrggbb`) in them, most first.
+    #[serde(default)]
+    pub color: Option<String>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

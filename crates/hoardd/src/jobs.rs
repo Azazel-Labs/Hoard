@@ -18,6 +18,7 @@ pub(crate) const CONVERT: &str = "convert";
 pub(crate) const UNREAL: &str = "unreal_convert";
 pub(crate) const SCAN: &str = "scan_location";
 pub(crate) const RELOCATE: &str = "relocate";
+pub(crate) const LOOKS: &str = "looks";
 
 /// With the backoff below, the last try comes about 15 minutes after the first: long enough for a local model
 /// that's still downloading on the first start of the compose stack.
@@ -67,6 +68,7 @@ pub(crate) fn job_label(kind: &str, pack: &str) -> String {
         UNREAL => format!("Converting Unreal packages in {pack}"),
         SCAN => "Scanning a watched folder".to_owned(),
         RELOCATE => "Moving files between library locations".to_owned(),
+        LOOKS => "Working out colours and looks".to_owned(),
         other => format!("{other} {pack}"),
     }
 }
@@ -90,6 +92,7 @@ async fn run(state: &AppState, job: db::JobRow) {
         UNREAL => UNREAL,
         SCAN => SCAN,
         RELOCATE => RELOCATE,
+        LOOKS => LOOKS,
         _ => "job",
     };
     let _activity = crate::activity::start(
@@ -127,6 +130,7 @@ async fn run(state: &AppState, job: db::JobRow) {
             None => Err(anyhow::anyhow!("scan job without a location")),
         },
         RELOCATE => crate::relocate::run(state, serde_json::from_value(job.payload.clone()).unwrap_or_default()).await,
+        LOOKS => crate::looks::run_job(state).await,
         other => Err(anyhow::anyhow!("unknown job kind {other}")),
     };
 
@@ -161,6 +165,10 @@ async fn run(state: &AppState, job: db::JobRow) {
         tracing::error!(error = ?e, "could not record job result");
     }
     tracing::info!(id = job.id, kind = %job.kind, ok = result.is_ok(), secs = started.elapsed().as_secs_f32(), "job finished");
+    // New or changed thumbnails get their colours and look worked out.
+    if result.is_ok() && matches!(job.kind.as_str(), INGEST | RETAG | CONVERT | UNREAL | SCAN) {
+        crate::looks::schedule(state).await;
+    }
 }
 
 /// Run CPU/disk-heavy work on a low-priority thread, with a runtime handle for storage calls.

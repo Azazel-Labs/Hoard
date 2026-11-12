@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, defineAsyncComponent, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import {
-  api, asUrl, bundleUrl, fileUrl, formatDuration, humanBytes, originalUrl, RESIZABLE_AS_ITSELF, thumbUrl,
+  api, asUrl, bundleUrl, fileUrl, formatDuration, humanBytes, looksAlike, originalUrl, RESIZABLE_AS_ITSELF, thumbUrl,
   type Asset, type AssetLink, type Collection, type CollectionRef, type ConversionStatus, type Facet, type LinkRel,
 } from '../api'
 import CollectionPicker from './CollectionPicker.vue'
@@ -32,7 +32,13 @@ const emit = defineEmits<{
   collect: [id: string, create?: string]
   uncollect: [id: string]
   browseCollection: [CollectionRef]
+  /** Find assets that look like this one. */
+  similar: []
+  /** Find assets with much of this colour (hex). */
+  color: [string]
 }>()
+const palette = computed(() => props.asset.palette ?? [])
+const alikeable = computed(() => looksAlike(props.asset))
 const inCollections = computed(() => props.asset.collections ?? [])
 
 // The grid's quick preview and this panel's player shouldn't talk over each other.
@@ -625,6 +631,28 @@ onBeforeUnmount(() => unswipe())
       <input v-model="showViews" type="checkbox" /> Show the four-view sheet the tagger saw
     </label>
 
+    <div v-if="alikeable || palette.length" class="looks">
+      <div v-if="palette.length" class="palette" role="group" aria-label="Colours in the picture">
+        <button
+          v-for="c in palette"
+          :key="c.hex"
+          type="button"
+          class="swatch"
+          :style="{ background: c.hex, '--g': c.share }"
+          :title="`${c.hex}, ${Math.round(c.share * 100)}% of the picture. Find assets with this colour`"
+          :aria-label="`Find assets with ${c.hex}, ${Math.round(c.share * 100)}% of this picture`"
+          @click="emit('color', c.hex)"
+        />
+      </div>
+      <button v-if="alikeable" type="button" class="btn alike" @click="emit('similar')">
+        <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round">
+          <rect x="1.8" y="5.5" width="7.5" height="7.5" rx="1.6" />
+          <rect x="6.7" y="2.5" width="7.5" height="7.5" rx="1.6" fill="var(--panel)" />
+        </svg>
+        More like this
+      </button>
+    </div>
+
     <section class="descs">
       <form v-if="editingDesc" class="descedit" @submit.prevent="saveDescription">
         <label class="visually-hidden" for="asset-desc">Your description</label>
@@ -976,6 +1004,18 @@ footer {
   position: sticky; bottom: -1.4rem; z-index: 1; display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center;
   margin: auto -1.2rem -1.4rem; padding: 0.75rem 1.2rem 1rem; background: var(--panel); border-top: 1px solid var(--line);
 }
+.looks { display: flex; gap: 0.6rem; align-items: center; }
+.palette {
+  flex: 1; display: flex; height: 1.9rem; min-width: 0; border-radius: 6px; overflow: hidden;
+  box-shadow: inset 0 0 0 1px var(--line);
+}
+.swatch {
+  flex: var(--g) 1 0; min-width: 0.6rem; border: 0; padding: 0; cursor: pointer;
+  transition: flex-grow var(--dur-2) var(--ease-out), box-shadow var(--dur-1);
+}
+.swatch:hover, .swatch:focus-visible { flex-grow: calc(var(--g) + 0.12); box-shadow: inset 0 0 0 2px var(--panel); outline: none; }
+.alike { white-space: nowrap; flex: none; display: inline-flex; gap: 0.4rem; align-items: center; }
+.looks:not(:has(.palette)) .alike { margin-right: auto; }
 .animcheck { display: inline-flex; gap: 0.35rem; align-items: center; font-size: var(--step--1); color: var(--muted); }
 .links { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.3rem; }
 .link {

@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
-import { formatDuration, thumbUrl, type Asset } from '../api'
+import { formatDuration, looksAlike, thumbUrl, type Asset } from '../api'
 import { canPreview, player, toggle } from '../player'
 import KindGlyph from './KindGlyph.vue'
 import { noteTileClick } from '../viewers'
 
 const props = defineProps<{ asset: Asset; selected: boolean; checked: boolean; selecting: boolean }>()
-const emit = defineEmits<{ open: [MouseEvent | KeyboardEvent]; check: [MouseEvent] }>()
+const emit = defineEmits<{ open: [MouseEvent | KeyboardEvent]; check: [MouseEvent]; similar: [] }>()
 
 const detail = computed(() => {
   const m = props.asset.meta
@@ -17,6 +17,7 @@ const detail = computed(() => {
 })
 const pixelated = computed(() => props.asset.tags.some((t) => t.tag === 'style:pixel-art'))
 const playable = computed(() => canPreview(props.asset))
+const alikeable = computed(() => looksAlike(props.asset))
 const isCurrent = computed(() => player.id === props.asset.id)
 // Thumbnails fade in once decoded instead of popping in line by line.
 const loaded = ref(false)
@@ -88,6 +89,20 @@ function onClick(e: MouseEvent) {
         </svg>
         <svg v-else viewBox="0 0 16 16" width="14" height="14" aria-hidden="true">
           <path d="M5 3.2v9.6a.5.5 0 0 0 .77.42l7.4-4.8a.5.5 0 0 0 0-.84l-7.4-4.8A.5.5 0 0 0 5 3.2Z" fill="currentColor" />
+        </svg>
+      </button>
+      <button
+        v-if="alikeable && !selecting"
+        type="button"
+        class="alike"
+        :aria-label="`More like ${asset.name}`"
+        title="More like this"
+        tabindex="-1"
+        @click.stop="emit('similar')"
+      >
+        <svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round">
+          <rect x="1.8" y="5.5" width="7.5" height="7.5" rx="1.6" />
+          <rect x="6.7" y="2.5" width="7.5" height="7.5" rx="1.6" fill="var(--panel)" />
         </svg>
       </button>
       <button
@@ -176,7 +191,7 @@ img.pixelated { image-rendering: pixelated; }
   transition: translate var(--dur-2) var(--ease-out);
 }
 .tile:hover .overlay { translate: 0 -3px; }
-.play, .check {
+.play, .check, .alike {
   position: absolute; pointer-events: auto; display: grid; place-items: center;
   border: 1px solid var(--line); background: var(--panel); color: var(--text); cursor: pointer;
   box-shadow: var(--elev-1);
@@ -192,15 +207,20 @@ img.pixelated { image-rendering: pixelated; }
   left: 0.45rem; top: 0.55rem; width: 1.35rem; height: 1.35rem; border-radius: 4px;
   color: transparent; opacity: 0; scale: 0.8;
 }
+.alike {
+  right: 0.45rem; top: 0.55rem; width: 1.6rem; height: 1.6rem; border-radius: 6px;
+  opacity: 0; translate: 0 -4px;
+}
 .tile:hover .play, .tile:focus-within .play, .playing .play { opacity: 1; translate: 0 0; }
+.tile:hover .alike { opacity: 1; translate: 0 0; }
 .tile:hover .check, .selecting .check { opacity: 1; scale: 1; }
 .checked .check { opacity: 1; scale: 1; background: var(--text); border-color: var(--text); color: var(--bg); animation: pop var(--dur-3) var(--ease-pop); }
 /* The tick draws itself in. */
 .check path { stroke-dasharray: 14; stroke-dashoffset: 14; transition: stroke-dashoffset var(--dur-2) var(--ease-out) 60ms; }
 .checked .check path { stroke-dashoffset: 0; }
 @keyframes pop { from { scale: 0.5; } }
-.play:hover, .check:hover { border-color: var(--muted); scale: 1.1; }
-.play:active, .check:active { scale: 0.92; transition-duration: 60ms; }
+.play:hover, .check:hover, .alike:hover { border-color: var(--muted); scale: 1.1; }
+.play:active, .check:active, .alike:active { scale: 0.92; transition-duration: 60ms; }
 .playing .play { background: var(--kind); border-color: var(--kind); color: var(--bg); }
 
 /* Touch screens have no hover: keep the play button visible. */

@@ -5,7 +5,7 @@
 //   server reports, so flaky wifi costs at most one chunk.
 // - The server recognizes a re-sent file list, so if the tab is closed, dropping the same folder again continues
 //   where it stopped, and packs that already finished aren't imported twice.
-import { ApiError, getToken, type Pack, type UploadFile } from './api'
+import { ApiError, authHeaders, signInNeeded, type Pack, type UploadFile } from './api'
 
 const CHUNK = 32 * 1024 * 1024
 const SMALL = 4 * 1024 * 1024
@@ -26,8 +26,7 @@ interface FileStatus { path: string; size: number; received: number }
 interface Session { pack: Pack; files: FileStatus[]; total_bytes: number; received_bytes: number }
 
 function headers(extra: Record<string, string> = {}): Record<string, string> {
-  const t = getToken()
-  return t ? { Authorization: `Bearer ${t}`, ...extra } : extra
+  return { ...authHeaders(), ...extra }
 }
 
 async function json<T>(res: Response): Promise<T> {
@@ -38,6 +37,7 @@ async function json<T>(res: Response): Promise<T> {
     } catch {
       // keep status line
     }
+    if (res.status === 401) signInNeeded()
     throw new ApiError(res.status, msg)
   }
   return res.json() as Promise<T>
@@ -175,6 +175,7 @@ export async function uploadPackResumable(
           report()
         }, signal)
         for (const w of group) inflight.delete(w.path)
+        if (res.status === 401) signInNeeded()
         if (res.status >= 300) throw new ApiError(res.status, res.body?.error ?? `batch failed (${res.status})`)
         for (const w of group) acked.set(w.path, w.size)
         report()
@@ -200,6 +201,7 @@ export async function uploadPackResumable(
             report()
             return res.body.received as number
           }
+          if (res.status === 401) signInNeeded()
           if (res.status >= 300) throw new ApiError(res.status, res.body?.error ?? `upload failed (${res.status})`)
           acked.set(w.path, res.body.received)
           report()

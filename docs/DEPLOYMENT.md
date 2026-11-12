@@ -57,8 +57,8 @@ Cloudflare's docs don't say this explicitly, so try one upload over 100 MB once 
    `--ca-cert` (or `HOARD_CA_CERT`). Point `hoard sync` (`server = ...`) and MCP
    clients at the same address, and set it as the public address in Settings → Server so MCP links resolve.
 
-Keep `HOARD_TOKEN` set even here. The network is private, but the token keeps other devices on your LAN or
-Zero Trust org read-only.
+Leave guest browsing off even here. The network is private, but an account keeps other devices on your LAN or Zero
+Trust org out.
 
 **HTTP/3.** `HOARD_HTTP3: "true"` in the compose file adds QUIC on UDP 4627 and advertises it with `Alt-Svc`; browsers switch after the
 first page load. Cloudflare's private routing carries UDP as well as TCP, but if HTTP/3 never kicks in over the
@@ -101,7 +101,7 @@ browser ─> (Cloudflare) ─> VPS: hoard + SQLite ──tailscale──> NAS: g
 - Garage's S3 port is only reachable on the tailnet (`network_mode: service:tailscale`).
 - Uploads land on the VPS and are pushed to the NAS. Size the VPS disk for the largest pack you'll upload at once
   (staging), not for the library.
-- Back up the VPS's `/config/hoard.db` with `POST /api/admin/backup` (cron + `curl`), and the NAS bucket with the NAS's
+- Back up the VPS's `/config/hoard.db` with `POST /api/admin/backup` (cron + `curl` with an access token), and the NAS bucket with the NAS's
   own snapshots.
 
 Instead of Tailscale you can publish Garage through a Cloudflare Tunnel too (`s3.example.com → http://garage:3900`),
@@ -303,5 +303,5 @@ when asked from the pack page.
 
 Meshes, animations and textures imported from uncompressed formats (which UE5 stores Oodle-compressed) wait for
 Unreal Editor. Run `hoard unreal-worker --editor <UnrealEditor-Cmd>` on a
-workstation with Unreal installed and network access to the server (with `HOARD_TOKEN` set if writes need one); it
+workstation with Unreal installed and network access to the server (with an access token from Settings → Account in `HOARD_TOKEN`); it
 can run as a service and polls every minute. The server never needs Unreal.

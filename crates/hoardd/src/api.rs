@@ -1,4 +1,5 @@
-//! HTTP API. Reads are open; writes go through `require_token` when `HOARD_TOKEN` is set.
+//! HTTP API. Changes and admin pages need an account or an access token (`auth::require_user`); reads do too,
+//! unless Settings lets anyone browse (`auth::require_reader`).
 
 use std::collections::BTreeSet;
 
@@ -73,11 +74,10 @@ pub(crate) fn router(state: &AppState) -> Router<AppState> {
         .route("/api/admin/chatgpt/sign-out", post(crate::chatgpt::sign_out_route))
         .route("/api/admin/chatgpt/models", get(crate::chatgpt::list_models))
         .merge(crate::uploads::router())
-        .route_layer(middleware::from_fn_with_state(std::sync::Arc::clone(state), require_token));
+        .merge(crate::auth::admin_router())
+        .route_layer(middleware::from_fn_with_state(std::sync::Arc::clone(state), crate::auth::require_user));
 
-    Router::new()
-        .route("/api/health", get(|| async { Json(json!({ "ok": true })) }))
-        .route("/auth/callback", get(crate::chatgpt::callback))
+    let reads = Router::new()
         .route("/api/stats", get(stats))
         .route("/api/stats/library", get(library_stats))
         .route("/api/packs", get(list_packs))
@@ -105,26 +105,16 @@ pub(crate) fn router(state: &AppState) -> Router<AppState> {
         .route("/api/assets/{id}/as/{format}", get(asset_as))
         .route("/api/assets/{id}/as/{format}/status", get(asset_as_status))
         .route("/api/activity", get(activity))
-        .merge(crate::mcp::router(state))
-        .merge(writes)
-}
+        .route_layer(middleware::from_fn_with_state(std::sync::Arc::clone(state), crate::auth::require_reader));
 
-async fn require_token(State(state): State<AppState>, req: Request, next: Next) -> Result<Response, AppError> {
-    if let Some(expected) = &state.cfg.token {
-        let given = req
-            .headers()
-            .get(header::AUTHORIZATION)
-            .and_then(|v| v.to_str().ok())
-            .and_then(|v| v.strip_prefix("Bearer "))
-            .unwrap_or("");
-        // Constant-time compare so the token can't be guessed byte by byte.
-        let same = given.len() == expected.len()
-            && given.bytes().zip(expected.bytes()).fold(0u8, |acc, (a, b)| acc | (a ^ b)) == 0;
-        if !same {
-            return Err(AppError::unauthorized());
-        }
-    }
-    Ok(next.run(req).await)
+    // Open: health, signing in, ChatGPT's sign-in redirect, and MCP (which checks for itself, per tool).
+    Router::new()
+        .route("/api/health", get(|| async { Json(json!({ "ok": true })) }))
+        .route("/auth/callback", get(crate::chatgpt::callback))
+        .merge(crate::auth::router())
+        .merge(crate::mcp::router(state))
+        .merge(reads)
+        .merge(writes)
 }
 
 /// Holds an upload to the "Largest upload" setting as it is now: refused up front when it says it's bigger, and
@@ -148,7 +138,6 @@ async fn limit_upload(State(state): State<AppState>, req: Request, next: Next) -
 async fn stats(State(state): State<AppState>) -> ApiResult<Json<Stats>> {
     let llm_enabled = state.settings.get().llm_enabled();
     let storage = state.blobs.label();
-    let auth_required = state.cfg.token.is_some();
     let s = db::call(&state.pool, move |c| {
         let one = |sql: &str| -> anyhow::Result<u64> { Ok(c.query_row(sql, [], |r| r.get::<_, i64>(0))? as u64) };
         // Counts are of the library; the archive has its own two.
@@ -173,7 +162,6 @@ async fn stats(State(state): State<AppState>) -> ApiResult<Json<Stats>> {
             jobs_pending: one("SELECT COUNT(*) FROM jobs WHERE status IN ('queued', 'running')")?,
             llm_enabled,
             storage,
-            auth_required,
             kinds,
             duplicate_assets: one(
                 "SELECT COALESCE(SUM(n - 1), 0) FROM (SELECT COUNT(*) AS n FROM assets GROUP BY blob_hash HAVING n > 1)",
@@ -1672,6 +1660,7 @@ fn settings_json(state: &AppState) -> Value {
             "max_expand_mb": option(now.max_expand_mb, cfg.max_expand_mb, saved.max_expand_mb.is_some()),
             "render": option(now.render, cfg.render, saved.render.is_some()),
             "update_check": option(now.update_check, cfg.update_check, saved.update_check.is_some()),
+            "guest_browsing": option(now.guest_browsing, false, saved.guest_browsing.is_some()),
             "public_url": option(
                 now.public_url.as_deref().unwrap_or(""),
                 cfg.public_url.as_deref().unwrap_or(""),

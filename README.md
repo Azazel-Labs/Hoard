@@ -42,7 +42,6 @@ services:
     image: ghcr.io/azazel-labs/hoard:latest
     restart: unless-stopped
     environment:
-      HOARD_TOKEN: ${HOARD_TOKEN:?set HOARD_TOKEN, e.g. HOARD_TOKEN=$(openssl rand -hex 32)}
       # Lets Hoard ask Watchtower (below) to update it as soon as it's idle after a release.
       HOARD_WATCHTOWER_URL: http://watchtower:8080
       HOARD_WATCHTOWER_TOKEN: hoard-update
@@ -89,11 +88,10 @@ disk, while the database stays small and easy to back up. Folders you mount need
 Then start it:
 
 ```sh
-echo "HOARD_TOKEN=$(openssl rand -hex 32)" > .env    # the portal asks for this once before uploads and edits
-docker compose up -d                                 # open http://<host>:4627
+docker compose up -d        # open http://<host>:4627
 ```
 
-The first visit opens a short setup that asks where your library lives. It suggests `/library`, the volume above; pick
+The first visit asks you to make an account, then opens a short setup that asks where your library lives. It suggests `/library`, the volume above; pick
 it and drop a pack onto the portal. More locations come later, from **Settings → Library locations**:
 
 - **A library Hoard keeps** gets copies of what you upload or import. Each one ticks the kinds of files it takes
@@ -142,7 +140,7 @@ cargo build --release
 
 # Try it with a generated sample pack (textures, PBR set, sprites, audio, glTF/OBJ/GLB models, CC0 license)
 python3 tools/make_sample_pack.py /tmp/sample       # needs Pillow + numpy; ffmpeg optional
-./target/release/hoard upload /tmp/sample/forest-starter-kit.zip
+./target/release/hoard --token <token> upload /tmp/sample/forest-starter-kit.zip   # make the token in Settings → Account
 ```
 
 Or drop the zip onto the portal.
@@ -476,9 +474,10 @@ both connect.
 | `get_asset` | full detail: metadata, tags with sources, links, what uses it, variants, identical copies |
 | `get_bundle` | download URLs and save-as paths for an asset and everything it needs, plus a zip URL |
 | `list_packs`, `list_tags`, `list_collections` | browse the library, its tag vocabulary and collections (`search_assets` takes `collection` too) |
-| `tag_asset`, `update_asset` | edits, recorded as human; need `Authorization: Bearer $HOARD_TOKEN` if a token is set |
+| `tag_asset`, `update_asset` | edits, recorded as human |
 
-Point any MCP client at `https://your-host/mcp` (add the bearer header for write tools). Browser-originated requests
+Point any MCP client at `https://your-host/mcp` with an access token from Settings → Account in an
+`Authorization: Bearer <token>` header. With guest browsing on, the read tools work without one. Browser-originated requests
 from other origins are rejected (DNS-rebinding guard). Set the public address in Settings → Server so returned links are absolute.
 
 ## Storage, and splitting it from the web server
@@ -523,7 +522,6 @@ Set before starting (these need a restart):
 | `HOARD_TLS_CERT` / `_KEY` | – | serve HTTPS (HTTP/2) with this PEM chain and key |
 | `HOARD_TLS_SELF_SIGNED` / `HOARD_TLS_NAMES` | `false` / – | HTTPS with a generated certificate for these names |
 | `HOARD_HTTP3` | `false` | also serve HTTP/3 (needs TLS) |
-| `HOARD_TOKEN` | – | bearer token for uploads, edits, Settings, admin and MCP writes; reads stay open |
 | `HOARD_WATCHTOWER_URL` / `_TOKEN` / `_CONTAINER` | – / – / `hoard` | Watchtower's HTTP API: Hoard asks it to update this container once a release is out and Hoard is idle |
 | `HOARD_LOCAL_LLM_URL` | `http://llm:8080/v1` | where the local model server listens (Settings → AI tagging → Local model) |
 | `HOARD_S3_ENDPOINT` / `_BUCKET` / `_REGION` / `_ACCESS_KEY` / `_SECRET_KEY` / `_HEADERS` | – | the S3 service for `s3://` library locations |
@@ -546,10 +544,32 @@ history the same way.
   packs).
 - Uploads: path traversal rejected, archive expansion capped, symlinks in tarballs ignored.
 
+## Accounts and access tokens
+
+The first visit to a new server makes its first account. Add accounts for other people, change your password, and
+make access tokens in **Settings → Account**. Every account can do everything, including managing accounts.
+
+- **Signing in** gives the browser a session cookie (HttpOnly, SameSite=Lax) that lasts until you sign out or don't
+  visit for 30 days. Repeated wrong passwords for a name are slowed down.
+- **Access tokens** are for everything that isn't a browser: the `hoard` CLI (`--token` or `HOARD_TOKEN`), scripts and
+  cron, MCP clients and the Unreal worker. They're sent as `Authorization: Bearer <token>`, shown once when made, and
+  can be revoked; the list shows when each was last used. A token can do everything except manage accounts and tokens.
+- **Guest browsing** (off by default) lets anyone who can reach the server search, preview and download without
+  signing in. Changing anything still needs an account or a token.
+- **Forgot your password?** On the server, `hoardd --reset-password <name>` prints a new one and signs that account out
+  everywhere. In Docker: `docker compose exec hoard hoardd --reset-password <name>`.
+
+From cron, with a token made for it:
+
+```sh
+curl -fsS -X POST -H "Authorization: Bearer $HOARD_TOKEN" http://localhost:4627/api/admin/backup
+```
+
 ## API overview
 
-Reads are open. Everything that changes something (and all of Settings) needs `Authorization: Bearer <HOARD_TOKEN>`
-when a token is set; those are marked 🔒.
+Every request needs a signed-in session or `Authorization: Bearer <token>`, except reads while guest browsing is on.
+Requests that change something are marked 🔒: guests can't make them. A browser session's changes must also carry an
+`X-Hoard` header, which pages on other sites can't add.
 
 **Assets**
 

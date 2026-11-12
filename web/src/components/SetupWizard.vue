@@ -1,14 +1,12 @@
 <script setup lang="ts">
 // The first visit to a new server: pick where the library lives before anything else.
 import { onMounted, ref } from 'vue'
-import { api, ApiError, setToken, type LibraryLocation, type LocationList } from '../api'
+import { api, type LibraryLocation, type LocationList } from '../api'
 import LocationForm from './LocationForm.vue'
 
 const emit = defineEmits<{ done: [] }>()
 
 const data = ref<LocationList | null>(null)
-const needsToken = ref(false)
-const token = ref('')
 const error = ref('')
 const made = ref<LibraryLocation | null>(null)
 
@@ -16,20 +14,13 @@ async function load() {
   error.value = ''
   try {
     data.value = await api.locations()
-    needsToken.value = false
     // Someone finished the setup in another tab.
     if (data.value.locations.length) emit('done')
   } catch (e) {
-    if (e instanceof ApiError && e.status === 401) needsToken.value = true
-    else error.value = (e as Error).message
+    error.value = (e as Error).message
   }
 }
 onMounted(load)
-
-function saveToken() {
-  setToken(token.value.trim())
-  load()
-}
 </script>
 
 <template>
@@ -44,14 +35,7 @@ function saveToken() {
           locations, on other disks, from Settings later.
         </p>
 
-        <form v-if="needsToken" class="token" @submit.prevent="saveToken">
-          <label for="setup-token">This server needs its token (<code>HOARD_TOKEN</code>) before it can be set up.</label>
-          <div class="row">
-            <input id="setup-token" v-model="token" class="field mono" type="password" autocomplete="off" />
-            <button type="submit" class="btn primary" :disabled="!token.trim()">Continue</button>
-          </div>
-        </form>
-        <div v-else-if="error" class="err" role="alert">
+        <div v-if="error" class="err" role="alert">
           <p>Couldn't reach the server: {{ error }}</p>
           <button type="button" class="btn" @click="load">Try again</button>
         </div>
@@ -63,7 +47,6 @@ function saveToken() {
           first
           submit-label="Start the library"
           @created="(l) => (made = l)"
-          @unauthorized="needsToken = true"
         />
       </template>
 
@@ -100,9 +83,6 @@ function saveToken() {
 h1 { margin: 0 0 0.4rem; font-size: var(--step-2); font-variation-settings: 'CASL' 0.5; line-height: 1.2; }
 .lede { margin: 0 0 1.3rem; color: var(--muted); font-size: var(--step-0); line-height: 1.5; }
 .lede .mono { color: var(--text); overflow-wrap: anywhere; }
-.token { display: grid; gap: 0.5rem; font-size: var(--step--1); }
-.token .row { display: flex; gap: 0.5rem; }
-.token .field { flex: 1; min-width: 0; max-width: 20rem; }
 .err { display: grid; gap: 0.5rem; justify-items: start; color: var(--danger); font-size: var(--step--1); }
 .err p { margin: 0; }
 .loading { color: var(--muted); font-size: var(--step--1); }

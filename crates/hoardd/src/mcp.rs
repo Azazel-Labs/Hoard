@@ -61,19 +61,18 @@ fn base_url(state: &AppState, headers: &HeaderMap) -> String {
     format!("{proto}://{host}")
 }
 
-fn authorized(state: &AppState, headers: &HeaderMap) -> bool {
-    let Some(expected) = &state.cfg.token else { return true };
-    let given = headers
-        .get(header::AUTHORIZATION)
-        .and_then(|v| v.to_str().ok())
-        .and_then(|v| v.strip_prefix("Bearer "))
-        .unwrap_or("");
-    given.len() == expected.len() && given.bytes().zip(expected.bytes()).fold(0u8, |acc, (a, b)| acc | (a ^ b)) == 0
-}
-
 async fn handle(State(state): State<AppState>, headers: HeaderMap, body: String) -> Response {
     if !origin_ok(&headers, state.settings.get().public_url.as_deref()) {
         return (StatusCode::FORBIDDEN, "origin not allowed").into_response();
+    }
+    // An access token from Settings → Account. Without one, only reads, and only if Settings lets anyone browse.
+    let authorized = crate::auth::authenticate(&state, &http::Method::POST, &headers).await.ok().flatten().is_some();
+    if !authorized && !state.settings.get().guest_browsing {
+        return (
+            StatusCode::UNAUTHORIZED,
+            "send an access token from Hoard's Settings → Account as `Authorization: Bearer <token>`",
+        )
+            .into_response();
     }
     let msg: Value = match serde_json::from_str(&body) {
         Ok(v) => v,
@@ -136,8 +135,7 @@ async fn handle(State(state): State<AppState>, headers: HeaderMap, body: String)
             let name = params.get("name").and_then(Value::as_str).unwrap_or_default().to_owned();
             let args = params.get("arguments").cloned().unwrap_or_else(|| json!({}));
             let base = base_url(&state, &headers);
-            let auth = authorized(&state, &headers);
-            match call_tool(&state, &name, args, &base, auth).await {
+            match call_tool(&state, &name, args, &base, authorized).await {
                 Ok(mut value) => {
                     let previews = value.as_object_mut().and_then(|o| o.remove(PREVIEWS_KEY));
                     let mut content = vec![
@@ -237,7 +235,7 @@ fn tool_list() -> Value {
         {
             "name": "tag_asset",
             "title": "Add or remove tags",
-            "description": "Add and/or remove tags on an asset. Added tags are recorded as human-sourced and are never overwritten by the automatic taggers. Needs the server token if one is configured.",
+            "description": "Add and/or remove tags on an asset. Added tags are recorded as human-sourced and are never overwritten by the automatic taggers. Needs an access token.",
             "inputSchema": {
                 "type": "object",
                 "properties": {
@@ -252,7 +250,7 @@ fn tool_list() -> Value {
         {
             "name": "update_asset",
             "title": "Rename or recategorize an asset",
-            "description": "Set an asset's display name, category or description (its own field, next to the AI's and the file's). Edited fields are locked against the AI tagger. Needs the server token if one is configured.",
+            "description": "Set an asset's display name, category or description (its own field, next to the AI's and the file's). Edited fields are locked against the AI tagger. Needs an access token.",
             "inputSchema": {
                 "type": "object",
                 "properties": {
@@ -470,7 +468,7 @@ async fn call_tool(
         "tag_asset" | "update_asset" => {
             if !authorized {
                 return Err(ToolError::Failed(
-                    "This server requires a token for changes: configure the MCP client to send `Authorization: Bearer <HOARD_TOKEN>`.".into(),
+                    "Changes need an access token: make one in Hoard's Settings → Account and configure the MCP client to send `Authorization: Bearer <token>`.".into(),
                 ));
             }
             let id = str_arg(&args, "id").ok_or_else(|| ToolError::Failed("`id` is required".into()))?;

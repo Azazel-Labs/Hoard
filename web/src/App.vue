@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import { computed, nextTick, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue'
 import {
-  api, filesFromDrop, getToken, KIND_LABEL, selectionZipUrl, setToken,
+  api, filesFromDrop, KIND_LABEL, selectionZipUrl,
   type Asset, type AssetKind, type BulkEdit, type Collection, type Facet, type Pack, type Stats, type UploadFile,
 } from './api'
 import { canPreview, stop as stopPreview, toggle as togglePreview } from './player'
 import { prefs, toggleIn } from './prefs'
+import { askToSignIn, auth, signOut } from './auth'
 import { DARK_THEMES, LIGHT_THEMES, themeFor } from './theme'
 import ActivityIndicator from './components/ActivityIndicator.vue'
 import { looksLikeFolderOfPacks, splitPerSubfolder } from './uploader'
@@ -62,11 +63,12 @@ const selected = ref<Asset | null>(null)
 const packs = ref<Pack[]>([])
 const stats = ref<Stats | null>(null)
 const showFilters = ref(false)
-const tokenDraft = ref(getToken())
-const showToken = ref(false)
 // A new server with nowhere to keep files opens the setup first; it stays up until it's finished.
 const setupOpen = ref(false)
 watch(() => stats.value?.setup_needed, (needed) => { if (needed) setupOpen.value = true })
+/** Signed in, rather than browsing as a guest: Settings and the setup are only for accounts. */
+const member = computed(() => !!auth.status?.signed_in)
+watch([member, view], ([m, v]) => { if (!m && v === 'settings') view.value = 'library' }, { immediate: true })
 function setupDone() {
   setupOpen.value = false
   refreshPacks()
@@ -516,11 +518,6 @@ function onUpdated(a: Asset) {
   items.value = items.value.map((x) => (x.id === a.id ? a : x))
 }
 
-function saveToken() {
-  setToken(tokenDraft.value.trim())
-  showToken.value = false
-}
-
 // ------------------------------------------------------------------ keyboard
 
 const tileButtons = () => [...(gridEl.value?.querySelectorAll<HTMLButtonElement>('.hit') ?? [])]
@@ -762,6 +759,7 @@ const paletteOpen = ref(false)
 const shortcutsOpen = ref(false)
 const archivedCount = computed(() => (stats.value?.archived_packs ?? 0) + (stats.value?.archived_assets ?? 0))
 function openSettings(section?: string) {
+  if (!member.value) return askToSignIn()
   if (section) settingsSection.value = section
   setView('settings')
 }
@@ -787,8 +785,13 @@ const commands = computed<Command[]>(() => {
     id: 'act:supporting', group: 'Actions', label: prefs.showSupporting ? 'Hide supporting files' : 'Show supporting files',
     keywords: 'normal maps roughness masks', run: () => (prefs.showSupporting = !prefs.showSupporting),
   })
-  if (stats.value?.auth_required) out.push({ id: 'act:token', group: 'Actions', label: getToken() ? 'Change the token' : 'Set the token', keywords: 'auth password', run: () => (showToken.value = true) })
-  out.push({ id: 'act:settings', group: 'Actions', label: 'Settings', keywords: 'blender ffmpeg llm ai tagging unreal admin tools preferences', run: () => openSettings() })
+  if (auth.status?.signed_in) {
+    out.push({ id: 'act:account', group: 'Actions', label: 'Account and access tokens', keywords: 'password login user token api', run: () => openSettings('account') })
+    out.push({ id: 'act:signout', group: 'Actions', label: `Sign out (${auth.status.user?.name ?? ''})`, keywords: 'log out logout', run: signOut })
+  } else {
+    out.push({ id: 'act:signin', group: 'Actions', label: 'Sign in', keywords: 'log in login account password', run: askToSignIn })
+  }
+  if (member.value) out.push({ id: 'act:settings', group: 'Actions', label: 'Settings', keywords: 'blender ffmpeg llm ai tagging unreal admin tools preferences', run: () => openSettings() })
   out.push({ id: 'act:keys', group: 'Actions', label: 'Keyboard shortcuts', hint: '?', keywords: 'help keys', run: () => (shortcutsOpen.value = true) })
   for (const t of THEMES) {
     out.push({ id: `theme:${t.value}`, group: 'Theme', label: t.label, hint: prefs.theme === t.value ? 'current' : undefined, keywords: 'theme appearance mode', run: () => setTheme(t.value) })
@@ -898,9 +901,7 @@ const commands = computed<Command[]>(() => {
             <span class="visually-hidden">{{ t.label }}</span>
           </button>
         </div>
-        <button v-if="stats?.auth_required" type="button" class="btn ghost" @click="showToken = !showToken">
-          {{ getToken() ? 'Token set' : 'Set token' }}
-        </button>
+        <button v-if="auth.status && !auth.status.signed_in" type="button" class="btn ghost" @click="askToSignIn">Sign in</button>
         <button
           v-if="archivedCount || view === 'archive'"
           type="button"
@@ -917,6 +918,7 @@ const commands = computed<Command[]>(() => {
           <span v-if="archivedCount" class="acount">{{ archivedCount > 999 ? '999+' : archivedCount }}</span>
         </button>
         <button
+          v-if="member"
           type="button"
           class="btn ghost settings-btn"
           title="Settings"
@@ -951,11 +953,6 @@ const commands = computed<Command[]>(() => {
       <button type="button" class="btn ghost" @click="pendingSplit = null">Cancel</button>
     </div>
 
-    <form v-if="showToken" class="tokenbar" @submit.prevent="saveToken">
-      <label for="token">This server needs a token to add or change assets.</label>
-      <input id="token" v-model="tokenDraft" class="field mono" type="password" autocomplete="off" placeholder="HOARD_TOKEN" />
-      <button class="btn primary" type="submit">Save token</button>
-    </form>
 
     <template v-if="view === 'library'">
       <div v-if="showFilters" class="scrim" aria-hidden="true" @click="showFilters = false" />
@@ -1217,7 +1214,7 @@ const commands = computed<Command[]>(() => {
       v-model:section="settingsSection"
       class="settings-pane"
       :stats="stats"
-      @unauthorized="showToken = true"
+      @unauthorized="askToSignIn"
       @tag="(t) => { Object.assign(filters, { tags: [], kind: '', pack: null, collection: null, q: '' }); toggleTag(t) }"
       @pack="browsePack"
       @open="openAsset"
@@ -1257,10 +1254,10 @@ const commands = computed<Command[]>(() => {
     </div>
     </Transition>
 
-    <UploadQueue ref="queue" @created="onCreated" @unauthorized="showToken = true" />
+    <UploadQueue ref="queue" @created="onCreated" @unauthorized="askToSignIn" />
     <CommandPalette v-if="paletteOpen" :commands="commands" @close="paletteOpen = false" @open="openAsset" />
     <ShortcutsDialog v-if="shortcutsOpen" @close="shortcutsOpen = false" />
-    <SetupWizard v-if="setupOpen" @done="setupDone" />
+    <SetupWizard v-if="setupOpen && member" @done="setupDone" />
     <UiLayer />
   </div>
 </template>

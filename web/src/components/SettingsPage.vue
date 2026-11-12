@@ -25,6 +25,7 @@ import { confirmDialog, showError, showOk } from '../ui'
 import LibraryStats from './LibraryStats.vue'
 import LocationsPanel from './LocationsPanel.vue'
 import MaintenancePanel from './MaintenancePanel.vue'
+import AccountPanel from './AccountPanel.vue'
 import ResetButton from './ResetButton.vue'
 import SizeInput from './SizeInput.vue'
 
@@ -49,6 +50,7 @@ const PAGES = [
   { id: 'tools', label: 'Tools', blurb: 'Outside programs Hoard uses to convert and read files.' },
   { id: 'ai', label: 'AI tagging', blurb: 'An AI model names, describes and tags new packs, on top of the built-in rules. Its tags are marked as suggested.' },
   { id: 'unreal', label: 'Unreal packages', blurb: 'What to do with .uasset files when a pack is added.' },
+  { id: 'account', label: 'Account', blurb: 'Your password, the other people who can sign in, and access tokens for scripts and other programs.' },
   { id: 'server', label: 'Server', blurb: 'The server’s switches and limits, saved on the server.' },
   { id: 'maintenance', label: 'Maintenance', blurb: 'Back up, check for damage and tidy up. One of each runs at a time, and you can leave this page while they do.' },
 ] as const
@@ -762,6 +764,7 @@ onBeforeUnmount(() => {
 
         <LocationsPanel v-else-if="current === 'locations'" @unauthorized="emit('unauthorized')" @changed="emit('changed')" />
         <MaintenancePanel v-else-if="current === 'maintenance'" @unauthorized="emit('unauthorized')" />
+        <AccountPanel v-else-if="current === 'account'" />
 
         <p v-else-if="!s" class="loading">Loading…</p>
 

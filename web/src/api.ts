@@ -190,7 +190,6 @@ export interface Stats {
   jobs_pending: number
   llm_enabled: boolean
   storage: string
-  auth_required: boolean
   kinds: Facet[]
   /** What's in the archive: whole packs, and assets archived on their own. */
   archived_packs?: number
@@ -242,6 +241,31 @@ export interface NewLocation {
   path: string
   kinds: AssetKind[]
   catch_all: boolean
+}
+
+/** `GET /api/auth/status`: who this browser is signed in as, and what the server wants first. */
+export interface AuthStatus {
+  /** No account yet: the portal asks for the first one. */
+  setup_needed: boolean
+  signed_in: boolean
+  user: { name: string; kind: 'user' | 'token' } | null
+  /** People who aren't signed in may look around. */
+  guest_browsing: boolean
+}
+
+export interface Account {
+  id: number
+  username: string
+  created_at: string
+  you: boolean
+}
+
+export interface AccessToken {
+  id: number
+  name: string
+  created_at: string
+  last_used_at: string | null
+  created_by: string | null
 }
 
 /** A finished (or interrupted) run of a maintenance task. */
@@ -388,6 +412,7 @@ export interface Settings {
     max_expand_mb: OptionSetting<number>
     render: OptionSetting<boolean>
     update_check: OptionSetting<boolean>
+    guest_browsing: OptionSetting<boolean>
     /** Empty: from the request's Host header. */
     public_url: OptionSetting<string>
     /** Empty: look in the usual places. */
@@ -412,6 +437,7 @@ export interface SettingsPatch {
   max_expand_mb?: number | null
   render?: boolean | null
   update_check?: boolean | null
+  guest_browsing?: boolean | null
   public_url?: string | null
   soundfont?: string | null
 }
@@ -442,28 +468,21 @@ function normalize(a: Asset): Asset {
   return { ...a, links: a.links ?? [], linked_from: a.linked_from ?? [], derivatives: a.derivatives ?? [] }
 }
 
-const TOKEN_KEY = 'hoard.token'
-
-export function getToken(): string {
-  try {
-    return localStorage.getItem(TOKEN_KEY) ?? ''
-  } catch {
-    return ''
-  }
+/**
+ * Sent with every request. The session cookie does the signing in; this header tells the server the request came
+ * from the portal and not from another site's page riding on the cookie.
+ */
+export function authHeaders(): Record<string, string> {
+  return { 'X-Hoard': '1' }
 }
 
-export function setToken(token: string): void {
-  try {
-    if (token) localStorage.setItem(TOKEN_KEY, token)
-    else localStorage.removeItem(TOKEN_KEY)
-  } catch {
-    // Storage can be unavailable (private mode, sandboxed frames); the token then lasts for this tab only.
-  }
+/** Called when the server says to sign in (set by the auth store). */
+let onSignInNeeded: () => void = () => {}
+export function whenSignInNeeded(f: () => void) {
+  onSignInNeeded = f
 }
-
-function authHeaders(): Record<string, string> {
-  const t = getToken()
-  return t ? { Authorization: `Bearer ${t}` } : {}
+export function signInNeeded() {
+  onSignInNeeded()
 }
 
 export class ApiError extends Error {
@@ -484,6 +503,7 @@ async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
     } catch {
       // Non-JSON error body; keep the status line.
     }
+    if (res.status === 401 && !path.startsWith('/api/auth/')) signInNeeded()
     throw new ApiError(res.status, msg)
   }
   if (res.status === 204 || res.status === 202) return undefined as T
@@ -611,6 +631,22 @@ export const api = {
     }),
   chatgptSignOut: () => request<ChatGptStatus>('/api/admin/chatgpt/sign-out', { method: 'POST' }),
   chatgptModels: () => request<{ models: ModelInfo[] }>('/api/admin/chatgpt/models'),
+  authStatus: () => request<AuthStatus>('/api/auth/status'),
+  setup: (username: string, password: string) =>
+    post<{ user: { name: string } }>('/api/auth/setup', { username, password }),
+  login: (username: string, password: string) =>
+    post<{ user: { name: string } }>('/api/auth/login', { username, password }),
+  logout: () => request<void>('/api/auth/logout', { method: 'POST' }),
+  changePassword: (current: string, next: string) =>
+    post<void>('/api/auth/password', { current, new: next }),
+  accounts: () => request<{ users: Account[] }>('/api/admin/users'),
+  addAccount: (username: string, password: string) =>
+    post<void>('/api/admin/users', { username, password }),
+  removeAccount: (id: number) => request<void>(`/api/admin/users/${id}`, { method: 'DELETE' }),
+  tokens: () => request<{ tokens: AccessToken[] }>('/api/admin/tokens'),
+  makeToken: (name: string) =>
+    post<{ id: number; name: string; token: string }>('/api/admin/tokens', { name }),
+  revokeToken: (id: number) => request<void>(`/api/admin/tokens/${id}`, { method: 'DELETE' }),
   maintenance: () => request<Maintenance>('/api/admin/maintenance'),
   runMaintenance: (task: string) =>
     request<{ run: number }>(`/api/admin/maintenance/${task}`, { method: 'POST' }),

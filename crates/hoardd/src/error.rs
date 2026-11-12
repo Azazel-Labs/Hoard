@@ -29,7 +29,13 @@ impl AppError {
         Self { status: StatusCode::UNPROCESSABLE_ENTITY, err: anyhow::anyhow!("{msg}") }
     }
     pub(crate) fn unauthorized() -> Self {
-        Self { status: StatusCode::UNAUTHORIZED, err: anyhow::anyhow!("missing or invalid bearer token") }
+        Self { status: StatusCode::UNAUTHORIZED, err: anyhow::anyhow!("sign in first (or send an access token)") }
+    }
+    pub(crate) fn forbidden(msg: impl std::fmt::Display) -> Self {
+        Self { status: StatusCode::FORBIDDEN, err: anyhow::anyhow!("{msg}") }
+    }
+    pub(crate) fn too_many(msg: impl std::fmt::Display) -> Self {
+        Self { status: StatusCode::TOO_MANY_REQUESTS, err: anyhow::anyhow!("{msg}") }
     }
 }
 

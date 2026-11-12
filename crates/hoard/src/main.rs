@@ -22,7 +22,7 @@ struct Cli {
     /// Server base URL.
     #[arg(long, global = true, env = "HOARD_SERVER")]
     server: Option<String>,
-    /// Bearer token for uploads (same as the server's `HOARD_TOKEN`).
+    /// Access token, made in the portal's Settings → Account.
     #[arg(long, global = true, env = "HOARD_TOKEN", hide_env_values = true)]
     token: Option<String>,
     /// Extra CA certificate (PEM) to trust, e.g. the server's self-signed `tls/cert.pem`.

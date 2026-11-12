@@ -4,6 +4,7 @@ mod activity;
 mod analyze;
 mod api;
 mod audio;
+mod auth;
 mod blender;
 mod blobs;
 mod bundle;
@@ -91,6 +92,14 @@ async fn main() -> Result<()> {
         std::fs::create_dir_all(&dir).with_context(|| format!("create {}", dir.display()))?;
     }
     let pool = db::open(&cfg.db_path(), &cfg.backups_dir())?;
+    if let Some(name) = &cfg.reset_password {
+        let (name, password) = auth::reset_password(&*pool.get()?, name)?;
+        #[expect(clippy::print_stdout, reason = "the new password is the command's output")]
+        {
+            println!("New password for {name}: {password}");
+        }
+        return Ok(());
+    }
     if let Some(loc) = locations::adopt_existing(&*pool.get()?, &cfg)? {
         tracing::info!(path = %loc.path, "your files stay where they are, as the library location \"Library\"");
     }
@@ -108,7 +117,6 @@ async fn main() -> Result<()> {
         data = %cfg.data_dir.display(),
         storage = %blobs.label(),
         llm = effective.llm_label(),
-        auth = cfg.token.is_some(),
         blender = %effective.blender,
         ffmpeg = %effective.ffmpeg,
         requeued,

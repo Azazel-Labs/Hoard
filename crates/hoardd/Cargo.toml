@@ -77,6 +77,8 @@ symphonia = { version = "0.6", default-features = false, features = ["wav", "pcm
 tempfile = "3.27.0"
 sha2 = "0.11"
 lzma-rust2 = { version = "0.25", default-features = false, features = ["std", "xz"] }
+argon2 = "0.6.0"
+getrandom = "0.4"
 
 [dev-dependencies]
 lzma-rust2 = { version = "0.25", default-features = false, features = ["std", "xz", "encoder"] }

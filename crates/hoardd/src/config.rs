@@ -75,9 +75,10 @@ pub(crate) struct Config {
     #[arg(long, env = "HOARD_HTTP3", default_value_t = false, action = clap::ArgAction::Set)]
     pub(crate) http3: bool,
 
-    /// If set, uploads, edits and admin calls require `Authorization: Bearer <token>`. Reads stay open.
-    #[arg(long, env = "HOARD_TOKEN", hide_env_values = true)]
-    pub(crate) token: Option<String>,
+    /// Give this account a new random password, print it, and exit (the server isn't started). For a forgotten
+    /// password: `docker compose exec hoard hoardd --reset-password <name>`.
+    #[arg(long, value_name = "NAME")]
+    pub(crate) reset_password: Option<String>,
 
     /// Watchtower's HTTP API (e.g. `http://watchtower:8080`). When set, Hoard asks it to update this container as
     /// soon as a newer release is out and the server is idle, instead of waiting for Watchtower's schedule.
@@ -222,6 +223,12 @@ const RETIRED_ENV: &[&str] = &[
 pub(crate) fn warn_retired_env() {
     for name in RETIRED_ENV.iter().filter(|n| std::env::var_os(n).is_some()) {
         tracing::warn!("{name} is no longer read: change it in the portal's Settings instead");
+    }
+    if std::env::var_os("HOARD_TOKEN").is_some() {
+        tracing::warn!(
+            "HOARD_TOKEN is no longer read: sign in to the portal with an account, and give scripts an access token \
+             from Settings → Account"
+        );
     }
 }
 

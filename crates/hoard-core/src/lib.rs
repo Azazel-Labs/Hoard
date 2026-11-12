@@ -611,7 +611,6 @@ pub struct Stats {
     pub llm_enabled: bool,
     /// Human-readable storage backend, e.g. `local:./hoard-data/blobs` or `s3:http://nas:3900/hoard`.
     pub storage: String,
-    pub auth_required: bool,
     pub kinds: Vec<Facet>,
     /// Packs in the archive.
     #[serde(default)]

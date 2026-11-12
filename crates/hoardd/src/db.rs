@@ -81,6 +81,28 @@ const MIGRATIONS: &[&str] = &[
        ok          INTEGER,
        summary     TEXT
      );",
+    // 16: accounts, replacing the shared HOARD_TOKEN (see `auth.rs`). Sessions and access tokens are stored as
+    // SHA-256 hashes, so a copy of the database doesn't let anyone in.
+    "CREATE TABLE users (
+       id            INTEGER PRIMARY KEY AUTOINCREMENT,
+       username      TEXT NOT NULL UNIQUE COLLATE NOCASE,
+       password_hash TEXT NOT NULL,
+       created_at    TEXT NOT NULL
+     );
+     CREATE TABLE sessions (
+       token_hash   TEXT PRIMARY KEY,
+       user_id      INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+       created_at   TEXT NOT NULL,
+       last_seen_at TEXT NOT NULL
+     ) WITHOUT ROWID;
+     CREATE TABLE access_tokens (
+       id           INTEGER PRIMARY KEY AUTOINCREMENT,
+       name         TEXT NOT NULL,
+       token_hash   TEXT NOT NULL UNIQUE,
+       created_by   INTEGER REFERENCES users(id) ON DELETE SET NULL,
+       created_at   TEXT NOT NULL,
+       last_used_at TEXT
+     );",
 ];
 
 /// How many automatic pre-upgrade backups to keep in `<data dir>/backups`.

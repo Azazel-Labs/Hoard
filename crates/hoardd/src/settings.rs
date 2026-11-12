@@ -62,6 +62,9 @@ pub(crate) struct Saved {
     pub(crate) retired_max_files: (),
     #[serde(skip_serializing_if = "Option::is_none")]
     pub(crate) workers: Option<usize>,
+    /// Let people who aren't signed in look around (search, preview, download). Changes still need an account.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub(crate) guest_browsing: Option<bool>,
 }
 
 /// Reads a retired setting and throws it away.
@@ -89,6 +92,7 @@ pub(crate) struct Effective {
     pub(crate) max_upload_mb: u64,
     pub(crate) max_expand_mb: u64,
     pub(crate) workers: usize,
+    pub(crate) guest_browsing: bool,
 }
 
 impl Effective {
@@ -145,6 +149,7 @@ impl Saved {
             max_upload_mb: self.max_upload_mb.unwrap_or(cfg.max_upload_mb),
             max_expand_mb: self.max_expand_mb.unwrap_or(cfg.max_expand_mb),
             workers: self.workers.unwrap_or(cfg.workers).clamp(1, MAX_WORKERS),
+            guest_browsing: self.guest_browsing.unwrap_or(false),
         }
     }
 

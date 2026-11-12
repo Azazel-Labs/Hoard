@@ -153,7 +153,7 @@ so other containers on the host are left alone.
 | `HOARD_VERSION=0.8.1` | exactly that version: Watchtower never changes it |
 | `HOARD_VERSION=edge` | every green commit on `main`, between releases |
 | `HOARD_UPDATE_SCHEDULE=0 30 3 * * 0` | when Watchtower checks (cron with a leading seconds field) |
-| `HOARD_UPDATE_CHECK=false` | stop the server from asking GitHub once a day whether a newer release exists |
+| `HOARD_UPDATE_CHECK=false` | stop the server from asking GitHub once a day whether a newer release exists (also a switch in Settings) |
 
 To update by hand instead, delete the `watchtower` service and run `docker compose pull && docker compose up -d`.
 If you build from a checkout, replace the `image:` line with `build: ..`.
@@ -227,9 +227,13 @@ HOARD_LLM_MODEL=qwen3-vl-2b                                  # the name Hoard as
 HOARD_LOCAL_MODEL_ARGS=                                      # empty for models without a thinking mode
 ```
 
-To use a hosted model or your own Ollama instead, open **Settings** in the portal and change the address, model and
-key; that takes effect at once. To go without AI tagging, delete the `llm` service from your compose file and set
-`HOARD_LLM_URL=` (empty) in `deploy/.env`, or turn it off in Settings.
+To use a hosted model or your own server instead, open **Settings** in the portal and pick the service: OpenRouter,
+OpenAI, Anthropic and Google Gemini need only an API key, and Ollama or any other OpenAI-compatible server needs only its
+address. Hoard then lists the service's models (marking the ones that take images on OpenRouter); pick one and save.
+It takes effect at once. The key is stored in Hoard's database, is never sent back to the browser, and is cleared when
+you switch to a different address. If you don't need the bundled model then, delete the `llm` service from your
+compose file to free its memory. To go without AI tagging at all, choose **Off** in Settings (or set `HOARD_LLM_URL=`
+empty in `deploy/.env`).
 
 ## Model conversion with Blender
 

@@ -1,8 +1,9 @@
 <script setup lang="ts">
-// Settings: turn Blender and ffmpeg on or off (downloading them if need be), point the AI tagger at an endpoint,
-// and choose what happens to Unreal packages. Saved on the server; a saved setting wins over its HOARD_* variable.
+// Settings: turn Blender and ffmpeg on or off (downloading them if need be), pick the AI service that tags packs,
+// choose what happens to Unreal packages, and the server's limits. Saved on the server and in effect at once; a
+// saved setting wins over its HOARD_* variable.
 import { computed, onBeforeUnmount, onMounted, reactive, ref } from 'vue'
-import { ApiError, api, type Settings, type SettingsPatch, type ToolSetting, type UnrealConvert } from '../api'
+import { ApiError, api, type ModelInfo, type Settings, type SettingsPatch, type ToolSetting, type UnrealConvert } from '../api'
 import { showError, showOk } from '../ui'
 
 const emit = defineEmits<{ close: []; unauthorized: [] }>()
@@ -22,10 +23,196 @@ const modeOf = (v: string): Mode => {
 const paths = reactive<Record<ToolKey, string>>({ blender: '', ffmpeg: '' })
 const chosen = reactive<Record<ToolKey, Mode>>({ blender: 'off', ffmpeg: 'auto' })
 
-const llm = reactive({ url: '', model: '', key: '', removeKey: false, vision: false })
+// AI services: picking one fills in its address, so all that's left is a key (for hosted ones) and a model.
+type ProviderId = 'off' | 'bundled' | 'openrouter' | 'openai' | 'anthropic' | 'gemini' | 'ollama' | 'custom'
+interface Provider {
+  id: ProviderId
+  label: string
+  url: string
+  /** Needs an API key. */
+  key?: boolean
+  /** Where to get one. */
+  keyUrl?: string
+  /** The address can be edited (a self-hosted service). */
+  editUrl?: boolean
+  hint: string
+}
+const PROVIDERS: Provider[] = [
+  { id: 'off', label: 'Off', url: '', hint: 'Packs are tagged with the built-in rules only.' },
+  {
+    id: 'bundled',
+    label: 'Bundled local model',
+    url: 'http://llm:8080/v1',
+    hint: 'The llm service in Hoard’s docker compose file. Runs on this machine; nothing leaves it.',
+  },
+  {
+    id: 'openrouter',
+    label: 'OpenRouter',
+    url: 'https://openrouter.ai/api/v1',
+    key: true,
+    keyUrl: 'https://openrouter.ai/keys',
+    hint: 'One key for hundreds of hosted models, some of them free. Models that take images are marked.',
+  },
+  {
+    id: 'openai',
+    label: 'OpenAI',
+    url: 'https://api.openai.com/v1',
+    key: true,
+    keyUrl: 'https://platform.openai.com/api-keys',
+    hint: 'Hosted by OpenAI.',
+  },
+  {
+    id: 'anthropic',
+    label: 'Anthropic',
+    url: 'https://api.anthropic.com/v1',
+    key: true,
+    keyUrl: 'https://console.anthropic.com/settings/keys',
+    hint: 'Hosted by Anthropic, through its OpenAI-compatible endpoint.',
+  },
+  {
+    id: 'gemini',
+    label: 'Google Gemini',
+    url: 'https://generativelanguage.googleapis.com/v1beta/openai',
+    key: true,
+    keyUrl: 'https://aistudio.google.com/apikey',
+    hint: 'Hosted by Google, through its OpenAI-compatible endpoint.',
+  },
+  {
+    id: 'ollama',
+    label: 'Ollama',
+    url: 'http://ollama:11434/v1',
+    editUrl: true,
+    hint: 'An Ollama server you run. Change the address if it isn’t a container called ollama.',
+  },
+  {
+    id: 'custom',
+    label: 'Other (OpenAI-compatible)',
+    url: '',
+    editUrl: true,
+    hint: 'Anything that speaks the OpenAI chat API: LM Studio, vLLM, llama.cpp, LiteLLM, …',
+  },
+]
+const trimUrl = (u: string) => u.trim().replace(/\/+$/, '')
+function providerOf(url: string): ProviderId {
+  const u = trimUrl(url)
+  if (!u) return 'off'
+  const exact = PROVIDERS.find((p) => p.url && trimUrl(p.url) === u)
+  if (exact) return exact.id
+  if (/:11434(\/|$)/.test(u)) return 'ollama'
+  return 'custom'
+}
+
+const llm = reactive({ provider: 'off' as ProviderId, url: '', model: '', key: '', removeKey: false, vision: false, batch: 1 })
+const provider = computed(() => PROVIDERS.find((p) => p.id === llm.provider) ?? PROVIDERS[0])
+/** The saved key belongs to the saved address; a different address starts without it. */
+const urlChanged = computed(() => !!s.value && trimUrl(llm.url) !== trimUrl(s.value.llm.url))
+const keptKey = computed(() => !!s.value?.llm.has_key && !urlChanged.value && !llm.removeKey)
+const missingKey = computed(() => !!provider.value.key && !llm.key && !keptKey.value)
 const llmDirty = computed(() => {
   const l = s.value?.llm
-  return !!l && (llm.url !== l.url || llm.model !== l.model || llm.key !== '' || llm.removeKey || llm.vision !== l.vision)
+  if (!l) return false
+  if (llm.provider === 'off') return l.url !== ''
+  return (
+    urlChanged.value || llm.model !== l.model || llm.key !== '' || llm.removeKey || llm.vision !== l.vision ||
+    llm.batch !== l.batch.value
+  )
+})
+const llmReady = computed(
+  () => llm.provider === 'off' || (!!trimUrl(llm.url) && !!llm.model.trim() && !missingKey.value && llm.batch >= 1),
+)
+
+const models = ref<ModelInfo[]>([])
+const modelsState = ref<{ kind: 'idle' | 'loading' | 'ok' | 'error'; text: string }>({ kind: 'idle', text: '' })
+let modelsAsk = 0
+async function loadModels() {
+  const url = trimUrl(llm.url)
+  const ask = ++modelsAsk
+  if (!url || missingKey.value) {
+    models.value = []
+    modelsState.value = { kind: 'idle', text: '' }
+    return
+  }
+  modelsState.value = { kind: 'loading', text: 'Connecting…' }
+  try {
+    // Nothing typed: the server uses the saved key, if this is the address in use.
+    const key = llm.key ? llm.key.trim() : llm.removeKey || urlChanged.value ? '' : undefined
+    const res = await api.llmModels(url, key)
+    if (ask !== modelsAsk) return
+    models.value = res.models
+    const n = res.models.length
+    modelsState.value = {
+      kind: 'ok',
+      text: n ? `Connected · ${n} model${n === 1 ? '' : 's'}` : 'Connected, but it lists no models; type the model’s name',
+    }
+    if (!llm.model && n === 1) chooseModel(res.models[0].id)
+  } catch (e) {
+    if (ask !== modelsAsk) return
+    if (e instanceof ApiError && e.status === 401) emit('unauthorized')
+    models.value = []
+    modelsState.value = { kind: 'error', text: (e as Error).message }
+  }
+}
+/** Picking a listed model also sets "send thumbnails" when the service says whether it takes images. */
+function modelPicked() {
+  const known = models.value.find((m) => m.id === llm.model.trim())?.vision
+  if (known !== undefined) llm.vision = known
+}
+function chooseModel(id: string) {
+  llm.model = id
+  modelPicked()
+}
+function pickProvider(id: ProviderId) {
+  const p = PROVIDERS.find((x) => x.id === id)
+  const cur = s.value?.llm
+  if (!p || !cur) return
+  llm.provider = id
+  llm.key = ''
+  llm.removeKey = false
+  models.value = []
+  modelsState.value = { kind: 'idle', text: '' }
+  if (id !== 'off' && providerOf(cur.url) === id) {
+    // Back to the one in use: put its settings back.
+    Object.assign(llm, { url: cur.url, model: cur.model, vision: cur.vision })
+  } else if (id === 'bundled' && providerOf(cur.default.url) === 'bundled') {
+    // The compose file names the bundled model.
+    Object.assign(llm, { url: cur.default.url, model: cur.default.model, vision: cur.default.vision })
+  } else {
+    Object.assign(llm, { url: p.url, model: '' })
+  }
+  void loadModels()
+}
+const modelLabel = (m: ModelInfo) => [m.name, m.vision ? 'takes images' : ''].filter(Boolean).join(' · ')
+
+// Server options: numbers and addresses wait for Save; the switches apply at once.
+const opts = reactive({ workers: 1, max_upload_mb: 1, max_expand_mb: 1, max_files: 1, public_url: '', soundfont: '' })
+type OptKey = keyof typeof opts
+const OPT_KEYS = Object.keys(opts) as OptKey[]
+const optsDirty = computed(() => !!s.value && OPT_KEYS.some((k) => opts[k] !== s.value!.options[k].value))
+const optsSaved = computed(() => !!s.value && Object.values(s.value.options).some((o) => o.saved))
+function saveOpts() {
+  const cur = s.value
+  if (!cur) return
+  const patch: Record<string, string | number> = {}
+  for (const k of OPT_KEYS) {
+    const v = opts[k]
+    if (v !== cur.options[k].value) patch[k] = typeof v === 'string' ? v.trim() : v
+  }
+  void save(patch as SettingsPatch, 'Server options saved')
+}
+function resetOpts() {
+  const patch: Record<string, null> = {}
+  for (const k of Object.keys(s.value?.options ?? {})) patch[k] = null
+  void save(patch as SettingsPatch, 'Server options are back to the defaults')
+}
+const mib = (n: number) => (n >= 1024 && n % 1024 === 0 ? `${n / 1024} GiB` : `${n} MiB`)
+const defaultsText = computed(() => {
+  const o = s.value?.options
+  if (!o) return ''
+  return [
+    `${o.workers.default} worker${o.workers.default === 1 ? '' : 's'}`,
+    `uploads up to ${mib(o.max_upload_mb.default)}`,
+    `packs up to ${mib(o.max_expand_mb.default)} and ${o.max_files.default.toLocaleString()} files`,
+  ].join(', ')
 })
 
 function take(next: Settings) {
@@ -34,7 +221,19 @@ function take(next: Settings) {
     chosen[k] = modeOf(next[k].value)
     paths[k] = chosen[k] === 'path' ? next[k].value : ''
   }
-  Object.assign(llm, { url: next.llm.url, model: next.llm.model, key: '', removeKey: false, vision: next.llm.vision })
+  Object.assign(llm, {
+    provider: providerOf(next.llm.url),
+    url: next.llm.url,
+    model: next.llm.model,
+    key: '',
+    removeKey: false,
+    vision: next.llm.vision,
+    batch: next.llm.batch.value,
+  })
+  Object.assign(
+    opts,
+    Object.fromEntries(OPT_KEYS.map((k) => [k, next.options[k].value])),
+  )
   schedulePoll()
 }
 
@@ -77,12 +276,18 @@ function usePath(k: ToolKey) {
 }
 
 function saveLlm() {
-  const patch: SettingsPatch = { llm_url: llm.url.trim(), llm_model: llm.model.trim(), llm_vision: llm.vision }
-  if (llm.key) patch.llm_api_key = llm.key
-  else if (llm.removeKey) patch.llm_api_key = ''
-  void save(patch, patch.llm_url ? 'AI tagging settings saved' : 'AI tagging is off')
+  if (llm.provider === 'off') {
+    void save({ llm_url: '' }, 'AI tagging is off')
+    return
+  }
+  const patch: SettingsPatch = { llm_url: trimUrl(llm.url), llm_model: llm.model.trim(), llm_vision: llm.vision }
+  if (llm.batch !== s.value?.llm.batch.value) patch.llm_batch = llm.batch
+  if (llm.key) patch.llm_api_key = llm.key.trim()
+  // A key is only ever sent to the address it was saved with.
+  else if (llm.removeKey || urlChanged.value) patch.llm_api_key = ''
+  void save(patch, `AI tagging: ${provider.value.label}`)
 }
-const resetLlm = () => save({ llm_url: null, llm_model: null, llm_api_key: null, llm_vision: null })
+const resetLlm = () => save({ llm_url: null, llm_model: null, llm_api_key: null, llm_vision: null, llm_batch: null })
 
 // While a tool is being looked for or downloaded, keep its status line current.
 let timer: number | undefined
@@ -135,9 +340,10 @@ const UNREAL: { value: UnrealConvert; label: string; hint: string }[] = [
   { value: 'replace', label: 'Convert, drop originals', hint: 'Saves space once the content is out. Meshes still wait for the Unreal worker.' },
 ]
 
-onMounted(() => {
+onMounted(async () => {
   dlg.value?.showModal()
-  void load()
+  await load()
+  if (s.value?.llm.enabled) void loadModels()
 })
 onBeforeUnmount(() => window.clearTimeout(timer))
 </script>
@@ -196,35 +402,84 @@ onBeforeUnmount(() => window.clearTimeout(timer))
 
       <section>
         <h3>AI tagging</h3>
-        <p class="what">
-          Any OpenAI-compatible endpoint (OpenAI, Ollama, LM Studio, vLLM, …) adds tags and names to new packs. Leave the address
-          empty to tag with the built-in rules only.
-        </p>
+        <p class="what">An AI model names, describes and tags new packs, on top of the built-in rules. Its tags are marked as suggested.</p>
         <form class="llm" @submit.prevent="saveLlm">
-          <label for="llm-url">Address</label>
-          <input id="llm-url" v-model="llm.url" class="field mono" type="url" spellcheck="false" placeholder="http://localhost:11434/v1" />
-          <label for="llm-model">Model</label>
-          <input id="llm-model" v-model="llm.model" class="field mono" type="text" spellcheck="false" placeholder="qwen2.5vl:7b" />
-          <label for="llm-key">API key</label>
-          <div class="key">
-            <input
-              id="llm-key"
-              v-model="llm.key"
-              class="field mono"
-              type="password"
-              autocomplete="off"
-              :placeholder="s.llm.has_key && !llm.removeKey ? 'Saved (type to replace)' : 'None'"
-              @input="llm.removeKey = false"
-            />
-            <button v-if="s.llm.has_key && !llm.key && !llm.removeKey" type="button" class="link" @click="llm.removeKey = true">Remove</button>
-          </div>
+          <label for="llm-provider">Service</label>
+          <select id="llm-provider" class="field" :value="llm.provider" :disabled="busy" @change="pickProvider(($event.target as HTMLSelectElement).value as ProviderId)">
+            <option v-for="p in PROVIDERS" :key="p.id" :value="p.id">{{ p.label }}</option>
+          </select>
           <span />
-          <label class="check"><input v-model="llm.vision" type="checkbox" /> Send thumbnails too (needs a vision model)</label>
+          <p class="hint inline">{{ provider.hint }}</p>
+          <template v-if="llm.provider !== 'off'">
+            <template v-if="provider.editUrl">
+              <label for="llm-url">Address</label>
+              <input
+                id="llm-url"
+                v-model="llm.url"
+                class="field mono"
+                type="url"
+                spellcheck="false"
+                placeholder="http://localhost:1234/v1"
+                @change="loadModels"
+              />
+            </template>
+            <template v-if="provider.key || provider.editUrl">
+              <label for="llm-key">API key</label>
+              <div class="key">
+                <input
+                  id="llm-key"
+                  v-model="llm.key"
+                  class="field mono"
+                  type="password"
+                  autocomplete="off"
+                  :placeholder="keptKey ? 'Saved (type to replace)' : provider.key ? 'Paste your key' : 'None (optional)'"
+                  @input="llm.removeKey = false"
+                  @change="loadModels"
+                />
+                <button v-if="keptKey && !llm.key" type="button" class="link" @click="llm.removeKey = true; loadModels()">Remove</button>
+                <a v-if="provider.keyUrl" class="link" :href="provider.keyUrl" target="_blank" rel="noopener noreferrer">Get a key</a>
+              </div>
+            </template>
+            <label for="llm-model">Model</label>
+            <div class="key">
+              <input
+                id="llm-model"
+                v-model="llm.model"
+                class="field mono"
+                type="text"
+                spellcheck="false"
+                list="llm-models"
+                :placeholder="models.length ? 'Pick or type a model' : 'Model name'"
+                @change="modelPicked"
+              />
+              <button type="button" class="link" :disabled="!trimUrl(llm.url) || missingKey || modelsState.kind === 'loading'" @click="loadModels">
+                {{ modelsState.kind === 'ok' ? 'Refresh' : 'Connect' }}
+              </button>
+            </div>
+            <datalist id="llm-models">
+              <option v-for="m in models" :key="m.id" :value="m.id">{{ modelLabel(m) }}</option>
+            </datalist>
+            <template v-if="modelsState.kind !== 'idle' || missingKey">
+              <span />
+              <p class="status" :data-state="missingKey ? 'off' : { loading: 'looking', ok: 'ready', error: 'unavailable', idle: 'off' }[modelsState.kind]" role="status">
+                <span class="dot" aria-hidden="true" />
+                <span class="text">{{ missingKey ? 'Add the API key to see its models' : modelsState.text }}</span>
+              </p>
+            </template>
+            <span />
+            <label class="check"><input v-model="llm.vision" type="checkbox" /> Send thumbnails too (needs a model that takes images)</label>
+            <label for="llm-batch">Per request</label>
+            <div class="key">
+              <input id="llm-batch" v-model.number="llm.batch" class="field num" type="number" min="1" max="200" />
+              <span class="unit">assets (fewer for small local models, more for big hosted ones)</span>
+            </div>
+          </template>
           <span />
           <div class="row">
-            <button class="btn primary" type="submit" :disabled="busy || !llmDirty">Save</button>
+            <button class="btn primary" type="submit" :disabled="busy || !llmDirty || !llmReady">Save</button>
             <span class="status" :data-state="s.llm.enabled ? 'ready' : 'off'">
-              <span class="dot" aria-hidden="true" /><span class="text">{{ s.llm.enabled ? 'On' : 'Off' }}</span>
+              <span class="dot" aria-hidden="true" />
+              <span class="text">{{ s.llm.enabled ? `On: ${PROVIDERS.find((p) => p.id === providerOf(s!.llm.url))?.label} · ${s.llm.model}` : 'Off' }}</span>
             </span>
           </div>
         </form>
@@ -252,6 +507,66 @@ onBeforeUnmount(() => window.clearTimeout(timer))
         <p v-if="s.unreal_convert.saved" class="default">
           Server default: {{ UNREAL.find((u) => u.value === s!.unreal_convert.default)?.label.toLowerCase() }} ·
           <button type="button" class="link" :disabled="busy" @click="save({ unreal_convert: null })">Use it</button>
+        </p>
+      </section>
+
+      <section>
+        <h3>Server</h3>
+        <div class="switches">
+          <label class="check">
+            <input type="checkbox" :checked="s.options.render.value" :disabled="busy" @change="save({ render: ($event.target as HTMLInputElement).checked })" />
+            Render thumbnails for 3D models
+          </label>
+          <label class="check">
+            <input
+              type="checkbox"
+              :checked="s.options.update_check.value"
+              :disabled="busy"
+              @change="save({ update_check: ($event.target as HTMLInputElement).checked })"
+            />
+            Check GitHub once a day for a new release
+          </label>
+        </div>
+        <form class="llm opts" @submit.prevent="saveOpts">
+          <label for="opt-workers">Background workers</label>
+          <div class="key">
+            <input id="opt-workers" v-model.number="opts.workers" class="field num" type="number" min="1" :max="s.max_workers" />
+            <span class="unit">jobs at once (ingest, tagging, conversions)</span>
+          </div>
+          <label for="opt-upload">Largest upload</label>
+          <div class="key">
+            <input id="opt-upload" v-model.number="opts.max_upload_mb" class="field num" type="number" min="1" />
+            <span class="unit">MiB</span>
+          </div>
+          <label for="opt-expand">Largest pack</label>
+          <div class="key">
+            <input id="opt-expand" v-model.number="opts.max_expand_mb" class="field num" type="number" min="1" />
+            <span class="unit">MiB once unpacked</span>
+          </div>
+          <label for="opt-files">Most files</label>
+          <div class="key">
+            <input id="opt-files" v-model.number="opts.max_files" class="field num" type="number" min="1" />
+            <span class="unit">in one pack</span>
+          </div>
+          <label for="opt-public">Public address</label>
+          <input
+            id="opt-public"
+            v-model="opts.public_url"
+            class="field mono"
+            type="url"
+            spellcheck="false"
+            placeholder="From the browser’s address (e.g. https://hoard.example.com)"
+          />
+          <label for="opt-sf">MIDI SoundFont</label>
+          <input id="opt-sf" v-model="opts.soundfont" class="field mono" type="text" spellcheck="false" placeholder="Found on the server, or built-in" />
+          <span />
+          <div class="row">
+            <button class="btn primary" type="submit" :disabled="busy || !optsDirty">Save</button>
+          </div>
+        </form>
+        <p class="default">
+          Server defaults: {{ defaultsText }}<template v-if="optsSaved">
+            · <button type="button" class="link" :disabled="busy" @click="resetOpts">Use them</button></template>
         </p>
       </section>
     </div>
@@ -310,6 +625,12 @@ h3 { margin: 0 0 0.3rem; font-size: 0.7rem; font-weight: 650; letter-spacing: 0.
 .llm .check { display: inline-flex; gap: 0.45rem; align-items: center; color: var(--text); }
 .llm .row { display: flex; gap: 0.9rem; align-items: center; }
 .llm .row .status { margin: 0; }
+.llm .status, .llm .hint.inline { margin: 0; }
+.llm .num { width: 6.5rem; flex: none; }
+.llm .unit { color: var(--muted); }
+.llm select.field { justify-self: start; min-width: 14rem; max-width: 100%; }
+.switches { display: grid; gap: 0.35rem; margin-bottom: 0.8rem; font-size: var(--step--1); }
+.switches .check { display: inline-flex; gap: 0.45rem; align-items: center; }
 @media (max-width: 30rem) { .llm { grid-template-columns: minmax(0, 1fr); } .llm > span:empty { display: none; } }
 
 .choices { display: grid; gap: 0.4rem; }

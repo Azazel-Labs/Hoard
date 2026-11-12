@@ -53,7 +53,7 @@ fn origin_ok(headers: &HeaderMap, public_url: Option<&str>) -> bool {
 }
 
 fn base_url(state: &AppState, headers: &HeaderMap) -> String {
-    if let Some(u) = &state.cfg.public_url {
+    if let Some(u) = &state.settings.get().public_url {
         return u.trim_end_matches('/').to_owned();
     }
     let host = headers.get(header::HOST).and_then(|v| v.to_str().ok()).unwrap_or("localhost");
@@ -72,7 +72,7 @@ fn authorized(state: &AppState, headers: &HeaderMap) -> bool {
 }
 
 async fn handle(State(state): State<AppState>, headers: HeaderMap, body: String) -> Response {
-    if !origin_ok(&headers, state.cfg.public_url.as_deref()) {
+    if !origin_ok(&headers, state.settings.get().public_url.as_deref()) {
         return (StatusCode::FORBIDDEN, "origin not allowed").into_response();
     }
     let msg: Value = match serde_json::from_str(&body) {

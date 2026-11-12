@@ -1,9 +1,10 @@
 //! Tells the portal when a newer Hoard release is out. Once a day the server asks GitHub for the latest release
 //! (pre-releases and drafts excluded); if it's newer than this build, `GET /api/stats` carries it as `update` and
 //! the portal shows a link to its notes. Nothing is installed: updating is pulling the new image (or binary), and
-//! the database migrates itself on the next start. `HOARD_UPDATE_CHECK=false` turns the check off.
+//! the database migrates itself on the next start. Settings (or `HOARD_UPDATE_CHECK=false`) turns the check off.
 
 use std::sync::RwLock;
+use std::sync::atomic::{AtomicBool, Ordering};
 use std::time::Duration;
 
 use anyhow::{Context, Result};
@@ -14,19 +15,36 @@ const FIRST_CHECK: Duration = Duration::from_secs(60);
 const INTERVAL: Duration = Duration::from_hours(24);
 
 static AVAILABLE: RwLock<Option<UpdateInfo>> = RwLock::new(None);
+static ENABLED: AtomicBool = AtomicBool::new(false);
+static CHANGED: tokio::sync::Notify = tokio::sync::Notify::const_new();
 
 /// The newer release, if the last check found one.
 pub(crate) fn available() -> Option<UpdateInfo> {
     AVAILABLE.read().ok()?.clone()
 }
 
-pub(crate) fn start(enabled: bool) {
-    if !enabled {
-        return;
+/// Turn the check on or off. Turning it on checks within a minute; off forgets what was found.
+pub(crate) fn set_enabled(enabled: bool) {
+    if ENABLED.swap(enabled, Ordering::Relaxed) != enabled {
+        if !enabled && let Ok(mut slot) = AVAILABLE.write() {
+            *slot = None;
+        }
+        CHANGED.notify_one();
     }
+}
+
+pub(crate) fn start(enabled: bool) {
+    ENABLED.store(enabled, Ordering::Relaxed);
     tokio::spawn(async {
-        tokio::time::sleep(FIRST_CHECK).await;
         loop {
+            // Off: wait to be turned on. On: a minute's grace (so a restart loop doesn't hammer GitHub), then check.
+            while !ENABLED.load(Ordering::Relaxed) {
+                CHANGED.notified().await;
+            }
+            tokio::select! {
+                () = tokio::time::sleep(FIRST_CHECK) => {}
+                () = CHANGED.notified() => continue,
+            }
             match latest().await {
                 Ok(latest) => {
                     let newer = latest.filter(|u| is_newer(&u.version, hoard_core::VERSION));
@@ -40,7 +58,10 @@ pub(crate) fn start(enabled: bool) {
                 // Offline, rate-limited, or no release yet: try again tomorrow, quietly.
                 Err(e) => tracing::debug!(error = %format!("{e:#}"), "update check failed"),
             }
-            tokio::time::sleep(INTERVAL).await;
+            tokio::select! {
+                () = tokio::time::sleep(INTERVAL) => {}
+                () = CHANGED.notified() => {}
+            }
         }
     });
 }

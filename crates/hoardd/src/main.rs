@@ -79,7 +79,6 @@ async fn main() -> Result<()> {
         .init();
 
     let cfg = Config::parse();
-    music::configure(cfg.soundfont.clone());
     for dir in [cfg.data_dir.clone(), cfg.staging_dir(), cfg.tmp_dir()] {
         std::fs::create_dir_all(&dir).with_context(|| format!("create {}", dir.display()))?;
     }
@@ -88,7 +87,8 @@ async fn main() -> Result<()> {
     let requeued = db::requeue_stale_jobs(&*pool.get()?)?;
     let settings = settings::Store::load(&cfg, &*pool.get()?)?;
     let effective = settings.get();
-    analyze::set_render_enabled(cfg.render, effective.llm_vision && effective.llm_enabled());
+    analyze::set_render_enabled(effective.render, effective.llm_vision && effective.llm_enabled());
+    music::configure(effective.soundfont.clone());
     let http = reqwest::Client::builder().timeout(Duration::from_secs(180)).build()?;
 
     tracing::info!(
@@ -119,7 +119,7 @@ async fn main() -> Result<()> {
     }
     ffmpeg::start(&effective.ffmpeg, state.cfg.tools_dir());
     convert::start_blender(&state, false);
-    updates::start(state.cfg.update_check);
+    updates::start(effective.update_check);
     analyze::warm_renderer();
     jobs::spawn_workers(&state);
 

@@ -22,12 +22,18 @@ pub(crate) const UNREAL: &str = "unreal_convert";
 /// that's still downloading on the first start of the compose stack.
 const MAX_LLM_ATTEMPTS: i64 = 5;
 
+/// Starts as many workers as Settings can ask for; the ones past the current count stay idle (checking every couple
+/// of seconds, and never taking a wake-up meant for a working one) so the count can change without a restart.
 pub(crate) fn spawn_workers(state: &AppState) {
-    for n in 0..state.cfg.workers.max(1) {
+    for n in 0..crate::settings::MAX_WORKERS {
         let state = std::sync::Arc::clone(state);
         tokio::spawn(async move {
             tracing::debug!(worker = n, "job worker started");
             loop {
+                if n >= state.settings.get().workers {
+                    tokio::time::sleep(Duration::from_secs(2)).await;
+                    continue;
+                }
                 match next_job(&state).await {
                     Ok(Some(job)) => run(&state, job).await,
                     Ok(None) => {

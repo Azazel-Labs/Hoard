@@ -533,8 +533,8 @@ pub(crate) fn ingest_pack(state: &AppState, rt: &Handle, pack_id: &str, auto_nam
     let conn = state.pool.get()?;
     db::set_pack_status(&conn, pack_id, PackStatus::Ingesting, None)?;
 
-    let mut budget =
-        Budget { bytes_left: state.cfg.max_expand_mb.saturating_mul(1 << 20), files_left: state.cfg.max_files };
+    let limits = state.settings.get();
+    let mut budget = Budget { bytes_left: limits.max_expand_mb.saturating_mul(1 << 20), files_left: limits.max_files };
     expand_archives(&staging, &mut budget, 0)?;
     let (root, wrapper_name) = find_root(&staging)?;
 
@@ -543,7 +543,7 @@ pub(crate) fn ingest_pack(state: &AppState, rt: &Handle, pack_id: &str, auto_nam
     files.retain(|f| !is_junk(&rel_of(&root, f)));
     let guids = harvest_unity_guids(&root, &files);
     files.retain(|f| !is_sidecar(&rel_of(&root, f)));
-    anyhow::ensure!(files.len() <= state.cfg.max_files, "pack has too many files (raise HOARD_MAX_FILES)");
+    anyhow::ensure!(files.len() <= limits.max_files, "pack has too many files (raise the limit in Settings)");
     conn.execute(
         "UPDATE packs SET files_total = ?2, files_done = 0 WHERE id = ?1",
         params![pack_id, files.len() as i64],

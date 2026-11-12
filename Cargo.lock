@@ -1749,6 +1749,7 @@ dependencies = [
  "hoard-render",
  "hoard-unreal",
  "http",
+ "http-body-util",
  "image 0.25.10",
  "infer",
  "ktx2",

@@ -188,6 +188,21 @@ export interface ToolSetting {
 
 export type UnrealConvert = 'off' | 'keep' | 'replace'
 
+/** A server option: what's in effect, what the flags give, and whether the portal changed it. */
+export interface OptionSetting<T> {
+  value: T
+  default: T
+  saved: boolean
+}
+
+/** A model an AI service offers (`POST /api/admin/llm/models`). */
+export interface ModelInfo {
+  id: string
+  name?: string
+  /** Whether it takes images, when the service says. */
+  vision?: boolean
+}
+
 export interface Settings {
   blender: ToolSetting
   ffmpeg: ToolSetting
@@ -197,10 +212,24 @@ export interface Settings {
     model: string
     has_key: boolean
     vision: boolean
+    batch: OptionSetting<number>
     enabled: boolean
     saved: boolean
     default: { url: string; model: string; has_key: boolean; vision: boolean }
   }
+  options: {
+    workers: OptionSetting<number>
+    max_upload_mb: OptionSetting<number>
+    max_expand_mb: OptionSetting<number>
+    max_files: OptionSetting<number>
+    render: OptionSetting<boolean>
+    update_check: OptionSetting<boolean>
+    /** Empty: from the request's Host header. */
+    public_url: OptionSetting<string>
+    /** Empty: look in the usual places. */
+    soundfont: OptionSetting<string>
+  }
+  max_workers: number
 }
 
 /** Settings to change; `null` goes back to the server's default. */
@@ -212,6 +241,15 @@ export interface SettingsPatch {
   llm_model?: string | null
   llm_api_key?: string | null
   llm_vision?: boolean | null
+  llm_batch?: number | null
+  workers?: number | null
+  max_upload_mb?: number | null
+  max_expand_mb?: number | null
+  max_files?: number | null
+  render?: boolean | null
+  update_check?: boolean | null
+  public_url?: string | null
+  soundfont?: string | null
 }
 
 export interface SearchParams {
@@ -354,6 +392,13 @@ export const api = {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(patch),
+    }),
+  /** The models an AI service offers; without `api_key`, the saved key is used if `url` is the one in use. */
+  llmModels: (url: string, api_key?: string) =>
+    request<{ models: ModelInfo[] }>('/api/admin/llm/models', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ url, api_key }),
     }),
   /** Start or look in on a "download as" conversion; answers when it moves on, or after `wait` seconds. */
   asStatus: (a: { id: string }, format: string, max?: number, wait = 5) =>

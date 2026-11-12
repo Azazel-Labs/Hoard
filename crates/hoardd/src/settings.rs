@@ -3,6 +3,7 @@
 //!
 //! They live in the database (`settings`, one JSON row), so they survive restarts and backups.
 
+use std::path::PathBuf;
 use std::sync::{Arc, Mutex, PoisonError, RwLock};
 
 use anyhow::{Context, Result};
@@ -11,6 +12,9 @@ use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
 use crate::config::{Config, UnrealConvert};
+
+/// Most background workers the Settings dialog can ask for (`HOARD_WORKERS` can't go past it either).
+pub(crate) const MAX_WORKERS: usize = 16;
 
 /// What's been saved from the portal. `None` means "use the flag".
 #[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
@@ -34,6 +38,26 @@ pub(crate) struct Saved {
     pub(crate) llm_api_key: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub(crate) llm_vision: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub(crate) llm_batch: Option<usize>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub(crate) render: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub(crate) update_check: Option<bool>,
+    /// Empty means "find one on the system".
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub(crate) soundfont: Option<String>,
+    /// Empty means "from the Host header".
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub(crate) public_url: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub(crate) max_upload_mb: Option<u64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub(crate) max_expand_mb: Option<u64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub(crate) max_files: Option<usize>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub(crate) workers: Option<usize>,
 }
 
 /// The settings in effect: saved ones over the flags.
@@ -46,17 +70,34 @@ pub(crate) struct Effective {
     pub(crate) llm_model: Option<String>,
     pub(crate) llm_api_key: Option<String>,
     pub(crate) llm_vision: bool,
+    pub(crate) llm_batch: usize,
+    pub(crate) render: bool,
+    pub(crate) update_check: bool,
+    pub(crate) soundfont: Option<PathBuf>,
+    pub(crate) public_url: Option<String>,
+    pub(crate) max_upload_mb: u64,
+    pub(crate) max_expand_mb: u64,
+    pub(crate) max_files: usize,
+    pub(crate) workers: usize,
 }
 
 impl Effective {
     pub(crate) fn llm_enabled(&self) -> bool {
         self.llm_url.is_some() && self.llm_model.is_some()
     }
+
+    pub(crate) fn max_upload_bytes(&self) -> u64 {
+        self.max_upload_mb.saturating_mul(1 << 20)
+    }
 }
 
 fn non_empty(s: &str) -> Option<String> {
     let s = s.trim();
     (!s.is_empty()).then(|| s.to_owned())
+}
+
+fn is_http(url: &str) -> bool {
+    url.starts_with("http://") || url.starts_with("https://")
 }
 
 impl Saved {
@@ -73,6 +114,18 @@ impl Saved {
             llm_model: pick(&self.llm_model, &cfg.llm_model),
             llm_api_key: pick(&self.llm_api_key, &cfg.llm_api_key),
             llm_vision: self.llm_vision.unwrap_or(cfg.llm_vision),
+            llm_batch: self.llm_batch.unwrap_or(cfg.llm_batch).max(1),
+            render: self.render.unwrap_or(cfg.render),
+            update_check: self.update_check.unwrap_or(cfg.update_check),
+            soundfont: match &self.soundfont {
+                Some(s) => non_empty(s).map(PathBuf::from),
+                None => cfg.soundfont.clone(),
+            },
+            public_url: pick(&self.public_url, &cfg.public_url),
+            max_upload_mb: self.max_upload_mb.unwrap_or(cfg.max_upload_mb),
+            max_expand_mb: self.max_expand_mb.unwrap_or(cfg.max_expand_mb),
+            max_files: self.max_files.unwrap_or(cfg.max_files),
+            workers: self.workers.unwrap_or(cfg.workers).clamp(1, MAX_WORKERS),
         }
     }
 
@@ -85,12 +138,33 @@ impl Saved {
         }
         if let Some(url) = self.llm_url.as_deref().map(str::trim)
             && !url.is_empty()
-            && !(url.starts_with("http://") || url.starts_with("https://"))
+            && !is_http(url)
         {
-            return Err("The LLM address should start with http:// or https://".into());
+            return Err("The AI address should start with http:// or https://".into());
         }
         if effective.llm_url.is_some() && effective.llm_model.is_none() {
-            return Err("Name the model the LLM endpoint should use".into());
+            return Err("Choose the model the AI service should use".into());
+        }
+        if let Some(url) = self.public_url.as_deref().map(str::trim)
+            && !url.is_empty()
+            && !is_http(url)
+        {
+            return Err("The public address should start with http:// or https://".into());
+        }
+        if let Some(sf) = self.soundfont.as_deref().map(str::trim)
+            && !sf.is_empty()
+            && !std::path::Path::new(sf).is_file()
+        {
+            return Err(format!("There's no SoundFont at {sf} on the server"));
+        }
+        if self.workers.is_some_and(|n| !(1..=MAX_WORKERS).contains(&n)) {
+            return Err(format!("Background workers: between 1 and {MAX_WORKERS}"));
+        }
+        if self.llm_batch.is_some_and(|n| !(1..=200).contains(&n)) {
+            return Err("Assets per AI request: between 1 and 200".into());
+        }
+        if self.max_upload_mb == Some(0) || self.max_expand_mb == Some(0) || self.max_files == Some(0) {
+            return Err("Limits can't be zero".into());
         }
         Ok(())
     }
@@ -237,6 +311,35 @@ mod tests {
                 .is_ok()
         );
         assert_eq!(store.get().unreal_convert, UnrealConvert::Replace);
+    }
+
+    #[test]
+    fn server_options_change_without_a_restart() {
+        let cfg = cfg(&["--workers", "2", "--public-url", "https://env.example"]);
+        let c = db();
+        let store = Store::load(&cfg, &c).unwrap();
+        assert_eq!(store.get().workers, 2);
+        assert_eq!(store.get().public_url.as_deref(), Some("https://env.example"));
+
+        let (_, after) = store
+            .update(&cfg, &c, &json!({ "workers": 6, "public_url": "", "max_upload_mb": 10, "render": false }))
+            .unwrap();
+        assert_eq!(after.workers, 6);
+        assert_eq!(after.public_url, None, "an empty address goes back to the Host header");
+        assert_eq!(after.max_upload_bytes(), 10 << 20);
+        assert!(!after.render);
+
+        let msg = |v: Value| match store.update(&cfg, &c, &v) {
+            Err(Ok(m)) => m,
+            other => panic!("expected a refusal, got {other:?}"),
+        };
+        assert!(msg(json!({ "workers": 0 })).contains("workers"));
+        assert!(msg(json!({ "workers": 99 })).contains("workers"));
+        assert!(msg(json!({ "max_files": 0 })).contains("zero"));
+        assert!(msg(json!({ "public_url": "hoard.example" })).contains("http"));
+        assert!(msg(json!({ "soundfont": "/no/such/font.sf2" })).contains("SoundFont"));
+        assert!(msg(json!({ "llm_batch": 0 })).contains("AI request"));
+        assert_eq!(store.get().workers, 6, "a refusal changes nothing");
     }
 
     #[test]

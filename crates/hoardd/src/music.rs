@@ -7,7 +7,7 @@
 
 use std::collections::HashMap;
 use std::path::{Path, PathBuf};
-use std::sync::{Arc, OnceLock};
+use std::sync::{Arc, Mutex, PoisonError};
 
 use anyhow::{Context, Result, ensure};
 use serde_json::{Map, Value, json};
@@ -29,32 +29,49 @@ const SOUNDFONT_PATHS: &[&str] = &[
     "/usr/local/share/soundfonts/default.sf2",
 ];
 
-static SOUNDFONT_PATH: OnceLock<Option<PathBuf>> = OnceLock::new();
+type Font = Option<(Arc<rustysynth::SoundFont>, String)>;
 
-/// Set the SoundFont from config (call once at startup); otherwise the usual paths are searched.
-pub(crate) fn configure(path: Option<PathBuf>) {
-    SOUNDFONT_PATH.set(path).ok();
+/// The configured SoundFont path, and the font loaded from it (`None` until first needed).
+struct FontSlot {
+    path: Option<PathBuf>,
+    font: Option<Font>,
 }
 
-fn soundfont() -> Option<(Arc<rustysynth::SoundFont>, String)> {
-    static FONT: OnceLock<Option<(Arc<rustysynth::SoundFont>, String)>> = OnceLock::new();
-    FONT.get_or_init(|| {
-        let configured = SOUNDFONT_PATH.get().cloned().flatten();
-        let path = configured.or_else(|| SOUNDFONT_PATHS.iter().map(PathBuf::from).find(|p| p.is_file()))?;
-        let mut f = std::io::BufReader::new(std::fs::File::open(&path).ok()?);
-        match rustysynth::SoundFont::new(&mut f) {
-            Ok(sf) => {
-                let name = path.file_name().map(|n| n.to_string_lossy().into_owned()).unwrap_or_default();
-                tracing::info!(soundfont = %path.display(), "MIDI previews use this SoundFont");
-                Some((Arc::new(sf), name))
-            }
-            Err(e) => {
-                tracing::warn!(soundfont = %path.display(), error = ?e, "couldn't load the SoundFont; MIDI uses the built-in synth");
-                None
-            }
+static FONT: Mutex<FontSlot> = Mutex::new(FontSlot { path: None, font: None });
+
+/// Use this SoundFont (from Settings or `HOARD_SOUNDFONT`); `None` searches the usual paths. Can be called again
+/// when the setting changes: the next MIDI render loads the new font.
+pub(crate) fn configure(path: Option<PathBuf>) {
+    let mut slot = FONT.lock().unwrap_or_else(PoisonError::into_inner);
+    if slot.path != path {
+        *slot = FontSlot { path, font: None };
+    }
+}
+
+fn soundfont() -> Font {
+    let mut slot = FONT.lock().unwrap_or_else(PoisonError::into_inner);
+    if let Some(font) = &slot.font {
+        return font.clone();
+    }
+    let font = load_soundfont(slot.path.clone());
+    slot.font = Some(font.clone());
+    font
+}
+
+fn load_soundfont(configured: Option<PathBuf>) -> Font {
+    let path = configured.or_else(|| SOUNDFONT_PATHS.iter().map(PathBuf::from).find(|p| p.is_file()))?;
+    let mut f = std::io::BufReader::new(std::fs::File::open(&path).ok()?);
+    match rustysynth::SoundFont::new(&mut f) {
+        Ok(sf) => {
+            let name = path.file_name().map(|n| n.to_string_lossy().into_owned()).unwrap_or_default();
+            tracing::info!(soundfont = %path.display(), "MIDI previews use this SoundFont");
+            Some((Arc::new(sf), name))
         }
-    })
-    .clone()
+        Err(e) => {
+            tracing::warn!(soundfont = %path.display(), error = ?e, "couldn't load the SoundFont; MIDI uses the built-in synth");
+            None
+        }
+    }
 }
 
 /// The song rendered (up to `max_secs`), and what's known about it.

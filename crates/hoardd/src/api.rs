@@ -27,15 +27,20 @@ use crate::ingest::safe_rel_path;
 use crate::{context, db, jobs};
 
 pub(crate) fn router(state: &AppState) -> Router<AppState> {
-    let max_upload = usize::try_from(state.cfg.max_upload_mb.saturating_mul(1 << 20)).unwrap_or(usize::MAX);
+    // The upload limit is a setting that can change while the server runs, so it's checked per request.
+    let upload_limit = || {
+        tower::ServiceBuilder::new()
+            .layer(DefaultBodyLimit::disable())
+            .layer(middleware::from_fn_with_state(std::sync::Arc::clone(state), limit_upload))
+    };
     let writes = Router::new()
-        .route("/api/packs", post(upload_pack).layer(DefaultBodyLimit::max(max_upload)))
+        .route("/api/packs", post(upload_pack).layer(upload_limit()))
         .route("/api/packs/{id}", axum::routing::delete(delete_pack))
         .route("/api/packs/{id}/retag", post(retag_pack))
         .route("/api/packs/{id}/context", axum::routing::put(put_pack_context))
         .route("/api/packs/{id}/unreal/convert", post(unreal_convert))
         .route("/api/packs/{id}/unreal/finish", post(unreal_finish))
-        .route("/api/assets/{id}/replace", post(replace_asset).layer(DefaultBodyLimit::max(max_upload)))
+        .route("/api/assets/{id}/replace", post(replace_asset).layer(upload_limit()))
         .route("/api/collections", post(create_collection))
         .route("/api/collections/{id}", axum::routing::patch(patch_collection).delete(delete_collection))
         .route("/api/collections/{id}/assets", post(collection_members))
@@ -44,6 +49,7 @@ pub(crate) fn router(state: &AppState) -> Router<AppState> {
         .route("/api/admin/gc", post(admin_gc))
         .route("/api/admin/backup", post(admin_backup))
         .route("/api/admin/settings", get(get_settings).put(put_settings))
+        .route("/api/admin/llm/models", post(llm_models))
         .merge(crate::uploads::router())
         .route_layer(middleware::from_fn_with_state(std::sync::Arc::clone(state), require_token));
 
@@ -95,6 +101,21 @@ async fn require_token(State(state): State<AppState>, req: Request, next: Next) 
         }
     }
     Ok(next.run(req).await)
+}
+
+/// Holds an upload to the "Largest upload" setting as it is now: refused up front when it says it's bigger, and
+/// cut off if it turns out to be.
+async fn limit_upload(State(state): State<AppState>, req: Request, next: Next) -> Response {
+    let limits = state.settings.get();
+    let max = limits.max_upload_bytes();
+    let declared = req.headers().get(header::CONTENT_LENGTH).and_then(|v| v.to_str().ok()?.parse::<u64>().ok());
+    if declared.is_some_and(|n| n > max) {
+        let msg = format!("this upload is over the {} MiB limit (raise it in Settings)", limits.max_upload_mb);
+        return (StatusCode::PAYLOAD_TOO_LARGE, msg).into_response();
+    }
+    let (parts, body) = req.into_parts();
+    let body = Body::new(http_body_util::Limited::new(body, usize::try_from(max).unwrap_or(usize::MAX)));
+    next.run(Request::from_parts(parts, body)).await
 }
 
 // ---------------------------------------------------------------------------------------------
@@ -1374,6 +1395,7 @@ fn settings_json(state: &AppState) -> Value {
             "model": now.llm_model.as_deref().unwrap_or(""),
             "has_key": now.llm_api_key.is_some(),
             "vision": now.llm_vision,
+            "batch": option(now.llm_batch, cfg.llm_batch, saved.llm_batch.is_some()),
             "enabled": now.llm_enabled(),
             "saved": saved.llm_url.is_some() || saved.llm_model.is_some() || saved.llm_api_key.is_some()
                 || saved.llm_vision.is_some(),
@@ -1384,7 +1406,58 @@ fn settings_json(state: &AppState) -> Value {
                 "vision": cfg.llm_vision,
             },
         },
+        // Server options that used to need a restart. `default` is what the flags (or env) give.
+        "options": {
+            "workers": option(now.workers, cfg.workers, saved.workers.is_some()),
+            "max_upload_mb": option(now.max_upload_mb, cfg.max_upload_mb, saved.max_upload_mb.is_some()),
+            "max_expand_mb": option(now.max_expand_mb, cfg.max_expand_mb, saved.max_expand_mb.is_some()),
+            "max_files": option(now.max_files, cfg.max_files, saved.max_files.is_some()),
+            "render": option(now.render, cfg.render, saved.render.is_some()),
+            "update_check": option(now.update_check, cfg.update_check, saved.update_check.is_some()),
+            "public_url": option(
+                now.public_url.as_deref().unwrap_or(""),
+                cfg.public_url.as_deref().unwrap_or(""),
+                saved.public_url.is_some(),
+            ),
+            "soundfont": option(
+                now.soundfont.as_deref().map(|p| p.display().to_string()).unwrap_or_default(),
+                cfg.soundfont.as_deref().map(|p| p.display().to_string()).unwrap_or_default(),
+                saved.soundfont.is_some(),
+            ),
+        },
+        "max_workers": crate::settings::MAX_WORKERS,
     })
+}
+
+#[derive(Deserialize)]
+struct ModelsBody {
+    url: String,
+    /// Absent: the saved key, when `url` is the address in use. Empty: no key.
+    api_key: Option<String>,
+}
+
+/// The models an AI service offers, for the Settings dialog. Doubles as a connection test.
+async fn llm_models(State(state): State<AppState>, Json(body): Json<ModelsBody>) -> ApiResult<Json<Value>> {
+    let url = body.url.trim();
+    if !(url.starts_with("http://") || url.starts_with("https://")) {
+        return Err(AppError::bad_request("The AI address should start with http:// or https://"));
+    }
+    let now = state.settings.get();
+    let key = match body.api_key {
+        Some(k) => Some(k.trim().to_owned()).filter(|k| !k.is_empty()),
+        None if now.llm_url.as_deref().map(|u| u.trim_end_matches('/')) == Some(url.trim_end_matches('/')) => {
+            now.llm_api_key.clone()
+        }
+        None => None,
+    };
+    let models = crate::llm::list_models(&state.http, url, key.as_deref())
+        .await
+        .map_err(|e| AppError::bad_request(format!("{e:#}")))?;
+    Ok(Json(json!({ "models": models })))
+}
+
+fn option(value: impl serde::Serialize, default: impl serde::Serialize, saved: bool) -> Value {
+    json!({ "value": value, "default": default, "saved": saved })
 }
 
 async fn get_settings(State(state): State<AppState>) -> Json<Value> {
@@ -1408,7 +1481,12 @@ async fn put_settings(State(state): State<AppState>, Json(patch): Json<Value>) -
     if before.ffmpeg != after.ffmpeg {
         crate::ffmpeg::start(&after.ffmpeg, state.cfg.tools_dir());
     }
-    crate::analyze::set_render_enabled(state.cfg.render, after.llm_vision && after.llm_enabled());
+    crate::analyze::set_render_enabled(after.render, after.llm_vision && after.llm_enabled());
+    crate::updates::set_enabled(after.update_check);
+    crate::music::configure(after.soundfont.clone());
+    if after.workers > before.workers {
+        state.wake.notify_waiters();
+    }
     tracing::info!(
         blender = %after.blender,
         ffmpeg = %after.ffmpeg,

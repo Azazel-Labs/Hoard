@@ -481,9 +481,12 @@ cached as immutable, and blob downloads carry ETags and Range support.
 
 ## Configuration
 
-Every flag has an env var; `hoardd --help` lists them all. Blender, ffmpeg, the LLM tagger and Unreal conversion can
-also be changed while the server runs, from **Settings** in the portal header (behind the write token). A setting saved
-there wins over its flag or env var until you clear it, and survives restarts and backups.
+Every flag has an env var; `hoardd --help` lists them all. Most of them can also be changed while the server runs, from
+**Settings** in the portal header (behind the write token), and take effect at once. A setting saved there wins over
+its flag or env var until you put it back to the default, and survives restarts and backups. For those the env var is
+just the starting value.
+
+Set before starting (these need a restart):
 
 | Env | Default | |
 |---|---|---|
@@ -493,18 +496,25 @@ there wins over its flag or env var until you clear it, and survives restarts an
 | `HOARD_TLS_CERT` / `_KEY` | – | serve HTTPS (HTTP/2) with this PEM chain and key |
 | `HOARD_TLS_SELF_SIGNED` / `HOARD_TLS_NAMES` | `false` / – | HTTPS with a generated certificate for these names |
 | `HOARD_HTTP3` | `false` | also serve HTTP/3 (needs TLS) |
-| `HOARD_TOKEN` | – | bearer token for uploads, edits, admin and MCP writes; reads stay open |
+| `HOARD_TOKEN` | – | bearer token for uploads, edits, Settings, admin and MCP writes; reads stay open |
 | `HOARD_STORAGE` | `local` | `local` or `s3` |
 | `HOARD_S3_ENDPOINT` / `_BUCKET` / `_REGION` / `_ACCESS_KEY` / `_SECRET_KEY` / `_HEADERS` | – | S3 backend |
-| `HOARD_RENDER` | `true` | wgpu model thumbnails |
+
+Also in Settings:
+
+| Env | Default | |
+|---|---|---|
 | `HOARD_BLENDER` | `off` | Blender for model conversion: `off`, `auto` (installed, else download 4.5 LTS), or a path |
-| `HOARD_SOUNDFONT` | system GM SoundFont | `.sf2` used to render MIDI |
 | `HOARD_FFMPEG` | `auto` | `auto` (system ffmpeg, else download one), a path, or `off` |
 | `HOARD_UNREAL_CONVERT` | `keep` | after ingest, convert Unreal packages: `off`, `keep` (keep the .uasset too) or `replace` |
-| `HOARD_LLM_URL` / `_MODEL` / `_API_KEY` / `_VISION` / `_BATCH` | – | LLM tagger (on when URL and model are both set) |
+| `HOARD_LLM_URL` / `_MODEL` / `_API_KEY` / `_VISION` | – | AI tagger (on when URL and model are both set); Settings has presets for the bundled model, OpenRouter, OpenAI, Anthropic, Gemini and Ollama |
+| `HOARD_LLM_BATCH` | `40` | assets per AI request |
+| `HOARD_RENDER` | `true` | wgpu model thumbnails |
+| `HOARD_UPDATE_CHECK` | `true` | check GitHub once a day for a newer release |
+| `HOARD_SOUNDFONT` | system GM SoundFont | `.sf2` used to render MIDI |
 | `HOARD_PUBLIC_URL` | Host header | absolute links for MCP |
 | `HOARD_MAX_UPLOAD_MB` / `_MAX_EXPAND_MB` / `_MAX_FILES` | 16 GiB / 64 GiB / 200k | upload and zip-bomb limits |
-| `HOARD_WORKERS` | `2` | background job workers |
+| `HOARD_WORKERS` | `2` | background job workers (up to 16) |
 
 ## Keeping it safe
 
@@ -519,18 +529,83 @@ there wins over its flag or env var until you clear it, and survives restarts an
 
 ## API overview
 
-`GET /api/assets?q=&kind=&tags=a,b&pack=&collection=&ext=&sort=&limit=&offset=&hide_supporting=` (results plus
-kind/tag facets) ·
-`GET|PATCH /api/assets/{id}` (PATCH takes `apply_to_family`) · `/api/assets/{id}/file[?download=1]` · `/thumb` ·
-`/bundle.zip[?animations=1]` · `/derivative/{glb,views}` · `GET /api/bundle.zip?ids=a,b,c[&deps=0][&sources=1]` (a selection) · `/derivative/source` (a recovered WAV/PNG) · `GET|POST /api/packs` · `GET|DELETE /api/packs/{id}` ·
-`/retag` · `GET|PUT /context` · `/bundle.zip` · `GET|POST /api/collections` · `GET|PATCH|DELETE /api/collections/{id}` ·
-`POST /api/collections/{id}/assets` (`add`/`remove`) · `/api/collections/{id}/bundle.zip[?sources=1]` ·
-`/files/{path}` (pack files by original path, used by the 3D viewer) · `GET /api/blobs/{hash}` · `GET /api/tags` ·
-`POST /api/packs/{id}/unreal/convert` (`discard_originals`, `drop_unsupported`) · `GET /api/packs/{id}/unreal` ·
-`POST /api/packs/{id}/unreal/finish` · `GET /api/unreal/pending` · `POST /api/assets/{id}/replace?ext=` ·
-`GET /api/assets/{id}/original` · `GET /api/assets/{id}/as/{format}[?max=&wait=]` (+ `/status`) · `POST /api/manifest` · `GET /api/stats` · `GET /api/activity` · `/api/admin/{jobs,scrub,gc,backup}` · `POST /mcp`. Resumable uploads:
-`POST /api/uploads` (file list) · `PUT /api/uploads/{id}/chunk?path=&offset=` (chunks) · `POST /api/uploads/{id}/batch`
-(small files) · `GET|DELETE /api/uploads/{id}` · `POST /api/uploads/{id}/complete`.
+Reads are open. Everything that changes something (and all of Settings) needs `Authorization: Bearer <HOARD_TOKEN>`
+when a token is set; those are marked 🔒.
+
+**Assets**
+
+| Method | Path | |
+|---|---|---|
+| GET | `/api/assets` | search: `q`, `kind`, `tags=a,b`, `pack`, `collection`, `ext`, `sort`, `limit`, `offset`, `hide_supporting`; results plus kind/tag facets |
+| GET | `/api/assets/{id}` | one asset, with tags, metadata and dependencies |
+| PATCH 🔒 | `/api/assets/{id}` | rename, recategorize, describe, tag; `apply_to_family` for a whole variant family |
+| GET | `/api/assets/{id}/file` | the file (`?download=1` to save it) |
+| GET | `/api/assets/{id}/thumb` | thumbnail |
+| GET | `/api/assets/{id}/original` | the file as it came in, when it was converted on ingest |
+| GET | `/api/assets/{id}/derivative/{kind}` | `glb`, `views`, or `source` (a recovered WAV/PNG) |
+| GET | `/api/assets/{id}/as/{format}` | download converted (`?max=` size, `?wait=` seconds); `/status` to follow a slow one |
+| GET | `/api/assets/{id}/bundle.zip` | the asset and everything it needs (`?animations=1`) |
+| POST 🔒 | `/api/assets/{id}/replace?ext=` | swap in a new file (body is the file) |
+| GET | `/api/bundle.zip?ids=a,b,c` | a selection as one zip (`&deps=0`, `&sources=1`) |
+| POST | `/api/manifest` | a flat file list (hash, path, URL) for `ids` or a search, with `include_deps`; what engine tools pull from |
+| GET | `/api/blobs/{hash}` | raw content by BLAKE3 hash |
+| GET | `/api/tags?prefix=` | tag autocomplete |
+
+**Packs**
+
+| Method | Path | |
+|---|---|---|
+| GET | `/api/packs` | all packs |
+| POST 🔒 | `/api/packs` | upload a pack in one request (multipart) |
+| GET | `/api/packs/{id}` | one pack and its status |
+| DELETE 🔒 | `/api/packs/{id}` | delete it (blobs go at the next `gc`) |
+| POST 🔒 | `/api/packs/{id}/retag` | run the tagger again |
+| GET, PUT 🔒 | `/api/packs/{id}/context` | store link, README and notes the tagger reads |
+| GET | `/api/packs/{id}/files/{path}` | a pack file by its original path (the 3D viewer uses this) |
+| GET | `/api/packs/{id}/bundle.zip` | the whole pack |
+
+**Resumable uploads** (what the portal and `hoard push` use)
+
+| Method | Path | |
+|---|---|---|
+| POST 🔒 | `/api/uploads` | start: the list of files and sizes |
+| PUT 🔒 | `/api/uploads/{id}/chunk?path=&offset=` | part of a large file |
+| POST 🔒 | `/api/uploads/{id}/batch` | many small files in one request |
+| GET, DELETE 🔒 | `/api/uploads/{id}` | what's arrived (to resume), or abandon it |
+| POST 🔒 | `/api/uploads/{id}/complete` | all there: ingest it |
+
+**Collections**
+
+| Method | Path | |
+|---|---|---|
+| GET, POST 🔒 | `/api/collections` | list, or create |
+| GET, PATCH 🔒, DELETE 🔒 | `/api/collections/{id}` | one collection |
+| POST 🔒 | `/api/collections/{id}/assets` | `add` / `remove` assets |
+| GET | `/api/collections/{id}/bundle.zip` | all of it as a zip (`?sources=1`) |
+
+**Unreal**
+
+| Method | Path | |
+|---|---|---|
+| GET | `/api/packs/{id}/unreal` | what's converted and what's waiting |
+| POST 🔒 | `/api/packs/{id}/unreal/convert` | convert (`discard_originals`, `drop_unsupported`) |
+| POST 🔒 | `/api/packs/{id}/unreal/finish` | after a worker's replacements: retag, queue previews, free discarded originals |
+| GET | `/api/unreal/pending?limit=` | Unreal packages still waiting for the Unreal worker |
+
+**Server**
+
+| Method | Path | |
+|---|---|---|
+| GET | `/api/health` | `{"ok": true}` |
+| GET | `/api/stats` | counts, storage, renderer, a newer release if there is one |
+| GET | `/api/activity` | background work in progress |
+| GET | `/api/admin/jobs` | the job queue |
+| GET 🔒, PUT 🔒 | `/api/admin/settings` | Settings: read, or change some (`null` goes back to the flag) |
+| POST 🔒 | `/api/admin/llm/models` | `{url, api_key?}`: the models an AI service offers (also a connection test) |
+| POST 🔒 | `/api/admin/scrub` | re-hash every blob |
+| POST 🔒 | `/api/admin/gc` | delete blobs nothing uses |
+| POST 🔒 | `/api/admin/backup` | snapshot the database |
+| POST | `/mcp` | MCP over streamable HTTP (writes need the token) |
 
 ## Repository layout
 

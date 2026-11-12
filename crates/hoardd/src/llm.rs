@@ -4,7 +4,7 @@
 //!
 //! The model sees the pack's context (store page text, README), paths, metadata and the rule tags (plus a numbered
 //! contact sheet of thumbnails when vision is on) and returns nicer names, a category, a one-line description and
-//! extra tags. Its tags are stored with `source = llm` and lower confidence; it never removes or overrides rule or
+//! extra tags. Its tags are stored with `source = ai` and lower confidence; it never removes or overrides rule or
 //! human tags. Variant families (`whoosh_01..12`) are sent once and the answer is shared by every member.
 
 use std::fmt::Write as _;
@@ -167,6 +167,63 @@ fn load_rows(conn: &rusqlite::Connection, pack_id: &str) -> Result<Vec<Row>> {
     Ok(rows)
 }
 
+/// One model an AI service offers, for the Settings dialog's model list.
+#[derive(Debug, serde::Serialize)]
+pub(crate) struct ModelInfo {
+    pub(crate) id: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub(crate) name: Option<String>,
+    /// Whether it takes images, when the service says (`OpenRouter` does).
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub(crate) vision: Option<bool>,
+}
+
+/// Ask an OpenAI-compatible service which models it has (`GET {base}/models`). Also how Settings tests a connection.
+pub(crate) async fn list_models(http: &reqwest::Client, base: &str, key: Option<&str>) -> Result<Vec<ModelInfo>> {
+    let base = base.trim().trim_end_matches('/');
+    let mut req = http.get(format!("{base}/models")).timeout(std::time::Duration::from_secs(20));
+    if let Some(key) = key {
+        req = req.bearer_auth(key);
+        // Anthropic's own model list wants its key header; its chat endpoint takes the bearer.
+        if base.contains("api.anthropic.com") {
+            req = req.header("x-api-key", key).header("anthropic-version", "2023-06-01");
+        }
+    }
+    let resp = req.send().await.with_context(|| format!("couldn't reach {base}"))?;
+    let status = resp.status();
+    let text = resp.text().await.unwrap_or_default();
+    if status == reqwest::StatusCode::UNAUTHORIZED || status == reqwest::StatusCode::FORBIDDEN {
+        bail!("{base} refused the API key ({status})");
+    }
+    if !status.is_success() {
+        bail!("{base} answered {status}: {}", text.chars().take(300).collect::<String>());
+    }
+    let v: Value = serde_json::from_str(&text).with_context(|| format!("{base}/models didn't answer with JSON"))?;
+    Ok(parse_models(&v))
+}
+
+fn parse_models(v: &Value) -> Vec<ModelInfo> {
+    // OpenAI and most others: {"data": [...]}; Ollama's native list: {"models": [...]}.
+    let list = v["data"].as_array().or_else(|| v["models"].as_array()).cloned().unwrap_or_default();
+    let mut out: Vec<ModelInfo> = list
+        .iter()
+        .filter_map(|m| {
+            let id = m["id"].as_str().or_else(|| m["name"].as_str())?;
+            // Gemini lists "models/gemini-…" but takes the bare name.
+            let id = id.strip_prefix("models/").unwrap_or(id).to_owned();
+            let name =
+                m["display_name"].as_str().or_else(|| m["name"].as_str()).filter(|n| *n != id).map(str::to_owned);
+            let vision = m["architecture"]["input_modalities"]
+                .as_array()
+                .map(|mods| mods.iter().any(|x| x.as_str() == Some("image")));
+            Some(ModelInfo { id, name, vision })
+        })
+        .collect();
+    out.sort_by(|a, b| a.id.cmp(&b.id));
+    out.dedup_by(|a, b| a.id == b.id);
+    out
+}
+
 async fn chat(state: &AppState, messages: Value) -> Result<Reply> {
     let cfg = state.settings.get();
     let base = cfg.llm_url.as_deref().context("LLM not configured")?.trim_end_matches('/');
@@ -287,7 +344,7 @@ pub(crate) async fn tag_pack(state: &AppState, pack_id: &str) -> Result<()> {
     let pack_ctx = context_block(&ctx);
     let entries = entries(&rows);
 
-    let batch_size = state.cfg.llm_batch.max(1);
+    let batch_size = state.settings.get().llm_batch;
     let mut done = 0;
     for (batch_no, batch) in entries.chunks(batch_size).enumerate() {
         crate::activity::job_progress(
@@ -398,6 +455,29 @@ fn apply_reply(
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn reads_model_lists_from_the_usual_services() {
+        let openrouter = json!({ "data": [
+            { "id": "z/text", "name": "Z Text", "architecture": { "input_modalities": ["text"] } },
+            { "id": "a/vision", "name": "A Vision", "architecture": { "input_modalities": ["text", "image"] } },
+        ]});
+        let m = parse_models(&openrouter);
+        assert_eq!(m.iter().map(|m| m.id.as_str()).collect::<Vec<_>>(), ["a/vision", "z/text"]);
+        assert_eq!(m[0].vision, Some(true));
+        assert_eq!(m[1].vision, Some(false));
+        assert_eq!(m[0].name.as_deref(), Some("A Vision"));
+
+        let gemini = json!({ "data": [{ "id": "models/gemini-2.5-flash", "object": "model" }] });
+        assert_eq!(parse_models(&gemini)[0].id, "gemini-2.5-flash");
+
+        let anthropic = json!({ "data": [{ "id": "claude-x", "display_name": "Claude X" }] });
+        assert_eq!(parse_models(&anthropic)[0].name.as_deref(), Some("Claude X"));
+
+        let ollama = json!({ "models": [{ "name": "qwen3:8b" }] });
+        let m = parse_models(&ollama);
+        assert_eq!((m[0].id.as_str(), m[0].name.as_deref(), m[0].vision), ("qwen3:8b", None, None));
+    }
 
     #[test]
     fn parses_fenced_json() {

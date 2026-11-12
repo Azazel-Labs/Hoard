@@ -576,6 +576,16 @@ const firstLoad = computed(() => loading.value && !items.value.length)
       </nav>
 
       <div class="actions">
+        <a
+          v-if="stats?.update"
+          class="btn ghost update"
+          :href="stats.update.url"
+          target="_blank"
+          rel="noopener"
+          :title="`Hoard ${stats.update.version} is out (this server runs ${stats.version}). Pull the new image or binary and restart; the database upgrades itself.`"
+        >
+          <span class="dot" aria-hidden="true" /><span class="wide-only">Update </span>{{ stats.update.version }}
+        </a>
         <ActivityIndicator />
         <div class="theme" role="group" aria-label="Theme">
           <button
@@ -902,6 +912,8 @@ const firstLoad = computed(() => loading.value && !items.value.length)
 .pulse { position: absolute; top: 0.35em; right: 0.3em; width: 6px; height: 6px; border-radius: 50%; background: var(--k-model); animation: blink 1.2s infinite; }
 @keyframes blink { 50% { opacity: 0.25; } }
 .actions { display: flex; gap: 0.5rem; margin-left: auto; }
+.update { color: var(--ok); text-decoration: none; white-space: nowrap; }
+.update .dot { width: 0.5em; height: 0.5em; border-radius: 50%; background: currentColor; }
 .narrow-only { display: none; }
 
 .tokenbar { grid-area: token; display: flex; gap: 0.75rem; align-items: center; padding: 0.6rem 1rem; background: var(--raised); font-size: var(--step--1); }

@@ -29,6 +29,7 @@ mod sheet;
 mod sources;
 mod tagger;
 mod textures;
+mod updates;
 mod uploads;
 
 use std::sync::Arc;
@@ -78,7 +79,7 @@ async fn main() -> Result<()> {
     for dir in [cfg.data_dir.clone(), cfg.staging_dir(), cfg.tmp_dir()] {
         std::fs::create_dir_all(&dir).with_context(|| format!("create {}", dir.display()))?;
     }
-    let pool = db::open(&cfg.db_path())?;
+    let pool = db::open(&cfg.db_path(), &cfg.backups_dir())?;
     let blobs = BlobStore::from_config(&cfg)?;
     let requeued = db::requeue_stale_jobs(&*pool.get()?)?;
     let http = reqwest::Client::builder().timeout(Duration::from_secs(180)).build()?;
@@ -102,6 +103,8 @@ async fn main() -> Result<()> {
         Err(e) => tracing::warn!(error = %e, "could not sweep old upload sessions"),
     }
     ffmpeg::start(&state.cfg.ffmpeg, state.cfg.tools_dir());
+    updates::start(state.cfg.update_check);
+    analyze::warm_renderer();
     jobs::spawn_workers(&state);
 
     let mut app = api::router(&state);

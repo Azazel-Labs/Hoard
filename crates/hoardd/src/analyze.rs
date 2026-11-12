@@ -27,6 +27,9 @@ pub(crate) fn set_render_enabled(on: bool, views: bool) {
     VIEWS_ENABLED.store(views, Ordering::Relaxed);
 }
 
+/// What the renderer runs on, for `GET /api/stats`; set once the renderer has been created (or failed to be).
+static RENDERER_STATUS: OnceLock<String> = OnceLock::new();
+
 /// The shared headless renderer, created on first use. `None` if disabled or no adapter exists.
 pub(crate) fn renderer() -> Option<&'static Mutex<hoard_render::Renderer>> {
     if !RENDER_ENABLED.load(Ordering::Relaxed) {
@@ -35,15 +38,40 @@ pub(crate) fn renderer() -> Option<&'static Mutex<hoard_render::Renderer>> {
     RENDERER
         .get_or_init(|| match hoard_render::Renderer::new() {
             Ok(r) => {
-                tracing::info!(adapter = r.adapter_name(), "model thumbnails enabled");
+                let kind = if r.is_hardware() { "gpu" } else { "cpu" };
+                tracing::info!(adapter = r.adapter_name(), backend = r.backend(), kind, "model thumbnails enabled");
+                if !r.is_hardware() {
+                    tracing::info!("no GPU visible: model thumbnails render in software (see docs/DEPLOYMENT.md, GPU)");
+                }
+                let _ = RENDERER_STATUS.set(format!("{kind}: {} ({})", r.adapter_name(), r.backend()));
                 Some(Mutex::new(r))
             }
             Err(e) => {
                 tracing::warn!(error = %format!("{e:#}"), "model thumbnails disabled: no GPU adapter");
+                let _ = RENDERER_STATUS.set(format!("unavailable: {e:#}"));
                 None
             }
         })
         .as_ref()
+}
+
+/// Create the renderer in the background at startup, so the server page can say whether a GPU is in use before the
+/// first model arrives.
+pub(crate) fn warm_renderer() {
+    if RENDER_ENABLED.load(Ordering::Relaxed) {
+        std::thread::spawn(|| {
+            renderer();
+        });
+    }
+}
+
+/// The renderer's state: `gpu: <adapter> (<api>)`, `cpu: <adapter> (<api>)` for a software rasterizer,
+/// `starting`, `off`, or `unavailable: <why>`.
+pub(crate) fn describe_renderer() -> String {
+    if !RENDER_ENABLED.load(Ordering::Relaxed) {
+        return "off".into();
+    }
+    RENDERER_STATUS.get().cloned().unwrap_or_else(|| "starting".into())
 }
 
 pub(crate) fn png_bytes(img: image::RgbaImage) -> anyhow::Result<Vec<u8>> {

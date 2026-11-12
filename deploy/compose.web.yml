@@ -20,7 +20,10 @@ services:
       - "7878:7878"
 
   hoard:
-    build: ..
+    image: ghcr.io/nickdarnell/hoard:${HOARD_VERSION:-latest}   # or `build: ..` to build from this checkout
+    labels:
+      com.centurylinklabs.watchtower.enable: "true"
+      com.centurylinklabs.watchtower.scope: hoard
     restart: unless-stopped
     network_mode: service:tailscale
     environment:
@@ -34,6 +37,21 @@ services:
       HOARD_PUBLIC_URL: https://hoard.example.com
     volumes:
       - hoard-meta:/data
+
+  # Pulls new Hoard images daily and restarts it; the database upgrades itself on start (backed up first).
+  # Pin HOARD_VERSION (e.g. 0.8) to take only patch releases, or remove this service to update by hand.
+  watchtower:
+    image: ghcr.io/nicholas-fedor/watchtower:1.21
+    restart: unless-stopped
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      WATCHTOWER_LABEL_ENABLE: "true"
+      WATCHTOWER_SCOPE: hoard
+      WATCHTOWER_CLEANUP: "true"
+      WATCHTOWER_SCHEDULE: "${HOARD_UPDATE_SCHEDULE:-0 0 4 * * *}"   # seconds-first cron: 04:00 daily
+    labels:
+      com.centurylinklabs.watchtower.scope: hoard
 
 volumes:
   ts-web:

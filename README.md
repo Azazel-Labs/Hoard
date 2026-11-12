@@ -23,7 +23,77 @@ Think of it as an asset store with no checkout.
  └───────────────────────────────┴──────────────────────────────────────────────────────────────────────┘
 ```
 
-## Quick start
+## Install with Docker
+
+Hoard ships as one image for amd64 and arm64: `ghcr.io/nickdarnell/hoard`. Save this as `compose.yml` (it's
+[deploy/compose.yml](deploy/compose.yml)):
+
+```yaml
+services:
+  hoard:
+    image: ghcr.io/nickdarnell/hoard:${HOARD_VERSION:-latest}
+    restart: unless-stopped
+    environment:
+      HOARD_TOKEN: ${HOARD_TOKEN:?set HOARD_TOKEN, e.g. HOARD_TOKEN=$(openssl rand -hex 32)}
+      HOARD_PUBLIC_URL: ${HOARD_PUBLIC_URL:-}
+    volumes:
+      - hoard-data:/data          # database, files, thumbnails, backups
+    ports:
+      - "7878:7878"
+    labels:
+      com.centurylinklabs.watchtower.enable: "true"
+      com.centurylinklabs.watchtower.scope: hoard
+
+  # Keeps Hoard up to date: pulls new images at 04:00 and restarts it.
+  watchtower:
+    image: ghcr.io/nicholas-fedor/watchtower:1.21
+    restart: unless-stopped
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      WATCHTOWER_LABEL_ENABLE: "true"
+      WATCHTOWER_SCOPE: hoard
+      WATCHTOWER_CLEANUP: "true"
+      WATCHTOWER_SCHEDULE: "${HOARD_UPDATE_SCHEDULE:-0 0 4 * * *}"
+    labels:
+      com.centurylinklabs.watchtower.scope: hoard
+
+volumes:
+  hoard-data:
+```
+
+Then start it:
+
+```sh
+echo "HOARD_TOKEN=$(openssl rand -hex 32)" > .env    # the portal asks for this once before uploads and edits
+docker compose up -d                                 # open http://<host>:7878
+```
+
+There's no setup wizard: the library starts empty, so drop a pack onto the portal.
+
+**Updates are automatic.** Watchtower pulls each new release, and Hoard upgrades its database on start, saving a copy
+in `/data/backups` first. Set `HOARD_VERSION=0.8` in `.env` to get patch releases only, or delete the `watchtower`
+service to update by hand (`docker compose pull && docker compose up -d`). The header shows a badge when a newer
+release exists.
+
+**GPU (optional).** Hoard renders 3D model thumbnails on the GPU when it can see one, and in software when it can't.
+The packs page shows which (`GPU: ...` or `No GPU found`). To pass the GPU through, add the overlay for your
+hardware:
+
+```sh
+# NVIDIA: needs the NVIDIA driver and the NVIDIA Container Toolkit on the host
+docker compose -f compose.yml -f compose.gpu-nvidia.yml up -d
+
+# Intel or AMD, including integrated graphics: needs /dev/dri on the host
+echo "RENDER_GID=$(getent group render | cut -d: -f3)" >> .env
+docker compose -f compose.yml -f compose.gpu-dri.yml up -d
+```
+
+Get both overlays from [deploy/](deploy/). They also put the optional local LLM tagger on the GPU (`--profile llm`
+with [compose.private.yml](deploy/compose.private.yml)). Files on a NAS, S3 storage, remote access through Cloudflare
+or Tailscale, and backups are covered in [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md).
+
+## Build from source
 
 ```sh
 # Server (Rust 1.99.1 is pinned in rust-toolchain.toml; rustup installs it automatically)

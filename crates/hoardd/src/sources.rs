@@ -159,7 +159,9 @@ pub(crate) fn read_blend(path: &Path, scan_paths: bool) -> Result<BlendInfo> {
                 let data = r.vec(len as usize)?;
                 let is_lib = code[0] == b'L';
                 for s in c_strings(&data) {
-                    let ext = Path::new(&s).extension().map(|e| format!(".{}", e.to_string_lossy().to_lowercase()));
+                    // Not Path::extension: on Windows, Blender's relative "//dir/file.png" parses as a UNC prefix.
+                    let name = s.rsplit(['/', '\\']).next().unwrap_or(&s);
+                    let ext = name.rsplit_once('.').map(|(_, e)| format!(".{}", e.to_lowercase()));
                     let wanted =
                         ext.is_some_and(|e| if is_lib { e == ".blend" } else { IMAGE_EXTS.contains(&e.as_str()) });
                     if wanted {

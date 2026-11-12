@@ -63,6 +63,11 @@ pub(crate) struct Config {
     #[arg(long, env = "HOARD_TOKEN", hide_env_values = true)]
     pub(crate) token: Option<String>,
 
+    /// Check GitHub once a day for a newer Hoard release and say so in the portal. Sends nothing but the request
+    /// (with a `hoard/<version>` user agent); `false` turns it off.
+    #[arg(long, env = "HOARD_UPDATE_CHECK", default_value_t = true, action = clap::ArgAction::Set)]
+    pub(crate) update_check: bool,
+
     /// Max size of one upload request, in MiB.
     #[arg(long, env = "HOARD_MAX_UPLOAD_MB", default_value_t = 16 * 1024)]
     pub(crate) max_upload_mb: u64,

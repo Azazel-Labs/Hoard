@@ -589,6 +589,22 @@ pub struct Stats {
     /// ffmpeg's state: its version line, `downloading`, `off` or `unavailable: <why>`.
     #[serde(default)]
     pub ffmpeg: String,
+    /// A newer Hoard release than this server, if the daily check found one (`HOARD_UPDATE_CHECK`).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub update: Option<UpdateInfo>,
+    /// What model thumbnails render on: `gpu: <adapter> (<api>)`, `cpu: <adapter> (<api>)` (software, no GPU
+    /// visible), `starting`, `off` or `unavailable: <why>`.
+    #[serde(default)]
+    pub renderer: String,
+}
+
+/// A Hoard release newer than the running server.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct UpdateInfo {
+    /// e.g. `0.9.0`.
+    pub version: String,
+    /// The release page, with its notes.
+    pub url: String,
 }
 
 /// Normalize a tag: lowercase, trimmed, spaces/underscores -> '-', optional `namespace:value`.

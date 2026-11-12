@@ -126,6 +126,8 @@ async fn stats(State(state): State<AppState>) -> ApiResult<Json<Stats>> {
             )?,
             version: env!("CARGO_PKG_VERSION").to_owned(),
             ffmpeg: crate::ffmpeg::describe(),
+            update: crate::updates::available(),
+            renderer: crate::analyze::describe_renderer(),
         })
     })
     .await?;

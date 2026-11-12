@@ -165,6 +165,10 @@ export interface Stats {
   version: string
   /** ffmpeg: its version line, `downloading`, `looking`, `off` or `unavailable: …`. */
   ffmpeg?: string
+  /** A newer Hoard release, when the server's daily check found one (`HOARD_UPDATE_CHECK`). */
+  update?: { version: string; url: string }
+  /** Model thumbnails: `gpu: <adapter> (<api>)`, `cpu: …` (software), `starting`, `off` or `unavailable: …`. */
+  renderer?: string
 }
 
 export interface SearchParams {

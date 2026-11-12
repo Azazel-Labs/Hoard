@@ -1,0 +1,40 @@
+# Hoard on one machine: the server, its files on a local volume, and automatic updates.
+#   HOARD_TOKEN=$(openssl rand -hex 32) docker compose -f deploy/compose.yml up -d     # then open http://<host>:7878
+# GPU for model thumbnails and the local LLM: add -f deploy/compose.gpu-nvidia.yml or -f deploy/compose.gpu-dri.yml.
+# Bigger setups (files on a NAS, remote access) are in docs/DEPLOYMENT.md.
+services:
+  hoard:
+    image: ghcr.io/nickdarnell/hoard:${HOARD_VERSION:-latest}
+    restart: unless-stopped
+    environment:
+      # Uploads, edits and admin calls need this token (the portal asks for it once); browsing doesn't.
+      HOARD_TOKEN: ${HOARD_TOKEN:?set HOARD_TOKEN, e.g. HOARD_TOKEN=$(openssl rand -hex 32)}
+      HOARD_PUBLIC_URL: ${HOARD_PUBLIC_URL:-}
+      HOARD_LLM_URL: ${HOARD_LLM_URL:-}
+      HOARD_LLM_MODEL: ${HOARD_LLM_MODEL:-}
+    volumes:
+      - hoard-data:/data          # database, files, thumbnails, backups
+    ports:
+      - "7878:7878"
+    labels:
+      # Watchtower below updates only containers with these labels.
+      com.centurylinklabs.watchtower.enable: "true"
+      com.centurylinklabs.watchtower.scope: hoard
+
+  # Pulls new Hoard images daily and restarts the container; the database upgrades itself on start (backed up
+  # first). Pin HOARD_VERSION (e.g. 0.8) to take only patch releases, or remove this service to update by hand.
+  watchtower:
+    image: ghcr.io/nicholas-fedor/watchtower:1.21
+    restart: unless-stopped
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      WATCHTOWER_LABEL_ENABLE: "true"
+      WATCHTOWER_SCOPE: hoard
+      WATCHTOWER_CLEANUP: "true"
+      WATCHTOWER_SCHEDULE: "${HOARD_UPDATE_SCHEDULE:-0 0 4 * * *}"   # seconds-first cron: 04:00 daily
+    labels:
+      com.centurylinklabs.watchtower.scope: hoard
+
+volumes:
+  hoard-data:

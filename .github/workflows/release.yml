@@ -1,6 +1,6 @@
 name: release
-# Builds binaries and a multi-arch container image, and publishes a GitHub release with the changelog section as
-# its notes. Runs two ways:
+# Builds binaries and a multi-arch container image, and publishes a GitHub release whose notes are the commit
+# subjects since the previous tag (scripts/release-notes.sh). Runs two ways:
 #   - auto-release.yml calls it after ci passes on main and it has cut and tagged a version (the usual path);
 #   - pushing a v*.*.* tag yourself (scripts/release.sh, then git push origin main vX.Y.Z).
 on:
@@ -90,7 +90,7 @@ jobs:
           exe=""; [[ "${{ matrix.target }}" == *windows* ]] && exe=".exe"
           cp "target/release/hoardd$exe" "target/release/hoard$exe" "$name/"
           cp -r web/dist "$name/web/dist"
-          cp README.md CHANGELOG.md LICENSE* "$name/" 2>/dev/null || true
+          cp README.md LICENSE* "$name/" 2>/dev/null || true
           if [[ -n "$exe" ]]; then
             7z a -tzip "$name.zip" "$name" >/dev/null
           else
@@ -114,13 +114,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-        with: { ref: "refs/tags/${{ env.TAG }}" }
+        with: { ref: "refs/tags/${{ env.TAG }}", fetch-depth: 0 }
       - uses: actions/download-artifact@v4
         with: { pattern: bin-*, path: dist, merge-multiple: true }
-      - name: Release notes from CHANGELOG.md
+      - name: Release notes from the commits since the previous tag
         run: |
           v="${{ needs.check-version.outputs.version }}"
-          awk -v v="$v" '$0 ~ "^## \\[" v "\\]" {on=1; next} /^## \[/ {on=0} on' CHANGELOG.md > notes.md
+          bash scripts/release-notes.sh "$TAG" > notes.md
           printf '\n### Container image\n\n```sh\ndocker pull ghcr.io/%s:%s\n```\n' "${GITHUB_REPOSITORY,,}" "$v" >> notes.md
           (cd dist && sha256sum * > SHA256SUMS)
       - name: Create GitHub release

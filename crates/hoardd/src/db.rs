@@ -15,9 +15,23 @@ use rusqlite::{Connection, OptionalExtension, Row, params, params_from_iter};
 pub(crate) type Pool = r2d2::Pool<SqliteConnectionManager>;
 pub(crate) type Conn = r2d2::PooledConnection<SqliteConnectionManager>;
 
-const SCHEMA_VERSION: i64 = 8;
+/// Schema version of [`BASELINE`]: the schema as of the first published release (0.8.0).
+const BASELINE_VERSION: i64 = 8;
 
-const SCHEMA: &str = "
+/// Changes since the baseline, oldest first. Step `i` takes the database from `BASELINE_VERSION + i` to
+/// `BASELINE_VERSION + i + 1`, inside one transaction, so a failing step leaves the database untouched.
+///
+/// **Append only.** Never edit, reorder or remove a step once it has shipped: databases out there have run it.
+/// And don't change [`BASELINE`] either; a new table, column or index is a new step here. A step can be any SQL
+/// SQLite accepts in a transaction, e.g. `ALTER TABLE packs ADD COLUMN notes TEXT;` or a table rebuild.
+const MIGRATIONS: &[&str] = &[];
+
+/// How many automatic pre-upgrade backups to keep in `<data dir>/backups`.
+const KEEP_UPGRADE_BACKUPS: usize = 5;
+
+/// Frozen: see [`MIGRATIONS`]. Every statement is `IF NOT EXISTS`, which is how databases from before the baseline
+/// (development builds) are brought up to it.
+const BASELINE: &str = "
 CREATE TABLE IF NOT EXISTS blobs (
     hash        TEXT PRIMARY KEY,
     size        INTEGER NOT NULL,
@@ -192,7 +206,9 @@ pub(crate) fn now() -> String {
     time::OffsetDateTime::now_utc().format(&time::format_description::well_known::Rfc3339).unwrap_or_default()
 }
 
-pub(crate) fn open(path: &Path) -> Result<Pool> {
+/// Open the database, upgrading its schema first if this build is newer (backing it up into `backups` before
+/// touching it). Refuses a database written by a newer build rather than guess at a schema it doesn't know.
+pub(crate) fn open(path: &Path, backups: &Path) -> Result<Pool> {
     let manager = SqliteConnectionManager::file(path).with_init(|c| {
         c.execute_batch(
             "PRAGMA journal_mode = WAL;
@@ -203,19 +219,77 @@ pub(crate) fn open(path: &Path) -> Result<Pool> {
         )
     });
     let pool = r2d2::Pool::builder().max_size(12).build(manager).context("open sqlite pool")?;
-    let conn = pool.get()?;
-    migrate(&conn)?;
+    let mut conn = pool.get()?;
+    migrate(&mut conn, backups, MIGRATIONS)?;
     Ok(pool)
 }
 
-fn migrate(conn: &Connection) -> Result<()> {
-    let version: i64 = conn.query_row("PRAGMA user_version", [], |r| r.get(0))?;
-    if version < SCHEMA_VERSION {
-        // Every statement is `IF NOT EXISTS`, so replaying the schema is the migration.
-        conn.execute_batch(SCHEMA)?;
-        conn.execute_batch(&format!("PRAGMA user_version = {SCHEMA_VERSION}"))?;
+fn user_version(conn: &Connection) -> Result<i64> {
+    Ok(conn.query_row("PRAGMA user_version", [], |r| r.get(0))?)
+}
+
+fn migrate(conn: &mut Connection, backups: &Path, steps: &[&str]) -> Result<()> {
+    let target = BASELINE_VERSION + steps.len() as i64;
+    let version = user_version(conn)?;
+    if version > target {
+        anyhow::bail!(
+            "the database is at schema version {version}, but this hoardd {} only knows up to {target}: a newer \
+             Hoard has upgraded it. Run that version again, or restore the backup it made before upgrading \
+             ({}/hoard-pre-upgrade-v{target}-*.db, or older).",
+            env!("CARGO_PKG_VERSION"),
+            backups.display(),
+        );
+    }
+    if version == target {
+        return Ok(());
+    }
+
+    let empty: bool =
+        conn.query_row("SELECT NOT EXISTS (SELECT 1 FROM sqlite_schema WHERE type = 'table')", [], |r| r.get(0))?;
+    if !empty {
+        let path = backup_before_upgrade(conn, backups, version)?;
+        tracing::info!(from = version, to = target, backup = %path.display(), "upgrading the database schema");
+    }
+
+    let step = |conn: &mut Connection, sql: &str, to: i64| -> Result<()> {
+        let tx = conn.transaction()?;
+        tx.execute_batch(sql).with_context(|| format!("database migration to schema version {to}"))?;
+        tx.execute_batch(&format!("PRAGMA user_version = {to}"))?;
+        tx.commit()?;
+        Ok(())
+    };
+    if version < BASELINE_VERSION {
+        step(conn, BASELINE, BASELINE_VERSION)?;
+    }
+    for (i, sql) in steps.iter().enumerate() {
+        let to = BASELINE_VERSION + i as i64 + 1;
+        if to > version {
+            step(conn, sql, to)?;
+        }
     }
     Ok(())
+}
+
+/// Snapshot the database before a schema upgrade, keeping the newest [`KEEP_UPGRADE_BACKUPS`] such snapshots.
+fn backup_before_upgrade(conn: &Connection, dir: &Path, from: i64) -> Result<std::path::PathBuf> {
+    std::fs::create_dir_all(dir).with_context(|| format!("create {}", dir.display()))?;
+    let stamp = now().replace([':', '-'], "").replace('T', "-");
+    let path = dir.join(format!("hoard-pre-upgrade-v{from}-{stamp}.db"));
+    conn.execute("VACUUM INTO ?1", [path.to_string_lossy()])
+        .with_context(|| format!("back up the database to {} before upgrading it", path.display()))?;
+
+    let mut old: Vec<_> = std::fs::read_dir(dir)?
+        .filter_map(|e| e.ok().map(|e| e.path()))
+        .filter(|p| p.file_name().and_then(|n| n.to_str()).is_some_and(|n| n.starts_with("hoard-pre-upgrade-")))
+        .filter_map(|p| Some((p.metadata().ok()?.modified().ok()?, p)))
+        .collect();
+    old.sort();
+    for (_, p) in old.iter().rev().skip(KEEP_UPGRADE_BACKUPS) {
+        if let Err(e) = std::fs::remove_file(p) {
+            tracing::warn!(path = %p.display(), error = %e, "could not remove an old pre-upgrade backup");
+        }
+    }
+    Ok(path)
 }
 
 /// Run blocking DB work off the async runtime.
@@ -967,4 +1041,129 @@ pub(crate) fn finish_job(conn: &Connection, id: i64, error: Option<&str>, retry_
 /// After a crash, anything left `running` gets another go.
 pub(crate) fn requeue_stale_jobs(conn: &Connection) -> Result<usize> {
     Ok(conn.execute("UPDATE jobs SET status = 'queued' WHERE status = 'running'", [])?)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    const SCHEMA_VERSION: i64 = BASELINE_VERSION + MIGRATIONS.len() as i64;
+
+    fn backups_in(dir: &Path) -> Vec<String> {
+        let mut names: Vec<String> = std::fs::read_dir(dir)
+            .map(|rd| rd.filter_map(|e| e.ok()?.file_name().into_string().ok()).collect())
+            .unwrap_or_default();
+        names.sort();
+        names
+    }
+
+    /// A database as the first published release left it: the baseline schema, with a pack in it.
+    fn baseline_db(dir: &Path) -> Connection {
+        let mut conn = Connection::open(dir.join("hoard.db")).unwrap();
+        migrate(&mut conn, &dir.join("backups"), &[]).unwrap();
+        conn.execute(
+            "INSERT INTO packs (id, name, status, created_at) VALUES ('p1', 'Forest', 'ready', '2026-11-11T00:00:00Z')",
+            [],
+        )
+        .unwrap();
+        conn
+    }
+
+    #[test]
+    fn fresh_database_gets_the_whole_schema_without_a_backup() {
+        let dir = tempfile::tempdir().unwrap();
+        let pool = open(&dir.path().join("hoard.db"), &dir.path().join("backups")).unwrap();
+        assert_eq!(user_version(&pool.get().unwrap()).unwrap(), SCHEMA_VERSION);
+        assert_eq!(backups_in(&dir.path().join("backups")), Vec::<String>::new());
+    }
+
+    /// The real migration list applies cleanly to a baseline database and keeps its data. When you add a step to
+    /// MIGRATIONS, extend this with a check that the data you care about survived it.
+    #[test]
+    fn baseline_database_upgrades_to_current() {
+        let dir = tempfile::tempdir().unwrap();
+        let mut conn = baseline_db(dir.path());
+        migrate(&mut conn, &dir.path().join("backups"), MIGRATIONS).unwrap();
+        assert_eq!(user_version(&conn).unwrap(), SCHEMA_VERSION);
+        let name: String = conn.query_row("SELECT name FROM packs WHERE id = 'p1'", [], |r| r.get(0)).unwrap();
+        assert_eq!(name, "Forest");
+    }
+
+    #[test]
+    fn upgrade_backs_up_then_applies_steps_in_order() {
+        let dir = tempfile::tempdir().unwrap();
+        let backups = dir.path().join("backups");
+        let mut conn = baseline_db(dir.path());
+        let steps = ["ALTER TABLE packs ADD COLUMN notes TEXT;", "UPDATE packs SET notes = 'from step 2';"];
+        migrate(&mut conn, &backups, &steps).unwrap();
+
+        assert_eq!(user_version(&conn).unwrap(), BASELINE_VERSION + 2);
+        let notes: String = conn.query_row("SELECT notes FROM packs WHERE id = 'p1'", [], |r| r.get(0)).unwrap();
+        assert_eq!(notes, "from step 2");
+
+        let saved = backups_in(&backups);
+        assert_eq!(saved.len(), 1);
+        assert!(saved[0].starts_with(&format!("hoard-pre-upgrade-v{BASELINE_VERSION}-")), "{saved:?}");
+        let snapshot = Connection::open(backups.join(&saved[0])).unwrap();
+        assert_eq!(user_version(&snapshot).unwrap(), BASELINE_VERSION);
+
+        // Already current: nothing to do, no new backup.
+        migrate(&mut conn, &backups, &steps).unwrap();
+        assert_eq!(backups_in(&backups).len(), 1);
+    }
+
+    #[test]
+    fn failing_step_rolls_back_and_keeps_earlier_steps() {
+        let dir = tempfile::tempdir().unwrap();
+        let mut conn = baseline_db(dir.path());
+        let steps = [
+            "ALTER TABLE packs ADD COLUMN notes TEXT;",
+            "ALTER TABLE packs ADD COLUMN rating INTEGER; ALTER TABLE no_such_table ADD COLUMN x TEXT;",
+        ];
+        let err = migrate(&mut conn, &dir.path().join("backups"), &steps).unwrap_err();
+        assert!(format!("{err:#}").contains(&format!("schema version {}", BASELINE_VERSION + 2)), "{err:#}");
+
+        assert_eq!(user_version(&conn).unwrap(), BASELINE_VERSION + 1);
+        let cols: Vec<String> = conn
+            .prepare("SELECT name FROM pragma_table_info('packs')")
+            .unwrap()
+            .query_map([], |r| r.get(0))
+            .unwrap()
+            .collect::<rusqlite::Result<_>>()
+            .unwrap();
+        assert!(cols.contains(&"notes".to_owned()));
+        assert!(!cols.contains(&"rating".to_owned()), "half of the failed step stuck: {cols:?}");
+    }
+
+    #[test]
+    fn database_from_a_newer_build_is_refused() {
+        let dir = tempfile::tempdir().unwrap();
+        let mut conn = baseline_db(dir.path());
+        conn.execute_batch(&format!("PRAGMA user_version = {}", SCHEMA_VERSION + 1)).unwrap();
+        let err = migrate(&mut conn, &dir.path().join("backups"), MIGRATIONS).unwrap_err();
+        assert!(err.to_string().contains("a newer Hoard has upgraded it"), "{err}");
+    }
+
+    #[test]
+    fn only_the_newest_upgrade_backups_are_kept() {
+        let dir = tempfile::tempdir().unwrap();
+        let backups = dir.path().join("backups");
+        std::fs::create_dir_all(&backups).unwrap();
+        std::fs::write(backups.join("hoard-20260101-000000.db"), b"manual backup").unwrap();
+        let conn = baseline_db(dir.path());
+        for i in 0..(KEEP_UPGRADE_BACKUPS + 2) {
+            let stale = backups.join(format!("hoard-pre-upgrade-v1-2020010{i}-000000.db"));
+            std::fs::write(&stale, b"old").unwrap();
+            let t = std::time::SystemTime::UNIX_EPOCH + std::time::Duration::from_secs(1_000_000 + i as u64);
+            std::fs::File::options().write(true).open(&stale).unwrap().set_modified(t).unwrap();
+        }
+        backup_before_upgrade(&conn, &backups, BASELINE_VERSION).unwrap();
+
+        let left = backups_in(&backups);
+        let upgrades: Vec<_> = left.iter().filter(|n| n.starts_with("hoard-pre-upgrade-")).collect();
+        assert_eq!(upgrades.len(), KEEP_UPGRADE_BACKUPS, "{left:?}");
+        assert!(upgrades.iter().any(|n| n.starts_with(&format!("hoard-pre-upgrade-v{BASELINE_VERSION}-"))));
+        assert!(!left.contains(&"hoard-pre-upgrade-v1-20200100-000000.db".to_owned()), "oldest kept: {left:?}");
+        assert!(left.contains(&"hoard-20260101-000000.db".to_owned()), "manual backups are never pruned");
+    }
 }

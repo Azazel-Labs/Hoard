@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-# Cut a Hoard release: bump versions, date the changelog, run the checks, commit and tag. Never pushes.
+# Cut a Hoard release: bump versions, run the checks, commit and tag. Never pushes.
+# The release notes are the commit subjects since the last tag (scripts/release-notes.sh).
 #
 #   scripts/release.sh 0.2.0                 # full release
 #   scripts/release.sh 0.2.0 --dry-run       # show what would change, touch nothing
@@ -8,7 +9,7 @@
 # Then: git push origin main v0.2.0   (the tag triggers .github/workflows/release.yml)
 set -euo pipefail
 
-usage() { sed -n '2,8p' "$0" | sed 's/^# \{0,1\}//'; exit 2; }
+usage() { sed -n '2,9p' "$0" | sed 's/^# \{0,1\}//'; exit 2; }
 
 version="${1:-}"
 [[ -n "$version" && "$version" != -* ]] || usage
@@ -40,9 +41,8 @@ git rev-parse -q --verify "refs/tags/$tag" >/dev/null && die "tag $tag already e
 branch="$(git branch --show-current)"
 [[ "$branch" == "main" ]] || echo "release: warning: releasing from '$branch', not main" >&2
 
-# The Unreleased section becomes the release notes, so it must say something.
-notes="$(awk '/^## \[Unreleased\]/{on=1; next} /^## \[/{on=0} on' CHANGELOG.md | sed -e '/./,$!d' | sed -e ':a' -e '/^\n*$/{$d;N;ba' -e '}')"
-[[ -n "$notes" ]] || die "CHANGELOG.md has nothing under [Unreleased]"
+notes="$(bash scripts/release-notes.sh HEAD)"
+[[ -n "$notes" ]] || die "nothing has been committed since the last release"
 
 echo "Releasing $current -> $version"
 echo "----- release notes -----"
@@ -50,25 +50,10 @@ echo "$notes"
 echo "-------------------------"
 $dry_run && { echo "(dry run: nothing changed)"; exit 0; }
 
-today="$(date -u +%Y-%m-%d)"
-
 # Versions: the Rust workspace (all crates inherit it) and the web app.
 sed -i.bak "/^\[workspace.package\]/,/^\[/ s/^version = \".*\"/version = \"$version\"/" Cargo.toml && rm Cargo.toml.bak
 cargo update --workspace --quiet
 (cd web && npm version "$version" --no-git-tag-version --allow-same-version >/dev/null)
-
-# Changelog: date the release, open a fresh Unreleased section, fix the compare links.
-repo_url="$(sed -n 's/^\[Unreleased\]: \(.*\)\/compare\/.*/\1/p' CHANGELOG.md)"
-[[ -n "$repo_url" ]] || die "couldn't find the [Unreleased] link at the bottom of CHANGELOG.md"
-awk -v v="$version" -v d="$today" -v url="$repo_url" -v prev="v$current" '
-  /^## \[Unreleased\]/ { print; print ""; print "## [" v "] - " d; next }
-  /^\[Unreleased\]: / {
-    print "[Unreleased]: " url "/compare/v" v "...HEAD"
-    print "[" v "]: " url "/compare/" prev "...v" v
-    next
-  }
-  { print }
-' CHANGELOG.md > CHANGELOG.md.tmp && mv CHANGELOG.md.tmp CHANGELOG.md
 
 if ! $skip_checks; then
   echo "Running checks (fmt, clippy, tests, web build)..."
@@ -78,7 +63,7 @@ if ! $skip_checks; then
   (cd web && npm run build --silent)
 fi
 
-git add Cargo.toml Cargo.lock web/package.json web/package-lock.json CHANGELOG.md
+git add Cargo.toml Cargo.lock web/package.json web/package-lock.json
 git commit --quiet -m "Release $tag" ${commit_args[@]+"${commit_args[@]}"}
 git tag -a "$tag" -F - <<NOTES
 Hoard $version

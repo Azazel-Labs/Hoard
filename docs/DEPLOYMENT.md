@@ -138,6 +138,79 @@ NAS: hoardd in "ingest node" mode ─ writes metadata to D1 (REST API), blobs to
 Topology B gets most of the benefit today (site up while the NAS sleeps, edge caching for downloads) with no new
 code; C removes the VPS. Pick B now and move to C if the VPS starts to feel like overhead.
 
+## Updating
+
+Every compose file here runs the published image `ghcr.io/nickdarnell/hoard` and a
+[Watchtower](https://github.com/nicholas-fedor/watchtower) container. (The original containrrr/watchtower was archived
+in 2025; this fork is maintained and works the same way.) Watchtower checks for a new image at 04:00 every day,
+replaces the Hoard container, and removes the old image. It only touches containers labelled with the `hoard` scope,
+so other containers on the host are left alone.
+
+| Setting (in `.env`) | Effect |
+|---|---|
+| `HOARD_VERSION=latest` (default) | every release |
+| `HOARD_VERSION=0.8` | patch releases of 0.8 only; change it by hand for 0.9 |
+| `HOARD_VERSION=0.8.1` | exactly that version: Watchtower never changes it |
+| `HOARD_VERSION=edge` | every green commit on `main`, between releases |
+| `HOARD_UPDATE_SCHEDULE=0 30 3 * * 0` | when Watchtower checks (cron with a leading seconds field) |
+| `HOARD_UPDATE_CHECK=false` | stop the server from asking GitHub once a day whether a newer release exists |
+
+To update by hand instead, delete the `watchtower` service and run `docker compose pull && docker compose up -d`.
+If you build from a checkout, replace the `image:` line with `build: ..`.
+
+**Database upgrades.** On start, Hoard compares the database's schema version with its own. If the database is
+older, Hoard saves a copy (`<data dir>/backups/hoard-pre-upgrade-v<old>-<time>.db`, newest five kept) and then applies
+each upgrade step in its own transaction, so a failed step leaves the database as it was. If the database is *newer*
+than the server, because you rolled the image back, Hoard refuses to start rather than run against a schema it
+doesn't know. To roll back, stop Hoard, copy the matching `hoard-pre-upgrade-*` file over `hoard.db` (anything added
+since the upgrade is lost), and start the older image.
+
+When a newer release exists, the portal header shows a green badge linking to its release notes. In `GET /api/stats`
+it's the `update` field.
+
+## GPU
+
+Hoard uses a GPU for 3D model thumbnails (wgpu over Vulkan) when the container can see one. Otherwise it falls back
+to Mesa's software renderer (lavapipe), which is already in the image, so a GPU is optional and only makes model
+thumbnails faster. The packs page shows what Hoard found: `GPU: <adapter> (vulkan)`, `No GPU found: model thumbnails
+render in software`, or no renderer at all. The same text is in `GET /api/stats` (`renderer`) and in the startup
+log.
+
+Layer the overlay for your hardware on any compose file that runs `hoard`:
+
+**NVIDIA**: [compose.gpu-nvidia.yml](../deploy/compose.gpu-nvidia.yml). Install the NVIDIA driver and the
+[NVIDIA Container Toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html)
+on the host, run `sudo nvidia-ctk runtime configure --runtime=docker`, and restart Docker. Then:
+
+```sh
+docker compose -f deploy/compose.yml -f deploy/compose.gpu-nvidia.yml up -d
+```
+
+The overlay asks for the `graphics` driver capability as well as `compute`. Without it the toolkit doesn't mount the
+Vulkan driver, and Hoard falls back to software rendering even though `nvidia-smi` works.
+
+**Intel or AMD**, including the integrated graphics in most NAS and mini-PC CPUs:
+[compose.gpu-dri.yml](../deploy/compose.gpu-dri.yml). The host needs `/dev/dri/renderD128`. Hoard runs as an
+unprivileged user, so the overlay adds it to the host's `render` group:
+
+```sh
+echo "RENDER_GID=$(getent group render | cut -d: -f3)" >> deploy/.env
+docker compose -f deploy/compose.yml -f deploy/compose.gpu-dri.yml --env-file deploy/.env up -d
+```
+
+If the host has no `render` group, use the group that owns the device: `stat -c %g /dev/dri/renderD128`.
+
+**The local LLM.** Both overlays also move the bundled tagger model (`--profile llm` in `compose.private.yml`) onto
+the GPU. NVIDIA swaps in the llama.cpp `server-cuda` image and Intel or AMD the `server-vulkan` image, and both
+offload every layer:
+
+```sh
+docker compose -f deploy/compose.private.yml -f deploy/compose.gpu-nvidia.yml --profile llm --env-file deploy/.env up -d
+```
+
+Docker Desktop on Windows passes NVIDIA GPUs through via WSL 2, so the NVIDIA overlay works there. On macOS Docker
+can't reach the GPU, so run `hoardd` natively instead, where it uses Metal.
+
 ## Model conversion with Blender
 
 Set `HOARD_BLENDER=/usr/bin/blender` (or build the image with `--build-arg WITH_BLENDER=1`). After each ingest, a

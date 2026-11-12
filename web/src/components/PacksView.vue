@@ -24,6 +24,14 @@ const ffmpegNote = computed(() => {
   if (f.startsWith('unavailable')) return `ffmpeg ${f}; MP3 and Opus use the built-in encoders.`
   return ''
 })
+/** Whether model thumbnails render on a GPU, in software, or not at all. */
+const gpuNote = computed(() => {
+  const r = props.stats?.renderer ?? ''
+  if (r.startsWith('gpu: ')) return { ok: true, text: `GPU: ${r.slice(5)}.` }
+  if (r.startsWith('cpu: ')) return { ok: false, text: `No GPU found: model thumbnails render in software (${r.slice(5)}).` }
+  if (r.startsWith('unavailable')) return { ok: false, text: 'No GPU or software renderer found, so models get no thumbnails.' }
+  return null
+})
 const shown = computed(() => {
   const q = query.value.trim().toLowerCase()
   if (!q) return props.packs
@@ -186,6 +194,7 @@ async function remove(p: Pack) {
       {{ summary(stats) }} Files live in <span class="mono">{{ stats.storage }}</span>.
       <span v-if="stats.version">Hoard {{ stats.version }}.</span>
       <span v-if="ffmpegNote">{{ ffmpegNote }}</span>
+      <span v-if="gpuNote" :class="{ gpu: gpuNote.ok }" :title="stats.renderer">{{ gpuNote.text }}</span>
       <strong v-if="stats.blobs_bad" class="bad">{{ stats.blobs_bad }} files failed their last integrity check.</strong>
     </p>
 
@@ -364,6 +373,7 @@ async function remove(p: Pack) {
 .packs { padding: 1.25rem 1.5rem 3rem; max-width: 900px; }
 .summary { margin: 0 0 1.25rem; color: var(--muted); font-size: var(--step--1); max-width: 75ch; }
 .bad { color: var(--danger); }
+.gpu { color: var(--ok); }
 .empty { color: var(--muted); }
 ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
 li { padding: 1rem 0; border-top: 1px solid var(--line); display: flex; gap: 1rem; align-items: flex-start; }

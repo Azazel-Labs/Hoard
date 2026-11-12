@@ -114,6 +114,8 @@ pub struct Renderer {
     sampler: wgpu::Sampler,
     white: wgpu::TextureView,
     adapter_name: String,
+    hardware: bool,
+    backend: String,
 }
 
 impl Renderer {
@@ -140,7 +142,14 @@ impl Renderer {
                 .await
                 .context("no GPU adapter found (install a GPU driver or Mesa's lavapipe for software rendering)")?,
         };
-        let adapter_name = adapter.get_info().name;
+        let info = adapter.get_info();
+        let adapter_name = info.name.clone();
+        // lavapipe/llvmpipe and wgpu's fallback report `Cpu`; anything else is a real (or passed-through) GPU.
+        let hardware = matches!(
+            info.device_type,
+            wgpu::DeviceType::DiscreteGpu | wgpu::DeviceType::IntegratedGpu | wgpu::DeviceType::VirtualGpu
+        );
+        let backend = info.backend.to_string();
         let (device, queue) = adapter
             .request_device(&wgpu::DeviceDescriptor {
                 label: Some("hoard-render"),
@@ -237,12 +246,33 @@ impl Renderer {
             ..Default::default()
         });
         let white = upload_rgba(&device, &queue, 1, 1, &[255, 255, 255, 255]);
-        Ok(Self { device, queue, pipeline, globals_layout, material_layout, sampler, white, adapter_name })
+        Ok(Self {
+            device,
+            queue,
+            pipeline,
+            globals_layout,
+            material_layout,
+            sampler,
+            white,
+            adapter_name,
+            hardware,
+            backend,
+        })
     }
 
     /// Name of the adapter in use, e.g. "llvmpipe (LLVM 19.1.7, 256 bits)" for lavapipe.
     pub fn adapter_name(&self) -> &str {
         &self.adapter_name
+    }
+
+    /// Whether the adapter is a GPU (discrete, integrated or virtual) rather than a software rasterizer.
+    pub fn is_hardware(&self) -> bool {
+        self.hardware
+    }
+
+    /// The graphics API in use, e.g. "vulkan".
+    pub fn backend(&self) -> &str {
+        &self.backend
     }
 
     /// Render a .gltf/.glb file; external buffers and images resolve relative to its folder.

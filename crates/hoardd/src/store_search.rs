@@ -1,26 +1,38 @@
-//! Looking a pack up by name in the stores it may have come from, so its store details can be filled in with a click.
+//! Looking a pack up in the stores it may have come from, so its store details can be filled in with a click.
 //!
 //! Fab, `itch.io`, Kenney and `OpenGameArt` are searched from the server. Humble and the Unity Asset Store can't be (one
 //! refuses non-browser clients, the other searches in the page's script), so for those the UI only gets search links.
+//!
+//! A pack's name is often too plain to pick out its listing ("Medieval Village" has dozens), so the pack's own files
+//! are read for clues first: store links in its README, the seller's name ("Created by", "©", `Assets/<Publisher>/`),
+//! product folders (`Content/MedievalVillage`), its engine and how many meshes and textures it has. The name and a
+//! few variants of it are searched, and the clues decide the order.
 
+use std::collections::{BTreeMap, HashMap};
 use std::fmt::Write as _;
 use std::time::Duration;
 
 use anyhow::{Context as _, Result};
 use axum::Json;
 use axum::extract::{Path, Query, State};
+use futures_util::future::join_all;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
-use crate::context::{attr, decode_entities, fetch_page};
+use crate::context::{attr, decode_entities, fetch_page, store_from_url};
 use crate::error::{ApiResult, AppError};
 use crate::{AppState, db};
 
-/// Results kept from each store before ranking.
-const PER_STORE: usize = 5;
+/// Results kept from each store after ranking.
+const PER_STORE: usize = 6;
 const MAX_MATCHES: usize = 12;
 const SEARCH_TIMEOUT: Duration = Duration::from_secs(10);
 const MAX_QUERY: usize = 120;
+/// Searches sent to Fab for one lookup (its search is quick and answers in JSON); the other stores get two.
+const FAB_QUERIES: usize = 4;
+const OTHER_QUERIES: usize = 2;
+/// Files read for clues.
+const MAX_PATHS: i64 = 50_000;
 
 /// Words in pack names that say where a pack is from or what it's for, not what it is.
 const NOISE: &[&str] = &[
@@ -44,6 +56,118 @@ const NOISE: &[&str] = &[
     "copy",
 ];
 
+/// Folder names that say what's in them, not which product they belong to.
+const GENERIC_FOLDERS: &[&str] = &[
+    "content",
+    "assets",
+    "asset",
+    "textures",
+    "texture",
+    "meshes",
+    "mesh",
+    "materials",
+    "material",
+    "maps",
+    "map",
+    "blueprints",
+    "audio",
+    "sounds",
+    "sound",
+    "music",
+    "sfx",
+    "models",
+    "model",
+    "prefabs",
+    "prefab",
+    "scenes",
+    "scene",
+    "demo",
+    "demos",
+    "source",
+    "sources",
+    "fbx",
+    "obj",
+    "gltf",
+    "glb",
+    "blend",
+    "sprites",
+    "sprite",
+    "animations",
+    "animation",
+    "anims",
+    "anim",
+    "characters",
+    "props",
+    "environment",
+    "environments",
+    "fx",
+    "vfx",
+    "particles",
+    "shaders",
+    "shader",
+    "ui",
+    "fonts",
+    "font",
+    "documentation",
+    "docs",
+    "doc",
+    "data",
+    "levels",
+    "level",
+    "plugins",
+    "plugin",
+    "resources",
+    "editor",
+    "scripts",
+    "script",
+    "misc",
+    "extras",
+    "extra",
+    "sample",
+    "samples",
+    "example",
+    "examples",
+    "images",
+    "image",
+    "png",
+    "tga",
+    "psd",
+    "files",
+    "export",
+    "exports",
+    "previews",
+    "preview",
+    "screenshots",
+    "thumbnails",
+    "standard",
+    "hdrp",
+    "urp",
+    "builtin",
+    "packages",
+    "streamingassets",
+    "collections",
+    "developers",
+    "lods",
+    "lod",
+    "static",
+    "skeletal",
+    "decals",
+    "foliage",
+    "landscape",
+    "lighting",
+    "physics",
+    "sounds_and_music",
+    "wav",
+    "ogg",
+    "mp3",
+    "license",
+    "licenses",
+];
+
+/// Words that don't name a product on their own ("Thank you for purchasing this asset").
+const NOT_A_NAME: &[&str] =
+    &["asset", "pack", "package", "product", "this", "it", "our", "the", "my", "item", "content"];
+
 #[derive(Debug, Clone, PartialEq, Serialize)]
 pub(crate) struct StoreMatch {
     store: &'static str,
@@ -58,6 +182,15 @@ pub(crate) struct StoreMatch {
     #[serde(skip_serializing_if = "Option::is_none")]
     price: Option<String>,
     score: f32,
+    /// Why it ranks where it does, beyond its title ("By Marco Maria Rossi, named in the README").
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    why: Vec<String>,
+    /// Engines and tools the listing is made for (`unreal-engine`, `unity`), where the store says.
+    #[serde(skip)]
+    formats: Vec<String>,
+    /// The listing's technical details as plain text, where the store gives them in search results.
+    #[serde(skip)]
+    specs: Option<String>,
 }
 
 #[derive(Debug, Serialize)]
@@ -69,6 +202,10 @@ pub(crate) struct StoreLink {
 #[derive(Debug, Serialize)]
 pub(crate) struct StoreMatches {
     query: String,
+    /// The other searches made from the name and the pack's files.
+    also: Vec<String>,
+    /// What the pack's files gave away, in words ("Seller: Marco Maria Rossi (README)").
+    clues: Vec<String>,
     matches: Vec<StoreMatch>,
     /// Stores that can only be searched in the browser.
     links: Vec<StoreLink>,
@@ -81,6 +218,247 @@ pub(crate) struct MatchQuery {
     q: Option<String>,
 }
 
+/// What a pack's own files say about where it came from.
+#[derive(Debug, Default, PartialEq)]
+pub(crate) struct Clues {
+    /// Product names besides the pack's: folders like `Content/MedievalVillage`, "Thank you for purchasing X".
+    names: Vec<String>,
+    /// Seller names, and where each was seen.
+    sellers: Vec<(String, &'static str)>,
+    /// Store pages the README links to.
+    links: Vec<(&'static str, String)>,
+    /// `unreal-engine`, `unity` or `blender`, from the files' types.
+    engine: Option<&'static str>,
+    meshes: u64,
+    textures: u64,
+}
+
+impl Clues {
+    fn describe(&self) -> Vec<String> {
+        let mut out: Vec<String> = self.names.iter().map(|n| format!("Product: {n}")).collect();
+        out.extend(self.sellers.iter().map(|(s, from)| format!("Seller: {s} ({from})")));
+        out.extend(self.links.iter().map(|(store, _)| format!("The README links to {store}")));
+        if let Some(e) = self.engine {
+            out.push(format!("Files for {}", engine_name(e)));
+        }
+        out
+    }
+}
+
+fn engine_name(code: &str) -> &str {
+    match code {
+        "unreal-engine" => "Unreal Engine",
+        "unity" => "Unity",
+        "blender" => "Blender",
+        other => other,
+    }
+}
+
+fn is_generic(folder: &str) -> bool {
+    let l = folder.to_ascii_lowercase();
+    l.chars().filter(|c| c.is_alphanumeric()).count() < 3
+        || l.starts_with("__")
+        || l.starts_with('.')
+        || GENERIC_FOLDERS.contains(&l.as_str())
+        || l.chars().all(|c| c.is_ascii_digit() || !c.is_alphanumeric())
+}
+
+/// Same words, ignoring case and punctuation.
+fn same_name(a: &str, b: &str) -> bool {
+    words(&search_terms(a)) == words(&search_terms(b))
+}
+
+/// A name cut out of a line of README text: up to the end of its sentence, without a leading year or "our".
+fn clean_name(raw: &str) -> Option<String> {
+    let mut s = raw.trim_start_matches(|c: char| c.is_whitespace() || matches!(c, ':' | '-' | '"' | '\'' | '“'));
+    for stop in [" all rights", " for ", " from ", " - ", " – ", " | ", ". ", "! ", ", ", " (", " <", " http"] {
+        if let Some(i) = s.to_ascii_lowercase().find(stop) {
+            s = &s[..i];
+        }
+    }
+    let s =
+        s.trim_end_matches(|c: char| c.is_whitespace() || matches!(c, '.' | '!' | ',' | ';' | ':' | '"' | '\'' | '”'));
+    let kept: Vec<&str> = s
+        .split_whitespace()
+        .skip_while(|w| {
+            w.chars().all(|c| c.is_ascii_digit() || c == '-' || c == ',')
+                || matches!(w.to_ascii_lowercase().as_str(), "our" | "the" | "this" | "by")
+        })
+        .collect();
+    let name = kept.join(" ");
+    let letters = name.chars().filter(|c| c.is_alphabetic()).count();
+    (letters >= 2 && name.len() <= 48 && kept.len() <= 6).then_some(name)
+}
+
+/// Every store link in some text, each once.
+fn store_links(text: &str) -> Vec<(&'static str, String)> {
+    let mut out: Vec<(&'static str, String)> = Vec::new();
+    for w in text.split(|c: char| c.is_whitespace() || matches!(c, '<' | '>' | '(' | ')' | '"' | '\'' | '[' | ']')) {
+        if !(w.starts_with("https://") || w.starts_with("http://")) {
+            continue;
+        }
+        let url = w.trim_end_matches(['.', ',', ';', ':']);
+        if let Some(store) = store_from_url(url)
+            && !out.iter().any(|(_, u)| u == url)
+        {
+            out.push((store, url.to_owned()));
+        }
+    }
+    out
+}
+
+/// Read a pack's README, file paths and kind counts for hints about which product it is and who made it.
+pub(crate) fn clues(pack_name: &str, readme: Option<&str>, paths: &[String], kinds: &BTreeMap<String, u64>) -> Clues {
+    let mut c = Clues {
+        meshes: kinds.get("model").copied().unwrap_or(0),
+        textures: kinds.get("texture").copied().unwrap_or(0),
+        ..Clues::default()
+    };
+    let mut folders: HashMap<&str, usize> = HashMap::new();
+    let mut publishers: HashMap<&str, usize> = HashMap::new();
+    let (mut unreal, mut unity, mut blender) = (0usize, 0usize, 0usize);
+    for p in paths {
+        let parts: Vec<&str> = p.split('/').filter(|s| !s.is_empty()).collect();
+        let Some((file, dirs)) = parts.split_last() else { continue };
+        match file.rsplit_once('.').map(|(_, e)| e.to_ascii_lowercase()).as_deref() {
+            Some("uasset" | "umap" | "uproject" | "uplugin") => unreal += 1,
+            Some("unity" | "prefab" | "unitypackage" | "asmdef" | "controller" | "anim") => unity += 1,
+            Some("blend") => blender += 1,
+            _ => {}
+        }
+        let at = |name: &str| dirs.iter().position(|d| d.eq_ignore_ascii_case(name));
+        let product = if let Some(i) = at("content") {
+            dirs.get(i + 1)
+        } else if let Some(i) = at("assets") {
+            // Unity: Assets/<Publisher>/<Product>/<what>/…, or Assets/<Product>/<what>/…
+            match (dirs.get(i + 1), dirs.get(i + 2)) {
+                (Some(a), Some(b)) if !is_generic(a) && !is_generic(b) && dirs.len() > i + 3 => {
+                    *publishers.entry(a).or_default() += 1;
+                    Some(b)
+                }
+                (a, _) => a,
+            }
+        } else {
+            dirs.first()
+        };
+        if let Some(f) = product.filter(|f| !is_generic(f)) {
+            *folders.entry(f).or_default() += 1;
+        }
+    }
+    // A product folder holds a good share of the files; the biggest two that aren't just the pack's name.
+    let floor = (paths.len() / 5).max(2);
+    let mut by_size: Vec<(&str, usize)> = folders.into_iter().filter(|(_, n)| *n >= floor).collect();
+    by_size.sort_by(|a, b| b.1.cmp(&a.1).then(a.0.cmp(b.0)));
+    for (f, _) in by_size {
+        let terms = search_terms(f);
+        if c.names.len() < 2
+            && !terms.is_empty()
+            && !same_name(&terms, pack_name)
+            && !c.names.iter().any(|n| same_name(n, &terms))
+        {
+            c.names.push(terms);
+        }
+    }
+    let mut pubs: Vec<(&str, usize)> = publishers.into_iter().filter(|(_, n)| *n >= floor).collect();
+    pubs.sort_by(|a, b| b.1.cmp(&a.1).then(a.0.cmp(b.0)));
+    if let Some((p, _)) = pubs.first() {
+        c.sellers.push((search_terms(p), "folder"));
+    }
+
+    if let Some(text) = readme {
+        c.links = store_links(text).into_iter().take(3).collect();
+        for line in text.lines().map(str::trim).filter(|l| !l.is_empty()).take(300) {
+            let lower = line.to_ascii_lowercase();
+            for key in [
+                "thank you for purchasing",
+                "thanks for purchasing",
+                "thank you for buying",
+                "thanks for buying",
+                "thank you for downloading",
+                "thanks for downloading",
+                "thank you for choosing",
+            ] {
+                if let Some(name) = lower.find(key).and_then(|i| clean_name(&line[i + key.len()..])) {
+                    let terms = search_terms(&name);
+                    let meaningful = words(&terms).iter().any(|w| !NOT_A_NAME.contains(&w.as_str()));
+                    if meaningful
+                        && c.names.len() < 3
+                        && !same_name(&terms, pack_name)
+                        && !c.names.iter().any(|n| same_name(n, &terms))
+                    {
+                        c.names.push(terms);
+                    }
+                }
+            }
+            for key in [
+                "created by",
+                "made by",
+                "developed by",
+                "published by",
+                "author:",
+                "publisher:",
+                "copyright",
+                "©",
+                "(c)",
+            ] {
+                if let Some(seller) = lower.find(key).and_then(|i| clean_name(&line[i + key.len()..])) {
+                    let seller = seller
+                        .trim_start_matches(|c: char| {
+                            matches!(c, '©' | '(' | ')') || c.is_whitespace() || c.is_ascii_digit()
+                        })
+                        .trim()
+                        .to_owned();
+                    let seller = seller
+                        .strip_prefix("(c)")
+                        .or_else(|| seller.strip_prefix("(C)"))
+                        .map_or(seller.as_str(), str::trim)
+                        .to_owned();
+                    if seller.chars().filter(|c| c.is_alphabetic()).count() >= 2
+                        && c.sellers.len() < 3
+                        && !c.sellers.iter().any(|(s, _)| s.eq_ignore_ascii_case(&seller))
+                    {
+                        c.sellers.push((seller, "README"));
+                    }
+                    break;
+                }
+            }
+        }
+    }
+    c.engine = if unreal > 0 {
+        Some("unreal-engine")
+    } else if unity > 0 {
+        Some("unity")
+    } else if blender > 0 {
+        Some("blender")
+    } else {
+        None
+    };
+    c
+}
+
+/// What to search for: the name, the product names from the files, and shorter pieces of the name (a listing
+/// called "Medieval Village" doesn't come up for "Medieval Village Props").
+fn queries(primary: &str, typed: bool, clues: &Clues) -> Vec<String> {
+    let mut out: Vec<String> = vec![primary.to_owned()];
+    let mut add = |q: String| {
+        if !q.trim().is_empty() && !out.iter().any(|o| o.eq_ignore_ascii_case(&q)) {
+            out.push(q);
+        }
+    };
+    if !typed {
+        clues.names.iter().cloned().for_each(&mut add);
+    }
+    let w: Vec<&str> = primary.split_whitespace().collect();
+    if w.len() >= 3 {
+        add(w[..w.len() - 1].join(" "));
+        add(w[1..].join(" "));
+    }
+    if !typed && let Some((seller, _)) = clues.sellers.first() {
+        add(format!("{seller} {primary}"));
+    }
+    out
+}
+
 /// `GET /api/packs/{id}/store-matches?q=`: likely store pages for a pack, best first. `q` defaults to the pack's name.
 pub(crate) async fn store_matches(
     State(state): State<AppState>,
@@ -88,10 +466,23 @@ pub(crate) async fn store_matches(
     Query(mq): Query<MatchQuery>,
 ) -> ApiResult<Json<StoreMatches>> {
     let id2 = id.clone();
-    let pack = db::call(&state.pool, move |c| db::get_pack(c, &id2))
-        .await?
-        .ok_or_else(|| AppError::not_found(format!("pack {id}")))?;
-    let query: String = match mq.q.as_deref().map(str::trim).filter(|q| !q.is_empty()) {
+    let found = db::call(&state.pool, move |c| {
+        let Some(pack) = db::get_pack(c, &id2)? else { return Ok(None) };
+        let readme = db::pack_context(c, &id2)?.readme;
+        let mut stmt = c.prepare(
+            "SELECT COALESCE(o.path, a.path) FROM assets a LEFT JOIN asset_origin o ON o.asset_id = a.id
+             WHERE a.pack_id = ?1 LIMIT ?2",
+        )?;
+        let paths = stmt
+            .query_map(rusqlite::params![id2, MAX_PATHS], |r| r.get::<_, String>(0))?
+            .collect::<Result<Vec<_>, _>>()?;
+        Ok(Some((pack, readme, paths)))
+    })
+    .await?;
+    let (pack, readme, paths) = found.ok_or_else(|| AppError::not_found(format!("pack {id}")))?;
+    let clues = clues(&pack.name, readme.as_deref(), &paths, &pack.kinds);
+    let typed = mq.q.as_deref().map(str::trim).filter(|q| !q.is_empty());
+    let query: String = match typed {
         Some(q) => q.split_whitespace().collect::<Vec<_>>().join(" "),
         None => search_terms(&pack.name),
     }
@@ -101,40 +492,56 @@ pub(crate) async fn store_matches(
     if query.is_empty() {
         return Err(AppError::bad_request("nothing to search for; type the pack's name"));
     }
+    let all = queries(&query, typed.is_some(), &clues);
 
     let http = &state.http;
-    let (fab, itch, kenney, oga) = tokio::join!(
-        search(
-            http,
-            "Fab",
-            url_with("https://www.fab.com/i/listings/search", "q", &query),
-            "application/json",
-            parse_fab
-        ),
-        search(http, "itch.io", url_with("https://itch.io/search", "q", &query), "text/html", |b| Ok(parse_itch(b))),
-        search(http, "Kenney", url_with("https://kenney.nl/assets", "search", &query), "text/html", |b| Ok(
-            parse_kenney(b)
-        )),
-        search(
-            http,
-            "OpenGameArt",
-            url_with("https://opengameart.org/art-search-advanced", "keys", &query),
-            "text/html",
-            |b| Ok(parse_opengameart(b)),
-        ),
-    );
+    let fab = join_all(all.iter().take(FAB_QUERIES).enumerate().map(|(i, q)| search_fab(http, q, i == 0)));
+    let others = join_all(all.iter().take(OTHER_QUERIES).flat_map(|q| {
+        [
+            search(http, "itch.io", url_with("https://itch.io/search", "q", q), "text/html", |b| Ok(parse_itch(b))),
+            search(http, "Kenney", url_with("https://kenney.nl/assets", "search", q), "text/html", |b| {
+                Ok(parse_kenney(b))
+            }),
+            search(
+                http,
+                "OpenGameArt",
+                url_with("https://opengameart.org/art-search-advanced", "keys", q),
+                "text/html",
+                |b| Ok(parse_opengameart(b)),
+            ),
+        ]
+    }));
+    let pages = join_all(clues.links.iter().map(|(store, url)| linked_page(http, store, url)));
+    let (fab, others, pages) = tokio::join!(fab, others, pages);
+
     let mut matches = Vec::new();
-    let mut failed = Vec::new();
-    for (store, found) in [("Fab", fab), ("itch.io", itch), ("Kenney", kenney), ("OpenGameArt", oga)] {
+    let mut tried: HashMap<&'static str, (usize, usize)> = HashMap::new();
+    let stores = std::iter::repeat_n("Fab", fab.len())
+        .chain(["itch.io", "Kenney", "OpenGameArt"].into_iter().cycle().take(others.len()));
+    for (store, found) in stores.zip(fab.into_iter().chain(others)) {
+        let t = tried.entry(store).or_default();
+        t.0 += 1;
         match found {
-            Ok(found) => matches.extend(found.into_iter().take(PER_STORE)),
+            Ok(found) => matches.extend(found),
             Err(e) => {
+                t.1 += 1;
                 tracing::info!(store, error = %format!("{e:#}"), "store search failed");
-                failed.push(store);
             }
         }
     }
-    let matches = rank(&query, matches);
+    let mut failed: Vec<&'static str> = ["Fab", "itch.io", "Kenney", "OpenGameArt"]
+        .into_iter()
+        .filter(|s| tried.get(s).is_some_and(|(n, bad)| n == bad))
+        .collect();
+    failed.dedup();
+    // A page the README links to is as good as it gets; if a search turned it up too, that one carries the details.
+    for page in pages.into_iter().flatten() {
+        match matches.iter_mut().find(|m| same_page(&m.url, &page.url)) {
+            Some(m) => m.why.insert(0, "Linked in the pack's README".to_owned()),
+            None => matches.push(page),
+        }
+    }
+    let matches = rank(&query, &clues, matches);
     let links = vec![
         StoreLink {
             store: "Unity Asset Store",
@@ -145,7 +552,14 @@ pub(crate) async fn store_matches(
             url: url_with("https://www.humblebundle.com/store/search", "search", &query),
         },
     ];
-    Ok(Json(StoreMatches { query, matches, links, failed }))
+    Ok(Json(StoreMatches {
+        query,
+        also: all.into_iter().skip(1).collect(),
+        clues: clues.describe(),
+        matches,
+        links,
+        failed,
+    }))
 }
 
 async fn search(
@@ -159,6 +573,54 @@ async fn search(
         .await
         .with_context(|| format!("{store} took too long"))??;
     parse(&body)
+}
+
+/// One Fab search; with `deep`, its second page of results too.
+async fn search_fab(http: &reqwest::Client, q: &str, deep: bool) -> Result<Vec<StoreMatch>> {
+    let url = url_with("https://www.fab.com/i/listings/search", "q", q);
+    let body = tokio::time::timeout(SEARCH_TIMEOUT, fetch_page(http, &url, "application/json"))
+        .await
+        .context("Fab took too long")??;
+    let (mut found, next) = parse_fab_page(&body)?;
+    if deep && let Some(cursor) = next {
+        let more =
+            reqwest::Url::parse_with_params("https://www.fab.com/i/listings/search", [("q", q), ("cursor", &cursor)])
+                .map(String::from)
+                .context("Fab's next page")?;
+        if let Ok(Ok(body)) = tokio::time::timeout(SEARCH_TIMEOUT, fetch_page(http, &more, "application/json")).await
+            && let Ok((page, _)) = parse_fab_page(&body)
+        {
+            found.extend(page);
+        }
+    }
+    Ok(found)
+}
+
+/// A store page the README links to, with its title read from the page (or its address, if it can't be fetched).
+async fn linked_page(http: &reqwest::Client, store: &'static str, url: &str) -> Option<StoreMatch> {
+    let title = match tokio::time::timeout(SEARCH_TIMEOUT, fetch_page(http, url, "text/html")).await {
+        Ok(Ok(html)) => html.find("<title").and_then(|i| {
+            let rest = &html[i..];
+            let open = rest.find('>')?;
+            Some(inner_text(&rest[open + 1..], "</title>").trim().to_owned())
+        }),
+        _ => None,
+    }
+    .filter(|t| !t.is_empty())
+    .unwrap_or_else(|| url.to_owned());
+    let mut m = found(store, &title, url.replace("http://", "https://"))?;
+    m.why.push("Linked in the pack's README".to_owned());
+    Some(m)
+}
+
+/// The same page, ignoring the scheme, `www.`, a trailing slash and the query.
+fn same_page(a: &str, b: &str) -> bool {
+    let norm = |u: &str| {
+        let u = u.split_once("://").map_or(u, |(_, r)| r);
+        let u = u.strip_prefix("www.").unwrap_or(u);
+        u.split(['?', '#']).next().unwrap_or(u).trim_end_matches('/').to_ascii_lowercase()
+    };
+    norm(a) == norm(b)
 }
 
 /// The words of a pack name worth searching for: separators become spaces, `CamelCase` is split, and version
@@ -217,18 +679,106 @@ fn score(query: &[String], title: &str) -> f32 {
     0.7 * hits / q + 0.3 * hits / t
 }
 
-/// Matches that share a word with the query, best first.
-fn rank(query: &str, matches: Vec<StoreMatch>) -> Vec<StoreMatch> {
-    let query = words(query);
-    let mut kept: Vec<StoreMatch> = matches
-        .into_iter()
-        .map(|mut m| {
-            m.score = (score(&query, &m.title) * 100.0).round() / 100.0;
-            m
-        })
-        .filter(|m| m.score > 0.0)
-        .collect();
-    kept.sort_by(|a, b| b.score.total_cmp(&a.score));
+/// Letters and digits only, lower case, for comparing names written differently (`Synty Studios`, `SyntyStudios`).
+fn squash(s: &str) -> String {
+    s.chars().filter(|c| c.is_alphanumeric()).flat_map(char::to_lowercase).collect()
+}
+
+/// The number a listing's technical details give for something ("Number of Meshes: 496", "173 textures").
+fn spec_count(specs: &str, stem: &str) -> Option<u64> {
+    let lower = specs.to_lowercase();
+    let number = |s: &str| -> Option<u64> {
+        let digits: String = s
+            .chars()
+            .skip_while(|c| !c.is_ascii_digit())
+            .take_while(|c| c.is_ascii_digit() || *c == ',')
+            .filter(char::is_ascii_digit)
+            .collect();
+        digits.parse().ok()
+    };
+    lower.match_indices(stem).find_map(|(i, _)| {
+        // "Meshes: 496": a number just after; "496 static meshes": a number just before.
+        let after: String = lower[i..].chars().skip_while(|c| c.is_alphabetic()).take(14).collect();
+        let after_ok = after.trim_start().starts_with(|c: char| c == ':' || c == '-' || c == '(' || c.is_ascii_digit());
+        if after_ok && let Some(n) = number(&after) {
+            return Some(n);
+        }
+        let before: String = lower[..i].chars().rev().take(18).collect::<Vec<_>>().into_iter().rev().collect();
+        let tail = before.split(['.', ';', ':', '\n']).next_back().unwrap_or("");
+        let n: String = tail.split_whitespace().rfind(|w| w.chars().any(|c| c.is_ascii_digit()))?.to_owned();
+        number(&n)
+    })
+}
+
+/// Close enough to be the same pack: within 15%.
+#[expect(clippy::cast_precision_loss, reason = "asset counts are far below 2^52")]
+fn about(a: u64, b: u64) -> bool {
+    a > 0 && b > 0 && (a.min(b) as f64) / (a.max(b) as f64) >= 0.85
+}
+
+/// Score each match against the name and the clues and keep the likely ones, best first.
+fn rank(query: &str, clues: &Clues, matches: Vec<StoreMatch>) -> Vec<StoreMatch> {
+    let primary = words(query);
+    let others: Vec<Vec<String>> = clues.names.iter().map(|n| words(n)).collect();
+    let mut kept: Vec<StoreMatch> = Vec::new();
+    for mut m in matches {
+        if let Some(k) = kept.iter_mut().find(|k| same_page(&k.url, &m.url)) {
+            // The same listing from two searches: keep one, with every reason.
+            for w in m.why.drain(..) {
+                if !k.why.contains(&w) {
+                    k.why.push(w);
+                }
+            }
+            continue;
+        }
+        let by_name = others.iter().map(|o| 0.9 * score(o, &m.title)).fold(score(&primary, &m.title), f32::max);
+        let mut s = by_name;
+        if m.why.iter().any(|w| w.starts_with("Linked")) {
+            s = 1.0;
+        }
+        if let Some(author) = m.author.as_deref().map(squash).filter(|a| a.len() >= 3)
+            && let Some((seller, from)) = clues.sellers.iter().find(|(s, _)| {
+                let s = squash(s);
+                s.len() >= 3 && (author.contains(&s) || s.contains(&author))
+            })
+        {
+            s += 0.35;
+            m.why.push(format!(
+                "By {}, named in the pack's {}",
+                m.author.as_deref().unwrap_or(seller),
+                if *from == "README" { "README" } else { "folders" }
+            ));
+        }
+        if let Some(specs) = m.specs.as_deref() {
+            if clues.meshes >= 5 && spec_count(specs, "mesh").is_some_and(|n| about(n, clues.meshes)) {
+                s += 0.2;
+                m.why.push(format!("About as many meshes as the pack ({})", clues.meshes));
+            }
+            if clues.textures >= 5 && spec_count(specs, "texture").is_some_and(|n| about(n, clues.textures)) {
+                s += 0.15;
+                m.why.push(format!("About as many textures as the pack ({})", clues.textures));
+            }
+        }
+        // A listing for another engine is less likely, though the same art is often sold for several.
+        if let Some(engine) = clues.engine
+            && !m.formats.is_empty()
+            && !m.formats.iter().any(|f| f == engine)
+        {
+            s -= 0.15;
+        }
+        if by_name <= 0.0 && m.why.is_empty() {
+            continue;
+        }
+        m.score = (s.clamp(0.0, 1.0) * 100.0).round() / 100.0;
+        kept.push(m);
+    }
+    kept.sort_by(|a, b| b.score.total_cmp(&a.score).then(b.why.len().cmp(&a.why.len())));
+    let mut per: HashMap<&'static str, usize> = HashMap::new();
+    kept.retain(|m| {
+        let n = per.entry(m.store).or_default();
+        *n += 1;
+        *n <= PER_STORE || !m.why.is_empty()
+    });
     kept.truncate(MAX_MATCHES);
     kept
 }
@@ -264,14 +814,19 @@ fn found(store: &'static str, title: &str, url: String) -> Option<StoreMatch> {
         thumb: None,
         price: None,
         score: 0.0,
+        why: Vec::new(),
+        formats: Vec::new(),
+        specs: None,
     })
 }
 
-/// Fab's listing search, which answers in JSON.
-fn parse_fab(body: &str) -> Result<Vec<StoreMatch>> {
+/// A page of Fab's listing search, which answers in JSON, and the cursor for the next page.
+fn parse_fab_page(body: &str) -> Result<(Vec<StoreMatch>, Option<String>)> {
     let v: Value = serde_json::from_str(body).context("Fab's answer isn't JSON")?;
     let results = v["results"].as_array().context("Fab's answer has no results")?;
-    Ok(results
+    let next =
+        v["cursors"]["next"].as_str().or_else(|| v["next"].as_str()).filter(|c| c.len() < 200).map(str::to_owned);
+    let found = results
         .iter()
         .filter_map(|r| {
             let uid = r["uid"].as_str().filter(|u| u.chars().all(|c| c.is_ascii_alphanumeric() || c == '-'))?;
@@ -287,9 +842,19 @@ fn parse_fab(body: &str) -> Result<Vec<StoreMatch>> {
             let image = images
                 .and_then(|i| i.iter().find(|i| i["width"].as_u64().is_some_and(|w| w >= 320)).or_else(|| i.last()));
             m.thumb = image.and_then(|i| i["url"].as_str()).filter(|u| u.starts_with("https://")).map(str::to_owned);
+            for f in r["assetFormats"].as_array().into_iter().flatten() {
+                if let Some(code) = f["assetFormatType"]["code"].as_str() {
+                    m.formats.push(code.to_owned());
+                }
+                if let Some(details) = f["technicalSpecs"]["technicalDetails"].as_str() {
+                    let text = plain_text(&details.replace("</p>", "\n").replace("<br", "\n<br"));
+                    m.specs = Some(m.specs.take().map_or_else(|| text.clone(), |s| s + "\n" + &text));
+                }
+            }
             Some(m)
         })
-        .collect())
+        .collect();
+    Ok((found, next))
 }
 
 fn parse_itch(html: &str) -> Vec<StoreMatch> {
@@ -396,7 +961,11 @@ fn first_tag<'a>(html: &'a str, name: &str) -> Option<(&'a str, &'a str)> {
 
 /// Plain text up to `close`, without tags.
 fn inner_text(html: &str, close: &str) -> String {
-    let html = html.find(close).map_or(html, |end| &html[..end]);
+    plain_text(html.find(close).map_or(html, |end| &html[..end]))
+}
+
+/// HTML as plain text, without tags.
+fn plain_text(html: &str) -> String {
     let mut text = String::new();
     let mut in_tag = false;
     for c in html.chars() {
@@ -424,9 +993,10 @@ mod tests {
 
     #[test]
     fn ranks_by_shared_words() {
-        let m = |store, title: &str| found(store, title, "https://example.com/x".to_owned()).unwrap();
+        let m = |store, title: &str| found(store, title, format!("https://example.com/{}", squash(title))).unwrap();
         let ranked = rank(
             "medieval village",
+            &Clues::default(),
             vec![
                 m("Fab", "Space Station"),
                 m("Fab", "Medieval Village Megakit Ultimate Edition"),
@@ -444,8 +1014,9 @@ mod tests {
             "startingPrice":{"price":29.99},"user":{"sellerName":"Marco"},"category":{"name":"Medieval"},
             "thumbnails":[{"images":[{"url":"https://media.fab.com/s.jpg","width":160},
             {"url":"https://media.fab.com/m.jpg","width":320}]}]},
-            {"title":"Bad","uid":"../x"}]}"#;
-        let found = parse_fab(body).unwrap();
+            {"title":"Bad","uid":"../x"}],"cursors":{"next":"bz0yNA==","previous":null}}"#;
+        let (found, next) = parse_fab_page(body).unwrap();
+        assert_eq!(next.as_deref(), Some("bz0yNA=="));
         assert_eq!(found.len(), 1);
         let m = &found[0];
         assert_eq!(m.url, "https://www.fab.com/listings/f89fe420-1942");
@@ -495,6 +1066,95 @@ mod tests {
         assert_eq!(found.len(), 1);
         assert_eq!(found[0].url, "https://opengameart.org/content/lpc-village");
         assert_eq!(found[0].thumb.as_deref(), Some("https://opengameart.org/thumb.png"));
+    }
+
+    #[test]
+    fn reads_clues_from_the_files() {
+        let paths: Vec<String> = [
+            "MedievalVillage/Content/MedievalVillage/Meshes/SM_House.uasset",
+            "MedievalVillage/Content/MedievalVillage/Meshes/SM_Well.uasset",
+            "MedievalVillage/Content/MedievalVillage/Textures/T_Wall_D.uasset",
+            "MedievalVillage/Content/MedievalVillage/Maps/Demo.umap",
+            "MedievalVillage/Content/Megascans/Rocks/T_Rock.uasset",
+        ]
+        .map(str::to_owned)
+        .into();
+        let readme = "Thank you for purchasing Rustic Hamlet Kit!\nCreated by Marco Maria Rossi.\n\
+                      Store page: https://www.fab.com/listings/f89fe420-1942 (rate it!)\n© 2024 Marco Maria Rossi";
+        let kinds = BTreeMap::from([("model".to_owned(), 496), ("texture".to_owned(), 173)]);
+        let c = clues("Medieval Village v1.2", Some(readme), &paths, &kinds);
+        // The product folder is just the pack's name again, so it adds nothing; the README's name does.
+        assert_eq!(c.names, ["Rustic Hamlet Kit"]);
+        assert_eq!(c.sellers, [("Marco Maria Rossi".to_owned(), "README")]);
+        assert_eq!(c.links, [("Fab", "https://www.fab.com/listings/f89fe420-1942".to_owned())]);
+        assert_eq!((c.engine, c.meshes, c.textures), (Some("unreal-engine"), 496, 173));
+
+        let unity: Vec<String> =
+            (0..6).map(|i| format!("Assets/Synty/PolygonFantasyKingdom/Models/m{i}.fbx")).collect();
+        let c = clues("pack_2023", None, &unity, &BTreeMap::new());
+        assert_eq!(c.names, ["Polygon Fantasy Kingdom"]);
+        assert_eq!(c.sellers, [("Synty".to_owned(), "folder")]);
+        assert_eq!(c.engine, None);
+    }
+
+    #[test]
+    fn searches_pieces_of_the_name_too() {
+        let c = Clues {
+            names: vec!["Rustic Hamlet".into()],
+            sellers: vec![("Marco".into(), "README")],
+            ..Clues::default()
+        };
+        assert_eq!(
+            queries("Medieval Village Props", false, &c),
+            [
+                "Medieval Village Props",
+                "Rustic Hamlet",
+                "Medieval Village",
+                "Village Props",
+                "Marco Medieval Village Props"
+            ]
+        );
+        assert_eq!(queries("castle", true, &c), ["castle"]);
+    }
+
+    #[test]
+    fn reads_counts_from_technical_details() {
+        let specs = "Number of Meshes: 496 Static meshes in total\nTexture: 173\nCollision: Yes";
+        assert_eq!(spec_count(specs, "mesh"), Some(496));
+        assert_eq!(spec_count(specs, "texture"), Some(173));
+        assert_eq!(spec_count("Includes 1,204 textures and 80 materials", "texture"), Some(1204));
+        assert_eq!(spec_count("Nanite: Yes", "mesh"), None);
+        assert!(about(496, 480) && !about(496, 300));
+    }
+
+    #[test]
+    fn clues_pick_the_listing_among_same_named_ones() {
+        let listing = |title: &str, author: &str, url: &str, specs: &str| {
+            let mut m = found("Fab", title, format!("https://www.fab.com/listings/{url}")).unwrap();
+            m.author = Some(author.to_owned());
+            m.formats = vec!["unreal-engine".to_owned()];
+            m.specs = Some(specs.to_owned());
+            m
+        };
+        let c = Clues {
+            sellers: vec![("Marco Maria Rossi".into(), "README")],
+            engine: Some("unreal-engine"),
+            meshes: 490,
+            ..Clues::default()
+        };
+        let ranked = rank(
+            "Medieval Village",
+            &c,
+            vec![
+                listing("Medieval Village", "Anatolii Umanets", "a", "Meshes: 40"),
+                listing("Medieval Village", "Marco Maria Rossi", "b", "Number of Meshes: 496"),
+                listing("Medieval Village", "Anatolii Umanets", "a", ""),
+            ],
+        );
+        assert_eq!(ranked.len(), 2, "the same listing found twice is kept once");
+        assert_eq!(ranked[0].url, "https://www.fab.com/listings/b");
+        assert_eq!(ranked[0].why.len(), 2);
+        assert!(ranked[0].why[0].contains("Marco Maria Rossi"));
     }
 
     #[test]

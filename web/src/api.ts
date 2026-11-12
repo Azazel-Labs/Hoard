@@ -116,12 +116,18 @@ export interface StoreMatch {
   summary?: string
   thumb?: string
   price?: string
-  /** 0 to 1: how well the title matches the search. */
+  /** 0 to 1: how well it matches the name and the clues in the pack's files. */
   score: number
+  /** Why it ranks where it does, beyond its title ("Linked in the pack's README"). */
+  why?: string[]
 }
 
 export interface StoreMatches {
   query: string
+  /** The other searches made, from pieces of the name and the pack's files. */
+  also: string[]
+  /** What the pack's files gave away ("Seller: Marco Maria Rossi (README)"). */
+  clues: string[]
   matches: StoreMatch[]
   /** Stores that can only be searched in the browser. */
   links: { store: string; url: string }[]

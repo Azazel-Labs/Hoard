@@ -540,6 +540,10 @@ async function archive(p: Pack) {
             </div>
             <p v-if="lookup.error" class="err">{{ lookup.error }}</p>
             <template v-else-if="lookup.result">
+              <p v-if="lookup.result.clues.length || lookup.result.also.length" class="hint">
+                <template v-if="lookup.result.clues.length">From the pack’s files: {{ lookup.result.clues.join(' · ') }}. </template>
+                <template v-if="lookup.result.also.length">Also searched {{ lookup.result.also.map((q) => `“${q}”`).join(', ') }}.</template>
+              </p>
               <p v-if="!lookup.result.matches.length" class="hint">
                 Nothing on Fab, itch.io, Kenney or OpenGameArt looks like it. Try fewer or different words.
               </p>
@@ -551,6 +555,7 @@ async function archive(p: Pack) {
                     <a :href="m.url" target="_blank" rel="noopener noreferrer" class="title">{{ m.title }}</a>
                     <span class="meta">{{ [m.store, m.author, m.price].filter(Boolean).join(' · ') }}</span>
                     <span v-if="m.summary" class="meta clamp">{{ m.summary }}</span>
+                    <span v-for="w in m.why ?? []" :key="w" class="why">{{ w }}</span>
                   </div>
                   <button class="btn" type="button" @click="useMatch(m)">Use</button>
                 </li>
@@ -728,6 +733,8 @@ li.flash .status { animation: ready-pop var(--dur-3) var(--ease-pop); }
 .matches .what { display: flex; flex-direction: column; gap: 0.1rem; flex: 1; min-width: 0; }
 .matches .title { color: var(--text); font-size: var(--step--1); font-weight: 600; overflow-wrap: anywhere; }
 .matches .meta { color: var(--muted); font-size: 0.75rem; overflow-wrap: anywhere; }
+.matches .why { color: var(--ok, var(--accent)); font-size: 0.75rem; }
+.matches .why::before { content: '✓ '; }
 .matches .clamp { display: -webkit-box; -webkit-line-clamp: 1; line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; }
 .find-again { align-self: flex-start; }
 .ustats { flex-direction: row; flex-wrap: wrap; gap: 0.3rem 1.25rem; font-size: var(--step--1); color: var(--muted); }

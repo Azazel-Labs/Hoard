@@ -28,7 +28,12 @@ export interface Asset {
   ext: string
   kind: AssetKind
   category: string | null
+  /** A person's own description. */
   description: string | null
+  /** What the file says about itself (BWF, RIFF INFO, iXML). */
+  source_description: string | null
+  /** Written by the AI tagger. */
+  ai_description: string | null
   hash: string
   size: number
   has_thumb: boolean

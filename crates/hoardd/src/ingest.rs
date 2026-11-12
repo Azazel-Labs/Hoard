@@ -582,7 +582,7 @@ pub(crate) fn ingest_pack(state: &AppState, rt: &Handle, pack_id: &str, auto_nam
         let id = uuid::Uuid::now_v7().to_string();
         tx.execute(
             "INSERT INTO assets (id, pack_id, blob_hash, path, name, ext, kind, category, meta, words, thumb_hash,
-                                 created_at, updated_at, description)
+                                 created_at, updated_at, source_description)
              VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?12, ?13)
              ON CONFLICT (pack_id, path) DO NOTHING",
             params![

@@ -3,7 +3,7 @@
 //! offline setup, or at a hosted model for better results.
 //!
 //! The model sees the pack's context (store page text, README), paths, metadata and the rule tags (plus a numbered
-//! contact sheet of thumbnails when vision is on) and returns nicer names, a category, a one-line description and
+//! contact sheet of thumbnails when vision is on) and returns nicer names, a category, a short description and
 //! extra tags. Its tags are stored with `source = ai` and lower confidence; it never removes or overrides rule or
 //! human tags. Variant families (`whoosh_01..12`) are sent once and the answer is shared by every member.
 
@@ -83,7 +83,9 @@ fn system_prompt() -> String {
          Rules:\n\
          - name: short human title, e.g. \"Footstep on gravel 3\". No file extensions.\n\
          - category: exactly one of: {}.\n\
-         - description: one sentence, what it is and how a game might use it.\n\
+         - description: 1-3 sentences: what it is, what it looks or sounds like, and how a game might use it. \
+           Music: mood, instruments, tempo and where it fits (menu, combat, exploration, ambience). Add detail \
+           only where the path, metadata, context or image supports it; one plain sentence is fine otherwise.\n\
          - tags: 3-8 lowercase kebab-case tags people would search for. Prefer these namespaces when they fit: \
            style:, theme:, mood:, genre:, material:, subject words (e.g. footsteps, sword, tree). Don't repeat \
            format/resolution facts; those are known.\n\
@@ -335,6 +337,7 @@ async fn batch_sheet(state: &AppState, batch: &[Entry<'_>]) -> Option<String> {
 }
 
 pub(crate) async fn tag_pack(state: &AppState, pack_id: &str) -> Result<()> {
+    crate::context::fill_store_text(state, pack_id).await;
     let pid = pack_id.to_owned();
     let (pack, ctx, rows) = db::call(&state.pool, move |c| {
         let pack = db::get_pack(c, &pid)?.context("pack not found")?;
@@ -423,7 +426,8 @@ fn apply_reply(
     for a in reply.assets {
         let Some(members) = targets.get(a.i) else { continue };
         let category = a.category.filter(|c| CATEGORIES.contains(&c.as_str()));
-        let description = a.description.map(|d| d.chars().take(400).collect::<String>());
+        let description =
+            a.description.map(|d| d.trim().chars().take(800).collect::<String>()).filter(|d| !d.is_empty());
         let name = a.name.map(|n| n.chars().take(120).collect::<String>());
         let tags: Vec<String> = a.tags.iter().take(12).filter_map(|t| hoard_core::normalize_tag(t)).collect();
         for (n, (id, human_edited)) in members.iter().enumerate() {
@@ -437,9 +441,16 @@ fn apply_reply(
                                 WHEN ?3 IS NULL THEN category
                                 WHEN category IS NULL OR instr(category, '/') = 0 OR instr(?3, '/') > 0 THEN ?3
                                 ELSE category END,
-                            description = COALESCE(?4, description), updated_at = ?5
+                            updated_at = ?4
                      WHERE id = ?1",
-                    params![id, name.as_ref().filter(|_| n == 0), category, description, now],
+                    params![id, name.as_ref().filter(|_| n == 0), category, now],
+                )?;
+            }
+            // The AI's description has its own field, so it stays current even after a person edits the asset.
+            if description.is_some() {
+                tx.execute(
+                    "UPDATE assets SET ai_description = ?2, updated_at = ?3 WHERE id = ?1",
+                    params![id, description, now],
                 )?;
             }
             for t in &tags {

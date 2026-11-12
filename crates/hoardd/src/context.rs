@@ -102,6 +102,44 @@ pub(crate) fn read_readmes(root: &Path, files: &[PathBuf]) -> Option<String> {
     (!out.is_empty()).then_some(out)
 }
 
+/// Fetch the store page's text for a pack that has a store link but no text yet (the link was found in a README,
+/// or the fetch failed before). Never fails: a pack without its store blurb is still a pack.
+pub(crate) async fn fill_store_text(state: &crate::AppState, pack_id: &str) {
+    let pid = pack_id.to_owned();
+    let url = crate::db::call(&state.pool, move |c| {
+        Ok(c.query_row(
+            "SELECT store_url FROM pack_context WHERE pack_id = ?1 AND store_text IS NULL AND store_url IS NOT NULL",
+            [&pid],
+            |r| r.get::<_, String>(0),
+        )
+        .ok())
+    })
+    .await
+    .ok()
+    .flatten();
+    let Some(url) = url else { return };
+    let text = match fetch_store_text(&state.http, &url).await {
+        Ok(Some(text)) => text.chars().take(MAX_STORE_TEXT).collect::<String>(),
+        Ok(None) => return,
+        Err(e) => {
+            tracing::info!(url, error = %format!("{e:#}"), "couldn't fetch store page");
+            return;
+        }
+    };
+    let pid = pack_id.to_owned();
+    let saved = crate::db::call(&state.pool, move |c| {
+        c.execute(
+            "UPDATE pack_context SET store_text = ?2 WHERE pack_id = ?1 AND store_text IS NULL",
+            rusqlite::params![pid, text],
+        )?;
+        Ok(())
+    })
+    .await;
+    if let Err(e) = saved {
+        tracing::warn!(pack_id, error = %format!("{e:#}"), "couldn't save store page text");
+    }
+}
+
 /// Fetch a store page and pull out its title and description (`<title>`, `description`, `og:description`).
 pub(crate) async fn fetch_store_text(http: &reqwest::Client, url: &str) -> Result<Option<String>> {
     let resp = http

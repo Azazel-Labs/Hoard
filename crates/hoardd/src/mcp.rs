@@ -252,7 +252,7 @@ fn tool_list() -> Value {
         {
             "name": "update_asset",
             "title": "Rename or recategorize an asset",
-            "description": "Set an asset's display name, category or description. Edited fields are locked against the LLM tagger. Needs the server token if one is configured.",
+            "description": "Set an asset's display name, category or description (its own field, next to the AI's and the file's). Edited fields are locked against the AI tagger. Needs the server token if one is configured.",
             "inputSchema": {
                 "type": "object",
                 "properties": {
@@ -315,7 +315,8 @@ fn summarize(base: &str, a: &hoard_core::Asset) -> Value {
         "name": a.name,
         "kind": a.kind,
         "category": a.category,
-        "description": a.description,
+        // A person's description wins, then the AI's, then what the file says about itself.
+        "description": a.description.as_ref().or(a.ai_description.as_ref()).or(a.source_description.as_ref()),
         "pack": a.pack_name,
         "path": a.path,
         "size_bytes": a.size,

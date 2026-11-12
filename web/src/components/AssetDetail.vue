@@ -238,7 +238,7 @@ async function copy(text: string, what: string) {
 }
 
 async function patch(body: Parameters<typeof api.patchAsset>[1]): Promise<boolean> {
-  if (family.value && applyToFamily.value && (body.add_tags || body.remove_tags || body.category || body.description)) {
+  if (family.value && applyToFamily.value && (body.add_tags || body.remove_tags || body.category || body.description !== undefined)) {
     body = { ...body, apply_to_family: true }
   }
   // Tag edits show at once and are rolled back if the server says no.
@@ -275,6 +275,37 @@ async function saveName() {
   editingName.value = false
   const name = nameDraft.value.trim()
   if (name && name !== props.asset.name) await patch({ name })
+}
+
+// Descriptions: a person's own (editable here), the AI's, the file's embedded text and the pack's store page.
+const editingDesc = ref(false)
+const descDraft = ref('')
+const storeBlurb = ref<{ pack: string; store: string | null; url: string | null; text: string } | null>(null)
+const storeOpen = ref(false)
+watch(() => props.asset.id, () => (editingDesc.value = false))
+watch(
+  () => props.asset.pack_id,
+  async (pack) => {
+    storeOpen.value = false
+    if (storeBlurb.value?.pack === pack) return
+    storeBlurb.value = null
+    try {
+      const ctx = await api.packContext(pack)
+      if (props.asset.pack_id === pack && ctx.store_text) {
+        storeBlurb.value = { pack, store: ctx.store, url: ctx.store_url, text: ctx.store_text }
+      }
+    } catch {
+      // No context, no blurb.
+    }
+  },
+  { immediate: true },
+)
+function editDescription() {
+  descDraft.value = props.asset.description ?? ''
+  editingDesc.value = true
+}
+async function saveDescription() {
+  if (await patch({ description: descDraft.value.trim() })) editingDesc.value = false
 }
 
 async function addTag() {
@@ -570,7 +601,44 @@ onBeforeUnmount(() => unswipe())
       <input v-model="showViews" type="checkbox" /> Show the four-view sheet the tagger saw
     </label>
 
-    <p v-if="asset.description" class="desc">{{ asset.description }}</p>
+    <section class="descs">
+      <form v-if="editingDesc" class="descedit" @submit.prevent="saveDescription">
+        <label class="visually-hidden" for="asset-desc">Your description</label>
+        <textarea id="asset-desc" v-model="descDraft" class="field" rows="3" maxlength="2000"
+          placeholder="What it is, where you'd use it…" />
+        <div class="descbtns">
+          <button class="btn primary" type="submit">Save</button>
+          <button class="btn" type="button" @click="editingDesc = false">Cancel</button>
+          <span v-if="family && applyToFamily" class="hint">Saves to all {{ family.size }} variants</span>
+        </div>
+      </form>
+      <template v-else>
+        <p v-if="asset.description" class="desc mine">{{ asset.description }}</p>
+        <button type="button" class="linkish small" @click="editDescription">
+          {{ asset.description ? 'Edit description' : 'Write a description' }}
+        </button>
+      </template>
+      <div v-if="asset.ai_description" class="descsrc">
+        <span class="srclabel">Written by AI</span>
+        <p class="desc">{{ asset.ai_description }}</p>
+      </div>
+      <div v-if="asset.source_description" class="descsrc">
+        <span class="srclabel">From the file</span>
+        <p class="desc">{{ asset.source_description }}</p>
+      </div>
+      <div v-if="storeBlurb" class="descsrc">
+        <span class="srclabel">
+          From the
+          <a v-if="storeBlurb.url" :href="storeBlurb.url" target="_blank" rel="noopener noreferrer">{{ storeBlurb.store ?? 'store' }} page</a>
+          <template v-else>{{ storeBlurb.store ?? 'store' }} page</template>
+          (the whole pack)
+        </span>
+        <p class="desc store" :class="{ open: storeOpen }">{{ storeBlurb.text }}</p>
+        <button v-if="storeBlurb.text.length > 240" type="button" class="linkish small" @click="storeOpen = !storeOpen">
+          {{ storeOpen ? 'Less' : 'More' }}
+        </button>
+      </div>
+    </section>
 
     <section>
       <h3>Tags</h3>
@@ -594,10 +662,10 @@ onBeforeUnmount(() => unswipe())
         <button class="btn" type="submit" :disabled="!newTag.trim()">Add</button>
       </form>
       <label v-if="family" class="animcheck familycheck">
-        <input v-model="applyToFamily" type="checkbox" /> Apply tag and category changes to all {{ family.size }} variants
+        <input v-model="applyToFamily" type="checkbox" /> Apply tag, category and description changes to all {{ family.size }} variants
       </label>
       <p class="legend">
-        Solid tags were added by a person, outlined ones by the offline tagger, dashed ones by the LLM. Click a tag to filter by it.
+        Solid tags were added by a person, outlined ones by the offline tagger, dashed ones by AI. Click a tag to filter by it.
       </p>
     </section>
 
@@ -833,7 +901,18 @@ h2 {
 .time { font-size: 0.78rem; font-variant-numeric: tabular-nums; }
 .time .of { color: var(--faint); }
 .wavenote { margin-left: auto; font-size: 0.72rem; color: var(--faint); }
-.desc { margin: 0; color: var(--muted); max-width: 60ch; }
+.desc { margin: 0; color: var(--muted); max-width: 60ch; white-space: pre-line; }
+.desc.mine { color: var(--text); }
+.descs { display: grid; gap: 0.6rem; justify-items: start; }
+.descsrc { display: grid; gap: 0.15rem; }
+.srclabel { font-size: 0.72rem; color: var(--faint); }
+.desc.store { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 4; line-clamp: 4; overflow: hidden; }
+.desc.store.open { display: block; }
+.descedit { display: grid; gap: 0.4rem; width: 100%; max-width: 60ch; }
+.descedit textarea { resize: vertical; font: inherit; }
+.descbtns { display: flex; gap: 0.4rem; align-items: center; }
+.hint { font-size: 0.75rem; color: var(--faint); }
+.linkish.small { font-size: 0.8rem; }
 h3 { margin: 0 0 0.5rem; font-size: var(--step--1); font-weight: 650; color: var(--muted); }
 .tags { position: relative; display: flex; flex-wrap: wrap; gap: 0.35rem; }
 .tags :deep(.chip) { cursor: pointer; }

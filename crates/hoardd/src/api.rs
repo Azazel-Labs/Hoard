@@ -429,14 +429,16 @@ async fn patch_asset(
         }
         let touches_fields = patch.name.is_some() || patch.category.is_some() || patch.description.is_some();
         let category = patch.category.map(|s| s.trim().to_owned()).filter(|s| !s.is_empty());
-        let description = patch.description.map(|s| s.trim().to_owned());
+        // An empty description clears it.
+        let description = patch.description.map(|s| s.trim().chars().take(2000).collect::<String>());
         let add_tags: Vec<String> = patch.add_tags.iter().filter_map(|t| hoard_core::normalize_tag(t)).collect();
         // Variants share everything but their name: category, description and tag edits fan out to the family.
         let targets = if patch.apply_to_family { db::family_ids(&tx, &id2)? } else { vec![id2.clone()] };
         for target in targets.iter().filter(|t| **t != id2) {
             let touches = category.is_some() || description.is_some();
             tx.execute(
-                "UPDATE assets SET category = COALESCE(?2, category), description = COALESCE(?3, description),
+                "UPDATE assets SET category = COALESCE(?2, category),
+                        description = CASE WHEN ?3 IS NULL THEN description WHEN ?3 = '' THEN NULL ELSE ?3 END,
                         human_edited = human_edited OR ?4, updated_at = ?5
                  WHERE id = ?1",
                 params![target, category, description, touches, db::now()],
@@ -444,7 +446,8 @@ async fn patch_asset(
         }
         tx.execute(
             "UPDATE assets SET name = COALESCE(?2, name), category = COALESCE(?3, category),
-                    description = COALESCE(?4, description), human_edited = human_edited OR ?5, updated_at = ?6
+                    description = CASE WHEN ?4 IS NULL THEN description WHEN ?4 = '' THEN NULL ELSE ?4 END,
+                    human_edited = human_edited OR ?5, updated_at = ?6
              WHERE id = ?1",
             params![
                 id2,

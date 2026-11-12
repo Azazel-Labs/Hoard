@@ -168,7 +168,8 @@ another model from the table, set its Hugging Face reference and name in `deploy
 | `lfm2.5-vl-1.6b` | `LiquidAI/LFM2.5-VL-1.6B-GGUF:Q4_0` | empty |
 
 with `HOARD_LOCAL_MODEL` and `HOARD_LLM_MODEL` both set to the model's name. A hosted model (OpenAI, OpenRouter, …)
-or your own Ollama can be set in the portal's **Settings** instead, without a restart.
+or your own Ollama can be set in the portal's **Settings** instead, without a restart. `deploy/compose.yml` has
+ready-to-uncomment Ollama and vLLM services; [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md#ai-tagging) compares them.
 
 ### Bulk imports
 
@@ -218,7 +219,7 @@ software rasterizer (`apt install mesa-vulkan-drivers`). Without any adapter, ev
    - Metadata inside WAVs, as sound libraries ship it: BWF `bext` descriptions, `LIST/INFO` titles and keywords, iXML
      from Soundminer/BaseHead with Universal Category System (UCS) category, subcategory and CatID, `smpl` loop
      points, ACID tempo, root note and one-shot flag, cue markers, and RF64 for files over 4 GB. Embedded titles
-     and descriptions become the asset's name and description.
+     become the asset's name, and embedded descriptions show as "From the file".
    - Models: glTF/GLB mesh, material, animation and skin counts, vertex/triangle counts; OBJ counts; FBX version
      plus skin and animation detection; a wgpu-rendered thumbnail for glTF/GLB/OBJ/FBX, and for STL, PLY and
      MagicaVoxel `.vox`, which Hoard reads itself (voxels keep their palette colors). Binary FBX geometry, node
@@ -246,8 +247,8 @@ software rasterizer (`apt install mesa-vulkan-drivers`). Without any adapter, ev
      listed under "Identical copies".
    - **Pack context.** README text is kept with the pack, and a store link inside it (Fab, itch.io, Humble Bundle,
      Unity Asset Store, Kenney, …) fills in where the pack came from. "Store details" on the packs page takes the
-     store page URL, license tier and listing text; with a URL and no text, Hoard fetches the page's title and
-     description.
+     store page URL, license tier and listing text. Whenever a pack has a store link and no text, from either
+     place, Hoard fetches the page's title and description; the asset panel shows it as "From the <store> page".
 5. **Link.** glTF buffers/images, OBJ → MTL → textures, FBX texture paths (absolute artist paths are matched by file
    name), DAE images, `.blend` external textures and linked libraries (`//` paths resolved relative to the file),
    `Model@Clip.fbx` animation clips, and name-based guesses for models that reference nothing. Game-engine and
@@ -255,11 +256,15 @@ software rasterizer (`apt install mesa-vulkan-drivers`). Without any adapter, ev
    → images; LDtk projects; BMFont `.fnt` → page images; Spine/libGDX `.atlas` → pages; TexturePacker JSON;
    Godot `.tres`/`.tscn` resources; and Unreal package imports.
 6. **Tag (LLM, optional).** Any OpenAI-compatible endpoint (OpenAI, OpenRouter, Ollama, llama.cpp, vLLM, LM Studio)
-   gets the pack context, paths, metadata and rule tags, and returns names, one-line descriptions, extra tags, UCS
-   subcategories and categories. Each variant family is sent once and the answer applies to every take. With
+   gets the pack context, paths, metadata and rule tags, and returns names, a description of one to three
+   sentences (for music: mood, instruments, tempo and where it fits), extra tags, UCS subcategories and
+   categories. Each variant family is sent once and the answer applies to every take. With
    `HOARD_LLM_VISION`, each batch also gets one numbered contact sheet of its thumbnails (one image instead of
    sixteen), and models appear as a 2x2 sheet rendered from four directions. It only adds; it never removes rule tags, never overrides anything a
    person edited, and can't flatten a specific category into a vaguer one.
+   - **Descriptions.** Each kind is kept apart: a person's own (written in the asset panel or over MCP), the AI's,
+     the file's embedded one and the pack's store page. Search covers all of them, and re-running the AI updates
+     its description without touching yours.
 7. **Convert (optional).** With Blender switched on (Settings, or `HOARD_BLENDER`), .blend/.fbx/.dae/.usd/.ply/.stl/.3ds
    files are exported to GLB by headless Blender, with their linked textures laid out beside them. The GLB is stored as a derivative that feeds
    thumbnails, the browser preview and downloads.

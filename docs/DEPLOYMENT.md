@@ -227,6 +227,16 @@ HOARD_LLM_MODEL=qwen3-vl-2b                                  # the name Hoard as
 HOARD_LOCAL_MODEL_ARGS=                                      # empty for models without a thinking mode
 ```
 
+To run your own model server next to Hoard, `deploy/compose.yml` has commented-out services under "Other model
+servers". The choice, roughly:
+
+| Server | Good for |
+|---|---|
+| llama.cpp (the bundled `llm` service) | One model, CPU or a small GPU, least memory. The default. |
+| Ollama | Keeping several models and switching between them (`ollama pull`), loaded on demand and unloaded when idle. |
+| vLLM | A dedicated NVIDIA GPU and a bigger model, when many packs need tagging quickly. |
+| LM Studio | A desktop app on another machine; switch on its server and use its address as "Custom". |
+
 To use a hosted model or your own server instead, open **Settings** in the portal and pick the service: OpenRouter,
 OpenAI, Anthropic and Google Gemini need only an API key, and Ollama or any other OpenAI-compatible server needs only its
 address. Hoard then lists the service's models (marking the ones that take images on OpenRouter); pick one and save.

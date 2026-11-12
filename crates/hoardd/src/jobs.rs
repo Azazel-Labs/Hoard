@@ -61,7 +61,7 @@ pub(crate) fn job_label(kind: &str, pack: &str) -> String {
     match kind {
         INGEST => format!("Ingesting {pack}"),
         RETAG => format!("Re-tagging {pack}"),
-        LLM_TAG => format!("Tagging {pack} with the LLM"),
+        LLM_TAG => format!("Tagging {pack} with AI"),
         SCRUB => "Checking stored files for damage".to_owned(),
         CONVERT => format!("Converting {pack} with Blender"),
         UNREAL => format!("Converting Unreal packages in {pack}"),
@@ -98,7 +98,12 @@ async fn run(state: &AppState, job: db::JobRow) {
     let result: Result<()> = match job.kind.as_str() {
         INGEST => {
             let auto_name = job.payload.get("auto_name").and_then(serde_json::Value::as_bool).unwrap_or(false);
-            blocking(state, move |s, rt| ingest::ingest_pack(s, rt, &pack_id, auto_name)).await
+            let pid = pack_id.clone();
+            let done = blocking(state, move |s, rt| ingest::ingest_pack(s, rt, &pid, auto_name)).await;
+            if done.is_ok() {
+                crate::context::fill_store_text(state, &pack_id).await;
+            }
+            done
         }
         RETAG => {
             let then_llm = job.payload.get("then_llm").and_then(serde_json::Value::as_bool).unwrap_or(false);

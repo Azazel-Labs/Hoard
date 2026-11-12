@@ -155,7 +155,15 @@ pub struct Asset {
     pub ext: String,
     pub kind: AssetKind,
     pub category: Option<String>,
+    /// Written by a person (the portal or MCP). Automatic passes never touch it.
     pub description: Option<String>,
+    /// What the source says about this file: the description embedded in it (BWF `bext`, `ICMT`, iXML). The pack's
+    /// store page, which covers the whole pack, is in its context (`GET /api/packs/{id}/context`).
+    #[serde(default)]
+    pub source_description: Option<String>,
+    /// Written by the AI tagger: what it is and how a game might use it.
+    #[serde(default)]
+    pub ai_description: Option<String>,
     /// BLAKE3 hex of the file contents. Stable identity for caching / lockfiles.
     pub hash: String,
     pub size: u64,

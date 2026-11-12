@@ -29,6 +29,16 @@ const MIGRATIONS: &[&str] = &[
     "CREATE TABLE settings (key TEXT PRIMARY KEY, value TEXT NOT NULL) WITHOUT ROWID;",
     // 10: the AI tagger's tags are source `ai`, not `llm`.
     "UPDATE asset_tags SET source = 'ai' WHERE source = 'llm';",
+    // 11: descriptions by where they come from. `description` becomes a person's alone; what was there and not
+    // edited by hand moves to the AI's (if the AI tagged that asset, since it wrote the description then) or the
+    // file's own.
+    "ALTER TABLE assets ADD COLUMN source_description TEXT;
+     ALTER TABLE assets ADD COLUMN ai_description TEXT;
+     UPDATE assets SET ai_description = description, description = NULL
+      WHERE human_edited = 0 AND description IS NOT NULL
+        AND EXISTS (SELECT 1 FROM asset_tags t WHERE t.asset_id = assets.id AND t.source = 'ai');
+     UPDATE assets SET source_description = description, description = NULL
+      WHERE human_edited = 0 AND description IS NOT NULL;",
 ];
 
 /// How many automatic pre-upgrade backups to keep in `<data dir>/backups`.
@@ -72,7 +82,7 @@ CREATE TABLE IF NOT EXISTS assets (
     meta         TEXT NOT NULL DEFAULT '{}',
     words        TEXT NOT NULL DEFAULT '',        -- tokenized path words for FTS
     thumb_hash   TEXT,
-    human_edited INTEGER NOT NULL DEFAULT 0,      -- 1 = LLM must not overwrite name/category/description
+    human_edited INTEGER NOT NULL DEFAULT 0,      -- 1 = AI must not overwrite name/category
     created_at   TEXT NOT NULL,
     updated_at   TEXT NOT NULL,
     UNIQUE (pack_id, path)
@@ -399,7 +409,8 @@ pub(crate) fn delete_pack(conn: &mut Connection, id: &str) -> Result<bool> {
 // Assets
 
 const ASSET_COLS: &str = "a.id, a.pack_id, p.name, a.name, a.path, a.ext, a.kind, a.category, a.description,
-    a.blob_hash, b.size, a.thumb_hash IS NOT NULL, a.meta, a.created_at, a.updated_at";
+    a.blob_hash, b.size, a.thumb_hash IS NOT NULL, a.meta, a.created_at, a.updated_at, a.source_description,
+    a.ai_description";
 
 fn asset_from_row(r: &Row<'_>) -> rusqlite::Result<Asset> {
     let meta: String = r.get(12)?;
@@ -413,6 +424,8 @@ fn asset_from_row(r: &Row<'_>) -> rusqlite::Result<Asset> {
         kind: AssetKind::parse(&r.get::<_, String>(6)?).unwrap_or(AssetKind::Other),
         category: r.get(7)?,
         description: r.get(8)?,
+        source_description: r.get(15)?,
+        ai_description: r.get(16)?,
         hash: r.get(9)?,
         size: r.get::<_, i64>(10)? as u64,
         has_thumb: r.get(11)?,
@@ -788,7 +801,8 @@ pub(crate) fn reindex_asset(conn: &Connection, id: &str) -> Result<()> {
     conn.execute("DELETE FROM assets_fts WHERE asset_id = ?1", [id])?;
     conn.execute(
         "INSERT INTO assets_fts (asset_id, name, words, category, description, tags)
-         SELECT a.id, a.name, a.words, COALESCE(a.category, ''), COALESCE(a.description, ''),
+         SELECT a.id, a.name, a.words, COALESCE(a.category, ''),
+                concat_ws(' ', a.description, a.source_description, a.ai_description),
                 COALESCE((SELECT group_concat(replace(replace(tag, ':', ' '), '-', ' '), ' ')
                           FROM asset_tags t WHERE t.asset_id = a.id), '')
          FROM assets a WHERE a.id = ?1",
@@ -1088,9 +1102,14 @@ mod tests {
     fn baseline_database_upgrades_to_current() {
         let dir = tempfile::tempdir().unwrap();
         let mut conn = baseline_db(dir.path());
-        // Just the tag row matters here, not the asset it hangs off.
+        // a1 was described by the AI, a2 by its file, a3 by a person. Blobs don't matter here.
         conn.execute_batch(
             "PRAGMA foreign_keys = OFF;
+             INSERT INTO assets (id, pack_id, blob_hash, path, name, ext, kind, description, human_edited,
+                                 created_at, updated_at) VALUES
+               ('a1', 'p1', 'h1', 'a1.wav', 'a1', 'wav', 'audio', 'Birds at dawn.', 0, 'x', 'x'),
+               ('a2', 'p1', 'h2', 'a2.wav', 'a2', 'wav', 'audio', 'Recorded in Kent.', 0, 'x', 'x'),
+               ('a3', 'p1', 'h3', 'a3.wav', 'a3', 'wav', 'audio', 'My favourite.', 1, 'x', 'x');
              INSERT INTO asset_tags (asset_id, tag, source, confidence) VALUES ('a1', 'forest', 'llm', 0.6);",
         )
         .unwrap();
@@ -1099,6 +1118,17 @@ mod tests {
         let source: String =
             conn.query_row("SELECT source FROM asset_tags WHERE asset_id = 'a1'", [], |r| r.get(0)).unwrap();
         assert_eq!(source, "ai");
+        let descriptions = |id: &str| -> (Option<String>, Option<String>, Option<String>) {
+            conn.query_row(
+                "SELECT description, source_description, ai_description FROM assets WHERE id = ?1",
+                [id],
+                |r| Ok((r.get(0)?, r.get(1)?, r.get(2)?)),
+            )
+            .unwrap()
+        };
+        assert_eq!(descriptions("a1"), (None, None, Some("Birds at dawn.".into())));
+        assert_eq!(descriptions("a2"), (None, Some("Recorded in Kent.".into()), None));
+        assert_eq!(descriptions("a3"), (Some("My favourite.".into()), None, None));
         let name: String = conn.query_row("SELECT name FROM packs WHERE id = 'p1'", [], |r| r.get(0)).unwrap();
         assert_eq!(name, "Forest");
         let settings: i64 = conn.query_row("SELECT COUNT(*) FROM settings", [], |r| r.get(0)).unwrap();

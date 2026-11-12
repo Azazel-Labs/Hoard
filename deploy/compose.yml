@@ -45,6 +45,45 @@ services:
     volumes:
       - llm-models:/models
 
+  # ── Other model servers (optional) ─────────────────────────────────────────────────────────────────────────────
+  # Any OpenAI-compatible server works; the `llm` service above (llama.cpp) is the lightest choice. To use one of
+  # these instead, uncomment it (and its volume at the bottom), delete `llm`, then pick it in the portal's Settings
+  # (or set HOARD_LLM_URL / HOARD_LLM_MODEL above).
+  #
+  # Ollama: the easy one if you want to keep several models around and switch between them. It loads a model on
+  # first use and unloads it when idle. Fetch models with
+  #   docker compose -f deploy/compose.yml exec ollama ollama pull qwen3-vl:4b
+  # then in Settings choose "Ollama" (http://ollama:11434/v1) and the model. NVIDIA GPU: give it the `deploy:` block
+  # the vllm service below has. (With a GPU overlay, also delete the overlay's `llm` section once `llm` is gone.)
+  # ollama:
+  #   image: ollama/ollama:latest
+  #   restart: unless-stopped
+  #   environment:
+  #     OLLAMA_CONTEXT_LENGTH: "16384"   # its default is too small for a batch of assets and a contact sheet
+  #     OLLAMA_KEEP_ALIVE: 10m           # how long a model stays in memory after the last request
+  #   volumes:
+  #     - ollama-models:/root/.ollama
+  #
+  # vLLM: for a dedicated NVIDIA GPU, when you want a bigger model and many packs tagged quickly. It serves one
+  # model, downloaded from Hugging Face on first start. In Settings choose "Custom": http://vllm:8000/v1 and the
+  # served model name below.
+  # vllm:
+  #   image: vllm/vllm-openai:latest
+  #   restart: unless-stopped
+  #   ipc: host
+  #   command: ["--model", "Qwen/Qwen3-VL-8B-Instruct", "--served-model-name", "qwen3-vl-8b", "--max-model-len", "16384"]
+  #   environment:
+  #     HF_TOKEN: ${HF_TOKEN:-}          # only for gated models
+  #   volumes:
+  #     - vllm-models:/root/.cache/huggingface
+  #   deploy:
+  #     resources:
+  #       reservations:
+  #         devices:
+  #           - driver: nvidia
+  #             count: all
+  #             capabilities: [gpu]
+
   # Pulls new Hoard images daily and restarts the container; the database upgrades itself on start (backed up
   # first). Pin HOARD_VERSION (e.g. 0.8) to take only patch releases, or remove this service to update by hand.
   watchtower:
@@ -63,3 +102,5 @@ services:
 volumes:
   hoard-data:
   llm-models:
+  # ollama-models:
+  # vllm-models:

@@ -31,17 +31,26 @@ One place for the jobs that look after a library: back up now, scrub (re-hash ev
 all packs, rebuild thumbnails, clear the cache, and remove files nothing refers to any more. Most of these exist as
 API calls already; this gives them buttons, progress and a history.
 
-## AI tagging with a Claude or ChatGPT subscription
+## AI tagging with a ChatGPT or Claude subscription
 
-People without an API key or an enterprise plan would like to use the subscription they already pay for. The
-providers' terms are the obstacle: Anthropic doesn't allow third-party apps to offer claude.ai login or to use
-subscription limits unless Anthropic has approved them, and OpenAI's ChatGPT plans are similar. Hoard can't log in
-with a subscription itself.
+People without an API key would like to use the subscription they already pay for. The two providers differ
+(checked 2026-11-12):
 
-What may be possible is driving a command-line tool the user has installed and signed into themselves (`claude -p`
-or `codex exec`) on the same machine as the server, so Hoard never touches the credentials. Whether that use is
-allowed under each subscription's terms needs checking before it's built. API keys, OpenRouter and local models
-stay the supported paths.
+- **ChatGPT: supported, and the better first step.** Since September 2026 OpenAI offers "Sign in with ChatGPT" with
+  plan usage, self-serve for open-source and locally hosted apps, which Hoard is. It's OAuth with PKCE; requests go
+  to the Responses API and draw on the user's plan, with a weekly cap per app that the user sets in ChatGPT. Open
+  questions:
+  - The sign-in redirects to a loopback address, which is the browser's machine, not the server on a NAS. The
+    usual fix is letting the user paste the redirected URL back into Hoard.
+  - Whether image input is allowed. Tagging sends thumbnails and contact sheets.
+  - The preview limits and how far a library's worth of tagging gets against the weekly cap.
+  - Docs: <https://developers.openai.com/siwc/token-sharing-open-source>
+- **Claude: only by running Claude Code itself.** Anthropic doesn't allow third-party apps to offer claude.ai login,
+  collect or store the session tokens, or send requests with Pro or Max credentials, so Hoard can't do the OAuth
+  itself (see [deadends.md](deadends.md)). Running the unmodified `claude` binary, signed into by the user through
+  Anthropic's own flow, is allowed. Hoard could install it on demand like Blender and run `claude -p` with the
+  thumbnails. Plan limits assume ordinary individual use, so tagging a large library this way may run into them.
+  Policy: <https://code.claude.com/docs/en/legal-and-compliance>
 
 ## Imports without the staging copy
 

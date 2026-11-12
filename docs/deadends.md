@@ -89,10 +89,13 @@ Each entry: **what** was tried, **why** it didn't work out, and **instead**, wha
 
 ## AI tagging
 
-### Logging in with a Claude or ChatGPT subscription (2026-11)
+### Signing in to Claude with a Pro or Max subscription from Hoard itself (2026-11)
 
-- **Why not:** Anthropic doesn't allow third-party apps to offer claude.ai login or use subscription limits
-  without its approval, and OpenAI's ChatGPT plans are similar.
-- **Instead:** API keys, OpenRouter and local models. Driving a CLI the user has signed into themselves
-  (`claude -p`, `codex exec`) is still open; see [roadmap.md](roadmap.md). The terms question has to be answered
-  before that's built.
+- **What:** do the same OAuth sign-in Claude Code does, then call the API with the user's subscription token.
+- **Why not:** it works technically, but Anthropic's terms forbid it: third-party apps may not offer claude.ai
+  login, collect or store its session tokens, or route requests through Free, Pro, Max or Ultra credentials.
+  Anthropic has enforced this against other tools since January 2026. Policy:
+  <https://code.claude.com/docs/en/legal-and-compliance>
+- **Instead:** a ChatGPT subscription through OpenAI's "Sign in with ChatGPT", which is allowed for open-source
+  apps, and running the unmodified `claude` binary the user signs into themselves. Both are on the
+  [roadmap](roadmap.md).

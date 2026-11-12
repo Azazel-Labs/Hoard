@@ -1,0 +1,74 @@
+import { MODELS, TEXTURES } from './support/seed'
+import { doubleClick, expect, openPack, test, tile } from './support/test'
+
+// Double-clicking a tile opens its full-screen viewer; the app spots the second click by where and when it lands, so
+// these use real mouse double-clicks.
+test.describe('full-screen viewers', () => {
+  test('a texture opens the image viewer; Escape closes it, then the panel', async ({ page, seed }) => {
+    await openPack(page, seed.packs[TEXTURES], TEXTURES, '&sort=name')
+    await doubleClick(page, tile(page, 'Brick wall'))
+    const viewer = page.getByRole('dialog', { name: 'Inspect Brick wall' })
+    await expect(viewer).toBeVisible()
+    await expect(viewer.getByRole('group', { name: 'Zoom' })).toBeVisible()
+    await page.keyboard.press('Escape')
+    await expect(viewer).toBeHidden()
+    const panel = page.getByRole('complementary', { name: 'Asset details' })
+    await expect(panel.getByRole('heading', { name: 'Brick wall' })).toBeVisible()
+    await page.keyboard.press('Escape')
+    await expect(panel).toHaveCount(0)
+  })
+
+  test('an OBJ model opens the 3D viewer and renders', async ({ page, seed }) => {
+    await openPack(page, seed.packs[MODELS], MODELS, '&sort=name')
+    await doubleClick(page, tile(page, 'Crate'))
+    const viewer = page.getByRole('dialog', { name: 'View Crate in 3D' })
+    await expect(viewer).toBeVisible()
+    await expect(viewer.getByText(/12 tris · 1 mesh/)).toBeVisible({ timeout: 20_000 })
+    await expect(viewer.getByText(/Couldn't show this model/)).toHaveCount(0)
+    await expect(viewer.locator('canvas')).toBeVisible()
+    await viewer.getByRole('button', { name: 'Close (Esc)' }).click()
+    await expect(viewer).toBeHidden()
+  })
+
+  test('a glTF model opens the 3D viewer too', async ({ page, seed }) => {
+    await openPack(page, seed.packs[MODELS], MODELS, '&sort=name')
+    await doubleClick(page, tile(page, 'Triangle'))
+    const viewer = page.getByRole('dialog', { name: 'View Triangle in 3D' })
+    await expect(viewer.getByText(/1 tris · 1 mesh/)).toBeVisible({ timeout: 20_000 })
+    await page.keyboard.press('Escape')
+    await expect(viewer).toBeHidden()
+  })
+
+  test('JSON opens as a folding tree, and pretty-printed', async ({ page, seed }) => {
+    await openPack(page, seed.packs[MODELS], MODELS, '&sort=name')
+    await doubleClick(page, tile(page, 'Level'))
+    const viewer = page.getByRole('dialog', { name: 'Read Level' })
+    await expect(viewer).toBeVisible()
+    const contents = viewer.getByLabel('Level contents')
+    await expect(viewer.getByRole('button', { name: 'Tree' })).toHaveAttribute('aria-pressed', 'true')
+    await expect(contents.getByText('"enemies"')).toBeVisible()
+    await expect(contents.getByText('"slime"')).toBeVisible()
+
+    await viewer.getByRole('button', { name: 'Collapse all' }).click()
+    await expect(contents.getByText('"slime"')).toBeHidden()
+    await expect(contents.getByRole('button', { name: 'Unfold', exact: true }).first()).toHaveAttribute('aria-expanded', 'false')
+    await viewer.getByRole('button', { name: 'Expand all' }).click()
+    await expect(contents.getByText('"slime"')).toBeVisible()
+
+    await viewer.getByRole('button', { name: 'Pretty' }).click()
+    await expect(viewer.getByRole('button', { name: 'Pretty' })).toHaveAttribute('aria-pressed', 'true')
+    await expect(contents).toContainText('"name": "Forest clearing"')
+    await page.keyboard.press('Escape')
+    await expect(viewer).toBeHidden()
+  })
+
+  test('plain text opens with its lines', async ({ page, seed }) => {
+    await openPack(page, seed.packs[MODELS], MODELS, '&sort=name')
+    await doubleClick(page, tile(page, 'Notes'))
+    const viewer = page.getByRole('dialog', { name: 'Read Notes' })
+    await expect(viewer.getByLabel('Notes contents')).toContainText('Notes for the e2e pack')
+    await expect(viewer.getByRole('group', { name: 'Show as' })).toHaveCount(0)
+    await page.keyboard.press('Escape')
+    await expect(viewer).toBeHidden()
+  })
+})

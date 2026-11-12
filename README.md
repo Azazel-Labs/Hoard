@@ -164,6 +164,26 @@ Releases are automatic and change no files. Each push to `main` that passes CI i
 (`#minor` or `#major` in a commit message bumps that instead; `#skip-release` only refreshes the `:edge` image), and
 the tag builds the binaries, the container image and the GitHub release. Builds take their version from the tag.
 
+### Tests
+
+`cargo test --workspace` runs the Rust tests. The portal has an end-to-end suite in [web/e2e/](web/e2e/) (Playwright,
+Chromium): it starts its own `hoardd` on a free port with temporary data and library folders, makes the account and a
+location, uploads packs it generates in code (PNGs, an OBJ with its material and texture, a glTF, JSON, text, a zip
+and a 300-image pack), and drives the real portal: sign-in, the grid's infinite scroll and keyboard, the side panel,
+the full-screen viewers, the packs finder, tag merging, collections, access tokens and copying, and phone-width and
+dark-mode passes. It needs no network.
+
+```sh
+cargo build -p hoardd
+cd web && npm ci && npm run build
+npm run e2e:install          # once: Playwright's Chromium
+npm run e2e                  # or: npx playwright test e2e/viewers.spec.ts --headed
+```
+
+It uses the newest `hoardd` under `target/` (debug, then release); `HOARD_BIN` points it at another, and
+`HOARD_WEB_DIR` at another portal build. Failures keep a trace, a screenshot and the server's log in
+`web/test-results/` (`npx playwright show-trace <trace.zip>`).
+
 ### Local models for the tagger
 
 The AI tagger works with any OpenAI-compatible endpoint. The simplest is a local model server: every compose file in

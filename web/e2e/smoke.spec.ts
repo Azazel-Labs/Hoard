@@ -1,0 +1,94 @@
+import { devices, type Page } from '@playwright/test'
+import { TEXTURES } from './support/seed'
+import { expect, openPack, test, tile } from './support/test'
+
+/** The main pages, each with something to wait for so the page has really drawn. */
+const PAGES: { name: string; path: string; ready: (page: Page) => ReturnType<Page['getByRole']> }[] = [
+  { name: 'library', path: '/', ready: (p) => p.locator('.grid button.hit').first() },
+  { name: 'packs', path: '/#packs', ready: (p) => p.getByLabel('Find a pack') },
+  { name: 'settings: appearance', path: '/#settings/appearance', ready: (p) => p.getByRole('heading', { name: 'Appearance', level: 2 }) },
+  { name: 'settings: library', path: '/#settings/library', ready: (p) => p.getByRole('heading', { name: 'Library', level: 2 }) },
+  { name: 'settings: tags', path: '/#settings/tags', ready: (p) => p.getByLabel('Find tags') },
+  { name: 'settings: account', path: '/#settings/account', ready: (p) => p.getByLabel('What will use it') },
+]
+
+/** The page's background (the body's, or the root's behind a see-through body) as luminance, 0 black to 1 white. */
+function bodyLuminance(page: Page): Promise<number> {
+  return page.evaluate(() => {
+    const probe = document.createElement('canvas').getContext('2d', { willReadFrequently: true })!
+    const read = (el: Element) => {
+      probe.clearRect(0, 0, 1, 1)
+      probe.fillStyle = getComputedStyle(el).backgroundColor
+      probe.fillRect(0, 0, 1, 1)
+      return probe.getImageData(0, 0, 1, 1).data
+    }
+    let px = read(document.body)
+    if (px[3] === 0) px = read(document.documentElement)
+    if (px[3] === 0) return -1
+    const [r, g, b] = px
+    const lin = (c: number) => ((c /= 255) <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4)
+    return 0.2126 * lin(r) + 0.7152 * lin(g) + 0.0722 * lin(b)
+  })
+}
+
+async function visitAll(page: Page, consoleErrors: string[], check: (name: string) => Promise<void>): Promise<void> {
+  for (const p of PAGES) {
+    await test.step(p.name, async () => {
+      await page.goto(p.path)
+      await expect(p.ready(page)).toBeVisible()
+      await check(p.name)
+    })
+  }
+  expect(consoleErrors, 'console errors').toEqual([])
+}
+
+test.describe('phone width (390px)', () => {
+  test.use({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true, userAgent: devices['iPhone 13'].userAgent })
+
+  test('main pages fit the screen without sideways scrolling or errors', async ({ page, consoleErrors }) => {
+    await visitAll(page, consoleErrors, async (name) => {
+      const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth)
+      expect(overflow, `${name} scrolls sideways`).toBeLessThanOrEqual(0)
+    })
+  })
+
+  test('filters open as a sheet and a tile opens its details', async ({ page, seed, consoleErrors }) => {
+    await openPack(page, seed.packs[TEXTURES], TEXTURES, '&sort=name')
+    const toggle = page.getByRole('button', { name: 'Filters' })
+    await toggle.click()
+    await expect(toggle).toHaveAttribute('aria-expanded', 'true')
+    await expect(page.getByRole('complementary', { name: 'Filters' }).getByRole('heading', { name: 'Kind' })).toBeVisible()
+    await page.getByRole('complementary', { name: 'Filters' }).getByRole('button', { name: 'Done' }).click()
+    await expect(toggle).toHaveAttribute('aria-expanded', 'false')
+
+    await tile(page, 'Brick wall').tap()
+    await expect(page.getByRole('complementary', { name: 'Asset details' }).getByRole('heading', { name: 'Brick wall' })).toBeVisible()
+    expect(consoleErrors).toEqual([])
+  })
+})
+
+test.describe('dark mode', () => {
+  test.use({ colorScheme: 'dark' })
+
+  test('main pages follow the system dark scheme without errors', async ({ page, consoleErrors }) => {
+    await visitAll(page, consoleErrors, async (name) => {
+      await expect(page.locator('html')).toHaveAttribute('data-scheme', 'dark')
+      const lum = await bodyLuminance(page)
+      expect(lum, `${name} background`).toBeGreaterThanOrEqual(0)
+      expect(lum, `${name} background`).toBeLessThan(0.2)
+    })
+  })
+
+  test('the theme buttons switch between light, dark and the system', async ({ page }) => {
+    await page.goto('/#packs')
+    const theme = page.getByRole('group', { name: 'Theme' })
+    const html = page.locator('html')
+    await expect(html).toHaveAttribute('data-scheme', 'dark')
+    await theme.getByRole('button', { name: 'Light theme' }).click()
+    await expect(html).toHaveAttribute('data-scheme', 'light')
+    await expect.poll(() => bodyLuminance(page)).toBeGreaterThan(0.5)
+    await theme.getByRole('button', { name: 'Match system theme' }).click()
+    await expect(html).toHaveAttribute('data-scheme', 'dark')
+    await expect(theme.getByRole('button', { name: 'Match system theme' })).toHaveAttribute('aria-pressed', 'true')
+  })
+})

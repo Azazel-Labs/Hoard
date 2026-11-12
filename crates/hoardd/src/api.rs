@@ -40,6 +40,7 @@ pub(crate) fn router(state: &AppState) -> Router<AppState> {
         .route("/api/tags/merge", post(merge_tags))
         .route("/api/tags/aliases", get(tag_aliases).delete(drop_tag_alias))
         .route("/api/packs/{id}/retag", post(retag_pack))
+        .route("/api/packs/{id}/read-files", post(read_pack_files))
         .route("/api/packs/{id}/context", axum::routing::put(put_pack_context))
         .route("/api/packs/{id}/store-matches", get(crate::store_search::store_matches))
         .route("/api/packs/{id}/unreal/convert", post(unreal_convert))
@@ -514,6 +515,27 @@ async fn retag_pack(
         } else {
             db::set_pack_status(c, &id2, hoard_core::PackStatus::Analyzing, None)?;
             db::enqueue(c, jobs::LLM_TAG, Some(&id2), &json!({}))?;
+        }
+        Ok(true)
+    })
+    .await?;
+    if !found {
+        return Err(AppError::not_found(format!("pack {id}")));
+    }
+    state.wake.notify_one();
+    Ok(StatusCode::ACCEPTED)
+}
+
+/// `POST /api/packs/{id}/read-files`: read the store's files in the pack again (a Megascans JSON) for its name, tags
+/// and description.
+async fn read_pack_files(State(state): State<AppState>, Path(id): Path<String>) -> ApiResult<StatusCode> {
+    let id2 = id.clone();
+    let found = db::call(&state.pool, move |c| {
+        if db::get_pack(c, &id2)?.is_none() {
+            return Ok(false);
+        }
+        if !db::job_pending(c, jobs::READ_FILES, Some(&id2), None)? {
+            db::enqueue(c, jobs::READ_FILES, Some(&id2), &json!({}))?;
         }
         Ok(true)
     })

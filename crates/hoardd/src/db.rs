@@ -128,6 +128,15 @@ const MIGRATIONS: &[&str] = &[
     // 19: tags merged into others. Tagging maps the old name to the new one, so a merged tag stays merged when the
     // taggers run again (see `merge_tags`).
     "CREATE TABLE tag_aliases (tag TEXT PRIMARY KEY, into_tag TEXT NOT NULL) WITHOUT ROWID;",
+    // 20: what a pack's own files say (a Megascans JSON's tags, and when they were read), who sells it, and the store
+    // lookup: suggestions found in the background, and whether the store page was attached automatically.
+    "ALTER TABLE packs ADD COLUMN file_tags TEXT;
+     ALTER TABLE packs ADD COLUMN files_read_at TEXT;
+     ALTER TABLE pack_context ADD COLUMN seller TEXT;
+     ALTER TABLE pack_context ADD COLUMN store_license TEXT;
+     ALTER TABLE pack_context ADD COLUMN store_auto TEXT;
+     ALTER TABLE pack_context ADD COLUMN store_matches TEXT;
+     ALTER TABLE pack_context ADD COLUMN store_lookup_at TEXT;",
 ];
 
 /// How many automatic pre-upgrade backups to keep in `<data dir>/backups`.

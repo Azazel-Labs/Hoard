@@ -194,6 +194,15 @@ async function retag(p: Pack, llm: boolean) {
   }
 }
 
+async function readFiles(p: Pack) {
+  try {
+    await api.readPackFiles(p.id)
+    emit('changed')
+  } catch (e) {
+    emit('error', `Couldn't read the pack's files: ${(e as Error).message}`)
+  }
+}
+
 // Pack context editor: one pack open at a time.
 const editing = ref<string | null>(null)
 const saving = ref(false)
@@ -473,6 +482,9 @@ async function archive(p: Pack) {
               </button>
               <button v-if="stats?.llm_enabled" type="button" :disabled="p.status !== 'ready'" @click="retag(p, true)">
                 Re-run LLM tagger
+              </button>
+              <button type="button" :disabled="p.status !== 'ready'" @click="readFiles(p)">
+                Read the pack's files again
               </button>
               <button v-if="p.unreal_packages || p.unreal_converted" type="button" @click="openUnreal(p)">
                 Convert Unreal content…

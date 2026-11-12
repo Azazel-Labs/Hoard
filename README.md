@@ -261,6 +261,10 @@ software rasterizer (`apt install mesa-vulkan-drivers`). Without any adapter, ev
      panel lists the other takes, and tag or category edits can apply to all of them at once.
    - **Duplicates.** Byte-identical files across packs (the same CC0 texture in five bundles) are stored once and
      listed under "Identical copies".
+   - **Megascans files.** The `<id>.json` that comes with each Megascans asset names the pack (unless someone typed
+     its name), adds its tags (`wood`, `furniture`, `color:brown`, …) to the pack and the asset, and gives the pack a
+     short description: what it is, where it was scanned, its size and its maps. More → "Read the pack's files again"
+     reads them again, for example after the description was deleted.
    - **Pack context.** README text is kept with the pack, and a store link inside it (Fab, itch.io, Humble Bundle,
      Unity Asset Store, Kenney, …) fills in where the pack came from. "Store details" on the packs page takes the
      store page URL, license tier and listing text. For a pack without a store link it first searches Fab, itch.io,
@@ -648,6 +652,7 @@ Requests that change something are marked 🔒: guests can't make them. A browse
 | PATCH 🔒 | `/api/packs/{id}` | rename it (`{name}`) |
 | DELETE 🔒 | `/api/packs/{id}` | delete it (blobs go at the next `gc`) |
 | POST 🔒 | `/api/packs/{id}/retag` | run the tagger again |
+| POST 🔒 | `/api/packs/{id}/read-files` | read the pack's Megascans files again (name, tags, description) |
 | GET, PUT 🔒 | `/api/packs/{id}/context` | store link, README and notes the tagger reads |
 | GET | `/api/packs/{id}/files/{path}` | a pack file by its original path (the 3D viewer uses this) |
 | GET | `/api/packs/{id}/bundle.zip` | the whole pack |

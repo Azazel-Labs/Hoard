@@ -624,9 +624,21 @@ fn apply_reply(
     let now = db::now();
     let tx = c.transaction()?;
     if let Some((pack_id, p)) = pack {
-        let tags: Vec<String> = p.tags.iter().filter_map(|t| hoard_core::normalize_tag(t)).collect();
+        let mut tags: Vec<String> = p.tags.iter().filter_map(|t| hoard_core::normalize_tag(t)).collect();
+        // What the pack's own files said (a Megascans JSON) stays: its tags alongside the AI's, its description
+        // instead of the AI's.
+        let file_tags: Option<String> =
+            tx.query_row("SELECT file_tags FROM packs WHERE id = ?1", [pack_id], |r| r.get(0)).optional()?.flatten();
+        for t in file_tags.as_deref().and_then(|t| serde_json::from_str::<Vec<String>>(t).ok()).unwrap_or_default() {
+            if !tags.contains(&t) {
+                tags.push(t);
+            }
+        }
         tx.execute(
-            "UPDATE packs SET description = COALESCE(?2, description), tags = ?3 WHERE id = ?1",
+            "UPDATE packs SET description = CASE WHEN file_tags IS NOT NULL AND description IS NOT NULL
+                                                 THEN description ELSE COALESCE(?2, description) END,
+                              tags = ?3
+             WHERE id = ?1",
             params![pack_id, p.description.or(p.title.map(|t| format!("{t}."))), serde_json::to_string(&tags)?],
         )?;
     }

@@ -18,6 +18,8 @@ pub(crate) const CONVERT: &str = "convert";
 pub(crate) const UNREAL: &str = "unreal_convert";
 pub(crate) const SCAN: &str = "scan_location";
 pub(crate) const RELOCATE: &str = "relocate";
+/// Read the store's files in a pack again (a Megascans JSON): name, tags and description.
+pub(crate) const READ_FILES: &str = "read_files";
 
 /// With the backoff below, the last try comes about 15 minutes after the first: long enough for a local model
 /// that's still downloading on the first start of the compose stack.
@@ -67,6 +69,7 @@ pub(crate) fn job_label(kind: &str, pack: &str) -> String {
         UNREAL => format!("Converting Unreal packages in {pack}"),
         SCAN => "Scanning a watched folder".to_owned(),
         RELOCATE => "Moving files between library locations".to_owned(),
+        READ_FILES => format!("Reading the files of {pack}"),
         other => format!("{other} {pack}"),
     }
 }
@@ -90,6 +93,7 @@ async fn run(state: &AppState, job: db::JobRow) {
         UNREAL => UNREAL,
         SCAN => SCAN,
         RELOCATE => RELOCATE,
+        READ_FILES => READ_FILES,
         _ => "job",
     };
     let _activity = crate::activity::start(
@@ -127,6 +131,7 @@ async fn run(state: &AppState, job: db::JobRow) {
             None => Err(anyhow::anyhow!("scan job without a location")),
         },
         RELOCATE => crate::relocate::run(state, serde_json::from_value(job.payload.clone()).unwrap_or_default()).await,
+        READ_FILES => crate::sidecar::apply(state, &pack_id, false, None).await.map(|_| ()),
         other => Err(anyhow::anyhow!("unknown job kind {other}")),
     };
 
@@ -161,6 +166,37 @@ async fn run(state: &AppState, job: db::JobRow) {
         tracing::error!(error = ?e, "could not record job result");
     }
     tracing::info!(id = job.id, kind = %job.kind, ok = result.is_ok(), secs = started.elapsed().as_secs_f32(), "job finished");
+}
+
+/// At startup: read the store's files of packs that have one but were added before Hoard read them.
+pub(crate) async fn read_unread_files(state: &AppState) -> Result<()> {
+    let n = db::call(&state.pool, |c| {
+        let ids: Vec<String> = {
+            let mut stmt = c.prepare(
+                "SELECT p.id FROM packs p
+                 WHERE p.description IS NULL AND p.files_read_at IS NULL AND p.status = 'ready'
+                   AND EXISTS (SELECT 1 FROM assets a JOIN blobs b ON b.hash = a.blob_hash
+                               WHERE a.pack_id = p.id AND lower(a.path) LIKE '%.json' AND b.size <= ?1)",
+            )?;
+            stmt.query_map([crate::sidecar::SIDECAR_BYTES], |r| r.get(0))?.collect::<rusqlite::Result<_>>()?
+        };
+        let tx = c.transaction()?;
+        let mut n = 0;
+        for id in &ids {
+            if !db::job_pending(&tx, READ_FILES, Some(id), None)? {
+                db::enqueue(&tx, READ_FILES, Some(id), &serde_json::json!({}))?;
+                n += 1;
+            }
+        }
+        tx.commit()?;
+        Ok(n)
+    })
+    .await?;
+    if n > 0 {
+        tracing::info!(packs = n, "reading the store files of packs added before Hoard read them");
+        state.wake.notify_one();
+    }
+    Ok(())
 }
 
 /// Run CPU/disk-heavy work on a low-priority thread, with a runtime handle for storage calls.

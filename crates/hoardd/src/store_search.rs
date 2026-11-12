@@ -8,7 +8,7 @@
 //! product folders (`Content/MedievalVillage`), its engine and how many meshes and textures it has. The name and a
 //! few variants of it are searched, and the clues decide the order.
 
-use std::collections::{BTreeMap, HashMap};
+use std::collections::{BTreeMap, BTreeSet, HashMap};
 use std::fmt::Write as _;
 use std::time::Duration;
 
@@ -21,6 +21,7 @@ use serde_json::Value;
 
 use crate::context::{attr, decode_entities, fetch_page, store_from_url};
 use crate::error::{ApiResult, AppError};
+use crate::sidecar::{self, Sidecar};
 use crate::{AppState, db};
 
 /// Results kept from each store after ranking.
@@ -31,9 +32,6 @@ const MAX_QUERY: usize = 120;
 /// Searches sent to Fab for one lookup (its search is quick and answers in JSON); the other stores get two.
 const FAB_QUERIES: usize = 4;
 const OTHER_QUERIES: usize = 2;
-/// Files read for clues.
-/// The largest JSON file read for clues; Megascans' run to about 30 KB.
-const SIDECAR_BYTES: i64 = 256 * 1024;
 const MAX_PATHS: i64 = 50_000;
 
 /// Words in pack names that say where a pack is from or what it's for, not what it is.
@@ -442,19 +440,19 @@ pub(crate) fn clues(pack_name: &str, readme: Option<&str>, paths: &[String], kin
 }
 
 impl Clues {
-    /// Read a JSON file that came with the pack. Megascans assets (from Fab or Bridge) carry `<id>.json` with the
-    /// listing's exact title under `semanticTags`; the pack's own name is usually the file name, with the id and
-    /// "Raw" in it, which finds nothing.
-    pub(crate) fn read_sidecar(&mut self, json: &str) {
-        let Ok(v) = serde_json::from_str::<Value>(json) else { return };
-        let tags = &v["semanticTags"];
-        let title = tags["name_formats"]["title"].as_str().or_else(|| tags["name"].as_str()).map(str::trim);
-        if let Some(t) = title.filter(|t| !t.is_empty() && t.len() <= 120)
+    /// Take what the store's own files in the pack say (see [`crate::sidecar`]). Megascans assets carry `<id>.json`
+    /// with the listing's exact title; the pack's own name is usually the file name, with the id and "Raw" in it,
+    /// which finds nothing. A pack of several assets has no one title, but its seller is still a clue.
+    pub(crate) fn add_sidecars(&mut self, files: &[Sidecar]) {
+        let titles: BTreeSet<&str> = files.iter().map(|f| f.title.as_str()).collect();
+        if let (Some(first), 1) = (files.first(), titles.len())
             && self.title.is_none()
         {
-            self.title = Some((t.split_whitespace().collect::<Vec<_>>().join(" "), "Megascans file"));
-            if !self.sellers.iter().any(|(s, _)| s == "Quixel Megascans") {
-                self.sellers.insert(0, ("Quixel Megascans".to_owned(), "Megascans file"));
+            self.title = Some((first.title.clone(), first.source));
+        }
+        for f in files {
+            if !self.sellers.iter().any(|(s, _)| s == f.seller) {
+                self.sellers.insert(0, (f.seller.to_owned(), f.source));
             }
         }
     }
@@ -509,24 +507,12 @@ pub(crate) async fn store_matches(
         let paths = stmt
             .query_map(rusqlite::params![id2, MAX_PATHS], |r| r.get::<_, String>(0))?
             .collect::<Result<Vec<_>, _>>()?;
-        // Small JSON files a store ships beside the art, which may name the product exactly.
-        let mut stmt = c.prepare(
-            "SELECT a.blob_hash FROM assets a JOIN blobs b ON b.hash = a.blob_hash
-             WHERE a.pack_id = ?1 AND lower(a.path) LIKE '%.json' AND b.size <= ?2 ORDER BY b.size DESC LIMIT 3",
-        )?;
-        let sidecars = stmt
-            .query_map(rusqlite::params![id2, SIDECAR_BYTES], |r| r.get::<_, String>(0))?
-            .collect::<Result<Vec<_>, _>>()?;
-        Ok(Some((pack, readme, paths, sidecars)))
+        Ok(Some((pack, readme, paths)))
     })
     .await?;
-    let (pack, readme, paths, sidecars) = found.ok_or_else(|| AppError::not_found(format!("pack {id}")))?;
+    let (pack, readme, paths) = found.ok_or_else(|| AppError::not_found(format!("pack {id}")))?;
     let mut clues = clues(&pack.name, readme.as_deref(), &paths, &pack.kinds);
-    for hash in sidecars {
-        if let Ok(bytes) = state.blobs.read_all(&hash).await {
-            clues.read_sidecar(&String::from_utf8_lossy(&bytes));
-        }
-    }
+    clues.add_sidecars(&sidecar::pack_sidecars(&state, &id).await?);
     let typed = mq.q.as_deref().map(str::trim).filter(|q| !q.is_empty());
     let query: String = match (typed, &clues.title) {
         (Some(q), _) => q.split_whitespace().collect::<Vec<_>>().join(" "),
@@ -1062,11 +1048,7 @@ mod tests {
         .map(String::from)
         .to_vec();
         let mut c = clues("historic_miscellaneous_stand_wood_old_05_xeokah0_raw", None, &paths, &BTreeMap::new());
-        c.read_sidecar(
-            r#"{"semanticTags":{"name":"Historic Miscellaneous Stand Wood Old 05","name_formats":
-            {"title":"Historic Miscellaneous Stand Wood Old 05"}},"tags":["table"]}"#,
-        );
-        c.read_sidecar("not json");
+        c.add_sidecars(&[sidecar::read("xeokah0.json", sidecar::tests::STAND).unwrap()]);
         assert_eq!(c.title, Some(("Historic Miscellaneous Stand Wood Old 05".to_owned(), "Megascans file")));
         assert_eq!(c.sellers[0].0, "Quixel Megascans");
         assert!(c.describe()[0].starts_with("Title: Historic Miscellaneous Stand Wood Old 05"));

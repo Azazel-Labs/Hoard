@@ -36,6 +36,7 @@ mod scan;
 mod server;
 mod settings;
 mod sheet;
+mod sidecar;
 mod sources;
 mod store_search;
 mod tagger;
@@ -145,6 +146,14 @@ async fn main() -> Result<()> {
     updates::start_auto_update(&state);
     analyze::warm_renderer();
     jobs::spawn_workers(&state);
+    {
+        let st = Arc::clone(&state);
+        tokio::spawn(async move {
+            if let Err(e) = jobs::read_unread_files(&st).await {
+                tracing::warn!(error = %format!("{e:#}"), "could not queue reading packs' store files");
+            }
+        });
+    }
     {
         let st = Arc::clone(&state);
         tokio::spawn(async move { formats::log_trim(&st).await });

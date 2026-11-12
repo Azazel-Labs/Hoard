@@ -785,6 +785,7 @@ pub(crate) fn ingest_pack(state: &AppState, rt: &Handle, pack_id: &str, auto_nam
     tx.execute("UPDATE packs SET files_done = files_total WHERE id = ?1", [pack_id])?;
     tx.commit()?;
     tracing::info!(pack = pack_id, links = n_links, families = n_families, "pack ingested");
+    read_pack_files(state, rt, pack_id, auto_name, wrapper_name);
 
     if watched.is_none() {
         fs::remove_dir_all(&staging).ok();
@@ -943,7 +944,20 @@ pub(crate) fn retag_pack(state: &AppState, rt: &Handle, pack_id: &str) -> Result
     tx.execute("UPDATE packs SET files_done = files_total WHERE id = ?1", [pack_id])?;
     tx.commit()?;
     fs::remove_dir_all(&work).ok();
+    read_pack_files(state, rt, pack_id, false, None);
     Ok(())
+}
+
+/// Name, tag and describe the pack from the store's files in it (a Megascans `<id>.json`). A file that can't be
+/// read doesn't fail the pack.
+fn read_pack_files(state: &AppState, rt: &Handle, pack_id: &str, auto_name: bool, folder: Option<String>) {
+    match rt.block_on(crate::sidecar::apply(state, pack_id, auto_name, folder)) {
+        Ok(a) if a.files > 0 => {
+            tracing::info!(pack = pack_id, files = a.files, renamed = ?a.renamed, "read the pack's store files");
+        }
+        Ok(_) => {}
+        Err(e) => tracing::warn!(pack = pack_id, error = %format!("{e:#}"), "could not read the pack's store files"),
+    }
 }
 
 #[cfg(test)]

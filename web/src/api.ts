@@ -566,6 +566,7 @@ export const api = {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body),
     }),
+  readPackFiles: (id: string) => request<void>(`/api/packs/${id}/read-files`, { method: 'POST' }),
   search(p: SearchParams): Promise<SearchResult> {
     const qs = new URLSearchParams()
     if (p.q) qs.set('q', p.q)

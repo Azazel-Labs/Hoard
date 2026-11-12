@@ -188,12 +188,13 @@ export function loadMaps(
 /** Put a material's maps on a model's materials: for a model that names no textures but uses a material's maps.
  *  `tracked` is what the model viewer remembers of each material's maps for its "textures off" switch; a slot the
  *  switch has emptied stays empty, with the new texture remembered for when it comes back. Returns how many kinds
- *  of map there are, and a function that stops loading. */
+ *  of map there are, and a function that stops loading. `onChange` hears each time maps arrive. */
 export function applyToModel(
   info: MaterialInfo,
   packId: string,
   flipY: boolean,
   tracked: Map<THREE.Material, Partial<Record<string, THREE.Texture | null>>>,
+  onChange?: () => void,
 ): { count: number; stop: () => void } {
   const roles = new Set<Slot>()
   const stop = loadMaps(info, packId, { max: 2048, flipY }, (set, replaced) => {
@@ -219,6 +220,7 @@ export function applyToModel(
       }
     }
     for (const t of replaced) t.dispose()
+    onChange?.()
   })
   for (const j of plan(pickMaps(info, 2048))) for (const s of j.slots) if (s !== 'height' && s !== 'bump') roles.add(s)
   return { count: roles.size, stop }

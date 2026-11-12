@@ -30,6 +30,54 @@ test.describe('full-screen viewers', () => {
     await expect(viewer).toBeHidden()
   })
 
+  test('the 3D viewer shows a model other ways, and its scene information', async ({ page, seed }) => {
+    test.slow()
+    await openPack(page, seed.packs[MODELS], MODELS, '&sort=name')
+    await doubleClick(page, tile(page, 'Crate'))
+    const viewer = page.getByRole('dialog', { name: 'View Crate in 3D' })
+    await expect(viewer.getByText(/12 tris · 1 mesh/)).toBeVisible({ timeout: 20_000 })
+    const menu = viewer.getByRole('navigation', { name: 'View' })
+    const mode = (name: string) => menu.getByRole('button', { name, exact: true })
+    await expect(mode('Final render')).toHaveAttribute('aria-pressed', 'true')
+    // The crate has a colour map and nothing else, so only that map is offered.
+    await expect(mode('Base color')).toBeVisible()
+    await expect(mode('Roughness')).toHaveCount(0)
+    await expect(mode('Normal')).toHaveCount(0)
+
+    await mode('UV checker').click()
+    await expect(mode('UV checker')).toHaveAttribute('aria-pressed', 'true')
+    await expect(mode('Final render')).toHaveAttribute('aria-pressed', 'false')
+    // The textures and light switches belong to the model's own look.
+    await expect(viewer.getByRole('button', { name: 'Textures', exact: true })).toBeDisabled()
+    await expect(viewer.getByRole('button', { name: 'Light', exact: true })).toBeDisabled()
+
+    await page.keyboard.press('3')
+    await expect(mode('Base color')).toHaveAttribute('aria-pressed', 'true')
+    await page.keyboard.press('w')
+    await expect(mode('Wireframe')).toHaveAttribute('aria-pressed', 'true')
+
+    await page.keyboard.press('i')
+    const info = viewer.getByRole('region', { name: 'Scene information' })
+    const row = (name: string) => info.locator('dl > div').filter({ has: page.getByText(name, { exact: true }) }).locator('dd')
+    await expect(row('Geometries')).toHaveText('1')
+    await expect(row('Materials')).toHaveText('1')
+    await expect(row('Textures')).toHaveText('1')
+    await expect(row('Triangles')).toHaveText('12')
+    await expect(row('Vertices')).toHaveText('36')
+    // OBJ says nothing of its units.
+    await expect(row('Height')).toHaveText('2 units')
+    await expect(row('Width')).toHaveText('2 units')
+    await info.getByRole('button', { name: 'Close scene information' }).click()
+    await expect(info).toHaveCount(0)
+
+    await page.keyboard.press('1')
+    await expect(mode('Final render')).toHaveAttribute('aria-pressed', 'true')
+    await expect(viewer.getByRole('button', { name: 'Textures', exact: true })).toBeEnabled()
+    await expect(viewer.getByText(/Couldn't show this model/)).toHaveCount(0)
+    await page.keyboard.press('Escape')
+    await expect(viewer).toBeHidden()
+  })
+
   test('a glTF model opens the 3D viewer too', async ({ page, seed }) => {
     await openPack(page, seed.packs[MODELS], MODELS, '&sort=name')
     await doubleClick(page, tile(page, 'Triangle'))

@@ -3,6 +3,7 @@
 // which falls back to WebGL2 by itself. Only the viewers import this, and they load on demand, so three stays out of
 // the main bundle.
 import * as THREE from 'three/webgpu'
+import { sRGBTransferEOTF, texture, vec3 } from 'three/tsl'
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js'
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js'
 import { TGALoader } from 'three/addons/loaders/TGALoader.js'
@@ -11,6 +12,39 @@ import { applyToModel } from './materialMaps'
 
 export type Background = 'checker' | 'dark' | 'grey' | 'light' | 'env'
 export const BACKGROUNDS: Background[] = ['checker', 'dark', 'grey', 'light', 'env']
+
+/** How the full-screen viewer shows the model: as it renders, plainly lit, one of its maps on its own, or a look that
+ *  shows its shape (clay, a UV checker, each mesh in its own colour). */
+export type ViewMode = 'final' | 'raw' | MapMode | 'matcap' | 'uv' | 'geometry'
+export type MapMode = 'color' | 'roughness' | 'metalness' | 'normal' | 'ao'
+
+/** Each map view: the slot it shows and the channel three reads from it. glTF packs roughness into G and metalness
+ *  into B of one texture, and occlusion lives in R; maps of their own are grey, so the same channel serves. */
+const MAP_VIEWS: Record<MapMode, { slot: MapSlot; channel: 'rgb' | 'r' | 'g' | 'b' }> = {
+  color: { slot: 'map', channel: 'rgb' },
+  roughness: { slot: 'roughnessMap', channel: 'g' },
+  metalness: { slot: 'metalnessMap', channel: 'b' },
+  normal: { slot: 'normalMap', channel: 'rgb' },
+  ao: { slot: 'aoMap', channel: 'r' },
+}
+export const MAP_MODES = Object.keys(MAP_VIEWS) as MapMode[]
+const isMapMode = (m: ViewMode): m is MapMode => m in MAP_VIEWS
+
+/** What the scene information panel shows. */
+export interface SceneStats {
+  meshes: number
+  materials: number
+  /** Distinct images the materials use. */
+  textures: number
+  triangles: number
+  vertices: number
+  /** The bounding box as the model loaded: X, Y (up) and Z. */
+  size: { x: number; y: number; z: number }
+  /** glTF is in metres; other formats say nothing dependable about their units. */
+  metres: boolean
+  /** The map views worth offering: a map at least one material has. */
+  maps: MapMode[]
+}
 
 export interface StageInfo {
   triangles: number
@@ -273,11 +307,27 @@ export class ModelStage {
   private disposed = false
   private envOn = true
   private texturesOn = true
+  private wireframeOn = false
+  private bg: Background = 'checker'
+  private mode: ViewMode = 'final'
+  /** The meshes and the materials a view mode put on them in place of their own, which go back afterwards. */
+  private views: { meshes: Map<THREE.Mesh, { own: THREE.Material | THREE.Material[]; view: THREE.Material | THREE.Material[] }>; made: AnyMaterial[] } | null = null
+  /** Made on first use: the clay and checker pictures. */
+  private matcap: THREE.Texture | null = null
+  private checker: THREE.Texture | null = null
+  private meshes: THREE.Mesh[] = []
+  private counts = { triangles: 0, vertices: 0 }
+  private size = new THREE.Vector3()
+  private metres = false
+  /** Image top at v = 1 (OBJ, FBX), as three's textures assume; glTF has it at v = 0. */
+  private flipY = true
   playing = true
   private missing: string[] = []
   private stopMaps: (() => void) | null = null
   /** Textures go on loading after the model is up; this hears about the ones that fail. */
   onMissing: ((names: string[]) => void) | null = null
+  /** Hears when a material's maps arrive late (a model wearing a material's maps), to count them again. */
+  onTexturesChanged: (() => void) | null = null
 
   constructor(host: HTMLElement, options: StageOptions = {}) {
     this.host = host
@@ -325,13 +375,12 @@ export class ModelStage {
     this.envMap = pmrem.fromScene(room, 0.04).texture
     room.dispose()
     pmrem.dispose()
-    this.scene.environment = this.envMap
     this.scene.add(this.hemi)
     this.camera.add(this.key, this.key.target)
     this.key.position.set(1.2, 1.6, 0.6)
     this.key.target.position.set(0, 0, -2)
     this.scene.add(this.camera)
-    this.applyLights()
+    this.applyLook()
 
     const controls = new OrbitControls(this.camera, renderer.domElement)
     controls.enableDamping = true
@@ -405,16 +454,17 @@ export class ModelStage {
     }
 
     let triangles = 0
-    let meshes = 0
+    let vertices = 0
     const textured = { any: false }
     const converted = new Map<THREE.Material, AnyMaterial>()
     object.traverse((o) => {
       const mesh = o as THREE.Mesh
       if (!mesh.isMesh && !(o as THREE.Points).isPoints && !(o as THREE.Line).isLine) return
       if (mesh.isMesh) {
-        meshes++
+        this.meshes.push(mesh)
         const g = mesh.geometry
         triangles += (g.index?.count ?? g.attributes.position?.count ?? 0) / 3
+        vertices += g.attributes.position?.count ?? 0
       }
       const list = (Array.isArray(mesh.material) ? mesh.material : [mesh.material]).map((m) => {
         // Meshes share materials: convert each once, so they stay shared and the colour fix isn't applied twice.
@@ -437,17 +487,25 @@ export class ModelStage {
 
     // A model that names no textures, next to textures named after it: try them on.
     let guessed = 0
+    this.flipY = src.ext !== 'glb' && src.ext !== 'gltf'
     // Or a material made from maps that share its name: its maps by role.
     const material = textured.any ? undefined : full.materials?.[0]
     if (material) {
-      const applied = applyToModel(material, asset.pack_id, src.ext !== 'glb' && src.ext !== 'gltf', this.materials)
+      const applied = applyToModel(material, asset.pack_id, this.flipY, this.materials, () => {
+        // A view built from the maps that were there shows the new ones only once built again.
+        if (this.views) this.buildViews()
+        this.onTexturesChanged?.()
+      })
       this.stopMaps = applied.stop
       guessed = applied.count
-    } else if (!textured.any && guesses.length) guessed = this.applyGuesses(guesses, asset.pack_id, src.ext !== 'glb' && src.ext !== 'gltf', manager)
+    } else if (!textured.any && guesses.length) guessed = this.applyGuesses(guesses, asset.pack_id, this.flipY, manager)
 
     this.object = object
     this.scene.add(object)
     this.frameHome()
+    this.counts = { triangles: Math.round(triangles), vertices }
+    this.bounds().box.getSize(this.size)
+    this.metres = ['glb', 'gltf'].includes(extOf(full.path))
 
     // Clips embedded in the file plus linked clip files ("Knight@Run.fbx").
     animations.forEach((c, i) => this.clips.set(c.name || `clip ${i + 1}`, c))
@@ -476,8 +534,8 @@ export class ModelStage {
     this.checkSettled()
 
     return {
-      triangles: Math.round(triangles),
-      meshes,
+      triangles: this.counts.triangles,
+      meshes: this.meshes.length,
       materials: this.materials.size,
       // An idle clip first, since the first is what plays: a character pack's clips come alphabetically, and a
       // looping "Death" or "Victory" is a poor first look.
@@ -601,10 +659,197 @@ export class ModelStage {
   }
 
   setWireframe(on: boolean) {
-    for (const m of this.materials.keys()) {
+    this.wireframeOn = on
+    for (const m of [...this.materials.keys(), ...(this.views?.made ?? [])]) {
       m.wireframe = on
       m.needsUpdate = true
     }
+  }
+
+  /** Show the model another way; the wireframe and grid stay as they are on top. */
+  setMode(mode: ViewMode) {
+    this.mode = mode
+    this.buildViews()
+    this.applyLook()
+    if (this.paused) this.renderOnce()
+  }
+
+  /** Counts for the scene information panel. Textures that failed to load don't count once loading is over. */
+  sceneStats(): SceneStats {
+    const settled = this.loaded && !this.pending
+    const sources = new Set<object>()
+    const maps = new Set<MapMode>()
+    for (const tracked of this.materials.values()) {
+      for (const [slot, t] of Object.entries(tracked) as [MapSlot, THREE.Texture | null][]) {
+        if (!t || (settled && !t.image)) continue
+        sources.add(t.source)
+        for (const mode of MAP_MODES) if (MAP_VIEWS[mode].slot === slot) maps.add(mode)
+      }
+    }
+    return {
+      meshes: this.meshes.length,
+      materials: this.materials.size,
+      textures: sources.size,
+      ...this.counts,
+      size: { x: this.size.x, y: this.size.y, z: this.size.z },
+      metres: this.metres,
+      maps: MAP_MODES.filter((m) => maps.has(m)),
+    }
+  }
+
+  /** Put each mesh's own materials back, and free the ones the view made. */
+  private dropViews() {
+    if (!this.views) return
+    for (const [mesh, { own }] of this.views.meshes) mesh.material = own
+    for (const m of this.views.made) m.dispose()
+    this.views = null
+  }
+
+  /** Swap between the view's materials and the meshes' own, keeping both (the thumbnail is taken in its own look). */
+  private showViews(on: boolean) {
+    for (const [mesh, { own, view }] of this.views?.meshes ?? []) mesh.material = on ? view : own
+  }
+
+  /** Make the materials the mode shows the meshes in. Meshes that share a material share its stand-in, except in
+   *  the geometry view, where each mesh gets a colour of its own. Points and lines keep theirs. */
+  private buildViews() {
+    this.dropViews()
+    const mode = this.mode
+    if (mode === 'final' || mode === 'raw') return
+    const views: NonNullable<typeof this.views> = { meshes: new Map(), made: [] }
+    const shared = new Map<string, AnyMaterial>()
+    this.meshes.forEach((mesh, i) => {
+      const own = mesh.material
+      const hasUv = !!mesh.geometry.attributes.uv
+      const list = (Array.isArray(own) ? own : [own]).map((m) => {
+        const key = mode === 'geometry' ? `${i}:${m.uuid}` : `${m.uuid}:${hasUv}`
+        let v = shared.get(key)
+        if (!v) {
+          v = this.viewMaterial(mode, m as AnyMaterial, hasUv, i)
+          shared.set(key, v)
+          views.made.push(v)
+        }
+        return v
+      })
+      const view = Array.isArray(own) ? list : list[0]
+      views.meshes.set(mesh, { own, view })
+      mesh.material = view
+    })
+    this.views = views
+  }
+
+  /** The stand-in for one material in a view mode, from the maps it had when it loaded (whatever "textures off" says). */
+  private viewMaterial(mode: Exclude<ViewMode, 'final' | 'raw'>, own: AnyMaterial, hasUv: boolean, index: number): AnyMaterial {
+    const maps = this.materials.get(own) ?? {}
+    let m: THREE.NodeMaterial
+    if (isMapMode(mode)) {
+      // Unlit and full-bright, a mesh without the map in flat grey. Colour maps are decoded from sRGB as they're
+      // read and encoded again on the way out; data maps are numbers, so they're read as if they were sRGB too, to
+      // show each pixel as the file has it.
+      m = new THREE.MeshBasicNodeMaterial({ color: 0x808080 })
+      const { slot, channel } = MAP_VIEWS[mode]
+      const t = maps[slot]
+      if (t) {
+        const s = texture(t)
+        const c = channel === 'rgb' ? s.rgb : vec3(channel === 'r' ? s.r : channel === 'g' ? s.g : s.b)
+        m.colorNode = t.colorSpace === THREE.SRGBColorSpace ? c : (sRGBTransferEOTF(c) as typeof c)
+      }
+    } else if (mode === 'matcap') {
+      // Clay, with the normal map's detail pressed in.
+      const std = own as THREE.MeshStandardMaterial
+      m = new THREE.MeshMatcapNodeMaterial({ matcap: this.matcapTexture(), normalMap: maps.normalMap ?? null })
+      if (std.normalScale) (m as THREE.MeshMatcapNodeMaterial).normalScale.copy(std.normalScale)
+    } else if (mode === 'uv') {
+      m = hasUv
+        ? new THREE.MeshStandardNodeMaterial({ map: this.checkerTexture(), roughness: 0.85, metalness: 0 })
+        : new THREE.MeshStandardNodeMaterial({ color: 0x808080, roughness: 0.85, metalness: 0 })
+    } else {
+      // Hues a golden angle apart, so neighbours in the file differ however many meshes there are.
+      const color = new THREE.Color().setHSL((index * 0.618034) % 1, 0.6, 0.55)
+      m = new THREE.MeshStandardNodeMaterial({ color, roughness: 0.6, metalness: 0 })
+    }
+    m.side = own.side
+    ;(m as AnyMaterial).wireframe = this.wireframeOn
+    // Cut-outs (leaves, fences) keep their holes, so the shape reads the same in every view.
+    if (own.alphaTest > 0) {
+      const cut = maps.alphaMap ? texture(maps.alphaMap).g : maps.map ? texture(maps.map).a : null
+      if (cut) {
+        m.opacityNode = cut
+        m.alphaTest = own.alphaTest
+      }
+    }
+    return m as AnyMaterial
+  }
+
+  /** A clay ball lit from the upper left, drawn pixel by pixel: the matcap view's only light. */
+  private matcapTexture(): THREE.Texture {
+    if (this.matcap) return this.matcap
+    const S = 256
+    const canvas = document.createElement('canvas')
+    canvas.width = canvas.height = S
+    const ctx = canvas.getContext('2d')!
+    const img = ctx.createImageData(S, S)
+    const L = new THREE.Vector3(-0.45, 0.6, 0.66).normalize()
+    // A dim fill from the lower right, so faces turned from the key light still show their shape.
+    const F = new THREE.Vector3(0.6, -0.25, 0.5).normalize()
+    const H = L.clone().add(new THREE.Vector3(0, 0, 1)).normalize()
+    const n = new THREE.Vector3()
+    for (let y = 0; y < S; y++) {
+      for (let x = 0; x < S; x++) {
+        n.set(((x + 0.5) / S) * 2 - 1, 1 - ((y + 0.5) / S) * 2, 0)
+        // Past the rim, the rim's own shade, so edges sampled at the very border don't pick up black.
+        const r2 = Math.min(n.x * n.x + n.y * n.y, 1)
+        if (r2 >= 1) n.normalize()
+        n.z = Math.sqrt(1 - r2)
+        const diffuse = Math.max(0, n.dot(L))
+        const spec = Math.pow(Math.max(0, n.dot(H)), 40) * 0.18
+        const rim = Math.pow(1 - n.z, 3) * 0.12
+        const shade = 0.3 + 0.62 * diffuse + 0.2 * Math.max(0, n.dot(F))
+        const i = (y * S + x) * 4
+        ;[0.76, 0.72, 0.68].forEach((base, c) => (img.data[i + c] = Math.min(255, (base * shade + spec + rim) * 255)))
+        img.data[i + 3] = 255
+      }
+    }
+    ctx.putImageData(img, 0, 0)
+    const t = new THREE.CanvasTexture(canvas)
+    t.colorSpace = THREE.SRGBColorSpace
+    this.matcap = t
+    return t
+  }
+
+  /** An 8 × 8 checker of coloured, labelled cells (A1 to H8): stretching shows in the squares, seams where the
+   *  labels jump, flipped islands in mirrored letters. */
+  private checkerTexture(): THREE.Texture {
+    if (this.checker) return this.checker
+    const S = 1024
+    const N = 8
+    const cell = S / N
+    const canvas = document.createElement('canvas')
+    canvas.width = canvas.height = S
+    const ctx = canvas.getContext('2d')!
+    ctx.textAlign = 'center'
+    ctx.textBaseline = 'middle'
+    ctx.font = `600 ${cell * 0.36}px system-ui, sans-serif`
+    for (let row = 0; row < N; row++) {
+      for (let col = 0; col < N; col++) {
+        const light = (row + col) % 2 === 0
+        ctx.fillStyle = `hsl(${(col * 360) / N} 60% ${light ? 70 : 42}%)`
+        ctx.fillRect(col * cell, row * cell, cell, cell)
+        // A small square in one corner of each cell shows which way round it is.
+        ctx.fillStyle = light ? 'rgb(0 0 0 / 0.35)' : 'rgb(255 255 255 / 0.45)'
+        ctx.fillRect(col * cell + cell * 0.08, row * cell + cell * 0.08, cell * 0.14, cell * 0.14)
+        ctx.fillStyle = light ? '#1b1c20' : '#ffffff'
+        // Row 1 at the bottom of the picture.
+        ctx.fillText(`${String.fromCharCode(65 + col)}${N - row}`, col * cell + cell / 2, row * cell + cell / 2)
+      }
+    }
+    const t = new THREE.CanvasTexture(canvas)
+    t.colorSpace = THREE.SRGBColorSpace
+    t.wrapS = t.wrapT = THREE.RepeatWrapping
+    t.anisotropy = 8
+    t.flipY = this.flipY
+    this.checker = t
+    return t
   }
 
   setTextures(on: boolean) {
@@ -617,23 +862,38 @@ export class ModelStage {
 
   setEnvironment(on: boolean) {
     this.envOn = on
-    this.scene.environment = on ? this.envMap : null
-    if (!on && this.scene.background === this.envMap) this.scene.background = null
-    this.applyLights()
-    for (const m of this.materials.keys()) m.needsUpdate = true
+    this.applyLook()
   }
 
-  /** With the environment off, the direct lights carry everything and need to be brighter. */
-  private applyLights() {
-    this.hemi.intensity = this.envOn ? 0.35 : 1.6
-    this.key.intensity = this.envOn ? 1.6 : 2.4
+  /** The light, tone mapping and background a mode wants. Final render is the switches as they are; raw render the
+   *  model's own materials under plain, even light with nothing added; the map and matcap views are unlit, shown as
+   *  their pixels are; the UV checker and geometry views take the studio light, so their shapes read. */
+  private applyLook(mode = this.mode) {
+    const studio = mode === 'final' ? this.envOn : mode === 'uv' || mode === 'geometry'
+    const environment = studio ? this.envMap : null
+    if (this.scene.environment !== environment) {
+      this.scene.environment = environment
+      // Materials are built for the light they're lit by.
+      for (const m of [...this.materials.keys(), ...(this.views?.made ?? [])]) m.needsUpdate = true
+    }
+    this.scene.background = this.bg === 'env' && (mode !== 'final' || this.envOn) ? this.envMap : null
+    if (this.renderer) {
+      this.renderer.toneMapping = mode === 'final' || mode === 'uv' || mode === 'geometry' ? THREE.NeutralToneMapping : THREE.NoToneMapping
+    }
+    // With the environment off, the direct lights carry everything and need to be brighter.
+    const raw = mode === 'raw'
+    this.hemi.color.set(raw ? 0xffffff : 0xdfe8ff)
+    this.hemi.groundColor.set(raw ? 0xa8a8a8 : 0x3a3226)
+    this.hemi.intensity = raw ? 2.4 : studio ? 0.35 : 1.6
+    this.key.intensity = raw ? 0.9 : studio ? 1.6 : 2.4
   }
 
   /** CSS backgrounds show through the transparent canvas; `env` draws the environment itself, blurred. */
   setBackground(bg: Background) {
-    this.scene.background = bg === 'env' && this.envOn ? this.envMap : null
+    this.bg = bg
     this.scene.backgroundBlurriness = 0.5
     this.scene.backgroundIntensity = 0.8
+    this.applyLook()
   }
 
   setGrid(on: boolean) {
@@ -674,8 +934,8 @@ export class ModelStage {
   }
 
   /** The model as its thumbnail: a square PNG taken from the angle the server draws thumbnails from (`camera` in
-   *  hoard-render), framed as tightly, lit by the studio room and the key light, on a clear background, with textures
-   *  on, wireframe and grid off. The view on screen is put back afterwards. */
+   *  hoard-render), framed as tightly, in the final render lit by the studio room and the key light, on a clear
+   *  background, with textures on, wireframe and grid off. The view on screen is put back afterwards. */
   async snapshot(size = 256): Promise<Blob> {
     const renderer = this.renderer
     const object = this.object
@@ -687,11 +947,13 @@ export class ModelStage {
       fov: cam.fov, aspect: cam.aspect, near: cam.near, far: cam.far,
       size: renderer.getSize(new THREE.Vector2()), ratio: renderer.getPixelRatio(),
       background: this.scene.background, grid: this.grid?.visible ?? false, env: this.envOn, textures: this.texturesOn,
-      wireframe: [...this.materials.keys()].some((m) => m.wireframe),
+      wireframe: this.wireframeOn,
     }
+    this.showViews(false)
     if (!this.envOn) this.setEnvironment(true)
     if (!this.texturesOn) this.setTextures(true)
     if (saved.wireframe) this.setWireframe(false)
+    this.applyLook('final')
     this.scene.background = null
     if (this.grid) this.grid.visible = false
     cam.up.copy(view.up)
@@ -726,6 +988,8 @@ export class ModelStage {
       if (!saved.env) this.setEnvironment(false)
       if (!saved.textures) this.setTextures(false)
       if (saved.wireframe) this.setWireframe(true)
+      this.showViews(true)
+      this.applyLook()
       this.renderOnce()
     }
     return new Promise((resolve, reject) =>
@@ -772,6 +1036,9 @@ export class ModelStage {
   dispose() {
     this.disposed = true
     this.stopMaps?.()
+    this.dropViews()
+    this.matcap?.dispose()
+    this.checker?.dispose()
     this.resizeObs?.disconnect()
     this.mixer?.stopAllAction()
     this.controls?.dispose()

@@ -21,6 +21,7 @@ import CommandPalette from './components/CommandPalette.vue'
 import ShortcutsDialog from './components/ShortcutsDialog.vue'
 import SettingsPage from './components/SettingsPage.vue'
 import SetupWizard from './components/SetupWizard.vue'
+import InsecureNotice from './components/InsecureNotice.vue'
 import ArchiveView from './components/ArchiveView.vue'
 import { archiveWithUndo, countText } from './archive'
 import { showError, showOk, swipeToClose, useTween, withTransition, type Command } from './ui'
@@ -969,6 +970,7 @@ const commands = computed<Command[]>(() => {
       <button type="button" class="btn" @click="resolveSplit(false)">Import as one pack</button>
       <button type="button" class="btn ghost" @click="pendingSplit = null">Cancel</button>
     </div>
+    <InsecureNotice v-else :member="member" @settings="openSettings('https')" />
 
 
     <template v-if="view === 'library'">

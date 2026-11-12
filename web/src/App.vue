@@ -17,7 +17,7 @@ import TagChip from './components/TagChip.vue'
 import UiLayer from './components/UiLayer.vue'
 import CommandPalette from './components/CommandPalette.vue'
 import ShortcutsDialog from './components/ShortcutsDialog.vue'
-import { showError, showOk, useTween, withTransition, type Command } from './ui'
+import { showError, showOk, swipeToClose, useTween, withTransition, type Command } from './ui'
 
 type View = 'library' | 'packs'
 const PAGE = 60
@@ -50,6 +50,9 @@ const showToken = ref(false)
 const searchInput = ref<HTMLInputElement | null>(null)
 const fileInput = ref<HTMLInputElement | null>(null)
 const gridEl = ref<HTMLElement | null>(null)
+/** The filters column, a drawer on phones that can be swiped shut. */
+const sideEl = ref<HTMLElement | null>(null)
+let unswipeSide = () => {}
 const sentinel = ref<HTMLElement | null>(null)
 
 type Group = { name: string; files: UploadFile[] }
@@ -576,8 +579,10 @@ onMounted(() => {
   refreshPacks()
   schedulePoll()
   window.addEventListener('keydown', onKey)
+  if (sideEl.value) unswipeSide = swipeToClose(sideEl.value, -1, () => (showFilters.value = false))
 })
 onBeforeUnmount(() => {
+  unswipeSide()
   clearInterval(poll)
   observer?.disconnect()
   window.removeEventListener('keydown', onKey)
@@ -762,7 +767,7 @@ const commands = computed<Command[]>(() => {
 
     <template v-if="view === 'library'">
       <div v-if="showFilters" class="scrim" aria-hidden="true" @click="showFilters = false" />
-      <aside id="filters" class="side" aria-label="Filters">
+      <aside id="filters" ref="sideEl" class="side" aria-label="Filters">
         <div class="side-head">
           <h2 class="side-title">Filters</h2>
           <button type="button" class="btn ghost" @click="showFilters = false">Done</button>
@@ -884,6 +889,15 @@ const commands = computed<Command[]>(() => {
         </p>
 
         <div v-if="!loading && stats && stats.assets === 0" class="welcome">
+          <svg class="art crates" viewBox="0 0 140 112" width="150" height="120" aria-hidden="true">
+            <g class="c c1"><rect x="30" y="14" width="26" height="26" rx="5" fill="var(--k-texture)" /></g>
+            <g class="c c2"><rect x="64" y="2" width="26" height="26" rx="5" fill="var(--k-audio)" /></g>
+            <g class="c c3"><rect x="50" y="42" width="26" height="26" rx="5" fill="var(--k-model)" /></g>
+            <g class="c c4"><rect x="86" y="32" width="26" height="26" rx="5" fill="var(--k-font)" /></g>
+            <path d="M16 64h108l-10 40a6 6 0 0 1-5.8 4.5H31.8A6 6 0 0 1 26 104Z" fill="var(--panel)" stroke="var(--line)" stroke-width="2" stroke-linejoin="round" />
+            <path d="M14 64h112" stroke="var(--muted)" stroke-width="3" stroke-linecap="round" />
+            <path d="M56 86h28" stroke="var(--line)" stroke-width="3" stroke-linecap="round" />
+          </svg>
           <h1>Drop an asset pack anywhere on this page</h1>
           <p>
             Zips, tarballs, folders or loose files all work. Hoard unpacks them, stores every file once by its hash,
@@ -896,6 +910,17 @@ const commands = computed<Command[]>(() => {
           </div>
         </div>
         <div v-else-if="!loading && items.length === 0" class="none">
+          <svg class="art" viewBox="0 0 124 92" width="124" height="92" aria-hidden="true">
+            <rect x="10" y="20" width="66" height="54" rx="7" fill="none" stroke="var(--line)" stroke-width="2" stroke-dasharray="6 5" />
+            <rect x="21" y="32" width="15" height="15" rx="3" fill="var(--k-texture)" opacity="0.3" />
+            <rect x="42" y="32" width="15" height="15" rx="3" fill="var(--k-audio)" opacity="0.3" />
+            <rect x="21" y="53" width="15" height="10" rx="3" fill="var(--k-model)" opacity="0.3" />
+            <g class="glass">
+              <circle cx="84" cy="44" r="17" fill="var(--bg)" stroke="var(--muted)" stroke-width="3" />
+              <path d="M78 38a8 8 0 0 1 9-3" stroke="var(--line)" stroke-width="2.5" stroke-linecap="round" fill="none" />
+              <path d="m96.5 56.5 13 13" stroke="var(--muted)" stroke-width="5.5" stroke-linecap="round" />
+            </g>
+          </svg>
           <p>Nothing matches{{ filters.q ? ` “${filters.q.trim()}”` : '' }}{{ hasFilters && (filters.tags.length || filters.kind || filters.pack) ? ' with these filters' : '' }}.</p>
           <button v-if="hasFilters" type="button" class="btn" @click="clearFilters">Clear search and filters</button>
         </div>
@@ -1021,7 +1046,15 @@ const commands = computed<Command[]>(() => {
   display: flex; align-items: center; gap: 1rem;
   padding: 0.6rem 1rem; border-bottom: 1px solid var(--line); background: var(--panel);
 }
-.brand { display: flex; align-items: center; gap: 0.5rem; font-weight: 750; font-size: var(--step-1); font-variation-settings: 'CASL' 1; }
+.brand { display: flex; align-items: center; gap: 0.5rem; font-weight: 750; font-size: var(--step-1); font-variation-settings: 'CASL' 1; cursor: default; }
+/* Hover the logo and the bins jostle while the wordmark leans from casual to slanted (Recursive's own axes). */
+.brand span { font-variation-settings: 'CASL' 1, 'slnt' 0; transition: font-variation-settings var(--dur-3) var(--ease-out); }
+.brand:hover span { font-variation-settings: 'CASL' 0, 'slnt' -15; }
+.brand rect { transform-box: fill-box; transform-origin: center; transition: rotate var(--dur-3) var(--ease-pop), scale var(--dur-3) var(--ease-pop), translate var(--dur-3) var(--ease-pop); }
+.brand:hover rect:nth-of-type(1) { rotate: -10deg; translate: -1px -1px; }
+.brand:hover rect:nth-of-type(2) { rotate: 8deg; scale: 1.08; transition-delay: 30ms; }
+.brand:hover rect:nth-of-type(3) { rotate: 6deg; translate: -1px 1px; transition-delay: 60ms; }
+.brand:hover rect:nth-of-type(4) { rotate: -12deg; scale: 0.9; transition-delay: 90ms; }
 .search { position: relative; flex: 1; max-width: 640px; }
 .search .field { background: var(--bg); padding: 0.55em 2.2em 0.55em 2.1em; }
 .search-icon { position: absolute; left: 0.7em; top: 50%; translate: 0 -50%; color: var(--faint); pointer-events: none; }
@@ -1092,11 +1125,23 @@ const commands = computed<Command[]>(() => {
 .facet[aria-pressed='true'] .n { color: var(--bg); opacity: 0.6; }
 .more-facets { border-style: dashed; color: var(--muted); }
 
-.main { grid-area: main; overflow-y: auto; padding: 0 1.25rem 4rem; }
+.main { grid-area: main; overflow-y: auto; padding: 0 1.25rem 4rem; scrollbar-gutter: stable; }
 .app:has(.selbar) .main { padding-bottom: 7rem; }
 .bar {
   position: sticky; top: 0; z-index: 3; display: flex; align-items: center; gap: 0.9rem;
-  padding: 0.75rem 0; background: var(--bg);
+  margin-inline: -1.25rem; padding: 0.75rem 1.25rem; background: var(--bg);
+}
+/* Once the grid scrolls under it, the bar frosts over and casts a soft edge (scroll-driven, no JS). */
+@supports (animation-timeline: scroll()) {
+  .main { scroll-timeline: --main block; }
+  .bar { animation: bar-lift linear both; animation-timeline: --main; animation-range: 0 40px; }
+}
+@keyframes bar-lift {
+  to {
+    background: color-mix(in srgb, var(--bg) 78%, transparent);
+    backdrop-filter: blur(12px) saturate(1.3);
+    box-shadow: 0 1px 0 var(--line), 0 10px 18px -14px var(--shadow);
+  }
 }
 .active { display: flex; flex-wrap: wrap; gap: 0.35rem; align-items: center; flex: 1; min-width: 0; }
 .count { font-size: var(--step--1); color: var(--muted); margin-right: 0.35rem; font-variant-numeric: tabular-nums; }
@@ -1117,7 +1162,17 @@ const commands = computed<Command[]>(() => {
 .supporting .linkbtn { font-size: inherit; color: var(--muted); }
 .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(var(--tile), 1fr)); gap: 1.1rem 0.9rem; }
 .more { display: flex; justify-content: center; margin-top: 1.5rem; }
-.none { color: var(--muted); padding: 2rem 0; }
+.none { color: var(--muted); padding: 3rem 0; display: flex; flex-direction: column; align-items: center; text-align: center; }
+.art { display: block; margin-bottom: 1rem; overflow: visible; }
+.welcome .art { margin-bottom: 1.25rem; }
+.glass { animation: hunt 3.2s var(--ease-in-out) infinite; }
+@keyframes hunt { 25% { translate: -14px -6px; } 50% { translate: -26px 6px; } 75% { translate: -8px 8px; } }
+.crates .c { animation: bob 2.6s var(--ease-in-out) infinite; }
+.crates .c2 { animation-delay: -0.6s; }
+.crates .c3 { animation-delay: -1.3s; }
+.crates .c4 { animation-delay: -1.9s; }
+.crates .c1 rect { rotate: -8deg; transform-box: fill-box; transform-origin: center; }
+.crates .c4 rect { rotate: 10deg; transform-box: fill-box; transform-origin: center; }
 .none p { margin: 0 0 0.9rem; }
 .hint { margin: 2.5rem 0 0; text-align: center; font-size: 0.75rem; color: var(--faint); }
 .welcome { max-width: 60ch; padding: 3rem 0; }
@@ -1213,6 +1268,7 @@ const commands = computed<Command[]>(() => {
   .scrim { display: block; position: fixed; inset: 0; z-index: 11; background: var(--scrim); }
   .filters-toggle { display: inline-flex; }
   .main { padding: 0 0.75rem 6rem; }
+  .bar { margin-inline: -0.75rem; padding-inline: 0.75rem; }
   .bar { flex-wrap: wrap; gap: 0.5rem; }
   .active { order: 3; flex-basis: 100%; }
   .sort { margin-left: auto; }
@@ -1222,6 +1278,11 @@ const commands = computed<Command[]>(() => {
   .selbar { left: 0.5rem; right: 0.5rem; bottom: 0.5rem; translate: none; max-width: none; gap: 0.5rem; justify-content: space-between; }
   .bulktag { order: 3; flex-basis: 100%; }
   .bulktag .field { flex: 1; width: auto; }
+}
+/* Fingers need bigger targets than pointers. */
+@media (pointer: coarse) {
+  .views button, .theme button { min-height: 44px; min-width: 44px; }
+  .linkbtn { padding-block: 0.6em; }
 }
 @media (max-width: 480px) {
   .wide-only { display: none; }

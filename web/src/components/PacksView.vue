@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onBeforeUnmount, onMounted, reactive, ref } from 'vue'
+import { computed, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue'
 import {
   api, collectionZipUrl, humanBytes, packZipUrl, thumbUrl, type Collection, type Pack, type PackContext, type Stats,
   type UnrealPackStatus,
@@ -33,6 +33,19 @@ onBeforeUnmount(() => {
 
 // Deleted packs and collections vanish at once and only go from the server once their Undo toast runs out.
 const hidden = reactive(new Set<string>())
+/** Packs that just finished: their row flashes once so the moment doesn't go unnoticed. */
+const justReady = reactive(new Set<string>())
+const lastStatus = new Map<string, Pack['status']>()
+watch(() => props.packs, (list) => {
+  for (const p of list) {
+    const was = lastStatus.get(p.id)
+    if (was && was !== 'ready' && p.status === 'ready') {
+      justReady.add(p.id)
+      setTimeout(() => justReady.delete(p.id), 1600)
+    }
+    lastStatus.set(p.id, p.status)
+  }
+}, { immediate: true })
 const visiblePacks = computed(() => props.packs.filter((p) => !hidden.has(p.id)))
 const visibleCollections = computed(() => props.collections.filter((c) => !hidden.has(c.id)))
 
@@ -283,7 +296,7 @@ function remove(p: Pack) {
     </div>
 
     <ul>
-      <li v-for="p in shown" :key="p.id" :class="`st-${p.status}`">
+      <li v-for="p in shown" :key="p.id" :class="[`st-${p.status}`, { flash: justReady.has(p.id) }]">
         <button type="button" class="cover checker" :aria-label="`Browse ${p.name}`" tabindex="-1" @click="$emit('browse', p)">
           <img
               v-for="(id, i) in p.preview"
@@ -300,7 +313,15 @@ function remove(p: Pack) {
           <button type="button" class="name" @click="$emit('browse', p)">{{ p.name }}</button>
           <span class="status">{{ statusText[p.status] }}</span>
         </div>
-        <div v-if="p.status === 'uploading' || p.status === 'ingesting' || p.status === 'analyzing'" class="bar" role="progressbar" :aria-valuenow="progress(p)" aria-valuemin="0" aria-valuemax="100">
+        <div
+          v-if="p.status === 'uploading' || p.status === 'ingesting' || p.status === 'analyzing'"
+          class="bar"
+          :class="{ indeterminate: !p.files_total }"
+          role="progressbar"
+          :aria-valuenow="p.files_total ? progress(p) : undefined"
+          aria-valuemin="0"
+          aria-valuemax="100"
+        >
           <span :style="{ width: `${progress(p)}%` }" />
         </div>
         <p v-if="p.description" class="desc">{{ p.description }}</p>
@@ -467,10 +488,28 @@ li { padding: 1rem 0; border-top: 1px solid var(--line); display: flex; gap: 1re
 }
 .name:hover { text-decoration: underline; }
 .status { font-size: var(--step--1); color: var(--muted); }
-.st-ready .status { color: var(--ok); }
+.st-ready .status { color: var(--ok); display: inline-block; }
 .st-failed .status { color: var(--danger); }
 .bar { height: 4px; background: var(--raised); border-radius: 2px; overflow: hidden; }
-.bar span { display: block; height: 100%; background: var(--k-texture); transition: width 0.4s; }
+.bar span {
+  position: relative; display: block; height: 100%; background: var(--k-texture); border-radius: inherit; overflow: hidden;
+  transition: width 0.5s var(--ease-out);
+}
+/* A sheen sweeps along the filled part so a slow import still looks alive. */
+.bar span::after {
+  content: ''; position: absolute; inset: 0; translate: -100% 0;
+  background: linear-gradient(90deg, transparent, color-mix(in srgb, white 45%, transparent), transparent);
+  animation: sheen 1.6s var(--ease-in-out) infinite;
+}
+@keyframes sheen { to { translate: 100% 0; } }
+/* No file count yet: a segment slides back and forth instead of a bar stuck at zero. */
+.bar.indeterminate span { width: 35% !important; animation: indeterminate 1.3s var(--ease-in-out) infinite alternate; }
+.bar.indeterminate span::after { display: none; }
+@keyframes indeterminate { from { translate: -10% 0; } to { translate: 195% 0; } }
+li.flash { animation: ready-flash 1.6s var(--ease-out); }
+li.flash .status { animation: ready-pop var(--dur-3) var(--ease-pop); }
+@keyframes ready-flash { from { background: color-mix(in srgb, var(--ok) 16%, transparent); } }
+@keyframes ready-pop { from { scale: 0.6; opacity: 0; } }
 .desc { margin: 0; color: var(--muted); max-width: 70ch; }
 .error { margin: 0; color: var(--danger); font-size: var(--step--1); }
 .facts { display: flex; flex-wrap: wrap; gap: 0.25rem 1.25rem; font-size: var(--step--1); color: var(--muted); }

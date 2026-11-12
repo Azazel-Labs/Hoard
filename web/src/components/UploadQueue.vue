@@ -154,13 +154,14 @@ onBeforeUnmount(() => window.removeEventListener('beforeunload', warnOnClose))
 </script>
 
 <template>
+  <Transition name="q">
   <section v-if="jobs.length" class="queue" aria-label="Imports" aria-live="polite">
     <header v-if="totals.count > 1">
       <strong>Importing {{ totals.count }} packs</strong>
       <span class="mono">{{ humanBytes(totals.sent) }} of {{ humanBytes(totals.total) }}</span>
       <span v-if="totals.rate" class="mono">{{ humanBytes(totals.rate) }}/s</span>
     </header>
-    <ol>
+    <TransitionGroup tag="ol" name="job">
       <li v-for="j in jobs" :key="j.id" :class="j.state">
         <div class="row">
           <span class="name" :title="j.name">{{ j.name }}</span>
@@ -168,7 +169,12 @@ onBeforeUnmount(() => window.removeEventListener('beforeunload', warnOnClose))
           <span v-else-if="j.state === 'uploading'" class="meta mono">
             {{ humanBytes(j.sent) }} / {{ humanBytes(j.total) }}
           </span>
-          <span v-else-if="j.state === 'done'" class="meta ok">Uploaded, now unpacking</span>
+          <span v-else-if="j.state === 'done'" class="meta ok donemsg">
+            <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <circle class="ring" cx="8" cy="8" r="6.5" /><path class="tick" d="m5 8.2 2 2 4-4.4" />
+            </svg>
+            Uploaded, now unpacking
+          </span>
           <span v-else-if="j.state === 'skipped'" class="meta">Already in the library</span>
           <span v-else class="meta err">Stopped</span>
         </div>
@@ -189,17 +195,34 @@ onBeforeUnmount(() => window.removeEventListener('beforeunload', warnOnClose))
           </button>
         </div>
       </li>
-    </ol>
+    </TransitionGroup>
   </section>
+  </Transition>
 </template>
 
 <style scoped>
 .queue {
   position: fixed; right: 1rem; bottom: 1rem; z-index: 30; width: min(400px, calc(100vw - 2rem));
-  max-height: 60vh; overflow-y: auto;
+  max-height: 60vh; overflow-y: auto; overflow-x: hidden;
   background: var(--raised); border: 1px solid var(--line); border-radius: var(--r-tile);
-  font-size: var(--step--1);
+  font-size: var(--step--1); box-shadow: var(--elev-3);
 }
+.q-enter-active { transition: opacity var(--dur-2) var(--ease-out), translate var(--dur-3) var(--ease-pop); }
+.q-leave-active { transition: opacity var(--dur-2) var(--ease-out), translate var(--dur-2) var(--ease-out); }
+.q-enter-from, .q-leave-to { opacity: 0; translate: 0 16px; }
+/* Finished jobs slide away and the rest close up behind them. */
+.job-enter-active { transition: opacity var(--dur-2) var(--ease-out), translate var(--dur-3) var(--ease-out); }
+.job-leave-active { transition: opacity var(--dur-2) var(--ease-out), translate var(--dur-2) var(--ease-out); position: absolute; width: 100%; }
+.job-enter-from { opacity: 0; translate: 0 -8px; }
+.job-leave-to { opacity: 0; translate: 40px 0; }
+.job-move { transition: translate var(--dur-3) var(--ease-out); }
+ol { position: relative; }
+.donemsg { display: inline-flex; align-items: center; gap: 0.35rem; }
+.donemsg .ring { stroke-dasharray: 41; stroke-dashoffset: 41; animation: draw 0.45s var(--ease-out) forwards; }
+.donemsg .tick { stroke-dasharray: 10; stroke-dashoffset: 10; animation: draw 0.3s 0.35s var(--ease-out) forwards; }
+@keyframes draw { to { stroke-dashoffset: 0; } }
+li.done { animation: done-glow 1.2s var(--ease-out); }
+@keyframes done-glow { from { background: color-mix(in srgb, var(--ok) 12%, transparent); } }
 header { display: flex; gap: 0.75rem; align-items: baseline; padding: 0.6rem 0.8rem; border-bottom: 1px solid var(--line); }
 header .mono { color: var(--muted); }
 ol { list-style: none; margin: 0; padding: 0; }
@@ -209,7 +232,13 @@ li + li { border-top: 1px solid var(--line); }
 .name { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .meta { color: var(--muted); white-space: nowrap; }
 .bar { height: 3px; background: var(--line); border-radius: 2px; overflow: hidden; }
-.bar span { display: block; height: 100%; background: var(--k-texture); transition: width 0.3s; }
+.bar span { position: relative; display: block; height: 100%; background: var(--k-texture); overflow: hidden; transition: width 0.3s var(--ease-out); }
+.bar span::after {
+  content: ''; position: absolute; inset: 0; translate: -100% 0;
+  background: linear-gradient(90deg, transparent, color-mix(in srgb, white 45%, transparent), transparent);
+  animation: sheen 1.6s var(--ease-in-out) infinite;
+}
+@keyframes sheen { to { translate: 100% 0; } }
 .sub { display: flex; flex-wrap: wrap; gap: 0.2rem 0.9rem; color: var(--muted); font-size: 0.75rem; }
 .ok { color: var(--ok); }
 .err { color: var(--danger); }

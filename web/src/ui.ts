@@ -226,3 +226,66 @@ export interface Command {
   keywords?: string
   run: () => void
 }
+
+/** Touch, on narrow screens: drag a panel in `dir` (1 = right, -1 = left) to dismiss it. It follows the finger, then
+ *  either goes (a third of its width, or a flick) or springs back. Set `leaves` when closing removes the element, so it
+ *  keeps its dragged position for the exit animation. Returns a function that removes the listeners. */
+export function swipeToClose(el: HTMLElement, dir: 1 | -1, close: () => void, leaves = false): () => void {
+  let id = -1
+  let x0 = 0
+  let y0 = 0
+  let dx = 0
+  let t0 = 0
+  let axis: 'x' | 'y' | null = null
+  el.style.touchAction = 'pan-y pinch-zoom'
+  const down = (e: PointerEvent) => {
+    if (e.pointerType !== 'touch' || !matchMedia('(max-width: 900px)').matches) return
+    if ((e.target as Element).closest('input, textarea, select, canvas, [role="slider"], [data-noswipe]')) return
+    id = e.pointerId
+    x0 = e.clientX
+    y0 = e.clientY
+    dx = 0
+    t0 = performance.now()
+    axis = null
+  }
+  const move = (e: PointerEvent) => {
+    if (e.pointerId !== id) return
+    const mx = e.clientX - x0
+    const my = e.clientY - y0
+    if (!axis) {
+      if (Math.hypot(mx, my) < 10) return
+      axis = Math.abs(mx) > Math.abs(my) * 1.3 ? 'x' : 'y'
+    }
+    if (axis !== 'x') return
+    dx = Math.max(0, mx * dir)
+    el.style.transition = 'none'
+    el.style.transform = `translateX(${dx * dir}px)`
+  }
+  const up = (e: PointerEvent) => {
+    if (e.pointerId !== id) return
+    id = -1
+    if (axis !== 'x') return
+    const flick = dx / Math.max(1, performance.now() - t0) > 0.6
+    if (dx > el.offsetWidth / 3 || (flick && dx > 30)) {
+      if (!leaves) {
+        el.style.transition = ''
+        el.style.transform = ''
+      }
+      close()
+      return
+    }
+    el.style.transition = `transform ${reducedMotion.matches ? 0 : 260}ms cubic-bezier(0.34, 1.56, 0.64, 1)`
+    el.style.transform = ''
+    setTimeout(() => (el.style.transition = ''), 280)
+  }
+  el.addEventListener('pointerdown', down)
+  el.addEventListener('pointermove', move)
+  el.addEventListener('pointerup', up)
+  el.addEventListener('pointercancel', up)
+  return () => {
+    el.removeEventListener('pointerdown', down)
+    el.removeEventListener('pointermove', move)
+    el.removeEventListener('pointerup', up)
+    el.removeEventListener('pointercancel', up)
+  }
+}

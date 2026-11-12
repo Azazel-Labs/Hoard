@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, defineAsyncComponent, nextTick, onBeforeUnmount, ref, watch } from 'vue'
+import { computed, defineAsyncComponent, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import {
   api, asUrl, bundleUrl, fileUrl, formatDuration, humanBytes, originalUrl, RESIZABLE_AS_ITSELF, thumbUrl,
   VIEWABLE_EXTS,
@@ -10,7 +10,7 @@ import ImageViewer from './ImageViewer.vue'
 import { playableUrl, player, sourceExt, sourceUrl, stop as stopPreview } from '../player'
 import KindGlyph from './KindGlyph.vue'
 import TagChip from './TagChip.vue'
-import { showOk } from '../ui'
+import { showOk, swipeToClose } from '../ui'
 
 // three.js is big; only load it when someone opens a model.
 const ModelViewer = defineAsyncComponent(() => import('./ModelViewer.vue'))
@@ -452,10 +452,18 @@ function scrubKey(e: KeyboardEvent) {
   f()
 }
 onBeforeUnmount(() => cancelAnimationFrame(frame))
+
+// On a phone the panel covers the screen: swipe it away to the right.
+const root = ref<HTMLElement | null>(null)
+let unswipe = () => {}
+onMounted(() => {
+  if (root.value) unswipe = swipeToClose(root.value, 1, () => emit('close'), true)
+})
+onBeforeUnmount(() => unswipe())
 </script>
 
 <template>
-  <aside class="detail" :style="{ '--kind': `var(--k-${asset.kind})` }" aria-label="Asset details">
+  <aside ref="root" class="detail" :style="{ '--kind': `var(--k-${asset.kind})` }" aria-label="Asset details">
     <header>
       <div class="titlebar">
         <input

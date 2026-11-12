@@ -64,6 +64,12 @@
 
 :root[data-scheme='light'] { color-scheme: light; }
 
+:root {
+  accent-color: var(--k-font);
+  scrollbar-color: color-mix(in srgb, var(--muted) 45%, transparent) transparent;
+}
+::selection { background: color-mix(in srgb, var(--k-font) 32%, transparent); }
+
 * { box-sizing: border-box; }
 body { margin: 0; min-height: 100vh; }
 button, input, select, textarea { font: inherit; color: inherit; }
@@ -105,6 +111,8 @@ button, input, select, textarea { font: inherit; color: inherit; }
 .btn:disabled { opacity: 0.5; cursor: default; }
 /* A button whose work is under way. */
 .btn[aria-busy='true'] { cursor: progress; }
+/* Fingers need bigger targets than pointers. */
+@media (pointer: coarse) { .btn { min-height: 44px; } }
 
 .chip {
   display: inline-flex; align-items: baseline; gap: 0.25em;
@@ -161,8 +169,15 @@ html[data-vt='detail']::view-transition-old(detail):only-child { animation: vt-s
 html[data-vt='theme']::view-transition-old(root),
 html[data-vt='theme']::view-transition-new(root) { animation: none; mix-blend-mode: normal; }
 
+/* Reduced motion: nothing moves, slides, scales or loops, but colour and opacity still change softly so state changes
+   don't snap. Animations finish at once on their final frame (a drawn tick still ends up drawn). */
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after { transition: none !important; animation: none !important; }
+  *, *::before, *::after {
+    animation-duration: 1ms !important; animation-delay: 0s !important; animation-iteration-count: 1 !important;
+    transition-property: opacity, color, background-color, border-color, outline-color, box-shadow !important;
+    scroll-behavior: auto !important;
+  }
+  ::view-transition-group(*), ::view-transition-old(*), ::view-transition-new(*) { animation: none !important; }
 }
 
 /* Font specimens (anything marked .glyphs) are drawn by the server as light glyphs on transparency: white text on

@@ -26,6 +26,7 @@ const playing = computed(() => isCurrent.value && player.playing)
 function onLongPress(e: MouseEvent) {
   if (!matchMedia('(hover: none)').matches) return
   e.preventDefault()
+  navigator.vibrate?.(12)
   emit('check', e)
 }
 </script>

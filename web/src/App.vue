@@ -19,6 +19,7 @@ import UiLayer from './components/UiLayer.vue'
 import CommandPalette from './components/CommandPalette.vue'
 import ShortcutsDialog from './components/ShortcutsDialog.vue'
 import SettingsPage from './components/SettingsPage.vue'
+import SetupWizard from './components/SetupWizard.vue'
 import ArchiveView from './components/ArchiveView.vue'
 import { archiveWithUndo, countText } from './archive'
 import { showError, showOk, swipeToClose, useTween, withTransition, type Command } from './ui'
@@ -63,6 +64,13 @@ const stats = ref<Stats | null>(null)
 const showFilters = ref(false)
 const tokenDraft = ref(getToken())
 const showToken = ref(false)
+// A new server with nowhere to keep files opens the setup first; it stays up until it's finished.
+const setupOpen = ref(false)
+watch(() => stats.value?.setup_needed, (needed) => { if (needed) setupOpen.value = true })
+function setupDone() {
+  setupOpen.value = false
+  refreshPacks()
+}
 const searchInput = ref<HTMLInputElement | null>(null)
 const fileInput = ref<HTMLInputElement | null>(null)
 const gridEl = ref<HTMLElement | null>(null)
@@ -1214,6 +1222,7 @@ const commands = computed<Command[]>(() => {
       @pack="browsePack"
       @open="openAsset"
       @archive="setView('archive')"
+      @changed="refreshPacks"
     />
 
     <ArchiveView
@@ -1251,6 +1260,7 @@ const commands = computed<Command[]>(() => {
     <UploadQueue ref="queue" @created="onCreated" @unauthorized="showToken = true" />
     <CommandPalette v-if="paletteOpen" :commands="commands" @close="paletteOpen = false" @open="openAsset" />
     <ShortcutsDialog v-if="shortcutsOpen" @close="shortcutsOpen = false" />
+    <SetupWizard v-if="setupOpen" @done="setupDone" />
     <UiLayer />
   </div>
 </template>

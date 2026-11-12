@@ -85,7 +85,15 @@ echo "HOARD_TOKEN=$(openssl rand -hex 32)" > .env    # the portal asks for this 
 docker compose up -d                                 # open http://<host>:4627
 ```
 
-There's no setup wizard: the library starts empty, so drop a pack onto the portal.
+The first visit opens a short setup that asks where your library lives. It suggests `/library`, the volume above; pick
+it and drop a pack onto the portal. More locations come later, from **Settings → Library locations**:
+
+- **A library Hoard keeps** gets copies of what you upload or import. Each one ticks the kinds of files it takes
+  (audio on one disk, models on another), and one is the catch-all for the rest.
+- **A watched folder** is a folder of packs you already have. Each folder inside it becomes a pack, indexed where it
+  sits. Hoard never changes, moves or deletes anything there. Mount it read-only if you like.
+
+A location is any folder the server can see, so in Docker, mount it into the container first.
 
 **Updates are automatic.** Watchtower pulls each new release, and Hoard upgrades its database on start, saving a copy
 in `/config/backups` first. Change the image tag to `:0.8` to get patch releases only, or delete the `watchtower`
@@ -457,8 +465,8 @@ from other origins are rejected (DNS-rebinding guard). Set the public address in
 
 ## Storage, and splitting it from the web server
 
-`HOARD_STORAGE=local` keeps blobs under `--data-dir/blobs`. `HOARD_STORAGE=s3` puts them in any S3-compatible bucket:
-Garage, RustFS, SeaweedFS or VersityGW on a NAS, or R2/B2/AWS. Downloads are streamed through the server with HTTP
+Each library location Hoard keeps is a folder, or an S3-compatible bucket: give the location's folder as
+`s3://<bucket>` and set the `HOARD_S3_*` variables for the endpoint and keys. The bucket can be Garage, RustFS, SeaweedFS or VersityGW on a NAS, or R2/B2/AWS. Downloads are streamed through the server with HTTP
 Range support (audio and video seek), and immutable caching headers let a CDN absorb repeat traffic.
 `HOARD_S3_HEADERS` adds headers to every storage request, e.g. Cloudflare Access service-token headers when the NAS's
 S3 endpoint sits behind Access.
@@ -491,16 +499,15 @@ Set before starting (these need a restart):
 |---|---|---|
 | `HOARD_LISTEN` | `127.0.0.1:4627` | bind address |
 | `HOARD_DATA_DIR` | `./hoard-data` | the database (with Settings), its backups, the self-signed certificate |
-| `HOARD_FILES_DIR` | `<data dir>/blobs` | your files, with `HOARD_STORAGE=local` |
+| `HOARD_FILES_DIR` | – | the folder the first-run setup suggests (`/library` in the image) |
 | `HOARD_CACHE_DIR` | `<data dir>` | thumbnails and previews, uploads in progress, scratch space, downloaded Blender/ffmpeg |
 | `HOARD_WEB_DIR` | `./web/dist` | built portal |
 | `HOARD_TLS_CERT` / `_KEY` | – | serve HTTPS (HTTP/2) with this PEM chain and key |
 | `HOARD_TLS_SELF_SIGNED` / `HOARD_TLS_NAMES` | `false` / – | HTTPS with a generated certificate for these names |
 | `HOARD_HTTP3` | `false` | also serve HTTP/3 (needs TLS) |
 | `HOARD_TOKEN` | – | bearer token for uploads, edits, Settings, admin and MCP writes; reads stay open |
-| `HOARD_STORAGE` | `local` | `local` or `s3` |
 | `HOARD_LOCAL_LLM_URL` | `http://llm:8080/v1` | where the local model server listens (Settings → AI tagging → Local model) |
-| `HOARD_S3_ENDPOINT` / `_BUCKET` / `_REGION` / `_ACCESS_KEY` / `_SECRET_KEY` / `_HEADERS` | – | S3 backend |
+| `HOARD_S3_ENDPOINT` / `_BUCKET` / `_REGION` / `_ACCESS_KEY` / `_SECRET_KEY` / `_HEADERS` | – | the S3 service for `s3://` library locations |
 
 ## Keeping it safe
 
@@ -587,6 +594,9 @@ when a token is set; those are marked 🔒.
 | GET | `/api/activity` | background work in progress |
 | GET | `/api/admin/jobs` | the job queue |
 | GET 🔒, PUT 🔒 | `/api/admin/settings` | Settings: read, or change some (`null` goes back to the flag) |
+| GET 🔒, POST 🔒 | `/api/admin/locations` | library locations (with whether each is reachable and its pack count), or add one: `{mode, path, kinds, catch_all, name?}` |
+| PATCH 🔒, DELETE 🔒 | `/api/admin/locations/{id}` | rename one, change its kinds or make it the catch-all; or remove it (a managed one must be empty) |
+| GET 🔒 | `/api/admin/fs?path=` | the folders in a folder on the server, for picking a location |
 | POST 🔒 | `/api/admin/llm/models` | `{url, api_key?}`: the models an AI service offers (also a connection test) |
 | POST 🔒 | `/api/admin/scrub` | re-hash every blob |
 | POST 🔒 | `/api/admin/gc` | delete blobs nothing uses |

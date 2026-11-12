@@ -183,6 +183,50 @@ export interface Stats {
   update?: { version: string; url: string }
   /** Model thumbnails: `gpu: <adapter> (<api>)`, `cpu: …` (software), `starting`, `off` or `unavailable: …`. */
   renderer?: string
+  /** No library location yet: the first-run setup should open. */
+  setup_needed?: boolean
+}
+
+/** Where a library keeps files: managed (Hoard copies files in) or watched (indexed where they sit). */
+export type LocationMode = 'managed' | 'watched'
+
+export interface LibraryLocation {
+  id: number
+  name: string
+  mode: LocationMode
+  /** A folder on the server, or `s3://bucket`. */
+  path: string
+  /** The asset kinds new files of which go here (managed locations). */
+  kinds: AssetKind[]
+  /** Takes every kind no other location ticks. */
+  catch_all: boolean
+  scanned_at?: string | null
+  created_at: string
+  /** Whether the folder can be reached right now. */
+  online: boolean
+  packs: number
+}
+
+export interface LocationList {
+  locations: LibraryLocation[]
+  /** Where the setup suggests the first location goes. */
+  suggested: string
+  kinds: AssetKind[]
+}
+
+export interface NewLocation {
+  name?: string
+  mode: LocationMode
+  path: string
+  kinds: AssetKind[]
+  catch_all: boolean
+}
+
+/** A folder on the server and the folders in it (`GET /api/admin/fs`). */
+export interface FolderListing {
+  path: string
+  parent?: string | null
+  dirs: { name: string; path: string }[]
 }
 
 /** The library in numbers (`GET /api/stats/library`); archived things aren't counted. */
@@ -484,6 +528,22 @@ export const api = {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ url, action, model }),
     }),
+  locations: () => request<LocationList>('/api/admin/locations'),
+  addLocation: (loc: NewLocation) =>
+    request<LibraryLocation>('/api/admin/locations', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(loc),
+    }),
+  patchLocation: (id: number, patch: { name?: string; kinds?: AssetKind[]; catch_all?: boolean }) =>
+    request<LibraryLocation>(`/api/admin/locations/${id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(patch),
+    }),
+  deleteLocation: (id: number) => request<void>(`/api/admin/locations/${id}`, { method: 'DELETE' }),
+  /** The folders in `path` on the server; an empty path lists the drives or `/`. */
+  browse: (path = '') => request<FolderListing>(`/api/admin/fs?path=${encodeURIComponent(path)}`),
   /** Start or look in on a "download as" conversion; answers when it moves on, or after `wait` seconds. */
   asStatus: (a: { id: string }, format: string, max?: number, wait = 5) =>
     request<ConversionStatus>(`/api/assets/${a.id}/as/${format}/status?wait=${wait}${max ? `&max=${max}` : ''}`),

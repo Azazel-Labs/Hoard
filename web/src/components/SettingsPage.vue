@@ -22,6 +22,7 @@ import { formatMiB } from '../sizes'
 import { DARK_THEMES, LIGHT_THEMES, previewScheme, themeFor, usedScheme } from '../theme'
 import { confirmDialog, showError, showOk } from '../ui'
 import LibraryStats from './LibraryStats.vue'
+import LocationsPanel from './LocationsPanel.vue'
 import ResetButton from './ResetButton.vue'
 import SizeInput from './SizeInput.vue'
 
@@ -34,12 +35,15 @@ const emit = defineEmits<{
   pack: [{ id: string; name: string }]
   open: [string]
   archive: []
+  /** Library locations changed: the stats need a refresh. */
+  changed: []
 }>()
 const s = ref<Settings | null>(null)
 
 const PAGES = [
   { id: 'appearance', label: 'Appearance', blurb: 'The themes this browser wears when it’s light and when it’s dark. Saved in this browser only.' },
   { id: 'library', label: 'Library', blurb: 'What’s in the hoard: how big it is, what it’s made of, how it grew and how well it’s tagged. Archived things aren’t counted.' },
+  { id: 'locations', label: 'Library locations', blurb: 'The folders on the server that hold the library: ones Hoard keeps files in, and folders of packs it indexes where they are.' },
   { id: 'tools', label: 'Tools', blurb: 'Outside programs Hoard uses to convert and read files.' },
   { id: 'ai', label: 'AI tagging', blurb: 'An AI model names, describes and tags new packs, on top of the built-in rules. Its tags are marked as suggested.' },
   { id: 'unreal', label: 'Unreal packages', blurb: 'What to do with .uasset files when a pack is added.' },
@@ -599,6 +603,8 @@ onBeforeUnmount(() => {
           @open="(id) => emit('open', id)"
           @archive="emit('archive')"
         />
+
+        <LocationsPanel v-else-if="current === 'locations'" @unauthorized="emit('unauthorized')" @changed="emit('changed')" />
 
         <p v-else-if="!s" class="loading">Loading…</p>
 

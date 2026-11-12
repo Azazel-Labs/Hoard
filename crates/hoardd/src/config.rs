@@ -129,9 +129,9 @@ pub(crate) struct Config {
     #[arg(skip = 2_usize)]
     pub(crate) workers: usize,
 
-    /// Where an install from before library locations kept its files: `local` or `s3`. New libraries are set up in
-    /// the portal, where a managed location can be a folder or an `s3://bucket` (any S3-compatible server, e.g.
-    /// Garage or `RustFS` on a home NAS, reached with the settings below).
+    /// Where the first-run setup suggests the library goes: `local` (a folder) or `s3` (`s3://<HOARD_S3_BUCKET>`).
+    /// Libraries are set up in the portal, where a managed location can be a folder or an `s3://bucket` (any
+    /// S3-compatible server, e.g. Garage or `RustFS` on a home NAS, reached with the settings below).
     #[arg(long, env = "HOARD_STORAGE", value_enum, default_value_t = StorageKind::Local)]
     pub(crate) storage: StorageKind,
 

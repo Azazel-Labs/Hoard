@@ -1,0 +1,110 @@
+<script setup lang="ts">
+// The first visit to a new server: pick where the library lives before anything else.
+import { onMounted, ref } from 'vue'
+import { api, ApiError, setToken, type LibraryLocation, type LocationList } from '../api'
+import LocationForm from './LocationForm.vue'
+
+const emit = defineEmits<{ done: [] }>()
+
+const data = ref<LocationList | null>(null)
+const needsToken = ref(false)
+const token = ref('')
+const error = ref('')
+const made = ref<LibraryLocation | null>(null)
+
+async function load() {
+  error.value = ''
+  try {
+    data.value = await api.locations()
+    needsToken.value = false
+    // Someone finished the setup in another tab.
+    if (data.value.locations.length) emit('done')
+  } catch (e) {
+    if (e instanceof ApiError && e.status === 401) needsToken.value = true
+    else error.value = (e as Error).message
+  }
+}
+onMounted(load)
+
+function saveToken() {
+  setToken(token.value.trim())
+  load()
+}
+</script>
+
+<template>
+  <div class="setup" role="dialog" aria-modal="true" aria-labelledby="setup-title">
+    <div class="card">
+      <p class="brand">Hoard</p>
+
+      <template v-if="!made">
+        <h1 id="setup-title">Where should your library live?</h1>
+        <p class="lede">
+          Pick a folder on the server for Hoard to keep your packs in, or point it at a folder of packs you already have. You can add more
+          locations, on other disks, from Settings later.
+        </p>
+
+        <form v-if="needsToken" class="token" @submit.prevent="saveToken">
+          <label for="setup-token">This server needs its token (<code>HOARD_TOKEN</code>) before it can be set up.</label>
+          <div class="row">
+            <input id="setup-token" v-model="token" class="field mono" type="password" autocomplete="off" />
+            <button type="submit" class="btn primary" :disabled="!token.trim()">Continue</button>
+          </div>
+        </form>
+        <div v-else-if="error" class="err" role="alert">
+          <p>Couldn't reach the server: {{ error }}</p>
+          <button type="button" class="btn" @click="load">Try again</button>
+        </div>
+        <p v-else-if="!data" class="loading">Loading…</p>
+        <LocationForm
+          v-else
+          :suggested="data.suggested"
+          :kinds="data.kinds"
+          first
+          submit-label="Start the library"
+          @created="(l) => (made = l)"
+          @unauthorized="needsToken = true"
+        />
+      </template>
+
+      <template v-else>
+        <h1 id="setup-title">Your library is ready</h1>
+        <p class="lede">
+          <template v-if="made.mode === 'managed'">
+            New packs go into <span class="mono">{{ made.path }}</span>. Drop files, folders or archives anywhere on the page to add your first
+            ones.
+          </template>
+          <template v-else>
+            Hoard is watching <span class="mono">{{ made.path }}</span>; packs show up as it finds them. To upload as well, add a library Hoard
+            keeps from Settings → Library locations.
+          </template>
+        </p>
+        <button type="button" class="btn primary" autofocus @click="emit('done')">Open the library</button>
+      </template>
+    </div>
+  </div>
+</template>
+
+<style scoped>
+.setup {
+  position: fixed; inset: 0; z-index: 50; display: grid; place-items: start center; overflow-y: auto; padding: clamp(1rem, 8vh, 5rem) 1rem 2rem;
+  background: var(--bg);
+}
+.card {
+  width: min(40rem, 100%); padding: 1.6rem 1.8rem 1.8rem; border: 1px solid var(--line); border-radius: 10px; background: var(--panel);
+  box-shadow: var(--elev-2); animation: rise var(--dur-3) var(--ease-out);
+}
+@keyframes rise { from { opacity: 0; translate: 0 8px; } }
+@media (prefers-reduced-motion: reduce) { .card { animation: none; } }
+.brand { margin: 0 0 1rem; font-size: 0.7rem; font-weight: 650; letter-spacing: 0.08em; text-transform: uppercase; color: var(--faint); }
+h1 { margin: 0 0 0.4rem; font-size: var(--step-2); font-variation-settings: 'CASL' 0.5; line-height: 1.2; }
+.lede { margin: 0 0 1.3rem; color: var(--muted); font-size: var(--step-0); line-height: 1.5; }
+.lede .mono { color: var(--text); overflow-wrap: anywhere; }
+.token { display: grid; gap: 0.5rem; font-size: var(--step--1); }
+.token .row { display: flex; gap: 0.5rem; }
+.token .field { flex: 1; min-width: 0; max-width: 20rem; }
+.err { display: grid; gap: 0.5rem; justify-items: start; color: var(--danger); font-size: var(--step--1); }
+.err p { margin: 0; }
+.loading { color: var(--muted); font-size: var(--step--1); }
+@media (max-width: 30rem) { .card { padding: 1.1rem 1rem 1.2rem; } }
+</style>

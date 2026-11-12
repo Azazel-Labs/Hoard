@@ -177,9 +177,12 @@ pub(crate) fn adopt_existing(c: &Connection, cfg: &Config) -> Result<Option<Loca
     insert(c, &new).map(Some)
 }
 
-/// Where the setup suggests the first library goes: `/library` in the container image, `HOARD_FILES_DIR` if
-/// it's set, else a `library` folder next to the data.
+/// Where the setup suggests the first library goes: the bucket with `HOARD_STORAGE=s3`, else `HOARD_FILES_DIR`
+/// (`/library` in the container image), else a `library` folder next to the data.
 pub(crate) fn suggested_path(cfg: &Config) -> String {
+    if let (StorageKind::S3, Some(bucket)) = (cfg.storage, cfg.s3_bucket.as_deref()) {
+        return format!("s3://{bucket}");
+    }
     let p = cfg.files_dir.clone().unwrap_or_else(|| cfg.data_dir.join("library"));
     std::path::absolute(&p).unwrap_or(p).display().to_string()
 }

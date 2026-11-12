@@ -6,8 +6,9 @@ Hoard has two kinds of data with very different costs:
 - **Blobs** (the files): large, cold, immutable, read only on download.
 
 So the natural split is metadata near the web server and blobs wherever storage is cheap: usually a NAS at home.
-`HOARD_STORAGE=s3` is the seam: the server talks S3 to whatever holds the bytes, and streams downloads through
-itself with Range support.
+An S3 library location is the seam: the server talks S3 to whatever holds the bytes, and streams downloads through
+itself with Range support. The setups below set `HOARD_STORAGE=s3` and the `HOARD_S3_*` variables, so the first-run
+setup suggests `s3://<bucket>` as the library; accept it and you're done.
 
 ## Choosing the NAS storage server
 
@@ -175,7 +176,7 @@ it's the `update` field.
 | Volume | Holds | Size | Lose it and |
 |---|---|---|---|
 | `/config` (`HOARD_DATA_DIR`) | the database with Settings, its backups, the self-signed certificate | small | you lose your library: back this one up |
-| `/library` (`HOARD_FILES_DIR`) | your files, with local storage (S3 setups keep them in the bucket) | big | you lose your files |
+| `/library` | your files: the library location the first-run setup suggests (S3 setups keep them in the bucket) | big | you lose your files |
 | `/cache` (`HOARD_CACHE_DIR`) | thumbnails and previews, uploads in progress, scratch space, downloaded Blender/ffmpeg | medium | **Re-analyze** a pack remakes its thumbnails; tools download again |
 
 ## GPU

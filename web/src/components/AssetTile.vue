@@ -3,6 +3,7 @@ import { computed, ref, watch } from 'vue'
 import { formatDuration, thumbUrl, type Asset } from '../api'
 import { canPreview, player, toggle } from '../player'
 import KindGlyph from './KindGlyph.vue'
+import { noteTileClick } from '../viewers'
 
 const props = defineProps<{ asset: Asset; selected: boolean; checked: boolean; selecting: boolean }>()
 const emit = defineEmits<{ open: [MouseEvent | KeyboardEvent]; check: [MouseEvent] }>()
@@ -29,6 +30,12 @@ function onLongPress(e: MouseEvent) {
   navigator.vibrate?.(12)
   emit('check', e)
 }
+
+function onClick(e: MouseEvent) {
+  // Remembered so a second click here opens the full-screen viewer (see viewers.ts for why it isn't a dblclick).
+  if (!props.selecting) noteTileClick(props.asset.id, e)
+  emit('open', e)
+}
 </script>
 
 <template>
@@ -43,7 +50,7 @@ function onLongPress(e: MouseEvent) {
       :data-id="asset.id"
       :aria-pressed="selected"
       :aria-label="`${asset.name}, ${asset.category ?? asset.kind}${detail ? `, ${detail}` : ''}`"
-      @click="emit('open', $event)"
+      @click="onClick"
       @contextmenu="onLongPress"
     >
       <span class="art checker">

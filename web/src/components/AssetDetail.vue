@@ -2,7 +2,6 @@
 import { computed, defineAsyncComponent, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import {
   api, asUrl, bundleUrl, fileUrl, formatDuration, humanBytes, originalUrl, RESIZABLE_AS_ITSELF, thumbUrl,
-  VIEWABLE_EXTS,
   type Asset, type AssetLink, type Collection, type CollectionRef, type ConversionStatus, type Facet, type LinkRel,
 } from '../api'
 import CollectionPicker from './CollectionPicker.vue'
@@ -11,9 +10,13 @@ import { playableUrl, player, sourceExt, sourceUrl, stop as stopPreview } from '
 import KindGlyph from './KindGlyph.vue'
 import TagChip from './TagChip.vue'
 import { showOk, swipeToClose } from '../ui'
+import { isModelAsset, isTextAsset, takeViewRequest, viewRequest, viewerFor, type ViewerKind } from '../viewers'
 
 // three.js is big; only load it when someone opens a model.
 const ModelViewer = defineAsyncComponent(() => import('./ModelViewer.vue'))
+const ModelInspector = defineAsyncComponent(() => import('./ModelInspector.vue'))
+const TextPreview = defineAsyncComponent(() => import('./TextPreview.vue'))
+const TextViewer = defineAsyncComponent(() => import('./TextViewer.vue'))
 
 const props = defineProps<{
   asset: Asset
@@ -39,10 +42,8 @@ watch(() => player.playing, (on) => {
 })
 
 const withAnimations = ref(false)
-const isModel = computed(
-  () => (props.asset.kind === 'model' || props.asset.kind === 'animation') &&
-    (VIEWABLE_EXTS.has(props.asset.ext) || props.asset.derivatives.includes('glb')),
-)
+const isModel = computed(() => isModelAsset(props.asset))
+const isText = computed(() => isTextAsset(props.asset))
 const REL_LABEL: Record<LinkRel, string> = {
   texture: 'texture', buffer: 'geometry data', material: 'material file', animation: 'animation',
   library: 'linked file', guess: 'probably goes with', variant: 'variant',
@@ -58,6 +59,15 @@ const linkGroups = computed(() =>
   ].filter((g) => g.items.length),
 )
 const linkLabel = (l: AssetLink) => REL_LABEL[l.rel]
+/** Long lists show their first few: the panel is about one asset, and a 40-texture "Needs" pushed the rest of it
+ *  out of reach. A list only a couple longer than that shows whole, rather than hiding two behind a button. */
+const LIST_PEEK = 6
+const unfolded = ref(new Set<string>())
+watch(() => props.asset.id, () => (unfolded.value = new Set()))
+function peek<T>(key: string, items: T[]): T[] {
+  return unfolded.value.has(key) || items.length <= LIST_PEEK + 2 ? items : items.slice(0, LIST_PEEK)
+}
+const unfold = (key: string) => (unfolded.value = new Set(unfolded.value).add(key))
 const linkedCount = computed(() => needs.value.length + (withAnimations.value ? anims.value.length : 0))
 
 // Variant families: tag edits can fan out to every take.
@@ -75,9 +85,19 @@ const copied = ref('')
 const canvas = ref<HTMLCanvasElement | null>(null)
 const canvasTop = ref<HTMLCanvasElement | null>(null)
 const waveState = ref<'idle' | 'loading' | 'done' | 'skipped'>('idle')
-/** The full-screen image inspector. */
-const inspecting = ref(false)
-watch(() => props.asset.id, () => (inspecting.value = false))
+/** The full-screen viewer that's open, if any. */
+const inspecting = ref<ViewerKind | ''>('')
+watch(() => props.asset.id, () => (inspecting.value = ''))
+// A double-clicked tile asks for its viewer. The first click may still be opening the asset, and the grid's summary
+// can lack what decides the viewer (a converted model's derivatives), so wait until this asset can say.
+watch(
+  [() => viewRequest.id, () => props.asset],
+  () => {
+    const kind = viewerFor(props.asset)
+    if (kind && takeViewRequest(props.asset.id)) inspecting.value = kind
+  },
+  { immediate: true },
+)
 
 const isImage = computed(() => props.asset.kind === 'texture' && props.asset.has_thumb)
 const audioUrl = computed(() => playableUrl(props.asset))
@@ -532,14 +552,14 @@ onBeforeUnmount(() => unswipe())
     <div v-if="isModel && showViews" class="preview checker">
       <img :src="`/api/assets/${asset.id}/derivative/views`" alt="The model from four directions" />
     </div>
-    <ModelViewer v-else-if="isModel" :asset="asset" />
+    <ModelViewer v-else-if="isModel" :asset="asset" :paused="inspecting === 'model'" @expand="inspecting = 'model'" />
     <button
       v-else-if="isImage"
       type="button"
       class="preview checker zoomable"
       :aria-label="`Inspect ${asset.name} full screen`"
       title="Inspect: zoom, tile, channels"
-      @click="inspecting = true"
+      @click="inspecting = 'image'"
     >
       <img :src="thumbUrl(asset)" alt="" :class="{ pixelated }" />
       <span class="zoombadge" aria-hidden="true">
@@ -594,11 +614,14 @@ onBeforeUnmount(() => unswipe())
         @durationchange="onMeta"
       />
     </div>
+    <TextPreview v-else-if="isText" :asset="asset" @expand="inspecting = 'text'" />
     <div v-else class="preview checker">
       <img v-if="asset.has_thumb" :src="thumbUrl(asset)" alt="" :class="{ pixelated, glyphs: asset.kind === 'font' }" />
       <KindGlyph v-else :kind="asset.kind" :size="72" />
     </div>
-    <ImageViewer v-if="inspecting" :asset="asset" :pixelated="pixelated" @close="inspecting = false" />
+    <ImageViewer v-if="inspecting === 'image'" :asset="asset" :pixelated="pixelated" @close="inspecting = ''" />
+    <ModelInspector v-else-if="inspecting === 'model'" :asset="asset" @close="inspecting = ''" />
+    <TextViewer v-else-if="inspecting === 'text'" :asset="asset" @close="inspecting = ''" />
     <label v-if="isModel && hasViews" class="animcheck">
       <input v-model="showViews" type="checkbox" /> Show the four-view sheet the tagger saw
     </label>
@@ -692,7 +715,7 @@ onBeforeUnmount(() => unswipe())
     <section v-for="g in linkGroups" :key="g.title">
       <h3>{{ g.title }}</h3>
       <ul class="links">
-        <li v-for="l in g.items" :key="l.id + l.rel">
+        <li v-for="l in peek(g.title, g.items)" :key="l.id + l.rel">
           <button type="button" class="link" :style="{ '--kind': `var(--k-${l.kind})` }" @click="$emit('open', l.id)">
             <span class="lthumb checker">
               <img v-if="l.has_thumb" :src="thumbUrl(l)" :class="{ glyphs: l.kind === 'font' }" alt="" loading="lazy" />
@@ -703,12 +726,15 @@ onBeforeUnmount(() => unswipe())
           </button>
         </li>
       </ul>
+      <button v-if="peek(g.title, g.items).length < g.items.length" type="button" class="linkish small showmore" @click="unfold(g.title)">
+        Show {{ g.items.length - LIST_PEEK }} more
+      </button>
     </section>
 
     <section v-if="family">
       <h3>Variants ({{ family.size }} takes)</h3>
       <ul class="links">
-        <li v-for="l in family.members" :key="l.id">
+        <li v-for="l in peek('variants', family.members)" :key="l.id">
           <button type="button" class="link" :style="{ '--kind': `var(--k-${l.kind})` }" @click="$emit('open', l.id)">
             <span class="lthumb checker">
               <img v-if="l.has_thumb" :src="thumbUrl(l)" :class="{ glyphs: l.kind === 'font' }" alt="" loading="lazy" />
@@ -719,19 +745,25 @@ onBeforeUnmount(() => unswipe())
           </button>
         </li>
       </ul>
+      <button v-if="peek('variants', family.members).length < family.members.length" type="button" class="linkish small showmore" @click="unfold('variants')">
+        Show {{ family.members.length - LIST_PEEK }} more
+      </button>
     </section>
 
     <section v-if="duplicates.length">
       <h3>Identical copies</h3>
       <p class="legend dupnote">The same bytes are stored once; these packs ship this file too.</p>
       <ul class="links">
-        <li v-for="d in duplicates" :key="d.id">
+        <li v-for="d in peek('copies', duplicates)" :key="d.id">
           <button type="button" class="link dup" @click="$emit('open', d.id)">
             <span class="lname">{{ d.pack_name }}</span>
             <span class="lrel">{{ d.path }}</span>
           </button>
         </li>
       </ul>
+      <button v-if="peek('copies', duplicates).length < duplicates.length" type="button" class="linkish small showmore" @click="unfold('copies')">
+        Show {{ duplicates.length - LIST_PEEK }} more
+      </button>
     </section>
 
     <section v-if="origin || ueStatus || recovered || ueTags.length" class="unreal">
@@ -917,6 +949,8 @@ h2 {
 .descbtns { display: flex; gap: 0.4rem; align-items: center; }
 .hint { font-size: 0.75rem; color: var(--faint); }
 .linkish.small { font-size: 0.8rem; }
+.showmore { margin-top: 0.45rem; color: var(--muted); }
+.showmore:hover { color: var(--text); }
 h3 { margin: 0 0 0.5rem; font-size: var(--step--1); font-weight: 650; color: var(--muted); }
 .tags { position: relative; display: flex; flex-wrap: wrap; gap: 0.35rem; }
 .tags :deep(.chip) { cursor: pointer; }

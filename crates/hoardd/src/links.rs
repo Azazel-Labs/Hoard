@@ -403,12 +403,14 @@ struct PackAsset {
     origin: Option<String>,
 }
 
-/// Path lookups for one pack: exact, case-insensitive, and by bare file name.
+/// Path lookups for one pack: exact, case-insensitive, by bare file name, and (for textures) by name without the
+/// extension.
 #[derive(Debug, Default)]
 struct PathIndex {
     exact: HashMap<String, usize>,
     lower: HashMap<String, usize>,
     by_name: HashMap<String, Vec<usize>>,
+    texture_by_stem: HashMap<String, Vec<usize>>,
 }
 
 impl PathIndex {
@@ -418,6 +420,9 @@ impl PathIndex {
             idx.exact.insert(a.path.clone(), i);
             idx.lower.insert(a.path.to_lowercase(), i);
             idx.by_name.entry(base_name(&a.path).to_lowercase()).or_default().push(i);
+            if a.kind == AssetKind::Texture {
+                idx.texture_by_stem.entry(stem(&a.path).to_lowercase()).or_default().push(i);
+            }
         }
         idx
     }
@@ -430,7 +435,13 @@ impl PathIndex {
         }
         // Absolute artist paths ("C:\Users\me\textures\Rock.png") and wrong folders: fall back to the file
         // name, preferring the candidate that shares the most leading folders with the referring file.
-        let candidates = self.by_name.get(&base_name(&percent_decode(target)).to_lowercase())?;
+        let target = percent_decode(target);
+        let candidates = self.by_name.get(&base_name(&target).to_lowercase()).or_else(|| {
+            // Artists' files point at the source they painted (`Rock.psd`) while the pack ships an export of it
+            // (`Rock.png`): any texture with the same name will do.
+            let is_image = IMAGE_EXTS.iter().any(|e| target.to_lowercase().ends_with(e));
+            is_image.then(|| self.texture_by_stem.get(&stem(&target).to_lowercase())).flatten()
+        })?;
         let from_dir: Vec<&str> = from_rel.split('/').collect();
         candidates
             .iter()
@@ -640,6 +651,9 @@ mod tests {
         ];
         let idx = PathIndex::build(&assets);
         assert_eq!(idx.resolve(&assets, "Models/barrel.fbx", "C:\\Users\\art\\barrel_albedo.PNG"), Some(1));
+        // The source it was painted in isn't in the pack, but its export is.
+        assert_eq!(idx.resolve(&assets, "Models/barrel.fbx", "D:/paint/Barrel_Albedo.psd"), Some(1));
+        assert_eq!(idx.resolve(&assets, "Models/barrel.fbx", "D:/paint/Barrel_Albedo.fbx"), None);
     }
 }
 

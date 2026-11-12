@@ -651,7 +651,7 @@ HTTPS with HTTP/2 and HTTP/3 in Chrome (page, thumbnails and uploads over h3); W
 families, duplicate detection, pack context with store-page fetching, contact sheets and multi-view renders against
 a mock LLM; and MCP inline previews.
 
-What's planned next is in [docs/roadmap.md](docs/roadmap.md).
+What's planned next is in [docs/roadmap.md](docs/roadmap.md). Ideas that were tried and dropped, and why, are in [docs/deadends.md](docs/deadends.md).
 
 ## License
 

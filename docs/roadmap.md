@@ -3,6 +3,8 @@
 What's planned or being weighed, roughly in order. Nothing here is promised; each item says what's settled and what
 isn't yet.
 
+Ideas that were tried and dropped are in [deadends.md](deadends.md); check there before picking one back up.
+
 ## Library locations: what's left
 
 The first-run setup and library locations are in. A server can keep files in several managed locations, routed by

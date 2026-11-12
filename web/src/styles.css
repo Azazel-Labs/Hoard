@@ -41,6 +41,18 @@
   --r-tile: 6px;
   --r-chip: 4px;
 
+  /* Motion: quick, decisive, a little springy where something lands. */
+  --dur-1: 120ms;
+  --dur-2: 200ms;
+  --dur-3: 320ms;
+  --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --ease-pop: cubic-bezier(0.34, 1.56, 0.64, 1);
+  /* Elevation: resting, lifted (hover), floating (menus, toasts). */
+  --elev-1: 0 1px 2px var(--shadow);
+  --elev-2: 0 6px 16px -4px var(--shadow);
+  --elev-3: 0 14px 36px -8px var(--shadow);
+
   font-family: var(--font);
   font-size: 16px;
   font-variation-settings: 'CASL' 0, 'MONO' 0;
@@ -59,6 +71,9 @@ button, input, select, textarea { font: inherit; color: inherit; }
 .mono { font-variation-settings: 'MONO' 1, 'CASL' 0; font-size: 0.92em; }
 
 :focus-visible { outline: 2px solid var(--k-font); outline-offset: 2px; }
+/* The focus ring settles in from a little further out, so keyboard moves read as motion. */
+:where(button, a, input, select, textarea, summary):focus-visible { animation: focus-in var(--dur-2) var(--ease-out); }
+@keyframes focus-in { from { outline-offset: 5px; outline-color: transparent; } }
 
 /* Transparency checkerboard: the vernacular of every image editor. */
 .checker {
@@ -74,14 +89,22 @@ button, input, select, textarea { font: inherit; color: inherit; }
   border: 1px solid var(--line); border-radius: var(--r-chip);
   background: var(--raised); cursor: pointer; color: var(--text);
   font-size: var(--step--1); font-weight: 500;
-  text-decoration: none;
+  text-decoration: none; user-select: none; -webkit-tap-highlight-color: transparent;
+  transition:
+    background-color var(--dur-1), border-color var(--dur-1), color var(--dur-1), opacity var(--dur-1),
+    box-shadow var(--dur-2) var(--ease-out), scale var(--dur-2) var(--ease-pop);
 }
-.btn:hover { border-color: var(--muted); }
+.btn:hover:not(:disabled) { border-color: var(--muted); box-shadow: var(--elev-1); }
+.btn:active:not(:disabled) { scale: 0.96; box-shadow: none; transition-duration: 60ms; }
 .btn.primary { background: var(--text); color: var(--bg); border-color: var(--text); font-weight: 650; }
-.btn.primary:hover { background: color-mix(in srgb, var(--text) 82%, var(--bg)); }
+.btn.primary:hover:not(:disabled) { background: color-mix(in srgb, var(--text) 82%, var(--bg)); box-shadow: var(--elev-2); }
 .btn.ghost { background: transparent; }
+.btn.ghost:hover:not(:disabled) { background: color-mix(in srgb, var(--raised) 70%, transparent); box-shadow: none; }
 .btn.danger { color: var(--danger); }
+.btn.danger:hover:not(:disabled) { border-color: var(--danger); }
 .btn:disabled { opacity: 0.5; cursor: default; }
+/* A button whose work is under way. */
+.btn[aria-busy='true'] { cursor: progress; }
 
 .chip {
   display: inline-flex; align-items: baseline; gap: 0.25em;
@@ -89,6 +112,7 @@ button, input, select, textarea { font: inherit; color: inherit; }
   border: 1px solid var(--line); border-radius: var(--r-chip);
   font-size: var(--step--1); line-height: 1.5; white-space: nowrap;
   background: transparent;
+  transition: background-color var(--dur-1), border-color var(--dur-1), color var(--dur-1);
 }
 .chip .ns { color: var(--faint); }
 .chip.src-human { background: var(--raised); border-color: var(--muted); }
@@ -100,8 +124,13 @@ input.field, select.field, textarea.field {
   padding: 0.5em 0.7em;
   border: 1px solid var(--line); border-radius: var(--r-chip);
   background: var(--bg);
+  transition: border-color var(--dur-1), box-shadow var(--dur-2) var(--ease-out), background-color var(--dur-1);
 }
-input.field:focus, textarea.field:focus { border-color: var(--muted); outline: none; }
+input.field:hover, select.field:hover, textarea.field:hover { border-color: color-mix(in srgb, var(--muted) 60%, var(--line)); }
+input.field:focus, textarea.field:focus {
+  border-color: var(--k-font); outline: none;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--k-font) 22%, transparent);
+}
 
 .visually-hidden {
   position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap;

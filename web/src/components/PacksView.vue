@@ -4,6 +4,7 @@ import {
   api, collectionZipUrl, humanBytes, packZipUrl, thumbUrl, type Collection, type Pack, type PackContext, type Stats,
   type UnrealPackStatus,
 } from '../api'
+import { confirmDialog, undoable } from '../ui'
 
 const props = defineProps<{ packs: Pack[]; stats: Stats | null; collections: Collection[] }>()
 
@@ -15,6 +16,11 @@ function closeMenus(e: MouseEvent) {
 }
 onMounted(() => document.addEventListener('click', closeMenus))
 onBeforeUnmount(() => document.removeEventListener('click', closeMenus))
+
+// Deleted packs and collections vanish at once and only go from the server once their Undo toast runs out.
+const hidden = reactive(new Set<string>())
+const visiblePacks = computed(() => props.packs.filter((p) => !hidden.has(p.id)))
+const visibleCollections = computed(() => props.collections.filter((c) => !hidden.has(c.id)))
 
 const query = ref('')
 /** Audio conversions use ffmpeg; say so while it's being fetched, or why it can't be. */
@@ -34,8 +40,8 @@ const gpuNote = computed(() => {
 })
 const shown = computed(() => {
   const q = query.value.trim().toLowerCase()
-  if (!q) return props.packs
-  return props.packs.filter((p) =>
+  if (!q) return visiblePacks.value
+  return visiblePacks.value.filter((p) =>
     [p.name, p.store, p.license, p.description, ...p.tags].some((s) => s?.toLowerCase().includes(q)),
   )
 })
@@ -59,14 +65,20 @@ async function saveRename(c: Collection) {
     emit('error', `Couldn't rename: ${(e as Error).message}`)
   }
 }
-async function removeCollection(c: Collection) {
-  if (!confirm(`Delete the collection "${c.name}"? The ${c.asset_count} assets in it stay in the library.`)) return
-  try {
-    await api.deleteCollection(c.id)
-    emit('changed')
-  } catch (e) {
-    emit('error', `Couldn't delete: ${(e as Error).message}`)
-  }
+function removeCollection(c: Collection) {
+  undoable(`Deleted the collection ${c.name}`, {
+    apply: () => hidden.add(c.id),
+    revert: () => hidden.delete(c.id),
+    commit: async () => {
+      try {
+        await api.deleteCollection(c.id)
+        emit('changed')
+      } catch (e) {
+        hidden.delete(c.id)
+        emit('error', `Couldn't delete: ${(e as Error).message}`)
+      }
+    },
+  })
 }
 
 const statusText: Record<Pack['status'], string> = {
@@ -155,8 +167,12 @@ async function openUnreal(p: Pack) {
 }
 
 async function convertUnreal(p: Pack) {
-  if (unrealOpts.discard_originals
-    && !confirm(`Discard the original .uasset files in "${p.name}" once converted? Unreal-only data in them is lost for good.`)) return
+  if (unrealOpts.discard_originals && !(await confirmDialog({
+    title: 'Discard the originals?',
+    body: `The original .uasset files in ${p.name} go once converted. Unreal-only data in them, such as material graphs, is lost for good.`,
+    confirm: 'Convert and discard',
+    danger: true,
+  }))) return
   unrealBusy.value = true
   try {
     await api.unrealConvert(p.id, { ...unrealOpts })
@@ -177,14 +193,20 @@ function unrealFact(p: Pack): string {
   return `${done.toLocaleString()} converted from Unreal, ${left.toLocaleString()} still packages`
 }
 
-async function remove(p: Pack) {
-  if (!confirm(`Delete "${p.name}" and its ${p.asset_count} assets from the library? Files shared with other packs stay.`)) return
-  try {
-    await api.deletePack(p.id)
-    emit('changed')
-  } catch (e) {
-    emit('error', `Couldn't delete: ${(e as Error).message}`)
-  }
+function remove(p: Pack) {
+  undoable(`Deleted ${p.name} and its ${p.asset_count.toLocaleString()} assets`, {
+    apply: () => hidden.add(p.id),
+    revert: () => hidden.delete(p.id),
+    commit: async () => {
+      try {
+        await api.deletePack(p.id)
+        emit('changed')
+      } catch (e) {
+        hidden.delete(p.id)
+        emit('error', `Couldn't delete: ${(e as Error).message}`)
+      }
+    },
+  })
 }
 </script>
 
@@ -198,10 +220,10 @@ async function remove(p: Pack) {
       <strong v-if="stats.blobs_bad" class="bad">{{ stats.blobs_bad }} files failed their last integrity check.</strong>
     </p>
 
-    <section v-if="collections.length" class="colsec" aria-label="Collections">
+    <section v-if="visibleCollections.length" class="colsec" aria-label="Collections">
       <h2>Collections</h2>
       <ul class="cols">
-        <li v-for="c in collections" :key="c.id">
+        <li v-for="c in visibleCollections" :key="c.id">
           <button type="button" class="cover checker" :aria-label="`Browse ${c.name}`" tabindex="-1" @click="$emit('browseCollection', c)">
             <img
               v-for="(id, i) in c.preview"
@@ -239,11 +261,11 @@ async function remove(p: Pack) {
       <h2>Packs</h2>
     </section>
 
-    <p v-if="packs.length === 0" class="empty">No packs yet. Drop a zip or a folder anywhere on this page to add one.</p>
-    <div v-else-if="packs.length > 5" class="find">
+    <p v-if="visiblePacks.length === 0" class="empty">No packs yet. Drop a zip or a folder anywhere on this page to add one.</p>
+    <div v-else-if="visiblePacks.length > 5" class="find">
       <label class="visually-hidden" for="pack-q">Find a pack</label>
       <input id="pack-q" v-model="query" class="field" type="search" placeholder="Find a pack by name, store, license or tag" />
-      <span v-if="query" class="muted">{{ shown.length }} of {{ packs.length }}</span>
+      <span v-if="query" class="muted">{{ shown.length }} of {{ visiblePacks.length }}</span>
     </div>
 
     <ul>
@@ -295,7 +317,7 @@ async function remove(p: Pack) {
               <button v-if="p.unreal_packages || p.unreal_converted" type="button" @click="openUnreal(p)">
                 Convert Unreal content…
               </button>
-              <button type="button" class="danger" @click="remove(p)">Delete pack…</button>
+              <button type="button" class="danger" @click="remove(p)">Delete pack</button>
             </div>
           </details>
         </div>

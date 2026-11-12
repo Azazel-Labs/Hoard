@@ -239,7 +239,7 @@ async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
 export const api = {
   stats: () => request<Stats>('/api/stats'),
   packs: () => request<Pack[]>('/api/packs'),
-  deletePack: (id: string) => request<void>(`/api/packs/${id}`, { method: 'DELETE' }),
+  deletePack: (id: string) => request<void>(`/api/packs/${id}`, { method: 'DELETE', keepalive: true }),
   retagPack: (id: string, body: { rules?: boolean; llm?: boolean }) =>
     request<void>(`/api/packs/${id}/retag`, {
       method: 'POST',
@@ -289,7 +289,7 @@ export const api = {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(patch),
     }),
-  deleteCollection: (id: string) => request<void>(`/api/collections/${id}`, { method: 'DELETE' }),
+  deleteCollection: (id: string) => request<void>(`/api/collections/${id}`, { method: 'DELETE', keepalive: true }),
   collectionMembers: (id: string, change: { add?: string[]; remove?: string[] }) =>
     request<Collection>(`/api/collections/${id}/assets`, {
       method: 'POST',

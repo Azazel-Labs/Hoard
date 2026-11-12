@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { formatDuration, thumbUrl, type Asset } from '../api'
 import { canPreview, player, toggle } from '../player'
 import KindGlyph from './KindGlyph.vue'
@@ -17,6 +17,9 @@ const detail = computed(() => {
 const pixelated = computed(() => props.asset.tags.some((t) => t.tag === 'style:pixel-art'))
 const playable = computed(() => canPreview(props.asset))
 const isCurrent = computed(() => player.id === props.asset.id)
+// Thumbnails fade in once decoded instead of popping in line by line.
+const loaded = ref(false)
+watch(() => thumbUrl(props.asset), () => (loaded.value = false))
 const playing = computed(() => isCurrent.value && player.playing)
 
 // Touch screens have no Ctrl-click: a long press (which fires contextmenu) selects instead.
@@ -49,7 +52,8 @@ function onLongPress(e: MouseEvent) {
           alt=""
           loading="lazy"
           decoding="async"
-          :class="{ pixelated, glyphs: asset.kind === 'font' }"
+          :class="{ pixelated, glyphs: asset.kind === 'font', loaded }"
+          @load="loaded = true"
         />
         <KindGlyph v-else :kind="asset.kind" :size="44" />
         <span v-if="isCurrent" class="playhead" aria-hidden="true" />
@@ -96,7 +100,13 @@ function onLongPress(e: MouseEvent) {
 </template>
 
 <style scoped>
-.tile { position: relative; min-width: 0; }
+.tile {
+  position: relative; min-width: 0;
+  /* Tiles rise in, staggered by their place in the page (App.vue sets --i). */
+  animation: tile-in var(--dur-3) var(--ease-out) backwards;
+  animation-delay: calc(min(var(--i, 0), 24) * 16ms);
+}
+@keyframes tile-in { from { opacity: 0; translate: 0 10px; scale: 0.97; } }
 .hit {
   display: flex; flex-direction: column; gap: 0.15rem; width: 100%;
   padding: 0; border: 0; background: none; text-align: left; cursor: pointer;
@@ -105,15 +115,28 @@ function onLongPress(e: MouseEvent) {
 .hit:focus-visible { outline: none; }
 .hit:focus-visible .art { outline: 2px solid var(--k-font); outline-offset: 2px; }
 .art {
+  --ring: 0 0 #0000;
+  --lift: 0 0 #0000;
   position: relative; display: grid; place-items: center;
   aspect-ratio: 1; width: 100%; border-radius: var(--r-tile); overflow: hidden;
   border: 1px solid var(--line);
-  box-shadow: inset 0 3px 0 var(--kind);
+  box-shadow: inset 0 3px 0 var(--kind), var(--ring), var(--lift);
+  transition:
+    border-color var(--dur-1), box-shadow var(--dur-2) var(--ease-out),
+    translate var(--dur-2) var(--ease-out), scale var(--dur-2) var(--ease-pop);
 }
-.hit:hover .art { border-color: var(--muted); }
+/* Hover lifts the tile off the shelf; pressing pushes it back down. */
+.tile:hover .art { border-color: var(--muted); translate: 0 -3px; --lift: var(--elev-2); }
+.hit:active .art { translate: 0 0; scale: 0.97; --lift: 0 0 #0000; transition-duration: 70ms; }
 .selected .art { border-color: var(--kind); outline: 2px solid var(--kind); outline-offset: 1px; }
-.checked .art { border-color: var(--text); box-shadow: inset 0 3px 0 var(--kind), inset 0 0 0 2px var(--text); }
-img { width: 100%; height: 100%; object-fit: contain; }
+.checked .art { border-color: var(--text); --ring: inset 0 0 0 2px var(--text); scale: 0.94; }
+.checked:hover .art { scale: 0.94; }
+img {
+  width: 100%; height: 100%; object-fit: contain;
+  opacity: 0; scale: 1.03; transition: opacity var(--dur-3) var(--ease-out), scale 0.45s var(--ease-out);
+}
+img.loaded { opacity: 1; scale: 1; }
+.tile:hover img.loaded { scale: 1.05; }
 img.pixelated { image-rendering: pixelated; }
 
 /* Played portion of the waveform, like a scrubbed region in an audio editor. */
@@ -140,23 +163,36 @@ img.pixelated { image-rendering: pixelated; }
 .sub > span:first-child { overflow: hidden; text-overflow: ellipsis; }
 
 /* Overlay controls sit on the artwork's corners. */
-.overlay { position: absolute; inset: 0 0 auto 0; aspect-ratio: 1; pointer-events: none; }
+.overlay {
+  position: absolute; inset: 0 0 auto 0; aspect-ratio: 1; pointer-events: none;
+  transition: translate var(--dur-2) var(--ease-out);
+}
+.tile:hover .overlay { translate: 0 -3px; }
 .play, .check {
   position: absolute; pointer-events: auto; display: grid; place-items: center;
   border: 1px solid var(--line); background: var(--panel); color: var(--text); cursor: pointer;
+  box-shadow: var(--elev-1);
+  transition:
+    opacity var(--dur-1), translate var(--dur-2) var(--ease-out), scale var(--dur-2) var(--ease-pop),
+    background-color var(--dur-1), border-color var(--dur-1), color var(--dur-1);
 }
 .play {
   right: 0.45rem; bottom: 0.45rem; width: 2rem; height: 2rem; border-radius: 50%;
-  opacity: 0; transition: opacity 0.12s;
+  opacity: 0; translate: 0 6px;
 }
 .check {
   left: 0.45rem; top: 0.55rem; width: 1.35rem; height: 1.35rem; border-radius: 4px;
-  color: transparent; opacity: 0; transition: opacity 0.12s;
+  color: transparent; opacity: 0; scale: 0.8;
 }
-.tile:hover .play, .tile:focus-within .play, .playing .play { opacity: 1; }
-.tile:hover .check, .selecting .check { opacity: 1; }
-.checked .check { opacity: 1; background: var(--text); border-color: var(--text); color: var(--bg); }
-.play:hover, .check:hover { border-color: var(--muted); }
+.tile:hover .play, .tile:focus-within .play, .playing .play { opacity: 1; translate: 0 0; }
+.tile:hover .check, .selecting .check { opacity: 1; scale: 1; }
+.checked .check { opacity: 1; scale: 1; background: var(--text); border-color: var(--text); color: var(--bg); animation: pop var(--dur-3) var(--ease-pop); }
+/* The tick draws itself in. */
+.check path { stroke-dasharray: 14; stroke-dashoffset: 14; transition: stroke-dashoffset var(--dur-2) var(--ease-out) 60ms; }
+.checked .check path { stroke-dashoffset: 0; }
+@keyframes pop { from { scale: 0.5; } }
+.play:hover, .check:hover { border-color: var(--muted); scale: 1.1; }
+.play:active, .check:active { scale: 0.92; transition-duration: 60ms; }
 .playing .play { background: var(--kind); border-color: var(--kind); color: var(--bg); }
 
 /* Touch screens have no hover: keep the play button visible. */

@@ -14,6 +14,8 @@ import AssetTile from './components/AssetTile.vue'
 import CollectionPicker from './components/CollectionPicker.vue'
 import PacksView from './components/PacksView.vue'
 import TagChip from './components/TagChip.vue'
+import UiLayer from './components/UiLayer.vue'
+import { showError, showOk } from './ui'
 
 type View = 'library' | 'packs'
 const PAGE = 60
@@ -40,7 +42,6 @@ const loading = ref(false)
 const selected = ref<Asset | null>(null)
 const packs = ref<Pack[]>([])
 const stats = ref<Stats | null>(null)
-const toast = ref<{ text: string; kind: 'error' | 'ok' } | null>(null)
 const showFilters = ref(false)
 const tokenDraft = ref(getToken())
 const showToken = ref(false)
@@ -83,7 +84,7 @@ async function runSearch(append = false) {
       tagFacets.value = res.tags
     }
   } catch (e) {
-    showError(`Search failed: ${(e as Error).message}`)
+    showError(`Search failed: ${(e as Error).message}`, { label: 'Retry', run: () => runSearch(append) })
   } finally {
     if (seq === searchSeq) loading.value = false
   }
@@ -109,7 +110,7 @@ async function refreshPacks() {
     // A pack just finished: its assets are now searchable.
     if (wasBusy && !p.some(busy)) runSearch()
   } catch (e) {
-    showError(`Couldn't reach the server: ${(e as Error).message}`)
+    showError(`Couldn't reach the server: ${(e as Error).message}`, { label: 'Retry', run: refreshPacks })
   }
 }
 const busy = (p: Pack) => p.status === 'ingesting' || p.status === 'analyzing' || p.status === 'uploading'
@@ -177,18 +178,21 @@ async function addToCollection(ids: string[], target: { id?: string; create?: st
     const id = target.id ?? (await api.createCollection(target.create!)).id
     const c = await api.collectionMembers(id, { add: ids })
     await refreshCollections()
-    showOk(`Added ${ids.length} ${ids.length === 1 ? 'asset' : 'assets'} to ${c.name}`)
+    showOk(`Added ${ids.length} ${ids.length === 1 ? 'asset' : 'assets'} to ${c.name}`, {
+      label: 'Undo',
+      run: () => removeFromCollection(ids, id, true),
+    })
     if (selected.value && ids.includes(selected.value.id)) openAsset(selected.value.id)
   } catch (e) {
     showError(`Couldn't add to the collection: ${(e as Error).message}`)
   }
 }
 
-async function removeFromCollection(ids: string[], id: string) {
+async function removeFromCollection(ids: string[], id: string, quiet = false) {
   try {
     const c = await api.collectionMembers(id, { remove: ids })
     await refreshCollections()
-    showOk(`Removed ${ids.length} from ${c.name}`)
+    if (!quiet) showOk(`Removed ${ids.length} from ${c.name}`, { label: 'Undo', run: () => addToCollection(ids, { id }) })
     if (filters.collection?.id === id) {
       checked.value = []
       runSearch()
@@ -264,23 +268,42 @@ function onTileOpen(a: Asset, e: MouseEvent | KeyboardEvent) {
 
 const bulkTag = ref('')
 const bulkBusy = ref(false)
-async function applyBulkTag() {
-  const tag = bulkTag.value.trim()
-  if (!tag || !checked.value.length) return
-  bulkBusy.value = true
-  let failed = 0
-  for (const id of checked.value) {
-    try {
-      const updated = await api.patchAsset(id, { add_tags: [tag] })
-      onUpdated(updated)
-    } catch {
-      failed++
+const bulkDone = ref(0)
+/** Patch many assets a few at a time, counting progress in `bulkDone`. Returns the ids that failed. */
+async function patchMany(ids: string[], body: Parameters<typeof api.patchAsset>[1]): Promise<string[]> {
+  const failed: string[] = []
+  const queue = [...ids]
+  bulkDone.value = 0
+  const worker = async () => {
+    for (let id = queue.shift(); id; id = queue.shift()) {
+      try {
+        onUpdated(await api.patchAsset(id, body))
+      } catch {
+        failed.push(id)
+      }
+      bulkDone.value++
     }
   }
+  await Promise.all(Array.from({ length: Math.min(6, ids.length) }, worker))
+  return failed
+}
+async function applyBulkTag() {
+  const tag = bulkTag.value.trim()
+  const ids = [...checked.value]
+  if (!tag || !ids.length) return
+  bulkBusy.value = true
+  // Undo only strips the tag from assets that didn't already have it.
+  const fresh = ids.filter((id) => !items.value.find((a) => a.id === id)?.tags.some((t) => t.tag === tag))
+  const failed = await patchMany(ids, { add_tags: [tag] })
   bulkBusy.value = false
   bulkTag.value = ''
-  if (failed) showError(`Couldn't tag ${failed} of ${checked.value.length} assets. Is the token set?`)
-  else showOk(`Tagged ${checked.value.length} ${checked.value.length === 1 ? 'asset' : 'assets'} with ${tag}`)
+  const n = ids.length
+  if (failed.length) showError(`Couldn't tag ${failed.length} of ${n} assets. Is the token set?`)
+  else
+    showOk(`Tagged ${n} ${n === 1 ? 'asset' : 'assets'} with ${tag}`, {
+      label: 'Undo',
+      run: () => void patchMany(fresh, { remove_tags: [tag] }),
+    })
 }
 // Unreal assets with a recovered WAV/PNG can go into the zip as that file instead of the .uasset.
 const preferSources = ref(true)
@@ -343,15 +366,6 @@ function onCreated() {
 }
 
 // ------------------------------------------------------------------ misc
-
-let toastTimer: ReturnType<typeof setTimeout> | undefined
-function showToast(text: string, kind: 'error' | 'ok') {
-  toast.value = { text, kind }
-  clearTimeout(toastTimer)
-  toastTimer = setTimeout(() => (toast.value = null), kind === 'error' ? 6000 : 2500)
-}
-const showError = (msg: string) => showToast(msg, 'error')
-const showOk = (msg: string) => showToast(msg, 'ok')
 
 /** Open an asset in the detail panel, upgrading the search hit to the full record (links, derivatives). */
 async function openAsset(idOrAsset: string | Asset) {
@@ -780,11 +794,12 @@ const firstLoad = computed(() => loading.value && !items.value.length)
 
         <div ref="gridEl" class="grid" :class="{ selecting: checked.length > 0 }">
           <template v-if="firstLoad">
-            <div v-for="n in 18" :key="`s${n}`" class="skeleton" aria-hidden="true"><span /><i /><b /></div>
+            <div v-for="n in 18" :key="`s${n}`" class="skeleton" :style="{ '--i': n }" aria-hidden="true"><span /><i /><b /></div>
           </template>
           <AssetTile
-            v-for="a in items"
+            v-for="(a, i) in items"
             :key="a.id"
+            :style="{ '--i': i % PAGE }"
             :asset="a"
             :selected="selected?.id === a.id"
             :checked="checkedSet.has(a.id)"
@@ -829,7 +844,9 @@ const firstLoad = computed(() => loading.value && !items.value.length)
         <form class="bulktag" @submit.prevent="applyBulkTag">
           <label class="visually-hidden" for="bulk-tag">Tag to add to the selected assets</label>
           <input id="bulk-tag" v-model="bulkTag" class="field" placeholder="Add a tag to all" autocomplete="off" :disabled="bulkBusy" />
-          <button class="btn" type="submit" :disabled="!bulkTag.trim() || bulkBusy">{{ bulkBusy ? 'Tagging…' : 'Tag' }}</button>
+          <button class="btn" type="submit" :disabled="!bulkTag.trim() || bulkBusy" :aria-busy="bulkBusy">
+            {{ bulkBusy ? `Tagging ${bulkDone}/${checked.length}` : 'Tag' }}
+          </button>
         </form>
         <CollectionPicker
           :collections="collections"
@@ -865,7 +882,7 @@ const firstLoad = computed(() => loading.value && !items.value.length)
     </div>
 
     <UploadQueue ref="queue" @created="onCreated" @unauthorized="showToken = true" />
-    <div v-if="toast" class="toast" :class="toast.kind" role="status"><span>{{ toast.text }}</span></div>
+    <UiLayer />
   </div>
 </template>
 
@@ -986,13 +1003,22 @@ const firstLoad = computed(() => loading.value && !items.value.length)
 .welcome-actions { display: flex; gap: 0.5rem; }
 
 /* Placeholder tiles while the first page loads. */
-.skeleton { display: flex; flex-direction: column; gap: 0.4rem; }
-.skeleton span { aspect-ratio: 1; border-radius: var(--r-tile); background: var(--panel); border: 1px solid var(--line); }
-.skeleton i, .skeleton b { height: 0.7rem; border-radius: 3px; background: var(--panel); }
+.skeleton {
+  display: flex; flex-direction: column; gap: 0.4rem;
+  animation: rise-in var(--dur-3) var(--ease-out) backwards; animation-delay: calc(var(--i, 0) * 20ms);
+}
+.skeleton span { aspect-ratio: 1; border-radius: var(--r-tile); border: 1px solid var(--line); }
+.skeleton i, .skeleton b { height: 0.7rem; border-radius: 3px; }
 .skeleton i { width: 70%; margin-top: 0.25rem; }
 .skeleton b { width: 45%; }
-.skeleton > * { animation: shimmer 1.4s ease-in-out infinite; }
-@keyframes shimmer { 50% { opacity: 0.45; } }
+/* One band of light sweeps across every placeholder together: the gradient is pinned to the viewport. */
+.skeleton > * {
+  background: var(--panel) linear-gradient(100deg, transparent 35%, color-mix(in srgb, var(--raised) 90%, var(--text) 10%) 50%, transparent 65%) fixed;
+  background-size: 200vw 100%;
+  animation: shimmer 1.6s linear infinite;
+}
+@keyframes shimmer { from { background-position: 100vw 0; } to { background-position: -100vw 0; } }
+@keyframes rise-in { from { opacity: 0; translate: 0 10px; } }
 
 .detail-pane { grid-area: detail; min-height: 0; }
 
@@ -1017,13 +1043,6 @@ const firstLoad = computed(() => loading.value && !items.value.length)
 .drop strong { font-size: var(--step-2); font-variation-settings: 'CASL' 0.6; }
 .drop span { color: var(--muted); }
 
-.toast {
-  position: fixed; left: 50%; top: 4.2rem; translate: -50% 0; z-index: 31; max-width: min(560px, calc(100vw - 2rem));
-  padding: 0.6rem 0.9rem; background: var(--raised); border: 1px solid var(--line); border-radius: var(--r-tile);
-  font-size: var(--step--1); box-shadow: 0 8px 24px var(--shadow);
-}
-.toast.error { border-color: var(--danger); color: var(--danger); }
-.toast.ok { border-color: var(--ok); color: var(--ok); }
 .splitbar { flex-wrap: wrap; }
 .scrim { display: none; }
 

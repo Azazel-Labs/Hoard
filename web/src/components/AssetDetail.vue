@@ -9,6 +9,7 @@ import CollectionPicker from './CollectionPicker.vue'
 import { playableUrl, player, sourceExt, sourceUrl, stop as stopPreview } from '../player'
 import KindGlyph from './KindGlyph.vue'
 import TagChip from './TagChip.vue'
+import { showOk } from '../ui'
 
 // three.js is big; only load it when someone opens a model.
 const ModelViewer = defineAsyncComponent(() => import('./ModelViewer.vue'))
@@ -231,15 +232,21 @@ async function copy(text: string, what: string) {
   }
 }
 
-async function patch(body: Parameters<typeof api.patchAsset>[1]) {
+async function patch(body: Parameters<typeof api.patchAsset>[1]): Promise<boolean> {
   if (family.value && applyToFamily.value && (body.add_tags || body.remove_tags || body.category || body.description)) {
     body = { ...body, apply_to_family: true }
   }
   try {
     emit('updated', await api.patchAsset(props.asset.id, body))
+    return true
   } catch (e) {
     emit('error', `Couldn't save: ${(e as Error).message}`)
+    return false
   }
+}
+
+async function removeTag(tag: string) {
+  if (await patch({ remove_tags: [tag] })) showOk(`Removed ${tag}`, { label: 'Undo', run: () => void patch({ add_tags: [tag] }) })
 }
 
 function startRename() {
@@ -380,7 +387,7 @@ watch(() => props.asset.id, drawWaveform, { immediate: true })
           :source="t.source"
           removable
           @click="$emit('tag', t.tag)"
-          @remove="patch({ remove_tags: [t.tag] })"
+          @remove="removeTag(t.tag)"
         />
       </div>
       <form class="addtag" @submit.prevent="addTag">

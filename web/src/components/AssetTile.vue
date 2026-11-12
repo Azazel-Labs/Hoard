@@ -4,6 +4,7 @@ import { formatDuration, thumbUrl, type Asset } from '../api'
 import { canPreview, player, toggle } from '../player'
 import KindGlyph from './KindGlyph.vue'
 import { noteTileClick } from '../viewers'
+import { materialSummary } from '../materials'
 
 const props = defineProps<{ asset: Asset; selected: boolean; checked: boolean; selecting: boolean }>()
 const emit = defineEmits<{ open: [MouseEvent | KeyboardEvent]; check: [MouseEvent] }>()
@@ -13,6 +14,7 @@ const detail = computed(() => {
   if (typeof m.width === 'number' && typeof m.height === 'number') return `${m.width}×${m.height}`
   if (typeof m.duration_secs === 'number') return formatDuration(m.duration_secs)
   if (typeof m.triangles === 'number') return `${m.triangles.toLocaleString()} tris`
+  if (typeof m.material_maps === 'number') return materialSummary(props.asset)
   return ''
 })
 const pixelated = computed(() => props.asset.tags.some((t) => t.tag === 'style:pixel-art'))

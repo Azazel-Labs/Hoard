@@ -7,6 +7,7 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js'
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js'
 import { TGALoader } from 'three/addons/loaders/TGALoader.js'
 import { api, asUrl, packFileUrl, thumbUrl, type Asset, type AssetLink } from './api'
+import { applyToModel } from './materialMaps'
 
 export type Background = 'checker' | 'dark' | 'grey' | 'light' | 'env'
 export const BACKGROUNDS: Background[] = ['checker', 'dark', 'grey', 'light', 'env']
@@ -241,6 +242,7 @@ export class ModelStage {
   private texturesOn = true
   playing = true
   private missing: string[] = []
+  private stopMaps: (() => void) | null = null
   /** Textures go on loading after the model is up; this hears about the ones that fail. */
   onMissing: ((names: string[]) => void) | null = null
 
@@ -369,7 +371,13 @@ export class ModelStage {
 
     // A model that names no textures, next to textures named after it: try them on.
     let guessed = 0
-    if (!textured.any && guesses.length) guessed = this.applyGuesses(guesses, asset.pack_id, src.ext !== 'glb' && src.ext !== 'gltf', manager)
+    // Or a material made from maps that share its name: its maps by role.
+    const material = textured.any ? undefined : full.materials?.[0]
+    if (material) {
+      const applied = applyToModel(material, asset.pack_id, src.ext !== 'glb' && src.ext !== 'gltf', this.materials)
+      this.stopMaps = applied.stop
+      guessed = applied.count
+    } else if (!textured.any && guesses.length) guessed = this.applyGuesses(guesses, asset.pack_id, src.ext !== 'glb' && src.ext !== 'gltf', manager)
 
     this.object = object
     this.scene.add(object)
@@ -635,6 +643,7 @@ export class ModelStage {
 
   dispose() {
     this.disposed = true
+    this.stopMaps?.()
     this.resizeObs?.disconnect()
     this.mixer?.stopAllAction()
     this.controls?.dispose()

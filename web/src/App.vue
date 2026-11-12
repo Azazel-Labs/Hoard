@@ -1097,7 +1097,7 @@ const commands = computed<Command[]>(() => {
 
         <p v-if="supportingHidden > 0 || prefs.showSupporting" class="supporting">
           <template v-if="!prefs.showSupporting">
-            <span :title="'glTF buffers and material libraries. They come along when you download the model that uses them.'">
+            <span :title="'glTF buffers, material libraries and the maps of materials. They come along when you download what uses them.'">
               {{ supportingHidden }} supporting {{ supportingHidden === 1 ? 'file' : 'files' }} hidden
             </span>
             <button type="button" class="linkbtn" @click="prefs.showSupporting = true">Show</button>

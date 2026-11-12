@@ -177,7 +177,119 @@ async fn handle(State(state): State<AppState>, headers: HeaderMap, body: String)
 
 fn tool_list() -> Value {
     let (read, write) = (read_hints(), write_hints());
-    let mut tools = json!([
+    let tools = json!([
+        {
+            "name": "get_asset",
+            "title": "Get asset details",
+            "description": "Everything known about one asset: metadata (size, duration, poly count…), tags with their source, linked dependencies (textures, buffers, materials, animation clips), what uses it, and URLs.",
+            "inputSchema": { "type": "object", "properties": { "id": { "type": "string" } }, "required": ["id"] },
+            "annotations": read
+        },
+        {
+            "name": "get_bundle",
+            "title": "Get download links for an asset and its dependencies",
+            "description": "Direct download URLs for an asset plus every file it needs, each with the relative path to save it at so references keep working, and a single zip URL.",
+            "inputSchema": {
+                "type": "object",
+                "properties": {
+                    "id": { "type": "string" },
+                    "include_animations": { "type": "boolean", "default": false }
+                },
+                "required": ["id"]
+            },
+            "annotations": read
+        },
+        {
+            "name": "list_packs",
+            "title": "List packs",
+            "description": "All uploaded packs with status, license, asset count and size.",
+            "inputSchema": { "type": "object", "properties": {} },
+            "annotations": read
+        },
+        {
+            "name": "list_collections",
+            "title": "List collections",
+            "description": "Hand-picked sets of assets (e.g. everything chosen for one level), with asset counts and a zip URL each. Pass a collection's id or name to search_assets as `collection` to see its contents.",
+            "inputSchema": { "type": "object", "properties": {} },
+            "annotations": read
+        },
+        {
+            "name": "get_credits",
+            "title": "Get credits",
+            "description": "Who made the packs a project uses, where each is sold, its license and whether the license asks for attribution (yes, no, or 'terms': keep the license notice with the files; 'unknown' where the license isn't known). Give any mix of packs, collections, asset ids and a search; everything is put together. `markdown` returns a ready CREDITS.md.",
+            "inputSchema": {
+                "type": "object",
+                "properties": {
+                    "packs": { "type": "array", "items": { "type": "string" }, "description": "Pack ids or names." },
+                    "collections": { "type": "array", "items": { "type": "string" }, "description": "Collection ids or names." },
+                    "ids": { "type": "array", "items": { "type": "string" }, "description": "Asset ids." },
+                    "query": { "type": "string", "description": "Also credit the packs of what this search finds." },
+                    "kind": { "type": "string", "description": "With `query`: only this kind." },
+                    "tags": { "type": "array", "items": { "type": "string" }, "description": "With `query`: all must match." },
+                    "markdown": { "type": "boolean", "default": false, "description": "Return CREDITS.md text instead of JSON." }
+                }
+            },
+            "annotations": read
+        },
+        {
+            "name": "list_tags",
+            "title": "List tags",
+            "description": "Most-used tags, optionally filtered by prefix (e.g. 'style:' or 'material:'). Useful to learn the vocabulary before searching.",
+            "inputSchema": {
+                "type": "object",
+                "properties": {
+                    "prefix": { "type": "string", "default": "" },
+                    "limit": { "type": "integer", "minimum": 1, "maximum": 200, "default": 50 }
+                }
+            },
+            "annotations": read
+        },
+        {
+            "name": "tag_asset",
+            "title": "Add or remove tags",
+            "description": "Add and/or remove tags on an asset. Added tags are recorded as human-sourced and are never overwritten by the automatic taggers.",
+            "inputSchema": {
+                "type": "object",
+                "properties": {
+                    "id": { "type": "string" },
+                    "add": { "type": "array", "items": { "type": "string" } },
+                    "remove": { "type": "array", "items": { "type": "string" } }
+                },
+                "required": ["id"]
+            },
+            "annotations": write
+        },
+        {
+            "name": "update_asset",
+            "title": "Rename or recategorize an asset",
+            "description": "Set an asset's display name, category or description (its own field, next to the AI's and the file's). Edited fields are locked against the AI tagger.",
+            "inputSchema": {
+                "type": "object",
+                "properties": {
+                    "id": { "type": "string" },
+                    "name": { "type": "string" },
+                    "category": { "type": "string" },
+                    "description": { "type": "string" }
+                },
+                "required": ["id"]
+            },
+            "annotations": write
+        }
+    ]);
+    let mut all = search_tools();
+    if let Some(list) = all.as_array_mut() {
+        for more in [tools, tagging_tools()] {
+            if let Value::Array(more) = more {
+                list.extend(more);
+            }
+        }
+    }
+    all
+}
+
+fn search_tools() -> Value {
+    let read = read_hints();
+    json!([
         {
             "name": "search_assets",
             "title": "Search assets",
@@ -229,91 +341,8 @@ fn tool_list() -> Value {
                 "required": ["color"]
             },
             "annotations": read
-        },
-        {
-            "name": "get_asset",
-            "title": "Get asset details",
-            "description": "Everything known about one asset: metadata (size, duration, poly count…), tags with their source, linked dependencies (textures, buffers, materials, animation clips), what uses it, and URLs.",
-            "inputSchema": { "type": "object", "properties": { "id": { "type": "string" } }, "required": ["id"] },
-            "annotations": read
-        },
-        {
-            "name": "get_bundle",
-            "title": "Get download links for an asset and its dependencies",
-            "description": "Direct download URLs for an asset plus every file it needs, each with the relative path to save it at so references keep working, and a single zip URL.",
-            "inputSchema": {
-                "type": "object",
-                "properties": {
-                    "id": { "type": "string" },
-                    "include_animations": { "type": "boolean", "default": false }
-                },
-                "required": ["id"]
-            },
-            "annotations": read
-        },
-        {
-            "name": "list_packs",
-            "title": "List packs",
-            "description": "All uploaded packs with status, license, asset count and size.",
-            "inputSchema": { "type": "object", "properties": {} },
-            "annotations": read
-        },
-        {
-            "name": "list_collections",
-            "title": "List collections",
-            "description": "Hand-picked sets of assets (e.g. everything chosen for one level), with asset counts and a zip URL each. Pass a collection's id or name to search_assets as `collection` to see its contents.",
-            "inputSchema": { "type": "object", "properties": {} },
-            "annotations": read
-        },
-        {
-            "name": "list_tags",
-            "title": "List tags",
-            "description": "Most-used tags, optionally filtered by prefix (e.g. 'style:' or 'material:'). Useful to learn the vocabulary before searching.",
-            "inputSchema": {
-                "type": "object",
-                "properties": {
-                    "prefix": { "type": "string", "default": "" },
-                    "limit": { "type": "integer", "minimum": 1, "maximum": 200, "default": 50 }
-                }
-            },
-            "annotations": read
-        },
-        {
-            "name": "tag_asset",
-            "title": "Add or remove tags",
-            "description": "Add and/or remove tags on an asset. Added tags are recorded as human-sourced and are never overwritten by the automatic taggers.",
-            "inputSchema": {
-                "type": "object",
-                "properties": {
-                    "id": { "type": "string" },
-                    "add": { "type": "array", "items": { "type": "string" } },
-                    "remove": { "type": "array", "items": { "type": "string" } }
-                },
-                "required": ["id"]
-            },
-            "annotations": write
-        },
-        {
-            "name": "update_asset",
-            "title": "Rename or recategorize an asset",
-            "description": "Set an asset's display name, category or description (its own field, next to the AI's and the file's). Edited fields are locked against the AI tagger.",
-            "inputSchema": {
-                "type": "object",
-                "properties": {
-                    "id": { "type": "string" },
-                    "name": { "type": "string" },
-                    "category": { "type": "string" },
-                    "description": { "type": "string" }
-                },
-                "required": ["id"]
-            },
-            "annotations": write
         }
-    ]);
-    if let (Some(all), Value::Array(more)) = (tools.as_array_mut(), tagging_tools()) {
-        all.extend(more);
-    }
-    tools
+    ])
 }
 
 fn read_hints() -> Value {
@@ -510,6 +539,35 @@ async fn preview_blocks(state: &AppState, wanted: Vec<Value>) -> Vec<Value> {
     out
 }
 
+/// `get_credits`: credits for any mix of packs, collections, asset ids and a search.
+async fn credits_call(state: &AppState, args: &Value) -> Result<Value, ToolError> {
+    let tags: Vec<String> = str_list(args, "tags").iter().filter_map(|t| hoard_core::normalize_tag(t)).collect();
+    let kind = str_arg(args, "kind");
+    let query = str_arg(args, "query");
+    let search = (query.is_some() || kind.is_some() || !tags.is_empty()).then(|| SearchQuery {
+        q: query,
+        kind,
+        tags,
+        ..Default::default()
+    });
+    let req = hoard_core::CreditsRequest {
+        packs: str_list(args, "packs"),
+        collections: str_list(args, "collections"),
+        ids: str_list(args, "ids"),
+        selections: search
+            .map(|q| hoard_core::ManifestRequest { query: Some(q), include_deps: true, ..Default::default() })
+            .into_iter()
+            .collect(),
+    };
+    let credits =
+        crate::credits::for_request(state, req).await.map_err(|e| ToolError::Failed(format!("{:#}", e.err)))?;
+    if args.get("markdown").and_then(Value::as_bool) == Some(true) {
+        Ok(json!({ "markdown": crate::credits::markdown(&credits) }))
+    } else {
+        Ok(json!(credits))
+    }
+}
+
 /// [`tagging_tools`]' calls.
 async fn tagging_call(state: &AppState, name: &str, args: &Value) -> Result<Value, ToolError> {
     match name {
@@ -653,6 +711,7 @@ async fn call_tool(state: &AppState, name: &str, args: Value, base: &str) -> Res
             let packs = db::call(&state.pool, |c| db::list_packs(c, false)).await?;
             Ok(json!({ "packs": packs }))
         }
+        "get_credits" => credits_call(state, &args).await,
         "list_collections" => {
             let cols = db::call(&state.pool, |c| db::list_collections(c)).await?;
             let cols: Vec<Value> = cols

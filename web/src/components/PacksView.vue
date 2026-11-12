@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue'
 import {
-  api, collectionZipUrl, humanBytes, KIND_LABEL, packZipUrl, thumbUrl, type AssetKind, type Collection, type Pack,
+  api, collectionCreditsUrl, collectionZipUrl, humanBytes, KIND_LABEL, packCreditsUrl, packZipUrl, thumbUrl, type AssetKind, type Collection, type Pack,
   type PackContext, type Stats, type StoreMatch, type StoreMatches, type UnrealPackStatus,
 } from '../api'
 import { confirmDialog, undoable } from '../ui'
@@ -195,10 +195,28 @@ async function retag(p: Pack, llm: boolean) {
   }
 }
 
+async function readFiles(p: Pack) {
+  try {
+    await api.readPackFiles(p.id)
+    emit('changed')
+  } catch (e) {
+    emit('error', `Couldn't read the pack's files: ${(e as Error).message}`)
+  }
+}
+
 // Pack context editor: one pack open at a time.
 const editing = ref<string | null>(null)
 const saving = ref(false)
-const draft = reactive<PackContext>({ store: null, store_url: null, store_text: null, license_tier: null, readme: null })
+const draft = reactive<PackContext>({
+  store: null,
+  store_url: null,
+  store_text: null,
+  license_tier: null,
+  readme: null,
+  seller: null,
+  store_license: null,
+  store_auto: null,
+})
 
 async function editContext(p: Pack) {
   if (editing.value === p.id) {
@@ -220,13 +238,13 @@ async function editContext(p: Pack) {
 const lookup = reactive({ q: '', loading: false, open: false, error: '', result: null as StoreMatches | null })
 let lookupAsked = 0
 
-async function findInStores(p: Pack, q?: string) {
+async function findInStores(p: Pack, q?: string, fresh = false) {
   const n = ++lookupAsked
   lookup.loading = true
   lookup.open = true
   lookup.error = ''
   try {
-    const r = await api.storeMatches(p.id, q?.trim() || undefined)
+    const r = await api.storeMatches(p.id, q?.trim() || undefined, fresh)
     if (n !== lookupAsked || editing.value !== p.id) return
     lookup.result = r
     if (!lookup.q) lookup.q = r.query
@@ -242,13 +260,30 @@ function useMatch(m: StoreMatch) {
   draft.store = m.store
   draft.store_url = m.url
   draft.store_text = null
+  if (m.author) draft.seller = m.author
+  draft.store_license = m.license ?? null
   lookup.open = false
+}
+
+/** The store page found automatically isn't this pack's: take it off and show the other suggestions. */
+async function notThisOne(p: Pack) {
+  try {
+    Object.assign(draft, await api.undoStorePage(p.id))
+    emit('changed')
+    findInStores(p)
+  } catch (e) {
+    emit('error', `Couldn't take off the store page: ${(e as Error).message}`)
+  }
+}
+
+function day(at: string) {
+  return new Date(at).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' })
 }
 
 async function saveContext(p: Pack, thenRetag: boolean) {
   saving.value = true
   try {
-    const { readme: _readme, ...ctx } = draft
+    const { readme: _readme, store_auto: _auto, ...ctx } = draft
     Object.assign(draft, await api.setPackContext(p.id, ctx))
     if (thenRetag) await api.retagPack(p.id, { rules: false, llm: true })
     editing.value = null
@@ -358,6 +393,7 @@ async function archive(p: Pack) {
             <div class="actions">
               <button class="btn" type="button" @click="$emit('browseCollection', c)">Browse</button>
               <a v-if="c.asset_count" class="btn ghost" :href="collectionZipUrl(c.id)">Download (.zip)</a>
+              <a v-if="c.asset_count" class="btn ghost" :href="collectionCreditsUrl(c.id)" download="CREDITS.md" title="Who made the packs these assets come from, their licenses and the credit lines they ask for">Credits</a>
               <button class="btn ghost" type="button" @click="startRename(c)">Rename</button>
               <button class="btn ghost danger" type="button" @click="removeCollection(c)">Delete</button>
             </div>
@@ -506,6 +542,10 @@ async function archive(p: Pack) {
               >
                 Make thumbnails in this browser
               </button>
+              <button type="button" :disabled="p.status !== 'ready'" @click="readFiles(p)">
+                Read the pack's files again
+              </button>
+              <a :href="packCreditsUrl(p.id)" download="CREDITS.md" title="CREDITS.md: who made the pack, its license and the credit line it asks for">Download credits</a>
               <button v-if="p.unreal_packages || p.unreal_converted" type="button" @click="openUnreal(p)">
                 Convert Unreal content…
               </button>
@@ -555,6 +595,10 @@ async function archive(p: Pack) {
             Where the pack came from and what the seller says about it. The LLM tagger reads this with every file,
             so a store blurb like "120 ice and fire spells" helps it name <span class="mono">spell35.wav</span>.
           </p>
+          <p v-if="draft.store_auto" class="auto">
+            <span>Found automatically: the pack names this page itself.</span>
+            <button class="btn ghost" type="button" @click="notThisOne(p)">Not this one</button>
+          </p>
           <section v-if="lookup.open" class="lookup" :aria-busy="lookup.loading">
             <div class="find">
               <input
@@ -593,6 +637,10 @@ async function archive(p: Pack) {
                 </li>
               </ul>
               <p class="hint">
+                <template v-if="lookup.result.searched_at">
+                  Searched {{ day(lookup.result.searched_at) }}.
+                  <button class="again" type="button" :disabled="lookup.loading" @click="findInStores(p, undefined, true)">Search again</button>.
+                </template>
                 <template v-if="lookup.result.failed.length">Couldn't reach {{ lookup.result.failed.join(', ') }} this time. </template>
                 Also look on
                 <template v-for="(l, i) in lookup.result.links" :key="l.store">
@@ -607,6 +655,10 @@ async function archive(p: Pack) {
           </button>
           <div class="row">
             <label>Store <input v-model="draft.store" class="field" placeholder="Fab, itch.io, Humble Bundle…" /></label>
+            <label>Seller <input v-model="draft.seller" class="field" placeholder="Who made it" /></label>
+          </div>
+          <div class="row">
+            <label>License <input v-model="draft.store_license" class="field" placeholder="Fab Standard License, CC BY 4.0…" /></label>
             <label>License tier <input v-model="draft.license_tier" class="field" placeholder="Personal, Professional…" /></label>
           </div>
           <label>Store page
@@ -673,12 +725,13 @@ li { padding: 1rem 0; border-top: 1px solid var(--line); display: flex; gap: 1re
 }
 .menu[open] .menu-items { animation: menu-in var(--dur-3) var(--ease-pop); }
 @keyframes menu-in { from { opacity: 0; scale: 0.95; translate: 0 -4px; } }
-.menu-items button {
+.menu-items button, .menu-items a {
   border: 0; background: none; text-align: left; padding: 0.45rem 0.6rem; border-radius: var(--r-chip);
   cursor: pointer; font-size: var(--step--1);
 }
-.menu-items button { transition: background-color var(--dur-1); }
-.menu-items button:hover:not(:disabled) { background: var(--panel); }
+.menu-items a { color: inherit; text-decoration: none; }
+.menu-items button, .menu-items a { transition: background-color var(--dur-1); }
+.menu-items button:hover:not(:disabled), .menu-items a:hover { background: var(--panel); }
 .menu-items button:disabled { opacity: 0.5; cursor: default; }
 .menu-items .danger { color: var(--danger); }
 .finder { display: grid; gap: 0.6rem; margin-bottom: 1rem; }
@@ -777,6 +830,13 @@ li.flash .status { animation: ready-pop var(--dur-3) var(--ease-pop); }
 .matches .why::before { content: '✓ '; }
 .matches .clamp { display: -webkit-box; -webkit-line-clamp: 1; line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; }
 .find-again { align-self: flex-start; }
+.again { padding: 0; border: 0; background: none; color: var(--accent); font: inherit; cursor: pointer; text-decoration: underline; }
+.again:disabled { color: var(--muted); cursor: default; }
+.auto {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 0.3rem 0.7rem; margin: 0; padding: 0.5rem 0.7rem;
+  border: 1px solid var(--line); border-radius: var(--r-tile); font-size: var(--step--1);
+}
+.auto span::before { content: '✓ '; color: var(--ok, var(--accent)); }
 .ustats { flex-direction: row; flex-wrap: wrap; gap: 0.3rem 1.25rem; font-size: var(--step--1); color: var(--muted); }
 .ustats li, .reasons li { padding: 0; border: 0; display: block; }
 .ustats strong { color: var(--text); font-variant-numeric: tabular-nums; }

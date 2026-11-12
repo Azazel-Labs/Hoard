@@ -12,6 +12,7 @@ mod chatgpt;
 mod config;
 mod context;
 mod convert;
+mod credits;
 mod db;
 mod error;
 mod extract;
@@ -40,7 +41,9 @@ mod scan;
 mod server;
 mod settings;
 mod sheet;
+mod sidecar;
 mod sources;
+mod store_lookup;
 mod store_search;
 mod tagger;
 mod textures;
@@ -163,6 +166,15 @@ async fn main() -> Result<()> {
     {
         let st = Arc::clone(&state);
         tokio::spawn(async move { looks::schedule(&st).await });
+    }
+    {
+        let st = Arc::clone(&state);
+        tokio::spawn(async move {
+            if let Err(e) = jobs::read_unread_files(&st).await {
+                tracing::warn!(error = %format!("{e:#}"), "could not queue reading packs' store files");
+            }
+            store_lookup::start(&st).await;
+        });
     }
     {
         let st = Arc::clone(&state);

@@ -40,8 +40,10 @@ pub(crate) fn router(state: &AppState) -> Router<AppState> {
         .route("/api/tags/merge", post(merge_tags))
         .route("/api/tags/aliases", get(tag_aliases).delete(drop_tag_alias))
         .route("/api/packs/{id}/retag", post(retag_pack))
+        .route("/api/packs/{id}/read-files", post(read_pack_files))
         .route("/api/packs/{id}/context", axum::routing::put(put_pack_context))
         .route("/api/packs/{id}/store-matches", get(crate::store_search::store_matches))
+        .route("/api/packs/{id}/store/undo", post(undo_store_page))
         .route("/api/packs/{id}/unreal/convert", post(unreal_convert))
         .route("/api/packs/{id}/unreal/finish", post(unreal_finish))
         .route("/api/assets/{id}/replace", post(replace_asset).layer(upload_limit()))
@@ -100,6 +102,9 @@ pub(crate) fn router(state: &AppState) -> Router<AppState> {
         .route("/api/blobs/{hash}", get(blob))
         .route("/api/tags", get(tags))
         .route("/api/manifest", post(manifest))
+        .route("/api/credits", post(crate::credits::credits))
+        .route("/api/packs/{id}/credits", get(crate::credits::pack_credits))
+        .route("/api/collections/{id}/credits", get(crate::credits::collection_credits))
         .route("/api/admin/jobs", get(admin_jobs))
         .route("/api/assets/{id}/bundle.zip", get(asset_bundle))
         .route("/api/bundle.zip", get(selection_bundle))
@@ -320,6 +325,8 @@ async fn put_pack_context(
     ctx.store_url = clean(ctx.store_url, 500).filter(|u| u.starts_with("https://") || u.starts_with("http://"));
     ctx.store_text = clean(ctx.store_text, context::MAX_STORE_TEXT);
     ctx.license_tier = clean(ctx.license_tier, 80);
+    ctx.seller = clean(ctx.seller, 120);
+    ctx.store_license = clean(ctx.store_license, 80);
     if ctx.store.is_none() {
         ctx.store = ctx.store_url.as_deref().and_then(context::store_from_url).map(str::to_owned);
     }
@@ -336,11 +343,15 @@ async fn put_pack_context(
         if db::get_pack(c, &id2)?.is_none() {
             return Ok(None);
         }
+        // A page someone changed is no longer the one found automatically.
         c.execute(
-            "INSERT INTO pack_context (pack_id, store, store_url, store_text, license_tier) VALUES (?1, ?2, ?3, ?4, ?5)
+            "INSERT INTO pack_context (pack_id, store, store_url, store_text, license_tier, seller, store_license)
+             VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7)
              ON CONFLICT (pack_id) DO UPDATE SET store = excluded.store, store_url = excluded.store_url,
-                 store_text = excluded.store_text, license_tier = excluded.license_tier",
-            params![id2, ctx.store, ctx.store_url, ctx.store_text, ctx.license_tier],
+                 store_text = excluded.store_text, license_tier = excluded.license_tier, seller = excluded.seller,
+                 store_license = excluded.store_license,
+                 store_auto = CASE WHEN store_url IS excluded.store_url THEN store_auto END",
+            params![id2, ctx.store, ctx.store_url, ctx.store_text, ctx.license_tier, ctx.seller, ctx.store_license],
         )?;
         Ok(Some(db::pack_context(c, &id2)?))
     })
@@ -532,6 +543,42 @@ async fn retag_pack(
     }
     state.wake.notify_one();
     Ok(StatusCode::ACCEPTED)
+}
+
+/// `POST /api/packs/{id}/read-files`: read the store's files in the pack again (a Megascans JSON) for its name, tags
+/// and description.
+async fn read_pack_files(State(state): State<AppState>, Path(id): Path<String>) -> ApiResult<StatusCode> {
+    let id2 = id.clone();
+    let found = db::call(&state.pool, move |c| {
+        if db::get_pack(c, &id2)?.is_none() {
+            return Ok(false);
+        }
+        if !db::job_pending(c, jobs::READ_FILES, Some(&id2), None)? {
+            db::enqueue(c, jobs::READ_FILES, Some(&id2), &json!({}))?;
+        }
+        Ok(true)
+    })
+    .await?;
+    if !found {
+        return Err(AppError::not_found(format!("pack {id}")));
+    }
+    state.wake.notify_one();
+    Ok(StatusCode::ACCEPTED)
+}
+
+/// `POST /api/packs/{id}/store/undo`: take off a store page that was found automatically. The pack isn't looked up
+/// again; the other suggestions stay for Store details.
+async fn undo_store_page(State(state): State<AppState>, Path(id): Path<String>) -> ApiResult<Json<PackContext>> {
+    let id2 = id.clone();
+    let ctx = db::call(&state.pool, move |c| {
+        if db::get_pack(c, &id2)?.is_none() {
+            return Ok(None);
+        }
+        crate::store_lookup::undo(c, &id2)?;
+        Ok(Some(db::pack_context(c, &id2)?))
+    })
+    .await?;
+    ctx.map(Json).ok_or_else(|| AppError::not_found(format!("pack {id}")))
 }
 
 // ---------------------------------------------------------------------------------------------
@@ -1034,7 +1081,7 @@ async fn asset_bundle(
     })
     .await?
     .ok_or_else(|| AppError::not_found(format!("asset {id}")))?;
-    Ok(crate::bundle::zip_files(&state, &root_name, &files)?)
+    Ok(crate::bundle::zip_files(&state, &root_name, &files, None)?)
 }
 
 #[derive(Debug, Deserialize)]
@@ -1078,21 +1125,26 @@ struct ZipOptions {
 /// Zip assets (and what they need) into one archive. Files keep their layout inside a folder per pack, so two
 /// packs' `Audio/hit.wav` don't collide and models still find their textures.
 async fn zip_assets(state: &AppState, ids: Vec<String>, opts: ZipOptions, name: &str) -> ApiResult<Response> {
-    let groups = db::call(&state.pool, move |c| {
+    let (groups, credits) = db::call(&state.pool, move |c| {
         let mut all = Vec::new();
         let mut seen = std::collections::HashSet::new();
         for id in &ids {
             let closure = if opts.deps { db::dependency_closure(c, id, opts.animations)? } else { vec![id.clone()] };
             all.extend(closure.into_iter().filter(|x| seen.insert(x.clone())));
         }
-        let mut stmt = c.prepare("SELECT p.name FROM assets a JOIN packs p ON p.id = a.pack_id WHERE a.id = ?1")?;
+        let mut stmt =
+            c.prepare("SELECT p.id, p.name FROM assets a JOIN packs p ON p.id = a.pack_id WHERE a.id = ?1")?;
         let mut by_pack: std::collections::BTreeMap<String, Vec<String>> = std::collections::BTreeMap::new();
+        let mut pack_ids = BTreeSet::new();
         for id in all {
-            if let Some(pack) = stmt.query_row([&id], |r| r.get::<_, String>(0)).optional()? {
+            let pack = stmt.query_row([&id], |r| Ok((r.get::<_, String>(0)?, r.get::<_, String>(1)?))).optional()?;
+            if let Some((pack_id, pack)) = pack {
+                pack_ids.insert(pack_id);
                 by_pack.entry(pack).or_default().push(id);
             }
         }
-        by_pack
+        let credits = crate::credits::markdown(&crate::credits::for_packs(c, &pack_ids)?);
+        let groups = by_pack
             .into_iter()
             .map(|(pack, ids)| {
                 let mut files = db::bundle_files(c, &ids)?;
@@ -1101,7 +1153,8 @@ async fn zip_assets(state: &AppState, ids: Vec<String>, opts: ZipOptions, name: 
                 }
                 Ok((pack, files))
             })
-            .collect::<anyhow::Result<Vec<_>>>()
+            .collect::<anyhow::Result<Vec<_>>>()?;
+        Ok((groups, credits))
     })
     .await?;
     if groups.is_empty() {
@@ -1126,7 +1179,7 @@ async fn zip_assets(state: &AppState, ids: Vec<String>, opts: ZipOptions, name: 
         })
         .collect();
     let root = name.replace(['/', '\\', '"'], "_");
-    Ok(crate::bundle::zip_response(state, &root, entries)?)
+    Ok(crate::bundle::zip_response(state, &root, entries, Some(credits))?)
 }
 
 // ---------------------------------------------------------------------------------------------
@@ -1280,15 +1333,16 @@ async fn collection_bundle(
 /// A whole pack as one zip, in its original layout.
 async fn pack_bundle(State(state): State<AppState>, Path(id): Path<String>) -> ApiResult<Response> {
     let id2 = id.clone();
-    let (name, files) = db::call(&state.pool, move |c| {
+    let (name, files, credits) = db::call(&state.pool, move |c| {
         let Some(pack) = db::get_pack(c, &id2)? else { return Ok(None) };
         let mut stmt = c.prepare("SELECT id FROM assets WHERE pack_id = ?1 ORDER BY path")?;
         let ids: Vec<String> = stmt.query_map([&id2], |r| r.get(0))?.collect::<rusqlite::Result<_>>()?;
-        Ok(Some((pack.name, db::bundle_files(c, &ids)?)))
+        let credits = crate::credits::markdown(&crate::credits::for_packs(c, &BTreeSet::from([pack.id]))?);
+        Ok(Some((pack.name, db::bundle_files(c, &ids)?, credits)))
     })
     .await?
     .ok_or_else(|| AppError::not_found(format!("pack {id}")))?;
-    Ok(crate::bundle::zip_files(&state, &name, &files)?)
+    Ok(crate::bundle::zip_files(&state, &name, &files, Some(credits))?)
 }
 
 /// Serve a pack's file by its original path. Browser model loaders resolve relative references
@@ -1778,6 +1832,7 @@ fn settings_json(state: &AppState) -> Value {
             "render": option(now.render, cfg.render, saved.render.is_some()),
             "update_check": option(now.update_check, cfg.update_check, saved.update_check.is_some()),
             "guest_browsing": option(now.guest_browsing, false, saved.guest_browsing.is_some()),
+            "store_lookup": option(now.store_lookup, true, saved.store_lookup.is_some()),
             "thumb_quality": option(
                 now.thumb_quality,
                 crate::settings::ThumbQuality::default(),
@@ -1900,6 +1955,9 @@ async fn put_settings(State(state): State<AppState>, Json(patch): Json<Value>) -
         tokio::spawn(async move { crate::formats::log_trim(&st).await });
     }
     crate::updates::set_enabled(after.update_check);
+    if after.store_lookup && !before.store_lookup {
+        crate::store_lookup::start(&state).await;
+    }
     crate::music::configure(after.soundfont.clone());
     if after.workers > before.workers {
         state.wake.notify_waiters();

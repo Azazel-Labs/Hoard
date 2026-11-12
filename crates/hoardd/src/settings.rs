@@ -96,6 +96,9 @@ pub(crate) struct Saved {
     pub(crate) guest_browsing: Option<bool>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub(crate) thumb_quality: Option<ThumbQuality>,
+    /// Search the stores for new packs' pages in the background, attaching the ones that are certain.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub(crate) store_lookup: Option<bool>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub(crate) conversion_cache_mb: Option<u64>,
 }
@@ -126,6 +129,7 @@ pub(crate) struct Effective {
     pub(crate) max_expand_mb: u64,
     pub(crate) workers: usize,
     pub(crate) guest_browsing: bool,
+    pub(crate) store_lookup: bool,
     pub(crate) thumb_quality: ThumbQuality,
     pub(crate) conversion_cache_mb: u64,
 }
@@ -189,6 +193,7 @@ impl Saved {
             max_expand_mb: self.max_expand_mb.unwrap_or(cfg.max_expand_mb),
             workers: self.workers.unwrap_or(cfg.workers).clamp(1, MAX_WORKERS),
             guest_browsing: self.guest_browsing.unwrap_or(false),
+            store_lookup: self.store_lookup.unwrap_or(true),
             thumb_quality: self.thumb_quality.unwrap_or_default(),
             conversion_cache_mb: self.conversion_cache_mb.unwrap_or(DEFAULT_CONVERSION_CACHE_MB),
         }

@@ -160,6 +160,15 @@ const MIGRATIONS: &[&str] = &[
     // 22: where an asset's thumbnail came from, when not the server's analysis: `browser` or `browser-partial`
     // (see `Asset::thumb_source`). NULL is the server's own.
     "ALTER TABLE assets ADD COLUMN thumb_source TEXT;",
+    // 23: what a pack's own files say (a Megascans JSON's tags, and when they were read), who sells it, and the store
+    // lookup: suggestions found in the background, and whether the store page was attached automatically.
+    "ALTER TABLE packs ADD COLUMN file_tags TEXT;
+     ALTER TABLE packs ADD COLUMN files_read_at TEXT;
+     ALTER TABLE pack_context ADD COLUMN seller TEXT;
+     ALTER TABLE pack_context ADD COLUMN store_license TEXT;
+     ALTER TABLE pack_context ADD COLUMN store_auto TEXT;
+     ALTER TABLE pack_context ADD COLUMN store_matches TEXT;
+     ALTER TABLE pack_context ADD COLUMN store_lookup_at TEXT;",
 ];
 
 /// How many automatic pre-upgrade backups to keep in `<data dir>/backups`.
@@ -856,7 +865,9 @@ pub(crate) fn family_ids(conn: &Connection, id: &str) -> Result<Vec<String>> {
 pub(crate) fn pack_context(conn: &Connection, pack_id: &str) -> Result<hoard_core::PackContext> {
     Ok(conn
         .query_row(
-            "SELECT store, store_url, store_text, license_tier, readme FROM pack_context WHERE pack_id = ?1",
+            "SELECT store, store_url, store_text, license_tier, readme, seller, store_license,
+                    json_extract(store_auto, '$.at')
+             FROM pack_context WHERE pack_id = ?1",
             [pack_id],
             |r| {
                 Ok(hoard_core::PackContext {
@@ -865,6 +876,9 @@ pub(crate) fn pack_context(conn: &Connection, pack_id: &str) -> Result<hoard_cor
                     store_text: r.get(2)?,
                     license_tier: r.get(3)?,
                     readme: r.get(4)?,
+                    seller: r.get(5)?,
+                    store_license: r.get(6)?,
+                    store_auto: r.get(7)?,
                 })
             },
         )

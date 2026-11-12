@@ -1110,6 +1110,18 @@ onBeforeUnmount(() => {
                   </label>
                   <ResetButton v-if="changed('update_check')" :to="onOff(s.options.update_check.default)" :disabled="busy" @reset="resetOpt('update_check')" />
                 </div>
+                <div class="opt-row">
+                  <label class="check">
+                    <input
+                      type="checkbox"
+                      :checked="s.options.store_lookup.value"
+                      :disabled="busy"
+                      @change="save({ store_lookup: ($event.target as HTMLInputElement).checked })"
+                    />
+                    Look up store pages automatically
+                  </label>
+                  <ResetButton v-if="changed('store_lookup')" :to="onOff(s.options.store_lookup.default)" :disabled="busy" @reset="resetOpt('store_lookup')" />
+                </div>
               </div>
             </section>
 

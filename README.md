@@ -285,6 +285,10 @@ software rasterizer (`apt install mesa-vulkan-drivers`). Without any adapter, ev
      panel lists the other takes, and tag or category edits can apply to all of them at once.
    - **Duplicates.** Byte-identical files across packs (the same CC0 texture in five bundles) are stored once and
      listed under "Identical copies".
+   - **Megascans files.** The `<id>.json` that comes with each Megascans asset names the pack (unless someone typed
+     its name), adds its tags (`wood`, `furniture`, `color:brown`, …) to the pack and the asset, and gives the pack a
+     short description: what it is, where it was scanned, its size and its maps. More → "Read the pack's files again"
+     reads them again, for example after the description was deleted.
    - **Pack context.** README text is kept with the pack, and a store link inside it (Fab, itch.io, Humble Bundle,
      Unity Asset Store, Kenney, …) fills in where the pack came from. "Store details" on the packs page takes the
      store page URL, license tier and listing text. For a pack without a store link it first searches Fab, itch.io,
@@ -296,6 +300,12 @@ software rasterizer (`apt install mesa-vulkan-drivers`). Without any adapter, ev
      the name are searched too, and each match says which clues it fits. Whenever a pack has
      a store link and no text, from either place, Hoard fetches the page's title and description; the asset panel
      shows it as "From the <store> page".
+   - **Store lookup.** New packs are looked up in the background, one every few seconds, newest first. When the pack
+     names its listing itself (the README links to it, or the listing has exactly the title in its Megascans file),
+     that listing becomes the pack's store page, with its seller and license. Store details says it was found
+     automatically, and "Not this one" takes it off. Anything less certain is kept, so Store details lists the likely
+     matches at once ("Search again" searches afresh). Turn it off in Settings → Server → "Look up store pages
+     automatically".
 5. **Link.** glTF buffers/images, OBJ → MTL → textures, FBX texture paths (absolute artist paths are matched by file
    name), DAE images, `.blend` external textures and linked libraries (`//` paths resolved relative to the file),
    `Model@Clip.fbx` animation clips, and name-based guesses for models that reference nothing. Game-engine and
@@ -557,6 +567,23 @@ hash that catches near-copies. It is all computed on the server from the thumbna
 offline. Nothing in it knows what a picture shows. Two brown, rough textures can count as alike even when one is bark
 and the other is rock. Fonts, audio, documents and shaders take no part.
 
+## Credits
+
+Hoard writes a `CREDITS.md` for whatever you ship: one row per pack with its seller, store page, license and
+whether the license asks for credit, then the credit lines to paste into your game's credits and any terms worth
+knowing ("Non-commercial use only."). The license comes from the pack's own license file, then the license on its
+store page, then the store itself (a Fab pack without one is under Fab's Standard License). Each pack says
+**Required**, **Not required**, **Keep the license notice** (MIT, GPL, OFL) or **Not known**. Nothing is guessed:
+when Hoard doesn't know a license, the file says how many packs to check by hand.
+
+- **Packs page:** More → Download credits on a pack, and Credits on a collection.
+- **A selection:** select tiles, then Credits next to "Download zip". It covers the packs of everything selected
+  and what it needs.
+- **Zips:** every pack, collection and selection zip has `CREDITS.md` at its root.
+- **Your game project:** `hoard credits` covers what `hoard.toml` selects (`--pack` and `--collection` name others
+  instead, `--json` for JSON, `--out CREDITS.md` to write a file).
+- **Agents:** the `get_credits` MCP tool.
+
 ## MCP for agents
 
 `POST /mcp` is a stateless Streamable HTTP MCP endpoint. It speaks both the 2026-07-28 protocol (per-request `_meta`,
@@ -571,6 +598,7 @@ both connect.
 | `get_asset` | full detail: metadata, tags with sources, links, what uses it, variants, identical copies, the thumbnail's colours |
 | `get_bundle` | download URLs and save-as paths for an asset and everything it needs, plus a zip URL |
 | `list_packs`, `list_tags`, `list_collections` | browse the library, its tag vocabulary and collections (`search_assets` takes `collection` too) |
+| `get_credits` | who made the packs behind some packs, collections, assets or a search, their licenses and the credit lines they ask for (`markdown` for a ready `CREDITS.md`) |
 | `tag_asset`, `update_asset` | edits, recorded as human |
 | `next_to_tag` | the next files nothing has described yet (up to 16, one pack at a time), with facts, the pack's store page and README, and a numbered contact sheet image |
 | `save_tags` | names, categories, descriptions and tags for a batch (and the pack), recorded as AI-made exactly like Hoard's own AI tagger: a person's edits always win |
@@ -746,6 +774,7 @@ Requests that change something are marked 🔒: guests can't make them. A browse
 | POST 🔒 | `/api/assets/{id}/replace?ext=` | swap in a new file (body is the file) |
 | GET | `/api/bundle.zip?ids=a,b,c` | a selection as one zip (`&deps=0`, `&sources=1`) |
 | POST | `/api/manifest` | a flat file list (hash, path, URL) for `ids` or a search, with `include_deps`; what engine tools pull from |
+| POST | `/api/credits` | credits for `packs` (ids or names), `collections`, asset `ids` and `selections` (manifest requests); `?format=md` for `CREDITS.md` |
 | GET | `/api/blobs/{hash}` | raw content by BLAKE3 hash |
 | GET | `/api/tags?prefix=` | tag autocomplete (`anywhere=true` matches inside names, for Settings → Tags) |
 | POST 🔒 | `/api/tags/merge` | `{from: [...], into}`: retag those assets and remember the old names |
@@ -761,9 +790,13 @@ Requests that change something are marked 🔒: guests can't make them. A browse
 | PATCH 🔒 | `/api/packs/{id}` | rename it (`{name}`) |
 | DELETE 🔒 | `/api/packs/{id}` | delete it (blobs go at the next `gc`) |
 | POST 🔒 | `/api/packs/{id}/retag` | run the tagger again |
-| GET, PUT 🔒 | `/api/packs/{id}/context` | store link, README and notes the tagger reads |
+| POST 🔒 | `/api/packs/{id}/read-files` | read the pack's Megascans files again (name, tags, description) |
+| GET, PUT 🔒 | `/api/packs/{id}/context` | store link, seller, license, README and notes the tagger reads |
+| GET 🔒 | `/api/packs/{id}/store-matches` | likely store pages (`q` to search for something else, `fresh` to search again) |
+| POST 🔒 | `/api/packs/{id}/store/undo` | take off a store page that was found automatically |
 | GET | `/api/packs/{id}/files/{path}` | a pack file by its original path (the 3D viewer uses this) |
 | GET | `/api/packs/{id}/bundle.zip` | the whole pack |
+| GET | `/api/packs/{id}/credits` | seller, license and credit line as JSON (`?format=md` for `CREDITS.md`) |
 
 **Resumable uploads** (what the portal and `hoard push` use)
 
@@ -783,6 +816,7 @@ Requests that change something are marked 🔒: guests can't make them. A browse
 | GET, PATCH 🔒, DELETE 🔒 | `/api/collections/{id}` | one collection |
 | POST 🔒 | `/api/collections/{id}/assets` | `add` / `remove` assets |
 | GET | `/api/collections/{id}/bundle.zip` | all of it as a zip (`?sources=1`) |
+| GET | `/api/collections/{id}/credits` | credits for its packs (`?format=md`) |
 
 **Unreal**
 

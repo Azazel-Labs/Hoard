@@ -416,6 +416,15 @@ pub struct PackContext {
     /// Text of README/LICENSE files found in the pack (read-only, captured at ingest).
     #[serde(default)]
     pub readme: Option<String>,
+    /// Who made or sells it ("Quixel Megascans"), for credits.
+    #[serde(default)]
+    pub seller: Option<String>,
+    /// The license the store sells it under ("Fab Standard License", "CC BY 4.0"), for credits.
+    #[serde(default)]
+    pub store_license: Option<String>,
+    /// When the store page was found and attached automatically (read-only; cleared when the page is changed).
+    #[serde(default)]
+    pub store_auto: Option<String>,
 }
 
 /// How two assets relate. `Texture`, `Buffer` and `Material` are hard dependencies (the file is broken
@@ -636,6 +645,24 @@ pub struct ManifestRequest {
     /// With `include_deps`, also pull in linked animation clips.
     #[serde(default)]
     pub include_animations: bool,
+}
+
+/// Credits for the packs a project uses: whole packs, collections, assets, and selections as `hoard.toml` writes
+/// them. Everything given is put together into one list of packs.
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+pub struct CreditsRequest {
+    /// Pack ids or names.
+    #[serde(default)]
+    pub packs: Vec<String>,
+    /// Collection ids or names.
+    #[serde(default)]
+    pub collections: Vec<String>,
+    /// Asset ids.
+    #[serde(default)]
+    pub ids: Vec<String>,
+    /// Selections, as for a manifest.
+    #[serde(default)]
+    pub selections: Vec<ManifestRequest>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

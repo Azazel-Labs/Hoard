@@ -164,6 +164,8 @@ export interface StoreMatch {
   summary?: string
   thumb?: string
   price?: string
+  /** The license the store sells it under ("Fab Standard License", "CC BY 4.0", "CC0"). */
+  license?: string
   /** 0 to 1: how well it matches the name and the clues in the pack's files. */
   score: number
   /** Why it ranks where it does, beyond its title ("Linked in the pack's README"). */
@@ -171,6 +173,8 @@ export interface StoreMatch {
 }
 
 export interface StoreMatches {
+  /** When the stores were searched (a lookup in the background keeps its results). */
+  searched_at: string
   query: string
   /** The other searches made, from pieces of the name and the pack's files. */
   also: string[]
@@ -190,6 +194,12 @@ export interface PackContext {
   license_tier: string | null
   /** README text captured at import (read-only). */
   readme: string | null
+  /** Who made or sells it, for credits. */
+  seller: string | null
+  /** The license the store sells it under, for credits. */
+  store_license: string | null
+  /** When the store page was found and attached automatically (read-only). */
+  store_auto: string | null
 }
 
 export type PackStatus = 'uploading' | 'ingesting' | 'analyzing' | 'ready' | 'failed'
@@ -539,6 +549,8 @@ export interface Settings {
     render: OptionSetting<boolean>
     update_check: OptionSetting<boolean>
     guest_browsing: OptionSetting<boolean>
+    /** Search the stores for packs' pages in the background. */
+    store_lookup: OptionSetting<boolean>
     thumb_quality: OptionSetting<ThumbQuality>
     /** Most space cached "Download as" conversions may take, in MiB. */
     conversion_cache_mb: OptionSetting<number>
@@ -570,6 +582,7 @@ export interface SettingsPatch {
   render?: boolean | null
   update_check?: boolean | null
   guest_browsing?: boolean | null
+  store_lookup?: boolean | null
   thumb_quality?: ThumbQuality | null
   conversion_cache_mb?: number | null
   public_url?: string | null
@@ -683,6 +696,7 @@ export const api = {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body),
     }),
+  readPackFiles: (id: string) => request<void>(`/api/packs/${id}/read-files`, { method: 'POST' }),
   search(p: SearchParams): Promise<SearchResult> {
     const qs = new URLSearchParams()
     if (p.q) qs.set('q', p.q)
@@ -710,10 +724,14 @@ export const api = {
       body: JSON.stringify(patch),
     }).then(normalize),
   packContext: (id: string) => request<PackContext>(`/api/packs/${id}/context`),
-  /** Likely store pages for a pack, searched by `q` or else by its name. */
-  storeMatches: (id: string, q?: string) =>
-    request<StoreMatches>(`/api/packs/${id}/store-matches${q ? `?q=${encodeURIComponent(q)}` : ''}`),
-  setPackContext: (id: string, ctx: Omit<PackContext, 'readme'>) =>
+  /** Likely store pages for a pack, searched by `q` or else by its name (what the last lookup found, unless `fresh`). */
+  storeMatches: (id: string, q?: string, fresh = false) =>
+    request<StoreMatches>(
+      `/api/packs/${id}/store-matches${q ? `?q=${encodeURIComponent(q)}` : fresh ? '?fresh=true' : ''}`,
+    ),
+  /** Take off a store page that was found automatically. */
+  undoStorePage: (id: string) => request<PackContext>(`/api/packs/${id}/store/undo`, { method: 'POST' }),
+  setPackContext: (id: string, ctx: Omit<PackContext, 'readme' | 'store_auto'>) =>
     request<PackContext>(`/api/packs/${id}/context`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
@@ -894,6 +912,42 @@ export const collectionZipUrl = (id: string, sources = false) =>
 /** Several assets in one zip, each with what it needs (one folder per pack when they come from several). */
 export const selectionZipUrl = (ids: string[], deps = true, sources = false) =>
   `/api/bundle.zip?ids=${ids.join(',')}${deps ? '' : '&deps=0'}${sources ? '&sources=1' : ''}`
+/** CREDITS.md for a pack, or for the packs a collection's assets come from. */
+export const packCreditsUrl = (packId: string) => `/api/packs/${packId}/credits?format=md`
+export const collectionCreditsUrl = (id: string) => `/api/collections/${id}/credits?format=md`
+
+/** What a project owes each pack, by any mix of packs, collections, assets and searches. */
+export interface CreditsRequest {
+  packs?: string[]
+  collections?: string[]
+  ids?: string[]
+  selections?: { ids?: string[]; query?: Record<string, unknown>; include_deps?: boolean }[]
+}
+
+/** Download CREDITS.md for a request (a POST, so it's fetched and then saved). */
+export async function downloadCredits(body: CreditsRequest): Promise<void> {
+  const res = await fetch('/api/credits?format=md', {
+    method: 'POST',
+    headers: { ...authHeaders(), 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+  })
+  if (!res.ok) {
+    let msg = `${res.status} ${res.statusText}`
+    try {
+      msg = (await res.json())?.error ?? msg
+    } catch {
+      // Non-JSON error body; keep the status line.
+    }
+    throw new ApiError(res.status, msg)
+  }
+  const url = URL.createObjectURL(await res.blob())
+  const a = document.createElement('a')
+  a.href = url
+  a.download = 'CREDITS.md'
+  a.click()
+  setTimeout(() => URL.revokeObjectURL(url), 10_000)
+}
+
 /** A pack file by its original path; relative references inside model files resolve against this URL. */
 export const packFileUrl = (packId: string, path: string) =>
   `/api/packs/${packId}/files/${path.split('/').map(encodeURIComponent).join('/')}`

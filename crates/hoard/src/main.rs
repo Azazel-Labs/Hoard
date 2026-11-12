@@ -12,7 +12,7 @@ use std::time::Duration;
 use anyhow::{Context, Result, bail};
 use clap::{Parser, Subcommand};
 use futures_util::{StreamExt, TryStreamExt, stream};
-use hoard_core::{Manifest, ManifestEntry, ManifestRequest, Pack, SearchQuery, SearchResult};
+use hoard_core::{CreditsRequest, Manifest, ManifestEntry, ManifestRequest, Pack, SearchQuery, SearchResult};
 use serde::{Deserialize, Serialize};
 use tokio::io::AsyncWriteExt;
 
@@ -83,6 +83,24 @@ enum Cmd {
         /// Re-hash every file on disk instead of trusting the lockfile.
         #[arg(long)]
         verify: bool,
+    },
+    /// Credits for what `hoard.toml` selects, or for the packs and collections you name: who made each pack, where
+    /// it's sold, its license and whether the license asks for attribution. Prints CREDITS.md.
+    Credits {
+        #[arg(long, default_value = "hoard.toml")]
+        config: PathBuf,
+        /// Credit this pack (id or name) instead of what hoard.toml selects. Repeatable.
+        #[arg(long = "pack")]
+        packs: Vec<String>,
+        /// Credit this collection (id or name) instead of what hoard.toml selects. Repeatable.
+        #[arg(long = "collection")]
+        collections: Vec<String>,
+        /// JSON instead of Markdown.
+        #[arg(long)]
+        json: bool,
+        /// Write to this file instead of printing.
+        #[arg(long)]
+        out: Option<PathBuf>,
     },
     /// Convert the Unreal packages the server can't (meshes, animations) with Unreal Editor on this machine, and
     /// upload the results. Leave it running next to an editor install, or use `--once`.
@@ -157,6 +175,33 @@ struct Select {
 
 fn default_limit() -> u32 {
     500
+}
+
+impl Select {
+    /// What the server is asked for this selection.
+    fn request(&self) -> ManifestRequest {
+        let has_query = self.query.is_some()
+            || self.kind.is_some()
+            || !self.tags.is_empty()
+            || self.pack.is_some()
+            || self.ext.is_some()
+            || self.collection.is_some();
+        ManifestRequest {
+            include_deps: self.with_deps,
+            include_animations: self.with_animations,
+            ids: self.ids.clone(),
+            query: has_query.then(|| SearchQuery {
+                q: self.query.clone(),
+                kind: self.kind.clone(),
+                tags: self.tags.clone(),
+                pack: self.pack.clone(),
+                ext: self.ext.clone(),
+                collection: self.collection.clone(),
+                limit: Some(self.limit),
+                ..Default::default()
+            }),
+        }
+    }
 }
 
 #[derive(Debug, Default, Serialize, Deserialize)]
@@ -276,6 +321,16 @@ impl Client {
         self.json(self.http.get(self.url("/api/assets")).query(&params)).await
     }
 
+    async fn text(&self, req: reqwest::RequestBuilder) -> Result<String> {
+        let resp = self.auth(req).send().await.with_context(|| format!("can't reach {}", self.base))?;
+        let status = resp.status();
+        let body = resp.text().await?;
+        if !status.is_success() {
+            bail!("server returned {status}: {body}");
+        }
+        Ok(body)
+    }
+
     async fn manifest(&self, req: &ManifestRequest) -> Result<Manifest> {
         self.json(self.http.post(self.url("/api/manifest")).json(req)).await
     }
@@ -383,6 +438,39 @@ async fn main() -> Result<()> {
             println!("wrote hoard.toml — edit the selections, then run `hoard sync`");
         }
         Cmd::Sync { config, dry_run, verify } => sync(cli.server, cli.token, &config, dry_run, verify).await?,
+        Cmd::Credits { config, packs, collections, json, out } => {
+            let mut req = CreditsRequest { packs, collections, ..Default::default() };
+            let mut server = cli.server;
+            // hoard.toml says which server, even when the packs are named here.
+            let named = !req.packs.is_empty() || !req.collections.is_empty();
+            if !named || config.exists() {
+                let text = std::fs::read_to_string(&config)
+                    .with_context(|| format!("read {} (or name packs with --pack)", config.display()))?;
+                let cfg: ProjectConfig =
+                    toml::from_str(&text).with_context(|| format!("parse {}", config.display()))?;
+                if !named {
+                    req.selections = cfg.selects.iter().map(Select::request).collect();
+                }
+                server = server.or(cfg.server);
+            }
+            let client = Client::new(server.as_deref().unwrap_or("http://127.0.0.1:4627"), cli.token)?;
+            let format = if json { "json" } else { "md" };
+            let text = client
+                .text(client.http.post(client.url("/api/credits")).query(&[("format", format)]).json(&req))
+                .await?;
+            let text = if json {
+                serde_json::to_string_pretty(&serde_json::from_str::<serde_json::Value>(&text)?)? + "\n"
+            } else {
+                text
+            };
+            match out {
+                Some(path) => {
+                    std::fs::write(&path, &text).with_context(|| format!("write {}", path.display()))?;
+                    println!("wrote {}", path.display());
+                }
+                None => print!("{text}"),
+            }
+        }
         Cmd::UnrealWorker(args) => unreal_worker::run(&Client::new(&server, cli.token)?, &args).await?,
     }
     Ok(())
@@ -471,28 +559,8 @@ async fn sync(server: Option<String>, token: Option<String>, config: &Path, dry_
     // 1. Resolve selections -> desired files.
     let mut wanted: BTreeMap<String, ManifestEntry> = BTreeMap::new();
     for (i, sel) in cfg.selects.iter().enumerate() {
-        let has_query = sel.query.is_some()
-            || sel.kind.is_some()
-            || !sel.tags.is_empty()
-            || sel.pack.is_some()
-            || sel.ext.is_some()
-            || sel.collection.is_some();
-        let req = ManifestRequest {
-            include_deps: sel.with_deps,
-            include_animations: sel.with_animations,
-            ids: sel.ids.clone(),
-            query: has_query.then(|| SearchQuery {
-                q: sel.query.clone(),
-                kind: sel.kind.clone(),
-                tags: sel.tags.clone(),
-                pack: sel.pack.clone(),
-                ext: sel.ext.clone(),
-                collection: sel.collection.clone(),
-                limit: Some(sel.limit),
-                ..Default::default()
-            }),
-        };
-        let manifest = client.manifest(&req).await.with_context(|| format!("resolve [[select]] #{}", i + 1))?;
+        let manifest =
+            client.manifest(&sel.request()).await.with_context(|| format!("resolve [[select]] #{}", i + 1))?;
         println!("select #{}: {} files", i + 1, manifest.entries.len());
         let roots: BTreeMap<String, ManifestEntry> = manifest
             .entries

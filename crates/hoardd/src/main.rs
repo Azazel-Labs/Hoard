@@ -12,6 +12,7 @@ mod chatgpt;
 mod config;
 mod context;
 mod convert;
+mod credits;
 mod db;
 mod error;
 mod extract;

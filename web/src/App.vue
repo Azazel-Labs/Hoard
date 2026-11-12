@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, nextTick, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue'
 import {
-  api, filesFromDrop, KIND_LABEL, selectionZipUrl,
+  api, downloadCredits, filesFromDrop, KIND_LABEL, selectionZipUrl,
   type Asset, type AssetKind, type BulkEdit, type Collection, type Facet, type Pack, type Stats, type UploadFile,
 } from './api'
 import { canPreview, stop as stopPreview, toggle as togglePreview } from './player'
@@ -404,6 +404,14 @@ async function bulkSetCategory() {
   })
 }
 /** Archive what's selected: gone from the grid at once, with Undo on the toast. */
+/** CREDITS.md for the selected assets' packs (and the packs of what they need, as the zip has them). */
+async function creditsForChecked() {
+  try {
+    await downloadCredits({ selections: [{ ids: [...checked.value], include_deps: true }] })
+  } catch (e) {
+    showError(`Couldn't make the credits: ${(e as Error).message}`)
+  }
+}
 async function archiveChecked() {
   const ids = [...checked.value]
   if (!ids.length) return
@@ -1193,6 +1201,7 @@ const commands = computed<Command[]>(() => {
       <div v-if="selecting" class="selbar" role="region" aria-label="Selected assets">
         <strong>{{ checked.length ? `${checked.length.toLocaleString()} selected` : 'Pick assets' }}</strong>
         <a v-if="checked.length" class="btn primary" :href="selectionUrl" download>Download zip</a>
+        <button v-if="checked.length" type="button" class="btn" title="CREDITS.md for the packs these come from: who made them, their licenses and the credit lines they ask for" @click="creditsForChecked">Credits</button>
         <label v-if="checkedWithSource" class="srccheck" title="Unreal SoundWaves and textures whose original file Hoard recovered">
           <input v-model="preferSources" type="checkbox" /> Recovered WAV/PNG instead of .uasset ({{ checkedWithSource }})
         </label>

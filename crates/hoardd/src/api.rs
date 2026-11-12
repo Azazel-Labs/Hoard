@@ -95,6 +95,9 @@ pub(crate) fn router(state: &AppState) -> Router<AppState> {
         .route("/api/blobs/{hash}", get(blob))
         .route("/api/tags", get(tags))
         .route("/api/manifest", post(manifest))
+        .route("/api/credits", post(crate::credits::credits))
+        .route("/api/packs/{id}/credits", get(crate::credits::pack_credits))
+        .route("/api/collections/{id}/credits", get(crate::credits::collection_credits))
         .route("/api/admin/jobs", get(admin_jobs))
         .route("/api/assets/{id}/bundle.zip", get(asset_bundle))
         .route("/api/bundle.zip", get(selection_bundle))
@@ -1048,7 +1051,7 @@ async fn asset_bundle(
     })
     .await?
     .ok_or_else(|| AppError::not_found(format!("asset {id}")))?;
-    Ok(crate::bundle::zip_files(&state, &root_name, &files)?)
+    Ok(crate::bundle::zip_files(&state, &root_name, &files, None)?)
 }
 
 #[derive(Debug, Deserialize)]
@@ -1092,21 +1095,26 @@ struct ZipOptions {
 /// Zip assets (and what they need) into one archive. Files keep their layout inside a folder per pack, so two
 /// packs' `Audio/hit.wav` don't collide and models still find their textures.
 async fn zip_assets(state: &AppState, ids: Vec<String>, opts: ZipOptions, name: &str) -> ApiResult<Response> {
-    let groups = db::call(&state.pool, move |c| {
+    let (groups, credits) = db::call(&state.pool, move |c| {
         let mut all = Vec::new();
         let mut seen = std::collections::HashSet::new();
         for id in &ids {
             let closure = if opts.deps { db::dependency_closure(c, id, opts.animations)? } else { vec![id.clone()] };
             all.extend(closure.into_iter().filter(|x| seen.insert(x.clone())));
         }
-        let mut stmt = c.prepare("SELECT p.name FROM assets a JOIN packs p ON p.id = a.pack_id WHERE a.id = ?1")?;
+        let mut stmt =
+            c.prepare("SELECT p.id, p.name FROM assets a JOIN packs p ON p.id = a.pack_id WHERE a.id = ?1")?;
         let mut by_pack: std::collections::BTreeMap<String, Vec<String>> = std::collections::BTreeMap::new();
+        let mut pack_ids = BTreeSet::new();
         for id in all {
-            if let Some(pack) = stmt.query_row([&id], |r| r.get::<_, String>(0)).optional()? {
+            let pack = stmt.query_row([&id], |r| Ok((r.get::<_, String>(0)?, r.get::<_, String>(1)?))).optional()?;
+            if let Some((pack_id, pack)) = pack {
+                pack_ids.insert(pack_id);
                 by_pack.entry(pack).or_default().push(id);
             }
         }
-        by_pack
+        let credits = crate::credits::markdown(&crate::credits::for_packs(c, &pack_ids)?);
+        let groups = by_pack
             .into_iter()
             .map(|(pack, ids)| {
                 let mut files = db::bundle_files(c, &ids)?;
@@ -1115,7 +1123,8 @@ async fn zip_assets(state: &AppState, ids: Vec<String>, opts: ZipOptions, name: 
                 }
                 Ok((pack, files))
             })
-            .collect::<anyhow::Result<Vec<_>>>()
+            .collect::<anyhow::Result<Vec<_>>>()?;
+        Ok((groups, credits))
     })
     .await?;
     if groups.is_empty() {
@@ -1140,7 +1149,7 @@ async fn zip_assets(state: &AppState, ids: Vec<String>, opts: ZipOptions, name: 
         })
         .collect();
     let root = name.replace(['/', '\\', '"'], "_");
-    Ok(crate::bundle::zip_response(state, &root, entries)?)
+    Ok(crate::bundle::zip_response(state, &root, entries, Some(credits))?)
 }
 
 // ---------------------------------------------------------------------------------------------
@@ -1294,15 +1303,16 @@ async fn collection_bundle(
 /// A whole pack as one zip, in its original layout.
 async fn pack_bundle(State(state): State<AppState>, Path(id): Path<String>) -> ApiResult<Response> {
     let id2 = id.clone();
-    let (name, files) = db::call(&state.pool, move |c| {
+    let (name, files, credits) = db::call(&state.pool, move |c| {
         let Some(pack) = db::get_pack(c, &id2)? else { return Ok(None) };
         let mut stmt = c.prepare("SELECT id FROM assets WHERE pack_id = ?1 ORDER BY path")?;
         let ids: Vec<String> = stmt.query_map([&id2], |r| r.get(0))?.collect::<rusqlite::Result<_>>()?;
-        Ok(Some((pack.name, db::bundle_files(c, &ids)?)))
+        let credits = crate::credits::markdown(&crate::credits::for_packs(c, &BTreeSet::from([pack.id]))?);
+        Ok(Some((pack.name, db::bundle_files(c, &ids)?, credits)))
     })
     .await?
     .ok_or_else(|| AppError::not_found(format!("pack {id}")))?;
-    Ok(crate::bundle::zip_files(&state, &name, &files)?)
+    Ok(crate::bundle::zip_files(&state, &name, &files, Some(credits))?)
 }
 
 /// Serve a pack's file by its original path. Browser model loaders resolve relative references

@@ -22,8 +22,14 @@ const STORED_EXTS: &[&str] = &[
     "glb",
 ];
 
-/// Stream `files` as a zip under a top folder called `root`, paths relative to the files' common folder.
-pub(crate) fn zip_files(state: &AppState, root: &str, files: &[BundleFile]) -> Result<Response> {
+/// Stream `files` as a zip under a top folder called `root`, paths relative to the files' common folder, with
+/// `credits` as `CREDITS.md` beside them.
+pub(crate) fn zip_files(
+    state: &AppState,
+    root: &str,
+    files: &[BundleFile],
+    credits: Option<String>,
+) -> Result<Response> {
     let paths: Vec<&str> = files.iter().map(|f| f.path.as_str()).collect();
     let common = db::common_dir(&paths);
     let entries: Vec<Entry> = files
@@ -35,7 +41,7 @@ pub(crate) fn zip_files(state: &AppState, root: &str, files: &[BundleFile]) -> R
             unity_guid: f.unity_guid.clone(),
         })
         .collect();
-    zip_response(state, root, entries)
+    zip_response(state, root, entries, credits)
 }
 
 /// One file in a zip.
@@ -82,9 +88,23 @@ impl Write for ChannelWriter {
 
 /// Stream entries as a zip under a top folder called `root`. The download starts at once; the zip is written on a
 /// low-priority thread as the client reads it, so a large pack never waits to be zipped first. Already-compressed
-/// formats are stored, the rest deflated.
-pub(crate) fn zip_response(state: &AppState, root: &str, entries: Vec<Entry>) -> Result<Response> {
+/// formats are stored, the rest deflated. `credits` goes in as `CREDITS.md` at the top, or `CREDITS (Hoard).md` where
+/// the files have a `CREDITS.md` of their own.
+pub(crate) fn zip_response(
+    state: &AppState,
+    root: &str,
+    entries: Vec<Entry>,
+    credits: Option<String>,
+) -> Result<Response> {
     let root = root.replace(['"', '\\', '/'], "_");
+    let extra: Vec<(String, Vec<u8>)> = credits
+        .map(|text| {
+            let taken = entries.iter().any(|e| e.name.eq_ignore_ascii_case(CREDITS));
+            let name = if taken { "CREDITS (Hoard).md" } else { CREDITS };
+            (format!("{root}/{name}"), text.into_bytes())
+        })
+        .into_iter()
+        .collect();
     let entries: Vec<Entry> = entries.into_iter().map(|e| Entry { name: format!("{root}/{}", e.name), ..e }).collect();
     let blobs = state.blobs.clone();
     let rt = tokio::runtime::Handle::current();
@@ -92,7 +112,8 @@ pub(crate) fn zip_response(state: &AppState, root: &str, entries: Vec<Entry>) ->
     let errors = tx.clone();
     let activity = crate::activity::start("zip", format!("Zipping {root}"), None);
     crate::heavy::spawn("zip", move || {
-        let result = write_zip(&rt, &blobs, entries, ChannelWriter { tx, buf: Vec::with_capacity(CHUNK) }, &activity);
+        let out = ChannelWriter { tx, buf: Vec::with_capacity(CHUNK) };
+        let result = write_zip(&rt, &blobs, extra, entries, out, &activity);
         if let Err(e) = result {
             // Fail the response rather than end it cleanly, so the client knows the zip is incomplete.
             if !e.chain().any(|c| {
@@ -111,9 +132,14 @@ pub(crate) fn zip_response(state: &AppState, root: &str, entries: Vec<Entry>) ->
         .body(body)?)
 }
 
+/// The name of the credits file in a zip.
+const CREDITS: &str = "CREDITS.md";
+
+/// Write `extra` (small files made on the spot), then the blobs `entries` name.
 fn write_zip(
     rt: &tokio::runtime::Handle,
     blobs: &crate::blobs::BlobStore,
+    extra: Vec<(String, Vec<u8>)>,
     entries: Vec<Entry>,
     out: ChannelWriter,
     activity: &crate::activity::Handle,
@@ -123,6 +149,12 @@ fn write_zip(
     activity.detail(format!("{count} files"));
     let mut zip = zip::ZipWriter::new_stream(out);
     let mut seen = std::collections::HashSet::new();
+    for (name, data) in extra {
+        let opts = SimpleFileOptions::default().last_modified_time(zip::DateTime::default_for_write());
+        zip.start_file(name.as_str(), opts)?;
+        zip.write_all(&data)?;
+        seen.insert(name);
+    }
     for Entry { name, hash, size, unity_guid } in entries {
         if !seen.insert(name.clone()) {
             continue;
@@ -178,7 +210,8 @@ mod tests {
         let rt = tokio::runtime::Handle::current();
         let writer = std::thread::spawn(move || {
             let shown = crate::activity::start("zip", "Zipping test", None);
-            write_zip(&rt, &blobs, entries, ChannelWriter { tx, buf: Vec::new() }, &shown).unwrap();
+            let extra = vec![("root/CREDITS.md".to_owned(), b"# Credits\n".to_vec())];
+            write_zip(&rt, &blobs, extra, entries, ChannelWriter { tx, buf: Vec::new() }, &shown).unwrap();
         });
         let mut bytes = Vec::new();
         while let Some(chunk) = rx.recv().await {
@@ -187,12 +220,15 @@ mod tests {
         writer.join().unwrap();
         let mut zip = zip::ZipArchive::new(std::io::Cursor::new(bytes)).unwrap();
         let names: Vec<String> = zip.file_names().map(|n| n.unwrap().into_owned()).collect();
-        assert_eq!(names.len(), 3, "{names:?}");
+        assert_eq!(names.len(), 4, "{names:?}");
         let mut s = String::new();
         std::io::Read::read_to_string(&mut zip.by_name("root/a.txt.meta").unwrap(), &mut s).unwrap();
         assert!(s.contains("guid: abc"));
         let mut b = Vec::new();
         std::io::Read::read_to_end(&mut zip.by_name("root/img/b.png").unwrap(), &mut b).unwrap();
         assert_eq!(b.len(), 300_000);
+        s.clear();
+        std::io::Read::read_to_string(&mut zip.by_name("root/CREDITS.md").unwrap(), &mut s).unwrap();
+        assert_eq!(s, "# Credits\n");
     }
 }

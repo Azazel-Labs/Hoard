@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue'
 import {
-  api, collectionZipUrl, humanBytes, KIND_LABEL, packZipUrl, thumbUrl, type AssetKind, type Collection, type Pack,
+  api, collectionCreditsUrl, collectionZipUrl, humanBytes, KIND_LABEL, packCreditsUrl, packZipUrl, thumbUrl, type AssetKind, type Collection, type Pack,
   type PackContext, type Stats, type StoreMatch, type StoreMatches, type UnrealPackStatus,
 } from '../api'
 import { confirmDialog, undoable } from '../ui'
@@ -392,6 +392,7 @@ async function archive(p: Pack) {
             <div class="actions">
               <button class="btn" type="button" @click="$emit('browseCollection', c)">Browse</button>
               <a v-if="c.asset_count" class="btn ghost" :href="collectionZipUrl(c.id)">Download (.zip)</a>
+              <a v-if="c.asset_count" class="btn ghost" :href="collectionCreditsUrl(c.id)" download="CREDITS.md" title="Who made the packs these assets come from, their licenses and the credit lines they ask for">Credits</a>
               <button class="btn ghost" type="button" @click="startRename(c)">Rename</button>
               <button class="btn ghost danger" type="button" @click="removeCollection(c)">Delete</button>
             </div>
@@ -512,6 +513,7 @@ async function archive(p: Pack) {
               <button type="button" :disabled="p.status !== 'ready'" @click="readFiles(p)">
                 Read the pack's files again
               </button>
+              <a :href="packCreditsUrl(p.id)" download="CREDITS.md" title="CREDITS.md: who made the pack, its license and the credit line it asks for">Download credits</a>
               <button v-if="p.unreal_packages || p.unreal_converted" type="button" @click="openUnreal(p)">
                 Convert Unreal content…
               </button>
@@ -691,12 +693,13 @@ li { padding: 1rem 0; border-top: 1px solid var(--line); display: flex; gap: 1re
 }
 .menu[open] .menu-items { animation: menu-in var(--dur-3) var(--ease-pop); }
 @keyframes menu-in { from { opacity: 0; scale: 0.95; translate: 0 -4px; } }
-.menu-items button {
+.menu-items button, .menu-items a {
   border: 0; background: none; text-align: left; padding: 0.45rem 0.6rem; border-radius: var(--r-chip);
   cursor: pointer; font-size: var(--step--1);
 }
-.menu-items button { transition: background-color var(--dur-1); }
-.menu-items button:hover:not(:disabled) { background: var(--panel); }
+.menu-items a { color: inherit; text-decoration: none; }
+.menu-items button, .menu-items a { transition: background-color var(--dur-1); }
+.menu-items button:hover:not(:disabled), .menu-items a:hover { background: var(--panel); }
 .menu-items button:disabled { opacity: 0.5; cursor: default; }
 .menu-items .danger { color: var(--danger); }
 .finder { display: grid; gap: 0.6rem; margin-bottom: 1rem; }

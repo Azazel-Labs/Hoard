@@ -489,6 +489,23 @@ collection = "Forest level"
 dest = "levels/forest"
 ```
 
+## Credits
+
+Hoard writes a `CREDITS.md` for whatever you ship: one row per pack with its seller, store page, license and
+whether the license asks for credit, then the credit lines to paste into your game's credits and any terms worth
+knowing ("Non-commercial use only."). The license comes from the pack's own license file, then the license on its
+store page, then the store itself (a Fab pack without one is under Fab's Standard License). Each pack says
+**Required**, **Not required**, **Keep the license notice** (MIT, GPL, OFL) or **Not known**. Nothing is guessed:
+when Hoard doesn't know a license, the file says how many packs to check by hand.
+
+- **Packs page:** More → Download credits on a pack, and Credits on a collection.
+- **A selection:** select tiles, then Credits next to "Download zip". It covers the packs of everything selected
+  and what it needs.
+- **Zips:** every pack, collection and selection zip has `CREDITS.md` at its root.
+- **Your game project:** `hoard credits` covers what `hoard.toml` selects (`--pack` and `--collection` name others
+  instead, `--json` for JSON, `--out CREDITS.md` to write a file).
+- **Agents:** the `get_credits` MCP tool.
+
 ## MCP for agents
 
 `POST /mcp` is a stateless Streamable HTTP MCP endpoint. It speaks both the 2026-07-28 protocol (per-request `_meta`,
@@ -501,6 +518,7 @@ both connect.
 | `get_asset` | full detail: metadata, tags with sources, links, what uses it, variants, identical copies |
 | `get_bundle` | download URLs and save-as paths for an asset and everything it needs, plus a zip URL |
 | `list_packs`, `list_tags`, `list_collections` | browse the library, its tag vocabulary and collections (`search_assets` takes `collection` too) |
+| `get_credits` | who made the packs behind some packs, collections, assets or a search, their licenses and the credit lines they ask for (`markdown` for a ready `CREDITS.md`) |
 | `tag_asset`, `update_asset` | edits, recorded as human |
 | `next_to_tag` | the next files nothing has described yet (up to 16, one pack at a time), with facts, the pack's store page and README, and a numbered contact sheet image |
 | `save_tags` | names, categories, descriptions and tags for a batch (and the pack), recorded as AI-made exactly like Hoard's own AI tagger: a person's edits always win |
@@ -643,6 +661,7 @@ Requests that change something are marked 🔒: guests can't make them. A browse
 | POST 🔒 | `/api/assets/{id}/replace?ext=` | swap in a new file (body is the file) |
 | GET | `/api/bundle.zip?ids=a,b,c` | a selection as one zip (`&deps=0`, `&sources=1`) |
 | POST | `/api/manifest` | a flat file list (hash, path, URL) for `ids` or a search, with `include_deps`; what engine tools pull from |
+| POST | `/api/credits` | credits for `packs` (ids or names), `collections`, asset `ids` and `selections` (manifest requests); `?format=md` for `CREDITS.md` |
 | GET | `/api/blobs/{hash}` | raw content by BLAKE3 hash |
 | GET | `/api/tags?prefix=` | tag autocomplete (`anywhere=true` matches inside names, for Settings → Tags) |
 | POST 🔒 | `/api/tags/merge` | `{from: [...], into}`: retag those assets and remember the old names |
@@ -664,6 +683,7 @@ Requests that change something are marked 🔒: guests can't make them. A browse
 | POST 🔒 | `/api/packs/{id}/store/undo` | take off a store page that was found automatically |
 | GET | `/api/packs/{id}/files/{path}` | a pack file by its original path (the 3D viewer uses this) |
 | GET | `/api/packs/{id}/bundle.zip` | the whole pack |
+| GET | `/api/packs/{id}/credits` | seller, license and credit line as JSON (`?format=md` for `CREDITS.md`) |
 
 **Resumable uploads** (what the portal and `hoard push` use)
 
@@ -683,6 +703,7 @@ Requests that change something are marked 🔒: guests can't make them. A browse
 | GET, PATCH 🔒, DELETE 🔒 | `/api/collections/{id}` | one collection |
 | POST 🔒 | `/api/collections/{id}/assets` | `add` / `remove` assets |
 | GET | `/api/collections/{id}/bundle.zip` | all of it as a zip (`?sources=1`) |
+| GET | `/api/collections/{id}/credits` | credits for its packs (`?format=md`) |
 
 **Unreal**
 

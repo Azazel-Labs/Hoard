@@ -230,6 +230,24 @@ fn tool_list() -> Value {
             "annotations": read
         },
         {
+            "name": "get_credits",
+            "title": "Get credits",
+            "description": "Who made the packs a project uses, where each is sold, its license and whether the license asks for attribution (yes, no, or 'terms': keep the license notice with the files; 'unknown' where the license isn't known). Give any mix of packs, collections, asset ids and a search; everything is put together. `markdown` returns a ready CREDITS.md.",
+            "inputSchema": {
+                "type": "object",
+                "properties": {
+                    "packs": { "type": "array", "items": { "type": "string" }, "description": "Pack ids or names." },
+                    "collections": { "type": "array", "items": { "type": "string" }, "description": "Collection ids or names." },
+                    "ids": { "type": "array", "items": { "type": "string" }, "description": "Asset ids." },
+                    "query": { "type": "string", "description": "Also credit the packs of what this search finds." },
+                    "kind": { "type": "string", "description": "With `query`: only this kind." },
+                    "tags": { "type": "array", "items": { "type": "string" }, "description": "With `query`: all must match." },
+                    "markdown": { "type": "boolean", "default": false, "description": "Return CREDITS.md text instead of JSON." }
+                }
+            },
+            "annotations": read
+        },
+        {
             "name": "list_tags",
             "title": "List tags",
             "description": "Most-used tags, optionally filtered by prefix (e.g. 'style:' or 'material:'). Useful to learn the vocabulary before searching.",
@@ -474,6 +492,35 @@ async fn preview_blocks(state: &AppState, wanted: Vec<Value>) -> Vec<Value> {
     out
 }
 
+/// `get_credits`: credits for any mix of packs, collections, asset ids and a search.
+async fn credits_call(state: &AppState, args: &Value) -> Result<Value, ToolError> {
+    let tags: Vec<String> = str_list(args, "tags").iter().filter_map(|t| hoard_core::normalize_tag(t)).collect();
+    let kind = str_arg(args, "kind");
+    let query = str_arg(args, "query");
+    let search = (query.is_some() || kind.is_some() || !tags.is_empty()).then(|| SearchQuery {
+        q: query,
+        kind,
+        tags,
+        ..Default::default()
+    });
+    let req = hoard_core::CreditsRequest {
+        packs: str_list(args, "packs"),
+        collections: str_list(args, "collections"),
+        ids: str_list(args, "ids"),
+        selections: search
+            .map(|q| hoard_core::ManifestRequest { query: Some(q), include_deps: true, ..Default::default() })
+            .into_iter()
+            .collect(),
+    };
+    let credits =
+        crate::credits::for_request(state, req).await.map_err(|e| ToolError::Failed(format!("{:#}", e.err)))?;
+    if args.get("markdown").and_then(Value::as_bool) == Some(true) {
+        Ok(json!({ "markdown": crate::credits::markdown(&credits) }))
+    } else {
+        Ok(json!(credits))
+    }
+}
+
 /// [`tagging_tools`]' calls.
 async fn tagging_call(state: &AppState, name: &str, args: &Value) -> Result<Value, ToolError> {
     match name {
@@ -598,6 +645,7 @@ async fn call_tool(state: &AppState, name: &str, args: Value, base: &str) -> Res
             let packs = db::call(&state.pool, |c| db::list_packs(c, false)).await?;
             Ok(json!({ "packs": packs }))
         }
+        "get_credits" => credits_call(state, &args).await,
         "list_collections" => {
             let cols = db::call(&state.pool, |c| db::list_collections(c)).await?;
             let cols: Vec<Value> = cols

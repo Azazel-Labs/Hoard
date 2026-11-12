@@ -580,6 +580,24 @@ pub struct ManifestRequest {
     pub include_animations: bool,
 }
 
+/// Credits for the packs a project uses: whole packs, collections, assets, and selections as `hoard.toml` writes
+/// them. Everything given is put together into one list of packs.
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+pub struct CreditsRequest {
+    /// Pack ids or names.
+    #[serde(default)]
+    pub packs: Vec<String>,
+    /// Collection ids or names.
+    #[serde(default)]
+    pub collections: Vec<String>,
+    /// Asset ids.
+    #[serde(default)]
+    pub ids: Vec<String>,
+    /// Selections, as for a manifest.
+    #[serde(default)]
+    pub selections: Vec<ManifestRequest>,
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ManifestEntry {
     pub id: String,

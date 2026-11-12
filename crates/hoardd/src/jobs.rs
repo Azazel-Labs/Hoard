@@ -20,6 +20,8 @@ pub(crate) const SCAN: &str = "scan_location";
 pub(crate) const RELOCATE: &str = "relocate";
 /// Read the store's files in a pack again (a Megascans JSON): name, tags and description.
 pub(crate) const READ_FILES: &str = "read_files";
+/// Look up the next pack's store page (see [`crate::store_lookup`]).
+pub(crate) const STORE_LOOKUP: &str = "store_lookup";
 
 /// With the backoff below, the last try comes about 15 minutes after the first: long enough for a local model
 /// that's still downloading on the first start of the compose stack.
@@ -70,6 +72,7 @@ pub(crate) fn job_label(kind: &str, pack: &str) -> String {
         SCAN => "Scanning a watched folder".to_owned(),
         RELOCATE => "Moving files between library locations".to_owned(),
         READ_FILES => format!("Reading the files of {pack}"),
+        STORE_LOOKUP => "Looking up a store page".to_owned(),
         other => format!("{other} {pack}"),
     }
 }
@@ -94,9 +97,10 @@ async fn run(state: &AppState, job: db::JobRow) {
         SCAN => SCAN,
         RELOCATE => RELOCATE,
         READ_FILES => READ_FILES,
+        STORE_LOOKUP => STORE_LOOKUP,
         _ => "job",
     };
-    let _activity = crate::activity::start(
+    let activity = crate::activity::start(
         kind,
         job_label(&job.kind, pack_name.as_deref().unwrap_or("a pack")),
         job.pack_id.as_deref(),
@@ -109,6 +113,7 @@ async fn run(state: &AppState, job: db::JobRow) {
             let done = blocking(state, move |s, rt| ingest::ingest_pack(s, rt, &pid, auto_name)).await;
             if done.is_ok() {
                 crate::context::fill_store_text(state, &pack_id).await;
+                crate::store_lookup::start(state).await;
             }
             done
         }
@@ -131,7 +136,8 @@ async fn run(state: &AppState, job: db::JobRow) {
             None => Err(anyhow::anyhow!("scan job without a location")),
         },
         RELOCATE => crate::relocate::run(state, serde_json::from_value(job.payload.clone()).unwrap_or_default()).await,
-        READ_FILES => crate::sidecar::apply(state, &pack_id, false, None).await.map(|_| ()),
+        READ_FILES => read_files(state, &pack_id).await,
+        STORE_LOOKUP => crate::store_lookup::run(state, &activity).await,
         other => Err(anyhow::anyhow!("unknown job kind {other}")),
     };
 
@@ -166,6 +172,23 @@ async fn run(state: &AppState, job: db::JobRow) {
         tracing::error!(error = ?e, "could not record job result");
     }
     tracing::info!(id = job.id, kind = %job.kind, ok = result.is_ok(), secs = started.elapsed().as_secs_f32(), "job finished");
+}
+
+/// Read the store's files in a pack again. What they say may find its store page now, so a pack without one is
+/// looked up again.
+async fn read_files(state: &AppState, pack_id: &str) -> Result<()> {
+    crate::sidecar::apply(state, pack_id, false, None).await?;
+    let pid = pack_id.to_owned();
+    db::call(&state.pool, move |c| {
+        c.execute(
+            "UPDATE pack_context SET store_lookup_at = NULL WHERE pack_id = ?1 AND COALESCE(store_url, '') = ''",
+            [pid],
+        )?;
+        Ok(())
+    })
+    .await?;
+    crate::store_lookup::start(state).await;
+    Ok(())
 }
 
 /// At startup: read the store's files of packs that have one but were added before Hoard read them.

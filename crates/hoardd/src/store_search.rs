@@ -16,6 +16,7 @@ use anyhow::{Context as _, Result};
 use axum::Json;
 use axum::extract::{Path, Query, State};
 use futures_util::future::join_all;
+use rusqlite::OptionalExtension as _;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
@@ -181,6 +182,9 @@ pub(crate) struct StoreMatch {
     thumb: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     price: Option<String>,
+    /// The license the store sells it under, where the store says ([`FAB_STANDARD`], [`CC_BY_4`], [`CC0`]).
+    #[serde(skip_serializing_if = "Option::is_none")]
+    license: Option<&'static str>,
     score: f32,
     /// Why it ranks where it does, beyond its title ("By Marco Maria Rossi, named in the README").
     #[serde(skip_serializing_if = "Vec::is_empty")]
@@ -201,6 +205,8 @@ pub(crate) struct StoreLink {
 
 #[derive(Debug, Serialize)]
 pub(crate) struct StoreMatches {
+    /// When the stores were searched.
+    searched_at: String,
     query: String,
     /// The other searches made from the name and the pack's files.
     also: Vec<String>,
@@ -216,6 +222,51 @@ pub(crate) struct StoreMatches {
 #[derive(Debug, Deserialize)]
 pub(crate) struct MatchQuery {
     q: Option<String>,
+    /// Search again instead of showing what the last lookup found.
+    #[serde(default)]
+    fresh: bool,
+}
+
+/// Licenses stores sell under. Fab's Personal and Professional tiers are both the Fab Standard License ("You are not
+/// required to give credit to the publisher", fab.com/eula); its Creative Commons listings are CC BY 4.0.
+pub(crate) const FAB_STANDARD: &str = "Fab Standard License";
+pub(crate) const CC_BY_4: &str = "CC BY 4.0";
+pub(crate) const CC0: &str = "CC0";
+
+/// Reasons that make a match certain: the pack names that listing itself.
+const CERTAIN: [&str; 2] = ["Linked in the pack's README", "Same title as the pack's "];
+
+impl StoreMatch {
+    pub(crate) fn store(&self) -> &'static str {
+        self.store
+    }
+    pub(crate) fn url(&self) -> &str {
+        &self.url
+    }
+    pub(crate) fn author(&self) -> Option<&str> {
+        self.author.as_deref()
+    }
+    pub(crate) fn license(&self) -> Option<&'static str> {
+        self.license
+    }
+    fn is_certain(&self) -> bool {
+        (self.score - 1.0).abs() < f32::EPSILON && self.why.iter().any(|w| CERTAIN.iter().any(|c| w.starts_with(c)))
+    }
+}
+
+impl StoreMatches {
+    /// The one listing the pack names itself (its README links to it, or it has the exact title of the pack's
+    /// Megascans file). None if no listing, or more than one, does.
+    pub(crate) fn certain(&self) -> Option<&StoreMatch> {
+        let mut sure = self.matches.iter().filter(|m| m.is_certain());
+        let first = sure.next()?;
+        sure.next().is_none().then_some(first)
+    }
+
+    /// Every store's search failed: likely offline.
+    pub(crate) fn all_failed(&self) -> bool {
+        self.failed.len() == 4 && self.matches.is_empty()
+    }
 }
 
 /// What a pack's own files say about where it came from.
@@ -490,13 +541,46 @@ fn queries(primary: &str, typed: bool, clues: &Clues) -> Vec<String> {
     out
 }
 
-/// `GET /api/packs/{id}/store-matches?q=`: likely store pages for a pack, best first. `q` defaults to the pack's name.
+/// `GET /api/packs/{id}/store-matches?q=&fresh=`: likely store pages for a pack, best first. `q` defaults to the pack's
+/// name. Without `q` or `fresh`, what the last lookup found is shown if there is one; a new search is kept for next time.
 pub(crate) async fn store_matches(
     State(state): State<AppState>,
     Path(id): Path<String>,
     Query(mq): Query<MatchQuery>,
-) -> ApiResult<Json<StoreMatches>> {
-    let id2 = id.clone();
+) -> ApiResult<Json<Value>> {
+    let typed = mq.q.as_deref().map(str::trim).filter(|q| !q.is_empty());
+    if typed.is_none() && !mq.fresh {
+        let id2 = id.clone();
+        let kept: Option<String> = db::call(&state.pool, move |c| {
+            Ok(c.query_row("SELECT store_matches FROM pack_context WHERE pack_id = ?1", [&id2], |r| r.get(0))
+                .optional()?
+                .flatten())
+        })
+        .await?;
+        if let Some(v) = kept.and_then(|k| serde_json::from_str::<Value>(&k).ok()) {
+            return Ok(Json(v));
+        }
+    }
+    let found = find_matches(&state, &id, typed).await?;
+    let json = serde_json::to_value(&found)?;
+    if typed.is_none() && !found.all_failed() {
+        let (id2, text) = (id.clone(), json.to_string());
+        db::call(&state.pool, move |c| {
+            c.execute(
+                "INSERT INTO pack_context (pack_id, store_matches) VALUES (?1, ?2)
+                 ON CONFLICT (pack_id) DO UPDATE SET store_matches = excluded.store_matches",
+                rusqlite::params![id2, text],
+            )?;
+            Ok(())
+        })
+        .await?;
+    }
+    Ok(Json(json))
+}
+
+/// Search the stores for a pack: for `typed`, or for what the pack's name and files say.
+pub(crate) async fn find_matches(state: &AppState, id: &str, typed: Option<&str>) -> ApiResult<StoreMatches> {
+    let id2 = id.to_owned();
     let found = db::call(&state.pool, move |c| {
         let Some(pack) = db::get_pack(c, &id2)? else { return Ok(None) };
         let readme = db::pack_context(c, &id2)?.readme;
@@ -512,8 +596,7 @@ pub(crate) async fn store_matches(
     .await?;
     let (pack, readme, paths) = found.ok_or_else(|| AppError::not_found(format!("pack {id}")))?;
     let mut clues = clues(&pack.name, readme.as_deref(), &paths, &pack.kinds);
-    clues.add_sidecars(&sidecar::pack_sidecars(&state, &id).await?);
-    let typed = mq.q.as_deref().map(str::trim).filter(|q| !q.is_empty());
+    clues.add_sidecars(&sidecar::pack_sidecars(state, id).await?);
     let query: String = match (typed, &clues.title) {
         (Some(q), _) => q.split_whitespace().collect::<Vec<_>>().join(" "),
         (None, Some((title, _))) => title.clone(),
@@ -590,14 +673,15 @@ pub(crate) async fn store_matches(
             url: url_with("https://www.humblebundle.com/store/search", "search", &query),
         },
     ];
-    Ok(Json(StoreMatches {
+    Ok(StoreMatches {
+        searched_at: db::now(),
         query,
         also: all.into_iter().skip(1).collect(),
         clues: clues.describe(),
         matches,
         links,
         failed,
-    }))
+    })
 }
 
 async fn search(
@@ -860,6 +944,7 @@ fn found(store: &'static str, title: &str, url: String) -> Option<StoreMatch> {
         summary: None,
         thumb: None,
         price: None,
+        license: None,
         score: 0.0,
         why: Vec::new(),
         formats: Vec::new(),
@@ -889,6 +974,7 @@ fn parse_fab_page(body: &str) -> Result<(Vec<StoreMatch>, Option<String>)> {
             let image = images
                 .and_then(|i| i.iter().find(|i| i["width"].as_u64().is_some_and(|w| w >= 320)).or_else(|| i.last()));
             m.thumb = image.and_then(|i| i["url"].as_str()).filter(|u| u.starts_with("https://")).map(str::to_owned);
+            m.license = fab_license(&r["licenses"]);
             for f in r["assetFormats"].as_array().into_iter().flatten() {
                 if let Some(code) = f["assetFormatType"]["code"].as_str() {
                     m.formats.push(code.to_owned());
@@ -902,6 +988,22 @@ fn parse_fab_page(body: &str) -> Result<(Vec<StoreMatch>, Option<String>)> {
         })
         .collect();
     Ok((found, next))
+}
+
+/// The license a Fab listing is sold under, from its `licenses` (`CC-BY`, or the `Personal` and `Professional` tiers).
+/// A Creative Commons license is named first: it's the one that asks for credit.
+fn fab_license(licenses: &Value) -> Option<&'static str> {
+    let names: Vec<&str> = licenses.as_array()?.iter().filter_map(|l| l["name"].as_str()).collect();
+    let has = |want: &str| names.iter().any(|n| n.eq_ignore_ascii_case(want));
+    if has("CC-BY") {
+        Some(CC_BY_4)
+    } else if has("CC0") {
+        Some(CC0)
+    } else if has("Personal") || has("Professional") {
+        Some(FAB_STANDARD)
+    } else {
+        None
+    }
 }
 
 fn parse_itch(html: &str) -> Vec<StoreMatch> {
@@ -939,6 +1041,8 @@ fn parse_kenney(html: &str) -> Vec<StoreMatch> {
             let mut m = found("Kenney", &inner_text(rest, "</a>"), attr(a, "href")?)?;
             m.author = Some("Kenney".to_owned());
             m.price = Some("Free".to_owned());
+            // Everything on kenney.nl is CC0.
+            m.license = Some(CC0);
             m.thumb = cell.split_once("url(").and_then(|(_, rest)| {
                 let u = rest.split(')').next()?.trim_matches(|c| matches!(c, '"' | '\'' | ' '));
                 u.starts_with("https://").then(|| u.to_owned())
@@ -1027,8 +1131,17 @@ fn plain_text(html: &str) -> String {
 }
 
 #[cfg(test)]
-mod tests {
+pub(crate) mod tests {
     use super::*;
+
+    /// A Fab result, as a lookup finds it.
+    pub(crate) fn fab_match(title: &str, author: &str, licenses: &[&str]) -> StoreMatch {
+        let mut m = found("Fab", title, format!("https://www.fab.com/listings/{}", squash(title))).unwrap();
+        m.author = Some(author.to_owned());
+        let licenses: Vec<Value> = licenses.iter().map(|l| serde_json::json!({ "name": l })).collect();
+        m.license = fab_license(&Value::Array(licenses));
+        m
+    }
 
     #[test]
     fn cleans_pack_names_into_search_terms() {
@@ -1073,6 +1186,53 @@ mod tests {
         assert!(ranked[0].why.iter().any(|w| w == "Same title as the pack's Megascans file"));
         assert!(ranked[1].score < 1.0, "a different number isn't the same listing");
         assert!(same_title("stand_wood_old_05", "Stand Wood Old 05") && !same_title("Old 05", "Old 04"));
+    }
+
+    fn matches(matches: Vec<StoreMatch>) -> StoreMatches {
+        StoreMatches {
+            searched_at: String::new(),
+            query: String::new(),
+            also: Vec::new(),
+            clues: Vec::new(),
+            matches,
+            links: Vec::new(),
+            failed: Vec::new(),
+        }
+    }
+
+    #[test]
+    fn only_a_listing_the_pack_names_is_certain() {
+        let mut c = Clues::default();
+        c.add_sidecars(&[sidecar::read("xeokah0.json", sidecar::tests::STAND).unwrap()]);
+        let stand = "Historic Miscellaneous Stand Wood Old 05";
+        let found = matches(rank(
+            stand,
+            &c,
+            vec![
+                fab_match(stand, "Quixel Megascans", &["Personal", "Professional"]),
+                fab_match("Historic Miscellaneous Stand Wood Old 04", "Quixel Megascans", &["Personal"]),
+            ],
+        ));
+        let sure = found.certain().unwrap();
+        assert_eq!(
+            (sure.url(), sure.license()),
+            ("https://www.fab.com/listings/historicmiscellaneousstandwoodold05", Some(FAB_STANDARD))
+        );
+
+        // The same words aren't enough: plain names have many listings.
+        let plain = matches(rank("medieval village", &Clues::default(), vec![fab_match("Medieval Village", "A", &[])]));
+        assert!((plain.matches[0].score - 1.0).abs() < f32::EPSILON && plain.certain().is_none());
+
+        // Two pages the README links to: which one is it?
+        let mut two = matches(vec![fab_match("One", "A", &[]), fab_match("Two", "B", &["CC-BY"])]);
+        for m in &mut two.matches {
+            m.score = 1.0;
+            m.why.push("Linked in the pack's README".to_owned());
+        }
+        assert!(two.certain().is_none());
+        assert_eq!(two.matches[1].license(), Some(CC_BY_4));
+        two.matches.truncate(1);
+        assert_eq!(two.certain().map(StoreMatch::url), Some("https://www.fab.com/listings/one"));
     }
 
     #[test]

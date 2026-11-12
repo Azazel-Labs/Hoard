@@ -359,6 +359,15 @@ pub struct PackContext {
     /// Text of README/LICENSE files found in the pack (read-only, captured at ingest).
     #[serde(default)]
     pub readme: Option<String>,
+    /// Who made or sells it ("Quixel Megascans"), for credits.
+    #[serde(default)]
+    pub seller: Option<String>,
+    /// The license the store sells it under ("Fab Standard License", "CC BY 4.0"), for credits.
+    #[serde(default)]
+    pub store_license: Option<String>,
+    /// When the store page was found and attached automatically (read-only; cleared when the page is changed).
+    #[serde(default)]
+    pub store_auto: Option<String>,
 }
 
 /// How two assets relate. `Texture`, `Buffer` and `Material` are hard dependencies (the file is broken

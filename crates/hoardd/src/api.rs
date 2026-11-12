@@ -43,6 +43,7 @@ pub(crate) fn router(state: &AppState) -> Router<AppState> {
         .route("/api/packs/{id}/read-files", post(read_pack_files))
         .route("/api/packs/{id}/context", axum::routing::put(put_pack_context))
         .route("/api/packs/{id}/store-matches", get(crate::store_search::store_matches))
+        .route("/api/packs/{id}/store/undo", post(undo_store_page))
         .route("/api/packs/{id}/unreal/convert", post(unreal_convert))
         .route("/api/packs/{id}/unreal/finish", post(unreal_finish))
         .route("/api/assets/{id}/replace", post(replace_asset).layer(upload_limit()))
@@ -312,6 +313,8 @@ async fn put_pack_context(
     ctx.store_url = clean(ctx.store_url, 500).filter(|u| u.starts_with("https://") || u.starts_with("http://"));
     ctx.store_text = clean(ctx.store_text, context::MAX_STORE_TEXT);
     ctx.license_tier = clean(ctx.license_tier, 80);
+    ctx.seller = clean(ctx.seller, 120);
+    ctx.store_license = clean(ctx.store_license, 80);
     if ctx.store.is_none() {
         ctx.store = ctx.store_url.as_deref().and_then(context::store_from_url).map(str::to_owned);
     }
@@ -328,11 +331,15 @@ async fn put_pack_context(
         if db::get_pack(c, &id2)?.is_none() {
             return Ok(None);
         }
+        // A page someone changed is no longer the one found automatically.
         c.execute(
-            "INSERT INTO pack_context (pack_id, store, store_url, store_text, license_tier) VALUES (?1, ?2, ?3, ?4, ?5)
+            "INSERT INTO pack_context (pack_id, store, store_url, store_text, license_tier, seller, store_license)
+             VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7)
              ON CONFLICT (pack_id) DO UPDATE SET store = excluded.store, store_url = excluded.store_url,
-                 store_text = excluded.store_text, license_tier = excluded.license_tier",
-            params![id2, ctx.store, ctx.store_url, ctx.store_text, ctx.license_tier],
+                 store_text = excluded.store_text, license_tier = excluded.license_tier, seller = excluded.seller,
+                 store_license = excluded.store_license,
+                 store_auto = CASE WHEN store_url IS excluded.store_url THEN store_auto END",
+            params![id2, ctx.store, ctx.store_url, ctx.store_text, ctx.license_tier, ctx.seller, ctx.store_license],
         )?;
         Ok(Some(db::pack_context(c, &id2)?))
     })
@@ -545,6 +552,21 @@ async fn read_pack_files(State(state): State<AppState>, Path(id): Path<String>) 
     }
     state.wake.notify_one();
     Ok(StatusCode::ACCEPTED)
+}
+
+/// `POST /api/packs/{id}/store/undo`: take off a store page that was found automatically. The pack isn't looked up
+/// again; the other suggestions stay for Store details.
+async fn undo_store_page(State(state): State<AppState>, Path(id): Path<String>) -> ApiResult<Json<PackContext>> {
+    let id2 = id.clone();
+    let ctx = db::call(&state.pool, move |c| {
+        if db::get_pack(c, &id2)?.is_none() {
+            return Ok(None);
+        }
+        crate::store_lookup::undo(c, &id2)?;
+        Ok(Some(db::pack_context(c, &id2)?))
+    })
+    .await?;
+    ctx.map(Json).ok_or_else(|| AppError::not_found(format!("pack {id}")))
 }
 
 // ---------------------------------------------------------------------------------------------
@@ -1770,6 +1792,7 @@ fn settings_json(state: &AppState) -> Value {
             "render": option(now.render, cfg.render, saved.render.is_some()),
             "update_check": option(now.update_check, cfg.update_check, saved.update_check.is_some()),
             "guest_browsing": option(now.guest_browsing, false, saved.guest_browsing.is_some()),
+            "store_lookup": option(now.store_lookup, true, saved.store_lookup.is_some()),
             "thumb_quality": option(
                 now.thumb_quality,
                 crate::settings::ThumbQuality::default(),
@@ -1892,6 +1915,9 @@ async fn put_settings(State(state): State<AppState>, Json(patch): Json<Value>) -
         tokio::spawn(async move { crate::formats::log_trim(&st).await });
     }
     crate::updates::set_enabled(after.update_check);
+    if after.store_lookup && !before.store_lookup {
+        crate::store_lookup::start(&state).await;
+    }
     crate::music::configure(after.soundfont.clone());
     if after.workers > before.workers {
         state.wake.notify_waiters();

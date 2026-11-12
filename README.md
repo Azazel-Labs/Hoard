@@ -276,6 +276,12 @@ software rasterizer (`apt install mesa-vulkan-drivers`). Without any adapter, ev
      the name are searched too, and each match says which clues it fits. Whenever a pack has
      a store link and no text, from either place, Hoard fetches the page's title and description; the asset panel
      shows it as "From the <store> page".
+   - **Store lookup.** New packs are looked up in the background, one every few seconds, newest first. When the pack
+     names its listing itself (the README links to it, or the listing has exactly the title in its Megascans file),
+     that listing becomes the pack's store page, with its seller and license. Store details says it was found
+     automatically, and "Not this one" takes it off. Anything less certain is kept, so Store details lists the likely
+     matches at once ("Search again" searches afresh). Turn it off in Settings → Server → "Look up store pages
+     automatically".
 5. **Link.** glTF buffers/images, OBJ → MTL → textures, FBX texture paths (absolute artist paths are matched by file
    name), DAE images, `.blend` external textures and linked libraries (`//` paths resolved relative to the file),
    `Model@Clip.fbx` animation clips, and name-based guesses for models that reference nothing. Game-engine and
@@ -653,7 +659,9 @@ Requests that change something are marked 🔒: guests can't make them. A browse
 | DELETE 🔒 | `/api/packs/{id}` | delete it (blobs go at the next `gc`) |
 | POST 🔒 | `/api/packs/{id}/retag` | run the tagger again |
 | POST 🔒 | `/api/packs/{id}/read-files` | read the pack's Megascans files again (name, tags, description) |
-| GET, PUT 🔒 | `/api/packs/{id}/context` | store link, README and notes the tagger reads |
+| GET, PUT 🔒 | `/api/packs/{id}/context` | store link, seller, license, README and notes the tagger reads |
+| GET 🔒 | `/api/packs/{id}/store-matches` | likely store pages (`q` to search for something else, `fresh` to search again) |
+| POST 🔒 | `/api/packs/{id}/store/undo` | take off a store page that was found automatically |
 | GET | `/api/packs/{id}/files/{path}` | a pack file by its original path (the 3D viewer uses this) |
 | GET | `/api/packs/{id}/bundle.zip` | the whole pack |
 

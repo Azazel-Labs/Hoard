@@ -116,6 +116,8 @@ export interface StoreMatch {
   summary?: string
   thumb?: string
   price?: string
+  /** The license the store sells it under ("Fab Standard License", "CC BY 4.0", "CC0"). */
+  license?: string
   /** 0 to 1: how well it matches the name and the clues in the pack's files. */
   score: number
   /** Why it ranks where it does, beyond its title ("Linked in the pack's README"). */
@@ -123,6 +125,8 @@ export interface StoreMatch {
 }
 
 export interface StoreMatches {
+  /** When the stores were searched (a lookup in the background keeps its results). */
+  searched_at: string
   query: string
   /** The other searches made, from pieces of the name and the pack's files. */
   also: string[]
@@ -142,6 +146,12 @@ export interface PackContext {
   license_tier: string | null
   /** README text captured at import (read-only). */
   readme: string | null
+  /** Who made or sells it, for credits. */
+  seller: string | null
+  /** The license the store sells it under, for credits. */
+  store_license: string | null
+  /** When the store page was found and attached automatically (read-only). */
+  store_auto: string | null
 }
 
 export type PackStatus = 'uploading' | 'ingesting' | 'analyzing' | 'ready' | 'failed'
@@ -435,6 +445,8 @@ export interface Settings {
     render: OptionSetting<boolean>
     update_check: OptionSetting<boolean>
     guest_browsing: OptionSetting<boolean>
+    /** Search the stores for packs' pages in the background. */
+    store_lookup: OptionSetting<boolean>
     thumb_quality: OptionSetting<ThumbQuality>
     /** Most space cached "Download as" conversions may take, in MiB. */
     conversion_cache_mb: OptionSetting<number>
@@ -466,6 +478,7 @@ export interface SettingsPatch {
   render?: boolean | null
   update_check?: boolean | null
   guest_browsing?: boolean | null
+  store_lookup?: boolean | null
   thumb_quality?: ThumbQuality | null
   conversion_cache_mb?: number | null
   public_url?: string | null
@@ -592,10 +605,14 @@ export const api = {
       body: JSON.stringify(patch),
     }).then(normalize),
   packContext: (id: string) => request<PackContext>(`/api/packs/${id}/context`),
-  /** Likely store pages for a pack, searched by `q` or else by its name. */
-  storeMatches: (id: string, q?: string) =>
-    request<StoreMatches>(`/api/packs/${id}/store-matches${q ? `?q=${encodeURIComponent(q)}` : ''}`),
-  setPackContext: (id: string, ctx: Omit<PackContext, 'readme'>) =>
+  /** Likely store pages for a pack, searched by `q` or else by its name (what the last lookup found, unless `fresh`). */
+  storeMatches: (id: string, q?: string, fresh = false) =>
+    request<StoreMatches>(
+      `/api/packs/${id}/store-matches${q ? `?q=${encodeURIComponent(q)}` : fresh ? '?fresh=true' : ''}`,
+    ),
+  /** Take off a store page that was found automatically. */
+  undoStorePage: (id: string) => request<PackContext>(`/api/packs/${id}/store/undo`, { method: 'POST' }),
+  setPackContext: (id: string, ctx: Omit<PackContext, 'readme' | 'store_auto'>) =>
     request<PackContext>(`/api/packs/${id}/context`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },

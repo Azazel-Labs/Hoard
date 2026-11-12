@@ -12,6 +12,9 @@ services:
     environment:
       # Uploads, edits and admin calls need this token (the portal asks for it once); browsing doesn't.
       HOARD_TOKEN: ${HOARD_TOKEN:?set HOARD_TOKEN, e.g. HOARD_TOKEN=$(openssl rand -hex 32)}
+      # Lets Hoard ask Watchtower (below) to update it as soon as it's idle after a release.
+      HOARD_WATCHTOWER_URL: http://watchtower:8080
+      HOARD_WATCHTOWER_TOKEN: hoard-update
     volumes:
       # Three volumes, so each can live where it fits (swap a name for a host path, e.g. /mnt/big/hoard:/library):
       - hoard-config:/config      # database, Settings, backups: small, back it up
@@ -93,6 +96,11 @@ services:
       WATCHTOWER_SCOPE: hoard
       WATCHTOWER_CLEANUP: "true"
       WATCHTOWER_SCHEDULE: "0 0 4 * * *"   # seconds-first cron: 04:00 daily
+      # Hoard asks for its own update over this API once it's idle; the port isn't published, so only containers
+      # in this file can reach it. Periodic polls keep the 04:00 check as well.
+      WATCHTOWER_HTTP_API_ENDPOINTS: update
+      WATCHTOWER_HTTP_API_TOKEN: hoard-update
+      WATCHTOWER_HTTP_API_PERIODIC_POLLS: "true"
     labels:
       com.centurylinklabs.watchtower.scope: hoard
 

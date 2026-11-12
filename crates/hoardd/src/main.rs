@@ -132,6 +132,7 @@ async fn main() -> Result<()> {
     ffmpeg::start(&effective.ffmpeg, state.cfg.tools_dir());
     convert::start_blender(&state, false);
     updates::start(effective.update_check);
+    updates::start_auto_update(&state);
     analyze::warm_renderer();
     jobs::spawn_workers(&state);
     scan::spawn_rescans(&state);

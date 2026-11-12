@@ -43,6 +43,9 @@ services:
     restart: unless-stopped
     environment:
       HOARD_TOKEN: ${HOARD_TOKEN:?set HOARD_TOKEN, e.g. HOARD_TOKEN=$(openssl rand -hex 32)}
+      # Lets Hoard ask Watchtower (below) to update it as soon as it's idle after a release.
+      HOARD_WATCHTOWER_URL: http://watchtower:8080
+      HOARD_WATCHTOWER_TOKEN: hoard-update
     volumes:
       - hoard-config:/config      # database, Settings, backups: small, back it up
       - hoard-library:/library    # your files: big, put it on the disk with room
@@ -65,6 +68,11 @@ services:
       WATCHTOWER_SCOPE: hoard
       WATCHTOWER_CLEANUP: "true"
       WATCHTOWER_SCHEDULE: "0 0 4 * * *"
+      # Hoard asks for its own update over this API once it's idle; the port isn't published, so only containers
+      # in this file can reach it. Periodic polls keep the 04:00 check as well.
+      WATCHTOWER_HTTP_API_ENDPOINTS: update
+      WATCHTOWER_HTTP_API_TOKEN: hoard-update
+      WATCHTOWER_HTTP_API_PERIODIC_POLLS: "true"
     labels:
       com.centurylinklabs.watchtower.scope: hoard
 
@@ -516,6 +524,7 @@ Set before starting (these need a restart):
 | `HOARD_TLS_SELF_SIGNED` / `HOARD_TLS_NAMES` | `false` / – | HTTPS with a generated certificate for these names |
 | `HOARD_HTTP3` | `false` | also serve HTTP/3 (needs TLS) |
 | `HOARD_TOKEN` | – | bearer token for uploads, edits, Settings, admin and MCP writes; reads stay open |
+| `HOARD_WATCHTOWER_URL` / `_TOKEN` / `_CONTAINER` | – / – / `hoard` | Watchtower's HTTP API: Hoard asks it to update this container once a release is out and Hoard is idle |
 | `HOARD_LOCAL_LLM_URL` | `http://llm:8080/v1` | where the local model server listens (Settings → AI tagging → Local model) |
 | `HOARD_S3_ENDPOINT` / `_BUCKET` / `_REGION` / `_ACCESS_KEY` / `_SECRET_KEY` / `_HEADERS` | – | the S3 service for `s3://` library locations |
 

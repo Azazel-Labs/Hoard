@@ -79,7 +79,20 @@ pub(crate) struct Config {
     #[arg(long, env = "HOARD_TOKEN", hide_env_values = true)]
     pub(crate) token: Option<String>,
 
-    /// Check GitHub once a day for a newer Hoard release and say so in the portal. Sends nothing but the request
+    /// Watchtower's HTTP API (e.g. `http://watchtower:8080`). When set, Hoard asks it to update this container as
+    /// soon as a newer release is out and the server is idle, instead of waiting for Watchtower's schedule.
+    #[arg(long, env = "HOARD_WATCHTOWER_URL")]
+    pub(crate) watchtower_url: Option<String>,
+
+    /// The token Watchtower's HTTP API was given (`WATCHTOWER_HTTP_API_TOKEN`).
+    #[arg(long, env = "HOARD_WATCHTOWER_TOKEN", hide_env_values = true)]
+    pub(crate) watchtower_token: Option<String>,
+
+    /// This container's name, for Watchtower to update only it.
+    #[arg(long, env = "HOARD_WATCHTOWER_CONTAINER", default_value = "hoard")]
+    pub(crate) watchtower_container: String,
+
+    /// Check GitHub every few hours for a newer Hoard release and say so in the portal. Sends nothing but the request
     /// (with a `hoard/<version>` user agent).
     #[arg(skip = true)]
     pub(crate) update_check: bool,

@@ -155,8 +155,16 @@ so other containers on the host are left alone.
 | `…/hoard:edge` | every green commit on `main`, between releases |
 | `WATCHTOWER_SCHEDULE: "0 30 3 * * 0"` | when Watchtower checks (cron with a leading seconds field) |
 
-The server also asks GitHub once a day whether a newer release exists, for the badge in the header; switch that off
-in Settings → Server.
+The server also asks GitHub every six hours whether a newer release exists, for the badge in the header; switch that
+off in Settings → Server.
+
+**Updating sooner.** The compose files also switch on Watchtower's HTTP API and point Hoard at it
+(`HOARD_WATCHTOWER_URL`, `HOARD_WATCHTOWER_TOKEN`). When Hoard sees a newer release, it waits until nothing is going
+on (no jobs, uploads, maintenance or conversions, two checks a minute apart) and asks Watchtower to update its
+container then, instead of at 04:00. The image is published a few minutes after the release, so if Watchtower finds
+nothing new Hoard asks again an hour later, up to six times. Watchtower's own schedule still runs. With a pinned tag
+(`:0.8.1`) the ask changes nothing. Leave out `HOARD_WATCHTOWER_URL` to update only on the schedule. If you renamed
+the Hoard container, set `HOARD_WATCHTOWER_CONTAINER` to its name.
 
 To update by hand instead, delete the `watchtower` service and run `docker compose pull && docker compose up -d`.
 If you build from a checkout, replace the `image:` line with `build: ..`.
@@ -198,7 +206,13 @@ docker compose -f deploy/compose.yml -f deploy/compose.gpu-nvidia.yml up -d
 ```
 
 The overlay asks for the `graphics` driver capability as well as `compute`. Without it the toolkit doesn't mount the
-Vulkan driver, and Hoard falls back to software rendering even though `nvidia-smi` works.
+Vulkan driver, and Hoard falls back to software rendering even though `nvidia-smi` works. `runtime: nvidia` on the
+`hoard` service works too: the image sets `NVIDIA_VISIBLE_DEVICES=all` and that capability list itself.
+
+Hoard's own GPU use is only model thumbnails. AI tagging runs in the `llm` service, so for that the model server
+needs the GPU: the overlay swaps in the `server-cuda` image (below); with `runtime: nvidia` by hand, change
+`llm`'s image to `ghcr.io/ggml-org/llama.cpp:server-cuda`, give it `runtime: nvidia` too, and set
+`LLAMA_ARG_N_GPU_LAYERS: "999"`.
 
 **Intel or AMD**, including the integrated graphics in most NAS and mini-PC CPUs:
 [compose.gpu-dri.yml](../deploy/compose.gpu-dri.yml). The host needs `/dev/dri/renderD128`. Hoard runs as an

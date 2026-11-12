@@ -51,6 +51,11 @@ COPY --from=build /src/target/release/hoardd /src/target/release/hoard /usr/loca
 COPY --from=web /web/dist /srv/hoard/web
 # Fixes up the mounted folders' owners, then runs hoardd as an ordinary user (see the script).
 COPY --chmod=755 deploy/entrypoint.sh /usr/local/bin/hoard-entrypoint
+# For the NVIDIA Container Toolkit: which GPUs to pass in, and "graphics" so it mounts the Vulkan driver (the model
+# thumbnail renderer's) and not only CUDA. CUDA base images set the first; this one isn't one, so without these
+# `runtime: nvidia` passes nothing in. Ignored on hosts without the toolkit.
+ENV NVIDIA_VISIBLE_DEVICES=all \
+    NVIDIA_DRIVER_CAPABILITIES=graphics,compute,utility
 ENV HOARD_LISTEN=0.0.0.0:4627 \
     HOARD_DATA_DIR=/config \
     HOARD_FILES_DIR=/library \

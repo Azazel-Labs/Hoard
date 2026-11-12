@@ -1075,7 +1075,7 @@ onBeforeUnmount(() => {
                       :disabled="busy"
                       @change="save({ update_check: ($event.target as HTMLInputElement).checked })"
                     />
-                    Check GitHub once a day for a new release
+                    Check GitHub every few hours for a new release
                   </label>
                   <ResetButton v-if="changed('update_check')" :to="onOff(s.options.update_check.default)" :disabled="busy" @reset="resetOpt('update_check')" />
                 </div>

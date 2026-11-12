@@ -416,6 +416,7 @@ fn write(
             }
             touched.insert(asset.clone());
         }
+        name_and_link(&tx, s, &mine)?;
         for t in tags {
             if !file_tags.contains(&t) {
                 file_tags.push(t);
@@ -480,6 +481,40 @@ fn write(
     )?;
     tx.commit()?;
     Ok(applied)
+}
+
+/// The model a store's file describes takes the listing's title (each LOD with its number), unless someone renamed
+/// it; and the file goes behind the model or material it describes rather than showing as a tile of its own.
+fn name_and_link(tx: &rusqlite::Connection, s: &Sidecar, mine: &[&(String, String, String)]) -> Result<()> {
+    let models: Vec<&(String, String, String)> =
+        mine.iter().copied().filter(|(_, _, k)| k == AssetKind::Model.as_str()).collect();
+    for (id, path, _) in &models {
+        let name = if models.len() == 1 {
+            s.title.clone()
+        } else if let Some(lod) = lod_of(path) {
+            format!("{} LOD{lod}", s.title)
+        } else {
+            continue;
+        };
+        tx.execute("UPDATE assets SET name = ?2 WHERE id = ?1 AND NOT human_edited AND name <> ?2", params![id, name])?;
+    }
+    let Some((json, ..)) = mine.iter().find(|(_, p, _)| *p == s.path) else { return Ok(()) };
+    for (id, _, kind) in mine {
+        if kind == AssetKind::Model.as_str() || kind == AssetKind::Material.as_str() {
+            tx.execute(
+                "INSERT INTO asset_links (from_id, to_id, rel) VALUES (?1, ?2, 'sidecar') ON CONFLICT DO NOTHING",
+                params![id, json],
+            )?;
+        }
+    }
+    Ok(())
+}
+
+/// The level of detail a model's file name says (`…_LOD2.fbx` → 2).
+fn lod_of(path: &str) -> Option<u32> {
+    let file = path.rsplit('/').next().unwrap_or(path);
+    let stem = file.rsplit_once('.').map_or(file, |(st, _)| st).to_ascii_lowercase();
+    stem.split(|c: char| !c.is_ascii_alphanumeric()).find_map(|w| w.strip_prefix("lod")?.parse().ok())
 }
 
 #[cfg(test)]
@@ -548,6 +583,14 @@ pub(crate) mod tests {
         assert_eq!(s.origin.as_deref(), Some("Iceland"));
         assert!(s.tags.contains(&"mossy".to_owned()) && s.tags.contains(&"rock".to_owned()));
         assert!(s.describe(&[]).starts_with("An asset from Quixel Megascans, scanned in Iceland. Size 2x2 m."));
+    }
+
+    #[test]
+    fn finds_the_lod_in_a_file_name() {
+        assert_eq!(lod_of("Stand_xeokah0/Stand_xeokah0_LOD2.fbx"), Some(2));
+        assert_eq!(lod_of("a/stand_lod0.obj"), Some(0));
+        assert_eq!(lod_of("a/Stand_High.fbx"), None);
+        assert_eq!(lod_of("a/lodge.obj"), None);
     }
 
     #[test]

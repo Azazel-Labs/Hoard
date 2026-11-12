@@ -7,7 +7,7 @@ import { tmpdir } from 'node:os'
 import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { request, type FullConfig } from '@playwright/test'
-import { assetsOf, HOARD_HEADERS, PASSWORD, signedIn, uploadPack, USERNAME, waitReady } from './support/api'
+import { assetsOf, HOARD_HEADERS, PASSWORD, signedIn, uploadPack, USERNAME, waitIdle, waitReady } from './support/api'
 import { seedPacks, STORE, ZIPPED } from './support/seed'
 import { AUTH_FILE, RUN_FILE, type RunInfo, type Seed } from './support/paths'
 
@@ -101,6 +101,10 @@ export default async function globalSetup(_config: FullConfig): Promise<void> {
   })
   if (!loc.ok()) throw new Error(`making the library location failed: ${loc.status()} ${await loc.text()}`)
 
+  // No looking packs up on real stores from a test run.
+  const settings = await api.put('/api/admin/settings', { data: { store_lookup: false } })
+  if (!settings.ok()) throw new Error(`turning off store lookups failed: ${settings.status()} ${await settings.text()}`)
+
   const uploaded = []
   for (const p of seedPacks()) uploaded.push(await uploadPack(api, p.name, p.files))
   await waitReady(
@@ -117,6 +121,8 @@ export default async function globalSetup(_config: FullConfig): Promise<void> {
     api,
     uploaded.map((p) => p.id),
   )
+
+  await waitIdle(api)
 
   const seed: Seed = { packs: {}, assets: {} }
   for (const p of packs) {

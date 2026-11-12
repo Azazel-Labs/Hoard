@@ -1,12 +1,17 @@
 // The packs every run starts with, all made in code.
 import type { UploadFile } from './api'
-import { checker, crate, hue, LEVEL_JSON, NOTES_TXT, triangleGltf, zip } from './files'
+import { checker, crate, hue, LEVEL_JSON, megascans, MEGASCANS_FOLDER, MEGASCANS_TITLE, NOTES_TXT, triangleGltf, zip } from './files'
 
 export const TEXTURES = 'E2E Textures'
 export const MODELS = 'E2E Models'
 export const ZIPPED = 'E2E Zipped'
 export const BIG = 'E2E Big Pack'
 export const BIG_COUNT = 300
+/** A Megascans download, uploaded under its folder's name; its JSON renames it to the listing's title. */
+export const MEGASCANS = MEGASCANS_TITLE
+/** One picture bigger than the light previews (2048 px), so viewers show the preview first. */
+export const LARGE = 'E2E Large Image'
+export const LARGE_PX = 2600
 /** The store the zipped pack says it came from. */
 export const STORE = 'Itch Example'
 
@@ -62,5 +67,7 @@ export function seedPacks(): SeedPack[] {
         data: checker(16, hue(i, BIG_COUNT), [i % 256, (i * 7) % 256, (i * 13) % 256], 2),
       })),
     },
+    { name: MEGASCANS_FOLDER, files: megascans().map((f) => ({ relpath: f.path, data: f.data })) },
+    { name: LARGE, files: [{ relpath: 'big_mural.png', data: checker(LARGE_PX, [210, 120, 60], [60, 120, 210], 100) }] },
   ]
 }

@@ -58,7 +58,7 @@ const isModel = computed(() => isModelAsset(props.asset))
 const isText = computed(() => isTextAsset(props.asset))
 const REL_LABEL: Record<LinkRel, string> = {
   texture: 'texture', buffer: 'geometry data', material: 'material file', animation: 'animation',
-  library: 'linked file', guess: 'probably goes with', variant: 'variant',
+  library: 'linked file', guess: 'probably goes with', sidecar: 'store details', variant: 'variant',
 }
 const needs = computed(() => props.asset.links.filter((l) => l.rel !== 'animation'))
 // A material made from texture maps lists its maps by role instead of as "Needs"; a texture or model that belongs

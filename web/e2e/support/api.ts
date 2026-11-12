@@ -74,6 +74,16 @@ export async function waitReady(api: APIRequestContext, ids: string[], timeoutMs
   }
 }
 
+/** Waits (up to a point) for background work after the uploads to settle, so tests don't race it for the CPU. */
+export async function waitIdle(api: APIRequestContext, timeoutMs = 90_000): Promise<void> {
+  const deadline = Date.now() + timeoutMs
+  while (Date.now() < deadline) {
+    const jobs = (await (await api.get('/api/admin/jobs')).json()) as { status: string }[]
+    if (!jobs.some((j) => j.status === 'queued' || j.status === 'running')) return
+    await new Promise((r) => setTimeout(r, 250))
+  }
+}
+
 export async function assetsOf(api: APIRequestContext, packId: string): Promise<Asset[]> {
   const res = await api.get('/api/assets', { params: { pack: packId, limit: 500, facets: false } })
   if (!res.ok()) throw new Error(`asset search failed: ${res.status()}`)

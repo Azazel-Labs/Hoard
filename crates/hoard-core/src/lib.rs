@@ -439,6 +439,8 @@ pub enum LinkRel {
     /// Another source file this one links in (a .blend library).
     Library,
     Guess,
+    /// The store's file that describes this asset (a Megascans `<id>.json`).
+    Sidecar,
     /// A sibling in the same variant family. Computed, never stored as a link.
     Variant,
 }
@@ -452,6 +454,7 @@ impl LinkRel {
             LinkRel::Animation => "animation",
             LinkRel::Library => "library",
             LinkRel::Guess => "guess",
+            LinkRel::Sidecar => "sidecar",
             LinkRel::Variant => "variant",
         }
     }
@@ -463,13 +466,22 @@ impl LinkRel {
             "animation" => LinkRel::Animation,
             "library" => LinkRel::Library,
             "guess" => LinkRel::Guess,
+            "sidecar" => LinkRel::Sidecar,
             "variant" => LinkRel::Variant,
             _ => return None,
         })
     }
     /// Whether a bundle download should include the target by default.
     pub fn is_dependency(&self) -> bool {
-        matches!(self, LinkRel::Texture | LinkRel::Buffer | LinkRel::Material | LinkRel::Library | LinkRel::Guess)
+        matches!(
+            self,
+            LinkRel::Texture
+                | LinkRel::Buffer
+                | LinkRel::Material
+                | LinkRel::Library
+                | LinkRel::Guess
+                | LinkRel::Sidecar
+        )
     }
 }
 

@@ -1309,10 +1309,11 @@ fn build_filter(q: &SearchQuery, include_kind: bool, look: Option<&LookRank>) ->
 pub(crate) const LIVE: &str =
     "a.archived_at IS NULL AND a.pack_id NOT IN (SELECT id FROM packs WHERE archived_at IS NOT NULL)";
 
-/// An asset another asset needs as raw data (a glTF's .bin, an OBJ's .mtl) or a map of a material (its roughness
+/// An asset another asset needs as raw data (a glTF's .bin, an OBJ's .mtl), the store's file describing a model
+/// (a Megascans `<id>.json`) or a map of a material (its roughness
 /// map, say): not something you'd browse for. The material is, and it shows its maps.
 pub(crate) const SUPPORTING: &str = "(EXISTS (SELECT 1 FROM asset_links l WHERE l.to_id = a.id
-     AND (l.rel = 'buffer' OR (l.rel = 'material' AND a.ext = 'mtl')))
+     AND (l.rel IN ('buffer', 'sidecar') OR (l.rel = 'material' AND a.ext = 'mtl')))
      OR EXISTS (SELECT 1 FROM material_maps m WHERE m.texture_id = a.id))";
 
 impl Filter {

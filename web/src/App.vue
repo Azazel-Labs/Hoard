@@ -1190,7 +1190,7 @@ const commands = computed<Command[]>(() => {
 
         <p v-if="supportingHidden > 0 || prefs.showSupporting" class="supporting">
           <template v-if="!prefs.showSupporting">
-            <span :title="'glTF buffers, material libraries and the maps of materials. They come along when you download what uses them.'">
+            <span :title="'glTF buffers, material libraries, the maps of materials and the store files describing models. They come along when you download what uses them.'">
               {{ supportingHidden }} supporting {{ supportingHidden === 1 ? 'file' : 'files' }} hidden
             </span>
             <button type="button" class="linkbtn" @click="prefs.showSupporting = true">Show</button>
@@ -1493,7 +1493,12 @@ const commands = computed<Command[]>(() => {
 .facet[aria-pressed='true'] .n { color: var(--bg); opacity: 0.6; }
 .more-facets { border-style: dashed; color: var(--muted); }
 
-.main { grid-area: main; overflow-y: auto; padding: 0 1.25rem 4rem; scrollbar-gutter: stable; }
+/* Positioned, so screen-reader-only text far down the grid stays inside it rather than making the page itself
+   scroll; and scrolling past the end stops here, never scrolling the whole app out of view. */
+.main {
+  grid-area: main; position: relative; overflow-y: auto; overscroll-behavior: contain; padding: 0 1.25rem 4rem;
+  scrollbar-gutter: stable;
+}
 .app:has(.selbar) .main { padding-bottom: 7rem; }
 .bar {
   position: sticky; top: 0; z-index: 3; display: flex; align-items: center; gap: 0.9rem;

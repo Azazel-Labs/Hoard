@@ -494,7 +494,14 @@ fn name_from_sidecars(
     }
     for f in found {
         let json = format!("{}.json", f.path.strip_suffix(".material").unwrap_or(&f.path)).to_lowercase();
-        let Some(hash) = sidecars.get(&json) else { continue };
+        // Megascans names the file after the asset's id (`xeokah0.json`): the only JSON in the folder will do.
+        let dir = dir_of(&f.path).to_lowercase();
+        let mut beside = sidecars.iter().filter(|(p, _)| dir_of(p) == dir);
+        let only = match (beside.next(), beside.next()) {
+            (Some((_, h)), None) => Some(h),
+            _ => None,
+        };
+        let Some(hash) = sidecars.get(&json).or(only) else { continue };
         match rt.block_on(state.blobs.read_all(hash)) {
             Ok(bytes) => {
                 if let Some(title) = sidecar_title(&bytes) {
@@ -633,7 +640,7 @@ pub(crate) fn detect_pack(state: &AppState, rt: &Handle, conn: &mut Connection, 
         }
         db::reindex_asset(&tx, &id)?;
         tx.execute("DELETE FROM material_maps WHERE material_id = ?1", [&id])?;
-        tx.execute("DELETE FROM asset_links WHERE from_id = ?1", [&id])?;
+        tx.execute("DELETE FROM asset_links WHERE from_id = ?1 AND rel = 'texture'", [&id])?;
         for (i, role, res) in &f.maps {
             let t = &textures[*i].id;
             tx.execute(

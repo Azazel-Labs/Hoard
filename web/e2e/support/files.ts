@@ -167,3 +167,54 @@ export const LEVEL_JSON = {
 }
 
 export const NOTES_TXT = ['Notes for the e2e pack', '', 'The crate uses crate_diffuse.png.', 'The triangle is a glTF with its buffer inline.'].join('\n')
+
+/** The folder a Megascans 3D asset downloads as: files named with the asset's id, and its `<id>.json`. */
+export const MEGASCANS_FOLDER = 'Historic_Miscellaneous_Stand_Wood_Old_05_xeokah0_Raw'
+/** The listing's title, from that JSON. */
+export const MEGASCANS_TITLE = 'Historic Miscellaneous Stand Wood Old 05'
+
+/** A Megascans 3D asset: a box of a model, four maps that make a material, and the JSON that says what it is. */
+export function megascans(): { path: string; data: Buffer }[] {
+  const base = MEGASCANS_FOLDER
+  const v = [
+    [-1, 0, -0.5], [1, 0, -0.5], [1, 0, 0.5], [-1, 0, 0.5],
+    [-1, 1.6, -0.5], [1, 1.6, -0.5], [1, 1.6, 0.5], [-1, 1.6, 0.5],
+  ]
+  const obj = [
+    'o Stand',
+    ...v.map((p) => `v ${p.join(' ')}`),
+    'vt 0 0', 'vt 1 0', 'vt 1 1', 'vt 0 1',
+    'f 1/1 2/2 3/3 4/4', 'f 5/1 8/4 7/3 6/2', 'f 1/1 5/4 6/3 2/2',
+    'f 2/1 6/4 7/3 3/2', 'f 3/1 7/4 8/3 4/2', 'f 4/1 8/4 5/3 1/2',
+    '',
+  ].join('\n')
+  const maps: [string, [number, number, number], [number, number, number]][] = [
+    ['BaseColor', [120, 80, 50], [100, 64, 40]],
+    ['Normal', [128, 128, 255], [120, 120, 250]],
+    ['Roughness', [200, 200, 200], [180, 180, 180]],
+    ['AO', [230, 230, 230], [210, 210, 210]],
+  ]
+  const meta = {
+    id: 'xeokah0',
+    semanticTags: {
+      name: MEGASCANS_TITLE,
+      name_formats: { title: MEGASCANS_TITLE, slug: 'historic_miscellaneous_stand_wood_old_05' },
+      contains: ['table'],
+      color: ['brown'],
+      country: 'Denmark',
+      region: 'Europe',
+      asset_type: '3D asset',
+    },
+    meta: [
+      { name: 'Length', key: 'length', value: '118 cm' },
+      { name: 'Width', key: 'width', value: '54 cm' },
+      { name: 'Height', key: 'height', value: '81 cm' },
+    ],
+    tags: ['wood', 'old', 'stand', 'furniture', 'rustic'],
+  }
+  return [
+    { path: `${base}/${base}.obj`, data: Buffer.from(obj) },
+    ...maps.map(([m, a, b]) => ({ path: `${base}/${base}_2K_${m}.png`, data: checker(64, a, b, 8) })),
+    { path: `${base}/xeokah0.json`, data: Buffer.from(JSON.stringify(meta, null, 2)) },
+  ]
+}

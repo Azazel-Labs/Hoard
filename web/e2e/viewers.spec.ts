@@ -1,4 +1,4 @@
-import { MODELS, TEXTURES } from './support/seed'
+import { LARGE, LARGE_PX, MODELS, TEXTURES } from './support/seed'
 import { doubleClick, expect, openPack, test, tile } from './support/test'
 
 // Double-clicking a tile opens its full-screen viewer; the app spots the second click by where and when it lands, so
@@ -70,5 +70,36 @@ test.describe('full-screen viewers', () => {
     await expect(viewer.getByRole('group', { name: 'Show as' })).toHaveCount(0)
     await page.keyboard.press('Escape')
     await expect(viewer).toBeHidden()
+  })
+})
+
+test.describe('light previews and lazy viewers', () => {
+  test('a big picture opens as a light preview, and Full resolution loads the file', async ({ page, seed }) => {
+    await openPack(page, seed.packs[LARGE], LARGE)
+    await doubleClick(page, tile(page, 'Big mural'))
+    const viewer = page.getByRole('dialog', { name: 'Inspect Big mural' })
+    await expect(viewer.getByText(/preview 2048×2048/)).toBeVisible({ timeout: 20_000 })
+    await expect(viewer.getByText(new RegExp(`${LARGE_PX}×${LARGE_PX}`)).first()).toBeVisible()
+    const full = page.waitForRequest((r) => /\/api\/assets\/[\w-]+\/file/.test(r.url()))
+    await viewer.getByRole('button', { name: 'Full resolution' }).click()
+    await full
+    await expect(viewer.getByRole('group', { name: 'Resolution' })).toBeHidden({ timeout: 20_000 })
+  })
+
+  test('3D code loads only when a model is opened', async ({ page, seed }) => {
+    const scripts: string[] = []
+    page.on('request', (r) => {
+      if (r.resourceType() === 'script') scripts.push(new URL(r.url()).pathname)
+    })
+    const threeish = () => scripts.filter((s) => /\/(materialMaps|modelStage|ModelInspector)-/.test(s))
+    await openPack(page, seed.packs[TEXTURES], TEXTURES, '&sort=name')
+    await tile(page, 'Brick wall').click()
+    await expect(page.getByRole('complementary', { name: 'Asset details' })).toBeVisible()
+    expect(threeish(), '3D code loaded for the library and a texture').toEqual([])
+
+    await openPack(page, seed.packs[MODELS], MODELS, '&sort=name')
+    await doubleClick(page, tile(page, 'Crate'))
+    await expect(page.getByRole('dialog', { name: 'View Crate in 3D' })).toBeVisible()
+    await expect.poll(() => threeish().length).toBeGreaterThan(0)
   })
 })

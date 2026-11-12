@@ -265,6 +265,15 @@ export interface Account {
   you: boolean
 }
 
+/** An app (Claude, another MCP client) someone let sign in over OAuth. */
+export interface Connection {
+  id: number
+  app: string
+  user: string
+  created_at: string
+  last_used_at: string | null
+}
+
 export interface AccessToken {
   id: number
   name: string
@@ -660,6 +669,11 @@ export const api = {
   makeToken: (name: string) =>
     post<{ id: number; name: string; token: string }>('/api/admin/tokens', { name }),
   revokeToken: (id: number) => request<void>(`/api/admin/tokens/${id}`, { method: 'DELETE' }),
+  connections: () => request<{ connections: Connection[] }>('/api/admin/connections'),
+  disconnect: (id: number) => request<void>(`/api/admin/connections/${id}`, { method: 'DELETE' }),
+  oauthRequest: (search: string) => request<{ client: string; redirect_host: string }>(`/api/oauth/request${search}`),
+  oauthApprove: (params: Record<string, string>, allow: boolean) =>
+    post<{ redirect: string }>('/api/oauth/approve', { ...params, allow }),
   maintenance: () => request<Maintenance>('/api/admin/maintenance'),
   runMaintenance: (task: string) =>
     request<{ run: number }>(`/api/admin/maintenance/${task}`, { method: 'POST' }),

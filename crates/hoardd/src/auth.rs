@@ -8,7 +8,7 @@
 //! <name>`) prints a new one.
 //!
 //! Every account can do everything; there are no roles. Access tokens can do everything except manage accounts and
-//! tokens, so a leaked one can be revoked and can't mint more.
+//! tokens, so a leaked one can be revoked and can't mint more. Apps that sign in over OAuth (`oauth.rs`) get the same.
 
 use std::collections::HashMap;
 use std::sync::{LazyLock, Mutex, PoisonError};
@@ -59,7 +59,7 @@ impl Who {
     }
 
     /// The signed-in person, for things access tokens can't do.
-    fn person(&self) -> ApiResult<i64> {
+    pub(crate) fn person(&self) -> ApiResult<i64> {
         match self {
             Self::User { id, .. } => Ok(*id),
             Self::Token { .. } => Err(AppError::forbidden("sign in to the portal to manage accounts and tokens")),
@@ -92,11 +92,11 @@ fn session_token(headers: &HeaderMap) -> Option<String> {
         .map(str::to_owned)
 }
 
-fn digest(secret: &str) -> String {
+pub(crate) fn digest(secret: &str) -> String {
     tools::hex(&sha2::Sha256::digest(secret.as_bytes()))
 }
 
-fn random_bytes<const N: usize>() -> Result<[u8; N]> {
+pub(crate) fn random_bytes<const N: usize>() -> Result<[u8; N]> {
     let mut b = [0u8; N];
     getrandom::fill(&mut b).map_err(|e| anyhow!("no randomness from the OS: {e}"))?;
     Ok(b)
@@ -130,7 +130,10 @@ fn lookup(c: &Connection, cred: &Credential) -> Result<Option<Who>> {
                     params![id, db::now()],
                 )?;
             }
-            Ok(row.map(|(_, name)| Who::Token { name }))
+            match row {
+                Some((_, name)) => Ok(Some(Who::Token { name })),
+                None => Ok(crate::oauth::lookup(c, &hash)?),
+            }
         }
         Credential::Session(token) => {
             let hash = digest(token);

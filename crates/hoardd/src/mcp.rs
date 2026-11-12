@@ -5,7 +5,8 @@
 //!   `server/discover`;
 //! - legacy clients (2025-11-25 and earlier) open with `initialize`, which we answer without a session.
 //!
-//! Read tools are open like the REST API; write tools need the same bearer token as the REST writes.
+//! Every request needs a sign-in: an app that signed in over OAuth (`oauth.rs`), or an access token from Settings →
+//! Account. Always asking, even when guests may browse the portal, is what makes MCP apps offer to sign in.
 
 use axum::extract::State;
 use axum::http::{HeaderMap, StatusCode, header};
@@ -53,7 +54,7 @@ fn origin_ok(headers: &HeaderMap, public_url: Option<&str>) -> bool {
         || public_url.is_some_and(|u| u.split("://").nth(1).unwrap_or(u).trim_end_matches('/') == origin_host)
 }
 
-fn base_url(state: &AppState, headers: &HeaderMap) -> String {
+pub(crate) fn base_url(state: &AppState, headers: &HeaderMap) -> String {
     if let Some(u) = &state.settings.get().public_url {
         return u.trim_end_matches('/').to_owned();
     }
@@ -66,12 +67,13 @@ async fn handle(State(state): State<AppState>, headers: HeaderMap, body: String)
     if !origin_ok(&headers, state.settings.get().public_url.as_deref()) {
         return (StatusCode::FORBIDDEN, "origin not allowed").into_response();
     }
-    // An access token from Settings → Account. Without one, only reads, and only if Settings lets anyone browse.
-    let authorized = crate::auth::authenticate(&state, &http::Method::POST, &headers).await.ok().flatten().is_some();
-    if !authorized && !state.settings.get().guest_browsing {
+    if crate::auth::authenticate(&state, &http::Method::POST, &headers).await.ok().flatten().is_none() {
+        let challenge = crate::oauth::challenge(&state, &headers, headers.contains_key(header::AUTHORIZATION));
         return (
             StatusCode::UNAUTHORIZED,
-            "send an access token from Hoard's Settings → Account as `Authorization: Bearer <token>`",
+            [(header::WWW_AUTHENTICATE, challenge)],
+            "sign in to Hoard: connect over OAuth, or send an access token from Settings → Account as \
+             `Authorization: Bearer <token>`",
         )
             .into_response();
     }
@@ -141,7 +143,7 @@ async fn handle(State(state): State<AppState>, headers: HeaderMap, body: String)
             let name = params.get("name").and_then(Value::as_str).unwrap_or_default().to_owned();
             let args = params.get("arguments").cloned().unwrap_or_else(|| json!({}));
             let base = base_url(&state, &headers);
-            match call_tool(&state, &name, args, &base, authorized).await {
+            match call_tool(&state, &name, args, &base).await {
                 Ok(mut value) => {
                     let previews = value.as_object_mut().and_then(|o| o.remove(PREVIEWS_KEY));
                     let sheet = value.as_object_mut().and_then(|o| o.remove(SHEET_KEY));
@@ -243,7 +245,7 @@ fn tool_list() -> Value {
         {
             "name": "tag_asset",
             "title": "Add or remove tags",
-            "description": "Add and/or remove tags on an asset. Added tags are recorded as human-sourced and are never overwritten by the automatic taggers. Needs an access token.",
+            "description": "Add and/or remove tags on an asset. Added tags are recorded as human-sourced and are never overwritten by the automatic taggers.",
             "inputSchema": {
                 "type": "object",
                 "properties": {
@@ -258,7 +260,7 @@ fn tool_list() -> Value {
         {
             "name": "update_asset",
             "title": "Rename or recategorize an asset",
-            "description": "Set an asset's display name, category or description (its own field, next to the AI's and the file's). Edited fields are locked against the AI tagger. Needs an access token.",
+            "description": "Set an asset's display name, category or description (its own field, next to the AI's and the file's). Edited fields are locked against the AI tagger.",
             "inputSchema": {
                 "type": "object",
                 "properties": {
@@ -307,7 +309,7 @@ fn tagging_tools() -> Value {
         {
             "name": "save_tags",
             "title": "Save descriptions and tags",
-            "description": "Store names, categories, descriptions and tags for assets (usually a batch from next_to_tag), recorded as AI-made the same way Hoard's own AI tagger records them: never overriding what a person typed, and an answer for a family's representative covers its variants. Optionally the pack's description and tags. Needs an access token.",
+            "description": "Store names, categories, descriptions and tags for assets (usually a batch from next_to_tag), recorded as AI-made the same way Hoard's own AI tagger records them: never overriding what a person typed, and an answer for a family's representative covers its variants. Optionally the pack's description and tags.",
             "inputSchema": {
                 "type": "object",
                 "properties": {
@@ -341,9 +343,6 @@ fn tagging_tools() -> Value {
         }
     ])
 }
-
-const NEEDS_TOKEN: &str = "Changes need you signed in: connect with an access token from Hoard's Settings → Account \
-(sent as `Authorization: Bearer <token>`).";
 
 /// The prompts this server offers: ready-made instructions a client can show as a command.
 fn prompt_list() -> Value {
@@ -476,7 +475,7 @@ async fn preview_blocks(state: &AppState, wanted: Vec<Value>) -> Vec<Value> {
 }
 
 /// [`tagging_tools`]' calls.
-async fn tagging_call(state: &AppState, name: &str, args: &Value, authorized: bool) -> Result<Value, ToolError> {
+async fn tagging_call(state: &AppState, name: &str, args: &Value) -> Result<Value, ToolError> {
     match name {
         "next_to_tag" => {
             let skip = args.get("skip").and_then(Value::as_u64).unwrap_or(0);
@@ -497,9 +496,6 @@ async fn tagging_call(state: &AppState, name: &str, args: &Value, authorized: bo
             Ok(out)
         }
         "save_tags" => {
-            if !authorized {
-                return Err(ToolError::Failed(NEEDS_TOKEN.into()));
-            }
             let assets: Vec<crate::llm::Described> =
                 serde_json::from_value(args.get("assets").cloned().unwrap_or_default())
                     .map_err(|e| ToolError::Failed(format!("`assets`: {e}")))?;
@@ -520,15 +516,9 @@ async fn tagging_call(state: &AppState, name: &str, args: &Value, authorized: bo
     }
 }
 
-async fn call_tool(
-    state: &AppState,
-    name: &str,
-    args: Value,
-    base: &str,
-    authorized: bool,
-) -> Result<Value, ToolError> {
+async fn call_tool(state: &AppState, name: &str, args: Value, base: &str) -> Result<Value, ToolError> {
     if matches!(name, "next_to_tag" | "save_tags") {
-        return tagging_call(state, name, &args, authorized).await;
+        return tagging_call(state, name, &args).await;
     }
     let base = base.to_owned();
     match name {
@@ -632,9 +622,6 @@ async fn call_tool(
             Ok(json!({ "tags": tags }))
         }
         "tag_asset" | "update_asset" => {
-            if !authorized {
-                return Err(ToolError::Failed(NEEDS_TOKEN.into()));
-            }
             let id = str_arg(&args, "id").ok_or_else(|| ToolError::Failed("`id` is required".into()))?;
             let is_tag = name == "tag_asset";
             let (add, remove) = (str_list(&args, "add"), str_list(&args, "remove"));

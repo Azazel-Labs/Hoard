@@ -30,6 +30,7 @@ mod maintenance;
 mod mcp;
 mod meshes;
 mod music;
+mod oauth;
 mod relocate;
 mod scan;
 mod server;

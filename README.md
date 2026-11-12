@@ -482,19 +482,25 @@ both connect.
 The `tag_pack` prompt (in Claude Code: `/mcp__hoard__tag_pack <pack name>`) tells the agent to loop `next_to_tag` →
 look → `save_tags` until the pack is done, with the same naming, category and tag rules Hoard's built-in tagger uses.
 
+**Connecting Claude.** Settings → Account → *Claude and other AI apps* has the address and the steps. Apps sign in to
+Hoard over OAuth the first time (Hoard opens in your browser and asks you to allow it), and Settings → Account lists
+them and disconnects them.
+
+- **Claude Code:** `claude mcp add --transport http --scope user hoard https://your-host/mcp`, then `/mcp` to sign in.
+- **claude.ai, Claude Desktop and Cowork:** Settings → Connectors → Add custom connector, paste
+  `https://your-host/mcp`, then Connect. These connect from Anthropic's servers, so Hoard has to be reachable from the
+  internet over HTTPS with a certificate browsers trust (for example through a reverse proxy, Tailscale Funnel or a
+  Cloudflare tunnel), and its Public address (Settings → Server) set to that URL.
+
 **Tagging with your Claude subscription.** Hoard can't sign in to Claude for you (Anthropic doesn't allow other apps to
-use a Claude login), but Claude can come to Hoard: connect it to `/mcp` and ask it to tag a pack. It looks at each
-contact sheet and saves its descriptions, on your plan. From Claude Code, with an access token from Settings → Account:
+use a Claude login), but Claude can come to Hoard: connect it and run `/mcp__hoard__tag_pack Medieval Village` (or ask
+"tag the untagged packs in Hoard"). It looks at each contact sheet and saves its descriptions, on your plan.
 
-```sh
-claude mcp add --transport http --scope user hoard https://your-host/mcp --header "Authorization: Bearer hoard_…"
-```
-
-then run `/mcp__hoard__tag_pack Medieval Village` (or just ask "tag the untagged packs in Hoard").
-
-Point any MCP client at `https://your-host/mcp` with an access token from Settings → Account in an
-`Authorization: Bearer <token>` header. With guest browsing on, the read tools work without one. Browser-originated requests
-from other origins are rejected (DNS-rebinding guard). Set the public address in Settings → Server so returned links are absolute.
+Other MCP clients can sign in the same way (OAuth 2.1 with PKCE and dynamic client registration; the 401 from `/mcp`
+points at `/.well-known/oauth-protected-resource/mcp`), or send an access token from Settings → Account as
+`Authorization: Bearer <token>`. `/mcp` always needs one or the other, even with guest browsing on: asking is what makes
+apps offer to sign in. Browser-originated requests from other origins are rejected (DNS-rebinding guard). Set the public
+address in Settings → Server so returned links are absolute.
 
 ## Storage, and splitting it from the web server
 
@@ -576,6 +582,8 @@ make access tokens in **Settings → Account**. Every account can do everything,
 - **Access tokens** are for everything that isn't a browser: the `hoard` CLI (`--token` or `HOARD_TOKEN`), scripts and
   cron, MCP clients and the Unreal worker. They're sent as `Authorization: Bearer <token>`, shown once when made, and
   can be revoked; the list shows when each was last used. A token can do everything except manage accounts and tokens.
+- **Connected apps** (Claude, other MCP clients) sign in over OAuth: you allow each one in the browser, it acts as
+  you with an access token's powers, and Settings → Account disconnects it.
 - **Guest browsing** (off by default) lets anyone who can reach the server search, preview and download without
   signing in. Changing anything still needs an account or a token.
 - **Forgot your password?** On the server, `hoardd --reset-password <name>` prints a new one and signs that account out
@@ -674,7 +682,10 @@ Requests that change something are marked 🔒: guests can't make them. A browse
 | POST 🔒 | `/api/admin/backup` | snapshot the database |
 | GET 🔒 | `/api/admin/maintenance` | maintenance tasks, what's running, past runs |
 | POST 🔒 | `/api/admin/maintenance/{task}` | start `backup`, `scrub`, `reanalyze`, `shrink_thumbs`, `clear_cache` or `gc` |
-| POST | `/mcp` | MCP over streamable HTTP (writes need the token) |
+| POST | `/mcp` | MCP over streamable HTTP (needs a sign-in: OAuth or an access token) |
+| GET | `/.well-known/oauth-protected-resource/mcp`, `/.well-known/oauth-authorization-server` | OAuth discovery for MCP apps |
+| POST | `/oauth/register`, `/oauth/token` | OAuth dynamic client registration; codes and refresh tokens for access tokens |
+| GET 🔒 | `/api/admin/connections` | apps signed in over OAuth (`DELETE /api/admin/connections/{id}` disconnects one) |
 
 ## Repository layout
 

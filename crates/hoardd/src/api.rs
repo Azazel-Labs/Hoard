@@ -75,6 +75,7 @@ pub(crate) fn router(state: &AppState) -> Router<AppState> {
         .route("/api/admin/chatgpt/models", get(crate::chatgpt::list_models))
         .merge(crate::uploads::router())
         .merge(crate::auth::admin_router())
+        .merge(crate::oauth::portal_router())
         .route_layer(middleware::from_fn_with_state(std::sync::Arc::clone(state), crate::auth::require_user));
 
     let reads = Router::new()
@@ -107,11 +108,12 @@ pub(crate) fn router(state: &AppState) -> Router<AppState> {
         .route("/api/activity", get(activity))
         .route_layer(middleware::from_fn_with_state(std::sync::Arc::clone(state), crate::auth::require_reader));
 
-    // Open: health, signing in, ChatGPT's sign-in redirect, and MCP (which checks for itself, per tool).
+    // Open: health, signing in, ChatGPT's sign-in redirect, OAuth for MCP apps, and MCP (which checks for itself).
     Router::new()
         .route("/api/health", get(|| async { Json(json!({ "ok": true })) }))
         .route("/auth/callback", get(crate::chatgpt::callback))
         .merge(crate::auth::router())
+        .merge(crate::oauth::router())
         .merge(crate::mcp::router(state))
         .merge(reads)
         .merge(writes)

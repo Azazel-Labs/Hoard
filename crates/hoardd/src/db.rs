@@ -106,6 +106,25 @@ const MIGRATIONS: &[&str] = &[
     // 17: when a cached "download as" conversion was last handed out, so the cache can drop the least recently used
     // when it outgrows its limit (see `formats::trim_conversions`).
     "ALTER TABLE derivatives ADD COLUMN used_at TEXT;",
+    // 18: apps (Claude and other MCP clients) that sign in over OAuth, and what each person let them do (see
+    // `oauth.rs`). Tokens are stored as hashes.
+    "CREATE TABLE oauth_clients (
+       id            TEXT PRIMARY KEY,
+       name          TEXT NOT NULL,
+       redirect_uris TEXT NOT NULL,
+       secret_hash   TEXT,
+       created_at    TEXT NOT NULL
+     ) WITHOUT ROWID;
+     CREATE TABLE oauth_grants (
+       id                INTEGER PRIMARY KEY AUTOINCREMENT,
+       client_id         TEXT NOT NULL REFERENCES oauth_clients(id) ON DELETE CASCADE,
+       user_id           INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+       access_hash       TEXT NOT NULL UNIQUE,
+       access_expires_at INTEGER NOT NULL,
+       refresh_hash      TEXT NOT NULL UNIQUE,
+       created_at        TEXT NOT NULL,
+       last_used_at      TEXT
+     );",
 ];
 
 /// How many automatic pre-upgrade backups to keep in `<data dir>/backups`.

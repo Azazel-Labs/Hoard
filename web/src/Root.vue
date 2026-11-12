@@ -3,7 +3,11 @@
 import { onMounted } from 'vue'
 import App from './App.vue'
 import SignIn from './components/SignIn.vue'
+import ConnectApp from './components/ConnectApp.vue'
 import { auth, canBrowse, refreshAuth } from './auth'
+
+/** An app signing in over OAuth (see `oauth.rs`): sign in if need be, then allow or cancel. */
+const connecting = location.pathname === '/oauth/authorize'
 
 onMounted(refreshAuth)
 
@@ -19,6 +23,10 @@ async function signedIn() {
     <button type="button" class="btn" @click="refreshAuth">Try again</button>
   </div>
   <SignIn v-else-if="auth.status?.setup_needed" mode="setup" @done="signedIn" />
+  <template v-else-if="auth.status && connecting">
+    <ConnectApp v-if="auth.status.signed_in" />
+    <SignIn v-else mode="login" @done="signedIn" />
+  </template>
   <template v-else-if="auth.status">
     <App v-if="canBrowse()" />
     <SignIn v-if="!canBrowse()" mode="login" @done="signedIn" />

@@ -1,22 +1,26 @@
 <script setup lang="ts">
-// Settings → Account: your password, the other accounts, access tokens for scripts and programs, and whether people
-// who aren't signed in may look around.
+// Settings → Account: your password, the other accounts, connecting Claude and other AI apps, access tokens for
+// scripts and programs, and whether people who aren't signed in may look around.
 import { computed, onMounted, reactive, ref } from 'vue'
-import { api, type AccessToken, type Account } from '../api'
+import { api, type AccessToken, type Account, type Connection } from '../api'
 import { auth, refreshAuth, signOut } from '../auth'
 import { confirmDialog, showError, showOk } from '../ui'
 
 const accounts = ref<Account[] | null>(null)
 const tokens = ref<AccessToken[] | null>(null)
+const connections = ref<Connection[] | null>(null)
 const guest = ref<boolean | null>(null)
 const busy = ref(false)
+const origin = ref(location.origin)
 
 async function load() {
   try {
-    const [a, t, s] = await Promise.all([api.accounts(), api.tokens(), api.settings()])
+    const [a, t, s, c] = await Promise.all([api.accounts(), api.tokens(), api.settings(), api.connections()])
     accounts.value = a.users
     tokens.value = t.tokens
+    connections.value = c.connections
     guest.value = s.options.guest_browsing.value
+    origin.value = (s.options.public_url.value || location.origin).replace(/\/+$/, '')
   } catch (e) {
     showError(`Couldn't load accounts: ${(e as Error).message}`)
   }
@@ -105,6 +109,28 @@ async function revoke(t: AccessToken) {
   }
 }
 
+// ---- Claude and other AI apps
+const mcpUrl = computed(() => `${origin.value}/mcp`)
+const claudeCode = computed(() => `claude mcp add --transport http --scope user hoard ${mcpUrl.value}`)
+const local = computed(() => /^http:\/\/|\/\/(localhost|127\.|10\.|192\.168\.|172\.(1[6-9]|2\d|3[01])\.)/.test(origin.value))
+async function copy(text: string) {
+  try {
+    await navigator.clipboard.writeText(text)
+    showOk('Copied')
+  } catch {
+    showError('Couldn’t copy: select it and copy it yourself')
+  }
+}
+async function disconnect(c: Connection) {
+  const ok = await confirmDialog({
+    title: `Disconnect ${c.app}?`,
+    body: 'It’s turned away from now on, and has to be connected again to use Hoard.',
+    confirm: 'Disconnect',
+    danger: true,
+  })
+  if (ok && (await run(`Couldn't disconnect ${c.app}`, () => api.disconnect(c.id)))) await load()
+}
+
 // ---- guests
 async function setGuest(on: boolean) {
   if (await run("Couldn't change that", () => api.saveSettings({ guest_browsing: on }))) {
@@ -115,7 +141,6 @@ async function setGuest(on: boolean) {
 
 const fmt = new Intl.DateTimeFormat(undefined, { dateStyle: 'medium' })
 const day = (at: string | null) => (at ? fmt.format(new Date(at)) : 'never')
-const origin = location.origin
 </script>
 
 <template>
@@ -159,6 +184,38 @@ const origin = location.origin
         <input id="new-password" v-model="person.password" class="field" type="password" placeholder="Password (8+ characters)" autocomplete="new-password" />
         <button type="submit" class="btn" :disabled="!personReady || busy">Add</button>
       </form>
+    </section>
+
+    <section>
+      <div class="sh"><h3>Claude and other AI apps</h3></div>
+      <p class="what">
+        Connect Claude (or any MCP app) and it can search and fetch assets for you, and describe and tag what Hoard hasn’t
+        yet. It signs in to Hoard the first time; you allow it here in the browser.
+      </p>
+      <div class="row">
+        <input class="field mono grow" :value="mcpUrl" readonly aria-label="Hoard's MCP address" @focus="($event.target as HTMLInputElement).select()" />
+        <button type="button" class="btn" @click="copy(mcpUrl)">Copy</button>
+      </div>
+      <ul class="steps">
+        <li>
+          <strong>Claude Code:</strong> run <span class="mono">{{ claudeCode }}</span>
+          <button type="button" class="btn ghost small" @click="copy(claudeCode)">Copy</button>, then <span class="mono">/mcp</span>
+          to sign in. <span class="mono">/mcp__hoard__tag_pack</span> describes a pack.
+        </li>
+        <li>
+          <strong>claude.ai, Claude Desktop and Cowork:</strong> Settings → Connectors → Add custom connector, paste the
+          address, then Connect. These connect from Anthropic’s servers, so Hoard has to be reachable from the internet over
+          HTTPS<template v-if="local"> (this address isn’t: set the Public address in Settings → Server)</template>.
+        </li>
+      </ul>
+      <ul v-if="connections?.length" class="list">
+        <li v-for="c in connections" :key="c.id">
+          <span class="name">{{ c.app }}</span>
+          <small>for {{ c.user }} since {{ day(c.created_at) }} · last used {{ day(c.last_used_at) }}</small>
+          <button type="button" class="btn ghost" :disabled="busy" @click="disconnect(c)">Disconnect</button>
+        </li>
+      </ul>
+      <p v-else-if="connections" class="what none">No apps connected yet.</p>
     </section>
 
     <section>
@@ -232,6 +289,10 @@ section { display: grid; gap: 0.6rem; }
 .made .use { color: var(--muted); line-height: 1.5; }
 .mono { overflow-wrap: anywhere; }
 .check { display: flex; gap: 0.5rem; align-items: center; }
+.grow { flex: 1; min-width: 0; }
+.steps { margin: 0; padding-left: 1.1rem; display: grid; gap: 0.4rem; color: var(--muted); line-height: 1.5; }
+.steps strong { color: var(--text); }
+.small { padding-block: 0.1rem; font-size: 0.85em; }
 .none { font-style: italic; }
 @media (max-width: 560px) {
   .grid { grid-template-columns: minmax(0, 1fr); }

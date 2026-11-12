@@ -12,7 +12,7 @@ use std::fmt::Write as _;
 use anyhow::{Context, Result, bail};
 use base64::Engine as _;
 use hoard_core::{PackStatus, TagSource};
-use rusqlite::params;
+use rusqlite::{OptionalExtension as _, params};
 use serde::Deserialize;
 use serde_json::{Value, json};
 
@@ -40,6 +40,8 @@ struct Row {
     views: Option<String>,
     human_edited: bool,
     family: Option<String>,
+    /// Nothing has described it yet (no AI or human tags, no AI description), and it's something you'd browse for.
+    untagged: bool,
 }
 
 #[derive(Debug, Deserialize, Default)]
@@ -50,7 +52,7 @@ struct Reply {
     assets: Vec<AssetReply>,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Clone, Deserialize)]
 struct PackReply {
     #[serde(default)]
     title: Option<String>,
@@ -80,8 +82,17 @@ fn system_prompt() -> String {
          metadata and tags an offline tagger already assigned. Reply with JSON only:\n\
          {{\"pack\": {{\"title\": str, \"description\": str, \"tags\": [str]}} | null,\n \
          \"assets\": [{{\"i\": int, \"name\": str, \"category\": str, \"description\": str, \"tags\": [str]}}]}}\n\
-         Rules:\n\
-         - name: short human title, e.g. \"Footstep on gravel 3\". No file extensions.\n\
+         Rules:\n{}\
+         - Include `pack` only when asked; otherwise null.",
+        tagging_rules()
+    )
+}
+
+/// How to name, categorize, describe and tag an asset: the built-in tagger's rules, also handed to an agent tagging
+/// over MCP (see `crate::mcp`).
+pub(crate) fn tagging_rules() -> String {
+    format!(
+        "- name: short human title, e.g. \"Footstep on gravel 3\". No file extensions.\n\
          - category: exactly one of: {}.\n\
          - description: 1-3 sentences: what it is, what it looks or sounds like, and how a game might use it. \
            Music: mood, instruments, tempo and where it fits (menu, combat, exploration, ambience). Add detail \
@@ -94,8 +105,7 @@ fn system_prompt() -> String {
          - A file marked \"+N variants\" stands for a family of near-identical takes; describe the family.\n\
          - Pack context (store page, README) explains what the files are for; use it, but trust the file over it.\n\
          - Only describe what the path, metadata, context or image supports. If unsure, keep it generic.\n\
-         - Images: a contact sheet; each tile's white number is its file number. Model tiles show four views.\n\
-         - Include `pack` only when asked; otherwise null.",
+         - Images: a contact sheet; each tile's white number is its file number. Model tiles show four views.\n",
         CATEGORIES.join(", ")
     )
 }
@@ -141,14 +151,17 @@ fn summarize_meta(meta: &Value) -> String {
 }
 
 fn load_rows(conn: &rusqlite::Connection, pack_id: &str) -> Result<Vec<Row>> {
-    let mut stmt = conn.prepare(
+    let mut stmt = conn.prepare(&format!(
         "SELECT a.id, a.path, a.kind, a.meta, a.thumb_hash, a.human_edited,
                 COALESCE((SELECT group_concat(tag, ' ') FROM asset_tags t
                           WHERE t.asset_id = a.id AND t.source != 'meta'), ''),
                 (SELECT family_key FROM asset_family f WHERE f.asset_id = a.id),
-                (SELECT blob_hash FROM derivatives d WHERE d.asset_id = a.id AND d.kind = 'views')
+                (SELECT blob_hash FROM derivatives d WHERE d.asset_id = a.id AND d.kind = 'views'),
+                ({UNTAGGED} AND {} AND NOT {})
          FROM assets a WHERE a.pack_id = ?1 ORDER BY a.path",
-    )?;
+        db::LIVE,
+        db::SUPPORTING
+    ))?;
     let rows = stmt
         .query_map([pack_id], |r| {
             let meta: String = r.get(3)?;
@@ -163,6 +176,7 @@ fn load_rows(conn: &rusqlite::Connection, pack_id: &str) -> Result<Vec<Row>> {
                 tags: tags.split_whitespace().map(str::to_owned).collect(),
                 family: r.get(7)?,
                 views: r.get(8)?,
+                untagged: r.get::<_, i64>(9)? != 0,
             })
         })?
         .collect::<rusqlite::Result<Vec<_>>>()?;
@@ -318,6 +332,12 @@ fn context_block(ctx: &hoard_core::PackContext) -> String {
 
 /// A numbered contact sheet of the batch's thumbnails (multi-view sheets for models), as a PNG data URL.
 async fn batch_sheet(state: &AppState, batch: &[Entry<'_>]) -> Option<String> {
+    let sheet = sheet_png(state, batch).await?;
+    Some(format!("data:image/png;base64,{}", base64::engine::general_purpose::STANDARD.encode(&sheet)))
+}
+
+/// [`batch_sheet`] as PNG bytes.
+async fn sheet_png(state: &AppState, batch: &[Entry<'_>]) -> Option<Vec<u8>> {
     let mut tiles = Vec::new();
     for (i, e) in batch.iter().enumerate() {
         let Some(hash) = e.row.views.as_ref().or(e.row.thumb.as_ref()) else { continue };
@@ -331,13 +351,12 @@ async fn batch_sheet(state: &AppState, batch: &[Entry<'_>]) -> Option<String> {
     if tiles.is_empty() {
         return None;
     }
-    let sheet = crate::heavy::run("contact-sheet", move || {
+    crate::heavy::run("contact-sheet", move || {
         crate::analyze::png_bytes(crate::sheet::contact_sheet(&tiles, SHEET_CELL, SHEET_COLS))
     })
     .await
     .ok()?
-    .ok()?;
-    Some(format!("data:image/png;base64,{}", base64::engine::general_purpose::STANDARD.encode(&sheet)))
+    .ok()
 }
 
 pub(crate) async fn tag_pack(state: &AppState, pack_id: &str) -> Result<()> {
@@ -400,7 +419,8 @@ pub(crate) async fn tag_pack(state: &AppState, pack_id: &str) -> Result<()> {
         done += targets.iter().map(Vec::len).sum::<usize>() as i64;
         let pid = pack_id.to_owned();
         db::call(&state.pool, move |c| {
-            apply_reply(c, &pid, &targets, reply, ask_pack)?;
+            let pack = reply.pack.filter(|_| ask_pack).map(|p| (pid.as_str(), p));
+            apply_reply(c, pack, &targets, reply.assets)?;
             c.execute("UPDATE packs SET files_done = ?2 WHERE id = ?1", params![pid, done])?;
             Ok(())
         })
@@ -411,23 +431,206 @@ pub(crate) async fn tag_pack(state: &AppState, pack_id: &str) -> Result<()> {
     db::call(&state.pool, move |c| db::set_pack_status(c, &pid, PackStatus::Ready, None)).await
 }
 
+/// Not yet described by an AI or a person (SQL over `assets a`). Rule and metadata tags don't count.
+const UNTAGGED: &str = "NOT EXISTS (SELECT 1 FROM asset_tags t WHERE t.asset_id = a.id \
+     AND t.source IN ('ai', 'llm', 'human')) AND a.ai_description IS NULL";
+
+/// Find a live pack by id or name: exact (any case) first, then the newest whose name contains `want`.
+fn find_pack(c: &rusqlite::Connection, want: &str) -> Result<Option<String>> {
+    let id = c
+        .query_row(
+            "SELECT id FROM (
+               SELECT id, 0 AS rank, created_at FROM packs
+                WHERE archived_at IS NULL AND (id = ?1 OR lower(name) = lower(?1))
+               UNION ALL
+               SELECT id, 1, created_at FROM packs WHERE archived_at IS NULL AND instr(lower(name), lower(?1)) > 0)
+             ORDER BY rank, created_at DESC LIMIT 1",
+            [want],
+            |r| r.get(0),
+        )
+        .optional()?;
+    Ok(id)
+}
+
+/// Assets nothing has described yet, as SQL over `assets a`.
+fn untagged_sql() -> String {
+    format!("{UNTAGGED} AND {} AND NOT {}", db::LIVE, db::SUPPORTING)
+}
+
+/// The next files an agent should describe: up to `limit` (a variant family counts once) from `pack`, or from the
+/// newest pack that has any, skipping the first `skip`. The JSON names the pack, its context and each file, numbered
+/// like the tiles on the contact sheet (PNG) that comes with it. `Ok(None)` when no pack has anything left.
+pub(crate) async fn next_untagged(
+    state: &AppState,
+    pack: Option<String>,
+    skip: usize,
+    limit: usize,
+) -> Result<Option<(Value, Option<Vec<u8>>)>> {
+    let found = db::call(&state.pool, move |c| {
+        let pid = if let Some(want) = pack {
+            find_pack(c, &want)?.with_context(|| format!("no pack called {want:?}; list_packs shows them"))?
+        } else {
+            let sql = format!(
+                "SELECT p.id FROM packs p WHERE p.archived_at IS NULL
+                    AND EXISTS (SELECT 1 FROM assets a WHERE a.pack_id = p.id AND {})
+                  ORDER BY p.created_at DESC LIMIT 1",
+                untagged_sql()
+            );
+            let Some(id) = c.query_row(&sql, [], |r| r.get::<_, String>(0)).optional()? else { return Ok(None) };
+            id
+        };
+        let pack = db::get_pack(c, &pid)?.context("pack not found")?;
+        let other_packs: i64 = c.query_row(
+            &format!("SELECT COUNT(DISTINCT a.pack_id) FROM assets a WHERE a.pack_id != ?1 AND {}", untagged_sql()),
+            [&pid],
+            |r| r.get(0),
+        )?;
+        Ok(Some((pack, db::pack_context(c, &pid)?, load_rows(c, &pid)?, other_packs)))
+    })
+    .await?;
+    let Some((pack, ctx, rows, other_packs)) = found else { return Ok(None) };
+    let rows: Vec<Row> = rows.into_iter().filter(|r| r.untagged).collect();
+    let mut batch = entries(&rows);
+    let total = batch.len();
+    batch.drain(..skip.min(total));
+    batch.truncate(limit.clamp(1, MAX_IMAGES_PER_BATCH));
+    let left = total.saturating_sub(skip + batch.len());
+    let files: Vec<Value> = batch
+        .iter()
+        .enumerate()
+        .map(|(n, e)| {
+            let r = e.row;
+            let mut f = json!({
+                "n": n,
+                "id": r.id,
+                "path": r.path,
+                "kind": r.kind,
+                "facts": summarize_meta(&r.meta),
+                "tags": r.tags,
+            });
+            if e.targets.len() > 1 {
+                f["variants"] = json!(e.targets.len() - 1);
+            }
+            f
+        })
+        .collect();
+    let sheet = sheet_png(state, &batch).await;
+    let next = if files.is_empty() {
+        "Nothing left in this pack.".to_owned()
+    } else {
+        format!(
+            "Describe every file, then call save_tags with each one's id{}. The white numbers on the contact sheet \
+             are the files' `n`.",
+            if pack.description.is_none() { ", plus `pack` (it has no description yet)" } else { "" }
+        )
+    };
+    let mut out = json!({
+        "pack": {
+            "id": pack.id,
+            "name": pack.name,
+            "license": pack.license,
+            "description": pack.description,
+            "tags": pack.tags,
+        },
+        "files": files,
+        "left_in_pack_after_these": left,
+        "other_packs_with_untagged_files": other_packs,
+        "next": next,
+    });
+    let context = context_block(&ctx);
+    if !context.is_empty() {
+        out["pack"]["context"] = json!(context);
+    }
+    Ok(Some((out, sheet)))
+}
+
+/// One asset as an agent described it.
+#[derive(Debug, Deserialize)]
+pub(crate) struct Described {
+    id: String,
+    #[serde(default)]
+    name: Option<String>,
+    #[serde(default)]
+    category: Option<String>,
+    #[serde(default)]
+    description: Option<String>,
+    #[serde(default)]
+    tags: Vec<String>,
+}
+
+/// A pack as an agent described it.
+#[derive(Debug, Deserialize)]
+pub(crate) struct PackDescribed {
+    id: String,
+    #[serde(default)]
+    description: Option<String>,
+    #[serde(default)]
+    tags: Vec<String>,
+}
+
+/// Store an agent's descriptions exactly as the built-in tagger stores its own: AI tags, the AI description, and a
+/// name and category unless a person has edited the asset. Each answer covers the asset's whole variant family.
+/// Returns how many assets changed and the ids that weren't found.
+pub(crate) async fn save_described(
+    state: &AppState,
+    pack: Option<PackDescribed>,
+    assets: Vec<Described>,
+) -> Result<(usize, Vec<String>)> {
+    db::call(&state.pool, move |c| {
+        let mut targets = Vec::new();
+        let mut replies = Vec::new();
+        let mut unknown = Vec::new();
+        {
+            let mut stmt = c.prepare(
+                "SELECT id, human_edited FROM assets WHERE id = ?1
+                  UNION ALL
+                 SELECT m.id, m.human_edited FROM asset_family f
+                   JOIN asset_family g ON g.family_key = f.family_key AND g.asset_id != f.asset_id
+                   JOIN assets m ON m.id = g.asset_id
+                  WHERE f.asset_id = ?1",
+            )?;
+            for d in assets {
+                let members: Vec<(String, bool)> = stmt
+                    .query_map([&d.id], |r| Ok((r.get(0)?, r.get::<_, i64>(1)? != 0)))?
+                    .collect::<rusqlite::Result<_>>()?;
+                if members.first().is_none_or(|(id, _)| *id != d.id) {
+                    unknown.push(d.id);
+                    continue;
+                }
+                replies.push(AssetReply {
+                    i: targets.len(),
+                    name: d.name,
+                    category: d.category,
+                    description: d.description,
+                    tags: d.tags,
+                });
+                targets.push(members);
+            }
+        }
+        let changed = targets.iter().map(Vec::len).sum();
+        let pack = pack.map(|p| (p.id, PackReply { title: None, description: p.description, tags: p.tags }));
+        apply_reply(c, pack.as_ref().map(|(id, p)| (id.as_str(), p.clone())), &targets, replies)?;
+        Ok((changed, unknown))
+    })
+    .await
+}
+
 fn apply_reply(
     c: &mut db::Conn,
-    pack_id: &str,
+    pack: Option<(&str, PackReply)>,
     targets: &[Vec<(String, bool)>],
-    reply: Reply,
-    ask_pack: bool,
+    assets: Vec<AssetReply>,
 ) -> Result<()> {
     let now = db::now();
     let tx = c.transaction()?;
-    if ask_pack && let Some(p) = reply.pack {
+    if let Some((pack_id, p)) = pack {
         let tags: Vec<String> = p.tags.iter().filter_map(|t| hoard_core::normalize_tag(t)).collect();
         tx.execute(
             "UPDATE packs SET description = COALESCE(?2, description), tags = ?3 WHERE id = ?1",
             params![pack_id, p.description.or(p.title.map(|t| format!("{t}."))), serde_json::to_string(&tags)?],
         )?;
     }
-    for a in reply.assets {
+    for a in assets {
         let Some(members) = targets.get(a.i) else { continue };
         let category = a.category.filter(|c| CATEGORIES.contains(&c.as_str()));
         let description =

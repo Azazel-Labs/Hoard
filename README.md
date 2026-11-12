@@ -476,6 +476,21 @@ both connect.
 | `get_bundle` | download URLs and save-as paths for an asset and everything it needs, plus a zip URL |
 | `list_packs`, `list_tags`, `list_collections` | browse the library, its tag vocabulary and collections (`search_assets` takes `collection` too) |
 | `tag_asset`, `update_asset` | edits, recorded as human |
+| `next_to_tag` | the next files nothing has described yet (up to 16, one pack at a time), with facts, the pack's store page and README, and a numbered contact sheet image |
+| `save_tags` | names, categories, descriptions and tags for a batch (and the pack), recorded as AI-made exactly like Hoard's own AI tagger: a person's edits always win |
+
+The `tag_pack` prompt (in Claude Code: `/mcp__hoard__tag_pack <pack name>`) tells the agent to loop `next_to_tag` →
+look → `save_tags` until the pack is done, with the same naming, category and tag rules Hoard's built-in tagger uses.
+
+**Tagging with your Claude subscription.** Hoard can't sign in to Claude for you (Anthropic doesn't allow other apps to
+use a Claude login), but Claude can come to Hoard: connect it to `/mcp` and ask it to tag a pack. It looks at each
+contact sheet and saves its descriptions, on your plan. From Claude Code, with an access token from Settings → Account:
+
+```sh
+claude mcp add --transport http --scope user hoard https://your-host/mcp --header "Authorization: Bearer hoard_…"
+```
+
+then run `/mcp__hoard__tag_pack Medieval Village` (or just ask "tag the untagged packs in Hoard").
 
 Point any MCP client at `https://your-host/mcp` with an access token from Settings → Account in an
 `Authorization: Bearer <token>` header. With guest browsing on, the read tools work without one. Browser-originated requests

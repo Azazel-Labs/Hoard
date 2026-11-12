@@ -25,7 +25,8 @@ const META_VERSION: &str = "io.modelcontextprotocol/protocolVersion";
 const INSTRUCTIONS: &str = "Hoard is a library of game assets (textures, sprites, audio, music, 3D models, fonts). \
 Use search_assets to find things by words, kind and tags (tags look like `sfx`, `material:stone`, `style:pixel-art`, \
 `map:normal`, `license:cc0`). Use get_asset for full details, including linked textures/animations. To actually \
-fetch files, use get_bundle: it returns direct download URLs for an asset and every file it depends on, plus a zip URL.";
+fetch files, use get_bundle: it returns direct download URLs for an asset and every file it depends on, plus a zip URL. \
+To describe and tag assets nothing has described yet, loop next_to_tag → save_tags (the tag_pack prompt explains how).";
 
 pub(crate) fn router(_state: &AppState) -> Router<AppState> {
     Router::new().route("/mcp", post(handle).get(|| async { StatusCode::METHOD_NOT_ALLOWED }))
@@ -114,7 +115,7 @@ async fn handle(State(state): State<AppState>, headers: HeaderMap, body: String)
                 &id,
                 &json!({
                     "protocolVersion": version,
-                    "capabilities": { "tools": { "listChanged": false } },
+                    "capabilities": { "tools": { "listChanged": false }, "prompts": { "listChanged": false } },
                     "serverInfo": server_info,
                     "instructions": INSTRUCTIONS,
                 }),
@@ -124,13 +125,18 @@ async fn handle(State(state): State<AppState>, headers: HeaderMap, body: String)
             &id,
             &complete(json!({
                 "supportedVersions": SUPPORTED,
-                "capabilities": { "tools": {} },
+                "capabilities": { "tools": {}, "prompts": {} },
                 "_meta": { "io.modelcontextprotocol/serverInfo": server_info },
                 "instructions": INSTRUCTIONS,
             })),
         ),
         "ping" => rpc_result(&id, &complete(json!({}))),
         "tools/list" => rpc_result(&id, &complete(json!({ "tools": tool_list() }))),
+        "prompts/list" => rpc_result(&id, &complete(json!({ "prompts": prompt_list() }))),
+        "prompts/get" => match get_prompt(&params) {
+            Some(p) => rpc_result(&id, &complete(p)),
+            None => rpc_error(&id, -32602, "unknown prompt", None),
+        },
         "tools/call" => {
             let name = params.get("name").and_then(Value::as_str).unwrap_or_default().to_owned();
             let args = params.get("arguments").cloned().unwrap_or_else(|| json!({}));
@@ -138,11 +144,15 @@ async fn handle(State(state): State<AppState>, headers: HeaderMap, body: String)
             match call_tool(&state, &name, args, &base, authorized).await {
                 Ok(mut value) => {
                     let previews = value.as_object_mut().and_then(|o| o.remove(PREVIEWS_KEY));
+                    let sheet = value.as_object_mut().and_then(|o| o.remove(SHEET_KEY));
                     let mut content = vec![
                         json!({ "type": "text", "text": serde_json::to_string_pretty(&value).unwrap_or_default() }),
                     ];
                     if let Some(Value::Array(p)) = previews {
                         content.extend(preview_blocks(&state, p).await);
+                    }
+                    if let Some(Value::String(png)) = sheet {
+                        content.push(json!({ "type": "image", "data": png, "mimeType": "image/png" }));
                     }
                     rpc_result(
                         &id,
@@ -162,10 +172,8 @@ async fn handle(State(state): State<AppState>, headers: HeaderMap, body: String)
 }
 
 fn tool_list() -> Value {
-    let read = json!({ "readOnlyHint": true, "openWorldHint": false });
-    let write =
-        json!({ "readOnlyHint": false, "destructiveHint": false, "idempotentHint": true, "openWorldHint": false });
-    json!([
+    let (read, write) = (read_hints(), write_hints());
+    let mut tools = json!([
         {
             "name": "search_assets",
             "title": "Search assets",
@@ -263,7 +271,115 @@ fn tool_list() -> Value {
             },
             "annotations": write
         }
+    ]);
+    if let (Some(all), Value::Array(more)) = (tools.as_array_mut(), tagging_tools()) {
+        all.extend(more);
+    }
+    tools
+}
+
+fn read_hints() -> Value {
+    json!({ "readOnlyHint": true, "openWorldHint": false })
+}
+
+fn write_hints() -> Value {
+    json!({ "readOnlyHint": false, "destructiveHint": false, "idempotentHint": true, "openWorldHint": false })
+}
+
+/// The tools for describing assets nothing has described yet (see the `tag_pack` prompt).
+fn tagging_tools() -> Value {
+    let (read, write) = (read_hints(), write_hints());
+    json!([
+        {
+            "name": "next_to_tag",
+            "title": "Next assets to describe",
+            "description": "The next files nothing has described yet (no AI or human tags), up to 16 at a time, from one pack: path, kind, measured facts, the offline tagger's tags, the pack's context (store page, README), and a contact sheet image whose white numbers match each file's `n`. A file with `variants` stands for a family of near-identical takes. Describe them and call save_tags; saved files drop out, so call again for the next batch until `files` is empty.",
+            "inputSchema": {
+                "type": "object",
+                "properties": {
+                    "pack": { "type": "string", "description": "Pack id or name. Leave out to take the newest pack that has undescribed files." },
+                    "skip": { "type": "integer", "minimum": 0, "default": 0, "description": "Skip this many, e.g. files you decided to leave alone." },
+                    "limit": { "type": "integer", "minimum": 1, "maximum": 16, "default": 16 }
+                }
+            },
+            "annotations": read
+        },
+        {
+            "name": "save_tags",
+            "title": "Save descriptions and tags",
+            "description": "Store names, categories, descriptions and tags for assets (usually a batch from next_to_tag), recorded as AI-made the same way Hoard's own AI tagger records them: never overriding what a person typed, and an answer for a family's representative covers its variants. Optionally the pack's description and tags. Needs an access token.",
+            "inputSchema": {
+                "type": "object",
+                "properties": {
+                    "assets": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "id": { "type": "string" },
+                                "name": { "type": "string", "description": "Short human title, no extension." },
+                                "category": { "type": "string", "description": "One of Hoard's categories (see the tag_pack prompt)." },
+                                "description": { "type": "string", "description": "1-3 sentences." },
+                                "tags": { "type": "array", "items": { "type": "string" }, "description": "3-8 lowercase kebab-case tags." }
+                            },
+                            "required": ["id"]
+                        }
+                    },
+                    "pack": {
+                        "type": "object",
+                        "properties": {
+                            "id": { "type": "string" },
+                            "description": { "type": "string" },
+                            "tags": { "type": "array", "items": { "type": "string" } }
+                        },
+                        "required": ["id"]
+                    }
+                },
+                "required": ["assets"]
+            },
+            "annotations": write
+        }
     ])
+}
+
+const NEEDS_TOKEN: &str = "Changes need you signed in: connect with an access token from Hoard's Settings → Account \
+(sent as `Authorization: Bearer <token>`).";
+
+/// The prompts this server offers: ready-made instructions a client can show as a command.
+fn prompt_list() -> Value {
+    json!([{
+        "name": "tag_pack",
+        "title": "Describe and tag a pack",
+        "description": "Go through the files in a pack that nothing has described yet, look at each one and save a name, category, description and tags.",
+        "arguments": [{ "name": "pack", "description": "Pack name or id (leave empty for the newest pack with undescribed files)", "required": false }]
+    }])
+}
+
+fn get_prompt(params: &Value) -> Option<Value> {
+    if params.get("name").and_then(Value::as_str) != Some("tag_pack") {
+        return None;
+    }
+    let pack = params.get("arguments").and_then(|a| a.get("pack")).and_then(Value::as_str).map(str::trim);
+    let (which, call) = match pack.filter(|p| !p.is_empty()) {
+        Some(p) => (format!("the pack \"{p}\""), format!("next_to_tag with pack \"{p}\"")),
+        None => ("the newest pack with undescribed files".to_owned(), "next_to_tag".to_owned()),
+    };
+    let text = format!(
+        "Describe and tag the files in Hoard's {which} that nothing has described yet.\n\n\
+         Work in batches. Call {call}. It returns up to 16 files with their paths, measured facts, the offline \
+         tagger's tags and the pack's context, plus a contact sheet: each tile's white number is a file's `n`. Look \
+         at the sheet and the facts, then call save_tags with a name, category, description and tags for every file \
+         in the batch, by `id`. If the pack has no description yet, include `pack` (id, description, tags) in the \
+         first save_tags. Saved files drop out, so call next_to_tag again (with the pack id it returned) until \
+         `files` is empty. If you can't say anything useful about a file, still save its tags, or skip it with \
+         `skip`. When done, tell me how many you described and anything that looked wrong or mislabelled.\n\n\
+         Rules:\n{}",
+        crate::llm::tagging_rules()
+    );
+    Some(json!({
+        "description": format!("Describe and tag {which}"),
+        "messages": [{ "role": "user", "content": { "type": "text", "text": text } }],
+    }))
 }
 
 #[derive(Debug)]
@@ -326,6 +442,8 @@ fn summarize(base: &str, a: &hoard_core::Asset) -> Value {
 
 /// Internal key a tool result uses to ask for image content blocks; stripped before the result is sent.
 const PREVIEWS_KEY: &str = "__previews";
+/// Internal key for a contact sheet (base64 PNG) sent as an image content block.
+const SHEET_KEY: &str = "__sheet";
 const MAX_PREVIEWS: usize = 8;
 
 /// Inline thumbnails as MCP image content, each preceded by a caption naming the asset.
@@ -357,6 +475,51 @@ async fn preview_blocks(state: &AppState, wanted: Vec<Value>) -> Vec<Value> {
     out
 }
 
+/// [`tagging_tools`]' calls.
+async fn tagging_call(state: &AppState, name: &str, args: &Value, authorized: bool) -> Result<Value, ToolError> {
+    match name {
+        "next_to_tag" => {
+            let skip = args.get("skip").and_then(Value::as_u64).unwrap_or(0);
+            let limit = args.get("limit").and_then(Value::as_u64).unwrap_or(16);
+            let next = crate::llm::next_untagged(
+                state,
+                str_arg(args, "pack"),
+                usize::try_from(skip).unwrap_or(usize::MAX),
+                usize::try_from(limit).unwrap_or(16),
+            )
+            .await?;
+            let Some((mut out, sheet)) = next else {
+                return Ok(json!({ "files": [], "next": "Every asset has been described. Nothing left to tag." }));
+            };
+            if let Some(png) = sheet {
+                out[SHEET_KEY] = json!(base64::engine::general_purpose::STANDARD.encode(png));
+            }
+            Ok(out)
+        }
+        "save_tags" => {
+            if !authorized {
+                return Err(ToolError::Failed(NEEDS_TOKEN.into()));
+            }
+            let assets: Vec<crate::llm::Described> =
+                serde_json::from_value(args.get("assets").cloned().unwrap_or_default())
+                    .map_err(|e| ToolError::Failed(format!("`assets`: {e}")))?;
+            let pack: Option<crate::llm::PackDescribed> = match args.get("pack") {
+                None | Some(Value::Null) => None,
+                Some(p) => {
+                    Some(serde_json::from_value(p.clone()).map_err(|e| ToolError::Failed(format!("`pack`: {e}")))?)
+                }
+            };
+            let (saved, unknown) = crate::llm::save_described(state, pack, assets).await?;
+            let mut out = json!({ "saved_assets": saved });
+            if !unknown.is_empty() {
+                out["unknown_ids"] = json!(unknown);
+            }
+            Ok(out)
+        }
+        _ => Err(ToolError::Unknown),
+    }
+}
+
 async fn call_tool(
     state: &AppState,
     name: &str,
@@ -364,6 +527,9 @@ async fn call_tool(
     base: &str,
     authorized: bool,
 ) -> Result<Value, ToolError> {
+    if matches!(name, "next_to_tag" | "save_tags") {
+        return tagging_call(state, name, &args, authorized).await;
+    }
     let base = base.to_owned();
     match name {
         "search_assets" => {
@@ -467,9 +633,7 @@ async fn call_tool(
         }
         "tag_asset" | "update_asset" => {
             if !authorized {
-                return Err(ToolError::Failed(
-                    "Changes need an access token: make one in Hoard's Settings → Account and configure the MCP client to send `Authorization: Bearer <token>`.".into(),
-                ));
+                return Err(ToolError::Failed(NEEDS_TOKEN.into()));
             }
             let id = str_arg(&args, "id").ok_or_else(|| ToolError::Failed("`id` is required".into()))?;
             let is_tag = name == "tag_asset";

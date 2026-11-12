@@ -1111,7 +1111,7 @@ pub(crate) const LIVE: &str =
     "a.archived_at IS NULL AND a.pack_id NOT IN (SELECT id FROM packs WHERE archived_at IS NOT NULL)";
 
 /// An asset another asset needs as raw data (a glTF's .bin, an OBJ's .mtl): not something you'd browse for.
-const SUPPORTING: &str = "EXISTS (SELECT 1 FROM asset_links l WHERE l.to_id = a.id
+pub(crate) const SUPPORTING: &str = "EXISTS (SELECT 1 FROM asset_links l WHERE l.to_id = a.id
      AND (l.rel = 'buffer' OR (l.rel = 'material' AND a.ext = 'mtl')))";
 
 impl Filter {

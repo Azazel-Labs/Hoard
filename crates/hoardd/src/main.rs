@@ -22,6 +22,7 @@ mod ingest;
 mod jobs;
 mod links;
 mod llm;
+mod local_llm;
 mod mcp;
 mod meshes;
 mod music;

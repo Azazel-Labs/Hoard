@@ -96,7 +96,7 @@ echo "RENDER_GID=$(getent group render | cut -d: -f3)" >> .env
 docker compose -f compose.yml -f compose.gpu-dri.yml up -d
 ```
 
-Get both overlays from [deploy/](deploy/). They also put the bundled local model (AI tagging) on the GPU. Files on a NAS, S3 storage, remote access through Cloudflare
+Get both overlays from [deploy/](deploy/). They also put the local model server (AI tagging) on the GPU. Files on a NAS, S3 storage, remote access through Cloudflare
 or Tailscale, and backups are covered in [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md).
 
 ## Build from source
@@ -123,7 +123,7 @@ model, unit tests, the CLI, `xtask`, the portal in the browser, and a "full stac
 
 ```sh
 cargo xtask dev              # hoardd + Vite with hot reload on http://127.0.0.1:5173; Ctrl-C stops both
-cargo xtask dev --llm        # ...plus a local model serving the LLM tagger (downloaded on first use)
+cargo xtask dev --llm        # ...plus a local model server for AI tagging (pick a model in Settings)
 cargo xtask ci               # fmt, clippy -D warnings, tests, web build: what CI runs
 cargo xtask sample --upload  # generate the sample pack and upload it
 cargo xtask web              # build the portal into web/dist
@@ -135,41 +135,26 @@ the tag builds the binaries, the container image and the GitHub release. Builds 
 
 ### Local models for the tagger
 
-The LLM tagger works with any OpenAI-compatible endpoint, and `cargo xtask` can set up a small one on your machine.
-These are vision models (they look at the contact sheets) that run on a laptop CPU:
+The AI tagger works with any OpenAI-compatible endpoint. The simplest is a local model server: every compose file in
+[deploy/](deploy/) has an `llm` service (llama.cpp's server in router mode), and `cargo xtask llm` runs the same
+thing on your machine. It starts with no model. In the portal, **Settings → AI tagging → Local model** lists these
+vision models (they look at the contact sheets), all of which run on a laptop CPU, and downloads, switches and deletes
+them with a click:
 
-| Model | Download | License | Notes |
-|---|---|---|---|
-| `qwen3.5-2b` (default) | ~1.9 GB | Apache-2.0 | Natively multimodal; good at the JSON format |
-| `qwen3.5-4b` | ~3.4 GB | Apache-2.0 | Better names and descriptions; wants 6 GB of RAM |
-| `qwen3-vl-2b` | ~1.9 GB | Apache-2.0 | Qwen's own GGUF build of the previous generation |
-| `gemma4-e2b` | ~3.5 GB | Apache-2.0 | Google's edge model; strong captions |
-| `lfm2.5-vl-1.6b` | ~1.3 GB | LFM Open License 1.0 | Smallest and fastest; check the license for commercial use |
+| Model | Hugging Face reference | Download | License | Notes |
+|---|---|---|---|---|
+| Qwen3.5 2B | `unsloth/Qwen3.5-2B-GGUF:Q4_K_M` | ~1.9 GB | Apache-2.0 | Good at the answer format; about 3 GB of RAM |
+| Qwen3.5 4B | `unsloth/Qwen3.5-4B-GGUF:Q4_K_M` | ~3.4 GB | Apache-2.0 | Better names and descriptions; wants 6 GB of RAM |
+| Qwen3-VL 2B | `Qwen/Qwen3-VL-2B-Instruct-GGUF:Q4_K_M` | ~1.9 GB | Apache-2.0 | Qwen's own GGUF build of the previous generation |
+| Gemma 4 E2B | `unsloth/gemma-4-E2B-it-GGUF:Q4_K_M` | ~3.5 GB | Apache-2.0 | Google's edge model; strong captions |
+| LFM2.5-VL 1.6B | `LiquidAI/LFM2.5-VL-1.6B-GGUF:Q4_0` | ~1.3 GB | LFM Open License 1.0 | Smallest and fastest; check the license for commercial use |
 
-```sh
-cargo xtask models list               # catalog and what's downloaded
-cargo xtask models fetch qwen3.5-4b   # resumable, checked against Hugging Face's SHA-256 (HF_TOKEN for gated repos)
-cargo xtask llm serve qwen3.5-4b      # runs llama.cpp and prints the HOARD_LLM_* settings for hoardd
-```
-
-Models land in `models/<id>/model.gguf` and `mmproj.gguf` (`HOARD_MODELS_DIR` to put them elsewhere).
-Serving needs llama.cpp: `curl -LsSf https://llama.app/install.sh | sh`, `brew install llama.cpp` or
-`winget install llama.cpp`. Thinking models are started with reasoning off, since tagging wants a quick JSON answer.
-With Docker you don't need any of this: every compose file in [deploy/](deploy/) includes an `llm` service (llama.cpp's
-container image) that downloads `qwen3.5-2b` from Hugging Face on its first start and serves it to Hoard. To run
-another model from the table, set its Hugging Face reference and name in `deploy/.env`:
-
-| Model | `HOARD_LOCAL_MODEL_HF` | `HOARD_LOCAL_MODEL_ARGS` |
-|---|---|---|
-| `qwen3.5-2b` | `unsloth/Qwen3.5-2B-GGUF:Q4_K_M` | (default) |
-| `qwen3.5-4b` | `unsloth/Qwen3.5-4B-GGUF:Q4_K_M` | (default) |
-| `qwen3-vl-2b` | `Qwen/Qwen3-VL-2B-Instruct-GGUF:Q4_K_M` | empty |
-| `gemma4-e2b` | `unsloth/gemma-4-E2B-it-GGUF:Q4_K_M` | empty |
-| `lfm2.5-vl-1.6b` | `LiquidAI/LFM2.5-VL-1.6B-GGUF:Q4_0` | empty |
-
-with `HOARD_LOCAL_MODEL` and `HOARD_LLM_MODEL` both set to the model's name. A hosted model (OpenAI, OpenRouter, …)
-or your own Ollama can be set in the portal's **Settings** instead, without a restart. `deploy/compose.yml` has
-ready-to-uncomment Ollama and vLLM services; [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md#ai-tagging) compares them.
+Any other GGUF model on Hugging Face can be downloaded the same way by its `owner/name:quant` reference; the vision
+projector comes along with it. Thinking models run with reasoning off, since tagging wants a quick JSON answer.
+`cargo xtask llm` needs llama.cpp (`curl -LsSf https://llama.app/install.sh | sh`, `brew install llama.cpp` or
+`winget install llama.cpp`) and keeps models in `models/`. A hosted model (OpenAI, OpenRouter, …) or your own Ollama is
+picked in the same place. `deploy/compose.yml` has ready-to-uncomment Ollama and vLLM services, and
+[docs/DEPLOYMENT.md](docs/DEPLOYMENT.md#ai-tagging) compares them.
 
 ### Bulk imports
 
@@ -512,7 +497,7 @@ Also in Settings:
 | `HOARD_BLENDER` | `off` | Blender for model conversion: `off`, `auto` (installed, else download 4.5 LTS), or a path |
 | `HOARD_FFMPEG` | `auto` | `auto` (system ffmpeg, else download one), a path, or `off` |
 | `HOARD_UNREAL_CONVERT` | `keep` | after ingest, convert Unreal packages: `off`, `keep` (keep the .uasset too) or `replace` |
-| `HOARD_LLM_URL` / `_MODEL` / `_API_KEY` / `_VISION` | – | AI tagger (on when URL and model are both set); Settings has presets for the bundled model, OpenRouter, OpenAI, Anthropic, Gemini and Ollama |
+| `HOARD_LLM_URL` / `_MODEL` / `_API_KEY` / `_VISION` | – | AI tagger (on when URL and model are both set); set in Settings, which has the local model server, OpenRouter, OpenAI, Anthropic, Gemini and Ollama |
 | `HOARD_LLM_BATCH` | `40` | assets per AI request |
 | `HOARD_RENDER` | `true` | wgpu model thumbnails |
 | `HOARD_UPDATE_CHECK` | `true` | check GitHub once a day for a newer release |

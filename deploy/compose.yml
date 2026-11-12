@@ -1,6 +1,7 @@
 # Hoard on one machine: the server, its files on a local volume, and automatic updates.
 #   HOARD_TOKEN=$(openssl rand -hex 32) docker compose -f deploy/compose.yml up -d     # then open http://<host>:7878
-# It includes a small local model for AI tagging, and Blender and ffmpeg can be switched on in the portal's Settings.
+# It includes a local model server for AI tagging (pick a model in the portal's Settings), and Blender and ffmpeg can
+# be switched on there too.
 # GPU for model thumbnails and the local model: add -f deploy/compose.gpu-nvidia.yml or -f deploy/compose.gpu-dri.yml.
 # Bigger setups (files on a NAS, remote access) are in docs/DEPLOYMENT.md.
 services:
@@ -11,11 +12,6 @@ services:
       # Uploads, edits and admin calls need this token (the portal asks for it once); browsing doesn't.
       HOARD_TOKEN: ${HOARD_TOKEN:?set HOARD_TOKEN, e.g. HOARD_TOKEN=$(openssl rand -hex 32)}
       HOARD_PUBLIC_URL: ${HOARD_PUBLIC_URL:-}
-      # The bundled model below. Settings in the portal can point Hoard elsewhere or turn AI tagging off.
-      HOARD_LLM_URL: ${HOARD_LLM_URL-http://llm:8080/v1}
-      HOARD_LLM_MODEL: ${HOARD_LLM_MODEL-qwen3.5-2b}
-      HOARD_LLM_VISION: ${HOARD_LLM_VISION:-true}
-      HOARD_LLM_BATCH: ${HOARD_LLM_BATCH:-12}         # assets per request; small models do better with fewer
     volumes:
       - hoard-data:/data          # database, files, thumbnails, backups
     ports:
@@ -25,30 +21,24 @@ services:
       com.centurylinklabs.watchtower.enable: "true"
       com.centurylinklabs.watchtower.scope: hoard
 
-  # A small local vision model for AI tagging and descriptions, served by llama.cpp. It downloads the model from
-  # Hugging Face on first start (about 2 GB, kept in the volume below) and runs on the CPU in about 3 GB of RAM;
-  # a GPU overlay (compose.gpu-*.yml) moves it onto the GPU. Other models: docs/DEPLOYMENT.md, "AI tagging". Don't want
-  # it? Delete this service and set HOARD_LLM_URL= (empty), or point Hoard at another endpoint in Settings.
+  # The local model server for AI tagging and descriptions (llama.cpp). It starts empty: in the portal, Settings →
+  # AI tagging → Local model lists suggested models, downloads the one you pick from Hugging Face into the volume
+  # below, and switches or deletes them later. The suggested ones run on the CPU in 3-6 GB of RAM; a GPU overlay
+  # (compose.gpu-*.yml) moves them onto the GPU. Don't want it? Delete this service (Settings can use a hosted one).
   llm:
     image: ghcr.io/ggml-org/llama.cpp:server
     restart: unless-stopped
     environment:
       LLAMA_CACHE: /models
-      # `<Hugging Face repo>:<quantization>`; the vision projector (mmproj) comes along automatically.
-      LLAMA_ARG_HF_REPO: ${HOARD_LOCAL_MODEL_HF:-unsloth/Qwen3.5-2B-GGUF:Q4_K_M}
-      LLAMA_ARG_ALIAS: ${HOARD_LOCAL_MODEL:-qwen3.5-2b}
-      LLAMA_ARG_CTX_SIZE: "16384"
-      LLAMA_ARG_HOST: 0.0.0.0
-      LLAMA_ARG_PORT: "8080"
-    # Thinking models answer straight away: tagging wants quick JSON, not a chain of thought.
-    command: ${HOARD_LOCAL_MODEL_ARGS---reasoning-budget 0}
+    # One model in memory at a time, room for a batch of assets plus a contact sheet, and thinking models answer
+    # straight away: tagging wants quick JSON, not a chain of thought.
+    command: ["--host", "0.0.0.0", "--port", "8080", "--models-max", "1", "-c", "16384", "--reasoning-budget", "0"]
     volumes:
       - llm-models:/models
 
   # ── Other model servers (optional) ─────────────────────────────────────────────────────────────────────────────
   # Any OpenAI-compatible server works; the `llm` service above (llama.cpp) is the lightest choice. To use one of
-  # these instead, uncomment it (and its volume at the bottom), delete `llm`, then pick it in the portal's Settings
-  # (or set HOARD_LLM_URL / HOARD_LLM_MODEL above).
+  # these instead, uncomment it (and its volume at the bottom), delete `llm`, then pick it in the portal's Settings.
   #
   # Ollama: the easy one if you want to keep several models around and switch between them. It loads a model on
   # first use and unloads it when idle. Fetch models with

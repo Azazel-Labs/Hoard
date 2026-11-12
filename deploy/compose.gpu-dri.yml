@@ -12,7 +12,7 @@ services:
     group_add:
       - "${RENDER_GID:?set RENDER_GID to the host's render group id: getent group render | cut -d: -f3}"
 
-  # The local model (the compose file you layer this on defines which one).
+  # The local model server: whichever model you pick in Settings runs on the GPU.
   llm:
     image: ghcr.io/ggml-org/llama.cpp:server-vulkan
     environment:

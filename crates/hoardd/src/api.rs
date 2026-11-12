@@ -50,6 +50,7 @@ pub(crate) fn router(state: &AppState) -> Router<AppState> {
         .route("/api/admin/backup", post(admin_backup))
         .route("/api/admin/settings", get(get_settings).put(put_settings))
         .route("/api/admin/llm/models", post(llm_models))
+        .route("/api/admin/llm/local", post(llm_local))
         .merge(crate::uploads::router())
         .route_layer(middleware::from_fn_with_state(std::sync::Arc::clone(state), require_token));
 
@@ -1400,6 +1401,8 @@ fn settings_json(state: &AppState) -> Value {
             "vision": now.llm_vision,
             "batch": option(now.llm_batch, cfg.llm_batch, saved.llm_batch.is_some()),
             "enabled": now.llm_enabled(),
+            // Where the compose files' local model server listens.
+            "local_url": crate::local_llm::DEFAULT_URL,
             "saved": saved.llm_url.is_some() || saved.llm_model.is_some() || saved.llm_api_key.is_some()
                 || saved.llm_vision.is_some(),
             "default": {
@@ -1457,6 +1460,44 @@ async fn llm_models(State(state): State<AppState>, Json(body): Json<ModelsBody>)
         .await
         .map_err(|e| AppError::bad_request(format!("{e:#}")))?;
     Ok(Json(json!({ "models": models })))
+}
+
+#[derive(Deserialize)]
+struct LocalBody {
+    url: String,
+    /// `list` (the default), `download` or `delete`.
+    #[serde(default)]
+    action: Option<String>,
+    #[serde(default)]
+    model: Option<String>,
+}
+
+/// The local model server (llama.cpp in router mode): what it has, plus downloading and deleting models. Always
+/// answers with the list, and with `reachable: false` and the reason when there's no such server at `url`.
+async fn llm_local(State(state): State<AppState>, Json(body): Json<LocalBody>) -> ApiResult<Json<Value>> {
+    use crate::local_llm;
+    let url = body.url.trim();
+    if !(url.starts_with("http://") || url.starts_with("https://")) {
+        return Err(AppError::bad_request("The AI address should start with http:// or https://"));
+    }
+    let model = body.model.as_deref().map(str::trim).filter(|m| !m.is_empty());
+    match (body.action.as_deref().unwrap_or("list"), model) {
+        ("list", _) => {}
+        ("download", Some(m)) => {
+            local_llm::download(&state.http, url, m).await.map_err(|e| AppError::bad_request(format!("{e:#}")))?;
+        }
+        ("delete", Some(m)) => {
+            local_llm::remove(&state.http, url, m).await.map_err(|e| AppError::bad_request(format!("{e:#}")))?;
+        }
+        _ => return Err(AppError::bad_request("action is list, download or delete, and the last two need a model")),
+    }
+    Ok(Json(match local_llm::list(&state.http, url).await {
+        Ok(models) => json!({ "reachable": true, "models": models, "suggested": local_llm::SUGGESTED }),
+        // Just the outermost reason ("no model server answers at …"), not the socket error under it.
+        Err(e) => {
+            json!({ "reachable": false, "error": e.to_string(), "models": [], "suggested": local_llm::SUGGESTED })
+        }
+    }))
 }
 
 fn option(value: impl serde::Serialize, default: impl serde::Serialize, saved: bool) -> Value {

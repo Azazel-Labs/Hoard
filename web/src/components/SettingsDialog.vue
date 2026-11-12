@@ -3,8 +3,18 @@
 // choose what happens to Unreal packages, and the server's limits. Saved on the server and in effect at once; a
 // saved setting wins over its HOARD_* variable.
 import { computed, onBeforeUnmount, onMounted, reactive, ref } from 'vue'
-import { ApiError, api, type ModelInfo, type Settings, type SettingsPatch, type ToolSetting, type UnrealConvert } from '../api'
-import { showError, showOk } from '../ui'
+import {
+  ApiError,
+  api,
+  type LocalModel,
+  type LocalModels,
+  type ModelInfo,
+  type Settings,
+  type SettingsPatch,
+  type ToolSetting,
+  type UnrealConvert,
+} from '../api'
+import { confirmDialog, showError, showOk } from '../ui'
 
 const emit = defineEmits<{ close: []; unauthorized: [] }>()
 const dlg = ref<HTMLDialogElement | null>(null)
@@ -24,7 +34,7 @@ const paths = reactive<Record<ToolKey, string>>({ blender: '', ffmpeg: '' })
 const chosen = reactive<Record<ToolKey, Mode>>({ blender: 'off', ffmpeg: 'auto' })
 
 // AI services: picking one fills in its address, so all that's left is a key (for hosted ones) and a model.
-type ProviderId = 'off' | 'bundled' | 'openrouter' | 'openai' | 'anthropic' | 'gemini' | 'ollama' | 'custom'
+type ProviderId = 'off' | 'local' | 'openrouter' | 'openai' | 'anthropic' | 'gemini' | 'ollama' | 'custom'
 interface Provider {
   id: ProviderId
   label: string
@@ -40,10 +50,12 @@ interface Provider {
 const PROVIDERS: Provider[] = [
   { id: 'off', label: 'Off', url: '', hint: 'Packs are tagged with the built-in rules only.' },
   {
-    id: 'bundled',
-    label: 'Bundled local model',
-    url: 'http://llm:8080/v1',
-    hint: 'The llm service in Hoard’s docker compose file. Runs on this machine; nothing leaves it.',
+    id: 'local',
+    label: 'Local model',
+    // Filled in from the server (llm.local_url).
+    url: '',
+    editUrl: true,
+    hint: 'The llm service in Hoard’s compose file (or cargo xtask llm). Download a model below; it runs on this machine and nothing leaves it.',
   },
   {
     id: 'openrouter',
@@ -98,7 +110,10 @@ function providerOf(url: string): ProviderId {
   if (!u) return 'off'
   const exact = PROVIDERS.find((p) => p.url && trimUrl(p.url) === u)
   if (exact) return exact.id
+  if (s.value && u === trimUrl(s.value.llm.local_url)) return 'local'
   if (/:11434(\/|$)/.test(u)) return 'ollama'
+  // The compose service, or `cargo xtask llm` on its usual port.
+  if (/^https?:\/\/(llm(:\d+)?|(localhost|127\.0\.0\.1):8081)(\/|$)/.test(u)) return 'local'
   return 'custom'
 }
 
@@ -170,16 +185,105 @@ function pickProvider(id: ProviderId) {
   llm.removeKey = false
   models.value = []
   modelsState.value = { kind: 'idle', text: '' }
+  local.value = null
   if (id !== 'off' && providerOf(cur.url) === id) {
     // Back to the one in use: put its settings back.
     Object.assign(llm, { url: cur.url, model: cur.model, vision: cur.vision })
-  } else if (id === 'bundled' && providerOf(cur.default.url) === 'bundled') {
-    // The compose file names the bundled model.
-    Object.assign(llm, { url: cur.default.url, model: cur.default.model, vision: cur.default.vision })
+  } else if (id === 'local') {
+    // The server's own default when that's a local model server (`cargo xtask dev --llm`), else the compose service.
+    const url = providerOf(cur.default.url) === 'local' ? cur.default.url : cur.local_url
+    Object.assign(llm, { url, model: '' })
   } else {
     Object.assign(llm, { url: p.url, model: '' })
   }
-  void loadModels()
+  void connect()
+}
+/** Look at the chosen service: the local model server's own list, or any other service's models. */
+function connect() {
+  return llm.provider === 'local' ? loadLocal() : loadModels()
+}
+
+// The local model server (llama.cpp in router mode): downloads models from Hugging Face and lists what it has.
+const local = ref<LocalModels | null>(null)
+const localState = ref<'idle' | 'loading' | 'ok'>('idle')
+/** The model being downloaded or deleted from here, while the server works on it. */
+const localBusy = ref('')
+const otherModel = ref('')
+let localAsk = 0
+let localTimer: number | undefined
+async function loadLocal(action: 'list' | 'download' | 'delete' = 'list', model?: string): Promise<void> {
+  window.clearTimeout(localTimer)
+  const url = trimUrl(llm.url)
+  const ask = ++localAsk
+  if (!url) {
+    local.value = null
+    localState.value = 'idle'
+    return
+  }
+  if (action === 'list' && !local.value) localState.value = 'loading'
+  if (model) localBusy.value = model
+  try {
+    const res = await api.llmLocal(url, action, model)
+    if (ask !== localAsk) return
+    local.value = res
+    if (action === 'download') otherModel.value = ''
+  } catch (e) {
+    if (ask !== localAsk) return
+    if (e instanceof ApiError && e.status === 401) emit('unauthorized')
+    showError((e as Error).message)
+    if (action !== 'list') {
+      localBusy.value = ''
+      return loadLocal()
+    }
+  }
+  localState.value = 'ok'
+  localBusy.value = ''
+  // Keep progress moving while something downloads or starts up.
+  if (local.value?.models.some((m) => ['downloading', 'loading'].includes(m.status))) {
+    localTimer = window.setTimeout(() => void loadLocal(), 1500)
+  }
+}
+const localIds = computed(() => new Set(local.value?.models.map((m) => m.id) ?? []))
+const notDownloaded = computed(() => local.value?.suggested.filter((m) => !localIds.value.has(m.id)) ?? [])
+const nameOf = (id: string) => local.value?.suggested.find((m) => m.id === id)?.name ?? id
+/** The model AI tagging uses right now, if it's on this server. */
+const inUse = (m: LocalModel) => !!s.value && s.value.llm.model === m.id && trimUrl(s.value.llm.url) === trimUrl(llm.url)
+const gb = (n: number) => `${(n / 1e9).toFixed(n >= 1e10 ? 0 : 1)} GB`
+function localStatus(m: LocalModel): string {
+  if (m.status === 'downloading') {
+    const [done, total] = m.progress ?? [0, 0]
+    return total ? `Downloading ${Math.floor((done / total) * 100)}% · ${gb(done)} of ${gb(total)}` : 'Downloading…'
+  }
+  if (m.status === 'incomplete') return 'Download stopped'
+  if (m.failed) return 'Failed to start last time'
+  if (inUse(m)) return m.status === 'loaded' ? 'In use · running' : 'In use'
+  if (m.status === 'loading') return 'Starting…'
+  if (m.status === 'loaded') return 'Running'
+  return m.vision ? 'Ready · takes images' : 'Ready · text only'
+}
+const ready = (m: LocalModel) => !['downloading', 'incomplete'].includes(m.status)
+function useLocal(m: LocalModel) {
+  const patch: SettingsPatch = { llm_url: trimUrl(llm.url), llm_model: m.id, llm_vision: m.vision, llm_api_key: '' }
+  // Small models tag better a few assets at a time; keep a batch size someone chose.
+  if (!s.value?.llm.batch.saved) patch.llm_batch = 12
+  void save(patch, `AI tagging: ${nameOf(m.id)}`)
+}
+async function deleteLocal(m: LocalModel) {
+  const ok = await confirmDialog({
+    title: `Delete ${nameOf(m.id)}?`,
+    body: inUse(m)
+      ? 'AI tagging uses this model, so it stops until you pick another. Its files are deleted from the model server.'
+      : m.status === 'downloading'
+        ? 'The download stops and what came down so far is deleted.'
+        : 'Its files are deleted from the model server. You can download it again later.',
+    confirm: 'Delete',
+    danger: true,
+  })
+  if (ok) void loadLocal('delete', m.id)
+}
+function downloadOther() {
+  const id = otherModel.value.trim()
+  if (id) void loadLocal('download', id)
 }
 const modelLabel = (m: ModelInfo) => [m.name, m.vision ? 'takes images' : ''].filter(Boolean).join(' · ')
 
@@ -343,9 +447,13 @@ const UNREAL: { value: UnrealConvert; label: string; hint: string }[] = [
 onMounted(async () => {
   dlg.value?.showModal()
   await load()
-  if (s.value?.llm.enabled) void loadModels()
+  if (s.value?.llm.enabled || llm.provider === 'local') void connect()
 })
-onBeforeUnmount(() => window.clearTimeout(timer))
+onBeforeUnmount(() => {
+  window.clearTimeout(timer)
+  window.clearTimeout(localTimer)
+  localAsk++
+})
 </script>
 
 <template>
@@ -419,11 +527,11 @@ onBeforeUnmount(() => window.clearTimeout(timer))
                 class="field mono"
                 type="url"
                 spellcheck="false"
-                placeholder="http://localhost:1234/v1"
-                @change="loadModels"
+                :placeholder="llm.provider === 'local' ? s.llm.local_url : 'http://localhost:1234/v1'"
+                @change="connect"
               />
             </template>
-            <template v-if="provider.key || provider.editUrl">
+            <template v-if="provider.key || (provider.editUrl && llm.provider !== 'local')">
               <label for="llm-key">API key</label>
               <div class="key">
                 <input
@@ -440,6 +548,77 @@ onBeforeUnmount(() => window.clearTimeout(timer))
                 <a v-if="provider.keyUrl" class="link" :href="provider.keyUrl" target="_blank" rel="noopener noreferrer">Get a key</a>
               </div>
             </template>
+            <template v-if="llm.provider === 'local' && !local?.reachable">
+              <span />
+              <p v-if="localState !== 'ok'" class="status" data-state="looking" role="status">
+                <span class="dot" aria-hidden="true" />
+                <span class="text">Connecting…</span>
+              </p>
+              <div v-else-if="local" class="local-off">
+                <p class="status" data-state="unavailable" role="status">
+                  <span class="dot" aria-hidden="true" />
+                  <span class="text">{{ local.error }}</span>
+                </p>
+                <p class="hint inline">
+                  Start it with <code>docker compose up -d llm</code> (or <code>cargo xtask llm</code> when developing), then
+                  <button type="button" class="link" @click="loadLocal()">try again</button>. A server that runs just one model
+                  works too: give its model’s name below.
+                </p>
+              </div>
+            </template>
+            <div v-if="llm.provider === 'local' && local?.reachable" class="local">
+              <ul v-if="local.models.length" class="mlist" aria-label="On the model server">
+                <li v-for="m in local.models" :key="m.id" :class="{ on: inUse(m) }">
+                  <span class="what">
+                    <strong>{{ nameOf(m.id) }}</strong>
+                    <small class="mono">{{ m.id }}</small>
+                    <span
+                      class="status"
+                      :data-state="m.status === 'downloading' ? 'downloading' : m.status === 'loading' ? 'looking' : m.failed || m.status === 'incomplete' ? 'unavailable' : inUse(m) ? 'ready' : 'off'"
+                    >
+                      <span class="dot" aria-hidden="true" />
+                      <span class="text">{{ localStatus(m) }}</span>
+                    </span>
+                    <progress v-if="m.status === 'downloading' && m.progress?.[1]" :value="m.progress[0]" :max="m.progress[1]" />
+                  </span>
+                  <span class="acts">
+                    <button v-if="m.status === 'incomplete'" type="button" class="btn" :disabled="!!localBusy" @click="loadLocal('download', m.id)">Resume</button>
+                    <button v-else-if="ready(m) && !inUse(m)" type="button" class="btn primary" :disabled="busy || !!localBusy" @click="useLocal(m)">Use</button>
+                    <button type="button" class="btn ghost" :disabled="!!localBusy" @click="deleteLocal(m)">
+                      {{ localBusy === m.id ? 'Deleting…' : m.status === 'downloading' ? 'Cancel' : 'Delete' }}
+                    </button>
+                  </span>
+                </li>
+              </ul>
+              <p v-else class="hint inline">Nothing downloaded yet. Pick one below; it’s kept on the server, and you can switch any time.</p>
+              <ul v-if="notDownloaded.length" class="mlist" aria-label="Models to download">
+                <li v-for="m in notDownloaded" :key="m.id">
+                  <span class="what">
+                    <strong>{{ m.name }}</strong>
+                    <small>{{ m.size_gb }} GB · {{ m.license }}</small>
+                    <small>{{ m.note }}</small>
+                  </span>
+                  <span class="acts">
+                    <button type="button" class="btn" :disabled="!!localBusy" @click="loadLocal('download', m.id)">
+                      {{ localBusy === m.id ? 'Starting…' : 'Download' }}
+                    </button>
+                  </span>
+                </li>
+              </ul>
+              <div class="key">
+                <input
+                  v-model="otherModel"
+                  class="field mono"
+                  type="text"
+                  spellcheck="false"
+                  aria-label="Another model from Hugging Face"
+                  placeholder="Another from Hugging Face: owner/name-GGUF:Q4_K_M"
+                  @keydown.enter.prevent="downloadOther"
+                />
+                <button type="button" class="btn" :disabled="!otherModel.trim() || !!localBusy" @click="downloadOther">Download</button>
+              </div>
+            </div>
+            <template v-if="llm.provider !== 'local' || (local && !local.reachable)">
             <label for="llm-model">Model</label>
             <div class="key">
               <input
@@ -465,6 +644,7 @@ onBeforeUnmount(() => window.clearTimeout(timer))
                 <span class="dot" aria-hidden="true" />
                 <span class="text">{{ missingKey ? 'Add the API key to see its models' : modelsState.text }}</span>
               </p>
+            </template>
             </template>
             <span />
             <label class="check"><input v-model="llm.vision" type="checkbox" /> Send thumbnails too (needs a model that takes images)</label>
@@ -629,6 +809,20 @@ h3 { margin: 0 0 0.3rem; font-size: 0.7rem; font-weight: 650; letter-spacing: 0.
 .llm .num { width: 6.5rem; flex: none; }
 .llm .unit { color: var(--muted); }
 .llm select.field { justify-self: start; min-width: 14rem; max-width: 100%; }
+.llm code { font-size: 0.95em; }
+.local-off { display: grid; gap: 0.35rem; }
+.local { grid-column: 1 / -1; display: grid; gap: 0.6rem; }
+.mlist { display: grid; gap: 0.4rem; margin: 0; padding: 0; list-style: none; }
+.mlist li {
+  display: flex; gap: 0.8rem; align-items: center; padding: 0.55rem 0.7rem; border: 1px solid var(--line); border-radius: var(--r-chip);
+}
+.mlist li.on { border-color: var(--muted); background: var(--raised); }
+.mlist .what { flex: 1; min-width: 0; display: grid; gap: 0.15rem; }
+.mlist small { color: var(--muted); font-size: inherit; overflow-wrap: anywhere; }
+.mlist .status { margin: 0.1rem 0 0; }
+.mlist progress { width: 100%; height: 0.35rem; accent-color: var(--k-font); }
+.mlist .acts { display: flex; gap: 0.4rem; flex: none; }
+@media (max-width: 30rem) { .mlist li { flex-direction: column; align-items: stretch; } }
 .switches { display: grid; gap: 0.35rem; margin-bottom: 0.8rem; font-size: var(--step--1); }
 .switches .check { display: inline-flex; gap: 0.45rem; align-items: center; }
 @media (max-width: 30rem) { .llm { grid-template-columns: minmax(0, 1fr); } .llm > span:empty { display: none; } }

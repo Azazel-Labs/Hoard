@@ -1,16 +1,14 @@
 //! `cargo xtask`: Hoard's project automation, in Rust so it runs the same on Linux, macOS and Windows.
 //!
 //! ```text
-//! cargo xtask models list                 # small local models for the LLM tagger
-//! cargo xtask models fetch qwen3.5-2b     # download (resumable, SHA-256 verified)
-//! cargo xtask llm serve                   # run it behind llama.cpp's OpenAI-compatible server
-//! cargo xtask dev --llm                   # hoardd + Vite dev server (+ the local model), wired together
+//! cargo xtask dev                         # hoardd + Vite dev server with hot reload
+//! cargo xtask dev --llm                   # ...plus a local model server (pick a model in Settings)
+//! cargo xtask llm                         # just the local model server (llama.cpp in router mode)
 //! cargo xtask ci                          # what CI runs: fmt, clippy, tests, web build
 //! ```
 #![expect(clippy::print_stdout, reason = "a CLI tool: printing is the point")]
 
 mod llm;
-mod models;
 
 use std::path::{Path, PathBuf};
 use std::process::{Child, Command, ExitStatus};
@@ -28,17 +26,21 @@ struct Cli {
 
 #[derive(Debug, Subcommand)]
 enum Cmd {
-    /// Small local models for the LLM tagger (GGUF files from Hugging Face).
-    #[command(subcommand)]
-    Models(ModelsCmd),
-    /// Run a downloaded model behind llama.cpp's OpenAI-compatible server.
-    #[command(subcommand)]
-    Llm(LlmCmd),
-    /// Run hoardd and the Vite dev server together (and a local model with `--llm`). Ctrl-C stops everything.
+    /// Run a local model server (llama.cpp in router mode) for AI tagging; pick and download models in Settings.
+    Llm {
+        #[command(flatten)]
+        serve: ServeArgs,
+        #[arg(long, value_name = "PATH", help = "Also write the HOARD_LLM_URL setting to this file once ready")]
+        env_file: Option<PathBuf>,
+        /// Extra llama.cpp arguments, after `--`.
+        #[arg(last = true)]
+        extra: Vec<String>,
+    },
+    /// Run hoardd and the Vite dev server together (and a local model server with `--llm`). Ctrl-C stops everything.
     Dev {
-        /// Also serve a local model and point hoardd's LLM tagger at it (default model if no id is given).
-        #[arg(long, num_args = 0..=1, default_missing_value = models::DEFAULT, value_name = "MODEL")]
-        llm: Option<String>,
+        /// Also run a local model server and point hoardd at it; pick a model in Settings.
+        #[arg(long)]
+        llm: bool,
         /// Only run hoardd (serving the built portal from web/dist).
         #[arg(long)]
         no_web: bool,
@@ -56,55 +58,6 @@ enum Cmd {
         /// Upload it to a running server afterwards.
         #[arg(long)]
         upload: bool,
-    },
-}
-
-#[derive(Debug, Subcommand)]
-enum ModelsCmd {
-    /// Show the catalog and what's downloaded.
-    List,
-    /// Download a model and its vision projector.
-    Fetch {
-        /// Catalog id (see `models list`).
-        #[arg(default_value = models::DEFAULT)]
-        id: String,
-        #[arg(long, help = "Quantization to fetch instead of the default, e.g. Q8_0 or Q5_K_M")]
-        quant: Option<String>,
-        /// Download again even if the files are already here.
-        #[arg(long)]
-        force: bool,
-    },
-    /// Re-check downloaded files against their published SHA-256.
-    Verify {
-        /// Catalog id; all downloaded models if omitted.
-        id: Option<String>,
-    },
-    /// Delete a downloaded model.
-    Rm { id: String },
-    /// Print the models folder.
-    Path,
-}
-
-#[derive(Debug, Subcommand)]
-enum LlmCmd {
-    /// Serve a model (downloading it first if needed) and print the settings for hoardd.
-    Serve {
-        #[arg(default_value = models::DEFAULT)]
-        id: String,
-        #[command(flatten)]
-        serve: ServeArgs,
-        #[arg(long, value_name = "PATH", help = "Also write the HOARD_LLM_* settings to this file once ready")]
-        env_file: Option<PathBuf>,
-        /// Extra llama.cpp arguments, after `--`.
-        #[arg(last = true)]
-        extra: Vec<String>,
-    },
-    #[command(about = "Print the HOARD_LLM_* environment for a model, for a .env file or `export`")]
-    Env {
-        #[arg(default_value = models::DEFAULT)]
-        id: String,
-        #[command(flatten)]
-        serve: ServeArgs,
     },
 }
 
@@ -131,7 +84,7 @@ struct ServeArgs {
     /// Port for llama.cpp.
     #[arg(long = "llm-port", default_value_t = 8081)]
     port: u16,
-    /// Context window in tokens: a 16-tile contact sheet plus a batch of 12 files fits comfortably in 16k.
+    /// Context window in tokens: a 16-tile contact sheet plus a batch of 12 assets fits comfortably in 16k.
     #[arg(long = "llm-ctx", default_value_t = 16384)]
     ctx: u32,
 }
@@ -149,109 +102,42 @@ pub(crate) fn root() -> PathBuf {
 
 fn main() -> Result<()> {
     match Cli::parse().cmd {
-        Cmd::Models(cmd) => models_cmd(cmd),
-        Cmd::Llm(LlmCmd::Serve { id, serve, env_file, extra }) => {
-            let model = models::find(&id)?;
-            let installed = llm::ensure_downloaded(model)?;
+        Cmd::Llm { serve, env_file, extra } => {
             let opts = serve.to_serve(extra);
-            let mut child = llm::spawn(model, &installed, &opts)?;
-            llm::wait_ready(&opts, &mut child, Duration::from_secs(300))?;
-            let env = llm::hoard_env(model, &installed, &opts);
+            let mut child = llm::spawn(&opts)?;
+            let ready = llm::wait_ready(&opts, &mut child, Duration::from_secs(60));
+            let mut guard = Guard(vec![("llama.cpp", child)]);
+            ready?;
+            let env = llm::hoard_env(&opts);
             if let Some(path) = env_file {
-                let text = env.iter().map(|(k, v)| format!("{k}={v}")).collect::<Vec<_>>().join("\n") + "\n";
+                let text = env.iter().map(|(k, v)| format!("{k}={v}")).collect::<Vec<_>>().join(
+                    "
+",
+                ) + "
+";
                 std::fs::write(&path, text).with_context(|| format!("write {}", path.display()))?;
             }
-            println!("\n{} is ready. Start hoardd with:\n", model.id);
+            println!(
+                "
+The local model server is ready. Start hoardd with:
+"
+            );
             for (k, v) in env {
                 println!("  {k}={v}");
             }
-            println!("\nCtrl-C to stop.");
+            println!(
+                "
+then pick a model in Settings → AI tagging → Local model. Ctrl-C to stop."
+            );
+            let (_, mut child) = guard.0.remove(0);
             let status = child.wait()?;
             check(status, "llama.cpp")
         }
-        Cmd::Llm(LlmCmd::Env { id, serve }) => {
-            let model = models::find(&id)?;
-            let installed = Installed::load(model.id).with_context(|| {
-                format!("{} isn't downloaded; run `cargo xtask models fetch {}`", model.id, model.id)
-            })?;
-            for (k, v) in llm::hoard_env(model, &installed, &serve.to_serve(Vec::new())) {
-                println!("{k}={v}");
-            }
-            Ok(())
-        }
-        Cmd::Dev { llm, no_web, serve } => dev(llm.as_deref(), no_web, &serve),
+        Cmd::Dev { llm, no_web, serve } => dev(llm, no_web, &serve),
         Cmd::Ci => ci(),
         Cmd::Web => web(),
         Cmd::Sample { upload } => sample(upload),
         Cmd::UnrealExport(args) => unreal_export(&args),
-    }
-}
-
-use models::Installed;
-
-fn models_cmd(cmd: ModelsCmd) -> Result<()> {
-    match cmd {
-        ModelsCmd::List => {
-            println!(
-                "Models for the LLM tagger (all take images; sizes are model + projector at the default quant):\n"
-            );
-            for m in models::CATALOG {
-                let have = Installed::load(m.id)
-                    .filter(|i| i.path("model.gguf").is_some())
-                    .map(|i| format!("downloaded, {}", models::human(i.files.iter().map(|f| f.size).sum())));
-                let default = if m.id == models::DEFAULT { " (default)" } else { "" };
-                println!(
-                    "  {:<16} ~{:.1} GB  {:<22} {}{default}",
-                    m.id,
-                    m.approx_gb,
-                    m.license,
-                    have.unwrap_or_default()
-                );
-                println!("  {:<16} {}", "", m.note);
-                println!("  {:<16} https://huggingface.co/{}\n", "", m.repo);
-            }
-            println!("Files go to {}", models::models_dir().display());
-            Ok(())
-        }
-        ModelsCmd::Fetch { id, quant, force } => {
-            let model = models::find(&id)?;
-            let installed = models::fetch(model, quant.as_deref(), force)?;
-            println!("\n{} is in {}", model.id, models::models_dir().join(&installed.id).display());
-            println!("Serve it with: cargo xtask llm serve {}", model.id);
-            Ok(())
-        }
-        ModelsCmd::Verify { id } => {
-            let ids: Vec<&str> = match &id {
-                Some(id) => vec![models::find(id)?.id],
-                None => models::CATALOG.iter().map(|m| m.id).collect(),
-            };
-            let mut any = false;
-            for id in ids {
-                if let Some(i) = Installed::load(id) {
-                    any = true;
-                    models::verify(&i)?;
-                }
-            }
-            if !any {
-                println!("Nothing downloaded yet.");
-            }
-            Ok(())
-        }
-        ModelsCmd::Rm { id } => {
-            let model = models::find(&id)?;
-            let dir = models::models_dir().join(model.id);
-            if dir.is_dir() {
-                std::fs::remove_dir_all(&dir).with_context(|| format!("delete {}", dir.display()))?;
-                println!("Deleted {}", dir.display());
-            } else {
-                println!("{} isn't downloaded.", model.id);
-            }
-            Ok(())
-        }
-        ModelsCmd::Path => {
-            println!("{}", models::models_dir().display());
-            Ok(())
-        }
     }
 }
 
@@ -267,24 +153,22 @@ impl Drop for Guard {
     }
 }
 
-fn dev(llm: Option<&str>, no_web: bool, serve: &ServeArgs) -> Result<()> {
+fn dev(llm: bool, no_web: bool, serve: &ServeArgs) -> Result<()> {
     let root = root();
     let mut guard = Guard(Vec::new());
     let mut hoardd = cargo();
     hoardd.current_dir(&root).args(["run", "-p", "hoardd", "--"]);
 
-    if let Some(id) = llm {
-        let model = models::find(id)?;
-        let installed = llm::ensure_downloaded(model)?;
+    if llm {
         let opts = serve.to_serve(Vec::new());
-        let mut child = llm::spawn(model, &installed, &opts)?;
-        eprintln!("Waiting for the model to load…");
-        let ready = llm::wait_ready(&opts, &mut child, Duration::from_secs(300));
+        let mut child = llm::spawn(&opts)?;
+        let ready = llm::wait_ready(&opts, &mut child, Duration::from_secs(60));
         guard.0.push(("llama.cpp", child));
         ready?;
-        for (k, v) in llm::hoard_env(model, &installed, &opts) {
+        for (k, v) in llm::hoard_env(&opts) {
             hoardd.env(k, v);
         }
+        eprintln!("Pick a model in Settings → AI tagging → Local model.");
     }
 
     if !no_web && !root.join("web/node_modules").is_dir() {

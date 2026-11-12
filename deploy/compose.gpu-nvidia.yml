@@ -16,7 +16,7 @@ services:
               count: all
               capabilities: [gpu, graphics, compute, utility]
 
-  # The local model (the compose file you layer this on defines which one).
+  # The local model server: whichever model you pick in Settings runs on the GPU.
   llm:
     image: ghcr.io/ggml-org/llama.cpp:server-cuda
     environment:

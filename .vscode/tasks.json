@@ -15,7 +15,7 @@
     },
     {
       "label": "dev + local model",
-      "detail": "Also serves the default local model and points the LLM tagger at it",
+      "detail": "Also runs a local model server; pick a model in Settings",
       "type": "shell",
       "command": "cargo xtask dev --llm",
       "isBackground": true,
@@ -57,28 +57,15 @@
       }
     },
     {
-      "label": "models: list",
-      "type": "shell",
-      "command": "cargo xtask models list",
-      "problemMatcher": []
-    },
-    {
-      "label": "models: fetch",
-      "detail": "Download a small local model for the LLM tagger",
-      "type": "shell",
-      "command": "cargo xtask models fetch ${input:model}",
-      "problemMatcher": []
-    },
-    {
       "label": "llm: serve",
-      "detail": "Serve a local model with llama.cpp; writes .vscode/llm.env for the debugger",
+      "detail": "Run the local model server (llama.cpp); writes .vscode/llm.env for the debugger",
       "type": "shell",
-      "command": "cargo xtask llm serve ${input:model} --env-file .vscode/llm.env",
+      "command": "cargo xtask llm --env-file .vscode/llm.env",
       "isBackground": true,
       "problemMatcher": {
         "owner": "llama",
         "pattern": { "regexp": "^__never_matches__$" },
-        "background": { "activeBegins": true, "beginsPattern": "Starting|Looking up", "endsPattern": "is ready" }
+        "background": { "activeBegins": true, "beginsPattern": "Starting", "endsPattern": "is ready" }
       },
       "presentation": { "panel": "dedicated" }
     },
@@ -95,15 +82,6 @@
       "command": "build",
       "args": ["-p", "hoardd"],
       "problemMatcher": ["$rustc"]
-    }
-  ],
-  "inputs": [
-    {
-      "id": "model",
-      "type": "pickString",
-      "description": "Local model (see `cargo xtask models list`)",
-      "options": ["qwen3.5-2b", "qwen3.5-4b", "qwen3-vl-2b", "gemma4-e2b", "lfm2.5-vl-1.6b"],
-      "default": "qwen3.5-2b"
     }
   ]
 }

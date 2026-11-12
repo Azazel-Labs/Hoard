@@ -1,4 +1,6 @@
-//! Run a downloaded model behind llama.cpp's OpenAI-compatible server, which is what Hoard's LLM tagger talks to.
+//! A local model server for development: llama.cpp's `llama-server` in router mode, the same thing the compose files'
+//! `llm` service runs. It starts with no model; the portal's Settings downloads, switches and deletes models through
+//! it, and they're kept in `<repo>/models`.
 //!
 //! llama.cpp isn't downloaded here: its own installers pick the right build for your GPU. We look for the unified
 //! `llama` binary (`llama serve`), then the classic `llama-server`, or whatever `$HOARD_LLAMA_BIN` points at.
@@ -9,9 +11,7 @@ use std::time::{Duration, Instant};
 
 use anyhow::{Context, Result, bail};
 
-use crate::models::{self, Installed, Model};
-
-/// How to start a llama.cpp server for one model.
+/// How to start the server.
 #[derive(Debug, Clone)]
 pub(crate) struct Serve {
     pub(crate) host: String,
@@ -53,40 +53,31 @@ fn which(name: &str) -> Option<PathBuf> {
     std::env::split_paths(&std::env::var_os("PATH")?).map(|d| d.join(&exe)).find(|p| p.is_file())
 }
 
-/// The model's files, downloading them first if needed.
-pub(crate) fn ensure_downloaded(model: &Model) -> Result<Installed> {
-    if let Some(i) = Installed::load(model.id).filter(|i| i.path("model.gguf").is_some()) {
-        return Ok(i);
-    }
-    eprintln!("{} isn't downloaded yet; fetching it first.", model.id);
-    models::fetch(model, None, false)
+/// Where downloaded models are kept.
+pub(crate) fn models_dir() -> PathBuf {
+    crate::root().join("models")
 }
 
-/// Start llama.cpp for `model`. The child inherits stdout/stderr.
-pub(crate) fn spawn(model: &Model, installed: &Installed, opts: &Serve) -> Result<Child> {
+/// Start the server with no model loaded. The child inherits stdout/stderr.
+pub(crate) fn spawn(opts: &Serve) -> Result<Child> {
     let (bin, unified) = server_binary()?;
-    let main = installed.path("model.gguf").context("model.gguf missing; run `cargo xtask models fetch` again")?;
+    let dir = models_dir();
+    std::fs::create_dir_all(&dir).with_context(|| format!("create {}", dir.display()))?;
     let mut cmd = Command::new(&bin);
     if unified {
         cmd.arg("serve");
     }
-    cmd.arg("-m").arg(&main);
-    if let Some(proj) = installed.path("mmproj.gguf") {
-        cmd.arg("--mmproj").arg(proj);
-    }
+    // Downloads from Settings land here.
+    cmd.env("LLAMA_CACHE", &dir);
     cmd.args(["--host", &opts.host, "--port", &opts.port.to_string(), "-c", &opts.ctx.to_string()]);
-    // Requests name the model by its catalog id (HOARD_LLM_MODEL).
-    cmd.args(["--alias", model.id]);
-    if model.thinking {
-        // Tagging wants a quick JSON answer, not a chain of thought.
-        cmd.args(["--reasoning-budget", "0"]);
-    }
+    // One model in memory at a time; thinking models answer straight away, since tagging wants quick JSON.
+    cmd.args(["--models-max", "1", "--reasoning-budget", "0"]);
     cmd.args(&opts.extra);
-    eprintln!("Starting {} for {} on {}", bin.display(), model.id, opts.base_url());
+    eprintln!("Starting {} on {} (models in {})", bin.display(), opts.base_url(), dir.display());
     cmd.spawn().with_context(|| format!("start {}", bin.display()))
 }
 
-/// Wait until the server answers `/health` (the model can take a while to load).
+/// Wait until the server answers `/health`.
 pub(crate) fn wait_ready(opts: &Serve, child: &mut Child, timeout: Duration) -> Result<()> {
     let agent: ureq::Agent = ureq::Agent::config_builder().timeout_global(Some(Duration::from_secs(2))).build().into();
     let url = format!("{}/health", opts.base_url());
@@ -103,13 +94,8 @@ pub(crate) fn wait_ready(opts: &Serve, child: &mut Child, timeout: Duration) -> 
     bail!("llama.cpp didn't become ready within {}s", timeout.as_secs())
 }
 
-/// Environment that points hoardd at the server.
-pub(crate) fn hoard_env(model: &Model, installed: &Installed, opts: &Serve) -> Vec<(&'static str, String)> {
-    vec![
-        ("HOARD_LLM_URL", format!("{}/v1", opts.base_url())),
-        ("HOARD_LLM_MODEL", model.id.to_owned()),
-        ("HOARD_LLM_VISION", installed.path("mmproj.gguf").is_some().to_string()),
-        // Small models do better with fewer files per request.
-        ("HOARD_LLM_BATCH", "12".to_owned()),
-    ]
+/// Environment that tells hoardd where the server is. The model is picked in Settings, so AI tagging stays off until
+/// then.
+pub(crate) fn hoard_env(opts: &Serve) -> Vec<(&'static str, String)> {
+    vec![("HOARD_LLM_URL", format!("{}/v1", opts.base_url()))]
 }

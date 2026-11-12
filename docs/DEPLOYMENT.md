@@ -200,7 +200,7 @@ docker compose -f deploy/compose.yml -f deploy/compose.gpu-dri.yml --env-file de
 
 If the host has no `render` group, use the group that owns the device: `stat -c %g /dev/dri/renderD128`.
 
-**The local LLM.** Both overlays also move the bundled tagger model (the `llm` service) onto the GPU. NVIDIA swaps in the llama.cpp `server-cuda` image and Intel or AMD the `server-vulkan` image, and both
+**The local model.** Both overlays also move the local model server (the `llm` service) onto the GPU. NVIDIA swaps in the llama.cpp `server-cuda` image and Intel or AMD the `server-vulkan` image, and both
 offload every layer:
 
 ```sh
@@ -212,27 +212,23 @@ can't reach the GPU, so run `hoardd` natively instead, where it uses Metal.
 
 ## AI tagging
 
-Every compose file runs an `llm` service next to Hoard: llama.cpp's server image, which downloads a small vision model
-(`qwen3.5-2b`, about 2 GB) from Hugging Face into the `llm-models` volume on its first start and then serves it on
-the compose network. Hoard sends it each asset's name, path and thumbnail and gets back tags (and, with vision, what's
-in the picture). Until the download finishes, tagging jobs wait and retry. It needs about 3 GB of RAM; on a CPU it
-tags a few assets a minute, and the GPU overlays above make it much faster.
+Every compose file runs an `llm` service next to Hoard: llama.cpp's server in router mode, reachable only on the
+compose network. It starts with no model. Open **Settings → AI tagging** in the portal and choose **Local model**:
+Hoard lists the models it suggests (all small vision models that run on a CPU) and what the server already has. Click
+**Download** on one; it comes from Hugging Face into the `llm-models` volume, with progress shown as it goes. Then click
+**Use** and tagging starts with the next pack. The same list switches to another model or deletes one you no longer
+want, and **Another from Hugging Face** takes any GGUF model by its `owner/name:quant` reference. The suggested models
+need 3-6 GB of RAM; on a CPU they tag a few assets a minute, and the GPU overlays above make them much faster.
 
-To run a different model, set these in `deploy/.env` (the README's table lists the ones Hoard is tuned for):
-
-```sh
-HOARD_LOCAL_MODEL_HF=Qwen/Qwen3-VL-2B-Instruct-GGUF:Q4_K_M   # Hugging Face repo:quant
-HOARD_LOCAL_MODEL=qwen3-vl-2b                                # the name it's served under
-HOARD_LLM_MODEL=qwen3-vl-2b                                  # the name Hoard asks for (same)
-HOARD_LOCAL_MODEL_ARGS=                                      # empty for models without a thinking mode
-```
+Hoard sends the model each asset's name, path and thumbnail and gets back a name, a description and tags (and, with
+vision, what's in the picture).
 
 To run your own model server next to Hoard, `deploy/compose.yml` has commented-out services under "Other model
 servers". The choice, roughly:
 
 | Server | Good for |
 |---|---|
-| llama.cpp (the bundled `llm` service) | One model, CPU or a small GPU, least memory. The default. |
+| llama.cpp (the `llm` service) | Models picked and downloaded from Settings; CPU or a small GPU, least memory. The default. |
 | Ollama | Keeping several models and switching between them (`ollama pull`), loaded on demand and unloaded when idle. |
 | vLLM | A dedicated NVIDIA GPU and a bigger model, when many packs need tagging quickly. |
 | LM Studio | A desktop app on another machine; switch on its server and use its address as "Custom". |
@@ -241,9 +237,8 @@ To use a hosted model or your own server instead, open **Settings** in the porta
 OpenAI, Anthropic and Google Gemini need only an API key, and Ollama or any other OpenAI-compatible server needs only its
 address. Hoard then lists the service's models (marking the ones that take images on OpenRouter); pick one and save.
 It takes effect at once. The key is stored in Hoard's database, is never sent back to the browser, and is cleared when
-you switch to a different address. If you don't need the bundled model then, delete the `llm` service from your
-compose file to free its memory. To go without AI tagging at all, choose **Off** in Settings (or set `HOARD_LLM_URL=`
-empty in `deploy/.env`).
+you switch to a different address. If you don't need the local model server then, delete the `llm` service from
+your compose file to free its memory. To go without AI tagging at all, choose **Off** in Settings.
 
 ## Model conversion with Blender
 

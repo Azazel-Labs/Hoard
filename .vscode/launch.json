@@ -1,6 +1,7 @@
 {
   // Debug the server, the CLI, xtask and tests with CodeLLDB, and the portal with the browser debugger.
-  // "hoardd + local model" starts llama.cpp first (task "llm: serve") and reads its settings from .vscode/llm.env.
+  // "hoardd + local model" starts the local model server first (task "llm: serve") and reads its address from
+  // .vscode/llm.env; pick a model in Settings.
   // "portal (browser)" needs hoardd running; "full stack" starts both.
   "version": "0.2.0",
   "configurations": [
@@ -65,6 +66,6 @@
   "inputs": [
     { "id": "testFilter", "type": "promptString", "description": "Test name filter (empty runs all)", "default": "" },
     { "id": "cliArgs", "type": "promptString", "description": "hoard arguments", "default": "search crate" },
-    { "id": "xtaskArgs", "type": "promptString", "description": "xtask arguments", "default": "models list" }
+    { "id": "xtaskArgs", "type": "promptString", "description": "xtask arguments", "default": "--help" }
   ]
 }

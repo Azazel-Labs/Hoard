@@ -208,6 +208,34 @@ export interface ModelInfo {
   vision?: boolean
 }
 
+/** A model the local model server has, or is downloading (`POST /api/admin/llm/local`). */
+export interface LocalModel {
+  /** Its Hugging Face reference, which is also the name to use it by. */
+  id: string
+  /** `downloading`, `incomplete`, `unloaded` (ready), `loading`, `loaded`, `sleeping`. */
+  status: string
+  /** Bytes done and expected, while downloading. */
+  progress?: [number, number]
+  vision: boolean
+  failed: boolean
+}
+
+/** A model Hoard suggests for the local model server. */
+export interface SuggestedModel {
+  id: string
+  name: string
+  size_gb: number
+  license: string
+  note: string
+}
+
+export interface LocalModels {
+  reachable: boolean
+  error?: string
+  models: LocalModel[]
+  suggested: SuggestedModel[]
+}
+
 export interface Settings {
   blender: ToolSetting
   ffmpeg: ToolSetting
@@ -221,6 +249,8 @@ export interface Settings {
     enabled: boolean
     saved: boolean
     default: { url: string; model: string; has_key: boolean; vision: boolean }
+    /** Where the compose files' local model server listens. */
+    local_url: string
   }
   options: {
     workers: OptionSetting<number>
@@ -404,6 +434,13 @@ export const api = {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ url, api_key }),
+    }),
+  /** The local model server's models; `download` and `delete` act on `model` first. */
+  llmLocal: (url: string, action: 'list' | 'download' | 'delete' = 'list', model?: string) =>
+    request<LocalModels>('/api/admin/llm/local', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ url, action, model }),
     }),
   /** Start or look in on a "download as" conversion; answers when it moves on, or after `wait` seconds. */
   asStatus: (a: { id: string }, format: string, max?: number, wait = 5) =>

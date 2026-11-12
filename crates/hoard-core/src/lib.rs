@@ -110,7 +110,7 @@ pub enum TagSource {
     Meta,
     /// Offline heuristic tagger (filename vocab, image analysis, audio heuristics).
     Rule,
-    /// An AI model (the bundled local one, or any OpenAI-compatible endpoint).
+    /// An AI model (the local model server, or any OpenAI-compatible endpoint).
     /// Stored as `llm` before v1.0.1; that still reads as this.
     #[serde(alias = "llm")]
     Ai,

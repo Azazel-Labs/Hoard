@@ -36,19 +36,15 @@ services:
       # Lets Hoard ask Watchtower (below) to update it as soon as it's idle after a release.
       HOARD_WATCHTOWER_URL: http://watchtower:8080
       HOARD_WATCHTOWER_TOKEN: hoard-update
-      # HTTPS gives browsers HTTP/2 (one connection for the whole thumbnail grid). Self-signed is fine on a private
-      # network: accept the warning once. HTTP/3 additionally needs the UDP port below.
-      HOARD_TLS_SELF_SIGNED: "true"
-      HOARD_TLS_NAMES: 192.168.50.10,nas.local   # the addresses you type into the browser
-      HOARD_HTTP3: "false"
     volumes:
       # Your files are in Garage's data folder above; these are the other two.
       - /volume1/hoard/config:/config      # database, Settings, backups: small, back it up
       - /volume1/hoard/cache:/cache        # thumbnails, uploads in progress, Blender/ffmpeg: can be rebuilt
     ports:
-      # LAN only. Don't forward this port on your router: remote access goes through the tunnel.
+      # LAN only. Don't forward this port on your router: remote access goes through the tunnel. http:// and https://
+      # (Settings → HTTPS) share the TCP port; HTTP/3 uses the UDP one.
       - "4627:4627"
-      - "4627:4627/udp"   # HTTP/3 (QUIC), only used with HOARD_HTTP3 "true"
+      - "4627:4627/udp"
 
   # The local model server for AI tagging and descriptions (llama.cpp). It starts empty: in the portal, Settings →
   # AI tagging → Local model lists suggested models, downloads the one you pick from Hugging Face into the volume

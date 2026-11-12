@@ -51,19 +51,20 @@ Cloudflare's docs don't say this explicitly, so try one upload over 100 MB once 
    WARP), and log in to your team. Optionally add a Gateway network policy so only your identity can reach
    `192.168.50.10:4627`.
 6. **Start it:** `docker compose -f deploy/compose.private.yml --env-file deploy/.env up -d`, then open
-   `https://192.168.50.10:4627` from anywhere with the client connected. The compose file turns on a self-signed
-   certificate (change `HOARD_TLS_NAMES` in it to the address you type), so the browser warns once; accept it and you get
-   HTTP/2. For the `hoard` CLI, copy `tls/self-signed.crt` from Hoard's data folder and pass it with
+   `http://192.168.50.10:4627` from anywhere with the client connected and make your account.
+7. **Turn on HTTPS:** Settings → HTTPS → Hoard's own certificate → Apply. It covers the address you're using. Download
+   `hoard-ca.crt` from the same page and install it on each device (the page has the steps), then open
+   `https://192.168.50.10:4627`: browsers trust it and you get HTTP/2. For the `hoard` CLI, pass the same file with
    `--ca-cert` (or `HOARD_CA_CERT`). Point `hoard sync` (`server = ...`) and MCP
    clients at the same address, and set it as the public address in Settings → Server so MCP links resolve.
 
 Leave guest browsing off even here. The network is private, but an account keeps other devices on your LAN or Zero
 Trust org out.
 
-**HTTP/3.** `HOARD_HTTP3: "true"` in the compose file adds QUIC on UDP 4627 and advertises it with `Alt-Svc`; browsers switch after the
-first page load. Cloudflare's private routing carries UDP as well as TCP, but if HTTP/3 never kicks in over the
-tunnel, HTTP/2 is doing the work and nothing is lost. Browsers only use HTTP/3 when they trust the certificate, so
-with a self-signed one, expect HTTP/2 unless you install the certificate on the device.
+**HTTP/3.** The HTTP/3 switch in Settings → HTTPS adds QUIC on UDP 4627 (the compose file maps it) and advertises it
+with `Alt-Svc`; browsers switch after the first page load. Cloudflare's private routing carries UDP as well as TCP, but
+if HTTP/3 never kicks in over the tunnel, HTTP/2 is doing the work and nothing is lost. Browsers only use HTTP/3 when
+they trust the certificate, so install `hoard-ca.crt` on the device.
 
 **Tailscale instead?** Same model and equally private (`compose.nas-storage.yml` shows the sidecar pattern).
 Tailscale usually connects your laptop *directly* to the NAS, while Cloudflare relays every byte through its edge,
@@ -183,7 +184,7 @@ it's the `update` field.
 
 | Volume | Holds | Size | Lose it and |
 |---|---|---|---|
-| `/config` (`HOARD_DATA_DIR`) | the database with Settings, its backups, the self-signed certificate | small | you lose your library: back this one up |
+| `/config` (`HOARD_DATA_DIR`) | the database with Settings, its backups, the HTTPS certificates | small | you lose your library: back this one up |
 | `/library` | your files: the library location the first-run setup suggests (S3 setups keep them in the bucket) | big | you lose your files |
 | `/cache` (`HOARD_CACHE_DIR`) | thumbnails and previews, uploads in progress, scratch space, downloaded Blender/ffmpeg | medium | **Re-analyze** a pack remakes its thumbnails; tools download again |
 

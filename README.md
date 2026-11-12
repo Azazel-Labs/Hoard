@@ -525,8 +525,8 @@ them and disconnects them.
 - **Claude Code:** `claude mcp add --transport http --scope user hoard https://your-host/mcp`, then `/mcp` to sign in.
 - **claude.ai, Claude Desktop and Cowork:** Settings → Connectors → Add custom connector, paste
   `https://your-host/mcp`, then Connect. These connect from Anthropic's servers, so Hoard has to be reachable from the
-  internet over HTTPS with a certificate browsers trust (for example through a reverse proxy, Tailscale Funnel or a
-  Cloudflare tunnel), and its Public address (Settings → Server) set to that URL.
+  internet over HTTPS with a certificate browsers trust (Settings → HTTPS with your own certificate, or a reverse
+  proxy, Tailscale Funnel or a Cloudflare tunnel), and its Public address (Settings → Server) set to that URL.
 
 **Tagging with your Claude subscription.** Hoard can't sign in to Claude for you (Anthropic doesn't allow other apps to
 use a Claude login), but Claude can come to Hoard: connect it and run `/mcp__hoard__tag_pack Medieval Village` (or ask
@@ -551,21 +551,55 @@ from anywhere only through Cloudflare One private routing (or Tailscale), with n
 (`deploy/compose.private.yml`). It also covers a public hostname via Cloudflare Tunnel, web on a VPS with blobs on the
 NAS, and a Cloudflare-native plan.
 
-## HTTP: TLS, HTTP/2 and HTTP/3
+## HTTPS, HTTP/2 and HTTP/3
 
 A library page loads hundreds of thumbnails, so connection reuse matters. Over plain HTTP, `hoardd` speaks HTTP/1.1
-and cleartext HTTP/2 (h2c), but browsers only use HTTP/2 over TLS. Give it a certificate (`HOARD_TLS_CERT` /
-`HOARD_TLS_KEY`, e.g. from `tailscale cert` or any ACME client), or `HOARD_TLS_SELF_SIGNED=true` for a private
-network, and the whole grid shares one multiplexed connection (ALPN `h2`). `HOARD_HTTP3=true` adds HTTP/3 over QUIC
-on the same port (UDP) and advertises it with `Alt-Svc`; it's experimental. Responses are compressed with
-Brotli/zstd/gzip where it helps (not for images, audio, models or zips), the built portal's hashed assets are
-cached as immutable, and blob downloads carry ETags and Range support.
+and cleartext HTTP/2 (h2c), but browsers only use HTTP/2 over HTTPS, where the whole grid shares one multiplexed
+connection. Browsers also keep some things for HTTPS pages: 3D with WebGPU, the modern clipboard, installing Hoard as
+an app, and Claude connectors. When the portal is opened over plain `http://` from another device, a dismissible line
+under the header says so and links to the setup.
+
+**Settings → HTTPS** turns it on. HTTPS is served on the same port as `http://` (4627 unless `--listen` says
+otherwise): Hoard tells the two apart by the first byte a client sends. So there's no extra port to open, and a change
+applies at once, without a restart. Choose one of:
+
+- **Hoard's own certificate.** Hoard makes a certificate authority once (kept in the data folder, under `tls/`) and
+  issues the server's certificate from it, for the addresses it finds (this computer's name and LAN addresses, the
+  public address from Settings → Server) and any you add. The address you're using is added for you, which matters in
+  Docker, where Hoard can't see the host's addresses. Download `hoard-ca.crt` from the same page and install it once on
+  each device (the page has the steps for Windows, macOS, iPhone and iPad, Android, Linux and Firefox); its browsers
+  then trust Hoard, now and after every renewal. The server certificate is renewed and re-issued by itself. Give the
+  `hoard` CLI the same file with `--ca-cert hoard-ca.crt`.
+- **My certificate.** Paste or upload a PEM certificate chain and its private key. Hoard checks that the key belongs to
+  the certificate and that it's in date, and shows the names it covers and when it runs out. On a tailnet with HTTPS
+  turned on, `tailscale cert <machine>.<tailnet>.ts.net` gives you one browsers trust (for 90 days, so upload the new
+  one before then); for a domain you own, use any ACME client (certbot, acme.sh, lego) and upload `fullchain.pem` and
+  `privkey.pem`.
+- **Off.** Plain `http://` only. The right choice behind a reverse proxy (Caddy, Traefik, nginx, Cloudflare Tunnel,
+  Tailscale Serve or Funnel) that has the certificate: let it send plain `http://` to Hoard. Hoard reads
+  `X-Forwarded-Proto` from it, so sign-in cookies and MCP links still say `https`.
+
+Hoard tries a new certificate in a test connection before switching to it, and keeps what it had if that fails.
+
+**Plain `http://` once HTTPS is on.** It keeps working on the same port. Browsers on other devices that load a page
+over `http://` are sent to `https://` (a temporary redirect, and Hoard never sends HSTS, so turning HTTPS off again
+just works); a switch on the page turns that off. Everything else is served as before: the `hoard` CLI, the Unreal
+worker, scripts, MCP apps, anything going through a reverse proxy, and `http://localhost` on the server itself. If a
+certificate ever locks you out, open `http://localhost:4627` on the server, or run `hoardd --https-off` (in Docker:
+`docker compose exec hoard hoardd --https-off`) and restart Hoard.
+
+**HTTP/3** (a switch on the same page) adds QUIC on the same port number over UDP, advertised with `Alt-Svc`, so
+browsers move to it after the first page load. Open UDP 4627 as well as TCP (the compose files map both). Browsers only
+use HTTP/3 with a certificate they trust.
+
+Responses are compressed with Brotli/zstd/gzip where it helps (not for images, audio, models or zips), the built
+portal's hashed assets are cached as immutable, and blob downloads carry ETags and Range support.
 
 ## Configuration
 
 Where the server keeps things, how it listens and how it's protected are set when it starts, with a flag or env var
 (`hoardd --help` lists them). Everything else (AI tagging, Blender, ffmpeg, Unreal conversion, thumbnails, the
-update check, workers, limits, the public address, the SoundFont) is changed in **Settings** in the portal header
+update check, workers, limits, the public address, HTTPS, the SoundFont) is changed in **Settings** in the portal header
 (behind the write token), takes effect at once, and is kept in the database, so it survives restarts and backups.
 
 Set before starting (these need a restart):
@@ -573,13 +607,10 @@ Set before starting (these need a restart):
 | Env | Default | |
 |---|---|---|
 | `HOARD_LISTEN` | `127.0.0.1:4627` | bind address |
-| `HOARD_DATA_DIR` | `./hoard-data` | the database (with Settings), its backups, the self-signed certificate |
+| `HOARD_DATA_DIR` | `./hoard-data` | the database (with Settings), its backups, the HTTPS certificates |
 | `HOARD_FILES_DIR` | – | the folder the first-run setup suggests (`/library` in the image) |
 | `HOARD_CACHE_DIR` | `<data dir>` | thumbnails and previews, uploads in progress, scratch space, downloaded Blender/ffmpeg |
 | `HOARD_WEB_DIR` | `./web/dist` | built portal |
-| `HOARD_TLS_CERT` / `_KEY` | – | serve HTTPS (HTTP/2) with this PEM chain and key |
-| `HOARD_TLS_SELF_SIGNED` / `HOARD_TLS_NAMES` | `false` / – | HTTPS with a generated certificate for these names |
-| `HOARD_HTTP3` | `false` | also serve HTTP/3 (needs TLS) |
 | `HOARD_WATCHTOWER_URL` / `_TOKEN` / `_CONTAINER` | – / – / `hoard` | Watchtower's HTTP API: Hoard asks it to update this container once a release is out and Hoard is idle |
 | `HOARD_LOCAL_LLM_URL` | `http://llm:8080/v1` | where the local model server listens (Settings → AI tagging → Local model) |
 | `HOARD_S3_ENDPOINT` / `_BUCKET` / `_REGION` / `_ACCESS_KEY` / `_SECRET_KEY` / `_HEADERS` | – | the S3 service for `s3://` library locations |
@@ -709,6 +740,9 @@ Requests that change something are marked 🔒: guests can't make them. A browse
 | GET | `/api/activity` | background work in progress |
 | GET | `/api/admin/jobs` | the job queue |
 | GET 🔒, PUT 🔒 | `/api/admin/settings` | Settings: read, or change some (`null` goes back to the flag) |
+| GET 🔒, PUT 🔒 | `/api/admin/https` | Settings → HTTPS: what's served, or change it: `{mode?: "off"\|"own"\|"custom", names?, http3?, redirect?, cert?, key?}` (tried before it's switched to; 400 with the reason if it doesn't work) |
+| POST 🔒 | `/api/admin/https/check` | `{cert, key}`: what a certificate covers and until when, and whether the key matches, without saving |
+| GET | `/api/https/ca.crt` | Hoard's certificate authority, to install on devices |
 | GET 🔒, POST 🔒 | `/api/admin/locations` | library locations (with whether each is reachable and its pack count), or add one: `{mode, path, kinds, catch_all, name?}` |
 | PATCH 🔒, DELETE 🔒 | `/api/admin/locations/{id}` | rename one, change its kinds or make it the catch-all; or remove it. A managed one must be empty (409 otherwise), and one that can't be reached is refused with 503 unless `?force=true` |
 | POST 🔒 | `/api/admin/locations/{id}/empty` | move a managed location's files to the other locations by kind, then remove it; returns 202 and runs as a job |

@@ -62,7 +62,8 @@ ENV HOARD_LISTEN=0.0.0.0:4627 \
     HOARD_CACHE_DIR=/cache \
     HOARD_WEB_DIR=/srv/hoard/web
 VOLUME /config
-EXPOSE 4627
+# http:// and https:// (Settings → HTTPS) share the TCP port; HTTP/3 uses UDP.
+EXPOSE 4627 4627/udp
 HEALTHCHECK CMD ["sh", "-c", "exec 3<>/dev/tcp/127.0.0.1/4627"]
 ENTRYPOINT ["hoard-entrypoint"]
 CMD ["hoardd"]

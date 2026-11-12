@@ -1,119 +1,133 @@
-//! Listening: HTTP/1.1, HTTP/2 and (opt-in) HTTP/3.
+//! Listening: HTTP/1.1, HTTP/2 and HTTP/3, plain and HTTPS on one port.
 //!
 //! Browsers only speak HTTP/2 over TLS, and HTTP/2 is what makes a grid of hundreds of thumbnails fast: one
 //! connection, every request multiplexed, headers compressed. Over plain HTTP they fall back to HTTP/1.1 with about six
-//! connections per host. So:
+//! connections per host.
 //!
-//! - no TLS configured: HTTP/1.1, plus cleartext HTTP/2 ("h2c", prior knowledge) for the CLI and reverse proxies;
-//! - `--tls-cert/--tls-key` or `--tls-self-signed`: HTTPS with HTTP/2 negotiated via ALPN, HTTP/1.1 as fallback;
-//! - `--http3` (needs TLS): HTTP/3 over QUIC on the same port number (UDP), advertised with `Alt-Svc` so browsers
-//!   switch to it after their first request. The Rust HTTP/3 stack (`h3`) is still pre-1.0, hence opt-in.
+//! Hoard answers both on the `--listen` port and tells them apart by the first byte a client sends (a TLS handshake
+//! starts with 0x16, an HTTP request with a letter, an HTTP/2 preface with `P`):
+//!
+//! - plain: HTTP/1.1, and cleartext HTTP/2 ("h2c", prior knowledge) for the CLI and reverse proxies;
+//! - TLS, while HTTPS is on in Settings: HTTP/2 negotiated via ALPN, HTTP/1.1 as fallback, with the certificate
+//!   chosen there (looked up per connection, so a change applies at once);
+//! - HTTP/3 (QUIC, UDP on the same port number), when turned on in Settings, advertised with `Alt-Svc` so browsers
+//!   switch to it after their first request.
+//!
+//! See `https.rs` for what plain HTTP does once HTTPS is on.
 
+use std::convert::Infallible;
 use std::net::SocketAddr;
 use std::sync::Arc;
 use std::time::Duration;
 
-use anyhow::{Context, Result, bail};
+use anyhow::{Context, Result};
 use axum::Router;
 use axum::body::Body;
+use axum::http::{HeaderValue, Request, Response, StatusCode, header};
 use bytes::{Buf, Bytes};
 use futures_util::StreamExt;
+use hyper_util::rt::{TokioExecutor, TokioIo};
+use hyper_util::server::graceful::{GracefulShutdown, Watcher};
 use rustls::ServerConfig;
-use rustls_pki_types::pem::PemObject;
-use rustls_pki_types::{CertificateDer, PrivateKeyDer};
+use tokio::io::{AsyncRead, AsyncWrite};
+use tokio::net::TcpStream;
 use tower::ServiceExt;
 
 use crate::config::Config;
 
-type CertChain = (Vec<CertificateDer<'static>>, PrivateKeyDer<'static>);
-
-/// Load the configured certificate, or create (once) and reuse a self-signed one under the data dir.
-pub(crate) fn load_tls(cfg: &Config) -> Result<Option<CertChain>> {
-    let (cert_path, key_path) = match (&cfg.tls_cert, &cfg.tls_key) {
-        (Some(c), Some(k)) => (c.clone(), k.clone()),
-        (None, None) if cfg.tls_self_signed => {
-            let dir = cfg.data_dir.join("tls");
-            let (c, k) = (dir.join("self-signed.crt"), dir.join("self-signed.key"));
-            if !c.is_file() || !k.is_file() {
-                std::fs::create_dir_all(&dir)?;
-                let mut names = vec!["localhost".to_owned(), "127.0.0.1".to_owned(), "::1".to_owned()];
-                names.extend(cfg.tls_names.iter().cloned());
-                if !cfg.listen.ip().is_unspecified() {
-                    names.push(cfg.listen.ip().to_string());
-                }
-                names.sort();
-                names.dedup();
-                let generated = rcgen::generate_simple_self_signed(names.clone()).context("generate certificate")?;
-                std::fs::write(&c, generated.cert.pem())?;
-                std::fs::write(&k, generated.signing_key.serialize_pem())?;
-                tracing::info!(names = ?names, cert = %c.display(), "generated a self-signed TLS certificate");
-            }
-            (c, k)
-        }
-        (None, None) => return Ok(None),
-        _ => bail!("--tls-cert and --tls-key go together"),
-    };
-    let certs = CertificateDer::pem_file_iter(&cert_path)
-        .with_context(|| format!("read {}", cert_path.display()))?
-        .collect::<Result<Vec<_>, _>>()?;
-    let key = PrivateKeyDer::from_pem_file(&key_path).with_context(|| format!("read {}", key_path.display()))?;
-    Ok(Some((certs, key)))
-}
-
-fn rustls_config(chain: &CertChain, alpn: &[&[u8]]) -> Result<ServerConfig> {
-    let provider = Arc::new(rustls::crypto::ring::default_provider());
-    let mut config = ServerConfig::builder_with_provider(provider)
-        .with_safe_default_protocol_versions()?
-        .with_no_client_auth()
-        .with_single_cert(chain.0.clone(), chain.1.clone_key())?;
-    config.alpn_protocols = alpn.iter().map(|p| p.to_vec()).collect();
-    Ok(config)
-}
-
-/// `Alt-Svc` value advertising HTTP/3 on `port`.
-pub(crate) fn alt_svc(port: u16) -> String {
-    format!("h3=\":{port}\"; ma=86400")
-}
+/// A client that connects and says nothing is dropped after this long; a TLS handshake gets this long.
+const FIRST_BYTE: Duration = Duration::from_secs(30);
+const HANDSHAKE: Duration = Duration::from_secs(15);
 
 pub(crate) async fn serve(cfg: &Config, app: Router) -> Result<()> {
     let addr = cfg.listen;
-    let Some(chain) = load_tls(cfg)? else {
-        if cfg.http3 {
-            bail!("--http3 needs TLS: set --tls-cert/--tls-key or --tls-self-signed");
+    let listener = tokio::net::TcpListener::bind(addr).await.with_context(|| format!("listen on {addr}"))?;
+    let https = crate::https::tls_config().is_some();
+    tracing::info!(%addr, https, "listening: http/1.1 + h2c, and https with http/2 when it's on in Settings");
+    crate::https::serving(app.clone());
+
+    let graceful = GracefulShutdown::new();
+    let shutdown = shutdown_signal();
+    tokio::pin!(shutdown);
+    loop {
+        tokio::select! {
+            accepted = listener.accept() => match accepted {
+                Ok((stream, remote)) => {
+                    tokio::spawn(connection(stream, remote, app.clone(), graceful.watcher()));
+                }
+                Err(e) => {
+                    // Out of file handles and the like: don't spin.
+                    tracing::warn!(error = %e, "accept failed");
+                    tokio::time::sleep(Duration::from_millis(100)).await;
+                }
+            },
+            () = &mut shutdown => break,
         }
-        // axum::serve speaks HTTP/1.1 and, with the `http2` feature, h2c with prior knowledge.
-        let listener = tokio::net::TcpListener::bind(addr).await?;
-        tracing::info!(%addr, "listening: http/1.1 + h2c (no TLS, so browsers will use HTTP/1.1)");
-        axum::serve(listener, app.into_make_service_with_connect_info::<SocketAddr>())
-            .with_graceful_shutdown(shutdown_signal())
-            .await?;
-        return Ok(());
-    };
-
-    if cfg.http3 {
-        let h3_config = rustls_config(&chain, &[b"h3"])?;
-        let h3_app = app.clone();
-        tokio::spawn(async move {
-            if let Err(e) = serve_h3(addr, h3_config, h3_app).await {
-                tracing::error!(error = %format!("{e:#}"), "HTTP/3 listener stopped");
-            }
-        });
     }
-
-    let tls =
-        axum_server::tls_rustls::RustlsConfig::from_config(Arc::new(rustls_config(&chain, &[b"h2", b"http/1.1"])?));
-    let handle = axum_server::Handle::new();
-    let shutdown = handle.clone();
-    tokio::spawn(async move {
-        shutdown_signal().await;
-        shutdown.graceful_shutdown(Some(Duration::from_secs(10)));
-    });
-    tracing::info!(%addr, http3 = cfg.http3, "listening: https with http/2 (ALPN), http/1.1 fallback");
-    axum_server::bind_rustls(addr, tls)
-        .handle(handle)
-        .serve(app.into_make_service_with_connect_info::<SocketAddr>())
-        .await?;
+    drop(listener);
+    crate::https::stop();
+    tokio::select! {
+        () = graceful.shutdown() => {}
+        () = tokio::time::sleep(Duration::from_secs(10)) => tracing::info!("stopped waiting for open connections"),
+    }
     Ok(())
+}
+
+/// One TCP connection: TLS or plain, by its first byte.
+async fn connection(stream: TcpStream, remote: SocketAddr, app: Router, watcher: Watcher) {
+    stream.set_nodelay(true).ok();
+    let mut first = [0u8; 1];
+    let tls = match tokio::time::timeout(FIRST_BYTE, stream.peek(&mut first)).await {
+        Ok(Ok(1)) => first[0] == 0x16,
+        _ => return,
+    };
+    if !tls {
+        return serve_io(TokioIo::new(stream), remote, app, false, watcher).await;
+    }
+    // HTTPS is off: nothing to answer a handshake with.
+    let Some(config) = crate::https::tls_config() else { return };
+    match tokio::time::timeout(HANDSHAKE, tokio_rustls::TlsAcceptor::from(config).accept(stream)).await {
+        Ok(Ok(tls)) => serve_io(TokioIo::new(tls), remote, app, true, watcher).await,
+        Ok(Err(e)) => tracing::debug!(%remote, error = %e, "TLS handshake failed"),
+        Err(_) => tracing::debug!(%remote, "TLS handshake timed out"),
+    }
+}
+
+async fn serve_io<I>(io: TokioIo<I>, remote: SocketAddr, app: Router, secure: bool, watcher: Watcher)
+where
+    I: AsyncRead + AsyncWrite + Unpin + Send + 'static,
+{
+    let service = hyper::service::service_fn(move |req: Request<hyper::body::Incoming>| {
+        let app = app.clone();
+        async move { Ok::<_, Infallible>(handle(app, req.map(Body::new), remote, secure).await) }
+    });
+    let builder = hyper_util::server::conn::auto::Builder::new(TokioExecutor::new());
+    if let Err(e) = watcher.watch(builder.serve_connection_with_upgrades(io, service)).await {
+        tracing::debug!(%remote, error = %e, "connection ended with an error");
+    }
+}
+
+/// One request, from any of the listeners, into the app.
+async fn handle(app: Router, mut req: Request<Body>, remote: SocketAddr, secure: bool) -> Response<Body> {
+    if secure {
+        // What a reverse proxy would say: the cookie gets `Secure`, and MCP builds `https://` addresses.
+        req.headers_mut().insert("x-forwarded-proto", HeaderValue::from_static("https"));
+    } else if let Some(to) = crate::https::redirect_for(&req, remote) {
+        // 307 rather than 308, and no HSTS: browsers don't remember it, so turning HTTPS off again just works.
+        return Response::builder()
+            .status(StatusCode::TEMPORARY_REDIRECT)
+            .header(header::LOCATION, to)
+            .header(header::CACHE_CONTROL, "no-store")
+            .body(Body::empty())
+            .unwrap_or_default();
+    }
+    let alt_svc = if secure { crate::https::alt_svc(&req) } else { None };
+    req.extensions_mut().insert(axum::extract::ConnectInfo(remote));
+    let mut resp = app.oneshot(req).await.unwrap_or_else(|never| match never {});
+    if let Some(v) = alt_svc {
+        resp.headers_mut().insert(header::ALT_SVC, v);
+    }
+    resp
 }
 
 async fn shutdown_signal() {
@@ -124,7 +138,8 @@ async fn shutdown_signal() {
 // ---------------------------------------------------------------------------------------------
 // HTTP/3
 
-async fn serve_h3(addr: SocketAddr, tls: ServerConfig, app: Router) -> Result<()> {
+/// QUIC settings around `tls` (ALPN `h3`).
+pub(crate) fn quic_config(tls: Arc<ServerConfig>) -> Result<quinn::ServerConfig> {
     let quic = quinn::crypto::rustls::QuicServerConfig::try_from(tls).context("QUIC TLS config")?;
     let mut server_config = quinn::ServerConfig::with_crypto(Arc::new(quic));
     // Notice vanished clients quickly (closed laptop lid), and keep healthy idle connections alive.
@@ -132,52 +147,61 @@ async fn serve_h3(addr: SocketAddr, tls: ServerConfig, app: Router) -> Result<()
     transport.max_idle_timeout(Some(Duration::from_secs(30).try_into()?));
     transport.keep_alive_interval(Some(Duration::from_secs(10)));
     server_config.transport_config(Arc::new(transport));
+    Ok(server_config)
+}
+
+/// Start the HTTP/3 listener on UDP `addr`. It runs until the endpoint is closed.
+pub(crate) fn start_h3(addr: SocketAddr, tls: Arc<ServerConfig>, app: Router) -> Result<quinn::Endpoint> {
     let endpoint =
-        quinn::Endpoint::server(server_config, addr).with_context(|| format!("bind UDP {addr} for HTTP/3"))?;
+        quinn::Endpoint::server(quic_config(tls)?, addr).with_context(|| format!("listen on UDP {addr} for HTTP/3"))?;
     tracing::info!(%addr, "listening: http/3 (QUIC)");
-    while let Some(incoming) = endpoint.accept().await {
-        let app = app.clone();
-        tokio::spawn(async move {
-            let remote = incoming.remote_address();
-            let conn = match incoming.await {
-                Ok(c) => c,
-                Err(e) => return tracing::debug!(%remote, error = %e, "QUIC handshake failed"),
-            };
-            let mut h3 = match h3::server::Connection::<_, Bytes>::new(h3_quinn::Connection::new(conn)).await {
-                Ok(c) => c,
-                Err(e) => return tracing::debug!(%remote, error = %e, "HTTP/3 setup failed"),
-            };
-            loop {
-                match h3.accept().await {
-                    Ok(Some(resolver)) => {
-                        let app = app.clone();
-                        tokio::spawn(async move {
-                            match resolver.resolve_request().await {
-                                Ok((req, stream)) => {
-                                    if let Err(e) = handle_h3(app, req, stream, remote).await {
-                                        tracing::debug!(error = %format!("{e:#}"), "HTTP/3 request failed");
-                                    }
-                                }
-                                Err(e) => tracing::debug!(error = %e, "bad HTTP/3 request"),
+    let accepting = endpoint.clone();
+    tokio::spawn(async move {
+        while let Some(incoming) = accepting.accept().await {
+            tokio::spawn(h3_connection(incoming, app.clone()));
+        }
+    });
+    Ok(endpoint)
+}
+
+async fn h3_connection(incoming: quinn::Incoming, app: Router) {
+    let remote = incoming.remote_address();
+    let conn = match incoming.await {
+        Ok(c) => c,
+        Err(e) => return tracing::debug!(%remote, error = %e, "QUIC handshake failed"),
+    };
+    let mut h3 = match h3::server::Connection::<_, Bytes>::new(h3_quinn::Connection::new(conn)).await {
+        Ok(c) => c,
+        Err(e) => return tracing::debug!(%remote, error = %e, "HTTP/3 setup failed"),
+    };
+    loop {
+        match h3.accept().await {
+            Ok(Some(resolver)) => {
+                let app = app.clone();
+                tokio::spawn(async move {
+                    match resolver.resolve_request().await {
+                        Ok((req, stream)) => {
+                            if let Err(e) = handle_h3(app, req, stream, remote).await {
+                                tracing::debug!(error = %format!("{e:#}"), "HTTP/3 request failed");
                             }
-                        });
+                        }
+                        Err(e) => tracing::debug!(error = %e, "bad HTTP/3 request"),
                     }
-                    Ok(None) => break,
-                    Err(e) => {
-                        tracing::debug!(%remote, error = %e, "HTTP/3 connection closed");
-                        break;
-                    }
-                }
+                });
             }
-        });
+            Ok(None) => break,
+            Err(e) => {
+                tracing::debug!(%remote, error = %e, "HTTP/3 connection closed");
+                break;
+            }
+        }
     }
-    Ok(())
 }
 
 /// Bridge one HTTP/3 request into the axum router and stream the response back.
 async fn handle_h3<S>(
     app: Router,
-    req: http::Request<()>,
+    req: Request<()>,
     stream: h3::server::RequestStream<S, Bytes>,
     remote: SocketAddr,
 ) -> Result<()>
@@ -209,12 +233,9 @@ where
     });
     let body =
         Body::from_stream(futures_util::stream::unfold(rx, |mut rx| async move { rx.recv().await.map(|v| (v, rx)) }));
-    let mut req = req.map(|()| body);
-    req.extensions_mut().insert(axum::extract::ConnectInfo(remote));
-
-    let resp = app.oneshot(req).await.unwrap_or_else(|never| match never {});
+    let resp = handle(app, req.map(|()| body), remote, true).await;
     let (parts, body) = resp.into_parts();
-    send.send_response(http::Response::from_parts(parts, ())).await?;
+    send.send_response(Response::from_parts(parts, ())).await?;
     let mut data = body.into_data_stream();
     while let Some(chunk) = data.next().await {
         send.send_data(chunk?).await?;

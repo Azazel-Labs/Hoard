@@ -33,7 +33,7 @@ pub(crate) struct Config {
     #[arg(long, env = "HOARD_LISTEN", default_value = "127.0.0.1:4627")]
     pub(crate) listen: SocketAddr,
 
-    /// The database (with Settings), its backups and the self-signed TLS certificate: small, and the one to back up.
+    /// The database (with Settings), its backups and the HTTPS certificates: small, and the one to back up.
     #[arg(long, env = "HOARD_DATA_DIR", default_value = "./hoard-data")]
     pub(crate) data_dir: PathBuf,
 
@@ -53,32 +53,15 @@ pub(crate) struct Config {
     #[arg(long, env = "HOARD_WEB_DIR", default_value = "./web/dist")]
     pub(crate) web_dir: PathBuf,
 
-    /// TLS certificate chain (PEM). With `--tls-key`, serves HTTPS with HTTP/2. `tailscale cert <name>` or any ACME
-    /// client gives you one browsers trust.
-    #[arg(long, env = "HOARD_TLS_CERT")]
-    pub(crate) tls_cert: Option<PathBuf>,
-
-    /// TLS private key (PEM).
-    #[arg(long, env = "HOARD_TLS_KEY")]
-    pub(crate) tls_key: Option<PathBuf>,
-
-    /// Serve HTTPS with a self-signed certificate generated on first start (kept in `--data-dir/tls`). Browsers will
-    /// warn once; accept it and you get HTTP/2.
-    #[arg(long, env = "HOARD_TLS_SELF_SIGNED", default_value_t = false, action = clap::ArgAction::Set)]
-    pub(crate) tls_self_signed: bool,
-
-    /// Extra host names/IPs for the self-signed certificate, comma-separated (e.g. `192.168.50.10,nas.local`).
-    #[arg(long, env = "HOARD_TLS_NAMES", value_delimiter = ',')]
-    pub(crate) tls_names: Vec<String>,
-
-    /// Also serve HTTP/3 (QUIC, UDP on the same port) and advertise it with `Alt-Svc`. Needs TLS. Experimental.
-    #[arg(long, env = "HOARD_HTTP3", default_value_t = false, action = clap::ArgAction::Set)]
-    pub(crate) http3: bool,
-
     /// Give this account a new random password, print it, and exit (the server isn't started). For a forgotten
     /// password: `docker compose exec hoard hoardd --reset-password <name>`.
     #[arg(long, value_name = "NAME")]
     pub(crate) reset_password: Option<String>,
+
+    /// Turn HTTPS off, and exit (the server isn't started). For when a certificate locks you out: start Hoard again
+    /// and set HTTPS up in Settings. In Docker: `docker compose exec hoard hoardd --https-off`, then restart.
+    #[arg(long)]
+    pub(crate) https_off: bool,
 
     /// Watchtower's HTTP API (e.g. `http://watchtower:8080`). When set, Hoard asks it to update this container as
     /// soon as a newer release is out and the server is idle, instead of waiting for Watchtower's schedule.
@@ -217,6 +200,11 @@ const RETIRED_ENV: &[&str] = &[
     "HOARD_LLM_API_KEY",
     "HOARD_LLM_VISION",
     "HOARD_LLM_BATCH",
+    "HOARD_TLS_CERT",
+    "HOARD_TLS_KEY",
+    "HOARD_TLS_SELF_SIGNED",
+    "HOARD_TLS_NAMES",
+    "HOARD_HTTP3",
 ];
 
 /// Warn about each retired setting variable that's still set.

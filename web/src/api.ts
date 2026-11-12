@@ -368,6 +368,62 @@ export interface ModelInfo {
   vision?: boolean
 }
 
+/** A certificate, as Settings → HTTPS shows it. Times are Unix seconds. */
+export interface CertInfo {
+  names: string[]
+  subject: string
+  issuer: string
+  not_before: number
+  not_after: number
+  self_signed: boolean
+  fingerprint: string
+}
+
+export type HttpsMode = 'off' | 'own' | 'custom'
+
+/** Settings → HTTPS (`GET /api/admin/https`). */
+export interface HttpsStatus {
+  available: boolean
+  mode: HttpsMode
+  /** Addresses added for Hoard's own certificate. */
+  names: string[]
+  http3: boolean
+  redirect: boolean
+  /** HTTPS is being served now. */
+  on: boolean
+  /** Why it isn't, though it's chosen. */
+  error: string | null
+  http3_running: boolean
+  http3_error: string | null
+  /** Addresses Hoard found by itself. */
+  found: string[]
+  covers_this_address: boolean | null
+  /** The certificate being served. */
+  cert: CertInfo | null
+  /** The uploaded certificate, if there is one. */
+  custom: CertInfo | null
+  /** Hoard's own certificate authority, once made. */
+  ca: CertInfo | null
+  port: number
+  this_address: string | null
+}
+
+export interface HttpsChange {
+  mode?: HttpsMode
+  names?: string[]
+  http3?: boolean
+  redirect?: boolean
+  cert?: string
+  key?: string
+}
+
+export interface CertCheck {
+  cert: CertInfo
+  problem: string | null
+  covers_this_address: boolean | null
+  this_address: string | null
+}
+
 /** The ChatGPT account the server tags through, if it's signed in (`GET /api/admin/chatgpt`). */
 export interface ChatGptStatus {
   signed_in: boolean
@@ -674,6 +730,15 @@ export const api = {
     }),
   chatgptSignOut: () => request<ChatGptStatus>('/api/admin/chatgpt/sign-out', { method: 'POST' }),
   chatgptModels: () => request<{ models: ModelInfo[] }>('/api/admin/chatgpt/models'),
+  https: () => request<HttpsStatus>('/api/admin/https'),
+  /** Tried before it's switched to: a setup that doesn't work is refused, and what's running stays. */
+  saveHttps: (change: HttpsChange) =>
+    request<HttpsStatus>('/api/admin/https', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(change),
+    }),
+  checkCert: (cert: string, key: string) => post<CertCheck>('/api/admin/https/check', { cert, key }),
   authStatus: () => request<AuthStatus>('/api/auth/status'),
   setup: (username: string, password: string) =>
     post<{ user: { name: string } }>('/api/auth/setup', { username, password }),

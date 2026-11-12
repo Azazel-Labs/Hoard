@@ -1,5 +1,5 @@
 import { devices, type Page } from '@playwright/test'
-import { TEXTURES } from './support/seed'
+import { BIG, TEXTURES } from './support/seed'
 import { expect, openPack, test, tile } from './support/test'
 
 /** The main pages, each with something to wait for so the page has really drawn. */
@@ -91,4 +91,22 @@ test.describe('dark mode', () => {
     await expect(html).toHaveAttribute('data-scheme', 'dark')
     await expect(theme.getByRole('button', { name: 'Match system theme' })).toHaveAttribute('aria-pressed', 'true')
   })
+})
+
+test.describe('detail panel', () => {
+  for (const width of [1280, 1600, 1920]) {
+    test(`opening it at ${width}px leaves the tiles their size; the grid drops a column instead`, async ({ page, seed }) => {
+      await page.setViewportSize({ width, height: 900 })
+      await openPack(page, seed.packs[BIG], BIG)
+      const tiles = page.locator('.grid button.hit')
+      await expect(tiles.first()).toBeVisible()
+      const before = (await tiles.first().boundingBox())!.width
+      await tiles.first().click()
+      await expect(page.getByRole('complementary', { name: 'Asset details' })).toBeVisible()
+      // The panel slides in; wait for the layout to settle before measuring.
+      await expect.poll(async () => Math.abs((await tiles.first().boundingBox())!.width - before)).toBeLessThan(0.5)
+      // Nothing scrolls sideways.
+      expect(await page.locator('.main').evaluate((m) => m.scrollWidth - m.clientWidth)).toBeLessThanOrEqual(0)
+    })
+  }
 })

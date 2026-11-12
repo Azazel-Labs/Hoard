@@ -233,6 +233,65 @@ const mainEl = ref<HTMLElement | null>(null)
 /** Index of the first tile of the newest page, the ones that animate in. */
 const fresh = ref(0)
 const win = useVirtualGrid({ scroller: mainEl, grid: gridEl, count: () => items.value.length })
+
+// Opening the detail panel leaves the tiles the size they were: the grid keeps its column width and drops a column,
+// and the panel takes what's left over (so it's a little wider or narrower depending on the window), instead of the
+// remaining columns stretching to fill the space.
+const appEl = ref<HTMLElement | null>(null)
+/** The room the grid and panel share, what the grid's padding and scrollbar take of it, and the column gap. */
+const room = ref({ width: 0, side: 0, chrome: 0, gap: 0 })
+const DETAIL_MIN = 340
+const DETAIL_MAX = 640
+const narrow = window.matchMedia('(max-width: 900px)')
+function measureRoom() {
+  const app = appEl.value
+  const side = sideEl.value
+  const main = mainEl.value
+  if (!app || !side || !main || narrow.matches) {
+    room.value = { width: 0, side: 0, chrome: 0, gap: 0 }
+    return
+  }
+  const ms = getComputedStyle(main)
+  const chrome = parseFloat(ms.paddingLeft) + parseFloat(ms.paddingRight) + (main.offsetWidth - main.clientWidth)
+  const gap = gridEl.value ? parseFloat(getComputedStyle(gridEl.value).columnGap) || 0 : room.value.gap
+  room.value = { width: app.clientWidth, side: side.offsetWidth, chrome, gap }
+}
+const roomObserver = new ResizeObserver(measureRoom)
+watch([appEl, sideEl], ([a, s]) => {
+  roomObserver.disconnect()
+  if (a) roomObserver.observe(a)
+  if (s) roomObserver.observe(s)
+})
+watch(gridEl, () => nextTick(measureRoom))
+narrow.addEventListener('change', measureRoom)
+onBeforeUnmount(() => {
+  roomObserver.disconnect()
+  narrow.removeEventListener('change', measureRoom)
+})
+/** With the panel open: the columns to show, their width, and the panel's width. */
+const fit = computed(() => {
+  const { width, side, chrome, gap } = room.value
+  if (!width || !gap) return null
+  const space = width - side - chrome
+  // The columns the grid has without the panel, as auto-fill makes them.
+  const n = Math.max(1, Math.floor((space + gap) / (prefs.tile + gap)))
+  const col = (space - gap * (n - 1)) / n
+  const cols = Math.floor((space - DETAIL_MIN + gap) / (col + gap))
+  if (cols < 1) return null
+  const used = cols * col + (cols - 1) * gap
+  return { col, cols, detail: Math.min(DETAIL_MAX, Math.floor(space - used)) }
+})
+const appStyle = computed(() => {
+  const s: Record<string, string> = { '--tile': `${prefs.tile}px` }
+  const f = fit.value
+  if (f) {
+    s['--side-w'] = `${room.value.side}px`
+    s['--detail-w'] = `${f.detail}px`
+    s['--fit-cols'] = String(f.cols)
+    s['--fit-col'] = `${f.col}px`
+  }
+  return s
+})
 const windowed = computed(() =>
   items.value.slice(win.start.value, win.end.value).map((a, n) => ({ a, i: win.start.value + n })),
 )
@@ -903,9 +962,10 @@ const commands = computed<Command[]>(() => {
 
 <template>
   <div
+    ref="appEl"
     class="app"
-    :class="{ 'with-detail': selected && view === 'library', 'filters-open': showFilters }"
-    :style="{ '--tile': `${prefs.tile}px` }"
+    :class="{ 'with-detail': selected && view === 'library', 'filters-open': showFilters, fitted: !!fit }"
+    :style="appStyle"
     @dragenter.prevent="onDragEnter"
     @dragover.prevent
     @dragleave="onDragLeave"
@@ -1389,6 +1449,8 @@ const commands = computed<Command[]>(() => {
   height: 100dvh;
 }
 .app.with-detail { grid-template-columns: 240px minmax(0, 1fr) minmax(340px, 420px); grid-template-areas: 'top top top' 'token token token' 'side main detail'; }
+.app.with-detail.fitted { grid-template-columns: var(--side-w) minmax(0, 1fr) var(--detail-w); }
+.app.with-detail.fitted .grid { grid-template-columns: repeat(var(--fit-cols), var(--fit-col)); }
 .packs-pane, .archive-pane { grid-row: 3; grid-column: 1 / -1; overflow-y: auto; }
 .settings-pane { grid-row: 3; grid-column: 1 / -1; }
 

@@ -136,6 +136,31 @@ input.field:focus, textarea.field:focus {
   position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap;
 }
 
+/* Popovers and menus (<Transition name="pop">): grow out of their anchor with a little overshoot. Each one sets
+   its own transform-origin. */
+.pop-enter-active { transition: opacity var(--dur-2) var(--ease-out), scale var(--dur-3) var(--ease-pop), translate var(--dur-3) var(--ease-pop); }
+.pop-leave-active { transition: opacity var(--dur-1) var(--ease-out), scale var(--dur-1) var(--ease-out); }
+.pop-enter-from, .pop-leave-to { opacity: 0; scale: 0.95; }
+.pop-enter-from { translate: 0 -4px; }
+
+/* View transitions (ui.ts withTransition puts the kind on <html> as data-vt). */
+::view-transition-group(*) { animation-duration: var(--dur-3); animation-timing-function: var(--ease-out); }
+html[data-vt='view']::view-transition-old(root) { animation: vt-out var(--dur-1) var(--ease-out) both; }
+html[data-vt='view']::view-transition-new(root) { animation: vt-in var(--dur-3) var(--ease-out) both; }
+@keyframes vt-out { to { opacity: 0; } }
+@keyframes vt-in { from { opacity: 0; translate: 0 8px; } }
+/* The detail panel slides in from the right and back out while the grid cross-fades into its new width. */
+html[data-vt='detail'] .detail-pane { view-transition-name: detail; }
+html[data-vt='detail']::view-transition-old(root),
+html[data-vt='detail']::view-transition-new(root) { animation-duration: var(--dur-2); }
+html[data-vt='detail']::view-transition-new(detail):only-child { animation: vt-slide-in var(--dur-3) var(--ease-out); }
+html[data-vt='detail']::view-transition-old(detail):only-child { animation: vt-slide-out var(--dur-2) var(--ease-in-out) forwards; }
+@keyframes vt-slide-in { from { opacity: 0; translate: 48px 0; } }
+@keyframes vt-slide-out { to { opacity: 0; translate: 48px 0; } }
+/* Theme changes: the new theme is revealed in a circle from the button (App.vue animates the clip-path). */
+html[data-vt='theme']::view-transition-old(root),
+html[data-vt='theme']::view-transition-new(root) { animation: none; mix-blend-mode: normal; }
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { transition: none !important; animation: none !important; }
 }

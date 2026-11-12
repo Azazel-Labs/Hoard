@@ -236,10 +236,22 @@ async function patch(body: Parameters<typeof api.patchAsset>[1]): Promise<boolea
   if (family.value && applyToFamily.value && (body.add_tags || body.remove_tags || body.category || body.description)) {
     body = { ...body, apply_to_family: true }
   }
+  // Tag edits show at once and are rolled back if the server says no.
+  const before = props.asset
+  const optimistic = !!(body.add_tags || body.remove_tags)
+  if (optimistic) {
+    const drop = new Set(body.remove_tags ?? [])
+    const tags = before.tags.filter((t) => !drop.has(t.tag))
+    for (const tag of body.add_tags ?? []) {
+      if (!tags.some((t) => t.tag === tag)) tags.push({ tag, source: 'human', confidence: 1 })
+    }
+    emit('updated', { ...before, tags })
+  }
   try {
     emit('updated', await api.patchAsset(props.asset.id, body))
     return true
   } catch (e) {
+    if (optimistic) emit('updated', before)
     emit('error', `Couldn't save: ${(e as Error).message}`)
     return false
   }
@@ -379,7 +391,7 @@ watch(() => props.asset.id, drawWaveform, { immediate: true })
 
     <section>
       <h3>Tags</h3>
-      <div class="tags">
+      <TransitionGroup tag="div" name="chip" class="tags">
         <TagChip
           v-for="t in visibleTags"
           :key="t.tag"
@@ -389,7 +401,7 @@ watch(() => props.asset.id, drawWaveform, { immediate: true })
           @click="$emit('tag', t.tag)"
           @remove="removeTag(t.tag)"
         />
-      </div>
+      </TransitionGroup>
       <form class="addtag" @submit.prevent="addTag">
         <label class="visually-hidden" for="new-tag">Add a tag</label>
         <input id="new-tag" v-model="newTag" class="field" list="tag-suggestions" placeholder="Add a tag, e.g. mood:tense" autocomplete="off" />
@@ -595,8 +607,12 @@ h2 {
 .player { width: 100%; height: 36px; }
 .desc { margin: 0; color: var(--muted); max-width: 60ch; }
 h3 { margin: 0 0 0.5rem; font-size: var(--step--1); font-weight: 650; color: var(--muted); }
-.tags { display: flex; flex-wrap: wrap; gap: 0.35rem; }
+.tags { position: relative; display: flex; flex-wrap: wrap; gap: 0.35rem; }
 .tags :deep(.chip) { cursor: pointer; }
+.chip-enter-active { transition: opacity var(--dur-2) var(--ease-out), scale var(--dur-3) var(--ease-pop); }
+.chip-leave-active { transition: opacity var(--dur-1) var(--ease-out), scale var(--dur-1) var(--ease-out); position: absolute; }
+.chip-enter-from, .chip-leave-to { opacity: 0; scale: 0.6; }
+.chip-move { transition: translate var(--dur-2) var(--ease-out); }
 .addtag { display: flex; gap: 0.4rem; margin-top: 0.6rem; }
 .legend { margin: 0.5rem 0 0; font-size: 0.75rem; color: var(--faint); max-width: 52ch; }
 .asrow { flex-basis: 100%; display: flex; flex-wrap: wrap; align-items: center; gap: 0.4rem; font-size: var(--step--1); color: var(--muted); }

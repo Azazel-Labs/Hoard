@@ -14,8 +14,22 @@ function closeMenus(e: MouseEvent) {
     if (!d.contains(e.target as Node)) d.removeAttribute('open')
   }
 }
-onMounted(() => document.addEventListener('click', closeMenus))
-onBeforeUnmount(() => document.removeEventListener('click', closeMenus))
+// Esc closes an open menu and hands focus back to its button.
+function escMenus(e: KeyboardEvent) {
+  if (e.key !== 'Escape') return
+  for (const d of document.querySelectorAll<HTMLDetailsElement>('.packs details.menu[open]')) {
+    d.removeAttribute('open')
+    d.querySelector('summary')?.focus()
+  }
+}
+onMounted(() => {
+  document.addEventListener('click', closeMenus)
+  document.addEventListener('keydown', escMenus)
+})
+onBeforeUnmount(() => {
+  document.removeEventListener('click', closeMenus)
+  document.removeEventListener('keydown', escMenus)
+})
 
 // Deleted packs and collections vanish at once and only go from the server once their Undo toast runs out.
 const hidden = reactive(new Set<string>())
@@ -426,12 +440,15 @@ li { padding: 1rem 0; border-top: 1px solid var(--line); display: flex; gap: 1re
 .menu-items {
   position: absolute; top: calc(100% + 4px); left: 0; z-index: 5; min-width: 13rem; padding: 0.3rem;
   display: flex; flex-direction: column; background: var(--raised); border: 1px solid var(--line);
-  border-radius: var(--r-tile); box-shadow: 0 10px 30px var(--shadow);
+  border-radius: var(--r-tile); box-shadow: var(--elev-3); transform-origin: top left;
 }
+.menu[open] .menu-items { animation: menu-in var(--dur-3) var(--ease-pop); }
+@keyframes menu-in { from { opacity: 0; scale: 0.95; translate: 0 -4px; } }
 .menu-items button {
   border: 0; background: none; text-align: left; padding: 0.45rem 0.6rem; border-radius: var(--r-chip);
   cursor: pointer; font-size: var(--step--1);
 }
+.menu-items button { transition: background-color var(--dur-1); }
 .menu-items button:hover:not(:disabled) { background: var(--panel); }
 .menu-items button:disabled { opacity: 0.5; cursor: default; }
 .menu-items .danger { color: var(--danger); }

@@ -1,6 +1,6 @@
 // App-wide feedback: stacked toasts (with an optional action such as Undo or Retry), a styled confirm dialog, and
 // undoable actions that only commit once their toast runs out. UiLayer.vue renders all of it.
-import { nextTick, reactive } from 'vue'
+import { nextTick, reactive, ref, watch } from 'vue'
 
 export type ToastKind = 'ok' | 'error' | 'info'
 export interface ToastAction {
@@ -25,6 +25,8 @@ interface Timer {
   /** Runs when the toast goes away without its action being taken (timeout or dismissed). */
   onClose?: () => void
 }
+
+export const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)')
 
 const MAX = 4
 export const toasts = reactive<Toast[]>([])
@@ -164,14 +166,14 @@ export function answerDialog(ok: boolean) {
 
 // ------------------------------------------------------------------ view transitions
 
-const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)')
-
 /**
  * Run a DOM-changing update inside a view transition when the browser has them (and motion is welcome); otherwise
  * just run it. `type` lands on <html> as data-vt for the transition's CSS to key off.
  */
-export function withTransition(update: () => void, type = 'swap'): Promise<void> {
-  const doc = document as Document & { startViewTransition?: (cb: () => Promise<void>) => { finished: Promise<void> } }
+export function withTransition(update: () => void, type = 'swap', onReady?: () => void): Promise<void> {
+  const doc = document as Document & {
+    startViewTransition?: (cb: () => Promise<void>) => { finished: Promise<void>; ready: Promise<void> }
+  }
   if (!doc.startViewTransition || reducedMotion.matches || document.hidden) {
     update()
     return Promise.resolve()
@@ -182,7 +184,32 @@ export function withTransition(update: () => void, type = 'swap'): Promise<void>
     update()
     await nextTick()
   })
+  if (onReady) vt.ready.then(onReady, () => {})
   return vt.finished.finally(() => {
     if (root.dataset.vt === type) delete root.dataset.vt
   }).catch(() => {})
+}
+
+// ------------------------------------------------------------------ numbers
+
+/** A number that eases toward `source` rather than jumping to it (result counts and the like). */
+export function useTween(source: () => number, ms = 450) {
+  const out = ref(source())
+  let raf = 0
+  watch(source, (to) => {
+    cancelAnimationFrame(raf)
+    const from = out.value
+    if (reducedMotion.matches || document.hidden || from === to) {
+      out.value = to
+      return
+    }
+    const t0 = performance.now()
+    const tick = (now: number) => {
+      const p = Math.min(1, (now - t0) / ms)
+      out.value = Math.round(from + (to - from) * (1 - (1 - p) ** 3))
+      if (p < 1) raf = requestAnimationFrame(tick)
+    }
+    raf = requestAnimationFrame(tick)
+  })
+  return out
 }

@@ -72,6 +72,7 @@ onBeforeUnmount(() => {
     <button type="button" class="btn" :aria-expanded="open" :disabled="busy" @click="toggle">
       {{ label ?? 'Add to collection' }}
     </button>
+    <Transition name="pop">
     <div v-if="open" class="menu" :class="{ up }" role="dialog" aria-label="Collections">
       <form class="new" @submit.prevent="create">
         <label class="visually-hidden" for="collection-name">Find or create a collection</label>
@@ -96,6 +97,7 @@ onBeforeUnmount(() => {
       </ul>
       <p v-else-if="!query" class="empty">No collections yet. Type a name to start one.</p>
     </div>
+    </Transition>
   </div>
 </template>
 
@@ -104,9 +106,9 @@ onBeforeUnmount(() => {
 .menu {
   position: absolute; left: 0; top: calc(100% + 4px); z-index: 40; width: 17rem; padding: 0.4rem;
   background: var(--raised); border: 1px solid var(--line); border-radius: var(--r-tile);
-  box-shadow: 0 12px 32px var(--shadow);
+  box-shadow: var(--elev-3); transform-origin: top left;
 }
-.menu.up { top: auto; bottom: calc(100% + 6px); }
+.menu.up { top: auto; bottom: calc(100% + 6px); transform-origin: bottom left; }
 .new { display: flex; gap: 0.35rem; }
 .new .field { padding: 0.35em 0.55em; font-size: var(--step--1); }
 ul { list-style: none; margin: 0.35rem 0 0; padding: 0; max-height: 15rem; overflow-y: auto; }
@@ -116,6 +118,9 @@ li button {
   text-align: left; font-size: var(--step--1);
 }
 li button:hover { background: var(--panel); }
+li button { transition: background-color var(--dur-1); }
+li button[aria-checked='true'] .tick { display: inline-block; animation: tick-pop var(--dur-3) var(--ease-pop); }
+@keyframes tick-pop { from { scale: 0; } }
 .tick { color: var(--ok); font-weight: 700; }
 .cname { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .n { color: var(--faint); font-size: 0.75rem; }

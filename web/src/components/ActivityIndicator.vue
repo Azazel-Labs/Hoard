@@ -1,7 +1,7 @@
 <script setup lang="ts">
 // What the server is doing in the background (ingests, tagging, conversions, zips, the ffmpeg download): a header
 // button with a count, and a list on hover or click. Polls quickly while anything runs or the list is open.
-import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { api, type ActivityItem } from '../api'
 
 const items = ref<ActivityItem[]>([])
@@ -9,6 +9,10 @@ const open = ref(false)
 const pinned = ref(false)
 const failed = ref(false)
 const root = ref<HTMLElement | null>(null)
+
+/** Bumped whenever the count goes up, to give the badge a little hop. */
+const bump = ref(0)
+watch(() => items.value.length, (n, was) => { if (n > was) bump.value++ })
 
 const running = computed(() => items.value.filter((i) => i.state === 'running'))
 const queued = computed(() => items.value.filter((i) => i.state === 'queued'))
@@ -98,9 +102,10 @@ const pct = (p: number) => `${Math.round(p * 100)}%`
       <svg viewBox="0 0 20 16" width="18" height="15" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
         <path d="M1 8h3.5l2-5.5 3.5 11 2.5-8 1.8 2.5H19" />
       </svg>
-      <span v-if="items.length" class="count">{{ items.length }}</span>
+      <Transition name="badge"><span v-if="items.length" :key="bump" class="count">{{ items.length }}</span></Transition>
     </button>
 
+    <Transition name="pop">
     <section v-if="open" id="activity-list" class="panel" aria-label="Background activity">
       <header>
         <h2>Background activity</h2>
@@ -122,6 +127,7 @@ const pct = (p: number) => `${Math.round(p * 100)}%`
         </li>
       </ul>
     </section>
+    </Transition>
   </div>
 </template>
 
@@ -141,12 +147,16 @@ const pct = (p: number) => `${Math.round(p * 100)}%`
   border-radius: 999px; background: var(--k-font); color: var(--bg);
   font-size: 0.6875rem; font-weight: 700; line-height: 1.1rem; text-align: center; font-variant-numeric: tabular-nums;
 }
+.badge-enter-active { animation: hop var(--dur-3) var(--ease-pop); }
+.badge-leave-active { display: none; }
+@keyframes hop { from { scale: 0.4; } 60% { scale: 1.25; } }
 
 .panel {
+  transform-origin: top right;
   position: absolute; right: 0; top: calc(100% + 0.5rem); z-index: 30; width: min(24rem, calc(100vw - 1.5rem));
   max-height: min(28rem, 70vh); overflow: auto;
   border: 1px solid var(--line); border-radius: var(--r-tile); background: var(--panel);
-  box-shadow: 0 12px 32px var(--shadow); font-size: var(--step--1);
+  box-shadow: var(--elev-3); font-size: var(--step--1);
 }
 .panel header {
   display: flex; align-items: baseline; justify-content: space-between; gap: 1rem;

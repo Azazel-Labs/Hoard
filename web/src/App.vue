@@ -15,7 +15,7 @@ import CollectionPicker from './components/CollectionPicker.vue'
 import PacksView from './components/PacksView.vue'
 import TagChip from './components/TagChip.vue'
 import UiLayer from './components/UiLayer.vue'
-import { showError, showOk } from './ui'
+import { showError, showOk, useTween, withTransition } from './ui'
 
 type View = 'library' | 'packs'
 const PAGE = 60
@@ -56,6 +56,8 @@ const folderInput = ref<HTMLInputElement | null>(null)
 /** A dropped/picked folder that contains several packs: ask how to import it. */
 const pendingSplit = ref<{ group: Group; parts: number } | null>(null)
 const dragDepth = ref(0)
+/** How many files or folders are being dragged over the page (0 when the browser won't say). */
+const dragCount = ref(0)
 
 // ------------------------------------------------------------------ data
 
@@ -146,14 +148,19 @@ function toggleTag(tag: string) {
 function setKind(kind: string) {
   filters.kind = filters.kind === kind ? '' : kind
 }
+/** Switch between the library and the packs list with a short cross-fade. */
+function setView(v: View) {
+  if (view.value === v) return
+  void withTransition(() => (view.value = v), 'view')
+}
 function browsePack(p: Pack) {
   Object.assign(filters, { pack: { id: p.id, name: p.name }, collection: null, kind: '', tags: [], q: '' })
-  view.value = 'library'
+  setView('library')
 }
 function browseCollection(c: Collection | Named) {
   const same = filters.collection?.id === c.id
   Object.assign(filters, { collection: same ? null : { id: c.id, name: c.name }, pack: null, kind: '', tags: [], q: '' })
-  view.value = 'library'
+  setView('library')
   showFilters.value = false
 }
 function clearFilters() {
@@ -336,7 +343,9 @@ function resolveSplit(split: boolean) {
 }
 
 function onDragEnter(e: DragEvent) {
-  if (e.dataTransfer?.types.includes('Files')) dragDepth.value++
+  if (!e.dataTransfer?.types.includes('Files')) return
+  if (!dragDepth.value) dragCount.value = e.dataTransfer.items?.length ?? 0
+  dragDepth.value++
 }
 function onDragLeave() {
   dragDepth.value = Math.max(0, dragDepth.value - 1)
@@ -367,17 +376,38 @@ function onCreated() {
 
 // ------------------------------------------------------------------ misc
 
+/** The asset the detail panel is opening or showing; cleared on close so a late fetch can't reopen it. */
+let opening = ''
+/** Show an asset in the detail panel. The panel slides in when it wasn't open; moving between assets just swaps. */
+function showDetail(a: Asset) {
+  if (selected.value || view.value !== 'library') selected.value = a
+  else void withTransition(() => (selected.value = a), 'detail')
+}
 /** Open an asset in the detail panel, upgrading the search hit to the full record (links, derivatives). */
 async function openAsset(idOrAsset: string | Asset) {
   const id = typeof idOrAsset === 'string' ? idOrAsset : idOrAsset.id
-  if (typeof idOrAsset !== 'string') selected.value = idOrAsset
+  opening = id
+  if (typeof idOrAsset !== 'string') showDetail(idOrAsset)
   view.value = 'library'
   try {
     const full = await api.asset(id)
-    if (typeof idOrAsset === 'string' || selected.value?.id === id) selected.value = full
+    if (opening === id) {
+      if (selected.value) selected.value = full
+      else showDetail(full)
+    }
   } catch (e) {
     showError(`Couldn't open that asset: ${(e as Error).message}`)
   }
+}
+/** Close the detail panel and put focus back on the tile it was showing, so the keyboard picks up where it was. */
+function closeDetail() {
+  const id = selected.value?.id
+  opening = ''
+  if (!id) return
+  const active = document.activeElement
+  const refocus = !active || active === document.body || !!active.closest('.detail-pane')
+  void withTransition(() => (selected.value = null), 'detail')
+  if (refocus) focusTile(id)
 }
 
 /** Previous/next asset in the grid (detail panel arrows, keyboard). */
@@ -445,7 +475,7 @@ function onKey(e: KeyboardEvent) {
   if (e.key === 'Escape') {
     if (showFilters.value) showFilters.value = false
     else if (checked.value.length) checked.value = []
-    else if (selected.value) selected.value = null
+    else if (selected.value) closeDetail()
     return
   }
   if (typing || view.value !== 'library' || e.altKey) return
@@ -537,6 +567,22 @@ onBeforeUnmount(() => {
 })
 
 const busyPacks = computed(() => packs.value.filter(busy))
+const shownTotal = useTween(() => total.value)
+
+/** Change the theme with the new one spreading out in a circle from the button that was pressed. */
+function setTheme(value: typeof prefs.theme, e: MouseEvent) {
+  if (prefs.theme === value) return
+  const r = (e.currentTarget as HTMLElement).getBoundingClientRect()
+  const x = r.left + r.width / 2
+  const y = r.top + r.height / 2
+  const reach = Math.hypot(Math.max(x, innerWidth - x), Math.max(y, innerHeight - y))
+  void withTransition(() => (prefs.theme = value), 'theme', () => {
+    document.documentElement.animate(
+      { clipPath: [`circle(0 at ${x}px ${y}px)`, `circle(${reach}px at ${x}px ${y}px)`] },
+      { duration: 520, easing: 'cubic-bezier(0.65, 0, 0.35, 1)', pseudoElement: '::view-transition-new(root)' },
+    )
+  })
+}
 const firstLoad = computed(() => loading.value && !items.value.length)
 </script>
 
@@ -583,8 +629,8 @@ const firstLoad = computed(() => loading.value && !items.value.length)
       </div>
 
       <nav class="views" aria-label="Views">
-        <button type="button" :aria-current="view === 'library' ? 'page' : undefined" @click="view = 'library'">Library</button>
-        <button type="button" :aria-current="view === 'packs' ? 'page' : undefined" @click="view = 'packs'">
+        <button type="button" :aria-current="view === 'library' ? 'page' : undefined" @click="setView('library')">Library</button>
+        <button type="button" :aria-current="view === 'packs' ? 'page' : undefined" @click="setView('packs')">
           Packs<span v-if="busyPacks.length" class="pulse" :title="`${busyPacks.length} working`" />
         </button>
       </nav>
@@ -608,7 +654,7 @@ const firstLoad = computed(() => loading.value && !items.value.length)
             type="button"
             :aria-pressed="prefs.theme === t.value"
             :title="t.label"
-            @click="prefs.theme = t.value"
+            @click="setTheme(t.value, $event)"
           >
             <svg viewBox="0 0 16 16" width="15" height="15" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
               <template v-if="t.value === 'light'">
@@ -736,8 +782,9 @@ const firstLoad = computed(() => loading.value && !items.value.length)
             Filters<span v-if="filters.tags.length + (filters.kind ? 1 : 0)" class="badge">{{ filters.tags.length + (filters.kind ? 1 : 0) }}</span>
           </button>
           <div class="active">
-            <span class="count" aria-live="polite">
-              {{ firstLoad ? 'Searching…' : `${total.toLocaleString()} ${total === 1 ? 'asset' : 'assets'}` }}
+            <span class="count">
+              <span aria-hidden="true">{{ firstLoad ? 'Searching…' : `${shownTotal.toLocaleString()} ${total === 1 ? 'asset' : 'assets'}` }}</span>
+              <span class="visually-hidden" aria-live="polite">{{ firstLoad ? 'Searching' : `${total.toLocaleString()} ${total === 1 ? 'asset' : 'assets'}` }}</span>
             </span>
             <TagChip v-if="filters.pack" :tag="`pack:${filters.pack.name}`" removable @remove="filters.pack = null" />
             <TagChip v-if="filters.collection" :tag="`collection:${filters.collection.name}`" removable @remove="filters.collection = null" />
@@ -824,7 +871,7 @@ const firstLoad = computed(() => loading.value && !items.value.length)
         :asset="selected"
         :position="position"
         :collections="collections"
-        @close="selected = null"
+        @close="closeDetail"
         @collect="(id, create) => addToCollection([selected!.id], create ? { create } : { id })"
         @uncollect="(id) => removeFromCollection([selected!.id], id)"
         @browse-collection="browseCollection"
@@ -835,6 +882,7 @@ const firstLoad = computed(() => loading.value && !items.value.length)
         @step="step"
       />
 
+      <Transition name="rise">
       <div v-if="checked.length" class="selbar" role="region" aria-label="Selected assets">
         <strong>{{ checked.length }} selected</strong>
         <a class="btn primary" :href="selectionUrl" download>Download zip</a>
@@ -860,6 +908,7 @@ const firstLoad = computed(() => loading.value && !items.value.length)
         <button type="button" class="linkbtn" @click="checked = items.map((a) => a.id)">Select all {{ items.length }}</button>
         <button type="button" class="btn ghost" @click="checked = []">Clear</button>
       </div>
+      </Transition>
     </template>
 
     <PacksView
@@ -874,12 +923,18 @@ const firstLoad = computed(() => loading.value && !items.value.length)
       @error="showError"
     />
 
+    <Transition name="drop">
     <div v-if="dragDepth > 0" class="drop" aria-hidden="true">
-      <div>
-        <strong>Drop to add to the hoard</strong>
+      <div class="well">
+        <svg class="ants" aria-hidden="true"><rect x="1" y="1" rx="12" /></svg>
+        <svg class="arrow" viewBox="0 0 24 24" width="34" height="34" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 15V4M7.5 8.5 12 4l4.5 4.5M4 15v3.5A1.5 1.5 0 0 0 5.5 20h13a1.5 1.5 0 0 0 1.5-1.5V15" />
+        </svg>
+        <strong>{{ dragCount > 1 ? `Drop ${dragCount} items to add them` : 'Drop to add to the hoard' }}</strong>
         <span>Each top-level file or folder becomes its own pack. Gigabytes are fine; big files resume if the connection drops.</span>
       </div>
     </div>
+    </Transition>
 
     <UploadQueue ref="queue" @created="onCreated" @unauthorized="showToken = true" />
     <UiLayer />
@@ -976,7 +1031,7 @@ const firstLoad = computed(() => loading.value && !items.value.length)
   padding: 0.75rem 0; background: var(--bg);
 }
 .active { display: flex; flex-wrap: wrap; gap: 0.35rem; align-items: center; flex: 1; min-width: 0; }
-.count { font-size: var(--step--1); color: var(--muted); margin-right: 0.35rem; }
+.count { font-size: var(--step--1); color: var(--muted); margin-right: 0.35rem; font-variant-numeric: tabular-nums; }
 .linkbtn {
   border: 0; background: none; padding: 0.1em 0.2em; cursor: pointer; font-size: var(--step--1);
   color: var(--text); text-decoration: underline; text-decoration-color: var(--faint); text-underline-offset: 3px;
@@ -1028,20 +1083,38 @@ const firstLoad = computed(() => loading.value && !items.value.length)
   padding: 0.6rem 0.75rem 0.6rem 1rem; border: 1px solid var(--muted); border-radius: var(--r-tile);
   background: var(--raised); box-shadow: 0 10px 30px var(--shadow); font-size: var(--step--1);
 }
+.rise-enter-active { transition: opacity var(--dur-2) var(--ease-out), transform var(--dur-3) var(--ease-pop); }
+.rise-leave-active { transition: opacity var(--dur-2) var(--ease-out), transform var(--dur-2) var(--ease-out); }
+.rise-enter-from, .rise-leave-to { opacity: 0; transform: translateY(18px) scale(0.97); }
 .bulktag { display: flex; gap: 0.35rem; }
 .srccheck { display: inline-flex; gap: 0.35rem; align-items: center; color: var(--muted); }
 .bulktag .field { width: 11rem; padding: 0.35em 0.6em; }
 
 .drop {
   position: fixed; inset: 0; z-index: 20; display: grid; place-items: center;
-  background: color-mix(in srgb, var(--bg) 85%, transparent); pointer-events: none;
+  background: color-mix(in srgb, var(--bg) 80%, transparent); backdrop-filter: blur(4px); pointer-events: none;
 }
-.drop div {
-  display: flex; flex-direction: column; gap: 0.4rem; align-items: center; text-align: center;
-  padding: 3rem 4rem; margin: 1rem; border: 2px dashed var(--k-texture); border-radius: 12px;
+.well {
+  position: relative; display: flex; flex-direction: column; gap: 0.4rem; align-items: center; text-align: center;
+  max-width: 34rem; padding: 2.5rem 3.5rem; margin: 1rem;
 }
-.drop strong { font-size: var(--step-2); font-variation-settings: 'CASL' 0.6; }
-.drop span { color: var(--muted); }
+/* Marching ants: an SVG outline so the dashes follow the rounded corners. */
+.ants { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+.ants rect {
+  width: calc(100% - 2px); height: calc(100% - 2px);
+  fill: color-mix(in srgb, var(--k-texture) 7%, transparent); stroke: var(--k-texture); stroke-width: 2;
+  stroke-dasharray: 10 8; animation: ants 0.8s linear infinite;
+}
+@keyframes ants { to { stroke-dashoffset: -18; } }
+.arrow { position: relative; color: var(--k-texture); animation: bob 1.4s var(--ease-in-out) infinite; }
+@keyframes bob { 50% { translate: 0 -6px; } }
+.drop strong { position: relative; font-size: var(--step-2); font-variation-settings: 'CASL' 0.6; }
+.drop span { position: relative; color: var(--muted); }
+.drop-enter-active { transition: opacity var(--dur-2) var(--ease-out); }
+.drop-enter-active .well { transition: scale var(--dur-3) var(--ease-pop); }
+.drop-leave-active { transition: opacity var(--dur-1) var(--ease-out); }
+.drop-enter-from, .drop-leave-to { opacity: 0; }
+.drop-enter-from .well { scale: 0.92; }
 
 .splitbar { flex-wrap: wrap; }
 .scrim { display: none; }

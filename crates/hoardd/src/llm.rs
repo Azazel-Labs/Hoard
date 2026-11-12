@@ -228,6 +228,10 @@ fn parse_models(v: &Value) -> Vec<ModelInfo> {
 
 async fn chat(state: &AppState, messages: Value) -> Result<Reply> {
     let cfg = state.settings.get();
+    if cfg.llm_chatgpt {
+        let model = cfg.llm_model.as_deref().context("no LLM model is set")?;
+        return parse_reply(&crate::chatgpt::chat(state, model, &messages).await?);
+    }
     let base = cfg.llm_url.as_deref().context("LLM not configured")?.trim_end_matches('/');
     let url = format!("{base}/chat/completions");
     let mut body = json!({

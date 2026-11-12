@@ -28,7 +28,7 @@ tower-http = { version = "0.7", features = ["fs", "cors", "trace", "compression-
 rusqlite = { version = "0.41", features = ["bundled"] }
 r2d2 = "0.8"
 r2d2_sqlite = "0.36"
-uuid = { version = "1.29", features = ["v7"] }
+uuid = { version = "1.29", features = ["v4", "v7"] }
 zip = { version = "9", default-features = false, features = ["deflate", "deflate64", "bzip2", "lzma", "zstd", "time"] }
 tar = "0.4"
 flate2 = "1.1"

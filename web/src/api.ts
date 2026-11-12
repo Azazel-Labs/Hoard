@@ -276,6 +276,20 @@ export interface ModelInfo {
   vision?: boolean
 }
 
+/** The ChatGPT account the server tags through, if it's signed in (`GET /api/admin/chatgpt`). */
+export interface ChatGptStatus {
+  signed_in: boolean
+  email?: string | null
+  /** Why tagging can't use the account right now. */
+  problem?: string | null
+  /** A sign-in was started and hasn't finished. */
+  waiting: boolean
+  /** Where to see or limit what Hoard uses of the plan. */
+  manage_url: string
+  /** After signing out: anything the person should still do. */
+  note?: string | null
+}
+
 /** A model the local model server has, or is downloading (`POST /api/admin/llm/local`). */
 export interface LocalModel {
   /** Its Hugging Face reference, which is also the name to use it by. */
@@ -313,6 +327,8 @@ export interface Settings {
     model: string
     has_key: boolean
     vision: boolean
+    /** Tagging goes through the ChatGPT account signed in on the server. */
+    chatgpt: boolean
     batch: OptionSetting<number>
     enabled: boolean
     saved: boolean
@@ -343,6 +359,7 @@ export interface SettingsPatch {
   llm_model?: string | null
   llm_api_key?: string | null
   llm_vision?: boolean | null
+  llm_chatgpt?: boolean | null
   llm_batch?: number | null
   workers?: number | null
   max_upload_mb?: number | null
@@ -528,6 +545,23 @@ export const api = {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ url, action, model }),
     }),
+  chatgpt: () => request<ChatGptStatus>('/api/admin/chatgpt'),
+  /** The address to open to sign in; `port` is the one the browser reaches Hoard on. */
+  chatgptStart: (port: number) =>
+    request<{ url: string }>('/api/admin/chatgpt/start', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ port }),
+    }),
+  /** Finish signing in from the address the browser ended up on. */
+  chatgptFinish: (url: string) =>
+    request<ChatGptStatus>('/api/admin/chatgpt/finish', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ url }),
+    }),
+  chatgptSignOut: () => request<ChatGptStatus>('/api/admin/chatgpt/sign-out', { method: 'POST' }),
+  chatgptModels: () => request<{ models: ModelInfo[] }>('/api/admin/chatgpt/models'),
   locations: () => request<LocationList>('/api/admin/locations'),
   addLocation: (loc: NewLocation) =>
     request<LibraryLocation>('/api/admin/locations', {

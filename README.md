@@ -177,8 +177,8 @@ them with a click:
 Any other GGUF model on Hugging Face can be downloaded the same way by its `owner/name:quant` reference; the vision
 projector comes along with it. Thinking models run with reasoning off, since tagging wants a quick JSON answer.
 `cargo xtask llm` needs llama.cpp (`curl -LsSf https://llama.app/install.sh | sh`, `brew install llama.cpp` or
-`winget install llama.cpp`) and keeps models in `models/`. A hosted model (OpenAI, OpenRouter, …) or your own Ollama is
-picked in the same place. `deploy/compose.yml` has ready-to-uncomment Ollama and vLLM services, and
+`winget install llama.cpp`) and keeps models in `models/`. A hosted model (OpenAI, OpenRouter, …), your own Ollama,
+or a ChatGPT plan through "Sign in with ChatGPT" is picked in the same place. `deploy/compose.yml` has ready-to-uncomment Ollama and vLLM services, and
 [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md#ai-tagging) compares them.
 
 ### Bulk imports
@@ -265,8 +265,8 @@ software rasterizer (`apt install mesa-vulkan-drivers`). Without any adapter, ev
    tool files link too: Unity materials, prefabs, scenes and controllers through their GUIDs; Tiled maps → tilesets
    → images; LDtk projects; BMFont `.fnt` → page images; Spine/libGDX `.atlas` → pages; TexturePacker JSON;
    Godot `.tres`/`.tscn` resources; and Unreal package imports.
-6. **Tag (LLM, optional).** Any OpenAI-compatible endpoint (OpenAI, OpenRouter, Ollama, llama.cpp, vLLM, LM Studio)
-   gets the pack context, paths, metadata and rule tags, and returns names, a description of one to three
+6. **Tag (LLM, optional).** Any OpenAI-compatible endpoint (OpenAI, OpenRouter, Ollama, llama.cpp, vLLM, LM Studio),
+   or a ChatGPT plan through "Sign in with ChatGPT", gets the pack context, paths, metadata and rule tags, and returns names, a description of one to three
    sentences (for music: mood, instruments, tempo and where it fits), extra tags, UCS subcategories and
    categories. Each variant family is sent once and the answer applies to every take. With
    thumbnails switched on in Settings, each batch also gets one numbered contact sheet of its thumbnails (one image instead of
@@ -651,7 +651,7 @@ HTTPS with HTTP/2 and HTTP/3 in Chrome (page, thumbnails and uploads over h3); W
 families, duplicate detection, pack context with store-page fetching, contact sheets and multi-view renders against
 a mock LLM; and MCP inline previews.
 
-What's planned next is in [docs/roadmap.md](docs/roadmap.md). Ideas that were tried and dropped, and why, are in [docs/deadends.md](docs/deadends.md).
+What's planned next is in [docs/roadmap.md](docs/roadmap.md).
 
 ## License
 

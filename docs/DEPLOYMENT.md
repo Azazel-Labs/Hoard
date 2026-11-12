@@ -251,6 +251,25 @@ It takes effect at once. The key is stored in Hoard's database, is never sent ba
 you switch to a different address. If you don't need the local model server then, delete the `llm` service from
 your compose file to free its memory. To go without AI tagging at all, choose **Off** in Settings.
 
+### With a ChatGPT plan
+
+With a ChatGPT Go, Plus, Pro or Business plan you can tag without an API key. Hoard uses OpenAI's
+[Sign in with ChatGPT](https://developers.openai.com/siwc/token-sharing-open-source), and tagging requests count
+toward the plan's usage. Choose **ChatGPT plan** under **Settings → AI tagging**, press **Continue with ChatGPT**
+and approve Hoard in the window that opens.
+
+ChatGPT only sends the browser back to `http://127.0.0.1:<port>`, meaning the machine the browser is on:
+
+- **Browser on the server itself:** that address is Hoard, so the sign-in finishes on its own.
+- **Browser on another computer (a NAS, say):** the sign-in ends on a page that won't load. Copy that page's address
+  from the address bar and paste it into the box Settings shows. A sign-in has to be finished within 15 minutes.
+
+Once you're signed in, pick a model and save. Thumbnails only go along if the model accepts images.
+**Manage usage** (<https://chatgpt.com/settings/usage>) shows what Hoard has used and lets you cap it. Signing out in
+Settings ends the sign-in. You can also disconnect Hoard in ChatGPT under **Settings → Security and login → Sign in
+with ChatGPT**. Either way, Hoard keeps its registration, so the next sign-in skips the setup step. The tokens are
+stored in Hoard's database and are never sent to the browser.
+
 ## Model conversion with Blender
 
 Open **Settings** in the portal and set Blender to **Automatic**: Hoard uses a Blender already on the PATH, or

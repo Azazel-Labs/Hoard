@@ -64,11 +64,17 @@ pub(crate) fn router(state: &AppState) -> Router<AppState> {
         .route("/api/admin/fs", get(locations::browse))
         .route("/api/admin/llm/models", post(llm_models))
         .route("/api/admin/llm/local", post(llm_local))
+        .route("/api/admin/chatgpt", get(crate::chatgpt::get_status))
+        .route("/api/admin/chatgpt/start", post(crate::chatgpt::start))
+        .route("/api/admin/chatgpt/finish", post(crate::chatgpt::finish))
+        .route("/api/admin/chatgpt/sign-out", post(crate::chatgpt::sign_out_route))
+        .route("/api/admin/chatgpt/models", get(crate::chatgpt::list_models))
         .merge(crate::uploads::router())
         .route_layer(middleware::from_fn_with_state(std::sync::Arc::clone(state), require_token));
 
     Router::new()
         .route("/api/health", get(|| async { Json(json!({ "ok": true })) }))
+        .route("/auth/callback", get(crate::chatgpt::callback))
         .route("/api/stats", get(stats))
         .route("/api/stats/library", get(library_stats))
         .route("/api/packs", get(list_packs))
@@ -1648,12 +1654,14 @@ fn settings_json(state: &AppState) -> Value {
             "model": now.llm_model.as_deref().unwrap_or(""),
             "has_key": now.llm_api_key.is_some(),
             "vision": now.llm_vision,
+            "chatgpt": now.llm_chatgpt,
             "batch": option(now.llm_batch, cfg.llm_batch, saved.llm_batch.is_some()),
             "enabled": now.llm_enabled(),
             // Where the local model server listens.
             "local_url": cfg.local_llm_url,
             "saved": saved.llm_url.is_some() || saved.llm_model.is_some() || saved.llm_api_key.is_some()
-                || saved.llm_vision.is_some(),
+                || saved.llm_vision.is_some()
+                || saved.llm_chatgpt.is_some(),
             "default": {
                 "url": cfg.llm_url.as_deref().unwrap_or(""),
                 "model": cfg.llm_model.as_deref().unwrap_or(""),
@@ -1783,7 +1791,7 @@ async fn put_settings(State(state): State<AppState>, Json(patch): Json<Value>) -
         blender = %after.blender,
         ffmpeg = %after.ffmpeg,
         unreal = ?after.unreal_convert,
-        llm = after.llm_url.as_deref().unwrap_or("off"),
+        llm = after.llm_label(),
         "settings changed"
     );
     Ok(Json(settings_json(&state)))

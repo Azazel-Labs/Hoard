@@ -9,6 +9,7 @@ export default defineConfig({
     proxy: {
       '/api': process.env.HOARD_API ?? 'http://127.0.0.1:4627',
       '/mcp': process.env.HOARD_API ?? 'http://127.0.0.1:4627',
+      '/auth': process.env.HOARD_API ?? 'http://127.0.0.1:4627',
     },
   },
 })

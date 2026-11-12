@@ -3,4 +3,4 @@ allow-unwrap-in-tests = true
 allow-expect-in-tests = true
 allow-dbg-in-tests = true
 too-many-lines-threshold = 150
-doc-valid-idents = ["SoundFont", "SoundFonts", "..", "MagicaVoxel", "BMFont", "TexturePacker", "LDtk", "OpenRaster", "DejaVu", "TrueType", "OpenType", "ProTracker"]
+doc-valid-idents = ["SoundFont", "SoundFonts", "..", "MagicaVoxel", "BMFont", "TexturePacker", "LDtk", "OpenRaster", "DejaVu", "TrueType", "OpenType", "ProTracker", "ChatGPT", "OpenAI", "OpenID"]

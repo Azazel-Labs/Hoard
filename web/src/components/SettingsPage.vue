@@ -8,6 +8,7 @@ import { computed, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue'
 import {
   ApiError,
   api,
+  type ChatGptStatus,
   type LocalModel,
   type LocalModels,
   type ModelInfo,
@@ -71,7 +72,7 @@ const paths = reactive<Record<ToolKey, string>>({ blender: '', ffmpeg: '' })
 const chosen = reactive<Record<ToolKey, Mode>>({ blender: 'off', ffmpeg: 'auto' })
 
 // AI services: picking one fills in its address, so all that's left is a key (for hosted ones) and a model.
-type ProviderId = 'off' | 'local' | 'openrouter' | 'openai' | 'anthropic' | 'gemini' | 'ollama' | 'custom'
+type ProviderId = 'off' | 'local' | 'chatgpt' | 'openrouter' | 'openai' | 'anthropic' | 'gemini' | 'ollama' | 'custom'
 interface Provider {
   id: ProviderId
   label: string
@@ -93,6 +94,12 @@ const PROVIDERS: Provider[] = [
     url: '',
     editUrl: true,
     hint: 'The llm service in Hoard’s compose file (or cargo xtask llm). Download a model below; it runs on this machine and nothing leaves it.',
+  },
+  {
+    id: 'chatgpt',
+    label: 'ChatGPT plan',
+    url: '',
+    hint: 'Uses your ChatGPT Go, Plus, Pro or Business plan instead of an API key.',
   },
   {
     id: 'openrouter',
@@ -153,6 +160,9 @@ function providerOf(url: string): ProviderId {
   if (/^https?:\/\/(llm(:\d+)?|(localhost|127\.0\.0\.1):8081)(\/|$)/.test(u)) return 'local'
   return 'custom'
 }
+/** The service the saved settings use. */
+const providerIn = (l: Settings['llm']): ProviderId => (l.chatgpt ? 'chatgpt' : providerOf(l.url))
+const providerLabel = (l: Settings['llm']) => PROVIDERS.find((p) => p.id === providerIn(l))?.label ?? l.url
 
 const llm = reactive({ provider: 'off' as ProviderId, url: '', model: '', key: '', removeKey: false, vision: false, batch: 1 })
 const provider = computed(() => PROVIDERS.find((p) => p.id === llm.provider) ?? PROVIDERS[0])
@@ -163,14 +173,19 @@ const missingKey = computed(() => !!provider.value.key && !llm.key && !keptKey.v
 const llmDirty = computed(() => {
   const l = s.value?.llm
   if (!l) return false
-  if (llm.provider === 'off') return l.url !== ''
+  if (llm.provider === 'off') return l.url !== '' || l.chatgpt
+  if ((llm.provider === 'chatgpt') !== l.chatgpt) return true
   return (
     urlChanged.value || llm.model !== l.model || llm.key !== '' || llm.removeKey || llm.vision !== l.vision ||
     llm.batch !== l.batch.value
   )
 })
 const llmReady = computed(
-  () => llm.provider === 'off' || (!!trimUrl(llm.url) && !!llm.model.trim() && !missingKey.value && llm.batch >= 1),
+  () =>
+    llm.provider === 'off' ||
+    ((llm.provider === 'chatgpt' ? !!gpt.value?.signed_in : !!trimUrl(llm.url) && !missingKey.value) &&
+      !!llm.model.trim() &&
+      llm.batch >= 1),
 )
 
 const models = ref<ModelInfo[]>([])
@@ -223,7 +238,7 @@ function pickProvider(id: ProviderId) {
   models.value = []
   modelsState.value = { kind: 'idle', text: '' }
   local.value = null
-  if (id !== 'off' && providerOf(cur.url) === id) {
+  if (id !== 'off' && providerIn(cur) === id) {
     // Back to the one in use: put its settings back.
     Object.assign(llm, { url: cur.url, model: cur.model, vision: cur.vision })
   } else if (id === 'local') {
@@ -233,9 +248,134 @@ function pickProvider(id: ProviderId) {
   }
   void connect()
 }
-/** Look at the chosen service: the local model server's own list, or any other service's models. */
+/** Look at the chosen service: the local model server's own list, the ChatGPT account, or a service's models. */
 function connect() {
+  if (llm.provider === 'chatgpt') return loadChatgpt()
   return llm.provider === 'local' ? loadLocal() : loadModels()
+}
+
+// A ChatGPT plan: the server signs in to the person's ChatGPT account and tags with what the plan includes.
+const gpt = ref<ChatGptStatus | null>(null)
+const gptBusy = ref(false)
+/** The sign-in address, once "Continue with ChatGPT" was pressed (in case the window didn't open). */
+const gptUrl = ref('')
+const gptPaste = ref('')
+let gptTimer: number | undefined
+let gptUntil = 0
+async function loadChatgpt() {
+  const ask = ++modelsAsk
+  try {
+    const st = await api.chatgpt()
+    if (ask !== modelsAsk) return
+    gpt.value = st
+  } catch (e) {
+    if (e instanceof ApiError && e.status === 401) emit('unauthorized')
+    showError((e as Error).message)
+    return
+  }
+  if (!gpt.value.signed_in || gpt.value.problem) {
+    models.value = []
+    modelsState.value = { kind: 'idle', text: '' }
+    return
+  }
+  modelsState.value = { kind: 'loading', text: 'Connecting…' }
+  try {
+    const res = await api.chatgptModels()
+    if (ask !== modelsAsk) return
+    models.value = res.models
+    const n = res.models.length
+    modelsState.value = { kind: 'ok', text: n ? `Connected · ${n} model${n === 1 ? '' : 's'}` : 'Connected; type the model’s name' }
+    // ChatGPT lists its recommended model first.
+    if (!llm.model && n) chooseModel(res.models[0].id)
+  } catch (e) {
+    if (ask !== modelsAsk) return
+    models.value = []
+    modelsState.value = { kind: 'error', text: (e as Error).message }
+  }
+}
+async function startChatgpt() {
+  // Open the window while the click still counts; it's sent on once the server has the address ready.
+  const win = window.open('', '_blank')
+  gptBusy.value = true
+  try {
+    // The port this browser reaches Hoard on: on the server's own machine, ChatGPT sends it straight back here.
+    const port = Number(location.port) || (location.protocol === 'https:' ? 443 : 80)
+    const { url } = await api.chatgptStart(port)
+    gptUrl.value = url
+    gptPaste.value = ''
+    if (win) {
+      win.opener = null
+      win.location.href = url
+    }
+    gptUntil = Date.now() + 15 * 60_000
+    pollChatgpt()
+  } catch (e) {
+    win?.close()
+    if (e instanceof ApiError && e.status === 401) emit('unauthorized')
+    showError((e as Error).message)
+  } finally {
+    gptBusy.value = false
+  }
+}
+/** While a sign-in is under way, notice when it finishes in the other window. */
+function pollChatgpt() {
+  window.clearTimeout(gptTimer)
+  if (Date.now() > gptUntil) return
+  gptTimer = window.setTimeout(async () => {
+    try {
+      const st = await api.chatgpt()
+      if (st.signed_in && !st.problem && (!gpt.value?.signed_in || gpt.value.problem)) return signedIn(st)
+      gpt.value = st
+    } catch {
+      // Try again on the next tick.
+    }
+    pollChatgpt()
+  }, 2000)
+}
+function signedIn(st: ChatGptStatus) {
+  window.clearTimeout(gptTimer)
+  gpt.value = st
+  gptUrl.value = ''
+  gptPaste.value = ''
+  showOk(st.email ? `Signed in to ChatGPT as ${st.email}` : 'Signed in to ChatGPT')
+  void loadChatgpt()
+}
+async function finishChatgpt() {
+  const url = gptPaste.value.trim()
+  if (!url) return
+  gptBusy.value = true
+  try {
+    signedIn(await api.chatgptFinish(url))
+  } catch (e) {
+    if (e instanceof ApiError && e.status === 401) emit('unauthorized')
+    showError((e as Error).message)
+  } finally {
+    gptBusy.value = false
+  }
+}
+async function signOutChatgpt() {
+  const ok = await confirmDialog({
+    title: 'Sign out of ChatGPT?',
+    body: s.value?.llm.chatgpt
+      ? 'AI tagging uses your ChatGPT plan, so it stops until you sign in again or pick another service.'
+      : 'Hoard forgets the sign-in and tells OpenAI to end it.',
+    confirm: 'Sign out',
+  })
+  if (!ok) return
+  gptBusy.value = true
+  try {
+    const st = await api.chatgptSignOut()
+    gpt.value = st
+    models.value = []
+    modelsState.value = { kind: 'idle', text: '' }
+    if (st.note) showError(st.note)
+    else showOk('Signed out of ChatGPT')
+  } catch (e) {
+    if (e instanceof ApiError && e.status === 401) emit('unauthorized')
+    showError((e as Error).message)
+  } finally {
+    gptBusy.value = false
+  }
 }
 
 // The local model server (llama.cpp in router mode): downloads models from Hugging Face and lists what it has.
@@ -386,7 +526,7 @@ function take(next: Settings) {
     paths[k] = chosen[k] === 'path' ? next[k].value : ''
   }
   Object.assign(llm, {
-    provider: providerOf(next.llm.url),
+    provider: providerIn(next.llm),
     url: next.llm.url,
     model: next.llm.model,
     key: '',
@@ -440,24 +580,34 @@ function usePath(k: ToolKey) {
 
 function saveLlm() {
   if (llm.provider === 'off') {
-    void save({ llm_url: '' }, 'AI tagging is off')
+    void save({ llm_url: '', llm_chatgpt: false }, 'AI tagging is off')
     return
   }
-  const patch: SettingsPatch = { llm_url: trimUrl(llm.url), llm_model: llm.model.trim(), llm_vision: llm.vision }
+  const chatgpt = llm.provider === 'chatgpt'
+  const patch: SettingsPatch = {
+    llm_chatgpt: chatgpt,
+    llm_url: chatgpt ? '' : trimUrl(llm.url),
+    llm_model: llm.model.trim(),
+    llm_vision: llm.vision,
+  }
   if (llm.batch !== s.value?.llm.batch.value) patch.llm_batch = llm.batch
-  if (llm.key) patch.llm_api_key = llm.key.trim()
+  if (chatgpt) patch.llm_api_key = ''
+  else if (llm.key) patch.llm_api_key = llm.key.trim()
   // A key is only ever sent to the address it was saved with.
   else if (llm.removeKey || urlChanged.value) patch.llm_api_key = ''
   void save(patch, `AI tagging: ${provider.value.label}`)
 }
 const resetLlm = () =>
-  save({ llm_url: null, llm_model: null, llm_api_key: null, llm_vision: null, llm_batch: null }, 'AI tagging: back to the default')
+  save(
+    { llm_url: null, llm_model: null, llm_api_key: null, llm_vision: null, llm_chatgpt: null, llm_batch: null },
+    'AI tagging: back to the default',
+  )
 const llmChanged = computed(() => {
   const l = s.value?.llm
   if (!l?.saved) return false
   const d = l.default
   return (
-    trimUrl(l.url) !== trimUrl(d.url) || l.model !== d.model || l.vision !== d.vision || l.has_key !== d.has_key ||
+    l.chatgpt || trimUrl(l.url) !== trimUrl(d.url) || l.model !== d.model || l.vision !== d.vision || l.has_key !== d.has_key ||
     l.batch.value !== l.batch.default
   )
 })
@@ -539,6 +689,7 @@ onBeforeUnmount(() => {
   endPreview()
   window.clearTimeout(timer)
   window.clearTimeout(localTimer)
+  window.clearTimeout(gptTimer)
   localAsk++
 })
 </script>
@@ -668,7 +819,53 @@ onBeforeUnmount(() => {
               </select>
               <span />
               <p class="hint inline">{{ provider.hint }}</p>
-              <template v-if="llm.provider !== 'off'">
+              <template v-if="llm.provider === 'chatgpt'">
+                <span class="label">Account</span>
+                <div class="gpt">
+                  <p v-if="!gpt" class="status" data-state="looking" role="status">
+                    <span class="dot" aria-hidden="true" />
+                    <span class="text">Checking…</span>
+                  </p>
+                  <template v-else>
+                    <p v-if="gpt.signed_in || gpt.problem" class="status" :data-state="gpt.problem ? 'unavailable' : 'ready'" role="status">
+                      <span class="dot" aria-hidden="true" />
+                      <span class="text">{{ gpt.problem ?? (gpt.email ? `Signed in as ${gpt.email}` : 'Signed in') }}</span>
+                    </p>
+                    <div class="row">
+                      <button v-if="!gpt.signed_in || gpt.problem" type="button" class="btn primary" :disabled="gptBusy" @click="startChatgpt">
+                        Continue with ChatGPT
+                      </button>
+                      <button v-if="gpt.signed_in" type="button" class="link" :disabled="gptBusy" @click="signOutChatgpt">Sign out</button>
+                      <a class="link" :href="gpt.manage_url" target="_blank" rel="noopener noreferrer">Manage usage</a>
+                    </div>
+                    <template v-if="gptUrl && (!gpt.signed_in || gpt.problem)">
+                      <p class="hint inline">
+                        Finish signing in in the window that opened (<a :href="gptUrl" target="_blank" rel="noopener noreferrer">open it again</a>).
+                        If it ends on a page that won’t load, at an address starting with <code>http://127.0.0.1</code>, copy that
+                        address and paste it here:
+                      </p>
+                      <div class="key">
+                        <input
+                          v-model="gptPaste"
+                          class="field mono"
+                          type="url"
+                          spellcheck="false"
+                          aria-label="The address the sign-in ended on"
+                          placeholder="http://127.0.0.1:…/auth/callback?code=…"
+                          @keydown.enter.prevent="finishChatgpt"
+                        />
+                        <button type="button" class="btn" :disabled="!gptPaste.trim() || gptBusy" @click="finishChatgpt">Finish</button>
+                      </div>
+                    </template>
+                  </template>
+                  <p class="hint inline">
+                    Tagging requests count toward your ChatGPT plan’s usage. Manage usage shows what Hoard has used and lets you
+                    limit it. To disconnect Hoard from ChatGPT itself, go to Settings → Security and login → Sign in with ChatGPT
+                    on chatgpt.com.
+                  </p>
+                </div>
+              </template>
+              <template v-if="llm.provider !== 'off' && (llm.provider !== 'chatgpt' || (gpt?.signed_in && !gpt.problem))">
                 <template v-if="provider.editUrl">
                   <label for="llm-url">Address</label>
                   <input
@@ -781,7 +978,12 @@ onBeforeUnmount(() => {
                       :placeholder="models.length ? 'Pick or type a model' : 'Model name'"
                       @change="modelPicked"
                     />
-                    <button type="button" class="link" :disabled="!trimUrl(llm.url) || missingKey || modelsState.kind === 'loading'" @click="loadModels">
+                    <button
+                      type="button"
+                      class="link"
+                      :disabled="(llm.provider !== 'chatgpt' && (!trimUrl(llm.url) || missingKey)) || modelsState.kind === 'loading'"
+                      @click="connect"
+                    >
                       {{ modelsState.kind === 'ok' ? 'Refresh' : 'Connect' }}
                     </button>
                   </div>
@@ -809,7 +1011,7 @@ onBeforeUnmount(() => {
                 <button class="btn primary" type="submit" :disabled="busy || !llmDirty || !llmReady">Save</button>
                 <span class="status" :data-state="s.llm.enabled ? 'ready' : 'off'">
                   <span class="dot" aria-hidden="true" />
-                  <span class="text">{{ s.llm.enabled ? `On: ${PROVIDERS.find((p) => p.id === providerOf(s!.llm.url))?.label} · ${s.llm.model}` : 'Off' }}</span>
+                  <span class="text">{{ s.llm.enabled ? `On: ${providerLabel(s.llm)} · ${s.llm.model}` : 'Off' }}</span>
                 </span>
               </div>
             </form>
@@ -1014,7 +1216,9 @@ h3 { margin: 0; font-size: 0.7rem; font-weight: 650; letter-spacing: 0.04em; tex
 @media (prefers-reduced-motion: reduce) { .status .dot { animation: none !important; } }
 
 .llm { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 0.5rem 0.8rem; align-items: center; font-size: var(--step--1); }
-.llm > label { color: var(--muted); }
+.llm > label, .llm > .label { color: var(--muted); }
+.gpt { display: grid; gap: 0.5rem; justify-items: start; }
+.gpt .key { width: 100%; }
 .llm .key { display: flex; gap: 0.6rem; align-items: center; }
 .llm .key .field { flex: 1; min-width: 0; max-width: 32rem; }
 .llm .check { display: inline-flex; gap: 0.45rem; align-items: center; color: var(--text); }

@@ -38,6 +38,9 @@ pub(crate) struct Saved {
     pub(crate) llm_api_key: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub(crate) llm_vision: Option<bool>,
+    /// Tag through the ChatGPT account signed in from Settings instead of `llm_url`.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub(crate) llm_chatgpt: Option<bool>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub(crate) llm_batch: Option<usize>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -68,6 +71,7 @@ fn ignore<'de, D: serde::Deserializer<'de>>(d: D) -> Result<(), D::Error> {
 
 /// The settings in effect: saved ones over the flags.
 #[derive(Clone, Debug)]
+#[expect(clippy::struct_excessive_bools, reason = "each bool is an independent setting")]
 pub(crate) struct Effective {
     pub(crate) blender: String,
     pub(crate) ffmpeg: String,
@@ -76,6 +80,7 @@ pub(crate) struct Effective {
     pub(crate) llm_model: Option<String>,
     pub(crate) llm_api_key: Option<String>,
     pub(crate) llm_vision: bool,
+    pub(crate) llm_chatgpt: bool,
     pub(crate) llm_batch: usize,
     pub(crate) render: bool,
     pub(crate) update_check: bool,
@@ -88,7 +93,16 @@ pub(crate) struct Effective {
 
 impl Effective {
     pub(crate) fn llm_enabled(&self) -> bool {
-        self.llm_url.is_some() && self.llm_model.is_some()
+        self.llm_model.is_some() && (self.llm_chatgpt || self.llm_url.is_some())
+    }
+
+    /// Where tagging requests go, for the log.
+    pub(crate) fn llm_label(&self) -> &str {
+        match (self.llm_enabled(), self.llm_chatgpt) {
+            (false, _) => "off",
+            (true, true) => "ChatGPT plan",
+            (true, false) => self.llm_url.as_deref().unwrap_or("off"),
+        }
     }
 
     pub(crate) fn max_upload_bytes(&self) -> u64 {
@@ -119,6 +133,7 @@ impl Saved {
             llm_model: pick(&self.llm_model, &cfg.llm_model),
             llm_api_key: pick(&self.llm_api_key, &cfg.llm_api_key),
             llm_vision: self.llm_vision.unwrap_or(cfg.llm_vision),
+            llm_chatgpt: self.llm_chatgpt.unwrap_or(false),
             llm_batch: self.llm_batch.unwrap_or(cfg.llm_batch).max(1),
             render: self.render.unwrap_or(cfg.render),
             update_check: self.update_check.unwrap_or(cfg.update_check),
@@ -146,7 +161,7 @@ impl Saved {
         {
             return Err("The AI address should start with http:// or https://".into());
         }
-        if effective.llm_url.is_some() && effective.llm_model.is_none() {
+        if (effective.llm_chatgpt || effective.llm_url.is_some()) && effective.llm_model.is_none() {
             return Err("Choose the model the AI service should use".into());
         }
         if let Some(url) = self.public_url.as_deref().map(str::trim)

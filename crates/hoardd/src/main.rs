@@ -7,6 +7,7 @@ mod audio;
 mod blender;
 mod blobs;
 mod bundle;
+mod chatgpt;
 mod config;
 mod context;
 mod convert;
@@ -103,7 +104,7 @@ async fn main() -> Result<()> {
         listen = %cfg.listen,
         data = %cfg.data_dir.display(),
         storage = %blobs.label(),
-        llm = effective.llm_url.as_deref().unwrap_or("off"),
+        llm = effective.llm_label(),
         auth = cfg.token.is_some(),
         blender = %effective.blender,
         ffmpeg = %effective.ffmpeg,

@@ -129,6 +129,10 @@ cargo xtask sample --upload  # generate the sample pack and upload it
 cargo xtask web              # build the portal into web/dist
 ```
 
+Releases are automatic and change no files. Each push to `main` that passes CI is tagged with the next patch version
+(`#minor` or `#major` in a commit message bumps that instead; `#skip-release` only refreshes the `:edge` image), and
+the tag builds the binaries, the container image and the GitHub release. Builds take their version from the tag.
+
 ### Local models for the tagger
 
 The LLM tagger works with any OpenAI-compatible endpoint, and `cargo xtask` can set up a small one on your machine.
@@ -260,7 +264,7 @@ software rasterizer (`apt install mesa-vulkan-drivers`). Without any adapter, ev
    files are exported to GLB by headless Blender, with their linked textures laid out beside them. The GLB is stored as a derivative that feeds
    thumbnails, the browser preview and downloads.
 
-Tags carry their source (`meta`, `rule`, `llm`, `human`). Human tags always win, and re-running the offline
+Tags carry their source (`meta`, `rule`, `ai`, `human`). Human tags always win, and re-running the offline
 tagger after improving the vocabulary (`POST /api/packs/{id}/retag`) replaces only `rule`/`meta` tags.
 
 ## Getting assets into an engine

@@ -10,7 +10,7 @@ on:
         type: string
         required: true
       version:
-        description: Value of the org.opencontainers.image.version label.
+        description: The version the build reports (HOARD_VERSION) and its org.opencontainers.image.version label.
         type: string
         required: true
       tags:
@@ -43,6 +43,7 @@ jobs:
         with:
           context: .
           platforms: ${{ matrix.platform }}
+          build-args: HOARD_VERSION=${{ inputs.version }}
           labels: |
             org.opencontainers.image.version=${{ inputs.version }}
             org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}

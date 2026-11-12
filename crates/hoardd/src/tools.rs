@@ -91,7 +91,7 @@ pub(crate) fn client() -> Result<reqwest::Client> {
     Ok(reqwest::Client::builder()
         .connect_timeout(Duration::from_secs(30))
         .read_timeout(Duration::from_secs(120))
-        .user_agent(concat!("hoard/", env!("CARGO_PKG_VERSION")))
+        .user_agent(hoard_core::user_agent())
         .build()?)
 }
 

@@ -106,7 +106,7 @@ async fn handle(State(state): State<AppState>, headers: HeaderMap, body: String)
         }
         v
     };
-    let server_info = json!({ "name": "hoard", "title": "Hoard asset library", "version": env!("CARGO_PKG_VERSION") });
+    let server_info = json!({ "name": "hoard", "title": "Hoard asset library", "version": hoard_core::VERSION });
     let reply = match method {
         "initialize" => {
             let requested = params.get("protocolVersion").and_then(Value::as_str).unwrap_or("2025-11-25");

@@ -107,7 +107,7 @@ pub(crate) async fn fetch_store_text(http: &reqwest::Client, url: &str) -> Resul
     let resp = http
         .get(url)
         .header(reqwest::header::ACCEPT, "text/html")
-        .header(reqwest::header::USER_AGENT, concat!("hoard/", env!("CARGO_PKG_VERSION")))
+        .header(reqwest::header::USER_AGENT, hoard_core::user_agent())
         .timeout(FETCH_TIMEOUT)
         .send()
         .await?

@@ -29,7 +29,7 @@ pub(crate) fn start(enabled: bool) {
         loop {
             match latest().await {
                 Ok(latest) => {
-                    let newer = latest.filter(|u| is_newer(&u.version, env!("CARGO_PKG_VERSION")));
+                    let newer = latest.filter(|u| is_newer(&u.version, hoard_core::VERSION));
                     if let Some(u) = &newer {
                         tracing::info!(version = %u.version, url = %u.url, "a newer Hoard release is available");
                     }
@@ -46,10 +46,8 @@ pub(crate) fn start(enabled: bool) {
 }
 
 async fn latest() -> Result<Option<UpdateInfo>> {
-    let http = reqwest::Client::builder()
-        .timeout(Duration::from_secs(30))
-        .user_agent(concat!("hoard/", env!("CARGO_PKG_VERSION")))
-        .build()?;
+    let http =
+        reqwest::Client::builder().timeout(Duration::from_secs(30)).user_agent(hoard_core::user_agent()).build()?;
     let resp = http.get(LATEST_RELEASE).header("Accept", "application/vnd.github+json").send().await?;
     if resp.status() == reqwest::StatusCode::NOT_FOUND {
         return Ok(None);

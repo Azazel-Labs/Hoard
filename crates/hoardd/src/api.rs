@@ -125,7 +125,7 @@ async fn stats(State(state): State<AppState>) -> ApiResult<Json<Stats>> {
             duplicate_assets: one(
                 "SELECT COALESCE(SUM(n - 1), 0) FROM (SELECT COUNT(*) AS n FROM assets GROUP BY blob_hash HAVING n > 1)",
             )?,
-            version: env!("CARGO_PKG_VERSION").to_owned(),
+            version: hoard_core::VERSION.to_owned(),
             ffmpeg: crate::ffmpeg::describe(),
             blender: crate::blender::describe(),
             update: crate::updates::available(),

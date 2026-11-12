@@ -124,7 +124,7 @@ button, input, select, textarea { font: inherit; color: inherit; }
 }
 .chip .ns { color: var(--faint); }
 .chip.src-human { background: var(--raised); border-color: var(--muted); }
-.chip.src-llm { border-style: dashed; }
+.chip.src-ai { border-style: dashed; }
 .chip.src-meta { color: var(--muted); }
 
 input.field, select.field, textarea.field {

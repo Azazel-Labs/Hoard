@@ -13,7 +13,7 @@ const sourceLabel: Record<TagSource, string> = {
   human: 'added by a person',
   rule: 'from the offline tagger',
   meta: 'measured from the file',
-  llm: 'suggested by the LLM',
+  ai: 'suggested by AI',
 }
 </script>
 

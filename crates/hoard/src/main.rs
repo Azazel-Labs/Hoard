@@ -17,7 +17,7 @@ use serde::{Deserialize, Serialize};
 use tokio::io::AsyncWriteExt;
 
 #[derive(Debug, Parser)]
-#[command(version, about = "Search, upload and sync assets from a Hoard server")]
+#[command(version = hoard_core::VERSION, about = "Search, upload and sync assets from a Hoard server")]
 struct Cli {
     /// Server base URL.
     #[arg(long, global = true, env = "HOARD_SERVER")]

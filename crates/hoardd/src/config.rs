@@ -23,7 +23,7 @@ pub(crate) enum UnrealConvert {
 
 /// Hoard asset server. Every flag can also be set with the matching `HOARD_*` environment variable.
 #[derive(Debug, Clone, Parser)]
-#[command(version, about)]
+#[command(version = hoard_core::VERSION, about)]
 #[expect(clippy::struct_excessive_bools, reason = "each bool is an independent command-line switch")]
 pub(crate) struct Config {
     /// Address to listen on.

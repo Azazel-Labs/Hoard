@@ -5,6 +5,18 @@
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
+/// This build's version. Releases set `HOARD_VERSION` from their git tag when building, so version numbers never
+/// have to be committed; without it (a local build) it's Cargo.toml's version.
+pub const VERSION: &str = match option_env!("HOARD_VERSION") {
+    Some(v) if !v.is_empty() => v,
+    _ => env!("CARGO_PKG_VERSION"),
+};
+
+/// `hoard/<version>`, the User-Agent for Hoard's own HTTP requests.
+pub fn user_agent() -> String {
+    format!("hoard/{VERSION}")
+}
+
 /// Broad bucket an asset falls into. Decided by extension + magic bytes, never by the LLM.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(rename_all = "lowercase")]
@@ -98,8 +110,10 @@ pub enum TagSource {
     Meta,
     /// Offline heuristic tagger (filename vocab, image analysis, audio heuristics).
     Rule,
-    /// LLM (online or local via Ollama/OpenAI-compatible endpoint).
-    Llm,
+    /// An AI model (the bundled local one, or any OpenAI-compatible endpoint).
+    /// Stored as `llm` before v1.0.1; that still reads as this.
+    #[serde(alias = "llm")]
+    Ai,
     /// A person typed it.
     Human,
 }
@@ -109,7 +123,7 @@ impl TagSource {
         match self {
             TagSource::Meta => "meta",
             TagSource::Rule => "rule",
-            TagSource::Llm => "llm",
+            TagSource::Ai => "ai",
             TagSource::Human => "human",
         }
     }
@@ -117,7 +131,7 @@ impl TagSource {
         match s {
             "meta" => TagSource::Meta,
             "rule" => TagSource::Rule,
-            "llm" => TagSource::Llm,
+            "ai" | "llm" => TagSource::Ai,
             _ => TagSource::Human,
         }
     }

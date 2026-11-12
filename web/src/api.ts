@@ -4,7 +4,7 @@ export type AssetKind =
   | 'texture' | 'audio' | 'model' | 'animation' | 'font' | 'shader'
   | 'material' | 'video' | 'document' | 'data' | 'other'
 
-export type TagSource = 'meta' | 'rule' | 'llm' | 'human'
+export type TagSource = 'meta' | 'rule' | 'ai' | 'human'
 
 export interface Tag { tag: string; source: TagSource; confidence: number }
 

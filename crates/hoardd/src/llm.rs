@@ -386,7 +386,7 @@ fn apply_reply(
                 )?;
             }
             for t in &tags {
-                db::upsert_tag(&tx, id, t, TagSource::Llm, LLM_CONFIDENCE)?;
+                db::upsert_tag(&tx, id, t, TagSource::Ai, LLM_CONFIDENCE)?;
             }
             db::reindex_asset(&tx, id)?;
         }

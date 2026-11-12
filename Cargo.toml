@@ -3,6 +3,8 @@ resolver = "3"
 members = ["crates/hoard-core", "crates/hoard-unreal", "crates/hoardd", "crates/hoard", "crates/hoard-render", "xtask"]
 
 [workspace.package]
+# Only what a local build reports. Releases are git tags (auto-release.yml tags every push to main that passes ci) and
+# builds take their version from the tag (HOARD_VERSION), so this isn't bumped.
 version = "1.0.1"
 edition = "2024"
 rust-version = "1.99"

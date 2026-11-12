@@ -27,6 +27,8 @@ const BASELINE_VERSION: i64 = 8;
 const MIGRATIONS: &[&str] = &[
     // 9: settings changed from the portal (see `settings.rs`).
     "CREATE TABLE settings (key TEXT PRIMARY KEY, value TEXT NOT NULL) WITHOUT ROWID;",
+    // 10: the AI tagger's tags are source `ai`, not `llm`.
+    "UPDATE asset_tags SET source = 'ai' WHERE source = 'llm';",
 ];
 
 /// How many automatic pre-upgrade backups to keep in `<data dir>/backups`.
@@ -239,7 +241,7 @@ fn migrate(conn: &mut Connection, backups: &Path, steps: &[&str]) -> Result<()> 
             "the database is at schema version {version}, but this hoardd {} only knows up to {target}: a newer \
              Hoard has upgraded it. Run that version again, or restore the backup it made before upgrading \
              ({}/hoard-pre-upgrade-v{target}-*.db, or older).",
-            env!("CARGO_PKG_VERSION"),
+            hoard_core::VERSION,
             backups.display(),
         );
     }
@@ -437,7 +439,7 @@ fn attach_tags(conn: &Connection, assets: &mut [Asset]) -> Result<()> {
     let placeholders = vec!["?"; assets.len()].join(",");
     let mut stmt = conn.prepare(&format!(
         "SELECT asset_id, tag, source, confidence FROM asset_tags WHERE asset_id IN ({placeholders})
-         ORDER BY CASE source WHEN 'human' THEN 0 WHEN 'rule' THEN 1 WHEN 'llm' THEN 2 ELSE 3 END, tag"
+         ORDER BY CASE source WHEN 'human' THEN 0 WHEN 'rule' THEN 1 WHEN 'ai' THEN 2 ELSE 3 END, tag"
     ))?;
     let mut by_id: HashMap<String, Vec<Tag>> = HashMap::new();
     let rows = stmt.query_map(params_from_iter(assets.iter().map(|a| a.id.as_str())), |r| {
@@ -1086,8 +1088,17 @@ mod tests {
     fn baseline_database_upgrades_to_current() {
         let dir = tempfile::tempdir().unwrap();
         let mut conn = baseline_db(dir.path());
+        // Just the tag row matters here, not the asset it hangs off.
+        conn.execute_batch(
+            "PRAGMA foreign_keys = OFF;
+             INSERT INTO asset_tags (asset_id, tag, source, confidence) VALUES ('a1', 'forest', 'llm', 0.6);",
+        )
+        .unwrap();
         migrate(&mut conn, &dir.path().join("backups"), MIGRATIONS).unwrap();
         assert_eq!(user_version(&conn).unwrap(), SCHEMA_VERSION);
+        let source: String =
+            conn.query_row("SELECT source FROM asset_tags WHERE asset_id = 'a1'", [], |r| r.get(0)).unwrap();
+        assert_eq!(source, "ai");
         let name: String = conn.query_row("SELECT name FROM packs WHERE id = 'p1'", [], |r| r.get(0)).unwrap();
         assert_eq!(name, "Forest");
         let settings: i64 = conn.query_row("SELECT COUNT(*) FROM settings", [], |r| r.get(0)).unwrap();

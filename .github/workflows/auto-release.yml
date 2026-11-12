@@ -1,12 +1,14 @@
 name: auto-release
 # After ci passes on a push to main:
-#   - usually                                        ->  bump, commit, tag and release (release.yml), moving :edge;
+#   - usually                                        ->  tag the next version and release it (release.yml), moving :edge;
 #   - the pushed commit's message has #skip-release  ->  just publish ghcr.io/<owner>/hoard:edge and :sha-<short>.
+# Releasing only adds a vX.Y.Z tag: no files are changed and nothing is committed to main, so your next push never
+# has to pull a bot commit first. Builds read their version from the tag (HOARD_VERSION).
 # The release notes are the commit subjects since the last tag (scripts/release-notes.sh).
 # The bump is patch by default; "#minor" or "#major" in any commit message since the last tag overrides it.
 #
-# The release commit and tag are pushed with GITHUB_TOKEN, which deliberately doesn't trigger workflows: no ci run
-# on the bump commit (ci already passed on its parent) and no second release.yml run from the tag push.
+# The tag is pushed with GITHUB_TOKEN, which deliberately doesn't trigger workflows, so release.yml is called here
+# rather than run a second time from the tag push.
 on:
   workflow_run:
     workflows: [ci]
@@ -35,6 +37,7 @@ jobs:
       short: ${{ steps.plan.outputs.short }}
       release: ${{ steps.plan.outputs.release }}
       version: ${{ steps.plan.outputs.version }}
+      edge-version: ${{ steps.plan.outputs.edge-version }}
     steps:
       - uses: actions/checkout@v4
         with: { ref: main, fetch-depth: 0 }
@@ -46,53 +49,56 @@ jobs:
             echo "main has moved past $SHA; skipping"
             echo "tip=false" >> "$GITHUB_OUTPUT"; exit 0
           fi
+          short="$(git rev-parse --short=7 HEAD)"
           echo "tip=true" >> "$GITHUB_OUTPUT"
-          echo "short=$(git rev-parse --short=7 HEAD)" >> "$GITHUB_OUTPUT"
+          echo "short=$short" >> "$GITHUB_OUTPUT"
+
+          last="$(git describe --tags --abbrev=0 --match 'v*' 2>/dev/null || true)"
+          # No release yet: start from Cargo.toml's version.
+          current="${last#v}"
+          [ -n "$current" ] || current="$(sed -n '/^\[workspace.package\]/,/^\[/ s/^version = "\(.*\)"/\1/p' Cargo.toml | head -1)"
+          # An :edge build reports the release it's built on, plus where it is (not "newer" than that release).
+          echo "edge-version=${current}+edge.$short" >> "$GITHUB_OUTPUT"
 
           if git log -1 --format=%B | grep -qi '#skip-release'; then
             echo "#skip-release; publishing :edge only"
             echo "release=false" >> "$GITHUB_OUTPUT"; exit 0
           fi
+          if [ -n "$last" ] && [ "$(git rev-list --count "$last..HEAD")" = 0 ]; then
+            echo "$last is already main's tip; nothing to release"
+            echo "release=false" >> "$GITHUB_OUTPUT"; exit 0
+          fi
 
-          current="$(sed -n '/^\[workspace.package\]/,/^\[/ s/^version = "\(.*\)"/\1/p' Cargo.toml | head -1)"
-          last="$(git describe --tags --abbrev=0 --match 'v*' 2>/dev/null || true)"
           log="$(git log --format=%B ${last:+$last..}HEAD)"
           IFS=. read -r major minor patch <<< "${current%%-*}"
-          if grep -qi '#major' <<< "$log"; then version="$((major + 1)).0.0"
+          if [ -z "$last" ]; then version="$current"                    # the first release is Cargo.toml's version
+          elif grep -qi '#major' <<< "$log"; then version="$((major + 1)).0.0"
           elif grep -qi '#minor' <<< "$log"; then version="$major.$((minor + 1)).0"
           elif [[ "$current" == *-* ]]; then version="${current%%-*}"   # 0.9.0-rc.1 -> 0.9.0
           else version="$major.$minor.$((patch + 1))"; fi
 
-          echo "Releasing $current -> $version (commits since ${last:-the start})"
+          echo "Releasing ${last:-nothing yet} -> v$version"
           echo "release=true" >> "$GITHUB_OUTPUT"
           echo "version=$version" >> "$GITHUB_OUTPUT"
 
-  cut:
+  tag:
     needs: plan
     if: needs.plan.outputs.tip == 'true' && needs.plan.outputs.release == 'true'
     runs-on: ubuntu-latest
     permissions: { contents: write }
     steps:
       - uses: actions/checkout@v4
-        with: { ref: main, fetch-depth: 0 }
-      - uses: actions/setup-node@v4
-        with: { node-version: 24 }
-      - name: Toolchain from rust-toolchain.toml
-        run: rustup show active-toolchain || rustup toolchain install
-      - name: Bump, commit and tag
+        with: { ref: "${{ github.event.workflow_run.head_sha }}", fetch-depth: 0 }
+      - name: Tag
         env: { VERSION: "${{ needs.plan.outputs.version }}" }
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          # ci already ran fmt/clippy/tests/web build on this commit; the bump only touches version numbers.
-          bash scripts/release.sh "$VERSION" --skip-checks
-      - name: Push
-        env: { VERSION: "${{ needs.plan.outputs.version }}" }
-        # Atomic: if main moved since plan, neither the commit nor the tag lands.
-        run: git push --atomic origin HEAD:main "v$VERSION"
+          { printf 'Hoard %s\n\n' "$VERSION"; bash scripts/release-notes.sh HEAD; } | git tag -a "v$VERSION" -F -
+          git push origin "v$VERSION"
 
   release:
-    needs: [plan, cut]
+    needs: [plan, tag]
     uses: ./.github/workflows/release.yml
     permissions: { contents: write, packages: write }
     with:
@@ -106,5 +112,5 @@ jobs:
     permissions: { contents: read, packages: write }
     with:
       ref: ${{ github.event.workflow_run.head_sha }}
-      version: edge-${{ needs.plan.outputs.short }}
+      version: ${{ needs.plan.outputs.edge-version }}
       tags: edge sha-${{ needs.plan.outputs.short }}

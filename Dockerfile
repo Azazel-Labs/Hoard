@@ -19,6 +19,8 @@ COPY crates ./crates
 # xtask is a workspace member; it isn't built, but cargo needs its manifest to load the workspace.
 COPY xtask ./xtask
 COPY tools/unreal_export.py ./tools/unreal_export.py
+# The version this build reports (CI passes the release tag's); empty means Cargo.toml's.
+ARG HOARD_VERSION=
 RUN cargo build --release --locked -p hoardd -p hoard
 
 FROM debian:trixie-slim

@@ -1,27 +1,26 @@
 #!/usr/bin/env bash
-# Cut a Hoard release: bump versions, run the checks, commit and tag. Never pushes.
-# The release notes are the commit subjects since the last tag (scripts/release-notes.sh).
+# Tag a Hoard release by hand. Usually you don't need this: every push to main that passes ci is tagged and
+# released by .github/workflows/auto-release.yml. Releasing is only a tag; no version is committed anywhere
+# (builds read it from the tag as HOARD_VERSION). Never pushes.
 #
-#   scripts/release.sh 0.2.0                 # full release
-#   scripts/release.sh 0.2.0 --dry-run       # show what would change, touch nothing
-#   scripts/release.sh 0.2.0 -- --trailer "Reviewed-by: someone"   # extra `git commit` arguments after `--`
+#   scripts/release.sh 1.2.0              # run the checks, then tag HEAD v1.2.0
+#   scripts/release.sh 1.2.0 --dry-run    # show the notes, touch nothing
+#   scripts/release.sh 1.2.0 --skip-checks
 #
-# Then: git push origin main v0.2.0   (the tag triggers .github/workflows/release.yml)
+# Then: git push origin v1.2.0   (the tag triggers .github/workflows/release.yml)
 set -euo pipefail
 
-usage() { sed -n '2,9p' "$0" | sed 's/^# \{0,1\}//'; exit 2; }
+usage() { sed -n '2,10p' "$0" | sed 's/^# \{0,1\}//'; exit 2; }
 
 version="${1:-}"
 [[ -n "$version" && "$version" != -* ]] || usage
 shift
 dry_run=false
 skip_checks=false
-commit_args=()
 while (($#)); do
   case "$1" in
     --dry-run) dry_run=true ;;
     --skip-checks) skip_checks=true ;;
-    --) shift; commit_args=("$@"); break ;;
     *) usage ;;
   esac
   shift
@@ -32,10 +31,11 @@ die() { echo "release: $*" >&2; exit 1; }
 
 [[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?$ ]] || die "'$version' isn't a semver version like 1.2.3"
 tag="v$version"
-current="$(sed -n '/^\[workspace.package\]/,/^\[/ s/^version = "\(.*\)"/\1/p' Cargo.toml | head -1)"
-[[ -n "$current" ]] || die "couldn't read [workspace.package] version from Cargo.toml"
-[[ "$(printf '%s\n%s\n' "$current" "$version" | sort -V | tail -1)" == "$version" && "$current" != "$version" ]] \
-  || die "$version isn't newer than the current $current"
+last="$(git describe --tags --abbrev=0 --match 'v*' 2>/dev/null || true)"
+if [[ -n "$last" ]]; then
+  [[ "$(printf '%s\n%s\n' "${last#v}" "$version" | sort -V | tail -1)" == "$version" && "${last#v}" != "$version" ]] \
+    || die "$version isn't newer than the last release, $last"
+fi
 git rev-parse -q --verify "refs/tags/$tag" >/dev/null && die "tag $tag already exists"
 [[ -z "$(git status --porcelain)" ]] || die "working tree isn't clean; commit or stash first"
 branch="$(git branch --show-current)"
@@ -44,16 +44,11 @@ branch="$(git branch --show-current)"
 notes="$(bash scripts/release-notes.sh HEAD)"
 [[ -n "$notes" ]] || die "nothing has been committed since the last release"
 
-echo "Releasing $current -> $version"
+echo "Releasing ${last:-(first release)} -> $tag"
 echo "----- release notes -----"
 echo "$notes"
 echo "-------------------------"
 $dry_run && { echo "(dry run: nothing changed)"; exit 0; }
-
-# Versions: the Rust workspace (all crates inherit it) and the web app.
-sed -i.bak "/^\[workspace.package\]/,/^\[/ s/^version = \".*\"/version = \"$version\"/" Cargo.toml && rm Cargo.toml.bak
-cargo update --workspace --quiet
-(cd web && npm version "$version" --no-git-tag-version --allow-same-version >/dev/null)
 
 if ! $skip_checks; then
   echo "Running checks (fmt, clippy, tests, web build)..."
@@ -63,8 +58,6 @@ if ! $skip_checks; then
   (cd web && npm run build --silent)
 fi
 
-git add Cargo.toml Cargo.lock web/package.json web/package-lock.json
-git commit --quiet -m "Release $tag" ${commit_args[@]+"${commit_args[@]}"}
 git tag -a "$tag" -F - <<NOTES
 Hoard $version
 
@@ -72,5 +65,5 @@ $notes
 NOTES
 
 echo
-echo "Committed and tagged $tag. Nothing was pushed. When you're ready:"
-echo "  git push origin $branch $tag"
+echo "Tagged $tag. Nothing was pushed. When you're ready:"
+echo "  git push origin $tag"

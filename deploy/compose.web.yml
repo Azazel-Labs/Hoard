@@ -24,9 +24,6 @@ services:
   hoard:
     container_name: hoard
     image: ghcr.io/azazel-labs/hoard:latest   # or `build: ..` to build from this checkout
-    labels:
-      com.centurylinklabs.watchtower.enable: "true"
-      com.centurylinklabs.watchtower.scope: hoard
     restart: unless-stopped
     network_mode: service:tailscale
     environment:
@@ -36,34 +33,10 @@ services:
       HOARD_S3_BUCKET: ${GARAGE_DEFAULT_BUCKET}
       HOARD_S3_ACCESS_KEY: ${GARAGE_DEFAULT_ACCESS_KEY}
       HOARD_S3_SECRET_KEY: ${GARAGE_DEFAULT_SECRET_KEY}
-      # Lets Hoard ask Watchtower (below) to update it as soon as it's idle after a release.
-      HOARD_WATCHTOWER_URL: http://watchtower:8080
-      HOARD_WATCHTOWER_TOKEN: hoard-update
     volumes:
       # Your files stay at home in the NAS bucket; these are the other two.
       - hoard-config:/config      # database, Settings, backups: small, back it up
       - hoard-cache:/cache        # thumbnails served from the VPS, uploads in progress: can be rebuilt
-
-  # Pulls new Hoard images daily and restarts it; the database upgrades itself on start (backed up first).
-  # Pin the image tag (e.g. :0.8) to take only patch releases, or remove this service to update by hand.
-  watchtower:
-    container_name: hoard-watchtower
-    image: ghcr.io/nicholas-fedor/watchtower:1.21
-    restart: unless-stopped
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-    environment:
-      WATCHTOWER_LABEL_ENABLE: "true"
-      WATCHTOWER_SCOPE: hoard
-      WATCHTOWER_CLEANUP: "true"
-      WATCHTOWER_SCHEDULE: "0 0 4 * * *"   # seconds-first cron: 04:00 daily
-      # Hoard asks for its own update over this API once it's idle; the port isn't published, so only containers
-      # in this file can reach it. Periodic polls keep the 04:00 check as well.
-      WATCHTOWER_HTTP_API_ENDPOINTS: update
-      WATCHTOWER_HTTP_API_TOKEN: hoard-update
-      WATCHTOWER_HTTP_API_PERIODIC_POLLS: "true"
-    labels:
-      com.centurylinklabs.watchtower.scope: hoard
 
 volumes:
   ts-web:

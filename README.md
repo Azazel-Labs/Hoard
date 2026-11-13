@@ -41,39 +41,12 @@ services:
     container_name: hoard
     image: ghcr.io/azazel-labs/hoard:latest
     restart: unless-stopped
-    environment:
-      # Lets Hoard ask Watchtower (below) to update it as soon as it's idle after a release.
-      HOARD_WATCHTOWER_URL: http://watchtower:8080
-      HOARD_WATCHTOWER_TOKEN: hoard-update
     volumes:
       - hoard-config:/config      # database, Settings, backups: small, back it up
       - hoard-library:/library    # your files: big, put it on the disk with room
       - hoard-cache:/cache        # thumbnails, uploads in progress, Blender/ffmpeg: fast disk, can be rebuilt
     ports:
       - "4627:4627"
-    labels:
-      com.centurylinklabs.watchtower.enable: "true"
-      com.centurylinklabs.watchtower.scope: hoard
-
-  # Keeps Hoard up to date: pulls new images at 04:00 and restarts it.
-  watchtower:
-    container_name: hoard-watchtower
-    image: ghcr.io/nicholas-fedor/watchtower:1.21
-    restart: unless-stopped
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-    environment:
-      WATCHTOWER_LABEL_ENABLE: "true"
-      WATCHTOWER_SCOPE: hoard
-      WATCHTOWER_CLEANUP: "true"
-      WATCHTOWER_SCHEDULE: "0 0 4 * * *"
-      # Hoard asks for its own update over this API once it's idle; the port isn't published, so only containers
-      # in this file can reach it. Periodic polls keep the 04:00 check as well.
-      WATCHTOWER_HTTP_API_ENDPOINTS: update
-      WATCHTOWER_HTTP_API_TOKEN: hoard-update
-      WATCHTOWER_HTTP_API_PERIODIC_POLLS: "true"
-    labels:
-      com.centurylinklabs.watchtower.scope: hoard
 
 volumes:
   hoard-config:
@@ -109,10 +82,9 @@ it and drop a pack onto the portal. More locations come later, from **Settings �
 
 A location is any folder the server can see, so in Docker, mount it into the container first.
 
-**Updates are automatic.** Watchtower pulls each new release, and Hoard upgrades its database on start, saving a copy
-in `/config/backups` first. Change the image tag to `:0.8` to get patch releases only, or delete the `watchtower`
-service to update by hand (`docker compose pull && docker compose up -d`). The header shows a badge when a newer
-release exists.
+**Updating.** The header shows a badge when a newer release exists. Run `docker compose pull && docker compose up -d`
+to take it; Hoard upgrades its database on start, saving a copy in `/config/backups` first. Change the image tag to
+`:0.8` to get patch releases only.
 
 **GPU (optional).** Hoard renders 3D model thumbnails on the GPU when it can see one, and in software when it can't.
 The packs page shows which (`GPU: ...` or `No GPU found`). To pass the GPU through, add the overlay for your
@@ -752,7 +724,6 @@ Set before starting (these need a restart):
 | `HOARD_FILES_DIR` | – | the folder the first-run setup suggests (`/library` in the image) |
 | `HOARD_CACHE_DIR` | `<data dir>` | thumbnails and previews, uploads in progress, scratch space, downloaded Blender/ffmpeg |
 | `HOARD_WEB_DIR` | `./web/dist` | built portal |
-| `HOARD_WATCHTOWER_URL` / `_TOKEN` / `_CONTAINER` | – / – / `hoard` | Watchtower's HTTP API: Hoard asks it to update this container once a release is out and Hoard is idle |
 | `HOARD_LOCAL_LLM_URL` | `http://llm:8080/v1` | where the local model server listens (Settings → AI tagging → Local model) |
 | `HOARD_S3_ENDPOINT` / `_BUCKET` / `_REGION` / `_ACCESS_KEY` / `_SECRET_KEY` / `_HEADERS` | – | the S3 service for `s3://` library locations |
 

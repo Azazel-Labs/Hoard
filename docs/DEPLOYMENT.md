@@ -142,32 +142,25 @@ code; C removes the VPS. Pick B now and move to C if the VPS starts to feel like
 
 ## Updating
 
-Every compose file here runs the published image `ghcr.io/azazel-labs/hoard` and a
-[Watchtower](https://github.com/nicholas-fedor/watchtower) container. (The original containrrr/watchtower was archived
-in 2025; this fork is maintained and works the same way.) Watchtower checks for a new image at 04:00 every day,
-replaces the Hoard container, and removes the old image. It only touches containers labelled with the `hoard` scope,
-so other containers on the host are left alone.
+Every compose file here runs the published image `ghcr.io/azazel-labs/hoard`. To update, pull the new image and
+recreate the container:
+
+```sh
+docker compose pull && docker compose up -d
+```
+
+Hoard upgrades its database on start, saving a copy in `/config/backups` first. The tag picks which releases a pull
+takes:
 
 | In the compose file | Effect |
 |---|---|
 | `image: ghcr.io/azazel-labs/hoard:latest` (as shipped) | every release |
 | `…/hoard:0.8` | patch releases of 0.8 only; change it by hand for 0.9 |
-| `…/hoard:0.8.1` | exactly that version: Watchtower never changes it |
+| `…/hoard:0.8.1` | exactly that version |
 | `…/hoard:edge` | every green commit on `main`, between releases |
-| `WATCHTOWER_SCHEDULE: "0 30 3 * * 0"` | when Watchtower checks (cron with a leading seconds field) |
 
-The server also asks GitHub every six hours whether a newer release exists, for the badge in the header; switch that
-off in Settings → Maintenance → Updates.
-
-**Updating sooner.** The compose files also switch on Watchtower's HTTP API and point Hoard at it
-(`HOARD_WATCHTOWER_URL`, `HOARD_WATCHTOWER_TOKEN`). When Hoard sees a newer release, it waits until nothing is going
-on (no jobs, uploads, maintenance or conversions, two checks a minute apart) and asks Watchtower to update its
-container then, instead of at 04:00. The image is published a few minutes after the release, so if Watchtower finds
-nothing new Hoard asks again an hour later, up to six times. Watchtower's own schedule still runs. With a pinned tag
-(`:0.8.1`) the ask changes nothing. Leave out `HOARD_WATCHTOWER_URL` to update only on the schedule. If you renamed
-the Hoard container, set `HOARD_WATCHTOWER_CONTAINER` to its name.
-
-To update by hand instead, delete the `watchtower` service and run `docker compose pull && docker compose up -d`.
+The server asks GitHub every six hours whether a newer release exists, for the badge in the header; switch that off
+in Settings → Maintenance → Updates.
 If you build from a checkout, replace the `image:` line with `build: ..`.
 
 **Database upgrades.** On start, Hoard compares the database's schema version with its own. If the database is

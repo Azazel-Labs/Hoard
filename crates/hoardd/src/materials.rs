@@ -8,6 +8,9 @@
 //! The same set at several resolutions (`Rock_2K_Color.jpg`, `Rock_4K_Color.jpg`, or `Rock_2K/…` and `Rock_4K/…`
 //! folders) is one material with each map in several sizes.
 //!
+//! A store's JSON beside the maps (a Megascans `<id>.json`) names the material, says what each listed map is where
+//! the file name doesn't, and gives a surface's real size and height, which the material's facts carry.
+//!
 //! Detection runs after a pack is ingested or re-tagged, and as a `materials` job for packs from before it existed.
 
 use std::collections::{BTreeMap, BTreeSet, HashMap, HashSet};
@@ -17,6 +20,7 @@ use hoard_core::{AssetKind, MaterialInfo, MaterialMap, TagSource};
 use rusqlite::{Connection, OptionalExtension, params};
 use tokio::runtime::Handle;
 
+use crate::sidecar::Sidecar;
 use crate::tagger::{self, TagSet};
 use crate::{AppState, db, links};
 
@@ -291,9 +295,16 @@ pub(crate) fn parse_map(stem: &str) -> Option<MapName> {
         }
     };
     let mut end = toks.len();
-    while end > 0 && is_noise(&toks[end - 1].text) {
-        note(&toks[end - 1].text);
-        end -= 1;
+    loop {
+        if end > 0 && is_noise(&toks[end - 1].text) {
+            note(&toks[end - 1].text);
+            end -= 1;
+        } else if end >= 2 && toks[end - 2].text == "lod" && toks[end - 1].text.chars().all(|c| c.is_ascii_digit()) {
+            // One normal map per level of detail: `xeokah0_4K_Normal_LOD0`.
+            end -= 2;
+        } else {
+            break;
+        }
     }
     // "nor_gl", "Normal_OpenGL", "NormalDX".
     // Every spelling is tried: "OpenGL" ends in "gl" too, but only "open gl" leaves "normal" in front of it.
@@ -348,6 +359,15 @@ fn dir_key(dir: &str) -> String {
 pub(crate) struct Candidate<'a> {
     pub(crate) path: &'a str,
     pub(crate) size_px: Option<u32>,
+    /// What the store's JSON beside it says it is, and the asset it's part of (its id), to group by when the file
+    /// name doesn't say.
+    pub(crate) listed: Option<(Role, &'a str)>,
+}
+
+/// A store's word for a kind of map (`albedo`, `displacement`, `ambient occlusion`) as a role.
+pub(crate) fn role_of_word(word: &str) -> Option<Role> {
+    let words = tokens(word).into_iter().map(|t| t.text).collect::<Vec<_>>().join(" ");
+    ROLE_WORDS.iter().find(|(w, _, _)| *w == words).map(|(_, role, _)| *role)
 }
 
 /// One material found among a pack's textures.
@@ -398,7 +418,15 @@ pub(crate) fn find(textures: &[Candidate<'_>]) -> Vec<Found> {
     }
     let mut groups: BTreeMap<(String, String), Vec<Member>> = BTreeMap::new();
     for (idx, c) in textures.iter().enumerate() {
-        let Some(name) = parse_map(stem_of(c.path)) else { continue };
+        let name = match (parse_map(stem_of(c.path)), c.listed) {
+            // The store's list beats the file name.
+            (Some(name), Some((role, _))) => MapName { role, weak: false, ..name },
+            (Some(name), None) => name,
+            (None, Some((role, asset))) => {
+                MapName { base: asset.to_owned(), key: asset.to_lowercase(), role, weak: false, resolution: None }
+            }
+            (None, None) => continue,
+        };
         groups.entry((dir_key(dir_of(c.path)), name.key.clone())).or_default().push(Member { idx, name });
     }
     let taken: HashSet<String> = textures.iter().map(|c| c.path.to_lowercase()).collect();
@@ -452,6 +480,8 @@ struct Made {
     found: Found,
     descriptor: crate::blobs::StoredBlob,
     thumb: Option<crate::blobs::StoredBlob>,
+    physical_size: Option<[f32; 2]>,
+    displacement: Option<f32>,
 }
 
 #[derive(Debug)]
@@ -472,6 +502,32 @@ fn sidecar_title(json: &[u8]) -> Option<String> {
         tags["name_formats"]["title"].as_str().or_else(|| tags["name"].as_str()).or_else(|| v["name"].as_str())?;
     let title = title.split_whitespace().collect::<Vec<_>>().join(" ");
     (!title.is_empty() && title.len() <= 120).then_some(title)
+}
+
+/// What the store's JSON files of the pack say each texture is (see [`Candidate::listed`]).
+fn listed_roles<'a>(textures: &[Texture], sidecars: &'a [Sidecar]) -> Vec<Option<(Role, &'a str)>> {
+    textures
+        .iter()
+        .map(|t| {
+            sidecars.iter().find_map(|s| {
+                let role = role_of_word(&s.listed_map(&t.path)?.kind)?;
+                Some((role, s.id.as_deref().unwrap_or(s.title.as_str())))
+            })
+        })
+        .collect()
+}
+
+/// The store's JSON that speaks for a material: the one listing its maps, or else the only one in its folder.
+fn sidecar_of<'a>(sidecars: &'a [Sidecar], textures: &[Texture], f: &Found) -> Option<&'a Sidecar> {
+    let listing = sidecars.iter().find(|s| f.maps.iter().any(|(i, ..)| s.listed_map(&textures[*i].path).is_some()));
+    listing.or_else(|| {
+        let dir = dir_of(&f.path);
+        let mut beside = sidecars.iter().filter(|s| dir_of(&s.path) == dir);
+        match (beside.next(), beside.next()) {
+            (Some(s), None) => Some(s),
+            _ => None,
+        }
+    })
 }
 
 /// Name materials after a `<name>.json` beside them, when there is one with a title in it.
@@ -532,6 +588,52 @@ pub(crate) fn detect_pack(state: &AppState, rt: &Handle, conn: &mut Connection, 
     Ok(n)
 }
 
+impl Made {
+    /// The material's facts, as its asset's `meta`.
+    fn meta(&self) -> serde_json::Value {
+        let f = &self.found;
+        let roles: BTreeSet<&str> = f.maps.iter().map(|(_, r, _)| r.as_str()).collect();
+        let mut resolutions: Vec<&str> = f.maps.iter().filter_map(|(_, _, r)| r.as_deref()).collect();
+        resolutions.sort_by_key(|r| std::cmp::Reverse(res_px(r)));
+        resolutions.dedup();
+        let mut meta = serde_json::json!({ "material_maps": f.maps.len(), "roles": roles, "resolutions": resolutions });
+        if let Some(size) = self.physical_size {
+            meta["physical_size"] = serde_json::json!(size);
+        }
+        if let Some(d) = self.displacement {
+            meta["displacement"] = serde_json::json!(d);
+        }
+        meta
+    }
+}
+
+/// A material's file: its maps by role, and a tiling surface's real size for an engine to scale its UVs by.
+fn descriptor(
+    f: &Found,
+    textures: &[Texture],
+    dir: &str,
+    physical_size: Option<[f32; 2]>,
+    displacement: Option<f32>,
+) -> serde_json::Value {
+    let mut descriptor = serde_json::json!({
+        "hoard_material": 1,
+        "name": f.name,
+        "maps": f.maps.iter().map(|(i, role, res)| serde_json::json!({
+            "role": role.as_str(),
+            "file": db::strip_dir(&textures[*i].path, dir),
+            "resolution": res,
+            "hash": textures[*i].hash,
+        })).collect::<Vec<_>>(),
+    });
+    if let Some(size) = physical_size {
+        descriptor["physical_size_m"] = serde_json::json!(size);
+    }
+    if let Some(d) = displacement {
+        descriptor["displacement_m"] = serde_json::json!(d);
+    }
+    descriptor
+}
+
 /// The materials in a pack's textures, made into assets, and the models that use them linked.
 fn find_materials(state: &AppState, rt: &Handle, conn: &mut Connection, pack_id: &str) -> Result<usize> {
     crate::issues::clear(
@@ -556,8 +658,13 @@ fn find_materials(state: &AppState, rt: &Handle, conn: &mut Connection, pack_id:
         })?
         .collect::<rusqlite::Result<_>>()?
     };
-    let candidates: Vec<Candidate<'_>> =
-        textures.iter().map(|t| Candidate { path: &t.path, size_px: t.size_px }).collect();
+    let sidecars = rt.block_on(crate::sidecar::pack_sidecars(state, pack_id))?;
+    let listed = listed_roles(&textures, &sidecars);
+    let candidates: Vec<Candidate<'_>> = textures
+        .iter()
+        .zip(&listed)
+        .map(|(t, l)| Candidate { path: &t.path, size_px: t.size_px, listed: *l })
+        .collect();
     let mut found = find(&candidates);
     name_from_sidecars(state, rt, conn, pack_id, &mut found)?;
     let existing: HashMap<String, (String, String, bool, bool)> = {
@@ -573,16 +680,10 @@ fn find_materials(state: &AppState, rt: &Handle, conn: &mut Connection, pack_id:
     let mut made = Vec::new();
     for f in found {
         let dir = dir_of(&f.path).to_owned();
-        let descriptor = serde_json::json!({
-            "hoard_material": 1,
-            "name": f.name,
-            "maps": f.maps.iter().map(|(i, role, res)| serde_json::json!({
-                "role": role.as_str(),
-                "file": db::strip_dir(&textures[*i].path, &dir),
-                "resolution": res,
-                "hash": textures[*i].hash,
-            })).collect::<Vec<_>>(),
-        });
+        let real = sidecar_of(&sidecars, &textures, &f);
+        let physical_size = real.and_then(|s| s.physical_size).map(|(w, h)| [w, h]);
+        let displacement = real.and_then(|s| s.displacement);
+        let descriptor = descriptor(&f, &textures, &dir, physical_size, displacement);
         let bytes = serde_json::to_vec_pretty(&descriptor)?;
         let hash = blake3::hash(&bytes).to_hex().to_string();
         match existing.get(&f.path) {
@@ -594,6 +695,8 @@ fn find_materials(state: &AppState, rt: &Handle, conn: &mut Connection, pack_id:
                     found: f,
                     descriptor: crate::blobs::StoredBlob { hash, size: bytes.len() as u64 },
                     thumb: None,
+                    physical_size,
+                    displacement,
                 });
                 continue;
             }
@@ -610,7 +713,7 @@ fn find_materials(state: &AppState, rt: &Handle, conn: &mut Connection, pack_id:
                 None
             }
         };
-        made.push(Made { found: f, descriptor, thumb });
+        made.push(Made { found: f, descriptor, thumb, physical_size, displacement });
     }
 
     let now = db::now();
@@ -627,14 +730,7 @@ fn find_materials(state: &AppState, rt: &Handle, conn: &mut Connection, pack_id:
                 params![b.hash, b.size as i64, now],
             )?;
         }
-        let roles: BTreeSet<&str> = f.maps.iter().map(|(_, r, _)| r.as_str()).collect();
-        let resolutions: Vec<&str> = {
-            let mut v: Vec<&str> = f.maps.iter().filter_map(|(_, _, r)| r.as_deref()).collect();
-            v.sort_by_key(|r| std::cmp::Reverse(res_px(r)));
-            v.dedup();
-            v
-        };
-        let meta = serde_json::json!({ "material_maps": f.maps.len(), "roles": roles, "resolutions": resolutions });
+        let meta = m.meta();
         let tags = material_tags(&tx, &textures, f)?;
         let category = tagger::categorize(AssetKind::Material, &tags);
         tx.execute(
@@ -1066,12 +1162,16 @@ fn render_thumb(state: &AppState, rt: &Handle, textures: &[Texture], f: &Found) 
 
 /// One material with its maps, for an asset's detail.
 fn info(conn: &Connection, id: &str) -> Result<Option<MaterialInfo>> {
-    let head: Option<(String, String, bool)> = conn
-        .query_row("SELECT name, path, thumb_hash IS NOT NULL FROM assets WHERE id = ?1", [id], |r| {
-            Ok((r.get(0)?, r.get(1)?, r.get(2)?))
+    let head: Option<(String, String, bool, Option<String>)> = conn
+        .query_row("SELECT name, path, thumb_hash IS NOT NULL, meta FROM assets WHERE id = ?1", [id], |r| {
+            Ok((r.get(0)?, r.get(1)?, r.get(2)?, r.get(3)?))
         })
         .optional()?;
-    let Some((name, path, has_thumb)) = head else { return Ok(None) };
+    let Some((name, path, has_thumb, meta)) = head else { return Ok(None) };
+    let meta: serde_json::Value = meta.and_then(|m| serde_json::from_str(&m).ok()).unwrap_or_default();
+    let physical_size = serde_json::from_value::<[f32; 2]>(meta["physical_size"].clone()).ok();
+    #[expect(clippy::cast_possible_truncation, reason = "metres, a handful of digits")]
+    let displacement = meta["displacement"].as_f64().map(|d| d as f32);
     let mut stmt = conn.prepare_cached(
         "SELECT a.id, a.name, a.path, a.ext, m.role, m.resolution, json_extract(a.meta, '$.width'),
                 json_extract(a.meta, '$.height'), a.thumb_hash IS NOT NULL, b.size
@@ -1098,7 +1198,7 @@ fn info(conn: &Connection, id: &str) -> Result<Option<MaterialInfo>> {
     maps.sort_by(|a, b| {
         order(a).cmp(&order(b)).then(b.width.unwrap_or(0).cmp(&a.width.unwrap_or(0))).then(a.path.cmp(&b.path))
     });
-    Ok(Some(MaterialInfo { id: id.to_owned(), name, path, has_thumb, maps }))
+    Ok(Some(MaterialInfo { id: id.to_owned(), name, path, has_thumb, maps, physical_size, displacement }))
 }
 
 /// Fill in an asset's material facts: a material's maps, or the materials a texture is part of or a model uses
@@ -1163,6 +1263,32 @@ mod tests {
         assert_eq!(sidecar_title(br#"{"name": "Metal Plate", "id": "tkxmfcwa"}"#).as_deref(), Some("Metal Plate"));
         assert_eq!(sidecar_title(br#"{"name": "  "}"#), None);
         assert_eq!(sidecar_title(b"not json"), None);
+    }
+
+    #[test]
+    fn a_normal_map_per_level_of_detail() {
+        assert_eq!(role("xeokah0_4K_Normal_LOD0"), r("xeokah0", Role::Normal, Some("4K")));
+        assert_eq!(role("Rock_Normal_LOD12"), r("Rock", Role::Normal, None));
+        assert_eq!(role("Rock_LOD0"), None);
+    }
+
+    #[test]
+    fn the_stores_list_says_what_a_map_is() {
+        assert_eq!(role_of_word("albedo"), Some(Role::BaseColor));
+        assert_eq!(role_of_word("Displacement"), Some(Role::Height));
+        assert_eq!(role_of_word("ambientOcclusion"), Some(Role::Ao));
+        assert_eq!(role_of_word("fuzz"), None);
+        // Named so nothing could tell, listed by the JSON beside them.
+        let c = [
+            Candidate { path: "S/sbkpa_4K_a.jpg", size_px: None, listed: Some((Role::BaseColor, "sbkpa")) },
+            Candidate { path: "S/sbkpa_4K_b.jpg", size_px: None, listed: Some((Role::Normal, "sbkpa")) },
+            // The list beats a name that says otherwise.
+            Candidate { path: "S/sbkpa_4K_Bump.jpg", size_px: None, listed: Some((Role::Height, "sbkpa")) },
+        ];
+        let found = find(&c);
+        assert_eq!(found.len(), 1, "{found:?}");
+        let roles: Vec<Role> = found[0].maps.iter().map(|(_, r, _)| *r).collect();
+        assert_eq!(roles, [Role::BaseColor, Role::Normal, Role::Height]);
     }
 
     fn role(stem: &str) -> Option<(String, Role, Option<String>)> {
@@ -1240,7 +1366,7 @@ mod tests {
     }
 
     fn found(paths: &[&str]) -> Vec<Found> {
-        let c: Vec<Candidate<'_>> = paths.iter().map(|p| Candidate { path: p, size_px: None }).collect();
+        let c: Vec<Candidate<'_>> = paths.iter().map(|p| Candidate { path: p, size_px: None, listed: None }).collect();
         find(&c)
     }
 

@@ -292,8 +292,12 @@ software rasterizer (`apt install mesa-vulkan-drivers`). Without any adapter, ev
      listed under "Identical copies".
    - **Megascans files.** The `<id>.json` that comes with each Megascans asset names the pack (unless someone typed
      its name), adds its tags (`wood`, `furniture`, `color:brown`, …) to the pack and the asset, and gives the pack a
-     short description: what it is, where it was scanned, its size and its maps. More → "Read the pack's files again"
-     reads them again, for example after the description was deleted.
+     short description: what it is, where it was scanned, its size, its maps and its levels of detail ("LOD0 to LOD5,
+     24,000 to 380 triangles"). Its list of maps says what each map is, which beats the file name (a normal map per
+     LOD is still one material), its triangle counts fill in a model's when the file doesn't give one, and a
+     surface's real size and height go with its material (see the "Real" repeat below). The file goes with the
+     whole pack's download, not with a model's or a material's. More → "Read the pack's files again" reads them again,
+     for example after the description was deleted.
    - **Pack context.** README text is kept with the pack, and a store link inside it (Fab, itch.io, Humble Bundle,
      Unity Asset Store, Kenney, …) fills in where the pack came from. "Store details" on the packs page takes the
      store page URL, license tier and listing text. For a pack without a store link it first searches Fab, itch.io,
@@ -359,6 +363,9 @@ one material. It takes a colour map plus one more, or two other kinds of map.
 - **In the detail panel**, the material turns in a live preview, with its maps listed by kind and size. Click one to
   open it. Double-click the tile (or the preview) for the full-screen viewer: sphere, cube or plane, how often it
   repeats, how far the height map pushes, each map switched off and on, the environment light and the background.
+  A scanned surface whose real size is known ("2 × 2 m" in its Megascans file) starts at "Real": the sphere is 2 m
+  across and the surface repeats as often as it would on something that size, and its height map pushes as far as
+  the scan was deep.
 - **Models** that use a material's maps, by naming them or by sharing its name (`Rock_A.fbx` next to the `Rock_…`
   maps), show the material in their panel with its maps under it by kind. On a model that names no textures, the 3D
   viewers put its maps on by kind.

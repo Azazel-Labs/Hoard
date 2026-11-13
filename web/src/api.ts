@@ -84,6 +84,10 @@ export interface MaterialInfo {
   has_thumb: boolean
   /** By role (colour first), each role's largest first. */
   maps: MaterialMap[]
+  /** How much ground one repeat of a tiling material covers, [width, height] in metres, when the store says. */
+  physical_size?: [number, number]
+  /** How far its height map reaches, in metres, when the store says. */
+  displacement?: number
 }
 
 export type MapRole =

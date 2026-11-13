@@ -90,6 +90,8 @@ test.describe('materials', () => {
       ]),
     )
     expect(names.filter((n) => n.includes('_2K_'))).toEqual([])
+    // The store's JSON goes with the whole pack, not with the model.
+    expect(names.filter((n) => n.endsWith('.json'))).toEqual([])
     // One map on its own, and in the manifest the hoard tool reads.
     const one = await api.get(`/api/assets/${ao.id}/file?download=1`)
     expect(one.headers()['content-disposition']).toContain(`"${stem}_AO.png"`)

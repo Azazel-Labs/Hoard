@@ -1,6 +1,8 @@
 //! Files a store ships beside the art that say what it is. A Megascans asset (from Fab or Bridge) carries
 //! `<id>.json` with the listing's exact title, tags, colour, where it was scanned and its real-world size, while its
-//! files are named `Historic_Miscellaneous_Stand_Wood_Old_05_xeokah0_Raw…`.
+//! files are named `Historic_Miscellaneous_Stand_Wood_Old_05_xeokah0_Raw…`. It also lists the asset's texture maps by
+//! kind, its levels of detail with their triangle counts and, for a surface, how much ground one repeat covers.
+//! Fields follow Quixel's published asset spec; every one is optional.
 //!
 //! [`read`] understands one such file; [`apply`] reads a pack's and names, tags and describes the pack from them.
 //! The store search reads them too ([`pack_sidecars`]), for the exact title.
@@ -47,6 +49,32 @@ pub(crate) struct Sidecar {
     /// The size range it's meant for, as written ("1-2 m").
     pub(crate) size: Option<String>,
     pub(crate) texel_density: Option<String>,
+    /// The texture maps it lists.
+    pub(crate) maps: Vec<ListedMap>,
+    /// Its levels of detail, lowest number first.
+    pub(crate) lods: Vec<Lod>,
+    /// For a tiling surface: width and height of one repeat, in metres.
+    pub(crate) physical_size: Option<(f32, f32)>,
+    /// For a tiling surface: how far its height map reaches, in metres.
+    pub(crate) displacement: Option<f32>,
+}
+
+/// A texture map the file lists.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub(crate) struct ListedMap {
+    /// Its file name, lowercase and without folders.
+    pub(crate) file: String,
+    /// What it's for, in the store's word, lowercase (`albedo`, `normal`, `displacement`).
+    pub(crate) kind: String,
+}
+
+/// A level of detail the file lists.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub(crate) struct Lod {
+    pub(crate) number: u32,
+    pub(crate) tris: u64,
+    /// Its mesh files' names, lowercase and without folders.
+    pub(crate) files: Vec<String>,
 }
 
 /// Strings from a value that may be a string, a comma-separated string or an array of either.
@@ -65,6 +93,114 @@ fn first_string(v: &Value) -> Option<String> {
 
 fn tidy(s: &str) -> String {
     s.split_whitespace().collect::<Vec<_>>().join(" ")
+}
+
+/// A URI's file name, lowercase.
+fn file_name(uri: &str) -> Option<String> {
+    let f = uri.rsplit(['/', '\\']).next()?.trim().to_ascii_lowercase();
+    (!f.is_empty()).then_some(f)
+}
+
+/// A length's unit in metres; `None` for one that isn't a length.
+fn unit_metres(unit: &str) -> Option<f32> {
+    match unit {
+        "m" | "meter" | "meters" | "metre" | "metres" => Some(1.0),
+        "dm" => Some(0.1),
+        "cm" => Some(0.01),
+        "mm" => Some(0.001),
+        _ => None,
+    }
+}
+
+/// A number and the unit after it (`"2cm"`, `"2 x 2 m"` → `("2 x 2", "m")`).
+fn split_unit(s: &str) -> (&str, &str) {
+    let s = s.trim();
+    let at = s.rfind(|c: char| c.is_ascii_digit() || c == '.').map_or(0, |i| i + 1);
+    (s[..at].trim(), s[at..].trim())
+}
+
+/// A length with its unit, in metres: `"2cm"` → 0.02.
+fn metres(s: &str) -> Option<f32> {
+    let (n, unit) = split_unit(s);
+    let v: f32 = n.parse().ok()?;
+    (v > 0.0).then_some(v * unit_metres(&unit.to_ascii_lowercase())?)
+}
+
+/// An area's width and height in metres: `"2x2 m"`, `"200 x 200 cm"`, `"0.91x0.91"`, `"40x40"`. Without a unit,
+/// numbers up to 20 are metres and larger ones decimetres: Quixel's API writes metres and its file spec decimetres.
+fn area_metres(s: &str) -> Option<(f32, f32)> {
+    let (n, unit) = split_unit(s);
+    let parts: Vec<f32> = n.split(['x', 'X', '×', '*']).map(|p| p.trim().parse().ok()).collect::<Option<_>>()?;
+    let (w, h) = match parts.as_slice() {
+        [w, h] => (*w, *h),
+        [s] => (*s, *s),
+        _ => return None,
+    };
+    if !(w > 0.0 && h > 0.0) {
+        return None;
+    }
+    let scale = if unit.is_empty() {
+        if w.max(h) > 20.0 { 0.1 } else { 1.0 }
+    } else {
+        unit_metres(&unit.to_ascii_lowercase())?
+    };
+    Some((w * scale, h * scale))
+}
+
+/// The texture maps a file lists: today's `maps` list, or the spec's `components` with their files nested by size,
+/// resolution and format. Also the physical sizes they're given.
+fn listed_maps(v: &Value) -> (Vec<ListedMap>, Vec<String>) {
+    let mut maps: Vec<ListedMap> = Vec::new();
+    let mut sizes = Vec::new();
+    let mut add = |kind: &str, uri: Option<&str>| {
+        if let Some(file) = uri.and_then(file_name)
+            && !kind.is_empty()
+            && !maps.iter().any(|m| m.file == file)
+        {
+            maps.push(ListedMap { file, kind: kind.to_ascii_lowercase() });
+        }
+    };
+    for m in v["maps"].as_array().into_iter().flatten() {
+        add(m["type"].as_str().unwrap_or_default(), m["uri"].as_str());
+        sizes.extend(m["physicalSize"].as_str().map(str::to_owned));
+    }
+    for c in v["components"].as_array().into_iter().flatten() {
+        let kind = c["type"].as_str().unwrap_or_default();
+        for u in c["uris"].as_array().into_iter().flatten() {
+            sizes.extend(u["physicalSize"].as_str().map(str::to_owned));
+            for r in u["resolutions"].as_array().into_iter().flatten() {
+                for f in r["formats"].as_array().into_iter().flatten() {
+                    add(kind, f["uri"].as_str());
+                }
+            }
+        }
+    }
+    (maps, sizes)
+}
+
+/// The levels of detail a file lists (`meshes` of type `lod`), numbered as their files are (`…_LOD2.fbx`) or else
+/// in order.
+fn listed_lods(v: &Value) -> Vec<Lod> {
+    let mut lods: Vec<Lod> = v["meshes"]
+        .as_array()
+        .into_iter()
+        .flatten()
+        .filter(|m| m["type"].as_str().is_some_and(|t| t.eq_ignore_ascii_case("lod")))
+        .enumerate()
+        .filter_map(|(i, m)| {
+            let files: Vec<String> = m["uris"]
+                .as_array()
+                .into_iter()
+                .flatten()
+                .filter_map(|u| u["uri"].as_str().and_then(file_name))
+                .collect();
+            let lod = files.iter().find_map(|f| lod_of(f)).or_else(|| u32::try_from(i).ok())?;
+            Some(Lod { number: lod, tris: m["tris"].as_u64().filter(|&t| t > 0)?, files })
+        })
+        .collect();
+    lods.sort_by_key(|l| l.number);
+    lods.dedup_by_key(|l| l.number);
+    lods
 }
 
 /// Understand a JSON file from a pack, if it's one a store ships to describe an asset.
@@ -135,8 +271,15 @@ pub(crate) fn read(path: &str, json: &str) -> Option<Sidecar> {
     let mut dims = Vec::new();
     let mut texel_density = None;
     let mut scan_area = None;
+    let mut tileable = false;
     for m in v["meta"].as_array().into_iter().flatten() {
         let key = m["key"].as_str().unwrap_or_default().to_ascii_lowercase();
+        if key == "tileable" {
+            tileable = m["value"]
+                .as_bool()
+                .unwrap_or_else(|| m["value"].as_str().is_some_and(|s| s.eq_ignore_ascii_case("true")));
+            continue;
+        }
         let Some(value) = first_string(&m["value"]).map(|s| tidy(&s)).filter(|s| !s.is_empty() && s.len() <= 40) else {
             continue;
         };
@@ -159,7 +302,19 @@ pub(crate) fn read(path: &str, json: &str) -> Option<Sidecar> {
     let size = match (size_of("min"), size_of("max")) {
         (Some(a), Some(b)) if a == b => Some(a),
         (Some(a), Some(b)) => Some(format!("{a} to {b}")),
-        (a, b) => a.or(b).or(scan_area),
+        (a, b) => a.or(b).or_else(|| scan_area.clone()),
+    };
+
+    let (maps, map_sizes) = listed_maps(&v);
+    // Only a surface tiles; a 3D asset's measurements are its own, not a repeat's.
+    let surface = tileable
+        || asset_type.as_deref().is_some_and(|t| t.to_ascii_lowercase().contains("surface"))
+        || strings(&v["categories"]).iter().any(|c| c.to_ascii_lowercase().starts_with("surface"));
+    let physical_size = surface.then(|| scan_area.iter().chain(&map_sizes).find_map(|s| area_metres(s))).flatten();
+    let displacement = if surface {
+        dims.iter().find(|(k, _)| k == "height").and_then(|(_, v)| metres(v)).filter(|&m| m < 1.0)
+    } else {
+        None
     };
 
     Some(Sidecar {
@@ -174,6 +329,10 @@ pub(crate) fn read(path: &str, json: &str) -> Option<Sidecar> {
         dims,
         size,
         texel_density,
+        maps,
+        lods: listed_lods(&v),
+        physical_size,
+        displacement,
     })
 }
 
@@ -221,6 +380,27 @@ impl Sidecar {
         self.id.as_deref().is_some_and(|id| file.contains(&id.to_ascii_lowercase())) || path == self.path
     }
 
+    /// The map this file lists for a file of the pack (in the JSON's folder or below it), if it does.
+    pub(crate) fn listed_map(&self, path: &str) -> Option<&ListedMap> {
+        let dir = self.path.rsplit_once('/').map_or("", |(d, _)| d);
+        if !dir.is_empty() && !path.starts_with(&format!("{dir}/")) {
+            return None;
+        }
+        let file = path.rsplit('/').next().unwrap_or(path).to_ascii_lowercase();
+        self.maps.iter().find(|m| m.file == file)
+    }
+
+    /// The triangle count this file gives a model file of the pack, if it lists it as a level of detail. The
+    /// spec's LODs are FBX and OBJ; the same mesh in another format counts the same.
+    pub(crate) fn lod_tris(&self, path: &str) -> Option<u64> {
+        let file = path.rsplit('/').next().unwrap_or(path).to_ascii_lowercase();
+        let stem = file.rsplit_once('.').map_or(file.as_str(), |(s, _)| s);
+        self.lods
+            .iter()
+            .find(|l| l.files.iter().any(|f| *f == file || f.rsplit_once('.').is_some_and(|(s, _)| s == stem)))
+            .map(|l| l.tris)
+    }
+
     /// A short description from the facts: what it is, where it's from, its size and maps.
     pub(crate) fn describe(&self, maps: &[&str]) -> String {
         let kind = self.asset_type.as_deref().unwrap_or("asset");
@@ -239,6 +419,17 @@ impl Sidecar {
         if let Some(t) = &self.texel_density {
             facts.push(format!("texel density {t}"));
         }
+        match self.lods.as_slice() {
+            [] => {}
+            [only] => facts.push(format!("{} triangles", thousands(only.tris))),
+            [first, .., last] => facts.push(format!(
+                "LOD{} to LOD{}, {} to {} triangles",
+                first.number,
+                last.number,
+                thousands(first.tris),
+                thousands(last.tris)
+            )),
+        }
         if !facts.is_empty() {
             let text = facts.join("; ");
             out.push(' ');
@@ -250,6 +441,19 @@ impl Sidecar {
         }
         out
     }
+}
+
+/// `12000` → `12,000`.
+fn thousands(n: u64) -> String {
+    let s = n.to_string();
+    let mut out = String::new();
+    for (i, c) in s.chars().enumerate() {
+        if i > 0 && (s.len() - i).is_multiple_of(3) {
+            out.push(',');
+        }
+        out.push(c);
+    }
+    out
 }
 
 /// A map's name in words.
@@ -417,6 +621,18 @@ fn write(
             touched.insert(asset.clone());
         }
         name_and_link(&tx, s, &mine)?;
+        // A model whose file couldn't be read for its triangles takes the count the store gives.
+        for (asset, path, kind) in &mine {
+            if kind == AssetKind::Model.as_str()
+                && let Some(tris) = s.lod_tris(path)
+            {
+                tx.execute(
+                    "UPDATE assets SET meta = json_set(COALESCE(meta, '{}'), '$.triangles', ?2)
+                     WHERE id = ?1 AND json_extract(meta, '$.triangles') IS NULL",
+                    params![asset, i64::try_from(tris).unwrap_or(i64::MAX)],
+                )?;
+            }
+        }
         for t in tags {
             if !file_tags.contains(&t) {
                 file_tags.push(t);
@@ -583,6 +799,68 @@ pub(crate) mod tests {
         assert_eq!(s.origin.as_deref(), Some("Iceland"));
         assert!(s.tags.contains(&"mossy".to_owned()) && s.tags.contains(&"rock".to_owned()));
         assert!(s.describe(&[]).starts_with("An asset from Quixel Megascans, scanned in Iceland. Size 2x2 m."));
+    }
+
+    /// A surface in the shape of Quixel's asset spec: maps under `components`, sizes in decimetres.
+    const SURFACE_SPEC: &str = r#"{
+        "id": "sbkpa", "name": "Mossy Ground", "categories": ["surface_scans", "soil"],
+        "meta": [
+            { "key": "scanArea", "value": "2x2 m" }, { "key": "tileable", "value": true },
+            { "key": "height", "value": "2cm" }
+        ],
+        "components": [
+            { "type": "albedo", "colorSpace": "sRGB", "uris": [{ "physicalSize": "20x20", "resolutions": [
+                { "resolution": "2048x2048", "formats": [
+                    { "mimeType": "image/jpeg", "uri": "sbkpa_2K_Albedo.jpg" },
+                    { "mimeType": "image/x-exr", "uri": "sbkpa_2K_Albedo.exr" }
+                ] }
+            ] }] },
+            { "type": "displacement", "uris": [{ "resolutions": [{ "formats": [{ "uri": "sbkpa_2K_Displacement.exr" }] }] }] }
+        ]
+    }"#;
+
+    #[test]
+    fn reads_a_surfaces_maps_and_size() {
+        let s = read("Mossy/sbkpa.json", SURFACE_SPEC).unwrap();
+        assert_eq!(s.physical_size, Some((2.0, 2.0)));
+        assert!((s.displacement.unwrap() - 0.02).abs() < 1e-6);
+        assert_eq!(s.maps.len(), 3);
+        assert_eq!(s.listed_map("Mossy/sbkpa_2K_Albedo.exr").map(|m| m.kind.as_str()), Some("albedo"));
+        assert_eq!(s.listed_map("Mossy/sbkpa_2K_displacement.EXR").map(|m| m.kind.as_str()), Some("displacement"));
+        assert_eq!(s.listed_map("Other/sbkpa_2K_Albedo.jpg"), None, "only files beside the JSON");
+
+        // Today's `maps` list; a size without a scan area, in metres.
+        let today = r#"{"id": "x1", "semanticTags": {"name": "Tiles", "asset_type": "surface"},
+            "maps": [{"type": "normal", "uri": "x1_4K_Normal.jpg", "physicalSize": "0.91x0.91", "colorSpace": "Linear"}]}"#;
+        let s = read("x1.json", today).unwrap();
+        assert_eq!(s.physical_size, Some((0.91, 0.91)));
+        assert_eq!(s.listed_map("x1_4K_Normal.jpg").map(|m| m.kind.as_str()), Some("normal"));
+
+        // A 3D asset's measurements aren't a repeat.
+        let s = read("xeokah0.json", STAND).unwrap();
+        assert_eq!((s.physical_size, s.displacement), (None, None));
+        assert_eq!(area_metres("200 x 100 cm"), Some((2.0, 1.0)));
+        assert_eq!(area_metres("40x40"), Some((4.0, 4.0)));
+        assert_eq!(area_metres("2x2 furlongs"), None);
+    }
+
+    #[test]
+    fn reads_levels_of_detail() {
+        let json = r#"{"id": "pdEuS", "name": "Branch", "meta": [],
+            "meshes": [
+                {"type": "zbrush", "uris": [{"uri": "Branch_pdEuS.ztl"}]},
+                {"type": "lod", "tris": 380, "uris": [{"uri": "Branch_pdEuS_LOD5.fbx"}]},
+                {"type": "lod", "tris": 24000, "uris": [{"mimeType": "application/x-fbx", "uri": "Branch_pdEuS_LOD0.fbx"},
+                                                       {"uri": "Branch_pdEuS_LOD0.obj"}]}
+            ]}"#;
+        let s = read("pdEuS.json", json).unwrap();
+        assert_eq!(s.lods.iter().map(|l| (l.number, l.tris)).collect::<Vec<_>>(), [(0, 24000), (5, 380)]);
+        assert_eq!(s.lod_tris("Branch/Branch_pdEuS_LOD0.OBJ"), Some(24000));
+        assert_eq!(s.lod_tris("Branch/Branch_pdEuS_LOD0.glb"), Some(24000), "the same mesh in another format");
+        assert_eq!(s.lod_tris("Branch/Branch_pdEuS_LOD3.fbx"), None);
+        assert!(s.describe(&[]).ends_with("LOD0 to LOD5, 24,000 to 380 triangles."), "{}", s.describe(&[]));
+        assert_eq!(thousands(999), "999");
+        assert_eq!(thousands(1_234_567), "1,234,567");
     }
 
     #[test]

@@ -240,6 +240,13 @@ pub struct MaterialInfo {
     pub has_thumb: bool,
     /// By role (colour first), each role's largest first.
     pub maps: Vec<MaterialMap>,
+    /// How much ground one repeat of a tiling material covers, width and height in metres, when the store says
+    /// (a Megascans surface's `<id>.json`).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub physical_size: Option<[f32; 2]>,
+    /// How far its height map reaches, in metres, when the store says.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub displacement: Option<f32>,
 }
 
 /// One texture of a material and what it's for.
@@ -439,7 +446,8 @@ pub enum LinkRel {
     /// Another source file this one links in (a .blend library).
     Library,
     Guess,
-    /// The store's file that describes this asset (a Megascans `<id>.json`).
+    /// The store's file that describes this asset (a Megascans `<id>.json`). Not something the asset needs: it goes
+    /// with the whole pack's download, not with the model's or material's.
     Sidecar,
     /// A sibling in the same variant family. Computed, never stored as a link.
     Variant,
@@ -473,15 +481,7 @@ impl LinkRel {
     }
     /// Whether a bundle download should include the target by default.
     pub fn is_dependency(&self) -> bool {
-        matches!(
-            self,
-            LinkRel::Texture
-                | LinkRel::Buffer
-                | LinkRel::Material
-                | LinkRel::Library
-                | LinkRel::Guess
-                | LinkRel::Sidecar
-        )
+        matches!(self, LinkRel::Texture | LinkRel::Buffer | LinkRel::Material | LinkRel::Library | LinkRel::Guess)
     }
 }
 

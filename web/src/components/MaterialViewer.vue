@@ -16,14 +16,26 @@ const BG_LABEL: Record<Background, string> = {
 }
 const SHAPE_LABEL: Record<Shape, string> = { sphere: 'Sphere', cube: 'Cube', plane: 'Plane' }
 const REPEATS = [1, 2, 4, 8]
+/** How far each shape's map runs, in the viewer's units, which are metres at real size: the sphere is 2 m across
+ * (its map runs from pole to pole, and twice as far around), the cube's side 1.5 m and the plane 2.4 m. */
+const EXTENT: Record<Shape, number> = { sphere: Math.PI, cube: 1.5, plane: 2.4 }
+
+/** `2` → "2 m", `0.5` → "50 cm". */
+const length = (m: number) => (m >= 1 ? `${+m.toFixed(2)} m` : `${+(m * 100).toFixed(1)} cm`)
 
 const dlg = ref<HTMLDialogElement | null>(null)
 const host = ref<HTMLDivElement | null>(null)
 const status = ref<'loading' | 'ready' | 'error'>('loading')
 const error = ref('')
 const shape = ref<Shape>('sphere')
-const repeat = ref(1)
-const displacement = ref(0.03)
+const real = computed(() => props.material.physical_size ?? null)
+/** Times the map repeats, or `real` for its real size (when the store gives one). */
+const repeat = ref<number | 'real'>(real.value ? 'real' : 1)
+const displacement = ref(Math.min(0.2, props.material.displacement ?? 0.03))
+const repeatTimes = computed(() =>
+  repeat.value === 'real' && real.value ? EXTENT[shape.value] / real.value[0] : repeat.value === 'real' ? 1 : repeat.value,
+)
+const realLabel = computed(() => (real.value ? real.value.map(length).join(' × ').replace(/ m × /, ' × ') : ''))
 const environment = ref(true)
 const spin = ref(false)
 const bg = ref<Background>('checker')
@@ -54,6 +66,8 @@ onMounted(async () => {
   const s = new MaterialStage(host.value)
   stage = s
   s.onMaps = (r) => (active.value = r)
+  s.setRepeat(repeatTimes.value)
+  s.setDisplacement(displacement.value)
   try {
     await s.load(props.material, props.asset.pack_id, 2048)
     status.value = 'ready'
@@ -66,7 +80,7 @@ onMounted(async () => {
 onBeforeUnmount(() => stage?.dispose())
 
 watch(shape, (v) => stage?.setShape(v))
-watch(repeat, (v) => stage?.setRepeat(v))
+watch(repeatTimes, (v) => stage?.setRepeat(v))
 watch(displacement, (v) => stage?.setDisplacement(v))
 watch(environment, (on) => {
   stage?.setEnvironment(on)
@@ -84,7 +98,11 @@ function toggle(role: MapRole) {
 }
 
 const cycleBg = () => (bg.value = BACKGROUNDS[(BACKGROUNDS.indexOf(bg.value) + 1) % BACKGROUNDS.length])
-const cycleRepeat = () => (repeat.value = REPEATS[(REPEATS.indexOf(repeat.value) + 1) % REPEATS.length])
+const repeatChoices = computed<(number | 'real')[]>(() => (real.value ? ['real', ...REPEATS] : REPEATS))
+const cycleRepeat = () => {
+  const all = repeatChoices.value
+  repeat.value = all[(all.indexOf(repeat.value) + 1) % all.length]
+}
 
 function onKey(e: KeyboardEvent) {
   // The page's own shortcuts (Esc closes the detail panel, arrows move between tiles) stay out of the viewer.
@@ -114,7 +132,7 @@ function onKey(e: KeyboardEvent) {
       <div class="title">
         <strong>{{ asset.name }}</strong>
         <span class="mono dim">
-          {{ material.maps.length }} {{ material.maps.length === 1 ? 'map' : 'maps' }}<template v-if="sizes"> · up to {{ sizes }}</template>
+          {{ material.maps.length }} {{ material.maps.length === 1 ? 'map' : 'maps' }}<template v-if="sizes"> · up to {{ sizes }}</template><template v-if="real"> · {{ realLabel }} a repeat</template>
         </span>
       </div>
       <div class="group" role="group" aria-label="Shape">
@@ -149,16 +167,16 @@ function onKey(e: KeyboardEvent) {
       </div>
       <div class="group" role="group" aria-label="Tiling">
         <button
-          v-for="n in REPEATS"
+          v-for="n in repeatChoices"
           :key="n"
           type="button"
           class="num"
-          :title="`Repeat ${n}× (T cycles)`"
+          :title="n === 'real' ? `Real size: one repeat is ${realLabel}, the sphere 2 m across (T cycles)` : `Repeat ${n}× (T cycles)`"
           :aria-pressed="repeat === n"
           :disabled="status !== 'ready'"
           @click="repeat = n"
         >
-          {{ n }}×
+          {{ n === 'real' ? 'Real' : `${n}×` }}
         </button>
       </div>
       <label v-if="hasHeight" class="group slider" title="How far the height map pushes the surface">

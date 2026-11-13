@@ -30,7 +30,7 @@ jobs:
       github.event.workflow_run.conclusion == 'success' &&
       github.event.workflow_run.event == 'push' &&
       github.event.workflow_run.head_repository.full_name == github.repository
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     permissions: { contents: read }
     outputs:
       tip: ${{ steps.plan.outputs.tip }}
@@ -39,7 +39,7 @@ jobs:
       version: ${{ steps.plan.outputs.version }}
       edge-version: ${{ steps.plan.outputs.edge-version }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with: { ref: main, fetch-depth: 0 }
       - id: plan
         env: { SHA: "${{ github.event.workflow_run.head_sha }}" }
@@ -84,10 +84,10 @@ jobs:
   tag:
     needs: plan
     if: needs.plan.outputs.tip == 'true' && needs.plan.outputs.release == 'true'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     permissions: { contents: write }
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with: { ref: "${{ github.event.workflow_run.head_sha }}", fetch-depth: 0 }
       - name: Tag
         env: { VERSION: "${{ needs.plan.outputs.version }}" }

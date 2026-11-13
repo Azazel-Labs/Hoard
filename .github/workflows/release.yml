@@ -27,12 +27,12 @@ env:
 
 jobs:
   check-version:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     outputs:
       version: ${{ steps.v.outputs.version }}
       image-tags: ${{ steps.v.outputs.image-tags }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with: { ref: "refs/tags/${{ env.TAG }}" }
       - id: v
         name: Version from the tag
@@ -48,15 +48,15 @@ jobs:
 
   web:
     needs: check-version
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with: { ref: "refs/tags/${{ env.TAG }}" }
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with: { node-version: 24, cache: npm, cache-dependency-path: web/package-lock.json }
       - run: npm ci && npm run build
         working-directory: web
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with: { name: web-dist, path: web/dist }
 
   binaries:
@@ -71,7 +71,7 @@ jobs:
           - { os: windows-2025, target: x86_64-pc-windows-msvc }
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with: { ref: "refs/tags/${{ env.TAG }}" }
       - name: Toolchain from rust-toolchain.toml
         run: rustup show active-toolchain || rustup toolchain install
@@ -79,7 +79,7 @@ jobs:
         with: { key: "${{ matrix.target }}" }
       - run: cargo build --release --locked -p hoardd -p hoard
         env: { HOARD_VERSION: "${{ needs.check-version.outputs.version }}" }
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
         with: { name: web-dist, path: web/dist }
       - name: Package
         shell: bash
@@ -95,7 +95,7 @@ jobs:
           else
             tar czf "$name.tar.gz" "$name"
           fi
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: bin-${{ matrix.target }}
           path: hoard-*.*z*
@@ -110,11 +110,11 @@ jobs:
 
   publish:
     needs: [check-version, binaries, image]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with: { ref: "refs/tags/${{ env.TAG }}", fetch-depth: 0 }
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
         with: { pattern: bin-*, path: dist, merge-multiple: true }
       - name: Release notes from the commits since the previous tag
         run: |

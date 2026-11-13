@@ -210,6 +210,19 @@ const MIGRATIONS: &[&str] = &[
               strftime('%Y-%m-%dT%H:%M:%SZ', 'now')
        FROM packs p WHERE p.status = 'ready'
         AND EXISTS (SELECT 1 FROM assets a WHERE a.pack_id = p.id AND a.ext = 'material');",
+    // 28: browser drawings of models that wear a material, by name or through its maps beside them, may be all white
+    // (taken before the maps arrived; 26 caught only the first kind). A browser draws them afresh the next time the
+    // model is opened, and FBX and OBJ ones go back to being the server's, which draws them again with the colour map.
+    "UPDATE assets SET thumb_source = CASE WHEN ext IN ('fbx', 'obj') THEN NULL ELSE 'browser-partial' END
+       WHERE thumb_source IN ('browser', 'browser-partial') AND kind = 'model'
+         AND EXISTS (SELECT 1 FROM asset_links l WHERE l.from_id = assets.id
+                       AND (l.rel = 'material' OR l.to_id IN (SELECT texture_id FROM material_maps)));
+     INSERT INTO jobs (kind, pack_id, payload, run_after, created_at, updated_at)
+       SELECT 'materials', p.id, '{}', strftime('%Y-%m-%dT%H:%M:%SZ', 'now'), strftime('%Y-%m-%dT%H:%M:%SZ', 'now'),
+              strftime('%Y-%m-%dT%H:%M:%SZ', 'now')
+       FROM packs p WHERE p.status = 'ready'
+        AND EXISTS (SELECT 1 FROM assets a WHERE a.pack_id = p.id AND a.ext = 'material')
+        AND NOT EXISTS (SELECT 1 FROM jobs j WHERE j.kind = 'materials' AND j.pack_id = p.id);",
 ];
 
 /// How many automatic pre-upgrade backups to keep in `<data dir>/backups`.

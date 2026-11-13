@@ -637,6 +637,53 @@ function closeDetail() {
   if (refocus) focusTile(id)
 }
 
+/** Set when a link in the panel opens another asset: that's somewhere new, so it gets its own history entry. */
+let following = ''
+/** Open an asset from a link in the detail panel (what it uses, what uses it, duplicates). Back returns to the one
+ *  before, scrolled where it was; the new one starts at the top. */
+function followAsset(id: string) {
+  if (id === selected.value?.id) return
+  following = id
+  scrollOnOpen = 0
+  void openAsset(id)
+}
+
+// The panel's scroll position, per history entry, so Back and Forward put it where it was.
+const scrolls = new Map<string, number>()
+let entries = 0
+const entryKey = () => `${Date.now().toString(36)}-${++entries}`
+const currentKey = (): string => (history.state as { key?: string } | null)?.key ?? ''
+const detailScroller = () => document.querySelector<HTMLElement>('.detail-pane')
+function onAnyScroll(e: Event) {
+  const el = e.target
+  if (el instanceof HTMLElement && el.classList.contains('detail-pane') && currentKey()) scrolls.set(currentKey(), el.scrollTop)
+}
+/** Where the panel should scroll once the asset being opened shows: the top for a followed link, where it was for
+ *  Back and Forward. */
+let scrollOnOpen: number | null = null
+watch(
+  () => selected.value?.id,
+  async () => {
+    const top = scrollOnOpen
+    scrollOnOpen = null
+    if (top === null) return
+    await nextTick()
+    scrollPanel(top)
+  },
+)
+/** Parts of the panel load after it opens (previews, links), so a deep position may not exist yet: keep trying for a
+ *  moment, unless someone scrolls first. */
+function scrollPanel(top: number) {
+  let frames = 0
+  const tryIt = () => {
+    const el = detailScroller()
+    if (!el) return
+    el.scrollTop = top
+    if (Math.abs(el.scrollTop - top) > 1 && ++frames < 40) requestAnimationFrame(tryIt)
+  }
+  tryIt()
+}
+
 /** Previous/next asset in the grid (detail panel arrows, keyboard). */
 async function step(delta: number) {
   const i = items.value.findIndex((a) => a.id === selected.value?.id)
@@ -809,10 +856,13 @@ function writeUrl() {
   if (url === location.pathname + location.search + location.hash) return
   // A new view, Settings page, filter, or opening or closing an asset is somewhere Back should return from.
   // Typing a search, or stepping from one open asset to the next, only rewrites where you are.
+  // So is following a link in the panel to another asset.
+  const followed = following !== '' && now.asset === following
+  if (followed) following = ''
   const moved =
-    now.view !== was.view || now.section !== was.section || now.place !== was.place || !now.asset !== !was.asset
-  if (moved) history.pushState(null, '', url)
-  else history.replaceState(null, '', url)
+    followed || now.view !== was.view || now.section !== was.section || now.place !== was.place || !now.asset !== !was.asset
+  if (moved) history.pushState({ key: entryKey() }, '', url)
+  else history.replaceState(history.state, '', url)
 }
 watch(
   [
@@ -841,6 +891,8 @@ onMounted(() => {
   const deep = location.hash.match(/^#asset=([\w-]+)/)
   if (deep) openAsset(deep[1])
   lastState = urlState()
+  if (!currentKey()) history.replaceState({ ...(history.state as object | null), key: entryKey() }, '')
+  document.addEventListener('scroll', onAnyScroll, { capture: true, passive: true })
   runSearch()
   refreshPacks()
   schedulePoll()
@@ -854,6 +906,7 @@ onBeforeUnmount(() => {
   observer?.disconnect()
   window.removeEventListener('keydown', onKey)
   window.removeEventListener('popstate', onHistory)
+  document.removeEventListener('scroll', onAnyScroll, { capture: true })
 })
 /** Back/Forward or a typed address: put the page back the way the address says. */
 async function onHistory() {
@@ -864,7 +917,12 @@ async function onHistory() {
     if (next.section) settingsSection.value = next.section
     const deep = location.hash.match(/^#asset=([\w-]+)/)
     if (deep) {
-      if (selected.value?.id !== deep[1]) await openAsset(deep[1])
+      const top = scrolls.get(currentKey()) ?? 0
+      if (selected.value?.id !== deep[1]) {
+        scrollOnOpen = top
+        following = ''
+        await openAsset(deep[1])
+      } else scrollPanel(top)
     } else {
       if (selected.value) closeDetail()
       setView(next.view)
@@ -1172,10 +1230,12 @@ const commands = computed<Command[]>(() => {
               :key="f.value"
               type="button"
               class="facet"
+              :class="{ long: facetLabel(g.ns, f.value).length > 30 }"
+              :title="facetLabel(g.ns, f.value).length > 30 ? facetLabel(g.ns, f.value) : undefined"
               :aria-pressed="filters.tags.includes(f.value)"
               @click="toggleTag(f.value)"
             >
-              {{ facetLabel(g.ns, f.value) }}<span class="n mono">{{ f.count }}</span>
+              <span class="fl">{{ facetLabel(g.ns, f.value) }}</span><span class="n mono">{{ f.count }}</span>
             </button>
             <button v-if="g.hidden > 0" type="button" class="facet more-facets" @click="prefs.expanded = toggleIn(prefs.expanded, g.ns)">
               {{ g.hidden }} more
@@ -1341,7 +1401,7 @@ const commands = computed<Command[]>(() => {
         @updated="onUpdated"
         @tag="toggleTag"
         @error="showError"
-        @open="openAsset"
+        @open="followAsset"
         @step="step"
         @archive="archiveSelected"
         @similar="findSimilar(selected!)"
@@ -1551,6 +1611,11 @@ const commands = computed<Command[]>(() => {
   background: none; cursor: pointer; font-size: 0.78rem;
 }
 .facet:hover { border-color: var(--muted); }
+/* Long tags stop at about 30 characters and fade, so the sidebar never scrolls sideways. */
+.facet { max-width: 100%; min-width: 0; }
+.facet .fl { min-width: 0; max-width: 30ch; overflow: hidden; white-space: nowrap; }
+.facet.long .fl { mask-image: linear-gradient(to right, #000 calc(100% - 2.5em), transparent); }
+.facet .n { flex: none; }
 .facet[aria-pressed='true'] { background: var(--text); color: var(--bg); border-color: var(--text); }
 .facet[aria-pressed='true'] .n { color: var(--bg); opacity: 0.6; }
 .more-facets { border-style: dashed; color: var(--muted); }

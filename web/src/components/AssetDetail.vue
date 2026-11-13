@@ -29,6 +29,8 @@ const props = defineProps<{
   /** Where this asset sits in the current results, for previous/next. */
   position: { index: number; total: number; hasPrev: boolean; hasNext: boolean } | null
   collections: Collection[]
+  /** Shown over the whole results area: the preview large on the left, the details beside it. */
+  page?: boolean
 }>()
 const emit = defineEmits<{
   close: []; updated: [Asset]; tag: [string]; error: [string]; open: [string]; step: [number]
@@ -42,6 +44,8 @@ const emit = defineEmits<{
   similar: []
   /** Find assets with much of this colour (hex). */
   color: [string]
+  /** Switch between the side panel and the full page. */
+  layout: []
 }>()
 const palette = computed(() => props.asset.palette ?? [])
 const alikeable = computed(() => looksAlike(props.asset))
@@ -602,7 +606,7 @@ onBeforeUnmount(() => unswipe())
 </script>
 
 <template>
-  <aside ref="root" class="detail" :style="{ '--kind': `var(--k-${asset.kind})` }" aria-label="Asset details">
+  <aside ref="root" class="detail" :class="{ page }" :style="{ '--kind': `var(--k-${asset.kind})` }" aria-label="Asset details">
     <header>
       <div class="topbar">
         <p class="where">
@@ -617,6 +621,16 @@ onBeforeUnmount(() => unswipe())
           <span v-if="position" class="pos mono">{{ position.index + 1 }}/{{ position.total }}</span>
           <button class="btn ghost icon" type="button" aria-label="Next asset" :disabled="!position?.hasNext" @click="$emit('step', 1)">
             <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="m6 3 5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" /></svg>
+          </button>
+          <button
+            class="btn ghost icon layout"
+            type="button"
+            :aria-label="page ? 'Show in a side panel' : 'Show full page'"
+            :title="page ? 'Show in a side panel' : 'Show full page: a big preview beside the details'"
+            @click="$emit('layout')"
+          >
+            <svg v-if="page" viewBox="0 0 16 16" width="14" height="14" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1.75" y="2.75" width="12.5" height="10.5" rx="1.5" /><path d="M9.5 2.75v10.5" /></svg>
+            <svg v-else viewBox="0 0 16 16" width="14" height="14" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="1.75" y="2.75" width="12.5" height="10.5" rx="1.5" /><path d="M5 9.5 7.5 7 10 9.5" transform="rotate(45 7.5 8)" /></svg>
           </button>
           <button class="btn ghost icon close" type="button" aria-label="Close details" @click="$emit('close')">
             <svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true"><path d="m4 4 8 8M12 4l-8 8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" /></svg>
@@ -639,6 +653,9 @@ onBeforeUnmount(() => unswipe())
       />
     </header>
 
+    <!-- Two columns on the full page (the preview stays in view while the details scroll); in the side panel these
+         wrappers step aside and everything is one column. -->
+    <div class="stagecol">
     <div v-if="isModel && showViews" class="preview checker">
       <img :src="`/api/assets/${asset.id}/derivative/views`" alt="The model from four directions" />
     </div>
@@ -751,7 +768,9 @@ onBeforeUnmount(() => unswipe())
         More like this
       </button>
     </div>
+    </div>
 
+    <div class="infocol">
     <section class="descs">
       <form v-if="editingDesc" class="descedit" @submit.prevent="saveDescription">
         <label class="visually-hidden" for="asset-desc">Your description</label>
@@ -1035,6 +1054,7 @@ onBeforeUnmount(() => unswipe())
         <button v-if="!asset.archived_at" class="btn ghost danger archive" type="button" title="Out of search until it's restored or deleted for good, from the Archive" @click="emit('archive')">Archive</button>
       </div>
     </footer>
+    </div>
   </aside>
 </template>
 
@@ -1046,7 +1066,28 @@ onBeforeUnmount(() => unswipe())
   overflow-y: auto; height: 100%;
 }
 /* The panel scrolls; its sections must keep their size instead of squashing the preview. */
-.detail > * { flex-shrink: 0; }
+.detail > *, .stagecol > *, .infocol > * { flex-shrink: 0; }
+.stagecol, .infocol { display: contents; }
+/* The full page: the preview as big as the screen allows, held in view on the left; the details scroll beside it. */
+.detail.page {
+  display: grid; grid-template-columns: minmax(0, 1.7fr) minmax(340px, 1fr); grid-template-rows: auto 1fr;
+  gap: 1.1rem clamp(1.5rem, 3vw, 3rem); align-items: start; padding: 1.1rem clamp(1.25rem, 3vw, 2.5rem) 0; border-left: 0;
+}
+.page > header { grid-column: 1 / -1; }
+.page .stagecol { display: flex; flex-direction: column; gap: 1rem; position: sticky; top: 0; padding-bottom: 1.5rem; }
+.page .infocol { display: flex; flex-direction: column; gap: 1rem; align-self: stretch; }
+.page .name { font-size: 1.85rem; line-height: 1.15; }
+.page .stagecol :is(.preview, :deep(.canvas), :deep(.peek)) { max-height: calc(100dvh - 14rem); }
+.page .stagecol .preview:not(.audio) { min-height: min(24rem, calc(100dvh - 14rem)); }
+.page .stagecol :deep(.peek) { max-height: calc(100dvh - 14rem); }
+.page footer { bottom: 0; margin: auto 0 0; padding-inline: 0; padding-bottom: 1rem; }
+@media (max-width: 900px) {
+  .detail.page { display: flex; flex-direction: column; padding: 1.1rem 1.2rem 1.4rem; }
+  .page .stagecol, .page .infocol { display: contents; }
+  .page .name { font-size: 1.3rem; }
+  .page footer { bottom: -1.4rem; margin: auto -1.2rem -1.4rem; padding: 0.85rem 1.2rem 0.7rem; }
+  .layout { display: none; }
+}
 /* Where it lives and the stepping buttons share a row, so the name below gets the panel's whole width. */
 .topbar { display: flex; gap: 0.75rem; align-items: center; justify-content: space-between; margin: -0.35rem 0 0.35rem; }
 /* The name is edited in place: the same element turns editable, so the text keeps its size and line breaks. */

@@ -117,4 +117,52 @@ test.describe('Asset details', () => {
     await handle.dblclick()
     await expect.poll(width).toBeCloseTo(fits, -1)
   })
+
+  test('full page: an asset can open over the results, big preview beside the details, and stays that way', async ({ page, api }) => {
+    await page.setViewportSize({ width: 1500, height: 900 })
+    const name = `E2E Page ${unique()}`
+    const { obj, mtl, texture } = crate()
+    const pack = await uploadPack(api, name, [
+      { relpath: 'crate.obj', data: obj },
+      { relpath: 'crate.mtl', data: mtl },
+      { relpath: 'crate_diffuse.png', data: texture },
+    ])
+    await waitReady(api, [pack.id])
+    await openPack(page, pack.id, name, '&sort=name')
+    await tile(page, 'Crate').first().click()
+
+    const panel = page.getByRole('complementary', { name: 'Asset details' })
+    const heading = panel.getByRole('heading', { level: 2 })
+    await expect(heading).toHaveText('Crate')
+    await panel.getByRole('button', { name: 'Show full page' }).click()
+
+    // It covers the filters and the grid, and the model is shown big.
+    await expect(tile(page, 'Crate').first()).toBeHidden()
+    expect((await panel.boundingBox())!.width).toBeGreaterThan(1400)
+    const stage = await panel.locator('.stagecol canvas').first().boundingBox()
+    expect(stage!.width).toBeGreaterThan(700)
+    expect(stage!.height).toBeGreaterThan(450)
+    await page.screenshot({ path: process.env.HOARD_SHOTS ? `${process.env.HOARD_SHOTS}/page-model.png` : undefined })
+
+    // Left and right step through the results without the grid.
+    await page.keyboard.press('ArrowRight')
+    await expect(heading).not.toHaveText('Crate')
+    await page.keyboard.press('ArrowLeft')
+    await expect(heading).toHaveText('Crate')
+
+    // The choice is remembered.
+    await page.reload()
+    await expect(heading).toHaveText('Crate')
+    await expect(panel.getByRole('button', { name: 'Show in a side panel' })).toBeVisible()
+    await expect(tile(page, 'Crate').first()).toBeHidden()
+
+    // Escape brings the results back; the side panel is a click away.
+    await page.keyboard.press('Escape')
+    await expect(panel).toBeHidden()
+    await expect(tile(page, 'Crate').first()).toBeVisible()
+    await tile(page, 'Crate').first().click()
+    await panel.getByRole('button', { name: 'Show in a side panel' }).click()
+    await expect(tile(page, 'Crate').first()).toBeVisible()
+    expect((await panel.boundingBox())!.width).toBeLessThan(700)
+  })
 })

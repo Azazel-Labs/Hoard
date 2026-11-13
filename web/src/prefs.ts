@@ -19,10 +19,12 @@ export interface Prefs {
   darkTheme: string
   /** The detail panel's width as last dragged, in px; null lets it take what the grid leaves. */
   detailWidth: number | null
+  /** Open assets over the whole results area, preview large beside the details, instead of in a side panel. */
+  detailPage: boolean
 }
 
 const KEY = 'hoard.prefs'
-const DEFAULTS: Prefs = { tile: 156, showSupporting: false, collapsed: ['license', 'format', 'blender'], expanded: [], theme: 'system', lightTheme: 'slate', darkTheme: 'graphite', detailWidth: null }
+const DEFAULTS: Prefs = { tile: 156, showSupporting: false, collapsed: ['license', 'format', 'blender'], expanded: [], theme: 'system', lightTheme: 'slate', darkTheme: 'graphite', detailWidth: null, detailPage: false }
 
 function load(): Prefs {
   try {

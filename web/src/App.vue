@@ -820,6 +820,13 @@ function onKey(e: KeyboardEvent) {
   }
   if (e.metaKey || e.ctrlKey) return
   if (['ArrowRight', 'ArrowLeft', 'ArrowDown', 'ArrowUp', 'j', 'k'].includes(e.key)) {
+    // On the full page the grid is out of sight: left and right step through it, up and down scroll the page.
+    if (prefs.detailPage && selected.value) {
+      if (e.key === 'ArrowUp' || e.key === 'ArrowDown') return
+      e.preventDefault()
+      step(e.key === 'ArrowLeft' || e.key === 'k' ? -1 : 1)
+      return
+    }
     // Arrow keys still scroll the detail panel when it has focus.
     if (target?.closest('.detail-pane') && e.key.startsWith('Arrow')) return
     e.preventDefault()
@@ -1072,7 +1079,12 @@ const commands = computed<Command[]>(() => {
   <div
     ref="appEl"
     class="app"
-    :class="{ 'with-detail': selected && view === 'library', 'filters-open': showFilters, fitted: !!fit }"
+    :class="{
+      'with-detail': selected && view === 'library' && !prefs.detailPage,
+      'page-detail': selected && view === 'library' && prefs.detailPage,
+      'filters-open': showFilters,
+      fitted: !!fit,
+    }"
     :style="appStyle"
     @dragenter.prevent="onDragEnter"
     @dragover.prevent
@@ -1439,7 +1451,7 @@ const commands = computed<Command[]>(() => {
       </main>
 
       <div
-        v-if="selected && view === 'library' && fit"
+        v-if="selected && view === 'library' && fit && !prefs.detailPage"
         class="detail-resize"
         :class="{ dragging: detailDrag !== null }"
         role="separator"
@@ -1458,6 +1470,8 @@ const commands = computed<Command[]>(() => {
         :asset="selected"
         :position="position"
         :collections="collections"
+        :page="prefs.detailPage"
+        @layout="prefs.detailPage = !prefs.detailPage"
         @close="closeDetail"
         @collect="(id, create) => addToCollection([selected!.id], create ? { create } : { id })"
         @uncollect="(id) => removeFromCollection([selected!.id], id)"
@@ -1763,6 +1777,9 @@ const commands = computed<Command[]>(() => {
 @keyframes rise-in { from { opacity: 0; translate: 0 10px; } }
 
 .detail-pane { grid-area: detail; min-height: 0; }
+/* The full-page detail covers the filters and the grid, which stay as they were underneath for when it closes. */
+.app.page-detail .detail-pane { grid-row: 3; grid-column: 1 / -1; z-index: 5; }
+.app.page-detail :is(.side, .main) { visibility: hidden; }
 /* The panel's left edge: a strip to grab, drawn as a line on hover or while dragging. */
 .detail-resize {
   grid-area: detail; justify-self: start; z-index: 3; width: 10px; margin-left: -5px; cursor: col-resize; touch-action: none;

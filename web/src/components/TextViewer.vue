@@ -1,8 +1,9 @@
 <script setup lang="ts">
-// Full-screen text viewer: JSON as a foldable tree (or re-indented, or as written), everything else with line
-// numbers and light colouring. Big files show their first megabyte until asked for the rest.
+// Full-screen text viewer: JSON as a foldable tree (or re-indented, or as written), markdown as a document (or its
+// source), everything else with line numbers and light colouring. Big files show their first megabyte until asked for the rest.
 import { computed, onMounted, provide, ref } from 'vue'
 import { fileUrl, humanBytes, type Asset } from '../api'
+import { renderMarkdown } from '../markdown'
 import { LANG_LABEL, fetchText, highlightLines, langOf, reflowJson, type TextFile } from '../text'
 import { copyText, showError } from '../ui'
 import JsonTree from './JsonTree.vue'
@@ -15,7 +16,7 @@ const CAP = 1024 * 1024
 /** JSON that follows the spec (no comments), which can be parsed and re-indented. */
 const STRICT_JSON = new Set(['json', 'ldtk', 'gltf'])
 
-type Mode = 'tree' | 'pretty' | 'raw'
+type Mode = 'tree' | 'pretty' | 'raw' | 'doc'
 
 const dlg = ref<HTMLDialogElement | null>(null)
 const file = ref<TextFile | null>(null)
@@ -26,7 +27,7 @@ const lang = computed(() => langOf(ext.value))
 // Code and scripts say which language (GLSL, CS, PY) rather than the generic name of their highlighter.
 const label = computed(() => (['c', 'hash', 'plain'].includes(lang.value) && ext.value ? ext.value.toUpperCase() : LANG_LABEL[lang.value]))
 const strict = computed(() => STRICT_JSON.has(ext.value))
-const mode = ref<Mode>('raw')
+const mode = ref<Mode>(lang.value === 'markdown' ? 'doc' : 'raw')
 // Prose reads best wrapped; code and data keep their lines.
 const wrap = ref(lang.value === 'plain' || lang.value === 'markdown')
 const copied = ref(false)
@@ -58,6 +59,7 @@ const shownText = computed(() => {
   const t = file.value?.text ?? ''
   return mode.value === 'pretty' ? reflowJson(t) : t
 })
+const doc = computed(() => (mode.value === 'doc' && file.value && !file.value.binary ? renderMarkdown(file.value.text) : ''))
 const lineCount = computed(() => (shownText.value.match(/\n/g)?.length ?? 0) + 1)
 const html = computed(() =>
   highlightLines(shownText.value, lang.value, ext.value)
@@ -91,6 +93,10 @@ function onKey(e: KeyboardEvent) {
     if (strict.value) act.p = () => (mode.value = 'pretty')
     act.r = () => (mode.value = 'raw')
   }
+  if (lang.value === 'markdown') {
+    act.d = () => (mode.value = 'doc')
+    act.r = () => (mode.value = 'raw')
+  }
   const f = act[e.key.toLowerCase()]
   if (!f) return
   e.preventDefault()
@@ -109,13 +115,17 @@ onMounted(() => {
       <div class="title">
         <strong>{{ asset.name }}</strong>
         <span class="mono dim">
-          {{ label }} · {{ humanBytes(asset.size) }}<template v-if="file && mode !== 'tree'"> · {{ lineCount.toLocaleString() }} {{ lineCount === 1 ? 'line' : 'lines' }}</template>
+          {{ label }} · {{ humanBytes(asset.size) }}<template v-if="file && mode !== 'tree' && mode !== 'doc'"> · {{ lineCount.toLocaleString() }} {{ lineCount === 1 ? 'line' : 'lines' }}</template>
         </span>
       </div>
       <div v-if="lang === 'json' && file && !file.binary" class="group" role="group" aria-label="Show as">
         <button type="button" title="Foldable tree (T)" :aria-pressed="mode === 'tree'" :disabled="!parsed?.ok" @click="mode = 'tree'">Tree</button>
         <button v-if="strict" type="button" title="Re-indented (P)" :aria-pressed="mode === 'pretty'" @click="mode = 'pretty'">Pretty</button>
         <button type="button" title="As written (R)" :aria-pressed="mode === 'raw'" @click="mode = 'raw'">Raw</button>
+      </div>
+      <div v-if="lang === 'markdown' && file && !file.binary" class="group" role="group" aria-label="Show as">
+        <button type="button" title="As a document (D)" :aria-pressed="mode === 'doc'" @click="mode = 'doc'">Document</button>
+        <button type="button" title="The markdown as written (R)" :aria-pressed="mode === 'raw'" @click="mode = 'raw'">Source</button>
       </div>
       <div v-if="mode === 'tree' && parsed?.ok" class="group" role="group" aria-label="Fold">
         <button type="button" title="Unfold everything" @click="setFold(true)">
@@ -128,7 +138,7 @@ onMounted(() => {
         </button>
       </div>
       <div class="group" role="group" aria-label="Text">
-        <button v-if="mode !== 'tree'" type="button" title="Wrap long lines (W)" :aria-pressed="wrap" :disabled="!file || file.binary" @click="wrap = !wrap">
+        <button v-if="mode !== 'tree' && mode !== 'doc'" type="button" title="Wrap long lines (W)" :aria-pressed="wrap" :disabled="!file || file.binary" @click="wrap = !wrap">
           <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M2 4h12M2 8h9.5a2.25 2.25 0 0 1 0 4.5H8m1.6-1.8L7.8 12.5l1.8 1.8M2 12.5h3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /></svg>
           <span class="wide">Wrap</span>
         </button>
@@ -159,12 +169,15 @@ onMounted(() => {
       <div v-else-if="mode === 'tree' && parsed?.ok" class="tree">
         <JsonTree :value="parsed.value" />
       </div>
+      <!-- eslint-disable-next-line vue/no-v-html -- markdown.ts renders with raw HTML off, so the file can't add markup. -->
+      <article v-else-if="mode === 'doc'" class="md-body doc" v-html="doc" />
       <!-- eslint-disable-next-line vue/no-v-html -- text.ts escapes every character of the file before adding spans. -->
       <pre v-else class="code-lines" :class="{ wrap }" :style="{ '--gutter': `${String(lineCount).length}ch` }" v-html="html" />
     </div>
     <footer class="keys" aria-hidden="true">
       <template v-if="lang === 'json'"><kbd>T</kbd> tree · <template v-if="strict"><kbd>P</kbd> pretty · </template><kbd>R</kbd> raw · </template>
-      <kbd>W</kbd> wrap · <kbd>C</kbd> copy · <kbd>Ctrl</kbd>+<kbd>F</kbd> find · <kbd>Esc</kbd> close
+      <template v-if="lang === 'markdown'"><kbd>D</kbd> document · <kbd>R</kbd> source · </template>
+      <template v-if="mode !== 'doc'"><kbd>W</kbd> wrap · </template><kbd>C</kbd> copy · <kbd>Ctrl</kbd>+<kbd>F</kbd> find · <kbd>Esc</kbd> close
     </footer>
   </dialog>
 </template>
@@ -175,6 +188,8 @@ onMounted(() => {
 .tree { font-variation-settings: 'MONO' 1, 'CASL' 0; font-size: 0.8rem; line-height: 1.55; }
 .code-lines { width: max-content; min-width: 100%; }
 .code-lines.wrap { width: auto; }
+/* A line length that reads well, centred, however wide the screen. */
+.doc { max-width: 46rem; margin: 1.25rem auto 0; font-size: 1rem; }
 .err { color: var(--danger); }
 .banner {
   margin: 0; padding: 0.4rem 0.75rem; border-bottom: 1px solid var(--line); background: var(--raised);

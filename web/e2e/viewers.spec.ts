@@ -1,7 +1,7 @@
 import { LARGE, LARGE_PX, MODELS, TEXTURES } from './support/seed'
 import { paintedCube3mf } from './support/files'
 import { assetsOf, signedIn, uploadPack, waitIdle, waitReady } from './support/api'
-import { doubleClick, expect, openPack, test, tile } from './support/test'
+import { doubleClick, expect, openPack, test, tile, unique } from './support/test'
 
 // Double-clicking a tile opens its full-screen viewer; the app spots the second click by where and when it lands, so
 // these use real mouse double-clicks.
@@ -141,6 +141,47 @@ test.describe('full-screen viewers', () => {
     await expect(viewer.getByRole('group', { name: 'Show as' })).toHaveCount(0)
     await page.keyboard.press('Escape')
     await expect(viewer).toBeHidden()
+  })
+
+  test('markdown reads as a document, in the panel and full screen, and shows its source on request', async ({ page, api }) => {
+    const name = `E2E Readme ${unique()}`
+    const md = [
+      '# Forest Kit',
+      '',
+      'Trees for **stylised** games. See [the store](https://example.com/forest).',
+      '',
+      '<img src=x onerror="window.pwned=1">',
+      '',
+      '| File | Tris |',
+      '|------|------|',
+      '| tree | 640 |',
+    ].join('\n')
+    const pack = await uploadPack(api, name, [{ relpath: 'README.md', data: Buffer.from(md) }])
+    await waitReady(api, [pack.id])
+    await openPack(page, pack.id, name, '&sort=name')
+    await page.locator('.grid button.hit').first().click()
+
+    const panel = page.getByRole('complementary', { name: 'Asset details' })
+    await expect(panel.getByRole('heading', { name: 'Forest Kit' })).toBeVisible()
+    await panel.getByRole('button', { name: /^Read .* full screen$/ }).click()
+    const viewer = page.getByRole('dialog', { name: /^Read / })
+    const body = viewer.getByLabel(/contents$/)
+    await expect(body.getByRole('heading', { name: 'Forest Kit' })).toBeVisible()
+    await expect(body.getByRole('cell', { name: '640' })).toBeVisible()
+    const link = body.getByRole('link', { name: 'the store' })
+    await expect(link).toHaveAttribute('target', '_blank')
+    await expect(link).toHaveAttribute('rel', 'noopener noreferrer')
+    // HTML in the file is shown as text, never run.
+    await expect(body).toContainText('<img src=x onerror=')
+    await expect(body.locator('img')).toHaveCount(0)
+    expect(await page.evaluate(() => (window as { pwned?: number }).pwned)).toBeUndefined()
+
+    await page.keyboard.press('r')
+    await expect(viewer.getByRole('button', { name: 'Source' })).toHaveAttribute('aria-pressed', 'true')
+    await expect(body).toContainText('# Forest Kit')
+    await expect(body.getByRole('heading')).toHaveCount(0)
+    await page.keyboard.press('d')
+    await expect(body.getByRole('heading', { name: 'Forest Kit' })).toBeVisible()
   })
 })
 

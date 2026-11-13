@@ -57,10 +57,10 @@ const PAGES = [
   { id: 'tools', label: 'Tools', blurb: 'Outside programs Hoard uses to convert and read files.' },
   { id: 'ai', label: 'AI tagging', blurb: 'An AI model names, describes and tags new packs, on top of the built-in rules. Its tags are marked as suggested.' },
   { id: 'search', label: 'Image search', blurb: 'Search pictures by what they show, not only by their names, and find things that are alike in kind, not only in colour.' },
-  { id: 'unreal', label: 'Unreal packages', blurb: 'What to do with .uasset files when a pack is added.' },
+  { id: 'adding', label: 'Adding packs', blurb: 'What Hoard does with a pack when it’s added, besides reading and tagging it.' },
   { id: 'account', label: 'Account', blurb: 'Your password, the other people who can sign in, and access tokens for scripts and other programs.' },
-  { id: 'https', label: 'HTTPS', blurb: 'Serve the portal over https://, with a certificate Hoard makes or one you have. Some browser features only work over HTTPS.' },
-  { id: 'server', label: 'Server', blurb: 'The server’s switches and limits, saved on the server.' },
+  { id: 'connection', label: 'Connection', blurb: 'How browsers and apps reach Hoard: the address it’s known by, and HTTPS, which some browser features need.' },
+  { id: 'performance', label: 'Performance', blurb: 'How hard the server works, how thumbnails are made and kept, and the most it takes in.' },
   { id: 'issues', label: 'Issues', blurb: 'What went wrong opening or processing files: archives that wouldn’t unpack, files that couldn’t be read, jobs that failed. Try them again once the cause is fixed, or dismiss them.' },
   { id: 'maintenance', label: 'Maintenance', blurb: 'Back up, check for damage and tidy up. One of each runs at a time, and you can leave this page while they do.' },
 ] as const
@@ -495,16 +495,10 @@ const onOff = (v: boolean) => (v ? 'on' : 'off')
 /** Whether model thumbnails render on a GPU, in software, or not at all. */
 const gpuNote = computed(() => {
   const r = props.stats?.renderer ?? ''
-  if (r.startsWith('gpu: ')) return { ok: true, text: `On the GPU: ${r.slice(5)}` }
-  if (r.startsWith('cpu: ')) return { ok: false, text: `No GPU found, so in software (${r.slice(5)})` }
-  if (r.startsWith('unavailable')) return { ok: false, text: 'No GPU or software renderer found, so models get no thumbnails' }
+  if (r.startsWith('gpu: ')) return { state: 'ready', text: `On the GPU: ${r.slice(5)}` }
+  if (r.startsWith('cpu: ')) return { state: 'off', text: `No GPU found, so in software (${r.slice(5)})` }
+  if (r.startsWith('unavailable')) return { state: 'unavailable', text: 'No GPU or software renderer found, so models get no thumbnails' }
   return null
-})
-const ffmpegNote = computed(() => {
-  const f = props.stats?.ffmpeg ?? ''
-  if (f === 'downloading' || f === 'looking') return 'Fetching it for audio conversions'
-  if (f.startsWith('unavailable')) return `${f[0].toUpperCase()}${f.slice(1)}; MP3 and Opus use the built-in encoders`
-  return ''
 })
 function saveOpt(k: OptKey) {
   const cur = s.value
@@ -702,7 +696,7 @@ const THUMBS: { value: ThumbQuality; label: string; hint: string }[] = [
   { value: 'sharp', label: 'Sharper', hint: 'JPEG, quality 92. About twice the size of Balanced.' },
   { value: 'lossless', label: 'Lossless', hint: 'PNG, exactly as made. Several times larger.' },
 ]
-// How much the server keeps around for previews and conversions, fetched fresh when the Server page opens.
+// How much the server keeps around for previews and conversions, fetched fresh when the Performance page opens.
 const usage = ref<Stats | null>(null)
 async function loadUsage() {
   try {
@@ -711,7 +705,7 @@ async function loadUsage() {
     usage.value = null
   }
 }
-watch(current, (c) => { if (c === 'server') void loadUsage() }, { immediate: true })
+watch(current, (c) => { if (c === 'performance') void loadUsage() }, { immediate: true })
 
 const UNREAL: { value: UnrealConvert; label: string; hint: string }[] = [
   { value: 'off', label: 'Leave as is', hint: 'Convert from a pack’s page when you want to.' },
@@ -810,7 +804,6 @@ onBeforeUnmount(() => {
         />
 
         <LocationsPanel v-else-if="current === 'locations'" @unauthorized="emit('unauthorized')" @changed="emit('changed')" />
-        <MaintenancePanel v-else-if="current === 'maintenance'" @unauthorized="emit('unauthorized')" />
         <IssuesPanel
           v-else-if="current === 'issues'"
           @unauthorized="emit('unauthorized')"
@@ -819,7 +812,6 @@ onBeforeUnmount(() => {
           @section="go"
         />
         <AccountPanel v-else-if="current === 'account'" />
-        <HttpsPanel v-else-if="current === 'https'" />
         <TagsPanel v-else-if="current === 'tags'" @tag="(t) => emit('tag', t)" @changed="emit('changed')" />
 
         <p v-else-if="!s" class="loading">Loading…</p>
@@ -869,6 +861,27 @@ onBeforeUnmount(() => {
                 <span class="dot" aria-hidden="true" />
                 <span class="text">{{ statusText(s[t.key]) }}</span>
               </p>
+            </section>
+            <section>
+              <div class="sh"><h3>MIDI SoundFont</h3></div>
+              <p class="what">The instruments MIDI files are played and converted with.</p>
+              <div class="llm opts">
+                <label for="opt-sf">SoundFont file</label>
+                <div class="key">
+                  <input
+                    id="opt-sf"
+                    v-model="opts.soundfont"
+                    class="field mono"
+                    type="text"
+                    spellcheck="false"
+                    placeholder="Found on the server, or built-in"
+                    :disabled="busy"
+                    @change="saveOpt('soundfont')"
+                    @keydown.enter.prevent="saveOpt('soundfont')"
+                  />
+                  <ResetButton v-if="changed('soundfont')" :to="s.options.soundfont.default || 'found on the server, or built-in'" :disabled="busy" @reset="resetOpt('soundfont')" />
+                </div>
+              </div>
             </section>
           </template>
 
@@ -1118,16 +1131,38 @@ onBeforeUnmount(() => {
             </form>
           </section>
 
-          <section v-else-if="current === 'unreal'">
-            <div class="sh">
-              <h3>When a pack is added</h3>
+          <template v-else-if="current === 'adding'">
+            <section>
+              <div class="sh"><h3>Store pages</h3></div>
+              <p class="what">
+                New packs are looked up on the stores in the background, so they get their store page, seller and license.
+              </p>
+              <div class="switches">
+                <div class="opt-row">
+                  <label class="check">
+                    <input
+                      type="checkbox"
+                      :checked="s.options.store_lookup.value"
+                      :disabled="busy"
+                      @change="save({ store_lookup: ($event.target as HTMLInputElement).checked })"
+                    />
+                    Look up store pages automatically
+                  </label>
+                  <ResetButton v-if="changed('store_lookup')" :to="onOff(s.options.store_lookup.default)" :disabled="busy" @reset="resetOpt('store_lookup')" />
+                </div>
+              </div>
+            </section>
+            <section>
+              <div class="sh">
+                <h3>Unreal packages</h3>
               <ResetButton
                 v-if="s.unreal_convert.value !== s.unreal_convert.default"
                 :to="UNREAL.find((u) => u.value === s!.unreal_convert.default)?.label ?? s.unreal_convert.default"
                 :disabled="busy"
                 @reset="save({ unreal_convert: null }, 'Unreal packages: back to the default')"
               />
-            </div>
+              </div>
+              <p class="what">What to do with .uasset files.</p>
             <div class="choices" role="radiogroup" aria-label="Unreal packages">
               <label v-for="u in UNREAL" :key="u.value" :class="{ on: s.unreal_convert.value === u.value }">
                 <input
@@ -1140,23 +1175,46 @@ onBeforeUnmount(() => {
                 <span><strong>{{ u.label }}</strong><small>{{ u.hint }}</small></span>
               </label>
             </div>
-          </section>
-
-          <template v-else-if="current === 'server'">
-            <section v-if="stats" class="about">
-              <div class="sh"><h3>This server</h3></div>
-              <dl>
-                <template v-if="stats.version"><dt>Version</dt><dd>Hoard {{ stats.version }}</dd></template>
-                <dt>Files</dt><dd class="mono">{{ stats.storage }}</dd>
-                <template v-if="gpuNote"><dt>3D thumbnails</dt><dd :class="{ ok: gpuNote.ok }" :title="stats.renderer">
-                  {{ gpuNote.text }}
-                  <small v-if="stats.renderer_hint" class="hint" data-testid="gpu-hint">{{ stats.renderer_hint }}</small>
-                </dd></template>
-                <template v-if="ffmpegNote"><dt>ffmpeg</dt><dd>{{ ffmpegNote }}</dd></template>
-              </dl>
             </section>
+          </template>
+
+          <template v-else-if="current === 'connection'">
             <section>
-              <div class="sh"><h3>Features</h3></div>
+              <div class="sh"><h3>Address</h3></div>
+              <p class="what">
+                The address people and apps use to reach Hoard, when it isn’t the one this browser is on: a reverse proxy’s,
+                a tunnel’s or a tailnet name, like https://hoard.example.com. Links Hoard hands out (to Claude and other apps,
+                in sign-in, on its certificate) use it.
+              </p>
+              <div class="llm opts">
+                <label for="opt-public">Public address</label>
+                <div class="key">
+                  <input
+                    id="opt-public"
+                    v-model="opts.public_url"
+                    class="field mono"
+                    type="url"
+                    spellcheck="false"
+                    placeholder="From the browser’s address (e.g. https://hoard.example.com)"
+                    :disabled="busy"
+                    @change="saveOpt('public_url')"
+                    @keydown.enter.prevent="saveOpt('public_url')"
+                  />
+                  <ResetButton v-if="changed('public_url')" :to="s.options.public_url.default || 'from the browser’s address'" :disabled="busy" @reset="resetOpt('public_url')" />
+                </div>
+              </div>
+            </section>
+            <HttpsPanel />
+          </template>
+
+          <template v-else-if="current === 'performance'">
+            <section>
+              <div class="sh"><h3>3D thumbnails</h3></div>
+              <p v-if="gpuNote" class="status" :data-state="gpuNote.state" role="status" :title="stats?.renderer">
+                <span class="dot" aria-hidden="true" />
+                <span class="text">{{ gpuNote.text }}</span>
+              </p>
+              <p v-if="stats?.renderer_hint" class="hint" data-testid="gpu-hint">{{ stats.renderer_hint }}</p>
               <div class="switches">
                 <div class="opt-row">
                   <label class="check">
@@ -1164,30 +1222,6 @@ onBeforeUnmount(() => {
                     Render thumbnails for 3D models
                   </label>
                   <ResetButton v-if="changed('render')" :to="onOff(s.options.render.default)" :disabled="busy" @reset="resetOpt('render')" />
-                </div>
-                <div class="opt-row">
-                  <label class="check">
-                    <input
-                      type="checkbox"
-                      :checked="s.options.update_check.value"
-                      :disabled="busy"
-                      @change="save({ update_check: ($event.target as HTMLInputElement).checked })"
-                    />
-                    Check GitHub every few hours for a new release
-                  </label>
-                  <ResetButton v-if="changed('update_check')" :to="onOff(s.options.update_check.default)" :disabled="busy" @reset="resetOpt('update_check')" />
-                </div>
-                <div class="opt-row">
-                  <label class="check">
-                    <input
-                      type="checkbox"
-                      :checked="s.options.store_lookup.value"
-                      :disabled="busy"
-                      @change="save({ store_lookup: ($event.target as HTMLInputElement).checked })"
-                    />
-                    Look up store pages automatically
-                  </label>
-                  <ResetButton v-if="changed('store_lookup')" :to="onOff(s.options.store_lookup.default)" :disabled="busy" @reset="resetOpt('store_lookup')" />
                 </div>
               </div>
             </section>
@@ -1222,7 +1256,7 @@ onBeforeUnmount(() => {
             </section>
 
             <section>
-              <div class="sh"><h3>Limits and work</h3></div>
+              <div class="sh"><h3>Work and limits</h3></div>
               <p class="what">Each one saves when you leave the field or press Enter. Sizes take units: 100 GB, 512 MB, 1.5 TB; a plain number is GB.</p>
               <div class="llm opts">
                 <label for="opt-workers">Background workers</label>
@@ -1261,38 +1295,30 @@ onBeforeUnmount(() => {
                   </span>
                   <ResetButton v-if="changed('conversion_cache_mb')" :to="formatMiB(s.options.conversion_cache_mb.default)" :disabled="busy" @reset="resetOpt('conversion_cache_mb')" />
                 </div>
-                <label for="opt-public">Public address</label>
-                <div class="key">
-                  <input
-                    id="opt-public"
-                    v-model="opts.public_url"
-                    class="field mono"
-                    type="url"
-                    spellcheck="false"
-                    placeholder="From the browser’s address (e.g. https://hoard.example.com)"
-                    :disabled="busy"
-                    @change="saveOpt('public_url')"
-                    @keydown.enter.prevent="saveOpt('public_url')"
-                  />
-                  <ResetButton v-if="changed('public_url')" :to="s.options.public_url.default || 'from the browser’s address'" :disabled="busy" @reset="resetOpt('public_url')" />
-                </div>
-                <label for="opt-sf">MIDI SoundFont</label>
-                <div class="key">
-                  <input
-                    id="opt-sf"
-                    v-model="opts.soundfont"
-                    class="field mono"
-                    type="text"
-                    spellcheck="false"
-                    placeholder="Found on the server, or built-in"
-                    :disabled="busy"
-                    @change="saveOpt('soundfont')"
-                    @keydown.enter.prevent="saveOpt('soundfont')"
-                  />
-                  <ResetButton v-if="changed('soundfont')" :to="s.options.soundfont.default || 'found on the server, or built-in'" :disabled="busy" @reset="resetOpt('soundfont')" />
+              </div>
+            </section>
+          </template>
+
+          <template v-else-if="current === 'maintenance'">
+            <section>
+              <div class="sh"><h3>Updates</h3></div>
+              <p v-if="stats?.version" class="what">This is Hoard {{ stats.version }}.</p>
+              <div class="switches">
+                <div class="opt-row">
+                  <label class="check">
+                    <input
+                      type="checkbox"
+                      :checked="s.options.update_check.value"
+                      :disabled="busy"
+                      @change="save({ update_check: ($event.target as HTMLInputElement).checked })"
+                    />
+                    Check GitHub every few hours for a new release
+                  </label>
+                  <ResetButton v-if="changed('update_check')" :to="onOff(s.options.update_check.default)" :disabled="busy" @reset="resetOpt('update_check')" />
                 </div>
               </div>
             </section>
+            <MaintenancePanel @unauthorized="emit('unauthorized')" />
           </template>
         </div>
       </div>
@@ -1338,11 +1364,6 @@ h3 { margin: 0; font-size: 0.7rem; font-weight: 650; letter-spacing: 0.04em; tex
 .hint.preview .btn { margin-left: 0.4rem; }
 .what, .hint { margin: 0 0 0.55rem; font-size: var(--step--1); color: var(--muted); line-height: 1.45; }
 .hint { margin-top: 0.45rem; }
-.about dl { display: grid; grid-template-columns: 8rem minmax(0, 1fr); gap: 0.35rem 1rem; margin: 0.3rem 0 0; font-size: var(--step--1); }
-.about dt { color: var(--muted); }
-.about dd { margin: 0; overflow-wrap: anywhere; }
-.about dd.ok { color: var(--ok); }
-.about dd .hint { display: block; margin-top: 0.25rem; color: var(--muted); line-height: 1.45; }
 .mono { font-family: var(--mono, ui-monospace, monospace); font-size: 0.95em; }
 .opt-row { display: flex; align-items: center; gap: 0.4rem; min-height: 1.75rem; }
 

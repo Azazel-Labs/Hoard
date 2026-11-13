@@ -19,8 +19,8 @@ services:
       - hoard-library:/library    # your files: big, put it on the disk with room
       - hoard-cache:/cache        # thumbnails, uploads in progress, Blender/ffmpeg: fast disk, can be rebuilt
     ports:
-      - "4627:4627"       # http:// and https:// (Settings → HTTPS)
-      - "4627:4627/udp"   # HTTP/3, when it's on in Settings → HTTPS
+      - "4627:4627"       # http:// and https:// (Settings → Connection)
+      - "4627:4627/udp"   # HTTP/3, when it's on in Settings → Connection
     labels:
       # Watchtower below updates only containers with these labels.
       com.centurylinklabs.watchtower.enable: "true"

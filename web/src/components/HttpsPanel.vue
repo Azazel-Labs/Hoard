@@ -1,5 +1,5 @@
 <script setup lang="ts">
-// Settings → HTTPS: off, Hoard's own certificate (from its own certificate authority, installed once per device), or
+// Settings → Connection: off, Hoard's own certificate (from its own certificate authority, installed once per device), or
 // your own certificate. HTTPS is served on the same port as http://, and a change applies at once.
 import { computed, onMounted, ref, watch } from 'vue'
 import { api, type CertCheck, type CertInfo, type HttpsMode, type HttpsStatus } from '../api'
@@ -364,10 +364,11 @@ const MODES: { value: HttpsMode; label: string; hint: string }[] = [
 </template>
 
 <style scoped>
-.https { display: grid; gap: 1.6rem; font-size: var(--step--1); }
-section { display: grid; gap: 0.6rem; }
-.sh { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
-.sh h3 { margin: 0; }
+.https { display: grid; font-size: var(--step--1); }
+/* The rest of Settings' look: rules between sections, small headings. It follows the Address section. */
+section { display: grid; gap: 0.6rem; padding: 1rem 0 1.1rem; border-top: 1px solid var(--line); }
+.sh { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; min-height: 1.75rem; }
+h3 { margin: 0; font-size: 0.7rem; font-weight: 650; letter-spacing: 0.04em; text-transform: uppercase; color: var(--faint); }
 p { margin: 0; }
 .what { color: var(--muted); line-height: 1.5; }
 .bad { color: var(--danger); line-height: 1.5; }
@@ -408,7 +409,7 @@ p { margin: 0; }
 .how strong { color: var(--text); }
 .fp { padding: 0.4rem 0.6rem; border-radius: var(--r-chip); background: var(--raised); font-size: 0.85em; cursor: copy; }
 
-.apply { display: flex; gap: 0.8rem; align-items: center; flex-wrap: wrap; }
+.apply { display: flex; padding-bottom: 1.1rem; gap: 0.8rem; align-items: center; flex-wrap: wrap; }
 .apply small { color: var(--muted); }
 .check { display: flex; gap: 0.5rem; align-items: center; }
 .small { padding-block: 0.1rem; font-size: 0.85em; }

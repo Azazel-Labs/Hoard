@@ -116,7 +116,7 @@ fn is_opaque(img: &image::RgbaImage) -> bool {
     img.pixels().all(|p| p[3] == 255)
 }
 
-/// Encode a thumbnail or model view sheet the way Settings → Server → Thumbnails asks. PNG when it has any
+/// Encode a thumbnail or model view sheet the way Settings → Performance → Thumbnails asks. PNG when it has any
 /// transparency (JPEG has none), when it's pixel art (`exact`: JPEG would smear its hard edges), or when the setting
 /// is Lossless. Otherwise JPEG, unless PNG is about as small anyway (flat colors, line art), since then it's exact.
 pub(crate) fn thumb_bytes(img: image::RgbaImage, exact: bool) -> anyhow::Result<Vec<u8>> {

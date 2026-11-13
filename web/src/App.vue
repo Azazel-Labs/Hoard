@@ -1098,7 +1098,7 @@ const commands = computed<Command[]>(() => {
       <button type="button" class="btn" @click="resolveSplit(false)">Import as one pack</button>
       <button type="button" class="btn ghost" @click="pendingSplit = null">Cancel</button>
     </div>
-    <InsecureNotice v-else :member="member" @settings="openSettings('https')" />
+    <InsecureNotice v-else :member="member" @settings="openSettings('connection')" />
 
 
     <template v-if="view === 'library'">

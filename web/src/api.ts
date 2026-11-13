@@ -466,7 +466,7 @@ export interface ModelInfo {
   vision?: boolean
 }
 
-/** A certificate, as Settings → HTTPS shows it. Times are Unix seconds. */
+/** A certificate, as Settings → Connection shows it. Times are Unix seconds. */
 export interface CertInfo {
   names: string[]
   subject: string
@@ -479,7 +479,7 @@ export interface CertInfo {
 
 export type HttpsMode = 'off' | 'own' | 'custom'
 
-/** Settings → HTTPS (`GET /api/admin/https`). */
+/** Settings → Connection (`GET /api/admin/https`). */
 export interface HttpsStatus {
   available: boolean
   mode: HttpsMode

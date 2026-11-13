@@ -18,8 +18,8 @@ services:
       - /dev/net/tun:/dev/net/tun
     cap_add: [net_admin]
     ports:
-      - "4627:4627"       # http:// and https:// (Settings → HTTPS)
-      - "4627:4627/udp"   # HTTP/3, when it's on in Settings → HTTPS
+      - "4627:4627"       # http:// and https:// (Settings → Connection)
+      - "4627:4627/udp"   # HTTP/3, when it's on in Settings → Connection
 
   hoard:
     container_name: hoard

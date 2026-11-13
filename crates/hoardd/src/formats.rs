@@ -537,7 +537,7 @@ pub(crate) fn conversion_cache_bytes(c: &rusqlite::Connection) -> Result<u64> {
     Ok(u64::try_from(n).unwrap_or(0))
 }
 
-/// Drop the least recently used cached conversions until the rest fit in Settings → Server's limit. Ones handed out
+/// Drop the least recently used cached conversions until the rest fit in Settings → Performance's limit. Ones handed out
 /// in the last hour stay, so the cache can be over for a while when it's busy. Returns (conversions, bytes) freed.
 pub(crate) async fn trim_conversions(state: &crate::AppState) -> Result<(u64, u64)> {
     let limit = state.settings.get().conversion_cache_bytes();

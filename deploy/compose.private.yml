@@ -42,7 +42,7 @@ services:
       - /volume1/hoard/cache:/cache        # thumbnails, uploads in progress, Blender/ffmpeg: can be rebuilt
     ports:
       # LAN only. Don't forward this port on your router: remote access goes through the tunnel. http:// and https://
-      # (Settings → HTTPS) share the TCP port; HTTP/3 uses the UDP one.
+      # (Settings → Connection) share the TCP port; HTTP/3 uses the UDP one.
       - "4627:4627"
       - "4627:4627/udp"
 

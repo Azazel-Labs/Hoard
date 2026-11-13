@@ -10,6 +10,10 @@ const PAGES: { name: string; path: string; ready: (page: Page) => ReturnType<Pag
   { name: 'settings: library', path: '/#settings/library', ready: (p) => p.getByRole('heading', { name: 'Library', level: 2 }) },
   { name: 'settings: tags', path: '/#settings/tags', ready: (p) => p.getByLabel('Find tags') },
   { name: 'settings: account', path: '/#settings/account', ready: (p) => p.getByLabel('What will use it') },
+  { name: 'settings: adding packs', path: '/#settings/adding', ready: (p) => p.getByRole('radiogroup', { name: 'Unreal packages' }) },
+  { name: 'settings: performance', path: '/#settings/performance', ready: (p) => p.getByLabel('Background workers') },
+  { name: 'settings: tools', path: '/#settings/tools', ready: (p) => p.getByLabel('SoundFont file') },
+  { name: 'settings: maintenance', path: '/#settings/maintenance', ready: (p) => p.getByRole('heading', { name: 'Updates' }) },
 ]
 
 /** The page's background (the body's, or the root's behind a see-through body) as luminance, 0 black to 1 white. */

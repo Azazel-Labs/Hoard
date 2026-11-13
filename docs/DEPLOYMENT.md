@@ -52,16 +52,16 @@ Cloudflare's docs don't say this explicitly, so try one upload over 100 MB once 
    `192.168.50.10:4627`.
 6. **Start it:** `docker compose -f deploy/compose.private.yml --env-file deploy/.env up -d`, then open
    `http://192.168.50.10:4627` from anywhere with the client connected and make your account.
-7. **Turn on HTTPS:** Settings → HTTPS → Hoard's own certificate → Apply. It covers the address you're using. Download
+7. **Turn on HTTPS:** Settings → Connection → Hoard's own certificate → Apply. It covers the address you're using. Download
    `hoard-ca.crt` from the same page and install it on each device (the page has the steps), then open
    `https://192.168.50.10:4627`: browsers trust it and you get HTTP/2. For the `hoard` CLI, pass the same file with
    `--ca-cert` (or `HOARD_CA_CERT`). Point `hoard sync` (`server = ...`) and MCP
-   clients at the same address, and set it as the public address in Settings → Server so MCP links resolve.
+   clients at the same address, and set it as the public address in Settings → Connection so MCP links resolve.
 
 Leave guest browsing off even here. The network is private, but an account keeps other devices on your LAN or Zero
 Trust org out.
 
-**HTTP/3.** The HTTP/3 switch in Settings → HTTPS adds QUIC on UDP 4627 (the compose file maps it) and advertises it
+**HTTP/3.** The HTTP/3 switch in Settings → Connection adds QUIC on UDP 4627 (the compose file maps it) and advertises it
 with `Alt-Svc`; browsers switch after the first page load. Cloudflare's private routing carries UDP as well as TCP, but
 if HTTP/3 never kicks in over the tunnel, HTTP/2 is doing the work and nothing is lost. Browsers only use HTTP/3 when
 they trust the certificate, so install `hoard-ca.crt` on the device.
@@ -157,7 +157,7 @@ so other containers on the host are left alone.
 | `WATCHTOWER_SCHEDULE: "0 30 3 * * 0"` | when Watchtower checks (cron with a leading seconds field) |
 
 The server also asks GitHub every six hours whether a newer release exists, for the badge in the header; switch that
-off in Settings → Server.
+off in Settings → Maintenance → Updates.
 
 **Updating sooner.** The compose files also switch on Watchtower's HTTP API and point Hoard at it
 (`HOARD_WATCHTOWER_URL`, `HOARD_WATCHTOWER_TOKEN`). When Hoard sees a newer release, it waits until nothing is going
@@ -192,7 +192,7 @@ it's the `update` field.
 
 Hoard uses a GPU for 3D model thumbnails (wgpu over Vulkan) when the container can see one. Otherwise it falls back
 to Mesa's software renderer (lavapipe), which is already in the image, so a GPU is optional and only makes model
-thumbnails faster. Settings → Server shows what Hoard found under "3D thumbnails": `On the GPU: <adapter>
+thumbnails faster. Settings → Performance shows what Hoard found under "3D thumbnails": `On the GPU: <adapter>
 (vulkan)`, `No GPU found, so in software`, or no renderer at all. The same is in `GET /api/stats` (`renderer`) and
 in the startup log.
 
@@ -212,7 +212,7 @@ Vulkan driver, and Hoard falls back to software rendering even though `nvidia-sm
 also brings NVIDIA's Vulkan manifest (`/usr/share/vulkan/icd.d/nvidia_icd.json`), which the toolkit copies from the
 host only when the host has one, and many (Unraid, headless servers) don't.
 
-When a GPU is passed in but Hoard still renders in software, Settings → Server says what the container is missing
+When a GPU is passed in but Hoard still renders in software, Settings → Performance says what the container is missing
 under "3D thumbnails" (and the startup log has the same line): the graphics capability, the Vulkan manifest, or
 driver libraries an older toolkit leaves out.
 
@@ -303,7 +303,7 @@ file, and failures are logged without blocking anything. The originals are never
 
 ## Unreal content
 
-Packs of `.uasset` files are converted after ingest by default (Settings → Unreal packages): textures become
+Packs of `.uasset` files are converted after ingest by default (Settings → Adding packs → Unreal packages): textures become
 PNG/EXR, sounds WAV, materials and data tables JSON, read by Hoard's own code with nothing extra installed. The
 original packages stay downloadable; choose to discard them once converted to save the space, or to convert only
 when asked from the pack page.

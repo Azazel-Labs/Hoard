@@ -1,10 +1,11 @@
 import { expect, test } from './support/test'
 
 // Only looks: turning HTTPS on would change how the shared server answers every other test.
-test.describe('HTTPS settings', () => {
-  test('shows that HTTPS is off and the ways to turn it on', async ({ page }) => {
-    await page.goto('/#settings/https')
-    await expect(page.getByRole('heading', { name: 'HTTPS', level: 2 })).toBeVisible()
+test.describe('Connection settings', () => {
+  test('has the public address, shows that HTTPS is off and the ways to turn it on', async ({ page }) => {
+    await page.goto('/#settings/connection')
+    await expect(page.getByRole('heading', { name: 'Connection', level: 2 })).toBeVisible()
+    await expect(page.getByLabel('Public address')).toBeVisible()
     await expect(page.getByText('HTTPS is off: pages are served over plain http://.')).toBeVisible()
     const modes = page.getByRole('radiogroup', { name: 'HTTPS' })
     await expect(modes.getByRole('radio', { name: /^Off/ })).toBeChecked()

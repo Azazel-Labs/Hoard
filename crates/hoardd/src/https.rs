@@ -1,4 +1,4 @@
-//! HTTPS, set up in Settings → HTTPS.
+//! HTTPS, set up in Settings → Connection.
 //!
 //! Hoard answers `https://` and `http://` on the same port: the first byte of a connection says which (a TLS
 //! handshake starts with 0x16, an HTTP request with a letter; see `server.rs`). So turning HTTPS on or off, or
@@ -62,7 +62,7 @@ pub(crate) enum Mode {
     Custom,
 }
 
-/// What's chosen in Settings → HTTPS.
+/// What's chosen in Settings → Connection.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(default)]
 pub(crate) struct Saved {
@@ -242,7 +242,7 @@ pub(crate) fn init(state: &AppState) -> Result<()> {
     match result {
         Ok(()) => {
             if let Some(cert) = &h.live().cert {
-                tracing::info!(names = ?cert.names, http3 = saved.http3, "HTTPS is on (Settings → HTTPS)");
+                tracing::info!(names = ?cert.names, http3 = saved.http3, "HTTPS is on (Settings → Connection)");
             }
         }
         Err(e) => {
@@ -295,7 +295,10 @@ async fn refresh(state: &AppState) {
             if let Some(cert) = &h.live().cert {
                 let days = (cert.not_after - OffsetDateTime::now_utc().unix_timestamp()) / 86_400;
                 if days < 14 {
-                    tracing::warn!(days, "your HTTPS certificate runs out soon: upload a new one in Settings → HTTPS");
+                    tracing::warn!(
+                        days,
+                        "your HTTPS certificate runs out soon: upload a new one in Settings → Connection"
+                    );
                 }
             }
         }
@@ -810,7 +813,7 @@ pub(crate) fn router() -> Router<AppState> {
     Router::new().route("/api/https/ca.crt", get(ca_cert))
 }
 
-/// Settings → HTTPS.
+/// Settings → Connection.
 pub(crate) fn admin_router() -> Router<AppState> {
     Router::new()
         .route("/api/admin/https", get(get_status).put(put_change))

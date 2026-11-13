@@ -42,7 +42,7 @@ services:
       - /volume1/hoard/cache:/cache        # thumbnails, uploads in progress, Blender/ffmpeg: can be rebuilt
     ports:
       - "4627:4627"                        # LAN access; drop this if you only use the tunnel
-      - "4627:4627/udp"                    # HTTP/3 on the LAN, when it's on in Settings → HTTPS
+      - "4627:4627/udp"                    # HTTP/3 on the LAN, when it's on in Settings → Connection
 
   # The local model server for AI tagging and descriptions (llama.cpp). It starts empty: in the portal, Settings →
   # AI tagging → Local model lists suggested models, downloads the one you pick from Hugging Face into the volume

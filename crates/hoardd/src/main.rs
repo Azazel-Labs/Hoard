@@ -119,7 +119,7 @@ async fn main() -> Result<()> {
         https::turn_off(&*pool.get()?)?;
         #[expect(clippy::print_stdout, reason = "the command's output")]
         {
-            println!("HTTPS is off. Start Hoard again and set it up in Settings → HTTPS.");
+            println!("HTTPS is off. Start Hoard again and set it up in Settings → Connection.");
         }
         return Ok(());
     }

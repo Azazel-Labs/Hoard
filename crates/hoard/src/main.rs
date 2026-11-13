@@ -25,7 +25,7 @@ struct Cli {
     /// Access token, made in the portal's Settings → Account.
     #[arg(long, global = true, env = "HOARD_TOKEN", hide_env_values = true)]
     token: Option<String>,
-    /// Extra CA certificate (PEM) to trust: `hoard-ca.crt` from the portal's Settings → HTTPS, when the server uses
+    /// Extra CA certificate (PEM) to trust: `hoard-ca.crt` from the portal's Settings → Connection, when the server uses
     /// its own certificate.
     #[arg(long, global = true, env = "HOARD_CA_CERT")]
     ca_cert: Option<PathBuf>,

@@ -60,7 +60,7 @@ pub(crate) const TASKS: &[Task] = &[
     Task {
         id: SHRINK_THUMBS,
         label: "Shrink thumbnails",
-        blurb: "Stores the thumbnails and model views kept as PNG the way Settings → Server → Thumbnails asks, which \
+        blurb: "Stores the thumbnails and model views kept as PNG the way Settings → Performance → Thumbnails asks, which \
                 usually makes them several times smaller. Ones with transparency, and pixel art, stay PNG.",
     },
     Task {

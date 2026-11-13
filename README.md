@@ -304,7 +304,7 @@ software rasterizer (`apt install mesa-vulkan-drivers`). Without any adapter, ev
      names its listing itself (the README links to it, or the listing has exactly the title in its Megascans file),
      that listing becomes the pack's store page, with its seller and license. Store details says it was found
      automatically, and "Not this one" takes it off. Anything less certain is kept, so Store details lists the likely
-     matches at once ("Search again" searches afresh). Turn it off in Settings → Server → "Look up store pages
+     matches at once ("Search again" searches afresh). Turn it off in Settings → Adding packs → "Look up store pages
      automatically".
 5. **Link.** glTF buffers/images, OBJ → MTL → textures, FBX texture paths (absolute artist paths are matched by file
    name), DAE images, `.blend` external textures and linked libraries (`//` paths resolved relative to the file),
@@ -383,7 +383,7 @@ Whole packs download as one zip too, and so does any selection: Ctrl/Cmd-click, 
 streamed as they're written, so even a multi-gigabyte pack starts downloading at once.
 
 **Download as.** The detail panel's "Download as" converts on request (the first download makes and caches it, so
-later ones are instant). Cached conversions are kept up to a limit (Settings → Server → Converted downloads, 10 GB
+later ones are instant). Cached conversions are kept up to a limit (Settings → Performance → Converted downloads, 10 GB
 unless you change it); past that, the least recently downloaded go first, never one handed out in the last hour. Images, models, fonts, WAV/FLAC and music rendering are Hoard's own code; MP3, OGG Vorbis
 and Opus use ffmpeg's reference encoders (LAME, libvorbis, libopus), as do sources only ffmpeg reads:
 
@@ -493,7 +493,7 @@ and WAV. Hoard reads editor packages from UE 4.x through 5.7 directly, without U
 ### Converting to common formats
 
 Hoard can take the content out of the packages and keep it as ordinary files, so a Fab pack ends up as PNGs, WAVs
-and FBX like any other pack. It runs after every ingest (Settings → Unreal packages, default keep the originals) or on demand from
+and FBX like any other pack. It runs after every ingest (Settings → Adding packs → Unreal packages, default keep the originals) or on demand from
 the pack page (More → Convert Unreal content) and `POST /api/packs/{id}/unreal/convert`.
 
 | Package | Becomes | Done by |
@@ -633,8 +633,8 @@ them and disconnects them.
 - **Claude Code:** `claude mcp add --transport http --scope user hoard https://your-host/mcp`, then `/mcp` to sign in.
 - **claude.ai, Claude Desktop and Cowork:** Settings → Connectors → Add custom connector, paste
   `https://your-host/mcp`, then Connect. These connect from Anthropic's servers, so Hoard has to be reachable from the
-  internet over HTTPS with a certificate browsers trust (Settings → HTTPS with your own certificate, or a reverse
-  proxy, Tailscale Funnel or a Cloudflare tunnel), and its Public address (Settings → Server) set to that URL.
+  internet over HTTPS with a certificate browsers trust (Settings → Connection with your own certificate, or a reverse
+  proxy, Tailscale Funnel or a Cloudflare tunnel), and its Public address (Settings → Connection) set to that URL.
 
 **Tagging with your Claude subscription.** Hoard can't sign in to Claude for you (Anthropic doesn't allow other apps to
 use a Claude login), but Claude can come to Hoard: connect it and run `/mcp__hoard__tag_pack Medieval Village` (or ask
@@ -644,7 +644,7 @@ Other MCP clients can sign in the same way (OAuth 2.1 with PKCE and dynamic clie
 points at `/.well-known/oauth-protected-resource/mcp`), or send an access token from Settings → Account as
 `Authorization: Bearer <token>`. `/mcp` always needs one or the other, even with guest browsing on: asking is what makes
 apps offer to sign in. Browser-originated requests from other origins are rejected (DNS-rebinding guard). Set the public
-address in Settings → Server so returned links are absolute.
+address in Settings → Connection so returned links are absolute.
 
 ## Storage, and splitting it from the web server
 
@@ -667,13 +667,13 @@ connection. Browsers also keep some things for HTTPS pages: 3D with WebGPU, the 
 an app, and Claude connectors. When the portal is opened over plain `http://` from another device, a dismissible line
 under the header says so and links to the setup.
 
-**Settings → HTTPS** turns it on. HTTPS is served on the same port as `http://` (4627 unless `--listen` says
+**Settings → Connection** turns it on. HTTPS is served on the same port as `http://` (4627 unless `--listen` says
 otherwise): Hoard tells the two apart by the first byte a client sends. So there's no extra port to open, and a change
 applies at once, without a restart. Choose one of:
 
 - **Hoard's own certificate.** Hoard makes a certificate authority once (kept in the data folder, under `tls/`) and
   issues the server's certificate from it, for the addresses it finds (this computer's name and LAN addresses, the
-  public address from Settings → Server) and any you add. The address you're using is added for you, which matters in
+  public address from Settings → Connection) and any you add. The address you're using is added for you, which matters in
   Docker, where Hoard can't see the host's addresses. Download `hoard-ca.crt` from the same page and install it once on
   each device (the page has the steps for Windows, macOS, iPhone and iPad, Android, Linux and Firefox); its browsers
   then trust Hoard, now and after every renewal. The server certificate is renewed and re-issued by itself. Give the
@@ -739,7 +739,7 @@ links to its pack or file, and says how often it happened and when. Fix the caus
 (scan the folder again, re-analyze the pack, retry the job), one at a time or a whole kind at once, or dismiss it.
 An issue that's fixed by the next scan or analysis goes away on its own. `GET /api/admin/issues` has the same list.
 
-**Thumbnails.** Settings → Server → Thumbnails picks how thumbnails and model views are stored: Smaller, Balanced
+**Thumbnails.** Settings → Performance → Thumbnails picks how thumbnails and model views are stored: Smaller, Balanced
 (the default) or Sharper JPEG, or Lossless PNG. Anything with transparency (model renders, waveforms, font
 specimens, cut-out sprites) and pixel art always stays PNG, and so does a picture whose PNG is about as small as the
 JPEG would be. For photo-like textures Balanced is roughly an eighth of the PNG. Changing it affects new thumbnails;
@@ -864,7 +864,7 @@ Requests that change something are marked 🔒: guests can't make them. A browse
 | GET | `/api/activity` | background work in progress |
 | GET | `/api/admin/jobs` | the job queue |
 | GET 🔒, PUT 🔒 | `/api/admin/settings` | Settings: read, or change some (`null` goes back to the flag) |
-| GET 🔒, PUT 🔒 | `/api/admin/https` | Settings → HTTPS: what's served, or change it: `{mode?: "off"\|"own"\|"custom", names?, http3?, redirect?, cert?, key?}` (tried before it's switched to; 400 with the reason if it doesn't work) |
+| GET 🔒, PUT 🔒 | `/api/admin/https` | Settings → Connection: what's served, or change it: `{mode?: "off"\|"own"\|"custom", names?, http3?, redirect?, cert?, key?}` (tried before it's switched to; 400 with the reason if it doesn't work) |
 | POST 🔒 | `/api/admin/https/check` | `{cert, key}`: what a certificate covers and until when, and whether the key matches, without saving |
 | GET | `/api/https/ca.crt` | Hoard's certificate authority, to install on devices |
 | GET 🔒, POST 🔒 | `/api/admin/locations` | library locations (with whether each is reachable and its pack count), or add one: `{mode, path, kinds, catch_all, name?}` |

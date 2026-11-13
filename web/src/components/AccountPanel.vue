@@ -197,7 +197,7 @@ const day = (at: string | null) => (at ? fmt.format(new Date(at)) : 'never')
         <li>
           <strong>claude.ai, Claude Desktop and Cowork:</strong> Settings → Connectors → Add custom connector, paste the
           address, then Connect. These connect from Anthropic’s servers, so Hoard has to be reachable from the internet over
-          HTTPS<template v-if="local"> (this address isn’t: set the Public address in Settings → Server)</template>.
+          HTTPS<template v-if="local"> (this address isn’t: set the Public address in Settings → Connection)</template>.
         </li>
       </ul>
       <ul v-if="connections?.length" class="list">

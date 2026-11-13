@@ -17,10 +17,12 @@ export interface Prefs {
   lightTheme: string
   /** Theme worn when dark, by id (see DARK_THEMES in theme.ts). */
   darkTheme: string
+  /** The detail panel's width as last dragged, in px; null lets it take what the grid leaves. */
+  detailWidth: number | null
 }
 
 const KEY = 'hoard.prefs'
-const DEFAULTS: Prefs = { tile: 156, showSupporting: false, collapsed: ['license', 'format', 'blender'], expanded: [], theme: 'system', lightTheme: 'slate', darkTheme: 'graphite' }
+const DEFAULTS: Prefs = { tile: 156, showSupporting: false, collapsed: ['license', 'format', 'blender'], expanded: [], theme: 'system', lightTheme: 'slate', darkTheme: 'graphite', detailWidth: null }
 
 function load(): Prefs {
   try {

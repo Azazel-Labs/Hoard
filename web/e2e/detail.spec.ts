@@ -88,4 +88,33 @@ test.describe('Asset details', () => {
     await page.goBack()
     await expect(panel).toHaveCount(0)
   })
+
+  test('the panel is as wide as you drag it, remembered after a reload; double-click goes back to the width that fits', async ({ page, seed }) => {
+    await page.setViewportSize({ width: 1600, height: 800 })
+    await openPack(page, seed.packs[MODELS], MODELS, '&sort=name')
+    await tile(page, 'Crate').first().click()
+    const panel = page.getByRole('complementary', { name: 'Asset details' })
+    await expect(panel).toBeVisible()
+    const handle = page.getByRole('separator', { name: 'Resize the details panel' })
+    const width = async () => (await panel.boundingBox())!.width
+    const fits = await width()
+
+    const box = (await handle.boundingBox())!
+    await page.mouse.move(box.x + box.width / 2, box.y + 200)
+    await page.mouse.down()
+    await page.mouse.move(box.x - 150, box.y + 200, { steps: 6 })
+    await page.mouse.move(box.x - 300, box.y + 200, { steps: 6 })
+    await page.mouse.up()
+    const wide = await width()
+    expect(wide).toBeGreaterThan(fits + 200)
+    // The grid gives up whole columns: nothing spills sideways.
+    expect(await page.locator('.main').evaluate((el) => el.scrollWidth - el.clientWidth)).toBeLessThanOrEqual(0)
+
+    await page.reload()
+    await expect(panel).toBeVisible()
+    await expect.poll(width).toBeCloseTo(wide, -1)
+
+    await handle.dblclick()
+    await expect.poll(width).toBeCloseTo(fits, -1)
+  })
 })

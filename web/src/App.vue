@@ -268,7 +268,10 @@ onBeforeUnmount(() => {
   roomObserver.disconnect()
   narrow.removeEventListener('change', measureRoom)
 })
-/** With the panel open: the columns to show, their width, and the panel's width. */
+/** The panel's width while its edge is being dragged. */
+const detailDrag = ref<number | null>(null)
+/** With the panel open: the columns to show, their width, and the panel's width. The tiles keep their size; the
+ *  grid drops columns to make room. */
 const fit = computed(() => {
   const { width, side, chrome, gap } = room.value
   if (!width || !gap) return null
@@ -276,11 +279,58 @@ const fit = computed(() => {
   // The columns the grid has without the panel, as auto-fill makes them.
   const n = Math.max(1, Math.floor((space + gap) / (prefs.tile + gap)))
   const col = (space - gap * (n - 1)) / n
-  const cols = Math.floor((space - DETAIL_MIN + gap) / (col + gap))
-  if (cols < 1) return null
-  const used = cols * col + (cols - 1) * gap
-  return { col, cols, detail: Math.min(DETAIL_MAX, Math.floor(space - used)) }
+  const used = (cols: number) => cols * col + (cols - 1) * gap
+  const want = detailDrag.value ?? prefs.detailWidth
+  if (want === null) {
+    // Left alone, the panel takes what's over once enough columns go for it to fit.
+    const cols = Math.floor((space - DETAIL_MIN + gap) / (col + gap))
+    if (cols < 1) return null
+    return { col, cols, detail: Math.min(DETAIL_MAX, Math.floor(space - used(cols))) }
+  }
+  // Dragged: as wide as asked, leaving the grid at least one column.
+  const detail = Math.min(Math.max(want, DETAIL_MIN), space - col)
+  if (detail < DETAIL_MIN) return null
+  let cols = Math.max(1, Math.floor((space - detail + gap) / (col + gap)))
+  // Mid-drag the edge follows the pointer; let go, and it settles on the nearest column so no gap is left over.
+  if (detailDrag.value !== null) return { col, cols, detail }
+  if (space - used(cols + 1) >= DETAIL_MIN && space - used(cols + 1) > detail - (col + gap) / 2) cols++
+  return { col, cols, detail: Math.floor(space - used(cols)) }
 })
+
+/** Dragging the panel's left edge sets its width; double-clicking it goes back to the width that fits. */
+function startResize(e: PointerEvent) {
+  const panel = detailScroller()
+  if (!panel || e.button !== 0) return
+  e.preventDefault()
+  const handle = e.currentTarget as HTMLElement
+  handle.setPointerCapture(e.pointerId)
+  const x0 = e.clientX
+  const w0 = panel.offsetWidth
+  detailDrag.value = w0
+  document.documentElement.classList.add('resizing')
+  const move = (m: PointerEvent) => (detailDrag.value = w0 + (x0 - m.clientX))
+  const up = () => {
+    handle.removeEventListener('pointermove', move)
+    handle.removeEventListener('pointerup', up)
+    handle.removeEventListener('pointercancel', up)
+    document.documentElement.classList.remove('resizing')
+    if (detailDrag.value !== null && Math.abs(detailDrag.value - w0) > 2) prefs.detailWidth = Math.round(fit.value?.detail ?? detailDrag.value)
+    detailDrag.value = null
+  }
+  handle.addEventListener('pointermove', move)
+  handle.addEventListener('pointerup', up)
+  handle.addEventListener('pointercancel', up)
+}
+function resizeBy(e: KeyboardEvent) {
+  const delta = e.key === 'ArrowLeft' ? 1 : e.key === 'ArrowRight' ? -1 : 0
+  if (e.key === 'Home') prefs.detailWidth = null
+  if (!delta) return
+  e.preventDefault()
+  const f = fit.value
+  if (!f) return
+  // A column at a time, so each press shows a change.
+  prefs.detailWidth = Math.round(f.detail + delta * (f.col + room.value.gap))
+}
 const appStyle = computed(() => {
   const s: Record<string, string> = { '--tile': `${prefs.tile}px` }
   const f = fit.value
@@ -1388,6 +1438,20 @@ const commands = computed<Command[]>(() => {
         </p>
       </main>
 
+      <div
+        v-if="selected && view === 'library' && fit"
+        class="detail-resize"
+        :class="{ dragging: detailDrag !== null }"
+        role="separator"
+        aria-orientation="vertical"
+        aria-label="Resize the details panel"
+        :aria-valuenow="fit.detail"
+        tabindex="0"
+        title="Drag to resize · double-click for the width that fits"
+        @pointerdown="startResize"
+        @dblclick="prefs.detailWidth = null"
+        @keydown="resizeBy"
+      />
       <AssetDetail
         v-if="selected"
         class="detail-pane"
@@ -1699,6 +1763,17 @@ const commands = computed<Command[]>(() => {
 @keyframes rise-in { from { opacity: 0; translate: 0 10px; } }
 
 .detail-pane { grid-area: detail; min-height: 0; }
+/* The panel's left edge: a strip to grab, drawn as a line on hover or while dragging. */
+.detail-resize {
+  grid-area: detail; justify-self: start; z-index: 3; width: 10px; margin-left: -5px; cursor: col-resize; touch-action: none;
+  position: relative; outline: none;
+}
+.detail-resize::after {
+  content: ''; position: absolute; inset: 0 4px; border-radius: 1px; background: transparent;
+  transition: background-color var(--dur-1);
+}
+.detail-resize:hover::after, .detail-resize:focus-visible::after, .detail-resize.dragging::after { background: var(--accent); }
+:global(.resizing), :global(.resizing *) { cursor: col-resize !important; user-select: none !important; }
 
 .selbar {
   position: fixed; left: 50%; bottom: 1rem; translate: -50% 0; z-index: 25;

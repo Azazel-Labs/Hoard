@@ -815,9 +815,6 @@ onBeforeUnmount(() => unswipe())
       <label v-if="family" class="animcheck familycheck">
         <input v-model="applyToFamily" type="checkbox" /> Apply tag, category and description changes to all {{ family.size }} variants
       </label>
-      <p class="legend">
-        Solid tags were added by a person, outlined ones by the offline tagger, dashed ones by AI. Click a tag to filter by it.
-      </p>
     </section>
 
     <section class="cols">

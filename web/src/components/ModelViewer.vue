@@ -92,7 +92,6 @@ onBeforeUnmount(teardown)
           <option v-for="c in info.clips" :key="c" :value="c">{{ c }}</option>
         </select>
       </label>
-      <span class="hint">Drag to orbit · scroll to zoom · double-click for full screen</span>
       <p v-if="missing.length" class="missing" :title="missing.join('\n')">
         {{ missing.length === 1 ? `Texture not found: ${missing[0]}` : `${missing.length} textures not found` }}
       </p>
@@ -120,6 +119,5 @@ onBeforeUnmount(teardown)
 .expand:active { scale: 0.92; }
 .hud { display: flex; flex-wrap: wrap; gap: 0.5rem 0.9rem; align-items: center; margin-top: 0.45rem; font-size: 0.78rem; color: var(--muted); }
 .hud .field { width: auto; padding: 0.2em 0.4em; font-size: 0.78rem; }
-.hint { margin-left: auto; color: var(--faint); }
 .missing { flex-basis: 100%; margin: 0; color: var(--faint); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 </style>

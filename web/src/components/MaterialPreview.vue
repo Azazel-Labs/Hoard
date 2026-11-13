@@ -59,7 +59,6 @@ onBeforeUnmount(teardown)
       <div class="shapes" role="group" aria-label="Shape">
         <button v-for="s in SHAPES" :key="s" type="button" :aria-pressed="shape === s" @click="shape = s">{{ SHAPE_LABEL[s] }}</button>
       </div>
-      <span class="hint">Drag to orbit · double-click for full screen</span>
     </div>
   </div>
 </template>
@@ -89,5 +88,4 @@ onBeforeUnmount(teardown)
 }
 .shapes button:hover { color: var(--text); background: var(--raised); }
 .shapes button[aria-pressed='true'] { color: var(--text); background: var(--raised); box-shadow: inset 0 0 0 1px var(--line); }
-.hint { margin-left: auto; color: var(--faint); }
 </style>

@@ -163,6 +163,67 @@ fn listed(root: &Path) -> Result<Vec<PathBuf>> {
     Ok(files)
 }
 
+/// An uploaded pack's `.gltf` models become `.glb`, their buffers packed in: a `.bin` is no use without its glTF,
+/// and one file is easier to keep, view and send. Their images stay as files beside it (a GLB may point at them),
+/// so textures are still assets of their own. Only done when nothing is lost: each buffer file is read by this glTF
+/// alone, no `.glb` of that name is there already, and none of the files is known to the pack or to Unity. Returns
+/// how many were converted. Never run on a watched folder: Hoard doesn't change the files there.
+fn pack_gltfs(root: &Path, files: &[PathBuf], keep: &HashSet<String>) -> usize {
+    let dir_rel = |gltf: &str, uri: &str| -> String {
+        match gltf.rsplit_once('/') {
+            Some((dir, _)) => format!("{dir}/{uri}"),
+            None => uri.to_owned(),
+        }
+    };
+    let gltfs: Vec<(String, serde_json::Value)> = files
+        .iter()
+        .map(|f| rel_of(root, f))
+        .filter(|rel| ext_of(rel) == "gltf")
+        .filter_map(|rel| {
+            let doc = serde_json::from_slice(&fs::read(root.join(&rel)).ok()?).ok()?;
+            Some((rel, doc))
+        })
+        .collect();
+    // How many glTFs read each file, as a buffer or an image.
+    let mut readers: HashMap<String, usize> = HashMap::new();
+    for (rel, doc) in &gltfs {
+        let mut uris = crate::formats::gltf_buffer_files(doc);
+        uris.extend(crate::formats::gltf_image_files(doc));
+        uris.sort();
+        uris.dedup();
+        for uri in uris {
+            *readers.entry(dir_rel(rel, &uri)).or_default() += 1;
+        }
+    }
+    let mut done = 0;
+    for (rel, doc) in &gltfs {
+        let glb = format!("{}.glb", &rel[..rel.len() - ".gltf".len()]);
+        let buffers: Vec<String> = crate::formats::gltf_buffer_files(doc).iter().map(|u| dir_rel(rel, u)).collect();
+        let shared = buffers.iter().any(|b| readers.get(b).copied().unwrap_or(0) > 1 || keep.contains(b));
+        if shared || keep.contains(rel) || keep.contains(&glb) || root.join(&glb).exists() {
+            continue;
+        }
+        let (bytes, _) = match crate::formats::gltf_buffers_to_glb(&root.join(rel)) {
+            Ok(out) => out,
+            Err(e) => {
+                tracing::debug!(file = %rel, error = %format!("{e:#}"), "glTF kept as it is");
+                continue;
+            }
+        };
+        if let Err(e) = fs::write(root.join(&glb), bytes) {
+            tracing::warn!(file = %rel, error = %e, "couldn't write the GLB; glTF kept as it is");
+            fs::remove_file(root.join(&glb)).ok();
+            continue;
+        }
+        fs::remove_file(root.join(rel)).ok();
+        for b in &buffers {
+            fs::remove_file(root.join(b)).ok();
+        }
+        done += 1;
+    }
+    done
+}
+
 /// The relative paths a pack folder would give its assets: what a rescan compares the pack against.
 pub(crate) fn pack_rels(root: &Path) -> Result<HashSet<String>> {
     Ok(listed(root)?.iter().map(|f| rel_of(root, f)).filter(|rel| !is_sidecar(rel)).collect())
@@ -759,11 +820,19 @@ pub(crate) fn ingest_pack(state: &AppState, rt: &Handle, pack_id: &str, auto_nam
 
     let mut files = listed(&root)?;
     let guids = harvest_unity_guids(&root, &files);
+    let known = db::known_paths(&conn, pack_id)?;
+    if watched.is_none() {
+        let keep: HashSet<String> = known.iter().cloned().chain(guids.iter().map(|(path, _)| path.clone())).collect();
+        let n = pack_gltfs(&root, &files, &keep);
+        if n > 0 {
+            tracing::info!(pack = pack_id, models = n, "glTF models packed into GLB");
+            files = listed(&root)?;
+        }
+    }
     files.retain(|f| !is_sidecar(&rel_of(&root, f)));
     files.sort();
     let license = detect_pack_license(&root, &files);
     let readme = context::read_readmes(&root, &files);
-    let known = db::known_paths(&conn, pack_id)?;
     let first = known.is_empty();
     files.retain(|f| !known.contains(&rel_of(&root, f)));
     drop(known);
@@ -1067,5 +1136,75 @@ mod tests {
         assert_eq!(unity_guid("fileFormatVersion: 2\nguid: nothex\n"), None);
         assert!(!is_junk("Assets/thing.png.meta"));
         assert!(!is_junk("Assets/thing.png"));
+    }
+
+    /// A one-triangle glTF reading `bin` for its buffer and `png` for its colour map.
+    fn tri_gltf(bin: &str, png: &str) -> String {
+        serde_json::json!({
+            "asset": { "version": "2.0" },
+            "buffers": [{ "uri": bin, "byteLength": 36 }],
+            "bufferViews": [{ "buffer": 0, "byteOffset": 0, "byteLength": 36 }],
+            "accessors": [{ "bufferView": 0, "componentType": 5126, "count": 3, "type": "VEC3",
+                            "min": [0, 0, 0], "max": [1, 1, 0] }],
+            "images": [{ "uri": png }],
+            "meshes": [{ "primitives": [{ "attributes": { "POSITION": 0 } }] }],
+            "nodes": [{ "mesh": 0 }], "scenes": [{ "nodes": [0] }], "scene": 0
+        })
+        .to_string()
+    }
+
+    #[test]
+    fn gltf_buffers_packed_into_glb() {
+        let dir = tempfile::tempdir().unwrap();
+        let root = dir.path();
+        let write = |rel: &str, data: &[u8]| {
+            let p = root.join(rel);
+            fs::create_dir_all(p.parent().unwrap()).unwrap();
+            fs::write(p, data).unwrap();
+        };
+        let tri: Vec<u8> = [0f32, 0., 0., 1., 0., 0., 0., 1., 0.].iter().flat_map(|f| f.to_le_bytes()).collect();
+        // Its own buffer: packed in, the texture stays beside it.
+        write("crate/crate.gltf", tri_gltf("crate.bin", "tex/crate.png").as_bytes());
+        write("crate/crate.bin", &tri);
+        write("crate/tex/crate.png", b"\x89PNG");
+        // Two glTFs sharing one buffer: left alone.
+        write("pair/a.gltf", tri_gltf("shared.bin", "a.png").as_bytes());
+        write("pair/b.gltf", tri_gltf("shared.bin", "b.png").as_bytes());
+        write("pair/shared.bin", &tri);
+        // A GLB of that name is there already: left alone.
+        write("both/m.gltf", tri_gltf("m.bin", "m.png").as_bytes());
+        write("both/m.bin", &tri);
+        write("both/m.glb", b"glTF");
+        // Known to the pack (or to Unity): left alone.
+        write("kept/k.gltf", tri_gltf("k.bin", "k.png").as_bytes());
+        write("kept/k.bin", &tri);
+
+        let keep = HashSet::from(["kept/k.bin".to_owned()]);
+        assert_eq!(pack_gltfs(root, &listed(root).unwrap(), &keep), 1);
+        let mut left: Vec<String> = listed(root).unwrap().iter().map(|f| rel_of(root, f)).collect();
+        left.sort();
+        assert_eq!(
+            left,
+            [
+                "both/m.bin",
+                "both/m.glb",
+                "both/m.gltf",
+                "crate/crate.glb",
+                "crate/tex/crate.png",
+                "kept/k.bin",
+                "kept/k.gltf",
+                "pair/a.gltf",
+                "pair/b.gltf",
+                "pair/shared.bin",
+            ]
+        );
+        // The GLB holds the geometry and still points at the texture beside it.
+        let glb = fs::read(root.join("crate/crate.glb")).unwrap();
+        let json_len = u32::from_le_bytes(glb[12..16].try_into().unwrap()) as usize;
+        let doc: serde_json::Value = serde_json::from_slice(&glb[20..20 + json_len]).unwrap();
+        assert_eq!(doc["images"][0]["uri"], "tex/crate.png");
+        assert!(doc["buffers"][0].get("uri").is_none());
+        assert_eq!(&glb[20 + json_len + 4..20 + json_len + 8], b"BIN\0");
+        assert_eq!(&glb[20 + json_len + 8..], &tri[..]);
     }
 }

@@ -229,7 +229,9 @@ software rasterizer (`apt install mesa-vulkan-drivers`). Without any adapter, ev
    3 levels deep), with `..`/absolute-path rejection and limits on expanded size and file count. A `.unitypackage`
    is rebuilt into its original `Assets/…` tree. `__MACOSX` and `.DS_Store` are dropped; Unity `.meta` files are read
    for their GUIDs (so materials and prefabs link to their textures) and then dropped, along with Godot `.import`
-   files. Wrapper folders are collapsed and the innermost folder's name becomes the pack name.
+   files. Wrapper folders are collapsed and the innermost folder's name becomes the pack name. A `.gltf` becomes a
+   `.glb` with its `.bin` packed in when nothing is lost (no other glTF reads that `.bin`); its textures stay files
+   beside it. Watched folders are never changed.
 2. **Store.** Each file's BLAKE3 hash is its name in blob storage, so a file shared by ten packs is stored once,
    corruption is detectable, and blobs never change (cache them forever, back them up with any sync tool).
 3. **Analyze.**

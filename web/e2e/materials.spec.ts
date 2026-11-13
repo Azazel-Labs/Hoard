@@ -1,7 +1,7 @@
 import { MEGASCANS } from './support/seed'
 import { checker, MEGASCANS_FOLDER, quadGltf } from './support/files'
 import type { Page } from '@playwright/test'
-import { assetsOf, signedIn, uploadPack, waitIdle, waitReady } from './support/api'
+import { type Asset, assetsOf, signedIn, uploadPack, waitIdle, waitReady } from './support/api'
 import { doubleClick, expect, openPack, test } from './support/test'
 
 // The Megascans pack's four maps make one material, named after the listing like its model. Only the model wears it,
@@ -82,6 +82,7 @@ test.describe('materials', () => {
     expect(full.meta.thumb_dressed).toBeTruthy()
   })
 
+  // Uploaded, it's packed into one GLB (its .bin inside, its maps still beside it), and dressed like any model.
   test("a glTF model's server thumbnail has the colour map of the material beside it on", async ({ baseURL }) => {
     const api = await signedIn(baseURL!)
     const stats = (await (await api.get('/api/stats')).json()) as { renderer?: string }
@@ -99,7 +100,10 @@ test.describe('materials', () => {
     ])
     await waitReady(api, [pack.id])
     await waitIdle(api)
-    const model = (await assetsOf(api, pack.id)).find((a) => a.kind === 'model')!
+    const assets = (await assetsOf(api, pack.id)) as (Asset & { path: string })[]
+    expect(assets.map((a) => a.path).filter((p) => /\.(gltf|bin|glb)$/.test(p))).toEqual(['Signpost.glb'])
+    expect(assets.filter((a) => a.kind === 'texture')).toHaveLength(3)
+    const model = assets.find((a) => a.kind === 'model')!
     const full = (await (await api.get(`/api/assets/${model.id}`)).json()) as { meta: { thumb_dressed?: string } }
     expect(full.meta.thumb_dressed).toBeTruthy()
     await api.delete(`/api/packs/${pack.id}`)

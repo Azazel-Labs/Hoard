@@ -354,8 +354,42 @@ fn glb_to_gltf_zip(path: &Path) -> Result<Output> {
 
 /// `.gltf` (with its external or embedded buffers and images) → one `.glb`.
 fn gltf_to_glb(path: &Path) -> Result<Output> {
+    Ok(Output { bytes: build_glb(path, true)?.0, ext: "glb" })
+}
+
+/// `.gltf` → `.glb` with its buffers packed in, its images left where they are (a GLB may point at image files
+/// beside it, as the glTF did): the same model in one file instead of two. Returns the GLB and the buffer files it
+/// took in, relative to the glTF's folder. Refused for what can't move losslessly: a buffer without a URI, or
+/// meshopt compression (whose extension points at buffers itself).
+pub(crate) fn gltf_buffers_to_glb(path: &Path) -> Result<(Vec<u8>, Vec<String>)> {
+    build_glb(path, false)
+}
+
+/// The buffer files a `.gltf` reads, relative to its folder (data URIs aren't files).
+pub(crate) fn gltf_buffer_files(doc: &Value) -> Vec<String> {
+    gltf_uris(doc, "buffers")
+}
+
+/// The image files a `.gltf` reads, relative to its folder.
+pub(crate) fn gltf_image_files(doc: &Value) -> Vec<String> {
+    gltf_uris(doc, "images")
+}
+
+fn gltf_uris(doc: &Value, key: &str) -> Vec<String> {
+    doc.get(key)
+        .and_then(Value::as_array)
+        .into_iter()
+        .flatten()
+        .filter_map(|b| b.get("uri").and_then(Value::as_str))
+        .filter(|uri| !uri.starts_with("data:"))
+        .map(percent_decode)
+        .collect()
+}
+
+fn build_glb(path: &Path, images: bool) -> Result<(Vec<u8>, Vec<String>)> {
     let dir = path.parent().context("no folder")?;
     let mut doc: Value = serde_json::from_slice(&std::fs::read(path)?)?;
+    let used = std::cell::RefCell::new(Vec::new());
     let read_uri = |uri: &str| -> Result<Vec<u8>> {
         if let Some(data) = uri.strip_prefix("data:") {
             let (_, b64) = data.split_once(";base64,").context("data URI isn't base64")?;
@@ -363,8 +397,20 @@ fn gltf_to_glb(path: &Path) -> Result<Output> {
         }
         let rel = percent_decode(uri);
         ensure!(!rel.contains("..") && !rel.starts_with('/'), "glTF points outside its pack: {uri}");
-        std::fs::read(dir.join(&rel)).with_context(|| format!("glTF file {rel} is missing from the pack"))
+        let bytes =
+            std::fs::read(dir.join(&rel)).with_context(|| format!("glTF file {rel} is missing from the pack"))?;
+        used.borrow_mut().push(rel);
+        Ok(bytes)
     };
+    if !images {
+        let meshopt = doc
+            .get("extensionsUsed")
+            .and_then(Value::as_array)
+            .is_some_and(|e| e.iter().filter_map(Value::as_str).any(|e| e.contains("meshopt")));
+        ensure!(!meshopt, "meshopt-compressed glTF points at its buffers itself");
+        let buffers = doc.get("buffers").and_then(Value::as_array).map(Vec::as_slice).unwrap_or_default();
+        ensure!(buffers.iter().all(|b| b.get("uri").is_some()), "a glTF buffer has no URI");
+    }
     let pad = |v: &mut Vec<u8>| v.resize(v.len().div_ceil(4) * 4, 0);
 
     // One BIN: every buffer back to back, 4-byte aligned; buffer views re-pointed at it.
@@ -385,10 +431,11 @@ fn gltf_to_glb(path: &Path) -> Result<Output> {
         v["buffer"] = json!(0);
         v["byteOffset"] = json!(off);
     }
+    let buffers_used = used.borrow().clone();
     // Images with URIs move into the BIN too.
     let mut new_views = Vec::new();
     let view_base = doc.get("bufferViews").and_then(Value::as_array).map_or(0, Vec::len);
-    for img in doc.get_mut("images").and_then(Value::as_array_mut).into_iter().flatten() {
+    for img in doc.get_mut("images").and_then(Value::as_array_mut).into_iter().flatten().filter(|_| images) {
         let Some(uri) = img.get("uri").and_then(Value::as_str).map(str::to_owned) else { continue };
         let bytes = read_uri(&uri)?;
         let mime = if bytes.starts_with(b"\x89PNG") {
@@ -433,7 +480,7 @@ fn gltf_to_glb(path: &Path) -> Result<Output> {
         out.extend_from_slice(b"BIN\0");
         out.extend(bin);
     }
-    Ok(Output { bytes: out, ext: "glb" })
+    Ok((out, buffers_used))
 }
 
 fn percent_decode(s: &str) -> String {

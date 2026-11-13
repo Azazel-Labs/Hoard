@@ -51,6 +51,21 @@ pub(crate) struct Entry {
     pub(crate) credit_line: Option<String>,
     /// Anything else the license asks ("Non-commercial use only").
     pub(crate) note: Option<String>,
+    /// The license tier it was bought under, where the store has tiers (Fab: Personal, Professional).
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub(crate) license_tier: Option<String>,
+    /// What the license keeps you from doing, for ship checks.
+    #[serde(skip)]
+    pub(crate) limit: Option<Limit>,
+}
+
+/// What a license keeps a commercial project from doing freely.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) enum Limit {
+    /// It can't be sold.
+    NonCommercial,
+    /// Changes must be shared under the same license (CC BY-SA; the GPL for code).
+    ShareAlike,
 }
 
 #[derive(Debug, Serialize)]
@@ -65,24 +80,31 @@ struct License {
     url: Option<&'static str>,
     attribution: Attribution,
     note: Option<&'static str>,
+    limit: Option<Limit>,
 }
 
 /// A license by the id the tagger gives it (`cc-by`), the name a store gives it (`Fab Standard License`), or as
 /// someone typed it (`CC-BY 4.0`): case, spaces and punctuation don't matter.
 fn license(name: &str) -> Option<License> {
-    let l = |name, url, attribution, note| Some(License { name, url, attribution, note });
+    let l = |name, url, attribution, note| Some(License { name, url, attribution, note, limit: None });
+    let limited = |limit, l: Option<License>| l.map(|l| License { limit: Some(limit), ..l });
     let key = name.chars().filter(char::is_ascii_alphanumeric).collect::<String>().to_ascii_lowercase();
     match key.as_str() {
         "cc0" | "cc010" | "creativecommonszero" => {
             l(CC0, Some("https://creativecommons.org/publicdomain/zero/1.0/"), Attribution::No, None)
         }
         "publicdomain" => l("Public domain", None, Attribution::No, None),
-        k if k.starts_with("ccbync") => l("CC BY-NC", None, Attribution::Yes, Some("Non-commercial use only.")),
-        k if k.starts_with("ccbysa") => l(
-            "CC BY-SA",
-            None,
-            Attribution::Yes,
-            Some("Share alike: changes to these assets must be shared under the same license."),
+        k if k.starts_with("ccbync") => {
+            limited(Limit::NonCommercial, l("CC BY-NC", None, Attribution::Yes, Some("Non-commercial use only.")))
+        }
+        k if k.starts_with("ccbysa") => limited(
+            Limit::ShareAlike,
+            l(
+                "CC BY-SA",
+                None,
+                Attribution::Yes,
+                Some("Share alike: changes to these assets must be shared under the same license."),
+            ),
         ),
         "ccby40" | "ccby4" => l(CC_BY_4, Some("https://creativecommons.org/licenses/by/4.0/"), Attribution::Yes, None),
         k if k.starts_with("ccby") => l("CC BY", None, Attribution::Yes, None),
@@ -95,9 +117,10 @@ fn license(name: &str) -> Option<License> {
         "mit" | "mitlicense" => {
             l("MIT", None, Attribution::Terms, Some("Keep the copyright and license notice with the files."))
         }
-        k if k.starts_with("gpl") || k.starts_with("gnugpl") => {
-            l("GPL", None, Attribution::Terms, Some("Keep the license with the files; read its terms."))
-        }
+        k if k.starts_with("gpl") || k.starts_with("gnugpl") => limited(
+            Limit::ShareAlike,
+            l("GPL", None, Attribution::Terms, Some("Keep the license with the files; read its terms.")),
+        ),
         "royaltyfree" => {
             l("Royalty-free", None, Attribution::Unknown, Some("Read the license that came with the pack."))
         }
@@ -161,7 +184,9 @@ fn credit(r: Row) -> Entry {
         license_url: lic.as_ref().and_then(|l| l.url).map(str::to_owned),
         attribution,
         credit_line,
-        note: lic.and_then(|l| l.note).map(str::to_owned),
+        note: lic.as_ref().and_then(|l| l.note).map(str::to_owned),
+        license_tier: r.license_tier,
+        limit: lic.and_then(|l| l.limit),
     }
 }
 
@@ -274,8 +299,15 @@ pub(crate) struct FormatQuery {
     format: Option<String>,
 }
 
+impl FormatQuery {
+    /// `format=md` (or `markdown`) asks for Markdown.
+    pub(crate) fn markdown(&self) -> bool {
+        matches!(self.format.as_deref(), Some("md" | "markdown"))
+    }
+}
+
 fn respond(credits: &Credits, f: &FormatQuery) -> Response {
-    if matches!(f.format.as_deref(), Some("md" | "markdown")) {
+    if f.markdown() {
         (
             [
                 (header::CONTENT_TYPE, "text/markdown; charset=utf-8"),

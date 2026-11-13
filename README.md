@@ -239,6 +239,12 @@ software rasterizer (`apt install mesa-vulkan-drivers`). Without any adapter, ev
      pixel-art detection (few colors, small, upscaled crisply), tangent-space normal map detection. Images over
      2048 px, and any format browsers can't draw (TGA, DDS, EXR, PSD…), also get a light preview of at most 2048 px
      (JPEG, or lossless WebP when there's transparency) for the image and 3D viewers.
+   - AI provenance: an image that says it was made or edited with generative AI is tagged `ai-generated` or
+     `ai-edited`, with what made it where the file names it. Read from C2PA Content Credentials (OpenAI, Adobe
+     Firefly, Google and others sign their images), the IPTC digital source type in XMP (Google, Midjourney, Adobe,
+     Meta), and the settings Stable Diffusion front ends keep in PNGs (AUTOMATIC1111, Forge, ComfyUI, InvokeAI,
+     NovelAI, Fooocus). It's what the file declares: metadata can be stripped, and invisible watermarks such as
+     Google's SynthID can only be read by their maker's detector.
    - GPU textures, decoded in pure Rust: DDS (BC1-7, raw RGBA/BGRA, float, legacy DXT and bitmask formats) and KTX2
      (BCn, ETC2/EAC, ASTC, raw, with zstd or zlib supercompression), with their GPU format and mip count. Basis
      Universal (KTX2 with BasisLZ/ETC1S or UASTC, and `.basis` files) is transcoded in pure Rust too. SVGs render
@@ -611,6 +617,25 @@ when Hoard doesn't know a license, the file says how many packs to check by hand
   instead, `--json` for JSON, `--out CREDITS.md` to write a file).
 - **Agents:** the `get_credits` MCP tool.
 
+### Ship check
+
+Hoard doesn't track your projects. Whatever builds them asks instead: send the BLAKE3 hashes of the files you ship
+(`b3sum`, or the `blake3` library) to `POST /api/check` (`{"hashes": [...]}`, up to 20,000; `?format=md` for
+Markdown) or the `check_files` MCP tool. A hash matches a file as Hoard keeps it, as it was uploaded before Hoard
+converted it, or a format Hoard made from it. The answer lists each file Hoard knows with its asset, path and pack,
+the credits for those packs, the hashes Hoard doesn't know, and which files need a look before shipping:
+
+| Warning | Means |
+|---|---|
+| `license_unknown` | Hoard doesn't know the pack's license, or can't read the one it has |
+| `non_commercial` | CC BY-NC: can't be sold |
+| `share_alike` | CC BY-SA or GPL: what's made from it shares the license |
+| `keep_notice` | MIT, OFL, GPL: ship the license notice with it |
+| `fab_personal` | bought under Fab's Personal tier, which has a revenue cap |
+| `ai_generated`, `ai_edited` | the image says it was made or edited with generative AI; stores such as Steam ask you to disclose it |
+
+A file is clear when any pack it's in covers it: the same bytes in a CC0 pack and an unknown one are fine.
+
 ## MCP for agents
 
 `POST /mcp` is a stateless Streamable HTTP MCP endpoint. It speaks both the 2026-07-28 protocol (per-request `_meta`,
@@ -626,6 +651,7 @@ both connect.
 | `get_bundle` | download URLs and save-as paths for an asset and everything it needs, plus a zip URL |
 | `list_packs`, `list_tags`, `list_collections` | browse the library, its tag vocabulary and collections (`search_assets` takes `collection` too) |
 | `get_credits` | who made the packs behind some packs, collections, assets or a search, their licenses and the credit lines they ask for (`markdown` for a ready `CREDITS.md`) |
+| `check_files` | given the BLAKE3 hashes of the files a project ships: which came from Hoard, their credits, and which need a look (unknown or limiting license, AI-made images); see [Ship check](#ship-check) |
 | `tag_asset`, `update_asset` | edits, recorded as human |
 | `next_to_tag` | the next files nothing has described yet (up to 16, one pack at a time), with facts, the pack's store page and README, and a numbered contact sheet image |
 | `save_tags` | names, categories, descriptions and tags for a batch (and the pack), recorded as AI-made exactly like Hoard's own AI tagger: a person's edits always win |

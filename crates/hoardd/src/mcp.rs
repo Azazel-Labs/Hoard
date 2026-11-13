@@ -232,6 +232,20 @@ fn tool_list() -> Value {
             "annotations": read
         },
         {
+            "name": "check_files",
+            "title": "Check files before shipping",
+            "description": "Given the BLAKE3 hashes of the files a project ships (b3sum), says which came from Hoard (the asset, its path and pack; a hash matches a file as Hoard keeps it, as it was uploaded before conversion, or a format Hoard made from it), the credits they need, and which files need a look first, with warnings: license_unknown, non_commercial, share_alike, keep_notice (ship the license notice), fab_personal (Fab's Personal tier), ai_generated / ai_edited (the image says so in its C2PA Content Credentials, IPTC metadata or generator settings). A file is ok when one pack it's in covers it. Hashes Hoard doesn't know are listed as not_found. `markdown` returns CREDITS.md with a ship-check section.",
+            "inputSchema": {
+                "type": "object",
+                "properties": {
+                    "hashes": { "type": "array", "items": { "type": "string" }, "description": "BLAKE3 hashes, 64 hex digits each." },
+                    "markdown": { "type": "boolean", "default": false, "description": "Return CREDITS.md text with the ship check instead of JSON." }
+                },
+                "required": ["hashes"]
+            },
+            "annotations": read
+        },
+        {
             "name": "list_tags",
             "title": "List tags",
             "description": "Most-used tags, optionally filtered by prefix (e.g. 'style:' or 'material:'). Useful to learn the vocabulary before searching.",
@@ -539,6 +553,25 @@ async fn preview_blocks(state: &AppState, wanted: Vec<Value>) -> Vec<Value> {
     out
 }
 
+/// `check_files`: what the files a project ships came from, their credits and what needs a look.
+async fn check_call(state: &AppState, args: &Value) -> Result<Value, ToolError> {
+    let hashes = str_list(args, "hashes");
+    if hashes.is_empty() {
+        return Err(ToolError::Failed("give `hashes`: the BLAKE3 hashes of the files".into()));
+    }
+    if hashes.len() > crate::check::MAX_HASHES {
+        return Err(ToolError::Failed(format!("at most {} hashes at a time", crate::check::MAX_HASHES)));
+    }
+    let result = db::call(&state.pool, move |c| crate::check::check(c, &hashes))
+        .await
+        .map_err(|e| ToolError::Failed(format!("{e:#}")))?;
+    if args.get("markdown").and_then(Value::as_bool) == Some(true) {
+        Ok(json!({ "markdown": crate::check::markdown(&result) }))
+    } else {
+        Ok(json!(result))
+    }
+}
+
 /// `get_credits`: credits for any mix of packs, collections, asset ids and a search.
 async fn credits_call(state: &AppState, args: &Value) -> Result<Value, ToolError> {
     let tags: Vec<String> = str_list(args, "tags").iter().filter_map(|t| hoard_core::normalize_tag(t)).collect();
@@ -712,6 +745,7 @@ async fn call_tool(state: &AppState, name: &str, args: Value, base: &str) -> Res
             Ok(json!({ "packs": packs }))
         }
         "get_credits" => credits_call(state, &args).await,
+        "check_files" => check_call(state, &args).await,
         "list_collections" => {
             let cols = db::call(&state.pool, |c| db::list_collections(c)).await?;
             let cols: Vec<Value> = cols

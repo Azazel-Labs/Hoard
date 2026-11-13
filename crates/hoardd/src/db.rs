@@ -245,6 +245,15 @@ const MIGRATIONS: &[&str] = &[
        FROM packs p WHERE p.status = 'ready'
         AND EXISTS (SELECT 1 FROM assets a WHERE a.pack_id = p.id AND a.ext = 'stl' AND a.kind = 'model')
         AND NOT EXISTS (SELECT 1 FROM jobs j WHERE j.kind = 'materials' AND j.pack_id = p.id);",
+    // 31: images say whether they were made or edited with AI (`provenance`), read on analysis; ones already read are
+    // looked at with each pack's materials job.
+    "UPDATE assets SET meta = json_set(meta, '$.provenance', 1) WHERE kind = 'texture';
+     INSERT INTO jobs (kind, pack_id, payload, run_after, created_at, updated_at)
+       SELECT 'materials', p.id, '{}', strftime('%Y-%m-%dT%H:%M:%SZ', 'now'), strftime('%Y-%m-%dT%H:%M:%SZ', 'now'),
+              strftime('%Y-%m-%dT%H:%M:%SZ', 'now')
+       FROM packs p WHERE p.status = 'ready'
+        AND EXISTS (SELECT 1 FROM assets a WHERE a.pack_id = p.id AND a.kind = 'texture')
+        AND NOT EXISTS (SELECT 1 FROM jobs j WHERE j.kind = 'materials' AND j.pack_id = p.id);",
 ];
 
 /// How many automatic pre-upgrade backups to keep in `<data dir>/backups`.

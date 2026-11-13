@@ -518,6 +518,10 @@ fn name_from_sidecars(
 /// id, tags people gave them and collections), ones whose maps are gone removed; then the thumbnails of models that
 /// wear one redrawn with it on. Returns how many materials it has.
 pub(crate) fn detect_pack(state: &AppState, rt: &Handle, conn: &mut Connection, pack_id: &str) -> Result<usize> {
+    // First, so materials take their colour map's AI tags.
+    if let Err(e) = crate::provenance::backfill(state, rt, conn, pack_id) {
+        tracing::warn!(pack = pack_id, error = %format!("{e:#}"), "could not read images' provenance");
+    }
     let n = find_materials(state, rt, conn, pack_id)?;
     if let Err(e) = dress_models(state, rt, conn, pack_id) {
         tracing::warn!(pack = pack_id, error = %format!("{e:#}"), "could not put materials on model thumbnails");

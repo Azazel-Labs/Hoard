@@ -661,6 +661,65 @@ fn unreal_tags(meta: &serde_json::Map<String, serde_json::Value>, tags: &mut Tag
     }
 }
 
+/// Facts about an image: its map type, colour, layers, depth and HDR, and whether it says AI made it.
+fn texture_tags(ext: &str, meta: &serde_json::Map<String, serde_json::Value>, tags: &mut TagSet) {
+    let num = |k: &str| meta.get(k).and_then(serde_json::Value::as_f64);
+    if let (Some(w), Some(h)) = (num("width"), num("height")) {
+        let (w, h) = (w as u32, h as u32);
+        let max = w.max(h);
+        let res = match max {
+            0..=64 => "res:tiny",
+            65..=256 => "res:256",
+            257..=512 => "res:512",
+            513..=1024 => "res:1k",
+            1025..=2048 => "res:2k",
+            2049..=4096 => "res:4k",
+            _ => "res:8k+",
+        };
+        tags.add(res, TagSource::Meta, 1.0);
+        if w.is_power_of_two() && h.is_power_of_two() {
+            tags.add("pot", TagSource::Meta, 1.0);
+        }
+        if w == h {
+            tags.add("square", TagSource::Meta, 1.0);
+        }
+        // A long strip of square frames is almost always an animation strip.
+        if h > 0 && w % h == 0 && w / h >= 3 && h <= 512 {
+            tags.add("spritesheet", TagSource::Rule, 0.6);
+            tags.add("frames", TagSource::Meta, 0.6);
+        }
+    }
+    for flag in ["alpha", "tileable", "pixel-art-likely", "normal-map-likely"] {
+        if meta.get(flag).and_then(serde_json::Value::as_bool) == Some(true) {
+            match flag {
+                "pixel-art-likely" => tags.add("style:pixel-art", TagSource::Rule, 0.65),
+                "normal-map-likely" => tags.add("map:normal", TagSource::Rule, 0.75),
+                "tileable" => tags.add("tileable", TagSource::Rule, 0.7),
+                _ => tags.add(flag, TagSource::Meta, 1.0),
+            }
+        }
+    }
+    if let Some(c) = meta.get("color").and_then(|v| v.as_str()) {
+        tags.add(&format!("color:{c}"), TagSource::Rule, 0.7);
+    }
+    if num("layers").is_some_and(|n| n > 1.0) {
+        tags.add("layered", TagSource::Meta, 1.0);
+    }
+    if meta.get("hdr").and_then(serde_json::Value::as_bool) == Some(true) {
+        tags.add("hdr", TagSource::Meta, 1.0);
+    }
+    if let Some(d) = num("bit_depth").filter(|d| *d > 8.0) {
+        tags.add(&format!("depth:{}-bit", d as u32), TagSource::Meta, 1.0);
+    }
+    if matches!(ext, "hdr" | "exr") {
+        tags.add("hdri", TagSource::Rule, 0.7);
+        tags.add("sky", TagSource::Rule, 0.5);
+    }
+    if let Some(t) = crate::provenance::tag(meta) {
+        tags.add(t, TagSource::Meta, 1.0);
+    }
+}
+
 /// Metadata-derived facts and heuristics per kind.
 pub(crate) fn meta_tags(
     kind: AssetKind,
@@ -737,59 +796,7 @@ pub(crate) fn meta_tags(
             }
             ucs_from_rules(tags);
         }
-        AssetKind::Texture => {
-            if let (Some(w), Some(h)) = (num("width"), num("height")) {
-                let (w, h) = (w as u32, h as u32);
-                let max = w.max(h);
-                let res = match max {
-                    0..=64 => "res:tiny",
-                    65..=256 => "res:256",
-                    257..=512 => "res:512",
-                    513..=1024 => "res:1k",
-                    1025..=2048 => "res:2k",
-                    2049..=4096 => "res:4k",
-                    _ => "res:8k+",
-                };
-                tags.add(res, TagSource::Meta, 1.0);
-                if w.is_power_of_two() && h.is_power_of_two() {
-                    tags.add("pot", TagSource::Meta, 1.0);
-                }
-                if w == h {
-                    tags.add("square", TagSource::Meta, 1.0);
-                }
-                // A long strip of square frames is almost always an animation strip.
-                if h > 0 && w % h == 0 && w / h >= 3 && h <= 512 {
-                    tags.add("spritesheet", TagSource::Rule, 0.6);
-                    tags.add("frames", TagSource::Meta, 0.6);
-                }
-            }
-            for flag in ["alpha", "tileable", "pixel-art-likely", "normal-map-likely"] {
-                if meta.get(flag).and_then(serde_json::Value::as_bool) == Some(true) {
-                    match flag {
-                        "pixel-art-likely" => tags.add("style:pixel-art", TagSource::Rule, 0.65),
-                        "normal-map-likely" => tags.add("map:normal", TagSource::Rule, 0.75),
-                        "tileable" => tags.add("tileable", TagSource::Rule, 0.7),
-                        _ => tags.add(flag, TagSource::Meta, 1.0),
-                    }
-                }
-            }
-            if let Some(c) = meta.get("color").and_then(|v| v.as_str()) {
-                tags.add(&format!("color:{c}"), TagSource::Rule, 0.7);
-            }
-            if num("layers").is_some_and(|n| n > 1.0) {
-                tags.add("layered", TagSource::Meta, 1.0);
-            }
-            if meta.get("hdr").and_then(serde_json::Value::as_bool) == Some(true) {
-                tags.add("hdr", TagSource::Meta, 1.0);
-            }
-            if let Some(d) = num("bit_depth").filter(|d| *d > 8.0) {
-                tags.add(&format!("depth:{}-bit", d as u32), TagSource::Meta, 1.0);
-            }
-            if matches!(ext, "hdr" | "exr") {
-                tags.add("hdri", TagSource::Rule, 0.7);
-                tags.add("sky", TagSource::Rule, 0.5);
-            }
-        }
+        AssetKind::Texture => texture_tags(ext, meta, tags),
         AssetKind::Model => {
             if let Some(v) = meta.get("blender_version").and_then(|v| v.as_str()) {
                 tags.add(&format!("blender:{v}"), TagSource::Meta, 1.0);

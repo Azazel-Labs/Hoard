@@ -268,6 +268,11 @@ const metaRows = computed(() => {
   if (num('layers') !== undefined) rows.push(['Layers', String(m.layers)])
   if (m.hdr === true) rows.push(['Range', 'HDR (preview is tone-mapped)'])
   if (m.large_document === true) rows.push(['Format', 'Large document (PSB)'])
+  const ai = m.ai as { made?: string; by?: string; how?: string } | undefined
+  if (ai?.made) {
+    const made = ai.made === 'edited' ? 'Edited with generative AI' : 'Made with generative AI'
+    rows.push(['AI', `${made}${ai.by ? ` (${ai.by})` : ''}, says its ${ai.how ?? 'metadata'}`])
+  } else if (m.content_credentials === true) rows.push(['Provenance', 'Has C2PA Content Credentials'])
   if (typeof m.compression === 'string') rows.push(['Compression', m.compression as string])
   if (typeof m.note === 'string') rows.push(['Note', m.note as string])
   if (material.value) {

@@ -106,6 +106,7 @@ pub(crate) fn router(state: &AppState) -> Router<AppState> {
         .route("/api/tags", get(tags))
         .route("/api/manifest", post(manifest))
         .route("/api/credits", post(crate::credits::credits))
+        .route("/api/check", post(crate::check::check_handler))
         .route("/api/packs/{id}/credits", get(crate::credits::pack_credits))
         .route("/api/collections/{id}/credits", get(crate::credits::collection_credits))
         .route("/api/admin/jobs", get(admin_jobs))

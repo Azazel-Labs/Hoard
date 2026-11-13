@@ -54,6 +54,13 @@ export function png(width: number, height: number, pixel: (x: number, y: number)
   ])
 }
 
+/** A PNG with a `tEXt` chunk added after its header, as image generators write their settings. */
+export function withText(image: Buffer, key: string, text: string): Buffer {
+  const ihdrEnd = 8 + 25
+  const data = Buffer.concat([Buffer.from(key, 'latin1'), Buffer.from([0]), Buffer.from(text, 'latin1')])
+  return Buffer.concat([image.subarray(0, ihdrEnd), chunk('tEXt', data), image.subarray(ihdrEnd)])
+}
+
 /** A two-colour checkerboard, so every image is different bytes and reads as a picture in a thumbnail. */
 export function checker(size: number, a: [number, number, number], b: [number, number, number], cell = 4): Buffer {
   return png(size, size, (x, y) => [...((Math.floor(x / cell) + Math.floor(y / cell)) % 2 ? a : b), 255])

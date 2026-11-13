@@ -267,6 +267,9 @@ pub(crate) fn analyze(path: &Path, root: &Path, kind: AssetKind, ext: &str) -> A
     if let Err(e) = result {
         a.meta.insert("analysis_error".into(), json!(format!("{e:#}")));
     }
+    if kind == AssetKind::Texture {
+        a.meta.extend(crate::provenance::scan(path));
+    }
     a
 }
 

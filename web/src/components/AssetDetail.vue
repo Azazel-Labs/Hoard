@@ -4,6 +4,7 @@ import {
   api, asUrl, bundleUrl, fileUrl, formatDuration, humanBytes, looksAlike, originalUrl, RESIZABLE_AS_ITSELF, thumbUrl,
   type Asset, type AssetLink, type Collection, type CollectionRef, type ConversionStatus, type Facet, type LinkRel,
   type MaterialInfo,
+  type MaterialMap,
 } from '../api'
 import CollectionPicker from './CollectionPicker.vue'
 import { playableUrl, player, sourceExt, sourceUrl, stop as stopPreview } from '../player'
@@ -74,13 +75,18 @@ const roleOfHere = (m: MaterialInfo) => {
   const own = m.maps.find((x) => x.id === props.asset.id)
   return own ? `${ROLE_LABEL[own.role].toLowerCase()} map` : `${m.maps.length} maps`
 }
+/** A model wears these materials: each lists its maps under it by what they're for, not by their long file names. */
+const wears = (m: MaterialInfo) => !m.maps.some((x) => x.id === props.asset.id)
+/** Files shown under a material already, so "Needs" doesn't list them again. */
+const inMaterials = computed(() => new Set(partOf.value.flatMap((m) => [m.id, ...m.maps.map((x) => x.id)])))
+const mapSize = (m: MaterialMap) => (m.resolution ? sizeLabel(m.resolution) : m.width ? `${m.width}×${m.height}` : m.ext)
 const mapsBytes = computed(() => material.value?.maps.reduce((n, m) => n + m.size, 0) ?? 0)
 const anims = computed(() => props.asset.links.filter((l) => l.rel === 'animation'))
 // The materials it belongs to have a section of their own.
 const usedBy = computed(() => props.asset.linked_from.filter((l) => !partOf.value.some((m) => m.id === l.id)))
 const linkGroups = computed(() =>
   [
-    { title: 'Needs', items: isMaterial.value ? [] : needs.value.filter((l) => !partOf.value.some((m) => m.id === l.id)) },
+    { title: 'Needs', items: isMaterial.value ? [] : needs.value.filter((l) => !inMaterials.value.has(l.id)) },
     { title: 'Animations', items: anims.value },
     { title: 'Used by', items: usedBy.value },
   ].filter((g) => g.items.length),
@@ -97,9 +103,13 @@ function peek<T>(key: string, items: T[]): T[] {
 const unfold = (key: string) => (unfolded.value = new Set(unfolded.value).add(key))
 // A material made from maps comes as its maps, not as a file of its own.
 const linkedCount = computed(() => {
-  const viaMaterial = partOf.value.filter((m) => needs.value.some((l) => l.id === m.id))
-  const files = needs.value.length - viaMaterial.length + viaMaterial.reduce((n, m) => n + m.maps.length, 0)
-  return files + (withAnimations.value ? anims.value.length : 0)
+  const files = new Set<string>()
+  for (const l of needs.value) {
+    const m = partOf.value.find((x) => x.id === l.id)
+    if (m) m.maps.forEach((x) => files.add(x.id))
+    else files.add(l.id)
+  }
+  return files.size + (withAnimations.value ? anims.value.length : 0)
 })
 /** What the zip holds before compression: this file and each linked one once (sizes the server didn't give count 0). A
  * material counts as its maps. */
@@ -864,7 +874,7 @@ onBeforeUnmount(() => unswipe())
               <KindGlyph v-else kind="texture" :size="22" />
             </span>
             <span class="lname">{{ ROLE_LABEL[m.role] }}</span>
-            <span class="lrel mono">{{ m.resolution ? sizeLabel(m.resolution) : (m.width ? `${m.width}×${m.height}` : m.ext) }}</span>
+            <span class="lrel mono">{{ mapSize(m) }}</span>
           </button>
         </li>
       </ul>
@@ -884,6 +894,26 @@ onBeforeUnmount(() => unswipe())
             </span>
             <span class="lname">{{ m.name }}</span>
             <span class="lrel">{{ roleOfHere(m) }}</span>
+          </button>
+          <ul v-if="wears(m)" class="links maps" :aria-label="`${m.name}: maps`">
+            <li v-for="x in peek(`maps-${m.id}`, m.maps)" :key="x.id">
+              <button type="button" class="link" style="--kind: var(--k-texture)" :title="x.path" @click="$emit('open', x.id)">
+                <span class="lthumb checker">
+                  <img v-if="x.has_thumb" :src="thumbUrl(x)" alt="" loading="lazy" />
+                  <KindGlyph v-else kind="texture" :size="22" />
+                </span>
+                <span class="lname">{{ ROLE_LABEL[x.role] }}</span>
+                <span class="lrel mono">{{ mapSize(x) }}</span>
+              </button>
+            </li>
+          </ul>
+          <button
+            v-if="wears(m) && peek(`maps-${m.id}`, m.maps).length < m.maps.length"
+            type="button"
+            class="linkish small showmore"
+            @click="unfold(`maps-${m.id}`)"
+          >
+            Show {{ m.maps.length - LIST_PEEK }} more
           </button>
         </li>
       </ul>
@@ -1234,6 +1264,8 @@ footer {
 .looks:not(:has(.palette)) .alike { margin-right: auto; }
 .animcheck { display: inline-flex; gap: 0.35rem; align-items: center; font-size: var(--step--1); color: var(--muted); }
 .links { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.3rem; }
+/* A material's maps, under it. */
+.links.maps { margin: 0.3rem 0 0.2rem 1.4rem; padding-left: 0.7rem; border-left: 1px solid var(--line); }
 .link {
   display: grid; grid-template-columns: 32px 1fr auto; gap: 0.6rem; align-items: center; width: 100%;
   padding: 0.25rem; border: 1px solid transparent; border-radius: var(--r-chip); background: none; cursor: pointer; text-align: left;

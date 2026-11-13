@@ -1,4 +1,5 @@
 // Typed client for the hoardd API. Types mirror crates/hoard-core.
+import type { TextureNames } from './texnames'
 
 export type AssetKind =
   | 'texture' | 'audio' | 'model' | 'animation' | 'font' | 'shader'
@@ -603,6 +604,8 @@ export interface Settings {
   clip: ImageSearchSetting
   /** Called once a newer release is out and the server is idle. The Authorization header is never sent back. */
   update_hook: { url: string; has_auth: boolean }
+  /** How texture maps are named in downloads, zips and manifests. `maps` has every role's suffix. */
+  texture_names: TextureNames & { default: TextureNames; saved: boolean }
 }
 
 /** GET /api/admin/update: whether a newer release is out and what's keeping the server busy. */
@@ -664,6 +667,7 @@ export interface SettingsPatch {
   public_url?: string | null
   soundfont?: string | null
   clip?: boolean | null
+  texture_names?: TextureNames | null
 }
 
 export interface SearchParams {

@@ -699,6 +699,10 @@ pub struct ManifestEntry {
     /// `<somewhere>/<bundle_path>` and relative references between them keep working.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub bundle_path: Option<String>,
+    /// The name to save the file as, when it isn't the one in `path`: texture maps are named by the server's
+    /// convention (`Rock_BaseColor.png`). A bundle's `bundle_path` already has it.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub file_name: Option<String>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

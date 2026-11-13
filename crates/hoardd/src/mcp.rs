@@ -718,12 +718,15 @@ async fn call_tool(state: &AppState, name: &str, args: Value, base: &str) -> Res
             let id = str_arg(&args, "id").ok_or_else(|| ToolError::Failed("`id` is required".into()))?;
             let anims = args.get("include_animations").and_then(Value::as_bool).unwrap_or(false);
             let id2 = id.clone();
+            let names = state.settings.get();
             let files = db::call(&state.pool, move |c| {
                 if db::asset_file_info(c, &id2)?.is_none() {
                     return Ok(None);
                 }
                 let ids = db::dependency_closure(c, &id2, anims)?;
-                Ok(Some(db::bundle_files(c, &ids)?))
+                let mut files = db::bundle_files(c, &ids)?;
+                crate::naming::apply(c, &names.texture_names, &mut files)?;
+                Ok(Some(files))
             })
             .await?
             .ok_or_else(|| ToolError::Failed("no asset with that id".into()))?;

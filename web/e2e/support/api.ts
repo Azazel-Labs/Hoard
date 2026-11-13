@@ -19,6 +19,7 @@ export interface Asset {
   name: string
   kind: string
   pack_id: string
+  path: string
   tags: { tag: string; source: string; confidence: number }[]
 }
 

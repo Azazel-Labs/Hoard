@@ -1,5 +1,5 @@
 import { MEGASCANS } from './support/seed'
-import { checker, MEGASCANS_FOLDER, quadGltf } from './support/files'
+import { checker, MEGASCANS_FOLDER, quadGltf, zipNames } from './support/files'
 import type { Page } from '@playwright/test'
 import { type Asset, assetsOf, signedIn, uploadPack, waitIdle, waitReady } from './support/api'
 import { doubleClick, expect, openPack, test } from './support/test'
@@ -71,6 +71,78 @@ test.describe('materials', () => {
     // Its own file name isn't what it's called any more.
     await expect(panel.getByRole('heading', { name: MEGASCANS })).toBeVisible()
     await expect(panel.getByText(MEGASCANS_FOLDER.replaceAll('_', ' '), { exact: true })).toHaveCount(0)
+  })
+
+  test('maps are called by their material and role, and go out named that way', async ({ page, seed, baseURL }) => {
+    const api = await signedIn(baseURL!)
+    const assets = await assetsOf(api, seed.packs[MEGASCANS])
+    const model = assets.find((a) => a.kind === 'model')!
+    const ao = assets.find((a) => a.path.endsWith('_AO.png'))!
+    expect(ao.name).toBe(`${MEGASCANS} Ambient occlusion`)
+    const stem = 'HistoricMiscellaneousStandWoodOld05'
+
+    // The model's zip: its maps renamed in their folder, the model as it was.
+    const names = zipNames(await (await api.get(`/api/assets/${model.id}/bundle.zip`)).body())
+    expect(names).toEqual(
+      expect.arrayContaining([
+        expect.stringMatching(new RegExp(`(^|/)${MEGASCANS_FOLDER}\\.obj$`)),
+        ...['BaseColor', 'Normal', 'Roughness', 'AO'].map((m) => expect.stringMatching(new RegExp(`(^|/)${stem}_${m}\\.png$`))),
+      ]),
+    )
+    expect(names.filter((n) => n.includes('_2K_'))).toEqual([])
+    // One map on its own, and in the manifest the hoard tool reads.
+    const one = await api.get(`/api/assets/${ao.id}/file?download=1`)
+    expect(one.headers()['content-disposition']).toContain(`"${stem}_AO.png"`)
+    const manifest = (await (await api.post('/api/manifest', { data: { ids: [model.id], include_deps: true } })).json()) as {
+      entries: { id: string; bundle_path?: string; file_name?: string }[]
+    }
+    const entry = manifest.entries.find((e) => e.id === ao.id)!
+    expect(entry.file_name).toBe(`${stem}_AO.png`)
+    expect(entry.bundle_path).toMatch(new RegExp(`(^|/)${stem}_AO\\.png$`))
+
+    // The model's page lists the maps under the material by what they're for, and not again under Needs.
+    await openPack(page, seed.packs[MEGASCANS], MEGASCANS, '&sort=name')
+    await page.locator('.grid button.hit[aria-label*=" tris"]').click()
+    const panel = page.getByRole('complementary', { name: 'Asset details' })
+    const worn = panel.getByRole('list', { name: `${MEGASCANS}: maps` })
+    for (const role of ['Colour', 'Normal', 'Roughness', 'Ambient occlusion']) {
+      await expect(worn.getByRole('button', { name: new RegExp(`^${role} `) })).toBeVisible()
+    }
+    const needs = panel.locator('section, div').filter({ has: page.getByRole('heading', { name: 'Needs', exact: true }) }).last()
+    await expect(needs.getByRole('button', { name: /Xeokah 0/ })).toBeVisible()
+    await expect(needs.getByRole('button', { name: new RegExp(MEGASCANS) })).toHaveCount(0)
+  })
+
+  test('Settings choose how maps are named in downloads', async ({ page, seed, baseURL }) => {
+    const api = await signedIn(baseURL!)
+    const ao = (await assetsOf(api, seed.packs[MEGASCANS])).find((a) => a.path.endsWith('_AO.png'))!
+    const fileName = async () => (await api.get(`/api/assets/${ao.id}/file?download=1`)).headers()['content-disposition']
+    await page.goto('/#settings/downloads')
+    const section = page.getByTestId('texture-names')
+    const example = page.getByTestId('texture-example')
+    await expect(example).toContainText('StandWoodOld05_BaseColor.jpg')
+    try {
+      await section.getByText('Short', { exact: true }).click()
+      await expect(example).toContainText('T_StandWoodOld05_BC.jpg')
+      await expect(example).toContainText('T_RockMoss_BC_4K.png')
+      await expect.poll(fileName).toContain('T_HistoricMiscellaneousStandWoodOld05_AO.png')
+
+      // A pattern that can't work is refused before it's saved.
+      const pattern = section.getByLabel('Pattern')
+      await pattern.fill('{name}')
+      await pattern.press('Enter')
+      await expect(section.getByRole('alert')).toContainText('{map}')
+      await pattern.fill('{map}-{name}')
+      await pattern.press('Enter')
+      await expect(example).toContainText('BC-StandWoodOld05.jpg')
+      await expect.poll(fileName).toContain('AO-HistoricMiscellaneousStandWoodOld05.png')
+
+      await section.getByRole('checkbox', { name: 'Name texture maps by their material' }).uncheck()
+      await expect.poll(fileName).toContain(`${MEGASCANS_FOLDER}_2K_AO.png`)
+    } finally {
+      await api.put('/api/admin/settings', { data: { texture_names: null } })
+    }
+    await expect.poll(fileName).toContain('HistoricMiscellaneousStandWoodOld05_AO.png')
   })
 
   test("the server's thumbnail of the model has the material's colour map on", async ({ seed, baseURL }) => {

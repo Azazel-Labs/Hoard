@@ -844,13 +844,20 @@ async fn asset_file(
     headers: HeaderMap,
 ) -> ApiResult<Response> {
     let id2 = id.clone();
-    let (hash, path, ext) = db::call(&state.pool, move |c| db::asset_file_info(c, &id2))
-        .await?
-        .ok_or_else(|| AppError::not_found(format!("asset {id}")))?;
+    let names = state.settings.get();
+    let download = p.download.is_some_and(|d| d != 0);
+    let (hash, path, ext, renamed) = db::call(&state.pool, move |c| {
+        let Some((hash, path, ext)) = db::asset_file_info(c, &id2)? else { return Ok(None) };
+        // A texture map goes out named by the convention in Settings.
+        let renamed = if download { crate::naming::file_name(c, &names.texture_names, &id2, &path)? } else { None };
+        Ok(Some((hash, path, ext, renamed)))
+    })
+    .await?
+    .ok_or_else(|| AppError::not_found(format!("asset {id}")))?;
     let mime = mime_guess::from_ext(&ext).first_or_octet_stream().to_string();
-    let disposition = p.download.filter(|d| *d != 0).map(|_| {
-        let file = path.rsplit('/').next().unwrap_or(&path).replace(['"', '\\'], "_");
-        format!("attachment; filename=\"{file}\"")
+    let disposition = download.then(|| {
+        let file = renamed.as_deref().unwrap_or_else(|| path.rsplit('/').next().unwrap_or(&path));
+        format!("attachment; filename=\"{}\"", file.replace(['"', '\\'], "_"))
     });
     serve_blob(&state, &hash, &headers, &mime, disposition).await
 }
@@ -1007,7 +1014,9 @@ async fn drop_tag_alias(State(state): State<AppState>, Query(p): Query<AliasPara
 
 /// Flatten a selection (explicit ids and/or a search) into an engine-friendly list of files.
 async fn manifest(State(state): State<AppState>, Json(req): Json<ManifestRequest>) -> ApiResult<Json<Manifest>> {
+    let names = state.settings.get();
     let entries = db::call(&state.pool, move |c| {
+        let names = &names.texture_names;
         let mut seen = BTreeSet::new();
         let mut assets = Vec::new();
         for id in &req.ids {
@@ -1024,19 +1033,23 @@ async fn manifest(State(state): State<AppState>, Json(req): Json<ManifestRequest
             let closure =
                 if req.include_deps { db::dependency_closure(c, &a.id, req.include_animations)? } else { Vec::new() };
             if closure.len() <= 1 {
-                entries.push(manifest_entry(a, None));
+                let file_name = crate::naming::file_name(c, names, &a.id, &a.path)?;
+                entries.push(manifest_entry(a, None, file_name));
                 continue;
             }
             // A bundle: the root plus its dependencies, with paths relative to their common folder.
-            let files = db::bundle_files(c, &closure)?;
+            let mut files = db::bundle_files(c, &closure)?;
             let paths: Vec<&str> = files.iter().map(|f| f.path.as_str()).collect();
             let common = db::common_dir(&paths);
+            let original: Vec<String> = files.iter().map(|f| f.path.clone()).collect();
+            crate::naming::apply(c, names, &mut files)?;
             let root = a.id.clone();
-            for f in &files {
+            for (f, was) in files.iter().zip(&original) {
                 let member = if f.id == root { Some(a.clone()) } else { db::get_asset(c, &f.id)? };
                 if let Some(m) = member {
                     let bundle_path = db::strip_dir(&f.path, &common).to_owned();
-                    entries.push(manifest_entry(m, Some((root.clone(), bundle_path))));
+                    let file_name = (f.path != *was).then(|| f.path.rsplit('/').next().unwrap_or(&f.path).to_owned());
+                    entries.push(manifest_entry(m, Some((root.clone(), bundle_path)), file_name));
                 }
             }
         }
@@ -1046,7 +1059,7 @@ async fn manifest(State(state): State<AppState>, Json(req): Json<ManifestRequest
     Ok(Json(Manifest { generated_at: db::now(), entries }))
 }
 
-fn manifest_entry(a: Asset, bundle: Option<(String, String)>) -> ManifestEntry {
+fn manifest_entry(a: Asset, bundle: Option<(String, String)>, file_name: Option<String>) -> ManifestEntry {
     let (bundle, bundle_path) = bundle.map_or((None, None), |(b, p)| (Some(b), Some(p)));
     ManifestEntry {
         url: format!("/api/blobs/{}", a.hash),
@@ -1062,6 +1075,7 @@ fn manifest_entry(a: Asset, bundle: Option<(String, String)>) -> ManifestEntry {
         meta: a.meta,
         bundle,
         bundle_path,
+        file_name,
     }
 }
 
@@ -1079,12 +1093,15 @@ async fn asset_bundle(
 ) -> ApiResult<Response> {
     let with_anims = p.animations.is_some_and(|a| a != 0);
     let id2 = id.clone();
+    let names = state.settings.get();
     let (files, root_name) = db::call(&state.pool, move |c| {
         let Some((_, path, _)) = db::asset_file_info(c, &id2)? else { return Ok(None) };
         let ids = db::dependency_closure(c, &id2, with_anims)?;
         let stem =
             path.rsplit('/').next().unwrap_or(&path).rsplit_once('.').map_or(path.as_str(), |(s, _)| s).to_owned();
-        Ok(Some((db::bundle_files(c, &ids)?, stem)))
+        let mut files = db::bundle_files(c, &ids)?;
+        crate::naming::apply(c, &names.texture_names, &mut files)?;
+        Ok(Some((files, stem)))
     })
     .await?
     .ok_or_else(|| AppError::not_found(format!("asset {id}")))?;
@@ -1132,6 +1149,7 @@ struct ZipOptions {
 /// Zip assets (and what they need) into one archive. Files keep their layout inside a folder per pack, so two
 /// packs' `Audio/hit.wav` don't collide and models still find their textures.
 async fn zip_assets(state: &AppState, ids: Vec<String>, opts: ZipOptions, name: &str) -> ApiResult<Response> {
+    let names = state.settings.get();
     let (groups, credits) = db::call(&state.pool, move |c| {
         let mut all = Vec::new();
         let mut seen = std::collections::HashSet::new();
@@ -1158,6 +1176,7 @@ async fn zip_assets(state: &AppState, ids: Vec<String>, opts: ZipOptions, name: 
                 if opts.sources {
                     db::prefer_sources(c, &mut files)?;
                 }
+                crate::naming::apply(c, &names.texture_names, &mut files)?;
                 Ok((pack, files))
             })
             .collect::<anyhow::Result<Vec<_>>>()?;
@@ -1340,12 +1359,15 @@ async fn collection_bundle(
 /// A whole pack as one zip, in its original layout.
 async fn pack_bundle(State(state): State<AppState>, Path(id): Path<String>) -> ApiResult<Response> {
     let id2 = id.clone();
+    let names = state.settings.get();
     let (name, files, credits) = db::call(&state.pool, move |c| {
         let Some(pack) = db::get_pack(c, &id2)? else { return Ok(None) };
         let mut stmt = c.prepare("SELECT id FROM assets WHERE pack_id = ?1 ORDER BY path")?;
         let ids: Vec<String> = stmt.query_map([&id2], |r| r.get(0))?.collect::<rusqlite::Result<_>>()?;
         let credits = crate::credits::markdown(&crate::credits::for_packs(c, &BTreeSet::from([pack.id]))?);
-        Ok(Some((pack.name, db::bundle_files(c, &ids)?, credits)))
+        let mut files = db::bundle_files(c, &ids)?;
+        crate::naming::apply(c, &names.texture_names, &mut files)?;
+        Ok(Some((pack.name, files, credits)))
     })
     .await?
     .ok_or_else(|| AppError::not_found(format!("pack {id}")))?;
@@ -1482,10 +1504,15 @@ async fn asset_as(
             }
         }
     };
+    // A texture map converted (a PNG of a TGA, a smaller copy) is named by the convention too.
+    let names = state.settings.get();
+    let id2 = id.clone();
+    let map_stem = db::call(&state.pool, move |c| crate::naming::stem_of(c, &names.texture_names, &id2)).await?;
+    let stem = map_stem.as_deref().unwrap_or(&ready.stem);
     let name = match (ready.ext.as_str(), p.max) {
-        ("zip", _) => format!("{}.gltf.zip", ready.stem),
-        (e, Some(m)) => format!("{}_{m}.{e}", ready.stem),
-        (e, None) => format!("{}.{e}", ready.stem),
+        ("zip", _) => format!("{stem}.gltf.zip"),
+        (e, Some(m)) => format!("{stem}_{m}.{e}"),
+        (e, None) => format!("{stem}.{e}"),
     };
     let mime = match ready.ext.as_str() {
         "glb" => "model/gltf-binary".to_owned(),
@@ -1894,6 +1921,14 @@ fn settings_json_sync(state: &AppState) -> Value {
             ),
         },
         "max_workers": crate::settings::MAX_WORKERS,
+        // How texture maps are named in what's sent; the suffixes are every role's, saved or not.
+        "texture_names": {
+            "on": now.texture_names.on,
+            "pattern": now.texture_names.pattern,
+            "maps": crate::naming::suffixes(&now.texture_names),
+            "default": crate::naming::defaults(),
+            "saved": saved.texture_names.is_some(),
+        },
     })
 }
 

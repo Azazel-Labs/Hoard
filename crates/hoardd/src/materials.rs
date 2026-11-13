@@ -81,7 +81,7 @@ impl Role {
     }
 }
 
-const ALL_ROLES: [Role; 17] = [
+pub(crate) const ALL_ROLES: [Role; 17] = [
     Role::BaseColor,
     Role::Normal,
     Role::NormalDx,
@@ -615,6 +615,7 @@ fn find_materials(state: &AppState, rt: &Handle, conn: &mut Connection, pack_id:
 
     let now = db::now();
     let tx = conn.transaction()?;
+    let were_maps = crate::naming::maps_of_pack(&tx, pack_id)?;
     let mut kept = HashSet::new();
     for m in &made {
         let f = &m.found;
@@ -685,11 +686,18 @@ fn find_materials(state: &AppState, rt: &Handle, conn: &mut Connection, pack_id:
             tx.execute("DELETE FROM assets WHERE id = ?1", [id])?;
         }
     }
-    link_models(&tx, pack_id)?;
-    mark_owned(&tx, pack_id)?;
-    links::assign_families(&tx, pack_id)?;
+    tie_up(&tx, pack_id, &were_maps)?;
     tx.commit()?;
     Ok(made.len())
+}
+
+/// Once a pack's materials are in: name their maps, put the materials on the models, and group the pack's files.
+fn tie_up(tx: &Connection, pack_id: &str, were_maps: &[(String, String)]) -> Result<()> {
+    crate::naming::rename_maps(tx, pack_id, were_maps)?;
+    link_models(tx, pack_id)?;
+    mark_owned(tx, pack_id)?;
+    links::assign_families(tx, pack_id)?;
+    Ok(())
 }
 
 /// Models whose file names no textures but which wear a material (by name, or through its maps beside them) get a

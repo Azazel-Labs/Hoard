@@ -38,6 +38,7 @@ mod materials;
 mod mcp;
 mod meshes;
 mod music;
+mod naming;
 mod oauth;
 mod previews;
 mod provenance;

@@ -23,6 +23,8 @@ import {
 } from '../api'
 import { prefs } from '../prefs'
 import { formatMiB } from '../sizes'
+import { ROLE_LABEL } from '../materials'
+import { ROLES, SHORT, problem as namesProblem, stem as mapStem, type TextureNames } from '../texnames'
 import { DARK_THEMES, LIGHT_THEMES, previewScheme, themeFor, usedScheme } from '../theme'
 import { confirmDialog, showError, showOk } from '../ui'
 import LibraryStats from './LibraryStats.vue'
@@ -59,6 +61,7 @@ const PAGES = [
   { id: 'ai', label: 'AI tagging', blurb: 'An AI model names, describes and tags new packs, on top of the built-in rules. Its tags are marked as suggested.' },
   { id: 'search', label: 'Image search', blurb: 'Search pictures by what they show, not only by their names, and find things that are alike in kind, not only in colour.' },
   { id: 'adding', label: 'Adding packs', blurb: 'What Hoard does with a pack when it’s added, besides reading and tagging it.' },
+  { id: 'downloads', label: 'Downloads', blurb: 'How files are named in what Hoard sends: downloads, zips, the hoard tool and AI assistants. Files in the library stay as they are.' },
   { id: 'account', label: 'Account', blurb: 'Your password, the other people who can sign in, and access tokens for scripts and other programs.' },
   { id: 'connection', label: 'Connection', blurb: 'How browsers and apps reach Hoard: the address it’s known by, and HTTPS, which some browser features need.' },
   { id: 'performance', label: 'Performance', blurb: 'How hard the server works, how thumbnails are made and kept, and the most it takes in.' },
@@ -523,6 +526,39 @@ function saveOpt(k: OptKey) {
 }
 const resetOpt = (k: AnyOpt) => save({ [k]: null } as SettingsPatch, 'Back to the default')
 
+// Texture names: edited here, saved when a field is left (or Enter), checked first the way the server checks.
+const names = reactive<TextureNames>({ on: true, pattern: '{name}_{map}', maps: {} })
+const namesError = computed(() => (names.on ? namesProblem(names) : null))
+const sameNames = (a: TextureNames, b: TextureNames) =>
+  a.on === b.on && a.pattern === b.pattern && ROLES.every((r) => (a.maps[r] ?? '').trim() === (b.maps[r] ?? '').trim())
+/** Which preset the convention is, if it's one. */
+const namesPreset = computed(() => {
+  const d = s.value?.texture_names.default
+  if (d && sameNames({ ...names, on: true }, { ...d, on: true })) return 'descriptive'
+  if (sameNames({ ...names, on: true }, { ...SHORT, on: true })) return 'short'
+  return 'custom'
+})
+const namesExample = computed(() =>
+  [
+    `${mapStem(names, 'Stand Wood Old 05', 'base_color')}.jpg`,
+    `${mapStem(names, 'Stand Wood Old 05', 'normal')}.jpg`,
+    `${mapStem(names, 'Stand Wood Old 05', 'roughness')}.jpg`,
+    `${mapStem(names, 'Rock Moss', 'base_color', '4K')}.png`,
+  ],
+)
+function saveNames() {
+  const cur = s.value
+  if (!cur || namesError.value) return
+  if (sameNames(names, cur.texture_names)) return
+  void save({ texture_names: { on: names.on, pattern: names.pattern.trim(), maps: { ...names.maps } } }, 'Texture names saved')
+}
+function useNames(preset: 'descriptive' | 'short') {
+  const d = s.value?.texture_names.default
+  if (!d) return
+  Object.assign(names, preset === 'short' ? { pattern: SHORT.pattern, maps: { ...SHORT.maps } } : { pattern: d.pattern, maps: { ...d.maps } })
+  saveNames()
+}
+
 /** A tool set to something other than its default (off / automatic / a different program). */
 function toolChanged(t: ToolSetting): boolean {
   const a = modeOf(t.value)
@@ -548,6 +584,7 @@ function take(next: Settings) {
     opts,
     Object.fromEntries(OPT_KEYS.map((k) => [k, next.options[k].value])),
   )
+  Object.assign(names, { on: next.texture_names.on, pattern: next.texture_names.pattern, maps: { ...next.texture_names.maps } })
   schedulePoll()
 }
 
@@ -1179,6 +1216,91 @@ onBeforeUnmount(() => {
             </section>
           </template>
 
+          <template v-else-if="current === 'downloads'">
+            <section data-testid="texture-names">
+              <div class="sh">
+                <h3>Texture names</h3>
+                <ResetButton
+                  v-if="s.texture_names.saved && !sameNames(s.texture_names, s.texture_names.default)"
+                  to="the default"
+                  :disabled="busy"
+                  @reset="save({ texture_names: null }, 'Texture names: back to the default')"
+                />
+              </div>
+              <p class="what">
+                A material’s maps go out named after it and what each map is for, however the files are named:
+                Rock_Normal.png, not rock_moss_xeokah0_raw_8K_Normal.png. The files in the library aren’t touched, and a map that a
+                model or MTL sent with it names keeps that name, so the model still finds it.
+              </p>
+              <div class="switches">
+                <div class="opt-row">
+                  <label class="check">
+                    <input
+                      type="checkbox"
+                      :checked="names.on"
+                      :disabled="busy"
+                      @change="names.on = ($event.target as HTMLInputElement).checked; saveNames()"
+                    />
+                    Name texture maps by their material
+                  </label>
+                </div>
+              </div>
+              <template v-if="names.on">
+                <div class="llm opts">
+                  <span class="label">Style</span>
+                  <div class="modes" role="radiogroup" aria-label="Naming style">
+                    <label><input type="radio" name="tn-style" :checked="namesPreset === 'descriptive'" :disabled="busy" @change="useNames('descriptive')" />Descriptive</label>
+                    <label><input type="radio" name="tn-style" :checked="namesPreset === 'short'" :disabled="busy" @change="useNames('short')" />Short</label>
+                    <label><input type="radio" name="tn-style" :checked="namesPreset === 'custom'" disabled />Your own</label>
+                  </div>
+                  <label for="tn-pattern">Pattern</label>
+                  <div class="key">
+                    <input
+                      id="tn-pattern"
+                      v-model="names.pattern"
+                      class="field mono"
+                      spellcheck="false"
+                      :disabled="busy"
+                      @change="saveNames"
+                      @keydown.enter.prevent="saveNames"
+                    />
+                  </div>
+                  <span />
+                  <p class="hint inline">
+                    <code>{name}</code> the material, <code>{map}</code> what the map is for, <code>{size}</code> its size
+                    when the set comes in more than one (added on the end if the pattern leaves it out).
+                  </p>
+                  <span class="label">Example</span>
+                  <p class="tn-example mono" data-testid="texture-example">
+                    <span v-for="e in namesExample" :key="e">{{ e }}</span>
+                  </p>
+                </div>
+                <p v-if="namesError" class="status" data-state="unavailable" role="alert">
+                  <span class="dot" aria-hidden="true" /><span class="text">{{ namesError }}</span>
+                </p>
+                <details class="tn-maps">
+                  <summary>Suffixes for each kind of map</summary>
+                  <div class="llm opts">
+                    <template v-for="r in ROLES" :key="r">
+                      <label :for="`tn-${r}`">{{ ROLE_LABEL[r] }}</label>
+                      <div class="key">
+                        <input
+                          :id="`tn-${r}`"
+                          v-model="names.maps[r]"
+                          class="field mono short"
+                          spellcheck="false"
+                          :disabled="busy"
+                          @change="saveNames"
+                          @keydown.enter.prevent="saveNames"
+                        />
+                      </div>
+                    </template>
+                  </div>
+                </details>
+              </template>
+            </section>
+          </template>
+
           <template v-else-if="current === 'connection'">
             <section>
               <div class="sh"><h3>Address</h3></div>
@@ -1424,6 +1546,11 @@ progress.learn { display: block; width: 100%; max-width: 28rem; height: 0.35rem;
 .switches { display: grid; gap: 0.35rem; margin-bottom: 0.8rem; font-size: var(--step--1); }
 .switches .check { display: inline-flex; gap: 0.45rem; align-items: center; }
 @media (max-width: 30rem) { .llm { grid-template-columns: minmax(0, 1fr); } .llm > span:empty { display: none; } }
+
+.tn-example { display: grid; gap: 0.1rem; margin: 0; color: var(--text); overflow-wrap: anywhere; }
+.tn-maps { margin-top: 0.8rem; font-size: var(--step--1); }
+.tn-maps summary { cursor: pointer; color: var(--muted); margin-bottom: 0.6rem; }
+.llm .key .field.short { max-width: 10rem; }
 
 .choices { display: grid; gap: 0.4rem; }
 .choices label {

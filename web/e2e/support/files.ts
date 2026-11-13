@@ -122,6 +122,24 @@ export function zip(entries: { path: string; data: Buffer }[]): Buffer {
   return Buffer.concat([...locals, dir, end])
 }
 
+/** The names of the files in a zip, from its central directory. */
+export function zipNames(buf: Buffer): string[] {
+  let end = buf.length - 22
+  while (end >= 0 && buf.readUInt32LE(end) !== 0x06054b50) end--
+  if (end < 0) throw new Error('not a zip')
+  const count = buf.readUInt16LE(end + 10)
+  let at = buf.readUInt32LE(end + 16)
+  const names: string[] = []
+  for (let i = 0; i < count; i++) {
+    const len = buf.readUInt16LE(at + 28)
+    const extra = buf.readUInt16LE(at + 30)
+    const comment = buf.readUInt16LE(at + 32)
+    names.push(buf.toString('utf8', at + 46, at + 46 + len))
+    at += 46 + len + extra + comment
+  }
+  return names
+}
+
 /** A textured cube: OBJ, its MTL and the diffuse texture the MTL names. */
 export function crate(): { obj: Buffer; mtl: Buffer; texture: Buffer } {
   const v = [

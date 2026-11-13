@@ -110,6 +110,9 @@ pub(crate) struct Saved {
     pub(crate) clip: Option<bool>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub(crate) conversion_cache_mb: Option<u64>,
+    /// How texture maps are named in downloads, bundles and manifests.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub(crate) texture_names: Option<crate::naming::TextureNames>,
 }
 
 /// Reads a retired setting and throws it away.
@@ -144,6 +147,7 @@ pub(crate) struct Effective {
     pub(crate) clip: bool,
     pub(crate) thumb_quality: ThumbQuality,
     pub(crate) conversion_cache_mb: u64,
+    pub(crate) texture_names: crate::naming::TextureNames,
 }
 
 impl Effective {
@@ -211,6 +215,7 @@ impl Saved {
             clip: self.clip.unwrap_or(false),
             thumb_quality: self.thumb_quality.unwrap_or_default(),
             conversion_cache_mb: self.conversion_cache_mb.unwrap_or(DEFAULT_CONVERSION_CACHE_MB),
+            texture_names: self.texture_names.clone().unwrap_or_default(),
         }
     }
 
@@ -261,6 +266,9 @@ impl Saved {
         }
         if self.max_upload_mb == Some(0) || self.max_expand_mb == Some(0) {
             return Err("Limits can't be zero".into());
+        }
+        if let Some(names) = &self.texture_names {
+            names.check()?;
         }
         Ok(())
     }

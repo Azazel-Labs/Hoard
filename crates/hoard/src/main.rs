@@ -499,7 +499,7 @@ fn sanitize_segment(s: &str) -> String {
 }
 
 fn file_name(entry: &ManifestEntry) -> String {
-    sanitize_segment(entry.path.rsplit('/').next().unwrap_or(&entry.path))
+    sanitize_segment(entry.file_name.as_deref().unwrap_or_else(|| entry.path.rsplit('/').next().unwrap_or(&entry.path)))
 }
 
 /// Where a bundle member goes: the root's folder, then a folder named after the root, then its bundle path.
@@ -704,6 +704,7 @@ mod tests {
             url: String::new(),
             bundle: None,
             bundle_path: None,
+            file_name: None,
         }
     }
 

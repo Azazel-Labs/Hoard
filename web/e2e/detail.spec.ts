@@ -119,6 +119,8 @@ test.describe('Asset details', () => {
   })
 
   test('full page: an asset can open over the results, big preview beside the details, and stays that way', async ({ page, api }) => {
+    // Software WebGL on CI draws the model slowly, and this opens it three times.
+    test.slow()
     await page.setViewportSize({ width: 1500, height: 900 })
     const name = `E2E Page ${unique()}`
     const { obj, mtl, texture } = crate()

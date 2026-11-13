@@ -156,6 +156,38 @@ pub(crate) async fn convert_pack(state: &AppState, pack_id: &str) -> Result<()> 
     Ok(())
 }
 
+/// A thumbnail drawn from a converted model.
+fn draw_thumb(glb: &[u8]) -> Option<Vec<u8>> {
+    let r = analyze::renderer()?;
+    let img = r.lock().unwrap_or_else(std::sync::PoisonError::into_inner).render_slice(glb, 256).ok()?;
+    analyze::thumb_bytes(img, false).ok()
+}
+
+/// Thumbnails for a pack's models that have none but were converted already: a .blend with no preview of its own,
+/// once its analysis has run again. Runs on a blocking thread.
+pub(crate) fn thumbs_from_conversions(state: &AppState, rt: &tokio::runtime::Handle, pack_id: &str) -> Result<()> {
+    let todo: Vec<(String, String)> = state
+        .pool
+        .get()?
+        .prepare(
+            "SELECT a.id, d.blob_hash FROM assets a JOIN derivatives d ON d.asset_id = a.id AND d.kind = 'glb'
+             WHERE a.pack_id = ?1 AND a.thumb_hash IS NULL",
+        )?
+        .query_map([pack_id], |r| Ok((r.get(0)?, r.get(1)?)))?
+        .collect::<rusqlite::Result<_>>()?;
+    for (id, glb) in todo {
+        let Some(thumb) = draw_thumb(&rt.block_on(state.blobs.read_all(&glb))?) else { continue };
+        let blob = rt.block_on(state.blobs.put_cache_bytes(thumb))?;
+        let conn = state.pool.get()?;
+        conn.execute(
+            "INSERT INTO blobs (hash, size, created_at) VALUES (?1, ?2, ?3) ON CONFLICT DO NOTHING",
+            params![blob.hash, blob.size as i64, db::now()],
+        )?;
+        conn.execute("UPDATE assets SET thumb_hash = ?2 WHERE id = ?1 AND thumb_hash IS NULL", params![id, blob.hash])?;
+    }
+    Ok(())
+}
+
 async fn convert_one(state: &AppState, blender: &Path, t: &Todo) -> Result<()> {
     let work = state.cfg.tmp_dir().join(format!("convert-{}", t.id));
     tokio::fs::create_dir_all(&work).await?;
@@ -194,12 +226,7 @@ async fn convert_one(state: &AppState, blender: &Path, t: &Todo) -> Result<()> {
             None
         } else {
             let bytes = glb.clone();
-            crate::heavy::run("thumbnail", move || -> Option<Vec<u8>> {
-                let r = analyze::renderer()?;
-                let img = r.lock().unwrap_or_else(std::sync::PoisonError::into_inner).render_slice(&bytes, 256).ok()?;
-                analyze::thumb_bytes(img, false).ok()
-            })
-            .await?
+            crate::heavy::run("thumbnail", move || draw_thumb(&bytes)).await?
         };
         let glb_blob = state.blobs.put_bytes(glb, hoard_core::AssetKind::Model).await?;
         let thumb_blob = match thumb {

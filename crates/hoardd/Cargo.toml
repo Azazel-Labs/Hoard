@@ -65,6 +65,9 @@ xmrsplayer = "0.15"
 midly = "0.5"
 rustysynth = "1"
 fbxcel = { version = "0.9", features = ["tree", "writer"] }
+# USD (.usd/.usda/.usdc/.usdz), read natively for thumbnails and the browser preview.
+openusd = "0.8"
+openusd-schemas = { version = "0.8", features = ["geom", "shade"] }
 ddsfile = "0.6"
 texture2ddecoder = "0.1"
 ktx2 = "0.5"

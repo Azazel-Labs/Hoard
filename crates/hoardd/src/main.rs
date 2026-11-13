@@ -57,6 +57,7 @@ mod threemf;
 mod tools;
 mod updates;
 mod uploads;
+mod usd;
 
 use std::sync::Arc;
 use std::time::Duration;

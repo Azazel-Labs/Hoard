@@ -1043,9 +1043,12 @@ pub(crate) fn retag_pack(state: &AppState, rt: &Handle, pack_id: &str) -> Result
                 }
                 tx.execute("DELETE FROM asset_tags WHERE asset_id = ?1 AND source IN ('rule', 'meta')", [&id])?;
                 tx.execute(
-                    // A thumbnail a browser drew stays: it shows the model as the viewer does.
+                    // A thumbnail a browser drew stays: it shows the model as the viewer does. A .blend's thumbnail is
+                    // its own preview, or one drawn from its conversion (below); analysis that can't draw one
+                    // otherwise keeps the one it has.
                     "UPDATE assets SET meta = ?2, kind = ?3,
-                            thumb_hash = CASE WHEN thumb_source IS NULL THEN COALESCE(?4, thumb_hash) ELSE thumb_hash END,
+                            thumb_hash = CASE WHEN thumb_source IS NOT NULL THEN thumb_hash WHEN ext = 'blend' THEN ?4
+                                              ELSE COALESCE(?4, thumb_hash) END,
                             words = ?5,
                             category = CASE WHEN ?6 THEN category ELSE ?7 END, updated_at = ?8
                      WHERE id = ?1",
@@ -1090,6 +1093,7 @@ pub(crate) fn retag_pack(state: &AppState, rt: &Handle, pack_id: &str) -> Result
     tx.execute("UPDATE packs SET files_done = files_total WHERE id = ?1", [pack_id])?;
     tx.commit()?;
     fs::remove_dir_all(&work).ok();
+    convert::thumbs_from_conversions(state, rt, pack_id)?;
     crate::materials::detect_logged(state, rt, &mut conn, pack_id);
     read_pack_files(state, rt, pack_id, false, None);
     Ok(())

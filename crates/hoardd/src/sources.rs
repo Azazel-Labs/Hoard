@@ -2,7 +2,8 @@
 //! what Hoard needs, a preview and a few facts, so a 3 GB file costs a few reads, not a full parse.
 //!
 //! - `.blend`: Blender embeds a small preview (the `TEST` block) near the start of every file it saves with
-//!   "save preview" on (the default). Files may be gzip (pre-3.0) or zstd (3.0+) compressed. Image (`IM`) and
+//!   "save preview" on (the default). A preview of the camera or viewport is square; a screenshot of the whole
+//!   Blender window keeps the window's shape, and is left out. Files may be gzip (pre-3.0) or zstd (3.0+) compressed. Image (`IM`) and
 //!   library (`LI`) blocks hold the paths of external textures and linked .blend files.
 //! - `.psd`/`.psb`: header facts, layer count, and the JPEG thumbnail Photoshop stores in image resource 1036.
 //! - `.kra` (Krita) and `.ora` (OpenRaster): zip files with a flattened `mergedimage.png` inside.
@@ -147,7 +148,11 @@ pub(crate) fn read_blend(path: &Path, scan_paths: bool) -> Result<BlendInfo> {
                     let mut img = RgbaImage::from_raw(w as u32, h as u32, data).context("bad .blend preview")?;
                     // Stored bottom-up (OpenGL order).
                     image::imageops::flip_vertical_in_place(&mut img);
-                    info.thumbnail = Some(img);
+                    // Blender renders the camera or viewport square. A preview of another shape is a screenshot
+                    // of the whole window, menus and panels and all, which shows the editor, not the model.
+                    if w == h {
+                        info.thumbnail = Some(img);
+                    }
                 } else {
                     r.skip(len - 8)?;
                 }
@@ -664,7 +669,8 @@ mod tests {
     use super::*;
     use std::io::Write;
 
-    fn legacy_blend(compress: bool) -> Vec<u8> {
+    /// A small .blend with a `w`×`h` preview whose bottom row is red and the rest blue.
+    fn legacy_blend(compress: bool, w: i32, h: i32) -> Vec<u8> {
         let mut out = b"BLENDER-v405".to_vec();
         let block = |out: &mut Vec<u8>, code: &[u8; 4], data: &[u8]| {
             out.extend_from_slice(code);
@@ -676,10 +682,12 @@ mod tests {
         };
         block(&mut out, b"REND", &[0u8; 72]);
         let mut test = Vec::new();
-        test.extend_from_slice(&2i32.to_le_bytes());
-        test.extend_from_slice(&2i32.to_le_bytes());
-        // bottom row red, top row blue
-        test.extend_from_slice(&[255, 0, 0, 255, 255, 0, 0, 255, 0, 0, 255, 255, 0, 0, 255, 255]);
+        test.extend_from_slice(&w.to_le_bytes());
+        test.extend_from_slice(&h.to_le_bytes());
+        for row in 0..h {
+            let px: [u8; 4] = if row == 0 { [255, 0, 0, 255] } else { [0, 0, 255, 255] };
+            test.extend(px.repeat(w as usize));
+        }
         block(&mut out, b"TEST", &test);
         let mut im = vec![0u8; 16];
         im.extend_from_slice(b"IMrock\0");
@@ -759,7 +767,7 @@ mod tests {
             let dir = std::env::temp_dir().join(format!("hoard-blend-test-{compress}"));
             std::fs::create_dir_all(&dir).unwrap();
             let p = dir.join("scene.blend");
-            File::create(&p).unwrap().write_all(&legacy_blend(compress)).unwrap();
+            File::create(&p).unwrap().write_all(&legacy_blend(compress, 2, 2)).unwrap();
             let info = read_blend(&p, true).unwrap();
             assert_eq!(info.version, "4.5");
             assert_eq!(info.compression, compress.then_some("zstd"));
@@ -769,5 +777,16 @@ mod tests {
             assert_eq!(info.image_paths, ["//textures/rock_albedo.png"]);
             assert_eq!(info.library_paths, ["//../shared/props.blend"]);
         }
+    }
+
+    #[test]
+    fn a_window_screenshot_is_no_preview() {
+        let dir = tempfile::tempdir().unwrap();
+        let p = dir.path().join("scene.blend");
+        // Blender's screenshot previews keep the window's shape: 128×72 for a 16:9 window.
+        std::fs::write(&p, legacy_blend(false, 128, 72)).unwrap();
+        let info = read_blend(&p, true).unwrap();
+        assert!(info.thumbnail.is_none());
+        assert_eq!(info.image_paths, ["//textures/rock_albedo.png"], "the rest of the file is still read");
     }
 }

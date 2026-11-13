@@ -257,10 +257,15 @@ software rasterizer (`apt install mesa-vulkan-drivers`). Without any adapter, ev
      projects the filament colors, which filament each object and part prints in, and filaments painted onto the
      model. Facts: triangles, objects, colors and the application that wrote it. The 3D viewer shows the GLB Hoard
      makes from it, so the colors match the thumbnail.
+   - USD (`.usd`, `.usda`, `.usdc`, `.usdz`): meshes, instances, transforms, units and up axis, read natively, with
+     their UsdPreviewSurface materials and textures (from beside the file or inside the `.usdz`), or their display
+     colors. Guides, proxies and hidden meshes are left out; a file of materials alone has no thumbnail. The 3D viewer
+     shows the GLB Hoard makes from it.
    - Unreal packages (`.uasset`, `.umap`), read without Unreal: see [Unreal packs](#unreal-packs).
    - Source files:
-     - `.blend`: Blender version, compression, and the preview Blender embeds in every file (read directly, gzip
-       or zstd, legacy and 5.0 headers, no Blender needed).
+     - `.blend`: Blender version, compression, and the preview Blender embeds in the file (read directly, gzip
+       or zstd, legacy and 5.0 headers, no Blender needed). A preview that is a picture of the Blender window isn't
+       used; with Blender switched on, the thumbnail is drawn from the converted model instead.
      - `.psd`/`.psb`: size, bit depth, color mode, layer count, and Photoshop's embedded preview.
      - `.kra`/`.ora`: the flattened image and layer count.
      - `.exr`/`.hdr`: tone-mapped previews.
@@ -393,7 +398,7 @@ and Opus use ffmpeg's reference encoders (LAME, libvorbis, libopus), as do sourc
 | MOD, XM, S3M, IT, MIDI | the same audio formats, rendered |
 | glTF | GLB (buffers and textures packed in) |
 | GLB | glTF + .bin (zipped) |
-| OBJ (with MTL and textures), binary FBX, STL, PLY, MagicaVoxel, 3MF (with its colors) | GLB with textures embedded |
+| OBJ (with MTL and textures), binary FBX, STL, PLY, MagicaVoxel, 3MF (with its colors), USD | GLB with textures embedded |
 | TTF/OTF | WOFF2, WOFF |
 | WOFF, WOFF2 | TTF/OTF and each other |
 | anything else Blender converted (Settings → Blender) | GLB |
@@ -930,7 +935,8 @@ deliberately corrupted blob; the LLM tagger (against a mock OpenAI-compatible se
 wgpu thumbnails on lavapipe; link discovery and bundle zips; `hoard sync` including pruning and bundles; the
 portal including the three.js viewer on its WebGL2 fallback; and source-format previews and links, checked against
 spec-built .blend (raw and zstd), PSD, Krita and EXR files. These were generated from the formats' specs, not saved
-by Blender, Photoshop or Krita.
+by Blender, Photoshop or Krita. USD reading was checked against Poly Haven's USDC models (with their textures,
+and packed as a `.usdz`) and ambientCG's material-only USDC.
 
 Written but not yet run against the real thing: files saved by real Blender/Photoshop/Krita (please throw some
 at it), Blender 5.0's new .blend header, Blender conversion, the Docker image and compose files, Garage/RustFS

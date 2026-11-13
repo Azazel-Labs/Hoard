@@ -262,6 +262,18 @@ const MIGRATIONS: &[&str] = &[
        FROM packs p WHERE p.status = 'ready'
         AND EXISTS (SELECT 1 FROM material_maps mm JOIN assets a ON a.id = mm.material_id WHERE a.pack_id = p.id)
         AND NOT EXISTS (SELECT 1 FROM jobs j WHERE j.kind = 'materials' AND j.pack_id = p.id);",
+    // 33: packs with USD models are analyzed again, now that Hoard reads USD, and so are packs with .blend files:
+    // a .blend without a preview of its own had a picture of the Blender window as its thumbnail.
+    "UPDATE packs SET status = 'ingesting'
+       WHERE status = 'ready' AND archived_at IS NULL
+         AND EXISTS (SELECT 1 FROM assets a WHERE a.pack_id = packs.id
+                     AND a.ext IN ('blend', 'usd', 'usda', 'usdc', 'usdz'))
+         AND NOT EXISTS (SELECT 1 FROM jobs j WHERE j.pack_id = packs.id AND j.status IN ('queued', 'running'));
+     INSERT INTO jobs (kind, pack_id, payload, run_after, created_at, updated_at)
+       SELECT 'retag', id, '{\"then_llm\":false}', strftime('%Y-%m-%dT%H:%M:%SZ', 'now'),
+              strftime('%Y-%m-%dT%H:%M:%SZ', 'now'), strftime('%Y-%m-%dT%H:%M:%SZ', 'now')
+       FROM packs p WHERE p.status = 'ingesting'
+         AND NOT EXISTS (SELECT 1 FROM jobs j WHERE j.pack_id = p.id AND j.status IN ('queued', 'running'));",
 ];
 
 /// How many automatic pre-upgrade backups to keep in `<data dir>/backups`.

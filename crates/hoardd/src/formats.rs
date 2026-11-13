@@ -70,7 +70,9 @@ pub(crate) fn options(ext: &str, derivatives: &[String]) -> Vec<FormatOption> {
         }
     }
     match ext.as_str() {
-        "stl" | "ply" | "vox" | "obj" | "fbx" | "3mf" => out.push(opt("glb", "GLB (textures embedded)", false)),
+        "stl" | "ply" | "vox" | "obj" | "fbx" | "3mf" | "usd" | "usda" | "usdc" | "usdz" => {
+            out.push(opt("glb", "GLB (textures embedded)", false));
+        }
         "ttf" | "otf" => {
             out.push(opt("woff2", "WOFF2 (for the web)", false));
             out.push(opt("woff", "WOFF", false));
@@ -159,7 +161,7 @@ pub(crate) fn convert(
         "gltf" if src == "glb" => glb_to_gltf_zip(local),
         "glb" if crate::meshes::EXTS.contains(&src.as_str()) => {
             let (mesh, _) = crate::meshes::load(local, &src, root)?;
-            let mesh = mesh.context("point clouds have no surfaces to export")?;
+            let mesh = mesh.context("this model has no surfaces to export")?;
             Ok(Output { bytes: crate::meshes::to_glb(&mesh)?, ext: "glb" })
         }
         "ttf" | "woff" | "woff2" if crate::fonts::EXTS.contains(&src.as_str()) => {

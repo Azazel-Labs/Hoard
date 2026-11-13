@@ -162,6 +162,18 @@ fn render_model_thumb(path: &Path, a: &mut Analysis) {
     }
 }
 
+/// A thumbnail of a glTF/GLB model wearing `color` (a texture's thumbnail) as its colour map; `None` when it has
+/// colour maps of its own, or no renderer is running.
+pub(crate) fn gltf_thumb_dressed(path: &Path, color: &[u8]) -> anyhow::Result<Option<Vec<u8>>> {
+    let Some(r) = renderer() else { return Ok(None) };
+    let color = image::load_from_memory(color)?.to_rgba8();
+    let guard = r.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
+    let drawn =
+        std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| guard.render_file_dressed(path, THUMB_SIZE, color)))
+            .map_err(|_| anyhow::anyhow!("the renderer failed on this model"))??;
+    drawn.map(|img| thumb_bytes(img, false)).transpose()
+}
+
 /// Don't try to decode images bigger than this on disk (thumbnails of 30k² PSD exports aren't worth it).
 pub(crate) const MAX_IMAGE_DECODE_BYTES: u64 = 256 << 20;
 const THUMB_SIZE: u32 = 256;

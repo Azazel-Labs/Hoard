@@ -340,6 +340,28 @@ impl Renderer {
         Ok(sheet)
     }
 
+    /// Render a .gltf/.glb file wearing `color` as its colour map, the way the portal shows a model with a material
+    /// beside it. `None` when the model has colour maps of its own: those are what it shows.
+    pub fn render_file_dressed(
+        &self,
+        path: &Path,
+        size: u32,
+        color: image::RgbaImage,
+    ) -> Result<Option<image::RgbaImage>> {
+        let (doc, buffers, images) = gltf::import(path).with_context(|| format!("load {}", path.display()))?;
+        let mut draws = bake(&doc, &buffers);
+        if draws.iter().any(|d| d.texture.is_some()) {
+            return Ok(None);
+        }
+        let mut images = gltf_images(&images);
+        images.push(Some(color));
+        for d in &mut draws {
+            d.texture = Some(images.len() - 1);
+            d.color = [1.0, 1.0, 1.0, d.color[3]];
+        }
+        self.render(&draws, &images, size, THREE_QUARTER).map(Some)
+    }
+
     /// Render a self-contained GLB (or glTF with embedded data URIs) from memory.
     pub fn render_slice(&self, bytes: &[u8], size: u32) -> Result<image::RgbaImage> {
         let (doc, buffers, images) = gltf::import_slice(bytes).context("parse glTF")?;

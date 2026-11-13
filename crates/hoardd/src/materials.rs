@@ -686,8 +686,9 @@ fn find_materials(state: &AppState, rt: &Handle, conn: &mut Connection, pack_id:
 }
 
 /// Models whose file names no textures but which wear a material (by name, or through its maps beside them) get a
-/// white thumbnail when they're read, before the material is found. Render them again with the material's colour map on, as the 3D viewers show them. A thumbnail
-/// a browser drew is left alone, and one already dressed isn't redone.
+/// white thumbnail when they're read, before the material is found. Render them again with the material's colour
+/// map on, as the 3D viewers show them: FBX, OBJ, glTF, GLB, STL and PLY. A thumbnail a browser drew is left alone,
+/// and one already dressed isn't redone.
 fn dress_models(state: &AppState, rt: &Handle, conn: &Connection, pack_id: &str) -> Result<usize> {
     let todo: Vec<(String, String, String, String)> = conn
         .prepare(
@@ -697,7 +698,7 @@ fn dress_models(state: &AppState, rt: &Handle, conn: &Connection, pack_id: &str)
                        AND ((l.rel = 'material' AND l.to_id = m.material_id)
                             OR l.to_id IN (SELECT x.texture_id FROM material_maps x WHERE x.material_id = m.material_id)))
                JOIN assets t ON t.id = m.texture_id AND t.thumb_hash IS NOT NULL
-              WHERE o.pack_id = ?1 AND o.kind = 'model' AND o.ext IN ('fbx', 'obj')
+              WHERE o.pack_id = ?1 AND o.kind = 'model' AND o.ext IN ('fbx', 'obj', 'glb', 'gltf', 'stl', 'ply')
                 AND o.thumb_source IS NULL AND o.thumb_hash IS NOT NULL
                 AND o.thumb_hash IS NOT json_extract(o.meta, '$.thumb_dressed')
               GROUP BY o.id",
@@ -714,6 +715,10 @@ fn dress_models(state: &AppState, rt: &Handle, conn: &Connection, pack_id: &str)
         let file = work.path().join(format!("model.{ext}"));
         let dressed = (|| -> Result<Option<Vec<u8>>> {
             rt.block_on(state.blobs.download_to(&blob, &file))?;
+            if matches!(ext.as_str(), "glb" | "gltf") {
+                let color = rt.block_on(state.blobs.read_all(&color))?;
+                return crate::analyze::gltf_thumb_dressed(&file, &color);
+            }
             let (Some(mut mesh), _) = crate::meshes::load(&file, &ext, work.path())? else { return Ok(None) };
             // Textures of its own after all: what it shows already is right.
             if mesh.materials.iter().any(|m| m.color_image.is_some()) {

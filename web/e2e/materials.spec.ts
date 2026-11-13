@@ -1,7 +1,7 @@
 import { MEGASCANS } from './support/seed'
-import { MEGASCANS_FOLDER } from './support/files'
+import { checker, MEGASCANS_FOLDER, quadGltf } from './support/files'
 import type { Page } from '@playwright/test'
-import { assetsOf, signedIn } from './support/api'
+import { assetsOf, signedIn, uploadPack, waitIdle, waitReady } from './support/api'
 import { doubleClick, expect, openPack, test } from './support/test'
 
 // The Megascans pack's four maps make one material, named after the listing like its model. Only the model wears it,
@@ -80,5 +80,26 @@ test.describe('materials', () => {
     const model = (await assetsOf(api, seed.packs[MEGASCANS])).find((a) => a.kind === 'model')!
     const full = (await (await api.get(`/api/assets/${model.id}`)).json()) as { meta: { thumb_dressed?: string } }
     expect(full.meta.thumb_dressed).toBeTruthy()
+  })
+
+  test("a glTF model's server thumbnail has the colour map of the material beside it on", async ({ baseURL }) => {
+    const api = await signedIn(baseURL!)
+    const stats = (await (await api.get('/api/stats')).json()) as { renderer?: string }
+    test.skip(!/^(gpu|cpu):/.test(stats.renderer ?? ''), `no model renderer here (${stats.renderer})`)
+    const maps: [string, [number, number, number]][] = [
+      ['BaseColor', [150, 40, 30]],
+      ['Normal', [128, 128, 255]],
+      ['Roughness', [200, 200, 200]],
+    ]
+    const pack = await uploadPack(api, 'E2E Dressed glTF', [
+      { relpath: 'Signpost/Signpost.gltf', data: quadGltf() },
+      ...maps.map(([m, c]) => ({ relpath: `Signpost/Signpost_${m}.png`, data: checker(64, c, c, 8) })),
+    ])
+    await waitReady(api, [pack.id])
+    await waitIdle(api)
+    const model = (await assetsOf(api, pack.id)).find((a) => a.kind === 'model')!
+    const full = (await (await api.get(`/api/assets/${model.id}`)).json()) as { meta: { thumb_dressed?: string } }
+    expect(full.meta.thumb_dressed).toBeTruthy()
+    await api.delete(`/api/packs/${pack.id}`)
   })
 })

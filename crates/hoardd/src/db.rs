@@ -223,6 +223,18 @@ const MIGRATIONS: &[&str] = &[
        FROM packs p WHERE p.status = 'ready'
         AND EXISTS (SELECT 1 FROM assets a WHERE a.pack_id = p.id AND a.ext = 'material')
         AND NOT EXISTS (SELECT 1 FROM jobs j WHERE j.kind = 'materials' AND j.pack_id = p.id);",
+    // 29: the server draws glTF, GLB, STL and PLY models with the colour map of the material they wear too, so their
+    // browser drawings that may be all white go back to being the server's (as 28 did for FBX and OBJ).
+    "UPDATE assets SET thumb_source = NULL
+       WHERE thumb_source IN ('browser', 'browser-partial') AND kind = 'model' AND ext IN ('glb', 'gltf', 'stl', 'ply')
+         AND EXISTS (SELECT 1 FROM asset_links l WHERE l.from_id = assets.id
+                       AND (l.rel = 'material' OR l.to_id IN (SELECT texture_id FROM material_maps)));
+     INSERT INTO jobs (kind, pack_id, payload, run_after, created_at, updated_at)
+       SELECT 'materials', p.id, '{}', strftime('%Y-%m-%dT%H:%M:%SZ', 'now'), strftime('%Y-%m-%dT%H:%M:%SZ', 'now'),
+              strftime('%Y-%m-%dT%H:%M:%SZ', 'now')
+       FROM packs p WHERE p.status = 'ready'
+        AND EXISTS (SELECT 1 FROM assets a WHERE a.pack_id = p.id AND a.ext = 'material')
+        AND NOT EXISTS (SELECT 1 FROM jobs j WHERE j.kind = 'materials' AND j.pack_id = p.id);",
 ];
 
 /// How many automatic pre-upgrade backups to keep in `<data dir>/backups`.

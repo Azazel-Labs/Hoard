@@ -541,7 +541,12 @@ fn stl(data: &[u8]) -> Result<Mesh> {
                     [v(0), v(1), v(2)]
                 })
                 .collect();
-            return Ok(single(soup(&tris)));
+            let attrs: Vec<u16> =
+                (0..n).map(|i| u16::from_le_bytes([data[84 + i * 50 + 48], data[84 + i * 50 + 49]])).collect();
+            return Ok(match stl_colors(&data[..80], &attrs) {
+                Some(colors) => colored_soup(&tris, &colors),
+                None => single(soup(&tris)),
+            });
         }
     }
     let text = std::str::from_utf8(data).context("neither binary nor ASCII STL")?;
@@ -559,6 +564,59 @@ fn stl(data: &[u8]) -> Result<Mesh> {
     let tris: Vec<[[f32; 3]; 3]> = verts.as_chunks::<3>().0.to_vec();
     ensure!(!tris.is_empty(), "STL has no triangles");
     Ok(single(soup(&tris)))
+}
+
+/// Each facet's colour (sRGB, 0-255) from a binary STL's attribute bytes, when the file has colours. Materialise
+/// Magics writes `COLOR=rgba` in the header, the default for facets whose top bit is set, and red in the low bits of
+/// the rest (as three.js reads it). `VisCAM` and `SolidView` set the top bit on coloured facets, blue in the low bits;
+/// there's no header saying so, and other tools leave junk in those bytes, so only two colours or more count.
+fn stl_colors(header: &[u8], attrs: &[u16]) -> Option<Vec<Option<[u8; 3]>>> {
+    let five = |v: u16| u8::try_from(u32::from(v & 0x1F) * 255 / 31).unwrap_or(u8::MAX);
+    if let Some(at) = header.windows(6).position(|w| w == b"COLOR=").filter(|at| at + 10 <= header.len()) {
+        let default = [header[at + 6], header[at + 7], header[at + 8]];
+        return Some(
+            attrs
+                .iter()
+                .map(|&a| Some(if a & 0x8000 == 0 { [five(a), five(a >> 5), five(a >> 10)] } else { default }))
+                .collect(),
+        );
+    }
+    let mut seen = std::collections::HashSet::new();
+    for &a in attrs.iter().filter(|&&a| a & 0x8000 != 0) {
+        seen.insert(a);
+        if seen.len() > 1 {
+            return Some(
+                attrs.iter().map(|&a| (a & 0x8000 != 0).then(|| [five(a >> 10), five(a >> 5), five(a)])).collect(),
+            );
+        }
+    }
+    None
+}
+
+/// Facets grouped by colour (gray for those without one): a primitive and plain material for each.
+fn colored_soup(tris: &[[[f32; 3]; 3]], colors: &[Option<[u8; 3]>]) -> Mesh {
+    type Tri = [[f32; 3]; 3];
+    let mut groups: Vec<(Option<[u8; 3]>, Vec<Tri>)> = Vec::new();
+    let mut index: HashMap<Option<[u8; 3]>, usize> = HashMap::new();
+    for (t, c) in tris.iter().zip(colors) {
+        let i = *index.entry(*c).or_insert_with(|| {
+            groups.push((*c, Vec::new()));
+            groups.len() - 1
+        });
+        groups[i].1.push(*t);
+    }
+    let mut mesh = Mesh::default();
+    for (i, (c, tris)) in groups.into_iter().enumerate() {
+        let mut p = soup(&tris);
+        p.material = i;
+        mesh.prims.push(p);
+        let color = c.map_or(GRAY, |c| {
+            let [r, g, b] = c.map(|v| srgb_to_linear(f32::from(v) / 255.0));
+            [r, g, b, 1.0]
+        });
+        mesh.materials.push(Material::plain(&format!("color_{i}"), color));
+    }
+    mesh
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -960,6 +1018,39 @@ mod tests {
         let ascii = "solid t\nfacet normal 0 0 1\nouter loop\nvertex 0 0 0\nvertex 1 0 0\nvertex 0 1 0\nendloop\nendfacet\nendsolid t\n";
         let (m, _) = load_bytes("b.stl", ascii.as_bytes());
         assert_eq!(m.unwrap().triangles(), 1);
+    }
+
+    #[test]
+    fn stl_facet_colors() {
+        let stl = |header: &[u8], attrs: &[u16]| {
+            let mut bin = header.to_vec();
+            bin.resize(80, 0);
+            bin.extend_from_slice(&u32::try_from(attrs.len()).unwrap().to_le_bytes());
+            for &a in attrs {
+                for v in [0f32, 0., 1., 0., 0., 0., 1., 0., 0., 0., 1., 0.] {
+                    bin.extend_from_slice(&v.to_le_bytes());
+                }
+                bin.extend_from_slice(&a.to_le_bytes());
+            }
+            load_bytes("c.stl", &bin).0.unwrap()
+        };
+        // Magics: red in the low bits; a set top bit takes the header's colour.
+        let m = stl(b"COLOR=\x00\xff\x00\xff", &[0x001F, 0x8000, 0x001F]);
+        assert_eq!(m.prims.len(), 2);
+        assert_eq!(m.prims[0].indices.len(), 6);
+        assert_eq!(m.materials[0].color, [1.0, 0.0, 0.0, 1.0]);
+        let m = stl(b"COLOR=\x00\x00\xff\xff", &[0x03E0, 0x8000]);
+        assert_eq!(m.materials[0].color, [0.0, 1.0, 0.0, 1.0]);
+        assert_eq!(m.materials[1].color, [0.0, 0.0, 1.0, 1.0]);
+        // VisCAM: the top bit marks a coloured facet, blue in the low bits.
+        let m = stl(b"binary", &[0x801F, 0xFC00, 0]);
+        assert_eq!(
+            m.materials.iter().map(|m| m.color).collect::<Vec<_>>(),
+            [[0.0, 0.0, 1.0, 1.0], [1.0, 0.0, 0.0, 1.0], GRAY]
+        );
+        // One colour without a header is as likely junk as a colour: plain gray.
+        let m = stl(b"binary", &[0xFFFF, 0xFFFF]);
+        assert_eq!((m.prims.len(), m.materials[0].color), (1, GRAY));
     }
 
     #[test]

@@ -522,6 +522,9 @@ pub(crate) fn detect_pack(state: &AppState, rt: &Handle, conn: &mut Connection, 
     if let Err(e) = dress_models(state, rt, conn, pack_id) {
         tracing::warn!(pack = pack_id, error = %format!("{e:#}"), "could not put materials on model thumbnails");
     }
+    if let Err(e) = recolor_stls(state, rt, conn, pack_id) {
+        tracing::warn!(pack = pack_id, error = %format!("{e:#}"), "could not redraw STL thumbnails in colour");
+    }
     Ok(n)
 }
 
@@ -746,31 +749,90 @@ fn dress_models(state: &AppState, rt: &Handle, conn: &Connection, pack_id: &str)
                 continue;
             }
         };
-        let stored = rt.block_on(state.blobs.put_cache_bytes(thumb))?;
-        let old: Option<String> = conn.query_row("SELECT thumb_hash FROM assets WHERE id = ?1", [&id], |r| r.get(0))?;
-        conn.execute(
-            "INSERT INTO blobs (hash, size, created_at) VALUES (?1, ?2, ?3) ON CONFLICT (hash) DO NOTHING",
-            params![stored.hash, stored.size as i64, db::now()],
-        )?;
-        // A browser may have sent its own meanwhile; that one stays.
-        let n = conn.execute(
-            "UPDATE assets SET thumb_hash = ?2, meta = json_set(meta, '$.thumb_dressed', ?2)
-              WHERE id = ?1 AND thumb_source IS NULL",
-            params![id, stored.hash],
-        )?;
-        if n > 0 {
+        if replace_thumb(state, rt, conn, &id, thumb, "json_set(meta, '$.thumb_dressed', ?2)")? {
             done += 1;
-            if let Some(old) = old.filter(|o| *o != stored.hash) {
-                let size: Option<i64> =
-                    conn.query_row("SELECT size FROM blobs WHERE hash = ?1", [&old], |r| r.get(0)).optional()?;
-                if let Some(size) = size {
-                    rt.block_on(crate::jobs::delete_unused(state, vec![(old, size)])).ok();
-                }
-            }
         }
     }
     if done > 0 {
         tracing::info!(pack = pack_id, models = done, "model thumbnails redrawn with their materials");
+    }
+    Ok(done)
+}
+
+/// Puts `thumb` in place of an asset's server thumbnail, its meta becoming `meta_sql` (`?2` is the new thumbnail's
+/// hash). A browser may have sent its own meanwhile: that one stays, and this returns false.
+fn replace_thumb(
+    state: &AppState,
+    rt: &Handle,
+    conn: &Connection,
+    id: &str,
+    thumb: Vec<u8>,
+    meta_sql: &str,
+) -> Result<bool> {
+    let stored = rt.block_on(state.blobs.put_cache_bytes(thumb))?;
+    let old: Option<String> = conn.query_row("SELECT thumb_hash FROM assets WHERE id = ?1", [id], |r| r.get(0))?;
+    conn.execute(
+        "INSERT INTO blobs (hash, size, created_at) VALUES (?1, ?2, ?3) ON CONFLICT (hash) DO NOTHING",
+        params![stored.hash, stored.size as i64, db::now()],
+    )?;
+    let n = conn.execute(
+        &format!("UPDATE assets SET thumb_hash = ?2, meta = {meta_sql} WHERE id = ?1 AND thumb_source IS NULL"),
+        params![id, stored.hash],
+    )?;
+    if n > 0
+        && let Some(old) = old.filter(|o| *o != stored.hash)
+    {
+        let size: Option<i64> =
+            conn.query_row("SELECT size FROM blobs WHERE hash = ?1", [&old], |r| r.get(0)).optional()?;
+        if let Some(size) = size {
+            rt.block_on(crate::jobs::delete_unused(state, vec![(old, size)])).ok();
+        }
+    }
+    Ok(n > 0)
+}
+
+/// STL files read before Hoard knew their facet colours (marked `recolor` on upgrade) drawn again, now in colour.
+/// Ones without colours keep the thumbnail they have.
+fn recolor_stls(state: &AppState, rt: &Handle, conn: &Connection, pack_id: &str) -> Result<usize> {
+    let todo: Vec<(String, String)> = conn
+        .prepare(
+            "SELECT id, blob_hash FROM assets
+              WHERE pack_id = ?1 AND kind = 'model' AND ext = 'stl' AND json_extract(meta, '$.recolor') IS NOT NULL",
+        )?
+        .query_map([pack_id], |r| Ok((r.get(0)?, r.get(1)?)))?
+        .collect::<rusqlite::Result<_>>()?;
+    if todo.is_empty() || crate::analyze::renderer().is_none() {
+        return Ok(0);
+    }
+    std::fs::create_dir_all(state.cfg.tmp_dir())?;
+    let work = tempfile::Builder::new().prefix("recolor-").tempdir_in(state.cfg.tmp_dir())?;
+    let file = work.path().join("model.stl");
+    let mut done = 0;
+    for (id, blob) in todo {
+        let drawn = (|| -> Result<Option<Vec<u8>>> {
+            rt.block_on(state.blobs.download_to(&blob, &file))?;
+            match crate::meshes::load(&file, "stl", work.path())? {
+                (Some(mesh), _) if mesh.materials.len() > 1 => crate::analyze::mesh_thumb_bytes(&mesh, &file),
+                _ => Ok(None),
+            }
+        })();
+        std::fs::remove_file(&file).ok();
+        let redrawn = match drawn {
+            Ok(Some(thumb)) => replace_thumb(state, rt, conn, &id, thumb, "json_remove(meta, '$.recolor')")?,
+            Ok(None) => false,
+            Err(e) => {
+                tracing::debug!(asset = %id, error = %format!("{e:#}"), "STL thumbnail kept as it was");
+                false
+            }
+        };
+        if redrawn {
+            done += 1;
+        } else {
+            conn.execute("UPDATE assets SET meta = json_remove(meta, '$.recolor') WHERE id = ?1", [&id])?;
+        }
+    }
+    if done > 0 {
+        tracing::info!(pack = pack_id, models = done, "STL thumbnails redrawn in their colours");
     }
     Ok(done)
 }

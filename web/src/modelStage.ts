@@ -108,6 +108,32 @@ async function textureLinks(asset: Asset): Promise<{ named: AssetLink[]; guesses
   return { named, guesses, full }
 }
 
+/** Facet colours the way VisCAM and SolidView write them in a binary STL (three.js reads only Materialise's): the
+ *  top bit of a facet's attribute marks it coloured, blue in the low bits. Nothing says a file does this and other
+ *  tools leave junk there, so it takes two colours or more. The server reads them the same way. */
+function visCamColors(buf: ArrayBuffer, geom: THREE.BufferGeometry) {
+  if (buf.byteLength < 84) return
+  const view = new DataView(buf)
+  const n = view.getUint32(80, true)
+  if (84 + n * 50 !== buf.byteLength || geom.attributes.position.count !== n * 3) return
+  const attrs = new Uint16Array(n)
+  const seen = new Set<number>()
+  for (let i = 0; i < n; i++) {
+    attrs[i] = view.getUint16(84 + i * 50 + 48, true)
+    if (attrs[i] & 0x8000) seen.add(attrs[i])
+  }
+  if (seen.size < 2) return
+  const colors = new Float32Array(n * 9)
+  const c = new THREE.Color()
+  for (let i = 0; i < n; i++) {
+    const a = attrs[i]
+    if (a & 0x8000) c.setRGB(((a >> 10) & 0x1f) / 31, ((a >> 5) & 0x1f) / 31, (a & 0x1f) / 31, THREE.SRGBColorSpace)
+    else c.set(0xb8c0d0)
+    for (let k = 0; k < 3; k++) c.toArray(colors, i * 9 + k * 3)
+  }
+  geom.setAttribute('color', new THREE.BufferAttribute(colors, 3))
+}
+
 async function loadModel(url: string, ext: string, manager: THREE.LoadingManager): Promise<Loaded> {
   switch (ext) {
     case 'glb':
@@ -148,13 +174,26 @@ async function loadModel(url: string, ext: string, manager: THREE.LoadingManager
       }
       return { object: loader.parse(text), animations: [], linearColors: /^# Blender/m.test(text.slice(0, 500)) }
     }
-    case 'stl':
+    case 'stl': {
+      const { STLLoader } = await import('three/addons/loaders/STLLoader.js')
+      const res = await fetch(url)
+      if (!res.ok) throw new Error(`HTTP ${res.status}`)
+      const buf = await res.arrayBuffer()
+      const geom = new STLLoader(manager).parse(buf)
+      // Some exporters leave the facet normals zero (they're optional): work them out, as the server does.
+      const normals = geom.attributes.normal?.array
+      if (!normals || normals.some((_, i) => i % 3 === 0 && !normals[i] && !normals[i + 1] && !normals[i + 2])) geom.computeVertexNormals()
+      if (!geom.attributes.color) visCamColors(buf, geom)
+      const material = new THREE.MeshStandardMaterial({ color: 0xb8c0d0, roughness: 0.6, vertexColors: !!geom.attributes.color })
+      if (geom.attributes.color) material.color.set(0xffffff)
+      return { object: new THREE.Mesh(geom, material), animations: [] }
+    }
     case 'ply': {
-      const mod = ext === 'stl' ? await import('three/addons/loaders/STLLoader.js') : await import('three/addons/loaders/PLYLoader.js')
-      const Loader = 'STLLoader' in mod ? mod.STLLoader : (mod as typeof import('three/addons/loaders/PLYLoader.js')).PLYLoader
-      const geom = await new Loader(manager).loadAsync(url)
+      const { PLYLoader } = await import('three/addons/loaders/PLYLoader.js')
+      const geom = await new PLYLoader(manager).loadAsync(url)
       if (!geom.attributes.normal) geom.computeVertexNormals()
       const material = new THREE.MeshStandardMaterial({ color: 0xb8c0d0, roughness: 0.6, vertexColors: !!geom.attributes.color })
+      if (geom.attributes.color) material.color.set(0xffffff) // the file's own colours, not tinted gray
       return { object: new THREE.Mesh(geom, material), animations: [] }
     }
     case 'dae': {

@@ -235,6 +235,16 @@ const MIGRATIONS: &[&str] = &[
        FROM packs p WHERE p.status = 'ready'
         AND EXISTS (SELECT 1 FROM assets a WHERE a.pack_id = p.id AND a.ext = 'material')
         AND NOT EXISTS (SELECT 1 FROM jobs j WHERE j.kind = 'materials' AND j.pack_id = p.id);",
+    // 30: STL files can colour their facets, which the server now draws (`materials::recolor_stls`, run with each
+    // pack's materials). Browser drawings of them go back to the server, and a browser draws them afresh when opened.
+    "UPDATE assets SET meta = json_set(meta, '$.recolor', 1), thumb_source = NULL
+       WHERE kind = 'model' AND ext = 'stl' AND thumb_hash IS NOT NULL;
+     INSERT INTO jobs (kind, pack_id, payload, run_after, created_at, updated_at)
+       SELECT 'materials', p.id, '{}', strftime('%Y-%m-%dT%H:%M:%SZ', 'now'), strftime('%Y-%m-%dT%H:%M:%SZ', 'now'),
+              strftime('%Y-%m-%dT%H:%M:%SZ', 'now')
+       FROM packs p WHERE p.status = 'ready'
+        AND EXISTS (SELECT 1 FROM assets a WHERE a.pack_id = p.id AND a.ext = 'stl' AND a.kind = 'model')
+        AND NOT EXISTS (SELECT 1 FROM jobs j WHERE j.kind = 'materials' AND j.pack_id = p.id);",
 ];
 
 /// How many automatic pre-upgrade backups to keep in `<data dir>/backups`.

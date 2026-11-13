@@ -12,6 +12,14 @@ animations, and makes all of it searchable from a web portal, a CLI, an MCP endp
 
 Think of it as an asset store with no checkout.
 
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/img/hero-dark.webp">
+  <img alt="The Hoard library: models and materials in a grid, with a treasure chest open in the 3D preview beside its tags and downloads" src="docs/img/hero-light.webp">
+</picture>
+
+<sub>The demo library is CC0 art: models from [Poly Haven](https://polyhaven.com) (glTF and USD) and surfaces from
+[ambientCG](https://ambientcg.com). `node web/scripts/readme-images.mts` makes these pictures and the social card.</sub>
+
 ```mermaid
 flowchart TB
     web["<b>Web portal</b> (Vue 3 + Vite)<br/>drop packs · search · facets · 3D/audio preview<br/>tag editing · linked assets · bundle downloads"]
@@ -919,6 +927,7 @@ crates/hoard          the CLI
 crates/hoard-unreal   Unreal package reader and converters (textures, sounds, materials, data tables)
 xtask/                `cargo xtask`: dev servers, checks, local model downloads and serving, Unreal export
 web/                  Vue 3 + TypeScript portal (Vite); three.js viewer is lazy-loaded
+web/scripts/          readme-images.mts: the README's screenshots and the social card, in docs/img/
 .vscode/              tasks, debug configurations, settings and recommended extensions
 deploy/               Dockerfile companions: compose topologies, Garage config, .env.example
 tools/                sample pack generator (now with a small Unreal content folder), Unreal Editor export script

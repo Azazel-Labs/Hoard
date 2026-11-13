@@ -1,5 +1,10 @@
 # Hoard
 
+[![CI](https://github.com/Azazel-Labs/Hoard/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/Azazel-Labs/Hoard/actions/workflows/ci.yml)
+[![Release](https://img.shields.io/github/v/release/Azazel-Labs/Hoard)](https://github.com/Azazel-Labs/Hoard/releases/latest)
+[![Rust 1.99+](https://img.shields.io/badge/rust-1.99%2B-orange?logo=rust)](https://www.rust-lang.org)
+[![License: MIT-0](https://img.shields.io/badge/license-MIT--0-blue)](LICENSE)
+
 A self-hosted asset library for game development. Drop in whole asset packs (zips, tarballs, folders), and Hoard
 stores every file once by its hash, works out what each file is, tags it, links meshes to their textures and
 animations, and makes all of it searchable from a web portal, a CLI, an MCP endpoint for agents, and a lockfile-based

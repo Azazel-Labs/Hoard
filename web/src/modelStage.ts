@@ -196,6 +196,22 @@ async function loadModel(url: string, ext: string, manager: THREE.LoadingManager
       if (geom.attributes.color) material.color.set(0xffffff) // the file's own colours, not tinted gray
       return { object: new THREE.Mesh(geom, material), animations: [] }
     }
+    case '3mf': {
+      // The server reads 3MF, slicers' filament colours and painting included, and hands it over as a GLB. A
+      // conversion still running answers 202 after waiting a while: ask again, for up to ten minutes or so.
+      const { GLTFLoader } = await import('three/addons/loaders/GLTFLoader.js')
+      for (let tries = 0; tries < 20; tries++) {
+        const res = await fetch(url)
+        if (res.status === 202) continue
+        if (!res.ok) {
+          const body = (await res.json().catch(() => ({}))) as { error?: string }
+          throw new Error(body.error ?? `HTTP ${res.status}`)
+        }
+        const g = await new GLTFLoader(manager).parseAsync(await res.arrayBuffer(), '')
+        return { object: g.scene, animations: g.animations }
+      }
+      throw new Error('the server is still converting this model')
+    }
     case 'dae': {
       const { ColladaLoader } = await import('three/addons/loaders/ColladaLoader.js')
       const c = await new ColladaLoader(manager).loadAsync(url)
@@ -209,6 +225,7 @@ async function loadModel(url: string, ext: string, manager: THREE.LoadingManager
 
 function sourceFor(a: Asset | AssetLink, packId: string, derivatives: string[] = []): { url: string; ext: string } {
   if (derivatives.includes('glb')) return { url: `/api/assets/${a.id}/derivative/glb`, ext: 'glb' }
+  if (extOf(a.path) === '3mf') return { url: `/api/assets/${a.id}/as/glb?download=0&wait=30`, ext: '3mf' }
   return { url: packFileUrl(packId, a.path), ext: extOf(a.path) }
 }
 

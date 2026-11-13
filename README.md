@@ -267,6 +267,11 @@ software rasterizer (`apt install mesa-vulkan-drivers`). Without any adapter, ev
      cut-outs and see-through surfaces; framed tightly from the same angle every time. Binary FBX geometry, node
      transforms, materials and embedded or nearby textures are read natively (axis and unit settings become glTF's
      Y-up meters); ASCII FBX needs Blender.
+   - 3D-print files (`.3mf`): meshes, components and build plates, read natively, with their colors: the 3MF
+     materials extension's base materials and color groups, and from Bambu Studio, OrcaSlicer and PrusaSlicer
+     projects the filament colors, which filament each object and part prints in, and filaments painted onto the
+     model. Facts: triangles, objects, colors and the application that wrote it. The 3D viewer shows the GLB Hoard
+     makes from it, so the colors match the thumbnail.
    - Unreal packages (`.uasset`, `.umap`), read without Unreal: see [Unreal packs](#unreal-packs).
    - Source files:
      - `.blend`: Blender version, compression, and the preview Blender embeds in every file (read directly, gzip
@@ -396,7 +401,7 @@ and Opus use ffmpeg's reference encoders (LAME, libvorbis, libopus), as do sourc
 | MOD, XM, S3M, IT, MIDI | the same audio formats, rendered |
 | glTF | GLB (buffers and textures packed in) |
 | GLB | glTF + .bin (zipped) |
-| OBJ (with MTL and textures), binary FBX, STL, PLY, MagicaVoxel | GLB with textures embedded |
+| OBJ (with MTL and textures), binary FBX, STL, PLY, MagicaVoxel, 3MF (with its colors) | GLB with textures embedded |
 | TTF/OTF | WOFF2, WOFF |
 | WOFF, WOFF2 | TTF/OTF and each other |
 | anything else Blender converted (Settings → Blender) | GLB |

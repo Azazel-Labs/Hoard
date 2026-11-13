@@ -182,6 +182,31 @@ export function quadGltf(bin: string): { gltf: Buffer; bin: Buffer } {
   return { gltf: Buffer.from(JSON.stringify(gltf, null, 2)), bin: data }
 }
 
+/** A Bambu Studio-style 3MF: a 10 mm cube printed in white (filament 1) with its top painted red (filament 2). */
+export function paintedCube3mf(): Buffer {
+  const v = [[0, 0, 0], [10, 0, 0], [10, 10, 0], [0, 10, 0], [0, 0, 10], [10, 0, 10], [10, 10, 10], [0, 10, 10]]
+  // Bottom, top, then the four sides; the top's two triangles (2 and 3) are painted.
+  const t = [[0, 2, 1], [0, 3, 2], [4, 5, 6], [4, 6, 7], [0, 1, 5], [0, 5, 4], [1, 2, 6], [1, 6, 5], [2, 3, 7], [2, 7, 6], [3, 0, 4], [3, 4, 7]]
+  const vertices = v.map(([x, y, z]) => `<vertex x="${x}" y="${y}" z="${z}"/>`).join('')
+  const triangles = t.map(([a, b, c], i) => `<triangle v1="${a}" v2="${b}" v3="${c}"${i === 2 || i === 3 ? ' paint_color="8"' : ''}/>`).join('')
+  const model = `<?xml version="1.0" encoding="UTF-8"?>
+<model unit="millimeter" xml:lang="en-US" xmlns="http://schemas.microsoft.com/3dmanufacturing/core/2015/02">
+ <metadata name="Application">BambuStudio-01.10.00.00</metadata>
+ <resources><object id="1" type="model"><mesh><vertices>${vertices}</vertices><triangles>${triangles}</triangles></mesh></object></resources>
+ <build><item objectid="1" transform="1 0 0 0 1 0 0 0 1 128 128 5"/></build>
+</model>`
+  const rels = `<?xml version="1.0" encoding="UTF-8"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Target="/3D/3dmodel.model" Id="rel-1" Type="http://schemas.microsoft.com/3dmanufacturing/2013/01/3dmodel"/></Relationships>`
+  const settings = `<?xml version="1.0" encoding="UTF-8"?>
+<config><object id="1"><metadata key="name" value="Cube"/><metadata key="extruder" value="1"/></object></config>`
+  return zip([
+    { path: '_rels/.rels', data: Buffer.from(rels) },
+    { path: '3D/3dmodel.model', data: Buffer.from(model) },
+    { path: 'Metadata/model_settings.config', data: Buffer.from(settings) },
+    { path: 'Metadata/project_settings.config', data: Buffer.from(JSON.stringify({ filament_colour: ['#FFFFFF', '#FF0000'] })) },
+  ])
+}
+
 export const LEVEL_JSON = {
   name: 'Forest clearing',
   version: 3,

@@ -31,6 +31,7 @@ r2d2_sqlite = "0.36"
 uuid = { version = "1.29", features = ["v4", "v7"] }
 zip = { version = "9", default-features = false, features = ["deflate", "deflate64", "bzip2", "lzma", "zstd", "time"] }
 tar = "0.4"
+quick-xml = "0.41"
 flate2 = "1.1"
 infer = "0.22"
 mime_guess = "2"

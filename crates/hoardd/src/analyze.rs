@@ -248,7 +248,7 @@ pub(crate) fn analyze(path: &Path, root: &Path, kind: AssetKind, ext: &str) -> A
             a.title = f.title;
             a.thumb = f.thumb.and_then(|t| thumb_bytes(t, false).ok());
         }),
-        AssetKind::Model if matches!(ext, "stl" | "ply" | "vox") => analyze_mesh(path, root, ext, &mut a),
+        AssetKind::Model if matches!(ext, "stl" | "ply" | "vox" | "3mf") => analyze_mesh(path, root, ext, &mut a),
         AssetKind::Model | AssetKind::Animation => analyze_model(path, ext, &mut a.meta).map(|()| {
             // Animation-only glTF clips have no meshes to draw.
             let has_mesh = a.meta.get("meshes").and_then(Value::as_u64).is_none_or(|n| n > 0);

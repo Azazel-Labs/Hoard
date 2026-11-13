@@ -1,4 +1,6 @@
 import { LARGE, LARGE_PX, MODELS, TEXTURES } from './support/seed'
+import { paintedCube3mf } from './support/files'
+import { assetsOf, signedIn, uploadPack, waitIdle, waitReady } from './support/api'
 import { doubleClick, expect, openPack, test, tile } from './support/test'
 
 // Double-clicking a tile opens its full-screen viewer; the app spots the second click by where and when it lands, so
@@ -28,6 +30,27 @@ test.describe('full-screen viewers', () => {
     await expect(viewer.locator('canvas')).toBeVisible()
     await viewer.getByRole('button', { name: 'Close (Esc)' }).click()
     await expect(viewer).toBeHidden()
+  })
+
+  // The server reads it, filaments and painting included, and the viewer shows the GLB it makes.
+  test('a painted 3MF print shows its filament colours', async ({ page, baseURL }) => {
+    const api = await signedIn(baseURL!)
+    const pack = await uploadPack(api, 'E2E Painted 3MF', [{ relpath: 'Painted_Cube.3mf', data: paintedCube3mf() }])
+    await waitReady(api, [pack.id])
+    await waitIdle(api)
+    const [model] = await assetsOf(api, pack.id)
+    expect(model.kind).toBe('model')
+    const full = (await (await api.get(`/api/assets/${model.id}`)).json()) as { meta: Record<string, unknown> }
+    expect(full.meta).toMatchObject({ triangles: 12, colors: 2, application: 'BambuStudio-01.10.00.00' })
+
+    await openPack(page, pack.id, 'E2E Painted 3MF')
+    await doubleClick(page, tile(page, 'Painted cube'))
+    const viewer = page.getByRole('dialog', { name: 'View Painted cube in 3D' })
+    await expect(viewer.getByText(/12 tris · 2 meshes/)).toBeVisible({ timeout: 30_000 })
+    await expect(viewer.getByText(/Couldn't show this model/)).toHaveCount(0)
+    await page.keyboard.press('Escape')
+    await expect(viewer).toBeHidden()
+    await api.delete(`/api/packs/${pack.id}`)
   })
 
   test('the 3D viewer shows a model other ways, and its scene information', async ({ page, seed }) => {

@@ -50,6 +50,7 @@ mod store_lookup;
 mod store_search;
 mod tagger;
 mod textures;
+mod threemf;
 mod tools;
 mod updates;
 mod uploads;

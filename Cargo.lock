@@ -2153,6 +2153,7 @@ dependencies = [
  "mime_guess",
  "object_store",
  "opus-pure",
+ "quick-xml",
  "quinn",
  "r2d2",
  "r2d2_sqlite",

@@ -70,7 +70,7 @@ pub(crate) fn options(ext: &str, derivatives: &[String]) -> Vec<FormatOption> {
         }
     }
     match ext.as_str() {
-        "stl" | "ply" | "vox" | "obj" | "fbx" => out.push(opt("glb", "GLB (textures embedded)", false)),
+        "stl" | "ply" | "vox" | "obj" | "fbx" | "3mf" => out.push(opt("glb", "GLB (textures embedded)", false)),
         "ttf" | "otf" => {
             out.push(opt("woff2", "WOFF2 (for the web)", false));
             out.push(opt("woff", "WOFF", false));

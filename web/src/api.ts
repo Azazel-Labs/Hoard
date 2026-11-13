@@ -1012,7 +1012,7 @@ export const packFileUrl = (packId: string, path: string) =>
   `/api/packs/${packId}/files/${path.split('/').map(encodeURIComponent).join('/')}`
 
 /** Asset kinds the browser viewer can open (plus anything the server converted to .glb). */
-export const VIEWABLE_EXTS = new Set(['glb', 'gltf', 'obj', 'fbx', 'stl', 'ply', 'dae'])
+export const VIEWABLE_EXTS = new Set(['glb', 'gltf', 'obj', 'fbx', 'stl', 'ply', 'dae', '3mf'])
 
 /** One file to upload with its path inside the pack. */
 export interface UploadFile { file: File; path: string }

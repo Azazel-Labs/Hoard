@@ -1,5 +1,5 @@
 //! Model formats read natively: STL (binary and ASCII), PLY (ASCII and binary), `MagicaVoxel` `.vox`, OBJ (with its
-//! MTL materials and textures) and binary FBX (see `fbx`). Each becomes a GLB, which feeds the thumbnail renderer
+//! MTL materials and textures), binary FBX (see `fbx`) and 3MF (see `threemf`). Each becomes a GLB, which feeds the thumbnail renderer
 //! and "download as GLB"; textures are embedded so the GLB stands on its own.
 
 #![expect(clippy::many_single_char_names, clippy::similar_names, reason = "geometry code: a/b/c, u/v, x/y/z")]
@@ -10,8 +10,8 @@ use std::path::Path;
 use anyhow::{Context, Result, bail, ensure};
 use serde_json::{Map, Value, json};
 
-pub(crate) const EXTS: &[&str] = &["stl", "ply", "vox", "obj", "fbx"];
-const MAX_TRIANGLES: usize = 4_000_000;
+pub(crate) const EXTS: &[&str] = &["stl", "ply", "vox", "obj", "fbx", "3mf"];
+pub(crate) const MAX_TRIANGLES: usize = 4_000_000;
 const MAX_VOXELS: usize = 4_000_000;
 
 /// One material's worth of triangles.
@@ -74,6 +74,7 @@ pub(crate) fn load(path: &Path, ext: &str, root: &Path) -> Result<(Option<Mesh>,
         "stl" => stl(&std::fs::read(path)?).map(counts),
         "ply" => ply(&std::fs::read(path)?),
         "vox" => vox(&std::fs::read(path)?),
+        "3mf" => crate::threemf::load(path),
         "obj" | "fbx" => {
             let mut mesh = if ext == "obj" { obj(path, root)? } else { crate::fbx::load(path, root)? };
             if !linear_colors(path, ext) {
@@ -503,6 +504,11 @@ fn single(p: Prim) -> Mesh {
     Mesh { prims: vec![p], materials: vec![Material::plain("default", GRAY)], images: Vec::new() }
 }
 
+/// A gray triangle soup.
+pub(crate) fn gray_soup(tris: &[[[f32; 3]; 3]]) -> Mesh {
+    single(soup(tris))
+}
+
 fn face_normal(a: [f32; 3], b: [f32; 3], c: [f32; 3]) -> [f32; 3] {
     let u = [b[0] - a[0], b[1] - a[1], b[2] - a[2]];
     let v = [c[0] - a[0], c[1] - a[1], c[2] - a[2]];
@@ -594,7 +600,7 @@ fn stl_colors(header: &[u8], attrs: &[u16]) -> Option<Vec<Option<[u8; 3]>>> {
 }
 
 /// Facets grouped by colour (gray for those without one): a primitive and plain material for each.
-fn colored_soup(tris: &[[[f32; 3]; 3]], colors: &[Option<[u8; 3]>]) -> Mesh {
+pub(crate) fn colored_soup(tris: &[[[f32; 3]; 3]], colors: &[Option<[u8; 3]>]) -> Mesh {
     type Tri = [[f32; 3]; 3];
     let mut groups: Vec<(Option<[u8; 3]>, Vec<Tri>)> = Vec::new();
     let mut index: HashMap<Option<[u8; 3]>, usize> = HashMap::new();

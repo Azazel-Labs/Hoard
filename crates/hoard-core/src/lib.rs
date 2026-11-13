@@ -83,7 +83,7 @@ impl AssetKind {
             // Models, including DCC scenes (Blender, Max, Maya, ZBrush, Cinema 4D, Houdini, Modo, SketchUp).
             "fbx" | "obj" | "gltf" | "glb" | "dae" | "blend" | "3ds" | "stl" | "ply" | "usd" | "usda" | "usdc"
             | "usdz" | "vox" | "max" | "ma" | "mb" | "ztl" | "zpr" | "c4d" | "hip" | "hiplc" | "hipnc" | "lxo"
-            | "skp" | "abc" | "x3d" => AssetKind::Model,
+            | "skp" | "abc" | "x3d" | "3mf" => AssetKind::Model,
             "anim" | "bvh" => AssetKind::Animation,
             "ttf" | "otf" | "ttc" | "otc" | "woff" | "woff2" | "fnt" => AssetKind::Font,
             "glsl" | "hlsl" | "wgsl" | "shader" | "vert" | "frag" | "comp" | "gdshader" | "usf" | "ush" | "metal"

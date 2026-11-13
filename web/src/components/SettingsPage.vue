@@ -28,6 +28,7 @@ import { confirmDialog, showError, showOk } from '../ui'
 import LibraryStats from './LibraryStats.vue'
 import LocationsPanel from './LocationsPanel.vue'
 import MaintenancePanel from './MaintenancePanel.vue'
+import UpdatesPanel from './UpdatesPanel.vue'
 import IssuesPanel from './IssuesPanel.vue'
 import AccountPanel from './AccountPanel.vue'
 import HttpsPanel from './HttpsPanel.vue'
@@ -1317,6 +1318,7 @@ onBeforeUnmount(() => {
                   <ResetButton v-if="changed('update_check')" :to="onOff(s.options.update_check.default)" :disabled="busy" @reset="resetOpt('update_check')" />
                 </div>
               </div>
+              <UpdatesPanel :settings="s" @saved="take" @unauthorized="emit('unauthorized')" />
             </section>
             <MaintenancePanel @unauthorized="emit('unauthorized')" />
           </template>

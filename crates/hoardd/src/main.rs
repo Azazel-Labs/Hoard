@@ -170,6 +170,7 @@ async fn main() -> Result<()> {
     clip::start(&state, effective.clip);
     convert::start_blender(&state, false);
     updates::start(effective.update_check);
+    updates::start_hook(&state);
     analyze::warm_renderer();
     jobs::spawn_workers(&state);
     {

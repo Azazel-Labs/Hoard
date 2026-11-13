@@ -76,6 +76,12 @@ pub(crate) struct Saved {
     pub(crate) render: Option<bool>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub(crate) update_check: Option<bool>,
+    /// Called (POST) when a newer release is out and Hoard is idle, for whatever updates the container. Empty: none.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub(crate) update_hook_url: Option<String>,
+    /// The `Authorization` header sent with it (e.g. `Bearer <token>`). Empty: none.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub(crate) update_hook_auth: Option<String>,
     /// Empty means "find one on the system".
     #[serde(skip_serializing_if = "Option::is_none")]
     pub(crate) soundfont: Option<String>,
@@ -126,6 +132,8 @@ pub(crate) struct Effective {
     pub(crate) llm_batch: usize,
     pub(crate) render: bool,
     pub(crate) update_check: bool,
+    pub(crate) update_hook_url: Option<String>,
+    pub(crate) update_hook_auth: Option<String>,
     pub(crate) soundfont: Option<PathBuf>,
     pub(crate) public_url: Option<String>,
     pub(crate) max_upload_mb: u64,
@@ -188,6 +196,8 @@ impl Saved {
             llm_batch: self.llm_batch.unwrap_or(cfg.llm_batch).max(1),
             render: self.render.unwrap_or(cfg.render),
             update_check: self.update_check.unwrap_or(cfg.update_check),
+            update_hook_url: self.update_hook_url.as_deref().and_then(non_empty),
+            update_hook_auth: self.update_hook_auth.as_deref().and_then(non_empty),
             soundfont: match &self.soundfont {
                 Some(s) => non_empty(s).map(PathBuf::from),
                 None => cfg.soundfont.clone(),
@@ -225,6 +235,14 @@ impl Saved {
             && !is_http(url)
         {
             return Err("The public address should start with http:// or https://".into());
+        }
+        if let Some(url) = &effective.update_hook_url
+            && !is_http(url)
+        {
+            return Err("The address to call for updates should start with http:// or https://".into());
+        }
+        if effective.update_hook_auth.as_deref().is_some_and(|a| reqwest::header::HeaderValue::from_str(a).is_err()) {
+            return Err("The Authorization header can't contain line breaks or other control characters".into());
         }
         if let Some(sf) = self.soundfont.as_deref().map(str::trim)
             && !sf.is_empty()

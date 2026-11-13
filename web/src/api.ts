@@ -601,6 +601,25 @@ export interface Settings {
   }
   max_workers: number
   clip: ImageSearchSetting
+  /** Called once a newer release is out and the server is idle. The Authorization header is never sent back. */
+  update_hook: { url: string; has_auth: boolean }
+}
+
+/** GET /api/admin/update: whether a newer release is out and what's keeping the server busy. */
+export interface UpdateStatus {
+  version: string
+  update: { version: string; url: string } | null
+  idle: boolean
+  busy: { work: string[]; queued: number; uploads: number }
+  hook: { set: boolean; last: UpdateHookCall | null }
+}
+
+export interface UpdateHookCall {
+  version: string
+  at: string
+  ok: boolean
+  /** The status that came back, or why nothing did. */
+  result: string
 }
 
 /** Image search (CLIP): its switch, its model, and how many pictures it has learned. */
@@ -636,6 +655,8 @@ export interface SettingsPatch {
   max_expand_mb?: number | null
   render?: boolean | null
   update_check?: boolean | null
+  update_hook_url?: string | null
+  update_hook_auth?: string | null
   guest_browsing?: boolean | null
   store_lookup?: boolean | null
   thumb_quality?: ThumbQuality | null
@@ -830,6 +851,9 @@ export const api = {
   dropTagAlias: (tag: string) => request<void>(`/api/tags/aliases?tag=${encodeURIComponent(tag)}`, { method: 'DELETE' }),
   activity: () => request<{ items: ActivityItem[] }>('/api/activity'),
   settings: () => request<Settings>('/api/admin/settings'),
+  updateStatus: () => request<UpdateStatus>('/api/admin/update'),
+  /** Call the update address now, to see that it's wired up. */
+  callUpdateHook: () => request<UpdateHookCall>('/api/admin/update/hook', { method: 'POST' }),
   saveSettings: (patch: SettingsPatch) =>
     request<Settings>('/api/admin/settings', {
       method: 'PUT',

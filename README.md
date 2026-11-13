@@ -84,7 +84,9 @@ A location is any folder the server can see, so in Docker, mount it into the con
 
 **Updating.** The header shows a badge when a newer release exists. Run `docker compose pull && docker compose up -d`
 to take it; Hoard upgrades its database on start, saving a copy in `/config/backups` first. Change the image tag to
-`:0.8` to get patch releases only.
+`:0.8` to get patch releases only. To update automatically without restarting Hoard mid-upload, give
+**Settings → Maintenance → Updates** an address to call: Hoard calls it once a release is out and nothing is going on
+(Watchtower's HTTP API, a Portainer webhook, a script; see [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md#updating)).
 
 **GPU (optional).** Hoard renders 3D model thumbnails on the GPU when it can see one, and in software when it can't.
 The packs page shows which (`GPU: ...` or `No GPU found`). To pass the GPU through, add the overlay for your
@@ -868,6 +870,8 @@ Requests that change something are marked 🔒: guests can't make them. A browse
 | GET | `/api/activity` | background work in progress |
 | GET | `/api/admin/jobs` | the job queue |
 | GET 🔒, PUT 🔒 | `/api/admin/settings` | Settings: read, or change some (`null` goes back to the flag) |
+| GET 🔒 | `/api/admin/update` | this version, the newer release if one is out, whether Hoard is idle and what's keeping it busy, the last call to the update address |
+| POST 🔒 | `/api/admin/update/hook` | call the update address now |
 | GET 🔒, PUT 🔒 | `/api/admin/https` | Settings → Connection: what's served, or change it: `{mode?: "off"\|"own"\|"custom", names?, http3?, redirect?, cert?, key?}` (tried before it's switched to; 400 with the reason if it doesn't work) |
 | POST 🔒 | `/api/admin/https/check` | `{cert, key}`: what a certificate covers and until when, and whether the key matches, without saving |
 | GET | `/api/https/ca.crt` | Hoard's certificate authority, to install on devices |

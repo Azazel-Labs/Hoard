@@ -69,6 +69,8 @@ pub(crate) fn router(state: &AppState) -> Router<AppState> {
         .route("/api/admin/issues/retry", post(crate::issues::retry))
         .route("/api/admin/issues/dismiss", post(crate::issues::dismiss))
         .route("/api/admin/settings", get(get_settings).put(put_settings))
+        .route("/api/admin/update", get(crate::updates::status_handler))
+        .route("/api/admin/update/hook", post(crate::updates::call_handler))
         .route("/api/admin/locations", get(locations::list_locations).post(locations::create_location))
         .route(
             "/api/admin/locations/{id}",
@@ -1855,6 +1857,11 @@ fn settings_json_sync(state: &AppState) -> Value {
                 "has_key": cfg.llm_api_key.is_some(),
                 "vision": cfg.llm_vision,
             },
+        },
+        // What's called when an update is out and Hoard is idle; the header itself is never sent back.
+        "update_hook": {
+            "url": now.update_hook_url.as_deref().unwrap_or(""),
+            "has_auth": now.update_hook_auth.is_some(),
         },
         // Server options that used to need a restart. `default` is what the flags (or env) give.
         "options": {

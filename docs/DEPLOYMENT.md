@@ -161,6 +161,45 @@ takes:
 
 The server asks GitHub every six hours whether a newer release exists, for the badge in the header; switch that off
 in Settings → Maintenance → Updates.
+
+### Updating automatically
+
+Anything that pulls the image and recreates the container can update Hoard. The catch is timing: a restart in the
+middle of an upload, a conversion or a backup cuts it short. So Hoard can say when to do it. Give
+**Settings → Maintenance → Updates** an address to call, and once a newer release is out and nothing is going on (no
+uploads, jobs, conversions, downloads or maintenance, two checks a minute apart) Hoard POSTs to it, with an
+`Authorization` header if you gave one and the release in a JSON body:
+
+```json
+{ "event": "update", "version": "1.0.36", "running": "1.0.35", "notes": "https://github.com/…/releases/tag/v1.0.36" }
+```
+
+It calls once per release; if the call fails, it tries again an hour later, up to six times. **Call it now** checks the
+wiring (whatever it's wired to runs). Jobs that are waiting for a later time, like the pauses between store-page
+lookups, don't count as busy.
+
+What it can call:
+
+- **Watchtower's HTTP API** ([nicholas-fedor/watchtower](https://github.com/nicholas-fedor/watchtower), the maintained
+  fork). Give Watchtower `WATCHTOWER_HTTP_API_ENDPOINTS: update`, a `WATCHTOWER_HTTP_API_TOKEN`, and
+  `WATCHTOWER_HTTP_API_PERIODIC_POLLS: "true"` if it should keep its own schedule too. The address is
+  `http://watchtower:8080/v1/update?container=hoard&async=true` and the header `Bearer <the token>`. Use `async=true`:
+  without it, Watchtower holds the request until the update is done.
+- **A Portainer webhook** on Hoard's stack or container, with re-pull image turned on. The token is part of the URL,
+  so leave the header empty.
+- **A script on the host** behind a webhook listener such as [adnanh/webhook](https://github.com/adnanh/webhook),
+  running `docker compose pull hoard && docker compose up -d hoard`. Check the header in the listener's rules.
+- **Home Assistant, n8n** or anything else that takes a webhook.
+
+Or ask instead of being called: a script with an access token (Settings → Account) can poll `GET /api/admin/update`
+and update once `update` is set and `idle` is true:
+
+```sh
+curl -s -H "Authorization: Bearer $HOARD_TOKEN" http://localhost:4627/api/admin/update \
+  | jq -e '.update and .idle' >/dev/null && docker compose pull hoard && docker compose up -d hoard
+```
+
+Run from cron every few minutes, that updates Hoard soon after each release, between jobs.
 If you build from a checkout, replace the `image:` line with `build: ..`.
 
 **Database upgrades.** On start, Hoard compares the database's schema version with its own. If the database is

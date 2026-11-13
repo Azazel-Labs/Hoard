@@ -257,7 +257,8 @@ software rasterizer (`apt install mesa-vulkan-drivers`). Without any adapter, ev
      plus skin and animation detection; a wgpu-rendered thumbnail for glTF/GLB/OBJ/FBX, and for STL, PLY and
      MagicaVoxel `.vox`, which Hoard reads itself (voxels keep their palette colors). Thumbnails are drawn the way the
      3D viewer shows the model: textures from the file, an OBJ's MTL, or found in the pack by name; tone mapping;
-     cut-outs and see-through surfaces; framed tightly from the same angle every time. Binary FBX geometry, node
+     cut-outs and see-through surfaces, glass included (glTF's transmission, where the metal parts of the same
+     material stay solid); framed tightly from the same angle every time. Binary FBX geometry, node
      transforms, materials and embedded or nearby textures are read natively (axis and unit settings become glTF's
      Y-up meters); ASCII FBX needs Blender.
    - 3D-print files (`.3mf`): meshes, components and build plates, read natively, with their colors: the 3MF

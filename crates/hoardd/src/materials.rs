@@ -14,6 +14,7 @@
 //! Detection runs after a pack is ingested or re-tagged, and as a `materials` job for packs from before it existed.
 
 use std::collections::{BTreeMap, BTreeSet, HashMap, HashSet};
+use std::path::{Path, PathBuf};
 
 use anyhow::{Context as _, Result};
 use hoard_core::{AssetKind, MaterialInfo, MaterialMap, TagSource};
@@ -579,6 +580,10 @@ pub(crate) fn detect_pack(state: &AppState, rt: &Handle, conn: &mut Connection, 
         tracing::warn!(pack = pack_id, error = %format!("{e:#}"), "could not read images' provenance");
     }
     let n = find_materials(state, rt, conn, pack_id)?;
+    // Before dressing, which then redraws the dressed ones among them.
+    if let Err(e) = redraw_glass(state, rt, conn, pack_id) {
+        tracing::warn!(pack = pack_id, error = %format!("{e:#}"), "could not redraw thumbnails of models with glass");
+    }
     if let Err(e) = dress_models(state, rt, conn, pack_id) {
         tracing::warn!(pack = pack_id, error = %format!("{e:#}"), "could not put materials on model thumbnails");
     }
@@ -825,21 +830,7 @@ fn dress_models(state: &AppState, rt: &Handle, conn: &Connection, pack_id: &str)
     for (id, ext, color) in todo {
         let dir = work.path().join(&id);
         let dressed = (|| -> Result<Option<Vec<u8>>> {
-            // The model with the files it needs (a glTF's buffers and images, an OBJ's MTL), where the pack has them.
-            let files = db::bundle_files(conn, &db::dependency_closure(conn, &id, false)?)?;
-            let mut file = None;
-            for f in &files {
-                let Some(rel) = crate::ingest::safe_rel_path(&f.path) else { continue };
-                let dest = dir.join(rel);
-                if let Some(parent) = dest.parent() {
-                    std::fs::create_dir_all(parent)?;
-                }
-                rt.block_on(state.blobs.download_to(&f.hash, &dest))?;
-                if f.id == id {
-                    file = Some(dest);
-                }
-            }
-            let file = file.context("the model's file is missing")?;
+            let file = fetch_model(state, rt, conn, &id, &dir)?;
             if matches!(ext.as_str(), "glb" | "gltf") {
                 let color = rt.block_on(state.blobs.read_all(&color))?;
                 return crate::analyze::gltf_thumb_dressed(&file, &color);
@@ -877,6 +868,91 @@ fn dress_models(state: &AppState, rt: &Handle, conn: &Connection, pack_id: &str)
     }
     if done > 0 {
         tracing::info!(pack = pack_id, models = done, "model thumbnails redrawn with their materials");
+    }
+    Ok(done)
+}
+
+/// A model's file with the files it needs (a glTF's buffers and images, an OBJ's MTL), where the pack has them,
+/// downloaded into `dir`; the model's own file's path.
+fn fetch_model(state: &AppState, rt: &Handle, conn: &Connection, id: &str, dir: &Path) -> Result<PathBuf> {
+    let files = db::bundle_files(conn, &db::dependency_closure(conn, id, false)?)?;
+    let mut file = None;
+    for f in &files {
+        let Some(rel) = crate::ingest::safe_rel_path(&f.path) else { continue };
+        let dest = dir.join(rel);
+        if let Some(parent) = dest.parent() {
+            std::fs::create_dir_all(parent)?;
+        }
+        rt.block_on(state.blobs.download_to(&f.hash, &dest))?;
+        if f.id == id {
+            file = Some(dest);
+        }
+    }
+    file.context("the model's file is missing")
+}
+
+/// Whether a glTF or GLB file has glass (`KHR_materials_transmission`), from its JSON alone.
+async fn uses_transmission(state: &AppState, hash: &str, ext: &str) -> Result<bool> {
+    const NEEDLE: &[u8] = b"KHR_materials_transmission";
+    const MOST: u64 = 64 << 20;
+    let json = if ext == "glb" {
+        // 12-byte header, then the JSON chunk's length and type.
+        let head = state.blobs.head(hash, 20).await?;
+        let Some(len) = head.get(12..16).filter(|_| head.starts_with(b"glTF")) else { return Ok(false) };
+        let len = u64::from(u32::from_le_bytes(len.try_into()?));
+        state.blobs.head(hash, 20 + len.min(MOST)).await?
+    } else {
+        state.blobs.head(hash, MOST).await?
+    };
+    Ok(json.windows(NEEDLE.len()).any(|w| w == NEEDLE))
+}
+
+/// glTF and GLB models drawn by the server before its renderer knew glass (marked `reglass` on upgrade), drawn again
+/// when they have some. One a material dressed is left for [`dress_models`] to redraw.
+fn redraw_glass(state: &AppState, rt: &Handle, conn: &Connection, pack_id: &str) -> Result<usize> {
+    let todo: Vec<(String, String, String, bool)> = conn
+        .prepare(
+            "SELECT id, ext, blob_hash, json_extract(meta, '$.thumb_dressed') IS NOT NULL FROM assets
+              WHERE pack_id = ?1 AND kind = 'model' AND json_extract(meta, '$.reglass') IS NOT NULL",
+        )?
+        .query_map([pack_id], |r| Ok((r.get(0)?, r.get(1)?, r.get(2)?, r.get(3)?)))?
+        .collect::<rusqlite::Result<_>>()?;
+    if todo.is_empty() || crate::analyze::renderer().is_none() {
+        return Ok(0);
+    }
+    std::fs::create_dir_all(state.cfg.tmp_dir())?;
+    let work = tempfile::Builder::new().prefix("glass-").tempdir_in(state.cfg.tmp_dir())?;
+    let mut done = 0;
+    for (id, ext, blob, dressed) in todo {
+        let dir = work.path().join(&id);
+        let drawn = (|| -> Result<Option<Vec<u8>>> {
+            if !rt.block_on(uses_transmission(state, &blob, &ext))? {
+                return Ok(None);
+            }
+            if dressed {
+                conn.execute("UPDATE assets SET meta = json_remove(meta, '$.thumb_dressed') WHERE id = ?1", [&id])?;
+                return Ok(None);
+            }
+            let file = fetch_model(state, rt, conn, &id, &dir)?;
+            crate::analyze::gltf_thumb(&file)
+        })();
+        std::fs::remove_dir_all(&dir).ok();
+        let redrawn = match drawn {
+            Ok(Some(thumb)) => replace_thumb(state, rt, conn, &id, thumb, "json_remove(meta, '$.reglass')")?,
+            Ok(None) => false,
+            Err(e) => {
+                tracing::debug!(asset = %id, error = %format!("{e:#}"), "model thumbnail kept without its glass");
+                false
+            }
+        };
+        if redrawn {
+            done += 1;
+        } else {
+            conn.execute("UPDATE assets SET meta = json_remove(meta, '$.reglass') WHERE id = ?1", [&id])?;
+        }
+    }
+    if done > 0 {
+        tracing::info!(pack = pack_id, models = done, "model thumbnails redrawn with their glass see-through");
     }
     Ok(done)
 }

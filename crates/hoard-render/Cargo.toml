@@ -13,7 +13,7 @@ workspace = true
 [dependencies]
 anyhow.workspace = true
 wgpu = "30"
-gltf = { version = "1.4", features = ["utils", "import", "KHR_materials_emissive_strength"] }
+gltf = { version = "1.4", features = ["utils", "import", "KHR_materials_emissive_strength", "KHR_materials_transmission"] }
 glam = { version = "0.34", features = ["bytemuck"] }
 bytemuck = { version = "1", features = ["derive"] }
 pollster = "1"

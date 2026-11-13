@@ -2,8 +2,8 @@
 //! the server makes.)
 //!
 //! Deliberately small: bakes every mesh primitive of the default scene into world space, frames the model tightly
-//! from a 3/4 angle, and shades with base color (factor × texture, with alpha cut-outs and blending) under a soft
-//! sky/ground light and a key light over the camera's shoulder, tone mapped like the browser viewer (Khronos PBR
+//! from a 3/4 angle, and shades with base color (factor × texture, with alpha cut-outs and blending; glass, glTF's
+//! transmission, as a mostly clear surface that shows edges and a highlight) under a soft sky/ground light and a key light over the camera's shoulder, tone mapped like the browser viewer (Khronos PBR
 //! Neutral), so a thumbnail looks like the model does when opened. No skinning or morph targets (meshes render in
 //! bind pose).
 //!
@@ -27,19 +27,23 @@ const DEPTH_FORMAT: wgpu::TextureFormat = wgpu::TextureFormat::Depth32Float;
 const FILL: f32 = 0.9;
 
 const SHADER: &str = "
-struct Globals { view_proj: mat4x4<f32>, light_dir: vec4<f32> };
-// flags: x = has a texture, y = alpha cut-off (0 for none), z = blended.
-struct Material { color: vec4<f32>, flags: vec4<f32> };
+struct Globals { view_proj: mat4x4<f32>, light_dir: vec4<f32>, eye: vec4<f32> };
+// flags: x = has a texture, y = alpha cut-off (0 for none), z = blended, w = which part of a glass surface this
+// draw is (0 all of it, 1 what lets no light through, 2 what does).
+// glass: x = transmission (0 to 1), y = roughness, z = metalness (both times the metallic-roughness texture).
+struct Material { color: vec4<f32>, flags: vec4<f32>, glass: vec4<f32> };
 
 @group(0) @binding(0) var<uniform> g: Globals;
 @group(1) @binding(0) var<uniform> m: Material;
 @group(1) @binding(1) var tex: texture_2d<f32>;
 @group(1) @binding(2) var samp: sampler;
+@group(1) @binding(3) var mr_tex: texture_2d<f32>;
 
 struct VOut {
     @builtin(position) pos: vec4<f32>,
     @location(0) n: vec3<f32>,
     @location(1) uv: vec2<f32>,
+    @location(2) world: vec3<f32>,
 };
 
 @vertex
@@ -48,6 +52,7 @@ fn vs(@location(0) p: vec3<f32>, @location(1) n: vec3<f32>, @location(2) uv: vec
     o.pos = g.view_proj * vec4<f32>(p, 1.0);
     o.n = n;
     o.uv = uv;
+    o.world = p;
     return o;
 }
 
@@ -69,17 +74,38 @@ fn neutral(v: vec3<f32>) -> vec3<f32> {
 @fragment
 fn fs(i: VOut, @builtin(front_facing) front: bool) -> @location(0) vec4<f32> {
     let sampled = textureSample(tex, samp, i.uv);
+    let mr = textureSample(mr_tex, samp, i.uv);
     let base = m.color * select(vec4<f32>(1.0), sampled, m.flags.x > 0.5);
     if (m.flags.y > 0.0 && base.a < m.flags.y) { discard; }
+    // Metal lets no light through, whatever the transmission says (a lantern's brass and glass can share one
+    // material and one texture).
+    let t = m.glass.x * (1.0 - clamp(m.glass.z * mr.b, 0.0, 1.0));
+    let glassy = t > 0.05;
+    if ((m.flags.w == 1.0 && glassy) || (m.flags.w == 2.0 && !glassy)) { discard; }
     // Both sides of a face are drawn; the back lights as if it faced the camera.
     let n = normalize(select(-i.n, i.n, front));
     let key = max(dot(n, g.light_dir.xyz), 0.0);
     // A soft room, bright overhead and darker toward the floor so no side goes black (the browser's environment
     // light), plus the key light.
     let room = mix(0.5, 0.95, 0.5 + 0.5 * n.y);
-    let rgb = neutral(base.rgb * (room + 0.6 * key));
+    var rgb = neutral(base.rgb * (room + 0.6 * key));
+    var a = select(1.0, base.a, m.flags.z > 0.5);
+    // Glass: light passes through, so the surface shows what's behind it, as much as its colour lets through (dark
+    // glass hides more, as the browser's viewer tints what's behind by it) and less the rougher (frosted) it is.
+    // What gives it away is the edge, where it reflects (Fresnel), and the key light's highlight. No refraction: at
+    // thumbnail size, this reads as glass.
+    if (glassy) {
+        let rough = clamp(m.glass.y * mr.g, 0.0, 1.0);
+        let v = normalize(g.eye.xyz - i.world);
+        let fresnel = 0.04 + 0.96 * pow(1.0 - abs(dot(n, v)), 5.0);
+        let h = normalize(v + g.light_dir.xyz);
+        let shine = pow(max(dot(n, h), 0.0), mix(256.0, 8.0, rough)) * (1.0 - 0.8 * rough);
+        let through = max(base.r, max(base.g, base.b)) * (1.0 - smoothstep(0.3, 0.9, rough));
+        let solid = clamp(1.0 - 0.85 * through + fresnel + shine, 0.0, 1.0);
+        a = mix(a, solid * base.a, t);
+        rgb = mix(rgb, vec3<f32>(1.0), clamp(shine * t, 0.0, 1.0));
+    }
     // Premultiplied, so blended surfaces and antialiased edges composite right; undone on readback.
-    let a = select(1.0, base.a, m.flags.z > 0.5);
     return vec4<f32>(rgb * a, a);
 }
 ";
@@ -97,6 +123,7 @@ struct Vertex {
 struct Globals {
     view_proj: [[f32; 4]; 4],
     light_dir: [f32; 4],
+    eye: [f32; 4],
 }
 
 #[repr(C)]
@@ -104,6 +131,7 @@ struct Globals {
 struct MaterialUniform {
     color: [f32; 4],
     flags: [f32; 4],
+    glass: [f32; 4],
 }
 
 pub mod sphere;
@@ -125,6 +153,12 @@ struct Draw {
     color: [f32; 4],
     texture: Option<usize>,
     alpha: Alpha,
+    /// How much light passes through (glTF's `KHR_materials_transmission`): glass, water, clear plastic.
+    transmission: f32,
+    metallic: f32,
+    roughness: f32,
+    /// The metallic-roughness texture (roughness in green, metalness in blue), as an image index.
+    metallic_roughness: Option<usize>,
 }
 
 /// GPU buffers for one draw.
@@ -133,6 +167,9 @@ struct Gpu {
     ib: wgpu::Buffer,
     count: u32,
     bg: wgpu::BindGroup,
+    /// For a glass surface that isn't all glass: its see-through part, drawn with the blended surfaces (`bg` draws
+    /// the rest with the solid ones).
+    bg_clear: Option<wgpu::BindGroup>,
 }
 
 /// The default thumbnail camera: 3/4 view from the front-right, slightly above.
@@ -236,6 +273,16 @@ impl Renderer {
                     ty: wgpu::BindingType::Sampler(wgpu::SamplerBindingType::Filtering),
                     count: None,
                 },
+                wgpu::BindGroupLayoutEntry {
+                    binding: 3,
+                    visibility: wgpu::ShaderStages::FRAGMENT,
+                    ty: wgpu::BindingType::Texture {
+                        sample_type: wgpu::TextureSampleType::Float { filterable: true },
+                        view_dimension: wgpu::TextureViewDimension::D2,
+                        multisampled: false,
+                    },
+                    count: None,
+                },
             ],
         });
         let layout = device.create_pipeline_layout(&wgpu::PipelineLayoutDescriptor {
@@ -289,7 +336,7 @@ impl Renderer {
             min_filter: wgpu::FilterMode::Linear,
             ..Default::default()
         });
-        let white = upload_rgba(&device, &queue, 1, 1, &[255, 255, 255, 255]);
+        let white = upload_rgba(&device, &queue, 1, 1, &[255, 255, 255, 255], true);
         Ok(Self {
             device,
             queue,
@@ -393,11 +440,15 @@ impl Renderer {
             entries: &[wgpu::BindGroupEntry { binding: 0, resource: globals_buf.as_entire_binding() }],
         });
 
-        // Upload only the images actually used as base color.
+        // Upload only the images actually used: as base color, and the metallic-roughness maps of glass (linear).
         let mut textures: Vec<Option<wgpu::TextureView>> = (0..images.len()).map(|_| None).collect();
-        for draw in draws {
-            if let Some(i) = draw.texture
-                && textures.get(i).is_some_and(Option::is_none)
+        let mut data_textures: Vec<Option<wgpu::TextureView>> = (0..images.len()).map(|_| None).collect();
+        let uses = draws.iter().flat_map(|d| {
+            [d.texture.map(|i| (i, true)), d.metallic_roughness.filter(|_| d.transmission > 0.0).map(|i| (i, false))]
+        });
+        for (i, srgb) in uses.flatten() {
+            let slot = if srgb { &mut textures } else { &mut data_textures };
+            if slot.get(i).is_some_and(Option::is_none)
                 && let Some(Some(img)) = images.get(i)
             {
                 // No mipmaps here, and the GPU may take no more than 2048 px: a big texture is scaled down first, which
@@ -411,7 +462,7 @@ impl Renderer {
                 } else {
                     img
                 };
-                textures[i] = Some(upload_rgba(d, &self.queue, img.width(), img.height(), img.as_raw()));
+                slot[i] = Some(upload_rgba(d, &self.queue, img.width(), img.height(), img.as_raw(), srgb));
             }
         }
 
@@ -419,34 +470,26 @@ impl Renderer {
             .iter()
             .map(|draw| {
                 let tex = draw.texture.and_then(|i| textures[i].as_ref());
+                let mr = draw.metallic_roughness.and_then(|i| data_textures[i].as_ref());
                 let (cutoff, blend) = match draw.alpha {
                     Alpha::Opaque => (0.0, 0.0),
                     Alpha::Mask(c) => (c.max(0.001), 0.0),
                     // Nearly clear texels of a blended surface draw nothing (and so hide nothing behind them).
                     Alpha::Blend => (0.02, 1.0),
                 };
-                let mat = MaterialUniform {
-                    color: draw.color,
-                    flags: [f32::from(u8::from(tex.is_some())), cutoff, blend, 0.0],
-                };
-                let mat_buf = d.create_buffer_init(&wgpu::util::BufferInitDescriptor {
-                    label: Some("material"),
-                    contents: bytemuck::bytes_of(&mat),
-                    usage: wgpu::BufferUsages::UNIFORM,
-                });
-                Gpu {
-                    vb: d.create_buffer_init(&wgpu::util::BufferInitDescriptor {
-                        label: Some("vertices"),
-                        contents: bytemuck::cast_slice(&draw.vertices),
-                        usage: wgpu::BufferUsages::VERTEX,
-                    }),
-                    ib: d.create_buffer_init(&wgpu::util::BufferInitDescriptor {
-                        label: Some("indices"),
-                        contents: bytemuck::cast_slice(&draw.indices),
-                        usage: wgpu::BufferUsages::INDEX,
-                    }),
-                    count: draw.indices.len() as u32,
-                    bg: d.create_bind_group(&wgpu::BindGroupDescriptor {
+                let split = draw.transmission > 0.0 && draw.alpha != Alpha::Blend;
+                let bind = |cutoff: f32, blend: f32, part: f32| {
+                    let mat = MaterialUniform {
+                        color: draw.color,
+                        flags: [f32::from(u8::from(tex.is_some())), cutoff, blend, part],
+                        glass: [draw.transmission, draw.roughness, draw.metallic, 0.0],
+                    };
+                    let mat_buf = d.create_buffer_init(&wgpu::util::BufferInitDescriptor {
+                        label: Some("material"),
+                        contents: bytemuck::bytes_of(&mat),
+                        usage: wgpu::BufferUsages::UNIFORM,
+                    });
+                    d.create_bind_group(&wgpu::BindGroupDescriptor {
                         label: Some("material"),
                         layout: &self.material_layout,
                         entries: &[
@@ -459,8 +502,28 @@ impl Renderer {
                                 binding: 2,
                                 resource: wgpu::BindingResource::Sampler(&self.sampler),
                             },
+                            wgpu::BindGroupEntry {
+                                binding: 3,
+                                resource: wgpu::BindingResource::TextureView(mr.unwrap_or(&self.white)),
+                            },
                         ],
+                    })
+                };
+                Gpu {
+                    vb: d.create_buffer_init(&wgpu::util::BufferInitDescriptor {
+                        label: Some("vertices"),
+                        contents: bytemuck::cast_slice(&draw.vertices),
+                        usage: wgpu::BufferUsages::VERTEX,
                     }),
+                    ib: d.create_buffer_init(&wgpu::util::BufferInitDescriptor {
+                        label: Some("indices"),
+                        contents: bytemuck::cast_slice(&draw.indices),
+                        usage: wgpu::BufferUsages::INDEX,
+                    }),
+                    count: draw.indices.len() as u32,
+                    bg: bind(cutoff, blend, if split { 1.0 } else { 0.0 }),
+                    // Glass is see-through whatever its alpha mode says.
+                    bg_clear: split.then(|| bind(0.02, 1.0, 2.0)),
                 }
             })
             .collect();
@@ -517,15 +580,17 @@ impl Renderer {
             });
             pass.set_bind_group(0, &globals_bg, &[]);
             // Solid surfaces first, then see-through ones, farthest first.
-            let (solid, mut clear): (Vec<usize>, Vec<usize>) =
-                (0..draws.len()).partition(|&i| draws[i].alpha != Alpha::Blend);
+            let solid: Vec<usize> = (0..draws.len()).filter(|&i| draws[i].alpha != Alpha::Blend).collect();
+            let mut clear: Vec<usize> =
+                (0..draws.len()).filter(|&i| draws[i].alpha == Alpha::Blend || gpu[i].bg_clear.is_some()).collect();
             let nearness = |i: usize| -(centroid(&draws[i]) - eye).length_squared();
             clear.sort_by(|&a, &b| nearness(a).total_cmp(&nearness(b)));
-            for (pipeline, list) in [(&self.pipeline, &solid), (&self.blend_pipeline, &clear)] {
+            for (pipeline, list, clear) in [(&self.pipeline, &solid, false), (&self.blend_pipeline, &clear, true)] {
                 pass.set_pipeline(pipeline);
                 for &i in list {
                     let g = &gpu[i];
-                    pass.set_bind_group(1, &g.bg, &[]);
+                    let bg = if clear { g.bg_clear.as_ref().unwrap_or(&g.bg) } else { &g.bg };
+                    pass.set_bind_group(1, bg, &[]);
                     pass.set_vertex_buffer(0, g.vb.slice(..));
                     pass.set_index_buffer(g.ib.slice(..), wgpu::IndexFormat::Uint32);
                     pass.draw_indexed(0..g.count, 0, 0..1);
@@ -609,7 +674,12 @@ fn camera(draws: &[Draw], dir: Vec3) -> Option<(Globals, Vec3)> {
     // wgpu clip space is Z in [0, 1], Y up: the "directx" convention.
     let near = (dist - hi.z).max(radius * 0.001) * 0.5;
     let proj = glam::camera::rh::proj::directx::perspective(fov, 1.0, near, dist - lo.z + radius);
-    Some((Globals { view_proj: (proj * view).to_cols_array_2d(), light_dir: [light.x, light.y, light.z, 0.0] }, eye))
+    let globals = Globals {
+        view_proj: (proj * view).to_cols_array_2d(),
+        light_dir: [light.x, light.y, light.z, 0.0],
+        eye: [eye.x, eye.y, eye.z, 1.0],
+    };
+    Some((globals, eye))
 }
 
 /// The largest texture side uploaded for a render.
@@ -620,16 +690,24 @@ fn scaled(side: u32, k: f64) -> u32 {
     ((f64::from(side) * k).round() as u32).max(1)
 }
 
-fn upload_rgba(device: &wgpu::Device, queue: &wgpu::Queue, w: u32, h: u32, rgba: &[u8]) -> wgpu::TextureView {
+/// A texture from 8-bit RGBA: colour (`srgb`) or data such as a metallic-roughness map.
+fn upload_rgba(
+    device: &wgpu::Device,
+    queue: &wgpu::Queue,
+    w: u32,
+    h: u32,
+    rgba: &[u8],
+    srgb: bool,
+) -> wgpu::TextureView {
     let tex = device.create_texture_with_data(
         queue,
         &wgpu::TextureDescriptor {
-            label: Some("base color"),
+            label: Some(if srgb { "color" } else { "data" }),
             size: wgpu::Extent3d { width: w, height: h, depth_or_array_layers: 1 },
             mip_level_count: 1,
             sample_count: 1,
             dimension: wgpu::TextureDimension::D2,
-            format: wgpu::TextureFormat::Rgba8UnormSrgb,
+            format: if srgb { wgpu::TextureFormat::Rgba8UnormSrgb } else { wgpu::TextureFormat::Rgba8Unorm },
             usage: wgpu::TextureUsages::TEXTURE_BINDING,
             view_formats: &[],
         },
@@ -735,6 +813,10 @@ fn bake_mesh(mesh: &gltf::Mesh<'_>, world: Mat4, buffers: &[gltf::buffer::Data],
                 gltf::material::AlphaMode::Mask => Alpha::Mask(material.alpha_cutoff().unwrap_or(0.5)),
                 gltf::material::AlphaMode::Blend => Alpha::Blend,
             },
+            transmission: material.transmission().map_or(0.0, |t| t.transmission_factor().clamp(0.0, 1.0)),
+            metallic: pbr.metallic_factor(),
+            roughness: pbr.roughness_factor(),
+            metallic_roughness: pbr.metallic_roughness_texture().map(|t| t.texture().source().index()),
         });
     }
 }
@@ -764,4 +846,33 @@ fn bounds(draws: &[Draw]) -> Option<(Vec3, f32)> {
     }
     let center = (min + max) / 2.0;
     Some((center, ((max - min).length() / 2.0).max(1e-4)))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn glass_is_read_from_transmission() {
+        // One triangle, three positions (36 bytes) in an embedded buffer, worn by a glass material.
+        let data = "AAAAAAAAAAAAAAAAAACAPwAAAAAAAAAAAAAAAAAAgD8AAAAA";
+        let gltf = format!(
+            r#"{{"asset":{{"version":"2.0"}},"extensionsUsed":["KHR_materials_transmission"],
+            "scene":0,"scenes":[{{"nodes":[0]}}],"nodes":[{{"mesh":0}}],
+            "meshes":[{{"primitives":[{{"attributes":{{"POSITION":0}},"material":0}}]}}],
+            "materials":[{{"pbrMetallicRoughness":{{"metallicFactor":0,"roughnessFactor":0.1}},
+              "extensions":{{"KHR_materials_transmission":{{"transmissionFactor":0.9}}}}}}],
+            "accessors":[{{"bufferView":0,"componentType":5126,"count":3,"type":"VEC3",
+              "min":[0,0,0],"max":[1,1,0]}}],
+            "bufferViews":[{{"buffer":0,"byteLength":36}}],
+            "buffers":[{{"byteLength":36,"uri":"data:application/octet-stream;base64,{data}"}}]}}"#
+        );
+        let (doc, buffers, _) = gltf::import_slice(gltf.as_bytes()).unwrap();
+        let draws = bake(&doc, &buffers);
+        assert_eq!(draws.len(), 1);
+        let d = &draws[0];
+        assert!((d.transmission - 0.9).abs() < 1e-6);
+        assert!(d.metallic.abs() < 1e-6 && (d.roughness - 0.1).abs() < 1e-6);
+        assert_eq!(d.alpha, Alpha::Opaque, "the alpha mode stays; the renderer splits off the clear part");
+    }
 }

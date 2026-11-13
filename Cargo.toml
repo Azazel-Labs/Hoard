@@ -5,7 +5,7 @@ members = ["crates/hoard-core", "crates/hoard-unreal", "crates/hoardd", "crates/
 [workspace.package]
 # Only what a local build reports. Releases are git tags (auto-release.yml tags every push to main that passes ci) and
 # builds take their version from the tag (HOARD_VERSION), so this isn't bumped.
-version = "1.0.1"
+version = "1.1.0"
 edition = "2024"
 rust-version = "1.99"
 license = "MIT-0"

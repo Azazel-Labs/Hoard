@@ -171,7 +171,7 @@ uploads, jobs, conversions, downloads or maintenance, two checks a minute apart)
 `Authorization` header if you gave one and the release in a JSON body:
 
 ```json
-{ "event": "update", "version": "1.0.36", "running": "1.0.35", "notes": "https://github.com/…/releases/tag/v1.0.36" }
+{ "event": "update", "version": "1.1.0", "running": "1.0.38", "notes": "https://github.com/…/releases/tag/v1.1.0" }
 ```
 
 It calls once per release; if the call fails, it tries again an hour later, up to six times. **Call it now** checks the

@@ -117,7 +117,7 @@ const showViews = ref(false)
 const hasViews = computed(() => props.asset.derivatives.includes('views'))
 
 const editingName = ref(false)
-const nameDraft = ref('')
+const nameEl = ref<HTMLElement | null>(null)
 const newTag = ref('')
 const suggestions = ref<Facet[]>([])
 const copied = ref('')
@@ -222,8 +222,7 @@ const asLabel = computed(() => {
   const st = asState.value
   if (st?.state === 'converting') return st.progress !== undefined ? `Converting… ${Math.round(st.progress * 100)}%` : 'Converting…'
   if (st) return 'Queued…'
-  const f = asFormat.value || sameFormat.value || ''
-  return `Download .${f === 'gltf' ? 'gltf.zip' : f}`
+  return 'Download'
 })
 const showAs = computed(() => asFormats.value.length > 0 || (sameFormat.value !== null && sizeChoices.value.length > 0))
 
@@ -336,15 +335,54 @@ async function removeTag(tag: string) {
   if (await patch({ remove_tags: [tag] })) showOk(`Removed ${tag}`, { label: 'Undo', run: () => void patch({ add_tags: [tag] }) })
 }
 
-function startRename() {
-  nameDraft.value = props.asset.name
+// Renaming edits the heading itself, so nothing moves: the text just becomes editable where it is.
+function startRename(ev?: MouseEvent) {
+  if (editingName.value) return
   editingName.value = true
-  nextTick(() => document.getElementById('asset-name-input')?.focus())
+  void nextTick(() => {
+    const el = nameEl.value
+    const sel = getSelection()
+    if (!el || !sel) return
+    el.focus()
+    // A click puts the caret where it landed; from the keyboard, the whole name is selected to type over.
+    const at = ev ? caretAt(ev.clientX, ev.clientY) : null
+    const range = document.createRange()
+    if (at && el.contains(at.node)) range.setStart(at.node, at.offset)
+    else range.selectNodeContents(el)
+    sel.removeAllRanges()
+    sel.addRange(range)
+  })
 }
-async function saveName() {
+function caretAt(x: number, y: number): { node: Node; offset: number } | null {
+  if (document.caretPositionFromPoint) {
+    const p = document.caretPositionFromPoint(x, y)
+    return p && { node: p.offsetNode, offset: p.offset }
+  }
+  const r = document.caretRangeFromPoint?.(x, y)
+  return r ? { node: r.startContainer, offset: r.startOffset } : null
+}
+async function endRename(save: boolean) {
+  const el = nameEl.value
+  if (!editingName.value || !el) return
   editingName.value = false
-  const name = nameDraft.value.trim()
-  if (name && name !== props.asset.name) await patch({ name })
+  getSelection()?.removeAllRanges()
+  const { id, name: was } = props.asset
+  const name = (el.textContent ?? '').replace(/\s+/g, ' ').trim()
+  const keep = save && name !== '' && name !== was
+  el.textContent = keep ? name : was
+  if (keep && !(await patch({ name })) && props.asset.id === id) el.textContent = props.asset.name
+}
+function onNameKey(e: KeyboardEvent) {
+  if (e.key === 'Enter') {
+    e.preventDefault()
+    if (editingName.value) void endRename(true)
+    else startRename()
+  } else if (e.key === 'Escape' && editingName.value) {
+    // Gives up the rename; the panel stays open.
+    e.preventDefault()
+    e.stopPropagation()
+    void endRename(false)
+  }
 }
 
 // Descriptions: a person's own (editable here), the AI's, the file's embedded text and the pack's store page.
@@ -566,17 +604,12 @@ onBeforeUnmount(() => unswipe())
 <template>
   <aside ref="root" class="detail" :style="{ '--kind': `var(--k-${asset.kind})` }" aria-label="Asset details">
     <header>
-      <div class="titlebar">
-        <input
-          v-if="editingName"
-          id="asset-name-input"
-          v-model="nameDraft"
-          class="field name-input"
-          @keydown.enter="saveName"
-          @keydown.esc="editingName = false"
-          @blur="saveName"
-        />
-        <h2 v-else :title="'Click to rename'" @click="startRename">{{ asset.name }}</h2>
+      <div class="topbar">
+        <p class="where">
+          <span>{{ asset.category ?? asset.kind }}</span>
+          <span class="sep" aria-hidden="true">in</span>
+          <span class="pack">{{ asset.pack_name }}</span>
+        </p>
         <div class="nav">
           <button class="btn ghost icon" type="button" aria-label="Previous asset" :disabled="!position?.hasPrev" @click="$emit('step', -1)">
             <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M10 3 5 8l5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" /></svg>
@@ -590,11 +623,20 @@ onBeforeUnmount(() => unswipe())
           </button>
         </div>
       </div>
-      <p class="where">
-        <span>{{ asset.category ?? asset.kind }}</span>
-        <span class="sep" aria-hidden="true">in</span>
-        <span>{{ asset.pack_name }}</span>
-      </p>
+      <h2
+        ref="nameEl"
+        class="name"
+        :class="{ editing: editingName }"
+        tabindex="0"
+        spellcheck="false"
+        :contenteditable="editingName ? 'plaintext-only' : undefined"
+        :title="editingName ? undefined : 'Click to rename'"
+        :aria-label="editingName ? 'Name' : undefined"
+        @click="startRename($event)"
+        @keydown="onNameKey"
+        @blur="endRename(true)"
+        v-text="asset.name"
+      />
     </header>
 
     <div v-if="isModel && showViews" class="preview checker">
@@ -952,27 +994,36 @@ onBeforeUnmount(() => unswipe())
     </section>
 
     <footer>
-      <template v-if="isMaterial && needs.length">
-        <a class="btn primary" :href="bundleUrl(asset)">Download all {{ needs.length }} {{ needs.length === 1 ? 'map' : 'maps' }} (.zip)
-          <span class="bytes">{{ humanBytes(bundleBytes) }}</span>
+      <div class="get">
+        <a v-if="isMaterial && needs.length" class="btn primary whole" :href="bundleUrl(asset)">
+          <span>Download all {{ needs.length }} {{ needs.length === 1 ? 'map' : 'maps' }}</span>
+          <span class="bytes">.zip · {{ humanBytes(bundleBytes) }}</span>
         </a>
-      </template>
-      <template v-else-if="needs.length || anims.length">
-        <a class="btn primary" :href="bundleUrl(asset, withAnimations)">
-          Download with {{ linkedCount }} linked {{ linkedCount === 1 ? 'file' : 'files' }} (.zip)
-          <span class="bytes">{{ humanBytes(bundleBytes) }}</span>
+        <template v-else-if="needs.length || anims.length">
+          <a class="btn primary whole" :href="bundleUrl(asset, withAnimations)">
+            <span>Download with {{ linkedCount }} linked {{ linkedCount === 1 ? 'file' : 'files' }}</span>
+            <span class="bytes">.zip · {{ humanBytes(bundleBytes) }}</span>
+          </a>
+          <a class="btn" :href="fileUrl(asset, true)" title="Just this file, without the files it uses">
+            <span>This file only</span>
+            <span class="bytes">.{{ asset.ext }} · {{ humanBytes(asset.size) }}</span>
+          </a>
+        </template>
+        <a v-else class="btn primary whole" :href="fileUrl(asset, true)">
+          <span>Download</span>
+          <span class="bytes">.{{ asset.ext }} · {{ humanBytes(asset.size) }}</span>
         </a>
-        <label v-if="anims.length" class="animcheck"><input v-model="withAnimations" type="checkbox" /> Include animations</label>
-        <a class="btn" :href="fileUrl(asset, true)">This file only <span class="bytes">{{ humanBytes(asset.size) }}</span></a>
-      </template>
-      <a v-else class="btn primary" :href="fileUrl(asset, true)">Download <span class="bytes">{{ humanBytes(asset.size) }}</span></a>
+      </div>
+      <label v-if="anims.length && !(isMaterial && needs.length)" class="animcheck">
+        <input v-model="withAnimations" type="checkbox" /> Include animations in the .zip
+      </label>
       <div v-if="showAs" class="asrow">
         <label for="as-format">Download as</label>
         <select id="as-format" v-model="asFormat" class="field">
           <option v-if="sameFormat" value="">{{ asset.ext.toUpperCase() }} (original format)</option>
           <option v-for="f in asFormats" :key="f.format" :value="f.format">{{ f.label }}</option>
         </select>
-        <select v-if="asResizable && sizeChoices.length" v-model.number="asMax" class="field" aria-label="Size">
+        <select v-if="asResizable && sizeChoices.length" v-model.number="asMax" class="field size" aria-label="Size">
           <option :value="0">Full size</option>
           <option v-for="m in sizeChoices" :key="m" :value="m">Up to {{ m }} px</option>
         </select>
@@ -980,16 +1031,17 @@ onBeforeUnmount(() => unswipe())
         <span v-else class="ashint">Pick a size or another format</span>
         <span v-if="asError" class="aserror" role="alert">{{ asError }}</span>
       </div>
-      <button class="btn" type="button" @click="copy(tomlSnippet, 'toml')">Copy hoard.toml entry</button>
-      <button class="btn ghost" type="button" @click="copy(asset.id, 'id')">Copy ID</button>
-      <span class="copied" role="status">{{ copied ? `Copied ${copied}` : '' }}</span>
-      <button v-if="!asset.archived_at" class="btn danger archive" type="button" title="Out of search until it's restored or deleted for good, from the Archive" @click="emit('archive')">Archive</button>
+      <div class="tools">
+        <button class="btn ghost" type="button" @click="copy(tomlSnippet, 'toml')">Copy hoard.toml entry</button>
+        <button class="btn ghost" type="button" @click="copy(asset.id, 'id')">Copy ID</button>
+        <span class="copied" role="status">{{ copied ? `Copied ${copied}` : '' }}</span>
+        <button v-if="!asset.archived_at" class="btn ghost danger archive" type="button" title="Out of search until it's restored or deleted for good, from the Archive" @click="emit('archive')">Archive</button>
+      </div>
     </footer>
   </aside>
 </template>
 
 <style scoped>
-.archive { margin-left: auto; }
 .detail {
   display: flex; flex-direction: column; gap: 1rem;
   padding: 1.1rem 1.2rem 1.4rem;
@@ -998,17 +1050,27 @@ onBeforeUnmount(() => unswipe())
 }
 /* The panel scrolls; its sections must keep their size instead of squashing the preview. */
 .detail > * { flex-shrink: 0; }
-.titlebar { display: flex; gap: 0.5rem; align-items: flex-start; }
-h2 {
-  flex: 1; margin: 0; font-size: var(--step-1); font-weight: 650; line-height: 1.25; cursor: text;
-  font-variation-settings: 'CASL' 0.4;
+/* Where it lives and the stepping buttons share a row, so the name below gets the panel's whole width. */
+.topbar { display: flex; gap: 0.75rem; align-items: center; justify-content: space-between; margin: -0.35rem 0 0.35rem; }
+/* The name is edited in place: the same element turns editable, so the text keeps its size and line breaks. */
+.name {
+  margin: 0; font-size: 1.3rem; font-weight: 650; line-height: 1.22; letter-spacing: -0.01em;
+  font-variation-settings: 'CASL' 0.4; text-wrap: balance; overflow-wrap: anywhere;
+  border-radius: 4px; outline: 1px solid transparent; outline-offset: 3px; cursor: text;
+  transition: outline-color var(--dur-1), background-color var(--dur-1);
 }
-.name-input { flex: 1; font-size: var(--step-1); font-weight: 650; }
-.nav { display: flex; align-items: center; gap: 0.1rem; flex: none; }
+.name:hover { outline-color: var(--line); }
+.name:focus-visible { outline: 2px solid var(--accent); }
+.name.editing {
+  outline: 2px solid var(--accent); background: color-mix(in srgb, var(--accent) 6%, transparent);
+  box-shadow: 0 0 0 5px color-mix(in srgb, var(--accent) 6%, transparent); text-wrap: pretty;
+}
+.nav { display: flex; align-items: center; gap: 0.1rem; flex: none; margin-right: -0.45rem; }
 .icon { padding: 0.35em 0.45em; }
 .pos { font-size: 0.72rem; color: var(--faint); padding: 0 0.15rem; }
 .close { margin-left: 0.3rem; }
-.where { margin: 0.25rem 0 0; color: var(--muted); font-size: var(--step--1); display: flex; gap: 0.4em; flex-wrap: wrap; }
+.where { margin: 0; min-width: 0; color: var(--muted); font-size: var(--step--1); display: flex; gap: 0.4em; white-space: nowrap; }
+.where .pack { overflow: hidden; text-overflow: ellipsis; }
 .sep { color: var(--faint); }
 .preview {
   display: grid; place-items: center; aspect-ratio: 4 / 3;
@@ -1087,8 +1149,11 @@ h3 { margin: 0 0 0.5rem; font-size: var(--step--1); font-weight: 650; color: var
 .chip-move { transition: translate var(--dur-2) var(--ease-out); }
 .addtag { display: flex; gap: 0.4rem; margin-top: 0.6rem; }
 .legend { margin: 0.5rem 0 0; font-size: 0.75rem; color: var(--faint); max-width: 52ch; }
-.asrow { flex-basis: 100%; display: flex; flex-wrap: wrap; align-items: center; gap: 0.4rem; font-size: var(--step--1); color: var(--muted); }
-.asrow select { width: auto; min-width: 0; max-width: 16rem; padding-block: 0.3rem; }
+.asrow { display: flex; flex-wrap: wrap; align-items: center; gap: 0.4rem; font-size: var(--step--1); color: var(--muted); }
+.asrow > label { flex: none; margin-right: 0.15rem; }
+.asrow .field { flex: 1 1 7rem; width: auto; min-width: 0; font-size: var(--step--1); padding: 0.42em 0.55em; }
+.asrow .field.size { flex: 0 1 8.5rem; }
+.asrow .btn { flex: none; }
 .ashint { color: var(--faint); }
 .aserror { flex-basis: 100%; color: var(--danger); }
 .asrow .btn[aria-busy='true'] { cursor: progress; font-variant-numeric: tabular-nums; }
@@ -1102,9 +1167,21 @@ dd { margin: 0; min-width: 0; }
 .btn .bytes { font-weight: 400; opacity: 0.75; font-variant-numeric: tabular-nums; }
 /* The download actions stay in reach while the panel scrolls. */
 footer {
-  position: sticky; bottom: -1.4rem; z-index: 1; display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center;
-  margin: auto -1.2rem -1.4rem; padding: 0.75rem 1.2rem 1rem; background: var(--panel); border-top: 1px solid var(--line);
+  position: sticky; bottom: -1.4rem; z-index: 1; display: flex; flex-direction: column; gap: 0.6rem;
+  margin: auto -1.2rem -1.4rem; padding: 0.85rem 1.2rem 0.7rem; background: var(--panel); border-top: 1px solid var(--line);
 }
+/* The download first and widest, the file alone beside it, converting under them, and the odds and ends last. */
+.get { display: flex; flex-direction: column; gap: 0.4rem; }
+.get .btn { justify-content: space-between; gap: 0.8rem; }
+.get .whole { padding-block: 0.65em; }
+.tools {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 0.15rem; margin: 0 -0.55rem; padding-top: 0.35rem;
+  border-top: 1px dashed color-mix(in srgb, var(--line) 80%, transparent);
+}
+.tools .btn { padding: 0.35em 0.55em; color: var(--muted); border-color: transparent; }
+.tools .btn:hover:not(:disabled) { color: var(--text); }
+.tools .btn.danger { color: var(--danger); }
+.tools .archive { margin-left: auto; }
 .looks { display: flex; gap: 0.6rem; align-items: center; }
 .palette {
   flex: 1; display: flex; height: 1.9rem; min-width: 0; border-radius: 6px; overflow: hidden;
@@ -1131,7 +1208,7 @@ footer {
 .lthumb img { width: 100%; height: 100%; object-fit: contain; }
 .lname { font-size: var(--step--1); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .lrel { font-size: 0.75rem; color: var(--faint); }
-.copied { font-size: 0.75rem; color: var(--ok); }
+.copied { font-size: 0.75rem; color: var(--ok); padding-left: 0.3rem; }
 .familycheck { margin-top: 0.5rem; }
 .cols .tags { align-items: center; }
 .colchip { gap: 0.35em; }

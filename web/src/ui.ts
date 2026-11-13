@@ -240,7 +240,7 @@ export function swipeToClose(el: HTMLElement, dir: 1 | -1, close: () => void, le
   el.style.touchAction = 'pan-y pinch-zoom'
   const down = (e: PointerEvent) => {
     if (e.pointerType !== 'touch' || !matchMedia('(max-width: 900px)').matches) return
-    if ((e.target as Element).closest('input, textarea, select, canvas, dialog, [role="slider"], [data-noswipe]')) return
+    if ((e.target as Element).closest('input, textarea, select, canvas, dialog, [contenteditable], [role="slider"], [data-noswipe]')) return
     id = e.pointerId
     x0 = e.clientX
     y0 = e.clientY

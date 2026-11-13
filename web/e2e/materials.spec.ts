@@ -91,8 +91,10 @@ test.describe('materials', () => {
       ['Normal', [128, 128, 255]],
       ['Roughness', [200, 200, 200]],
     ]
+    const sign = quadGltf('Signpost.bin')
     const pack = await uploadPack(api, 'E2E Dressed glTF', [
-      { relpath: 'Signpost/Signpost.gltf', data: quadGltf() },
+      { relpath: 'Signpost/Signpost.gltf', data: sign.gltf },
+      { relpath: 'Signpost/Signpost.bin', data: sign.bin },
       ...maps.map(([m, c]) => ({ relpath: `Signpost/Signpost_${m}.png`, data: checker(64, c, c, 8) })),
     ])
     await waitReady(api, [pack.id])

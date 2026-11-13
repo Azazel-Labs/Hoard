@@ -12,7 +12,7 @@
 
 use std::collections::{BTreeMap, BTreeSet, HashMap, HashSet};
 
-use anyhow::Result;
+use anyhow::{Context as _, Result};
 use hoard_core::{AssetKind, MaterialInfo, MaterialMap, TagSource};
 use rusqlite::{Connection, OptionalExtension, params};
 use tokio::runtime::Handle;
@@ -693,9 +693,9 @@ fn find_materials(state: &AppState, rt: &Handle, conn: &mut Connection, pack_id:
 /// map on, as the 3D viewers show them: FBX, OBJ, glTF, GLB, STL and PLY. A thumbnail a browser drew is left alone,
 /// and one already dressed isn't redone.
 fn dress_models(state: &AppState, rt: &Handle, conn: &Connection, pack_id: &str) -> Result<usize> {
-    let todo: Vec<(String, String, String, String)> = conn
+    let todo: Vec<(String, String, String)> = conn
         .prepare(
-            "SELECT o.id, o.blob_hash, o.ext, MAX(t.thumb_hash) FROM assets o
+            "SELECT o.id, o.ext, MAX(t.thumb_hash) FROM assets o
                JOIN material_maps m ON m.role = 'base_color' AND EXISTS (
                     SELECT 1 FROM asset_links l WHERE l.from_id = o.id
                        AND ((l.rel = 'material' AND l.to_id = m.material_id)
@@ -706,7 +706,7 @@ fn dress_models(state: &AppState, rt: &Handle, conn: &Connection, pack_id: &str)
                 AND o.thumb_hash IS NOT json_extract(o.meta, '$.thumb_dressed')
               GROUP BY o.id",
         )?
-        .query_map([pack_id], |r| Ok((r.get(0)?, r.get(1)?, r.get(2)?, r.get(3)?)))?
+        .query_map([pack_id], |r| Ok((r.get(0)?, r.get(1)?, r.get(2)?)))?
         .collect::<rusqlite::Result<_>>()?;
     if todo.is_empty() || crate::analyze::renderer().is_none() {
         return Ok(0);
@@ -714,18 +714,32 @@ fn dress_models(state: &AppState, rt: &Handle, conn: &Connection, pack_id: &str)
     std::fs::create_dir_all(state.cfg.tmp_dir())?;
     let work = tempfile::Builder::new().prefix("dress-").tempdir_in(state.cfg.tmp_dir())?;
     let mut done = 0;
-    for (id, blob, ext, color) in todo {
-        let file = work.path().join(format!("model.{ext}"));
+    for (id, ext, color) in todo {
+        let dir = work.path().join(&id);
         let dressed = (|| -> Result<Option<Vec<u8>>> {
-            rt.block_on(state.blobs.download_to(&blob, &file))?;
+            // The model with the files it needs (a glTF's buffers and images, an OBJ's MTL), where the pack has them.
+            let files = db::bundle_files(conn, &db::dependency_closure(conn, &id, false)?)?;
+            let mut file = None;
+            for f in &files {
+                let Some(rel) = crate::ingest::safe_rel_path(&f.path) else { continue };
+                let dest = dir.join(rel);
+                if let Some(parent) = dest.parent() {
+                    std::fs::create_dir_all(parent)?;
+                }
+                rt.block_on(state.blobs.download_to(&f.hash, &dest))?;
+                if f.id == id {
+                    file = Some(dest);
+                }
+            }
+            let file = file.context("the model's file is missing")?;
             if matches!(ext.as_str(), "glb" | "gltf") {
                 let color = rt.block_on(state.blobs.read_all(&color))?;
                 return crate::analyze::gltf_thumb_dressed(&file, &color);
             }
-            let (Some(mut mesh), _) = crate::meshes::load(&file, &ext, work.path())? else { return Ok(None) };
-            // Textures of its own after all: what it shows already is right.
+            let (Some(mut mesh), _) = crate::meshes::load(&file, &ext, &dir)? else { return Ok(None) };
+            // Maps of its own after all (now that the files beside it are here): drawn with those.
             if mesh.materials.iter().any(|m| m.color_image.is_some()) {
-                return Ok(None);
+                return crate::analyze::mesh_thumb_bytes(&mesh, &file);
             }
             let bytes = rt.block_on(state.blobs.read_all(&color))?.to_vec();
             let mime = crate::analyze::thumb_mime(&bytes);
@@ -740,7 +754,7 @@ fn dress_models(state: &AppState, rt: &Handle, conn: &Connection, pack_id: &str)
             }
             crate::analyze::mesh_thumb_bytes(&mesh, &file)
         })();
-        std::fs::remove_file(&file).ok();
+        std::fs::remove_dir_all(&dir).ok();
         let thumb = match dressed {
             Ok(Some(t)) => t,
             Ok(None) => continue,

@@ -155,19 +155,19 @@ export function triangleGltf(): Buffer {
   return Buffer.from(JSON.stringify(gltf, null, 2))
 }
 
-/** A square glTF with texture coordinates and no material of its own, its buffer inline. */
-export function quadGltf(): Buffer {
+/** A square glTF with texture coordinates and no material of its own, its buffer in `<bin>` beside it. */
+export function quadGltf(bin: string): { gltf: Buffer; bin: Buffer } {
   const positions = new Float32Array([-1, 0, 0, 1, 0, 0, 1, 2, 0, -1, 2, 0])
   const uvs = new Float32Array([0, 1, 1, 1, 1, 0, 0, 0])
   const indices = new Uint16Array([0, 1, 2, 0, 2, 3])
-  const bin = Buffer.concat([Buffer.from(positions.buffer), Buffer.from(uvs.buffer), Buffer.from(indices.buffer)])
+  const data = Buffer.concat([Buffer.from(positions.buffer), Buffer.from(uvs.buffer), Buffer.from(indices.buffer)])
   const gltf = {
     asset: { version: '2.0', generator: 'hoard e2e' },
     scene: 0,
     scenes: [{ nodes: [0] }],
     nodes: [{ mesh: 0, name: 'sign' }],
     meshes: [{ name: 'sign', primitives: [{ attributes: { POSITION: 0, TEXCOORD_0: 1 }, indices: 2 }] }],
-    buffers: [{ uri: `data:application/octet-stream;base64,${bin.toString('base64')}`, byteLength: bin.length }],
+    buffers: [{ uri: bin, byteLength: data.length }],
     bufferViews: [
       { buffer: 0, byteOffset: 0, byteLength: 48, target: 34962 },
       { buffer: 0, byteOffset: 48, byteLength: 32, target: 34962 },
@@ -179,7 +179,7 @@ export function quadGltf(): Buffer {
       { bufferView: 2, componentType: 5123, count: 6, type: 'SCALAR' },
     ],
   }
-  return Buffer.from(JSON.stringify(gltf, null, 2))
+  return { gltf: Buffer.from(JSON.stringify(gltf, null, 2)), bin: data }
 }
 
 export const LEVEL_JSON = {

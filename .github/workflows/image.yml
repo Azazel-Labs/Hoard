@@ -27,8 +27,8 @@ jobs:
     strategy:
       matrix:
         include:
-          - { os: ubuntu-24.04, platform: linux/amd64 }
-          - { os: ubuntu-24.04-arm, platform: linux/arm64 }
+          - { os: ubuntu-24.04, platform: linux/amd64, arch: amd64 }
+          - { os: ubuntu-24.04-arm, platform: linux/arm64, arch: arm64 }
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v7
@@ -49,8 +49,10 @@ jobs:
             org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
             org.opencontainers.image.licenses=MIT-0
           outputs: type=image,name=${{ env.IMAGE }},push-by-digest=true,name-canonical=true,push=true
-          cache-from: type=gha,scope=${{ matrix.platform }}
-          cache-to: type=gha,mode=max,scope=${{ matrix.platform }}
+          # The layer cache lives in the registry beside the image: in Actions' cache it took a third of the
+          # repository's 10 GB and pushed CI's Rust cache out.
+          cache-from: type=registry,ref=${{ env.IMAGE }}:buildcache-${{ matrix.arch }}
+          cache-to: type=registry,ref=${{ env.IMAGE }}:buildcache-${{ matrix.arch }},mode=max
       - name: Record digest
         run: |
           mkdir -p /tmp/digests

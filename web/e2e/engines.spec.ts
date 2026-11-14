@@ -11,7 +11,7 @@ import { basename, dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import type { APIRequestContext } from '@playwright/test'
 import { assetsOf, uploadPack, waitReady } from './support/api'
-import { crate } from './support/files'
+import { checker, crate, sound } from './support/files'
 import { expect, test, unique } from './support/test'
 
 const repo = resolve(dirname(fileURLToPath(import.meta.url)), '..', '..')
@@ -56,6 +56,59 @@ interface Plugin {
   run(dir: string, env: Record<string, string>): Outcome
   /** Anything more to check after the first add, with the files in place. */
   after?(dir: string, first: Outcome, folder: string): void
+  /** Sending the project's own assets to Hoard, after it has some from Hoard. */
+  exporter?: Exporter
+}
+
+interface Planted {
+  /** What's picked to send, as the engine names it. */
+  pick: string[]
+  /** The paths the new pack should have, and nothing else. */
+  expect: string[]
+  /** How many picked or used things are left out because Hoard gave them, or only this engine opens them. */
+  fromHoard: number
+  engineOnly: number
+}
+
+interface Sent {
+  ok: boolean
+  error?: string | null
+  pack?: string
+  link?: string
+  sent?: string[]
+  planned: string[]
+  from_hoard: number
+  engine_only: number
+}
+
+interface Exporter {
+  plant(dir: string, tag: string): Planted
+  run(dir: string, env: Record<string, string>): Sent
+}
+
+/** A project's own model, not from Hoard: an OBJ whose material's picture is in a folder below it. */
+function ownCrate(tag: string): { obj: Buffer; mtl: Buffer; texture: Buffer; png: string } {
+  const c = crate()
+  const png = `tex/wood_${tag}.png`
+  return {
+    obj: Buffer.from(c.obj.toString().replace('mtllib crate.mtl', `mtllib mine_${tag}.mtl`)),
+    mtl: Buffer.from(c.mtl.toString().replace('map_Kd crate_diffuse.png', `map_Kd ${png}`)),
+    texture: checker(32, [40, 120, 200], [20, 60, 100], 4),
+    png,
+  }
+}
+
+function withoutSharedTop(paths: string[]): string[] {
+  let out = paths
+  for (;;) {
+    const top = out[0]?.split('/')[0]
+    if (!top || !out.every((p) => p.startsWith(`${top}/`))) return out
+    out = out.map((p) => p.slice(top.length + 1))
+  }
+}
+
+function sentOutcome(out: SpawnSyncReturns<string>, engine: string): Sent {
+  return outcome(out, engine) as unknown as Sent
 }
 
 async function roundTrip(api: APIRequestContext, baseURL: string, plugin: Plugin) {
@@ -75,19 +128,28 @@ async function roundTrip(api: APIRequestContext, baseURL: string, plugin: Plugin
   }
   const dir = mkdtempSync(join(tmpdir(), `hoard-${plugin.engine.toLowerCase()}-`))
   const name = plugin.project(dir, `${plugin.engine} Test ${tag}`)
+  const cleanup: (() => Promise<unknown>)[] = []
+  const gone = async (id: string) => {
+    await api.post('/api/archive', { data: { packs: [id] } })
+    await api.post('/api/archive/purge', { data: { packs: [id] } })
+  }
   try {
     await waitReady(api, [pack.id])
     const obj = (await assetsOf(api, pack.id)).find((a) => a.path.endsWith('.obj'))!
-    // A model's thumbnail is drawn in the background after its pack is ready; the plugin should find it drawn.
-    await expect
-      .poll(async () => ((await (await api.get(`/api/assets/${obj.id}`)).json()) as { has_thumb?: boolean }).has_thumb, { timeout: 120_000 })
-      .toBe(true)
+    // A model's thumbnail is drawn in the background after its pack is ready, when there's a renderer to draw it
+    // (CI runners have none); the plugin should find it drawn.
+    const stats = (await (await api.get('/api/stats')).json()) as { renderer?: string }
+    const thumbnails = /^(gpu|cpu):/.test(stats.renderer ?? '') ? 1 : 0
+    if (thumbnails)
+      await expect
+        .poll(async () => ((await (await api.get(`/api/assets/${obj.id}`)).json()) as { has_thumb?: boolean }).has_thumb, { timeout: 120_000 })
+        .toBe(true)
     plugin.prepare(dir, name)
     const env = { HOARD_URL: baseURL, HOARD_TOKEN: made.token, HOARD_QUERY: `crate ${tag}`, HOARD_KIND: 'model', HOARD_PROJECT: dir }
 
     const first = plugin.run(dir, env)
     expect(first.error ?? undefined).toBeUndefined()
-    expect(first).toMatchObject({ ok: true, matched: 1, thumbnails: 1, files: 3, fetched: 3, reported: true })
+    expect(first).toMatchObject({ ok: true, matched: 1, thumbnails, files: 3, fetched: 3, reported: true })
     // Where hoard sync puts a model with what it needs: its category, then a folder named after it.
     const category = ((await (await api.get(`/api/assets/${obj.id}`)).json()) as { category: string }).category
     const folder = join(dir, plugin.outDir, ...category.split('/'), `crate_${tag}`)
@@ -114,19 +176,47 @@ async function roundTrip(api: APIRequestContext, baseURL: string, plugin: Plugin
     expect(second).toMatchObject({ ok: true, files: 3, fetched: 0 })
     expect(readFileSync(join(dir, 'hoard.toml'), 'utf8').split(obj.id).length).toBe(2)
     expect(await used()).toBe(3)
+
+    if (plugin.exporter) {
+      // The project's own assets go to Hoard as a new pack: originals, or copies other engines open; nothing from Hoard.
+      const planted = plugin.exporter.plant(dir, tag)
+      const pick = { ...env, HOARD_EXPORT: planted.pick.join('\n'), HOARD_PACK_NAME: `Sent from ${plugin.engine} ${tag}` }
+      const refused = plugin.exporter.run(dir, pick)
+      expect(refused.ok).toBe(false)
+      expect(refused.error).toContain('can only look')
+      const editor = (await (await api.post('/api/admin/tokens', { data: { name: `${plugin.engine} sends ${tag}`, role: 'edit' } })).json()) as {
+        id: number
+        token: string
+      }
+      cleanup.push(() => api.delete(`/api/admin/tokens/${editor.id}`))
+      const sent = plugin.exporter.run(dir, { ...pick, HOARD_TOKEN: editor.token })
+      expect(sent.error ?? undefined).toBeUndefined()
+      if (sent.pack) cleanup.push(() => gone(sent.pack!))
+      expect(sent).toMatchObject({ ok: true, from_hoard: planted.fromHoard, engine_only: planted.engineOnly })
+      expect([...sent.sent!].sort()).toEqual([...planted.expect].sort())
+      expect(sent.link).toContain(`pack=${sent.pack}`)
+      await waitReady(api, [sent.pack!])
+      // The server drops a top folder every file shares.
+      expect((await assetsOf(api, sent.pack!)).map((a) => a.path).sort()).toEqual(withoutSharedTop(planted.expect).sort())
+    }
   } finally {
+    for (const undo of cleanup.reverse()) await undo()
     rmSync(dir, { recursive: true, force: true })
     await api.delete(`/api/projects/${encodeURIComponent(name)}`)
     await api.delete(`/api/admin/tokens/${made.id}`)
-    await api.post('/api/archive', { data: { packs: [pack.id] } })
-    await api.post('/api/archive/purge', { data: { packs: [pack.id] } })
+    await gone(pack.id)
   }
 }
 
-test('the Godot plugin adds an asset with what it needs, where hoard sync would, and says the project uses it', async ({ api, baseURL }) => {
+test('the Godot plugin adds an asset with what it needs, where hoard sync would, says the project uses it, and sends the project’s own', async ({
+  api,
+  baseURL,
+}) => {
   const godot = process.env.GODOT_BIN
   test.skip(!godot, 'GODOT_BIN is not set')
-  test.setTimeout(150_000)
+  test.setTimeout(200_000)
+  const godotRun = (script: string) => (dir: string, env: Record<string, string>) =>
+    spawnSync(godot!, ['--headless', '--path', dir, '-s', `res://test/${script}`], { env: { ...process.env, ...env }, encoding: 'utf8', timeout: 90_000 })
   await roundTrip(api, baseURL!, {
     engine: 'Godot',
     outDir: 'assets/hoard',
@@ -137,8 +227,34 @@ test('the Godot plugin adds an asset with what it needs, where hoard sync would,
       cpSync(join(repo, 'integrations/godot/addons'), join(dir, 'addons'), { recursive: true })
       cpSync(join(repo, 'integrations/godot/test'), join(dir, 'test'), { recursive: true })
     },
-    run: (dir, env) =>
-      outcome(spawnSync(godot!, ['--headless', '--path', dir, '-s', 'res://test/add_assets.gd'], { env: { ...process.env, ...env }, encoding: 'utf8', timeout: 90_000 }), 'Godot'),
+    run: (dir, env) => outcome(godotRun('add_assets.gd')(dir, env), 'Godot'),
+    exporter: {
+      plant(dir, tag) {
+        // A scene using the project's own OBJ and a script, a mesh made in Godot, and a sound.
+        const own = ownCrate(tag)
+        const mine = join(dir, 'mine')
+        mkdirSync(join(mine, 'tex'), { recursive: true })
+        writeFileSync(join(mine, `mine_${tag}.obj`), own.obj)
+        writeFileSync(join(mine, `mine_${tag}.mtl`), own.mtl)
+        writeFileSync(join(mine, own.png), own.texture)
+        writeFileSync(join(mine, 'beep.wav'), sound('zap', 3))
+        writeFileSync(join(mine, 'spin.gd'), 'extends Node3D\n')
+        writeFileSync(join(mine, 'box.tres'), '[gd_resource type="BoxMesh" format=3]\n\n[resource]\nsize = Vector3(1, 2, 1)\n')
+        writeFileSync(
+          join(mine, 'level.tscn'),
+          `[gd_scene load_steps=3 format=3]\n\n[ext_resource type="PackedScene" path="res://mine/mine_${tag}.obj" id="1"]\n` +
+            `[ext_resource type="Script" path="res://mine/spin.gd" id="2"]\n\n[node name="Level" type="Node3D"]\nscript = ExtResource("2")\n\n` +
+            `[node name="Crate" parent="." instance=ExtResource("1")]\n`,
+        )
+        return {
+          pick: ['res://mine/level.tscn', 'res://mine/box.tres', 'res://mine/beep.wav', 'res://assets/hoard'],
+          expect: [`mine/mine_${tag}.obj`, `mine/mine_${tag}.mtl`, `mine/${own.png}`, 'mine/box.glb', 'mine/beep.wav'],
+          fromHoard: 1,
+          engineOnly: 2,
+        }
+      },
+      run: (dir, env) => sentOutcome(godotRun('export_assets.gd')(dir, env), 'Godot'),
+    },
   })
 })
 

@@ -531,10 +531,24 @@ the plugin get the same files from it. A token that can only look is enough. The
 kept in your editor's own settings, never in the project (the address falls back to `hoard.toml`'s `server`). Files
 are checked by size as they arrive; `hoard sync --verify` checks their BLAKE3 hashes.
 
+Going the other way, the Godot plugin sends a project's own assets to Hoard as a new pack, and only what another tool can
+open goes:
+
+- **Originals:** the file an asset was imported from, if it's still there. That includes the files a model names: an
+  OBJ's material libraries and the pictures they use, and a glTF's buffers and images.
+- **Copies of things made in the engine:** a mesh as glTF, FBX or OBJ, and a texture as PNG.
+- **Left out:** scenes, materials, prefabs, scripts and Blueprints only the engine reads (what they use still goes),
+  and anything Hoard put in the project.
+
+Sending needs a token that can add to the library (an editor's or an admin's). When it's done, the plugin links to the
+new pack.
+
 **Godot 4.** Copy [integrations/godot/addons/hoard/](integrations/godot/addons/hoard/) into your project's
 `addons/`, then Project → Project Settings → Plugins → enable Hoard. The dock sits top right; open Settings in it for
 the server and token. Assets go under `out_dir` (`assets/hoard` unless `hoard.toml` says otherwise), and the editor
-rescans when they land. Double-click a result to add it, or pick several and press Add to project.
+rescans when they land. Double-click a result to add it, or pick several and press Add to project. To send, right-click
+files or folders in the FileSystem dock → Send to Hoard… (or select them and press Send… in the dock). It lists what
+will go before sending. Meshes and textures made in Godot go as `.glb` and `.png`.
 
 **Unity 2021.3 or later.** Window → Package Manager → + → Add package from git URL:
 `https://github.com/Azazel-Labs/Hoard.git?path=integrations/unity/com.hoard.browser` (or Add package from disk, and pick

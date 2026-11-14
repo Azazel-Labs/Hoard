@@ -4,6 +4,7 @@ extends VBoxContainer
 
 const HoardClient := preload("hoard_client.gd")
 const HoardProject := preload("hoard_project.gd")
+const HoardExport := preload("hoard_export.gd")
 const PAGE := 40
 const KINDS := [["Anything", ""], ["Textures", "texture"], ["Models", "model"], ["Materials", "material"],
 	["Sounds", "audio"], ["Animations", "animation"], ["Fonts", "font"], ["Shaders", "shader"], ["Data", "data"]]
@@ -18,6 +19,12 @@ var results: ItemList
 var status: Label
 var more_button: Button
 var add_button: Button
+var send_button: Button
+var open_button: LinkButton
+var send_dialog: ConfirmationDialog
+var send_name: LineEdit
+var send_list: Label
+var pending: RefCounted
 var debounce: Timer
 
 var assets: Array = []
@@ -69,7 +76,7 @@ func _build() -> void:
 	server_box.placeholder_text = "Server address, like http://nas.local:4627"
 	settings_box.add_child(server_box)
 	token_box = LineEdit.new()
-	token_box.placeholder_text = "Access token (one that can only look is enough)"
+	token_box.placeholder_text = "Access token (one that can only look can add; sending needs an editor's)"
 	token_box.secret = true
 	settings_box.add_child(token_box)
 	var save := Button.new()
@@ -99,6 +106,11 @@ func _build() -> void:
 	status = Label.new()
 	status.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	add_child(status)
+	open_button = LinkButton.new()
+	open_button.text = "Open it in Hoard"
+	open_button.visible = false
+	open_button.pressed.connect(func(): OS.shell_open(open_button.uri))
+	add_child(open_button)
 	var actions := HBoxContainer.new()
 	add_child(actions)
 	more_button = Button.new()
@@ -113,6 +125,29 @@ func _build() -> void:
 	add_button.tooltip_text = "Download with what it needs, and pin it in hoard.toml so hoard sync keeps it"
 	add_button.pressed.connect(_add)
 	actions.add_child(add_button)
+	send_button = Button.new()
+	send_button.text = "Send…"
+	send_button.tooltip_text = "Send what's selected in the FileSystem dock to Hoard as a new pack: the files it was made from, or copies other engines open"
+	send_button.pressed.connect(func(): send_paths(EditorInterface.get_selected_paths()))
+	actions.add_child(send_button)
+
+	send_dialog = ConfirmationDialog.new()
+	send_dialog.title = "Send to Hoard"
+	send_dialog.ok_button_text = "Send"
+	var box := VBoxContainer.new()
+	box.custom_minimum_size = Vector2(420, 0)
+	send_dialog.add_child(box)
+	var label := Label.new()
+	label.text = "Pack name"
+	box.add_child(label)
+	send_name = LineEdit.new()
+	box.add_child(send_name)
+	send_list = Label.new()
+	send_list.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	box.add_child(send_list)
+	send_dialog.register_text_enter(send_name)
+	send_dialog.confirmed.connect(_send)
+	add_child(send_dialog)
 
 	debounce = Timer.new()
 	debounce.one_shot = true
@@ -182,6 +217,7 @@ func _thumb(i: int, a: Dictionary, mine: int) -> void:
 func _update_buttons() -> void:
 	more_button.visible = assets.size() < total
 	add_button.disabled = busy or results.get_selected_items().is_empty()
+	send_button.disabled = busy
 
 
 func _add() -> void:
@@ -204,6 +240,52 @@ func _add() -> void:
 	if not r.reported:
 		status.text += " The server wasn't told the project uses them."
 	EditorInterface.get_resource_filesystem().scan()
+
+
+## Work out what sending these res:// files and folders means, and ask before sending.
+func send_paths(paths: Array) -> void:
+	if busy:
+		return
+	if paths.is_empty():
+		status.text = "Select files or folders in the FileSystem dock to send them."
+		return
+	var export := HoardExport.new(_project())
+	export.plan(paths)
+	if export.files.is_empty():
+		status.text = "Nothing to send: %s." % export.why_nothing()
+		return
+	pending = export
+	var first := String(paths[0]).trim_suffix("/").get_file().get_basename()
+	send_name.text = "%s: %s" % [export.project.project, first if first != "" else "assets"]
+	var lines := PackedStringArray()
+	for f in export.files.slice(0, 12):
+		lines.append("  " + f.rel + ("  (a copy)" if f.has("bytes") else ""))
+	if export.files.size() > 12:
+		lines.append("  and %d more" % (export.files.size() - 12))
+	send_list.text = "%s:\n%s" % [export.summary(), "\n".join(lines)]
+	send_dialog.popup_centered()
+	send_name.grab_focus()
+	send_name.select_all()
+
+
+func _send() -> void:
+	var export: RefCounted = pending
+	pending = null
+	if export == null or busy:
+		return
+	busy = true
+	open_button.visible = false
+	_update_buttons()
+	status.text = "Sending %d files…" % export.files.size()
+	var r: Dictionary = await export.send(client, send_name.text if send_name.text.strip_edges() != "" else "From " + export.project.project)
+	busy = false
+	_update_buttons()
+	if not r.ok:
+		status.text = r.error
+		return
+	status.text = "Sent %d files to Hoard as “%s”." % [r.sent.size(), r.name]
+	open_button.uri = r.link
+	open_button.visible = true
 
 
 static func _bytes(n) -> String:

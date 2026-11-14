@@ -11,21 +11,22 @@ func url(path: String) -> String:
 	return server.strip_edges().trim_suffix("/") + path
 
 
-## {ok, code, body} or {ok: false, error}.
-func send(path: String, method := HTTPClient.METHOD_GET, body := "", download_to := "") -> Dictionary:
+## {ok, code, body} or {ok: false, error}. `body` is JSON text, or bytes sent as `content_type` (an upload).
+func send(path: String, method := HTTPClient.METHOD_GET, body: Variant = "", download_to := "", content_type := "application/json") -> Dictionary:
 	if server.strip_edges() == "":
 		return {"ok": false, "error": "No server address: set it in the Hoard dock's settings."}
+	var raw := body is PackedByteArray
 	var http := HTTPRequest.new()
-	http.timeout = 0.0 if download_to != "" else 30.0
+	http.timeout = 0.0 if download_to != "" or raw else 30.0
 	if download_to != "":
 		http.download_file = download_to
 	add_child(http)
 	var headers := PackedStringArray(["Accept: application/json"])
 	if token.strip_edges() != "":
 		headers.append("Authorization: Bearer " + token.strip_edges())
-	if body != "":
-		headers.append("Content-Type: application/json")
-	var err := http.request(url(path), headers, method, body)
+	if raw or body != "":
+		headers.append("Content-Type: " + content_type)
+	var err := http.request_raw(url(path), headers, method, body) if raw else http.request(url(path), headers, method, body)
 	if err != OK:
 		http.queue_free()
 		return {"ok": false, "error": "Can't reach %s." % server}

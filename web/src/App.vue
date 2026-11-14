@@ -6,7 +6,7 @@ import {
 } from './api'
 import { canPreview, stop as stopPreview, toggle as togglePreview } from './player'
 import { prefs, toggleIn } from './prefs'
-import { askToSignIn, auth, signOut } from './auth'
+import { askToSignIn, auth, may, mayEdit, signOut } from './auth'
 import { teach } from './storeFormats'
 import { DARK_THEMES, LIGHT_THEMES, themeFor } from './theme'
 import ActivityIndicator from './components/ActivityIndicator.vue'
@@ -87,6 +87,9 @@ const setupOpen = ref(false)
 watch(() => stats.value?.setup_needed, (needed) => { if (needed) setupOpen.value = true })
 /** Signed in, rather than browsing as a guest: Settings and the setup are only for accounts. */
 const member = computed(() => !!auth.status?.signed_in)
+/** May change the library (a guest is asked to sign in when they try). */
+const editor = computed(() => mayEdit())
+const admin = computed(() => may('admin'))
 watch([member, view], ([m, v]) => { if (!m && v === 'settings') view.value = 'library' }, { immediate: true })
 function setupDone() {
   setupOpen.value = false
@@ -603,6 +606,7 @@ const selectionUrl = computed(() =>
 
 /** Queue groups for import; a lone folder full of packs gets a choice first. */
 function importGroups(groups: Group[]) {
+  if (!editor.value) return
   if (groups.length === 1) {
     const parts = looksLikeFolderOfPacks(groups[0].files)
     if (parts) {
@@ -621,7 +625,7 @@ function resolveSplit(split: boolean) {
 }
 
 function onDragEnter(e: DragEvent) {
-  if (!e.dataTransfer?.types.includes('Files')) return
+  if (!editor.value || !e.dataTransfer?.types.includes('Files')) return
   if (!dragDepth.value) dragCount.value = e.dataTransfer.items?.length ?? 0
   dragDepth.value++
 }
@@ -1037,14 +1041,16 @@ const commands = computed<Command[]>(() => {
     { id: 'go:archive', group: 'Go to', label: 'Archive', hint: archivedCount.value ? archivedCount.value.toLocaleString() : undefined, keywords: 'trash recycle bin deleted restore', run: () => setView('archive') },
     { id: 'go:stats', group: 'Go to', label: 'Library stats', keywords: 'statistics numbers size disk space count', run: () => openSettings('library') },
     { id: 'go:search', group: 'Go to', label: 'Search', hint: '/', run: () => { setView('library'); void nextTick(() => searchInput.value?.focus()) } },
-    { id: 'act:add', group: 'Actions', label: 'Add files…', keywords: 'upload import', run: () => fileInput.value?.click() },
-    { id: 'act:folder', group: 'Actions', label: 'Import a folder…', keywords: 'upload pack', run: () => folderInput.value?.click() },
   ]
+  if (editor.value) {
+    out.push({ id: 'act:add', group: 'Actions', label: 'Add files…', keywords: 'upload import', run: () => fileInput.value?.click() })
+    out.push({ id: 'act:folder', group: 'Actions', label: 'Import a folder…', keywords: 'upload pack', run: () => folderInput.value?.click() })
+  }
   if (view.value === 'library' && items.value.length) {
     out.push({ id: 'act:all', group: 'Actions', label: `Select all ${items.value.length} shown`, hint: `${mod}A`, keywords: 'check', run: () => (checked.value = items.value.map((a) => a.id)) })
   }
   if (view.value === 'library' && !selecting.value) out.push({ id: 'act:select', group: 'Actions', label: 'Select several…', hint: 'X', keywords: 'bulk multiple tag archive', run: () => (selectMode.value = true) })
-  if (checked.value.length) out.push({ id: 'act:archive', group: 'Actions', label: `Archive the ${checked.value.length} selected`, keywords: 'delete remove trash', run: archiveChecked })
+  if (checked.value.length && editor.value) out.push({ id: 'act:archive', group: 'Actions', label: `Archive the ${checked.value.length} selected`, keywords: 'delete remove trash', run: archiveChecked })
   if (checked.value.length) out.push({ id: 'act:none', group: 'Actions', label: 'Clear the selection', hint: 'Esc', run: () => (checked.value = []) })
   if (hasFilters.value) out.push({ id: 'act:clear', group: 'Actions', label: 'Clear filters', keywords: 'reset', run: clearFilters })
   out.push({
@@ -1207,10 +1213,12 @@ const commands = computed<Command[]>(() => {
         <button type="button" class="btn ghost cmdk" :title="`Command palette (${mod}K)`" @click="paletteOpen = true">
           <kbd>{{ mod.replace('+', '') }}</kbd><kbd>K</kbd>
         </button>
-        <button type="button" class="btn import-folder" @click="folderInput?.click()">Import folder</button>
-        <button type="button" class="btn primary" @click="fileInput?.click()">
-          <span class="wide-only">Add files</span><span class="narrow-only" aria-hidden="true">Add</span>
-        </button>
+        <template v-if="editor">
+          <button type="button" class="btn import-folder" @click="folderInput?.click()">Import folder</button>
+          <button type="button" class="btn primary" @click="fileInput?.click()">
+            <span class="wide-only">Add files</span><span class="narrow-only" aria-hidden="true">Add</span>
+          </button>
+        </template>
         <input ref="fileInput" type="file" multiple hidden @change="onPick" />
         <input ref="folderInput" type="file" webkitdirectory multiple hidden @change="onPickFolder" />
       </div>
@@ -1501,6 +1509,7 @@ const commands = computed<Command[]>(() => {
         <label v-if="checkedWithSource" class="srccheck" title="Unreal SoundWaves and textures whose original file Hoard recovered">
           <input v-model="preferSources" type="checkbox" /> Recovered WAV/PNG instead of .uasset ({{ checkedWithSource }})
         </label>
+        <template v-if="editor">
         <form class="bulktag" @submit.prevent="bulkTagEdit(false)">
           <label class="visually-hidden" for="bulk-tag">A tag to add to, or take off, the selected assets</label>
           <input id="bulk-tag" v-model="bulkTag" class="field" placeholder="Tag" autocomplete="off" :disabled="bulkBusy || !checked.length" />
@@ -1524,8 +1533,9 @@ const commands = computed<Command[]>(() => {
         <button v-if="filters.collection && checked.length" type="button" class="btn" @click="removeFromCollection(checked, filters.collection.id)">
           Remove from {{ filters.collection.name }}
         </button>
+        </template>
         <button type="button" class="linkbtn" @click="checked = items.map((a) => a.id)">Select all {{ items.length }}</button>
-        <button type="button" class="btn danger" :disabled="!checked.length || bulkBusy" title="Out of search until they're restored or deleted for good, from the Archive" @click="archiveChecked">Archive</button>
+        <button v-if="editor" type="button" class="btn danger" :disabled="!checked.length || bulkBusy" title="Out of search until they're restored or deleted for good, from the Archive" @click="archiveChecked">Archive</button>
         <button type="button" class="btn ghost" @click="checked = []; selectMode = false">Done</button>
       </div>
       </Transition>
@@ -1579,7 +1589,7 @@ const commands = computed<Command[]>(() => {
     <UploadQueue ref="queue" @created="onCreated" @unauthorized="askToSignIn" />
     <CommandPalette v-if="paletteOpen" :commands="commands" @close="paletteOpen = false" @open="openAsset" />
     <ShortcutsDialog v-if="shortcutsOpen" @close="shortcutsOpen = false" />
-    <SetupWizard v-if="setupOpen && member" @done="setupDone" />
+    <SetupWizard v-if="setupOpen && admin" @done="setupDone" />
     <UiLayer />
   </div>
 </template>

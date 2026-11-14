@@ -575,6 +575,14 @@ collection = "Forest level"
 dest = "levels/forest"
 ```
 
+## The archive
+
+Archiving a pack or an asset (from its menu, its details, or a selection) takes it out of search, the counts and the
+tag list without deleting anything: the **Archive** (the button in the header, or `#archive`) lists it, searchable, until it's restored
+or deleted for good. Deleting for good frees its space at the next clean-up, and a watched folder's pack deleted that
+way isn't read in again (the folder itself is never touched). Archiving and restoring need an account that can change
+the library; deleting for good, an admin.
+
 ## Search by colour, by what pictures show, and More like this
 
 Hoard looks at the thumbnail of every texture, model, material, animation, video and sprite, and works out its main
@@ -804,16 +812,28 @@ Maintenance → Shrink thumbnails re-stores the existing PNG ones.
 
 ## Accounts and access tokens
 
-The first visit to a new server makes its first account. Add accounts for other people, change your password, and
-make access tokens in **Settings → Account**. Every account can do everything, including managing accounts.
+The first visit to a new server makes its first account, an admin. Add accounts for other people, change your
+password, and make access tokens in **Settings → Account**. Each account has a role:
+
+| Role | Can |
+|---|---|
+| Can look | search, preview and download; sync a project; make tokens that only look |
+| Can change | also add packs, rename, describe, tag, collect, archive and restore (new accounts get this) |
+| Admin | also Settings, library locations, maintenance, accounts and everyone's tokens, and deleting for good |
+
+An admin changes another account's role in its row; nobody changes their own, so there's always an admin. The portal
+only shows what an account may do: one that can look has no Add files button or tag editing, and only the Appearance,
+Library and Account pages of Settings.
 
 - **Signing in** gives the browser a session cookie (HttpOnly, SameSite=Lax) that lasts until you sign out or don't
   visit for 30 days. Repeated wrong passwords for a name are slowed down.
 - **Access tokens** are for everything that isn't a browser: the `hoard` CLI (`--token` or `HOARD_TOKEN`), scripts and
   cron, MCP clients and the Unreal worker. They're sent as `Authorization: Bearer <token>`, shown once when made, and
-  can be revoked; the list shows when each was last used. A token can do everything except manage accounts and tokens.
+  can be revoked; the list shows when each was last used. A token has a role too, up to its maker's (and lowered with
+  it if the maker's is), and never manages accounts or tokens. Each account sees and revokes its own; admins see all.
 - **Connected apps** (Claude, other MCP clients) sign in over OAuth: you allow each one in the browser, it acts as
-  you with an access token's powers, and Settings → Account disconnects it.
+  you with your role (one that can look isn't offered the tools that change things), and Settings → Account
+  disconnects it.
 - **Guest browsing** (off by default) lets anyone who can reach the server search, preview and download without
   signing in. Changing anything still needs an account or a token.
 - **Forgot your password?** On the server, `hoardd --reset-password <name>` prints a new one and signs that account out
@@ -828,8 +848,9 @@ curl -fsS -X POST -H "Authorization: Bearer $HOARD_TOKEN" http://localhost:4627/
 ## API overview
 
 Every request needs a signed-in session or `Authorization: Bearer <token>`, except reads while guest browsing is on.
-Requests that change something are marked 🔒: guests can't make them. A browser session's changes must also carry an
-`X-Hoard` header, which pages on other sites can't add.
+Requests that change something are marked 🔒: guests and accounts that can only look can't make them. Those under
+`/api/admin/` (except your own tokens and connected apps), deleting a pack and emptying the archive need an admin. A
+browser session's changes must also carry an `X-Hoard` header, which pages on other sites can't add.
 
 **Assets**
 
@@ -863,7 +884,7 @@ Requests that change something are marked 🔒: guests can't make them. A browse
 | POST 🔒 | `/api/packs` | upload a pack in one request (multipart) |
 | GET | `/api/packs/{id}` | one pack and its status |
 | PATCH 🔒 | `/api/packs/{id}` | rename it (`{name}`) |
-| DELETE 🔒 | `/api/packs/{id}` | delete it (blobs go at the next `gc`) |
+| DELETE 🔒 | `/api/packs/{id}` | delete it (blobs go at the next `gc`); admins only |
 | POST 🔒 | `/api/packs/{id}/retag` | run the tagger again |
 | POST 🔒 | `/api/packs/{id}/read-files` | read the pack's store files again (name, tags, description) |
 | GET, PUT 🔒 | `/api/packs/{id}/context` | store link, seller, license, README and notes the tagger reads |
@@ -872,6 +893,15 @@ Requests that change something are marked 🔒: guests can't make them. A browse
 | GET | `/api/packs/{id}/files/{path}` | a pack file by its original path (the 3D viewer uses this) |
 | GET | `/api/packs/{id}/bundle.zip` | the whole pack |
 | GET | `/api/packs/{id}/credits` | seller, license and credit line as JSON (`?format=md` for `CREDITS.md`) |
+
+**Archive**
+
+| Method | Path | |
+|---|---|---|
+| GET | `/api/packs?archived=true`, `/api/assets?archived=true` | what's in the archive |
+| POST 🔒 | `/api/archive` | `{packs?, assets?}`: archive them |
+| POST 🔒 | `/api/archive/restore` | `{packs?, assets?}`: put them back |
+| POST 🔒 | `/api/archive/purge` | `{packs?, assets?, all?}`: delete archived ones for good; admins only |
 
 **Resumable uploads** (what the portal and `hoard push` use)
 
@@ -935,7 +965,19 @@ Requests that change something are marked 🔒: guests can't make them. A browse
 | POST | `/mcp` | MCP over streamable HTTP (needs a sign-in: OAuth or an access token) |
 | GET | `/.well-known/oauth-protected-resource/mcp`, `/.well-known/oauth-authorization-server` | OAuth discovery for MCP apps |
 | POST | `/oauth/register`, `/oauth/token` | OAuth dynamic client registration; codes and refresh tokens for access tokens |
-| GET 🔒 | `/api/admin/connections` | apps signed in over OAuth (`DELETE /api/admin/connections/{id}` disconnects one) |
+| GET 🔒 | `/api/admin/connections` | apps signed in over OAuth: your own, or everyone's for an admin (`DELETE /api/admin/connections/{id}` disconnects one) |
+
+**Accounts**
+
+| Method | Path | |
+|---|---|---|
+| GET | `/api/auth/status` | whether there's an account yet, and who's signed in with what role |
+| POST | `/api/auth/setup`, `/api/auth/login`, `/api/auth/logout` | the first account; signing in and out |
+| POST 🔒 | `/api/auth/password` | change your password |
+| GET 🔒, POST 🔒 | `/api/admin/tokens` | your access tokens (an admin sees all), or make one: `{name, role?}` (it defaults to yours) |
+| DELETE 🔒 | `/api/admin/tokens/{id}` | revoke one |
+| GET 🔒, POST 🔒 | `/api/admin/users` | accounts, or add one: `{username, password, role?}` (`view`, `edit`, the default, or `admin`); admins only |
+| PATCH 🔒, DELETE 🔒 | `/api/admin/users/{id}` | change another account's role (`{role}`), or remove it; admins only |
 
 ## Repository layout
 

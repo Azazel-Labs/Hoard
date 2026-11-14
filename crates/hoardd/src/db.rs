@@ -301,6 +301,9 @@ const MIGRATIONS: &[&str] = &[
                                                              WHERE mm.material_id = a.id)))))
         AND NOT EXISTS (SELECT 1 FROM jobs j WHERE j.kind = 'materials' AND j.pack_id = p.id
                           AND j.status IN ('queued', 'running'));",
+    // 36: roles (see `auth::Role`). Everyone could do everything before, so existing accounts and tokens are admins.
+    "ALTER TABLE users ADD COLUMN role TEXT NOT NULL DEFAULT 'admin' CHECK (role IN ('view', 'edit', 'admin'));
+     ALTER TABLE access_tokens ADD COLUMN role TEXT NOT NULL DEFAULT 'admin' CHECK (role IN ('view', 'edit', 'admin'));",
 ];
 
 /// How many automatic pre-upgrade backups to keep in `<data dir>/backups`.

@@ -322,11 +322,14 @@ export interface NewLocation {
 }
 
 /** `GET /api/auth/status`: who this browser is signed in as, and what the server wants first. */
+/** What an account or token may do: look; look and change the library; or that and Settings and accounts too. */
+export type Role = 'view' | 'edit' | 'admin'
+
 export interface AuthStatus {
   /** No account yet: the portal asks for the first one. */
   setup_needed: boolean
   signed_in: boolean
-  user: { name: string; kind: 'user' | 'token' } | null
+  user: { name: string; kind: 'user' | 'token'; role: Role } | null
   /** People who aren't signed in may look around. */
   guest_browsing: boolean
 }
@@ -335,6 +338,7 @@ export interface Account {
   id: number
   username: string
   created_at: string
+  role: Role
   you: boolean
 }
 
@@ -353,6 +357,7 @@ export interface AccessToken {
   created_at: string
   last_used_at: string | null
   created_by: string | null
+  role: Role
 }
 
 /** A finished (or interrupted) run of a maintenance task. */
@@ -957,12 +962,18 @@ export const api = {
   changePassword: (current: string, next: string) =>
     post<void>('/api/auth/password', { current, new: next }),
   accounts: () => request<{ users: Account[] }>('/api/admin/users'),
-  addAccount: (username: string, password: string) =>
-    post<void>('/api/admin/users', { username, password }),
+  addAccount: (username: string, password: string, role: Role) =>
+    post<void>('/api/admin/users', { username, password, role }),
+  setRole: (id: number, role: Role) =>
+    request<void>(`/api/admin/users/${id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ role }),
+    }),
   removeAccount: (id: number) => request<void>(`/api/admin/users/${id}`, { method: 'DELETE' }),
   tokens: () => request<{ tokens: AccessToken[] }>('/api/admin/tokens'),
-  makeToken: (name: string) =>
-    post<{ id: number; name: string; token: string }>('/api/admin/tokens', { name }),
+  makeToken: (name: string, role: Role) =>
+    post<{ id: number; name: string; token: string }>('/api/admin/tokens', { name, role }),
   revokeToken: (id: number) => request<void>(`/api/admin/tokens/${id}`, { method: 'DELETE' }),
   connections: () => request<{ connections: Connection[] }>('/api/admin/connections'),
   disconnect: (id: number) => request<void>(`/api/admin/connections/${id}`, { method: 'DELETE' }),

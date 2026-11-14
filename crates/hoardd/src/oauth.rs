@@ -30,7 +30,7 @@ use serde::Deserialize;
 use serde_json::{Value, json};
 use sha2::Digest as _;
 
-use crate::auth::{Who, digest, random_bytes};
+use crate::auth::{Role, Who, digest, owner_filter, random_bytes};
 use crate::error::{ApiResult, AppError};
 use crate::{AppState, db, tools};
 
@@ -71,13 +71,13 @@ pub(crate) fn challenge(state: &AppState, headers: &HeaderMap, bad_token: bool) 
 
 /// Who an OAuth access token (by its hash) belongs to, if it's live.
 pub(crate) fn lookup(c: &Connection, hash: &str) -> rusqlite::Result<Option<Who>> {
-    let row: Option<(i64, String, String)> = c
+    let row: Option<(i64, String, String, String)> = c
         .query_row(
-            "SELECT g.id, cl.name, u.username FROM oauth_grants g
+            "SELECT g.id, cl.name, u.username, u.role FROM oauth_grants g
                JOIN oauth_clients cl ON cl.id = g.client_id JOIN users u ON u.id = g.user_id
               WHERE g.access_hash = ?1 AND g.access_expires_at > unixepoch('now')",
             [hash],
-            |r| Ok((r.get(0)?, r.get(1)?, r.get(2)?)),
+            |r| Ok((r.get(0)?, r.get(1)?, r.get(2)?, r.get(3)?)),
         )
         .optional()?;
     if let Some((id, ..)) = &row {
@@ -87,7 +87,8 @@ pub(crate) fn lookup(c: &Connection, hash: &str) -> rusqlite::Result<Option<Who>
             params![id, db::now()],
         )?;
     }
-    Ok(row.map(|(_, client, user)| Who::Token { name: format!("{client} for {user}") }))
+    Ok(row
+        .map(|(_, client, user, role)| Who::Token { name: format!("{client} for {user}"), role: Role::stored(&role) }))
 }
 
 // ---------------------------------------------------------------------------------------------
@@ -514,15 +515,15 @@ async fn issue(state: &AppState, headers: &HeaderMap, f: &HashMap<String, String
 // Settings → Account
 
 async fn list_connections(State(state): State<AppState>, Extension(who): Extension<Who>) -> ApiResult<Json<Value>> {
-    who.person()?;
-    let rows = db::call(&state.pool, |c| {
+    let only = owner_filter(&who)?;
+    let rows = db::call(&state.pool, move |c| {
         let mut stmt = c.prepare(
             "SELECT g.id, cl.name, u.username, g.created_at, g.last_used_at FROM oauth_grants g
                JOIN oauth_clients cl ON cl.id = g.client_id JOIN users u ON u.id = g.user_id
-              ORDER BY g.created_at DESC",
+              WHERE ?1 IS NULL OR g.user_id = ?1 ORDER BY g.created_at DESC",
         )?;
         let rows = stmt
-            .query_map([], |r| {
+            .query_map([only], |r| {
                 Ok(json!({
                     "id": r.get::<_, i64>(0)?,
                     "app": r.get::<_, String>(1)?,
@@ -543,8 +544,11 @@ async fn disconnect(
     Extension(who): Extension<Who>,
     Path(id): Path<i64>,
 ) -> ApiResult<StatusCode> {
-    who.person()?;
-    let n = db::call(&state.pool, move |c| Ok(c.execute("DELETE FROM oauth_grants WHERE id = ?1", [id])?)).await?;
+    let only = owner_filter(&who)?;
+    let n = db::call(&state.pool, move |c| {
+        Ok(c.execute("DELETE FROM oauth_grants WHERE id = ?1 AND (?2 IS NULL OR user_id = ?2)", params![id, only])?)
+    })
+    .await?;
     if n == 0 {
         return Err(AppError::not_found("connection"));
     }

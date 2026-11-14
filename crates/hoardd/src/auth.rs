@@ -7,8 +7,11 @@
 //! the server: `hoardd --reset-password <name>` (in Docker, `docker compose exec hoard hoardd --reset-password
 //! <name>`) prints a new one.
 //!
-//! Every account can do everything; there are no roles. Access tokens can do everything except manage accounts and
-//! tokens, so a leaked one can be revoked and can't mint more. Apps that sign in over OAuth (`oauth.rs`) get the same.
+//! Each account has a [`Role`]: it can look, change the library as well, or administer the server too (Settings,
+//! accounts, maintenance). The first account is an admin. An access token has a role of its own, chosen when it's made
+//! and never more than its maker's: a token made by someone who is later given a lesser role has that role too.
+//! Tokens can't manage accounts or tokens, so a leaked one can be revoked and can't mint more. Apps that sign in over
+//! OAuth (`oauth.rs`) act with the role of the person who let them in.
 
 use std::collections::HashMap;
 use std::sync::{LazyLock, Mutex, PoisonError};
@@ -47,19 +50,78 @@ const MIN_PASSWORD: usize = 8;
 const FREE_TRIES: u32 = 5;
 const THROTTLE: Duration = Duration::from_secs(30);
 
+/// What an account or token may do. Each can do everything the ones before it can.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord)]
+pub(crate) enum Role {
+    /// Look around, search and download.
+    View,
+    /// Also add, change, tag, collect and archive.
+    Edit,
+    /// Also Settings, accounts, maintenance, and deleting for good.
+    Admin,
+}
+
+impl Role {
+    pub(crate) fn parse(s: &str) -> Option<Self> {
+        match s {
+            "view" => Some(Self::View),
+            "edit" => Some(Self::Edit),
+            "admin" => Some(Self::Admin),
+            _ => None,
+        }
+    }
+
+    pub(crate) const fn as_str(self) -> &'static str {
+        match self {
+            Self::View => "view",
+            Self::Edit => "edit",
+            Self::Admin => "admin",
+        }
+    }
+
+    /// As stored. Anything else (there shouldn't be) can only look.
+    pub(crate) fn stored(s: &str) -> Self {
+        Self::parse(s).unwrap_or(Self::View)
+    }
+
+    fn requested(s: Option<&str>, default: Self) -> ApiResult<Self> {
+        match s {
+            None => Ok(default),
+            Some(s) => Self::parse(s).ok_or_else(|| AppError::bad_request("A role is view, edit or admin")),
+        }
+    }
+}
+
 /// Who a request is from.
 #[derive(Clone, Debug)]
 pub(crate) enum Who {
-    User { id: i64, name: String },
-    Token { name: String },
+    User { id: i64, name: String, role: Role },
+    Token { name: String, role: Role },
 }
 
 impl Who {
     fn json(&self) -> Value {
         match self {
-            Self::User { name, .. } => json!({ "name": name, "kind": "user" }),
-            Self::Token { name, .. } => json!({ "name": name, "kind": "token" }),
+            Self::User { name, role, .. } => json!({ "name": name, "kind": "user", "role": role.as_str() }),
+            Self::Token { name, role } => json!({ "name": name, "kind": "token", "role": role.as_str() }),
         }
+    }
+
+    pub(crate) const fn role(&self) -> Role {
+        match self {
+            Self::User { role, .. } | Self::Token { role, .. } => *role,
+        }
+    }
+
+    /// Refused unless this can do what `role` can.
+    pub(crate) fn needs(&self, role: Role) -> ApiResult<()> {
+        if self.role() >= role {
+            return Ok(());
+        }
+        Err(AppError::forbidden(match role {
+            Role::Admin => "only an admin can do this",
+            _ => "this account can look but not change anything: an admin can change that in Settings → Account",
+        }))
     }
 
     /// The signed-in person, for things access tokens can't do.
@@ -130,12 +192,15 @@ fn lookup(c: &Connection, cred: &Credential) -> Result<Option<Who>> {
     match cred {
         Credential::Bearer(token) => {
             let hash = digest(token);
-            let row: Option<(i64, String)> = c
-                .query_row("SELECT id, name FROM access_tokens WHERE token_hash = ?1", [&hash], |r| {
-                    Ok((r.get(0)?, r.get(1)?))
-                })
+            let row: Option<(i64, String, String, Option<String>)> = c
+                .query_row(
+                    "SELECT t.id, t.name, t.role, u.role
+                       FROM access_tokens t LEFT JOIN users u ON u.id = t.created_by WHERE t.token_hash = ?1",
+                    [&hash],
+                    |r| Ok((r.get(0)?, r.get(1)?, r.get(2)?, r.get(3)?)),
+                )
                 .optional()?;
-            if let Some((id, _)) = &row {
+            if let Some((id, ..)) = &row {
                 c.execute(
                     "UPDATE access_tokens SET last_used_at = ?2
                       WHERE id = ?1 AND (last_used_at IS NULL OR unixepoch(last_used_at) < unixepoch('now') - 60)",
@@ -143,21 +208,25 @@ fn lookup(c: &Connection, cred: &Credential) -> Result<Option<Who>> {
                 )?;
             }
             match row {
-                Some((_, name)) => Ok(Some(Who::Token { name })),
+                Some((_, name, own, maker)) => {
+                    let own = Role::stored(&own);
+                    let role = maker.map_or(own, |m| own.min(Role::stored(&m)));
+                    Ok(Some(Who::Token { name, role }))
+                }
                 None => Ok(crate::oauth::lookup(c, &hash)?),
             }
         }
         Credential::Session(token) => {
             let hash = digest(token);
-            let row: Option<(i64, String, i64)> = c
+            let row: Option<(i64, String, String, i64)> = c
                 .query_row(
-                    "SELECT u.id, u.username, unixepoch('now') - unixepoch(s.last_seen_at)
+                    "SELECT u.id, u.username, u.role, unixepoch('now') - unixepoch(s.last_seen_at)
                        FROM sessions s JOIN users u ON u.id = s.user_id WHERE s.token_hash = ?1",
                     [&hash],
-                    |r| Ok((r.get(0)?, r.get(1)?, r.get(2)?)),
+                    |r| Ok((r.get(0)?, r.get(1)?, r.get(2)?, r.get(3)?)),
                 )
                 .optional()?;
-            let Some((id, name, idle)) = row else { return Ok(None) };
+            let Some((id, name, role, idle)) = row else { return Ok(None) };
             if idle > SESSION_DAYS * 86_400 {
                 c.execute("DELETE FROM sessions WHERE token_hash = ?1", [&hash])?;
                 return Ok(None);
@@ -165,7 +234,7 @@ fn lookup(c: &Connection, cred: &Credential) -> Result<Option<Who>> {
             if idle > 3600 {
                 c.execute("UPDATE sessions SET last_seen_at = ?2 WHERE token_hash = ?1", params![hash, db::now()])?;
             }
-            Ok(Some(Who::User { id, name }))
+            Ok(Some(Who::User { id, name, role: Role::stored(&role) }))
         }
     }
 }
@@ -181,14 +250,29 @@ pub(crate) async fn authenticate(state: &AppState, method: &Method, headers: &He
     Ok(db::call(&state.pool, move |c| lookup(c, &cred)).await?)
 }
 
-/// Middleware for changes and admin pages: a signed-in person or an access token.
-pub(crate) async fn require_user(State(state): State<AppState>, mut req: Request, next: Next) -> ApiResult<Response> {
-    let who = authenticate(&state, req.method(), req.headers()).await?.ok_or_else(AppError::unauthorized)?;
+async fn require(state: &AppState, role: Role, mut req: Request, next: Next) -> ApiResult<Response> {
+    let who = authenticate(state, req.method(), req.headers()).await?.ok_or_else(AppError::unauthorized)?;
+    who.needs(role)?;
     req.extensions_mut().insert(who);
     Ok(next.run(req).await)
 }
 
-/// Middleware for reads: the same, unless Settings lets anyone browse.
+/// Middleware for what's anyone's own (their password, tokens and connected apps): a signed-in person or a token.
+pub(crate) async fn require_user(State(state): State<AppState>, req: Request, next: Next) -> ApiResult<Response> {
+    require(&state, Role::View, req, next).await
+}
+
+/// Middleware for changes to the library.
+pub(crate) async fn require_editor(State(state): State<AppState>, req: Request, next: Next) -> ApiResult<Response> {
+    require(&state, Role::Edit, req, next).await
+}
+
+/// Middleware for Settings, accounts and maintenance.
+pub(crate) async fn require_admin(State(state): State<AppState>, req: Request, next: Next) -> ApiResult<Response> {
+    require(&state, Role::Admin, req, next).await
+}
+
+/// Middleware for reads: anyone signed in, unless Settings lets anyone browse.
 pub(crate) async fn require_reader(State(state): State<AppState>, mut req: Request, next: Next) -> ApiResult<Response> {
     match authenticate(&state, req.method(), req.headers()).await? {
         Some(who) => {
@@ -249,14 +333,19 @@ async fn from_portal(req: Request, next: Next) -> Response {
     }
 }
 
-/// Behind [`require_user`].
-pub(crate) fn admin_router() -> Router<AppState> {
+/// Behind [`require_user`]: everyone's own password and tokens. An admin sees and can revoke everyone's tokens.
+pub(crate) fn account_router() -> Router<AppState> {
     Router::new()
         .route("/api/auth/password", post(change_password))
-        .route("/api/admin/users", get(list_users).post(create_user))
-        .route("/api/admin/users/{id}", axum::routing::delete(delete_user))
         .route("/api/admin/tokens", get(list_tokens).post(create_token))
         .route("/api/admin/tokens/{id}", axum::routing::delete(delete_token))
+}
+
+/// Behind [`require_admin`].
+pub(crate) fn admin_router() -> Router<AppState> {
+    Router::new()
+        .route("/api/admin/users", get(list_users).post(create_user))
+        .route("/api/admin/users/{id}", axum::routing::delete(delete_user).patch(patch_user))
 }
 
 async fn status(State(state): State<AppState>, headers: HeaderMap) -> ApiResult<Json<Value>> {
@@ -328,9 +417,10 @@ fn new_session(c: &Connection, user_id: i64) -> Result<String> {
     Ok(token)
 }
 
-fn signed_in(headers: &HeaderMap, token: &str, name: &str) -> ApiResult<Response> {
+fn signed_in(headers: &HeaderMap, token: &str, name: &str, role: Role) -> ApiResult<Response> {
     let set = cookie(headers, token, 400 * 86_400)?;
-    Ok(([(header::SET_COOKIE, set)], Json(json!({ "user": { "name": name, "kind": "user" } }))).into_response())
+    let user = json!({ "name": name, "kind": "user", "role": role.as_str() });
+    Ok(([(header::SET_COOKIE, set)], Json(json!({ "user": user }))).into_response())
 }
 
 /// The first account. Refused once there is one.
@@ -344,8 +434,8 @@ async fn setup(
     let token = db::call(&state.pool, move |c| {
         let hash = hash_password(&body.password)?;
         let added = c.execute(
-            "INSERT INTO users (username, password_hash, created_at)
-             SELECT ?1, ?2, ?3 WHERE NOT EXISTS (SELECT 1 FROM users)",
+            "INSERT INTO users (username, password_hash, role, created_at)
+             SELECT ?1, ?2, 'admin', ?3 WHERE NOT EXISTS (SELECT 1 FROM users)",
             params![made, hash, db::now()],
         )?;
         if added == 0 {
@@ -356,7 +446,7 @@ async fn setup(
     .await?
     .ok_or_else(|| AppError::conflict("There's already an account: sign in"))?;
     tracing::info!(user = %name, "first account made");
-    signed_in(&headers, &token, &name)
+    signed_in(&headers, &token, &name, Role::Admin)
 }
 
 async fn login(
@@ -370,25 +460,25 @@ async fn login(
     }
     let lookup_name = name.clone();
     let found = db::call(&state.pool, move |c| {
-        let row: Option<(i64, String, String)> = c
-            .query_row("SELECT id, username, password_hash FROM users WHERE username = ?1", [&lookup_name], |r| {
-                Ok((r.get(0)?, r.get(1)?, r.get(2)?))
+        let row: Option<(i64, String, String, String)> = c
+            .query_row("SELECT id, username, password_hash, role FROM users WHERE username = ?1", [&lookup_name], |r| {
+                Ok((r.get(0)?, r.get(1)?, r.get(2)?, r.get(3)?))
             })
             .optional()?;
         let hash = row.as_ref().map_or(DUMMY_HASH.as_str(), |r| r.2.as_str());
         if !password_matches(&body.password, hash) {
             return Ok(None);
         }
-        let Some((id, username, _)) = row else { return Ok(None) };
-        Ok(Some((new_session(c, id)?, username)))
+        let Some((id, username, _, role)) = row else { return Ok(None) };
+        Ok(Some((new_session(c, id)?, username, Role::stored(&role))))
     })
     .await?;
     note_attempt(&name, found.is_some());
-    let Some((token, username)) = found else {
+    let Some((token, username, role)) = found else {
         tracing::info!(user = %name, "failed sign-in");
         return Err(AppError { status: StatusCode::UNAUTHORIZED, err: anyhow!("That name and password don't match") });
     };
-    signed_in(&headers, &token, &username)
+    signed_in(&headers, &token, &username, role)
 }
 
 async fn logout(State(state): State<AppState>, headers: HeaderMap) -> ApiResult<Response> {
@@ -449,11 +539,17 @@ async fn change_password(
 async fn list_users(State(state): State<AppState>, Extension(who): Extension<Who>) -> ApiResult<Json<Value>> {
     let me = who.person()?;
     let users = db::call(&state.pool, move |c| {
-        let mut stmt = c.prepare("SELECT id, username, created_at FROM users ORDER BY username")?;
+        let mut stmt = c.prepare("SELECT id, username, created_at, role FROM users ORDER BY username")?;
         let rows = stmt
             .query_map([], |r| {
                 let id: i64 = r.get(0)?;
-                Ok(json!({ "id": id, "username": r.get::<_, String>(1)?, "created_at": r.get::<_, String>(2)?, "you": id == me }))
+                Ok(json!({
+                    "id": id,
+                    "username": r.get::<_, String>(1)?,
+                    "created_at": r.get::<_, String>(2)?,
+                    "role": Role::stored(&r.get::<_, String>(3)?).as_str(),
+                    "you": id == me,
+                }))
             })?
             .collect::<rusqlite::Result<Vec<_>>>()?;
         Ok(rows)
@@ -462,19 +558,29 @@ async fn list_users(State(state): State<AppState>, Extension(who): Extension<Who
     Ok(Json(json!({ "users": users })))
 }
 
+#[derive(Deserialize)]
+struct NewAccount {
+    username: String,
+    password: String,
+    /// `view`, `edit` (the default) or `admin`.
+    role: Option<String>,
+}
+
 async fn create_user(
     State(state): State<AppState>,
     Extension(who): Extension<Who>,
-    Json(body): Json<Credentials>,
+    Json(body): Json<NewAccount>,
 ) -> ApiResult<(StatusCode, Json<Value>)> {
     who.person()?;
     let name = check_new(&body.username, &body.password)?;
+    let role = Role::requested(body.role.as_deref(), Role::Edit)?;
     let username = name.clone();
     let added = db::call(&state.pool, move |c| {
         let hash = hash_password(&body.password)?;
         let n = c.execute(
-            "INSERT INTO users (username, password_hash, created_at) VALUES (?1, ?2, ?3) ON CONFLICT DO NOTHING",
-            params![username, hash, db::now()],
+            "INSERT INTO users (username, password_hash, role, created_at) VALUES (?1, ?2, ?3, ?4)
+             ON CONFLICT DO NOTHING",
+            params![username, hash, role.as_str(), db::now()],
         )?;
         Ok((n == 1).then(|| c.last_insert_rowid()))
     })
@@ -482,7 +588,33 @@ async fn create_user(
     let Some(id) = added else {
         return Err(AppError::conflict("There's already an account with that name"));
     };
-    Ok((StatusCode::CREATED, Json(json!({ "id": id, "username": name }))))
+    Ok((StatusCode::CREATED, Json(json!({ "id": id, "username": name, "role": role.as_str() }))))
+}
+
+#[derive(Deserialize)]
+struct AccountChange {
+    role: String,
+}
+
+/// Give an account another role. Not your own: there's always an admin, because the one doing this is one.
+async fn patch_user(
+    State(state): State<AppState>,
+    Extension(who): Extension<Who>,
+    Path(id): Path<i64>,
+    Json(body): Json<AccountChange>,
+) -> ApiResult<StatusCode> {
+    if who.person()? == id {
+        return Err(AppError::bad_request("Another admin can change your role"));
+    }
+    let role = Role::requested(Some(&body.role), Role::View)?;
+    let n = db::call(&state.pool, move |c| {
+        Ok(c.execute("UPDATE users SET role = ?2 WHERE id = ?1", params![id, role.as_str()])?)
+    })
+    .await?;
+    if n == 0 {
+        return Err(AppError::not_found("account"));
+    }
+    Ok(StatusCode::NO_CONTENT)
 }
 
 async fn delete_user(
@@ -500,21 +632,29 @@ async fn delete_user(
     Ok(StatusCode::NO_CONTENT)
 }
 
+/// Whose tokens and connected apps `who` may see and revoke: everyone's for an admin (`None`), else their own.
+pub(crate) fn owner_filter(who: &Who) -> ApiResult<Option<i64>> {
+    let me = who.person()?;
+    Ok((who.role() < Role::Admin).then_some(me))
+}
+
 async fn list_tokens(State(state): State<AppState>, Extension(who): Extension<Who>) -> ApiResult<Json<Value>> {
-    who.person()?;
-    let tokens = db::call(&state.pool, |c| {
+    let only = owner_filter(&who)?;
+    let tokens = db::call(&state.pool, move |c| {
         let mut stmt = c.prepare(
-            "SELECT t.id, t.name, t.created_at, t.last_used_at, u.username
-               FROM access_tokens t LEFT JOIN users u ON u.id = t.created_by ORDER BY t.created_at DESC",
+            "SELECT t.id, t.name, t.created_at, t.last_used_at, u.username, t.role
+               FROM access_tokens t LEFT JOIN users u ON u.id = t.created_by
+              WHERE ?1 IS NULL OR t.created_by = ?1 ORDER BY t.created_at DESC",
         )?;
         let rows = stmt
-            .query_map([], |r| {
+            .query_map([only], |r| {
                 Ok(json!({
                     "id": r.get::<_, i64>(0)?,
                     "name": r.get::<_, String>(1)?,
                     "created_at": r.get::<_, String>(2)?,
                     "last_used_at": r.get::<_, Option<String>>(3)?,
                     "created_by": r.get::<_, Option<String>>(4)?,
+                    "role": Role::stored(&r.get::<_, String>(5)?).as_str(),
                 }))
             })?
             .collect::<rusqlite::Result<Vec<_>>>()?;
@@ -527,6 +667,8 @@ async fn list_tokens(State(state): State<AppState>, Extension(who): Extension<Wh
 #[derive(Deserialize)]
 struct NewToken {
     name: String,
+    /// Up to the maker's own role, which is the default.
+    role: Option<String>,
 }
 
 /// A new access token. The token itself is in this response and nowhere else: only its hash is kept.
@@ -540,17 +682,21 @@ async fn create_token(
     if name.is_empty() || name.chars().count() > 80 {
         return Err(AppError::bad_request("Name the token after what will use it, in up to 80 characters"));
     }
+    let role = Role::requested(body.role.as_deref(), who.role())?;
+    if role > who.role() {
+        return Err(AppError::forbidden("A token can't do more than the account that makes it"));
+    }
     let token = format!("hoard_{}", tools::hex(&random_bytes::<32>()?));
     let (hash, label) = (digest(&token), name.clone());
     let id = db::call(&state.pool, move |c| {
         c.execute(
-            "INSERT INTO access_tokens (name, token_hash, created_by, created_at) VALUES (?1, ?2, ?3, ?4)",
-            params![label, hash, me, db::now()],
+            "INSERT INTO access_tokens (name, token_hash, created_by, role, created_at) VALUES (?1, ?2, ?3, ?4, ?5)",
+            params![label, hash, me, role.as_str(), db::now()],
         )?;
         Ok(c.last_insert_rowid())
     })
     .await?;
-    Ok(Json(json!({ "id": id, "name": name, "token": token })))
+    Ok(Json(json!({ "id": id, "name": name, "token": token, "role": role.as_str() })))
 }
 
 async fn delete_token(
@@ -558,8 +704,11 @@ async fn delete_token(
     Extension(who): Extension<Who>,
     Path(id): Path<i64>,
 ) -> ApiResult<StatusCode> {
-    who.person()?;
-    let n = db::call(&state.pool, move |c| Ok(c.execute("DELETE FROM access_tokens WHERE id = ?1", [id])?)).await?;
+    let only = owner_filter(&who)?;
+    let n = db::call(&state.pool, move |c| {
+        Ok(c.execute("DELETE FROM access_tokens WHERE id = ?1 AND (?2 IS NULL OR created_by = ?2)", params![id, only])?)
+    })
+    .await?;
     if n == 0 {
         return Err(AppError::not_found("token"));
     }

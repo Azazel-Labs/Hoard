@@ -2,8 +2,8 @@
 // Settings → Account: your password, the other accounts, connecting Claude and other AI apps, access tokens for
 // scripts and programs, and whether people who aren't signed in may look around.
 import { computed, onMounted, reactive, ref } from 'vue'
-import { api, type AccessToken, type Account, type Connection } from '../api'
-import { auth, refreshAuth, signOut } from '../auth'
+import { api, type AccessToken, type Account, type Connection, type Role } from '../api'
+import { auth, may, refreshAuth, signOut } from '../auth'
 import { confirmDialog, copyText, showError, showOk } from '../ui'
 
 const accounts = ref<Account[] | null>(null)
@@ -13,14 +13,29 @@ const guest = ref<boolean | null>(null)
 const busy = ref(false)
 const origin = ref(location.origin)
 
+const admin = computed(() => may('admin'))
+const myRole = computed<Role>(() => auth.status?.user?.role ?? 'view')
+
+const ROLES: { id: Role; label: string; hint: string }[] = [
+  { id: 'view', label: 'Can look', hint: 'Search, preview and download' },
+  { id: 'edit', label: 'Can change', hint: 'Also add, change, tag, collect and archive' },
+  { id: 'admin', label: 'Admin', hint: 'Also Settings, accounts and maintenance, and deleting for good' },
+]
+const roleLabel = (r: Role) => ROLES.find((x) => x.id === r)!.label
+/** What a token may be given: up to what you can do. */
+const tokenRoles = computed(() => ROLES.slice(0, ROLES.findIndex((r) => r.id === myRole.value) + 1))
+
 async function load() {
   try {
-    const [a, t, s, c] = await Promise.all([api.accounts(), api.tokens(), api.settings(), api.connections()])
-    accounts.value = a.users
+    const [t, c] = await Promise.all([api.tokens(), api.connections()])
     tokens.value = t.tokens
     connections.value = c.connections
-    guest.value = s.options.guest_browsing.value
-    origin.value = (s.options.public_url.value || location.origin).replace(/\/+$/, '')
+    if (admin.value) {
+      const [a, s] = await Promise.all([api.accounts(), api.settings()])
+      accounts.value = a.users
+      guest.value = s.options.guest_browsing.value
+      origin.value = (s.options.public_url.value || location.origin).replace(/\/+$/, '')
+    }
   } catch (e) {
     showError(`Couldn't load accounts: ${(e as Error).message}`)
   }
@@ -53,16 +68,19 @@ async function changePassword() {
 }
 
 // ---- other people
-const person = reactive({ username: '', password: '' })
+const person = reactive({ username: '', password: '', role: 'edit' as Role })
 const personReady = computed(() => person.username.trim() !== '' && person.password.length >= 8)
 async function addPerson() {
   if (!personReady.value) return
   const name = person.username.trim()
-  if (await run(`Couldn't add ${name}`, () => api.addAccount(name, person.password))) {
-    Object.assign(person, { username: '', password: '' })
+  if (await run(`Couldn't add ${name}`, () => api.addAccount(name, person.password, person.role))) {
+    Object.assign(person, { username: '', password: '', role: 'edit' })
     showOk(`${name} can sign in now.`)
     await load()
   }
+}
+async function setRole(a: Account, role: Role) {
+  if (await run(`Couldn't change what ${a.username} can do`, () => api.setRole(a.id, role))) await load()
 }
 async function removePerson(a: Account) {
   const ok = await confirmDialog({
@@ -76,12 +94,13 @@ async function removePerson(a: Account) {
 
 // ---- access tokens
 const tokenName = ref('')
+const tokenRole = ref<Role>('view')
 const made = ref<{ name: string; token: string } | null>(null)
 async function makeToken() {
   const name = tokenName.value.trim()
   if (!name) return
   await run("Couldn't make the token", async () => {
-    const t = await api.makeToken(name)
+    const t = await api.makeToken(name, tokenRole.value)
     made.value = { name: t.name, token: t.token }
     tokenName.value = ''
     await load()
@@ -142,7 +161,10 @@ const day = (at: string | null) => (at ? fmt.format(new Date(at)) : 'never')
         <h3>You</h3>
         <button type="button" class="btn" @click="signOut">Sign out</button>
       </div>
-      <p class="what">Signed in as <strong>{{ auth.status?.user?.name }}</strong>.</p>
+      <p class="what">
+        Signed in as <strong>{{ auth.status?.user?.name }}</strong>, who
+        {{ myRole === 'admin' ? 'is an admin' : myRole === 'edit' ? 'can change the library' : 'can look but not change anything' }}.
+      </p>
       <form class="grid" @submit.prevent="changePassword">
         <input type="text" autocomplete="username" :value="auth.status?.user?.name" hidden readonly />
         <label for="pw-current">Current password</label>
@@ -159,13 +181,27 @@ const day = (at: string | null) => (at ? fmt.format(new Date(at)) : 'never')
       </form>
     </section>
 
-    <section>
+    <section v-if="admin">
       <div class="sh"><h3>People</h3></div>
-      <p class="what">Everyone with an account can do everything, including managing accounts.</p>
+      <p class="what">
+        Each person can look (search, preview and download), change the library too (add, edit, tag, collect and
+        archive), or be an admin as well (Settings, accounts and maintenance, and deleting for good).
+      </p>
       <ul v-if="accounts" class="list">
-        <li v-for="a in accounts" :key="a.id">
+        <li v-for="a in accounts" :key="a.id" :data-person="a.username">
           <span class="name">{{ a.username }} <small v-if="a.you">(you)</small></span>
           <small>since {{ day(a.created_at) }}</small>
+          <span v-if="a.you" class="role">{{ roleLabel(a.role) }}</span>
+          <select
+            v-else
+            class="field role"
+            :value="a.role"
+            :disabled="busy"
+            :aria-label="`What ${a.username} can do`"
+            @change="setRole(a, ($event.target as HTMLSelectElement).value as Role)"
+          >
+            <option v-for="r in ROLES" :key="r.id" :value="r.id" :title="r.hint">{{ r.label }}</option>
+          </select>
           <button v-if="!a.you" type="button" class="btn ghost" :disabled="busy" @click="removePerson(a)">Remove</button>
         </li>
       </ul>
@@ -174,6 +210,10 @@ const day = (at: string | null) => (at ? fmt.format(new Date(at)) : 'never')
         <input id="new-name" v-model="person.username" class="field" placeholder="Name" autocomplete="off" maxlength="64" />
         <label class="visually-hidden" for="new-password">Password (at least 8 characters)</label>
         <input id="new-password" v-model="person.password" class="field" type="password" placeholder="Password (8+ characters)" autocomplete="new-password" />
+        <label class="visually-hidden" for="new-role">What they can do</label>
+        <select id="new-role" v-model="person.role" class="field role">
+          <option v-for="r in ROLES" :key="r.id" :value="r.id" :title="r.hint">{{ r.label }}</option>
+        </select>
         <button type="submit" class="btn" :disabled="!personReady || busy">Add</button>
       </form>
     </section>
@@ -214,7 +254,9 @@ const day = (at: string | null) => (at ? fmt.format(new Date(at)) : 'never')
       <div class="sh"><h3>Access tokens</h3></div>
       <p class="what">
         For the <span class="mono">hoard</span> command line tool, scripts, MCP clients and the Unreal worker: they send it as
-        <span class="mono">Authorization: Bearer &lt;token&gt;</span>. A token can do everything except manage accounts and tokens.
+        <span class="mono">Authorization: Bearer &lt;token&gt;</span>. A token can do what you choose, up to what you can,
+        but never manage accounts or tokens. One that only looks is enough to search and download, and to sync a project.
+        <template v-if="admin">You see everyone’s tokens and connected apps; others see their own.</template>
       </p>
 
       <div v-if="made" class="made" role="status">
@@ -233,7 +275,7 @@ const day = (at: string | null) => (at ? fmt.format(new Date(at)) : 'never')
       <ul v-if="tokens?.length" class="list">
         <li v-for="t in tokens" :key="t.id">
           <span class="name">{{ t.name }}</span>
-          <small>made {{ day(t.created_at) }}{{ t.created_by ? ` by ${t.created_by}` : '' }} · last used {{ day(t.last_used_at) }}</small>
+          <small>{{ roleLabel(t.role) }} · made {{ day(t.created_at) }}{{ t.created_by ? ` by ${t.created_by}` : '' }} · last used {{ day(t.last_used_at) }}</small>
           <button type="button" class="btn ghost" :disabled="busy" @click="revoke(t)">Revoke</button>
         </li>
       </ul>
@@ -241,6 +283,10 @@ const day = (at: string | null) => (at ? fmt.format(new Date(at)) : 'never')
       <form class="add" @submit.prevent="makeToken">
         <label class="visually-hidden" for="token-name">What will use it</label>
         <input id="token-name" v-model="tokenName" class="field" placeholder="What will use it, e.g. “Unreal worker”" maxlength="80" autocomplete="off" />
+        <label class="visually-hidden" for="token-role">What it can do</label>
+        <select id="token-role" v-model="tokenRole" class="field role">
+          <option v-for="r in tokenRoles" :key="r.id" :value="r.id" :title="r.hint">{{ r.label }}</option>
+        </select>
         <button type="submit" class="btn" :disabled="!tokenName.trim() || busy">Make a token</button>
       </form>
     </section>
@@ -272,6 +318,8 @@ section { display: grid; gap: 0.6rem; }
 .list .name { font-weight: 550; overflow-wrap: anywhere; }
 .list .name small { font-weight: 400; color: var(--muted); }
 .list li > small { flex: 1; color: var(--muted); }
+.list .role:not(select) { color: var(--muted); }
+select.role { flex: 0 0 auto; width: auto; }
 .add { display: flex; gap: 0.5rem; flex-wrap: wrap; }
 .add .field { flex: 1 1 12rem; min-width: 0; }
 .made { display: grid; gap: 0.5rem; justify-items: start; padding: 0.8rem 0.9rem; border: 1px solid var(--accent); border-radius: var(--r-chip); background: var(--raised); }

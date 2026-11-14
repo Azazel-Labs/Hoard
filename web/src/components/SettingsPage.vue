@@ -12,6 +12,7 @@ import {
   type LocalModel,
   type LocalModels,
   type ModelInfo,
+  type Role,
   type Settings,
   type SettingsPatch,
   type Stats,
@@ -21,6 +22,7 @@ import {
   type UnrealConvert,
   humanBytes,
 } from '../api'
+import { may } from '../auth'
 import { prefs } from '../prefs'
 import { formatMiB } from '../sizes'
 import { ROLE_LABEL } from '../materials'
@@ -53,25 +55,27 @@ const emit = defineEmits<{
 }>()
 const s = ref<Settings | null>(null)
 
-const PAGES = [
+const ALL_PAGES: { id: string; label: string; blurb: string; need?: Role }[] = [
   { id: 'appearance', label: 'Appearance', blurb: 'The themes this browser wears when it’s light and when it’s dark. Saved in this browser only.' },
   { id: 'library', label: 'Library', blurb: 'What’s in the hoard: how big it is, what it’s made of, how it grew and how well it’s tagged. Archived things aren’t counted.' },
-  { id: 'tags', label: 'Tags', blurb: 'Every tag in the library. Merge ones that mean the same thing, or rename one; the taggers use the new name from then on.' },
-  { id: 'store-files', label: 'Store files', blurb: 'The files stores put beside their art, which Hoard reads to name packs and credit their makers. Teach it ones it doesn’t know, and share what you taught it.' },
-  { id: 'locations', label: 'Library locations', blurb: 'The folders on the server that hold the library: ones Hoard keeps files in, and folders of packs it indexes where they are.' },
-  { id: 'tools', label: 'Tools', blurb: 'Outside programs Hoard uses to convert and read files.' },
-  { id: 'ai', label: 'AI tagging', blurb: 'An AI model names, describes and tags new packs, on top of the built-in rules. Its tags are marked as suggested.' },
-  { id: 'search', label: 'Image search', blurb: 'Search pictures by what they show, not only by their names, and find things that are alike in kind, not only in colour.' },
-  { id: 'adding', label: 'Adding packs', blurb: 'What Hoard does with a pack when it’s added, besides reading and tagging it.' },
-  { id: 'downloads', label: 'Downloads', blurb: 'How files are named in what Hoard sends: downloads, zips, the hoard tool and AI assistants. Files in the library stay as they are.' },
+  { id: 'tags', need: 'edit', label: 'Tags', blurb: 'Every tag in the library. Merge ones that mean the same thing, or rename one; the taggers use the new name from then on.' },
+  { id: 'store-files', need: 'admin', label: 'Store files', blurb: 'The files stores put beside their art, which Hoard reads to name packs and credit their makers. Teach it ones it doesn’t know, and share what you taught it.' },
+  { id: 'locations', need: 'admin', label: 'Library locations', blurb: 'The folders on the server that hold the library: ones Hoard keeps files in, and folders of packs it indexes where they are.' },
+  { id: 'tools', need: 'admin', label: 'Tools', blurb: 'Outside programs Hoard uses to convert and read files.' },
+  { id: 'ai', need: 'admin', label: 'AI tagging', blurb: 'An AI model names, describes and tags new packs, on top of the built-in rules. Its tags are marked as suggested.' },
+  { id: 'search', need: 'admin', label: 'Image search', blurb: 'Search pictures by what they show, not only by their names, and find things that are alike in kind, not only in colour.' },
+  { id: 'adding', need: 'admin', label: 'Adding packs', blurb: 'What Hoard does with a pack when it’s added, besides reading and tagging it.' },
+  { id: 'downloads', need: 'admin', label: 'Downloads', blurb: 'How files are named in what Hoard sends: downloads, zips, the hoard tool and AI assistants. Files in the library stay as they are.' },
   { id: 'account', label: 'Account', blurb: 'Your password, the other people who can sign in, and access tokens for scripts and other programs.' },
-  { id: 'connection', label: 'Connection', blurb: 'How browsers and apps reach Hoard: the address it’s known by, and HTTPS, which some browser features need.' },
-  { id: 'performance', label: 'Performance', blurb: 'How hard the server works, how thumbnails are made and kept, and the most it takes in.' },
-  { id: 'issues', label: 'Issues', blurb: 'What went wrong opening or processing files: archives that wouldn’t unpack, files that couldn’t be read, jobs that failed. Try them again once the cause is fixed, or dismiss them.' },
-  { id: 'maintenance', label: 'Maintenance', blurb: 'Back up, check for damage and tidy up. One of each runs at a time, and you can leave this page while they do.' },
+  { id: 'connection', need: 'admin', label: 'Connection', blurb: 'How browsers and apps reach Hoard: the address it’s known by, and HTTPS, which some browser features need.' },
+  { id: 'performance', need: 'admin', label: 'Performance', blurb: 'How hard the server works, how thumbnails are made and kept, and the most it takes in.' },
+  { id: 'issues', need: 'admin', label: 'Issues', blurb: 'What went wrong opening or processing files: archives that wouldn’t unpack, files that couldn’t be read, jobs that failed. Try them again once the cause is fixed, or dismiss them.' },
+  { id: 'maintenance', need: 'admin', label: 'Maintenance', blurb: 'Back up, check for damage and tidy up. One of each runs at a time, and you can leave this page while they do.' },
 ] as const
-const current = computed(() => (PAGES.some((p) => p.id === props.section) ? props.section : 'appearance'))
-const page = computed(() => PAGES.find((p) => p.id === current.value)!)
+/** The pages this account may see: an admin sees them all. */
+const PAGES = computed(() => ALL_PAGES.filter((p) => !p.need || may(p.need)))
+const current = computed(() => (PAGES.value.some((p) => p.id === props.section) ? props.section : 'appearance'))
+const page = computed(() => PAGES.value.find((p) => p.id === current.value)!)
 const paneEl = ref<HTMLElement | null>(null)
 function go(id: string) {
   emit('update:section', id)
@@ -770,6 +774,7 @@ const endPreview = () => (previewScheme.value = null)
 watch(current, (c) => c !== 'appearance' && endPreview())
 
 onMounted(async () => {
+  if (!may('admin')) return
   await load()
   if (s.value?.llm.enabled || llm.provider === 'local') void connect()
 })

@@ -1,7 +1,7 @@
 // Who this browser is signed in as. The session itself is an HttpOnly cookie the server sets; this only mirrors what
 // `GET /api/auth/status` says, so the portal knows whether to show the library or the sign-in screen.
 import { reactive } from 'vue'
-import { api, whenSignInNeeded, type AuthStatus } from './api'
+import { api, whenSignInNeeded, type AuthStatus, type Role } from './api'
 
 export const auth = reactive({
   status: null as AuthStatus | null,
@@ -24,6 +24,24 @@ export async function refreshAuth(): Promise<void> {
 export function canBrowse(): boolean {
   const s = auth.status
   return !!s && !s.setup_needed && (s.signed_in || s.guest_browsing)
+}
+
+const RANK = { view: 0, edit: 1, admin: 2 } as const
+
+/** Whoever's signed in may do what `role` can. Guests can only look. */
+export function may(role: Role): boolean {
+  const r = auth.status?.user?.role
+  return !!r && RANK[r] >= RANK[role]
+}
+
+/** Whoever's here may do what `role` can, or could by signing in (a guest is asked to when they try). */
+export function mayTry(role: Role): boolean {
+  return !auth.status?.signed_in || may(role)
+}
+
+/** Whoever's here may change the library, or could by signing in. */
+export function mayEdit(): boolean {
+  return mayTry('edit')
 }
 
 export function askToSignIn() {

@@ -69,7 +69,7 @@ async fn handle(State(state): State<AppState>, headers: HeaderMap, body: String)
     if !origin_ok(&headers, state.settings.get().public_url.as_deref()) {
         return (StatusCode::FORBIDDEN, "origin not allowed").into_response();
     }
-    if crate::auth::authenticate(&state, &http::Method::POST, &headers).await.ok().flatten().is_none() {
+    let Some(who) = crate::auth::authenticate(&state, &http::Method::POST, &headers).await.ok().flatten() else {
         let challenge = crate::oauth::challenge(&state, &headers, headers.contains_key(header::AUTHORIZATION));
         return (
             StatusCode::UNAUTHORIZED,
@@ -78,7 +78,8 @@ async fn handle(State(state): State<AppState>, headers: HeaderMap, body: String)
              `Authorization: Bearer <token>`",
         )
             .into_response();
-    }
+    };
+    let may_change = who.role() >= crate::auth::Role::Edit;
     let msg: Value = match serde_json::from_str(&body) {
         Ok(v) => v,
         Err(e) => return Json(rpc_error(&Value::Null, -32700, &format!("parse error: {e}"), None)).into_response(),
@@ -135,7 +136,7 @@ async fn handle(State(state): State<AppState>, headers: HeaderMap, body: String)
             })),
         ),
         "ping" => rpc_result(&id, &complete(json!({}))),
-        "tools/list" => rpc_result(&id, &complete(json!({ "tools": tool_list() }))),
+        "tools/list" => rpc_result(&id, &complete(json!({ "tools": tool_list(may_change) }))),
         "prompts/list" => rpc_result(&id, &complete(json!({ "prompts": prompt_list() }))),
         "prompts/get" => match get_prompt(&params) {
             Some(p) => rpc_result(&id, &complete(p)),
@@ -145,7 +146,12 @@ async fn handle(State(state): State<AppState>, headers: HeaderMap, body: String)
             let name = params.get("name").and_then(Value::as_str).unwrap_or_default().to_owned();
             let args = params.get("arguments").cloned().unwrap_or_else(|| json!({}));
             let base = base_url(&state, &headers);
-            match call_tool(&state, &name, args, &base).await {
+            let result = if !may_change && CHANGES.contains(&name.as_str()) {
+                Err(ToolError::Failed("this account can look but not change anything".into()))
+            } else {
+                call_tool(&state, &name, args, &base).await
+            };
+            match result {
                 Ok(mut value) => {
                     let previews = value.as_object_mut().and_then(|o| o.remove(PREVIEWS_KEY));
                     let sheet = value.as_object_mut().and_then(|o| o.remove(SHEET_KEY));
@@ -175,7 +181,10 @@ async fn handle(State(state): State<AppState>, headers: HeaderMap, body: String)
     Json(reply).into_response()
 }
 
-fn tool_list() -> Value {
+/// The tools that change the library, which accounts that can only look don't get.
+const CHANGES: [&str; 3] = ["tag_asset", "update_asset", "save_tags"];
+
+fn tool_list(may_change: bool) -> Value {
     let (read, write) = (read_hints(), write_hints());
     let tools = json!([
         {
@@ -296,6 +305,9 @@ fn tool_list() -> Value {
             if let Value::Array(more) = more {
                 list.extend(more);
             }
+        }
+        if !may_change {
+            list.retain(|t| !t["name"].as_str().is_some_and(|n| CHANGES.contains(&n)));
         }
     }
     all

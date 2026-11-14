@@ -6,9 +6,13 @@ import {
 } from '../api'
 import { confirmDialog, undoable } from '../ui'
 import { archiveWithUndo } from '../archive'
+import { mayEdit } from '../auth'
 import { canDrawThumbs, cancelThumbRun, makePackThumbs, thumbRun } from '../browserThumbs'
 
 const props = defineProps<{ packs: Pack[]; stats: Stats | null; collections: Collection[] }>()
+
+/** May change packs and collections (a guest is asked to sign in when they try). */
+const editor = computed(() => mayEdit())
 
 // Close an open "More" menu when clicking anywhere else.
 function closeMenus(e: MouseEvent) {
@@ -394,8 +398,10 @@ async function archive(p: Pack) {
               <button class="btn" type="button" @click="$emit('browseCollection', c)">Browse</button>
               <a v-if="c.asset_count" class="btn ghost" :href="collectionZipUrl(c.id)">Download (.zip)</a>
               <a v-if="c.asset_count" class="btn ghost" :href="collectionCreditsUrl(c.id)" download="CREDITS.md" title="Who made the packs these assets come from, their licenses and the credit lines they ask for">Credits</a>
-              <button class="btn ghost" type="button" @click="startRename(c)">Rename</button>
-              <button class="btn ghost danger" type="button" @click="removeCollection(c)">Delete</button>
+              <template v-if="editor">
+                <button class="btn ghost" type="button" @click="startRename(c)">Rename</button>
+                <button class="btn ghost danger" type="button" @click="removeCollection(c)">Delete</button>
+              </template>
             </div>
           </div>
         </li>
@@ -522,10 +528,11 @@ async function archive(p: Pack) {
         <div class="actions">
           <button class="btn" type="button" @click="$emit('browse', p)">Browse</button>
           <a class="btn ghost" :href="packZipUrl(p.id)">Download pack (.zip)</a>
-          <button class="btn ghost" type="button" :aria-expanded="editing === p.id" @click="editContext(p)">Store details</button>
+          <button v-if="editor" class="btn ghost" type="button" :aria-expanded="editing === p.id" @click="editContext(p)">Store details</button>
           <details class="menu">
             <summary class="btn ghost" :aria-label="`More actions for ${p.name}`">More</summary>
             <div class="menu-items" @click="($event.currentTarget as HTMLElement).closest('details')?.removeAttribute('open')">
+              <template v-if="editor">
               <button type="button" @click="startPackRename(p)">Rename…</button>
               <button type="button" :disabled="p.status !== 'ready' && p.status !== 'failed'" @click="retag(p, false)">
                 Re-run offline tagger
@@ -545,11 +552,12 @@ async function archive(p: Pack) {
               <button type="button" :disabled="p.status !== 'ready'" @click="readFiles(p)">
                 Read the pack's files again
               </button>
+              </template>
               <a :href="packCreditsUrl(p.id)" download="CREDITS.md" title="CREDITS.md: who made the pack, its license and the credit line it asks for">Download credits</a>
-              <button v-if="p.unreal_packages || p.unreal_converted" type="button" @click="openUnreal(p)">
+              <button v-if="editor && (p.unreal_packages || p.unreal_converted)" type="button" @click="openUnreal(p)">
                 Convert Unreal content…
               </button>
-              <button type="button" class="danger" @click="archive(p)">Archive pack</button>
+              <button v-if="editor" type="button" class="danger" @click="archive(p)">Archive pack</button>
             </div>
           </details>
         </div>

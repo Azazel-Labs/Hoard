@@ -34,9 +34,10 @@ pub(crate) fn router(state: &AppState) -> Router<AppState> {
             .layer(DefaultBodyLimit::disable())
             .layer(middleware::from_fn_with_state(std::sync::Arc::clone(state), limit_upload))
     };
-    let writes = Router::new()
+    // Changes to the library.
+    let edits = Router::new()
         .route("/api/packs", post(upload_pack).layer(upload_limit()))
-        .route("/api/packs/{id}", axum::routing::delete(delete_pack).patch(patch_pack))
+        .route("/api/packs/{id}", axum::routing::patch(patch_pack))
         .route("/api/tags/merge", post(merge_tags))
         .route("/api/tags/aliases", get(tag_aliases).delete(drop_tag_alias))
         .route("/api/packs/{id}/retag", post(retag_pack))
@@ -59,6 +60,12 @@ pub(crate) fn router(state: &AppState) -> Router<AppState> {
         .route("/api/assets/bulk", post(bulk_assets))
         .route("/api/archive", post(archive))
         .route("/api/archive/restore", post(restore))
+        .merge(crate::uploads::router())
+        .route_layer(middleware::from_fn_with_state(std::sync::Arc::clone(state), crate::auth::require_editor));
+
+    // Settings, accounts, maintenance, and deleting for good.
+    let admin = Router::new()
+        .route("/api/packs/{id}", axum::routing::delete(delete_pack))
         .route("/api/archive/purge", post(purge))
         .route("/api/admin/scrub", post(admin_scrub))
         .route("/api/admin/gc", post(admin_gc))
@@ -87,11 +94,15 @@ pub(crate) fn router(state: &AppState) -> Router<AppState> {
         .route("/api/admin/chatgpt/finish", post(crate::chatgpt::finish))
         .route("/api/admin/chatgpt/sign-out", post(crate::chatgpt::sign_out_route))
         .route("/api/admin/chatgpt/models", get(crate::chatgpt::list_models))
-        .merge(crate::uploads::router())
         .merge(crate::format_wizard::router())
         .merge(crate::auth::admin_router())
-        .merge(crate::oauth::portal_router())
         .merge(crate::https::admin_router())
+        .route_layer(middleware::from_fn_with_state(std::sync::Arc::clone(state), crate::auth::require_admin));
+
+    // Everyone's own: their password, access tokens and connected apps.
+    let own = Router::new()
+        .merge(crate::auth::account_router())
+        .merge(crate::oauth::portal_router())
         .route_layer(middleware::from_fn_with_state(std::sync::Arc::clone(state), crate::auth::require_user));
 
     let reads = Router::new()
@@ -139,7 +150,9 @@ pub(crate) fn router(state: &AppState) -> Router<AppState> {
         .merge(crate::https::router())
         .merge(crate::mcp::router(state))
         .merge(reads)
-        .merge(writes)
+        .merge(edits)
+        .merge(admin)
+        .merge(own)
 }
 
 /// Holds an upload to the "Largest upload" setting as it is now: refused up front when it says it's bigger, and

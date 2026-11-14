@@ -11,7 +11,7 @@ import { playableUrl, player, sourceExt, sourceUrl, stop as stopPreview } from '
 import KindGlyph from './KindGlyph.vue'
 import TagChip from './TagChip.vue'
 import { copyText, showOk, swipeToClose } from '../ui'
-import { auth } from '../auth'
+import { may, mayEdit } from '../auth'
 import { MAX_STORE_FILE, TEXT_EXTS } from '../storeFormats'
 import { lazy } from '../lazy'
 import { isModelAsset, isTextAsset, takeViewRequest, viewRequest, viewerFor, type ViewerKind } from '../viewers'
@@ -54,8 +54,10 @@ const emit = defineEmits<{
 }>()
 const palette = computed(() => props.asset.palette ?? [])
 /** A text file that may be a store's, which a signed-in user can teach Hoard to read. */
+/** May change it (a guest is asked to sign in when they try). */
+const editor = computed(() => mayEdit())
 const teachable = computed(
-  () => !!auth.status?.signed_in && TEXT_EXTS.includes(props.asset.ext.toLowerCase()) && props.asset.size <= MAX_STORE_FILE,
+  () => may('admin') && TEXT_EXTS.includes(props.asset.ext.toLowerCase()) && props.asset.size <= MAX_STORE_FILE,
 )
 const alikeable = computed(() => looksAlike(props.asset))
 const inCollections = computed(() => props.asset.collections ?? [])
@@ -359,7 +361,7 @@ async function removeTag(tag: string) {
 
 // Renaming edits the heading itself, so nothing moves: the text just becomes editable where it is.
 function startRename(ev?: MouseEvent) {
-  if (editingName.value) return
+  if (editingName.value || !editor.value) return
   editingName.value = true
   void nextTick(() => {
     const el = nameEl.value
@@ -662,7 +664,7 @@ onBeforeUnmount(() => unswipe())
         tabindex="0"
         spellcheck="false"
         :contenteditable="editingName ? 'plaintext-only' : undefined"
-        :title="editingName ? undefined : 'Click to rename'"
+        :title="editingName || !editor ? undefined : 'Click to rename'"
         :aria-label="editingName ? 'Name' : undefined"
         @click="startRename($event)"
         @keydown="onNameKey"
@@ -802,7 +804,7 @@ onBeforeUnmount(() => unswipe())
       </form>
       <template v-else>
         <p v-if="asset.description" class="desc mine">{{ asset.description }}</p>
-        <button type="button" class="linkish small" @click="editDescription">
+        <button v-if="editor" type="button" class="linkish small" @click="editDescription">
           {{ asset.description ? 'Edit description' : 'Write a description' }}
         </button>
       </template>
@@ -836,12 +838,12 @@ onBeforeUnmount(() => unswipe())
           :key="t.tag"
           :tag="t.tag"
           :source="t.source"
-          removable
+          :removable="editor"
           @click="$emit('tag', t.tag)"
           @remove="removeTag(t.tag)"
         />
       </TransitionGroup>
-      <form class="addtag" @submit.prevent="addTag">
+      <form v-if="editor" class="addtag" @submit.prevent="addTag">
         <label class="visually-hidden" for="new-tag">Add a tag</label>
         <input id="new-tag" v-model="newTag" class="field" list="tag-suggestions" placeholder="Add a tag, e.g. mood:tense" autocomplete="off" />
         <datalist id="tag-suggestions">
@@ -849,19 +851,20 @@ onBeforeUnmount(() => unswipe())
         </datalist>
         <button class="btn" type="submit" :disabled="!newTag.trim()">Add</button>
       </form>
-      <label v-if="family" class="animcheck familycheck">
+      <label v-if="family && editor" class="animcheck familycheck">
         <input v-model="applyToFamily" type="checkbox" /> Apply tag, category and description changes to all {{ family.size }} variants
       </label>
     </section>
 
-    <section class="cols">
+    <section v-if="editor || inCollections.length" class="cols">
       <h3>Collections</h3>
       <div class="tags">
         <span v-for="c in inCollections" :key="c.id" class="chip src-human colchip">
           <button type="button" class="linkish" @click="$emit('browseCollection', c)">{{ c.name }}</button>
-          <button class="x" type="button" :aria-label="`Remove from ${c.name}`" @click="$emit('uncollect', c.id)">×</button>
+          <button v-if="editor" class="x" type="button" :aria-label="`Remove from ${c.name}`" @click="$emit('uncollect', c.id)">×</button>
         </span>
         <CollectionPicker
+          v-if="editor"
           :collections="collections"
           :current="inCollections.map((c) => c.id)"
           :label="inCollections.length ? 'Add to another' : 'Add to collection'"
@@ -1090,7 +1093,7 @@ onBeforeUnmount(() => unswipe())
         <button class="btn ghost" type="button" @click="copy(asset.id, 'id')">Copy ID</button>
         <button v-if="teachable" class="btn ghost" type="button" title="Describe this store's file so Hoard reads it (Settings → Store files)" @click="emit('teach')">Teach Hoard this file</button>
         <span class="copied" role="status">{{ copied ? `Copied ${copied}` : '' }}</span>
-        <button v-if="!asset.archived_at" class="btn ghost danger archive" type="button" title="Out of search until it's restored or deleted for good, from the Archive" @click="emit('archive')">Archive</button>
+        <button v-if="!asset.archived_at && editor" class="btn ghost danger archive" type="button" title="Out of search until it's restored or deleted for good, from the Archive" @click="emit('archive')">Archive</button>
       </div>
     </footer>
     </div>

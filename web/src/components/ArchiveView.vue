@@ -4,6 +4,7 @@
 import { computed, onMounted, ref } from 'vue'
 import { api, humanBytes, KIND_LABEL, thumbUrl, type ArchiveItems, type Asset, type Pack } from '../api'
 import { countText } from '../archive'
+import { mayTry } from '../auth'
 import { confirmDialog, showError, showOk } from '../ui'
 import KindGlyph from './KindGlyph.vue'
 
@@ -61,6 +62,9 @@ async function run(what: 'restore' | 'purge', items: ArchiveItems & { all?: bool
   }
 }
 
+/** Restoring changes the library; deleting for good is for admins. */
+const restorer = computed(() => mayTry('edit'))
+const purger = computed(() => mayTry('admin'))
 const restorePack = (p: Pack) => run('restore', { packs: [p.id] })
 const restoreAsset = (a: Asset) => run('restore', { assets: [a.id] })
 async function purgePack(p: Pack) {
@@ -103,7 +107,7 @@ async function emptyArchive() {
             good to free their space.
           </p>
         </div>
-        <button v-if="!empty && !loading" type="button" class="btn danger" :disabled="busy" @click="emptyArchive">Empty archive</button>
+        <button v-if="!empty && !loading && purger" type="button" class="btn danger" :disabled="busy" @click="emptyArchive">Empty archive</button>
       </header>
 
       <p v-if="loading" class="muted">Loading…</p>
@@ -130,8 +134,8 @@ async function emptyArchive() {
                 <span>{{ p.asset_count.toLocaleString() }} {{ p.asset_count === 1 ? 'asset' : 'assets' }} · {{ humanBytes(p.total_bytes) }} · archived {{ when(p.archived_at) }}</span>
               </div>
               <div class="acts">
-                <button type="button" class="btn" :disabled="busy" @click="restorePack(p)">Restore</button>
-                <button type="button" class="btn danger" :disabled="busy" @click="purgePack(p)">Delete forever</button>
+                <button v-if="restorer" type="button" class="btn" :disabled="busy" @click="restorePack(p)">Restore</button>
+                <button v-if="purger" type="button" class="btn danger" :disabled="busy" @click="purgePack(p)">Delete forever</button>
               </div>
             </li>
           </ul>
@@ -150,8 +154,8 @@ async function emptyArchive() {
                 <span>{{ KIND_LABEL[a.kind] ?? a.kind }} · {{ humanBytes(a.size) }} · from {{ a.pack_name }} · archived {{ when(a.archived_at) }}</span>
               </div>
               <div class="acts">
-                <button type="button" class="btn" :disabled="busy" @click="restoreAsset(a)">Restore</button>
-                <button type="button" class="btn danger" :disabled="busy" @click="purgeAsset(a)">Delete forever</button>
+                <button v-if="restorer" type="button" class="btn" :disabled="busy" @click="restoreAsset(a)">Restore</button>
+                <button v-if="purger" type="button" class="btn danger" :disabled="busy" @click="purgeAsset(a)">Delete forever</button>
               </div>
             </li>
           </ul>

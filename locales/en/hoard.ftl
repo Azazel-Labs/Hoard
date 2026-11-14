@@ -206,6 +206,24 @@ error-texture-name-chars = Texture names can't have < > : " / \ | ? or *
 # $role is the map type's name as given (base_color, normal…).
 error-texture-map-type = There's no map type called { $role }
 # $map is the map type in English, in lower case (colour, normal, roughness…).
+# Each kind of texture map, as it reads in the middle of the two messages after these.
+server-role-base-color = colour
+server-role-normal = normal
+server-role-normal-dx = normal (DirectX)
+server-role-roughness = roughness
+server-role-gloss = gloss
+server-role-metalness = metalness
+server-role-ao = ambient occlusion
+server-role-orm = ORM
+server-role-mra = MRA
+server-role-rma = RMA
+server-role-height = height
+server-role-bump = bump
+server-role-cavity = cavity
+server-role-specular = specular
+server-role-opacity = opacity
+server-role-emissive = emissive
+server-role-translucency = translucency
 error-texture-suffix-missing = Give { $map } maps a suffix
 error-texture-suffix-chars = The suffix for { $map } maps can't have < > : " / \ | ? or *
 # Connecting an app (an MCP client) to Hoard: shown on the page the app opened. client_id, response_type=code, PKCE
@@ -333,6 +351,16 @@ error-already-imported = already imported as "{ $name }"
 
 ## Server text
 
+# Why a store listing found for a pack (Packs → Look up) is likely the one: where in the pack it was seen.
+server-store-place-readme = README
+server-store-place-folders = folders
+# $place is server-store-place-readme, -folders, or a store's file as its format names it ("Sketchfab file").
+server-store-why-linked = Linked in the pack's { $place }
+server-store-why-same-title = Same title as the pack's { $place }
+server-store-why-by = By { $author }, named in the pack's { $place }
+# $count is how many the pack has.
+server-store-why-meshes = About as many meshes as the pack ({ $count })
+server-store-why-textures = About as many textures as the pack ({ $count })
 server-chatgpt-revoke-failed = Signed out here, but OpenAI couldn't be told. To be sure, disconnect Hoard in ChatGPT Settings → Security and login → Sign in with ChatGPT.
 # The page a browser lands on after signing in to ChatGPT.
 server-chatgpt-signed-in-title = Signed in to ChatGPT

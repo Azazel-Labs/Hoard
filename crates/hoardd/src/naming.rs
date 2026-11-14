@@ -19,6 +19,29 @@ use crate::i18n::tr;
 use crate::materials::{ALL_ROLES, Role};
 
 impl Role {
+    /// The kind of map as it reads mid-sentence ("Give normal maps a suffix"), in the request's language.
+    fn name(self) -> String {
+        match self {
+            Role::BaseColor => tr!("server-role-base-color"),
+            Role::Normal => tr!("server-role-normal"),
+            Role::NormalDx => tr!("server-role-normal-dx"),
+            Role::Roughness => tr!("server-role-roughness"),
+            Role::Gloss => tr!("server-role-gloss"),
+            Role::Metalness => tr!("server-role-metalness"),
+            Role::Ao => tr!("server-role-ao"),
+            Role::Orm => tr!("server-role-orm"),
+            Role::Mra => tr!("server-role-mra"),
+            Role::Rma => tr!("server-role-rma"),
+            Role::Height => tr!("server-role-height"),
+            Role::Bump => tr!("server-role-bump"),
+            Role::Cavity => tr!("server-role-cavity"),
+            Role::Specular => tr!("server-role-specular"),
+            Role::Opacity => tr!("server-role-opacity"),
+            Role::Emissive => tr!("server-role-emissive"),
+            Role::Translucency => tr!("server-role-translucency"),
+        }
+    }
+
     /// What the map is for, in words: what the portal shows for it too.
     pub(crate) fn label(self) -> &'static str {
         match self {
@@ -173,10 +196,10 @@ impl TextureNames {
         for (role, suffix) in &self.maps {
             let Some(r) = Role::parse(role) else { return Err(tr!("error-texture-map-type", role = role)) };
             if suffix.trim().is_empty() {
-                return Err(tr!("error-texture-suffix-missing", map = r.label().to_lowercase()));
+                return Err(tr!("error-texture-suffix-missing", map = r.name()));
             }
             if suffix.chars().any(bad_char) {
-                return Err(tr!("error-texture-suffix-chars", map = r.label().to_lowercase()));
+                return Err(tr!("error-texture-suffix-chars", map = r.name()));
             }
         }
         Ok(())

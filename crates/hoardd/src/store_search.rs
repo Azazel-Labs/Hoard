@@ -191,7 +191,7 @@ pub(crate) struct StoreMatch {
     score: f32,
     /// Why it ranks where it does, beyond its title ("By Marco Maria Rossi, named in the README").
     #[serde(skip_serializing_if = "Vec::is_empty")]
-    why: Vec<String>,
+    why: Vec<Why>,
     /// Engines and tools the listing is made for (`unreal-engine`, `unity`), where the store says.
     #[serde(skip)]
     formats: Vec<String>,
@@ -236,8 +236,69 @@ pub(crate) const FAB_STANDARD: &str = "Fab Standard License";
 pub(crate) const CC_BY_4: &str = "CC BY 4.0";
 pub(crate) const CC0: &str = "CC0";
 
-/// Reasons that make a match certain: the pack names that listing itself.
-const CERTAIN: [&str; 2] = ["Linked in the pack's ", "Same title as the pack's "];
+/// Where in the pack a clue was seen.
+#[derive(Clone, Debug, PartialEq)]
+enum Place {
+    Readme,
+    Folders,
+    /// A store's own file, as its format calls it ("Sketchfab file").
+    File(String),
+}
+
+impl Place {
+    /// In English, for the clues an AI is given.
+    fn english(&self) -> &str {
+        match self {
+            Self::Readme => "README",
+            Self::Folders => "folders",
+            Self::File(called) => called,
+        }
+    }
+
+    /// In the request's language.
+    fn text(&self) -> String {
+        match self {
+            Self::Readme => tr!("server-store-place-readme"),
+            Self::Folders => tr!("server-store-place-folders"),
+            Self::File(called) => called.clone(),
+        }
+    }
+}
+
+/// Why a match ranks where it does, beyond its title: sent written out in the request's language.
+#[derive(Clone, Debug, PartialEq)]
+enum Why {
+    Linked(Place),
+    SameTitle(Place),
+    By { author: String, place: Place },
+    Meshes(u64),
+    Textures(u64),
+}
+
+impl Why {
+    /// Whether this makes a match certain: the pack names that listing itself.
+    const fn is_certain(&self) -> bool {
+        matches!(self, Self::Linked(_) | Self::SameTitle(_))
+    }
+}
+
+impl std::fmt::Display for Why {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str(&match self {
+            Self::Linked(place) => tr!("server-store-why-linked", place = place.text()),
+            Self::SameTitle(place) => tr!("server-store-why-same-title", place = place.text()),
+            Self::By { author, place } => tr!("server-store-why-by", author = author, place = place.text()),
+            Self::Meshes(count) => tr!("server-store-why-meshes", count = count),
+            Self::Textures(count) => tr!("server-store-why-textures", count = count),
+        })
+    }
+}
+
+impl Serialize for Why {
+    fn serialize<S: serde::Serializer>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error> {
+        serializer.collect_str(self)
+    }
+}
 
 impl StoreMatch {
     pub(crate) fn store(&self) -> &'static str {
@@ -253,7 +314,7 @@ impl StoreMatch {
         self.license
     }
     fn is_certain(&self) -> bool {
-        (self.score - 1.0).abs() < f32::EPSILON && self.why.iter().any(|w| CERTAIN.iter().any(|c| w.starts_with(c)))
+        (self.score - 1.0).abs() < f32::EPSILON && self.why.iter().any(Why::is_certain)
     }
 }
 
@@ -276,11 +337,11 @@ impl StoreMatches {
 #[derive(Debug, Default, PartialEq)]
 pub(crate) struct Clues {
     /// The product's exact title, from a file the store ships with it (a Megascans `<id>.json`), and that file.
-    title: Option<(String, String)>,
+    title: Option<(String, Place)>,
     /// Product names besides the pack's: folders like `Content/MedievalVillage`, "Thank you for purchasing X".
     names: Vec<String>,
     /// Seller names, and where each was seen.
-    sellers: Vec<(String, String)>,
+    sellers: Vec<(String, Place)>,
     /// Store pages the pack links to: in its README, or in a store's file (Sketchfab's `license.txt`).
     links: Vec<Link>,
     /// `unreal-engine`, `unity` or `blender`, from the files' types.
@@ -294,8 +355,7 @@ pub(crate) struct Clues {
 struct Link {
     store: &'static str,
     url: String,
-    /// Where: "README", "Sketchfab file".
-    from: String,
+    from: Place,
     /// What the store's file says about the page, when it's one that links to it.
     title: Option<String>,
     author: Option<String>,
@@ -304,16 +364,17 @@ struct Link {
 
 impl Link {
     fn readme(store: &'static str, url: String) -> Self {
-        Self { store, url, from: "README".to_owned(), title: None, author: None, license: None }
+        Self { store, url, from: Place::Readme, title: None, author: None, license: None }
     }
 }
 
 impl Clues {
     fn describe(&self) -> Vec<String> {
-        let mut out: Vec<String> = self.title.iter().map(|(t, from)| format!("Title: {t} ({from})")).collect();
+        let mut out: Vec<String> =
+            self.title.iter().map(|(t, from)| format!("Title: {t} ({})", from.english())).collect();
         out.extend(self.names.iter().map(|n| format!("Product: {n}")));
-        out.extend(self.sellers.iter().map(|(s, from)| format!("Seller: {s} ({from})")));
-        out.extend(self.links.iter().map(|l| format!("The {} links to {}", l.from, l.store)));
+        out.extend(self.sellers.iter().map(|(s, from)| format!("Seller: {s} ({})", from.english())));
+        out.extend(self.links.iter().map(|l| format!("The {} links to {}", l.from.english(), l.store)));
         if let Some(e) = self.engine {
             out.push(format!("Files for {}", engine_name(e)));
         }
@@ -438,7 +499,7 @@ pub(crate) fn clues(pack_name: &str, readme: Option<&str>, paths: &[String], kin
     let mut pubs: Vec<(&str, usize)> = publishers.into_iter().filter(|(_, n)| *n >= floor).collect();
     pubs.sort_by(|a, b| b.1.cmp(&a.1).then(a.0.cmp(b.0)));
     if let Some((p, _)) = pubs.first() {
-        c.sellers.push((search_terms(p), "folders".to_owned()));
+        c.sellers.push((search_terms(p), Place::Folders));
     }
 
     if let Some(text) = readme {
@@ -493,7 +554,7 @@ pub(crate) fn clues(pack_name: &str, readme: Option<&str>, paths: &[String], kin
                         && c.sellers.len() < 3
                         && !c.sellers.iter().any(|(s, _)| s.eq_ignore_ascii_case(&seller))
                     {
-                        c.sellers.push((seller, "README".to_owned()));
+                        c.sellers.push((seller, Place::Readme));
                     }
                     break;
                 }
@@ -522,13 +583,13 @@ impl Clues {
         if let (Some(first), 1) = (files.first(), titles.len())
             && self.title.is_none()
         {
-            self.title = Some((first.title.clone(), first.source.clone()));
+            self.title = Some((first.title.clone(), Place::File(first.source.clone())));
         }
         for f in files {
             if let Some(seller) = &f.seller
                 && !self.sellers.iter().any(|(s, _)| s == seller)
             {
-                self.sellers.insert(0, (seller.clone(), f.source.clone()));
+                self.sellers.insert(0, (seller.clone(), Place::File(f.source.clone())));
             }
             if let Some(url) = &f.url
                 && let Some(store) = store_from_url(url)
@@ -538,7 +599,7 @@ impl Clues {
                 self.links.push(Link {
                     store,
                     url: url.clone(),
-                    from: f.source.clone(),
+                    from: Place::File(f.source.clone()),
                     title: Some(f.title.clone()),
                     author: f.seller.clone(),
                     license: f.license.clone(),
@@ -780,7 +841,7 @@ async fn linked_page(http: &reqwest::Client, link: &Link) -> Option<StoreMatch> 
     let mut m = found(link.store, &title, url.replace("http://", "https://"))?;
     m.author.clone_from(&link.author);
     m.license = link.license.as_deref().and_then(crate::credits::license_name);
-    m.why.push(format!("Linked in the pack's {}", link.from));
+    m.why.push(Why::Linked(link.from.clone()));
     Some(m)
 }
 
@@ -904,14 +965,14 @@ fn rank(query: &str, clues: &Clues, matches: Vec<StoreMatch>) -> Vec<StoreMatch>
         }
         let by_name = others.iter().map(|o| 0.9 * score(o, &m.title)).fold(score(&primary, &m.title), f32::max);
         let mut s = by_name;
-        if m.why.iter().any(|w| w.starts_with("Linked")) {
+        if m.why.iter().any(|w| matches!(w, Why::Linked(_))) {
             s = 1.0;
         }
         if let Some((title, from)) = &clues.title
             && same_title(title, &m.title)
         {
             s = 1.0;
-            m.why.push(format!("Same title as the pack's {from}"));
+            m.why.push(Why::SameTitle(from.clone()));
         }
         if let Some(author) = m.author.as_deref().map(squash).filter(|a| a.len() >= 3)
             && let Some((seller, from)) = clues.sellers.iter().find(|(s, _)| {
@@ -920,16 +981,17 @@ fn rank(query: &str, clues: &Clues, matches: Vec<StoreMatch>) -> Vec<StoreMatch>
             })
         {
             s += 0.35;
-            m.why.push(format!("By {}, named in the pack's {from}", m.author.as_deref().unwrap_or(seller)));
+            let author = m.author.clone().unwrap_or_else(|| seller.clone());
+            m.why.push(Why::By { author, place: from.clone() });
         }
         if let Some(specs) = m.specs.as_deref() {
             if clues.meshes >= 5 && spec_count(specs, "mesh").is_some_and(|n| about(n, clues.meshes)) {
                 s += 0.2;
-                m.why.push(format!("About as many meshes as the pack ({})", clues.meshes));
+                m.why.push(Why::Meshes(clues.meshes));
             }
             if clues.textures >= 5 && spec_count(specs, "texture").is_some_and(|n| about(n, clues.textures)) {
                 s += 0.15;
-                m.why.push(format!("About as many textures as the pack ({})", clues.textures));
+                m.why.push(Why::Textures(clues.textures));
             }
         }
         // A listing for another engine is less likely, though the same art is often sold for several.
@@ -945,7 +1007,7 @@ fn rank(query: &str, clues: &Clues, matches: Vec<StoreMatch>) -> Vec<StoreMatch>
         // Knowing the exact title, a listing with another one (the same scan's "Old 04") is a near miss at best.
         if let Some((title, _)) = &clues.title
             && !same_title(title, &m.title)
-            && !m.why.iter().any(|w| w.starts_with("Linked"))
+            && !m.why.iter().any(|w| matches!(w, Why::Linked(_)))
         {
             s = s.min(0.85);
         }
@@ -1211,7 +1273,10 @@ pub(crate) mod tests {
         .to_vec();
         let mut c = clues("historic_miscellaneous_stand_wood_old_05_xeokah0_raw", None, &paths, &BTreeMap::new());
         c.add_sidecars(&[sidecar::read("xeokah0.json", sidecar::tests::STAND).unwrap()]);
-        assert_eq!(c.title, Some(("Historic Miscellaneous Stand Wood Old 05".to_owned(), "Megascans file".to_owned())));
+        assert_eq!(
+            c.title,
+            Some(("Historic Miscellaneous Stand Wood Old 05".to_owned(), Place::File("Megascans file".to_owned())))
+        );
         assert_eq!(c.sellers[0].0, "Quixel Megascans");
         assert!(c.describe()[0].starts_with("Title: Historic Miscellaneous Stand Wood Old 05"));
 
@@ -1232,7 +1297,7 @@ pub(crate) mod tests {
         );
         assert_eq!(ranked[0].title, "Historic Miscellaneous Stand Wood Old 05");
         assert!((ranked[0].score - 1.0).abs() < f32::EPSILON);
-        assert!(ranked[0].why.iter().any(|w| w == "Same title as the pack's Megascans file"));
+        assert!(ranked[0].why.iter().any(|w| w.to_string() == "Same title as the pack's Megascans file"));
         assert!(ranked[1].score < 1.0, "a different number isn't the same listing");
         assert!(same_title("stand_wood_old_05", "Stand Wood Old 05") && !same_title("Old 05", "Old 04"));
     }
@@ -1242,7 +1307,7 @@ pub(crate) mod tests {
         let text = include_str!("../formats/samples/sketchfab/license.txt");
         let mut c = Clues::default();
         c.add_sidecars(&[sidecar::read("Lantern/license.txt", text).unwrap()]);
-        assert_eq!(c.title, Some(("Brass Lantern".to_owned(), "Sketchfab file".to_owned())));
+        assert_eq!(c.title, Some(("Brass Lantern".to_owned(), Place::File("Sketchfab file".to_owned()))));
         assert_eq!(c.describe().last().map(String::as_str), Some("The Sketchfab file links to Sketchfab"));
 
         // Its page needn't be fetched: the file gives the title, the author and the license.
@@ -1297,7 +1362,7 @@ pub(crate) mod tests {
         let mut two = matches(vec![fab_match("One", "A", &[]), fab_match("Two", "B", &["CC-BY"])]);
         for m in &mut two.matches {
             m.score = 1.0;
-            m.why.push("Linked in the pack's README".to_owned());
+            m.why.push(Why::Linked(Place::Readme));
         }
         assert!(two.certain().is_none());
         assert_eq!(two.matches[1].license(), Some(CC_BY_4));
@@ -1399,7 +1464,7 @@ pub(crate) mod tests {
         let c = clues("Medieval Village v1.2", Some(readme), &paths, &kinds);
         // The product folder is just the pack's name again, so it adds nothing; the README's name does.
         assert_eq!(c.names, ["Rustic Hamlet Kit"]);
-        assert_eq!(c.sellers, [("Marco Maria Rossi".to_owned(), "README".to_owned())]);
+        assert_eq!(c.sellers, [("Marco Maria Rossi".to_owned(), Place::Readme)]);
         assert_eq!(c.links, [Link::readme("Fab", "https://www.fab.com/listings/f89fe420-1942".to_owned())]);
         assert_eq!((c.engine, c.meshes, c.textures), (Some("unreal-engine"), 496, 173));
 
@@ -1407,7 +1472,7 @@ pub(crate) mod tests {
             (0..6).map(|i| format!("Assets/Synty/PolygonFantasyKingdom/Models/m{i}.fbx")).collect();
         let c = clues("pack_2023", None, &unity, &BTreeMap::new());
         assert_eq!(c.names, ["Polygon Fantasy Kingdom"]);
-        assert_eq!(c.sellers, [("Synty".to_owned(), "folders".to_owned())]);
+        assert_eq!(c.sellers, [("Synty".to_owned(), Place::Folders)]);
         assert_eq!(c.engine, None);
     }
 
@@ -1415,7 +1480,7 @@ pub(crate) mod tests {
     fn searches_pieces_of_the_name_too() {
         let c = Clues {
             names: vec!["Rustic Hamlet".into()],
-            sellers: vec![("Marco".into(), "README".into())],
+            sellers: vec![("Marco".into(), Place::Readme)],
             ..Clues::default()
         };
         assert_eq!(
@@ -1451,7 +1516,7 @@ pub(crate) mod tests {
             m
         };
         let c = Clues {
-            sellers: vec![("Marco Maria Rossi".into(), "README".into())],
+            sellers: vec![("Marco Maria Rossi".into(), Place::Readme)],
             engine: Some("unreal-engine"),
             meshes: 490,
             ..Clues::default()
@@ -1468,7 +1533,7 @@ pub(crate) mod tests {
         assert_eq!(ranked.len(), 2, "the same listing found twice is kept once");
         assert_eq!(ranked[0].url, "https://www.fab.com/listings/b");
         assert_eq!(ranked[0].why.len(), 2);
-        assert!(ranked[0].why[0].contains("Marco Maria Rossi"));
+        assert!(ranked[0].why[0].to_string().contains("Marco Maria Rossi"));
     }
 
     #[test]

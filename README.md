@@ -171,9 +171,11 @@ It uses the newest `hoardd` under `target/` (debug, then release); `HOARD_BIN` p
 `HOARD_WEB_DIR` at another portal build. Failures keep a trace, a screenshot and the server's log in
 `web/test-results/` (`npx playwright show-trace <trace.zip>`).
 
-`e2e/engines.spec.ts` runs the engine plugins against that server: with `GODOT_BIN` set to a Godot 4 executable it
-builds a scratch project, adds a model through the Godot plugin's code headless, and checks the files, `hoard.toml`,
-`hoard.lock` and what the server was told. Without it the test is skipped.
+`e2e/engines.spec.ts` runs the engine plugins against that server: each adds a model to a scratch project through
+the plugin's own code, the files, `hoard.toml`, `hoard.lock` and what the server was told are checked, and then the
+real `hoard sync --verify` must find everything in place, downloading nothing and writing the same lock. The Unity
+package's code runs on .NET whenever `dotnet` is installed (so in CI); Godot's runs headless when `GODOT_BIN` names a
+Godot 4 executable. Both use the hoard CLI under `target/` (`cargo build -p hoard`), or `HOARD_CLI`.
 
 ### Local models for the tagger
 
@@ -531,6 +533,13 @@ are checked by size as they arrive; `hoard sync --verify` checks their BLAKE3 ha
 `addons/`, then Project → Project Settings → Plugins → enable Hoard. The dock sits top right; open Settings in it for
 the server and token. Assets go under `out_dir` (`assets/hoard` unless `hoard.toml` says otherwise), and the editor
 rescans when they land. Double-click a result to add it, or pick several and press Add to project.
+
+**Unity 2021.3 or later.** Window → Package Manager → + → Add package from git URL:
+`https://github.com/Azazel-Labs/Hoard.git?path=integrations/unity/com.hoard.browser` (or Add package from disk, and pick
+[integrations/unity/com.hoard.browser/package.json](integrations/unity/com.hoard.browser/package.json) in a checkout).
+Then Window → Hoard; Settings in its toolbar takes the server and token. Assets go under `Assets/Hoard` unless
+`hoard.toml` says otherwise, and the editor imports them when they land. Click, Ctrl/Cmd-click and Shift-click pick
+results; double-click adds one.
 
 ## Unreal packs
 
@@ -1056,6 +1065,7 @@ crates/hoard          the CLI
 crates/hoard-unreal   Unreal package reader and converters (textures, sounds, materials, data tables)
 xtask/                `cargo xtask`: dev servers, checks, local model downloads and serving, Unreal export
 integrations/godot    the Godot 4 editor plugin (addons/hoard) and its headless test script
+integrations/unity    the Unity editor package (com.hoard.browser) and a .NET harness that runs its code without Unity
 web/                  Vue 3 + TypeScript portal (Vite); three.js viewer is lazy-loaded
 web/scripts/          readme-images.mts: the README's screenshots and the social card, in docs/img/
 .vscode/              tasks, debug configurations, settings and recommended extensions

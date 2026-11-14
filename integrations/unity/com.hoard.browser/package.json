@@ -1,0 +1,8 @@
+{
+  "name": "com.hoard.browser",
+  "displayName": "Hoard",
+  "version": "1.0.0",
+  "unity": "2021.3",
+  "description": "Search a Hoard asset library from the editor, with thumbnails, and add what you pick to the project with what it needs, where hoard sync would put it. Window > Hoard.",
+  "keywords": ["assets", "hoard", "library"]
+}

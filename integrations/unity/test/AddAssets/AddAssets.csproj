@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Adds assets to a project the way the Hoard window's "Add to project" does, without Unity. -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <!-- Whichever .NET the SDK running it ships, so any recent SDK will do. -->
+    <TargetFramework>net$(NETCoreAppMaximumVersion)</TargetFramework>
+    <LangVersion>9.0</LangVersion>
+    <Nullable>disable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../HoardCore/HoardCore.csproj" />
+  </ItemGroup>
+</Project>

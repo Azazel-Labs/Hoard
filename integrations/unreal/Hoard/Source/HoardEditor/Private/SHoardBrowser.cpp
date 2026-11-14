@@ -5,6 +5,7 @@
 #include "HoardImport.h"
 #include "HoardJson.h"
 #include "HoardProject.h"
+#include "HoardSend.h"
 #include "Misc/ConfigCacheIni.h"
 #include "Misc/Paths.h"
 #include "Styling/AppStyle.h"
@@ -133,7 +134,7 @@ void SHoardBrowser::Construct(const FArguments& InArgs)
 				[
 					SNew(SEditableTextBox)
 					.IsPassword(true)
-					.HintText(LOCTEXT("TokenHint", "A token that can look is enough"))
+					.HintText(LOCTEXT("TokenHint", "One that can look is enough to add; sending needs an editor's"))
 					.Text_Lambda([this] { return FText::FromString(TokenField); })
 					.OnTextChanged_Lambda([this](const FText& T) { TokenField = T.ToString(); })
 				]
@@ -172,6 +173,18 @@ void SHoardBrowser::Construct(const FArguments& InArgs)
 				SNew(STextBlock)
 				.Text_Lambda([this] { return Status; })
 				.AutoWrapText(true)
+			]
+			+ SHorizontalBox::Slot().AutoWidth().Padding(4, 0, 0, 0)
+			[
+				SNew(SButton)
+				.Text(LOCTEXT("SendButton", "Send..."))
+				.ToolTipText(LOCTEXT("SendButtonTip", "Send what's picked in the Content Browser to Hoard as a new pack (it needs an editor's token)."))
+				.OnClicked_Lambda([this]
+				{
+					SaveSettings();
+					HoardSend::Open(HoardSend::Selection());
+					return FReply::Handled();
+				})
 			]
 			+ SHorizontalBox::Slot().AutoWidth().Padding(4, 0, 0, 0)
 			[

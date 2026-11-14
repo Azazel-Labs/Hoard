@@ -531,7 +531,7 @@ the plugin get the same files from it. A token that can only look is enough. The
 kept in your editor's own settings, never in the project (the address falls back to `hoard.toml`'s `server`). Files
 are checked by size as they arrive; `hoard sync --verify` checks their BLAKE3 hashes.
 
-Going the other way, the Godot and Unity plugins send a project's own assets to Hoard as a new pack, and only what another tool can
+Going the other way, the Godot, Unity and Unreal plugins send a project's own assets to Hoard as a new pack, and only what another tool can
 open goes:
 
 - **Originals:** the file an asset was imported from, if it's still there. That includes the files a model names: an
@@ -565,7 +565,9 @@ plugin), or build it once with `RunUAT BuildPlugin -Plugin=…/Hoard.uplugin -Pa
 Window → Hoard; the gear takes the server and token, kept in the editor's own settings. Files go under `Hoard/` beside
 `Content/`, not in it (unless `hoard.toml` says otherwise), so Unreal never imports them twice; what was just
 downloaded is then imported into `/Game/Hoard`, in the same folders: models bring their materials and textures, and
-pictures, sounds and fonts come in on their own. Click, Ctrl-click and Shift-click pick results; double-click adds one.
+pictures, sounds and fonts come in on their own. Click, Ctrl-click and Shift-click pick results; double-click adds one. To send,
+right-click assets or folders in the Content Browser → Send to Hoard… (or select them and press Send… in the Hoard
+tab). It lists what will go before sending. Meshes, textures and sounds made in Unreal go as `.fbx`, `.png` and `.wav`.
 
 ## Unreal packs
 

@@ -363,12 +363,19 @@ ${built.stderr}`).toBe(0)
   return out
 }
 
-test('the Unreal plugin adds an asset with what it needs, where hoard sync would, and imports it', async ({ api, baseURL }) => {
+test('the Unreal plugin adds an asset with what it needs, where hoard sync would, imports it, and sends the project’s own', async ({ api, baseURL }) => {
   const editor = process.env.UNREAL_EDITOR
   test.skip(!editor, 'UNREAL_EDITOR is not set')
   test.setTimeout(1_800_000)
   const plugin = unrealPlugin(editor!)
   const uproject = 'HoardTest.uproject'
+  const unreal = (dir: string, commandlet: string, env: Record<string, string>) =>
+    spawnSync(editor!, [join(dir, uproject), `-run=${commandlet}`, '-unattended', '-nullrhi', '-nosplash', '-nosound', '-nop4'], {
+      env: { ...process.env, ...env },
+      encoding: 'utf8',
+      timeout: 900_000,
+      maxBuffer: 256 * 1024 * 1024,
+    })
   await roundTrip(api, baseURL!, {
     engine: 'Unreal',
     outDir: 'Hoard',
@@ -377,21 +384,41 @@ test('the Unreal plugin adds an asset with what it needs, where hoard sync would
       writeFileSync(join(dir, uproject), JSON.stringify({ FileVersion: 3, Plugins: [{ Name: 'Hoard', Enabled: true }] }, null, 2))
       cpSync(plugin, join(dir, 'Plugins', 'Hoard'), { recursive: true })
     },
-    run: (dir, env) =>
-      outcome(
-        spawnSync(editor!, [join(dir, uproject), '-run=HoardAdd', '-unattended', '-nullrhi', '-nosplash', '-nosound', '-nop4'], {
-          env: { ...process.env, ...env },
-          encoding: 'utf8',
-          timeout: 900_000,
-          maxBuffer: 256 * 1024 * 1024,
-        }),
-        'Unreal',
-      ),
+    run: (dir, env) => outcome(unreal(dir, 'HoardAdd', env), 'Unreal'),
     after(dir, first, folder) {
       // The model came in as Unreal assets, under /Game/Hoard in the folders it has under Hoard/.
       expect(first.imported?.length, JSON.stringify(first.imported)).toBeGreaterThan(0)
       const content = join(dir, 'Content', 'Hoard', ...folder.slice(join(dir, 'Hoard').length + 1).split(/[\\/]/))
       expect(existsSync(content) && filesUnder(content).some((f) => f.endsWith('.uasset')), `nothing imported into ${content}`).toBe(true)
+    },
+    exporter: {
+      plant(dir, tag) {
+        // The project's own OBJ (its material library and picture come along from where it was imported) and a sound,
+        // kept outside Content as source files are; and a picture and a model whose files are gone once imported, so
+        // only copies can go.
+        const own = ownCrate(tag)
+        const source = join(dir, 'Source', 'mine')
+        const gone = join(dir, 'Source', 'gone')
+        mkdirSync(join(source, 'tex'), { recursive: true })
+        mkdirSync(gone, { recursive: true })
+        writeFileSync(join(source, `mine_${tag}.obj`), own.obj)
+        writeFileSync(join(source, `mine_${tag}.mtl`), own.mtl)
+        writeFileSync(join(source, own.png), own.texture)
+        writeFileSync(join(source, 'beep.wav'), sound('zap', 3))
+        writeFileSync(join(gone, `paint_${tag}.png`), checker(16, [200, 40, 40], [100, 20, 20], 2))
+        writeFileSync(join(gone, `blob_${tag}.obj`), crate().obj.toString().replace(/^mtllib .*$/m, ''))
+        const files = [join(source, `mine_${tag}.obj`), join(source, 'beep.wav'), join(gone, `paint_${tag}.png`), join(gone, `blob_${tag}.obj`)]
+        const imported = outcome(unreal(dir, 'HoardSend', { HOARD_IMPORT: files.join('\n'), HOARD_IMPORT_TO: '/Game/Mine' }), 'Unreal')
+        expect(imported.ok, JSON.stringify(imported)).toBe(true)
+        rmSync(gone, { recursive: true, force: true })
+        return {
+          pick: ['/Game/Mine', '/Game/Hoard'],
+          expect: [`Mine/mine_${tag}.obj`, `Mine/mine_${tag}.mtl`, `Mine/${own.png}`, 'Mine/beep.wav', `Mine/paint_${tag}.png`, `Mine/blob_${tag}.fbx`],
+          fromHoard: 1,
+          engineOnly: 0,
+        }
+      },
+      run: (dir, env) => sentOutcome(unreal(dir, 'HoardSend', env), 'Unreal'),
     },
   })
 })

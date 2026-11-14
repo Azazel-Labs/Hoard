@@ -1,7 +1,11 @@
 #include "HoardClient.h"
 
+#include "Containers/Ticker.h"
 #include "HAL/FileManager.h"
+#include "HAL/PlatformProcess.h"
+#include "HAL/PlatformTime.h"
 #include "HoardJson.h"
+#include "HttpManager.h"
 #include "HttpModule.h"
 #include "Interfaces/IHttpRequest.h"
 #include "Interfaces/IHttpResponse.h"
@@ -64,6 +68,25 @@ static FString Unreachable(EHttpFailureReason Reason)
 
 void FHoardClient::Send(const FString& Path, const FString& Verb, const FString& Payload, FHoardDone Done, const FString& DownloadTo) const
 {
+	TArray<uint8> Content;
+	if (!Payload.IsEmpty())
+	{
+		const FTCHARToUTF8 Utf8(*Payload);
+		Content.Append(reinterpret_cast<const uint8*>(Utf8.Get()), Utf8.Length());
+	}
+	Request(Path, Verb, Payload.IsEmpty() ? FString() : FString(TEXT("application/json")), MoveTemp(Content), DownloadTo.IsEmpty() ? 30.f : 0.f,
+		MoveTemp(Done), DownloadTo);
+}
+
+void FHoardClient::Upload(const FString& Path, TArray<uint8>&& Body, const FString& ContentType, FHoardDone Done) const
+{
+	// Long enough for a big pack on a slow link; the server answers once it has it all.
+	Request(Path, TEXT("POST"), ContentType, MoveTemp(Body), 3600.f, MoveTemp(Done), FString());
+}
+
+void FHoardClient::Request(const FString& Path, const FString& Verb, const FString& ContentType, TArray<uint8>&& Content, float Timeout, FHoardDone Done,
+	const FString& DownloadTo) const
+{
 	if (Server.TrimStartAndEnd().IsEmpty())
 	{
 		Done(Fail(TEXT("No server address: set it in the Hoard tab's settings.")));
@@ -78,17 +101,17 @@ void FHoardClient::Send(const FString& Path, const FString& Verb, const FString&
 	{
 		Req->SetHeader(TEXT("Authorization"), TEXT("Bearer ") + Bearer);
 	}
-	if (!Payload.IsEmpty())
+	if (!ContentType.IsEmpty())
 	{
-		Req->SetHeader(TEXT("Content-Type"), TEXT("application/json"));
-		Req->SetContentAsString(Payload);
+		Req->SetHeader(TEXT("Content-Type"), ContentType);
+		Req->SetContent(MoveTemp(Content));
+	}
+	if (Timeout > 0.f)
+	{
+		Req->SetTimeout(Timeout);
 	}
 	TSharedPtr<FArchive> Writer;
-	if (DownloadTo.IsEmpty())
-	{
-		Req->SetTimeout(30.f);
-	}
-	else
+	if (!DownloadTo.IsEmpty())
 	{
 		// Straight to disk as it arrives, so a big file never sits in memory.
 		Writer = MakeShareable(IFileManager::Get().CreateFileWriter(*DownloadTo));
@@ -182,4 +205,19 @@ void FHoardClient::Thumbnail(const TSharedPtr<FJsonObject>& Asset, TFunction<voi
 	{
 		Done(R.bOk ? R.Body : TArray<uint8>());
 	});
+}
+
+void HoardWait(const bool& bDone, double Seconds)
+{
+	const double Until = FPlatformTime::Seconds() + Seconds;
+	double Last = FPlatformTime::Seconds();
+	while (!bDone && FPlatformTime::Seconds() < Until)
+	{
+		const double Now = FPlatformTime::Seconds();
+		const float Delta = static_cast<float>(Now - Last);
+		Last = Now;
+		FHttpModule::Get().GetHttpManager().Tick(Delta);
+		FTSTicker::GetCoreTicker().Tick(Delta);
+		FPlatformProcess::Sleep(0.005f);
+	}
 }

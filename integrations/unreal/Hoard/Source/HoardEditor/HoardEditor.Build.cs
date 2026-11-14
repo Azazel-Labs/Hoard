@@ -7,8 +7,8 @@ public class HoardEditor : ModuleRules
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 		PrivateDependencyModuleNames.AddRange(new[]
 		{
-			"AssetTools", "Core", "CoreUObject", "Engine", "HTTP", "ImageWrapper", "InputCore", "Json", "Slate", "SlateCore",
-			"UnrealEd", "WorkspaceMenuStructure",
+			"AssetRegistry", "AssetTools", "ContentBrowser", "ContentBrowserData", "Core", "CoreUObject", "Engine", "HTTP", "ImageWrapper",
+			"InputCore", "Json", "Slate", "SlateCore", "ToolMenus", "UnrealEd", "WorkspaceMenuStructure",
 		});
 	}
 }

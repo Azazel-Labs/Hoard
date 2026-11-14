@@ -1,15 +1,10 @@
 #include "HoardAddCommandlet.h"
 
-#include "Containers/Ticker.h"
 #include "HAL/PlatformMisc.h"
-#include "HAL/PlatformProcess.h"
-#include "HAL/PlatformTime.h"
 #include "HoardClient.h"
 #include "HoardImport.h"
 #include "HoardJson.h"
 #include "HoardProject.h"
-#include "HttpManager.h"
-#include "HttpModule.h"
 #include "Misc/Paths.h"
 
 #include <cstdio>
@@ -21,22 +16,6 @@ UHoardAddCommandlet::UHoardAddCommandlet()
 	IsEditor = true;
 	LogToConsole = true;
 	ShowErrorCount = false;
-}
-
-/** Tick HTTP until Done says so, or a while has gone by. */
-static void Pump(const bool& bDone, double Seconds = 120.0)
-{
-	const double Until = FPlatformTime::Seconds() + Seconds;
-	double Last = FPlatformTime::Seconds();
-	while (!bDone && FPlatformTime::Seconds() < Until)
-	{
-		const double Now = FPlatformTime::Seconds();
-		const float Delta = static_cast<float>(Now - Last);
-		Last = Now;
-		FHttpModule::Get().GetHttpManager().Tick(Delta);
-		FTSTicker::GetCoreTicker().Tick(Delta);
-		FPlatformProcess::Sleep(0.005f);
-	}
 }
 
 int32 UHoardAddCommandlet::Main(const FString& Params)
@@ -58,7 +37,7 @@ int32 UHoardAddCommandlet::Main(const FString& Params)
 			Found = R;
 			bDone = true;
 		});
-	Pump(bDone);
+	HoardWait(bDone);
 
 	TArray<TSharedPtr<FJsonObject>> Assets;
 	for (const TSharedPtr<FJsonValue>& V : HoardJson::List(Found.Object(), TEXT("items")))
@@ -80,7 +59,7 @@ int32 UHoardAddCommandlet::Main(const FString& Params)
 			Thumbnails += HoardImport::Decode(Bytes, Pixels, W, H) ? 1 : 0;
 			bDone = true;
 		});
-		Pump(bDone);
+		HoardWait(bDone);
 	}
 
 	FHoardAddResult Added;
@@ -95,7 +74,7 @@ int32 UHoardAddCommandlet::Main(const FString& Params)
 			Added = R;
 			bDone = true;
 		});
-		Pump(bDone, 600.0);
+		HoardWait(bDone, 600.0);
 		if (!bDone)
 		{
 			Added.Error = TEXT("it took too long");

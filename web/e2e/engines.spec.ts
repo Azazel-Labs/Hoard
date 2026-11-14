@@ -1,9 +1,11 @@
 // The engine plugins against a real server: each adds a model with what it needs to a scratch project, then the real
 // `hoard sync --verify` must find every file already in place. Godot runs when GODOT_BIN names a Godot 4 executable (its
-// console build on Windows); Unity's package code runs on .NET when `dotnet` is installed, as it is on CI's runners.
-// Both need the hoard CLI built (`cargo build -p hoard`, or HOARD_CLI).
+// console build on Windows); Unity's package code runs on .NET when `dotnet` is installed, as it is on CI's runners;
+// Unreal runs when UNREAL_EDITOR names UnrealEditor-Cmd, building the plugin with that engine's UAT the first time.
+// All need the hoard CLI built (`cargo build -p hoard`, or HOARD_CLI).
+import { createHash } from 'node:crypto'
 import { spawnSync, type SpawnSyncReturns } from 'node:child_process'
-import { cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs'
+import { cpSync, existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { basename, dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -22,6 +24,8 @@ interface Outcome {
   reported: boolean
   matched: number
   thumbnails: number
+  /** Unreal: the assets it imported. */
+  imported?: string[]
 }
 
 /** HOARD_CLI, the hoard CLI beside HOARD_BIN, or the newest one built in the usual places. */
@@ -50,6 +54,8 @@ interface Plugin {
   /** The project's name on the server, once prepared. */
   project(dir: string, name: string): string
   run(dir: string, env: Record<string, string>): Outcome
+  /** Anything more to check after the first add, with the files in place. */
+  after?(dir: string, first: Outcome, folder: string): void
 }
 
 async function roundTrip(api: APIRequestContext, baseURL: string, plugin: Plugin) {
@@ -72,6 +78,10 @@ async function roundTrip(api: APIRequestContext, baseURL: string, plugin: Plugin
   try {
     await waitReady(api, [pack.id])
     const obj = (await assetsOf(api, pack.id)).find((a) => a.path.endsWith('.obj'))!
+    // A model's thumbnail is drawn in the background after its pack is ready; the plugin should find it drawn.
+    await expect
+      .poll(async () => ((await (await api.get(`/api/assets/${obj.id}`)).json()) as { has_thumb?: boolean }).has_thumb, { timeout: 120_000 })
+      .toBe(true)
     plugin.prepare(dir, name)
     const env = { HOARD_URL: baseURL, HOARD_TOKEN: made.token, HOARD_QUERY: `crate ${tag}`, HOARD_KIND: 'model', HOARD_PROJECT: dir }
 
@@ -82,6 +92,7 @@ async function roundTrip(api: APIRequestContext, baseURL: string, plugin: Plugin
     const category = ((await (await api.get(`/api/assets/${obj.id}`)).json()) as { category: string }).category
     const folder = join(dir, plugin.outDir, ...category.split('/'), `crate_${tag}`)
     for (const f of [`crate_${tag}.obj`, `crate_${tag}.mtl`, 'crate_diffuse.png']) expect(existsSync(join(folder, f)), f).toBe(true)
+    plugin.after?.(dir, first, folder)
     const toml = readFileSync(join(dir, 'hoard.toml'), 'utf8')
     expect(toml).toContain(`[[select]]\nids = ["${obj.id}"]`)
     const lockText = readFileSync(join(dir, 'hoard.lock'), 'utf8')
@@ -149,5 +160,68 @@ test('the Unity package adds an asset with what it needs, making hoard.toml, whe
     },
     run: (_dir, env) =>
       outcome(spawnSync('dotnet', ['run', '--no-build', '--project', project], { env: { ...dotnet, ...env }, encoding: 'utf8', timeout: 90_000 }), 'Unity'),
+  })
+})
+
+/** Every file under a folder, relative to it, in a stable order. */
+function filesUnder(root: string, at = ''): string[] {
+  return readdirSync(join(root, at), { withFileTypes: true })
+    .sort((a, b) => a.name.localeCompare(b.name))
+    .flatMap((e) => (e.isDirectory() ? filesUnder(root, join(at, e.name)) : [join(at, e.name)]))
+}
+
+/** The plugin built for this engine from the sources as they are now: UAT's BuildPlugin, once per change. */
+function unrealPlugin(editor: string): string {
+  const source = join(repo, 'integrations/unreal/Hoard')
+  const hash = createHash('sha256').update(editor)
+  for (const f of filesUnder(source)) hash.update(f).update(readFileSync(join(source, f)))
+  const out = join(tmpdir(), `hoard-unreal-plugin-${hash.digest('hex').slice(0, 12)}`)
+  if (existsSync(join(out, 'Hoard.uplugin'))) return out
+  const uat = resolve(dirname(editor), '..', '..', 'Build', 'BatchFiles', process.platform === 'win32' ? 'RunUAT.bat' : 'RunUAT.sh')
+  const args = ['BuildPlugin', `-Plugin=${join(source, 'Hoard.uplugin')}`, `-Package=${out}`, '-Rocket']
+  // A .bat runs through cmd, which wants the whole line quoted as it will read it.
+  const built =
+    process.platform === 'win32'
+      ? spawnSync('cmd.exe', ['/d', '/s', '/c', `"${[uat, ...args].map((a) => `"${a}"`).join(' ')}"`], {
+          encoding: 'utf8',
+          timeout: 1_200_000,
+          windowsVerbatimArguments: true,
+        })
+      : spawnSync(uat, args, { encoding: 'utf8', timeout: 1_200_000 })
+  expect(built.status, `${built.stdout?.slice(-4000)}
+${built.stderr}`).toBe(0)
+  return out
+}
+
+test('the Unreal plugin adds an asset with what it needs, where hoard sync would, and imports it', async ({ api, baseURL }) => {
+  const editor = process.env.UNREAL_EDITOR
+  test.skip(!editor, 'UNREAL_EDITOR is not set')
+  test.setTimeout(1_800_000)
+  const plugin = unrealPlugin(editor!)
+  const uproject = 'HoardTest.uproject'
+  await roundTrip(api, baseURL!, {
+    engine: 'Unreal',
+    outDir: 'Hoard',
+    project: (dir) => basename(dir),
+    prepare(dir) {
+      writeFileSync(join(dir, uproject), JSON.stringify({ FileVersion: 3, Plugins: [{ Name: 'Hoard', Enabled: true }] }, null, 2))
+      cpSync(plugin, join(dir, 'Plugins', 'Hoard'), { recursive: true })
+    },
+    run: (dir, env) =>
+      outcome(
+        spawnSync(editor!, [join(dir, uproject), '-run=HoardAdd', '-unattended', '-nullrhi', '-nosplash', '-nosound', '-nop4'], {
+          env: { ...process.env, ...env },
+          encoding: 'utf8',
+          timeout: 900_000,
+          maxBuffer: 256 * 1024 * 1024,
+        }),
+        'Unreal',
+      ),
+    after(dir, first, folder) {
+      // The model came in as Unreal assets, under /Game/Hoard in the folders it has under Hoard/.
+      expect(first.imported?.length, JSON.stringify(first.imported)).toBeGreaterThan(0)
+      const content = join(dir, 'Content', 'Hoard', ...folder.slice(join(dir, 'Hoard').length + 1).split(/[\\/]/))
+      expect(existsSync(content) && filesUnder(content).some((f) => f.endsWith('.uasset')), `nothing imported into ${content}`).toBe(true)
+    },
   })
 })

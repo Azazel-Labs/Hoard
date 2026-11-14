@@ -175,7 +175,9 @@ It uses the newest `hoardd` under `target/` (debug, then release); `HOARD_BIN` p
 the plugin's own code, the files, `hoard.toml`, `hoard.lock` and what the server was told are checked, and then the
 real `hoard sync --verify` must find everything in place, downloading nothing and writing the same lock. The Unity
 package's code runs on .NET whenever `dotnet` is installed (so in CI); Godot's runs headless when `GODOT_BIN` names a
-Godot 4 executable. Both use the hoard CLI under `target/` (`cargo build -p hoard`), or `HOARD_CLI`.
+Godot 4 executable; Unreal's runs as a commandlet (`-run=HoardAdd`) when `UNREAL_EDITOR` names `UnrealEditor-Cmd`,
+which also checks the model was imported. The Unreal plugin is built with that engine's UAT the first time, and again
+whenever its sources change. All use the hoard CLI under `target/` (`cargo build -p hoard`), or `HOARD_CLI`.
 
 ### Local models for the tagger
 
@@ -540,6 +542,14 @@ rescans when they land. Double-click a result to add it, or pick several and pre
 Then Window → Hoard; Settings in its toolbar takes the server and token. Assets go under `Assets/Hoard` unless
 `hoard.toml` says otherwise, and the editor imports them when they land. Click, Ctrl/Cmd-click and Shift-click pick
 results; double-click adds one.
+
+**Unreal Engine 5** (built and tested with 5.8). Copy [integrations/unreal/Hoard/](integrations/unreal/Hoard/) into
+your project's `Plugins/` and open the project; Unreal offers to build it (a C++ toolchain is needed, as for any code
+plugin), or build it once with `RunUAT BuildPlugin -Plugin=…/Hoard.uplugin -Package=…` and copy the result. Then
+Window → Hoard; the gear takes the server and token, kept in the editor's own settings. Files go under `Hoard/` beside
+`Content/`, not in it (unless `hoard.toml` says otherwise), so Unreal never imports them twice; what was just
+downloaded is then imported into `/Game/Hoard`, in the same folders: models bring their materials and textures, and
+pictures, sounds and fonts come in on their own. Click, Ctrl-click and Shift-click pick results; double-click adds one.
 
 ## Unreal packs
 
@@ -1066,6 +1076,7 @@ crates/hoard-unreal   Unreal package reader and converters (textures, sounds, ma
 xtask/                `cargo xtask`: dev servers, checks, local model downloads and serving, Unreal export
 integrations/godot    the Godot 4 editor plugin (addons/hoard) and its headless test script
 integrations/unity    the Unity editor package (com.hoard.browser) and a .NET harness that runs its code without Unity
+integrations/unreal   the Unreal Engine 5 editor plugin (Hoard), with a HoardAdd commandlet for headless tests
 web/                  Vue 3 + TypeScript portal (Vite); three.js viewer is lazy-loaded
 web/scripts/          readme-images.mts: the README's screenshots and the social card, in docs/img/
 .vscode/              tasks, debug configurations, settings and recommended extensions

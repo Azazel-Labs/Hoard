@@ -207,6 +207,33 @@ export function quadGltf(bin: string): { gltf: Buffer; bin: Buffer } {
   return { gltf: Buffer.from(JSON.stringify(gltf, null, 2)), bin: data }
 }
 
+/** A row of `n` squares, each a mesh of its own in a node of its own, all in one material: the viewer draws them as
+ *  one mesh, and still counts them as the file has them. */
+export function partsGltf(n: number): Buffer {
+  const positions = new Float32Array([0, 0, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0])
+  const indices = new Uint16Array([0, 1, 2, 0, 2, 3])
+  const bin = Buffer.concat([Buffer.from(positions.buffer), Buffer.from(indices.buffer)])
+  const parts = [...Array(n).keys()]
+  const gltf = {
+    asset: { version: '2.0', generator: 'hoard e2e' },
+    scene: 0,
+    scenes: [{ nodes: parts }],
+    nodes: parts.map((i) => ({ mesh: i, name: `part ${i + 1}`, translation: [i * 1.2, 0, 0] })),
+    meshes: parts.map((i) => ({ name: `part ${i + 1}`, primitives: [{ attributes: { POSITION: 0 }, indices: 1, material: 0 }] })),
+    materials: [{ name: 'grey', pbrMetallicRoughness: { baseColorFactor: [0.6, 0.6, 0.6, 1] } }],
+    buffers: [{ uri: `data:application/octet-stream;base64,${bin.toString('base64')}`, byteLength: bin.length }],
+    bufferViews: [
+      { buffer: 0, byteOffset: 0, byteLength: 48, target: 34962 },
+      { buffer: 0, byteOffset: 48, byteLength: 12, target: 34963 },
+    ],
+    accessors: [
+      { bufferView: 0, componentType: 5126, count: 4, type: 'VEC3', min: [0, 0, 0], max: [1, 1, 0] },
+      { bufferView: 1, componentType: 5123, count: 6, type: 'SCALAR' },
+    ],
+  }
+  return Buffer.from(JSON.stringify(gltf, null, 2))
+}
+
 /** A Bambu Studio-style 3MF: a 10 mm cube printed in white (filament 1) with its top painted red (filament 2). */
 export function paintedCube3mf(): Buffer {
   const v = [[0, 0, 0], [10, 0, 0], [10, 10, 0], [0, 10, 0], [0, 0, 10], [10, 0, 10], [10, 10, 10], [0, 10, 10]]

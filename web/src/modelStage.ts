@@ -3,10 +3,11 @@
 // which falls back to WebGL2 by itself. Only the viewers import this, and they load on demand, so three stays out of
 // the main bundle.
 import * as THREE from 'three/webgpu'
-import { sRGBTransferEOTF, texture, vec3 } from 'three/tsl'
+import { attribute, sRGBTransferEOTF, texture, vec3 } from 'three/tsl'
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js'
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js'
 import { TGALoader } from 'three/addons/loaders/TGALoader.js'
+import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js'
 import { api, asUrl, liteUrl, packFileUrl, thumbUrl, type Asset, type AssetLink } from './api'
 import { applyToModel } from './materialMaps'
 
@@ -374,7 +375,12 @@ export class ModelStage {
   /** Made on first use: the clay and checker pictures. */
   private matcap: THREE.Texture | null = null
   private checker: THREE.Texture | null = null
+  /** The meshes drawn: the file's, with the still ones that share a material merged into one (see `mergeStill`). */
   private meshes: THREE.Mesh[] = []
+  /** How many meshes the file has, before merging. */
+  private meshCount = 0
+  /** Frames are drawn only when something changed, and for a moment after, until this time (`redraw`). */
+  private redrawUntil = 0
   private counts = { triangles: 0, vertices: 0 }
   private size = new THREE.Vector3()
   private metres = false
@@ -444,6 +450,8 @@ export class ModelStage {
     const controls = new OrbitControls(this.camera, renderer.domElement)
     controls.enableDamping = true
     controls.addEventListener('start', () => (this.glide = null))
+    // Moved by the pointer, or still gliding to a stop, or spinning.
+    controls.addEventListener('change', () => this.redraw(100))
     this.controls = controls
 
     // Every file the loaders ask for passes through here: textures are matched to the pack's files by name (FBX
@@ -502,6 +510,7 @@ export class ModelStage {
     manager.itemEnd = (url) => {
       itemEnd(url)
       this.pending = Math.max(0, this.pending - 1)
+      this.redraw()
       this.checkSettled()
     }
 
@@ -543,6 +552,9 @@ export class ModelStage {
       mesh.material = Array.isArray(mesh.material) ? list : list[0]
       for (const m of list) this.track(m)
     })
+    this.meshCount = this.meshes.length
+    // Nothing moves in a model without animation, so its meshes can be drawn together.
+    if (!animations.length && !full.links.some((l) => l.rel === 'animation')) this.meshes = mergeStill(object, this.meshes)
 
     // A model that names no textures, next to textures named after it: try them on.
     let guessed = 0
@@ -558,6 +570,7 @@ export class ModelStage {
         () => {
           // A view built from the maps that were there shows the new ones only once built again.
           if (this.views) this.buildViews()
+          this.redraw()
           this.onTexturesChanged?.()
         },
         // The material's maps count as the model's textures: a thumbnail waits for them, and one that fails is missing.
@@ -565,6 +578,7 @@ export class ModelStage {
           this.pending++
           return (ok) => {
             this.pending = Math.max(0, this.pending - 1)
+            this.redraw()
             if (!ok && !this.missing.includes(name)) {
               this.missing.push(name)
               this.onMissing?.([...this.missing])
@@ -612,7 +626,7 @@ export class ModelStage {
 
     return {
       triangles: this.counts.triangles,
-      meshes: this.meshes.length,
+      meshes: this.meshCount,
       materials: this.materials.size,
       // An idle clip first, since the first is what plays: a character pack's clips come alphabetically, and a
       // looping "Death" or "Victory" is a poor first look.
@@ -717,6 +731,7 @@ export class ModelStage {
       toT: target.clone(),
       t: 0,
     }
+    this.redraw()
     if (this.paused) this.renderOnce()
   }
 
@@ -741,6 +756,7 @@ export class ModelStage {
       m.wireframe = on
       m.needsUpdate = true
     }
+    this.redraw()
   }
 
   /** Show the model another way; the wireframe and grid stay as they are on top. */
@@ -764,7 +780,7 @@ export class ModelStage {
       }
     }
     return {
-      meshes: this.meshes.length,
+      meshes: this.meshCount,
       materials: this.materials.size,
       textures: sources.size,
       ...this.counts,
@@ -802,7 +818,7 @@ export class ModelStage {
         const key = mode === 'geometry' ? `${i}:${m.uuid}` : `${m.uuid}:${hasUv}`
         let v = shared.get(key)
         if (!v) {
-          v = this.viewMaterial(mode, m as AnyMaterial, hasUv, i)
+          v = this.viewMaterial(mode, m as AnyMaterial, hasUv, i, !!mesh.geometry.attributes[PART_COLOR])
           shared.set(key, v)
           views.made.push(v)
         }
@@ -813,10 +829,11 @@ export class ModelStage {
       mesh.material = view
     })
     this.views = views
+    this.redraw()
   }
 
   /** The stand-in for one material in a view mode, from the maps it had when it loaded (whatever "textures off" says). */
-  private viewMaterial(mode: Exclude<ViewMode, 'final' | 'raw'>, own: AnyMaterial, hasUv: boolean, index: number): AnyMaterial {
+  private viewMaterial(mode: Exclude<ViewMode, 'final' | 'raw'>, own: AnyMaterial, hasUv: boolean, index: number, parts: boolean): AnyMaterial {
     const maps = this.materials.get(own) ?? {}
     let m: THREE.NodeMaterial
     if (isMapMode(mode)) {
@@ -844,6 +861,8 @@ export class ModelStage {
       // Hues a golden angle apart, so neighbours in the file differ however many meshes there are.
       const color = new THREE.Color().setHSL((index * 0.618034) % 1, 0.6, 0.55)
       m = new THREE.MeshStandardNodeMaterial({ color, roughness: 0.6, metalness: 0 })
+      // Meshes merged into one still show as the parts they were.
+      if (parts) m.colorNode = attribute(PART_COLOR, 'vec3')
     }
     m.side = own.side
     ;(m as AnyMaterial).wireframe = this.wireframeOn
@@ -935,6 +954,7 @@ export class ModelStage {
       for (const slot of Object.keys(maps) as MapSlot[]) m[slot] = on ? maps[slot]! : null
       m.needsUpdate = true
     }
+    this.redraw()
   }
 
   setEnvironment(on: boolean) {
@@ -963,6 +983,7 @@ export class ModelStage {
     this.hemi.groundColor.set(raw ? 0xa8a8a8 : 0x3a3226)
     this.hemi.intensity = raw ? 2.4 : studio ? 0.35 : 1.6
     this.key.intensity = raw ? 0.9 : studio ? 1.6 : 2.4
+    this.redraw()
   }
 
   /** CSS backgrounds show through the transparent canvas; `env` draws the environment itself, blurred. */
@@ -975,10 +996,12 @@ export class ModelStage {
 
   setGrid(on: boolean) {
     if (this.grid) this.grid.visible = on
+    this.redraw()
   }
 
   setAutoRotate(on: boolean) {
     if (this.controls) this.controls.autoRotate = on
+    this.redraw()
   }
 
   /** Play a clip by name ('' stops). */
@@ -992,11 +1015,13 @@ export class ModelStage {
       this.action.paused = !this.playing
       this.action.play()
     }
+    this.redraw()
   }
 
   setPlaying(on: boolean) {
     this.playing = on
     if (this.action) this.action.paused = !on
+    this.redraw()
   }
 
   /** Stop drawing while hidden (the full-screen viewer covers the side panel's). */
@@ -1077,13 +1102,24 @@ export class ModelStage {
   private start() {
     if (!this.renderer || this.paused || this.disposed) return
     this.timer.reset()
+    this.redraw(1000)
     this.renderer.setAnimationLoop((time) => this.tick(time))
   }
 
+  /** Draw the frames from now until `ms` from now. A change is drawn for a moment longer than it takes: a texture or
+   *  material reaches the GPU a frame or two after it's asked for. */
+  private redraw(ms = 500) {
+    this.redrawUntil = Math.max(this.redrawUntil, performance.now() + ms)
+  }
+
+  /** Each frame moves what moves; it's drawn only if something did, or changed a moment ago. A still model costs
+   *  nothing to look at. */
   private tick(time: number) {
     this.timer.update(time)
     const dt = Math.min(this.timer.getDelta(), 0.1)
-    this.mixer?.update(dt)
+    const animating = !!this.action?.isRunning()
+    if (animating) this.mixer?.update(dt)
+    if (this.glide) this.redraw(100)
     if (this.glide && this.controls) {
       const g = this.glide
       g.t = Math.min(1, g.t + dt / 0.35)
@@ -1093,7 +1129,7 @@ export class ModelStage {
       if (g.t >= 1) this.glide = null
     }
     this.controls?.update(dt)
-    this.renderer?.render(this.scene, this.camera)
+    if (animating || this.pending || performance.now() < this.redrawUntil) this.renderer?.render(this.scene, this.camera)
   }
 
   private renderOnce() {
@@ -1107,6 +1143,7 @@ export class ModelStage {
     this.renderer.setSize(el.clientWidth, el.clientHeight)
     this.camera.aspect = el.clientWidth / el.clientHeight
     this.camera.updateProjectionMatrix()
+    this.redraw()
     if (this.paused) this.renderOnce()
   }
 
@@ -1187,6 +1224,79 @@ function snapshotView(object: THREE.Object3D, dir: THREE.Vector3) {
     near: Math.max(dist - hz, radius * 0.001) * 0.5,
     far: dist - lz + radius,
   }
+}
+
+/** The attribute a merged mesh keeps each part's colour in, for the geometry view. */
+const PART_COLOR = 'partColor'
+
+/** Merge the meshes that never move apart and look the same (one material, the same attributes) into one mesh
+ *  each: a model of thousands of parts otherwise takes thousands of draws a frame, which is what makes a big CAD
+ *  model slow to turn, not its triangles. Each part's vertices are put where it stands, and its colour in the
+ *  geometry view goes in `PART_COLOR`. Returns the meshes left to draw. */
+function mergeStill(root: THREE.Object3D, meshes: THREE.Mesh[]): THREE.Mesh[] {
+  root.updateWorldMatrix(true, true)
+  // Parts are put where they stand in the root, which keeps its own transform.
+  const toRoot = root.matrixWorld.clone().invert()
+  const rootDet = root.matrixWorld.determinant()
+  const groups = new Map<string, { mesh: THREE.Mesh; index: number }[]>()
+  meshes.forEach((mesh, index) => {
+    const g = mesh.geometry
+    const a = g.attributes
+    if ((mesh as THREE.SkinnedMesh).isSkinnedMesh || (mesh as THREE.InstancedMesh).isInstancedMesh || Array.isArray(mesh.material)) return
+    // Quantized positions would be clamped to their range once moved.
+    if (Object.keys(g.morphAttributes).length || !(a.position?.array instanceof Float32Array) || !mesh.visible) return
+    // Mirrored parts are drawn with their faces turned the other way: they'd merge inside out.
+    if (mesh.matrixWorld.determinant() * rootDet < 0) return
+    const shape = Object.keys(a).sort().map((n) => `${n}:${a[n].itemSize}:${a[n].normalized}:${a[n].array.constructor.name}`)
+    const key = `${(mesh.material as THREE.Material).uuid}|${!!g.index}|${mesh.renderOrder}|${shape.join(',')}`
+    let list = groups.get(key)
+    if (!list) groups.set(key, (list = []))
+    list.push({ mesh, index })
+  })
+  const color = new THREE.Color()
+  const merged = new Set<THREE.Mesh>()
+  const out: THREE.Mesh[] = []
+  for (const list of groups.values()) {
+    if (list.length < 2) continue
+    const parts = list.map(({ mesh, index }) => {
+      const g = mesh.geometry.clone().applyMatrix4(toRoot.clone().multiply(mesh.matrixWorld))
+      // Hues a golden angle apart, as the geometry view gives meshes of their own.
+      color.setHSL((index * 0.618034) % 1, 0.6, 0.55)
+      const n = g.attributes.position.count
+      const c = new Float32Array(n * 3)
+      for (let i = 0; i < n * 3; i += 3) {
+        c[i] = color.r
+        c[i + 1] = color.g
+        c[i + 2] = color.b
+      }
+      g.setAttribute(PART_COLOR, new THREE.BufferAttribute(c, 3))
+      return g
+    })
+    const geometry = mergeGeometries(parts)
+    for (const g of parts) g.dispose()
+    if (!geometry) continue
+    const first = list[0].mesh
+    const mesh = new THREE.Mesh(geometry, first.material)
+    mesh.name = first.name
+    mesh.renderOrder = first.renderOrder
+    root.add(mesh)
+    out.push(mesh)
+    // Each part's node stays, empty, for what hangs from it.
+    for (const { mesh: m } of list) {
+      merged.add(m)
+      const node = new THREE.Group()
+      node.name = m.name
+      node.position.copy(m.position)
+      node.quaternion.copy(m.quaternion)
+      node.scale.copy(m.scale)
+      for (const child of [...m.children]) node.add(child)
+      m.parent?.add(node)
+      m.removeFromParent()
+      m.geometry.dispose()
+    }
+  }
+  if (!merged.size) return meshes
+  return [...meshes.filter((m) => !merged.has(m)), ...out]
 }
 
 /** Free a loaded model's GPU resources: geometry, materials and every texture they hold. */

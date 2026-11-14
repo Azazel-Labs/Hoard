@@ -1,5 +1,5 @@
 import { LARGE, LARGE_PX, MODELS, TEXTURES } from './support/seed'
-import { paintedCube3mf } from './support/files'
+import { paintedCube3mf, partsGltf } from './support/files'
 import { assetsOf, signedIn, uploadPack, waitIdle, waitReady } from './support/api'
 import { doubleClick, expect, openPack, test, tile, unique } from './support/test'
 
@@ -47,6 +47,31 @@ test.describe('full-screen viewers', () => {
     await doubleClick(page, tile(page, 'Painted cube'))
     const viewer = page.getByRole('dialog', { name: 'View Painted cube in 3D' })
     await expect(viewer.getByText(/12 tris · 2 meshes/)).toBeVisible({ timeout: 30_000 })
+    await expect(viewer.getByText(/Couldn't show this model/)).toHaveCount(0)
+    await page.keyboard.press('Escape')
+    await expect(viewer).toBeHidden()
+    await api.delete(`/api/packs/${pack.id}`)
+  })
+
+  // Parts that share a material are drawn as one mesh, so a model of thousands turns smoothly; they still count, and
+  // still show apart in the geometry view.
+  test('a model of many parts counts each part', async ({ page, baseURL }) => {
+    const api = await signedIn(baseURL!)
+    const name = `E2E Parts ${unique()}`
+    const pack = await uploadPack(api, name, [{ relpath: 'Parts.gltf', data: partsGltf(4) }])
+    await waitReady(api, [pack.id])
+    await openPack(page, pack.id, name)
+    await doubleClick(page, tile(page, 'Parts'))
+    const viewer = page.getByRole('dialog', { name: 'View Parts in 3D' })
+    await expect(viewer.getByText(/8 tris · 4 meshes · 1 material/)).toBeVisible({ timeout: 20_000 })
+    await page.keyboard.press('0')
+    const menu = viewer.getByRole('navigation', { name: 'View' })
+    await expect(menu.getByRole('button', { name: 'Geometries', exact: true })).toHaveAttribute('aria-pressed', 'true')
+    await page.keyboard.press('i')
+    const info = viewer.getByRole('region', { name: 'Scene information' })
+    const row = (label: string) => info.locator('dl > div').filter({ has: page.getByText(label, { exact: true }) }).locator('dd')
+    await expect(row('Geometries')).toHaveText('4')
+    await expect(row('Triangles')).toHaveText('8')
     await expect(viewer.getByText(/Couldn't show this model/)).toHaveCount(0)
     await page.keyboard.press('Escape')
     await expect(viewer).toBeHidden()

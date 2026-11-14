@@ -494,17 +494,6 @@ struct Texture {
     size_px: Option<u32>,
 }
 
-/// The title in a JSON file that came with the maps: Megascans' `<id>.json` names the surface ("Metal Plate") where
-/// the file names only carry its id.
-fn sidecar_title(json: &[u8]) -> Option<String> {
-    let v: serde_json::Value = serde_json::from_slice(json).ok()?;
-    let tags = &v["semanticTags"];
-    let title =
-        tags["name_formats"]["title"].as_str().or_else(|| tags["name"].as_str()).or_else(|| v["name"].as_str())?;
-    let title = title.split_whitespace().collect::<Vec<_>>().join(" ");
-    (!title.is_empty() && title.len() <= 120).then_some(title)
-}
-
 /// What the store's JSON files of the pack say each texture is (see [`Candidate::listed`]).
 fn listed_roles<'a>(textures: &[Texture], sidecars: &'a [Sidecar]) -> Vec<Option<(Role, &'a str)>> {
     textures
@@ -531,44 +520,21 @@ fn sidecar_of<'a>(sidecars: &'a [Sidecar], textures: &[Texture], f: &Found) -> O
     })
 }
 
-/// Name materials after a `<name>.json` beside them, when there is one with a title in it.
-fn name_from_sidecars(
-    state: &AppState,
-    rt: &Handle,
-    conn: &Connection,
-    pack_id: &str,
-    found: &mut [Found],
-) -> Result<()> {
-    let sidecars: HashMap<String, String> = {
-        let mut stmt = conn.prepare(
-            "SELECT lower(a.path), a.blob_hash FROM assets a JOIN blobs b ON b.hash = a.blob_hash
-             WHERE a.pack_id = ?1 AND lower(a.ext) = 'json' AND b.size < 1000000",
-        )?;
-        stmt.query_map([pack_id], |r| Ok((r.get(0)?, r.get(1)?)))?.collect::<rusqlite::Result<_>>()?
-    };
-    if sidecars.is_empty() {
-        return Ok(());
-    }
+/// Name materials after the store's file beside them: `<name>.json`, or else the only one in their folder that's
+/// about one asset (it has the asset's id, as Megascans' `<id>.json` does).
+fn name_from_sidecars(sidecars: &[Sidecar], found: &mut [Found]) {
     for f in found {
         let json = format!("{}.json", f.path.strip_suffix(".material").unwrap_or(&f.path)).to_lowercase();
-        // Megascans names the file after the asset's id (`xeokah0.json`): the only JSON in the folder will do.
         let dir = dir_of(&f.path).to_lowercase();
-        let mut beside = sidecars.iter().filter(|(p, _)| dir_of(p) == dir);
+        let mut beside = sidecars.iter().filter(|s| s.id.is_some() && dir_of(&s.path).to_lowercase() == dir);
         let only = match (beside.next(), beside.next()) {
-            (Some((_, h)), None) => Some(h),
+            (Some(s), None) => Some(s),
             _ => None,
         };
-        let Some(hash) = sidecars.get(&json).or(only) else { continue };
-        match rt.block_on(state.blobs.read_all(hash)) {
-            Ok(bytes) => {
-                if let Some(title) = sidecar_title(&bytes) {
-                    f.name = title;
-                }
-            }
-            Err(e) => tracing::debug!(file = %json, error = %format!("{e:#}"), "couldn't read a material's JSON"),
+        if let Some(s) = sidecars.iter().find(|s| s.path.to_lowercase() == json).or(only) {
+            f.name.clone_from(&s.title);
         }
     }
-    Ok(())
 }
 
 /// Find the pack's materials and bring the library in line: new ones added, changed ones updated (keeping their
@@ -671,7 +637,7 @@ fn find_materials(state: &AppState, rt: &Handle, conn: &mut Connection, pack_id:
         .map(|(t, l)| Candidate { path: &t.path, size_px: t.size_px, listed: *l })
         .collect();
     let mut found = find(&candidates);
-    name_from_sidecars(state, rt, conn, pack_id, &mut found)?;
+    name_from_sidecars(&sidecars, &mut found);
     let existing: HashMap<String, (String, String, bool, bool)> = {
         let mut stmt = conn.prepare(&format!(
             "SELECT a.path, a.id, a.blob_hash, a.thumb_hash IS NOT NULL, {IS_MATERIAL} FROM assets a WHERE a.pack_id = ?1
@@ -1333,12 +1299,21 @@ mod tests {
 
     #[test]
     fn titles_from_json_beside_the_maps() {
-        let megascans = br#"{"id": "tkxmfcwa", "semanticTags": {"name": "metal plate", "name_formats": {"title": "Metal  Plate"}}}"#;
-        assert_eq!(sidecar_title(megascans).as_deref(), Some("Metal Plate"));
-        assert_eq!(sidecar_title(br#"{"semanticTags": {"name": "Rusty Iron"}}"#).as_deref(), Some("Rusty Iron"));
-        assert_eq!(sidecar_title(br#"{"name": "Metal Plate", "id": "tkxmfcwa"}"#).as_deref(), Some("Metal Plate"));
-        assert_eq!(sidecar_title(br#"{"name": "  "}"#), None);
-        assert_eq!(sidecar_title(b"not json"), None);
+        let file = |path: &str, json: &str| crate::sidecar::read(path, json).unwrap();
+        let sidecars = [
+            file(
+                "Plate/tkxmfcwa.json",
+                r#"{"id": "tkxmfcwa", "semanticTags": {"name_formats": {"title": "Metal  Plate"}}}"#,
+            ),
+            file("Iron/Rusty.json", r#"{"semanticTags": {"name": "Rusty Iron"}}"#),
+        ];
+        let mut found: Vec<Found> = ["Plate/Plate.material", "Iron/Rusty.material", "Other/Thing.material"]
+            .into_iter()
+            .map(|p| Found { path: p.to_owned(), name: "x".to_owned(), key: String::new(), maps: Vec::new() })
+            .collect();
+        name_from_sidecars(&sidecars, &mut found);
+        assert_eq!(found.iter().map(|f| f.name.as_str()).collect::<Vec<_>>(), ["Metal Plate", "Rusty Iron", "x"]);
+        assert!(crate::sidecar::read("a.json", r#"{"name": "  ", "id": "a", "meta": []}"#).is_none());
     }
 
     #[test]

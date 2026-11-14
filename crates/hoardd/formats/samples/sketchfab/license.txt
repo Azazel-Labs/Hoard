@@ -1,0 +1,11 @@
+Model Information:
+* title:	Brass Lantern
+* source:	https://sketchfab.com/3d-models/brass-lantern-0123456789abcdef0123456789abcdef
+* author:	Example Artist (https://sketchfab.com/example-artist)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Brass Lantern" (https://sketchfab.com/3d-models/brass-lantern-0123456789abcdef0123456789abcdef) by Example Artist (https://sketchfab.com/example-artist) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)

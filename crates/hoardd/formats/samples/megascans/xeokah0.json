@@ -1,0 +1,26 @@
+{
+  "id": "xeokah0",
+  "semanticTags": {
+    "name": "Historic Miscellaneous Stand Wood Old 05",
+    "name_formats": { "title": "Historic Miscellaneous Stand Wood Old 05", "slug": "historic_miscellaneous_stand_wood_old_05" },
+    "contains": ["table"],
+    "color": ["brown"],
+    "country": "Denmark",
+    "region": "Europe",
+    "asset_type": "3D asset",
+    "minSize": "1 m",
+    "maxSize": "2 m",
+    "theme": ["historic", "medieval"]
+  },
+  "meta": [
+    { "name": "Texel Density", "key": "texelDensity", "value": "4096 px/m" },
+    { "name": "Length", "key": "length", "value": "118 cm" },
+    { "name": "Width", "key": "width", "value": "54 cm" },
+    { "name": "Height", "key": "height", "value": "81 cm" }
+  ],
+  "meshes": [
+    { "type": "lod", "tris": 12000, "uris": [{ "uri": "Stand_xeokah0_LOD0.fbx" }] },
+    { "type": "lod", "tris": 3000, "uris": [{ "uri": "Stand_xeokah0_LOD1.fbx" }] }
+  ],
+  "tags": ["wood", "old", "stand"]
+}

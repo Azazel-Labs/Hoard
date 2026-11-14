@@ -1,0 +1,20 @@
+# A model downloaded from Sketchfab comes with license.txt, which names the model, its page, its author and its
+# license:
+#
+#   Model Information:
+#   * title:	Round carpet
+#   * source:	https://sketchfab.com/3d-models/round-carpet-b78ec509a3824dab91ac6752151ad687
+#   * author:	1-3D.com (https://sketchfab.com/1-3D.com)
+#
+#   Model License:
+#   * license type:	CC-BY-SA-4.0 (http://creativecommons.org/licenses/by-sa/4.0/)
+name = "Sketchfab"
+files = ["license.txt"]
+syntax = "text"
+require = ['^Model Information:']
+
+[fields]
+title = '^\* title:[ \t]*(.+?)[ \t]*$'
+url = '^\* source:[ \t]*(https?://\S+)'
+seller = '^\* author:[ \t]*(.+?)(?:[ \t]+\(https?://[^)]*\))?[ \t]*$'
+license = '^\* license type:[ \t]*(.+?)(?:[ \t]+\(https?://[^)]*\))?[ \t]*$'

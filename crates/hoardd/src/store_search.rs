@@ -34,6 +34,8 @@ const MAX_QUERY: usize = 120;
 const FAB_QUERIES: usize = 4;
 const OTHER_QUERIES: usize = 2;
 const MAX_PATHS: i64 = 50_000;
+/// How many store pages the pack links to are looked at.
+const MAX_LINKS: usize = 3;
 
 /// Words in pack names that say where a pack is from or what it's for, not what it is.
 const NOISE: &[&str] = &[
@@ -234,7 +236,7 @@ pub(crate) const CC_BY_4: &str = "CC BY 4.0";
 pub(crate) const CC0: &str = "CC0";
 
 /// Reasons that make a match certain: the pack names that listing itself.
-const CERTAIN: [&str; 2] = ["Linked in the pack's README", "Same title as the pack's "];
+const CERTAIN: [&str; 2] = ["Linked in the pack's ", "Same title as the pack's "];
 
 impl StoreMatch {
     pub(crate) fn store(&self) -> &'static str {
@@ -273,17 +275,36 @@ impl StoreMatches {
 #[derive(Debug, Default, PartialEq)]
 pub(crate) struct Clues {
     /// The product's exact title, from a file the store ships with it (a Megascans `<id>.json`), and that file.
-    title: Option<(String, &'static str)>,
+    title: Option<(String, String)>,
     /// Product names besides the pack's: folders like `Content/MedievalVillage`, "Thank you for purchasing X".
     names: Vec<String>,
     /// Seller names, and where each was seen.
-    sellers: Vec<(String, &'static str)>,
-    /// Store pages the README links to.
-    links: Vec<(&'static str, String)>,
+    sellers: Vec<(String, String)>,
+    /// Store pages the pack links to: in its README, or in a store's file (Sketchfab's `license.txt`).
+    links: Vec<Link>,
     /// `unreal-engine`, `unity` or `blender`, from the files' types.
     engine: Option<&'static str>,
     meshes: u64,
     textures: u64,
+}
+
+/// A store page the pack links to.
+#[derive(Debug, PartialEq)]
+struct Link {
+    store: &'static str,
+    url: String,
+    /// Where: "README", "Sketchfab file".
+    from: String,
+    /// What the store's file says about the page, when it's one that links to it.
+    title: Option<String>,
+    author: Option<String>,
+    license: Option<String>,
+}
+
+impl Link {
+    fn readme(store: &'static str, url: String) -> Self {
+        Self { store, url, from: "README".to_owned(), title: None, author: None, license: None }
+    }
 }
 
 impl Clues {
@@ -291,7 +312,7 @@ impl Clues {
         let mut out: Vec<String> = self.title.iter().map(|(t, from)| format!("Title: {t} ({from})")).collect();
         out.extend(self.names.iter().map(|n| format!("Product: {n}")));
         out.extend(self.sellers.iter().map(|(s, from)| format!("Seller: {s} ({from})")));
-        out.extend(self.links.iter().map(|(store, _)| format!("The README links to {store}")));
+        out.extend(self.links.iter().map(|l| format!("The {} links to {}", l.from, l.store)));
         if let Some(e) = self.engine {
             out.push(format!("Files for {}", engine_name(e)));
         }
@@ -416,11 +437,11 @@ pub(crate) fn clues(pack_name: &str, readme: Option<&str>, paths: &[String], kin
     let mut pubs: Vec<(&str, usize)> = publishers.into_iter().filter(|(_, n)| *n >= floor).collect();
     pubs.sort_by(|a, b| b.1.cmp(&a.1).then(a.0.cmp(b.0)));
     if let Some((p, _)) = pubs.first() {
-        c.sellers.push((search_terms(p), "folders"));
+        c.sellers.push((search_terms(p), "folders".to_owned()));
     }
 
     if let Some(text) = readme {
-        c.links = store_links(text).into_iter().take(3).collect();
+        c.links = store_links(text).into_iter().take(MAX_LINKS).map(|(store, url)| Link::readme(store, url)).collect();
         for line in text.lines().map(str::trim).filter(|l| !l.is_empty()).take(300) {
             let lower = line.to_ascii_lowercase();
             for key in [
@@ -471,7 +492,7 @@ pub(crate) fn clues(pack_name: &str, readme: Option<&str>, paths: &[String], kin
                         && c.sellers.len() < 3
                         && !c.sellers.iter().any(|(s, _)| s.eq_ignore_ascii_case(&seller))
                     {
-                        c.sellers.push((seller, "README"));
+                        c.sellers.push((seller, "README".to_owned()));
                     }
                     break;
                 }
@@ -493,17 +514,34 @@ pub(crate) fn clues(pack_name: &str, readme: Option<&str>, paths: &[String], kin
 impl Clues {
     /// Take what the store's own files in the pack say (see [`crate::sidecar`]). Megascans assets carry `<id>.json`
     /// with the listing's exact title; the pack's own name is usually the file name, with the id and "Raw" in it,
-    /// which finds nothing. A pack of several assets has no one title, but its seller is still a clue.
+    /// which finds nothing. A pack of several assets has no one title, but its seller is still a clue. A file that
+    /// gives the store page (Sketchfab's `license.txt`) links to it as surely as a README does.
     pub(crate) fn add_sidecars(&mut self, files: &[Sidecar]) {
         let titles: BTreeSet<&str> = files.iter().map(|f| f.title.as_str()).collect();
         if let (Some(first), 1) = (files.first(), titles.len())
             && self.title.is_none()
         {
-            self.title = Some((first.title.clone(), first.source));
+            self.title = Some((first.title.clone(), first.source.clone()));
         }
         for f in files {
-            if !self.sellers.iter().any(|(s, _)| s == f.seller) {
-                self.sellers.insert(0, (f.seller.to_owned(), f.source));
+            if let Some(seller) = &f.seller
+                && !self.sellers.iter().any(|(s, _)| s == seller)
+            {
+                self.sellers.insert(0, (seller.clone(), f.source.clone()));
+            }
+            if let Some(url) = &f.url
+                && let Some(store) = store_from_url(url)
+                && self.links.len() < MAX_LINKS
+                && !self.links.iter().any(|l| same_page(&l.url, url))
+            {
+                self.links.push(Link {
+                    store,
+                    url: url.clone(),
+                    from: f.source.clone(),
+                    title: Some(f.title.clone()),
+                    author: f.seller.clone(),
+                    license: f.license.clone(),
+                });
             }
         }
     }
@@ -632,7 +670,7 @@ pub(crate) async fn find_matches(state: &AppState, id: &str, typed: Option<&str>
             ),
         ]
     }));
-    let pages = join_all(clues.links.iter().map(|(store, url)| linked_page(http, store, url)));
+    let pages = join_all(clues.links.iter().map(|l| linked_page(http, l)));
     let (fab, others, pages) = tokio::join!(fab, others, pages);
 
     let mut matches = Vec::new();
@@ -655,10 +693,13 @@ pub(crate) async fn find_matches(state: &AppState, id: &str, typed: Option<&str>
         .filter(|s| tried.get(s).is_some_and(|(n, bad)| n == bad))
         .collect();
     failed.dedup();
-    // A page the README links to is as good as it gets; if a search turned it up too, that one carries the details.
+    // A page the pack links to is as good as it gets; if a search turned it up too, that one carries the details.
     for page in pages.into_iter().flatten() {
         match matches.iter_mut().find(|m| same_page(&m.url, &page.url)) {
-            Some(m) => m.why.insert(0, "Linked in the pack's README".to_owned()),
+            Some(m) => {
+                m.why.splice(0..0, page.why);
+                m.license = m.license.or(page.license);
+            }
             None => matches.push(page),
         }
     }
@@ -718,20 +759,27 @@ async fn search_fab(http: &reqwest::Client, q: &str, deep: bool) -> Result<Vec<S
     Ok(found)
 }
 
-/// A store page the README links to, with its title read from the page (or its address, if it can't be fetched).
-async fn linked_page(http: &reqwest::Client, store: &'static str, url: &str) -> Option<StoreMatch> {
-    let title = match tokio::time::timeout(SEARCH_TIMEOUT, fetch_page(http, url, "text/html")).await {
-        Ok(Ok(html)) => html.find("<title").and_then(|i| {
-            let rest = &html[i..];
-            let open = rest.find('>')?;
-            Some(inner_text(&rest[open + 1..], "</title>").trim().to_owned())
-        }),
-        _ => None,
-    }
-    .filter(|t| !t.is_empty())
-    .unwrap_or_else(|| url.to_owned());
-    let mut m = found(store, &title, url.replace("http://", "https://"))?;
-    m.why.push("Linked in the pack's README".to_owned());
+/// A store page the pack links to. A store's file gives its title; a README's link is fetched for it (and named by
+/// its address if it can't be).
+async fn linked_page(http: &reqwest::Client, link: &Link) -> Option<StoreMatch> {
+    let url = link.url.as_str();
+    let title = match &link.title {
+        Some(t) => t.clone(),
+        None => match tokio::time::timeout(SEARCH_TIMEOUT, fetch_page(http, url, "text/html")).await {
+            Ok(Ok(html)) => html.find("<title").and_then(|i| {
+                let rest = &html[i..];
+                let open = rest.find('>')?;
+                Some(inner_text(&rest[open + 1..], "</title>").trim().to_owned())
+            }),
+            _ => None,
+        }
+        .filter(|t| !t.is_empty())
+        .unwrap_or_else(|| url.to_owned()),
+    };
+    let mut m = found(link.store, &title, url.replace("http://", "https://"))?;
+    m.author.clone_from(&link.author);
+    m.license = link.license.as_deref().and_then(crate::credits::license_name);
+    m.why.push(format!("Linked in the pack's {}", link.from));
     Some(m)
 }
 
@@ -1162,7 +1210,7 @@ pub(crate) mod tests {
         .to_vec();
         let mut c = clues("historic_miscellaneous_stand_wood_old_05_xeokah0_raw", None, &paths, &BTreeMap::new());
         c.add_sidecars(&[sidecar::read("xeokah0.json", sidecar::tests::STAND).unwrap()]);
-        assert_eq!(c.title, Some(("Historic Miscellaneous Stand Wood Old 05".to_owned(), "Megascans file")));
+        assert_eq!(c.title, Some(("Historic Miscellaneous Stand Wood Old 05".to_owned(), "Megascans file".to_owned())));
         assert_eq!(c.sellers[0].0, "Quixel Megascans");
         assert!(c.describe()[0].starts_with("Title: Historic Miscellaneous Stand Wood Old 05"));
 
@@ -1186,6 +1234,27 @@ pub(crate) mod tests {
         assert!(ranked[0].why.iter().any(|w| w == "Same title as the pack's Megascans file"));
         assert!(ranked[1].score < 1.0, "a different number isn't the same listing");
         assert!(same_title("stand_wood_old_05", "Stand Wood Old 05") && !same_title("Old 05", "Old 04"));
+    }
+
+    #[tokio::test]
+    async fn a_sketchfab_file_links_to_its_page() {
+        let text = include_str!("../formats/samples/sketchfab/license.txt");
+        let mut c = Clues::default();
+        c.add_sidecars(&[sidecar::read("Lantern/license.txt", text).unwrap()]);
+        assert_eq!(c.title, Some(("Brass Lantern".to_owned(), "Sketchfab file".to_owned())));
+        assert_eq!(c.describe().last().map(String::as_str), Some("The Sketchfab file links to Sketchfab"));
+
+        // Its page needn't be fetched: the file gives the title, the author and the license.
+        let page = linked_page(&reqwest::Client::new(), &c.links[0]).await.unwrap();
+        assert_eq!(
+            (page.title.as_str(), page.author.as_deref(), page.license),
+            ("Brass Lantern", Some("Example Artist"), Some(CC_BY_4))
+        );
+        let found = matches(rank("lantern", &c, vec![page]));
+        assert_eq!(
+            found.certain().map(StoreMatch::url),
+            Some("https://sketchfab.com/3d-models/brass-lantern-0123456789abcdef0123456789abcdef")
+        );
     }
 
     fn matches(matches: Vec<StoreMatch>) -> StoreMatches {
@@ -1329,15 +1398,15 @@ pub(crate) mod tests {
         let c = clues("Medieval Village v1.2", Some(readme), &paths, &kinds);
         // The product folder is just the pack's name again, so it adds nothing; the README's name does.
         assert_eq!(c.names, ["Rustic Hamlet Kit"]);
-        assert_eq!(c.sellers, [("Marco Maria Rossi".to_owned(), "README")]);
-        assert_eq!(c.links, [("Fab", "https://www.fab.com/listings/f89fe420-1942".to_owned())]);
+        assert_eq!(c.sellers, [("Marco Maria Rossi".to_owned(), "README".to_owned())]);
+        assert_eq!(c.links, [Link::readme("Fab", "https://www.fab.com/listings/f89fe420-1942".to_owned())]);
         assert_eq!((c.engine, c.meshes, c.textures), (Some("unreal-engine"), 496, 173));
 
         let unity: Vec<String> =
             (0..6).map(|i| format!("Assets/Synty/PolygonFantasyKingdom/Models/m{i}.fbx")).collect();
         let c = clues("pack_2023", None, &unity, &BTreeMap::new());
         assert_eq!(c.names, ["Polygon Fantasy Kingdom"]);
-        assert_eq!(c.sellers, [("Synty".to_owned(), "folders")]);
+        assert_eq!(c.sellers, [("Synty".to_owned(), "folders".to_owned())]);
         assert_eq!(c.engine, None);
     }
 
@@ -1345,7 +1414,7 @@ pub(crate) mod tests {
     fn searches_pieces_of_the_name_too() {
         let c = Clues {
             names: vec!["Rustic Hamlet".into()],
-            sellers: vec![("Marco".into(), "README")],
+            sellers: vec![("Marco".into(), "README".into())],
             ..Clues::default()
         };
         assert_eq!(
@@ -1381,7 +1450,7 @@ pub(crate) mod tests {
             m
         };
         let c = Clues {
-            sellers: vec![("Marco Maria Rossi".into(), "README")],
+            sellers: vec![("Marco Maria Rossi".into(), "README".into())],
             engine: Some("unreal-engine"),
             meshes: 490,
             ..Clues::default()

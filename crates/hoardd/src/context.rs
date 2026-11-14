@@ -46,7 +46,7 @@ const STORES: &[(&str, &str)] = &[
 /// The marketplace a URL belongs to, if it's one we know.
 pub(crate) fn store_from_url(url: &str) -> Option<&'static str> {
     let host = url.split("://").nth(1)?.split(['/', '?', '#']).next()?.to_ascii_lowercase();
-    STORES.iter().find(|(h, _)| host == *h || host.ends_with(&format!(".{h}")) || host.contains(h)).map(|(_, s)| *s)
+    STORES.iter().find(|(h, _)| host == *h || host.ends_with(&format!(".{h}"))).map(|(_, s)| *s)
 }
 
 /// The first store link mentioned in some text (a README often links back to its store page).
@@ -279,6 +279,7 @@ mod tests {
     #[test]
     fn recognises_stores() {
         assert_eq!(store_from_url("https://www.fab.com/listings/abc"), Some("Fab"));
+        assert_eq!(store_from_url("https://sketchfab.com/3d-models/abc"), Some("Sketchfab"));
         assert_eq!(store_from_url("https://kenney.itch.io/pack"), Some("itch.io"));
         assert_eq!(store_from_url("https://example.com/x"), None);
         assert_eq!(

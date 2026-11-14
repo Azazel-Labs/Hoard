@@ -299,6 +299,10 @@ software rasterizer (`apt install mesa-vulkan-drivers`). Without any adapter, ev
      surface's real size and height go with its material (see the "Real" repeat below). The file goes with the
      whole pack's download, not with a model's or a material's. More → "Read the pack's files again" reads them again,
      for example after the description was deleted.
+   - **Sketchfab files.** The `license.txt` in a Sketchfab download names the model, its author, its license and its
+     page, which becomes the pack's store page without a search. Each store's file is described in TOML, not code, so
+     reading another store's takes one file and a sample ([docs/store-formats.md](docs/store-formats.md)). PRs for
+     more stores are welcome.
    - **Pack context.** README text is kept with the pack, and a store link inside it (Fab, itch.io, Humble Bundle,
      Unity Asset Store, Kenney, …) fills in where the pack came from. "Store details" on the packs page takes the
      store page URL, license tier and listing text. For a pack without a store link it first searches Fab, itch.io,
@@ -311,9 +315,9 @@ software rasterizer (`apt install mesa-vulkan-drivers`). Without any adapter, ev
      a store link and no text, from either place, Hoard fetches the page's title and description; the asset panel
      shows it as "From the <store> page".
    - **Store lookup.** New packs are looked up in the background, one every few seconds, newest first. When the pack
-     names its listing itself (the README links to it, or the listing has exactly the title in its Megascans file),
-     that listing becomes the pack's store page, with its seller and license. Store details says it was found
-     automatically, and "Not this one" takes it off. Anything less certain is kept, so Store details lists the likely
+     names its listing itself (its README or Sketchfab file links to it, or the listing has exactly the title in its
+     Megascans file), that listing becomes the pack's store page, with its seller and license. Store details says it
+     was found automatically, and "Not this one" takes it off. Anything less certain is kept, so Store details lists the likely
      matches at once ("Search again" searches afresh). Turn it off in Settings → Adding packs → "Look up store pages
      automatically".
 5. **Link.** glTF buffers/images, OBJ → MTL → textures, FBX texture paths (absolute artist paths are matched by file
@@ -857,7 +861,7 @@ Requests that change something are marked 🔒: guests can't make them. A browse
 | PATCH 🔒 | `/api/packs/{id}` | rename it (`{name}`) |
 | DELETE 🔒 | `/api/packs/{id}` | delete it (blobs go at the next `gc`) |
 | POST 🔒 | `/api/packs/{id}/retag` | run the tagger again |
-| POST 🔒 | `/api/packs/{id}/read-files` | read the pack's Megascans files again (name, tags, description) |
+| POST 🔒 | `/api/packs/{id}/read-files` | read the pack's store files again (name, tags, description) |
 | GET, PUT 🔒 | `/api/packs/{id}/context` | store link, seller, license, README and notes the tagger reads |
 | GET 🔒 | `/api/packs/{id}/store-matches` | likely store pages (`q` to search for something else, `fresh` to search again) |
 | POST 🔒 | `/api/packs/{id}/store/undo` | take off a store page that was found automatically |
@@ -930,7 +934,7 @@ Requests that change something are marked 🔒: guests can't make them. A browse
 ```
 crates/hoard-core     shared wire types (serde), kind detection, tag normalization
 crates/hoard-render   headless wgpu renderer: glTF/GLB/OBJ in, thumbnail out (`cargo run -p hoard-render --example render`)
-crates/hoardd         the server
+crates/hoardd         the server; formats/ describes the files stores ship beside their art (Megascans, Sketchfab)
 crates/hoard          the CLI
 crates/hoard-unreal   Unreal package reader and converters (textures, sounds, materials, data tables)
 xtask/                `cargo xtask`: dev servers, checks, local model downloads and serving, Unreal export

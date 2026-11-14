@@ -49,6 +49,7 @@ mod settings;
 mod sheet;
 mod sidecar;
 mod sources;
+mod store_formats;
 mod store_lookup;
 mod store_search;
 mod tagger;
@@ -131,6 +132,7 @@ async fn main() -> Result<()> {
     if let Some(loc) = locations::adopt_existing(&*pool.get()?, &cfg)? {
         tracing::info!(path = %loc.path, "your files stay where they are, as the library location \"Library\"");
     }
+    store_formats::load(&cfg.data_dir.join("formats"));
     let blobs = BlobStore::open(&cfg, pool.clone())?;
     let requeued = db::requeue_stale_jobs(&*pool.get()?)?;
     maintenance::mark_interrupted(&*pool.get()?)?;

@@ -1,32 +1,34 @@
 //! Files a store ships beside the art that say what it is. A Megascans asset (from Fab or Bridge) carries
 //! `<id>.json` with the listing's exact title, tags, colour, where it was scanned and its real-world size, while its
 //! files are named `Historic_Miscellaneous_Stand_Wood_Old_05_xeokah0_Raw…`. It also lists the asset's texture maps by
-//! kind, its levels of detail with their triangle counts and, for a surface, how much ground one repeat covers.
-//! Fields follow Quixel's published asset spec; every one is optional.
+//! kind, its levels of detail with their triangle counts and, for a surface, how much ground one repeat covers. A
+//! Sketchfab download's `license.txt` names the model, its page, its author and its license.
 //!
+//! Each store's file is described in TOML ([`crate::store_formats`]); this module makes sense of what they find.
 //! [`read`] understands one such file; [`apply`] reads a pack's and names, tags and describes the pack from them.
-//! The store search reads them too ([`pack_sidecars`]), for the exact title.
+//! The store search reads them too ([`pack_sidecars`]), for the exact title and the store page.
 
 use std::collections::BTreeSet;
 use std::fmt::Write as _;
 
 use anyhow::Result;
 use hoard_core::{AssetKind, TagSource};
-use rusqlite::{OptionalExtension as _, params};
-use serde_json::Value;
+use rusqlite::{OptionalExtension as _, params, params_from_iter};
+use serde::Serialize;
 
+use crate::store_formats::{self, Format};
 use crate::tagger::{self, TagSet};
 use crate::{AppState, db};
 
-/// Larger JSON files are data, not a description of the pack.
+/// Larger files are data, not a description of the pack.
 pub(crate) const SIDECAR_BYTES: i64 = 256 * 1024;
-/// How many JSON files of a pack are read at most.
+/// How many store files of a pack are read at most.
 const MAX_SIDECARS: i64 = 50;
 /// Tags taken from one file at most.
 const MAX_TAGS: usize = 24;
 
 /// What a store's file says about the asset beside it.
-#[derive(Debug, Clone, Default, PartialEq)]
+#[derive(Debug, Clone, Default, PartialEq, Serialize)]
 pub(crate) struct Sidecar {
     /// The file's path in the pack.
     pub(crate) path: String,
@@ -34,10 +36,19 @@ pub(crate) struct Sidecar {
     pub(crate) id: Option<String>,
     /// The listing's exact title.
     pub(crate) title: String,
+    /// The format that read it ("Megascans").
+    pub(crate) format: String,
     /// The kind of file, in words ("Megascans file").
-    pub(crate) source: &'static str,
-    /// Who sells it.
-    pub(crate) seller: &'static str,
+    pub(crate) source: String,
+    /// Who sells it, or made it.
+    pub(crate) seller: Option<String>,
+    /// The license it's sold under, as the file writes it ("CC-BY-4.0").
+    pub(crate) license: Option<String>,
+    /// The store page.
+    pub(crate) url: Option<String>,
+    /// How the description says where it's from ("scanned in").
+    #[serde(skip)]
+    pub(crate) origin_words: String,
     /// "3D asset", "Surface", "Decal"…
     pub(crate) asset_type: Option<String>,
     /// Plain, normalised tags (`table`, `wood`, `color:brown`, `megascans`).
@@ -60,7 +71,7 @@ pub(crate) struct Sidecar {
 }
 
 /// A texture map the file lists.
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub(crate) struct ListedMap {
     /// Its file name, lowercase and without folders.
     pub(crate) file: String,
@@ -69,26 +80,12 @@ pub(crate) struct ListedMap {
 }
 
 /// A level of detail the file lists.
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub(crate) struct Lod {
     pub(crate) number: u32,
     pub(crate) tris: u64,
     /// Its mesh files' names, lowercase and without folders.
     pub(crate) files: Vec<String>,
-}
-
-/// Strings from a value that may be a string, a comma-separated string or an array of either.
-fn strings(v: &Value) -> Vec<String> {
-    match v {
-        Value::String(s) => s.split(',').map(str::trim).filter(|s| !s.is_empty()).map(str::to_owned).collect(),
-        Value::Array(a) => a.iter().flat_map(strings).collect(),
-        Value::Number(n) => vec![n.to_string()],
-        _ => Vec::new(),
-    }
-}
-
-fn first_string(v: &Value) -> Option<String> {
-    strings(v).into_iter().next()
 }
 
 fn tidy(s: &str) -> String {
@@ -147,102 +144,35 @@ fn area_metres(s: &str) -> Option<(f32, f32)> {
     Some((w * scale, h * scale))
 }
 
-/// The texture maps a file lists: today's `maps` list, or the spec's `components` with their files nested by size,
-/// resolution and format. Also the physical sizes they're given.
-fn listed_maps(v: &Value) -> (Vec<ListedMap>, Vec<String>) {
-    let mut maps: Vec<ListedMap> = Vec::new();
-    let mut sizes = Vec::new();
-    let mut add = |kind: &str, uri: Option<&str>| {
-        if let Some(file) = uri.and_then(file_name)
-            && !kind.is_empty()
-            && !maps.iter().any(|m| m.file == file)
-        {
-            maps.push(ListedMap { file, kind: kind.to_ascii_lowercase() });
-        }
-    };
-    for m in v["maps"].as_array().into_iter().flatten() {
-        add(m["type"].as_str().unwrap_or_default(), m["uri"].as_str());
-        sizes.extend(m["physicalSize"].as_str().map(str::to_owned));
-    }
-    for c in v["components"].as_array().into_iter().flatten() {
-        let kind = c["type"].as_str().unwrap_or_default();
-        for u in c["uris"].as_array().into_iter().flatten() {
-            sizes.extend(u["physicalSize"].as_str().map(str::to_owned));
-            for r in u["resolutions"].as_array().into_iter().flatten() {
-                for f in r["formats"].as_array().into_iter().flatten() {
-                    add(kind, f["uri"].as_str());
-                }
-            }
-        }
-    }
-    (maps, sizes)
+/// Understand a file from a pack, if it's one a store ships to describe an asset.
+pub(crate) fn read(path: &str, text: &str) -> Option<Sidecar> {
+    store_formats::all().iter().filter(|f| f.wants(path)).find_map(|f| read_as(f, path, text))
 }
 
-/// The levels of detail a file lists (`meshes` of type `lod`), numbered as their files are (`…_LOD2.fbx`) or else
-/// in order.
-fn listed_lods(v: &Value) -> Vec<Lod> {
-    let mut lods: Vec<Lod> = v["meshes"]
-        .as_array()
-        .into_iter()
-        .flatten()
-        .filter(|m| m["type"].as_str().is_some_and(|t| t.eq_ignore_ascii_case("lod")))
-        .enumerate()
-        .filter_map(|(i, m)| {
-            let files: Vec<String> = m["uris"]
-                .as_array()
-                .into_iter()
-                .flatten()
-                .filter_map(|u| u["uri"].as_str().and_then(file_name))
-                .collect();
-            let lod = files.iter().find_map(|f| lod_of(f)).or_else(|| u32::try_from(i).ok())?;
-            Some(Lod { number: lod, tris: m["tris"].as_u64().filter(|&t| t > 0)?, files })
-        })
-        .collect();
-    lods.sort_by_key(|l| l.number);
-    lods.dedup_by_key(|l| l.number);
-    lods
+/// Values that may be comma-separated lists, one value each.
+fn split_commas(values: &[String]) -> Vec<String> {
+    values.iter().flat_map(|s| s.split(',')).map(str::trim).filter(|s| !s.is_empty()).map(str::to_owned).collect()
 }
 
-/// Understand a JSON file from a pack, if it's one a store ships to describe an asset.
-pub(crate) fn read(path: &str, json: &str) -> Option<Sidecar> {
-    let v: Value = serde_json::from_str(json).ok()?;
-    let sem = &v["semanticTags"];
-    // Today's files name the listing under `semanticTags`; older ones have `id`, `name` and a `meta` list.
-    let title = first_string(&sem["name_formats"]["title"])
-        .or_else(|| first_string(&sem["name"]))
-        .or_else(|| (v["id"].is_string() && v["meta"].is_array()).then(|| first_string(&v["name"])).flatten())
-        .map(|t| tidy(&t))
-        .filter(|t| !t.is_empty() && t.len() <= 120)?;
+fn read_as(f: &Format, path: &str, text: &str) -> Option<Sidecar> {
+    let doc = f.open(text)?;
+    let at = doc.root();
+    let x = &f.fields;
+    let title = x.title.first(at).map(|t| tidy(&t)).filter(|t| !t.is_empty() && t.len() <= 120)?;
     let file_stem = path.rsplit('/').next().unwrap_or(path).rsplit_once('.').map_or(path, |(s, _)| s);
-    let id = v["id"]
-        .as_str()
-        .map(str::to_owned)
-        .or_else(|| (file_stem.len() <= 16 && !file_stem.contains(' ')).then(|| file_stem.to_owned()))
-        .filter(|s| !s.is_empty() && s.chars().all(|c| c.is_ascii_alphanumeric() || c == '_' || c == '-'));
+    let id =
+        x.id.first(at)
+            .or_else(|| {
+                (f.id_from_file_name && file_stem.len() <= 16 && !file_stem.contains(' ')).then(|| file_stem.to_owned())
+            })
+            .filter(|s| !s.is_empty() && s.chars().all(|c| c.is_ascii_alphanumeric() || c == '_' || c == '-'));
 
-    let mut words: Vec<String> = strings(&v["tags"]);
-    words.extend(strings(&v["categories"]));
-    let mut colors: Vec<String> = strings(&sem["color"]);
-    if let Some(Value::Object(o)) = sem.as_object().map(|_| sem) {
-        for (key, value) in o {
-            let skip = matches!(key.as_str(), "name" | "name_formats" | "color" | "country" | "region" | "asset_type")
-                || key.contains("size");
-            // Lists of words (`contains`, `theme`, `descriptive`…) are tags; single values are facts read below.
-            if !skip && value.is_array() {
-                words.extend(strings(value));
-            }
-        }
-    }
-    let asset_type = first_string(&sem["asset_type"]).or_else(|| first_string(&v["type"])).map(|t| tidy(&t));
+    let mut words = split_commas(&x.words.all(at));
+    let asset_type = x.kind.first(at).map(|t| tidy(&t)).filter(|t| !t.is_empty());
     if let Some(t) = &asset_type {
         words.push(t.clone());
     }
-    if colors.is_empty()
-        && let Some(c) = v["averageColor"].as_str().filter(|c| !c.starts_with('#'))
-    {
-        colors.push(c.to_owned());
-    }
-
+    let colors = split_commas(&x.colors.all(at));
     let mut tags: Vec<String> = Vec::new();
     let mut push = |t: Option<String>| {
         if let Some(t) = t.filter(|t| t.len() <= 40 && !t.chars().all(|c| c.is_ascii_digit() || c == '-'))
@@ -251,7 +181,9 @@ pub(crate) fn read(path: &str, json: &str) -> Option<Sidecar> {
             tags.push(t);
         }
     };
-    push(Some("megascans".to_owned()));
+    for t in &f.tags {
+        push(hoard_core::normalize_tag(t));
+    }
     for w in &words {
         push(hoard_core::normalize_tag(&w.replace(':', " ")));
     }
@@ -261,76 +193,75 @@ pub(crate) fn read(path: &str, json: &str) -> Option<Sidecar> {
     tags.truncate(MAX_TAGS);
 
     let mut places: Vec<String> = Vec::new();
-    for p in [&sem["country"], &sem["region"], &v["environment"]["region"]].into_iter().filter_map(first_string) {
+    for p in x.origin.all(at).iter().map(|p| tidy(p)) {
         if !places.iter().any(|q| q.eq_ignore_ascii_case(&p)) {
-            places.push(tidy(&p));
+            places.push(p);
         }
     }
-
-    // `meta` is a list of `{key, name, value}`.
+    let fact = |v: Option<String>| v.map(|v| tidy(&v)).filter(|v| !v.is_empty() && v.len() <= 40);
     let mut dims = Vec::new();
-    let mut texel_density = None;
-    let mut scan_area = None;
-    let mut tileable = false;
-    for m in v["meta"].as_array().into_iter().flatten() {
-        let key = m["key"].as_str().unwrap_or_default().to_ascii_lowercase();
-        if key == "tileable" {
-            tileable = m["value"]
-                .as_bool()
-                .unwrap_or_else(|| m["value"].as_str().is_some_and(|s| s.eq_ignore_ascii_case("true")));
-            continue;
-        }
-        let Some(value) = first_string(&m["value"]).map(|s| tidy(&s)).filter(|s| !s.is_empty() && s.len() <= 40) else {
-            continue;
-        };
-        match key.as_str() {
-            "length" | "width" | "height" | "depth" => dims.push((key.clone(), value)),
-            "texeldensity" => texel_density = Some(value),
-            "scanarea" => scan_area = Some(value),
-            _ => {}
+    for g in &x.dims {
+        for n in g.each.nodes(at) {
+            if let (Some(name), Some(value)) = (fact(g.name.first(n)), fact(g.value.first(n))) {
+                dims.push((name.to_lowercase(), value));
+            }
         }
     }
-    let size_of = |want: &str| {
-        sem.as_object()?
-            .iter()
-            .find(|(k, _)| {
-                let k = k.to_ascii_lowercase();
-                k.contains("size") && k.contains(want)
-            })
-            .and_then(|(_, v)| v.as_str().map(tidy))
-    };
-    let size = match (size_of("min"), size_of("max")) {
+    let size = match (fact(x.size_min.first(at)), fact(x.size_max.first(at))) {
         (Some(a), Some(b)) if a == b => Some(a),
         (Some(a), Some(b)) => Some(format!("{a} to {b}")),
-        (a, b) => a.or(b).or_else(|| scan_area.clone()),
+        (a, b) => a.or(b).or_else(|| fact(x.size.first(at))),
     };
 
-    let (maps, map_sizes) = listed_maps(&v);
-    // Only a surface tiles; a 3D asset's measurements are its own, not a repeat's.
-    let surface = tileable
-        || asset_type.as_deref().is_some_and(|t| t.to_ascii_lowercase().contains("surface"))
-        || strings(&v["categories"]).iter().any(|c| c.to_ascii_lowercase().starts_with("surface"));
-    let physical_size = surface.then(|| scan_area.iter().chain(&map_sizes).find_map(|s| area_metres(s))).flatten();
-    let displacement = if surface {
-        dims.iter().find(|(k, _)| k == "height").and_then(|(_, v)| metres(v)).filter(|&m| m < 1.0)
-    } else {
-        None
-    };
+    let mut maps: Vec<ListedMap> = Vec::new();
+    for g in &x.maps {
+        for n in g.each.nodes(at) {
+            let kind = g.kind.first(n).unwrap_or_default().to_lowercase();
+            for file in g.file.all(n).iter().filter_map(|u| file_name(u)) {
+                if !kind.is_empty() && !maps.iter().any(|m| m.file == file) {
+                    maps.push(ListedMap { file, kind: kind.clone() });
+                }
+            }
+        }
+    }
+    // Numbered as their files are (`…_LOD2.fbx`), or else in order.
+    let mut lods: Vec<Lod> = Vec::new();
+    for g in &x.lods {
+        for (i, n) in g.each.nodes(at).into_iter().enumerate() {
+            let files: Vec<String> = g.files.all(n).iter().filter_map(|u| file_name(u)).collect();
+            let Some(tris) = g.tris.first(n).and_then(|t| t.parse::<u64>().ok()).filter(|&t| t > 0) else { continue };
+            if let Some(number) = files.iter().find_map(|f| lod_of(f)).or_else(|| u32::try_from(i).ok()) {
+                lods.push(Lod { number, tris, files });
+            }
+        }
+    }
+    lods.sort_by_key(|l| l.number);
+    lods.dedup_by_key(|l| l.number);
+
+    // Only a surface tiles: its size is one repeat's, and its height map's reach is its displacement.
+    let surface = x.tiles.holds(at);
+    let physical_size = surface.then(|| x.physical_size.all(at).iter().find_map(|s| area_metres(s))).flatten();
+    let displacement =
+        surface.then(|| x.displacement.all(at).iter().find_map(|s| metres(s))).flatten().filter(|&m| m < 1.0);
 
     Some(Sidecar {
         path: path.to_owned(),
         id,
         title,
-        source: "Megascans file",
-        seller: "Quixel Megascans",
+        format: f.name.clone(),
+        source: f.called.clone(),
+        seller: x.seller.first(at).map(|s| tidy(&s)).filter(|s| !s.is_empty() && s.len() <= 80).or(f.seller.clone()),
+        license: x.license.first(at).map(|s| tidy(&s)).filter(|s| !s.is_empty() && s.len() <= 120),
+        url: x.url.first(at).filter(|u| u.starts_with("https://") || u.starts_with("http://")),
+        origin_words: f.origin_words.clone(),
         asset_type,
         tags,
         origin: (!places.is_empty()).then(|| places.join(", ")),
         dims,
         size,
-        texel_density,
+        texel_density: fact(x.texel_density.first(at)),
         maps,
-        lods: listed_lods(&v),
+        lods,
         physical_size,
         displacement,
     })
@@ -405,9 +336,12 @@ impl Sidecar {
     pub(crate) fn describe(&self, maps: &[&str]) -> String {
         let kind = self.asset_type.as_deref().unwrap_or("asset");
         let lead = if kind.starts_with(['A', 'E', 'I', 'O', 'U', 'a', 'e', 'i', 'o', 'u']) { "An" } else { "A" };
-        let mut out = format!("{lead} {kind} from {}", self.seller);
+        let mut out = format!("{lead} {kind}");
+        if let Some(s) = &self.seller {
+            let _ = write!(out, " from {s}");
+        }
         if let Some(o) = &self.origin {
-            let _ = write!(out, ", scanned in {o}");
+            let _ = write!(out, ", {} {o}", self.origin_words);
         }
         out.push('.');
         let mut facts: Vec<String> = Vec::new();
@@ -435,6 +369,9 @@ impl Sidecar {
             out.push(' ');
             out.push_str(&capitalised(&text));
             out.push('.');
+        }
+        if let Some(l) = &self.license {
+            let _ = write!(out, " License: {l}.");
         }
         if !maps.is_empty() {
             let _ = write!(out, " Maps: {}.", maps.join(", "));
@@ -502,18 +439,35 @@ pub(crate) fn name_is_automatic(name: &str, sidecar: &Sidecar, folder: Option<&s
     [json_dir, folder].into_iter().flatten().any(|f| words(f) == have)
 }
 
-/// The store files in a pack (small JSON files only are looked at).
+/// SQL that's true for an asset (`a`) whose path some format reads, and its parameters.
+pub(crate) fn path_filter() -> (String, Vec<String>) {
+    let mut patterns: Vec<String> = Vec::new();
+    for p in store_formats::all().iter().flat_map(Format::like_patterns) {
+        if !patterns.contains(&p) {
+            patterns.push(p);
+        }
+    }
+    if patterns.is_empty() {
+        return ("0".to_owned(), patterns);
+    }
+    let sql = vec![r"lower(a.path) LIKE ? ESCAPE '\'"; patterns.len()].join(" OR ");
+    (format!("({sql})"), patterns)
+}
+
+/// The store files in a pack (small files any format reads).
 pub(crate) async fn pack_sidecars(state: &AppState, pack_id: &str) -> Result<Vec<Sidecar>> {
     let pid = pack_id.to_owned();
     let files = db::call(&state.pool, move |c| {
-        let mut stmt = c.prepare(
+        let (filter, patterns) = path_filter();
+        let mut stmt = c.prepare(&format!(
             "SELECT a.path, a.blob_hash FROM assets a JOIN blobs b ON b.hash = a.blob_hash
-             WHERE a.pack_id = ?1 AND lower(a.path) LIKE '%.json' AND b.size <= ?2 ORDER BY a.path LIMIT ?3",
-        )?;
+             WHERE a.pack_id = ? AND b.size <= ? AND {filter} ORDER BY a.path LIMIT ?"
+        ))?;
+        let mut args: Vec<rusqlite::types::Value> = vec![pid.into(), SIDECAR_BYTES.into()];
+        args.extend(patterns.into_iter().map(Into::into));
+        args.push(MAX_SIDECARS.into());
         let rows = stmt
-            .query_map(params![pid, SIDECAR_BYTES, MAX_SIDECARS], |r| {
-                Ok((r.get::<_, String>(0)?, r.get::<_, String>(1)?))
-            })?
+            .query_map(params_from_iter(args), |r| Ok((r.get::<_, String>(0)?, r.get::<_, String>(1)?)))?
             .collect::<rusqlite::Result<Vec<_>>>()?;
         Ok(rows)
     })
@@ -671,8 +625,13 @@ fn write(
         let names: Vec<&str> = titles.iter().copied().collect();
         let shown = names.iter().take(4).copied().collect::<Vec<_>>().join(", ");
         let more = names.len().saturating_sub(4);
+        let formats: BTreeSet<&str> = sidecars.iter().map(|s| s.format.as_str()).collect();
+        let whose = match formats.into_iter().collect::<Vec<_>>().as_slice() {
+            [one] => format!("{one} "),
+            _ => String::new(),
+        };
         format!(
-            "{} Megascans assets: {shown}{}.",
+            "{} {whose}assets: {shown}{}.",
             sidecars.len(),
             if more > 0 { format!(" and {more} more") } else { String::new() }
         )
@@ -689,12 +648,13 @@ fn write(
             serde_json::to_string(&file_tags)?
         ],
     )?;
-    let seller = sidecars[0].seller;
-    tx.execute(
-        "INSERT INTO pack_context (pack_id, seller) VALUES (?1, ?2)
-         ON CONFLICT (pack_id) DO UPDATE SET seller = COALESCE(seller, excluded.seller)",
-        params![pack_id, seller],
-    )?;
+    if let Some(seller) = sidecars.iter().find_map(|s| s.seller.as_deref()) {
+        tx.execute(
+            "INSERT INTO pack_context (pack_id, seller) VALUES (?1, ?2)
+             ON CONFLICT (pack_id) DO UPDATE SET seller = COALESCE(seller, excluded.seller)",
+            params![pack_id, seller],
+        )?;
+    }
     tx.commit()?;
     Ok(applied)
 }

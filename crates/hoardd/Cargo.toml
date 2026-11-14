@@ -80,6 +80,7 @@ futures-util = "0.3"
 tokio-util = { version = "0.7", features = ["io"] }
 time = { version = "0.3", features = ["formatting", "macros", "parsing"] }
 regex = "1"
+toml = "1"
 object_store = { version = "0.14", features = ["aws"] }
 bytes = "1"
 tower = { version = "0.5", features = ["util"] }

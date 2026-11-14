@@ -83,6 +83,11 @@ struct License {
     limit: Option<Limit>,
 }
 
+/// The usual name of a license, however it's written (`CC-BY-SA-4.0` → `CC BY-SA`).
+pub(crate) fn license_name(name: &str) -> Option<&'static str> {
+    license(name).map(|l| l.name)
+}
+
 /// A license by the id the tagger gives it (`cc-by`), the name a store gives it (`Fab Standard License`), or as
 /// someone typed it (`CC-BY 4.0`): case, spaces and punctuation don't matter.
 fn license(name: &str) -> Option<License> {

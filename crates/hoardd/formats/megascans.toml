@@ -1,0 +1,51 @@
+# Quixel Megascans assets, from Fab or Bridge, carry `<id>.json`. It has the listing's exact title, its tags, its
+# colour, where it was scanned, its real-world size, its texture maps by kind and its levels of detail. Today's files
+# name the listing under `semanticTags`; older ones, in the shape of Quixel's published asset spec, have `id`, `name`
+# and a `meta` list of `{key, value}`.
+name = "Megascans"
+seller = "Quixel Megascans"
+files = ["*.json"]
+require = ["semanticTags", ["id", "meta"]]
+tags = ["megascans"]
+origin_words = "scanned in"
+id_from_file_name = true
+
+[fields]
+title = ["semanticTags.name_formats.title", "semanticTags.name", "name"]
+id = "id"
+type = ["semanticTags.asset_type", "type"]
+# Lists of words under semanticTags (`contains`, `theme`, `descriptive`…) are tags; its single values are facts.
+words = ["tags", "categories", "semanticTags.*!(name,name_formats,color,country,region,asset_type,*size*)[array]"]
+colors = ["semanticTags.color", "averageColor !~ #*"]
+origin = ["semanticTags.country", "semanticTags.region", "environment.region"]
+texel_density = "meta[key=texelDensity].value"
+size_min = ["semanticTags.*size*min*", "semanticTags.*min*size*"]
+size_max = ["semanticTags.*size*max*", "semanticTags.*max*size*"]
+size = "meta[key=scanArea].value"
+# Only a surface tiles; a 3D asset's measurements are its own, not a repeat's.
+tiles = ["meta[key=tileable].value", "semanticTags.asset_type ~ *surface*", "type ~ *surface*", "categories ~ surface*"]
+# Quixel's API writes metres ("2x2 m", "0.91x0.91"), its file spec decimetres ("20x20").
+physical_size = ["meta[key=scanArea].value", "maps.physicalSize", "components.uris.physicalSize"]
+displacement = "meta[key=height].value"
+
+[[fields.dims]]
+each = "meta[key=length|width|height|depth]"
+name = "key"
+value = "value"
+
+# Today's `maps` list.
+[[fields.maps]]
+each = "maps[]"
+kind = "type"
+file = "uri"
+
+# The spec's `components`, with their files nested by size, resolution and format.
+[[fields.maps]]
+each = "components[]"
+kind = "type"
+file = "uris.resolutions.formats.uri"
+
+[[fields.lods]]
+each = "meshes[type=lod]"
+tris = "tris"
+files = "uris.uri"

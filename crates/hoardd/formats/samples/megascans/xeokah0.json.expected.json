@@ -1,0 +1,16 @@
+{
+  "title": "Historic Miscellaneous Stand Wood Old 05",
+  "id": "xeokah0",
+  "seller": "Quixel Megascans",
+  "asset_type": "3D asset",
+  "origin": "Denmark, Europe",
+  "size": "1 m to 2 m",
+  "texel_density": "4096 px/m",
+  "dims": [["length", "118 cm"], ["width", "54 cm"], ["height", "81 cm"]],
+  "tags": ["megascans", "wood", "old", "stand", "table", "historic", "medieval", "3d-asset", "color:brown"],
+  "lods": [
+    { "number": 0, "tris": 12000, "files": ["stand_xeokah0_lod0.fbx"] },
+    { "number": 1, "tris": 3000, "files": ["stand_xeokah0_lod1.fbx"] }
+  ],
+  "physical_size": null
+}

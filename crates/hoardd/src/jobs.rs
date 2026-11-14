@@ -212,13 +212,16 @@ async fn read_files(state: &AppState, pack_id: &str) -> Result<()> {
 pub(crate) async fn read_unread_files(state: &AppState) -> Result<()> {
     let n = db::call(&state.pool, |c| {
         let ids: Vec<String> = {
-            let mut stmt = c.prepare(
+            let (filter, patterns) = crate::sidecar::path_filter();
+            let mut stmt = c.prepare(&format!(
                 "SELECT p.id FROM packs p
                  WHERE p.description IS NULL AND p.files_read_at IS NULL AND p.status = 'ready'
                    AND EXISTS (SELECT 1 FROM assets a JOIN blobs b ON b.hash = a.blob_hash
-                               WHERE a.pack_id = p.id AND lower(a.path) LIKE '%.json' AND b.size <= ?1)",
-            )?;
-            stmt.query_map([crate::sidecar::SIDECAR_BYTES], |r| r.get(0))?.collect::<rusqlite::Result<_>>()?
+                               WHERE a.pack_id = p.id AND b.size <= ? AND {filter})"
+            ))?;
+            let mut args: Vec<rusqlite::types::Value> = vec![crate::sidecar::SIDECAR_BYTES.into()];
+            args.extend(patterns.into_iter().map(Into::into));
+            stmt.query_map(rusqlite::params_from_iter(args), |r| r.get(0))?.collect::<rusqlite::Result<_>>()?
         };
         let tx = c.transaction()?;
         let mut n = 0;

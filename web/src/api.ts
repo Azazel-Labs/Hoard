@@ -343,6 +343,14 @@ export interface Account {
 }
 
 /** An app (Claude, another MCP client) someone let sign in over OAuth. */
+/** A search someone kept: the portal's query string for it (`q=rock&kind=texture`). */
+export interface SavedSearch {
+  id: number
+  name: string
+  query: string
+  created_at: string
+}
+
 export interface Connection {
   id: number
   app: string
@@ -735,6 +743,8 @@ export interface SearchParams {
   similar?: string
   /** `#rrggbb`: assets with much of this colour. */
   color?: string
+  /** Only the favourites of whoever's signed in. */
+  favourites?: boolean
 }
 
 /** Packs and assets to archive, restore or delete for good. */
@@ -841,6 +851,7 @@ export const api = {
     if (p.archived) qs.set('archived', 'true')
     if (p.similar) qs.set('similar', p.similar)
     if (p.color) qs.set('color', p.color)
+    if (p.favourites) qs.set('favourites', 'true')
     return request<SearchResult>(`/api/assets?${qs}`).then((r) => ({ ...r, items: r.items.map(normalize) }))
   },
   asset: (id: string) => request<Asset>(`/api/assets/${id}`).then(normalize),
@@ -975,6 +986,11 @@ export const api = {
   makeToken: (name: string, role: Role) =>
     post<{ id: number; name: string; token: string }>('/api/admin/tokens', { name, role }),
   revokeToken: (id: number) => request<void>(`/api/admin/tokens/${id}`, { method: 'DELETE' }),
+  favourites: () => request<{ assets: string[] }>('/api/me/favourites'),
+  setFavourites: (change: { add?: string[]; remove?: string[] }) => post<{ assets: string[] }>('/api/me/favourites', change),
+  savedSearches: () => request<{ searches: SavedSearch[] }>('/api/me/searches'),
+  saveSearch: (name: string, query: string) => post<{ searches: SavedSearch[] }>('/api/me/searches', { name, query }),
+  deleteSearch: (id: number) => request<void>(`/api/me/searches/${id}`, { method: 'DELETE' }),
   connections: () => request<{ connections: Connection[] }>('/api/admin/connections'),
   disconnect: (id: number) => request<void>(`/api/admin/connections/${id}`, { method: 'DELETE' }),
   oauthRequest: (search: string) => request<{ client: string; redirect_host: string }>(`/api/oauth/request${search}`),

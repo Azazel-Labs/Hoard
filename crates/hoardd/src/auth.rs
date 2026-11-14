@@ -95,15 +95,24 @@ impl Role {
 /// Who a request is from.
 #[derive(Clone, Debug)]
 pub(crate) enum Who {
-    User { id: i64, name: String, role: Role },
-    Token { name: String, role: Role },
+    User {
+        id: i64,
+        name: String,
+        role: Role,
+    },
+    /// An access token or connected app, acting for `owner` (gone if that account was removed).
+    Token {
+        name: String,
+        role: Role,
+        owner: Option<i64>,
+    },
 }
 
 impl Who {
     fn json(&self) -> Value {
         match self {
             Self::User { name, role, .. } => json!({ "name": name, "kind": "user", "role": role.as_str() }),
-            Self::Token { name, role } => json!({ "name": name, "kind": "token", "role": role.as_str() }),
+            Self::Token { name, role, .. } => json!({ "name": name, "kind": "token", "role": role.as_str() }),
         }
     }
 
@@ -122,6 +131,14 @@ impl Who {
             Role::Admin => "only an admin can do this",
             _ => "this account can look but not change anything: an admin can change that in Settings → Account",
         }))
+    }
+
+    /// The account this is or acts for: whose favourites and saved searches are meant.
+    pub(crate) const fn owner(&self) -> Option<i64> {
+        match self {
+            Self::User { id, .. } => Some(*id),
+            Self::Token { owner, .. } => *owner,
+        }
     }
 
     /// The signed-in person, for things access tokens can't do.
@@ -187,17 +204,20 @@ fn password_matches(password: &str, hash: &str) -> bool {
 /// Checked against when there's no such name, so a wrong name takes as long as a wrong password.
 static DUMMY_HASH: LazyLock<String> = LazyLock::new(|| hash_password("not a password").unwrap_or_default());
 
+/// An access token's id, name and role, and its maker's role and id (gone if they were removed).
+type TokenRow = (i64, String, String, Option<String>, Option<i64>);
+
 /// Who `cred` belongs to, if anyone. Notes the use (at most once a minute for tokens, once an hour for sessions).
 fn lookup(c: &Connection, cred: &Credential) -> Result<Option<Who>> {
     match cred {
         Credential::Bearer(token) => {
             let hash = digest(token);
-            let row: Option<(i64, String, String, Option<String>)> = c
+            let row: Option<TokenRow> = c
                 .query_row(
-                    "SELECT t.id, t.name, t.role, u.role
+                    "SELECT t.id, t.name, t.role, u.role, u.id
                        FROM access_tokens t LEFT JOIN users u ON u.id = t.created_by WHERE t.token_hash = ?1",
                     [&hash],
-                    |r| Ok((r.get(0)?, r.get(1)?, r.get(2)?, r.get(3)?)),
+                    |r| Ok((r.get(0)?, r.get(1)?, r.get(2)?, r.get(3)?, r.get(4)?)),
                 )
                 .optional()?;
             if let Some((id, ..)) = &row {
@@ -208,10 +228,10 @@ fn lookup(c: &Connection, cred: &Credential) -> Result<Option<Who>> {
                 )?;
             }
             match row {
-                Some((_, name, own, maker)) => {
+                Some((_, name, own, maker, owner)) => {
                     let own = Role::stored(&own);
                     let role = maker.map_or(own, |m| own.min(Role::stored(&m)));
-                    Ok(Some(Who::Token { name, role }))
+                    Ok(Some(Who::Token { name, role, owner }))
                 }
                 None => Ok(crate::oauth::lookup(c, &hash)?),
             }

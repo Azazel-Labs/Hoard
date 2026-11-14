@@ -7,6 +7,7 @@ import {
 import { canPreview, stop as stopPreview, toggle as togglePreview } from './player'
 import { prefs, toggleIn } from './prefs'
 import { askToSignIn, auth, may, mayEdit, signOut } from './auth'
+import { forgetSearch, mine, saveSearch, setFavourite, toggleFavourite } from './mine'
 import { teach } from './storeFormats'
 import { DARK_THEMES, LIGHT_THEMES, themeFor } from './theme'
 import ActivityIndicator from './components/ActivityIndicator.vue'
@@ -57,6 +58,8 @@ const settingsSection = ref(initial.section || 'appearance')
 type Named = { id: string; name: string }
 const filters = reactive({
   q: '', kind: '', tags: [] as string[], pack: null as Named | null, collection: null as Named | null, sort: '',
+  /** Only your favourites. */
+  favourites: false,
   /** Assets that look like this one, most alike first. */
   similar: null as Named | null,
   /** Assets with much of this colour (hex), most of it first. */
@@ -128,6 +131,7 @@ async function runSearch(append = false) {
       sort: filters.sort || undefined,
       similar: filters.similar?.id,
       color: filters.color || undefined,
+      favourites: filters.favourites || undefined,
       limit: PAGE,
       offset: append ? items.value.length : 0,
       hide_supporting: !prefs.showSupporting,
@@ -164,7 +168,7 @@ watch(() => filters.q, () => {
 })
 watch(() => [
   filters.kind, filters.tags.join(','), filters.pack?.id, filters.collection?.id, filters.sort, filters.similar?.id,
-  filters.color, prefs.showSupporting,
+  filters.color, filters.favourites, prefs.showSupporting,
 ], () => {
   checked.value = []
   runSearch()
@@ -222,17 +226,59 @@ function setView(v: View) {
   void withTransition(() => (view.value = v), 'view')
 }
 function browsePack(p: Named) {
-  Object.assign(filters, { pack: { id: p.id, name: p.name }, collection: null, kind: '', tags: [], q: '', similar: null, color: '' })
+  Object.assign(filters, { pack: { id: p.id, name: p.name }, collection: null, favourites: false, kind: '', tags: [], q: '', similar: null, color: '' })
   setView('library')
 }
 function browseCollection(c: Collection | Named) {
   const same = filters.collection?.id === c.id
   Object.assign(filters, {
     collection: same ? null : { id: c.id, name: c.name }, pack: null, kind: '', tags: [], q: '', similar: null, color: '',
+    favourites: false,
   })
   setView('library')
   showFilters.value = false
 }
+function browseFavourites() {
+  const same = filters.favourites
+  Object.assign(filters, { favourites: !same, collection: null, pack: null, kind: '', tags: [], q: '', similar: null, color: '' })
+  setView('library')
+  showFilters.value = false
+}
+
+// ------------------------------------------------------------------ saved searches
+
+/** The saved search you're looking at, if it's one. */
+const savedNow = computed(() => {
+  const q = filterQuery()
+  return q ? (mine.searches.find((s) => s.query === q) ?? null) : null
+})
+function applySearch(s: { query: string }) {
+  readUrl(`?${s.query}`)
+  setView('library')
+  showFilters.value = false
+}
+const naming = ref(false)
+const saveName = ref('')
+const saveNameEl = ref<HTMLInputElement | null>(null)
+async function startNaming() {
+  saveName.value = [
+    filters.q.trim(), filters.kind, ...filters.tags, filters.pack?.name, filters.collection?.name,
+    filters.similar && `like ${filters.similar.name}`, filters.color, filters.favourites && 'favourites',
+  ].filter(Boolean).join(' · ').slice(0, 80)
+  naming.value = true
+  await nextTick()
+  saveNameEl.value?.select()
+}
+async function saveCurrent() {
+  const name = saveName.value.trim()
+  if (!name) return
+  if (await saveSearch(name, filterQuery())) {
+    naming.value = false
+    showOk(`Saved “${name}”: it's in Filters, under Yours`)
+  }
+}
+/** Every selected asset is a favourite already, so the button takes them out. */
+const allStarred = computed(() => checked.value.length > 0 && checked.value.every((id) => mine.favourites.has(id)))
 const mainEl = ref<HTMLElement | null>(null)
 /** Index of the first tile of the newest page, the ones that animate in. */
 const fresh = ref(0)
@@ -357,22 +403,22 @@ function goHome() {
   mainEl.value?.scrollTo({ top: 0, behavior: 'smooth' })
 }
 function clearFilters() {
-  Object.assign(filters, { q: '', kind: '', tags: [], pack: null, collection: null, similar: null, color: '' })
+  Object.assign(filters, { q: '', kind: '', tags: [], pack: null, collection: null, favourites: false, similar: null, color: '' })
 }
 const hasFilters = computed(
-  () => !!(filters.q || filters.kind || filters.tags.length || filters.pack || filters.collection || filters.similar || filters.color),
+  () => !!(filters.q || filters.kind || filters.tags.length || filters.pack || filters.collection || filters.similar || filters.color || filters.favourites),
 )
 /** "More like this": everything that looks like an asset, across every pack, most alike first. */
 function findSimilar(a: Asset) {
   Object.assign(filters, {
-    similar: { id: a.id, name: a.name }, color: '', q: '', kind: '', tags: [], pack: null, collection: null, sort: '',
+    similar: { id: a.id, name: a.name }, color: '', q: '', kind: '', tags: [], pack: null, collection: null, favourites: false, sort: '',
   })
   setView('library')
   mainEl.value?.scrollTo({ top: 0 })
 }
 /** A colour from an asset's palette: everything with much of it, across the library. */
 function findColor(hex: string) {
-  Object.assign(filters, { color: hex, similar: null, q: '', kind: '', tags: [], pack: null, collection: null, sort: '' })
+  Object.assign(filters, { color: hex, similar: null, q: '', kind: '', tags: [], pack: null, collection: null, favourites: false, sort: '' })
   setView('library')
   mainEl.value?.scrollTo({ top: 0 })
 }
@@ -850,14 +896,17 @@ function onKey(e: KeyboardEvent) {
   if (e.key === 'x' && focused) {
     toggleCheck(focused)
   }
+  if (e.key === 'f' && focused && member.value) {
+    toggleFavourite(focused.id)
+  }
 }
 
 // ------------------------------------------------------------------ URL
 
 // Filters live in the query string (bookmarkable searches); the hash holds the view or an open asset
 // (#packs, #archive, #settings/<page>, #asset=<id>; MCP links use the last).
-function readUrl() {
-  const u = new URLSearchParams(location.search)
+function readUrl(search = location.search) {
+  const u = new URLSearchParams(search)
   filters.q = u.get('q') ?? ''
   filters.kind = u.get('kind') ?? ''
   filters.tags = (u.get('tags') ?? '').split(',').filter(Boolean)
@@ -870,6 +919,7 @@ function readUrl() {
   filters.similar = like ? { id: like, name: u.get('similar_name') ?? 'asset' } : null
   const color = u.get('color') ?? ''
   filters.color = /^#[0-9a-f]{6}$/i.test(color) ? color.toLowerCase() : ''
+  filters.favourites = u.get('fav') === '1'
 }
 /** What a history entry is: going somewhere new adds an entry; refining where you are rewrites it. */
 function urlState() {
@@ -879,15 +929,15 @@ function urlState() {
     asset: selected.value?.id ?? '',
     place: [
       filters.kind, filters.tags.join(','), filters.sort, filters.pack?.id, filters.collection?.id, filters.similar?.id,
-      filters.color,
+      filters.color, filters.favourites,
     ].join('|'),
   }
 }
 let lastState = urlState()
 /** Set while Back/Forward is being followed, so following it doesn't write history of its own. */
 let restoring = false
-function writeUrl() {
-  if (restoring) return
+/** The filters as a query string: what goes in the address, and what a saved search keeps. */
+function filterQuery(): string {
   const u = new URLSearchParams()
   if (filters.q.trim()) u.set('q', filters.q.trim())
   if (filters.kind) u.set('kind', filters.kind)
@@ -906,7 +956,12 @@ function writeUrl() {
     u.set('similar_name', filters.similar.name)
   }
   if (filters.color) u.set('color', filters.color)
-  const qs = u.toString()
+  if (filters.favourites) u.set('fav', '1')
+  return u.toString()
+}
+function writeUrl() {
+  if (restoring) return
+  const qs = filterQuery()
   const hash =
     view.value === 'packs' ? '#packs'
     : view.value === 'archive' ? '#archive'
@@ -939,6 +994,7 @@ watch(
     () => filters.collection?.id,
     () => filters.similar?.id,
     () => filters.color,
+    () => filters.favourites,
   ],
   writeUrl,
 )
@@ -1037,6 +1093,9 @@ const mod = /Mac|iPhone|iPad/.test(navigator.platform) ? '⌘' : 'Ctrl+'
 const commands = computed<Command[]>(() => {
   const out: Command[] = [
     { id: 'go:library', group: 'Go to', label: 'Library', keywords: 'assets grid home', run: () => setView('library') },
+    ...(member.value
+      ? [{ id: 'go:favourites', group: 'Go to', label: 'Favourites', hint: mine.favourites.size ? mine.favourites.size.toLocaleString() : undefined, keywords: 'starred stars liked', run: browseFavourites }]
+      : []),
     { id: 'go:packs', group: 'Go to', label: 'Packs', hint: busyPacks.value.length ? `${busyPacks.value.length} working` : undefined, run: () => setView('packs') },
     { id: 'go:archive', group: 'Go to', label: 'Archive', hint: archivedCount.value ? archivedCount.value.toLocaleString() : undefined, keywords: 'trash recycle bin deleted restore', run: () => setView('archive') },
     { id: 'go:stats', group: 'Go to', label: 'Library stats', keywords: 'statistics numbers size disk space count', run: () => openSettings('library') },
@@ -1083,6 +1142,7 @@ const commands = computed<Command[]>(() => {
   }
   for (const p of packs.value) out.push({ id: `pack:${p.id}`, group: 'Packs', label: p.name, run: () => browsePack(p) })
   for (const c of collections.value) out.push({ id: `col:${c.id}`, group: 'Collections', label: c.name, run: () => browseCollection(c) })
+  for (const s of mine.searches) out.push({ id: `saved:${s.id}`, group: 'Saved searches', label: s.name, run: () => applySearch(s) })
   return out
 })
 </script>
@@ -1242,6 +1302,27 @@ const commands = computed<Command[]>(() => {
           <h2 class="side-title">Filters</h2>
           <button type="button" class="btn ghost" @click="showFilters = false">Done</button>
         </div>
+        <section v-if="member" class="collections yours">
+          <h3>Yours</h3>
+          <ul class="kinds">
+            <li>
+              <button type="button" :aria-pressed="filters.favourites" @click="browseFavourites">
+                <svg viewBox="0 0 16 16" width="11" height="11" aria-hidden="true"><path d="M8 1.9l1.8 3.7 4.1.6-3 2.9.7 4.1L8 11.3l-3.6 1.9.7-4.1-3-2.9 4.1-.6z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" /></svg>
+                <span class="cname">Favourites</span>
+                <span class="n mono">{{ mine.favourites.size }}</span>
+              </button>
+            </li>
+            <li v-for="s in mine.searches" :key="s.id" class="saved">
+              <button type="button" :aria-pressed="savedNow?.id === s.id" :title="s.query" @click="applySearch(s)">
+                <svg viewBox="0 0 16 16" width="11" height="11" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="7" cy="7" r="4.5" /><path d="m10.5 10.5 3 3" /></svg>
+                <span class="cname">{{ s.name }}</span>
+              </button>
+              <button type="button" class="forget" :aria-label="`Forget the saved search ${s.name}`" title="Forget this search" @click="forgetSearch(s)">
+                <svg viewBox="0 0 16 16" width="10" height="10" aria-hidden="true"><path d="m4 4 8 8M12 4l-8 8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" /></svg>
+              </button>
+            </li>
+          </ul>
+        </section>
         <section v-if="collections.length" class="collections">
           <h3>Collections</h3>
           <ul class="kinds">
@@ -1346,11 +1427,21 @@ const commands = computed<Command[]>(() => {
             </span>
             <TagChip v-if="filters.pack" :tag="`pack:${filters.pack.name}`" removable @remove="filters.pack = null" />
             <TagChip v-if="filters.collection" :tag="`collection:${filters.collection.name}`" removable @remove="filters.collection = null" />
+            <TagChip v-if="filters.favourites" tag="your:favourites" removable @remove="filters.favourites = false" />
             <TagChip v-if="filters.similar" :tag="`like:${filters.similar.name}`" removable @remove="filters.similar = null" />
             <TagChip v-if="filters.color" :tag="`colour:${filters.color}`" :swatch="filters.color" removable @remove="filters.color = ''" />
             <TagChip v-if="filters.kind" :tag="`kind:${filters.kind}`" removable @remove="filters.kind = ''" />
             <TagChip v-for="t in filters.tags" :key="t" :tag="t" removable @remove="toggleTag(t)" />
             <button v-if="hasFilters" type="button" class="linkbtn" @click="clearFilters">Clear all</button>
+            <template v-if="member && hasFilters && !savedNow">
+              <form v-if="naming" class="savesearch" @submit.prevent="saveCurrent">
+                <label class="visually-hidden" for="save-name">Name for this search</label>
+                <input id="save-name" ref="saveNameEl" v-model="saveName" class="field" maxlength="80" placeholder="Name it" autocomplete="off" @keydown.esc.stop="naming = false" />
+                <button class="btn" type="submit" :disabled="!saveName.trim()">Save</button>
+                <button class="btn ghost" type="button" @click="naming = false">Cancel</button>
+              </form>
+              <button v-else type="button" class="linkbtn" title="Keep this search in Filters, under Yours" @click="startNaming">Save search</button>
+            </template>
           </div>
           <button
             v-if="items.length"
@@ -1534,6 +1625,9 @@ const commands = computed<Command[]>(() => {
           Remove from {{ filters.collection.name }}
         </button>
         </template>
+        <button v-if="member && checked.length" type="button" class="btn" @click="setFavourite(checked, !allStarred)">
+          {{ allStarred ? 'Unfavourite' : 'Favourite' }}
+        </button>
         <button type="button" class="linkbtn" @click="checked = items.map((a) => a.id)">Select all {{ items.length }}</button>
         <button v-if="editor" type="button" class="btn danger" :disabled="!checked.length || bulkBusy" title="Out of search until they're restored or deleted for good, from the Archive" @click="archiveChecked">Archive</button>
         <button type="button" class="btn ghost" @click="checked = []; selectMode = false">Done</button>
@@ -1547,7 +1641,7 @@ const commands = computed<Command[]>(() => {
       class="settings-pane"
       :stats="stats"
       @unauthorized="askToSignIn"
-      @tag="(t) => { Object.assign(filters, { tags: [], kind: '', pack: null, collection: null, q: '' }); toggleTag(t) }"
+      @tag="(t) => { Object.assign(filters, { tags: [], kind: '', pack: null, collection: null, favourites: false, q: '' }); toggleTag(t) }"
       @pack="browsePack"
       @open="openAsset"
       @archive="setView('archive')"
@@ -1700,6 +1794,15 @@ const commands = computed<Command[]>(() => {
 .kinds button[aria-pressed='true'] { background: var(--raised); box-shadow: inset 3px 0 0 var(--kind); }
 .dot { width: 10px; height: 10px; border-radius: 2px; background: var(--kind); flex: none; }
 .n { margin-left: auto; color: var(--faint); font-size: 0.75rem; padding-left: 0.4rem; }
+.yours li.saved { display: flex; align-items: center; }
+.yours .forget {
+  flex: none; width: auto; padding: 0.3rem 0.4rem; color: var(--faint); opacity: 0;
+}
+.yours li.saved:hover .forget, .yours .forget:focus-visible { opacity: 1; }
+.yours .forget:hover { color: var(--text); }
+@media (hover: none) { .yours .forget { opacity: 1; } }
+.savesearch { display: inline-flex; gap: 0.3rem; align-items: center; }
+.savesearch .field { width: 12rem; padding-block: 0.2rem; }
 .facet-tags { display: flex; flex-wrap: wrap; gap: 0.3rem; }
 .facet {
   display: inline-flex; align-items: baseline; padding: 0.1em 0.45em; border: 1px solid var(--line); border-radius: var(--r-chip);

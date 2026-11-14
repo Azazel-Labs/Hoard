@@ -611,6 +611,9 @@ pub struct SearchQuery {
     /// Assets with much of this colour (`#rrggbb`) in them, most first.
     #[serde(default)]
     pub color: Option<String>,
+    /// Only this account's favourites. Set by the server for whoever asks, never sent.
+    #[serde(skip)]
+    pub favourites_of: Option<i64>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

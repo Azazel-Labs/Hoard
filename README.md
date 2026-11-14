@@ -575,6 +575,14 @@ collection = "Forest level"
 dest = "levels/forest"
 ```
 
+## Favourites and saved searches
+
+Everyone signed in has their own: star a tile (or press F on it, or star its details), and Favourites, under
+**Yours** at the top of the filter sidebar, shows just those, with every other filter still working. "Save search"
+beside the active filters keeps what you're looking at under a name, there and in the command palette (Ctrl K);
+saving the same name again replaces it. An account that can only look has them too, and an access token or a
+connected app uses its maker's.
+
 ## The archive
 
 Archiving a pack or an asset (from its menu, its details, or a selection) takes it out of search, the counts and the
@@ -856,7 +864,7 @@ browser session's changes must also carry an `X-Hoard` header, which pages on ot
 
 | Method | Path | |
 |---|---|---|
-| GET | `/api/assets` | search: `q`, `kind`, `tags=a,b`, `pack`, `collection`, `ext`, `similar=<asset id>`, `color=<hex>`, `sort`, `limit`, `offset`, `hide_supporting`; results plus kind/tag facets |
+| GET | `/api/assets` | search: `q`, `kind`, `tags=a,b`, `pack`, `collection`, `ext`, `similar=<asset id>`, `color=<hex>`, `favourites=true` (whoever's asking), `sort`, `limit`, `offset`, `hide_supporting`; results plus kind/tag facets |
 | GET | `/api/assets/{id}` | one asset, with tags, metadata and dependencies |
 | PATCH 🔒 | `/api/assets/{id}` | rename, recategorize, describe, tag; `apply_to_family` for a whole variant family |
 | GET | `/api/assets/{id}/file` | the file (`?download=1` to save it) |
@@ -922,6 +930,14 @@ browser session's changes must also carry an `X-Hoard` header, which pages on ot
 | POST 🔒 | `/api/collections/{id}/assets` | `add` / `remove` assets |
 | GET | `/api/collections/{id}/bundle.zip` | all of it as a zip (`?sources=1`) |
 | GET | `/api/collections/{id}/credits` | credits for its packs (`?format=md`) |
+
+**Favourites and saved searches** (each person's own, so a guest has none; looking is enough)
+
+| Method | Path | |
+|---|---|---|
+| GET, POST | `/api/me/favourites` | your favourite asset ids, or change them: `{add?: [ids], remove?: [ids]}` |
+| GET, POST | `/api/me/searches` | your saved searches, or save one: `{name, query}` (the portal's query string, like `q=rock&kind=texture`) |
+| DELETE | `/api/me/searches/{id}` | forget one |
 
 **Unreal**
 

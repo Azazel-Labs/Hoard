@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { canStar, mine, toggleFavourite } from '../mine'
 import { computed, ref, watch } from 'vue'
 import { formatDuration, looksAlike, thumbUrl, type Asset } from '../api'
 import { canPreview, player, toggle } from '../player'
@@ -25,6 +26,7 @@ const isCurrent = computed(() => player.id === props.asset.id)
 const loaded = ref(false)
 watch(() => thumbUrl(props.asset), () => (loaded.value = false))
 const playing = computed(() => isCurrent.value && player.playing)
+const starred = computed(() => mine.favourites.has(props.asset.id))
 
 // Touch screens have no Ctrl-click: a long press (which fires contextmenu) selects instead.
 function onLongPress(e: MouseEvent) {
@@ -92,6 +94,19 @@ function onClick(e: MouseEvent) {
         <svg v-else viewBox="0 0 16 16" width="14" height="14" aria-hidden="true">
           <path d="M5 3.2v9.6a.5.5 0 0 0 .77.42l7.4-4.8a.5.5 0 0 0 0-.84l-7.4-4.8A.5.5 0 0 0 5 3.2Z" fill="currentColor" />
         </svg>
+      </button>
+      <button
+        v-if="canStar() && (starred || !selecting)"
+        type="button"
+        class="fav"
+        :class="{ on: starred }"
+        :aria-pressed="starred"
+        :aria-label="`Favourite ${asset.name}`"
+        :title="starred ? 'In your favourites' : 'Add to your favourites (F)'"
+        tabindex="-1"
+        @click.stop="toggleFavourite(asset.id)"
+      >
+        <svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true"><path d="M8 1.9l1.8 3.7 4.1.6-3 2.9.7 4.1L8 11.3l-3.6 1.9.7-4.1-3-2.9 4.1-.6z" :fill="starred ? 'currentColor' : 'none'" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" /></svg>
       </button>
       <button
         v-if="alikeable && !selecting"
@@ -193,7 +208,7 @@ img.pixelated { image-rendering: pixelated; }
   transition: translate var(--dur-2) var(--ease-out);
 }
 .tile:hover .overlay { translate: 0 -3px; }
-.play, .check, .alike {
+.play, .check, .alike, .fav {
   position: absolute; pointer-events: auto; display: grid; place-items: center;
   border: 1px solid var(--line); background: var(--panel); color: var(--text); cursor: pointer;
   box-shadow: var(--elev-1);
@@ -209,20 +224,25 @@ img.pixelated { image-rendering: pixelated; }
   left: 0.45rem; top: 0.55rem; width: 1.35rem; height: 1.35rem; border-radius: 4px;
   color: transparent; opacity: 0; scale: 0.8;
 }
-.alike {
+.fav {
   right: 0.45rem; top: 0.55rem; width: 1.6rem; height: 1.6rem; border-radius: 6px;
   opacity: 0; translate: 0 -4px;
 }
+.fav.on { opacity: 1; translate: 0 0; color: var(--star); }
+.alike {
+  right: 0.45rem; top: 2.45rem; width: 1.6rem; height: 1.6rem; border-radius: 6px;
+  opacity: 0; translate: 0 -4px;
+}
 .tile:hover .play, .tile:focus-within .play, .playing .play { opacity: 1; translate: 0 0; }
-.tile:hover .alike { opacity: 1; translate: 0 0; }
+.tile:hover .alike, .tile:hover .fav { opacity: 1; translate: 0 0; }
 .tile:hover .check, .selecting .check { opacity: 1; scale: 1; }
 .checked .check { opacity: 1; scale: 1; background: var(--text); border-color: var(--text); color: var(--bg); animation: pop var(--dur-3) var(--ease-pop); }
 /* The tick draws itself in. */
 .check path { stroke-dasharray: 14; stroke-dashoffset: 14; transition: stroke-dashoffset var(--dur-2) var(--ease-out) 60ms; }
 .checked .check path { stroke-dashoffset: 0; }
 @keyframes pop { from { scale: 0.5; } }
-.play:hover, .check:hover, .alike:hover { border-color: var(--muted); scale: 1.1; }
-.play:active, .check:active, .alike:active { scale: 0.92; transition-duration: 60ms; }
+.play:hover, .check:hover, .alike:hover, .fav:hover { border-color: var(--muted); scale: 1.1; }
+.play:active, .check:active, .alike:active, .fav:active { scale: 0.92; transition-duration: 60ms; }
 .playing .play { background: var(--kind); border-color: var(--kind); color: var(--bg); }
 
 /* Touch screens have no hover: keep the play button visible. */

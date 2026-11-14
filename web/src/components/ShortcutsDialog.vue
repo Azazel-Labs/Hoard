@@ -23,6 +23,7 @@ const SECTIONS: { title: string; keys: [string[], string][] }[] = [
       [['Enter'], 'Open the details'],
       [['Space'], 'Play or stop a sound'],
       [['X'], 'Select or deselect'],
+      [['F'], 'Add to or take out of your favourites'],
       [['Shift', 'click'], 'Select a range'],
       [[mod, 'A'], 'Select everything shown'],
     ],

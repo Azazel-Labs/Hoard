@@ -86,6 +86,8 @@
   --accent: light-dark(var(--l-accent), var(--d-accent));
   --danger: light-dark(#b93a3a, #ef7b7b);
   --ok: light-dark(#2f7d36, #8fd18b);
+  /* A favourite's star. */
+  --star: light-dark(#b07d06, #f2c14e);
 
   /* Kind colors, darker on light so text in them stays readable. */
   --k-texture: light-dark(#26806f, #5fb3a1);

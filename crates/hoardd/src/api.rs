@@ -6,7 +6,7 @@ use std::collections::BTreeSet;
 use anyhow::Context;
 use axum::body::Body;
 use axum::extract::{DefaultBodyLimit, Multipart, Path, Query, Request, State};
-use axum::http::{HeaderMap, HeaderValue, StatusCode, header};
+use axum::http::{HeaderMap, HeaderValue, Method, StatusCode, header};
 use axum::middleware::{self, Next};
 use axum::response::{IntoResponse, Response};
 use axum::routing::{get, post};
@@ -99,9 +99,10 @@ pub(crate) fn router(state: &AppState) -> Router<AppState> {
         .merge(crate::https::admin_router())
         .route_layer(middleware::from_fn_with_state(std::sync::Arc::clone(state), crate::auth::require_admin));
 
-    // Everyone's own: their password, access tokens and connected apps.
+    // Everyone's own: their password, access tokens, connected apps, favourites and saved searches.
     let own = Router::new()
         .merge(crate::auth::account_router())
+        .merge(crate::me::router())
         .merge(crate::oauth::portal_router())
         .route_layer(middleware::from_fn_with_state(std::sync::Arc::clone(state), crate::auth::require_user));
 
@@ -631,6 +632,9 @@ struct AssetsParams {
     /// `#rrggbb`: assets with much of this colour.
     #[serde(default)]
     color: Option<String>,
+    /// Only the favourites of whoever asks.
+    #[serde(default)]
+    favourites: Option<bool>,
 }
 
 impl From<AssetsParams> for SearchQuery {
@@ -649,13 +653,23 @@ impl From<AssetsParams> for SearchQuery {
             archived: p.archived.unwrap_or(false),
             similar: p.similar,
             color: p.color,
+            favourites_of: None,
         }
     }
 }
 
-async fn search_assets(State(state): State<AppState>, Query(p): Query<AssetsParams>) -> ApiResult<Json<SearchResult>> {
+async fn search_assets(
+    State(state): State<AppState>,
+    headers: HeaderMap,
+    Query(p): Query<AssetsParams>,
+) -> ApiResult<Json<SearchResult>> {
     let facets = p.facets.unwrap_or(true);
-    let q: SearchQuery = p.into();
+    let favourites = p.favourites.unwrap_or(false);
+    let mut q: SearchQuery = p.into();
+    if favourites {
+        let who = crate::auth::authenticate(&state, &Method::GET, &headers).await?;
+        q.favourites_of = Some(who.and_then(|w| w.owner()).ok_or_else(AppError::unauthorized)?);
+    }
     let page = crate::looks::search(&state, q, facets).await?;
     Ok(Json(SearchResult {
         items: page.items,

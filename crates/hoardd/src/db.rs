@@ -304,6 +304,22 @@ const MIGRATIONS: &[&str] = &[
     // 36: roles (see `auth::Role`). Everyone could do everything before, so existing accounts and tokens are admins.
     "ALTER TABLE users ADD COLUMN role TEXT NOT NULL DEFAULT 'admin' CHECK (role IN ('view', 'edit', 'admin'));
      ALTER TABLE access_tokens ADD COLUMN role TEXT NOT NULL DEFAULT 'admin' CHECK (role IN ('view', 'edit', 'admin'));",
+    // 37: each person's favourite assets and saved searches (see `me`).
+    "CREATE TABLE favourites (
+       user_id  INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+       asset_id TEXT NOT NULL REFERENCES assets(id) ON DELETE CASCADE,
+       added_at TEXT NOT NULL,
+       PRIMARY KEY (user_id, asset_id)
+     );
+     CREATE INDEX favourites_asset ON favourites(asset_id);
+     CREATE TABLE saved_searches (
+       id         INTEGER PRIMARY KEY AUTOINCREMENT,
+       user_id    INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+       name       TEXT NOT NULL,
+       query      TEXT NOT NULL,
+       created_at TEXT NOT NULL,
+       UNIQUE (user_id, name)
+     );",
 ];
 
 /// How many automatic pre-upgrade backups to keep in `<data dir>/backups`.
@@ -1428,6 +1444,10 @@ fn build_filter(q: &SearchQuery, include_kind: bool, look: Option<&LookRank>) ->
         }
         .to_owned(),
     );
+    if let Some(user) = q.favourites_of {
+        f.clauses.push("a.id IN (SELECT asset_id FROM favourites WHERE user_id = ?)".to_owned());
+        f.params.push(SqlValue::Integer(user));
+    }
     if let Some(c) = q.collection.as_deref().filter(|c| !c.is_empty()) {
         f.clauses.push(
             "a.id IN (SELECT ca.asset_id FROM collection_assets ca JOIN collections c ON c.id = ca.collection_id

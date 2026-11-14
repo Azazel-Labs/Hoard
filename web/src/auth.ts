@@ -11,10 +11,16 @@ export const auth = reactive({
   prompt: false,
 })
 
+/** What this server is called: Hoard, or the name it was given in Settings → General. */
+export function siteName(): string {
+  return auth.status?.name || 'Hoard'
+}
+
 export async function refreshAuth(): Promise<void> {
   try {
     auth.status = await api.authStatus()
     auth.error = ''
+    document.title = siteName()
   } catch (e) {
     auth.error = (e as Error).message
   }

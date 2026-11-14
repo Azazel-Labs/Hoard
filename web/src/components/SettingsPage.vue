@@ -22,7 +22,7 @@ import {
   type UnrealConvert,
   humanBytes,
 } from '../api'
-import { may } from '../auth'
+import { may, refreshAuth } from '../auth'
 import { prefs } from '../prefs'
 import { formatMiB } from '../sizes'
 import { ROLE_LABEL } from '../materials'
@@ -57,6 +57,7 @@ const emit = defineEmits<{
 const s = ref<Settings | null>(null)
 
 const ALL_PAGES: { id: string; label: string; blurb: string; need?: Role }[] = [
+  { id: 'general', need: 'admin', label: 'General', blurb: 'What this server is called, for everyone who uses it.' },
   { id: 'appearance', label: 'Appearance', blurb: 'The themes this browser wears when it’s light and when it’s dark. Saved in this browser only.' },
   { id: 'library', label: 'Library', blurb: 'What’s in the hoard: how big it is, what it’s made of, how it grew and how well it’s tagged. Archived things aren’t counted.' },
   { id: 'tags', need: 'edit', label: 'Tags', blurb: 'Every tag in the library. Merge ones that mean the same thing, or rename one; the taggers use the new name from then on.' },
@@ -489,7 +490,7 @@ function downloadOther() {
 const modelLabel = (m: ModelInfo) => [m.name, m.vision ? 'takes images' : ''].filter(Boolean).join(' · ')
 
 // Server options: each saves on its own when it's entered (Enter, or leaving the field); switches at once.
-const opts = reactive({ workers: 1, max_upload_mb: 1, max_expand_mb: 1, conversion_cache_mb: 1, public_url: '', soundfont: '' })
+const opts = reactive({ workers: 1, max_upload_mb: 1, max_expand_mb: 1, conversion_cache_mb: 1, name: '', public_url: '', soundfont: '' })
 type OptKey = keyof typeof opts
 const OPT_KEYS = Object.keys(opts) as OptKey[]
 const OPT_LABEL: Record<OptKey, string> = {
@@ -497,6 +498,7 @@ const OPT_LABEL: Record<OptKey, string> = {
   max_upload_mb: 'Largest upload',
   max_expand_mb: 'Largest pack',
   conversion_cache_mb: 'Converted downloads',
+  name: 'Name',
   public_url: 'Public address',
   soundfont: 'MIDI SoundFont',
 }
@@ -615,6 +617,8 @@ async function save(patch: SettingsPatch, done?: string) {
     if (done) showOk(done)
     // A smaller cache limit trims in the background; show what's left once it has.
     if ('conversion_cache_mb' in patch) setTimeout(loadUsage, 1500)
+    // The top bar, the tab and the sign-in page show the name.
+    if ('name' in patch) void refreshAuth()
   } catch (e) {
     if (e instanceof ApiError && e.status === 401) emit('unauthorized')
     showError((e as Error).message)
@@ -1309,6 +1313,32 @@ onBeforeUnmount(() => {
                   </div>
                 </details>
               </template>
+            </section>
+          </template>
+
+          <template v-else-if="current === 'general'">
+            <section>
+              <div class="sh"><h3>Name</h3></div>
+              <p class="what">
+                What this server is called in the top bar, the browser tab and on the sign-in page, so with more than one
+                hoard you can tell which is which.
+              </p>
+              <div class="llm opts">
+                <label for="opt-name">Name</label>
+                <div class="key">
+                  <input
+                    id="opt-name"
+                    v-model="opts.name"
+                    class="field"
+                    maxlength="40"
+                    :placeholder="s.options.name.default"
+                    :disabled="busy"
+                    @change="saveOpt('name')"
+                    @keydown.enter.prevent="saveOpt('name')"
+                  />
+                  <ResetButton v-if="changed('name')" :to="s.options.name.default" :disabled="busy" @reset="resetOpt('name')" />
+                </div>
+              </div>
             </section>
           </template>
 

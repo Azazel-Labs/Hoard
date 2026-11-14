@@ -404,6 +404,7 @@ async fn status(State(state): State<AppState>, headers: HeaderMap) -> ApiResult<
         "signed_in": who.is_some(),
         "user": user,
         "guest_browsing": settings.guest_browsing,
+        "name": settings.name,
         "sign_in": crate::signin::sign_in_options(&settings.auth),
     })))
 }

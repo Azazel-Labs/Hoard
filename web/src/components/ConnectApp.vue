@@ -3,7 +3,7 @@
 // here with the app's request in the query string; allowing hands the browser back to the app with a one-time code.
 import { onMounted, ref } from 'vue'
 import { api } from '../api'
-import { auth } from '../auth'
+import { auth, siteName } from '../auth'
 
 const params = Object.fromEntries(new URLSearchParams(location.search))
 const info = ref<{ client: string; redirect_host: string } | null>(null)
@@ -33,7 +33,7 @@ async function answer(allow: boolean) {
 <template>
   <div class="connect">
     <div class="card" role="dialog" aria-labelledby="connect-title">
-      <p class="brand">Hoard</p>
+      <p class="brand">{{ siteName() }}</p>
       <template v-if="info">
         <h1 id="connect-title">Connect {{ info.client }}?</h1>
         <p class="lede">

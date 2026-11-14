@@ -1947,6 +1947,7 @@ fn settings_json_sync(state: &AppState) -> Value {
                 crate::settings::DEFAULT_CONVERSION_CACHE_MB,
                 saved.conversion_cache_mb.is_some(),
             ),
+            "name": option(&now.name, crate::settings::DEFAULT_NAME, saved.name.is_some()),
             "public_url": option(
                 now.public_url.as_deref().unwrap_or(""),
                 cfg.public_url.as_deref().unwrap_or(""),

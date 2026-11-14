@@ -3,7 +3,7 @@
 // dialog over the library when someone browsing as a guest needs to sign in to change something.
 import { computed, nextTick, onMounted, ref } from 'vue'
 import { api, ApiError } from '../api'
-import { auth } from '../auth'
+import { auth, siteName } from '../auth'
 
 const props = defineProps<{ mode: 'setup' | 'login'; overlay?: boolean }>()
 const emit = defineEmits<{ done: []; close: [] }>()
@@ -56,7 +56,7 @@ async function submit() {
 <template>
   <div class="signin" :class="{ overlay }" role="dialog" aria-modal="true" :aria-labelledby="`${f}-title`" @keydown.esc="overlay && emit('close')">
     <form :id="`${f}-form`" :name="f" class="card" method="post" :action="setup ? '/api/auth/setup' : '/api/auth/login'" @submit.prevent="submit">
-      <p class="brand">Hoard</p>
+      <p class="brand">{{ siteName() }}</p>
       <h1 :id="`${f}-title`">{{ setup ? 'Create your account' : 'Sign in' }}</h1>
       <p class="lede">
         <template v-if="setup">

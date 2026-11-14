@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { siteName } from '../auth'
 // The first visit to a new server: pick where the library lives before anything else.
 import { onMounted, ref } from 'vue'
 import { api, type LibraryLocation, type LocationList } from '../api'
@@ -26,7 +27,7 @@ onMounted(load)
 <template>
   <div class="setup" role="dialog" aria-modal="true" aria-labelledby="setup-title">
     <div class="card">
-      <p class="brand">Hoard</p>
+      <p class="brand">{{ siteName() }}</p>
 
       <template v-if="!made">
         <h1 id="setup-title">Where should your library live?</h1>

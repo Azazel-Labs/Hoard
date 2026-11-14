@@ -848,9 +848,12 @@ portal's hashed assets are cached as immutable, and blob downloads carry ETags a
 ## Configuration
 
 Where the server keeps things, how it listens and how it's protected are set when it starts, with a flag or env var
-(`hoardd --help` lists them). Everything else (AI tagging, Blender, ffmpeg, Unreal conversion, thumbnails, the
-update check, workers, limits, the public address, HTTPS, the SoundFont) is changed in **Settings** in the portal header
-(behind the write token), takes effect at once, and is kept in the database, so it survives restarts and backups.
+(`hoardd --help` lists them). Everything else (the server's name, AI tagging, Blender, ffmpeg, Unreal conversion,
+thumbnails, the update check, workers, limits, the public address, HTTPS, sign-in, the SoundFont) is changed in
+**Settings** in the portal header (by an admin), takes effect at once, and is kept in the database, so it survives restarts and backups.
+
+**Settings → General** names the server: the name is shown in the top bar, the browser tab and on the sign-in page,
+for telling several hoards apart.
 
 Set before starting (these need a restart):
 

@@ -6,7 +6,7 @@ import {
 } from './api'
 import { canPreview, stop as stopPreview, toggle as togglePreview } from './player'
 import { prefs, toggleIn } from './prefs'
-import { askToSignIn, auth, may, mayEdit, signOut } from './auth'
+import { askToSignIn, auth, may, mayEdit, signOut, siteName } from './auth'
 import { forgetSearch, mine, saveSearch, setFavourite, toggleFavourite } from './mine'
 import { loadProjects, projects } from './projects'
 import { teach } from './storeFormats'
@@ -1200,7 +1200,7 @@ const commands = computed<Command[]>(() => {
           <rect x="3" y="17" width="12" height="12" rx="2.5" fill="var(--k-model)" />
           <rect x="17" y="17" width="12" height="12" rx="2.5" fill="var(--k-font)" />
         </svg>
-        <span>Hoard</span>
+        <span>{{ siteName() }}</span>
       </a>
 
       <div class="search">

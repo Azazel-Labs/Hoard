@@ -157,3 +157,29 @@ test.describe('authentication', () => {
     await expect(page.locator('[data-method="oauth"]')).toHaveClass(/on/)
   })
 })
+
+test.describe('naming the server', () => {
+  test.afterAll(async () => {
+    const api = await signedIn(process.env.HOARD_E2E_URL!)
+    await api.put('/api/admin/settings', { data: { name: null } })
+    await api.dispose()
+  })
+
+  test('an admin names it, and the top bar, tab and sign-in page say so', async ({ page, browser, baseURL }) => {
+    await page.goto('/#settings/general')
+    await page.getByLabel('Name', { exact: true }).fill('Studio art')
+    await page.getByLabel('Name', { exact: true }).press('Enter')
+    await expect(page.locator('header .brand')).toHaveText('Studio art')
+    await expect(page).toHaveTitle('Studio art')
+
+    const ctx = await browser.newContext({ baseURL, storageState: { cookies: [], origins: [] } })
+    const them = await ctx.newPage()
+    await them.goto('/')
+    await expect(them.getByRole('dialog', { name: 'Sign in' }).locator('.brand')).toHaveText('Studio art')
+    await expect(them).toHaveTitle('Studio art')
+    await ctx.close()
+
+    await page.getByRole('button', { name: 'Reset to the default, Hoard' }).click()
+    await expect(page.locator('header .brand')).toHaveText('Hoard')
+  })
+})

@@ -85,6 +85,9 @@ pub(crate) struct Saved {
     /// Empty means "find one on the system".
     #[serde(skip_serializing_if = "Option::is_none")]
     pub(crate) soundfont: Option<String>,
+    /// What this server calls itself in the portal (top bar, tab, sign-in page): telling several hoards apart.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub(crate) name: Option<String>,
     /// Empty means "from the Host header".
     #[serde(skip_serializing_if = "Option::is_none")]
     pub(crate) public_url: Option<String>,
@@ -141,6 +144,8 @@ pub(crate) struct Effective {
     pub(crate) update_hook_url: Option<String>,
     pub(crate) update_hook_auth: Option<String>,
     pub(crate) soundfont: Option<PathBuf>,
+    /// [`DEFAULT_NAME`] unless one was given.
+    pub(crate) name: String,
     pub(crate) public_url: Option<String>,
     pub(crate) max_upload_mb: u64,
     pub(crate) max_expand_mb: u64,
@@ -177,6 +182,10 @@ impl Effective {
     }
 }
 
+/// What the server is called until it's given a name.
+pub(crate) const DEFAULT_NAME: &str = "Hoard";
+const MAX_NAME: usize = 40;
+
 fn non_empty(s: &str) -> Option<String> {
     let s = s.trim();
     (!s.is_empty()).then(|| s.to_owned())
@@ -210,6 +219,7 @@ impl Saved {
                 Some(s) => non_empty(s).map(PathBuf::from),
                 None => cfg.soundfont.clone(),
             },
+            name: self.name.as_deref().and_then(non_empty).unwrap_or_else(|| DEFAULT_NAME.to_owned()),
             public_url: pick(&self.public_url, &cfg.public_url),
             max_upload_mb: self.max_upload_mb.unwrap_or(cfg.max_upload_mb),
             max_expand_mb: self.max_expand_mb.unwrap_or(cfg.max_expand_mb),
@@ -227,6 +237,9 @@ impl Saved {
     /// Problems a person can fix, in their words.
     fn check(&self, effective: &Effective) -> Result<(), String> {
         effective.auth.check()?;
+        if effective.name.chars().count() > MAX_NAME || effective.name.chars().any(char::is_control) {
+            return Err(format!("Choose a name of up to {MAX_NAME} characters, on one line"));
+        }
         for (name, v) in [("Blender", &self.blender), ("ffmpeg", &self.ffmpeg)] {
             if v.as_deref().is_some_and(|s| s.trim().is_empty()) {
                 return Err(format!("{name}: choose off, automatic, or give a path"));
@@ -452,6 +465,17 @@ mod tests {
         assert!(msg(json!({ "public_url": "hoard.example" })).contains("http"));
         assert!(msg(json!({ "soundfont": "/no/such/font.sf2" })).contains("SoundFont"));
         assert!(msg(json!({ "llm_batch": 0 })).contains("AI request"));
+        assert!(msg(json!({ "name": "x".repeat(41) })).contains("name"));
+        assert!(
+            msg(json!({ "name": "two
+lines" }))
+            .contains("name")
+        );
+        assert_eq!(store.get().name, "Hoard");
+        let (_, named) = store.update(&cfg, &c, &json!({ "name": "  Studio art  " })).unwrap();
+        assert_eq!(named.name, "Studio art");
+        let (_, blank) = store.update(&cfg, &c, &json!({ "name": " " })).unwrap();
+        assert_eq!(blank.name, "Hoard", "an empty name goes back to Hoard");
         assert_eq!(store.get().workers, 6, "a refusal changes nothing");
     }
 

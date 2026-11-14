@@ -358,6 +358,8 @@ export interface AuthStatus {
   user: { name: string; kind: 'user' | 'token'; role: Role; source?: AccountSource } | null
   /** People who aren't signed in may look around. */
   guest_browsing: boolean
+  /** What this server is called (Settings → General): Hoard unless it was given a name. */
+  name: string
   /** Ways to sign in besides Hoard's own accounts (Settings → Authentication). */
   sign_in?: { directory: string | null; oauth: string | null }
 }
@@ -706,6 +708,8 @@ export interface Settings {
     thumb_quality: OptionSetting<ThumbQuality>
     /** Most space cached "Download as" conversions may take, in MiB. */
     conversion_cache_mb: OptionSetting<number>
+    /** What the portal calls this server. */
+    name: OptionSetting<string>
     /** Empty: from the request's Host header. */
     public_url: OptionSetting<string>
     /** Empty: look in the usual places. */
@@ -815,6 +819,7 @@ export interface SettingsPatch {
   store_lookup?: boolean | null
   thumb_quality?: ThumbQuality | null
   conversion_cache_mb?: number | null
+  name?: string | null
   public_url?: string | null
   soundfont?: string | null
   clip?: boolean | null

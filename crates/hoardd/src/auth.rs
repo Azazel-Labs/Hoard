@@ -33,6 +33,7 @@ use sha2::Digest as _;
 
 use crate::AppState;
 use crate::error::{ApiResult, AppError};
+use crate::signin::Source;
 use crate::{db, tools};
 
 /// The session cookie over plain `http://`.
@@ -172,7 +173,7 @@ fn session_token(headers: &HeaderMap) -> Option<String> {
         .or_else(|| cookie_value(headers, COOKIE))
 }
 
-fn cookie_value(headers: &HeaderMap, name: &str) -> Option<String> {
+pub(crate) fn cookie_value(headers: &HeaderMap, name: &str) -> Option<String> {
     headers
         .get_all(header::COOKIE)
         .iter()
@@ -208,7 +209,9 @@ static DUMMY_HASH: LazyLock<String> = LazyLock::new(|| hash_password("not a pass
 type TokenRow = (i64, String, String, Option<String>, Option<i64>);
 
 /// Who `cred` belongs to, if anyone. Notes the use (at most once a minute for tokens, once an hour for sessions).
-fn lookup(c: &Connection, cred: &Credential) -> Result<Option<Who>> {
+/// Sessions end after [`SESSION_DAYS`] unused, or `session_hours` after signing in when Settings → Authentication
+/// says so.
+fn lookup(c: &Connection, cred: &Credential, session_hours: Option<u32>) -> Result<Option<Who>> {
     match cred {
         Credential::Bearer(token) => {
             let hash = digest(token);
@@ -238,16 +241,17 @@ fn lookup(c: &Connection, cred: &Credential) -> Result<Option<Who>> {
         }
         Credential::Session(token) => {
             let hash = digest(token);
-            let row: Option<(i64, String, String, i64)> = c
+            let row: Option<(i64, String, String, i64, i64)> = c
                 .query_row(
-                    "SELECT u.id, u.username, u.role, unixepoch('now') - unixepoch(s.last_seen_at)
+                    "SELECT u.id, u.username, u.role, unixepoch('now') - unixepoch(s.last_seen_at),
+                            unixepoch('now') - unixepoch(s.created_at)
                        FROM sessions s JOIN users u ON u.id = s.user_id WHERE s.token_hash = ?1",
                     [&hash],
-                    |r| Ok((r.get(0)?, r.get(1)?, r.get(2)?, r.get(3)?)),
+                    |r| Ok((r.get(0)?, r.get(1)?, r.get(2)?, r.get(3)?, r.get(4)?)),
                 )
                 .optional()?;
-            let Some((id, name, role, idle)) = row else { return Ok(None) };
-            if idle > SESSION_DAYS * 86_400 {
+            let Some((id, name, role, idle, age)) = row else { return Ok(None) };
+            if idle > SESSION_DAYS * 86_400 || session_hours.is_some_and(|h| age > i64::from(h) * 3600) {
                 c.execute("DELETE FROM sessions WHERE token_hash = ?1", [&hash])?;
                 return Ok(None);
             }
@@ -267,7 +271,8 @@ pub(crate) async fn authenticate(state: &AppState, method: &Method, headers: &He
     if matches!(cred, Credential::Session(_)) && !safe && !headers.contains_key(CSRF_HEADER) {
         return Err(AppError::forbidden("this request didn't come from the Hoard portal"));
     }
-    Ok(db::call(&state.pool, move |c| lookup(c, &cred)).await?)
+    let hours = state.settings.get().auth.session_hours;
+    Ok(db::call(&state.pool, move |c| lookup(c, &cred, hours)).await?)
 }
 
 async fn require(state: &AppState, role: Role, mut req: Request, next: Next) -> ApiResult<Response> {
@@ -370,20 +375,36 @@ pub(crate) fn admin_router() -> Router<AppState> {
 
 async fn status(State(state): State<AppState>, headers: HeaderMap) -> ApiResult<Json<Value>> {
     let cred = credential(&headers);
+    let settings = state.settings.get();
+    let hours = settings.auth.session_hours;
     let (accounts, who) = db::call(&state.pool, move |c| {
         let n: i64 = c.query_row("SELECT COUNT(*) FROM users", [], |r| r.get(0))?;
         let who = match cred {
-            Some(cred) => lookup(c, &cred)?,
+            Some(cred) => lookup(c, &cred, hours)?,
             None => None,
         };
-        Ok((n, who))
+        let source: Option<String> = match &who {
+            Some(Who::User { id, .. }) => {
+                c.query_row("SELECT source FROM users WHERE id = ?1", [id], |r| r.get(0)).optional()?
+            }
+            _ => None,
+        };
+        Ok((n, who.map(|w| (w, source))))
     })
     .await?;
+    let user = who.as_ref().map(|(w, source)| {
+        let mut j = w.json();
+        if let (Some(source), Some(o)) = (source, j.as_object_mut()) {
+            o.insert("source".into(), json!(source));
+        }
+        j
+    });
     Ok(Json(json!({
         "setup_needed": accounts == 0,
         "signed_in": who.is_some(),
-        "user": who.as_ref().map(Who::json),
-        "guest_browsing": state.settings.get().guest_browsing,
+        "user": user,
+        "guest_browsing": settings.guest_browsing,
+        "sign_in": crate::signin::sign_in_options(&settings.auth),
     })))
 }
 
@@ -395,11 +416,16 @@ struct Credentials {
 
 /// A name and password fit to save, or what's wrong with them.
 fn check_new(username: &str, password: &str) -> ApiResult<String> {
+    let name = check_name(username)?;
+    check_password(password)?;
+    Ok(name)
+}
+
+fn check_name(username: &str) -> ApiResult<String> {
     let name = username.trim();
     if name.is_empty() || name.chars().count() > 64 || name.chars().any(char::is_control) {
         return Err(AppError::bad_request("Choose a name of up to 64 characters"));
     }
-    check_password(password)?;
     Ok(name.to_owned())
 }
 
@@ -413,7 +439,7 @@ fn check_password(password: &str) -> ApiResult<()> {
 /// Whether to mark the cookie `Secure`: when this request came over HTTPS, directly (the server says so in the same
 /// header) or through a proxy that says so. (Not from the public address alone: someone on plain `http://` at home
 /// would never get the cookie back.)
-fn over_https(headers: &HeaderMap) -> bool {
+pub(crate) fn over_https(headers: &HeaderMap) -> bool {
     headers.get("x-forwarded-proto").and_then(|v| v.to_str().ok()).is_some_and(|p| p.eq_ignore_ascii_case("https"))
 }
 
@@ -427,7 +453,7 @@ fn set_cookie(secure: bool, token: &str, max_age: i64) -> Result<HeaderValue> {
     Ok(HeaderValue::from_str(&format!("{name}={token}; Path=/; HttpOnly; SameSite=Lax; Max-Age={max_age}{flag}"))?)
 }
 
-fn new_session(c: &Connection, user_id: i64) -> Result<String> {
+pub(crate) fn new_session(c: &Connection, user_id: i64) -> Result<String> {
     let token = tools::hex(&random_bytes::<32>()?);
     c.execute(
         "INSERT INTO sessions (token_hash, user_id, created_at, last_seen_at) VALUES (?1, ?2, ?3, ?3)",
@@ -437,8 +463,13 @@ fn new_session(c: &Connection, user_id: i64) -> Result<String> {
     Ok(token)
 }
 
+/// The session cookie for a new sign-in.
+pub(crate) fn session_cookie(headers: &HeaderMap, token: &str) -> Result<HeaderValue> {
+    cookie(headers, token, 400 * 86_400)
+}
+
 fn signed_in(headers: &HeaderMap, token: &str, name: &str, role: Role) -> ApiResult<Response> {
-    let set = cookie(headers, token, 400 * 86_400)?;
+    let set = session_cookie(headers, token)?;
     let user = json!({ "name": name, "kind": "user", "role": role.as_str() });
     Ok(([(header::SET_COOKIE, set)], Json(json!({ "user": user }))).into_response())
 }
@@ -478,27 +509,68 @@ async fn login(
     if let Some(wait) = wait_for(&name) {
         return Err(AppError::too_many(format!("Too many wrong tries: wait {} seconds", wait.as_secs().max(1))));
     }
-    let lookup_name = name.clone();
+    let auth = state.settings.get().auth.clone();
+    let directory = auth.directory().is_some();
+    let (lookup_name, password) = (name.clone(), body.password.clone());
+    // Hoard's own accounts always sign in with their own password, whatever Settings → Authentication says, so a
+    // directory that's down or set up wrong can't lock an admin out. Anyone else goes to the directory, if there is one.
     let found = db::call(&state.pool, move |c| {
-        let row: Option<(i64, String, String, String)> = c
-            .query_row("SELECT id, username, password_hash, role FROM users WHERE username = ?1", [&lookup_name], |r| {
-                Ok((r.get(0)?, r.get(1)?, r.get(2)?, r.get(3)?))
-            })
+        let row: Option<(i64, String, String, String, String)> = c
+            .query_row(
+                "SELECT id, username, password_hash, role, source FROM users WHERE username = ?1",
+                [&lookup_name],
+                |r| Ok((r.get(0)?, r.get(1)?, r.get(2)?, r.get(3)?, r.get(4)?)),
+            )
             .optional()?;
-        let hash = row.as_ref().map_or(DUMMY_HASH.as_str(), |r| r.2.as_str());
-        if !password_matches(&body.password, hash) {
-            return Ok(None);
+        if directory && row.as_ref().is_none_or(|r| r.4 == "ldap") {
+            return Ok(Err(()));
         }
-        let Some((id, username, _, role)) = row else { return Ok(None) };
-        Ok(Some((new_session(c, id)?, username, Role::stored(&role))))
+        let internal = row.filter(|r| r.4 == "internal");
+        let hash = internal.as_ref().map_or(DUMMY_HASH.as_str(), |r| r.2.as_str());
+        if !password_matches(&password, hash) {
+            return Ok(Ok(None));
+        }
+        let Some((id, username, _, role, _)) = internal else { return Ok(Ok(None)) };
+        Ok(Ok(Some((new_session(c, id)?, username, Role::stored(&role)))))
     })
     .await?;
+    let found = match found {
+        Ok(found) => found,
+        Err(()) => directory_login(&state, &auth, &name, &body.password).await?,
+    };
     note_attempt(&name, found.is_some());
     let Some((token, username, role)) = found else {
         tracing::info!(user = %name, "failed sign-in");
         return Err(AppError { status: StatusCode::UNAUTHORIZED, err: anyhow!("That name and password don't match") });
     };
     signed_in(&headers, &token, &username, role)
+}
+
+/// Sign in through LDAP or Active Directory. `None`: not someone the directory knows with that password.
+async fn directory_login(
+    state: &AppState,
+    auth: &crate::signin::AuthConfig,
+    name: &str,
+    password: &str,
+) -> ApiResult<Option<(String, String, Role)>> {
+    let Some(dir) = auth.directory() else { return Ok(None) };
+    let person = crate::signin::directory_sign_in(dir, name, password).await.map_err(|e| {
+        tracing::warn!(user = %name, "the directory couldn't check a sign-in: {e:#}");
+        AppError::unavailable(format!("The directory couldn't check your password: {e:#}"))
+    })?;
+    let Some(person) = person else { return Ok(None) };
+    let auth = auth.clone();
+    let made = db::call(&state.pool, move |c| {
+        Ok(match crate::signin::account_for(c, &auth, Source::Ldap, &person.name, &person.groups)? {
+            Ok((id, username, role)) => Ok((new_session(c, id)?, username, role)),
+            Err(msg) => Err(msg),
+        })
+    })
+    .await?;
+    match made {
+        Ok(signed_in) => Ok(Some(signed_in)),
+        Err(msg) => Err(AppError::forbidden(msg)),
+    }
 }
 
 async fn logout(State(state): State<AppState>, headers: HeaderMap) -> ApiResult<Response> {
@@ -541,25 +613,30 @@ async fn change_password(
     check_password(&body.new)?;
     let keep = session_token(&headers).map(|t| digest(&t)).unwrap_or_default();
     let changed = db::call(&state.pool, move |c| {
-        let hash: String = c.query_row("SELECT password_hash FROM users WHERE id = ?1", [id], |r| r.get(0))?;
+        let (hash, source): (String, String) =
+            c.query_row("SELECT password_hash, source FROM users WHERE id = ?1", [id], |r| Ok((r.get(0)?, r.get(1)?)))?;
+        if source != "internal" {
+            return Ok(None);
+        }
         if !password_matches(&body.current, &hash) {
-            return Ok(false);
+            return Ok(Some(false));
         }
         c.execute("UPDATE users SET password_hash = ?2 WHERE id = ?1", params![id, hash_password(&body.new)?])?;
         c.execute("DELETE FROM sessions WHERE user_id = ?1 AND token_hash != ?2", params![id, keep])?;
-        Ok(true)
+        Ok(Some(true))
     })
     .await?;
-    if !changed {
-        return Err(AppError::bad_request("Your current password isn't right"));
+    match changed {
+        None => Err(AppError::bad_request("Your password is kept by the directory or provider you sign in with")),
+        Some(false) => Err(AppError::bad_request("Your current password isn't right")),
+        Some(true) => Ok(StatusCode::NO_CONTENT),
     }
-    Ok(StatusCode::NO_CONTENT)
 }
 
 async fn list_users(State(state): State<AppState>, Extension(who): Extension<Who>) -> ApiResult<Json<Value>> {
     let me = who.person()?;
     let users = db::call(&state.pool, move |c| {
-        let mut stmt = c.prepare("SELECT id, username, created_at, role FROM users ORDER BY username")?;
+        let mut stmt = c.prepare("SELECT id, username, created_at, role, source FROM users ORDER BY username")?;
         let rows = stmt
             .query_map([], |r| {
                 let id: i64 = r.get(0)?;
@@ -568,6 +645,7 @@ async fn list_users(State(state): State<AppState>, Extension(who): Extension<Who
                     "username": r.get::<_, String>(1)?,
                     "created_at": r.get::<_, String>(2)?,
                     "role": Role::stored(&r.get::<_, String>(3)?).as_str(),
+                    "source": r.get::<_, String>(4)?,
                     "you": id == me,
                 }))
             })?
@@ -581,7 +659,11 @@ async fn list_users(State(state): State<AppState>, Extension(who): Extension<Who
 #[derive(Deserialize)]
 struct NewAccount {
     username: String,
+    /// Not for accounts that sign in through a directory or OAuth.
+    #[serde(default)]
     password: String,
+    /// `internal` (the default), `ldap` or `oauth`: who checks the account's sign-in.
+    source: Option<String>,
     /// `view`, `edit` (the default) or `admin`.
     role: Option<String>,
 }
@@ -592,15 +674,22 @@ async fn create_user(
     Json(body): Json<NewAccount>,
 ) -> ApiResult<(StatusCode, Json<Value>)> {
     who.person()?;
-    let name = check_new(&body.username, &body.password)?;
+    let source = match body.source.as_deref() {
+        None => Source::Internal,
+        Some(s) => Source::parse(s).ok_or_else(|| {
+            AppError::bad_request("An account signs in with Hoard (internal), a directory (ldap) or OAuth")
+        })?,
+    };
+    let internal = source == Source::Internal;
+    let name = if internal { check_new(&body.username, &body.password)? } else { check_name(&body.username)? };
     let role = Role::requested(body.role.as_deref(), Role::Edit)?;
     let username = name.clone();
     let added = db::call(&state.pool, move |c| {
-        let hash = hash_password(&body.password)?;
+        let hash = if internal { hash_password(&body.password)? } else { String::new() };
         let n = c.execute(
-            "INSERT INTO users (username, password_hash, role, created_at) VALUES (?1, ?2, ?3, ?4)
+            "INSERT INTO users (username, password_hash, role, source, created_at) VALUES (?1, ?2, ?3, ?4, ?5)
              ON CONFLICT DO NOTHING",
-            params![username, hash, role.as_str(), db::now()],
+            params![username, hash, role.as_str(), source.as_str(), db::now()],
         )?;
         Ok((n == 1).then(|| c.last_insert_rowid()))
     })
@@ -608,7 +697,8 @@ async fn create_user(
     let Some(id) = added else {
         return Err(AppError::conflict("There's already an account with that name"));
     };
-    Ok((StatusCode::CREATED, Json(json!({ "id": id, "username": name, "role": role.as_str() }))))
+    let made = json!({ "id": id, "username": name, "role": role.as_str(), "source": source.as_str() });
+    Ok((StatusCode::CREATED, Json(made)))
 }
 
 #[derive(Deserialize)]
@@ -757,7 +847,11 @@ pub(crate) fn reset_password(c: &Connection, name: &str) -> Result<(String, Stri
     };
     let password: String =
         random_bytes::<16>()?.iter().map(|b| char::from(ALPHABET[usize::from(*b) % ALPHABET.len()])).collect();
-    c.execute("UPDATE users SET password_hash = ?2 WHERE id = ?1", params![id, hash_password(&password)?])?;
+    // From then on it signs in with this password, even if a directory or provider checked it before.
+    c.execute(
+        "UPDATE users SET password_hash = ?2, source = 'internal' WHERE id = ?1",
+        params![id, hash_password(&password)?],
+    )?;
     c.execute("DELETE FROM sessions WHERE user_id = ?1", [id])?;
     Ok((username, password))
 }

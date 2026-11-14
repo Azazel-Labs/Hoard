@@ -3,6 +3,7 @@
 // dialog over the library when someone browsing as a guest needs to sign in to change something.
 import { computed, nextTick, onMounted, ref } from 'vue'
 import { api, ApiError } from '../api'
+import { auth } from '../auth'
 
 const props = defineProps<{ mode: 'setup' | 'login'; overlay?: boolean }>()
 const emit = defineEmits<{ done: []; close: [] }>()
@@ -11,10 +12,19 @@ const username = ref('')
 const password = ref('')
 const again = ref('')
 const busy = ref(false)
-const error = ref('')
+/** Signing in with a provider came back with a reason it didn't work: say it once, and take it out of the address. */
+const turnedAway = new URLSearchParams(location.search).get('signin_error')
+if (turnedAway !== null) {
+  const u = new URL(location.href)
+  u.searchParams.delete('signin_error')
+  history.replaceState(history.state, '', u)
+}
+const error = ref(turnedAway ?? '')
 const nameEl = ref<HTMLInputElement | null>(null)
 
 const setup = computed(() => props.mode === 'setup')
+/** Other ways to sign in, from Settings → Authentication. */
+const others = computed(() => (setup.value ? null : (auth.status?.sign_in ?? null)))
 // Password managers (1Password, Bitwarden, browsers) tell a sign-up form from a sign-in one by its field names, ids
 // and button words as much as by `autocomplete`, so the account-making form uses sign-up words throughout: that's
 // what makes them offer a new strong password instead of filling a saved one.
@@ -55,6 +65,11 @@ async function submit() {
         </template>
         <template v-else-if="overlay">Browsing is open to everyone here, but changes need an account.</template>
       </p>
+
+      <template v-if="others?.oauth">
+        <a class="btn primary oauth" href="/api/auth/oauth/start">Sign in with {{ others.oauth }}</a>
+        <p class="or"><span>or with a name and password</span></p>
+      </template>
 
       <label :for="`${f}-username`">{{ setup ? 'Username' : 'Name' }}</label>
       <input
@@ -107,8 +122,9 @@ async function submit() {
         <button v-if="overlay" type="button" class="btn ghost" @click="emit('close')">Keep browsing</button>
       </div>
 
+      <p v-if="others?.directory" class="hint">Use your {{ others.directory }} name and password.</p>
       <p v-if="!setup" class="hint">
-        Forgot it? On the server, run <span class="mono">hoardd --reset-password &lt;name&gt;</span> (in Docker,
+        Forgot a Hoard password? On the server, run <span class="mono">hoardd --reset-password &lt;name&gt;</span> (in Docker,
         <span class="mono">docker compose exec hoard hoardd --reset-password &lt;name&gt;</span>) for a new one.
       </p>
     </form>
@@ -138,6 +154,9 @@ label { margin-top: 0.45rem; font-size: var(--step--1); font-weight: 550; }
 .err { margin: 0.5rem 0 0; font-size: var(--step--1); }
 .actions { display: flex; gap: 0.5rem; margin-top: 1rem; }
 .hint { margin: 1rem 0 0; color: var(--muted); font-size: var(--step--1); line-height: 1.5; }
+.oauth { justify-content: center; text-align: center; text-decoration: none; padding-block: 0.55rem; }
+.or { display: flex; align-items: center; gap: 0.6rem; margin: 0.9rem 0 0.1rem; color: var(--faint); font-size: var(--step--1); }
+.or::before, .or::after { content: ''; flex: 1; border-top: 1px solid var(--line); }
 .hint .mono { overflow-wrap: anywhere; color: var(--text); }
 @media (max-width: 30rem) { .card { padding: 1.1rem 1rem 1.2rem; } }
 </style>

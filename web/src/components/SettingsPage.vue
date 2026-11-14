@@ -35,6 +35,7 @@ import MaintenancePanel from './MaintenancePanel.vue'
 import UpdatesPanel from './UpdatesPanel.vue'
 import IssuesPanel from './IssuesPanel.vue'
 import AccountPanel from './AccountPanel.vue'
+import AuthPanel from './AuthPanel.vue'
 import HttpsPanel from './HttpsPanel.vue'
 import TagsPanel from './TagsPanel.vue'
 import StoreFormatsPanel from './StoreFormatsPanel.vue'
@@ -67,6 +68,7 @@ const ALL_PAGES: { id: string; label: string; blurb: string; need?: Role }[] = [
   { id: 'adding', need: 'admin', label: 'Adding packs', blurb: 'What Hoard does with a pack when it’s added, besides reading and tagging it.' },
   { id: 'downloads', need: 'admin', label: 'Downloads', blurb: 'How files are named in what Hoard sends: downloads, zips, the hoard tool and AI assistants. Files in the library stay as they are.' },
   { id: 'account', label: 'Account', blurb: 'Your password, the other people who can sign in, and access tokens for scripts and other programs.' },
+  { id: 'auth', need: 'admin', label: 'Authentication', blurb: 'How people sign in: Hoard’s own accounts, an LDAP directory, Microsoft Active Directory or an OAuth provider, how long sessions last, and which groups get which role.' },
   { id: 'connection', need: 'admin', label: 'Connection', blurb: 'How browsers and apps reach Hoard: the address it’s known by, and HTTPS, which some browser features need.' },
   { id: 'performance', need: 'admin', label: 'Performance', blurb: 'How hard the server works, how thumbnails are made and kept, and the most it takes in.' },
   { id: 'issues', need: 'admin', label: 'Issues', blurb: 'What went wrong opening or processing files: archives that wouldn’t unpack, files that couldn’t be read, jobs that failed. Try them again once the cause is fixed, or dismiss them.' },
@@ -857,6 +859,7 @@ onBeforeUnmount(() => {
           @section="go"
         />
         <AccountPanel v-else-if="current === 'account'" />
+        <AuthPanel v-else-if="current === 'auth'" />
         <TagsPanel v-else-if="current === 'tags'" @tag="(t) => emit('tag', t)" @changed="emit('changed')" />
         <StoreFormatsPanel v-else-if="current === 'store-files'" />
 

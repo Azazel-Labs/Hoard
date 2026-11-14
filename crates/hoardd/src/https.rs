@@ -751,7 +751,7 @@ async fn try_handshake(config: Arc<ServerConfig>) -> Result<()> {
 
 /// Checks the server's signature in the handshake, and nothing about who it is (that's not the question here).
 #[derive(Debug)]
-struct SignatureOnly(Arc<rustls::crypto::CryptoProvider>);
+pub(crate) struct SignatureOnly(pub(crate) Arc<rustls::crypto::CryptoProvider>);
 
 impl rustls::client::danger::ServerCertVerifier for SignatureOnly {
     fn verify_server_cert(

@@ -97,6 +97,7 @@ pub(crate) fn router(state: &AppState) -> Router<AppState> {
         .route("/api/admin/chatgpt/models", get(crate::chatgpt::list_models))
         .merge(crate::format_wizard::router())
         .merge(crate::auth::admin_router())
+        .merge(crate::signin::admin_router())
         .merge(crate::https::admin_router())
         .route_layer(middleware::from_fn_with_state(std::sync::Arc::clone(state), crate::auth::require_admin));
 
@@ -152,6 +153,7 @@ pub(crate) fn router(state: &AppState) -> Router<AppState> {
         .route("/auth/callback", get(crate::chatgpt::callback))
         .merge(crate::auth::router())
         .merge(crate::oauth::router())
+        .merge(crate::signin::router())
         .merge(crate::https::router())
         .merge(crate::mcp::router(state))
         .merge(reads)

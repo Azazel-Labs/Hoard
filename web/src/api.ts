@@ -355,17 +355,85 @@ export interface AuthStatus {
   /** No account yet: the portal asks for the first one. */
   setup_needed: boolean
   signed_in: boolean
-  user: { name: string; kind: 'user' | 'token'; role: Role } | null
+  user: { name: string; kind: 'user' | 'token'; role: Role; source?: AccountSource } | null
   /** People who aren't signed in may look around. */
   guest_browsing: boolean
+  /** Ways to sign in besides Hoard's own accounts (Settings → Authentication). */
+  sign_in?: { directory: string | null; oauth: string | null }
 }
+
+/** Who checks an account's sign-in: Hoard, a directory (LDAP or Active Directory) or an OAuth provider. */
+export type AccountSource = 'internal' | 'ldap' | 'oauth'
 
 export interface Account {
   id: number
   username: string
   created_at: string
   role: Role
+  source: AccountSource
   you: boolean
+}
+
+export type AuthMethod = 'internal' | 'ldap' | 'ad' | 'oauth'
+export type LdapTls = 'none' | 'starttls' | 'ldaps'
+
+/** A directory to sign in against: LDAP (a custom server or OpenLDAP) or Active Directory. */
+export interface LdapConfig {
+  server_type: string
+  servers: string[]
+  tls: LdapTls
+  skip_verify: boolean
+  ca_cert: string
+  anonymous: boolean
+  bind_dn: string
+  /** Always empty from the server: see `bind_password_set`. Left empty, the saved one is kept. */
+  bind_password: string
+  bind_password_set?: boolean
+  clear_bind_password?: boolean
+  base_dn: string
+  username_attribute: string
+  user_filter: string
+  group_base_dn: string
+  group_filter: string
+}
+
+export interface OAuthConfig {
+  provider: string
+  client_id: string
+  /** Always empty from the server: see `client_secret_set`. Left empty, the saved one is kept. */
+  client_secret: string
+  client_secret_set?: boolean
+  clear_client_secret?: boolean
+  authorization_url: string
+  token_url: string
+  userinfo_url: string
+  scopes: string
+  username_claim: string
+  groups_claim: string
+  button: string
+}
+
+/** Settings → Authentication. */
+export interface AuthConfig {
+  method: AuthMethod
+  session_hours: number | null
+  provision: boolean
+  default_role: Role
+  roles: { admin: string[]; edit: string[]; view: string[] }
+  ldap: LdapConfig
+  ad: LdapConfig
+  oauth: OAuthConfig
+}
+
+export interface AuthSettings {
+  config: AuthConfig
+  /** Where the OAuth provider sends people back: give the provider this. */
+  callback_url: string
+}
+
+export interface LdapTestResult {
+  servers: { server: string; ok: boolean; error?: string }[]
+  user: { ok: boolean; error?: string; name?: string; dn?: string; groups?: string[]; role?: Role | 'default' | null } | null
 }
 
 /** An app (Claude, another MCP client) someone let sign in over OAuth. */
@@ -1002,8 +1070,19 @@ export const api = {
   changePassword: (current: string, next: string) =>
     post<void>('/api/auth/password', { current, new: next }),
   accounts: () => request<{ users: Account[] }>('/api/admin/users'),
-  addAccount: (username: string, password: string, role: Role) =>
-    post<void>('/api/admin/users', { username, password, role }),
+  addAccount: (username: string, password: string, role: Role, source: AccountSource = 'internal') =>
+    post<void>('/api/admin/users', { username, password, role, source }),
+  authSettings: () => request<AuthSettings>('/api/admin/auth'),
+  saveAuthSettings: (config: AuthConfig) =>
+    request<AuthSettings>('/api/admin/auth', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(config),
+    }),
+  testLdap: (kind: 'ldap' | 'ad', config: LdapConfig, username?: string, password?: string) =>
+    post<LdapTestResult>('/api/admin/auth/ldap/test', { kind, config, username, password }),
+  discoverOAuth: (issuer: string) =>
+    post<Pick<OAuthConfig, 'authorization_url' | 'token_url' | 'userinfo_url'>>('/api/admin/auth/oauth/discover', { issuer }),
   setRole: (id: number, role: Role) =>
     request<void>(`/api/admin/users/${id}`, {
       method: 'PATCH',

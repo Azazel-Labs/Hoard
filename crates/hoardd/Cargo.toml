@@ -90,6 +90,9 @@ sha2 = "0.11"
 lzma-rust2 = { version = "0.25", default-features = false, features = ["std", "xz"] }
 argon2 = "0.6.0"
 getrandom = "0.4"
+# Settings → Authentication: signing in against LDAP or Active Directory.
+ldap3 = { version = "0.12", default-features = false, features = ["tls-rustls-ring"] }
+rustls-native-certs = "0.8"
 # Settings: Image search runs CLIP on the CPU, in pure Rust.
 candle-core = "0.11"
 candle-nn = "0.11"
@@ -97,6 +100,9 @@ tokenizers = { version = "0.23", default-features = false, features = ["fancy-re
 rayon = "1"
 
 [dev-dependencies]
+ldap3_proto = "0.9"
+futures-util = { version = "0.3", features = ["sink"] }
+tokio-util = { version = "0.7", features = ["codec"] }
 lzma-rust2 = { version = "0.25", default-features = false, features = ["std", "xz", "encoder"] }
 
 [target.'cfg(target_os = "linux")'.dependencies]

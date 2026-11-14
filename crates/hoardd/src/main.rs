@@ -51,6 +51,7 @@ mod server;
 mod settings;
 mod sheet;
 mod sidecar;
+mod signin;
 mod sounds;
 mod sources;
 mod store_formats;

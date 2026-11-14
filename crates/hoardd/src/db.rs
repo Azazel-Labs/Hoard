@@ -340,6 +340,9 @@ const MIGRATIONS: &[&str] = &[
        version    INTEGER NOT NULL,
        descriptor BLOB NOT NULL
      ) WITHOUT ROWID;",
+    // 40: accounts whose sign-in a directory (LDAP, Active Directory) or an OAuth provider checks (see `signin`).
+    // They have no password of their own (an empty hash, which never matches).
+    "ALTER TABLE users ADD COLUMN source TEXT NOT NULL DEFAULT 'internal' CHECK (source IN ('internal', 'ldap', 'oauth'));",
 ];
 
 /// How many automatic pre-upgrade backups to keep in `<data dir>/backups`.

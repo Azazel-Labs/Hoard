@@ -2,7 +2,7 @@
 // Settings → Account: your password, the other accounts, connecting Claude and other AI apps, access tokens for
 // scripts and programs, and whether people who aren't signed in may look around.
 import { computed, onMounted, reactive, ref } from 'vue'
-import { api, type AccessToken, type Account, type Connection, type Role } from '../api'
+import { api, type AccessToken, type Account, type AccountSource, type Connection, type Role } from '../api'
 import { auth, may, refreshAuth, signOut } from '../auth'
 import { confirmDialog, copyText, showError, showOk } from '../ui'
 
@@ -22,6 +22,17 @@ const ROLES: { id: Role; label: string; hint: string }[] = [
   { id: 'admin', label: 'Admin', hint: 'Also Settings, accounts and maintenance, and deleting for good' },
 ]
 const roleLabel = (r: Role) => ROLES.find((x) => x.id === r)!.label
+/** Someone whose password the directory or OAuth provider keeps, not Hoard. */
+const external = computed(() => !!auth.status?.user?.source && auth.status.user.source !== 'internal')
+const SOURCES = computed<{ id: AccountSource; label: string }[]>(() => {
+  const s = auth.status?.sign_in
+  return [
+    { id: 'internal', label: 'A Hoard password' },
+    ...(s?.directory ? [{ id: 'ldap' as const, label: `Their ${s.directory} password` }] : []),
+    ...(s?.oauth ? [{ id: 'oauth' as const, label: `Signing in with ${s.oauth}` }] : []),
+  ]
+})
+const sourceWord = (s: AccountSource) => (s === 'ldap' ? 'directory' : s === 'oauth' ? 'OAuth' : '')
 /** What a token may be given: up to what you can do. */
 const tokenRoles = computed(() => ROLES.slice(0, ROLES.findIndex((r) => r.id === myRole.value) + 1))
 
@@ -68,13 +79,14 @@ async function changePassword() {
 }
 
 // ---- other people
-const person = reactive({ username: '', password: '', role: 'edit' as Role })
-const personReady = computed(() => person.username.trim() !== '' && person.password.length >= 8)
+const person = reactive({ username: '', password: '', role: 'edit' as Role, source: 'internal' as AccountSource })
+const personReady = computed(() => person.username.trim() !== '' && (person.source !== 'internal' || person.password.length >= 8))
 async function addPerson() {
   if (!personReady.value) return
   const name = person.username.trim()
-  if (await run(`Couldn't add ${name}`, () => api.addAccount(name, person.password, person.role))) {
-    Object.assign(person, { username: '', password: '', role: 'edit' })
+  const pw = person.source === 'internal' ? person.password : ''
+  if (await run(`Couldn't add ${name}`, () => api.addAccount(name, pw, person.role, person.source))) {
+    Object.assign(person, { username: '', password: '', role: 'edit', source: 'internal' })
     showOk(`${name} can sign in now.`)
     await load()
   }
@@ -165,7 +177,10 @@ const day = (at: string | null) => (at ? fmt.format(new Date(at)) : 'never')
         Signed in as <strong>{{ auth.status?.user?.name }}</strong>, who
         {{ myRole === 'admin' ? 'is an admin' : myRole === 'edit' ? 'can change the library' : 'can look but not change anything' }}.
       </p>
-      <form class="grid" @submit.prevent="changePassword">
+      <p v-if="external" class="what">
+        Your password is kept by the {{ auth.status?.user?.source === 'oauth' ? 'provider' : 'directory' }} you sign in with, so you change it there.
+      </p>
+      <form v-else class="grid" @submit.prevent="changePassword">
         <input type="text" autocomplete="username" :value="auth.status?.user?.name" hidden readonly />
         <label for="pw-current">Current password</label>
         <input id="pw-current" v-model="pw.current" class="field" type="password" autocomplete="current-password" />
@@ -190,7 +205,9 @@ const day = (at: string | null) => (at ? fmt.format(new Date(at)) : 'never')
       <ul v-if="accounts" class="list">
         <li v-for="a in accounts" :key="a.id" :data-person="a.username">
           <span class="name">{{ a.username }} <small v-if="a.you">(you)</small></span>
-          <small>since {{ day(a.created_at) }}</small>
+          <small>
+            <span v-if="a.source !== 'internal'" class="src" :title="`Signs in with the ${a.source === 'oauth' ? 'OAuth provider' : 'directory'}`">{{ sourceWord(a.source) }} · </span>since {{ day(a.created_at) }}
+          </small>
           <span v-if="a.you" class="role">{{ roleLabel(a.role) }}</span>
           <select
             v-else
@@ -208,8 +225,16 @@ const day = (at: string | null) => (at ? fmt.format(new Date(at)) : 'never')
       <form class="add" @submit.prevent="addPerson">
         <label class="visually-hidden" for="new-name">Name</label>
         <input id="new-name" v-model="person.username" class="field" placeholder="Name" autocomplete="off" maxlength="64" />
-        <label class="visually-hidden" for="new-password">Password (at least 8 characters)</label>
-        <input id="new-password" v-model="person.password" class="field" type="password" placeholder="Password (8+ characters)" autocomplete="new-password" />
+        <template v-if="SOURCES.length > 1">
+          <label class="visually-hidden" for="new-source">How they sign in</label>
+          <select id="new-source" v-model="person.source" class="field role">
+            <option v-for="s in SOURCES" :key="s.id" :value="s.id">{{ s.label }}</option>
+          </select>
+        </template>
+        <template v-if="person.source === 'internal'">
+          <label class="visually-hidden" for="new-password">Password (at least 8 characters)</label>
+          <input id="new-password" v-model="person.password" class="field" type="password" placeholder="Password (8+ characters)" autocomplete="new-password" />
+        </template>
         <label class="visually-hidden" for="new-role">What they can do</label>
         <select id="new-role" v-model="person.role" class="field role">
           <option v-for="r in ROLES" :key="r.id" :value="r.id" :title="r.hint">{{ r.label }}</option>

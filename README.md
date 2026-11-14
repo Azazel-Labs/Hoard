@@ -912,7 +912,8 @@ only shows what an account may do: one that can look has no Add files button or 
 Library and Account pages of Settings.
 
 - **Signing in** gives the browser a session cookie (HttpOnly, SameSite=Lax) that lasts until you sign out or don't
-  visit for 30 days. Repeated wrong passwords for a name are slowed down.
+  visit for 30 days, or for a set time from signing in if Settings → Authentication says so. Repeated wrong passwords
+  for a name are slowed down.
 - **Access tokens** are for everything that isn't a browser: the `hoard` CLI (`--token` or `HOARD_TOKEN`), scripts and
   cron, MCP clients and the Unreal worker. They're sent as `Authorization: Bearer <token>`, shown once when made, and
   can be revoked; the list shows when each was last used. A token has a role too, up to its maker's (and lowered with
@@ -924,6 +925,34 @@ Library and Account pages of Settings.
   signing in. Changing anything still needs an account or a token.
 - **Forgot your password?** On the server, `hoardd --reset-password <name>` prints a new one and signs that account out
   everywhere. In Docker: `docker compose exec hoard hoardd --reset-password <name>`.
+
+### Signing in with a directory or OAuth
+
+**Settings → Authentication** chooses how people sign in besides Hoard's own accounts, which always work (so a
+directory that's down can't lock out the admin):
+
+- **LDAP**: the name and password typed on the sign-in page are checked against a directory: OpenLDAP (or FreeIPA,
+  LLDAP and the like) or a custom setup. List one or more servers (the next is tried when one can't be reached), choose
+  StartTLS, LDAPS or none, and give a certificate authority if the directory's certificate isn't one the system trusts.
+  Hoard finds the person's entry as a reader account (or anonymously) under *People are under*, matching the name
+  attribute and an optional filter, then signs in as them with their password. Their groups come from `memberOf` and,
+  if *Groups are under* is set, a search there (`{dn}` and `{user}` stand for the person).
+- **Microsoft Active Directory**: the same, with Active Directory's defaults (`sAMAccountName`, nested groups).
+- **OAuth**: a *Sign in with…* button on the sign-in page goes to the provider and back, with PKCE. Presets fill in
+  Google, Microsoft Entra ID, GitHub and GitLab; for anything else (Keycloak, Authentik, Authelia, Okta…) give the issuer
+  and *Discover* reads its OpenID configuration. Give the provider the redirect address shown there (it's built from
+  the public address in Settings → Connection). The name comes from a claim (`preferred_username` unless you say), and
+  so do groups.
+
+*Test connectivity* reaches each LDAP server, signs in as the reader account and, given a name and password, as that
+person, and shows their groups and the role they'd get, without saving anything.
+
+People from a directory or provider get a Hoard account the first time they sign in (unless that's turned off: then an
+admin adds them in Settings → Account, choosing how they sign in), with the default role. Under *Roles from groups*,
+list the groups whose members are admins, can change or can look: the highest that matches wins and is checked at
+every sign-in, and with groups listed under *Can look*, people in none of the listed groups are turned away. Their
+passwords are the directory's or provider's, so Hoard has none to change or reset for them, and a Hoard account of the
+same name that signs in another way is never taken over.
 
 From cron, with a token made for it:
 
@@ -1080,7 +1109,10 @@ browser session's changes must also carry an `X-Hoard` header, which pages on ot
 | POST 🔒 | `/api/auth/password` | change your password |
 | GET 🔒, POST 🔒 | `/api/admin/tokens` | your access tokens (an admin sees all), or make one: `{name, role?}` (it defaults to yours) |
 | DELETE 🔒 | `/api/admin/tokens/{id}` | revoke one |
-| GET 🔒, POST 🔒 | `/api/admin/users` | accounts, or add one: `{username, password, role?}` (`view`, `edit`, the default, or `admin`); admins only |
+| GET 🔒, POST 🔒 | `/api/admin/users` | accounts, or add one: `{username, password, role?, source?}` (role `view`, `edit`, the default, or `admin`; source `internal`, the default, or `ldap` or `oauth` with no password); admins only |
+| GET 🔒, PUT 🔒 | `/api/admin/auth` | Settings → Authentication, and the OAuth redirect address; secrets are never sent back, and left empty they're kept; admins only |
+| POST 🔒 | `/api/admin/auth/ldap/test`, `/api/admin/auth/oauth/discover` | test an LDAP setup (`{kind, config, username?, password?}`); read a provider's addresses from its issuer (`{issuer}`); admins only |
+| GET | `/api/auth/oauth/start`, `/api/auth/oauth/callback` | signing in with the OAuth provider |
 | PATCH 🔒, DELETE 🔒 | `/api/admin/users/{id}` | change another account's role (`{role}`), or remove it; admins only |
 
 ## Repository layout

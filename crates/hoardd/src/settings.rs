@@ -113,6 +113,9 @@ pub(crate) struct Saved {
     /// How texture maps are named in downloads, bundles and manifests.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub(crate) texture_names: Option<crate::naming::TextureNames>,
+    /// Settings → Authentication: signing in through a directory or OAuth, and how long sessions last.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub(crate) auth: Option<crate::signin::AuthConfig>,
 }
 
 /// Reads a retired setting and throws it away.
@@ -148,6 +151,7 @@ pub(crate) struct Effective {
     pub(crate) thumb_quality: ThumbQuality,
     pub(crate) conversion_cache_mb: u64,
     pub(crate) texture_names: crate::naming::TextureNames,
+    pub(crate) auth: crate::signin::AuthConfig,
 }
 
 impl Effective {
@@ -216,11 +220,13 @@ impl Saved {
             thumb_quality: self.thumb_quality.unwrap_or_default(),
             conversion_cache_mb: self.conversion_cache_mb.unwrap_or(DEFAULT_CONVERSION_CACHE_MB),
             texture_names: self.texture_names.clone().unwrap_or_default(),
+            auth: self.auth.clone().unwrap_or_default(),
         }
     }
 
     /// Problems a person can fix, in their words.
     fn check(&self, effective: &Effective) -> Result<(), String> {
+        effective.auth.check()?;
         for (name, v) in [("Blender", &self.blender), ("ffmpeg", &self.ffmpeg)] {
             if v.as_deref().is_some_and(|s| s.trim().is_empty()) {
                 return Err(format!("{name}: choose off, automatic, or give a path"));

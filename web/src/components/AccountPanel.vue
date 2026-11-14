@@ -31,7 +31,9 @@ const SOURCES = computed<{ id: AccountSource; label: string }[]>(() => {
   return [
     { id: 'internal', label: t('account-source-internal') },
     ...(s?.directory ? [{ id: 'ldap' as const, label: t('account-source-ldap', { directory: s.directory }) }] : []),
-    ...(s?.oauth ? [{ id: 'oauth' as const, label: t('account-source-oauth', { provider: s.oauth }) }] : []),
+    ...(s?.oauth != null
+      ? [{ id: 'oauth' as const, label: t('account-source-oauth', { provider: s.oauth || t('auth-button-placeholder') }) }]
+      : []),
   ]
 })
 const sourceWord = (s: AccountSource) => (s === 'ldap' ? t('account-source-word-directory') : s === 'oauth' ? 'OAuth' : '')

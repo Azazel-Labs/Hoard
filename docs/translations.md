@@ -5,8 +5,8 @@ Translations live in Git and are reviewed in pull requests. No translation servi
 The English sources are `locales/en/hoard.ftl` and `README.md`. One catalog serves both the server (its error
 messages) and the web portal. Each locale directory must contain every English message, in valid
 [Fluent](https://projectfluent.org/fluent/guide/) syntax, with no message IDs English doesn't have and no variables
-English doesn't pass. Each locale also needs `docs/i18n/README.<locale>.md`: the overview, features, install and
-contributing parts of the README. The detailed reference stays in English.
+English doesn't pass. Each locale also needs `docs/i18n/README.<locale>.md`: the overview, install, translations and
+license parts of the README. The detailed reference stays in English.
 
 The server answers in the language a request's `Accept-Language` asks for, and the portal sends the one picked in
 Settings → Appearance (the browser's by default). Clients that don't ask, like the `hoard` CLI and the engine

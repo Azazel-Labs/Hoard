@@ -72,8 +72,10 @@ async function submit() {
         <template v-else-if="overlay">{{ t('signin-overlay-lede') }}</template>
       </p>
 
-      <template v-if="others?.oauth">
-        <a class="btn primary oauth" href="/api/auth/oauth/start">{{ t('signin-with', { provider: others.oauth }) }}</a>
+      <template v-if="others?.oauth != null">
+        <a class="btn primary oauth" href="/api/auth/oauth/start">{{
+          t('signin-with', { provider: others.oauth || t('auth-button-placeholder') })
+        }}</a>
         <p class="or"><span>{{ t('signin-or-password') }}</span></p>
       </template>
 

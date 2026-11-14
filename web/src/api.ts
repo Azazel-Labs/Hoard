@@ -364,6 +364,7 @@ export interface AuthStatus {
   /** What this server is called (Settings → General): Hoard unless it was given a name. */
   name: string
   /** Ways to sign in besides Hoard's own accounts (Settings → Authentication). */
+  /** `oauth` is the sign-in button's text, "" when it has none of its own (then it's the reader's "your account"). */
   sign_in?: { directory: string | null; oauth: string | null }
 }
 

@@ -124,7 +124,7 @@ async fn relocate(blobs: &BlobStore, pool: &db::Pool, req: Request) -> Result<()
         if move_blob(&m).await? {
             moved += 1;
         } else {
-            tracing::warn!(hash = %m.hash, "a stored file doesn't match its hash; left where it is (Check storage will flag it)");
+            tracing::warn!(hash = %m.hash, "a stored file doesn't match its hash; left where it is (Check files for damage will flag it)");
             damaged += 1;
         }
     }

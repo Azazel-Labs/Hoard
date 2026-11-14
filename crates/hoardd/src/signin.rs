@@ -1003,7 +1003,8 @@ pub(crate) fn admin_router() -> Router<AppState> {
         .route("/api/admin/auth/oauth/discover", post(discover))
 }
 
-/// What the sign-in page offers.
+/// What the sign-in page offers. An OAuth button with no text of its own is "" and the portal words it in the reader's
+/// language.
 pub(crate) fn sign_in_options(cfg: &AuthConfig) -> Value {
     let button = cfg.oauth.button.trim();
     json!({
@@ -1012,7 +1013,7 @@ pub(crate) fn sign_in_options(cfg: &AuthConfig) -> Value {
             Method::Ad => Some("Active Directory"),
             Method::Internal | Method::Oauth => None,
         },
-        "oauth": (cfg.method == Method::Oauth).then(|| if button.is_empty() { "your account".to_owned() } else { button.to_owned() }),
+        "oauth": (cfg.method == Method::Oauth).then_some(button),
     })
 }
 

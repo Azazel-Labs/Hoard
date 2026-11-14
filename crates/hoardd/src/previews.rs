@@ -10,6 +10,7 @@
 //!   signed-in person's browser sends that picture to replace the server's. Where a thumbnail came from is kept, so
 //!   a worse one never replaces a better one and re-analysis leaves it be.
 
+use crate::i18n::tr;
 use axum::Json;
 use axum::body::Bytes;
 use axum::extract::{Path, Query, State};
@@ -116,9 +117,9 @@ async fn lite_response(state: AppState, id: String, headers: HeaderMap) -> ApiRe
         .optional()?)
     })
     .await?
-    .ok_or_else(|| AppError::not_found(format!("asset {id}")))?;
+    .ok_or_else(|| AppError::not_found(tr!("error-asset-not-found", id = id)))?;
     if row.kind != "texture" {
-        return Err(AppError::bad_request("only images have a light preview"));
+        return Err(AppError::bad_request(tr!("error-light-preview-images")));
     }
     if let Some(hash) = &row.lite {
         let mime = lite_mime(&state.blobs.head(hash, 4).await.unwrap_or_default());
@@ -130,7 +131,7 @@ async fn lite_response(state: AppState, id: String, headers: HeaderMap) -> ApiRe
         return crate::api::serve_blob(&state, &row.hash, &headers, &mime, None).await;
     }
     if row.size > crate::analyze::MAX_IMAGE_DECODE_BYTES {
-        return Err(AppError::not_found("this image is too big to make a light preview of"));
+        return Err(AppError::not_found(tr!("error-preview-too-big")));
     }
     // Made once, now: fetch the original, decode it and keep the preview.
     let tmp = state.cfg.tmp_dir();
@@ -152,7 +153,9 @@ async fn lite_response(state: AppState, id: String, headers: HeaderMap) -> ApiRe
     }
     .await;
     drop(work);
-    let Some(bytes) = made.map_err(|e| AppError::bad_request(format!("no light preview: {e:#}")))? else {
+    let Some(bytes) =
+        made.map_err(|e| AppError::bad_request(tr!("error-no-light-preview", reason = format!("{e:#}"))))?
+    else {
         let mime = mime_guess::from_ext(&row.ext).first_or_octet_stream().to_string();
         return crate::api::serve_blob(&state, &row.hash, &headers, &mime, None).await;
     };
@@ -180,12 +183,12 @@ pub(crate) async fn asset_frames(
         .optional()?)
     })
     .await?
-    .ok_or_else(|| AppError::not_found(format!("asset {id}")))?;
+    .ok_or_else(|| AppError::not_found(tr!("error-asset-not-found", id = id)))?;
     if let Some(sheet) = sheet {
         return crate::api::serve_blob(&state, &sheet, &headers, "image/png", None).await.map(unversioned);
     }
     if !matches!(ext.as_str(), "aseprite" | "ase") {
-        return Err(AppError::not_found("only Aseprite files have a frame sheet"));
+        return Err(AppError::not_found(tr!("error-frame-sheet-aseprite-only")));
     }
     let tmp = state.cfg.tmp_dir();
     tokio::fs::create_dir_all(&tmp).await?;
@@ -195,8 +198,8 @@ pub(crate) async fn asset_frames(
     let made = crate::heavy::run("frame sheet", move || crate::textures::aseprite_sheet(&local)).await?;
     drop(work);
     let bytes = made
-        .map_err(|e| AppError::bad_request(format!("no frame sheet: {e:#}")))?
-        .ok_or_else(|| AppError::not_found("this has one frame, or too many to lay out"))?;
+        .map_err(|e| AppError::bad_request(tr!("error-no-frame-sheet", reason = format!("{e:#}"))))?
+        .ok_or_else(|| AppError::not_found(tr!("error-frame-sheet-frames")))?;
     let blob = save_derivative(&state, id, "frames", bytes).await?;
     crate::api::serve_blob(&state, &blob, &headers, "image/png", None).await.map(unversioned)
 }
@@ -253,10 +256,10 @@ pub(crate) async fn put_thumb(
     let source = match p.source.as_deref() {
         None | Some("browser") => "browser",
         Some("browser-partial") => "browser-partial",
-        Some(other) => return Err(AppError::bad_request(format!("unknown thumbnail source: {other}"))),
+        Some(other) => return Err(AppError::bad_request(tr!("error-thumbnail-source", source = other))),
     };
     if body.len() > MAX_DRAWN_BYTES {
-        return Err(AppError::bad_request("that picture is too big for a thumbnail"));
+        return Err(AppError::bad_request(tr!("error-thumbnail-too-big")));
     }
     let id2 = id.clone();
     let (kind, current, old) = db::call(&state.pool, move |c| {
@@ -266,9 +269,9 @@ pub(crate) async fn put_thumb(
         .optional()?)
     })
     .await?
-    .ok_or_else(|| AppError::not_found(format!("asset {id}")))?;
+    .ok_or_else(|| AppError::not_found(tr!("error-asset-not-found", id = id)))?;
     if !matches!(kind.as_str(), "model" | "animation") {
-        return Err(AppError::bad_request("only models take a thumbnail drawn by a browser"));
+        return Err(AppError::bad_request(tr!("error-thumbnail-models-only")));
     }
     if rank(current.as_deref()) > rank(Some(source)) {
         return Ok(Json(json!({ "replaced": false, "thumb_source": current })));
@@ -280,7 +283,7 @@ pub(crate) async fn put_thumb(
         crate::analyze::thumb_bytes(img.thumbnail(256, 256).to_rgba8(), false)
     })
     .await?
-    .map_err(|e| AppError::bad_request(format!("not a picture Hoard can read: {e:#}")))?;
+    .map_err(|e| AppError::bad_request(tr!("error-not-a-picture", reason = format!("{e:#}"))))?;
     let blob = state.blobs.put_cache_bytes(bytes).await?;
     let (hash, size) = (blob.hash.clone(), i64::try_from(blob.size).unwrap_or(i64::MAX));
     let (id2, src) = (id.clone(), source.to_owned());

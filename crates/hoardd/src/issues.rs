@@ -16,6 +16,7 @@ use serde::Deserialize;
 use serde_json::{Value, json};
 
 use crate::error::{ApiResult, AppError};
+use crate::i18n::tr;
 use crate::{AppState, db, jobs};
 
 /// An archive in an upload that couldn't be unpacked; it's kept in the pack as a plain file.
@@ -119,112 +120,103 @@ pub(crate) fn clear_in(state: &AppState, kinds: &[&str], at: At<'_>) {
 /// How many of a group are listed; the rest are counted.
 const SHOWN: i64 = 200;
 
-/// One kind of issue, as Settings → Issues shows it. `retry` is what the retry button says, when there is one.
+/// One kind of issue, as Settings → Issues shows it. `text` gives its title, its blurb and what the retry button
+/// says, when there is one.
 struct Group {
     kind: &'static str,
-    title: &'static str,
-    blurb: &'static str,
-    retry: Option<&'static str>,
+    text: fn() -> (String, String, Option<String>),
     dismiss: bool,
 }
 
 const GROUPS: &[Group] = &[
-    Group {
-        kind: "pack",
-        title: "Packs that couldn’t be added",
-        blurb: "Delete the pack and add it again, or open it to see what it has.",
-        retry: None,
-        dismiss: false,
-    },
+    Group { kind: "pack", text: || (tr!("server-issues-pack"), tr!("server-issues-pack-blurb"), None), dismiss: false },
     Group {
         kind: "damaged",
-        title: "Stored files that are damaged or gone",
-        blurb: "Found by Check storage. Restore them from a backup or add their pack again, then run Check storage.",
-        retry: None,
+        text: || (tr!("server-issues-damaged"), tr!("server-issues-damaged-blurb"), None),
         dismiss: false,
     },
     Group {
         kind: FOLDER,
-        title: "Watched folders that can’t be read",
-        blurb: "Their packs are left as they are until the folder can be read again.",
-        retry: Some("Scan again"),
+        text: || {
+            (tr!("server-issues-folder"), tr!("server-issues-folder-blurb"), Some(tr!("server-issues-scan-again")))
+        },
         dismiss: true,
     },
     Group {
         kind: "missing",
-        title: "Watched packs whose folder is gone",
-        blurb: "Each pack is kept for 3 days in case its folder is only offline, then removed.",
-        retry: Some("Scan again"),
+        text: || {
+            (tr!("server-issues-missing"), tr!("server-issues-missing-blurb"), Some(tr!("server-issues-scan-again")))
+        },
         dismiss: false,
     },
     Group {
         kind: "job",
-        title: "Background jobs that failed",
-        blurb: "Retrying runs the job again from the start.",
-        retry: Some("Retry"),
+        text: || (tr!("server-issues-job"), tr!("server-issues-job-blurb"), Some(tr!("server-issues-retry"))),
         dismiss: true,
     },
     Group {
         kind: FILE,
-        title: "Files that couldn’t be opened",
-        blurb: "Hoard couldn’t open or store them. A watched pack tries them again at its next scan; a file already in the library kept what it had before.",
-        retry: Some("Scan again"),
+        text: || (tr!("server-issues-file"), tr!("server-issues-file-blurb"), Some(tr!("server-issues-scan-again"))),
         dismiss: true,
     },
     Group {
         kind: UNPACK,
-        title: "Archives that couldn’t be unpacked",
-        blurb: "Each is kept in its pack as a plain file, so nothing inside it is in the library.",
-        retry: None,
+        text: || (tr!("server-issues-unpack"), tr!("server-issues-unpack-blurb"), None),
         dismiss: true,
     },
     Group {
         kind: "read",
-        title: "Files Hoard couldn’t make sense of",
-        blurb: "They’re in the library, but without the facts, tags or thumbnail that reading them gives.",
-        retry: Some("Re-analyze pack"),
+        text: || (tr!("server-issues-read"), tr!("server-issues-read-blurb"), Some(tr!("server-issues-reanalyze"))),
         dismiss: false,
     },
     Group {
         kind: "render",
-        title: "Models the thumbnail renderer failed on",
-        blurb: "They have no thumbnail. Opening one in the viewer may still work, and can save one.",
-        retry: Some("Re-analyze pack"),
+        text: || (tr!("server-issues-render"), tr!("server-issues-render-blurb"), Some(tr!("server-issues-reanalyze"))),
         dismiss: false,
     },
     Group {
         kind: CONVERT,
-        title: "Models Blender couldn’t convert",
-        blurb: "They have no GLB copy, so they can’t be shown in 3D.",
-        retry: Some("Convert again"),
+        text: || {
+            (tr!("server-issues-convert"), tr!("server-issues-convert-blurb"), Some(tr!("server-issues-convert-again")))
+        },
         dismiss: true,
     },
     Group {
         kind: "unreal",
-        title: "Unreal packages that couldn’t be converted",
-        blurb: "The pack’s Unreal page has the rest of its packages.",
-        retry: None,
+        text: || (tr!("server-issues-unreal"), tr!("server-issues-unreal-blurb"), None),
         dismiss: false,
     },
     Group {
         kind: MATERIALS,
-        title: "Packs whose materials couldn’t be worked out",
-        blurb: "Their textures are all there; they just aren’t grouped into materials.",
-        retry: Some("Look again"),
+        text: || {
+            (
+                tr!("server-issues-materials"),
+                tr!("server-issues-materials-blurb"),
+                Some(tr!("server-issues-look-again")),
+            )
+        },
         dismiss: true,
     },
     Group {
         kind: MATERIAL_THUMB,
-        title: "Materials without a thumbnail",
-        blurb: "The material was found, but its preview couldn’t be drawn.",
-        retry: Some("Look again"),
+        text: || {
+            (
+                tr!("server-issues-material-thumb"),
+                tr!("server-issues-material-thumb-blurb"),
+                Some(tr!("server-issues-look-again")),
+            )
+        },
         dismiss: true,
     },
     Group {
         kind: STORE_FILES,
-        title: "Store files that couldn’t be read",
-        blurb: "Files from the store a pack came from, such as a Megascans JSON, that name and tag it.",
-        retry: Some("Read again"),
+        text: || {
+            (
+                tr!("server-issues-store-files"),
+                tr!("server-issues-store-files-blurb"),
+                Some(tr!("server-issues-read-again")),
+            )
+        },
         dismiss: true,
     },
 ];
@@ -288,9 +280,9 @@ fn items(c: &Connection, kind: &str) -> Result<(Vec<Item>, i64)> {
                     path: r.get(5)?,
                     title: r.get(5)?,
                     message: if status == "missing" {
-                        "The stored file is gone.".to_owned()
+                        tr!("server-issues-blob-missing")
                     } else {
-                        "The stored file doesn’t match what was stored: it’s damaged.".to_owned()
+                        tr!("server-issues-blob-damaged")
                     },
                     at: r.get(6)?,
                     ..Item::default()
@@ -310,7 +302,7 @@ fn items(c: &Connection, kind: &str) -> Result<(Vec<Item>, i64)> {
                     pack_name: r.get(1)?,
                     location_id: r.get(2)?,
                     location_name: r.get(3)?,
-                    message: format!("The folder “{}” wasn’t found.", folder.unwrap_or_default()),
+                    message: tr!("server-issues-folder-gone", folder = folder.unwrap_or_default()),
                     at: r.get(5)?,
                     retry: true,
                     ..Item::default()
@@ -326,7 +318,7 @@ fn items(c: &Connection, kind: &str) -> Result<(Vec<Item>, i64)> {
                 let pack: Option<String> = r.get(3)?;
                 Ok(Item {
                     id: format!("job:{}", r.get::<_, i64>(0)?),
-                    title: jobs::job_label(&kind, pack.as_deref().unwrap_or("a pack")),
+                    title: jobs::job_label(&kind, pack.as_deref()),
                     pack_id: r.get(2)?,
                     pack_name: pack,
                     message: r.get::<_, Option<String>>(4)?.unwrap_or_default(),
@@ -443,8 +435,9 @@ pub(crate) async fn list(State(state): State<AppState>) -> ApiResult<Json<Value>
             if total == 0 {
                 continue;
             }
+            let (title, blurb, retry) = (g.text)();
             out.push(json!({
-                "kind": g.kind, "title": g.title, "blurb": g.blurb, "retry": g.retry, "dismiss": g.dismiss,
+                "kind": g.kind, "title": title, "blurb": blurb, "retry": retry, "dismiss": g.dismiss,
                 "total": total, "items": rows.into_iter().map(Item::json).collect::<Vec<_>>(),
             }));
         }
@@ -626,7 +619,7 @@ pub(crate) async fn retry(State(state): State<AppState>, Json(chosen): Json<Pick
     })
     .await?;
     if n == 0 {
-        return Err(AppError::bad_request("nothing there can be retried"));
+        return Err(AppError::bad_request(tr!("error-nothing-to-retry")));
     }
     state.wake.notify_one();
     Ok(Json(json!({ "started": n })))

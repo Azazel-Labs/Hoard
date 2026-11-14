@@ -21,10 +21,12 @@ export interface Prefs {
   detailWidth: number | null
   /** Open assets over the whole results area, preview large beside the details, instead of in a side panel. */
   detailPage: boolean
+  /** The portal's language: `auto` follows the browser, or a code from LANGUAGES in i18n.ts. */
+  language: string
 }
 
 const KEY = 'hoard.prefs'
-const DEFAULTS: Prefs = { tile: 156, showSupporting: false, collapsed: ['license', 'format', 'blender'], expanded: [], theme: 'system', lightTheme: 'slate', darkTheme: 'graphite', detailWidth: null, detailPage: false }
+const DEFAULTS: Prefs = { tile: 156, showSupporting: false, collapsed: ['license', 'format', 'blender'], expanded: [], theme: 'system', lightTheme: 'slate', darkTheme: 'graphite', detailWidth: null, detailPage: false, language: 'auto' }
 
 function load(): Prefs {
   try {

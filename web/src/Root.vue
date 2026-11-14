@@ -5,8 +5,9 @@ import App from './App.vue'
 import SignIn from './components/SignIn.vue'
 import { auth, canBrowse, refreshAuth } from './auth'
 import { lazy } from './lazy'
+import { t } from './i18n'
 
-const ConnectApp = lazy(() => import('./components/ConnectApp.vue'), 'the app connection')
+const ConnectApp = lazy(() => import('./components/ConnectApp.vue'), () => t('root-lazy-connect'))
 
 /** An app signing in over OAuth (see `oauth.rs`): sign in if need be, then allow or cancel. */
 const connecting = location.pathname === '/oauth/authorize'
@@ -21,8 +22,8 @@ async function signedIn() {
 
 <template>
   <div v-if="!auth.status && auth.error" class="unreachable" role="alert">
-    <p>Couldn’t reach the Hoard server: {{ auth.error }}</p>
-    <button type="button" class="btn" @click="refreshAuth">Try again</button>
+    <p>{{ t('root-unreachable', { error: auth.error }) }}</p>
+    <button type="button" class="btn" @click="refreshAuth">{{ t('root-try-again') }}</button>
   </div>
   <SignIn v-else-if="auth.status?.setup_needed" mode="setup" @done="signedIn" />
   <template v-else-if="auth.status && connecting">

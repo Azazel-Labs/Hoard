@@ -11,6 +11,8 @@ use anyhow::{Context, Result, bail};
 use serde::Serialize;
 use serde_json::{Value, json};
 
+use crate::i18n::tr;
+
 /// Models Hoard is tuned for: all take images, run on a CPU, and fit in a few gigabytes.
 #[derive(Debug, Serialize)]
 pub(crate) struct Suggested {
@@ -75,19 +77,25 @@ pub(crate) struct LocalModel {
     pub(crate) failed: bool,
 }
 
+/// The model server's refusal, with its reason.
+fn refused(reason: &str) -> String {
+    tr!("error-model-server-refused", reason = reason)
+}
+
 /// The router's own address: the OpenAI-compatible one without `/v1`.
 fn router(url: &str) -> String {
     let url = url.trim().trim_end_matches('/');
     url.strip_suffix("/v1").unwrap_or(url).to_owned()
 }
 
-async fn answer(resp: reqwest::Response, what: &str) -> Result<Value> {
+/// The answer's JSON, or the error `refused` makes of the server's reason.
+async fn answer(resp: reqwest::Response, refused: impl FnOnce(&str) -> String) -> Result<Value> {
     let status = resp.status();
     let text = resp.text().await.unwrap_or_default();
     let v: Value = serde_json::from_str(&text).unwrap_or(Value::Null);
     if !status.is_success() {
         let msg = v["error"]["message"].as_str().map_or_else(|| text.chars().take(300).collect(), str::to_owned);
-        bail!("{what}: {msg}");
+        bail!(refused(&msg));
     }
     Ok(v)
 }
@@ -100,10 +108,9 @@ pub(crate) async fn list(http: &reqwest::Client, url: &str) -> Result<Vec<LocalM
         .timeout(Duration::from_secs(10))
         .send()
         .await
-        .with_context(|| format!("no model server answers at {base}"))?;
-    let v = answer(resp, "the model server").await?;
-    let mut models = parse_list(&v)
-        .with_context(|| format!("{base} isn't a llama.cpp server in router mode, so it can't download models"))?;
+        .with_context(|| tr!("error-no-model-server", url = base))?;
+    let v = answer(resp, refused).await?;
+    let mut models = parse_list(&v).with_context(|| tr!("error-not-llama-router", url = base))?;
     let downloading = models.iter().any(|m| m.status == "downloading");
     if downloading {
         // The model list doesn't say how far a download has got; the router's event stream does.
@@ -159,7 +166,7 @@ async fn read_events(http: &reqwest::Client, base: &str) -> Result<()> {
             Ok(Err(e)) => return Err(e.into()),
             // Quiet for a while: stop once nothing is downloading.
             Err(_) => {
-                let v = answer(http.get(format!("{base}/models")).send().await?, "the model server").await?;
+                let v = answer(http.get(format!("{base}/models")).send().await?, refused).await?;
                 if !parse_list(&v).unwrap_or_default().iter().any(|m| m.status == "downloading") {
                     return Ok(());
                 }
@@ -243,8 +250,8 @@ pub(crate) async fn download(http: &reqwest::Client, url: &str, model: &str) -> 
         .timeout(Duration::from_secs(60))
         .send()
         .await
-        .with_context(|| format!("no model server answers at {base}"))?;
-    answer(resp, &format!("couldn't download {model}")).await.map(drop)
+        .with_context(|| tr!("error-no-model-server", url = base))?;
+    answer(resp, |reason| tr!("error-model-download", model = model, reason = reason)).await.map(drop)
 }
 
 /// Stop a model (or its download) and delete its files.
@@ -273,8 +280,8 @@ pub(crate) async fn remove(http: &reqwest::Client, url: &str, model: &str) -> Re
         .timeout(Duration::from_secs(60))
         .send()
         .await
-        .with_context(|| format!("no model server answers at {base}"))?;
-    answer(resp, &format!("couldn't delete {model}")).await.map(drop)
+        .with_context(|| tr!("error-no-model-server", url = base))?;
+    answer(resp, |reason| tr!("error-model-delete", model = model, reason = reason)).await.map(drop)
 }
 
 #[cfg(test)]

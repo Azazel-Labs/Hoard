@@ -6,29 +6,37 @@
 // light previews (at most 2048 px) unless "Full-resolution textures" is on.
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import type { Asset } from '../api'
+import { formatNumber, t } from '../i18n'
 // Types only: the scene (and three.js with it) loads once the dialog is open, so it shows straight away.
 import type { Background, MapMode, ModelStage, SceneStats, StageInfo, ViewMode } from '../modelStage'
 
 const props = defineProps<{ asset: Asset }>()
 const emit = defineEmits<{ close: [] }>()
 
-const BG_LABEL: Record<Background, string> = {
-  checker: 'Checker', dark: 'Dark', grey: 'Grey', light: 'Light', env: 'Environment',
+const BACKGROUNDS: Background[] = ['checker', 'dark', 'grey', 'light', 'env']
+/** A background swatch's name, as read out: "Checker background". */
+function bgLabel(b: Background): string {
+  switch (b) {
+    case 'checker': return t('model-bg-checker')
+    case 'dark': return t('model-bg-dark')
+    case 'grey': return t('model-bg-grey')
+    case 'light': return t('model-bg-light')
+    case 'env': return t('model-bg-env')
+  }
 }
-const BACKGROUNDS = Object.keys(BG_LABEL) as Background[]
 
 /** The view modes, in menu order, with their keys: 1 to 9, then 0. */
-const MODES: { mode: ViewMode; label: string; key: string }[] = [
-  { mode: 'final', label: 'Final render', key: '1' },
-  { mode: 'raw', label: 'Raw render', key: '2' },
-  { mode: 'color', label: 'Base color', key: '3' },
-  { mode: 'roughness', label: 'Roughness', key: '4' },
-  { mode: 'metalness', label: 'Metalness', key: '5' },
-  { mode: 'normal', label: 'Normal', key: '6' },
-  { mode: 'ao', label: 'Occlusion', key: '7' },
-  { mode: 'matcap', label: 'Matcap', key: '8' },
-  { mode: 'uv', label: 'UV checker', key: '9' },
-  { mode: 'geometry', label: 'Geometries', key: '0' },
+const MODES: { mode: ViewMode; label: () => string; key: string }[] = [
+  { mode: 'final', label: () => t('model-mode-final'), key: '1' },
+  { mode: 'raw', label: () => t('model-mode-raw'), key: '2' },
+  { mode: 'color', label: () => t('model-mode-color'), key: '3' },
+  { mode: 'roughness', label: () => t('model-mode-roughness'), key: '4' },
+  { mode: 'metalness', label: () => t('model-mode-metalness'), key: '5' },
+  { mode: 'normal', label: () => t('model-mode-normal'), key: '6' },
+  { mode: 'ao', label: () => t('model-mode-ao'), key: '7' },
+  { mode: 'matcap', label: () => t('model-mode-matcap'), key: '8' },
+  { mode: 'uv', label: () => t('model-mode-uv'), key: '9' },
+  { mode: 'geometry', label: () => t('model-mode-geometry'), key: '0' },
 ]
 const MAP_MODES = new Set<ViewMode>(['color', 'roughness', 'metalness', 'normal', 'ao'])
 
@@ -57,21 +65,20 @@ let stage: ModelStage | null = null
 /** A map's view is offered only when some material has that map. */
 const available = (m: ViewMode) => !MAP_MODES.has(m) || !!stats.value?.maps.includes(m as MapMode)
 const menu = computed(() => [
-  { label: 'Render', modes: MODES.slice(0, 2) },
-  { label: 'Maps', modes: MODES.slice(2, 7).filter((m) => available(m.mode)) },
-  { label: 'Inspect', modes: MODES.slice(7) },
+  { id: 'render', label: t('model-menu-render'), modes: MODES.slice(0, 2) },
+  { id: 'maps', label: t('model-menu-maps'), modes: MODES.slice(2, 7).filter((m) => available(m.mode)) },
+  { id: 'inspect', label: t('model-menu-inspect'), modes: MODES.slice(7) },
 ].filter((g) => g.modes.length))
-const modeLabel = computed(() => MODES.find((m) => m.mode === mode.value)!.label)
+const modeLabel = computed(() => MODES.find((m) => m.mode === mode.value)!.label())
 // The textures switch means something only with the model's own materials, the light switch only in the final render.
 const ownMaterials = computed(() => mode.value === 'final' || mode.value === 'raw')
 
 /** A length as people say it, to three figures: metres for glTF (in cm or mm when small), else plain units. */
 function length(n: number, metres: boolean): string {
-  const fig = (v: number) => v.toLocaleString(undefined, { maximumSignificantDigits: 3 })
-  if (!metres) return `${fig(n)} ${n === 1 ? 'unit' : 'units'}`
-  if (n >= 1 || n === 0) return `${fig(n)} m`
-  if (n >= 0.01) return `${fig(n * 100)} cm`
-  return `${fig(n * 1000)} mm`
+  if (!metres) return t('model-length-units', { n })
+  if (n >= 1 || n === 0) return t('model-length-m', { n })
+  if (n >= 0.01) return t('model-length-cm', { n: n * 100 })
+  return t('model-length-mm', { n: n * 1000 })
 }
 
 /** Load the model into a new stage; switching texture resolution starts over, keeping the switches as they were. */
@@ -81,7 +88,7 @@ async function open() {
     ;({ ModelStage } = await import('../modelStage'))
   } catch (e) {
     status.value = 'error'
-    error.value = `the 3D viewer didn't load (${(e as Error).message}); reloading the page may help`
+    error.value = t('model-viewer-failed', { error: (e as Error).message })
     return
   }
   if (!host.value || closed) return
@@ -196,150 +203,157 @@ function onKey(e: KeyboardEvent) {
 </script>
 
 <template>
-  <dialog ref="dlg" class="viewer" :aria-label="`View ${asset.name} in 3D`" @close="emit('close')" @keydown="onKey">
+  <dialog ref="dlg" class="viewer" :aria-label="t('model-dialog', { name: asset.name })" @close="emit('close')" @keydown="onKey">
     <header class="tools">
       <div class="title">
         <strong>{{ asset.name }}</strong>
         <span v-if="info" class="mono dim">
-          {{ info.triangles.toLocaleString() }} tris · {{ info.meshes }} {{ info.meshes === 1 ? 'mesh' : 'meshes' }} ·
-          {{ info.materials }} {{ info.materials === 1 ? 'material' : 'materials' }}
+          {{ t('model-title-stats', { triangles: info.triangles, meshes: info.meshes, materials: info.materials }) }}
         </span>
       </div>
-      <div class="group" role="group" aria-label="Camera">
-        <button type="button" title="Frame the model (F)" :disabled="status !== 'ready'" @click="stage?.frame()">
+      <div class="group" role="group" :aria-label="t('model-group-camera')">
+        <button type="button" :title="t('model-frame-title')" :disabled="status !== 'ready'" @click="stage?.frame()">
           <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M2.5 6V2.5H6M10 2.5h3.5V6M13.5 10v3.5H10M6 13.5H2.5V10" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" /><circle cx="8" cy="8" r="2" fill="currentColor" /></svg>
-          <span class="wide">Frame</span>
+          <span class="wide">{{ t('model-frame') }}</span>
         </button>
-        <button type="button" title="Back to the starting view (R)" :disabled="status !== 'ready'" @click="stage?.reset()">
+        <button type="button" :title="t('model-reset-title')" :disabled="status !== 'ready'" @click="stage?.reset()">
           <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M3 8a5 5 0 1 0 1.6-3.7M3 2.5v2.8h2.8" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" /></svg>
-          <span class="wide">Reset</span>
+          <span class="wide">{{ t('model-reset') }}</span>
         </button>
-        <button type="button" title="Turn slowly (A)" :aria-pressed="spin" :disabled="status !== 'ready'" @click="spin = !spin">
+        <button type="button" :title="t('model-turn-title')" :aria-pressed="spin" :disabled="status !== 'ready'" @click="spin = !spin">
           <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><ellipse cx="8" cy="8" rx="6" ry="2.6" fill="none" stroke="currentColor" stroke-width="1.5" /><path d="m11.5 3.8 2 1.6-2.4.9" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /></svg>
-          <span class="wide">Turn</span>
+          <span class="wide">{{ t('model-turn') }}</span>
         </button>
       </div>
-      <div class="group" role="group" aria-label="Shading">
-        <button type="button" title="Textures (T)" :aria-pressed="textures" :disabled="status !== 'ready' || !ownMaterials" @click="textures = !textures">
+      <div class="group" role="group" :aria-label="t('model-group-shading')">
+        <button type="button" :title="t('model-textures-title')" :aria-pressed="textures" :disabled="status !== 'ready' || !ownMaterials" @click="textures = !textures">
           <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><rect x="2" y="2" width="12" height="12" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.5" /><path d="M2 8h12M8 2v12" stroke="currentColor" stroke-width="1.2" /><rect x="2.8" y="2.8" width="5.2" height="5.2" fill="currentColor" opacity=".55" /><rect x="8" y="8" width="5.2" height="5.2" fill="currentColor" opacity=".55" /></svg>
-          <span class="wide">Textures</span>
+          <span class="wide">{{ t('model-textures') }}</span>
         </button>
         <button
           type="button"
-          title="Full-resolution textures (H): each texture file as it is, however big; off, light previews of at most 2048 px"
+          :title="t('model-full-res-title')"
           :aria-pressed="fullTextures"
           :disabled="status !== 'ready'"
           @click="fullTextures = !fullTextures"
         >
           <span class="hd">HD</span>
-          <span class="wide">Full-res</span>
+          <span class="wide">{{ t('model-full-res') }}</span>
         </button>
-        <button type="button" title="Environment light (E)" :aria-pressed="environment" :disabled="status !== 'ready' || mode !== 'final'" @click="environment = !environment">
+        <button type="button" :title="t('model-light-title')" :aria-pressed="environment" :disabled="status !== 'ready' || mode !== 'final'" @click="environment = !environment">
           <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><circle cx="8" cy="8" r="2.8" fill="currentColor" /><path d="M8 1.5v1.8M8 12.7v1.8M1.5 8h1.8M12.7 8h1.8M3.4 3.4l1.3 1.3M11.3 11.3l1.3 1.3M3.4 12.6l1.3-1.3M11.3 4.7l1.3-1.3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" /></svg>
-          <span class="wide">Light</span>
+          <span class="wide">{{ t('model-light') }}</span>
         </button>
-        <button type="button" title="Floor grid (G)" :aria-pressed="grid" :disabled="status !== 'ready'" @click="grid = !grid">
+        <button type="button" :title="t('model-grid-title')" :aria-pressed="grid" :disabled="status !== 'ready'" @click="grid = !grid">
           <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M1.5 12.5h13M3 9.5h10M4.5 6.5h7M5 12.5l1.6-6M11 12.5l-1.6-6M8 12.5v-6" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" /></svg>
-          <span class="wide">Grid</span>
+          <span class="wide">{{ t('model-grid') }}</span>
         </button>
       </div>
-      <div class="group" role="group" aria-label="Background">
+      <div class="group" role="group" :aria-label="t('model-group-background')">
         <button
           v-for="b in BACKGROUNDS"
           :key="b"
           type="button"
           class="swatch"
           :class="b"
-          :title="`${BG_LABEL[b]} background (K cycles)`"
-          :aria-label="`${BG_LABEL[b]} background`"
+          :title="t('model-bg-title', { background: bgLabel(b) })"
+          :aria-label="bgLabel(b)"
           :aria-pressed="bg === b"
           @click="bg = b"
         />
       </div>
-      <div v-if="info?.clips.length" class="group" role="group" aria-label="Animation">
+      <div v-if="info?.clips.length" class="group" role="group" :aria-label="t('model-group-animation')">
         <button
           type="button"
-          :title="playing ? 'Pause (Space)' : 'Play (Space)'"
-          :aria-label="playing ? 'Pause' : 'Play'"
+          :title="playing ? t('model-pause-title') : t('model-play-title')"
+          :aria-label="playing ? t('model-pause') : t('model-play')"
           @click="playing = !playing"
         >
           <svg v-if="playing" viewBox="0 0 16 16" width="14" height="14" aria-hidden="true" fill="currentColor"><rect x="4" y="3" width="3" height="10" rx=".8" /><rect x="9" y="3" width="3" height="10" rx=".8" /></svg>
           <svg v-else viewBox="0 0 16 16" width="14" height="14" aria-hidden="true" fill="currentColor"><path d="M4.5 2.8v10.4L13 8z" /></svg>
         </button>
         <label>
-          <span class="visually-hidden">Animation clip</span>
+          <span class="visually-hidden">{{ t('model-animation-clip') }}</span>
           <select v-model="clip">
             <option v-for="c in info.clips" :key="c" :value="c">{{ c }}</option>
           </select>
         </label>
       </div>
-      <button type="button" class="close" aria-label="Close (Esc)" title="Close (Esc)" autofocus @click="dlg?.close()">
+      <button type="button" class="close" :aria-label="t('model-close-title')" :title="t('model-close-title')" autofocus @click="dlg?.close()">
         <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="m4 4 8 8M12 4l-8 8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" /></svg>
       </button>
     </header>
 
     <div class="stage" :class="[`bg-${bg}`, { checker: bg === 'checker' }]">
       <div ref="host" class="canvas" @dblclick="stage?.frame()" />
-      <nav v-if="status === 'ready'" class="modes" aria-label="View">
-        <button ref="foldBtn" type="button" class="fold" :aria-expanded="menuOpen" :title="menuOpen ? 'Fold the menu away' : 'Show the menu'" @click="menuOpen = !menuOpen">
-          <span><span class="visually-hidden">View: </span>{{ modeLabel }}</span>
+      <nav v-if="status === 'ready'" class="modes" :aria-label="t('model-group-view')">
+        <button ref="foldBtn" type="button" class="fold" :aria-expanded="menuOpen" :title="menuOpen ? t('model-menu-fold') : t('model-menu-show')" @click="menuOpen = !menuOpen">
+          <span><span class="visually-hidden">{{ t('model-view-prefix') }}</span>{{ modeLabel }}</span>
           <svg viewBox="0 0 16 16" width="12" height="12" aria-hidden="true"><path :d="menuOpen ? 'm4 10 4-4 4 4' : 'm4 6 4 4 4-4'" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" /></svg>
         </button>
         <template v-if="menuOpen">
-          <div v-for="g in menu" :key="g.label" class="section" role="group" :aria-label="g.label">
+          <div v-for="g in menu" :key="g.id" class="section" role="group" :aria-label="g.label">
             <span class="label" aria-hidden="true">{{ g.label }}</span>
             <button
               v-for="m in g.modes"
               :key="m.mode"
               type="button"
-              :title="`${m.label} (${m.key})`"
+              :title="t('model-mode-title', { mode: m.label(), key: m.key })"
               :aria-pressed="mode === m.mode"
               @click="mode = m.mode"
             >
-              <span>{{ m.label }}</span><kbd aria-hidden="true">{{ m.key }}</kbd>
+              <span>{{ m.label() }}</span><kbd aria-hidden="true">{{ m.key }}</kbd>
             </button>
           </div>
-          <div class="section" role="group" aria-label="Show">
-            <button type="button" title="Wireframe (W), over any view" :aria-pressed="wireframe" @click="wireframe = !wireframe">
-              <span>Wireframe</span><kbd aria-hidden="true">W</kbd>
+          <div class="section" role="group" :aria-label="t('model-group-show')">
+            <button type="button" :title="t('model-wireframe-title')" :aria-pressed="wireframe" @click="wireframe = !wireframe">
+              <span>{{ t('model-wireframe') }}</span><kbd aria-hidden="true">W</kbd>
             </button>
-            <button ref="infoBtn" type="button" title="Scene information (I)" :aria-pressed="showInfo" @click="showInfo = !showInfo">
-              <span>Scene information</span><kbd aria-hidden="true">I</kbd>
+            <button ref="infoBtn" type="button" :title="t('model-info-title')" :aria-pressed="showInfo" @click="showInfo = !showInfo">
+              <span>{{ t('model-info') }}</span><kbd aria-hidden="true">I</kbd>
             </button>
           </div>
         </template>
       </nav>
       <section v-if="status === 'ready' && showInfo && stats" class="scene-info" aria-labelledby="scene-info-title">
         <header>
-          <h2 id="scene-info-title">Scene information</h2>
-          <button type="button" class="x" aria-label="Close scene information" title="Close (I)" @click="closeInfo">
+          <h2 id="scene-info-title">{{ t('model-info') }}</h2>
+          <button type="button" class="x" :aria-label="t('model-info-close')" :title="t('model-info-close-title')" @click="closeInfo">
             <svg viewBox="0 0 16 16" width="12" height="12" aria-hidden="true"><path d="m4 4 8 8M12 4l-8 8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" /></svg>
           </button>
         </header>
         <dl>
-          <div><dt>Geometries</dt><dd>{{ stats.meshes.toLocaleString() }}</dd></div>
-          <div><dt>Materials</dt><dd>{{ stats.materials.toLocaleString() }}</dd></div>
-          <div><dt>Textures</dt><dd>{{ stats.textures.toLocaleString() }}</dd></div>
-          <div><dt>Triangles</dt><dd>{{ stats.triangles.toLocaleString() }}</dd></div>
-          <div><dt>Vertices</dt><dd>{{ stats.vertices.toLocaleString() }}</dd></div>
+          <div><dt>{{ t('model-info-geometries') }}</dt><dd>{{ formatNumber(stats.meshes) }}</dd></div>
+          <div><dt>{{ t('model-info-materials') }}</dt><dd>{{ formatNumber(stats.materials) }}</dd></div>
+          <div><dt>{{ t('model-info-textures') }}</dt><dd>{{ formatNumber(stats.textures) }}</dd></div>
+          <div><dt>{{ t('model-info-triangles') }}</dt><dd>{{ formatNumber(stats.triangles) }}</dd></div>
+          <div><dt>{{ t('model-info-vertices') }}</dt><dd>{{ formatNumber(stats.vertices) }}</dd></div>
         </dl>
-        <dl class="size" :title="stats.metres ? 'glTF is in metres' : 'This format doesn’t say what its units are'">
-          <div><dt>Height</dt><dd>{{ length(stats.size.y, stats.metres) }}</dd></div>
-          <div><dt>Length</dt><dd>{{ length(stats.size.z, stats.metres) }}</dd></div>
-          <div><dt>Width</dt><dd>{{ length(stats.size.x, stats.metres) }}</dd></div>
+        <dl class="size" :title="stats.metres ? t('model-info-metres') : t('model-info-no-units')">
+          <div><dt>{{ t('model-info-height') }}</dt><dd>{{ length(stats.size.y, stats.metres) }}</dd></div>
+          <div><dt>{{ t('model-info-length') }}</dt><dd>{{ length(stats.size.z, stats.metres) }}</dd></div>
+          <div><dt>{{ t('model-info-width') }}</dt><dd>{{ length(stats.size.x, stats.metres) }}</dd></div>
         </dl>
       </section>
-      <p v-if="status === 'viewer'" class="msg">Loading the 3D viewer…</p>
-      <p v-else-if="status === 'loading'" class="msg">Loading model…</p>
-      <p v-else-if="status === 'error'" class="msg err">Couldn't show this model: {{ error }}</p>
+      <p v-if="status === 'viewer'" class="msg">{{ t('model-loading-viewer') }}</p>
+      <p v-else-if="status === 'loading'" class="msg">{{ t('model-loading') }}</p>
+      <p v-else-if="status === 'error'" class="msg err">{{ t('model-show-failed', { error }) }}</p>
       <p v-if="missing.length" class="note" :title="missing.join('\n')">
-        {{ missing.length === 1 ? `Texture not found: ${missing[0]}` : `${missing.length} textures not found: ${missing.slice(0, 3).join(', ')}${missing.length > 3 ? '…' : ''}` }}
+        {{
+          missing.length === 1
+            ? t('model-missing-one', { name: missing[0] })
+            : missing.length > 3
+              ? t('model-missing-more', { count: missing.length, names: missing.slice(0, 3).join(', ') })
+              : t('model-missing-some', { count: missing.length, names: missing.slice(0, 3).join(', ') })
+        }}
       </p>
-      <p v-else-if="info?.guessed" class="note">Textures matched by name; the file names none.</p>
+      <p v-else-if="info?.guessed" class="note">{{ t('model-guessed') }}</p>
     </div>
     <footer class="keys" aria-hidden="true">
-      Drag to orbit · right-drag to pan · scroll to zoom · double-click to frame · <kbd>F</kbd> frame · <kbd>R</kbd> reset ·
-      <kbd>1</kbd>–<kbd>0</kbd> view · <kbd>W</kbd> wireframe · <kbd>I</kbd> scene information · <kbd>T</kbd> textures · <kbd>H</kbd> full-res textures · <kbd>E</kbd> light · <kbd>G</kbd> grid · <kbd>K</kbd> background<template v-if="info?.clips.length"> · <kbd>Space</kbd> play</template>
+      {{ t('model-keys-mouse') }} · <kbd>F</kbd> {{ t('model-key-frame') }} · <kbd>R</kbd> {{ t('model-key-reset') }} ·
+      <kbd>1</kbd>–<kbd>0</kbd> {{ t('model-key-view') }} · <kbd>W</kbd> {{ t('model-key-wireframe') }} · <kbd>I</kbd> {{ t('model-key-info') }} ·
+      <kbd>T</kbd> {{ t('model-key-textures') }} · <kbd>H</kbd> {{ t('model-key-full-res') }} · <kbd>E</kbd> {{ t('model-key-light') }} ·
+      <kbd>G</kbd> {{ t('model-key-grid') }} · <kbd>K</kbd> {{ t('model-key-background') }}<template v-if="info?.clips.length"> · <kbd>Space</kbd> {{ t('model-key-play') }}</template>
     </footer>
   </dialog>
 </template>

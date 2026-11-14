@@ -1,7 +1,9 @@
 use axum::Json;
-use axum::http::StatusCode;
+use axum::http::{HeaderValue, StatusCode, header};
 use axum::response::{IntoResponse, Response};
 use serde_json::json;
+
+use crate::i18n::tr;
 
 /// Error type for HTTP handlers: an `anyhow` error plus the status to report.
 #[derive(Debug)]
@@ -13,8 +15,8 @@ pub(crate) struct AppError {
 pub(crate) type ApiResult<T> = Result<T, AppError>;
 
 impl AppError {
-    pub(crate) fn not_found(what: impl std::fmt::Display) -> Self {
-        Self { status: StatusCode::NOT_FOUND, err: anyhow::anyhow!("{what} not found") }
+    pub(crate) fn not_found(msg: impl std::fmt::Display) -> Self {
+        Self { status: StatusCode::NOT_FOUND, err: anyhow::anyhow!("{msg}") }
     }
     pub(crate) fn bad_request(msg: impl std::fmt::Display) -> Self {
         Self { status: StatusCode::BAD_REQUEST, err: anyhow::anyhow!("{msg}") }
@@ -29,7 +31,7 @@ impl AppError {
         Self { status: StatusCode::UNPROCESSABLE_ENTITY, err: anyhow::anyhow!("{msg}") }
     }
     pub(crate) fn unauthorized() -> Self {
-        Self { status: StatusCode::UNAUTHORIZED, err: anyhow::anyhow!("sign in first (or send an access token)") }
+        Self { status: StatusCode::UNAUTHORIZED, err: anyhow::anyhow!(tr!("error-sign-in-first")) }
     }
     pub(crate) fn forbidden(msg: impl std::fmt::Display) -> Self {
         Self { status: StatusCode::FORBIDDEN, err: anyhow::anyhow!("{msg}") }
@@ -50,6 +52,8 @@ impl IntoResponse for AppError {
         if self.status.is_server_error() {
             tracing::error!(error = ?self.err, "request failed");
         }
-        (self.status, Json(json!({ "error": format!("{:#}", self.err) }))).into_response()
+        // The message is in the language the request asked for.
+        let vary = [(header::VARY, HeaderValue::from_static("accept-language"))];
+        (self.status, vary, Json(json!({ "error": format!("{:#}", self.err) }))).into_response()
     }
 }

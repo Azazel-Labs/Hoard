@@ -4,6 +4,7 @@
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { ApiError, humanBytes, type Pack, type UploadFile } from '../api'
 import { abandonUpload, AlreadyImported, uploadPackResumable } from '../uploader'
+import { formatNumber, t } from '../i18n'
 
 type State = 'queued' | 'uploading' | 'done' | 'failed' | 'skipped'
 interface Job {
@@ -139,9 +140,9 @@ function eta(j: Job): string {
   if (!j.rate || j.state !== 'uploading') return ''
   const s = (j.total - j.sent) / j.rate
   if (!Number.isFinite(s)) return ''
-  if (s < 60) return `${Math.ceil(s)} s left`
-  if (s < 3600) return `${Math.ceil(s / 60)} min left`
-  return `${(s / 3600).toFixed(1)} h left`
+  if (s < 60) return t('upload-eta-seconds', { s: Math.ceil(s) })
+  if (s < 3600) return t('upload-eta-minutes', { min: Math.ceil(s / 60) })
+  return t('upload-eta-hours', { h: formatNumber(s / 3600, { minimumFractionDigits: 1, maximumFractionDigits: 1 }) })
 }
 
 function warnOnClose(e: BeforeUnloadEvent) {
@@ -155,17 +156,17 @@ onBeforeUnmount(() => window.removeEventListener('beforeunload', warnOnClose))
 
 <template>
   <Transition name="q">
-  <section v-if="jobs.length" class="queue" aria-label="Imports" aria-live="polite">
+  <section v-if="jobs.length" class="queue" :aria-label="t('upload-queue')" aria-live="polite">
     <header v-if="totals.count > 1">
-      <strong>Importing {{ totals.count }} packs</strong>
-      <span class="mono">{{ humanBytes(totals.sent) }} of {{ humanBytes(totals.total) }}</span>
-      <span v-if="totals.rate" class="mono">{{ humanBytes(totals.rate) }}/s</span>
+      <strong>{{ t('upload-importing', { count: totals.count }) }}</strong>
+      <span class="mono">{{ t('upload-bytes-of', { sent: humanBytes(totals.sent), total: humanBytes(totals.total) }) }}</span>
+      <span v-if="totals.rate" class="mono">{{ t('upload-rate', { size: humanBytes(totals.rate) }) }}</span>
     </header>
     <TransitionGroup tag="ol" name="job">
       <li v-for="j in jobs" :key="j.id" :class="j.state">
         <div class="row">
           <span class="name" :title="j.name">{{ j.name }}</span>
-          <span v-if="j.state === 'queued'" class="meta">Waiting</span>
+          <span v-if="j.state === 'queued'" class="meta">{{ t('upload-waiting') }}</span>
           <span v-else-if="j.state === 'uploading'" class="meta mono">
             {{ humanBytes(j.sent) }} / {{ humanBytes(j.total) }}
           </span>
@@ -173,25 +174,25 @@ onBeforeUnmount(() => window.removeEventListener('beforeunload', warnOnClose))
             <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
               <circle class="ring" cx="8" cy="8" r="6.5" /><path class="tick" d="m5 8.2 2 2 4-4.4" />
             </svg>
-            Uploaded, now unpacking
+            {{ t('upload-unpacking') }}
           </span>
-          <span v-else-if="j.state === 'skipped'" class="meta">Already in the library</span>
-          <span v-else class="meta err">Stopped</span>
+          <span v-else-if="j.state === 'skipped'" class="meta">{{ t('upload-already') }}</span>
+          <span v-else class="meta err">{{ t('upload-stopped') }}</span>
         </div>
         <div v-if="j.state === 'uploading'" class="bar"><span :style="{ width: `${j.total ? (j.sent / j.total) * 100 : 0}%` }" /></div>
         <div v-if="j.state === 'uploading'" class="sub">
-          <span>{{ j.filesDone.toLocaleString() }} of {{ j.filesTotal.toLocaleString() }} files</span>
-          <span v-if="j.rate" class="mono">{{ humanBytes(j.rate) }}/s</span>
+          <span>{{ t('upload-files-of', { done: j.filesDone, total: j.filesTotal }) }}</span>
+          <span v-if="j.rate" class="mono">{{ t('upload-rate', { size: humanBytes(j.rate) }) }}</span>
           <span>{{ eta(j) }}</span>
-          <span v-if="j.resumed" class="ok">resumed, {{ humanBytes(j.resumed) }} were already there</span>
+          <span v-if="j.resumed" class="ok">{{ t('upload-resumed', { size: humanBytes(j.resumed) }) }}</span>
         </div>
-        <p v-if="j.state === 'skipped'" class="msg">These exact files were already imported as “{{ j.existing }}”, so they were skipped.</p>
-        <p v-if="j.error" class="err msg">{{ j.error }}. Your progress is kept: retry, or drop the same files again later.</p>
+        <p v-if="j.state === 'skipped'" class="msg">{{ t('upload-skipped', { name: j.existing ?? '' }) }}</p>
+        <p v-if="j.error" class="err msg">{{ t('upload-error', { error: j.error }) }}</p>
         <div v-if="j.state !== 'done'" class="actions">
-          <button v-if="j.state === 'failed'" type="button" class="btn" @click="retry(j)">Retry</button>
-          <button v-if="j.state === 'skipped'" type="button" class="btn" @click="importAgain(j)">Import again anyway</button>
+          <button v-if="j.state === 'failed'" type="button" class="btn" @click="retry(j)">{{ t('upload-retry') }}</button>
+          <button v-if="j.state === 'skipped'" type="button" class="btn" @click="importAgain(j)">{{ t('upload-import-again') }}</button>
           <button type="button" class="btn ghost" @click="cancel(j)">
-            {{ j.state === 'queued' || j.state === 'skipped' ? 'Dismiss' : 'Cancel' }}
+            {{ j.state === 'queued' || j.state === 'skipped' ? t('upload-dismiss') : t('upload-cancel') }}
           </button>
         </div>
       </li>

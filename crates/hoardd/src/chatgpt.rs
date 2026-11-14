@@ -24,6 +24,7 @@ use sha2::Digest as _;
 use crate::AppState;
 use crate::db;
 use crate::error::{ApiResult, AppError};
+use crate::i18n::tr;
 use crate::llm::ModelInfo;
 
 const AUTHORIZE: &str = "https://auth.openai.com/api/accounts/authorize";
@@ -202,16 +203,20 @@ async fn token_request(state: &AppState, body: String) -> Result<Tokens, Result<
         .timeout(Duration::from_secs(30))
         .send()
         .await
-        .map_err(|e| Err(anyhow!(e).context("couldn't reach auth.openai.com")))?;
+        .map_err(|e| Err(anyhow!(e).context(tr!("error-openai-auth-unreachable"))))?;
     let status = resp.status();
     let text = resp.text().await.map_err(|e| Err(e.into()))?;
     if status.is_success() {
-        return serde_json::from_str(&text).map_err(|e| Err(anyhow!(e).context("unexpected answer from OpenAI")));
+        return serde_json::from_str(&text).map_err(|e| Err(anyhow!(e).context(tr!("error-openai-unexpected"))));
     }
     let v: Value = serde_json::from_str(&text).unwrap_or_default();
     match v["error"].as_str() {
         Some(code) => Err(Ok(code.to_owned())),
-        None => Err(Err(anyhow!("OpenAI answered {status}: {}", text.chars().take(300).collect::<String>()))),
+        None => Err(Err(anyhow!(tr!(
+            "error-openai-answered",
+            status = status.to_string(),
+            reason = text.chars().take(300).collect::<String>()
+        )))),
     }
 }
 
@@ -219,10 +224,10 @@ async fn token_request(state: &AppState, body: String) -> Result<Tokens, Result<
 /// accepts in place of checking its signature (Core 1.0, 3.1.3.7); the issuer, audience, expiry and nonce are
 /// checked here.
 fn id_claims(token: &str, client_id: &str, nonce: &str) -> Result<Value> {
-    let payload = token.split('.').nth(1).context("the ID token isn't a JWT")?;
+    let payload = token.split('.').nth(1).with_context(|| tr!("error-chatgpt-id-token-not-jwt"))?;
     let claims: Value = serde_json::from_slice(&URL_SAFE_NO_PAD.decode(payload.trim_end_matches('='))?)?;
     if claims["iss"].as_str().map(|i| i.trim_end_matches('/')) != Some(ISSUER) {
-        bail!("the ID token is from {}, not {ISSUER}", claims["iss"]);
+        bail!(tr!("error-chatgpt-id-token-issuer", issuer = claims["iss"].to_string(), expected = ISSUER));
     }
     let aud_ok = match &claims["aud"] {
         Value::String(a) => a == client_id,
@@ -230,43 +235,40 @@ fn id_claims(token: &str, client_id: &str, nonce: &str) -> Result<Value> {
         _ => false,
     };
     if !aud_ok {
-        bail!("the ID token is for another app");
+        bail!(tr!("error-chatgpt-id-token-audience"));
     }
     if claims["exp"].as_i64().is_none_or(|exp| exp < now() - 60) {
-        bail!("the ID token has expired");
+        bail!(tr!("error-chatgpt-id-token-expired"));
     }
     if claims["nonce"].as_str() != Some(nonce) {
-        bail!("the ID token doesn't belong to this sign-in");
+        bail!(tr!("error-chatgpt-id-token-nonce"));
     }
     Ok(claims)
 }
 
 /// Finish a sign-in: check what came back, swap the code for tokens, and keep them.
 async fn complete(state: &AppState, cb: Callback) -> Result<Account> {
-    let sent = cb.state.as_deref().context("the address has no state; copy the whole address")?;
+    let sent = cb.state.as_deref().with_context(|| tr!("error-chatgpt-no-state"))?;
     let p = {
         let mut list = pending();
-        let i = list.iter().position(|p| p.state == sent).context(
-            "this sign-in wasn't started here, or it was started more than 15 minutes ago. Start it again from \
-             Settings.",
-        )?;
+        let i = list.iter().position(|p| p.state == sent).with_context(|| tr!("error-chatgpt-not-started"))?;
         list.remove(i)
     };
     if let Some(e) = &cb.error {
         if e == "access_denied" {
-            bail!("the sign-in was cancelled");
+            bail!(tr!("error-chatgpt-cancelled"));
         }
-        bail!("ChatGPT refused the sign-in: {}", cb.error_description.as_deref().unwrap_or(e));
+        bail!(tr!("error-chatgpt-refused", reason = cb.error_description.as_deref().unwrap_or(e)));
     }
-    let code = cb.code.context("the address has no sign-in code; copy the whole address")?;
+    let code = cb.code.with_context(|| tr!("error-chatgpt-no-code"))?;
     let mut account = account(state).await?;
     let client_id = match (&account.client_id, cb.client_id) {
         (Some(saved), Some(sent)) if *saved != sent => {
-            bail!("ChatGPT answered for a different registration of this server; start the sign-in again")
+            bail!(tr!("error-chatgpt-other-registration"))
         }
         (Some(saved), _) => saved.clone(),
         (None, Some(sent)) => sent,
-        (None, None) => bail!("ChatGPT didn't finish registering Hoard; start the sign-in again"),
+        (None, None) => bail!(tr!("error-chatgpt-not-registered")),
     };
     let body = form(&[
         ("grant_type", "authorization_code"),
@@ -279,12 +281,12 @@ async fn complete(state: &AppState, cb: Callback) -> Result<Account> {
     let tokens = match token_request(state, body).await {
         Ok(t) => t,
         Err(Ok(code)) if code == "invalid_grant" => {
-            bail!("the sign-in code was already used or has expired; sign in again")
+            bail!(tr!("error-chatgpt-code-used"))
         }
-        Err(Ok(code)) => bail!("ChatGPT refused the sign-in ({code})"),
+        Err(Ok(code)) => bail!(tr!("error-chatgpt-refused-code", code = code)),
         Err(Err(e)) => return Err(e),
     };
-    let id_token = tokens.id_token.as_deref().context("ChatGPT sent no ID token")?;
+    let id_token = tokens.id_token.as_deref().with_context(|| tr!("error-chatgpt-no-id-token"))?;
     let claims = id_claims(id_token, &client_id, &p.nonce)?;
     let plan = tokens.scope.as_deref().is_some_and(|s| s.split_whitespace().any(|s| s == PLAN_SCOPE));
     account.client_id = Some(client_id);
@@ -295,9 +297,7 @@ async fn complete(state: &AppState, cb: Callback) -> Result<Account> {
     account.refresh_token = tokens.refresh_token;
     account.expires_at = Some(now() + tokens.expires_in.unwrap_or(3600));
     account.scopes = tokens.scope;
-    account.problem = (!plan).then(|| {
-        "Signed in, but using the plan wasn't allowed. Sign in again and allow it, or use an API key instead.".into()
-    });
+    account.problem = (!plan).then(|| tr!("error-chatgpt-plan-not-allowed"));
     store(state, account.clone()).await?;
     tracing::info!(email = account.email.as_deref().unwrap_or("?"), "signed in to ChatGPT");
     Ok(account)
@@ -309,14 +309,14 @@ async fn access_token(state: &AppState, force: bool) -> Result<String> {
     let _one = REFRESHING.lock().await;
     let mut account = account(state).await?;
     if let Some(problem) = &account.problem {
-        bail!("ChatGPT: {problem}");
+        bail!(tr!("error-chatgpt-problem", problem = problem));
     }
     let fresh = account.expires_at.is_some_and(|t| t - REFRESH_AHEAD > now());
     if let (Some(token), true, false) = (&account.access_token, fresh, force) {
         return Ok(token.clone());
     }
     let (Some(client_id), Some(refresh)) = (account.client_id.clone(), account.refresh_token.clone()) else {
-        bail!("not signed in to ChatGPT; sign in from Settings → AI tagging");
+        bail!(tr!("error-chatgpt-not-signed-in"));
     };
     let body = form(&[
         ("grant_type", "refresh_token"),
@@ -340,15 +340,13 @@ async fn access_token(state: &AppState, force: bool) -> Result<String> {
         }
         // OpenAI having a moment: keep the tokens and try again next time.
         Err(Ok(code)) if matches!(code.as_str(), "server_error" | "temporarily_unavailable" | "slow_down") => {
-            bail!("ChatGPT couldn't refresh the sign-in just now ({code}); it'll be tried again later")
+            bail!(tr!("error-chatgpt-refresh-later", code = code))
         }
         // A refresh token that's no good any more (revoked, expired, disconnected in ChatGPT): sign in again.
         Err(Ok(code)) => {
-            account.clear_tokens(Some(format!(
-                "ChatGPT signed this server out ({code}). Sign in again to keep tagging with your plan."
-            )));
+            account.clear_tokens(Some(tr!("error-chatgpt-signed-out-problem", code = code)));
             store(state, account).await?;
-            bail!("ChatGPT signed this server out ({code}); sign in again from Settings → AI tagging")
+            bail!(tr!("error-chatgpt-signed-out", code = code))
         }
         // A network problem: keep the tokens and try again next time.
         Err(Err(e)) => Err(e),
@@ -397,9 +395,9 @@ pub(crate) async fn chat(state: &AppState, model: &str, messages: &Value) -> Res
             .timeout(Duration::from_mins(5))
             .send()
             .await
-            .context("couldn't reach api.openai.com")?;
+            .with_context(|| tr!("error-openai-api-unreachable"))?;
         let status = resp.status();
-        let text = resp.text().await.context("the reply from OpenAI broke off")?;
+        let text = resp.text().await.with_context(|| tr!("error-openai-broke-off"))?;
         // Once, a turned-down token gets refreshed and the request sent again.
         if status == reqwest::StatusCode::UNAUTHORIZED && !retry {
             continue;
@@ -410,7 +408,7 @@ pub(crate) async fn chat(state: &AppState, model: &str, messages: &Value) -> Res
         }
         return read_stream(&text);
     }
-    bail!("OpenAI kept refusing the ChatGPT sign-in; sign in again from Settings → AI tagging")
+    bail!(tr!("error-chatgpt-kept-refusing"))
 }
 
 /// The reply's text from a Responses event stream, or why there isn't one.
@@ -422,16 +420,16 @@ fn read_stream(sse: &str) -> Result<String> {
         match event["type"].as_str().unwrap_or_default() {
             "response.output_text.delta" => out.push_str(event["delta"].as_str().unwrap_or_default()),
             "response.completed" => return Ok(out),
-            "response.failed" => bail!(explain(&event["response"]["error"], "the request failed", 0)),
-            "response.incomplete" => bail!(
-                "the reply was cut off ({})",
-                event["response"]["incomplete_details"]["reason"].as_str().unwrap_or("no reason given")
-            ),
-            "error" => bail!(explain(&event["error"], "the request failed", 0)),
+            "response.failed" => bail!(explain(&event["response"]["error"], &tr!("error-chatgpt-request-failed"), 0)),
+            "response.incomplete" => match event["response"]["incomplete_details"]["reason"].as_str() {
+                Some(reason) => bail!(tr!("error-chatgpt-cut-off", reason = reason)),
+                None => bail!(tr!("error-chatgpt-cut-off-no-reason")),
+            },
+            "error" => bail!(explain(&event["error"], &tr!("error-chatgpt-request-failed"), 0)),
             _ => {}
         }
     }
-    bail!("the reply from OpenAI ended before it was complete")
+    bail!(tr!("error-openai-ended-early"))
 }
 
 /// An OpenAI error in words, with what to do about it for the ones the docs single out.
@@ -439,25 +437,21 @@ fn explain(error: &Value, fallback: &str, status: u16) -> String {
     let code = error["code"].as_str().unwrap_or_default();
     let message = error["message"].as_str().unwrap_or(fallback);
     match code {
-        "subscription_sharing_usage_limit_exceeded" => format!(
-            "your ChatGPT plan's usage for Hoard has run out for now. See or change the limit at {MANAGE_USAGE}"
-        ),
-        "subscription_sharing_user_not_eligible" => {
-            "this ChatGPT account or workspace can't use its plan in other apps. Use an API key instead.".into()
-        }
+        "subscription_sharing_usage_limit_exceeded" => tr!("error-chatgpt-usage-limit", url = MANAGE_USAGE),
+        "subscription_sharing_user_not_eligible" => tr!("error-chatgpt-not-eligible"),
         "subscription_sharing_usage_unavailable" | "subscription_sharing_user_unavailable" => {
-            "ChatGPT couldn't check the plan's usage just now; it'll be tried again later".into()
+            tr!("error-chatgpt-usage-unavailable")
         }
-        "subscription_sharing_unsupported_capability" => format!(
-            "ChatGPT plan usage doesn't support {} with this model{}",
-            error["param"].as_str().unwrap_or("part of the request"),
-            if error["param"].as_str().is_some_and(|p| p.contains("image")) {
-                "; pick a model that takes images, or turn off sending thumbnails"
-            } else {
-                ""
-            }
+        "subscription_sharing_unsupported_capability" => match error["param"].as_str() {
+            Some(param) if param.contains("image") => tr!("error-chatgpt-unsupported-images", param = param),
+            Some(param) => tr!("error-chatgpt-unsupported", param = param),
+            None => tr!("error-chatgpt-unsupported-part"),
+        },
+        "" if status != 0 => tr!(
+            "error-openai-answered",
+            status = status.to_string(),
+            reason = message.chars().take(300).collect::<String>()
         ),
-        "" if status != 0 => format!("OpenAI answered {status}: {}", message.chars().take(300).collect::<String>()),
         "" => message.to_owned(),
         _ => format!("{message} ({code})"),
     }
@@ -473,7 +467,7 @@ async fn models(state: &AppState) -> Result<Vec<ModelInfo>> {
         .timeout(Duration::from_secs(20))
         .send()
         .await
-        .context("couldn't reach api.openai.com")?;
+        .with_context(|| tr!("error-openai-api-unreachable"))?;
     let status = resp.status();
     let text = resp.text().await?;
     if !status.is_success() {
@@ -521,11 +515,7 @@ async fn sign_out(state: &AppState) -> Result<Option<String>> {
         .await;
         if let Err(e) = revoked {
             tracing::warn!("couldn't revoke the ChatGPT sign-in: {e:#}");
-            note = Some(
-                "Signed out here, but OpenAI couldn't be told. To be sure, disconnect Hoard in ChatGPT Settings → \
-                 Security and login → Sign in with ChatGPT."
-                    .to_owned(),
-            );
+            note = Some(tr!("server-chatgpt-revoke-failed"));
         }
     }
     account.clear_tokens(None);
@@ -557,7 +547,7 @@ pub(crate) struct StartBody {
 /// `POST /api/admin/chatgpt/start`: the address to open to sign in.
 pub(crate) async fn start(State(state): State<AppState>, Json(body): Json<StartBody>) -> ApiResult<Json<Value>> {
     if body.port == 0 {
-        return Err(AppError::bad_request("port is the one the browser reaches Hoard on"));
+        return Err(AppError::bad_request(tr!("error-chatgpt-port")));
     }
     let account = account(&state).await?;
     let p = Pending {
@@ -585,8 +575,8 @@ pub(crate) struct FinishBody {
 
 /// `POST /api/admin/chatgpt/finish`: finish a sign-in from the address pasted in Settings.
 pub(crate) async fn finish(State(state): State<AppState>, Json(body): Json<FinishBody>) -> ApiResult<Json<Value>> {
-    let url = reqwest::Url::parse(body.url.trim())
-        .map_err(|_| AppError::bad_request("paste the whole address, starting with http://127.0.0.1"))?;
+    let url =
+        reqwest::Url::parse(body.url.trim()).map_err(|_| AppError::bad_request(tr!("error-chatgpt-paste-address")))?;
     let cb: Callback = serde_json::from_value(Value::Object(
         url.query_pairs().map(|(k, v)| (k.into_owned(), Value::String(v.into_owned()))).collect(),
     ))
@@ -612,22 +602,24 @@ pub(crate) async fn list_models(State(state): State<AppState>) -> ApiResult<Json
 /// `GET /auth/callback`: where OpenAI sends a browser on the server's own machine after signing in. No API token:
 /// the one-time state, which only Settings has seen, is what ties it to a sign-in.
 pub(crate) async fn callback(State(state): State<AppState>, Query(cb): Query<Callback>) -> impl IntoResponse {
+    let back = html_escape(&tr!("server-back-to-settings"));
     let (title, body) = match complete(&state, cb).await {
         Ok(a) => (
-            "Signed in to ChatGPT",
+            html_escape(&tr!("server-chatgpt-signed-in-title")),
             format!(
-                "<p>Hoard is signed in{}. AI tagging can use your ChatGPT plan now.</p>\
-                 <p><a href=\"/#settings/ai\">Back to Settings</a></p>",
-                a.email.map(|e| format!(" as {}", html_escape(&e))).unwrap_or_default()
+                "<p>{}</p><p><a href=\"/#settings/ai\">{back}</a></p>",
+                html_escape(&match a.email {
+                    Some(email) => tr!("server-chatgpt-signed-in-as", email = email),
+                    None => tr!("server-chatgpt-signed-in"),
+                })
             ),
         ),
         Err(e) => (
-            "Sign-in not finished",
+            html_escape(&tr!("server-chatgpt-not-finished-title")),
             format!(
-                "<p>{}</p><p>If you started the sign-in from Hoard on another computer, copy this page's address \
-                 from the address bar and paste it into Hoard's Settings there.</p>\
-                 <p><a href=\"/#settings/ai\">Back to Settings</a></p>",
-                html_escape(&sentence(&format!("{e:#}")))
+                "<p>{}</p><p>{}</p><p><a href=\"/#settings/ai\">{back}</a></p>",
+                html_escape(&sentence(&format!("{e:#}"))),
+                html_escape(&tr!("server-chatgpt-other-computer"))
             ),
         ),
     };

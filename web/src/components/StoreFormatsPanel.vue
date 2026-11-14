@@ -3,6 +3,7 @@
 // library none of them reads that look like a store's, and the wizard that teaches Hoard one.
 import { onMounted, ref, watch } from 'vue'
 import { api, type FilePlace, type StoreFormat, type StoreFormats } from '../api'
+import { t } from '../i18n'
 import { confirmDialog, showError, showOk } from '../ui'
 import { teach } from '../storeFormats'
 import FormatWizard from './FormatWizard.vue'
@@ -15,7 +16,7 @@ async function load() {
   try {
     data.value = await api.storeFormats()
   } catch (e) {
-    showError(`Couldn't load the store file formats: ${(e as Error).message}`)
+    showError(t('storefiles-load-failed', { error: (e as Error).message }))
   }
 }
 onMounted(load)
@@ -38,18 +39,18 @@ function done(saved: boolean) {
 
 async function remove(f: StoreFormat) {
   const ok = await confirmDialog({
-    title: `Remove ${f.name}?`,
-    body: `${f.file} is deleted from the data folder. Packs already read with it keep what it read.`,
-    confirm: 'Remove',
+    title: t('storefiles-remove-title', { name: f.name }),
+    body: t('storefiles-remove-body', { file: f.file }),
+    confirm: t('storefiles-remove'),
     danger: true,
   })
   if (!ok) return
   try {
     await api.removeStoreFormat(f.file)
-    showOk(`Removed ${f.name}.`)
+    showOk(t('storefiles-removed', { name: f.name }))
     void load()
   } catch (e) {
-    showError(`Couldn't remove ${f.name}: ${(e as Error).message}`)
+    showError(t('storefiles-remove-failed', { name: f.name, error: (e as Error).message }))
   }
 }
 </script>
@@ -59,38 +60,38 @@ async function remove(f: StoreFormat) {
     <FormatWizard v-if="open" :place="open.place" :format="open.format" @done="done" />
     <template v-else>
       <section>
-        <div class="sh"><h3>Files Hoard doesn’t read</h3></div>
-        <p v-if="!data" class="what">Loading…</p>
-        <p v-else-if="!data.unread.length" class="what none">None: no file in the library looks like an unread store’s.</p>
+        <div class="sh"><h3>{{ t('storefiles-unread') }}</h3></div>
+        <p v-if="!data" class="what">{{ t('storefiles-loading') }}</p>
+        <p v-else-if="!data.unread.length" class="what none">{{ t('storefiles-unread-none') }}</p>
         <template v-else>
-          <p class="what">Files in more than one pack, or named like a store’s, that no format reads.</p>
+          <p class="what">{{ t('storefiles-unread-what') }}</p>
           <ul class="list">
             <li v-for="u in data.unread" :key="u.name" :data-file="u.name">
               <span class="mono grow">{{ u.name }}</span>
-              <span class="n">{{ u.packs.toLocaleString() }} {{ u.packs === 1 ? 'pack' : 'packs' }}</span>
-              <span class="ex grow" :title="u.example.path">e.g. {{ u.example.pack_name }}</span>
-              <button type="button" class="btn ghost small" @click="open = { place: u.example }">Teach Hoard this file</button>
+              <span class="n">{{ t('storefiles-unread-packs', { count: u.packs }) }}</span>
+              <span class="ex grow" :title="u.example.path">{{ t('storefiles-unread-example', { pack: u.example.pack_name }) }}</span>
+              <button type="button" class="btn ghost small" @click="open = { place: u.example }">{{ t('storefiles-teach') }}</button>
             </li>
           </ul>
         </template>
       </section>
 
       <section>
-        <div class="sh"><h3>Formats</h3></div>
+        <div class="sh"><h3>{{ t('storefiles-formats') }}</h3></div>
         <p class="what">
-          Yours are tried first and take the place of a built-in one of the same name.
-          <template v-if="data?.dir">They’re kept in <span class="mono">{{ data.dir }}</span>.</template>
+          {{ t('storefiles-formats-what') }}
+          <template v-if="data?.dir">{{ t('storefiles-dir-before') }} <span class="mono">{{ data.dir }}</span>{{ t('storefiles-dir-after') }}</template>
         </p>
         <ul v-if="data" class="list">
           <li v-for="f in data.formats" :key="f.file + f.custom" :data-format="f.name">
             <span class="grow">{{ f.name }}</span>
             <span class="n mono">{{ f.file }}</span>
-            <span class="tag" :class="{ yours: f.custom }">{{ f.custom ? 'Yours' : 'Built in' }}</span>
+            <span class="tag" :class="{ yours: f.custom }">{{ f.custom ? t('storefiles-yours') : t('storefiles-built-in') }}</span>
             <template v-if="f.custom">
-              <button type="button" class="btn ghost small" @click="open = { format: f }">Edit</button>
-              <button type="button" class="btn ghost small" @click="remove(f)">Remove</button>
+              <button type="button" class="btn ghost small" @click="open = { format: f }">{{ t('storefiles-edit') }}</button>
+              <button type="button" class="btn ghost small" @click="remove(f)">{{ t('storefiles-remove') }}</button>
             </template>
-            <button v-else type="button" class="btn ghost small" @click="open = { format: f }">Start from this</button>
+            <button v-else type="button" class="btn ghost small" @click="open = { format: f }">{{ t('storefiles-start-from') }}</button>
           </li>
         </ul>
       </section>

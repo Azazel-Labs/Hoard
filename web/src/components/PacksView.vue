@@ -8,6 +8,7 @@ import { confirmDialog, undoable } from '../ui'
 import { archiveWithUndo } from '../archive'
 import { mayEdit } from '../auth'
 import { canDrawThumbs, cancelThumbRun, makePackThumbs, thumbRun } from '../browserThumbs'
+import { formatDate, t } from '../i18n'
 
 const props = defineProps<{ packs: Pack[]; stats: Stats | null; collections: Collection[] }>()
 
@@ -139,7 +140,7 @@ async function savePackRename(p: Pack) {
     await api.renamePack(p.id, name)
     emit('changed')
   } catch (e) {
-    emit('error', `Couldn't rename: ${(e as Error).message}`)
+    emit('error', t('packs-rename-failed', { error: (e as Error).message }))
   }
 }
 const emit = defineEmits<{ browse: [Pack]; browseCollection: [Collection]; changed: []; error: [string] }>()
@@ -159,11 +160,11 @@ async function saveRename(c: Collection) {
     await api.updateCollection(c.id, { name })
     emit('changed')
   } catch (e) {
-    emit('error', `Couldn't rename: ${(e as Error).message}`)
+    emit('error', t('packs-rename-failed', { error: (e as Error).message }))
   }
 }
 function removeCollection(c: Collection) {
-  undoable(`Deleted the collection ${c.name}`, {
+  undoable(t('packs-collection-deleted', { name: c.name }), {
     apply: () => hidden.add(c.id),
     revert: () => hidden.delete(c.id),
     commit: async () => {
@@ -172,18 +173,21 @@ function removeCollection(c: Collection) {
         emit('changed')
       } catch (e) {
         hidden.delete(c.id)
-        emit('error', `Couldn't delete: ${(e as Error).message}`)
+        emit('error', t('packs-delete-failed', { error: (e as Error).message }))
       }
     },
   })
 }
 
-const statusText: Record<Pack['status'], string> = {
-  uploading: 'Uploading (files received so far)',
-  ingesting: 'Unpacking and tagging',
-  analyzing: 'LLM is tagging',
-  ready: 'Ready',
-  failed: 'Failed',
+function statusText(status: Pack['status']): string {
+  switch (status) {
+    case 'uploading': return t('packs-status-uploading')
+    case 'ingesting': return t('packs-status-ingesting')
+    case 'analyzing': return t('packs-status-analyzing')
+    case 'ready': return t('packs-status-ready')
+    case 'failed': return t('packs-status-failed')
+  }
+  return status
 }
 
 function progress(p: Pack): number {
@@ -195,7 +199,7 @@ async function retag(p: Pack, llm: boolean) {
     await api.retagPack(p.id, llm ? { rules: false, llm: true } : { rules: true, llm: false })
     emit('changed')
   } catch (e) {
-    emit('error', `Couldn't start retagging: ${(e as Error).message}`)
+    emit('error', t('packs-retag-failed', { error: (e as Error).message }))
   }
 }
 
@@ -204,7 +208,7 @@ async function readFiles(p: Pack) {
     await api.readPackFiles(p.id)
     emit('changed')
   } catch (e) {
-    emit('error', `Couldn't read the pack's files: ${(e as Error).message}`)
+    emit('error', t('packs-read-files-failed', { error: (e as Error).message }))
   }
 }
 
@@ -234,7 +238,7 @@ async function editContext(p: Pack) {
     // No store page yet: look for one straight away.
     if (!draft.store_url) findInStores(p)
   } catch (e) {
-    emit('error', `Couldn't load the pack's store details: ${(e as Error).message}`)
+    emit('error', t('packs-context-load-failed', { error: (e as Error).message }))
   }
 }
 
@@ -276,12 +280,12 @@ async function notThisOne(p: Pack) {
     emit('changed')
     findInStores(p)
   } catch (e) {
-    emit('error', `Couldn't take off the store page: ${(e as Error).message}`)
+    emit('error', t('packs-undo-store-failed', { error: (e as Error).message }))
   }
 }
 
 function day(at: string) {
-  return new Date(at).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' })
+  return formatDate(at, { day: 'numeric', month: 'short', year: 'numeric' })
 }
 
 async function saveContext(p: Pack, thenRetag: boolean) {
@@ -293,7 +297,7 @@ async function saveContext(p: Pack, thenRetag: boolean) {
     editing.value = null
     emit('changed')
   } catch (e) {
-    emit('error', `Couldn't save store details: ${(e as Error).message}`)
+    emit('error', t('packs-context-save-failed', { error: (e as Error).message }))
   } finally {
     saving.value = false
   }
@@ -317,15 +321,15 @@ async function openUnreal(p: Pack) {
     unrealOpen.value = p.id
     editing.value = null
   } catch (e) {
-    emit('error', `Couldn't load the Unreal conversion status: ${(e as Error).message}`)
+    emit('error', t('packs-unreal-load-failed', { error: (e as Error).message }))
   }
 }
 
 async function convertUnreal(p: Pack) {
   if (unrealOpts.discard_originals && !(await confirmDialog({
-    title: 'Discard the originals?',
-    body: `The original .uasset files in ${p.name} go once converted. Unreal-only data in them, such as material graphs, is lost for good.`,
-    confirm: 'Convert and discard',
+    title: t('packs-unreal-discard-title'),
+    body: t('packs-unreal-discard-body', { name: p.name }),
+    confirm: t('packs-unreal-discard-confirm'),
     danger: true,
   }))) return
   unrealBusy.value = true
@@ -334,7 +338,7 @@ async function convertUnreal(p: Pack) {
     unrealOpen.value = null
     emit('changed')
   } catch (e) {
-    emit('error', `Couldn't start the conversion: ${(e as Error).message}`)
+    emit('error', t('packs-unreal-convert-failed', { error: (e as Error).message }))
   } finally {
     unrealBusy.value = false
   }
@@ -343,15 +347,25 @@ async function convertUnreal(p: Pack) {
 function unrealFact(p: Pack): string {
   const left = p.unreal_packages ?? 0
   const done = p.unreal_converted ?? 0
-  if (!left) return `${done.toLocaleString()} converted from Unreal`
-  if (!done) return `${left.toLocaleString()} Unreal ${left === 1 ? 'package' : 'packages'}`
-  return `${done.toLocaleString()} converted from Unreal, ${left.toLocaleString()} still packages`
+  if (!left) return t('packs-unreal-fact-converted', { done })
+  if (!done) return t('packs-unreal-fact-packages', { left })
+  return t('packs-unreal-fact-both', { done, left })
+}
+
+/** What a finished "Make thumbnails in this browser" run did. */
+function thumbSummary(): string {
+  const lead = thumbRun.done < thumbRun.total
+    ? t('packs-thumbs-cancelled', { done: thumbRun.done, total: thumbRun.total })
+    : t('packs-thumbs-drew', { count: thumbRun.total })
+  return thumbRun.failed
+    ? t('packs-thumbs-result-failed', { lead, improved: thumbRun.improved, failed: thumbRun.failed })
+    : t('packs-thumbs-result', { lead, improved: thumbRun.improved })
 }
 
 /** To the archive (Undo on the toast brings it back); it's deleted for good from there. */
 async function archive(p: Pack) {
   hidden.add(p.id)
-  const ok = await archiveWithUndo(`Archived ${p.name} and its ${p.asset_count.toLocaleString()} assets`, { packs: [p.id] }, () => {
+  const ok = await archiveWithUndo(t('packs-archived', { name: p.name, count: p.asset_count }), { packs: [p.id] }, () => {
     hidden.delete(p.id)
     emit('changed')
   })
@@ -362,14 +376,14 @@ async function archive(p: Pack) {
 <template>
   <div class="packs">
     <p v-if="stats?.blobs_bad" class="summary">
-      <strong class="bad">{{ stats.blobs_bad }} files failed their last integrity check.</strong>
+      <strong class="bad">{{ t('packs-blobs-bad', { count: stats.blobs_bad }) }}</strong>
     </p>
 
-    <section v-if="visibleCollections.length" class="colsec" aria-label="Collections">
-      <h2>Collections</h2>
+    <section v-if="visibleCollections.length" class="colsec" :aria-label="t('packs-collections')">
+      <h2>{{ t('packs-collections') }}</h2>
       <ul class="cols">
         <li v-for="c in visibleCollections" :key="c.id">
-          <button type="button" class="cover checker" :aria-label="`Browse ${c.name}`" tabindex="-1" @click="$emit('browseCollection', c)">
+          <button type="button" class="cover checker" :aria-label="t('packs-browse-named', { name: c.name })" tabindex="-1" @click="$emit('browseCollection', c)">
             <img
               v-for="(id, i) in c.preview"
               :key="id"
@@ -382,49 +396,49 @@ async function archive(p: Pack) {
           </button>
           <div class="body">
             <form v-if="renaming === c.id" class="rename" @submit.prevent="saveRename(c)">
-              <label class="visually-hidden" :for="`rename-${c.id}`">Collection name</label>
+              <label class="visually-hidden" :for="`rename-${c.id}`">{{ t('packs-collection-name') }}</label>
               <input :id="`rename-${c.id}`" v-model="nameDraft" class="field" @keydown.esc="renaming = null" />
-              <button class="btn primary" type="submit">Save</button>
-              <button class="btn ghost" type="button" @click="renaming = null">Cancel</button>
+              <button class="btn primary" type="submit">{{ t('packs-save') }}</button>
+              <button class="btn ghost" type="button" @click="renaming = null">{{ t('packs-cancel') }}</button>
             </form>
             <button v-else type="button" class="name" @click="$emit('browseCollection', c)">{{ c.name }}</button>
             <p v-if="c.description" class="desc">{{ c.description }}</p>
             <div class="facts">
-              <span>{{ c.asset_count.toLocaleString() }} {{ c.asset_count === 1 ? 'asset' : 'assets' }}</span>
+              <span>{{ t('packs-assets', { count: c.asset_count }) }}</span>
               <span>{{ humanBytes(c.total_bytes) }}</span>
-              <span>Updated {{ new Date(c.updated_at).toLocaleDateString() }}</span>
+              <span>{{ t('packs-updated', { date: formatDate(c.updated_at) }) }}</span>
             </div>
             <div class="actions">
-              <button class="btn" type="button" @click="$emit('browseCollection', c)">Browse</button>
-              <a v-if="c.asset_count" class="btn ghost" :href="collectionZipUrl(c.id)">Download (.zip)</a>
-              <a v-if="c.asset_count" class="btn ghost" :href="collectionCreditsUrl(c.id)" download="CREDITS.md" title="Who made the packs these assets come from, their licenses and the credit lines they ask for">Credits</a>
+              <button class="btn" type="button" @click="$emit('browseCollection', c)">{{ t('packs-browse') }}</button>
+              <a v-if="c.asset_count" class="btn ghost" :href="collectionZipUrl(c.id)">{{ t('packs-collection-download') }}</a>
+              <a v-if="c.asset_count" class="btn ghost" :href="collectionCreditsUrl(c.id)" download="CREDITS.md" :title="t('packs-collection-credits-title')">{{ t('packs-collection-credits') }}</a>
               <template v-if="editor">
-                <button class="btn ghost" type="button" @click="startRename(c)">Rename</button>
-                <button class="btn ghost danger" type="button" @click="removeCollection(c)">Delete</button>
+                <button class="btn ghost" type="button" @click="startRename(c)">{{ t('packs-rename') }}</button>
+                <button class="btn ghost danger" type="button" @click="removeCollection(c)">{{ t('packs-delete') }}</button>
               </template>
             </div>
           </div>
         </li>
       </ul>
-      <h2>Packs</h2>
+      <h2>{{ t('packs-packs') }}</h2>
     </section>
 
-    <p v-if="visiblePacks.length === 0" class="empty">No packs yet. Drop a zip or a folder anywhere on this page to add one.</p>
+    <p v-if="visiblePacks.length === 0" class="empty">{{ t('packs-empty') }}</p>
     <div v-else class="finder" role="search">
       <div class="find">
-        <label class="visually-hidden" for="pack-q">Find a pack</label>
-        <input id="pack-q" v-model="query" class="field" type="search" placeholder="Find a pack by name, store, license or tag" />
-        <label class="visually-hidden" for="pack-sort">Order</label>
+        <label class="visually-hidden" for="pack-q">{{ t('packs-find') }}</label>
+        <input id="pack-q" v-model="query" class="field" type="search" :placeholder="t('packs-find-placeholder')" />
+        <label class="visually-hidden" for="pack-sort">{{ t('packs-sort') }}</label>
         <select id="pack-sort" v-model="sort" class="field narrow">
-          <option value="new">Newest first</option>
-          <option value="old">Oldest first</option>
-          <option value="name">By name</option>
-          <option value="size">Biggest first</option>
-          <option value="assets">Most assets first</option>
+          <option value="new">{{ t('packs-sort-new') }}</option>
+          <option value="old">{{ t('packs-sort-old') }}</option>
+          <option value="name">{{ t('packs-sort-name') }}</option>
+          <option value="size">{{ t('packs-sort-size') }}</option>
+          <option value="assets">{{ t('packs-sort-assets') }}</option>
         </select>
       </div>
       <div class="filters">
-        <div v-if="kindsPresent.length > 1" class="chips" role="group" aria-label="Packs with">
+        <div v-if="kindsPresent.length > 1" class="chips" role="group" :aria-label="t('packs-with-kind')">
           <button
             v-for="k in kindsPresent"
             :key="k"
@@ -435,30 +449,30 @@ async function archive(p: Pack) {
             @click="kind = kind === k ? '' : k"
           >{{ KIND_LABEL[k] }}</button>
         </div>
-        <label class="visually-hidden" for="pack-state">Status</label>
+        <label class="visually-hidden" for="pack-state">{{ t('packs-state') }}</label>
         <select id="pack-state" v-model="state" class="field narrow">
-          <option value="">Any status</option>
-          <option value="working">Working on</option>
-          <option value="failed">Failed</option>
-          <option value="untagged">Not described yet</option>
+          <option value="">{{ t('packs-state-any') }}</option>
+          <option value="working">{{ t('packs-state-working') }}</option>
+          <option value="failed">{{ t('packs-state-failed') }}</option>
+          <option value="untagged">{{ t('packs-state-untagged') }}</option>
         </select>
-        <label class="visually-hidden" for="pack-store">Store</label>
+        <label class="visually-hidden" for="pack-store">{{ t('packs-store') }}</label>
         <select id="pack-store" v-model="store" class="field narrow">
-          <option value="">Any store</option>
-          <option v-for="s in stores" :key="s" :value="s">From {{ s }}</option>
-          <option value="none">No store page</option>
+          <option value="">{{ t('packs-store-any') }}</option>
+          <option v-for="s in stores" :key="s" :value="s">{{ t('packs-store-from', { store: s }) }}</option>
+          <option value="none">{{ t('packs-store-none') }}</option>
         </select>
-        <span v-if="filtering" class="muted">{{ shown.length.toLocaleString() }} of {{ visiblePacks.length.toLocaleString() }}</span>
-        <button v-if="filtering" type="button" class="btn ghost" @click="clearFinding">Clear</button>
+        <span v-if="filtering" class="muted">{{ t('packs-shown-of', { shown: shown.length, total: visiblePacks.length }) }}</span>
+        <button v-if="filtering" type="button" class="btn ghost" @click="clearFinding">{{ t('packs-clear') }}</button>
       </div>
     </div>
     <p v-if="visiblePacks.length && !shown.length" class="empty">
-      No packs match. <button type="button" class="linkish" @click="clearFinding">Clear the search and filters</button>
+      {{ t('packs-no-match') }} <button type="button" class="linkish" @click="clearFinding">{{ t('packs-clear-all') }}</button>
     </p>
 
     <ul>
       <li v-for="p in rendered" :key="p.id" :class="[`st-${p.status}`, { flash: justReady.has(p.id) }]">
-        <button type="button" class="cover checker" :aria-label="`Browse ${p.name}`" tabindex="-1" @click="$emit('browse', p)">
+        <button type="button" class="cover checker" :aria-label="t('packs-browse-named', { name: p.name })" tabindex="-1" @click="$emit('browse', p)">
           <img
               v-for="(id, i) in p.preview"
               :key="id"
@@ -471,14 +485,14 @@ async function archive(p: Pack) {
         </button>
         <div class="body">
         <form v-if="renamingPack === p.id" class="rename" @submit.prevent="savePackRename(p)">
-          <label class="visually-hidden" :for="`prename-${p.id}`">Pack name</label>
+          <label class="visually-hidden" :for="`prename-${p.id}`">{{ t('packs-pack-name') }}</label>
           <input :id="`prename-${p.id}`" v-model="packName" v-focus class="field" maxlength="200" @keydown.esc="renamingPack = null" />
-          <button class="btn primary" type="submit">Save</button>
-          <button class="btn ghost" type="button" @click="renamingPack = null">Cancel</button>
+          <button class="btn primary" type="submit">{{ t('packs-save') }}</button>
+          <button class="btn ghost" type="button" @click="renamingPack = null">{{ t('packs-cancel') }}</button>
         </form>
         <div v-else class="head">
           <button type="button" class="name" @click="$emit('browse', p)">{{ p.name }}</button>
-          <span class="status">{{ statusText[p.status] }}</span>
+          <span class="status">{{ statusText(p.status) }}</span>
         </div>
         <div
           v-if="p.status === 'uploading' || p.status === 'ingesting' || p.status === 'analyzing'"
@@ -494,118 +508,109 @@ async function archive(p: Pack) {
         <div v-if="thumbRun.packId === p.id" class="thumbrun" role="status">
           <template v-if="thumbRun.running">
             <span>
-              Drawing thumbnails in this browser<template v-if="thumbRun.total">: {{ thumbRun.done }} of {{ thumbRun.total }}</template>…
+              {{ thumbRun.total ? t('packs-thumbs-drawing-count', { done: thumbRun.done, total: thumbRun.total }) : t('packs-thumbs-drawing') }}
               <span v-if="thumbRun.current" class="dim">{{ thumbRun.current }}</span>
             </span>
-            <button class="btn ghost" type="button" @click="cancelThumbRun">Cancel</button>
+            <button class="btn ghost" type="button" @click="cancelThumbRun">{{ t('packs-cancel') }}</button>
             <div class="bar" :class="{ indeterminate: !thumbRun.total }" role="progressbar" aria-valuemin="0" aria-valuemax="100"
               :aria-valuenow="thumbRun.total ? Math.round((thumbRun.done / thumbRun.total) * 100) : undefined">
               <span :style="{ width: `${thumbRun.total ? (thumbRun.done / thumbRun.total) * 100 : 0}%` }" />
             </div>
           </template>
           <template v-else>
-            <span v-if="thumbRun.error" class="bad">Stopped: {{ thumbRun.error }}</span>
-            <span v-else-if="!thumbRun.total">Every model here already has a thumbnail drawn with all its textures.</span>
-            <span v-else>
-              {{ thumbRun.done < thumbRun.total ? `Cancelled after ${thumbRun.done} of ${thumbRun.total}` : `Drew ${thumbRun.total} ${thumbRun.total === 1 ? 'model' : 'models'}` }}:
-              {{ thumbRun.improved }} {{ thumbRun.improved === 1 ? 'thumbnail' : 'thumbnails' }} replaced<template v-if="thumbRun.failed">, {{ thumbRun.failed }} couldn't be drawn</template>.
-            </span>
-            <button class="btn ghost" type="button" @click="thumbRun.packId = ''">Dismiss</button>
+            <span v-if="thumbRun.error" class="bad">{{ t('packs-thumbs-stopped', { error: thumbRun.error }) }}</span>
+            <span v-else-if="!thumbRun.total">{{ t('packs-thumbs-none') }}</span>
+            <span v-else>{{ thumbSummary() }}</span>
+            <button class="btn ghost" type="button" @click="thumbRun.packId = ''">{{ t('packs-dismiss') }}</button>
           </template>
         </div>
         <p v-if="p.description" class="desc">{{ p.description }}</p>
         <p v-if="p.error" class="error">{{ p.error }}</p>
         <div class="facts">
-          <span>{{ p.asset_count.toLocaleString() }} assets</span>
+          <span>{{ t('packs-assets', { count: p.asset_count }) }}</span>
           <span>{{ humanBytes(p.total_bytes) }}</span>
-          <span>License: {{ p.license ?? 'not found' }}{{ p.license_tier ? ` (${p.license_tier})` : '' }}</span>
+          <span>{{ p.license_tier ? t('packs-license-tier', { license: p.license ?? t('packs-license-not-found'), tier: p.license_tier }) : t('packs-license', { license: p.license ?? t('packs-license-not-found') }) }}</span>
           <span v-if="p.store">
-            From <a v-if="p.store_url" :href="p.store_url" target="_blank" rel="noopener noreferrer">{{ p.store }}</a><template v-else>{{ p.store }}</template>
+            {{ t('packs-from-before') }} <a v-if="p.store_url" :href="p.store_url" target="_blank" rel="noopener noreferrer">{{ p.store }}</a><template v-else>{{ p.store }}</template>{{ t('packs-from-after') }}
           </span>
           <span v-if="p.unreal_packages || p.unreal_converted">{{ unrealFact(p) }}</span>
-          <span>Added {{ new Date(p.created_at).toLocaleDateString() }}</span>
+          <span>{{ t('packs-added', { date: formatDate(p.created_at) }) }}</span>
         </div>
         <div class="actions">
-          <button class="btn" type="button" @click="$emit('browse', p)">Browse</button>
-          <a class="btn ghost" :href="packZipUrl(p.id)">Download pack (.zip)</a>
-          <button v-if="editor" class="btn ghost" type="button" :aria-expanded="editing === p.id" @click="editContext(p)">Store details</button>
+          <button class="btn" type="button" @click="$emit('browse', p)">{{ t('packs-browse') }}</button>
+          <a class="btn ghost" :href="packZipUrl(p.id)">{{ t('packs-download') }}</a>
+          <button v-if="editor" class="btn ghost" type="button" :aria-expanded="editing === p.id" @click="editContext(p)">{{ t('packs-store-details') }}</button>
           <details class="menu">
-            <summary class="btn ghost" :aria-label="`More actions for ${p.name}`">More</summary>
+            <summary class="btn ghost" :aria-label="t('packs-more-named', { name: p.name })">{{ t('packs-more') }}</summary>
             <div class="menu-items" @click="($event.currentTarget as HTMLElement).closest('details')?.removeAttribute('open')">
               <template v-if="editor">
-              <button type="button" @click="startPackRename(p)">Rename…</button>
+              <button type="button" @click="startPackRename(p)">{{ t('packs-rename-more') }}</button>
               <button type="button" :disabled="p.status !== 'ready' && p.status !== 'failed'" @click="retag(p, false)">
-                Re-run offline tagger
+                {{ t('packs-retag-rules') }}
               </button>
               <button v-if="stats?.llm_enabled" type="button" :disabled="p.status !== 'ready'" @click="retag(p, true)">
-                Re-run LLM tagger
+                {{ t('packs-retag-llm') }}
               </button>
               <button
                 v-if="canDrawThumbs() && (!p.kinds || p.kinds.model || p.kinds.animation)"
                 type="button"
                 :disabled="thumbRun.running || p.status !== 'ready'"
-                title="Open each model in a 3D viewer out of sight, one at a time, and use its picture as the thumbnail where that's better than the server's"
+                :title="t('packs-make-thumbs-title')"
                 @click="makePackThumbs(p.id, p.name)"
               >
-                Make thumbnails in this browser
+                {{ t('packs-make-thumbs') }}
               </button>
               <button type="button" :disabled="p.status !== 'ready'" @click="readFiles(p)">
-                Read the pack's files again
+                {{ t('packs-read-files') }}
               </button>
               </template>
-              <a :href="packCreditsUrl(p.id)" download="CREDITS.md" title="CREDITS.md: who made the pack, its license and the credit line it asks for">Download credits</a>
+              <a :href="packCreditsUrl(p.id)" download="CREDITS.md" :title="t('packs-credits-title')">{{ t('packs-credits') }}</a>
               <button v-if="editor && (p.unreal_packages || p.unreal_converted)" type="button" @click="openUnreal(p)">
-                Convert Unreal content…
+                {{ t('packs-unreal-open') }}
               </button>
-              <button v-if="editor" type="button" class="danger" @click="archive(p)">Archive pack</button>
+              <button v-if="editor" type="button" class="danger" @click="archive(p)">{{ t('packs-archive') }}</button>
             </div>
           </details>
         </div>
         <form v-if="unrealOpen === p.id && unrealStatus" class="context unreal" @submit.prevent="convertUnreal(p)">
-          <p class="hint">
-            Hoard reads Unreal packages itself and stores what's inside as ordinary files: textures as PNG or EXR,
-            sounds as WAV, materials as JSON. The converted file takes the package's place, keeping its tags, links
-            and collections.
-          </p>
+          <p class="hint">{{ t('packs-unreal-intro') }}</p>
           <ul class="ustats">
-            <li><strong>{{ unrealStatus.converted }}</strong> converted<template v-if="unrealStatus.originals_kept">, {{ unrealStatus.originals_kept }} with the original kept</template></li>
-            <li v-if="unrealStatus.pending"><strong>{{ unrealStatus.pending }}</strong> not looked at yet</li>
-            <li v-if="unrealStatus.needs_editor"><strong>{{ unrealStatus.needs_editor }}</strong> waiting for Unreal Editor</li>
-            <li v-if="unrealStatus.unsupported"><strong>{{ unrealStatus.unsupported }}</strong> with no common format</li>
-            <li v-if="unrealStatus.failed" class="bad"><strong>{{ unrealStatus.failed }}</strong> failed</li>
+            <li><strong>{{ unrealStatus.converted }}</strong> {{ unrealStatus.originals_kept ? t('packs-unreal-converted-kept', { count: unrealStatus.converted, kept: unrealStatus.originals_kept }) : t('packs-unreal-converted', { count: unrealStatus.converted }) }}</li>
+            <li v-if="unrealStatus.pending"><strong>{{ unrealStatus.pending }}</strong> {{ t('packs-unreal-pending', { count: unrealStatus.pending }) }}</li>
+            <li v-if="unrealStatus.needs_editor"><strong>{{ unrealStatus.needs_editor }}</strong> {{ t('packs-unreal-needs-editor', { count: unrealStatus.needs_editor }) }}</li>
+            <li v-if="unrealStatus.unsupported"><strong>{{ unrealStatus.unsupported }}</strong> {{ t('packs-unreal-unsupported', { count: unrealStatus.unsupported }) }}</li>
+            <li v-if="unrealStatus.failed" class="bad"><strong>{{ unrealStatus.failed }}</strong> {{ t('packs-unreal-failed', { count: unrealStatus.failed }) }}</li>
           </ul>
           <details v-if="unrealStatus.reasons.length">
-            <summary>Why packages are left</summary>
+            <summary>{{ t('packs-unreal-reasons') }}</summary>
             <ul class="reasons">
               <li v-for="[why, n] in unrealStatus.reasons" :key="why"><span class="mono">{{ n }}×</span> {{ why }}</li>
             </ul>
           </details>
           <p v-if="unrealStatus.needs_editor" class="hint">
-            Meshes and animations need Unreal Editor. On a machine with Unreal installed, run
-            <span class="mono">hoard unreal-worker --editor &lt;path to UnrealEditor-Cmd&gt;</span>; it exports
-            them as FBX and uploads the results here.
+            {{ t('packs-unreal-editor-before') }}
+            <span class="mono">{{ t('packs-unreal-editor-command') }}</span>{{ t('packs-unreal-editor-after') }}
           </p>
           <label class="check">
             <input v-model="unrealOpts.discard_originals" type="checkbox" />
-            <span>Discard the original .uasset files once converted<small>Frees the space. Unreal-only data, such as material graphs, is lost.</small></span>
+            <span>{{ t('packs-unreal-discard') }}<small>{{ t('packs-unreal-discard-hint') }}</small></span>
           </label>
           <label class="check">
             <input v-model="unrealOpts.drop_unsupported" type="checkbox" />
-            <span>Delete packages with no common format<small>Blueprints, levels and other engine-only assets.</small></span>
+            <span>{{ t('packs-unreal-drop') }}<small>{{ t('packs-unreal-drop-hint') }}</small></span>
           </label>
           <div class="actions">
-            <button class="btn primary" type="submit" :disabled="unrealBusy">Convert</button>
-            <button class="btn ghost" type="button" @click="unrealOpen = null">Cancel</button>
+            <button class="btn primary" type="submit" :disabled="unrealBusy">{{ t('packs-unreal-convert') }}</button>
+            <button class="btn ghost" type="button" @click="unrealOpen = null">{{ t('packs-cancel') }}</button>
           </div>
         </form>
         <form v-if="editing === p.id" class="context" @submit.prevent="saveContext(p, false)">
           <p class="hint">
-            Where the pack came from and what the seller says about it. The LLM tagger reads this with every file,
-            so a store blurb like "120 ice and fire spells" helps it name <span class="mono">spell35.wav</span>.
+            {{ t('packs-context-hint-before') }} <span class="mono">spell35.wav</span>{{ t('packs-context-hint-after') }}
           </p>
           <p v-if="draft.store_auto" class="auto">
-            <span>Found automatically: the pack names this page itself.</span>
-            <button class="btn ghost" type="button" @click="notThisOne(p)">Not this one</button>
+            <span>{{ t('packs-store-auto') }}</span>
+            <button class="btn ghost" type="button" @click="notThisOne(p)">{{ t('packs-store-not-this') }}</button>
           </p>
           <section v-if="lookup.open" class="lookup" :aria-busy="lookup.loading">
             <div class="find">
@@ -613,23 +618,23 @@ async function archive(p: Pack) {
                 v-model="lookup.q"
                 class="field"
                 type="search"
-                aria-label="Search the stores for"
-                placeholder="The pack's name in the store"
+                :aria-label="t('packs-lookup-label')"
+                :placeholder="t('packs-lookup-placeholder')"
                 @keydown.enter.prevent="findInStores(p, lookup.q)"
               />
               <button class="btn" type="button" :disabled="lookup.loading" @click="findInStores(p, lookup.q)">
-                {{ lookup.loading ? 'Searching…' : 'Search stores' }}
+                {{ lookup.loading ? t('packs-lookup-searching') : t('packs-lookup-search') }}
               </button>
-              <button class="btn ghost" type="button" @click="lookup.open = false">Hide</button>
+              <button class="btn ghost" type="button" @click="lookup.open = false">{{ t('packs-lookup-hide') }}</button>
             </div>
             <p v-if="lookup.error" class="err">{{ lookup.error }}</p>
             <template v-else-if="lookup.result">
               <p v-if="lookup.result.clues.length || lookup.result.also.length" class="hint">
-                <template v-if="lookup.result.clues.length">From the pack’s files: {{ lookup.result.clues.join(' · ') }}. </template>
-                <template v-if="lookup.result.also.length">Also searched {{ lookup.result.also.map((q) => `“${q}”`).join(', ') }}.</template>
+                <template v-if="lookup.result.clues.length">{{ t('packs-lookup-clues', { clues: lookup.result.clues.join(' · ') }) }} </template>
+                <template v-if="lookup.result.also.length">{{ t('packs-lookup-also', { queries: lookup.result.also.map((q) => t('packs-lookup-quoted', { query: q })).join(', ') }) }}</template>
               </p>
               <p v-if="!lookup.result.matches.length" class="hint">
-                Nothing on Fab, itch.io, Kenney or OpenGameArt looks like it. Try fewer or different words.
+                {{ t('packs-lookup-nothing') }}
               </p>
               <ul v-else class="matches">
                 <li v-for="m in lookup.result.matches" :key="m.url">
@@ -641,51 +646,51 @@ async function archive(p: Pack) {
                     <span v-if="m.summary" class="meta clamp">{{ m.summary }}</span>
                     <span v-for="w in m.why ?? []" :key="w" class="why">{{ w }}</span>
                   </div>
-                  <button class="btn" type="button" @click="useMatch(m)">Use</button>
+                  <button class="btn" type="button" @click="useMatch(m)">{{ t('packs-lookup-use') }}</button>
                 </li>
               </ul>
               <p class="hint">
                 <template v-if="lookup.result.searched_at">
-                  Searched {{ day(lookup.result.searched_at) }}.
-                  <button class="again" type="button" :disabled="lookup.loading" @click="findInStores(p, undefined, true)">Search again</button>.
+                  {{ t('packs-lookup-searched', { date: day(lookup.result.searched_at) }) }}
+                  <button class="again" type="button" :disabled="lookup.loading" @click="findInStores(p, undefined, true)">{{ t('packs-lookup-again') }}</button>{{ t('packs-lookup-again-after') }}
                 </template>
-                <template v-if="lookup.result.failed.length">Couldn't reach {{ lookup.result.failed.join(', ') }} this time. </template>
-                Also look on
+                <template v-if="lookup.result.failed.length">{{ t('packs-lookup-unreachable', { stores: lookup.result.failed.join(', ') }) }} </template>
+                {{ t('packs-lookup-also-look') }}
                 <template v-for="(l, i) in lookup.result.links" :key="l.store">
-                  <a :href="l.url" target="_blank" rel="noopener noreferrer">{{ l.store }}</a>{{ i < lookup.result.links.length - 1 ? ' and ' : '' }}
+                  <a :href="l.url" target="_blank" rel="noopener noreferrer">{{ l.store }}</a>{{ i < lookup.result.links.length - 1 ? t('packs-lookup-links-and') : '' }}
                 </template>
-                (they can only be searched in your browser); paste the page's address below.
+                {{ t('packs-lookup-browser-only') }}
               </p>
             </template>
           </section>
           <button v-else class="btn ghost find-again" type="button" @click="lookup.result ? (lookup.open = true) : findInStores(p)">
-            Find in stores…
+            {{ t('packs-lookup-open') }}
           </button>
           <div class="row">
-            <label>Store <input v-model="draft.store" class="field" placeholder="Fab, itch.io, Humble Bundle…" /></label>
-            <label>Seller <input v-model="draft.seller" class="field" placeholder="Who made it" /></label>
+            <label>{{ t('packs-store') }} <input v-model="draft.store" class="field" :placeholder="t('packs-store-placeholder')" /></label>
+            <label>{{ t('packs-seller') }} <input v-model="draft.seller" class="field" :placeholder="t('packs-seller-placeholder')" /></label>
           </div>
           <div class="row">
-            <label>License <input v-model="draft.store_license" class="field" placeholder="Fab Standard License, CC BY 4.0…" /></label>
-            <label>License tier <input v-model="draft.license_tier" class="field" placeholder="Personal, Professional…" /></label>
+            <label>{{ t('packs-license-label') }} <input v-model="draft.store_license" class="field" :placeholder="t('packs-license-placeholder')" /></label>
+            <label>{{ t('packs-license-tier-label') }} <input v-model="draft.license_tier" class="field" :placeholder="t('packs-license-tier-placeholder')" /></label>
           </div>
-          <label>Store page
+          <label>{{ t('packs-store-page') }}
             <input v-model="draft.store_url" class="field" type="url" placeholder="https://…" />
           </label>
-          <label>Description from the store
-            <textarea v-model="draft.store_text" class="field" rows="5" placeholder="Paste the listing text, or leave empty to fetch it from the store page." />
+          <label>{{ t('packs-store-text') }}
+            <textarea v-model="draft.store_text" class="field" rows="5" :placeholder="t('packs-store-text-placeholder')" />
           </label>
-          <p v-if="draft.store_url && !draft.store_text" class="hint">Saving fetches the description from the store page.</p>
+          <p v-if="draft.store_url && !draft.store_text" class="hint">{{ t('packs-store-text-fetch') }}</p>
           <details v-if="draft.readme">
-            <summary>README found in the pack</summary>
+            <summary>{{ t('packs-readme') }}</summary>
             <pre>{{ draft.readme }}</pre>
           </details>
           <div class="actions">
-            <button class="btn primary" type="submit" :disabled="saving">Save</button>
+            <button class="btn primary" type="submit" :disabled="saving">{{ t('packs-save') }}</button>
             <button v-if="stats?.llm_enabled" class="btn" type="button" :disabled="saving || p.status !== 'ready'" @click="saveContext(p, true)">
-              Save and re-run LLM tagger
+              {{ t('packs-save-retag') }}
             </button>
-            <button class="btn ghost" type="button" @click="editing = null">Cancel</button>
+            <button class="btn ghost" type="button" @click="editing = null">{{ t('packs-cancel') }}</button>
           </div>
         </form>
         </div>

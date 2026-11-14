@@ -12,6 +12,8 @@ WORKDIR /web
 COPY web/package.json web/package-lock.json ./
 RUN npm ci
 COPY web/ ./
+# The catalogs, shared with the server (the portal reads them from ../locales).
+COPY locales /locales
 RUN npm run build
 
 # The pinned compiler (rust-toolchain.toml) and cargo-chef, which change almost never.
@@ -36,6 +38,9 @@ RUN cargo chef cook --release --locked --recipe-path recipe.json -p hoardd -p ho
 COPY Cargo.toml Cargo.lock rustfmt.toml clippy.toml ./
 COPY crates ./crates
 COPY xtask ./xtask
+# The server's build checks and embeds the catalogs.
+COPY locales ./locales
+COPY localization ./localization
 COPY tools/unreal_export.py ./tools/unreal_export.py
 # The version this build reports (CI passes the release tag's); empty means Cargo.toml's.
 ARG HOARD_VERSION=

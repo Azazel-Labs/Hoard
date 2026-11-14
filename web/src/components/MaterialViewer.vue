@@ -4,24 +4,38 @@
 // the background.
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import type { Asset, MapRole, MaterialInfo } from '../api'
-import { ROLE_LABEL, UNUSED_ROLES } from '../materials'
+import { formatNumber, t } from '../i18n'
+import { ROLE_LABEL, ROLE_NAME, UNUSED_ROLES } from '../materials'
 import { MaterialStage, SHAPES, type Shape } from '../materialStage'
 import { BACKGROUNDS, type Background } from '../modelStage'
 
 const props = defineProps<{ asset: Asset; material: MaterialInfo }>()
 const emit = defineEmits<{ close: [] }>()
 
-const BG_LABEL: Record<Background, string> = {
-  checker: 'Checker', dark: 'Dark', grey: 'Grey', light: 'Light', env: 'Environment',
+/** A background swatch's name, as read out: "Checker background". */
+function bgLabel(b: Background): string {
+  switch (b) {
+    case 'checker': return t('model-bg-checker')
+    case 'dark': return t('model-bg-dark')
+    case 'grey': return t('model-bg-grey')
+    case 'light': return t('model-bg-light')
+    case 'env': return t('model-bg-env')
+  }
 }
-const SHAPE_LABEL: Record<Shape, string> = { sphere: 'Sphere', cube: 'Cube', plane: 'Plane' }
+function shapeLabel(s: Shape): string {
+  switch (s) {
+    case 'sphere': return t('material-shape-sphere')
+    case 'cube': return t('material-shape-cube')
+    case 'plane': return t('material-shape-plane')
+  }
+}
 const REPEATS = [1, 2, 4, 8]
 /** How far each shape's map runs, in the viewer's units, which are metres at real size: the sphere is 2 m across
  * (its map runs from pole to pole, and twice as far around), the cube's side 1.5 m and the plane 2.4 m. */
 const EXTENT: Record<Shape, number> = { sphere: Math.PI, cube: 1.5, plane: 2.4 }
 
 /** `2` → "2 m", `0.5` → "50 cm". */
-const length = (m: number) => (m >= 1 ? `${+m.toFixed(2)} m` : `${+(m * 100).toFixed(1)} cm`)
+const length = (m: number) => (m >= 1 ? `${formatNumber(+m.toFixed(2))} m` : `${formatNumber(+(m * 100).toFixed(1))} cm`)
 
 const dlg = ref<HTMLDialogElement | null>(null)
 const host = ref<HTMLDivElement | null>(null)
@@ -127,20 +141,20 @@ function onKey(e: KeyboardEvent) {
 </script>
 
 <template>
-  <dialog ref="dlg" class="viewer" :aria-label="`View the material ${asset.name}`" @close="emit('close')" @keydown="onKey">
+  <dialog ref="dlg" class="viewer" :aria-label="t('material-dialog', { name: asset.name })" @close="emit('close')" @keydown="onKey">
     <header class="tools">
       <div class="title">
         <strong>{{ asset.name }}</strong>
         <span class="mono dim">
-          {{ material.maps.length }} {{ material.maps.length === 1 ? 'map' : 'maps' }}<template v-if="sizes"> · up to {{ sizes }}</template><template v-if="real"> · {{ realLabel }} a repeat</template>
+          {{ t('material-maps', { count: material.maps.length }) }}<template v-if="sizes"> · {{ t('material-up-to', { size: sizes }) }}</template><template v-if="real"> · {{ t('material-repeat-size', { size: realLabel }) }}</template>
         </span>
       </div>
-      <div class="group" role="group" aria-label="Shape">
+      <div class="group" role="group" :aria-label="t('material-group-shape')">
         <button
           v-for="(s, i) in SHAPES"
           :key="s"
           type="button"
-          :title="`${SHAPE_LABEL[s]} (${i + 1})`"
+          :title="t('material-shape-title', { shape: shapeLabel(s), key: i + 1 })"
           :aria-pressed="shape === s"
           :disabled="status !== 'ready'"
           @click="shape = s"
@@ -148,71 +162,71 @@ function onKey(e: KeyboardEvent) {
           <svg v-if="s === 'sphere'" viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><circle cx="8" cy="8" r="5.8" fill="none" stroke="currentColor" stroke-width="1.5" /><ellipse cx="8" cy="8" rx="5.8" ry="2.2" fill="none" stroke="currentColor" stroke-width="1" opacity=".6" /></svg>
           <svg v-else-if="s === 'cube'" viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M8 1.8 13.6 5v6L8 14.2 2.4 11V5zM2.4 5 8 8.2 13.6 5M8 8.2v6" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round" /></svg>
           <svg v-else viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M1.8 11 6 4.5h8.2L10 11z" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round" /></svg>
-          <span class="wide">{{ SHAPE_LABEL[s] }}</span>
+          <span class="wide">{{ shapeLabel(s) }}</span>
         </button>
       </div>
-      <div class="group" role="group" aria-label="Camera">
-        <button type="button" title="Back to the starting view (R)" :disabled="status !== 'ready'" @click="stage?.reset()">
+      <div class="group" role="group" :aria-label="t('model-group-camera')">
+        <button type="button" :title="t('model-reset-title')" :disabled="status !== 'ready'" @click="stage?.reset()">
           <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M3 8a5 5 0 1 0 1.6-3.7M3 2.5v2.8h2.8" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" /></svg>
-          <span class="wide">Reset</span>
+          <span class="wide">{{ t('model-reset') }}</span>
         </button>
-        <button type="button" title="Turn slowly (A)" :aria-pressed="spin" :disabled="status !== 'ready'" @click="spin = !spin">
+        <button type="button" :title="t('model-turn-title')" :aria-pressed="spin" :disabled="status !== 'ready'" @click="spin = !spin">
           <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><ellipse cx="8" cy="8" rx="6" ry="2.6" fill="none" stroke="currentColor" stroke-width="1.5" /><path d="m11.5 3.8 2 1.6-2.4.9" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /></svg>
-          <span class="wide">Turn</span>
+          <span class="wide">{{ t('model-turn') }}</span>
         </button>
-        <button type="button" title="Environment light (E)" :aria-pressed="environment" :disabled="status !== 'ready'" @click="environment = !environment">
+        <button type="button" :title="t('model-light-title')" :aria-pressed="environment" :disabled="status !== 'ready'" @click="environment = !environment">
           <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><circle cx="8" cy="8" r="2.8" fill="currentColor" /><path d="M8 1.5v1.8M8 12.7v1.8M1.5 8h1.8M12.7 8h1.8M3.4 3.4l1.3 1.3M11.3 11.3l1.3 1.3M3.4 12.6l1.3-1.3M11.3 4.7l1.3-1.3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" /></svg>
-          <span class="wide">Light</span>
+          <span class="wide">{{ t('model-light') }}</span>
         </button>
       </div>
-      <div class="group" role="group" aria-label="Tiling">
+      <div class="group" role="group" :aria-label="t('material-group-tiling')">
         <button
           v-for="n in repeatChoices"
           :key="n"
           type="button"
           class="num"
-          :title="n === 'real' ? `Real size: one repeat is ${realLabel}, the sphere 2 m across (T cycles)` : `Repeat ${n}× (T cycles)`"
+          :title="n === 'real' ? t('material-real-title', { size: realLabel }) : t('material-repeat-title', { n })"
           :aria-pressed="repeat === n"
           :disabled="status !== 'ready'"
           @click="repeat = n"
         >
-          {{ n === 'real' ? 'Real' : `${n}×` }}
+          {{ n === 'real' ? t('material-real') : t('material-repeat', { n }) }}
         </button>
       </div>
-      <label v-if="hasHeight" class="group slider" title="How far the height map pushes the surface">
-        <span class="wide">Height</span>
-        <input v-model.number="displacement" type="range" min="0" max="0.2" step="0.005" :disabled="status !== 'ready'" aria-label="Height strength" />
+      <label v-if="hasHeight" class="group slider" :title="t('material-height-title')">
+        <span class="wide">{{ t('material-height') }}</span>
+        <input v-model.number="displacement" type="range" min="0" max="0.2" step="0.005" :disabled="status !== 'ready'" :aria-label="t('material-height-strength')" />
       </label>
-      <div class="group" role="group" aria-label="Background">
+      <div class="group" role="group" :aria-label="t('model-group-background')">
         <button
           v-for="b in BACKGROUNDS"
           :key="b"
           type="button"
           class="swatch"
           :class="b"
-          :title="`${BG_LABEL[b]} background (K cycles)`"
-          :aria-label="`${BG_LABEL[b]} background`"
+          :title="t('model-bg-title', { background: bgLabel(b) })"
+          :aria-label="bgLabel(b)"
           :aria-pressed="bg === b"
           @click="bg = b"
         />
       </div>
-      <button type="button" class="close" aria-label="Close (Esc)" title="Close (Esc)" autofocus @click="dlg?.close()">
+      <button type="button" class="close" :aria-label="t('model-close-title')" :title="t('model-close-title')" autofocus @click="dlg?.close()">
         <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="m4 4 8 8M12 4l-8 8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" /></svg>
       </button>
     </header>
 
     <div class="stage" :class="[`bg-${bg}`, { checker: bg === 'checker' }]">
       <div ref="host" class="canvas" @dblclick="stage?.reset()" />
-      <p v-if="status === 'loading'" class="msg">Loading material…</p>
-      <p v-else-if="status === 'error'" class="msg err">Couldn't show this material: {{ error }}</p>
-      <div v-if="status === 'ready'" class="maps" role="group" aria-label="Maps">
+      <p v-if="status === 'loading'" class="msg">{{ t('material-loading') }}</p>
+      <p v-else-if="status === 'error'" class="msg err">{{ t('material-show-failed', { error }) }}</p>
+      <div v-if="status === 'ready'" class="maps" role="group" :aria-label="t('material-group-maps')">
         <button
           v-for="r in roles"
           :key="r.role"
           type="button"
           :aria-pressed="r.used && !off.has(r.role)"
           :disabled="!r.used"
-          :title="r.used ? `${off.has(r.role) ? 'Show' : 'Hide'} the ${ROLE_LABEL[r.role].toLowerCase()} map` : 'Not used by the preview'"
+          :title="!r.used ? t('material-map-unused') : off.has(r.role) ? t('material-map-show', { map: ROLE_NAME[r.role] }) : t('material-map-hide', { map: ROLE_NAME[r.role] })"
           @click="toggle(r.role)"
         >
           <span class="dot" :class="{ on: active.includes(r.role) && !off.has(r.role) }" aria-hidden="true" />
@@ -221,8 +235,9 @@ function onKey(e: KeyboardEvent) {
       </div>
     </div>
     <footer class="keys" aria-hidden="true">
-      Drag to orbit · right-drag to pan · scroll to zoom · click a map to switch it off · <kbd>1</kbd><kbd>2</kbd><kbd>3</kbd> shape ·
-      <kbd>T</kbd> tiling · <kbd>R</kbd> reset · <kbd>A</kbd> turn · <kbd>E</kbd> light · <kbd>K</kbd> background
+      {{ t('material-keys-mouse') }} · <kbd>1</kbd><kbd>2</kbd><kbd>3</kbd> {{ t('material-key-shape') }} ·
+      <kbd>T</kbd> {{ t('material-key-tiling') }} · <kbd>R</kbd> {{ t('model-key-reset') }} · <kbd>A</kbd> {{ t('material-key-turn') }} ·
+      <kbd>E</kbd> {{ t('model-key-light') }} · <kbd>K</kbd> {{ t('model-key-background') }}
     </footer>
   </dialog>
 </template>

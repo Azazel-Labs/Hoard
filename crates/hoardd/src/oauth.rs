@@ -13,6 +13,7 @@
 //! A connected app acts for the person who allowed it and can do what an access token can: everything except manage
 //! accounts and tokens. Settings → Account lists connected apps and disconnects them.
 
+use crate::i18n::tr;
 use std::collections::HashMap;
 use std::fmt::Write as _;
 use std::sync::{LazyLock, Mutex, PoisonError};
@@ -298,7 +299,7 @@ struct Checked {
 /// The app and where to send the browser back, or why the request can't go ahead (shown on the page: with a bad
 /// redirect there's nowhere safe to send an error).
 async fn check(state: &AppState, r: &AuthRequest) -> ApiResult<Checked> {
-    let client_id = r.client_id.clone().ok_or_else(|| AppError::bad_request("This link has no client_id."))?;
+    let client_id = r.client_id.clone().ok_or_else(|| AppError::bad_request(tr!("error-oauth-no-client-id")))?;
     let id = client_id.clone();
     let client: Option<(String, String)> = db::call(&state.pool, move |c| {
         Ok(c.query_row("SELECT name, redirect_uris FROM oauth_clients WHERE id = ?1", [&id], |r| {
@@ -308,22 +309,20 @@ async fn check(state: &AppState, r: &AuthRequest) -> ApiResult<Checked> {
     })
     .await?;
     let Some((client_name, uris)) = client else {
-        return Err(AppError::bad_request(
-            "This app isn't registered here (any more). Start connecting again from the app.",
-        ));
+        return Err(AppError::bad_request(tr!("error-oauth-unknown-app")));
     };
     let uris: Vec<String> = serde_json::from_str(&uris)?;
     let redirect_uri = match (&r.redirect_uri, uris.as_slice()) {
         (Some(u), _) if redirect_matches(&uris, u) => u.clone(),
         (None, [only]) => only.clone(),
-        _ => return Err(AppError::bad_request("The app asked to be sent back to an address it didn't register.")),
+        _ => return Err(AppError::bad_request(tr!("error-oauth-redirect"))),
     };
     if r.response_type.as_deref() != Some("code") {
-        return Err(AppError::bad_request("Hoard only hands out sign-in codes (response_type=code)."));
+        return Err(AppError::bad_request(tr!("error-oauth-response-type")));
     }
     let challenge = r.code_challenge.clone().unwrap_or_default();
     if r.code_challenge_method.as_deref() != Some("S256") || !(43..=128).contains(&challenge.len()) {
-        return Err(AppError::bad_request("The app has to use PKCE with S256 to sign in to Hoard."));
+        return Err(AppError::bad_request(tr!("error-oauth-pkce")));
     }
     Ok(Checked { client_id, client_name, redirect_uri, challenge })
 }
@@ -560,7 +559,7 @@ async fn disconnect(
     })
     .await?;
     if n == 0 {
-        return Err(AppError::not_found("connection"));
+        return Err(AppError::not_found(tr!("error-connection-not-found")));
     }
     Ok(StatusCode::NO_CONTENT)
 }

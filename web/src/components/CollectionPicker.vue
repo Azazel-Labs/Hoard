@@ -2,6 +2,7 @@
 // "Add to collection" button with a small menu: existing collections, or a new one by name.
 import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue'
 import type { Collection } from '../api'
+import { t } from '../i18n'
 
 const props = defineProps<{
   collections: Collection[]
@@ -70,21 +71,21 @@ onBeforeUnmount(() => {
 <template>
   <div ref="root" class="picker">
     <button type="button" class="btn" :aria-expanded="open" :disabled="busy" @click="toggle">
-      {{ label ?? 'Add to collection' }}
+      {{ label ?? t('collections-add') }}
     </button>
     <Transition name="pop">
-    <div v-if="open" class="menu" :class="{ up }" role="dialog" aria-label="Collections">
+    <div v-if="open" class="menu" :class="{ up }" role="dialog" :aria-label="t('collections-menu')">
       <form class="new" @submit.prevent="create">
-        <label class="visually-hidden" for="collection-name">Find or create a collection</label>
+        <label class="visually-hidden" for="collection-name">{{ t('collections-find-label') }}</label>
         <input
           id="collection-name"
           ref="input"
           v-model="draft"
           class="field"
-          placeholder="Find or name a new collection"
+          :placeholder="t('collections-find-placeholder')"
           autocomplete="off"
         />
-        <button v-if="query && !exact" class="btn primary" type="submit">Create</button>
+        <button v-if="query && !exact" class="btn primary" type="submit">{{ t('collections-create') }}</button>
       </form>
       <ul v-if="shown.length">
         <li v-for="c in shown" :key="c.id">
@@ -95,7 +96,7 @@ onBeforeUnmount(() => {
           </button>
         </li>
       </ul>
-      <p v-else-if="!query" class="empty">No collections yet. Type a name to start one.</p>
+      <p v-else-if="!query" class="empty">{{ t('collections-empty') }}</p>
     </div>
     </Transition>
   </div>

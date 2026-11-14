@@ -20,6 +20,7 @@ use serde_json::Value;
 
 use crate::credits::{Attribution, Credits, Entry, FormatQuery, Limit};
 use crate::error::{ApiResult, AppError};
+use crate::i18n::tr;
 use crate::{AppState, db};
 
 /// The most hashes one check takes.
@@ -269,7 +270,7 @@ pub(crate) async fn check_handler(
     Json(req): Json<CheckRequest>,
 ) -> ApiResult<Response> {
     if req.hashes.len() > MAX_HASHES {
-        return Err(AppError::bad_request(format!("at most {MAX_HASHES} hashes at a time")));
+        return Err(AppError::bad_request(tr!("error-too-many-hashes", max = MAX_HASHES)));
     }
     let result = db::call(&state.pool, move |c| check(c, &req.hashes)).await?;
     Ok(if f.markdown() {

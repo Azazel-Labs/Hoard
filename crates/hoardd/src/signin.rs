@@ -38,6 +38,7 @@ use crate::AppState;
 use crate::auth::Role;
 use crate::db;
 use crate::error::{ApiResult, AppError};
+use crate::i18n::tr;
 
 /// How long to wait for a directory server to answer at all, and for each request after that.
 const LDAP_CONNECT: Duration = Duration::from_secs(8);
@@ -288,44 +289,44 @@ impl AuthConfig {
     /// Problems a person can fix, in their words.
     pub(crate) fn check(&self) -> Result<(), String> {
         if Role::parse(&self.default_role).is_none() {
-            return Err("The default role is view, edit or admin".into());
+            return Err(tr!("error-auth-default-role"));
         }
         if self.session_hours.is_some_and(|h| !(1..=8760).contains(&h)) {
-            return Err("Sessions last between 1 hour and a year".into());
+            return Err(tr!("error-auth-session-hours"));
         }
         if let Some(l) = self.directory() {
             if l.servers.iter().all(|s| s.trim().is_empty()) {
-                return Err("Add the directory server's address".into());
+                return Err(tr!("error-ldap-no-server"));
             }
             for s in &l.servers {
                 server_url(s, l.tls)?;
             }
             if l.base_dn.trim().is_empty() {
-                return Err("Say where people's entries are (the base DN)".into());
+                return Err(tr!("error-ldap-base-dn"));
             }
             if l.username_attribute.trim().is_empty() {
-                return Err("Say which attribute holds the name people sign in with".into());
+                return Err(tr!("error-ldap-username-attribute"));
             }
             if !l.anonymous && l.bind_dn.trim().is_empty() {
-                return Err("Give the account that looks people up, or look them up anonymously".into());
+                return Err(tr!("error-ldap-bind-dn"));
             }
             if !l.ca_cert.trim().is_empty() && roots_from_pem(&l.ca_cert).is_err() {
-                return Err("The certificate authority isn't a PEM certificate (-----BEGIN CERTIFICATE-----)".into());
+                return Err(tr!("error-ldap-ca-cert"));
             }
         }
         if self.method == Method::Oauth {
             let o = &self.oauth;
             if o.client_id.trim().is_empty() {
-                return Err("Give the client ID the provider made for Hoard".into());
+                return Err(tr!("error-oauth-client-id"));
             }
             if !http_url(o.authorization_url.trim()) || !http_url(o.token_url.trim()) {
-                return Err("The authorization and token addresses should start with https://".into());
+                return Err(tr!("error-oauth-addresses"));
             }
             if !o.userinfo_url.trim().is_empty() && !http_url(o.userinfo_url.trim()) {
-                return Err("The user info address should start with https://".into());
+                return Err(tr!("error-oauth-userinfo-address"));
             }
             if o.username_claim.trim().is_empty() {
-                return Err("Say which claim holds the person's name".into());
+                return Err(tr!("error-oauth-username-claim"));
             }
         }
         Ok(())
@@ -418,7 +419,7 @@ pub(crate) fn account_for(
 ) -> Result<Result<(i64, String, Role), String>> {
     let decision = decide(&cfg.roles, groups);
     if decision == Decision::Refused {
-        return Ok(Err(format!("{name} isn't in a group that may use Hoard")));
+        return Ok(Err(tr!("error-signin-no-group", name = name)));
     }
     let pick = |column: &str, key: &str| -> rusqlite::Result<Option<UserRow>> {
         c.query_row(&format!("SELECT id, username, role, source, subject FROM users WHERE {column} = ?1"), [key], |r| {
@@ -435,14 +436,12 @@ pub(crate) fn account_for(
     };
     if let Some((id, username, role, from, stored)) = found {
         if Source::parse(&from) != Some(source) {
-            return Ok(Err(format!("There's already a Hoard account called {username} that signs in another way")));
+            return Ok(Err(tr!("error-signin-other-source", name = username.as_str())));
         }
         if let Some(s) = subject {
             match stored.as_deref() {
                 Some(t) if t != s => {
-                    return Ok(Err(format!(
-                        "There's already a Hoard account called {username} for someone else at the provider"
-                    )));
+                    return Ok(Err(tr!("error-signin-other-subject", name = username.as_str())));
                 }
                 Some(_) => {}
                 None => {
@@ -460,10 +459,10 @@ pub(crate) fn account_for(
         return Ok(Ok((id, username, role)));
     }
     if !cfg.provision {
-        return Ok(Err(format!("{name} has no Hoard account yet: an admin can add it in Settings → Account")));
+        return Ok(Err(tr!("error-signin-no-account", name = name)));
     }
     if name.is_empty() || name.chars().count() > 64 || name.chars().any(char::is_control) {
-        return Ok(Err("That name can't be a Hoard account (up to 64 characters)".into()));
+        return Ok(Err(tr!("error-signin-bad-name")));
     }
     let role = match decision {
         Decision::Role(r) => r,
@@ -484,7 +483,7 @@ pub(crate) fn account_for(
 fn server_url(s: &str, tls: Tls) -> Result<String, String> {
     let s = s.trim();
     if s.is_empty() {
-        return Err("A directory server's address is empty".into());
+        return Err(tr!("error-ldap-empty-server"));
     }
     let url = if s.contains("://") {
         s.to_owned()
@@ -492,10 +491,10 @@ fn server_url(s: &str, tls: Tls) -> Result<String, String> {
         format!("{}://{s}", if tls == Tls::Ldaps { "ldaps" } else { "ldap" })
     };
     if !(url.starts_with("ldap://") || url.starts_with("ldaps://")) {
-        return Err(format!("{s}: a directory server's address is host:port, ldap://… or ldaps://…"));
+        return Err(tr!("error-ldap-server-form", server = s));
     }
     if url.starts_with("ldaps://") && tls == Tls::StartTls {
-        return Err(format!("{s}: that's LDAPS, not StartTLS"));
+        return Err(tr!("error-ldap-not-starttls", server = s));
     }
     Ok(url)
 }
@@ -506,7 +505,7 @@ fn roots_from_pem(pem: &str) -> Result<rustls::RootCertStore> {
         roots.add(cert?)?;
     }
     if roots.is_empty() {
-        bail!("no certificate in it");
+        bail!(tr!("error-ldap-no-certificate"));
     }
     Ok(roots)
 }
@@ -546,7 +545,7 @@ async fn connect(l: &Ldap) -> Result<(ldap3::Ldap, String)> {
             Err(e) => why.push(format!("{}: {e:#}", s.trim())),
         }
     }
-    bail!("no directory server could be reached ({})", why.join("; "))
+    bail!(tr!("error-ldap-unreachable", reasons = why.join("; ")))
 }
 
 async fn connect_to(l: &Ldap, server: &str) -> Result<ldap3::Ldap> {
@@ -566,9 +565,9 @@ async fn bind_service(ldap: &mut ldap3::Ldap, l: &Ldap) -> Result<()> {
     let (dn, pw) = if l.anonymous { ("", "") } else { (l.bind_dn.trim(), l.bind_password.0.as_str()) };
     ldap.with_timeout(LDAP_OP).simple_bind(dn, pw).await?.success().map_err(|e| {
         if l.anonymous {
-            anyhow!("the directory doesn't allow looking people up anonymously ({e})")
+            anyhow!(tr!("error-ldap-no-anonymous", reason = e.to_string()))
         } else {
-            anyhow!("the account that looks people up couldn't sign in ({e})")
+            anyhow!(tr!("error-ldap-bind-failed", reason = e.to_string()))
         }
     })?;
     Ok(())
@@ -618,10 +617,10 @@ async fn find_entry(ldap: &mut ldap3::Ldap, l: &Ldap, name: &str, active_only: b
         .search(l.base_dn.trim(), Scope::Subtree, &filter, vec![user_attr, "memberOf"])
         .await?
         .success()
-        .with_context(|| format!("looking for {name} under {}", l.base_dn.trim()))?;
+        .with_context(|| tr!("error-ldap-search", name = name, base = l.base_dn.trim()))?;
     let mut entries: Vec<SearchEntry> = entries.into_iter().map(SearchEntry::construct).collect();
     if entries.len() > 1 {
-        bail!("{} entries in the directory match {name}: narrow the user filter", entries.len());
+        bail!(tr!("error-ldap-several", count = entries.len(), name = name));
     }
     Ok(entries.pop())
 }
@@ -634,7 +633,7 @@ async fn find_and_bind(ldap: &mut ldap3::Ldap, l: &Ldap, name: &str, password: &
         0 => {}
         // invalidCredentials
         49 => return Ok(None),
-        _ => bail!("the directory wouldn't check {name}'s password ({bound})"),
+        _ => bail!(tr!("error-ldap-password-check", name = name, reason = bound.to_string())),
     }
     let groups = groups_of(ldap, l, &entry, name).await?;
     let user_attr = l.username_attribute.trim();
@@ -659,7 +658,7 @@ async fn groups_of(ldap: &mut ldap3::Ldap, l: &Ldap, entry: &SearchEntry, name: 
             .search(l.group_base_dn.trim(), Scope::Subtree, &filter, vec!["cn"])
             .await?
             .success()
-            .with_context(|| format!("looking for {name}'s groups under {}", l.group_base_dn.trim()))?;
+            .with_context(|| tr!("error-ldap-group-search", name = name, base = l.group_base_dn.trim()))?;
         for g in found.into_iter().map(SearchEntry::construct) {
             groups.extend(attr(&g, "cn").into_iter().flatten().cloned());
             groups.push(g.dn);
@@ -806,7 +805,7 @@ fn back_with_error(headers: &HeaderMap, msg: &str) -> Response {
 async fn oauth_start(State(state): State<AppState>, headers: HeaderMap) -> Response {
     let cfg = state.settings.get().auth.clone();
     if cfg.method != Method::Oauth {
-        return back_with_error(&headers, "Signing in with OAuth isn't turned on");
+        return back_with_error(&headers, &tr!("error-oauth-off"));
     }
     match start_url(&state, &headers, &cfg.oauth) {
         Ok((location, st)) => {
@@ -825,7 +824,8 @@ fn start_url(state: &AppState, headers: &HeaderMap, o: &OAuth) -> Result<(String
     let verifier = random()?;
     let challenge = b64(&sha2::Sha256::digest(verifier.as_bytes()));
     let redirect = callback_url(state, headers);
-    let mut url = reqwest::Url::parse(o.authorization_url.trim()).context("the authorization address isn't valid")?;
+    let mut url = reqwest::Url::parse(o.authorization_url.trim())
+        .with_context(|| tr!("error-oauth-bad-authorization-address"))?;
     url.query_pairs_mut()
         .append_pair("response_type", "code")
         .append_pair("client_id", o.client_id.trim())
@@ -852,32 +852,29 @@ struct Callback {
 async fn oauth_callback(State(state): State<AppState>, headers: HeaderMap, Query(q): Query<Callback>) -> Response {
     if let Some(err) = q.error {
         let detail = q.error_description.unwrap_or(err);
-        return back_with_error(&headers, &format!("The provider didn't sign you in: {detail}"));
+        return back_with_error(&headers, &tr!("error-oauth-refused", reason = detail));
     }
     let (Some(code), Some(st)) = (q.code, q.state) else {
-        return back_with_error(&headers, "The provider sent you back without a sign-in");
+        return back_with_error(&headers, &tr!("error-oauth-no-code"));
     };
     let same_browser = crate::auth::cookie_value(&headers, OAUTH_COOKIE).is_some_and(|c| c == st);
     let pending = PENDING.lock().unwrap_or_else(PoisonError::into_inner).remove(&st);
     let Some(pending) = pending.filter(|p| same_browser && p.since.elapsed() < OAUTH_WAIT) else {
-        return back_with_error(&headers, "That sign-in took too long or was started elsewhere: try again");
+        return back_with_error(&headers, &tr!("error-oauth-expired"));
     };
     let cfg = state.settings.get().auth.clone();
     if cfg.method != Method::Oauth {
-        return back_with_error(&headers, "Signing in with OAuth isn't turned on");
+        return back_with_error(&headers, &tr!("error-oauth-off"));
     }
     let claims = match who_signed_in(&state.http, &cfg.oauth, &code, &pending).await {
         Ok(c) => c,
         Err(e) => return back_with_error(&headers, &format!("{e:#}")),
     };
     let Some(name) = claim_string(&claims, cfg.oauth.username_claim.trim()) else {
-        return back_with_error(
-            &headers,
-            &format!("The provider didn't say who you are (no {} claim)", cfg.oauth.username_claim.trim()),
-        );
+        return back_with_error(&headers, &tr!("error-oauth-no-claim", claim = cfg.oauth.username_claim.trim()));
     };
     let Some(sub) = claim_string(&claims, "sub").or_else(|| claim_string(&claims, "id")) else {
-        return back_with_error(&headers, "The provider didn't say who you are (no sub or id claim)");
+        return back_with_error(&headers, &tr!("error-oauth-no-sub"));
     };
     let issuer = claim_string(&claims, "iss").unwrap_or_else(|| cfg.oauth.token_url.trim().to_owned());
     let subject = format!("{issuer} {sub}");
@@ -925,7 +922,7 @@ async fn who_signed_in(http: &reqwest::Client, o: &OAuth, code: &str, pending: &
         .body(form.query().unwrap_or_default().to_owned())
         .send()
         .await
-        .context("couldn't reach the provider's token address")?;
+        .with_context(|| tr!("error-oauth-token-unreachable"))?;
     let status = res.status();
     let body: Value = res.json().await.unwrap_or(Value::Null);
     if !status.is_success() || body.get("error").is_some() {
@@ -934,11 +931,12 @@ async fn who_signed_in(http: &reqwest::Client, o: &OAuth, code: &str, pending: &
             .or_else(|| body.get("error"))
             .and_then(Value::as_str)
             .map_or_else(|| status.to_string(), str::to_owned);
-        bail!("The provider wouldn't finish the sign-in: {why}");
+        bail!(tr!("error-oauth-token-refused", reason = why));
     }
     let mut claims = body.get("id_token").and_then(Value::as_str).and_then(jwt_claims).unwrap_or_else(|| json!({}));
     if !o.userinfo_url.trim().is_empty() {
-        let token = body.get("access_token").and_then(Value::as_str).context("the provider sent no access token")?;
+        let token =
+            body.get("access_token").and_then(Value::as_str).with_context(|| tr!("error-oauth-no-access-token"))?;
         let res = http
             .get(o.userinfo_url.trim())
             .bearer_auth(token)
@@ -947,11 +945,11 @@ async fn who_signed_in(http: &reqwest::Client, o: &OAuth, code: &str, pending: &
             .timeout(Duration::from_secs(30))
             .send()
             .await
-            .context("couldn't reach the provider's user info address")?;
+            .with_context(|| tr!("error-oauth-userinfo-unreachable"))?;
         if !res.status().is_success() {
-            bail!("The provider wouldn't say who signed in ({})", res.status());
+            bail!(tr!("error-oauth-userinfo-refused", status = res.status().to_string()));
         }
-        let info: Value = res.json().await.context("the provider's user info isn't JSON")?;
+        let info: Value = res.json().await.with_context(|| tr!("error-oauth-userinfo-not-json"))?;
         if let (Some(all), Some(more)) = (claims.as_object_mut(), info.as_object()) {
             all.extend(more.iter().map(|(k, v)| (k.clone(), v.clone())));
         }
@@ -1035,8 +1033,9 @@ fn same_target(next: &Ldap, saved: &Ldap) -> bool {
         && next.bind_dn.trim() == saved.bind_dn.trim()
 }
 
-const GIVE_PASSWORD_AGAIN: &str = "Give the password of the account that looks people up again: the saved one is only \
-                                   sent to the servers it was given for";
+fn give_password_again() -> String {
+    tr!("error-ldap-password-again")
+}
 
 /// A secret sent empty (as the Settings page shows them) keeps the saved one; `clear_<field>` clears it. Only for
 /// where it was given: pointing the servers or token address somewhere else needs it typed again, so whoever can
@@ -1050,7 +1049,7 @@ fn keep_secrets(next: &mut AuthConfig, saved: &AuthConfig, body: &Value) -> Resu
             if same_target(n, s) {
                 n.bind_password = s.bind_password.clone();
             } else if !n.anonymous {
-                return Err(GIVE_PASSWORD_AGAIN.into());
+                return Err(give_password_again());
             }
         }
     }
@@ -1058,9 +1057,7 @@ fn keep_secrets(next: &mut AuthConfig, saved: &AuthConfig, body: &Value) -> Resu
         if next.oauth.token_url.trim() == saved.oauth.token_url.trim() {
             next.oauth.client_secret = saved.oauth.client_secret.clone();
         } else {
-            return Err(
-                "Give the client secret again: the saved one is only sent to the token address it was given for".into(),
-            );
+            return Err(tr!("error-oauth-secret-again"));
         }
     }
     Ok(())
@@ -1074,7 +1071,7 @@ fn parse_config(body: &Value) -> ApiResult<AuthConfig> {
             o.retain(|k, _| !k.ends_with("_set") && !k.starts_with("clear_"));
         }
     }
-    serde_json::from_value(body).map_err(|e| AppError::bad_request(format!("bad authentication settings: {e}")))
+    serde_json::from_value(body).map_err(|e| AppError::bad_request(tr!("error-auth-settings", reason = e.to_string())))
 }
 
 async fn put_config(
@@ -1117,22 +1114,22 @@ async fn test_ldap(State(state): State<AppState>, Json(body): Json<LdapTest>) ->
         if let Some(o) = c.as_object_mut() {
             o.retain(|k, _| !k.ends_with("_set") && !k.starts_with("clear_"));
         }
-        let mut l: Ldap =
-            serde_json::from_value(c).map_err(|e| AppError::bad_request(format!("bad LDAP settings: {e}")))?;
+        let mut l: Ldap = serde_json::from_value(c)
+            .map_err(|e| AppError::bad_request(tr!("error-ldap-settings", reason = e.to_string())))?;
         let auth = state.settings.get().auth.clone();
         let saved = if body.kind == "ad" { auth.ad } else { auth.ldap };
         if !l.bind_password.is_set() && !clear && saved.bind_password.is_set() {
             if same_target(&l, &saved) {
                 l.bind_password = saved.bind_password;
             } else if !l.anonymous {
-                return Err(AppError::bad_request(GIVE_PASSWORD_AGAIN));
+                return Err(AppError::bad_request(give_password_again()));
             }
         }
         l
     };
     l.servers.retain(|s| !s.trim().is_empty());
     if l.servers.is_empty() {
-        return Err(AppError::bad_request("Add the directory server's address"));
+        return Err(AppError::bad_request(tr!("error-ldap-no-server")));
     }
     let mut servers = Vec::new();
     for s in &l.servers {
@@ -1164,7 +1161,7 @@ async fn test_ldap(State(state): State<AppState>, Json(body): Json<LdapTest>) ->
                     },
                 }),
                 Ok(None) => {
-                    json!({ "ok": false, "error": format!("The directory doesn't know {name} with that password") })
+                    json!({ "ok": false, "error": tr!("error-ldap-wrong-password", name = name) })
                 }
                 Err(e) => json!({ "ok": false, "error": format!("{e:#}") }),
             })
@@ -1183,7 +1180,7 @@ struct Discover {
 async fn discover(State(state): State<AppState>, Json(body): Json<Discover>) -> ApiResult<Json<Value>> {
     let issuer = body.issuer.trim().trim_end_matches('/');
     if !http_url(issuer) {
-        return Err(AppError::bad_request("The issuer should start with https://"));
+        return Err(AppError::bad_request(tr!("error-oauth-issuer")));
     }
     let url = if issuer.contains("/.well-known/") {
         issuer.to_owned()
@@ -1197,15 +1194,21 @@ async fn discover(State(state): State<AppState>, Json(body): Json<Discover>) -> 
         .timeout(Duration::from_secs(20))
         .send()
         .await
-        .map_err(|e| AppError::bad_request(format!("Couldn't reach {url}: {e}")))?;
+        .map_err(|e| {
+            AppError::bad_request(tr!("error-oauth-discovery-unreachable", url = url.as_str(), reason = e.to_string()))
+        })?;
     if !res.status().is_success() {
-        return Err(AppError::bad_request(format!("{url} answered {}", res.status())));
+        return Err(AppError::bad_request(tr!(
+            "error-oauth-discovery-status",
+            url = url.as_str(),
+            status = res.status().to_string()
+        )));
     }
     let doc: Value =
-        res.json().await.map_err(|_| AppError::bad_request(format!("{url} isn't a discovery document")))?;
+        res.json().await.map_err(|_| AppError::bad_request(tr!("error-oauth-discovery-bad", url = url.as_str())))?;
     let field = |k: &str| doc.get(k).and_then(Value::as_str).unwrap_or_default().to_owned();
     if field("authorization_endpoint").is_empty() || field("token_endpoint").is_empty() {
-        return Err(AppError::bad_request(format!("{url} doesn't name the authorization and token addresses")));
+        return Err(AppError::bad_request(tr!("error-oauth-discovery-incomplete", url = url.as_str())));
     }
     Ok(Json(json!({
         "authorization_url": field("authorization_endpoint"),

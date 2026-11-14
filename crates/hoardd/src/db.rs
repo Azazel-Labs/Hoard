@@ -638,16 +638,19 @@ fn backup_before_upgrade(conn: &Connection, dir: &Path, from: i64) -> Result<std
     Ok(path)
 }
 
-/// Run blocking DB work off the async runtime.
+/// Run blocking DB work off the async runtime, in the language of the request it's for.
 pub(crate) async fn call<T, F>(pool: &Pool, f: F) -> Result<T>
 where
     T: Send + 'static,
     F: FnOnce(&mut Conn) -> Result<T> + Send + 'static,
 {
     let pool = pool.clone();
+    let language = crate::i18n::current();
     tokio::task::spawn_blocking(move || {
-        let mut conn = pool.get()?;
-        f(&mut conn)
+        crate::i18n::blocking(language, || {
+            let mut conn = pool.get()?;
+            f(&mut conn)
+        })
     })
     .await?
 }

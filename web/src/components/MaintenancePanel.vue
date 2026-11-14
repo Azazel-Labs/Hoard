@@ -2,6 +2,7 @@
 // Settings → Maintenance: run the jobs that look after the library and see how past runs went.
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { api, ApiError, type Maintenance, type MaintenanceTask } from '../api'
+import { formatDate, formatNumber, t } from '../i18n'
 import { confirmDialog, showError } from '../ui'
 
 const emit = defineEmits<{ unauthorized: [] }>()
@@ -24,7 +25,7 @@ async function load() {
   try {
     data.value = await api.maintenance()
   } catch (e) {
-    failed(e, "Couldn't load Maintenance")
+    failed(e, t('maintenance-load-failed'))
   }
   // Follow running tasks closely; otherwise just keep the history current.
   if (!gone) timer = setTimeout(load, anyRunning.value ? 1500 : 5000)
@@ -35,107 +36,114 @@ onUnmounted(() => {
   clearTimeout(timer)
 })
 
-/** Tasks that change or delete things ask first. */
-const ASK: Record<string, { title: string; body: string; confirm: string; danger?: boolean }> = {
-  reanalyze: {
-    title: 'Re-analyze every pack?',
-    body: 'Every file is read again, which can take a long while on a big library; packs show as working until it’s their turn. Your own names, tags and notes stay.',
-    confirm: 'Re-analyze',
-  },
-  gc: {
-    title: 'Delete unused files?',
-    body: 'Stored files that nothing in the library points at are deleted for good. Packs in the archive keep theirs.',
-    confirm: 'Delete them',
-    danger: true,
-  },
-}
+/** Tasks that change or delete things ask first. A function, so the questions are in the language of the moment. */
+const ask = (id: string): { title: string; body: string; confirm: string; danger?: boolean } | undefined =>
+  ({
+    reanalyze: {
+      title: t('maintenance-reanalyze-title'),
+      body: t('maintenance-reanalyze-body'),
+      confirm: t('maintenance-reanalyze-confirm'),
+    },
+    gc: {
+      title: t('maintenance-gc-title'),
+      body: t('maintenance-gc-body'),
+      confirm: t('maintenance-gc-confirm'),
+      danger: true,
+    },
+  })[id]
 
-async function run(t: MaintenanceTask) {
-  const ask = ASK[t.id]
-  if (ask && !(await confirmDialog(ask))) return
-  starting.value = t.id
+async function run(task: MaintenanceTask) {
+  const question = ask(task.id)
+  if (question && !(await confirmDialog(question))) return
+  starting.value = task.id
   try {
-    await api.runMaintenance(t.id)
+    await api.runMaintenance(task.id)
   } catch (e) {
-    failed(e, `Couldn't start “${t.label}”`)
+    failed(e, t('maintenance-start-failed', { task: task.label }))
   } finally {
     starting.value = null
   }
   await load()
 }
 
-const fmt = new Intl.DateTimeFormat(undefined, { dateStyle: 'medium', timeStyle: 'short' })
 function when(at: string): string {
   const secs = (Date.now() - Date.parse(at)) / 1000
-  if (secs < 60) return 'just now'
-  if (secs < 3600) return `${Math.round(secs / 60)} min ago`
-  if (secs < 86400) return `${Math.round(secs / 3600)} h ago`
-  return fmt.format(new Date(at))
+  if (secs < 60) return t('maintenance-just-now')
+  if (secs < 3600) return t('maintenance-minutes-ago', { count: Math.round(secs / 60) })
+  if (secs < 86400) return t('maintenance-hours-ago', { count: Math.round(secs / 3600) })
+  return formatDate(at, { dateStyle: 'medium', timeStyle: 'short' })
 }
 function took(from: string, to: string | null): string {
   if (!to) return ''
   const s = Math.max(0, Math.round((Date.parse(to) - Date.parse(from)) / 1000))
-  return s < 60 ? `${s} s` : s < 3600 ? `${Math.round(s / 60)} min` : `${(s / 3600).toFixed(1)} h`
+  return s < 60
+    ? t('maintenance-took-seconds', { count: s })
+    : s < 3600
+      ? t('maintenance-took-minutes', { count: Math.round(s / 60) })
+      : t('maintenance-took-hours', { hours: formatNumber(s / 3600, { minimumFractionDigits: 1, maximumFractionDigits: 1 }) })
 }
 </script>
 
 <template>
   <div class="maint" :aria-busy="!data">
-    <p v-if="!data" class="loading">Loading…</p>
+    <p v-if="!data" class="loading">{{ t('maintenance-loading') }}</p>
     <template v-else>
       <ul class="tasks">
-        <li v-for="t in data.tasks" :key="t.id" :class="{ on: t.running }">
+        <li v-for="task in data.tasks" :key="task.id" :class="{ on: task.running }">
           <div class="top">
             <div class="what">
-              <strong>{{ t.label }}</strong>
-              <small>{{ t.blurb }}</small>
+              <strong>{{ task.label }}</strong>
+              <small>{{ task.blurb }}</small>
             </div>
             <button
               type="button"
               class="btn"
-              :disabled="!!t.running || starting === t.id"
-              @click="run(t)"
+              :disabled="!!task.running || starting === task.id"
+              @click="run(task)"
             >
-              {{ t.running ? 'Running…' : starting === t.id ? 'Starting…' : 'Run' }}
+              {{ task.running ? t('maintenance-running') : starting === task.id ? t('maintenance-starting') : t('maintenance-run') }}
             </button>
           </div>
-          <div v-if="t.running" class="live" role="status">
-            <div class="bar" :class="{ unknown: t.running.progress == null }">
-              <span :style="t.running.progress != null ? { width: `${Math.round(t.running.progress * 100)}%` } : undefined" />
+          <div v-if="task.running" class="live" role="status">
+            <div class="bar" :class="{ unknown: task.running.progress == null }">
+              <span :style="task.running.progress != null ? { width: `${Math.round(task.running.progress * 100)}%` } : undefined" />
             </div>
-            <small>{{ t.running.detail ?? 'Starting' }} · started {{ when(t.running.started_at) }}</small>
+            <small>{{ t('maintenance-started', { detail: task.running.detail ?? t('maintenance-starting-detail'), when: when(task.running.started_at) }) }}</small>
           </div>
-          <p v-else-if="t.last" class="last" :class="{ bad: !t.last.ok }">
+          <p v-else-if="task.last" class="last" :class="{ bad: !task.last.ok }">
             <span class="dot" aria-hidden="true" />
             <span>
-              <span class="sr">{{ t.last.ok ? 'Finished' : 'Failed' }}: </span>{{ t.last.summary }}
-              <small>· {{ when(t.last.finished_at ?? t.last.started_at) }}</small>
+              <span class="sr">{{ task.last.ok ? t('maintenance-finished') : t('maintenance-failed') }}</span>{{ task.last.summary }}
+              <small>· {{ when(task.last.finished_at ?? task.last.started_at) }}</small>
             </span>
           </p>
-          <p v-else class="last never">Never run</p>
+          <p v-else class="last never">{{ t('maintenance-never-run') }}</p>
         </li>
       </ul>
 
       <section v-if="data.history.length" class="history">
-        <h3>Past runs</h3>
+        <h3>{{ t('maintenance-history') }}</h3>
         <table>
           <thead>
-            <tr><th scope="col">Task</th><th scope="col">Finished</th><th scope="col">Took</th><th scope="col">Result</th></tr>
+            <tr>
+              <th scope="col">{{ t('maintenance-col-task') }}</th>
+              <th scope="col">{{ t('maintenance-col-finished') }}</th>
+              <th scope="col">{{ t('maintenance-col-took') }}</th>
+              <th scope="col">{{ t('maintenance-col-result') }}</th>
+            </tr>
           </thead>
           <tbody>
             <tr v-for="r in data.history" :key="r.id" :class="{ bad: !r.ok }">
               <td>{{ labels[r.task] ?? r.task }}</td>
               <td class="num">{{ r.finished_at ? when(r.finished_at) : '' }}</td>
               <td class="num">{{ took(r.started_at, r.finished_at) }}</td>
-              <td><span class="sr">{{ r.ok ? 'Finished' : 'Failed' }}: </span>{{ r.summary }}</td>
+              <td><span class="sr">{{ r.ok ? t('maintenance-finished') : t('maintenance-failed') }}</span>{{ r.summary }}</td>
             </tr>
           </tbody>
         </table>
       </section>
       <p class="hint">
-        Backups and the damage check can also be run from a script:
-        <span class="mono">POST /api/admin/backup</span>, <span class="mono">/api/admin/scrub</span> and
-        <span class="mono">/api/admin/gc</span>. Those runs show up here too.
+        {{ t('maintenance-script-before') }}<span class="mono">POST /api/admin/backup</span>{{ t('maintenance-script-comma') }}<span class="mono">/api/admin/scrub</span>{{ t('maintenance-script-and') }}<span class="mono">/api/admin/gc</span>{{ t('maintenance-script-after') }}
       </p>
     </template>
   </div>

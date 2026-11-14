@@ -1,53 +1,55 @@
 <script setup lang="ts">
 // "?": every keyboard shortcut on one card.
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
+import { t } from '../i18n'
 
 const emit = defineEmits<{ close: [] }>()
 const dlg = ref<HTMLDialogElement | null>(null)
 const mod = /Mac|iPhone|iPad/.test(navigator.platform) ? '⌘' : 'Ctrl'
 
-const SECTIONS: { title: string; keys: [string[], string][] }[] = [
+// A computed, so the descriptions follow a change of language.
+const sections = computed<{ title: string; keys: [string[], string][] }[]>(() => [
   {
-    title: 'Anywhere',
+    title: t('shortcuts-anywhere'),
     keys: [
-      [[mod, 'K'], 'Command palette: search, jump, run'],
-      [['/'], 'Search'],
-      [['?'], 'This list'],
-      [['Esc'], 'Close, clear the selection, or close the details'],
+      [[mod, 'K'], t('shortcuts-palette')],
+      [['/'], t('shortcuts-search')],
+      [['?'], t('shortcuts-this-list')],
+      [['Esc'], t('shortcuts-escape')],
     ],
   },
   {
-    title: 'Library',
+    title: t('shortcuts-library'),
     keys: [
-      [['←', '↑', '↓', '→'], 'Move between tiles (or J and K)'],
-      [['Enter'], 'Open the details'],
-      [['Space'], 'Play or stop a sound'],
-      [['X'], 'Select or deselect'],
-      [['F'], 'Add to or take out of your favourites'],
-      [['Shift', 'click'], 'Select a range'],
-      [[mod, 'A'], 'Select everything shown'],
+      [['←', '↑', '↓', '→'], t('shortcuts-move')],
+      [['Enter'], t('shortcuts-open')],
+      [['Space'], t('shortcuts-play-sound')],
+      [['X'], t('shortcuts-select')],
+      [['F'], t('shortcuts-favourite')],
+      [['Shift', t('shortcuts-key-click')], t('shortcuts-select-range')],
+      [[mod, 'A'], t('shortcuts-select-all')],
     ],
   },
   {
-    title: 'Sound player',
+    title: t('shortcuts-sound-player'),
     keys: [
-      [['Space'], 'Play or pause'],
-      [['←', '→'], 'Skip back or ahead'],
-      [['Home', 'End'], 'Start or end'],
+      [['Space'], t('shortcuts-play-pause')],
+      [['←', '→'], t('shortcuts-skip')],
+      [['Home', 'End'], t('shortcuts-start-end')],
     ],
   },
   {
-    title: 'Image inspector',
+    title: t('shortcuts-image-inspector'),
     keys: [
-      [['+', '−'], 'Zoom in or out'],
-      [['0'], 'Fit to the window'],
-      [['1'], 'Actual pixels'],
-      [['T'], 'Tile 3×3 to check the seams'],
-      [['K'], 'Next background'],
-      [['R', 'G', 'B', 'A'], 'Show one channel'],
+      [['+', '−'], t('shortcuts-zoom')],
+      [['0'], t('shortcuts-fit')],
+      [['1'], t('shortcuts-actual-pixels')],
+      [['T'], t('shortcuts-tile')],
+      [['K'], t('shortcuts-background')],
+      [['R', 'G', 'B', 'A'], t('shortcuts-channel')],
     ],
   },
-]
+])
 
 onMounted(() => dlg.value?.showModal())
 </script>
@@ -55,13 +57,13 @@ onMounted(() => dlg.value?.showModal())
 <template>
   <dialog ref="dlg" class="keys" aria-labelledby="keys-title" @close="emit('close')" @click.self="dlg?.close()">
     <header>
-      <h2 id="keys-title">Keyboard shortcuts</h2>
-      <button type="button" class="btn ghost x" aria-label="Close" autofocus @click="dlg?.close()">
+      <h2 id="keys-title">{{ t('shortcuts-title') }}</h2>
+      <button type="button" class="btn ghost x" :aria-label="t('shortcuts-close')" autofocus @click="dlg?.close()">
         <svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true"><path d="m4 4 8 8M12 4l-8 8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" /></svg>
       </button>
     </header>
     <div class="cols">
-      <section v-for="s in SECTIONS" :key="s.title">
+      <section v-for="s in sections" :key="s.title">
         <h3>{{ s.title }}</h3>
         <dl>
           <template v-for="[combo, what] in s.keys" :key="what">

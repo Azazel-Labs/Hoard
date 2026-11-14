@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import type { TagSource } from '../api'
+import { t } from '../i18n'
 
 const props = defineProps<{
   tag: string; source?: TagSource; count?: number; removable?: boolean
@@ -18,15 +19,18 @@ const LONG = 30
 const long = computed(() => parts.value.value.length > LONG)
 const longNs = computed(() => parts.value.ns.length > 12)
 const title = computed(() => {
-  const who = props.source ? sourceLabel[props.source] : ''
+  const who = props.source ? sourceLabel(props.source) : ''
   if (!long.value && !longNs.value) return who || undefined
-  return who ? `${props.tag} (${who})` : props.tag
+  return who ? t('tag-title-with-source', { tag: props.tag, source: who }) : props.tag
 })
-const sourceLabel: Record<TagSource, string> = {
-  human: 'added by a person',
-  rule: 'from the offline tagger',
-  meta: 'measured from the file',
-  ai: 'suggested by AI',
+function sourceLabel(source: TagSource): string {
+  switch (source) {
+    case 'human': return t('tag-source-human')
+    case 'rule': return t('tag-source-rule')
+    case 'meta': return t('tag-source-meta')
+    case 'ai': return t('tag-source-ai')
+  }
+  return ''
 }
 </script>
 
@@ -36,7 +40,7 @@ const sourceLabel: Record<TagSource, string> = {
     <span v-if="parts.ns" class="ns">{{ parts.ns }}:</span>
     <span class="value">{{ parts.value }}</span>
     <span v-if="count !== undefined" class="count">{{ count }}</span>
-    <button v-if="removable" class="x" type="button" :aria-label="`Remove tag ${tag}`" @click.stop="$emit('remove')">
+    <button v-if="removable" class="x" type="button" :aria-label="t('tag-remove', { tag })" @click.stop="$emit('remove')">
       ×
     </button>
   </span>

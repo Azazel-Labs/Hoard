@@ -3,32 +3,34 @@
 // controls and scrollbars. The chosen themes go on as `data-light` and `data-dark`, which styles.css turns into the
 // --l-* and --d-* colors. index.html applies the saved choices before first paint; this keeps them current.
 import { ref, watch } from 'vue'
+import { t } from './i18n'
 import { prefs } from './prefs'
 
 export interface ThemeInfo {
   id: string
-  name: string
+  /** In the reader's language (a getter, so it follows a change of language). */
+  readonly name: string
   /** A few words on the feel, for Settings. */
-  blurb: string
+  readonly blurb: string
 }
 
 // The first of each list is the default. Keep in step with the [data-light] / [data-dark] blocks in styles.css.
 export const LIGHT_THEMES: ThemeInfo[] = [
-  { id: 'slate', name: 'Slate', blurb: 'Cool blue-grey' },
-  { id: 'paper', name: 'Paper', blurb: 'Plain neutral grey' },
-  { id: 'linen', name: 'Linen', blurb: 'Warm cream, amber' },
-  { id: 'sage', name: 'Sage', blurb: 'Soft green' },
-  { id: 'lilac', name: 'Lilac', blurb: 'Pale violet' },
-  { id: 'blush', name: 'Blush', blurb: 'Dusty rose' },
+  { id: 'slate', get name() { return t('theme-slate') }, get blurb() { return t('theme-light-slate-blurb') } },
+  { id: 'paper', get name() { return t('theme-paper') }, get blurb() { return t('theme-light-paper-blurb') } },
+  { id: 'linen', get name() { return t('theme-linen') }, get blurb() { return t('theme-light-linen-blurb') } },
+  { id: 'sage', get name() { return t('theme-sage') }, get blurb() { return t('theme-light-sage-blurb') } },
+  { id: 'lilac', get name() { return t('theme-lilac') }, get blurb() { return t('theme-light-lilac-blurb') } },
+  { id: 'blush', get name() { return t('theme-blush') }, get blurb() { return t('theme-light-blush-blurb') } },
 ]
 export const DARK_THEMES: ThemeInfo[] = [
-  { id: 'graphite', name: 'Graphite', blurb: 'Neutral grey, no tint' },
-  { id: 'slate', name: 'Slate', blurb: 'Blue-grey' },
-  { id: 'obsidian', name: 'Obsidian', blurb: 'Near black, for OLED' },
-  { id: 'ember', name: 'Ember', blurb: 'Warm charcoal, amber' },
-  { id: 'moss', name: 'Moss', blurb: 'Forest green-black' },
-  { id: 'aubergine', name: 'Aubergine', blurb: 'Plum-black, lilac' },
-  { id: 'oxblood', name: 'Oxblood', blurb: 'Wine-black, coral' },
+  { id: 'graphite', get name() { return t('theme-graphite') }, get blurb() { return t('theme-dark-graphite-blurb') } },
+  { id: 'slate', get name() { return t('theme-slate') }, get blurb() { return t('theme-dark-slate-blurb') } },
+  { id: 'obsidian', get name() { return t('theme-obsidian') }, get blurb() { return t('theme-dark-obsidian-blurb') } },
+  { id: 'ember', get name() { return t('theme-ember') }, get blurb() { return t('theme-dark-ember-blurb') } },
+  { id: 'moss', get name() { return t('theme-moss') }, get blurb() { return t('theme-dark-moss-blurb') } },
+  { id: 'aubergine', get name() { return t('theme-aubergine') }, get blurb() { return t('theme-dark-aubergine-blurb') } },
+  { id: 'oxblood', get name() { return t('theme-oxblood') }, get blurb() { return t('theme-dark-oxblood-blurb') } },
 ]
 
 /** The theme in use for a scheme: the saved one, or the default when it's unknown (renamed, removed). */

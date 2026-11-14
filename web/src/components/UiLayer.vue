@@ -1,6 +1,7 @@
 <script setup lang="ts">
 // Renders ui.ts: the toast stack and the confirm dialog.
 import { nextTick, ref, watch } from 'vue'
+import { t } from '../i18n'
 import { act, answerDialog, dialog, dismiss, pause, resume, toasts } from '../ui'
 
 const dlg = ref<HTMLDialogElement | null>(null)
@@ -26,29 +27,29 @@ function onDialogClick(e: MouseEvent) {
 </script>
 
 <template>
-  <TransitionGroup tag="ol" name="toast" class="toasts" aria-label="Notifications">
+  <TransitionGroup tag="ol" name="toast" class="toasts" :aria-label="t('ui-notifications')">
     <li
-      v-for="t in toasts"
-      :key="t.id"
+      v-for="item in toasts"
+      :key="item.id"
       class="toast"
-      :class="[t.kind, { paused: t.paused }]"
-      :role="t.kind === 'error' ? 'alert' : 'status'"
-      @mouseenter="pause(t.id)"
-      @mouseleave="resume(t.id)"
-      @focusin="pause(t.id)"
-      @focusout="resume(t.id)"
+      :class="[item.kind, { paused: item.paused }]"
+      :role="item.kind === 'error' ? 'alert' : 'status'"
+      @mouseenter="pause(item.id)"
+      @mouseleave="resume(item.id)"
+      @focusin="pause(item.id)"
+      @focusout="resume(item.id)"
     >
-      <span :key="t.repeat" class="icon" :class="{ nudge: t.repeat }" aria-hidden="true">
-        <svg v-if="t.kind === 'ok'" viewBox="0 0 16 16" width="14" height="14"><path d="M3.5 8.5 6.5 11.5 12.5 4.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /></svg>
-        <svg v-else-if="t.kind === 'error'" viewBox="0 0 16 16" width="14" height="14"><path d="M8 4.5v4.5M8 11.6v.1" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" /></svg>
+      <span :key="item.repeat" class="icon" :class="{ nudge: item.repeat }" aria-hidden="true">
+        <svg v-if="item.kind === 'ok'" viewBox="0 0 16 16" width="14" height="14"><path d="M3.5 8.5 6.5 11.5 12.5 4.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /></svg>
+        <svg v-else-if="item.kind === 'error'" viewBox="0 0 16 16" width="14" height="14"><path d="M8 4.5v4.5M8 11.6v.1" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" /></svg>
         <svg v-else viewBox="0 0 16 16" width="14" height="14"><path d="M3 4.5h10M6.5 4.5V3h3v1.5M4.5 4.5l.6 8.5h5.8l.6-8.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /></svg>
       </span>
-      <span class="text">{{ t.text }}</span>
-      <button v-if="t.action" type="button" class="act" @click="act(t.id)">{{ t.action.label }}</button>
-      <button type="button" class="x" aria-label="Dismiss" @click="dismiss(t.id)">
+      <span class="text">{{ item.text }}</span>
+      <button v-if="item.action" type="button" class="act" @click="act(item.id)">{{ item.action.label }}</button>
+      <button type="button" class="x" :aria-label="t('ui-dismiss')" @click="dismiss(item.id)">
         <svg viewBox="0 0 16 16" width="11" height="11" aria-hidden="true"><path d="m4 4 8 8M12 4l-8 8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" /></svg>
       </button>
-      <span :key="`${t.repeat}-timer`" class="timer" :style="{ animationDuration: `${t.duration}ms` }" aria-hidden="true" />
+      <span :key="`${item.repeat}-timer`" class="timer" :style="{ animationDuration: `${item.duration}ms` }" aria-hidden="true" />
     </li>
   </TransitionGroup>
 
@@ -57,7 +58,7 @@ function onDialogClick(e: MouseEvent) {
       <h2>{{ dialog.open.title }}</h2>
       <p v-if="dialog.open.body">{{ dialog.open.body }}</p>
       <div class="row">
-        <button type="button" class="btn ghost" autofocus @click="answerDialog(false)">{{ dialog.open.cancel ?? 'Cancel' }}</button>
+        <button type="button" class="btn ghost" autofocus @click="answerDialog(false)">{{ dialog.open.cancel ?? t('ui-cancel') }}</button>
         <button ref="confirmBtn" type="submit" class="btn" :class="dialog.open.danger ? 'danger-solid' : 'primary'">{{ dialog.open.confirm }}</button>
       </div>
     </form>

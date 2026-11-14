@@ -2,6 +2,7 @@
 // One value of a JSON document as a tree: objects and arrays fold, and a long one shows its children a page at a
 // time, so a 50 MB level file opens as fast as a 5 KB one (only what's unfolded is drawn).
 import { computed, inject, ref, watch, type Ref } from 'vue'
+import { t } from '../i18n'
 
 const props = withDefaults(defineProps<{ value: unknown; k?: string | number; depth?: number }>(), { depth: 0 })
 
@@ -32,7 +33,7 @@ const scalar = computed(() => {
 })
 const summary = computed(() => {
   const n = entries.value.length
-  return isArray.value ? `${n} ${n === 1 ? 'item' : 'items'}` : `${n} ${n === 1 ? 'key' : 'keys'}`
+  return isArray.value ? t('json-items', { count: n }) : t('json-keys', { count: n })
 })
 </script>
 
@@ -44,7 +45,7 @@ const summary = computed(() => {
         type="button"
         class="twist"
         :aria-expanded="open"
-        :aria-label="open ? 'Fold' : 'Unfold'"
+        :aria-label="open ? t('json-fold') : t('json-unfold')"
         @click="open = !open"
       >
         <svg viewBox="0 0 10 10" width="9" height="9" aria-hidden="true"><path d="M3 1.8 7 5 3 8.2z" fill="currentColor" /></svg>
@@ -59,7 +60,7 @@ const summary = computed(() => {
         <span class="tk-p">{{ isArray ? '[' : '{' }}</span>
         <template v-if="!entries.length"><span class="tk-p">{{ isArray ? ']' : '}' }}</span></template>
         <template v-else-if="!open">
-          <button type="button" class="ellipsis" :aria-label="`Unfold ${summary}`" @click="open = true">…</button>
+          <button type="button" class="ellipsis" :aria-label="t('json-unfold-summary', { summary })" @click="open = true">…</button>
           <span class="tk-p">{{ isArray ? ']' : '}' }}</span>
           <span class="count">{{ summary }}</span>
         </template>
@@ -70,8 +71,8 @@ const summary = computed(() => {
       <div class="kids">
         <JsonTree v-for="[ck, cv] in shown" :key="ck" :value="cv" :k="ck" :depth="depth + 1" />
         <button v-if="entries.length > limit" type="button" class="more" @click="limit += PAGE">
-          Show {{ Math.min(PAGE, entries.length - limit).toLocaleString() }} more
-          <span class="count">of {{ (entries.length - limit).toLocaleString() }} left</span>
+          {{ t('json-show-more', { count: Math.min(PAGE, entries.length - limit) }) }}
+          <span class="count">{{ t('json-left', { count: entries.length - limit }) }}</span>
         </button>
       </div>
       <div class="row close"><span class="twist-space" /><span class="tk-p">{{ isArray ? ']' : '}' }}</span></div>

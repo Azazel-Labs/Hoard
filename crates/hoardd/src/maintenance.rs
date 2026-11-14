@@ -3,6 +3,7 @@
 //!
 //! One of each runs at a time. A run that was going when the server stopped is marked as stopped at the next start.
 
+use crate::i18n::tr;
 use std::collections::HashMap;
 use std::sync::{LazyLock, Mutex, PoisonError};
 use std::time::Duration;
@@ -20,8 +21,8 @@ use crate::{AppState, activity, db, jobs};
 
 pub(crate) struct Task {
     pub(crate) id: &'static str,
-    label: &'static str,
-    blurb: &'static str,
+    label: fn() -> String,
+    blurb: fn() -> String,
 }
 
 pub(crate) const BACKUP: &str = "backup";
@@ -32,42 +33,24 @@ pub(crate) const SHRINK_THUMBS: &str = "shrink_thumbs";
 pub(crate) const GC: &str = "gc";
 
 pub(crate) const TASKS: &[Task] = &[
-    Task {
-        id: BACKUP,
-        label: "Back up the database",
-        blurb: "A consistent copy of the database (packs, tags, notes, collections and Settings) in the backups \
-                folder next to it. The library's files aren't in it: they never change once stored, so any file sync \
-                backs them up.",
-    },
-    Task {
-        id: SCRUB,
-        label: "Check files for damage",
-        blurb: "Reads every stored file back and checks it against its fingerprint, to catch files that have rotted or \
-                gone missing from a disk or NAS. Takes a while on a big library.",
-    },
+    Task { id: BACKUP, label: || tr!("server-maintenance-backup"), blurb: || tr!("server-maintenance-backup-blurb") },
+    Task { id: SCRUB, label: || tr!("server-maintenance-scrub"), blurb: || tr!("server-maintenance-scrub-blurb") },
     Task {
         id: REANALYZE,
-        label: "Re-analyze every pack",
-        blurb: "Reads every file again with this version of Hoard: thumbnails, previews, details and rule tags are \
-                made afresh. Your own edits stay; the AI isn't asked again.",
+        label: || tr!("server-maintenance-reanalyze"),
+        blurb: || tr!("server-maintenance-reanalyze-blurb"),
     },
     Task {
         id: CLEAR_CACHE,
-        label: "Clear cached conversions",
-        blurb: "Drops the files kept from “Download as” conversions (they're made again when next asked for) and \
-                what interrupted work left behind.",
+        label: || tr!("server-maintenance-clear-cache"),
+        blurb: || tr!("server-maintenance-clear-cache-blurb"),
     },
     Task {
         id: SHRINK_THUMBS,
-        label: "Shrink thumbnails",
-        blurb: "Stores the thumbnails and model views kept as PNG the way Settings → Performance → Thumbnails asks, which \
-                usually makes them several times smaller. Ones with transparency, and pixel art, stay PNG.",
+        label: || tr!("server-maintenance-shrink-thumbs"),
+        blurb: || tr!("server-maintenance-shrink-thumbs-blurb"),
     },
-    Task {
-        id: GC,
-        label: "Delete unused files",
-        blurb: "Deletes stored files nothing points at any more, such as the files of packs deleted for good.",
-    },
+    Task { id: GC, label: || tr!("server-maintenance-gc"), blurb: || tr!("server-maintenance-gc-blurb") },
 ];
 
 /// Runs kept in the history.
@@ -140,7 +123,7 @@ async fn begin(state: &AppState, t: &'static Task) -> ApiResult<i64> {
         true
     });
     if !claimed {
-        return Err(AppError::conflict(format!("“{}” is already running", t.label)));
+        return Err(AppError::conflict(tr!("error-task-running", task = (t.label)())));
     }
     let (id, at) = (t.id, started_at.clone());
     let run = db::call(&state.pool, move |c| {
@@ -164,7 +147,7 @@ async fn begin(state: &AppState, t: &'static Task) -> ApiResult<i64> {
 
 /// Do the task, record how it went and let it go.
 async fn execute(state: &AppState, t: &'static Task, run: i64) -> Result<String> {
-    let report = Report { task: t.id, activity: activity::start("maintenance", t.label, None) };
+    let report = Report { task: t.id, activity: activity::start("maintenance", (t.label)(), None) };
     let result = match t.id {
         BACKUP => backup(state).await,
         SCRUB => scrub(state, &report).await,
@@ -199,7 +182,7 @@ async fn execute(state: &AppState, t: &'static Task, run: i64) -> Result<String>
 
 /// Start a task in the background.
 pub(crate) async fn start(state: &AppState, id: &str) -> ApiResult<i64> {
-    let t = task(id).ok_or_else(|| AppError::not_found(format!("maintenance task {id}")))?;
+    let t = task(id).ok_or_else(|| AppError::not_found(tr!("error-maintenance-task-not-found", id = id)))?;
     let run = begin(state, t).await?;
     let state = std::sync::Arc::clone(state);
     tokio::spawn(async move {
@@ -210,7 +193,7 @@ pub(crate) async fn start(state: &AppState, id: &str) -> ApiResult<i64> {
 
 /// Run a task and wait for it, for the scriptable endpoints (`POST /api/admin/backup` from cron).
 pub(crate) async fn run_now(state: &AppState, id: &str) -> ApiResult<String> {
-    let t = task(id).ok_or_else(|| AppError::not_found(format!("maintenance task {id}")))?;
+    let t = task(id).ok_or_else(|| AppError::not_found(tr!("error-maintenance-task-not-found", id = id)))?;
     let run = begin(state, t).await?;
     Ok(execute(state, t, run).await?)
 }
@@ -253,8 +236,8 @@ pub(crate) async fn overview(State(state): State<AppState>) -> ApiResult<Json<Va
         .map(|t| {
             json!({
                 "id": t.id,
-                "label": t.label,
-                "blurb": t.blurb,
+                "label": (t.label)(),
+                "blurb": (t.blurb)(),
                 "running": live.get(t.id),
                 "last": history.iter().find(|r| r.task == t.id),
             })

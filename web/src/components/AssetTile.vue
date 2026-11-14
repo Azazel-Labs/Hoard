@@ -7,6 +7,7 @@ import KindGlyph from './KindGlyph.vue'
 import { noteTileClick } from '../viewers'
 import { materialSummary } from '../materials'
 import { animatedSrc, PLAY_ON_TILE } from '../sprites'
+import { t } from '../i18n'
 
 const props = defineProps<{ asset: Asset; selected: boolean; checked: boolean; selecting: boolean }>()
 const emit = defineEmits<{ open: [MouseEvent | KeyboardEvent]; check: [MouseEvent]; similar: [] }>()
@@ -15,7 +16,7 @@ const detail = computed(() => {
   const m = props.asset.meta
   if (typeof m.width === 'number' && typeof m.height === 'number') return `${m.width}×${m.height}`
   if (typeof m.duration_secs === 'number') return formatDuration(m.duration_secs)
-  if (typeof m.triangles === 'number') return `${m.triangles.toLocaleString()} tris`
+  if (typeof m.triangles === 'number') return t('tile-triangles', { count: m.triangles })
   if (typeof m.material_maps === 'number') return materialSummary(props.asset)
   return ''
 })
@@ -64,7 +65,7 @@ function onClick(e: MouseEvent) {
       class="hit"
       :data-id="asset.id"
       :aria-pressed="selected"
-      :aria-label="`${asset.name}, ${asset.category ?? asset.kind}${detail ? `, ${detail}` : ''}`"
+      :aria-label="detail ? t('tile-label-detail', { name: asset.name, category: asset.category ?? asset.kind, detail }) : t('tile-label', { name: asset.name, category: asset.category ?? asset.kind })"
       @click="onClick"
       @contextmenu="onLongPress"
     >
@@ -93,7 +94,7 @@ function onClick(e: MouseEvent) {
         v-if="playable"
         type="button"
         class="play"
-        :aria-label="playing ? `Pause ${asset.name}` : `Play ${asset.name}`"
+        :aria-label="playing ? t('tile-pause', { name: asset.name }) : t('tile-play', { name: asset.name })"
         tabindex="-1"
         @click.stop="toggle(asset)"
       >
@@ -111,8 +112,8 @@ function onClick(e: MouseEvent) {
         class="fav"
         :class="{ on: starred }"
         :aria-pressed="starred"
-        :aria-label="`Favourite ${asset.name}`"
-        :title="starred ? 'In your favourites' : 'Add to your favourites (F)'"
+        :aria-label="t('tile-favourite', { name: asset.name })"
+        :title="starred ? t('tile-in-favourites') : t('tile-add-favourite')"
         tabindex="-1"
         @click.stop="toggleFavourite(asset.id)"
       >
@@ -122,8 +123,8 @@ function onClick(e: MouseEvent) {
         v-if="alikeable && !selecting"
         type="button"
         class="alike"
-        :aria-label="`More like ${asset.name}`"
-        title="More like this"
+        :aria-label="t('tile-more-like', { name: asset.name })"
+        :title="t('tile-more-like-this')"
         tabindex="-1"
         @click.stop="emit('similar')"
       >
@@ -137,7 +138,7 @@ function onClick(e: MouseEvent) {
         class="check"
         role="checkbox"
         :aria-checked="checked"
-        :aria-label="`Select ${asset.name}`"
+        :aria-label="t('tile-select', { name: asset.name })"
         tabindex="-1"
         @click.stop="emit('check', $event)"
       >

@@ -15,20 +15,21 @@ import { may, mayEdit } from '../auth'
 import { canStar, mine, toggleFavourite } from '../mine'
 import { MAX_STORE_FILE, TEXT_EXTS } from '../storeFormats'
 import { lazy } from '../lazy'
+import { formatDate, formatNumber, t } from '../i18n'
 import { isModelAsset, isTextAsset, takeViewRequest, viewRequest, viewerFor, type ViewerKind } from '../viewers'
-import { isMaterialAsset, resolutions, ROLE_LABEL, sizeLabel } from '../materials'
+import { isMaterialAsset, resolutions, ROLE_LABEL, ROLE_NAME, sizeLabel } from '../materials'
 import { withThumb } from '../browserThumbs'
 import { animatedAseprite, animatedSrc, PLAY_IN_PANEL, spriteSheet } from '../sprites'
 
 // three.js is big; only load it when someone opens a model.
-const ModelViewer = lazy(() => import('./ModelViewer.vue'), 'the 3D viewer', 'model-slot')
-const ModelInspector = lazy(() => import('./ModelInspector.vue'), 'the 3D viewer', 'overlay')
-const TextPreview = lazy(() => import('./TextPreview.vue'), 'the text')
-const TextViewer = lazy(() => import('./TextViewer.vue'), 'the text viewer', 'overlay')
-const ImageViewer = lazy(() => import('./ImageViewer.vue'), 'the image viewer', 'overlay')
-const MaterialPreview = lazy(() => import('./MaterialPreview.vue'), 'the material preview', 'model-slot')
-const MaterialViewer = lazy(() => import('./MaterialViewer.vue'), 'the material viewer', 'overlay')
-const SpritePlayer = lazy(() => import('./SpritePlayer.vue'), 'the sprite player')
+const ModelViewer = lazy(() => import('./ModelViewer.vue'), () => t('asset-lazy-3d-viewer'), 'model-slot')
+const ModelInspector = lazy(() => import('./ModelInspector.vue'), () => t('asset-lazy-3d-viewer'), 'overlay')
+const TextPreview = lazy(() => import('./TextPreview.vue'), () => t('asset-lazy-text'))
+const TextViewer = lazy(() => import('./TextViewer.vue'), () => t('asset-lazy-text-viewer'), 'overlay')
+const ImageViewer = lazy(() => import('./ImageViewer.vue'), () => t('asset-lazy-image-viewer'), 'overlay')
+const MaterialPreview = lazy(() => import('./MaterialPreview.vue'), () => t('asset-lazy-material-preview'), 'model-slot')
+const MaterialViewer = lazy(() => import('./MaterialViewer.vue'), () => t('asset-lazy-material-viewer'), 'overlay')
+const SpritePlayer = lazy(() => import('./SpritePlayer.vue'), () => t('asset-lazy-sprite-player'))
 
 const props = defineProps<{
   asset: Asset
@@ -93,9 +94,16 @@ watch(() => player.playing, (on) => {
 const withAnimations = ref(false)
 const isModel = computed(() => isModelAsset(props.asset))
 const isText = computed(() => isTextAsset(props.asset))
+// Getters, so the words are read at render time in the current language.
 const REL_LABEL: Record<LinkRel, string> = {
-  texture: 'texture', buffer: 'geometry data', material: 'material file', animation: 'animation',
-  library: 'linked file', guess: 'probably goes with', sidecar: 'store details', variant: 'variant',
+  get texture() { return t('asset-rel-texture') },
+  get buffer() { return t('asset-rel-buffer') },
+  get material() { return t('asset-rel-material') },
+  get animation() { return t('asset-rel-animation') },
+  get library() { return t('asset-rel-library') },
+  get guess() { return t('asset-rel-guess') },
+  get sidecar() { return t('asset-rel-sidecar') },
+  get variant() { return t('asset-rel-variant') },
 }
 const needs = computed(() => props.asset.links.filter((l) => l.rel !== 'animation'))
 // A material made from texture maps lists its maps by role instead of as "Needs"; a texture or model that belongs
@@ -105,7 +113,7 @@ const material = computed(() => props.asset.material ?? null)
 const partOf = computed(() => props.asset.materials ?? [])
 const roleOfHere = (m: MaterialInfo) => {
   const own = m.maps.find((x) => x.id === props.asset.id)
-  return own ? `${ROLE_LABEL[own.role].toLowerCase()} map` : `${m.maps.length} maps`
+  return own ? t('asset-role-map', { role: ROLE_NAME[own.role] }) : t('asset-maps-count', { count: m.maps.length })
 }
 /** A model wears these materials: each lists its maps under it by what they're for, not by their long file names. */
 const wears = (m: MaterialInfo) => !m.maps.some((x) => x.id === props.asset.id)
@@ -118,9 +126,9 @@ const anims = computed(() => props.asset.links.filter((l) => l.rel === 'animatio
 const usedBy = computed(() => props.asset.linked_from.filter((l) => !partOf.value.some((m) => m.id === l.id)))
 const linkGroups = computed(() =>
   [
-    { title: 'Needs', items: isMaterial.value ? [] : needs.value.filter((l) => !inMaterials.value.has(l.id)) },
-    { title: 'Animations', items: anims.value },
-    { title: 'Used by', items: usedBy.value },
+    { key: 'needs', title: t('asset-needs'), items: isMaterial.value ? [] : needs.value.filter((l) => !inMaterials.value.has(l.id)) },
+    { key: 'animations', title: t('asset-animations'), items: anims.value },
+    { key: 'used-by', title: t('asset-used-by'), items: usedBy.value },
   ].filter((g) => g.items.length),
 )
 const linkLabel = (l: AssetLink) => REL_LABEL[l.rel]
@@ -193,8 +201,8 @@ const audioUrl = computed(() => playableUrl(props.asset))
 const isAudio = computed(() => audioUrl.value !== null)
 const recovered = computed(() => sourceExt(props.asset))
 const ueTags = computed(() => {
-  const t = props.asset.meta.ue_tags
-  return t && typeof t === 'object' ? Object.entries(t as Record<string, string>) : []
+  const tags = props.asset.meta.ue_tags
+  return tags && typeof tags === 'object' ? Object.entries(tags as Record<string, string>) : []
 })
 // "Download as": another format, or the same one scaled down. '' = the original format.
 const asFormats = computed(() => props.asset.formats ?? [])
@@ -250,7 +258,7 @@ async function downloadAs(ev: MouseEvent) {
       const asked = Date.now()
       const st = await api.asStatus(props.asset, format, max)
       if (run !== asRun) return
-      if (st.state === 'failed') throw new Error(st.error ?? 'conversion failed')
+      if (st.state === 'failed') throw new Error(st.error ?? t('asset-conversion-failed'))
       if (st.state === 'ready') break
       asState.value = st
       // Progress comes back as it moves; a few updates a second is plenty.
@@ -270,9 +278,11 @@ async function downloadAs(ev: MouseEvent) {
 }
 const asLabel = computed(() => {
   const st = asState.value
-  if (st?.state === 'converting') return st.progress !== undefined ? `Converting… ${Math.round(st.progress * 100)}%` : 'Converting…'
-  if (st) return 'Queued…'
-  return 'Download'
+  if (st?.state === 'converting') {
+    return st.progress !== undefined ? t('asset-as-converting-percent', { percent: Math.round(st.progress * 100) }) : t('asset-as-converting')
+  }
+  if (st) return t('asset-as-queued')
+  return t('asset-download')
 })
 const showAs = computed(() => asFormats.value.length > 0 || (sameFormat.value !== null && sizeChoices.value.length > 0))
 
@@ -285,61 +295,88 @@ const visibleTags = computed(() =>
   props.asset.tags.filter((t) => !t.tag.startsWith('kind:') && !t.tag.startsWith('format:')),
 )
 
+/** A number with one decimal, the reader's way (44.1). */
+const oneDecimal = (n: number) => formatNumber(n, { minimumFractionDigits: 1, maximumFractionDigits: 1 })
+/** Labels for metadata the file names by key. */
+const TEXT_FIELD_LABEL: Record<string, () => string> = {
+  title: () => t('asset-meta-title'),
+  artist: () => t('asset-meta-artist'),
+  album: () => t('asset-meta-album'),
+  genre: () => t('asset-meta-genre'),
+  generator: () => t('asset-meta-generator'),
+}
+const COUNT_LABEL: Record<string, () => string> = {
+  meshes: () => t('asset-meta-meshes'),
+  materials: () => t('asset-meta-materials'),
+  animations: () => t('asset-meta-animations'),
+  skins: () => t('asset-meta-skins'),
+}
+
 const metaRows = computed(() => {
   const m = props.asset.meta
   const rows: [string, string][] = []
   const num = (k: string) => (typeof m[k] === 'number' ? (m[k] as number) : undefined)
-  if (num('width') !== undefined) rows.push(['Size', `${m.width} × ${m.height} px`])
-  if (num('duration_secs') !== undefined) rows.push(['Length', formatDuration(num('duration_secs')!)])
-  if (num('sample_rate') !== undefined) rows.push(['Sample rate', `${(num('sample_rate')! / 1000).toFixed(1)} kHz`])
-  if (num('channels') !== undefined) rows.push(['Channels', num('channels') === 1 ? 'Mono' : num('channels') === 2 ? 'Stereo' : String(m.channels)])
-  if (num('bit_depth') !== undefined) rows.push(['Bit depth', `${m.bit_depth}-bit`])
+  if (num('width') !== undefined) rows.push([t('asset-meta-size'), `${m.width} × ${m.height} px`])
+  if (num('duration_secs') !== undefined) rows.push([t('asset-meta-length'), formatDuration(num('duration_secs')!)])
+  if (num('sample_rate') !== undefined) rows.push([t('asset-meta-sample-rate'), `${oneDecimal(num('sample_rate')! / 1000)} kHz`])
+  if (num('channels') !== undefined) {
+    const ch = num('channels') === 1 ? t('asset-meta-mono') : num('channels') === 2 ? t('asset-meta-stereo') : String(m.channels)
+    rows.push([t('asset-meta-channels'), ch])
+  }
+  if (num('bit_depth') !== undefined) rows.push([t('asset-meta-bit-depth'), t('asset-meta-bits', { bits: num('bit_depth')! })])
   if (num('peak_dbfs') !== undefined) {
-    rows.push(['Level', `peak ${num('peak_dbfs')!.toFixed(1)} dBFS, RMS ${num('rms_dbfs')!.toFixed(1)} dBFS${m.clipped ? ', clips' : ''}`])
+    const peak = oneDecimal(num('peak_dbfs')!)
+    const rms = oneDecimal(num('rms_dbfs')!)
+    rows.push([t('asset-meta-level'), m.clipped ? t('asset-meta-level-clips', { peak, rms }) : t('asset-meta-level-value', { peak, rms })])
   }
   if (num('loop_start') !== undefined && num('sample_rate')) {
     const sr = num('sample_rate')!
-    rows.push(['Loop', `${formatDuration(num('loop_start')! / sr)} to ${formatDuration(num('loop_end')! / sr)}`])
-  } else if (m.one_shot === true) rows.push(['Playback', 'One-shot'])
-  if (num('tempo_bpm') !== undefined) rows.push(['Tempo', `${m.tempo_bpm} BPM`])
-  if (typeof m.root_note === 'string') rows.push(['Root note', m.root_note as string])
-  if (num('cue_points')) rows.push(['Cue markers', String(m.cue_points)])
+    rows.push([t('asset-meta-loop'), t('asset-meta-loop-value', { start: formatDuration(num('loop_start')! / sr), end: formatDuration(num('loop_end')! / sr) })])
+  } else if (m.one_shot === true) rows.push([t('asset-meta-playback'), t('asset-meta-one-shot')])
+  if (num('tempo_bpm') !== undefined) rows.push([t('asset-meta-tempo'), `${m.tempo_bpm} BPM`])
+  if (typeof m.root_note === 'string') rows.push([t('asset-meta-root-note'), m.root_note as string])
+  if (num('cue_points')) rows.push([t('asset-meta-cue-markers'), String(m.cue_points)])
   if (typeof m.ucs_category === 'string') {
     rows.push(['UCS', [m.ucs_category, m.ucs_subcategory].filter(Boolean).join(' / ') + (m.ucs_catid ? ` (${m.ucs_catid})` : '')])
   }
-  if (typeof m.library === 'string') rows.push(['Library', m.library as string])
-  if (Array.isArray(m.keywords) && m.keywords.length) rows.push(['Keywords', (m.keywords as string[]).join(', ')])
+  if (typeof m.library === 'string') rows.push([t('asset-meta-library'), m.library as string])
+  if (Array.isArray(m.keywords) && m.keywords.length) rows.push([t('asset-meta-keywords'), (m.keywords as string[]).join(', ')])
   for (const k of ['title', 'artist', 'album', 'genre', 'generator']) {
-    if (typeof m[k] === 'string') rows.push([k[0].toUpperCase() + k.slice(1), m[k] as string])
+    if (typeof m[k] === 'string') rows.push([TEXT_FIELD_LABEL[k](), m[k] as string])
   }
-  if (typeof m.blender_version === 'string') rows.push(['Saved with', `Blender ${m.blender_version}`])
-  if (typeof m.color_mode === 'string') rows.push(['Color mode', (m.color_mode as string).toUpperCase()])
-  if (num('layers') !== undefined) rows.push(['Layers', String(m.layers)])
-  if (m.hdr === true) rows.push(['Range', 'HDR (preview is tone-mapped)'])
-  if (m.large_document === true) rows.push(['Format', 'Large document (PSB)'])
+  if (typeof m.blender_version === 'string') rows.push([t('asset-meta-saved-with'), `Blender ${m.blender_version}`])
+  if (typeof m.color_mode === 'string') rows.push([t('asset-meta-color-mode'), (m.color_mode as string).toUpperCase()])
+  if (num('layers') !== undefined) rows.push([t('asset-meta-layers'), String(m.layers)])
+  if (m.hdr === true) rows.push([t('asset-meta-range'), t('asset-meta-hdr')])
+  if (m.large_document === true) rows.push([t('asset-meta-format'), t('asset-meta-large-document')])
   const ai = m.ai as { made?: string; by?: string; how?: string } | undefined
   if (ai?.made) {
-    const made = ai.made === 'edited' ? 'Edited with generative AI' : 'Made with generative AI'
-    rows.push(['AI', `${made}${ai.by ? ` (${ai.by})` : ''}, says its ${ai.how ?? 'metadata'}`])
-  } else if (m.content_credentials === true) rows.push(['Provenance', 'Has C2PA Content Credentials'])
-  if (typeof m.compression === 'string') rows.push(['Compression', m.compression as string])
-  if (typeof m.note === 'string') rows.push(['Note', m.note as string])
+    const made = ai.made === 'edited' ? t('asset-meta-ai-edited') : t('asset-meta-ai-made')
+    // The server names where it read this with one of a few fixed English phrases.
+    const how = ai.how === 'generator settings' ? t('asset-meta-ai-how-generator')
+      : ai.how === 'IPTC digital source type' ? t('asset-meta-ai-how-iptc')
+      : ai.how ?? t('asset-meta-ai-how-metadata')
+    rows.push([t('asset-meta-ai'), ai.by ? t('asset-meta-ai-by-says', { made, by: ai.by, how }) : t('asset-meta-ai-says', { made, how })])
+  } else if (m.content_credentials === true) rows.push([t('asset-meta-provenance'), t('asset-meta-c2pa')])
+  if (typeof m.compression === 'string') rows.push([t('asset-meta-compression'), m.compression as string])
+  if (typeof m.note === 'string') rows.push([t('asset-meta-note'), m.note as string])
   if (material.value) {
-    rows.push(['Maps', String(material.value.maps.length)])
+    rows.push([t('asset-meta-maps'), String(material.value.maps.length)])
     const sizes = resolutions(material.value)
-    if (sizes.length) rows.push([sizes.length === 1 ? 'Size' : 'Sizes', sizes.map(sizeLabel).join(', ')])
+    if (sizes.length) rows.push([t('asset-meta-sizes', { count: sizes.length }), sizes.map(sizeLabel).join(', ')])
   }
-  if (num('triangles') !== undefined) rows.push(['Triangles', num('triangles')!.toLocaleString()])
-  if (num('vertices') !== undefined) rows.push(['Vertices', num('vertices')!.toLocaleString()])
+  if (num('triangles') !== undefined) rows.push([t('asset-meta-triangles'), formatNumber(num('triangles')!)])
+  if (num('vertices') !== undefined) rows.push([t('asset-meta-vertices'), formatNumber(num('vertices')!)])
   for (const k of ['meshes', 'materials', 'animations', 'skins']) {
-    if (num(k)) rows.push([k[0].toUpperCase() + k.slice(1), String(m[k])])
+    if (num(k)) rows.push([COUNT_LABEL[k](), String(m[k])])
   }
   if (typeof m.ue_class === 'string') {
-    rows.push(['Unreal asset', `${m.ue_class}${typeof m.ue_engine === 'string' ? `, saved with UE ${m.ue_engine}` : ''}`])
-    if (m.ue_cooked === true) rows.push(['Package', 'Cooked (game build): previews and sources are stripped'])
+    const cls = m.ue_class as string
+    rows.push([t('asset-meta-unreal-asset'), typeof m.ue_engine === 'string' ? t('asset-meta-unreal-saved-with', { class: cls, engine: m.ue_engine }) : cls])
+    if (m.ue_cooked === true) rows.push([t('asset-meta-package'), t('asset-meta-cooked')])
   }
-  if (m.tileable === true) rows.push(['Tiling', 'Seamless on both axes'])
-  if (typeof m.analysis_error === 'string') rows.push(['Note', `Couldn't fully read this file: ${m.analysis_error}`])
+  if (m.tileable === true) rows.push([t('asset-meta-tiling'), t('asset-meta-seamless')])
+  if (typeof m.analysis_error === 'string') rows.push([t('asset-meta-note'), t('asset-meta-analysis-error', { error: m.analysis_error })])
   return rows
 })
 
@@ -347,12 +384,41 @@ const tomlSnippet = computed(
   () => `[[select]]\nids = ["${props.asset.id}"]  # ${props.asset.name}\ndest = "${props.asset.category ?? props.asset.kind}"`,
 )
 
-async function copy(text: string, what: string) {
+/** What the copy buttons put on the clipboard, for the "Copied …" note. */
+type Copyable = 'hash' | 'toml' | 'id'
+function copiedNote(what: string): string {
+  switch (what) {
+    case 'hash': return t('asset-copied-hash')
+    case 'toml': return t('asset-copied-toml')
+    case 'id': return t('asset-copied-id')
+    default: return ''
+  }
+}
+
+/** The end of "This file was X…": its class and the engine version that saved it, as far as they're known. */
+const originTail = computed(() => {
+  const o = origin.value
+  if (!o) return ''
+  if (o.class && o.engine) return t('asset-origin-class-engine', { class: o.class, engine: o.engine })
+  if (o.class) return t('asset-origin-class', { class: o.class })
+  if (o.engine) return t('asset-origin-engine', { engine: o.engine })
+  return t('asset-origin-end')
+})
+/** Who converted it, when, and any notes. */
+const originHow = computed(() => {
+  const o = origin.value
+  if (!o) return ''
+  const date = formatDate(o.converted_at)
+  if (o.method === 'editor') return o.notes ? t('asset-origin-editor-notes', { date, notes: o.notes }) : t('asset-origin-editor', { date })
+  return o.notes ? t('asset-origin-hoard-notes', { date, notes: o.notes }) : t('asset-origin-hoard', { date })
+})
+
+async function copy(text: string, what: Copyable) {
   if (await copyText(text)) {
     copied.value = what
     setTimeout(() => (copied.value = ''), 1500)
   } else {
-    emit('error', 'Couldn’t copy: the browser blocked it')
+    emit('error', t('asset-copy-blocked'))
   }
 }
 
@@ -376,13 +442,13 @@ async function patch(body: Parameters<typeof api.patchAsset>[1]): Promise<boolea
     return true
   } catch (e) {
     if (optimistic) emit('updated', before)
-    emit('error', `Couldn't save: ${(e as Error).message}`)
+    emit('error', t('asset-save-error', { error: (e as Error).message }))
     return false
   }
 }
 
 async function removeTag(tag: string) {
-  if (await patch({ remove_tags: [tag] })) showOk(`Removed ${tag}`, { label: 'Undo', run: () => void patch({ add_tags: [tag] }) })
+  if (await patch({ remove_tags: [tag] })) showOk(t('asset-tag-removed', { tag }), { label: t('asset-undo'), run: () => void patch({ add_tags: [tag] }) })
 }
 
 // Renaming edits the heading itself, so nothing moves: the text just becomes editable where it is.
@@ -467,11 +533,11 @@ async function saveDescription() {
 }
 
 async function addTag() {
-  const t = newTag.value.trim()
-  if (!t) return
+  const tag = newTag.value.trim()
+  if (!tag) return
   newTag.value = ''
   suggestions.value = []
-  await patch({ add_tags: [t] })
+  await patch({ add_tags: [tag] })
 }
 
 let suggestTimer: ReturnType<typeof setTimeout> | undefined
@@ -593,15 +659,15 @@ function togglePlay() {
   if (!el) return
   if (el.paused) {
     if (el.ended || progress.value >= 1) el.currentTime = 0
-    void el.play().catch((e) => emit('error', `Couldn't play this file: ${(e as Error).message}`))
+    void el.play().catch((e) => emit('error', t('asset-play-error', { error: (e as Error).message })))
   } else el.pause()
 }
 function seekTo(f: number) {
   const el = audioEl.value
   if (!el || !duration.value) return
-  const t = Math.min(1, Math.max(0, f)) * duration.value
-  el.currentTime = t
-  current.value = t
+  const at = Math.min(1, Math.max(0, f)) * duration.value
+  el.currentTime = at
+  current.value = at
 }
 const fractionAt = (e: PointerEvent) => {
   const r = (e.currentTarget as HTMLElement).getBoundingClientRect()
@@ -652,20 +718,20 @@ onBeforeUnmount(() => unswipe())
 </script>
 
 <template>
-  <aside ref="root" class="detail" :class="{ page }" :style="{ '--kind': `var(--k-${asset.kind})` }" aria-label="Asset details">
+  <aside ref="root" class="detail" :class="{ page }" :style="{ '--kind': `var(--k-${asset.kind})` }" :aria-label="t('asset-details')">
     <header>
       <div class="topbar">
         <p class="where">
           <span>{{ asset.category ?? asset.kind }}</span>
-          <span class="sep" aria-hidden="true">in</span>
+          <span class="sep" aria-hidden="true">{{ t('asset-in-pack') }}</span>
           <span class="pack">{{ asset.pack_name }}</span>
         </p>
         <div class="nav">
-          <button class="btn ghost icon" type="button" aria-label="Previous asset" :disabled="!position?.hasPrev" @click="$emit('step', -1)">
+          <button class="btn ghost icon" type="button" :aria-label="t('asset-previous')" :disabled="!position?.hasPrev" @click="$emit('step', -1)">
             <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M10 3 5 8l5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" /></svg>
           </button>
           <span v-if="position" class="pos mono">{{ position.index + 1 }}/{{ position.total }}</span>
-          <button class="btn ghost icon" type="button" aria-label="Next asset" :disabled="!position?.hasNext" @click="$emit('step', 1)">
+          <button class="btn ghost icon" type="button" :aria-label="t('asset-next')" :disabled="!position?.hasNext" @click="$emit('step', 1)">
             <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="m6 3 5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" /></svg>
           </button>
           <button
@@ -674,8 +740,8 @@ onBeforeUnmount(() => unswipe())
             :class="{ on: starred }"
             type="button"
             :aria-pressed="starred"
-            aria-label="Favourite"
-            :title="starred ? 'In your favourites (F takes it out)' : 'Add to your favourites (F)'"
+            :aria-label="t('asset-favourite')"
+            :title="starred ? t('asset-favourite-on-title') : t('asset-favourite-off-title')"
             @click="toggleFavourite(asset.id)"
           >
             <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M8 1.9l1.8 3.7 4.1.6-3 2.9.7 4.1L8 11.3l-3.6 1.9.7-4.1-3-2.9 4.1-.6z" :fill="starred ? 'currentColor' : 'none'" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round" /></svg>
@@ -683,14 +749,14 @@ onBeforeUnmount(() => unswipe())
           <button
             class="btn ghost icon layout"
             type="button"
-            :aria-label="page ? 'Show in a side panel' : 'Show full page'"
-            :title="page ? 'Show in a side panel' : 'Show full page: a big preview beside the details'"
+            :aria-label="page ? t('asset-layout-panel') : t('asset-layout-page')"
+            :title="page ? t('asset-layout-panel') : t('asset-layout-page-title')"
             @click="$emit('layout')"
           >
             <svg v-if="page" viewBox="0 0 16 16" width="14" height="14" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1.75" y="2.75" width="12.5" height="10.5" rx="1.5" /><path d="M9.5 2.75v10.5" /></svg>
             <svg v-else viewBox="0 0 16 16" width="14" height="14" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="1.75" y="2.75" width="12.5" height="10.5" rx="1.5" /><path d="M5 9.5 7.5 7 10 9.5" transform="rotate(45 7.5 8)" /></svg>
           </button>
-          <button class="btn ghost icon close" type="button" aria-label="Close details" @click="$emit('close')">
+          <button class="btn ghost icon close" type="button" :aria-label="t('asset-close')" @click="$emit('close')">
             <svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true"><path d="m4 4 8 8M12 4l-8 8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" /></svg>
           </button>
         </div>
@@ -702,8 +768,8 @@ onBeforeUnmount(() => unswipe())
         tabindex="0"
         spellcheck="false"
         :contenteditable="editingName ? 'plaintext-only' : undefined"
-        :title="editingName || !editor ? undefined : 'Click to rename'"
-        :aria-label="editingName ? 'Name' : undefined"
+        :title="editingName || !editor ? undefined : t('asset-rename-title')"
+        :aria-label="editingName ? t('asset-name') : undefined"
         @click="startRename($event)"
         @keydown="onNameKey"
         @blur="endRename(true)"
@@ -715,7 +781,7 @@ onBeforeUnmount(() => unswipe())
          wrappers step aside and everything is one column. -->
     <div class="stagecol">
     <div v-if="isModel && showViews" class="preview checker">
-      <img :src="`/api/assets/${asset.id}/derivative/views`" alt="The model from four directions" />
+      <img :src="`/api/assets/${asset.id}/derivative/views`" :alt="t('asset-views-alt')" />
     </div>
     <ModelViewer
       v-else-if="isModel"
@@ -736,8 +802,8 @@ onBeforeUnmount(() => unswipe())
       v-else-if="isImage"
       type="button"
       class="preview checker zoomable"
-      :aria-label="`Inspect ${asset.name} full screen`"
-      title="Inspect: zoom, tile, channels"
+      :aria-label="t('asset-inspect-aria', { name: asset.name })"
+      :title="t('asset-inspect-title')"
       @click="inspecting = 'image'"
     >
       <img :src="animatedSrc(asset, PLAY_IN_PANEL) ?? thumbUrl(asset)" alt="" :class="{ pixelated }" />
@@ -753,11 +819,11 @@ onBeforeUnmount(() => unswipe())
         :class="{ flat: waveState !== 'done' }"
         role="slider"
         tabindex="0"
-        aria-label="Playback position"
+        :aria-label="t('asset-playback-position')"
         :aria-valuemin="0"
         :aria-valuemax="Math.round(duration)"
         :aria-valuenow="Math.round(current)"
-        :aria-valuetext="`${clock(current)} of ${clock(duration)}`"
+        :aria-valuetext="t('asset-playback-value', { current: clock(current), duration: clock(duration) })"
         :style="{ '--p': progress }"
         @pointerdown="scrubDown"
         @pointermove="scrubMove"
@@ -774,13 +840,13 @@ onBeforeUnmount(() => unswipe())
         </span>
       </div>
       <div class="transport">
-        <button type="button" class="play" :aria-label="playing ? 'Pause' : 'Play'" @click="togglePlay">
+        <button type="button" class="play" :aria-label="playing ? t('asset-pause') : t('asset-play')" @click="togglePlay">
           <svg v-if="playing" viewBox="0 0 16 16" width="14" height="14" fill="currentColor" aria-hidden="true"><rect x="3.5" y="2.5" width="3" height="11" rx="1" /><rect x="9.5" y="2.5" width="3" height="11" rx="1" /></svg>
           <svg v-else viewBox="0 0 16 16" width="14" height="14" fill="currentColor" aria-hidden="true"><path d="M4.5 2.8v10.4a.8.8 0 0 0 1.2.7l8.3-5.2a.8.8 0 0 0 0-1.4L5.7 2.1a.8.8 0 0 0-1.2.7Z" /></svg>
         </button>
         <span class="mono time">{{ clock(current) }} <span class="of">/ {{ clock(duration) }}</span></span>
-        <span v-if="waveState === 'loading'" class="wavenote">Drawing waveform…</span>
-        <span v-else-if="waveState === 'skipped'" class="wavenote">No waveform for files this big</span>
+        <span v-if="waveState === 'loading'" class="wavenote">{{ t('asset-waveform-drawing') }}</span>
+        <span v-else-if="waveState === 'skipped'" class="wavenote">{{ t('asset-waveform-skipped') }}</span>
       </div>
       <audio
         ref="audioEl"
@@ -803,22 +869,22 @@ onBeforeUnmount(() => unswipe())
     <TextViewer v-else-if="inspecting === 'text'" :asset="asset" @close="inspecting = ''" />
     <MaterialViewer v-else-if="inspecting === 'material' && material" :asset="asset" :material="material" @close="inspecting = ''" />
     <label v-if="spritePlayable" class="animcheck">
-      <input v-model="animate" type="checkbox" /> Play as animation
+      <input v-model="animate" type="checkbox" /> {{ t('asset-play-animation') }}
     </label>
     <label v-if="isModel && hasViews" class="animcheck">
-      <input v-model="showViews" type="checkbox" /> Show the four-view sheet the tagger saw
+      <input v-model="showViews" type="checkbox" /> {{ t('asset-show-views') }}
     </label>
 
     <div v-if="alikeable || palette.length" class="looks">
-      <div v-if="palette.length" class="palette" role="group" aria-label="Colours in the picture">
+      <div v-if="palette.length" class="palette" role="group" :aria-label="t('asset-palette')">
         <button
           v-for="c in palette"
           :key="c.hex"
           type="button"
           class="swatch"
           :style="{ background: c.hex, '--g': c.share }"
-          :title="`${c.hex}, ${Math.round(c.share * 100)}% of the picture. Find assets with this colour`"
-          :aria-label="`Find assets with ${c.hex}, ${Math.round(c.share * 100)}% of this picture`"
+          :title="t('asset-swatch-title', { hex: c.hex, percent: Math.round(c.share * 100) })"
+          :aria-label="t('asset-swatch-aria', { hex: c.hex, percent: Math.round(c.share * 100) })"
           @click="emit('color', c.hex)"
         />
       </div>
@@ -827,7 +893,7 @@ onBeforeUnmount(() => unswipe())
           <rect x="1.8" y="5.5" width="7.5" height="7.5" rx="1.6" />
           <rect x="6.7" y="2.5" width="7.5" height="7.5" rx="1.6" fill="var(--panel)" />
         </svg>
-        More like this
+        {{ t('asset-more-like-this') }}
       </button>
     </div>
     </div>
@@ -835,81 +901,81 @@ onBeforeUnmount(() => unswipe())
     <div class="infocol">
     <section class="descs">
       <form v-if="editingDesc" class="descedit" @submit.prevent="saveDescription">
-        <label class="visually-hidden" for="asset-desc">Your description</label>
+        <label class="visually-hidden" for="asset-desc">{{ t('asset-desc-label') }}</label>
         <textarea id="asset-desc" v-model="descDraft" class="field" rows="3" maxlength="2000"
-          placeholder="What it is, where you'd use it…" />
+          :placeholder="t('asset-desc-placeholder')" />
         <div class="descbtns">
-          <button class="btn primary" type="submit">Save</button>
-          <button class="btn" type="button" @click="editingDesc = false">Cancel</button>
-          <span v-if="family && applyToFamily" class="hint">Saves to all {{ family.size }} variants</span>
+          <button class="btn primary" type="submit">{{ t('asset-save') }}</button>
+          <button class="btn" type="button" @click="editingDesc = false">{{ t('asset-cancel') }}</button>
+          <span v-if="family && applyToFamily" class="hint">{{ t('asset-desc-family', { count: family.size }) }}</span>
         </div>
       </form>
       <template v-else>
         <p v-if="asset.description" class="desc mine">{{ asset.description }}</p>
         <button v-if="editor" type="button" class="linkish small" @click="editDescription">
-          {{ asset.description ? 'Edit description' : 'Write a description' }}
+          {{ asset.description ? t('asset-desc-edit') : t('asset-desc-write') }}
         </button>
       </template>
       <div v-if="asset.ai_description" class="descsrc">
-        <span class="srclabel">Written by AI</span>
+        <span class="srclabel">{{ t('asset-desc-ai') }}</span>
         <p class="desc">{{ asset.ai_description }}</p>
       </div>
       <div v-if="asset.source_description" class="descsrc">
-        <span class="srclabel">From the file</span>
+        <span class="srclabel">{{ t('asset-desc-file') }}</span>
         <p class="desc">{{ asset.source_description }}</p>
       </div>
       <div v-if="storeBlurb" class="descsrc">
         <span class="srclabel">
-          From the
-          <a v-if="storeBlurb.url" :href="storeBlurb.url" target="_blank" rel="noopener noreferrer">{{ storeBlurb.store ?? 'store' }} page</a>
-          <template v-else>{{ storeBlurb.store ?? 'store' }} page</template>
-          (the whole pack)
+          {{ t('asset-desc-store-before') }}
+          <a v-if="storeBlurb.url" :href="storeBlurb.url" target="_blank" rel="noopener noreferrer">{{ storeBlurb.store ? t('asset-desc-store-page', { store: storeBlurb.store }) : t('asset-desc-store-page-unnamed') }}</a>
+          <template v-else>{{ storeBlurb.store ? t('asset-desc-store-page', { store: storeBlurb.store }) : t('asset-desc-store-page-unnamed') }}</template>
+          {{ t('asset-desc-store-after') }}
         </span>
         <p class="desc store" :class="{ open: storeOpen }">{{ storeBlurb.text }}</p>
         <button v-if="storeBlurb.text.length > 240" type="button" class="linkish small" @click="storeOpen = !storeOpen">
-          {{ storeOpen ? 'Less' : 'More' }}
+          {{ storeOpen ? t('asset-less') : t('asset-more') }}
         </button>
       </div>
     </section>
 
     <section>
-      <h3>Tags</h3>
+      <h3>{{ t('asset-tags') }}</h3>
       <TransitionGroup tag="div" name="chip" class="tags">
         <TagChip
-          v-for="t in visibleTags"
-          :key="t.tag"
-          :tag="t.tag"
-          :source="t.source"
+          v-for="vt in visibleTags"
+          :key="vt.tag"
+          :tag="vt.tag"
+          :source="vt.source"
           :removable="editor"
-          @click="$emit('tag', t.tag)"
-          @remove="removeTag(t.tag)"
+          @click="$emit('tag', vt.tag)"
+          @remove="removeTag(vt.tag)"
         />
       </TransitionGroup>
       <form v-if="editor" class="addtag" @submit.prevent="addTag">
-        <label class="visually-hidden" for="new-tag">Add a tag</label>
-        <input id="new-tag" v-model="newTag" class="field" list="tag-suggestions" placeholder="Add a tag, e.g. mood:tense" autocomplete="off" />
+        <label class="visually-hidden" for="new-tag">{{ t('asset-tag-add-label') }}</label>
+        <input id="new-tag" v-model="newTag" class="field" list="tag-suggestions" :placeholder="t('asset-tag-add-placeholder')" autocomplete="off" />
         <datalist id="tag-suggestions">
           <option v-for="s in suggestions" :key="s.value" :value="s.value">{{ s.count }}</option>
         </datalist>
-        <button class="btn" type="submit" :disabled="!newTag.trim()">Add</button>
+        <button class="btn" type="submit" :disabled="!newTag.trim()">{{ t('asset-tag-add') }}</button>
       </form>
       <label v-if="family && editor" class="animcheck familycheck">
-        <input v-model="applyToFamily" type="checkbox" /> Apply tag, category and description changes to all {{ family.size }} variants
+        <input v-model="applyToFamily" type="checkbox" /> {{ t('asset-apply-family', { count: family.size }) }}
       </label>
     </section>
 
     <section v-if="editor || inCollections.length" class="cols">
-      <h3>Collections</h3>
+      <h3>{{ t('asset-collections') }}</h3>
       <div class="tags">
         <span v-for="c in inCollections" :key="c.id" class="chip src-human colchip">
           <button type="button" class="linkish" @click="$emit('browseCollection', c)">{{ c.name }}</button>
-          <button v-if="editor" class="x" type="button" :aria-label="`Remove from ${c.name}`" @click="$emit('uncollect', c.id)">×</button>
+          <button v-if="editor" class="x" type="button" :aria-label="t('asset-collection-remove', { name: c.name })" @click="$emit('uncollect', c.id)">×</button>
         </span>
         <CollectionPicker
           v-if="editor"
           :collections="collections"
           :current="inCollections.map((c) => c.id)"
-          :label="inCollections.length ? 'Add to another' : 'Add to collection'"
+          :label="inCollections.length ? t('asset-collection-add-another') : t('asset-collection-add')"
           @add="(id) => $emit('collect', id)"
           @remove="(id) => $emit('uncollect', id)"
           @create="(name) => $emit('collect', '', name)"
@@ -918,18 +984,18 @@ onBeforeUnmount(() => unswipe())
     </section>
 
     <section v-if="usedIn.length" class="used">
-      <h3>Used in</h3>
+      <h3>{{ t('asset-used-in') }}</h3>
       <ul>
         <li v-for="u in usedIn" :key="u.id">
-          <button type="button" class="linkish" :title="`Show what ${u.name} has`" @click="$emit('browseProject', u.name)">{{ u.name }}</button>
+          <button type="button" class="linkish" :title="t('asset-used-in-title', { name: u.name })" @click="$emit('browseProject', u.name)">{{ u.name }}</button>
           <span class="mono where" :title="u.examples[0]?.path">{{ u.examples[0]?.path }}</span>
-          <span class="when">synced {{ daysAgo(u.synced_at) }}</span>
+          <span class="when">{{ t('asset-used-in-synced', { when: daysAgo(u.synced_at) }) }}</span>
         </li>
       </ul>
     </section>
 
     <section v-if="material">
-      <h3>Maps</h3>
+      <h3>{{ t('asset-maps') }}</h3>
       <ul class="links">
         <li v-for="m in peek('maps', material.maps)" :key="m.id">
           <button type="button" class="link" style="--kind: var(--k-texture)" :title="m.path" @click="$emit('open', m.id)">
@@ -943,12 +1009,12 @@ onBeforeUnmount(() => unswipe())
         </li>
       </ul>
       <button v-if="peek('maps', material.maps).length < material.maps.length" type="button" class="linkish small showmore" @click="unfold('maps')">
-        Show {{ material.maps.length - LIST_PEEK }} more
+        {{ t('asset-show-more', { count: material.maps.length - LIST_PEEK }) }}
       </button>
     </section>
 
     <section v-if="partOf.length">
-      <h3>{{ partOf.length === 1 ? 'Material' : 'Materials' }}</h3>
+      <h3>{{ t('asset-materials-heading', { count: partOf.length }) }}</h3>
       <ul class="links">
         <li v-for="m in partOf" :key="m.id">
           <button type="button" class="link" style="--kind: var(--k-material)" @click="$emit('open', m.id)">
@@ -959,7 +1025,7 @@ onBeforeUnmount(() => unswipe())
             <span class="lname">{{ m.name }}</span>
             <span class="lrel">{{ roleOfHere(m) }}</span>
           </button>
-          <ul v-if="wears(m)" class="links maps" :aria-label="`${m.name}: maps`">
+          <ul v-if="wears(m)" class="links maps" :aria-label="t('asset-material-maps-aria', { name: m.name })">
             <li v-for="x in peek(`maps-${m.id}`, m.maps)" :key="x.id">
               <button type="button" class="link" style="--kind: var(--k-texture)" :title="x.path" @click="$emit('open', x.id)">
                 <span class="lthumb checker">
@@ -977,16 +1043,16 @@ onBeforeUnmount(() => unswipe())
             class="linkish small showmore"
             @click="unfold(`maps-${m.id}`)"
           >
-            Show {{ m.maps.length - LIST_PEEK }} more
+            {{ t('asset-show-more', { count: m.maps.length - LIST_PEEK }) }}
           </button>
         </li>
       </ul>
     </section>
 
-    <section v-for="g in linkGroups" :key="g.title">
+    <section v-for="g in linkGroups" :key="g.key">
       <h3>{{ g.title }}</h3>
       <ul class="links">
-        <li v-for="l in peek(g.title, g.items)" :key="l.id + l.rel">
+        <li v-for="l in peek(g.key, g.items)" :key="l.id + l.rel">
           <button type="button" class="link" :style="{ '--kind': `var(--k-${l.kind})` }" @click="$emit('open', l.id)">
             <span class="lthumb checker">
               <img v-if="l.has_thumb" :src="thumbUrl(l)" :class="{ glyphs: l.kind === 'font' }" alt="" loading="lazy" />
@@ -997,13 +1063,13 @@ onBeforeUnmount(() => unswipe())
           </button>
         </li>
       </ul>
-      <button v-if="peek(g.title, g.items).length < g.items.length" type="button" class="linkish small showmore" @click="unfold(g.title)">
-        Show {{ g.items.length - LIST_PEEK }} more
+      <button v-if="peek(g.key, g.items).length < g.items.length" type="button" class="linkish small showmore" @click="unfold(g.key)">
+        {{ t('asset-show-more', { count: g.items.length - LIST_PEEK }) }}
       </button>
     </section>
 
     <section v-if="family">
-      <h3>Variants ({{ family.size }} takes)</h3>
+      <h3>{{ t('asset-variants', { count: family.size }) }}</h3>
       <ul class="links">
         <li v-for="l in peek('variants', family.members)" :key="l.id">
           <button type="button" class="link" :style="{ '--kind': `var(--k-${l.kind})` }" @click="$emit('open', l.id)">
@@ -1017,13 +1083,13 @@ onBeforeUnmount(() => unswipe())
         </li>
       </ul>
       <button v-if="peek('variants', family.members).length < family.members.length" type="button" class="linkish small showmore" @click="unfold('variants')">
-        Show {{ family.members.length - LIST_PEEK }} more
+        {{ t('asset-show-more', { count: family.members.length - LIST_PEEK }) }}
       </button>
     </section>
 
     <section v-if="duplicates.length">
-      <h3>Identical copies</h3>
-      <p class="legend dupnote">The same bytes are stored once; these packs ship this file too.</p>
+      <h3>{{ t('asset-copies') }}</h3>
+      <p class="legend dupnote">{{ t('asset-copies-note') }}</p>
       <ul class="links">
         <li v-for="d in peek('copies', duplicates)" :key="d.id">
           <button type="button" class="link dup" @click="$emit('open', d.id)">
@@ -1033,43 +1099,42 @@ onBeforeUnmount(() => unswipe())
         </li>
       </ul>
       <button v-if="peek('copies', duplicates).length < duplicates.length" type="button" class="linkish small showmore" @click="unfold('copies')">
-        Show {{ duplicates.length - LIST_PEEK }} more
+        {{ t('asset-show-more', { count: duplicates.length - LIST_PEEK }) }}
       </button>
     </section>
 
     <section v-if="origin || ueStatus || recovered || ueTags.length" class="unreal">
-      <h3>{{ origin ? 'Converted from Unreal' : 'From the Unreal package' }}</h3>
+      <h3>{{ origin ? t('asset-unreal-converted') : t('asset-unreal-package') }}</h3>
       <template v-if="origin">
         <p class="origin-note">
-          This file was <span class="mono">{{ originFile }}</span><template v-if="origin.class">, a {{ origin.class }}</template><template v-if="origin.engine"> saved by UE {{ origin.engine }}</template>.
-          {{ origin.method === 'editor' ? 'Unreal Editor exported it' : 'Hoard read it out of the package' }}
-          on {{ new Date(origin.converted_at).toLocaleDateString() }}<template v-if="origin.notes"> ({{ origin.notes }})</template>.
+          {{ t('asset-origin-before') }} <span class="mono">{{ originFile }}</span>{{ originTail }}
+          {{ originHow }}
         </p>
         <p class="legend">
-          <a v-if="origin.original_kept" class="btn" :href="originalUrl(asset)">Download the original .{{ origin.ext }}</a>
-          <template v-else>The original package was discarded after conversion.</template>
+          <a v-if="origin.original_kept" class="btn" :href="originalUrl(asset)">{{ t('asset-origin-download', { ext: origin.ext }) }}</a>
+          <template v-else>{{ t('asset-origin-discarded') }}</template>
         </p>
       </template>
       <p v-else-if="ueStatus?.status === 'needs_editor'" class="legend">
-        Waiting for Unreal Editor: {{ ueStatus.reason }}. On a machine with Unreal installed, run
-        <span class="mono">hoard unreal-worker --editor &lt;path to UnrealEditor-Cmd&gt;</span> and it comes back as FBX.
+        {{ t('asset-ue-needs-editor-before', { reason: ueStatus.reason }) }}
+        <span class="mono">hoard unreal-worker --editor &lt;{{ t('asset-ue-editor-path') }}&gt;</span> {{ t('asset-ue-needs-editor-after') }}
       </p>
       <p v-else-if="ueStatus?.status === 'unsupported'" class="legend">
-        Kept as a package: {{ ueStatus.reason }}.
+        {{ t('asset-ue-unsupported', { reason: ueStatus.reason }) }}
       </p>
       <p v-else-if="ueStatus?.status === 'failed'" class="legend bad">
-        Conversion failed: {{ ueStatus.reason }}
+        {{ t('asset-ue-failed', { reason: ueStatus.reason }) }}
       </p>
       <p v-if="recovered && !origin" class="recovered">
-        The original .{{ recovered }} was stored inside this package, and Hoard pulled it out.
-        <a class="btn" :href="sourceUrl(asset, true)">Download .{{ recovered }}</a>
+        {{ t('asset-recovered', { ext: recovered }) }}
+        <a class="btn" :href="sourceUrl(asset, true)">{{ t('asset-recovered-download', { ext: recovered }) }}</a>
       </p>
       <p v-else-if="!origin && !ueStatus && (asset.kind === 'model' || asset.kind === 'animation')" class="legend">
-        Meshes and animations are stored in Unreal's own format. Convert the pack (pack page, More), then run
-        <span class="mono">hoard unreal-worker</span> next to an Unreal Editor install to get FBX.
+        {{ t('asset-ue-meshes-before') }}
+        <span class="mono">hoard unreal-worker</span> {{ t('asset-ue-meshes-after') }}
       </p>
       <details v-if="ueTags.length">
-        <summary>{{ ueTags.length }} asset registry {{ ueTags.length === 1 ? 'tag' : 'tags' }}</summary>
+        <summary>{{ t('asset-ue-registry-tags', { count: ueTags.length }) }}</summary>
         <dl>
           <template v-for="[k, v] in ueTags" :key="k">
             <dt>{{ k }}</dt>
@@ -1080,21 +1145,21 @@ onBeforeUnmount(() => unswipe())
     </section>
 
     <section v-if="metaRows.length">
-      <h3>File</h3>
+      <h3>{{ t('asset-file') }}</h3>
       <dl>
         <template v-for="[k, v] in metaRows" :key="k">
           <dt>{{ k }}</dt>
           <dd>{{ v }}</dd>
         </template>
-        <dt>Bytes</dt>
+        <dt>{{ t('asset-bytes') }}</dt>
         <dd>{{ humanBytes(material ? mapsBytes : asset.size) }}</dd>
       </dl>
     </section>
 
     <section>
-      <h3>Source</h3>
+      <h3>{{ t('asset-source') }}</h3>
       <dl>
-        <dt>Path</dt>
+        <dt>{{ t('asset-path') }}</dt>
         <dd class="mono path">{{ asset.path }}</dd>
         <dt>BLAKE3</dt>
         <dd class="mono hash">
@@ -1106,47 +1171,47 @@ onBeforeUnmount(() => unswipe())
     <footer>
       <div class="get">
         <a v-if="isMaterial && needs.length" class="btn primary whole" :href="bundleUrl(asset)">
-          <span>Download all {{ needs.length }} {{ needs.length === 1 ? 'map' : 'maps' }}</span>
+          <span>{{ t('asset-download-maps', { count: needs.length }) }}</span>
           <span class="bytes">.zip · {{ humanBytes(bundleBytes) }}</span>
         </a>
         <template v-else-if="needs.length || anims.length">
           <a class="btn primary whole" :href="bundleUrl(asset, withAnimations)">
-            <span>Download with {{ linkedCount }} linked {{ linkedCount === 1 ? 'file' : 'files' }}</span>
+            <span>{{ t('asset-download-linked', { count: linkedCount }) }}</span>
             <span class="bytes">.zip · {{ humanBytes(bundleBytes) }}</span>
           </a>
-          <a class="btn" :href="fileUrl(asset, true)" title="Just this file, without the files it uses">
-            <span>This file only</span>
+          <a class="btn" :href="fileUrl(asset, true)" :title="t('asset-download-only-title')">
+            <span>{{ t('asset-download-only') }}</span>
             <span class="bytes">.{{ asset.ext }} · {{ humanBytes(asset.size) }}</span>
           </a>
         </template>
         <a v-else class="btn primary whole" :href="fileUrl(asset, true)">
-          <span>Download</span>
+          <span>{{ t('asset-download') }}</span>
           <span class="bytes">.{{ asset.ext }} · {{ humanBytes(asset.size) }}</span>
         </a>
       </div>
       <label v-if="anims.length && !(isMaterial && needs.length)" class="animcheck">
-        <input v-model="withAnimations" type="checkbox" /> Include animations in the .zip
+        <input v-model="withAnimations" type="checkbox" /> {{ t('asset-include-animations') }}
       </label>
       <div v-if="showAs" class="asrow">
-        <label for="as-format">Download as</label>
+        <label for="as-format">{{ t('asset-as-label') }}</label>
         <select id="as-format" v-model="asFormat" class="field">
-          <option v-if="sameFormat" value="">{{ asset.ext.toUpperCase() }} (original format)</option>
+          <option v-if="sameFormat" value="">{{ t('asset-as-original', { format: asset.ext.toUpperCase() }) }}</option>
           <option v-for="f in asFormats" :key="f.format" :value="f.format">{{ f.label }}</option>
         </select>
-        <select v-if="asResizable && sizeChoices.length" v-model.number="asMax" class="field size" aria-label="Size">
-          <option :value="0">Full size</option>
-          <option v-for="m in sizeChoices" :key="m" :value="m">Up to {{ m }} px</option>
+        <select v-if="asResizable && sizeChoices.length" v-model.number="asMax" class="field size" :aria-label="t('asset-as-size')">
+          <option :value="0">{{ t('asset-as-full-size') }}</option>
+          <option v-for="m in sizeChoices" :key="m" :value="m">{{ t('asset-as-up-to', { size: String(m) }) }}</option>
         </select>
         <a v-if="asHref" class="btn" :href="asHref" :aria-busy="asState ? 'true' : 'false'" @click="downloadAs">{{ asLabel }}</a>
-        <span v-else class="ashint">Pick a size or another format</span>
+        <span v-else class="ashint">{{ t('asset-as-hint') }}</span>
         <span v-if="asError" class="aserror" role="alert">{{ asError }}</span>
       </div>
       <div class="tools">
-        <button class="btn ghost" type="button" @click="copy(tomlSnippet, 'toml')">Copy hoard.toml entry</button>
-        <button class="btn ghost" type="button" @click="copy(asset.id, 'id')">Copy ID</button>
-        <button v-if="teachable" class="btn ghost" type="button" title="Describe this store's file so Hoard reads it (Settings → Store files)" @click="emit('teach')">Teach Hoard this file</button>
-        <span class="copied" role="status">{{ copied ? `Copied ${copied}` : '' }}</span>
-        <button v-if="!asset.archived_at && editor" class="btn ghost danger archive" type="button" title="Out of search until it's restored or deleted for good, from the Archive" @click="emit('archive')">Archive</button>
+        <button class="btn ghost" type="button" @click="copy(tomlSnippet, 'toml')">{{ t('asset-copy-toml') }}</button>
+        <button class="btn ghost" type="button" @click="copy(asset.id, 'id')">{{ t('asset-copy-id') }}</button>
+        <button v-if="teachable" class="btn ghost" type="button" :title="t('asset-teach-title')" @click="emit('teach')">{{ t('asset-teach') }}</button>
+        <span class="copied" role="status">{{ copied ? copiedNote(copied) : '' }}</span>
+        <button v-if="!asset.archived_at && editor" class="btn ghost danger archive" type="button" :title="t('asset-archive-title')" @click="emit('archive')">{{ t('asset-archive') }}</button>
       </div>
     </footer>
     </div>

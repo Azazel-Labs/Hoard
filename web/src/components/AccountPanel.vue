@@ -4,6 +4,7 @@
 import { computed, onMounted, reactive, ref } from 'vue'
 import { api, type AccessToken, type Account, type AccountSource, type Connection, type Role } from '../api'
 import { auth, may, refreshAuth, signOut } from '../auth'
+import { formatDate, t } from '../i18n'
 import { confirmDialog, copyText, showError, showOk } from '../ui'
 
 const accounts = ref<Account[] | null>(null)
@@ -16,30 +17,34 @@ const origin = ref(location.origin)
 const admin = computed(() => may('admin'))
 const myRole = computed<Role>(() => auth.status?.user?.role ?? 'view')
 
-const ROLES: { id: Role; label: string; hint: string }[] = [
-  { id: 'view', label: 'Can look', hint: 'Search, preview and download' },
-  { id: 'edit', label: 'Can change', hint: 'Also add, change, tag, collect and archive' },
-  { id: 'admin', label: 'Admin', hint: 'Also Settings, accounts and maintenance, and deleting for good' },
+// A function, so the labels are read in the current language each time they're shown.
+const ROLES = (): { id: Role; label: string; hint: string }[] => [
+  { id: 'view', label: t('account-role-view'), hint: t('account-role-view-hint') },
+  { id: 'edit', label: t('account-role-edit'), hint: t('account-role-edit-hint') },
+  { id: 'admin', label: t('account-role-admin'), hint: t('account-role-admin-hint') },
 ]
-const roleLabel = (r: Role) => ROLES.find((x) => x.id === r)!.label
+const roleLabel = (r: Role) => ROLES().find((x) => x.id === r)!.label
 /** Someone whose password the directory or OAuth provider keeps, not Hoard. */
 const external = computed(() => !!auth.status?.user?.source && auth.status.user.source !== 'internal')
 const SOURCES = computed<{ id: AccountSource; label: string }[]>(() => {
   const s = auth.status?.sign_in
   return [
-    { id: 'internal', label: 'A Hoard password' },
-    ...(s?.directory ? [{ id: 'ldap' as const, label: `Their ${s.directory} password` }] : []),
-    ...(s?.oauth ? [{ id: 'oauth' as const, label: `Signing in with ${s.oauth}` }] : []),
+    { id: 'internal', label: t('account-source-internal') },
+    ...(s?.directory ? [{ id: 'ldap' as const, label: t('account-source-ldap', { directory: s.directory }) }] : []),
+    ...(s?.oauth ? [{ id: 'oauth' as const, label: t('account-source-oauth', { provider: s.oauth }) }] : []),
   ]
 })
-const sourceWord = (s: AccountSource) => (s === 'ldap' ? 'directory' : s === 'oauth' ? 'OAuth' : '')
+const sourceWord = (s: AccountSource) => (s === 'ldap' ? t('account-source-word-directory') : s === 'oauth' ? 'OAuth' : '')
 /** What a token may be given: up to what you can do. */
-const tokenRoles = computed(() => ROLES.slice(0, ROLES.findIndex((r) => r.id === myRole.value) + 1))
+const tokenRoles = computed(() => {
+  const all = ROLES()
+  return all.slice(0, all.findIndex((r) => r.id === myRole.value) + 1)
+})
 
 async function load() {
   try {
-    const [t, c] = await Promise.all([api.tokens(), api.connections()])
-    tokens.value = t.tokens
+    const [tk, c] = await Promise.all([api.tokens(), api.connections()])
+    tokens.value = tk.tokens
     connections.value = c.connections
     if (admin.value) {
       const [a, s] = await Promise.all([api.accounts(), api.settings()])
@@ -48,7 +53,7 @@ async function load() {
       origin.value = (s.options.public_url.value || location.origin).replace(/\/+$/, '')
     }
   } catch (e) {
-    showError(`Couldn't load accounts: ${(e as Error).message}`)
+    showError(t('account-load-failed', { error: (e as Error).message }))
   }
 }
 onMounted(load)
@@ -59,7 +64,7 @@ async function run(what: string, f: () => Promise<unknown>): Promise<boolean> {
     await f()
     return true
   } catch (e) {
-    showError(`${what}: ${(e as Error).message}`)
+    showError(t('account-failed', { what, error: (e as Error).message }))
     return false
   } finally {
     busy.value = false
@@ -72,9 +77,9 @@ const pwMismatch = computed(() => pw.again !== '' && pw.again !== pw.next)
 const pwReady = computed(() => pw.current !== '' && pw.next.length >= 8 && pw.again === pw.next)
 async function changePassword() {
   if (!pwReady.value) return
-  if (await run("Couldn't change your password", () => api.changePassword(pw.current, pw.next))) {
+  if (await run(t('account-password-failed'), () => api.changePassword(pw.current, pw.next))) {
     Object.assign(pw, { current: '', next: '', again: '' })
-    showOk('Password changed. Your other devices are signed out.')
+    showOk(t('account-password-changed'))
   }
 }
 
@@ -85,23 +90,23 @@ async function addPerson() {
   if (!personReady.value) return
   const name = person.username.trim()
   const pw = person.source === 'internal' ? person.password : ''
-  if (await run(`Couldn't add ${name}`, () => api.addAccount(name, pw, person.role, person.source))) {
+  if (await run(t('account-add-failed', { name }), () => api.addAccount(name, pw, person.role, person.source))) {
     Object.assign(person, { username: '', password: '', role: 'edit', source: 'internal' })
-    showOk(`${name} can sign in now.`)
+    showOk(t('account-added', { name }))
     await load()
   }
 }
 async function setRole(a: Account, role: Role) {
-  if (await run(`Couldn't change what ${a.username} can do`, () => api.setRole(a.id, role))) await load()
+  if (await run(t('account-role-failed', { name: a.username }), () => api.setRole(a.id, role))) await load()
 }
 async function removePerson(a: Account) {
   const ok = await confirmDialog({
-    title: `Remove ${a.username}?`,
-    body: 'They’re signed out everywhere and can’t sign in again. Nothing they added to the library is removed.',
-    confirm: 'Remove',
+    title: t('account-remove-title', { name: a.username }),
+    body: t('account-remove-body'),
+    confirm: t('account-remove'),
     danger: true,
   })
-  if (ok && (await run(`Couldn't remove ${a.username}`, () => api.removeAccount(a.id)))) await load()
+  if (ok && (await run(t('account-remove-failed', { name: a.username }), () => api.removeAccount(a.id)))) await load()
 }
 
 // ---- access tokens
@@ -111,27 +116,27 @@ const made = ref<{ name: string; token: string } | null>(null)
 async function makeToken() {
   const name = tokenName.value.trim()
   if (!name) return
-  await run("Couldn't make the token", async () => {
-    const t = await api.makeToken(name, tokenRole.value)
-    made.value = { name: t.name, token: t.token }
+  await run(t('account-token-failed'), async () => {
+    const res = await api.makeToken(name, tokenRole.value)
+    made.value = { name: res.name, token: res.token }
     tokenName.value = ''
     await load()
   })
 }
 async function copyToken() {
   if (!made.value) return
-  if (await copyText(made.value.token)) showOk('Copied')
-  else showError('Couldn’t copy: select the token and copy it yourself')
+  if (await copyText(made.value.token)) showOk(t('account-copied'))
+  else showError(t('account-copy-token-failed'))
 }
-async function revoke(t: AccessToken) {
+async function revoke(tok: AccessToken) {
   const ok = await confirmDialog({
-    title: `Revoke “${t.name}”?`,
-    body: 'Anything still using it is turned away from now on.',
-    confirm: 'Revoke',
+    title: t('account-revoke-title', { name: tok.name }),
+    body: t('account-revoke-body'),
+    confirm: t('account-revoke'),
     danger: true,
   })
-  if (ok && (await run(`Couldn't revoke “${t.name}”`, () => api.revokeToken(t.id)))) {
-    if (made.value?.name === t.name) made.value = null
+  if (ok && (await run(t('account-revoke-failed', { name: tok.name }), () => api.revokeToken(tok.id)))) {
+    if (made.value?.name === tok.name) made.value = null
     await load()
   }
 }
@@ -141,72 +146,71 @@ const mcpUrl = computed(() => `${origin.value}/mcp`)
 const claudeCode = computed(() => `claude mcp add --transport http --scope user hoard ${mcpUrl.value}`)
 const local = computed(() => /^http:\/\/|\/\/(localhost|127\.|10\.|192\.168\.|172\.(1[6-9]|2\d|3[01])\.)/.test(origin.value))
 async function copy(text: string) {
-  if (await copyText(text)) showOk('Copied')
-  else showError('Couldn’t copy: select it and copy it yourself')
+  if (await copyText(text)) showOk(t('account-copied'))
+  else showError(t('account-copy-failed'))
 }
 async function disconnect(c: Connection) {
   const ok = await confirmDialog({
-    title: `Disconnect ${c.app}?`,
-    body: 'It’s turned away from now on, and has to be connected again to use Hoard.',
-    confirm: 'Disconnect',
+    title: t('account-disconnect-title', { app: c.app }),
+    body: t('account-disconnect-body'),
+    confirm: t('account-disconnect'),
     danger: true,
   })
-  if (ok && (await run(`Couldn't disconnect ${c.app}`, () => api.disconnect(c.id)))) await load()
+  if (ok && (await run(t('account-disconnect-failed', { app: c.app }), () => api.disconnect(c.id)))) await load()
 }
 
 // ---- guests
 async function setGuest(on: boolean) {
-  if (await run("Couldn't change that", () => api.saveSettings({ guest_browsing: on }))) {
+  if (await run(t('account-guest-failed'), () => api.saveSettings({ guest_browsing: on }))) {
     guest.value = on
     await refreshAuth()
   }
 }
 
-const fmt = new Intl.DateTimeFormat(undefined, { dateStyle: 'medium' })
-const day = (at: string | null) => (at ? fmt.format(new Date(at)) : 'never')
+const day = (at: string | null) => (at ? formatDate(at, { dateStyle: 'medium' }) : t('account-never'))
 </script>
 
 <template>
   <div class="account" :aria-busy="busy">
     <section>
       <div class="sh">
-        <h3>You</h3>
-        <button type="button" class="btn" @click="signOut">Sign out</button>
+        <h3>{{ t('account-you') }}</h3>
+        <button type="button" class="btn" @click="signOut">{{ t('account-sign-out') }}</button>
       </div>
       <p class="what">
-        Signed in as <strong>{{ auth.status?.user?.name }}</strong>, who
-        {{ myRole === 'admin' ? 'is an admin' : myRole === 'edit' ? 'can change the library' : 'can look but not change anything' }}.
+        {{ t('account-signed-in-as-before') }}<strong>{{ auth.status?.user?.name }}</strong>{{
+          myRole === 'admin' ? t('account-signed-in-as-admin') : myRole === 'edit' ? t('account-signed-in-as-edit') : t('account-signed-in-as-view')
+        }}
       </p>
       <p v-if="external" class="what">
-        Your password is kept by the {{ auth.status?.user?.source === 'oauth' ? 'provider' : 'directory' }} you sign in with, so you change it there.
+        {{ auth.status?.user?.source === 'oauth' ? t('account-password-at-provider') : t('account-password-at-directory') }}
       </p>
       <form v-else class="grid" @submit.prevent="changePassword">
         <input type="text" autocomplete="username" :value="auth.status?.user?.name" hidden readonly />
-        <label for="pw-current">Current password</label>
+        <label for="pw-current">{{ t('account-current-password') }}</label>
         <input id="pw-current" v-model="pw.current" class="field" type="password" autocomplete="current-password" />
-        <label for="pw-new">New password</label>
+        <label for="pw-new">{{ t('account-new-password') }}</label>
         <input id="pw-new" v-model="pw.next" class="field" type="password" autocomplete="new-password" minlength="8" aria-describedby="pw-rule" />
-        <label for="pw-again">New password again</label>
+        <label for="pw-again">{{ t('account-new-password-again') }}</label>
         <input id="pw-again" v-model="pw.again" class="field" type="password" autocomplete="new-password" :aria-invalid="pwMismatch" />
         <span />
         <div class="row">
-          <button type="submit" class="btn primary" :disabled="!pwReady || busy">Change password</button>
-          <small id="pw-rule" :class="{ bad: pwMismatch }">{{ pwMismatch ? 'The new passwords don’t match.' : 'At least 8 characters.' }}</small>
+          <button type="submit" class="btn primary" :disabled="!pwReady || busy">{{ t('account-change-password') }}</button>
+          <small id="pw-rule" :class="{ bad: pwMismatch }">{{ pwMismatch ? t('account-password-mismatch') : t('account-password-rule') }}</small>
         </div>
       </form>
     </section>
 
     <section v-if="admin">
-      <div class="sh"><h3>People</h3></div>
+      <div class="sh"><h3>{{ t('account-people') }}</h3></div>
       <p class="what">
-        Each person can look (search, preview and download), change the library too (add, edit, tag, collect and
-        archive), or be an admin as well (Settings, accounts and maintenance, and deleting for good).
+        {{ t('account-people-hint') }}
       </p>
       <ul v-if="accounts" class="list">
         <li v-for="a in accounts" :key="a.id" :data-person="a.username">
-          <span class="name">{{ a.username }} <small v-if="a.you">(you)</small></span>
+          <span class="name">{{ a.username }} <small v-if="a.you">{{ t('account-you-tag') }}</small></span>
           <small>
-            <span v-if="a.source !== 'internal'" class="src" :title="`Signs in with the ${a.source === 'oauth' ? 'OAuth provider' : 'directory'}`">{{ sourceWord(a.source) }} · </span>since {{ day(a.created_at) }}
+            <span v-if="a.source !== 'internal'" class="src" :title="a.source === 'oauth' ? t('account-signs-in-oauth') : t('account-signs-in-directory')">{{ sourceWord(a.source) }} · </span>{{ t('account-since', { date: day(a.created_at) }) }}
           </small>
           <span v-if="a.you" class="role">{{ roleLabel(a.role) }}</span>
           <select
@@ -214,115 +218,112 @@ const day = (at: string | null) => (at ? fmt.format(new Date(at)) : 'never')
             class="field role"
             :value="a.role"
             :disabled="busy"
-            :aria-label="`What ${a.username} can do`"
+            :aria-label="t('account-what-can-do', { name: a.username })"
             @change="setRole(a, ($event.target as HTMLSelectElement).value as Role)"
           >
-            <option v-for="r in ROLES" :key="r.id" :value="r.id" :title="r.hint">{{ r.label }}</option>
+            <option v-for="r in ROLES()" :key="r.id" :value="r.id" :title="r.hint">{{ r.label }}</option>
           </select>
-          <button v-if="!a.you" type="button" class="btn ghost" :disabled="busy" @click="removePerson(a)">Remove</button>
+          <button v-if="!a.you" type="button" class="btn ghost" :disabled="busy" @click="removePerson(a)">{{ t('account-remove') }}</button>
         </li>
       </ul>
       <form class="add" @submit.prevent="addPerson">
-        <label class="visually-hidden" for="new-name">Name</label>
-        <input id="new-name" v-model="person.username" class="field" placeholder="Name" autocomplete="off" maxlength="64" />
+        <label class="visually-hidden" for="new-name">{{ t('account-name') }}</label>
+        <input id="new-name" v-model="person.username" class="field" :placeholder="t('account-name')" autocomplete="off" maxlength="64" />
         <template v-if="SOURCES.length > 1">
-          <label class="visually-hidden" for="new-source">How they sign in</label>
+          <label class="visually-hidden" for="new-source">{{ t('account-how-sign-in') }}</label>
           <select id="new-source" v-model="person.source" class="field role">
             <option v-for="s in SOURCES" :key="s.id" :value="s.id">{{ s.label }}</option>
           </select>
         </template>
         <template v-if="person.source === 'internal'">
-          <label class="visually-hidden" for="new-password">Password (at least 8 characters)</label>
-          <input id="new-password" v-model="person.password" class="field" type="password" placeholder="Password (8+ characters)" autocomplete="new-password" />
+          <label class="visually-hidden" for="new-password">{{ t('account-password-label') }}</label>
+          <input id="new-password" v-model="person.password" class="field" type="password" :placeholder="t('account-password-placeholder')" autocomplete="new-password" />
         </template>
-        <label class="visually-hidden" for="new-role">What they can do</label>
+        <label class="visually-hidden" for="new-role">{{ t('account-what-they-can-do') }}</label>
         <select id="new-role" v-model="person.role" class="field role">
-          <option v-for="r in ROLES" :key="r.id" :value="r.id" :title="r.hint">{{ r.label }}</option>
+          <option v-for="r in ROLES()" :key="r.id" :value="r.id" :title="r.hint">{{ r.label }}</option>
         </select>
-        <button type="submit" class="btn" :disabled="!personReady || busy">Add</button>
+        <button type="submit" class="btn" :disabled="!personReady || busy">{{ t('account-add') }}</button>
       </form>
     </section>
 
     <section>
-      <div class="sh"><h3>Claude and other AI apps</h3></div>
+      <div class="sh"><h3>{{ t('account-ai-apps') }}</h3></div>
       <p class="what">
-        Connect Claude (or any MCP app) and it can search and fetch assets for you, and describe and tag what Hoard hasn’t
-        yet. It signs in to Hoard the first time; you allow it here in the browser.
+        {{ t('account-ai-apps-hint') }}
       </p>
       <div class="row">
-        <input class="field mono grow" :value="mcpUrl" readonly aria-label="Hoard's MCP address" @focus="($event.target as HTMLInputElement).select()" />
-        <button type="button" class="btn" @click="copy(mcpUrl)">Copy</button>
+        <input class="field mono grow" :value="mcpUrl" readonly :aria-label="t('account-mcp-address')" @focus="($event.target as HTMLInputElement).select()" />
+        <button type="button" class="btn" @click="copy(mcpUrl)">{{ t('account-copy') }}</button>
       </div>
       <ul class="steps">
         <li>
-          <strong>Claude Code:</strong> run <span class="mono">{{ claudeCode }}</span>
-          <button type="button" class="btn ghost small" @click="copy(claudeCode)">Copy</button>, then <span class="mono">/mcp</span>
-          to sign in. <span class="mono">/mcp__hoard__tag_pack</span> describes a pack.
+          <strong>Claude Code:</strong> {{ t('account-claude-code-1') }}<span class="mono">{{ claudeCode }}</span>
+          <button type="button" class="btn ghost small" @click="copy(claudeCode)">{{ t('account-copy') }}</button>{{ t('account-claude-code-2') }}<span class="mono">/mcp</span>{{ t('account-claude-code-3') }}<span class="mono">/mcp__hoard__tag_pack</span>{{ t('account-claude-code-4') }}
         </li>
         <li>
-          <strong>claude.ai, Claude Desktop and Cowork:</strong> Settings → Connectors → Add custom connector, paste the
-          address, then Connect. These connect from Anthropic’s servers, so Hoard has to be reachable from the internet over
-          HTTPS<template v-if="local"> (this address isn’t: set the Public address in Settings → Connection)</template>.
+          <strong>claude.ai, Claude Desktop and Cowork:</strong> {{ local ? t('account-claude-ai-local') : t('account-claude-ai') }}
         </li>
       </ul>
       <ul v-if="connections?.length" class="list">
         <li v-for="c in connections" :key="c.id">
           <span class="name">{{ c.app }}</span>
-          <small>for {{ c.user }} since {{ day(c.created_at) }} · last used {{ day(c.last_used_at) }}</small>
-          <button type="button" class="btn ghost" :disabled="busy" @click="disconnect(c)">Disconnect</button>
+          <small>{{ t('account-connection-meta', { user: c.user, since: day(c.created_at), used: day(c.last_used_at) }) }}</small>
+          <button type="button" class="btn ghost" :disabled="busy" @click="disconnect(c)">{{ t('account-disconnect') }}</button>
         </li>
       </ul>
-      <p v-else-if="connections" class="what none">No apps connected yet.</p>
+      <p v-else-if="connections" class="what none">{{ t('account-no-apps') }}</p>
     </section>
 
     <section>
-      <div class="sh"><h3>Access tokens</h3></div>
+      <div class="sh"><h3>{{ t('account-tokens') }}</h3></div>
       <p class="what">
-        For the <span class="mono">hoard</span> command line tool, scripts, MCP clients and the Unreal worker: they send it as
-        <span class="mono">Authorization: Bearer &lt;token&gt;</span>. A token can do what you choose, up to what you can,
-        but never manage accounts or tokens. One that only looks is enough to search and download, and to sync a project.
-        <template v-if="admin">You see everyone’s tokens and connected apps; others see their own.</template>
+        {{ t('account-tokens-hint-1') }}<span class="mono">hoard</span>{{ t('account-tokens-hint-2') }}<span class="mono">Authorization: Bearer &lt;token&gt;</span>{{ t('account-tokens-hint-3') }}
+        <template v-if="admin">{{ t('account-tokens-admin') }}</template>
       </p>
 
       <div v-if="made" class="made" role="status">
-        <p><strong>{{ made.name }}</strong>: copy it now. It isn’t shown again.</p>
+        <p>{{ t('account-made-before') }}<strong>{{ made.name }}</strong>{{ t('account-made-after') }}</p>
         <div class="row">
-          <input class="field mono" :value="made.token" readonly aria-label="The new token" @focus="($event.target as HTMLInputElement).select()" />
-          <button type="button" class="btn primary" @click="copyToken">Copy</button>
+          <input class="field mono" :value="made.token" readonly :aria-label="t('account-new-token')" @focus="($event.target as HTMLInputElement).select()" />
+          <button type="button" class="btn primary" @click="copyToken">{{ t('account-copy') }}</button>
         </div>
         <p class="use">
-          For the CLI: <span class="mono">hoard --server {{ origin }} --token &lt;token&gt;</span>, or put it in
-          <span class="mono">HOARD_TOKEN</span>.
+          {{ t('account-cli-1') }}<span class="mono">hoard --server {{ origin }} --token &lt;token&gt;</span>{{ t('account-cli-2') }}<span class="mono">HOARD_TOKEN</span>{{ t('account-cli-3') }}
         </p>
-        <button type="button" class="btn ghost" @click="made = null">Done</button>
+        <button type="button" class="btn ghost" @click="made = null">{{ t('account-done') }}</button>
       </div>
 
       <ul v-if="tokens?.length" class="list">
-        <li v-for="t in tokens" :key="t.id">
-          <span class="name">{{ t.name }}</span>
-          <small>{{ roleLabel(t.role) }} · made {{ day(t.created_at) }}{{ t.created_by ? ` by ${t.created_by}` : '' }} · last used {{ day(t.last_used_at) }}</small>
-          <button type="button" class="btn ghost" :disabled="busy" @click="revoke(t)">Revoke</button>
+        <li v-for="tok in tokens" :key="tok.id">
+          <span class="name">{{ tok.name }}</span>
+          <small>{{ roleLabel(tok.role) }} · {{
+            tok.created_by
+              ? t('account-token-meta-by', { made: day(tok.created_at), by: tok.created_by, used: day(tok.last_used_at) })
+              : t('account-token-meta', { made: day(tok.created_at), used: day(tok.last_used_at) })
+          }}</small>
+          <button type="button" class="btn ghost" :disabled="busy" @click="revoke(tok)">{{ t('account-revoke') }}</button>
         </li>
       </ul>
-      <p v-else-if="tokens" class="what none">No tokens yet.</p>
+      <p v-else-if="tokens" class="what none">{{ t('account-no-tokens') }}</p>
       <form class="add" @submit.prevent="makeToken">
-        <label class="visually-hidden" for="token-name">What will use it</label>
-        <input id="token-name" v-model="tokenName" class="field" placeholder="What will use it, e.g. “Unreal worker”" maxlength="80" autocomplete="off" />
-        <label class="visually-hidden" for="token-role">What it can do</label>
+        <label class="visually-hidden" for="token-name">{{ t('account-token-name') }}</label>
+        <input id="token-name" v-model="tokenName" class="field" :placeholder="t('account-token-name-placeholder')" maxlength="80" autocomplete="off" />
+        <label class="visually-hidden" for="token-role">{{ t('account-token-role') }}</label>
         <select id="token-role" v-model="tokenRole" class="field role">
           <option v-for="r in tokenRoles" :key="r.id" :value="r.id" :title="r.hint">{{ r.label }}</option>
         </select>
-        <button type="submit" class="btn" :disabled="!tokenName.trim() || busy">Make a token</button>
+        <button type="submit" class="btn" :disabled="!tokenName.trim() || busy">{{ t('account-make-token') }}</button>
       </form>
     </section>
 
     <section v-if="guest !== null">
-      <div class="sh"><h3>Guests</h3></div>
+      <div class="sh"><h3>{{ t('account-guests') }}</h3></div>
       <label class="check">
         <input type="checkbox" :checked="guest" :disabled="busy" @change="setGuest(($event.target as HTMLInputElement).checked)" />
-        Let anyone who can reach the server browse without signing in
+        {{ t('account-guests-allow') }}
       </label>
-      <p class="what">They can search, preview and download, but not add, change or delete anything, or see Settings.</p>
+      <p class="what">{{ t('account-guests-hint') }}</p>
     </section>
   </div>
 </template>

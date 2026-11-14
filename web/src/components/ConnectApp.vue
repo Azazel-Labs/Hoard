@@ -4,6 +4,7 @@
 import { onMounted, ref } from 'vue'
 import { api } from '../api'
 import { auth, siteName } from '../auth'
+import { t } from '../i18n'
 
 const params = Object.fromEntries(new URLSearchParams(location.search))
 const info = ref<{ client: string; redirect_host: string } | null>(null)
@@ -35,25 +36,24 @@ async function answer(allow: boolean) {
     <div class="card" role="dialog" aria-labelledby="connect-title">
       <p class="brand">{{ siteName() }}</p>
       <template v-if="info">
-        <h1 id="connect-title">Connect {{ info.client }}?</h1>
+        <h1 id="connect-title">{{ t('connect-title', { app: info.client }) }}</h1>
         <p class="lede">
-          <strong>{{ info.client }}</strong> will be able to search, download, describe and tag everything in this Hoard,
-          acting as <strong>{{ auth.status?.user?.name }}</strong>. It can’t manage accounts or access tokens.
+          <strong>{{ info.client }}</strong>{{ t('connect-lede-1') }}<strong>{{ auth.status?.user?.name }}</strong>{{ t('connect-lede-2') }}
         </p>
         <p class="lede">
-          You’ll go back to <span class="mono">{{ info.redirect_host }}</span>. Disconnect it any time in Settings → Account.
+          {{ t('connect-back-before') }}<span class="mono">{{ info.redirect_host }}</span>{{ t('connect-back-after') }}
         </p>
         <div class="actions">
-          <button type="button" class="btn primary" :disabled="busy" @click="answer(true)">Allow</button>
-          <button type="button" class="btn" :disabled="busy" @click="answer(false)">Cancel</button>
+          <button type="button" class="btn primary" :disabled="busy" @click="answer(true)">{{ t('connect-allow') }}</button>
+          <button type="button" class="btn" :disabled="busy" @click="answer(false)">{{ t('connect-cancel') }}</button>
         </div>
       </template>
       <template v-else-if="error">
-        <h1 id="connect-title">Can’t connect this app</h1>
+        <h1 id="connect-title">{{ t('connect-failed') }}</h1>
         <p class="err" role="alert">{{ error }}</p>
-        <a class="btn" href="/">Go to the library</a>
+        <a class="btn" href="/">{{ t('connect-go-library') }}</a>
       </template>
-      <p v-else id="connect-title" class="lede">Checking…</p>
+      <p v-else id="connect-title" class="lede">{{ t('connect-checking') }}</p>
       <p v-if="info && error" class="err" role="alert">{{ error }}</p>
     </div>
   </div>

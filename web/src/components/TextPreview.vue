@@ -4,6 +4,7 @@
 // big the file.
 import { computed, nextTick, ref, watch } from 'vue'
 import type { Asset } from '../api'
+import { t } from '../i18n'
 import { renderMarkdown } from '../markdown'
 import { fetchText, highlightLines, langOf, reflowJson, type TextFile } from '../text'
 
@@ -57,15 +58,15 @@ const more = computed(() => peek.value.more || overflows.value)
 </script>
 
 <template>
-  <button v-if="!file?.binary && !failed" ref="box" type="button" class="peek" :class="{ more, doc: isMarkdown }" :aria-label="`Read ${asset.name} full screen`" @click="emit('expand')">
-    <p v-if="!file" class="wait">Loading…</p>
+  <button v-if="!file?.binary && !failed" ref="box" type="button" class="peek" :class="{ more, doc: isMarkdown }" :aria-label="t('text-preview-aria', { name: asset.name })" @click="emit('expand')">
+    <p v-if="!file" class="wait">{{ t('text-loading') }}</p>
     <!-- eslint-disable-next-line vue/no-v-html -- markdown.ts renders with raw HTML off, so the file can't add markup. -->
     <div v-else-if="isMarkdown" class="md-body" v-html="doc" />
     <!-- eslint-disable-next-line vue/no-v-html -- text.ts escapes every character of the file before adding spans. -->
     <pre v-else class="code-lines" :class="{ prose: isProse, wrap: isProse }" style="--gutter: 2ch" v-html="html" />
     <span class="badge">
       <svg viewBox="0 0 16 16" width="12" height="12" aria-hidden="true"><path d="M2.5 6V2.5H6M10 2.5h3.5V6M13.5 10v3.5H10M6 13.5H2.5V10" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" /></svg>
-      Read
+      {{ t('text-preview-read') }}
     </span>
   </button>
 </template>

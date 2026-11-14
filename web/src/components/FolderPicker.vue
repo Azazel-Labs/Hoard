@@ -3,6 +3,7 @@
 // walking the server's folders.
 import { computed, nextTick, onBeforeUnmount, ref, useId } from 'vue'
 import { api, ApiError, type FolderListing } from '../api'
+import { t } from '../i18n'
 
 const model = defineModel<string>({ required: true })
 const props = defineProps<{ id?: string; placeholder?: string }>()
@@ -157,7 +158,7 @@ onBeforeUnmount(() => clearTimeout(timer))
           @blur="onBlur"
           @keydown="onKey"
         />
-        <ul v-show="suggestOpen" :id="listId" class="suggest" role="listbox" aria-label="Folders">
+        <ul v-show="suggestOpen" :id="listId" class="suggest" role="listbox" :aria-label="t('folders-list')">
           <li
             v-for="(d, i) in suggestions"
             :id="`${listId}-${i}`"
@@ -172,19 +173,19 @@ onBeforeUnmount(() => clearTimeout(timer))
           </li>
         </ul>
       </div>
-      <button type="button" class="btn" :aria-expanded="open" @click="toggle">{{ open ? 'Close' : 'Browse…' }}</button>
+      <button type="button" class="btn" :aria-expanded="open" @click="toggle">{{ open ? t('folders-close') : t('folders-browse') }}</button>
     </div>
     <div v-if="open" class="browser" :aria-busy="loading">
       <div class="where">
-        <button type="button" class="btn ghost" :disabled="listing?.parent == null || loading" title="Up one folder" @click="listing?.parent != null && choose(listing.parent)">
+        <button type="button" class="btn ghost" :disabled="listing?.parent == null || loading" :title="t('folders-up-title')" @click="listing?.parent != null && choose(listing.parent)">
           <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7" /></svg>
-          Up
+          {{ t('folders-up') }}
         </button>
-        <span class="mono cur">{{ listing?.path || 'This computer' }}</span>
+        <span class="mono cur">{{ listing?.path || t('folders-this-computer') }}</span>
       </div>
       <p v-if="error" class="err">{{ error }}</p>
       <ul v-else-if="listing" class="dirs">
-        <li v-if="!listing.dirs.length" class="none">No folders in here.</li>
+        <li v-if="!listing.dirs.length" class="none">{{ t('folders-none') }}</li>
         <li v-for="d in listing.dirs" :key="d.path">
           <button type="button" @click="choose(d.path)">
             <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><path d="M3 7.5A1.5 1.5 0 0 1 4.5 6H9l2 2h8.5A1.5 1.5 0 0 1 21 9.5v8a1.5 1.5 0 0 1-1.5 1.5h-15A1.5 1.5 0 0 1 3 17.5z" /></svg>

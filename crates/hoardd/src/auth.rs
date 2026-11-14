@@ -13,6 +13,7 @@
 //! Tokens can't manage accounts or tokens, so a leaked one can be revoked and can't mint more. Apps that sign in over
 //! OAuth (`oauth.rs`) act with the role of the person who let them in.
 
+use crate::i18n::tr;
 use std::collections::HashMap;
 use std::sync::{LazyLock, Mutex, PoisonError};
 use std::time::{Duration, Instant};
@@ -88,7 +89,7 @@ impl Role {
     fn requested(s: Option<&str>, default: Self) -> ApiResult<Self> {
         match s {
             None => Ok(default),
-            Some(s) => Self::parse(s).ok_or_else(|| AppError::bad_request("A role is view, edit or admin")),
+            Some(s) => Self::parse(s).ok_or_else(|| AppError::bad_request(tr!("error-role"))),
         }
     }
 }
@@ -129,8 +130,8 @@ impl Who {
             return Ok(());
         }
         Err(AppError::forbidden(match role {
-            Role::Admin => "only an admin can do this",
-            _ => "this account can look but not change anything: an admin can change that in Settings → Account",
+            Role::Admin => tr!("error-admin-only"),
+            _ => tr!("error-view-only"),
         }))
     }
 
@@ -146,7 +147,7 @@ impl Who {
     pub(crate) fn person(&self) -> ApiResult<i64> {
         match self {
             Self::User { id, .. } => Ok(*id),
-            Self::Token { .. } => Err(AppError::forbidden("sign in to the portal to manage accounts and tokens")),
+            Self::Token { .. } => Err(AppError::forbidden(tr!("error-portal-only"))),
         }
     }
 }
@@ -280,7 +281,7 @@ pub(crate) async fn authenticate(state: &AppState, method: &Method, headers: &He
     let Some(cred) = credential(headers) else { return Ok(None) };
     let safe = matches!(*method, Method::GET | Method::HEAD | Method::OPTIONS);
     if matches!(cred, Credential::Session(_)) && !safe && !headers.contains_key(CSRF_HEADER) {
-        return Err(AppError::forbidden("this request didn't come from the Hoard portal"));
+        return Err(AppError::forbidden(tr!("error-not-from-portal")));
     }
     let gate = state.settings.get().auth.gate();
     Ok(db::call(&state.pool, move |c| lookup(c, &cred, gate)).await?)
@@ -365,7 +366,7 @@ async fn from_portal(req: Request, next: Next) -> Response {
     if req.headers().contains_key(CSRF_HEADER) {
         next.run(req).await
     } else {
-        AppError::forbidden("this request didn't come from the Hoard portal").into_response()
+        AppError::forbidden(tr!("error-not-from-portal")).into_response()
     }
 }
 
@@ -445,14 +446,14 @@ fn check_new(username: &str, password: &str) -> ApiResult<String> {
 fn check_name(username: &str) -> ApiResult<String> {
     let name = username.trim();
     if name.is_empty() || name.chars().count() > 64 || name.chars().any(char::is_control) {
-        return Err(AppError::bad_request("Choose a name of up to 64 characters"));
+        return Err(AppError::bad_request(tr!("error-account-name")));
     }
     Ok(name.to_owned())
 }
 
 fn check_password(password: &str) -> ApiResult<()> {
     if password.chars().count() < MIN_PASSWORD {
-        return Err(AppError::bad_request(format!("Use a password of at least {MIN_PASSWORD} characters")));
+        return Err(AppError::bad_request(tr!("error-password-length", min = MIN_PASSWORD)));
     }
     Ok(())
 }
@@ -506,16 +507,13 @@ async fn setup(State(state): State<AppState>, headers: HeaderMap, Json(body): Js
     if let Some(expected) = setup_code(&state) {
         const TRIES: &str = "\u{1}setup";
         if let Some(wait) = wait_for(TRIES) {
-            return Err(AppError::too_many(format!("Too many wrong codes: wait {} seconds", wait.as_secs().max(1))));
+            return Err(AppError::too_many(tr!("error-too-many-codes", seconds = wait.as_secs().max(1))));
         }
         // Compared as digests, so how long it takes says nothing about how much of the code was right.
         let right = digest(body.code.trim()) == digest(expected);
         note_attempt(TRIES, right);
         if !right {
-            return Err(AppError {
-                status: StatusCode::FORBIDDEN,
-                err: anyhow!("That isn't the setup code given to the server in HOARD_SETUP_CODE"),
-            });
+            return Err(AppError { status: StatusCode::FORBIDDEN, err: anyhow!(tr!("error-wrong-setup-code")) });
         }
     }
     let made = name.clone();
@@ -532,7 +530,7 @@ async fn setup(State(state): State<AppState>, headers: HeaderMap, Json(body): Js
         new_session(c, c.last_insert_rowid()).map(Some)
     })
     .await?
-    .ok_or_else(|| AppError::conflict("There's already an account: sign in"))?;
+    .ok_or_else(|| AppError::conflict(tr!("error-already-set-up")))?;
     tracing::info!(user = %name, "first account made");
     signed_in(&headers, &token, &name, Role::Admin)
 }
@@ -544,7 +542,7 @@ async fn login(
 ) -> ApiResult<Response> {
     let name = body.username.trim().to_owned();
     if let Some(wait) = wait_for(&name) {
-        return Err(AppError::too_many(format!("Too many wrong tries: wait {} seconds", wait.as_secs().max(1))));
+        return Err(AppError::too_many(tr!("error-too-many-tries", seconds = wait.as_secs().max(1))));
     }
     let auth = state.settings.get().auth.clone();
     let directory = auth.directory().is_some();
@@ -578,7 +576,7 @@ async fn login(
     note_attempt(&name, found.is_some());
     let Some((token, username, role)) = found else {
         tracing::info!(user = %name, "failed sign-in");
-        return Err(AppError { status: StatusCode::UNAUTHORIZED, err: anyhow!("That name and password don't match") });
+        return Err(AppError { status: StatusCode::UNAUTHORIZED, err: anyhow!(tr!("error-wrong-password")) });
     };
     signed_in(&headers, &token, &username, role)
 }
@@ -593,7 +591,7 @@ async fn directory_login(
     let Some(dir) = auth.directory() else { return Ok(None) };
     let person = crate::signin::directory_sign_in(dir, name, password).await.map_err(|e| {
         tracing::warn!(user = %name, "the directory couldn't check a sign-in: {e:#}");
-        AppError::unavailable(format!("The directory couldn't check your password: {e:#}"))
+        AppError::unavailable(tr!("error-directory-unavailable", reason = format!("{e:#}")))
     })?;
     let Some(person) = person else { return Ok(None) };
     let auth = auth.clone();
@@ -664,8 +662,8 @@ async fn change_password(
     })
     .await?;
     match changed {
-        None => Err(AppError::bad_request("Your password is kept by the directory or provider you sign in with")),
-        Some(false) => Err(AppError::bad_request("Your current password isn't right")),
+        None => Err(AppError::bad_request(tr!("error-password-elsewhere"))),
+        Some(false) => Err(AppError::bad_request(tr!("error-current-password"))),
         Some(true) => Ok(StatusCode::NO_CONTENT),
     }
 }
@@ -713,9 +711,7 @@ async fn create_user(
     who.person()?;
     let source = match body.source.as_deref() {
         None => Source::Internal,
-        Some(s) => Source::parse(s).ok_or_else(|| {
-            AppError::bad_request("An account signs in with Hoard (internal), a directory (ldap) or OAuth")
-        })?,
+        Some(s) => Source::parse(s).ok_or_else(|| AppError::bad_request(tr!("error-account-source")))?,
     };
     let internal = source == Source::Internal;
     let name = if internal { check_new(&body.username, &body.password)? } else { check_name(&body.username)? };
@@ -732,7 +728,7 @@ async fn create_user(
     })
     .await?;
     let Some(id) = added else {
-        return Err(AppError::conflict("There's already an account with that name"));
+        return Err(AppError::conflict(tr!("error-account-exists")));
     };
     let made = json!({ "id": id, "username": name, "role": role.as_str(), "source": source.as_str() });
     Ok((StatusCode::CREATED, Json(made)))
@@ -751,7 +747,7 @@ async fn patch_user(
     Json(body): Json<AccountChange>,
 ) -> ApiResult<StatusCode> {
     if who.person()? == id {
-        return Err(AppError::bad_request("Another admin can change your role"));
+        return Err(AppError::bad_request(tr!("error-own-role")));
     }
     let role = Role::requested(Some(&body.role), Role::View)?;
     let n = db::call(&state.pool, move |c| {
@@ -759,7 +755,7 @@ async fn patch_user(
     })
     .await?;
     if n == 0 {
-        return Err(AppError::not_found("account"));
+        return Err(AppError::not_found(tr!("error-account-not-found")));
     }
     Ok(StatusCode::NO_CONTENT)
 }
@@ -770,7 +766,7 @@ async fn delete_user(
     Path(id): Path<i64>,
 ) -> ApiResult<StatusCode> {
     if who.person()? == id {
-        return Err(AppError::bad_request("You can't remove your own account while you're signed in to it"));
+        return Err(AppError::bad_request(tr!("error-remove-self")));
     }
     // Their tokens and connected apps go with them.
     let n = db::call(&state.pool, move |c| {
@@ -779,7 +775,7 @@ async fn delete_user(
     })
     .await?;
     if n == 0 {
-        return Err(AppError::not_found("account"));
+        return Err(AppError::not_found(tr!("error-account-not-found")));
     }
     Ok(StatusCode::NO_CONTENT)
 }
@@ -840,11 +836,11 @@ async fn create_token(
     let me = who.person()?;
     let name = body.name.trim().to_owned();
     if name.is_empty() || name.chars().count() > 80 {
-        return Err(AppError::bad_request("Name the token after what will use it, in up to 80 characters"));
+        return Err(AppError::bad_request(tr!("error-token-name")));
     }
     let role = Role::requested(body.role.as_deref(), who.role())?;
     if role > who.role() {
-        return Err(AppError::forbidden("A token can't do more than the account that makes it"));
+        return Err(AppError::forbidden(tr!("error-token-role")));
     }
     let token = format!("hoard_{}", tools::hex(&random_bytes::<32>()?));
     let (hash, label) = (digest(&token), name.clone());
@@ -870,7 +866,7 @@ async fn delete_token(
     })
     .await?;
     if n == 0 {
-        return Err(AppError::not_found("token"));
+        return Err(AppError::not_found(tr!("error-token-not-found")));
     }
     Ok(StatusCode::NO_CONTENT)
 }

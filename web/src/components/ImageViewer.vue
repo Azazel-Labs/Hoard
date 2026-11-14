@@ -4,6 +4,7 @@
 // 2048 px) and swaps to the file itself once zoomed in past the preview's pixels, or on "Full resolution".
 import { computed, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue'
 import { asUrl, fileUrl, humanBytes, liteUrl, thumbUrl, type Asset } from '../api'
+import { t } from '../i18n'
 
 const props = defineProps<{ asset: Asset; pixelated?: boolean }>()
 const emit = defineEmits<{ close: [] }>()
@@ -17,13 +18,33 @@ const fullUrl = computed(() => (native.value ? fileUrl(props.asset) : `${asUrl(p
 const src = ref('')
 
 const BACKGROUNDS = ['checker', 'black', 'grey', 'white'] as const
+// The letters are the keys that pick each channel; the titles are getters so they follow the language.
 const CHANNELS = [
-  { key: 'r', label: 'R', title: 'Red channel' },
-  { key: 'g', label: 'G', title: 'Green channel' },
-  { key: 'b', label: 'B', title: 'Blue channel' },
-  { key: 'a', label: 'A', title: 'Alpha channel' },
+  { key: 'r', label: 'R', get title() { return t('image-channel-red') } },
+  { key: 'g', label: 'G', get title() { return t('image-channel-green') } },
+  { key: 'b', label: 'B', get title() { return t('image-channel-blue') } },
+  { key: 'a', label: 'A', get title() { return t('image-channel-alpha') } },
 ] as const
 type Channel = (typeof CHANNELS)[number]['key'] | ''
+type Background = (typeof BACKGROUNDS)[number]
+/** A background swatch's tooltip. */
+function bgTitle(b: Background): string {
+  switch (b) {
+    case 'checker': return t('image-bg-checker-title')
+    case 'black': return t('image-bg-black-title')
+    case 'grey': return t('image-bg-grey-title')
+    case 'white': return t('image-bg-white-title')
+  }
+}
+/** A background swatch's name for screen readers. */
+function bgLabel(b: Background): string {
+  switch (b) {
+    case 'checker': return t('image-bg-checker')
+    case 'black': return t('image-bg-black')
+    case 'grey': return t('image-bg-grey')
+    case 'white': return t('image-bg-white')
+  }
+}
 
 const dlg = ref<HTMLDialogElement | null>(null)
 const stage = ref<HTMLElement | null>(null)
@@ -238,7 +259,7 @@ const contentStyle = computed(() => ({
 </script>
 
 <template>
-  <dialog ref="dlg" class="viewer" :aria-label="`Inspect ${asset.name}`" @close="emit('close')" @keydown="onKey">
+  <dialog ref="dlg" class="viewer" :aria-label="t('image-inspect-aria', { name: asset.name })" @close="emit('close')" @keydown="onKey">
     <svg width="0" height="0" aria-hidden="true" class="defs">
       <!-- Each channel as greyscale, fully opaque: the alpha one turns transparency into black. -->
       <filter id="hoard-ch-r" color-interpolation-filters="sRGB"><feColorMatrix values="1 0 0 0 0  1 0 0 0 0  1 0 0 0 0  0 0 0 0 1" /></filter>
@@ -252,35 +273,35 @@ const contentStyle = computed(() => ({
         <strong>{{ asset.name }}</strong>
         <span v-if="size.w" class="mono dim">
           {{ size.w }}×{{ size.h }} · {{ humanBytes(asset.size) }}
-          <template v-if="smaller && full !== 'shown'"> · preview {{ lite.w }}×{{ lite.h }}, {{ humanBytes(lite.bytes) }}</template>
-          <template v-else-if="!native && !smaller && !lite.w"> · preview</template>
+          <template v-if="smaller && full !== 'shown'"> · {{ t('image-preview-size', { width: String(lite.w), height: String(lite.h), bytes: humanBytes(lite.bytes) }) }}</template>
+          <template v-else-if="!native && !smaller && !lite.w"> · {{ t('image-preview') }}</template>
         </span>
       </div>
-      <div v-if="smaller && full !== 'shown'" class="group" role="group" aria-label="Resolution">
+      <div v-if="smaller && full !== 'shown'" class="group" role="group" :aria-label="t('image-resolution')">
         <button
           type="button"
-          :title="`Load the full ${size.w}×${size.h} picture (F); zooming in past the preview does too`"
+          :title="t('image-full-title', { width: String(size.w), height: String(size.h) })"
           :disabled="full === 'loading'"
           @click="showFull"
         >
-          {{ full === 'loading' ? 'Loading full resolution…' : full === 'failed' ? "Full resolution didn't load: retry" : 'Full resolution' }}
+          {{ full === 'loading' ? t('image-full-loading') : full === 'failed' ? t('image-full-failed') : t('image-full') }}
         </button>
       </div>
-      <div class="group" role="group" aria-label="Zoom">
-        <button type="button" title="Zoom out (−)" aria-label="Zoom out" @click="place(view.s / 1.5)">
+      <div class="group" role="group" :aria-label="t('image-zoom')">
+        <button type="button" :title="t('image-zoom-out-title')" :aria-label="t('image-zoom-out')" @click="place(view.s / 1.5)">
           <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M3.5 8h9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" /></svg>
         </button>
         <span class="mono zoom" aria-live="polite">{{ pct }}</span>
-        <button type="button" title="Zoom in (+)" aria-label="Zoom in" @click="place(view.s * 1.5)">
+        <button type="button" :title="t('image-zoom-in-title')" :aria-label="t('image-zoom-in')" @click="place(view.s * 1.5)">
           <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M3.5 8h9M8 3.5v9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" /></svg>
         </button>
-        <button type="button" title="Fit (0)" @click="fit()">Fit</button>
-        <button type="button" title="Actual pixels (1)" @click="actual()">1:1</button>
+        <button type="button" :title="t('image-fit-title')" @click="fit()">{{ t('image-fit') }}</button>
+        <button type="button" :title="t('image-actual-title')" @click="actual()">1:1</button>
       </div>
-      <div class="group" role="group" aria-label="View">
-        <button type="button" title="Tile 3×3 to check the seams (T)" :aria-pressed="tiled" @click="toggleTile">
+      <div class="group" role="group" :aria-label="t('image-view')">
+        <button type="button" :title="t('image-tile-title')" :aria-pressed="tiled" @click="toggleTile">
           <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true" fill="currentColor"><rect x="1.5" y="1.5" width="3.6" height="3.6" rx=".6" /><rect x="6.2" y="1.5" width="3.6" height="3.6" rx=".6" /><rect x="10.9" y="1.5" width="3.6" height="3.6" rx=".6" /><rect x="1.5" y="6.2" width="3.6" height="3.6" rx=".6" /><rect x="6.2" y="6.2" width="3.6" height="3.6" rx=".6" /><rect x="10.9" y="6.2" width="3.6" height="3.6" rx=".6" /><rect x="1.5" y="10.9" width="3.6" height="3.6" rx=".6" /><rect x="6.2" y="10.9" width="3.6" height="3.6" rx=".6" /><rect x="10.9" y="10.9" width="3.6" height="3.6" rx=".6" /></svg>
-          <span class="wide">Tile</span>
+          <span class="wide">{{ t('image-tile') }}</span>
         </button>
         <button
           v-for="b in BACKGROUNDS"
@@ -288,27 +309,27 @@ const contentStyle = computed(() => ({
           type="button"
           class="swatch"
           :class="b"
-          :title="`${b[0].toUpperCase()}${b.slice(1)} background (K cycles)`"
-          :aria-label="`${b} background`"
+          :title="bgTitle(b)"
+          :aria-label="bgLabel(b)"
           :aria-pressed="bg === b"
           @click="bg = b"
         />
       </div>
-      <div class="group" role="group" aria-label="Channels">
+      <div class="group" role="group" :aria-label="t('image-channels')">
         <button
           v-for="c in CHANNELS"
           :key="c.key"
           type="button"
           class="ch"
           :class="`ch-${c.key}`"
-          :title="`${c.title} (${c.label})`"
+          :title="t('image-channel-title', { channel: c.title, key: c.label })"
           :aria-pressed="channel === c.key"
           @click="setChannel(c.key)"
         >
           {{ c.label }}
         </button>
       </div>
-      <button type="button" class="close" aria-label="Close (Esc)" title="Close (Esc)" autofocus @click="dlg?.close()">
+      <button type="button" class="close" :aria-label="t('image-close')" :title="t('image-close')" autofocus @click="dlg?.close()">
         <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="m4 4 8 8M12 4l-8 8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" /></svg>
       </button>
     </header>
@@ -324,7 +345,7 @@ const contentStyle = computed(() => ({
       @pointercancel="onUp"
       @dblclick="onDouble"
     >
-      <p v-if="failed" class="msg">This image couldn't be loaded.</p>
+      <p v-if="failed" class="msg">{{ t('image-failed') }}</p>
       <div
         v-else-if="size.w"
         class="content"
@@ -333,10 +354,10 @@ const contentStyle = computed(() => ({
         role="img"
         :aria-label="asset.name"
       />
-      <p v-else class="msg">Loading…</p>
+      <p v-else class="msg">{{ t('image-loading') }}</p>
     </div>
     <footer class="keys" aria-hidden="true">
-      Scroll or pinch to zoom · drag to pan · double-click to zoom in or fit · <kbd>T</kbd> tile · <kbd>K</kbd> background<template v-if="smaller"> · <kbd>F</kbd> full resolution</template> · <kbd>R</kbd><kbd>G</kbd><kbd>B</kbd><kbd>A</kbd> channels
+      {{ t('image-key-gestures') }} · <kbd>T</kbd> {{ t('image-key-tile') }} · <kbd>K</kbd> {{ t('image-key-background') }}<template v-if="smaller"> · <kbd>F</kbd> {{ t('image-key-full') }}</template> · <kbd>R</kbd><kbd>G</kbd><kbd>B</kbd><kbd>A</kbd> {{ t('image-key-channels') }}
     </footer>
   </dialog>
 </template>

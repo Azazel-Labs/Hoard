@@ -3,6 +3,7 @@
 // (merge it into a new name). The old names are remembered, so the taggers use the new one from then on.
 import { computed, onMounted, ref, watch } from 'vue'
 import { api, type Facet } from '../api'
+import { formatNumber, t } from '../i18n'
 import { confirmDialog, showError, showOk } from '../ui'
 import TagChip from './TagChip.vue'
 
@@ -19,11 +20,11 @@ const limit = ref(200)
 
 async function load() {
   try {
-    const [t, a] = await Promise.all([api.allTags(q.value.trim().toLowerCase()), api.tagAliases()])
-    tags.value = t
+    const [all, a] = await Promise.all([api.allTags(q.value.trim().toLowerCase()), api.tagAliases()])
+    tags.value = all
     aliases.value = a
   } catch (e) {
-    showError(`Couldn't load the tags: ${(e as Error).message}`)
+    showError(t('tags-load-failed', { error: (e as Error).message }))
   }
 }
 onMounted(load)
@@ -64,22 +65,24 @@ async function merge() {
   if (!ready.value) return
   const from = picked.value.filter((t) => t !== target.value)
   const ok = await confirmDialog({
-    title: renaming.value ? `Rename ${from[0]}?` : `Merge ${from.length + (picked.value.includes(target.value) ? 1 : 0)} tags?`,
+    title: renaming.value
+      ? t('tags-rename-title', { tag: from[0] })
+      : t('tags-merge-title', { count: from.length + (picked.value.includes(target.value) ? 1 : 0) }),
     body: renaming.value
-      ? `Its ${affected.value.toLocaleString()} assets get ${target.value} instead, and the taggers use the new name from now on.`
-      : `${from.join(', ')} become ${target.value} on up to ${affected.value.toLocaleString()} assets. The taggers use ${target.value} from now on.`,
-    confirm: renaming.value ? 'Rename' : 'Merge',
+      ? t('tags-rename-body', { count: affected.value, into: target.value })
+      : t('tags-merge-body', { tags: from.join(', '), into: target.value, count: affected.value }),
+    confirm: renaming.value ? t('tags-rename') : t('tags-merge'),
   })
   if (!ok) return
   busy.value = true
   try {
     const r = await api.mergeTags(from, target.value)
-    showOk(`${r.assets.toLocaleString()} ${r.assets === 1 ? 'asset' : 'assets'} now tagged ${r.into}`)
+    showOk(t('tags-merged', { count: r.assets, into: r.into }))
     picked.value = []
     await load()
     emit('changed')
   } catch (e) {
-    showError(`Couldn't merge: ${(e as Error).message}`)
+    showError(t('tags-merge-failed', { error: (e as Error).message }))
   } finally {
     busy.value = false
   }
@@ -90,7 +93,7 @@ async function forget(a: { tag: string; into: string }) {
     await api.dropTagAlias(a.tag)
     aliases.value = aliases.value.filter((x) => x.tag !== a.tag)
   } catch (e) {
-    showError(`Couldn't change that: ${(e as Error).message}`)
+    showError(t('tags-forget-failed', { error: (e as Error).message }))
   }
 }
 
@@ -110,50 +113,50 @@ watch(moreEl, (el) => {
   <div class="tags">
     <section>
       <div class="find">
-        <label class="visually-hidden" for="tags-q">Find tags</label>
-        <input id="tags-q" v-model="q" class="field" type="search" placeholder="Find tags, e.g. rock or set:" />
-        <span v-if="tags" class="muted">{{ tags.length.toLocaleString() }}{{ tags.length >= 2000 ? '+' : '' }} {{ tags.length === 1 ? 'tag' : 'tags' }}</span>
+        <label class="visually-hidden" for="tags-q">{{ t('tags-find') }}</label>
+        <input id="tags-q" v-model="q" class="field" type="search" :placeholder="t('tags-find-placeholder')" />
+        <span v-if="tags" class="muted">{{ tags.length >= 2000 ? t('tags-count-more', { count: tags.length }) : t('tags-count', { count: tags.length }) }}</span>
       </div>
-      <p class="what">Pick tags that mean the same thing and merge them, or pick one to rename it.</p>
+      <p class="what">{{ t('tags-what') }}</p>
 
       <form v-if="picked.length" class="merge" @submit.prevent="merge">
         <div class="picked">
-          <TagChip v-for="t in picked" :key="t" :tag="t" removable @remove="toggle(t)" />
+          <TagChip v-for="tag in picked" :key="tag" :tag="tag" removable @remove="toggle(tag)" />
         </div>
         <label class="into">
-          <span>{{ renaming ? 'New name' : 'Merge into' }}</span>
+          <span>{{ renaming ? t('tags-new-name') : t('tags-merge-into') }}</span>
           <input v-model="into" class="field mono" list="tags-picked" autocomplete="off" spellcheck="false" />
-          <datalist id="tags-picked"><option v-for="t in picked" :key="t" :value="t" /></datalist>
+          <datalist id="tags-picked"><option v-for="tag in picked" :key="tag" :value="tag" /></datalist>
         </label>
-        <p v-if="target && target !== into.trim()" class="what">Saved as <span class="mono">{{ target }}</span></p>
+        <p v-if="target && target !== into.trim()" class="what">{{ t('tags-saved-as-before') }} <span class="mono">{{ target }}</span>{{ t('tags-saved-as-after') }}</p>
         <div class="row">
-          <button class="btn primary" type="submit" :disabled="!ready || busy">{{ renaming ? 'Rename' : 'Merge' }}</button>
-          <button class="btn ghost" type="button" @click="picked = []">Cancel</button>
+          <button class="btn primary" type="submit" :disabled="!ready || busy">{{ renaming ? t('tags-rename') : t('tags-merge') }}</button>
+          <button class="btn ghost" type="button" @click="picked = []">{{ t('tags-cancel') }}</button>
         </div>
       </form>
 
-      <p v-if="!tags" class="what">Loading…</p>
-      <p v-else-if="!tags.length" class="what none">No tags{{ q ? ` containing “${q.trim()}”` : '' }}.</p>
+      <p v-if="!tags" class="what">{{ t('tags-loading') }}</p>
+      <p v-else-if="!tags.length" class="what none">{{ q ? t('tags-none-containing', { text: q.trim() }) : t('tags-none') }}</p>
       <ul v-else class="list">
-        <li v-for="t in tags.slice(0, limit)" :key="t.value" :class="{ on: picked.includes(t.value) }">
+        <li v-for="tag in tags.slice(0, limit)" :key="tag.value" :class="{ on: picked.includes(tag.value) }">
           <label class="pick">
-            <input type="checkbox" :checked="picked.includes(t.value)" @change="toggle(t.value)" />
-            <span class="mono">{{ t.value }}</span>
+            <input type="checkbox" :checked="picked.includes(tag.value)" @change="toggle(tag.value)" />
+            <span class="mono">{{ tag.value }}</span>
           </label>
-          <span class="n">{{ t.count.toLocaleString() }}</span>
-          <button type="button" class="btn ghost small" :title="`Browse assets tagged ${t.value}`" @click="emit('tag', t.value)">Browse</button>
+          <span class="n">{{ formatNumber(tag.count) }}</span>
+          <button type="button" class="btn ghost small" :title="t('tags-browse-title', { tag: tag.value })" @click="emit('tag', tag.value)">{{ t('tags-browse') }}</button>
         </li>
       </ul>
       <div v-if="tags && tags.length > limit" ref="moreEl" class="more" aria-hidden="true" />
     </section>
 
     <section v-if="aliases.length">
-      <div class="sh"><h3>Merged tags</h3></div>
-      <p class="what">When the taggers come up with one of these old names, the asset gets the tag it was merged into.</p>
+      <div class="sh"><h3>{{ t('tags-merged-heading') }}</h3></div>
+      <p class="what">{{ t('tags-merged-what') }}</p>
       <ul class="list">
         <li v-for="a in aliases" :key="a.tag">
           <span class="mono grow">{{ a.tag }} → {{ a.into }}</span>
-          <button type="button" class="btn ghost small" @click="forget(a)">Allow the old name again</button>
+          <button type="button" class="btn ghost small" @click="forget(a)">{{ t('tags-allow-old') }}</button>
         </li>
       </ul>
     </section>

@@ -3,6 +3,7 @@
 // archiving or deleting something a project uses asks first, since that project's next sync would take it out.
 import { ref } from 'vue'
 import { api, type Project, type ProjectUse, type UsageItems } from './api'
+import { t } from './i18n'
 
 export const projects = ref<Project[]>([])
 
@@ -16,15 +17,15 @@ export async function loadProjects(): Promise<void> {
 
 /** "a, b and c". */
 function listText(parts: string[]): string {
-  return parts.length < 2 ? (parts[0] ?? '') : `${parts.slice(0, -1).join(', ')} and ${parts[parts.length - 1]}`
+  return parts.length < 2 ? (parts[0] ?? '') : t('projects-list-and', { items: parts.slice(0, -1).join(t('projects-list-separator')), last: parts[parts.length - 1] })
 }
 
 /** One project's share: "Forest (props/crate.obj and 2 more)". */
 function useText(u: ProjectUse): string {
   const more = u.assets - u.examples.length
   const files = u.examples.map((e) => e.path)
-  if (more > 0) files.push(`${more.toLocaleString()} more`)
-  return `${u.name} (${listText(files)})`
+  if (more > 0) files.push(t('projects-use-more', { count: more }))
+  return t('projects-use', { name: u.name, files: listText(files) })
 }
 
 /**
@@ -41,8 +42,9 @@ export async function usageWarning(items: UsageItems): Promise<{ title: string; 
   if (!uses.length) return null
   const shown = uses.slice(0, 3).map(useText)
   const rest = uses.length - shown.length
-  if (rest > 0) shown.push(`${rest} other project${rest === 1 ? '' : 's'}`)
-  const title = uses.length === 1 ? `${uses[0].name} uses this` : `${uses.length} projects use this`
-  const each = uses.length === 1 ? 'its' : 'each one’s'
-  return { title, body: `Used in ${listText(shown)}: ${each} next hoard sync takes them out.` }
+  if (rest > 0) shown.push(t('projects-other', { count: rest }))
+  const title = uses.length === 1 ? t('projects-usage-title-one', { name: uses[0].name }) : t('projects-usage-title', { count: uses.length })
+  const list = listText(shown)
+  const body = uses.length === 1 ? t('projects-usage-body-one', { list }) : t('projects-usage-body', { list })
+  return { title, body }
 }

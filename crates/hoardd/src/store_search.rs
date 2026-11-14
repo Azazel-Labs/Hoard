@@ -8,6 +8,7 @@
 //! product folders (`Content/MedievalVillage`), its engine and how many meshes and textures it has. The name and a
 //! few variants of it are searched, and the clues decide the order.
 
+use crate::i18n::tr;
 use std::collections::{BTreeMap, BTreeSet, HashMap};
 use std::fmt::Write as _;
 use std::time::Duration;
@@ -632,7 +633,7 @@ pub(crate) async fn find_matches(state: &AppState, id: &str, typed: Option<&str>
         Ok(Some((pack, readme, paths)))
     })
     .await?;
-    let (pack, readme, paths) = found.ok_or_else(|| AppError::not_found(format!("pack {id}")))?;
+    let (pack, readme, paths) = found.ok_or_else(|| AppError::not_found(tr!("error-pack-not-found", id = id)))?;
     let mut clues = clues(&pack.name, readme.as_deref(), &paths, &pack.kinds);
     clues.add_sidecars(&sidecar::pack_sidecars(state, id).await?);
     let query: String = match (typed, &clues.title) {
@@ -644,7 +645,7 @@ pub(crate) async fn find_matches(state: &AppState, id: &str, typed: Option<&str>
     .take(MAX_QUERY)
     .collect();
     if query.is_empty() {
-        return Err(AppError::bad_request("nothing to search for; type the pack's name"));
+        return Err(AppError::bad_request(tr!("error-store-search-empty")));
     }
     let mut all = queries(&query, typed.is_some(), &clues);
     // With an exact title in hand the pack's name is the fallback, searched second.

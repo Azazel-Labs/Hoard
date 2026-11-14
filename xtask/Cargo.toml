@@ -12,6 +12,12 @@ publish = false
 anyhow.workspace = true
 clap.workspace = true
 ureq = "3.5.1"
+fluent-syntax = "0.12"
+unic-langid = "0.9"
+proc-macro2 = { version = "1", features = ["span-locations"] }
+syn = { version = "3", features = ["full", "visit"] }
+toml_edit = "0.25.17"
+sha2 = "0.11"
 
 [lints]
 workspace = true

@@ -1,6 +1,7 @@
 // App-wide feedback: stacked toasts (with an optional action such as Undo or Retry), a styled confirm dialog, and
 // undoable actions that only commit once their toast runs out. UiLayer.vue renders all of it.
 import { nextTick, reactive, ref, watch } from 'vue'
+import { formatDate, t } from './i18n'
 
 export type ToastKind = 'ok' | 'error' | 'info'
 export interface ToastAction {
@@ -120,7 +121,7 @@ export function undoable(text: string, steps: { apply?: () => void; revert: () =
     kind: 'info',
     duration: 6000,
     action: {
-      label: 'Undo',
+      label: t('ui-undo'),
       run: () => {
         pending.delete(id)
         steps.revert()
@@ -330,8 +331,8 @@ export function daysAgo(iso?: string | null): string {
   if (!iso) return ''
   const d = new Date(iso.replace(' ', 'T') + (/[zZ+]/.test(iso.slice(10)) ? '' : 'Z'))
   const days = Math.floor((Date.now() - d.getTime()) / 86_400_000)
-  if (days < 1) return 'today'
-  if (days === 1) return 'yesterday'
-  if (days < 30) return `${days} days ago`
-  return d.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })
+  if (days < 1) return t('ui-today')
+  if (days === 1) return t('ui-yesterday')
+  if (days < 30) return t('ui-days-ago', { days })
+  return formatDate(d, { year: 'numeric', month: 'short', day: 'numeric' })
 }

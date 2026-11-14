@@ -4,6 +4,7 @@
 //!
 //! Written as `CREDITS.md` (into pack, collection and selection zips, too) or as JSON.
 
+use crate::i18n::tr;
 use std::collections::BTreeSet;
 use std::fmt::Write as _;
 
@@ -281,13 +282,13 @@ fn resolve(c: &Connection, req: &CreditsRequest) -> Result<Result<BTreeSet<Strin
     for key in &req.packs {
         match pack_id(c, key)? {
             Some(id) => packs.insert(id),
-            None => return Ok(Err(format!("pack {key}"))),
+            None => return Ok(Err(tr!("error-credits-pack", key = key))),
         };
     }
     for key in &req.collections {
         match packs_of_collection(c, key)? {
             Some((_, p)) => packs.extend(p),
-            None => return Ok(Err(format!("collection {key}"))),
+            None => return Ok(Err(tr!("error-credits-collection", key = key))),
         }
     }
     packs.extend(packs_of_assets(c, &req.ids, false, false)?);
@@ -338,7 +339,7 @@ pub(crate) async fn pack_credits(
         Ok(Some(for_packs(c, &BTreeSet::from([id]))?))
     })
     .await?
-    .ok_or_else(|| AppError::not_found(format!("pack {id}")))?;
+    .ok_or_else(|| AppError::not_found(tr!("error-pack-not-found", id = id)))?;
     Ok(respond(&credits, &f))
 }
 
@@ -354,7 +355,7 @@ pub(crate) async fn collection_credits(
         Ok(Some(for_packs(c, &packs)?))
     })
     .await?
-    .ok_or_else(|| AppError::not_found(format!("collection {id}")))?;
+    .ok_or_else(|| AppError::not_found(tr!("error-collection-not-found", id = id)))?;
     Ok(respond(&credits, &f))
 }
 

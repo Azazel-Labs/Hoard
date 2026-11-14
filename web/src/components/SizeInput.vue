@@ -3,6 +3,7 @@
 // gigabytes, and once it's entered (Enter, or leaving the field) the text is rewritten with its unit, so "100"
 // visibly becomes "100 GB". Something that isn't a size is flagged and left as typed until it's fixed.
 import { ref, watch } from 'vue'
+import { t } from '../i18n'
 import { formatMiB, parseMiB } from '../sizes'
 
 const props = defineProps<{ modelValue: number; id?: string; disabled?: boolean }>()
@@ -36,7 +37,7 @@ function commit() {
     autocomplete="off"
     :disabled="disabled"
     :aria-invalid="bad || undefined"
-    :title="bad ? 'A size like 100 GB, 512 MB or 1.5 TB' : 'A size like 100 GB, 512 MB or 1.5 TB; a plain number is GB'"
+    :title="bad ? t('size-invalid') : t('size-hint')"
     @change="commit"
     @keydown.enter.prevent="commit"
     @input="bad = false"

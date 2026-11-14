@@ -33,11 +33,13 @@ use tokio::io::{AsyncReadExt, AsyncWriteExt};
 
 use crate::config::Config;
 use crate::db;
+use crate::i18n::tr;
 use crate::locations::Mode;
 
 /// What an upload is refused with when there's nowhere to put it.
-pub(crate) const NO_LIBRARY: &str =
-    "there's no library location to store files in yet: add a managed one in Settings → Library locations";
+pub(crate) fn no_library() -> String {
+    tr!("error-no-library")
+}
 
 #[derive(Clone)]
 pub(crate) struct BlobStore {
@@ -151,12 +153,12 @@ pub(crate) fn open_store(cfg: &Config, path: &str) -> Result<(Arc<dyn ObjectStor
     let Some(bucket) = s3_bucket(path) else {
         let dir = FsPath::new(path);
         if !dir.is_dir() {
-            bail!("{path} isn't there (a disk that isn't mounted?)");
+            bail!(tr!("error-folder-missing", path = path));
         }
         return Ok((Arc::new(LocalFileSystem::new_with_prefix(dir)?), false));
     };
     if bucket.is_empty() || bucket.contains('/') {
-        bail!("an S3 location looks like s3://bucket");
+        bail!(tr!("error-s3-path"));
     }
     let mut b = AmazonS3Builder::new()
         .with_bucket_name(bucket)
@@ -314,7 +316,7 @@ impl BlobStore {
         if libs.holds(&blob.hash).await? {
             return Ok(());
         }
-        let (target, _writing) = self.claim(&libs, kind).context(NO_LIBRARY)?;
+        let (target, _writing) = self.claim(&libs, kind).with_context(no_library)?;
         write_file(&target.store, path, &key(&blob.hash)).await
     }
 

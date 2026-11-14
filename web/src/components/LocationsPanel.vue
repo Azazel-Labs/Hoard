@@ -3,6 +3,7 @@
 import { computed, onMounted, reactive, ref } from 'vue'
 import { api, ApiError, KIND_LABEL, type AssetKind, type LibraryLocation, type LocationList } from '../api'
 import { confirmDialog, showError, showOk } from '../ui'
+import { formatDate, t } from '../i18n'
 import KindChips from './KindChips.vue'
 import LocationForm from './LocationForm.vue'
 
@@ -19,14 +20,14 @@ const watched = computed(() => data.value?.locations.filter((l) => l.mode === 'w
 
 function failed(e: unknown, what: string) {
   if (e instanceof ApiError && e.status === 401) emit('unauthorized')
-  showError(`${what}: ${(e as Error).message}`)
+  showError(t('locations-failed', { what, error: (e as Error).message }))
 }
 
 async function load() {
   try {
     data.value = await api.locations()
   } catch (e) {
-    failed(e, "Couldn't load the library locations")
+    failed(e, t('locations-load-failed'))
   }
 }
 onMounted(load)
@@ -34,8 +35,8 @@ onMounted(load)
 function takes(l: LibraryLocation): string {
   const kinds = l.kinds.map((k) => KIND_LABEL[k] ?? k)
   const others = managed.value.some((m) => m.id !== l.id && m.kinds.length)
-  if (l.catch_all) return kinds.length ? `${kinds.join(', ')}, and everything else` : others ? 'Everything the others don’t take' : 'Everything'
-  return kinds.length ? kinds.join(', ') : 'Nothing yet'
+  if (l.catch_all) return kinds.length ? t('locations-takes-and-rest', { kinds: kinds.join(', ') }) : others ? t('locations-takes-rest') : t('locations-takes-everything')
+  return kinds.length ? kinds.join(', ') : t('locations-takes-nothing')
 }
 
 function edit(l: LibraryLocation) {
@@ -51,7 +52,7 @@ async function save(l: LibraryLocation) {
     editing.value = null
     await load()
   } catch (e) {
-    failed(e, "Couldn't save the location")
+    failed(e, t('locations-save-failed'))
   } finally {
     busy.value = false
   }
@@ -63,19 +64,19 @@ async function remove(l: LibraryLocation) {
   const ok = await confirmDialog(
     watchedLoc
       ? {
-          title: `Stop watching ${l.name}?`,
+          title: t('locations-unwatch-title', { name: l.name }),
           body: l.packs
-            ? `Its ${l.packs} pack${l.packs === 1 ? '' : 's'} leave the hoard, with their tags and notes. The files in the folder aren't touched.`
-            : "The files in the folder aren't touched.",
-          confirm: 'Stop watching',
+            ? t('locations-unwatch-body', { count: l.packs })
+            : t('locations-unwatch-body-empty'),
+          confirm: t('locations-unwatch'),
           danger: true,
         }
       : {
-          title: `Remove ${l.name}?`,
+          title: t('locations-remove-title', { name: l.name }),
           body: others
-            ? 'Any files in it move to the other locations first, by kind; it goes once it’s empty. Nothing is lost.'
-            : 'If it holds files, add another location for them to move to first.',
-          confirm: 'Remove',
+            ? t('locations-remove-body')
+            : t('locations-remove-body-only'),
+          confirm: t('locations-remove'),
           danger: true,
         },
   )
@@ -84,24 +85,24 @@ async function remove(l: LibraryLocation) {
   try {
     try {
       await api.deleteLocation(l.id)
-      showOk(`Removed ${l.name}`)
+      showOk(t('locations-removed', { name: l.name }))
     } catch (e) {
       if (!(e instanceof ApiError) || watchedLoc) throw e
       if (e.status === 409 && others) {
         // It still holds files: move them out, and it's removed when that's done.
         await api.emptyLocation(l.id)
-        showOk(`Moving the files out of ${l.name}; it's removed when that's done`)
+        showOk(t('locations-emptying', { name: l.name }))
       } else if (e.status === 503) {
         // Its disk can't be reached, so its files can't be moved.
         const anyway = await confirmDialog({
-          title: `${l.name} can't be reached`,
-          body: 'Its files can’t be moved out while it’s offline. Remove it anyway? Any files still on it will show as missing.',
-          confirm: 'Remove anyway',
+          title: t('locations-offline-title', { name: l.name }),
+          body: t('locations-offline-body'),
+          confirm: t('locations-remove-anyway'),
           danger: true,
         })
         if (!anyway) return
         await api.deleteLocation(l.id, true)
-        showOk(`Removed ${l.name}`)
+        showOk(t('locations-removed', { name: l.name }))
       } else {
         throw e
       }
@@ -109,7 +110,7 @@ async function remove(l: LibraryLocation) {
     await load()
     emit('changed')
   } catch (e) {
-    failed(e, `Couldn't remove ${l.name}`)
+    failed(e, t('locations-remove-failed', { name: l.name }))
   } finally {
     busy.value = false
   }
@@ -119,22 +120,22 @@ async function rebalance() {
   busy.value = true
   try {
     await api.rebalance()
-    showOk('Moving stored files to the locations that take their kind')
+    showOk(t('locations-rebalancing'))
   } catch (e) {
-    failed(e, "Couldn't move the files")
+    failed(e, t('locations-rebalance-failed'))
   } finally {
     busy.value = false
   }
 }
 
 function scannedAgo(iso?: string | null): string {
-  if (!iso) return 'not scanned yet'
+  if (!iso) return t('locations-scanned-never')
   const mins = Math.floor((Date.now() - new Date(iso).getTime()) / 60_000)
-  if (mins < 1) return 'scanned just now'
-  if (mins < 60) return `scanned ${mins} min ago`
+  if (mins < 1) return t('locations-scanned-now')
+  if (mins < 60) return t('locations-scanned-minutes', { mins })
   const hours = Math.floor(mins / 60)
-  if (hours < 24) return `scanned ${hours} h ago`
-  return `scanned ${new Date(iso).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}`
+  if (hours < 24) return t('locations-scanned-hours', { hours })
+  return t('locations-scanned-date', { date: formatDate(iso, { month: 'short', day: 'numeric' }) })
 }
 
 const scanning = ref<number | null>(null)
@@ -152,7 +153,7 @@ async function scanNow(l: LibraryLocation) {
     }
     emit('changed')
   } catch (e) {
-    failed(e, `Couldn't scan ${l.name}`)
+    failed(e, t('locations-scan-failed', { name: l.name }))
   } finally {
     scanning.value = null
   }
@@ -160,7 +161,7 @@ async function scanNow(l: LibraryLocation) {
 
 async function created(l: LibraryLocation) {
   adding.value = false
-  showOk(l.mode === 'watched' ? `Watching ${l.name}` : `Added ${l.name}`)
+  showOk(l.mode === 'watched' ? t('locations-watching', { name: l.name }) : t('locations-added', { name: l.name }))
   await load()
   emit('changed')
 }
@@ -168,67 +169,67 @@ async function created(l: LibraryLocation) {
 
 <template>
   <div class="locs" :aria-busy="busy">
-    <p v-if="!data" class="loading">Loading…</p>
+    <p v-if="!data" class="loading">{{ t('locations-loading') }}</p>
     <template v-else>
-      <section v-for="group in [{ id: 'managed', title: 'Libraries Hoard keeps', list: managed }, { id: 'watched', title: 'Watched folders', list: watched }]" :key="group.id">
+      <section v-for="group in [{ id: 'managed', title: t('locations-managed-title'), list: managed }, { id: 'watched', title: t('locations-watched-title'), list: watched }]" :key="group.id">
         <template v-if="group.list.length || group.id === 'managed'">
           <div class="sh"><h3>{{ group.title }}</h3></div>
           <p v-if="group.id === 'managed'" class="hint">
-            Uploads and imports are copied in here. Each location takes the kinds it ticks; the catch-all takes the rest.
+            {{ t('locations-managed-hint') }}
           </p>
-          <p v-else class="hint">Folders of packs indexed where they are. Hoard never changes the files in them, and looks for new and removed folders every 15 minutes.</p>
-          <p v-if="!group.list.length" class="hint empty">None yet, so there's nowhere to put an upload. Add one below.</p>
+          <p v-else class="hint">{{ t('locations-watched-hint') }}</p>
+          <p v-if="!group.list.length" class="hint empty">{{ t('locations-managed-empty') }}</p>
           <ul class="list">
             <li v-for="l in group.list" :key="l.id" :class="{ open: editing === l.id }">
               <div class="top">
-                <span class="dot" :data-on="l.online" :title="l.online ? 'Reachable' : 'Can’t be reached right now'" />
+                <span class="dot" :data-on="l.online" :title="l.online ? t('locations-reachable') : t('locations-unreachable-now')" />
                 <div class="what">
-                  <strong>{{ l.name }} <span v-if="l.catch_all" class="tag">catch-all</span></strong>
+                  <strong>{{ l.name }} <span v-if="l.catch_all" class="tag">{{ t('locations-catch-all-tag') }}</span></strong>
                   <small class="mono">{{ l.path }}</small>
                   <small>
                     <template v-if="l.mode === 'managed'">{{ takes(l) }}</template>
-                    <template v-else>{{ l.packs }} pack{{ l.packs === 1 ? '' : 's' }} · {{ scannedAgo(l.scanned_at) }}</template>
-                    <template v-if="!l.online"> · <span class="off">can’t be reached</span></template>
+                    <template v-else>{{ t('locations-packs', { count: l.packs }) }} · {{ scannedAgo(l.scanned_at) }}</template>
+                    <template v-if="!l.online"> · <span class="off">{{ t('locations-unreachable') }}</span></template>
                   </small>
                 </div>
                 <div v-if="editing !== l.id" class="acts">
                   <button v-if="l.mode === 'watched'" type="button" class="btn ghost" :disabled="busy || scanning === l.id" @click="scanNow(l)">
-                    {{ scanning === l.id ? 'Scanning…' : 'Scan now' }}
+                    {{ scanning === l.id ? t('locations-scanning') : t('locations-scan') }}
                   </button>
-                  <button type="button" class="btn ghost" :disabled="busy" @click="edit(l)">Edit</button>
-                  <button type="button" class="btn ghost danger" :disabled="busy" @click="remove(l)">Remove</button>
+                  <button type="button" class="btn ghost" :disabled="busy" @click="edit(l)">{{ t('locations-edit') }}</button>
+                  <button type="button" class="btn ghost danger" :disabled="busy" @click="remove(l)">{{ t('locations-remove') }}</button>
                 </div>
               </div>
               <form v-if="editing === l.id" class="edit" @submit.prevent="save(l)">
-                <label class="lbl" :for="`ln-${l.id}`">Name</label>
+                <label class="lbl" :for="`ln-${l.id}`">{{ t('locations-name') }}</label>
                 <input :id="`ln-${l.id}`" v-model="draft.name" class="field" type="text" maxlength="80" />
                 <template v-if="l.mode === 'managed'">
-                  <span class="lbl">Files that go here</span>
+                  <span class="lbl">{{ t('locations-files') }}</span>
                   <div>
                     <KindChips v-model="draft.kinds" :kinds="data.kinds" />
-                    <label class="check" :title="l.catch_all ? 'To change this, make another location the catch-all' : undefined">
-                      <input v-model="draft.catch_all" type="checkbox" :disabled="l.catch_all" /> Also everything no other location takes
+                    <label class="check" :title="l.catch_all ? t('locations-catch-all-locked') : undefined">
+                      <input v-model="draft.catch_all" type="checkbox" :disabled="l.catch_all" /> {{ t('locations-catch-all') }}
                     </label>
-                    <p class="hint">Applies to files added from now on. To move what's stored already, use <em>Move stored files to match</em> below.</p>
+                    <p class="hint">{{ t('locations-edit-hint-before') }} <em>{{ t('locations-rebalance') }}</em> {{ t('locations-edit-hint-after') }}</p>
                   </div>
                 </template>
                 <span />
                 <div class="eacts">
-                  <button type="submit" class="btn primary" :disabled="busy">Save</button>
-                  <button type="button" class="btn ghost" @click="editing = null">Cancel</button>
+                  <button type="submit" class="btn primary" :disabled="busy">{{ t('locations-save') }}</button>
+                  <button type="button" class="btn ghost" @click="editing = null">{{ t('locations-cancel') }}</button>
                 </div>
               </form>
             </li>
           </ul>
           <div v-if="group.id === 'managed' && managed.length > 1" class="rebal">
-            <button type="button" class="btn" :disabled="busy" @click="rebalance">Move stored files to match</button>
-            <small>After changing what a location takes: files already stored move to the location their kind goes to now.</small>
+            <button type="button" class="btn" :disabled="busy" @click="rebalance">{{ t('locations-rebalance') }}</button>
+            <small>{{ t('locations-rebalance-hint') }}</small>
           </div>
         </template>
       </section>
 
       <section>
-        <div class="sh"><h3>Add a location</h3></div>
+        <div class="sh"><h3>{{ t('locations-add-title') }}</h3></div>
         <LocationForm
           v-if="adding"
           :suggested="managed.length ? '' : data.suggested"
@@ -240,8 +241,8 @@ async function created(l: LibraryLocation) {
           @unauthorized="emit('unauthorized')"
         />
         <template v-else>
-          <p class="hint">Another disk for some kinds of files, or a folder of packs you already have.</p>
-          <button type="button" class="btn" @click="adding = true">Add a location…</button>
+          <p class="hint">{{ t('locations-add-hint') }}</p>
+          <button type="button" class="btn" @click="adding = true">{{ t('locations-add-more') }}</button>
         </template>
       </section>
     </template>

@@ -3,6 +3,7 @@
 // without HTTPS, and where to set it up. Not on localhost (browsers treat it as secure) or over HTTPS. Dismissed per
 // browser.
 import { onMounted, ref } from 'vue'
+import { t } from '../i18n'
 
 defineProps<{ member: boolean }>()
 const emit = defineEmits<{ settings: [] }>()
@@ -47,12 +48,11 @@ function dismiss() {
 <template>
   <div v-if="show" class="notice" role="note">
     <span class="text">
-      This is plain http://, so a few things need HTTPS: 3D with WebGPU, the modern clipboard, installing Hoard as an app,
-      and Claude connectors.
+      {{ t('insecure-text') }}
     </span>
-    <a v-if="httpsReady" class="go" :href="httpsUrl">Switch to https://</a>
-    <button v-else-if="member" type="button" class="go" @click="emit('settings')">Set up HTTPS</button>
-    <button type="button" class="x" aria-label="Don’t show this again" title="Don’t show this again" @click="dismiss">×</button>
+    <a v-if="httpsReady" class="go" :href="httpsUrl">{{ t('insecure-switch') }}</a>
+    <button v-else-if="member" type="button" class="go" @click="emit('settings')">{{ t('insecure-set-up') }}</button>
+    <button type="button" class="x" :aria-label="t('insecure-dismiss')" :title="t('insecure-dismiss')" @click="dismiss">×</button>
   </div>
 </template>
 

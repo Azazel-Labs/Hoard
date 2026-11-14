@@ -3,6 +3,7 @@
 // button with a count, and a list on hover or click. Polls quickly while anything runs or the list is open.
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { api, type ActivityItem } from '../api'
+import { t } from '../i18n'
 
 const items = ref<ActivityItem[]>([])
 const open = ref(false)
@@ -17,9 +18,10 @@ watch(() => items.value.length, (n, was) => { if (n > was) bump.value++ })
 const running = computed(() => items.value.filter((i) => i.state === 'running'))
 const queued = computed(() => items.value.filter((i) => i.state === 'queued'))
 const label = computed(() => {
-  if (!items.value.length) return 'Background activity: idle'
-  const q = queued.value.length ? `, ${queued.value.length} queued` : ''
-  return `Background activity: ${running.value.length} running${q}`
+  if (!items.value.length) return t('activity-label-idle')
+  return queued.value.length
+    ? t('activity-label-queued', { running: running.value.length, queued: queued.value.length })
+    : t('activity-label-running', { running: running.value.length })
 })
 
 let timer: ReturnType<typeof setTimeout> | undefined
@@ -81,11 +83,12 @@ onBeforeUnmount(() => {
 
 function since(iso: string) {
   const s = Math.max(0, Math.round((Date.now() - Date.parse(iso)) / 1000))
-  if (s < 60) return `${s} s`
-  if (s < 3600) return `${Math.floor(s / 60)} min`
-  return `${Math.floor(s / 3600)} h ${Math.floor((s % 3600) / 60)} min`
+  if (s < 60) return t('activity-seconds', { s })
+  if (s < 3600) return t('activity-minutes', { min: Math.floor(s / 60) })
+  return t('activity-hours', { h: Math.floor(s / 3600), min: Math.floor((s % 3600) / 60) })
 }
 const pct = (p: number) => `${Math.round(p * 100)}%`
+const pctText = (p: number) => t('activity-percent', { pct: Math.round(p * 100) })
 </script>
 
 <template>
@@ -106,19 +109,19 @@ const pct = (p: number) => `${Math.round(p * 100)}%`
     </button>
 
     <Transition name="pop">
-    <section v-if="open" id="activity-list" class="panel" aria-label="Background activity">
+    <section v-if="open" id="activity-list" class="panel" :aria-label="t('activity-title')">
       <header>
-        <h2>Background activity</h2>
-        <span v-if="failed" class="stale">Can't reach the server</span>
+        <h2>{{ t('activity-title') }}</h2>
+        <span v-if="failed" class="stale">{{ t('activity-unreachable') }}</span>
       </header>
       <p v-if="!items.length" class="empty">
-        Nothing running. Imports, tagging, conversions and zip downloads show up here while they work.
+        {{ t('activity-empty') }}
       </p>
       <ul v-else>
         <li v-for="i in items" :key="i.id" :class="i.state">
           <div class="line">
             <span class="what">{{ i.label }}</span>
-            <span class="when mono">{{ i.state === 'queued' ? 'queued' : i.progress !== undefined ? pct(i.progress) : since(i.since) }}</span>
+            <span class="when mono">{{ i.state === 'queued' ? t('activity-queued') : i.progress !== undefined ? pctText(i.progress) : since(i.since) }}</span>
           </div>
           <div v-if="i.state === 'running'" class="bar" :class="{ unknown: i.progress === undefined }">
             <span :style="i.progress !== undefined ? { width: pct(i.progress) } : undefined" />

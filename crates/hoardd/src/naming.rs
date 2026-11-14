@@ -15,6 +15,7 @@ use rusqlite::{Connection, OptionalExtension};
 use serde::{Deserialize, Serialize};
 
 use crate::db::BundleFile;
+use crate::i18n::tr;
 use crate::materials::{ALL_ROLES, Role};
 
 impl Role {
@@ -160,27 +161,22 @@ impl TextureNames {
     /// Problems a person can fix, in their words.
     pub(crate) fn check(&self) -> Result<(), String> {
         if !self.pattern.contains("{map}") {
-            return Err(
-                "The texture name pattern needs {map}, or every map of a material would get the same name".into()
-            );
+            return Err(tr!("error-texture-pattern-map"));
         }
         let rest = self.pattern.replace("{name}", "").replace("{map}", "").replace("{size}", "");
         if rest.contains(['{', '}']) {
-            return Err("The texture name pattern can use {name}, {map} and {size}".into());
+            return Err(tr!("error-texture-pattern-fields"));
         }
         if rest.chars().any(bad_char) {
-            return Err(r#"Texture names can't have < > : " / \ | ? or *"#.into());
+            return Err(tr!("error-texture-name-chars"));
         }
         for (role, suffix) in &self.maps {
-            let Some(r) = Role::parse(role) else { return Err(format!("There's no map type called {role}")) };
+            let Some(r) = Role::parse(role) else { return Err(tr!("error-texture-map-type", role = role)) };
             if suffix.trim().is_empty() {
-                return Err(format!("Give {} maps a suffix", r.label().to_lowercase()));
+                return Err(tr!("error-texture-suffix-missing", map = r.label().to_lowercase()));
             }
             if suffix.chars().any(bad_char) {
-                return Err(format!(
-                    r#"The suffix for {} maps can't have < > : " / \ | ? or *"#,
-                    r.label().to_lowercase()
-                ));
+                return Err(tr!("error-texture-suffix-chars", map = r.label().to_lowercase()));
             }
         }
         Ok(())

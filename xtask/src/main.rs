@@ -5,10 +5,12 @@
 //! cargo xtask dev --llm                   # ...plus a local model server (pick a model in Settings)
 //! cargo xtask llm                         # just the local model server (llama.cpp in router mode)
 //! cargo xtask ci                          # what CI runs: fmt, clippy, tests, web build
+//! cargo xtask translations check          # the catalogs in locales/ against each other and the code
 //! ```
 #![expect(clippy::print_stdout, reason = "a CLI tool: printing is the point")]
 
 mod llm;
+mod translations;
 
 use std::path::{Path, PathBuf};
 use std::process::{Child, Command, ExitStatus};
@@ -59,6 +61,9 @@ enum Cmd {
         #[arg(long)]
         upload: bool,
     },
+    /// Check, format and review the translations in locales/ (see docs/translations.md).
+    #[command(subcommand)]
+    Translations(translations::Action),
 }
 
 #[derive(Debug, Args)]
@@ -138,6 +143,7 @@ then pick a model in Settings → AI tagging → Local model. Ctrl-C to stop."
         Cmd::Web => web(),
         Cmd::Sample { upload } => sample(upload),
         Cmd::UnrealExport(args) => unreal_export(&args),
+        Cmd::Translations(action) => translations::run(&root(), action).map_err(|e| anyhow::anyhow!("{e}")),
     }
 }
 

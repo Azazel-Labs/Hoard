@@ -16,6 +16,7 @@ use image::DynamicImage;
 use serde_json::{Value, json};
 
 use crate::audio::{Audio, decode_audio, write_flac, write_wav};
+use crate::i18n::tr;
 use crate::{analyze, sources};
 
 /// Image formats we can read pixels from.
@@ -676,10 +677,10 @@ pub(crate) async fn request(
     let allowed = options(&ext, &names).iter().any(|o| o.format == format)
         || (max.is_some() && resizable_as_itself(&ext) == Some(format));
     if !allowed {
-        return Err(Refused::Unsupported(format!(".{ext} files can't be downloaded as {format}")));
+        return Err(Refused::Unsupported(tr!("error-cant-download-as", ext = ext, format = format)));
     }
     if max.is_some() && !(IMAGE_IN.contains(&ext.to_ascii_lowercase().as_str())) {
-        return Err(Refused::Unsupported("only images can be resized".into()));
+        return Err(Refused::Unsupported(tr!("error-only-images-resize")));
     }
     // Blender's GLB is already there.
     if format == "glb" && ext != "gltf" && !crate::meshes::EXTS.contains(&ext.to_ascii_lowercase().as_str()) {

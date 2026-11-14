@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { siteName } from '../auth'
+import { t } from '../i18n'
 // The first visit to a new server: pick where the library lives before anything else.
 import { onMounted, ref } from 'vue'
 import { api, type LibraryLocation, type LocationList } from '../api'
@@ -30,40 +31,37 @@ onMounted(load)
       <p class="brand">{{ siteName() }}</p>
 
       <template v-if="!made">
-        <h1 id="setup-title">Where should your library live?</h1>
+        <h1 id="setup-title">{{ t('setup-title') }}</h1>
         <p class="lede">
-          Pick a folder on the server for Hoard to keep your packs in, or point it at a folder of packs you already have. You can add more
-          locations, on other disks, from Settings later.
+          {{ t('setup-lede') }}
         </p>
 
         <div v-if="error" class="err" role="alert">
-          <p>Couldn't reach the server: {{ error }}</p>
-          <button type="button" class="btn" @click="load">Try again</button>
+          <p>{{ t('setup-unreachable', { error }) }}</p>
+          <button type="button" class="btn" @click="load">{{ t('setup-try-again') }}</button>
         </div>
-        <p v-else-if="!data" class="loading">Loading…</p>
+        <p v-else-if="!data" class="loading">{{ t('setup-loading') }}</p>
         <LocationForm
           v-else
           :suggested="data.suggested"
           :kinds="data.kinds"
           first
-          submit-label="Start the library"
+          :submit-label="t('setup-start')"
           @created="(l) => (made = l)"
         />
       </template>
 
       <template v-else>
-        <h1 id="setup-title">Your library is ready</h1>
+        <h1 id="setup-title">{{ t('setup-ready') }}</h1>
         <p class="lede">
           <template v-if="made.mode === 'managed'">
-            New packs go into <span class="mono">{{ made.path }}</span>. Drop files, folders or archives anywhere on the page to add your first
-            ones.
+            {{ t('setup-managed-before') }}<span class="mono">{{ made.path }}</span>{{ t('setup-managed-after') }}
           </template>
           <template v-else>
-            Hoard is watching <span class="mono">{{ made.path }}</span>; packs show up as it finds them. To upload as well, add a library Hoard
-            keeps from Settings → Library locations.
+            {{ t('setup-watched-before') }}<span class="mono">{{ made.path }}</span>{{ t('setup-watched-after') }}
           </template>
         </p>
-        <button type="button" class="btn primary" autofocus @click="emit('done')">Open the library</button>
+        <button type="button" class="btn primary" autofocus @click="emit('done')">{{ t('setup-open') }}</button>
       </template>
     </div>
   </div>

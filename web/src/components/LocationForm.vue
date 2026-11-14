@@ -4,6 +4,7 @@ import { computed, ref, watch } from 'vue'
 import { api, ApiError, type AssetKind, type LibraryLocation, type LocationMode } from '../api'
 import FolderPicker from './FolderPicker.vue'
 import KindChips from './KindChips.vue'
+import { t } from '../i18n'
 
 const props = defineProps<{
   /** Where the server suggests a first location goes. */
@@ -61,64 +62,61 @@ async function submit() {
 <template>
   <form class="locform" @submit.prevent="submit">
     <fieldset class="choices">
-      <legend class="lbl">What should Hoard do with this folder?</legend>
+      <legend class="lbl">{{ t('locations-mode-question') }}</legend>
       <label :class="{ on: mode === 'managed' }">
         <input v-model="mode" type="radio" name="mode" value="managed" />
         <span>
-          <strong>Keep my library here</strong>
-          <small>Packs you upload or import are copied into this folder. Hoard looks after it, so leave its contents alone.</small>
+          <strong>{{ t('locations-mode-managed') }}</strong>
+          <small>{{ t('locations-mode-managed-hint') }}</small>
         </span>
       </label>
       <label :class="{ on: mode === 'watched' }">
         <input v-model="mode" type="radio" name="mode" value="watched" />
         <span>
-          <strong>Index a folder I already have</strong>
-          <small>
-            Each folder inside it becomes a pack. Hoard reads the files where they are and never changes, moves or deletes them, and picks up
-            new folders as they appear.
-          </small>
+          <strong>{{ t('locations-mode-watched') }}</strong>
+          <small>{{ t('locations-mode-watched-hint') }}</small>
         </span>
       </label>
     </fieldset>
 
     <div class="grid">
-      <label class="lbl" for="loc-path">Folder on the server</label>
+      <label class="lbl" for="loc-path">{{ t('locations-folder') }}</label>
       <div>
-        <FolderPicker id="loc-path" v-model="path" :placeholder="mode === 'managed' ? suggested : 'The folder your packs are in'" @unauthorized="emit('unauthorized')" />
+        <FolderPicker id="loc-path" v-model="path" :placeholder="mode === 'managed' ? suggested : t('locations-folder-placeholder')" @unauthorized="emit('unauthorized')" />
         <p class="hint">
-          <template v-if="mode === 'managed'">Hoard creates it if it isn't there. In Docker, this is a folder you've mounted into the container.</template>
-          <template v-else>In Docker, mount the folder into the container first (read-only is fine), then pick it here.</template>
+          <template v-if="mode === 'managed'">{{ t('locations-folder-hint-managed') }}</template>
+          <template v-else>{{ t('locations-folder-hint-watched') }}</template>
         </p>
       </div>
 
-      <label class="lbl" for="loc-name">Name</label>
-      <input id="loc-name" v-model="name" class="field" type="text" maxlength="80" :placeholder="folderName || (mode === 'managed' ? 'Library' : 'My packs')" />
+      <label class="lbl" for="loc-name">{{ t('locations-name') }}</label>
+      <input id="loc-name" v-model="name" class="field" type="text" maxlength="80" :placeholder="folderName || (mode === 'managed' ? t('locations-name-placeholder-managed') : t('locations-name-placeholder-watched'))" />
 
       <template v-if="mode === 'managed' && !first">
-        <span class="lbl">Files that go here</span>
+        <span class="lbl">{{ t('locations-files') }}</span>
         <div>
           <KindChips v-model="picked" :kinds="kinds" />
           <label class="check">
             <input v-model="catchAll" type="checkbox" />
-            Also everything no other location takes
+            {{ t('locations-catch-all') }}
           </label>
-          <p class="hint">A new pack's files go to the location that ticks their kind. The rest go to the catch-all.</p>
+          <p class="hint">{{ t('locations-kinds-hint') }}</p>
         </div>
       </template>
       <template v-else-if="mode === 'managed'">
-        <span class="lbl">Files that go here</span>
-        <p class="hint flat">All of them, for now. Add more locations later from Settings to send some kinds (music, say) to another disk.</p>
+        <span class="lbl">{{ t('locations-files') }}</span>
+        <p class="hint flat">{{ t('locations-files-all') }}</p>
       </template>
     </div>
 
     <p v-if="first && mode === 'watched'" class="hint note">
-      Uploading needs a library Hoard keeps. You can add one later from Settings → Library locations.
+      {{ t('locations-first-watched-note') }}
     </p>
     <p v-if="error" class="err" role="alert">{{ error }}</p>
 
     <div class="acts">
-      <button type="submit" class="btn primary" :disabled="!ready || busy" :aria-busy="busy">{{ busy ? 'Checking the folder…' : submitLabel || 'Add location' }}</button>
-      <button v-if="cancellable" type="button" class="btn ghost" @click="emit('cancel')">Cancel</button>
+      <button type="submit" class="btn primary" :disabled="!ready || busy" :aria-busy="busy">{{ busy ? t('locations-checking') : submitLabel || t('locations-add') }}</button>
+      <button v-if="cancellable" type="button" class="btn ghost" @click="emit('cancel')">{{ t('locations-cancel') }}</button>
     </div>
   </form>
 </template>

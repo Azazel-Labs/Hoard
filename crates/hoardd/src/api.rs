@@ -1,6 +1,7 @@
 //! HTTP API. Changes and admin pages need an account or an access token (`auth::require_user`); reads do too,
 //! unless Settings lets anyone browse (`auth::require_reader`).
 
+use crate::i18n::tr;
 use std::collections::BTreeSet;
 
 use anyhow::Context;
@@ -336,7 +337,7 @@ async fn get_pack_context(State(state): State<AppState>, Path(id): Path<String>)
     let ctx =
         db::call(&state.pool, move |c| db::get_pack(c, &id2)?.is_some().then(|| db::pack_context(c, &id2)).transpose())
             .await?;
-    ctx.map(Json).ok_or_else(|| AppError::not_found(format!("pack {id}")))
+    ctx.map(Json).ok_or_else(|| AppError::not_found(tr!("error-pack-not-found", id = id)))
 }
 
 /// Set what the seller says about a pack. `readme` is captured at ingest and ignored here. Giving a store URL
@@ -384,7 +385,7 @@ async fn put_pack_context(
         Ok(Some(db::pack_context(c, &id2)?))
     })
     .await?;
-    saved.map(Json).ok_or_else(|| AppError::not_found(format!("pack {id}")))
+    saved.map(Json).ok_or_else(|| AppError::not_found(tr!("error-pack-not-found", id = id)))
 }
 
 #[derive(Debug, Deserialize)]
@@ -404,7 +405,7 @@ async fn get_pack(State(state): State<AppState>, Path(id): Path<String>) -> ApiR
     db::call(&state.pool, move |c| db::get_pack(c, &id2))
         .await?
         .map(Json)
-        .ok_or_else(|| AppError::not_found(format!("pack {id}")))
+        .ok_or_else(|| AppError::not_found(tr!("error-pack-not-found", id = id)))
 }
 
 #[derive(Deserialize)]
@@ -420,7 +421,7 @@ async fn patch_pack(
 ) -> ApiResult<Json<Pack>> {
     let name = patch.name.map(|n| n.trim().chars().take(200).collect::<String>());
     if name.as_deref() == Some("") {
-        return Err(AppError::bad_request("a pack needs a name"));
+        return Err(AppError::bad_request(tr!("error-pack-needs-name")));
     }
     let id2 = id.clone();
     db::call(&state.pool, move |c| {
@@ -431,7 +432,7 @@ async fn patch_pack(
     })
     .await?
     .map(Json)
-    .ok_or_else(|| AppError::not_found(format!("pack {id}")))
+    .ok_or_else(|| AppError::not_found(tr!("error-pack-not-found", id = id)))
 }
 
 async fn delete_pack(State(state): State<AppState>, Path(id): Path<String>) -> ApiResult<StatusCode> {
@@ -440,7 +441,7 @@ async fn delete_pack(State(state): State<AppState>, Path(id): Path<String>) -> A
         tokio::fs::remove_dir_all(state.cfg.staging_dir().join(&id)).await.ok();
         Ok(StatusCode::NO_CONTENT)
     } else {
-        Err(AppError::not_found(format!("pack {id}")))
+        Err(AppError::not_found(tr!("error-pack-not-found", id = id)))
     }
 }
 
@@ -450,7 +451,7 @@ async fn delete_pack(State(state): State<AppState>, Path(id): Path<String>) -> A
 ///   filename is used. Archives (.zip/.tar/.tar.gz) are unpacked server-side, nested ones too.
 async fn upload_pack(State(state): State<AppState>, mut multipart: Multipart) -> ApiResult<(StatusCode, Json<Pack>)> {
     if !state.blobs.can_store() {
-        return Err(AppError::conflict(crate::blobs::NO_LIBRARY));
+        return Err(AppError::conflict(crate::blobs::no_library()));
     }
     let id = uuid::Uuid::now_v7().to_string();
     let staging = state.cfg.staging_dir().join(&id);
@@ -494,11 +495,11 @@ async fn upload_pack(State(state): State<AppState>, mut multipart: Multipart) ->
 
     if let Err(e) = received {
         tokio::fs::remove_dir_all(&staging).await.ok();
-        return Err(AppError::bad_request(format!("upload failed: {e:#}")));
+        return Err(AppError::bad_request(tr!("error-upload-failed", reason = format!("{e:#}"))));
     }
     if files.is_empty() {
         tokio::fs::remove_dir_all(&staging).await.ok();
-        return Err(AppError::bad_request("no files in upload"));
+        return Err(AppError::bad_request(tr!("error-upload-no-files")));
     }
 
     let auto_name = name.is_none();
@@ -549,7 +550,7 @@ async fn retag_pack(
     let llm_on = state.settings.get().llm_enabled();
     let llm = body.llm.unwrap_or(llm_on) && llm_on;
     if !body.rules && !llm {
-        return Err(AppError::bad_request("nothing to do: rules=false and LLM is off"));
+        return Err(AppError::bad_request(tr!("error-analyze-nothing-to-do")));
     }
     let id2 = id.clone();
     let found = db::call(&state.pool, move |c| {
@@ -567,7 +568,7 @@ async fn retag_pack(
     })
     .await?;
     if !found {
-        return Err(AppError::not_found(format!("pack {id}")));
+        return Err(AppError::not_found(tr!("error-pack-not-found", id = id)));
     }
     state.wake.notify_one();
     Ok(StatusCode::ACCEPTED)
@@ -588,7 +589,7 @@ async fn read_pack_files(State(state): State<AppState>, Path(id): Path<String>) 
     })
     .await?;
     if !found {
-        return Err(AppError::not_found(format!("pack {id}")));
+        return Err(AppError::not_found(tr!("error-pack-not-found", id = id)));
     }
     state.wake.notify_one();
     Ok(StatusCode::ACCEPTED)
@@ -606,7 +607,7 @@ async fn undo_store_page(State(state): State<AppState>, Path(id): Path<String>) 
         Ok(Some(db::pack_context(c, &id2)?))
     })
     .await?;
-    ctx.map(Json).ok_or_else(|| AppError::not_found(format!("pack {id}")))
+    ctx.map(Json).ok_or_else(|| AppError::not_found(tr!("error-pack-not-found", id = id)))
 }
 
 // ---------------------------------------------------------------------------------------------
@@ -695,7 +696,7 @@ async fn get_asset(State(state): State<AppState>, Path(id): Path<String>) -> Api
     db::call(&state.pool, move |c| db::get_asset(c, &id2))
         .await?
         .map(Json)
-        .ok_or_else(|| AppError::not_found(format!("asset {id}")))
+        .ok_or_else(|| AppError::not_found(tr!("error-asset-not-found", id = id)))
 }
 
 async fn patch_asset(
@@ -754,7 +755,7 @@ async fn patch_asset(
         db::get_asset(c, &id2)
     })
     .await?;
-    asset.map(Json).ok_or_else(|| AppError::not_found(format!("asset {id}")))
+    asset.map(Json).ok_or_else(|| AppError::not_found(tr!("error-asset-not-found", id = id)))
 }
 
 /// The same edit to many assets at once, in one transaction: tags in and out, and a category.
@@ -772,7 +773,7 @@ struct BulkEdit {
 
 async fn bulk_assets(State(state): State<AppState>, Json(edit): Json<BulkEdit>) -> ApiResult<Json<Value>> {
     if edit.ids.len() > 50_000 {
-        return Err(AppError::bad_request("too many assets in one request"));
+        return Err(AppError::bad_request(tr!("error-too-many-assets")));
     }
     let add: Vec<String> = edit.add_tags.iter().filter_map(|t| hoard_core::normalize_tag(t)).collect();
     let remove: Vec<String> = edit.remove_tags.iter().filter_map(|t| hoard_core::normalize_tag(t)).collect();
@@ -828,7 +829,7 @@ struct ArchiveItems {
 impl ArchiveItems {
     fn check(&self) -> ApiResult<()> {
         if self.packs.len() + self.assets.len() > 50_000 {
-            return Err(AppError::bad_request("too many items in one request"));
+            return Err(AppError::bad_request(tr!("error-too-many-items")));
         }
         Ok(())
     }
@@ -891,7 +892,7 @@ async fn asset_file(
         Ok(Some((hash, path, ext, renamed)))
     })
     .await?
-    .ok_or_else(|| AppError::not_found(format!("asset {id}")))?;
+    .ok_or_else(|| AppError::not_found(tr!("error-asset-not-found", id = id)))?;
     let mime = mime_guess::from_ext(&ext).first_or_octet_stream().to_string();
     let disposition = download.then(|| {
         let file = renamed.as_deref().unwrap_or_else(|| path.rsplit('/').next().unwrap_or(&path));
@@ -916,7 +917,7 @@ async fn asset_thumb(
     let id2 = id.clone();
     let hash = db::call(&state.pool, move |c| db::asset_thumb(c, &id2))
         .await?
-        .ok_or_else(|| AppError::not_found(format!("thumbnail for {id}")))?;
+        .ok_or_else(|| AppError::not_found(tr!("error-thumbnail-not-found", id = id)))?;
     // Thumbnails are JPEG or PNG; the first bytes say which. A browser revalidating its copy gets a 304 without them.
     let revalidating =
         headers.get(header::IF_NONE_MATCH).is_some_and(|v| v.as_bytes() == format!("\"{hash}\"").as_bytes());
@@ -931,7 +932,7 @@ async fn asset_thumb(
 
 async fn blob(State(state): State<AppState>, Path(hash): Path<String>, headers: HeaderMap) -> ApiResult<Response> {
     if !is_valid_hash(&hash) {
-        return Err(AppError::bad_request("not a blake3 hex hash"));
+        return Err(AppError::bad_request(tr!("error-not-a-hash")));
     }
     serve_blob(&state, &hash, &headers, "application/octet-stream", None).await
 }
@@ -985,7 +986,7 @@ pub(crate) async fn serve_blob(
     let partial = range.is_some();
     let read = match state.blobs.read(hash, range).await {
         Ok(Some(r)) => r,
-        Ok(None) => return Err(AppError::not_found(format!("blob {hash}"))),
+        Ok(None) => return Err(AppError::not_found(tr!("error-blob-not-found", hash = hash))),
         Err(_) if partial => return Ok(StatusCode::RANGE_NOT_SATISFIABLE.into_response()),
         Err(e) => return Err(e.into()),
     };
@@ -1046,11 +1047,11 @@ struct MergeTags {
 
 /// Merge tags into one (or rename one: a single tag into a new name).
 async fn merge_tags(State(state): State<AppState>, Json(m): Json<MergeTags>) -> ApiResult<Json<Value>> {
-    let into = hoard_core::normalize_tag(&m.into).ok_or_else(|| AppError::bad_request("into must be a tag"))?;
+    let into = hoard_core::normalize_tag(&m.into).ok_or_else(|| AppError::bad_request(tr!("error-merge-into-tag")))?;
     let from: Vec<String> =
         m.from.iter().map(|t| t.trim().to_lowercase()).filter(|t| !t.is_empty() && *t != into).collect();
     if from.is_empty() {
-        return Err(AppError::bad_request("nothing to merge"));
+        return Err(AppError::bad_request(tr!("error-nothing-to-merge")));
     }
     let (into2, from2) = (into.clone(), from.clone());
     let assets = db::call(&state.pool, move |c| db::merge_tags(c, &from2, &into2)).await?;
@@ -1167,7 +1168,7 @@ async fn asset_bundle(
         Ok(Some((files, stem)))
     })
     .await?
-    .ok_or_else(|| AppError::not_found(format!("asset {id}")))?;
+    .ok_or_else(|| AppError::not_found(tr!("error-asset-not-found", id = id)))?;
     Ok(crate::bundle::zip_files(&state, &root_name, &files, None)?)
 }
 
@@ -1192,7 +1193,7 @@ const MAX_SELECTION: usize = 1000;
 async fn selection_bundle(State(state): State<AppState>, Query(p): Query<SelectionParams>) -> ApiResult<Response> {
     let ids: Vec<String> = p.ids.split(',').map(str::trim).filter(|s| !s.is_empty()).map(str::to_owned).collect();
     if ids.is_empty() || ids.len() > MAX_SELECTION {
-        return Err(AppError::bad_request(format!("give between 1 and {MAX_SELECTION} asset ids")));
+        return Err(AppError::bad_request(tr!("error-selection-size", max = MAX_SELECTION)));
     }
     let opts = ZipOptions {
         deps: p.deps.is_none_or(|d| d != 0),
@@ -1247,7 +1248,7 @@ async fn zip_assets(state: &AppState, ids: Vec<String>, opts: ZipOptions, name: 
     })
     .await?;
     if groups.is_empty() {
-        return Err(AppError::not_found("those assets"));
+        return Err(AppError::not_found(tr!("error-those-assets-not-found")));
     }
     let single = groups.len() == 1;
     let entries = groups
@@ -1283,7 +1284,7 @@ async fn get_collection(State(state): State<AppState>, Path(id): Path<String>) -
     db::call(&state.pool, move |c| db::get_collection(c, &key))
         .await?
         .map(Json)
-        .ok_or_else(|| AppError::not_found(format!("collection {id}")))
+        .ok_or_else(|| AppError::not_found(tr!("error-collection-not-found", id = id)))
 }
 
 fn clean_name(name: Option<String>) -> Option<String> {
@@ -1295,7 +1296,7 @@ async fn create_collection(
     State(state): State<AppState>,
     Json(body): Json<CollectionPatch>,
 ) -> ApiResult<(StatusCode, Json<Collection>)> {
-    let name = clean_name(body.name).ok_or_else(|| AppError::bad_request("a collection needs a name"))?;
+    let name = clean_name(body.name).ok_or_else(|| AppError::bad_request(tr!("error-collection-needs-name")))?;
     let description =
         body.description.map(|d| d.trim().chars().take(1000).collect::<String>()).filter(|d| !d.is_empty());
     let created = db::call(&state.pool, move |c| {
@@ -1313,7 +1314,7 @@ async fn create_collection(
     .await?;
     match created {
         Ok(c) => Ok((StatusCode::CREATED, Json(c))),
-        Err(name) => Err(AppError::conflict(format!("there's already a collection called {name}"))),
+        Err(name) => Err(AppError::conflict(tr!("error-collection-exists", name = name))),
     }
 }
 
@@ -1342,8 +1343,8 @@ async fn patch_collection(
     })
     .await?;
     match updated {
-        None => Err(AppError::not_found(format!("collection {id}"))),
-        Some(Err(name)) => Err(AppError::conflict(format!("there's already a collection called {name}"))),
+        None => Err(AppError::not_found(tr!("error-collection-not-found", id = id))),
+        Some(Err(name)) => Err(AppError::conflict(tr!("error-collection-exists", name = name))),
         Some(Ok(c)) => Ok(Json(c)),
     }
 }
@@ -1351,7 +1352,11 @@ async fn patch_collection(
 async fn delete_collection(State(state): State<AppState>, Path(id): Path<String>) -> ApiResult<StatusCode> {
     let key = id.clone();
     let n = db::call(&state.pool, move |c| Ok(c.execute("DELETE FROM collections WHERE id = ?1", [&key])?)).await?;
-    if n == 0 { Err(AppError::not_found(format!("collection {id}"))) } else { Ok(StatusCode::NO_CONTENT) }
+    if n == 0 {
+        Err(AppError::not_found(tr!("error-collection-not-found", id = id)))
+    } else {
+        Ok(StatusCode::NO_CONTENT)
+    }
 }
 
 async fn collection_members(
@@ -1360,7 +1365,7 @@ async fn collection_members(
     Json(body): Json<CollectionMembers>,
 ) -> ApiResult<Json<Collection>> {
     if body.add.len() + body.remove.len() > 10_000 {
-        return Err(AppError::bad_request("too many assets in one request"));
+        return Err(AppError::bad_request(tr!("error-too-many-assets")));
     }
     let key = id.clone();
     let updated = db::call(&state.pool, move |c| {
@@ -1385,7 +1390,7 @@ async fn collection_members(
         db::get_collection(c, &existing.id)
     })
     .await?;
-    updated.map(Json).ok_or_else(|| AppError::not_found(format!("collection {id}")))
+    updated.map(Json).ok_or_else(|| AppError::not_found(tr!("error-collection-not-found", id = id)))
 }
 
 #[derive(Debug, Deserialize)]
@@ -1407,9 +1412,9 @@ async fn collection_bundle(
         Ok(Some((col.name, db::collection_asset_ids(c, &col.id)?)))
     })
     .await?
-    .ok_or_else(|| AppError::not_found(format!("collection {id}")))?;
+    .ok_or_else(|| AppError::not_found(tr!("error-collection-not-found", id = id)))?;
     if ids.is_empty() {
-        return Err(AppError::bad_request(format!("collection {name} is empty")));
+        return Err(AppError::bad_request(tr!("error-collection-empty", name = name)));
     }
     let opts = ZipOptions {
         deps: true,
@@ -1433,7 +1438,7 @@ async fn pack_bundle(State(state): State<AppState>, Path(id): Path<String>) -> A
         Ok(Some((pack.name, files, credits)))
     })
     .await?
-    .ok_or_else(|| AppError::not_found(format!("pack {id}")))?;
+    .ok_or_else(|| AppError::not_found(tr!("error-pack-not-found", id = id)))?;
     Ok(crate::bundle::zip_files(&state, &name, &files, Some(credits))?)
 }
 
@@ -1448,7 +1453,7 @@ async fn pack_file(
     let p2 = path.clone();
     let (hash, ext) = db::call(&state.pool, move |c| db::pack_file(c, &id2, &p2))
         .await?
-        .ok_or_else(|| AppError::not_found(format!("{path} in pack {id}")))?;
+        .ok_or_else(|| AppError::not_found(tr!("error-file-in-pack-not-found", path = path, id = id)))?;
     let mime = mime_guess::from_ext(&ext).first_or_octet_stream().to_string();
     serve_blob(&state, &hash, &headers, &mime, None).await
 }
@@ -1469,7 +1474,7 @@ async fn asset_derivative(
         Ok(Some((hash, path, ext)))
     })
     .await?
-    .ok_or_else(|| AppError::not_found(format!("{kind} derivative of {id}")))?;
+    .ok_or_else(|| AppError::not_found(tr!("error-derivative-not-found", kind = kind, id = id)))?;
     // A recovered source file is served as what it is (a .wav out of a .uasset).
     let ext = match kind.as_str() {
         "glb" => "glb".to_owned(),
@@ -1524,9 +1529,9 @@ fn stage_json(stage: &crate::formats::Stage) -> Value {
 fn refused(format: &str, r: crate::formats::Refused) -> AppError {
     use crate::formats::Refused;
     match r {
-        Refused::NotFound => AppError::not_found("asset"),
+        Refused::NotFound => AppError::not_found(tr!("error-asset-gone")),
         Refused::Unsupported(m) => AppError::bad_request(m),
-        Refused::Failed(m) => AppError::unprocessable(format!("couldn't convert to {format}: {m}")),
+        Refused::Failed(m) => AppError::unprocessable(tr!("error-conversion-failed", format = format, reason = m)),
     }
 }
 
@@ -1534,7 +1539,7 @@ fn check_max(max: Option<u32>) -> ApiResult<()> {
     if let Some(m) = max
         && !crate::formats::valid_max(m)
     {
-        return Err(AppError::bad_request("max must be a power of two from 64 to 16384"));
+        return Err(AppError::bad_request(tr!("error-max-size")));
     }
     Ok(())
 }
@@ -1558,7 +1563,9 @@ async fn asset_as(
             let limit = std::time::Duration::from_secs(p.wait.unwrap_or(AS_WAIT_DEFAULT).min(60));
             match crate::formats::wait(rx, limit).await {
                 Stage::Done(r) => r,
-                Stage::Failed(m) => return Err(AppError::unprocessable(format!("couldn't convert to {format}: {m}"))),
+                Stage::Failed(m) => {
+                    return Err(AppError::unprocessable(tr!("error-conversion-failed", format = format, reason = m)));
+                }
                 pending => {
                     let mut resp = (StatusCode::ACCEPTED, Json(stage_json(&pending))).into_response();
                     resp.headers_mut().insert(header::RETRY_AFTER, HeaderValue::from_static("2"));
@@ -1634,7 +1641,7 @@ async fn unreal_convert(
         Ok(Some(db::enqueue(c, jobs::UNREAL, Some(&id2), &serde_json::to_value(job)?)?))
     })
     .await?
-    .ok_or_else(|| AppError::not_found(format!("pack {id}")))?;
+    .ok_or_else(|| AppError::not_found(tr!("error-pack-not-found", id = id)))?;
     state.wake.notify_one();
     Ok((StatusCode::ACCEPTED, Json(json!({ "job": queued }))))
 }
@@ -1652,7 +1659,7 @@ async fn unreal_status(
     })
     .await?
     .map(Json)
-    .ok_or_else(|| AppError::not_found(format!("pack {id}")))
+    .ok_or_else(|| AppError::not_found(tr!("error-pack-not-found", id = id)))
 }
 
 #[derive(Deserialize)]
@@ -1691,10 +1698,10 @@ async fn replace_asset(
 ) -> ApiResult<Json<Asset>> {
     let ext = p.ext.trim_start_matches('.').to_ascii_lowercase();
     if ext.is_empty() || ext.len() > 12 || !ext.chars().all(|c| c.is_ascii_alphanumeric()) {
-        return Err(AppError::bad_request("ext must be a short file extension"));
+        return Err(AppError::bad_request(tr!("error-replace-ext")));
     }
     if body.is_empty() {
-        return Err(AppError::bad_request("empty file"));
+        return Err(AppError::bad_request(tr!("error-empty-file")));
     }
     let id2 = id.clone();
     let class = db::call(&state.pool, move |c| {
@@ -1707,7 +1714,7 @@ async fn replace_asset(
         .optional()?)
     })
     .await?
-    .ok_or_else(|| AppError::not_found(format!("asset {id}")))?;
+    .ok_or_else(|| AppError::not_found(tr!("error-asset-not-found", id = id)))?;
     let blob = state.blobs.put_bytes(body.to_vec(), hoard_core::AssetKind::from_ext(&ext)).await?;
     let origin = crate::extract::Origin {
         class,
@@ -1737,9 +1744,7 @@ async fn replace_asset(
         if kept { db::get_asset(c, &id2) } else { Ok(None) }
     })
     .await?
-    .ok_or_else(|| {
-        AppError::conflict("the converted file duplicates one already in the pack; the package was merged into it")
-    })?;
+    .ok_or_else(|| AppError::conflict(tr!("error-replace-duplicate")))?;
     Ok(Json(asset))
 }
 
@@ -1756,7 +1761,7 @@ async fn unreal_finish(State(state): State<AppState>, Path(id): Path<String>) ->
     })
     .await?;
     if !found {
-        return Err(AppError::not_found(format!("pack {id}")));
+        return Err(AppError::not_found(tr!("error-pack-not-found", id = id)));
     }
     crate::extract::after_changes(&state, &id, true, None).await?;
     Ok(StatusCode::ACCEPTED)
@@ -1778,7 +1783,7 @@ async fn asset_original(
         .optional()?)
     })
     .await?
-    .ok_or_else(|| AppError::not_found(format!("original file of {id}")))?;
+    .ok_or_else(|| AppError::not_found(tr!("error-original-not-found", id = id)))?;
     let file = path.rsplit('/').next().unwrap_or(&path).replace(['"', '\\'], "_");
     serve_blob(&state, &hash, &headers, "application/octet-stream", Some(format!("attachment; filename=\"{file}\"")))
         .await
@@ -1815,7 +1820,7 @@ async fn activity(State(state): State<AppState>) -> ApiResult<Json<Value>> {
         items.push(crate::activity::Entry {
             id: u64::MAX - id.unsigned_abs(),
             kind: "job",
-            label: jobs::job_label(&kind, pack.as_deref().unwrap_or("a pack")),
+            label: jobs::job_label(&kind, pack.as_deref()),
             detail: None,
             progress: None,
             state: "queued",
@@ -2007,7 +2012,7 @@ struct ModelsBody {
 async fn llm_models(State(state): State<AppState>, Json(body): Json<ModelsBody>) -> ApiResult<Json<Value>> {
     let url = body.url.trim();
     if !(url.starts_with("http://") || url.starts_with("https://")) {
-        return Err(AppError::bad_request("The AI address should start with http:// or https://"));
+        return Err(AppError::bad_request(tr!("error-ai-address")));
     }
     let now = state.settings.get();
     let key = match body.api_key {
@@ -2039,7 +2044,7 @@ async fn llm_local(State(state): State<AppState>, Json(body): Json<LocalBody>) -
     use crate::local_llm;
     let url = body.url.trim();
     if !(url.starts_with("http://") || url.starts_with("https://")) {
-        return Err(AppError::bad_request("The AI address should start with http:// or https://"));
+        return Err(AppError::bad_request(tr!("error-ai-address")));
     }
     let model = body.model.as_deref().map(str::trim).filter(|m| !m.is_empty());
     match (body.action.as_deref().unwrap_or("list"), model) {
@@ -2050,7 +2055,7 @@ async fn llm_local(State(state): State<AppState>, Json(body): Json<LocalBody>) -
         ("delete", Some(m)) => {
             local_llm::remove(&state.http, url, m).await.map_err(|e| AppError::bad_request(format!("{e:#}")))?;
         }
-        _ => return Err(AppError::bad_request("action is list, download or delete, and the last two need a model")),
+        _ => return Err(AppError::bad_request(tr!("error-local-llm-action"))),
     }
     Ok(Json(match local_llm::list(&state.http, url).await {
         Ok(models) => json!({ "reachable": true, "models": models, "suggested": local_llm::SUGGESTED }),

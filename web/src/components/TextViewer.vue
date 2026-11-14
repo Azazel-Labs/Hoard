@@ -4,6 +4,7 @@
 import { computed, onMounted, provide, ref } from 'vue'
 import { fileUrl, humanBytes, type Asset } from '../api'
 import { renderMarkdown } from '../markdown'
+import { t } from '../i18n'
 import { LANG_LABEL, fetchText, highlightLines, langOf, reflowJson, type TextFile } from '../text'
 import { copyText, showError } from '../ui'
 import JsonTree from './JsonTree.vue'
@@ -56,8 +57,8 @@ async function load(all = false) {
 }
 
 const shownText = computed(() => {
-  const t = file.value?.text ?? ''
-  return mode.value === 'pretty' ? reflowJson(t) : t
+  const text = file.value?.text ?? ''
+  return mode.value === 'pretty' ? reflowJson(text) : text
 })
 const doc = computed(() => (mode.value === 'doc' && file.value && !file.value.binary ? renderMarkdown(file.value.text) : ''))
 const lineCount = computed(() => (shownText.value.match(/\n/g)?.length ?? 0) + 1)
@@ -69,7 +70,7 @@ const html = computed(() =>
 
 async function copy() {
   if (!(await copyText(shownText.value))) {
-    showError('Couldn’t copy: the browser blocked it')
+    showError(t('text-copy-blocked'))
     return
   }
   copied.value = true
@@ -110,62 +111,62 @@ onMounted(() => {
 </script>
 
 <template>
-  <dialog ref="dlg" class="viewer" :aria-label="`Read ${asset.name}`" @close="emit('close')" @keydown="onKey">
+  <dialog ref="dlg" class="viewer" :aria-label="t('text-read-aria', { name: asset.name })" @close="emit('close')" @keydown="onKey">
     <header class="tools">
       <div class="title">
         <strong>{{ asset.name }}</strong>
         <span class="mono dim">
-          {{ label }} · {{ humanBytes(asset.size) }}<template v-if="file && mode !== 'tree' && mode !== 'doc'"> · {{ lineCount.toLocaleString() }} {{ lineCount === 1 ? 'line' : 'lines' }}</template>
+          {{ label }} · {{ humanBytes(asset.size) }}<template v-if="file && mode !== 'tree' && mode !== 'doc'"> · {{ t('text-lines', { count: lineCount }) }}</template>
         </span>
       </div>
-      <div v-if="lang === 'json' && file && !file.binary" class="group" role="group" aria-label="Show as">
-        <button type="button" title="Foldable tree (T)" :aria-pressed="mode === 'tree'" :disabled="!parsed?.ok" @click="mode = 'tree'">Tree</button>
-        <button v-if="strict" type="button" title="Re-indented (P)" :aria-pressed="mode === 'pretty'" @click="mode = 'pretty'">Pretty</button>
-        <button type="button" title="As written (R)" :aria-pressed="mode === 'raw'" @click="mode = 'raw'">Raw</button>
+      <div v-if="lang === 'json' && file && !file.binary" class="group" role="group" :aria-label="t('text-show-as')">
+        <button type="button" :title="t('text-tree-title')" :aria-pressed="mode === 'tree'" :disabled="!parsed?.ok" @click="mode = 'tree'">{{ t('text-tree') }}</button>
+        <button v-if="strict" type="button" :title="t('text-pretty-title')" :aria-pressed="mode === 'pretty'" @click="mode = 'pretty'">{{ t('text-pretty') }}</button>
+        <button type="button" :title="t('text-raw-title')" :aria-pressed="mode === 'raw'" @click="mode = 'raw'">{{ t('text-raw') }}</button>
       </div>
-      <div v-if="lang === 'markdown' && file && !file.binary" class="group" role="group" aria-label="Show as">
-        <button type="button" title="As a document (D)" :aria-pressed="mode === 'doc'" @click="mode = 'doc'">Document</button>
-        <button type="button" title="The markdown as written (R)" :aria-pressed="mode === 'raw'" @click="mode = 'raw'">Source</button>
+      <div v-if="lang === 'markdown' && file && !file.binary" class="group" role="group" :aria-label="t('text-show-as')">
+        <button type="button" :title="t('text-document-title')" :aria-pressed="mode === 'doc'" @click="mode = 'doc'">{{ t('text-document') }}</button>
+        <button type="button" :title="t('text-source-title')" :aria-pressed="mode === 'raw'" @click="mode = 'raw'">{{ t('text-source') }}</button>
       </div>
-      <div v-if="mode === 'tree' && parsed?.ok" class="group" role="group" aria-label="Fold">
-        <button type="button" title="Unfold everything" @click="setFold(true)">
+      <div v-if="mode === 'tree' && parsed?.ok" class="group" role="group" :aria-label="t('text-fold')">
+        <button type="button" :title="t('text-expand-all-title')" @click="setFold(true)">
           <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="m4.5 6 3.5 3.5L11.5 6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" /></svg>
-          <span class="wide">Expand all</span>
+          <span class="wide">{{ t('text-expand-all') }}</span>
         </button>
-        <button type="button" title="Fold everything" @click="setFold(false)">
+        <button type="button" :title="t('text-collapse-all-title')" @click="setFold(false)">
           <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M6 4.5 9.5 8 6 11.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" /></svg>
-          <span class="wide">Collapse all</span>
+          <span class="wide">{{ t('text-collapse-all') }}</span>
         </button>
       </div>
-      <div class="group" role="group" aria-label="Text">
-        <button v-if="mode !== 'tree' && mode !== 'doc'" type="button" title="Wrap long lines (W)" :aria-pressed="wrap" :disabled="!file || file.binary" @click="wrap = !wrap">
+      <div class="group" role="group" :aria-label="t('text-group-text')">
+        <button v-if="mode !== 'tree' && mode !== 'doc'" type="button" :title="t('text-wrap-title')" :aria-pressed="wrap" :disabled="!file || file.binary" @click="wrap = !wrap">
           <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M2 4h12M2 8h9.5a2.25 2.25 0 0 1 0 4.5H8m1.6-1.8L7.8 12.5l1.8 1.8M2 12.5h3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /></svg>
-          <span class="wide">Wrap</span>
+          <span class="wide">{{ t('text-wrap') }}</span>
         </button>
-        <button type="button" title="Copy the text (C)" :disabled="!file || file.binary" @click="copy">
+        <button type="button" :title="t('text-copy-title')" :disabled="!file || file.binary" @click="copy">
           <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><rect x="5" y="5" width="8.5" height="8.5" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.5" /><path d="M10.5 3.2V3a1 1 0 0 0-1-1H3.5a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h.3" fill="none" stroke="currentColor" stroke-width="1.5" /></svg>
-          <span class="wide" aria-live="polite">{{ copied ? 'Copied' : 'Copy' }}</span>
+          <span class="wide" aria-live="polite">{{ copied ? t('text-copied') : t('text-copy') }}</span>
         </button>
-        <a class="btn" :href="fileUrl(asset, true)" download title="Download the file">
+        <a class="btn" :href="fileUrl(asset, true)" download :title="t('text-download-title')">
           <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M8 2.5v8m-3.2-3.2L8 10.5l3.2-3.2M3 13.5h10" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" /></svg>
-          <span class="wide">Download</span>
+          <span class="wide">{{ t('text-download') }}</span>
         </a>
       </div>
-      <button type="button" class="close" aria-label="Close (Esc)" title="Close (Esc)" autofocus @click="dlg?.close()">
+      <button type="button" class="close" :aria-label="t('text-close')" :title="t('text-close')" autofocus @click="dlg?.close()">
         <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="m4 4 8 8M12 4l-8 8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" /></svg>
       </button>
     </header>
 
     <p v-if="file?.truncated && status === 'ready'" class="banner">
-      Showing the first {{ humanBytes(CAP) }} of {{ humanBytes(file.total) }}{{ lang === 'json' ? ' (the tree needs the whole file)' : '' }}.
-      <button type="button" class="linkish" @click="load(true)">Show all</button>
+      {{ lang === 'json' ? t('text-truncated-json', { shown: humanBytes(CAP), total: humanBytes(file.total) }) : t('text-truncated', { shown: humanBytes(CAP), total: humanBytes(file.total) }) }}
+      <button type="button" class="linkish" @click="load(true)">{{ t('text-show-all') }}</button>
     </p>
-    <p v-else-if="parsed && !parsed.ok && status === 'ready'" class="banner">This JSON doesn't parse: {{ parsed.error }}</p>
+    <p v-else-if="parsed && !parsed.ok && status === 'ready'" class="banner">{{ t('text-json-error', { error: parsed.error }) }}</p>
 
-    <div class="stage scroll" tabindex="0" :aria-label="`${asset.name} contents`">
-      <p v-if="status === 'loading'" class="msg">Loading…</p>
-      <p v-else-if="status === 'error'" class="msg err">Couldn't load this file: {{ error }}</p>
-      <p v-else-if="file?.binary" class="msg">This file is binary, not text, so there's nothing to read here. Download it to open it in its own tool.</p>
+    <div class="stage scroll" tabindex="0" :aria-label="t('text-contents-aria', { name: asset.name })">
+      <p v-if="status === 'loading'" class="msg">{{ t('text-loading') }}</p>
+      <p v-else-if="status === 'error'" class="msg err">{{ t('text-load-error', { error }) }}</p>
+      <p v-else-if="file?.binary" class="msg">{{ t('text-binary') }}</p>
       <div v-else-if="mode === 'tree' && parsed?.ok" class="tree">
         <JsonTree :value="parsed.value" />
       </div>
@@ -175,9 +176,9 @@ onMounted(() => {
       <pre v-else class="code-lines" :class="{ wrap }" :style="{ '--gutter': `${String(lineCount).length}ch` }" v-html="html" />
     </div>
     <footer class="keys" aria-hidden="true">
-      <template v-if="lang === 'json'"><kbd>T</kbd> tree · <template v-if="strict"><kbd>P</kbd> pretty · </template><kbd>R</kbd> raw · </template>
-      <template v-if="lang === 'markdown'"><kbd>D</kbd> document · <kbd>R</kbd> source · </template>
-      <template v-if="mode !== 'doc'"><kbd>W</kbd> wrap · </template><kbd>C</kbd> copy · <kbd>Ctrl</kbd>+<kbd>F</kbd> find · <kbd>Esc</kbd> close
+      <template v-if="lang === 'json'"><kbd>T</kbd> {{ t('text-key-tree') }} · <template v-if="strict"><kbd>P</kbd> {{ t('text-key-pretty') }} · </template><kbd>R</kbd> {{ t('text-key-raw') }} · </template>
+      <template v-if="lang === 'markdown'"><kbd>D</kbd> {{ t('text-key-document') }} · <kbd>R</kbd> {{ t('text-key-source') }} · </template>
+      <template v-if="mode !== 'doc'"><kbd>W</kbd> {{ t('text-key-wrap') }} · </template><kbd>C</kbd> {{ t('text-key-copy') }} · <kbd>Ctrl</kbd>+<kbd>F</kbd> {{ t('text-key-find') }} · <kbd>Esc</kbd> {{ t('text-key-close') }}
     </footer>
   </dialog>
 </template>

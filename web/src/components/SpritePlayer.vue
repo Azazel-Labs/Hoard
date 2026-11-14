@@ -3,6 +3,7 @@
 // tagged animations, or a sprite sheet cut into a grid (guessed, and changeable) at a steady rate.
 import { computed, onBeforeUnmount, ref, watch } from 'vue'
 import { liteUrl, type Asset } from '../api'
+import { t } from '../i18n'
 import { animatedAseprite, animations, filledCells, framesUrl, guessGrid, sequence, type Grid } from '../sprites'
 
 const props = defineProps<{ asset: Asset; pixelated: boolean }>()
@@ -30,8 +31,8 @@ const playing = ref(!matchMedia('(prefers-reduced-motion: reduce)').matches)
 const order = computed(() => {
   if (!aseprite.value) return cells.value
   const n = num(meta.value.frames, 1)
-  const t = tags.value.find((x) => x.name === tag.value)
-  return t ? sequence(Math.max(0, t.from), Math.min(n - 1, t.to), t.direction) : sequence(0, n - 1, 'forward')
+  const anim = tags.value.find((x) => x.name === tag.value)
+  return anim ? sequence(Math.max(0, anim.from), Math.min(n - 1, anim.to), anim.direction) : sequence(0, n - 1, 'forward')
 })
 const frameMs = (cell: number) => {
   if (!aseprite.value) return 1000 / Math.min(60, Math.max(1, fps.value || 10))
@@ -182,37 +183,37 @@ onBeforeUnmount(stop)
 <template>
   <div class="sprite">
     <div class="stage checker">
-      <canvas v-show="image" ref="canvas" :class="{ pixelated }" role="img" :aria-label="`${asset.name}, frame ${frame + 1} of ${order.length}`" />
-      <p v-if="failed" class="note">This one can't be played.</p>
-      <p v-else-if="!image" class="note">Loading frames…</p>
+      <canvas v-show="image" ref="canvas" :class="{ pixelated }" role="img" :aria-label="t('sprite-frame-aria', { name: asset.name, frame: frame + 1, count: order.length })" />
+      <p v-if="failed" class="note">{{ t('sprite-failed') }}</p>
+      <p v-else-if="!image" class="note">{{ t('sprite-loading') }}</p>
     </div>
     <div class="controls">
-      <button type="button" class="btn ghost icon" aria-label="Previous frame" title="Previous frame" @click="step(-1)">
+      <button type="button" class="btn ghost icon" :aria-label="t('sprite-previous')" :title="t('sprite-previous')" @click="step(-1)">
         <svg viewBox="0 0 16 16" width="14" height="14" fill="currentColor" aria-hidden="true"><rect x="3" y="3" width="2" height="10" rx="0.6" /><path d="M13 3.6v8.8a.6.6 0 0 1-.92.5L6.2 8.5a.6.6 0 0 1 0-1l5.88-4.4a.6.6 0 0 1 .92.5Z" /></svg>
       </button>
-      <button type="button" class="btn play" :aria-label="playing ? 'Pause animation' : 'Play animation'" @click="togglePlay">
+      <button type="button" class="btn play" :aria-label="playing ? t('sprite-pause') : t('sprite-play')" @click="togglePlay">
         <svg v-if="playing" viewBox="0 0 16 16" width="14" height="14" fill="currentColor" aria-hidden="true"><rect x="3.5" y="2.5" width="3" height="11" rx="1" /><rect x="9.5" y="2.5" width="3" height="11" rx="1" /></svg>
         <svg v-else viewBox="0 0 16 16" width="14" height="14" fill="currentColor" aria-hidden="true"><path d="M4.5 2.8v10.4a.8.8 0 0 0 1.2.7l8.3-5.2a.8.8 0 0 0 0-1.4L5.7 2.1a.8.8 0 0 0-1.2.7Z" /></svg>
       </button>
-      <button type="button" class="btn ghost icon" aria-label="Next frame" title="Next frame" @click="step(1)">
+      <button type="button" class="btn ghost icon" :aria-label="t('sprite-next')" :title="t('sprite-next')" @click="step(1)">
         <svg viewBox="0 0 16 16" width="14" height="14" fill="currentColor" aria-hidden="true"><rect x="11" y="3" width="2" height="10" rx="0.6" /><path d="M3 3.6v8.8a.6.6 0 0 0 .92.5L9.8 8.5a.6.6 0 0 0 0-1L3.92 3.1a.6.6 0 0 0-.92.5Z" /></svg>
       </button>
       <span class="mono count" data-testid="frame-count">{{ frame + 1 }} / {{ order.length }}</span>
       <span v-if="tags.length" class="field">
-        <select v-model="tag" aria-label="Animation">
-          <option value="">All frames</option>
-          <option v-for="t in tags" :key="t.name" :value="t.name">{{ t.name }}</option>
+        <select v-model="tag" :aria-label="t('sprite-animation')">
+          <option value="">{{ t('sprite-all-frames') }}</option>
+          <option v-for="a in tags" :key="a.name" :value="a.name">{{ a.name }}</option>
         </select>
       </span>
       <template v-if="!aseprite">
-        <span class="field grid" title="How the sheet is cut into frames">
-          <input :value="grid.cols" type="number" min="1" max="256" aria-label="Columns" @change="setGrid('cols', $event)" />
+        <span class="field grid" :title="t('sprite-grid-title')">
+          <input :value="grid.cols" type="number" min="1" max="256" :aria-label="t('sprite-columns')" @change="setGrid('cols', $event)" />
           <span aria-hidden="true">×</span>
-          <input :value="grid.rows" type="number" min="1" max="256" aria-label="Rows" @change="setGrid('rows', $event)" />
+          <input :value="grid.rows" type="number" min="1" max="256" :aria-label="t('sprite-rows')" @change="setGrid('rows', $event)" />
         </span>
         <label class="field">
-          <input v-model.number="fps" type="number" min="1" max="60" aria-label="Frames a second" />
-          <span>fps</span>
+          <input v-model.number="fps" type="number" min="1" max="60" :aria-label="t('sprite-fps-aria')" />
+          <span>{{ t('sprite-fps') }}</span>
         </label>
       </template>
     </div>

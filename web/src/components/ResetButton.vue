@@ -1,5 +1,6 @@
 <script setup lang="ts">
 // The little turn-back arrow beside a setting that isn't at its default. Its tooltip says what the default is.
+import { t } from '../i18n'
 defineProps<{ to: string; disabled?: boolean }>()
 defineEmits<{ reset: [] }>()
 </script>
@@ -8,8 +9,8 @@ defineEmits<{ reset: [] }>()
   <button
     type="button"
     class="reset"
-    :title="`Reset to the default: ${to}`"
-    :aria-label="`Reset to the default, ${to}`"
+    :title="t('reset-title', { value: to })"
+    :aria-label="t('reset-label', { value: to })"
     :disabled="disabled"
     @click="$emit('reset')"
   >

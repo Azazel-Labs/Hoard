@@ -18,6 +18,7 @@ use serde_json::{Value, json};
 
 use crate::AppState;
 use crate::db;
+use crate::i18n::tr;
 use crate::tagger::CATEGORIES;
 
 const LLM_CONFIDENCE: f32 = 0.7;
@@ -205,16 +206,21 @@ pub(crate) async fn list_models(http: &reqwest::Client, base: &str, key: Option<
             req = req.header("x-api-key", key).header("anthropic-version", "2023-06-01");
         }
     }
-    let resp = req.send().await.with_context(|| format!("couldn't reach {base}"))?;
+    let resp = req.send().await.with_context(|| tr!("error-ai-unreachable", url = base))?;
     let status = resp.status();
     let text = resp.text().await.unwrap_or_default();
     if status == reqwest::StatusCode::UNAUTHORIZED || status == reqwest::StatusCode::FORBIDDEN {
-        bail!("{base} refused the API key ({status})");
+        bail!(tr!("error-ai-key-refused", url = base, status = status.to_string()));
     }
     if !status.is_success() {
-        bail!("{base} answered {status}: {}", text.chars().take(300).collect::<String>());
+        bail!(tr!(
+            "error-ai-answered",
+            url = base,
+            status = status.to_string(),
+            reason = text.chars().take(300).collect::<String>()
+        ));
     }
-    let v: Value = serde_json::from_str(&text).with_context(|| format!("{base}/models didn't answer with JSON"))?;
+    let v: Value = serde_json::from_str(&text).with_context(|| tr!("error-ai-not-json", url = base))?;
     Ok(parse_models(&v))
 }
 

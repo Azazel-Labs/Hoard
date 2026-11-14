@@ -2,6 +2,7 @@
 // A small hand-rolled highlighter instead of a library: it only has to make structure visible (comments, strings,
 // keys, tags) across a few dozen formats, and a full grammar engine would outweigh the rest of the viewer.
 import { fileUrl, type Asset } from './api'
+import { t } from './i18n'
 import './textTokens.css'
 
 export interface TextFile {
@@ -59,9 +60,14 @@ export function langOf(ext: string): Lang {
   return LANG_BY_EXT[ext.toLowerCase()] ?? 'plain'
 }
 
+/** What each kind of text is called in the viewer's title; getters, so the words follow the language. */
 export const LANG_LABEL: Record<Lang, string> = {
-  json: 'JSON', xml: 'XML', yaml: 'YAML', ini: 'Config', csv: 'Table', markdown: 'Markdown', c: 'Code',
-  hash: 'Script', lua: 'Lua', plain: 'Text',
+  json: 'JSON', xml: 'XML', yaml: 'YAML', markdown: 'Markdown', lua: 'Lua',
+  get ini() { return t('text-lang-config') },
+  get csv() { return t('text-lang-table') },
+  get c() { return t('text-lang-code') },
+  get hash() { return t('text-lang-script') },
+  get plain() { return t('text-lang-text') },
 }
 
 /** Re-indent JSON two spaces deep without parsing it, so it works on a file cut short or one too big to parse, and

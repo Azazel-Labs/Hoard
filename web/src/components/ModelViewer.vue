@@ -6,6 +6,7 @@
 import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import type { Asset, ThumbUpload } from '../api'
 import { drawThumb, wantsBrowserThumb } from '../browserThumbs'
+import { t } from '../i18n'
 import type { ModelStage, StageInfo } from '../modelStage'
 
 const props = defineProps<{ asset: Asset; paused?: boolean }>()
@@ -32,7 +33,7 @@ async function setup() {
     ;({ ModelStage } = await import('../modelStage'))
   } catch (e) {
     status.value = 'error'
-    error.value = `the 3D viewer didn't load (${(e as Error).message}); reloading the page may help`
+    error.value = t('model-viewer-failed', { error: (e as Error).message })
     return
   }
   if (!host.value || props.asset.id !== id || stage) return
@@ -79,23 +80,23 @@ onBeforeUnmount(teardown)
 <template>
   <div class="mv">
     <div ref="host" class="canvas checker" @dblclick="emit('expand')" />
-    <p v-if="status === 'loading'" class="overlay">Loading model…</p>
-    <p v-else-if="status === 'error'" class="overlay err">Couldn't preview this model: {{ error }}</p>
-    <button type="button" class="expand" title="Full screen" aria-label="Open the full-screen 3D viewer" @click="emit('expand')">
+    <p v-if="status === 'loading'" class="overlay">{{ t('model-loading') }}</p>
+    <p v-else-if="status === 'error'" class="overlay err">{{ t('model-preview-failed', { error }) }}</p>
+    <button type="button" class="expand" :title="t('model-full-screen')" :aria-label="t('model-open-full-screen')" @click="emit('expand')">
       <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M2.5 6V2.5H6M10 2.5h3.5V6M13.5 10v3.5H10M6 13.5H2.5V10" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" /></svg>
     </button>
     <div v-if="status === 'ready' && info" class="hud">
-      <span class="mono">{{ info.triangles.toLocaleString() }} triangles</span>
+      <span class="mono">{{ t('model-triangles', { count: info.triangles }) }}</span>
       <label v-if="info.clips.length">
-        <span class="visually-hidden">Animation</span>
+        <span class="visually-hidden">{{ t('model-animation') }}</span>
         <select v-model="activeClip" class="field">
           <option v-for="c in info.clips" :key="c" :value="c">{{ c }}</option>
         </select>
       </label>
       <p v-if="missing.length" class="missing" :title="missing.join('\n')">
-        {{ missing.length === 1 ? `Texture not found: ${missing[0]}` : `${missing.length} textures not found` }}
+        {{ missing.length === 1 ? t('model-missing-one', { name: missing[0] }) : t('model-missing-count', { count: missing.length }) }}
       </p>
-      <p v-else-if="info.guessed" class="missing">Textures matched by name; the file names none.</p>
+      <p v-else-if="info.guessed" class="missing">{{ t('model-guessed') }}</p>
     </div>
   </div>
 </template>

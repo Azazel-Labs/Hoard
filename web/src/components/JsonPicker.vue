@@ -2,6 +2,7 @@
 // A JSON file as a tree whose values can be clicked, for the format wizard: clicking one picks its path. Values a
 // field already has are marked with the field's name.
 import { computed } from 'vue'
+import { t } from '../i18n'
 import { pathKey, type JsonPath } from '../storeFormats'
 
 defineOptions({ name: 'JsonPicker' })
@@ -54,7 +55,7 @@ const mark = (k: string | number) => props.marks[pathKey(at(k))]
         <JsonPicker :value="v" :path="at(k)" :marks="marks" @pick="(p) => emit('pick', p)" />
       </details>
     </li>
-    <li v-if="more" class="more">… {{ more }} more</li>
+    <li v-if="more" class="more">{{ t('json-picker-more', { count: more }) }}</li>
   </ul>
 </template>
 

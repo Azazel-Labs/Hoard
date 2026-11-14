@@ -26,6 +26,7 @@ mod formats;
 mod gpu_hint;
 mod heavy;
 mod https;
+mod i18n;
 mod ingest;
 mod issues;
 mod jobs;
@@ -214,6 +215,7 @@ async fn main() -> Result<()> {
         tracing::warn!(dir = %web.display(), "web portal not built; serving API only (run `npm run build` in web/)");
     }
     let app = app
+        .layer(middleware::from_fn(i18n::negotiate))
         .layer(middleware::from_fn(cache_headers))
         .layer(CompressionLayer::new().br(true).zstd(true).gzip(true).compress_when(compressible()))
         .layer(TraceLayer::new_for_http())

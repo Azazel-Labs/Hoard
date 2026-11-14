@@ -3,6 +3,7 @@
 //! format goes in `<data dir>/formats/`, and the packs with files it reads are read again. "Share it" puts the format,
 //! the sample and what the sample reads as in a zip laid out like the repository, to send in for everyone.
 
+use crate::i18n::tr;
 use std::collections::HashMap;
 use std::io::Write as _;
 
@@ -222,7 +223,7 @@ struct LibraryRead {
 
 fn parse(toml: &str) -> ApiResult<Format> {
     if toml.len() > MAX_TOML {
-        return Err(AppError::bad_request("the format is too long"));
+        return Err(AppError::bad_request(tr!("error-format-too-long")));
     }
     Format::parse(toml).map_err(|e| AppError::bad_request(format!("{e:#}")))
 }
@@ -231,7 +232,7 @@ fn parse(toml: &str) -> ApiResult<Format> {
 async fn try_format(State(state): State<AppState>, Json(t): Json<Trial>) -> ApiResult<Json<Value>> {
     let f = match Format::parse(&t.toml) {
         Ok(f) if t.toml.len() <= MAX_TOML => f,
-        Ok(_) => return Ok(Json(json!({ "error": "the format is too long" }))),
+        Ok(_) => return Ok(Json(json!({ "error": tr!("error-format-too-long") }))),
         Err(e) => return Ok(Json(json!({ "error": format!("{e:#}") }))),
     };
     let example = t.example.map(|ex| {
@@ -296,13 +297,13 @@ struct Save {
 
 /// A file in the data folder's formats, by a name from this API.
 fn format_file(name: &str) -> ApiResult<std::path::PathBuf> {
-    let dir = store_formats::dir().ok_or_else(|| AppError::unavailable("the server hasn't started"))?;
+    let dir = store_formats::dir().ok_or_else(|| AppError::unavailable(tr!("error-not-started")))?;
     let ok = !name.is_empty()
         && !name.contains(['/', '\\', ':'])
         && !name.starts_with('.')
         && std::path::Path::new(name).extension().is_some_and(|e| e.eq_ignore_ascii_case("toml"));
     if !ok {
-        return Err(AppError::bad_request(format!("not a format's file: {name}")));
+        return Err(AppError::bad_request(tr!("error-not-format-file", name = name)));
     }
     Ok(dir.join(name))
 }
@@ -312,7 +313,7 @@ async fn save(State(state): State<AppState>, Json(s): Json<Save>) -> ApiResult<J
     let f = parse(&s.toml)?;
     let slug = store_formats::slug(&f.name);
     if slug.is_empty() {
-        return Err(AppError::bad_request("the name needs a letter or digit from A to Z or 0 to 9"));
+        return Err(AppError::bad_request(tr!("error-format-name")));
     }
     let file = format!("{slug}.toml");
     let path = format_file(&file)?;
@@ -369,7 +370,7 @@ async fn read_again(state: &AppState, f: Format) -> anyhow::Result<usize> {
 async fn remove(Path(file): Path<String>) -> ApiResult<StatusCode> {
     let path = format_file(&file)?;
     if !path.is_file() {
-        return Err(AppError::not_found(format!("format {file}")));
+        return Err(AppError::not_found(tr!("error-format-not-found", file = file)));
     }
     tokio::fs::remove_file(&path).await.map_err(anyhow::Error::from)?;
     store_formats::reload();
@@ -389,14 +390,14 @@ async fn share(Json(s): Json<Share>) -> ApiResult<Response> {
     let f = parse(&s.toml)?;
     let slug = store_formats::slug(&f.name);
     if slug.is_empty() {
-        return Err(AppError::bad_request("the name needs a letter or digit from A to Z or 0 to 9"));
+        return Err(AppError::bad_request(tr!("error-format-name")));
     }
     let name = s.example.path.rsplit(['/', '\\']).next().unwrap_or_default().to_owned();
     let got = read_with(&f, &name, &s.example.text).map_err(|m| {
         AppError::bad_request(match m {
-            Miss::Name => format!("the format's files don't take {name}"),
-            Miss::NotTheStores => format!("the format doesn't take {name} for the store's (see require)"),
-            Miss::NoTitle => format!("the format finds no title in {name}"),
+            Miss::Name => tr!("error-format-miss-name", file = name),
+            Miss::NotTheStores => tr!("error-format-miss-store", file = name),
+            Miss::NoTitle => tr!("error-format-miss-title", file = name),
         })
     })?;
     let zip = share_zip(&f, &slug, &name, &s.example.text, &got).map_err(AppError::from)?;

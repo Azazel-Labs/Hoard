@@ -9,6 +9,7 @@ use hoard_core::PackStatus;
 use rusqlite::params;
 
 use crate::AppState;
+use crate::i18n::tr;
 use crate::{db, ingest, llm};
 
 pub(crate) const INGEST: &str = "ingest";
@@ -68,21 +69,23 @@ async fn next_job(state: &AppState) -> Result<Option<db::JobRow>> {
 }
 
 /// How a job reads in the activity list.
-pub(crate) fn job_label(kind: &str, pack: &str) -> String {
+pub(crate) fn job_label(kind: &str, pack: Option<&str>) -> String {
+    let pack = pack.map_or_else(|| tr!("server-job-a-pack"), str::to_owned);
+    let pack = pack.as_str();
     match kind {
-        INGEST => format!("Ingesting {pack}"),
-        RETAG => format!("Re-tagging {pack}"),
-        LLM_TAG => format!("Tagging {pack} with AI"),
-        CONVERT => format!("Converting {pack} with Blender"),
-        UNREAL => format!("Converting Unreal packages in {pack}"),
-        SCAN => "Scanning a watched folder".to_owned(),
-        RELOCATE => "Moving files between library locations".to_owned(),
-        LOOKS => "Working out colours and looks".to_owned(),
-        SOUNDS => "Listening to sounds".to_owned(),
-        EMBED => "Learning what pictures show".to_owned(),
-        MATERIALS => format!("Finding materials in {pack}"),
-        READ_FILES => format!("Reading the files of {pack}"),
-        STORE_LOOKUP => "Looking up a store page".to_owned(),
+        INGEST => tr!("server-job-ingest", pack = pack),
+        RETAG => tr!("server-job-retag", pack = pack),
+        LLM_TAG => tr!("server-job-llm-tag", pack = pack),
+        CONVERT => tr!("server-job-convert", pack = pack),
+        UNREAL => tr!("server-job-unreal", pack = pack),
+        SCAN => tr!("server-job-scan"),
+        RELOCATE => tr!("server-job-relocate"),
+        LOOKS => tr!("server-job-looks"),
+        SOUNDS => tr!("server-job-sounds"),
+        EMBED => tr!("server-job-embed"),
+        MATERIALS => tr!("server-job-materials", pack = pack),
+        READ_FILES => tr!("server-job-read-files", pack = pack),
+        STORE_LOOKUP => tr!("server-job-store-lookup"),
         other => format!("{other} {pack}"),
     }
 }
@@ -114,11 +117,7 @@ async fn run(state: &AppState, job: db::JobRow) {
         STORE_LOOKUP => STORE_LOOKUP,
         _ => "job",
     };
-    let activity = crate::activity::start(
-        kind,
-        job_label(&job.kind, pack_name.as_deref().unwrap_or("a pack")),
-        job.pack_id.as_deref(),
-    );
+    let activity = crate::activity::start(kind, job_label(&job.kind, pack_name.as_deref()), job.pack_id.as_deref());
 
     let result: Result<()> = match job.kind.as_str() {
         INGEST => {

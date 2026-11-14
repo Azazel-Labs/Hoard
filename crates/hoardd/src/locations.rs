@@ -24,6 +24,7 @@ use crate::AppState;
 use crate::config::{Config, StorageKind};
 use crate::db;
 use crate::error::{ApiResult, AppError};
+use crate::i18n::tr;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "lowercase")]
@@ -134,7 +135,7 @@ fn check_kinds(kinds: &[String]) -> Result<Vec<String>, AppError> {
     let mut out: Vec<String> = Vec::new();
     for k in kinds {
         if !AssetKind::ALL.iter().any(|a| a.as_str() == k) {
-            return Err(AppError::bad_request(format!("unknown asset kind {k:?}")));
+            return Err(AppError::bad_request(tr!("error-unknown-kind", kind = format!("{k:?}"))));
         }
         if !out.contains(k) {
             out.push(k.clone());
@@ -237,39 +238,42 @@ async fn probe(state: &AppState, new: &NewLocation, others: &[Location]) -> Resu
     let path = new.path.clone();
     if crate::blobs::s3_bucket(&path).is_some() {
         if new.mode == Mode::Watched {
-            return Err(AppError::bad_request("a watched location is a folder on this server"));
+            return Err(AppError::bad_request(tr!("error-watched-is-folder")));
         }
         let (store, _) = crate::blobs::open_store(&state.cfg, &path).map_err(AppError::bad_request)?;
         if let Some(Err(e)) = store.list(None).next().await {
-            return Err(AppError::bad_request(format!("can't reach {path}: {e}")));
+            return Err(AppError::bad_request(tr!("error-cant-reach", path = path, reason = e.to_string())));
         }
     } else {
         if !Path::new(&path).is_absolute() {
-            return Err(AppError::bad_request("give the folder's full path"));
+            return Err(AppError::bad_request(tr!("error-folder-full-path")));
         }
         let mode = new.mode;
         let path = path.clone();
-        tokio::task::spawn_blocking(move || -> Result<()> {
-            let dir = Path::new(&path);
-            match mode {
-                Mode::Managed => {
-                    std::fs::create_dir_all(dir).with_context(|| format!("can't create {path}"))?;
-                    let test = dir.join(".hoard-write-test");
-                    std::fs::write(&test, b"ok").with_context(|| format!("can't write to {path}"))?;
-                    std::fs::remove_file(&test).ok();
+        let language = crate::i18n::current();
+        tokio::task::spawn_blocking(move || {
+            crate::i18n::blocking(language, || -> Result<()> {
+                let dir = Path::new(&path);
+                match mode {
+                    Mode::Managed => {
+                        std::fs::create_dir_all(dir).with_context(|| tr!("error-cant-create", path = path))?;
+                        let test = dir.join(".hoard-write-test");
+                        std::fs::write(&test, b"ok").with_context(|| tr!("error-cant-write", path = path))?;
+                        std::fs::remove_file(&test).ok();
+                    }
+                    Mode::Watched => {
+                        std::fs::read_dir(dir).with_context(|| tr!("error-cant-read", path = path))?;
+                    }
                 }
-                Mode::Watched => {
-                    std::fs::read_dir(dir).with_context(|| format!("can't read {path}"))?;
-                }
-            }
-            Ok(())
+                Ok(())
+            })
         })
         .await
         .map_err(anyhow::Error::from)?
         .map_err(|e| AppError::bad_request(format!("{e:#}")))?;
     }
-    let (others, cfg) = (others.to_vec(), state.cfg.clone());
-    tokio::task::spawn_blocking(move || overlaps(&path, &others, &cfg))
+    let (others, cfg, language) = (others.to_vec(), state.cfg.clone(), crate::i18n::current());
+    tokio::task::spawn_blocking(move || crate::i18n::blocking(language, || overlaps(&path, &others, &cfg)))
         .await
         .map_err(anyhow::Error::from)?
         .map_or(Ok(()), |msg| Err(AppError::conflict(msg)))
@@ -289,7 +293,7 @@ fn overlaps(path: &str, others: &[Location], cfg: &Config) -> Option<String> {
             nests(&mine, &real(Path::new(&o.path)))
         };
         if clash {
-            return Some(format!("that overlaps the location {:?} ({})", o.name, o.path));
+            return Some(tr!("error-overlaps-location", name = format!("{:?}", o.name), path = o.path));
         }
     }
     if is_bucket {
@@ -297,11 +301,11 @@ fn overlaps(path: &str, others: &[Location], cfg: &Config) -> Option<String> {
     }
     let data = real(&cfg.data_dir);
     if nests(&mine, &data) && mine != data.join("library") {
-        return Some(format!("that overlaps Hoard's data folder ({})", cfg.data_dir.display()));
+        return Some(tr!("error-overlaps-data", path = cfg.data_dir.display().to_string()));
     }
     for dir in [cfg.thumbs_dir(), cfg.staging_dir(), cfg.tmp_dir()] {
         if nests(&mine, &real(&dir)) {
-            return Some(format!("that overlaps Hoard's cache folder ({})", dir.display()));
+            return Some(tr!("error-overlaps-cache", path = dir.display().to_string()));
         }
     }
     None
@@ -351,7 +355,7 @@ pub(crate) async fn create_location(
 ) -> ApiResult<(StatusCode, Json<Location>)> {
     new.path = normalize(&new.path);
     if new.path.is_empty() {
-        return Err(AppError::bad_request("pick a folder"));
+        return Err(AppError::bad_request(tr!("error-pick-folder")));
     }
     new.kinds = check_kinds(&new.kinds)?;
     let others = db::call(&state.pool, |c| list(c)).await?;
@@ -370,9 +374,9 @@ pub(crate) async fn create_location(
 pub(crate) async fn scan_location(State(state): State<AppState>, UrlPath(id): UrlPath<i64>) -> ApiResult<StatusCode> {
     let loc = db::call(&state.pool, move |c| get(c, id))
         .await?
-        .ok_or_else(|| AppError::not_found(format!("location {id}")))?;
+        .ok_or_else(|| AppError::not_found(tr!("error-location-not-found", id = id)))?;
     if loc.mode != Mode::Watched {
-        return Err(AppError::bad_request(format!("{} isn't a watched folder", loc.name)));
+        return Err(AppError::bad_request(tr!("error-not-watched", name = loc.name)));
     }
     let s = std::sync::Arc::clone(&state);
     db::call(&state.pool, move |c| crate::scan::enqueue(c, &s, id)).await?;
@@ -389,12 +393,12 @@ pub(crate) async fn patch_location(
     let kinds = patch.kinds.as_deref().map(check_kinds).transpose()?;
     let current = db::call(&state.pool, move |c| get(c, id))
         .await?
-        .ok_or_else(|| AppError::not_found(format!("location {id}")))?;
+        .ok_or_else(|| AppError::not_found(tr!("error-location-not-found", id = id)))?;
     if current.mode == Mode::Watched && (kinds.is_some() || patch.catch_all.is_some()) {
-        return Err(AppError::bad_request("a watched folder doesn't take new files, so it has no kinds to change"));
+        return Err(AppError::bad_request(tr!("error-watched-no-kinds")));
     }
     if current.catch_all && patch.catch_all == Some(false) {
-        return Err(AppError::bad_request("make another location the catch-all instead"));
+        return Err(AppError::bad_request(tr!("error-keep-catch-all")));
     }
     let loc = db::call(&state.pool, move |c| {
         let Some(loc) = get(c, id)? else { return Ok(None) };
@@ -417,7 +421,7 @@ pub(crate) async fn patch_location(
         get(c, id)
     })
     .await?
-    .ok_or_else(|| AppError::not_found(format!("location {id}")))?;
+    .ok_or_else(|| AppError::not_found(tr!("error-location-not-found", id = id)))?;
     state.blobs.refresh().await?;
     Ok(Json(loc))
 }
@@ -439,25 +443,19 @@ pub(crate) async fn delete_location(
 ) -> ApiResult<StatusCode> {
     let loc = db::call(&state.pool, move |c| get(c, id))
         .await?
-        .ok_or_else(|| AppError::not_found(format!("location {id}")))?;
+        .ok_or_else(|| AppError::not_found(tr!("error-location-not-found", id = id)))?;
     if loc.mode == Mode::Managed {
         match state.blobs.managed_store(id) {
             Some(store) => {
                 if crate::blobs::holds_any(&*store).await? {
-                    return Err(AppError::conflict(format!(
-                        "{} still holds files: move them to the other locations first (POST /api/admin/locations/{id}/empty)",
-                        loc.name
-                    )));
+                    return Err(AppError::conflict(tr!("error-location-holds-files", name = loc.name, id = id)));
                 }
             }
             None if q.force => {
                 tracing::warn!(name = %loc.name, path = %loc.path, "removing a library location that can't be reached; files on it are missing now");
             }
             None => {
-                return Err(AppError::unavailable(format!(
-                    "{} can't be reached, so Hoard can't tell whether it still holds files",
-                    loc.name
-                )));
+                return Err(AppError::unavailable(tr!("error-location-unreachable", name = loc.name)));
             }
         }
     }
@@ -478,7 +476,7 @@ async fn queue_relocate(state: &AppState, req: crate::relocate::Request) -> ApiR
     })
     .await?;
     if !queued {
-        return Err(AppError::conflict("files are already being moved between locations; try again when that's done"));
+        return Err(AppError::conflict(tr!("error-relocate-running")));
     }
     state.wake.notify_one();
     Ok(())
@@ -489,13 +487,13 @@ async fn queue_relocate(state: &AppState, req: crate::relocate::Request) -> ApiR
 pub(crate) async fn empty_location(State(state): State<AppState>, UrlPath(id): UrlPath<i64>) -> ApiResult<StatusCode> {
     let loc = db::call(&state.pool, move |c| get(c, id))
         .await?
-        .ok_or_else(|| AppError::not_found(format!("location {id}")))?;
+        .ok_or_else(|| AppError::not_found(tr!("error-location-not-found", id = id)))?;
     if loc.mode != Mode::Managed {
-        return Err(AppError::bad_request(format!("{} is a watched folder: Hoard doesn't move its files", loc.name)));
+        return Err(AppError::bad_request(tr!("error-watched-not-moved", name = loc.name)));
     }
     let others = state.blobs.managed_stores().iter().filter(|(i, _)| *i != id).count();
     if others == 0 {
-        return Err(AppError::conflict("there's no other library location to move the files to: add one first"));
+        return Err(AppError::conflict(tr!("error-no-other-location")));
     }
     queue_relocate(&state, crate::relocate::Request { from: Some(id), remove: true }).await?;
     Ok(StatusCode::ACCEPTED)
@@ -529,7 +527,8 @@ pub(crate) struct BrowseQuery {
 /// `GET /api/admin/fs?path=`: the folders in a folder on the server, for picking a location. No path lists the
 /// drives on Windows and `/` elsewhere.
 pub(crate) async fn browse(Query(q): Query<BrowseQuery>) -> ApiResult<Json<Value>> {
-    let v = tokio::task::spawn_blocking(move || browse_dir(q.path.trim()))
+    let language = crate::i18n::current();
+    let v = tokio::task::spawn_blocking(move || crate::i18n::blocking(language, || browse_dir(q.path.trim())))
         .await
         .map_err(anyhow::Error::from)?
         .map_err(|e| AppError::bad_request(format!("{e:#}")))?;
@@ -550,10 +549,10 @@ fn browse_dir(path: &str) -> Result<Value> {
     }
     let dir = Path::new(path);
     if !dir.is_absolute() {
-        bail!("give a full path");
+        bail!(tr!("error-full-path"));
     }
     let mut dirs: Vec<(String, String)> = Vec::new();
-    for entry in std::fs::read_dir(dir).with_context(|| format!("can't read {path}"))? {
+    for entry in std::fs::read_dir(dir).with_context(|| tr!("error-cant-read", path = path))? {
         let Ok(entry) = entry else { continue };
         let name = entry.file_name().to_string_lossy().into_owned();
         if name.starts_with('.') || !entry.path().is_dir() {

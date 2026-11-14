@@ -14,6 +14,8 @@ use regex::Regex;
 use serde::Deserialize;
 use serde_json::Value;
 
+use crate::i18n::tr;
+
 /// The formats Hoard ships with, by file name (a test checks every file in `formats/` is here).
 const BUILT_IN: &[(&str, &str)] = &[
     ("megascans.toml", include_str!("../formats/megascans.toml")),
@@ -254,10 +256,10 @@ impl Format {
         let spec: Spec = toml::from_str(text)?;
         let name = spec.name.trim().to_owned();
         if name.is_empty() {
-            bail!("name is empty");
+            bail!(tr!("error-format-no-name"));
         }
         if spec.files.is_empty() {
-            bail!("files is empty: say which files the format reads, like [\"*.json\"]");
+            bail!(tr!("error-format-no-files"));
         }
         let syntax = spec.syntax;
         let sel = |s: &str, at: &str| Sel::parse(s, syntax).with_context(|| format!("{at}: {s:?}"));
@@ -405,7 +407,7 @@ impl Sel {
     fn parse(s: &str, syntax: Syntax) -> Result<Self> {
         let s = s.trim();
         if s.is_empty() {
-            bail!("empty");
+            bail!(tr!("error-format-empty-selector"));
         }
         if syntax == Syntax::Text {
             return Ok(Self::Pattern(Regex::new(&format!("(?m){s}"))?));
@@ -581,15 +583,15 @@ fn split_steps(path: &str) -> Result<Vec<&str>> {
             _ => {}
         }
         if depth < 0 {
-            bail!("a closing bracket without an opening one");
+            bail!(tr!("error-format-unopened-bracket"));
         }
     }
     if depth != 0 {
-        bail!("a bracket isn't closed");
+        bail!(tr!("error-format-unclosed-bracket"));
     }
     out.push(&path[start..]);
     if out.iter().any(|s| s.trim().is_empty()) {
-        bail!("an empty step (two dots in a row, or a dot at either end)");
+        bail!(tr!("error-format-empty-step-dots"));
     }
     Ok(out)
 }
@@ -602,34 +604,34 @@ fn parse_step(part: &str) -> Result<Step> {
     let mut rest = &part[key_end..];
     let mut except = Vec::new();
     if let Some(r) = rest.strip_prefix("!(") {
-        let close = r.find(')').context("!( isn't closed")?;
+        let close = r.find(')').with_context(|| tr!("error-format-unclosed-except"))?;
         except = r[..close].split(',').map(|e| e.trim().to_lowercase()).filter(|e| !e.is_empty()).collect();
         rest = &r[close + 1..];
     }
     let mut filters = Vec::new();
     while let Some(r) = rest.strip_prefix('[') {
-        let close = r.find(']').context("[ isn't closed")?;
+        let close = r.find(']').with_context(|| tr!("error-format-unclosed-filter"))?;
         filters.push(parse_filter(r[..close].trim())?);
         rest = &r[close + 1..];
     }
     if !rest.is_empty() {
-        bail!("{rest:?} after {part:?}'s key and filters");
+        bail!(tr!("error-format-after-filters", rest = format!("{rest:?}"), step = format!("{part:?}")));
     }
     let key = if key.is_empty() {
         if !except.is_empty() {
-            bail!("!(…) goes after a key with * in it");
+            bail!(tr!("error-format-except-needs-glob"));
         }
         None
     } else if key.contains(['*', '?']) {
         Some(Key::Glob { glob: key.to_lowercase(), except })
     } else {
         if !except.is_empty() {
-            bail!("!(…) goes after a key with * in it, not {key:?}");
+            bail!(tr!("error-format-except-not-glob", key = format!("{key:?}")));
         }
         Some(Key::Exact(key.to_owned()))
     };
     if key.is_none() && filters.is_empty() {
-        bail!("an empty step");
+        bail!(tr!("error-format-empty-step"));
     }
     Ok(Step { key, filters })
 }
@@ -643,15 +645,11 @@ fn parse_filter(f: &str) -> Result<Filter> {
         "bool" => Filter::Type(Value::is_boolean),
         "object" => Filter::Type(Value::is_object),
         f => {
-            let (key, values) = f.split_once('=').with_context(|| {
-                format!(
-                    "[{f}] isn't a filter: use [], [key=value|other], [array], [string], [number], [bool] or [object]"
-                )
-            })?;
+            let (key, values) = f.split_once('=').with_context(|| tr!("error-format-not-a-filter", filter = f))?;
             let any_of: Vec<String> =
                 values.split('|').map(|v| v.trim().to_lowercase()).filter(|v| !v.is_empty()).collect();
             if key.trim().is_empty() || any_of.is_empty() {
-                bail!("[{f}] needs a key and a value");
+                bail!(tr!("error-format-filter-needs-value", filter = f));
             }
             Filter::Where { key: key.trim().to_owned(), any_of }
         }

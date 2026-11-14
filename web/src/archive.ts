@@ -3,6 +3,7 @@
 import { api, type ArchiveItems } from './api'
 import { usageWarning } from './projects'
 import { confirmDialog, showError, toast } from './ui'
+import { t } from './i18n'
 
 /**
  * Move things to the archive now, with an Undo on the toast that brings them back. When projects use any of them it
@@ -10,11 +11,11 @@ import { confirmDialog, showError, toast } from './ui'
  */
 export async function archiveWithUndo(text: string, items: ArchiveItems, changed: () => void): Promise<boolean> {
   const uses = await usageWarning(items)
-  if (uses && !(await confirmDialog({ title: uses.title, body: uses.body, confirm: 'Archive anyway' }))) return false
+  if (uses && !(await confirmDialog({ title: uses.title, body: uses.body, confirm: t('archive-anyway') }))) return false
   try {
     await api.archive(items)
   } catch (e) {
-    showError(`Couldn't archive: ${(e as Error).message}`)
+    showError(t('archive-failed', { error: (e as Error).message }))
     return false
   }
   changed()
@@ -22,13 +23,13 @@ export async function archiveWithUndo(text: string, items: ArchiveItems, changed
     kind: 'info',
     duration: 7000,
     action: {
-      label: 'Undo',
+      label: t('archive-undo'),
       run: async () => {
         try {
           await api.restore(items)
           changed()
         } catch (e) {
-          showError(`Couldn't restore: ${(e as Error).message}`)
+          showError(t('archive-restore-failed', { error: (e as Error).message }))
         }
       },
     },
@@ -38,6 +39,8 @@ export async function archiveWithUndo(text: string, items: ArchiveItems, changed
 
 /** "3 packs and 12 assets", "1 asset". */
 export function countText(packs: number, assets: number): string {
-  const part = (n: number, one: string) => (n ? `${n.toLocaleString()} ${one}${n === 1 ? '' : 's'}` : '')
-  return [part(packs, 'pack'), part(assets, 'asset')].filter(Boolean).join(' and ') || 'nothing'
+  if (packs && assets) return t('archive-count-packs-and-assets', { packs, assets })
+  if (packs) return t('archive-count-packs', { packs })
+  if (assets) return t('archive-count-assets', { assets })
+  return t('archive-count-nothing')
 }

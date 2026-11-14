@@ -19,6 +19,7 @@
 //! `force` is set, so re-running an interrupted bulk import doesn't duplicate the packs that already finished.
 //! What's on disk is the source of truth for progress, so a server restart mid-upload loses nothing.
 
+use crate::i18n::tr;
 use std::collections::HashSet;
 use std::path::PathBuf;
 
@@ -51,10 +52,7 @@ const STALE_DAYS: i64 = 7;
 const BODY_IDLE: std::time::Duration = std::time::Duration::from_secs(60);
 
 fn stalled(path: &str) -> AppError {
-    AppError {
-        status: StatusCode::REQUEST_TIMEOUT,
-        err: anyhow::anyhow!("upload of {path} stalled; send that part again"),
-    }
+    AppError { status: StatusCode::REQUEST_TIMEOUT, err: anyhow::anyhow!(tr!("error-upload-stalled", path = path)) }
 }
 
 pub(crate) fn router() -> Router<AppState> {
@@ -148,7 +146,7 @@ async fn session_status(state: &AppState, id: &str) -> ApiResult<SessionStatus> 
         Ok(Some((pack, files)))
     })
     .await?;
-    let (pack, files) = found.ok_or_else(|| AppError::not_found(format!("upload {id}")))?;
+    let (pack, files) = found.ok_or_else(|| AppError::not_found(tr!("error-upload-not-found", id = id)))?;
     let total_bytes = files.iter().map(|f| f.size).sum();
     let received_bytes = files.iter().map(|f| f.received).sum();
     Ok(SessionStatus {
@@ -164,10 +162,10 @@ async fn session_status(state: &AppState, id: &str) -> ApiResult<SessionStatus> 
 
 async fn create(State(state): State<AppState>, Json(body): Json<CreateBody>) -> ApiResult<Response> {
     if body.files.is_empty() {
-        return Err(AppError::bad_request("no files"));
+        return Err(AppError::bad_request(tr!("error-upload-no-files-listed")));
     }
     if !state.blobs.can_store() {
-        return Err(AppError::conflict(crate::blobs::NO_LIBRARY));
+        return Err(AppError::conflict(crate::blobs::no_library()));
     }
     let mut seen = HashSet::new();
     let mut files = Vec::with_capacity(body.files.len());
@@ -200,7 +198,7 @@ async fn create(State(state): State<AppState>, Json(body): Json<CreateBody>) -> 
             return Ok((StatusCode::OK, Json(s)).into_response());
         }
         Some(Existing::Imported(pack)) if !body.force => {
-            let msg = format!("already imported as \"{}\"", pack.name);
+            let msg = tr!("error-already-imported", name = pack.name);
             return Ok((StatusCode::CONFLICT, Json(json!({ "error": msg, "pack": pack }))).into_response());
         }
         _ => {}
@@ -257,8 +255,8 @@ async fn expected(state: &AppState, id: &str, path: &str) -> ApiResult<(u64, u64
     .await?;
     match row {
         Ok(v) => Ok(v),
-        Err(true) => Err(AppError::bad_request(format!("{path} is not part of upload {id}, or the upload is closed"))),
-        Err(false) => Err(AppError::not_found(format!("upload {id}"))),
+        Err(true) => Err(AppError::bad_request(tr!("error-upload-not-part", path = path, id = id))),
+        Err(false) => Err(AppError::not_found(tr!("error-upload-not-found", id = id))),
     }
 }
 
@@ -318,7 +316,7 @@ impl<'a> InFlight<'a> {
         if !set.insert(key.clone()) {
             return Err(AppError {
                 status: StatusCode::CONFLICT,
-                err: anyhow::anyhow!("{path} is already being written"),
+                err: anyhow::anyhow!(tr!("error-upload-busy", path = path)),
             });
         }
         Ok(Self { state, key })
@@ -343,10 +341,10 @@ async fn chunk(
     Query(p): Query<ChunkParams>,
     req: Request,
 ) -> ApiResult<Response> {
-    let path = safe_rel_path(&p.path).ok_or_else(|| AppError::bad_request("bad path"))?;
+    let path = safe_rel_path(&p.path).ok_or_else(|| AppError::bad_request(tr!("error-bad-path")))?;
     let (size, received) = expected(&state, &id, &path).await?;
     if p.offset % PART_BYTES != 0 || p.offset >= size {
-        return Err(AppError::bad_request(format!("{} isn't where a part of {path} starts", p.offset)));
+        return Err(AppError::bad_request(tr!("error-upload-part-offset", offset = p.offset, path = path)));
     }
     let part = p.offset / PART_BYTES;
     let len = PART_BYTES.min(size - p.offset);
@@ -379,15 +377,22 @@ async fn chunk(
         let Ok(next) = tokio::time::timeout(BODY_IDLE, body.next()).await else { return Err(stalled(&path)) };
         let Some(bytes) = next else { break };
         // A part that didn't all arrive isn't counted: the client sends it again.
-        let bytes = bytes.map_err(|e| AppError::bad_request(format!("upload interrupted: {e}")))?;
+        let bytes =
+            bytes.map_err(|e| AppError::bad_request(tr!("error-upload-interrupted", reason = e.to_string())))?;
         written += bytes.len() as u64;
         if written > len {
-            return Err(AppError::bad_request(format!("part {part} of {path} is longer than {len} bytes")));
+            return Err(AppError::bad_request(tr!("error-upload-part-long", part = part, path = path, len = len)));
         }
         out.write_all(&bytes).await?;
     }
     if written != len {
-        return Err(AppError::bad_request(format!("part {part} of {path}: got {written} bytes, expected {len}")));
+        return Err(AppError::bad_request(tr!(
+            "error-upload-part-short",
+            part = part,
+            path = path,
+            got = written,
+            len = len
+        )));
     }
     out.flush().await?;
     // On disk before it's counted, so a crash can't leave a part that's recorded but missing.
@@ -414,7 +419,7 @@ async fn batch(
             }
             (_, Some(file_name)) => {
                 let raw = pending_rel.take().unwrap_or(file_name);
-                let path = safe_rel_path(&raw).ok_or_else(|| AppError::bad_request("bad path"))?;
+                let path = safe_rel_path(&raw).ok_or_else(|| AppError::bad_request(tr!("error-bad-path")))?;
                 let (size, _) = expected(&state, &id, &path).await?;
                 let _guard = InFlight::claim(&state, &id, &path, None)?;
                 let dest = root.join(&path);
@@ -431,13 +436,18 @@ async fn batch(
                 {
                     written += bytes.len() as u64;
                     if written > size {
-                        return Err(AppError::bad_request(format!("{path} is larger than declared")));
+                        return Err(AppError::bad_request(tr!("error-upload-file-long", path = path)));
                     }
                     out.write_all(&bytes).await?;
                 }
                 out.flush().await?;
                 if written != size {
-                    return Err(AppError::bad_request(format!("{path}: got {written} bytes, expected {size}")));
+                    return Err(AppError::bad_request(tr!(
+                        "error-upload-file-short",
+                        path = path,
+                        got = written,
+                        len = size
+                    )));
                 }
                 record(&state, &id, &path, None, written, size).await?;
                 done.push(path);
@@ -451,18 +461,18 @@ async fn batch(
 async fn complete(State(state): State<AppState>, Path(id): Path<String>) -> ApiResult<(StatusCode, Json<Pack>)> {
     let current = session_status(&state, &id).await?;
     if current.pack.status != hoard_core::PackStatus::Uploading {
-        return Err(AppError::bad_request("upload is already complete"));
+        return Err(AppError::bad_request(tr!("error-upload-complete")));
     }
     let missing: Vec<&str> =
         current.files.iter().filter(|f| f.received != f.size).map(|f| f.path.as_str()).take(20).collect();
     if !missing.is_empty() {
         return Err(AppError {
             status: StatusCode::CONFLICT,
-            err: anyhow::anyhow!(
-                "{} files are incomplete, e.g. {}",
-                current.files.iter().filter(|f| f.received != f.size).count(),
-                missing.join(", ")
-            ),
+            err: anyhow::anyhow!(tr!(
+                "error-upload-incomplete",
+                count = current.files.iter().filter(|f| f.received != f.size).count(),
+                files = missing.join(", ")
+            )),
         });
     }
     // Empty files never receive a byte, so create them now; ingest only sees what's on disk.
@@ -505,7 +515,7 @@ async fn abort(State(state): State<AppState>, Path(id): Path<String>) -> ApiResu
     })
     .await?;
     if !removed {
-        return Err(AppError::not_found(format!("open upload {id}")));
+        return Err(AppError::not_found(tr!("error-open-upload-not-found", id = id)));
     }
     tokio::fs::remove_dir_all(staging(&state, &id)).await.ok();
     Ok(StatusCode::NO_CONTENT)

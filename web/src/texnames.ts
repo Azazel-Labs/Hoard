@@ -1,7 +1,8 @@
 // How texture maps are named in what Hoard sends (Settings → Downloads). The server does the renaming
 // (crates/hoardd/src/naming.rs); this mirrors it so Settings can show an example as the pattern is typed.
 import type { MapRole } from './api'
-import { ROLE_LABEL } from './materials'
+import { t } from './i18n'
+import { ROLE_LABEL, ROLE_NAME } from './materials'
 
 export interface TextureNames {
   on: boolean
@@ -56,16 +57,16 @@ export function stem(n: TextureNames, material: string, role: MapRole, size?: st
 
 const BAD = /[<>:"/\\|?*\p{Cc}]/u
 
-/** What's wrong with the convention, in the server's words, or null. */
+/** What's wrong with the convention, in the server's words (in the reader's language), or null. */
 export function problem(n: TextureNames): string | null {
-  if (!n.pattern.includes('{map}')) return 'The pattern needs {map}, or every map of a material would get the same name'
+  if (!n.pattern.includes('{map}')) return t('texnames-needs-map')
   const rest = n.pattern.replaceAll('{name}', '').replaceAll('{map}', '').replaceAll('{size}', '')
-  if (/[{}]/.test(rest)) return 'The pattern can use {name}, {map} and {size}'
-  if (BAD.test(rest)) return 'Names can’t have < > : " / \\ | ? or *'
+  if (/[{}]/.test(rest)) return t('texnames-placeholders')
+  if (BAD.test(rest)) return t('texnames-bad-characters')
   for (const r of ROLES) {
     const s = n.maps[r] ?? ''
-    if (!s.trim()) return `Give ${ROLE_LABEL[r].toLowerCase()} maps a suffix`
-    if (BAD.test(s)) return `The suffix for ${ROLE_LABEL[r].toLowerCase()} maps can’t have < > : " / \\ | ? or *`
+    if (!s.trim()) return t('texnames-no-suffix', { role: ROLE_NAME[r] })
+    if (BAD.test(s)) return t('texnames-bad-suffix', { role: ROLE_NAME[r] })
   }
   return null
 }

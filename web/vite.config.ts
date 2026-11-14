@@ -16,6 +16,8 @@ export default defineConfig({
     chunkSizeWarningLimit: 700,
   },
   server: {
+    // The catalogs live beside the server's, in ../locales.
+    fs: { allow: ['..'] },
     proxy: {
       '/api': process.env.HOARD_API ?? 'http://127.0.0.1:4627',
       '/mcp': process.env.HOARD_API ?? 'http://127.0.0.1:4627',

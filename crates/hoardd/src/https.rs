@@ -42,6 +42,7 @@ use time::OffsetDateTime;
 
 use crate::AppState;
 use crate::error::{ApiResult, AppError};
+use crate::i18n::tr;
 
 /// The row in `settings` that holds [`Saved`].
 const KEY: &str = "https";
@@ -390,7 +391,7 @@ fn build(dir: &Path, saved: &Saved, public_url: Option<&str>, upload: Option<&Up
             } else {
                 let (c, k) = (dir.join("custom.crt"), dir.join("custom.key"));
                 if !c.is_file() || !k.is_file() {
-                    bail!("Paste or upload your certificate and its key first");
+                    bail!(tr!("error-https-no-certificate"));
                 }
                 read_pair(&c, &k)?
             };
@@ -424,17 +425,15 @@ impl Upload {
         let keys: Vec<&str> =
             blocks.iter().filter(|(label, _)| label.ends_with("PRIVATE KEY")).map(|(_, b)| b.as_str()).collect();
         if certs.is_empty() {
-            bail!("No certificate found: paste the text that starts with -----BEGIN CERTIFICATE-----");
+            bail!(tr!("error-https-no-cert-found"));
         }
         match keys.len() {
-            0 => bail!("No private key found: paste the text that starts with -----BEGIN PRIVATE KEY-----"),
+            0 => bail!(tr!("error-https-no-key-found")),
             1 => {}
-            _ => bail!("There's more than one private key: paste only the one that goes with the certificate"),
+            _ => bail!(tr!("error-https-several-keys")),
         }
         if blocks.iter().any(|(label, _)| label == "ENCRYPTED PRIVATE KEY") {
-            bail!(
-                "The key is protected with a password: give it without one (openssl pkey -in key.pem -out plain.pem)"
-            );
+            bail!(tr!("error-https-key-password"));
         }
         Ok((certs.join(""), keys.concat()))
     }
@@ -443,15 +442,12 @@ impl Upload {
         let (certs, key) = self.split()?;
         let chain = CertificateDer::pem_slice_iter(certs.as_bytes())
             .collect::<Result<Vec<_>, _>>()
-            .map_err(|_| anyhow!("The certificate isn't valid PEM"))?;
-        let key =
-            PrivateKeyDer::from_pem_slice(key.as_bytes()).map_err(|_| anyhow!("The private key isn't valid PEM"))?;
+            .map_err(|_| anyhow!(tr!("error-https-cert-not-pem")))?;
+        let key = PrivateKeyDer::from_pem_slice(key.as_bytes()).map_err(|_| anyhow!(tr!("error-https-key-not-pem")))?;
         let info = cert_info(&chain[0])?;
         server_config(&chain, &key, &[b"h2"]).map_err(|e| match e.downcast_ref::<rustls::Error>() {
-            Some(rustls::Error::InconsistentKeys(_)) => anyhow!(
-                "The key doesn't belong to the certificate. If you gave a chain, put your server's certificate first"
-            ),
-            _ => e.context("The certificate or key can't be used"),
+            Some(rustls::Error::InconsistentKeys(_)) => anyhow!(tr!("error-https-key-mismatch")),
+            _ => e.context(tr!("error-https-unusable")),
         })?;
         Ok(Built { chain, key, info })
     }
@@ -489,10 +485,10 @@ fn pem_blocks(text: &str) -> Vec<(String, String)> {
 fn check_dates(info: &CertInfo) -> Result<()> {
     let now = OffsetDateTime::now_utc().unix_timestamp();
     if info.not_after < now {
-        bail!("This certificate expired on {}", day(info.not_after));
+        bail!(tr!("error-https-expired", date = day(info.not_after)));
     }
     if info.not_before > now {
-        bail!("This certificate isn't valid until {}", day(info.not_before));
+        bail!(tr!("error-https-not-yet-valid", date = day(info.not_before)));
     }
     Ok(())
 }
@@ -520,8 +516,7 @@ pub(crate) fn server_config(
 
 fn cert_info(der: &[u8]) -> Result<CertInfo> {
     use x509_parser::extensions::GeneralName;
-    let (_, x) =
-        x509_parser::parse_x509_certificate(der).map_err(|_| anyhow!("That isn't a certificate Hoard can read"))?;
+    let (_, x) = x509_parser::parse_x509_certificate(der).map_err(|_| anyhow!(tr!("error-https-unreadable")))?;
     let cn = |n: &x509_parser::x509::X509Name<'_>| {
         n.iter_common_name().next().and_then(|a| a.as_str().ok()).map_or_else(|| n.to_string(), str::to_owned)
     };
@@ -691,7 +686,7 @@ fn sort_names(names: &mut Vec<String>) {
 
 /// An address as typed (`https://NAS.local:4627/`, `[::1]`, `192.168.1.5`) as a certificate holds it.
 fn clean_name(raw: &str) -> Result<String, String> {
-    let bad = || format!("“{}” isn't an address a certificate can hold", raw.trim());
+    let bad = || tr!("error-https-bad-name", name = raw.trim());
     let mut s = raw.trim();
     if let Some((_, rest)) = s.split_once("://") {
         s = rest;
@@ -743,9 +738,9 @@ async fn try_handshake(config: Arc<ServerConfig>) -> Result<()> {
     let client = tokio_rustls::TlsConnector::from(Arc::new(client)).connect(ServerName::try_from("hoard.test")?, b);
     let (s, c) = tokio::time::timeout(Duration::from_secs(10), async { tokio::join!(server, client) })
         .await
-        .context("the test connection timed out")?;
-    s.context("the test connection failed")?;
-    c.context("the test connection failed")?;
+        .with_context(|| tr!("error-https-test-timed-out"))?;
+    s.with_context(|| tr!("error-https-test-failed"))?;
+    c.with_context(|| tr!("error-https-test-failed"))?;
     Ok(())
 }
 
@@ -822,7 +817,7 @@ pub(crate) fn admin_router() -> Router<AppState> {
 
 async fn ca_cert() -> Response {
     let Some(pem) = HTTPS.get().and_then(|h| std::fs::read(h.dir.join("ca.crt")).ok()) else {
-        return (StatusCode::NOT_FOUND, "Hoard hasn't made its certificate authority yet").into_response();
+        return (StatusCode::NOT_FOUND, tr!("error-https-no-ca")).into_response();
     };
     (
         [
@@ -896,7 +891,7 @@ async fn put_change(
     headers: HeaderMap,
     Json(change): Json<Change>,
 ) -> ApiResult<Json<Value>> {
-    let h = HTTPS.get().ok_or_else(|| AppError::unavailable("HTTPS isn't available on this server"))?;
+    let h = HTTPS.get().ok_or_else(|| AppError::unavailable(tr!("error-https-unavailable")))?;
     let _one = h.change.lock().await;
     let mut next = h.live().saved.clone();
     if let Some(m) = change.mode {
@@ -920,14 +915,14 @@ async fn put_change(
     }
     let upload = upload_of(change.cert, change.key);
     if upload.is_some() && next.mode != Mode::Custom {
-        return Err(AppError::bad_request("A certificate goes with “My certificate”"));
+        return Err(AppError::bad_request(tr!("error-https-certificate-mode")));
     }
 
     let public_url = state.settings.get().public_url.clone();
     let dir = h.dir.clone();
-    let (to_save, upload) = (next.clone(), upload);
+    let (to_save, upload, language) = (next.clone(), upload, crate::i18n::current());
     let (built, upload) = tokio::task::spawn_blocking(move || {
-        let built = build(&dir, &to_save, public_url.as_deref(), upload.as_ref());
+        let built = crate::i18n::blocking(language, || build(&dir, &to_save, public_url.as_deref(), upload.as_ref()));
         (built, upload)
     })
     .await?;
@@ -936,7 +931,7 @@ async fn put_change(
         let config = server_config(&b.chain, &b.key, &[b"h2", b"http/1.1"])?;
         try_handshake(Arc::new(config))
             .await
-            .map_err(|e| AppError::bad_request(format!("The certificate didn't work in a test connection: {e:#}")))?;
+            .map_err(|e| AppError::bad_request(tr!("error-https-test", reason = format!("{e:#}"))))?;
     }
     if let Some(u) = &upload {
         u.store(&h.dir)?;

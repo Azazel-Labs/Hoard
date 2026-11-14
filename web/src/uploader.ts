@@ -7,6 +7,7 @@
 // - The server recognizes a re-sent file list, so if the tab is closed, dropping the same folder again continues
 //   where it stopped, and packs that already finished aren't imported twice.
 import { ApiError, authHeaders, signInNeeded, type Pack, type UploadFile } from './api'
+import { t } from './i18n'
 
 const SMALL = 4 * 1024 * 1024
 const BATCH_BYTES = 32 * 1024 * 1024
@@ -76,7 +77,7 @@ function send(
       }
       resolve({ status: xhr.status, body: parsed })
     }
-    xhr.onerror = () => reject(new Error('network error'))
+    xhr.onerror = () => reject(new Error(t('upload-network-error')))
     xhr.onabort = () => reject(new DOMException('aborted', 'AbortError'))
     signal.addEventListener('abort', () => xhr.abort(), { once: true })
     xhr.send(body)
@@ -97,7 +98,7 @@ async function withRetry<T>(what: string, signal: AbortSignal, fn: () => Promise
       await sleep(Math.min(30_000, 500 * 2 ** attempt))
     }
   }
-  throw new Error(`${what}: ${(lastError as Error)?.message ?? 'failed'} after ${MAX_ATTEMPTS} attempts`)
+  throw new Error(t('upload-gave-up', { what, error: (lastError as Error)?.message ?? t('upload-failed-plain'), attempts: MAX_ATTEMPTS }))
 }
 
 export async function uploadPackResumable(
@@ -119,7 +120,7 @@ export async function uploadPackResumable(
   })
   if (res.status === 409) {
     const body = await res.json().catch(() => ({}))
-    if (body.pack) throw new AlreadyImported(body.pack, body.error ?? 'already imported')
+    if (body.pack) throw new AlreadyImported(body.pack, body.error ?? t('upload-already-imported'))
   }
   const session = await json<Session & { resumed: boolean }>(res)
   onSession(session.pack.id)
@@ -171,7 +172,7 @@ export async function uploadPackResumable(
             report()
           }, signal).finally(() => inflight.delete(key))
           if (res.status === 401) signInNeeded()
-          if (res.status >= 300) throw new ApiError(res.status, res.body?.error ?? `upload failed (${res.status})`)
+          if (res.status >= 300) throw new ApiError(res.status, res.body?.error ?? t('upload-part-failed', { status: res.status }))
           // Parts finish in any order: keep the largest count the server has given.
           acked.set(w.path, Math.max(acked.get(w.path) ?? 0, res.body.received as number))
           report()
@@ -188,7 +189,7 @@ export async function uploadPackResumable(
       group.push(pendingSmall[i++])
     }
     tasks.push(() =>
-      withRetry(`batch of ${group.length} files`, signal, async () => {
+      withRetry(t('upload-batch', { count: group.length }), signal, async () => {
         const form = new FormData()
         for (const w of group) {
           form.append('relpath', w.path)
@@ -200,7 +201,7 @@ export async function uploadPackResumable(
           report()
         }, signal).finally(() => inflight.delete(key))
         if (res.status === 401) signInNeeded()
-        if (res.status >= 300) throw new ApiError(res.status, res.body?.error ?? `batch failed (${res.status})`)
+        if (res.status >= 300) throw new ApiError(res.status, res.body?.error ?? t('upload-batch-failed', { status: res.status }))
         for (const w of group) acked.set(w.path, w.size)
         report()
       }),
@@ -216,7 +217,7 @@ export async function uploadPackResumable(
   })
   await Promise.all(workers)
 
-  const pack = await withRetry('finish upload', signal, async () =>
+  const pack = await withRetry(t('upload-finish'), signal, async () =>
     json<Pack>(await fetch(`${base}/complete`, { method: 'POST', headers: headers(), signal })),
   )
   return pack

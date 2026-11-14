@@ -3,6 +3,7 @@
 // and what it's waiting for.
 import { computed, onMounted, onUnmounted, reactive, ref, watch } from 'vue'
 import { ApiError, api, type Settings, type UpdateStatus } from '../api'
+import { formatDate, t } from '../i18n'
 import { showError, showOk } from '../ui'
 
 const props = defineProps<{ settings: Settings }>()
@@ -51,10 +52,10 @@ async function save() {
     if (form.auth) patch.update_hook_auth = form.auth.trim()
     else if (form.removeAuth || !url) patch.update_hook_auth = ''
     emit('saved', await api.saveSettings(patch))
-    showOk(url ? 'Hoard will call it when an update is ready' : 'No address to call')
+    showOk(url ? t('updates-saved') : t('updates-saved-none'))
     void load()
   } catch (e) {
-    failed(e, "Couldn't save")
+    failed(e, t('updates-save-failed'))
   } finally {
     busy.value = false
   }
@@ -64,17 +65,17 @@ async function callNow() {
   busy.value = true
   try {
     const call = await api.callUpdateHook()
-    if (call.ok) showOk(`It answered ${call.result}`)
-    else showError(`It didn't take the request: ${call.result}`)
+    if (call.ok) showOk(t('updates-call-answered', { result: call.result }))
+    else showError(t('updates-call-refused', { result: call.result }))
     void load()
   } catch (e) {
-    failed(e, "Couldn't call it")
+    failed(e, t('updates-call-failed'))
   } finally {
     busy.value = false
   }
 }
 
-const when = (iso: string) => new Date(iso).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' })
+const when = (iso: string) => formatDate(iso, { dateStyle: 'medium', timeStyle: 'short' })
 
 /** One line on where things stand: nothing to do, waiting for quiet, or how the last call went. */
 const line = computed((): { state: string; text: string } | null => {
@@ -83,41 +84,37 @@ const line = computed((): { state: string; text: string } | null => {
   const last = st.hook.last
   if (last && (!st.update || last.version === st.update.version)) {
     return last.ok
-      ? { state: 'ready', text: `Called ${when(last.at)} for ${last.version}: ${last.result}` }
-      : { state: 'unavailable', text: `Called ${when(last.at)} for ${last.version}: ${last.result}. Hoard tries again in an hour.` }
+      ? { state: 'ready', text: t('updates-called', { when: when(last.at), version: last.version, result: last.result }) }
+      : { state: 'unavailable', text: t('updates-called-failed', { when: when(last.at), version: last.version, result: last.result }) }
   }
-  if (!st.update) return { state: 'off', text: `Hoard ${st.version} is the latest release.` }
-  if (!st.hook.set) return { state: 'off', text: `Hoard ${st.update.version} is out.` }
-  if (st.idle) return { state: 'looking', text: `Hoard ${st.update.version} is out; calling within a couple of minutes, while nothing is going on.` }
+  if (!st.update) return { state: 'off', text: t('updates-latest', { version: st.version }) }
+  if (!st.hook.set) return { state: 'off', text: t('updates-out', { version: st.update.version }) }
+  if (st.idle) return { state: 'looking', text: t('updates-out-idle', { version: st.update.version }) }
   const parts = [
     ...st.busy.work.slice(0, 2),
-    st.busy.work.length > 2 ? `${st.busy.work.length - 2} more` : '',
-    st.busy.queued ? `${st.busy.queued} job${st.busy.queued === 1 ? '' : 's'} waiting` : '',
-    st.busy.uploads ? `${st.busy.uploads} upload${st.busy.uploads === 1 ? '' : 's'}` : '',
+    st.busy.work.length > 2 ? t('updates-busy-more', { count: st.busy.work.length - 2 }) : '',
+    st.busy.queued ? t('updates-busy-jobs', { count: st.busy.queued }) : '',
+    st.busy.uploads ? t('updates-busy-uploads', { count: st.busy.uploads }) : '',
   ].filter(Boolean)
-  return { state: 'looking', text: `Hoard ${st.update.version} is out; waiting until nothing is going on (${parts.join(', ')}).` }
+  return { state: 'looking', text: t('updates-out-busy', { version: st.update.version, work: parts.join(t('updates-list-separator')) }) }
 })
 </script>
 
 <template>
   <div class="hook">
-    <p class="what">
-      When a new release is out, Hoard can call an address once nothing is going on (no uploads, jobs, conversions or
-      maintenance), so whatever updates its container doesn’t restart it mid-upload. It sends a POST with the
-      release in a JSON body. This needs the release check above.
-    </p>
+    <p class="what">{{ t('updates-what') }}</p>
     <form class="grid" @submit.prevent="save">
-      <label for="hook-url">Address to call</label>
+      <label for="hook-url">{{ t('updates-url') }}</label>
       <input
         id="hook-url"
         v-model="form.url"
         class="field mono"
         type="url"
         spellcheck="false"
-        placeholder="None (e.g. http://watchtower:8080/v1/update?container=hoard&amp;async=true)"
+        :placeholder="t('updates-url-placeholder')"
         :disabled="busy"
       />
-      <label for="hook-auth">Authorization</label>
+      <label for="hook-auth">{{ t('updates-auth') }}</label>
       <div class="key">
         <input
           id="hook-auth"
@@ -125,17 +122,17 @@ const line = computed((): { state: string; text: string } | null => {
           class="field mono"
           type="password"
           autocomplete="off"
-          :placeholder="keptAuth ? 'Saved (type to replace)' : 'None (e.g. Bearer my-token)'"
+          :placeholder="keptAuth ? t('updates-auth-saved') : t('updates-auth-placeholder')"
           :disabled="busy"
           @input="form.removeAuth = false"
         />
-        <button v-if="keptAuth && !form.auth" type="button" class="link" @click="form.removeAuth = true">Remove</button>
+        <button v-if="keptAuth && !form.auth" type="button" class="link" @click="form.removeAuth = true">{{ t('updates-remove') }}</button>
       </div>
       <span />
       <div class="row">
-        <button class="btn primary" type="submit" :disabled="busy || !dirty">Save</button>
-        <button type="button" class="btn ghost" :disabled="busy || dirty || !settings.update_hook.url" title="Whatever it's wired to runs" @click="callNow">
-          Call it now
+        <button class="btn primary" type="submit" :disabled="busy || !dirty">{{ t('updates-save') }}</button>
+        <button type="button" class="btn ghost" :disabled="busy || dirty || !settings.update_hook.url" :title="t('updates-call-now-title')" @click="callNow">
+          {{ t('updates-call-now') }}
         </button>
       </div>
     </form>
@@ -144,22 +141,19 @@ const line = computed((): { state: string; text: string } | null => {
       <span class="text">{{ line.text }}</span>
     </p>
     <details class="hint">
-      <summary>What can it call?</summary>
+      <summary>{{ t('updates-what-calls') }}</summary>
       <ul>
         <li>
-          <b>Watchtower’s HTTP API</b>: <code>http://watchtower:8080/v1/update?container=hoard&amp;async=true</code>, with
-          <code>Bearer</code> and the token from <code>WATCHTOWER_HTTP_API_TOKEN</code> (its <code>update</code> endpoint switched on).
+          <b>{{ t('updates-watchtower') }}</b>{{ t('updates-watchtower-at') }}<code>http://watchtower:8080/v1/update?container=hoard&amp;async=true</code>{{ t('updates-watchtower-with') }}<code>Bearer</code>{{ t('updates-watchtower-token') }}<code>WATCHTOWER_HTTP_API_TOKEN</code>{{ t('updates-watchtower-its') }}<code>update</code>{{ t('updates-watchtower-endpoint') }}
         </li>
-        <li><b>A Portainer webhook</b> on Hoard’s stack or container, with re-pull image on. The token is in the URL.</li>
+        <li><b>{{ t('updates-portainer') }}</b>{{ t('updates-portainer-rest') }}</li>
         <li>
-          <b>A script on the host</b> behind a webhook listener (such as <code>adnanh/webhook</code>) that runs
-          <code>docker compose pull &amp;&amp; docker compose up -d</code>.
+          <b>{{ t('updates-script') }}</b>{{ t('updates-script-listener') }}<code>adnanh/webhook</code>{{ t('updates-script-runs') }}<code>docker compose pull &amp;&amp; docker compose up -d</code>{{ t('updates-script-end') }}
         </li>
-        <li><b>Home Assistant, n8n</b> or anything else that takes a webhook.</li>
+        <li><b>{{ t('updates-others') }}</b>{{ t('updates-others-rest') }}</li>
       </ul>
       <p>
-        Or skip the address: a script with an access token can poll <code>GET /api/admin/update</code> until
-        <code>update</code> is set and <code>idle</code> is true, then pull and restart Hoard.
+        {{ t('updates-poll-before') }}<code>GET /api/admin/update</code>{{ t('updates-poll-until') }}<code>update</code>{{ t('updates-poll-and') }}<code>idle</code>{{ t('updates-poll-after') }}
       </p>
     </details>
   </div>

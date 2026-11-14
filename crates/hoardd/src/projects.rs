@@ -5,6 +5,7 @@
 //! A project is known by its name (`project` in `hoard.toml`, or its folder's name): everyone syncing the same name
 //! reports into the same project, and each report replaces what it had.
 
+use crate::i18n::tr;
 use std::collections::BTreeMap;
 
 use axum::extract::{Path, State};
@@ -92,10 +93,10 @@ async fn report(
 ) -> ApiResult<Json<Value>> {
     let name = name.trim().to_owned();
     if name.is_empty() || name.chars().count() > 200 {
-        return Err(AppError::bad_request("a project needs a name of at most 200 characters"));
+        return Err(AppError::bad_request(tr!("error-project-name")));
     }
     if report.assets.len() > 1_000_000 {
-        return Err(AppError::bad_request("at most a million assets in one project"));
+        return Err(AppError::bad_request(tr!("error-project-too-big")));
     }
     let by = match &who {
         Who::User { name, .. } | Who::Token { name, .. } => name.clone(),
@@ -139,7 +140,7 @@ async fn forget(State(state): State<AppState>, Path(name): Path<String>) -> ApiR
     let name2 = name.clone();
     let n = db::call(&state.pool, move |c| Ok(c.execute("DELETE FROM projects WHERE name = ?1", [name2])?)).await?;
     if n == 0 {
-        return Err(AppError::not_found(format!("project {name}")));
+        return Err(AppError::not_found(tr!("error-project-not-found", name = name)));
     }
     Ok(StatusCode::NO_CONTENT)
 }
@@ -178,7 +179,7 @@ struct UsageExample {
 /// Which projects use any of these packs or assets, most-using first.
 async fn usage(State(state): State<AppState>, Json(req): Json<UsageRequest>) -> ApiResult<Json<Value>> {
     if req.packs.len() + req.assets.len() > 100_000 {
-        return Err(AppError::bad_request("at most 100,000 at a time"));
+        return Err(AppError::bad_request(tr!("error-project-too-many-at-once")));
     }
     let projects = db::call(&state.pool, move |c| projects_using(c, &req)).await?;
     Ok(Json(json!({ "projects": projects })))

@@ -4,6 +4,7 @@
 import { computed, nextTick, onMounted, ref } from 'vue'
 import { api, ApiError } from '../api'
 import { auth, siteName } from '../auth'
+import { t } from '../i18n'
 
 const props = defineProps<{ mode: 'setup' | 'login'; overlay?: boolean }>()
 const emit = defineEmits<{ done: []; close: [] }>()
@@ -63,21 +64,20 @@ async function submit() {
   <div class="signin" :class="{ overlay }" role="dialog" aria-modal="true" :aria-labelledby="`${f}-title`" @keydown.esc="overlay && emit('close')">
     <form :id="`${f}-form`" :name="f" class="card" method="post" :action="setup ? '/api/auth/setup' : '/api/auth/login'" @submit.prevent="submit">
       <p class="brand">{{ siteName() }}</p>
-      <h1 :id="`${f}-title`">{{ setup ? 'Create your account' : 'Sign in' }}</h1>
+      <h1 :id="`${f}-title`">{{ setup ? t('signin-create-title') : t('signin-title') }}</h1>
       <p class="lede">
         <template v-if="setup">
-          This server doesn’t have an account yet. The one you make here can do everything; add accounts for other people from Settings → Account
-          later.
+          {{ t('signin-setup-lede') }}
         </template>
-        <template v-else-if="overlay">Browsing is open to everyone here, but changes need an account.</template>
+        <template v-else-if="overlay">{{ t('signin-overlay-lede') }}</template>
       </p>
 
       <template v-if="others?.oauth">
-        <a class="btn primary oauth" href="/api/auth/oauth/start">Sign in with {{ others.oauth }}</a>
-        <p class="or"><span>or with a name and password</span></p>
+        <a class="btn primary oauth" href="/api/auth/oauth/start">{{ t('signin-with', { provider: others.oauth }) }}</a>
+        <p class="or"><span>{{ t('signin-or-password') }}</span></p>
       </template>
 
-      <label :for="`${f}-username`">{{ setup ? 'Username' : 'Name' }}</label>
+      <label :for="`${f}-username`">{{ setup ? t('signin-username') : t('signin-name') }}</label>
       <input
         :id="`${f}-username`"
         ref="nameEl"
@@ -90,7 +90,7 @@ async function submit() {
         maxlength="64"
         required
       />
-      <label :for="setup ? 'new-password' : 'current-password'">{{ setup ? 'New password' : 'Password' }}</label>
+      <label :for="setup ? 'new-password' : 'current-password'">{{ setup ? t('signin-new-password') : t('signin-password') }}</label>
       <input
         :id="setup ? 'new-password' : 'current-password'"
         :name="setup ? 'new-password' : 'password'"
@@ -103,8 +103,8 @@ async function submit() {
         :aria-describedby="setup ? 'signup-rule' : undefined"
       />
       <template v-if="setup">
-        <small id="signup-rule" class="rule">At least 8 characters.</small>
-        <label for="confirm-password">Confirm password</label>
+        <small id="signup-rule" class="rule">{{ t('signin-password-rule') }}</small>
+        <label for="confirm-password">{{ t('signin-confirm-password') }}</label>
         <input
           id="confirm-password"
           name="confirm-password"
@@ -116,9 +116,9 @@ async function submit() {
           :aria-invalid="mismatch"
           :aria-describedby="mismatch ? 'signup-mismatch' : undefined"
         />
-        <small v-if="mismatch" id="signup-mismatch" class="rule bad">The two passwords don’t match.</small>
+        <small v-if="mismatch" id="signup-mismatch" class="rule bad">{{ t('signin-mismatch') }}</small>
         <template v-if="needsCode">
-          <label for="setup-code">Setup code</label>
+          <label for="setup-code">{{ t('signin-setup-code') }}</label>
           <input
             id="setup-code"
             name="setup-code"
@@ -132,7 +132,7 @@ async function submit() {
             aria-describedby="setup-code-hint"
           />
           <small id="setup-code-hint" class="rule">
-            The code this server was given in <span class="mono">HOARD_SETUP_CODE</span>.
+            {{ t('signin-setup-code-hint-before') }}<span class="mono">HOARD_SETUP_CODE</span>{{ t('signin-setup-code-hint-after') }}
           </small>
         </template>
       </template>
@@ -141,15 +141,14 @@ async function submit() {
 
       <div class="actions">
         <button type="submit" class="btn primary" :disabled="!ready || busy">
-          {{ busy ? (setup ? 'Creating…' : 'Signing in…') : setup ? 'Create account' : 'Sign in' }}
+          {{ busy ? (setup ? t('signin-creating') : t('signin-signing-in')) : setup ? t('signin-create') : t('signin-submit') }}
         </button>
-        <button v-if="overlay" type="button" class="btn ghost" @click="emit('close')">Keep browsing</button>
+        <button v-if="overlay" type="button" class="btn ghost" @click="emit('close')">{{ t('signin-keep-browsing') }}</button>
       </div>
 
-      <p v-if="others?.directory" class="hint">Use your {{ others.directory }} name and password.</p>
+      <p v-if="others?.directory" class="hint">{{ t('signin-directory-hint', { directory: others.directory }) }}</p>
       <p v-if="!setup" class="hint">
-        Forgot a Hoard password? On the server, run <span class="mono">hoardd --reset-password &lt;name&gt;</span> (in Docker,
-        <span class="mono">docker compose exec hoard hoardd --reset-password &lt;name&gt;</span>) for a new one.
+        {{ t('signin-forgot-1') }}<span class="mono">hoardd --reset-password &lt;name&gt;</span>{{ t('signin-forgot-2') }}<span class="mono">docker compose exec hoard hoardd --reset-password &lt;name&gt;</span>{{ t('signin-forgot-3') }}
       </p>
     </form>
   </div>

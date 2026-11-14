@@ -16,6 +16,8 @@ use std::time::Duration;
 use anyhow::{Context, Result};
 use hoard_core::UpdateInfo;
 
+use crate::i18n::tr;
+
 const LATEST_RELEASE: &str = "https://api.github.com/repos/Azazel-Labs/Hoard/releases/latest";
 const FIRST_CHECK: Duration = Duration::from_secs(60);
 const INTERVAL: Duration = Duration::from_hours(6);
@@ -177,7 +179,7 @@ pub(crate) fn start_hook(state: &crate::AppState) {
 pub(crate) async fn call_hook(state: &crate::AppState, version: &str) -> HookCall {
     let settings = state.settings.get();
     let result = match settings.update_hook_url.as_deref() {
-        None => Err("no address to call is set".to_owned()),
+        None => Err(tr!("server-update-no-address")),
         Some(url) => {
             tracing::info!(version, url, "asking for an update");
             let mut req = state.http.post(url).timeout(Duration::from_secs(30)).json(&serde_json::json!({
@@ -192,7 +194,7 @@ pub(crate) async fn call_hook(state: &crate::AppState, version: &str) -> HookCal
             match req.send().await {
                 Ok(resp) if resp.status().is_success() => Ok(resp.status().to_string()),
                 Ok(resp) => Err(resp.status().to_string()),
-                Err(e) if e.is_timeout() => Err("no answer within 30 seconds".to_owned()),
+                Err(e) if e.is_timeout() => Err(tr!("server-update-no-answer")),
                 Err(e) => Err(format!("{e}")),
             }
         }
@@ -233,7 +235,7 @@ pub(crate) async fn call_handler(
     axum::extract::State(state): axum::extract::State<crate::AppState>,
 ) -> crate::error::ApiResult<axum::Json<HookCall>> {
     if state.settings.get().update_hook_url.is_none() {
-        return Err(crate::error::AppError::bad_request("set an address to call first"));
+        return Err(crate::error::AppError::bad_request(tr!("error-update-hook-not-set")));
     }
     let version = available().map_or_else(|| hoard_core::VERSION.to_owned(), |u| u.version);
     Ok(axum::Json(call_hook(&state, &version).await))

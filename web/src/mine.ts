@@ -4,6 +4,7 @@ import { reactive, watch } from 'vue'
 import { api, type SavedSearch } from './api'
 import { auth } from './auth'
 import { showError } from './ui'
+import { t } from './i18n'
 
 export const mine = reactive({
   favourites: new Set<string>(),
@@ -47,7 +48,7 @@ export async function setFavourite(ids: string[], on: boolean): Promise<void> {
     mine.favourites = new Set((await api.setFavourites(on ? { add: ids } : { remove: ids })).assets)
   } catch (e) {
     mine.favourites = was
-    showError(`Couldn't ${on ? 'add to' : 'take out of'} your favourites: ${(e as Error).message}`)
+    showError(on ? t('projects-favourite-add-failed', { error: (e as Error).message }) : t('projects-favourite-remove-failed', { error: (e as Error).message }))
   }
 }
 
@@ -60,7 +61,7 @@ export async function saveSearch(name: string, query: string): Promise<boolean> 
     mine.searches = (await api.saveSearch(name, query)).searches
     return true
   } catch (e) {
-    showError(`Couldn't save the search: ${(e as Error).message}`)
+    showError(t('projects-save-search-failed', { error: (e as Error).message }))
     return false
   }
 }
@@ -70,6 +71,6 @@ export async function forgetSearch(s: SavedSearch): Promise<void> {
     await api.deleteSearch(s.id)
     mine.searches = mine.searches.filter((x) => x.id !== s.id)
   } catch (e) {
-    showError(`Couldn't remove ${s.name}: ${(e as Error).message}`)
+    showError(t('projects-forget-search-failed', { name: s.name, error: (e as Error).message }))
   }
 }

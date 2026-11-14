@@ -2,6 +2,7 @@
 //! Looking is enough for both, since neither changes the library. An access token or connected app acts for the
 //! account that made it.
 
+use crate::i18n::tr;
 use axum::extract::{Path, State};
 use axum::http::StatusCode;
 use axum::routing::{delete, get};
@@ -25,7 +26,7 @@ pub(crate) fn router() -> Router<AppState> {
 
 /// The person `who` is, or acts for.
 fn owner(who: &Who) -> ApiResult<i64> {
-    who.owner().ok_or_else(|| AppError::forbidden("this token's account is gone, so it has no favourites or searches"))
+    who.owner().ok_or_else(|| AppError::forbidden(tr!("error-token-account-gone")))
 }
 
 /// A person's favourite assets, most recently starred first.
@@ -57,7 +58,7 @@ async fn change_favourites(
 ) -> ApiResult<Json<Value>> {
     let user = owner(&who)?;
     if change.add.len() + change.remove.len() > 10_000 {
-        return Err(AppError::bad_request("at most 10,000 at a time"));
+        return Err(AppError::bad_request(tr!("error-favourites-too-many")));
     }
     let ids = db::call(&state.pool, move |c| {
         let tx = c.transaction()?;
@@ -115,10 +116,10 @@ async fn save_search(
     let name = s.name.trim().to_owned();
     let query = s.query.trim().trim_start_matches('?').to_owned();
     if name.is_empty() || name.chars().count() > 80 {
-        return Err(AppError::bad_request("a saved search needs a name of at most 80 characters"));
+        return Err(AppError::bad_request(tr!("error-saved-search-name")));
     }
     if query.len() > 2000 {
-        return Err(AppError::bad_request("that search is too long to save"));
+        return Err(AppError::bad_request(tr!("error-saved-search-too-long")));
     }
     let all = db::call(&state.pool, move |c| {
         c.execute(
@@ -143,7 +144,7 @@ async fn delete_search(
     })
     .await?;
     if n == 0 {
-        return Err(AppError::not_found(format!("saved search {id}")));
+        return Err(AppError::not_found(tr!("error-saved-search-not-found", id = id)));
     }
     Ok(StatusCode::NO_CONTENT)
 }

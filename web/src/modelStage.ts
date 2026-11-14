@@ -9,6 +9,7 @@ import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js'
 import { TGALoader } from 'three/addons/loaders/TGALoader.js'
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js'
 import { api, asUrl, liteUrl, packFileUrl, thumbUrl, type Asset, type AssetLink } from './api'
+import { t } from './i18n'
 import { applyToModel } from './materialMaps'
 
 export type Background = 'checker' | 'dark' | 'grey' | 'light' | 'env'
@@ -211,16 +212,16 @@ async function loadModel(url: string, ext: string, manager: THREE.LoadingManager
         const g = await new GLTFLoader(manager).parseAsync(await res.arrayBuffer(), '')
         return { object: g.scene, animations: g.animations }
       }
-      throw new Error('the server is still converting this model')
+      throw new Error(t('model-error-converting'))
     }
     case 'dae': {
       const { ColladaLoader } = await import('three/addons/loaders/ColladaLoader.js')
       const c = await new ColladaLoader(manager).loadAsync(url)
-      if (!c) throw new Error('empty Collada file')
+      if (!c) throw new Error(t('model-error-empty-collada'))
       return { object: c.scene, animations: c.scene.animations ?? [] }
     }
     default:
-      throw new Error(`No browser loader for .${ext}`)
+      throw new Error(t('model-error-no-loader', { ext }))
   }
 }
 

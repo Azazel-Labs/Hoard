@@ -3,6 +3,7 @@
 // your own certificate. HTTPS is served on the same port as http://, and a change applies at once.
 import { computed, onMounted, ref, watch } from 'vue'
 import { api, type CertCheck, type CertInfo, type HttpsMode, type HttpsStatus } from '../api'
+import { formatDate, t } from '../i18n'
 import { copyText, showError, showOk } from '../ui'
 
 const st = ref<HttpsStatus | null>(null)
@@ -35,7 +36,7 @@ async function load() {
   try {
     adopt(await api.https())
   } catch (e) {
-    showError(`Couldn't load HTTPS: ${(e as Error).message}`)
+    showError(t('https-load-failed', { error: (e as Error).message }))
   }
 }
 onMounted(load)
@@ -97,11 +98,11 @@ async function apply() {
     checked.value = null
     adopt(s)
     if (!s.on && secure) {
-      showOk('HTTPS is off. Taking you to http://')
+      showOk(t('https-off-redirecting'))
       setTimeout(() => location.replace(httpUrl), 800)
-    } else if (s.on && !was) showOk('HTTPS is on')
-    else if (s.on) showOk('Saved. New connections use the new certificate.')
-    else showOk('HTTPS is off')
+    } else if (s.on && !was) showOk(t('https-now-on'))
+    else if (s.on) showOk(t('https-saved'))
+    else showOk(t('https-now-off'))
   } catch (e) {
     showError((e as Error).message)
   } finally {
@@ -114,7 +115,7 @@ async function toggle(change: { http3?: boolean; redirect?: boolean }) {
   try {
     const s = await api.saveHttps(change)
     st.value = { ...s }
-    if (change.http3 && s.http3_error) showError(`HTTP/3 couldn't start: ${s.http3_error}`)
+    if (change.http3 && s.http3_error) showError(t('https-http3-failed-toast', { error: s.http3_error }))
   } catch (e) {
     showError((e as Error).message)
   } finally {
@@ -150,59 +151,58 @@ async function pick(e: Event, into: 'cert' | 'key') {
 }
 
 async function copy(text: string) {
-  if (await copyText(text)) showOk('Copied')
-  else showError('Couldn’t copy: select it and copy it yourself')
+  if (await copyText(text)) showOk(t('https-copied'))
+  else showError(t('https-copy-failed'))
 }
 
-const fmt = new Intl.DateTimeFormat(undefined, { dateStyle: 'medium' })
-const day = (unix: number) => fmt.format(new Date(unix * 1000))
+const day = (unix: number) => formatDate(unix * 1000, { dateStyle: 'medium' })
 const daysLeft = (c: CertInfo) => Math.floor((c.not_after * 1000 - Date.now()) / 86_400_000)
 
-const MODES: { value: HttpsMode; label: string; hint: string }[] = [
-  { value: 'off', label: 'Off', hint: 'Plain http:// only.' },
-  {
-    value: 'own',
-    label: 'Hoard’s own certificate',
-    hint: 'Hoard makes one for this server’s addresses. Install Hoard’s certificate authority once on each device and its browsers trust it.',
-  },
-  {
-    value: 'custom',
-    label: 'My certificate',
-    hint: 'One you already have, e.g. from tailscale cert or Let’s Encrypt. Browsers trust it without installing anything.',
-  },
+// A function, so the labels are read in the current language each time they're shown.
+const MODES = (): { value: HttpsMode; label: string; hint: string }[] => [
+  { value: 'off', label: t('https-mode-off'), hint: t('https-mode-off-hint') },
+  { value: 'own', label: t('https-mode-own'), hint: t('https-mode-own-hint') },
+  { value: 'custom', label: t('https-mode-custom'), hint: t('https-mode-custom-hint') },
 ]
+/** Why this browser doesn't trust https:// here yet. */
+const untrusted = computed(() =>
+  st.value?.mode === 'own'
+    ? t('https-untrusted-own', { host })
+    : st.value?.covers_this_address === false
+      ? t('https-untrusted-uncovered', { host })
+      : t('https-untrusted', { host }),
+)
 </script>
 
 <template>
   <div v-if="st" class="https" :aria-busy="busy">
     <section>
-      <div class="sh"><h3>Now</h3></div>
-      <p v-if="st.error" class="bad">HTTPS is set up but couldn’t start: {{ st.error }}</p>
+      <div class="sh"><h3>{{ t('https-now') }}</h3></div>
+      <p v-if="st.error" class="bad">{{ t('https-start-failed', { error: st.error }) }}</p>
       <template v-if="st.on">
         <p class="what">
-          HTTPS is on, on port {{ st.port }} like http://.
-          <template v-if="secure">You’re using it now.</template>
-          <a v-else :href="httpsUrl" class="link">Open {{ httpsUrl.replace(/\/$/, '') }}</a>
+          {{ t('https-on-port', { port: String(st.port) }) }}
+          <template v-if="secure">{{ t('https-using-it') }}</template>
+          <a v-else :href="httpsUrl" class="link">{{ t('https-open', { url: httpsUrl.replace(/\/$/, '') }) }}</a>
         </p>
-        <p v-if="!secure && trusted === true" class="what good">This browser trusts it.</p>
+        <p v-if="!secure && trusted === true" class="what good">{{ t('https-trusted') }}</p>
         <p v-else-if="!secure && trusted === false" class="what warn">
-          This browser doesn’t trust it for {{ host }} yet<template v-if="st.mode === 'own'">: install Hoard’s certificate authority below</template><template v-else-if="st.covers_this_address === false">: the certificate doesn’t cover this address</template>.
-          You’ll see a warning you can click past.
+          {{ untrusted }}
         </p>
         <p v-if="st.cert" class="what">
-          Certificate for <span class="mono">{{ st.cert.names.join(', ') }}</span>, until {{ day(st.cert.not_after) }}<template v-if="st.mode === 'own'"> (renewed by itself)</template>.
+          {{ t('https-cert-for-before') }}<span class="mono">{{ st.cert.names.join(', ') }}</span>{{ st.mode === 'own' ? t('https-cert-for-after-own', { date: day(st.cert.not_after) }) : t('https-cert-for-after', { date: day(st.cert.not_after) }) }}
         </p>
         <p v-if="st.covers_this_address === false && st.this_address" class="what warn">
-          It doesn’t cover <span class="mono">{{ st.this_address }}</span>, the address you’re using.
+          {{ t('https-not-covered-before') }}<span class="mono">{{ st.this_address }}</span>{{ t('https-not-covered-after') }}
         </p>
       </template>
-      <p v-else class="what">HTTPS is off: pages are served over plain http://.</p>
+      <p v-else class="what">{{ t('https-is-off') }}</p>
     </section>
 
     <section>
       <div class="sh"><h3>HTTPS</h3></div>
       <div class="choices" role="radiogroup" aria-label="HTTPS">
-        <label v-for="m in MODES" :key="m.value" :class="{ on: mode === m.value }">
+        <label v-for="m in MODES()" :key="m.value" :class="{ on: mode === m.value }">
           <input v-model="mode" type="radio" name="https-mode" :value="m.value" :disabled="busy" @change="chose" />
           <span><strong>{{ m.label }}</strong><small>{{ m.hint }}</small></span>
         </label>
@@ -210,68 +210,65 @@ const MODES: { value: HttpsMode; label: string; hint: string }[] = [
     </section>
 
     <section v-if="mode === 'own'">
-      <div class="sh"><h3>Addresses</h3></div>
-      <p class="what">The certificate covers the addresses Hoard found, and any you add (a name your router gives it, a Tailscale name).</p>
+      <div class="sh"><h3>{{ t('https-addresses') }}</h3></div>
+      <p class="what">{{ t('https-addresses-hint') }}</p>
       <ul class="chips">
         <li v-for="n in st.found" :key="n" class="chip mono">{{ n }}</li>
         <li v-for="n in names" :key="n" class="chip mono added">
           {{ n }}
-          <button type="button" class="x" :aria-label="`Remove ${n}`" :disabled="busy" @click="removeName(n)">×</button>
+          <button type="button" class="x" :aria-label="t('https-remove-name', { name: n })" :disabled="busy" @click="removeName(n)">×</button>
         </li>
       </ul>
       <form class="add" @submit.prevent="addName">
-        <label class="visually-hidden" for="https-name">Another address</label>
-        <input id="https-name" v-model="newName" class="field mono" placeholder="Another address, e.g. nas.local" autocomplete="off" />
-        <button type="submit" class="btn" :disabled="!newName.trim() || busy">Add</button>
+        <label class="visually-hidden" for="https-name">{{ t('https-another-address') }}</label>
+        <input id="https-name" v-model="newName" class="field mono" :placeholder="t('https-another-address-placeholder')" autocomplete="off" />
+        <button type="submit" class="btn" :disabled="!newName.trim() || busy">{{ t('https-add') }}</button>
       </form>
     </section>
 
     <section v-if="mode === 'custom'">
-      <div class="sh"><h3>Your certificate</h3></div>
+      <div class="sh"><h3>{{ t('https-your-cert') }}</h3></div>
       <p v-if="st.custom && !pasted" class="what">
-        Saved: <span class="mono">{{ st.custom.names.join(', ') || st.custom.subject }}</span> from {{ st.custom.issuer }},
-        until {{ day(st.custom.not_after) }}. Paste a new one to replace it.
+        {{ t('https-saved-cert-before') }}<span class="mono">{{ st.custom.names.join(', ') || st.custom.subject }}</span>{{ t('https-saved-cert-after', { issuer: st.custom.issuer, date: day(st.custom.not_after) }) }}
       </p>
       <p class="what">
-        The certificate (with its chain) and its private key, as PEM text: the files that start with
-        <span class="mono">-----BEGIN</span>.
+        {{ t('https-pem-before') }}<span class="mono">-----BEGIN</span>{{ t('https-pem-after') }}
       </p>
       <div class="pem">
-        <label for="https-cert">Certificate</label>
+        <label for="https-cert">{{ t('https-certificate') }}</label>
         <textarea id="https-cert" v-model="cert" class="field mono" rows="5" spellcheck="false" placeholder="-----BEGIN CERTIFICATE-----" />
-        <label class="btn ghost small file">Choose file…<input type="file" accept=".pem,.crt,.cer,.txt" @change="pick($event, 'cert')" /></label>
-        <label for="https-key">Private key</label>
+        <label class="btn ghost small file">{{ t('https-choose-file') }}<input type="file" accept=".pem,.crt,.cer,.txt" @change="pick($event, 'cert')" /></label>
+        <label for="https-key">{{ t('https-private-key') }}</label>
         <textarea id="https-key" v-model="key" class="field mono" rows="5" spellcheck="false" placeholder="-----BEGIN PRIVATE KEY-----" />
-        <label class="btn ghost small file">Choose file…<input type="file" accept=".pem,.key,.txt" @change="pick($event, 'key')" /></label>
+        <label class="btn ghost small file">{{ t('https-choose-file') }}<input type="file" accept=".pem,.key,.txt" @change="pick($event, 'key')" /></label>
       </div>
       <p v-if="checkError" class="bad" role="alert">{{ checkError }}</p>
       <div v-else-if="checked" class="checked" role="status">
         <p>
-          For <span class="mono">{{ checked.cert.names.join(', ') || checked.cert.subject }}</span>, from {{ checked.cert.issuer }},
-          until {{ day(checked.cert.not_after) }}<template v-if="!checked.problem"> ({{ daysLeft(checked.cert) }} days)</template>.
+          {{ t('https-checked-before') }}<span class="mono">{{ checked.cert.names.join(', ') || checked.cert.subject }}</span>{{
+            checked.problem
+              ? t('https-checked-after', { issuer: checked.cert.issuer, date: day(checked.cert.not_after) })
+              : t('https-checked-after-days', { issuer: checked.cert.issuer, date: day(checked.cert.not_after), days: daysLeft(checked.cert) })
+          }}
         </p>
         <p v-if="checked.problem" class="bad">{{ checked.problem }}</p>
-        <p v-else-if="checked.cert.self_signed" class="warn">It’s self-signed: browsers will warn about it.</p>
+        <p v-else-if="checked.cert.self_signed" class="warn">{{ t('https-self-signed') }}</p>
         <p v-if="checked.covers_this_address === false" class="warn">
-          It doesn’t cover <span class="mono">{{ checked.this_address }}</span>, the address you’re using.
+          {{ t('https-not-covered-before') }}<span class="mono">{{ checked.this_address }}</span>{{ t('https-not-covered-after') }}
         </p>
-        <p v-else-if="!checked.problem" class="good">The key matches.</p>
+        <p v-else-if="!checked.problem" class="good">{{ t('https-key-matches') }}</p>
       </div>
       <details class="how">
-        <summary>Where to get one</summary>
+        <summary>{{ t('https-where-to-get') }}</summary>
         <ul>
           <li>
-            <strong>Tailscale:</strong> turn on HTTPS for your tailnet, then run
-            <span class="mono">tailscale cert &lt;name&gt;.&lt;tailnet&gt;.ts.net</span> on the server and upload the two files.
-            They last 90 days: run it again and upload them again before then.
+            <strong>Tailscale:</strong> {{ t('https-get-tailscale-before') }}<span class="mono">tailscale cert &lt;name&gt;.&lt;tailnet&gt;.ts.net</span>{{ t('https-get-tailscale-after') }}
           </li>
           <li>
-            <strong>Let’s Encrypt or another ACME client</strong> (certbot, acme.sh, lego) for a domain you own: upload
-            <span class="mono">fullchain.pem</span> and <span class="mono">privkey.pem</span>.
+            <strong>{{ t('https-get-acme-title') }}</strong> {{ t('https-get-acme-before') }}<span class="mono">fullchain.pem</span>{{ t('https-get-acme-and') }}<span class="mono">privkey.pem</span>{{ t('https-get-acme-after') }}
           </li>
           <li>
-            <strong>A reverse proxy</strong> (Caddy, Traefik, nginx, Cloudflare Tunnel) that has the certificate: leave HTTPS off
-            here and let the proxy send plain http:// to Hoard.
+            <strong>{{ t('https-get-proxy-title') }}</strong> {{ t('https-get-proxy') }}
           </li>
         </ul>
       </details>
@@ -279,85 +276,77 @@ const MODES: { value: HttpsMode; label: string; hint: string }[] = [
 
     <div class="apply">
       <button type="button" class="btn primary" :disabled="!canApply" @click="apply">
-        {{ busy ? 'Trying it…' : 'Apply' }}
+        {{ busy ? t('https-trying') : t('https-apply') }}
       </button>
-      <small v-if="changed">Hoard tries the new setup first, and keeps what it has if that doesn’t work.</small>
+      <small v-if="changed">{{ t('https-apply-hint') }}</small>
     </div>
 
     <section v-if="st.mode === 'own' && st.ca">
       <div class="sh">
-        <h3>Trust Hoard on your devices</h3>
-        <a class="btn" href="/api/https/ca.crt" download="hoard-ca.crt">Download hoard-ca.crt</a>
+        <h3>{{ t('https-trust-title') }}</h3>
+        <a class="btn" href="/api/https/ca.crt" download="hoard-ca.crt">{{ t('https-download-ca') }}</a>
       </div>
       <p class="what">
-        Install Hoard’s certificate authority once on each device, and its browsers trust this server (and any certificate
-        Hoard makes for it later). It can only vouch for this Hoard. Fingerprint (SHA-256):
+        {{ t('https-trust-hint') }}
       </p>
       <p class="fp mono" @click="copy(st.ca.fingerprint)">{{ st.ca.fingerprint }}</p>
       <details class="how">
         <summary>Windows (Chrome, Edge)</summary>
-        <p>Open the file → Install Certificate → Current User → Place all certificates in the following store → Browse → Trusted Root Certification Authorities → Finish. Restart the browser.</p>
+        <p>{{ t('https-ca-windows') }}</p>
       </details>
       <details class="how">
         <summary>macOS (Safari, Chrome)</summary>
-        <p>Open the file; it goes into Keychain Access. Double-click “{{ st.ca.subject }}” there → Trust → When using this certificate: Always Trust.</p>
+        <p>{{ t('https-ca-macos', { subject: st.ca.subject }) }}</p>
       </details>
       <details class="how">
-        <summary>iPhone and iPad</summary>
-        <p>Download it in Safari and allow it. Settings → Profile Downloaded → Install. Then Settings → General → About → Certificate Trust Settings → turn on “{{ st.ca.subject }}”.</p>
+        <summary>{{ t('https-ca-ios-title') }}</summary>
+        <p>{{ t('https-ca-ios', { subject: st.ca.subject }) }}</p>
       </details>
       <details class="how">
         <summary>Android</summary>
-        <p>Settings → Security → More security settings → Encryption &amp; credentials → Install a certificate → CA certificate, and pick the file. (The names vary a little between phones; search Settings for “certificate”.)</p>
+        <p>{{ t('https-ca-android') }}</p>
       </details>
       <details class="how">
         <summary>Linux</summary>
         <p>
-          Debian and Ubuntu: <span class="mono">sudo cp hoard-ca.crt /usr/local/share/ca-certificates/ &amp;&amp; sudo update-ca-certificates</span>.
-          Fedora and Arch: <span class="mono">sudo trust anchor hoard-ca.crt</span>. Chrome on Linux keeps its own list:
-          Settings → Privacy and security → Security → Manage certificates → Import.
+          {{ t('https-ca-linux-1') }}<span class="mono">sudo cp hoard-ca.crt /usr/local/share/ca-certificates/ &amp;&amp; sudo update-ca-certificates</span>{{ t('https-ca-linux-2') }}<span class="mono">sudo trust anchor hoard-ca.crt</span>{{ t('https-ca-linux-3') }}
         </p>
       </details>
       <details class="how">
         <summary>Firefox</summary>
-        <p>Firefox keeps its own list: Settings → Privacy &amp; Security → Certificates → View Certificates → Authorities → Import, and tick “Trust this CA to identify websites”.</p>
+        <p>{{ t('https-ca-firefox') }}</p>
       </details>
       <details class="how">
-        <summary>The hoard command line tool</summary>
-        <p><span class="mono">hoard --server https://{{ here }} --ca-cert hoard-ca.crt …</span>, or put the path in <span class="mono">HOARD_CA_CERT</span>.</p>
+        <summary>{{ t('https-ca-cli-title') }}</summary>
+        <p>{{ t('https-ca-cli-before') }}<span class="mono">hoard --server https://{{ here }} --ca-cert hoard-ca.crt …</span>{{ t('https-ca-cli-middle') }}<span class="mono">HOARD_CA_CERT</span>{{ t('https-ca-cli-after') }}</p>
       </details>
     </section>
 
     <section>
-      <div class="sh"><h3>Options</h3></div>
+      <div class="sh"><h3>{{ t('https-options') }}</h3></div>
       <label class="check">
         <input type="checkbox" :checked="st.redirect" :disabled="busy" @change="toggle({ redirect: ($event.target as HTMLInputElement).checked })" />
-        Send browsers on other devices from http:// to https://
+        {{ t('https-redirect') }}
       </label>
       <p class="what">
-        Only page loads are sent over. The hoard command line tool, the Unreal worker, scripts and AI apps keep working on
-        http://, and so does http://localhost on the server itself.
+        {{ t('https-redirect-hint') }}
       </p>
       <label class="check">
         <input type="checkbox" :checked="st.http3" :disabled="busy" @change="toggle({ http3: ($event.target as HTMLInputElement).checked })" />
         HTTP/3
       </label>
       <p class="what">
-        Faster on flaky Wi-Fi and phones. Needs HTTPS, and UDP port {{ st.port }} open as well as TCP (in Docker:
-        <span class="mono">"{{ st.port }}:{{ st.port }}/udp"</span>).
-        <template v-if="st.http3 && st.http3_running"> Running.</template>
-        <template v-else-if="st.http3 && !st.on"> It starts when HTTPS is on.</template>
+        {{ t('https-http3-hint-before', { port: String(st.port) }) }}<span class="mono">"{{ st.port }}:{{ st.port }}/udp"</span>{{ t('https-http3-hint-after') }}
+        <template v-if="st.http3 && st.http3_running"> {{ t('https-http3-running') }}</template>
+        <template v-else-if="st.http3 && !st.on"> {{ t('https-http3-waits') }}</template>
       </p>
-      <p v-if="st.http3_error" class="bad">HTTP/3 couldn’t start: {{ st.http3_error }}</p>
+      <p v-if="st.http3_error" class="bad">{{ t('https-http3-failed', { error: st.http3_error }) }}</p>
     </section>
 
     <section>
-      <div class="sh"><h3>If you get locked out</h3></div>
+      <div class="sh"><h3>{{ t('https-lockout-title') }}</h3></div>
       <p class="what">
-        <span class="mono">http://localhost:{{ st.port }}</span> on the server itself always works over plain http://. Or turn
-        HTTPS off from the server’s command line and start Hoard again:
-        <span class="mono">hoardd --https-off</span> (in Docker: <span class="mono">docker compose exec hoard hoardd --https-off</span>,
-        then <span class="mono">docker compose restart hoard</span>).
+        {{ t('https-lockout-1') }}<span class="mono">http://localhost:{{ st.port }}</span>{{ t('https-lockout-2') }}<span class="mono">hoardd --https-off</span>{{ t('https-lockout-3') }}<span class="mono">docker compose exec hoard hoardd --https-off</span>{{ t('https-lockout-4') }}<span class="mono">docker compose restart hoard</span>{{ t('https-lockout-5') }}
       </p>
     </section>
   </div>

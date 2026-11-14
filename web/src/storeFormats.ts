@@ -3,6 +3,7 @@
 // docs/store-formats.md).
 import { ref } from 'vue'
 import type { FilePlace } from './api'
+import { t } from './i18n'
 
 /** A file someone asked to teach Hoard, from its details; Settings → Store files opens the wizard on it. */
 export const teach = ref<FilePlace | null>(null)
@@ -15,18 +16,18 @@ export const MAX_STORE_FILE = 256 * 1024
 export type FieldKey = 'title' | 'seller' | 'license' | 'url' | 'words' | 'type' | 'colors' | 'id' | 'origin' | 'size'
 
 /** The fields the form fills in, in the order shown. The others (sizes, surfaces, maps, levels of detail) are written
- *  in TOML. */
-export const FIELDS: { key: FieldKey; label: string; many?: boolean; hint: string }[] = [
-  { key: 'title', label: 'Title', hint: 'The listing’s exact title. It names the pack, and without it the file is skipped.' },
-  { key: 'seller', label: 'Seller', hint: 'Who made or sells it.' },
-  { key: 'license', label: 'License', hint: 'As the file writes it, like CC-BY-4.0.' },
-  { key: 'url', label: 'Store page', hint: 'The listing’s address, starting http:// or https://.' },
-  { key: 'words', label: 'Tags', many: true, hint: 'Words to tag it with. Comma-separated values are split.' },
-  { key: 'type', label: 'Kind', hint: 'What it is, like “3D model” or “surface”. Also a tag.' },
-  { key: 'colors', label: 'Colours', many: true, hint: 'Its colours, as color: tags.' },
-  { key: 'id', label: 'Store id', hint: 'The store’s id for it: letters, digits, _ or -.' },
-  { key: 'origin', label: 'Made in', many: true, hint: 'Where it was made or scanned, for the description.' },
-  { key: 'size', label: 'Size', hint: 'How big it is, in words, for the description.' },
+ *  in TOML. Labels and hints are getters, so they're in the language of the moment. */
+export const FIELDS: { key: FieldKey; readonly label: string; readonly name: string; many?: boolean; readonly hint: string }[] = [
+  { key: 'title', get label() { return t('storefiles-field-title') }, get name() { return t('storefiles-field-title-name') }, get hint() { return t('storefiles-field-title-hint') } },
+  { key: 'seller', get label() { return t('storefiles-field-seller') }, get name() { return t('storefiles-field-seller-name') }, get hint() { return t('storefiles-field-seller-hint') } },
+  { key: 'license', get label() { return t('storefiles-field-license') }, get name() { return t('storefiles-field-license-name') }, get hint() { return t('storefiles-field-license-hint') } },
+  { key: 'url', get label() { return t('storefiles-field-url') }, get name() { return t('storefiles-field-url-name') }, get hint() { return t('storefiles-field-url-hint') } },
+  { key: 'words', many: true, get label() { return t('storefiles-field-words') }, get name() { return t('storefiles-field-words-name') }, get hint() { return t('storefiles-field-words-hint') } },
+  { key: 'type', get label() { return t('storefiles-field-type') }, get name() { return t('storefiles-field-type-name') }, get hint() { return t('storefiles-field-type-hint') } },
+  { key: 'colors', many: true, get label() { return t('storefiles-field-colors') }, get name() { return t('storefiles-field-colors-name') }, get hint() { return t('storefiles-field-colors-hint') } },
+  { key: 'id', get label() { return t('storefiles-field-id') }, get name() { return t('storefiles-field-id-name') }, get hint() { return t('storefiles-field-id-hint') } },
+  { key: 'origin', many: true, get label() { return t('storefiles-field-origin') }, get name() { return t('storefiles-field-origin-name') }, get hint() { return t('storefiles-field-origin-hint') } },
+  { key: 'size', get label() { return t('storefiles-field-size') }, get name() { return t('storefiles-field-size-name') }, get hint() { return t('storefiles-field-size-hint') } },
 ]
 
 export type JsonPath = (string | number)[]

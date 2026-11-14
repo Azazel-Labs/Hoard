@@ -9,6 +9,7 @@ import { countText } from '../archive'
 import { mayTry } from '../auth'
 import { confirmDialog, daysAgo, showError, showOk } from '../ui'
 import KindGlyph from './KindGlyph.vue'
+import { formatNumber, t } from '../i18n'
 
 const emit = defineEmits<{ changed: []; error: [string] }>()
 const PAGE = 100
@@ -29,7 +30,7 @@ async function load(more = false) {
     assets.value = more ? [...assets.value, ...a.items] : a.items
     assetTotal.value = a.total
   } catch (e) {
-    emit('error', `Couldn't load the archive: ${(e as Error).message}`)
+    emit('error', t('archive-load-failed', { error: (e as Error).message }))
   } finally {
     loading.value = false
   }
@@ -43,7 +44,7 @@ const when = daysAgo
 /** The usual warning, after which projects use what's going, if any do. */
 async function warned(body: string, items: UsageItems): Promise<string> {
   const uses = await usageWarning(items)
-  return uses ? `${uses.body} ${body}` : body
+  return uses ? t('archive-warning-with-uses', { uses: uses.body, body }) : body
 }
 
 async function run(what: 'restore' | 'purge', items: ArchiveItems & { all?: boolean }) {
@@ -51,11 +52,11 @@ async function run(what: 'restore' | 'purge', items: ArchiveItems & { all?: bool
   try {
     const n = what === 'restore' ? await api.restore(items) : await api.purge(items)
     const text = countText(n.packs, n.assets)
-    showOk(what === 'restore' ? `Restored ${text}` : `Deleted ${text} for good`)
+    showOk(what === 'restore' ? t('archive-restored', { what: text }) : t('archive-purged', { what: text }))
     emit('changed')
     await load()
   } catch (e) {
-    showError(`Couldn't ${what === 'restore' ? 'restore' : 'delete'}: ${(e as Error).message}`)
+    showError(what === 'restore' ? t('archive-restore-failed', { error: (e as Error).message }) : t('archive-purge-failed', { error: (e as Error).message }))
   } finally {
     busy.value = false
   }
@@ -68,33 +69,33 @@ const restorePack = (p: Pack) => run('restore', { packs: [p.id] })
 const restoreAsset = (a: Asset) => run('restore', { assets: [a.id] })
 async function purgePack(p: Pack) {
   const ok = await confirmDialog({
-    title: `Delete ${p.name} for good?`,
+    title: t('archive-purge-title', { name: p.name }),
     body: await warned(
-      `Its ${p.asset_count.toLocaleString()} assets and ${humanBytes(p.total_bytes)} of files go too, except files another pack shares. This can't be undone.`,
+      t('archive-purge-pack-body', { count: p.asset_count, size: humanBytes(p.total_bytes) }),
       { packs: [p.id] },
     ),
-    confirm: 'Delete forever',
+    confirm: t('archive-purge'),
     danger: true,
   })
   if (ok) await run('purge', { packs: [p.id] })
 }
 async function purgeAsset(a: Asset) {
   const ok = await confirmDialog({
-    title: `Delete ${a.name} for good?`,
-    body: await warned("Its file is freed unless another asset shares it. This can't be undone.", { assets: [a.id] }),
-    confirm: 'Delete forever',
+    title: t('archive-purge-title', { name: a.name }),
+    body: await warned(t('archive-purge-asset-body'), { assets: [a.id] }),
+    confirm: t('archive-purge'),
     danger: true,
   })
   if (ok) await run('purge', { assets: [a.id] })
 }
 async function emptyArchive() {
   const ok = await confirmDialog({
-    title: 'Empty the archive?',
+    title: t('archive-empty-title'),
     body: await warned(
-      `${countText(packs.value.length, assetTotal.value)} will be deleted for good, and their files freed. This can't be undone.`,
+      t('archive-empty-body', { what: countText(packs.value.length, assetTotal.value) }),
       { archived: true },
     ),
-    confirm: 'Empty archive',
+    confirm: t('archive-empty'),
     danger: true,
   })
   if (ok) await run('purge', { all: true })
@@ -106,29 +107,26 @@ async function emptyArchive() {
     <div class="inner">
       <header class="head">
         <div>
-          <h2>Archive</h2>
-          <p class="what">
-            Archived packs and assets are out of search, the counts and the tag list. Restore them, or delete them for
-            good to free their space.
-          </p>
+          <h2>{{ t('archive-title') }}</h2>
+          <p class="what">{{ t('archive-intro') }}</p>
         </div>
-        <button v-if="!empty && !loading && purger" type="button" class="btn danger" :disabled="busy" @click="emptyArchive">Empty archive</button>
+        <button v-if="!empty && !loading && purger" type="button" class="btn danger" :disabled="busy" @click="emptyArchive">{{ t('archive-empty') }}</button>
       </header>
 
-      <p v-if="loading" class="muted">Loading…</p>
+      <p v-if="loading" class="muted">{{ t('archive-loading') }}</p>
 
       <div v-else-if="empty" class="empty">
         <svg viewBox="0 0 24 24" width="40" height="40" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
           <rect x="3" y="4" width="18" height="4.5" rx="1" />
           <path d="M5 8.5V19a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V8.5M10 12.5h4" />
         </svg>
-        <strong>The archive is empty</strong>
-        <span>Archive a pack or an asset and it waits here until you restore it or delete it for good.</span>
+        <strong>{{ t('archive-is-empty') }}</strong>
+        <span>{{ t('archive-is-empty-hint') }}</span>
       </div>
 
       <template v-else>
         <section v-if="packs.length" aria-labelledby="arch-packs">
-          <h3 id="arch-packs">Packs <span class="n">{{ packs.length.toLocaleString() }} · {{ humanBytes(packBytes) }}</span></h3>
+          <h3 id="arch-packs">{{ t('archive-packs') }} <span class="n">{{ formatNumber(packs.length) }} · {{ humanBytes(packBytes) }}</span></h3>
           <ul class="rows">
             <li v-for="p in packs" :key="p.id" class="row">
               <div class="cover" aria-hidden="true">
@@ -136,18 +134,18 @@ async function emptyArchive() {
               </div>
               <div class="info">
                 <strong :title="p.name">{{ p.name }}</strong>
-                <span>{{ p.asset_count.toLocaleString() }} {{ p.asset_count === 1 ? 'asset' : 'assets' }} · {{ humanBytes(p.total_bytes) }} · archived {{ when(p.archived_at) }}</span>
+                <span>{{ t('archive-asset-count', { count: p.asset_count }) }} · {{ humanBytes(p.total_bytes) }} · {{ t('archive-archived', { when: when(p.archived_at) }) }}</span>
               </div>
               <div class="acts">
-                <button v-if="restorer" type="button" class="btn" :disabled="busy" @click="restorePack(p)">Restore</button>
-                <button v-if="purger" type="button" class="btn danger" :disabled="busy" @click="purgePack(p)">Delete forever</button>
+                <button v-if="restorer" type="button" class="btn" :disabled="busy" @click="restorePack(p)">{{ t('archive-restore') }}</button>
+                <button v-if="purger" type="button" class="btn danger" :disabled="busy" @click="purgePack(p)">{{ t('archive-purge') }}</button>
               </div>
             </li>
           </ul>
         </section>
 
         <section v-if="assetTotal" aria-labelledby="arch-assets">
-          <h3 id="arch-assets">Assets <span class="n">{{ assetTotal.toLocaleString() }}</span></h3>
+          <h3 id="arch-assets">{{ t('archive-assets') }} <span class="n">{{ formatNumber(assetTotal) }}</span></h3>
           <ul class="rows">
             <li v-for="a in assets" :key="a.id" class="row">
               <div class="cover" aria-hidden="true">
@@ -156,16 +154,16 @@ async function emptyArchive() {
               </div>
               <div class="info">
                 <strong :title="a.path">{{ a.name }}</strong>
-                <span>{{ KIND_LABEL[a.kind] ?? a.kind }} · {{ humanBytes(a.size) }} · from {{ a.pack_name }} · archived {{ when(a.archived_at) }}</span>
+                <span>{{ KIND_LABEL[a.kind] ?? a.kind }} · {{ humanBytes(a.size) }} · {{ t('archive-from', { pack: a.pack_name }) }} · {{ t('archive-archived', { when: when(a.archived_at) }) }}</span>
               </div>
               <div class="acts">
-                <button v-if="restorer" type="button" class="btn" :disabled="busy" @click="restoreAsset(a)">Restore</button>
-                <button v-if="purger" type="button" class="btn danger" :disabled="busy" @click="purgeAsset(a)">Delete forever</button>
+                <button v-if="restorer" type="button" class="btn" :disabled="busy" @click="restoreAsset(a)">{{ t('archive-restore') }}</button>
+                <button v-if="purger" type="button" class="btn danger" :disabled="busy" @click="purgeAsset(a)">{{ t('archive-purge') }}</button>
               </div>
             </li>
           </ul>
           <div v-if="assets.length < assetTotal" class="more">
-            <button type="button" class="btn ghost" @click="load(true)">Show more ({{ (assetTotal - assets.length).toLocaleString() }} left)</button>
+            <button type="button" class="btn ghost" @click="load(true)">{{ t('archive-show-more', { count: assetTotal - assets.length }) }}</button>
           </div>
         </section>
       </template>

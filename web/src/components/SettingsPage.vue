@@ -23,6 +23,7 @@ import {
   humanBytes,
 } from '../api'
 import { may, refreshAuth } from '../auth'
+import { formatNumber, LANGUAGES, languageName, preferredCatalog, t } from '../i18n'
 import { prefs } from '../prefs'
 import { formatMiB } from '../sizes'
 import { ROLE_LABEL } from '../materials'
@@ -56,25 +57,27 @@ const emit = defineEmits<{
 }>()
 const s = ref<Settings | null>(null)
 
-const ALL_PAGES: { id: string; label: string; blurb: string; need?: Role }[] = [
-  { id: 'general', need: 'admin', label: 'General', blurb: 'What this server is called, for everyone who uses it.' },
-  { id: 'appearance', label: 'Appearance', blurb: 'The themes this browser wears when it’s light and when it’s dark. Saved in this browser only.' },
-  { id: 'library', label: 'Library', blurb: 'What’s in the hoard: how big it is, what it’s made of, how it grew and how well it’s tagged. Archived things aren’t counted.' },
-  { id: 'tags', need: 'edit', label: 'Tags', blurb: 'Every tag in the library. Merge ones that mean the same thing, or rename one; the taggers use the new name from then on.' },
-  { id: 'store-files', need: 'admin', label: 'Store files', blurb: 'The files stores put beside their art, which Hoard reads to name packs and credit their makers. Teach it ones it doesn’t know, and share what you taught it.' },
-  { id: 'locations', need: 'admin', label: 'Library locations', blurb: 'The folders on the server that hold the library: ones Hoard keeps files in, and folders of packs it indexes where they are.' },
-  { id: 'tools', need: 'admin', label: 'Tools', blurb: 'Outside programs Hoard uses to convert and read files.' },
-  { id: 'ai', need: 'admin', label: 'AI tagging', blurb: 'An AI model names, describes and tags new packs, on top of the built-in rules. Its tags are marked as suggested.' },
-  { id: 'search', need: 'admin', label: 'Image search', blurb: 'Search pictures by what they show, not only by their names, and find things that are alike in kind, not only in colour.' },
-  { id: 'adding', need: 'admin', label: 'Adding packs', blurb: 'What Hoard does with a pack when it’s added, besides reading and tagging it.' },
-  { id: 'downloads', need: 'admin', label: 'Downloads', blurb: 'How files are named in what Hoard sends: downloads, zips, the hoard tool and AI assistants. Files in the library stay as they are.' },
-  { id: 'account', label: 'Account', blurb: 'Your password, the other people who can sign in, and access tokens for scripts and other programs.' },
-  { id: 'auth', need: 'admin', label: 'Authentication', blurb: 'How people sign in: Hoard’s own accounts, an LDAP directory, Microsoft Active Directory or an OAuth provider, how long sessions last, and which groups get which role.' },
-  { id: 'connection', need: 'admin', label: 'Connection', blurb: 'How browsers and apps reach Hoard: the address it’s known by, and HTTPS, which some browser features need.' },
-  { id: 'performance', need: 'admin', label: 'Performance', blurb: 'How hard the server works, how thumbnails are made and kept, and the most it takes in.' },
-  { id: 'issues', need: 'admin', label: 'Issues', blurb: 'What went wrong opening or processing files: archives that wouldn’t unpack, files that couldn’t be read, jobs that failed. Try them again once the cause is fixed, or dismiss them.' },
-  { id: 'maintenance', need: 'admin', label: 'Maintenance', blurb: 'Back up, check for damage and tidy up. One of each runs at a time, and you can leave this page while they do.' },
-] as const
+const browserLanguages = navigator.languages
+// Labels and blurbs are getters, so they're in the language of the moment.
+const ALL_PAGES: { id: string; readonly label: string; readonly blurb: string; need?: Role }[] = [
+  { id: 'general', need: 'admin', get label() { return t('settings-page-general') }, get blurb() { return t('settings-page-general-blurb') } },
+  { id: 'appearance', get label() { return t('settings-page-appearance') }, get blurb() { return t('settings-page-appearance-blurb') } },
+  { id: 'library', get label() { return t('settings-page-library') }, get blurb() { return t('settings-page-library-blurb') } },
+  { id: 'tags', need: 'edit', get label() { return t('settings-page-tags') }, get blurb() { return t('settings-page-tags-blurb') } },
+  { id: 'store-files', need: 'admin', get label() { return t('settings-page-store-files') }, get blurb() { return t('settings-page-store-files-blurb') } },
+  { id: 'locations', need: 'admin', get label() { return t('settings-page-locations') }, get blurb() { return t('settings-page-locations-blurb') } },
+  { id: 'tools', need: 'admin', get label() { return t('settings-page-tools') }, get blurb() { return t('settings-page-tools-blurb') } },
+  { id: 'ai', need: 'admin', get label() { return t('settings-page-ai') }, get blurb() { return t('settings-page-ai-blurb') } },
+  { id: 'search', need: 'admin', get label() { return t('settings-page-search') }, get blurb() { return t('settings-page-search-blurb') } },
+  { id: 'adding', need: 'admin', get label() { return t('settings-page-adding') }, get blurb() { return t('settings-page-adding-blurb') } },
+  { id: 'downloads', need: 'admin', get label() { return t('settings-page-downloads') }, get blurb() { return t('settings-page-downloads-blurb') } },
+  { id: 'account', get label() { return t('settings-page-account') }, get blurb() { return t('settings-page-account-blurb') } },
+  { id: 'auth', need: 'admin', get label() { return t('settings-page-auth') }, get blurb() { return t('settings-page-auth-blurb') } },
+  { id: 'connection', need: 'admin', get label() { return t('settings-page-connection') }, get blurb() { return t('settings-page-connection-blurb') } },
+  { id: 'performance', need: 'admin', get label() { return t('settings-page-performance') }, get blurb() { return t('settings-page-performance-blurb') } },
+  { id: 'issues', need: 'admin', get label() { return t('settings-page-issues') }, get blurb() { return t('settings-page-issues-blurb') } },
+  { id: 'maintenance', need: 'admin', get label() { return t('settings-page-maintenance') }, get blurb() { return t('settings-page-maintenance-blurb') } },
+]
 /** The pages this account may see: an admin sees them all. */
 const PAGES = computed(() => ALL_PAGES.filter((p) => !p.need || may(p.need)))
 const current = computed(() => (PAGES.value.some((p) => p.id === props.section) ? props.section : 'appearance'))
@@ -102,7 +105,7 @@ const chosen = reactive<Record<ToolKey, Mode>>({ blender: 'off', ffmpeg: 'auto' 
 type ProviderId = 'off' | 'local' | 'chatgpt' | 'openrouter' | 'openai' | 'anthropic' | 'gemini' | 'ollama' | 'custom'
 interface Provider {
   id: ProviderId
-  label: string
+  readonly label: string
   url: string
   /** Needs an API key. */
   key?: boolean
@@ -110,23 +113,24 @@ interface Provider {
   keyUrl?: string
   /** The address can be edited (a self-hosted service). */
   editUrl?: boolean
-  hint: string
+  readonly hint: string
 }
+// Labels that aren't product names, and hints, are getters, so they're in the language of the moment.
 const PROVIDERS: Provider[] = [
-  { id: 'off', label: 'Off', url: '', hint: 'Packs are tagged with the built-in rules only.' },
+  { id: 'off', get label() { return t('settings-ai-off') }, url: '', get hint() { return t('settings-ai-off-hint') } },
   {
     id: 'local',
-    label: 'Local model',
+    get label() { return t('settings-ai-local') },
     // Filled in from the server (llm.local_url).
     url: '',
     editUrl: true,
-    hint: 'The llm service in Hoard’s compose file (or cargo xtask llm). Download a model below; it runs on this machine and nothing leaves it.',
+    get hint() { return t('settings-ai-local-hint') },
   },
   {
     id: 'chatgpt',
-    label: 'ChatGPT plan',
+    get label() { return t('settings-ai-chatgpt') },
     url: '',
-    hint: 'Uses your ChatGPT Go, Plus, Pro or Business plan instead of an API key.',
+    get hint() { return t('settings-ai-chatgpt-hint') },
   },
   {
     id: 'openrouter',
@@ -134,7 +138,7 @@ const PROVIDERS: Provider[] = [
     url: 'https://openrouter.ai/api/v1',
     key: true,
     keyUrl: 'https://openrouter.ai/keys',
-    hint: 'One key for hundreds of hosted models, some of them free. Models that take images are marked.',
+    get hint() { return t('settings-ai-openrouter-hint') },
   },
   {
     id: 'openai',
@@ -142,7 +146,7 @@ const PROVIDERS: Provider[] = [
     url: 'https://api.openai.com/v1',
     key: true,
     keyUrl: 'https://platform.openai.com/api-keys',
-    hint: 'Hosted by OpenAI.',
+    get hint() { return t('settings-ai-openai-hint') },
   },
   {
     id: 'anthropic',
@@ -150,7 +154,7 @@ const PROVIDERS: Provider[] = [
     url: 'https://api.anthropic.com/v1',
     key: true,
     keyUrl: 'https://console.anthropic.com/settings/keys',
-    hint: 'Hosted by Anthropic, through its OpenAI-compatible endpoint.',
+    get hint() { return t('settings-ai-anthropic-hint') },
   },
   {
     id: 'gemini',
@@ -158,21 +162,21 @@ const PROVIDERS: Provider[] = [
     url: 'https://generativelanguage.googleapis.com/v1beta/openai',
     key: true,
     keyUrl: 'https://aistudio.google.com/apikey',
-    hint: 'Hosted by Google, through its OpenAI-compatible endpoint.',
+    get hint() { return t('settings-ai-gemini-hint') },
   },
   {
     id: 'ollama',
     label: 'Ollama',
     url: 'http://ollama:11434/v1',
     editUrl: true,
-    hint: 'An Ollama server you run. Change the address if it isn’t a container called ollama.',
+    get hint() { return t('settings-ai-ollama-hint') },
   },
   {
     id: 'custom',
-    label: 'Other (OpenAI-compatible)',
+    get label() { return t('settings-ai-custom') },
     url: '',
     editUrl: true,
-    hint: 'Anything that speaks the OpenAI chat API: LM Studio, vLLM, llama.cpp, LiteLLM, …',
+    get hint() { return t('settings-ai-custom-hint') },
   },
 ]
 const trimUrl = (u: string) => u.trim().replace(/\/+$/, '')
@@ -226,7 +230,7 @@ async function loadModels() {
     modelsState.value = { kind: 'idle', text: '' }
     return
   }
-  modelsState.value = { kind: 'loading', text: 'Connecting…' }
+  modelsState.value = { kind: 'loading', text: t('settings-ai-connecting') }
   try {
     // Nothing typed: the server uses the saved key, if this is the address in use.
     const key = llm.key ? llm.key.trim() : llm.removeKey || urlChanged.value ? '' : undefined
@@ -236,7 +240,7 @@ async function loadModels() {
     const n = res.models.length
     modelsState.value = {
       kind: 'ok',
-      text: n ? `Connected · ${n} model${n === 1 ? '' : 's'}` : 'Connected, but it lists no models; type the model’s name',
+      text: n ? t('settings-ai-connected', { count: n }) : t('settings-ai-connected-none'),
     }
     if (!llm.model && n === 1) chooseModel(res.models[0].id)
   } catch (e) {
@@ -305,13 +309,13 @@ async function loadChatgpt() {
     modelsState.value = { kind: 'idle', text: '' }
     return
   }
-  modelsState.value = { kind: 'loading', text: 'Connecting…' }
+  modelsState.value = { kind: 'loading', text: t('settings-ai-connecting') }
   try {
     const res = await api.chatgptModels()
     if (ask !== modelsAsk) return
     models.value = res.models
     const n = res.models.length
-    modelsState.value = { kind: 'ok', text: n ? `Connected · ${n} model${n === 1 ? '' : 's'}` : 'Connected; type the model’s name' }
+    modelsState.value = { kind: 'ok', text: n ? t('settings-ai-connected', { count: n }) : t('settings-chatgpt-connected-none') }
     // ChatGPT lists its recommended model first.
     if (!llm.model && n) chooseModel(res.models[0].id)
   } catch (e) {
@@ -364,7 +368,7 @@ function signedIn(st: ChatGptStatus) {
   gpt.value = st
   gptUrl.value = ''
   gptPaste.value = ''
-  showOk(st.email ? `Signed in to ChatGPT as ${st.email}` : 'Signed in to ChatGPT')
+  showOk(st.email ? t('settings-chatgpt-signed-in-as', { email: st.email }) : t('settings-chatgpt-signed-in'))
   void loadChatgpt()
 }
 async function finishChatgpt() {
@@ -382,11 +386,9 @@ async function finishChatgpt() {
 }
 async function signOutChatgpt() {
   const ok = await confirmDialog({
-    title: 'Sign out of ChatGPT?',
-    body: s.value?.llm.chatgpt
-      ? 'AI tagging uses your ChatGPT plan, so it stops until you sign in again or pick another service.'
-      : 'Hoard forgets the sign-in and tells OpenAI to end it.',
-    confirm: 'Sign out',
+    title: t('settings-chatgpt-sign-out-title'),
+    body: s.value?.llm.chatgpt ? t('settings-chatgpt-sign-out-in-use') : t('settings-chatgpt-sign-out-body'),
+    confirm: t('settings-chatgpt-sign-out'),
   })
   if (!ok) return
   gptBusy.value = true
@@ -396,7 +398,7 @@ async function signOutChatgpt() {
     models.value = []
     modelsState.value = { kind: 'idle', text: '' }
     if (st.note) showError(st.note)
-    else showOk('Signed out of ChatGPT')
+    else showOk(t('settings-chatgpt-signed-out'))
   } catch (e) {
     if (e instanceof ApiError && e.status === 401) emit('unauthorized')
     showError((e as Error).message)
@@ -450,35 +452,40 @@ const notDownloaded = computed(() => local.value?.suggested.filter((m) => !local
 const nameOf = (id: string) => local.value?.suggested.find((m) => m.id === id)?.name ?? id
 /** The model AI tagging uses right now, if it's on this server. */
 const inUse = (m: LocalModel) => !!s.value && s.value.llm.model === m.id && trimUrl(s.value.llm.url) === trimUrl(llm.url)
-const gb = (n: number) => `${(n / 1e9).toFixed(n >= 1e10 ? 0 : 1)} GB`
+const gb = (n: number) => {
+  const digits = n >= 1e10 ? 0 : 1
+  return `${formatNumber(n / 1e9, { minimumFractionDigits: digits, maximumFractionDigits: digits })} GB`
+}
 function localStatus(m: LocalModel): string {
   if (m.status === 'downloading') {
     const [done, total] = m.progress ?? [0, 0]
-    return total ? `Downloading ${Math.floor((done / total) * 100)}% · ${gb(done)} of ${gb(total)}` : 'Downloading…'
+    return total
+      ? t('settings-local-downloading-progress', { percent: Math.floor((done / total) * 100), done: gb(done), total: gb(total) })
+      : t('settings-local-downloading')
   }
-  if (m.status === 'incomplete') return 'Download stopped'
-  if (m.failed) return 'Failed to start last time'
-  if (inUse(m)) return m.status === 'loaded' ? 'In use · running' : 'In use'
-  if (m.status === 'loading') return 'Starting…'
-  if (m.status === 'loaded') return 'Running'
-  return m.vision ? 'Ready · takes images' : 'Ready · text only'
+  if (m.status === 'incomplete') return t('settings-local-incomplete')
+  if (m.failed) return t('settings-local-failed')
+  if (inUse(m)) return m.status === 'loaded' ? t('settings-local-in-use-running') : t('settings-local-in-use')
+  if (m.status === 'loading') return t('settings-local-starting')
+  if (m.status === 'loaded') return t('settings-local-running')
+  return m.vision ? t('settings-local-ready-images') : t('settings-local-ready-text')
 }
 const ready = (m: LocalModel) => !['downloading', 'incomplete'].includes(m.status)
 function useLocal(m: LocalModel) {
   const patch: SettingsPatch = { llm_url: trimUrl(llm.url), llm_model: m.id, llm_vision: m.vision, llm_api_key: '' }
   // Small models tag better a few assets at a time; keep a batch size someone chose.
   if (!s.value?.llm.batch.saved) patch.llm_batch = 12
-  void save(patch, `AI tagging: ${nameOf(m.id)}`)
+  void save(patch, t('settings-ai-saved', { service: nameOf(m.id) }))
 }
 async function deleteLocal(m: LocalModel) {
   const ok = await confirmDialog({
-    title: `Delete ${nameOf(m.id)}?`,
+    title: t('settings-local-delete-title', { name: nameOf(m.id) }),
     body: inUse(m)
-      ? 'AI tagging uses this model, so it stops until you pick another. Its files are deleted from the model server.'
+      ? t('settings-local-delete-in-use')
       : m.status === 'downloading'
-        ? 'The download stops and what came down so far is deleted.'
-        : 'Its files are deleted from the model server. You can download it again later.',
-    confirm: 'Delete',
+        ? t('settings-local-delete-downloading')
+        : t('settings-local-delete-body'),
+    confirm: t('settings-local-delete'),
     danger: true,
   })
   if (ok) void loadLocal('delete', m.id)
@@ -487,31 +494,33 @@ function downloadOther() {
   const id = otherModel.value.trim()
   if (id) void loadLocal('download', id)
 }
-const modelLabel = (m: ModelInfo) => [m.name, m.vision ? 'takes images' : ''].filter(Boolean).join(' · ')
+const modelLabel = (m: ModelInfo) => [m.name, m.vision ? t('settings-ai-takes-images') : ''].filter(Boolean).join(' · ')
 
 // Server options: each saves on its own when it's entered (Enter, or leaving the field); switches at once.
 const opts = reactive({ workers: 1, max_upload_mb: 1, max_expand_mb: 1, conversion_cache_mb: 1, name: '', public_url: '', soundfont: '' })
 type OptKey = keyof typeof opts
 const OPT_KEYS = Object.keys(opts) as OptKey[]
-const OPT_LABEL: Record<OptKey, string> = {
-  workers: 'Background workers',
-  max_upload_mb: 'Largest upload',
-  max_expand_mb: 'Largest pack',
-  conversion_cache_mb: 'Converted downloads',
-  name: 'Name',
-  public_url: 'Public address',
-  soundfont: 'MIDI SoundFont',
-}
+/** An option's name, for the note that it's saved. */
+const optLabel = (k: OptKey): string =>
+  ({
+    workers: t('settings-workers'),
+    max_upload_mb: t('settings-max-upload'),
+    max_expand_mb: t('settings-max-expand'),
+    conversion_cache_mb: t('settings-conversion-cache'),
+    name: t('settings-name'),
+    public_url: t('settings-public-url'),
+    soundfont: t('settings-soundfont'),
+  })[k]
 type AnyOpt = keyof Settings['options']
 /** Not at the server's default, so it gets a reset arrow. */
 const changed = (k: AnyOpt) => !!s.value && s.value.options[k].value !== s.value.options[k].default
-const onOff = (v: boolean) => (v ? 'on' : 'off')
+const onOff = (v: boolean) => (v ? t('settings-default-on') : t('settings-default-off'))
 /** Whether model thumbnails render on a GPU, in software, or not at all. */
 const gpuNote = computed(() => {
   const r = props.stats?.renderer ?? ''
-  if (r.startsWith('gpu: ')) return { state: 'ready', text: `On the GPU: ${r.slice(5)}` }
-  if (r.startsWith('cpu: ')) return { state: 'off', text: `No GPU found, so in software (${r.slice(5)})` }
-  if (r.startsWith('unavailable')) return { state: 'unavailable', text: 'No GPU or software renderer found, so models get no thumbnails' }
+  if (r.startsWith('gpu: ')) return { state: 'ready', text: t('settings-gpu-on', { renderer: r.slice(5) }) }
+  if (r.startsWith('cpu: ')) return { state: 'off', text: t('settings-gpu-software', { renderer: r.slice(5) }) }
+  if (r.startsWith('unavailable')) return { state: 'unavailable', text: t('settings-gpu-none') }
   return null
 })
 function saveOpt(k: OptKey) {
@@ -530,11 +539,11 @@ function saveOpt(k: OptKey) {
     k === 'max_upload_mb' || k === 'max_expand_mb' || k === 'conversion_cache_mb'
       ? formatMiB(v as number)
       : typeof v === 'number'
-        ? v.toLocaleString()
-        : v || 'the default'
-  void save({ [k]: v } as SettingsPatch, `${OPT_LABEL[k]}: ${shown}`)
+        ? formatNumber(v)
+        : v || t('settings-the-default')
+  void save({ [k]: v } as SettingsPatch, t('settings-option-saved', { name: optLabel(k), value: shown }))
 }
-const resetOpt = (k: AnyOpt) => save({ [k]: null } as SettingsPatch, 'Back to the default')
+const resetOpt = (k: AnyOpt) => save({ [k]: null } as SettingsPatch, t('settings-back-to-default'))
 
 // Texture names: edited here, saved when a field is left (or Enter), checked first the way the server checks.
 const names = reactive<TextureNames>({ on: true, pattern: '{name}_{map}', maps: {} })
@@ -560,7 +569,7 @@ function saveNames() {
   const cur = s.value
   if (!cur || namesError.value) return
   if (sameNames(names, cur.texture_names)) return
-  void save({ texture_names: { on: names.on, pattern: names.pattern.trim(), maps: { ...names.maps } } }, 'Texture names saved')
+  void save({ texture_names: { on: names.on, pattern: names.pattern.trim(), maps: { ...names.maps } } }, t('settings-tn-saved'))
 }
 function useNames(preset: 'descriptive' | 'short') {
   const d = s.value?.texture_names.default
@@ -570,9 +579,9 @@ function useNames(preset: 'descriptive' | 'short') {
 }
 
 /** A tool set to something other than its default (off / automatic / a different program). */
-function toolChanged(t: ToolSetting): boolean {
-  const a = modeOf(t.value)
-  return t.saved && (a !== modeOf(t.default) || (a === 'path' && t.value.trim() !== t.default.trim()))
+function toolChanged(tool: ToolSetting): boolean {
+  const a = modeOf(tool.value)
+  return tool.saved && (a !== modeOf(tool.default) || (a === 'path' && tool.value.trim() !== tool.default.trim()))
 }
 
 function take(next: Settings) {
@@ -606,7 +615,7 @@ async function load() {
       emit('unauthorized')
       return
     }
-    showError(`Couldn't load the settings: ${(e as Error).message}`)
+    showError(t('settings-load-failed', { error: (e as Error).message }))
   }
 }
 
@@ -628,7 +637,7 @@ async function save(patch: SettingsPatch, done?: string) {
   }
 }
 
-const toggleClip = (on: boolean) => save({ clip: on }, on ? 'Image search: on' : 'Image search: off')
+const toggleClip = (on: boolean) => save({ clip: on }, on ? t('settings-clip-saved-on') : t('settings-clip-saved-off'))
 
 function pick(k: ToolKey, m: Mode) {
   chosen[k] = m
@@ -643,7 +652,7 @@ function usePath(k: ToolKey) {
 
 function saveLlm() {
   if (llm.provider === 'off') {
-    void save({ llm_url: '', llm_chatgpt: false }, 'AI tagging is off')
+    void save({ llm_url: '', llm_chatgpt: false }, t('settings-ai-saved-off'))
     return
   }
   const chatgpt = llm.provider === 'chatgpt'
@@ -658,12 +667,12 @@ function saveLlm() {
   else if (llm.key) patch.llm_api_key = llm.key.trim()
   // A key is only ever sent to the address it was saved with.
   else if (llm.removeKey || urlChanged.value) patch.llm_api_key = ''
-  void save(patch, `AI tagging: ${provider.value.label}`)
+  void save(patch, t('settings-ai-saved', { service: provider.value.label }))
 }
 const resetLlm = () =>
   save(
     { llm_url: null, llm_model: null, llm_api_key: null, llm_vision: null, llm_chatgpt: null, llm_batch: null },
-    'AI tagging: back to the default',
+    t('settings-ai-reset'),
   )
 const llmChanged = computed(() => {
   const l = s.value?.llm
@@ -676,7 +685,7 @@ const llmChanged = computed(() => {
 })
 const llmDefaultText = computed(() => {
   const d = s.value?.llm.default
-  if (!d?.url) return 'off'
+  if (!d?.url) return t('settings-default-off')
   return `${PROVIDERS.find((p) => p.id === providerOf(d.url))?.label ?? d.url} · ${d.model}`
 })
 
@@ -701,50 +710,52 @@ function schedulePoll() {
   }
 }
 
-const TOOLS: { key: ToolKey; title: string; what: string; download: string }[] = [
+// What each tool does and how it's found are getters, so they're in the language of the moment.
+const TOOLS: { key: ToolKey; title: string; readonly what: string; readonly download: string }[] = [
   {
     key: 'blender',
     title: 'Blender',
-    what: 'Converts .blend, .fbx, .dae, .usd, .ply, .stl and .3ds models to glTF in the background, so they get thumbnails and a 3D preview. Packs added while it was off are converted once it’s ready.',
-    download: 'Uses an installed Blender, or downloads Blender 4.5 LTS (about 400 MB) from a blender.org mirror.',
+    get what() { return t('settings-blender-what') },
+    get download() { return t('settings-blender-download') },
   },
   {
     key: 'ffmpeg',
     title: 'ffmpeg',
-    what: 'Encodes MP3, OGG and Opus downloads, and reads audio Hoard can’t decode itself (AAC, M4A, WMA, …).',
-    download: 'Uses a system ffmpeg with the right encoders, or downloads a static build (about 80 MB).',
+    get what() { return t('settings-ffmpeg-what') },
+    get download() { return t('settings-ffmpeg-download') },
   },
 ]
 
 function clipStatus(c: ImageSearchSetting): string {
   switch (c.state) {
-    case 'off': return 'Off'
-    case 'looking': return 'Looking for the model…'
-    case 'downloading': return 'Downloading the model… progress is in the activity indicator'
+    case 'off': return t('settings-status-off')
+    case 'looking': return t('settings-clip-looking')
+    case 'downloading': return t('settings-clip-downloading')
     case 'ready':
-      if (!c.total) return 'Ready. Pictures are learned as packs are added.'
-      if (c.done >= c.total) return `Ready: knows all ${c.total.toLocaleString()} pictures`
-      return `Ready: learning pictures, ${c.done.toLocaleString()} of ${c.total.toLocaleString()} so far`
-    case 'unavailable': return `Couldn’t get the model: ${c.detail}. Trying again every hour.`
+      if (!c.total) return t('settings-clip-ready-empty')
+      if (c.done >= c.total) return t('settings-clip-ready-all', { count: c.total })
+      return t('settings-clip-learning', { done: c.done, total: c.total })
+    case 'unavailable': return t('settings-clip-unavailable', { detail: c.detail })
   }
 }
 
-function statusText(t: ToolSetting): string {
-  switch (t.state) {
-    case 'off': return 'Off'
-    case 'looking': return 'Looking…'
-    case 'downloading': return 'Downloading… progress is in the activity indicator'
-    case 'ready': return `Ready: ${t.detail}`
-    case 'unavailable': return t.detail
+function statusText(tool: ToolSetting): string {
+  switch (tool.state) {
+    case 'off': return t('settings-status-off')
+    case 'looking': return t('settings-tool-looking')
+    case 'downloading': return t('settings-tool-downloading')
+    case 'ready': return t('settings-tool-ready', { detail: tool.detail })
+    case 'unavailable': return tool.detail
   }
 }
-const defaultText = (v: string) => (modeOf(v) === 'off' ? 'off' : modeOf(v) === 'auto' ? 'automatic' : v)
+const defaultText = (v: string) => (modeOf(v) === 'off' ? t('settings-default-off') : modeOf(v) === 'auto' ? t('settings-default-auto') : v)
 
-const THUMBS: { value: ThumbQuality; label: string; hint: string }[] = [
-  { value: 'small', label: 'Smaller', hint: 'JPEG, quality 70. Fine in the grid; a little soft up close.' },
-  { value: 'balanced', label: 'Balanced', hint: 'JPEG, quality 82. Hard to tell from the original at thumbnail size.' },
-  { value: 'sharp', label: 'Sharper', hint: 'JPEG, quality 92. About twice the size of Balanced.' },
-  { value: 'lossless', label: 'Lossless', hint: 'PNG, exactly as made. Several times larger.' },
+// Labels and hints are getters, so they're in the language of the moment.
+const THUMBS: { value: ThumbQuality; readonly label: string; readonly hint: string }[] = [
+  { value: 'small', get label() { return t('settings-thumbs-small') }, get hint() { return t('settings-thumbs-small-hint') } },
+  { value: 'balanced', get label() { return t('settings-thumbs-balanced') }, get hint() { return t('settings-thumbs-balanced-hint') } },
+  { value: 'sharp', get label() { return t('settings-thumbs-sharp') }, get hint() { return t('settings-thumbs-sharp-hint') } },
+  { value: 'lossless', get label() { return t('settings-thumbs-lossless') }, get hint() { return t('settings-thumbs-lossless-hint') } },
 ]
 // How much the server keeps around for previews and conversions, fetched fresh when the Performance page opens.
 const usage = ref<Stats | null>(null)
@@ -757,15 +768,15 @@ async function loadUsage() {
 }
 watch(current, (c) => { if (c === 'performance') void loadUsage() }, { immediate: true })
 
-const UNREAL: { value: UnrealConvert; label: string; hint: string }[] = [
-  { value: 'off', label: 'Leave as is', hint: 'Convert from a pack’s page when you want to.' },
-  { value: 'keep', label: 'Convert, keep originals', hint: 'Textures, sounds and materials come out in common formats; the .uasset stays too.' },
-  { value: 'replace', label: 'Convert, drop originals', hint: 'Saves space once the content is out. Meshes still wait for the Unreal worker.' },
+const UNREAL: { value: UnrealConvert; readonly label: string; readonly hint: string }[] = [
+  { value: 'off', get label() { return t('settings-unreal-off') }, get hint() { return t('settings-unreal-off-hint') } },
+  { value: 'keep', get label() { return t('settings-unreal-keep') }, get hint() { return t('settings-unreal-keep-hint') } },
+  { value: 'replace', get label() { return t('settings-unreal-replace') }, get hint() { return t('settings-unreal-replace-hint') } },
 ]
 
 const LOOKS = [
-  { scheme: 'light' as const, label: 'Light', list: LIGHT_THEMES },
-  { scheme: 'dark' as const, label: 'Dark', list: DARK_THEMES },
+  { scheme: 'light' as const, get label() { return t('settings-look-light') }, list: LIGHT_THEMES },
+  { scheme: 'dark' as const, get label() { return t('settings-look-dark') }, list: DARK_THEMES },
 ]
 /**
  * Pick a theme and wear it at once, even when it's for the scheme not in use (see `previewScheme`). Runs on click,
@@ -795,8 +806,8 @@ onBeforeUnmount(() => {
 
 <template>
   <div class="settings-page">
-    <nav class="snav" aria-label="Settings">
-      <h2>Settings</h2>
+    <nav class="snav" :aria-label="t('settings-title')">
+      <h2>{{ t('settings-title') }}</h2>
       <ul>
         <li v-for="p in PAGES" :key="p.id">
           <button type="button" :aria-current="current === p.id ? 'page' : undefined" @click="go(p.id)">
@@ -815,33 +826,39 @@ onBeforeUnmount(() => {
         </header>
 
         <template v-if="current === 'appearance'">
-          <section class="look" aria-label="Themes">
+          <section class="look" :aria-label="t('settings-themes')">
+            <div class="themes">
+              <label class="tlabel lang" for="language">{{ t('appearance-language') }}</label>
+              <select id="language" v-model="prefs.language" class="field lang">
+                <option value="auto">{{ t('appearance-language-auto', { name: languageName(preferredCatalog(browserLanguages, LANGUAGES) ?? 'en') }) }}</option>
+                <option v-for="code in LANGUAGES" :key="code" :value="code" :lang="code">{{ languageName(code) }}</option>
+              </select>
+            </div>
             <div v-for="g in LOOKS" :key="g.scheme" class="themes">
               <span class="tlabel">{{ g.label }}</span>
-              <div class="swatches" role="radiogroup" :aria-label="`${g.label} theme`">
+              <div class="swatches" role="radiogroup" :aria-label="t('settings-look-group', { scheme: g.scheme })">
                 <label
-                  v-for="t in g.list"
-                  :key="t.id"
+                  v-for="theme in g.list"
+                  :key="theme.id"
                   class="sw"
-                  :class="[g.scheme, { on: themeFor(g.scheme).id === t.id }]"
-                  v-bind="{ [`data-${g.scheme}`]: t.id }"
-                  :title="t.blurb"
+                  :class="[g.scheme, { on: themeFor(g.scheme).id === theme.id }]"
+                  v-bind="{ [`data-${g.scheme}`]: theme.id }"
+                  :title="theme.blurb"
                 >
-                  <input type="radio" :name="`theme-${g.scheme}`" :checked="themeFor(g.scheme).id === t.id" @click="setLook(g.scheme, t.id)" />
+                  <input type="radio" :name="`theme-${g.scheme}`" :checked="themeFor(g.scheme).id === theme.id" @click="setLook(g.scheme, theme.id)" />
                   <span class="mini" aria-hidden="true">
                     <span class="bar" /><span class="ln" /><span class="ln short" /><span class="dot" />
                   </span>
-                  <span class="nm">{{ t.name }}</span>
-                  <small>{{ t.blurb }}</small>
+                  <span class="nm">{{ theme.name }}</span>
+                  <small>{{ theme.blurb }}</small>
                 </label>
               </div>
             </div>
             <p v-if="previewScheme" class="hint preview" role="status">
-              Showing the {{ previewScheme }} theme so you can see it. You're using {{ usedScheme() }}{{ prefs.theme === 'system' ? ' (following the system)' : '' }},
-              and it comes back when you leave this page.
-              <button type="button" class="btn ghost" @click="endPreview">Back to {{ usedScheme() }}</button>
+              {{ t('settings-preview', { preview: previewScheme, used: usedScheme(), system: prefs.theme === 'system' ? 'yes' : 'no' }) }}
+              <button type="button" class="btn ghost" @click="endPreview">{{ t('settings-preview-back', { used: usedScheme() }) }}</button>
             </p>
-            <p v-else class="hint">Switch between light and dark (or follow the system) from the top bar.</p>
+            <p v-else class="hint">{{ t('settings-look-hint') }}</p>
           </section>
         </template>
 
@@ -867,59 +884,59 @@ onBeforeUnmount(() => {
         <TagsPanel v-else-if="current === 'tags'" @tag="(t) => emit('tag', t)" @changed="emit('changed')" />
         <StoreFormatsPanel v-else-if="current === 'store-files'" />
 
-        <p v-else-if="!s" class="loading">Loading…</p>
+        <p v-else-if="!s" class="loading">{{ t('settings-loading') }}</p>
 
         <div v-else class="body">
           <template v-if="current === 'tools'">
-            <section v-for="t in TOOLS" :key="t.key">
+            <section v-for="tool in TOOLS" :key="tool.key">
               <div class="sh">
-                <h3>{{ t.title }}</h3>
+                <h3>{{ tool.title }}</h3>
                 <ResetButton
-                  v-if="toolChanged(s[t.key])"
-                  :to="defaultText(s[t.key].default)"
+                  v-if="toolChanged(s[tool.key])"
+                  :to="defaultText(s[tool.key].default)"
                   :disabled="busy"
-                  @reset="save({ [t.key]: null }, `${t.title}: back to the default`)"
+                  @reset="save({ [tool.key]: null }, t('settings-tool-reset', { tool: tool.title }))"
                 />
               </div>
-              <p class="what">{{ t.what }}</p>
-              <div class="modes" role="radiogroup" :aria-label="t.title">
+              <p class="what">{{ tool.what }}</p>
+              <div class="modes" role="radiogroup" :aria-label="tool.title">
                 <label>
-                  <input type="radio" :name="t.key" :checked="chosen[t.key] === 'off'" :disabled="busy" @change="pick(t.key, 'off')" />
-                  Off
+                  <input type="radio" :name="tool.key" :checked="chosen[tool.key] === 'off'" :disabled="busy" @change="pick(tool.key, 'off')" />
+                  {{ t('settings-mode-off') }}
                 </label>
                 <label>
-                  <input type="radio" :name="t.key" :checked="chosen[t.key] === 'auto'" :disabled="busy" @change="pick(t.key, 'auto')" />
-                  Automatic
+                  <input type="radio" :name="tool.key" :checked="chosen[tool.key] === 'auto'" :disabled="busy" @change="pick(tool.key, 'auto')" />
+                  {{ t('settings-mode-auto') }}
                 </label>
                 <label>
-                  <input type="radio" :name="t.key" :checked="chosen[t.key] === 'path'" :disabled="busy" @change="pick(t.key, 'path')" />
-                  This program
+                  <input type="radio" :name="tool.key" :checked="chosen[tool.key] === 'path'" :disabled="busy" @change="pick(tool.key, 'path')" />
+                  {{ t('settings-mode-path') }}
                 </label>
               </div>
-              <p v-if="chosen[t.key] === 'auto'" class="hint">
-                {{ s[t.key].can_download ? t.download : `Uses an installed ${t.title}. There’s no build to download for this machine, so install it or give its path.` }}
+              <p v-if="chosen[tool.key] === 'auto'" class="hint">
+                {{ s[tool.key].can_download ? tool.download : t('settings-tool-no-download', { tool: tool.title }) }}
               </p>
-              <form v-if="chosen[t.key] === 'path'" class="path" @submit.prevent="usePath(t.key)">
+              <form v-if="chosen[tool.key] === 'path'" class="path" @submit.prevent="usePath(tool.key)">
                 <input
-                  v-model="paths[t.key]"
+                  v-model="paths[tool.key]"
                   class="field mono"
                   type="text"
                   spellcheck="false"
-                  :aria-label="`${t.title} program path`"
-                  :placeholder="t.key === 'blender' ? '/opt/blender/blender' : '/usr/bin/ffmpeg'"
+                  :aria-label="t('settings-tool-path', { tool: tool.title })"
+                  :placeholder="tool.key === 'blender' ? '/opt/blender/blender' : '/usr/bin/ffmpeg'"
                 />
-                <button class="btn" type="submit" :disabled="busy || !paths[t.key].trim() || paths[t.key].trim() === s[t.key].value">Use</button>
+                <button class="btn" type="submit" :disabled="busy || !paths[tool.key].trim() || paths[tool.key].trim() === s[tool.key].value">{{ t('settings-use') }}</button>
               </form>
-              <p class="status" :data-state="s[t.key].state" role="status">
+              <p class="status" :data-state="s[tool.key].state" role="status">
                 <span class="dot" aria-hidden="true" />
-                <span class="text">{{ statusText(s[t.key]) }}</span>
+                <span class="text">{{ statusText(s[tool.key]) }}</span>
               </p>
             </section>
             <section>
-              <div class="sh"><h3>MIDI SoundFont</h3></div>
-              <p class="what">The instruments MIDI files are played and converted with.</p>
+              <div class="sh"><h3>{{ t('settings-soundfont') }}</h3></div>
+              <p class="what">{{ t('settings-soundfont-what') }}</p>
               <div class="llm opts">
-                <label for="opt-sf">SoundFont file</label>
+                <label for="opt-sf">{{ t('settings-soundfont-file') }}</label>
                 <div class="key">
                   <input
                     id="opt-sf"
@@ -927,12 +944,12 @@ onBeforeUnmount(() => {
                     class="field mono"
                     type="text"
                     spellcheck="false"
-                    placeholder="Found on the server, or built-in"
+                    :placeholder="t('settings-soundfont-placeholder')"
                     :disabled="busy"
                     @change="saveOpt('soundfont')"
                     @keydown.enter.prevent="saveOpt('soundfont')"
                   />
-                  <ResetButton v-if="changed('soundfont')" :to="s.options.soundfont.default || 'found on the server, or built-in'" :disabled="busy" @reset="resetOpt('soundfont')" />
+                  <ResetButton v-if="changed('soundfont')" :to="s.options.soundfont.default || t('settings-soundfont-default')" :disabled="busy" @reset="resetOpt('soundfont')" />
                 </div>
               </div>
             </section>
@@ -940,13 +957,10 @@ onBeforeUnmount(() => {
 
           <section v-else-if="current === 'search'">
             <div class="sh">
-              <h3>Search by what pictures show</h3>
-              <ResetButton v-if="s.clip.saved" :to="onOff(s.clip.default)" :disabled="busy" @reset="save({ clip: null }, 'Image search: back to the default')" />
+              <h3>{{ t('settings-clip-heading') }}</h3>
+              <ResetButton v-if="s.clip.saved" :to="onOff(s.clip.default)" :disabled="busy" @reset="save({ clip: null }, t('settings-clip-reset'))" />
             </div>
-            <p class="what">
-              Type what you’re after (“mossy rock”, “sci-fi door”, “wooden barrel”) and pictures that show it turn up beside
-              names that have the words. “More like this” finds things of the same kind, not only the same colours.
-            </p>
+            <p class="what">{{ t('settings-clip-what') }}</p>
             <div class="switches">
               <div class="opt-row">
                 <label class="check">
@@ -957,16 +971,11 @@ onBeforeUnmount(() => {
                     :disabled="busy"
                     @change="toggleClip(($event.target as HTMLInputElement).checked)"
                   />
-                  Turn on image search
+                  {{ t('settings-clip-toggle') }}
                 </label>
               </div>
             </div>
-            <p class="hint">
-              Uses OpenAI’s CLIP model, run on this server’s processor: nothing leaves it. Turning it on downloads the model
-              ({{ Math.round(s.clip.download_bytes / 1e6) }} MB) from Hugging Face, then learns every picture in the background
-              at low priority. It takes 300 to 600 MB of memory while it works or someone searches. Turning it off deletes
-              the model and keeps what it learned, for next time.
-            </p>
+            <p class="hint">{{ t('settings-clip-hint', { size: Math.round(s.clip.download_bytes / 1e6) }) }}</p>
             <p class="status" :data-state="s.clip.state" role="status" data-testid="clip-status">
               <span class="dot" aria-hidden="true" />
               <span class="text">{{ clipStatus(s.clip) }}</span>
@@ -976,40 +985,38 @@ onBeforeUnmount(() => {
 
           <section v-else-if="current === 'ai'">
             <div class="sh">
-              <h3>Service</h3>
+              <h3>{{ t('settings-ai-service') }}</h3>
               <ResetButton v-if="llmChanged" :to="llmDefaultText" :disabled="busy" @reset="resetLlm" />
             </div>
             <form class="llm" @submit.prevent="saveLlm">
-              <label for="llm-provider">Service</label>
+              <label for="llm-provider">{{ t('settings-ai-service') }}</label>
               <select id="llm-provider" class="field" :value="llm.provider" :disabled="busy" @change="pickProvider(($event.target as HTMLSelectElement).value as ProviderId)">
                 <option v-for="p in PROVIDERS" :key="p.id" :value="p.id">{{ p.label }}</option>
               </select>
               <span />
               <p class="hint inline">{{ provider.hint }}</p>
               <template v-if="llm.provider === 'chatgpt'">
-                <span class="label">Account</span>
+                <span class="label">{{ t('settings-chatgpt-account') }}</span>
                 <div class="gpt">
                   <p v-if="!gpt" class="status" data-state="looking" role="status">
                     <span class="dot" aria-hidden="true" />
-                    <span class="text">Checking…</span>
+                    <span class="text">{{ t('settings-chatgpt-checking') }}</span>
                   </p>
                   <template v-else>
                     <p v-if="gpt.signed_in || gpt.problem" class="status" :data-state="gpt.problem ? 'unavailable' : 'ready'" role="status">
                       <span class="dot" aria-hidden="true" />
-                      <span class="text">{{ gpt.problem ?? (gpt.email ? `Signed in as ${gpt.email}` : 'Signed in') }}</span>
+                      <span class="text">{{ gpt.problem ?? (gpt.email ? t('settings-chatgpt-status-as', { email: gpt.email }) : t('settings-chatgpt-status')) }}</span>
                     </p>
                     <div class="row">
                       <button v-if="!gpt.signed_in || gpt.problem" type="button" class="btn primary" :disabled="gptBusy" @click="startChatgpt">
-                        Continue with ChatGPT
+                        {{ t('settings-chatgpt-continue') }}
                       </button>
-                      <button v-if="gpt.signed_in" type="button" class="link" :disabled="gptBusy" @click="signOutChatgpt">Sign out</button>
-                      <a class="link" :href="gpt.manage_url" target="_blank" rel="noopener noreferrer">Manage usage</a>
+                      <button v-if="gpt.signed_in" type="button" class="link" :disabled="gptBusy" @click="signOutChatgpt">{{ t('settings-chatgpt-sign-out') }}</button>
+                      <a class="link" :href="gpt.manage_url" target="_blank" rel="noopener noreferrer">{{ t('settings-chatgpt-manage') }}</a>
                     </div>
                     <template v-if="gptUrl && (!gpt.signed_in || gpt.problem)">
                       <p class="hint inline">
-                        Finish signing in in the window that opened (<a :href="gptUrl" target="_blank" rel="noopener noreferrer">open it again</a>).
-                        If it ends on a page that won’t load, at an address starting with <code>http://127.0.0.1</code>, copy that
-                        address and paste it here:
+                        {{ t('settings-chatgpt-finish-before') }}<a :href="gptUrl" target="_blank" rel="noopener noreferrer">{{ t('settings-chatgpt-finish-link') }}</a>{{ t('settings-chatgpt-finish-middle') }}<code>http://127.0.0.1</code>{{ t('settings-chatgpt-finish-after') }}
                       </p>
                       <div class="key">
                         <input
@@ -1017,24 +1024,20 @@ onBeforeUnmount(() => {
                           class="field mono"
                           type="url"
                           spellcheck="false"
-                          aria-label="The address the sign-in ended on"
+                          :aria-label="t('settings-chatgpt-paste')"
                           placeholder="http://127.0.0.1:…/auth/callback?code=…"
                           @keydown.enter.prevent="finishChatgpt"
                         />
-                        <button type="button" class="btn" :disabled="!gptPaste.trim() || gptBusy" @click="finishChatgpt">Finish</button>
+                        <button type="button" class="btn" :disabled="!gptPaste.trim() || gptBusy" @click="finishChatgpt">{{ t('settings-chatgpt-finish') }}</button>
                       </div>
                     </template>
                   </template>
-                  <p class="hint inline">
-                    Tagging requests count toward your ChatGPT plan’s usage. Manage usage shows what Hoard has used and lets you
-                    limit it. To disconnect Hoard from ChatGPT itself, go to Settings → Security and login → Sign in with ChatGPT
-                    on chatgpt.com.
-                  </p>
+                  <p class="hint inline">{{ t('settings-chatgpt-usage') }}</p>
                 </div>
               </template>
               <template v-if="llm.provider !== 'off' && (llm.provider !== 'chatgpt' || (gpt?.signed_in && !gpt.problem))">
                 <template v-if="provider.editUrl">
-                  <label for="llm-url">Address</label>
+                  <label for="llm-url">{{ t('settings-ai-url') }}</label>
                   <input
                     id="llm-url"
                     v-model="llm.url"
@@ -1046,7 +1049,7 @@ onBeforeUnmount(() => {
                   />
                 </template>
                 <template v-if="provider.key || (provider.editUrl && llm.provider !== 'local')">
-                  <label for="llm-key">API key</label>
+                  <label for="llm-key">{{ t('settings-ai-key') }}</label>
                   <div class="key">
                     <input
                       id="llm-key"
@@ -1054,19 +1057,19 @@ onBeforeUnmount(() => {
                       class="field mono"
                       type="password"
                       autocomplete="off"
-                      :placeholder="keptKey ? 'Saved (type to replace)' : provider.key ? 'Paste your key' : 'None (optional)'"
+                      :placeholder="keptKey ? t('settings-ai-key-saved') : provider.key ? t('settings-ai-key-paste') : t('settings-ai-key-optional')"
                       @input="llm.removeKey = false"
                       @change="loadModels"
                     />
-                    <button v-if="keptKey && !llm.key" type="button" class="link" @click="llm.removeKey = true; loadModels()">Remove</button>
-                    <a v-if="provider.keyUrl" class="link" :href="provider.keyUrl" target="_blank" rel="noopener noreferrer">Get a key</a>
+                    <button v-if="keptKey && !llm.key" type="button" class="link" @click="llm.removeKey = true; loadModels()">{{ t('settings-ai-key-remove') }}</button>
+                    <a v-if="provider.keyUrl" class="link" :href="provider.keyUrl" target="_blank" rel="noopener noreferrer">{{ t('settings-ai-get-key') }}</a>
                   </div>
                 </template>
                 <template v-if="llm.provider === 'local' && !local?.reachable">
                   <span />
                   <p v-if="localState !== 'ok'" class="status" data-state="looking" role="status">
                     <span class="dot" aria-hidden="true" />
-                    <span class="text">Connecting…</span>
+                    <span class="text">{{ t('settings-ai-connecting') }}</span>
                   </p>
                   <div v-else-if="local" class="local-off">
                     <p class="status" data-state="unavailable" role="status">
@@ -1074,14 +1077,12 @@ onBeforeUnmount(() => {
                       <span class="text">{{ local.error }}</span>
                     </p>
                     <p class="hint inline">
-                      Start it with <code>docker compose up -d llm</code> (or <code>cargo xtask llm</code> when developing), then
-                      <button type="button" class="link" @click="loadLocal()">try again</button>. A server that runs just one model
-                      works too: give its model’s name below.
+                      {{ t('settings-local-start-before') }}<code>docker compose up -d llm</code>{{ t('settings-local-start-or') }}<code>cargo xtask llm</code>{{ t('settings-local-start-developing') }}<button type="button" class="link" @click="loadLocal()">{{ t('settings-local-start-retry') }}</button>{{ t('settings-local-start-after') }}
                     </p>
                   </div>
                 </template>
                 <div v-if="llm.provider === 'local' && local?.reachable" class="local">
-                  <ul v-if="local.models.length" class="mlist" aria-label="On the model server">
+                  <ul v-if="local.models.length" class="mlist" :aria-label="t('settings-local-list')">
                     <li v-for="m in local.models" :key="m.id" :class="{ on: inUse(m) }">
                       <span class="what">
                         <strong>{{ nameOf(m.id) }}</strong>
@@ -1096,25 +1097,25 @@ onBeforeUnmount(() => {
                         <progress v-if="m.status === 'downloading' && m.progress?.[1]" :value="m.progress[0]" :max="m.progress[1]" />
                       </span>
                       <span class="acts">
-                        <button v-if="m.status === 'incomplete'" type="button" class="btn" :disabled="!!localBusy" @click="loadLocal('download', m.id)">Resume</button>
-                        <button v-else-if="ready(m) && !inUse(m)" type="button" class="btn primary" :disabled="busy || !!localBusy" @click="useLocal(m)">Use</button>
+                        <button v-if="m.status === 'incomplete'" type="button" class="btn" :disabled="!!localBusy" @click="loadLocal('download', m.id)">{{ t('settings-local-resume') }}</button>
+                        <button v-else-if="ready(m) && !inUse(m)" type="button" class="btn primary" :disabled="busy || !!localBusy" @click="useLocal(m)">{{ t('settings-use') }}</button>
                         <button type="button" class="btn ghost" :disabled="!!localBusy" @click="deleteLocal(m)">
-                          {{ localBusy === m.id ? 'Deleting…' : m.status === 'downloading' ? 'Cancel' : 'Delete' }}
+                          {{ localBusy === m.id ? t('settings-local-deleting') : m.status === 'downloading' ? t('settings-local-cancel') : t('settings-local-delete') }}
                         </button>
                       </span>
                     </li>
                   </ul>
-                  <p v-else class="hint inline">Nothing downloaded yet. Pick one below; it’s kept on the server, and you can switch any time.</p>
-                  <ul v-if="notDownloaded.length" class="mlist" aria-label="Models to download">
+                  <p v-else class="hint inline">{{ t('settings-local-none') }}</p>
+                  <ul v-if="notDownloaded.length" class="mlist" :aria-label="t('settings-local-catalog')">
                     <li v-for="m in notDownloaded" :key="m.id">
                       <span class="what">
                         <strong>{{ m.name }}</strong>
-                        <small>{{ m.size_gb }} GB · {{ m.license }}</small>
+                        <small>{{ t('settings-local-size', { size: m.size_gb, license: m.license }) }}</small>
                         <small>{{ m.note }}</small>
                       </span>
                       <span class="acts">
                         <button type="button" class="btn" :disabled="!!localBusy" @click="loadLocal('download', m.id)">
-                          {{ localBusy === m.id ? 'Starting…' : 'Download' }}
+                          {{ localBusy === m.id ? t('settings-local-starting') : t('settings-local-download') }}
                         </button>
                       </span>
                     </li>
@@ -1125,15 +1126,15 @@ onBeforeUnmount(() => {
                       class="field mono"
                       type="text"
                       spellcheck="false"
-                      aria-label="Another model from Hugging Face"
-                      placeholder="Another from Hugging Face: owner/name-GGUF:Q4_K_M"
+                      :aria-label="t('settings-local-other')"
+                      :placeholder="t('settings-local-other-placeholder')"
                       @keydown.enter.prevent="downloadOther"
                     />
-                    <button type="button" class="btn" :disabled="!otherModel.trim() || !!localBusy" @click="downloadOther">Download</button>
+                    <button type="button" class="btn" :disabled="!otherModel.trim() || !!localBusy" @click="downloadOther">{{ t('settings-local-download') }}</button>
                   </div>
                 </div>
                 <template v-if="llm.provider !== 'local' || (local && !local.reachable)">
-                  <label for="llm-model">Model</label>
+                  <label for="llm-model">{{ t('settings-ai-model') }}</label>
                   <div class="key">
                     <input
                       id="llm-model"
@@ -1142,7 +1143,7 @@ onBeforeUnmount(() => {
                       type="text"
                       spellcheck="false"
                       list="llm-models"
-                      :placeholder="models.length ? 'Pick or type a model' : 'Model name'"
+                      :placeholder="models.length ? t('settings-ai-model-pick') : t('settings-ai-model-name')"
                       @change="modelPicked"
                     />
                     <button
@@ -1151,7 +1152,7 @@ onBeforeUnmount(() => {
                       :disabled="(llm.provider !== 'chatgpt' && (!trimUrl(llm.url) || missingKey)) || modelsState.kind === 'loading'"
                       @click="connect"
                     >
-                      {{ modelsState.kind === 'ok' ? 'Refresh' : 'Connect' }}
+                      {{ modelsState.kind === 'ok' ? t('settings-ai-refresh') : t('settings-ai-connect') }}
                     </button>
                   </div>
                   <datalist id="llm-models">
@@ -1161,24 +1162,24 @@ onBeforeUnmount(() => {
                     <span />
                     <p class="status" :data-state="missingKey ? 'off' : { loading: 'looking', ok: 'ready', error: 'unavailable', idle: 'off' }[modelsState.kind]" role="status">
                       <span class="dot" aria-hidden="true" />
-                      <span class="text">{{ missingKey ? 'Add the API key to see its models' : modelsState.text }}</span>
+                      <span class="text">{{ missingKey ? t('settings-ai-need-key') : modelsState.text }}</span>
                     </p>
                   </template>
                 </template>
                 <span />
-                <label class="check"><input v-model="llm.vision" type="checkbox" /> Send thumbnails too (needs a model that takes images)</label>
-                <label for="llm-batch">Per request</label>
+                <label class="check"><input v-model="llm.vision" type="checkbox" /> {{ t('settings-ai-vision') }}</label>
+                <label for="llm-batch">{{ t('settings-ai-batch') }}</label>
                 <div class="key">
                   <input id="llm-batch" v-model.number="llm.batch" class="field num" type="number" min="1" max="200" />
-                  <span class="unit">assets (fewer for small local models, more for big hosted ones)</span>
+                  <span class="unit">{{ t('settings-ai-batch-unit') }}</span>
                 </div>
               </template>
               <span />
               <div class="row">
-                <button class="btn primary" type="submit" :disabled="busy || !llmDirty || !llmReady">Save</button>
+                <button class="btn primary" type="submit" :disabled="busy || !llmDirty || !llmReady">{{ t('settings-save') }}</button>
                 <span class="status" :data-state="s.llm.enabled ? 'ready' : 'off'">
                   <span class="dot" aria-hidden="true" />
-                  <span class="text">{{ s.llm.enabled ? `On: ${providerLabel(s.llm)} · ${s.llm.model}` : 'Off' }}</span>
+                  <span class="text">{{ s.llm.enabled ? t('settings-ai-on', { service: providerLabel(s.llm), model: s.llm.model }) : t('settings-status-off') }}</span>
                 </span>
               </div>
             </form>
@@ -1186,10 +1187,8 @@ onBeforeUnmount(() => {
 
           <template v-else-if="current === 'adding'">
             <section>
-              <div class="sh"><h3>Store pages</h3></div>
-              <p class="what">
-                New packs are looked up on the stores in the background, so they get their store page, seller and license.
-              </p>
+              <div class="sh"><h3>{{ t('settings-store-pages') }}</h3></div>
+              <p class="what">{{ t('settings-store-pages-what') }}</p>
               <div class="switches">
                 <div class="opt-row">
                   <label class="check">
@@ -1199,7 +1198,7 @@ onBeforeUnmount(() => {
                       :disabled="busy"
                       @change="save({ store_lookup: ($event.target as HTMLInputElement).checked })"
                     />
-                    Look up store pages automatically
+                    {{ t('settings-store-lookup') }}
                   </label>
                   <ResetButton v-if="changed('store_lookup')" :to="onOff(s.options.store_lookup.default)" :disabled="busy" @reset="resetOpt('store_lookup')" />
                 </div>
@@ -1207,16 +1206,16 @@ onBeforeUnmount(() => {
             </section>
             <section>
               <div class="sh">
-                <h3>Unreal packages</h3>
+                <h3>{{ t('settings-unreal') }}</h3>
               <ResetButton
                 v-if="s.unreal_convert.value !== s.unreal_convert.default"
                 :to="UNREAL.find((u) => u.value === s!.unreal_convert.default)?.label ?? s.unreal_convert.default"
                 :disabled="busy"
-                @reset="save({ unreal_convert: null }, 'Unreal packages: back to the default')"
+                @reset="save({ unreal_convert: null }, t('settings-unreal-reset'))"
               />
               </div>
-              <p class="what">What to do with .uasset files.</p>
-            <div class="choices" role="radiogroup" aria-label="Unreal packages">
+              <p class="what">{{ t('settings-unreal-what') }}</p>
+            <div class="choices" role="radiogroup" :aria-label="t('settings-unreal')">
               <label v-for="u in UNREAL" :key="u.value" :class="{ on: s.unreal_convert.value === u.value }">
                 <input
                   type="radio"
@@ -1234,19 +1233,15 @@ onBeforeUnmount(() => {
           <template v-else-if="current === 'downloads'">
             <section data-testid="texture-names">
               <div class="sh">
-                <h3>Texture names</h3>
+                <h3>{{ t('settings-tn') }}</h3>
                 <ResetButton
                   v-if="s.texture_names.saved && !sameNames(s.texture_names, s.texture_names.default)"
-                  to="the default"
+                  :to="t('settings-the-default')"
                   :disabled="busy"
-                  @reset="save({ texture_names: null }, 'Texture names: back to the default')"
+                  @reset="save({ texture_names: null }, t('settings-tn-reset'))"
                 />
               </div>
-              <p class="what">
-                A material’s maps go out named after it and what each map is for, however the files are named:
-                Rock_Normal.png, not rock_moss_xeokah0_raw_8K_Normal.png. The files in the library aren’t touched, and a map that a
-                model or MTL sent with it names keeps that name, so the model still finds it.
-              </p>
+              <p class="what">{{ t('settings-tn-what') }}</p>
               <div class="switches">
                 <div class="opt-row">
                   <label class="check">
@@ -1256,19 +1251,19 @@ onBeforeUnmount(() => {
                       :disabled="busy"
                       @change="names.on = ($event.target as HTMLInputElement).checked; saveNames()"
                     />
-                    Name texture maps by their material
+                    {{ t('settings-tn-toggle') }}
                   </label>
                 </div>
               </div>
               <template v-if="names.on">
                 <div class="llm opts">
-                  <span class="label">Style</span>
-                  <div class="modes" role="radiogroup" aria-label="Naming style">
-                    <label><input type="radio" name="tn-style" :checked="namesPreset === 'descriptive'" :disabled="busy" @change="useNames('descriptive')" />Descriptive</label>
-                    <label><input type="radio" name="tn-style" :checked="namesPreset === 'short'" :disabled="busy" @change="useNames('short')" />Short</label>
-                    <label><input type="radio" name="tn-style" :checked="namesPreset === 'custom'" disabled />Your own</label>
+                  <span class="label">{{ t('settings-tn-style') }}</span>
+                  <div class="modes" role="radiogroup" :aria-label="t('settings-tn-style-group')">
+                    <label><input type="radio" name="tn-style" :checked="namesPreset === 'descriptive'" :disabled="busy" @change="useNames('descriptive')" />{{ t('settings-tn-descriptive') }}</label>
+                    <label><input type="radio" name="tn-style" :checked="namesPreset === 'short'" :disabled="busy" @change="useNames('short')" />{{ t('settings-tn-short') }}</label>
+                    <label><input type="radio" name="tn-style" :checked="namesPreset === 'custom'" disabled />{{ t('settings-tn-custom') }}</label>
                   </div>
-                  <label for="tn-pattern">Pattern</label>
+                  <label for="tn-pattern">{{ t('settings-tn-pattern') }}</label>
                   <div class="key">
                     <input
                       id="tn-pattern"
@@ -1282,10 +1277,9 @@ onBeforeUnmount(() => {
                   </div>
                   <span />
                   <p class="hint inline">
-                    <code>{name}</code> the material, <code>{map}</code> what the map is for, <code>{size}</code> its size
-                    when the set comes in more than one (added on the end if the pattern leaves it out).
+                    <code>{name}</code>{{ t('settings-tn-hint-name') }}<code>{map}</code>{{ t('settings-tn-hint-map') }}<code>{size}</code>{{ t('settings-tn-hint-size') }}
                   </p>
-                  <span class="label">Example</span>
+                  <span class="label">{{ t('settings-tn-example') }}</span>
                   <p class="tn-example mono" data-testid="texture-example">
                     <span v-for="e in namesExample" :key="e">{{ e }}</span>
                   </p>
@@ -1294,7 +1288,7 @@ onBeforeUnmount(() => {
                   <span class="dot" aria-hidden="true" /><span class="text">{{ namesError }}</span>
                 </p>
                 <details class="tn-maps">
-                  <summary>Suffixes for each kind of map</summary>
+                  <summary>{{ t('settings-tn-suffixes') }}</summary>
                   <div class="llm opts">
                     <template v-for="r in ROLES" :key="r">
                       <label :for="`tn-${r}`">{{ ROLE_LABEL[r] }}</label>
@@ -1318,13 +1312,10 @@ onBeforeUnmount(() => {
 
           <template v-else-if="current === 'general'">
             <section>
-              <div class="sh"><h3>Name</h3></div>
-              <p class="what">
-                What this server is called in the top bar, the browser tab and on the sign-in page, so with more than one
-                hoard you can tell which is which.
-              </p>
+              <div class="sh"><h3>{{ t('settings-name') }}</h3></div>
+              <p class="what">{{ t('settings-name-what') }}</p>
               <div class="llm opts">
-                <label for="opt-name">Name</label>
+                <label for="opt-name">{{ t('settings-name') }}</label>
                 <div class="key">
                   <input
                     id="opt-name"
@@ -1344,14 +1335,10 @@ onBeforeUnmount(() => {
 
           <template v-else-if="current === 'connection'">
             <section>
-              <div class="sh"><h3>Address</h3></div>
-              <p class="what">
-                The address people and apps use to reach Hoard, when it isn’t the one this browser is on: a reverse proxy’s,
-                a tunnel’s or a tailnet name, like https://hoard.example.com. Links Hoard hands out (to Claude and other apps,
-                in sign-in, on its certificate) use it.
-              </p>
+              <div class="sh"><h3>{{ t('settings-address') }}</h3></div>
+              <p class="what">{{ t('settings-address-what') }}</p>
               <div class="llm opts">
-                <label for="opt-public">Public address</label>
+                <label for="opt-public">{{ t('settings-public-url') }}</label>
                 <div class="key">
                   <input
                     id="opt-public"
@@ -1359,12 +1346,12 @@ onBeforeUnmount(() => {
                     class="field mono"
                     type="url"
                     spellcheck="false"
-                    placeholder="From the browser’s address (e.g. https://hoard.example.com)"
+                    :placeholder="t('settings-public-url-placeholder')"
                     :disabled="busy"
                     @change="saveOpt('public_url')"
                     @keydown.enter.prevent="saveOpt('public_url')"
                   />
-                  <ResetButton v-if="changed('public_url')" :to="s.options.public_url.default || 'from the browser’s address'" :disabled="busy" @reset="resetOpt('public_url')" />
+                  <ResetButton v-if="changed('public_url')" :to="s.options.public_url.default || t('settings-public-url-default')" :disabled="busy" @reset="resetOpt('public_url')" />
                 </div>
               </div>
             </section>
@@ -1373,7 +1360,7 @@ onBeforeUnmount(() => {
 
           <template v-else-if="current === 'performance'">
             <section>
-              <div class="sh"><h3>3D thumbnails</h3></div>
+              <div class="sh"><h3>{{ t('settings-render') }}</h3></div>
               <p v-if="gpuNote" class="status" :data-state="gpuNote.state" role="status" :title="stats?.renderer">
                 <span class="dot" aria-hidden="true" />
                 <span class="text">{{ gpuNote.text }}</span>
@@ -1383,7 +1370,7 @@ onBeforeUnmount(() => {
                 <div class="opt-row">
                   <label class="check">
                     <input type="checkbox" :checked="s.options.render.value" :disabled="busy" @change="save({ render: ($event.target as HTMLInputElement).checked })" />
-                    Render thumbnails for 3D models
+                    {{ t('settings-render-toggle') }}
                   </label>
                   <ResetButton v-if="changed('render')" :to="onOff(s.options.render.default)" :disabled="busy" @reset="resetOpt('render')" />
                 </div>
@@ -1392,7 +1379,7 @@ onBeforeUnmount(() => {
 
             <section>
               <div class="sh">
-                <h3>Thumbnails</h3>
+                <h3>{{ t('settings-thumbs') }}</h3>
                 <ResetButton
                   v-if="changed('thumb_quality')"
                   :to="THUMBS.find((t) => t.value === s!.options.thumb_quality.default)?.label ?? s.options.thumb_quality.default"
@@ -1401,29 +1388,28 @@ onBeforeUnmount(() => {
                 />
               </div>
               <p class="what">
-                How new thumbnails and model views are stored. Ones with transparency, and pixel art, are always PNG.
-                To shrink the ones you already have, run Shrink thumbnails in Maintenance.
-                <template v-if="usage?.preview_bytes !== undefined">Previews take {{ humanBytes(usage.preview_bytes) }} now.</template>
+                {{ t('settings-thumbs-what') }}
+                <template v-if="usage?.preview_bytes !== undefined">{{ t('settings-previews-size', { size: humanBytes(usage.preview_bytes) }) }}</template>
               </p>
-              <div class="choices" role="radiogroup" aria-label="Thumbnails">
-                <label v-for="t in THUMBS" :key="t.value" :class="{ on: s.options.thumb_quality.value === t.value }">
+              <div class="choices" role="radiogroup" :aria-label="t('settings-thumbs')">
+                <label v-for="q in THUMBS" :key="q.value" :class="{ on: s.options.thumb_quality.value === q.value }">
                   <input
                     type="radio"
                     name="thumbs"
-                    :checked="s.options.thumb_quality.value === t.value"
+                    :checked="s.options.thumb_quality.value === q.value"
                     :disabled="busy"
-                    @change="save({ thumb_quality: t.value }, `Thumbnails: ${t.label}`)"
+                    @change="save({ thumb_quality: q.value }, t('settings-thumbs-saved', { quality: q.label }))"
                   />
-                  <span><strong>{{ t.label }}</strong><small>{{ t.hint }}</small></span>
+                  <span><strong>{{ q.label }}</strong><small>{{ q.hint }}</small></span>
                 </label>
               </div>
             </section>
 
             <section>
-              <div class="sh"><h3>Work and limits</h3></div>
-              <p class="what">Each one saves when you leave the field or press Enter. Sizes take units: 100 GB, 512 MB, 1.5 TB; a plain number is GB.</p>
+              <div class="sh"><h3>{{ t('settings-limits') }}</h3></div>
+              <p class="what">{{ t('settings-limits-what') }}</p>
               <div class="llm opts">
-                <label for="opt-workers">Background workers</label>
+                <label for="opt-workers">{{ t('settings-workers') }}</label>
                 <div class="key">
                   <input
                     id="opt-workers"
@@ -1436,26 +1422,26 @@ onBeforeUnmount(() => {
                     @change="saveOpt('workers')"
                     @keydown.enter.prevent="saveOpt('workers')"
                   />
-                  <span class="unit">jobs at once (ingest, tagging, conversions)</span>
-                  <ResetButton v-if="changed('workers')" :to="String(s.options.workers.default)" :disabled="busy" @reset="resetOpt('workers')" />
+                  <span class="unit">{{ t('settings-workers-unit') }}</span>
+                  <ResetButton v-if="changed('workers')" :to="formatNumber(s.options.workers.default)" :disabled="busy" @reset="resetOpt('workers')" />
                 </div>
-                <label for="opt-upload">Largest upload</label>
+                <label for="opt-upload">{{ t('settings-max-upload') }}</label>
                 <div class="key">
                   <SizeInput id="opt-upload" v-model="opts.max_upload_mb" class="num" :disabled="busy" @update:model-value="saveOpt('max_upload_mb')" />
-                  <span class="unit">per file</span>
+                  <span class="unit">{{ t('settings-max-upload-unit') }}</span>
                   <ResetButton v-if="changed('max_upload_mb')" :to="formatMiB(s.options.max_upload_mb.default)" :disabled="busy" @reset="resetOpt('max_upload_mb')" />
                 </div>
-                <label for="opt-expand">Largest pack</label>
+                <label for="opt-expand">{{ t('settings-max-expand') }}</label>
                 <div class="key">
                   <SizeInput id="opt-expand" v-model="opts.max_expand_mb" class="num" :disabled="busy" @update:model-value="saveOpt('max_expand_mb')" />
-                  <span class="unit">once unpacked</span>
+                  <span class="unit">{{ t('settings-max-expand-unit') }}</span>
                   <ResetButton v-if="changed('max_expand_mb')" :to="formatMiB(s.options.max_expand_mb.default)" :disabled="busy" @reset="resetOpt('max_expand_mb')" />
                 </div>
-                <label for="opt-conv">Converted downloads</label>
+                <label for="opt-conv">{{ t('settings-conversion-cache') }}</label>
                 <div class="key">
                   <SizeInput id="opt-conv" v-model="opts.conversion_cache_mb" class="num" :disabled="busy" @update:model-value="saveOpt('conversion_cache_mb')" />
                   <span class="unit">
-                    kept at most{{ usage?.conversion_cache_bytes !== undefined ? `, ${humanBytes(usage.conversion_cache_bytes)} now` : '' }}; the least recently used go first
+                    {{ usage?.conversion_cache_bytes !== undefined ? t('settings-conversion-cache-unit-now', { size: humanBytes(usage.conversion_cache_bytes) }) : t('settings-conversion-cache-unit') }}
                   </span>
                   <ResetButton v-if="changed('conversion_cache_mb')" :to="formatMiB(s.options.conversion_cache_mb.default)" :disabled="busy" @reset="resetOpt('conversion_cache_mb')" />
                 </div>
@@ -1465,8 +1451,8 @@ onBeforeUnmount(() => {
 
           <template v-else-if="current === 'maintenance'">
             <section>
-              <div class="sh"><h3>Updates</h3></div>
-              <p v-if="stats?.version" class="what">This is Hoard {{ stats.version }}.</p>
+              <div class="sh"><h3>{{ t('settings-updates') }}</h3></div>
+              <p v-if="stats?.version" class="what">{{ t('settings-version', { version: stats.version }) }}</p>
               <div class="switches">
                 <div class="opt-row">
                   <label class="check">
@@ -1476,7 +1462,7 @@ onBeforeUnmount(() => {
                       :disabled="busy"
                       @change="save({ update_check: ($event.target as HTMLInputElement).checked })"
                     />
-                    Check GitHub every few hours for a new release
+                    {{ t('settings-update-check') }}
                   </label>
                   <ResetButton v-if="changed('update_check')" :to="onOff(s.options.update_check.default)" :disabled="busy" @reset="resetOpt('update_check')" />
                 </div>
@@ -1606,8 +1592,10 @@ progress.learn { display: block; width: 100%; max-width: 28rem; height: 0.35rem;
 .choices small { color: var(--muted); font-size: inherit; }
 
 /* Theme swatches: each label carries data-light / data-dark, so styles.css gives it that theme's --l-* / --d-*. */
-.themes { display: grid; grid-template-columns: 3rem minmax(0, 1fr); gap: 0.8rem; align-items: start; margin-bottom: 1.4rem; }
+.themes { display: grid; grid-template-columns: 6rem minmax(0, 1fr); gap: 0.8rem; align-items: start; margin-bottom: 1.4rem; }
 .tlabel { font-size: var(--step--1); color: var(--muted); padding-top: 1.3rem; }
+.tlabel.lang { padding-top: 0; align-self: center; }
+.field.lang { justify-self: start; min-width: 14rem; }
 .swatches { display: grid; grid-template-columns: repeat(auto-fill, minmax(6.5rem, 1fr)); gap: 0.6rem; }
 .sw small { font-size: 0.68rem; color: var(--faint); font-weight: 400; line-height: 1.3; }
 .sw.light { --s-bg: var(--l-bg); --s-panel: var(--l-panel); --s-line: var(--l-line); --s-text: var(--l-text); --s-muted: var(--l-muted); --s-accent: var(--l-accent); }

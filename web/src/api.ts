@@ -1,4 +1,5 @@
 // Typed client for the hoardd API. Types mirror crates/hoard-core.
+import { formatNumber, language, t } from './i18n'
 import type { TextureNames } from './texnames'
 
 export type AssetKind =
@@ -867,7 +868,8 @@ function normalize(a: Asset): Asset {
  * from the portal and not from another site's page riding on the cookie.
  */
 export function authHeaders(): Record<string, string> {
-  return { 'X-Hoard': '1' }
+  // The server's messages (errors, mostly) come back in the portal's language.
+  return { 'X-Hoard': '1', 'Accept-Language': language() }
 }
 
 /** Called when the server says to sign in (set by the auth store). */
@@ -1291,28 +1293,45 @@ export function humanBytes(b: number): string {
     v /= 1024
     i++
   }
-  return `${v < 10 && i > 0 ? v.toFixed(1) : Math.round(v)} ${units[i]}`
+  const digits = v < 10 && i > 0 ? 1 : 0
+  return `${formatNumber(v, { minimumFractionDigits: digits, maximumFractionDigits: digits, useGrouping: false })} ${units[i]}`
 }
 
 export function formatDuration(secs: number): string {
-  if (secs < 10) return `${secs.toFixed(2)} s`
+  if (secs < 10) return `${formatNumber(secs, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} s`
   const m = Math.floor(secs / 60)
   const s = Math.round(secs % 60)
   return m ? `${m}:${String(s).padStart(2, '0')}` : `${s} s`
 }
 
+/** Each kind's name, in the current language: getters, so `KIND_LABEL[k]` reads it when it's shown. */
 export const KIND_LABEL: Record<AssetKind, string> = {
-  texture: 'Textures',
-  audio: 'Audio',
-  model: 'Models',
-  animation: 'Animations',
-  font: 'Fonts',
-  shader: 'Shaders',
-  material: 'Materials',
-  video: 'Video',
-  document: 'Documents',
-  data: 'Data',
-  other: 'Other',
+  get texture() { return t('api-kind-texture') },
+  get audio() { return t('api-kind-audio') },
+  get model() { return t('api-kind-model') },
+  get animation() { return t('api-kind-animation') },
+  get font() { return t('api-kind-font') },
+  get shader() { return t('api-kind-shader') },
+  get material() { return t('api-kind-material') },
+  get video() { return t('api-kind-video') },
+  get document() { return t('api-kind-document') },
+  get data() { return t('api-kind-data') },
+  get other() { return t('api-kind-other') },
+}
+
+/** Each kind's name as it reads mid-sentence (“Only textures”), in the current language. */
+export const KIND_NAME: Record<AssetKind, string> = {
+  get texture() { return t('api-kind-texture-name') },
+  get audio() { return t('api-kind-audio-name') },
+  get model() { return t('api-kind-model-name') },
+  get animation() { return t('api-kind-animation-name') },
+  get font() { return t('api-kind-font-name') },
+  get shader() { return t('api-kind-shader-name') },
+  get material() { return t('api-kind-material-name') },
+  get video() { return t('api-kind-video-name') },
+  get document() { return t('api-kind-document-name') },
+  get data() { return t('api-kind-data-name') },
+  get other() { return t('api-kind-other-name') },
 }
 
 /** Kinds whose thumbnails are pictures of the thing itself, so "looks like" means something (mirrors the server). */

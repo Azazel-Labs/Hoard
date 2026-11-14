@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, nextTick, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue'
 import {
-  api, downloadCredits, filesFromDrop, KIND_LABEL, selectionZipUrl,
+  api, downloadCredits, filesFromDrop, KIND_LABEL, KIND_NAME, selectionZipUrl,
   type Asset, type AssetKind, type BulkEdit, type Collection, type Facet, type Pack, type Project, type Stats, type UploadFile,
 } from './api'
 import { canPreview, stop as stopPreview, toggle as togglePreview } from './player'
@@ -26,19 +26,20 @@ import { archiveWithUndo, countText } from './archive'
 import { confirmDialog, daysAgo, showError, showOk, swipeToClose, useTween, withTransition, type Command } from './ui'
 import { useVirtualGrid } from './virtualGrid'
 import { lazy } from './lazy'
+import { formatNumber, t } from './i18n'
 
 // Opened now and then, so they load when first shown.
-const SettingsPage = lazy(() => import('./components/SettingsPage.vue'), 'settings')
-const ArchiveView = lazy(() => import('./components/ArchiveView.vue'), 'the archive')
-const ShortcutsDialog = lazy(() => import('./components/ShortcutsDialog.vue'), 'the shortcuts', 'overlay')
-const SetupWizard = lazy(() => import('./components/SetupWizard.vue'), 'setup', 'overlay')
+const SettingsPage = lazy(() => import('./components/SettingsPage.vue'), () => t('app-lazy-settings'))
+const ArchiveView = lazy(() => import('./components/ArchiveView.vue'), () => t('app-lazy-archive'))
+const ShortcutsDialog = lazy(() => import('./components/ShortcutsDialog.vue'), () => t('app-lazy-shortcuts'), 'overlay')
+const SetupWizard = lazy(() => import('./components/SetupWizard.vue'), () => t('app-lazy-setup'), 'overlay')
 
 type View = 'library' | 'packs' | 'settings' | 'archive'
 const PAGE = 60
 const THEMES = [
-  { value: 'system', label: 'Match system theme' },
-  { value: 'light', label: 'Light theme' },
-  { value: 'dark', label: 'Dark theme' },
+  { value: 'system', label: () => t('app-theme-system') },
+  { value: 'light', label: () => t('app-theme-light') },
+  { value: 'dark', label: () => t('app-theme-dark') },
 ] as const
 /** Values shown per filter group before "more". */
 const FACET_PREVIEW = 8
@@ -69,12 +70,14 @@ const filters = reactive({
   color: '',
 })
 /** Colours to search by in one click; the picker beside them does any other. */
-const COLOR_PRESETS: { hex: string; name: string }[] = [
-  { hex: '#b8322a', name: 'Red' }, { hex: '#e07b28', name: 'Orange' }, { hex: '#e8c234', name: 'Yellow' },
-  { hex: '#4f8a2e', name: 'Green' }, { hex: '#2a9d8f', name: 'Teal' }, { hex: '#2f6fd0', name: 'Blue' },
-  { hex: '#7b4bb3', name: 'Purple' }, { hex: '#d9599a', name: 'Pink' }, { hex: '#7a5230', name: 'Brown' },
-  { hex: '#d6c09a', name: 'Sand' }, { hex: '#8a8a8a', name: 'Grey' }, { hex: '#4a5560', name: 'Slate' },
-  { hex: '#1c1c1c', name: 'Black' }, { hex: '#f2f2f0', name: 'White' },
+const COLOR_PRESETS: { hex: string; name: () => string }[] = [
+  { hex: '#b8322a', name: () => t('app-color-red') }, { hex: '#e07b28', name: () => t('app-color-orange') },
+  { hex: '#e8c234', name: () => t('app-color-yellow') }, { hex: '#4f8a2e', name: () => t('app-color-green') },
+  { hex: '#2a9d8f', name: () => t('app-color-teal') }, { hex: '#2f6fd0', name: () => t('app-color-blue') },
+  { hex: '#7b4bb3', name: () => t('app-color-purple') }, { hex: '#d9599a', name: () => t('app-color-pink') },
+  { hex: '#7a5230', name: () => t('app-color-brown') }, { hex: '#d6c09a', name: () => t('app-color-sand') },
+  { hex: '#8a8a8a', name: () => t('app-color-grey') }, { hex: '#4a5560', name: () => t('app-color-slate') },
+  { hex: '#1c1c1c', name: () => t('app-color-black') }, { hex: '#f2f2f0', name: () => t('app-color-white') },
 ]
 
 const collections = ref<Collection[]>([])
@@ -151,7 +154,7 @@ async function runSearch(append = false) {
       tagFacets.value = res.tags
     }
   } catch (e) {
-    showError(`Search failed: ${(e as Error).message}`, { label: 'Retry', run: () => runSearch(append) })
+    showError(t('app-search-failed', { error: (e as Error).message }), { label: t('app-retry'), run: () => runSearch(append) })
   } finally {
     if (seq === searchSeq) {
       loading.value = false
@@ -188,7 +191,7 @@ async function refreshPacks() {
     // A pack just finished: its assets are now searchable.
     if (wasBusy && !p.some(busy)) runSearch()
   } catch (e) {
-    showError(`Couldn't reach the server: ${(e as Error).message}`, { label: 'Retry', run: refreshPacks })
+    showError(t('app-unreachable', { error: (e as Error).message }), { label: t('app-retry'), run: refreshPacks })
   }
 }
 const busy = (p: Pack) => p.status === 'ingesting' || p.status === 'analyzing' || p.status === 'uploading'
@@ -250,9 +253,9 @@ function browseProject(name: string) {
 }
 async function forgetProject(p: Project) {
   const ok = await confirmDialog({
-    title: `Forget ${p.name}?`,
-    body: `Hoard stops listing it where its ${p.assets.toLocaleString()} assets are used, until its next hoard sync tells it again. Nothing in the project changes.`,
-    confirm: 'Forget it',
+    title: t('app-forget-project-title', { name: p.name }),
+    body: t('app-forget-project-body', { count: p.assets }),
+    confirm: t('app-forget-project-confirm'),
   })
   if (!ok) return
   try {
@@ -260,7 +263,7 @@ async function forgetProject(p: Project) {
     if (filters.project === p.name) filters.project = ''
     await loadProjects()
   } catch (e) {
-    showError(`Couldn't forget ${p.name}: ${(e as Error).message}`)
+    showError(t('app-forget-project-failed', { name: p.name, error: (e as Error).message }))
   }
 }
 function browseFavourites() {
@@ -288,7 +291,8 @@ const saveNameEl = ref<HTMLInputElement | null>(null)
 async function startNaming() {
   saveName.value = [
     filters.q.trim(), filters.kind, ...filters.tags, filters.pack?.name, filters.collection?.name,
-    filters.similar && `like ${filters.similar.name}`, filters.color, filters.favourites && 'favourites', filters.project,
+    filters.similar && t('app-save-name-like', { name: filters.similar.name }), filters.color,
+    filters.favourites && t('app-save-name-favourites'), filters.project,
   ].filter(Boolean).join(' · ').slice(0, 80)
   naming.value = true
   await nextTick()
@@ -299,7 +303,7 @@ async function saveCurrent() {
   if (!name) return
   if (await saveSearch(name, filterQuery())) {
     naming.value = false
-    showOk(`Saved “${name}”: it's in Filters, under Yours`)
+    showOk(t('app-search-saved', { name }))
   }
 }
 /** Every selected asset is a favourite already, so the button takes them out. */
@@ -452,7 +456,7 @@ function pickColor(hex: string) {
   filters.color = filters.color === hex ? '' : hex
 }
 const rankLabel = computed(() =>
-  filters.similar ? 'Most alike' : filters.color ? 'Most of the colour' : filters.q ? 'Best match' : 'Newest',
+  filters.similar ? t('app-rank-alike') : filters.color ? t('app-rank-colour') : filters.q ? t('app-rank-match') : t('app-sort-newest'),
 )
 
 // ------------------------------------------------------------------ collections
@@ -472,13 +476,13 @@ async function addToCollection(ids: string[], target: { id?: string; create?: st
     const id = target.id ?? (await api.createCollection(target.create!)).id
     const c = await api.collectionMembers(id, { add: ids })
     await refreshCollections()
-    showOk(`Added ${ids.length} ${ids.length === 1 ? 'asset' : 'assets'} to ${c.name}`, {
-      label: 'Undo',
+    showOk(t('app-collection-added', { count: ids.length, name: c.name }), {
+      label: t('app-undo'),
       run: () => removeFromCollection(ids, id, true),
     })
     if (selected.value && ids.includes(selected.value.id)) openAsset(selected.value.id)
   } catch (e) {
-    showError(`Couldn't add to the collection: ${(e as Error).message}`)
+    showError(t('app-collection-add-failed', { error: (e as Error).message }))
   }
 }
 
@@ -486,24 +490,26 @@ async function removeFromCollection(ids: string[], id: string, quiet = false) {
   try {
     const c = await api.collectionMembers(id, { remove: ids })
     await refreshCollections()
-    if (!quiet) showOk(`Removed ${ids.length} from ${c.name}`, { label: 'Undo', run: () => addToCollection(ids, { id }) })
+    if (!quiet) showOk(t('app-collection-removed', { count: ids.length, name: c.name }), { label: t('app-undo'), run: () => addToCollection(ids, { id }) })
     if (filters.collection?.id === id) {
       checked.value = []
       runSearch()
     }
     if (selected.value && ids.includes(selected.value.id)) openAsset(selected.value.id)
   } catch (e) {
-    showError(`Couldn't remove from the collection: ${(e as Error).message}`)
+    showError(t('app-collection-remove-failed', { error: (e as Error).message }))
   }
 }
 
-const NS_LABEL: Record<string, string> = {
-  '': 'Subject', style: 'Style', theme: 'Theme', material: 'Material', map: 'PBR map', color: 'Color',
-  mood: 'Mood', genre: 'Genre', license: 'License', res: 'Resolution', duration: 'Length', poly: 'Poly count',
-  format: 'Format', weight: 'Weight', tech: 'Technical', blender: 'Blender version', depth: 'Bit depth',
-  ucs: 'Sound category (UCS)', bpm: 'Tempo', root: 'Root note', level: 'Loudness',
-  ue: 'Unreal class', engine: 'Engine', extracted: 'Recovered source', script: 'Writing system',
-}
+/** The heading of each tag group in Filters, by tag namespace (a function, so it follows a change of language). */
+const NS_LABEL = (): Record<string, string> => ({
+  '': t('app-ns-subject'), style: t('app-ns-style'), theme: t('app-ns-theme'), material: t('app-ns-material'),
+  map: t('app-ns-map'), color: t('app-ns-color'), mood: t('app-ns-mood'), genre: t('app-ns-genre'),
+  license: t('app-ns-license'), res: t('app-ns-res'), duration: t('app-ns-duration'), poly: t('app-ns-poly'),
+  format: t('app-ns-format'), weight: t('app-ns-weight'), tech: t('app-ns-tech'), blender: t('app-ns-blender'),
+  depth: t('app-ns-depth'), ucs: t('app-ns-ucs'), bpm: t('app-ns-bpm'), root: t('app-ns-root'), level: t('app-ns-level'),
+  ue: t('app-ns-ue'), engine: t('app-ns-engine'), extracted: t('app-ns-extracted'), script: t('app-ns-script'),
+})
 // Plain tags that are measured facts rather than subjects; they get their own group so "Subject" stays useful.
 const TECH = new Set(['pot', 'square', 'alpha', 'mono', 'stereo', 'surround', 'tileable', 'frames', 'rigged', 'animated', 'loop', 'one-shot', 'clipped'])
 const NS_ORDER = ['', 'ue', 'ucs', 'style', 'theme', 'material', 'map', 'mood', 'genre', 'color', 'tech', 'duration', 'bpm', 'root', 'level', 'res', 'depth', 'poly', 'blender', 'license', 'format']
@@ -518,6 +524,7 @@ const tagGroups = computed(() => {
     groups.get(ns)!.push(f)
   }
   const rank = (ns: string) => (NS_ORDER.indexOf(ns) === -1 ? 50 : NS_ORDER.indexOf(ns))
+  const labels = NS_LABEL()
   return [...groups.entries()]
     .sort(([a], [b]) => rank(a) - rank(b) || a.localeCompare(b))
     .map(([ns, facets]) => {
@@ -526,7 +533,7 @@ const tagGroups = computed(() => {
       const open = !prefs.collapsed.includes(ns)
       const long = prefs.expanded.includes(ns) ? facets : facets.slice(0, FACET_PREVIEW)
       const shown = open ? [...new Set([...long, ...active])] : active
-      return { ns, label: NS_LABEL[ns] ?? ns, open, shown, hidden: open ? facets.length - shown.length : 0, all: facets.length }
+      return { ns, label: labels[ns] ?? ns, open, shown, hidden: open ? facets.length - shown.length : 0, all: facets.length }
     })
 })
 const facetLabel = (ns: string, value: string) => (ns && ns !== 'tech' ? value.slice(ns.length + 1) : value)
@@ -591,7 +598,7 @@ async function bulkEdit(ids: string[], edit: Omit<BulkEdit, 'ids'>): Promise<boo
   try {
     await api.bulkAssets({ ids, ...edit })
   } catch (e) {
-    showError(`Couldn't change ${ids.length === 1 ? 'that asset' : `those ${ids.length} assets`}: ${(e as Error).message}`)
+    showError(t('app-bulk-failed', { count: ids.length, error: (e as Error).message }))
     return false
   } finally {
     bulkBusy.value = false
@@ -599,7 +606,6 @@ async function bulkEdit(ids: string[], edit: Omit<BulkEdit, 'ids'>): Promise<boo
   patchLoaded(ids, edit)
   return true
 }
-const plural = (n: number) => `${n.toLocaleString()} ${n === 1 ? 'asset' : 'assets'}`
 async function bulkTagEdit(remove: boolean) {
   const tag = bulkTag.value.trim().toLowerCase()
   const ids = [...checked.value]
@@ -610,8 +616,8 @@ async function bulkTagEdit(remove: boolean) {
   if (!(await bulkEdit(ids, remove ? { remove_tags: [tag] } : { add_tags: [tag] }))) return
   bulkTag.value = ''
   const undo = remove ? { add_tags: [tag] } : { remove_tags: [tag] }
-  showOk(remove ? `Took ${tag} off ${plural(touched.length)}` : `Tagged ${plural(ids.length)} with ${tag}`, {
-    label: 'Undo',
+  showOk(remove ? t('app-bulk-untagged', { tag, count: touched.length }) : t('app-bulk-tagged', { tag, count: ids.length }), {
+    label: t('app-undo'),
     run: () => void bulkEdit(touched, undo),
   })
 }
@@ -627,8 +633,8 @@ async function bulkSetCategory() {
   }
   if (!(await bulkEdit(ids, { category }))) return
   bulkCategory.value = ''
-  showOk(category ? `Set the category of ${plural(ids.length)} to ${category}` : `Cleared the category of ${plural(ids.length)}`, {
-    label: 'Undo',
+  showOk(category ? t('app-bulk-category-set', { category, count: ids.length }) : t('app-bulk-category-cleared', { count: ids.length }), {
+    label: t('app-undo'),
     run: () => {
       for (const [c, group] of before) void bulkEdit(group, { category: c })
     },
@@ -640,13 +646,13 @@ async function creditsForChecked() {
   try {
     await downloadCredits({ selections: [{ ids: [...checked.value], include_deps: true }] })
   } catch (e) {
-    showError(`Couldn't make the credits: ${(e as Error).message}`)
+    showError(t('app-credits-failed', { error: (e as Error).message }))
   }
 }
 async function archiveChecked() {
   const ids = [...checked.value]
   if (!ids.length) return
-  const ok = await archiveWithUndo(`Archived ${plural(ids.length)}`, { assets: ids }, onArchiveChanged)
+  const ok = await archiveWithUndo(t('app-archived-assets', { count: ids.length }), { assets: ids }, onArchiveChanged)
   if (!ok) return
   checked.value = []
   selectMode.value = false
@@ -656,7 +662,7 @@ async function archiveChecked() {
 async function archiveSelected() {
   const a = selected.value
   if (!a) return
-  const ok = await archiveWithUndo(`Archived ${a.name}`, { assets: [a.id] }, onArchiveChanged)
+  const ok = await archiveWithUndo(t('app-archived-one', { name: a.name }), { assets: [a.id] }, onArchiveChanged)
   if (ok && selected.value?.id === a.id) closeDetail()
 }
 /** Something went into or came out of the archive: the grid, counts and packs change. */
@@ -749,7 +755,7 @@ async function openAsset(idOrAsset: string | Asset) {
       else showDetail(full)
     }
   } catch (e) {
-    showError(`Couldn't open that asset: ${(e as Error).message}`)
+    showError(t('app-open-failed', { error: (e as Error).message }))
   }
 }
 /** Close the detail panel and put focus back on the tile it was showing, so the keyboard picks up where it was. */
@@ -937,11 +943,11 @@ function readUrl(search = location.search) {
   filters.tags = (u.get('tags') ?? '').split(',').filter(Boolean)
   filters.sort = u.get('sort') ?? ''
   const pack = u.get('pack')
-  filters.pack = pack ? { id: pack, name: u.get('pack_name') ?? 'pack' } : null
+  filters.pack = pack ? { id: pack, name: u.get('pack_name') ?? t('app-unnamed-pack') } : null
   const col = u.get('collection')
-  filters.collection = col ? { id: col, name: u.get('collection_name') ?? 'collection' } : null
+  filters.collection = col ? { id: col, name: u.get('collection_name') ?? t('app-unnamed-collection') } : null
   const like = u.get('similar')
-  filters.similar = like ? { id: like, name: u.get('similar_name') ?? 'asset' } : null
+  filters.similar = like ? { id: like, name: u.get('similar_name') ?? t('app-unnamed-asset') } : null
   const color = u.get('color') ?? ''
   filters.color = /^#[0-9a-f]{6}$/i.test(color) ? color.toLowerCase() : ''
   filters.favourites = u.get('fav') === '1'
@@ -1101,6 +1107,13 @@ function setTheme(value: typeof prefs.theme, e?: MouseEvent) {
   })
 }
 const firstLoad = computed(() => loading.value && !items.value.length)
+/** Said when a search finds nothing. */
+const noneText = computed(() => {
+  const query = filters.q.trim()
+  const narrowed = hasFilters.value && !!(filters.tags.length || filters.kind || filters.pack)
+  if (filters.q) return narrowed ? t('app-none-query-filters', { query }) : t('app-none-query', { query })
+  return narrowed ? t('app-none-filters') : t('app-none')
+})
 
 // ------------------------------------------------------------------ command palette
 
@@ -1119,59 +1132,70 @@ function teachFile(a: Asset) {
 }
 const mod = /Mac|iPhone|iPad/.test(navigator.platform) ? '⌘' : 'Ctrl+'
 const commands = computed<Command[]>(() => {
+  // The group names match the ones CommandPalette shows before anything is typed.
+  const goTo = t('palette-group-go-to')
+  const actions = t('palette-group-actions')
+  const themeGroup = t('palette-group-theme')
+  const current = t('palette-hint-current')
   const out: Command[] = [
-    { id: 'go:library', group: 'Go to', label: 'Library', keywords: 'assets grid home', run: () => setView('library') },
+    { id: 'go:library', group: goTo, label: t('palette-library'), keywords: t('palette-library-keywords'), run: () => setView('library') },
     ...(member.value
-      ? [{ id: 'go:favourites', group: 'Go to', label: 'Favourites', hint: mine.favourites.size ? mine.favourites.size.toLocaleString() : undefined, keywords: 'starred stars liked', run: browseFavourites }]
+      ? [{ id: 'go:favourites', group: goTo, label: t('palette-favourites'), hint: mine.favourites.size ? formatNumber(mine.favourites.size) : undefined, keywords: t('palette-favourites-keywords'), run: browseFavourites }]
       : []),
-    { id: 'go:packs', group: 'Go to', label: 'Packs', hint: busyPacks.value.length ? `${busyPacks.value.length} working` : undefined, run: () => setView('packs') },
-    { id: 'go:archive', group: 'Go to', label: 'Archive', hint: archivedCount.value ? archivedCount.value.toLocaleString() : undefined, keywords: 'trash recycle bin deleted restore', run: () => setView('archive') },
-    { id: 'go:stats', group: 'Go to', label: 'Library stats', keywords: 'statistics numbers size disk space count', run: () => openSettings('library') },
-    { id: 'go:search', group: 'Go to', label: 'Search', hint: '/', run: () => { setView('library'); void nextTick(() => searchInput.value?.focus()) } },
+    { id: 'go:packs', group: goTo, label: t('palette-packs'), hint: busyPacks.value.length ? t('app-packs-working', { count: busyPacks.value.length }) : undefined, run: () => setView('packs') },
+    { id: 'go:archive', group: goTo, label: t('palette-archive'), hint: archivedCount.value ? formatNumber(archivedCount.value) : undefined, keywords: t('palette-archive-keywords'), run: () => setView('archive') },
+    { id: 'go:stats', group: goTo, label: t('palette-stats'), keywords: t('palette-stats-keywords'), run: () => openSettings('library') },
+    { id: 'go:search', group: goTo, label: t('palette-search'), hint: '/', run: () => { setView('library'); void nextTick(() => searchInput.value?.focus()) } },
   ]
   if (editor.value) {
-    out.push({ id: 'act:add', group: 'Actions', label: 'Add files…', keywords: 'upload import', run: () => fileInput.value?.click() })
-    out.push({ id: 'act:folder', group: 'Actions', label: 'Import a folder…', keywords: 'upload pack', run: () => folderInput.value?.click() })
+    out.push({ id: 'act:add', group: actions, label: t('palette-add-files'), keywords: t('palette-add-files-keywords'), run: () => fileInput.value?.click() })
+    out.push({ id: 'act:folder', group: actions, label: t('palette-import-folder'), keywords: t('palette-import-folder-keywords'), run: () => folderInput.value?.click() })
   }
   if (view.value === 'library' && items.value.length) {
-    out.push({ id: 'act:all', group: 'Actions', label: `Select all ${items.value.length} shown`, hint: `${mod}A`, keywords: 'check', run: () => (checked.value = items.value.map((a) => a.id)) })
+    out.push({ id: 'act:all', group: actions, label: t('palette-select-all', { count: items.value.length }), hint: `${mod}A`, keywords: t('palette-select-all-keywords'), run: () => (checked.value = items.value.map((a) => a.id)) })
   }
-  if (view.value === 'library' && !selecting.value) out.push({ id: 'act:select', group: 'Actions', label: 'Select several…', hint: 'X', keywords: 'bulk multiple tag archive', run: () => (selectMode.value = true) })
-  if (checked.value.length && editor.value) out.push({ id: 'act:archive', group: 'Actions', label: `Archive the ${checked.value.length} selected`, keywords: 'delete remove trash', run: archiveChecked })
-  if (checked.value.length) out.push({ id: 'act:none', group: 'Actions', label: 'Clear the selection', hint: 'Esc', run: () => (checked.value = []) })
-  if (hasFilters.value) out.push({ id: 'act:clear', group: 'Actions', label: 'Clear filters', keywords: 'reset', run: clearFilters })
+  if (view.value === 'library' && !selecting.value) out.push({ id: 'act:select', group: actions, label: t('palette-select-several'), hint: 'X', keywords: t('palette-select-several-keywords'), run: () => (selectMode.value = true) })
+  if (checked.value.length && editor.value) out.push({ id: 'act:archive', group: actions, label: t('palette-archive-selected', { count: checked.value.length }), keywords: t('palette-archive-selected-keywords'), run: archiveChecked })
+  if (checked.value.length) out.push({ id: 'act:none', group: actions, label: t('palette-clear-selection'), hint: 'Esc', run: () => (checked.value = []) })
+  if (hasFilters.value) out.push({ id: 'act:clear', group: actions, label: t('palette-clear-filters'), keywords: t('palette-clear-filters-keywords'), run: clearFilters })
   out.push({
-    id: 'act:supporting', group: 'Actions', label: prefs.showSupporting ? 'Hide supporting files' : 'Show supporting files',
-    keywords: 'normal maps roughness masks', run: () => (prefs.showSupporting = !prefs.showSupporting),
+    id: 'act:supporting', group: actions, label: prefs.showSupporting ? t('palette-hide-supporting') : t('palette-show-supporting'),
+    keywords: t('palette-supporting-keywords'), run: () => (prefs.showSupporting = !prefs.showSupporting),
   })
   if (auth.status?.signed_in) {
-    out.push({ id: 'act:account', group: 'Actions', label: 'Account and access tokens', keywords: 'password login user token api', run: () => openSettings('account') })
-    out.push({ id: 'act:signout', group: 'Actions', label: `Sign out (${auth.status.user?.name ?? ''})`, keywords: 'log out logout', run: signOut })
+    out.push({ id: 'act:account', group: actions, label: t('palette-account'), keywords: t('palette-account-keywords'), run: () => openSettings('account') })
+    out.push({ id: 'act:signout', group: actions, label: t('palette-sign-out', { name: auth.status.user?.name ?? '' }), keywords: t('palette-sign-out-keywords'), run: signOut })
   } else {
-    out.push({ id: 'act:signin', group: 'Actions', label: 'Sign in', keywords: 'log in login account password', run: askToSignIn })
+    out.push({ id: 'act:signin', group: actions, label: t('palette-sign-in'), keywords: t('palette-sign-in-keywords'), run: askToSignIn })
   }
-  if (member.value) out.push({ id: 'act:settings', group: 'Actions', label: 'Settings', keywords: 'blender ffmpeg llm ai tagging unreal admin tools preferences', run: () => openSettings() })
-  out.push({ id: 'act:keys', group: 'Actions', label: 'Keyboard shortcuts', hint: '?', keywords: 'help keys', run: () => (shortcutsOpen.value = true) })
-  for (const t of THEMES) {
-    out.push({ id: `theme:${t.value}`, group: 'Theme', label: t.label, hint: prefs.theme === t.value ? 'current' : undefined, keywords: 'theme appearance mode', run: () => setTheme(t.value) })
+  if (member.value) out.push({ id: 'act:settings', group: actions, label: t('palette-settings'), keywords: t('palette-settings-keywords'), run: () => openSettings() })
+  out.push({ id: 'act:keys', group: actions, label: t('palette-shortcuts'), hint: '?', keywords: t('palette-shortcuts-keywords'), run: () => (shortcutsOpen.value = true) })
+  for (const th of THEMES) {
+    out.push({ id: `theme:${th.value}`, group: themeGroup, label: th.label(), hint: prefs.theme === th.value ? current : undefined, keywords: t('palette-theme-keywords'), run: () => setTheme(th.value) })
   }
-  for (const t of LIGHT_THEMES) {
-    out.push({ id: `light:${t.id}`, group: 'Theme', label: `Light theme: ${t.name}`, hint: themeFor('light').id === t.id ? 'current' : undefined, keywords: `appearance color ${t.blurb}`, run: () => (prefs.lightTheme = t.id) })
+  for (const th of LIGHT_THEMES) {
+    out.push({ id: `light:${th.id}`, group: themeGroup, label: t('palette-light-theme', { name: th.name }), hint: themeFor('light').id === th.id ? current : undefined, keywords: `${t('palette-theme-variant-keywords')} ${th.blurb}`, run: () => (prefs.lightTheme = th.id) })
   }
-  for (const t of DARK_THEMES) {
-    out.push({ id: `dark:${t.id}`, group: 'Theme', label: `Dark theme: ${t.name}`, hint: themeFor('dark').id === t.id ? 'current' : undefined, keywords: `appearance color ${t.blurb}`, run: () => (prefs.darkTheme = t.id) })
+  for (const th of DARK_THEMES) {
+    out.push({ id: `dark:${th.id}`, group: themeGroup, label: t('palette-dark-theme', { name: th.name }), hint: themeFor('dark').id === th.id ? current : undefined, keywords: `${t('palette-theme-variant-keywords')} ${th.blurb}`, run: () => (prefs.darkTheme = th.id) })
   }
+  const kinds = t('palette-group-kinds')
   for (const k of kindFacets.value) {
     const label = KIND_LABEL[k.value as AssetKind] ?? k.value
+    const kind = KIND_NAME[k.value as AssetKind] ?? k.value
     out.push({
-      id: `kind:${k.value}`, group: 'Kinds', label: filters.kind === k.value ? `All kinds (stop showing only ${label.toLowerCase()})` : `Only ${label.toLowerCase()}`,
-      hint: k.count.toLocaleString(), keywords: label, run: () => { setView('library'); setKind(k.value) },
+      id: `kind:${k.value}`, group: kinds, label: filters.kind === k.value ? t('palette-kind-all', { kind }) : t('palette-kind-only', { kind }),
+      hint: formatNumber(k.count), keywords: label, run: () => { setView('library'); setKind(k.value) },
     })
   }
-  for (const p of packs.value) out.push({ id: `pack:${p.id}`, group: 'Packs', label: p.name, run: () => browsePack(p) })
-  for (const c of collections.value) out.push({ id: `col:${c.id}`, group: 'Collections', label: c.name, run: () => browseCollection(c) })
-  for (const p of projects.value) out.push({ id: `project:${p.id}`, group: 'Projects', label: p.name, hint: p.assets.toLocaleString(), run: () => browseProject(p.name) })
-  for (const s of mine.searches) out.push({ id: `saved:${s.id}`, group: 'Saved searches', label: s.name, run: () => applySearch(s) })
+  const packsGroup = t('palette-group-packs')
+  const collectionsGroup = t('palette-group-collections')
+  const projectsGroup = t('palette-group-projects')
+  const savedGroup = t('palette-group-saved')
+  for (const p of packs.value) out.push({ id: `pack:${p.id}`, group: packsGroup, label: p.name, run: () => browsePack(p) })
+  for (const c of collections.value) out.push({ id: `col:${c.id}`, group: collectionsGroup, label: c.name, run: () => browseCollection(c) })
+  for (const p of projects.value) out.push({ id: `project:${p.id}`, group: projectsGroup, label: p.name, hint: formatNumber(p.assets), run: () => browseProject(p.name) })
+  for (const sv of mine.searches) out.push({ id: `saved:${sv.id}`, group: savedGroup, label: sv.name, run: () => applySearch(sv) })
   return out
 })
 </script>
@@ -1193,7 +1217,7 @@ const commands = computed<Command[]>(() => {
     @drop.prevent="onDrop"
   >
     <header class="top">
-      <a href="#" class="brand" :title="stats?.version ? `Hoard ${stats.version} — back to the library` : 'Back to the library'" @click.prevent="goHome">
+      <a href="#" class="brand" :title="stats?.version ? t('app-home-version', { version: stats.version }) : t('app-home')" @click.prevent="goHome">
         <svg viewBox="0 0 32 32" width="24" height="24" aria-hidden="true">
           <rect x="3" y="3" width="12" height="12" rx="2.5" fill="var(--k-texture)" />
           <rect x="17" y="3" width="12" height="12" rx="2.5" fill="var(--k-audio)" />
@@ -1204,7 +1228,7 @@ const commands = computed<Command[]>(() => {
       </a>
 
       <div class="search">
-        <label for="q" class="visually-hidden">Search assets</label>
+        <label for="q" class="visually-hidden">{{ t('app-search-label') }}</label>
         <svg class="search-icon" viewBox="0 0 16 16" width="15" height="15" aria-hidden="true">
           <circle cx="7" cy="7" r="4.5" fill="none" stroke="currentColor" stroke-width="1.6" />
           <path d="m10.5 10.5 3.5 3.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
@@ -1215,7 +1239,7 @@ const commands = computed<Command[]>(() => {
           v-model="filters.q"
           class="field"
           type="search"
-          placeholder="Search names, paths, tags"
+          :placeholder="t('app-search-placeholder')"
           autocomplete="off"
           enterkeyhint="search"
           @focus="view = 'library'"
@@ -1224,10 +1248,10 @@ const commands = computed<Command[]>(() => {
         <kbd class="slash" aria-hidden="true">/</kbd>
       </div>
 
-      <nav class="views" aria-label="Views">
-        <button type="button" :aria-current="view === 'library' ? 'page' : undefined" @click="setView('library')">Library</button>
+      <nav class="views" :aria-label="t('app-views')">
+        <button type="button" :aria-current="view === 'library' ? 'page' : undefined" @click="setView('library')">{{ t('app-library') }}</button>
         <button type="button" :aria-current="view === 'packs' ? 'page' : undefined" @click="setView('packs')">
-          Packs<span v-if="busyPacks.length" class="pulse" :title="`${busyPacks.length} working`" />
+          {{ t('app-packs') }}<span v-if="busyPacks.length" class="pulse" :title="t('app-packs-working', { count: busyPacks.length })" />
         </button>
       </nav>
 
@@ -1238,26 +1262,26 @@ const commands = computed<Command[]>(() => {
           :href="stats.update.url"
           target="_blank"
           rel="noopener"
-          :title="`Hoard ${stats.update.version} is out (this server runs ${stats.version}). Pull the new image or binary and restart; the database upgrades itself.`"
+          :title="t('app-update-title', { version: stats.update.version, current: stats.version })"
         >
-          <span class="dot" aria-hidden="true" /><span class="wide-only">Update </span>{{ stats.update.version }}
+          <span class="dot" aria-hidden="true" /><span class="wide-only">{{ t('app-update') }} </span>{{ stats.update.version }}
         </a>
         <ActivityIndicator />
-        <div class="theme" role="group" aria-label="Theme">
+        <div class="theme" role="group" :aria-label="t('app-theme')">
           <button
-            v-for="t in THEMES"
-            :key="t.value"
+            v-for="th in THEMES"
+            :key="th.value"
             type="button"
-            :aria-pressed="prefs.theme === t.value"
-            :title="t.label"
-            @click="setTheme(t.value, $event)"
+            :aria-pressed="prefs.theme === th.value"
+            :title="th.label()"
+            @click="setTheme(th.value, $event)"
           >
             <svg viewBox="0 0 16 16" width="15" height="15" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
-              <template v-if="t.value === 'light'">
+              <template v-if="th.value === 'light'">
                 <circle cx="8" cy="8" r="3" />
                 <path d="M8 1.5v1.6M8 12.9v1.6M1.5 8h1.6M12.9 8h1.6M3.4 3.4l1.1 1.1M11.5 11.5l1.1 1.1M3.4 12.6l1.1-1.1M11.5 4.5l1.1-1.1" />
               </template>
-              <template v-else-if="t.value === 'dark'">
+              <template v-else-if="th.value === 'dark'">
                 <path d="M13.2 10.1A5.6 5.6 0 0 1 5.9 2.8a5.6 5.6 0 1 0 7.3 7.3Z" />
               </template>
               <template v-else>
@@ -1265,17 +1289,17 @@ const commands = computed<Command[]>(() => {
                 <path d="M5.5 14h5M8 11v3" />
               </template>
             </svg>
-            <span class="visually-hidden">{{ t.label }}</span>
+            <span class="visually-hidden">{{ th.label() }}</span>
           </button>
         </div>
-        <button v-if="auth.status && !auth.status.signed_in" type="button" class="btn ghost" @click="askToSignIn">Sign in</button>
+        <button v-if="auth.status && !auth.status.signed_in" type="button" class="btn ghost" @click="askToSignIn">{{ t('app-sign-in') }}</button>
         <button
           v-if="archivedCount || view === 'archive'"
           type="button"
           class="btn ghost archive-btn"
           :aria-pressed="view === 'archive'"
-          :title="`Archive: ${countText(stats?.archived_packs ?? 0, stats?.archived_assets ?? 0)}`"
-          aria-label="Archive"
+          :title="t('app-archive-title', { contents: countText(stats?.archived_packs ?? 0, stats?.archived_assets ?? 0) })"
+          :aria-label="t('app-archive')"
           @click="setView(view === 'archive' ? 'library' : 'archive')"
         >
           <svg viewBox="0 0 16 16" width="15" height="15" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
@@ -1288,8 +1312,8 @@ const commands = computed<Command[]>(() => {
           v-if="member"
           type="button"
           class="btn ghost settings-btn"
-          title="Settings"
-          aria-label="Settings"
+          :title="t('app-settings')"
+          :aria-label="t('app-settings')"
           :aria-pressed="view === 'settings'"
           @click="view === 'settings' ? setView('library') : openSettings()"
         >
@@ -1299,13 +1323,13 @@ const commands = computed<Command[]>(() => {
             <circle cx="6" cy="11.5" r="1.6" />
           </svg>
         </button>
-        <button type="button" class="btn ghost cmdk" :title="`Command palette (${mod}K)`" @click="paletteOpen = true">
+        <button type="button" class="btn ghost cmdk" :title="t('app-palette-title', { keys: `${mod}K` })" @click="paletteOpen = true">
           <kbd>{{ mod.replace('+', '') }}</kbd><kbd>K</kbd>
         </button>
         <template v-if="editor">
-          <button type="button" class="btn import-folder" @click="folderInput?.click()">Import folder</button>
+          <button type="button" class="btn import-folder" @click="folderInput?.click()">{{ t('app-import-folder') }}</button>
           <button type="button" class="btn primary" @click="fileInput?.click()">
-            <span class="wide-only">Add files</span><span class="narrow-only" aria-hidden="true">Add</span>
+            <span class="wide-only">{{ t('app-add-files') }}</span><span class="narrow-only" aria-hidden="true">{{ t('app-add-files-short') }}</span>
           </button>
         </template>
         <input ref="fileInput" type="file" multiple hidden @change="onPick" />
@@ -1313,31 +1337,31 @@ const commands = computed<Command[]>(() => {
       </div>
     </header>
 
-    <div v-if="pendingSplit" class="tokenbar splitbar" role="dialog" aria-label="How to import this folder">
+    <div v-if="pendingSplit" class="tokenbar splitbar" role="dialog" :aria-label="t('app-split-label')">
       <span>
-        <strong>{{ pendingSplit.group.name }}</strong> contains {{ pendingSplit.parts }} folders or archives.
+        {{ t('app-split-before') }}<strong>{{ pendingSplit.group.name }}</strong>{{ t('app-split-after', { count: pendingSplit.parts }) }}
       </span>
-      <button type="button" class="btn primary" @click="resolveSplit(true)">Import each as its own pack ({{ pendingSplit.parts }})</button>
-      <button type="button" class="btn" @click="resolveSplit(false)">Import as one pack</button>
-      <button type="button" class="btn ghost" @click="pendingSplit = null">Cancel</button>
+      <button type="button" class="btn primary" @click="resolveSplit(true)">{{ t('app-split-each', { count: pendingSplit.parts }) }}</button>
+      <button type="button" class="btn" @click="resolveSplit(false)">{{ t('app-split-one') }}</button>
+      <button type="button" class="btn ghost" @click="pendingSplit = null">{{ t('app-cancel') }}</button>
     </div>
     <InsecureNotice v-else :member="member" @settings="openSettings('connection')" />
 
 
     <template v-if="view === 'library'">
       <div v-if="showFilters" class="scrim" aria-hidden="true" @click="showFilters = false" />
-      <aside id="filters" ref="sideEl" class="side" aria-label="Filters">
+      <aside id="filters" ref="sideEl" class="side" :aria-label="t('app-filters')">
         <div class="side-head">
-          <h2 class="side-title">Filters</h2>
-          <button type="button" class="btn ghost" @click="showFilters = false">Done</button>
+          <h2 class="side-title">{{ t('app-filters') }}</h2>
+          <button type="button" class="btn ghost" @click="showFilters = false">{{ t('app-done') }}</button>
         </div>
         <section v-if="member" class="collections yours">
-          <h3>Yours</h3>
+          <h3>{{ t('app-yours') }}</h3>
           <ul class="kinds">
             <li>
               <button type="button" :aria-pressed="filters.favourites" @click="browseFavourites">
                 <svg viewBox="0 0 16 16" width="11" height="11" aria-hidden="true"><path d="M8 1.9l1.8 3.7 4.1.6-3 2.9.7 4.1L8 11.3l-3.6 1.9.7-4.1-3-2.9 4.1-.6z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" /></svg>
-                <span class="cname">Favourites</span>
+                <span class="cname">{{ t('app-favourites') }}</span>
                 <span class="n mono">{{ mine.favourites.size }}</span>
               </button>
             </li>
@@ -1346,29 +1370,29 @@ const commands = computed<Command[]>(() => {
                 <svg viewBox="0 0 16 16" width="11" height="11" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="7" cy="7" r="4.5" /><path d="m10.5 10.5 3 3" /></svg>
                 <span class="cname">{{ s.name }}</span>
               </button>
-              <button type="button" class="forget" :aria-label="`Forget the saved search ${s.name}`" title="Forget this search" @click="forgetSearch(s)">
+              <button type="button" class="forget" :aria-label="t('app-forget-search-label', { name: s.name })" :title="t('app-forget-search')" @click="forgetSearch(s)">
                 <svg viewBox="0 0 16 16" width="10" height="10" aria-hidden="true"><path d="m4 4 8 8M12 4l-8 8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" /></svg>
               </button>
             </li>
           </ul>
         </section>
         <section v-if="projects.length" class="collections projects">
-          <h3 title="Projects that hoard sync from here, with what their last sync had">Projects</h3>
+          <h3 :title="t('app-projects-title')">{{ t('app-projects') }}</h3>
           <ul class="kinds">
             <li v-for="p in projects" :key="p.id" class="saved">
-              <button type="button" :aria-pressed="filters.project === p.name" :title="`Synced ${daysAgo(p.synced_at)}${p.synced_by ? ` by ${p.synced_by}` : ''}`" @click="browseProject(p.name)">
+              <button type="button" :aria-pressed="filters.project === p.name" :title="p.synced_by ? t('app-project-synced-by', { when: daysAgo(p.synced_at), who: p.synced_by }) : t('app-project-synced', { when: daysAgo(p.synced_at) })" @click="browseProject(p.name)">
                 <svg viewBox="0 0 16 16" width="11" height="11" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><path d="M2 4.5h4.5l1.5 1.5H14v6.5H2z" /></svg>
                 <span class="cname">{{ p.name }}</span>
-                <span class="n mono">{{ p.assets.toLocaleString() }}</span>
+                <span class="n mono">{{ formatNumber(p.assets) }}</span>
               </button>
-              <button v-if="editor" type="button" class="forget" :aria-label="`Forget the project ${p.name}`" title="Forget this project" @click="forgetProject(p)">
+              <button v-if="editor" type="button" class="forget" :aria-label="t('app-forget-project-label', { name: p.name })" :title="t('app-forget-project')" @click="forgetProject(p)">
                 <svg viewBox="0 0 16 16" width="10" height="10" aria-hidden="true"><path d="m4 4 8 8M12 4l-8 8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" /></svg>
               </button>
             </li>
           </ul>
         </section>
         <section v-if="collections.length" class="collections">
-          <h3>Collections</h3>
+          <h3>{{ t('app-collections') }}</h3>
           <ul class="kinds">
             <li v-for="c in collections" :key="c.id">
               <button type="button" :aria-pressed="filters.collection?.id === c.id" @click="browseCollection(c)">
@@ -1380,7 +1404,7 @@ const commands = computed<Command[]>(() => {
           </ul>
         </section>
         <section class="colors">
-          <h3>Colour</h3>
+          <h3>{{ t('app-colour') }}</h3>
           <div class="swatches">
             <button
               v-for="c in COLOR_PRESETS"
@@ -1389,19 +1413,19 @@ const commands = computed<Command[]>(() => {
               class="sw"
               :style="{ background: c.hex }"
               :aria-pressed="filters.color === c.hex"
-              :aria-label="`${c.name}: assets with much ${c.name.toLowerCase()} in them`"
-              :title="c.name"
+              :aria-label="t('app-colour-swatch', { color: c.name(), lower: c.name().toLowerCase() })"
+              :title="c.name()"
               @click="pickColor(c.hex)"
             />
-            <label class="sw pick" :class="{ on: filters.color && !COLOR_PRESETS.some((c) => c.hex === filters.color) }" title="Any colour">
-              <span class="visually-hidden">Pick any colour</span>
+            <label class="sw pick" :class="{ on: filters.color && !COLOR_PRESETS.some((c) => c.hex === filters.color) }" :title="t('app-colour-any')">
+              <span class="visually-hidden">{{ t('app-colour-pick') }}</span>
               <input type="color" :value="filters.color || '#808080'" @change="filters.color = ($event.target as HTMLInputElement).value" />
             </label>
           </div>
         </section>
-        <p v-if="!kindFacets.length && !loading" class="side-empty">No filters for this search.</p>
+        <p v-if="!kindFacets.length && !loading" class="side-empty">{{ t('app-no-filters') }}</p>
         <section v-if="kindFacets.length">
-          <h3>Kind</h3>
+          <h3>{{ t('app-kind') }}</h3>
           <ul class="kinds">
             <li v-for="k in kindFacets" :key="k.value">
               <button type="button" :aria-pressed="filters.kind === k.value" :style="{ '--kind': `var(--k-${k.value})` }" @click="setKind(k.value)">
@@ -1439,7 +1463,7 @@ const commands = computed<Command[]>(() => {
               <span class="fl">{{ facetLabel(g.ns, f.value) }}</span><span class="n mono">{{ f.count }}</span>
             </button>
             <button v-if="g.hidden > 0" type="button" class="facet more-facets" @click="prefs.expanded = toggleIn(prefs.expanded, g.ns)">
-              {{ g.hidden }} more
+              {{ t('app-facets-more', { count: g.hidden }) }}
             </button>
             <button
               v-else-if="prefs.expanded.includes(g.ns) && g.all > FACET_PREVIEW"
@@ -1447,7 +1471,7 @@ const commands = computed<Command[]>(() => {
               class="facet more-facets"
               @click="prefs.expanded = toggleIn(prefs.expanded, g.ns)"
             >
-              fewer
+              {{ t('app-facets-fewer') }}
             </button>
           </div>
         </section>
@@ -1462,12 +1486,12 @@ const commands = computed<Command[]>(() => {
             :aria-expanded="showFilters"
             @click="showFilters = !showFilters"
           >
-            Filters<span v-if="filters.tags.length + (filters.kind ? 1 : 0)" class="badge">{{ filters.tags.length + (filters.kind ? 1 : 0) }}</span>
+            {{ t('app-filters') }}<span v-if="filters.tags.length + (filters.kind ? 1 : 0)" class="badge">{{ filters.tags.length + (filters.kind ? 1 : 0) }}</span>
           </button>
           <div class="active">
             <span class="count">
-              <span aria-hidden="true">{{ firstLoad ? 'Searching…' : `${shownTotal.toLocaleString()} ${total === 1 ? 'asset' : 'assets'}` }}</span>
-              <span class="visually-hidden" aria-live="polite">{{ firstLoad ? 'Searching' : `${total.toLocaleString()} ${total === 1 ? 'asset' : 'assets'}` }}</span>
+              <span aria-hidden="true">{{ firstLoad ? t('app-searching') : t('app-asset-count', { count: shownTotal }) }}</span>
+              <span class="visually-hidden" aria-live="polite">{{ firstLoad ? t('app-searching-live') : t('app-asset-count', { count: total }) }}</span>
             </span>
             <TagChip v-if="filters.pack" :tag="`pack:${filters.pack.name}`" removable @remove="filters.pack = null" />
             <TagChip v-if="filters.collection" :tag="`collection:${filters.collection.name}`" removable @remove="filters.collection = null" />
@@ -1477,15 +1501,15 @@ const commands = computed<Command[]>(() => {
             <TagChip v-if="filters.color" :tag="`colour:${filters.color}`" :swatch="filters.color" removable @remove="filters.color = ''" />
             <TagChip v-if="filters.kind" :tag="`kind:${filters.kind}`" removable @remove="filters.kind = ''" />
             <TagChip v-for="t in filters.tags" :key="t" :tag="t" removable @remove="toggleTag(t)" />
-            <button v-if="hasFilters" type="button" class="linkbtn" @click="clearFilters">Clear all</button>
+            <button v-if="hasFilters" type="button" class="linkbtn" @click="clearFilters">{{ t('app-clear-all') }}</button>
             <template v-if="member && hasFilters && !savedNow">
               <form v-if="naming" class="savesearch" @submit.prevent="saveCurrent">
-                <label class="visually-hidden" for="save-name">Name for this search</label>
-                <input id="save-name" ref="saveNameEl" v-model="saveName" class="field" maxlength="80" placeholder="Name it" autocomplete="off" @keydown.esc.stop="naming = false" />
-                <button class="btn" type="submit" :disabled="!saveName.trim()">Save</button>
-                <button class="btn ghost" type="button" @click="naming = false">Cancel</button>
+                <label class="visually-hidden" for="save-name">{{ t('app-save-name-label') }}</label>
+                <input id="save-name" ref="saveNameEl" v-model="saveName" class="field" maxlength="80" :placeholder="t('app-save-name-placeholder')" autocomplete="off" @keydown.esc.stop="naming = false" />
+                <button class="btn" type="submit" :disabled="!saveName.trim()">{{ t('app-save') }}</button>
+                <button class="btn ghost" type="button" @click="naming = false">{{ t('app-cancel') }}</button>
               </form>
-              <button v-else type="button" class="linkbtn" title="Keep this search in Filters, under Yours" @click="startNaming">Save search</button>
+              <button v-else type="button" class="linkbtn" :title="t('app-save-search-title')" @click="startNaming">{{ t('app-save-search') }}</button>
             </template>
           </div>
           <button
@@ -1493,43 +1517,43 @@ const commands = computed<Command[]>(() => {
             type="button"
             class="btn ghost select-btn"
             :aria-pressed="selecting"
-            title="Pick several assets to tag, categorize, collect, download or archive together (X, or Ctrl-click)"
+            :title="t('app-select-title')"
             @click="selecting ? ((checked = []), (selectMode = false)) : (selectMode = true)"
           >
             <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
               <rect x="2" y="2" width="12" height="12" rx="2.5" />
               <path d="m5.2 8.2 2 2 3.8-4.2" />
             </svg>
-            <span>{{ selecting ? 'Done' : 'Select' }}</span>
+            <span>{{ selecting ? t('app-done') : t('app-select') }}</span>
           </button>
-          <label class="size" title="Tile size">
-            <span class="visually-hidden">Tile size</span>
+          <label class="size" :title="t('app-tile-size')">
+            <span class="visually-hidden">{{ t('app-tile-size') }}</span>
             <svg viewBox="0 0 16 16" width="12" height="12" aria-hidden="true"><rect x="2" y="2" width="5" height="5" rx="1" fill="currentColor" /><rect x="9" y="2" width="5" height="5" rx="1" fill="currentColor" /><rect x="2" y="9" width="5" height="5" rx="1" fill="currentColor" /><rect x="9" y="9" width="5" height="5" rx="1" fill="currentColor" /></svg>
             <input v-model.number="prefs.tile" type="range" min="112" max="280" step="4" />
             <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><rect x="2" y="2" width="12" height="12" rx="1.5" fill="currentColor" /></svg>
           </label>
           <label class="sort">
-            <span class="visually-hidden">Sort</span>
+            <span class="visually-hidden">{{ t('app-sort') }}</span>
             <select v-model="filters.sort" class="field">
               <option value="">{{ rankLabel }}</option>
-              <option v-if="filters.similar || filters.color" value="new">Newest</option>
-              <option value="name">Name</option>
-              <option value="size">Largest</option>
-              <option value="old">Oldest</option>
+              <option v-if="filters.similar || filters.color" value="new">{{ t('app-sort-newest') }}</option>
+              <option value="name">{{ t('app-sort-name') }}</option>
+              <option value="size">{{ t('app-sort-largest') }}</option>
+              <option value="old">{{ t('app-sort-oldest') }}</option>
             </select>
           </label>
         </div>
 
         <p v-if="supportingHidden > 0 || prefs.showSupporting" class="supporting">
           <template v-if="!prefs.showSupporting">
-            <span :title="'glTF buffers, material libraries, the maps of materials, materials only one model wears and the store files describing models. They come along when you download what uses them.'">
-              {{ supportingHidden }} supporting {{ supportingHidden === 1 ? 'file' : 'files' }} hidden
+            <span :title="t('app-supporting-title')">
+              {{ t('app-supporting-hidden', { count: supportingHidden }) }}
             </span>
-            <button type="button" class="linkbtn" @click="prefs.showSupporting = true">Show</button>
+            <button type="button" class="linkbtn" @click="prefs.showSupporting = true">{{ t('app-supporting-show') }}</button>
           </template>
           <template v-else>
-            Including supporting files
-            <button type="button" class="linkbtn" @click="prefs.showSupporting = false">Hide</button>
+            {{ t('app-supporting-shown') }}
+            <button type="button" class="linkbtn" @click="prefs.showSupporting = false">{{ t('app-supporting-hide') }}</button>
           </template>
         </p>
 
@@ -1543,15 +1567,13 @@ const commands = computed<Command[]>(() => {
             <path d="M14 64h112" stroke="var(--muted)" stroke-width="3" stroke-linecap="round" />
             <path d="M56 86h28" stroke="var(--line)" stroke-width="3" stroke-linecap="round" />
           </svg>
-          <h1>Drop an asset pack anywhere on this page</h1>
+          <h1>{{ t('app-welcome-title') }}</h1>
           <p>
-            Zips, tarballs, folders or loose files all work. Hoard unpacks them, stores every file once by its hash,
-            reads sizes, lengths and poly counts, and tags everything so you can search for things like
-            <span class="mono">grass footsteps</span> or <span class="mono">pbr stone</span>.
+            {{ t('app-welcome-before') }}<span class="mono">{{ t('app-welcome-example-1') }}</span>{{ t('app-welcome-or') }}<span class="mono">{{ t('app-welcome-example-2') }}</span>{{ t('app-welcome-after') }}
           </p>
           <div class="welcome-actions">
-            <button type="button" class="btn primary" @click="folderInput?.click()">Import a folder</button>
-            <button type="button" class="btn" @click="fileInput?.click()">Choose files</button>
+            <button type="button" class="btn primary" @click="folderInput?.click()">{{ t('app-welcome-import-folder') }}</button>
+            <button type="button" class="btn" @click="fileInput?.click()">{{ t('app-welcome-choose-files') }}</button>
           </div>
         </div>
         <div v-else-if="!loading && items.length === 0" class="none">
@@ -1567,10 +1589,10 @@ const commands = computed<Command[]>(() => {
             </g>
           </svg>
           <p v-if="filters.similar && !filters.q && !filters.kind && !filters.tags.length && !filters.color">
-            Nothing else looks much like {{ filters.similar.name }} yet.
+            {{ t('app-none-similar', { name: filters.similar.name }) }}
           </p>
-          <p v-else>Nothing matches{{ filters.q ? ` “${filters.q.trim()}”` : '' }}{{ hasFilters && (filters.tags.length || filters.kind || filters.pack) ? ' with these filters' : '' }}.</p>
-          <button v-if="hasFilters" type="button" class="btn" @click="clearFilters">Clear search and filters</button>
+          <p v-else>{{ noneText }}</p>
+          <button v-if="hasFilters" type="button" class="btn" @click="clearFilters">{{ t('app-clear-search-filters') }}</button>
         </div>
 
         <div ref="gridEl" class="grid" :class="{ selecting: checked.length > 0 }" :style="win.padding.value">
@@ -1594,9 +1616,9 @@ const commands = computed<Command[]>(() => {
         <div v-if="items.length < total" ref="sentinel" class="grid more" aria-hidden="true">
           <div v-for="n in win.columns.value * 2" :key="`m${n}`" class="skeleton" :style="{ '--i': n }"><span /><i /><b /></div>
         </div>
-        <p v-if="items.length < total" class="visually-hidden" aria-live="polite">{{ loading ? 'Loading more' : '' }}</p>
+        <p v-if="items.length < total" class="visually-hidden" aria-live="polite">{{ loading ? t('app-loading-more') : '' }}</p>
         <p v-if="items.length && !checked.length" class="hint">
-          Arrow keys move, Enter opens, Space plays a sound, X or Ctrl-click selects several (long-press on touch).
+          {{ t('app-keys-hint') }}
         </p>
       </main>
 
@@ -1606,10 +1628,10 @@ const commands = computed<Command[]>(() => {
         :class="{ dragging: detailDrag !== null }"
         role="separator"
         aria-orientation="vertical"
-        aria-label="Resize the details panel"
+        :aria-label="t('app-resize-label')"
         :aria-valuenow="fit.detail"
         tabindex="0"
-        title="Drag to resize · double-click for the width that fits"
+        :title="t('app-resize-title')"
         @pointerdown="startResize"
         @dblclick="prefs.detailWidth = null"
         @keydown="resizeBy"
@@ -1639,25 +1661,25 @@ const commands = computed<Command[]>(() => {
       />
 
       <Transition name="rise">
-      <div v-if="selecting" class="selbar" role="region" aria-label="Selected assets">
-        <strong>{{ checked.length ? `${checked.length.toLocaleString()} selected` : 'Pick assets' }}</strong>
-        <a v-if="checked.length" class="btn primary" :href="selectionUrl" download>Download zip</a>
-        <button v-if="checked.length" type="button" class="btn" title="CREDITS.md for the packs these come from: who made them, their licenses and the credit lines they ask for" @click="creditsForChecked">Credits</button>
-        <label v-if="checkedWithSource" class="srccheck" title="Unreal SoundWaves and textures whose original file Hoard recovered">
-          <input v-model="preferSources" type="checkbox" /> Recovered WAV/PNG instead of .uasset ({{ checkedWithSource }})
+      <div v-if="selecting" class="selbar" role="region" :aria-label="t('app-selected-label')">
+        <strong>{{ checked.length ? t('app-selected', { count: checked.length }) : t('app-pick-assets') }}</strong>
+        <a v-if="checked.length" class="btn primary" :href="selectionUrl" download>{{ t('app-download-zip') }}</a>
+        <button v-if="checked.length" type="button" class="btn" :title="t('app-credits-title')" @click="creditsForChecked">{{ t('app-credits') }}</button>
+        <label v-if="checkedWithSource" class="srccheck" :title="t('app-prefer-sources-title')">
+          <input v-model="preferSources" type="checkbox" /> {{ t('app-prefer-sources', { count: checkedWithSource }) }}
         </label>
         <template v-if="editor">
         <form class="bulktag" @submit.prevent="bulkTagEdit(false)">
-          <label class="visually-hidden" for="bulk-tag">A tag to add to, or take off, the selected assets</label>
-          <input id="bulk-tag" v-model="bulkTag" class="field" placeholder="Tag" autocomplete="off" :disabled="bulkBusy || !checked.length" />
-          <button class="btn" type="submit" :disabled="!bulkTag.trim() || bulkBusy" :aria-busy="bulkBusy" title="Add this tag to every selected asset">Add</button>
-          <button class="btn" type="button" :disabled="!bulkTag.trim() || bulkBusy" title="Take this tag off every selected asset" @click="bulkTagEdit(true)">Remove</button>
+          <label class="visually-hidden" for="bulk-tag">{{ t('app-bulk-tag-label') }}</label>
+          <input id="bulk-tag" v-model="bulkTag" class="field" :placeholder="t('app-bulk-tag-placeholder')" autocomplete="off" :disabled="bulkBusy || !checked.length" />
+          <button class="btn" type="submit" :disabled="!bulkTag.trim() || bulkBusy" :aria-busy="bulkBusy" :title="t('app-bulk-tag-add-title')">{{ t('app-bulk-tag-add') }}</button>
+          <button class="btn" type="button" :disabled="!bulkTag.trim() || bulkBusy" :title="t('app-bulk-tag-remove-title')" @click="bulkTagEdit(true)">{{ t('app-bulk-tag-remove') }}</button>
         </form>
         <form class="bulktag" @submit.prevent="bulkSetCategory">
-          <label class="visually-hidden" for="bulk-cat">Category for the selected assets (empty clears it)</label>
-          <input id="bulk-cat" v-model="bulkCategory" class="field cat" placeholder="Category" autocomplete="off" :disabled="bulkBusy || !checked.length" />
-          <button class="btn" type="submit" :disabled="bulkBusy || !checked.length" :title="bulkCategory.trim() ? 'Set the category of every selected asset' : 'Clear the category of every selected asset'">
-            {{ bulkCategory.trim() ? 'Set' : 'Clear' }}
+          <label class="visually-hidden" for="bulk-cat">{{ t('app-bulk-category-label') }}</label>
+          <input id="bulk-cat" v-model="bulkCategory" class="field cat" :placeholder="t('app-bulk-category-placeholder')" autocomplete="off" :disabled="bulkBusy || !checked.length" />
+          <button class="btn" type="submit" :disabled="bulkBusy || !checked.length" :title="bulkCategory.trim() ? t('app-bulk-category-set-title') : t('app-bulk-category-clear-title')">
+            {{ bulkCategory.trim() ? t('app-bulk-category-set-button') : t('app-bulk-category-clear-button') }}
           </button>
         </form>
         <CollectionPicker
@@ -1668,15 +1690,15 @@ const commands = computed<Command[]>(() => {
           @create="(name) => addToCollection(checked, { create: name })"
         />
         <button v-if="filters.collection && checked.length" type="button" class="btn" @click="removeFromCollection(checked, filters.collection.id)">
-          Remove from {{ filters.collection.name }}
+          {{ t('app-remove-from-collection', { name: filters.collection.name }) }}
         </button>
         </template>
         <button v-if="member && checked.length" type="button" class="btn" @click="setFavourite(checked, !allStarred)">
-          {{ allStarred ? 'Unfavourite' : 'Favourite' }}
+          {{ allStarred ? t('app-unfavourite') : t('app-favourite') }}
         </button>
-        <button type="button" class="linkbtn" @click="checked = items.map((a) => a.id)">Select all {{ items.length }}</button>
-        <button v-if="editor" type="button" class="btn danger" :disabled="!checked.length || bulkBusy" title="Out of search until they're restored or deleted for good, from the Archive" @click="archiveChecked">Archive</button>
-        <button type="button" class="btn ghost" @click="checked = []; selectMode = false">Done</button>
+        <button type="button" class="linkbtn" @click="checked = items.map((a) => a.id)">{{ t('app-select-all', { count: items.length }) }}</button>
+        <button v-if="editor" type="button" class="btn danger" :disabled="!checked.length || bulkBusy" :title="t('app-archive-selected-title')" @click="archiveChecked">{{ t('app-archive') }}</button>
+        <button type="button" class="btn ghost" @click="checked = []; selectMode = false">{{ t('app-done') }}</button>
       </div>
       </Transition>
     </template>
@@ -1720,8 +1742,8 @@ const commands = computed<Command[]>(() => {
         <svg class="arrow" viewBox="0 0 24 24" width="34" height="34" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
           <path d="M12 15V4M7.5 8.5 12 4l4.5 4.5M4 15v3.5A1.5 1.5 0 0 0 5.5 20h13a1.5 1.5 0 0 0 1.5-1.5V15" />
         </svg>
-        <strong>{{ dragCount > 1 ? `Drop ${dragCount} items to add them` : 'Drop to add to the hoard' }}</strong>
-        <span>Each top-level file or folder becomes its own pack. Gigabytes are fine; big files resume if the connection drops.</span>
+        <strong>{{ dragCount > 1 ? t('app-drop-items', { count: dragCount }) : t('app-drop') }}</strong>
+        <span>{{ t('app-drop-hint') }}</span>
       </div>
     </div>
     </Transition>

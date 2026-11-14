@@ -1,6 +1,7 @@
 <script setup lang="ts">
 // Toggle chips for picking asset kinds (which kinds a library location takes).
 import { KIND_LABEL, type AssetKind } from '../api'
+import { t } from '../i18n'
 
 const model = defineModel<AssetKind[]>({ required: true })
 defineProps<{ kinds: AssetKind[] }>()
@@ -11,7 +12,7 @@ function toggle(k: AssetKind) {
 </script>
 
 <template>
-  <div class="kinds" role="group" aria-label="Asset kinds">
+  <div class="kinds" role="group" :aria-label="t('kinds-group')">
     <label v-for="k in kinds" :key="k" class="kind" :class="{ on: model.includes(k) }">
       <input type="checkbox" :checked="model.includes(k)" @change="toggle(k)" />
       {{ KIND_LABEL[k] ?? k }}

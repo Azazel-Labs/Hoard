@@ -3,13 +3,15 @@
 import { computed, nextTick, onMounted, ref, watch } from 'vue'
 import { api, thumbUrl, type Asset } from '../api'
 import KindGlyph from './KindGlyph.vue'
+import { t } from '../i18n'
 import type { Command } from '../ui'
 
 const props = defineProps<{ commands: Command[] }>()
 const emit = defineEmits<{ close: []; open: [Asset] }>()
 
-/** Groups shown before anything is typed; the long lists (packs, collections) wait for a query. */
-const IDLE_GROUPS = new Set(['Go to', 'Actions', 'Theme'])
+/** Groups shown before anything is typed; the long lists (packs, collections) wait for a query. App.vue names the
+ *  groups with these same messages. */
+const idleGroups = computed(() => new Set([t('palette-group-go-to'), t('palette-group-actions'), t('palette-group-theme')]))
 const PER_GROUP = 6
 
 interface Row {
@@ -33,17 +35,17 @@ const searching = ref(false)
 /** Case-insensitive match: a run of the query scores best (earlier and at a word start better still), then the
  *  query's letters in order with gaps between them. */
 function match(text: string, q: string): { score: number; hits: number[] } | null {
-  const t = text.toLowerCase()
-  const at = t.indexOf(q)
+  const lower = text.toLowerCase()
+  const at = lower.indexOf(q)
   if (at >= 0) {
-    const wordStart = at === 0 || /[\s\-_/.(]/.test(t[at - 1])
+    const wordStart = at === 0 || /[\s\-_/.(]/.test(lower[at - 1])
     return { score: (wordStart ? 0 : 2) + at / 100, hits: Array.from({ length: q.length }, (_, k) => at + k) }
   }
   const hits: number[] = []
   let i = 0
   for (const ch of q) {
     if (ch === ' ') continue
-    i = t.indexOf(ch, i)
+    i = lower.indexOf(ch, i)
     if (i < 0) return null
     hits.push(i++)
   }
@@ -64,10 +66,11 @@ function segments(label: string, hits: number[]) {
 
 const rows = computed<Row[]>(() => {
   const q = query.value.trim().toLowerCase()
+  const idle = idleGroups.value
   const order: string[] = []
   const byGroup = new Map<string, { score: number; row: Row }[]>()
   for (const c of props.commands) {
-    if (!q && !IDLE_GROUPS.has(c.group)) continue
+    if (!q && !idle.has(c.group)) continue
     let score = 0
     let hits: number[] = []
     if (q) {
@@ -97,7 +100,7 @@ const rows = computed<Row[]>(() => {
   const out = groups.flatMap((x) => x.items.map((i) => i.row))
   for (const a of assets.value) {
     out.push({
-      key: `asset:${a.id}`, group: 'Assets', label: a.name, segs: segments(a.name, match(a.name, q)?.hits ?? []),
+      key: `asset:${a.id}`, group: t('palette-group-assets'), label: a.name, segs: segments(a.name, match(a.name, q)?.hits ?? []),
       hint: a.pack_name, asset: a, run: () => emit('open', a),
     })
   }
@@ -170,7 +173,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <dialog ref="dlg" class="palette" aria-label="Command palette" @close="emit('close')" @click.self="dlg?.close()">
+  <dialog ref="dlg" class="palette" :aria-label="t('palette-title')" @close="emit('close')" @click.self="dlg?.close()">
     <div class="box">
       <div class="inputrow">
         <svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true">
@@ -186,7 +189,7 @@ onMounted(() => {
           aria-controls="palette-list"
           aria-autocomplete="list"
           :aria-activedescendant="rows[active] ? `pal-${active}` : undefined"
-          placeholder="Search assets, go to a pack, run a command…"
+          :placeholder="t('palette-placeholder')"
           autocomplete="off"
           spellcheck="false"
           @keydown="onKey"
@@ -194,7 +197,7 @@ onMounted(() => {
         <span v-if="searching" class="spinner" aria-hidden="true" />
         <kbd>Esc</kbd>
       </div>
-      <div id="palette-list" ref="list" class="list" role="listbox" aria-label="Results">
+      <div id="palette-list" ref="list" class="list" role="listbox" :aria-label="t('palette-results')">
         <div v-for="s in sections" :key="s.group" role="group" :aria-label="s.group">
           <div class="group" aria-hidden="true">{{ s.group }}</div>
           <div
@@ -218,12 +221,12 @@ onMounted(() => {
             </svg>
           </div>
         </div>
-        <p v-if="!rows.length" class="empty">{{ searching ? 'Searching…' : `Nothing matches “${query.trim()}”` }}</p>
+        <p v-if="!rows.length" class="empty">{{ searching ? t('palette-searching') : t('palette-no-match', { query: query.trim() }) }}</p>
       </div>
       <footer class="foot" aria-hidden="true">
-        <span><kbd>↑</kbd><kbd>↓</kbd> move</span>
-        <span><kbd>Enter</kbd> run</span>
-        <span><kbd>?</kbd> all shortcuts</span>
+        <span><kbd>↑</kbd><kbd>↓</kbd> {{ t('palette-foot-move') }}</span>
+        <span><kbd>Enter</kbd> {{ t('palette-foot-run') }}</span>
+        <span><kbd>?</kbd> {{ t('palette-foot-shortcuts') }}</span>
       </footer>
     </div>
   </dialog>

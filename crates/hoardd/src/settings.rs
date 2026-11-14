@@ -12,6 +12,7 @@ use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
 use crate::config::{Config, UnrealConvert};
+use crate::i18n::tr;
 
 /// Most background workers the Settings dialog can ask for .
 pub(crate) const MAX_WORKERS: usize = 16;
@@ -238,53 +239,53 @@ impl Saved {
     fn check(&self, effective: &Effective) -> Result<(), String> {
         effective.auth.check()?;
         if effective.name.chars().count() > MAX_NAME || effective.name.chars().any(char::is_control) {
-            return Err(format!("Choose a name of up to {MAX_NAME} characters, on one line"));
+            return Err(tr!("error-server-name", max = MAX_NAME));
         }
         for (name, v) in [("Blender", &self.blender), ("ffmpeg", &self.ffmpeg)] {
             if v.as_deref().is_some_and(|s| s.trim().is_empty()) {
-                return Err(format!("{name}: choose off, automatic, or give a path"));
+                return Err(tr!("error-tool-setting", tool = name));
             }
         }
         if let Some(url) = self.llm_url.as_deref().map(str::trim)
             && !url.is_empty()
             && !is_http(url)
         {
-            return Err("The AI address should start with http:// or https://".into());
+            return Err(tr!("error-ai-address"));
         }
         if (effective.llm_chatgpt || effective.llm_url.is_some()) && effective.llm_model.is_none() {
-            return Err("Choose the model the AI service should use".into());
+            return Err(tr!("error-ai-model"));
         }
         if let Some(url) = self.public_url.as_deref().map(str::trim)
             && !url.is_empty()
             && !is_http(url)
         {
-            return Err("The public address should start with http:// or https://".into());
+            return Err(tr!("error-public-address"));
         }
         if let Some(url) = &effective.update_hook_url
             && !is_http(url)
         {
-            return Err("The address to call for updates should start with http:// or https://".into());
+            return Err(tr!("error-update-hook-address"));
         }
         if effective.update_hook_auth.as_deref().is_some_and(|a| reqwest::header::HeaderValue::from_str(a).is_err()) {
-            return Err("The Authorization header can't contain line breaks or other control characters".into());
+            return Err(tr!("error-update-hook-auth"));
         }
         if let Some(sf) = self.soundfont.as_deref().map(str::trim)
             && !sf.is_empty()
             && !std::path::Path::new(sf).is_file()
         {
-            return Err(format!("There's no SoundFont at {sf} on the server"));
+            return Err(tr!("error-no-soundfont", path = sf));
         }
         if self.workers.is_some_and(|n| !(1..=MAX_WORKERS).contains(&n)) {
-            return Err(format!("Background workers: between 1 and {MAX_WORKERS}"));
+            return Err(tr!("error-workers", max = MAX_WORKERS));
         }
         if self.llm_batch.is_some_and(|n| !(1..=200).contains(&n)) {
-            return Err("Assets per AI request: between 1 and 200".into());
+            return Err(tr!("error-ai-batch"));
         }
         if self.conversion_cache_mb.is_some_and(|n| n < 100) {
-            return Err("Converted downloads: at least 100 MB".into());
+            return Err(tr!("error-conversion-cache"));
         }
         if self.max_upload_mb == Some(0) || self.max_expand_mb == Some(0) {
-            return Err("Limits can't be zero".into());
+            return Err(tr!("error-limits-zero"));
         }
         if let Some(names) = &self.texture_names {
             names.check()?;
@@ -331,7 +332,7 @@ impl Store {
         conn: &Connection,
         patch: &Value,
     ) -> Result<(Arc<Effective>, Arc<Effective>), Result<String, anyhow::Error>> {
-        let patch = patch.as_object().ok_or_else(|| Ok("expected a JSON object of settings".to_owned()))?;
+        let patch = patch.as_object().ok_or_else(|| Ok(tr!("error-settings-object")))?;
         let mut saved = self.saved.lock().unwrap_or_else(PoisonError::into_inner);
         let mut merged = serde_json::to_value(&*saved).map_err(|e| Err(e.into()))?;
         let obj = merged.as_object_mut().ok_or_else(|| Err(anyhow::anyhow!("settings aren't an object")))?;
@@ -342,7 +343,8 @@ impl Store {
                 obj.insert(k.clone(), v.clone());
             }
         }
-        let next: Saved = serde_json::from_value(merged).map_err(|e| Ok(format!("bad setting: {e}")))?;
+        let next: Saved =
+            serde_json::from_value(merged).map_err(|e| Ok(tr!("error-bad-setting", reason = e.to_string())))?;
         let effective = Arc::new(next.over(cfg));
         next.check(&effective).map_err(Ok)?;
         let text = serde_json::to_string(&next).map_err(|e| Err(e.into()))?;

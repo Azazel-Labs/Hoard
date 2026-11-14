@@ -3,12 +3,19 @@
 // expand button (or a double-click) opens the full-screen viewer. The scene itself is MaterialStage, shared with it.
 import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import type { Asset, MaterialInfo } from '../api'
+import { t } from '../i18n'
 import { MaterialStage, SHAPES, type Shape } from '../materialStage'
 
 const props = defineProps<{ asset: Asset; material: MaterialInfo; paused?: boolean }>()
 const emit = defineEmits<{ expand: [] }>()
 
-const SHAPE_LABEL: Record<Shape, string> = { sphere: 'Sphere', cube: 'Cube', plane: 'Plane' }
+function shapeLabel(s: Shape): string {
+  switch (s) {
+    case 'sphere': return t('material-shape-sphere')
+    case 'cube': return t('material-shape-cube')
+    case 'plane': return t('material-shape-plane')
+  }
+}
 
 const host = ref<HTMLDivElement | null>(null)
 const status = ref<'loading' | 'ready' | 'error'>('loading')
@@ -50,14 +57,14 @@ onBeforeUnmount(teardown)
 <template>
   <div class="mp">
     <div ref="host" class="canvas checker" @dblclick="emit('expand')" />
-    <p v-if="status === 'loading'" class="overlay">Loading material…</p>
-    <p v-else-if="status === 'error'" class="overlay err">Couldn't preview this material: {{ error }}</p>
-    <button type="button" class="expand" title="Full screen" aria-label="Open the full-screen material viewer" @click="emit('expand')">
+    <p v-if="status === 'loading'" class="overlay">{{ t('material-loading') }}</p>
+    <p v-else-if="status === 'error'" class="overlay err">{{ t('material-preview-failed', { error }) }}</p>
+    <button type="button" class="expand" :title="t('model-full-screen')" :aria-label="t('material-open-full-screen')" @click="emit('expand')">
       <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M2.5 6V2.5H6M10 2.5h3.5V6M13.5 10v3.5H10M6 13.5H2.5V10" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" /></svg>
     </button>
     <div v-if="status === 'ready'" class="hud">
-      <div class="shapes" role="group" aria-label="Shape">
-        <button v-for="s in SHAPES" :key="s" type="button" :aria-pressed="shape === s" @click="shape = s">{{ SHAPE_LABEL[s] }}</button>
+      <div class="shapes" role="group" :aria-label="t('material-group-shape')">
+        <button v-for="s in SHAPES" :key="s" type="button" :aria-pressed="shape === s" @click="shape = s">{{ shapeLabel(s) }}</button>
       </div>
     </div>
   </div>

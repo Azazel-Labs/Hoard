@@ -4,6 +4,7 @@
 import { onMounted, onUnmounted, reactive, ref } from 'vue'
 import { api, ApiError, type Issue, type IssueGroup, type IssuePick, type Issues } from '../api'
 import { confirmDialog, showError, showOk } from '../ui'
+import { formatDate, t } from '../i18n'
 
 const emit = defineEmits<{
   unauthorized: []
@@ -23,7 +24,7 @@ let gone = false
 
 function failed(e: unknown, what: string) {
   if (e instanceof ApiError && e.status === 401) emit('unauthorized')
-  showError(`${what}: ${(e as Error).message}`)
+  showError(t('issues-failed', { what, error: (e as Error).message }))
 }
 
 async function load() {
@@ -31,7 +32,7 @@ async function load() {
   try {
     data.value = await api.issues()
   } catch (e) {
-    failed(e, "Couldn't load Issues")
+    failed(e, t('issues-load-failed'))
   }
   // Retries take a while to land; keep the list current while the page is open.
   if (!gone) timer = setTimeout(load, 10_000)
@@ -51,12 +52,12 @@ async function act(what: 'retry' | 'dismiss', pick: IssuePick, key: string) {
   try {
     if (what === 'retry') {
       const { started } = await api.retryIssues(pick)
-      showOk(started === 1 ? 'Started again.' : `Started ${started} things again.`)
+      showOk(t('issues-started', { count: started }))
     } else {
       await api.dismissIssues(pick)
     }
   } catch (e) {
-    failed(e, what === 'retry' ? "Couldn't retry" : "Couldn't dismiss")
+    failed(e, what === 'retry' ? t('issues-retry-failed') : t('issues-dismiss-failed'))
   } finally {
     busy.value = null
   }
@@ -65,21 +66,20 @@ async function act(what: 'retry' | 'dismiss', pick: IssuePick, key: string) {
 
 async function dismissAll(g: IssueGroup) {
   const ok = await confirmDialog({
-    title: `Dismiss all ${g.total}?`,
-    body: `“${g.title}” is cleared. Anything that goes wrong again is listed again.`,
-    confirm: 'Dismiss all',
+    title: t('issues-dismiss-all-title', { count: g.total }),
+    body: t('issues-dismiss-all-body', { title: g.title }),
+    confirm: t('issues-dismiss-all'),
   })
   if (ok) await act('dismiss', { kind: g.kind }, `all:${g.kind}`)
 }
 
-const fmt = new Intl.DateTimeFormat(undefined, { dateStyle: 'medium', timeStyle: 'short' })
 function when(at: string | null): string {
   if (!at) return ''
   const secs = (Date.now() - Date.parse(at)) / 1000
-  if (secs < 60) return 'just now'
-  if (secs < 3600) return `${Math.round(secs / 60)} min ago`
-  if (secs < 86400) return `${Math.round(secs / 3600)} h ago`
-  return fmt.format(new Date(at))
+  if (secs < 60) return t('issues-just-now')
+  if (secs < 3600) return t('issues-minutes-ago', { mins: Math.round(secs / 60) })
+  if (secs < 86400) return t('issues-hours-ago', { hours: Math.round(secs / 3600) })
+  return formatDate(at, { dateStyle: 'medium', timeStyle: 'short' })
 }
 
 /** Where the issue is, when the title doesn't already say. */
@@ -102,9 +102,9 @@ function openWhere(i: Issue) {
 
 <template>
   <div class="issues" :aria-busy="!data">
-    <p v-if="!data" class="loading">Loading…</p>
+    <p v-if="!data" class="loading">{{ t('issues-loading') }}</p>
     <p v-else-if="!data.groups.length" class="none" data-testid="issues-none">
-      <span class="dot" aria-hidden="true" />Nothing has gone wrong.
+      <span class="dot" aria-hidden="true" />{{ t('issues-none') }}
     </p>
     <template v-else>
       <section v-for="g in data.groups" :key="g.kind" class="group" :data-testid="`issues-${g.kind}`">
@@ -121,10 +121,10 @@ function openWhere(i: Issue) {
               :disabled="busy !== null"
               @click="act('retry', { kind: g.kind }, `all:${g.kind}`)"
             >
-              {{ g.retry }} all
+              {{ t('issues-action-all', { action: g.retry }) }}
             </button>
             <button v-if="g.dismiss && g.total > 1" type="button" class="btn ghost" :disabled="busy !== null" @click="dismissAll(g)">
-              Dismiss all
+              {{ t('issues-dismiss-all') }}
             </button>
           </div>
         </header>
@@ -135,7 +135,7 @@ function openWhere(i: Issue) {
                 v-if="i.asset_id || i.pack_id || i.location_id != null"
                 type="button"
                 class="link title"
-                :title="i.asset_id ? 'Open it' : i.pack_id ? 'Show the pack' : 'Library locations'"
+                :title="i.asset_id ? t('issues-open-asset') : i.pack_id ? t('issues-open-pack') : t('issues-open-locations')"
                 @click="openTitle(i)"
               >
                 {{ i.title }}
@@ -143,9 +143,9 @@ function openWhere(i: Issue) {
               <strong v-else class="title">{{ i.title }}</strong>
               <small class="meta">
                 <template v-if="where(i)">
-                  in <button type="button" class="link" @click="openWhere(i)">{{ where(i) }}</button> ·
+                  {{ t('issues-where-before') }} <button type="button" class="link" @click="openWhere(i)">{{ where(i) }}</button>{{ t('issues-where-after') }} ·
                 </template>
-                {{ when(i.at) }}<template v-if="i.count > 1"> · {{ i.count }} times</template>
+                {{ when(i.at) }}<template v-if="i.count > 1"> · {{ t('issues-times', { count: i.count }) }}</template>
               </small>
               <p v-if="i.message" class="msg">{{ i.message }}</p>
             </div>
@@ -157,27 +157,27 @@ function openWhere(i: Issue) {
                 :disabled="busy !== null"
                 @click="act('retry', { ids: [i.id] }, i.id)"
               >
-                {{ busy === i.id ? 'Starting…' : g.retry }}
+                {{ busy === i.id ? t('issues-starting') : g.retry }}
               </button>
               <button
                 v-if="g.dismiss"
                 type="button"
                 class="btn ghost"
                 :disabled="busy !== null"
-                :aria-label="`Dismiss ${i.title}`"
+                :aria-label="t('issues-dismiss-named', { title: i.title })"
                 @click="act('dismiss', { ids: [i.id] }, i.id)"
               >
-                Dismiss
+                {{ t('issues-dismiss') }}
               </button>
             </div>
           </li>
         </ul>
         <p v-if="g.items.length > FEW || g.total > g.items.length" class="more">
           <button v-if="g.items.length > FEW" type="button" class="link" @click="expanded.has(g.kind) ? expanded.delete(g.kind) : expanded.add(g.kind)">
-            {{ expanded.has(g.kind) ? 'Show fewer' : `Show all ${g.items.length}` }}
+            {{ expanded.has(g.kind) ? t('issues-show-fewer') : t('issues-show-all', { count: g.items.length }) }}
           </button>
           <span v-if="g.total > g.items.length && (expanded.has(g.kind) || g.items.length <= FEW)">
-            {{ g.total - g.items.length }} more aren’t listed.
+            {{ t('issues-not-listed', { count: g.total - g.items.length }) }}
           </span>
         </p>
       </section>

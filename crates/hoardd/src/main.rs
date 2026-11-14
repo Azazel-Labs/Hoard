@@ -173,7 +173,6 @@ async fn main() -> Result<()> {
         clip: clip::Index::default(),
         sounds: sounds::Index::default(),
     });
-    auth::prepare_setup(&state).await?;
     tokio::spawn(signin::recheck_loop(Arc::clone(&state)));
     match uploads::sweep_stale(&state) {
         Ok(0) => {}

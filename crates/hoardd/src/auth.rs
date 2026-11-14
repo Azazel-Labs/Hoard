@@ -412,6 +412,7 @@ async fn status(State(state): State<AppState>, headers: HeaderMap) -> ApiResult<
     });
     Ok(Json(json!({
         "setup_needed": accounts == 0,
+        "setup_code": accounts == 0 && setup_code(&state).is_some(),
         "signed_in": who.is_some(),
         "user": user,
         "guest_browsing": settings.guest_browsing,
@@ -432,40 +433,6 @@ struct SetupBody {
     password: String,
     #[serde(default)]
     code: String,
-}
-
-/// The code that makes the first account while there's none, from the server's log (or `HOARD_SETUP_CODE`): whoever
-/// reaches a fresh server's address first can't claim it, only someone who can see the server.
-static SETUP_CODE: Mutex<Option<String>> = Mutex::new(None);
-
-/// A setup code as typed: any case, with or without its dash.
-fn normalized_code(s: &str) -> String {
-    s.chars().filter(|c| !matches!(c, '-' | ' ')).flat_map(char::to_uppercase).collect()
-}
-
-/// When there's no account yet, choose the setup code and say it in the log.
-pub(crate) async fn prepare_setup(state: &AppState) -> Result<()> {
-    let accounts: i64 =
-        db::call(&state.pool, |c| Ok(c.query_row("SELECT COUNT(*) FROM users", [], |r| r.get(0))?)).await?;
-    if accounts > 0 {
-        return Ok(());
-    }
-    let given = state.cfg.setup_code.as_deref().map(str::trim).filter(|s| !s.is_empty());
-    let code = if let Some(code) = given {
-        tracing::warn!(
-            "This server has no accounts yet: open the portal and give the setup code from HOARD_SETUP_CODE"
-        );
-        code.to_owned()
-    } else {
-        const ALPHABET: &[u8] = b"ABCDEFGHJKMNPQRSTUVWXYZ23456789";
-        let s: String =
-            random_bytes::<10>()?.iter().map(|b| char::from(ALPHABET[usize::from(*b) % ALPHABET.len()])).collect();
-        let code = format!("{}-{}", &s[..5], &s[5..]);
-        tracing::warn!("This server has no accounts yet: open the portal and give the setup code {code}");
-        code
-    };
-    *SETUP_CODE.lock().unwrap_or_else(PoisonError::into_inner) = Some(normalized_code(&code));
-    Ok(())
 }
 
 /// A name and password fit to save, or what's wrong with them.
@@ -528,23 +495,28 @@ fn signed_in(headers: &HeaderMap, token: &str, name: &str, role: Role) -> ApiRes
     Ok(([(header::SET_COOKIE, set)], Json(json!({ "user": user }))).into_response())
 }
 
-/// The first account, with the setup code from the server's log. Refused once there is one.
+/// `HOARD_SETUP_CODE`, when it's set: then only someone who knows it can make the first account.
+fn setup_code(state: &AppState) -> Option<&str> {
+    state.cfg.setup_code.as_deref().map(str::trim).filter(|s| !s.is_empty())
+}
+
+/// The first account: whoever comes first, or with `HOARD_SETUP_CODE` when that's set. Refused once there is one.
 async fn setup(State(state): State<AppState>, headers: HeaderMap, Json(body): Json<SetupBody>) -> ApiResult<Response> {
-    const TRIES: &str = "\u{1}setup";
-    if let Some(wait) = wait_for(TRIES) {
-        return Err(AppError::too_many(format!("Too many wrong codes: wait {} seconds", wait.as_secs().max(1))));
-    }
     let name = check_new(&body.username, &body.password)?;
-    let expected = SETUP_CODE.lock().unwrap_or_else(PoisonError::into_inner).clone();
-    let Some(expected) = expected else { return Err(AppError::conflict("There's already an account: sign in")) };
-    // Compared as digests, so how long it takes says nothing about how much of the code was right.
-    let right = digest(&normalized_code(&body.code)) == digest(&expected);
-    note_attempt(TRIES, right);
-    if !right {
-        return Err(AppError {
-            status: StatusCode::FORBIDDEN,
-            err: anyhow!("That isn't the setup code: the server prints it in its log when it starts"),
-        });
+    if let Some(expected) = setup_code(&state) {
+        const TRIES: &str = "\u{1}setup";
+        if let Some(wait) = wait_for(TRIES) {
+            return Err(AppError::too_many(format!("Too many wrong codes: wait {} seconds", wait.as_secs().max(1))));
+        }
+        // Compared as digests, so how long it takes says nothing about how much of the code was right.
+        let right = digest(body.code.trim()) == digest(expected);
+        note_attempt(TRIES, right);
+        if !right {
+            return Err(AppError {
+                status: StatusCode::FORBIDDEN,
+                err: anyhow!("That isn't the setup code given to the server in HOARD_SETUP_CODE"),
+            });
+        }
     }
     let made = name.clone();
     let token = db::call(&state.pool, move |c| {
@@ -561,7 +533,6 @@ async fn setup(State(state): State<AppState>, headers: HeaderMap, Json(body): Js
     })
     .await?
     .ok_or_else(|| AppError::conflict("There's already an account: sign in"))?;
-    *SETUP_CODE.lock().unwrap_or_else(PoisonError::into_inner) = None;
     tracing::info!(user = %name, "first account made");
     signed_in(&headers, &token, &name, Role::Admin)
 }

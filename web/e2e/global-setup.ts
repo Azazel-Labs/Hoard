@@ -15,7 +15,7 @@ const here = dirname(fileURLToPath(import.meta.url))
 const webDir = resolve(here, '..')
 const repo = resolve(webDir, '..')
 
-/** What makes the first account: a fresh server only takes the one in its log, or this when it's given. */
+/** Given to the server, so the first account can only be made with it. */
 const SETUP_CODE = 'E2E-SETUP'
 
 /** `HOARD_BIN`, or the newest hoardd built in the usual places. */
@@ -94,6 +94,10 @@ export default async function globalSetup(_config: FullConfig): Promise<void> {
   await waitUp(url, () => exit)
 
   const anon = await request.newContext({ baseURL: url, extraHTTPHeaders: HOARD_HEADERS })
+  const status = (await (await anon.get('/api/auth/status')).json()) as { setup_code?: boolean }
+  if (!status.setup_code) throw new Error('the server should say the first account needs its setup code')
+  const wrong = await anon.post('/api/auth/setup', { data: { username: USERNAME, password: PASSWORD, code: 'nope' } })
+  if (wrong.status() !== 403) throw new Error(`a wrong setup code should be refused, got ${wrong.status()}`)
   const setup = await anon.post('/api/auth/setup', { data: { username: USERNAME, password: PASSWORD, code: SETUP_CODE } })
   if (!setup.ok()) throw new Error(`account setup failed: ${setup.status()} ${await setup.text()}`)
   await anon.dispose()

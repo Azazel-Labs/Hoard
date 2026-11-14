@@ -53,8 +53,8 @@ pub(crate) struct Config {
     #[arg(long, env = "HOARD_WEB_DIR", default_value = "./web/dist")]
     pub(crate) web_dir: PathBuf,
 
-    /// The code that makes the first account. Without it, a server with no accounts prints a new one in its log each
-    /// time it starts.
+    /// A code that whoever makes the first account has to give. Without it, the first person to open a new server
+    /// makes its admin account.
     #[arg(long, env = "HOARD_SETUP_CODE", hide_env_values = true)]
     pub(crate) setup_code: Option<String>,
 

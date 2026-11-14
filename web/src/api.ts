@@ -354,6 +354,8 @@ export type Role = 'view' | 'edit' | 'admin'
 export interface AuthStatus {
   /** No account yet: the portal asks for the first one. */
   setup_needed: boolean
+  /** The first account needs the code from `HOARD_SETUP_CODE`. */
+  setup_code?: boolean
   signed_in: boolean
   user: { name: string; kind: 'user' | 'token'; role: Role; source?: AccountSource } | null
   /** People who aren't signed in may look around. */
@@ -1067,7 +1069,7 @@ export const api = {
     }),
   checkCert: (cert: string, key: string) => post<CertCheck>('/api/admin/https/check', { cert, key }),
   authStatus: () => request<AuthStatus>('/api/auth/status'),
-  setup: (username: string, password: string, code: string) =>
+  setup: (username: string, password: string, code = '') =>
     post<{ user: { name: string } }>('/api/auth/setup', { username, password, code }),
   login: (username: string, password: string) =>
     post<{ user: { name: string } }>('/api/auth/login', { username, password }),

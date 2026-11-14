@@ -867,7 +867,7 @@ Set before starting (these need a restart):
 | `HOARD_WEB_DIR` | `./web/dist` | built portal |
 | `HOARD_LOCAL_LLM_URL` | `http://llm:8080/v1` | where the local model server listens (Settings → AI tagging → Local model) |
 | `HOARD_S3_ENDPOINT` / `_BUCKET` / `_REGION` / `_ACCESS_KEY` / `_SECRET_KEY` / `_HEADERS` | – | the S3 service for `s3://` library locations |
-| `HOARD_SETUP_CODE` | – | the setup code for the first account, instead of a new one in the log at each start |
+| `HOARD_SETUP_CODE` | – | a code whoever makes the first account has to give; without it, the first visitor makes it |
 
 ## Keeping it safe
 
@@ -907,9 +907,9 @@ Maintenance → Shrink thumbnails re-stores the existing PNG ones.
 
 ## Accounts and access tokens
 
-The first visit to a new server makes its first account, an admin, with the **setup code** the server prints in its
-log when it starts with no accounts (`docker compose logs hoard`), so whoever reaches a fresh server first can't claim
-it. Add accounts for other people, change your password, and make access tokens in **Settings → Account**. Each
+The first visit to a new server makes its first account, an admin. If a new server is reachable by people you don't
+know, set `HOARD_SETUP_CODE` in its environment before starting it, and that account can only be made by someone who
+gives the code. Add accounts for other people, change your password, and make access tokens in **Settings → Account**. Each
 account has a role:
 
 | Role | Can |

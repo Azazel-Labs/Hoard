@@ -26,7 +26,7 @@ const META_VERSION: &str = "io.modelcontextprotocol/protocolVersion";
 const INSTRUCTIONS: &str = "Hoard is a library of game assets (textures, sprites, audio, music, 3D models, fonts). \
 Use search_assets to find things by words, kind and tags (tags look like `sfx`, `material:stone`, `style:pixel-art`, \
 `map:normal`, `license:cc0`). Use get_asset for full details, including linked textures/animations and the thumbnail's colours. find_similar finds \
-assets that look like one you have (textures, models, sprites, across every pack) and find_by_color finds assets with \
+assets that look like one you have (textures, models, sprites, across every pack), or sound like it for a sound, and find_by_color finds assets with \
 much of a colour in them. To actually \
 fetch files, use get_bundle: it returns direct download URLs for an asset and every file it depends on, plus a zip URL. \
 To describe and tag assets nothing has described yet, loop next_to_tag → save_tags (the tag_pack prompt explains how).";
@@ -336,13 +336,13 @@ fn search_tools() -> Value {
         },
         {
             "name": "find_similar",
-            "title": "Find assets that look alike",
-            "description": "Assets whose thumbnail looks like this asset's (colours, surface grain, edges, layout, and, when image search is on, what it shows), across every pack, most alike first: other rocks for a rock texture, near-copies at other sizes, renders of similar models. Same result shape as search_assets.",
+            "title": "Find assets that look or sound alike",
+            "description": "Assets whose thumbnail looks like this asset's (colours, surface grain, edges, layout, and, when image search is on, what it shows), across every pack, most alike first: other rocks for a rock texture, near-copies at other sizes, renders of similar models. For a sound, the sounds that sound like it (its spectrum, how it rises and dies away, how bright, noisy and busy it is), whatever they're called. Same result shape as search_assets.",
             "inputSchema": {
                 "type": "object",
                 "properties": {
                     "id": { "type": "string", "description": "The asset to match." },
-                    "kind": { "type": "string", "enum": ["texture", "model", "material", "animation", "video", "other"] },
+                    "kind": { "type": "string", "enum": ["texture", "model", "material", "animation", "video", "audio", "other"] },
                     "query": { "type": "string", "description": "Optional words the matches must also have." },
                     "limit": { "type": "integer", "minimum": 1, "maximum": 100, "default": 20 },
                     "include_previews": { "type": "boolean", "default": false, "description": "Also return the first 8 thumbnails as images." }

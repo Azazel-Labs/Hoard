@@ -1231,5 +1231,8 @@ export const KIND_LABEL: Record<AssetKind, string> = {
 
 /** Kinds whose thumbnails are pictures of the thing itself, so "looks like" means something (mirrors the server). */
 const LOOK_KINDS = new Set<AssetKind>(['texture', 'model', 'material', 'animation', 'video', 'other'])
+/** Sound files the server listens to, for "more like this" by how they sound (mirrors the server's decoders). */
+const SOUND_EXTS = new Set(['wav', 'wave', 'ogg', 'oga', 'flac', 'mp3', 'aif', 'aiff', 'aifc'])
 /** Whether "More like this" can find anything for an asset. */
-export const looksAlike = (a: Asset) => a.has_thumb && LOOK_KINDS.has(a.kind)
+export const looksAlike = (a: Asset) =>
+  (a.has_thumb && LOOK_KINDS.has(a.kind)) || (a.kind === 'audio' && SOUND_EXTS.has(a.ext.toLowerCase()))

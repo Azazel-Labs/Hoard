@@ -51,6 +51,7 @@ mod server;
 mod settings;
 mod sheet;
 mod sidecar;
+mod sounds;
 mod sources;
 mod store_formats;
 mod store_lookup;
@@ -98,6 +99,8 @@ pub(crate) struct Inner {
     pub(crate) looks: looks::Index,
     /// Every thumbnail's CLIP embedding, for image search.
     pub(crate) clip: clip::Index,
+    /// Every sound's acoustic descriptor, for "more like this" on sounds.
+    pub(crate) sounds: sounds::Index,
 }
 
 pub(crate) type AppState = Arc<Inner>;
@@ -167,6 +170,7 @@ async fn main() -> Result<()> {
         settings,
         looks: looks::Index::default(),
         clip: clip::Index::default(),
+        sounds: sounds::Index::default(),
     });
     match uploads::sweep_stale(&state) {
         Ok(0) => {}

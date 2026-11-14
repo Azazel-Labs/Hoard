@@ -599,7 +599,7 @@ and ask first. Deleting for good frees its space at the next clean-up, and a wat
 way isn't read in again (the folder itself is never touched). Archiving and restoring need an account that can change
 the library; deleting for good, an admin.
 
-## Search by colour, by what pictures show, and More like this
+## Search by colour, by what pictures show, by how things sound, and More like this
 
 Hoard looks at the thumbnail of every texture, model, material, animation, video and sprite, and works out its main
 colours and what its surface looks like. A background job does this for new packs and, once, for everything already
@@ -619,7 +619,14 @@ What counts as alike is the colours (a colour histogram), the grain and edges of
 contrast and local binary patterns, measured in a way that ignores which way a texture is turned), and a perceptual
 hash that catches near-copies. It is all computed on the server from the thumbnail, needs no model download and works
 offline. On its own, nothing in it knows what a picture shows. Two brown, rough textures can count as alike even when
-one is bark and the other is rock. Fonts, audio, documents and shaders take no part.
+one is bark and the other is rock. Fonts, documents and shaders take no part.
+
+A sound's **More like this** listens instead of looking: it brings up other sounds that sound like it, whatever their
+files are called, so one footstep finds the other footsteps and one laser the other lasers. A background job,
+"Listening to sounds", works through every WAV, Ogg, FLAC, MP3 and AIFF (the first 30 seconds of each) and keeps up
+with new packs. It compares the spectrum's shape, how the sound rises and dies away, and its character: how long,
+bright, noisy, busy and bass-heavy it is and how much it changes. How loud a file is, the silence around it and the
+rate it was recorded at don't count. Like the pictures, it all runs on the server and needs no model.
 
 ### Image search
 

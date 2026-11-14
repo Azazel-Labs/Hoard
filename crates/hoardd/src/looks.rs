@@ -745,16 +745,31 @@ async fn rank(state: &AppState, q: &SearchQuery) -> Result<Option<db::LookRank>>
                 Vec::new()
             }
         };
-        return Ok((!hits.is_empty()).then_some(db::LookRank { scores: hits, exclude: None, blend: true }));
+        return Ok((!hits.is_empty()).then_some(db::LookRank {
+            scores: hits,
+            exclude: None,
+            blend: true,
+            by_file: false,
+        }));
     }
-    state.looks.ensure(state).await?;
     let mut scores: Option<Vec<(String, f32)>> = None;
     if let Some(id) = &similar {
         let id = id.clone();
-        let thumb: Option<String> = db::call(&state.pool, move |c| {
-            Ok(c.query_row("SELECT thumb_hash FROM assets WHERE id = ?1", [id], |r| r.get(0)).optional()?.flatten())
+        let asset: Option<(String, String, Option<String>)> = db::call(&state.pool, move |c| {
+            Ok(c.query_row("SELECT kind, blob_hash, thumb_hash FROM assets WHERE id = ?1", [id], |r| {
+                Ok((r.get(0)?, r.get(1)?, r.get(2)?))
+            })
+            .optional()?)
         })
         .await?;
+        let (kind, file, thumb) = asset.unwrap_or_default();
+        // A sound: what sounds like it (a waveform's colours say nothing).
+        if kind == "audio" {
+            state.sounds.ensure(state).await?;
+            let scores = state.sounds.similar(&file);
+            return Ok(Some(db::LookRank { scores, exclude: similar, blend: false, by_file: true }));
+        }
+        state.looks.ensure(state).await?;
         scores = Some(match thumb {
             Some(h) => {
                 let meaning = crate::clip::similar(state, &h).await;
@@ -764,6 +779,7 @@ async fn rank(state: &AppState, q: &SearchQuery) -> Result<Option<db::LookRank>>
         });
     }
     if let Some(color) = color {
+        state.looks.ensure(state).await?;
         // A colour that doesn't parse matches nothing rather than everything.
         let by_color = color.map(|lab| state.looks.by_color(lab)).unwrap_or_default();
         scores = Some(match scores {
@@ -775,7 +791,7 @@ async fn rank(state: &AppState, q: &SearchQuery) -> Result<Option<db::LookRank>>
             None => by_color,
         });
     }
-    Ok(Some(db::LookRank { scores: scores.unwrap_or_default(), exclude: similar, blend: false }))
+    Ok(Some(db::LookRank { scores: scores.unwrap_or_default(), exclude: similar, blend: false, by_file: false }))
 }
 
 // ---------------------------------------------------------------------------------------------
@@ -815,6 +831,7 @@ pub(crate) async fn schedule(state: &AppState) {
         Err(e) => tracing::warn!(error = ?e, "could not queue the looks job"),
     }
     crate::clip::schedule(state).await;
+    crate::sounds::schedule(state).await;
 }
 
 /// Thumbnails done per round (read, analyzed, written).

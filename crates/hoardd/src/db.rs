@@ -334,6 +334,12 @@ const MIGRATIONS: &[&str] = &[
        PRIMARY KEY (project_id, asset_id)
      );
      CREATE INDEX project_assets_asset ON project_assets(asset_id);",
+    // 39: "more like this" for sounds (see `sounds`): an acoustic descriptor per audio file, keyed by its blob.
+    "CREATE TABLE sounds (
+       hash       TEXT PRIMARY KEY,
+       version    INTEGER NOT NULL,
+       descriptor BLOB NOT NULL
+     ) WITHOUT ROWID;",
 ];
 
 /// How many automatic pre-upgrade backups to keep in `<data dir>/backups`.
@@ -1394,18 +1400,26 @@ pub(crate) struct LookRank {
     /// With a text query: match either the words or the look, and rank by both (text-to-image search). Without
     /// it, only assets in `scores` match.
     pub(crate) blend: bool,
+    /// The hashes are of the assets' files (sounds, see `sounds`), not their thumbnails.
+    pub(crate) by_file: bool,
 }
 
 const FTS_JOIN: &str = "JOIN (SELECT asset_id, bm25(assets_fts, 0.0, 8.0, 4.0, 3.0, 1.0, 5.0) AS rank
           FROM assets_fts WHERE assets_fts MATCH ?) f ON f.asset_id = a.id";
-const LOOK_JOIN: &str = "JOIN temp.look_rank lr ON lr.hash = a.thumb_hash";
+fn look_join(look: &LookRank) -> &'static str {
+    if look.by_file {
+        "JOIN temp.look_rank lr ON lr.hash = a.blob_hash"
+    } else {
+        "JOIN temp.look_rank lr ON lr.hash = a.thumb_hash"
+    }
+}
 
 fn build_filter(q: &SearchQuery, include_kind: bool, look: Option<&LookRank>) -> Filter {
     let mut f = Filter { join: String::new(), clauses: Vec::new(), params: Vec::new(), ranked: false };
     let fts = q.q.as_deref().and_then(fts_query);
     match (fts, look) {
         (Some(fts), Some(look)) if look.blend => {
-            f.join = format!("LEFT {FTS_JOIN} LEFT {LOOK_JOIN}");
+            f.join = format!("LEFT {FTS_JOIN} LEFT {}", look_join(look));
             f.clauses.push("(f.asset_id IS NOT NULL OR lr.hash IS NOT NULL)".to_owned());
             f.params.push(SqlValue::Text(fts));
             f.ranked = true;
@@ -1416,8 +1430,8 @@ fn build_filter(q: &SearchQuery, include_kind: bool, look: Option<&LookRank>) ->
                 f.params.push(SqlValue::Text(fts));
                 f.ranked = true;
             }
-            if look.is_some() {
-                f.join = format!("{} {LOOK_JOIN}", f.join);
+            if let Some(look) = look {
+                f.join = format!("{} {}", f.join, look_join(look));
             }
         }
     }
@@ -1956,6 +1970,7 @@ mod tests {
             scores: vec![("t3".into(), 0.9), ("t2".into(), 0.8), ("t1".into(), 0.7)],
             exclude: Some("a1".into()),
             blend: false,
+            by_file: false,
         };
         let q = SearchQuery::default();
         assert_eq!(ids(search_ranked(&conn, &q, true, Some(&rank)).unwrap()), ["a3", "a2"], "best first, minus a1");
@@ -1965,7 +1980,7 @@ mod tests {
         assert_eq!(ids(page), ["a2"]);
 
         // Blended (text-to-image): word matches and look matches both count.
-        let rank = LookRank { scores: vec![("t3".into(), 0.2)], exclude: None, blend: true };
+        let rank = LookRank { scores: vec![("t3".into(), 0.2)], exclude: None, blend: true, by_file: false };
         let q = SearchQuery { q: Some("mossy".into()), ..Default::default() };
         assert_eq!(ids(search_ranked(&conn, &q, false, Some(&rank)).unwrap()), ["a2", "a3"]);
         assert_eq!(ids(search(&conn, &q, false).unwrap()), ["a2"], "a plain search is unchanged");

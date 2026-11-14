@@ -322,3 +322,61 @@ export function megascans(): { path: string; data: Buffer }[] {
     { path: `${base}/xeokah0.json`, data: Buffer.from(JSON.stringify(meta, null, 2)) },
   ]
 }
+
+/** A mono 16-bit WAV of samples in -1..1. */
+export function wav(samples: number[], rate = 22_050): Buffer {
+  const data = Buffer.alloc(samples.length * 2)
+  samples.forEach((s, i) => data.writeInt16LE(Math.round(Math.max(-1, Math.min(1, s)) * 32_767), i * 2))
+  const head = Buffer.alloc(44)
+  head.write('RIFF', 0)
+  head.writeUInt32LE(36 + data.length, 4)
+  head.write('WAVEfmt ', 8)
+  head.writeUInt32LE(16, 16)
+  head.writeUInt16LE(1, 20)
+  head.writeUInt16LE(1, 22)
+  head.writeUInt32LE(rate, 24)
+  head.writeUInt32LE(rate * 2, 28)
+  head.writeUInt16LE(2, 32)
+  head.writeUInt16LE(16, 34)
+  head.write('data', 36)
+  head.writeUInt32LE(data.length, 40)
+  return Buffer.concat([head, data])
+}
+
+/** A repeatable noise source in -1..1. */
+function noise(seed: number): () => number {
+  let x = seed >>> 0 || 1
+  return () => {
+    x ^= x << 13
+    x >>>= 0
+    x ^= x >>> 17
+    x ^= x << 5
+    x >>>= 0
+    return (x / 0xffffffff) * 2 - 1
+  }
+}
+
+/** Sounds of three sorts, each a little different by `seed`: a thud (a footstep), a zap (a laser), rain. */
+export function sound(sort: 'thud' | 'zap' | 'rain', seed: number, rate = 22_050): Buffer {
+  const next = noise(seed)
+  const out: number[] = []
+  if (sort === 'thud') {
+    const a = Math.exp((-2 * Math.PI * (280 + seed * 20)) / rate)
+    let y = 0
+    for (let i = 0; i < rate * (0.3 + seed * 0.02); i++) {
+      y = a * y + (1 - a) * next()
+      out.push(y * Math.exp(-i / (0.04 * rate)) * 4)
+    }
+  } else if (sort === 'zap') {
+    const len = Math.round(rate * (0.4 + seed * 0.03))
+    let phase = 0
+    for (let i = 0; i < len; i++) {
+      const t = i / len
+      phase += (2 * Math.PI * (2000 - seed * 100 + (300 - 2000 + seed * 100) * t)) / rate
+      out.push(Math.sin(phase) * (1 - t))
+    }
+  } else {
+    for (let i = 0; i < rate * (3 + seed * 0.5); i++) out.push(next() * 0.5)
+  }
+  return wav(out, rate)
+}

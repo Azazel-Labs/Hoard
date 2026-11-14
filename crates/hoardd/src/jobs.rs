@@ -19,6 +19,8 @@ pub(crate) const UNREAL: &str = "unreal_convert";
 pub(crate) const SCAN: &str = "scan_location";
 pub(crate) const RELOCATE: &str = "relocate";
 pub(crate) const LOOKS: &str = "looks";
+/// "More like this" for sounds: listen to sounds that haven't been (see [`crate::sounds`]).
+pub(crate) const SOUNDS: &str = "sounds";
 pub(crate) const MATERIALS: &str = "materials";
 /// Image search: embed thumbnails that have no embedding yet (see [`crate::clip`]).
 pub(crate) const EMBED: &str = "embed";
@@ -76,6 +78,7 @@ pub(crate) fn job_label(kind: &str, pack: &str) -> String {
         SCAN => "Scanning a watched folder".to_owned(),
         RELOCATE => "Moving files between library locations".to_owned(),
         LOOKS => "Working out colours and looks".to_owned(),
+        SOUNDS => "Listening to sounds".to_owned(),
         EMBED => "Learning what pictures show".to_owned(),
         MATERIALS => format!("Finding materials in {pack}"),
         READ_FILES => format!("Reading the files of {pack}"),
@@ -104,6 +107,7 @@ async fn run(state: &AppState, job: db::JobRow) {
         SCAN => SCAN,
         RELOCATE => RELOCATE,
         LOOKS => LOOKS,
+        SOUNDS => SOUNDS,
         EMBED => EMBED,
         MATERIALS => MATERIALS,
         READ_FILES => READ_FILES,
@@ -147,6 +151,7 @@ async fn run(state: &AppState, job: db::JobRow) {
         },
         RELOCATE => crate::relocate::run(state, serde_json::from_value(job.payload.clone()).unwrap_or_default()).await,
         LOOKS => crate::looks::run_job(state).await,
+        SOUNDS => crate::sounds::run_job(state).await,
         EMBED => crate::clip::run_job(state).await,
         MATERIALS => blocking(state, move |s, rt| crate::materials::run_job(s, rt, &pack_id)).await,
         READ_FILES => read_files(state, &pack_id).await,

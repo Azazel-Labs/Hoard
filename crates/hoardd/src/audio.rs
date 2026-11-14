@@ -20,18 +20,34 @@ pub(crate) struct Audio {
 }
 
 pub(crate) fn decode_audio(path: &Path) -> Result<Audio> {
+    let (mut samples, mut channels, mut rate, mut bits) = (Vec::new(), 0u16, 0u32, 16u16);
+    decode_each(Box::new(std::fs::File::open(path)?), path.extension().and_then(|e| e.to_str()), |pcm, c, r, b| {
+        (channels, rate, bits) = (c, r, b);
+        let max = if b == 24 { 8_388_607.0 } else { 32_767.0 };
+        ensure!(samples.len() + pcm.len() <= MAX_SAMPLES, "too long to convert here");
+        samples.extend(pcm.iter().map(|s| (s.clamp(-1.0, 1.0) * max).round() as i32));
+        Ok(true)
+    })?;
+    ensure!(channels > 0 && rate > 0, "no audio decoded");
+    Ok(Audio { samples, channels, rate, bits })
+}
+
+/// Decode `source` (its file extension a hint), handing each packet's interleaved samples (about -1..=1) to `each`
+/// with the channel count, the rate and the source's bit depth (16 or 24), until the stream ends or `each` says stop.
+pub(crate) fn decode_each(
+    source: Box<dyn symphonia::core::io::MediaSource>,
+    ext: Option<&str>,
+    mut each: impl FnMut(&[f32], u16, u32, u16) -> Result<bool>,
+) -> Result<()> {
     use symphonia::core::codecs::audio::AudioDecoderOptions;
     use symphonia::core::formats::probe::Hint;
     use symphonia::core::formats::{FormatOptions, TrackType};
     use symphonia::core::io::MediaSourceStream;
     use symphonia::core::meta::MetadataOptions;
 
-    let mss = MediaSourceStream::new(
-        Box::new(std::fs::File::open(path)?),
-        symphonia::core::io::MediaSourceStreamOptions::default(),
-    );
+    let mss = MediaSourceStream::new(source, symphonia::core::io::MediaSourceStreamOptions::default());
     let mut hint = Hint::new();
-    if let Some(ext) = path.extension().and_then(|e| e.to_str()) {
+    if let Some(ext) = ext {
         hint.with_extension(ext);
     }
     let mut format =
@@ -44,8 +60,6 @@ pub(crate) fn decode_audio(path: &Path) -> Result<Audio> {
     };
     let mut decoder = symphonia::default::get_codecs().make_audio_decoder(params, &AudioDecoderOptions::default())?;
     let track_id = track.id;
-    let max = if bits == 24 { 8_388_607.0 } else { 32_767.0 };
-    let (mut samples, mut channels, mut rate) = (Vec::new(), 0u16, 0u32);
     let mut scratch: Vec<f32> = Vec::new();
     loop {
         let packet = match format.next_packet() {
@@ -63,15 +77,15 @@ pub(crate) fn decode_audio(path: &Path) -> Result<Audio> {
             Err(symphonia::core::errors::Error::DecodeError(_)) => continue,
             Err(e) => return Err(e.into()),
         };
-        rate = buf.spec().rate();
-        channels = u16::try_from(buf.spec().channels().count().max(1))?;
+        let rate = buf.spec().rate();
+        let channels = u16::try_from(buf.spec().channels().count().max(1))?;
         scratch.resize(buf.samples_interleaved(), 0.0);
         buf.copy_to_slice_interleaved(&mut scratch);
-        ensure!(samples.len() + scratch.len() <= MAX_SAMPLES, "too long to convert here");
-        samples.extend(scratch.iter().map(|s| (s.clamp(-1.0, 1.0) * max).round() as i32));
+        if !each(&scratch, channels, rate, bits)? {
+            break;
+        }
     }
-    ensure!(channels > 0 && rate > 0, "no audio decoded");
-    Ok(Audio { samples, channels, rate, bits })
+    Ok(())
 }
 
 pub(crate) fn write_wav(a: &Audio) -> Vec<u8> {

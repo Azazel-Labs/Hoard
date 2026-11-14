@@ -171,6 +171,10 @@ It uses the newest `hoardd` under `target/` (debug, then release); `HOARD_BIN` p
 `HOARD_WEB_DIR` at another portal build. Failures keep a trace, a screenshot and the server's log in
 `web/test-results/` (`npx playwright show-trace <trace.zip>`).
 
+`e2e/engines.spec.ts` runs the engine plugins against that server: with `GODOT_BIN` set to a Godot 4 executable it
+builds a scratch project, adds a model through the Godot plugin's code headless, and checks the files, `hoard.toml`,
+`hoard.lock` and what the server was told. Without it the test is skipped.
+
 ### Local models for the tagger
 
 The AI tagger works with any OpenAI-compatible endpoint. The simplest is a local model server: every compose file in
@@ -512,6 +516,21 @@ renamed or abandoned can be forgotten from the sidebar.
 
 **Manifest API.** Engine plugins can call `POST /api/manifest` with ids and/or a search, plus
 `include_deps`, and get a flat list of hashes, sizes, tags, suggested paths and immutable `/api/blobs/{hash}` URLs.
+
+### Engine plugins
+
+A browser for the hoard inside the editor: search, thumbnails, and **Add to project**, which downloads the picked
+assets with what they need (a model's textures and buffers), places them exactly where `hoard sync` would, pins them
+in `hoard.toml` as a `[[select]] ids = […]` (making the file if there's none), merges `hoard.lock` and tells the server
+the project uses them. A later `hoard sync` finds everything already there and downloads nothing; teammates without
+the plugin get the same files from it. A token that can only look is enough. The server's address and the token are
+kept in your editor's own settings, never in the project (the address falls back to `hoard.toml`'s `server`). Files
+are checked by size as they arrive; `hoard sync --verify` checks their BLAKE3 hashes.
+
+**Godot 4.** Copy [integrations/godot/addons/hoard/](integrations/godot/addons/hoard/) into your project's
+`addons/`, then Project → Project Settings → Plugins → enable Hoard. The dock sits top right; open Settings in it for
+the server and token. Assets go under `out_dir` (`assets/hoard` unless `hoard.toml` says otherwise), and the editor
+rescans when they land. Double-click a result to add it, or pick several and press Add to project.
 
 ## Unreal packs
 
@@ -1036,6 +1055,7 @@ crates/hoardd         the server; formats/ describes the files stores ship besid
 crates/hoard          the CLI
 crates/hoard-unreal   Unreal package reader and converters (textures, sounds, materials, data tables)
 xtask/                `cargo xtask`: dev servers, checks, local model downloads and serving, Unreal export
+integrations/godot    the Godot 4 editor plugin (addons/hoard) and its headless test script
 web/                  Vue 3 + TypeScript portal (Vite); three.js viewer is lazy-loaded
 web/scripts/          readme-images.mts: the README's screenshots and the social card, in docs/img/
 .vscode/              tasks, debug configurations, settings and recommended extensions

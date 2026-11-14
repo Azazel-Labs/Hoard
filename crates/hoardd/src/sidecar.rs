@@ -154,7 +154,9 @@ fn split_commas(values: &[String]) -> Vec<String> {
     values.iter().flat_map(|s| s.split(',')).map(str::trim).filter(|s| !s.is_empty()).map(str::to_owned).collect()
 }
 
-fn read_as(f: &Format, path: &str, text: &str) -> Option<Sidecar> {
+/// Understand a file as this format reads it: `None` when it isn't the store's (see [`Format::open`]) or gives no
+/// title.
+pub(crate) fn read_as(f: &Format, path: &str, text: &str) -> Option<Sidecar> {
     let doc = f.open(text)?;
     let at = doc.root();
     let x = &f.fields;
@@ -441,8 +443,13 @@ pub(crate) fn name_is_automatic(name: &str, sidecar: &Sidecar, folder: Option<&s
 
 /// SQL that's true for an asset (`a`) whose path some format reads, and its parameters.
 pub(crate) fn path_filter() -> (String, Vec<String>) {
+    filter_for(&store_formats::all())
+}
+
+/// SQL that's true for an asset (`a`) whose path one of these formats reads, and its parameters.
+pub(crate) fn filter_for(formats: &[Format]) -> (String, Vec<String>) {
     let mut patterns: Vec<String> = Vec::new();
-    for p in store_formats::all().iter().flat_map(Format::like_patterns) {
+    for p in formats.iter().flat_map(Format::like_patterns) {
         if !patterns.contains(&p) {
             patterns.push(p);
         }

@@ -612,6 +612,46 @@ export interface Settings {
   texture_names: TextureNames & { default: TextureNames; saved: boolean }
 }
 
+/** A store file format: built in, or one of the data folder's (`custom`), which can be changed or removed. */
+export interface StoreFormat { name: string; file: string; custom: boolean; toml: string }
+/** A file in the library. */
+export interface FilePlace { asset_id: string; pack_id: string; pack_name: string; path: string }
+/** Files of one name that may be a store's, which no format reads. */
+export interface UnreadFile { name: string; packs: number; files: number; example: FilePlace }
+/** Settings → Store files (`GET /api/admin/store-formats`). */
+export interface StoreFormats { formats: StoreFormat[]; unread: UnreadFile[]; dir: string | null }
+/** Why a format didn't read a file: its `files` don't take the name, its `require` says it isn't the store's, or it
+ *  finds no title. */
+export type FormatMiss = 'name' | 'not_the_stores' | 'no_title'
+/** What a format read in a store's file. */
+export interface StoreFileRead {
+  path: string
+  id: string | null
+  title: string
+  format: string
+  source: string
+  seller: string | null
+  license: string | null
+  url: string | null
+  asset_type: string | null
+  tags: string[]
+  origin: string | null
+  dims: [string, string][]
+  size: string | null
+  texel_density: string | null
+  maps: { file: string; kind: string }[]
+  lods: { number: number; tris: number; files: string[] }[]
+  physical_size: [number, number] | null
+  displacement: number | null
+}
+/** `POST /api/admin/store-formats/try`: what a format makes of a file, and of the library's files like it. */
+export interface FormatTrial {
+  error?: string
+  example?: { read: StoreFileRead | null; miss: FormatMiss | null; also: string | null } | null
+  library?: { files: number; packs: number; tried: { place: FilePlace; title: string | null; miss: FormatMiss | null }[] }
+}
+export interface ExampleFile { path: string; text: string }
+
 /** GET /api/admin/update: whether a newer release is out and what's keeping the server busy. */
 export interface UpdateStatus {
   version: string
@@ -956,6 +996,12 @@ export const api = {
   rebalance: () => request<void>('/api/admin/locations/rebalance', { method: 'POST' }),
   /** The folders in `path` on the server; an empty path lists the drives or `/`. */
   browse: (path = '') => request<FolderListing>(`/api/admin/fs?path=${encodeURIComponent(path)}`),
+  storeFormats: () => request<StoreFormats>('/api/admin/store-formats'),
+  tryStoreFormat: (toml: string, example?: ExampleFile | null) =>
+    post<FormatTrial>('/api/admin/store-formats/try', { toml, example: example ?? null }),
+  saveStoreFormat: (toml: string, replaces?: string | null) =>
+    post<{ file: string; packs: number }>('/api/admin/store-formats', { toml, replaces: replaces ?? null }),
+  removeStoreFormat: (file: string) => request<void>(`/api/admin/store-formats/${encodeURIComponent(file)}`, { method: 'DELETE' }),
   /** Start or look in on a "download as" conversion; answers when it moves on, or after `wait` seconds. */
   asStatus: (a: { id: string }, format: string, max?: number, wait = 5) =>
     request<ConversionStatus>(`/api/assets/${a.id}/as/${format}/status?wait=${wait}${max ? `&max=${max}` : ''}`),
@@ -1016,8 +1062,18 @@ export interface CreditsRequest {
 }
 
 /** Download CREDITS.md for a request (a POST, so it's fetched and then saved). */
-export async function downloadCredits(body: CreditsRequest): Promise<void> {
-  const res = await fetch('/api/credits?format=md', {
+export function downloadCredits(body: CreditsRequest): Promise<void> {
+  return postDownload('/api/credits?format=md', body, 'CREDITS.md')
+}
+
+/** Download a zip of a store file format, its sample and what the sample reads as, to send in for everyone. */
+export function downloadFormatShare(toml: string, example: ExampleFile, file: string): Promise<void> {
+  return postDownload('/api/admin/store-formats/share', { toml, example }, file)
+}
+
+/** POST, then save what comes back as a file. */
+async function postDownload(path: string, body: unknown, file: string): Promise<void> {
+  const res = await fetch(path, {
     method: 'POST',
     headers: { ...authHeaders(), 'Content-Type': 'application/json' },
     body: JSON.stringify(body),
@@ -1034,7 +1090,7 @@ export async function downloadCredits(body: CreditsRequest): Promise<void> {
   const url = URL.createObjectURL(await res.blob())
   const a = document.createElement('a')
   a.href = url
-  a.download = 'CREDITS.md'
+  a.download = file
   a.click()
   setTimeout(() => URL.revokeObjectURL(url), 10_000)
 }

@@ -35,6 +35,7 @@ import IssuesPanel from './IssuesPanel.vue'
 import AccountPanel from './AccountPanel.vue'
 import HttpsPanel from './HttpsPanel.vue'
 import TagsPanel from './TagsPanel.vue'
+import StoreFormatsPanel from './StoreFormatsPanel.vue'
 import ResetButton from './ResetButton.vue'
 import SizeInput from './SizeInput.vue'
 
@@ -56,6 +57,7 @@ const PAGES = [
   { id: 'appearance', label: 'Appearance', blurb: 'The themes this browser wears when it’s light and when it’s dark. Saved in this browser only.' },
   { id: 'library', label: 'Library', blurb: 'What’s in the hoard: how big it is, what it’s made of, how it grew and how well it’s tagged. Archived things aren’t counted.' },
   { id: 'tags', label: 'Tags', blurb: 'Every tag in the library. Merge ones that mean the same thing, or rename one; the taggers use the new name from then on.' },
+  { id: 'store-files', label: 'Store files', blurb: 'The files stores put beside their art, which Hoard reads to name packs and credit their makers. Teach it ones it doesn’t know, and share what you taught it.' },
   { id: 'locations', label: 'Library locations', blurb: 'The folders on the server that hold the library: ones Hoard keeps files in, and folders of packs it indexes where they are.' },
   { id: 'tools', label: 'Tools', blurb: 'Outside programs Hoard uses to convert and read files.' },
   { id: 'ai', label: 'AI tagging', blurb: 'An AI model names, describes and tags new packs, on top of the built-in rules. Its tags are marked as suggested.' },
@@ -795,7 +797,7 @@ onBeforeUnmount(() => {
     </nav>
 
     <div ref="paneEl" class="pane" :aria-busy="busy">
-      <div class="inner">
+      <div class="inner" :class="{ wide: current === 'store-files' }">
         <header class="phead">
           <h2>{{ page.label }}</h2>
           <p class="what">{{ page.blurb }}</p>
@@ -851,6 +853,7 @@ onBeforeUnmount(() => {
         />
         <AccountPanel v-else-if="current === 'account'" />
         <TagsPanel v-else-if="current === 'tags'" @tag="(t) => emit('tag', t)" @changed="emit('changed')" />
+        <StoreFormatsPanel v-else-if="current === 'store-files'" />
 
         <p v-else-if="!s" class="loading">Loading…</p>
 
@@ -1468,6 +1471,8 @@ onBeforeUnmount(() => {
 .pane { overflow-y: auto; scrollbar-gutter: stable; }
 .pane[aria-busy='true'] { cursor: progress; }
 .inner { max-width: 48rem; padding: 1.4rem 2rem 5rem; }
+/* The format wizard shows a file beside its form. */
+.inner.wide { max-width: 80rem; }
 .phead { margin-bottom: 1.1rem; }
 .phead h2 { margin: 0 0 0.25rem; font-size: var(--step-2); font-variation-settings: 'CASL' 0.5; }
 .phead .what { margin: 0; max-width: 40rem; }

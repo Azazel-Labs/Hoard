@@ -7,6 +7,7 @@ import {
 import { canPreview, stop as stopPreview, toggle as togglePreview } from './player'
 import { prefs, toggleIn } from './prefs'
 import { askToSignIn, auth, signOut } from './auth'
+import { teach } from './storeFormats'
 import { DARK_THEMES, LIGHT_THEMES, themeFor } from './theme'
 import ActivityIndicator from './components/ActivityIndicator.vue'
 import { looksLikeFolderOfPacks, splitPerSubfolder } from './uploader'
@@ -1023,6 +1024,11 @@ function openSettings(section?: string) {
   if (section) settingsSection.value = section
   setView('settings')
 }
+/** Open the format wizard on a file, from its details. */
+function teachFile(a: Asset) {
+  teach.value = { asset_id: a.id, pack_id: a.pack_id, pack_name: a.pack_name, path: a.path }
+  openSettings('store-files')
+}
 const mod = /Mac|iPhone|iPad/.test(navigator.platform) ? '⌘' : 'Ctrl+'
 const commands = computed<Command[]>(() => {
   const out: Command[] = [
@@ -1484,6 +1490,7 @@ const commands = computed<Command[]>(() => {
         @archive="archiveSelected"
         @similar="findSimilar(selected!)"
         @color="findColor"
+        @teach="teachFile(selected!)"
       />
 
       <Transition name="rise">

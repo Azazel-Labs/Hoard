@@ -88,6 +88,7 @@ pub(crate) fn router(state: &AppState) -> Router<AppState> {
         .route("/api/admin/chatgpt/sign-out", post(crate::chatgpt::sign_out_route))
         .route("/api/admin/chatgpt/models", get(crate::chatgpt::list_models))
         .merge(crate::uploads::router())
+        .merge(crate::format_wizard::router())
         .merge(crate::auth::admin_router())
         .merge(crate::oauth::portal_router())
         .merge(crate::https::admin_router())

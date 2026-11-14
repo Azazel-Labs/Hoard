@@ -21,6 +21,7 @@ mod extract;
 mod fbx;
 mod ffmpeg;
 mod fonts;
+mod format_wizard;
 mod formats;
 mod gpu_hint;
 mod heavy;

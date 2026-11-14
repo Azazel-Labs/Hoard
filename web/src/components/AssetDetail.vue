@@ -11,6 +11,8 @@ import { playableUrl, player, sourceExt, sourceUrl, stop as stopPreview } from '
 import KindGlyph from './KindGlyph.vue'
 import TagChip from './TagChip.vue'
 import { copyText, showOk, swipeToClose } from '../ui'
+import { auth } from '../auth'
+import { MAX_STORE_FILE, TEXT_EXTS } from '../storeFormats'
 import { lazy } from '../lazy'
 import { isModelAsset, isTextAsset, takeViewRequest, viewRequest, viewerFor, type ViewerKind } from '../viewers'
 import { isMaterialAsset, resolutions, ROLE_LABEL, sizeLabel } from '../materials'
@@ -47,8 +49,14 @@ const emit = defineEmits<{
   color: [string]
   /** Switch between the side panel and the full page. */
   layout: []
+  /** Open the format wizard on this file (Settings → Store files). */
+  teach: []
 }>()
 const palette = computed(() => props.asset.palette ?? [])
+/** A text file that may be a store's, which a signed-in user can teach Hoard to read. */
+const teachable = computed(
+  () => !!auth.status?.signed_in && TEXT_EXTS.includes(props.asset.ext.toLowerCase()) && props.asset.size <= MAX_STORE_FILE,
+)
 const alikeable = computed(() => looksAlike(props.asset))
 const inCollections = computed(() => props.asset.collections ?? [])
 
@@ -1080,6 +1088,7 @@ onBeforeUnmount(() => unswipe())
       <div class="tools">
         <button class="btn ghost" type="button" @click="copy(tomlSnippet, 'toml')">Copy hoard.toml entry</button>
         <button class="btn ghost" type="button" @click="copy(asset.id, 'id')">Copy ID</button>
+        <button v-if="teachable" class="btn ghost" type="button" title="Describe this store's file so Hoard reads it (Settings → Store files)" @click="emit('teach')">Teach Hoard this file</button>
         <span class="copied" role="status">{{ copied ? `Copied ${copied}` : '' }}</span>
         <button v-if="!asset.archived_at" class="btn ghost danger archive" type="button" title="Out of search until it's restored or deleted for good, from the Archive" @click="emit('archive')">Archive</button>
       </div>

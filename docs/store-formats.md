@@ -5,6 +5,25 @@ Some stores ship a small file beside the art that says what it is: Megascans' `<
 described by a TOML file in [`crates/hoardd/formats/`](../crates/hoardd/formats/). No Rust is needed. Adding a store
 means adding a TOML file and a sample, which makes a small PR.
 
+## The wizard
+
+Settings → Store files lists the files in the library that look like a store's but that no format reads: names found
+in more than one pack, or named like `info`, `license` or `manifest`. "Teach Hoard this file" opens the wizard on one;
+so does the same button in a text file's details.
+
+The file is shown beside a form. Name the store, then pick a field and click its value in the file. In JSON the
+wizard writes the selector, and picks out an item of a list by a key only it has (`meta[key=scanArea]`). In text,
+select the value, or click the line to take what follows its `name:`, and it writes a regular expression. "Recognise
+by" is filled in from the title's place; it needs to be something only the store's files have, when other files share
+the name. Sizes, maps and levels of detail aren't in the form: "Edit as TOML" writes them by hand. A format that's
+already there opens as TOML.
+
+As the format changes, the wizard shows what it reads in the file and how many of the library's files with a name it
+takes it reads. "Use it here" saves it as `<data dir>/formats/<name>.toml` and reads the packs with such a file again.
+"Share it" downloads `hoard-format-<name>.zip`, laid out like this repository: the TOML, the file as its sample (which
+can be trimmed of anything private first), the `.expected.json` of what it reads, and `HOW-TO-ADD.txt`. Copying it
+into the repository and following steps 1, 3 and 4 below makes the PR.
+
 ## Adding a store
 
 1. Write `crates/hoardd/formats/<store>.toml` (see below), and add it to `BUILT_IN` in
@@ -13,15 +32,17 @@ means adding a TOML file and a sample, which makes a small PR.
 2. Put a real (or realistic, made-up) file in `crates/hoardd/formats/samples/<store>/`. Beside it, put
    `<file>.expected.json` with the values you expect it to read. Only the keys you list are compared. Start with
    `{"title": ""}`: the failing test prints everything that was read, and you keep the parts that are right. The
-   sample folder's name must match the format's `name`.
+   sample folder is named after the format's `name` in lowercase, with dashes between words (`Quixel Bridge` →
+   `quixel-bridge`).
 3. If the file gives the store page's address, add the store's host to `STORES` in
    [`context.rs`](../crates/hoardd/src/context.rs) if it isn't there. A page on a known store becomes the pack's
    store page, with no search needed.
 4. `cargo test -p hoardd store_formats`.
 
-To try a format without rebuilding, drop the TOML file into `<data dir>/formats/` and restart the server. A file there
-with the same `name` as a built-in format replaces it. The log says which files were read, and why any wasn't.
-Packs already in the library are read again with More → "Read the pack's files again".
+To try a format without rebuilding, use the wizard, or drop the TOML file into `<data dir>/formats/` and restart the
+server. A file there with the same `name` as a built-in format replaces it. The log says which files were read, and
+why any wasn't. The wizard reads the library's packs again when it saves; otherwise More → "Read the pack's files
+again" does it for one pack.
 
 ## The file
 

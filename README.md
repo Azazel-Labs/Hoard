@@ -303,6 +303,10 @@ software rasterizer (`apt install mesa-vulkan-drivers`). Without any adapter, ev
      page, which becomes the pack's store page without a search. Each store's file is described in TOML, not code, so
      reading another store's takes one file and a sample ([docs/store-formats.md](docs/store-formats.md)). PRs for
      more stores are welcome.
+   - **Teaching it a store's file.** Settings → Store files lists files that look like a store's but aren't read. Its
+     wizard shows one beside a form: pick a field, click its value in the file, and it writes the format, showing what
+     it reads there and in the library's other files like it. "Use it here" saves it and reads those packs again;
+     "Share it" downloads a zip of the format and the file as its sample, laid out like this repository, to send in.
    - **Pack context.** README text is kept with the pack, and a store link inside it (Fab, itch.io, Humble Bundle,
      Unity Asset Store, Kenney, …) fills in where the pack came from. "Store details" on the packs page takes the
      store page URL, license tier and listing text. For a pack without a store link it first searches Fab, itch.io,
@@ -909,6 +913,10 @@ Requests that change something are marked 🔒: guests can't make them. A browse
 | GET 🔒, PUT 🔒 | `/api/admin/settings` | Settings: read, or change some (`null` goes back to the flag) |
 | GET 🔒 | `/api/admin/update` | this version, the newer release if one is out, whether Hoard is idle and what's keeping it busy, the last call to the update address |
 | POST 🔒 | `/api/admin/update/hook` | call the update address now |
+| GET, POST 🔒 | `/api/admin/store-formats` | the store file formats, and files that look like a store's that none reads; `{toml, replaces?}` saves one in the data folder and reads the packs with such a file again |
+| POST 🔒 | `/api/admin/store-formats/try` | `{toml, example?}`: what a format reads in a file and in the library's files with a name it takes, without saving |
+| POST 🔒 | `/api/admin/store-formats/share` | `{toml, example}`: a zip of the format, its sample and what the sample reads as, laid out like the repository |
+| DELETE 🔒 | `/api/admin/store-formats/{file}` | remove one of the data folder's formats |
 | GET 🔒, PUT 🔒 | `/api/admin/https` | Settings → Connection: what's served, or change it: `{mode?: "off"\|"own"\|"custom", names?, http3?, redirect?, cert?, key?}` (tried before it's switched to; 400 with the reason if it doesn't work) |
 | POST 🔒 | `/api/admin/https/check` | `{cert, key}`: what a certificate covers and until when, and whether the key matches, without saving |
 | GET | `/api/https/ca.crt` | Hoard's certificate authority, to install on devices |

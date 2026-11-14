@@ -1,13 +1,13 @@
 //! The files stores ship beside their art ([`crate::sidecar`]) are described in TOML, not code. Reading another
 //! store's file takes a new file in `crates/hoardd/formats/`: which files it reads, how to tell they're the store's,
 //! and where each fact is in them (see `docs/store-formats.md`). The built-in formats are compiled in. More can go in
-//! `<data dir>/formats/`, which is read at startup.
+//! `<data dir>/formats/`, which is read at startup and again whenever Settings → Store files changes it.
 //!
 //! A JSON format points at values with paths (`semanticTags.name`, `meta[key=scanArea].value`). A text format
 //! points at them with regular expressions, whose first group is the value.
 
-use std::path::Path;
-use std::sync::OnceLock;
+use std::path::{Path, PathBuf};
+use std::sync::{Arc, LazyLock, OnceLock, PoisonError, RwLock};
 
 use anyhow::{Context as _, Result, bail};
 use regex::Regex;
@@ -20,18 +20,42 @@ const BUILT_IN: &[(&str, &str)] = &[
     ("sketchfab.toml", include_str!("../formats/sketchfab.toml")),
 ];
 
-static FORMATS: OnceLock<Vec<Format>> = OnceLock::new();
+static FORMATS: LazyLock<RwLock<Arc<Vec<Format>>>> = LazyLock::new(|| RwLock::new(Arc::new(built_in())));
+/// `<data dir>/formats`, once the server has started.
+static DIR: OnceLock<PathBuf> = OnceLock::new();
 
 /// Every format, the data folder's first.
-pub(crate) fn all() -> &'static [Format] {
-    FORMATS.get_or_init(built_in)
+pub(crate) fn all() -> Arc<Vec<Format>> {
+    Arc::clone(&FORMATS.read().unwrap_or_else(PoisonError::into_inner))
+}
+
+/// The folder of the data folder's formats, once the server has started.
+pub(crate) fn dir() -> Option<&'static Path> {
+    DIR.get().map(PathBuf::as_path)
+}
+
+/// A format's name as a file name: lowercase, words joined by dashes ("Quixel Bridge" → `quixel-bridge`). The
+/// samples of a built-in format are in `formats/samples/<slug>/`.
+pub(crate) fn slug(name: &str) -> String {
+    let mut out = String::new();
+    for c in name.chars() {
+        if c.is_ascii_alphanumeric() {
+            out.push(c.to_ascii_lowercase());
+        } else if !out.is_empty() && !out.ends_with('-') {
+            out.push('-');
+        }
+    }
+    out.trim_end_matches('-').to_owned()
 }
 
 fn built_in() -> Vec<Format> {
     BUILT_IN
         .iter()
         .filter_map(|(file, text)| match Format::parse(text) {
-            Ok(f) => Some(f),
+            Ok(mut f) => {
+                (*file).clone_into(&mut f.file);
+                Some(f)
+            }
             Err(e) => {
                 tracing::error!(file, error = %format!("{e:#}"), "a built-in store file format doesn't read");
                 None
@@ -41,9 +65,19 @@ fn built_in() -> Vec<Format> {
 }
 
 /// Read the formats in `dir` (`<data dir>/formats`) as well as the built-in ones. One named like a built-in one
-/// takes its place. Called once at startup; a file that doesn't read is reported and left out.
+/// takes its place. Called at startup; a file that doesn't read is reported and left out.
 pub(crate) fn load(dir: &Path) {
+    DIR.get_or_init(|| dir.to_owned());
+    reload();
+}
+
+/// Read the data folder's formats again, after one was added, changed or removed.
+pub(crate) fn reload() {
     let mut formats = built_in();
+    let Some(dir) = dir() else {
+        *FORMATS.write().unwrap_or_else(PoisonError::into_inner) = Arc::new(formats);
+        return;
+    };
     let mut paths: Vec<_> = std::fs::read_dir(dir)
         .into_iter()
         .flatten()
@@ -54,17 +88,17 @@ pub(crate) fn load(dir: &Path) {
     paths.sort();
     for p in paths.iter().rev() {
         match std::fs::read_to_string(p).map_err(anyhow::Error::from).and_then(|t| Format::parse(&t)) {
-            Ok(f) => {
+            Ok(mut f) => {
                 tracing::info!(file = %p.display(), format = %f.name, "store file format read");
+                f.file = p.file_name().map(|n| n.to_string_lossy().into_owned()).unwrap_or_default();
+                f.custom = true;
                 formats.retain(|b| !b.name.eq_ignore_ascii_case(&f.name));
                 formats.insert(0, f);
             }
             Err(e) => tracing::warn!(file = %p.display(), error = %format!("{e:#}"), "store file format not read"),
         }
     }
-    if FORMATS.set(formats).is_err() {
-        tracing::warn!("store file formats were read before the data folder's");
-    }
+    *FORMATS.write().unwrap_or_else(PoisonError::into_inner) = Arc::new(formats);
 }
 
 /// A store's file, as its TOML describes it.
@@ -83,6 +117,12 @@ pub(crate) struct Format {
     /// The file's name is the asset's id (`xeokah0.json`) when the file doesn't give one.
     pub(crate) id_from_file_name: bool,
     pub(crate) fields: Fields,
+    /// Its file's name (`megascans.toml`).
+    pub(crate) file: String,
+    /// It's in the data folder, not built in.
+    pub(crate) custom: bool,
+    /// The TOML it was read from.
+    pub(crate) text: String,
     /// Lowercase globs of the file names it reads.
     files: Vec<String>,
     syntax: Syntax,
@@ -284,6 +324,9 @@ impl Format {
             origin_words: spec.origin_words.unwrap_or_else(|| "from".to_owned()),
             id_from_file_name: spec.id_from_file_name,
             fields,
+            file: String::new(),
+            custom: false,
+            text: text.to_owned(),
             files: spec.files.iter().map(|g| g.trim().to_lowercase()).collect(),
             syntax,
             require: spec.require.iter().map(|r| sels(r, "require").map(|s| s.0)).collect::<Result<_>>()?,
@@ -811,7 +854,15 @@ mod tests {
         }
     }
 
-    /// Each sample in `formats/samples/<format>/` reads as that format, and gives what its `.expected.json` says
+    #[test]
+    fn slugs() {
+        assert_eq!(slug("Quixel Bridge"), "quixel-bridge");
+        assert_eq!(slug("  Itch.io (assets)!"), "itch-io-assets");
+        assert_eq!(slug("Megascans"), "megascans");
+        assert_eq!(slug("ÆØ"), "");
+    }
+
+    /// Each sample in `formats/samples/<slug of the format's name>/` reads as that format, and gives what its `.expected.json` says
     /// (only the keys it lists are compared).
     #[test]
     fn samples_read_as_expected() {
@@ -835,7 +886,7 @@ mod tests {
                     .unwrap_or_else(|| panic!("samples/{format}/{name} isn't read as any format"));
                 let got = serde_json::to_value(&got).unwrap();
                 let pretty = serde_json::to_string_pretty(&got).unwrap();
-                assert!(got["format"].as_str().is_some_and(|f| f.eq_ignore_ascii_case(&format)), "{pretty}");
+                assert!(got["format"].as_str().is_some_and(|f| slug(f) == format), "{pretty}");
                 for (k, v) in expected.as_object().unwrap() {
                     assert_eq!(&got[k], v, "samples/{format}/{name}: {k}\nread as:\n{pretty}");
                 }

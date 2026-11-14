@@ -10,8 +10,10 @@ interface Session {
 
 test.describe('resumable uploads', () => {
   test('a big file goes up in parts at once and in any order, and arrives whole', async ({ api }) => {
+    // A session is picked up again by its list of files, so each attempt names its file afresh.
     const name = `e2e parts ${unique()}`
-    const opened = await api.post('/api/uploads', { data: { name, files: [{ path: 'notes.txt', size: 1 }] } })
+    const file = `notes-${unique()}.txt`
+    const opened = await api.post('/api/uploads', { data: { name, files: [{ path: file, size: 1 }] } })
     expect(opened.status()).toBe(201)
     const partBytes = ((await opened.json()) as Session).part_bytes
     await api.delete(`/api/uploads/${((await opened.json()) as Session).pack.id}`)
@@ -21,12 +23,12 @@ test.describe('resumable uploads', () => {
     const text = Buffer.alloc(size)
     for (let at = 0; at < size; at += 16) text.write(`${at.toString(16).padStart(15, '0')}\n`.slice(0, size - at), at)
     const session = (await (
-      await api.post('/api/uploads', { data: { name, files: [{ path: 'notes.txt', size }] } })
+      await api.post('/api/uploads', { data: { name, files: [{ path: file, size }] } })
     ).json()) as Session
     const base = `/api/uploads/${session.pack.id}`
     const part = (n: number) =>
       api.put(`${base}/chunk`, {
-        params: { path: 'notes.txt', offset: n * partBytes },
+        params: { path: file, offset: n * partBytes },
         data: text.subarray(n * partBytes, Math.min(size, (n + 1) * partBytes)),
       })
 
@@ -40,7 +42,7 @@ test.describe('resumable uploads', () => {
 
     // A part sent again counts once; an offset that isn't where a part starts is refused.
     expect(await (await part(1)).json()).toEqual({ received: size, size })
-    const wrong = await api.put(`${base}/chunk`, { params: { path: 'notes.txt', offset: 5 }, data: Buffer.from('x') })
+    const wrong = await api.put(`${base}/chunk`, { params: { path: file, offset: 5 }, data: Buffer.from('x') })
     expect(wrong.status()).toBe(400)
 
     expect((await api.post(`${base}/complete`)).status()).toBe(202)

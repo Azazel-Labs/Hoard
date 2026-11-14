@@ -361,6 +361,15 @@ async fn chunk(
     })
     .await?;
     if have || received == size {
+        // Read what the client is sending anyway: answering before the body is in breaks its connection mid-write.
+        let mut body = req.into_body().into_data_stream();
+        let mut skipped = 0u64;
+        while skipped <= len {
+            match tokio::time::timeout(BODY_IDLE, body.next()).await {
+                Ok(Some(Ok(bytes))) => skipped += bytes.len() as u64,
+                _ => break,
+            }
+        }
         return Ok(Json(json!({ "received": received, "size": size })).into_response());
     }
     let dest = staging(&state, &id).join(&path);

@@ -114,6 +114,9 @@ enum Cmd {
 #[serde(deny_unknown_fields)]
 struct ProjectConfig {
     server: Option<String>,
+    /// What the server calls this project when a sync reports what it has (so an asset's details list the projects
+    /// using it); the project folder's name if not set.
+    project: Option<String>,
     /// Root folder for synced assets, relative to hoard.toml.
     out_dir: PathBuf,
     /// `category` (out/sfx/footsteps/file.wav), `pack` (out/Pack Name/original/path.wav) or `flat`.
@@ -222,6 +225,7 @@ const STARTER: &str = r#"# Hoard project config. `hoard sync` makes `out_dir` ma
 # Commit both files; teammates run `hoard sync` to get identical, hash-verified assets.
 
 server = "http://127.0.0.1:4627"
+# project = "My Game"           # what the server calls this project (each sync tells it what's used); the folder's name if not set
 out_dir = "assets/hoard"        # Godot: a folder under res://, Unity: "Assets/Hoard", Bevy: "assets/hoard"
 layout = "category"             # category | pack | flat
 sidecars = true                 # write <file>.hoard.json with tags/provenance for import scripts
@@ -329,6 +333,18 @@ impl Client {
             bail!("server returned {status}: {body}");
         }
         Ok(body)
+    }
+
+    /// Tell the server what this project's hoard.lock holds now.
+    async fn report(&self, project: &str, lock: &Lockfile) -> Result<serde_json::Value> {
+        let mut url = reqwest::Url::parse(&self.base)?;
+        url.path_segments_mut()
+            .map_err(|()| anyhow::anyhow!("{} can't be a server address", self.base))?
+            .pop_if_empty()
+            .extend(["api", "projects", project]);
+        let assets: Vec<_> =
+            lock.files.iter().map(|(path, e)| serde_json::json!({ "id": e.id, "path": path })).collect();
+        self.json(self.http.put(url).json(&serde_json::json!({ "assets": assets }))).await
     }
 
     async fn manifest(&self, req: &ManifestRequest) -> Result<Manifest> {
@@ -675,7 +691,19 @@ async fn sync(server: Option<String>, token: Option<String>, config: &Path, dry_
     };
     std::fs::write(&lock_path, serde_json::to_string_pretty(&lock)? + "\n")?;
     println!("synced {} files into {}", wanted.len(), out_dir.display());
+
+    // So the library knows what this project uses. The files are in place either way.
+    let name = cfg.project.clone().or_else(|| project_folder_name(project)).unwrap_or_else(|| "project".into());
+    if let Err(e) = client.report(&name, &lock).await {
+        eprintln!("warning: couldn't tell the server what {name} uses: {e:#}");
+    }
     Ok(())
+}
+
+/// The name of the folder holding hoard.toml.
+fn project_folder_name(project: &Path) -> Option<String> {
+    let dir = std::fs::canonicalize(project).ok()?;
+    Some(dir.file_name()?.to_string_lossy().into_owned())
 }
 
 fn hash_file(path: &Path) -> Result<String> {

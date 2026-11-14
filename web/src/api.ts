@@ -145,6 +145,32 @@ export interface UnrealPackStatus {
 export interface Duplicate { id: string; name: string; pack_id: string; pack_name: string; path: string }
 
 /** A hand-picked set of assets across packs ("Forest level props"). */
+/** A project that `hoard sync`s from here (`GET /api/projects`). */
+export interface Project {
+  id: number
+  name: string
+  synced_at: string
+  /** Who reported its last sync. */
+  synced_by?: string | null
+  /** How many assets it has. */
+  assets: number
+}
+
+/** A project using some of the assets asked about (`POST /api/usage`). */
+export interface ProjectUse {
+  id: number
+  name: string
+  synced_at: string
+  synced_by?: string | null
+  /** How many of them it has. */
+  assets: number
+  /** A few of them, and where the project keeps them. */
+  examples: { asset_id: string; name: string; path: string }[]
+}
+
+/** What to ask `/api/usage` about: assets, whole packs, or everything in the archive. */
+export interface UsageItems { packs?: string[]; assets?: string[]; archived?: boolean }
+
 export interface Collection {
   id: string
   name: string
@@ -737,6 +763,8 @@ export interface SearchParams {
   offset?: number
   hide_supporting?: boolean
   collection?: string
+  /** Only what this project (name) has. */
+  project?: string
   /** Search the archive instead of the library. */
   archived?: boolean
   /** "More like this": an asset id. */
@@ -848,6 +876,7 @@ export const api = {
     if (p.offset) qs.set('offset', String(p.offset))
     if (p.hide_supporting) qs.set('hide_supporting', 'true')
     if (p.collection) qs.set('collection', p.collection)
+    if (p.project) qs.set('project', p.project)
     if (p.archived) qs.set('archived', 'true')
     if (p.similar) qs.set('similar', p.similar)
     if (p.color) qs.set('color', p.color)
@@ -986,6 +1015,9 @@ export const api = {
   makeToken: (name: string, role: Role) =>
     post<{ id: number; name: string; token: string }>('/api/admin/tokens', { name, role }),
   revokeToken: (id: number) => request<void>(`/api/admin/tokens/${id}`, { method: 'DELETE' }),
+  projects: () => request<{ projects: Project[] }>('/api/projects'),
+  usage: (items: UsageItems) => post<{ projects: ProjectUse[] }>('/api/usage', items),
+  forgetProject: (name: string) => request<void>(`/api/projects/${encodeURIComponent(name)}`, { method: 'DELETE' }),
   favourites: () => request<{ assets: string[] }>('/api/me/favourites'),
   setFavourites: (change: { add?: string[]; remove?: string[] }) => post<{ assets: string[] }>('/api/me/favourites', change),
   savedSearches: () => request<{ searches: SavedSearch[] }>('/api/me/searches'),

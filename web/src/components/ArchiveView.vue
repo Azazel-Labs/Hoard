@@ -1,11 +1,13 @@
 <script setup lang="ts">
+import type { UsageItems } from '../api'
+import { usageWarning } from '../projects'
 // The archive: Hoard's recycling bin. Archived packs and assets are out of search, the counts and the tag list, and
 // wait here until they're restored or deleted for good (which is when their files are freed).
 import { computed, onMounted, ref } from 'vue'
 import { api, humanBytes, KIND_LABEL, thumbUrl, type ArchiveItems, type Asset, type Pack } from '../api'
 import { countText } from '../archive'
 import { mayTry } from '../auth'
-import { confirmDialog, showError, showOk } from '../ui'
+import { confirmDialog, daysAgo, showError, showOk } from '../ui'
 import KindGlyph from './KindGlyph.vue'
 
 const emit = defineEmits<{ changed: []; error: [string] }>()
@@ -37,14 +39,11 @@ onMounted(() => load())
 const empty = computed(() => !loading.value && !packs.value.length && !assetTotal.value)
 const packBytes = computed(() => packs.value.reduce((n, p) => n + p.total_bytes, 0))
 
-function when(iso?: string | null): string {
-  if (!iso) return ''
-  const d = new Date(iso.replace(' ', 'T') + (/[zZ+]/.test(iso.slice(10)) ? '' : 'Z'))
-  const days = Math.floor((Date.now() - d.getTime()) / 86_400_000)
-  if (days < 1) return 'today'
-  if (days === 1) return 'yesterday'
-  if (days < 30) return `${days} days ago`
-  return d.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })
+const when = daysAgo
+/** The usual warning, after which projects use what's going, if any do. */
+async function warned(body: string, items: UsageItems): Promise<string> {
+  const uses = await usageWarning(items)
+  return uses ? `${uses.body} ${body}` : body
 }
 
 async function run(what: 'restore' | 'purge', items: ArchiveItems & { all?: boolean }) {
@@ -70,7 +69,10 @@ const restoreAsset = (a: Asset) => run('restore', { assets: [a.id] })
 async function purgePack(p: Pack) {
   const ok = await confirmDialog({
     title: `Delete ${p.name} for good?`,
-    body: `Its ${p.asset_count.toLocaleString()} assets and ${humanBytes(p.total_bytes)} of files go too, except files another pack shares. This can't be undone.`,
+    body: await warned(
+      `Its ${p.asset_count.toLocaleString()} assets and ${humanBytes(p.total_bytes)} of files go too, except files another pack shares. This can't be undone.`,
+      { packs: [p.id] },
+    ),
     confirm: 'Delete forever',
     danger: true,
   })
@@ -79,7 +81,7 @@ async function purgePack(p: Pack) {
 async function purgeAsset(a: Asset) {
   const ok = await confirmDialog({
     title: `Delete ${a.name} for good?`,
-    body: "Its file is freed unless another asset shares it. This can't be undone.",
+    body: await warned("Its file is freed unless another asset shares it. This can't be undone.", { assets: [a.id] }),
     confirm: 'Delete forever',
     danger: true,
   })
@@ -88,7 +90,10 @@ async function purgeAsset(a: Asset) {
 async function emptyArchive() {
   const ok = await confirmDialog({
     title: 'Empty the archive?',
-    body: `${countText(packs.value.length, assetTotal.value)} will be deleted for good, and their files freed. This can't be undone.`,
+    body: await warned(
+      `${countText(packs.value.length, assetTotal.value)} will be deleted for good, and their files freed. This can't be undone.`,
+      { archived: true },
+    ),
     confirm: 'Empty archive',
     danger: true,
   })

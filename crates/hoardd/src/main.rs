@@ -43,6 +43,7 @@ mod music;
 mod naming;
 mod oauth;
 mod previews;
+mod projects;
 mod provenance;
 mod relocate;
 mod scan;

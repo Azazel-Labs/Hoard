@@ -4,13 +4,13 @@ import {
   api, asUrl, bundleUrl, fileUrl, formatDuration, humanBytes, looksAlike, originalUrl, RESIZABLE_AS_ITSELF, thumbUrl,
   type Asset, type AssetLink, type Collection, type CollectionRef, type ConversionStatus, type Facet, type LinkRel,
   type MaterialInfo,
-  type MaterialMap,
+  type MaterialMap, type ProjectUse,
 } from '../api'
 import CollectionPicker from './CollectionPicker.vue'
 import { playableUrl, player, sourceExt, sourceUrl, stop as stopPreview } from '../player'
 import KindGlyph from './KindGlyph.vue'
 import TagChip from './TagChip.vue'
-import { copyText, showOk, swipeToClose } from '../ui'
+import { copyText, daysAgo, showOk, swipeToClose } from '../ui'
 import { may, mayEdit } from '../auth'
 import { canStar, mine, toggleFavourite } from '../mine'
 import { MAX_STORE_FILE, TEXT_EXTS } from '../storeFormats'
@@ -44,6 +44,8 @@ const emit = defineEmits<{
   collect: [id: string, create?: string]
   uncollect: [id: string]
   browseCollection: [CollectionRef]
+  /** Show what this project (its name) has. */
+  browseProject: [string]
   /** Find assets that look like this one. */
   similar: []
   /** Find assets with much of this colour (hex). */
@@ -63,6 +65,22 @@ const teachable = computed(
 )
 const alikeable = computed(() => looksAlike(props.asset))
 const inCollections = computed(() => props.asset.collections ?? [])
+
+/** The projects whose last hoard sync had this asset. */
+const usedIn = ref<ProjectUse[]>([])
+watch(
+  () => props.asset.id,
+  async (id) => {
+    usedIn.value = []
+    try {
+      const uses = (await api.usage({ assets: [id] })).projects
+      if (props.asset.id === id) usedIn.value = uses
+    } catch {
+      // Not knowing where it's used isn't worth an error.
+    }
+  },
+  { immediate: true },
+)
 
 // The grid's quick preview and this panel's player shouldn't talk over each other.
 const audioEl = ref<HTMLAudioElement | null>(null)
@@ -889,6 +907,17 @@ onBeforeUnmount(() => unswipe())
       </div>
     </section>
 
+    <section v-if="usedIn.length" class="used">
+      <h3>Used in</h3>
+      <ul>
+        <li v-for="u in usedIn" :key="u.id">
+          <button type="button" class="linkish" :title="`Show what ${u.name} has`" @click="$emit('browseProject', u.name)">{{ u.name }}</button>
+          <span class="mono where" :title="u.examples[0]?.path">{{ u.examples[0]?.path }}</span>
+          <span class="when">synced {{ daysAgo(u.synced_at) }}</span>
+        </li>
+      </ul>
+    </section>
+
     <section v-if="material">
       <h3>Maps</h3>
       <ul class="links">
@@ -1115,6 +1144,10 @@ onBeforeUnmount(() => unswipe())
 </template>
 
 <style scoped>
+.used ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.3rem; }
+.used li { display: flex; align-items: baseline; gap: 0.5rem; min-width: 0; font-size: 0.85rem; }
+.used .where { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--muted); font-size: 0.75rem; }
+.used .when { flex: none; color: var(--faint); font-size: 0.75rem; }
 .star.on { color: var(--star); }
 .detail {
   display: flex; flex-direction: column; gap: 1rem;

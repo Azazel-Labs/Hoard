@@ -601,6 +601,9 @@ pub struct SearchQuery {
     /// Only assets in this collection (id or name).
     #[serde(default)]
     pub collection: Option<String>,
+    /// Only assets this project's last `hoard sync` reported having (id or name).
+    #[serde(default)]
+    pub project: Option<String>,
     /// Search the archive instead of the library: assets archived one by one, or with `pack`, everything archived
     /// from that pack.
     #[serde(default)]

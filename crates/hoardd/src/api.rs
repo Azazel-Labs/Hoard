@@ -61,6 +61,7 @@ pub(crate) fn router(state: &AppState) -> Router<AppState> {
         .route("/api/archive", post(archive))
         .route("/api/archive/restore", post(restore))
         .merge(crate::uploads::router())
+        .merge(crate::projects::edit_router())
         .route_layer(middleware::from_fn_with_state(std::sync::Arc::clone(state), crate::auth::require_editor));
 
     // Settings, accounts, maintenance, and deleting for good.
@@ -103,6 +104,7 @@ pub(crate) fn router(state: &AppState) -> Router<AppState> {
     let own = Router::new()
         .merge(crate::auth::account_router())
         .merge(crate::me::router())
+        .merge(crate::projects::report_router())
         .merge(crate::oauth::portal_router())
         .route_layer(middleware::from_fn_with_state(std::sync::Arc::clone(state), crate::auth::require_user));
 
@@ -139,6 +141,7 @@ pub(crate) fn router(state: &AppState) -> Router<AppState> {
         .route("/api/assets/{id}/as/{format}", get(asset_as))
         .route("/api/assets/{id}/as/{format}/status", get(asset_as_status))
         .route("/api/activity", get(activity))
+        .merge(crate::projects::read_router())
         .route_layer(middleware::from_fn_with_state(std::sync::Arc::clone(state), crate::auth::require_reader));
 
     // Open: health, signing in, ChatGPT's sign-in redirect, OAuth for MCP apps, MCP (which checks for itself), and
@@ -623,6 +626,9 @@ struct AssetsParams {
     hide_supporting: Option<bool>,
     #[serde(default)]
     collection: Option<String>,
+    /// Only what this project (id or name) has.
+    #[serde(default)]
+    project: Option<String>,
     /// Search the archive instead of the library.
     #[serde(default)]
     archived: Option<bool>,
@@ -650,6 +656,7 @@ impl From<AssetsParams> for SearchQuery {
             offset: p.offset,
             hide_supporting: p.hide_supporting.unwrap_or(false),
             collection: p.collection,
+            project: p.project,
             archived: p.archived.unwrap_or(false),
             similar: p.similar,
             color: p.color,

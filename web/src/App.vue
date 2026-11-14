@@ -2,12 +2,13 @@
 import { computed, nextTick, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue'
 import {
   api, downloadCredits, filesFromDrop, KIND_LABEL, selectionZipUrl,
-  type Asset, type AssetKind, type BulkEdit, type Collection, type Facet, type Pack, type Stats, type UploadFile,
+  type Asset, type AssetKind, type BulkEdit, type Collection, type Facet, type Pack, type Project, type Stats, type UploadFile,
 } from './api'
 import { canPreview, stop as stopPreview, toggle as togglePreview } from './player'
 import { prefs, toggleIn } from './prefs'
 import { askToSignIn, auth, may, mayEdit, signOut } from './auth'
 import { forgetSearch, mine, saveSearch, setFavourite, toggleFavourite } from './mine'
+import { loadProjects, projects } from './projects'
 import { teach } from './storeFormats'
 import { DARK_THEMES, LIGHT_THEMES, themeFor } from './theme'
 import ActivityIndicator from './components/ActivityIndicator.vue'
@@ -22,7 +23,7 @@ import UiLayer from './components/UiLayer.vue'
 import CommandPalette from './components/CommandPalette.vue'
 import InsecureNotice from './components/InsecureNotice.vue'
 import { archiveWithUndo, countText } from './archive'
-import { showError, showOk, swipeToClose, useTween, withTransition, type Command } from './ui'
+import { confirmDialog, daysAgo, showError, showOk, swipeToClose, useTween, withTransition, type Command } from './ui'
 import { useVirtualGrid } from './virtualGrid'
 import { lazy } from './lazy'
 
@@ -60,6 +61,8 @@ const filters = reactive({
   q: '', kind: '', tags: [] as string[], pack: null as Named | null, collection: null as Named | null, sort: '',
   /** Only your favourites. */
   favourites: false,
+  /** Only what this project (its name) has. */
+  project: '',
   /** Assets that look like this one, most alike first. */
   similar: null as Named | null,
   /** Assets with much of this colour (hex), most of it first. */
@@ -132,6 +135,7 @@ async function runSearch(append = false) {
       similar: filters.similar?.id,
       color: filters.color || undefined,
       favourites: filters.favourites || undefined,
+      project: filters.project || undefined,
       limit: PAGE,
       offset: append ? items.value.length : 0,
       hide_supporting: !prefs.showSupporting,
@@ -168,7 +172,7 @@ watch(() => filters.q, () => {
 })
 watch(() => [
   filters.kind, filters.tags.join(','), filters.pack?.id, filters.collection?.id, filters.sort, filters.similar?.id,
-  filters.color, filters.favourites, prefs.showSupporting,
+  filters.color, filters.favourites, filters.project, prefs.showSupporting,
 ], () => {
   checked.value = []
   runSearch()
@@ -176,7 +180,7 @@ watch(() => [
 
 async function refreshPacks() {
   try {
-    const [p, s, c] = await Promise.all([api.packs(), api.stats(), api.collections()])
+    const [p, s, c] = await Promise.all([api.packs(), api.stats(), api.collections(), loadProjects()])
     const wasBusy = packs.value.some(busy)
     packs.value = p
     stats.value = s
@@ -226,21 +230,42 @@ function setView(v: View) {
   void withTransition(() => (view.value = v), 'view')
 }
 function browsePack(p: Named) {
-  Object.assign(filters, { pack: { id: p.id, name: p.name }, collection: null, favourites: false, kind: '', tags: [], q: '', similar: null, color: '' })
+  Object.assign(filters, { pack: { id: p.id, name: p.name }, collection: null, favourites: false, project: '', kind: '', tags: [], q: '', similar: null, color: '' })
   setView('library')
 }
 function browseCollection(c: Collection | Named) {
   const same = filters.collection?.id === c.id
   Object.assign(filters, {
     collection: same ? null : { id: c.id, name: c.name }, pack: null, kind: '', tags: [], q: '', similar: null, color: '',
-    favourites: false,
+    favourites: false, project: '',
   })
   setView('library')
   showFilters.value = false
 }
+function browseProject(name: string) {
+  const same = filters.project === name
+  Object.assign(filters, { project: same ? '' : name, favourites: false, collection: null, pack: null, kind: '', tags: [], q: '', similar: null, color: '' })
+  setView('library')
+  showFilters.value = false
+}
+async function forgetProject(p: Project) {
+  const ok = await confirmDialog({
+    title: `Forget ${p.name}?`,
+    body: `Hoard stops listing it where its ${p.assets.toLocaleString()} assets are used, until its next hoard sync tells it again. Nothing in the project changes.`,
+    confirm: 'Forget it',
+  })
+  if (!ok) return
+  try {
+    await api.forgetProject(p.name)
+    if (filters.project === p.name) filters.project = ''
+    await loadProjects()
+  } catch (e) {
+    showError(`Couldn't forget ${p.name}: ${(e as Error).message}`)
+  }
+}
 function browseFavourites() {
   const same = filters.favourites
-  Object.assign(filters, { favourites: !same, collection: null, pack: null, kind: '', tags: [], q: '', similar: null, color: '' })
+  Object.assign(filters, { favourites: !same, project: '', collection: null, pack: null, kind: '', tags: [], q: '', similar: null, color: '' })
   setView('library')
   showFilters.value = false
 }
@@ -263,7 +288,7 @@ const saveNameEl = ref<HTMLInputElement | null>(null)
 async function startNaming() {
   saveName.value = [
     filters.q.trim(), filters.kind, ...filters.tags, filters.pack?.name, filters.collection?.name,
-    filters.similar && `like ${filters.similar.name}`, filters.color, filters.favourites && 'favourites',
+    filters.similar && `like ${filters.similar.name}`, filters.color, filters.favourites && 'favourites', filters.project,
   ].filter(Boolean).join(' · ').slice(0, 80)
   naming.value = true
   await nextTick()
@@ -403,22 +428,22 @@ function goHome() {
   mainEl.value?.scrollTo({ top: 0, behavior: 'smooth' })
 }
 function clearFilters() {
-  Object.assign(filters, { q: '', kind: '', tags: [], pack: null, collection: null, favourites: false, similar: null, color: '' })
+  Object.assign(filters, { q: '', kind: '', tags: [], pack: null, collection: null, favourites: false, project: '', similar: null, color: '' })
 }
 const hasFilters = computed(
-  () => !!(filters.q || filters.kind || filters.tags.length || filters.pack || filters.collection || filters.similar || filters.color || filters.favourites),
+  () => !!(filters.q || filters.kind || filters.tags.length || filters.pack || filters.collection || filters.similar || filters.color || filters.favourites || filters.project),
 )
 /** "More like this": everything that looks like an asset, across every pack, most alike first. */
 function findSimilar(a: Asset) {
   Object.assign(filters, {
-    similar: { id: a.id, name: a.name }, color: '', q: '', kind: '', tags: [], pack: null, collection: null, favourites: false, sort: '',
+    similar: { id: a.id, name: a.name }, color: '', q: '', kind: '', tags: [], pack: null, collection: null, favourites: false, project: '', sort: '',
   })
   setView('library')
   mainEl.value?.scrollTo({ top: 0 })
 }
 /** A colour from an asset's palette: everything with much of it, across the library. */
 function findColor(hex: string) {
-  Object.assign(filters, { color: hex, similar: null, q: '', kind: '', tags: [], pack: null, collection: null, favourites: false, sort: '' })
+  Object.assign(filters, { color: hex, similar: null, q: '', kind: '', tags: [], pack: null, collection: null, favourites: false, project: '', sort: '' })
   setView('library')
   mainEl.value?.scrollTo({ top: 0 })
 }
@@ -920,6 +945,7 @@ function readUrl(search = location.search) {
   const color = u.get('color') ?? ''
   filters.color = /^#[0-9a-f]{6}$/i.test(color) ? color.toLowerCase() : ''
   filters.favourites = u.get('fav') === '1'
+  filters.project = u.get('project') ?? ''
 }
 /** What a history entry is: going somewhere new adds an entry; refining where you are rewrites it. */
 function urlState() {
@@ -929,7 +955,7 @@ function urlState() {
     asset: selected.value?.id ?? '',
     place: [
       filters.kind, filters.tags.join(','), filters.sort, filters.pack?.id, filters.collection?.id, filters.similar?.id,
-      filters.color, filters.favourites,
+      filters.color, filters.favourites, filters.project,
     ].join('|'),
   }
 }
@@ -957,6 +983,7 @@ function filterQuery(): string {
   }
   if (filters.color) u.set('color', filters.color)
   if (filters.favourites) u.set('fav', '1')
+  if (filters.project) u.set('project', filters.project)
   return u.toString()
 }
 function writeUrl() {
@@ -995,6 +1022,7 @@ watch(
     () => filters.similar?.id,
     () => filters.color,
     () => filters.favourites,
+    () => filters.project,
   ],
   writeUrl,
 )
@@ -1142,6 +1170,7 @@ const commands = computed<Command[]>(() => {
   }
   for (const p of packs.value) out.push({ id: `pack:${p.id}`, group: 'Packs', label: p.name, run: () => browsePack(p) })
   for (const c of collections.value) out.push({ id: `col:${c.id}`, group: 'Collections', label: c.name, run: () => browseCollection(c) })
+  for (const p of projects.value) out.push({ id: `project:${p.id}`, group: 'Projects', label: p.name, hint: p.assets.toLocaleString(), run: () => browseProject(p.name) })
   for (const s of mine.searches) out.push({ id: `saved:${s.id}`, group: 'Saved searches', label: s.name, run: () => applySearch(s) })
   return out
 })
@@ -1323,6 +1352,21 @@ const commands = computed<Command[]>(() => {
             </li>
           </ul>
         </section>
+        <section v-if="projects.length" class="collections projects">
+          <h3 title="Projects that hoard sync from here, with what their last sync had">Projects</h3>
+          <ul class="kinds">
+            <li v-for="p in projects" :key="p.id" class="saved">
+              <button type="button" :aria-pressed="filters.project === p.name" :title="`Synced ${daysAgo(p.synced_at)}${p.synced_by ? ` by ${p.synced_by}` : ''}`" @click="browseProject(p.name)">
+                <svg viewBox="0 0 16 16" width="11" height="11" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><path d="M2 4.5h4.5l1.5 1.5H14v6.5H2z" /></svg>
+                <span class="cname">{{ p.name }}</span>
+                <span class="n mono">{{ p.assets.toLocaleString() }}</span>
+              </button>
+              <button v-if="editor" type="button" class="forget" :aria-label="`Forget the project ${p.name}`" title="Forget this project" @click="forgetProject(p)">
+                <svg viewBox="0 0 16 16" width="10" height="10" aria-hidden="true"><path d="m4 4 8 8M12 4l-8 8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" /></svg>
+              </button>
+            </li>
+          </ul>
+        </section>
         <section v-if="collections.length" class="collections">
           <h3>Collections</h3>
           <ul class="kinds">
@@ -1428,6 +1472,7 @@ const commands = computed<Command[]>(() => {
             <TagChip v-if="filters.pack" :tag="`pack:${filters.pack.name}`" removable @remove="filters.pack = null" />
             <TagChip v-if="filters.collection" :tag="`collection:${filters.collection.name}`" removable @remove="filters.collection = null" />
             <TagChip v-if="filters.favourites" tag="your:favourites" removable @remove="filters.favourites = false" />
+            <TagChip v-if="filters.project" :tag="`project:${filters.project}`" removable @remove="filters.project = ''" />
             <TagChip v-if="filters.similar" :tag="`like:${filters.similar.name}`" removable @remove="filters.similar = null" />
             <TagChip v-if="filters.color" :tag="`colour:${filters.color}`" :swatch="filters.color" removable @remove="filters.color = ''" />
             <TagChip v-if="filters.kind" :tag="`kind:${filters.kind}`" removable @remove="filters.kind = ''" />
@@ -1581,6 +1626,7 @@ const commands = computed<Command[]>(() => {
         @collect="(id, create) => addToCollection([selected!.id], create ? { create } : { id })"
         @uncollect="(id) => removeFromCollection([selected!.id], id)"
         @browse-collection="browseCollection"
+        @browse-project="browseProject"
         @updated="onUpdated"
         @tag="toggleTag"
         @error="showError"
@@ -1641,7 +1687,7 @@ const commands = computed<Command[]>(() => {
       class="settings-pane"
       :stats="stats"
       @unauthorized="askToSignIn"
-      @tag="(t) => { Object.assign(filters, { tags: [], kind: '', pack: null, collection: null, favourites: false, q: '' }); toggleTag(t) }"
+      @tag="(t) => { Object.assign(filters, { tags: [], kind: '', pack: null, collection: null, favourites: false, project: '', q: '' }); toggleTag(t) }"
       @pack="browsePack"
       @open="openAsset"
       @archive="setView('archive')"
@@ -1794,13 +1840,13 @@ const commands = computed<Command[]>(() => {
 .kinds button[aria-pressed='true'] { background: var(--raised); box-shadow: inset 3px 0 0 var(--kind); }
 .dot { width: 10px; height: 10px; border-radius: 2px; background: var(--kind); flex: none; }
 .n { margin-left: auto; color: var(--faint); font-size: 0.75rem; padding-left: 0.4rem; }
-.yours li.saved { display: flex; align-items: center; }
-.yours .forget {
+.collections li.saved { display: flex; align-items: center; }
+.collections .forget {
   flex: none; width: auto; padding: 0.3rem 0.4rem; color: var(--faint); opacity: 0;
 }
-.yours li.saved:hover .forget, .yours .forget:focus-visible { opacity: 1; }
-.yours .forget:hover { color: var(--text); }
-@media (hover: none) { .yours .forget { opacity: 1; } }
+.collections li.saved:hover .forget, .collections .forget:focus-visible { opacity: 1; }
+.collections .forget:hover { color: var(--text); }
+@media (hover: none) { .collections .forget { opacity: 1; } }
 .savesearch { display: inline-flex; gap: 0.3rem; align-items: center; }
 .savesearch .field { width: 12rem; padding-block: 0.2rem; }
 .facet-tags { display: flex; flex-wrap: wrap; gap: 0.3rem; }

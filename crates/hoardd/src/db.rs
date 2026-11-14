@@ -320,6 +320,20 @@ const MIGRATIONS: &[&str] = &[
        created_at TEXT NOT NULL,
        UNIQUE (user_id, name)
      );",
+    // 38: which projects use which assets, as each `hoard sync` reports its hoard.lock (see `projects`).
+    "CREATE TABLE projects (
+       id         INTEGER PRIMARY KEY AUTOINCREMENT,
+       name       TEXT NOT NULL UNIQUE COLLATE NOCASE,
+       synced_at  TEXT NOT NULL,
+       synced_by  TEXT
+     );
+     CREATE TABLE project_assets (
+       project_id INTEGER NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
+       asset_id   TEXT NOT NULL REFERENCES assets(id) ON DELETE CASCADE,
+       path       TEXT NOT NULL,
+       PRIMARY KEY (project_id, asset_id)
+     );
+     CREATE INDEX project_assets_asset ON project_assets(asset_id);",
 ];
 
 /// How many automatic pre-upgrade backups to keep in `<data dir>/backups`.
@@ -1447,6 +1461,15 @@ fn build_filter(q: &SearchQuery, include_kind: bool, look: Option<&LookRank>) ->
     if let Some(user) = q.favourites_of {
         f.clauses.push("a.id IN (SELECT asset_id FROM favourites WHERE user_id = ?)".to_owned());
         f.params.push(SqlValue::Integer(user));
+    }
+    if let Some(p) = q.project.as_deref().filter(|p| !p.is_empty()) {
+        f.clauses.push(
+            "a.id IN (SELECT pa.asset_id FROM project_assets pa JOIN projects p ON p.id = pa.project_id
+                      WHERE CAST(p.id AS TEXT) = ? OR p.name = ?)"
+                .to_owned(),
+        );
+        f.params.push(SqlValue::Text(p.to_owned()));
+        f.params.push(SqlValue::Text(p.to_owned()));
     }
     if let Some(c) = q.collection.as_deref().filter(|c| !c.is_empty()) {
         f.clauses.push(

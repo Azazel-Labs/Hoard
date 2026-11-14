@@ -324,3 +324,14 @@ export async function copyText(text: string): Promise<boolean> {
   had?.focus?.()
   return ok
 }
+
+/** "today", "yesterday", "12 days ago", or the date: for a server timestamp (UTC, with or without its zone). */
+export function daysAgo(iso?: string | null): string {
+  if (!iso) return ''
+  const d = new Date(iso.replace(' ', 'T') + (/[zZ+]/.test(iso.slice(10)) ? '' : 'Z'))
+  const days = Math.floor((Date.now() - d.getTime()) / 86_400_000)
+  if (days < 1) return 'today'
+  if (days === 1) return 'yesterday'
+  if (days < 30) return `${days} days ago`
+  return d.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })
+}

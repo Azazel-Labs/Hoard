@@ -473,6 +473,7 @@ hoard sync        # downloads, verifies BLAKE3, writes hoard.lock; run again and
 
 ```toml
 server = "http://nas.local:4627"
+project = "My Game"             # what the server calls this project; the folder's name if not set
 out_dir = "assets/hoard"        # Godot: a folder under res://, Unity: Assets/Hoard, Bevy: assets/hoard
 layout = "category"             # category | pack | flat
 sidecars = true                 # <file>.hoard.json with tags, category, provenance for import scripts
@@ -495,6 +496,12 @@ with_animations = true
 Models with dependencies land in their own folder (`models/props/crate/crate.gltf`, `…/crate/textures/…`), so
 relative references survive any layout. Commit `hoard.toml` and `hoard.lock`, and teammates get identical,
 hash-verified files.
+
+**Where assets are used.** Each sync tells the server what its `hoard.lock` now holds, under the project's name (a
+token that can only look is enough). An asset's details list the projects that have it, with the path each put it at
+and when it last synced; **Projects** in the filter sidebar shows just one project's assets; and archiving or deleting
+something a project uses names the projects and asks first, since their next sync would take it out. A project
+renamed or abandoned can be forgotten from the sidebar.
 
 **Manifest API.** Engine plugins can call `POST /api/manifest` with ids and/or a search, plus
 `include_deps`, and get a flat list of hashes, sizes, tags, suggested paths and immutable `/api/blobs/{hash}` URLs.
@@ -587,7 +594,8 @@ connected app uses its maker's.
 
 Archiving a pack or an asset (from its menu, its details, or a selection) takes it out of search, the counts and the
 tag list without deleting anything: the **Archive** (the button in the header, or `#archive`) lists it, searchable, until it's restored
-or deleted for good. Deleting for good frees its space at the next clean-up, and a watched folder's pack deleted that
+or deleted for good. If a project's last `hoard sync` had any of it, archiving and deleting say which projects
+and ask first. Deleting for good frees its space at the next clean-up, and a watched folder's pack deleted that
 way isn't read in again (the folder itself is never touched). Archiving and restoring need an account that can change
 the library; deleting for good, an admin.
 
@@ -864,7 +872,7 @@ browser session's changes must also carry an `X-Hoard` header, which pages on ot
 
 | Method | Path | |
 |---|---|---|
-| GET | `/api/assets` | search: `q`, `kind`, `tags=a,b`, `pack`, `collection`, `ext`, `similar=<asset id>`, `color=<hex>`, `favourites=true` (whoever's asking), `sort`, `limit`, `offset`, `hide_supporting`; results plus kind/tag facets |
+| GET | `/api/assets` | search: `q`, `kind`, `tags=a,b`, `pack`, `collection`, `ext`, `similar=<asset id>`, `color=<hex>`, `favourites=true` (whoever's asking), `project` (name or id), `sort`, `limit`, `offset`, `hide_supporting`; results plus kind/tag facets |
 | GET | `/api/assets/{id}` | one asset, with tags, metadata and dependencies |
 | PATCH 🔒 | `/api/assets/{id}` | rename, recategorize, describe, tag; `apply_to_family` for a whole variant family |
 | GET | `/api/assets/{id}/file` | the file (`?download=1` to save it) |
@@ -930,6 +938,15 @@ browser session's changes must also carry an `X-Hoard` header, which pages on ot
 | POST 🔒 | `/api/collections/{id}/assets` | `add` / `remove` assets |
 | GET | `/api/collections/{id}/bundle.zip` | all of it as a zip (`?sources=1`) |
 | GET | `/api/collections/{id}/credits` | credits for its packs (`?format=md`) |
+
+**Projects** (what each `hoard sync` last had)
+
+| Method | Path | |
+|---|---|---|
+| GET | `/api/projects` | every project, with how many assets it has and when and by whom it last synced |
+| PUT | `/api/projects/{name}` | `{assets: [{id, path}]}`: what this project has now, replacing the last report; looking is enough |
+| DELETE 🔒 | `/api/projects/{name}` | forget it |
+| POST | `/api/usage` | `{packs?, assets?, archived?}`: the projects using any of these, with how many and a few of their paths |
 
 **Favourites and saved searches** (each person's own, so a guest has none; looking is enough)
 

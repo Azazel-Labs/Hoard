@@ -260,12 +260,24 @@ test('the Godot plugin adds an asset with what it needs, where hoard sync would,
 
 const dotnet = { ...process.env, DOTNET_CLI_TELEMETRY_OPTOUT: '1', DOTNET_NOLOGO: '1', DOTNET_SKIP_FIRST_TIME_EXPERIENCE: '1' }
 
-test('the Unity package adds an asset with what it needs, making hoard.toml, where hoard sync would', async ({ api, baseURL }) => {
+/** A Unity GUID that stays the same for the same name. */
+const unityGuid = (name: string) => createHash('md5').update(name).digest('hex')
+
+function unityMeta(guid: string, importer: string): string {
+  return `fileFormatVersion: 2\nguid: ${guid}\n${importer}:\n  externalObjects: {}\n  userData: \n`
+}
+
+test('the Unity package adds an asset with what it needs, making hoard.toml, where hoard sync would, and sends the project’s own', async ({
+  api,
+  baseURL,
+}) => {
   test.skip(spawnSync('dotnet', ['--version'], { env: dotnet }).status !== 0, 'dotnet is not installed')
   test.setTimeout(240_000)
   const project = join(repo, 'integrations/unity/test/AddAssets/AddAssets.csproj')
   const build = spawnSync('dotnet', ['build', project, '-nologo', '-v', 'q'], { env: dotnet, encoding: 'utf8', timeout: 180_000 })
   expect(build.status, `${build.stdout}\n${build.stderr}`).toBe(0)
+  const unity = (env: Record<string, string>) =>
+    spawnSync('dotnet', ['run', '--no-build', '--project', project], { env: { ...dotnet, ...env }, encoding: 'utf8', timeout: 90_000 })
   await roundTrip(api, baseURL!, {
     engine: 'Unity',
     outDir: 'Assets/Hoard',
@@ -274,8 +286,50 @@ test('the Unity package adds an asset with what it needs, making hoard.toml, whe
     prepare(dir) {
       mkdirSync(join(dir, 'Assets'))
     },
-    run: (_dir, env) =>
-      outcome(spawnSync('dotnet', ['run', '--no-build', '--project', project], { env: { ...dotnet, ...env }, encoding: 'utf8', timeout: 90_000 }), 'Unity'),
+    run: (_dir, env) => outcome(unity(env), 'Unity'),
+    exporter: {
+      plant(dir, tag) {
+        // The project's own OBJ (Unity imports the model and its picture; the material library rides along), a
+        // sound, a prefab of the model, a material using its own picture and one Hoard brought, and a script.
+        const own = ownCrate(tag)
+        const mine = join(dir, 'Assets', 'Mine')
+        mkdirSync(join(mine, 'tex'), { recursive: true })
+        const put = (rel: string, data: Buffer | string, importer?: string) => {
+          writeFileSync(join(mine, rel), data)
+          if (importer) writeFileSync(join(mine, `${rel}.meta`), unityMeta(unityGuid(`${tag}/${rel}`), importer))
+        }
+        put(`mine_${tag}.obj`, own.obj, 'ModelImporter')
+        put(`mine_${tag}.mtl`, own.mtl, 'DefaultImporter')
+        put(own.png, own.texture, 'TextureImporter')
+        put('beep.wav', sound('zap', 3), 'AudioImporter')
+        put('Spin.cs', 'using UnityEngine;\npublic class Spin : MonoBehaviour {}\n', 'MonoImporter')
+        // Unity gives what Hoard downloaded a .meta of its own when it imports it.
+        const hoardPng = filesUnder(join(dir, 'Assets', 'Hoard')).find((f) => f.endsWith('crate_diffuse.png'))!
+        writeFileSync(join(dir, 'Assets', 'Hoard', `${hoardPng}.meta`), unityMeta(unityGuid(`${tag}/hoard`), 'TextureImporter'))
+        const yaml = '%YAML 1.1\n%TAG !u! tag:unity3d.com,2011:\n'
+        put(
+          'Crate.prefab',
+          `${yaml}--- !u!1001 &1\nPrefabInstance:\n  m_SourcePrefab: {fileID: 100100000, guid: ${unityGuid(`${tag}/mine_${tag}.obj`)}, type: 3}\n`,
+          'PrefabImporter',
+        )
+        put(
+          'Wood.mat',
+          `${yaml}--- !u!21 &2100000\nMaterial:\n  m_SavedProperties:\n    m_TexEnvs:\n` +
+            `    - _MainTex:\n        m_Texture: {fileID: 2800000, guid: ${unityGuid(`${tag}/${own.png}`)}, type: 3}\n` +
+            `    - _DetailAlbedoMap:\n        m_Texture: {fileID: 2800000, guid: ${unityGuid(`${tag}/hoard`)}, type: 3}\n`,
+          'NativeFormatImporter',
+        )
+        return {
+          pick: ['Assets/Mine', 'Assets/Hoard'],
+          expect: [`Mine/mine_${tag}.obj`, `Mine/mine_${tag}.mtl`, `Mine/${own.png}`, 'Mine/beep.wav'],
+          // The Hoard folder, and the picture the material uses from it.
+          fromHoard: 2,
+          // The prefab, the material and the script.
+          engineOnly: 3,
+        }
+      },
+      run: (_dir, env) => sentOutcome(unity(env), 'Unity'),
+    },
   })
 })
 

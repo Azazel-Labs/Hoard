@@ -531,7 +531,7 @@ the plugin get the same files from it. A token that can only look is enough. The
 kept in your editor's own settings, never in the project (the address falls back to `hoard.toml`'s `server`). Files
 are checked by size as they arrive; `hoard sync --verify` checks their BLAKE3 hashes.
 
-Going the other way, the Godot plugin sends a project's own assets to Hoard as a new pack, and only what another tool can
+Going the other way, the Godot and Unity plugins send a project's own assets to Hoard as a new pack, and only what another tool can
 open goes:
 
 - **Originals:** the file an asset was imported from, if it's still there. That includes the files a model names: an
@@ -555,7 +555,9 @@ will go before sending. Meshes and textures made in Godot go as `.glb` and `.png
 [integrations/unity/com.hoard.browser/package.json](integrations/unity/com.hoard.browser/package.json) in a checkout).
 Then Window → Hoard; Settings in its toolbar takes the server and token. Assets go under `Assets/Hoard` unless
 `hoard.toml` says otherwise, and the editor imports them when they land. Click, Ctrl/Cmd-click and Shift-click pick
-results; double-click adds one.
+results; double-click adds one. To send, right-click assets or folders in the Project window → Send to Hoard… (or
+select them and press Send… in the Hoard window). It lists what will go before sending. Meshes and textures made in
+Unity go as `.obj` and `.png`.
 
 **Unreal Engine 5** (built and tested with 5.8). Copy [integrations/unreal/Hoard/](integrations/unreal/Hoard/) into
 your project's `Plugins/` and open the project; Unreal offers to build it (a C++ toolchain is needed, as for any code

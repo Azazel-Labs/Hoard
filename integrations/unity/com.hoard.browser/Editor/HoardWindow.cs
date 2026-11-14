@@ -38,6 +38,10 @@ namespace Hoard
         string status = "";
         double searchAt = -1;
         Vector2 scroll;
+        /// <summary>What Send to Hoard would send, shown until it's sent or cancelled.</summary>
+        HoardExport pending;
+        string packName = "";
+        string sentLink;
 
         [MenuItem("Window/Hoard")]
         static void Open() => GetWindow<HoardWindow>("Hoard");
@@ -199,6 +203,93 @@ namespace Hoard
             Repaint();
         }
 
+        [MenuItem("Assets/Send to Hoard…", false, 2000)]
+        static void SendSelection() => GetWindow<HoardWindow>("Hoard").SendPaths(SelectedPaths());
+
+        [MenuItem("Assets/Send to Hoard…", true)]
+        static bool CanSendSelection() => Selection.assetGUIDs.Length > 0;
+
+        static List<string> SelectedPaths() => Selection.assetGUIDs.Select(AssetDatabase.GUIDToAssetPath).Where(p => p != "").ToList();
+
+        /// <summary>Work out what sending these assets and folders means, and show it before sending.</summary>
+        void SendPaths(List<string> paths)
+        {
+            if (busy) return;
+            sentLink = null;
+            if (paths.Count == 0)
+            {
+                status = "Select assets or folders in the Project window to send them.";
+                Repaint();
+                return;
+            }
+            var export = new HoardExport(Project(), new UnityExportSource());
+            try
+            {
+                export.Plan(paths);
+            }
+            catch (Exception e)
+            {
+                Debug.LogException(e);
+                status = e.Message;
+                Repaint();
+                return;
+            }
+            if (export.Files.Count == 0)
+            {
+                status = $"Nothing to send: {export.WhyNothing()}.";
+                Repaint();
+                return;
+            }
+            pending = export;
+            packName = $"{export.Project.Project}: {Path.GetFileNameWithoutExtension(paths[0].TrimEnd('/'))}";
+            Focus();
+            Repaint();
+        }
+
+        async void Send()
+        {
+            var export = pending;
+            pending = null;
+            if (export == null || busy) return;
+            busy = true;
+            status = $"Sending {export.Files.Count} files…";
+            Repaint();
+            SendResult r;
+            try
+            {
+                r = await export.Send(client, packName);
+            }
+            catch (Exception e)
+            {
+                Debug.LogException(e);
+                r = new SendResult { Error = e.Message };
+            }
+            busy = false;
+            if (this == null) return;
+            status = r.Ok ? $"Sent {r.Sent.Count} files to Hoard as “{r.Name}”." : r.Error;
+            sentLink = r.Ok ? r.Link : null;
+            Repaint();
+        }
+
+        void SendPanel()
+        {
+            using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox))
+            {
+                EditorGUILayout.LabelField("Send to Hoard", EditorStyles.boldLabel);
+                packName = EditorGUILayout.TextField("Pack name", packName);
+                var lines = pending.Files.Take(12).Select(f => "  " + f.Rel + (f.IsCopy ? "  (a copy)" : ""));
+                var more = pending.Files.Count > 12 ? $"\n  and {pending.Files.Count - 12} more" : "";
+                EditorGUILayout.LabelField($"{pending.Summary()}:\n{string.Join("\n", lines)}{more}", EditorStyles.wordWrappedMiniLabel);
+                using (new EditorGUILayout.HorizontalScope())
+                {
+                    GUILayout.FlexibleSpace();
+                    if (GUILayout.Button("Cancel", GUILayout.Width(70))) pending = null;
+                    using (new EditorGUI.DisabledScope(busy))
+                        if (GUILayout.Button("Send", GUILayout.Width(70))) Send();
+                }
+            }
+        }
+
         static string Relative(string path)
         {
             var root = ProjectRoot.Replace('\\', '/').TrimEnd('/') + "/";
@@ -209,6 +300,7 @@ namespace Hoard
         {
             Toolbar();
             if (showSettings) Settings();
+            if (pending != null) SendPanel();
             Grid();
             Footer();
         }
@@ -240,7 +332,7 @@ namespace Hoard
             {
                 serverField = EditorGUILayout.TextField(new GUIContent("Server", "Like http://nas.local:4627"), serverField);
                 tokenField = EditorGUILayout.PasswordField(new GUIContent("Token", "Make one in Hoard: Settings → Access tokens"), tokenField);
-                EditorGUILayout.LabelField("A token that can only look is enough. Both are kept in this computer's editor preferences, not the project.", EditorStyles.wordWrappedMiniLabel);
+                EditorGUILayout.LabelField("A token that can only look is enough to add; sending needs an editor's. Both are kept in this computer's editor preferences, not the project.", EditorStyles.wordWrappedMiniLabel);
                 if (GUILayout.Button("Save and search")) SaveSettings();
             }
         }
@@ -321,10 +413,16 @@ namespace Hoard
         void Footer()
         {
             EditorGUILayout.LabelField(status, EditorStyles.wordWrappedMiniLabel);
+            if (sentLink != null && GUILayout.Button("Open it in Hoard", EditorStyles.linkLabel)) Application.OpenURL(sentLink);
             using (new EditorGUILayout.HorizontalScope())
             {
                 if (assets.Count < total && GUILayout.Button("More", GUILayout.Width(60))) Search(true);
                 GUILayout.FlexibleSpace();
+                using (new EditorGUI.DisabledScope(busy))
+                {
+                    var send = new GUIContent("Send…", "Send what's selected in the Project window to Hoard as a new pack: the files it was made from, or copies other engines open");
+                    if (GUILayout.Button(send, GUILayout.Width(60))) SendPaths(SelectedPaths());
+                }
                 using (new EditorGUI.DisabledScope(busy || selected.Count == 0))
                 {
                     var label = new GUIContent(selected.Count > 1 ? $"Add {selected.Count} to project" : "Add to project",

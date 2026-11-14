@@ -1,5 +1,5 @@
-// Talks to a Hoard server: searches, thumbnails, manifests, downloads and usage reports. A token that can only look
-// is enough for all of it. The requests themselves go through an ITransport: UnityWebRequest in the editor.
+// Talks to a Hoard server: searches, thumbnails, manifests, downloads and usage reports, which a token that can only
+// look is enough for, and uploads, which need an editor's. The requests themselves go through an ITransport: UnityWebRequest in the editor.
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -62,17 +62,31 @@ namespace Hoard
         }
 
         /// <summary>Send a request; with <paramref name="downloadTo"/>, stream the body into that file instead.</summary>
-        public async Task<Reply> Send(string path, string method = "GET", object payload = null, string downloadTo = null)
+        public Task<Reply> Send(string path, string method = "GET", object payload = null, string downloadTo = null)
         {
-            if (Server.Trim() == "") return Reply.Fail("No server address: set it in the Hoard window's settings.");
-            var call = new HttpCall { Url = Url(path), Method = method, DownloadTo = downloadTo, TimeoutSeconds = downloadTo == null ? 30 : 0 };
-            call.Headers["Accept"] = "application/json";
-            if (Token.Trim() != "") call.Headers["Authorization"] = "Bearer " + Token.Trim();
+            var call = new HttpCall { Method = method, DownloadTo = downloadTo, TimeoutSeconds = downloadTo == null ? 30 : 0 };
             if (payload != null)
             {
                 call.Headers["Content-Type"] = "application/json";
                 call.Body = Encoding.UTF8.GetBytes(Hoard.Json.Write(payload));
             }
+            return Send(path, call);
+        }
+
+        /// <summary>Send a body as it is (an upload), waiting as long as it takes.</summary>
+        public Task<Reply> Upload(string path, byte[] body, string contentType)
+        {
+            var call = new HttpCall { Method = "POST", Body = body };
+            call.Headers["Content-Type"] = contentType;
+            return Send(path, call);
+        }
+
+        async Task<Reply> Send(string path, HttpCall call)
+        {
+            if (Server.Trim() == "") return Reply.Fail("No server address: set it in the Hoard window's settings.");
+            call.Url = Url(path);
+            call.Headers["Accept"] = "application/json";
+            if (Token.Trim() != "") call.Headers["Authorization"] = "Bearer " + Token.Trim();
             var a = await transport.Send(call);
             if (a.Error != null) return Reply.Fail($"Couldn't talk to {Server}: {a.Error}");
             if (a.Code < 200 || a.Code >= 300) return Reply.Fail(Why(a.Code, Encoding.UTF8.GetString(a.Body ?? Array.Empty<byte>())), a.Code);

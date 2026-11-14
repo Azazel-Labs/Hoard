@@ -1,3 +1,4 @@
+import type { Locator } from '@playwright/test'
 import { crate } from './support/files'
 import { MODELS } from './support/seed'
 import { addTags, assetsOf, uploadPack, waitReady } from './support/api'
@@ -138,12 +139,13 @@ test.describe('Asset details', () => {
     await expect(heading).toHaveText('Crate')
     await panel.getByRole('button', { name: 'Show full page' }).click()
 
-    // It covers the filters and the grid, and the model is shown big.
+    // It covers the filters and the grid, and the model is shown big (once the layout has settled).
     await expect(tile(page, 'Crate').first()).toBeHidden()
-    expect((await panel.boundingBox())!.width).toBeGreaterThan(1400)
-    const stage = await panel.locator('.stagecol canvas').first().boundingBox()
-    expect(stage!.width).toBeGreaterThan(700)
-    expect(stage!.height).toBeGreaterThan(450)
+    const box = async (l: Locator) => (await l.boundingBox()) ?? { width: 0, height: 0 }
+    await expect.poll(async () => (await box(panel)).width).toBeGreaterThan(1400)
+    const stage = panel.locator('.stagecol canvas').first()
+    await expect.poll(async () => (await box(stage)).width).toBeGreaterThan(700)
+    await expect.poll(async () => (await box(stage)).height).toBeGreaterThan(450)
     await page.screenshot({ path: process.env.HOARD_SHOTS ? `${process.env.HOARD_SHOTS}/page-model.png` : undefined })
 
     // Left and right step through the results without the grid.
@@ -165,6 +167,6 @@ test.describe('Asset details', () => {
     await tile(page, 'Crate').first().click()
     await panel.getByRole('button', { name: 'Show in a side panel' }).click()
     await expect(tile(page, 'Crate').first()).toBeVisible()
-    expect((await panel.boundingBox())!.width).toBeLessThan(700)
+    await expect.poll(async () => (await box(panel)).width).toBeLessThan(700)
   })
 })

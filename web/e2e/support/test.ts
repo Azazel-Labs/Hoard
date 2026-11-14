@@ -31,7 +31,9 @@ export const test = base.extend<Fixtures>({
   page: async ({ page, consoleErrors }, use) => {
     page.on('pageerror', (e) => consoleErrors.push(`pageerror: ${e.message}`))
     page.on('console', (m) => {
-      if (m.type() === 'error') consoleErrors.push(`console: ${m.text()}`)
+      // A failed load's message doesn't say what failed; its location does.
+      const url = m.location().url
+      if (m.type() === 'error') consoleErrors.push(`console: ${m.text()}${url ? ` (${url})` : ''}`)
     })
     await use(page)
     const thrown = consoleErrors.filter((e) => e.startsWith('pageerror:'))

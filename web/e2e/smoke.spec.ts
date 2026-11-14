@@ -1,4 +1,4 @@
-import { devices, type Page } from '@playwright/test'
+import { devices, type APIRequestContext, type Page } from '@playwright/test'
 import { BIG, TEXTURES } from './support/seed'
 import { expect, openPack, test, tile } from './support/test'
 
@@ -35,7 +35,24 @@ function bodyLuminance(page: Page): Promise<number> {
   })
 }
 
-async function visitAll(page: Page, consoleErrors: string[], check: (name: string) => Promise<void>): Promise<void> {
+/** The errors left once thumbnails that failed because their asset is gone are set aside: other tests delete packs
+ * and read them again on the same server, and a page listing one of their assets can ask for its thumbnail just after. */
+async function realErrors(api: APIRequestContext, errors: string[]): Promise<string[]> {
+  const kept: string[] = []
+  for (const e of errors) {
+    const id = /\/api\/assets\/([^/?)]+)\/thumb/.exec(e)?.[1]
+    if (id && (await api.get(`/api/assets/${id}`)).status() === 404) continue
+    kept.push(e)
+  }
+  return kept
+}
+
+async function visitAll(
+  page: Page,
+  api: APIRequestContext,
+  consoleErrors: string[],
+  check: (name: string) => Promise<void>,
+): Promise<void> {
   for (const p of PAGES) {
     await test.step(p.name, async () => {
       await page.goto(p.path)
@@ -43,14 +60,14 @@ async function visitAll(page: Page, consoleErrors: string[], check: (name: strin
       await check(p.name)
     })
   }
-  expect(consoleErrors, 'console errors').toEqual([])
+  expect(await realErrors(api, consoleErrors), 'console errors').toEqual([])
 }
 
 test.describe('phone width (390px)', () => {
   test.use({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true, userAgent: devices['iPhone 13'].userAgent })
 
-  test('main pages fit the screen without sideways scrolling or errors', async ({ page, consoleErrors }) => {
-    await visitAll(page, consoleErrors, async (name) => {
+  test('main pages fit the screen without sideways scrolling or errors', async ({ page, api, consoleErrors }) => {
+    await visitAll(page, api, consoleErrors, async (name) => {
       const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth)
       expect(overflow, `${name} scrolls sideways`).toBeLessThanOrEqual(0)
     })
@@ -74,8 +91,8 @@ test.describe('phone width (390px)', () => {
 test.describe('dark mode', () => {
   test.use({ colorScheme: 'dark' })
 
-  test('main pages follow the system dark scheme without errors', async ({ page, consoleErrors }) => {
-    await visitAll(page, consoleErrors, async (name) => {
+  test('main pages follow the system dark scheme without errors', async ({ page, api, consoleErrors }) => {
+    await visitAll(page, api, consoleErrors, async (name) => {
       await expect(page.locator('html')).toHaveAttribute('data-scheme', 'dark')
       const lum = await bodyLuminance(page)
       expect(lum, `${name} background`).toBeGreaterThanOrEqual(0)

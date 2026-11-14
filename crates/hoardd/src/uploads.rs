@@ -4,9 +4,11 @@
 //!
 //! 1. `POST /api/uploads` registers every file (`path`, `size`) up front and returns what's already received
 //!    (zero for a new session).
-//! 2. Big files go up in chunks: `PUT /api/uploads/{id}/chunk?path=…&offset=…`. The offset must equal what the server
-//!    has; otherwise it answers 409 with the right offset, so a client resumes after any failure by asking.
-//!    Chunks are capped below 100 MB so they also pass proxies with request-size limits.
+//! 2. Big files go up in parts of `part_bytes` (the last one shorter): `PUT /api/uploads/{id}/chunk?path=…&offset=…`
+//!    with the part's offset. Parts can go up at the same time and in any order, so one big file uses as many
+//!    connections as the client likes instead of waiting out each round trip; the session lists the parts that have
+//!    arrived, so a client resumes after any failure by sending the rest. Parts are far below 100 MB, so they also
+//!    pass proxies with request-size limits.
 //! 3. Small files go up many at a time: `POST /api/uploads/{id}/batch` (multipart, `relpath` + `file` pairs).
 //! 4. `POST /api/uploads/{id}/complete` checks every file arrived and queues the normal ingest.
 //!
@@ -31,7 +33,7 @@ use hoard_core::Pack;
 use rusqlite::{OptionalExtension, params};
 use serde::{Deserialize, Serialize};
 use serde_json::json;
-use tokio::io::AsyncWriteExt;
+use tokio::io::{AsyncSeekExt, AsyncWriteExt};
 
 use crate::error::{ApiResult, AppError};
 use crate::ingest::safe_rel_path;
@@ -39,6 +41,9 @@ use crate::{AppState, db, jobs};
 
 /// Largest single chunk or batch request. Below Cloudflare's 100 MB request cap, with room for multipart overhead.
 pub(crate) const MAX_REQUEST_BYTES: usize = 96 << 20;
+/// The size of each part of a big file. Small enough that a lost connection costs little and several are in flight at
+/// once, big enough that a round trip per part doesn't matter.
+const PART_BYTES: u64 = 8 << 20;
 /// Sessions with no activity for this long are removed at startup.
 const STALE_DAYS: i64 = 7;
 /// A request body that sends nothing for this long is abandoned, releasing its file for a retry. Without this, a
@@ -48,7 +53,7 @@ const BODY_IDLE: std::time::Duration = std::time::Duration::from_secs(60);
 fn stalled(path: &str) -> AppError {
     AppError {
         status: StatusCode::REQUEST_TIMEOUT,
-        err: anyhow::anyhow!("upload of {path} stalled; retry from the server's offset"),
+        err: anyhow::anyhow!("upload of {path} stalled; send that part again"),
     }
 }
 
@@ -95,6 +100,9 @@ struct FileStatus {
     path: String,
     size: u64,
     received: u64,
+    /// The parts that have arrived, for a big file that isn't all there yet.
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    parts: Vec<u64>,
 }
 
 #[derive(Debug, Serialize)]
@@ -104,6 +112,7 @@ struct SessionStatus {
     total_bytes: u64,
     received_bytes: u64,
     max_request_bytes: usize,
+    part_bytes: u64,
     /// True when this call picked up an existing session instead of starting one.
     resumed: bool,
 }
@@ -117,22 +126,40 @@ async fn session_status(state: &AppState, id: &str) -> ApiResult<SessionStatus> 
     let found = db::call(&state.pool, move |c| {
         let Some(pack) = db::get_pack(c, &id2)? else { return Ok(None) };
         let mut stmt = c.prepare("SELECT path, size, received FROM upload_files WHERE pack_id = ?1 ORDER BY path")?;
-        let files = stmt
+        let mut files = stmt
             .query_map([&id2], |r| {
                 Ok(FileStatus {
                     path: r.get(0)?,
                     size: r.get::<_, i64>(1)? as u64,
                     received: r.get::<_, i64>(2)? as u64,
+                    parts: Vec::new(),
                 })
             })?
             .collect::<rusqlite::Result<Vec<_>>>()?;
+        let mut stmt = c.prepare("SELECT path, part FROM upload_parts WHERE pack_id = ?1 ORDER BY path, part")?;
+        let mut parts: std::collections::HashMap<String, Vec<u64>> = std::collections::HashMap::new();
+        for row in stmt.query_map([&id2], |r| Ok((r.get::<_, String>(0)?, r.get::<_, i64>(1)? as u64)))? {
+            let (path, part) = row?;
+            parts.entry(path).or_default().push(part);
+        }
+        for f in files.iter_mut().filter(|f| f.received < f.size) {
+            f.parts = parts.remove(&f.path).unwrap_or_default();
+        }
         Ok(Some((pack, files)))
     })
     .await?;
     let (pack, files) = found.ok_or_else(|| AppError::not_found(format!("upload {id}")))?;
     let total_bytes = files.iter().map(|f| f.size).sum();
     let received_bytes = files.iter().map(|f| f.received).sum();
-    Ok(SessionStatus { pack, files, total_bytes, received_bytes, max_request_bytes: MAX_REQUEST_BYTES, resumed: false })
+    Ok(SessionStatus {
+        pack,
+        files,
+        total_bytes,
+        received_bytes,
+        max_request_bytes: MAX_REQUEST_BYTES,
+        part_bytes: PART_BYTES,
+        resumed: false,
+    })
 }
 
 async fn create(State(state): State<AppState>, Json(body): Json<CreateBody>) -> ApiResult<Response> {
@@ -235,14 +262,34 @@ async fn expected(state: &AppState, id: &str, path: &str) -> ApiResult<(u64, u64
     }
 }
 
-async fn record(state: &AppState, id: &str, path: &str, received: u64, size: u64) -> ApiResult<()> {
+/// What's arrived of a file: all of it (`part` is `None`), or one more part of `bytes`. Returns how much is there now.
+async fn record(state: &AppState, id: &str, path: &str, part: Option<u64>, bytes: u64, size: u64) -> ApiResult<u64> {
     let (id2, p2) = (id.to_owned(), path.to_owned());
-    db::call(&state.pool, move |c| {
+    let received = db::call(&state.pool, move |c| {
         let tx = c.transaction()?;
-        tx.execute(
-            "UPDATE upload_files SET received = ?3 WHERE pack_id = ?1 AND path = ?2",
-            params![id2, p2, received as i64],
-        )?;
+        if let Some(part) = part {
+            // A part that was already counted (sent twice by a retry) adds nothing.
+            let new = tx.execute(
+                "INSERT OR IGNORE INTO upload_parts (pack_id, path, part, bytes) VALUES (?1, ?2, ?3, ?4)",
+                params![id2, p2, part as i64, bytes as i64],
+            )?;
+            if new == 1 {
+                tx.execute(
+                    "UPDATE upload_files SET received = MIN(size, received + ?3) WHERE pack_id = ?1 AND path = ?2",
+                    params![id2, p2, bytes as i64],
+                )?;
+            }
+        } else {
+            tx.execute(
+                "UPDATE upload_files SET received = ?3 WHERE pack_id = ?1 AND path = ?2",
+                params![id2, p2, bytes as i64],
+            )?;
+        }
+        let received = tx.query_row(
+            "SELECT received FROM upload_files WHERE pack_id = ?1 AND path = ?2",
+            params![id2, p2],
+            |r| r.get::<_, i64>(0),
+        )? as u64;
         tx.execute("UPDATE upload_meta SET touched_at = ?2 WHERE pack_id = ?1", params![id2, db::now()])?;
         if received == size {
             tx.execute(
@@ -252,21 +299,21 @@ async fn record(state: &AppState, id: &str, path: &str, received: u64, size: u64
             )?;
         }
         tx.commit()?;
-        Ok(())
+        Ok(received)
     })
     .await?;
-    Ok(())
+    Ok(received)
 }
 
-/// One request per file at a time: a second concurrent writer for the same file is turned away.
+/// One request per file (or part of one) at a time: a second concurrent writer for the same bytes is turned away.
 struct InFlight<'a> {
     state: &'a AppState,
     key: String,
 }
 
 impl<'a> InFlight<'a> {
-    fn claim(state: &'a AppState, id: &str, path: &str) -> ApiResult<Self> {
-        let key = format!("{id}\0{path}");
+    fn claim(state: &'a AppState, id: &str, path: &str, part: Option<u64>) -> ApiResult<Self> {
+        let key = part.map_or_else(|| format!("{id}\0{path}"), |part| format!("{id}\0{path}\0{part}"));
         let mut set = state.uploads_in_flight.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
         if !set.insert(key.clone()) {
             return Err(AppError {
@@ -297,52 +344,56 @@ async fn chunk(
     req: Request,
 ) -> ApiResult<Response> {
     let path = safe_rel_path(&p.path).ok_or_else(|| AppError::bad_request("bad path"))?;
-    let (size, _) = expected(&state, &id, &path).await?;
-    let _guard = InFlight::claim(&state, &id, &path)?;
+    let (size, received) = expected(&state, &id, &path).await?;
+    if p.offset % PART_BYTES != 0 || p.offset >= size {
+        return Err(AppError::bad_request(format!("{} isn't where a part of {path} starts", p.offset)));
+    }
+    let part = p.offset / PART_BYTES;
+    let len = PART_BYTES.min(size - p.offset);
+    let _guard = InFlight::claim(&state, &id, &path, Some(part))?;
+    let key = (id.clone(), path.clone());
+    let have = db::call(&state.pool, move |c| {
+        Ok(c.query_row(
+            "SELECT 1 FROM upload_parts WHERE pack_id = ?1 AND path = ?2 AND part = ?3",
+            params![key.0, key.1, part as i64],
+            |_| Ok(()),
+        )
+        .optional()?
+        .is_some())
+    })
+    .await?;
+    if have || received == size {
+        return Ok(Json(json!({ "received": received, "size": size })).into_response());
+    }
     let dest = staging(&state, &id).join(&path);
     if let Some(parent) = dest.parent() {
         tokio::fs::create_dir_all(parent).await?;
     }
-    let mut file = tokio::fs::OpenOptions::new().create(true).append(true).open(&dest).await?;
-    // The bytes on disk are the truth (they survive restarts; the DB row may lag by one chunk).
-    let have = file.metadata().await?.len();
-    if p.offset != have {
-        record(&state, &id, &path, have, size).await?;
-        return Ok(
-            (StatusCode::CONFLICT, Json(json!({ "error": "offset mismatch", "received": have }))).into_response()
-        );
-    }
-    let mut written = have;
+    // Each part is written in place, so parts can arrive in any order and at once.
+    let mut file = tokio::fs::OpenOptions::new().create(true).write(true).truncate(false).open(&dest).await?;
+    file.seek(std::io::SeekFrom::Start(p.offset)).await?;
+    let mut out = tokio::io::BufWriter::with_capacity(1 << 20, file);
+    let mut written = 0u64;
     let mut body = req.into_body().into_data_stream();
     loop {
-        let next = tokio::time::timeout(BODY_IDLE, body.next()).await;
-        let Ok(next) = next else {
-            file.flush().await?;
-            record(&state, &id, &path, written, size).await?;
-            return Err(stalled(&path));
-        };
+        let Ok(next) = tokio::time::timeout(BODY_IDLE, body.next()).await else { return Err(stalled(&path)) };
         let Some(bytes) = next else { break };
-        let bytes = match bytes {
-            Ok(b) => b,
-            Err(e) => {
-                // Keep what arrived; the client resumes from here.
-                file.flush().await?;
-                record(&state, &id, &path, written, size).await?;
-                return Err(AppError::bad_request(format!("upload interrupted: {e}")));
-            }
-        };
-        if written + bytes.len() as u64 > size {
-            // Keep what fits so the client can't corrupt the file by overrunning it.
-            file.flush().await?;
-            file.set_len(have).await?;
-            return Err(AppError::bad_request(format!("chunk runs past the declared size of {path}")));
-        }
-        file.write_all(&bytes).await?;
+        // A part that didn't all arrive isn't counted: the client sends it again.
+        let bytes = bytes.map_err(|e| AppError::bad_request(format!("upload interrupted: {e}")))?;
         written += bytes.len() as u64;
+        if written > len {
+            return Err(AppError::bad_request(format!("part {part} of {path} is longer than {len} bytes")));
+        }
+        out.write_all(&bytes).await?;
     }
-    file.flush().await?;
-    record(&state, &id, &path, written, size).await?;
-    Ok(Json(json!({ "received": written, "size": size })).into_response())
+    if written != len {
+        return Err(AppError::bad_request(format!("part {part} of {path}: got {written} bytes, expected {len}")));
+    }
+    out.flush().await?;
+    // On disk before it's counted, so a crash can't leave a part that's recorded but missing.
+    out.get_ref().sync_data().await?;
+    let received = record(&state, &id, &path, Some(part), len, size).await?;
+    Ok(Json(json!({ "received": received, "size": size })).into_response())
 }
 
 /// Many small, whole files in one request: `relpath` text field, then `file`, repeated.
@@ -365,7 +416,7 @@ async fn batch(
                 let raw = pending_rel.take().unwrap_or(file_name);
                 let path = safe_rel_path(&raw).ok_or_else(|| AppError::bad_request("bad path"))?;
                 let (size, _) = expected(&state, &id, &path).await?;
-                let _guard = InFlight::claim(&state, &id, &path)?;
+                let _guard = InFlight::claim(&state, &id, &path, None)?;
                 let dest = root.join(&path);
                 if let Some(parent) = dest.parent() {
                     tokio::fs::create_dir_all(parent).await?;
@@ -388,7 +439,7 @@ async fn batch(
                 if written != size {
                     return Err(AppError::bad_request(format!("{path}: got {written} bytes, expected {size}")));
                 }
-                record(&state, &id, &path, written, size).await?;
+                record(&state, &id, &path, None, written, size).await?;
                 done.push(path);
             }
             _ => {}
@@ -431,6 +482,7 @@ async fn complete(State(state): State<AppState>, Path(id): Path<String>) -> ApiR
         let tx = c.transaction()?;
         tx.execute("UPDATE packs SET status = 'ingesting', files_done = 0 WHERE id = ?1", [&id2])?;
         tx.execute("DELETE FROM upload_files WHERE pack_id = ?1", [&id2])?;
+        tx.execute("DELETE FROM upload_parts WHERE pack_id = ?1", [&id2])?;
         tx.execute("DELETE FROM upload_meta WHERE pack_id = ?1", [&id2])?;
         db::enqueue(&tx, jobs::INGEST, Some(&id2), &json!({ "auto_name": auto_name }))?;
         tx.commit()?;

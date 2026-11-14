@@ -348,6 +348,16 @@ const MIGRATIONS: &[&str] = &[
     "ALTER TABLE users ADD COLUMN subject TEXT;
      CREATE UNIQUE INDEX users_subject ON users(subject) WHERE subject IS NOT NULL;
      DELETE FROM access_tokens WHERE created_by IS NULL;",
+    // 42: big files upload as fixed-size parts, several at once and in any order (see `uploads`), so what's arrived
+    // is a set of parts rather than a length. A file that was part-way through starts over.
+    "CREATE TABLE upload_parts (
+       pack_id TEXT NOT NULL REFERENCES packs(id) ON DELETE CASCADE,
+       path    TEXT NOT NULL,
+       part    INTEGER NOT NULL,
+       bytes   INTEGER NOT NULL,
+       PRIMARY KEY (pack_id, path, part)
+     ) WITHOUT ROWID;
+     UPDATE upload_files SET received = 0 WHERE received < size;",
 ];
 
 /// How many automatic pre-upgrade backups to keep in `<data dir>/backups`.

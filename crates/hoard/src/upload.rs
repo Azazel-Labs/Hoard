@@ -18,11 +18,10 @@ use tokio::io::{AsyncReadExt, AsyncSeekExt};
 
 use crate::{Client, human_bytes};
 
-const CHUNK: u64 = 32 << 20;
 const SMALL: u64 = 4 << 20;
 const BATCH_BYTES: u64 = 32 << 20;
 const BATCH_FILES: usize = 400;
-const PARALLEL: usize = 4;
+const PARALLEL: usize = 6;
 const ATTEMPTS: u32 = 8;
 
 #[derive(Debug, Clone)]
@@ -45,6 +44,9 @@ struct FileStatus {
     path: String,
     size: u64,
     received: u64,
+    /// The parts of a big file that have arrived.
+    #[serde(default)]
+    parts: Vec<u64>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -53,6 +55,7 @@ struct Session {
     files: Vec<FileStatus>,
     total_bytes: u64,
     received_bytes: u64,
+    part_bytes: u64,
     #[serde(default)]
     resumed: bool,
 }
@@ -210,10 +213,11 @@ async fn open_session(
     Ok(Ok(s))
 }
 
-/// What still needs sending: batches of small untouched files, plus one chunked task per big or partial file.
+/// What still needs sending: batches of small untouched files, and each missing part of the big ones (parts go up at
+/// the same time, so one big file isn't stuck on one connection).
 enum Task {
     Batch(Vec<(LocalFile, u64)>),
-    Chunks(LocalFile, u64),
+    Part { file: LocalFile, offset: u64, len: u64 },
 }
 
 fn plan_tasks(g: &Group, session: &Session) -> Result<Vec<Task>> {
@@ -233,7 +237,12 @@ fn plan_tasks(g: &Group, session: &Session) -> Result<Vec<Task>> {
         if st.size <= SMALL && st.received == 0 {
             small.push((local, st.size));
         } else {
-            tasks.push(Task::Chunks(local, st.received));
+            let done: std::collections::HashSet<u64> = st.parts.iter().copied().collect();
+            for part in (0..st.size.div_ceil(session.part_bytes)).filter(|part| !done.contains(part)) {
+                let offset = part * session.part_bytes;
+                let len = session.part_bytes.min(st.size - offset);
+                tasks.push(Task::Part { file: local.clone(), offset, len });
+            }
         }
     }
     let mut batch = Vec::new();
@@ -301,38 +310,28 @@ async fn upload_group(client: &Client, g: &Group, source: Option<String>, force:
                     sent_ref.fetch_add(files.iter().map(|(_, s)| s).sum(), Ordering::Relaxed);
                     Ok(())
                 }
-                Task::Chunks(f, mut offset) => {
-                    while offset < f.size {
-                        let new_offset = with_retry(&f.rel, || async {
-                            let len = CHUNK.min(f.size - offset);
-                            let mut file = tokio::fs::File::open(&f.abs).await?;
-                            file.seek(std::io::SeekFrom::Start(offset)).await?;
-                            let mut buf = vec![0u8; usize::try_from(len)?];
-                            file.read_exact(&mut buf).await?;
-                            let url = client.url(&format!("/api/uploads/{id_ref}/chunk"));
-                            let req = client
-                                .http
-                                .put(url)
-                                .query(&[("path", f.rel.as_str()), ("offset", &offset.to_string())])
-                                .body(buf);
-                            let resp = client.auth(req).send().await?;
-                            let status = resp.status();
-                            let body: serde_json::Value = resp.json().await.unwrap_or_default();
-                            let received = body.get("received").and_then(serde_json::Value::as_u64);
-                            match (status.as_u16(), received) {
-                                (200 | 409, Some(r)) => Ok(r),
-                                _ => bail!(
-                                    "{status}: {}",
-                                    body.get("error").and_then(|e| e.as_str()).unwrap_or("upload failed")
-                                ),
-                            }
-                        })
-                        .await?;
-                        if new_offset > offset {
-                            sent_ref.fetch_add(new_offset - offset, Ordering::Relaxed);
+                Task::Part { file: f, offset, len } => {
+                    with_retry(&f.rel, || async {
+                        let mut file = tokio::fs::File::open(&f.abs).await?;
+                        file.seek(std::io::SeekFrom::Start(offset)).await?;
+                        let mut buf = vec![0u8; usize::try_from(len)?];
+                        file.read_exact(&mut buf).await?;
+                        let url = client.url(&format!("/api/uploads/{id_ref}/chunk"));
+                        let req = client
+                            .http
+                            .put(url)
+                            .query(&[("path", f.rel.as_str()), ("offset", &offset.to_string())])
+                            .body(buf);
+                        let resp = client.auth(req).send().await?;
+                        let status = resp.status();
+                        if status.is_success() {
+                            return Ok(());
                         }
-                        offset = new_offset;
-                    }
+                        let body: serde_json::Value = resp.json().await.unwrap_or_default();
+                        bail!("{status}: {}", body.get("error").and_then(|e| e.as_str()).unwrap_or("upload failed"))
+                    })
+                    .await?;
+                    sent_ref.fetch_add(len, Ordering::Relaxed);
                     Ok(())
                 }
             }

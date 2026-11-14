@@ -1,17 +1,17 @@
 // Resumable bulk uploads (see crates/hoardd/src/uploads.rs for the protocol).
 //
-// - Every file is registered up front; big files then go up in chunks, small ones in batches.
-// - Several requests run at once; each retries with backoff, and chunk uploads resume from whatever offset the
-//   server reports, so flaky wifi costs at most one chunk.
+// - Every file is registered up front; big files then go up in parts, small ones in batches.
+// - Several requests run at once, parts of one big file included, so a single zip doesn't crawl along one connection
+//   waiting out a round trip per piece. Each retries with backoff, and the server lists the parts it has, so flaky
+//   wifi costs at most one part.
 // - The server recognizes a re-sent file list, so if the tab is closed, dropping the same folder again continues
 //   where it stopped, and packs that already finished aren't imported twice.
 import { ApiError, authHeaders, signInNeeded, type Pack, type UploadFile } from './api'
 
-const CHUNK = 32 * 1024 * 1024
 const SMALL = 4 * 1024 * 1024
 const BATCH_BYTES = 32 * 1024 * 1024
 const BATCH_FILES = 400
-const PARALLEL = 4
+const PARALLEL = 6
 const MAX_ATTEMPTS = 8
 
 export interface Progress {
@@ -22,8 +22,8 @@ export interface Progress {
   resumedBytes: number
 }
 
-interface FileStatus { path: string; size: number; received: number }
-interface Session { pack: Pack; files: FileStatus[]; total_bytes: number; received_bytes: number }
+interface FileStatus { path: string; size: number; received: number; parts?: number[] }
+interface Session { pack: Pack; files: FileStatus[]; total_bytes: number; received_bytes: number; part_bytes: number }
 
 function headers(extra: Record<string, string> = {}): Record<string, string> {
   return { ...authHeaders(), ...extra }
@@ -134,6 +134,7 @@ export async function uploadPackResumable(
 
   const total = session.total_bytes
   const acked = new Map<string, number>(work.map((w) => [w.path, w.received]))
+  // Bytes on their way, by request (a batch's files, or `path#part`).
   const inflight = new Map<string, number>()
   const resumedBytes = session.received_bytes
   const report = () => {
@@ -141,18 +142,43 @@ export async function uploadPackResumable(
     let filesDone = 0
     for (const w of work) {
       const a = acked.get(w.path) ?? 0
-      sent += Math.min(w.size, a + (inflight.get(w.path) ?? 0))
+      sent += a
       if (a >= w.size) filesDone++
     }
-    onProgress({ sent, total, filesDone, filesTotal: work.length, resumedBytes })
+    for (const n of inflight.values()) sent += n
+    onProgress({ sent: Math.min(total, sent), total, filesDone, filesTotal: work.length, resumedBytes })
   }
   report()
 
-  // Build tasks: batches of small whole files, and one sequential chunk task per big file.
+  // Big files' parts first, in order, so a 4 GB file doesn't start last; then batches of small whole files.
   type Task = () => Promise<void>
   const tasks: Task[] = []
   const pendingSmall = work.filter((w) => w.received < w.size && w.size <= SMALL && w.received === 0)
   const big = work.filter((w) => w.received < w.size && !pendingSmall.includes(w))
+  const partBytes = session.part_bytes
+  for (const w of big) {
+    const done = new Set(w.parts ?? [])
+    for (let part = 0; part * partBytes < w.size; part++) {
+      if (done.has(part)) continue
+      const start = part * partBytes
+      const end = Math.min(w.size, start + partBytes)
+      const key = `${w.path}#${part}`
+      tasks.push(() =>
+        withRetry(w.path, signal, async () => {
+          const url = `${base}/chunk?path=${encodeURIComponent(w.path)}&offset=${start}`
+          const res = await send('PUT', url, w.file.slice(start, end), (loaded) => {
+            inflight.set(key, loaded)
+            report()
+          }, signal).finally(() => inflight.delete(key))
+          if (res.status === 401) signInNeeded()
+          if (res.status >= 300) throw new ApiError(res.status, res.body?.error ?? `upload failed (${res.status})`)
+          // Parts finish in any order: keep the largest count the server has given.
+          acked.set(w.path, Math.max(acked.get(w.path) ?? 0, res.body.received as number))
+          report()
+        }),
+      )
+    }
+  }
   // Zero-byte files never need bytes sent but must be "received": send them in batches too.
   for (let i = 0; i < pendingSmall.length; ) {
     const group: typeof pendingSmall = []
@@ -168,13 +194,11 @@ export async function uploadPackResumable(
           form.append('relpath', w.path)
           form.append('file', w.file, w.path)
         }
+        const key = `batch:${group[0].path}`
         const res = await send('POST', `${base}/batch`, form, (loaded) => {
-          // Spread in-flight bytes across the group proportionally for a smooth bar.
-          const frac = bytes ? Math.min(1, loaded / bytes) : 1
-          for (const w of group) inflight.set(w.path, w.size * frac)
+          inflight.set(key, Math.min(bytes, loaded))
           report()
-        }, signal)
-        for (const w of group) inflight.delete(w.path)
+        }, signal).finally(() => inflight.delete(key))
         if (res.status === 401) signInNeeded()
         if (res.status >= 300) throw new ApiError(res.status, res.body?.error ?? `batch failed (${res.status})`)
         for (const w of group) acked.set(w.path, w.size)
@@ -182,37 +206,7 @@ export async function uploadPackResumable(
       }),
     )
   }
-  for (const w of big) {
-    tasks.push(async () => {
-      let offset = acked.get(w.path) ?? 0
-      while (offset < w.size) {
-        offset = await withRetry(w.path, signal, async () => {
-          const start = acked.get(w.path) ?? 0
-          const end = Math.min(w.size, start + CHUNK)
-          const url = `${base}/chunk?path=${encodeURIComponent(w.path)}&offset=${start}`
-          const res = await send('PUT', url, w.file.slice(start, end), (loaded) => {
-            inflight.set(w.path, loaded)
-            report()
-          }, signal)
-          inflight.delete(w.path)
-          if (res.status === 409 && typeof res.body?.received === 'number') {
-            // Server has a different amount (an earlier attempt landed, or a restart): continue from there.
-            acked.set(w.path, res.body.received)
-            report()
-            return res.body.received as number
-          }
-          if (res.status === 401) signInNeeded()
-          if (res.status >= 300) throw new ApiError(res.status, res.body?.error ?? `upload failed (${res.status})`)
-          acked.set(w.path, res.body.received)
-          report()
-          return res.body.received as number
-        })
-      }
-    })
-  }
-
-  // Run with a small pool; big files first so a 4 GB file doesn't start last.
-  tasks.reverse()
+  // Run with a small pool.
   let next = 0
   const workers = Array.from({ length: Math.min(PARALLEL, tasks.length) }, async () => {
     while (next < tasks.length) {

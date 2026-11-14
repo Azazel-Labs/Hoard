@@ -1044,7 +1044,7 @@ browser session's changes must also carry an `X-Hoard` header, which pages on ot
 | Method | Path | |
 |---|---|---|
 | POST 🔒 | `/api/uploads` | start: the list of files and sizes |
-| PUT 🔒 | `/api/uploads/{id}/chunk?path=&offset=` | part of a large file |
+| PUT 🔒 | `/api/uploads/{id}/chunk?path=&offset=` | one part of a large file (`part_bytes` each, any order, several at once) |
 | POST 🔒 | `/api/uploads/{id}/batch` | many small files in one request |
 | GET, DELETE 🔒 | `/api/uploads/{id}` | what's arrived (to resume), or abandon it |
 | POST 🔒 | `/api/uploads/{id}/complete` | all there: ingest it |

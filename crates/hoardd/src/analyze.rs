@@ -301,6 +301,10 @@ fn analyze_image(path: &Path, ext: &str, a: &mut Analysis) -> anyhow::Result<()>
     a.meta.insert("width".into(), json!(w));
     a.meta.insert("height".into(), json!(h));
     a.meta.insert("color_type".into(), json!(format!("{:?}", img.color())));
+    if let Some((frames, ms)) = animation(path, ext) {
+        a.meta.insert("frames".into(), json!(frames));
+        a.meta.insert("duration_ms".into(), json!(ms));
+    }
     if crate::previews::wants_lite(ext, w, h) {
         a.lite = crate::previews::lite_bytes(&img).ok();
     }
@@ -311,6 +315,42 @@ fn analyze_image(path: &Path, ext: &str, a: &mut Analysis) -> anyhow::Result<()>
         img
     };
     analyze_pixels(&img, a, true)
+}
+
+/// Most frames counted in an animated picture.
+const MAX_FRAMES: usize = 10_000;
+
+/// An animated GIF, PNG or WebP's frames and how long it takes to play through once, in ms. None for a still.
+fn animation(path: &Path, ext: &str) -> Option<(usize, u64)> {
+    use image::AnimationDecoder as _;
+    use image::codecs::{gif::GifDecoder, png::PngDecoder, webp::WebPDecoder};
+    let file = BufReader::new(File::open(path).ok()?);
+    let frames: image::Frames<'static> = match ext {
+        "gif" => GifDecoder::new(file).ok()?.into_frames(),
+        "png" | "apng" => {
+            let d = PngDecoder::new(file).ok()?;
+            if !d.is_apng().ok()? {
+                return None;
+            }
+            d.apng().ok()?.into_frames()
+        }
+        "webp" => {
+            let d = WebPDecoder::new(file).ok()?;
+            if !d.has_animation() {
+                return None;
+            }
+            d.into_frames()
+        }
+        _ => return None,
+    };
+    let (mut n, mut ms) = (0usize, 0u64);
+    for f in frames.take(MAX_FRAMES) {
+        let Ok(f) = f else { break };
+        let (num, den) = f.delay().numer_denom_ms();
+        ms += u64::from(num) / u64::from(den.max(1));
+        n += 1;
+    }
+    (n > 1).then_some((n, ms))
 }
 
 /// MIDI and tracker modules: rendered to audio for the facts a sound gets (duration, levels), a waveform and a
@@ -1354,5 +1394,30 @@ mod tests {
         let thumb = image::load_from_memory(&a.thumb.expect("thumbnail")).unwrap().to_rgba8();
         let (dark, bright) = (thumb.get_pixel(1, 1)[0], thumb.get_pixel(thumb.width() - 2, 1)[0]);
         assert!(dark < bright && bright < 255 && bright > 100, "dark={dark} bright={bright}");
+    }
+
+    #[test]
+    fn an_animated_gif_says_how_many_frames_and_how_long() {
+        use image::codecs::gif::GifEncoder;
+        use image::{Delay, Frame, RgbaImage};
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("spin.gif");
+        let mut out = Vec::new();
+        {
+            let mut enc = GifEncoder::new(&mut out);
+            let frames = (0..4u8).map(|i| {
+                let img = RgbaImage::from_pixel(8, 8, image::Rgba([i * 60, 0, 0, 255]));
+                Frame::from_parts(img, 0, 0, Delay::from_numer_denom_ms(80, 1))
+            });
+            enc.encode_frames(frames).unwrap();
+        }
+        std::fs::write(&path, &out).unwrap();
+        assert_eq!(animation(&path, "gif"), Some((4, 320)));
+        let a = analyze(&path, dir.path(), AssetKind::Texture, "gif");
+        assert_eq!(a.meta.get("frames"), Some(&json!(4)));
+
+        let still = dir.path().join("still.png");
+        RgbaImage::from_pixel(8, 8, image::Rgba([0, 0, 0, 255])).save(&still).unwrap();
+        assert_eq!(animation(&still, "png"), None);
     }
 }

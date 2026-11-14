@@ -119,6 +119,7 @@ pub(crate) fn router(state: &AppState) -> Router<AppState> {
         .route("/api/assets/{id}/file", get(asset_file))
         .route("/api/assets/{id}/thumb", get(asset_thumb))
         .route("/api/assets/{id}/lite", get(crate::previews::asset_lite))
+        .route("/api/assets/{id}/frames.png", get(crate::previews::asset_frames))
         .route("/api/blobs/{hash}", get(blob))
         .route("/api/tags", get(tags))
         .route("/api/manifest", post(manifest))

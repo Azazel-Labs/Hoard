@@ -237,6 +237,13 @@ software rasterizer (`apt install mesa-vulkan-drivers`). Without any adapter, ev
      Universal (KTX2 with BasisLZ/ETC1S or UASTC, and `.basis` files) is transcoded in pure Rust too. SVGs render
      with their text (system fonts, DejaVu in the Docker image), and Aseprite files show their first frame with
      frame, layer and animation-tag counts.
+   - Pictures that move: an animated GIF, PNG or WebP says how many frames it has and how long it plays (`frames`,
+     `duration_ms`), and plays in its details (up to 16 MB) and on its tile while the pointer is over it (up to
+     4 MB). An Aseprite file of more than one frame plays in its details too, at each frame's own time and through
+     any of its tags (forward, reverse or ping-pong), from a sheet of its frames made on first request. A sprite
+     sheet tagged `spritesheet` or `frames` plays when asked, cut into the frame size its name gives (`coin_16x16.png`)
+     or where the see-through gutters between its frames are, skipping empty cells; the columns, rows and speed can be
+     changed. With reduced motion asked for, they wait to be played.
    - Fonts (TTF, OTF, TTC, WOFF, WOFF2): family and style (used as the name), designer, license, weight, italic, monospace,
      variable axes, glyph count and the writing systems covered, with an "Aa" specimen as the thumbnail. Symbol
      fonts show their first glyphs. Tagged `weight:bold`, `script:cyrillic`, `monospace`, `variable-font`, `icons`.
@@ -886,6 +893,7 @@ browser session's changes must also carry an `X-Hoard` header, which pages on ot
 | GET | `/api/assets/{id}/thumb` | thumbnail (`?v=` its `thumb_rev`, for a URL that's cached for good) |
 | PUT 🔒 | `/api/assets/{id}/thumb` | a model's thumbnail drawn by a browser (PNG/JPEG/WebP body, `?source=browser` or `browser-partial`); kept only if it's no worse than the one there |
 | GET | `/api/assets/{id}/lite` | a texture's light preview (at most 2048 px), made on first request if it has none |
+| GET | `/api/assets/{id}/frames.png` | an Aseprite file's frames on one sheet, as many columns as rows, each its `width`×`height`, to play with its `frame_ms` |
 | GET | `/api/assets/{id}/original` | the file as it came in, when it was converted on ingest |
 | GET | `/api/assets/{id}/derivative/{kind}` | `glb`, `views`, or `source` (a recovered WAV/PNG) |
 | GET | `/api/assets/{id}/as/{format}` | download converted (`?max=` size, `?wait=` seconds); `/status` to follow a slow one |

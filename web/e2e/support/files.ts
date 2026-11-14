@@ -380,3 +380,107 @@ export function sound(sort: 'thud' | 'zap' | 'rain', seed: number, rate = 22_050
   }
   return wav(out, rate)
 }
+
+/** An animated PNG: one picture per frame (`pixel(frame, x, y)`), each shown for `delayMs`, looping. */
+export function apng(
+  width: number,
+  height: number,
+  frames: number,
+  delayMs: number,
+  pixel: (frame: number, x: number, y: number) => [number, number, number, number],
+): Buffer {
+  const still = (f: number) => {
+    const raw = Buffer.alloc((width * 4 + 1) * height)
+    let o = 0
+    for (let y = 0; y < height; y++) {
+      raw[o++] = 0
+      for (let x = 0; x < width; x++) for (const v of pixel(f, x, y)) raw[o++] = v
+    }
+    return deflateSync(raw)
+  }
+  const ihdr = Buffer.alloc(13)
+  ihdr.writeUInt32BE(width, 0)
+  ihdr.writeUInt32BE(height, 4)
+  ihdr[8] = 8
+  ihdr[9] = 6
+  const actl = Buffer.alloc(8)
+  actl.writeUInt32BE(frames, 0) // frames; plays forever
+  let seq = 0
+  const fctl = () => {
+    const c = Buffer.alloc(26)
+    c.writeUInt32BE(seq++, 0)
+    c.writeUInt32BE(width, 4)
+    c.writeUInt32BE(height, 8)
+    c.writeUInt16BE(delayMs, 20)
+    c.writeUInt16BE(1000, 22)
+    return chunk('fcTL', c)
+  }
+  const parts = [Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]), chunk('IHDR', ihdr), chunk('acTL', actl)]
+  for (let f = 0; f < frames; f++) {
+    parts.push(fctl())
+    if (f === 0) parts.push(chunk('IDAT', still(0)))
+    else {
+      const s = Buffer.alloc(4)
+      s.writeUInt32BE(seq++)
+      parts.push(chunk('fdAT', Buffer.concat([s, still(f)])))
+    }
+  }
+  parts.push(chunk('IEND', Buffer.alloc(0)))
+  return Buffer.concat(parts)
+}
+
+/**
+ * An Aseprite file of one RGBA layer: `frames` pictures of `size`×`size` (`pixel(frame, x, y)`), each shown for its
+ * `ms`, with tags (name, first frame, last frame, direction: 0 forward, 1 reverse, 2 ping-pong). Laid out from the
+ * format spec.
+ */
+export function aseprite(
+  size: number,
+  ms: number[],
+  pixel: (frame: number, x: number, y: number) => [number, number, number, number],
+  tags: [string, number, number, number][] = [],
+): Buffer {
+  const u16 = (v: number) => {
+    const b = Buffer.alloc(2)
+    b.writeUInt16LE(v)
+    return b
+  }
+  const u32 = (v: number) => {
+    const b = Buffer.alloc(4)
+    b.writeUInt32LE(v)
+    return b
+  }
+  const chunkOf = (kind: number, data: Buffer) => Buffer.concat([u32(data.length + 6), u16(kind), data])
+  const layer = Buffer.concat([u16(1), Buffer.alloc(10), Buffer.from([255, 0, 0, 0]), u16(4), Buffer.from('Base')])
+  const tagChunk = Buffer.concat([
+    u16(tags.length),
+    Buffer.alloc(8),
+    ...tags.map(([name, from, to, dir]) =>
+      Buffer.concat([u16(from), u16(to), Buffer.from([dir]), Buffer.alloc(12), u16(name.length), Buffer.from(name)]),
+    ),
+  ])
+  const frames = ms.map((duration, f) => {
+    const px = Buffer.alloc(size * size * 4)
+    for (let y = 0; y < size; y++) for (let x = 0; x < size; x++) Buffer.from(pixel(f, x, y)).copy(px, (y * size + x) * 4)
+    const cel = Buffer.concat([u16(0), Buffer.alloc(4), Buffer.from([255]), u16(0), Buffer.alloc(7), u16(size), u16(size), px])
+    const chunks = [
+      ...(f === 0 ? [chunkOf(0x2004, layer), ...(tags.length ? [chunkOf(0x2018, tagChunk)] : [])] : []),
+      chunkOf(0x2005, cel),
+    ]
+    const body = Buffer.concat(chunks)
+    return Buffer.concat([u32(16 + body.length), u16(0xf1fa), u16(chunks.length), u16(duration), Buffer.alloc(2), u32(chunks.length), body])
+  })
+  const body = Buffer.concat(frames)
+  const head = Buffer.alloc(128)
+  head.writeUInt32LE(128 + body.length, 0)
+  head.writeUInt16LE(0xa5e0, 4)
+  head.writeUInt16LE(ms.length, 6)
+  head.writeUInt16LE(size, 8)
+  head.writeUInt16LE(size, 10)
+  head.writeUInt16LE(32, 12) // bits per pixel
+  head.writeUInt32LE(1, 14) // flags
+  head.writeUInt16LE(100, 18)
+  head[34] = 1 // pixel ratio
+  head[35] = 1
+  return Buffer.concat([head, body])
+}

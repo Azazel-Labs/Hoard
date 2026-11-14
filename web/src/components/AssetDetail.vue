@@ -18,6 +18,7 @@ import { lazy } from '../lazy'
 import { isModelAsset, isTextAsset, takeViewRequest, viewRequest, viewerFor, type ViewerKind } from '../viewers'
 import { isMaterialAsset, resolutions, ROLE_LABEL, sizeLabel } from '../materials'
 import { withThumb } from '../browserThumbs'
+import { animatedAseprite, animatedSrc, PLAY_IN_PANEL, spriteSheet } from '../sprites'
 
 // three.js is big; only load it when someone opens a model.
 const ModelViewer = lazy(() => import('./ModelViewer.vue'), 'the 3D viewer', 'model-slot')
@@ -27,6 +28,7 @@ const TextViewer = lazy(() => import('./TextViewer.vue'), 'the text viewer', 'ov
 const ImageViewer = lazy(() => import('./ImageViewer.vue'), 'the image viewer', 'overlay')
 const MaterialPreview = lazy(() => import('./MaterialPreview.vue'), 'the material preview', 'model-slot')
 const MaterialViewer = lazy(() => import('./MaterialViewer.vue'), 'the material viewer', 'overlay')
+const SpritePlayer = lazy(() => import('./SpritePlayer.vue'), 'the sprite player')
 
 const props = defineProps<{
   asset: Asset
@@ -183,6 +185,10 @@ watch(
 )
 
 const isImage = computed(() => props.asset.kind === 'texture' && props.asset.has_thumb)
+// Aseprite animations play from the start; a sprite sheet does when asked.
+const spritePlayable = computed(() => isImage.value && (animatedAseprite(props.asset) || spriteSheet(props.asset)))
+const animate = ref(false)
+watch(() => props.asset.id, () => (animate.value = animatedAseprite(props.asset)), { immediate: true })
 const audioUrl = computed(() => playableUrl(props.asset))
 const isAudio = computed(() => audioUrl.value !== null)
 const recovered = computed(() => sourceExt(props.asset))
@@ -725,6 +731,7 @@ onBeforeUnmount(() => unswipe())
       :paused="inspecting === 'material'"
       @expand="inspecting = 'material'"
     />
+    <SpritePlayer v-else-if="spritePlayable && animate" :asset="asset" :pixelated="pixelated" />
     <button
       v-else-if="isImage"
       type="button"
@@ -733,7 +740,7 @@ onBeforeUnmount(() => unswipe())
       title="Inspect: zoom, tile, channels"
       @click="inspecting = 'image'"
     >
-      <img :src="thumbUrl(asset)" alt="" :class="{ pixelated }" />
+      <img :src="animatedSrc(asset, PLAY_IN_PANEL) ?? thumbUrl(asset)" alt="" :class="{ pixelated }" />
       <span class="zoombadge" aria-hidden="true">
         <svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round">
           <circle cx="7" cy="7" r="4.5" /><path d="m10.5 10.5 3.5 3.5M5 7h4M7 5v4" />
@@ -795,6 +802,9 @@ onBeforeUnmount(() => unswipe())
     <ModelInspector v-else-if="inspecting === 'model'" :asset="asset" @close="inspecting = ''" />
     <TextViewer v-else-if="inspecting === 'text'" :asset="asset" @close="inspecting = ''" />
     <MaterialViewer v-else-if="inspecting === 'material' && material" :asset="asset" :material="material" @close="inspecting = ''" />
+    <label v-if="spritePlayable" class="animcheck">
+      <input v-model="animate" type="checkbox" /> Play as animation
+    </label>
     <label v-if="isModel && hasViews" class="animcheck">
       <input v-model="showViews" type="checkbox" /> Show the four-view sheet the tagger saw
     </label>

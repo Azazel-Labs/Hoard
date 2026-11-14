@@ -4,6 +4,8 @@
 //!   textures a model, in the 3D viewer) without fetching tens of megabytes first. Made at ingest for big images,
 //!   or on first request; stored as the `lite` derivative. Images small enough and readable by browsers are their own
 //!   preview.
+//! - **Frame sheets** of Aseprite files: every frame side by side, for the portal to play (see
+//!   `textures::aseprite_sheet`). Made on first request and stored as the `frames` derivative.
 //! - **Thumbnails drawn by a browser**: the 3D viewer draws a model with all its textures, lit as it shows it, and a
 //!   signed-in person's browser sends that picture to replace the server's. Where a thumbnail came from is kept, so
 //!   a worse one never replaces a better one and re-analysis leaves it be.
@@ -155,6 +157,52 @@ async fn lite_response(state: AppState, id: String, headers: HeaderMap) -> ApiRe
         return crate::api::serve_blob(&state, &row.hash, &headers, &mime, None).await;
     };
     let mime = lite_mime(&bytes);
+    let blob = save_derivative(&state, id, LITE, bytes).await?;
+    crate::api::serve_blob(&state, &blob, &headers, mime, None).await
+}
+
+/// `GET /api/assets/{id}/frames.png`: an Aseprite file's frames side by side, as many rows as columns, each the
+/// asset's `width`×`height`, to play with its `frame_ms`. 404 for a single frame or one too big for a sheet.
+pub(crate) async fn asset_frames(
+    State(state): State<AppState>,
+    Path(id): Path<String>,
+    headers: HeaderMap,
+) -> ApiResult<Response> {
+    let id2 = id.clone();
+    let (hash, ext, sheet) = db::call(&state.pool, move |c| {
+        Ok(c.query_row(
+            "SELECT a.blob_hash, lower(a.ext),
+                    (SELECT blob_hash FROM derivatives d WHERE d.asset_id = a.id AND d.kind = 'frames')
+               FROM assets a WHERE a.id = ?1",
+            [&id2],
+            |r| Ok((r.get::<_, String>(0)?, r.get::<_, String>(1)?, r.get::<_, Option<String>>(2)?)),
+        )
+        .optional()?)
+    })
+    .await?
+    .ok_or_else(|| AppError::not_found(format!("asset {id}")))?;
+    if let Some(sheet) = sheet {
+        return crate::api::serve_blob(&state, &sheet, &headers, "image/png", None).await.map(unversioned);
+    }
+    if !matches!(ext.as_str(), "aseprite" | "ase") {
+        return Err(AppError::not_found("only Aseprite files have a frame sheet"));
+    }
+    let tmp = state.cfg.tmp_dir();
+    tokio::fs::create_dir_all(&tmp).await?;
+    let work = tempfile::Builder::new().prefix("frames-").tempdir_in(&tmp)?;
+    let local = work.path().join(format!("original.{ext}"));
+    state.blobs.download_to(&hash, &local).await?;
+    let made = crate::heavy::run("frame sheet", move || crate::textures::aseprite_sheet(&local)).await?;
+    drop(work);
+    let bytes = made
+        .map_err(|e| AppError::bad_request(format!("no frame sheet: {e:#}")))?
+        .ok_or_else(|| AppError::not_found("this has one frame, or too many to lay out"))?;
+    let blob = save_derivative(&state, id, "frames", bytes).await?;
+    crate::api::serve_blob(&state, &blob, &headers, "image/png", None).await.map(unversioned)
+}
+
+/// Keep a picture made from an asset as its derivative of this kind; returns the picture's hash.
+async fn save_derivative(state: &AppState, id: String, kind: &'static str, bytes: Vec<u8>) -> ApiResult<String> {
     let blob = state.blobs.put_cache_bytes(bytes).await?;
     let (hash, size) = (blob.hash.clone(), i64::try_from(blob.size).unwrap_or(i64::MAX));
     db::call(&state.pool, move |c| {
@@ -164,14 +212,14 @@ async fn lite_response(state: AppState, id: String, headers: HeaderMap) -> ApiRe
             params![hash, size, now],
         )?;
         c.execute(
-            "INSERT INTO derivatives (asset_id, kind, blob_hash, created_at) VALUES (?1, 'lite', ?2, ?3)
+            "INSERT INTO derivatives (asset_id, kind, blob_hash, created_at) VALUES (?1, ?4, ?2, ?3)
              ON CONFLICT (asset_id, kind) DO UPDATE SET blob_hash = excluded.blob_hash, created_at = excluded.created_at",
-            params![id, hash, now],
+            params![id, hash, now, kind],
         )?;
         Ok(())
     })
     .await?;
-    crate::api::serve_blob(&state, &blob.hash, &headers, mime, None).await
+    Ok(blob.hash)
 }
 
 /// How good a thumbnail's source is: the server's own drawing, a browser's with textures missing, a browser's

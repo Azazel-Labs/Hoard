@@ -6,6 +6,7 @@ import { canPreview, player, toggle } from '../player'
 import KindGlyph from './KindGlyph.vue'
 import { noteTileClick } from '../viewers'
 import { materialSummary } from '../materials'
+import { animatedSrc, PLAY_ON_TILE } from '../sprites'
 
 const props = defineProps<{ asset: Asset; selected: boolean; checked: boolean; selecting: boolean }>()
 const emit = defineEmits<{ open: [MouseEvent | KeyboardEvent]; check: [MouseEvent]; similar: [] }>()
@@ -27,6 +28,13 @@ const loaded = ref(false)
 watch(() => thumbUrl(props.asset), () => (loaded.value = false))
 const playing = computed(() => isCurrent.value && player.playing)
 const starred = computed(() => mine.favourites.has(props.asset.id))
+// Animated pictures move while the pointer is over them (unless motion is unwelcome).
+const hovering = ref(false)
+const moving = computed(() => (hovering.value ? animatedSrc(props.asset, PLAY_ON_TILE) : null))
+function hoverPlay(on: boolean, e: PointerEvent) {
+  if (on && (e.pointerType !== 'mouse' || matchMedia('(prefers-reduced-motion: reduce)').matches)) return
+  hovering.value = on
+}
 
 // Touch screens have no Ctrl-click: a long press (which fires contextmenu) selects instead.
 function onLongPress(e: MouseEvent) {
@@ -48,6 +56,8 @@ function onClick(e: MouseEvent) {
     class="tile"
     :class="{ selected, checked, selecting, playing }"
     :style="{ '--kind': `var(--k-${asset.kind})`, '--progress': isCurrent ? player.progress : 0 }"
+    @pointerenter="hoverPlay(true, $event)"
+    @pointerleave="hoverPlay(false, $event)"
   >
     <button
       type="button"
@@ -61,7 +71,7 @@ function onClick(e: MouseEvent) {
       <span class="art checker">
         <img
           v-if="asset.has_thumb"
-          :src="thumbUrl(asset)"
+          :src="moving ?? thumbUrl(asset)"
           alt=""
           loading="lazy"
           decoding="async"

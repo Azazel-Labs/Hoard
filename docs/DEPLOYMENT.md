@@ -82,9 +82,12 @@ browser ──https──> Cloudflare edge ──tunnel──> cloudflared ─> 
    the token in `deploy/.env`.
 2. Protect the hostname with a Cloudflare Access application (email OTP or your IdP). For MCP clients and
    `hoard sync` from CI, add an Access **service token** and send its two headers.
-3. Add a cache rule: cache everything for `/api/blobs/*`, `/api/assets/*/thumb` and `/api/assets/*/derivative/*`,
-   respecting origin headers. Those responses are `immutable` and keyed by content hash, so the edge can keep them
-   indefinitely and your home uplink only serves each file once per edge location.
+3. Add a cache rule: cache everything for `/api/blobs/*`, `/api/assets/*/thumb` and `/api/assets/*/derivative/*`.
+   Those responses are `immutable` and keyed by content hash, so the edge can keep them indefinitely and your home
+   uplink only serves each file once per edge location. Hoard marks them `public` only with guest browsing on;
+   otherwise they're `private`, which a rule that respects origin headers won't cache. Behind Access an Edge TTL that
+   overrides it is safe, since Access checks each request before the cache answers it; on a hostname without Access
+   it would hand files to anyone with the address.
 
 Simple, but public: anyone can reach the login page, and uploads through a public hostname are capped at
 100 MB per request on Free and Pro plans, which large source files will hit. Prefer "Private access" above

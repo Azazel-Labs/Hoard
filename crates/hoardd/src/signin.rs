@@ -232,11 +232,46 @@ impl Default for AuthConfig {
     }
 }
 
+/// How long an OAuth sign-in lasts when Settings doesn't say: the provider isn't asked again until it ends, so someone
+/// it has since turned away isn't kept in for a month.
+const OAUTH_SESSION_HOURS: u32 = 24;
+
+/// Which accounts may be used under the current settings, and how long their sessions last.
+#[derive(Clone, Copy, Debug)]
+pub(crate) struct Gate {
+    session_hours: Option<u32>,
+    method: Method,
+}
+
+impl Gate {
+    /// Hoard's own accounts always; directory and OAuth accounts only while that's how people sign in.
+    pub(crate) fn lets_in(self, source: &str) -> bool {
+        match Source::parse(source) {
+            Some(Source::Internal) => true,
+            Some(Source::Ldap) => matches!(self.method, Method::Ldap | Method::Ad),
+            Some(Source::Oauth) => self.method == Method::Oauth,
+            None => false,
+        }
+    }
+
+    pub(crate) fn session_hours(self, source: &str) -> Option<u32> {
+        if Source::parse(source) == Some(Source::Oauth) {
+            Some(self.session_hours.unwrap_or(OAUTH_SESSION_HOURS))
+        } else {
+            self.session_hours
+        }
+    }
+}
+
 fn http_url(s: &str) -> bool {
     s.starts_with("http://") || s.starts_with("https://")
 }
 
 impl AuthConfig {
+    pub(crate) fn gate(&self) -> Gate {
+        Gate { session_hours: self.session_hours, method: self.method }
+    }
+
     /// The directory in use, if signing in goes through one.
     pub(crate) fn directory(&self) -> Option<&Ldap> {
         match self.method {
@@ -366,27 +401,54 @@ impl Source {
     }
 }
 
-/// The account `name` signs in to from `source`, made if need be and its role brought up to date. `Err(msg)`: why
-/// they can't, in their words.
+/// An account's id, name, role, where it signs in and who it is at the OAuth provider.
+type UserRow = (i64, String, String, String, Option<String>);
+
+/// The account `name` signs in to from `source`, made if need be and its role brought up to date. `subject` is who
+/// the OAuth provider says they are (its issuer and `sub`), which a name can't stand in for: the account follows it
+/// when they're renamed there, and someone else given their old name doesn't get their account. `Err(msg)`: why they
+/// can't, in their words.
 pub(crate) fn account_for(
     c: &Connection,
     cfg: &AuthConfig,
     source: Source,
     name: &str,
+    subject: Option<&str>,
     groups: &[String],
 ) -> Result<Result<(i64, String, Role), String>> {
     let decision = decide(&cfg.roles, groups);
     if decision == Decision::Refused {
         return Ok(Err(format!("{name} isn't in a group that may use Hoard")));
     }
-    let found: Option<(i64, String, String, String)> = c
-        .query_row("SELECT id, username, role, source FROM users WHERE username = ?1", [name], |r| {
-            Ok((r.get(0)?, r.get(1)?, r.get(2)?, r.get(3)?))
+    let pick = |column: &str, key: &str| -> rusqlite::Result<Option<UserRow>> {
+        c.query_row(&format!("SELECT id, username, role, source, subject FROM users WHERE {column} = ?1"), [key], |r| {
+            Ok((r.get(0)?, r.get(1)?, r.get(2)?, r.get(3)?, r.get(4)?))
         })
-        .optional()?;
-    if let Some((id, username, role, from)) = found {
+        .optional()
+    };
+    let found = match subject {
+        Some(s) => match pick("subject", s)? {
+            Some(row) => Some(row),
+            None => pick("username", name)?,
+        },
+        None => pick("username", name)?,
+    };
+    if let Some((id, username, role, from, stored)) = found {
         if Source::parse(&from) != Some(source) {
             return Ok(Err(format!("There's already a Hoard account called {username} that signs in another way")));
+        }
+        if let Some(s) = subject {
+            match stored.as_deref() {
+                Some(t) if t != s => {
+                    return Ok(Err(format!(
+                        "There's already a Hoard account called {username} for someone else at the provider"
+                    )));
+                }
+                Some(_) => {}
+                None => {
+                    c.execute("UPDATE users SET subject = ?2 WHERE id = ?1", params![id, s])?;
+                }
+            }
         }
         let role = match decision {
             Decision::Role(r) => {
@@ -408,8 +470,8 @@ pub(crate) fn account_for(
         _ => cfg.default_role(),
     };
     c.execute(
-        "INSERT INTO users (username, password_hash, role, source, created_at) VALUES (?1, '', ?2, ?3, ?4)",
-        params![name, role.as_str(), source.as_str(), db::now()],
+        "INSERT INTO users (username, password_hash, role, source, subject, created_at) VALUES (?1, '', ?2, ?3, ?4, ?5)",
+        params![name, role.as_str(), source.as_str(), subject, db::now()],
     )?;
     tracing::info!(user = %name, source = source.as_str(), role = role.as_str(), "account made at first sign-in");
     Ok(Ok((c.last_insert_rowid(), name.to_owned(), role)))
@@ -544,10 +606,13 @@ pub(crate) async fn directory_sign_in(l: &Ldap, name: &str, password: &str) -> R
     found
 }
 
-async fn find_and_bind(ldap: &mut ldap3::Ldap, l: &Ldap, name: &str, password: &str) -> Result<Option<DirectoryUser>> {
-    bind_service(ldap, l).await?;
+/// `name`'s entry, looked up as the service account (signed in already). `active_only`: in Active Directory, not if
+/// the account is turned off (signing in checks that itself).
+async fn find_entry(ldap: &mut ldap3::Ldap, l: &Ldap, name: &str, active_only: bool) -> Result<Option<SearchEntry>> {
     let user_attr = l.username_attribute.trim();
-    let filter = format!("(&({user_attr}={}){})", ldap_escape(name), l.user_filter.trim());
+    let enabled =
+        if active_only && l.server_type == "ad" { "(!(userAccountControl:1.2.840.113556.1.4.803:=2))" } else { "" };
+    let filter = format!("(&({user_attr}={}){}{enabled})", ldap_escape(name), l.user_filter.trim());
     let (entries, _) = ldap
         .with_timeout(LDAP_OP)
         .search(l.base_dn.trim(), Scope::Subtree, &filter, vec![user_attr, "memberOf"])
@@ -558,7 +623,12 @@ async fn find_and_bind(ldap: &mut ldap3::Ldap, l: &Ldap, name: &str, password: &
     if entries.len() > 1 {
         bail!("{} entries in the directory match {name}: narrow the user filter", entries.len());
     }
-    let Some(entry) = entries.pop() else { return Ok(None) };
+    Ok(entries.pop())
+}
+
+async fn find_and_bind(ldap: &mut ldap3::Ldap, l: &Ldap, name: &str, password: &str) -> Result<Option<DirectoryUser>> {
+    bind_service(ldap, l).await?;
+    let Some(entry) = find_entry(ldap, l, name, false).await? else { return Ok(None) };
     let bound = ldap.with_timeout(LDAP_OP).simple_bind(&entry.dn, password).await?;
     match bound.rc {
         0 => {}
@@ -566,8 +636,16 @@ async fn find_and_bind(ldap: &mut ldap3::Ldap, l: &Ldap, name: &str, password: &
         49 => return Ok(None),
         _ => bail!("the directory wouldn't check {name}'s password ({bound})"),
     }
+    let groups = groups_of(ldap, l, &entry, name).await?;
+    let user_attr = l.username_attribute.trim();
+    let spelled = attr(&entry, user_attr).and_then(|v| v.iter().find(|v| v.eq_ignore_ascii_case(name))).cloned();
+    Ok(Some(DirectoryUser { name: spelled.unwrap_or_else(|| name.to_owned()), dn: entry.dn, groups }))
+}
+
+/// The groups `entry` (found for `name`) is in, by DN and name.
+async fn groups_of(ldap: &mut ldap3::Ldap, l: &Ldap, entry: &SearchEntry, name: &str) -> Result<Vec<String>> {
     let mut groups = Vec::new();
-    for dn in attr(&entry, "memberOf").into_iter().flatten() {
+    for dn in attr(entry, "memberOf").into_iter().flatten() {
         groups.push(dn.clone());
         groups.extend(first_rdn_value(dn).map(str::to_owned));
     }
@@ -589,8 +667,94 @@ async fn find_and_bind(ldap: &mut ldap3::Ldap, l: &Ldap, name: &str, password: &
     }
     groups.sort_unstable_by_key(|g| g.to_lowercase());
     groups.dedup_by(|a, b| a.eq_ignore_ascii_case(b));
-    let spelled = attr(&entry, user_attr).and_then(|v| v.iter().find(|v| v.eq_ignore_ascii_case(name))).cloned();
-    Ok(Some(DirectoryUser { name: spelled.unwrap_or_else(|| name.to_owned()), dn: entry.dn, groups }))
+    Ok(groups)
+}
+
+/// How often the directory is asked again about the people signed in through it.
+const RECHECK: Duration = Duration::from_mins(15);
+
+/// Each name's groups, or `None` for someone the directory no longer has (or, in Active Directory, has turned off).
+pub(crate) async fn directory_lookup(l: &Ldap, names: &[String]) -> Result<Vec<Option<Vec<String>>>> {
+    let (mut ldap, _) = connect(l).await?;
+    let found = async {
+        let mut out = Vec::with_capacity(names.len());
+        for name in names {
+            bind_service(&mut ldap, l).await?;
+            out.push(match find_entry(&mut ldap, l, name, true).await? {
+                Some(entry) => Some(groups_of(&mut ldap, l, &entry, name).await?),
+                None => None,
+            });
+        }
+        Ok(out)
+    }
+    .await;
+    let _ = ldap.unbind().await;
+    found
+}
+
+/// What the directory's answer about someone means now: their role (`None`: leave it, no groups are listed), or why
+/// they're signed out.
+fn recheck_verdict(roles: &Roles, groups: Option<&[String]>) -> Result<Option<Role>, &'static str> {
+    let Some(groups) = groups else { return Err("no longer in the directory") };
+    match decide(roles, groups) {
+        Decision::Refused => Err("no longer in a group that may use Hoard"),
+        Decision::Role(r) => Ok(Some(r)),
+        Decision::Default => Ok(None),
+    }
+}
+
+/// Ask the directory about everyone signed in through it (with a session, token or connected app): someone it no
+/// longer has, or no longer lets use Hoard, is signed out everywhere, and everyone else's role follows their groups.
+/// A password checked at sign-in would otherwise keep working for a month after they left.
+pub(crate) async fn recheck_directory(state: &AppState) -> Result<()> {
+    let cfg = state.settings.get().auth.clone();
+    let Some(l) = cfg.directory().cloned() else { return Ok(()) };
+    let people: Vec<(i64, String)> = db::call(&state.pool, |c| {
+        let mut stmt = c.prepare(
+            "SELECT id, username FROM users u WHERE source = 'ldap' AND (
+               EXISTS (SELECT 1 FROM sessions s WHERE s.user_id = u.id)
+               OR EXISTS (SELECT 1 FROM access_tokens t WHERE t.created_by = u.id)
+               OR EXISTS (SELECT 1 FROM oauth_grants g WHERE g.user_id = u.id))",
+        )?;
+        let rows = stmt.query_map([], |r| Ok((r.get(0)?, r.get(1)?)))?.collect::<rusqlite::Result<Vec<_>>>()?;
+        Ok(rows)
+    })
+    .await?;
+    if people.is_empty() {
+        return Ok(());
+    }
+    let names: Vec<String> = people.iter().map(|(_, n)| n.clone()).collect();
+    let found = directory_lookup(&l, &names).await?;
+    let roles = cfg.roles;
+    db::call(&state.pool, move |c| {
+        for ((id, name), groups) in people.iter().zip(&found) {
+            match recheck_verdict(&roles, groups.as_deref()) {
+                Ok(Some(role)) => {
+                    c.execute("UPDATE users SET role = ?2 WHERE id = ?1 AND role <> ?2", params![id, role.as_str()])?;
+                }
+                Ok(None) => {}
+                Err(why) => {
+                    crate::auth::sign_out_everywhere(c, *id)?;
+                    tracing::info!(user = %name, "signed out everywhere: {why}");
+                }
+            }
+        }
+        Ok(())
+    })
+    .await
+}
+
+/// [`recheck_directory`] every [`RECHECK`].
+pub(crate) async fn recheck_loop(state: AppState) {
+    let mut every = tokio::time::interval(RECHECK);
+    every.set_missed_tick_behavior(tokio::time::MissedTickBehavior::Delay);
+    every.tick().await;
+    loop {
+        every.tick().await;
+        if let Err(e) = recheck_directory(&state).await {
+            tracing::warn!("couldn't check directory accounts against the directory: {e:#}");
+        }
+    }
 }
 
 // ---------------------------------------------------------------------------------------------
@@ -712,9 +876,14 @@ async fn oauth_callback(State(state): State<AppState>, headers: HeaderMap, Query
             &format!("The provider didn't say who you are (no {} claim)", cfg.oauth.username_claim.trim()),
         );
     };
+    let Some(sub) = claim_string(&claims, "sub").or_else(|| claim_string(&claims, "id")) else {
+        return back_with_error(&headers, "The provider didn't say who you are (no sub or id claim)");
+    };
+    let issuer = claim_string(&claims, "iss").unwrap_or_else(|| cfg.oauth.token_url.trim().to_owned());
+    let subject = format!("{issuer} {sub}");
     let groups = claim_strings(&claims, cfg.oauth.groups_claim.trim());
     let made = db::call(&state.pool, move |c| {
-        Ok(match account_for(c, &cfg, Source::Oauth, &name, &groups)? {
+        Ok(match account_for(c, &cfg, Source::Oauth, &name, Some(&subject), &groups)? {
             Ok((id, username, _)) => Ok((crate::auth::new_session(c, id)?, username)),
             Err(msg) => Err(msg),
         })
@@ -854,20 +1023,47 @@ async fn get_config(State(state): State<AppState>, headers: HeaderMap) -> Json<V
     Json(json!({ "config": cfg.shown(), "callback_url": callback_url(&state, &headers) }))
 }
 
-/// A secret sent empty (as the Settings page shows them) keeps the saved one; `clear_<field>` clears it.
-fn keep_secrets(next: &mut AuthConfig, saved: &AuthConfig, body: &Value) {
+/// Whether a saved reader password may go to `next`: it's the same servers, reached the same way, as the same account.
+fn same_target(next: &Ldap, saved: &Ldap) -> bool {
+    let servers = |l: &Ldap| {
+        l.servers.iter().map(|s| s.trim().to_ascii_lowercase()).filter(|s| !s.is_empty()).collect::<Vec<_>>()
+    };
+    servers(next) == servers(saved)
+        && next.tls == saved.tls
+        && next.skip_verify == saved.skip_verify
+        && next.ca_cert.trim() == saved.ca_cert.trim()
+        && next.bind_dn.trim() == saved.bind_dn.trim()
+}
+
+const GIVE_PASSWORD_AGAIN: &str = "Give the password of the account that looks people up again: the saved one is only \
+                                   sent to the servers it was given for";
+
+/// A secret sent empty (as the Settings page shows them) keeps the saved one; `clear_<field>` clears it. Only for
+/// where it was given: pointing the servers or token address somewhere else needs it typed again, so whoever can
+/// change the settings can't have it sent to a server of theirs.
+fn keep_secrets(next: &mut AuthConfig, saved: &AuthConfig, body: &Value) -> Result<(), String> {
     let cleared = |part: &str, field: &str| {
         body.get(part).and_then(|p| p.get(format!("clear_{field}"))).and_then(Value::as_bool).unwrap_or(false)
     };
-    if !next.ldap.bind_password.is_set() && !cleared("ldap", "bind_password") {
-        next.ldap.bind_password = saved.ldap.bind_password.clone();
+    for (part, n, s) in [("ldap", &mut next.ldap, &saved.ldap), ("ad", &mut next.ad, &saved.ad)] {
+        if !n.bind_password.is_set() && !cleared(part, "bind_password") && s.bind_password.is_set() {
+            if same_target(n, s) {
+                n.bind_password = s.bind_password.clone();
+            } else if !n.anonymous {
+                return Err(GIVE_PASSWORD_AGAIN.into());
+            }
+        }
     }
-    if !next.ad.bind_password.is_set() && !cleared("ad", "bind_password") {
-        next.ad.bind_password = saved.ad.bind_password.clone();
+    if !next.oauth.client_secret.is_set() && !cleared("oauth", "client_secret") && saved.oauth.client_secret.is_set() {
+        if next.oauth.token_url.trim() == saved.oauth.token_url.trim() {
+            next.oauth.client_secret = saved.oauth.client_secret.clone();
+        } else {
+            return Err(
+                "Give the client secret again: the saved one is only sent to the token address it was given for".into(),
+            );
+        }
     }
-    if !next.oauth.client_secret.is_set() && !cleared("oauth", "client_secret") {
-        next.oauth.client_secret = saved.oauth.client_secret.clone();
-    }
+    Ok(())
 }
 
 /// The page's fields, without the ones it adds for itself (`*_set`, `clear_*`).
@@ -888,7 +1084,7 @@ async fn put_config(
 ) -> ApiResult<Json<Value>> {
     let mut next = parse_config(&body)?;
     let saved = state.settings.get().auth.clone();
-    keep_secrets(&mut next, &saved, &body);
+    keep_secrets(&mut next, &saved, &body).map_err(AppError::bad_request)?;
     next.check().map_err(AppError::bad_request)?;
     let patch = json!({ "auth": next });
     let st = Arc::clone(&state);
@@ -923,9 +1119,14 @@ async fn test_ldap(State(state): State<AppState>, Json(body): Json<LdapTest>) ->
         }
         let mut l: Ldap =
             serde_json::from_value(c).map_err(|e| AppError::bad_request(format!("bad LDAP settings: {e}")))?;
-        let saved = state.settings.get().auth.clone();
-        if !l.bind_password.is_set() && !clear {
-            l.bind_password = if body.kind == "ad" { saved.ad.bind_password } else { saved.ldap.bind_password };
+        let auth = state.settings.get().auth.clone();
+        let saved = if body.kind == "ad" { auth.ad } else { auth.ldap };
+        if !l.bind_password.is_set() && !clear && saved.bind_password.is_set() {
+            if same_target(&l, &saved) {
+                l.bind_password = saved.bind_password;
+            } else if !l.anonymous {
+                return Err(AppError::bad_request(GIVE_PASSWORD_AGAIN));
+            }
         }
         l
     };
@@ -1062,13 +1263,41 @@ mod tests {
         assert!(!format!("{cfg:?}").contains("hunter22"));
         // Sent back as shown, the saved password stays; clearing it is asked for.
         let mut next = parse_config(&shown).unwrap();
-        keep_secrets(&mut next, &cfg, &shown);
+        keep_secrets(&mut next, &cfg, &shown).unwrap();
         assert_eq!(next.ldap.bind_password.0, "hunter22");
         let mut asked = shown.clone();
         asked["ldap"]["clear_bind_password"] = json!(true);
         let mut next = parse_config(&asked).unwrap();
-        keep_secrets(&mut next, &cfg, &asked);
+        keep_secrets(&mut next, &cfg, &asked).unwrap();
         assert!(!next.ldap.bind_password.is_set());
+        // Pointed at another server, the saved password isn't sent there: it's asked for again.
+        let mut elsewhere = shown.clone();
+        elsewhere["ldap"]["servers"] = json!(["ldap.attacker.example"]);
+        let mut next = parse_config(&elsewhere).unwrap();
+        assert!(keep_secrets(&mut next, &cfg, &elsewhere).unwrap_err().contains("again"));
+        let mut cfg = AuthConfig::default();
+        cfg.oauth.token_url = "https://id.example/token".into();
+        cfg.oauth.client_secret = Secret("shh".into());
+        let mut moved = cfg.shown();
+        moved["oauth"]["token_url"] = json!("https://attacker.example/token");
+        let mut next = parse_config(&moved).unwrap();
+        assert!(keep_secrets(&mut next, &cfg, &moved).unwrap_err().contains("again"));
+    }
+
+    #[test]
+    fn signing_in_follows_the_settings() {
+        let oauth = AuthConfig { method: Method::Oauth, ..AuthConfig::default() }.gate();
+        assert!(oauth.lets_in("internal") && oauth.lets_in("oauth") && !oauth.lets_in("ldap"));
+        assert_eq!(oauth.session_hours("oauth"), Some(OAUTH_SESSION_HOURS));
+        assert_eq!(oauth.session_hours("internal"), None);
+        let ad = AuthConfig { method: Method::Ad, session_hours: Some(8), ..AuthConfig::default() }.gate();
+        assert!(ad.lets_in("ldap") && !ad.lets_in("oauth"));
+        assert_eq!(ad.session_hours("oauth"), Some(8));
+        let only = Roles { view: vec!["hoard".into()], ..Roles::default() };
+        assert_eq!(recheck_verdict(&only, None), Err("no longer in the directory"));
+        assert!(recheck_verdict(&only, Some(&["other".into()])).is_err());
+        assert_eq!(recheck_verdict(&only, Some(&["Hoard".into()])), Ok(Some(Role::View)));
+        assert_eq!(recheck_verdict(&Roles::default(), Some(&[])), Ok(None));
     }
 
     #[test]
@@ -1211,8 +1440,13 @@ mod tests {
         let bad = Ldap { bind_password: Secret("nope".into()), ..l.clone() };
         let err = directory_sign_in(&bad, "bob", "builder22").await.unwrap_err();
         assert!(format!("{err:#}").contains("looks people up"), "{err:#}");
-        let only_dead = Ldap { servers: vec![format!("127.0.0.1:{dead}")], ..l };
+        let only_dead = Ldap { servers: vec![format!("127.0.0.1:{dead}")], ..l.clone() };
         assert!(format!("{:#}", directory_sign_in(&only_dead, "bob", "x").await.unwrap_err()).contains("reached"));
+
+        // Asked again later without a password: who's still there, and in which groups.
+        let found = directory_lookup(&l, &["ada".into(), "carol".into()]).await.unwrap();
+        assert!(found[0].as_ref().is_some_and(|g| g.iter().any(|g| g == "Artists")), "{found:?}");
+        assert_eq!(found[1], None);
     }
 
     #[test]
@@ -1221,24 +1455,34 @@ mod tests {
         c.execute_batch(
             "CREATE TABLE users (id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT NOT NULL UNIQUE COLLATE NOCASE,
                password_hash TEXT NOT NULL, created_at TEXT NOT NULL, role TEXT NOT NULL DEFAULT 'admin',
-               source TEXT NOT NULL DEFAULT 'internal');
+               source TEXT NOT NULL DEFAULT 'internal', subject TEXT UNIQUE);
              INSERT INTO users (username, password_hash, created_at) VALUES ('root', 'x', '');",
         )
         .unwrap();
         let mut cfg = AuthConfig::default();
-        let (_, name, role) = account_for(&c, &cfg, Source::Ldap, "ada", &[]).unwrap().unwrap();
+        let (_, name, role) = account_for(&c, &cfg, Source::Ldap, "ada", None, &[]).unwrap().unwrap();
         assert_eq!((name.as_str(), role), ("ada", Role::View));
         // Same person again: the same account, and the role an admin gave it stays when no groups are listed.
         c.execute("UPDATE users SET role = 'edit' WHERE username = 'ada'", []).unwrap();
-        assert_eq!(account_for(&c, &cfg, Source::Ldap, "ADA", &[]).unwrap().unwrap().2, Role::Edit);
+        assert_eq!(account_for(&c, &cfg, Source::Ldap, "ADA", None, &[]).unwrap().unwrap().2, Role::Edit);
         // Groups listed: they decide, each time.
         cfg.roles.admin = vec!["Admins".into()];
-        assert_eq!(account_for(&c, &cfg, Source::Ldap, "ada", &["admins".into()]).unwrap().unwrap().2, Role::Admin);
-        assert_eq!(account_for(&c, &cfg, Source::Ldap, "ada", &[]).unwrap().unwrap().2, Role::View);
+        assert_eq!(
+            account_for(&c, &cfg, Source::Ldap, "ada", None, &["admins".into()]).unwrap().unwrap().2,
+            Role::Admin
+        );
+        assert_eq!(account_for(&c, &cfg, Source::Ldap, "ada", None, &[]).unwrap().unwrap().2, Role::View);
         // Not someone else's account, and not a new one when provisioning is off.
-        assert!(account_for(&c, &cfg, Source::Oauth, "root", &[]).unwrap().unwrap_err().contains("another way"));
-        assert!(account_for(&c, &cfg, Source::Oauth, "ada", &[]).unwrap().is_err());
+        assert!(account_for(&c, &cfg, Source::Oauth, "root", None, &[]).unwrap().unwrap_err().contains("another way"));
+        assert!(account_for(&c, &cfg, Source::Oauth, "ada", None, &[]).unwrap().is_err());
+        // An OAuth account follows the person at the provider, not their name there.
+        let (carol, ..) = account_for(&c, &cfg, Source::Oauth, "carol", Some("https://id 1"), &[]).unwrap().unwrap();
+        let (again, name, _) =
+            account_for(&c, &cfg, Source::Oauth, "caroline", Some("https://id 1"), &[]).unwrap().unwrap();
+        assert_eq!((again, name.as_str()), (carol, "carol"));
+        let other = account_for(&c, &cfg, Source::Oauth, "carol", Some("https://id 2"), &[]).unwrap().unwrap_err();
+        assert!(other.contains("someone else"), "{other}");
         cfg.provision = false;
-        assert!(account_for(&c, &cfg, Source::Oauth, "eve", &[]).unwrap().unwrap_err().contains("admin can add"));
+        assert!(account_for(&c, &cfg, Source::Oauth, "eve", None, &[]).unwrap().unwrap_err().contains("admin can add"));
     }
 }

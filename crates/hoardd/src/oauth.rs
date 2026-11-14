@@ -257,10 +257,17 @@ fn allowed(u: &str) -> bool {
 
 /// An `http://` address on this machine without its port: a native app may pick any port when it signs in.
 fn loopback(u: &str) -> Option<String> {
-    let rest = u.strip_prefix("http://")?;
-    let (authority, path) = rest.split_at(rest.find('/').unwrap_or(rest.len()));
-    let host = if authority.starts_with("[::1]") { "[::1]" } else { authority.split(':').next()? };
-    matches!(host, "localhost" | "127.0.0.1" | "[::1]").then(|| format!("http://{host}{path}"))
+    // Read as a browser reads it, so `http://localhost:1@evil.example/` is evil.example's, not this machine's.
+    let url = reqwest::Url::parse(u).ok()?;
+    if url.scheme() != "http" || !url.username().is_empty() || url.password().is_some() {
+        return None;
+    }
+    let host = url.host_str()?;
+    if !matches!(host, "localhost" | "127.0.0.1" | "[::1]") {
+        return None;
+    }
+    let query = url.query().map(|q| format!("?{q}")).unwrap_or_default();
+    Some(format!("http://{host}{}{query}", url.path()))
 }
 
 fn redirect_matches(registered: &[String], given: &str) -> bool {
@@ -570,7 +577,13 @@ mod tests {
         assert!(allowed("http://[::1]:9000/cb"));
         assert!(!allowed("http://example.com/cb"));
         assert!(!allowed("http://localhost.evil.com/cb"));
-        assert!(!allowed("http://evil@localhost/cb") || loopback("http://evil@localhost/cb").is_none());
+        assert!(!allowed("http://evil@localhost/cb"));
+        assert!(!allowed("http://localhost:1@evil.com/cb"));
+        assert!(
+            !allowed("http://localhost\\@evil.com/cb")
+                || loopback("http://localhost\\@evil.com/cb").is_some_and(|l| l.starts_with("http://localhost/"))
+        );
+        assert!(!redirect_matches(&["http://localhost/cb".to_owned()], "http://localhost:1@evil.com/cb"));
         assert!(!allowed("https://x.example/cb#frag"));
         assert!(!allowed("javascript:alert(1)"));
         let reg = vec!["http://localhost:1234/callback".to_owned(), "https://claude.ai/cb".to_owned()];

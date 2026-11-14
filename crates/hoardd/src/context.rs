@@ -5,7 +5,9 @@
 use std::fmt::Write as _;
 use std::fs::File;
 use std::io::Read as _;
+use std::net::{IpAddr, SocketAddr};
 use std::path::{Path, PathBuf};
+use std::sync::LazyLock;
 use std::time::Duration;
 
 use anyhow::{Context as _, Result};
@@ -45,7 +47,8 @@ const STORES: &[(&str, &str)] = &[
 
 /// The marketplace a URL belongs to, if it's one we know.
 pub(crate) fn store_from_url(url: &str) -> Option<&'static str> {
-    let host = url.split("://").nth(1)?.split(['/', '?', '#']).next()?.to_ascii_lowercase();
+    let url = reqwest::Url::parse(url).ok()?;
+    let host = url.host_str()?.to_ascii_lowercase();
     STORES.iter().find(|(h, _)| host == *h || host.ends_with(&format!(".{h}"))).map(|(_, s)| *s)
 }
 
@@ -118,7 +121,7 @@ pub(crate) async fn fill_store_text(state: &crate::AppState, pack_id: &str) {
     .ok()
     .flatten();
     let Some(url) = url else { return };
-    let text = match fetch_store_text(&state.http, &url).await {
+    let text = match fetch_store_text(web(), &url).await {
         Ok(Some(text)) => text.chars().take(MAX_STORE_TEXT).collect::<String>(),
         Ok(None) => return,
         Err(e) => {
@@ -145,8 +148,93 @@ pub(crate) async fn fetch_store_text(http: &reqwest::Client, url: &str) -> Resul
     Ok(page_summary(&fetch_page(http, url, "text/html").await?))
 }
 
+/// Is this an address on the internet, rather than this machine, the local network or something reserved?
+pub(crate) fn is_public_ip(ip: IpAddr) -> bool {
+    match ip {
+        IpAddr::V4(v4) => {
+            let [a, b, c, _] = v4.octets();
+            !(v4.is_private()
+                || v4.is_loopback()
+                || v4.is_link_local()
+                || v4.is_broadcast()
+                || v4.is_documentation()
+                || v4.is_unspecified()
+                || v4.is_multicast()
+                || a == 0
+                || a >= 240
+                || (a == 100 && (64..128).contains(&b))
+                || (a == 192 && b == 0 && c == 0)
+                || (a == 198 && (18..20).contains(&b)))
+        }
+        IpAddr::V6(v6) => {
+            if let Some(v4) = v6.to_ipv4_mapped() {
+                return is_public_ip(IpAddr::V4(v4));
+            }
+            let first = v6.segments()[0];
+            !(v6.is_loopback()
+                || v6.is_unspecified()
+                || v6.is_multicast()
+                || (first & 0xfe00) == 0xfc00
+                || (first & 0xffc0) == 0xfe80)
+        }
+    }
+}
+
+/// Looks names up as usual, but only answers with addresses on the internet.
+struct PublicOnly;
+
+impl reqwest::dns::Resolve for PublicOnly {
+    fn resolve(&self, name: reqwest::dns::Name) -> reqwest::dns::Resolving {
+        let host = name.as_str().to_owned();
+        Box::pin(async move {
+            let addrs: Vec<SocketAddr> = tokio::net::lookup_host((host.as_str(), 0)).await?.collect();
+            let public: Vec<SocketAddr> = addrs.into_iter().filter(|a| is_public_ip(a.ip())).collect();
+            if public.is_empty() {
+                return Err(format!("{host} isn't an address on the internet").into());
+            }
+            Ok(Box::new(public.into_iter()) as reqwest::dns::Addrs)
+        })
+    }
+}
+
+/// A host written as an address that isn't on the internet.
+fn private_literal(url: &reqwest::Url) -> bool {
+    match url.host_str() {
+        Some(host) => {
+            host.trim_start_matches('[').trim_end_matches(']').parse::<IpAddr>().is_ok_and(|ip| !is_public_ip(ip))
+        }
+        None => true,
+    }
+}
+
+/// The client for pages named by people or packs (store pages, store searches): it only goes to the internet, never
+/// to this machine or the local network (a NAS's admin page, a cloud's metadata address), however the address is
+/// written or wherever a redirect points.
+pub(crate) fn web() -> &'static reqwest::Client {
+    static WEB: LazyLock<reqwest::Client> = LazyLock::new(|| {
+        reqwest::Client::builder()
+            .dns_resolver(PublicOnly)
+            .redirect(reqwest::redirect::Policy::custom(|attempt| {
+                if attempt.previous().len() >= 5 {
+                    attempt.stop()
+                } else if private_literal(attempt.url()) {
+                    attempt.error("that address isn't on the internet")
+                } else {
+                    attempt.follow()
+                }
+            }))
+            .timeout(Duration::from_secs(180))
+            .build()
+            .expect("an HTTP client")
+    });
+    &WEB
+}
+
 /// A web page's text (the first 2 MB), fetched as Hoard.
 pub(crate) async fn fetch_page(http: &reqwest::Client, url: &str, accept: &str) -> Result<String> {
+    let parsed = reqwest::Url::parse(url).context("not a web address")?;
+    anyhow::ensure!(matches!(parsed.scheme(), "http" | "https"), "not a web address");
+    anyhow::ensure!(!private_literal(&parsed), "that address isn't on the internet");
     let resp = http
         .get(url)
         .header(reqwest::header::ACCEPT, accept)
@@ -263,6 +351,49 @@ pub(crate) fn decode_entities(s: &str) -> String {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn only_internet_addresses_are_public() {
+        for ip in [
+            "127.0.0.1",
+            "10.0.0.1",
+            "192.168.0.150",
+            "172.16.3.4",
+            "169.254.169.254",
+            "100.64.0.1",
+            "0.0.0.0",
+            "::1",
+            "fd00::1",
+            "fe80::1",
+            "::ffff:127.0.0.1",
+            "::ffff:192.168.1.1",
+            "198.18.0.1",
+            "255.255.255.255",
+        ] {
+            assert!(!is_public_ip(ip.parse().unwrap()), "{ip}");
+        }
+        for ip in ["1.1.1.1", "93.184.216.34", "2606:4700::1111", "::ffff:8.8.8.8"] {
+            assert!(is_public_ip(ip.parse().unwrap()), "{ip}");
+        }
+    }
+
+    #[test]
+    fn a_store_is_known_by_the_real_host() {
+        assert_eq!(store_from_url("https://someone.itch.io/pack"), Some("itch.io"));
+        assert_eq!(store_from_url("http://10.0.0.1\\@x.itch.io/"), None);
+        assert_eq!(store_from_url("http://evil.example/?x.itch.io"), None);
+    }
+
+    #[tokio::test]
+    async fn pages_on_this_machine_are_never_fetched() {
+        let listener = std::net::TcpListener::bind("127.0.0.1:0").unwrap();
+        let port = listener.local_addr().unwrap().port();
+        for url in
+            [format!("http://127.0.0.1:{port}/"), format!("http://localhost:{port}/"), format!("http://[::1]:{port}/")]
+        {
+            assert!(fetch_page(web(), &url, "text/html").await.is_err(), "{url}");
+        }
+    }
 
     #[test]
     fn summarizes_store_page() {

@@ -209,7 +209,13 @@ function pick(id: string) {
   if (!o || !p) return
   const { id: _id, label: _l, note: _n, ...fields } = p
   Object.assign(o, fields, { provider: id })
+  // Anyone at all has an account with these, so new accounts are an admin's choice to turn on.
+  if (id !== 'custom' && cfg.value) cfg.value.provision = false
 }
+/** Signing in makes accounts, with a provider anyone can have an account with, and no group needed. */
+const openToAnyone = computed(
+  () => cfg.value?.method === 'oauth' && cfg.value.provision && preset.value.id !== 'custom' && cfg.value.roles.view.length === 0,
+)
 const issuer = ref('')
 async function discover() {
   const o = cfg.value?.oauth
@@ -456,6 +462,9 @@ async function copyCallback() {
         <p class="what">
           {{ cfg.provision ? 'Otherwise an admin adds each person first, in Settings → Account.' : 'An admin adds each person first, in Settings → Account, choosing how they sign in.' }}
         </p>
+        <p v-if="openToAnyone" class="what bad" role="note">
+          Anyone with a {{ preset.label }} account can get in. Add viewer groups below, or turn this off and add people yourself.
+        </p>
         <div class="grid">
           <label for="auth-role">New accounts</label>
           <select id="auth-role" v-model="cfg.default_role" class="field">
@@ -495,6 +504,7 @@ section:first-child { border-top: 0; padding-top: 0; }
 h3 { margin: 0; font-size: 0.7rem; font-weight: 650; letter-spacing: 0.04em; text-transform: uppercase; color: var(--faint); }
 p { margin: 0; }
 .what { color: var(--muted); line-height: 1.5; }
+.what.bad { color: var(--danger); }
 .bad { color: var(--danger); line-height: 1.5; }
 .good { color: var(--ok); line-height: 1.5; }
 .mono { overflow-wrap: anywhere; }

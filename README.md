@@ -792,7 +792,8 @@ address in Settings → Connection so returned links are absolute.
 
 Each library location Hoard keeps is a folder, or an S3-compatible bucket: give the location's folder as
 `s3://<bucket>` and set the `HOARD_S3_*` variables for the endpoint and keys. The bucket can be Garage, RustFS, SeaweedFS or VersityGW on a NAS, or R2/B2/AWS. Downloads are streamed through the server with HTTP
-Range support (audio and video seek), and immutable caching headers let a CDN absorb repeat traffic.
+Range support (audio and video seek), and immutable caching headers let the browser keep them (and a CDN too, when
+guest browsing is on: otherwise they're marked private, so a shared cache never hands them out).
 `HOARD_S3_HEADERS` adds headers to every storage request, e.g. Cloudflare Access service-token headers when the NAS's
 S3 endpoint sits behind Access.
 
@@ -866,6 +867,7 @@ Set before starting (these need a restart):
 | `HOARD_WEB_DIR` | `./web/dist` | built portal |
 | `HOARD_LOCAL_LLM_URL` | `http://llm:8080/v1` | where the local model server listens (Settings → AI tagging → Local model) |
 | `HOARD_S3_ENDPOINT` / `_BUCKET` / `_REGION` / `_ACCESS_KEY` / `_SECRET_KEY` / `_HEADERS` | – | the S3 service for `s3://` library locations |
+| `HOARD_SETUP_CODE` | – | the setup code for the first account, instead of a new one in the log at each start |
 
 ## Keeping it safe
 
@@ -897,12 +899,18 @@ Maintenance → Shrink thumbnails re-stores the existing PNG ones.
   incremental sync is trivial.
 - `POST /api/admin/gc` deletes blobs no asset, thumbnail, derivative or kept original references (after deleting
   packs).
-- Uploads: path traversal rejected, archive expansion capped, symlinks in tarballs ignored.
+- Uploads: path traversal rejected, archive expansion capped, symlinks in tarballs ignored. A file opened on its own
+  is served sandboxed (no scripts, nothing loaded from elsewhere) unless it's a picture, sound, video or PDF, so an SVG
+  or HTML page in a pack can't act as whoever opened it.
+- Store pages and store searches are only fetched from the internet, never this machine or the local network, however
+  the address is written or wherever it redirects.
 
 ## Accounts and access tokens
 
-The first visit to a new server makes its first account, an admin. Add accounts for other people, change your
-password, and make access tokens in **Settings → Account**. Each account has a role:
+The first visit to a new server makes its first account, an admin, with the **setup code** the server prints in its
+log when it starts with no accounts (`docker compose logs hoard`), so whoever reaches a fresh server first can't claim
+it. Add accounts for other people, change your password, and make access tokens in **Settings → Account**. Each
+account has a role:
 
 | Role | Can |
 |---|---|
@@ -916,7 +924,7 @@ Library and Account pages of Settings.
 
 - **Signing in** gives the browser a session cookie (HttpOnly, SameSite=Lax) that lasts until you sign out or don't
   visit for 30 days, or for a set time from signing in if Settings → Authentication says so. Repeated wrong passwords
-  for a name are slowed down.
+  for a name are slowed down. Removing an account signs it out everywhere and revokes its tokens and connected apps.
 - **Access tokens** are for everything that isn't a browser: the `hoard` CLI (`--token` or `HOARD_TOKEN`), scripts and
   cron, MCP clients and the Unreal worker. They're sent as `Authorization: Bearer <token>`, shown once when made, and
   can be revoked; the list shows when each was last used. A token has a role too, up to its maker's (and lowered with
@@ -955,7 +963,16 @@ admin adds them in Settings → Account, choosing how they sign in), with the de
 list the groups whose members are admins, can change or can look: the highest that matches wins and is checked at
 every sign-in, and with groups listed under *Can look*, people in none of the listed groups are turned away. Their
 passwords are the directory's or provider's, so Hoard has none to change or reset for them, and a Hoard account of the
-same name that signs in another way is never taken over.
+same name that signs in another way is never taken over. An OAuth account belongs to who the provider says signed in
+(its issuer and `sub`), not the name: it follows them when they're renamed there, and someone else given their old name
+is turned away.
+
+Directory and OAuth accounts, with their sessions, tokens and connected apps, only work while that's how people sign
+in. An OAuth sign-in lasts a day unless Settings → Authentication sets a time. People from a directory are asked about
+again every 15 minutes: someone it no longer has (or, in Active Directory, has disabled), or who's left every group
+under *Can look*, is signed out everywhere, and everyone else's role follows their groups. A saved reader password or
+client secret is only sent where it was given: change the servers, how they're reached or the token address, and it's
+asked for again.
 
 From cron, with a token made for it:
 

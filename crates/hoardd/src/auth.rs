@@ -33,7 +33,7 @@ use sha2::Digest as _;
 
 use crate::AppState;
 use crate::error::{ApiResult, AppError};
-use crate::signin::Source;
+use crate::signin::{Gate, Source};
 use crate::{db, tools};
 
 /// The session cookie over plain `http://`.
@@ -205,53 +205,64 @@ fn password_matches(password: &str, hash: &str) -> bool {
 /// Checked against when there's no such name, so a wrong name takes as long as a wrong password.
 static DUMMY_HASH: LazyLock<String> = LazyLock::new(|| hash_password("not a password").unwrap_or_default());
 
-/// An access token's id, name and role, and its maker's role and id (gone if they were removed).
-type TokenRow = (i64, String, String, Option<String>, Option<i64>);
+/// An access token's id, name and role, and its maker's role, id and where they sign in.
+type TokenRow = (i64, String, String, String, i64, String);
 
 /// Who `cred` belongs to, if anyone. Notes the use (at most once a minute for tokens, once an hour for sessions).
-/// Sessions end after [`SESSION_DAYS`] unused, or `session_hours` after signing in when Settings → Authentication
-/// says so.
-fn lookup(c: &Connection, cred: &Credential, session_hours: Option<u32>) -> Result<Option<Who>> {
+/// Sessions end after [`SESSION_DAYS`] unused, or when `gate` says so. Nothing gets in for an account whose way of
+/// signing in is turned off (a directory account once the directory is), and a token goes with the account that made
+/// it.
+fn lookup(c: &Connection, cred: &Credential, gate: Gate) -> Result<Option<Who>> {
     match cred {
         Credential::Bearer(token) => {
             let hash = digest(token);
             let row: Option<TokenRow> = c
                 .query_row(
-                    "SELECT t.id, t.name, t.role, u.role, u.id
-                       FROM access_tokens t LEFT JOIN users u ON u.id = t.created_by WHERE t.token_hash = ?1",
+                    "SELECT t.id, t.name, t.role, u.role, u.id, u.source
+                       FROM access_tokens t JOIN users u ON u.id = t.created_by WHERE t.token_hash = ?1",
                     [&hash],
-                    |r| Ok((r.get(0)?, r.get(1)?, r.get(2)?, r.get(3)?, r.get(4)?)),
+                    |r| Ok((r.get(0)?, r.get(1)?, r.get(2)?, r.get(3)?, r.get(4)?, r.get(5)?)),
                 )
                 .optional()?;
-            if let Some((id, ..)) = &row {
-                c.execute(
-                    "UPDATE access_tokens SET last_used_at = ?2
-                      WHERE id = ?1 AND (last_used_at IS NULL OR unixepoch(last_used_at) < unixepoch('now') - 60)",
-                    params![id, db::now()],
-                )?;
-            }
-            match row {
-                Some((_, name, own, maker, owner)) => {
-                    let own = Role::stored(&own);
-                    let role = maker.map_or(own, |m| own.min(Role::stored(&m)));
-                    Ok(Some(Who::Token { name, role, owner }))
+            let Some((id, name, own, maker, owner, source)) = row else {
+                let who = crate::oauth::lookup(c, &hash)?;
+                if let Some(Who::Token { owner: Some(owner), .. }) = &who {
+                    let source: Option<String> =
+                        c.query_row("SELECT source FROM users WHERE id = ?1", [owner], |r| r.get(0)).optional()?;
+                    if !source.is_some_and(|s| gate.lets_in(&s)) {
+                        return Ok(None);
+                    }
                 }
-                None => Ok(crate::oauth::lookup(c, &hash)?),
+                return Ok(who);
+            };
+            if !gate.lets_in(&source) {
+                return Ok(None);
             }
+            c.execute(
+                "UPDATE access_tokens SET last_used_at = ?2
+                  WHERE id = ?1 AND (last_used_at IS NULL OR unixepoch(last_used_at) < unixepoch('now') - 60)",
+                params![id, db::now()],
+            )?;
+            let role = Role::stored(&own).min(Role::stored(&maker));
+            Ok(Some(Who::Token { name, role, owner: Some(owner) }))
         }
         Credential::Session(token) => {
             let hash = digest(token);
-            let row: Option<(i64, String, String, i64, i64)> = c
+            let row: Option<(i64, String, String, i64, i64, String)> = c
                 .query_row(
                     "SELECT u.id, u.username, u.role, unixepoch('now') - unixepoch(s.last_seen_at),
-                            unixepoch('now') - unixepoch(s.created_at)
+                            unixepoch('now') - unixepoch(s.created_at), u.source
                        FROM sessions s JOIN users u ON u.id = s.user_id WHERE s.token_hash = ?1",
                     [&hash],
-                    |r| Ok((r.get(0)?, r.get(1)?, r.get(2)?, r.get(3)?, r.get(4)?)),
+                    |r| Ok((r.get(0)?, r.get(1)?, r.get(2)?, r.get(3)?, r.get(4)?, r.get(5)?)),
                 )
                 .optional()?;
-            let Some((id, name, role, idle, age)) = row else { return Ok(None) };
-            if idle > SESSION_DAYS * 86_400 || session_hours.is_some_and(|h| age > i64::from(h) * 3600) {
+            let Some((id, name, role, idle, age, source)) = row else { return Ok(None) };
+            let hours = gate.session_hours(&source);
+            if !gate.lets_in(&source)
+                || idle > SESSION_DAYS * 86_400
+                || hours.is_some_and(|h| age > i64::from(h) * 3600)
+            {
                 c.execute("DELETE FROM sessions WHERE token_hash = ?1", [&hash])?;
                 return Ok(None);
             }
@@ -271,8 +282,8 @@ pub(crate) async fn authenticate(state: &AppState, method: &Method, headers: &He
     if matches!(cred, Credential::Session(_)) && !safe && !headers.contains_key(CSRF_HEADER) {
         return Err(AppError::forbidden("this request didn't come from the Hoard portal"));
     }
-    let hours = state.settings.get().auth.session_hours;
-    Ok(db::call(&state.pool, move |c| lookup(c, &cred, hours)).await?)
+    let gate = state.settings.get().auth.gate();
+    Ok(db::call(&state.pool, move |c| lookup(c, &cred, gate)).await?)
 }
 
 async fn require(state: &AppState, role: Role, mut req: Request, next: Next) -> ApiResult<Response> {
@@ -376,11 +387,11 @@ pub(crate) fn admin_router() -> Router<AppState> {
 async fn status(State(state): State<AppState>, headers: HeaderMap) -> ApiResult<Json<Value>> {
     let cred = credential(&headers);
     let settings = state.settings.get();
-    let hours = settings.auth.session_hours;
+    let gate = settings.auth.gate();
     let (accounts, who) = db::call(&state.pool, move |c| {
         let n: i64 = c.query_row("SELECT COUNT(*) FROM users", [], |r| r.get(0))?;
         let who = match cred {
-            Some(cred) => lookup(c, &cred, hours)?,
+            Some(cred) => lookup(c, &cred, gate)?,
             None => None,
         };
         let source: Option<String> = match &who {
@@ -413,6 +424,48 @@ async fn status(State(state): State<AppState>, headers: HeaderMap) -> ApiResult<
 struct Credentials {
     username: String,
     password: String,
+}
+
+#[derive(Deserialize)]
+struct SetupBody {
+    username: String,
+    password: String,
+    #[serde(default)]
+    code: String,
+}
+
+/// The code that makes the first account while there's none, from the server's log (or `HOARD_SETUP_CODE`): whoever
+/// reaches a fresh server's address first can't claim it, only someone who can see the server.
+static SETUP_CODE: Mutex<Option<String>> = Mutex::new(None);
+
+/// A setup code as typed: any case, with or without its dash.
+fn normalized_code(s: &str) -> String {
+    s.chars().filter(|c| !matches!(c, '-' | ' ')).flat_map(char::to_uppercase).collect()
+}
+
+/// When there's no account yet, choose the setup code and say it in the log.
+pub(crate) async fn prepare_setup(state: &AppState) -> Result<()> {
+    let accounts: i64 =
+        db::call(&state.pool, |c| Ok(c.query_row("SELECT COUNT(*) FROM users", [], |r| r.get(0))?)).await?;
+    if accounts > 0 {
+        return Ok(());
+    }
+    let given = state.cfg.setup_code.as_deref().map(str::trim).filter(|s| !s.is_empty());
+    let code = if let Some(code) = given {
+        tracing::warn!(
+            "This server has no accounts yet: open the portal and give the setup code from HOARD_SETUP_CODE"
+        );
+        code.to_owned()
+    } else {
+        const ALPHABET: &[u8] = b"ABCDEFGHJKMNPQRSTUVWXYZ23456789";
+        let s: String =
+            random_bytes::<10>()?.iter().map(|b| char::from(ALPHABET[usize::from(*b) % ALPHABET.len()])).collect();
+        let code = format!("{}-{}", &s[..5], &s[5..]);
+        tracing::warn!("This server has no accounts yet: open the portal and give the setup code {code}");
+        code
+    };
+    *SETUP_CODE.lock().unwrap_or_else(PoisonError::into_inner) = Some(normalized_code(&code));
+    Ok(())
 }
 
 /// A name and password fit to save, or what's wrong with them.
@@ -475,13 +528,24 @@ fn signed_in(headers: &HeaderMap, token: &str, name: &str, role: Role) -> ApiRes
     Ok(([(header::SET_COOKIE, set)], Json(json!({ "user": user }))).into_response())
 }
 
-/// The first account. Refused once there is one.
-async fn setup(
-    State(state): State<AppState>,
-    headers: HeaderMap,
-    Json(body): Json<Credentials>,
-) -> ApiResult<Response> {
+/// The first account, with the setup code from the server's log. Refused once there is one.
+async fn setup(State(state): State<AppState>, headers: HeaderMap, Json(body): Json<SetupBody>) -> ApiResult<Response> {
+    const TRIES: &str = "\u{1}setup";
+    if let Some(wait) = wait_for(TRIES) {
+        return Err(AppError::too_many(format!("Too many wrong codes: wait {} seconds", wait.as_secs().max(1))));
+    }
     let name = check_new(&body.username, &body.password)?;
+    let expected = SETUP_CODE.lock().unwrap_or_else(PoisonError::into_inner).clone();
+    let Some(expected) = expected else { return Err(AppError::conflict("There's already an account: sign in")) };
+    // Compared as digests, so how long it takes says nothing about how much of the code was right.
+    let right = digest(&normalized_code(&body.code)) == digest(&expected);
+    note_attempt(TRIES, right);
+    if !right {
+        return Err(AppError {
+            status: StatusCode::FORBIDDEN,
+            err: anyhow!("That isn't the setup code: the server prints it in its log when it starts"),
+        });
+    }
     let made = name.clone();
     let token = db::call(&state.pool, move |c| {
         let hash = hash_password(&body.password)?;
@@ -497,6 +561,7 @@ async fn setup(
     })
     .await?
     .ok_or_else(|| AppError::conflict("There's already an account: sign in"))?;
+    *SETUP_CODE.lock().unwrap_or_else(PoisonError::into_inner) = None;
     tracing::info!(user = %name, "first account made");
     signed_in(&headers, &token, &name, Role::Admin)
 }
@@ -562,7 +627,7 @@ async fn directory_login(
     let Some(person) = person else { return Ok(None) };
     let auth = auth.clone();
     let made = db::call(&state.pool, move |c| {
-        Ok(match crate::signin::account_for(c, &auth, Source::Ldap, &person.name, &person.groups)? {
+        Ok(match crate::signin::account_for(c, &auth, Source::Ldap, &person.name, None, &person.groups)? {
             Ok((id, username, role)) => Ok((new_session(c, id)?, username, role)),
             Err(msg) => Err(msg),
         })
@@ -736,11 +801,24 @@ async fn delete_user(
     if who.person()? == id {
         return Err(AppError::bad_request("You can't remove your own account while you're signed in to it"));
     }
-    let n = db::call(&state.pool, move |c| Ok(c.execute("DELETE FROM users WHERE id = ?1", [id])?)).await?;
+    // Their tokens and connected apps go with them.
+    let n = db::call(&state.pool, move |c| {
+        sign_out_everywhere(c, id)?;
+        Ok(c.execute("DELETE FROM users WHERE id = ?1", [id])?)
+    })
+    .await?;
     if n == 0 {
         return Err(AppError::not_found("account"));
     }
     Ok(StatusCode::NO_CONTENT)
+}
+
+/// End everything `user_id` is signed in with: sessions, access tokens and connected apps.
+pub(crate) fn sign_out_everywhere(c: &Connection, user_id: i64) -> rusqlite::Result<()> {
+    c.execute("DELETE FROM sessions WHERE user_id = ?1", [user_id])?;
+    c.execute("DELETE FROM access_tokens WHERE created_by = ?1", [user_id])?;
+    c.execute("DELETE FROM oauth_grants WHERE user_id = ?1", [user_id])?;
+    Ok(())
 }
 
 /// Whose tokens and connected apps `who` may see and revoke: everyone's for an admin (`None`), else their own.

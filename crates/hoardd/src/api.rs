@@ -95,6 +95,7 @@ pub(crate) fn router(state: &AppState) -> Router<AppState> {
         .route("/api/admin/chatgpt/finish", post(crate::chatgpt::finish))
         .route("/api/admin/chatgpt/sign-out", post(crate::chatgpt::sign_out_route))
         .route("/api/admin/chatgpt/models", get(crate::chatgpt::list_models))
+        .route("/api/admin/jobs", get(admin_jobs))
         .merge(crate::format_wizard::router())
         .merge(crate::auth::admin_router())
         .merge(crate::signin::admin_router())
@@ -128,7 +129,6 @@ pub(crate) fn router(state: &AppState) -> Router<AppState> {
         .route("/api/check", post(crate::check::check_handler))
         .route("/api/packs/{id}/credits", get(crate::credits::pack_credits))
         .route("/api/collections/{id}/credits", get(crate::credits::collection_credits))
-        .route("/api/admin/jobs", get(admin_jobs))
         .route("/api/assets/{id}/bundle.zip", get(asset_bundle))
         .route("/api/bundle.zip", get(selection_bundle))
         .route("/api/collections", get(list_collections))
@@ -361,7 +361,7 @@ async fn put_pack_context(
     if ctx.store_text.is_none()
         && let Some(url) = &ctx.store_url
     {
-        match context::fetch_store_text(&state.http, url).await {
+        match context::fetch_store_text(context::web(), url).await {
             Ok(text) => ctx.store_text = text,
             Err(e) => tracing::info!(url, error = %format!("{e:#}"), "couldn't fetch store page"),
         }
@@ -953,9 +953,23 @@ fn parse_range(headers: &HeaderMap) -> Option<GetRange> {
     }
 }
 
+/// What a file of this type may do when it's opened on its own. Files are whatever people uploaded, served from the
+/// portal's origin, so an SVG or HTML page with a script in it would run as whoever opened it: sandboxed with
+/// nothing allowed, it can't. Pictures, sound, video and PDFs are left alone, since browsers show them with their own
+/// viewers (a sandboxed PDF isn't shown at all).
+fn file_policy(content_type: &str) -> Option<&'static str> {
+    let ct = content_type.split(';').next().unwrap_or("").trim().to_ascii_lowercase();
+    let viewer = (ct.starts_with("image/") && !ct.contains("svg"))
+        || ct.starts_with("audio/")
+        || ct.starts_with("video/")
+        || ct == "application/pdf";
+    (!viewer).then_some("default-src 'none'; style-src 'unsafe-inline'; img-src data:; sandbox")
+}
+
 /// Stream a blob from storage to the client. This is the proxy path: when blobs live on a NAS, bytes flow
-/// NAS -> this server -> client. Blobs are immutable, so anything in front (Cloudflare, nginx, the browser)
-/// may cache them forever, which keeps repeat downloads off your home uplink.
+/// NAS -> this server -> client. Blobs are immutable, so the browser may keep them forever, and so may anything in
+/// front (Cloudflare, nginx) when guest browsing is on: otherwise they're private, since a shared cache would hand
+/// them to anyone with the address.
 pub(crate) async fn serve_blob(
     state: &AppState,
     hash: &str,
@@ -982,7 +996,18 @@ pub(crate) async fn serve_blob(
         .header(header::CONTENT_LENGTH, len)
         .header(header::ACCEPT_RANGES, "bytes")
         .header(header::ETAG, &etag)
-        .header(header::CACHE_CONTROL, "public, max-age=31536000, immutable");
+        .header(header::X_CONTENT_TYPE_OPTIONS, "nosniff")
+        .header(
+            header::CACHE_CONTROL,
+            if state.settings.get().guest_browsing {
+                "public, max-age=31536000, immutable"
+            } else {
+                "private, max-age=31536000, immutable"
+            },
+        );
+    if let Some(policy) = file_policy(content_type) {
+        resp = resp.header(header::CONTENT_SECURITY_POLICY, policy);
+    }
     if partial {
         resp = resp.header(
             header::CONTENT_RANGE,
@@ -2106,6 +2131,23 @@ mod tests {
         assert_eq!(parse_range(&h), Some(GetRange::Suffix(200)));
         h.insert(header::RANGE, HeaderValue::from_static("bytes=0-1,5-6"));
         assert_eq!(parse_range(&h), None);
+    }
+
+    #[test]
+    fn files_that_could_run_scripts_are_sandboxed() {
+        for ct in [
+            "image/svg+xml",
+            "text/html",
+            "application/xhtml+xml",
+            "text/xml",
+            "application/octet-stream",
+            "text/plain",
+        ] {
+            assert!(file_policy(ct).is_some_and(|p| p.contains("sandbox")), "{ct}");
+        }
+        for ct in ["image/png", "image/jpeg", "audio/ogg", "video/mp4", "application/pdf"] {
+            assert_eq!(file_policy(ct), None, "{ct}");
+        }
     }
 
     #[test]

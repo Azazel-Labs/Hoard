@@ -343,6 +343,11 @@ const MIGRATIONS: &[&str] = &[
     // 40: accounts whose sign-in a directory (LDAP, Active Directory) or an OAuth provider checks (see `signin`).
     // They have no password of their own (an empty hash, which never matches).
     "ALTER TABLE users ADD COLUMN source TEXT NOT NULL DEFAULT 'internal' CHECK (source IN ('internal', 'ldap', 'oauth'));",
+    // 41: who an OAuth account is at its provider (issuer and `sub`), so a name there can't stand in for them. Tokens
+    // go with the account that made them.
+    "ALTER TABLE users ADD COLUMN subject TEXT;
+     CREATE UNIQUE INDEX users_subject ON users(subject) WHERE subject IS NOT NULL;
+     DELETE FROM access_tokens WHERE created_by IS NULL;",
 ];
 
 /// How many automatic pre-upgrade backups to keep in `<data dir>/backups`.

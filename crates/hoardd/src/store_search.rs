@@ -653,7 +653,7 @@ pub(crate) async fn find_matches(state: &AppState, id: &str, typed: Option<&str>
         all.insert(1, named);
     }
 
-    let http = &state.http;
+    let http = crate::context::web();
     let fab = join_all(all.iter().take(FAB_QUERIES).enumerate().map(|(i, q)| search_fab(http, q, i == 0)));
     let others = join_all(all.iter().take(OTHER_QUERIES).flat_map(|q| {
         [

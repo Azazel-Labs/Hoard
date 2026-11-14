@@ -1,5 +1,5 @@
 # Garage single-node config for Hoard's blob storage. See https://garagehq.deuxfleurs.fr/documentation/
-# Replace both secrets: `openssl rand -hex 32` for rpc_secret, `openssl rand -base64 32` for the tokens.
+# Replace rpc_secret with your own: `openssl rand -hex 32`.
 metadata_dir = "/var/lib/garage/meta"
 data_dir = "/var/lib/garage/data"
 db_engine = "sqlite"
@@ -18,7 +18,5 @@ root_domain = ".s3.garage.localhost"
 bind_addr = "[::]:3902"
 root_domain = ".web.garage.localhost"
 
-[admin]
-api_bind_addr = "[::]:3903"
-admin_token = "CHANGE_ME"
-metrics_token = "CHANGE_ME"
+# No [admin] section: Hoard never uses Garage's admin API, so it isn't served (the `garage` command works without
+# it). Add one with tokens of your own if you want metrics.

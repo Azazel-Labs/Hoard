@@ -53,6 +53,11 @@ pub(crate) struct Config {
     #[arg(long, env = "HOARD_WEB_DIR", default_value = "./web/dist")]
     pub(crate) web_dir: PathBuf,
 
+    /// The code that makes the first account. Without it, a server with no accounts prints a new one in its log each
+    /// time it starts.
+    #[arg(long, env = "HOARD_SETUP_CODE", hide_env_values = true)]
+    pub(crate) setup_code: Option<String>,
+
     /// Give this account a new random password, print it, and exit (the server isn't started). For a forgotten
     /// password: `docker compose exec hoard hoardd --reset-password <name>`.
     #[arg(long, value_name = "NAME")]

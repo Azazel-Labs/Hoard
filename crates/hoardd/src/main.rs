@@ -173,6 +173,8 @@ async fn main() -> Result<()> {
         clip: clip::Index::default(),
         sounds: sounds::Index::default(),
     });
+    auth::prepare_setup(&state).await?;
+    tokio::spawn(signin::recheck_loop(Arc::clone(&state)));
     match uploads::sweep_stale(&state) {
         Ok(0) => {}
         Ok(n) => tracing::info!(removed = n, "removed abandoned upload sessions"),
@@ -241,6 +243,9 @@ async fn cache_headers(req: Request, next: Next) -> Response {
     let path = req.uri().path().to_owned();
     let mut resp = next.run(req).await;
     let headers = resp.headers_mut();
+    // Nothing is guessed at from its bytes, and no other site can show the portal in a frame to trick clicks on it.
+    headers.insert(header::X_CONTENT_TYPE_OPTIONS, HeaderValue::from_static("nosniff"));
+    headers.insert(header::X_FRAME_OPTIONS, HeaderValue::from_static("SAMEORIGIN"));
     if !path.starts_with("/api/") && !path.starts_with("/mcp") && !headers.contains_key(header::CACHE_CONTROL) {
         let value = if path.starts_with("/assets/") { "public, max-age=31536000, immutable" } else { "no-cache" };
         headers.insert(header::CACHE_CONTROL, HeaderValue::from_static(value));

@@ -1067,8 +1067,8 @@ export const api = {
     }),
   checkCert: (cert: string, key: string) => post<CertCheck>('/api/admin/https/check', { cert, key }),
   authStatus: () => request<AuthStatus>('/api/auth/status'),
-  setup: (username: string, password: string) =>
-    post<{ user: { name: string } }>('/api/auth/setup', { username, password }),
+  setup: (username: string, password: string, code: string) =>
+    post<{ user: { name: string } }>('/api/auth/setup', { username, password, code }),
   login: (username: string, password: string) =>
     post<{ user: { name: string } }>('/api/auth/login', { username, password }),
   logout: () => request<void>('/api/auth/logout', { method: 'POST' }),

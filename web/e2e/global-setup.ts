@@ -15,6 +15,9 @@ const here = dirname(fileURLToPath(import.meta.url))
 const webDir = resolve(here, '..')
 const repo = resolve(webDir, '..')
 
+/** What makes the first account: a fresh server only takes the one in its log, or this when it's given. */
+const SETUP_CODE = 'E2E-SETUP'
+
 /** `HOARD_BIN`, or the newest hoardd built in the usual places. */
 function findBinary(): string {
   const fromEnv = process.env.HOARD_BIN
@@ -78,7 +81,7 @@ export default async function globalSetup(_config: FullConfig): Promise<void> {
   const log = openSync(logFile, 'w')
   const child = spawn(bin, ['--listen', `127.0.0.1:${port}`, '--data-dir', dataDir, '--web-dir', webDist], {
     stdio: ['ignore', log, log],
-    env: { ...process.env, RUST_LOG: process.env.RUST_LOG ?? 'info' },
+    env: { ...process.env, RUST_LOG: process.env.RUST_LOG ?? 'info', HOARD_SETUP_CODE: SETUP_CODE },
   })
   let exit: string | null = null
   child.on('exit', (code, signal) => (exit = `code ${code}, signal ${signal}`))
@@ -91,7 +94,7 @@ export default async function globalSetup(_config: FullConfig): Promise<void> {
   await waitUp(url, () => exit)
 
   const anon = await request.newContext({ baseURL: url, extraHTTPHeaders: HOARD_HEADERS })
-  const setup = await anon.post('/api/auth/setup', { data: { username: USERNAME, password: PASSWORD } })
+  const setup = await anon.post('/api/auth/setup', { data: { username: USERNAME, password: PASSWORD, code: SETUP_CODE } })
   if (!setup.ok()) throw new Error(`account setup failed: ${setup.status()} ${await setup.text()}`)
   await anon.dispose()
 

@@ -11,6 +11,7 @@ const emit = defineEmits<{ done: []; close: [] }>()
 const username = ref('')
 const password = ref('')
 const again = ref('')
+const code = ref('')
 const busy = ref(false)
 /** Signing in with a provider came back with a reason it didn't work: say it once, and take it out of the address. */
 const turnedAway = new URLSearchParams(location.search).get('signin_error')
@@ -31,7 +32,10 @@ const others = computed(() => (setup.value ? null : (auth.status?.sign_in ?? nul
 const f = computed(() => (setup.value ? 'signup' : 'signin'))
 const mismatch = computed(() => setup.value && again.value !== '' && again.value !== password.value)
 const ready = computed(
-  () => username.value.trim() !== '' && password.value !== '' && (!setup.value || (password.value.length >= 8 && again.value === password.value)),
+  () =>
+    username.value.trim() !== '' &&
+    password.value !== '' &&
+    (!setup.value || (password.value.length >= 8 && again.value === password.value && code.value.trim() !== '')),
 )
 
 onMounted(() => nextTick(() => nameEl.value?.focus()))
@@ -41,7 +45,7 @@ async function submit() {
   busy.value = true
   error.value = ''
   try {
-    if (setup.value) await api.setup(username.value.trim(), password.value)
+    if (setup.value) await api.setup(username.value.trim(), password.value, code.value.trim())
     else await api.login(username.value.trim(), password.value)
     emit('done')
   } catch (e) {
@@ -111,6 +115,23 @@ async function submit() {
           :aria-describedby="mismatch ? 'signup-mismatch' : undefined"
         />
         <small v-if="mismatch" id="signup-mismatch" class="rule bad">The two passwords don’t match.</small>
+        <label for="setup-code">Setup code</label>
+        <input
+          id="setup-code"
+          name="setup-code"
+          v-model="code"
+          class="field mono"
+          autocomplete="off"
+          autocapitalize="characters"
+          spellcheck="false"
+          maxlength="64"
+          required
+          aria-describedby="setup-code-hint"
+        />
+        <small id="setup-code-hint" class="rule">
+          The server prints it in its log when it starts (in Docker, <span class="mono">docker compose logs hoard</span>), so only someone who
+          runs the server can claim it.
+        </small>
       </template>
 
       <p v-if="error" class="err" role="alert">{{ error }}</p>

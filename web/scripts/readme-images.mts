@@ -150,6 +150,7 @@ async function startServer(root: string): Promise<{ url: string; child: ChildPro
   mkdirSync(join(root, 'library'))
   const child = spawn(hoardd(), ['--listen', `127.0.0.1:${port}`, '--data-dir', join(root, 'data'), '--web-dir', join(web, 'dist')], {
     stdio: 'ignore',
+    env: { ...process.env, HOARD_SETUP_CODE: 'README' },
   })
   for (let i = 0; i < 600; i++) {
     if (child.exitCode !== null) throw new Error(`hoardd exited (${child.exitCode})`)
@@ -165,7 +166,7 @@ async function startServer(root: string): Promise<{ url: string; child: ChildPro
 
 async function fillLibrary(url: string, root: string): Promise<{ api: APIRequestContext; hero: string }> {
   const anon = await request.newContext({ baseURL: url, extraHTTPHeaders: HEADERS })
-  await anon.post('/api/auth/setup', { data: { username: USER, password: PASSWORD } })
+  await anon.post('/api/auth/setup', { data: { username: USER, password: PASSWORD, code: 'README' } })
   await anon.dispose()
   const api = await request.newContext({ baseURL: url, extraHTTPHeaders: HEADERS })
   await api.post('/api/auth/login', { data: { username: USER, password: PASSWORD } })

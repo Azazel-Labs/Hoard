@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "c3a648fe06168ec030cbf90c412711e419a9c02c780615c74c3780fbcd3cd6d4"
+source = "891f79f948a92d869b9df6f77d941aa064980bd848aa25e819f5cb33945415d3"
 translation = "d073d842e3907b36df735ef3f28cef79117bc68ca6aa17eb939d93ae4dfa9de0"
 
 [messages.account-add]
@@ -1758,6 +1758,10 @@ translation = "I dine favoritter (F fjerner det)"
 source = "File"
 translation = "Fil"
 
+[messages.asset-in-atlas]
+source = "In atlas"
+translation = "I atlas"
+
 [messages.asset-in-pack]
 source = "in"
 translation = "i"
@@ -2230,6 +2234,10 @@ translation = "materialefil"
 source = "store details"
 translation = "butiksoplysninger"
 
+[messages.asset-rel-sprite]
+source = "sprite"
+translation = "sprite"
+
 [messages.asset-rel-texture]
 source = "texture"
 translation = "tekstur"
@@ -2265,6 +2273,10 @@ translation = "Vis arket med de fire visninger, som taggeren så"
 [messages.asset-source]
 source = "Source"
 translation = "Kilde"
+
+[messages.asset-sprites]
+source = "Sprites"
+translation = "Sprites"
 
 [messages.asset-swatch-aria]
 source = "Find assets with { $hex }, { $percent }% of this picture"

@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "c3a648fe06168ec030cbf90c412711e419a9c02c780615c74c3780fbcd3cd6d4"
+source = "891f79f948a92d869b9df6f77d941aa064980bd848aa25e819f5cb33945415d3"
 translation = "a3af76f04bd0cf3a54e80250b023600249f866c9e9f2a002a568b2b09fe11ed2"
 
 [messages.account-add]
@@ -1765,6 +1765,10 @@ translation = "У вашим омиљенима (F га уклања)"
 source = "File"
 translation = "Датотека"
 
+[messages.asset-in-atlas]
+source = "In atlas"
+translation = "У атласу"
+
 [messages.asset-in-pack]
 source = "in"
 translation = "у"
@@ -2240,6 +2244,10 @@ translation = "датотека материјала"
 source = "store details"
 translation = "подаци из продавнице"
 
+[messages.asset-rel-sprite]
+source = "sprite"
+translation = "спрајт"
+
 [messages.asset-rel-texture]
 source = "texture"
 translation = "текстура"
@@ -2275,6 +2283,10 @@ translation = "Прикажи лист с четири погледа који �
 [messages.asset-source]
 source = "Source"
 translation = "Извор"
+
+[messages.asset-sprites]
+source = "Sprites"
+translation = "Спрајтови"
 
 [messages.asset-swatch-aria]
 source = "Find assets with { $hex }, { $percent }% of this picture"

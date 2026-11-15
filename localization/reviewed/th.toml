@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "c3a648fe06168ec030cbf90c412711e419a9c02c780615c74c3780fbcd3cd6d4"
+source = "891f79f948a92d869b9df6f77d941aa064980bd848aa25e819f5cb33945415d3"
 translation = "a5124539186f3504db97de01588f221c92e88a2330b0ab03677434b7d099a580"
 
 [messages.account-add]
@@ -1691,6 +1691,10 @@ translation = "อยู่ในรายการโปรดของคุ�
 source = "File"
 translation = "ไฟล์"
 
+[messages.asset-in-atlas]
+source = "In atlas"
+translation = "ในแอตลาส"
+
 [messages.asset-in-pack]
 source = "in"
 translation = "ใน"
@@ -2157,6 +2161,10 @@ translation = "ไฟล์แมทีเรียล"
 source = "store details"
 translation = "รายละเอียดร้านค้า"
 
+[messages.asset-rel-sprite]
+source = "sprite"
+translation = "สไปรต์"
+
 [messages.asset-rel-texture]
 source = "texture"
 translation = "เท็กซ์เจอร์"
@@ -2192,6 +2200,10 @@ translation = "แสดงแผ่นภาพสี่มุมมองท�
 [messages.asset-source]
 source = "Source"
 translation = "แหล่งที่มา"
+
+[messages.asset-sprites]
+source = "Sprites"
+translation = "สไปรต์"
 
 [messages.asset-swatch-aria]
 source = "Find assets with { $hex }, { $percent }% of this picture"

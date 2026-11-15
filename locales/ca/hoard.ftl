@@ -1227,6 +1227,7 @@ asset-rel-library = fitxer enllaçat
 asset-rel-guess = probablement va amb
 asset-rel-sidecar = detalls de botiga
 asset-rel-variant = variant
+asset-rel-sprite = sprite
 asset-role-map = mapa: { $role }
 asset-maps-count =
     { $count ->
@@ -1235,6 +1236,8 @@ asset-maps-count =
     }
 asset-needs = Necessita
 asset-animations = Animacions
+asset-sprites = Sprites
+asset-in-atlas = A l’atles
 asset-used-by = Utilitzat per
 asset-conversion-failed = la conversió ha fallat
 asset-as-converting = S'està convertint…

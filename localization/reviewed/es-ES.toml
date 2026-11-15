@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "c3a648fe06168ec030cbf90c412711e419a9c02c780615c74c3780fbcd3cd6d4"
+source = "891f79f948a92d869b9df6f77d941aa064980bd848aa25e819f5cb33945415d3"
 translation = "e0f39abe16802379cc848347bf542db29c817463f994599dea644c28869d6f85"
 
 [messages.account-add]
@@ -1766,6 +1766,10 @@ translation = "En tus favoritos (F lo quita)"
 source = "File"
 translation = "Archivo"
 
+[messages.asset-in-atlas]
+source = "In atlas"
+translation = "En el atlas"
+
 [messages.asset-in-pack]
 source = "in"
 translation = "en"
@@ -2238,6 +2242,10 @@ translation = "archivo de material"
 source = "store details"
 translation = "datos de tienda"
 
+[messages.asset-rel-sprite]
+source = "sprite"
+translation = "sprite"
+
 [messages.asset-rel-texture]
 source = "texture"
 translation = "textura"
@@ -2273,6 +2281,10 @@ translation = "Mostrar la hoja de cuatro vistas que vio el etiquetador"
 [messages.asset-source]
 source = "Source"
 translation = "Origen"
+
+[messages.asset-sprites]
+source = "Sprites"
+translation = "Sprites"
 
 [messages.asset-swatch-aria]
 source = "Find assets with { $hex }, { $percent }% of this picture"

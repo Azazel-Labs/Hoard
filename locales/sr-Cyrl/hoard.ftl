@@ -1269,6 +1269,7 @@ asset-rel-library = повезана датотека
 asset-rel-guess = вероватно иде уз
 asset-rel-sidecar = подаци из продавнице
 asset-rel-variant = варијанта
+asset-rel-sprite = спрајт
 asset-role-map = мапа типа { $role }
 asset-maps-count =
     { $count ->
@@ -1278,6 +1279,8 @@ asset-maps-count =
     }
 asset-needs = Потребно
 asset-animations = Анимације
+asset-sprites = Спрајтови
+asset-in-atlas = У атласу
 asset-used-by = Користи га
 asset-conversion-failed = претварање није успело
 asset-as-converting = Претварање…

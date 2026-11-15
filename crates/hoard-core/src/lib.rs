@@ -457,6 +457,8 @@ pub enum LinkRel {
     Sidecar,
     /// A sibling in the same variant family. Computed, never stored as a link.
     Variant,
+    /// A sprite packed in this atlas page. Not something the page needs: each sprite is in it already.
+    Sprite,
 }
 
 impl LinkRel {
@@ -470,6 +472,7 @@ impl LinkRel {
             LinkRel::Guess => "guess",
             LinkRel::Sidecar => "sidecar",
             LinkRel::Variant => "variant",
+            LinkRel::Sprite => "sprite",
         }
     }
     pub fn parse(s: &str) -> Option<Self> {
@@ -482,6 +485,7 @@ impl LinkRel {
             "guess" => LinkRel::Guess,
             "sidecar" => LinkRel::Sidecar,
             "variant" => LinkRel::Variant,
+            "sprite" => LinkRel::Sprite,
             _ => return None,
         })
     }

@@ -1323,6 +1323,7 @@ asset-rel-library = propojený soubor
 asset-rel-guess = nejspíš patří k
 asset-rel-sidecar = údaje z obchodu
 asset-rel-variant = varianta
+asset-rel-sprite = sprite
 asset-role-map = mapa typu { $role }
 asset-maps-count =
     { $count ->
@@ -1332,6 +1333,8 @@ asset-maps-count =
     }
 asset-needs = Potřebuje
 asset-animations = Animace
+asset-sprites = Sprity
+asset-in-atlas = V atlasu
 asset-used-by = Používá ho
 asset-conversion-failed = převod selhal
 asset-as-converting = Převádím…

@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "c3a648fe06168ec030cbf90c412711e419a9c02c780615c74c3780fbcd3cd6d4"
+source = "891f79f948a92d869b9df6f77d941aa064980bd848aa25e819f5cb33945415d3"
 translation = "ce76896eda079d0047893c1a9ed497c2b58da807c5aa0d961cf1fd28e025c5ee"
 
 [messages.account-add]
@@ -1758,6 +1758,10 @@ translation = "Als vostres preferits (F el treu)"
 source = "File"
 translation = "Fitxer"
 
+[messages.asset-in-atlas]
+source = "In atlas"
+translation = "A l’atles"
+
 [messages.asset-in-pack]
 source = "in"
 translation = "a"
@@ -2230,6 +2234,10 @@ translation = "fitxer de material"
 source = "store details"
 translation = "detalls de botiga"
 
+[messages.asset-rel-sprite]
+source = "sprite"
+translation = "sprite"
+
 [messages.asset-rel-texture]
 source = "texture"
 translation = "textura"
@@ -2265,6 +2273,10 @@ translation = "Mostra el full de quatre vistes que ha vist l'etiquetador"
 [messages.asset-source]
 source = "Source"
 translation = "Origen"
+
+[messages.asset-sprites]
+source = "Sprites"
+translation = "Sprites"
 
 [messages.asset-swatch-aria]
 source = "Find assets with { $hex }, { $percent }% of this picture"

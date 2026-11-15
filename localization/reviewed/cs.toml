@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "c3a648fe06168ec030cbf90c412711e419a9c02c780615c74c3780fbcd3cd6d4"
+source = "891f79f948a92d869b9df6f77d941aa064980bd848aa25e819f5cb33945415d3"
 translation = "ebb9867350f07ef10a3efb802fdc3be8d6657d7e6160ffddbc175d2f25278e53"
 
 [messages.account-add]
@@ -1790,6 +1790,10 @@ translation = "V oblíbených (F ho odebere)"
 source = "File"
 translation = "Soubor"
 
+[messages.asset-in-atlas]
+source = "In atlas"
+translation = "V atlasu"
+
 [messages.asset-in-pack]
 source = "in"
 translation = "v"
@@ -2265,6 +2269,10 @@ translation = "soubor materiálu"
 source = "store details"
 translation = "údaje z obchodu"
 
+[messages.asset-rel-sprite]
+source = "sprite"
+translation = "sprite"
+
 [messages.asset-rel-texture]
 source = "texture"
 translation = "textura"
@@ -2300,6 +2308,10 @@ translation = "Zobrazit čtyřpohledový list, který viděl štítkovač"
 [messages.asset-source]
 source = "Source"
 translation = "Zdroj"
+
+[messages.asset-sprites]
+source = "Sprites"
+translation = "Sprity"
 
 [messages.asset-swatch-aria]
 source = "Find assets with { $hex }, { $percent }% of this picture"

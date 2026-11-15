@@ -1271,6 +1271,7 @@ asset-rel-library = linkitetty tiedosto
 asset-rel-guess = kuuluu luultavasti yhteen
 asset-rel-sidecar = kauppatiedot
 asset-rel-variant = muunnelma
+asset-rel-sprite = sprite
 asset-role-map = kartta: { $role }
 asset-maps-count =
     { $count ->
@@ -1279,6 +1280,8 @@ asset-maps-count =
     }
 asset-needs = Tarvitsee
 asset-animations = Animaatiot
+asset-sprites = Spritet
+asset-in-atlas = Atlaksessa
 asset-used-by = Käyttäjät
 asset-conversion-failed = muunnos epäonnistui
 asset-as-converting = Muunnetaan…

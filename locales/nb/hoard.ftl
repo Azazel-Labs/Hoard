@@ -1223,6 +1223,7 @@ asset-rel-library = lenket fil
 asset-rel-guess = hører trolig til
 asset-rel-sidecar = butikkdetaljer
 asset-rel-variant = variant
+asset-rel-sprite = sprite
 asset-role-map = { $role }-kart
 asset-maps-count =
     { $count ->
@@ -1231,6 +1232,8 @@ asset-maps-count =
     }
 asset-needs = Trenger
 asset-animations = Animasjoner
+asset-sprites = Sprites
+asset-in-atlas = I atlas
 asset-used-by = Brukes av
 asset-conversion-failed = konverteringen mislyktes
 asset-as-converting = Konverterer …

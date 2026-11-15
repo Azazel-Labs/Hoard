@@ -1328,6 +1328,7 @@ asset-rel-library = fișier legat
 asset-rel-guess = probabil merge cu
 asset-rel-sidecar = detalii de magazin
 asset-rel-variant = variantă
+asset-rel-sprite = sprite
 asset-role-map = hartă de { $role }
 asset-maps-count =
     { $count ->
@@ -1337,6 +1338,8 @@ asset-maps-count =
     }
 asset-needs = Are nevoie de
 asset-animations = Animații
+asset-sprites = Sprite-uri
+asset-in-atlas = În atlas
 asset-used-by = Folosit de
 asset-conversion-failed = conversia a eșuat
 asset-as-converting = Se convertește…

@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "c3a648fe06168ec030cbf90c412711e419a9c02c780615c74c3780fbcd3cd6d4"
+source = "891f79f948a92d869b9df6f77d941aa064980bd848aa25e819f5cb33945415d3"
 translation = "2701cb3147c57e837f2b2456d8b8bfc81b269cd92a0d8a2997fa5b09d72a7926"
 
 [messages.account-add]
@@ -1694,6 +1694,10 @@ translation = "Có trong mục yêu thích (F để bỏ ra)"
 source = "File"
 translation = "Tệp"
 
+[messages.asset-in-atlas]
+source = "In atlas"
+translation = "Trong atlas"
+
 [messages.asset-in-pack]
 source = "in"
 translation = "trong"
@@ -2154,6 +2158,10 @@ translation = "tệp vật liệu"
 source = "store details"
 translation = "thông tin cửa hàng"
 
+[messages.asset-rel-sprite]
+source = "sprite"
+translation = "sprite"
+
 [messages.asset-rel-texture]
 source = "texture"
 translation = "texture"
@@ -2189,6 +2197,10 @@ translation = "Hiện bảng bốn góc nhìn mà bộ gắn thẻ đã xem"
 [messages.asset-source]
 source = "Source"
 translation = "Nguồn"
+
+[messages.asset-sprites]
+source = "Sprites"
+translation = "Sprite"
 
 [messages.asset-swatch-aria]
 source = "Find assets with { $hex }, { $percent }% of this picture"

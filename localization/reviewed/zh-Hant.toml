@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "c3a648fe06168ec030cbf90c412711e419a9c02c780615c74c3780fbcd3cd6d4"
+source = "891f79f948a92d869b9df6f77d941aa064980bd848aa25e819f5cb33945415d3"
 translation = "cdd4835079c4d81044254371837d772d61f200a1ab5ae6e412f7ffd9bf3987ef"
 
 [messages.account-add]
@@ -1694,6 +1694,10 @@ translation = "已在你的最愛中（按 F 移除）"
 source = "File"
 translation = "檔案"
 
+[messages.asset-in-atlas]
+source = "In atlas"
+translation = "所在圖集"
+
 [messages.asset-in-pack]
 source = "in"
 translation = "位於"
@@ -2160,6 +2164,10 @@ translation = "材質檔"
 source = "store details"
 translation = "商店詳細資訊"
 
+[messages.asset-rel-sprite]
+source = "sprite"
+translation = "精靈"
+
 [messages.asset-rel-texture]
 source = "texture"
 translation = "貼圖"
@@ -2195,6 +2203,10 @@ translation = "顯示標記器看到的四視圖"
 [messages.asset-source]
 source = "Source"
 translation = "來源"
+
+[messages.asset-sprites]
+source = "Sprites"
+translation = "精靈"
 
 [messages.asset-swatch-aria]
 source = "Find assets with { $hex }, { $percent }% of this picture"

@@ -10,7 +10,7 @@ export type TagSource = 'meta' | 'rule' | 'ai' | 'human'
 
 export interface Tag { tag: string; source: TagSource; confidence: number }
 
-export type LinkRel = 'texture' | 'buffer' | 'material' | 'animation' | 'library' | 'guess' | 'sidecar' | 'variant'
+export type LinkRel = 'texture' | 'buffer' | 'material' | 'animation' | 'library' | 'guess' | 'sidecar' | 'variant' | 'sprite'
 
 export interface AssetLink {
   id: string

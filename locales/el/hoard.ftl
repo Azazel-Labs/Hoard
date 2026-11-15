@@ -1271,6 +1271,7 @@ asset-rel-library = συνδεδεμένο αρχείο
 asset-rel-guess = μάλλον συνοδεύει
 asset-rel-sidecar = στοιχεία καταστήματος
 asset-rel-variant = παραλλαγή
+asset-rel-sprite = sprite
 asset-role-map = χάρτης { $role }
 asset-maps-count =
     { $count ->
@@ -1279,6 +1280,8 @@ asset-maps-count =
     }
 asset-needs = Χρειάζεται
 asset-animations = Animation
+asset-sprites = Sprites
+asset-in-atlas = Στον άτλαντα
 asset-used-by = Χρησιμοποιείται από
 asset-conversion-failed = η μετατροπή απέτυχε
 asset-as-converting = Μετατροπή…

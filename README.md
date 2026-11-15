@@ -259,6 +259,11 @@ software rasterizer (`apt install mesa-vulkan-drivers`). Without any adapter, ev
      sheet tagged `spritesheet` or `frames` plays when asked, cut into the frame size its name gives (`coin_16x16.png`)
      or where the see-through gutters between its frames are, skipping empty cells; the columns, rows and speed can be
      changed. With reduced motion asked for, they wait to be played.
+   - Sprite atlases (Starling/Sparrow XML, TexturePacker JSON including multipack, libGDX `.atlas` and Cocos2d
+     `.plist`): each sprite becomes an asset of its own, cut from its page, turned back upright and put back on its
+     untrimmed canvas, at `<atlas name>/<sprite name>.png` and tagged `sprite`. A sprite the pack also has as a loose
+     file (the same pixels, or the same name and shape) is that file instead of a copy. The page lists its sprites
+     and each sprite names the page it's from; the atlas file needs its page.
    - Fonts (TTF, OTF, TTC, WOFF, WOFF2): family and style (used as the name), designer, license, weight, italic, monospace,
      variable axes, glyph count and the writing systems covered, with an "Aa" specimen as the thumbnail. Symbol
      fonts show their first glyphs. Tagged `weight:bold`, `script:cyrillic`, `monospace`, `variable-font`, `icons`.

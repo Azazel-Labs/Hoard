@@ -104,8 +104,12 @@ const REL_LABEL: Record<LinkRel, string> = {
   get guess() { return t('asset-rel-guess') },
   get sidecar() { return t('asset-rel-sidecar') },
   get variant() { return t('asset-rel-variant') },
+  get sprite() { return t('asset-rel-sprite') },
 }
-const needs = computed(() => props.asset.links.filter((l) => l.rel !== 'animation'))
+const needs = computed(() => props.asset.links.filter((l) => l.rel !== 'animation' && l.rel !== 'sprite'))
+// An atlas page lists the sprites cut from it, and a sprite names the page it's cut from: neither needs the other.
+const sprites = computed(() => props.asset.links.filter((l) => l.rel === 'sprite'))
+const inAtlas = computed(() => props.asset.linked_from.filter((l) => l.rel === 'sprite'))
 // A material made from texture maps lists its maps by role instead of as "Needs"; a texture or model that belongs
 // to one names it.
 const isMaterial = computed(() => isMaterialAsset(props.asset))
@@ -123,11 +127,15 @@ const mapSize = (m: MaterialMap) => (m.resolution ? sizeLabel(m.resolution) : m.
 const mapsBytes = computed(() => material.value?.maps.reduce((n, m) => n + m.size, 0) ?? 0)
 const anims = computed(() => props.asset.links.filter((l) => l.rel === 'animation'))
 // The materials it belongs to have a section of their own.
-const usedBy = computed(() => props.asset.linked_from.filter((l) => !partOf.value.some((m) => m.id === l.id)))
+const usedBy = computed(() =>
+  props.asset.linked_from.filter((l) => l.rel !== 'sprite' && !partOf.value.some((m) => m.id === l.id)),
+)
 const linkGroups = computed(() =>
   [
     { key: 'needs', title: t('asset-needs'), items: isMaterial.value ? [] : needs.value.filter((l) => !inMaterials.value.has(l.id)) },
     { key: 'animations', title: t('asset-animations'), items: anims.value },
+    { key: 'sprites', title: t('asset-sprites'), items: sprites.value },
+    { key: 'in-atlas', title: t('asset-in-atlas'), items: inAtlas.value },
     { key: 'used-by', title: t('asset-used-by'), items: usedBy.value },
   ].filter((g) => g.items.length),
 )

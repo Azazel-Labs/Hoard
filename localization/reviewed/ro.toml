@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "c3a648fe06168ec030cbf90c412711e419a9c02c780615c74c3780fbcd3cd6d4"
+source = "891f79f948a92d869b9df6f77d941aa064980bd848aa25e819f5cb33945415d3"
 translation = "07c41192b2a6ae3c09166a8e2ef568f2c0f361580c067f608d0e66c26744b910"
 
 [messages.account-add]
@@ -1805,6 +1805,10 @@ translation = "În favoritele dvs. (F o scoate)"
 source = "File"
 translation = "Fișier"
 
+[messages.asset-in-atlas]
+source = "In atlas"
+translation = "În atlas"
+
 [messages.asset-in-pack]
 source = "in"
 translation = "în"
@@ -2285,6 +2289,10 @@ translation = "fișier de material"
 source = "store details"
 translation = "detalii de magazin"
 
+[messages.asset-rel-sprite]
+source = "sprite"
+translation = "sprite"
+
 [messages.asset-rel-texture]
 source = "texture"
 translation = "textură"
@@ -2320,6 +2328,10 @@ translation = "Afișați foaia cu cele patru vederi pe care a văzut-o etichetat
 [messages.asset-source]
 source = "Source"
 translation = "Sursă"
+
+[messages.asset-sprites]
+source = "Sprites"
+translation = "Sprite-uri"
 
 [messages.asset-swatch-aria]
 source = "Find assets with { $hex }, { $percent }% of this picture"

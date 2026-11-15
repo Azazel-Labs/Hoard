@@ -1381,6 +1381,7 @@ asset-rel-library = пов’язаний файл
 asset-rel-guess = імовірно, пов’язаний
 asset-rel-sidecar = відомості з магазину
 asset-rel-variant = варіант
+asset-rel-sprite = спрайт
 asset-role-map = карта { $role }
 asset-maps-count =
     { $count ->
@@ -1391,6 +1392,8 @@ asset-maps-count =
     }
 asset-needs = Потребує
 asset-animations = Анімації
+asset-sprites = Спрайти
+asset-in-atlas = В атласі
 asset-used-by = Використовується в
 asset-conversion-failed = перетворення не вдалося
 asset-as-converting = Перетворення…

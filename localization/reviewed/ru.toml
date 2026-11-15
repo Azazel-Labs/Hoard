@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "c3a648fe06168ec030cbf90c412711e419a9c02c780615c74c3780fbcd3cd6d4"
+source = "891f79f948a92d869b9df6f77d941aa064980bd848aa25e819f5cb33945415d3"
 translation = "34dcaefeb07609a80e1eeef1689d6a2d04a3d3d12d9259774db4a32069c5687e"
 
 [messages.account-add]
@@ -1822,6 +1822,10 @@ translation = "В вашем избранном (F — убрать)"
 source = "File"
 translation = "Файл"
 
+[messages.asset-in-atlas]
+source = "In atlas"
+translation = "В атласе"
+
 [messages.asset-in-pack]
 source = "in"
 translation = "из"
@@ -2300,6 +2304,10 @@ translation = "файл материала"
 source = "store details"
 translation = "сведения из магазина"
 
+[messages.asset-rel-sprite]
+source = "sprite"
+translation = "спрайт"
+
 [messages.asset-rel-texture]
 source = "texture"
 translation = "текстура"
@@ -2335,6 +2343,10 @@ translation = "Показать лист с четырьмя видами, ко�
 [messages.asset-source]
 source = "Source"
 translation = "Источник"
+
+[messages.asset-sprites]
+source = "Sprites"
+translation = "Спрайты"
 
 [messages.asset-swatch-aria]
 source = "Find assets with { $hex }, { $percent }% of this picture"

@@ -16,9 +16,12 @@ const num = (v: unknown) => (typeof v === 'number' && Number.isFinite(v) ? v : 0
 export const animatedNative = (a: Asset) => NATIVE_ANIMATED.has(a.ext.toLowerCase()) && num(a.meta.frames) > 1
 /** An Aseprite file with more than one frame. */
 export const animatedAseprite = (a: Asset) => ['aseprite', 'ase'].includes(a.ext.toLowerCase()) && num(a.meta.frames) > 1
-/** A picture that's frames laid out in a grid, by its tags. */
+/** A picture that's frames laid out in a grid, by its tags. An atlas page has its sprites cut out already. */
 export const spriteSheet = (a: Asset) =>
-  a.kind === 'texture' && !animatedNative(a) && a.tags.some((t) => t.tag === 'spritesheet' || t.tag === 'frames')
+  a.kind === 'texture' &&
+  !animatedNative(a) &&
+  !a.meta.atlas &&
+  a.tags.some((t) => t.tag === 'spritesheet' || t.tag === 'frames')
 /** What shows a native animation moving: the file itself, when it isn't too big. */
 export const animatedSrc = (a: Asset, limit: number) => (animatedNative(a) && a.size <= limit ? fileUrl(a) : null)
 export const framesUrl = (a: { id: string }) => `/api/assets/${a.id}/frames.png`

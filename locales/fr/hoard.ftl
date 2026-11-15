@@ -1251,6 +1251,7 @@ asset-rel-library = fichier lié
 asset-rel-guess = va probablement avec
 asset-rel-sidecar = informations de boutique
 asset-rel-variant = variante
+asset-rel-sprite = sprite
 asset-role-map = carte { $role }
 asset-maps-count =
     { $count ->
@@ -1259,6 +1260,8 @@ asset-maps-count =
     }
 asset-needs = Nécessite
 asset-animations = Animations
+asset-sprites = Sprites
+asset-in-atlas = Dans l’atlas
 asset-used-by = Utilisé par
 asset-conversion-failed = échec de la conversion
 asset-as-converting = Conversion…

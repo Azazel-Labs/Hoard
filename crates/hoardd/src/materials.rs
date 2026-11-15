@@ -555,6 +555,11 @@ pub(crate) fn detect_pack(state: &AppState, rt: &Handle, conn: &mut Connection, 
         tracing::warn!(pack = pack_id, error = %format!("{e:#}"), "could not read images' provenance");
     }
     let n = find_materials(state, rt, conn, pack_id)?;
+    match crate::atlas::detect_pack(state, rt, conn, pack_id) {
+        Ok(0) => {}
+        Ok(atlases) => tracing::info!(pack = pack_id, atlases, "sprite atlases found"),
+        Err(e) => tracing::warn!(pack = pack_id, error = %format!("{e:#}"), "could not read sprite atlases"),
+    }
     // Before dressing, which then redraws the dressed ones among them.
     if let Err(e) = redraw_glass(state, rt, conn, pack_id) {
         tracing::warn!(pack = pack_id, error = %format!("{e:#}"), "could not redraw thumbnails of models with glass");
@@ -622,11 +627,12 @@ fn find_materials(state: &AppState, rt: &Handle, conn: &mut Connection, pack_id:
         crate::issues::At::pack(pack_id),
     );
     let textures: Vec<Texture> = {
-        let mut stmt = conn.prepare(
+        let mut stmt = conn.prepare(&format!(
             "SELECT a.id, a.path, a.blob_hash, a.thumb_hash,
                     MAX(COALESCE(json_extract(a.meta, '$.width'), 0), COALESCE(json_extract(a.meta, '$.height'), 0))
-             FROM assets a WHERE a.pack_id = ?1 AND a.kind = 'texture' ORDER BY a.path",
-        )?;
+             FROM assets a WHERE a.pack_id = ?1 AND a.kind = 'texture' AND NOT {} ORDER BY a.path",
+            crate::atlas::IS_SPRITE
+        ))?;
         stmt.query_map([pack_id], |r| {
             Ok(Texture {
                 id: r.get(0)?,

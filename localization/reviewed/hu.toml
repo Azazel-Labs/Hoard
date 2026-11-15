@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "c3a648fe06168ec030cbf90c412711e419a9c02c780615c74c3780fbcd3cd6d4"
+source = "891f79f948a92d869b9df6f77d941aa064980bd848aa25e819f5cb33945415d3"
 translation = "c6684f3aa4c07e66944a392378175378b3171efffc214b475e3c149225b2c90e"
 
 [messages.account-add]
@@ -1695,6 +1695,10 @@ translation = "A kedvencei között (az F eltávolítja)"
 source = "File"
 translation = "Fájl"
 
+[messages.asset-in-atlas]
+source = "In atlas"
+translation = "Atlaszban"
+
 [messages.asset-in-pack]
 source = "in"
 translation = "·"
@@ -2163,6 +2167,10 @@ translation = "anyagfájl"
 source = "store details"
 translation = "áruházi adatok"
 
+[messages.asset-rel-sprite]
+source = "sprite"
+translation = "sprite"
+
 [messages.asset-rel-texture]
 source = "texture"
 translation = "textúra"
@@ -2198,6 +2206,10 @@ translation = "A címkéző által látott négynézetes lap megjelenítése"
 [messages.asset-source]
 source = "Source"
 translation = "Forrás"
+
+[messages.asset-sprites]
+source = "Sprites"
+translation = "Sprite-ok"
 
 [messages.asset-swatch-aria]
 source = "Find assets with { $hex }, { $percent }% of this picture"

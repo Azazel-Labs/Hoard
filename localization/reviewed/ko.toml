@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "c3a648fe06168ec030cbf90c412711e419a9c02c780615c74c3780fbcd3cd6d4"
+source = "891f79f948a92d869b9df6f77d941aa064980bd848aa25e819f5cb33945415d3"
 translation = "95bf625ed3312f7690b94129f029f26bbf119096668ff545dedaf6076a581e89"
 
 [messages.account-add]
@@ -1691,6 +1691,10 @@ translation = "즐겨찾기에 있음(F로 제거)"
 source = "File"
 translation = "파일"
 
+[messages.asset-in-atlas]
+source = "In atlas"
+translation = "아틀라스"
+
 [messages.asset-in-pack]
 source = "in"
 translation = "·"
@@ -2151,6 +2155,10 @@ translation = "머티리얼 파일"
 source = "store details"
 translation = "스토어 정보"
 
+[messages.asset-rel-sprite]
+source = "sprite"
+translation = "스프라이트"
+
 [messages.asset-rel-texture]
 source = "texture"
 translation = "텍스처"
@@ -2186,6 +2194,10 @@ translation = "태거가 본 네 방향 시트 표시"
 [messages.asset-source]
 source = "Source"
 translation = "소스"
+
+[messages.asset-sprites]
+source = "Sprites"
+translation = "스프라이트"
 
 [messages.asset-swatch-aria]
 source = "Find assets with { $hex }, { $percent }% of this picture"

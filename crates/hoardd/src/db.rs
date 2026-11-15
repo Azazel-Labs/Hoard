@@ -416,6 +416,15 @@ const MIGRATIONS: &[&str] = &[
          AND NOT EXISTS (SELECT 1 FROM jobs j WHERE j.pack_id = p.id AND j.kind = 'convert'
                            AND j.status IN ('queued', 'running'));
      DELETE FROM issues WHERE kind = 'convert' AND lower(subject) LIKE '%.3ds';",
+    // 47: sprite atlases' sprites are assets of their own. Packs with a file that may be an atlas are looked
+    // through for them.
+    "INSERT INTO jobs (kind, pack_id, payload, run_after, created_at, updated_at)
+       SELECT 'materials', p.id, '{}', strftime('%Y-%m-%dT%H:%M:%SZ', 'now'), strftime('%Y-%m-%dT%H:%M:%SZ', 'now'),
+              strftime('%Y-%m-%dT%H:%M:%SZ', 'now')
+       FROM packs p WHERE p.status = 'ready' AND p.archived_at IS NULL
+         AND EXISTS (SELECT 1 FROM assets a WHERE a.pack_id = p.id AND a.ext IN ('xml', 'json', 'atlas', 'plist'))
+         AND EXISTS (SELECT 1 FROM assets a WHERE a.pack_id = p.id AND a.kind = 'texture')
+         AND NOT EXISTS (SELECT 1 FROM jobs j WHERE j.pack_id = p.id AND j.status IN ('queued', 'running'));",
 ];
 
 /// How many automatic pre-upgrade backups to keep in `<data dir>/backups`.
@@ -1944,7 +1953,7 @@ mod tests {
     fn ascii_fbx_and_3ds_packs_are_read_again() {
         let dir = tempfile::tempdir().unwrap();
         let mut conn = baseline_db(dir.path());
-        migrate(&mut conn, &dir.path().join("backups"), &MIGRATIONS[..MIGRATIONS.len() - 1]).unwrap();
+        migrate(&mut conn, &dir.path().join("backups"), &MIGRATIONS[..MIGRATIONS.len() - 2]).unwrap();
         conn.execute_batch(
             "PRAGMA foreign_keys = OFF;
              INSERT INTO packs (id, name, status, created_at) VALUES
@@ -1976,6 +1985,38 @@ mod tests {
             .flatten()
             .collect();
         assert_eq!(issues, ["Models/station.fbx"]);
+    }
+
+    /// Packs with images and a file that may be an atlas are looked through for sprites.
+    #[test]
+    fn packs_that_may_have_atlases_are_looked_through() {
+        let dir = tempfile::tempdir().unwrap();
+        let mut conn = baseline_db(dir.path());
+        migrate(&mut conn, &dir.path().join("backups"), &MIGRATIONS[..MIGRATIONS.len() - 1]).unwrap();
+        conn.execute_batch(
+            "PRAGMA foreign_keys = OFF;
+             INSERT INTO packs (id, name, status, created_at) VALUES
+               ('sheet', 'Sheets', 'ready', 'x'), ('docs', 'Notes', 'ready', 'x'), ('busy', 'Busy', 'ready', 'x');
+             INSERT INTO assets (id, pack_id, blob_hash, path, name, ext, kind, meta, created_at, updated_at) VALUES
+               ('a', 'sheet', 'h1', 'sheet.xml', 'sheet', 'xml', 'data', '{}', 'x', 'x'),
+               ('b', 'sheet', 'h2', 'sheet.png', 'sheet', 'png', 'texture', '{}', 'x', 'x'),
+               ('c', 'docs', 'h3', 'notes.json', 'notes', 'json', 'data', '{}', 'x', 'x'),
+               ('d', 'busy', 'h4', 'a.atlas', 'a', 'atlas', 'data', '{}', 'x', 'x'),
+               ('e', 'busy', 'h5', 'a.png', 'a', 'png', 'texture', '{}', 'x', 'x');
+             INSERT INTO jobs (kind, pack_id, payload, run_after, created_at, updated_at)
+               VALUES ('ingest', 'busy', '{}', 'x', 'x', 'x');",
+        )
+        .unwrap();
+        migrate(&mut conn, &dir.path().join("backups"), MIGRATIONS).unwrap();
+        let jobs: Vec<(String, String)> = conn
+            .prepare("SELECT kind, pack_id FROM jobs WHERE pack_id <> 'p1' ORDER BY pack_id, kind")
+            .unwrap()
+            .query_map([], |r| Ok((r.get(0)?, r.get(1)?)))
+            .unwrap()
+            .collect::<rusqlite::Result<_>>()
+            .unwrap();
+        let jobs: Vec<(&str, &str)> = jobs.iter().map(|(k, p)| (k.as_str(), p.as_str())).collect();
+        assert_eq!(jobs, [("ingest", "busy"), ("materials", "sheet")]);
     }
 
     #[test]

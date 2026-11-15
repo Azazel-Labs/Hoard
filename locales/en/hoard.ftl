@@ -1364,6 +1364,7 @@ asset-rel-library = linked file
 asset-rel-guess = probably goes with
 asset-rel-sidecar = store details
 asset-rel-variant = variant
+asset-rel-sprite = sprite
 # Beside a material this texture belongs to: what kind of map it is in it. $role is the map's role, lowercase ("normal").
 asset-role-map = { $role } map
 # Beside a material a model wears: how many maps it has.
@@ -1375,6 +1376,8 @@ asset-maps-count =
 # Headings of the lists of linked files.
 asset-needs = Needs
 asset-animations = Animations
+asset-sprites = Sprites
+asset-in-atlas = In atlas
 asset-used-by = Used by
 # "Download as": converting the file on the server.
 asset-conversion-failed = conversion failed

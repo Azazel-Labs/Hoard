@@ -1221,6 +1221,7 @@ asset-rel-library = gekoppelde lêer
 asset-rel-guess = hoort waarskynlik by
 asset-rel-sidecar = winkelbesonderhede
 asset-rel-variant = variant
+asset-rel-sprite = sprite
 asset-role-map = kaart vir { $role }
 asset-maps-count =
     { $count ->
@@ -1229,6 +1230,8 @@ asset-maps-count =
     }
 asset-needs = Benodig
 asset-animations = Animasies
+asset-sprites = Sprites
+asset-in-atlas = In atlas
 asset-used-by = Gebruik deur
 asset-conversion-failed = omskakeling het misluk
 asset-as-converting = Skakel om…

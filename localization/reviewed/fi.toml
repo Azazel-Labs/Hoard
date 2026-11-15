@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "c3a648fe06168ec030cbf90c412711e419a9c02c780615c74c3780fbcd3cd6d4"
+source = "891f79f948a92d869b9df6f77d941aa064980bd848aa25e819f5cb33945415d3"
 translation = "1381fb1c261e8132d9dcf57774023142df4f4444b02c8d32c388e084b4bc8789"
 
 [messages.account-add]
@@ -1762,6 +1762,10 @@ translation = "Suosikeissasi (F poistaa sen)"
 source = "File"
 translation = "Tiedosto"
 
+[messages.asset-in-atlas]
+source = "In atlas"
+translation = "Atlaksessa"
+
 [messages.asset-in-pack]
 source = "in"
 translation = "paketissa"
@@ -2234,6 +2238,10 @@ translation = "materiaalitiedosto"
 source = "store details"
 translation = "kauppatiedot"
 
+[messages.asset-rel-sprite]
+source = "sprite"
+translation = "sprite"
+
 [messages.asset-rel-texture]
 source = "texture"
 translation = "tekstuuri"
@@ -2269,6 +2277,10 @@ translation = "Näytä neljän näkymän arkki, jonka tunnistelija näki"
 [messages.asset-source]
 source = "Source"
 translation = "Lähde"
+
+[messages.asset-sprites]
+source = "Sprites"
+translation = "Spritet"
 
 [messages.asset-swatch-aria]
 source = "Find assets with { $hex }, { $percent }% of this picture"

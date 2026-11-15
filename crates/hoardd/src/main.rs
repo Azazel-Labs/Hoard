@@ -3,6 +3,7 @@
 mod activity;
 mod analyze;
 mod api;
+mod atlas;
 mod audio;
 mod auth;
 mod blender;

@@ -1,4 +1,4 @@
-//! Models read natively, by [mithril]: STL, PLY, `MagicaVoxel` `.vox`, OBJ (with its MTL materials and textures),
+//! Models read natively, by [polysmelt]: STL, PLY, `MagicaVoxel` `.vox`, OBJ (with its MTL materials and textures),
 //! FBX (binary and ASCII), 3DS, 3MF and USD. Each becomes a GLB, which feeds the thumbnail renderer and "download
 //! as GLB"; textures are embedded so the GLB stands on its own, re-encoded as PNG from anything Hoard can decode.
 //! glTF and GLB are read too, for the triangles they draw, and decoded into plain glTF when compressed or quantized
@@ -7,19 +7,19 @@
 use std::path::{Path, PathBuf};
 
 use anyhow::Result;
-use mithril::assets::{Assets, Folder};
-use mithril::document::{Keep, Pose};
+use polysmelt::assets::{Assets, Folder};
+use polysmelt::document::{Keep, Pose};
 use serde_json::{Map, Value};
 
-pub(crate) use mithril::mesh::{Image, Material, Mesh, to_glb};
+pub(crate) use polysmelt::mesh::{Image, Material, Mesh, to_glb};
 
 /// Whether a model in this format becomes a GLB by being read into a mesh. A glTF is packed as it is instead,
 /// keeping what a mesh leaves out (animation, skins, compression).
 pub(crate) fn rebuilt_as_glb(ext: &str) -> bool {
-    mithril::formats::EXTENSIONS.contains(&ext) && !matches!(ext, "gltf" | "glb")
+    polysmelt::formats::EXTENSIONS.contains(&ext) && !matches!(ext, "gltf" | "glb")
 }
 
-/// A pack laid out in a folder: mithril finds the files a model points at, and Hoard decodes the textures.
+/// A pack laid out in a folder: polysmelt finds the files a model points at, and Hoard decodes the textures.
 struct Pack(Folder);
 
 impl Assets for Pack {
@@ -40,7 +40,7 @@ impl Assets for Pack {
 /// the folder laid out like the pack, searched for textures the model points at by bare name or a foreign path.
 pub(crate) fn load(path: &Path, ext: &str, root: &Path) -> Result<(Option<Mesh>, Map<String, Value>)> {
     // What a rest-pose mesh needs: animations, cameras and lights are skipped.
-    let doc = mithril::formats::load(path, ext, &Pack(Folder::new(root)), Keep::MESHES)?;
+    let doc = polysmelt::formats::load(path, ext, &Pack(Folder::new(root)), Keep::MESHES)?;
     Ok((doc.flatten(Pose::Rest)?, doc.facts))
 }
 
@@ -57,22 +57,22 @@ pub(crate) fn facts(path: &Path, ext: &str, root: &Path) -> Result<Map<String, V
         lights: false,
         extras: false,
     };
-    Ok(mithril::formats::load(path, ext, &Pack(Folder::new(root)), nothing)?.facts)
+    Ok(polysmelt::formats::load(path, ext, &Pack(Folder::new(root)), nothing)?.facts)
 }
 
 /// A model in another format as a GLB for download: its whole document (hierarchy, skins, morph targets, animation,
 /// materials and embedded textures), not just the mesh it draws.
 pub(crate) fn glb(path: &Path, ext: &str, root: &Path) -> Result<Vec<u8>> {
-    let doc = mithril::formats::load(path, ext, &Pack(Folder::new(root)), Keep::ALL)?;
+    let doc = polysmelt::formats::load(path, ext, &Pack(Folder::new(root)), Keep::ALL)?;
     anyhow::ensure!(doc.counts().triangles > 0, "this model has no surfaces to export");
     Ok(doc.to_glb()?)
 }
 
 /// A glTF rewritten as plain glTF in a GLB, for a reader without meshopt, Draco or quantization (the thumbnail
-/// renderer): mithril decodes those and takes the images in. Animations, cameras and lights are left out.
+/// renderer): polysmelt decodes those and takes the images in. Animations, cameras and lights are left out.
 pub(crate) fn plain_glb(path: &Path, ext: &str) -> Result<Vec<u8>> {
     let folder = path.parent().unwrap_or(Path::new("."));
-    let mut doc = mithril::formats::load(path, ext, &Pack(Folder::new(folder)), Keep::MESHES)?;
+    let mut doc = polysmelt::formats::load(path, ext, &Pack(Folder::new(folder)), Keep::MESHES)?;
     doc.decode()?;
     Ok(doc.to_glb()?)
 }
@@ -113,7 +113,7 @@ mod tests {
     use super::*;
 
     #[test]
-    fn textures_mithril_wont_embed_are_converted_to_png() {
+    fn textures_polysmelt_wont_embed_are_converted_to_png() {
         let dir = tempfile::tempdir().unwrap();
         let obj = dir.path().join("rock.obj");
         std::fs::write(

@@ -320,10 +320,10 @@ async fn convert_one(state: &AppState, blender: &crate::blender::Tool, t: &Todo)
 /// Blender reads only binary FBX, so an ASCII one is rewritten in place (in the work folder) first.
 async fn ascii_fbx_to_binary(src: &Path) -> Result<()> {
     let data = tokio::fs::read(src).await?;
-    if !mithril::formats::fbx_ascii::is_ascii(&data) {
+    if !polysmelt::formats::fbx_ascii::is_ascii(&data) {
         return Ok(());
     }
-    let binary = crate::heavy::run("ascii fbx", move || mithril::formats::fbx_ascii::to_binary(&data))
+    let binary = crate::heavy::run("ascii fbx", move || polysmelt::formats::fbx_ascii::to_binary(&data))
         .await?
         .context("couldn't read this ASCII FBX file")?;
     tokio::fs::write(src, binary).await?;

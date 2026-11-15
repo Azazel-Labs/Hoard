@@ -385,14 +385,14 @@ fn gltf_uris(doc: &Value, key: &str) -> Vec<String> {
         .collect()
 }
 
-/// Packs a `.gltf` and the files it reads (from its own folder, never outside it) into a GLB with mithril, which
+/// Packs a `.gltf` and the files it reads (from its own folder, never outside it) into a GLB with polysmelt, which
 /// re-points meshopt-compressed buffer views as it goes. With `images` false, image files stay beside the GLB.
 fn build_glb(path: &Path, images: bool) -> Result<Vec<u8>> {
     let dir = path.parent().context("no folder")?;
     let mut doc: Value = serde_json::from_slice(&std::fs::read(path)?)?;
     // A buffer must say where its bytes are, unless it's a meshopt fallback (which decoders never read).
     let fallback = |b: &Value| {
-        mithril::gltf::MESHOPT_EXTENSIONS
+        polysmelt::gltf::MESHOPT_EXTENSIONS
             .iter()
             .any(|n| b.pointer(&format!("/extensions/{n}/fallback")) == Some(&json!(true)))
     };
@@ -408,11 +408,13 @@ fn build_glb(path: &Path, images: bool) -> Result<Vec<u8>> {
             }
         }
     }
-    let mut read = mithril::gltf::files_in(dir);
-    let glb = mithril::gltf::pack_glb(&serde_json::to_vec(&doc)?, |uri| {
+    let mut read = polysmelt::gltf::files_in(dir);
+    let glb = polysmelt::gltf::pack_glb(&serde_json::to_vec(&doc)?, |uri| {
         read(uri).map_err(|e| match e {
-            mithril::Error::Io(_) => mithril::Error::InvalidInput(format!("glTF file {uri} is missing from the pack")),
-            e @ mithril::Error::InvalidInput(_) => e,
+            polysmelt::Error::Io(_) => {
+                polysmelt::Error::InvalidInput(format!("glTF file {uri} is missing from the pack"))
+            }
+            e @ polysmelt::Error::InvalidInput(_) => e,
         })
     })?;
     if kept.is_empty() {

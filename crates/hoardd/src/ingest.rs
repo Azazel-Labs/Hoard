@@ -1260,7 +1260,7 @@ mod tests {
         glb.extend(36u32.to_le_bytes());
         glb.extend(b"BIN\0");
         glb.extend(&tri);
-        let compressed = mithril::gltf::compress(&glb).unwrap();
+        let compressed = polysmelt::gltf::compress(&glb).unwrap();
         let (mut doc, bin) = glb_chunks(&compressed);
         assert!(doc["extensionsUsed"].to_string().contains("meshopt"));
         doc["buffers"][0]["uri"] = "m.bin".into();
@@ -1280,7 +1280,7 @@ mod tests {
         assert!(doc["extensionsUsed"].to_string().contains("meshopt"));
         assert_eq!(doc["images"][0]["uri"], "m.png");
         // It decodes to the triangle it started as.
-        let (_, decoded) = glb_chunks(&mithril::gltf::decompress(&packed).unwrap());
+        let (_, decoded) = glb_chunks(&polysmelt::gltf::decompress(&packed).unwrap());
         assert_eq!(&decoded[..36], &tri[..]);
     }
 }

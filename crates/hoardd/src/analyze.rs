@@ -137,14 +137,14 @@ pub(crate) fn thumb_mime(bytes: &[u8]) -> &'static str {
 }
 
 /// A glTF/GLB the renderer can read: one using meshopt, Draco or quantization (which the renderer's glTF reader
-/// rejects) is rewritten by mithril as a plain GLB (its images taken in) in a temporary folder, anything else is read
+/// rejects) is rewritten by polysmelt as a plain GLB (its images taken in) in a temporary folder, anything else is read
 /// where it is.
 struct Drawable {
     path: PathBuf,
     _dir: Option<tempfile::TempDir>,
 }
 
-/// The extensions plain glTF readers lack, which `mithril` decodes away.
+/// The extensions plain glTF readers lack, which `polysmelt` decodes away.
 const ENCODINGS: [&str; 4] =
     ["EXT_meshopt_compression", "KHR_meshopt_compression", "KHR_draco_mesh_compression", "KHR_mesh_quantization"];
 
@@ -1211,7 +1211,7 @@ fn analyze_model(path: &Path, root: &Path, ext: &str, meta: &mut Map<String, Val
             };
             gltf_stats(&json, meta);
             // The triangles the scene draws (strips and fans, meshes placed more than once, points and lines
-            // apart), when mithril can read it: not glTF 1.0.
+            // apart), when polysmelt can read it: not glTF 1.0.
             match crate::meshes::facts(path, ext, root) {
                 Ok(facts) => {
                     meta.insert("triangles".into(), json!(0));
@@ -1342,7 +1342,7 @@ mod tests {
         assert_eq!(meta["vertices"], json!(4));
         assert_eq!(meta["meshes"], json!(1));
 
-        // What mithril refuses (glTF 1.0) is still counted from the JSON.
+        // What polysmelt refuses (glTF 1.0) is still counted from the JSON.
         let mut old = doc.clone();
         old["asset"]["version"] = json!("1.0");
         std::fs::write(&path, serde_json::to_vec(&old).unwrap()).unwrap();
@@ -1353,7 +1353,7 @@ mod tests {
 
     #[test]
     fn compressed_gltf_is_drawn_from_a_plain_copy() {
-        use mithril::mesh::{Material, Mesh, Prim};
+        use polysmelt::mesh::{Material, Mesh, Prim};
         let mut p = Prim::default();
         for y in 0..=8u32 {
             for x in 0..=8u32 {
@@ -1368,7 +1368,7 @@ mod tests {
             }
         }
         let mesh = Mesh { prims: vec![p], materials: vec![Material::plain("Grey", [0.5; 4])], images: Vec::new() };
-        let packed = mithril::gltf::compress(&mithril::mesh::to_glb(&mesh).unwrap()).unwrap();
+        let packed = polysmelt::gltf::compress(&polysmelt::mesh::to_glb(&mesh).unwrap()).unwrap();
         let dir = tempfile::tempdir().unwrap();
         let path = dir.path().join("grid.glb");
         std::fs::write(&path, packed).unwrap();
@@ -1384,7 +1384,7 @@ mod tests {
 
         // Plain glTF is drawn where it is.
         let plain = dir.path().join("plain.glb");
-        std::fs::write(&plain, mithril::mesh::to_glb(&mesh).unwrap()).unwrap();
+        std::fs::write(&plain, polysmelt::mesh::to_glb(&mesh).unwrap()).unwrap();
         assert_eq!(drawable(&plain).unwrap().path, plain);
     }
 

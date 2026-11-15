@@ -1,5 +1,5 @@
 //! Files a store ships beside the art that say what it is. A Megascans asset (from Fab or Bridge) carries
-//! `<id>.json` with the listing's exact title, tags, colour, where it was scanned and its real-world size, while its
+//! `<id>.json` with the listing's exact title, tags, color, where it was scanned and its real-world size, while its
 //! files are named `Historic_Miscellaneous_Stand_Wood_Old_05_xeokah0_Raw…`. It also lists the asset's texture maps by
 //! kind, its levels of detail with their triangle counts and, for a surface, how much ground one repeat covers. A
 //! Sketchfab download's `license.txt` names the model, its page, its author and its license.
@@ -51,7 +51,7 @@ pub(crate) struct Sidecar {
     pub(crate) origin_words: String,
     /// "3D asset", "Surface", "Decal"…
     pub(crate) asset_type: Option<String>,
-    /// Plain, normalised tags (`table`, `wood`, `color:brown`, `megascans`).
+    /// Plain, normalized tags (`table`, `wood`, `color:brown`, `megascans`).
     pub(crate) tags: Vec<String>,
     /// Where it was scanned ("Denmark").
     pub(crate) origin: Option<String>,
@@ -64,9 +64,9 @@ pub(crate) struct Sidecar {
     pub(crate) maps: Vec<ListedMap>,
     /// Its levels of detail, lowest number first.
     pub(crate) lods: Vec<Lod>,
-    /// For a tiling surface: width and height of one repeat, in metres.
+    /// For a tiling surface: width and height of one repeat, in meters.
     pub(crate) physical_size: Option<(f32, f32)>,
-    /// For a tiling surface: how far its height map reaches, in metres.
+    /// For a tiling surface: how far its height map reaches, in meters.
     pub(crate) displacement: Option<f32>,
 }
 
@@ -98,7 +98,7 @@ fn file_name(uri: &str) -> Option<String> {
     (!f.is_empty()).then_some(f)
 }
 
-/// A length's unit in metres; `None` for one that isn't a length.
+/// A length's unit in meters; `None` for one that isn't a length.
 fn unit_metres(unit: &str) -> Option<f32> {
     match unit {
         "m" | "meter" | "meters" | "metre" | "metres" => Some(1.0),
@@ -116,15 +116,15 @@ fn split_unit(s: &str) -> (&str, &str) {
     (s[..at].trim(), s[at..].trim())
 }
 
-/// A length with its unit, in metres: `"2cm"` → 0.02.
-fn metres(s: &str) -> Option<f32> {
+/// A length with its unit, in meters: `"2cm"` → 0.02.
+fn meters(s: &str) -> Option<f32> {
     let (n, unit) = split_unit(s);
     let v: f32 = n.parse().ok()?;
     (v > 0.0).then_some(v * unit_metres(&unit.to_ascii_lowercase())?)
 }
 
-/// An area's width and height in metres: `"2x2 m"`, `"200 x 200 cm"`, `"0.91x0.91"`, `"40x40"`. Without a unit,
-/// numbers up to 20 are metres and larger ones decimetres: Quixel's API writes metres and its file spec decimetres.
+/// An area's width and height in meters: `"2x2 m"`, `"200 x 200 cm"`, `"0.91x0.91"`, `"40x40"`. Without a unit,
+/// numbers up to 20 are meters and larger ones decimetres: Quixel's API writes meters and its file spec decimetres.
 fn area_metres(s: &str) -> Option<(f32, f32)> {
     let (n, unit) = split_unit(s);
     let parts: Vec<f32> = n.split(['x', 'X', '×', '*']).map(|p| p.trim().parse().ok()).collect::<Option<_>>()?;
@@ -244,7 +244,7 @@ pub(crate) fn read_as(f: &Format, path: &str, text: &str) -> Option<Sidecar> {
     let surface = x.tiles.holds(at);
     let physical_size = surface.then(|| x.physical_size.all(at).iter().find_map(|s| area_metres(s))).flatten();
     let displacement =
-        surface.then(|| x.displacement.all(at).iter().find_map(|s| metres(s))).flatten().filter(|&m| m < 1.0);
+        surface.then(|| x.displacement.all(at).iter().find_map(|s| meters(s))).flatten().filter(|&m| m < 1.0);
 
     Some(Sidecar {
         path: path.to_owned(),
@@ -269,7 +269,7 @@ pub(crate) fn read_as(f: &Format, path: &str, text: &str) -> Option<Sidecar> {
     })
 }
 
-fn capitalised(s: &str) -> String {
+fn capitalized(s: &str) -> String {
     let mut c = s.chars();
     c.next().map_or_else(String::new, |f| f.to_uppercase().chain(c).collect())
 }
@@ -302,7 +302,7 @@ impl Sidecar {
     }
 
     /// Whether a file of the pack belongs to this asset: next to the JSON, and named with the asset's id when its
-    /// neighbours are (several assets can share a folder).
+    /// neighbors are (several assets can share a folder).
     fn owns(&self, path: &str, ids_in_folder: bool) -> bool {
         let dir = self.path.rsplit_once('/').map_or("", |(d, _)| d);
         let inside = if dir.is_empty() { true } else { path.starts_with(&format!("{dir}/")) };
@@ -369,7 +369,7 @@ impl Sidecar {
         if !facts.is_empty() {
             let text = facts.join("; ");
             out.push(' ');
-            out.push_str(&capitalised(&text));
+            out.push_str(&capitalized(&text));
             out.push('.');
         }
         if let Some(l) = &self.license {
@@ -573,7 +573,7 @@ fn write(
         let tags: Vec<String> = s.all_tags().into_iter().map(&alias).collect::<rusqlite::Result<_>>()?;
         for (asset, _, kind) in &mine {
             for t in &tags {
-                // A colour is the model's, not its normal map's.
+                // A color is the model's, not its normal map's.
                 if t.starts_with("color:") && kind != AssetKind::Model.as_str() {
                     continue;
                 }
@@ -796,7 +796,7 @@ pub(crate) mod tests {
         assert_eq!(s.listed_map("Mossy/sbkpa_2K_displacement.EXR").map(|m| m.kind.as_str()), Some("displacement"));
         assert_eq!(s.listed_map("Other/sbkpa_2K_Albedo.jpg"), None, "only files beside the JSON");
 
-        // Today's `maps` list; a size without a scan area, in metres.
+        // Today's `maps` list; a size without a scan area, in meters.
         let today = r#"{"id": "x1", "semanticTags": {"name": "Tiles", "asset_type": "surface"},
             "maps": [{"type": "normal", "uri": "x1_4K_Normal.jpg", "physicalSize": "0.91x0.91", "colorSpace": "Linear"}]}"#;
         let s = read("x1.json", today).unwrap();

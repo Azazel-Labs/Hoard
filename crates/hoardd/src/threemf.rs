@@ -1,6 +1,6 @@
 //! 3MF, the 3D-printing format: a zip of XML models. Read here: meshes, components (in the same model or another
-//! part of the zip) and the build's placed items; the colours of the 3MF materials extension (base materials and
-//! colour groups); and what slicers keep beside them: the filaments' colours, which filament each object and part
+//! part of the zip) and the build's placed items; the colors of the 3MF materials extension (base materials and
+//! color groups); and what slicers keep beside them: the filaments' colors, which filament each object and part
 //! prints in (Bambu Studio, `OrcaSlicer`, `PrusaSlicer`), and the filaments painted onto triangles.
 
 use std::collections::{HashMap, HashSet};
@@ -22,7 +22,7 @@ const IDENTITY: Mat = [1., 0., 0., 0., 1., 0., 0., 0., 1., 0., 0., 0.];
 const MAX_PART: u64 = 2 << 30;
 /// Slicer settings files are small; anything bigger isn't one.
 const MAX_CONFIG: u64 = 64 << 20;
-/// Filament colours for a slicer project that assigns filaments without saying what colour they are.
+/// Filament colors for a slicer project that assigns filaments without saying what color they are.
 const FALLBACK: [[u8; 3]; 6] = [
     [0xB8, 0xBC, 0xC4],
     [0xD9, 0x48, 0x3B],
@@ -60,13 +60,13 @@ struct Object {
 #[derive(Default)]
 struct Part {
     objects: HashMap<u32, Object>,
-    /// Base materials and colour groups by resource id: each entry's colour (sRGB).
+    /// Base materials and color groups by resource id: each entry's color (sRGB).
     colors: HashMap<u32, Vec<Option<[u8; 3]>>>,
     build: Vec<(u32, Mat)>,
     application: Option<String>,
 }
 
-/// What a slicer project says about filaments: their colours, and which one each object, part (Bambu Studio,
+/// What a slicer project says about filaments: their colors, and which one each object, part (Bambu Studio,
 /// `OrcaSlicer`) or range of triangles (`PrusaSlicer`'s volumes) prints in. Filaments count from 1.
 #[derive(Default)]
 struct Slicer {
@@ -83,7 +83,7 @@ impl Slicer {
     }
 }
 
-/// Load a 3MF: one mesh with a material per colour, and the facts worth keeping.
+/// Load a 3MF: one mesh with a material per color, and the facts worth keeping.
 pub(crate) fn load(path: &Path) -> Result<(Option<Mesh>, Map<String, Value>)> {
     let mut zip = ZipArchive::new(File::open(path)?).context("not a 3MF file (it isn't a zip)")?;
     let names: HashMap<String, String> =
@@ -140,7 +140,7 @@ pub(crate) fn load(path: &Path) -> Result<(Option<Mesh>, Map<String, Value>)> {
     Ok((Some(mesh), facts))
 }
 
-/// The build's objects as placed triangles, each with its colour.
+/// The build's objects as placed triangles, each with its color.
 struct Emit<'a> {
     parts: &'a HashMap<String, Part>,
     slicer: &'a Slicer,
@@ -452,7 +452,7 @@ fn paint_state(code: &[u8]) -> u8 {
     u8::try_from(best).unwrap_or(0)
 }
 
-/// Filament colours and assignments from a slicer project's settings files, when it has them.
+/// Filament colors and assignments from a slicer project's settings files, when it has them.
 fn read_slicer(zip: &mut ZipArchive<File>, names: &HashMap<String, String>) -> Slicer {
     let mut s = Slicer::default();
     // Bambu Studio and OrcaSlicer: JSON.
@@ -467,7 +467,7 @@ fn read_slicer(zip: &mut ZipArchive<File>, names: &HashMap<String, String>) -> S
             .map(|c| c.as_str().and_then(hex_color).unwrap_or(FALLBACK[0]))
             .collect();
     }
-    // PrusaSlicer: `; key = value` lines; an extruder's own colour wins over its filament's.
+    // PrusaSlicer: `; key = value` lines; an extruder's own color wins over its filament's.
     if s.filaments.is_empty()
         && let Some(cfg) = text(zip, names, "Metadata/Slic3r_PE.config", MAX_CONFIG)
     {
@@ -575,7 +575,7 @@ mod tests {
     }
 
     #[test]
-    fn base_material_colours_and_build_transforms() {
+    fn base_material_colors_and_build_transforms() {
         let model = format!(
             r##"<?xml version="1.0"?><model unit="millimeter" xmlns="http://schemas.microsoft.com/3dmanufacturing/core/2015/02">
             <metadata name="Application">Test Exporter</metadata>
@@ -643,7 +643,7 @@ mod tests {
             ("Metadata/Slic3r_PE.config", settings),
         ]);
         let (mesh, _) = load(f.path()).unwrap();
-        // Volume 0 in extruder 2 (no colour of its own: its filament's yellow); volume 1 in the object's extruder 1.
+        // Volume 0 in extruder 2 (no color of its own: its filament's yellow); volume 1 in the object's extruder 1.
         assert_eq!(colors(&mesh.unwrap()), [[255, 255, 0], [0, 0, 255]]);
     }
 }

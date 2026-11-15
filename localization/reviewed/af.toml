@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "453ff96837a704352761a5bf6af773e801a1f4018577b2f5bc3be44f27d2733f"
+source = "40994fa61278db02342a17e111610609be967f167ac0e561724a1ecc0fd4792e"
 translation = "7c8f389c80d884a4ec430346315190e3c87c0c5a45e023cdb559f7139678b184"
 
 [messages.account-add]
@@ -716,6 +716,14 @@ translation = "{ $count } uit { $name } verwyder"
 source = "Collections"
 translation = "Versamelings"
 
+[messages.app-color]
+source = "Color"
+translation = "Kleur"
+
+[messages.app-color-any]
+source = "Any color"
+translation = "Enige kleur"
+
 [messages.app-color-black]
 source = "Black"
 translation = "Swart"
@@ -728,17 +736,21 @@ translation = "Blou"
 source = "Brown"
 translation = "Bruin"
 
+[messages.app-color-gray]
+source = "Gray"
+translation = "Grys"
+
 [messages.app-color-green]
 source = "Green"
 translation = "Groen"
 
-[messages.app-color-grey]
-source = "Grey"
-translation = "Grys"
-
 [messages.app-color-orange]
 source = "Orange"
 translation = "Oranje"
+
+[messages.app-color-pick]
+source = "Pick any color"
+translation = "Kies enige kleur"
 
 [messages.app-color-pink]
 source = "Pink"
@@ -760,6 +772,10 @@ translation = "Sand"
 source = "Slate"
 translation = "Leiklip"
 
+[messages.app-color-swatch]
+source = "{ $color }: assets with much { $lower } in them"
+translation = "{ $color }: bates met baie { $lower } daarin"
+
 [messages.app-color-teal]
 source = "Teal"
 translation = "Blougroen"
@@ -771,22 +787,6 @@ translation = "Wit"
 [messages.app-color-yellow]
 source = "Yellow"
 translation = "Geel"
-
-[messages.app-colour]
-source = "Colour"
-translation = "Kleur"
-
-[messages.app-colour-any]
-source = "Any colour"
-translation = "Enige kleur"
-
-[messages.app-colour-pick]
-source = "Pick any colour"
-translation = "Kies enige kleur"
-
-[messages.app-colour-swatch]
-source = "{ $color }: assets with much { $lower } in them"
-translation = "{ $color }: bates met baie { $lower } daarin"
 
 [messages.app-credits]
 source = "Credits"
@@ -828,12 +828,12 @@ translation = "minder"
 source = "{ $count } more"
 translation = "Nog { $count }"
 
-[messages.app-favourite]
-source = "Favourite"
+[messages.app-favorite]
+source = "Favorite"
 translation = "Gunsteling"
 
-[messages.app-favourites]
-source = "Favourites"
+[messages.app-favorites]
+source = "Favorites"
 translation = "Gunstelinge"
 
 [messages.app-filters]
@@ -1088,8 +1088,8 @@ translation = "Projekte wat van hier af hoard sync, met wat hul laaste sinkronis
 source = "Most alike"
 translation = "Mees eenders"
 
-[messages.app-rank-colour]
-source = "Most of the colour"
+[messages.app-rank-color]
+source = "Most of the color"
 translation = "Meeste van die kleur"
 
 [messages.app-rank-match]
@@ -1116,8 +1116,8 @@ translation = "Probeer weer"
 source = "Save"
 translation = "Stoor"
 
-[messages.app-save-name-favourites]
-source = "favourites"
+[messages.app-save-name-favorites]
+source = "favorites"
 translation = "gunstelinge"
 
 [messages.app-save-name-label]
@@ -1284,8 +1284,8 @@ translation = "Teëlgrootte"
 source = "Undo"
 translation = "Ontdoen"
 
-[messages.app-unfavourite]
-source = "Unfavourite"
+[messages.app-unfavorite]
+source = "Unfavorite"
 translation = "Haal uit gunstelinge"
 
 [messages.app-unnamed-asset]
@@ -1734,16 +1734,16 @@ translation = "Net hierdie lêer"
 source = "Just this file, without the files it uses"
 translation = "Net hierdie lêer, sonder die lêers wat dit gebruik"
 
-[messages.asset-favourite]
-source = "Favourite"
+[messages.asset-favorite]
+source = "Favorite"
 translation = "Gunsteling"
 
-[messages.asset-favourite-off-title]
-source = "Add to your favourites (F)"
+[messages.asset-favorite-off-title]
+source = "Add to your favorites (F)"
 translation = "Voeg by jou gunstelinge (F)"
 
-[messages.asset-favourite-on-title]
-source = "In your favourites (F takes it out)"
+[messages.asset-favorite-on-title]
+source = "In your favorites (F takes it out)"
 translation = "In jou gunstelinge (F haal dit uit)"
 
 [messages.asset-file]
@@ -1921,6 +1921,10 @@ translation = "Gekook (speelbou): voorskoue en bronne is verwyder"
 [messages.asset-meta-cue-markers]
 source = "Cue markers"
 translation = "Merkers"
+
+[messages.asset-meta-everything-with]
+source = "Show everything tagged { $tag }"
+translation = "Wys alles met die etiket { $tag }"
 
 [messages.asset-meta-format]
 source = "Format"
@@ -2151,7 +2155,7 @@ source = "Hoard read it out of the package on { $date } ({ $notes })."
 translation = "Hoard het dit op { $date } uit die pakket gelees ({ $notes })."
 
 [messages.asset-palette]
-source = "Colours in the picture"
+source = "Colors in the picture"
 translation = "Kleure in die prent"
 
 [messages.asset-path]
@@ -2259,7 +2263,7 @@ source = "Find assets with { $hex }, { $percent }% of this picture"
 translation = "Vind bates met { $hex }, { $percent }% van hierdie prent"
 
 [messages.asset-swatch-title]
-source = "{ $hex }, { $percent }% of the picture. Find assets with this colour"
+source = "{ $hex }, { $percent }% of the picture. Find assets with this color"
 translation = "{ $hex }, { $percent }% van die prent. Vind bates met hierdie kleur"
 
 [messages.asset-tag-add]
@@ -2543,7 +2547,7 @@ source = "Make an OAuth client (Web application) in Google Cloud Console → API
 translation = "Maak 'n OAuth-kliënt (Web application) in Google Cloud Console → APIs & Services → Credentials. Google stuur geen groepe nie, so gee rolle in Instellings → Rekening, en skakel die maak van rekeninge by die eerste aanmelding af tensy enigiemand met 'n Google-rekening moet kan inkom."
 
 [messages.auth-preset-microsoft-note]
-source = "Register an app in Entra ID → App registrations (a Web redirect to the address below). Put your tenant ID in place of “organizations” to let only your organisation in. For roles from groups, add the groups claim under Token configuration: it lists group IDs."
+source = "Register an app in Entra ID → App registrations (a Web redirect to the address below). Put your tenant ID in place of “organizations” to let only your organization in. For roles from groups, add the groups claim under Token configuration: it lists group IDs."
 translation = "Registreer 'n toep in Entra ID → App registrations ('n Web-herleiding na die adres hieronder). Sit jou tenant-ID in die plek van “organizations” om net jou organisasie in te laat. Vir rolle uit groepe, voeg die groups-claim by onder Token configuration: dit lys groep-ID's."
 
 [messages.auth-provider]
@@ -2994,8 +2998,8 @@ translation = "kan nie { $path } lees nie"
 source = "can't write to { $path }"
 translation = "kan nie na { $path } skryf nie"
 
-[messages.error-chatgpt-cancelled]
-source = "the sign-in was cancelled"
+[messages.error-chatgpt-canceled]
+source = "the sign-in was canceled"
 translation = "die aanmelding is gekanselleer"
 
 [messages.error-chatgpt-code-used]
@@ -3178,7 +3182,7 @@ translation = "Die gids kon nie jou wagwoord nagaan nie: { $reason }"
 source = "empty file"
 translation = "leë lêer"
 
-[messages.error-favourites-too-many]
+[messages.error-favorites-too-many]
 source = "at most 10,000 at a time"
 translation = "hoogstens 10 000 op 'n slag"
 
@@ -3887,7 +3891,7 @@ source = "that picture is too big for a thumbnail"
 translation = "daardie prent is te groot vir 'n duimnael"
 
 [messages.error-token-account-gone]
-source = "this token's account is gone, so it has no favourites or searches"
+source = "this token's account is gone, so it has no favorites or searches"
 translation = "hierdie token se rekening bestaan nie meer nie, dus het dit geen gunstelinge of soektogte nie"
 
 [messages.error-token-name]
@@ -4157,7 +4161,7 @@ source = "It finds no title in this file. Pick the title."
 translation = "Dit vind geen titel in hierdie lêer nie. Kies die titel."
 
 [messages.formatwizard-miss-not-the-stores]
-source = "What it recognises the store’s files by isn’t in this file. Change Recognise by."
+source = "What it recognizes the store’s files by isn’t in this file. Change Recognize by."
 translation = "Dit waaraan dit die winkel se lêers herken, is nie in hierdie lêer nie. Verander Herken aan."
 
 [messages.formatwizard-miss-short-name]
@@ -4232,19 +4236,19 @@ translation = "Titel"
 source = "Store page"
 translation = "Winkelbladsy"
 
-[messages.formatwizard-recognise]
-source = "Recognise by"
+[messages.formatwizard-recognize]
+source = "Recognize by"
 translation = "Herken aan"
 
-[messages.formatwizard-recognise-hint]
+[messages.formatwizard-recognize-hint]
 source = "One way a line; any of them will do. Needed when other files have the same name."
 translation = "Een manier per reël; enigeen daarvan is genoeg. Nodig wanneer ander lêers dieselfde naam het."
 
-[messages.formatwizard-recognise-json]
+[messages.formatwizard-recognize-json]
 source = "A key only the store’s files have"
 translation = "'n Sleutel wat net die winkel se lêers het"
 
-[messages.formatwizard-recognise-text]
+[messages.formatwizard-recognize-text]
 source = "A line only the store’s files have"
 translation = "'n Reël wat net die winkel se lêers het"
 
@@ -4744,12 +4748,12 @@ translation = "skaakbordagtergrond"
 source = "Checker background (K cycles)"
 translation = "Skaakbordagtergrond (K wissel)"
 
-[messages.image-bg-grey]
-source = "grey background"
+[messages.image-bg-gray]
+source = "gray background"
 translation = "grys agtergrond"
 
-[messages.image-bg-grey-title]
-source = "Grey background (K cycles)"
+[messages.image-bg-gray-title]
+source = "Gray background (K cycles)"
 translation = "Grys agtergrond (K wissel)"
 
 [messages.image-bg-white]
@@ -5625,11 +5629,11 @@ source = "ambient occlusion"
 translation = "omgewingsokklusie"
 
 [messages.material-role-base-color]
-source = "Colour"
+source = "Color"
 translation = "Kleur"
 
 [messages.material-role-base-color-name]
-source = "colour"
+source = "color"
 translation = "kleur"
 
 [messages.material-role-bump]
@@ -5796,8 +5800,8 @@ translation = "Donker agtergrond"
 source = "Environment background"
 translation = "Omgewingsagtergrond"
 
-[messages.model-bg-grey]
-source = "Grey background"
+[messages.model-bg-gray]
+source = "Gray background"
 translation = "Grys agtergrond"
 
 [messages.model-bg-light]
@@ -5912,8 +5916,8 @@ translation = "Lengte"
 source = "Materials"
 translation = "Materiale"
 
-[messages.model-info-metres]
-source = "glTF is in metres"
+[messages.model-info-meters]
+source = "glTF is in meters"
 translation = "glTF is in meter"
 
 [messages.model-info-no-units]
@@ -6634,8 +6638,8 @@ translation = "Stoor haal die beskrywing van die winkelbladsy af."
 source = "Paste the listing text, or leave empty to fetch it from the store page."
 translation = "Plak die lysteks, of laat leeg om dit van die winkelbladsy af te haal."
 
-[messages.packs-thumbs-cancelled]
-source = "Cancelled after { $done } of { $total }"
+[messages.packs-thumbs-canceled]
+source = "Canceled after { $done } of { $total }"
 translation = "Gekanselleer ná { $done } van { $total }"
 
 [messages.packs-thumbs-drawing]
@@ -6894,11 +6898,11 @@ translation = "Maak die keuse skoon"
 source = "Dark theme: { $name }"
 translation = "Donker tema: { $name }"
 
-[messages.palette-favourites]
-source = "Favourites"
+[messages.palette-favorites]
+source = "Favorites"
 translation = "Gunstelinge"
 
-[messages.palette-favourites-keywords]
+[messages.palette-favorites-keywords]
 source = "starred stars liked"
 translation = "ster sterre gehou starred stars liked"
 
@@ -7086,12 +7090,12 @@ translation = "voorkoms kleur appearance color"
 source = "Command palette"
 translation = "Opdragpalet"
 
-[messages.projects-favourite-add-failed]
-source = "Couldn't add to your favourites: { $error }"
+[messages.projects-favorite-add-failed]
+source = "Couldn't add to your favorites: { $error }"
 translation = "Kon nie by jou gunstelinge voeg nie: { $error }"
 
-[messages.projects-favourite-remove-failed]
-source = "Couldn't take out of your favourites: { $error }"
+[messages.projects-favorite-remove-failed]
+source = "Couldn't take out of your favorites: { $error }"
 translation = "Kon nie uit jou gunstelinge haal nie: { $error }"
 
 [messages.projects-forget-search-failed]
@@ -7363,7 +7367,7 @@ source = "Tagging { $pack } with AI"
 translation = "Etiketteer { $pack } met KI"
 
 [messages.server-job-looks]
-source = "Working out colours and looks"
+source = "Working out colors and looks"
 translation = "Werk kleure en voorkoms uit"
 
 [messages.server-job-materials]
@@ -7451,7 +7455,7 @@ source = "ambient occlusion"
 translation = "omgewingsokklusie"
 
 [messages.server-role-base-color]
-source = "colour"
+source = "color"
 translation = "kleur"
 
 [messages.server-role-bump]
@@ -7869,7 +7873,7 @@ source = "Couldn’t get the model: { $detail }. Trying again every hour."
 translation = "Kon nie die model kry nie: { $detail }. Probeer elke uur weer."
 
 [messages.settings-clip-what]
-source = "Type what you’re after (“mossy rock”, “sci-fi door”, “wooden barrel”) and pictures that show it turn up beside names that have the words. “More like this” finds things of the same kind, not only the same colours."
+source = "Type what you’re after (“mossy rock”, “sci-fi door”, “wooden barrel”) and pictures that show it turn up beside names that have the words. “More like this” finds things of the same kind, not only the same colors."
 translation = "Tik waarna jy soek (“mossy rock”, “sci-fi door”, “wooden barrel”) en prente wat dit wys, verskyn langs name wat die woorde bevat. “Meer soos hierdie” vind dinge van dieselfde soort, nie net dieselfde kleure nie."
 
 [messages.settings-conversion-cache]
@@ -8225,7 +8229,7 @@ source = "Image search"
 translation = "Beeldsoektog"
 
 [messages.settings-page-search-blurb]
-source = "Search pictures by what they show, not only by their names, and find things that are alike in kind, not only in colour."
+source = "Search pictures by what they show, not only by their names, and find things that are alike in kind, not only in color."
 translation = "Soek prente volgens wat hulle wys, nie net volgens hul name nie, en vind dinge wat in soort eenders is, nie net in kleur nie."
 
 [messages.settings-page-store-files]
@@ -8628,8 +8632,8 @@ translation = "Sluit"
 source = "Close, clear the selection, or close the details"
 translation = "Sluit, maak die keuse skoon, of sluit die besonderhede"
 
-[messages.shortcuts-favourite]
-source = "Add to or take out of your favourites"
+[messages.shortcuts-favorite]
+source = "Add to or take out of your favorites"
 translation = "Voeg by of haal uit jou gunstelinge"
 
 [messages.shortcuts-fit]
@@ -9031,15 +9035,15 @@ source = "Edit"
 translation = "Wysig"
 
 [messages.storefiles-field-colors]
-source = "Colours"
+source = "Colors"
 translation = "Kleure"
 
 [messages.storefiles-field-colors-hint]
-source = "Its colours, as color: tags."
+source = "Its colors, as color: tags."
 translation = "Sy kleure, as color:-etikette."
 
 [messages.storefiles-field-colors-name]
-source = "colours"
+source = "colors"
 translation = "kleure"
 
 [messages.storefiles-field-id]
@@ -9631,7 +9635,7 @@ source = "Warm charcoal, amber"
 translation = "Warm houtskool, amber"
 
 [messages.theme-dark-graphite-blurb]
-source = "Neutral grey, no tint"
+source = "Neutral gray, no tint"
 translation = "Neutrale grys, geen tint nie"
 
 [messages.theme-dark-moss-blurb]
@@ -9647,7 +9651,7 @@ source = "Wine-black, coral"
 translation = "Wynswart, koraal"
 
 [messages.theme-dark-slate-blurb]
-source = "Blue-grey"
+source = "Blue-gray"
 translation = "Blougrys"
 
 [messages.theme-ember]
@@ -9671,7 +9675,7 @@ source = "Warm cream, amber"
 translation = "Warm room, amber"
 
 [messages.theme-light-paper-blurb]
-source = "Plain neutral grey"
+source = "Plain neutral gray"
 translation = "Eenvoudige neutrale grys"
 
 [messages.theme-light-sage-blurb]
@@ -9679,7 +9683,7 @@ source = "Soft green"
 translation = "Sagte groen"
 
 [messages.theme-light-slate-blurb]
-source = "Cool blue-grey"
+source = "Cool blue-gray"
 translation = "Koel blougrys"
 
 [messages.theme-lilac]
@@ -9714,16 +9718,16 @@ translation = "Salie"
 source = "Slate"
 translation = "Leiklip"
 
-[messages.tile-add-favourite]
-source = "Add to your favourites (F)"
+[messages.tile-add-favorite]
+source = "Add to your favorites (F)"
 translation = "Voeg by jou gunstelinge (F)"
 
-[messages.tile-favourite]
-source = "Favourite { $name }"
+[messages.tile-favorite]
+source = "Favorite { $name }"
 translation = "Maak { $name } 'n gunsteling"
 
-[messages.tile-in-favourites]
-source = "In your favourites"
+[messages.tile-in-favorites]
+source = "In your favorites"
 translation = "In jou gunstelinge"
 
 [messages.tile-label]

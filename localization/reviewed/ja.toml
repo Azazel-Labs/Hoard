@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "453ff96837a704352761a5bf6af773e801a1f4018577b2f5bc3be44f27d2733f"
+source = "40994fa61278db02342a17e111610609be967f167ac0e561724a1ecc0fd4792e"
 translation = "2747fe98adaa1a9a8f59088de731244eb53b6f693efd9a25e00eb6aa64262f58"
 
 [messages.account-add]
@@ -684,6 +684,14 @@ translation = "{ $name } から { $count } 件を外しました"
 source = "Collections"
 translation = "コレクション"
 
+[messages.app-color]
+source = "Color"
+translation = "色"
+
+[messages.app-color-any]
+source = "Any color"
+translation = "すべての色"
+
 [messages.app-color-black]
 source = "Black"
 translation = "黒"
@@ -696,17 +704,21 @@ translation = "青"
 source = "Brown"
 translation = "茶"
 
+[messages.app-color-gray]
+source = "Gray"
+translation = "グレー"
+
 [messages.app-color-green]
 source = "Green"
 translation = "緑"
 
-[messages.app-color-grey]
-source = "Grey"
-translation = "グレー"
-
 [messages.app-color-orange]
 source = "Orange"
 translation = "オレンジ"
+
+[messages.app-color-pick]
+source = "Pick any color"
+translation = "任意の色を選ぶ"
 
 [messages.app-color-pink]
 source = "Pink"
@@ -728,6 +740,10 @@ translation = "サンド"
 source = "Slate"
 translation = "スレート"
 
+[messages.app-color-swatch]
+source = "{ $color }: assets with much { $lower } in them"
+translation = "{ $color }: { $lower }を多く含むアセット"
+
 [messages.app-color-teal]
 source = "Teal"
 translation = "ティール"
@@ -739,22 +755,6 @@ translation = "白"
 [messages.app-color-yellow]
 source = "Yellow"
 translation = "黄"
-
-[messages.app-colour]
-source = "Colour"
-translation = "色"
-
-[messages.app-colour-any]
-source = "Any colour"
-translation = "すべての色"
-
-[messages.app-colour-pick]
-source = "Pick any colour"
-translation = "任意の色を選ぶ"
-
-[messages.app-colour-swatch]
-source = "{ $color }: assets with much { $lower } in them"
-translation = "{ $color }: { $lower }を多く含むアセット"
 
 [messages.app-credits]
 source = "Credits"
@@ -796,12 +796,12 @@ translation = "減らす"
 source = "{ $count } more"
 translation = "ほか { $count } 件"
 
-[messages.app-favourite]
-source = "Favourite"
+[messages.app-favorite]
+source = "Favorite"
 translation = "お気に入り"
 
-[messages.app-favourites]
-source = "Favourites"
+[messages.app-favorites]
+source = "Favorites"
 translation = "お気に入り"
 
 [messages.app-filters]
@@ -1056,8 +1056,8 @@ translation = "ここから hoard sync しているプロジェクトと、前�
 source = "Most alike"
 translation = "似ている順"
 
-[messages.app-rank-colour]
-source = "Most of the colour"
+[messages.app-rank-color]
+source = "Most of the color"
 translation = "色の多い順"
 
 [messages.app-rank-match]
@@ -1084,8 +1084,8 @@ translation = "再試行"
 source = "Save"
 translation = "保存"
 
-[messages.app-save-name-favourites]
-source = "favourites"
+[messages.app-save-name-favorites]
+source = "favorites"
 translation = "お気に入り"
 
 [messages.app-save-name-label]
@@ -1248,8 +1248,8 @@ translation = "タイルのサイズ"
 source = "Undo"
 translation = "元に戻す"
 
-[messages.app-unfavourite]
-source = "Unfavourite"
+[messages.app-unfavorite]
+source = "Unfavorite"
 translation = "お気に入りから外す"
 
 [messages.app-unnamed-asset]
@@ -1667,16 +1667,16 @@ translation = "このファイルだけ"
 source = "Just this file, without the files it uses"
 translation = "使っているファイルを含めず、このファイルだけ"
 
-[messages.asset-favourite]
-source = "Favourite"
+[messages.asset-favorite]
+source = "Favorite"
 translation = "お気に入り"
 
-[messages.asset-favourite-off-title]
-source = "Add to your favourites (F)"
+[messages.asset-favorite-off-title]
+source = "Add to your favorites (F)"
 translation = "お気に入りに追加（F）"
 
-[messages.asset-favourite-on-title]
-source = "In your favourites (F takes it out)"
+[messages.asset-favorite-on-title]
+source = "In your favorites (F takes it out)"
 translation = "お気に入りに追加済み（F で外す）"
 
 [messages.asset-file]
@@ -1849,6 +1849,10 @@ translation = "クック済み（ゲームビルド）: プレビューとソー
 [messages.asset-meta-cue-markers]
 source = "Cue markers"
 translation = "キューマーカー"
+
+[messages.asset-meta-everything-with]
+source = "Show everything tagged { $tag }"
+translation = "タグ { $tag } が付いたものをすべて表示"
 
 [messages.asset-meta-format]
 source = "Format"
@@ -2078,7 +2082,7 @@ source = "Hoard read it out of the package on { $date } ({ $notes })."
 translation = "Hoard が { $date } にパッケージから読み出しました（{ $notes }）。"
 
 [messages.asset-palette]
-source = "Colours in the picture"
+source = "Colors in the picture"
 translation = "画像の色"
 
 [messages.asset-path]
@@ -2186,7 +2190,7 @@ source = "Find assets with { $hex }, { $percent }% of this picture"
 translation = "{ $hex } のアセットを探す（この画像の { $percent }%）"
 
 [messages.asset-swatch-title]
-source = "{ $hex }, { $percent }% of the picture. Find assets with this colour"
+source = "{ $hex }, { $percent }% of the picture. Find assets with this color"
 translation = "{ $hex }、画像の { $percent }%。この色のアセットを探す"
 
 [messages.asset-tag-add]
@@ -2466,7 +2470,7 @@ source = "Make an OAuth client (Web application) in Google Cloud Console → API
 translation = "Google Cloud Console → API とサービス → 認証情報 で OAuth クライアント（ウェブ アプリケーション）を作成してください。Google はグループを送らないので、ロールは 設定 → アカウント で付けてください。また、Google アカウントを持つ人なら誰でも入れてよい場合を除き、初回サインイン時のアカウント作成はオフにしてください。"
 
 [messages.auth-preset-microsoft-note]
-source = "Register an app in Entra ID → App registrations (a Web redirect to the address below). Put your tenant ID in place of “organizations” to let only your organisation in. For roles from groups, add the groups claim under Token configuration: it lists group IDs."
+source = "Register an app in Entra ID → App registrations (a Web redirect to the address below). Put your tenant ID in place of “organizations” to let only your organization in. For roles from groups, add the groups claim under Token configuration: it lists group IDs."
 translation = "Entra ID → アプリの登録 でアプリを登録してください（下のアドレスへの Web リダイレクト）。自分の組織だけを入れるには、「organizations」をテナント ID に置き換えてください。グループからロールを付けるには、トークン構成 で groups クレームを追加してください。グループ ID が一覧されます。"
 
 [messages.auth-provider]
@@ -2916,8 +2920,8 @@ translation = "{ $path } を読み取れません"
 source = "can't write to { $path }"
 translation = "{ $path } に書き込めません"
 
-[messages.error-chatgpt-cancelled]
-source = "the sign-in was cancelled"
+[messages.error-chatgpt-canceled]
+source = "the sign-in was canceled"
 translation = "サインインはキャンセルされました"
 
 [messages.error-chatgpt-code-used]
@@ -3100,7 +3104,7 @@ translation = "ディレクトリでパスワードを確認できませんで�
 source = "empty file"
 translation = "空のファイルです"
 
-[messages.error-favourites-too-many]
+[messages.error-favorites-too-many]
 source = "at most 10,000 at a time"
 translation = "一度に 10,000 件までです"
 
@@ -3809,7 +3813,7 @@ source = "that picture is too big for a thumbnail"
 translation = "その画像はサムネイルには大きすぎます"
 
 [messages.error-token-account-gone]
-source = "this token's account is gone, so it has no favourites or searches"
+source = "this token's account is gone, so it has no favorites or searches"
 translation = "このトークンのアカウントは削除されているため、お気に入りも検索もありません"
 
 [messages.error-token-name]
@@ -4077,7 +4081,7 @@ source = "It finds no title in this file. Pick the title."
 translation = "このファイルにタイトルが見つかりません。タイトルを選んでください。"
 
 [messages.formatwizard-miss-not-the-stores]
-source = "What it recognises the store’s files by isn’t in this file. Change Recognise by."
+source = "What it recognizes the store’s files by isn’t in this file. Change Recognize by."
 translation = "ストアのファイルを識別する手がかりが、このファイルにありません。「識別方法」を変更してください。"
 
 [messages.formatwizard-miss-short-name]
@@ -4152,19 +4156,19 @@ translation = "タイトル"
 source = "Store page"
 translation = "ストアページ"
 
-[messages.formatwizard-recognise]
-source = "Recognise by"
+[messages.formatwizard-recognize]
+source = "Recognize by"
 translation = "識別方法"
 
-[messages.formatwizard-recognise-hint]
+[messages.formatwizard-recognize-hint]
 source = "One way a line; any of them will do. Needed when other files have the same name."
 translation = "1 行に 1 つ。どれか 1 つが一致すれば十分です。ほかのファイルが同じ名前を持つときに必要です。"
 
-[messages.formatwizard-recognise-json]
+[messages.formatwizard-recognize-json]
 source = "A key only the store’s files have"
 translation = "ストアのファイルだけが持つキー"
 
-[messages.formatwizard-recognise-text]
+[messages.formatwizard-recognize-text]
 source = "A line only the store’s files have"
 translation = "ストアのファイルだけが持つ行"
 
@@ -4662,12 +4666,12 @@ translation = "市松模様の背景"
 source = "Checker background (K cycles)"
 translation = "市松模様の背景（K で切り替え）"
 
-[messages.image-bg-grey]
-source = "grey background"
+[messages.image-bg-gray]
+source = "gray background"
 translation = "グレーの背景"
 
-[messages.image-bg-grey-title]
-source = "Grey background (K cycles)"
+[messages.image-bg-gray-title]
+source = "Gray background (K cycles)"
 translation = "グレーの背景（K で切り替え）"
 
 [messages.image-bg-white]
@@ -5515,11 +5519,11 @@ source = "ambient occlusion"
 translation = "アンビエントオクルージョン"
 
 [messages.material-role-base-color]
-source = "Colour"
+source = "Color"
 translation = "カラー"
 
 [messages.material-role-base-color-name]
-source = "colour"
+source = "color"
 translation = "カラー"
 
 [messages.material-role-bump]
@@ -5686,8 +5690,8 @@ translation = "暗い背景"
 source = "Environment background"
 translation = "環境の背景"
 
-[messages.model-bg-grey]
-source = "Grey background"
+[messages.model-bg-gray]
+source = "Gray background"
 translation = "グレーの背景"
 
 [messages.model-bg-light]
@@ -5802,8 +5806,8 @@ translation = "長さ"
 source = "Materials"
 translation = "マテリアル"
 
-[messages.model-info-metres]
-source = "glTF is in metres"
+[messages.model-info-meters]
+source = "glTF is in meters"
 translation = "glTF の単位はメートルです"
 
 [messages.model-info-no-units]
@@ -6505,8 +6509,8 @@ translation = "保存するとストアページから説明を取得します�
 source = "Paste the listing text, or leave empty to fetch it from the store page."
 translation = "掲載テキストを貼り付けるか、空のままにするとストアページから取得します。"
 
-[messages.packs-thumbs-cancelled]
-source = "Cancelled after { $done } of { $total }"
+[messages.packs-thumbs-canceled]
+source = "Canceled after { $done } of { $total }"
 translation = "{ $total } 件中 { $done } 件でキャンセルしました"
 
 [messages.packs-thumbs-drawing]
@@ -6749,11 +6753,11 @@ translation = "選択を解除"
 source = "Dark theme: { $name }"
 translation = "ダークテーマ: { $name }"
 
-[messages.palette-favourites]
-source = "Favourites"
+[messages.palette-favorites]
+source = "Favorites"
 translation = "お気に入り"
 
-[messages.palette-favourites-keywords]
+[messages.palette-favorites-keywords]
 source = "starred stars liked"
 translation = "スター 星 いいね starred stars liked"
 
@@ -6941,12 +6945,12 @@ translation = "外観 色 appearance color"
 source = "Command palette"
 translation = "コマンドパレット"
 
-[messages.projects-favourite-add-failed]
-source = "Couldn't add to your favourites: { $error }"
+[messages.projects-favorite-add-failed]
+source = "Couldn't add to your favorites: { $error }"
 translation = "お気に入りに追加できませんでした: { $error }"
 
-[messages.projects-favourite-remove-failed]
-source = "Couldn't take out of your favourites: { $error }"
+[messages.projects-favorite-remove-failed]
+source = "Couldn't take out of your favorites: { $error }"
 translation = "お気に入りから外せませんでした: { $error }"
 
 [messages.projects-forget-search-failed]
@@ -7214,7 +7218,7 @@ source = "Tagging { $pack } with AI"
 translation = "AI で { $pack } にタグ付け中"
 
 [messages.server-job-looks]
-source = "Working out colours and looks"
+source = "Working out colors and looks"
 translation = "色と見た目を分析中"
 
 [messages.server-job-materials]
@@ -7302,7 +7306,7 @@ source = "ambient occlusion"
 translation = "アンビエントオクルージョン"
 
 [messages.server-role-base-color]
-source = "colour"
+source = "color"
 translation = "カラー"
 
 [messages.server-role-bump]
@@ -7716,7 +7720,7 @@ source = "Couldn’t get the model: { $detail }. Trying again every hour."
 translation = "モデルを取得できませんでした: { $detail }。1 時間ごとに再試行します。"
 
 [messages.settings-clip-what]
-source = "Type what you’re after (“mossy rock”, “sci-fi door”, “wooden barrel”) and pictures that show it turn up beside names that have the words. “More like this” finds things of the same kind, not only the same colours."
+source = "Type what you’re after (“mossy rock”, “sci-fi door”, “wooden barrel”) and pictures that show it turn up beside names that have the words. “More like this” finds things of the same kind, not only the same colors."
 translation = "探しているもの（「mossy rock」「sci-fi door」「wooden barrel」など）を入力すると、その語句を含む名前のものと並んで、それが写っている画像が表示されます。「これに似たもの」は、同じ色だけでなく同じ種類のものを見つけます。"
 
 [messages.settings-conversion-cache]
@@ -8072,7 +8076,7 @@ source = "Image search"
 translation = "画像検索"
 
 [messages.settings-page-search-blurb]
-source = "Search pictures by what they show, not only by their names, and find things that are alike in kind, not only in colour."
+source = "Search pictures by what they show, not only by their names, and find things that are alike in kind, not only in color."
 translation = "画像を名前だけでなく写っている内容で検索し、色だけでなく種類の似たものを見つけます。"
 
 [messages.settings-page-store-files]
@@ -8475,8 +8479,8 @@ translation = "閉じる"
 source = "Close, clear the selection, or close the details"
 translation = "閉じる、選択を解除する、または詳細を閉じる"
 
-[messages.shortcuts-favourite]
-source = "Add to or take out of your favourites"
+[messages.shortcuts-favorite]
+source = "Add to or take out of your favorites"
 translation = "お気に入りに追加、またはお気に入りから外す"
 
 [messages.shortcuts-fit]
@@ -8878,15 +8882,15 @@ source = "Edit"
 translation = "編集"
 
 [messages.storefiles-field-colors]
-source = "Colours"
+source = "Colors"
 translation = "色"
 
 [messages.storefiles-field-colors-hint]
-source = "Its colours, as color: tags."
+source = "Its colors, as color: tags."
 translation = "その色で、color: タグになります。"
 
 [messages.storefiles-field-colors-name]
-source = "colours"
+source = "colors"
 translation = "色"
 
 [messages.storefiles-field-id]
@@ -9462,7 +9466,7 @@ source = "Warm charcoal, amber"
 translation = "温かみのあるチャコールとアンバー"
 
 [messages.theme-dark-graphite-blurb]
-source = "Neutral grey, no tint"
+source = "Neutral gray, no tint"
 translation = "色味のないニュートラルグレー"
 
 [messages.theme-dark-moss-blurb]
@@ -9478,7 +9482,7 @@ source = "Wine-black, coral"
 translation = "ワインがかった黒とコーラル"
 
 [messages.theme-dark-slate-blurb]
-source = "Blue-grey"
+source = "Blue-gray"
 translation = "青みがかったグレー"
 
 [messages.theme-ember]
@@ -9502,7 +9506,7 @@ source = "Warm cream, amber"
 translation = "温かみのあるクリームとアンバー"
 
 [messages.theme-light-paper-blurb]
-source = "Plain neutral grey"
+source = "Plain neutral gray"
 translation = "素朴なニュートラルグレー"
 
 [messages.theme-light-sage-blurb]
@@ -9510,7 +9514,7 @@ source = "Soft green"
 translation = "柔らかな緑"
 
 [messages.theme-light-slate-blurb]
-source = "Cool blue-grey"
+source = "Cool blue-gray"
 translation = "涼しげな青みがかったグレー"
 
 [messages.theme-lilac]
@@ -9545,16 +9549,16 @@ translation = "Sage"
 source = "Slate"
 translation = "Slate"
 
-[messages.tile-add-favourite]
-source = "Add to your favourites (F)"
+[messages.tile-add-favorite]
+source = "Add to your favorites (F)"
 translation = "お気に入りに追加（F）"
 
-[messages.tile-favourite]
-source = "Favourite { $name }"
+[messages.tile-favorite]
+source = "Favorite { $name }"
 translation = "{ $name } をお気に入りに追加"
 
-[messages.tile-in-favourites]
-source = "In your favourites"
+[messages.tile-in-favorites]
+source = "In your favorites"
 translation = "お気に入りに追加済み"
 
 [messages.tile-label]

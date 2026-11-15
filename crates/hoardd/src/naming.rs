@@ -45,7 +45,7 @@ impl Role {
     /// What the map is for, in words: what the portal shows for it too.
     pub(crate) fn label(self) -> &'static str {
         match self {
-            Role::BaseColor => "Colour",
+            Role::BaseColor => "Color",
             Role::Normal => "Normal",
             Role::NormalDx => "Normal (DirectX)",
             Role::Roughness => "Roughness",
@@ -89,7 +89,7 @@ impl Role {
     }
 }
 
-/// `CASE <col> WHEN 'base_color' THEN 'Colour' … END`, for naming maps in SQL.
+/// `CASE <col> WHEN 'base_color' THEN 'Color' … END`, for naming maps in SQL.
 fn label_sql(col: &str) -> String {
     let arms: Vec<String> = ALL_ROLES.iter().map(|r| format!("WHEN '{}' THEN '{}'", r.as_str(), r.label())).collect();
     format!("CASE {col} {} ELSE {col} END", arms.join(" "))
@@ -416,7 +416,7 @@ mod tests {
         let name =
             |id: &str| c.query_row("SELECT name FROM assets WHERE id = ?1", [id], |r| r.get::<_, String>(0)).unwrap();
         assert_eq!(name("ao"), "Stand Wood Old 05 Ambient occlusion", "one size, so no size in the name");
-        assert_eq!(name("col4"), "Crate Colour 4K", "two sizes of the colour map");
+        assert_eq!(name("col4"), "Crate Color 4K", "two sizes of the color map");
         assert_eq!(name("n"), "stand normal", "named by hand");
         assert!(name_maps(&c, Some("p")).unwrap().is_empty(), "nothing left to do the second time");
     }

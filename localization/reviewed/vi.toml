@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "453ff96837a704352761a5bf6af773e801a1f4018577b2f5bc3be44f27d2733f"
+source = "40994fa61278db02342a17e111610609be967f167ac0e561724a1ecc0fd4792e"
 translation = "2701cb3147c57e837f2b2456d8b8bfc81b269cd92a0d8a2997fa5b09d72a7926"
 
 [messages.account-add]
@@ -687,6 +687,14 @@ translation = "Đã gỡ { $count } khỏi { $name }"
 source = "Collections"
 translation = "Bộ sưu tập"
 
+[messages.app-color]
+source = "Color"
+translation = "Màu"
+
+[messages.app-color-any]
+source = "Any color"
+translation = "Màu bất kỳ"
+
 [messages.app-color-black]
 source = "Black"
 translation = "Đen"
@@ -699,17 +707,21 @@ translation = "Xanh dương"
 source = "Brown"
 translation = "Nâu"
 
+[messages.app-color-gray]
+source = "Gray"
+translation = "Xám"
+
 [messages.app-color-green]
 source = "Green"
 translation = "Xanh lá"
 
-[messages.app-color-grey]
-source = "Grey"
-translation = "Xám"
-
 [messages.app-color-orange]
 source = "Orange"
 translation = "Cam"
+
+[messages.app-color-pick]
+source = "Pick any color"
+translation = "Chọn màu bất kỳ"
 
 [messages.app-color-pink]
 source = "Pink"
@@ -731,6 +743,10 @@ translation = "Màu cát"
 source = "Slate"
 translation = "Xám đá"
 
+[messages.app-color-swatch]
+source = "{ $color }: assets with much { $lower } in them"
+translation = "{ $color }: tài nguyên có nhiều màu { $lower }"
+
 [messages.app-color-teal]
 source = "Teal"
 translation = "Xanh mòng két"
@@ -742,22 +758,6 @@ translation = "Trắng"
 [messages.app-color-yellow]
 source = "Yellow"
 translation = "Vàng"
-
-[messages.app-colour]
-source = "Colour"
-translation = "Màu"
-
-[messages.app-colour-any]
-source = "Any colour"
-translation = "Màu bất kỳ"
-
-[messages.app-colour-pick]
-source = "Pick any colour"
-translation = "Chọn màu bất kỳ"
-
-[messages.app-colour-swatch]
-source = "{ $color }: assets with much { $lower } in them"
-translation = "{ $color }: tài nguyên có nhiều màu { $lower }"
 
 [messages.app-credits]
 source = "Credits"
@@ -799,12 +799,12 @@ translation = "bớt"
 source = "{ $count } more"
 translation = "Thêm { $count }"
 
-[messages.app-favourite]
-source = "Favourite"
+[messages.app-favorite]
+source = "Favorite"
 translation = "Yêu thích"
 
-[messages.app-favourites]
-source = "Favourites"
+[messages.app-favorites]
+source = "Favorites"
 translation = "Yêu thích"
 
 [messages.app-filters]
@@ -1059,8 +1059,8 @@ translation = "Các dự án chạy hoard sync từ đây, cùng nội dung củ
 source = "Most alike"
 translation = "Giống nhất"
 
-[messages.app-rank-colour]
-source = "Most of the colour"
+[messages.app-rank-color]
+source = "Most of the color"
 translation = "Nhiều màu đó nhất"
 
 [messages.app-rank-match]
@@ -1087,8 +1087,8 @@ translation = "Thử lại"
 source = "Save"
 translation = "Lưu"
 
-[messages.app-save-name-favourites]
-source = "favourites"
+[messages.app-save-name-favorites]
+source = "favorites"
 translation = "yêu thích"
 
 [messages.app-save-name-label]
@@ -1251,8 +1251,8 @@ translation = "Kích thước ô"
 source = "Undo"
 translation = "Hoàn tác"
 
-[messages.app-unfavourite]
-source = "Unfavourite"
+[messages.app-unfavorite]
+source = "Unfavorite"
 translation = "Bỏ yêu thích"
 
 [messages.app-unnamed-asset]
@@ -1670,16 +1670,16 @@ translation = "Chỉ tệp này"
 source = "Just this file, without the files it uses"
 translation = "Chỉ tệp này, không kèm các tệp nó dùng"
 
-[messages.asset-favourite]
-source = "Favourite"
+[messages.asset-favorite]
+source = "Favorite"
 translation = "Yêu thích"
 
-[messages.asset-favourite-off-title]
-source = "Add to your favourites (F)"
+[messages.asset-favorite-off-title]
+source = "Add to your favorites (F)"
 translation = "Thêm vào mục yêu thích (F)"
 
-[messages.asset-favourite-on-title]
-source = "In your favourites (F takes it out)"
+[messages.asset-favorite-on-title]
+source = "In your favorites (F takes it out)"
 translation = "Có trong mục yêu thích (F để bỏ ra)"
 
 [messages.asset-file]
@@ -1849,6 +1849,10 @@ translation = "Đã cook (bản build game): bản xem trước và nguồn đã
 [messages.asset-meta-cue-markers]
 source = "Cue markers"
 translation = "Điểm đánh dấu cue"
+
+[messages.asset-meta-everything-with]
+source = "Show everything tagged { $tag }"
+translation = "Hiện mọi thứ có thẻ { $tag }"
 
 [messages.asset-meta-format]
 source = "Format"
@@ -2075,7 +2079,7 @@ source = "Hoard read it out of the package on { $date } ({ $notes })."
 translation = "Hoard đã đọc tệp này ra từ package vào { $date } ({ $notes })."
 
 [messages.asset-palette]
-source = "Colours in the picture"
+source = "Colors in the picture"
 translation = "Màu trong ảnh"
 
 [messages.asset-path]
@@ -2183,7 +2187,7 @@ source = "Find assets with { $hex }, { $percent }% of this picture"
 translation = "Tìm tài nguyên có { $hex }, { $percent }% ảnh này"
 
 [messages.asset-swatch-title]
-source = "{ $hex }, { $percent }% of the picture. Find assets with this colour"
+source = "{ $hex }, { $percent }% of the picture. Find assets with this color"
 translation = "{ $hex }, { $percent }% ảnh. Tìm tài nguyên có màu này"
 
 [messages.asset-tag-add]
@@ -2463,7 +2467,7 @@ source = "Make an OAuth client (Web application) in Google Cloud Console → API
 translation = "Tạo một OAuth client (Web application) trong Google Cloud Console → APIs & Services → Credentials. Google không gửi nhóm, nên hãy cấp vai trò trong Cài đặt → Tài khoản, và tắt việc tạo tài khoản ở lần đăng nhập đầu tiên, trừ khi ai có tài khoản Google cũng được vào."
 
 [messages.auth-preset-microsoft-note]
-source = "Register an app in Entra ID → App registrations (a Web redirect to the address below). Put your tenant ID in place of “organizations” to let only your organisation in. For roles from groups, add the groups claim under Token configuration: it lists group IDs."
+source = "Register an app in Entra ID → App registrations (a Web redirect to the address below). Put your tenant ID in place of “organizations” to let only your organization in. For roles from groups, add the groups claim under Token configuration: it lists group IDs."
 translation = "Đăng ký một ứng dụng trong Entra ID → App registrations (chuyển hướng Web tới địa chỉ bên dưới). Thay “organizations” bằng tenant ID của bạn để chỉ cho tổ chức của bạn vào. Để lấy vai trò từ nhóm, hãy thêm groups claim trong Token configuration: nó liệt kê ID của nhóm."
 
 [messages.auth-provider]
@@ -2910,8 +2914,8 @@ translation = "không thể đọc { $path }"
 source = "can't write to { $path }"
 translation = "không thể ghi vào { $path }"
 
-[messages.error-chatgpt-cancelled]
-source = "the sign-in was cancelled"
+[messages.error-chatgpt-canceled]
+source = "the sign-in was canceled"
 translation = "lần đăng nhập đã bị hủy"
 
 [messages.error-chatgpt-code-used]
@@ -3094,7 +3098,7 @@ translation = "Máy chủ thư mục không thể kiểm tra mật khẩu của 
 source = "empty file"
 translation = "tệp trống"
 
-[messages.error-favourites-too-many]
+[messages.error-favorites-too-many]
 source = "at most 10,000 at a time"
 translation = "tối đa 10.000 mục mỗi lần"
 
@@ -3803,7 +3807,7 @@ source = "that picture is too big for a thumbnail"
 translation = "ảnh đó quá lớn để làm ảnh thu nhỏ"
 
 [messages.error-token-account-gone]
-source = "this token's account is gone, so it has no favourites or searches"
+source = "this token's account is gone, so it has no favorites or searches"
 translation = "tài khoản của token này không còn, nên nó không có mục yêu thích hay tìm kiếm nào"
 
 [messages.error-token-name]
@@ -4066,7 +4070,7 @@ source = "It finds no title in this file. Pick the title."
 translation = "Nó không tìm thấy tiêu đề trong tệp này. Hãy chọn tiêu đề."
 
 [messages.formatwizard-miss-not-the-stores]
-source = "What it recognises the store’s files by isn’t in this file. Change Recognise by."
+source = "What it recognizes the store’s files by isn’t in this file. Change Recognize by."
 translation = "Thứ mà nó dùng để nhận ra tệp của cửa hàng không có trong tệp này. Hãy đổi Nhận ra bằng."
 
 [messages.formatwizard-miss-short-name]
@@ -4141,19 +4145,19 @@ translation = "Tiêu đề"
 source = "Store page"
 translation = "Trang cửa hàng"
 
-[messages.formatwizard-recognise]
-source = "Recognise by"
+[messages.formatwizard-recognize]
+source = "Recognize by"
 translation = "Nhận ra bằng"
 
-[messages.formatwizard-recognise-hint]
+[messages.formatwizard-recognize-hint]
 source = "One way a line; any of them will do. Needed when other files have the same name."
 translation = "Mỗi dòng một cách; cách nào cũng được. Cần khi có tệp khác trùng tên."
 
-[messages.formatwizard-recognise-json]
+[messages.formatwizard-recognize-json]
 source = "A key only the store’s files have"
 translation = "Một khóa chỉ tệp của cửa hàng mới có"
 
-[messages.formatwizard-recognise-text]
+[messages.formatwizard-recognize-text]
 source = "A line only the store’s files have"
 translation = "Một dòng chỉ tệp của cửa hàng mới có"
 
@@ -4645,12 +4649,12 @@ translation = "nền ô cờ"
 source = "Checker background (K cycles)"
 translation = "Nền ô cờ (K để chuyển)"
 
-[messages.image-bg-grey]
-source = "grey background"
+[messages.image-bg-gray]
+source = "gray background"
 translation = "nền xám"
 
-[messages.image-bg-grey-title]
-source = "Grey background (K cycles)"
+[messages.image-bg-gray-title]
+source = "Gray background (K cycles)"
 translation = "Nền xám (K để chuyển)"
 
 [messages.image-bg-white]
@@ -5501,11 +5505,11 @@ source = "ambient occlusion"
 translation = "ambient occlusion"
 
 [messages.material-role-base-color]
-source = "Colour"
+source = "Color"
 translation = "Màu"
 
 [messages.material-role-base-color-name]
-source = "colour"
+source = "color"
 translation = "màu"
 
 [messages.material-role-bump]
@@ -5672,8 +5676,8 @@ translation = "Nền tối"
 source = "Environment background"
 translation = "Nền môi trường"
 
-[messages.model-bg-grey]
-source = "Grey background"
+[messages.model-bg-gray]
+source = "Gray background"
 translation = "Nền xám"
 
 [messages.model-bg-light]
@@ -5788,8 +5792,8 @@ translation = "Chiều dài"
 source = "Materials"
 translation = "Vật liệu"
 
-[messages.model-info-metres]
-source = "glTF is in metres"
+[messages.model-info-meters]
+source = "glTF is in meters"
 translation = "glTF tính bằng mét"
 
 [messages.model-info-no-units]
@@ -6491,8 +6495,8 @@ translation = "Khi lưu, mô tả sẽ được lấy từ trang cửa hàng."
 source = "Paste the listing text, or leave empty to fetch it from the store page."
 translation = "Dán nội dung trang sản phẩm, hoặc để trống để lấy từ trang cửa hàng."
 
-[messages.packs-thumbs-cancelled]
-source = "Cancelled after { $done } of { $total }"
+[messages.packs-thumbs-canceled]
+source = "Canceled after { $done } of { $total }"
 translation = "Đã hủy sau { $done } / { $total }"
 
 [messages.packs-thumbs-drawing]
@@ -6735,11 +6739,11 @@ translation = "Bỏ chọn"
 source = "Dark theme: { $name }"
 translation = "Chủ đề tối: { $name }"
 
-[messages.palette-favourites]
-source = "Favourites"
+[messages.palette-favorites]
+source = "Favorites"
 translation = "Yêu thích"
 
-[messages.palette-favourites-keywords]
+[messages.palette-favorites-keywords]
 source = "starred stars liked"
 translation = "yêu thích sao đánh dấu starred stars liked"
 
@@ -6927,12 +6931,12 @@ translation = "giao diện màu appearance color"
 source = "Command palette"
 translation = "Bảng lệnh"
 
-[messages.projects-favourite-add-failed]
-source = "Couldn't add to your favourites: { $error }"
+[messages.projects-favorite-add-failed]
+source = "Couldn't add to your favorites: { $error }"
 translation = "Không thể thêm vào mục yêu thích: { $error }"
 
-[messages.projects-favourite-remove-failed]
-source = "Couldn't take out of your favourites: { $error }"
+[messages.projects-favorite-remove-failed]
+source = "Couldn't take out of your favorites: { $error }"
 translation = "Không thể bỏ khỏi mục yêu thích: { $error }"
 
 [messages.projects-forget-search-failed]
@@ -7200,7 +7204,7 @@ source = "Tagging { $pack } with AI"
 translation = "Đang gắn thẻ { $pack } bằng AI"
 
 [messages.server-job-looks]
-source = "Working out colours and looks"
+source = "Working out colors and looks"
 translation = "Đang xác định màu sắc và diện mạo"
 
 [messages.server-job-materials]
@@ -7288,7 +7292,7 @@ source = "ambient occlusion"
 translation = "ambient occlusion"
 
 [messages.server-role-base-color]
-source = "colour"
+source = "color"
 translation = "màu"
 
 [messages.server-role-bump]
@@ -7702,7 +7706,7 @@ source = "Couldn’t get the model: { $detail }. Trying again every hour."
 translation = "Không lấy được mô hình: { $detail }. Sẽ thử lại mỗi giờ."
 
 [messages.settings-clip-what]
-source = "Type what you’re after (“mossy rock”, “sci-fi door”, “wooden barrel”) and pictures that show it turn up beside names that have the words. “More like this” finds things of the same kind, not only the same colours."
+source = "Type what you’re after (“mossy rock”, “sci-fi door”, “wooden barrel”) and pictures that show it turn up beside names that have the words. “More like this” finds things of the same kind, not only the same colors."
 translation = "Nhập thứ bạn đang tìm (“mossy rock”, “sci-fi door”, “wooden barrel”) và những ảnh thể hiện nó sẽ hiện ra cạnh những tên có các từ đó. “Thêm nữa giống thế này” tìm những thứ cùng loại, không chỉ cùng màu."
 
 [messages.settings-conversion-cache]
@@ -8058,7 +8062,7 @@ source = "Image search"
 translation = "Tìm kiếm hình ảnh"
 
 [messages.settings-page-search-blurb]
-source = "Search pictures by what they show, not only by their names, and find things that are alike in kind, not only in colour."
+source = "Search pictures by what they show, not only by their names, and find things that are alike in kind, not only in color."
 translation = "Tìm ảnh theo nội dung trong ảnh, không chỉ theo tên, và tìm những thứ giống nhau về loại, không chỉ về màu."
 
 [messages.settings-page-store-files]
@@ -8461,8 +8465,8 @@ translation = "Đóng"
 source = "Close, clear the selection, or close the details"
 translation = "Đóng, bỏ chọn, hoặc đóng chi tiết"
 
-[messages.shortcuts-favourite]
-source = "Add to or take out of your favourites"
+[messages.shortcuts-favorite]
+source = "Add to or take out of your favorites"
 translation = "Thêm vào hoặc bỏ khỏi mục yêu thích"
 
 [messages.shortcuts-fit]
@@ -8864,15 +8868,15 @@ source = "Edit"
 translation = "Sửa"
 
 [messages.storefiles-field-colors]
-source = "Colours"
+source = "Colors"
 translation = "Màu"
 
 [messages.storefiles-field-colors-hint]
-source = "Its colours, as color: tags."
+source = "Its colors, as color: tags."
 translation = "Các màu của nó, dưới dạng thẻ color:."
 
 [messages.storefiles-field-colors-name]
-source = "colours"
+source = "colors"
 translation = "màu"
 
 [messages.storefiles-field-id]
@@ -9448,7 +9452,7 @@ source = "Warm charcoal, amber"
 translation = "Than ấm, hổ phách"
 
 [messages.theme-dark-graphite-blurb]
-source = "Neutral grey, no tint"
+source = "Neutral gray, no tint"
 translation = "Xám trung tính, không ánh màu"
 
 [messages.theme-dark-moss-blurb]
@@ -9464,7 +9468,7 @@ source = "Wine-black, coral"
 translation = "Đen ánh rượu vang, san hô"
 
 [messages.theme-dark-slate-blurb]
-source = "Blue-grey"
+source = "Blue-gray"
 translation = "Xám xanh"
 
 [messages.theme-ember]
@@ -9488,7 +9492,7 @@ source = "Warm cream, amber"
 translation = "Kem ấm, hổ phách"
 
 [messages.theme-light-paper-blurb]
-source = "Plain neutral grey"
+source = "Plain neutral gray"
 translation = "Xám trung tính đơn giản"
 
 [messages.theme-light-sage-blurb]
@@ -9496,7 +9500,7 @@ source = "Soft green"
 translation = "Xanh lá dịu"
 
 [messages.theme-light-slate-blurb]
-source = "Cool blue-grey"
+source = "Cool blue-gray"
 translation = "Xám xanh dịu mát"
 
 [messages.theme-lilac]
@@ -9531,16 +9535,16 @@ translation = "Xô thơm"
 source = "Slate"
 translation = "Đá phiến"
 
-[messages.tile-add-favourite]
-source = "Add to your favourites (F)"
+[messages.tile-add-favorite]
+source = "Add to your favorites (F)"
 translation = "Thêm vào mục yêu thích (F)"
 
-[messages.tile-favourite]
-source = "Favourite { $name }"
+[messages.tile-favorite]
+source = "Favorite { $name }"
 translation = "Yêu thích { $name }"
 
-[messages.tile-in-favourites]
-source = "In your favourites"
+[messages.tile-in-favorites]
+source = "In your favorites"
 translation = "Có trong mục yêu thích của bạn"
 
 [messages.tile-label]

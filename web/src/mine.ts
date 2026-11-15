@@ -7,7 +7,7 @@ import { showError } from './ui'
 import { t } from './i18n'
 
 export const mine = reactive({
-  favourites: new Set<string>(),
+  favorites: new Set<string>(),
   searches: [] as SavedSearch[],
 })
 
@@ -18,13 +18,13 @@ export function canStar(): boolean {
 
 export async function loadMine(): Promise<void> {
   if (!canStar()) {
-    mine.favourites = new Set()
+    mine.favorites = new Set()
     mine.searches = []
     return
   }
   try {
-    const [f, s] = await Promise.all([api.favourites(), api.savedSearches()])
-    mine.favourites = new Set(f.assets)
+    const [f, s] = await Promise.all([api.favorites(), api.savedSearches()])
+    mine.favorites = new Set(f.assets)
     mine.searches = s.searches
   } catch {
     // Not worth an error of its own: the stars just don't show until the next sign-in or reload.
@@ -34,26 +34,26 @@ export async function loadMine(): Promise<void> {
 watch(() => auth.status?.user?.name ?? null, loadMine, { immediate: true })
 
 /** Star (or with `on` false, unstar) these assets. */
-export async function setFavourite(ids: string[], on: boolean): Promise<void> {
+export async function setFavorite(ids: string[], on: boolean): Promise<void> {
   if (!ids.length) return
   // Shown at once; put back if the server says no.
-  const was = new Set(mine.favourites)
+  const was = new Set(mine.favorites)
   const next = new Set(was)
   for (const id of ids) {
     if (on) next.add(id)
     else next.delete(id)
   }
-  mine.favourites = next
+  mine.favorites = next
   try {
-    mine.favourites = new Set((await api.setFavourites(on ? { add: ids } : { remove: ids })).assets)
+    mine.favorites = new Set((await api.setFavorites(on ? { add: ids } : { remove: ids })).assets)
   } catch (e) {
-    mine.favourites = was
-    showError(on ? t('projects-favourite-add-failed', { error: (e as Error).message }) : t('projects-favourite-remove-failed', { error: (e as Error).message }))
+    mine.favorites = was
+    showError(on ? t('projects-favorite-add-failed', { error: (e as Error).message }) : t('projects-favorite-remove-failed', { error: (e as Error).message }))
   }
 }
 
-export function toggleFavourite(id: string): Promise<void> {
-  return setFavourite([id], !mine.favourites.has(id))
+export function toggleFavorite(id: string): Promise<void> {
+  return setFavorite([id], !mine.favorites.has(id))
 }
 
 export async function saveSearch(name: string, query: string): Promise<boolean> {

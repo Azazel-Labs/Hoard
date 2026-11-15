@@ -56,10 +56,10 @@ export const thumbRun = reactive({
   running: false,
   error: '',
 })
-let cancelled = false
+let canceled = false
 
 export function cancelThumbRun() {
-  cancelled = true
+  canceled = true
 }
 
 async function packModels(packId: string): Promise<Asset[]> {
@@ -82,7 +82,7 @@ async function packModels(packId: string): Promise<Asset[]> {
 export async function makePackThumbs(packId: string, packName: string): Promise<void> {
   if (thumbRun.running) return
   Object.assign(thumbRun, { packId, packName, done: 0, total: 0, improved: 0, failed: 0, current: '', running: true, error: '' })
-  cancelled = false
+  canceled = false
   // A fixed size, off the page: the stage renders to it like any viewer.
   const host = document.createElement('div')
   host.setAttribute('aria-hidden', 'true')
@@ -93,7 +93,7 @@ export async function makePackThumbs(packId: string, packName: string): Promise<
     thumbRun.total = models.length
     const { ModelStage } = await import('./modelStage')
     for (const a of models) {
-      if (cancelled) break
+      if (canceled) break
       thumbRun.current = a.name
       const stage = new ModelStage(host)
       try {

@@ -25,9 +25,9 @@ const META_VERSION: &str = "io.modelcontextprotocol/protocolVersion";
 
 const INSTRUCTIONS: &str = "Hoard is a library of game assets (textures, sprites, audio, music, 3D models, fonts). \
 Use search_assets to find things by words, kind and tags (tags look like `sfx`, `material:stone`, `style:pixel-art`, \
-`map:normal`, `license:cc0`). Use get_asset for full details, including linked textures/animations and the thumbnail's colours. find_similar finds \
+`map:normal`, `license:cc0`). Use get_asset for full details, including linked textures/animations and the thumbnail's colors. find_similar finds \
 assets that look like one you have (textures, models, sprites, across every pack), or sound like it for a sound, and find_by_color finds assets with \
-much of a colour in them. To actually \
+much of a color in them. To actually \
 fetch files, use get_bundle: it returns direct download URLs for an asset and every file it depends on, plus a zip URL. \
 To describe and tag assets nothing has described yet, loop next_to_tag → save_tags (the tag_pack prompt explains how).";
 
@@ -337,7 +337,7 @@ fn search_tools() -> Value {
         {
             "name": "find_similar",
             "title": "Find assets that look or sound alike",
-            "description": "Assets whose thumbnail looks like this asset's (colours, surface grain, edges, layout, and, when image search is on, what it shows), across every pack, most alike first: other rocks for a rock texture, near-copies at other sizes, renders of similar models. For a sound, the sounds that sound like it (its spectrum, how it rises and dies away, how bright, noisy and busy it is), whatever they're called. Same result shape as search_assets.",
+            "description": "Assets whose thumbnail looks like this asset's (colors, surface grain, edges, layout, and, when image search is on, what it shows), across every pack, most alike first: other rocks for a rock texture, near-copies at other sizes, renders of similar models. For a sound, the sounds that sound like it (its spectrum, how it rises and dies away, how bright, noisy and busy it is), whatever they're called. Same result shape as search_assets.",
             "inputSchema": {
                 "type": "object",
                 "properties": {
@@ -353,12 +353,12 @@ fn search_tools() -> Value {
         },
         {
             "name": "find_by_color",
-            "title": "Find assets by colour",
-            "description": "Assets with much of a colour in their thumbnail, those covered most by it first (colours are compared perceptually, so a slightly different shade still matches). Same result shape as search_assets.",
+            "title": "Find assets by color",
+            "description": "Assets with much of a color in their thumbnail, those covered most by it first (colors are compared perceptually, so a slightly different shade still matches). Same result shape as search_assets.",
             "inputSchema": {
                 "type": "object",
                 "properties": {
-                    "color": { "type": "string", "description": "Hex colour, e.g. '#3a7d2c'." },
+                    "color": { "type": "string", "description": "Hex color, e.g. '#3a7d2c'." },
                     "kind": { "type": "string", "enum": ["texture", "model", "material", "animation", "video", "other"] },
                     "query": { "type": "string", "description": "Optional words the matches must also have." },
                     "limit": { "type": "integer", "minimum": 1, "maximum": 100, "default": 20 },
@@ -462,7 +462,7 @@ fn get_prompt(params: &Value) -> Option<Value> {
          in the batch, by `id`. If the pack has no description yet, include `pack` (id, description, tags) in the \
          first save_tags. Saved files drop out, so call next_to_tag again (with the pack id it returned) until \
          `files` is empty. If you can't say anything useful about a file, still save its tags, or skip it with \
-         `skip`. When done, tell me how many you described and anything that looked wrong or mislabelled.\n\n\
+         `skip`. When done, tell me how many you described and anything that looked wrong or mislabeled.\n\n\
          Rules:\n{}",
         crate::llm::tagging_rules()
     );
@@ -663,7 +663,7 @@ async fn search_call(state: &AppState, name: &str, args: &Value, base: &str) -> 
     let color = (name == "find_by_color")
         .then(|| match str_arg(args, "color") {
             Some(c) if crate::looks::parse_hex(&c).is_some() => Ok(c),
-            _ => Err(ToolError::Failed("`color` must be a hex colour like '#3a7d2c'".into())),
+            _ => Err(ToolError::Failed("`color` must be a hex color like '#3a7d2c'".into())),
         })
         .transpose()?;
     let q = SearchQuery {

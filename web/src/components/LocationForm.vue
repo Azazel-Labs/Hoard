@@ -14,7 +14,7 @@ const props = defineProps<{
   first?: boolean
   /** Label for the button that adds it. */
   submitLabel?: string
-  cancellable?: boolean
+  cancelable?: boolean
 }>()
 const emit = defineEmits<{ created: [LibraryLocation]; cancel: []; unauthorized: [] }>()
 
@@ -116,7 +116,7 @@ async function submit() {
 
     <div class="acts">
       <button type="submit" class="btn primary" :disabled="!ready || busy" :aria-busy="busy">{{ busy ? t('locations-checking') : submitLabel || t('locations-add') }}</button>
-      <button v-if="cancellable" type="button" class="btn ghost" @click="emit('cancel')">{{ t('locations-cancel') }}</button>
+      <button v-if="cancelable" type="button" class="btn ghost" @click="emit('cancel')">{{ t('locations-cancel') }}</button>
     </div>
   </form>
 </template>

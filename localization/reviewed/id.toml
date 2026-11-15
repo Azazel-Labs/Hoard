@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "453ff96837a704352761a5bf6af773e801a1f4018577b2f5bc3be44f27d2733f"
+source = "40994fa61278db02342a17e111610609be967f167ac0e561724a1ecc0fd4792e"
 translation = "7d990334b35f2ab2d739392744c59874f8728f92852d52348d1711aca37a7ef0"
 
 [messages.account-add]
@@ -684,6 +684,14 @@ translation = "{ $count } dikeluarkan dari { $name }"
 source = "Collections"
 translation = "Koleksi"
 
+[messages.app-color]
+source = "Color"
+translation = "Warna"
+
+[messages.app-color-any]
+source = "Any color"
+translation = "Warna apa saja"
+
 [messages.app-color-black]
 source = "Black"
 translation = "Hitam"
@@ -696,17 +704,21 @@ translation = "Biru"
 source = "Brown"
 translation = "Cokelat"
 
+[messages.app-color-gray]
+source = "Gray"
+translation = "Abu-abu"
+
 [messages.app-color-green]
 source = "Green"
 translation = "Hijau"
 
-[messages.app-color-grey]
-source = "Grey"
-translation = "Abu-abu"
-
 [messages.app-color-orange]
 source = "Orange"
 translation = "Oranye"
+
+[messages.app-color-pick]
+source = "Pick any color"
+translation = "Pilih warna apa saja"
 
 [messages.app-color-pink]
 source = "Pink"
@@ -728,6 +740,10 @@ translation = "Pasir"
 source = "Slate"
 translation = "Abu-abu batu"
 
+[messages.app-color-swatch]
+source = "{ $color }: assets with much { $lower } in them"
+translation = "{ $color }: aset yang banyak mengandung warna { $lower }"
+
 [messages.app-color-teal]
 source = "Teal"
 translation = "Hijau kebiruan"
@@ -739,22 +755,6 @@ translation = "Putih"
 [messages.app-color-yellow]
 source = "Yellow"
 translation = "Kuning"
-
-[messages.app-colour]
-source = "Colour"
-translation = "Warna"
-
-[messages.app-colour-any]
-source = "Any colour"
-translation = "Warna apa saja"
-
-[messages.app-colour-pick]
-source = "Pick any colour"
-translation = "Pilih warna apa saja"
-
-[messages.app-colour-swatch]
-source = "{ $color }: assets with much { $lower } in them"
-translation = "{ $color }: aset yang banyak mengandung warna { $lower }"
 
 [messages.app-credits]
 source = "Credits"
@@ -796,12 +796,12 @@ translation = "lebih sedikit"
 source = "{ $count } more"
 translation = "{ $count } lagi"
 
-[messages.app-favourite]
-source = "Favourite"
+[messages.app-favorite]
+source = "Favorite"
 translation = "Favoritkan"
 
-[messages.app-favourites]
-source = "Favourites"
+[messages.app-favorites]
+source = "Favorites"
 translation = "Favorit"
 
 [messages.app-filters]
@@ -1056,8 +1056,8 @@ translation = "Proyek yang menjalankan hoard sync dari sini, beserta isi sinkron
 source = "Most alike"
 translation = "Paling mirip"
 
-[messages.app-rank-colour]
-source = "Most of the colour"
+[messages.app-rank-color]
+source = "Most of the color"
 translation = "Paling banyak warnanya"
 
 [messages.app-rank-match]
@@ -1084,8 +1084,8 @@ translation = "Coba lagi"
 source = "Save"
 translation = "Simpan"
 
-[messages.app-save-name-favourites]
-source = "favourites"
+[messages.app-save-name-favorites]
+source = "favorites"
 translation = "favorit"
 
 [messages.app-save-name-label]
@@ -1248,8 +1248,8 @@ translation = "Ukuran ubin"
 source = "Undo"
 translation = "Urungkan"
 
-[messages.app-unfavourite]
-source = "Unfavourite"
+[messages.app-unfavorite]
+source = "Unfavorite"
 translation = "Hapus dari favorit"
 
 [messages.app-unnamed-asset]
@@ -1667,16 +1667,16 @@ translation = "Hanya berkas ini"
 source = "Just this file, without the files it uses"
 translation = "Hanya berkas ini, tanpa berkas yang dipakainya"
 
-[messages.asset-favourite]
-source = "Favourite"
+[messages.asset-favorite]
+source = "Favorite"
 translation = "Favorit"
 
-[messages.asset-favourite-off-title]
-source = "Add to your favourites (F)"
+[messages.asset-favorite-off-title]
+source = "Add to your favorites (F)"
 translation = "Tambahkan ke favorit Anda (F)"
 
-[messages.asset-favourite-on-title]
-source = "In your favourites (F takes it out)"
+[messages.asset-favorite-on-title]
+source = "In your favorites (F takes it out)"
 translation = "Ada di favorit Anda (F untuk mengeluarkannya)"
 
 [messages.asset-file]
@@ -1849,6 +1849,10 @@ translation = "Cooked (build game): pratinjau dan sumber dihapus"
 [messages.asset-meta-cue-markers]
 source = "Cue markers"
 translation = "Penanda cue"
+
+[messages.asset-meta-everything-with]
+source = "Show everything tagged { $tag }"
+translation = "Tampilkan semua yang bertag { $tag }"
 
 [messages.asset-meta-format]
 source = "Format"
@@ -2078,7 +2082,7 @@ source = "Hoard read it out of the package on { $date } ({ $notes })."
 translation = "Hoard membacanya dari paket Unreal pada { $date } ({ $notes })."
 
 [messages.asset-palette]
-source = "Colours in the picture"
+source = "Colors in the picture"
 translation = "Warna dalam gambar"
 
 [messages.asset-path]
@@ -2186,7 +2190,7 @@ source = "Find assets with { $hex }, { $percent }% of this picture"
 translation = "Cari aset dengan { $hex }, { $percent }% dari gambar ini"
 
 [messages.asset-swatch-title]
-source = "{ $hex }, { $percent }% of the picture. Find assets with this colour"
+source = "{ $hex }, { $percent }% of the picture. Find assets with this color"
 translation = "{ $hex }, { $percent }% dari gambar. Cari aset dengan warna ini"
 
 [messages.asset-tag-add]
@@ -2466,7 +2470,7 @@ source = "Make an OAuth client (Web application) in Google Cloud Console → API
 translation = "Buat klien OAuth (Web application) di Google Cloud Console → APIs & Services → Credentials. Google tidak mengirim grup, jadi berikan peran di Pengaturan → Akun, dan matikan pembuatan akun saat pertama masuk kecuali siapa pun yang memiliki akun Google boleh masuk."
 
 [messages.auth-preset-microsoft-note]
-source = "Register an app in Entra ID → App registrations (a Web redirect to the address below). Put your tenant ID in place of “organizations” to let only your organisation in. For roles from groups, add the groups claim under Token configuration: it lists group IDs."
+source = "Register an app in Entra ID → App registrations (a Web redirect to the address below). Put your tenant ID in place of “organizations” to let only your organization in. For roles from groups, add the groups claim under Token configuration: it lists group IDs."
 translation = "Daftarkan aplikasi di Entra ID → App registrations (redirect Web ke alamat di bawah). Ganti “organizations” dengan ID tenant Anda agar hanya organisasi Anda yang dapat masuk. Untuk peran dari grup, tambahkan klaim groups di Token configuration: klaim itu mencantumkan ID grup."
 
 [messages.auth-provider]
@@ -2913,8 +2917,8 @@ translation = "tidak dapat membaca { $path }"
 source = "can't write to { $path }"
 translation = "tidak dapat menulis ke { $path }"
 
-[messages.error-chatgpt-cancelled]
-source = "the sign-in was cancelled"
+[messages.error-chatgpt-canceled]
+source = "the sign-in was canceled"
 translation = "proses masuk dibatalkan"
 
 [messages.error-chatgpt-code-used]
@@ -3097,7 +3101,7 @@ translation = "Direktori tidak dapat memeriksa kata sandi Anda: { $reason }"
 source = "empty file"
 translation = "berkas kosong"
 
-[messages.error-favourites-too-many]
+[messages.error-favorites-too-many]
 source = "at most 10,000 at a time"
 translation = "paling banyak 10.000 sekaligus"
 
@@ -3806,7 +3810,7 @@ source = "that picture is too big for a thumbnail"
 translation = "gambar itu terlalu besar untuk gambar mini"
 
 [messages.error-token-account-gone]
-source = "this token's account is gone, so it has no favourites or searches"
+source = "this token's account is gone, so it has no favorites or searches"
 translation = "akun token ini sudah tidak ada, jadi token ini tidak punya favorit atau pencarian"
 
 [messages.error-token-name]
@@ -4069,7 +4073,7 @@ source = "It finds no title in this file. Pick the title."
 translation = "Tidak ada judul yang ditemukan di berkas ini. Pilih judulnya."
 
 [messages.formatwizard-miss-not-the-stores]
-source = "What it recognises the store’s files by isn’t in this file. Change Recognise by."
+source = "What it recognizes the store’s files by isn’t in this file. Change Recognize by."
 translation = "Penanda berkas toko yang dipakainya tidak ada di berkas ini. Ubah Kenali dari."
 
 [messages.formatwizard-miss-short-name]
@@ -4144,19 +4148,19 @@ translation = "Judul"
 source = "Store page"
 translation = "Halaman toko"
 
-[messages.formatwizard-recognise]
-source = "Recognise by"
+[messages.formatwizard-recognize]
+source = "Recognize by"
 translation = "Kenali dari"
 
-[messages.formatwizard-recognise-hint]
+[messages.formatwizard-recognize-hint]
 source = "One way a line; any of them will do. Needed when other files have the same name."
 translation = "Satu per baris; salah satunya sudah cukup. Diperlukan jika berkas lain memiliki nama yang sama."
 
-[messages.formatwizard-recognise-json]
+[messages.formatwizard-recognize-json]
 source = "A key only the store’s files have"
 translation = "Kunci yang hanya dimiliki berkas toko"
 
-[messages.formatwizard-recognise-text]
+[messages.formatwizard-recognize-text]
 source = "A line only the store’s files have"
 translation = "Baris yang hanya dimiliki berkas toko"
 
@@ -4648,12 +4652,12 @@ translation = "latar kotak-kotak"
 source = "Checker background (K cycles)"
 translation = "Latar kotak-kotak (K untuk berganti)"
 
-[messages.image-bg-grey]
-source = "grey background"
+[messages.image-bg-gray]
+source = "gray background"
 translation = "latar abu-abu"
 
-[messages.image-bg-grey-title]
-source = "Grey background (K cycles)"
+[messages.image-bg-gray-title]
+source = "Gray background (K cycles)"
 translation = "Latar abu-abu (K untuk berganti)"
 
 [messages.image-bg-white]
@@ -5505,11 +5509,11 @@ source = "ambient occlusion"
 translation = "ambient occlusion"
 
 [messages.material-role-base-color]
-source = "Colour"
+source = "Color"
 translation = "Warna"
 
 [messages.material-role-base-color-name]
-source = "colour"
+source = "color"
 translation = "warna"
 
 [messages.material-role-bump]
@@ -5676,8 +5680,8 @@ translation = "Latar gelap"
 source = "Environment background"
 translation = "Latar lingkungan"
 
-[messages.model-bg-grey]
-source = "Grey background"
+[messages.model-bg-gray]
+source = "Gray background"
 translation = "Latar abu-abu"
 
 [messages.model-bg-light]
@@ -5792,8 +5796,8 @@ translation = "Panjang"
 source = "Materials"
 translation = "Material"
 
-[messages.model-info-metres]
-source = "glTF is in metres"
+[messages.model-info-meters]
+source = "glTF is in meters"
 translation = "glTF memakai satuan meter"
 
 [messages.model-info-no-units]
@@ -6495,8 +6499,8 @@ translation = "Menyimpan akan mengambil deskripsi dari halaman toko."
 source = "Paste the listing text, or leave empty to fetch it from the store page."
 translation = "Tempel teks listingnya, atau biarkan kosong untuk mengambilnya dari halaman toko."
 
-[messages.packs-thumbs-cancelled]
-source = "Cancelled after { $done } of { $total }"
+[messages.packs-thumbs-canceled]
+source = "Canceled after { $done } of { $total }"
 translation = "Dibatalkan setelah { $done } dari { $total }"
 
 [messages.packs-thumbs-drawing]
@@ -6739,11 +6743,11 @@ translation = "Kosongkan pilihan"
 source = "Dark theme: { $name }"
 translation = "Tema gelap: { $name }"
 
-[messages.palette-favourites]
-source = "Favourites"
+[messages.palette-favorites]
+source = "Favorites"
 translation = "Favorit"
 
-[messages.palette-favourites-keywords]
+[messages.palette-favorites-keywords]
 source = "starred stars liked"
 translation = "bintang disukai starred stars liked"
 
@@ -6931,12 +6935,12 @@ translation = "tampilan warna appearance color"
 source = "Command palette"
 translation = "Palet perintah"
 
-[messages.projects-favourite-add-failed]
-source = "Couldn't add to your favourites: { $error }"
+[messages.projects-favorite-add-failed]
+source = "Couldn't add to your favorites: { $error }"
 translation = "Tidak dapat menambahkan ke favorit Anda: { $error }"
 
-[messages.projects-favourite-remove-failed]
-source = "Couldn't take out of your favourites: { $error }"
+[messages.projects-favorite-remove-failed]
+source = "Couldn't take out of your favorites: { $error }"
 translation = "Tidak dapat mengeluarkan dari favorit Anda: { $error }"
 
 [messages.projects-forget-search-failed]
@@ -7204,7 +7208,7 @@ source = "Tagging { $pack } with AI"
 translation = "Memberi tag { $pack } dengan AI"
 
 [messages.server-job-looks]
-source = "Working out colours and looks"
+source = "Working out colors and looks"
 translation = "Menentukan warna dan tampilan"
 
 [messages.server-job-materials]
@@ -7292,7 +7296,7 @@ source = "ambient occlusion"
 translation = "ambient occlusion"
 
 [messages.server-role-base-color]
-source = "colour"
+source = "color"
 translation = "warna"
 
 [messages.server-role-bump]
@@ -7706,7 +7710,7 @@ source = "Couldn’t get the model: { $detail }. Trying again every hour."
 translation = "Tidak dapat mengambil model: { $detail }. Mencoba lagi setiap jam."
 
 [messages.settings-clip-what]
-source = "Type what you’re after (“mossy rock”, “sci-fi door”, “wooden barrel”) and pictures that show it turn up beside names that have the words. “More like this” finds things of the same kind, not only the same colours."
+source = "Type what you’re after (“mossy rock”, “sci-fi door”, “wooden barrel”) and pictures that show it turn up beside names that have the words. “More like this” finds things of the same kind, not only the same colors."
 translation = "Ketik apa yang Anda cari (“mossy rock”, “sci-fi door”, “wooden barrel”) dan gambar yang menampilkannya muncul di samping nama yang mengandung kata-kata itu. “Lainnya yang mirip ini” menemukan hal yang sejenis, bukan hanya yang warnanya sama."
 
 [messages.settings-conversion-cache]
@@ -8062,7 +8066,7 @@ source = "Image search"
 translation = "Pencarian gambar"
 
 [messages.settings-page-search-blurb]
-source = "Search pictures by what they show, not only by their names, and find things that are alike in kind, not only in colour."
+source = "Search pictures by what they show, not only by their names, and find things that are alike in kind, not only in color."
 translation = "Cari gambar berdasarkan isinya, bukan hanya namanya, dan temukan hal yang sejenis, bukan hanya yang sewarna."
 
 [messages.settings-page-store-files]
@@ -8465,8 +8469,8 @@ translation = "Tutup"
 source = "Close, clear the selection, or close the details"
 translation = "Tutup, kosongkan pilihan, atau tutup detail"
 
-[messages.shortcuts-favourite]
-source = "Add to or take out of your favourites"
+[messages.shortcuts-favorite]
+source = "Add to or take out of your favorites"
 translation = "Tambahkan ke atau keluarkan dari favorit Anda"
 
 [messages.shortcuts-fit]
@@ -8868,15 +8872,15 @@ source = "Edit"
 translation = "Edit"
 
 [messages.storefiles-field-colors]
-source = "Colours"
+source = "Colors"
 translation = "Warna"
 
 [messages.storefiles-field-colors-hint]
-source = "Its colours, as color: tags."
+source = "Its colors, as color: tags."
 translation = "Warnanya, sebagai tag color:."
 
 [messages.storefiles-field-colors-name]
-source = "colours"
+source = "colors"
 translation = "warna"
 
 [messages.storefiles-field-id]
@@ -9452,7 +9456,7 @@ source = "Warm charcoal, amber"
 translation = "Arang hangat, amber"
 
 [messages.theme-dark-graphite-blurb]
-source = "Neutral grey, no tint"
+source = "Neutral gray, no tint"
 translation = "Abu-abu netral, tanpa rona"
 
 [messages.theme-dark-moss-blurb]
@@ -9468,7 +9472,7 @@ source = "Wine-black, coral"
 translation = "Hitam anggur, koral"
 
 [messages.theme-dark-slate-blurb]
-source = "Blue-grey"
+source = "Blue-gray"
 translation = "Biru keabuan"
 
 [messages.theme-ember]
@@ -9492,7 +9496,7 @@ source = "Warm cream, amber"
 translation = "Krem hangat, amber"
 
 [messages.theme-light-paper-blurb]
-source = "Plain neutral grey"
+source = "Plain neutral gray"
 translation = "Abu-abu netral polos"
 
 [messages.theme-light-sage-blurb]
@@ -9500,7 +9504,7 @@ source = "Soft green"
 translation = "Hijau lembut"
 
 [messages.theme-light-slate-blurb]
-source = "Cool blue-grey"
+source = "Cool blue-gray"
 translation = "Biru keabuan yang sejuk"
 
 [messages.theme-lilac]
@@ -9535,16 +9539,16 @@ translation = "Sage"
 source = "Slate"
 translation = "Batu Sabak"
 
-[messages.tile-add-favourite]
-source = "Add to your favourites (F)"
+[messages.tile-add-favorite]
+source = "Add to your favorites (F)"
 translation = "Tambahkan ke favorit Anda (F)"
 
-[messages.tile-favourite]
-source = "Favourite { $name }"
+[messages.tile-favorite]
+source = "Favorite { $name }"
 translation = "Favoritkan { $name }"
 
-[messages.tile-in-favourites]
-source = "In your favourites"
+[messages.tile-in-favorites]
+source = "In your favorites"
 translation = "Ada di favorit Anda"
 
 [messages.tile-label]

@@ -1,5 +1,5 @@
-//! Texture formats `image` doesn't read: GPU containers (DDS, KTX2) with block-compressed data, vector art (SVG)
-//! and pixel-art sources (Aseprite). Each decodes to an ordinary image (mip 0 of the first layer or face) for
+//! Texture formats `image` doesn't read: GPU containers (DDS, KTX2) with block-compressed data, vector art (SVG,
+//! Illustrator) and pixel-art sources (Aseprite). Each decodes to an ordinary image (mip 0 of the first layer or face) for
 //! thumbnails, color analysis and "download as", plus the container's own facts.
 
 use std::io::Read;
@@ -19,7 +19,10 @@ pub(crate) struct Decoded {
 }
 
 /// Extensions handled here.
-pub(crate) const EXTS: &[&str] = &["dds", "ktx2", "basis", "svg", "svgz", "aseprite", "ase"];
+pub(crate) const EXTS: &[&str] = &["dds", "ktx2", "basis", "svg", "svgz", "ai", "aseprite", "ase"];
+
+/// Vector art: drawn at whatever size it's asked for.
+pub(crate) const VECTOR: &[&str] = &["svg", "svgz", "ai"];
 
 pub(crate) fn decode(path: &Path, ext: &str) -> Result<Decoded> {
     match ext {
@@ -27,6 +30,8 @@ pub(crate) fn decode(path: &Path, ext: &str) -> Result<Decoded> {
         "ktx2" => ktx2(path),
         "basis" => basis(&std::fs::read(path)?),
         "svg" | "svgz" => svg(path, 1024),
+        // Browsers can't show Illustrator files, so this drawing is their preview too.
+        "ai" => illustrator(path, crate::previews::LITE_MAX),
         "aseprite" | "ase" => aseprite(path),
         _ => bail!("not a texture format handled here: .{ext}"),
     }
@@ -389,11 +394,85 @@ pub(crate) fn svg(path: &Path, size: u32) -> Result<Decoded> {
             [c.red(), c.green(), c.blue(), c.alpha()]
         })
         .collect();
+    let image = DynamicImage::ImageRgba8(RgbaImage::from_raw(w, h, rgba).context("size")?);
+    Ok(Decoded { image, facts: vector_facts(s.width(), s.height()) })
+}
+
+/// Vector art at `size` pixels on its longer side.
+pub(crate) fn vector(path: &Path, ext: &str, size: u32) -> Result<Decoded> {
+    match ext {
+        "ai" => illustrator(path, size),
+        _ => svg(path, size),
+    }
+}
+
+/// What's said of vector art: that it is, and its own size (in its units), which is its `width` and `height`.
+fn vector_facts(width: f32, height: f32) -> Map<String, Value> {
     let mut facts = Map::new();
     facts.insert("vector".into(), json!(true));
-    facts.insert("svg_width".into(), json!(s.width().round() as u32));
-    facts.insert("svg_height".into(), json!(s.height().round() as u32));
-    Ok(Decoded { image: DynamicImage::ImageRgba8(RgbaImage::from_raw(w, h, rgba).context("size")?), facts })
+    facts.insert("vector_width".into(), json!(width.round() as u32));
+    facts.insert("vector_height".into(), json!(height.round() as u32));
+    facts
+}
+
+/// Adobe Illustrator art. Since Illustrator 9 a file is a PDF too, and its first artboard is drawn like a PDF page.
+/// Older files (PostScript), and newer ones saved without their PDF content, show the preview Illustrator keeps in
+/// their XMP metadata instead.
+pub(crate) fn illustrator(path: &Path, size: u32) -> Result<Decoded> {
+    let data = std::fs::read(path)?;
+    if data.starts_with(b"%PDF")
+        && let Some(drawn) = pdf_page(data.clone(), size)?
+    {
+        return Ok(drawn);
+    }
+    let image =
+        xmp_thumbnail(&data).context("this Illustrator file has neither a drawing Hoard can read nor a preview")?;
+    let mut facts = vector_facts(image.width() as f32, image.height() as f32);
+    // The preview is only small: its size isn't the art's.
+    facts.remove("vector_width");
+    facts.remove("vector_height");
+    Ok(Decoded { image, facts })
+}
+
+/// A PDF's first page drawn `size` pixels on its longer side, over transparency. `None` for Illustrator's stand-in
+/// page ("saved without PDF Content").
+fn pdf_page(data: Vec<u8>, size: u32) -> Result<Option<Decoded>> {
+    use hayro::hayro_interpret::InterpreterSettings;
+    use hayro::vello_cpu::color::palette::css::TRANSPARENT;
+    use hayro::vello_cpu::peniko::ImageAlphaType;
+    let pdf = hayro::hayro_syntax::Pdf::new(data).map_err(|e| anyhow::anyhow!("not a readable PDF: {e:?}"))?;
+    let page = pdf.pages().first().context("the PDF has no pages")?;
+    if page.page_stream().is_some_and(|s| s.windows(19).any(|w| w == b"without PDF Content")) {
+        return Ok(None);
+    }
+    let (w, h) = page.render_dimensions();
+    ensure!(w >= 1.0 && h >= 1.0, "the page has no size");
+    let scale = size.min(u32::from(u16::MAX)) as f32 / w.max(h);
+    let settings = hayro::PixmapSettings { x_scale: scale, y_scale: scale, bg_color: TRANSPARENT };
+    let pixmap = hayro::render(
+        page,
+        &hayro::RenderCache::new(),
+        &InterpreterSettings::default(),
+        &hayro::RenderSettings::default(),
+        &settings,
+    );
+    let (pw, ph) = (u32::from(pixmap.width()), u32::from(pixmap.height()));
+    ensure!(pw > 0 && ph > 0, "the page drew nothing");
+    let rgba = pixmap.take_rgba8(ImageAlphaType::Alpha);
+    let image = DynamicImage::ImageRgba8(RgbaImage::from_raw(pw, ph, rgba).context("size")?);
+    Ok(Some(Decoded { image, facts: vector_facts(w, h) }))
+}
+
+/// The JPEG preview an Adobe file keeps in its XMP metadata (`xmpGImg:image`, base64 with `&#xA;` line breaks).
+fn xmp_thumbnail(data: &[u8]) -> Option<DynamicImage> {
+    use base64::Engine as _;
+    const OPEN: &[u8] = b"<xmpGImg:image>";
+    let start = data.windows(OPEN.len()).position(|w| w == OPEN)? + OPEN.len();
+    let len = data[start..].iter().position(|&b| b == b'<')?;
+    let text = std::str::from_utf8(&data[start..start + len]).ok()?.replace("&#xA;", "");
+    let text: String = text.chars().filter(|c| !c.is_whitespace()).collect();
+    let jpeg = base64::engine::general_purpose::STANDARD.decode(text).ok()?;
+    image::load_from_memory_with_format(&jpeg, image::ImageFormat::Jpeg).ok()
 }
 
 fn aseprite(path: &Path) -> Result<Decoded> {
@@ -578,6 +657,129 @@ mod tests {
         assert_eq!(img.get_pixel(900, 100).0[3], 0);
     }
 
+    /// A PDF with one 20x10 page whose content is `content`, with a correct cross-reference table.
+    fn pdf(content: &str) -> Vec<u8> {
+        let objects = [
+            "<< /Type /Catalog /Pages 2 0 R >>".to_owned(),
+            "<< /Type /Pages /Kids [3 0 R] /Count 1 >>".to_owned(),
+            "<< /Type /Page /Parent 2 0 R /MediaBox [0 0 20 10] /Contents 4 0 R >>".to_owned(),
+            format!(
+                "<< /Length {} >>
+stream
+{content}
+endstream",
+                content.len()
+            ),
+        ];
+        let mut out = b"%PDF-1.5
+"
+        .to_vec();
+        let mut offsets = Vec::new();
+        for (i, o) in objects.iter().enumerate() {
+            offsets.push(out.len());
+            out.extend(
+                format!(
+                    "{} 0 obj
+{o}
+endobj
+",
+                    i + 1
+                )
+                .bytes(),
+            );
+        }
+        let xref = out.len();
+        out.extend(
+            format!(
+                "xref
+0 {}
+0000000000 65535 f 
+",
+                objects.len() + 1
+            )
+            .bytes(),
+        );
+        for o in offsets {
+            out.extend(
+                format!(
+                    "{o:010} 00000 n 
+"
+                )
+                .bytes(),
+            );
+        }
+        out.extend(
+            format!(
+                "trailer
+<< /Size {} /Root 1 0 R >>
+startxref
+{xref}
+%%EOF
+",
+                objects.len() + 1
+            )
+            .bytes(),
+        );
+        out
+    }
+
+    #[test]
+    fn illustrator_art_is_drawn_from_its_pdf() {
+        let dir = tempfile::tempdir().unwrap();
+        // Red over the left half of the artboard.
+        let d = illustrator(&write(&dir, "icons.ai", &pdf("1 0 0 rg 0 0 10 10 re f")), 200).unwrap();
+        let img = d.image.to_rgba8();
+        assert_eq!(img.dimensions(), (200, 100));
+        assert_eq!(img.get_pixel(40, 50).0, [255, 0, 0, 255]);
+        assert_eq!(img.get_pixel(160, 50).0[3], 0, "the rest is see-through");
+        assert_eq!((d.facts["vector_width"].clone(), d.facts["vector_height"].clone()), (json!(20), json!(10)));
+        assert_eq!(decode(&write(&dir, "big.ai", &pdf("0 0 1 rg 0 0 20 10 re f")), "ai").unwrap().image.width(), 2048);
+    }
+
+    #[test]
+    fn illustrator_art_without_a_drawing_shows_its_preview() {
+        use base64::Engine as _;
+        let mut jpeg = Vec::new();
+        DynamicImage::ImageRgb8(image::RgbImage::from_pixel(8, 4, image::Rgb([0, 200, 0])))
+            .write_to(&mut std::io::Cursor::new(&mut jpeg), image::ImageFormat::Jpeg)
+            .unwrap();
+        let b64 = base64::engine::general_purpose::STANDARD.encode(&jpeg);
+        let (a, b) = b64.split_at(b64.len() / 2);
+        let xmp = format!("<xmpGImg:width>8</xmpGImg:width><xmpGImg:image>{a}&#xA;{b}</xmpGImg:image>");
+        let dir = tempfile::tempdir().unwrap();
+        // Illustrator 8 and earlier: PostScript.
+        let old = format!(
+            "%!PS-Adobe-3.0
+%%Creator: Adobe Illustrator(R) 8.0
+{xmp}
+%%EOF
+"
+        );
+        let d = illustrator(&write(&dir, "old.ai", old.as_bytes()), 512).unwrap();
+        assert_eq!((d.image.width(), d.image.height()), (8, 4));
+        assert!(d.image.to_rgb8().get_pixel(4, 2).0[1] > 150);
+        assert!(!d.facts.contains_key("vector_width"));
+        // Saved without PDF content: the page only says so.
+        let mut stand_in = pdf("BT /F1 12 Tf (saved without PDF Content.) Tj ET");
+        stand_in.extend(xmp.bytes());
+        assert_eq!(
+            illustrator(&write(&dir, "no-pdf.ai", &stand_in), 512).unwrap().image.to_rgba8().dimensions(),
+            (8, 4)
+        );
+        assert!(
+            illustrator(
+                &write(
+                    &dir,
+                    "junk.ai",
+                    b"%!PS-Adobe-3.0
+"
+                ),
+                512
+            )
+            .is_err()
+        );
+    }
+
     #[test]
     fn svg_text_renders_with_system_fonts() {
         if font_db().is_empty() {
@@ -625,7 +827,7 @@ mod tests {
             tag_chunk.extend_from_slice(&from.to_le_bytes());
             tag_chunk.extend_from_slice(&to.to_le_bytes());
             tag_chunk.push(*dir);
-            tag_chunk.extend_from_slice(&[0; 2 + 6 + 4]); // repeat, reserved, colour
+            tag_chunk.extend_from_slice(&[0; 2 + 6 + 4]); // repeat, reserved, color
             tag_chunk.extend_from_slice(&(name.len() as u16).to_le_bytes());
             tag_chunk.extend_from_slice(name.as_bytes());
         }

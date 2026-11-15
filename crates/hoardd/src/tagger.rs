@@ -4,7 +4,7 @@
 //! It is intentionally deterministic so re-running it (`POST /api/packs/{id}/retag`) after improving the
 //! vocabulary gives predictable results. The LLM pass layers on top; it never replaces these tags.
 
-use std::collections::{BTreeSet, HashMap};
+use std::collections::{BTreeSet, HashMap, HashSet};
 
 use hoard_core::{AssetKind, TagSource};
 
@@ -537,6 +537,31 @@ pub(crate) fn vocab_tags(rel_path: &str, kind: AssetKind, tags: &mut TagSet) {
     }
 }
 
+/// Words a pack puts in brackets in a folder or file name, `Audio (Female)/level_up.ogg` or `Door (Wood).png`, are
+/// a fact about the file: each becomes a tag. A copy number (`(1)`), a year, "copy" and anything longer than a few
+/// words are left out.
+pub(crate) fn aside_tags(rel_path: &str, tags: &mut TagSet) {
+    let path = rel_path.rsplit_once('.').map_or(rel_path, |(s, _)| s);
+    for (open, close) in [('(', ')'), ('[', ']')] {
+        let mut rest = path;
+        while let Some(start) = rest.find(open) {
+            let after = &rest[start + open.len_utf8()..];
+            let Some(end) = after.find(close) else { break };
+            let inner = after[..end].trim();
+            rest = &after[end + close.len_utf8()..];
+            let words = inner.split_whitespace().count();
+            let letters = inner.chars().any(char::is_alphabetic);
+            if inner.contains('/') || !(1..=3).contains(&words) || !letters || inner.chars().count() > 32 {
+                continue;
+            }
+            if matches!(inner.to_lowercase().as_str(), "copy" | "old" | "new" | "final" | "backup" | "unused") {
+                continue;
+            }
+            tags.add(inner, TagSource::Rule, 0.8);
+        }
+    }
+}
+
 /// A PBR map suffix found on a texture's file stem.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub(crate) struct MapHit {
@@ -547,6 +572,38 @@ pub(crate) struct MapHit {
     pub(crate) strong: bool,
     /// The suffix words that matched ("base color").
     pub(crate) suffix: String,
+}
+
+/// Whether a texture could be a PBR map: a raster image. A drawing (SVG) is artwork, whatever its name ends in.
+pub(crate) fn could_be_map(rel: &str) -> bool {
+    let ext = rel.rsplit_once('.').map_or("", |(_, e)| e).to_ascii_lowercase();
+    !matches!(ext.as_str(), "svg" | "svgz")
+}
+
+/// Names whose one-letter endings are a lettered series of variants (`extra_character_a` … `extra_character_d`), not
+/// map types: some file of the series ends in a letter that names no map. Each is `folder/name`, lowercase, as
+/// [`series_key`] writes it.
+pub(crate) fn lettered_series<'a>(paths: impl IntoIterator<Item = &'a str>) -> HashSet<String> {
+    let mut out = HashSet::new();
+    for rel in paths {
+        let (dir, file) = rel.rsplit_once('/').unwrap_or(("", rel));
+        let stem = file.rsplit_once('.').map_or(file, |(s, _)| s);
+        let tokens = tokenize(stem);
+        if let [base @ .., last] = tokens.as_slice()
+            && !base.is_empty()
+            && last.len() == 1
+            && last.chars().all(|c| c.is_ascii_alphabetic())
+            && !MAP_SUFFIXES.iter().any(|(s, _, _)| s == last)
+        {
+            out.insert(series_key(dir, &base.join("_")));
+        }
+    }
+    out
+}
+
+/// A name's key among [`lettered_series`]: its folder and its words before the last, joined by `_`.
+pub(crate) fn series_key(dir: &str, base: &str) -> String {
+    format!("{}/{base}", dir.to_lowercase())
 }
 
 /// Detect a PBR map suffix on a texture stem.
@@ -661,7 +718,7 @@ fn unreal_tags(meta: &serde_json::Map<String, serde_json::Value>, tags: &mut Tag
     }
 }
 
-/// Facts about an image: its map type, colour, layers, depth and HDR, and whether it says AI made it.
+/// Facts about an image: its map type, color, layers, depth and HDR, and whether it says AI made it.
 fn texture_tags(ext: &str, meta: &serde_json::Map<String, serde_json::Value>, tags: &mut TagSet) {
     let num = |k: &str| meta.get(k).and_then(serde_json::Value::as_f64);
     if let (Some(w), Some(h)) = (num("width"), num("height")) {
@@ -728,6 +785,10 @@ pub(crate) fn meta_tags(
     tags: &mut TagSet,
 ) {
     tags.add(&format!("format:{ext}"), TagSource::Meta, 1.0);
+    // Who made it, as the file says (a sound's artist tag), so everything by them is a click away.
+    if let Some(a) = meta.get("artist").and_then(|v| v.as_str()) {
+        tags.add(&format!("artist:{a}"), TagSource::Meta, 1.0);
+    }
     music_tags(ext, tags);
     let num = |k: &str| meta.get(k).and_then(serde_json::Value::as_f64);
     unreal_tags(meta, tags);
@@ -991,6 +1052,30 @@ mod tests {
         vocab_tags("Sounds/Impacts/explosion_big_03.ogg", AssetKind::Audio, &mut t);
         assert!(t.has("explosion"));
         assert_eq!(categorize(AssetKind::Audio, &t), "sfx/explosion");
+    }
+
+    #[test]
+    fn bracketed_words_are_tags() {
+        const NONE: [&str; 0] = [];
+        let tags = |p: &str| {
+            let mut t = TagSet::default();
+            aside_tags(p, &mut t);
+            t.into_vec().into_iter().map(|s| s.tag).collect::<Vec<_>>()
+        };
+        assert_eq!(tags("Audio/Voiceover Pack/Audio (Female)/level_up.ogg"), ["female"]);
+        assert_eq!(tags("Doors/door (Old Wood) [Hi Res].png"), ["hi-res", "old-wood"]);
+        assert_eq!(tags("rock (1).png"), NONE, "a copy number");
+        assert_eq!(tags("Music (2019)/theme (copy).ogg"), NONE, "a year and a copy");
+        assert_eq!(tags("Read me (this explains every file in the pack).txt"), NONE, "a sentence");
+        assert_eq!(tags("weird (name.png"), NONE);
+    }
+
+    #[test]
+    fn the_artist_is_a_tag() {
+        let mut t = TagSet::default();
+        let meta = serde_json::json!({ "artist": "Kenney Vleugels" });
+        meta_tags(AssetKind::Audio, "ogg", meta.as_object().unwrap(), &mut t);
+        assert!(t.has("artist:kenney-vleugels"));
     }
 
     #[test]

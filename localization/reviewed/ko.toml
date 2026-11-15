@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "453ff96837a704352761a5bf6af773e801a1f4018577b2f5bc3be44f27d2733f"
+source = "40994fa61278db02342a17e111610609be967f167ac0e561724a1ecc0fd4792e"
 translation = "95bf625ed3312f7690b94129f029f26bbf119096668ff545dedaf6076a581e89"
 
 [messages.account-add]
@@ -684,6 +684,14 @@ translation = "{ $name }에서 { $count }개를 제거했습니다"
 source = "Collections"
 translation = "컬렉션"
 
+[messages.app-color]
+source = "Color"
+translation = "색상"
+
+[messages.app-color-any]
+source = "Any color"
+translation = "모든 색상"
+
 [messages.app-color-black]
 source = "Black"
 translation = "검정"
@@ -696,17 +704,21 @@ translation = "파랑"
 source = "Brown"
 translation = "갈색"
 
+[messages.app-color-gray]
+source = "Gray"
+translation = "회색"
+
 [messages.app-color-green]
 source = "Green"
 translation = "초록"
 
-[messages.app-color-grey]
-source = "Grey"
-translation = "회색"
-
 [messages.app-color-orange]
 source = "Orange"
 translation = "주황"
+
+[messages.app-color-pick]
+source = "Pick any color"
+translation = "색상 직접 고르기"
 
 [messages.app-color-pink]
 source = "Pink"
@@ -728,6 +740,10 @@ translation = "모래색"
 source = "Slate"
 translation = "슬레이트"
 
+[messages.app-color-swatch]
+source = "{ $color }: assets with much { $lower } in them"
+translation = "{ $color }: { $lower }이(가) 많이 들어간 에셋"
+
 [messages.app-color-teal]
 source = "Teal"
 translation = "청록"
@@ -739,22 +755,6 @@ translation = "흰색"
 [messages.app-color-yellow]
 source = "Yellow"
 translation = "노랑"
-
-[messages.app-colour]
-source = "Colour"
-translation = "색상"
-
-[messages.app-colour-any]
-source = "Any colour"
-translation = "모든 색상"
-
-[messages.app-colour-pick]
-source = "Pick any colour"
-translation = "색상 직접 고르기"
-
-[messages.app-colour-swatch]
-source = "{ $color }: assets with much { $lower } in them"
-translation = "{ $color }: { $lower }이(가) 많이 들어간 에셋"
 
 [messages.app-credits]
 source = "Credits"
@@ -796,12 +796,12 @@ translation = "접기"
 source = "{ $count } more"
 translation = "{ $count }개 더 보기"
 
-[messages.app-favourite]
-source = "Favourite"
+[messages.app-favorite]
+source = "Favorite"
 translation = "즐겨찾기"
 
-[messages.app-favourites]
-source = "Favourites"
+[messages.app-favorites]
+source = "Favorites"
 translation = "즐겨찾기"
 
 [messages.app-filters]
@@ -1056,8 +1056,8 @@ translation = "여기서 hoard sync하는 프로젝트와 마지막 동기화 �
 source = "Most alike"
 translation = "가장 비슷한 순"
 
-[messages.app-rank-colour]
-source = "Most of the colour"
+[messages.app-rank-color]
+source = "Most of the color"
 translation = "색상이 많은 순"
 
 [messages.app-rank-match]
@@ -1084,8 +1084,8 @@ translation = "다시 시도"
 source = "Save"
 translation = "저장"
 
-[messages.app-save-name-favourites]
-source = "favourites"
+[messages.app-save-name-favorites]
+source = "favorites"
 translation = "즐겨찾기"
 
 [messages.app-save-name-label]
@@ -1248,8 +1248,8 @@ translation = "타일 크기"
 source = "Undo"
 translation = "실행 취소"
 
-[messages.app-unfavourite]
-source = "Unfavourite"
+[messages.app-unfavorite]
+source = "Unfavorite"
 translation = "즐겨찾기 해제"
 
 [messages.app-unnamed-asset]
@@ -1667,16 +1667,16 @@ translation = "이 파일만"
 source = "Just this file, without the files it uses"
 translation = "사용하는 파일 없이 이 파일만"
 
-[messages.asset-favourite]
-source = "Favourite"
+[messages.asset-favorite]
+source = "Favorite"
 translation = "즐겨찾기"
 
-[messages.asset-favourite-off-title]
-source = "Add to your favourites (F)"
+[messages.asset-favorite-off-title]
+source = "Add to your favorites (F)"
 translation = "즐겨찾기에 추가(F)"
 
-[messages.asset-favourite-on-title]
-source = "In your favourites (F takes it out)"
+[messages.asset-favorite-on-title]
+source = "In your favorites (F takes it out)"
 translation = "즐겨찾기에 있음(F로 제거)"
 
 [messages.asset-file]
@@ -1846,6 +1846,10 @@ translation = "쿠킹됨(게임 빌드): 미리보기와 원본이 제거되어 
 [messages.asset-meta-cue-markers]
 source = "Cue markers"
 translation = "큐 마커"
+
+[messages.asset-meta-everything-with]
+source = "Show everything tagged { $tag }"
+translation = "{ $tag } 태그가 있는 항목 모두 보기"
 
 [messages.asset-meta-format]
 source = "Format"
@@ -2072,7 +2076,7 @@ source = "Hoard read it out of the package on { $date } ({ $notes })."
 translation = "{ $date }에 Hoard가 패키지에서 읽어 냈습니다({ $notes })."
 
 [messages.asset-palette]
-source = "Colours in the picture"
+source = "Colors in the picture"
 translation = "그림의 색상"
 
 [messages.asset-path]
@@ -2180,7 +2184,7 @@ source = "Find assets with { $hex }, { $percent }% of this picture"
 translation = "{ $hex }이(가) 있는 에셋 찾기, 이 그림의 { $percent }%"
 
 [messages.asset-swatch-title]
-source = "{ $hex }, { $percent }% of the picture. Find assets with this colour"
+source = "{ $hex }, { $percent }% of the picture. Find assets with this color"
 translation = "{ $hex }, 그림의 { $percent }%. 이 색상이 있는 에셋 찾기"
 
 [messages.asset-tag-add]
@@ -2460,7 +2464,7 @@ source = "Make an OAuth client (Web application) in Google Cloud Console → API
 translation = "Google Cloud Console → APIs & Services → Credentials에서 OAuth 클라이언트(Web application)를 만드세요. Google은 그룹을 보내지 않으므로 설정 → 계정에서 역할을 주고, Google 계정이 있는 누구나 들어와도 되는 경우가 아니라면 첫 로그인 때 계정 만들기를 끄세요."
 
 [messages.auth-preset-microsoft-note]
-source = "Register an app in Entra ID → App registrations (a Web redirect to the address below). Put your tenant ID in place of “organizations” to let only your organisation in. For roles from groups, add the groups claim under Token configuration: it lists group IDs."
+source = "Register an app in Entra ID → App registrations (a Web redirect to the address below). Put your tenant ID in place of “organizations” to let only your organization in. For roles from groups, add the groups claim under Token configuration: it lists group IDs."
 translation = "Entra ID → App registrations에서 앱을 등록하세요(아래 주소로 가는 Web 리디렉션). 내 조직만 들어오게 하려면 “organizations” 자리에 테넌트 ID를 넣으세요. 그룹으로 역할을 정하려면 Token configuration에서 groups 클레임을 추가하세요. 그룹 ID 목록이 들어옵니다."
 
 [messages.auth-provider]
@@ -2907,8 +2911,8 @@ translation = "{ $path }을(를) 읽을 수 없습니다"
 source = "can't write to { $path }"
 translation = "{ $path }에 쓸 수 없습니다"
 
-[messages.error-chatgpt-cancelled]
-source = "the sign-in was cancelled"
+[messages.error-chatgpt-canceled]
+source = "the sign-in was canceled"
 translation = "로그인이 취소되었습니다"
 
 [messages.error-chatgpt-code-used]
@@ -3091,7 +3095,7 @@ translation = "디렉터리에서 비밀번호를 확인할 수 없었습니다:
 source = "empty file"
 translation = "빈 파일입니다"
 
-[messages.error-favourites-too-many]
+[messages.error-favorites-too-many]
 source = "at most 10,000 at a time"
 translation = "한 번에 최대 10,000개까지 가능합니다"
 
@@ -3800,7 +3804,7 @@ source = "that picture is too big for a thumbnail"
 translation = "그림이 너무 커서 썸네일로 쓸 수 없습니다"
 
 [messages.error-token-account-gone]
-source = "this token's account is gone, so it has no favourites or searches"
+source = "this token's account is gone, so it has no favorites or searches"
 translation = "이 토큰의 계정이 없어져서 즐겨찾기나 검색이 없습니다"
 
 [messages.error-token-name]
@@ -4063,7 +4067,7 @@ source = "It finds no title in this file. Pick the title."
 translation = "이 파일에서 제목을 찾지 못했습니다. 제목을 고르세요."
 
 [messages.formatwizard-miss-not-the-stores]
-source = "What it recognises the store’s files by isn’t in this file. Change Recognise by."
+source = "What it recognizes the store’s files by isn’t in this file. Change Recognize by."
 translation = "스토어 파일을 알아보는 기준이 이 파일에 없습니다. 알아보는 기준을 바꾸세요."
 
 [messages.formatwizard-miss-short-name]
@@ -4138,19 +4142,19 @@ translation = "제목"
 source = "Store page"
 translation = "스토어 페이지"
 
-[messages.formatwizard-recognise]
-source = "Recognise by"
+[messages.formatwizard-recognize]
+source = "Recognize by"
 translation = "알아보는 기준"
 
-[messages.formatwizard-recognise-hint]
+[messages.formatwizard-recognize-hint]
 source = "One way a line; any of them will do. Needed when other files have the same name."
 translation = "한 줄에 하나씩 적으며, 그중 하나만 맞으면 됩니다. 다른 파일이 같은 이름을 가질 때 필요합니다."
 
-[messages.formatwizard-recognise-json]
+[messages.formatwizard-recognize-json]
 source = "A key only the store’s files have"
 translation = "스토어 파일에만 있는 키"
 
-[messages.formatwizard-recognise-text]
+[messages.formatwizard-recognize-text]
 source = "A line only the store’s files have"
 translation = "스토어 파일에만 있는 줄"
 
@@ -4642,12 +4646,12 @@ translation = "체커 배경"
 source = "Checker background (K cycles)"
 translation = "체커 배경(K로 전환)"
 
-[messages.image-bg-grey]
-source = "grey background"
+[messages.image-bg-gray]
+source = "gray background"
 translation = "회색 배경"
 
-[messages.image-bg-grey-title]
-source = "Grey background (K cycles)"
+[messages.image-bg-gray-title]
+source = "Gray background (K cycles)"
 translation = "회색 배경(K로 전환)"
 
 [messages.image-bg-white]
@@ -5495,11 +5499,11 @@ source = "ambient occlusion"
 translation = "앰비언트 오클루전"
 
 [messages.material-role-base-color]
-source = "Colour"
+source = "Color"
 translation = "색상"
 
 [messages.material-role-base-color-name]
-source = "colour"
+source = "color"
 translation = "색상"
 
 [messages.material-role-bump]
@@ -5666,8 +5670,8 @@ translation = "어두운 배경"
 source = "Environment background"
 translation = "환경 배경"
 
-[messages.model-bg-grey]
-source = "Grey background"
+[messages.model-bg-gray]
+source = "Gray background"
 translation = "회색 배경"
 
 [messages.model-bg-light]
@@ -5782,8 +5786,8 @@ translation = "길이"
 source = "Materials"
 translation = "머티리얼"
 
-[messages.model-info-metres]
-source = "glTF is in metres"
+[messages.model-info-meters]
+source = "glTF is in meters"
 translation = "glTF는 미터 단위입니다"
 
 [messages.model-info-no-units]
@@ -6485,8 +6489,8 @@ translation = "저장하면 스토어 페이지에서 설명을 가져옵니다.
 source = "Paste the listing text, or leave empty to fetch it from the store page."
 translation = "판매 페이지의 텍스트를 붙여 넣거나, 비워 두면 스토어 페이지에서 가져옵니다."
 
-[messages.packs-thumbs-cancelled]
-source = "Cancelled after { $done } of { $total }"
+[messages.packs-thumbs-canceled]
+source = "Canceled after { $done } of { $total }"
 translation = "{ $total }개 중 { $done }개 후 취소됨"
 
 [messages.packs-thumbs-drawing]
@@ -6711,11 +6715,11 @@ translation = "선택 해제"
 source = "Dark theme: { $name }"
 translation = "어두운 테마: { $name }"
 
-[messages.palette-favourites]
-source = "Favourites"
+[messages.palette-favorites]
+source = "Favorites"
 translation = "즐겨찾기"
 
-[messages.palette-favourites-keywords]
+[messages.palette-favorites-keywords]
 source = "starred stars liked"
 translation = "별표 좋아요 starred stars liked"
 
@@ -6903,12 +6907,12 @@ translation = "모양 색상 appearance color"
 source = "Command palette"
 translation = "명령 팔레트"
 
-[messages.projects-favourite-add-failed]
-source = "Couldn't add to your favourites: { $error }"
+[messages.projects-favorite-add-failed]
+source = "Couldn't add to your favorites: { $error }"
 translation = "즐겨찾기에 추가하지 못했습니다: { $error }"
 
-[messages.projects-favourite-remove-failed]
-source = "Couldn't take out of your favourites: { $error }"
+[messages.projects-favorite-remove-failed]
+source = "Couldn't take out of your favorites: { $error }"
 translation = "즐겨찾기에서 제거하지 못했습니다: { $error }"
 
 [messages.projects-forget-search-failed]
@@ -7176,7 +7180,7 @@ source = "Tagging { $pack } with AI"
 translation = "AI로 { $pack } 태그하는 중"
 
 [messages.server-job-looks]
-source = "Working out colours and looks"
+source = "Working out colors and looks"
 translation = "색상과 외형 분석하는 중"
 
 [messages.server-job-materials]
@@ -7264,7 +7268,7 @@ source = "ambient occlusion"
 translation = "앰비언트 오클루전"
 
 [messages.server-role-base-color]
-source = "colour"
+source = "color"
 translation = "색상"
 
 [messages.server-role-bump]
@@ -7675,7 +7679,7 @@ source = "Couldn’t get the model: { $detail }. Trying again every hour."
 translation = "모델을 가져오지 못했습니다: { $detail }. 1시간마다 다시 시도합니다."
 
 [messages.settings-clip-what]
-source = "Type what you’re after (“mossy rock”, “sci-fi door”, “wooden barrel”) and pictures that show it turn up beside names that have the words. “More like this” finds things of the same kind, not only the same colours."
+source = "Type what you’re after (“mossy rock”, “sci-fi door”, “wooden barrel”) and pictures that show it turn up beside names that have the words. “More like this” finds things of the same kind, not only the same colors."
 translation = "찾는 것을 입력하면(“mossy rock”, “sci-fi door”, “wooden barrel”) 이름에 그 단어가 들어간 것과 함께 그 내용이 담긴 그림이 나타납니다. “비슷한 것 더 보기”는 색상뿐 아니라 종류가 같은 것도 찾습니다."
 
 [messages.settings-conversion-cache]
@@ -8031,7 +8035,7 @@ source = "Image search"
 translation = "이미지 검색"
 
 [messages.settings-page-search-blurb]
-source = "Search pictures by what they show, not only by their names, and find things that are alike in kind, not only in colour."
+source = "Search pictures by what they show, not only by their names, and find things that are alike in kind, not only in color."
 translation = "이름뿐 아니라 그림에 나타난 내용으로 검색하고, 색상뿐 아니라 종류가 비슷한 것을 찾습니다."
 
 [messages.settings-page-store-files]
@@ -8434,8 +8438,8 @@ translation = "닫기"
 source = "Close, clear the selection, or close the details"
 translation = "닫기, 선택 해제 또는 세부 정보 닫기"
 
-[messages.shortcuts-favourite]
-source = "Add to or take out of your favourites"
+[messages.shortcuts-favorite]
+source = "Add to or take out of your favorites"
 translation = "즐겨찾기에 추가 또는 제거"
 
 [messages.shortcuts-fit]
@@ -8834,15 +8838,15 @@ source = "Edit"
 translation = "편집"
 
 [messages.storefiles-field-colors]
-source = "Colours"
+source = "Colors"
 translation = "색상"
 
 [messages.storefiles-field-colors-hint]
-source = "Its colours, as color: tags."
+source = "Its colors, as color: tags."
 translation = "color: 태그로 붙일 색상입니다."
 
 [messages.storefiles-field-colors-name]
-source = "colours"
+source = "colors"
 translation = "색상"
 
 [messages.storefiles-field-id]
@@ -9418,7 +9422,7 @@ source = "Warm charcoal, amber"
 translation = "따뜻한 숯색, 호박색"
 
 [messages.theme-dark-graphite-blurb]
-source = "Neutral grey, no tint"
+source = "Neutral gray, no tint"
 translation = "색조 없는 중성 회색"
 
 [messages.theme-dark-moss-blurb]
@@ -9434,7 +9438,7 @@ source = "Wine-black, coral"
 translation = "와인빛 검정, 코럴"
 
 [messages.theme-dark-slate-blurb]
-source = "Blue-grey"
+source = "Blue-gray"
 translation = "청회색"
 
 [messages.theme-ember]
@@ -9458,7 +9462,7 @@ source = "Warm cream, amber"
 translation = "따뜻한 크림색, 호박색"
 
 [messages.theme-light-paper-blurb]
-source = "Plain neutral grey"
+source = "Plain neutral gray"
 translation = "무난한 중성 회색"
 
 [messages.theme-light-sage-blurb]
@@ -9466,7 +9470,7 @@ source = "Soft green"
 translation = "부드러운 초록"
 
 [messages.theme-light-slate-blurb]
-source = "Cool blue-grey"
+source = "Cool blue-gray"
 translation = "차가운 청회색"
 
 [messages.theme-lilac]
@@ -9501,16 +9505,16 @@ translation = "세이지"
 source = "Slate"
 translation = "슬레이트"
 
-[messages.tile-add-favourite]
-source = "Add to your favourites (F)"
+[messages.tile-add-favorite]
+source = "Add to your favorites (F)"
 translation = "즐겨찾기에 추가(F)"
 
-[messages.tile-favourite]
-source = "Favourite { $name }"
+[messages.tile-favorite]
+source = "Favorite { $name }"
 translation = "{ $name } 즐겨찾기"
 
-[messages.tile-in-favourites]
-source = "In your favourites"
+[messages.tile-in-favorites]
+source = "In your favorites"
 translation = "즐겨찾기에 있음"
 
 [messages.tile-label]

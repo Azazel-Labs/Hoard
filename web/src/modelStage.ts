@@ -12,16 +12,16 @@ import { api, asUrl, liteUrl, packFileUrl, thumbUrl, type Asset, type AssetLink 
 import { t } from './i18n'
 import { applyToModel } from './materialMaps'
 
-export type Background = 'checker' | 'dark' | 'grey' | 'light' | 'env'
-export const BACKGROUNDS: Background[] = ['checker', 'dark', 'grey', 'light', 'env']
+export type Background = 'checker' | 'dark' | 'gray' | 'light' | 'env'
+export const BACKGROUNDS: Background[] = ['checker', 'dark', 'gray', 'light', 'env']
 
 /** How the full-screen viewer shows the model: as it renders, plainly lit, one of its maps on its own, or a look that
- *  shows its shape (clay, a UV checker, each mesh in its own colour). */
+ *  shows its shape (clay, a UV checker, each mesh in its own color). */
 export type ViewMode = 'final' | 'raw' | MapMode | 'matcap' | 'uv' | 'geometry'
 export type MapMode = 'color' | 'roughness' | 'metalness' | 'normal' | 'ao'
 
 /** Each map view: the slot it shows and the channel three reads from it. glTF packs roughness into G and metalness
- *  into B of one texture, and occlusion lives in R; maps of their own are grey, so the same channel serves. */
+ *  into B of one texture, and occlusion lives in R; maps of their own are gray, so the same channel serves. */
 const MAP_VIEWS: Record<MapMode, { slot: MapSlot; channel: 'rgb' | 'r' | 'g' | 'b' }> = {
   color: { slot: 'map', channel: 'rgb' },
   roughness: { slot: 'roughnessMap', channel: 'g' },
@@ -42,8 +42,8 @@ export interface SceneStats {
   vertices: number
   /** The bounding box as the model loaded: X, Y (up) and Z. */
   size: { x: number; y: number; z: number }
-  /** glTF is in metres; other formats say nothing dependable about their units. */
-  metres: boolean
+  /** glTF is in meters; other formats say nothing dependable about their units. */
+  meters: boolean
   /** The map views worth offering: a map at least one material has. */
   maps: MapMode[]
 }
@@ -69,7 +69,7 @@ export interface StageOptions {
 type Loaded = {
   object: THREE.Object3D
   animations: THREE.AnimationClip[]
-  /** Material colours were written as linear values (Blender's OBJ and FBX exporters), not the sRGB the loaders
+  /** Material colors were written as linear values (Blender's OBJ and FBX exporters), not the sRGB the loaders
    *  assume: read as sRGB they come out far too dark, a dark green skin turning black. */
   linearColors?: boolean
 }
@@ -110,9 +110,9 @@ async function textureLinks(asset: Asset): Promise<{ named: AssetLink[]; guesses
   return { named, guesses, full }
 }
 
-/** Facet colours the way VisCAM and SolidView write them in a binary STL (three.js reads only Materialise's): the
- *  top bit of a facet's attribute marks it coloured, blue in the low bits. Nothing says a file does this and other
- *  tools leave junk there, so it takes two colours or more. The server reads them the same way. */
+/** Facet colors the way VisCAM and SolidView write them in a binary STL (three.js reads only Materialise's): the
+ *  top bit of a facet's attribute marks it colored, blue in the low bits. Nothing says a file does this and other
+ *  tools leave junk there, so it takes two colors or more. The server reads them the same way. */
 function visCamColors(buf: ArrayBuffer, geom: THREE.BufferGeometry) {
   if (buf.byteLength < 84) return
   const view = new DataView(buf)
@@ -195,11 +195,11 @@ async function loadModel(url: string, ext: string, manager: THREE.LoadingManager
       const geom = await new PLYLoader(manager).loadAsync(url)
       if (!geom.attributes.normal) geom.computeVertexNormals()
       const material = new THREE.MeshStandardMaterial({ color: 0xb8c0d0, roughness: 0.6, vertexColors: !!geom.attributes.color })
-      if (geom.attributes.color) material.color.set(0xffffff) // the file's own colours, not tinted gray
+      if (geom.attributes.color) material.color.set(0xffffff) // the file's own colors, not tinted gray
       return { object: new THREE.Mesh(geom, material), animations: [] }
     }
     case 'server-glb': {
-      // The server reads 3MF (slicers' filament colours and painting included) and USD, and hands them over as a GLB. A
+      // The server reads 3MF (slicers' filament colors and painting included) and USD, and hands them over as a GLB. A
       // conversion still running answers 202 after waiting a while: ask again, for up to ten minutes or so.
       const { GLTFLoader } = await import('three/addons/loaders/GLTFLoader.js')
       for (let tries = 0; tries < 20; tries++) {
@@ -245,7 +245,7 @@ type AnyMaterial = THREE.Material & Partial<Record<MapSlot, THREE.Texture | null
 }
 
 /** FBX and OBJ files arrive with Phong or Lambert materials, which only see direct lights: no environment, so they
- *  read flat and dark in a viewer. Remake them as standard PBR materials (same colour, maps and transparency) so the
+ *  read flat and dark in a viewer. Remake them as standard PBR materials (same color, maps and transparency) so the
  *  environment lights them like everything else. */
 function toStandard(m: THREE.Material): THREE.Material {
   const old = m as THREE.MeshPhongMaterial & THREE.MeshLambertMaterial
@@ -290,7 +290,7 @@ function sanitize(m: AnyMaterial, geometry: THREE.BufferGeometry | undefined) {
     m.opacity = 1
     m.transparent = false
   }
-  // Vertex colours that are all black (an empty colour layer) multiply the whole model to black.
+  // Vertex colors that are all black (an empty color layer) multiply the whole model to black.
   const color = geometry?.attributes.color
   if (m.vertexColors && color) {
     let max = 0
@@ -316,7 +316,7 @@ function roleOf(name: string): MapSlot | 'skip' | null {
   if (/metal/.test(n) || end('m|mt')) return 'metalnessMap'
   if (/occlusion/.test(n) || end('ao|occ')) return 'aoMap'
   if (/height|disp|bump|mask|opacity|alpha|spec|gloss|smooth/.test(n) || end('h|orm|arm|mra|rma|s|g')) return 'skip'
-  if (/albedo|base.?colou?r|diffuse/.test(n) || end('diff|dif|col|color|colour|d|bc|a|c')) return 'map'
+  if (/albedo|base.?colou?r|diffuse/.test(n) || end('diff|dif|col|color|color|d|bc|a|c')) return 'map'
   return null
 }
 
@@ -384,7 +384,7 @@ export class ModelStage {
   private redrawUntil = 0
   private counts = { triangles: 0, vertices: 0 }
   private size = new THREE.Vector3()
-  private metres = false
+  private meters = false
   /** Image top at v = 1 (OBJ, FBX), as three's textures assume; glTF has it at v = 0. */
   private flipY = true
   playing = true
@@ -428,7 +428,7 @@ export class ModelStage {
     this.renderer = renderer
     renderer.setPixelRatio(Math.min(devicePixelRatio, 2))
     renderer.setSize(el.clientWidth || 1, el.clientHeight || 1)
-    // Neutral tone mapping keeps base colours as painted (ACES would shift and desaturate them), while highlights
+    // Neutral tone mapping keeps base colors as painted (ACES would shift and desaturate them), while highlights
     // from the environment still roll off instead of clipping.
     renderer.toneMapping = THREE.NeutralToneMapping
     renderer.toneMappingExposure = 1
@@ -536,7 +536,7 @@ export class ModelStage {
         vertices += g.attributes.position?.count ?? 0
       }
       const list = (Array.isArray(mesh.material) ? mesh.material : [mesh.material]).map((m) => {
-        // Meshes share materials: convert each once, so they stay shared and the colour fix isn't applied twice.
+        // Meshes share materials: convert each once, so they stay shared and the color fix isn't applied twice.
         let s = converted.get(m)
         if (!s) {
           s = toStandard(m) as AnyMaterial
@@ -597,7 +597,7 @@ export class ModelStage {
     this.frameHome()
     this.counts = { triangles: Math.round(triangles), vertices }
     this.bounds().box.getSize(this.size)
-    this.metres = ['glb', 'gltf'].includes(extOf(full.path))
+    this.meters = ['glb', 'gltf'].includes(extOf(full.path))
 
     // Clips embedded in the file plus linked clip files ("Knight@Run.fbx").
     animations.forEach((c, i) => this.clips.set(c.name || `clip ${i + 1}`, c))
@@ -652,7 +652,7 @@ export class ModelStage {
       if (role === null) unknown.push(g)
       else if (role !== 'skip' && !roles.has(role)) roles.set(role, g)
     }
-    // No texture says it's the colour: the first one whose name doesn't say otherwise ("Barrel.png") is.
+    // No texture says it's the color: the first one whose name doesn't say otherwise ("Barrel.png") is.
     if (!roles.has('map') && unknown.length) roles.set('map', unknown[0])
     if (!roles.has('map')) return 0
     const image = new THREE.TextureLoader(manager)
@@ -673,8 +673,8 @@ export class ModelStage {
         m[slot] = t
         maps[slot] = t
       }
-      // A painted colour map stands for the whole surface: a grey base colour would only darken it, and an
-      // emissive map shows only through a lit emissive colour.
+      // A painted color map stands for the whole surface: a gray base color would only darken it, and an
+      // emissive map shows only through a lit emissive color.
       m.color?.set(0xffffff)
       if (textures.has('emissiveMap') && 'emissive' in m) (m as THREE.MeshStandardMaterial).emissive.set(0xffffff)
       m.needsUpdate = true
@@ -786,7 +786,7 @@ export class ModelStage {
       textures: sources.size,
       ...this.counts,
       size: { x: this.size.x, y: this.size.y, z: this.size.z },
-      metres: this.metres,
+      meters: this.meters,
       maps: MAP_MODES.filter((m) => maps.has(m)),
     }
   }
@@ -805,7 +805,7 @@ export class ModelStage {
   }
 
   /** Make the materials the mode shows the meshes in. Meshes that share a material share its stand-in, except in
-   *  the geometry view, where each mesh gets a colour of its own. Points and lines keep theirs. */
+   *  the geometry view, where each mesh gets a color of its own. Points and lines keep theirs. */
   private buildViews() {
     this.dropViews()
     const mode = this.mode
@@ -838,7 +838,7 @@ export class ModelStage {
     const maps = this.materials.get(own) ?? {}
     let m: THREE.NodeMaterial
     if (isMapMode(mode)) {
-      // Unlit and full-bright, a mesh without the map in flat grey. Colour maps are decoded from sRGB as they're
+      // Unlit and full-bright, a mesh without the map in flat gray. Color maps are decoded from sRGB as they're
       // read and encoded again on the way out; data maps are numbers, so they're read as if they were sRGB too, to
       // show each pixel as the file has it.
       m = new THREE.MeshBasicNodeMaterial({ color: 0x808080 })
@@ -859,7 +859,7 @@ export class ModelStage {
         ? new THREE.MeshStandardNodeMaterial({ map: this.checkerTexture(), roughness: 0.85, metalness: 0 })
         : new THREE.MeshStandardNodeMaterial({ color: 0x808080, roughness: 0.85, metalness: 0 })
     } else {
-      // Hues a golden angle apart, so neighbours in the file differ however many meshes there are.
+      // Hues a golden angle apart, so neighbors in the file differ however many meshes there are.
       const color = new THREE.Color().setHSL((index * 0.618034) % 1, 0.6, 0.55)
       m = new THREE.MeshStandardNodeMaterial({ color, roughness: 0.6, metalness: 0 })
       // Meshes merged into one still show as the parts they were.
@@ -914,7 +914,7 @@ export class ModelStage {
     return t
   }
 
-  /** An 8 × 8 checker of coloured, labelled cells (A1 to H8): stretching shows in the squares, seams where the
+  /** An 8 × 8 checker of colored, labeled cells (A1 to H8): stretching shows in the squares, seams where the
    *  labels jump, flipped islands in mirrored letters. */
   private checkerTexture(): THREE.Texture {
     if (this.checker) return this.checker
@@ -1182,7 +1182,7 @@ function snapshotView(object: THREE.Object3D, dir: THREE.Vector3) {
   const up0 = Math.abs(dir.y) > 0.95 ? new THREE.Vector3(0, 0, -1) : new THREE.Vector3(0, 1, 0)
   const right = up0.clone().cross(dir).normalize()
   const up = dir.clone().cross(right)
-  // Every vertex where it stands now (skinned and morphed), about the box centre, in the camera's axes. Big meshes
+  // Every vertex where it stands now (skinned and morphed), about the box center, in the camera's axes. Big meshes
   // are sampled: the frame's margin covers what a sample misses.
   const local: number[] = []
   const v = new THREE.Vector3()
@@ -1227,12 +1227,12 @@ function snapshotView(object: THREE.Object3D, dir: THREE.Vector3) {
   }
 }
 
-/** The attribute a merged mesh keeps each part's colour in, for the geometry view. */
+/** The attribute a merged mesh keeps each part's color in, for the geometry view. */
 const PART_COLOR = 'partColor'
 
 /** Merge the meshes that never move apart and look the same (one material, the same attributes) into one mesh
  *  each: a model of thousands of parts otherwise takes thousands of draws a frame, which is what makes a big CAD
- *  model slow to turn, not its triangles. Each part's vertices are put where it stands, and its colour in the
+ *  model slow to turn, not its triangles. Each part's vertices are put where it stands, and its color in the
  *  geometry view goes in `PART_COLOR`. Returns the meshes left to draw. */
 function mergeStill(root: THREE.Object3D, meshes: THREE.Mesh[]): THREE.Mesh[] {
   root.updateWorldMatrix(true, true)

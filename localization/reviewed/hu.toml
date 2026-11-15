@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "453ff96837a704352761a5bf6af773e801a1f4018577b2f5bc3be44f27d2733f"
+source = "40994fa61278db02342a17e111610609be967f167ac0e561724a1ecc0fd4792e"
 translation = "c6684f3aa4c07e66944a392378175378b3171efffc214b475e3c149225b2c90e"
 
 [messages.account-add]
@@ -688,6 +688,14 @@ translation = "{ $count } eltávolítva ebből a gyűjteményből: { $name }"
 source = "Collections"
 translation = "Gyűjtemények"
 
+[messages.app-color]
+source = "Color"
+translation = "Szín"
+
+[messages.app-color-any]
+source = "Any color"
+translation = "Bármilyen szín"
+
 [messages.app-color-black]
 source = "Black"
 translation = "Fekete"
@@ -700,17 +708,21 @@ translation = "Kék"
 source = "Brown"
 translation = "Barna"
 
+[messages.app-color-gray]
+source = "Gray"
+translation = "Szürke"
+
 [messages.app-color-green]
 source = "Green"
 translation = "Zöld"
 
-[messages.app-color-grey]
-source = "Grey"
-translation = "Szürke"
-
 [messages.app-color-orange]
 source = "Orange"
 translation = "Narancs"
+
+[messages.app-color-pick]
+source = "Pick any color"
+translation = "Tetszőleges szín választása"
 
 [messages.app-color-pink]
 source = "Pink"
@@ -732,6 +744,10 @@ translation = "Homok"
 source = "Slate"
 translation = "Palaszürke"
 
+[messages.app-color-swatch]
+source = "{ $color }: assets with much { $lower } in them"
+translation = "{ $color }: sok { $lower } színt tartalmazó assetek"
+
 [messages.app-color-teal]
 source = "Teal"
 translation = "Kékeszöld"
@@ -743,22 +759,6 @@ translation = "Fehér"
 [messages.app-color-yellow]
 source = "Yellow"
 translation = "Sárga"
-
-[messages.app-colour]
-source = "Colour"
-translation = "Szín"
-
-[messages.app-colour-any]
-source = "Any colour"
-translation = "Bármilyen szín"
-
-[messages.app-colour-pick]
-source = "Pick any colour"
-translation = "Tetszőleges szín választása"
-
-[messages.app-colour-swatch]
-source = "{ $color }: assets with much { $lower } in them"
-translation = "{ $color }: sok { $lower } színt tartalmazó assetek"
 
 [messages.app-credits]
 source = "Credits"
@@ -800,12 +800,12 @@ translation = "kevesebb"
 source = "{ $count } more"
 translation = "még { $count }"
 
-[messages.app-favourite]
-source = "Favourite"
+[messages.app-favorite]
+source = "Favorite"
 translation = "Kedvencekhez"
 
-[messages.app-favourites]
-source = "Favourites"
+[messages.app-favorites]
+source = "Favorites"
 translation = "Kedvencek"
 
 [messages.app-filters]
@@ -1060,8 +1060,8 @@ translation = "Projektek, amelyek a hoard sync paranccsal innen szinkronizálnak
 source = "Most alike"
 translation = "Leginkább hasonló"
 
-[messages.app-rank-colour]
-source = "Most of the colour"
+[messages.app-rank-color]
+source = "Most of the color"
 translation = "Legtöbb ebből a színből"
 
 [messages.app-rank-match]
@@ -1088,8 +1088,8 @@ translation = "Újra"
 source = "Save"
 translation = "Mentés"
 
-[messages.app-save-name-favourites]
-source = "favourites"
+[messages.app-save-name-favorites]
+source = "favorites"
 translation = "kedvencek"
 
 [messages.app-save-name-label]
@@ -1252,8 +1252,8 @@ translation = "Csempeméret"
 source = "Undo"
 translation = "Visszavonás"
 
-[messages.app-unfavourite]
-source = "Unfavourite"
+[messages.app-unfavorite]
+source = "Unfavorite"
 translation = "Eltávolítás a kedvencekből"
 
 [messages.app-unnamed-asset]
@@ -1671,16 +1671,16 @@ translation = "Csak ez a fájl"
 source = "Just this file, without the files it uses"
 translation = "Csak ez a fájl, az általa használt fájlok nélkül"
 
-[messages.asset-favourite]
-source = "Favourite"
+[messages.asset-favorite]
+source = "Favorite"
 translation = "Kedvenc"
 
-[messages.asset-favourite-off-title]
-source = "Add to your favourites (F)"
+[messages.asset-favorite-off-title]
+source = "Add to your favorites (F)"
 translation = "Hozzáadás a kedvencekhez (F)"
 
-[messages.asset-favourite-on-title]
-source = "In your favourites (F takes it out)"
+[messages.asset-favorite-on-title]
+source = "In your favorites (F takes it out)"
 translation = "A kedvencei között (az F eltávolítja)"
 
 [messages.asset-file]
@@ -1854,6 +1854,10 @@ translation = "Cookolt (játékbuild): az előnézetek és a források el vannak
 [messages.asset-meta-cue-markers]
 source = "Cue markers"
 translation = "Jelölők"
+
+[messages.asset-meta-everything-with]
+source = "Show everything tagged { $tag }"
+translation = "Minden { $tag } címkéjű elem megjelenítése"
 
 [messages.asset-meta-format]
 source = "Format"
@@ -2084,7 +2088,7 @@ source = "Hoard read it out of the package on { $date } ({ $notes })."
 translation = "A Hoard olvasta ki a csomagfájlból ekkor: { $date } ({ $notes })."
 
 [messages.asset-palette]
-source = "Colours in the picture"
+source = "Colors in the picture"
 translation = "A kép színei"
 
 [messages.asset-path]
@@ -2192,7 +2196,7 @@ source = "Find assets with { $hex }, { $percent }% of this picture"
 translation = "Assetek keresése ezzel a színnel: { $hex } (a képből { $percent }%)"
 
 [messages.asset-swatch-title]
-source = "{ $hex }, { $percent }% of the picture. Find assets with this colour"
+source = "{ $hex }, { $percent }% of the picture. Find assets with this color"
 translation = "{ $hex }, a képből { $percent }%. Ilyen színű assetek keresése"
 
 [messages.asset-tag-add]
@@ -2472,7 +2476,7 @@ source = "Make an OAuth client (Web application) in Google Cloud Console → API
 translation = "Hozzon létre egy OAuth-klienst (Web application) a Google Cloud Console → APIs & Services → Credentials alatt. A Google nem küld csoportokat, ezért a szerepköröket a Beállítások → Fiók oldalon adja meg, és kapcsolja ki a fiókok első bejelentkezéskor történő létrehozását, hacsak nem juthat be bárki, akinek Google-fiókja van."
 
 [messages.auth-preset-microsoft-note]
-source = "Register an app in Entra ID → App registrations (a Web redirect to the address below). Put your tenant ID in place of “organizations” to let only your organisation in. For roles from groups, add the groups claim under Token configuration: it lists group IDs."
+source = "Register an app in Entra ID → App registrations (a Web redirect to the address below). Put your tenant ID in place of “organizations” to let only your organization in. For roles from groups, add the groups claim under Token configuration: it lists group IDs."
 translation = "Regisztráljon egy alkalmazást az Entra ID → App registrations alatt (Web átirányítással az alábbi címre). Az „organizations” helyére írja a bérlőazonosítóját, hogy csak a saját szervezete jusson be. A csoportokból származó szerepkörökhöz adja hozzá a groups claimet a Token configuration alatt: ez csoportazonosítókat sorol fel."
 
 [messages.auth-provider]
@@ -2919,8 +2923,8 @@ translation = "nem olvasható: { $path }"
 source = "can't write to { $path }"
 translation = "nem írható: { $path }"
 
-[messages.error-chatgpt-cancelled]
-source = "the sign-in was cancelled"
+[messages.error-chatgpt-canceled]
+source = "the sign-in was canceled"
 translation = "a bejelentkezést megszakították"
 
 [messages.error-chatgpt-code-used]
@@ -3103,7 +3107,7 @@ translation = "A címtár nem tudta ellenőrizni a jelszavát: { $reason }"
 source = "empty file"
 translation = "üres fájl"
 
-[messages.error-favourites-too-many]
+[messages.error-favorites-too-many]
 source = "at most 10,000 at a time"
 translation = "egyszerre legfeljebb 10 000"
 
@@ -3812,7 +3816,7 @@ source = "that picture is too big for a thumbnail"
 translation = "ez a kép túl nagy bélyegképnek"
 
 [messages.error-token-account-gone]
-source = "this token's account is gone, so it has no favourites or searches"
+source = "this token's account is gone, so it has no favorites or searches"
 translation = "ennek a tokennek a fiókja már nem létezik, így nincsenek kedvencei és keresései"
 
 [messages.error-token-name]
@@ -4075,7 +4079,7 @@ source = "It finds no title in this file. Pick the title."
 translation = "Nem talál címet ebben a fájlban. Válassza ki a címet."
 
 [messages.formatwizard-miss-not-the-stores]
-source = "What it recognises the store’s files by isn’t in this file. Change Recognise by."
+source = "What it recognizes the store’s files by isn’t in this file. Change Recognize by."
 translation = "Ami alapján az áruház fájljait felismeri, az nincs ebben a fájlban. Módosítsa a Felismerés alapja mezőt."
 
 [messages.formatwizard-miss-short-name]
@@ -4150,19 +4154,19 @@ translation = "Cím"
 source = "Store page"
 translation = "Áruházi oldal"
 
-[messages.formatwizard-recognise]
-source = "Recognise by"
+[messages.formatwizard-recognize]
+source = "Recognize by"
 translation = "Felismerés alapja"
 
-[messages.formatwizard-recognise-hint]
+[messages.formatwizard-recognize-hint]
 source = "One way a line; any of them will do. Needed when other files have the same name."
 translation = "Soronként egy módszer; bármelyik elég. Akkor kell, ha más fájloknak is ugyanez a neve."
 
-[messages.formatwizard-recognise-json]
+[messages.formatwizard-recognize-json]
 source = "A key only the store’s files have"
 translation = "Egy kulcs, amely csak az áruház fájljaiban van"
 
-[messages.formatwizard-recognise-text]
+[messages.formatwizard-recognize-text]
 source = "A line only the store’s files have"
 translation = "Egy sor, amely csak az áruház fájljaiban van"
 
@@ -4654,12 +4658,12 @@ translation = "sakktábla háttér"
 source = "Checker background (K cycles)"
 translation = "Sakktábla háttér (K: váltás)"
 
-[messages.image-bg-grey]
-source = "grey background"
+[messages.image-bg-gray]
+source = "gray background"
 translation = "szürke háttér"
 
-[messages.image-bg-grey-title]
-source = "Grey background (K cycles)"
+[messages.image-bg-gray-title]
+source = "Gray background (K cycles)"
 translation = "Szürke háttér (K: váltás)"
 
 [messages.image-bg-white]
@@ -5511,11 +5515,11 @@ source = "ambient occlusion"
 translation = "ambient occlusion"
 
 [messages.material-role-base-color]
-source = "Colour"
+source = "Color"
 translation = "Szín"
 
 [messages.material-role-base-color-name]
-source = "colour"
+source = "color"
 translation = "szín"
 
 [messages.material-role-bump]
@@ -5682,8 +5686,8 @@ translation = "Sötét háttér"
 source = "Environment background"
 translation = "Környezeti háttér"
 
-[messages.model-bg-grey]
-source = "Grey background"
+[messages.model-bg-gray]
+source = "Gray background"
 translation = "Szürke háttér"
 
 [messages.model-bg-light]
@@ -5798,8 +5802,8 @@ translation = "Hosszúság"
 source = "Materials"
 translation = "Anyagok"
 
-[messages.model-info-metres]
-source = "glTF is in metres"
+[messages.model-info-meters]
+source = "glTF is in meters"
 translation = "A glTF méterben van"
 
 [messages.model-info-no-units]
@@ -6501,8 +6505,8 @@ translation = "Mentéskor a leírás letöltődik az áruházi oldalról."
 source = "Paste the listing text, or leave empty to fetch it from the store page."
 translation = "Illessze be a hirdetés szövegét, vagy hagyja üresen, hogy az áruházi oldalról töltődjön le."
 
-[messages.packs-thumbs-cancelled]
-source = "Cancelled after { $done } of { $total }"
+[messages.packs-thumbs-canceled]
+source = "Canceled after { $done } of { $total }"
 translation = "Megszakítva ennyi után: { $done } / { $total }"
 
 [messages.packs-thumbs-drawing]
@@ -6745,11 +6749,11 @@ translation = "Kijelölés megszüntetése"
 source = "Dark theme: { $name }"
 translation = "Sötét téma: { $name }"
 
-[messages.palette-favourites]
-source = "Favourites"
+[messages.palette-favorites]
+source = "Favorites"
 translation = "Kedvencek"
 
-[messages.palette-favourites-keywords]
+[messages.palette-favorites-keywords]
 source = "starred stars liked"
 translation = "csillag csillagozott kedvelt starred stars liked"
 
@@ -6937,12 +6941,12 @@ translation = "megjelenés szín appearance color"
 source = "Command palette"
 translation = "Parancspaletta"
 
-[messages.projects-favourite-add-failed]
-source = "Couldn't add to your favourites: { $error }"
+[messages.projects-favorite-add-failed]
+source = "Couldn't add to your favorites: { $error }"
 translation = "Nem sikerült hozzáadni a kedvencekhez: { $error }"
 
-[messages.projects-favourite-remove-failed]
-source = "Couldn't take out of your favourites: { $error }"
+[messages.projects-favorite-remove-failed]
+source = "Couldn't take out of your favorites: { $error }"
 translation = "Nem sikerült eltávolítani a kedvencek közül: { $error }"
 
 [messages.projects-forget-search-failed]
@@ -7210,7 +7214,7 @@ source = "Tagging { $pack } with AI"
 translation = "Címkézés MI-vel: { $pack }"
 
 [messages.server-job-looks]
-source = "Working out colours and looks"
+source = "Working out colors and looks"
 translation = "Színek és megjelenés elemzése"
 
 [messages.server-job-materials]
@@ -7298,7 +7302,7 @@ source = "ambient occlusion"
 translation = "ambient occlusion"
 
 [messages.server-role-base-color]
-source = "colour"
+source = "color"
 translation = "szín"
 
 [messages.server-role-bump]
@@ -7712,7 +7716,7 @@ source = "Couldn’t get the model: { $detail }. Trying again every hour."
 translation = "Nem sikerült beszerezni a modellt: { $detail }. Óránként újrapróbálja."
 
 [messages.settings-clip-what]
-source = "Type what you’re after (“mossy rock”, “sci-fi door”, “wooden barrel”) and pictures that show it turn up beside names that have the words. “More like this” finds things of the same kind, not only the same colours."
+source = "Type what you’re after (“mossy rock”, “sci-fi door”, “wooden barrel”) and pictures that show it turn up beside names that have the words. “More like this” finds things of the same kind, not only the same colors."
 translation = "Írja be, amit keres (angolul, pl. „mossy rock”, „sci-fi door”, „wooden barrel”), és az ezt ábrázoló képek megjelennek a szavakat tartalmazó nevek mellett. A „Több ilyen” ugyanolyan fajtájú dolgokat talál, nem csak ugyanolyan színűeket."
 
 [messages.settings-conversion-cache]
@@ -8068,7 +8072,7 @@ source = "Image search"
 translation = "Képkeresés"
 
 [messages.settings-page-search-blurb]
-source = "Search pictures by what they show, not only by their names, and find things that are alike in kind, not only in colour."
+source = "Search pictures by what they show, not only by their names, and find things that are alike in kind, not only in color."
 translation = "Keressen a képek között aszerint, hogy mit ábrázolnak, ne csak a nevük szerint, és találjon fajtájukban hasonló dolgokat, ne csak színükben hasonlókat."
 
 [messages.settings-page-store-files]
@@ -8471,8 +8475,8 @@ translation = "Bezárás"
 source = "Close, clear the selection, or close the details"
 translation = "Bezárás, a kijelölés megszüntetése vagy a részletek bezárása"
 
-[messages.shortcuts-favourite]
-source = "Add to or take out of your favourites"
+[messages.shortcuts-favorite]
+source = "Add to or take out of your favorites"
 translation = "Hozzáadás a kedvencekhez vagy eltávolítás onnan"
 
 [messages.shortcuts-fit]
@@ -8874,15 +8878,15 @@ source = "Edit"
 translation = "Szerkesztés"
 
 [messages.storefiles-field-colors]
-source = "Colours"
+source = "Colors"
 translation = "Színek"
 
 [messages.storefiles-field-colors-hint]
-source = "Its colours, as color: tags."
+source = "Its colors, as color: tags."
 translation = "A színei, color: címkékként."
 
 [messages.storefiles-field-colors-name]
-source = "colours"
+source = "colors"
 translation = "színek"
 
 [messages.storefiles-field-id]
@@ -9458,7 +9462,7 @@ source = "Warm charcoal, amber"
 translation = "Meleg szénszürke, borostyán"
 
 [messages.theme-dark-graphite-blurb]
-source = "Neutral grey, no tint"
+source = "Neutral gray, no tint"
 translation = "Semleges szürke, árnyalat nélkül"
 
 [messages.theme-dark-moss-blurb]
@@ -9474,7 +9478,7 @@ source = "Wine-black, coral"
 translation = "Borfekete, korall"
 
 [messages.theme-dark-slate-blurb]
-source = "Blue-grey"
+source = "Blue-gray"
 translation = "Kékesszürke"
 
 [messages.theme-ember]
@@ -9498,7 +9502,7 @@ source = "Warm cream, amber"
 translation = "Meleg krém, borostyán"
 
 [messages.theme-light-paper-blurb]
-source = "Plain neutral grey"
+source = "Plain neutral gray"
 translation = "Egyszerű semleges szürke"
 
 [messages.theme-light-sage-blurb]
@@ -9506,7 +9510,7 @@ source = "Soft green"
 translation = "Lágy zöld"
 
 [messages.theme-light-slate-blurb]
-source = "Cool blue-grey"
+source = "Cool blue-gray"
 translation = "Hűvös kékesszürke"
 
 [messages.theme-lilac]
@@ -9541,16 +9545,16 @@ translation = "Zsálya"
 source = "Slate"
 translation = "Pala"
 
-[messages.tile-add-favourite]
-source = "Add to your favourites (F)"
+[messages.tile-add-favorite]
+source = "Add to your favorites (F)"
 translation = "Hozzáadás a kedvencekhez (F)"
 
-[messages.tile-favourite]
-source = "Favourite { $name }"
+[messages.tile-favorite]
+source = "Favorite { $name }"
 translation = "Kedvenc: { $name }"
 
-[messages.tile-in-favourites]
-source = "In your favourites"
+[messages.tile-in-favorites]
+source = "In your favorites"
 translation = "A kedvencei között"
 
 [messages.tile-label]

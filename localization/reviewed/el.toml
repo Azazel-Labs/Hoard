@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "453ff96837a704352761a5bf6af773e801a1f4018577b2f5bc3be44f27d2733f"
+source = "40994fa61278db02342a17e111610609be967f167ac0e561724a1ecc0fd4792e"
 translation = "e5705daf120ffc89630a2dfab18c62e5c126f3f32bace52e36f4dc9999786b67"
 
 [messages.account-add]
@@ -720,6 +720,14 @@ translation = """
 source = "Collections"
 translation = "Συλλογές"
 
+[messages.app-color]
+source = "Color"
+translation = "Χρώμα"
+
+[messages.app-color-any]
+source = "Any color"
+translation = "Οποιοδήποτε χρώμα"
+
 [messages.app-color-black]
 source = "Black"
 translation = "Μαύρο"
@@ -732,17 +740,21 @@ translation = "Μπλε"
 source = "Brown"
 translation = "Καφέ"
 
+[messages.app-color-gray]
+source = "Gray"
+translation = "Γκρι"
+
 [messages.app-color-green]
 source = "Green"
 translation = "Πράσινο"
 
-[messages.app-color-grey]
-source = "Grey"
-translation = "Γκρι"
-
 [messages.app-color-orange]
 source = "Orange"
 translation = "Πορτοκαλί"
+
+[messages.app-color-pick]
+source = "Pick any color"
+translation = "Επιλέξτε οποιοδήποτε χρώμα"
 
 [messages.app-color-pink]
 source = "Pink"
@@ -764,6 +776,10 @@ translation = "Μπεζ"
 source = "Slate"
 translation = "Γκριζομπλέ"
 
+[messages.app-color-swatch]
+source = "{ $color }: assets with much { $lower } in them"
+translation = "{ $color }: στοιχεία με πολύ { $lower }"
+
 [messages.app-color-teal]
 source = "Teal"
 translation = "Πετρόλ"
@@ -775,22 +791,6 @@ translation = "Λευκό"
 [messages.app-color-yellow]
 source = "Yellow"
 translation = "Κίτρινο"
-
-[messages.app-colour]
-source = "Colour"
-translation = "Χρώμα"
-
-[messages.app-colour-any]
-source = "Any colour"
-translation = "Οποιοδήποτε χρώμα"
-
-[messages.app-colour-pick]
-source = "Pick any colour"
-translation = "Επιλέξτε οποιοδήποτε χρώμα"
-
-[messages.app-colour-swatch]
-source = "{ $color }: assets with much { $lower } in them"
-translation = "{ $color }: στοιχεία με πολύ { $lower }"
 
 [messages.app-credits]
 source = "Credits"
@@ -832,12 +832,12 @@ translation = "λιγότερα"
 source = "{ $count } more"
 translation = "{ $count } ακόμη"
 
-[messages.app-favourite]
-source = "Favourite"
+[messages.app-favorite]
+source = "Favorite"
 translation = "Αγαπημένο"
 
-[messages.app-favourites]
-source = "Favourites"
+[messages.app-favorites]
+source = "Favorites"
 translation = "Αγαπημένα"
 
 [messages.app-filters]
@@ -1096,8 +1096,8 @@ translation = "Έργα που κάνουν hoard sync από εδώ, με ό,τ
 source = "Most alike"
 translation = "Πιο παρόμοια"
 
-[messages.app-rank-colour]
-source = "Most of the colour"
+[messages.app-rank-color]
+source = "Most of the color"
 translation = "Περισσότερο από το χρώμα"
 
 [messages.app-rank-match]
@@ -1124,8 +1124,8 @@ translation = "Επανάληψη"
 source = "Save"
 translation = "Αποθήκευση"
 
-[messages.app-save-name-favourites]
-source = "favourites"
+[messages.app-save-name-favorites]
+source = "favorites"
 translation = "αγαπημένα"
 
 [messages.app-save-name-label]
@@ -1296,8 +1296,8 @@ translation = "Μέγεθος πλακιδίων"
 source = "Undo"
 translation = "Αναίρεση"
 
-[messages.app-unfavourite]
-source = "Unfavourite"
+[messages.app-unfavorite]
+source = "Unfavorite"
 translation = "Αφαίρεση από αγαπημένα"
 
 [messages.app-unnamed-asset]
@@ -1746,16 +1746,16 @@ translation = "Μόνο αυτό το αρχείο"
 source = "Just this file, without the files it uses"
 translation = "Μόνο αυτό το αρχείο, χωρίς τα αρχεία που χρησιμοποιεί"
 
-[messages.asset-favourite]
-source = "Favourite"
+[messages.asset-favorite]
+source = "Favorite"
 translation = "Αγαπημένο"
 
-[messages.asset-favourite-off-title]
-source = "Add to your favourites (F)"
+[messages.asset-favorite-off-title]
+source = "Add to your favorites (F)"
 translation = "Προσθήκη στα αγαπημένα σας (F)"
 
-[messages.asset-favourite-on-title]
-source = "In your favourites (F takes it out)"
+[messages.asset-favorite-on-title]
+source = "In your favorites (F takes it out)"
 translation = "Στα αγαπημένα σας (το F το αφαιρεί)"
 
 [messages.asset-file]
@@ -1933,6 +1933,10 @@ translation = "Cooked (build παιχνιδιού): οι προεπισκοπή�
 [messages.asset-meta-cue-markers]
 source = "Cue markers"
 translation = "Δείκτες cue"
+
+[messages.asset-meta-everything-with]
+source = "Show everything tagged { $tag }"
+translation = "Εμφάνιση όλων με την ετικέτα { $tag }"
 
 [messages.asset-meta-format]
 source = "Format"
@@ -2163,7 +2167,7 @@ source = "Hoard read it out of the package on { $date } ({ $notes })."
 translation = "Το Hoard το διάβασε από το πακέτο στις { $date } ({ $notes })."
 
 [messages.asset-palette]
-source = "Colours in the picture"
+source = "Colors in the picture"
 translation = "Χρώματα στην εικόνα"
 
 [messages.asset-path]
@@ -2271,7 +2275,7 @@ source = "Find assets with { $hex }, { $percent }% of this picture"
 translation = "Εύρεση στοιχείων με { $hex }, { $percent }% αυτής της εικόνας"
 
 [messages.asset-swatch-title]
-source = "{ $hex }, { $percent }% of the picture. Find assets with this colour"
+source = "{ $hex }, { $percent }% of the picture. Find assets with this color"
 translation = "{ $hex }, { $percent }% της εικόνας. Εύρεση στοιχείων με αυτό το χρώμα"
 
 [messages.asset-tag-add]
@@ -2555,7 +2559,7 @@ source = "Make an OAuth client (Web application) in Google Cloud Console → API
 translation = "Δημιουργήστε έναν OAuth client (Web application) στο Google Cloud Console → APIs & Services → Credentials. Το Google δεν στέλνει ομάδες, οπότε δώστε ρόλους στις Ρυθμίσεις → Λογαριασμός και απενεργοποιήστε τη δημιουργία λογαριασμών στην πρώτη σύνδεση, εκτός αν πρέπει να μπαίνει οποιοσδήποτε έχει λογαριασμό Google."
 
 [messages.auth-preset-microsoft-note]
-source = "Register an app in Entra ID → App registrations (a Web redirect to the address below). Put your tenant ID in place of “organizations” to let only your organisation in. For roles from groups, add the groups claim under Token configuration: it lists group IDs."
+source = "Register an app in Entra ID → App registrations (a Web redirect to the address below). Put your tenant ID in place of “organizations” to let only your organization in. For roles from groups, add the groups claim under Token configuration: it lists group IDs."
 translation = "Καταχωρίστε μια εφαρμογή στο Entra ID → App registrations (με ανακατεύθυνση Web στην παρακάτω διεύθυνση). Βάλτε το tenant ID σας στη θέση του «organizations» για να μπαίνει μόνο ο οργανισμός σας. Για ρόλους από ομάδες, προσθέστε το claim groups στο Token configuration: παραθέτει τα ID των ομάδων."
 
 [messages.auth-provider]
@@ -3006,8 +3010,8 @@ translation = "δεν είναι δυνατή η ανάγνωση του { $path
 source = "can't write to { $path }"
 translation = "δεν είναι δυνατή η εγγραφή στο { $path }"
 
-[messages.error-chatgpt-cancelled]
-source = "the sign-in was cancelled"
+[messages.error-chatgpt-canceled]
+source = "the sign-in was canceled"
 translation = "η σύνδεση ακυρώθηκε"
 
 [messages.error-chatgpt-code-used]
@@ -3190,7 +3194,7 @@ translation = "Ο κατάλογος δεν μπόρεσε να ελέγξει �
 source = "empty file"
 translation = "κενό αρχείο"
 
-[messages.error-favourites-too-many]
+[messages.error-favorites-too-many]
 source = "at most 10,000 at a time"
 translation = "το πολύ 10.000 τη φορά"
 
@@ -3899,7 +3903,7 @@ source = "that picture is too big for a thumbnail"
 translation = "η εικόνα είναι πολύ μεγάλη για μικρογραφία"
 
 [messages.error-token-account-gone]
-source = "this token's account is gone, so it has no favourites or searches"
+source = "this token's account is gone, so it has no favorites or searches"
 translation = "ο λογαριασμός αυτού του διακριτικού δεν υπάρχει πια, οπότε δεν έχει αγαπημένα ή αναζητήσεις"
 
 [messages.error-token-name]
@@ -4178,7 +4182,7 @@ source = "It finds no title in this file. Pick the title."
 translation = "Δεν βρίσκει τίτλο σε αυτό το αρχείο. Επιλέξτε τον τίτλο."
 
 [messages.formatwizard-miss-not-the-stores]
-source = "What it recognises the store’s files by isn’t in this file. Change Recognise by."
+source = "What it recognizes the store’s files by isn’t in this file. Change Recognize by."
 translation = "Αυτό με βάση το οποίο αναγνωρίζει τα αρχεία του καταστήματος δεν υπάρχει σε αυτό το αρχείο. Αλλάξτε το «Αναγνώριση με βάση»."
 
 [messages.formatwizard-miss-short-name]
@@ -4253,19 +4257,19 @@ translation = "Τίτλος"
 source = "Store page"
 translation = "Σελίδα καταστήματος"
 
-[messages.formatwizard-recognise]
-source = "Recognise by"
+[messages.formatwizard-recognize]
+source = "Recognize by"
 translation = "Αναγνώριση με βάση"
 
-[messages.formatwizard-recognise-hint]
+[messages.formatwizard-recognize-hint]
 source = "One way a line; any of them will do. Needed when other files have the same name."
 translation = "Ένας τρόπος ανά γραμμή· αρκεί οποιοσδήποτε. Χρειάζεται όταν άλλα αρχεία έχουν το ίδιο όνομα."
 
-[messages.formatwizard-recognise-json]
+[messages.formatwizard-recognize-json]
 source = "A key only the store’s files have"
 translation = "Ένα κλειδί που έχουν μόνο τα αρχεία του καταστήματος"
 
-[messages.formatwizard-recognise-text]
+[messages.formatwizard-recognize-text]
 source = "A line only the store’s files have"
 translation = "Μια γραμμή που έχουν μόνο τα αρχεία του καταστήματος"
 
@@ -4765,12 +4769,12 @@ translation = "φόντο σκακιέρας"
 source = "Checker background (K cycles)"
 translation = "Φόντο σκακιέρας (το K εναλλάσσει)"
 
-[messages.image-bg-grey]
-source = "grey background"
+[messages.image-bg-gray]
+source = "gray background"
 translation = "γκρι φόντο"
 
-[messages.image-bg-grey-title]
-source = "Grey background (K cycles)"
+[messages.image-bg-gray-title]
+source = "Gray background (K cycles)"
 translation = "Γκρι φόντο (το K εναλλάσσει)"
 
 [messages.image-bg-white]
@@ -5654,11 +5658,11 @@ source = "ambient occlusion"
 translation = "ambient occlusion (AO)"
 
 [messages.material-role-base-color]
-source = "Colour"
+source = "Color"
 translation = "Χρώμα"
 
 [messages.material-role-base-color-name]
-source = "colour"
+source = "color"
 translation = "χρώματος"
 
 [messages.material-role-bump]
@@ -5825,8 +5829,8 @@ translation = "Σκοτεινό φόντο"
 source = "Environment background"
 translation = "Φόντο περιβάλλοντος"
 
-[messages.model-bg-grey]
-source = "Grey background"
+[messages.model-bg-gray]
+source = "Gray background"
 translation = "Γκρι φόντο"
 
 [messages.model-bg-light]
@@ -5941,8 +5945,8 @@ translation = "Μήκος"
 source = "Materials"
 translation = "Υλικά"
 
-[messages.model-info-metres]
-source = "glTF is in metres"
+[messages.model-info-meters]
+source = "glTF is in meters"
 translation = "Το glTF είναι σε μέτρα"
 
 [messages.model-info-no-units]
@@ -6683,8 +6687,8 @@ translation = "Η αποθήκευση φέρνει την περιγραφή α
 source = "Paste the listing text, or leave empty to fetch it from the store page."
 translation = "Επικολλήστε το κείμενο της καταχώρισης ή αφήστε το κενό για λήψη από τη σελίδα του καταστήματος."
 
-[messages.packs-thumbs-cancelled]
-source = "Cancelled after { $done } of { $total }"
+[messages.packs-thumbs-canceled]
+source = "Canceled after { $done } of { $total }"
 translation = "Ακυρώθηκε μετά από { $done } από { $total }"
 
 [messages.packs-thumbs-drawing]
@@ -6953,11 +6957,11 @@ translation = "Απαλοιφή επιλογής"
 source = "Dark theme: { $name }"
 translation = "Σκοτεινό θέμα: { $name }"
 
-[messages.palette-favourites]
-source = "Favourites"
+[messages.palette-favorites]
+source = "Favorites"
 translation = "Αγαπημένα"
 
-[messages.palette-favourites-keywords]
+[messages.palette-favorites-keywords]
 source = "starred stars liked"
 translation = "αστέρι αστεράκι αγαπημένο μου αρέσει starred stars liked"
 
@@ -7145,12 +7149,12 @@ translation = "εμφάνιση χρώμα appearance color"
 source = "Command palette"
 translation = "Παλέτα εντολών"
 
-[messages.projects-favourite-add-failed]
-source = "Couldn't add to your favourites: { $error }"
+[messages.projects-favorite-add-failed]
+source = "Couldn't add to your favorites: { $error }"
 translation = "Δεν ήταν δυνατή η προσθήκη στα αγαπημένα σας: { $error }"
 
-[messages.projects-favourite-remove-failed]
-source = "Couldn't take out of your favourites: { $error }"
+[messages.projects-favorite-remove-failed]
+source = "Couldn't take out of your favorites: { $error }"
 translation = "Δεν ήταν δυνατή η αφαίρεση από τα αγαπημένα σας: { $error }"
 
 [messages.projects-forget-search-failed]
@@ -7422,7 +7426,7 @@ source = "Tagging { $pack } with AI"
 translation = "Ετικέτες με AI: { $pack }"
 
 [messages.server-job-looks]
-source = "Working out colours and looks"
+source = "Working out colors and looks"
 translation = "Ανάλυση χρωμάτων και εμφάνισης"
 
 [messages.server-job-materials]
@@ -7510,7 +7514,7 @@ source = "ambient occlusion"
 translation = "ambient occlusion (AO)"
 
 [messages.server-role-base-color]
-source = "colour"
+source = "color"
 translation = "χρώματος"
 
 [messages.server-role-bump]
@@ -7929,7 +7933,7 @@ source = "Couldn’t get the model: { $detail }. Trying again every hour."
 translation = "Δεν ήταν δυνατή η λήψη του μοντέλου: { $detail }. Νέα προσπάθεια κάθε ώρα."
 
 [messages.settings-clip-what]
-source = "Type what you’re after (“mossy rock”, “sci-fi door”, “wooden barrel”) and pictures that show it turn up beside names that have the words. “More like this” finds things of the same kind, not only the same colours."
+source = "Type what you’re after (“mossy rock”, “sci-fi door”, “wooden barrel”) and pictures that show it turn up beside names that have the words. “More like this” finds things of the same kind, not only the same colors."
 translation = "Πληκτρολογήστε αυτό που ψάχνετε («mossy rock», «sci-fi door», «wooden barrel») και οι εικόνες που το δείχνουν εμφανίζονται δίπλα στα ονόματα που περιέχουν τις λέξεις. Το «Περισσότερα σαν αυτό» βρίσκει πράγματα του ίδιου είδους, όχι μόνο με τα ίδια χρώματα."
 
 [messages.settings-conversion-cache]
@@ -8285,7 +8289,7 @@ source = "Image search"
 translation = "Αναζήτηση εικόνων"
 
 [messages.settings-page-search-blurb]
-source = "Search pictures by what they show, not only by their names, and find things that are alike in kind, not only in colour."
+source = "Search pictures by what they show, not only by their names, and find things that are alike in kind, not only in color."
 translation = "Αναζητήστε εικόνες με βάση αυτό που δείχνουν, όχι μόνο με τα ονόματά τους, και βρείτε πράγματα που μοιάζουν στο είδος, όχι μόνο στο χρώμα."
 
 [messages.settings-page-store-files]
@@ -8688,8 +8692,8 @@ translation = "Κλείσιμο"
 source = "Close, clear the selection, or close the details"
 translation = "Κλείσιμο, απαλοιφή επιλογής ή κλείσιμο λεπτομερειών"
 
-[messages.shortcuts-favourite]
-source = "Add to or take out of your favourites"
+[messages.shortcuts-favorite]
+source = "Add to or take out of your favorites"
 translation = "Προσθήκη ή αφαίρεση από τα αγαπημένα σας"
 
 [messages.shortcuts-fit]
@@ -9108,15 +9112,15 @@ source = "Edit"
 translation = "Επεξεργασία"
 
 [messages.storefiles-field-colors]
-source = "Colours"
+source = "Colors"
 translation = "Χρώματα"
 
 [messages.storefiles-field-colors-hint]
-source = "Its colours, as color: tags."
+source = "Its colors, as color: tags."
 translation = "Τα χρώματά του, ως ετικέτες color:."
 
 [messages.storefiles-field-colors-name]
-source = "colours"
+source = "colors"
 translation = "χρώματα"
 
 [messages.storefiles-field-id]
@@ -9712,7 +9716,7 @@ source = "Warm charcoal, amber"
 translation = "Ζεστό ανθρακί, κεχριμπάρι"
 
 [messages.theme-dark-graphite-blurb]
-source = "Neutral grey, no tint"
+source = "Neutral gray, no tint"
 translation = "Ουδέτερο γκρι, χωρίς απόχρωση"
 
 [messages.theme-dark-moss-blurb]
@@ -9728,7 +9732,7 @@ source = "Wine-black, coral"
 translation = "Κρασάτο προς το μαύρο, κοραλλί"
 
 [messages.theme-dark-slate-blurb]
-source = "Blue-grey"
+source = "Blue-gray"
 translation = "Γαλαζογκρίζο"
 
 [messages.theme-ember]
@@ -9752,7 +9756,7 @@ source = "Warm cream, amber"
 translation = "Ζεστό κρεμ, κεχριμπάρι"
 
 [messages.theme-light-paper-blurb]
-source = "Plain neutral grey"
+source = "Plain neutral gray"
 translation = "Απλό ουδέτερο γκρι"
 
 [messages.theme-light-sage-blurb]
@@ -9760,7 +9764,7 @@ source = "Soft green"
 translation = "Απαλό πράσινο"
 
 [messages.theme-light-slate-blurb]
-source = "Cool blue-grey"
+source = "Cool blue-gray"
 translation = "Ψυχρό γαλαζογκρίζο"
 
 [messages.theme-lilac]
@@ -9795,16 +9799,16 @@ translation = "Φασκόμηλο"
 source = "Slate"
 translation = "Σχιστόλιθος"
 
-[messages.tile-add-favourite]
-source = "Add to your favourites (F)"
+[messages.tile-add-favorite]
+source = "Add to your favorites (F)"
 translation = "Προσθήκη στα αγαπημένα σας (F)"
 
-[messages.tile-favourite]
-source = "Favourite { $name }"
+[messages.tile-favorite]
+source = "Favorite { $name }"
 translation = "Αγαπημένο: { $name }"
 
-[messages.tile-in-favourites]
-source = "In your favourites"
+[messages.tile-in-favorites]
+source = "In your favorites"
 translation = "Στα αγαπημένα σας"
 
 [messages.tile-label]

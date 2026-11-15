@@ -1,6 +1,6 @@
 <script setup lang="ts">
 // The side panel's peek at a text file, and a click opens the full-screen viewer. Markdown shows as a document,
-// prose wraps, code and data show their first lines coloured. Only the first few kilobytes are fetched, however
+// prose wraps, code and data show their first lines colored. Only the first few kilobytes are fetched, however
 // big the file.
 import { computed, nextTick, ref, watch } from 'vue'
 import type { Asset } from '../api'

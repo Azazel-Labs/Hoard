@@ -262,7 +262,7 @@ fn character(frames: &[Frame], voiced: &[&Frame], secs: f32) -> [f32; CHARACTER]
 }
 
 /// Triangular mel filters from [`LOW_HZ`] to [`HIGH_HZ`]: for each band, the power-spectrum bins and their weights.
-#[expect(clippy::many_single_char_names, reason = "a filter's left, centre and right edges")]
+#[expect(clippy::many_single_char_names, reason = "a filter's left, center and right edges")]
 fn mel_filters(n: usize, sr: f32) -> Vec<Vec<(usize, f32)>> {
     let edges = mel_edges();
     let bin_hz = sr / n as f32;

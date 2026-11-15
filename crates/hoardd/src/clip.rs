@@ -1,6 +1,6 @@
 //! Search by meaning with CLIP (`OpenAI`'s ViT-B/32): every thumbnail gets a 512-number embedding, and so does what's
 //! typed in the search box, so "mossy rock" finds mossy rocks whatever the files are called, and "more like this"
-//! knows a barrel from a crate rather than only matching colours and grain.
+//! knows a barrel from a crate rather than only matching colors and grain.
 //!
 //! It's off until an admin turns it on in Settings, because the model is a 605 MB download and takes 250–350 MB of
 //! memory while it runs. Turned on, the model is fetched (pinned to one revision, checked against its SHA-256) into
@@ -402,7 +402,7 @@ fn files_present(dir: &Path) -> bool {
     FILES.iter().all(|(name, size, _)| std::fs::metadata(dir.join(name)).is_ok_and(|m| m.len() == *size))
 }
 
-async fn download(dir: &Path, cancelled: &(dyn Fn() -> bool + Sync)) -> Result<()> {
+async fn download(dir: &Path, canceled: &(dyn Fn() -> bool + Sync)) -> Result<()> {
     let http = tools::client()?;
     tokio::fs::create_dir_all(dir).await?;
     let activity = crate::activity::start("clip", "Downloading the image search model", None);
@@ -413,7 +413,7 @@ async fn download(dir: &Path, cancelled: &(dyn Fn() -> bool + Sync)) -> Result<(
         }
         activity.detail(name);
         let part = dir.join(format!("{name}.part"));
-        let fetched = tools::fetch(&http, &format!("{REPO}/{name}"), &part, size, &activity, cancelled)
+        let fetched = tools::fetch(&http, &format!("{REPO}/{name}"), &part, size, &activity, canceled)
             .await
             .with_context(|| format!("downloading {name}"))?;
         if fetched.sha256 != sha256 {

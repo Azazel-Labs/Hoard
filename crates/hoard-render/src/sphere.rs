@@ -30,7 +30,7 @@ pub enum Packed {
 /// The maps a material swatch is shaded with. Any can be missing.
 #[derive(Debug, Default)]
 pub struct Maps {
-    /// sRGB colour.
+    /// sRGB color.
     pub base_color: Option<RgbaImage>,
     pub normal: Option<RgbaImage>,
     /// The normal map is DirectX-style (green points down).
@@ -44,7 +44,7 @@ pub struct Maps {
     /// Height, displacement or bump: only used when there's no normal map.
     pub height: Option<RgbaImage>,
     pub opacity: Option<RgbaImage>,
-    /// sRGB colour.
+    /// sRGB color.
     pub emissive: Option<RgbaImage>,
     pub packed: Option<(RgbaImage, Packed)>,
 }
@@ -117,7 +117,7 @@ impl Tex<'_> {
         })
     }
 
-    /// The first channel, 0..1 (grey maps).
+    /// The first channel, 0..1 (gray maps).
     fn value(&self, u: f32, v: f32) -> f32 {
         self.sample(u, v)[0] / 255.0
     }
@@ -147,7 +147,7 @@ impl<'a> Shader<'a> {
         Vec3::new(l(s[0]), l(s[1]), l(s[2]))
     }
 
-    /// Colour (linear) and coverage of the sphere at picture coordinates -1..1, or None off the sphere.
+    /// Color (linear) and coverage of the sphere at picture coordinates -1..1, or None off the sphere.
     fn shade(&self, x: f32, y: f32) -> Option<(Vec3, f32)> {
         let r2 = x * x + y * y;
         if r2 > 1.0 {

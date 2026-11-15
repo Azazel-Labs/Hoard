@@ -450,6 +450,7 @@ pub(crate) fn analyze_one(local: PathBuf, root: &Path, rel: String, blob: Option
     let mut tags = TagSet::default();
     tags.add(&format!("kind:{}", kind.as_str()), TagSource::Meta, 1.0);
     tagger::vocab_tags(&rel, kind, &mut tags);
+    tagger::aside_tags(&rel, &mut tags);
     tagger::meta_tags(kind, &ext, &analysis.meta, &mut tags);
     let refs = links::extract_refs(&local, &ext);
     Ok(Item { asset_id: None, rel, ext, kind, local, blob, analysis, tags, category: String::new(), refs })
@@ -487,10 +488,15 @@ fn could_be_texture(rel: &str) -> bool {
 
 impl MapSets {
     pub(crate) fn new<'a>(texture_paths: impl IntoIterator<Item = &'a str>) -> Self {
+        let paths: Vec<&str> = texture_paths.into_iter().filter(|rel| tagger::could_be_map(rel)).collect();
+        let series = tagger::lettered_series(paths.iter().copied());
         let mut groups: HashMap<(&str, String), Vec<(&str, tagger::MapHit)>> = HashMap::new();
-        for rel in texture_paths {
+        for rel in paths {
             if let Some(hit) = tagger::map_suffix(stem_of(rel)) {
                 let dir = rel.rsplit_once('/').map_or("", |(d, _)| d);
+                if hit.suffix.len() == 1 && series.contains(&tagger::series_key(dir, &hit.base)) {
+                    continue;
+                }
                 groups.entry((dir, hit.base.clone())).or_default().push((rel, hit));
             }
         }
@@ -558,7 +564,7 @@ fn detect_pack_license(root: &Path, files: &[PathBuf]) -> Option<&'static str> {
     license_in(files.iter().filter(|f| tagger::is_license_file(&rel_of(root, f))))
 }
 
-/// The first license recognised in these files (only their first few KB are read).
+/// The first license recognized in these files (only their first few KB are read).
 fn license_in<'a>(files: impl IntoIterator<Item = &'a PathBuf>) -> Option<&'static str> {
     files.into_iter().find_map(|f| {
         let mut text = String::new();
@@ -1121,6 +1127,22 @@ mod tests {
     use super::*;
 
     #[test]
+    fn lettered_variants_and_drawings_are_not_map_sets() {
+        let paths = [
+            "Brick Pack/PNG/Special/extra_character_a.png",
+            "Brick Pack/PNG/Special/extra_character_d.png",
+            "Brick Pack/PNG/Special/extra_character_e.png",
+            "Brick Pack/Vector/rock_d.svg",
+            "Brick Pack/Vector/rock_n.svg",
+            "Textures/T_Rock_D.png",
+            "Textures/T_Rock_N.png",
+        ];
+        let sets = MapSets::new(paths);
+        let tagged: Vec<&str> = paths.into_iter().filter(|p| sets.0.contains_key(*p)).collect();
+        assert_eq!(tagged, ["Textures/T_Rock_D.png", "Textures/T_Rock_N.png"]);
+    }
+
+    #[test]
     fn rejects_traversal() {
         assert_eq!(safe_rel_path("../etc/passwd"), None);
         assert_eq!(safe_rel_path("a/../../b"), None);
@@ -1142,7 +1164,7 @@ mod tests {
         assert!(!is_junk("Assets/thing.png"));
     }
 
-    /// A one-triangle glTF reading `bin` for its buffer and `png` for its colour map.
+    /// A one-triangle glTF reading `bin` for its buffer and `png` for its color map.
     fn tri_gltf(bin: &str, png: &str) -> String {
         serde_json::json!({
             "asset": { "version": "2.0" },

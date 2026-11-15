@@ -17,7 +17,7 @@ const fullUrl = computed(() => (native.value ? fileUrl(props.asset) : `${asUrl(p
 /** What's on screen: the light preview, then the full picture. */
 const src = ref('')
 
-const BACKGROUNDS = ['checker', 'black', 'grey', 'white'] as const
+const BACKGROUNDS = ['checker', 'black', 'gray', 'white'] as const
 // The letters are the keys that pick each channel; the titles are getters so they follow the language.
 const CHANNELS = [
   { key: 'r', label: 'R', get title() { return t('image-channel-red') } },
@@ -32,7 +32,7 @@ function bgTitle(b: Background): string {
   switch (b) {
     case 'checker': return t('image-bg-checker-title')
     case 'black': return t('image-bg-black-title')
-    case 'grey': return t('image-bg-grey-title')
+    case 'gray': return t('image-bg-gray-title')
     case 'white': return t('image-bg-white-title')
   }
 }
@@ -41,7 +41,7 @@ function bgLabel(b: Background): string {
   switch (b) {
     case 'checker': return t('image-bg-checker')
     case 'black': return t('image-bg-black')
-    case 'grey': return t('image-bg-grey')
+    case 'gray': return t('image-bg-gray')
     case 'white': return t('image-bg-white')
   }
 }
@@ -261,7 +261,7 @@ const contentStyle = computed(() => ({
 <template>
   <dialog ref="dlg" class="viewer" :aria-label="t('image-inspect-aria', { name: asset.name })" @close="emit('close')" @keydown="onKey">
     <svg width="0" height="0" aria-hidden="true" class="defs">
-      <!-- Each channel as greyscale, fully opaque: the alpha one turns transparency into black. -->
+      <!-- Each channel as grayscale, fully opaque: the alpha one turns transparency into black. -->
       <filter id="hoard-ch-r" color-interpolation-filters="sRGB"><feColorMatrix values="1 0 0 0 0  1 0 0 0 0  1 0 0 0 0  0 0 0 0 1" /></filter>
       <filter id="hoard-ch-g" color-interpolation-filters="sRGB"><feColorMatrix values="0 1 0 0 0  0 1 0 0 0  0 1 0 0 0  0 0 0 0 1" /></filter>
       <filter id="hoard-ch-b" color-interpolation-filters="sRGB"><feColorMatrix values="0 0 1 0 0  0 0 1 0 0  0 0 1 0 0  0 0 0 0 1" /></filter>
@@ -393,7 +393,7 @@ const contentStyle = computed(() => ({
 .swatch::after { content: ''; width: 0.9rem; height: 0.9rem; border-radius: 50%; border: 1px solid var(--line); }
 .swatch.checker::after { background: repeating-conic-gradient(#888 0 25%, #ccc 0 50%) 0 0 / 0.45rem 0.45rem; }
 .swatch.black::after { background: #000; }
-.swatch.grey::after { background: #808080; }
+.swatch.gray::after { background: #808080; }
 .swatch.white::after { background: #fff; }
 .swatch[aria-pressed='true']::after { outline: 2px solid var(--text); outline-offset: 1px; }
 .ch { font-weight: 700; font-variation-settings: 'MONO' 1; }
@@ -404,7 +404,7 @@ const contentStyle = computed(() => ({
 .stage { position: relative; flex: 1; overflow: hidden; cursor: grab; touch-action: none; user-select: none; }
 .stage:active { cursor: grabbing; }
 .stage.bg-black { background: #000; }
-.stage.bg-grey { background: #808080; }
+.stage.bg-gray { background: #808080; }
 .stage.bg-white { background: #fff; }
 .content {
   position: absolute; left: 0; top: 0; transform-origin: 0 0; background-repeat: no-repeat; will-change: transform;

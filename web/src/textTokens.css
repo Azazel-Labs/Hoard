@@ -1,4 +1,4 @@
-/* Colours for the text viewers' highlighting (text.ts) and the JSON tree: muted enough to read for a long time,
+/* Colors for the text viewers' highlighting (text.ts) and the JSON tree: muted enough to read for a long time,
    distinct enough to tell a key from a value at a glance. Each is light-dark(on light, on dark). */
 .tk-c { color: light-dark(#78808e, #7d828d); font-style: italic; }
 .tk-s { color: light-dark(#2d7a33, #98c379); }

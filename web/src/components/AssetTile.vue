@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { canStar, mine, toggleFavourite } from '../mine'
+import { canStar, mine, toggleFavorite } from '../mine'
 import { computed, ref, watch } from 'vue'
 import { formatDuration, looksAlike, thumbUrl, type Asset } from '../api'
 import { canPreview, player, toggle } from '../player'
@@ -28,7 +28,7 @@ const isCurrent = computed(() => player.id === props.asset.id)
 const loaded = ref(false)
 watch(() => thumbUrl(props.asset), () => (loaded.value = false))
 const playing = computed(() => isCurrent.value && player.playing)
-const starred = computed(() => mine.favourites.has(props.asset.id))
+const starred = computed(() => mine.favorites.has(props.asset.id))
 // Animated pictures move while the pointer is over them (unless motion is unwelcome).
 const hovering = ref(false)
 const moving = computed(() => (hovering.value ? animatedSrc(props.asset, PLAY_ON_TILE) : null))
@@ -112,10 +112,10 @@ function onClick(e: MouseEvent) {
         class="fav"
         :class="{ on: starred }"
         :aria-pressed="starred"
-        :aria-label="t('tile-favourite', { name: asset.name })"
-        :title="starred ? t('tile-in-favourites') : t('tile-add-favourite')"
+        :aria-label="t('tile-favorite', { name: asset.name })"
+        :title="starred ? t('tile-in-favorites') : t('tile-add-favorite')"
         tabindex="-1"
-        @click.stop="toggleFavourite(asset.id)"
+        @click.stop="toggleFavorite(asset.id)"
       >
         <svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true"><path d="M8 1.9l1.8 3.7 4.1.6-3 2.9.7 4.1L8 11.3l-3.6 1.9.7-4.1-3-2.9 4.1-.6z" :fill="starred ? 'currentColor' : 'none'" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" /></svg>
       </button>

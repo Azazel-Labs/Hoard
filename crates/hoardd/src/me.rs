@@ -1,4 +1,4 @@
-//! What's each person's own in the library: the assets they've starred (favourites) and the searches they've saved.
+//! What's each person's own in the library: the assets they've starred (favorites) and the searches they've saved.
 //! Looking is enough for both, since neither changes the library. An access token or connected app acts for the
 //! account that made it.
 
@@ -19,7 +19,7 @@ use crate::error::{ApiResult, AppError};
 /// Behind [`crate::auth::require_user`].
 pub(crate) fn router() -> Router<AppState> {
     Router::new()
-        .route("/api/me/favourites", get(list_favourites).post(change_favourites))
+        .route("/api/me/favorites", get(list_favorites).post(change_favorites))
         .route("/api/me/searches", get(list_searches).post(save_search))
         .route("/api/me/searches/{id}", delete(delete_search))
 }
@@ -29,21 +29,20 @@ fn owner(who: &Who) -> ApiResult<i64> {
     who.owner().ok_or_else(|| AppError::forbidden(tr!("error-token-account-gone")))
 }
 
-/// A person's favourite assets, most recently starred first.
-pub(crate) fn favourite_ids(c: &Connection, user: i64) -> anyhow::Result<Vec<String>> {
-    let mut stmt =
-        c.prepare("SELECT asset_id FROM favourites WHERE user_id = ?1 ORDER BY added_at DESC, rowid DESC")?;
+/// A person's favorite assets, most recently starred first.
+pub(crate) fn favorite_ids(c: &Connection, user: i64) -> anyhow::Result<Vec<String>> {
+    let mut stmt = c.prepare("SELECT asset_id FROM favorites WHERE user_id = ?1 ORDER BY added_at DESC, rowid DESC")?;
     Ok(stmt.query_map([user], |r| r.get(0))?.collect::<rusqlite::Result<_>>()?)
 }
 
-async fn list_favourites(State(state): State<AppState>, Extension(who): Extension<Who>) -> ApiResult<Json<Value>> {
+async fn list_favorites(State(state): State<AppState>, Extension(who): Extension<Who>) -> ApiResult<Json<Value>> {
     let user = owner(&who)?;
-    let ids = db::call(&state.pool, move |c| favourite_ids(c, user)).await?;
+    let ids = db::call(&state.pool, move |c| favorite_ids(c, user)).await?;
     Ok(Json(json!({ "assets": ids })))
 }
 
 #[derive(Debug, Deserialize)]
-struct FavouriteChange {
+struct FavoriteChange {
     #[serde(default)]
     add: Vec<String>,
     #[serde(default)]
@@ -51,29 +50,29 @@ struct FavouriteChange {
 }
 
 /// Star or unstar assets; answers with all of them. Ids that aren't assets are passed over.
-async fn change_favourites(
+async fn change_favorites(
     State(state): State<AppState>,
     Extension(who): Extension<Who>,
-    Json(change): Json<FavouriteChange>,
+    Json(change): Json<FavoriteChange>,
 ) -> ApiResult<Json<Value>> {
     let user = owner(&who)?;
     if change.add.len() + change.remove.len() > 10_000 {
-        return Err(AppError::bad_request(tr!("error-favourites-too-many")));
+        return Err(AppError::bad_request(tr!("error-favorites-too-many")));
     }
     let ids = db::call(&state.pool, move |c| {
         let tx = c.transaction()?;
         let now = db::now();
         for id in &change.add {
             tx.execute(
-                "INSERT OR IGNORE INTO favourites (user_id, asset_id, added_at)
+                "INSERT OR IGNORE INTO favorites (user_id, asset_id, added_at)
                  SELECT ?1, id, ?3 FROM assets WHERE id = ?2",
                 params![user, id, now],
             )?;
         }
         for id in &change.remove {
-            tx.execute("DELETE FROM favourites WHERE user_id = ?1 AND asset_id = ?2", params![user, id])?;
+            tx.execute("DELETE FROM favorites WHERE user_id = ?1 AND asset_id = ?2", params![user, id])?;
         }
-        let ids = favourite_ids(&tx, user)?;
+        let ids = favorite_ids(&tx, user)?;
         tx.commit()?;
         Ok(ids)
     })

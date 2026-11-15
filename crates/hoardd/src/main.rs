@@ -97,7 +97,7 @@ pub(crate) struct Inner {
     pub(crate) http: reqwest::Client,
     /// Settings changed from the portal, over `cfg`. Read these, not `cfg`, for anything listed in [`settings::Saved`].
     pub(crate) settings: settings::Store,
-    /// Every thumbnail's look, for "find by colour" and "more like this".
+    /// Every thumbnail's look, for "find by color" and "more like this".
     pub(crate) looks: looks::Index,
     /// Every thumbnail's CLIP embedding, for image search.
     pub(crate) clip: clip::Index,

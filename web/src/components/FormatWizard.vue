@@ -47,7 +47,7 @@ const active = ref<FieldKey | null>('title')
 /** Where each field's value was picked: a path in JSON, a line in text. */
 const pickedPath = reactive<Partial<Record<FieldKey, JsonPath>>>({})
 const pickedLine = reactive<Partial<Record<FieldKey, number>>>({})
-/** "Recognise by" was written by hand, so picking the title doesn't suggest it again. */
+/** "Recognize by" was written by hand, so picking the title doesn't suggest it again. */
 let requireTouched = false
 const touchRequire = () => {
   requireTouched = true
@@ -334,17 +334,17 @@ const show = (v: string | null | undefined) => (v && v.trim() ? v : '—')
             <input v-model="draft.files" class="field mono" placeholder="asset_info.json, *.nfo" spellcheck="false" />
           </label>
           <label class="row2 top-align">
-            <span class="lbl">{{ t('formatwizard-recognise') }}</span>
+            <span class="lbl">{{ t('formatwizard-recognize') }}</span>
             <textarea
               v-model="draft.require"
               class="field mono"
               rows="2"
               spellcheck="false"
-              :placeholder="draft.syntax === 'json' ? t('formatwizard-recognise-json') : t('formatwizard-recognise-text')"
+              :placeholder="draft.syntax === 'json' ? t('formatwizard-recognize-json') : t('formatwizard-recognize-text')"
               @input="touchRequire"
             />
           </label>
-          <p class="what indent">{{ t('formatwizard-recognise-hint') }}</p>
+          <p class="what indent">{{ t('formatwizard-recognize-hint') }}</p>
           <label class="row2">
             <span class="lbl">{{ t('formatwizard-seller') }}</span>
             <input v-model="draft.seller" class="field" :placeholder="t('formatwizard-seller-placeholder')" autocomplete="off" />

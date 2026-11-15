@@ -135,7 +135,7 @@ impl Who {
         }))
     }
 
-    /// The account this is or acts for: whose favourites and saved searches are meant.
+    /// The account this is or acts for: whose favorites and saved searches are meant.
     pub(crate) const fn owner(&self) -> Option<i64> {
         match self {
             Self::User { id, .. } => Some(*id),

@@ -19,7 +19,7 @@ const DIGITS: [[u8; 5]; 10] = [
 const SCALE: u32 = 3;
 const PAD: u32 = 4;
 
-/// Lay `tiles` (label, image) out in a grid of `cell`-sized squares, `cols` wide, each labelled in its corner.
+/// Lay `tiles` (label, image) out in a grid of `cell`-sized squares, `cols` wide, each labeled in its corner.
 pub(crate) fn contact_sheet(tiles: &[(usize, RgbaImage)], cell: u32, cols: u32) -> RgbaImage {
     let cols = cols.max(1);
     let rows = (tiles.len() as u32).div_ceil(cols).max(1);

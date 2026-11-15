@@ -17,7 +17,7 @@ function bgLabel(b: Background): string {
   switch (b) {
     case 'checker': return t('model-bg-checker')
     case 'dark': return t('model-bg-dark')
-    case 'grey': return t('model-bg-grey')
+    case 'gray': return t('model-bg-gray')
     case 'light': return t('model-bg-light')
     case 'env': return t('model-bg-env')
   }
@@ -30,7 +30,7 @@ function shapeLabel(s: Shape): string {
   }
 }
 const REPEATS = [1, 2, 4, 8]
-/** How far each shape's map runs, in the viewer's units, which are metres at real size: the sphere is 2 m across
+/** How far each shape's map runs, in the viewer's units, which are meters at real size: the sphere is 2 m across
  * (its map runs from pole to pole, and twice as far around), the cube's side 1.5 m and the plane 2.4 m. */
 const EXTENT: Record<Shape, number> = { sphere: Math.PI, cube: 1.5, plane: 2.4 }
 
@@ -245,11 +245,11 @@ function onKey(e: KeyboardEvent) {
 <style scoped src="./viewerChrome.css"></style>
 <style scoped>
 .stage.bg-dark { background: #1b1c20; }
-.stage.bg-grey { background: #808080; }
+.stage.bg-gray { background: #808080; }
 .stage.bg-light { background: #e8e9ed; }
 .stage.bg-env { background: #6e6e72; }
 .swatch.dark::after { background: #1b1c20; }
-.swatch.grey::after { background: #808080; }
+.swatch.gray::after { background: #808080; }
 .swatch.light::after { background: #e8e9ed; }
 .swatch.env::after { background: radial-gradient(circle at 35% 30%, #fff, #9a9aa0 55%, #4a4a50); }
 .canvas { position: absolute; inset: 0; cursor: grab; touch-action: none; }

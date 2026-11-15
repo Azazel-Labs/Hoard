@@ -81,7 +81,7 @@ export function guessGrid(pixels: Uint8ClampedArray | null, w: number, h: number
   return { cols: 1, rows: 1 }
 }
 
-/** Which pixels are background: see-through ones, or for a sheet with none, the colour of its corner. */
+/** Which pixels are background: see-through ones, or for a sheet with none, the color of its corner. */
 function emptiness(px: Uint8ClampedArray, w: number): (x: number, y: number) => boolean {
   let clear = false
   for (let i = 3; i < px.length; i += 4) {

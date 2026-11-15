@@ -103,7 +103,7 @@ pub(crate) struct Fetched {
     pub(crate) final_url: reqwest::Url,
 }
 
-/// Download `url` to `dest`, refusing anything over `max` bytes and stopping as soon as `cancelled` says so. Leaves
+/// Download `url` to `dest`, refusing anything over `max` bytes and stopping as soon as `canceled` says so. Leaves
 /// no file behind on failure.
 pub(crate) async fn fetch(
     http: &reqwest::Client,
@@ -111,9 +111,9 @@ pub(crate) async fn fetch(
     dest: &Path,
     max: u64,
     activity: &crate::activity::Handle,
-    cancelled: &(dyn Fn() -> bool + Sync),
+    canceled: &(dyn Fn() -> bool + Sync),
 ) -> Result<Fetched> {
-    let result = fetch_inner(http, url, dest, max, activity, cancelled).await;
+    let result = fetch_inner(http, url, dest, max, activity, canceled).await;
     if result.is_err() {
         tokio::fs::remove_file(dest).await.ok();
     }
@@ -126,7 +126,7 @@ async fn fetch_inner(
     dest: &Path,
     max: u64,
     activity: &crate::activity::Handle,
-    cancelled: &(dyn Fn() -> bool + Sync),
+    canceled: &(dyn Fn() -> bool + Sync),
 ) -> Result<Fetched> {
     let resp = http.get(url).send().await?.error_for_status()?;
     let final_url = resp.url().clone();
@@ -137,8 +137,8 @@ async fn fetch_inner(
     let mut size = 0u64;
     let mut stream = resp.bytes_stream();
     while let Some(chunk) = stream.next().await {
-        if cancelled() {
-            bail!("cancelled");
+        if canceled() {
+            bail!("canceled");
         }
         let chunk = chunk?;
         size += chunk.len() as u64;

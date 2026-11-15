@@ -22,7 +22,7 @@ use crate::{analyze, sources};
 /// Image formats we can read pixels from.
 const IMAGE_IN: &[&str] = &[
     "png", "jpg", "jpeg", "gif", "bmp", "tga", "webp", "tif", "tiff", "hdr", "exr", "psd", "psb", "kra", "ora", "dds",
-    "ktx2", "basis", "svg", "svgz", "aseprite", "ase",
+    "ktx2", "basis", "svg", "svgz", "ai", "aseprite", "ase",
 ];
 /// Rendered size for vector art when no size is asked for.
 const SVG_DEFAULT: u32 = 2048;
@@ -142,8 +142,8 @@ pub(crate) fn convert(
     match format {
         "png" | "jpg" | "webp" | "tga" | "tiff" | "exr" if IMAGE_IN.contains(&src.as_str()) => {
             // Vector art renders straight at the asked size.
-            if matches!(src.as_str(), "svg" | "svgz") {
-                let img = crate::textures::svg(local, max.unwrap_or(SVG_DEFAULT))?.image;
+            if crate::textures::VECTOR.contains(&src.as_str()) {
+                let img = crate::textures::vector(local, &src, max.unwrap_or(SVG_DEFAULT))?.image;
                 return encode_image(&img, format);
             }
             let mut img = load_image(local, &src)?;

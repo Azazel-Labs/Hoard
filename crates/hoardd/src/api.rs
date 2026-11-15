@@ -103,7 +103,7 @@ pub(crate) fn router(state: &AppState) -> Router<AppState> {
         .merge(crate::https::admin_router())
         .route_layer(middleware::from_fn_with_state(std::sync::Arc::clone(state), crate::auth::require_admin));
 
-    // Everyone's own: their password, access tokens, connected apps, favourites and saved searches.
+    // Everyone's own: their password, access tokens, connected apps, favorites and saved searches.
     let own = Router::new()
         .merge(crate::auth::account_router())
         .merge(crate::me::router())
@@ -639,12 +639,12 @@ struct AssetsParams {
     /// "More like this": an asset id.
     #[serde(default)]
     similar: Option<String>,
-    /// `#rrggbb`: assets with much of this colour.
+    /// `#rrggbb`: assets with much of this color.
     #[serde(default)]
     color: Option<String>,
-    /// Only the favourites of whoever asks.
+    /// Only the favorites of whoever asks.
     #[serde(default)]
-    favourites: Option<bool>,
+    favorites: Option<bool>,
 }
 
 impl From<AssetsParams> for SearchQuery {
@@ -664,7 +664,7 @@ impl From<AssetsParams> for SearchQuery {
             archived: p.archived.unwrap_or(false),
             similar: p.similar,
             color: p.color,
-            favourites_of: None,
+            favorites_of: None,
         }
     }
 }
@@ -675,11 +675,11 @@ async fn search_assets(
     Query(p): Query<AssetsParams>,
 ) -> ApiResult<Json<SearchResult>> {
     let facets = p.facets.unwrap_or(true);
-    let favourites = p.favourites.unwrap_or(false);
+    let favorites = p.favorites.unwrap_or(false);
     let mut q: SearchQuery = p.into();
-    if favourites {
+    if favorites {
         let who = crate::auth::authenticate(&state, &Method::GET, &headers).await?;
-        q.favourites_of = Some(who.and_then(|w| w.owner()).ok_or_else(AppError::unauthorized)?);
+        q.favorites_of = Some(who.and_then(|w| w.owner()).ok_or_else(AppError::unauthorized)?);
     }
     let page = crate::looks::search(&state, q, facets).await?;
     Ok(Json(SearchResult {

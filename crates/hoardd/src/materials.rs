@@ -107,7 +107,7 @@ pub(crate) const ALL_ROLES: [Role; 17] = [
 ];
 
 /// Map-type words at the end of a file name, as lowercase tokens (see [`tokens`]). `true` marks a word that's only
-/// trusted next to a colour or normal map with the same name (`T_Rock_D` + `T_Rock_N`), since on its own it's
+/// trusted next to a color or normal map with the same name (`T_Rock_D` + `T_Rock_N`), since on its own it's
 /// as likely to mean something else.
 const ROLE_WORDS: &[(&str, Role, bool)] = &[
     ("base color", Role::BaseColor, false),
@@ -265,7 +265,7 @@ pub(crate) struct MapName {
     /// `base` as lowercase words joined by `_`, to group by.
     pub(crate) key: String,
     pub(crate) role: Role,
-    /// Only trusted beside a colour or normal map (see [`ROLE_WORDS`]).
+    /// Only trusted beside a color or normal map (see [`ROLE_WORDS`]).
     pub(crate) weak: bool,
     /// A resolution in the name (`8K`).
     pub(crate) resolution: Option<String>,
@@ -410,16 +410,25 @@ fn material_name(base: &str, dir: &str) -> String {
     if chosen.is_empty() { "Material".to_owned() } else { tagger::display_name(&chosen.join(" ")) }
 }
 
-/// Group a pack's textures into materials. A material needs two kinds of map (a colour map and a normal map,
-/// say); a set named only with one-letter or other loose words also needs a colour or normal map among them.
+/// Group a pack's textures into materials. A material needs two kinds of map (a color map and a normal map,
+/// say); a set named only with one-letter or other loose words also needs a color or normal map among them.
 pub(crate) fn find(textures: &[Candidate<'_>]) -> Vec<Found> {
     struct Member {
         idx: usize,
         name: MapName,
     }
+    let series = tagger::lettered_series(textures.iter().map(|c| c.path));
     let mut groups: BTreeMap<(String, String), Vec<Member>> = BTreeMap::new();
     for (idx, c) in textures.iter().enumerate() {
-        let name = match (parse_map(stem_of(c.path)), c.listed) {
+        if !tagger::could_be_map(c.path) {
+            continue;
+        }
+        let parsed = parse_map(stem_of(c.path)).filter(|name| {
+            // `extra_character_d` beside `extra_character_a`: variant d, not a diffuse map.
+            let letter = tokens(stem_of(c.path)).last().is_some_and(|t| t.text.len() == 1);
+            !(name.weak && letter && series.contains(&tagger::series_key(dir_of(c.path), &name.key)))
+        });
+        let name = match (parsed, c.listed) {
             // The store's list beats the file name.
             (Some(name), Some((role, _))) => MapName { role, weak: false, ..name },
             (Some(name), None) => name,
@@ -541,7 +550,7 @@ fn name_from_sidecars(sidecars: &[Sidecar], found: &mut [Found]) {
 /// id, tags people gave them and collections), ones whose maps are gone removed; then the thumbnails of models that
 /// wear one redrawn with it on. Returns how many materials it has.
 pub(crate) fn detect_pack(state: &AppState, rt: &Handle, conn: &mut Connection, pack_id: &str) -> Result<usize> {
-    // First, so materials take their colour map's AI tags.
+    // First, so materials take their color map's AI tags.
     if let Err(e) = crate::provenance::backfill(state, rt, conn, pack_id) {
         tracing::warn!(pack = pack_id, error = %format!("{e:#}"), "could not read images' provenance");
     }
@@ -554,7 +563,7 @@ pub(crate) fn detect_pack(state: &AppState, rt: &Handle, conn: &mut Connection, 
         tracing::warn!(pack = pack_id, error = %format!("{e:#}"), "could not put materials on model thumbnails");
     }
     if let Err(e) = recolor_stls(state, rt, conn, pack_id) {
-        tracing::warn!(pack = pack_id, error = %format!("{e:#}"), "could not redraw STL thumbnails in colour");
+        tracing::warn!(pack = pack_id, error = %format!("{e:#}"), "could not redraw STL thumbnails in color");
     }
     Ok(n)
 }
@@ -768,7 +777,7 @@ fn tie_up(tx: &Connection, pack_id: &str, were_maps: &[(String, String)]) -> Res
 }
 
 /// Models whose file names no textures but which wear a material (by name, or through its maps beside them) get a
-/// white thumbnail when they're read, before the material is found. Render them again with the material's colour
+/// white thumbnail when they're read, before the material is found. Render them again with the material's color
 /// map on, as the 3D viewers show them: FBX, OBJ, glTF, GLB, STL and PLY. A thumbnail a browser drew is left alone,
 /// and one already dressed isn't redone.
 fn dress_models(state: &AppState, rt: &Handle, conn: &Connection, pack_id: &str) -> Result<usize> {
@@ -955,8 +964,8 @@ fn replace_thumb(
     Ok(n > 0)
 }
 
-/// STL files read before Hoard knew their facet colours (marked `recolor` on upgrade) drawn again, now in colour.
-/// Ones without colours keep the thumbnail they have.
+/// STL files read before Hoard knew their facet colors (marked `recolor` on upgrade) drawn again, now in color.
+/// Ones without colors keep the thumbnail they have.
 fn recolor_stls(state: &AppState, rt: &Handle, conn: &Connection, pack_id: &str) -> Result<usize> {
     let todo: Vec<(String, String)> = conn
         .prepare(
@@ -996,7 +1005,7 @@ fn recolor_stls(state: &AppState, rt: &Handle, conn: &Connection, pack_id: &str)
         }
     }
     if done > 0 {
-        tracing::info!(pack = pack_id, models = done, "STL thumbnails redrawn in their colours");
+        tracing::info!(pack = pack_id, models = done, "STL thumbnails redrawn in their colors");
     }
     Ok(done)
 }
@@ -1006,7 +1015,7 @@ fn res_px(r: &str) -> u32 {
     r.strip_suffix('K').and_then(|n| n.parse::<u32>().ok()).map_or_else(|| r.parse().unwrap_or(0), |k| k * 1024)
 }
 
-/// A material's tags: what its colour map (or first map) was tagged with, less what only describes a single file
+/// A material's tags: what its color map (or first map) was tagged with, less what only describes a single file
 /// (its map type, format, size or shape), plus the sizes it comes in.
 fn material_tags(tx: &Connection, textures: &[Texture], f: &Found) -> Result<TagSet> {
     const DROP_PREFIX: &[&str] = &["map:", "set:", "format:", "depth:", "res:"];
@@ -1212,7 +1221,7 @@ fn info(conn: &Connection, id: &str) -> Result<Option<MaterialInfo>> {
     let Some((name, path, has_thumb, meta)) = head else { return Ok(None) };
     let meta: serde_json::Value = meta.and_then(|m| serde_json::from_str(&m).ok()).unwrap_or_default();
     let physical_size = serde_json::from_value::<[f32; 2]>(meta["physical_size"].clone()).ok();
-    #[expect(clippy::cast_possible_truncation, reason = "metres, a handful of digits")]
+    #[expect(clippy::cast_possible_truncation, reason = "meters, a handful of digits")]
     let displacement = meta["displacement"].as_f64().map(|d| d as f32);
     let mut stmt = conn.prepare_cached(
         "SELECT a.id, a.name, a.path, a.ext, m.role, m.resolution, json_extract(a.meta, '$.width'),
@@ -1465,9 +1474,15 @@ mod tests {
         assert_eq!(found(&["a/Rock_BaseColor.png"]).len(), 0);
         assert_eq!(found(&["a/Rock_Diffuse_1k.png", "a/Rock_Diffuse_2k.png"]).len(), 0);
         assert_eq!(found(&["a/rock_nor_gl.png", "a/rock_nor_dx.png"]).len(), 0);
-        // Loose words alone need a colour or normal map: these are just two masks.
+        // Loose words alone need a color or normal map: these are just two masks.
         assert_eq!(found(&["ui/panel_mask.png", "ui/panel_glow.png"]).len(), 0);
         assert_eq!(found(&["T_Rock_D.png", "T_Rock_N.png"]).len(), 1);
+        // Kenney's lettered variants: d is the fourth of a series, e the fifth, not a diffuse and an emissive map.
+        let series =
+            ["Special/extra_character_a.png", "Special/extra_character_d.png", "Special/extra_character_e.png"];
+        assert_eq!(found(&series).len(), 0);
+        // And a drawing is never a map.
+        assert_eq!(found(&["Vector/brick_d.svg", "Vector/brick_n.svg"]).len(), 0);
         assert_eq!(found(&["a/Rock_Roughness.png", "a/Rock_Metallic.png"]).len(), 1);
         // Same name in different folders: two materials.
         assert_eq!(found(&["a/Rock_Color.png", "a/Rock_Normal.png", "b/Rock_Color.png", "b/Rock_Normal.png"]).len(), 2);

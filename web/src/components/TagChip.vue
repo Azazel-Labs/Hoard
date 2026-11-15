@@ -5,7 +5,7 @@ import { t } from '../i18n'
 
 const props = defineProps<{
   tag: string; source?: TagSource; count?: number; removable?: boolean
-  /** A colour shown before the tag (for a colour filter). */
+  /** A color shown before the tag (for a color filter). */
   swatch?: string
 }>()
 defineEmits<{ remove: [] }>()

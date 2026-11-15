@@ -13,7 +13,7 @@ so does the same button in a text file's details.
 
 The file is shown beside a form. Name the store, then pick a field and click its value in the file. In JSON the
 wizard writes the selector, and picks out an item of a list by a key only it has (`meta[key=scanArea]`). In text,
-select the value, or click the line to take what follows its `name:`, and it writes a regular expression. "Recognise
+select the value, or click the line to take what follows its `name:`, and it writes a regular expression. "Recognize
 by" is filled in from the title's place; it needs to be something only the store's files have, when other files share
 the name. Sizes, maps and levels of detail aren't in the form: "Edit as TOML" writes them by hand. A format that's
 already there opens as TOML.
@@ -66,7 +66,7 @@ title = "semanticTags.name"
 A file is read as the first format whose `files` match its name, whose `require` holds, and in which `title` finds
 something. Other files are skipped. Keep `require` specific: `*.json` matches every JSON file in every pack.
 
-`require` lists the ways to recognise the file. Each way is one selector, or a list of selectors that must all find
+`require` lists the ways to recognize the file. Each way is one selector, or a list of selectors that must all find
 something. `["semanticTags", ["id", "meta"]]` means: it has `semanticTags`, or it has both `id` and `meta`.
 
 ### Fields

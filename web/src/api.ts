@@ -69,7 +69,7 @@ export interface Asset {
   unreal?: UnrealStatus | null
   /** Other formats the server can convert this asset to on download. */
   formats?: FormatOption[]
-  /** Dominant colours of the thumbnail, most of the picture first. */
+  /** Dominant colors of the thumbnail, most of the picture first. */
   palette?: Swatch[]
   /** For a material made from texture maps: its maps. */
   material?: MaterialInfo | null
@@ -83,11 +83,11 @@ export interface MaterialInfo {
   name: string
   path: string
   has_thumb: boolean
-  /** By role (colour first), each role's largest first. */
+  /** By role (color first), each role's largest first. */
   maps: MaterialMap[]
-  /** How much ground one repeat of a tiling material covers, [width, height] in metres, when the store says. */
+  /** How much ground one repeat of a tiling material covers, [width, height] in meters, when the store says. */
   physical_size?: [number, number]
-  /** How far its height map reaches, in metres, when the store says. */
+  /** How far its height map reaches, in meters, when the store says. */
   displacement?: number
 }
 
@@ -846,10 +846,10 @@ export interface SearchParams {
   archived?: boolean
   /** "More like this": an asset id. */
   similar?: string
-  /** `#rrggbb`: assets with much of this colour. */
+  /** `#rrggbb`: assets with much of this color. */
   color?: string
-  /** Only the favourites of whoever's signed in. */
-  favourites?: boolean
+  /** Only the favorites of whoever's signed in. */
+  favorites?: boolean
 }
 
 /** Packs and assets to archive, restore or delete for good. */
@@ -958,7 +958,7 @@ export const api = {
     if (p.archived) qs.set('archived', 'true')
     if (p.similar) qs.set('similar', p.similar)
     if (p.color) qs.set('color', p.color)
-    if (p.favourites) qs.set('favourites', 'true')
+    if (p.favorites) qs.set('favorites', 'true')
     return request<SearchResult>(`/api/assets?${qs}`).then((r) => ({ ...r, items: r.items.map(normalize) }))
   },
   asset: (id: string) => request<Asset>(`/api/assets/${id}`).then(normalize),
@@ -1107,8 +1107,8 @@ export const api = {
   projects: () => request<{ projects: Project[] }>('/api/projects'),
   usage: (items: UsageItems) => post<{ projects: ProjectUse[] }>('/api/usage', items),
   forgetProject: (name: string) => request<void>(`/api/projects/${encodeURIComponent(name)}`, { method: 'DELETE' }),
-  favourites: () => request<{ assets: string[] }>('/api/me/favourites'),
-  setFavourites: (change: { add?: string[]; remove?: string[] }) => post<{ assets: string[] }>('/api/me/favourites', change),
+  favorites: () => request<{ assets: string[] }>('/api/me/favorites'),
+  setFavorites: (change: { add?: string[]; remove?: string[] }) => post<{ assets: string[] }>('/api/me/favorites', change),
   savedSearches: () => request<{ searches: SavedSearch[] }>('/api/me/searches'),
   saveSearch: (name: string, query: string) => post<{ searches: SavedSearch[] }>('/api/me/searches', { name, query }),
   deleteSearch: (id: number) => request<void>(`/api/me/searches/${id}`, { method: 'DELETE' }),

@@ -1,8 +1,8 @@
 //! USD (`.usd`, `.usda`, `.usdc`, `.usdz`), read with the pure-Rust `openusd` crate. The composed stage's visible
 //! meshes become one `meshes::Mesh`: references, payloads, variants and instances resolved, each mesh placed by its
 //! world transform, the stage's up axis and units turned into glTF's (Y up, meters). Materials come from
-//! `UsdPreviewSurface`: the diffuse colour or texture, the normal map and the opacity, with textures read from the
-//! `.usdz` itself or found in the pack. A mesh with no material shows its display colour.
+//! `UsdPreviewSurface`: the diffuse color or texture, the normal map and the opacity, with textures read from the
+//! `.usdz` itself or found in the pack. A mesh with no material shows its display color.
 
 #![expect(clippy::many_single_char_names, reason = "geometry code: x/y/z, u/v")]
 
@@ -85,7 +85,7 @@ struct Builder<'a> {
     root: &'a Path,
     usdz: Option<Usdz>,
     mesh: Mesh,
-    /// Material prim path (or `display:<rgb>` for a display colour) to its index in `mesh.materials`.
+    /// Material prim path (or `display:<rgb>` for a display color) to its index in `mesh.materials`.
     materials: HashMap<String, usize>,
     /// Texture asset path to its index in `mesh.images`, or `None` when it couldn't be found.
     images: HashMap<String, Option<usize>>,
@@ -308,7 +308,7 @@ impl Builder<'_> {
     }
 
     /// The material bound to `prim`, made once per material prim; with none bound, a plain one in the mesh's
-    /// display colour (or gray).
+    /// display color (or gray).
     fn material_of(&mut self, prim: &usd::Prim, display: Option<[f32; 3]>) -> usize {
         let bound = MaterialBindingAPI::from_prim_unchecked(prim.clone()).compute_bound_material("").ok().flatten();
         let key = match &bound {
@@ -333,7 +333,7 @@ impl Builder<'_> {
         let Ok(Some(ps)) = shade::read_preview_surface(self.stage, path) else {
             return Material::plain(&name, GRAY);
         };
-        // UsdPreviewSurface colours are linear, as glTF's are.
+        // UsdPreviewSurface colors are linear, as glTF's are.
         let mut color = match ps.diffuse_color.value() {
             Some(c) => [c.x, c.y, c.z, 1.0],
             None if ps.diffuse_color.texture().is_some() => [1.0; 4],
@@ -525,7 +525,7 @@ def Material \"Planks\"
     }
 
     #[test]
-    fn a_mesh_with_no_material_shows_its_display_colour() {
+    fn a_mesh_with_no_material_shows_its_display_color() {
         let dir = tempfile::tempdir().unwrap();
         let path = dir.path().join("tri.usda");
         std::fs::write(

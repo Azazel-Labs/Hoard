@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "453ff96837a704352761a5bf6af773e801a1f4018577b2f5bc3be44f27d2733f"
+source = "40994fa61278db02342a17e111610609be967f167ac0e561724a1ecc0fd4792e"
 translation = "e0f39abe16802379cc848347bf542db29c817463f994599dea644c28869d6f85"
 
 [messages.account-add]
@@ -716,6 +716,14 @@ translation = "Se han quitado { $count } de { $name }"
 source = "Collections"
 translation = "Colecciones"
 
+[messages.app-color]
+source = "Color"
+translation = "Color"
+
+[messages.app-color-any]
+source = "Any color"
+translation = "Cualquier color"
+
 [messages.app-color-black]
 source = "Black"
 translation = "Negro"
@@ -728,17 +736,21 @@ translation = "Azul"
 source = "Brown"
 translation = "Marrón"
 
+[messages.app-color-gray]
+source = "Gray"
+translation = "Gris"
+
 [messages.app-color-green]
 source = "Green"
 translation = "Verde"
 
-[messages.app-color-grey]
-source = "Grey"
-translation = "Gris"
-
 [messages.app-color-orange]
 source = "Orange"
 translation = "Naranja"
+
+[messages.app-color-pick]
+source = "Pick any color"
+translation = "Elegir cualquier color"
 
 [messages.app-color-pink]
 source = "Pink"
@@ -760,6 +772,10 @@ translation = "Arena"
 source = "Slate"
 translation = "Pizarra"
 
+[messages.app-color-swatch]
+source = "{ $color }: assets with much { $lower } in them"
+translation = "{ $color }: recursos con mucho { $lower }"
+
 [messages.app-color-teal]
 source = "Teal"
 translation = "Verde azulado"
@@ -771,22 +787,6 @@ translation = "Blanco"
 [messages.app-color-yellow]
 source = "Yellow"
 translation = "Amarillo"
-
-[messages.app-colour]
-source = "Colour"
-translation = "Color"
-
-[messages.app-colour-any]
-source = "Any colour"
-translation = "Cualquier color"
-
-[messages.app-colour-pick]
-source = "Pick any colour"
-translation = "Elegir cualquier color"
-
-[messages.app-colour-swatch]
-source = "{ $color }: assets with much { $lower } in them"
-translation = "{ $color }: recursos con mucho { $lower }"
 
 [messages.app-credits]
 source = "Credits"
@@ -828,12 +828,12 @@ translation = "menos"
 source = "{ $count } more"
 translation = "{ $count } más"
 
-[messages.app-favourite]
-source = "Favourite"
+[messages.app-favorite]
+source = "Favorite"
 translation = "Añadir a favoritos"
 
-[messages.app-favourites]
-source = "Favourites"
+[messages.app-favorites]
+source = "Favorites"
 translation = "Favoritos"
 
 [messages.app-filters]
@@ -1092,8 +1092,8 @@ translation = "Proyectos que hacen hoard sync desde aquí, con lo que tenía su 
 source = "Most alike"
 translation = "Más parecidos"
 
-[messages.app-rank-colour]
-source = "Most of the colour"
+[messages.app-rank-color]
+source = "Most of the color"
 translation = "Con más de ese color"
 
 [messages.app-rank-match]
@@ -1120,8 +1120,8 @@ translation = "Reintentar"
 source = "Save"
 translation = "Guardar"
 
-[messages.app-save-name-favourites]
-source = "favourites"
+[messages.app-save-name-favorites]
+source = "favorites"
 translation = "favoritos"
 
 [messages.app-save-name-label]
@@ -1292,8 +1292,8 @@ translation = "Tamaño de mosaico"
 source = "Undo"
 translation = "Deshacer"
 
-[messages.app-unfavourite]
-source = "Unfavourite"
+[messages.app-unfavorite]
+source = "Unfavorite"
 translation = "Quitar de favoritos"
 
 [messages.app-unnamed-asset]
@@ -1742,16 +1742,16 @@ translation = "Solo este archivo"
 source = "Just this file, without the files it uses"
 translation = "Solo este archivo, sin los archivos que usa"
 
-[messages.asset-favourite]
-source = "Favourite"
+[messages.asset-favorite]
+source = "Favorite"
 translation = "Favorito"
 
-[messages.asset-favourite-off-title]
-source = "Add to your favourites (F)"
+[messages.asset-favorite-off-title]
+source = "Add to your favorites (F)"
 translation = "Añadir a tus favoritos (F)"
 
-[messages.asset-favourite-on-title]
-source = "In your favourites (F takes it out)"
+[messages.asset-favorite-on-title]
+source = "In your favorites (F takes it out)"
 translation = "En tus favoritos (F lo quita)"
 
 [messages.asset-file]
@@ -1929,6 +1929,10 @@ translation = "Cocinado (build del juego): sin vistas previas ni fuentes"
 [messages.asset-meta-cue-markers]
 source = "Cue markers"
 translation = "Marcadores"
+
+[messages.asset-meta-everything-with]
+source = "Show everything tagged { $tag }"
+translation = "Mostrar todo lo que tiene la etiqueta { $tag }"
 
 [messages.asset-meta-format]
 source = "Format"
@@ -2159,7 +2163,7 @@ source = "Hoard read it out of the package on { $date } ({ $notes })."
 translation = "Hoard lo extrajo del paquete el { $date } ({ $notes })."
 
 [messages.asset-palette]
-source = "Colours in the picture"
+source = "Colors in the picture"
 translation = "Colores de la imagen"
 
 [messages.asset-path]
@@ -2267,7 +2271,7 @@ source = "Find assets with { $hex }, { $percent }% of this picture"
 translation = "Buscar recursos con { $hex }, { $percent } % de esta imagen"
 
 [messages.asset-swatch-title]
-source = "{ $hex }, { $percent }% of the picture. Find assets with this colour"
+source = "{ $hex }, { $percent }% of the picture. Find assets with this color"
 translation = "{ $hex }, { $percent } % de la imagen. Buscar recursos con este color"
 
 [messages.asset-tag-add]
@@ -2551,7 +2555,7 @@ source = "Make an OAuth client (Web application) in Google Cloud Console → API
 translation = "Crea un cliente OAuth (Aplicación web) en Google Cloud Console → APIs y servicios → Credenciales. Google no envía grupos, así que asigna los roles en Ajustes → Cuenta, y desactiva la creación de cuentas en el primer inicio de sesión salvo que deba poder entrar cualquiera con una cuenta de Google."
 
 [messages.auth-preset-microsoft-note]
-source = "Register an app in Entra ID → App registrations (a Web redirect to the address below). Put your tenant ID in place of “organizations” to let only your organisation in. For roles from groups, add the groups claim under Token configuration: it lists group IDs."
+source = "Register an app in Entra ID → App registrations (a Web redirect to the address below). Put your tenant ID in place of “organizations” to let only your organization in. For roles from groups, add the groups claim under Token configuration: it lists group IDs."
 translation = "Registra una aplicación en Entra ID → Registros de aplicaciones (con una redirección web a la dirección de abajo). Pon el ID de tu inquilino en lugar de «organizations» para que solo entre tu organización. Para obtener roles de los grupos, añade la notificación de grupos en Configuración de token: enumera los ID de los grupos."
 
 [messages.auth-provider]
@@ -3002,8 +3006,8 @@ translation = "no se puede leer { $path }"
 source = "can't write to { $path }"
 translation = "no se puede escribir en { $path }"
 
-[messages.error-chatgpt-cancelled]
-source = "the sign-in was cancelled"
+[messages.error-chatgpt-canceled]
+source = "the sign-in was canceled"
 translation = "se ha cancelado el inicio de sesión"
 
 [messages.error-chatgpt-code-used]
@@ -3186,7 +3190,7 @@ translation = "El directorio no ha podido comprobar tu contraseña: { $reason }"
 source = "empty file"
 translation = "archivo vacío"
 
-[messages.error-favourites-too-many]
+[messages.error-favorites-too-many]
 source = "at most 10,000 at a time"
 translation = "como máximo 10.000 a la vez"
 
@@ -3899,7 +3903,7 @@ source = "that picture is too big for a thumbnail"
 translation = "esa imagen es demasiado grande para una miniatura"
 
 [messages.error-token-account-gone]
-source = "this token's account is gone, so it has no favourites or searches"
+source = "this token's account is gone, so it has no favorites or searches"
 translation = "la cuenta de este token ya no existe, así que no tiene favoritos ni búsquedas"
 
 [messages.error-token-name]
@@ -4173,7 +4177,7 @@ source = "It finds no title in this file. Pick the title."
 translation = "No encuentra ningún título en este archivo. Elige el título."
 
 [messages.formatwizard-miss-not-the-stores]
-source = "What it recognises the store’s files by isn’t in this file. Change Recognise by."
+source = "What it recognizes the store’s files by isn’t in this file. Change Recognize by."
 translation = "Lo que usa para reconocer los archivos de la tienda no está en este archivo. Cambia Reconocer por."
 
 [messages.formatwizard-miss-short-name]
@@ -4248,19 +4252,19 @@ translation = "Título"
 source = "Store page"
 translation = "Página de la tienda"
 
-[messages.formatwizard-recognise]
-source = "Recognise by"
+[messages.formatwizard-recognize]
+source = "Recognize by"
 translation = "Reconocer por"
 
-[messages.formatwizard-recognise-hint]
+[messages.formatwizard-recognize-hint]
 source = "One way a line; any of them will do. Needed when other files have the same name."
 translation = "Una forma por línea; vale cualquiera de ellas. Hace falta cuando otros archivos tienen el mismo nombre."
 
-[messages.formatwizard-recognise-json]
+[messages.formatwizard-recognize-json]
 source = "A key only the store’s files have"
 translation = "Una clave que solo tienen los archivos de la tienda"
 
-[messages.formatwizard-recognise-text]
+[messages.formatwizard-recognize-text]
 source = "A line only the store’s files have"
 translation = "Una línea que solo tienen los archivos de la tienda"
 
@@ -4760,12 +4764,12 @@ translation = "fondo de cuadros"
 source = "Checker background (K cycles)"
 translation = "Fondo de cuadros (K cambia)"
 
-[messages.image-bg-grey]
-source = "grey background"
+[messages.image-bg-gray]
+source = "gray background"
 translation = "fondo gris"
 
-[messages.image-bg-grey-title]
-source = "Grey background (K cycles)"
+[messages.image-bg-gray-title]
+source = "Gray background (K cycles)"
 translation = "Fondo gris (K cambia)"
 
 [messages.image-bg-white]
@@ -5645,11 +5649,11 @@ source = "ambient occlusion"
 translation = "oclusión ambiental"
 
 [messages.material-role-base-color]
-source = "Colour"
+source = "Color"
 translation = "Color"
 
 [messages.material-role-base-color-name]
-source = "colour"
+source = "color"
 translation = "color"
 
 [messages.material-role-bump]
@@ -5816,8 +5820,8 @@ translation = "Fondo oscuro"
 source = "Environment background"
 translation = "Fondo del entorno"
 
-[messages.model-bg-grey]
-source = "Grey background"
+[messages.model-bg-gray]
+source = "Gray background"
 translation = "Fondo gris"
 
 [messages.model-bg-light]
@@ -5932,8 +5936,8 @@ translation = "Largo"
 source = "Materials"
 translation = "Materiales"
 
-[messages.model-info-metres]
-source = "glTF is in metres"
+[messages.model-info-meters]
+source = "glTF is in meters"
 translation = "glTF está en metros"
 
 [messages.model-info-no-units]
@@ -6662,8 +6666,8 @@ translation = "Al guardar se obtiene la descripción de la página de la tienda.
 source = "Paste the listing text, or leave empty to fetch it from the store page."
 translation = "Pega el texto del anuncio, o déjalo vacío para obtenerlo de la página de la tienda."
 
-[messages.packs-thumbs-cancelled]
-source = "Cancelled after { $done } of { $total }"
+[messages.packs-thumbs-canceled]
+source = "Canceled after { $done } of { $total }"
 translation = "Cancelado tras { $done } de { $total }"
 
 [messages.packs-thumbs-drawing]
@@ -6929,11 +6933,11 @@ translation = "Borrar la selección"
 source = "Dark theme: { $name }"
 translation = "Tema oscuro: { $name }"
 
-[messages.palette-favourites]
-source = "Favourites"
+[messages.palette-favorites]
+source = "Favorites"
 translation = "Favoritos"
 
-[messages.palette-favourites-keywords]
+[messages.palette-favorites-keywords]
 source = "starred stars liked"
 translation = "estrella destacados gustan favoritos starred stars liked"
 
@@ -7121,12 +7125,12 @@ translation = "apariencia color appearance"
 source = "Command palette"
 translation = "Paleta de comandos"
 
-[messages.projects-favourite-add-failed]
-source = "Couldn't add to your favourites: { $error }"
+[messages.projects-favorite-add-failed]
+source = "Couldn't add to your favorites: { $error }"
 translation = "No se ha podido añadir a tus favoritos: { $error }"
 
-[messages.projects-favourite-remove-failed]
-source = "Couldn't take out of your favourites: { $error }"
+[messages.projects-favorite-remove-failed]
+source = "Couldn't take out of your favorites: { $error }"
 translation = "No se ha podido quitar de tus favoritos: { $error }"
 
 [messages.projects-forget-search-failed]
@@ -7398,7 +7402,7 @@ source = "Tagging { $pack } with AI"
 translation = "Etiquetando { $pack } con IA"
 
 [messages.server-job-looks]
-source = "Working out colours and looks"
+source = "Working out colors and looks"
 translation = "Analizando colores y aspecto"
 
 [messages.server-job-materials]
@@ -7486,7 +7490,7 @@ source = "ambient occlusion"
 translation = "oclusión ambiental"
 
 [messages.server-role-base-color]
-source = "colour"
+source = "color"
 translation = "color"
 
 [messages.server-role-bump]
@@ -7905,7 +7909,7 @@ source = "Couldn’t get the model: { $detail }. Trying again every hour."
 translation = "No se ha podido obtener el modelo: { $detail }. Se vuelve a intentar cada hora."
 
 [messages.settings-clip-what]
-source = "Type what you’re after (“mossy rock”, “sci-fi door”, “wooden barrel”) and pictures that show it turn up beside names that have the words. “More like this” finds things of the same kind, not only the same colours."
+source = "Type what you’re after (“mossy rock”, “sci-fi door”, “wooden barrel”) and pictures that show it turn up beside names that have the words. “More like this” finds things of the same kind, not only the same colors."
 translation = "Escribe lo que buscas («mossy rock», «sci-fi door», «wooden barrel») y las imágenes que lo muestran aparecen junto a los nombres que tienen esas palabras. «Más como este» encuentra cosas del mismo tipo, no solo de los mismos colores."
 
 [messages.settings-conversion-cache]
@@ -8261,7 +8265,7 @@ source = "Image search"
 translation = "Búsqueda de imágenes"
 
 [messages.settings-page-search-blurb]
-source = "Search pictures by what they show, not only by their names, and find things that are alike in kind, not only in colour."
+source = "Search pictures by what they show, not only by their names, and find things that are alike in kind, not only in color."
 translation = "Busca imágenes por lo que muestran, no solo por su nombre, y encuentra cosas parecidas en su naturaleza, no solo en su color."
 
 [messages.settings-page-store-files]
@@ -8664,8 +8668,8 @@ translation = "Cerrar"
 source = "Close, clear the selection, or close the details"
 translation = "Cerrar, borrar la selección o cerrar los detalles"
 
-[messages.shortcuts-favourite]
-source = "Add to or take out of your favourites"
+[messages.shortcuts-favorite]
+source = "Add to or take out of your favorites"
 translation = "Añadir a favoritos o quitar de favoritos"
 
 [messages.shortcuts-fit]
@@ -9072,15 +9076,15 @@ source = "Edit"
 translation = "Editar"
 
 [messages.storefiles-field-colors]
-source = "Colours"
+source = "Colors"
 translation = "Colores"
 
 [messages.storefiles-field-colors-hint]
-source = "Its colours, as color: tags."
+source = "Its colors, as color: tags."
 translation = "Sus colores, como etiquetas color:."
 
 [messages.storefiles-field-colors-name]
-source = "colours"
+source = "colors"
 translation = "los colores"
 
 [messages.storefiles-field-id]
@@ -9676,7 +9680,7 @@ source = "Warm charcoal, amber"
 translation = "Carbón cálido, ámbar"
 
 [messages.theme-dark-graphite-blurb]
-source = "Neutral grey, no tint"
+source = "Neutral gray, no tint"
 translation = "Gris neutro, sin matiz"
 
 [messages.theme-dark-moss-blurb]
@@ -9692,7 +9696,7 @@ source = "Wine-black, coral"
 translation = "Negro vino, coral"
 
 [messages.theme-dark-slate-blurb]
-source = "Blue-grey"
+source = "Blue-gray"
 translation = "Gris azulado"
 
 [messages.theme-ember]
@@ -9716,7 +9720,7 @@ source = "Warm cream, amber"
 translation = "Crema cálido, ámbar"
 
 [messages.theme-light-paper-blurb]
-source = "Plain neutral grey"
+source = "Plain neutral gray"
 translation = "Gris neutro sencillo"
 
 [messages.theme-light-sage-blurb]
@@ -9724,7 +9728,7 @@ source = "Soft green"
 translation = "Verde suave"
 
 [messages.theme-light-slate-blurb]
-source = "Cool blue-grey"
+source = "Cool blue-gray"
 translation = "Gris azulado frío"
 
 [messages.theme-lilac]
@@ -9759,16 +9763,16 @@ translation = "Salvia"
 source = "Slate"
 translation = "Pizarra"
 
-[messages.tile-add-favourite]
-source = "Add to your favourites (F)"
+[messages.tile-add-favorite]
+source = "Add to your favorites (F)"
 translation = "Añadir a tus favoritos (F)"
 
-[messages.tile-favourite]
-source = "Favourite { $name }"
+[messages.tile-favorite]
+source = "Favorite { $name }"
 translation = "Añadir { $name } a favoritos"
 
-[messages.tile-in-favourites]
-source = "In your favourites"
+[messages.tile-in-favorites]
+source = "In your favorites"
 translation = "En tus favoritos"
 
 [messages.tile-label]

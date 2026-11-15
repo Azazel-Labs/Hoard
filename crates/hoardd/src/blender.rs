@@ -250,7 +250,7 @@ async fn download_from(
     suffix: &str,
     archive: Archive,
     tools_dir: &Path,
-    cancelled: &(dyn Fn() -> bool + Sync),
+    canceled: &(dyn Fn() -> bool + Sync),
 ) -> Result<PathBuf> {
     let http = tools::client()?;
     // The first mirror that answers decides the version.
@@ -283,7 +283,7 @@ async fn download_from(
     let activity =
         crate::activity::start("blender", format!("Downloading Blender {version} for model conversion"), None);
     let fetched =
-        tools::fetch(&http, &url, &file, MAX_DOWNLOAD, &activity, cancelled).await.context("Blender download")?;
+        tools::fetch(&http, &url, &file, MAX_DOWNLOAD, &activity, canceled).await.context("Blender download")?;
     activity.detail("checking and unpacking");
     activity.progress(1.0);
 
@@ -311,8 +311,8 @@ async fn download_from(
         }
         let expected = expected.context("Blender's published checksum couldn't be read")?;
         ensure!(fetched.sha256 == expected, "the Blender download doesn't match its published SHA-256");
-        if cancelled() {
-            bail!("cancelled");
+        if canceled() {
+            bail!("canceled");
         }
 
         let partial = tools_dir.join("blender.partial");

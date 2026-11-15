@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "453ff96837a704352761a5bf6af773e801a1f4018577b2f5bc3be44f27d2733f"
+source = "40994fa61278db02342a17e111610609be967f167ac0e561724a1ecc0fd4792e"
 translation = "a3af76f04bd0cf3a54e80250b023600249f866c9e9f2a002a568b2b09fe11ed2"
 
 [messages.account-add]
@@ -714,6 +714,14 @@ translation = "Уклоњено из { $name }: { $count }"
 source = "Collections"
 translation = "Колекције"
 
+[messages.app-color]
+source = "Color"
+translation = "Боја"
+
+[messages.app-color-any]
+source = "Any color"
+translation = "Било која боја"
+
 [messages.app-color-black]
 source = "Black"
 translation = "Црна"
@@ -726,17 +734,21 @@ translation = "Плава"
 source = "Brown"
 translation = "Браон"
 
+[messages.app-color-gray]
+source = "Gray"
+translation = "Сива"
+
 [messages.app-color-green]
 source = "Green"
 translation = "Зелена"
 
-[messages.app-color-grey]
-source = "Grey"
-translation = "Сива"
-
 [messages.app-color-orange]
 source = "Orange"
 translation = "Наранџаста"
+
+[messages.app-color-pick]
+source = "Pick any color"
+translation = "Изабери било коју боју"
 
 [messages.app-color-pink]
 source = "Pink"
@@ -758,6 +770,10 @@ translation = "Пешчана"
 source = "Slate"
 translation = "Шкриљаста"
 
+[messages.app-color-swatch]
+source = "{ $color }: assets with much { $lower } in them"
+translation = "{ $color }: ресурси у којима преовлађује { $lower } боја"
+
 [messages.app-color-teal]
 source = "Teal"
 translation = "Тиркизна"
@@ -769,22 +785,6 @@ translation = "Бела"
 [messages.app-color-yellow]
 source = "Yellow"
 translation = "Жута"
-
-[messages.app-colour]
-source = "Colour"
-translation = "Боја"
-
-[messages.app-colour-any]
-source = "Any colour"
-translation = "Било која боја"
-
-[messages.app-colour-pick]
-source = "Pick any colour"
-translation = "Изабери било коју боју"
-
-[messages.app-colour-swatch]
-source = "{ $color }: assets with much { $lower } in them"
-translation = "{ $color }: ресурси у којима преовлађује { $lower } боја"
 
 [messages.app-credits]
 source = "Credits"
@@ -826,12 +826,12 @@ translation = "мање"
 source = "{ $count } more"
 translation = "још { $count }"
 
-[messages.app-favourite]
-source = "Favourite"
+[messages.app-favorite]
+source = "Favorite"
 translation = "Додај у омиљене"
 
-[messages.app-favourites]
-source = "Favourites"
+[messages.app-favorites]
+source = "Favorites"
 translation = "Омиљени"
 
 [messages.app-filters]
@@ -1086,8 +1086,8 @@ translation = "Пројекти који се одавде синхронизу�
 source = "Most alike"
 translation = "Најсличније"
 
-[messages.app-rank-colour]
-source = "Most of the colour"
+[messages.app-rank-color]
+source = "Most of the color"
 translation = "Највише те боје"
 
 [messages.app-rank-match]
@@ -1114,8 +1114,8 @@ translation = "Покушај поново"
 source = "Save"
 translation = "Сачувај"
 
-[messages.app-save-name-favourites]
-source = "favourites"
+[messages.app-save-name-favorites]
+source = "favorites"
 translation = "омиљени"
 
 [messages.app-save-name-label]
@@ -1288,8 +1288,8 @@ translation = "Величина плочица"
 source = "Undo"
 translation = "Опозови"
 
-[messages.app-unfavourite]
-source = "Unfavourite"
+[messages.app-unfavorite]
+source = "Unfavorite"
 translation = "Уклони из омиљених"
 
 [messages.app-unnamed-asset]
@@ -1741,16 +1741,16 @@ translation = "Само ова датотека"
 source = "Just this file, without the files it uses"
 translation = "Само ова датотека, без датотека које користи"
 
-[messages.asset-favourite]
-source = "Favourite"
+[messages.asset-favorite]
+source = "Favorite"
 translation = "Омиљено"
 
-[messages.asset-favourite-off-title]
-source = "Add to your favourites (F)"
+[messages.asset-favorite-off-title]
+source = "Add to your favorites (F)"
 translation = "Додај у омиљене (F)"
 
-[messages.asset-favourite-on-title]
-source = "In your favourites (F takes it out)"
+[messages.asset-favorite-on-title]
+source = "In your favorites (F takes it out)"
 translation = "У вашим омиљенима (F га уклања)"
 
 [messages.asset-file]
@@ -1930,6 +1930,10 @@ translation = "Cooked (верзија игре): прегледи и извор�
 [messages.asset-meta-cue-markers]
 source = "Cue markers"
 translation = "Ознаке позиција"
+
+[messages.asset-meta-everything-with]
+source = "Show everything tagged { $tag }"
+translation = "Прикажи све са ознаком { $tag }"
 
 [messages.asset-meta-format]
 source = "Format"
@@ -2161,7 +2165,7 @@ source = "Hoard read it out of the package on { $date } ({ $notes })."
 translation = "Hoard ју је прочитао из пакета { $date } ({ $notes })."
 
 [messages.asset-palette]
-source = "Colours in the picture"
+source = "Colors in the picture"
 translation = "Боје на слици"
 
 [messages.asset-path]
@@ -2269,7 +2273,7 @@ source = "Find assets with { $hex }, { $percent }% of this picture"
 translation = "Пронађи ресурсе са { $hex }, { $percent }% ове слике"
 
 [messages.asset-swatch-title]
-source = "{ $hex }, { $percent }% of the picture. Find assets with this colour"
+source = "{ $hex }, { $percent }% of the picture. Find assets with this color"
 translation = "{ $hex }, { $percent }% слике. Пронађи ресурсе с овом бојом"
 
 [messages.asset-tag-add]
@@ -2554,7 +2558,7 @@ source = "Make an OAuth client (Web application) in Google Cloud Console → API
 translation = "Направите OAuth клијент (Web application) у Google Cloud Console → APIs & Services → Credentials. Google не шаље групе, па улоге доделите у Подешавања → Налог и искључите прављење налога при првој пријави, осим ако треба да уђе свако ко има Google налог."
 
 [messages.auth-preset-microsoft-note]
-source = "Register an app in Entra ID → App registrations (a Web redirect to the address below). Put your tenant ID in place of “organizations” to let only your organisation in. For roles from groups, add the groups claim under Token configuration: it lists group IDs."
+source = "Register an app in Entra ID → App registrations (a Web redirect to the address below). Put your tenant ID in place of “organizations” to let only your organization in. For roles from groups, add the groups claim under Token configuration: it lists group IDs."
 translation = "Региструјте апликацију у Entra ID → App registrations (Web преусмеравање на адресу испод). Уместо „organizations“ ставите ID свог закупца (tenant) да бисте пустили само своју организацију. За улоге из група додајте groups claim под Token configuration: он наводи ID-јеве група."
 
 [messages.auth-provider]
@@ -3006,8 +3010,8 @@ translation = "не може да се чита { $path }"
 source = "can't write to { $path }"
 translation = "не може да се пише у { $path }"
 
-[messages.error-chatgpt-cancelled]
-source = "the sign-in was cancelled"
+[messages.error-chatgpt-canceled]
+source = "the sign-in was canceled"
 translation = "пријава је отказана"
 
 [messages.error-chatgpt-code-used]
@@ -3190,7 +3194,7 @@ translation = "Директоријум није могао да провери 
 source = "empty file"
 translation = "празна датотека"
 
-[messages.error-favourites-too-many]
+[messages.error-favorites-too-many]
 source = "at most 10,000 at a time"
 translation = "највише 10.000 одједном"
 
@@ -3904,7 +3908,7 @@ source = "that picture is too big for a thumbnail"
 translation = "та слика је превелика за сличицу"
 
 [messages.error-token-account-gone]
-source = "this token's account is gone, so it has no favourites or searches"
+source = "this token's account is gone, so it has no favorites or searches"
 translation = "налог овог токена више не постоји, па токен нема омиљене ни претраге"
 
 [messages.error-token-name]
@@ -4181,7 +4185,7 @@ source = "It finds no title in this file. Pick the title."
 translation = "Не проналази наслов у овој датотеци. Изаберите наслов."
 
 [messages.formatwizard-miss-not-the-stores]
-source = "What it recognises the store’s files by isn’t in this file. Change Recognise by."
+source = "What it recognizes the store’s files by isn’t in this file. Change Recognize by."
 translation = "Оно по чему препознаје датотеке продавнице није у овој датотеци. Промените „Препознај по“."
 
 [messages.formatwizard-miss-short-name]
@@ -4256,19 +4260,19 @@ translation = "Наслов"
 source = "Store page"
 translation = "Страница продавнице"
 
-[messages.formatwizard-recognise]
-source = "Recognise by"
+[messages.formatwizard-recognize]
+source = "Recognize by"
 translation = "Препознај по"
 
-[messages.formatwizard-recognise-hint]
+[messages.formatwizard-recognize-hint]
 source = "One way a line; any of them will do. Needed when other files have the same name."
 translation = "Један начин по реду; било који од њих је довољан. Потребно кад друге датотеке имају исти назив."
 
-[messages.formatwizard-recognise-json]
+[messages.formatwizard-recognize-json]
 source = "A key only the store’s files have"
 translation = "Кључ који имају само датотеке продавнице"
 
-[messages.formatwizard-recognise-text]
+[messages.formatwizard-recognize-text]
 source = "A line only the store’s files have"
 translation = "Ред који имају само датотеке продавнице"
 
@@ -4770,12 +4774,12 @@ translation = "позадина шаховница"
 source = "Checker background (K cycles)"
 translation = "Позадина шаховница (K мења)"
 
-[messages.image-bg-grey]
-source = "grey background"
+[messages.image-bg-gray]
+source = "gray background"
 translation = "сива позадина"
 
-[messages.image-bg-grey-title]
-source = "Grey background (K cycles)"
+[messages.image-bg-gray-title]
+source = "Gray background (K cycles)"
 translation = "Сива позадина (K мења)"
 
 [messages.image-bg-white]
@@ -5654,11 +5658,11 @@ source = "ambient occlusion"
 translation = "амбијентална оклузија"
 
 [messages.material-role-base-color]
-source = "Colour"
+source = "Color"
 translation = "Боја"
 
 [messages.material-role-base-color-name]
-source = "colour"
+source = "color"
 translation = "боја"
 
 [messages.material-role-bump]
@@ -5825,8 +5829,8 @@ translation = "Тамна позадина"
 source = "Environment background"
 translation = "Позадина окружења"
 
-[messages.model-bg-grey]
-source = "Grey background"
+[messages.model-bg-gray]
+source = "Gray background"
 translation = "Сива позадина"
 
 [messages.model-bg-light]
@@ -5941,8 +5945,8 @@ translation = "Дужина"
 source = "Materials"
 translation = "Материјали"
 
-[messages.model-info-metres]
-source = "glTF is in metres"
+[messages.model-info-meters]
+source = "glTF is in meters"
 translation = "glTF је у метрима"
 
 [messages.model-info-no-units]
@@ -6677,8 +6681,8 @@ translation = "Чување преузима опис са странице пр
 source = "Paste the listing text, or leave empty to fetch it from the store page."
 translation = "Налепите текст огласа или оставите празно да би се преузео са странице продавнице."
 
-[messages.packs-thumbs-cancelled]
-source = "Cancelled after { $done } of { $total }"
+[messages.packs-thumbs-canceled]
+source = "Canceled after { $done } of { $total }"
 translation = "Отказано након { $done } од { $total }"
 
 [messages.packs-thumbs-drawing]
@@ -6953,11 +6957,11 @@ translation = "Поништи избор"
 source = "Dark theme: { $name }"
 translation = "Тамна тема: { $name }"
 
-[messages.palette-favourites]
-source = "Favourites"
+[messages.palette-favorites]
+source = "Favorites"
 translation = "Омиљени"
 
-[messages.palette-favourites-keywords]
+[messages.palette-favorites-keywords]
 source = "starred stars liked"
 translation = "омиљено звездица свиђа starred stars liked"
 
@@ -7145,12 +7149,12 @@ translation = "изглед боја appearance color"
 source = "Command palette"
 translation = "Палета команди"
 
-[messages.projects-favourite-add-failed]
-source = "Couldn't add to your favourites: { $error }"
+[messages.projects-favorite-add-failed]
+source = "Couldn't add to your favorites: { $error }"
 translation = "Није могуће додати у омиљене: { $error }"
 
-[messages.projects-favourite-remove-failed]
-source = "Couldn't take out of your favourites: { $error }"
+[messages.projects-favorite-remove-failed]
+source = "Couldn't take out of your favorites: { $error }"
 translation = "Није могуће уклонити из омиљених: { $error }"
 
 [messages.projects-forget-search-failed]
@@ -7428,7 +7432,7 @@ source = "Tagging { $pack } with AI"
 translation = "Означавање помоћу ВИ: { $pack }"
 
 [messages.server-job-looks]
-source = "Working out colours and looks"
+source = "Working out colors and looks"
 translation = "Утврђивање боја и изгледа"
 
 [messages.server-job-materials]
@@ -7516,7 +7520,7 @@ source = "ambient occlusion"
 translation = "амбијентална оклузија"
 
 [messages.server-role-base-color]
-source = "colour"
+source = "color"
 translation = "боја"
 
 [messages.server-role-bump]
@@ -7937,7 +7941,7 @@ source = "Couldn’t get the model: { $detail }. Trying again every hour."
 translation = "Није могуће добити модел: { $detail }. Покушава се поново на сваких сат времена."
 
 [messages.settings-clip-what]
-source = "Type what you’re after (“mossy rock”, “sci-fi door”, “wooden barrel”) and pictures that show it turn up beside names that have the words. “More like this” finds things of the same kind, not only the same colours."
+source = "Type what you’re after (“mossy rock”, “sci-fi door”, “wooden barrel”) and pictures that show it turn up beside names that have the words. “More like this” finds things of the same kind, not only the same colors."
 translation = "Унесите шта тражите („mossy rock“, „sci-fi door“, „wooden barrel“) и слике које то приказују појавиће се поред назива који садрже те речи. „Још сличних“ проналази ствари исте врсте, а не само истих боја."
 
 [messages.settings-conversion-cache]
@@ -8293,7 +8297,7 @@ source = "Image search"
 translation = "Претрага слика"
 
 [messages.settings-page-search-blurb]
-source = "Search pictures by what they show, not only by their names, and find things that are alike in kind, not only in colour."
+source = "Search pictures by what they show, not only by their names, and find things that are alike in kind, not only in color."
 translation = "Претражујте слике по ономе што приказују, а не само по називима, и проналазите ствари сличне по врсти, а не само по боји."
 
 [messages.settings-page-store-files]
@@ -8696,8 +8700,8 @@ translation = "Затвори"
 source = "Close, clear the selection, or close the details"
 translation = "Затвори, поништи избор или затвори детаље"
 
-[messages.shortcuts-favourite]
-source = "Add to or take out of your favourites"
+[messages.shortcuts-favorite]
+source = "Add to or take out of your favorites"
 translation = "Додај у омиљене или уклони из њих"
 
 [messages.shortcuts-fit]
@@ -9126,15 +9130,15 @@ source = "Edit"
 translation = "Уреди"
 
 [messages.storefiles-field-colors]
-source = "Colours"
+source = "Colors"
 translation = "Боје"
 
 [messages.storefiles-field-colors-hint]
-source = "Its colours, as color: tags."
+source = "Its colors, as color: tags."
 translation = "Његове боје, као ознаке color:."
 
 [messages.storefiles-field-colors-name]
-source = "colours"
+source = "colors"
 translation = "боје"
 
 [messages.storefiles-field-id]
@@ -9730,7 +9734,7 @@ source = "Warm charcoal, amber"
 translation = "Топли угаљ, ћилибар"
 
 [messages.theme-dark-graphite-blurb]
-source = "Neutral grey, no tint"
+source = "Neutral gray, no tint"
 translation = "Неутрална сива, без нијансе"
 
 [messages.theme-dark-moss-blurb]
@@ -9746,7 +9750,7 @@ source = "Wine-black, coral"
 translation = "Винскоцрна, корал"
 
 [messages.theme-dark-slate-blurb]
-source = "Blue-grey"
+source = "Blue-gray"
 translation = "Плавосива"
 
 [messages.theme-ember]
@@ -9770,7 +9774,7 @@ source = "Warm cream, amber"
 translation = "Топла крем, ћилибар"
 
 [messages.theme-light-paper-blurb]
-source = "Plain neutral grey"
+source = "Plain neutral gray"
 translation = "Обична неутрална сива"
 
 [messages.theme-light-sage-blurb]
@@ -9778,7 +9782,7 @@ source = "Soft green"
 translation = "Мека зелена"
 
 [messages.theme-light-slate-blurb]
-source = "Cool blue-grey"
+source = "Cool blue-gray"
 translation = "Хладна плавосива"
 
 [messages.theme-lilac]
@@ -9813,16 +9817,16 @@ translation = "Жалфија"
 source = "Slate"
 translation = "Шкриљац"
 
-[messages.tile-add-favourite]
-source = "Add to your favourites (F)"
+[messages.tile-add-favorite]
+source = "Add to your favorites (F)"
 translation = "Додај у омиљене (F)"
 
-[messages.tile-favourite]
-source = "Favourite { $name }"
+[messages.tile-favorite]
+source = "Favorite { $name }"
 translation = "Додај у омиљене: { $name }"
 
-[messages.tile-in-favourites]
-source = "In your favourites"
+[messages.tile-in-favorites]
+source = "In your favorites"
 translation = "У вашим омиљенима"
 
 [messages.tile-label]

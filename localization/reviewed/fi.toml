@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "453ff96837a704352761a5bf6af773e801a1f4018577b2f5bc3be44f27d2733f"
+source = "40994fa61278db02342a17e111610609be967f167ac0e561724a1ecc0fd4792e"
 translation = "1381fb1c261e8132d9dcf57774023142df4f4444b02c8d32c388e084b4bc8789"
 
 [messages.account-add]
@@ -716,6 +716,14 @@ translation = "Kokoelmasta { $name } poistettiin { $count }"
 source = "Collections"
 translation = "Kokoelmat"
 
+[messages.app-color]
+source = "Color"
+translation = "Väri"
+
+[messages.app-color-any]
+source = "Any color"
+translation = "Mikä tahansa väri"
+
 [messages.app-color-black]
 source = "Black"
 translation = "Musta"
@@ -728,17 +736,21 @@ translation = "Sininen"
 source = "Brown"
 translation = "Ruskea"
 
+[messages.app-color-gray]
+source = "Gray"
+translation = "Harmaa"
+
 [messages.app-color-green]
 source = "Green"
 translation = "Vihreä"
 
-[messages.app-color-grey]
-source = "Grey"
-translation = "Harmaa"
-
 [messages.app-color-orange]
 source = "Orange"
 translation = "Oranssi"
+
+[messages.app-color-pick]
+source = "Pick any color"
+translation = "Valitse mikä tahansa väri"
 
 [messages.app-color-pink]
 source = "Pink"
@@ -760,6 +772,10 @@ translation = "Hiekka"
 source = "Slate"
 translation = "Liuskeenharmaa"
 
+[messages.app-color-swatch]
+source = "{ $color }: assets with much { $lower } in them"
+translation = "{ $color }: resurssit, joissa on paljon tätä väriä"
+
 [messages.app-color-teal]
 source = "Teal"
 translation = "Sinivihreä"
@@ -771,22 +787,6 @@ translation = "Valkoinen"
 [messages.app-color-yellow]
 source = "Yellow"
 translation = "Keltainen"
-
-[messages.app-colour]
-source = "Colour"
-translation = "Väri"
-
-[messages.app-colour-any]
-source = "Any colour"
-translation = "Mikä tahansa väri"
-
-[messages.app-colour-pick]
-source = "Pick any colour"
-translation = "Valitse mikä tahansa väri"
-
-[messages.app-colour-swatch]
-source = "{ $color }: assets with much { $lower } in them"
-translation = "{ $color }: resurssit, joissa on paljon tätä väriä"
 
 [messages.app-credits]
 source = "Credits"
@@ -828,12 +828,12 @@ translation = "vähemmän"
 source = "{ $count } more"
 translation = "{ $count } lisää"
 
-[messages.app-favourite]
-source = "Favourite"
+[messages.app-favorite]
+source = "Favorite"
 translation = "Suosikiksi"
 
-[messages.app-favourites]
-source = "Favourites"
+[messages.app-favorites]
+source = "Favorites"
 translation = "Suosikit"
 
 [messages.app-filters]
@@ -1088,8 +1088,8 @@ translation = "Projektit, jotka tekevät hoard sync -synkronoinnin täältä, ja
 source = "Most alike"
 translation = "Samankaltaisimmat"
 
-[messages.app-rank-colour]
-source = "Most of the colour"
+[messages.app-rank-color]
+source = "Most of the color"
 translation = "Eniten väriä"
 
 [messages.app-rank-match]
@@ -1116,8 +1116,8 @@ translation = "Yritä uudelleen"
 source = "Save"
 translation = "Tallenna"
 
-[messages.app-save-name-favourites]
-source = "favourites"
+[messages.app-save-name-favorites]
+source = "favorites"
 translation = "suosikit"
 
 [messages.app-save-name-label]
@@ -1288,8 +1288,8 @@ translation = "Ruutujen koko"
 source = "Undo"
 translation = "Kumoa"
 
-[messages.app-unfavourite]
-source = "Unfavourite"
+[messages.app-unfavorite]
+source = "Unfavorite"
 translation = "Poista suosikeista"
 
 [messages.app-unnamed-asset]
@@ -1738,16 +1738,16 @@ translation = "Vain tämä tiedosto"
 source = "Just this file, without the files it uses"
 translation = "Vain tämä tiedosto ilman tiedostoja, joita se käyttää"
 
-[messages.asset-favourite]
-source = "Favourite"
+[messages.asset-favorite]
+source = "Favorite"
 translation = "Suosikki"
 
-[messages.asset-favourite-off-title]
-source = "Add to your favourites (F)"
+[messages.asset-favorite-off-title]
+source = "Add to your favorites (F)"
 translation = "Lisää suosikkeihin (F)"
 
-[messages.asset-favourite-on-title]
-source = "In your favourites (F takes it out)"
+[messages.asset-favorite-on-title]
+source = "In your favorites (F takes it out)"
 translation = "Suosikeissasi (F poistaa sen)"
 
 [messages.asset-file]
@@ -1925,6 +1925,10 @@ translation = "Cooked (pelikäännös): esikatselut ja lähteet on poistettu"
 [messages.asset-meta-cue-markers]
 source = "Cue markers"
 translation = "Cue-merkit"
+
+[messages.asset-meta-everything-with]
+source = "Show everything tagged { $tag }"
+translation = "Näytä kaikki, joilla on tunniste { $tag }"
 
 [messages.asset-meta-format]
 source = "Format"
@@ -2155,7 +2159,7 @@ source = "Hoard read it out of the package on { $date } ({ $notes })."
 translation = "Hoard luki sen paketista { $date } ({ $notes })."
 
 [messages.asset-palette]
-source = "Colours in the picture"
+source = "Colors in the picture"
 translation = "Kuvan värit"
 
 [messages.asset-path]
@@ -2263,7 +2267,7 @@ source = "Find assets with { $hex }, { $percent }% of this picture"
 translation = "Etsi resursseja värillä { $hex }, { $percent } % tästä kuvasta"
 
 [messages.asset-swatch-title]
-source = "{ $hex }, { $percent }% of the picture. Find assets with this colour"
+source = "{ $hex }, { $percent }% of the picture. Find assets with this color"
 translation = "{ $hex }, { $percent } % kuvasta. Etsi resursseja, joissa on tätä väriä"
 
 [messages.asset-tag-add]
@@ -2551,7 +2555,7 @@ source = "Make an OAuth client (Web application) in Google Cloud Console → API
 translation = "Tee OAuth-asiakas (Web application) kohdassa Google Cloud Console → APIs & Services → Credentials. Google ei lähetä ryhmiä, joten anna roolit kohdassa Asetukset → Tili ja poista tilien luonti ensimmäisellä kirjautumisella käytöstä, ellei kenen tahansa Google-tilin omistajan pidä päästä sisään."
 
 [messages.auth-preset-microsoft-note]
-source = "Register an app in Entra ID → App registrations (a Web redirect to the address below). Put your tenant ID in place of “organizations” to let only your organisation in. For roles from groups, add the groups claim under Token configuration: it lists group IDs."
+source = "Register an app in Entra ID → App registrations (a Web redirect to the address below). Put your tenant ID in place of “organizations” to let only your organization in. For roles from groups, add the groups claim under Token configuration: it lists group IDs."
 translation = "Rekisteröi sovellus kohdassa Entra ID → App registrations (Web-uudelleenohjaus alla olevaan osoitteeseen). Laita vuokraajasi tunnus (tenant ID) ”organizations”-sanan tilalle, jotta vain organisaatiosi pääsee sisään. Saadaksesi roolit ryhmistä lisää groups-vaatimus kohdassa Token configuration: se luettelee ryhmien tunnukset."
 
 [messages.auth-provider]
@@ -3002,8 +3006,8 @@ translation = "ei voi lukea: { $path }"
 source = "can't write to { $path }"
 translation = "ei voi kirjoittaa: { $path }"
 
-[messages.error-chatgpt-cancelled]
-source = "the sign-in was cancelled"
+[messages.error-chatgpt-canceled]
+source = "the sign-in was canceled"
 translation = "kirjautuminen peruttiin"
 
 [messages.error-chatgpt-code-used]
@@ -3186,7 +3190,7 @@ translation = "Hakemisto ei voinut tarkistaa salasanaasi: { $reason }"
 source = "empty file"
 translation = "tyhjä tiedosto"
 
-[messages.error-favourites-too-many]
+[messages.error-favorites-too-many]
 source = "at most 10,000 at a time"
 translation = "enintään 10 000 kerrallaan"
 
@@ -3899,7 +3903,7 @@ source = "that picture is too big for a thumbnail"
 translation = "kuva on liian suuri pikkukuvaksi"
 
 [messages.error-token-account-gone]
-source = "this token's account is gone, so it has no favourites or searches"
+source = "this token's account is gone, so it has no favorites or searches"
 translation = "tämän tunnuksen tiliä ei enää ole, joten sillä ei ole suosikkeja eikä hakuja"
 
 [messages.error-token-name]
@@ -4173,7 +4177,7 @@ source = "It finds no title in this file. Pick the title."
 translation = "Se ei löydä tästä tiedostosta otsikkoa. Valitse otsikko."
 
 [messages.formatwizard-miss-not-the-stores]
-source = "What it recognises the store’s files by isn’t in this file. Change Recognise by."
+source = "What it recognizes the store’s files by isn’t in this file. Change Recognize by."
 translation = "Se, mistä se tunnistaa kaupan tiedostot, ei ole tässä tiedostossa. Muuta kohtaa Tunnista."
 
 [messages.formatwizard-miss-short-name]
@@ -4248,19 +4252,19 @@ translation = "Otsikko"
 source = "Store page"
 translation = "Kauppasivu"
 
-[messages.formatwizard-recognise]
-source = "Recognise by"
+[messages.formatwizard-recognize]
+source = "Recognize by"
 translation = "Tunnista"
 
-[messages.formatwizard-recognise-hint]
+[messages.formatwizard-recognize-hint]
 source = "One way a line; any of them will do. Needed when other files have the same name."
 translation = "Yksi tapa riviä kohden; mikä tahansa niistä riittää. Tarvitaan, kun muilla tiedostoilla on sama nimi."
 
-[messages.formatwizard-recognise-json]
+[messages.formatwizard-recognize-json]
 source = "A key only the store’s files have"
 translation = "Avain, joka on vain kaupan tiedostoissa"
 
-[messages.formatwizard-recognise-text]
+[messages.formatwizard-recognize-text]
 source = "A line only the store’s files have"
 translation = "Rivi, joka on vain kaupan tiedostoissa"
 
@@ -4760,12 +4764,12 @@ translation = "ruudukkotausta"
 source = "Checker background (K cycles)"
 translation = "Ruudukkotausta (K vaihtaa)"
 
-[messages.image-bg-grey]
-source = "grey background"
+[messages.image-bg-gray]
+source = "gray background"
 translation = "harmaa tausta"
 
-[messages.image-bg-grey-title]
-source = "Grey background (K cycles)"
+[messages.image-bg-gray-title]
+source = "Gray background (K cycles)"
 translation = "Harmaa tausta (K vaihtaa)"
 
 [messages.image-bg-white]
@@ -5645,11 +5649,11 @@ source = "ambient occlusion"
 translation = "ympäristövarjostus (AO)"
 
 [messages.material-role-base-color]
-source = "Colour"
+source = "Color"
 translation = "Väri"
 
 [messages.material-role-base-color-name]
-source = "colour"
+source = "color"
 translation = "väri"
 
 [messages.material-role-bump]
@@ -5816,8 +5820,8 @@ translation = "Tumma tausta"
 source = "Environment background"
 translation = "Ympäristötausta"
 
-[messages.model-bg-grey]
-source = "Grey background"
+[messages.model-bg-gray]
+source = "Gray background"
 translation = "Harmaa tausta"
 
 [messages.model-bg-light]
@@ -5932,8 +5936,8 @@ translation = "Pituus"
 source = "Materials"
 translation = "Materiaalit"
 
-[messages.model-info-metres]
-source = "glTF is in metres"
+[messages.model-info-meters]
+source = "glTF is in meters"
 translation = "glTF on metreissä"
 
 [messages.model-info-no-units]
@@ -6665,8 +6669,8 @@ translation = "Tallennus hakee kuvauksen kauppasivulta."
 source = "Paste the listing text, or leave empty to fetch it from the store page."
 translation = "Liitä myyntisivun teksti tai jätä tyhjäksi, niin se haetaan kauppasivulta."
 
-[messages.packs-thumbs-cancelled]
-source = "Cancelled after { $done } of { $total }"
+[messages.packs-thumbs-canceled]
+source = "Canceled after { $done } of { $total }"
 translation = "Peruttu, { $done }/{ $total } valmiina"
 
 [messages.packs-thumbs-drawing]
@@ -6935,11 +6939,11 @@ translation = "Tyhjennä valinta"
 source = "Dark theme: { $name }"
 translation = "Tumma teema: { $name }"
 
-[messages.palette-favourites]
-source = "Favourites"
+[messages.palette-favorites]
+source = "Favorites"
 translation = "Suosikit"
 
-[messages.palette-favourites-keywords]
+[messages.palette-favorites-keywords]
 source = "starred stars liked"
 translation = "tähdet tähditetyt tykätyt starred stars liked"
 
@@ -7131,12 +7135,12 @@ translation = "ulkoasu väri appearance color"
 source = "Command palette"
 translation = "Komentopaletti"
 
-[messages.projects-favourite-add-failed]
-source = "Couldn't add to your favourites: { $error }"
+[messages.projects-favorite-add-failed]
+source = "Couldn't add to your favorites: { $error }"
 translation = "Suosikkeihin lisääminen epäonnistui: { $error }"
 
-[messages.projects-favourite-remove-failed]
-source = "Couldn't take out of your favourites: { $error }"
+[messages.projects-favorite-remove-failed]
+source = "Couldn't take out of your favorites: { $error }"
 translation = "Suosikeista poistaminen epäonnistui: { $error }"
 
 [messages.projects-forget-search-failed]
@@ -7412,7 +7416,7 @@ source = "Tagging { $pack } with AI"
 translation = "Lisätään tunnisteita tekoälyllä: { $pack }"
 
 [messages.server-job-looks]
-source = "Working out colours and looks"
+source = "Working out colors and looks"
 translation = "Selvitetään värejä ja ulkonäköä"
 
 [messages.server-job-materials]
@@ -7500,7 +7504,7 @@ source = "ambient occlusion"
 translation = "ympäristövarjostus (AO)"
 
 [messages.server-role-base-color]
-source = "colour"
+source = "color"
 translation = "väri"
 
 [messages.server-role-bump]
@@ -7919,7 +7923,7 @@ source = "Couldn’t get the model: { $detail }. Trying again every hour."
 translation = "Mallia ei saatu: { $detail }. Yritetään uudelleen tunnin välein."
 
 [messages.settings-clip-what]
-source = "Type what you’re after (“mossy rock”, “sci-fi door”, “wooden barrel”) and pictures that show it turn up beside names that have the words. “More like this” finds things of the same kind, not only the same colours."
+source = "Type what you’re after (“mossy rock”, “sci-fi door”, “wooden barrel”) and pictures that show it turn up beside names that have the words. “More like this” finds things of the same kind, not only the same colors."
 translation = "Kirjoita, mitä etsit (”mossy rock”, ”sci-fi door”, ”wooden barrel”), niin sitä esittävät kuvat näkyvät sanat sisältävien nimien rinnalla. ”Lisää samankaltaisia” löytää samantyyppisiä asioita, ei vain samanvärisiä."
 
 [messages.settings-conversion-cache]
@@ -8275,7 +8279,7 @@ source = "Image search"
 translation = "Kuvahaku"
 
 [messages.settings-page-search-blurb]
-source = "Search pictures by what they show, not only by their names, and find things that are alike in kind, not only in colour."
+source = "Search pictures by what they show, not only by their names, and find things that are alike in kind, not only in color."
 translation = "Hae kuvia sen mukaan, mitä ne esittävät, eikä vain nimen perusteella, ja löydä tyypiltään eikä vain väriltään samankaltaisia."
 
 [messages.settings-page-store-files]
@@ -8678,8 +8682,8 @@ translation = "Sulje"
 source = "Close, clear the selection, or close the details"
 translation = "Sulje, tyhjennä valinta tai sulje tiedot"
 
-[messages.shortcuts-favourite]
-source = "Add to or take out of your favourites"
+[messages.shortcuts-favorite]
+source = "Add to or take out of your favorites"
 translation = "Lisää suosikkeihin tai poista niistä"
 
 [messages.shortcuts-fit]
@@ -9102,15 +9106,15 @@ source = "Edit"
 translation = "Muokkaa"
 
 [messages.storefiles-field-colors]
-source = "Colours"
+source = "Colors"
 translation = "Värit"
 
 [messages.storefiles-field-colors-hint]
-source = "Its colours, as color: tags."
+source = "Its colors, as color: tags."
 translation = "Sen värit color:-tunnisteina."
 
 [messages.storefiles-field-colors-name]
-source = "colours"
+source = "colors"
 translation = "värit"
 
 [messages.storefiles-field-id]
@@ -9706,7 +9710,7 @@ source = "Warm charcoal, amber"
 translation = "Lämmin hiilenharmaa, meripihka"
 
 [messages.theme-dark-graphite-blurb]
-source = "Neutral grey, no tint"
+source = "Neutral gray, no tint"
 translation = "Neutraali harmaa, ei sävyä"
 
 [messages.theme-dark-moss-blurb]
@@ -9722,7 +9726,7 @@ source = "Wine-black, coral"
 translation = "Viininmusta, koralli"
 
 [messages.theme-dark-slate-blurb]
-source = "Blue-grey"
+source = "Blue-gray"
 translation = "Siniharmaa"
 
 [messages.theme-ember]
@@ -9746,7 +9750,7 @@ source = "Warm cream, amber"
 translation = "Lämmin kerma, meripihka"
 
 [messages.theme-light-paper-blurb]
-source = "Plain neutral grey"
+source = "Plain neutral gray"
 translation = "Pelkistetty neutraali harmaa"
 
 [messages.theme-light-sage-blurb]
@@ -9754,7 +9758,7 @@ source = "Soft green"
 translation = "Pehmeä vihreä"
 
 [messages.theme-light-slate-blurb]
-source = "Cool blue-grey"
+source = "Cool blue-gray"
 translation = "Viileä siniharmaa"
 
 [messages.theme-lilac]
@@ -9789,16 +9793,16 @@ translation = "Salvia"
 source = "Slate"
 translation = "Liuske"
 
-[messages.tile-add-favourite]
-source = "Add to your favourites (F)"
+[messages.tile-add-favorite]
+source = "Add to your favorites (F)"
 translation = "Lisää suosikkeihin (F)"
 
-[messages.tile-favourite]
-source = "Favourite { $name }"
+[messages.tile-favorite]
+source = "Favorite { $name }"
 translation = "Suosikiksi: { $name }"
 
-[messages.tile-in-favourites]
-source = "In your favourites"
+[messages.tile-in-favorites]
+source = "In your favorites"
 translation = "Suosikeissasi"
 
 [messages.tile-label]

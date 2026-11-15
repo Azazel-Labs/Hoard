@@ -302,7 +302,7 @@ test('the Unity package adds an asset with what it needs, making hoard.toml, whe
         put(`mine_${tag}.mtl`, own.mtl, 'DefaultImporter')
         put(own.png, own.texture, 'TextureImporter')
         put('beep.wav', sound('zap', 3), 'AudioImporter')
-        put('Spin.cs', 'using UnityEngine;\npublic class Spin : MonoBehaviour {}\n', 'MonoImporter')
+        put('Spin.cs', 'using UnityEngine;\npublic class Spin : MonoBehavior {}\n', 'MonoImporter')
         // Unity gives what Hoard downloaded a .meta of its own when it imports it.
         const hoardPng = filesUnder(join(dir, 'Assets', 'Hoard')).find((f) => f.endsWith('crate_diffuse.png'))!
         writeFileSync(join(dir, 'Assets', 'Hoard', `${hoardPng}.meta`), unityMeta(unityGuid(`${tag}/hoard`), 'TextureImporter'))

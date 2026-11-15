@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "453ff96837a704352761a5bf6af773e801a1f4018577b2f5bc3be44f27d2733f"
+source = "40994fa61278db02342a17e111610609be967f167ac0e561724a1ecc0fd4792e"
 translation = "34dcaefeb07609a80e1eeef1689d6a2d04a3d3d12d9259774db4a32069c5687e"
 
 [messages.account-add]
@@ -732,6 +732,14 @@ translation = "Убрано из «{ $name }»: { $count }"
 source = "Collections"
 translation = "Коллекции"
 
+[messages.app-color]
+source = "Color"
+translation = "Цвет"
+
+[messages.app-color-any]
+source = "Any color"
+translation = "Любой цвет"
+
 [messages.app-color-black]
 source = "Black"
 translation = "Чёрный"
@@ -744,17 +752,21 @@ translation = "Синий"
 source = "Brown"
 translation = "Коричневый"
 
+[messages.app-color-gray]
+source = "Gray"
+translation = "Серый"
+
 [messages.app-color-green]
 source = "Green"
 translation = "Зелёный"
 
-[messages.app-color-grey]
-source = "Grey"
-translation = "Серый"
-
 [messages.app-color-orange]
 source = "Orange"
 translation = "Оранжевый"
+
+[messages.app-color-pick]
+source = "Pick any color"
+translation = "Выбрать любой цвет"
 
 [messages.app-color-pink]
 source = "Pink"
@@ -776,6 +788,10 @@ translation = "Песочный"
 source = "Slate"
 translation = "Сланцевый"
 
+[messages.app-color-swatch]
+source = "{ $color }: assets with much { $lower } in them"
+translation = "{ $color }: ассеты, в которых много этого цвета"
+
 [messages.app-color-teal]
 source = "Teal"
 translation = "Бирюзовый"
@@ -787,22 +803,6 @@ translation = "Белый"
 [messages.app-color-yellow]
 source = "Yellow"
 translation = "Жёлтый"
-
-[messages.app-colour]
-source = "Colour"
-translation = "Цвет"
-
-[messages.app-colour-any]
-source = "Any colour"
-translation = "Любой цвет"
-
-[messages.app-colour-pick]
-source = "Pick any colour"
-translation = "Выбрать любой цвет"
-
-[messages.app-colour-swatch]
-source = "{ $color }: assets with much { $lower } in them"
-translation = "{ $color }: ассеты, в которых много этого цвета"
 
 [messages.app-credits]
 source = "Credits"
@@ -850,12 +850,12 @@ translation = "меньше"
 source = "{ $count } more"
 translation = "ещё { $count }"
 
-[messages.app-favourite]
-source = "Favourite"
+[messages.app-favorite]
+source = "Favorite"
 translation = "В избранное"
 
-[messages.app-favourites]
-source = "Favourites"
+[messages.app-favorites]
+source = "Favorites"
 translation = "Избранное"
 
 [messages.app-filters]
@@ -1116,8 +1116,8 @@ translation = "Проекты, которые выполняют hoard sync с �
 source = "Most alike"
 translation = "Самые похожие"
 
-[messages.app-rank-colour]
-source = "Most of the colour"
+[messages.app-rank-color]
+source = "Most of the color"
 translation = "Больше всего этого цвета"
 
 [messages.app-rank-match]
@@ -1144,8 +1144,8 @@ translation = "Повторить"
 source = "Save"
 translation = "Сохранить"
 
-[messages.app-save-name-favourites]
-source = "favourites"
+[messages.app-save-name-favorites]
+source = "favorites"
 translation = "избранное"
 
 [messages.app-save-name-label]
@@ -1320,8 +1320,8 @@ translation = "Размер плиток"
 source = "Undo"
 translation = "Отменить"
 
-[messages.app-unfavourite]
-source = "Unfavourite"
+[messages.app-unfavorite]
+source = "Unfavorite"
 translation = "Убрать из избранного"
 
 [messages.app-unnamed-asset]
@@ -1798,16 +1798,16 @@ translation = "Только этот файл"
 source = "Just this file, without the files it uses"
 translation = "Только этот файл, без файлов, которые он использует"
 
-[messages.asset-favourite]
-source = "Favourite"
+[messages.asset-favorite]
+source = "Favorite"
 translation = "В избранное"
 
-[messages.asset-favourite-off-title]
-source = "Add to your favourites (F)"
+[messages.asset-favorite-off-title]
+source = "Add to your favorites (F)"
 translation = "Добавить в избранное (F)"
 
-[messages.asset-favourite-on-title]
-source = "In your favourites (F takes it out)"
+[messages.asset-favorite-on-title]
+source = "In your favorites (F takes it out)"
 translation = "В вашем избранном (F — убрать)"
 
 [messages.asset-file]
@@ -1989,6 +1989,10 @@ translation = "Cooked (сборка игры): превью и исходник�
 [messages.asset-meta-cue-markers]
 source = "Cue markers"
 translation = "Маркеры"
+
+[messages.asset-meta-everything-with]
+source = "Show everything tagged { $tag }"
+translation = "Показать всё с тегом { $tag }"
 
 [messages.asset-meta-format]
 source = "Format"
@@ -2221,7 +2225,7 @@ source = "Hoard read it out of the package on { $date } ({ $notes })."
 translation = "Hoard извлёк его из пакета { $date } ({ $notes })."
 
 [messages.asset-palette]
-source = "Colours in the picture"
+source = "Colors in the picture"
 translation = "Цвета на картинке"
 
 [messages.asset-path]
@@ -2329,7 +2333,7 @@ source = "Find assets with { $hex }, { $percent }% of this picture"
 translation = "Найти ассеты с цветом { $hex }, { $percent }% этой картинки"
 
 [messages.asset-swatch-title]
-source = "{ $hex }, { $percent }% of the picture. Find assets with this colour"
+source = "{ $hex }, { $percent }% of the picture. Find assets with this color"
 translation = "{ $hex }, { $percent }% картинки. Найти ассеты с этим цветом"
 
 [messages.asset-tag-add]
@@ -2615,7 +2619,7 @@ source = "Make an OAuth client (Web application) in Google Cloud Console → API
 translation = "Создайте OAuth-клиент (Web application) в Google Cloud Console → APIs & Services → Credentials. Google не передаёт группы, поэтому назначайте роли в «Настройки → Учётная запись» и выключите создание учётных записей при первом входе, если только не любой обладатель учётной записи Google должен получить доступ."
 
 [messages.auth-preset-microsoft-note]
-source = "Register an app in Entra ID → App registrations (a Web redirect to the address below). Put your tenant ID in place of “organizations” to let only your organisation in. For roles from groups, add the groups claim under Token configuration: it lists group IDs."
+source = "Register an app in Entra ID → App registrations (a Web redirect to the address below). Put your tenant ID in place of “organizations” to let only your organization in. For roles from groups, add the groups claim under Token configuration: it lists group IDs."
 translation = "Зарегистрируйте приложение в Entra ID → App registrations (с перенаправлением Web на адрес ниже). Подставьте ID своего клиента (tenant) вместо «organizations», чтобы впускать только свою организацию. Чтобы получать роли из групп, добавьте утверждение groups в Token configuration: в нём перечислены ID групп."
 
 [messages.auth-provider]
@@ -3068,8 +3072,8 @@ translation = "не удалось прочитать { $path }"
 source = "can't write to { $path }"
 translation = "не удалось записать в { $path }"
 
-[messages.error-chatgpt-cancelled]
-source = "the sign-in was cancelled"
+[messages.error-chatgpt-canceled]
+source = "the sign-in was canceled"
 translation = "вход отменён"
 
 [messages.error-chatgpt-code-used]
@@ -3252,7 +3256,7 @@ translation = "Каталог не смог проверить ваш парол
 source = "empty file"
 translation = "пустой файл"
 
-[messages.error-favourites-too-many]
+[messages.error-favorites-too-many]
 source = "at most 10,000 at a time"
 translation = "не больше 10 000 за раз"
 
@@ -3967,7 +3971,7 @@ source = "that picture is too big for a thumbnail"
 translation = "эта картинка слишком большая для миниатюры"
 
 [messages.error-token-account-gone]
-source = "this token's account is gone, so it has no favourites or searches"
+source = "this token's account is gone, so it has no favorites or searches"
 translation = "учётной записи этого токена больше нет, поэтому у него нет избранного и поисков"
 
 [messages.error-token-name]
@@ -4247,7 +4251,7 @@ source = "It finds no title in this file. Pick the title."
 translation = "В этом файле он не находит названия. Выберите название."
 
 [messages.formatwizard-miss-not-the-stores]
-source = "What it recognises the store’s files by isn’t in this file. Change Recognise by."
+source = "What it recognizes the store’s files by isn’t in this file. Change Recognize by."
 translation = "В этом файле нет того, по чему он распознаёт файлы магазина. Измените «Распознавать по»."
 
 [messages.formatwizard-miss-short-name]
@@ -4322,19 +4326,19 @@ translation = "Название"
 source = "Store page"
 translation = "Страница в магазине"
 
-[messages.formatwizard-recognise]
-source = "Recognise by"
+[messages.formatwizard-recognize]
+source = "Recognize by"
 translation = "Распознавать по"
 
-[messages.formatwizard-recognise-hint]
+[messages.formatwizard-recognize-hint]
 source = "One way a line; any of them will do. Needed when other files have the same name."
 translation = "По одному способу на строку; подойдёт любой. Нужно, когда у других файлов такое же имя."
 
-[messages.formatwizard-recognise-json]
+[messages.formatwizard-recognize-json]
 source = "A key only the store’s files have"
 translation = "Ключ, который есть только в файлах магазина"
 
-[messages.formatwizard-recognise-text]
+[messages.formatwizard-recognize-text]
 source = "A line only the store’s files have"
 translation = "Строка, которая есть только в файлах магазина"
 
@@ -4838,12 +4842,12 @@ translation = "фон «шахматка»"
 source = "Checker background (K cycles)"
 translation = "Фон «шахматка» (K — переключить)"
 
-[messages.image-bg-grey]
-source = "grey background"
+[messages.image-bg-gray]
+source = "gray background"
 translation = "серый фон"
 
-[messages.image-bg-grey-title]
-source = "Grey background (K cycles)"
+[messages.image-bg-gray-title]
+source = "Gray background (K cycles)"
 translation = "Серый фон (K — переключить)"
 
 [messages.image-bg-white]
@@ -5733,11 +5737,11 @@ source = "ambient occlusion"
 translation = "фонового затенения"
 
 [messages.material-role-base-color]
-source = "Colour"
+source = "Color"
 translation = "Цвет"
 
 [messages.material-role-base-color-name]
-source = "colour"
+source = "color"
 translation = "цвета"
 
 [messages.material-role-bump]
@@ -5904,8 +5908,8 @@ translation = "Тёмный фон"
 source = "Environment background"
 translation = "Фон окружения"
 
-[messages.model-bg-grey]
-source = "Grey background"
+[messages.model-bg-gray]
+source = "Gray background"
 translation = "Серый фон"
 
 [messages.model-bg-light]
@@ -6020,8 +6024,8 @@ translation = "Длина"
 source = "Materials"
 translation = "Материалы"
 
-[messages.model-info-metres]
-source = "glTF is in metres"
+[messages.model-info-meters]
+source = "glTF is in meters"
 translation = "glTF задаётся в метрах"
 
 [messages.model-info-no-units]
@@ -6782,8 +6786,8 @@ translation = "При сохранении описание загрузится
 source = "Paste the listing text, or leave empty to fetch it from the store page."
 translation = "Вставьте текст описания или оставьте пустым, чтобы загрузить его со страницы магазина."
 
-[messages.packs-thumbs-cancelled]
-source = "Cancelled after { $done } of { $total }"
+[messages.packs-thumbs-canceled]
+source = "Canceled after { $done } of { $total }"
 translation = "Отменено после { $done } из { $total }"
 
 [messages.packs-thumbs-drawing]
@@ -7068,11 +7072,11 @@ translation = "Снять выделение"
 source = "Dark theme: { $name }"
 translation = "Тёмная тема: { $name }"
 
-[messages.palette-favourites]
-source = "Favourites"
+[messages.palette-favorites]
+source = "Favorites"
 translation = "Избранное"
 
-[messages.palette-favourites-keywords]
+[messages.palette-favorites-keywords]
 source = "starred stars liked"
 translation = "звёзды звезда понравилось избранные starred stars liked"
 
@@ -7260,12 +7264,12 @@ translation = "оформление цвет appearance color"
 source = "Command palette"
 translation = "Палитра команд"
 
-[messages.projects-favourite-add-failed]
-source = "Couldn't add to your favourites: { $error }"
+[messages.projects-favorite-add-failed]
+source = "Couldn't add to your favorites: { $error }"
 translation = "Не удалось добавить в избранное: { $error }"
 
-[messages.projects-favourite-remove-failed]
-source = "Couldn't take out of your favourites: { $error }"
+[messages.projects-favorite-remove-failed]
+source = "Couldn't take out of your favorites: { $error }"
 translation = "Не удалось убрать из избранного: { $error }"
 
 [messages.projects-forget-search-failed]
@@ -7545,7 +7549,7 @@ source = "Tagging { $pack } with AI"
 translation = "Теги от ИИ: { $pack }"
 
 [messages.server-job-looks]
-source = "Working out colours and looks"
+source = "Working out colors and looks"
 translation = "Определение цветов и внешнего вида"
 
 [messages.server-job-materials]
@@ -7633,7 +7637,7 @@ source = "ambient occlusion"
 translation = "фонового затенения"
 
 [messages.server-role-base-color]
-source = "colour"
+source = "color"
 translation = "цвета"
 
 [messages.server-role-bump]
@@ -8056,7 +8060,7 @@ source = "Couldn’t get the model: { $detail }. Trying again every hour."
 translation = "Не удалось получить модель: { $detail }. Пробуем снова каждый час."
 
 [messages.settings-clip-what]
-source = "Type what you’re after (“mossy rock”, “sci-fi door”, “wooden barrel”) and pictures that show it turn up beside names that have the words. “More like this” finds things of the same kind, not only the same colours."
+source = "Type what you’re after (“mossy rock”, “sci-fi door”, “wooden barrel”) and pictures that show it turn up beside names that have the words. “More like this” finds things of the same kind, not only the same colors."
 translation = "Введите, что ищете («mossy rock», «sci-fi door», «wooden barrel»), и картинки, на которых это есть, появятся рядом с названиями, где есть эти слова. «Похожие» находит вещи того же рода, а не только тех же цветов."
 
 [messages.settings-conversion-cache]
@@ -8412,7 +8416,7 @@ source = "Image search"
 translation = "Поиск по картинкам"
 
 [messages.settings-page-search-blurb]
-source = "Search pictures by what they show, not only by their names, and find things that are alike in kind, not only in colour."
+source = "Search pictures by what they show, not only by their names, and find things that are alike in kind, not only in color."
 translation = "Ищите картинки по тому, что на них изображено, а не только по названиям, и находите похожие по сути, а не только по цвету."
 
 [messages.settings-page-store-files]
@@ -8815,8 +8819,8 @@ translation = "Закрыть"
 source = "Close, clear the selection, or close the details"
 translation = "Закрыть, снять выделение или закрыть сведения"
 
-[messages.shortcuts-favourite]
-source = "Add to or take out of your favourites"
+[messages.shortcuts-favorite]
+source = "Add to or take out of your favorites"
 translation = "Добавить в избранное или убрать из него"
 
 [messages.shortcuts-fit]
@@ -9245,15 +9249,15 @@ source = "Edit"
 translation = "Изменить"
 
 [messages.storefiles-field-colors]
-source = "Colours"
+source = "Colors"
 translation = "Цвета"
 
 [messages.storefiles-field-colors-hint]
-source = "Its colours, as color: tags."
+source = "Its colors, as color: tags."
 translation = "Его цвета в виде тегов color:."
 
 [messages.storefiles-field-colors-name]
-source = "colours"
+source = "colors"
 translation = "цвета"
 
 [messages.storefiles-field-id]
@@ -9871,7 +9875,7 @@ source = "Warm charcoal, amber"
 translation = "Тёплый угольный, янтарь"
 
 [messages.theme-dark-graphite-blurb]
-source = "Neutral grey, no tint"
+source = "Neutral gray, no tint"
 translation = "Нейтральный серый без оттенка"
 
 [messages.theme-dark-moss-blurb]
@@ -9887,7 +9891,7 @@ source = "Wine-black, coral"
 translation = "Винно-чёрный, коралл"
 
 [messages.theme-dark-slate-blurb]
-source = "Blue-grey"
+source = "Blue-gray"
 translation = "Сине-серый"
 
 [messages.theme-ember]
@@ -9911,7 +9915,7 @@ source = "Warm cream, amber"
 translation = "Тёплый кремовый, янтарь"
 
 [messages.theme-light-paper-blurb]
-source = "Plain neutral grey"
+source = "Plain neutral gray"
 translation = "Простой нейтральный серый"
 
 [messages.theme-light-sage-blurb]
@@ -9919,7 +9923,7 @@ source = "Soft green"
 translation = "Мягкий зелёный"
 
 [messages.theme-light-slate-blurb]
-source = "Cool blue-grey"
+source = "Cool blue-gray"
 translation = "Холодный сине-серый"
 
 [messages.theme-lilac]
@@ -9954,16 +9958,16 @@ translation = "Шалфей"
 source = "Slate"
 translation = "Сланец"
 
-[messages.tile-add-favourite]
-source = "Add to your favourites (F)"
+[messages.tile-add-favorite]
+source = "Add to your favorites (F)"
 translation = "Добавить в избранное (F)"
 
-[messages.tile-favourite]
-source = "Favourite { $name }"
+[messages.tile-favorite]
+source = "Favorite { $name }"
 translation = "В избранное: { $name }"
 
-[messages.tile-in-favourites]
-source = "In your favourites"
+[messages.tile-in-favorites]
+source = "In your favorites"
 translation = "В вашем избранном"
 
 [messages.tile-label]

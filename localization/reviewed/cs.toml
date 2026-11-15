@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "453ff96837a704352761a5bf6af773e801a1f4018577b2f5bc3be44f27d2733f"
+source = "40994fa61278db02342a17e111610609be967f167ac0e561724a1ecc0fd4792e"
 translation = "ebb9867350f07ef10a3efb802fdc3be8d6657d7e6160ffddbc175d2f25278e53"
 
 [messages.account-add]
@@ -724,6 +724,14 @@ translation = "Odebráno z { $name }: { $count }"
 source = "Collections"
 translation = "Kolekce"
 
+[messages.app-color]
+source = "Color"
+translation = "Barva"
+
+[messages.app-color-any]
+source = "Any color"
+translation = "Jakákoli barva"
+
 [messages.app-color-black]
 source = "Black"
 translation = "Černá"
@@ -736,17 +744,21 @@ translation = "Modrá"
 source = "Brown"
 translation = "Hnědá"
 
+[messages.app-color-gray]
+source = "Gray"
+translation = "Šedá"
+
 [messages.app-color-green]
 source = "Green"
 translation = "Zelená"
 
-[messages.app-color-grey]
-source = "Grey"
-translation = "Šedá"
-
 [messages.app-color-orange]
 source = "Orange"
 translation = "Oranžová"
+
+[messages.app-color-pick]
+source = "Pick any color"
+translation = "Vybrat libovolnou barvu"
 
 [messages.app-color-pink]
 source = "Pink"
@@ -768,6 +780,10 @@ translation = "Písková"
 source = "Slate"
 translation = "Břidlicová"
 
+[messages.app-color-swatch]
+source = "{ $color }: assets with much { $lower } in them"
+translation = "{ $color }: assety, ve kterých převládá { $lower }"
+
 [messages.app-color-teal]
 source = "Teal"
 translation = "Tyrkysová"
@@ -779,22 +795,6 @@ translation = "Bílá"
 [messages.app-color-yellow]
 source = "Yellow"
 translation = "Žlutá"
-
-[messages.app-colour]
-source = "Colour"
-translation = "Barva"
-
-[messages.app-colour-any]
-source = "Any colour"
-translation = "Jakákoli barva"
-
-[messages.app-colour-pick]
-source = "Pick any colour"
-translation = "Vybrat libovolnou barvu"
-
-[messages.app-colour-swatch]
-source = "{ $color }: assets with much { $lower } in them"
-translation = "{ $color }: assety, ve kterých převládá { $lower }"
 
 [messages.app-credits]
 source = "Credits"
@@ -841,12 +841,12 @@ translation = "méně"
 source = "{ $count } more"
 translation = "Další ({ $count })"
 
-[messages.app-favourite]
-source = "Favourite"
+[messages.app-favorite]
+source = "Favorite"
 translation = "Přidat do oblíbených"
 
-[messages.app-favourites]
-source = "Favourites"
+[messages.app-favorites]
+source = "Favorites"
 translation = "Oblíbené"
 
 [messages.app-filters]
@@ -1106,8 +1106,8 @@ translation = "Projekty, které odsud synchronizuje hoard sync, s tím, co měla
 source = "Most alike"
 translation = "Nejpodobnější"
 
-[messages.app-rank-colour]
-source = "Most of the colour"
+[messages.app-rank-color]
+source = "Most of the color"
 translation = "Nejvíc dané barvy"
 
 [messages.app-rank-match]
@@ -1134,8 +1134,8 @@ translation = "Zkusit znovu"
 source = "Save"
 translation = "Uložit"
 
-[messages.app-save-name-favourites]
-source = "favourites"
+[messages.app-save-name-favorites]
+source = "favorites"
 translation = "oblíbené"
 
 [messages.app-save-name-label]
@@ -1308,8 +1308,8 @@ translation = "Velikost dlaždic"
 source = "Undo"
 translation = "Zpět"
 
-[messages.app-unfavourite]
-source = "Unfavourite"
+[messages.app-unfavorite]
+source = "Unfavorite"
 translation = "Odebrat z oblíbených"
 
 [messages.app-unnamed-asset]
@@ -1766,16 +1766,16 @@ translation = "Jen tento soubor"
 source = "Just this file, without the files it uses"
 translation = "Jen tento soubor, bez souborů, které používá"
 
-[messages.asset-favourite]
-source = "Favourite"
+[messages.asset-favorite]
+source = "Favorite"
 translation = "Oblíbené"
 
-[messages.asset-favourite-off-title]
-source = "Add to your favourites (F)"
+[messages.asset-favorite-off-title]
+source = "Add to your favorites (F)"
 translation = "Přidat do oblíbených (F)"
 
-[messages.asset-favourite-on-title]
-source = "In your favourites (F takes it out)"
+[messages.asset-favorite-on-title]
+source = "In your favorites (F takes it out)"
 translation = "V oblíbených (F ho odebere)"
 
 [messages.asset-file]
@@ -1955,6 +1955,10 @@ translation = "Cooked (herní build): náhledy a zdroje jsou odstraněné"
 [messages.asset-meta-cue-markers]
 source = "Cue markers"
 translation = "Značky"
+
+[messages.asset-meta-everything-with]
+source = "Show everything tagged { $tag }"
+translation = "Zobrazit vše se štítkem { $tag }"
 
 [messages.asset-meta-format]
 source = "Format"
@@ -2186,7 +2190,7 @@ source = "Hoard read it out of the package on { $date } ({ $notes })."
 translation = "Hoard ho vyčetl ze souboru Unrealu { $date } ({ $notes })."
 
 [messages.asset-palette]
-source = "Colours in the picture"
+source = "Colors in the picture"
 translation = "Barvy na obrázku"
 
 [messages.asset-path]
@@ -2294,7 +2298,7 @@ source = "Find assets with { $hex }, { $percent }% of this picture"
 translation = "Najít assety s barvou { $hex }, { $percent } % tohoto obrázku"
 
 [messages.asset-swatch-title]
-source = "{ $hex }, { $percent }% of the picture. Find assets with this colour"
+source = "{ $hex }, { $percent }% of the picture. Find assets with this color"
 translation = "{ $hex }, { $percent } % obrázku. Najít assety s touto barvou"
 
 [messages.asset-tag-add]
@@ -2579,7 +2583,7 @@ source = "Make an OAuth client (Web application) in Google Cloud Console → API
 translation = "Vytvořte klienta OAuth (Web application) v Google Cloud Console → APIs & Services → Credentials. Google neposílá žádné skupiny, takže role přidělte v Nastavení → Účet a vytváření účtů při prvním přihlášení vypněte, pokud se nemá dostat dovnitř kdokoli s účtem Google."
 
 [messages.auth-preset-microsoft-note]
-source = "Register an app in Entra ID → App registrations (a Web redirect to the address below). Put your tenant ID in place of “organizations” to let only your organisation in. For roles from groups, add the groups claim under Token configuration: it lists group IDs."
+source = "Register an app in Entra ID → App registrations (a Web redirect to the address below). Put your tenant ID in place of “organizations” to let only your organization in. For roles from groups, add the groups claim under Token configuration: it lists group IDs."
 translation = "Zaregistrujte aplikaci v Entra ID → App registrations (přesměrování typu Web na adresu níže). Chcete-li pustit jen svou organizaci, nahraďte „organizations“ ID svého tenanta. Pro role ze skupin přidejte v Token configuration deklaraci groups: uvádí ID skupin."
 
 [messages.auth-provider]
@@ -3031,8 +3035,8 @@ translation = "nelze číst { $path }"
 source = "can't write to { $path }"
 translation = "nelze zapisovat do { $path }"
 
-[messages.error-chatgpt-cancelled]
-source = "the sign-in was cancelled"
+[messages.error-chatgpt-canceled]
+source = "the sign-in was canceled"
 translation = "přihlášení bylo zrušeno"
 
 [messages.error-chatgpt-code-used]
@@ -3215,7 +3219,7 @@ translation = "Adresář nemohl ověřit vaše heslo: { $reason }"
 source = "empty file"
 translation = "prázdný soubor"
 
-[messages.error-favourites-too-many]
+[messages.error-favorites-too-many]
 source = "at most 10,000 at a time"
 translation = "nejvýše 10 000 najednou"
 
@@ -3929,7 +3933,7 @@ source = "that picture is too big for a thumbnail"
 translation = "ten obrázek je na miniaturu příliš velký"
 
 [messages.error-token-account-gone]
-source = "this token's account is gone, so it has no favourites or searches"
+source = "this token's account is gone, so it has no favorites or searches"
 translation = "účet tohoto tokenu už neexistuje, takže nemá žádné oblíbené ani hledání"
 
 [messages.error-token-name]
@@ -4210,7 +4214,7 @@ source = "It finds no title in this file. Pick the title."
 translation = "V tomto souboru nenachází žádný název. Vyberte název."
 
 [messages.formatwizard-miss-not-the-stores]
-source = "What it recognises the store’s files by isn’t in this file. Change Recognise by."
+source = "What it recognizes the store’s files by isn’t in this file. Change Recognize by."
 translation = "To, podle čeho formát soubory obchodu poznává, v tomto souboru není. Změňte Rozpoznat podle."
 
 [messages.formatwizard-miss-short-name]
@@ -4285,19 +4289,19 @@ translation = "Název"
 source = "Store page"
 translation = "Stránka v obchodě"
 
-[messages.formatwizard-recognise]
-source = "Recognise by"
+[messages.formatwizard-recognize]
+source = "Recognize by"
 translation = "Rozpoznat podle"
 
-[messages.formatwizard-recognise-hint]
+[messages.formatwizard-recognize-hint]
 source = "One way a line; any of them will do. Needed when other files have the same name."
 translation = "Jeden způsob na řádek; stačí kterýkoli z nich. Potřeba, když mají stejný název i jiné soubory."
 
-[messages.formatwizard-recognise-json]
+[messages.formatwizard-recognize-json]
 source = "A key only the store’s files have"
 translation = "Klíč, který mají jen soubory obchodu"
 
-[messages.formatwizard-recognise-text]
+[messages.formatwizard-recognize-text]
 source = "A line only the store’s files have"
 translation = "Řádek, který mají jen soubory obchodu"
 
@@ -4799,12 +4803,12 @@ translation = "šachovnicové pozadí"
 source = "Checker background (K cycles)"
 translation = "Šachovnicové pozadí (K přepíná)"
 
-[messages.image-bg-grey]
-source = "grey background"
+[messages.image-bg-gray]
+source = "gray background"
 translation = "šedé pozadí"
 
-[messages.image-bg-grey-title]
-source = "Grey background (K cycles)"
+[messages.image-bg-gray-title]
+source = "Gray background (K cycles)"
 translation = "Šedé pozadí (K přepíná)"
 
 [messages.image-bg-white]
@@ -5702,11 +5706,11 @@ source = "ambient occlusion"
 translation = "ambientní okluze"
 
 [messages.material-role-base-color]
-source = "Colour"
+source = "Color"
 translation = "Barva"
 
 [messages.material-role-base-color-name]
-source = "colour"
+source = "color"
 translation = "barva"
 
 [messages.material-role-bump]
@@ -5873,8 +5877,8 @@ translation = "Tmavé pozadí"
 source = "Environment background"
 translation = "Pozadí z prostředí"
 
-[messages.model-bg-grey]
-source = "Grey background"
+[messages.model-bg-gray]
+source = "Gray background"
 translation = "Šedé pozadí"
 
 [messages.model-bg-light]
@@ -5989,8 +5993,8 @@ translation = "Délka"
 source = "Materials"
 translation = "Materiály"
 
-[messages.model-info-metres]
-source = "glTF is in metres"
+[messages.model-info-meters]
+source = "glTF is in meters"
 translation = "glTF je v metrech"
 
 [messages.model-info-no-units]
@@ -6742,8 +6746,8 @@ translation = "Uložení načte popis ze stránky obchodu."
 source = "Paste the listing text, or leave empty to fetch it from the store page."
 translation = "Vložte text nabídky, nebo nechte prázdné a načte se ze stránky obchodu."
 
-[messages.packs-thumbs-cancelled]
-source = "Cancelled after { $done } of { $total }"
+[messages.packs-thumbs-canceled]
+source = "Canceled after { $done } of { $total }"
 translation = "Zrušeno po { $done } z { $total }"
 
 [messages.packs-thumbs-drawing]
@@ -7018,11 +7022,11 @@ translation = "Zrušit výběr"
 source = "Dark theme: { $name }"
 translation = "Tmavý motiv: { $name }"
 
-[messages.palette-favourites]
-source = "Favourites"
+[messages.palette-favorites]
+source = "Favorites"
 translation = "Oblíbené"
 
-[messages.palette-favourites-keywords]
+[messages.palette-favorites-keywords]
 source = "starred stars liked"
 translation = "hvězdička hvězdičky líbí starred stars liked"
 
@@ -7210,12 +7214,12 @@ translation = "vzhled barva appearance color"
 source = "Command palette"
 translation = "Paleta příkazů"
 
-[messages.projects-favourite-add-failed]
-source = "Couldn't add to your favourites: { $error }"
+[messages.projects-favorite-add-failed]
+source = "Couldn't add to your favorites: { $error }"
 translation = "Nepodařilo se přidat do oblíbených: { $error }"
 
-[messages.projects-favourite-remove-failed]
-source = "Couldn't take out of your favourites: { $error }"
+[messages.projects-favorite-remove-failed]
+source = "Couldn't take out of your favorites: { $error }"
 translation = "Nepodařilo se odebrat z oblíbených: { $error }"
 
 [messages.projects-forget-search-failed]
@@ -7498,7 +7502,7 @@ source = "Tagging { $pack } with AI"
 translation = "Štítkování pomocí AI: { $pack }"
 
 [messages.server-job-looks]
-source = "Working out colours and looks"
+source = "Working out colors and looks"
 translation = "Zjišťování barev a vzhledu"
 
 [messages.server-job-materials]
@@ -7586,7 +7590,7 @@ source = "ambient occlusion"
 translation = "ambientní okluze"
 
 [messages.server-role-base-color]
-source = "colour"
+source = "color"
 translation = "barva"
 
 [messages.server-role-bump]
@@ -8007,7 +8011,7 @@ source = "Couldn’t get the model: { $detail }. Trying again every hour."
 translation = "Model se nepodařilo získat: { $detail }. Zkouší se to znovu každou hodinu."
 
 [messages.settings-clip-what]
-source = "Type what you’re after (“mossy rock”, “sci-fi door”, “wooden barrel”) and pictures that show it turn up beside names that have the words. “More like this” finds things of the same kind, not only the same colours."
+source = "Type what you’re after (“mossy rock”, “sci-fi door”, “wooden barrel”) and pictures that show it turn up beside names that have the words. “More like this” finds things of the same kind, not only the same colors."
 translation = "Napište, co hledáte („mossy rock“, „sci-fi door“, „wooden barrel“), a obrázky, které to zobrazují, se objeví vedle názvů obsahujících tato slova. „Další podobné“ najde věci stejného druhu, nejen stejných barev."
 
 [messages.settings-conversion-cache]
@@ -8363,7 +8367,7 @@ source = "Image search"
 translation = "Hledání obrázků"
 
 [messages.settings-page-search-blurb]
-source = "Search pictures by what they show, not only by their names, and find things that are alike in kind, not only in colour."
+source = "Search pictures by what they show, not only by their names, and find things that are alike in kind, not only in color."
 translation = "Hledejte obrázky podle toho, co zobrazují, nejen podle názvů, a nacházejte věci, které jsou si podobné druhem, nejen barvou."
 
 [messages.settings-page-store-files]
@@ -8766,8 +8770,8 @@ translation = "Zavřít"
 source = "Close, clear the selection, or close the details"
 translation = "Zavřít, zrušit výběr nebo zavřít podrobnosti"
 
-[messages.shortcuts-favourite]
-source = "Add to or take out of your favourites"
+[messages.shortcuts-favorite]
+source = "Add to or take out of your favorites"
 translation = "Přidat do oblíbených nebo z nich odebrat"
 
 [messages.shortcuts-fit]
@@ -9196,15 +9200,15 @@ source = "Edit"
 translation = "Upravit"
 
 [messages.storefiles-field-colors]
-source = "Colours"
+source = "Colors"
 translation = "Barvy"
 
 [messages.storefiles-field-colors-hint]
-source = "Its colours, as color: tags."
+source = "Its colors, as color: tags."
 translation = "Jeho barvy jako štítky color:."
 
 [messages.storefiles-field-colors-name]
-source = "colours"
+source = "colors"
 translation = "barvy"
 
 [messages.storefiles-field-id]
@@ -9810,7 +9814,7 @@ source = "Warm charcoal, amber"
 translation = "Teplá antracitová, jantarová"
 
 [messages.theme-dark-graphite-blurb]
-source = "Neutral grey, no tint"
+source = "Neutral gray, no tint"
 translation = "Neutrální šedá bez nádechu"
 
 [messages.theme-dark-moss-blurb]
@@ -9826,7 +9830,7 @@ source = "Wine-black, coral"
 translation = "Vínově černá, korálová"
 
 [messages.theme-dark-slate-blurb]
-source = "Blue-grey"
+source = "Blue-gray"
 translation = "Modrošedá"
 
 [messages.theme-ember]
@@ -9850,7 +9854,7 @@ source = "Warm cream, amber"
 translation = "Teplá krémová, jantarová"
 
 [messages.theme-light-paper-blurb]
-source = "Plain neutral grey"
+source = "Plain neutral gray"
 translation = "Prostá neutrální šedá"
 
 [messages.theme-light-sage-blurb]
@@ -9858,7 +9862,7 @@ source = "Soft green"
 translation = "Jemná zelená"
 
 [messages.theme-light-slate-blurb]
-source = "Cool blue-grey"
+source = "Cool blue-gray"
 translation = "Chladná modrošedá"
 
 [messages.theme-lilac]
@@ -9893,16 +9897,16 @@ translation = "Šalvěj"
 source = "Slate"
 translation = "Břidlice"
 
-[messages.tile-add-favourite]
-source = "Add to your favourites (F)"
+[messages.tile-add-favorite]
+source = "Add to your favorites (F)"
 translation = "Přidat do oblíbených (F)"
 
-[messages.tile-favourite]
-source = "Favourite { $name }"
+[messages.tile-favorite]
+source = "Favorite { $name }"
 translation = "Přidat { $name } do oblíbených"
 
-[messages.tile-in-favourites]
-source = "In your favourites"
+[messages.tile-in-favorites]
+source = "In your favorites"
 translation = "V oblíbených"
 
 [messages.tile-label]

@@ -33,7 +33,7 @@ test.describe('materials', () => {
     const panel = await openMaterial(page, seed.packs[MEGASCANS])
     await expect(panel.getByRole('heading', { name: MEGASCANS })).toBeVisible()
     const maps = panel.locator('section', { has: page.getByRole('heading', { name: 'Maps' }) })
-    for (const role of ['Colour', 'Normal', 'Roughness', 'Ambient occlusion']) {
+    for (const role of ['Color', 'Normal', 'Roughness', 'Ambient occlusion']) {
       await expect(maps.getByRole('button', { name: new RegExp(`^${role} `) })).toBeVisible()
     }
     await expect(panel.getByRole('group', { name: 'Shape' })).toBeVisible()
@@ -111,7 +111,7 @@ test.describe('materials', () => {
       await page.locator('.grid button.hit[aria-label*=" tris"]').click()
       const panel = page.getByRole('complementary', { name: 'Asset details' })
       const worn = panel.getByRole('list', { name: `${MEGASCANS}: maps` })
-      for (const role of ['Colour', 'Normal', 'Roughness', 'Ambient occlusion']) {
+      for (const role of ['Color', 'Normal', 'Roughness', 'Ambient occlusion']) {
         await expect(worn.getByRole('button', { name: new RegExp(`^${role} `) })).toBeVisible()
       }
       const needs = panel.locator('section, div').filter({ has: page.getByRole('heading', { name: 'Needs', exact: true }) }).last()
@@ -152,7 +152,7 @@ test.describe('materials', () => {
     })
   })
 
-  test("the server's thumbnail of the model has the material's colour map on", async ({ seed, baseURL }) => {
+  test("the server's thumbnail of the model has the material's color map on", async ({ seed, baseURL }) => {
     const api = await signedIn(baseURL!)
     const stats = (await (await api.get('/api/stats')).json()) as { renderer?: string }
     test.skip(!/^(gpu|cpu):/.test(stats.renderer ?? ''), `no model renderer here (${stats.renderer})`)
@@ -162,7 +162,7 @@ test.describe('materials', () => {
   })
 
   // Uploaded, it's packed into one GLB (its .bin inside, its maps still beside it), and dressed like any model.
-  test("a glTF model's server thumbnail has the colour map of the material beside it on", async ({ baseURL }) => {
+  test("a glTF model's server thumbnail has the color map of the material beside it on", async ({ baseURL }) => {
     const api = await signedIn(baseURL!)
     const stats = (await (await api.get('/api/stats')).json()) as { renderer?: string }
     test.skip(!/^(gpu|cpu):/.test(stats.renderer ?? ''), `no model renderer here (${stats.renderer})`)

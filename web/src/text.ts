@@ -1,4 +1,4 @@
-// Reading text assets for the text viewers: fetch (all or the first part), decode, and colour lines for display.
+// Reading text assets for the text viewers: fetch (all or the first part), decode, and color lines for display.
 // A small hand-rolled highlighter instead of a library: it only has to make structure visible (comments, strings,
 // keys, tags) across a few dozen formats, and a full grammar engine would outweigh the rest of the viewer.
 import { fileUrl, type Asset } from './api'
@@ -15,7 +15,7 @@ export interface TextFile {
   binary: boolean
 }
 
-/** Fetch the file's text, only its first `limit` bytes when given (a Range request; the server honours them). */
+/** Fetch the file's text, only its first `limit` bytes when given (a Range request; the server honors them). */
 export async function fetchText(asset: Asset, limit?: number): Promise<TextFile> {
   const headers: HeadersInit = limit ? { Range: `bytes=0-${limit - 1}` } : {}
   const res = await fetch(fileUrl(asset), { headers })
@@ -205,8 +205,8 @@ const GRAMMARS: Record<Exclude<Lang, 'csv' | 'plain'>, Grammar> = {
 const esc = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
 const span = (cls: string, s: string) => `<span class="tk-${cls}">${esc(s)}</span>`
 
-/** One line of CSV: each column its own colour, so a row can be followed across. Quoted fields may hold the
- *  delimiter; a field running over a line break just colours on as the next column. */
+/** One line of CSV: each column its own color, so a row can be followed across. Quoted fields may hold the
+ *  delimiter; a field running over a line break just colors on as the next column. */
 function csvLine(line: string, delim: string): string {
   const out: string[] = []
   const field = new RegExp(`"(?:[^"]|"")*"?|[^${delim === '\t' ? '\\t' : delim}]*`, 'y')
@@ -225,7 +225,7 @@ function csvLine(line: string, delim: string): string {
   return out.join('')
 }
 
-/** Lines as HTML, coloured for the language. */
+/** Lines as HTML, colored for the language. */
 export function highlightLines(text: string, lang: Lang, ext = ''): string[] {
   const lines = text.split('\n')
   if (lang === 'plain') return lines.map(esc)
@@ -236,7 +236,7 @@ export function highlightLines(text: string, lang: Lang, ext = ''): string[] {
   const g = GRAMMARS[lang]
   let inBlock = false
   return lines.map((line) => {
-    // Very long lines (minified data) are shown as they are: colouring them costs more than it helps.
+    // Very long lines (minified data) are shown as they are: coloring them costs more than it helps.
     if (line.length > 20000) return esc(line)
     const out: string[] = []
     let plain = ''

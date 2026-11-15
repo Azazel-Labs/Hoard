@@ -247,7 +247,9 @@ software rasterizer (`apt install mesa-vulkan-drivers`). Without any adapter, ev
    - GPU textures, decoded in pure Rust: DDS (BC1-7, raw RGBA/BGRA, float, legacy DXT and bitmask formats) and KTX2
      (BCn, ETC2/EAC, ASTC, raw, with zstd or zlib supercompression), with their GPU format and mip count. Basis
      Universal (KTX2 with BasisLZ/ETC1S or UASTC, and `.basis` files) is transcoded in pure Rust too. SVGs render
-     with their text (system fonts, DejaVu in the Docker image), and Aseprite files show their first frame with
+     with their text (system fonts, DejaVu in the Docker image). Illustrator files (`.ai`) render their first
+     artboard from the PDF inside them, or show the preview they carry when they have none (Illustrator 8 and
+     earlier, or saved without PDF content). Aseprite files show their first frame with
      frame, layer and animation-tag counts.
    - Pictures that move: an animated GIF, PNG or WebP says how many frames it has and how long it plays (`frames`,
      `duration_ms`), and plays in its details (up to 16 MB) and on its tile while the pointer is over it (up to
@@ -305,7 +307,10 @@ software rasterizer (`apt install mesa-vulkan-drivers`). Without any adapter, ev
    `map:normal`, `set:rock-cliff`), detects the pack license from LICENSE/README files (`license:cc0`, `cc-by`, …),
    and picks a category from a fixed tree (`sfx/footsteps`, `textures/pbr`, `models/props`, …). Sounds get a UCS
    category (`ucs:footsteps`, `ucs:swooshes/swish`) from embedded metadata or confident rules, plus `loop`,
-   `one-shot`, `bpm:120`, `root:a3`, `level:quiet`/`level:loud` and `clipped` where measured.
+   `one-shot`, `bpm:120`, `root:a3`, `level:quiet`/`level:loud` and `clipped` where measured. A sound's genre
+   and artist are tags too (`genre:ambient`, `artist:kenney`), and clicking either in the details shows everything
+   with it. Words in brackets in a folder or file name are tags: everything in `Audio (Female)/` is tagged `female`
+   (a copy number like `(1)`, a year or a whole sentence isn't).
    - **Variants.** Numbered takes (`whoosh_01..12`, `Hit (3)`, `rock_v2`) in one folder form a family. The detail
      panel lists the other takes, and tag or category edits can apply to all of them at once.
    - **Duplicates.** Byte-identical files across packs (the same CC0 texture in five bundles) are stored once and
@@ -381,10 +386,10 @@ match), filters by what a pack holds, its status and its store, and sorts by dat
 
 Texture maps that share a name in one folder become a material: `Rock_BaseColor.png`, `Rock_Normal.png` and
 `Rock_Roughness.png` are one "Rock" tile in the grid, with a lit sphere as its thumbnail. Hoard reads the naming of
-Megascans, Poly Haven, ambientCG, Substance and Unreal (`T_Rock_N`), and knows base colour, normal (OpenGL or
+Megascans, Poly Haven, ambientCG, Substance and Unreal (`T_Rock_N`), and knows base color, normal (OpenGL or
 DirectX), roughness, gloss, metalness, ambient occlusion, height, bump, cavity, specular, opacity, emissive and packed
 maps (ORM, ARM, MRA, RMA). The same set in several sizes (`Rock_2K_…`, `Rock_4K_…`, or `2K/` and `4K/` folders) is
-one material. It takes a colour map plus one more, or two other kinds of map.
+one material. It takes a color map plus one more, or two other kinds of map.
 
 - **In the grid**, a material searches, filters, tags and collects like any asset. Its maps are hidden; "Show" next
   to "supporting files hidden" brings them back.
@@ -436,7 +441,7 @@ and Opus use ffmpeg's reference encoders (LAME, libvorbis, libopus), as do sourc
 
 | From | To |
 |---|---|
-| PNG, JPEG, WebP, TGA, TIFF, BMP, GIF, EXR, HDR, PSD/PSB (full composite), Krita, OpenRaster, DDS, KTX2, SVG, Aseprite | PNG, JPEG, WebP (lossless), TGA, TIFF, plus EXR for HDR sources; optionally scaled down to 4096…64 px, including in the original format |
+| PNG, JPEG, WebP, TGA, TIFF, BMP, GIF, EXR, HDR, PSD/PSB (full composite), Krita, OpenRaster, DDS, KTX2, SVG, Illustrator, Aseprite | PNG, JPEG, WebP (lossless), TGA, TIFF, plus EXR for HDR sources; optionally scaled down to 4096…64 px, including in the original format |
 | WAV, FLAC, OGG Vorbis, MP3, AIFF, and with ffmpeg also AAC/M4A, Opus, WMA, CAF, WavPack, APE, MKA | WAV (16 or 24-bit, as the source), FLAC, MP3 (VBR ~190 kbps), OGG Vorbis (q5), Opus (128 kbps) |
 | MOD, XM, S3M, IT, MIDI | the same audio formats, rendered |
 | glTF | GLB (buffers and textures packed in) |
@@ -649,9 +654,9 @@ collection = "Forest level"
 dest = "levels/forest"
 ```
 
-## Favourites and saved searches
+## Favorites and saved searches
 
-Everyone signed in has their own: star a tile (or press F on it, or star its details), and Favourites, under
+Everyone signed in has their own: star a tile (or press F on it, or star its details), and Favorites, under
 **Yours** at the top of the filter sidebar, shows just those, with every other filter still working. "Save search"
 beside the active filters keeps what you're looking at under a name, there and in the command palette (Ctrl K);
 saving the same name again replaces it. An account that can only look has them too, and an access token or a
@@ -666,23 +671,23 @@ and ask first. Deleting for good frees its space at the next clean-up, and a wat
 way isn't read in again (the folder itself is never touched). Archiving and restoring need an account that can change
 the library; deleting for good, an admin.
 
-## Search by colour, by what pictures show, by how things sound, and More like this
+## Search by color, by what pictures show, by how things sound, and More like this
 
 Hoard looks at the thumbnail of every texture, model, material, animation, video and sprite, and works out its main
-colours and what its surface looks like. A background job does this for new packs and, once, for everything already
-in the library. Activity shows it as "Working out colours and looks".
+colors and what its surface looks like. A background job does this for new packs and, once, for everything already
+in the library. Activity shows it as "Working out colors and looks".
 
-- **Colour.** The Colour swatches in the filter sidebar (or the picker beside them, for any colour) show assets with
-  much of that colour, the ones it covers most first. A slightly different shade still counts, because colours are
-  compared the way eyes see them (in OKLab). Colour works together with words, kind, tags, pack and collection. An
-  asset's detail panel shows its colours as a strip sized by how much of the picture each covers. Click one to search
+- **Color.** The Color swatches in the filter sidebar (or the picker beside them, for any color) show assets with
+  much of that color, the ones it covers most first. A slightly different shade still counts, because colors are
+  compared the way eyes see them (in OKLab). Color works together with words, kind, tags, pack and collection. An
+  asset's detail panel shows its colors as a strip sized by how much of the picture each covers. Click one to search
   the whole library for it.
 - **More like this.** The button in the detail panel, or the overlapping squares on a tile's corner, shows assets that
   look like this one, across every pack, most alike first. You might get other rocks for a rock texture, the same
   texture at another size, or renders of similar models. The results are an ordinary search, so you can scroll, select
   and narrow them by kind, tags or words. "Newest" in the sort menu sets the ranking aside.
 
-What counts as alike is the colours (a colour histogram), the grain and edges of the surface (edge directions,
+What counts as alike is the colors (a color histogram), the grain and edges of the surface (edge directions,
 contrast and local binary patterns, measured in a way that ignores which way a texture is turned), and a perceptual
 hash that catches near-copies. It is all computed on the server from the thumbnail, needs no model download and works
 offline. On its own, nothing in it knows what a picture shows. Two brown, rough textures can count as alike even when
@@ -706,7 +711,7 @@ roughly 5–10 pictures a second, and keeps up with new packs. Settings shows ho
 - **Words.** The main search box finds pictures that show what you typed ("mossy rock", "brick wall", "ceiling
   lamp") beside the assets whose names, tags or descriptions have the words. A name match still ranks above a weak
   picture match. Words with nothing to show return only the name matches.
-- **More like this** weighs what the pictures show above their colours and grain, so a barrel brings up barrels
+- **More like this** weighs what the pictures show above their colors and grain, so a barrel brings up barrels
   rather than anything brown.
 
 The model takes 300–600 MB of memory while it works: the picture half during the job, the words half from the first
@@ -758,9 +763,9 @@ both connect.
 | Tool | What it does |
 |---|---|
 | `search_assets` | full-text + kind/tag/pack filters, with thumbnail and download URLs; `include_previews` returns the first 8 thumbnails as images |
-| `find_similar` | assets that look like a given one (colours, surface, near-copies), across every pack; same result shape as `search_assets` |
-| `find_by_color` | assets with much of a hex colour in them, most of it first |
-| `get_asset` | full detail: metadata, tags with sources, links, what uses it, variants, identical copies, the thumbnail's colours |
+| `find_similar` | assets that look like a given one (colors, surface, near-copies), across every pack; same result shape as `search_assets` |
+| `find_by_color` | assets with much of a hex color in them, most of it first |
+| `get_asset` | full detail: metadata, tags with sources, links, what uses it, variants, identical copies, the thumbnail's colors |
 | `get_bundle` | download URLs and save-as paths for an asset and everything it needs, plus a zip URL |
 | `list_packs`, `list_tags`, `list_collections` | browse the library, its tag vocabulary and collections (`search_assets` takes `collection` too) |
 | `get_credits` | who made the packs behind some packs, collections, assets or a search, their licenses and the credit lines they ask for (`markdown` for a ready `CREDITS.md`) |
@@ -995,7 +1000,7 @@ browser session's changes must also carry an `X-Hoard` header, which pages on ot
 
 | Method | Path | |
 |---|---|---|
-| GET | `/api/assets` | search: `q`, `kind`, `tags=a,b`, `pack`, `collection`, `ext`, `similar=<asset id>`, `color=<hex>`, `favourites=true` (whoever's asking), `project` (name or id), `sort`, `limit`, `offset`, `hide_supporting`; results plus kind/tag facets |
+| GET | `/api/assets` | search: `q`, `kind`, `tags=a,b`, `pack`, `collection`, `ext`, `similar=<asset id>`, `color=<hex>`, `favorites=true` (whoever's asking), `project` (name or id), `sort`, `limit`, `offset`, `hide_supporting`; results plus kind/tag facets |
 | GET | `/api/assets/{id}` | one asset, with tags, metadata and dependencies |
 | PATCH 🔒 | `/api/assets/{id}` | rename, recategorize, describe, tag; `apply_to_family` for a whole variant family |
 | GET | `/api/assets/{id}/file` | the file (`?download=1` to save it) |
@@ -1072,11 +1077,11 @@ browser session's changes must also carry an `X-Hoard` header, which pages on ot
 | DELETE 🔒 | `/api/projects/{name}` | forget it |
 | POST | `/api/usage` | `{packs?, assets?, archived?}`: the projects using any of these, with how many and a few of their paths |
 
-**Favourites and saved searches** (each person's own, so a guest has none; looking is enough)
+**Favorites and saved searches** (each person's own, so a guest has none; looking is enough)
 
 | Method | Path | |
 |---|---|---|
-| GET, POST | `/api/me/favourites` | your favourite asset ids, or change them: `{add?: [ids], remove?: [ids]}` |
+| GET, POST | `/api/me/favorites` | your favorite asset ids, or change them: `{add?: [ids], remove?: [ids]}` |
 | GET, POST | `/api/me/searches` | your saved searches, or save one: `{name, query}` (the portal's query string, like `q=rock&kind=texture`) |
 | DELETE | `/api/me/searches/{id}` | forget one |
 

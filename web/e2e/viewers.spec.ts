@@ -33,7 +33,7 @@ test.describe('full-screen viewers', () => {
   })
 
   // The server reads it, filaments and painting included, and the viewer shows the GLB it makes.
-  test('a painted 3MF print shows its filament colours', async ({ page, baseURL }) => {
+  test('a painted 3MF print shows its filament colors', async ({ page, baseURL }) => {
     const api = await signedIn(baseURL!)
     const pack = await uploadPack(api, 'E2E Painted 3MF', [{ relpath: 'Painted_Cube.3mf', data: paintedCube3mf() }])
     await waitReady(api, [pack.id])
@@ -87,7 +87,7 @@ test.describe('full-screen viewers', () => {
     const menu = viewer.getByRole('navigation', { name: 'View' })
     const mode = (name: string) => menu.getByRole('button', { name, exact: true })
     await expect(mode('Final render')).toHaveAttribute('aria-pressed', 'true')
-    // The crate has a colour map and nothing else, so only that map is offered.
+    // The crate has a color map and nothing else, so only that map is offered.
     await expect(mode('Base color')).toBeVisible()
     await expect(mode('Roughness')).toHaveCount(0)
     await expect(mode('Normal')).toHaveCount(0)

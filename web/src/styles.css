@@ -86,7 +86,7 @@
   --accent: light-dark(var(--l-accent), var(--d-accent));
   --danger: light-dark(#b93a3a, #ef7b7b);
   --ok: light-dark(#2f7d36, #8fd18b);
-  /* A favourite's star. */
+  /* A favorite's star. */
   --star: light-dark(#b07d06, #f2c14e);
 
   /* Kind colors, darker on light so text in them stays readable. */
@@ -258,7 +258,7 @@ html[data-vt='detail']::view-transition-old(detail):only-child { animation: vt-s
 html[data-vt='theme']::view-transition-old(root),
 html[data-vt='theme']::view-transition-new(root) { animation: none; mix-blend-mode: normal; }
 
-/* Reduced motion: nothing moves, slides, scales or loops, but colour and opacity still change softly so state changes
+/* Reduced motion: nothing moves, slides, scales or loops, but color and opacity still change softly so state changes
    don't snap. Animations finish at once on their final frame (a drawn tick still ends up drawn). */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {

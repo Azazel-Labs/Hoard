@@ -78,7 +78,7 @@ struct AssetReply {
 
 fn system_prompt() -> String {
     format!(
-        "You catalogue game-development assets (textures, sprites, audio, music, 3D models, fonts, shaders) for a \
+        "You catalog game-development assets (textures, sprites, audio, music, 3D models, fonts, shaders) for a \
          searchable asset library. For each numbered file you get its path inside the pack, its kind, measured \
          metadata and tags an offline tagger already assigned. Reply with JSON only:\n\
          {{\"pack\": {{\"title\": str, \"description\": str, \"tags\": [str]}} | null,\n \

@@ -2,7 +2,7 @@ import { addTags, assetsOf, uploadPack, waitReady } from './support/api'
 import { apng, aseprite, png } from './support/files'
 import { expect, openPack, test, tile, unique } from './support/test'
 
-const COLOURS: [number, number, number, number][] = [
+const COLORS: [number, number, number, number][] = [
   [230, 60, 60, 255],
   [60, 200, 90, 255],
   [70, 110, 240, 255],
@@ -15,7 +15,7 @@ test('pictures that move play: Aseprite frames by their times and tags, sprite s
   api,
 }) => {
   const name = `E2E Sprites ${unique()}`
-  const walk = aseprite(8, [100, 150, 100, 100], (f) => COLOURS[f], [
+  const walk = aseprite(8, [100, 150, 100, 100], (f) => COLORS[f], [
     ['walk', 0, 3, 0],
     ['blink', 1, 2, 1],
   ])
@@ -23,9 +23,9 @@ test('pictures that move play: Aseprite frames by their times and tags, sprite s
   const coins = png(48, 32, (x, y) => {
     const [c, r] = [Math.floor(x / 16), Math.floor(y / 16)]
     const inside = x % 16 >= 3 && x % 16 < 13 && y % 16 >= 3 && y % 16 < 13
-    return inside && r * 3 + c < 5 ? COLOURS[r * 3 + c] : [0, 0, 0, 0]
+    return inside && r * 3 + c < 5 ? COLORS[r * 3 + c] : [0, 0, 0, 0]
   })
-  const blink = apng(8, 8, 3, 100, (f) => COLOURS[f])
+  const blink = apng(8, 8, 3, 100, (f) => COLORS[f])
   const pack = await uploadPack(api, name, [
     { relpath: 'walk.aseprite', data: walk },
     { relpath: 'coins.png', data: coins },

@@ -3,24 +3,24 @@ import { assetsOf } from './support/api'
 import { MODELS } from './support/seed'
 import { expect, openPack, test, tile, unique } from './support/test'
 
-test.describe('favourites and saved searches', () => {
+test.describe('favorites and saved searches', () => {
   test('are each person’s own, and a token sees its maker’s', async ({ api, baseURL, seed }) => {
     const [asset] = await assetsOf(api, seed.packs[MODELS])
     try {
-      const starred = (await (await api.post('/api/me/favourites', { data: { add: [asset.id, 'no-such-asset'] } })).json()) as { assets: string[] }
+      const starred = (await (await api.post('/api/me/favorites', { data: { add: [asset.id, 'no-such-asset'] } })).json()) as { assets: string[] }
       expect(starred.assets).toContain(asset.id)
       expect(starred.assets).not.toContain('no-such-asset')
-      const found = (await (await api.get('/api/assets?favourites=true&limit=500')).json()) as { items: { id: string }[] }
+      const found = (await (await api.get('/api/assets?favorites=true&limit=500')).json()) as { items: { id: string }[] }
       expect(found.items.map((a) => a.id)).toContain(asset.id)
 
       const { token } = (await (await api.post('/api/admin/tokens', { data: { name: `fav-${unique()}`, role: 'view' } })).json()) as { token: string }
       const bearer = await request.newContext({ baseURL, extraHTTPHeaders: { Authorization: `Bearer ${token}` } })
-      expect(((await (await bearer.get('/api/me/favourites')).json()) as { assets: string[] }).assets).toContain(asset.id)
+      expect(((await (await bearer.get('/api/me/favorites')).json()) as { assets: string[] }).assets).toContain(asset.id)
       await bearer.dispose()
 
       // A guest has none to ask for.
       const guest = await request.newContext({ baseURL, storageState: { cookies: [], origins: [] } })
-      expect((await guest.get('/api/assets?favourites=true')).status()).toBe(401)
+      expect((await guest.get('/api/assets?favorites=true')).status()).toBe(401)
       await guest.dispose()
 
       const name = `Saved ${unique()}`
@@ -33,26 +33,26 @@ test.describe('favourites and saved searches', () => {
       expect(again).toEqual([expect.objectContaining({ query: 'q=barrel' })])
       expect((await api.delete(`/api/me/searches/${mine.id}`)).status()).toBe(204)
     } finally {
-      await api.post('/api/me/favourites', { data: { remove: [asset.id] } })
+      await api.post('/api/me/favorites', { data: { remove: [asset.id] } })
     }
   })
 
-  test('a star on a tile, Favourites in the filters, and a search kept under Yours', async ({ page, api, seed }) => {
+  test('a star on a tile, Favorites in the filters, and a search kept under Yours', async ({ page, api, seed }) => {
     const crates = (await assetsOf(api, seed.packs[MODELS])).filter((a) => a.name === 'Crate').map((a) => a.id)
     const name = `Crates ${unique()}`
     try {
       await openPack(page, seed.packs[MODELS], MODELS, '&sort=name')
       const crateTile = tile(page, 'Crate').first()
       await crateTile.hover()
-      const star = page.getByRole('button', { name: 'Favourite Crate' }).first()
+      const star = page.getByRole('button', { name: 'Favorite Crate' }).first()
       await star.click()
       await expect(star).toHaveAttribute('aria-pressed', 'true')
       await expect
-        .poll(async () => ((await (await api.get('/api/me/favourites')).json()) as { assets: string[] }).assets.some((id) => crates.includes(id)))
+        .poll(async () => ((await (await api.get('/api/me/favorites')).json()) as { assets: string[] }).assets.some((id) => crates.includes(id)))
         .toBe(true)
 
       const yours = page.getByRole('complementary', { name: 'Filters' }).locator('.yours')
-      await yours.getByRole('button', { name: /^Favourites/ }).click()
+      await yours.getByRole('button', { name: /^Favorites/ }).click()
       await expect(page).toHaveURL(/fav=1/)
       await expect(page.locator('.grid button.hit')).toHaveCount(1)
       await expect(crateTile).toBeVisible()
@@ -78,7 +78,7 @@ test.describe('favourites and saved searches', () => {
 
       // F on the open asset takes it out again.
       await crateTile.click()
-      const detailStar = page.getByRole('complementary', { name: 'Asset details' }).getByRole('button', { name: 'Favourite' })
+      const detailStar = page.getByRole('complementary', { name: 'Asset details' }).getByRole('button', { name: 'Favorite' })
       await expect(detailStar).toHaveAttribute('aria-pressed', 'true')
       await page.keyboard.press('f')
       await expect(detailStar).toHaveAttribute('aria-pressed', 'false')
@@ -86,7 +86,7 @@ test.describe('favourites and saved searches', () => {
       await yours.getByRole('button', { name: `Forget the saved search ${name}` }).click()
       await expect(saved).toHaveCount(0)
     } finally {
-      await api.post('/api/me/favourites', { data: { remove: crates } })
+      await api.post('/api/me/favorites', { data: { remove: crates } })
       const left = ((await (await api.get('/api/me/searches')).json()) as { searches: { id: number; name: string }[] }).searches
       for (const s of left.filter((s) => s.name === name)) await api.delete(`/api/me/searches/${s.id}`)
     }

@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "453ff96837a704352761a5bf6af773e801a1f4018577b2f5bc3be44f27d2733f"
+source = "40994fa61278db02342a17e111610609be967f167ac0e561724a1ecc0fd4792e"
 translation = "a47b0730f979c0795174abb9fbad1897a70e3a902f7efefe65823d02f25bdbc0"
 
 [messages.account-add]
@@ -716,6 +716,14 @@ translation = "Tog bort { $count } från { $name }"
 source = "Collections"
 translation = "Samlingar"
 
+[messages.app-color]
+source = "Color"
+translation = "Färg"
+
+[messages.app-color-any]
+source = "Any color"
+translation = "Valfri färg"
+
 [messages.app-color-black]
 source = "Black"
 translation = "Svart"
@@ -728,17 +736,21 @@ translation = "Blå"
 source = "Brown"
 translation = "Brun"
 
+[messages.app-color-gray]
+source = "Gray"
+translation = "Grå"
+
 [messages.app-color-green]
 source = "Green"
 translation = "Grön"
 
-[messages.app-color-grey]
-source = "Grey"
-translation = "Grå"
-
 [messages.app-color-orange]
 source = "Orange"
 translation = "Orange"
+
+[messages.app-color-pick]
+source = "Pick any color"
+translation = "Välj en färg"
 
 [messages.app-color-pink]
 source = "Pink"
@@ -760,6 +772,10 @@ translation = "Sand"
 source = "Slate"
 translation = "Skiffer"
 
+[messages.app-color-swatch]
+source = "{ $color }: assets with much { $lower } in them"
+translation = "{ $color }: resurser med mycket av färgen { $lower }"
+
 [messages.app-color-teal]
 source = "Teal"
 translation = "Blågrön"
@@ -771,22 +787,6 @@ translation = "Vit"
 [messages.app-color-yellow]
 source = "Yellow"
 translation = "Gul"
-
-[messages.app-colour]
-source = "Colour"
-translation = "Färg"
-
-[messages.app-colour-any]
-source = "Any colour"
-translation = "Valfri färg"
-
-[messages.app-colour-pick]
-source = "Pick any colour"
-translation = "Välj en färg"
-
-[messages.app-colour-swatch]
-source = "{ $color }: assets with much { $lower } in them"
-translation = "{ $color }: resurser med mycket av färgen { $lower }"
 
 [messages.app-credits]
 source = "Credits"
@@ -828,12 +828,12 @@ translation = "färre"
 source = "{ $count } more"
 translation = "{ $count } till"
 
-[messages.app-favourite]
-source = "Favourite"
+[messages.app-favorite]
+source = "Favorite"
 translation = "Favorit"
 
-[messages.app-favourites]
-source = "Favourites"
+[messages.app-favorites]
+source = "Favorites"
 translation = "Favoriter"
 
 [messages.app-filters]
@@ -1088,8 +1088,8 @@ translation = "Projekt som kör hoard sync härifrån, med det som deras senaste
 source = "Most alike"
 translation = "Mest lika"
 
-[messages.app-rank-colour]
-source = "Most of the colour"
+[messages.app-rank-color]
+source = "Most of the color"
 translation = "Mest av färgen"
 
 [messages.app-rank-match]
@@ -1116,8 +1116,8 @@ translation = "Försök igen"
 source = "Save"
 translation = "Spara"
 
-[messages.app-save-name-favourites]
-source = "favourites"
+[messages.app-save-name-favorites]
+source = "favorites"
 translation = "favoriter"
 
 [messages.app-save-name-label]
@@ -1284,8 +1284,8 @@ translation = "Rutstorlek"
 source = "Undo"
 translation = "Ångra"
 
-[messages.app-unfavourite]
-source = "Unfavourite"
+[messages.app-unfavorite]
+source = "Unfavorite"
 translation = "Ta bort favorit"
 
 [messages.app-unnamed-asset]
@@ -1734,16 +1734,16 @@ translation = "Bara den här filen"
 source = "Just this file, without the files it uses"
 translation = "Bara den här filen, utan filerna den använder"
 
-[messages.asset-favourite]
-source = "Favourite"
+[messages.asset-favorite]
+source = "Favorite"
 translation = "Favorit"
 
-[messages.asset-favourite-off-title]
-source = "Add to your favourites (F)"
+[messages.asset-favorite-off-title]
+source = "Add to your favorites (F)"
 translation = "Lägg till i dina favoriter (F)"
 
-[messages.asset-favourite-on-title]
-source = "In your favourites (F takes it out)"
+[messages.asset-favorite-on-title]
+source = "In your favorites (F takes it out)"
 translation = "Bland dina favoriter (F tar bort den)"
 
 [messages.asset-file]
@@ -1921,6 +1921,10 @@ translation = "Cookad (spelbygge): förhandsvisningar och källor är borttagna"
 [messages.asset-meta-cue-markers]
 source = "Cue markers"
 translation = "Cue-markörer"
+
+[messages.asset-meta-everything-with]
+source = "Show everything tagged { $tag }"
+translation = "Visa allt med taggen { $tag }"
 
 [messages.asset-meta-format]
 source = "Format"
@@ -2151,7 +2155,7 @@ source = "Hoard read it out of the package on { $date } ({ $notes })."
 translation = "Hoard läste ut den ur paketfilen { $date } ({ $notes })."
 
 [messages.asset-palette]
-source = "Colours in the picture"
+source = "Colors in the picture"
 translation = "Färger i bilden"
 
 [messages.asset-path]
@@ -2259,7 +2263,7 @@ source = "Find assets with { $hex }, { $percent }% of this picture"
 translation = "Hitta resurser med { $hex }, { $percent } % av den här bilden"
 
 [messages.asset-swatch-title]
-source = "{ $hex }, { $percent }% of the picture. Find assets with this colour"
+source = "{ $hex }, { $percent }% of the picture. Find assets with this color"
 translation = "{ $hex }, { $percent } % av bilden. Hitta resurser med den här färgen"
 
 [messages.asset-tag-add]
@@ -2543,7 +2547,7 @@ source = "Make an OAuth client (Web application) in Google Cloud Console → API
 translation = "Skapa en OAuth-klient (webbapplikation) i Google Cloud Console → APIs & Services → Credentials. Google skickar inga grupper, så ge roller i Inställningar → Konto, och stäng av att konton skapas vid första inloggningen om inte alla med ett Google-konto ska komma in."
 
 [messages.auth-preset-microsoft-note]
-source = "Register an app in Entra ID → App registrations (a Web redirect to the address below). Put your tenant ID in place of “organizations” to let only your organisation in. For roles from groups, add the groups claim under Token configuration: it lists group IDs."
+source = "Register an app in Entra ID → App registrations (a Web redirect to the address below). Put your tenant ID in place of “organizations” to let only your organization in. For roles from groups, add the groups claim under Token configuration: it lists group IDs."
 translation = "Registrera en app i Entra ID → App registrations (en Web-omdirigering till adressen nedan). Ersätt ”organizations” med ditt klient-ID (tenant ID) för att bara släppa in din organisation. För roller från grupper lägger du till groups-claimet under Token configuration: det listar grupp-ID:n."
 
 [messages.auth-provider]
@@ -2994,8 +2998,8 @@ translation = "kan inte läsa { $path }"
 source = "can't write to { $path }"
 translation = "kan inte skriva till { $path }"
 
-[messages.error-chatgpt-cancelled]
-source = "the sign-in was cancelled"
+[messages.error-chatgpt-canceled]
+source = "the sign-in was canceled"
 translation = "inloggningen avbröts"
 
 [messages.error-chatgpt-code-used]
@@ -3178,7 +3182,7 @@ translation = "Katalogen kunde inte kontrollera ditt lösenord: { $reason }"
 source = "empty file"
 translation = "tom fil"
 
-[messages.error-favourites-too-many]
+[messages.error-favorites-too-many]
 source = "at most 10,000 at a time"
 translation = "högst 10 000 åt gången"
 
@@ -3887,7 +3891,7 @@ source = "that picture is too big for a thumbnail"
 translation = "bilden är för stor för en miniatyrbild"
 
 [messages.error-token-account-gone]
-source = "this token's account is gone, so it has no favourites or searches"
+source = "this token's account is gone, so it has no favorites or searches"
 translation = "kontot för den här token finns inte längre, så den har inga favoriter eller sökningar"
 
 [messages.error-token-name]
@@ -4157,7 +4161,7 @@ source = "It finds no title in this file. Pick the title."
 translation = "Det hittar ingen titel i den här filen. Välj titeln."
 
 [messages.formatwizard-miss-not-the-stores]
-source = "What it recognises the store’s files by isn’t in this file. Change Recognise by."
+source = "What it recognizes the store’s files by isn’t in this file. Change Recognize by."
 translation = "Det som butikens filer känns igen på finns inte i den här filen. Ändra Känn igen på."
 
 [messages.formatwizard-miss-short-name]
@@ -4232,19 +4236,19 @@ translation = "Titel"
 source = "Store page"
 translation = "Butikssida"
 
-[messages.formatwizard-recognise]
-source = "Recognise by"
+[messages.formatwizard-recognize]
+source = "Recognize by"
 translation = "Känn igen på"
 
-[messages.formatwizard-recognise-hint]
+[messages.formatwizard-recognize-hint]
 source = "One way a line; any of them will do. Needed when other files have the same name."
 translation = "Ett sätt per rad; vilket som helst av dem räcker. Behövs när andra filer har samma namn."
 
-[messages.formatwizard-recognise-json]
+[messages.formatwizard-recognize-json]
 source = "A key only the store’s files have"
 translation = "En nyckel som bara butikens filer har"
 
-[messages.formatwizard-recognise-text]
+[messages.formatwizard-recognize-text]
 source = "A line only the store’s files have"
 translation = "En rad som bara butikens filer har"
 
@@ -4744,12 +4748,12 @@ translation = "rutig bakgrund"
 source = "Checker background (K cycles)"
 translation = "Rutig bakgrund (K växlar)"
 
-[messages.image-bg-grey]
-source = "grey background"
+[messages.image-bg-gray]
+source = "gray background"
 translation = "grå bakgrund"
 
-[messages.image-bg-grey-title]
-source = "Grey background (K cycles)"
+[messages.image-bg-gray-title]
+source = "Gray background (K cycles)"
 translation = "Grå bakgrund (K växlar)"
 
 [messages.image-bg-white]
@@ -5625,11 +5629,11 @@ source = "ambient occlusion"
 translation = "ambient occlusion"
 
 [messages.material-role-base-color]
-source = "Colour"
+source = "Color"
 translation = "Färg"
 
 [messages.material-role-base-color-name]
-source = "colour"
+source = "color"
 translation = "färg"
 
 [messages.material-role-bump]
@@ -5796,8 +5800,8 @@ translation = "Mörk bakgrund"
 source = "Environment background"
 translation = "Miljöbakgrund"
 
-[messages.model-bg-grey]
-source = "Grey background"
+[messages.model-bg-gray]
+source = "Gray background"
 translation = "Grå bakgrund"
 
 [messages.model-bg-light]
@@ -5912,8 +5916,8 @@ translation = "Längd"
 source = "Materials"
 translation = "Material"
 
-[messages.model-info-metres]
-source = "glTF is in metres"
+[messages.model-info-meters]
+source = "glTF is in meters"
 translation = "glTF anges i meter"
 
 [messages.model-info-no-units]
@@ -6634,8 +6638,8 @@ translation = "När du sparar hämtas beskrivningen från butikssidan."
 source = "Paste the listing text, or leave empty to fetch it from the store page."
 translation = "Klistra in annonstexten, eller lämna tomt för att hämta den från butikssidan."
 
-[messages.packs-thumbs-cancelled]
-source = "Cancelled after { $done } of { $total }"
+[messages.packs-thumbs-canceled]
+source = "Canceled after { $done } of { $total }"
 translation = "Avbröts efter { $done } av { $total }"
 
 [messages.packs-thumbs-drawing]
@@ -6897,11 +6901,11 @@ translation = "Rensa markeringen"
 source = "Dark theme: { $name }"
 translation = "Mörkt tema: { $name }"
 
-[messages.palette-favourites]
-source = "Favourites"
+[messages.palette-favorites]
+source = "Favorites"
 translation = "Favoriter"
 
-[messages.palette-favourites-keywords]
+[messages.palette-favorites-keywords]
 source = "starred stars liked"
 translation = "stjärnmärkta stjärnor gillade starred stars liked"
 
@@ -7089,12 +7093,12 @@ translation = "utseende färg appearance color"
 source = "Command palette"
 translation = "Kommandopalett"
 
-[messages.projects-favourite-add-failed]
-source = "Couldn't add to your favourites: { $error }"
+[messages.projects-favorite-add-failed]
+source = "Couldn't add to your favorites: { $error }"
 translation = "Kunde inte lägga till i dina favoriter: { $error }"
 
-[messages.projects-favourite-remove-failed]
-source = "Couldn't take out of your favourites: { $error }"
+[messages.projects-favorite-remove-failed]
+source = "Couldn't take out of your favorites: { $error }"
 translation = "Kunde inte ta bort från dina favoriter: { $error }"
 
 [messages.projects-forget-search-failed]
@@ -7366,7 +7370,7 @@ source = "Tagging { $pack } with AI"
 translation = "Taggar { $pack } med AI"
 
 [messages.server-job-looks]
-source = "Working out colours and looks"
+source = "Working out colors and looks"
 translation = "Räknar ut färger och utseende"
 
 [messages.server-job-materials]
@@ -7454,7 +7458,7 @@ source = "ambient occlusion"
 translation = "ambient occlusion"
 
 [messages.server-role-base-color]
-source = "colour"
+source = "color"
 translation = "färg"
 
 [messages.server-role-bump]
@@ -7873,7 +7877,7 @@ source = "Couldn’t get the model: { $detail }. Trying again every hour."
 translation = "Kunde inte hämta modellen: { $detail }. Försöker igen varje timme."
 
 [messages.settings-clip-what]
-source = "Type what you’re after (“mossy rock”, “sci-fi door”, “wooden barrel”) and pictures that show it turn up beside names that have the words. “More like this” finds things of the same kind, not only the same colours."
+source = "Type what you’re after (“mossy rock”, “sci-fi door”, “wooden barrel”) and pictures that show it turn up beside names that have the words. “More like this” finds things of the same kind, not only the same colors."
 translation = "Skriv vad du letar efter (”mossy rock”, ”sci-fi door”, ”wooden barrel”) så dyker bilder som visar det upp bredvid namn som innehåller orden. ”Fler som den här” hittar saker av samma slag, inte bara med samma färger."
 
 [messages.settings-conversion-cache]
@@ -8229,7 +8233,7 @@ source = "Image search"
 translation = "Bildsökning"
 
 [messages.settings-page-search-blurb]
-source = "Search pictures by what they show, not only by their names, and find things that are alike in kind, not only in colour."
+source = "Search pictures by what they show, not only by their names, and find things that are alike in kind, not only in color."
 translation = "Sök bilder efter vad de visar, inte bara efter namn, och hitta saker som liknar varandra till sin art, inte bara till färgen."
 
 [messages.settings-page-store-files]
@@ -8632,8 +8636,8 @@ translation = "Stäng"
 source = "Close, clear the selection, or close the details"
 translation = "Stäng, rensa markeringen eller stäng detaljerna"
 
-[messages.shortcuts-favourite]
-source = "Add to or take out of your favourites"
+[messages.shortcuts-favorite]
+source = "Add to or take out of your favorites"
 translation = "Lägg till i eller ta bort från dina favoriter"
 
 [messages.shortcuts-fit]
@@ -9036,15 +9040,15 @@ source = "Edit"
 translation = "Redigera"
 
 [messages.storefiles-field-colors]
-source = "Colours"
+source = "Colors"
 translation = "Färger"
 
 [messages.storefiles-field-colors-hint]
-source = "Its colours, as color: tags."
+source = "Its colors, as color: tags."
 translation = "Dess färger, som color:-taggar."
 
 [messages.storefiles-field-colors-name]
-source = "colours"
+source = "colors"
 translation = "färgerna"
 
 [messages.storefiles-field-id]
@@ -9636,7 +9640,7 @@ source = "Warm charcoal, amber"
 translation = "Varm kolgrå, bärnsten"
 
 [messages.theme-dark-graphite-blurb]
-source = "Neutral grey, no tint"
+source = "Neutral gray, no tint"
 translation = "Neutral grå, ingen ton"
 
 [messages.theme-dark-moss-blurb]
@@ -9652,7 +9656,7 @@ source = "Wine-black, coral"
 translation = "Vinsvart, korall"
 
 [messages.theme-dark-slate-blurb]
-source = "Blue-grey"
+source = "Blue-gray"
 translation = "Blågrå"
 
 [messages.theme-ember]
@@ -9676,7 +9680,7 @@ source = "Warm cream, amber"
 translation = "Varm gräddvit, bärnsten"
 
 [messages.theme-light-paper-blurb]
-source = "Plain neutral grey"
+source = "Plain neutral gray"
 translation = "Enkel neutral grå"
 
 [messages.theme-light-sage-blurb]
@@ -9684,7 +9688,7 @@ source = "Soft green"
 translation = "Mjuk grön"
 
 [messages.theme-light-slate-blurb]
-source = "Cool blue-grey"
+source = "Cool blue-gray"
 translation = "Sval blågrå"
 
 [messages.theme-lilac]
@@ -9719,16 +9723,16 @@ translation = "Salvia"
 source = "Slate"
 translation = "Skiffer"
 
-[messages.tile-add-favourite]
-source = "Add to your favourites (F)"
+[messages.tile-add-favorite]
+source = "Add to your favorites (F)"
 translation = "Lägg till i dina favoriter (F)"
 
-[messages.tile-favourite]
-source = "Favourite { $name }"
+[messages.tile-favorite]
+source = "Favorite { $name }"
 translation = "Favoritmarkera { $name }"
 
-[messages.tile-in-favourites]
-source = "In your favourites"
+[messages.tile-in-favorites]
+source = "In your favorites"
 translation = "Bland dina favoriter"
 
 [messages.tile-label]

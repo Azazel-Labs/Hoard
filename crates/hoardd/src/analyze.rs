@@ -171,7 +171,7 @@ pub(crate) fn gltf_thumb(path: &Path) -> anyhow::Result<Option<Vec<u8>>> {
     thumb_bytes(drawn, false).map(Some)
 }
 
-/// A thumbnail of a glTF/GLB model wearing `color` (a texture's thumbnail) as its colour map, or its own maps when
+/// A thumbnail of a glTF/GLB model wearing `color` (a texture's thumbnail) as its color map, or its own maps when
 /// it has some; `None` when no renderer is running.
 pub(crate) fn gltf_thumb_dressed(path: &Path, color: &[u8]) -> anyhow::Result<Option<Vec<u8>>> {
     let Some(r) = renderer() else { return Ok(None) };
@@ -471,22 +471,22 @@ fn render_mesh(mesh: &crate::meshes::Mesh, path: &Path, ext: &str, a: &mut Analy
     Ok(())
 }
 
-/// GPU containers, SVG and Aseprite: decoded by `textures`, then analyzed like any image.
+/// GPU containers, vector art and Aseprite: decoded by `textures`, then analyzed like any image.
 fn analyze_decoded(path: &Path, ext: &str, a: &mut Analysis) -> anyhow::Result<()> {
     let d = crate::textures::decode(path, ext)?;
     let vector = d.facts.contains_key("vector");
-    let (w, h) = match (d.facts.get("svg_width"), d.facts.get("svg_height")) {
+    let (w, h) = match (d.facts.get("vector_width"), d.facts.get("vector_height")) {
         (Some(w), Some(h)) => (w.clone(), h.clone()),
         _ => (json!(d.image.width()), json!(d.image.height())),
     };
     a.meta.insert("width".into(), w);
     a.meta.insert("height".into(), h);
     for (k, v) in d.facts {
-        if !k.starts_with("svg_") {
+        if !k.starts_with("vector_") {
             a.meta.insert(k, v);
         }
     }
-    if !vector && crate::previews::wants_lite(ext, d.image.width(), d.image.height()) {
+    if crate::previews::wants_lite(ext, d.image.width(), d.image.height()) {
         a.lite = crate::previews::lite_bytes(&d.image).ok();
     }
     let img = if is_float(&d.image) {
@@ -525,7 +525,7 @@ pub(crate) fn tonemap(img: &DynamicImage) -> DynamicImage {
 /// an embedded preview), so pixel-art and tiling tests are meaningful.
 fn analyze_pixels(img: &DynamicImage, a: &mut Analysis, full: bool) -> anyhow::Result<()> {
     let (w, h) = img.dimensions();
-    // Pixel art: small and few distinct colors. Upscale its thumbnail with nearest-neighbour so it stays crisp.
+    // Pixel art: small and few distinct colors. Upscale its thumbnail with nearest-neighbor so it stays crisp.
     let pixel_art = full && w.max(h) <= 512 && distinct_colors(img, 64).is_some_and(|n| n <= 48);
     let thumb = if pixel_art && w.max(h) < THUMB_SIZE {
         let scale = (THUMB_SIZE / w.max(h)).max(1);

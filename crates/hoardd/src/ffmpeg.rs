@@ -218,15 +218,14 @@ async fn download(generation: u64, tools_dir: &Path) -> Result<PathBuf> {
     download_from(&src, tools_dir, &|| !SLOT.current(generation)).await
 }
 
-async fn download_from(src: &Source, tools_dir: &Path, cancelled: &(dyn Fn() -> bool + Sync)) -> Result<PathBuf> {
+async fn download_from(src: &Source, tools_dir: &Path, canceled: &(dyn Fn() -> bool + Sync)) -> Result<PathBuf> {
     let http = tools::client()?;
     tokio::fs::create_dir_all(tools_dir).await?;
     tracing::info!(url = %src.url, "downloading ffmpeg");
     let zip_path = tools_dir.join(format!("ffmpeg-download-{}.zip", std::process::id()));
     let activity = crate::activity::start("ffmpeg", "Downloading ffmpeg for audio conversions", None);
-    let fetched = tools::fetch(&http, &src.url, &zip_path, MAX_DOWNLOAD, &activity, cancelled)
-        .await
-        .context("ffmpeg download")?;
+    let fetched =
+        tools::fetch(&http, &src.url, &zip_path, MAX_DOWNLOAD, &activity, canceled).await.context("ffmpeg download")?;
     activity.detail("checking and unpacking");
     let finish = async {
         let final_url = &fetched.final_url;

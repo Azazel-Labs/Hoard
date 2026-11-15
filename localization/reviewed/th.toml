@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "453ff96837a704352761a5bf6af773e801a1f4018577b2f5bc3be44f27d2733f"
+source = "40994fa61278db02342a17e111610609be967f167ac0e561724a1ecc0fd4792e"
 translation = "a5124539186f3504db97de01588f221c92e88a2330b0ab03677434b7d099a580"
 
 [messages.account-add]
@@ -684,6 +684,14 @@ translation = "นำ { $count } รายการออกจาก { $name } 
 source = "Collections"
 translation = "คอลเลกชัน"
 
+[messages.app-color]
+source = "Color"
+translation = "สี"
+
+[messages.app-color-any]
+source = "Any color"
+translation = "สีใดก็ได้"
+
 [messages.app-color-black]
 source = "Black"
 translation = "ดำ"
@@ -696,17 +704,21 @@ translation = "น้ำเงิน"
 source = "Brown"
 translation = "น้ำตาล"
 
+[messages.app-color-gray]
+source = "Gray"
+translation = "เทา"
+
 [messages.app-color-green]
 source = "Green"
 translation = "เขียว"
 
-[messages.app-color-grey]
-source = "Grey"
-translation = "เทา"
-
 [messages.app-color-orange]
 source = "Orange"
 translation = "ส้ม"
+
+[messages.app-color-pick]
+source = "Pick any color"
+translation = "เลือกสีใดก็ได้"
 
 [messages.app-color-pink]
 source = "Pink"
@@ -728,6 +740,10 @@ translation = "ทราย"
 source = "Slate"
 translation = "เทาอมฟ้า"
 
+[messages.app-color-swatch]
+source = "{ $color }: assets with much { $lower } in them"
+translation = "{ $color }: แอสเซ็ตที่มีสี{ $lower }อยู่มาก"
+
 [messages.app-color-teal]
 source = "Teal"
 translation = "เขียวอมฟ้า"
@@ -739,22 +755,6 @@ translation = "ขาว"
 [messages.app-color-yellow]
 source = "Yellow"
 translation = "เหลือง"
-
-[messages.app-colour]
-source = "Colour"
-translation = "สี"
-
-[messages.app-colour-any]
-source = "Any colour"
-translation = "สีใดก็ได้"
-
-[messages.app-colour-pick]
-source = "Pick any colour"
-translation = "เลือกสีใดก็ได้"
-
-[messages.app-colour-swatch]
-source = "{ $color }: assets with much { $lower } in them"
-translation = "{ $color }: แอสเซ็ตที่มีสี{ $lower }อยู่มาก"
 
 [messages.app-credits]
 source = "Credits"
@@ -796,12 +796,12 @@ translation = "น้อยลง"
 source = "{ $count } more"
 translation = "อีก { $count } รายการ"
 
-[messages.app-favourite]
-source = "Favourite"
+[messages.app-favorite]
+source = "Favorite"
 translation = "เพิ่มในรายการโปรด"
 
-[messages.app-favourites]
-source = "Favourites"
+[messages.app-favorites]
+source = "Favorites"
 translation = "รายการโปรด"
 
 [messages.app-filters]
@@ -1056,8 +1056,8 @@ translation = "โปรเจกต์ที่ใช้ hoard sync จาก�
 source = "Most alike"
 translation = "คล้ายที่สุด"
 
-[messages.app-rank-colour]
-source = "Most of the colour"
+[messages.app-rank-color]
+source = "Most of the color"
 translation = "มีสีนี้มากที่สุด"
 
 [messages.app-rank-match]
@@ -1084,8 +1084,8 @@ translation = "ลองใหม่"
 source = "Save"
 translation = "บันทึก"
 
-[messages.app-save-name-favourites]
-source = "favourites"
+[messages.app-save-name-favorites]
+source = "favorites"
 translation = "รายการโปรด"
 
 [messages.app-save-name-label]
@@ -1248,8 +1248,8 @@ translation = "ขนาดไทล์"
 source = "Undo"
 translation = "เลิกทำ"
 
-[messages.app-unfavourite]
-source = "Unfavourite"
+[messages.app-unfavorite]
+source = "Unfavorite"
 translation = "นำออกจากรายการโปรด"
 
 [messages.app-unnamed-asset]
@@ -1667,16 +1667,16 @@ translation = "เฉพาะไฟล์นี้"
 source = "Just this file, without the files it uses"
 translation = "เฉพาะไฟล์นี้ โดยไม่รวมไฟล์ที่ไฟล์นี้ใช้"
 
-[messages.asset-favourite]
-source = "Favourite"
+[messages.asset-favorite]
+source = "Favorite"
 translation = "รายการโปรด"
 
-[messages.asset-favourite-off-title]
-source = "Add to your favourites (F)"
+[messages.asset-favorite-off-title]
+source = "Add to your favorites (F)"
 translation = "เพิ่มในรายการโปรด (F)"
 
-[messages.asset-favourite-on-title]
-source = "In your favourites (F takes it out)"
+[messages.asset-favorite-on-title]
+source = "In your favorites (F takes it out)"
 translation = "อยู่ในรายการโปรดของคุณ (กด F เพื่อนำออก)"
 
 [messages.asset-file]
@@ -1849,6 +1849,10 @@ translation = "ผ่านการ cook (บิลด์เกม): ตัว�
 [messages.asset-meta-cue-markers]
 source = "Cue markers"
 translation = "เครื่องหมายคิว"
+
+[messages.asset-meta-everything-with]
+source = "Show everything tagged { $tag }"
+translation = "แสดงทุกอย่างที่มีแท็ก { $tag }"
 
 [messages.asset-meta-format]
 source = "Format"
@@ -2078,7 +2082,7 @@ source = "Hoard read it out of the package on { $date } ({ $notes })."
 translation = "Hoard อ่านออกมาจากแพ็กเกจเมื่อ { $date } ({ $notes })"
 
 [messages.asset-palette]
-source = "Colours in the picture"
+source = "Colors in the picture"
 translation = "สีในภาพ"
 
 [messages.asset-path]
@@ -2186,7 +2190,7 @@ source = "Find assets with { $hex }, { $percent }% of this picture"
 translation = "ค้นหาแอสเซ็ตที่มี { $hex } คิดเป็น { $percent }% ของภาพนี้"
 
 [messages.asset-swatch-title]
-source = "{ $hex }, { $percent }% of the picture. Find assets with this colour"
+source = "{ $hex }, { $percent }% of the picture. Find assets with this color"
 translation = "{ $hex } คิดเป็น { $percent }% ของภาพ ค้นหาแอสเซ็ตที่มีสีนี้"
 
 [messages.asset-tag-add]
@@ -2466,7 +2470,7 @@ source = "Make an OAuth client (Web application) in Google Cloud Console → API
 translation = "สร้าง OAuth client (Web application) ใน Google Cloud Console → APIs & Services → Credentials Google ไม่ส่งกลุ่มมา จึงต้องกำหนดบทบาทที่ การตั้งค่า → บัญชี และปิดการสร้างบัญชีเมื่อลงชื่อเข้าใช้ครั้งแรก เว้นแต่ทุกคนที่มีบัญชี Google ควรเข้าได้"
 
 [messages.auth-preset-microsoft-note]
-source = "Register an app in Entra ID → App registrations (a Web redirect to the address below). Put your tenant ID in place of “organizations” to let only your organisation in. For roles from groups, add the groups claim under Token configuration: it lists group IDs."
+source = "Register an app in Entra ID → App registrations (a Web redirect to the address below). Put your tenant ID in place of “organizations” to let only your organization in. For roles from groups, add the groups claim under Token configuration: it lists group IDs."
 translation = "ลงทะเบียนแอปใน Entra ID → App registrations (ตั้ง redirect แบบ Web ไปยังที่อยู่ด้านล่าง) ใส่ tenant ID ของคุณแทน “organizations” เพื่อให้เฉพาะองค์กรของคุณเข้าได้ หากต้องการบทบาทจากกลุ่ม ให้เพิ่ม groups claim ใน Token configuration: ซึ่งจะระบุ ID ของกลุ่ม"
 
 [messages.auth-provider]
@@ -2913,8 +2917,8 @@ translation = "อ่าน { $path } ไม่ได้"
 source = "can't write to { $path }"
 translation = "เขียนลง { $path } ไม่ได้"
 
-[messages.error-chatgpt-cancelled]
-source = "the sign-in was cancelled"
+[messages.error-chatgpt-canceled]
+source = "the sign-in was canceled"
 translation = "การลงชื่อเข้าใช้ถูกยกเลิก"
 
 [messages.error-chatgpt-code-used]
@@ -3097,7 +3101,7 @@ translation = "ไดเรกทอรีตรวจสอบรหัสผ�
 source = "empty file"
 translation = "ไฟล์ว่างเปล่า"
 
-[messages.error-favourites-too-many]
+[messages.error-favorites-too-many]
 source = "at most 10,000 at a time"
 translation = "ครั้งละไม่เกิน 10,000 รายการ"
 
@@ -3806,7 +3810,7 @@ source = "that picture is too big for a thumbnail"
 translation = "ภาพนั้นใหญ่เกินไปสำหรับภาพย่อ"
 
 [messages.error-token-account-gone]
-source = "this token's account is gone, so it has no favourites or searches"
+source = "this token's account is gone, so it has no favorites or searches"
 translation = "บัญชีของโทเค็นนี้ไม่มีอยู่แล้ว จึงไม่มีรายการโปรดหรือการค้นหา"
 
 [messages.error-token-name]
@@ -4069,7 +4073,7 @@ source = "It finds no title in this file. Pick the title."
 translation = "ไม่พบชื่อในไฟล์นี้ เลือกชื่อ"
 
 [messages.formatwizard-miss-not-the-stores]
-source = "What it recognises the store’s files by isn’t in this file. Change Recognise by."
+source = "What it recognizes the store’s files by isn’t in this file. Change Recognize by."
 translation = "สิ่งที่ใช้จดจำไฟล์ของร้านค้าไม่อยู่ในไฟล์นี้ เปลี่ยน จดจำจาก"
 
 [messages.formatwizard-miss-short-name]
@@ -4144,19 +4148,19 @@ translation = "ชื่อ"
 source = "Store page"
 translation = "หน้าร้านค้า"
 
-[messages.formatwizard-recognise]
-source = "Recognise by"
+[messages.formatwizard-recognize]
+source = "Recognize by"
 translation = "จดจำจาก"
 
-[messages.formatwizard-recognise-hint]
+[messages.formatwizard-recognize-hint]
 source = "One way a line; any of them will do. Needed when other files have the same name."
 translation = "บรรทัดละหนึ่งวิธี ตรงกับวิธีใดก็ได้ จำเป็นเมื่อไฟล์อื่นมีชื่อเดียวกัน"
 
-[messages.formatwizard-recognise-json]
+[messages.formatwizard-recognize-json]
 source = "A key only the store’s files have"
 translation = "คีย์ที่มีเฉพาะในไฟล์ของร้านค้า"
 
-[messages.formatwizard-recognise-text]
+[messages.formatwizard-recognize-text]
 source = "A line only the store’s files have"
 translation = "บรรทัดที่มีเฉพาะในไฟล์ของร้านค้า"
 
@@ -4648,12 +4652,12 @@ translation = "พื้นหลังลายตาราง"
 source = "Checker background (K cycles)"
 translation = "พื้นหลังลายตาราง (K เพื่อสลับ)"
 
-[messages.image-bg-grey]
-source = "grey background"
+[messages.image-bg-gray]
+source = "gray background"
 translation = "พื้นหลังสีเทา"
 
-[messages.image-bg-grey-title]
-source = "Grey background (K cycles)"
+[messages.image-bg-gray-title]
+source = "Gray background (K cycles)"
 translation = "พื้นหลังสีเทา (K เพื่อสลับ)"
 
 [messages.image-bg-white]
@@ -5501,11 +5505,11 @@ source = "ambient occlusion"
 translation = "แอมเบียนต์อักคลูชัน"
 
 [messages.material-role-base-color]
-source = "Colour"
+source = "Color"
 translation = "สี"
 
 [messages.material-role-base-color-name]
-source = "colour"
+source = "color"
 translation = "สี"
 
 [messages.material-role-bump]
@@ -5672,8 +5676,8 @@ translation = "พื้นหลังมืด"
 source = "Environment background"
 translation = "พื้นหลังสภาพแวดล้อม"
 
-[messages.model-bg-grey]
-source = "Grey background"
+[messages.model-bg-gray]
+source = "Gray background"
 translation = "พื้นหลังสีเทา"
 
 [messages.model-bg-light]
@@ -5788,8 +5792,8 @@ translation = "ความยาว"
 source = "Materials"
 translation = "แมทีเรียล"
 
-[messages.model-info-metres]
-source = "glTF is in metres"
+[messages.model-info-meters]
+source = "glTF is in meters"
 translation = "glTF ใช้หน่วยเมตร"
 
 [messages.model-info-no-units]
@@ -6494,8 +6498,8 @@ translation = "การบันทึกจะดึงคำอธิบา�
 source = "Paste the listing text, or leave empty to fetch it from the store page."
 translation = "วางข้อความในหน้าสินค้า หรือเว้นว่างไว้เพื่อดึงจากหน้าร้านค้า"
 
-[messages.packs-thumbs-cancelled]
-source = "Cancelled after { $done } of { $total }"
+[messages.packs-thumbs-canceled]
+source = "Canceled after { $done } of { $total }"
 translation = "ยกเลิกหลังจากทำไป { $done } จาก { $total }"
 
 [messages.packs-thumbs-drawing]
@@ -6738,11 +6742,11 @@ translation = "ล้างการเลือก"
 source = "Dark theme: { $name }"
 translation = "ธีมมืด: { $name }"
 
-[messages.palette-favourites]
-source = "Favourites"
+[messages.palette-favorites]
+source = "Favorites"
 translation = "รายการโปรด"
 
-[messages.palette-favourites-keywords]
+[messages.palette-favorites-keywords]
 source = "starred stars liked"
 translation = "ดาว ชอบ โปรด starred stars liked"
 
@@ -6930,12 +6934,12 @@ translation = "รูปลักษณ์ สี appearance color"
 source = "Command palette"
 translation = "แผงคำสั่ง"
 
-[messages.projects-favourite-add-failed]
-source = "Couldn't add to your favourites: { $error }"
+[messages.projects-favorite-add-failed]
+source = "Couldn't add to your favorites: { $error }"
 translation = "เพิ่มในรายการโปรดไม่ได้: { $error }"
 
-[messages.projects-favourite-remove-failed]
-source = "Couldn't take out of your favourites: { $error }"
+[messages.projects-favorite-remove-failed]
+source = "Couldn't take out of your favorites: { $error }"
 translation = "นำออกจากรายการโปรดไม่ได้: { $error }"
 
 [messages.projects-forget-search-failed]
@@ -7203,7 +7207,7 @@ source = "Tagging { $pack } with AI"
 translation = "กำลังติดแท็ก { $pack } ด้วย AI"
 
 [messages.server-job-looks]
-source = "Working out colours and looks"
+source = "Working out colors and looks"
 translation = "กำลังวิเคราะห์สีและลักษณะ"
 
 [messages.server-job-materials]
@@ -7291,7 +7295,7 @@ source = "ambient occlusion"
 translation = "แอมเบียนต์อักคลูชัน"
 
 [messages.server-role-base-color]
-source = "colour"
+source = "color"
 translation = "สี"
 
 [messages.server-role-bump]
@@ -7705,7 +7709,7 @@ source = "Couldn’t get the model: { $detail }. Trying again every hour."
 translation = "รับโมเดลไม่ได้: { $detail } จะลองใหม่ทุกชั่วโมง"
 
 [messages.settings-clip-what]
-source = "Type what you’re after (“mossy rock”, “sci-fi door”, “wooden barrel”) and pictures that show it turn up beside names that have the words. “More like this” finds things of the same kind, not only the same colours."
+source = "Type what you’re after (“mossy rock”, “sci-fi door”, “wooden barrel”) and pictures that show it turn up beside names that have the words. “More like this” finds things of the same kind, not only the same colors."
 translation = "พิมพ์สิ่งที่คุณต้องการ (“หินมีมอส”, “ประตูไซไฟ”, “ถังไม้”) แล้วรูปภาพที่แสดงสิ่งนั้นจะปรากฏข้างรายการที่มีคำเหล่านั้นในชื่อ “คล้ายกับรายการนี้” จะค้นหาสิ่งที่เป็นประเภทเดียวกัน ไม่ใช่แค่สีเดียวกัน"
 
 [messages.settings-conversion-cache]
@@ -8061,7 +8065,7 @@ source = "Image search"
 translation = "ค้นหาด้วยภาพ"
 
 [messages.settings-page-search-blurb]
-source = "Search pictures by what they show, not only by their names, and find things that are alike in kind, not only in colour."
+source = "Search pictures by what they show, not only by their names, and find things that are alike in kind, not only in color."
 translation = "ค้นหารูปภาพจากสิ่งที่ปรากฏในภาพ ไม่ใช่แค่จากชื่อ และค้นหาสิ่งที่เป็นประเภทเดียวกัน ไม่ใช่แค่สีคล้ายกัน"
 
 [messages.settings-page-store-files]
@@ -8464,8 +8468,8 @@ translation = "ปิด"
 source = "Close, clear the selection, or close the details"
 translation = "ปิด ล้างการเลือก หรือปิดรายละเอียด"
 
-[messages.shortcuts-favourite]
-source = "Add to or take out of your favourites"
+[messages.shortcuts-favorite]
+source = "Add to or take out of your favorites"
 translation = "เพิ่มหรือนำออกจากรายการโปรด"
 
 [messages.shortcuts-fit]
@@ -8867,15 +8871,15 @@ source = "Edit"
 translation = "แก้ไข"
 
 [messages.storefiles-field-colors]
-source = "Colours"
+source = "Colors"
 translation = "สี"
 
 [messages.storefiles-field-colors-hint]
-source = "Its colours, as color: tags."
+source = "Its colors, as color: tags."
 translation = "สีของสิ่งนี้ ในรูปแท็ก color:"
 
 [messages.storefiles-field-colors-name]
-source = "colours"
+source = "colors"
 translation = "สี"
 
 [messages.storefiles-field-id]
@@ -9451,7 +9455,7 @@ source = "Warm charcoal, amber"
 translation = "ถ่านโทนอุ่น อำพัน"
 
 [messages.theme-dark-graphite-blurb]
-source = "Neutral grey, no tint"
+source = "Neutral gray, no tint"
 translation = "เทากลาง ไม่มีโทนสี"
 
 [messages.theme-dark-moss-blurb]
@@ -9467,7 +9471,7 @@ source = "Wine-black, coral"
 translation = "แดงไวน์เกือบดำ ปะการัง"
 
 [messages.theme-dark-slate-blurb]
-source = "Blue-grey"
+source = "Blue-gray"
 translation = "เทาอมฟ้า"
 
 [messages.theme-ember]
@@ -9491,7 +9495,7 @@ source = "Warm cream, amber"
 translation = "ครีมอุ่น อำพัน"
 
 [messages.theme-light-paper-blurb]
-source = "Plain neutral grey"
+source = "Plain neutral gray"
 translation = "เทากลางเรียบ ๆ"
 
 [messages.theme-light-sage-blurb]
@@ -9499,7 +9503,7 @@ source = "Soft green"
 translation = "เขียวอ่อนนุ่ม"
 
 [messages.theme-light-slate-blurb]
-source = "Cool blue-grey"
+source = "Cool blue-gray"
 translation = "เทาอมฟ้าโทนเย็น"
 
 [messages.theme-lilac]
@@ -9534,16 +9538,16 @@ translation = "เสจ"
 source = "Slate"
 translation = "หินชนวน"
 
-[messages.tile-add-favourite]
-source = "Add to your favourites (F)"
+[messages.tile-add-favorite]
+source = "Add to your favorites (F)"
 translation = "เพิ่มในรายการโปรด (F)"
 
-[messages.tile-favourite]
-source = "Favourite { $name }"
+[messages.tile-favorite]
+source = "Favorite { $name }"
 translation = "เพิ่ม { $name } ในรายการโปรด"
 
-[messages.tile-in-favourites]
-source = "In your favourites"
+[messages.tile-in-favorites]
+source = "In your favorites"
 translation = "อยู่ในรายการโปรดของคุณ"
 
 [messages.tile-label]

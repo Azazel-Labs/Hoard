@@ -189,7 +189,7 @@ async fn run(state: &AppState, job: db::JobRow) {
         tracing::error!(error = ?e, "could not record job result");
     }
     tracing::info!(id = job.id, kind = %job.kind, ok = result.is_ok(), secs = started.elapsed().as_secs_f32(), "job finished");
-    // New or changed thumbnails get their colours and look worked out.
+    // New or changed thumbnails get their colors and look worked out.
     if result.is_ok() && matches!(job.kind.as_str(), INGEST | RETAG | CONVERT | UNREAL | SCAN | MATERIALS) {
         crate::looks::schedule(state).await;
     }

@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "453ff96837a704352761a5bf6af773e801a1f4018577b2f5bc3be44f27d2733f"
+source = "40994fa61278db02342a17e111610609be967f167ac0e561724a1ecc0fd4792e"
 translation = "5e583e90f9866c5600d61ee588f5bf97df567e20adafa0c0bb0c2e0bfa18dec4"
 
 [messages.account-add]
@@ -687,6 +687,14 @@ translation = "已从 { $name } 中移除 { $count } 个"
 source = "Collections"
 translation = "合集"
 
+[messages.app-color]
+source = "Color"
+translation = "颜色"
+
+[messages.app-color-any]
+source = "Any color"
+translation = "任意颜色"
+
 [messages.app-color-black]
 source = "Black"
 translation = "黑色"
@@ -699,17 +707,21 @@ translation = "蓝色"
 source = "Brown"
 translation = "棕色"
 
+[messages.app-color-gray]
+source = "Gray"
+translation = "灰色"
+
 [messages.app-color-green]
 source = "Green"
 translation = "绿色"
 
-[messages.app-color-grey]
-source = "Grey"
-translation = "灰色"
-
 [messages.app-color-orange]
 source = "Orange"
 translation = "橙色"
+
+[messages.app-color-pick]
+source = "Pick any color"
+translation = "选择任意颜色"
 
 [messages.app-color-pink]
 source = "Pink"
@@ -731,6 +743,10 @@ translation = "沙色"
 source = "Slate"
 translation = "石板灰"
 
+[messages.app-color-swatch]
+source = "{ $color }: assets with much { $lower } in them"
+translation = "{ $color }：含有大量{ $lower }的资源"
+
 [messages.app-color-teal]
 source = "Teal"
 translation = "青色"
@@ -742,22 +758,6 @@ translation = "白色"
 [messages.app-color-yellow]
 source = "Yellow"
 translation = "黄色"
-
-[messages.app-colour]
-source = "Colour"
-translation = "颜色"
-
-[messages.app-colour-any]
-source = "Any colour"
-translation = "任意颜色"
-
-[messages.app-colour-pick]
-source = "Pick any colour"
-translation = "选择任意颜色"
-
-[messages.app-colour-swatch]
-source = "{ $color }: assets with much { $lower } in them"
-translation = "{ $color }：含有大量{ $lower }的资源"
 
 [messages.app-credits]
 source = "Credits"
@@ -799,12 +799,12 @@ translation = "收起"
 source = "{ $count } more"
 translation = "还有 { $count } 个"
 
-[messages.app-favourite]
-source = "Favourite"
+[messages.app-favorite]
+source = "Favorite"
 translation = "收藏"
 
-[messages.app-favourites]
-source = "Favourites"
+[messages.app-favorites]
+source = "Favorites"
 translation = "收藏"
 
 [messages.app-filters]
@@ -1059,8 +1059,8 @@ translation = "从此处执行 hoard sync 的项目，以及它们上次同步�
 source = "Most alike"
 translation = "最相似"
 
-[messages.app-rank-colour]
-source = "Most of the colour"
+[messages.app-rank-color]
+source = "Most of the color"
 translation = "该颜色最多"
 
 [messages.app-rank-match]
@@ -1087,8 +1087,8 @@ translation = "重试"
 source = "Save"
 translation = "保存"
 
-[messages.app-save-name-favourites]
-source = "favourites"
+[messages.app-save-name-favorites]
+source = "favorites"
 translation = "收藏"
 
 [messages.app-save-name-label]
@@ -1251,8 +1251,8 @@ translation = "图块大小"
 source = "Undo"
 translation = "撤销"
 
-[messages.app-unfavourite]
-source = "Unfavourite"
+[messages.app-unfavorite]
+source = "Unfavorite"
 translation = "取消收藏"
 
 [messages.app-unnamed-asset]
@@ -1670,16 +1670,16 @@ translation = "仅此文件"
 source = "Just this file, without the files it uses"
 translation = "只下载此文件，不包括它使用的文件"
 
-[messages.asset-favourite]
-source = "Favourite"
+[messages.asset-favorite]
+source = "Favorite"
 translation = "收藏"
 
-[messages.asset-favourite-off-title]
-source = "Add to your favourites (F)"
+[messages.asset-favorite-off-title]
+source = "Add to your favorites (F)"
 translation = "加入收藏（F）"
 
-[messages.asset-favourite-on-title]
-source = "In your favourites (F takes it out)"
+[messages.asset-favorite-on-title]
+source = "In your favorites (F takes it out)"
 translation = "已在收藏中（按 F 移出）"
 
 [messages.asset-file]
@@ -1849,6 +1849,10 @@ translation = "已烘焙（游戏构建）：预览和源数据已被剥离"
 [messages.asset-meta-cue-markers]
 source = "Cue markers"
 translation = "提示标记"
+
+[messages.asset-meta-everything-with]
+source = "Show everything tagged { $tag }"
+translation = "显示所有带有标签 { $tag } 的内容"
 
 [messages.asset-meta-format]
 source = "Format"
@@ -2075,7 +2079,7 @@ source = "Hoard read it out of the package on { $date } ({ $notes })."
 translation = "由 Hoard 于 { $date } 从包中读出（{ $notes }）。"
 
 [messages.asset-palette]
-source = "Colours in the picture"
+source = "Colors in the picture"
 translation = "图片中的颜色"
 
 [messages.asset-path]
@@ -2183,7 +2187,7 @@ source = "Find assets with { $hex }, { $percent }% of this picture"
 translation = "查找含有 { $hex } 的资源（占此图片的 { $percent }%）"
 
 [messages.asset-swatch-title]
-source = "{ $hex }, { $percent }% of the picture. Find assets with this colour"
+source = "{ $hex }, { $percent }% of the picture. Find assets with this color"
 translation = "{ $hex }，占图片的 { $percent }%。查找含有此颜色的资源"
 
 [messages.asset-tag-add]
@@ -2463,7 +2467,7 @@ source = "Make an OAuth client (Web application) in Google Cloud Console → API
 translation = "在 Google Cloud Console → API 和服务 → 凭据 中创建一个 OAuth 客户端（Web 应用）。Google 不提供组信息，因此请在“设置 → 账户”中分配角色；除非任何拥有 Google 账户的人都应能进入，否则请关闭“首次登录时创建账户”。"
 
 [messages.auth-preset-microsoft-note]
-source = "Register an app in Entra ID → App registrations (a Web redirect to the address below). Put your tenant ID in place of “organizations” to let only your organisation in. For roles from groups, add the groups claim under Token configuration: it lists group IDs."
+source = "Register an app in Entra ID → App registrations (a Web redirect to the address below). Put your tenant ID in place of “organizations” to let only your organization in. For roles from groups, add the groups claim under Token configuration: it lists group IDs."
 translation = "在 Entra ID → 应用注册 中注册一个应用（Web 重定向地址填写下方的地址）。将“organizations”替换为你的租户 ID，即可只允许你的组织成员进入。如需按组分配角色，请在“令牌配置”中添加 groups 声明：它会列出组 ID。"
 
 [messages.auth-provider]
@@ -2913,8 +2917,8 @@ translation = "无法读取 { $path }"
 source = "can't write to { $path }"
 translation = "无法写入 { $path }"
 
-[messages.error-chatgpt-cancelled]
-source = "the sign-in was cancelled"
+[messages.error-chatgpt-canceled]
+source = "the sign-in was canceled"
 translation = "登录已取消"
 
 [messages.error-chatgpt-code-used]
@@ -3097,7 +3101,7 @@ translation = "目录服务无法验证你的密码：{ $reason }"
 source = "empty file"
 translation = "空文件"
 
-[messages.error-favourites-too-many]
+[messages.error-favorites-too-many]
 source = "at most 10,000 at a time"
 translation = "一次最多 10,000 个"
 
@@ -3806,7 +3810,7 @@ source = "that picture is too big for a thumbnail"
 translation = "该图片太大，无法用作缩略图"
 
 [messages.error-token-account-gone]
-source = "this token's account is gone, so it has no favourites or searches"
+source = "this token's account is gone, so it has no favorites or searches"
 translation = "此令牌所属的账户已不存在，因此没有收藏或已保存的搜索"
 
 [messages.error-token-name]
@@ -4074,7 +4078,7 @@ source = "It finds no title in this file. Pick the title."
 translation = "它在此文件中找不到标题。请选取标题。"
 
 [messages.formatwizard-miss-not-the-stores]
-source = "What it recognises the store’s files by isn’t in this file. Change Recognise by."
+source = "What it recognizes the store’s files by isn’t in this file. Change Recognize by."
 translation = "此文件中没有它用来识别该商店文件的内容。请修改“识别依据”。"
 
 [messages.formatwizard-miss-short-name]
@@ -4149,19 +4153,19 @@ translation = "标题"
 source = "Store page"
 translation = "商店页面"
 
-[messages.formatwizard-recognise]
-source = "Recognise by"
+[messages.formatwizard-recognize]
+source = "Recognize by"
 translation = "识别依据"
 
-[messages.formatwizard-recognise-hint]
+[messages.formatwizard-recognize-hint]
 source = "One way a line; any of them will do. Needed when other files have the same name."
 translation = "每行一种方式；满足任意一种即可。当其他文件同名时需要填写。"
 
-[messages.formatwizard-recognise-json]
+[messages.formatwizard-recognize-json]
 source = "A key only the store’s files have"
 translation = "只有该商店的文件才有的键"
 
-[messages.formatwizard-recognise-text]
+[messages.formatwizard-recognize-text]
 source = "A line only the store’s files have"
 translation = "只有该商店的文件才有的一行"
 
@@ -4659,12 +4663,12 @@ translation = "棋盘格背景"
 source = "Checker background (K cycles)"
 translation = "棋盘格背景（按 K 切换）"
 
-[messages.image-bg-grey]
-source = "grey background"
+[messages.image-bg-gray]
+source = "gray background"
 translation = "灰色背景"
 
-[messages.image-bg-grey-title]
-source = "Grey background (K cycles)"
+[messages.image-bg-gray-title]
+source = "Gray background (K cycles)"
 translation = "灰色背景（按 K 切换）"
 
 [messages.image-bg-white]
@@ -5515,11 +5519,11 @@ source = "ambient occlusion"
 translation = "环境光遮蔽"
 
 [messages.material-role-base-color]
-source = "Colour"
+source = "Color"
 translation = "颜色"
 
 [messages.material-role-base-color-name]
-source = "colour"
+source = "color"
 translation = "颜色"
 
 [messages.material-role-bump]
@@ -5686,8 +5690,8 @@ translation = "深色背景"
 source = "Environment background"
 translation = "环境背景"
 
-[messages.model-bg-grey]
-source = "Grey background"
+[messages.model-bg-gray]
+source = "Gray background"
 translation = "灰色背景"
 
 [messages.model-bg-light]
@@ -5802,8 +5806,8 @@ translation = "长度"
 source = "Materials"
 translation = "材质"
 
-[messages.model-info-metres]
-source = "glTF is in metres"
+[messages.model-info-meters]
+source = "glTF is in meters"
 translation = "glTF 以米为单位"
 
 [messages.model-info-no-units]
@@ -6505,8 +6509,8 @@ translation = "保存时会从商店页面获取描述。"
 source = "Paste the listing text, or leave empty to fetch it from the store page."
 translation = "粘贴商品页面的文字，或留空以从商店页面获取。"
 
-[messages.packs-thumbs-cancelled]
-source = "Cancelled after { $done } of { $total }"
+[messages.packs-thumbs-canceled]
+source = "Canceled after { $done } of { $total }"
 translation = "在完成 { $done } / { $total } 后取消"
 
 [messages.packs-thumbs-drawing]
@@ -6749,11 +6753,11 @@ translation = "清除选择"
 source = "Dark theme: { $name }"
 translation = "深色主题：{ $name }"
 
-[messages.palette-favourites]
-source = "Favourites"
+[messages.palette-favorites]
+source = "Favorites"
 translation = "收藏"
 
-[messages.palette-favourites-keywords]
+[messages.palette-favorites-keywords]
 source = "starred stars liked"
 translation = "星标 收藏夹 喜欢 starred stars liked"
 
@@ -6941,12 +6945,12 @@ translation = "外观 颜色 appearance color"
 source = "Command palette"
 translation = "命令面板"
 
-[messages.projects-favourite-add-failed]
-source = "Couldn't add to your favourites: { $error }"
+[messages.projects-favorite-add-failed]
+source = "Couldn't add to your favorites: { $error }"
 translation = "无法加入收藏：{ $error }"
 
-[messages.projects-favourite-remove-failed]
-source = "Couldn't take out of your favourites: { $error }"
+[messages.projects-favorite-remove-failed]
+source = "Couldn't take out of your favorites: { $error }"
 translation = "无法移出收藏：{ $error }"
 
 [messages.projects-forget-search-failed]
@@ -7214,7 +7218,7 @@ source = "Tagging { $pack } with AI"
 translation = "正在用 AI 为 { $pack } 打标签"
 
 [messages.server-job-looks]
-source = "Working out colours and looks"
+source = "Working out colors and looks"
 translation = "正在分析颜色和外观"
 
 [messages.server-job-materials]
@@ -7302,7 +7306,7 @@ source = "ambient occlusion"
 translation = "环境光遮蔽"
 
 [messages.server-role-base-color]
-source = "colour"
+source = "color"
 translation = "颜色"
 
 [messages.server-role-bump]
@@ -7716,7 +7720,7 @@ source = "Couldn’t get the model: { $detail }. Trying again every hour."
 translation = "无法获取模型：{ $detail }。每小时重试一次。"
 
 [messages.settings-clip-what]
-source = "Type what you’re after (“mossy rock”, “sci-fi door”, “wooden barrel”) and pictures that show it turn up beside names that have the words. “More like this” finds things of the same kind, not only the same colours."
+source = "Type what you’re after (“mossy rock”, “sci-fi door”, “wooden barrel”) and pictures that show it turn up beside names that have the words. “More like this” finds things of the same kind, not only the same colors."
 translation = "输入你要找的内容（“mossy rock”“sci-fi door”“wooden barrel”），显示这些内容的图片会与名称含有这些词的结果一起出现。“更多类似内容”会查找同类的东西，而不仅是颜色相同的。"
 
 [messages.settings-conversion-cache]
@@ -8072,7 +8076,7 @@ source = "Image search"
 translation = "图像搜索"
 
 [messages.settings-page-search-blurb]
-source = "Search pictures by what they show, not only by their names, and find things that are alike in kind, not only in colour."
+source = "Search pictures by what they show, not only by their names, and find things that are alike in kind, not only in color."
 translation = "按图片内容而不仅是名称搜索图片，并查找类型相似而不仅是颜色相似的内容。"
 
 [messages.settings-page-store-files]
@@ -8475,8 +8479,8 @@ translation = "关闭"
 source = "Close, clear the selection, or close the details"
 translation = "关闭、清除选择或关闭详情"
 
-[messages.shortcuts-favourite]
-source = "Add to or take out of your favourites"
+[messages.shortcuts-favorite]
+source = "Add to or take out of your favorites"
 translation = "加入或移出收藏"
 
 [messages.shortcuts-fit]
@@ -8878,15 +8882,15 @@ source = "Edit"
 translation = "编辑"
 
 [messages.storefiles-field-colors]
-source = "Colours"
+source = "Colors"
 translation = "颜色"
 
 [messages.storefiles-field-colors-hint]
-source = "Its colours, as color: tags."
+source = "Its colors, as color: tags."
 translation = "它的颜色，作为 color: 标签。"
 
 [messages.storefiles-field-colors-name]
-source = "colours"
+source = "colors"
 translation = "颜色"
 
 [messages.storefiles-field-id]
@@ -9462,7 +9466,7 @@ source = "Warm charcoal, amber"
 translation = "暖调炭灰，琥珀点缀"
 
 [messages.theme-dark-graphite-blurb]
-source = "Neutral grey, no tint"
+source = "Neutral gray, no tint"
 translation = "中性灰，无色调"
 
 [messages.theme-dark-moss-blurb]
@@ -9478,7 +9482,7 @@ source = "Wine-black, coral"
 translation = "酒红黑，珊瑚点缀"
 
 [messages.theme-dark-slate-blurb]
-source = "Blue-grey"
+source = "Blue-gray"
 translation = "蓝灰"
 
 [messages.theme-ember]
@@ -9502,7 +9506,7 @@ source = "Warm cream, amber"
 translation = "暖调奶油色，琥珀点缀"
 
 [messages.theme-light-paper-blurb]
-source = "Plain neutral grey"
+source = "Plain neutral gray"
 translation = "素净中性灰"
 
 [messages.theme-light-sage-blurb]
@@ -9510,7 +9514,7 @@ source = "Soft green"
 translation = "柔和绿色"
 
 [messages.theme-light-slate-blurb]
-source = "Cool blue-grey"
+source = "Cool blue-gray"
 translation = "冷调蓝灰"
 
 [messages.theme-lilac]
@@ -9545,16 +9549,16 @@ translation = "鼠尾草"
 source = "Slate"
 translation = "石板"
 
-[messages.tile-add-favourite]
-source = "Add to your favourites (F)"
+[messages.tile-add-favorite]
+source = "Add to your favorites (F)"
 translation = "加入收藏（F）"
 
-[messages.tile-favourite]
-source = "Favourite { $name }"
+[messages.tile-favorite]
+source = "Favorite { $name }"
 translation = "收藏 { $name }"
 
-[messages.tile-in-favourites]
-source = "In your favourites"
+[messages.tile-in-favorites]
+source = "In your favorites"
 translation = "已在收藏中"
 
 [messages.tile-label]

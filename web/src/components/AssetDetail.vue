@@ -12,7 +12,7 @@ import KindGlyph from './KindGlyph.vue'
 import TagChip from './TagChip.vue'
 import { copyText, daysAgo, showOk, swipeToClose } from '../ui'
 import { may, mayEdit } from '../auth'
-import { canStar, mine, toggleFavourite } from '../mine'
+import { canStar, mine, toggleFavorite } from '../mine'
 import { MAX_STORE_FILE, TEXT_EXTS } from '../storeFormats'
 import { lazy } from '../lazy'
 import { formatDate, formatNumber, t } from '../i18n'
@@ -51,7 +51,7 @@ const emit = defineEmits<{
   browseProject: [string]
   /** Find assets that look like this one. */
   similar: []
-  /** Find assets with much of this colour (hex). */
+  /** Find assets with much of this color (hex). */
   color: [string]
   /** Switch between the side panel and the full page. */
   layout: []
@@ -62,7 +62,7 @@ const palette = computed(() => props.asset.palette ?? [])
 /** A text file that may be a store's, which a signed-in user can teach Hoard to read. */
 /** May change it (a guest is asked to sign in when they try). */
 const editor = computed(() => mayEdit())
-const starred = computed(() => mine.favourites.has(props.asset.id))
+const starred = computed(() => mine.favorites.has(props.asset.id))
 const teachable = computed(
   () => may('admin') && TEXT_EXTS.includes(props.asset.ext.toLowerCase()) && props.asset.size <= MAX_STORE_FILE,
 )
@@ -312,9 +312,12 @@ const COUNT_LABEL: Record<string, () => string> = {
   skins: () => t('asset-meta-skins'),
 }
 
+/** A fact the file states that's also a tag (its artist, its genre): the value searches for everything with it. */
+const factTag = (key: string) => props.asset.tags.find((x) => x.tag.startsWith(`${key}:`))?.tag
+
 const metaRows = computed(() => {
   const m = props.asset.meta
-  const rows: [string, string][] = []
+  const rows: [string, string, string?][] = []
   const num = (k: string) => (typeof m[k] === 'number' ? (m[k] as number) : undefined)
   if (num('width') !== undefined) rows.push([t('asset-meta-size'), `${m.width} × ${m.height} px`])
   if (num('duration_secs') !== undefined) rows.push([t('asset-meta-length'), formatDuration(num('duration_secs')!)])
@@ -342,7 +345,7 @@ const metaRows = computed(() => {
   if (typeof m.library === 'string') rows.push([t('asset-meta-library'), m.library as string])
   if (Array.isArray(m.keywords) && m.keywords.length) rows.push([t('asset-meta-keywords'), (m.keywords as string[]).join(', ')])
   for (const k of ['title', 'artist', 'album', 'genre', 'generator']) {
-    if (typeof m[k] === 'string') rows.push([TEXT_FIELD_LABEL[k](), m[k] as string])
+    if (typeof m[k] === 'string') rows.push([TEXT_FIELD_LABEL[k](), m[k] as string, factTag(k)])
   }
   if (typeof m.blender_version === 'string') rows.push([t('asset-meta-saved-with'), `Blender ${m.blender_version}`])
   if (typeof m.color_mode === 'string') rows.push([t('asset-meta-color-mode'), (m.color_mode as string).toUpperCase()])
@@ -740,9 +743,9 @@ onBeforeUnmount(() => unswipe())
             :class="{ on: starred }"
             type="button"
             :aria-pressed="starred"
-            :aria-label="t('asset-favourite')"
-            :title="starred ? t('asset-favourite-on-title') : t('asset-favourite-off-title')"
-            @click="toggleFavourite(asset.id)"
+            :aria-label="t('asset-favorite')"
+            :title="starred ? t('asset-favorite-on-title') : t('asset-favorite-off-title')"
+            @click="toggleFavorite(asset.id)"
           >
             <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M8 1.9l1.8 3.7 4.1.6-3 2.9.7 4.1L8 11.3l-3.6 1.9.7-4.1-3-2.9 4.1-.6z" :fill="starred ? 'currentColor' : 'none'" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round" /></svg>
           </button>
@@ -1147,9 +1150,12 @@ onBeforeUnmount(() => unswipe())
     <section v-if="metaRows.length">
       <h3>{{ t('asset-file') }}</h3>
       <dl>
-        <template v-for="[k, v] in metaRows" :key="k">
+        <template v-for="[k, v, tag] in metaRows" :key="k">
           <dt>{{ k }}</dt>
-          <dd>{{ v }}</dd>
+          <dd v-if="tag">
+            <button type="button" class="linkish" :title="t('asset-meta-everything-with', { tag })" @click="$emit('tag', tag)">{{ v }}</button>
+          </dd>
+          <dd v-else>{{ v }}</dd>
         </template>
         <dt>{{ t('asset-bytes') }}</dt>
         <dd>{{ humanBytes(material ? mapsBytes : asset.size) }}</dd>
@@ -1163,7 +1169,10 @@ onBeforeUnmount(() => unswipe())
         <dd class="mono path">{{ asset.path }}</dd>
         <dt>BLAKE3</dt>
         <dd class="mono hash">
-          <button type="button" class="linkish" @click="copy(asset.hash, 'hash')">{{ asset.hash.slice(0, 16) }}…</button>
+          <span class="copywrap">
+            <button type="button" class="linkish" @click="copy(asset.hash, 'hash')">{{ asset.hash.slice(0, 16) }}…</button>
+            <span v-if="copied === 'hash'" class="copytip" aria-hidden="true">{{ copiedNote('hash') }}</span>
+          </span>
         </dd>
       </dl>
     </section>
@@ -1207,13 +1216,19 @@ onBeforeUnmount(() => unswipe())
         <span v-if="asError" class="aserror" role="alert">{{ asError }}</span>
       </div>
       <div class="tools">
-        <button class="btn ghost" type="button" @click="copy(tomlSnippet, 'toml')">{{ t('asset-copy-toml') }}</button>
-        <button class="btn ghost" type="button" @click="copy(asset.id, 'id')">{{ t('asset-copy-id') }}</button>
+        <span class="copywrap">
+          <button class="btn ghost" type="button" @click="copy(tomlSnippet, 'toml')">{{ t('asset-copy-toml') }}</button>
+          <span v-if="copied === 'toml'" class="copytip" aria-hidden="true">{{ copiedNote('toml') }}</span>
+        </span>
+        <span class="copywrap">
+          <button class="btn ghost" type="button" @click="copy(asset.id, 'id')">{{ t('asset-copy-id') }}</button>
+          <span v-if="copied === 'id'" class="copytip" aria-hidden="true">{{ copiedNote('id') }}</span>
+        </span>
         <button v-if="teachable" class="btn ghost" type="button" :title="t('asset-teach-title')" @click="emit('teach')">{{ t('asset-teach') }}</button>
-        <span class="copied" role="status">{{ copied ? copiedNote(copied) : '' }}</span>
         <button v-if="!asset.archived_at && editor" class="btn ghost danger archive" type="button" :title="t('asset-archive-title')" @click="emit('archive')">{{ t('asset-archive') }}</button>
       </div>
     </footer>
+    <span class="visually-hidden" role="status">{{ copied ? copiedNote(copied) : '' }}</span>
     </div>
   </aside>
 </template>
@@ -1292,7 +1307,7 @@ onBeforeUnmount(() => unswipe())
   opacity: 0; scale: 0.8; transition: opacity var(--dur-2) var(--ease-out), scale var(--dur-2) var(--ease-pop);
 }
 .zoomable:hover .zoombadge, .zoomable:focus-visible .zoombadge { opacity: 1; scale: 1; }
-/* Sounds: the waveform is the scrubber. Dim bars underneath, full-colour ones revealed up to the playhead. */
+/* Sounds: the waveform is the scrubber. Dim bars underneath, full-color ones revealed up to the playhead. */
 .preview.audio {
   display: flex; flex-direction: column; aspect-ratio: auto; place-items: stretch; gap: 0.4rem; padding: 0.75rem 0.75rem 0.5rem;
   background: var(--bg);
@@ -1413,7 +1428,20 @@ footer {
 .lthumb img { width: 100%; height: 100%; object-fit: contain; }
 .lname { font-size: var(--step--1); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .lrel { font-size: 0.75rem; color: var(--faint); }
-.copied { font-size: 0.75rem; color: var(--ok); padding-left: 0.3rem; }
+/* "Copied" pops up above the button that was pressed, over whatever is there, so nothing moves. */
+.copywrap { position: relative; display: inline-flex; }
+.copytip {
+  position: absolute; bottom: calc(100% + 6px); left: 50%; transform: translateX(-50%); z-index: 5;
+  padding: 0.2em 0.55em; border-radius: 6px; white-space: nowrap; pointer-events: none;
+  font-size: 0.75rem; color: var(--text); background: var(--panel); border: 1px solid var(--line);
+  box-shadow: 0 4px 12px rgb(0 0 0 / 0.25); animation: copytip 1.5s ease forwards;
+}
+@keyframes copytip {
+  0% { opacity: 0; transform: translate(-50%, 4px); }
+  12%, 75% { opacity: 1; transform: translate(-50%, 0); }
+  100% { opacity: 0; transform: translate(-50%, 0); }
+}
+@media (prefers-reduced-motion: reduce) { .copytip { animation: none; } }
 .familycheck { margin-top: 0.5rem; }
 .cols .tags { align-items: center; }
 .colchip { gap: 0.35em; }

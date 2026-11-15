@@ -88,7 +88,7 @@ error-chatgpt-id-token-nonce = the ID token doesn't belong to this sign-in
 # Signing in to ChatGPT: the address the browser ended up at, pasted into Settings.
 error-chatgpt-no-state = the address has no state; copy the whole address
 error-chatgpt-not-started = this sign-in wasn't started here, or it was started more than 15 minutes ago. Start it again from Settings.
-error-chatgpt-cancelled = the sign-in was cancelled
+error-chatgpt-canceled = the sign-in was canceled
 error-chatgpt-refused = ChatGPT refused the sign-in: { $reason }
 error-chatgpt-no-code = the address has no sign-in code; copy the whole address
 error-chatgpt-other-registration = ChatGPT answered for a different registration of this server; start the sign-in again
@@ -195,8 +195,8 @@ error-no-other-location = there's no other library location to move the files to
 error-full-path = give a full path
 error-pick-folder = pick a folder
 error-task-running = “{ $task }” is already running
-error-token-account-gone = this token's account is gone, so it has no favourites or searches
-error-favourites-too-many = at most 10,000 at a time
+error-token-account-gone = this token's account is gone, so it has no favorites or searches
+error-favorites-too-many = at most 10,000 at a time
 error-saved-search-name = a saved search needs a name of at most 80 characters
 error-saved-search-too-long = that search is too long to save
 # Settings → Textures. {"{"}name{"}"}, {"{"}map{"}"} and {"{"}size{"}"} are placeholders people type in the pattern: keep them as they are.
@@ -205,9 +205,9 @@ error-texture-pattern-fields = The texture name pattern can use { "{" }name{ "}"
 error-texture-name-chars = Texture names can't have < > : " / \ | ? or *
 # $role is the map type's name as given (base_color, normal…).
 error-texture-map-type = There's no map type called { $role }
-# $map is the map type in English, in lower case (colour, normal, roughness…).
+# $map is the map type in English, in lower case (color, normal, roughness…).
 # Each kind of texture map, as it reads in the middle of the two messages after these.
-server-role-base-color = colour
+server-role-base-color = color
 server-role-normal = normal
 server-role-normal-dx = normal (DirectX)
 server-role-roughness = roughness
@@ -417,7 +417,7 @@ server-job-convert = Converting { $pack } with Blender
 server-job-unreal = Converting Unreal packages in { $pack }
 server-job-scan = Scanning a watched folder
 server-job-relocate = Moving files between library locations
-server-job-looks = Working out colours and looks
+server-job-looks = Working out colors and looks
 server-job-sounds = Listening to sounds
 server-job-embed = Learning what pictures show
 server-job-materials = Finding materials in { $pack }
@@ -464,7 +464,7 @@ app-lazy-setup = setup
 app-theme-system = Match system theme
 app-theme-light = Light theme
 app-theme-dark = Dark theme
-# The colour swatches in Filters, to find assets with much of that colour.
+# The color swatches in Filters, to find assets with much of that color.
 app-color-red = Red
 app-color-orange = Orange
 app-color-yellow = Yellow
@@ -475,15 +475,15 @@ app-color-purple = Purple
 app-color-pink = Pink
 app-color-brown = Brown
 app-color-sand = Sand
-app-color-grey = Grey
+app-color-gray = Gray
 app-color-slate = Slate
 app-color-black = Black
 app-color-white = White
-# A swatch's spoken label: $color is the colour's name, $lower the same name in lowercase.
-app-colour-swatch = { $color }: assets with much { $lower } in them
-app-colour-any = Any colour
-app-colour-pick = Pick any colour
-app-colour = Colour
+# A swatch's spoken label: $color is the color's name, $lower the same name in lowercase.
+app-color-swatch = { $color }: assets with much { $lower } in them
+app-color-any = Any color
+app-color-pick = Pick any color
+app-color = Color
 app-retry = Retry
 app-undo = Undo
 app-search-failed = Search failed: { $error }
@@ -497,11 +497,11 @@ app-forget-project-label = Forget the project { $name }
 app-forget-project = Forget this project
 # Parts of the name suggested for a saved search, joined with " · ". $name is the asset the search looks like.
 app-save-name-like = like { $name }
-app-save-name-favourites = favourites
+app-save-name-favorites = favorites
 app-search-saved = Saved “{ $name }”: it's in Filters, under Yours
 # The first sort option, named after how results are ranked.
 app-rank-alike = Most alike
-app-rank-colour = Most of the colour
+app-rank-color = Most of the color
 app-rank-match = Best match
 app-sort = Sort
 app-sort-newest = Newest
@@ -588,7 +588,7 @@ app-search-placeholder = Search names, paths, tags
 app-views = Views
 app-library = Library
 app-packs = Packs
-# How many packs are being imported or analysed.
+# How many packs are being imported or analyzed.
 app-packs-working = { $count } working
 # The update button's tooltip: $version is the new release, $current the one this server runs.
 app-update-title = Hoard { $version } is out (this server runs { $current }). Pull the new image or binary and restart; the database upgrades itself.
@@ -615,9 +615,9 @@ app-split-one = Import as one pack
 app-cancel = Cancel
 app-filters = Filters
 app-done = Done
-# Filters only for you: your favourites and saved searches.
+# Filters only for you: your favorites and saved searches.
 app-yours = Yours
-app-favourites = Favourites
+app-favorites = Favorites
 app-forget-search-label = Forget the saved search { $name }
 app-forget-search = Forget this search
 app-projects-title = Projects that hoard sync from here, with what their last sync had
@@ -701,8 +701,8 @@ app-bulk-category-clear-title = Clear the category of every selected asset
 app-bulk-category-set-button = Set
 app-bulk-category-clear-button = Clear
 app-remove-from-collection = Remove from { $name }
-app-unfavourite = Unfavourite
-app-favourite = Favourite
+app-unfavorite = Unfavorite
+app-favorite = Favorite
 app-select-all = Select all { $count }
 app-archive-selected-title = Out of search until they're restored or deleted for good, from the Archive
 # Over the page while files are dragged onto it; $count is 2 or more.
@@ -728,8 +728,8 @@ palette-hint-current = current
 # the reader's language help most; English ones may be kept as well.
 palette-library = Library
 palette-library-keywords = assets grid home
-palette-favourites = Favourites
-palette-favourites-keywords = starred stars liked
+palette-favorites = Favorites
+palette-favorites-keywords = starred stars liked
 palette-packs = Packs
 palette-archive = Archive
 palette-archive-keywords = trash recycle bin deleted restore
@@ -797,7 +797,7 @@ shortcuts-move = Move between tiles (or J and K)
 shortcuts-open = Open the details
 shortcuts-play-sound = Play or stop a sound
 shortcuts-select = Select or deselect
-shortcuts-favourite = Add to or take out of your favourites
+shortcuts-favorite = Add to or take out of your favorites
 # Shown as a key after Shift: Shift-click.
 shortcuts-key-click = click
 shortcuts-select-range = Select a range
@@ -853,9 +853,9 @@ tile-label = { $name }, { $category }
 tile-label-detail = { $name }, { $category }, { $detail }
 tile-play = Play { $name }
 tile-pause = Pause { $name }
-tile-favourite = Favourite { $name }
-tile-in-favourites = In your favourites
-tile-add-favourite = Add to your favourites (F)
+tile-favorite = Favorite { $name }
+tile-in-favorites = In your favorites
+tile-add-favorite = Add to your favorites (F)
 tile-more-like = More like { $name }
 tile-more-like-this = More like this
 tile-select = Select { $name }
@@ -893,7 +893,7 @@ locations-folder-placeholder = The folder your packs are in
 locations-folder-hint-managed = Hoard creates it if it isn't there. In Docker, this is a folder you've mounted into the container.
 locations-folder-hint-watched = In Docker, mount the folder into the container first (read-only is fine), then pick it here.
 locations-name = Name
-# Example names for a new location, shown greyed out in its name field.
+# Example names for a new location, shown grayed out in its name field.
 locations-name-placeholder-managed = Library
 locations-name-placeholder-watched = My packs
 locations-files = Files that go here
@@ -1085,8 +1085,8 @@ archive-show-more = Show more ({ $count } left)
 
 ## mine.ts
 
-projects-favourite-add-failed = Couldn't add to your favourites: { $error }
-projects-favourite-remove-failed = Couldn't take out of your favourites: { $error }
+projects-favorite-add-failed = Couldn't add to your favorites: { $error }
+projects-favorite-remove-failed = Couldn't take out of your favorites: { $error }
 projects-save-search-failed = Couldn't save the search: { $error }
 # $name is a saved search's name.
 projects-forget-search-failed = Couldn't remove { $name }: { $error }
@@ -1180,13 +1180,13 @@ packs-unreal-fact-packages =
        *[other] { $left } Unreal packages
     }
 packs-unreal-fact-both = { $done } converted from Unreal, { $left } still packages
-packs-thumbs-cancelled = Cancelled after { $done } of { $total }
+packs-thumbs-canceled = Canceled after { $done } of { $total }
 packs-thumbs-drew =
     { $count ->
         [one] Drew { $count } model
        *[other] Drew { $count } models
     }
-# $lead is packs-thumbs-cancelled or packs-thumbs-drew.
+# $lead is packs-thumbs-canceled or packs-thumbs-drew.
 packs-thumbs-result =
     { $improved ->
         [one] { $lead }: { $improved } thumbnail replaced.
@@ -1418,6 +1418,8 @@ asset-meta-artist = Artist
 asset-meta-album = Album
 asset-meta-genre = Genre
 asset-meta-generator = Generator
+# The hint on a value that's also a tag (an artist, a genre); clicking it shows everything with the tag.
+asset-meta-everything-with = Show everything tagged { $tag }
 asset-meta-saved-with = Saved with
 asset-meta-color-mode = Color mode
 asset-meta-layers = Layers
@@ -1489,9 +1491,9 @@ asset-details = Asset details
 asset-in-pack = in
 asset-previous = Previous asset
 asset-next = Next asset
-asset-favourite = Favourite
-asset-favourite-on-title = In your favourites (F takes it out)
-asset-favourite-off-title = Add to your favourites (F)
+asset-favorite = Favorite
+asset-favorite-on-title = In your favorites (F takes it out)
+asset-favorite-off-title = Add to your favorites (F)
 asset-layout-panel = Show in a side panel
 asset-layout-page = Show full page
 asset-layout-page-title = Show full page: a big preview beside the details
@@ -1510,9 +1512,9 @@ asset-waveform-drawing = Drawing waveform…
 asset-waveform-skipped = No waveform for files this big
 asset-play-animation = Play as animation
 asset-show-views = Show the four-view sheet the tagger saw
-asset-palette = Colours in the picture
-# A colour swatch; $hex is the colour (#3a5f2c), $percent how much of the picture it covers.
-asset-swatch-title = { $hex }, { $percent }% of the picture. Find assets with this colour
+asset-palette = Colors in the picture
+# A color swatch; $hex is the color (#3a5f2c), $percent how much of the picture it covers.
+asset-swatch-title = { $hex }, { $percent }% of the picture. Find assets with this color
 asset-swatch-aria = Find assets with { $hex }, { $percent }% of this picture
 asset-more-like-this = More like this
 asset-desc-label = Your description
@@ -1614,11 +1616,11 @@ image-channel-title = { $channel } ({ $key })
 # The background swatches: tooltip, then name for screen readers.
 image-bg-checker-title = Checker background (K cycles)
 image-bg-black-title = Black background (K cycles)
-image-bg-grey-title = Grey background (K cycles)
+image-bg-gray-title = Gray background (K cycles)
 image-bg-white-title = White background (K cycles)
 image-bg-checker = checker background
 image-bg-black = black background
-image-bg-grey = grey background
+image-bg-gray = gray background
 image-bg-white = white background
 image-inspect-aria = Inspect { $name }
 # After the picture's size in the title bar, when a smaller preview is shown; $width and $height are pixels, $bytes the preview's size.
@@ -1809,7 +1811,7 @@ model-grid = Grid
 # The background swatches, as read out and in their tooltips.
 model-bg-checker = Checker background
 model-bg-dark = Dark background
-model-bg-grey = Grey background
+model-bg-gray = Gray background
 model-bg-light = Light background
 model-bg-env = Environment background
 # A background swatch's tooltip; $background is one of the backgrounds above. K is the key that goes to the next one.
@@ -1855,7 +1857,7 @@ model-info-materials = Materials
 model-info-textures = Textures
 model-info-triangles = Triangles
 model-info-vertices = Vertices
-model-info-metres = glTF is in metres
+model-info-meters = glTF is in meters
 model-info-no-units = This format doesn’t say what its units are
 model-info-height = Height
 model-info-length = Length
@@ -1892,7 +1894,7 @@ model-key-play = play
 ## Materials (MaterialViewer.vue, MaterialPreview.vue, materials.ts)
 
 # What each kind of texture map in a material is for.
-material-role-base-color = Colour
+material-role-base-color = Color
 material-role-normal = Normal
 material-role-normal-dx = Normal (DirectX)
 material-role-roughness = Roughness
@@ -1911,7 +1913,7 @@ material-role-emissive = Emissive
 material-role-translucency = Translucency
 # The same, as they read in the middle of a sentence, in “Show the { $map } map”, “{ $role } map”,
 # “Give { $role } maps a suffix” and the like.
-material-role-base-color-name = colour
+material-role-base-color-name = color
 material-role-normal-name = normal
 material-role-normal-dx-name = normal (DirectX)
 material-role-roughness-name = roughness
@@ -1985,14 +1987,14 @@ theme-moss = Moss
 theme-aubergine = Aubergine
 theme-oxblood = Oxblood
 # A few words on how each theme feels, under its name in Settings → Appearance.
-theme-light-slate-blurb = Cool blue-grey
-theme-light-paper-blurb = Plain neutral grey
+theme-light-slate-blurb = Cool blue-gray
+theme-light-paper-blurb = Plain neutral gray
 theme-light-linen-blurb = Warm cream, amber
 theme-light-sage-blurb = Soft green
 theme-light-lilac-blurb = Pale violet
 theme-light-blush-blurb = Dusty rose
-theme-dark-graphite-blurb = Neutral grey, no tint
-theme-dark-slate-blurb = Blue-grey
+theme-dark-graphite-blurb = Neutral gray, no tint
+theme-dark-slate-blurb = Blue-gray
 theme-dark-obsidian-blurb = Near black, for OLED
 theme-dark-ember-blurb = Warm charcoal, amber
 theme-dark-moss-blurb = Forest green-black
@@ -2025,9 +2027,9 @@ storefiles-field-words = Tags
 storefiles-field-words-hint = Words to tag it with. Comma-separated values are split.
 storefiles-field-type = Kind
 storefiles-field-type-hint = What it is, like “3D model” or “surface”. Also a tag.
-storefiles-field-colors = Colours
+storefiles-field-colors = Colors
 # “color:” is the tag prefix, kept as it is.
-storefiles-field-colors-hint = Its colours, as color: tags.
+storefiles-field-colors-hint = Its colors, as color: tags.
 storefiles-field-id = Store id
 storefiles-field-id-hint = The store’s id for it: letters, digits, _ or -.
 storefiles-field-origin = Made in
@@ -2041,7 +2043,7 @@ storefiles-field-license-name = license
 storefiles-field-url-name = store page
 storefiles-field-words-name = tags
 storefiles-field-type-name = kind
-storefiles-field-colors-name = colours
+storefiles-field-colors-name = colors
 storefiles-field-id-name = store id
 storefiles-field-origin-name = made in
 storefiles-field-size-name = size
@@ -2308,7 +2310,7 @@ settings-page-tools-blurb = Outside programs Hoard uses to convert and read file
 settings-page-ai = AI tagging
 settings-page-ai-blurb = An AI model names, describes and tags new packs, on top of the built-in rules. Its tags are marked as suggested.
 settings-page-search = Image search
-settings-page-search-blurb = Search pictures by what they show, not only by their names, and find things that are alike in kind, not only in colour.
+settings-page-search-blurb = Search pictures by what they show, not only by their names, and find things that are alike in kind, not only in color.
 settings-page-adding = Adding packs
 settings-page-adding-blurb = What Hoard does with a pack when it’s added, besides reading and tagging it.
 settings-page-downloads = Downloads
@@ -2398,7 +2400,7 @@ settings-clip-heading = Search by what pictures show
 settings-clip-reset = Image search: back to the default
 settings-clip-saved-on = Image search: on
 settings-clip-saved-off = Image search: off
-settings-clip-what = Type what you’re after (“mossy rock”, “sci-fi door”, “wooden barrel”) and pictures that show it turn up beside names that have the words. “More like this” finds things of the same kind, not only the same colours.
+settings-clip-what = Type what you’re after (“mossy rock”, “sci-fi door”, “wooden barrel”) and pictures that show it turn up beside names that have the words. “More like this” finds things of the same kind, not only the same colors.
 settings-clip-toggle = Turn on image search
 # $size is the model's download size in MB.
 settings-clip-hint = Uses OpenAI’s CLIP model, run on this server’s processor: nothing leaves it. Turning it on downloads the model ({ $size } MB) from Hugging Face, then learns every picture in the background at low priority. It takes 300 to 600 MB of memory while it works or someone searches. Turning it off deletes the model and keeps what it learned, for next time.
@@ -2712,7 +2714,7 @@ auth-test-failed = Couldn't test: { $error }
 auth-preset-custom = Other (OpenID Connect)
 auth-preset-custom-note = Keycloak, Authentik, Authelia, Okta, Zitadel and others: give the issuer and Discover fills in the addresses.
 auth-preset-google-note = Make an OAuth client (Web application) in Google Cloud Console → APIs & Services → Credentials. Google sends no groups, so give roles in Settings → Account, and turn off making accounts at first sign-in unless anyone with a Google account should get in.
-auth-preset-microsoft-note = Register an app in Entra ID → App registrations (a Web redirect to the address below). Put your tenant ID in place of “organizations” to let only your organisation in. For roles from groups, add the groups claim under Token configuration: it lists group IDs.
+auth-preset-microsoft-note = Register an app in Entra ID → App registrations (a Web redirect to the address below). Put your tenant ID in place of “organizations” to let only your organization in. For roles from groups, add the groups claim under Token configuration: it lists group IDs.
 auth-preset-github-note = Make an OAuth app in GitHub → Settings → Developer settings. GitHub sends no groups, so give roles in Settings → Account, and turn off making accounts at first sign-in unless anyone with a GitHub account should get in.
 auth-preset-gitlab-note = Make an application in GitLab → Preferences → Applications (or your instance’s admin area: change gitlab.com in the addresses).
 auth-discovered = Filled in the provider’s addresses.
@@ -3115,7 +3117,7 @@ formatwizard-back-body = Changes made in the TOML are lost: the form writes the 
 formatwizard-back-to-form = Back to the form
 # Why the format doesn't read the example file. $file is the file's name.
 formatwizard-miss-name = Its files don’t take the name { $file }. Add it to Files.
-formatwizard-miss-not-the-stores = What it recognises the store’s files by isn’t in this file. Change Recognise by.
+formatwizard-miss-not-the-stores = What it recognizes the store’s files by isn’t in this file. Change Recognize by.
 formatwizard-miss-no-title = It finds no title in this file. Pick the title.
 # The same, short, beside a library file it tried.
 formatwizard-miss-short-name = not its name
@@ -3156,10 +3158,10 @@ formatwizard-syntax-after = .
 formatwizard-store = Store
 formatwizard-store-placeholder = The store’s name, like Kenney
 formatwizard-files = Files
-formatwizard-recognise = Recognise by
-formatwizard-recognise-json = A key only the store’s files have
-formatwizard-recognise-text = A line only the store’s files have
-formatwizard-recognise-hint = One way a line; any of them will do. Needed when other files have the same name.
+formatwizard-recognize = Recognize by
+formatwizard-recognize-json = A key only the store’s files have
+formatwizard-recognize-text = A line only the store’s files have
+formatwizard-recognize-hint = One way a line; any of them will do. Needed when other files have the same name.
 formatwizard-seller = Seller
 formatwizard-seller-placeholder = When the file doesn’t say
 formatwizard-tags = Tags

@@ -67,7 +67,7 @@ test.describe('settings: tags', () => {
     await expect(page.locator('li').filter({ hasText: `set:e2eold${u} → set:e2enew${u}` })).toBeVisible()
   })
 
-  test('cancelling a merge changes nothing', async ({ page, api, seed }) => {
+  test('canceling a merge changes nothing', async ({ page, api, seed }) => {
     const u = unique()
     const id = seed.assets[`${BIG}/Img 120`]
     await addTags(api, id, [`e2ekeep${u}`])

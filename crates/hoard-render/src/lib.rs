@@ -56,7 +56,7 @@ fn vs(@location(0) p: vec3<f32>, @location(1) n: vec3<f32>, @location(2) uv: vec
     return o;
 }
 
-// Khronos PBR Neutral, the browser viewer's tone mapping: colours stay as painted, highlights roll off.
+// Khronos PBR Neutral, the browser viewer's tone mapping: colors stay as painted, highlights roll off.
 fn neutral(v: vec3<f32>) -> vec3<f32> {
     let start = 0.76;
     let x = min(v.r, min(v.g, v.b));
@@ -90,7 +90,7 @@ fn fs(i: VOut, @builtin(front_facing) front: bool) -> @location(0) vec4<f32> {
     let room = mix(0.5, 0.95, 0.5 + 0.5 * n.y);
     var rgb = neutral(base.rgb * (room + 0.6 * key));
     var a = select(1.0, base.a, m.flags.z > 0.5);
-    // Glass: light passes through, so the surface shows what's behind it, as much as its colour lets through (dark
+    // Glass: light passes through, so the surface shows what's behind it, as much as its color lets through (dark
     // glass hides more, as the browser's viewer tints what's behind by it) and less the rougher (frosted) it is.
     // What gives it away is the edge, where it reflects (Fresnel), and the key light's highlight. No refraction: at
     // thumbnail size, this reads as glass.
@@ -387,8 +387,8 @@ impl Renderer {
         Ok(sheet)
     }
 
-    /// Render a .gltf/.glb file wearing `color` as its colour map, the way the portal shows a model with a material
-    /// beside it. `None` when the model has colour maps of its own: those are what it shows.
+    /// Render a .gltf/.glb file wearing `color` as its color map, the way the portal shows a model with a material
+    /// beside it. `None` when the model has color maps of its own: those are what it shows.
     pub fn render_file_dressed(
         &self,
         path: &Path,
@@ -618,7 +618,7 @@ impl Renderer {
         readback.unmap();
 
         let img = image::RgbaImage::from_raw(RENDER_SIZE, RENDER_SIZE, pixels).context("readback size mismatch")?;
-        // Scale down while still premultiplied (so clear pixels lend no colour to the edges), then undo it.
+        // Scale down while still premultiplied (so clear pixels lend no color to the edges), then undo it.
         let mut img = image::imageops::resize(&img, size, size, image::imageops::FilterType::Triangle);
         for p in img.pixels_mut() {
             let a = u32::from(p[3]);
@@ -650,7 +650,7 @@ fn camera(draws: &[Draw], dir: Vec3) -> Option<(Globals, Vec3)> {
     let up = if dir.y.abs() > 0.95 { Vec3::NEG_Z } else { Vec3::Y };
     let right = up.cross(dir).normalize_or_zero();
     let up = dir.cross(right);
-    // Each vertex in the camera's axes, about the bounding box centre: across, up, and toward the camera.
+    // Each vertex in the camera's axes, about the bounding box center: across, up, and toward the camera.
     let local = || draws.iter().flat_map(|d| &d.vertices).map(|v| Vec3::from(v.pos) - center);
     let (mut lo, mut hi) = (Vec3::splat(f32::INFINITY), Vec3::splat(f32::NEG_INFINITY));
     for p in local() {
@@ -690,7 +690,7 @@ fn scaled(side: u32, k: f64) -> u32 {
     ((f64::from(side) * k).round() as u32).max(1)
 }
 
-/// A texture from 8-bit RGBA: colour (`srgb`) or data such as a metallic-roughness map.
+/// A texture from 8-bit RGBA: color (`srgb`) or data such as a metallic-roughness map.
 fn upload_rgba(
     device: &wgpu::Device,
     queue: &wgpu::Queue,

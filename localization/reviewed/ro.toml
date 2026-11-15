@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "453ff96837a704352761a5bf6af773e801a1f4018577b2f5bc3be44f27d2733f"
+source = "40994fa61278db02342a17e111610609be967f167ac0e561724a1ecc0fd4792e"
 translation = "07c41192b2a6ae3c09166a8e2ef568f2c0f361580c067f608d0e66c26744b910"
 
 [messages.account-add]
@@ -729,6 +729,14 @@ translation = """
 source = "Collections"
 translation = "Colecții"
 
+[messages.app-color]
+source = "Color"
+translation = "Culoare"
+
+[messages.app-color-any]
+source = "Any color"
+translation = "Orice culoare"
+
 [messages.app-color-black]
 source = "Black"
 translation = "Negru"
@@ -741,17 +749,21 @@ translation = "Albastru"
 source = "Brown"
 translation = "Maro"
 
+[messages.app-color-gray]
+source = "Gray"
+translation = "Gri"
+
 [messages.app-color-green]
 source = "Green"
 translation = "Verde"
 
-[messages.app-color-grey]
-source = "Grey"
-translation = "Gri"
-
 [messages.app-color-orange]
 source = "Orange"
 translation = "Portocaliu"
+
+[messages.app-color-pick]
+source = "Pick any color"
+translation = "Alegeți orice culoare"
 
 [messages.app-color-pink]
 source = "Pink"
@@ -773,6 +785,10 @@ translation = "Nisipiu"
 source = "Slate"
 translation = "Ardezie"
 
+[messages.app-color-swatch]
+source = "{ $color }: assets with much { $lower } in them"
+translation = "{ $color }: resurse cu mult { $lower }"
+
 [messages.app-color-teal]
 source = "Teal"
 translation = "Turcoaz"
@@ -784,22 +800,6 @@ translation = "Alb"
 [messages.app-color-yellow]
 source = "Yellow"
 translation = "Galben"
-
-[messages.app-colour]
-source = "Colour"
-translation = "Culoare"
-
-[messages.app-colour-any]
-source = "Any colour"
-translation = "Orice culoare"
-
-[messages.app-colour-pick]
-source = "Pick any colour"
-translation = "Alegeți orice culoare"
-
-[messages.app-colour-swatch]
-source = "{ $color }: assets with much { $lower } in them"
-translation = "{ $color }: resurse cu mult { $lower }"
 
 [messages.app-credits]
 source = "Credits"
@@ -846,12 +846,12 @@ translation = "mai puține"
 source = "{ $count } more"
 translation = "încă { $count }"
 
-[messages.app-favourite]
-source = "Favourite"
+[messages.app-favorite]
+source = "Favorite"
 translation = "Adăugați la favorite"
 
-[messages.app-favourites]
-source = "Favourites"
+[messages.app-favorites]
+source = "Favorites"
 translation = "Favorite"
 
 [messages.app-filters]
@@ -1111,8 +1111,8 @@ translation = "Proiectele care rulează hoard sync de aici, cu ce avea ultima lo
 source = "Most alike"
 translation = "Cele mai asemănătoare"
 
-[messages.app-rank-colour]
-source = "Most of the colour"
+[messages.app-rank-color]
+source = "Most of the color"
 translation = "Cel mai mult din culoare"
 
 [messages.app-rank-match]
@@ -1139,8 +1139,8 @@ translation = "Reîncercați"
 source = "Save"
 translation = "Salvați"
 
-[messages.app-save-name-favourites]
-source = "favourites"
+[messages.app-save-name-favorites]
+source = "favorites"
 translation = "favorite"
 
 [messages.app-save-name-label]
@@ -1313,8 +1313,8 @@ translation = "Mărimea dalelor"
 source = "Undo"
 translation = "Anulați"
 
-[messages.app-unfavourite]
-source = "Unfavourite"
+[messages.app-unfavorite]
+source = "Unfavorite"
 translation = "Scoateți din favorite"
 
 [messages.app-unnamed-asset]
@@ -1781,16 +1781,16 @@ translation = "Doar acest fișier"
 source = "Just this file, without the files it uses"
 translation = "Doar acest fișier, fără fișierele pe care le folosește"
 
-[messages.asset-favourite]
-source = "Favourite"
+[messages.asset-favorite]
+source = "Favorite"
 translation = "Favorit"
 
-[messages.asset-favourite-off-title]
-source = "Add to your favourites (F)"
+[messages.asset-favorite-off-title]
+source = "Add to your favorites (F)"
 translation = "Adăugați la favorite (F)"
 
-[messages.asset-favourite-on-title]
-source = "In your favourites (F takes it out)"
+[messages.asset-favorite-on-title]
+source = "In your favorites (F takes it out)"
 translation = "În favoritele dvs. (F o scoate)"
 
 [messages.asset-file]
@@ -1975,6 +1975,10 @@ translation = "Cooked (build de joc): previzualizările și sursele sunt elimina
 [messages.asset-meta-cue-markers]
 source = "Cue markers"
 translation = "Marcaje cue"
+
+[messages.asset-meta-everything-with]
+source = "Show everything tagged { $tag }"
+translation = "Arată tot ce are eticheta { $tag }"
 
 [messages.asset-meta-format]
 source = "Format"
@@ -2206,7 +2210,7 @@ source = "Hoard read it out of the package on { $date } ({ $notes })."
 translation = "Hoard l-a extras din pachet pe { $date } ({ $notes })."
 
 [messages.asset-palette]
-source = "Colours in the picture"
+source = "Colors in the picture"
 translation = "Culorile din imagine"
 
 [messages.asset-path]
@@ -2314,7 +2318,7 @@ source = "Find assets with { $hex }, { $percent }% of this picture"
 translation = "Găsiți resurse cu { $hex }, { $percent }% din această imagine"
 
 [messages.asset-swatch-title]
-source = "{ $hex }, { $percent }% of the picture. Find assets with this colour"
+source = "{ $hex }, { $percent }% of the picture. Find assets with this color"
 translation = "{ $hex }, { $percent }% din imagine. Găsiți resurse cu această culoare"
 
 [messages.asset-tag-add]
@@ -2604,7 +2608,7 @@ source = "Make an OAuth client (Web application) in Google Cloud Console → API
 translation = "Creați un client OAuth (Web application) în Google Cloud Console → APIs & Services → Credentials. Google nu trimite grupuri, așa că dați rolurile în Setări → Cont și dezactivați crearea conturilor la prima conectare, dacă nu trebuie să intre oricine are un cont Google."
 
 [messages.auth-preset-microsoft-note]
-source = "Register an app in Entra ID → App registrations (a Web redirect to the address below). Put your tenant ID in place of “organizations” to let only your organisation in. For roles from groups, add the groups claim under Token configuration: it lists group IDs."
+source = "Register an app in Entra ID → App registrations (a Web redirect to the address below). Put your tenant ID in place of “organizations” to let only your organization in. For roles from groups, add the groups claim under Token configuration: it lists group IDs."
 translation = "Înregistrați o aplicație în Entra ID → App registrations (cu o redirecționare Web către adresa de mai jos). Puneți ID-ul tenantului dvs. în locul lui „organizations” ca să intre doar organizația dvs. Pentru roluri din grupuri, adăugați claimul groups în Token configuration: listează ID-urile grupurilor."
 
 [messages.auth-provider]
@@ -3056,8 +3060,8 @@ translation = "{ $path } nu poate fi citit"
 source = "can't write to { $path }"
 translation = "nu se poate scrie în { $path }"
 
-[messages.error-chatgpt-cancelled]
-source = "the sign-in was cancelled"
+[messages.error-chatgpt-canceled]
+source = "the sign-in was canceled"
 translation = "conectarea a fost anulată"
 
 [messages.error-chatgpt-code-used]
@@ -3240,7 +3244,7 @@ translation = "Directorul nu v-a putut verifica parola: { $reason }"
 source = "empty file"
 translation = "fișier gol"
 
-[messages.error-favourites-too-many]
+[messages.error-favorites-too-many]
 source = "at most 10,000 at a time"
 translation = "cel mult 10.000 odată"
 
@@ -3954,7 +3958,7 @@ source = "that picture is too big for a thumbnail"
 translation = "imaginea este prea mare pentru o miniatură"
 
 [messages.error-token-account-gone]
-source = "this token's account is gone, so it has no favourites or searches"
+source = "this token's account is gone, so it has no favorites or searches"
 translation = "contul acestui token nu mai există, așa că nu are favorite sau căutări"
 
 [messages.error-token-name]
@@ -4231,7 +4235,7 @@ source = "It finds no title in this file. Pick the title."
 translation = "Nu găsește niciun titlu în acest fișier. Alegeți titlul."
 
 [messages.formatwizard-miss-not-the-stores]
-source = "What it recognises the store’s files by isn’t in this file. Change Recognise by."
+source = "What it recognizes the store’s files by isn’t in this file. Change Recognize by."
 translation = "Elementul după care recunoaște fișierele magazinului nu este în acest fișier. Schimbați Recunoaștere după."
 
 [messages.formatwizard-miss-short-name]
@@ -4306,19 +4310,19 @@ translation = "Titlu"
 source = "Store page"
 translation = "Pagina de magazin"
 
-[messages.formatwizard-recognise]
-source = "Recognise by"
+[messages.formatwizard-recognize]
+source = "Recognize by"
 translation = "Recunoaștere după"
 
-[messages.formatwizard-recognise-hint]
+[messages.formatwizard-recognize-hint]
 source = "One way a line; any of them will do. Needed when other files have the same name."
 translation = "Câte un criteriu pe rând; oricare dintre ele este suficient. Necesar când alte fișiere au același nume."
 
-[messages.formatwizard-recognise-json]
+[messages.formatwizard-recognize-json]
 source = "A key only the store’s files have"
 translation = "O cheie pe care o au doar fișierele magazinului"
 
-[messages.formatwizard-recognise-text]
+[messages.formatwizard-recognize-text]
 source = "A line only the store’s files have"
 translation = "Un rând pe care îl au doar fișierele magazinului"
 
@@ -4820,12 +4824,12 @@ translation = "fundal în carouri"
 source = "Checker background (K cycles)"
 translation = "Fundal în carouri (K schimbă)"
 
-[messages.image-bg-grey]
-source = "grey background"
+[messages.image-bg-gray]
+source = "gray background"
 translation = "fundal gri"
 
-[messages.image-bg-grey-title]
-source = "Grey background (K cycles)"
+[messages.image-bg-gray-title]
+source = "Gray background (K cycles)"
 translation = "Fundal gri (K schimbă)"
 
 [messages.image-bg-white]
@@ -5713,11 +5717,11 @@ source = "ambient occlusion"
 translation = "ocluzie ambientală"
 
 [messages.material-role-base-color]
-source = "Colour"
+source = "Color"
 translation = "Culoare"
 
 [messages.material-role-base-color-name]
-source = "colour"
+source = "color"
 translation = "culoare"
 
 [messages.material-role-bump]
@@ -5884,8 +5888,8 @@ translation = "Fundal întunecat"
 source = "Environment background"
 translation = "Fundalul mediului"
 
-[messages.model-bg-grey]
-source = "Grey background"
+[messages.model-bg-gray]
+source = "Gray background"
 translation = "Fundal gri"
 
 [messages.model-bg-light]
@@ -6000,8 +6004,8 @@ translation = "Lungime"
 source = "Materials"
 translation = "Materiale"
 
-[messages.model-info-metres]
-source = "glTF is in metres"
+[messages.model-info-meters]
+source = "glTF is in meters"
 translation = "glTF este în metri"
 
 [messages.model-info-no-units]
@@ -6752,8 +6756,8 @@ translation = "Salvarea preia descrierea de pe pagina de magazin."
 source = "Paste the listing text, or leave empty to fetch it from the store page."
 translation = "Lipiți textul anunțului sau lăsați gol pentru a-l prelua de pe pagina de magazin."
 
-[messages.packs-thumbs-cancelled]
-source = "Cancelled after { $done } of { $total }"
+[messages.packs-thumbs-canceled]
+source = "Canceled after { $done } of { $total }"
 translation = "Anulat după { $done } din { $total }"
 
 [messages.packs-thumbs-drawing]
@@ -7028,11 +7032,11 @@ translation = "Goliți selecția"
 source = "Dark theme: { $name }"
 translation = "Temă întunecată: { $name }"
 
-[messages.palette-favourites]
-source = "Favourites"
+[messages.palette-favorites]
+source = "Favorites"
 translation = "Favorite"
 
-[messages.palette-favourites-keywords]
+[messages.palette-favorites-keywords]
 source = "starred stars liked"
 translation = "favorite stele steluțe apreciate starred stars liked"
 
@@ -7220,12 +7224,12 @@ translation = "aspect culoare appearance color"
 source = "Command palette"
 translation = "Paleta de comenzi"
 
-[messages.projects-favourite-add-failed]
-source = "Couldn't add to your favourites: { $error }"
+[messages.projects-favorite-add-failed]
+source = "Couldn't add to your favorites: { $error }"
 translation = "Nu s-a putut adăuga la favorite: { $error }"
 
-[messages.projects-favourite-remove-failed]
-source = "Couldn't take out of your favourites: { $error }"
+[messages.projects-favorite-remove-failed]
+source = "Couldn't take out of your favorites: { $error }"
 translation = "Nu s-a putut scoate din favorite: { $error }"
 
 [messages.projects-forget-search-failed]
@@ -7503,7 +7507,7 @@ source = "Tagging { $pack } with AI"
 translation = "Se etichetează { $pack } cu AI"
 
 [messages.server-job-looks]
-source = "Working out colours and looks"
+source = "Working out colors and looks"
 translation = "Se determină culorile și aspectul"
 
 [messages.server-job-materials]
@@ -7591,7 +7595,7 @@ source = "ambient occlusion"
 translation = "ocluzie ambientală"
 
 [messages.server-role-base-color]
-source = "colour"
+source = "color"
 translation = "culoare"
 
 [messages.server-role-bump]
@@ -8012,7 +8016,7 @@ source = "Couldn’t get the model: { $detail }. Trying again every hour."
 translation = "Modelul nu a putut fi obținut: { $detail }. Se încearcă din nou în fiecare oră."
 
 [messages.settings-clip-what]
-source = "Type what you’re after (“mossy rock”, “sci-fi door”, “wooden barrel”) and pictures that show it turn up beside names that have the words. “More like this” finds things of the same kind, not only the same colours."
+source = "Type what you’re after (“mossy rock”, “sci-fi door”, “wooden barrel”) and pictures that show it turn up beside names that have the words. “More like this” finds things of the same kind, not only the same colors."
 translation = "Tastați ce căutați („mossy rock”, „sci-fi door”, „wooden barrel”), iar imaginile care arată asta apar lângă numele care conțin cuvintele. „Mai multe ca aceasta” găsește lucruri de același fel, nu doar de aceleași culori."
 
 [messages.settings-conversion-cache]
@@ -8368,7 +8372,7 @@ source = "Image search"
 translation = "Căutare după imagine"
 
 [messages.settings-page-search-blurb]
-source = "Search pictures by what they show, not only by their names, and find things that are alike in kind, not only in colour."
+source = "Search pictures by what they show, not only by their names, and find things that are alike in kind, not only in color."
 translation = "Căutați imagini după ce arată, nu doar după nume, și găsiți lucruri asemănătoare ca fel, nu doar ca culoare."
 
 [messages.settings-page-store-files]
@@ -8771,8 +8775,8 @@ translation = "Închideți"
 source = "Close, clear the selection, or close the details"
 translation = "Închidere, golirea selecției sau închiderea detaliilor"
 
-[messages.shortcuts-favourite]
-source = "Add to or take out of your favourites"
+[messages.shortcuts-favorite]
+source = "Add to or take out of your favorites"
 translation = "Adăugare la favorite sau scoatere din favorite"
 
 [messages.shortcuts-fit]
@@ -9196,15 +9200,15 @@ source = "Edit"
 translation = "Editați"
 
 [messages.storefiles-field-colors]
-source = "Colours"
+source = "Colors"
 translation = "Culori"
 
 [messages.storefiles-field-colors-hint]
-source = "Its colours, as color: tags."
+source = "Its colors, as color: tags."
 translation = "Culorile sale, ca etichete color:."
 
 [messages.storefiles-field-colors-name]
-source = "colours"
+source = "colors"
 translation = "culorile"
 
 [messages.storefiles-field-id]
@@ -9820,7 +9824,7 @@ source = "Warm charcoal, amber"
 translation = "Cărbune cald, chihlimbar"
 
 [messages.theme-dark-graphite-blurb]
-source = "Neutral grey, no tint"
+source = "Neutral gray, no tint"
 translation = "Gri neutru, fără nuanță"
 
 [messages.theme-dark-moss-blurb]
@@ -9836,7 +9840,7 @@ source = "Wine-black, coral"
 translation = "Vin spre negru, coral"
 
 [messages.theme-dark-slate-blurb]
-source = "Blue-grey"
+source = "Blue-gray"
 translation = "Gri-albastru"
 
 [messages.theme-ember]
@@ -9860,7 +9864,7 @@ source = "Warm cream, amber"
 translation = "Crem cald, chihlimbar"
 
 [messages.theme-light-paper-blurb]
-source = "Plain neutral grey"
+source = "Plain neutral gray"
 translation = "Gri neutru simplu"
 
 [messages.theme-light-sage-blurb]
@@ -9868,7 +9872,7 @@ source = "Soft green"
 translation = "Verde moale"
 
 [messages.theme-light-slate-blurb]
-source = "Cool blue-grey"
+source = "Cool blue-gray"
 translation = "Gri-albastru rece"
 
 [messages.theme-lilac]
@@ -9903,16 +9907,16 @@ translation = "Salvie"
 source = "Slate"
 translation = "Ardezie"
 
-[messages.tile-add-favourite]
-source = "Add to your favourites (F)"
+[messages.tile-add-favorite]
+source = "Add to your favorites (F)"
 translation = "Adăugați la favorite (F)"
 
-[messages.tile-favourite]
-source = "Favourite { $name }"
+[messages.tile-favorite]
+source = "Favorite { $name }"
 translation = "Adăugați { $name } la favorite"
 
-[messages.tile-in-favourites]
-source = "In your favourites"
+[messages.tile-in-favorites]
+source = "In your favorites"
 translation = "În favoritele dvs."
 
 [messages.tile-label]

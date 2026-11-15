@@ -67,13 +67,13 @@ interface Want {
   track?: (name: string) => (ok: boolean) => void
 }
 
-/** Decode a map for one slot. Colour maps keep their colour profile; data maps are read as raw numbers. */
+/** Decode a map for one slot. Color maps keep their color profile; data maps are read as raw numbers. */
 async function decode(blob: Blob, role: MapRole, want: Want): Promise<THREE.Texture> {
-  const colour = role === 'base_color' || role === 'emissive'
+  const color = role === 'base_color' || role === 'emissive'
   const bitmap = await createImageBitmap(blob, {
     imageOrientation: want.flipY ? 'flipY' : 'from-image',
     premultiplyAlpha: 'none',
-    colorSpaceConversion: colour ? 'default' : 'none',
+    colorSpaceConversion: color ? 'default' : 'none',
   })
   const repack = REPACK[role]
   let tex: THREE.Texture
@@ -106,7 +106,7 @@ async function decode(blob: Blob, role: MapRole, want: Want): Promise<THREE.Text
   }
   // The bitmap is already the right way up.
   tex.flipY = false
-  tex.colorSpace = colour ? THREE.SRGBColorSpace : THREE.NoColorSpace
+  tex.colorSpace = color ? THREE.SRGBColorSpace : THREE.NoColorSpace
   tex.wrapS = tex.wrapT = THREE.RepeatWrapping
   tex.anisotropy = 8
   tex.generateMipmaps = true

@@ -61,12 +61,12 @@ export function withText(image: Buffer, key: string, text: string): Buffer {
   return Buffer.concat([image.subarray(0, ihdrEnd), chunk('tEXt', data), image.subarray(ihdrEnd)])
 }
 
-/** A two-colour checkerboard, so every image is different bytes and reads as a picture in a thumbnail. */
+/** A two-color checkerboard, so every image is different bytes and reads as a picture in a thumbnail. */
 export function checker(size: number, a: [number, number, number], b: [number, number, number], cell = 4): Buffer {
   return png(size, size, (x, y) => [...((Math.floor(x / cell) + Math.floor(y / cell)) % 2 ? a : b), 255])
 }
 
-/** A colour for the n-th of many images: spread round the hue wheel. */
+/** A color for the n-th of many images: spread round the hue wheel. */
 export function hue(n: number, of: number): [number, number, number] {
   const h = (n / of) * 6
   const x = Math.round(255 * (1 - Math.abs((h % 2) - 1)))
@@ -220,7 +220,7 @@ export function partsGltf(n: number): Buffer {
     scenes: [{ nodes: parts }],
     nodes: parts.map((i) => ({ mesh: i, name: `part ${i + 1}`, translation: [i * 1.2, 0, 0] })),
     meshes: parts.map((i) => ({ name: `part ${i + 1}`, primitives: [{ attributes: { POSITION: 0 }, indices: 1, material: 0 }] })),
-    materials: [{ name: 'grey', pbrMetallicRoughness: { baseColorFactor: [0.6, 0.6, 0.6, 1] } }],
+    materials: [{ name: 'gray', pbrMetallicRoughness: { baseColorFactor: [0.6, 0.6, 0.6, 1] } }],
     buffers: [{ uri: `data:application/octet-stream;base64,${bin.toString('base64')}`, byteLength: bin.length }],
     bufferViews: [
       { buffer: 0, byteOffset: 0, byteLength: 48, target: 34962 },

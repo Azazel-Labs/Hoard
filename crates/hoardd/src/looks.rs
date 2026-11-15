@@ -1,14 +1,14 @@
-//! Search by look: a dominant-colour palette and a visual descriptor per thumbnail, for "find by colour" and
+//! Search by look: a dominant-color palette and a visual descriptor per thumbnail, for "find by color" and
 //! "more like this".
 //!
 //! Everything is computed from an asset's thumbnail, so textures, models (their renders), materials, PSDs and videos
 //! are covered the same way. Features are stored per thumbnail blob (`looks`, keyed by its hash), so a changed
 //! thumbnail is simply a new row, and the same picture shared by several assets is done once.
 //!
-//! - **Palette**: up to eight colours found by k-means in `OKLab` (a perceptual colour space), each with the share of
+//! - **Palette**: up to eight colors found by k-means in `OKLab` (a perceptual color space), each with the share of
 //!   the picture it covers. Transparent pixels (a model render's background) don't count.
 //! - **Descriptor**: 127 signed bytes, four blocks each scaled so that the dot product of two descriptors is a
-//!   weighted cosine similarity: a soft colour histogram (lightness × chroma × hue), a rotation-normalized edge
+//!   weighted cosine similarity: a soft color histogram (lightness × chroma × hue), a rotation-normalized edge
 //!   orientation histogram, surface statistics (contrast, detail at four scales, lightness spread, coverage), and
 //!   rotation-invariant local binary patterns at two radii (the "grain" of a texture).
 //! - **Perceptual hash**: 64 bits from the low frequencies of a 32×32 DCT, so near-copies rank first.
@@ -48,7 +48,7 @@ const W_ORIENT: f32 = 0.13;
 const W_SCALARS: f32 = 0.2;
 const W_LBP: f32 = 0.25;
 
-/// One colour of a palette, in `OKLab`, with the share of the (opaque part of the) picture it covers.
+/// One color of a palette, in `OKLab`, with the share of the (opaque part of the) picture it covers.
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub(crate) struct Swatch {
     pub(crate) lab: [f32; 3],
@@ -64,7 +64,7 @@ pub(crate) struct Features {
 }
 
 // ---------------------------------------------------------------------------------------------
-// Colour
+// Color
 
 static SRGB_TO_LINEAR: LazyLock<[f64; 256]> = LazyLock::new(|| {
     std::array::from_fn(|i| {
@@ -74,7 +74,7 @@ static SRGB_TO_LINEAR: LazyLock<[f64; 256]> = LazyLock::new(|| {
 });
 
 /// sRGB bytes to `OKLab` (L in 0..=1, a and b roughly -0.3..=0.3).
-#[expect(clippy::many_single_char_names, reason = "the names colour science uses")]
+#[expect(clippy::many_single_char_names, reason = "the names color science uses")]
 pub(crate) fn oklab(rgb: [u8; 3]) -> [f32; 3] {
     let [r, g, b] = rgb.map(|c| SRGB_TO_LINEAR[usize::from(c)]);
     let l = (0.412_221_470_8 * r + 0.536_332_536_3 * g + 0.051_445_992_9 * b).cbrt();
@@ -88,7 +88,7 @@ pub(crate) fn oklab(rgb: [u8; 3]) -> [f32; 3] {
 }
 
 /// `OKLab` back to sRGB bytes, clipped to the gamut.
-#[expect(clippy::many_single_char_names, reason = "the names colour science uses")]
+#[expect(clippy::many_single_char_names, reason = "the names color science uses")]
 pub(crate) fn srgb(lab: [f32; 3]) -> [u8; 3] {
     let [l, a, b] = lab.map(f64::from);
     let l_ = (l + 0.396_337_777_4 * a + 0.215_803_757_3 * b).powi(3);
@@ -199,7 +199,7 @@ fn push_block(out: &mut Vec<f32>, block: Vec<f32>, weight: f32) {
     out.extend(block.into_iter().map(|v| v * k));
 }
 
-/// Dominant colours by weighted k-means, seeded from the fullest cells of a coarse `OKLab` grid.
+/// Dominant colors by weighted k-means, seeded from the fullest cells of a coarse `OKLab` grid.
 fn palette(samples: &[([f32; 3], f32)]) -> Vec<Swatch> {
     const CELLS: usize = 6 * 8 * 8;
     let cell = |p: [f32; 3]| {
@@ -251,7 +251,7 @@ fn palette(samples: &[([f32; 3], f32)]) -> Vec<Swatch> {
 
     let mut swatches: Vec<Swatch> =
         centers.into_iter().zip(weights).map(|(lab, w)| Swatch { lab, share: w / total }).collect();
-    // Clusters that ended up near each other read as one colour.
+    // Clusters that ended up near each other read as one color.
     loop {
         let mut closest: Option<(usize, usize, f32)> = None;
         for i in 0..swatches.len() {
@@ -286,15 +286,15 @@ fn nearest(centers: &[[f32; 3]], p: [f32; 3]) -> usize {
     best.0
 }
 
-/// Soft histogram over 5 lightness bands × (grey, 8 muted hues, 8 vivid hues), square-rooted (Hellinger) so a
+/// Soft histogram over 5 lightness bands × (gray, 8 muted hues, 8 vivid hues), square-rooted (Hellinger) so a
 /// large flat area doesn't drown everything else.
 fn color_histogram(samples: &[([f32; 3], f32)]) -> Vec<f32> {
     let mut hist = vec![0.0f32; COLOR_BINS];
     for &([l, a, b], w) in samples {
         let (l0, l1, lf) = soft_bin(l * 5.0 - 0.5, 5, false);
         let chroma = a.hypot(b);
-        // Weights for grey / muted / vivid, linear between 0, 0.05 and 0.13 of chroma.
-        let (grey, muted, vivid) = if chroma < 0.05 {
+        // Weights for gray / muted / vivid, linear between 0, 0.05 and 0.13 of chroma.
+        let (gray, muted, vivid) = if chroma < 0.05 {
             let t = chroma / 0.05;
             (1.0 - t, t, 0.0)
         } else if chroma < 0.13 {
@@ -308,7 +308,7 @@ fn color_histogram(samples: &[([f32; 3], f32)]) -> Vec<f32> {
         for (lb, lw) in [(l0, 1.0 - lf), (l1, lf)] {
             let base = lb * 17;
             let lw = lw * w;
-            hist[base] += lw * grey;
+            hist[base] += lw * gray;
             hist[base + 1 + h0] += lw * muted * (1.0 - hf);
             hist[base + 1 + h1] += lw * muted * hf;
             hist[base + 9 + h0] += lw * vivid * (1.0 - hf);
@@ -318,7 +318,7 @@ fn color_histogram(samples: &[([f32; 3], f32)]) -> Vec<f32> {
     hist.into_iter().map(f32::sqrt).collect()
 }
 
-/// The two bins a continuous position `t` (bin centres at 0, 1, …) falls between and how far toward the second.
+/// The two bins a continuous position `t` (bin centers at 0, 1, …) falls between and how far toward the second.
 fn soft_bin(t: f32, n: usize, circular: bool) -> (usize, usize, f32) {
     if circular {
         let t = t.rem_euclid(n as f32);
@@ -344,7 +344,7 @@ impl Plane {
         self.v[y * self.w + x]
     }
 
-    /// Pixels whose whole `r`-neighbourhood is in the mask (so edges against a transparent background aren't
+    /// Pixels whose whole `r`-neighborhood is in the mask (so edges against a transparent background aren't
     /// counted as surface detail).
     fn interior(&self, r: usize) -> impl Iterator<Item = (usize, usize)> + '_ {
         let eroded = erode(&self.ok, self.w, self.h, r);
@@ -458,8 +458,8 @@ fn scalars(p: &Plane, work: &Work) -> Vec<f32> {
     values.iter().flat_map(|v| [(v * PI).cos(), (v * PI).sin()]).collect()
 }
 
-/// Rotation-invariant uniform local binary patterns (8 neighbours at radius `r`): how often each pixel is a spot,
-/// an edge, a corner or a ridge. Square-rooted like the colour histogram.
+/// Rotation-invariant uniform local binary patterns (8 neighbors at radius `r`): how often each pixel is a spot,
+/// an edge, a corner or a ridge. Square-rooted like the color histogram.
 fn lbp(p: &Plane, r: f32) -> [f32; LBP_BINS] {
     let mut hist = [0.0f32; LBP_BINS];
     let offsets: [(f32, f32); 8] = std::array::from_fn(|k| {
@@ -485,8 +485,8 @@ fn lbp(p: &Plane, r: f32) -> [f32; LBP_BINS] {
     hist.map(f32::sqrt)
 }
 
-/// 64-bit perceptual hash: the signs of the lowest 8×8 DCT frequencies of a 32×32 grey version, relative to their
-/// median. Transparent pixels read as mid grey.
+/// 64-bit perceptual hash: the signs of the lowest 8×8 DCT frequencies of a 32×32 gray version, relative to their
+/// median. Transparent pixels read as mid gray.
 fn phash(work: &Work) -> u64 {
     const N: usize = 32;
     let mut small = [[0.0f32; N]; N];
@@ -527,7 +527,7 @@ fn phash(work: &Work) -> u64 {
 // ---------------------------------------------------------------------------------------------
 // Storage
 
-/// Four bytes a colour: L × 255, a × 400, b × 400 (signed), share × 255.
+/// Four bytes a color: L × 255, a × 400, b × 400 (signed), share × 255.
 pub(crate) fn encode_palette(palette: &[Swatch]) -> Vec<u8> {
     palette
         .iter()
@@ -574,10 +574,10 @@ const SIMILAR_MAX: usize = 1000;
 const SIMILAR_FLOOR: f32 = 0.55;
 /// How much what a picture shows counts in "more like this", against how it looks, when image search is on.
 const MEANING_WEIGHT: f32 = 0.7;
-/// "Find by colour" keeps assets with at least about this share of the picture near the colour.
+/// "Find by color" keeps assets with at least about this share of the picture near the color.
 const COLOR_MAX: usize = 3000;
 const COLOR_FLOOR: f32 = 0.08;
-/// How far (in `OKLab`) a colour still counts as the one asked for, and how little lightness matters next to hue.
+/// How far (in `OKLab`) a color still counts as the one asked for, and how little lightness matters next to hue.
 const COLOR_SIGMA: f32 = 0.08;
 const COLOR_L_WEIGHT: f32 = 0.5;
 
@@ -663,7 +663,7 @@ impl Index {
     }
 
     /// Thumbnails that look like `hash`'s, best first. With image search's scores (`meaning`, by what the pictures
-    /// show), those count most where a thumbnail has one; colours and grain decide the rest.
+    /// show), those count most where a thumbnail has one; colors and grain decide the rest.
     fn similar(&self, hash: &str, meaning: Option<&HashMap<String, f32>>) -> Vec<(String, f32)> {
         self.read(|m| {
             let Some(target) = m.get(hash) else { return Vec::new() };
@@ -707,7 +707,7 @@ fn similarity(a: &Entry, b: &Entry) -> f32 {
     0.85 * descriptor + 0.15 * near_copy
 }
 
-/// How much of a picture is close to `lab`: each palette colour's share, counted less the further it is.
+/// How much of a picture is close to `lab`: each palette color's share, counted less the further it is.
 fn color_score(palette: &[Swatch], lab: [f32; 3]) -> f32 {
     palette
         .iter()
@@ -723,7 +723,7 @@ fn color_score(palette: &[Swatch], lab: [f32; 3]) -> f32 {
 // ---------------------------------------------------------------------------------------------
 // Search
 
-/// A library search, ranked by look when it asks for "more like this" (`similar`) or a colour (`color`).
+/// A library search, ranked by look when it asks for "more like this" (`similar`) or a color (`color`).
 pub(crate) async fn search(state: &AppState, q: SearchQuery, facets: bool) -> Result<db::SearchPage> {
     let rank = rank(state, &q).await?;
     db::call(&state.pool, move |c| db::search_ranked(c, &q, facets, rank.as_ref())).await
@@ -763,7 +763,7 @@ async fn rank(state: &AppState, q: &SearchQuery) -> Result<Option<db::LookRank>>
         })
         .await?;
         let (kind, file, thumb) = asset.unwrap_or_default();
-        // A sound: what sounds like it (a waveform's colours say nothing).
+        // A sound: what sounds like it (a waveform's colors say nothing).
         if kind == "audio" {
             state.sounds.ensure(state).await?;
             let scores = state.sounds.similar(&file);
@@ -780,10 +780,10 @@ async fn rank(state: &AppState, q: &SearchQuery) -> Result<Option<db::LookRank>>
     }
     if let Some(color) = color {
         state.looks.ensure(state).await?;
-        // A colour that doesn't parse matches nothing rather than everything.
+        // A color that doesn't parse matches nothing rather than everything.
         let by_color = color.map(|lab| state.looks.by_color(lab)).unwrap_or_default();
         scores = Some(match scores {
-            // Both: what looks alike and has the colour, by both scores.
+            // Both: what looks alike and has the color, by both scores.
             Some(similar) => {
                 let by_color: HashMap<String, f32> = by_color.into_iter().collect();
                 similar.into_iter().filter_map(|(h, s)| by_color.get(&h).map(|c| (h, s + c))).collect()
@@ -994,7 +994,7 @@ mod tests {
     }
 
     #[test]
-    fn colours_round_trip_through_oklab() {
+    fn colors_round_trip_through_oklab() {
         for hex_in in ["#3a7d2c", "#000000", "#ffffff", "#ff0000", "#1e90ff"] {
             assert_eq!(hex(parse_hex(hex_in).unwrap()), hex_in);
         }
@@ -1004,7 +1004,7 @@ mod tests {
     }
 
     #[test]
-    fn palette_finds_the_colours_and_their_shares() {
+    fn palette_finds_the_colors_and_their_shares() {
         let img = image::RgbaImage::from_fn(200, 100, |x, _| {
             if x < 150 { image::Rgba([200, 30, 30, 255]) } else { image::Rgba([30, 60, 200, 255]) }
         });
@@ -1037,7 +1037,7 @@ mod tests {
     }
 
     #[test]
-    fn colour_search_scores_by_how_much_of_the_picture_is_that_colour() {
+    fn color_search_scores_by_how_much_of_the_picture_is_that_color() {
         let green = oklab([40, 160, 60]);
         let palette = [Swatch { lab: green, share: 0.6 }, Swatch { lab: oklab([200, 200, 200]), share: 0.4 }];
         let exact = color_score(&palette, green);
@@ -1049,18 +1049,18 @@ mod tests {
     #[test]
     fn like_looks_like_like() {
         let brown = [0.55, 0.42, 0.3];
-        let grey = [0.5, 0.5, 0.5];
+        let gray = [0.5, 0.5, 0.5];
         let rock_a = entry(&rock(1, brown));
         let rock_b = entry(&rock(7, brown));
-        let grey_rock = entry(&rock(3, grey));
+        let gray_rock = entry(&rock(3, gray));
         let planks = entry(&stripes(16, false, [150, 110, 70], [110, 75, 45]));
         let planks_turned = entry(&stripes(16, true, [150, 110, 70], [110, 75, 45]));
         let blue_tiles = entry(&stripes(8, true, [30, 60, 200], [220, 220, 240]));
 
         let same_kind = similarity(&rock_a, &rock_b);
         assert!(same_kind > SIMILAR_FLOOR, "{same_kind}");
-        assert!(same_kind > similarity(&rock_a, &grey_rock), "colour counts");
-        assert!(similarity(&rock_a, &grey_rock) > similarity(&rock_a, &blue_tiles), "and so does surface");
+        assert!(same_kind > similarity(&rock_a, &gray_rock), "color counts");
+        assert!(similarity(&rock_a, &gray_rock) > similarity(&rock_a, &blue_tiles), "and so does surface");
         assert!(same_kind > similarity(&rock_a, &planks));
         // Only the perceptual hash (which is for near-copies) sees the turn.
         assert!(similarity(&planks, &planks_turned) > 0.75, "turning a texture doesn't change what it looks like");

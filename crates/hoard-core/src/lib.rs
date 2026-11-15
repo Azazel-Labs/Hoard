@@ -211,7 +211,7 @@ pub struct Asset {
     /// Other formats this asset can be downloaded as (`GET /api/assets/{id}/as/{format}`). Detail view only.
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub formats: Vec<FormatOption>,
-    /// Dominant colours of the thumbnail, most of the picture first. Detail view only.
+    /// Dominant colors of the thumbnail, most of the picture first. Detail view only.
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub palette: Vec<Swatch>,
     /// For a material made from texture maps: its maps. Detail view only.
@@ -222,7 +222,7 @@ pub struct Asset {
     pub materials: Vec<MaterialInfo>,
 }
 
-/// One colour of an asset's palette.
+/// One color of an asset's palette.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Swatch {
     /// `#rrggbb`.
@@ -238,13 +238,13 @@ pub struct MaterialInfo {
     pub name: String,
     pub path: String,
     pub has_thumb: bool,
-    /// By role (colour first), each role's largest first.
+    /// By role (color first), each role's largest first.
     pub maps: Vec<MaterialMap>,
-    /// How much ground one repeat of a tiling material covers, width and height in metres, when the store says
+    /// How much ground one repeat of a tiling material covers, width and height in meters, when the store says
     /// (a Megascans surface's `<id>.json`).
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub physical_size: Option<[f32; 2]>,
-    /// How far its height map reaches, in metres, when the store says.
+    /// How far its height map reaches, in meters, when the store says.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub displacement: Option<f32>,
 }
@@ -586,7 +586,7 @@ pub struct SearchQuery {
     pub pack: Option<String>,
     #[serde(default)]
     pub ext: Option<String>,
-    /// Best match first (default; newest first without a text, colour or similar query), or "new", "old", "name",
+    /// Best match first (default; newest first without a text, color or similar query), or "new", "old", "name",
     /// "size".
     #[serde(default)]
     pub sort: Option<String>,
@@ -611,12 +611,12 @@ pub struct SearchQuery {
     /// "More like this": assets that look like this one (an asset id), most alike first.
     #[serde(default)]
     pub similar: Option<String>,
-    /// Assets with much of this colour (`#rrggbb`) in them, most first.
+    /// Assets with much of this color (`#rrggbb`) in them, most first.
     #[serde(default)]
     pub color: Option<String>,
-    /// Only this account's favourites. Set by the server for whoever asks, never sent.
+    /// Only this account's favorites. Set by the server for whoever asks, never sent.
     #[serde(skip)]
-    pub favourites_of: Option<i64>,
+    pub favorites_of: Option<i64>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

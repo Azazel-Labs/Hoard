@@ -44,7 +44,7 @@ An upload is unpacked into a staging folder, then each file is hashed and copied
 of many small files the cost is creating files, not reading them: the Kenney all-in-one (92,000 files in a 529 MB
 zip) took nine minutes just to unpack on Windows with Defender scanning each new file, where a plain single-threaded
 extract manages about 150 files a second on the same machine. Reading entries straight out of the archive into the
-library would create each file once instead of twice. Nested archives, and analysis that needs neighbouring files
+library would create each file once instead of twice. Nested archives, and analysis that needs neighboring files
 (a model next to its textures), are what make it more than a small change.
 
 ## Lower priority for heavy work on Windows

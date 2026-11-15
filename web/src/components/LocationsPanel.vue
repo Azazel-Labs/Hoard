@@ -235,7 +235,7 @@ async function created(l: LibraryLocation) {
           :suggested="managed.length ? '' : data.suggested"
           :kinds="data.kinds"
           :first="!data.locations.length"
-          cancellable
+          cancelable
           @created="created"
           @cancel="adding = false"
           @unauthorized="emit('unauthorized')"

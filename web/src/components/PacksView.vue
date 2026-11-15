@@ -355,7 +355,7 @@ function unrealFact(p: Pack): string {
 /** What a finished "Make thumbnails in this browser" run did. */
 function thumbSummary(): string {
   const lead = thumbRun.done < thumbRun.total
-    ? t('packs-thumbs-cancelled', { done: thumbRun.done, total: thumbRun.total })
+    ? t('packs-thumbs-canceled', { done: thumbRun.done, total: thumbRun.total })
     : t('packs-thumbs-drew', { count: thumbRun.total })
   return thumbRun.failed
     ? t('packs-thumbs-result-failed', { lead, improved: thumbRun.improved, failed: thumbRun.failed })

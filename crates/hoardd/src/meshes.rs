@@ -94,7 +94,7 @@ pub(crate) fn load(path: &Path, ext: &str, root: &Path) -> Result<(Option<Mesh>,
     }
 }
 
-/// Whether the file's material colours are linear values (Blender's OBJ and FBX exporters write them so) rather
+/// Whether the file's material colors are linear values (Blender's OBJ and FBX exporters write them so) rather
 /// than the sRGB other tools write. The browser viewer makes the same call.
 fn linear_colors(path: &Path, ext: &str) -> bool {
     use std::io::Read as _;
@@ -115,8 +115,8 @@ fn srgb_to_linear(c: f32) -> f32 {
     if c <= 0.040_45 { c / 12.92 } else { ((c + 0.055) / 1.055).powf(2.4) }
 }
 
-/// A model that names no colour texture takes one by name, as the browser viewer does: `Barrel.png` or
-/// `Barrel_Albedo.png` for `Barrel.obj`, from anywhere in the pack. Its colour then shows as painted.
+/// A model that names no color texture takes one by name, as the browser viewer does: `Barrel.png` or
+/// `Barrel_Albedo.png` for `Barrel.obj`, from anywhere in the pack. Its color then shows as painted.
 fn guess_color_texture(mesh: &mut Mesh, path: &Path, root: &Path) {
     let has_uvs = mesh.prims.iter().any(|p| !p.uvs.is_empty());
     if !has_uvs || mesh.materials.iter().any(|m| m.color_image.is_some()) {
@@ -126,22 +126,22 @@ fn guess_color_texture(mesh: &mut Mesh, path: &Path, root: &Path) {
     if stem.len() < 3 || stem.contains('@') {
         return;
     }
-    // A name that says it's the colour wins; one that says nothing ("Barrel.png") will do.
+    // A name that says it's the color wins; one that says nothing ("Barrel.png") will do.
     let mut plain = None;
-    let mut colour = None;
+    let mut color = None;
     walk_images(root, |p, file_stem| {
         let Some(rest) = file_stem.strip_prefix(&stem) else { return false };
         if !(rest.is_empty() || rest.starts_with(['_', '-', ' ', '.'])) {
             return false;
         }
         match texture_role(file_stem) {
-            Some(Role::Color) if colour.is_none() => colour = Some(p.to_path_buf()),
+            Some(Role::Color) if color.is_none() => color = Some(p.to_path_buf()),
             None if plain.is_none() => plain = Some(p.to_path_buf()),
             _ => {}
         }
-        colour.is_some()
+        color.is_some()
     });
-    let Some(img) = colour.or(plain).and_then(|p| load_image(&p)) else { return };
+    let Some(img) = color.or(plain).and_then(|p| load_image(&p)) else { return };
     mesh.images.push(img);
     let i = mesh.images.len() - 1;
     for (n, m) in mesh.materials.iter_mut().enumerate() {
@@ -575,10 +575,10 @@ fn stl(data: &[u8]) -> Result<Mesh> {
     Ok(single(soup(&tris)))
 }
 
-/// Each facet's colour (sRGB, 0-255) from a binary STL's attribute bytes, when the file has colours. Materialise
+/// Each facet's color (sRGB, 0-255) from a binary STL's attribute bytes, when the file has colors. Materialize
 /// Magics writes `COLOR=rgba` in the header, the default for facets whose top bit is set, and red in the low bits of
-/// the rest (as three.js reads it). `VisCAM` and `SolidView` set the top bit on coloured facets, blue in the low bits;
-/// there's no header saying so, and other tools leave junk in those bytes, so only two colours or more count.
+/// the rest (as three.js reads it). `VisCAM` and `SolidView` set the top bit on colored facets, blue in the low bits;
+/// there's no header saying so, and other tools leave junk in those bytes, so only two colors or more count.
 fn stl_colors(header: &[u8], attrs: &[u16]) -> Option<Vec<Option<[u8; 3]>>> {
     let five = |v: u16| u8::try_from(u32::from(v & 0x1F) * 255 / 31).unwrap_or(u8::MAX);
     if let Some(at) = header.windows(6).position(|w| w == b"COLOR=").filter(|at| at + 10 <= header.len()) {
@@ -602,7 +602,7 @@ fn stl_colors(header: &[u8], attrs: &[u16]) -> Option<Vec<Option<[u8; 3]>>> {
     None
 }
 
-/// Facets grouped by colour (gray for those without one): a primitive and plain material for each.
+/// Facets grouped by color (gray for those without one): a primitive and plain material for each.
 pub(crate) fn colored_soup(tris: &[[[f32; 3]; 3]], colors: &[Option<[u8; 3]>]) -> Mesh {
     type Tri = [[f32; 3]; 3];
     let mut groups: Vec<(Option<[u8; 3]>, Vec<Tri>)> = Vec::new();
@@ -1043,7 +1043,7 @@ mod tests {
             }
             load_bytes("c.stl", &bin).0.unwrap()
         };
-        // Magics: red in the low bits; a set top bit takes the header's colour.
+        // Magics: red in the low bits; a set top bit takes the header's color.
         let m = stl(b"COLOR=\x00\xff\x00\xff", &[0x001F, 0x8000, 0x001F]);
         assert_eq!(m.prims.len(), 2);
         assert_eq!(m.prims[0].indices.len(), 6);
@@ -1051,13 +1051,13 @@ mod tests {
         let m = stl(b"COLOR=\x00\x00\xff\xff", &[0x03E0, 0x8000]);
         assert_eq!(m.materials[0].color, [0.0, 1.0, 0.0, 1.0]);
         assert_eq!(m.materials[1].color, [0.0, 0.0, 1.0, 1.0]);
-        // VisCAM: the top bit marks a coloured facet, blue in the low bits.
+        // VisCAM: the top bit marks a colored facet, blue in the low bits.
         let m = stl(b"binary", &[0x801F, 0xFC00, 0]);
         assert_eq!(
             m.materials.iter().map(|m| m.color).collect::<Vec<_>>(),
             [[0.0, 0.0, 1.0, 1.0], [1.0, 0.0, 0.0, 1.0], GRAY]
         );
-        // One colour without a header is as likely junk as a colour: plain gray.
+        // One color without a header is as likely junk as a color: plain gray.
         let m = stl(b"binary", &[0xFFFF, 0xFFFF]);
         assert_eq!((m.prims.len(), m.materials[0].color), (1, GRAY));
     }
@@ -1144,7 +1144,7 @@ mod obj_tests {
     const QUAD: &str = "v 0 0 0\nv 1 0 0\nv 1 1 0\nv 0 1 0\nvt 0 0\nvt 1 0\nvt 1 1\nvt 0 1\n";
 
     #[test]
-    fn obj_texture_in_another_format_and_colour_space() {
+    fn obj_texture_in_another_format_and_color_space() {
         let dir = tempfile::tempdir().unwrap();
         // The MTL names a TGA; the pack ships it as PNG.
         std::fs::write(dir.path().join("rock.png"), png([10, 20, 30])).unwrap();

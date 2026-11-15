@@ -20,7 +20,7 @@ const MAX_README: usize = 6000;
 const MAX_PAGE_BYTES: usize = 2 << 20;
 const FETCH_TIMEOUT: Duration = Duration::from_secs(12);
 
-/// Marketplaces recognised from a URL's host.
+/// Marketplaces recognized from a URL's host.
 const STORES: &[(&str, &str)] = &[
     ("fab.com", "Fab"),
     ("unrealengine.com", "Unreal Marketplace"),
@@ -408,7 +408,7 @@ mod tests {
     }
 
     #[test]
-    fn recognises_stores() {
+    fn recognizes_stores() {
         assert_eq!(store_from_url("https://www.fab.com/listings/abc"), Some("Fab"));
         assert_eq!(store_from_url("https://sketchfab.com/3d-models/abc"), Some("Sketchfab"));
         assert_eq!(store_from_url("https://kenney.itch.io/pack"), Some("itch.io"));

@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "453ff96837a704352761a5bf6af773e801a1f4018577b2f5bc3be44f27d2733f"
+source = "40994fa61278db02342a17e111610609be967f167ac0e561724a1ecc0fd4792e"
 translation = "ce76896eda079d0047893c1a9ed497c2b58da807c5aa0d961cf1fd28e025c5ee"
 
 [messages.account-add]
@@ -716,6 +716,14 @@ translation = "S'han tret { $count } de { $name }"
 source = "Collections"
 translation = "Col·leccions"
 
+[messages.app-color]
+source = "Color"
+translation = "Color"
+
+[messages.app-color-any]
+source = "Any color"
+translation = "Qualsevol color"
+
 [messages.app-color-black]
 source = "Black"
 translation = "Negre"
@@ -728,17 +736,21 @@ translation = "Blau"
 source = "Brown"
 translation = "Marró"
 
+[messages.app-color-gray]
+source = "Gray"
+translation = "Gris"
+
 [messages.app-color-green]
 source = "Green"
 translation = "Verd"
 
-[messages.app-color-grey]
-source = "Grey"
-translation = "Gris"
-
 [messages.app-color-orange]
 source = "Orange"
 translation = "Taronja"
+
+[messages.app-color-pick]
+source = "Pick any color"
+translation = "Tria qualsevol color"
 
 [messages.app-color-pink]
 source = "Pink"
@@ -760,6 +772,10 @@ translation = "Sorra"
 source = "Slate"
 translation = "Pissarra"
 
+[messages.app-color-swatch]
+source = "{ $color }: assets with much { $lower } in them"
+translation = "{ $color }: recursos amb molt de { $lower }"
+
 [messages.app-color-teal]
 source = "Teal"
 translation = "Verd blavós"
@@ -771,22 +787,6 @@ translation = "Blanc"
 [messages.app-color-yellow]
 source = "Yellow"
 translation = "Groc"
-
-[messages.app-colour]
-source = "Colour"
-translation = "Color"
-
-[messages.app-colour-any]
-source = "Any colour"
-translation = "Qualsevol color"
-
-[messages.app-colour-pick]
-source = "Pick any colour"
-translation = "Tria qualsevol color"
-
-[messages.app-colour-swatch]
-source = "{ $color }: assets with much { $lower } in them"
-translation = "{ $color }: recursos amb molt de { $lower }"
 
 [messages.app-credits]
 source = "Credits"
@@ -828,12 +828,12 @@ translation = "menys"
 source = "{ $count } more"
 translation = "{ $count } més"
 
-[messages.app-favourite]
-source = "Favourite"
+[messages.app-favorite]
+source = "Favorite"
 translation = "Afegeix a preferits"
 
-[messages.app-favourites]
-source = "Favourites"
+[messages.app-favorites]
+source = "Favorites"
 translation = "Preferits"
 
 [messages.app-filters]
@@ -1088,8 +1088,8 @@ translation = "Projectes que fan hoard sync des d'aquí, amb el que tenia la sev
 source = "Most alike"
 translation = "Més semblants"
 
-[messages.app-rank-colour]
-source = "Most of the colour"
+[messages.app-rank-color]
+source = "Most of the color"
 translation = "Amb més d'aquest color"
 
 [messages.app-rank-match]
@@ -1116,8 +1116,8 @@ translation = "Torna-ho a provar"
 source = "Save"
 translation = "Desa"
 
-[messages.app-save-name-favourites]
-source = "favourites"
+[messages.app-save-name-favorites]
+source = "favorites"
 translation = "preferits"
 
 [messages.app-save-name-label]
@@ -1284,8 +1284,8 @@ translation = "Mida de les miniatures"
 source = "Undo"
 translation = "Desfés"
 
-[messages.app-unfavourite]
-source = "Unfavourite"
+[messages.app-unfavorite]
+source = "Unfavorite"
 translation = "Treu de preferits"
 
 [messages.app-unnamed-asset]
@@ -1734,16 +1734,16 @@ translation = "Només aquest fitxer"
 source = "Just this file, without the files it uses"
 translation = "Només aquest fitxer, sense els fitxers que fa servir"
 
-[messages.asset-favourite]
-source = "Favourite"
+[messages.asset-favorite]
+source = "Favorite"
 translation = "Preferit"
 
-[messages.asset-favourite-off-title]
-source = "Add to your favourites (F)"
+[messages.asset-favorite-off-title]
+source = "Add to your favorites (F)"
 translation = "Afegeix als preferits (F)"
 
-[messages.asset-favourite-on-title]
-source = "In your favourites (F takes it out)"
+[messages.asset-favorite-on-title]
+source = "In your favorites (F takes it out)"
 translation = "Als vostres preferits (F el treu)"
 
 [messages.asset-file]
@@ -1921,6 +1921,10 @@ translation = "Cuinat (versió de joc): no té previsualitzacions ni fonts"
 [messages.asset-meta-cue-markers]
 source = "Cue markers"
 translation = "Marcadors"
+
+[messages.asset-meta-everything-with]
+source = "Show everything tagged { $tag }"
+translation = "Mostra tot el que té l’etiqueta { $tag }"
 
 [messages.asset-meta-format]
 source = "Format"
@@ -2151,7 +2155,7 @@ source = "Hoard read it out of the package on { $date } ({ $notes })."
 translation = "Hoard el va extreure del paquet el { $date } ({ $notes })."
 
 [messages.asset-palette]
-source = "Colours in the picture"
+source = "Colors in the picture"
 translation = "Colors de la imatge"
 
 [messages.asset-path]
@@ -2259,7 +2263,7 @@ source = "Find assets with { $hex }, { $percent }% of this picture"
 translation = "Cerca recursos amb { $hex }, { $percent } % d'aquesta imatge"
 
 [messages.asset-swatch-title]
-source = "{ $hex }, { $percent }% of the picture. Find assets with this colour"
+source = "{ $hex }, { $percent }% of the picture. Find assets with this color"
 translation = "{ $hex }, { $percent } % de la imatge. Cerca recursos amb aquest color"
 
 [messages.asset-tag-add]
@@ -2543,7 +2547,7 @@ source = "Make an OAuth client (Web application) in Google Cloud Console → API
 translation = "Creeu un client OAuth (Web application) a Google Cloud Console → APIs & Services → Credentials. Google no envia grups, així que doneu els rols a Configuració → Compte, i desactiveu la creació de comptes al primer inici de sessió tret que qualsevol persona amb un compte de Google hagi de poder entrar."
 
 [messages.auth-preset-microsoft-note]
-source = "Register an app in Entra ID → App registrations (a Web redirect to the address below). Put your tenant ID in place of “organizations” to let only your organisation in. For roles from groups, add the groups claim under Token configuration: it lists group IDs."
+source = "Register an app in Entra ID → App registrations (a Web redirect to the address below). Put your tenant ID in place of “organizations” to let only your organization in. For roles from groups, add the groups claim under Token configuration: it lists group IDs."
 translation = "Registreu una aplicació a Entra ID → App registrations (amb una redirecció Web a l'adreça de sota). Poseu l'ID del vostre inquilí en lloc de «organizations» perquè només hi pugui entrar la vostra organització. Per obtenir els rols dels grups, afegiu el claim groups a Token configuration: llista els ID dels grups."
 
 [messages.auth-provider]
@@ -2994,8 +2998,8 @@ translation = "no es pot llegir { $path }"
 source = "can't write to { $path }"
 translation = "no es pot escriure a { $path }"
 
-[messages.error-chatgpt-cancelled]
-source = "the sign-in was cancelled"
+[messages.error-chatgpt-canceled]
+source = "the sign-in was canceled"
 translation = "s'ha cancel·lat l'inici de sessió"
 
 [messages.error-chatgpt-code-used]
@@ -3178,7 +3182,7 @@ translation = "El directori no ha pogut comprovar la contrasenya: { $reason }"
 source = "empty file"
 translation = "fitxer buit"
 
-[messages.error-favourites-too-many]
+[messages.error-favorites-too-many]
 source = "at most 10,000 at a time"
 translation = "com a màxim 10.000 alhora"
 
@@ -3887,7 +3891,7 @@ source = "that picture is too big for a thumbnail"
 translation = "aquesta imatge és massa gran per a una miniatura"
 
 [messages.error-token-account-gone]
-source = "this token's account is gone, so it has no favourites or searches"
+source = "this token's account is gone, so it has no favorites or searches"
 translation = "el compte d'aquest testimoni ja no existeix, així que no té preferits ni cerques"
 
 [messages.error-token-name]
@@ -4157,7 +4161,7 @@ source = "It finds no title in this file. Pick the title."
 translation = "No troba cap títol en aquest fitxer. Trieu el títol."
 
 [messages.formatwizard-miss-not-the-stores]
-source = "What it recognises the store’s files by isn’t in this file. Change Recognise by."
+source = "What it recognizes the store’s files by isn’t in this file. Change Recognize by."
 translation = "Allò pel qual reconeix els fitxers de la botiga no és en aquest fitxer. Canvieu «Es reconeix per»."
 
 [messages.formatwizard-miss-short-name]
@@ -4232,19 +4236,19 @@ translation = "Títol"
 source = "Store page"
 translation = "Pàgina de botiga"
 
-[messages.formatwizard-recognise]
-source = "Recognise by"
+[messages.formatwizard-recognize]
+source = "Recognize by"
 translation = "Es reconeix per"
 
-[messages.formatwizard-recognise-hint]
+[messages.formatwizard-recognize-hint]
 source = "One way a line; any of them will do. Needed when other files have the same name."
 translation = "Una manera per línia; n'hi ha prou amb qualsevol. Cal quan altres fitxers tenen el mateix nom."
 
-[messages.formatwizard-recognise-json]
+[messages.formatwizard-recognize-json]
 source = "A key only the store’s files have"
 translation = "Una clau que només tenen els fitxers de la botiga"
 
-[messages.formatwizard-recognise-text]
+[messages.formatwizard-recognize-text]
 source = "A line only the store’s files have"
 translation = "Una línia que només tenen els fitxers de la botiga"
 
@@ -4744,12 +4748,12 @@ translation = "fons d'escaquer"
 source = "Checker background (K cycles)"
 translation = "Fons d'escaquer (K canvia)"
 
-[messages.image-bg-grey]
-source = "grey background"
+[messages.image-bg-gray]
+source = "gray background"
 translation = "fons gris"
 
-[messages.image-bg-grey-title]
-source = "Grey background (K cycles)"
+[messages.image-bg-gray-title]
+source = "Gray background (K cycles)"
 translation = "Fons gris (K canvia)"
 
 [messages.image-bg-white]
@@ -5625,11 +5629,11 @@ source = "ambient occlusion"
 translation = "oclusió ambiental"
 
 [messages.material-role-base-color]
-source = "Colour"
+source = "Color"
 translation = "Color"
 
 [messages.material-role-base-color-name]
-source = "colour"
+source = "color"
 translation = "color"
 
 [messages.material-role-bump]
@@ -5796,8 +5800,8 @@ translation = "Fons fosc"
 source = "Environment background"
 translation = "Fons de l'entorn"
 
-[messages.model-bg-grey]
-source = "Grey background"
+[messages.model-bg-gray]
+source = "Gray background"
 translation = "Fons gris"
 
 [messages.model-bg-light]
@@ -5912,8 +5916,8 @@ translation = "Llargada"
 source = "Materials"
 translation = "Materials"
 
-[messages.model-info-metres]
-source = "glTF is in metres"
+[messages.model-info-meters]
+source = "glTF is in meters"
 translation = "glTF és en metres"
 
 [messages.model-info-no-units]
@@ -6634,8 +6638,8 @@ translation = "En desar, s'obté la descripció de la pàgina de botiga."
 source = "Paste the listing text, or leave empty to fetch it from the store page."
 translation = "Enganxeu el text de l'anunci, o deixeu-ho buit per obtenir-lo de la pàgina de botiga."
 
-[messages.packs-thumbs-cancelled]
-source = "Cancelled after { $done } of { $total }"
+[messages.packs-thumbs-canceled]
+source = "Canceled after { $done } of { $total }"
 translation = "S'ha cancel·lat després de { $done } de { $total }"
 
 [messages.packs-thumbs-drawing]
@@ -6900,11 +6904,11 @@ translation = "Esborra la selecció"
 source = "Dark theme: { $name }"
 translation = "Tema fosc: { $name }"
 
-[messages.palette-favourites]
-source = "Favourites"
+[messages.palette-favorites]
+source = "Favorites"
 translation = "Preferits"
 
-[messages.palette-favourites-keywords]
+[messages.palette-favorites-keywords]
 source = "starred stars liked"
 translation = "destacats estrelles m'agrada favorits starred stars liked"
 
@@ -7092,12 +7096,12 @@ translation = "aparença color appearance"
 source = "Command palette"
 translation = "Paleta d'ordres"
 
-[messages.projects-favourite-add-failed]
-source = "Couldn't add to your favourites: { $error }"
+[messages.projects-favorite-add-failed]
+source = "Couldn't add to your favorites: { $error }"
 translation = "No s'ha pogut afegir als preferits: { $error }"
 
-[messages.projects-favourite-remove-failed]
-source = "Couldn't take out of your favourites: { $error }"
+[messages.projects-favorite-remove-failed]
+source = "Couldn't take out of your favorites: { $error }"
 translation = "No s'ha pogut treure dels preferits: { $error }"
 
 [messages.projects-forget-search-failed]
@@ -7369,7 +7373,7 @@ source = "Tagging { $pack } with AI"
 translation = "Etiquetant { $pack } amb IA"
 
 [messages.server-job-looks]
-source = "Working out colours and looks"
+source = "Working out colors and looks"
 translation = "Deduint colors i aspecte"
 
 [messages.server-job-materials]
@@ -7457,7 +7461,7 @@ source = "ambient occlusion"
 translation = "oclusió ambiental"
 
 [messages.server-role-base-color]
-source = "colour"
+source = "color"
 translation = "color"
 
 [messages.server-role-bump]
@@ -7875,7 +7879,7 @@ source = "Couldn’t get the model: { $detail }. Trying again every hour."
 translation = "No s'ha pogut obtenir el model: { $detail }. Es torna a provar cada hora."
 
 [messages.settings-clip-what]
-source = "Type what you’re after (“mossy rock”, “sci-fi door”, “wooden barrel”) and pictures that show it turn up beside names that have the words. “More like this” finds things of the same kind, not only the same colours."
+source = "Type what you’re after (“mossy rock”, “sci-fi door”, “wooden barrel”) and pictures that show it turn up beside names that have the words. “More like this” finds things of the same kind, not only the same colors."
 translation = "Escriviu el que busqueu («roca molsosa», «porta de ciència-ficció», «barril de fusta») i les imatges que ho mostren apareixen al costat dels noms que contenen les paraules. «Més com aquest» troba coses del mateix tipus, no només dels mateixos colors."
 
 [messages.settings-conversion-cache]
@@ -8231,7 +8235,7 @@ source = "Image search"
 translation = "Cerca d'imatges"
 
 [messages.settings-page-search-blurb]
-source = "Search pictures by what they show, not only by their names, and find things that are alike in kind, not only in colour."
+source = "Search pictures by what they show, not only by their names, and find things that are alike in kind, not only in color."
 translation = "Cerqueu imatges pel que mostren, no només pel nom, i trobeu coses semblants pel tipus, no només pel color."
 
 [messages.settings-page-store-files]
@@ -8634,8 +8638,8 @@ translation = "Tanca"
 source = "Close, clear the selection, or close the details"
 translation = "Tanca, esborra la selecció o tanca els detalls"
 
-[messages.shortcuts-favourite]
-source = "Add to or take out of your favourites"
+[messages.shortcuts-favorite]
+source = "Add to or take out of your favorites"
 translation = "Afegeix als preferits o treu-ne"
 
 [messages.shortcuts-fit]
@@ -9038,15 +9042,15 @@ source = "Edit"
 translation = "Edita"
 
 [messages.storefiles-field-colors]
-source = "Colours"
+source = "Colors"
 translation = "Colors"
 
 [messages.storefiles-field-colors-hint]
-source = "Its colours, as color: tags."
+source = "Its colors, as color: tags."
 translation = "Els seus colors, com a etiquetes color:."
 
 [messages.storefiles-field-colors-name]
-source = "colours"
+source = "colors"
 translation = "els colors"
 
 [messages.storefiles-field-id]
@@ -9638,7 +9642,7 @@ source = "Warm charcoal, amber"
 translation = "Carbó càlid, ambre"
 
 [messages.theme-dark-graphite-blurb]
-source = "Neutral grey, no tint"
+source = "Neutral gray, no tint"
 translation = "Gris neutre, sense tint"
 
 [messages.theme-dark-moss-blurb]
@@ -9654,7 +9658,7 @@ source = "Wine-black, coral"
 translation = "Negre vi, corall"
 
 [messages.theme-dark-slate-blurb]
-source = "Blue-grey"
+source = "Blue-gray"
 translation = "Gris blavós"
 
 [messages.theme-ember]
@@ -9678,7 +9682,7 @@ source = "Warm cream, amber"
 translation = "Crema càlid, ambre"
 
 [messages.theme-light-paper-blurb]
-source = "Plain neutral grey"
+source = "Plain neutral gray"
 translation = "Gris neutre senzill"
 
 [messages.theme-light-sage-blurb]
@@ -9686,7 +9690,7 @@ source = "Soft green"
 translation = "Verd suau"
 
 [messages.theme-light-slate-blurb]
-source = "Cool blue-grey"
+source = "Cool blue-gray"
 translation = "Gris blavós fred"
 
 [messages.theme-lilac]
@@ -9721,16 +9725,16 @@ translation = "Sàlvia"
 source = "Slate"
 translation = "Pissarra"
 
-[messages.tile-add-favourite]
-source = "Add to your favourites (F)"
+[messages.tile-add-favorite]
+source = "Add to your favorites (F)"
 translation = "Afegeix als preferits (F)"
 
-[messages.tile-favourite]
-source = "Favourite { $name }"
+[messages.tile-favorite]
+source = "Favorite { $name }"
 translation = "Afegeix { $name } als preferits"
 
-[messages.tile-in-favourites]
-source = "In your favourites"
+[messages.tile-in-favorites]
+source = "In your favorites"
 translation = "Als vostres preferits"
 
 [messages.tile-label]

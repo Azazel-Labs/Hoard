@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "453ff96837a704352761a5bf6af773e801a1f4018577b2f5bc3be44f27d2733f"
+source = "40994fa61278db02342a17e111610609be967f167ac0e561724a1ecc0fd4792e"
 translation = "6418f4b94c42e173c975e080fc872f8f87c3caed7b4bc5be80fefb4028ebdcef"
 
 [messages.account-add]
@@ -688,6 +688,14 @@ translation = "{ $count } öğe şuradan kaldırıldı: { $name }"
 source = "Collections"
 translation = "Koleksiyonlar"
 
+[messages.app-color]
+source = "Color"
+translation = "Renk"
+
+[messages.app-color-any]
+source = "Any color"
+translation = "Herhangi bir renk"
+
 [messages.app-color-black]
 source = "Black"
 translation = "Siyah"
@@ -700,17 +708,21 @@ translation = "Mavi"
 source = "Brown"
 translation = "Kahverengi"
 
+[messages.app-color-gray]
+source = "Gray"
+translation = "Gri"
+
 [messages.app-color-green]
 source = "Green"
 translation = "Yeşil"
 
-[messages.app-color-grey]
-source = "Grey"
-translation = "Gri"
-
 [messages.app-color-orange]
 source = "Orange"
 translation = "Turuncu"
+
+[messages.app-color-pick]
+source = "Pick any color"
+translation = "Bir renk seç"
 
 [messages.app-color-pink]
 source = "Pink"
@@ -732,6 +744,10 @@ translation = "Kum"
 source = "Slate"
 translation = "Arduvaz"
 
+[messages.app-color-swatch]
+source = "{ $color }: assets with much { $lower } in them"
+translation = "{ $color }: içinde bolca { $lower } olan varlıklar"
+
 [messages.app-color-teal]
 source = "Teal"
 translation = "Camgöbeği"
@@ -743,22 +759,6 @@ translation = "Beyaz"
 [messages.app-color-yellow]
 source = "Yellow"
 translation = "Sarı"
-
-[messages.app-colour]
-source = "Colour"
-translation = "Renk"
-
-[messages.app-colour-any]
-source = "Any colour"
-translation = "Herhangi bir renk"
-
-[messages.app-colour-pick]
-source = "Pick any colour"
-translation = "Bir renk seç"
-
-[messages.app-colour-swatch]
-source = "{ $color }: assets with much { $lower } in them"
-translation = "{ $color }: içinde bolca { $lower } olan varlıklar"
 
 [messages.app-credits]
 source = "Credits"
@@ -800,12 +800,12 @@ translation = "daha az"
 source = "{ $count } more"
 translation = "{ $count } tane daha"
 
-[messages.app-favourite]
-source = "Favourite"
+[messages.app-favorite]
+source = "Favorite"
 translation = "Favorilere ekle"
 
-[messages.app-favourites]
-source = "Favourites"
+[messages.app-favorites]
+source = "Favorites"
 translation = "Favoriler"
 
 [messages.app-filters]
@@ -1060,8 +1060,8 @@ translation = "Buradan hoard sync yapan projeler ve son eşitlemelerinde olanlar
 source = "Most alike"
 translation = "En benzer"
 
-[messages.app-rank-colour]
-source = "Most of the colour"
+[messages.app-rank-color]
+source = "Most of the color"
 translation = "En çok bu renk"
 
 [messages.app-rank-match]
@@ -1088,8 +1088,8 @@ translation = "Yeniden dene"
 source = "Save"
 translation = "Kaydet"
 
-[messages.app-save-name-favourites]
-source = "favourites"
+[messages.app-save-name-favorites]
+source = "favorites"
 translation = "favoriler"
 
 [messages.app-save-name-label]
@@ -1252,8 +1252,8 @@ translation = "Kutucuk boyutu"
 source = "Undo"
 translation = "Geri al"
 
-[messages.app-unfavourite]
-source = "Unfavourite"
+[messages.app-unfavorite]
+source = "Unfavorite"
 translation = "Favorilerden çıkar"
 
 [messages.app-unnamed-asset]
@@ -1675,16 +1675,16 @@ translation = "Yalnızca bu dosya"
 source = "Just this file, without the files it uses"
 translation = "Yalnızca bu dosya, kullandığı dosyalar olmadan"
 
-[messages.asset-favourite]
-source = "Favourite"
+[messages.asset-favorite]
+source = "Favorite"
 translation = "Favori"
 
-[messages.asset-favourite-off-title]
-source = "Add to your favourites (F)"
+[messages.asset-favorite-off-title]
+source = "Add to your favorites (F)"
 translation = "Favorilerinize ekleyin (F)"
 
-[messages.asset-favourite-on-title]
-source = "In your favourites (F takes it out)"
+[messages.asset-favorite-on-title]
+source = "In your favorites (F takes it out)"
 translation = "Favorilerinizde (F ile çıkarılır)"
 
 [messages.asset-file]
@@ -1858,6 +1858,10 @@ translation = "Pişirilmiş (oyun derlemesi): önizlemeler ve kaynaklar çıkar�
 [messages.asset-meta-cue-markers]
 source = "Cue markers"
 translation = "İşaretçiler"
+
+[messages.asset-meta-everything-with]
+source = "Show everything tagged { $tag }"
+translation = "{ $tag } etiketli her şeyi göster"
 
 [messages.asset-meta-format]
 source = "Format"
@@ -2088,7 +2092,7 @@ source = "Hoard read it out of the package on { $date } ({ $notes })."
 translation = "Hoard bunu { $date } tarihinde paketin içinden okudu ({ $notes })."
 
 [messages.asset-palette]
-source = "Colours in the picture"
+source = "Colors in the picture"
 translation = "Resimdeki renkler"
 
 [messages.asset-path]
@@ -2196,7 +2200,7 @@ source = "Find assets with { $hex }, { $percent }% of this picture"
 translation = "{ $hex } rengine sahip varlıkları bul (bu resmin %{ $percent } kadarı)"
 
 [messages.asset-swatch-title]
-source = "{ $hex }, { $percent }% of the picture. Find assets with this colour"
+source = "{ $hex }, { $percent }% of the picture. Find assets with this color"
 translation = "{ $hex }, resmin %{ $percent } kadarı. Bu renkteki varlıkları bul"
 
 [messages.asset-tag-add]
@@ -2476,7 +2480,7 @@ source = "Make an OAuth client (Web application) in Google Cloud Console → API
 translation = "Google Cloud Console → APIs & Services → Credentials bölümünde bir OAuth istemcisi (Web application) oluşturun. Google grup göndermez; bu yüzden rolleri Ayarlar → Hesap bölümünden verin ve Google hesabı olan herkesin girmesini istemiyorsanız ilk oturum açmada hesap oluşturmayı kapatın."
 
 [messages.auth-preset-microsoft-note]
-source = "Register an app in Entra ID → App registrations (a Web redirect to the address below). Put your tenant ID in place of “organizations” to let only your organisation in. For roles from groups, add the groups claim under Token configuration: it lists group IDs."
+source = "Register an app in Entra ID → App registrations (a Web redirect to the address below). Put your tenant ID in place of “organizations” to let only your organization in. For roles from groups, add the groups claim under Token configuration: it lists group IDs."
 translation = "Entra ID → App registrations bölümünde bir uygulama kaydedin (aşağıdaki adrese bir Web yönlendirmesiyle). Yalnızca kuruluşunuzun girmesi için “organizations” yerine kiracı kimliğinizi yazın. Rolleri gruplardan almak için Token configuration altında groups talebini ekleyin: grup kimliklerini listeler."
 
 [messages.auth-provider]
@@ -2923,8 +2927,8 @@ translation = "okunamıyor: { $path }"
 source = "can't write to { $path }"
 translation = "yazılamıyor: { $path }"
 
-[messages.error-chatgpt-cancelled]
-source = "the sign-in was cancelled"
+[messages.error-chatgpt-canceled]
+source = "the sign-in was canceled"
 translation = "oturum açma iptal edildi"
 
 [messages.error-chatgpt-code-used]
@@ -3107,7 +3111,7 @@ translation = "Dizin parolanızı denetleyemedi: { $reason }"
 source = "empty file"
 translation = "boş dosya"
 
-[messages.error-favourites-too-many]
+[messages.error-favorites-too-many]
 source = "at most 10,000 at a time"
 translation = "bir seferde en fazla 10.000"
 
@@ -3816,7 +3820,7 @@ source = "that picture is too big for a thumbnail"
 translation = "bu resim küçük resim için çok büyük"
 
 [messages.error-token-account-gone]
-source = "this token's account is gone, so it has no favourites or searches"
+source = "this token's account is gone, so it has no favorites or searches"
 translation = "bu belirtecin hesabı artık yok, bu yüzden favorileri ya da aramaları yok"
 
 [messages.error-token-name]
@@ -4079,7 +4083,7 @@ source = "It finds no title in this file. Pick the title."
 translation = "Bu dosyada başlık bulamıyor. Başlığı seçin."
 
 [messages.formatwizard-miss-not-the-stores]
-source = "What it recognises the store’s files by isn’t in this file. Change Recognise by."
+source = "What it recognizes the store’s files by isn’t in this file. Change Recognize by."
 translation = "Mağazanın dosyalarını tanıdığı şey bu dosyada yok. Tanıma ölçütü’nü değiştirin."
 
 [messages.formatwizard-miss-short-name]
@@ -4154,19 +4158,19 @@ translation = "Başlık"
 source = "Store page"
 translation = "Mağaza sayfası"
 
-[messages.formatwizard-recognise]
-source = "Recognise by"
+[messages.formatwizard-recognize]
+source = "Recognize by"
 translation = "Tanıma ölçütü"
 
-[messages.formatwizard-recognise-hint]
+[messages.formatwizard-recognize-hint]
 source = "One way a line; any of them will do. Needed when other files have the same name."
 translation = "Her satıra bir yol; herhangi biri yeterlidir. Başka dosyalar da aynı adı taşıyorsa gerekir."
 
-[messages.formatwizard-recognise-json]
+[messages.formatwizard-recognize-json]
 source = "A key only the store’s files have"
 translation = "Yalnızca mağazanın dosyalarında olan bir anahtar"
 
-[messages.formatwizard-recognise-text]
+[messages.formatwizard-recognize-text]
 source = "A line only the store’s files have"
 translation = "Yalnızca mağazanın dosyalarında olan bir satır"
 
@@ -4658,12 +4662,12 @@ translation = "damalı arka plan"
 source = "Checker background (K cycles)"
 translation = "Damalı arka plan (K ile değiştir)"
 
-[messages.image-bg-grey]
-source = "grey background"
+[messages.image-bg-gray]
+source = "gray background"
 translation = "gri arka plan"
 
-[messages.image-bg-grey-title]
-source = "Grey background (K cycles)"
+[messages.image-bg-gray-title]
+source = "Gray background (K cycles)"
 translation = "Gri arka plan (K ile değiştir)"
 
 [messages.image-bg-white]
@@ -5515,11 +5519,11 @@ source = "ambient occlusion"
 translation = "ortam kapanması"
 
 [messages.material-role-base-color]
-source = "Colour"
+source = "Color"
 translation = "Renk"
 
 [messages.material-role-base-color-name]
-source = "colour"
+source = "color"
 translation = "renk"
 
 [messages.material-role-bump]
@@ -5686,8 +5690,8 @@ translation = "Koyu arka plan"
 source = "Environment background"
 translation = "Ortam arka planı"
 
-[messages.model-bg-grey]
-source = "Grey background"
+[messages.model-bg-gray]
+source = "Gray background"
 translation = "Gri arka plan"
 
 [messages.model-bg-light]
@@ -5802,8 +5806,8 @@ translation = "Uzunluk"
 source = "Materials"
 translation = "Malzemeler"
 
-[messages.model-info-metres]
-source = "glTF is in metres"
+[messages.model-info-meters]
+source = "glTF is in meters"
 translation = "glTF metre cinsindendir"
 
 [messages.model-info-no-units]
@@ -6505,8 +6509,8 @@ translation = "Kaydetmek, açıklamayı mağaza sayfasından alır."
 source = "Paste the listing text, or leave empty to fetch it from the store page."
 translation = "İlan metnini yapıştırın ya da mağaza sayfasından alınması için boş bırakın."
 
-[messages.packs-thumbs-cancelled]
-source = "Cancelled after { $done } of { $total }"
+[messages.packs-thumbs-canceled]
+source = "Canceled after { $done } of { $total }"
 translation = "İptal edildi ({ $done } / { $total } tamamlanmıştı)"
 
 [messages.packs-thumbs-drawing]
@@ -6749,11 +6753,11 @@ translation = "Seçimi temizle"
 source = "Dark theme: { $name }"
 translation = "Koyu tema: { $name }"
 
-[messages.palette-favourites]
-source = "Favourites"
+[messages.palette-favorites]
+source = "Favorites"
 translation = "Favoriler"
 
-[messages.palette-favourites-keywords]
+[messages.palette-favorites-keywords]
 source = "starred stars liked"
 translation = "yıldızlı yıldız beğenilen starred stars liked"
 
@@ -6941,12 +6945,12 @@ translation = "görünüm renk appearance color"
 source = "Command palette"
 translation = "Komut paleti"
 
-[messages.projects-favourite-add-failed]
-source = "Couldn't add to your favourites: { $error }"
+[messages.projects-favorite-add-failed]
+source = "Couldn't add to your favorites: { $error }"
 translation = "Favorilerinize eklenemedi: { $error }"
 
-[messages.projects-favourite-remove-failed]
-source = "Couldn't take out of your favourites: { $error }"
+[messages.projects-favorite-remove-failed]
+source = "Couldn't take out of your favorites: { $error }"
 translation = "Favorilerinizden çıkarılamadı: { $error }"
 
 [messages.projects-forget-search-failed]
@@ -7214,7 +7218,7 @@ source = "Tagging { $pack } with AI"
 translation = "Yapay zekâ ile etiketleniyor: { $pack }"
 
 [messages.server-job-looks]
-source = "Working out colours and looks"
+source = "Working out colors and looks"
 translation = "Renkler ve görünümler çıkarılıyor"
 
 [messages.server-job-materials]
@@ -7302,7 +7306,7 @@ source = "ambient occlusion"
 translation = "ortam kapanması"
 
 [messages.server-role-base-color]
-source = "colour"
+source = "color"
 translation = "renk"
 
 [messages.server-role-bump]
@@ -7716,7 +7720,7 @@ source = "Couldn’t get the model: { $detail }. Trying again every hour."
 translation = "Model alınamadı: { $detail }. Her saat yeniden deneniyor."
 
 [messages.settings-clip-what]
-source = "Type what you’re after (“mossy rock”, “sci-fi door”, “wooden barrel”) and pictures that show it turn up beside names that have the words. “More like this” finds things of the same kind, not only the same colours."
+source = "Type what you’re after (“mossy rock”, “sci-fi door”, “wooden barrel”) and pictures that show it turn up beside names that have the words. “More like this” finds things of the same kind, not only the same colors."
 translation = "Aradığınızı yazın (“mossy rock”, “sci-fi door”, “wooden barrel”); onu gösteren resimler, adında bu sözcükler geçenlerin yanında çıkar. “Buna benzer daha fazla”, yalnızca aynı renkleri değil, aynı türden şeyleri bulur."
 
 [messages.settings-conversion-cache]
@@ -8072,7 +8076,7 @@ source = "Image search"
 translation = "Görsel arama"
 
 [messages.settings-page-search-blurb]
-source = "Search pictures by what they show, not only by their names, and find things that are alike in kind, not only in colour."
+source = "Search pictures by what they show, not only by their names, and find things that are alike in kind, not only in color."
 translation = "Resimleri yalnızca adlarına göre değil, gösterdiklerine göre arayın; yalnızca renkte değil, türde de benzeyen şeyleri bulun."
 
 [messages.settings-page-store-files]
@@ -8475,8 +8479,8 @@ translation = "Kapat"
 source = "Close, clear the selection, or close the details"
 translation = "Kapat, seçimi temizle ya da ayrıntıları kapat"
 
-[messages.shortcuts-favourite]
-source = "Add to or take out of your favourites"
+[messages.shortcuts-favorite]
+source = "Add to or take out of your favorites"
 translation = "Favorilere ekle ya da favorilerden çıkar"
 
 [messages.shortcuts-fit]
@@ -8878,15 +8882,15 @@ source = "Edit"
 translation = "Düzenle"
 
 [messages.storefiles-field-colors]
-source = "Colours"
+source = "Colors"
 translation = "Renkler"
 
 [messages.storefiles-field-colors-hint]
-source = "Its colours, as color: tags."
+source = "Its colors, as color: tags."
 translation = "Renkleri, color: etiketleri olarak."
 
 [messages.storefiles-field-colors-name]
-source = "colours"
+source = "colors"
 translation = "renkler"
 
 [messages.storefiles-field-id]
@@ -9462,7 +9466,7 @@ source = "Warm charcoal, amber"
 translation = "Sıcak kömür, kehribar"
 
 [messages.theme-dark-graphite-blurb]
-source = "Neutral grey, no tint"
+source = "Neutral gray, no tint"
 translation = "Nötr gri, renk tonu yok"
 
 [messages.theme-dark-moss-blurb]
@@ -9478,7 +9482,7 @@ source = "Wine-black, coral"
 translation = "Şarap siyahı, mercan"
 
 [messages.theme-dark-slate-blurb]
-source = "Blue-grey"
+source = "Blue-gray"
 translation = "Mavi-gri"
 
 [messages.theme-ember]
@@ -9502,7 +9506,7 @@ source = "Warm cream, amber"
 translation = "Sıcak krem, kehribar"
 
 [messages.theme-light-paper-blurb]
-source = "Plain neutral grey"
+source = "Plain neutral gray"
 translation = "Sade nötr gri"
 
 [messages.theme-light-sage-blurb]
@@ -9510,7 +9514,7 @@ source = "Soft green"
 translation = "Yumuşak yeşil"
 
 [messages.theme-light-slate-blurb]
-source = "Cool blue-grey"
+source = "Cool blue-gray"
 translation = "Serin mavi-gri"
 
 [messages.theme-lilac]
@@ -9545,16 +9549,16 @@ translation = "Adaçayı"
 source = "Slate"
 translation = "Arduvaz"
 
-[messages.tile-add-favourite]
-source = "Add to your favourites (F)"
+[messages.tile-add-favorite]
+source = "Add to your favorites (F)"
 translation = "Favorilerinize ekleyin (F)"
 
-[messages.tile-favourite]
-source = "Favourite { $name }"
+[messages.tile-favorite]
+source = "Favorite { $name }"
 translation = "Favorilere ekle: { $name }"
 
-[messages.tile-in-favourites]
-source = "In your favourites"
+[messages.tile-in-favorites]
+source = "In your favorites"
 translation = "Favorilerinizde"
 
 [messages.tile-label]

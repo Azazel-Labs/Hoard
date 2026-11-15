@@ -2,7 +2,7 @@
 // Full-screen 3D viewer, the model counterpart of the image inspector: orbit, frame and reset, and the switches that
 // answer "what is this model made of" (wireframe, textures off, lighting without the environment, a floor grid),
 // against different backgrounds, with its clips. A menu on the left shows it other ways: plainly lit, one map at a
-// time, as clay, with a UV checker or each mesh in its own colour, and the scene's counts and size. Textures come as
+// time, as clay, with a UV checker or each mesh in its own color, and the scene's counts and size. Textures come as
 // light previews (at most 2048 px) unless "Full-resolution textures" is on.
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import type { Asset } from '../api'
@@ -13,13 +13,13 @@ import type { Background, MapMode, ModelStage, SceneStats, StageInfo, ViewMode }
 const props = defineProps<{ asset: Asset }>()
 const emit = defineEmits<{ close: [] }>()
 
-const BACKGROUNDS: Background[] = ['checker', 'dark', 'grey', 'light', 'env']
+const BACKGROUNDS: Background[] = ['checker', 'dark', 'gray', 'light', 'env']
 /** A background swatch's name, as read out: "Checker background". */
 function bgLabel(b: Background): string {
   switch (b) {
     case 'checker': return t('model-bg-checker')
     case 'dark': return t('model-bg-dark')
-    case 'grey': return t('model-bg-grey')
+    case 'gray': return t('model-bg-gray')
     case 'light': return t('model-bg-light')
     case 'env': return t('model-bg-env')
   }
@@ -73,9 +73,9 @@ const modeLabel = computed(() => MODES.find((m) => m.mode === mode.value)!.label
 // The textures switch means something only with the model's own materials, the light switch only in the final render.
 const ownMaterials = computed(() => mode.value === 'final' || mode.value === 'raw')
 
-/** A length as people say it, to three figures: metres for glTF (in cm or mm when small), else plain units. */
-function length(n: number, metres: boolean): string {
-  if (!metres) return t('model-length-units', { n })
+/** A length as people say it, to three figures: meters for glTF (in cm or mm when small), else plain units. */
+function length(n: number, meters: boolean): string {
+  if (!meters) return t('model-length-units', { n })
   if (n >= 1 || n === 0) return t('model-length-m', { n })
   if (n >= 0.01) return t('model-length-cm', { n: n * 100 })
   return t('model-length-mm', { n: n * 1000 })
@@ -329,10 +329,10 @@ function onKey(e: KeyboardEvent) {
           <div><dt>{{ t('model-info-triangles') }}</dt><dd>{{ formatNumber(stats.triangles) }}</dd></div>
           <div><dt>{{ t('model-info-vertices') }}</dt><dd>{{ formatNumber(stats.vertices) }}</dd></div>
         </dl>
-        <dl class="size" :title="stats.metres ? t('model-info-metres') : t('model-info-no-units')">
-          <div><dt>{{ t('model-info-height') }}</dt><dd>{{ length(stats.size.y, stats.metres) }}</dd></div>
-          <div><dt>{{ t('model-info-length') }}</dt><dd>{{ length(stats.size.z, stats.metres) }}</dd></div>
-          <div><dt>{{ t('model-info-width') }}</dt><dd>{{ length(stats.size.x, stats.metres) }}</dd></div>
+        <dl class="size" :title="stats.meters ? t('model-info-meters') : t('model-info-no-units')">
+          <div><dt>{{ t('model-info-height') }}</dt><dd>{{ length(stats.size.y, stats.meters) }}</dd></div>
+          <div><dt>{{ t('model-info-length') }}</dt><dd>{{ length(stats.size.z, stats.meters) }}</dd></div>
+          <div><dt>{{ t('model-info-width') }}</dt><dd>{{ length(stats.size.x, stats.meters) }}</dd></div>
         </dl>
       </section>
       <p v-if="status === 'viewer'" class="msg">{{ t('model-loading-viewer') }}</p>
@@ -361,11 +361,11 @@ function onKey(e: KeyboardEvent) {
 <style scoped src="./viewerChrome.css"></style>
 <style scoped>
 .stage.bg-dark { background: #1b1c20; }
-.stage.bg-grey { background: #808080; }
+.stage.bg-gray { background: #808080; }
 .stage.bg-light { background: #e8e9ed; }
 .stage.bg-env { background: #6e6e72; }
 .swatch.dark::after { background: #1b1c20; }
-.swatch.grey::after { background: #808080; }
+.swatch.gray::after { background: #808080; }
 .swatch.light::after { background: #e8e9ed; }
 .swatch.env::after { background: radial-gradient(circle at 35% 30%, #fff, #9a9aa0 55%, #4a4a50); }
 .hd { font-size: 0.62rem; font-weight: 700; letter-spacing: 0.02em; border: 1.4px solid currentColor; border-radius: 3px; padding: 0 2px; line-height: 1.25; }

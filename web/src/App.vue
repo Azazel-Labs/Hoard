@@ -7,7 +7,7 @@ import {
 import { canPreview, stop as stopPreview, toggle as togglePreview } from './player'
 import { prefs, toggleIn } from './prefs'
 import { askToSignIn, auth, may, mayEdit, signOut, siteName } from './auth'
-import { forgetSearch, mine, saveSearch, setFavourite, toggleFavourite } from './mine'
+import { forgetSearch, mine, saveSearch, setFavorite, toggleFavorite } from './mine'
 import { loadProjects, projects } from './projects'
 import { teach } from './storeFormats'
 import { DARK_THEMES, LIGHT_THEMES, themeFor } from './theme'
@@ -60,23 +60,23 @@ const settingsSection = ref(initial.section || 'appearance')
 type Named = { id: string; name: string }
 const filters = reactive({
   q: '', kind: '', tags: [] as string[], pack: null as Named | null, collection: null as Named | null, sort: '',
-  /** Only your favourites. */
-  favourites: false,
+  /** Only your favorites. */
+  favorites: false,
   /** Only what this project (its name) has. */
   project: '',
   /** Assets that look like this one, most alike first. */
   similar: null as Named | null,
-  /** Assets with much of this colour (hex), most of it first. */
+  /** Assets with much of this color (hex), most of it first. */
   color: '',
 })
-/** Colours to search by in one click; the picker beside them does any other. */
+/** Colors to search by in one click; the picker beside them does any other. */
 const COLOR_PRESETS: { hex: string; name: () => string }[] = [
   { hex: '#b8322a', name: () => t('app-color-red') }, { hex: '#e07b28', name: () => t('app-color-orange') },
   { hex: '#e8c234', name: () => t('app-color-yellow') }, { hex: '#4f8a2e', name: () => t('app-color-green') },
   { hex: '#2a9d8f', name: () => t('app-color-teal') }, { hex: '#2f6fd0', name: () => t('app-color-blue') },
   { hex: '#7b4bb3', name: () => t('app-color-purple') }, { hex: '#d9599a', name: () => t('app-color-pink') },
   { hex: '#7a5230', name: () => t('app-color-brown') }, { hex: '#d6c09a', name: () => t('app-color-sand') },
-  { hex: '#8a8a8a', name: () => t('app-color-grey') }, { hex: '#4a5560', name: () => t('app-color-slate') },
+  { hex: '#8a8a8a', name: () => t('app-color-gray') }, { hex: '#4a5560', name: () => t('app-color-slate') },
   { hex: '#1c1c1c', name: () => t('app-color-black') }, { hex: '#f2f2f0', name: () => t('app-color-white') },
 ]
 
@@ -137,7 +137,7 @@ async function runSearch(append = false) {
       sort: filters.sort || undefined,
       similar: filters.similar?.id,
       color: filters.color || undefined,
-      favourites: filters.favourites || undefined,
+      favorites: filters.favorites || undefined,
       project: filters.project || undefined,
       limit: PAGE,
       offset: append ? items.value.length : 0,
@@ -175,7 +175,7 @@ watch(() => filters.q, () => {
 })
 watch(() => [
   filters.kind, filters.tags.join(','), filters.pack?.id, filters.collection?.id, filters.sort, filters.similar?.id,
-  filters.color, filters.favourites, filters.project, prefs.showSupporting,
+  filters.color, filters.favorites, filters.project, prefs.showSupporting,
 ], () => {
   checked.value = []
   runSearch()
@@ -233,21 +233,21 @@ function setView(v: View) {
   void withTransition(() => (view.value = v), 'view')
 }
 function browsePack(p: Named) {
-  Object.assign(filters, { pack: { id: p.id, name: p.name }, collection: null, favourites: false, project: '', kind: '', tags: [], q: '', similar: null, color: '' })
+  Object.assign(filters, { pack: { id: p.id, name: p.name }, collection: null, favorites: false, project: '', kind: '', tags: [], q: '', similar: null, color: '' })
   setView('library')
 }
 function browseCollection(c: Collection | Named) {
   const same = filters.collection?.id === c.id
   Object.assign(filters, {
     collection: same ? null : { id: c.id, name: c.name }, pack: null, kind: '', tags: [], q: '', similar: null, color: '',
-    favourites: false, project: '',
+    favorites: false, project: '',
   })
   setView('library')
   showFilters.value = false
 }
 function browseProject(name: string) {
   const same = filters.project === name
-  Object.assign(filters, { project: same ? '' : name, favourites: false, collection: null, pack: null, kind: '', tags: [], q: '', similar: null, color: '' })
+  Object.assign(filters, { project: same ? '' : name, favorites: false, collection: null, pack: null, kind: '', tags: [], q: '', similar: null, color: '' })
   setView('library')
   showFilters.value = false
 }
@@ -266,9 +266,9 @@ async function forgetProject(p: Project) {
     showError(t('app-forget-project-failed', { name: p.name, error: (e as Error).message }))
   }
 }
-function browseFavourites() {
-  const same = filters.favourites
-  Object.assign(filters, { favourites: !same, project: '', collection: null, pack: null, kind: '', tags: [], q: '', similar: null, color: '' })
+function browseFavorites() {
+  const same = filters.favorites
+  Object.assign(filters, { favorites: !same, project: '', collection: null, pack: null, kind: '', tags: [], q: '', similar: null, color: '' })
   setView('library')
   showFilters.value = false
 }
@@ -292,7 +292,7 @@ async function startNaming() {
   saveName.value = [
     filters.q.trim(), filters.kind, ...filters.tags, filters.pack?.name, filters.collection?.name,
     filters.similar && t('app-save-name-like', { name: filters.similar.name }), filters.color,
-    filters.favourites && t('app-save-name-favourites'), filters.project,
+    filters.favorites && t('app-save-name-favorites'), filters.project,
   ].filter(Boolean).join(' · ').slice(0, 80)
   naming.value = true
   await nextTick()
@@ -306,8 +306,8 @@ async function saveCurrent() {
     showOk(t('app-search-saved', { name }))
   }
 }
-/** Every selected asset is a favourite already, so the button takes them out. */
-const allStarred = computed(() => checked.value.length > 0 && checked.value.every((id) => mine.favourites.has(id)))
+/** Every selected asset is a favorite already, so the button takes them out. */
+const allStarred = computed(() => checked.value.length > 0 && checked.value.every((id) => mine.favorites.has(id)))
 const mainEl = ref<HTMLElement | null>(null)
 /** Index of the first tile of the newest page, the ones that animate in. */
 const fresh = ref(0)
@@ -432,31 +432,31 @@ function goHome() {
   mainEl.value?.scrollTo({ top: 0, behavior: 'smooth' })
 }
 function clearFilters() {
-  Object.assign(filters, { q: '', kind: '', tags: [], pack: null, collection: null, favourites: false, project: '', similar: null, color: '' })
+  Object.assign(filters, { q: '', kind: '', tags: [], pack: null, collection: null, favorites: false, project: '', similar: null, color: '' })
 }
 const hasFilters = computed(
-  () => !!(filters.q || filters.kind || filters.tags.length || filters.pack || filters.collection || filters.similar || filters.color || filters.favourites || filters.project),
+  () => !!(filters.q || filters.kind || filters.tags.length || filters.pack || filters.collection || filters.similar || filters.color || filters.favorites || filters.project),
 )
 /** "More like this": everything that looks like an asset, across every pack, most alike first. */
 function findSimilar(a: Asset) {
   Object.assign(filters, {
-    similar: { id: a.id, name: a.name }, color: '', q: '', kind: '', tags: [], pack: null, collection: null, favourites: false, project: '', sort: '',
+    similar: { id: a.id, name: a.name }, color: '', q: '', kind: '', tags: [], pack: null, collection: null, favorites: false, project: '', sort: '',
   })
   setView('library')
   mainEl.value?.scrollTo({ top: 0 })
 }
-/** A colour from an asset's palette: everything with much of it, across the library. */
+/** A color from an asset's palette: everything with much of it, across the library. */
 function findColor(hex: string) {
-  Object.assign(filters, { color: hex, similar: null, q: '', kind: '', tags: [], pack: null, collection: null, favourites: false, project: '', sort: '' })
+  Object.assign(filters, { color: hex, similar: null, q: '', kind: '', tags: [], pack: null, collection: null, favorites: false, project: '', sort: '' })
   setView('library')
   mainEl.value?.scrollTo({ top: 0 })
 }
-/** A colour from the sidebar: added to the filters already set, or taken off when it's the one set. */
+/** A color from the sidebar: added to the filters already set, or taken off when it's the one set. */
 function pickColor(hex: string) {
   filters.color = filters.color === hex ? '' : hex
 }
 const rankLabel = computed(() =>
-  filters.similar ? t('app-rank-alike') : filters.color ? t('app-rank-colour') : filters.q ? t('app-rank-match') : t('app-sort-newest'),
+  filters.similar ? t('app-rank-alike') : filters.color ? t('app-rank-color') : filters.q ? t('app-rank-match') : t('app-sort-newest'),
 )
 
 // ------------------------------------------------------------------ collections
@@ -928,7 +928,7 @@ function onKey(e: KeyboardEvent) {
     toggleCheck(focused)
   }
   if (e.key === 'f' && focused && member.value) {
-    toggleFavourite(focused.id)
+    toggleFavorite(focused.id)
   }
 }
 
@@ -950,7 +950,7 @@ function readUrl(search = location.search) {
   filters.similar = like ? { id: like, name: u.get('similar_name') ?? t('app-unnamed-asset') } : null
   const color = u.get('color') ?? ''
   filters.color = /^#[0-9a-f]{6}$/i.test(color) ? color.toLowerCase() : ''
-  filters.favourites = u.get('fav') === '1'
+  filters.favorites = u.get('fav') === '1'
   filters.project = u.get('project') ?? ''
 }
 /** What a history entry is: going somewhere new adds an entry; refining where you are rewrites it. */
@@ -961,7 +961,7 @@ function urlState() {
     asset: selected.value?.id ?? '',
     place: [
       filters.kind, filters.tags.join(','), filters.sort, filters.pack?.id, filters.collection?.id, filters.similar?.id,
-      filters.color, filters.favourites, filters.project,
+      filters.color, filters.favorites, filters.project,
     ].join('|'),
   }
 }
@@ -988,7 +988,7 @@ function filterQuery(): string {
     u.set('similar_name', filters.similar.name)
   }
   if (filters.color) u.set('color', filters.color)
-  if (filters.favourites) u.set('fav', '1')
+  if (filters.favorites) u.set('fav', '1')
   if (filters.project) u.set('project', filters.project)
   return u.toString()
 }
@@ -1027,7 +1027,7 @@ watch(
     () => filters.collection?.id,
     () => filters.similar?.id,
     () => filters.color,
-    () => filters.favourites,
+    () => filters.favorites,
     () => filters.project,
   ],
   writeUrl,
@@ -1140,7 +1140,7 @@ const commands = computed<Command[]>(() => {
   const out: Command[] = [
     { id: 'go:library', group: goTo, label: t('palette-library'), keywords: t('palette-library-keywords'), run: () => setView('library') },
     ...(member.value
-      ? [{ id: 'go:favourites', group: goTo, label: t('palette-favourites'), hint: mine.favourites.size ? formatNumber(mine.favourites.size) : undefined, keywords: t('palette-favourites-keywords'), run: browseFavourites }]
+      ? [{ id: 'go:favorites', group: goTo, label: t('palette-favorites'), hint: mine.favorites.size ? formatNumber(mine.favorites.size) : undefined, keywords: t('palette-favorites-keywords'), run: browseFavorites }]
       : []),
     { id: 'go:packs', group: goTo, label: t('palette-packs'), hint: busyPacks.value.length ? t('app-packs-working', { count: busyPacks.value.length }) : undefined, run: () => setView('packs') },
     { id: 'go:archive', group: goTo, label: t('palette-archive'), hint: archivedCount.value ? formatNumber(archivedCount.value) : undefined, keywords: t('palette-archive-keywords'), run: () => setView('archive') },
@@ -1359,10 +1359,10 @@ const commands = computed<Command[]>(() => {
           <h3>{{ t('app-yours') }}</h3>
           <ul class="kinds">
             <li>
-              <button type="button" :aria-pressed="filters.favourites" @click="browseFavourites">
+              <button type="button" :aria-pressed="filters.favorites" @click="browseFavorites">
                 <svg viewBox="0 0 16 16" width="11" height="11" aria-hidden="true"><path d="M8 1.9l1.8 3.7 4.1.6-3 2.9.7 4.1L8 11.3l-3.6 1.9.7-4.1-3-2.9 4.1-.6z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" /></svg>
-                <span class="cname">{{ t('app-favourites') }}</span>
-                <span class="n mono">{{ mine.favourites.size }}</span>
+                <span class="cname">{{ t('app-favorites') }}</span>
+                <span class="n mono">{{ mine.favorites.size }}</span>
               </button>
             </li>
             <li v-for="s in mine.searches" :key="s.id" class="saved">
@@ -1404,7 +1404,7 @@ const commands = computed<Command[]>(() => {
           </ul>
         </section>
         <section class="colors">
-          <h3>{{ t('app-colour') }}</h3>
+          <h3>{{ t('app-color') }}</h3>
           <div class="swatches">
             <button
               v-for="c in COLOR_PRESETS"
@@ -1413,12 +1413,12 @@ const commands = computed<Command[]>(() => {
               class="sw"
               :style="{ background: c.hex }"
               :aria-pressed="filters.color === c.hex"
-              :aria-label="t('app-colour-swatch', { color: c.name(), lower: c.name().toLowerCase() })"
+              :aria-label="t('app-color-swatch', { color: c.name(), lower: c.name().toLowerCase() })"
               :title="c.name()"
               @click="pickColor(c.hex)"
             />
-            <label class="sw pick" :class="{ on: filters.color && !COLOR_PRESETS.some((c) => c.hex === filters.color) }" :title="t('app-colour-any')">
-              <span class="visually-hidden">{{ t('app-colour-pick') }}</span>
+            <label class="sw pick" :class="{ on: filters.color && !COLOR_PRESETS.some((c) => c.hex === filters.color) }" :title="t('app-color-any')">
+              <span class="visually-hidden">{{ t('app-color-pick') }}</span>
               <input type="color" :value="filters.color || '#808080'" @change="filters.color = ($event.target as HTMLInputElement).value" />
             </label>
           </div>
@@ -1495,10 +1495,10 @@ const commands = computed<Command[]>(() => {
             </span>
             <TagChip v-if="filters.pack" :tag="`pack:${filters.pack.name}`" removable @remove="filters.pack = null" />
             <TagChip v-if="filters.collection" :tag="`collection:${filters.collection.name}`" removable @remove="filters.collection = null" />
-            <TagChip v-if="filters.favourites" tag="your:favourites" removable @remove="filters.favourites = false" />
+            <TagChip v-if="filters.favorites" tag="your:favorites" removable @remove="filters.favorites = false" />
             <TagChip v-if="filters.project" :tag="`project:${filters.project}`" removable @remove="filters.project = ''" />
             <TagChip v-if="filters.similar" :tag="`like:${filters.similar.name}`" removable @remove="filters.similar = null" />
-            <TagChip v-if="filters.color" :tag="`colour:${filters.color}`" :swatch="filters.color" removable @remove="filters.color = ''" />
+            <TagChip v-if="filters.color" :tag="`color:${filters.color}`" :swatch="filters.color" removable @remove="filters.color = ''" />
             <TagChip v-if="filters.kind" :tag="`kind:${filters.kind}`" removable @remove="filters.kind = ''" />
             <TagChip v-for="t in filters.tags" :key="t" :tag="t" removable @remove="toggleTag(t)" />
             <button v-if="hasFilters" type="button" class="linkbtn" @click="clearFilters">{{ t('app-clear-all') }}</button>
@@ -1693,8 +1693,8 @@ const commands = computed<Command[]>(() => {
           {{ t('app-remove-from-collection', { name: filters.collection.name }) }}
         </button>
         </template>
-        <button v-if="member && checked.length" type="button" class="btn" @click="setFavourite(checked, !allStarred)">
-          {{ allStarred ? t('app-unfavourite') : t('app-favourite') }}
+        <button v-if="member && checked.length" type="button" class="btn" @click="setFavorite(checked, !allStarred)">
+          {{ allStarred ? t('app-unfavorite') : t('app-favorite') }}
         </button>
         <button type="button" class="linkbtn" @click="checked = items.map((a) => a.id)">{{ t('app-select-all', { count: items.length }) }}</button>
         <button v-if="editor" type="button" class="btn danger" :disabled="!checked.length || bulkBusy" :title="t('app-archive-selected-title')" @click="archiveChecked">{{ t('app-archive') }}</button>
@@ -1709,7 +1709,7 @@ const commands = computed<Command[]>(() => {
       class="settings-pane"
       :stats="stats"
       @unauthorized="askToSignIn"
-      @tag="(t) => { Object.assign(filters, { tags: [], kind: '', pack: null, collection: null, favourites: false, project: '', q: '' }); toggleTag(t) }"
+      @tag="(t) => { Object.assign(filters, { tags: [], kind: '', pack: null, collection: null, favorites: false, project: '', q: '' }); toggleTag(t) }"
       @pack="browsePack"
       @open="openAsset"
       @archive="setView('archive')"

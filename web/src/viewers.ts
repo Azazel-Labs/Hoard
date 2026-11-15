@@ -80,7 +80,7 @@ function secondOf(e: MouseEvent): string {
 
 if (typeof document !== 'undefined') {
   // Capture phase, so the second click never reaches what's under the pointer now: it would open a different asset.
-  // Its mousedown is cancelled too, or the browser selects the word under it.
+  // Its mousedown is canceled too, or the browser selects the word under it.
   document.addEventListener('mousedown', (e) => { if (secondOf(e)) e.preventDefault() }, true)
   document.addEventListener(
     'click',

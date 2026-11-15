@@ -256,7 +256,7 @@ async fn complete(state: &AppState, cb: Callback) -> Result<Account> {
     };
     if let Some(e) = &cb.error {
         if e == "access_denied" {
-            bail!(tr!("error-chatgpt-cancelled"));
+            bail!(tr!("error-chatgpt-canceled"));
         }
         bail!(tr!("error-chatgpt-refused", reason = cb.error_description.as_deref().unwrap_or(e)));
     }

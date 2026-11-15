@@ -1,6 +1,6 @@
 <script setup lang="ts">
 // Full-screen text viewer: JSON as a foldable tree (or re-indented, or as written), markdown as a document (or its
-// source), everything else with line numbers and light colouring. Big files show their first megabyte until asked for the rest.
+// source), everything else with line numbers and light coloring. Big files show their first megabyte until asked for the rest.
 import { computed, onMounted, provide, ref } from 'vue'
 import { fileUrl, humanBytes, type Asset } from '../api'
 import { renderMarkdown } from '../markdown'
@@ -189,7 +189,7 @@ onMounted(() => {
 .tree { font-variation-settings: 'MONO' 1, 'CASL' 0; font-size: 0.8rem; line-height: 1.55; }
 .code-lines { width: max-content; min-width: 100%; }
 .code-lines.wrap { width: auto; }
-/* A line length that reads well, centred, however wide the screen. */
+/* A line length that reads well, centered, however wide the screen. */
 .doc { max-width: 46rem; margin: 1.25rem auto 0; font-size: 1rem; }
 .err { color: var(--danger); }
 .banner {

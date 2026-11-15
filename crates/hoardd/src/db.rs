@@ -358,6 +358,25 @@ const MIGRATIONS: &[&str] = &[
        PRIMARY KEY (pack_id, path, part)
      ) WITHOUT ROWID;
      UPDATE upload_files SET received = 0 WHERE received < size;",
+    // 43: "favourites" is spelled the American way.
+    "ALTER TABLE favourites RENAME TO favorites;
+     DROP INDEX favourites_asset;
+     CREATE INDEX favorites_asset ON favorites(asset_id);",
+    // 44: packs are tagged again where the tagger now says more or groups differently: words in brackets in a path
+    // and a sound's artist are tags, Illustrator files are pictures, drawings are never material maps, and a
+    // lettered series (`character_a`, `character_d`) isn't a material.
+    "UPDATE packs SET status = 'ingesting'
+       WHERE status = 'ready' AND archived_at IS NULL
+         AND EXISTS (SELECT 1 FROM assets a WHERE a.pack_id = packs.id
+                     AND (a.ext IN ('ai', 'svg', 'svgz') OR a.path LIKE '%(%' OR a.path LIKE '%[%'
+                          OR json_extract(a.meta, '$.artist') IS NOT NULL
+                          OR (a.ext = 'material' AND json_extract(a.meta, '$.material_maps') IS NOT NULL)))
+         AND NOT EXISTS (SELECT 1 FROM jobs j WHERE j.pack_id = packs.id AND j.status IN ('queued', 'running'));
+     INSERT INTO jobs (kind, pack_id, payload, run_after, created_at, updated_at)
+       SELECT 'retag', id, '{\"then_llm\":false}', strftime('%Y-%m-%dT%H:%M:%SZ', 'now'),
+              strftime('%Y-%m-%dT%H:%M:%SZ', 'now'), strftime('%Y-%m-%dT%H:%M:%SZ', 'now')
+       FROM packs p WHERE p.status = 'ingesting'
+         AND NOT EXISTS (SELECT 1 FROM jobs j WHERE j.pack_id = p.id AND j.status IN ('queued', 'running'));",
 ];
 
 /// How many automatic pre-upgrade backups to keep in `<data dir>/backups`.
@@ -1493,8 +1512,8 @@ fn build_filter(q: &SearchQuery, include_kind: bool, look: Option<&LookRank>) ->
         }
         .to_owned(),
     );
-    if let Some(user) = q.favourites_of {
-        f.clauses.push("a.id IN (SELECT asset_id FROM favourites WHERE user_id = ?)".to_owned());
+    if let Some(user) = q.favorites_of {
+        f.clauses.push("a.id IN (SELECT asset_id FROM favorites WHERE user_id = ?)".to_owned());
         f.params.push(SqlValue::Integer(user));
     }
     if let Some(p) = q.project.as_deref().filter(|p| !p.is_empty()) {
@@ -1803,7 +1822,7 @@ mod tests {
                                  created_at, updated_at) VALUES
                ('a1', 'p1', 'h1', 'a1.wav', 'a1', 'wav', 'audio', 'Birds at dawn.', 0, 'x', 'x'),
                ('a2', 'p1', 'h2', 'a2.wav', 'a2', 'wav', 'audio', 'Recorded in Kent.', 0, 'x', 'x'),
-               ('a3', 'p1', 'h3', 'a3.wav', 'a3', 'wav', 'audio', 'My favourite.', 1, 'x', 'x');
+               ('a3', 'p1', 'h3', 'a3.wav', 'a3', 'wav', 'audio', 'My favorite.', 1, 'x', 'x');
              INSERT INTO asset_tags (asset_id, tag, source, confidence) VALUES ('a1', 'forest', 'llm', 0.6);",
         )
         .unwrap();
@@ -1822,7 +1841,7 @@ mod tests {
         };
         assert_eq!(descriptions("a1"), (None, None, Some("Birds at dawn.".into())));
         assert_eq!(descriptions("a2"), (None, Some("Recorded in Kent.".into()), None));
-        assert_eq!(descriptions("a3"), (Some("My favourite.".into()), None, None));
+        assert_eq!(descriptions("a3"), (Some("My favorite.".into()), None, None));
         let name: String = conn.query_row("SELECT name FROM packs WHERE id = 'p1'", [], |r| r.get(0)).unwrap();
         assert_eq!(name, "Forest");
         let settings: i64 = conn.query_row("SELECT COUNT(*) FROM settings", [], |r| r.get(0)).unwrap();
@@ -1980,10 +1999,10 @@ mod tests {
             "INSERT INTO blobs (hash, size, created_at) VALUES ('h1', 1, 'x'), ('h2', 1, 'x'), ('h3', 1, 'x');
              INSERT INTO packs (id, name, status, tags, created_at) VALUES ('p1', 'Rocks', 'ready', '[]', 'x');
              INSERT INTO assets (id, pack_id, blob_hash, path, name, ext, kind, thumb_hash, created_at, updated_at) VALUES
-               ('a1', 'p1', 'h1', 'grey rock.png', 'grey rock', 'png', 'texture', 't1', 'x', 'x'),
+               ('a1', 'p1', 'h1', 'gray rock.png', 'gray rock', 'png', 'texture', 't1', 'x', 'x'),
                ('a2', 'p1', 'h2', 'mossy rock.png', 'mossy rock', 'png', 'texture', 't2', 'x', 'x'),
                ('a3', 'p1', 'h3', 'rock.glb', 'rock', 'glb', 'model', 't3', 'x', 'x');
-             INSERT INTO assets_fts (asset_id, name) VALUES ('a1', 'grey rock'), ('a2', 'mossy rock'), ('a3', 'rock');",
+             INSERT INTO assets_fts (asset_id, name) VALUES ('a1', 'gray rock'), ('a2', 'mossy rock'), ('a3', 'rock');",
         )
         .unwrap();
         let ids = |page: SearchPage| page.items.into_iter().map(|a| a.id).collect::<Vec<_>>();

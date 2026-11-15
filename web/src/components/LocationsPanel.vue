@@ -252,16 +252,15 @@ async function created(l: LibraryLocation) {
 <style scoped>
 .locs[aria-busy='true'] { cursor: progress; }
 .loading { color: var(--muted); font-size: var(--step--1); }
-section { padding: 1rem 0 1.1rem; border-top: 1px solid var(--line); }
-section:first-child { border-top: 0; padding-top: 0.2rem; }
+/* Its sections are cards like the rest of Settings' (that look is SettingsPage's). */
+.locs { display: grid; gap: 1rem; }
 section:empty { display: none; }
 .sh { display: flex; align-items: center; gap: 0.4rem; min-height: 1.75rem; margin-bottom: 0.3rem; }
-h3 { margin: 0; font-size: 0.7rem; font-weight: 650; letter-spacing: 0.04em; text-transform: uppercase; color: var(--faint); }
 .hint { margin: 0 0 0.6rem; font-size: var(--step--1); color: var(--muted); line-height: 1.45; }
 .hint.empty { color: var(--text); }
 .list { display: grid; gap: 0.4rem; margin: 0 0 0.4rem; padding: 0; list-style: none; }
-.list li { padding: 0.6rem 0.75rem; border: 1px solid var(--line); border-radius: var(--r-chip); font-size: var(--step--1); }
-.list li.open { border-color: var(--muted); background: var(--raised); }
+.list li { padding: 0.6rem 0.75rem; border: 1px solid var(--line); border-radius: 8px; font-size: var(--step--1); }
+.list li.open { border-color: var(--card-on-line); background: var(--card-on); }
 .top { display: flex; gap: 0.7rem; align-items: center; }
 .dot { flex: none; align-self: flex-start; margin-top: 0.4rem; width: 0.5rem; height: 0.5rem; border-radius: 50%; background: var(--danger); }
 .dot[data-on='true'] { background: var(--ok); }

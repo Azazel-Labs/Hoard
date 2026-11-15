@@ -163,7 +163,7 @@ const line = computed((): { state: string; text: string } | null => {
 .hook { margin-top: 1rem; }
 .what { margin: 0 0 0.55rem; font-size: var(--step--1); color: var(--muted); line-height: 1.45; }
 .grid { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 0.5rem 0.8rem; align-items: center; font-size: var(--step--1); }
-.grid > label { color: var(--muted); }
+.grid > label { color: var(--text); font-weight: 550; }
 .grid > .field, .key .field { width: 100%; max-width: 32rem; min-width: 0; }
 .key { display: flex; gap: 0.6rem; align-items: center; }
 .key .field { flex: 1; }

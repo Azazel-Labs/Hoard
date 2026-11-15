@@ -325,14 +325,14 @@ const untrusted = computed(() =>
     <section>
       <div class="sh"><h3>{{ t('https-options') }}</h3></div>
       <label class="check">
-        <input type="checkbox" :checked="st.redirect" :disabled="busy" @change="toggle({ redirect: ($event.target as HTMLInputElement).checked })" />
+        <input type="checkbox" class="switch" :checked="st.redirect" :disabled="busy" @change="toggle({ redirect: ($event.target as HTMLInputElement).checked })" />
         {{ t('https-redirect') }}
       </label>
       <p class="what">
         {{ t('https-redirect-hint') }}
       </p>
       <label class="check">
-        <input type="checkbox" :checked="st.http3" :disabled="busy" @change="toggle({ http3: ($event.target as HTMLInputElement).checked })" />
+        <input type="checkbox" class="switch" :checked="st.http3" :disabled="busy" @change="toggle({ http3: ($event.target as HTMLInputElement).checked })" />
         HTTP/3
       </label>
       <p class="what">
@@ -353,11 +353,10 @@ const untrusted = computed(() =>
 </template>
 
 <style scoped>
-.https { display: grid; font-size: var(--step--1); }
-/* The rest of Settings' look: rules between sections, small headings. It follows the Address section. */
-section { display: grid; gap: 0.6rem; padding: 1rem 0 1.1rem; border-top: 1px solid var(--line); }
+/* Its sections are cards like the rest of Settings' (that look is SettingsPage's), following the Address one. */
+.https { display: grid; gap: 1rem; font-size: var(--step--1); }
+section { display: grid; gap: 0.6rem; }
 .sh { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; min-height: 1.75rem; }
-h3 { margin: 0; font-size: 0.7rem; font-weight: 650; letter-spacing: 0.04em; text-transform: uppercase; color: var(--faint); }
 p { margin: 0; }
 .what { color: var(--muted); line-height: 1.5; }
 .bad { color: var(--danger); line-height: 1.5; }
@@ -369,9 +368,9 @@ p { margin: 0; }
 .choices { display: grid; gap: 0.4rem; }
 .choices label {
   display: flex; gap: 0.6rem; align-items: flex-start; padding: 0.55rem 0.7rem; border: 1px solid var(--line);
-  border-radius: var(--r-chip); cursor: pointer; transition: border-color var(--dur-1), background-color var(--dur-1);
+  border-radius: 8px; cursor: pointer; transition: border-color var(--dur-1), background-color var(--dur-1);
 }
-.choices label.on { border-color: var(--muted); background: var(--raised); }
+.choices label.on { border-color: var(--card-on-line); background: var(--card-on); }
 .choices input { margin: 0.2rem 0 0; }
 .choices span { display: grid; gap: 0.1rem; }
 .choices small { color: var(--muted); font-size: inherit; line-height: 1.45; }
@@ -389,16 +388,16 @@ p { margin: 0; }
 .pem textarea { resize: vertical; font-size: 0.85em; min-height: 5.5rem; }
 .file { position: relative; overflow: hidden; cursor: pointer; }
 .file input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
-.checked { display: grid; gap: 0.3rem; padding: 0.6rem 0.8rem; border: 1px solid var(--line); border-radius: var(--r-chip); background: var(--raised); line-height: 1.5; }
+.checked { display: grid; gap: 0.3rem; padding: 0.6rem 0.8rem; border: 1px solid var(--line); border-radius: 8px; background: var(--well); line-height: 1.5; }
 
 .how { color: var(--muted); line-height: 1.5; }
 .how summary { cursor: pointer; color: var(--text); }
 .how p, .how ul { margin: 0.35rem 0 0.2rem; }
 .how ul { padding-left: 1.1rem; display: grid; gap: 0.35rem; }
 .how strong { color: var(--text); }
-.fp { padding: 0.4rem 0.6rem; border-radius: var(--r-chip); background: var(--raised); font-size: 0.85em; cursor: copy; }
+.fp { padding: 0.4rem 0.6rem; border-radius: var(--r-chip); background: var(--well); font-size: 0.85em; cursor: copy; }
 
-.apply { display: flex; padding-bottom: 1.1rem; gap: 0.8rem; align-items: center; flex-wrap: wrap; }
+.apply { display: flex; gap: 0.8rem; align-items: center; flex-wrap: wrap; }
 .apply small { color: var(--muted); }
 .check { display: flex; gap: 0.5rem; align-items: center; }
 .small { padding-block: 0.1rem; font-size: 0.85em; }

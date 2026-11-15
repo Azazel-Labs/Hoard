@@ -178,14 +178,18 @@ const assets = computed(() => props.stats?.assets ?? 0)
 </template>
 
 <style scoped>
-.stats { display: grid; gap: 1.6rem; }
+/* Its sections are cards like the rest of Settings' (that look is SettingsPage's). */
+.stats { display: grid; gap: 1rem; }
 .note { margin: 0; color: var(--muted); font-size: var(--step--1); }
 h4 { margin: 0 0 0.6rem; font-size: var(--step-0); font-weight: 650; }
 h5 { margin: 1rem 0 0.5rem; font-size: var(--step--1); font-weight: 600; color: var(--muted); }
 section { min-width: 0; }
 
 .tiles { display: grid; grid-template-columns: repeat(auto-fill, minmax(9.5rem, 1fr)); gap: 0.6rem; margin: 0; }
-.tiles > div { padding: 0.75rem 0.9rem; border: 1px solid var(--line); border-radius: 8px; background: var(--panel); }
+.tiles > div {
+  padding: 0.75rem 0.9rem; border: 1px solid var(--line); border-radius: 10px; box-shadow: var(--elev-1);
+  background: linear-gradient(160deg, color-mix(in srgb, var(--accent) 7%, var(--card, var(--panel))), var(--card, var(--panel)) 70%);
+}
 .tiles dt { font-size: var(--step--1); color: var(--muted); }
 .tiles dd { margin: 0.2rem 0 0; font-size: var(--step-2); font-weight: 700; font-variant-numeric: tabular-nums; letter-spacing: -0.01em; }
 
@@ -196,7 +200,7 @@ section { min-width: 0; }
   padding: 0.3rem 0.4rem; border-radius: 5px;
 }
 .bars.tags li { grid-template-columns: minmax(6rem, 11rem) minmax(0, 1fr) 3.6rem; }
-.bars li:hover { background: var(--raised); }
+.bars li:hover { background: color-mix(in srgb, var(--text) 6%, transparent); }
 .name { display: flex; align-items: center; gap: 0.45rem; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 button.name {
   display: block; padding: 0; border: 0; background: none; color: var(--text); font: inherit; text-align: left; cursor: pointer;
@@ -226,7 +230,7 @@ button.name:hover { text-decoration: underline; text-underline-offset: 0.15em; }
 
 .files { display: grid; gap: 0.15rem; margin: 0; padding: 0; list-style: none; font-size: var(--step--1); }
 .files li { display: grid; grid-template-columns: auto minmax(0, 1fr) minmax(0, 12rem) 4.8rem; gap: 0.6rem; align-items: center; padding: 0.3rem 0.4rem; border-radius: 5px; }
-.files li:hover { background: var(--raised); }
+.files li:hover { background: color-mix(in srgb, var(--text) 6%, transparent); }
 .files .sub { text-align: left; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
 .linkish { padding: 0; border: 0; background: none; color: var(--accent); font: inherit; cursor: pointer; text-decoration: underline; text-underline-offset: 0.12em; }

@@ -501,11 +501,10 @@ async function copyCallback() {
 </template>
 
 <style scoped>
-.authn { display: grid; font-size: var(--step--1); }
-section { display: grid; gap: 0.6rem; padding: 1rem 0 1.1rem; border-top: 1px solid var(--line); }
-section:first-child { border-top: 0; padding-top: 0; }
+/* Its sections are cards like the rest of Settings' (that look is SettingsPage's). */
+.authn { display: grid; gap: 1rem; font-size: var(--step--1); }
+section { display: grid; gap: 0.6rem; }
 .sh { display: flex; align-items: center; justify-content: space-between; gap: 1rem; min-height: 1.75rem; }
-h3 { margin: 0; font-size: 0.7rem; font-weight: 650; letter-spacing: 0.04em; text-transform: uppercase; color: var(--faint); }
 p { margin: 0; }
 .what { color: var(--muted); line-height: 1.5; }
 .what.bad { color: var(--danger); }
@@ -516,9 +515,9 @@ p { margin: 0; }
 .choices { display: grid; gap: 0.4rem; }
 .choices label {
   display: flex; gap: 0.6rem; align-items: flex-start; padding: 0.55rem 0.7rem; border: 1px solid var(--line);
-  border-radius: var(--r-chip); cursor: pointer; transition: border-color var(--dur-1), background-color var(--dur-1);
+  border-radius: 8px; cursor: pointer; transition: border-color var(--dur-1), background-color var(--dur-1);
 }
-.choices label.on { border-color: var(--muted); background: var(--raised); }
+.choices label.on { border-color: var(--card-on-line); background: var(--card-on); }
 .choices input { margin: 0.2rem 0 0; }
 .choices span { display: grid; gap: 0.1rem; }
 .choices small { color: var(--muted); font-size: inherit; line-height: 1.45; }
@@ -537,7 +536,7 @@ p { margin: 0; }
 
 .add { display: flex; gap: 0.5rem; flex-wrap: wrap; }
 .add .field { flex: 1 1 12rem; min-width: 0; }
-.results { margin: 0; padding: 0.6rem 0.8rem; list-style: none; display: grid; gap: 0.35rem; border: 1px solid var(--line); border-radius: var(--r-chip); background: var(--raised); }
+.results { margin: 0; padding: 0.6rem 0.8rem; list-style: none; display: grid; gap: 0.35rem; border: 1px solid var(--line); border-radius: 8px; background: var(--well); }
 .results li.good { color: var(--text); }
 .results li.good::before { content: '✓ '; color: var(--ok); }
 .results li.bad::before { content: '✕ '; }
@@ -548,7 +547,7 @@ p { margin: 0; }
 .roles label { font-weight: 550; }
 .roles textarea { resize: vertical; font-size: 0.9em; }
 
-.apply { display: flex; padding: 0.4rem 0 1.1rem; gap: 0.8rem; align-items: center; flex-wrap: wrap; border-top: 1px solid var(--line); padding-top: 1rem; }
+.apply { display: flex; gap: 0.8rem; align-items: center; flex-wrap: wrap; }
 @media (max-width: 560px) {
   .grid { grid-template-columns: minmax(0, 1fr); }
   .grid > span:empty { display: none; }

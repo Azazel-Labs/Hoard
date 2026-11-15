@@ -100,8 +100,8 @@ async function remove(f: StoreFormat) {
 </template>
 
 <style scoped>
-.sf { display: grid; gap: 1.8rem; font-size: var(--step--1); }
-.sf > section { max-width: 44rem; }
+/* Its sections are cards like the rest of Settings' (that look is SettingsPage's). */
+.sf { display: grid; gap: 1rem; font-size: var(--step--1); }
 section { display: grid; gap: 0.6rem; }
 .sh h3 { margin: 0; }
 .what { margin: 0; color: var(--muted); line-height: 1.5; }

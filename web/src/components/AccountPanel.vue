@@ -331,7 +331,8 @@ const day = (at: string | null) => (at ? formatDate(at, { dateStyle: 'medium' })
 </template>
 
 <style scoped>
-.account { display: grid; gap: 1.8rem; font-size: var(--step--1); }
+/* Its sections are cards like the rest of Settings' (that look is SettingsPage's). */
+.account { display: grid; gap: 1rem; font-size: var(--step--1); }
 section { display: grid; gap: 0.6rem; }
 .sh { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
 .sh h3 { margin: 0; }
@@ -350,7 +351,7 @@ section { display: grid; gap: 0.6rem; }
 select.role { flex: 0 0 auto; width: auto; }
 .add { display: flex; gap: 0.5rem; flex-wrap: wrap; }
 .add .field { flex: 1 1 12rem; min-width: 0; }
-.made { display: grid; gap: 0.5rem; justify-items: start; padding: 0.8rem 0.9rem; border: 1px solid var(--accent); border-radius: var(--r-chip); background: var(--raised); }
+.made { display: grid; gap: 0.5rem; justify-items: start; padding: 0.8rem 0.9rem; border: 1px solid var(--card-on-line); border-radius: 8px; background: var(--card-on); }
 .made p { margin: 0; }
 .made .row { width: 100%; }
 .made .field { flex: 1; min-width: 0; }

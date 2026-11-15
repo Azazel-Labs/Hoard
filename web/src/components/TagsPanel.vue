@@ -164,7 +164,8 @@ watch(moreEl, (el) => {
 </template>
 
 <style scoped>
-.tags { display: grid; gap: 1.8rem; font-size: var(--step--1); }
+/* Its sections are cards like the rest of Settings' (that look is SettingsPage's). */
+.tags { display: grid; gap: 1rem; font-size: var(--step--1); }
 section { display: grid; gap: 0.6rem; }
 .sh h3 { margin: 0; }
 .what { margin: 0; color: var(--muted); line-height: 1.5; }
@@ -174,7 +175,7 @@ section { display: grid; gap: 0.6rem; }
 .muted { color: var(--muted); white-space: nowrap; }
 .merge {
   position: sticky; top: 0; z-index: 2; display: grid; gap: 0.6rem; padding: 0.8rem 0.9rem;
-  border: 1px solid var(--accent); border-radius: var(--r-chip); background: var(--raised); box-shadow: var(--elev-2);
+  border: 1px solid var(--card-on-line); border-radius: 8px; background: var(--raised); box-shadow: var(--elev-2);
 }
 .picked { display: flex; flex-wrap: wrap; gap: 0.35rem; }
 .into { display: flex; gap: 0.6rem; align-items: center; }

@@ -41,6 +41,7 @@ import HttpsPanel from './HttpsPanel.vue'
 import TagsPanel from './TagsPanel.vue'
 import StoreFormatsPanel from './StoreFormatsPanel.vue'
 import ResetButton from './ResetButton.vue'
+import SettingsGlyph from './SettingsGlyph.vue'
 import SizeInput from './SizeInput.vue'
 
 const props = defineProps<{ section: string; stats: Stats | null }>()
@@ -58,23 +59,24 @@ const emit = defineEmits<{
 const s = ref<Settings | null>(null)
 
 const browserLanguages = navigator.languages
-// Labels and blurbs are getters, so they're in the language of the moment.
-const ALL_PAGES: { id: string; readonly label: string; readonly blurb: string; need?: Role }[] = [
+// Labels and blurbs are getters, so they're in the language of the moment. `sep` starts a group in the list: what's
+// in the library, how things get into it, who gets in, and how the server is doing.
+const ALL_PAGES: { id: string; readonly label: string; readonly blurb: string; need?: Role; sep?: boolean }[] = [
   { id: 'general', need: 'admin', get label() { return t('settings-page-general') }, get blurb() { return t('settings-page-general-blurb') } },
   { id: 'appearance', get label() { return t('settings-page-appearance') }, get blurb() { return t('settings-page-appearance-blurb') } },
   { id: 'library', get label() { return t('settings-page-library') }, get blurb() { return t('settings-page-library-blurb') } },
   { id: 'tags', need: 'edit', get label() { return t('settings-page-tags') }, get blurb() { return t('settings-page-tags-blurb') } },
   { id: 'store-files', need: 'admin', get label() { return t('settings-page-store-files') }, get blurb() { return t('settings-page-store-files-blurb') } },
-  { id: 'locations', need: 'admin', get label() { return t('settings-page-locations') }, get blurb() { return t('settings-page-locations-blurb') } },
+  { id: 'locations', sep: true, need: 'admin', get label() { return t('settings-page-locations') }, get blurb() { return t('settings-page-locations-blurb') } },
   { id: 'tools', need: 'admin', get label() { return t('settings-page-tools') }, get blurb() { return t('settings-page-tools-blurb') } },
   { id: 'ai', need: 'admin', get label() { return t('settings-page-ai') }, get blurb() { return t('settings-page-ai-blurb') } },
   { id: 'search', need: 'admin', get label() { return t('settings-page-search') }, get blurb() { return t('settings-page-search-blurb') } },
   { id: 'adding', need: 'admin', get label() { return t('settings-page-adding') }, get blurb() { return t('settings-page-adding-blurb') } },
   { id: 'downloads', need: 'admin', get label() { return t('settings-page-downloads') }, get blurb() { return t('settings-page-downloads-blurb') } },
-  { id: 'account', get label() { return t('settings-page-account') }, get blurb() { return t('settings-page-account-blurb') } },
+  { id: 'account', sep: true, get label() { return t('settings-page-account') }, get blurb() { return t('settings-page-account-blurb') } },
   { id: 'auth', need: 'admin', get label() { return t('settings-page-auth') }, get blurb() { return t('settings-page-auth-blurb') } },
   { id: 'connection', need: 'admin', get label() { return t('settings-page-connection') }, get blurb() { return t('settings-page-connection-blurb') } },
-  { id: 'performance', need: 'admin', get label() { return t('settings-page-performance') }, get blurb() { return t('settings-page-performance-blurb') } },
+  { id: 'performance', sep: true, need: 'admin', get label() { return t('settings-page-performance') }, get blurb() { return t('settings-page-performance-blurb') } },
   { id: 'issues', need: 'admin', get label() { return t('settings-page-issues') }, get blurb() { return t('settings-page-issues-blurb') } },
   { id: 'maintenance', need: 'admin', get label() { return t('settings-page-maintenance') }, get blurb() { return t('settings-page-maintenance-blurb') } },
 ]
@@ -809,9 +811,10 @@ onBeforeUnmount(() => {
     <nav class="snav" :aria-label="t('settings-title')">
       <h2>{{ t('settings-title') }}</h2>
       <ul>
-        <li v-for="p in PAGES" :key="p.id">
+        <li v-for="p in PAGES" :key="p.id" :class="{ sep: p.sep }">
           <button type="button" :aria-current="current === p.id ? 'page' : undefined" @click="go(p.id)">
-            <span>{{ p.label }}</span>
+            <SettingsGlyph class="ico" :page="p.id" />
+            <span class="lbl">{{ p.label }}</span>
             <span v-if="p.id === 'ai' && s" class="pip" :data-on="s.llm.enabled" aria-hidden="true" />
           </button>
         </li>
@@ -821,8 +824,11 @@ onBeforeUnmount(() => {
     <div ref="paneEl" class="pane" :aria-busy="busy">
       <div class="inner" :class="{ wide: current === 'store-files' }">
         <header class="phead">
-          <h2>{{ page.label }}</h2>
-          <p class="what">{{ page.blurb }}</p>
+          <span class="pglyph" aria-hidden="true"><SettingsGlyph :page="page.id" :size="22" /></span>
+          <div class="ptext">
+            <h2>{{ page.label }}</h2>
+            <p class="what">{{ page.blurb }}</p>
+          </div>
         </header>
 
         <template v-if="current === 'appearance'">
@@ -1480,25 +1486,47 @@ onBeforeUnmount(() => {
 <style scoped>
 /* A page of its own: the list of pages down the side, the open one beside it (scrolling on its own). */
 .settings-page { display: grid; grid-template-columns: 220px minmax(0, 1fr); min-height: 0; }
-.snav { overflow-y: auto; padding: 1.1rem 0.75rem 2rem; border-right: 1px solid var(--line); }
-.snav h2 { margin: 0 0 0.7rem 0.6rem; font-size: var(--step-1); font-variation-settings: 'CASL' 0.5; }
-.snav ul { display: grid; gap: 0.1rem; margin: 0; padding: 0; list-style: none; }
-.snav button {
-  display: flex; align-items: center; justify-content: space-between; width: 100%; padding: 0.45rem 0.6rem;
-  border: 0; border-radius: var(--r-chip); background: none; color: var(--muted); font: inherit; font-size: var(--step--1);
-  text-align: left; cursor: pointer; transition: background-color var(--dur-1), color var(--dur-1);
+.snav {
+  overflow-y: auto; padding: 1.1rem 0.75rem 2rem; border-right: 1px solid var(--line);
+  background: color-mix(in srgb, var(--panel) 60%, transparent);
 }
+.snav h2 { margin: 0 0 0.8rem 0.6rem; font-size: var(--step-1); font-variation-settings: 'CASL' 0.5; }
+.snav ul { display: grid; gap: 0.1rem; margin: 0; padding: 0; list-style: none; }
+/* The groups (what's in the library, how it gets in, who gets in, how the server is doing) have a rule between. */
+.snav li.sep:not(:first-child) { margin-top: 0.45rem; padding-top: 0.45rem; border-top: 1px solid var(--line); }
+.snav button {
+  position: relative; display: flex; align-items: center; gap: 0.6rem; width: 100%; padding: 0.42rem 0.6rem;
+  border: 0; border-radius: 6px; background: none; color: var(--muted); font: inherit; font-size: var(--step--1);
+  text-align: left; cursor: pointer; transition: background-color var(--dur-1), color var(--dur-1), box-shadow var(--dur-2);
+}
+.snav .ico { flex: none; color: var(--faint); transition: color var(--dur-1); }
+.snav .lbl { flex: 1; min-width: 0; }
 .snav button:hover { color: var(--text); background: color-mix(in srgb, var(--raised) 60%, transparent); }
-.snav button[aria-current='page'] { color: var(--text); background: var(--raised); font-weight: 600; }
-.pip { width: 0.45rem; height: 0.45rem; border-radius: 50%; background: var(--faint); }
-.pip[data-on='true'] { background: var(--ok); }
+.snav button:hover .ico { color: var(--muted); }
+.snav button[aria-current='page'] { color: var(--text); background: var(--raised); font-weight: 600; box-shadow: var(--elev-1); }
+.snav button[aria-current='page'] .ico { color: var(--accent); }
+/* The open page is marked with the accent at the list's edge. */
+.snav button[aria-current='page']::before {
+  content: ''; position: absolute; left: -0.75rem; top: 0.35rem; bottom: 0.35rem; width: 3px; border-radius: 0 3px 3px 0;
+  background: var(--accent);
+}
+.pip { flex: none; width: 0.45rem; height: 0.45rem; border-radius: 50%; background: var(--faint); }
+.pip[data-on='true'] { background: var(--ok); box-shadow: 0 0 0 3px color-mix(in srgb, var(--ok) 22%, transparent); }
 .pane { overflow-y: auto; scrollbar-gutter: stable; }
 .pane[aria-busy='true'] { cursor: progress; }
-.inner { max-width: 48rem; padding: 1.4rem 2rem 5rem; }
+.inner { max-width: 50rem; padding: 1.6rem 2rem 5rem; }
 /* The format wizard shows a file beside its form. */
 .inner.wide { max-width: 80rem; }
-.phead { margin-bottom: 1.1rem; }
-.phead h2 { margin: 0 0 0.25rem; font-size: var(--step-2); font-variation-settings: 'CASL' 0.5; }
+/* The page's heading: its icon on an accent tile, the anchor the eye lands on first. */
+.phead { display: flex; align-items: center; gap: 0.95rem; margin-bottom: 1.5rem; }
+.pglyph {
+  flex: none; display: grid; place-items: center; width: 2.9rem; height: 2.9rem; border-radius: 12px; color: var(--accent);
+  border: 1px solid color-mix(in srgb, var(--accent) 30%, var(--line));
+  background: linear-gradient(145deg, color-mix(in srgb, var(--accent) 26%, var(--raised)), color-mix(in srgb, var(--accent) 7%, var(--raised)));
+  box-shadow: var(--elev-1);
+}
+.ptext { min-width: 0; }
+.phead h2 { margin: 0 0 0.15rem; font-size: var(--step-2); line-height: 1.2; font-variation-settings: 'CASL' 0.5; }
 .phead .what { margin: 0; max-width: 40rem; }
 .loading { color: var(--muted); font-size: var(--step--1); }
 @media (max-width: 47.99rem) {
@@ -1506,45 +1534,68 @@ onBeforeUnmount(() => {
   .snav { display: flex; align-items: center; gap: 0.75rem; padding: 0.5rem 0.75rem; overflow-x: auto; border-right: 0; border-bottom: 1px solid var(--line); }
   .snav h2 { display: none; }
   .snav ul { display: flex; gap: 0.25rem; }
-  .snav button { white-space: nowrap; min-height: 40px; gap: 0.4rem; }
-  .inner { padding: 1rem 1rem 5rem; }
+  .snav li.sep:not(:first-child) { margin: 0 0 0 0.3rem; padding: 0 0 0 0.55rem; border-top: 0; border-left: 1px solid var(--line); }
+  .snav button { white-space: nowrap; min-height: 40px; gap: 0.45rem; }
+  .snav button[aria-current='page']::before { inset: auto 0.6rem 0; width: auto; height: 2px; border-radius: 2px 2px 0 0; }
+  .inner { padding: 1.1rem 1rem 5rem; }
+  .phead { align-items: flex-start; gap: 0.75rem; margin-bottom: 1.1rem; }
+  .pglyph { width: 2.5rem; height: 2.5rem; border-radius: 10px; }
 }
 
-section { padding: 1rem 0 1.1rem; border-top: 1px solid var(--line); }
-section:first-child { border-top: 0; padding-top: 0.2rem; }
-.sh { display: flex; align-items: center; gap: 0.4rem; min-height: 1.75rem; margin-bottom: 0.3rem; }
-h3 { margin: 0; font-size: 0.7rem; font-weight: 650; letter-spacing: 0.04em; text-transform: uppercase; color: var(--faint); }
+.body { display: grid; gap: 1rem; }
+.sh { display: flex; align-items: center; gap: 0.4rem; min-height: 1.75rem; margin-bottom: 0.2rem; }
 .hint.preview .btn { margin-left: 0.4rem; }
 .what, .hint { margin: 0 0 0.55rem; font-size: var(--step--1); color: var(--muted); line-height: 1.45; }
+section > .what { margin-bottom: 0.9rem; max-width: 40rem; }
 .hint { margin-top: 0.45rem; }
 .mono { font-family: var(--mono, ui-monospace, monospace); font-size: 0.95em; }
 .opt-row { display: flex; align-items: center; gap: 0.4rem; min-height: 1.75rem; }
 
-.modes { display: inline-flex; flex-wrap: wrap; border: 1px solid var(--line); border-radius: var(--r-chip); overflow: hidden; }
-.modes label {
-  display: inline-flex; align-items: center; padding: 0.4em 0.85em; font-size: var(--step--1); cursor: pointer;
-  border-left: 1px solid var(--line); transition: background-color var(--dur-1), color var(--dur-1);
+/* Off / automatic / a program of your own: a segmented control, the chosen one lifted out of its track. */
+.modes {
+  display: inline-flex; flex-wrap: wrap; justify-self: start; gap: 2px; padding: 2px; border: 1px solid var(--line);
+  border-radius: 8px; background: var(--well);
 }
-.modes label:first-child { border-left: 0; }
-.modes label:has(:checked) { background: var(--text); color: var(--bg); font-weight: 600; }
+.modes label {
+  display: inline-flex; align-items: center; padding: 0.35em 0.85em; border-radius: 6px; font-size: var(--step--1);
+  color: var(--muted); cursor: pointer; transition: background-color var(--dur-1), color var(--dur-1), box-shadow var(--dur-2);
+}
+.modes label:hover { color: var(--text); }
+.modes label:has(:checked) { background: var(--raised); color: var(--text); font-weight: 600; box-shadow: var(--elev-1), 0 0 0 1px var(--line); }
+.modes label:has(:disabled) { cursor: default; }
 .modes label:has(:focus-visible) { outline: 2px solid var(--accent); outline-offset: -2px; }
 .modes input { position: absolute; opacity: 0; pointer-events: none; }
 
-.path { display: flex; gap: 0.5rem; margin-top: 0.55rem; }
+.path { display: flex; gap: 0.5rem; margin-top: 0.7rem; }
 .path .field { flex: 1; min-width: 0; }
 
-.status { display: flex; align-items: baseline; gap: 0.45rem; margin: 0.55rem 0 0; font-size: var(--step--1); color: var(--muted); }
+.status {
+  --st: var(--faint);
+  display: flex; align-items: baseline; gap: 0.45rem; margin: 0.55rem 0 0; font-size: var(--step--1); color: var(--muted);
+}
+.status[data-state='ready'] { --st: var(--ok); }
+.status[data-state='unavailable'] { --st: var(--danger); color: var(--danger); }
+.status[data-state='looking'], .status[data-state='downloading'] { --st: var(--accent); }
 .status .text { overflow-wrap: anywhere; }
-.status .dot { flex: none; width: 0.5rem; height: 0.5rem; border-radius: 50%; background: var(--faint); translate: 0 -0.05rem; }
-.status[data-state='ready'] .dot { background: var(--ok); }
-.status[data-state='unavailable'] { color: var(--danger); }
-.status[data-state='unavailable'] .dot { background: var(--danger); }
-.status[data-state='looking'] .dot, .status[data-state='downloading'] .dot { background: var(--accent); animation: pulse 1.2s var(--ease-in-out) infinite; }
+.status .dot { flex: none; width: 0.5rem; height: 0.5rem; border-radius: 50%; background: var(--st); translate: 0 -0.05rem; }
+.status[data-state='looking'] .dot, .status[data-state='downloading'] .dot { animation: pulse 1.2s var(--ease-in-out) infinite; }
+/* A section's own state (a tool found, image search learning, the renderer) stands out as a tinted strip. */
+section > .status {
+  width: fit-content; max-width: 100%; margin-top: 0.85rem; padding: 0.4rem 0.75rem; border-radius: 8px; color: var(--text);
+  border: 1px solid color-mix(in srgb, var(--st) 28%, transparent); background: color-mix(in srgb, var(--st) 9%, transparent);
+}
+section > .status[data-state='unavailable'] { color: var(--danger); }
+section > .sh + .status { margin: 0.35rem 0 0.8rem; }
+.switches:last-child { margin-bottom: 0; }
 @keyframes pulse { 50% { opacity: 0.3; } }
 @media (prefers-reduced-motion: reduce) { .status .dot { animation: none !important; } }
 
-.llm { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 0.5rem 0.8rem; align-items: center; font-size: var(--step--1); }
-.llm > label, .llm > .label { color: var(--muted); }
+.llm { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 0.55rem 0.9rem; align-items: center; font-size: var(--step--1); }
+/* Labels in the text color, help in muted: the two read as different things at a glance. */
+.llm > label, .llm > .label { color: var(--text); font-weight: 550; }
+/* The AI form ends in its Save row, across the card under a rule. */
+.llm > span:empty:has(+ .row:last-child) { display: none; }
+.llm > .row:last-child { grid-column: 1 / -1; margin-top: 0.35rem; padding-top: 0.9rem; border-top: 1px solid var(--line); flex-wrap: wrap; }
 .gpt { display: grid; gap: 0.5rem; justify-items: start; }
 .gpt .key { width: 100%; }
 .llm .key { display: flex; gap: 0.6rem; align-items: center; }
@@ -1562,9 +1613,9 @@ h3 { margin: 0; font-size: 0.7rem; font-weight: 650; letter-spacing: 0.04em; tex
 .local { grid-column: 1 / -1; display: grid; gap: 0.6rem; }
 .mlist { display: grid; gap: 0.4rem; margin: 0; padding: 0; list-style: none; }
 .mlist li {
-  display: flex; gap: 0.8rem; align-items: center; padding: 0.55rem 0.7rem; border: 1px solid var(--line); border-radius: var(--r-chip);
+  display: flex; gap: 0.8rem; align-items: center; padding: 0.6rem 0.75rem; border: 1px solid var(--line); border-radius: 8px;
 }
-.mlist li.on { border-color: var(--muted); background: var(--raised); }
+.mlist li.on { border-color: var(--card-on-line); background: var(--card-on); }
 .mlist .what { flex: 1; min-width: 0; display: grid; gap: 0.15rem; }
 .mlist small { color: var(--muted); font-size: inherit; overflow-wrap: anywhere; }
 .mlist .status { margin: 0.1rem 0 0; }
@@ -1573,27 +1624,34 @@ progress.learn { display: block; width: 100%; max-width: 28rem; height: 0.35rem;
 .mlist .acts { display: flex; gap: 0.4rem; flex: none; }
 @media (max-width: 30rem) { .mlist li { flex-direction: column; align-items: stretch; } }
 .switches { display: grid; gap: 0.35rem; margin-bottom: 0.8rem; font-size: var(--step--1); }
-.switches .check { display: inline-flex; gap: 0.45rem; align-items: center; }
+.switches .check { display: inline-flex; gap: 0.6rem; align-items: center; font-weight: 550; cursor: pointer; }
 @media (max-width: 30rem) { .llm { grid-template-columns: minmax(0, 1fr); } .llm > span:empty { display: none; } }
 
-.tn-example { display: grid; gap: 0.1rem; margin: 0; color: var(--text); overflow-wrap: anywhere; }
-.tn-maps { margin-top: 0.8rem; font-size: var(--step--1); }
-.tn-maps summary { cursor: pointer; color: var(--muted); margin-bottom: 0.6rem; }
+.tn-example {
+  display: grid; gap: 0.1rem; margin: 0; padding: 0.5rem 0.75rem; border: 1px dashed var(--line); border-radius: 8px;
+  background: var(--well); color: var(--text); overflow-wrap: anywhere;
+}
+.tn-maps { margin-top: 0.9rem; padding-top: 0.8rem; border-top: 1px solid var(--line); font-size: var(--step--1); }
+.tn-maps summary { cursor: pointer; color: var(--muted); width: fit-content; }
+.tn-maps summary:hover { color: var(--text); }
+.tn-maps[open] summary { margin-bottom: 0.7rem; }
 .llm .key .field.short { max-width: 10rem; }
 
 .choices { display: grid; gap: 0.4rem; }
 .choices label {
-  display: flex; gap: 0.6rem; align-items: flex-start; padding: 0.55rem 0.7rem; border: 1px solid var(--line);
-  border-radius: var(--r-chip); cursor: pointer; font-size: var(--step--1); transition: border-color var(--dur-1), background-color var(--dur-1);
+  display: flex; gap: 0.6rem; align-items: flex-start; padding: 0.6rem 0.75rem; border: 1px solid var(--line);
+  border-radius: 8px; cursor: pointer; font-size: var(--step--1); transition: border-color var(--dur-1), background-color var(--dur-1);
 }
-.choices label.on { border-color: var(--muted); background: var(--raised); }
+.choices label:hover { border-color: color-mix(in srgb, var(--muted) 55%, var(--line)); }
+.choices label.on { border-color: var(--card-on-line); background: var(--card-on); }
 .choices input { margin: 0.2rem 0 0; }
 .choices span { display: grid; gap: 0.1rem; }
 .choices small { color: var(--muted); font-size: inherit; }
 
 /* Theme swatches: each label carries data-light / data-dark, so styles.css gives it that theme's --l-* / --d-*. */
 .themes { display: grid; grid-template-columns: 6rem minmax(0, 1fr); gap: 0.8rem; align-items: start; margin-bottom: 1.4rem; }
-.tlabel { font-size: var(--step--1); color: var(--muted); padding-top: 1.3rem; }
+.themes + .themes { padding-top: 1.2rem; border-top: 1px solid var(--line); }
+.tlabel { font-size: var(--step--1); font-weight: 550; color: var(--text); padding-top: 1.3rem; }
 .tlabel.lang { padding-top: 0; align-self: center; }
 .field.lang { justify-self: start; min-width: 14rem; }
 .swatches { display: grid; grid-template-columns: repeat(auto-fill, minmax(6.5rem, 1fr)); gap: 0.6rem; }
@@ -1623,4 +1681,45 @@ progress.learn { display: block; width: 100%; max-width: 28rem; height: 0.35rem;
   text-underline-offset: 0.15em;
 }
 .link:disabled { opacity: 0.5; cursor: default; }
+</style>
+
+<style>
+/* The Settings look, shared with the panels its pages show (they only ever appear in here): each section is a card
+   on the page, titled a step below the page's heading and a step above its labels. */
+.settings-page {
+  --card: light-dark(var(--raised), var(--panel));
+  /* A chosen option or the row in use, inside a card: tinted with the accent rather than lifted. */
+  --card-on: color-mix(in srgb, var(--accent) 8%, var(--card));
+  --card-on-line: color-mix(in srgb, var(--accent) 50%, var(--line));
+  /* Something set into a card: an example, a fingerprint, a track. */
+  --well: color-mix(in srgb, var(--bg) 65%, var(--card));
+}
+.settings-page .inner section {
+  min-width: 0; padding: 1.1rem 1.25rem 1.2rem; border: 1px solid var(--line); border-radius: 10px; background: var(--card);
+  box-shadow: var(--elev-1);
+}
+.settings-page .inner h3 {
+  margin: 0; font-size: var(--step-0); font-weight: 650; letter-spacing: -0.005em; text-transform: none; color: var(--text);
+}
+@media (max-width: 30rem) {
+  .settings-page .inner section { padding: 0.95rem 0.9rem 1rem; }
+}
+/* Options that save the moment they're flipped look like switches: still checkboxes underneath. */
+.settings-page .switches input[type='checkbox'],
+.settings-page input[type='checkbox'].switch {
+  appearance: none; position: relative; flex: none; width: 2.15rem; height: 1.25rem; margin: 0; border-radius: 999px;
+  background: color-mix(in srgb, var(--muted) 40%, var(--card)); cursor: pointer;
+  transition: background-color var(--dur-2) var(--ease-out);
+}
+.settings-page .switches input[type='checkbox']::before,
+.settings-page input[type='checkbox'].switch::before {
+  content: ''; position: absolute; top: 0.16rem; left: 0.16rem; width: 0.93rem; height: 0.93rem; border-radius: 50%;
+  background: light-dark(#fff, var(--text)); box-shadow: 0 1px 2px rgb(0 0 0 / 0.25); transition: translate var(--dur-2) var(--ease-pop);
+}
+.settings-page .switches input[type='checkbox']:checked,
+.settings-page input[type='checkbox'].switch:checked { background: var(--accent); }
+.settings-page .switches input[type='checkbox']:checked::before,
+.settings-page input[type='checkbox'].switch:checked::before { translate: 0.9rem 0; background: light-dark(#fff, var(--bg)); }
+.settings-page .switches input[type='checkbox']:disabled,
+.settings-page input[type='checkbox'].switch:disabled { opacity: 0.5; cursor: default; }
 </style>

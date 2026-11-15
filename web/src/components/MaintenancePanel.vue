@@ -98,6 +98,7 @@ function took(from: string, to: string | null): string {
             <button
               type="button"
               class="btn"
+              :class="{ danger: ask(task.id)?.danger }"
               :disabled="!!task.running || starting === task.id"
               @click="run(task)"
             >
@@ -152,12 +153,18 @@ function took(from: string, to: string | null): string {
 <style scoped>
 .maint[aria-busy='true'] { cursor: progress; }
 .loading { color: var(--muted); font-size: var(--step--1); }
-.tasks { display: grid; gap: 0.5rem; margin: 0 0 1.4rem; padding: 0; list-style: none; }
-.tasks li { padding: 0.7rem 0.85rem; border: 1px solid var(--line); border-radius: var(--r-chip); font-size: var(--step--1); }
-.tasks li.on { border-color: var(--muted); background: var(--raised); }
+/* Each task is a card like Settings' sections (that look is SettingsPage's); the one running is tinted. */
+.maint { display: grid; gap: 1rem; }
+.tasks { display: grid; gap: 0.6rem; margin: 0; padding: 0; list-style: none; }
+.tasks li {
+  padding: 0.95rem 1.25rem; border: 1px solid var(--line); border-radius: 10px; background: var(--card); box-shadow: var(--elev-1);
+  font-size: var(--step--1);
+}
+.tasks li.on { border-color: var(--card-on-line); background: var(--card-on); }
 .top { display: flex; gap: 0.9rem; align-items: flex-start; }
 .top .btn { flex: none; min-width: 6rem; }
 .what { flex: 1; min-width: 0; display: grid; gap: 0.2rem; }
+.what strong { font-weight: 650; }
 .what small { color: var(--muted); font-size: inherit; line-height: 1.45; }
 .live { margin-top: 0.6rem; display: grid; gap: 0.3rem; }
 .live small, .last small { color: var(--muted); font-size: inherit; }
@@ -169,7 +176,7 @@ function took(from: string, to: string | null): string {
 .last.never { color: var(--muted); }
 .dot { flex: none; width: 0.5rem; height: 0.5rem; border-radius: 50%; background: var(--ok); }
 .bad .dot { background: var(--danger); }
-.history h3 { margin: 0 0 0.4rem; }
+.history h3 { margin: 0 0 0.5rem; }
 table { width: 100%; border-collapse: collapse; font-size: var(--step--1); }
 th { text-align: left; font-weight: 500; color: var(--muted); padding: 0.3rem 0.6rem 0.3rem 0; border-bottom: 1px solid var(--line); }
 td { padding: 0.4rem 0.6rem 0.4rem 0; border-bottom: 1px solid color-mix(in srgb, var(--line) 60%, transparent); vertical-align: top; overflow-wrap: anywhere; }

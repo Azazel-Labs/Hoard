@@ -190,7 +190,8 @@ function openWhere(i: Issue) {
 .loading { color: var(--muted); font-size: var(--step--1); }
 .none { display: flex; gap: 0.5rem; align-items: baseline; font-size: var(--step--1); margin: 0; }
 .dot { flex: none; width: 0.5rem; height: 0.5rem; border-radius: 50%; background: var(--ok); }
-.group { margin: 0 0 1.4rem; }
+/* Each kind of issue is a card like the rest of Settings' sections (that look is SettingsPage's). */
+.issues { display: grid; gap: 1rem; }
 header { display: flex; gap: 0.9rem; align-items: flex-start; margin-bottom: 0.5rem; }
 .what { flex: 1; min-width: 0; display: grid; gap: 0.2rem; }
 .what h3 { margin: 0; display: flex; gap: 0.5rem; align-items: baseline; }
@@ -203,7 +204,7 @@ header { display: flex; gap: 0.9rem; align-items: flex-start; margin-bottom: 0.5
 ul { display: grid; gap: 0.4rem; margin: 0; padding: 0; list-style: none; }
 li {
   display: flex; gap: 0.9rem; align-items: flex-start;
-  padding: 0.6rem 0.85rem; border: 1px solid var(--line); border-radius: var(--r-chip); font-size: var(--step--1);
+  padding: 0.6rem 0.85rem; border: 1px solid var(--line); border-radius: 8px; font-size: var(--step--1);
 }
 .item { flex: 1; min-width: 0; display: grid; gap: 0.15rem; }
 .title { font-weight: 500; overflow-wrap: anywhere; text-align: left; justify-self: start; }

@@ -64,10 +64,8 @@ xmrs = "0.15"
 xmrsplayer = "0.15"
 midly = "0.5"
 rustysynth = "1"
-fbxcel = { version = "0.9", features = ["tree", "writer"] }
-# USD (.usd/.usda/.usdc/.usdz), read natively for thumbnails and the browser preview.
-openusd = "0.8"
-openusd-schemas = { version = "0.8", features = ["geom", "shade"] }
+# Model formats (STL, PLY, VOX, OBJ, FBX, 3DS, 3MF, USD) read natively for thumbnails and GLB copies.
+mithril = { git = "https://github.com/Azazel-Labs/Mithril", rev = "0b013173928fcb70434903f10a8285618b1f6d8a" }
 ddsfile = "0.6"
 texture2ddecoder = "0.1"
 ktx2 = "0.5"

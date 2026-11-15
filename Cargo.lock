@@ -2349,7 +2349,6 @@ dependencies = [
  "candle-nn",
  "clap",
  "ddsfile",
- "fbxcel",
  "flacenc",
  "flate2",
  "fluent-bundle",
@@ -2377,9 +2376,8 @@ dependencies = [
  "lzma-rust2",
  "midly",
  "mime_guess",
+ "mithril",
  "object_store",
- "openusd",
- "openusd-schemas",
  "opus-pure",
  "quick-xml",
  "quinn",
@@ -3351,6 +3349,21 @@ dependencies = [
  "libc",
  "wasi",
  "windows-sys 0.61.2",
+]
+
+[[package]]
+name = "mithril"
+version = "0.1.0"
+source = "git+https://github.com/Azazel-Labs/Mithril?rev=0b013173928fcb70434903f10a8285618b1f6d8a#0b013173928fcb70434903f10a8285618b1f6d8a"
+dependencies = [
+ "base64 0.22.1",
+ "fbxcel",
+ "openusd",
+ "openusd-schemas",
+ "quick-xml",
+ "serde_json",
+ "thiserror 2.0.21",
+ "zip 9.5.1",
 ]
 
 [[package]]

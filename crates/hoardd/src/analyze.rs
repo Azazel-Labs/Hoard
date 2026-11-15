@@ -1208,9 +1208,9 @@ fn analyze_model(path: &Path, root: &Path, ext: &str, meta: &mut Map<String, Val
             };
             gltf_stats(&json, meta);
             // The triangles the scene draws (strips and fans, meshes placed more than once, points and lines
-            // apart), when mithril can read it: not a Draco-compressed file or glTF 1.0.
-            match crate::meshes::load(path, ext, root) {
-                Ok((_, facts)) => {
+            // apart), when mithril can read it: not glTF 1.0.
+            match crate::meshes::facts(path, ext, root) {
+                Ok(facts) => {
                     meta.insert("triangles".into(), json!(0));
                     meta.extend(facts);
                 }
@@ -1339,10 +1339,10 @@ mod tests {
         assert_eq!(meta["vertices"], json!(4));
         assert_eq!(meta["meshes"], json!(1));
 
-        // What mithril refuses is still counted from the JSON.
-        let mut draco = doc.clone();
-        draco["extensionsRequired"] = json!(["KHR_draco_mesh_compression"]);
-        std::fs::write(&path, serde_json::to_vec(&draco).unwrap()).unwrap();
+        // What mithril refuses (glTF 1.0) is still counted from the JSON.
+        let mut old = doc.clone();
+        old["asset"]["version"] = json!("1.0");
+        std::fs::write(&path, serde_json::to_vec(&old).unwrap()).unwrap();
         let mut meta = Map::new();
         analyze_model(&path, dir.path(), "gltf", &mut meta).unwrap();
         assert_eq!(meta["triangles"], json!(1));

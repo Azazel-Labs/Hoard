@@ -7,6 +7,7 @@ use std::path::{Path, PathBuf};
 
 use anyhow::Result;
 use mithril::assets::{Assets, Folder};
+use mithril::document::{Keep, Pose};
 use serde_json::{Map, Value};
 
 pub(crate) use mithril::mesh::{Image, Material, Mesh, to_glb};
@@ -37,8 +38,25 @@ impl Assets for Pack {
 /// Load a model and the facts worth recording about it. Point clouds (PLY without faces) give no mesh. `root` is
 /// the folder laid out like the pack, searched for textures the model points at by bare name or a foreign path.
 pub(crate) fn load(path: &Path, ext: &str, root: &Path) -> Result<(Option<Mesh>, Map<String, Value>)> {
-    let loaded = mithril::formats::load(path, ext, &Pack(Folder::new(root)))?;
-    Ok((loaded.mesh, loaded.facts))
+    // What a rest-pose mesh needs: animations, cameras and lights are skipped.
+    let doc = mithril::formats::load(path, ext, &Pack(Folder::new(root)), Keep::MESHES)?;
+    Ok((doc.flatten(Pose::Rest)?, doc.facts))
+}
+
+/// The facts about a model without drawing its mesh. A glTF's are counted from its JSON, so nothing in its buffers
+/// (Draco, meshopt, textures) is decoded.
+pub(crate) fn facts(path: &Path, ext: &str, root: &Path) -> Result<Map<String, Value>> {
+    let nothing = Keep {
+        animations: false,
+        skins: false,
+        morph_targets: false,
+        materials: false,
+        textures: false,
+        cameras: false,
+        lights: false,
+        extras: false,
+    };
+    Ok(mithril::formats::load(path, ext, &Pack(Folder::new(root)), nothing)?.facts)
 }
 
 /// Texture bytes (a file, or embedded in an FBX) as PNG or JPEG: those as they are, anything else Hoard can

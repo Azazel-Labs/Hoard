@@ -20,7 +20,7 @@ RUN npm run build
 FROM rust:1-slim-trixie AS chef
 WORKDIR /src
 COPY rust-toolchain.toml ./
-RUN rustup show active-toolchain || rustup toolchain install
+RUN rustup update --no-self-update stable && rustup toolchain install
 RUN cargo install cargo-chef --locked --version ^0.1
 
 # The dependency list, from the manifests alone.

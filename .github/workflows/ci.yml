@@ -6,8 +6,8 @@ jobs:
     runs-on: ubuntu-26.04
     steps:
       - uses: actions/checkout@v7
-      - name: Toolchain from rust-toolchain.toml
-        run: rustup show active-toolchain || rustup toolchain install
+      - name: Latest stable, with the components rust-toolchain.toml lists
+        run: rustup update --no-self-update stable && rustup toolchain install
       # One cache for this job and e2e, saved here from main only: Actions keeps 10 GB per repository, and a cache
       # per job and branch pushes the others out.
       - uses: Swatinem/rust-cache@v2
@@ -43,8 +43,8 @@ jobs:
     runs-on: ubuntu-26.04
     steps:
       - uses: actions/checkout@v7
-      - name: Toolchain from rust-toolchain.toml
-        run: rustup show active-toolchain || rustup toolchain install
+      - name: Latest stable, with the components rust-toolchain.toml lists
+        run: rustup update --no-self-update stable && rustup toolchain install
       - uses: Swatinem/rust-cache@v2
         with:
           shared-key: linux-debug

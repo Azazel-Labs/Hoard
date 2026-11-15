@@ -73,8 +73,8 @@ jobs:
     steps:
       - uses: actions/checkout@v7
         with: { ref: "refs/tags/${{ env.TAG }}" }
-      - name: Toolchain from rust-toolchain.toml
-        run: rustup show active-toolchain || rustup toolchain install
+      - name: Latest stable, with the components rust-toolchain.toml lists
+        run: rustup update --no-self-update stable && rustup toolchain install
       - uses: Swatinem/rust-cache@v2
         with: { key: "${{ matrix.target }}" }
       - run: cargo build --release --locked -p hoardd -p hoard

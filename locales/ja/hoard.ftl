@@ -2154,6 +2154,7 @@ settings-update-check = 数時間ごとに GitHub で新しいリリースを確
 ## アセットの種類（api.ts）
 
 api-kind-texture = テクスチャ
+api-kind-vector = ベクターアート
 api-kind-audio = オーディオ
 api-kind-model = モデル
 api-kind-animation = アニメーション
@@ -2165,6 +2166,7 @@ api-kind-document = ドキュメント
 api-kind-data = データ
 api-kind-other = その他
 api-kind-texture-name = テクスチャ
+api-kind-vector-name = ベクターアート
 api-kind-audio-name = オーディオ
 api-kind-model-name = モデル
 api-kind-animation-name = アニメーション

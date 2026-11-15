@@ -2518,6 +2518,7 @@ settings-update-check = Každých pár hodin kontrolovat na GitHubu novou verzi
 ## Druhy assetů (api.ts)
 
 api-kind-texture = Textury
+api-kind-vector = Vektorová grafika
 api-kind-audio = Zvuk
 api-kind-model = Modely
 api-kind-animation = Animace
@@ -2529,6 +2530,7 @@ api-kind-document = Dokumenty
 api-kind-data = Data
 api-kind-other = Ostatní
 api-kind-texture-name = textury
+api-kind-vector-name = vektorová grafika
 api-kind-audio-name = zvuk
 api-kind-model-name = modely
 api-kind-animation-name = animace

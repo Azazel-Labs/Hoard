@@ -2164,6 +2164,7 @@ settings-update-check = Új kiadás keresése a GitHubon néhány óránként
 ## Assettípusok (api.ts)
 
 api-kind-texture = Textúrák
+api-kind-vector = Vektorgrafikák
 api-kind-audio = Hang
 api-kind-model = Modellek
 api-kind-animation = Animációk
@@ -2175,6 +2176,7 @@ api-kind-document = Dokumentumok
 api-kind-data = Adatok
 api-kind-other = Egyéb
 api-kind-texture-name = textúrák
+api-kind-vector-name = vektorgrafikák
 api-kind-audio-name = hangok
 api-kind-model-name = modellek
 api-kind-animation-name = animációk

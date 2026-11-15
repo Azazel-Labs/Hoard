@@ -777,6 +777,17 @@ fn texture_tags(ext: &str, meta: &serde_json::Map<String, serde_json::Value>, ta
     }
 }
 
+/// Facts about a drawing: its main color and whether it says AI made it. Pixel facts (resolution, power of two,
+/// tiling) don't apply to something that scales to any size.
+fn vector_tags(meta: &serde_json::Map<String, serde_json::Value>, tags: &mut TagSet) {
+    if let Some(c) = meta.get("color").and_then(|v| v.as_str()) {
+        tags.add(&format!("color:{c}"), TagSource::Rule, 0.7);
+    }
+    if let Some(t) = crate::provenance::tag(meta) {
+        tags.add(t, TagSource::Meta, 1.0);
+    }
+}
+
 /// Metadata-derived facts and heuristics per kind.
 pub(crate) fn meta_tags(
     kind: AssetKind,
@@ -858,6 +869,7 @@ pub(crate) fn meta_tags(
             ucs_from_rules(tags);
         }
         AssetKind::Texture => texture_tags(ext, meta, tags),
+        AssetKind::Vector => vector_tags(meta, tags),
         AssetKind::Model => {
             if let Some(v) = meta.get("blender_version").and_then(|v| v.as_str()) {
                 tags.add(&format!("blender:{v}"), TagSource::Meta, 1.0);
@@ -962,6 +974,7 @@ pub(crate) fn categorize(kind: AssetKind, tags: &TagSet) -> String {
             ],
             "textures",
         ),
+        AssetKind::Vector => pick(&[("icon", "ui/icons"), ("ui", "ui"), ("character", "vector/characters")], "vector"),
         AssetKind::Model => pick(
             &[
                 ("character", "models/characters"),

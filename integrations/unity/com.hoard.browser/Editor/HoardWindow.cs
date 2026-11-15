@@ -17,8 +17,8 @@ namespace Hoard
         const float Gap = 6;
         const string ServerPref = "Hoard.Server";
         const string TokenPref = "Hoard.Token";
-        static readonly string[] KindLabels = { "Anything", "Textures", "Models", "Materials", "Sounds", "Animations", "Fonts", "Shaders", "Data" };
-        static readonly string[] KindValues = { "", "texture", "model", "material", "audio", "animation", "font", "shader", "data" };
+        static readonly string[] KindLabels = { "Anything", "Textures", "Vector art", "Models", "Materials", "Sounds", "Animations", "Fonts", "Shaders", "Data" };
+        static readonly string[] KindValues = { "", "texture", "vector", "model", "material", "audio", "animation", "font", "shader", "data" };
 
         HoardClient client;
         string query = "";

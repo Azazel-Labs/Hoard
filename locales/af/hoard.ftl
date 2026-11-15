@@ -2326,6 +2326,7 @@ settings-update-check = Kyk elke paar uur op GitHub vir 'n nuwe weergawe
 ## Batesoorte (api.ts)
 
 api-kind-texture = Teksture
+api-kind-vector = Vektorkuns
 api-kind-audio = Klank
 api-kind-model = Modelle
 api-kind-animation = Animasies
@@ -2337,6 +2338,7 @@ api-kind-document = Dokumente
 api-kind-data = Data
 api-kind-other = Ander
 api-kind-texture-name = teksture
+api-kind-vector-name = vektorkuns
 api-kind-audio-name = klank
 api-kind-model-name = modelle
 api-kind-animation-name = animasies

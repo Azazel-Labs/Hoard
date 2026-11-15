@@ -2341,6 +2341,7 @@ settings-update-check = Controlla GitHub ogni poche ore per una nuova versione
 ## Tipi di asset (api.ts)
 
 api-kind-texture = Texture
+api-kind-vector = Grafica vettoriale
 api-kind-audio = Audio
 api-kind-model = Modelli
 api-kind-animation = Animazioni
@@ -2352,6 +2353,7 @@ api-kind-document = Documenti
 api-kind-data = Dati
 api-kind-other = Altro
 api-kind-texture-name = texture
+api-kind-vector-name = grafica vettoriale
 api-kind-audio-name = audio
 api-kind-model-name = modelli
 api-kind-animation-name = animazioni

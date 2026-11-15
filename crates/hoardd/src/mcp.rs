@@ -324,7 +324,7 @@ fn search_tools() -> Value {
                 "type": "object",
                 "properties": {
                     "query": { "type": "string", "description": "Words to search for, e.g. 'grass footsteps'." },
-                    "kind": { "type": "string", "enum": ["texture", "audio", "model", "animation", "font", "shader", "material", "video", "document", "data", "other"] },
+                    "kind": { "type": "string", "enum": ["texture", "vector", "audio", "model", "animation", "font", "shader", "material", "video", "document", "data", "other"] },
                     "tags": { "type": "array", "items": { "type": "string" }, "description": "All must match, e.g. ['sfx', 'material:stone']." },
                     "pack_id": { "type": "string" },
                     "collection": { "type": "string", "description": "Only assets in this collection (id or name)." },
@@ -342,7 +342,7 @@ fn search_tools() -> Value {
                 "type": "object",
                 "properties": {
                     "id": { "type": "string", "description": "The asset to match." },
-                    "kind": { "type": "string", "enum": ["texture", "model", "material", "animation", "video", "audio", "other"] },
+                    "kind": { "type": "string", "enum": ["texture", "vector", "model", "material", "animation", "video", "audio", "other"] },
                     "query": { "type": "string", "description": "Optional words the matches must also have." },
                     "limit": { "type": "integer", "minimum": 1, "maximum": 100, "default": 20 },
                     "include_previews": { "type": "boolean", "default": false, "description": "Also return the first 8 thumbnails as images." }
@@ -359,7 +359,7 @@ fn search_tools() -> Value {
                 "type": "object",
                 "properties": {
                     "color": { "type": "string", "description": "Hex color, e.g. '#3a7d2c'." },
-                    "kind": { "type": "string", "enum": ["texture", "model", "material", "animation", "video", "other"] },
+                    "kind": { "type": "string", "enum": ["texture", "vector", "model", "material", "animation", "video", "other"] },
                     "query": { "type": "string", "description": "Optional words the matches must also have." },
                     "limit": { "type": "integer", "minimum": 1, "maximum": 100, "default": 20 },
                     "include_previews": { "type": "boolean", "default": false, "description": "Also return the first 8 thumbnails as images." }

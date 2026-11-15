@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "40994fa61278db02342a17e111610609be967f167ac0e561724a1ecc0fd4792e"
+source = "5eedcb6aaa1166390e8176cce353cc83907cfe3b09058c6dfa234db84acca0d1"
 translation = "c6684f3aa4c07e66944a392378175378b3171efffc214b475e3c149225b2c90e"
 
 [messages.account-add]
@@ -511,6 +511,14 @@ translation = "Textúrák"
 [messages.api-kind-texture-name]
 source = "textures"
 translation = "textúrák"
+
+[messages.api-kind-vector]
+source = "Vector art"
+translation = "Vektorgrafikák"
+
+[messages.api-kind-vector-name]
+source = "vector art"
+translation = "vektorgrafikák"
 
 [messages.api-kind-video]
 source = "Video"

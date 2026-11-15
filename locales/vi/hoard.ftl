@@ -2154,6 +2154,7 @@ settings-update-check = Kiểm tra GitHub vài giờ một lần để tìm bả
 ## Loại tài nguyên (api.ts)
 
 api-kind-texture = Texture
+api-kind-vector = Ảnh vector
 api-kind-audio = Âm thanh
 api-kind-model = Mô hình
 api-kind-animation = Hoạt ảnh
@@ -2165,6 +2166,7 @@ api-kind-document = Tài liệu
 api-kind-data = Dữ liệu
 api-kind-other = Khác
 api-kind-texture-name = texture
+api-kind-vector-name = ảnh vector
 api-kind-audio-name = âm thanh
 api-kind-model-name = mô hình
 api-kind-animation-name = hoạt ảnh

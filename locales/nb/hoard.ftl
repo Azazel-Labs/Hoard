@@ -2330,6 +2330,7 @@ settings-update-check = Sjekk GitHub med noen timers mellomrom etter en ny versj
 ## Ressurstyper (api.ts)
 
 api-kind-texture = Teksturer
+api-kind-vector = Vektorgrafikk
 api-kind-audio = Lyd
 api-kind-model = Modeller
 api-kind-animation = Animasjoner
@@ -2341,6 +2342,7 @@ api-kind-document = Dokumenter
 api-kind-data = Data
 api-kind-other = Annet
 api-kind-texture-name = teksturer
+api-kind-vector-name = vektorgrafikk
 api-kind-audio-name = lyd
 api-kind-model-name = modeller
 api-kind-animation-name = animasjoner

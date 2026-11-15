@@ -2168,6 +2168,7 @@ settings-update-check = Yeni bir sürüm için birkaç saatte bir GitHub’ı de
 ## Asset kinds (api.ts)
 
 api-kind-texture = Dokular
+api-kind-vector = Vektör çizimler
 api-kind-audio = Ses
 api-kind-model = Modeller
 api-kind-animation = Animasyonlar
@@ -2179,6 +2180,7 @@ api-kind-document = Belgeler
 api-kind-data = Veri
 api-kind-other = Diğer
 api-kind-texture-name = dokular
+api-kind-vector-name = vektör çizimler
 api-kind-audio-name = ses
 api-kind-model-name = modeller
 api-kind-animation-name = animasyonlar

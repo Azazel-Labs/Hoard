@@ -118,7 +118,7 @@ async fn lite_response(state: AppState, id: String, headers: HeaderMap) -> ApiRe
     })
     .await?
     .ok_or_else(|| AppError::not_found(tr!("error-asset-not-found", id = id)))?;
-    if row.kind != "texture" {
+    if row.kind != "texture" && row.kind != "vector" {
         return Err(AppError::bad_request(tr!("error-light-preview-images")));
     }
     if let Some(hash) = &row.lite {

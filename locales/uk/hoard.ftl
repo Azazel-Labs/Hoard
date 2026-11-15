@@ -2615,6 +2615,7 @@ settings-update-check = Перевіряти GitHub на нові випуски
 ## Asset kinds (api.ts)
 
 api-kind-texture = Текстури
+api-kind-vector = Векторна графіка
 api-kind-audio = Аудіо
 api-kind-model = Моделі
 api-kind-animation = Анімації
@@ -2626,6 +2627,7 @@ api-kind-document = Документи
 api-kind-data = Дані
 api-kind-other = Інше
 api-kind-texture-name = текстури
+api-kind-vector-name = векторна графіка
 api-kind-audio-name = аудіо
 api-kind-model-name = моделі
 api-kind-animation-name = анімації

@@ -32,7 +32,7 @@ export function isTextAsset(a: Asset): boolean {
 
 /** The viewer a double-click opens, or null when the side panel is all there is. */
 export function viewerFor(a: Asset): ViewerKind | null {
-  if (a.kind === 'texture' && a.has_thumb) return 'image'
+  if ((a.kind === 'texture' || a.kind === 'vector') && a.has_thumb) return 'image'
   if (isMaterialAsset(a)) return 'material'
   // A .gltf is JSON too, but the model viewer is what anyone wants.
   if (isModelAsset(a)) return 'model'

@@ -2124,6 +2124,7 @@ settings-update-check = 몇 시간마다 GitHub에서 새 릴리스 확인
 ## Asset kinds (api.ts)
 
 api-kind-texture = 텍스처
+api-kind-vector = 벡터 아트
 api-kind-audio = 오디오
 api-kind-model = 모델
 api-kind-animation = 애니메이션
@@ -2135,6 +2136,7 @@ api-kind-document = 문서
 api-kind-data = 데이터
 api-kind-other = 기타
 api-kind-texture-name = 텍스처
+api-kind-vector-name = 벡터 아트
 api-kind-audio-name = 오디오
 api-kind-model-name = 모델
 api-kind-animation-name = 애니메이션

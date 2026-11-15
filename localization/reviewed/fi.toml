@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "40994fa61278db02342a17e111610609be967f167ac0e561724a1ecc0fd4792e"
+source = "5eedcb6aaa1166390e8176cce353cc83907cfe3b09058c6dfa234db84acca0d1"
 translation = "1381fb1c261e8132d9dcf57774023142df4f4444b02c8d32c388e084b4bc8789"
 
 [messages.account-add]
@@ -511,6 +511,14 @@ translation = "Tekstuurit"
 [messages.api-kind-texture-name]
 source = "textures"
 translation = "tekstuurit"
+
+[messages.api-kind-vector]
+source = "Vector art"
+translation = "Vektorigrafiikka"
+
+[messages.api-kind-vector-name]
+source = "vector art"
+translation = "vektorigrafiikka"
 
 [messages.api-kind-video]
 source = "Video"

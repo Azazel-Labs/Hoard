@@ -250,6 +250,7 @@ pub(crate) fn analyze(path: &Path, root: &Path, kind: AssetKind, ext: &str) -> A
         AssetKind::Model if ext == "blend" => analyze_blend(path, &mut a),
         AssetKind::Texture if crate::textures::EXTS.contains(&ext) => analyze_decoded(path, ext, &mut a),
         AssetKind::Texture => analyze_image(path, ext, &mut a),
+        AssetKind::Vector if crate::textures::VECTOR.contains(&ext) => analyze_decoded(path, ext, &mut a),
         AssetKind::Audio if crate::music::EXTS.contains(&ext) => analyze_music(path, ext, &mut a),
         AssetKind::Audio => analyze_sound(path, ext, &mut a),
         AssetKind::Font if crate::fonts::EXTS.contains(&ext) => crate::fonts::analyze(path, ext, THUMB_SIZE).map(|f| {
@@ -278,7 +279,7 @@ pub(crate) fn analyze(path: &Path, root: &Path, kind: AssetKind, ext: &str) -> A
     if let Err(e) = result {
         a.meta.insert("analysis_error".into(), json!(format!("{e:#}")));
     }
-    if kind == AssetKind::Texture {
+    if matches!(kind, AssetKind::Texture | AssetKind::Vector) {
         a.meta.extend(crate::provenance::scan(path));
     }
     a

@@ -2532,6 +2532,7 @@ settings-update-check = Verificați GitHub la câteva ore pentru o versiune nou�
 ## Asset kinds (api.ts)
 
 api-kind-texture = Texturi
+api-kind-vector = Grafică vectorială
 api-kind-audio = Audio
 api-kind-model = Modele
 api-kind-animation = Animații
@@ -2543,6 +2544,7 @@ api-kind-document = Documente
 api-kind-data = Date
 api-kind-other = Altele
 api-kind-texture-name = texturi
+api-kind-vector-name = grafică vectorială
 api-kind-audio-name = audio
 api-kind-model-name = modele
 api-kind-animation-name = animații

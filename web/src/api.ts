@@ -3,7 +3,7 @@ import { formatNumber, language, t } from './i18n'
 import type { TextureNames } from './texnames'
 
 export type AssetKind =
-  | 'texture' | 'audio' | 'model' | 'animation' | 'font' | 'shader'
+  | 'texture' | 'vector' | 'audio' | 'model' | 'animation' | 'font' | 'shader'
   | 'material' | 'video' | 'document' | 'data' | 'other'
 
 export type TagSource = 'meta' | 'rule' | 'ai' | 'human'
@@ -1308,6 +1308,7 @@ export function formatDuration(secs: number): string {
 /** Each kind's name, in the current language: getters, so `KIND_LABEL[k]` reads it when it's shown. */
 export const KIND_LABEL: Record<AssetKind, string> = {
   get texture() { return t('api-kind-texture') },
+  get vector() { return t('api-kind-vector') },
   get audio() { return t('api-kind-audio') },
   get model() { return t('api-kind-model') },
   get animation() { return t('api-kind-animation') },
@@ -1323,6 +1324,7 @@ export const KIND_LABEL: Record<AssetKind, string> = {
 /** Each kind's name as it reads mid-sentence (“Only textures”), in the current language. */
 export const KIND_NAME: Record<AssetKind, string> = {
   get texture() { return t('api-kind-texture-name') },
+  get vector() { return t('api-kind-vector-name') },
   get audio() { return t('api-kind-audio-name') },
   get model() { return t('api-kind-model-name') },
   get animation() { return t('api-kind-animation-name') },
@@ -1336,7 +1338,7 @@ export const KIND_NAME: Record<AssetKind, string> = {
 }
 
 /** Kinds whose thumbnails are pictures of the thing itself, so "looks like" means something (mirrors the server). */
-const LOOK_KINDS = new Set<AssetKind>(['texture', 'model', 'material', 'animation', 'video', 'other'])
+const LOOK_KINDS = new Set<AssetKind>(['texture', 'vector', 'model', 'material', 'animation', 'video', 'other'])
 /** Sound files the server listens to, for "more like this" by how they sound (mirrors the server's decoders). */
 const SOUND_EXTS = new Set(['wav', 'wave', 'ogg', 'oga', 'flac', 'mp3', 'aif', 'aiff', 'aifc'])
 /** Whether "More like this" can find anything for an asset. */

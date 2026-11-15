@@ -2154,6 +2154,7 @@ settings-update-check = 每隔几小时检查 GitHub 上是否有新版本
 ## 资源类型（api.ts）
 
 api-kind-texture = 纹理
+api-kind-vector = 矢量图
 api-kind-audio = 音频
 api-kind-model = 模型
 api-kind-animation = 动画
@@ -2165,6 +2166,7 @@ api-kind-document = 文档
 api-kind-data = 数据
 api-kind-other = 其他
 api-kind-texture-name = 纹理
+api-kind-vector-name = 矢量图
 api-kind-audio-name = 音频
 api-kind-model-name = 模型
 api-kind-animation-name = 动画

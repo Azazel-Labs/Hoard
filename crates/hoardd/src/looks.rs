@@ -29,7 +29,8 @@ use crate::{AppState, db};
 pub(crate) const VERSION: i64 = 1;
 
 /// Kinds whose thumbnails are pictures of the thing (not a waveform, a type specimen or a page).
-pub(crate) const KINDS_SQL: &str = "a.kind IN ('texture', 'model', 'material', 'animation', 'video', 'other')";
+pub(crate) const KINDS_SQL: &str =
+    "a.kind IN ('texture', 'vector', 'model', 'material', 'animation', 'video', 'other')";
 
 /// Side of the working image every feature is computed on.
 const WORK: u32 = 128;

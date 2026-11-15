@@ -2618,6 +2618,7 @@ settings-update-check = Check GitHub every few hours for a new release
 ## Asset kinds (api.ts)
 
 api-kind-texture = Textures
+api-kind-vector = Vector art
 api-kind-audio = Audio
 api-kind-model = Models
 api-kind-animation = Animations
@@ -2630,6 +2631,7 @@ api-kind-data = Data
 api-kind-other = Other
 # The same, as they read in the middle of a sentence, in the command palette’s “Only { $kind }”.
 api-kind-texture-name = textures
+api-kind-vector-name = vector art
 api-kind-audio-name = audio
 api-kind-model-name = models
 api-kind-animation-name = animations

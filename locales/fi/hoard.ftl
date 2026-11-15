@@ -2413,6 +2413,7 @@ settings-update-check = Tarkista GitHubista muutaman tunnin välein, onko uutta 
 ## Resurssityypit
 
 api-kind-texture = Tekstuurit
+api-kind-vector = Vektorigrafiikka
 api-kind-audio = Ääni
 api-kind-model = Mallit
 api-kind-animation = Animaatiot
@@ -2424,6 +2425,7 @@ api-kind-document = Dokumentit
 api-kind-data = Data
 api-kind-other = Muut
 api-kind-texture-name = tekstuurit
+api-kind-vector-name = vektorigrafiikka
 api-kind-audio-name = ääni
 api-kind-model-name = mallit
 api-kind-animation-name = animaatiot

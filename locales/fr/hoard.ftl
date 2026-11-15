@@ -2370,6 +2370,7 @@ settings-update-check = Vérifier sur GitHub toutes les quelques heures si une n
 ## Types de ressources (api.ts)
 
 api-kind-texture = Textures
+api-kind-vector = Art vectoriel
 api-kind-audio = Audio
 api-kind-model = Modèles
 api-kind-animation = Animations
@@ -2381,6 +2382,7 @@ api-kind-document = Documents
 api-kind-data = Données
 api-kind-other = Autres
 api-kind-texture-name = textures
+api-kind-vector-name = art vectoriel
 api-kind-audio-name = fichiers audio
 api-kind-model-name = modèles
 api-kind-animation-name = animations

@@ -2327,6 +2327,7 @@ settings-update-check = Elke paar uur op GitHub controleren op een nieuwe versie
 ## Asset kinds (api.ts)
 
 api-kind-texture = Texturen
+api-kind-vector = Vectorafbeeldingen
 api-kind-audio = Audio
 api-kind-model = Modellen
 api-kind-animation = Animaties
@@ -2338,6 +2339,7 @@ api-kind-document = Documenten
 api-kind-data = Gegevens
 api-kind-other = Overig
 api-kind-texture-name = texturen
+api-kind-vector-name = vectorafbeeldingen
 api-kind-audio-name = audio
 api-kind-model-name = modellen
 api-kind-animation-name = animaties

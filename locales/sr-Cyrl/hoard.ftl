@@ -2427,6 +2427,7 @@ settings-update-check = Проверавај GitHub на сваких некол
 ## Врсте ресурса (api.ts)
 
 api-kind-texture = Текстуре
+api-kind-vector = Векторска графика
 api-kind-audio = Звук
 api-kind-model = Модели
 api-kind-animation = Анимације
@@ -2438,6 +2439,7 @@ api-kind-document = Документи
 api-kind-data = Подаци
 api-kind-other = Остало
 api-kind-texture-name = текстуре
+api-kind-vector-name = векторска графика
 api-kind-audio-name = звук
 api-kind-model-name = модели
 api-kind-animation-name = анимације

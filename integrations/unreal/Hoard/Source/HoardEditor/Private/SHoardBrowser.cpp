@@ -26,8 +26,8 @@
 #define LOCTEXT_NAMESPACE "Hoard"
 
 static const TCHAR* Section = TEXT("Hoard");
-static const TCHAR* KindValues[] = {TEXT(""), TEXT("texture"), TEXT("model"), TEXT("material"), TEXT("audio"), TEXT("animation"), TEXT("font"), TEXT("shader"), TEXT("data")};
-static const TCHAR* KindNames[] = {TEXT("Anything"), TEXT("Textures"), TEXT("Models"), TEXT("Materials"), TEXT("Sounds"), TEXT("Animations"), TEXT("Fonts"), TEXT("Shaders"), TEXT("Data")};
+static const TCHAR* KindValues[] = {TEXT(""), TEXT("texture"), TEXT("vector"), TEXT("model"), TEXT("material"), TEXT("audio"), TEXT("animation"), TEXT("font"), TEXT("shader"), TEXT("data")};
+static const TCHAR* KindNames[] = {TEXT("Anything"), TEXT("Textures"), TEXT("Vector art"), TEXT("Models"), TEXT("Materials"), TEXT("Sounds"), TEXT("Animations"), TEXT("Fonts"), TEXT("Shaders"), TEXT("Data")};
 static constexpr int32 Page = 40;
 
 static FString Size(int64 Bytes)

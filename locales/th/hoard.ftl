@@ -2157,6 +2157,7 @@ settings-update-check = ตรวจหารุ่นใหม่บน GitHub 
 ## Asset kinds (api.ts)
 
 api-kind-texture = เท็กซ์เจอร์
+api-kind-vector = ภาพเวกเตอร์
 api-kind-audio = เสียง
 api-kind-model = โมเดล
 api-kind-animation = แอนิเมชัน
@@ -2168,6 +2169,7 @@ api-kind-document = เอกสาร
 api-kind-data = ข้อมูล
 api-kind-other = อื่น ๆ
 api-kind-texture-name = เท็กซ์เจอร์
+api-kind-vector-name = ภาพเวกเตอร์
 api-kind-audio-name = เสียง
 api-kind-model-name = โมเดล
 api-kind-animation-name = แอนิเมชัน

@@ -2333,6 +2333,7 @@ settings-update-check = Comprova GitHub cada poques hores per si hi ha una versi
 ## Asset kinds (api.ts)
 
 api-kind-texture = Textures
+api-kind-vector = Art vectorial
 api-kind-audio = Àudio
 api-kind-model = Models
 api-kind-animation = Animacions
@@ -2344,6 +2345,7 @@ api-kind-document = Documents
 api-kind-data = Dades
 api-kind-other = Altres
 api-kind-texture-name = textures
+api-kind-vector-name = art vectorial
 api-kind-audio-name = àudio
 api-kind-model-name = models
 api-kind-animation-name = animacions

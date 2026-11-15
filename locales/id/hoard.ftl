@@ -2158,6 +2158,7 @@ settings-update-check = Periksa GitHub setiap beberapa jam untuk rilis baru
 ## Jenis aset (api.ts)
 
 api-kind-texture = Tekstur
+api-kind-vector = Seni vektor
 api-kind-audio = Audio
 api-kind-model = Model
 api-kind-animation = Animasi
@@ -2169,6 +2170,7 @@ api-kind-document = Dokumen
 api-kind-data = Data
 api-kind-other = Lainnya
 api-kind-texture-name = tekstur
+api-kind-vector-name = seni vektor
 api-kind-audio-name = audio
 api-kind-model-name = model
 api-kind-animation-name = animasi

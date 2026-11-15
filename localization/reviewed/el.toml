@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "40994fa61278db02342a17e111610609be967f167ac0e561724a1ecc0fd4792e"
+source = "5eedcb6aaa1166390e8176cce353cc83907cfe3b09058c6dfa234db84acca0d1"
 translation = "e5705daf120ffc89630a2dfab18c62e5c126f3f32bace52e36f4dc9999786b67"
 
 [messages.account-add]
@@ -511,6 +511,14 @@ translation = "Υφές"
 [messages.api-kind-texture-name]
 source = "textures"
 translation = "υφές"
+
+[messages.api-kind-vector]
+source = "Vector art"
+translation = "Διανυσματικά"
+
+[messages.api-kind-vector-name]
+source = "vector art"
+translation = "διανυσματικά"
 
 [messages.api-kind-video]
 source = "Video"

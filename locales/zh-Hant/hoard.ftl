@@ -2160,6 +2160,7 @@ settings-update-check = 每隔幾小時檢查 GitHub 是否有新版本
 ## 素材類型
 
 api-kind-texture = 貼圖
+api-kind-vector = 向量圖
 api-kind-audio = 音訊
 api-kind-model = 模型
 api-kind-animation = 動畫
@@ -2171,6 +2172,7 @@ api-kind-document = 文件
 api-kind-data = 資料
 api-kind-other = 其他
 api-kind-texture-name = 貼圖
+api-kind-vector-name = 向量圖
 api-kind-audio-name = 音訊
 api-kind-model-name = 模型
 api-kind-animation-name = 動畫

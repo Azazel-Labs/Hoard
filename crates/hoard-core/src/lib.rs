@@ -22,6 +22,8 @@ pub fn user_agent() -> String {
 #[serde(rename_all = "lowercase")]
 pub enum AssetKind {
     Texture,
+    /// Drawings made of shapes rather than pixels (SVG, Illustrator), which scale to any size.
+    Vector,
     Audio,
     Model,
     Animation,
@@ -35,8 +37,9 @@ pub enum AssetKind {
 }
 
 impl AssetKind {
-    pub const ALL: [AssetKind; 11] = [
+    pub const ALL: [AssetKind; 12] = [
         AssetKind::Texture,
+        AssetKind::Vector,
         AssetKind::Audio,
         AssetKind::Model,
         AssetKind::Animation,
@@ -52,6 +55,7 @@ impl AssetKind {
     pub fn as_str(&self) -> &'static str {
         match self {
             AssetKind::Texture => "texture",
+            AssetKind::Vector => "vector",
             AssetKind::Audio => "audio",
             AssetKind::Model => "model",
             AssetKind::Animation => "animation",
@@ -72,10 +76,12 @@ impl AssetKind {
     /// Classify by lowercase file extension (no dot).
     pub fn from_ext(ext: &str) -> Self {
         match ext {
-            // Images, including layered/source formats (PSD/PSB, Krita, OpenRaster, GIMP, Clip Studio, Affinity).
+            // Images, including layered/source formats (PSD/PSB, Krita, OpenRaster, GIMP, Clip Studio, Affinity Photo).
             "png" | "jpg" | "jpeg" | "tga" | "bmp" | "gif" | "webp" | "tif" | "tiff" | "psd" | "psb" | "dds"
-            | "ktx" | "ktx2" | "exr" | "hdr" | "basis" | "svg" | "svgz" | "aseprite" | "ase" | "kra" | "ora"
-            | "xcf" | "clip" | "afphoto" | "afdesign" | "ai" | "procreate" => AssetKind::Texture,
+            | "ktx" | "ktx2" | "exr" | "hdr" | "basis" | "aseprite" | "ase" | "kra" | "ora" | "xcf" | "clip"
+            | "afphoto" | "procreate" => AssetKind::Texture,
+            // Vector art: SVG, Illustrator, Affinity Designer, EPS.
+            "svg" | "svgz" | "ai" | "afdesign" | "eps" => AssetKind::Vector,
             // Audio, including DAW projects (Ableton, FL Studio, Reaper, Pro Tools, Logic, Cubase, Studio One).
             "wav" | "ogg" | "oga" | "mp3" | "flac" | "aif" | "aiff" | "aifc" | "opus" | "m4a" | "aac" | "wma"
             | "caf" | "wv" | "ape" | "mka" | "w64" | "au" | "mid" | "midi" | "xm" | "it" | "mod" | "s3m" | "als"

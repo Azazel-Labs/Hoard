@@ -2410,6 +2410,7 @@ settings-update-check = Έλεγχος στο GitHub κάθε λίγες ώρε�
 ## Asset kinds (api.ts)
 
 api-kind-texture = Υφές
+api-kind-vector = Διανυσματικά
 api-kind-audio = Ήχος
 api-kind-model = Μοντέλα
 api-kind-animation = Animations
@@ -2421,6 +2422,7 @@ api-kind-document = Έγγραφα
 api-kind-data = Δεδομένα
 api-kind-other = Άλλα
 api-kind-texture-name = υφές
+api-kind-vector-name = διανυσματικά
 api-kind-audio-name = ήχος
 api-kind-model-name = μοντέλα
 api-kind-animation-name = animations

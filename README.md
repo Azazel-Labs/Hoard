@@ -246,11 +246,12 @@ software rasterizer (`apt install mesa-vulkan-drivers`). Without any adapter, ev
      Google's SynthID can only be read by their maker's detector.
    - GPU textures, decoded in pure Rust: DDS (BC1-7, raw RGBA/BGRA, float, legacy DXT and bitmask formats) and KTX2
      (BCn, ETC2/EAC, ASTC, raw, with zstd or zlib supercompression), with their GPU format and mip count. Basis
-     Universal (KTX2 with BasisLZ/ETC1S or UASTC, and `.basis` files) is transcoded in pure Rust too. SVGs render
-     with their text (system fonts, DejaVu in the Docker image). Illustrator files (`.ai`) render their first
-     artboard from the PDF inside them, or show the preview they carry when they have none (Illustrator 8 and
-     earlier, or saved without PDF content). Aseprite files show their first frame with
-     frame, layer and animation-tag counts.
+     Universal (KTX2 with BasisLZ/ETC1S or UASTC, and `.basis` files) is transcoded in pure Rust too. Aseprite
+     files show their first frame with frame, layer and animation-tag counts.
+   - Vector art (SVG, Illustrator, Affinity Designer, EPS) is a kind of its own, filtered apart from pictures made of
+     pixels, and goes wherever a library location takes textures. SVGs render with their text (system fonts, DejaVu
+     in the Docker image). Illustrator files (`.ai`) render their first artboard from the PDF inside them, or show
+     the preview they carry when they have none (Illustrator 8 and earlier, or saved without PDF content).
    - Pictures that move: an animated GIF, PNG or WebP says how many frames it has and how long it plays (`frames`,
      `duration_ms`), and plays in its details (up to 16 MB) and on its tile while the pointer is over it (up to
      4 MB). An Aseprite file of more than one frame plays in its details too, at each frame's own time and through

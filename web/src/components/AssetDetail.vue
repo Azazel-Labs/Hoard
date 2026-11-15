@@ -192,7 +192,7 @@ watch(
   { immediate: true },
 )
 
-const isImage = computed(() => props.asset.kind === 'texture' && props.asset.has_thumb)
+const isImage = computed(() => (props.asset.kind === 'texture' || props.asset.kind === 'vector') && props.asset.has_thumb)
 // Aseprite animations play from the start; a sprite sheet does when asked.
 const spritePlayable = computed(() => isImage.value && (animatedAseprite(props.asset) || spriteSheet(props.asset)))
 const animate = ref(false)

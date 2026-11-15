@@ -2572,6 +2572,7 @@ settings-update-check = Проверять GitHub каждые нескольк�
 ## Виды ассетов (api.ts)
 
 api-kind-texture = Текстуры
+api-kind-vector = Векторная графика
 api-kind-audio = Аудио
 api-kind-model = Модели
 api-kind-animation = Анимации
@@ -2583,6 +2584,7 @@ api-kind-document = Документы
 api-kind-data = Данные
 api-kind-other = Другое
 api-kind-texture-name = текстуры
+api-kind-vector-name = векторная графика
 api-kind-audio-name = аудио
 api-kind-model-name = модели
 api-kind-animation-name = анимации

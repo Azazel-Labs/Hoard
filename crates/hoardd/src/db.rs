@@ -377,6 +377,23 @@ const MIGRATIONS: &[&str] = &[
               strftime('%Y-%m-%dT%H:%M:%SZ', 'now'), strftime('%Y-%m-%dT%H:%M:%SZ', 'now')
        FROM packs p WHERE p.status = 'ingesting'
          AND NOT EXISTS (SELECT 1 FROM jobs j WHERE j.pack_id = p.id AND j.status IN ('queued', 'running'));",
+    // 45: vector art (SVG, Illustrator, Affinity Designer, EPS) is a kind of its own rather than a texture. A library
+    // location that takes textures takes it too, so nothing has to move.
+    "UPDATE assets SET kind = 'vector',
+            category = CASE WHEN category = 'textures' THEN 'vector' ELSE category END
+       WHERE kind = 'texture' AND ext IN ('svg', 'svgz', 'ai', 'afdesign', 'eps');
+     UPDATE OR IGNORE asset_tags SET tag = 'kind:vector'
+       WHERE tag = 'kind:texture' AND asset_id IN (SELECT id FROM assets WHERE kind = 'vector');
+     DELETE FROM asset_tags WHERE tag = 'kind:texture' AND asset_id IN (SELECT id FROM assets WHERE kind = 'vector');
+     DELETE FROM assets_fts WHERE asset_id IN (SELECT id FROM assets WHERE kind = 'vector');
+     INSERT INTO assets_fts (asset_id, name, words, category, description, tags)
+       SELECT a.id, a.name, a.words, COALESCE(a.category, ''),
+              concat_ws(' ', a.description, a.source_description, a.ai_description),
+              COALESCE((SELECT group_concat(replace(replace(tag, ':', ' '), '-', ' '), ' ')
+                        FROM asset_tags t WHERE t.asset_id = a.id), '')
+       FROM assets a WHERE a.kind = 'vector';
+     UPDATE locations SET kinds = json_insert(kinds, '$[#]', 'vector')
+       WHERE EXISTS (SELECT 1 FROM json_each(locations.kinds) WHERE value = 'texture');",
 ];
 
 /// How many automatic pre-upgrade backups to keep in `<data dir>/backups`.
@@ -742,8 +759,9 @@ pub(crate) fn list_packs(conn: &Connection, archived: bool) -> Result<Vec<Pack>>
         "SELECT id, kind FROM (
            SELECT id, kind, path, ROW_NUMBER() OVER (PARTITION BY kind ORDER BY path) AS n
            FROM assets WHERE pack_id = ?1 AND thumb_hash IS NOT NULL
-             AND kind IN ('model', 'texture', 'audio', 'animation', 'font')
-         ) ORDER BY n, CASE kind WHEN 'model' THEN 0 WHEN 'texture' THEN 1 WHEN 'font' THEN 3 ELSE 2 END LIMIT 4",
+             AND kind IN ('model', 'texture', 'vector', 'audio', 'animation', 'font')
+         ) ORDER BY n, CASE kind WHEN 'model' THEN 0 WHEN 'texture' THEN 1 WHEN 'vector' THEN 1 WHEN 'font' THEN 3 ELSE 2 END
+         LIMIT 4",
     )?;
     for p in &mut rows {
         let cover: Vec<(String, String)> =
@@ -1846,6 +1864,55 @@ mod tests {
         assert_eq!(name, "Forest");
         let settings: i64 = conn.query_row("SELECT COUNT(*) FROM settings", [], |r| r.get(0)).unwrap();
         assert_eq!(settings, 0);
+    }
+
+    /// Favorites keep their stars across the table's new name, and drawings become vector art, taken by the
+    /// locations that took them as textures.
+    #[test]
+    fn favorites_and_vector_art_survive_their_upgrades() {
+        let dir = tempfile::tempdir().unwrap();
+        let mut conn = baseline_db(dir.path());
+        migrate(&mut conn, &dir.path().join("backups"), &MIGRATIONS[..MIGRATIONS.len() - 3]).unwrap();
+        conn.execute_batch(
+            "PRAGMA foreign_keys = OFF;
+             INSERT INTO users (id, username, password_hash, created_at) VALUES (1, 'ann', '', 'x');
+             INSERT INTO assets (id, pack_id, blob_hash, path, name, ext, kind, category, created_at, updated_at) VALUES
+               ('svg', 'p1', 'h1', 'icon.svg', 'icon', 'svg', 'texture', 'textures', 'x', 'x'),
+               ('png', 'p1', 'h2', 'icon.png', 'icon', 'png', 'texture', 'textures', 'x', 'x');
+             INSERT INTO asset_tags (asset_id, tag, source, confidence) VALUES
+               ('svg', 'kind:texture', 'meta', 1.0), ('png', 'kind:texture', 'meta', 1.0);
+             INSERT INTO favourites (user_id, asset_id, added_at) VALUES (1, 'svg', 'x');
+             INSERT INTO locations (name, mode, path, kinds, created_at) VALUES
+               ('Pictures', 'managed', '/p', '[\"texture\"]', 'x'), ('Sounds', 'managed', '/s', '[\"audio\"]', 'x');",
+        )
+        .unwrap();
+        migrate(&mut conn, &dir.path().join("backups"), MIGRATIONS).unwrap();
+        let row = |id: &str| -> (String, String, String) {
+            conn.query_row(
+                "SELECT kind, category, (SELECT group_concat(tag) FROM asset_tags WHERE asset_id = a.id)
+                   FROM assets a WHERE id = ?1",
+                [id],
+                |r| Ok((r.get(0)?, r.get(1)?, r.get(2)?)),
+            )
+            .unwrap()
+        };
+        assert_eq!(row("svg"), ("vector".into(), "vector".into(), "kind:vector".into()));
+        assert_eq!(row("png"), ("texture".into(), "textures".into(), "kind:texture".into()));
+        let found: String = conn
+            .query_row("SELECT asset_id FROM assets_fts WHERE assets_fts MATCH 'vector'", [], |r| r.get(0))
+            .unwrap();
+        assert_eq!(found, "svg");
+        let kinds: Vec<String> = conn
+            .prepare("SELECT kinds FROM locations ORDER BY id")
+            .unwrap()
+            .query_map([], |r| r.get(0))
+            .unwrap()
+            .collect::<rusqlite::Result<_>>()
+            .unwrap();
+        assert_eq!(kinds, [r#"["texture","vector"]"#, r#"["audio"]"#]);
+        let stars: i64 =
+            conn.query_row("SELECT COUNT(*) FROM favorites WHERE asset_id = 'svg'", [], |r| r.get(0)).unwrap();
+        assert_eq!(stars, 1);
     }
 
     #[test]

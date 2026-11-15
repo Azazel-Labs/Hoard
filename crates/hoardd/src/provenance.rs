@@ -68,7 +68,7 @@ pub(crate) fn backfill(state: &AppState, rt: &Handle, conn: &Connection, pack_id
     let todo: Vec<(String, String, String, i64)> = conn
         .prepare(
             "SELECT a.id, a.blob_hash, a.ext, COALESCE(b.size, 0) FROM assets a LEFT JOIN blobs b ON b.hash = a.blob_hash
-              WHERE a.pack_id = ?1 AND a.kind = 'texture' AND json_extract(a.meta, '$.provenance') IS NOT NULL",
+              WHERE a.pack_id = ?1 AND a.kind IN ('texture', 'vector') AND json_extract(a.meta, '$.provenance') IS NOT NULL",
         )?
         .query_map([pack_id], |r| Ok((r.get(0)?, r.get(1)?, r.get(2)?, r.get(3)?)))?
         .collect::<rusqlite::Result<_>>()?;

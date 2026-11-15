@@ -38,6 +38,14 @@ defineProps<{ kind: AssetKind; size?: number }>()
       <path d="M7 26l8-8 6 6 4-4 8 8" />
       <circle cx="26" cy="14" r="2.5" />
     </template>
+    <template v-else-if="kind === 'vector'">
+      <path d="M8 31C12 14 28 26 32 9" />
+      <path d="M8 31 19 13M32 9 21 27" opacity="0.5" />
+      <rect x="5" y="28" width="6" height="6" rx="1" />
+      <rect x="29" y="6" width="6" height="6" rx="1" />
+      <circle cx="19" cy="13" r="2" />
+      <circle cx="21" cy="27" r="2" />
+    </template>
     <template v-else-if="kind === 'video'">
       <rect x="6" y="10" width="28" height="20" rx="2" />
       <path d="M17 15v10l8-5Z" />

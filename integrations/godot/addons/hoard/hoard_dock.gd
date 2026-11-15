@@ -6,7 +6,7 @@ const HoardClient := preload("hoard_client.gd")
 const HoardProject := preload("hoard_project.gd")
 const HoardExport := preload("hoard_export.gd")
 const PAGE := 40
-const KINDS := [["Anything", ""], ["Textures", "texture"], ["Models", "model"], ["Materials", "material"],
+const KINDS := [["Anything", ""], ["Textures", "texture"], ["Vector art", "vector"], ["Models", "model"], ["Materials", "material"],
 	["Sounds", "audio"], ["Animations", "animation"], ["Fonts", "font"], ["Shaders", "shader"], ["Data", "data"]]
 
 var client: HoardClient

@@ -136,27 +136,30 @@ pub(crate) fn thumb_mime(bytes: &[u8]) -> &'static str {
     if bytes.starts_with(&[0xFF, 0xD8, 0xFF]) { "image/jpeg" } else { "image/png" }
 }
 
-/// A glTF/GLB the renderer can read: a meshopt-compressed one is decoded by mithril into a plain GLB (its images
-/// taken in) in a temporary folder, anything else is read where it is.
+/// A glTF/GLB the renderer can read: one using meshopt, Draco or quantization (which the renderer's glTF reader
+/// rejects) is rewritten by mithril as a plain GLB (its images taken in) in a temporary folder, anything else is read
+/// where it is.
 struct Drawable {
     path: PathBuf,
     _dir: Option<tempfile::TempDir>,
 }
 
+/// The extensions plain glTF readers lack, which `mithril` decodes away.
+const ENCODINGS: [&str; 4] =
+    ["EXT_meshopt_compression", "KHR_meshopt_compression", "KHR_draco_mesh_compression", "KHR_mesh_quantization"];
+
 fn drawable(path: &Path) -> anyhow::Result<Drawable> {
     let doc = glb_json(path).or_else(|_| anyhow::Ok(serde_json::from_slice::<Value>(&std::fs::read(path)?)?))?;
-    let meshopt = doc
+    let encoded = doc
         .get("extensionsUsed")
         .and_then(Value::as_array)
-        .is_some_and(|e| e.iter().filter_map(Value::as_str).any(|e| mithril::gltf::MESHOPT_EXTENSIONS.contains(&e)));
-    if !meshopt {
+        .is_some_and(|e| e.iter().filter_map(Value::as_str).any(|e| ENCODINGS.contains(&e)));
+    if !encoded {
         return Ok(Drawable { path: path.to_owned(), _dir: None });
     }
-    let bytes = std::fs::read(path)?;
-    let folder = path.parent().context("no folder")?;
-    let glb = mithril::gltf::pack_glb_decompressed(&bytes, mithril::gltf::files_in(folder))
-        .or_else(|_| mithril::gltf::decompress(&bytes))
-        .context("decoding meshopt compression")?;
+    let glb = path.extension().is_some_and(|e| e.eq_ignore_ascii_case("glb"));
+    let ext = if glb { "glb" } else { "gltf" };
+    let glb = crate::meshes::plain_glb(path, ext).context("decoding a compressed glTF")?;
     let dir = tempfile::tempdir()?;
     let plain = dir.path().join("model.glb");
     std::fs::write(&plain, glb)?;
@@ -1346,6 +1349,43 @@ mod tests {
         let mut meta = Map::new();
         analyze_model(&path, dir.path(), "gltf", &mut meta).unwrap();
         assert_eq!(meta["triangles"], json!(1));
+    }
+
+    #[test]
+    fn compressed_gltf_is_drawn_from_a_plain_copy() {
+        use mithril::mesh::{Material, Mesh, Prim};
+        let mut p = Prim::default();
+        for y in 0..=8u32 {
+            for x in 0..=8u32 {
+                p.positions.push([x as f32, 0.0, y as f32]);
+                p.normals.push([0.0, 1.0, 0.0]);
+            }
+        }
+        for y in 0..8 {
+            for x in 0..8 {
+                let i = y * 9 + x;
+                p.indices.extend_from_slice(&[i, i + 9, i + 1, i + 1, i + 9, i + 10]);
+            }
+        }
+        let mesh = Mesh { prims: vec![p], materials: vec![Material::plain("Grey", [0.5; 4])], images: Vec::new() };
+        let packed = mithril::gltf::compress(&mithril::mesh::to_glb(&mesh).unwrap()).unwrap();
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("grid.glb");
+        std::fs::write(&path, packed).unwrap();
+        assert!(glb_json(&path).unwrap()["extensionsUsed"].to_string().contains("meshopt"));
+
+        let drawn = drawable(&path).unwrap();
+        assert_ne!(drawn.path, path);
+        let json = glb_json(&drawn.path).unwrap();
+        assert!(json.get("extensionsUsed").is_none_or(|e| !ENCODINGS.iter().any(|n| e.to_string().contains(n))));
+        let mut meta = Map::new();
+        analyze_model(&drawn.path, dir.path(), "glb", &mut meta).unwrap();
+        assert_eq!(meta["triangles"], json!(128));
+
+        // Plain glTF is drawn where it is.
+        let plain = dir.path().join("plain.glb");
+        std::fs::write(&plain, mithril::mesh::to_glb(&mesh).unwrap()).unwrap();
+        assert_eq!(drawable(&plain).unwrap().path, plain);
     }
 
     #[test]

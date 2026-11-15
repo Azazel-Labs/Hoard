@@ -160,9 +160,7 @@ pub(crate) fn convert(
         }
         "gltf" if src == "glb" => glb_to_gltf_zip(local),
         "glb" if crate::meshes::rebuilt_as_glb(&src) => {
-            let (mesh, _) = crate::meshes::load(local, &src, root)?;
-            let mesh = mesh.context("this model has no surfaces to export")?;
-            Ok(Output { bytes: crate::meshes::to_glb(&mesh)?, ext: "glb" })
+            Ok(Output { bytes: crate::meshes::glb(local, &src, root)?, ext: "glb" })
         }
         "ttf" | "woff" | "woff2" if crate::fonts::EXTS.contains(&src.as_str()) => {
             let sfnt = crate::fonts::sfnt(local, &src)?;

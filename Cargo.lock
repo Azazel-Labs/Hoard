@@ -3363,7 +3363,7 @@ dependencies = [
 [[package]]
 name = "mithril"
 version = "0.1.0"
-source = "git+https://github.com/Azazel-Labs/Mithril?rev=218d636458af90ea3a56e70443b40be217dc1640#218d636458af90ea3a56e70443b40be217dc1640"
+source = "git+https://github.com/Azazel-Labs/mithril?rev=c61f3c32b488c941657f02ec71ef54279aceffcf#c61f3c32b488c941657f02ec71ef54279aceffcf"
 dependencies = [
  "base64 0.22.1",
  "bytemuck",

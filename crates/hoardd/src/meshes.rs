@@ -1,7 +1,8 @@
 //! Models read natively, by [mithril]: STL, PLY, `MagicaVoxel` `.vox`, OBJ (with its MTL materials and textures),
 //! FBX (binary and ASCII), 3DS, 3MF and USD. Each becomes a GLB, which feeds the thumbnail renderer and "download
 //! as GLB"; textures are embedded so the GLB stands on its own, re-encoded as PNG from anything Hoard can decode.
-//! glTF and GLB are read too, for the triangles they draw; their GLB is packed from the file as it is.
+//! glTF and GLB are read too, for the triangles they draw, and decoded into plain glTF when compressed or quantized
+//! so the thumbnail renderer can draw them; their download GLB is packed from the file as it is.
 
 use std::path::{Path, PathBuf};
 
@@ -57,6 +58,23 @@ pub(crate) fn facts(path: &Path, ext: &str, root: &Path) -> Result<Map<String, V
         extras: false,
     };
     Ok(mithril::formats::load(path, ext, &Pack(Folder::new(root)), nothing)?.facts)
+}
+
+/// A model in another format as a GLB for download: its whole document (hierarchy, skins, morph targets, animation,
+/// materials and embedded textures), not just the mesh it draws.
+pub(crate) fn glb(path: &Path, ext: &str, root: &Path) -> Result<Vec<u8>> {
+    let doc = mithril::formats::load(path, ext, &Pack(Folder::new(root)), Keep::ALL)?;
+    anyhow::ensure!(doc.counts().triangles > 0, "this model has no surfaces to export");
+    Ok(doc.to_glb()?)
+}
+
+/// A glTF rewritten as plain glTF in a GLB, for a reader without meshopt, Draco or quantization (the thumbnail
+/// renderer): mithril decodes those and takes the images in. Animations, cameras and lights are left out.
+pub(crate) fn plain_glb(path: &Path, ext: &str) -> Result<Vec<u8>> {
+    let folder = path.parent().unwrap_or(Path::new("."));
+    let mut doc = mithril::formats::load(path, ext, &Pack(Folder::new(folder)), Keep::MESHES)?;
+    doc.decode()?;
+    Ok(doc.to_glb()?)
 }
 
 /// Texture bytes (a file, or embedded in an FBX) as PNG or JPEG: those as they are, anything else Hoard can

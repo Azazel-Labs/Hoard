@@ -3354,7 +3354,7 @@ dependencies = [
 [[package]]
 name = "mithril"
 version = "0.1.0"
-source = "git+https://github.com/Azazel-Labs/Mithril?rev=546fd91fe148309dbe19914b72bc87c91217aecc#546fd91fe148309dbe19914b72bc87c91217aecc"
+source = "git+https://github.com/Azazel-Labs/Mithril?rev=7543ba0d06388c295f0a11945f3fb8eb0a33deb5#7543ba0d06388c295f0a11945f3fb8eb0a33deb5"
 dependencies = [
  "base64 0.22.1",
  "fbxcel",

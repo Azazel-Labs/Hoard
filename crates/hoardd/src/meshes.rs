@@ -1,6 +1,7 @@
 //! Models read natively, by [mithril]: STL, PLY, `MagicaVoxel` `.vox`, OBJ (with its MTL materials and textures),
 //! FBX (binary and ASCII), 3DS, 3MF and USD. Each becomes a GLB, which feeds the thumbnail renderer and "download
 //! as GLB"; textures are embedded so the GLB stands on its own, re-encoded as PNG from anything Hoard can decode.
+//! glTF and GLB are read too, for the triangles they draw; their GLB is packed from the file as it is.
 
 use std::path::{Path, PathBuf};
 
@@ -8,8 +9,13 @@ use anyhow::Result;
 use mithril::assets::{Assets, Folder};
 use serde_json::{Map, Value};
 
-pub(crate) use mithril::formats::EXTENSIONS as EXTS;
 pub(crate) use mithril::mesh::{Image, Material, Mesh, to_glb};
+
+/// Whether a model in this format becomes a GLB by being read into a mesh. A glTF is packed as it is instead,
+/// keeping what a mesh leaves out (animation, skins, compression).
+pub(crate) fn rebuilt_as_glb(ext: &str) -> bool {
+    mithril::formats::EXTENSIONS.contains(&ext) && !matches!(ext, "gltf" | "glb")
+}
 
 /// A pack laid out in a folder: mithril finds the files a model points at, and Hoard decodes the textures.
 struct Pack(Folder);

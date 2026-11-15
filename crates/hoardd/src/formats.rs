@@ -159,7 +159,7 @@ pub(crate) fn convert(
             convert_audio(local, &src, format, progress)
         }
         "gltf" if src == "glb" => glb_to_gltf_zip(local),
-        "glb" if crate::meshes::EXTS.contains(&src.as_str()) => {
+        "glb" if crate::meshes::rebuilt_as_glb(&src) => {
             let (mesh, _) = crate::meshes::load(local, &src, root)?;
             let mesh = mesh.context("this model has no surfaces to export")?;
             Ok(Output { bytes: crate::meshes::to_glb(&mesh)?, ext: "glb" })
@@ -641,7 +641,7 @@ pub(crate) async fn request(
         return Err(Refused::Unsupported(tr!("error-only-images-resize")));
     }
     // Blender's GLB is already there.
-    if format == "glb" && ext != "gltf" && !crate::meshes::EXTS.contains(&ext.to_ascii_lowercase().as_str()) {
+    if format == "glb" && ext != "gltf" && !crate::meshes::rebuilt_as_glb(&ext.to_ascii_lowercase()) {
         let glb = derivs.iter().find(|(k, _)| k == "glb").ok_or(Refused::NotFound)?;
         return Ok(Lookup::Ready(Ready { hash: glb.1.clone(), ext: "glb".into(), stem }));
     }

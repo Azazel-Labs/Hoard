@@ -65,7 +65,7 @@ xmrsplayer = "0.15"
 midly = "0.5"
 rustysynth = "1"
 # Model formats (STL, PLY, VOX, OBJ, FBX, 3DS, 3MF, USD) read natively for thumbnails and GLB copies.
-mithril = { git = "https://github.com/Azazel-Labs/Mithril", rev = "546fd91fe148309dbe19914b72bc87c91217aecc" }
+mithril = { git = "https://github.com/Azazel-Labs/Mithril", rev = "7543ba0d06388c295f0a11945f3fb8eb0a33deb5" }
 ddsfile = "0.6"
 texture2ddecoder = "0.1"
 ktx2 = "0.5"

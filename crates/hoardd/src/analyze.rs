@@ -300,7 +300,7 @@ pub(crate) fn analyze(path: &Path, root: &Path, kind: AssetKind, ext: &str) -> A
         AssetKind::Model if matches!(ext, "stl" | "ply" | "vox" | "3ds" | "3mf" | "usd" | "usda" | "usdc" | "usdz") => {
             analyze_mesh(path, root, ext, &mut a)
         }
-        AssetKind::Model | AssetKind::Animation => analyze_model(path, ext, &mut a.meta).map(|()| {
+        AssetKind::Model | AssetKind::Animation => analyze_model(path, root, ext, &mut a.meta).map(|()| {
             // Animation-only glTF clips have no meshes to draw.
             let has_mesh = a.meta.get("meshes").and_then(Value::as_u64).is_none_or(|n| n > 0);
             if matches!(ext, "gltf" | "glb") && has_mesh {
@@ -1198,15 +1198,26 @@ fn draw_waveform(bars: &[Bar]) -> anyhow::Result<Vec<u8>> {
 // ---------------------------------------------------------------------------------------------
 // Models
 
-fn analyze_model(path: &Path, ext: &str, meta: &mut Map<String, Value>) -> anyhow::Result<()> {
+fn analyze_model(path: &Path, root: &Path, ext: &str, meta: &mut Map<String, Value>) -> anyhow::Result<()> {
     match ext {
-        "gltf" => {
-            let json: Value = serde_json::from_reader(BufReader::new(File::open(path)?))?;
+        "gltf" | "glb" => {
+            let json = if ext == "glb" {
+                glb_json(path)?
+            } else {
+                serde_json::from_reader(BufReader::new(File::open(path)?))?
+            };
             gltf_stats(&json, meta);
-        }
-        "glb" => {
-            let json = glb_json(path)?;
-            gltf_stats(&json, meta);
+            // The triangles the scene draws (strips and fans, meshes placed more than once, points and lines
+            // apart), when mithril can read it: not a Draco-compressed file or glTF 1.0.
+            match crate::meshes::load(path, ext, root) {
+                Ok((_, facts)) => {
+                    meta.insert("triangles".into(), json!(0));
+                    meta.extend(facts);
+                }
+                Err(e) => {
+                    tracing::debug!(path = %path.display(), error = %format!("{e:#}"), "glTF counted from its JSON");
+                }
+            }
         }
         "obj" => obj_stats(path, meta)?,
         "fbx" => fbx_stats(path, meta)?,
@@ -1297,6 +1308,45 @@ fn fbx_stats(path: &Path, meta: &mut Map<String, Value>) -> anyhow::Result<()> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn gltf_triangles_are_the_ones_drawn() {
+        let dir = tempfile::tempdir().unwrap();
+        // Four corners of a quad as one triangle strip: two triangles, though four vertices over three is one.
+        let bin: Vec<u8> = [[0f32, 0., 0.], [1., 0., 0.], [0., 1., 0.], [1., 1., 0.]]
+            .iter()
+            .flatten()
+            .flat_map(|f| f.to_le_bytes())
+            .collect();
+        std::fs::write(dir.path().join("quad.bin"), &bin).unwrap();
+        let doc = json!({
+            "asset": {"version": "2.0"},
+            "buffers": [{"uri": "quad.bin", "byteLength": bin.len()}],
+            "bufferViews": [{"buffer": 0, "byteLength": bin.len()}],
+            "accessors": [{"bufferView": 0, "componentType": 5126, "count": 4, "type": "VEC3",
+                           "min": [0, 0, 0], "max": [1, 1, 0]}],
+            "meshes": [{"primitives": [{"attributes": {"POSITION": 0}, "mode": 5}]}],
+            // The quad placed twice.
+            "nodes": [{"mesh": 0}, {"mesh": 0, "translation": [2, 0, 0]}],
+            "scenes": [{"nodes": [0, 1]}],
+            "scene": 0,
+        });
+        let path = dir.path().join("quad.gltf");
+        std::fs::write(&path, serde_json::to_vec(&doc).unwrap()).unwrap();
+        let mut meta = Map::new();
+        analyze_model(&path, dir.path(), "gltf", &mut meta).unwrap();
+        assert_eq!(meta["triangles"], json!(4));
+        assert_eq!(meta["vertices"], json!(4));
+        assert_eq!(meta["meshes"], json!(1));
+
+        // What mithril refuses is still counted from the JSON.
+        let mut draco = doc.clone();
+        draco["extensionsRequired"] = json!(["KHR_draco_mesh_compression"]);
+        std::fs::write(&path, serde_json::to_vec(&draco).unwrap()).unwrap();
+        let mut meta = Map::new();
+        analyze_model(&path, dir.path(), "gltf", &mut meta).unwrap();
+        assert_eq!(meta["triangles"], json!(1));
+    }
 
     #[test]
     fn thumbnails_are_jpeg_only_when_opaque_and_not_pixel_art() {

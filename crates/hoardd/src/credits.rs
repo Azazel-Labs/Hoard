@@ -417,7 +417,7 @@ pub(crate) fn markdown(credits: &Credits) -> String {
             md,
             "| {} | {} | {store} | {license} | {attribution} |",
             cell(&p.pack),
-            p.seller.as_deref().map(cell).unwrap_or_default()
+            p.seller.as_deref().map_or_default(cell)
         );
     }
     let lines: Vec<&Entry> = credits.packs.iter().filter(|p| p.credit_line.is_some()).collect();

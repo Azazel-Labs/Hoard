@@ -185,7 +185,7 @@ fn texture(data: &[u8], pkg: &Package) -> Converted {
                 .unwrap_or(f.into_owned())
         },
     );
-    let compression = str_or_num(src.get("CompressionFormat")).map(std::borrow::Cow::into_owned).unwrap_or_default();
+    let compression = str_or_num(src.get("CompressionFormat")).map_or_default(std::borrow::Cow::into_owned);
     let png = src.get("bPNGCompressed").and_then(Value::as_bool).unwrap_or(false)
         || compression == "TSCF_PNG"
         || compression == "1";

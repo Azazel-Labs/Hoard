@@ -396,7 +396,7 @@ fn build_glb(path: &Path, images: bool) -> Result<Vec<u8>> {
             .iter()
             .any(|n| b.pointer(&format!("/extensions/{n}/fallback")) == Some(&json!(true)))
     };
-    let buffers = doc.get("buffers").and_then(Value::as_array).map(Vec::as_slice).unwrap_or_default();
+    let buffers = doc.get("buffers").and_then(Value::as_array).map_or_default(Vec::as_slice);
     ensure!(buffers.iter().all(|b| b.get("uri").is_some() || fallback(b)), "a glTF buffer has no URI");
     // Image files that stay put: their URIs are set aside while the rest is packed, then put back.
     let mut kept = Vec::new();
@@ -673,7 +673,7 @@ pub(crate) async fn request(
     };
     tokio::spawn(async move {
         let file = job.path.rsplit('/').next().unwrap_or(&job.path).to_owned();
-        let size = job.max.map(|m| format!(" up to {m} px")).unwrap_or_default();
+        let size = job.max.map_or_default(|m| format!(" up to {m} px"));
         let activity = std::sync::Arc::new(crate::activity::start(
             "download_as",
             format!("Converting {file} to {}{size}", format_name(&job.format)),

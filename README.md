@@ -2,7 +2,7 @@
 
 [![CI](https://github.com/Azazel-Labs/Hoard/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/Azazel-Labs/Hoard/actions/workflows/ci.yml)
 [![Release](https://img.shields.io/github/v/release/Azazel-Labs/Hoard)](https://github.com/Azazel-Labs/Hoard/releases/latest)
-[![Rust 1.99+](https://img.shields.io/badge/rust-1.99%2B-orange?logo=rust)](https://www.rust-lang.org)
+[![Rust 1.100+](https://img.shields.io/badge/rust-1.100%2B-orange?logo=rust)](https://www.rust-lang.org)
 [![License: MIT-0](https://img.shields.io/badge/license-MIT--0-blue)](LICENSE)
 
 <!-- languages:start -->
@@ -124,7 +124,7 @@ or Tailscale, and backups are covered in [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md
 ## Build from source
 
 ```sh
-# Server (Rust 1.99.1 is pinned in rust-toolchain.toml; rustup installs it automatically)
+# Server (stable Rust via rust-toolchain.toml, MSRV 1.100; rustup installs it automatically)
 cargo build --release
 (cd web && npm ci && npm run build)
 ./target/release/hoardd                      # http://127.0.0.1:4627
@@ -1173,7 +1173,7 @@ deploy/               Dockerfile companions: compose topologies, Garage config, 
 tools/                sample pack generator (now with a small Unreal content folder), Unreal Editor export script
 ```
 
-Rust 2024 edition, toolchain pinned to 1.99.1, clippy `pedantic` plus panic/footgun lints for the whole workspace
+Rust 2024 edition, stable toolchain (MSRV 1.100), clippy `pedantic` plus panic/footgun lints for the whole workspace
 (`[workspace.lints]`), rustfmt at 120 columns. CI runs fmt, clippy `-D warnings`, tests and the web build.
 
 ## Status

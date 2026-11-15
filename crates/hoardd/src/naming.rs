@@ -228,7 +228,7 @@ fn run_together(name: &str) -> String {
         .filter(|w| !w.is_empty())
         .map(|w| {
             let mut cs = w.chars();
-            cs.next().map(|c| c.to_uppercase().chain(cs).collect::<String>()).unwrap_or_default()
+            cs.next().map_or_default(|c| c.to_uppercase().chain(cs).collect::<String>())
         })
         .collect()
 }

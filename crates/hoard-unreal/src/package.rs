@@ -765,7 +765,7 @@ pub(crate) mod tests {
                         p.class.as_deref().unwrap_or("?"),
                         p.dependencies.len(),
                         p.thumbnail.as_ref().map_or(0, Vec::len),
-                        p.thumbnail.as_ref().map(|t| t[..4.min(t.len())].to_vec()).unwrap_or_default(),
+                        p.thumbnail.as_ref().map_or_default(|t| t[..4.min(t.len())].to_vec()),
                         p.tags.len(),
                         p.tags
                             .iter()

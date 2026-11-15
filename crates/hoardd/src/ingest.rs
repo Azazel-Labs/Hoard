@@ -251,7 +251,7 @@ fn expand_archives(dir: &Path, budget: &Budget, depth: u32) -> Result<()> {
         while target.exists() {
             target.set_file_name(format!("{}_x", target.file_name().unwrap_or_default().to_string_lossy()));
         }
-        let ext = Path::new(&name).extension().map(|e| e.to_string_lossy().to_lowercase()).unwrap_or_default();
+        let ext = Path::new(&name).extension().map_or_default(|e| e.to_string_lossy().to_lowercase());
         let res = match ext.as_str() {
             "zip" => extract_zip(&file, &target, budget),
             "gz" | "tgz" => extract_tar(&file, &target, budget, true),
@@ -357,7 +357,7 @@ fn extract_tar(path: &Path, target: &Path, budget: &Budget, gz: bool) -> Result<
 fn extract_unitypackage(path: &Path, target: &Path, budget: &Budget) -> Result<()> {
     let scratch = target.with_file_name(format!(
         "{}.unity-unpack",
-        target.file_name().map(|n| n.to_string_lossy().into_owned()).unwrap_or_default()
+        target.file_name().map_or_default(|n| n.to_string_lossy().into_owned())
     ));
     let result = (|| -> Result<usize> {
         extract_tar(path, &scratch, budget, true)?;
@@ -428,7 +428,7 @@ pub(crate) struct Item {
 
 pub(crate) fn ext_of(rel: &str) -> String {
     let file = rel.rsplit('/').next().unwrap_or(rel);
-    file.rsplit_once('.').map(|(_, e)| e.to_lowercase()).unwrap_or_default()
+    file.rsplit_once('.').map_or_default(|(_, e)| e.to_lowercase())
 }
 
 fn stem_of(rel: &str) -> &str {

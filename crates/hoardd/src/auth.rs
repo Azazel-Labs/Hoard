@@ -646,7 +646,7 @@ async fn change_password(
 ) -> ApiResult<StatusCode> {
     let id = who.person()?;
     check_password(&body.new)?;
-    let keep = session_token(&headers).map(|t| digest(&t)).unwrap_or_default();
+    let keep = session_token(&headers).map_or_default(|t| digest(&t));
     let changed = db::call(&state.pool, move |c| {
         let (hash, source): (String, String) =
             c.query_row("SELECT password_hash, source FROM users WHERE id = ?1", [id], |r| Ok((r.get(0)?, r.get(1)?)))?;

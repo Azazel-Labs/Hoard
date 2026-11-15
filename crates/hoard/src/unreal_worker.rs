@@ -120,7 +120,7 @@ impl Layout {
                 }
             }
         }
-        let prefix = votes.into_iter().max_by_key(|(p, n)| (*n, p.len())).map(|(p, _)| p).unwrap_or_default();
+        let prefix = votes.into_iter().max_by_key(|(p, n)| (*n, p.len())).map_or_default(|(p, _)| p);
         Self { prefix }
     }
 

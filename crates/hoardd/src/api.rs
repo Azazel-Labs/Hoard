@@ -652,7 +652,7 @@ impl From<AssetsParams> for SearchQuery {
         SearchQuery {
             q: p.q,
             kind: p.kind,
-            tags: p.tags.map(|t| t.split(',').filter_map(hoard_core::normalize_tag).collect()).unwrap_or_default(),
+            tags: p.tags.map_or_default(|t| t.split(',').filter_map(hoard_core::normalize_tag).collect()),
             pack: p.pack,
             ext: p.ext,
             sort: p.sort,
@@ -1627,7 +1627,7 @@ async fn unreal_convert(
     Path(id): Path<String>,
     body: Option<Json<hoard_core::UnrealConvertRequest>>,
 ) -> ApiResult<(StatusCode, Json<Value>)> {
-    let req = body.map(|Json(b)| b).unwrap_or_default();
+    let req = body.map_or_default(|Json(b)| b);
     let job = crate::extract::Request {
         discard_originals: req.discard_originals,
         drop_unsupported: req.drop_unsupported,
@@ -1735,8 +1735,7 @@ async fn replace_asset(
             origin.dependencies = m
                 .get("ue_dependencies")
                 .and_then(Value::as_array)
-                .map(|a| a.iter().filter_map(|d| d.as_str().map(str::to_owned)).collect())
-                .unwrap_or_default();
+                .map_or_default(|a| a.iter().filter_map(|d| d.as_str().map(str::to_owned)).collect());
         }
         let tx = c.transaction()?;
         let kept = crate::extract::replace_asset(&tx, &id2, &blob, &ext, &origin, keep)?;
@@ -1984,8 +1983,8 @@ fn settings_json_sync(state: &AppState) -> Value {
                 saved.public_url.is_some(),
             ),
             "soundfont": option(
-                now.soundfont.as_deref().map(|p| p.display().to_string()).unwrap_or_default(),
-                cfg.soundfont.as_deref().map(|p| p.display().to_string()).unwrap_or_default(),
+                now.soundfont.as_deref().map_or_default(|p| p.display().to_string()),
+                cfg.soundfont.as_deref().map_or_default(|p| p.display().to_string()),
                 saved.soundfont.is_some(),
             ),
         },

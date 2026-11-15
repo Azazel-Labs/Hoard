@@ -324,8 +324,7 @@ impl Fft {
     }
 
     fn run(&self, re: &mut [f32], im: &mut [f32]) {
-        for i in 0..self.n {
-            let j = self.rev[i];
+        for (i, &j) in self.rev.iter().enumerate() {
             if j > i {
                 re.swap(i, j);
                 im.swap(i, j);
@@ -572,7 +571,7 @@ async fn save(state: &AppState, computed: &[(String, Option<Vec<i8>>)]) -> Resul
     let rows: Vec<(String, Vec<u8>)> = computed
         .iter()
         // Not a sound this can decode: an empty row, so it isn't tried again.
-        .map(|(hash, d)| (hash.clone(), d.as_ref().map(|d| d.iter().map(|&v| v as u8).collect()).unwrap_or_default()))
+        .map(|(hash, d)| (hash.clone(), d.as_ref().map_or_default(|d| d.iter().map(|&v| v as u8).collect())))
         .collect();
     db::call(&state.pool, move |c| {
         let tx = c.transaction()?;

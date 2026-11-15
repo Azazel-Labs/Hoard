@@ -61,7 +61,7 @@ struct Session {
 }
 
 fn is_archive(p: &Path) -> bool {
-    let n = p.file_name().map(|n| n.to_string_lossy().to_lowercase()).unwrap_or_default();
+    let n = p.file_name().map_or_default(|n| n.to_string_lossy().to_lowercase());
     [".zip", ".tar", ".tgz", ".tar.gz"].iter().any(|e| n.ends_with(e))
 }
 
@@ -91,7 +91,7 @@ fn plan(paths: &[PathBuf], name: Option<String>, each: bool) -> Result<Vec<Group
         for p in paths {
             files.extend(collect(p)?);
         }
-        let label = name.clone().unwrap_or_else(|| paths.first().map(|p| file_label(p)).unwrap_or_default());
+        let label = name.clone().unwrap_or_else(|| paths.first().map_or_default(|p| file_label(p)));
         return Ok(vec![Group { name, label, files }]);
     }
     let mut groups = Vec::new();

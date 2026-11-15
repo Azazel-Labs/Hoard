@@ -158,7 +158,7 @@ pub(crate) fn check(c: &Connection, hashes: &[String]) -> Result<Check> {
     let mut files: BTreeMap<String, File> = BTreeMap::new();
     for (hash, id, matched, (name, path, kind, pack_id, pack, ai)) in assets {
         let entry = entries.get(pack_id.as_str()).copied();
-        let mut warnings = entry.map(license_warnings).unwrap_or_default();
+        let mut warnings = entry.map_or_default(license_warnings);
         if let Some(w) = ai.as_deref().and_then(ai_warning) {
             warnings.push(w);
         }
@@ -249,7 +249,7 @@ fn license_warnings(e: &Entry) -> Vec<Warning> {
 
 fn ai_warning(ai: &str) -> Option<Warning> {
     let ai: Value = serde_json::from_str(ai).ok()?;
-    let by = ai.get("by").and_then(Value::as_str).map(|b| format!(" ({b})")).unwrap_or_default();
+    let by = ai.get("by").and_then(Value::as_str).map_or_default(|b| format!(" ({b})"));
     let how = ai.get("how").and_then(Value::as_str).unwrap_or("its metadata");
     let (code, made) = match ai.get("made")?.as_str()? {
         "generated" => ("ai_generated", "made with generative AI"),

@@ -92,7 +92,7 @@ pub(crate) fn reload() {
         match std::fs::read_to_string(p).map_err(anyhow::Error::from).and_then(|t| Format::parse(&t)) {
             Ok(mut f) => {
                 tracing::info!(file = %p.display(), format = %f.name, "store file format read");
-                f.file = p.file_name().map(|n| n.to_string_lossy().into_owned()).unwrap_or_default();
+                f.file = p.file_name().map_or_default(|n| n.to_string_lossy().into_owned());
                 f.custom = true;
                 formats.retain(|b| !b.name.eq_ignore_ascii_case(&f.name));
                 formats.insert(0, f);

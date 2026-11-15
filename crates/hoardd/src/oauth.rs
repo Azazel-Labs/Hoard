@@ -267,7 +267,7 @@ fn loopback(u: &str) -> Option<String> {
     if !matches!(host, "localhost" | "127.0.0.1" | "[::1]") {
         return None;
     }
-    let query = url.query().map(|q| format!("?{q}")).unwrap_or_default();
+    let query = url.query().map_or_default(|q| format!("?{q}"));
     Some(format!("http://{host}{}{query}", url.path()))
 }
 
@@ -462,7 +462,7 @@ async fn issue(state: &AppState, headers: &HeaderMap, f: &HashMap<String, String
     let (access_hash, refresh_hash) = (digest(&access), digest(&refresh));
     match f.get("grant_type").map(String::as_str) {
         Some("authorization_code") => {
-            let code = f.get("code").map(|c| digest(c)).unwrap_or_default();
+            let code = f.get("code").map_or_default(|c| digest(c));
             let p = PENDING.lock().unwrap_or_else(PoisonError::into_inner).remove(&code);
             let Some(p) = p.filter(|p| p.at.elapsed() < CODE_LIFETIME && p.client_id == client_id) else {
                 return Err(OAuthError::grant("the code is unknown, used or expired"));
@@ -488,7 +488,7 @@ async fn issue(state: &AppState, headers: &HeaderMap, f: &HashMap<String, String
             .await?;
         }
         Some("refresh_token") => {
-            let old = f.get("refresh_token").map(|t| digest(t)).unwrap_or_default();
+            let old = f.get("refresh_token").map_or_default(|t| digest(t));
             let n = db::call(&state.pool, move |c| {
                 Ok(c.execute(
                     "UPDATE oauth_grants SET access_hash = ?3, access_expires_at = unixepoch('now') + ?4,

@@ -319,11 +319,7 @@ fn entries(rows: &[Row]) -> Vec<Entry<'_>> {
 fn context_block(ctx: &hoard_core::PackContext) -> String {
     let mut out = String::new();
     if let Some(s) = &ctx.store {
-        let _ = writeln!(
-            out,
-            "Store: {s}{}",
-            ctx.license_tier.as_ref().map(|t| format!(" ({t} license)")).unwrap_or_default()
-        );
+        let _ = writeln!(out, "Store: {s}{}", ctx.license_tier.as_ref().map_or_default(|t| format!(" ({t} license)")));
     }
     let mut left = CONTEXT_CHARS;
     for (label, text) in [("Store page", &ctx.store_text), ("README", &ctx.readme)] {

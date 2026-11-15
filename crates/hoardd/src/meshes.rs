@@ -83,7 +83,7 @@ fn image_from_bytes(bytes: &[u8], hint: &Path) -> Option<Image> {
     if let Some(img) = Image::png_or_jpeg(bytes) {
         return Some(img);
     }
-    let ext = hint.extension().map(|e| e.to_string_lossy().to_lowercase()).unwrap_or_default();
+    let ext = hint.extension().map_or_default(|e| e.to_string_lossy().to_lowercase());
     let img = if crate::textures::EXTS.contains(&ext.as_str()) {
         let dir = tempfile::tempdir().ok()?;
         let p = dir.path().join(format!("t.{ext}"));

@@ -16,7 +16,7 @@ COPY web/ ./
 COPY locales /locales
 RUN npm run build
 
-# The pinned compiler (rust-toolchain.toml) and cargo-chef, which change almost never.
+# The compiler (stable, from rust-toolchain.toml) and cargo-chef, which change almost never.
 FROM rust:1-slim-trixie AS chef
 WORKDIR /src
 COPY rust-toolchain.toml ./

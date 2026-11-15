@@ -63,7 +63,7 @@ fn load_soundfont(configured: Option<PathBuf>) -> Font {
     let mut f = std::io::BufReader::new(std::fs::File::open(&path).ok()?);
     match rustysynth::SoundFont::new(&mut f) {
         Ok(sf) => {
-            let name = path.file_name().map(|n| n.to_string_lossy().into_owned()).unwrap_or_default();
+            let name = path.file_name().map_or_default(|n| n.to_string_lossy().into_owned());
             tracing::info!(soundfont = %path.display(), "MIDI previews use this SoundFont");
             Some((Arc::new(sf), name))
         }

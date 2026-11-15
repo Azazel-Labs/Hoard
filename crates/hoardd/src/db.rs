@@ -1844,8 +1844,7 @@ mod tests {
 
     fn backups_in(dir: &Path) -> Vec<String> {
         let mut names: Vec<String> = std::fs::read_dir(dir)
-            .map(|rd| rd.filter_map(|e| e.ok()?.file_name().into_string().ok()).collect())
-            .unwrap_or_default();
+            .map_or_default(|rd| rd.filter_map(|e| e.ok()?.file_name().into_string().ok()).collect());
         names.sort();
         names
     }

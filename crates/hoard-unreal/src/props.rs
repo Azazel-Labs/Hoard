@@ -260,7 +260,7 @@ fn read_value(
             let inner = ty.param(0).cloned().unwrap_or_default();
             let mut items = Vec::with_capacity(count.min(4096));
             if inner.name == "StructProperty" {
-                let mut struct_name = inner.param(0).map(|t| t.name.clone()).unwrap_or_default();
+                let mut struct_name = inner.param(0).map_or_default(|t| t.name.clone());
                 if !pkg.complete_type_names() && pkg.ue4 >= ue4::INNER_ARRAY_TAG_INFO && ty.name == "ArrayProperty" {
                     // A full inner tag describing the element struct.
                     fname(r, ctx)?; // name

@@ -634,7 +634,7 @@ pub(crate) async fn callback(State(state): State<AppState>, Query(cb): Query<Cal
 /// An error message as a sentence, for a page of its own.
 fn sentence(s: &str) -> String {
     let mut chars = s.chars();
-    chars.next().map(|c| c.to_uppercase().chain(chars).collect()).unwrap_or_default()
+    chars.next().map_or_default(|c| c.to_uppercase().chain(chars).collect())
 }
 
 fn html_escape(s: &str) -> String {

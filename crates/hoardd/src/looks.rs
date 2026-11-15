@@ -560,8 +560,7 @@ pub(crate) fn palette_of(conn: &rusqlite::Connection, thumb_hash: &str) -> Resul
     let bytes: Option<Vec<u8>> =
         conn.query_row("SELECT palette FROM looks WHERE thumb_hash = ?1", [thumb_hash], |r| r.get(0)).optional()?;
     Ok(bytes
-        .map(|b| decode_palette(&b))
-        .unwrap_or_default()
+        .map_or_default(|b| decode_palette(&b))
         .into_iter()
         .map(|s| hoard_core::Swatch { hex: hex(s.lab), share: (s.share * 100.0).round() / 100.0 })
         .collect())
@@ -782,7 +781,7 @@ async fn rank(state: &AppState, q: &SearchQuery) -> Result<Option<db::LookRank>>
     if let Some(color) = color {
         state.looks.ensure(state).await?;
         // A color that doesn't parse matches nothing rather than everything.
-        let by_color = color.map(|lab| state.looks.by_color(lab)).unwrap_or_default();
+        let by_color = color.map_or_default(|lab| state.looks.by_color(lab));
         scores = Some(match scores {
             // Both: what looks alike and has the color, by both scores.
             Some(similar) => {

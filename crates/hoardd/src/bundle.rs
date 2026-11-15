@@ -166,7 +166,7 @@ fn write_zip(
             zip.start_file(format!("{name}.meta"), opts)?;
             zip.write_all(format!("fileFormatVersion: 2\nguid: {guid}\n").as_bytes())?;
         }
-        let ext = name.rsplit_once('.').map(|(_, e)| e.to_lowercase()).unwrap_or_default();
+        let ext = name.rsplit_once('.').map_or_default(|(_, e)| e.to_lowercase());
         let method =
             if STORED_EXTS.contains(&ext.as_str()) { CompressionMethod::Stored } else { CompressionMethod::Deflated };
         let opts = SimpleFileOptions::default()

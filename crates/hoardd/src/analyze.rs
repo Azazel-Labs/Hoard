@@ -798,7 +798,7 @@ fn analyze_converted_json(path: &Path, a: &mut Analysis) -> anyhow::Result<()> {
     let format = doc.get("format").and_then(Value::as_str).unwrap_or_default();
     let m = &mut a.meta;
     let keys = |k: &str| -> Vec<String> {
-        doc.get(k).and_then(Value::as_object).map(|o| o.keys().cloned().collect()).unwrap_or_default()
+        doc.get(k).and_then(Value::as_object).map_or_default(|o| o.keys().cloned().collect())
     };
     if format.starts_with("hoard-material/") {
         a.kind = Some(AssetKind::Material);

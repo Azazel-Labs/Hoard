@@ -814,7 +814,7 @@ async fn save(state: &AppState, computed: &[(String, Option<Vec<i8>>)]) -> Resul
     let rows: Vec<(String, Vec<u8>)> = computed
         .iter()
         // Not a picture after all: an empty row, so it isn't tried again.
-        .map(|(h, v)| (h.clone(), v.as_ref().map(|v| v.iter().map(|&x| x as u8).collect()).unwrap_or_default()))
+        .map(|(h, v)| (h.clone(), v.as_ref().map_or_default(|v| v.iter().map(|&x| x as u8).collect())))
         .collect();
     db::call(&state.pool, move |c| {
         let tx = c.transaction()?;

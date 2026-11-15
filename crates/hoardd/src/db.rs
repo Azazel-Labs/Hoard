@@ -425,6 +425,18 @@ const MIGRATIONS: &[&str] = &[
          AND EXISTS (SELECT 1 FROM assets a WHERE a.pack_id = p.id AND a.ext IN ('xml', 'json', 'atlas', 'plist'))
          AND EXISTS (SELECT 1 FROM assets a WHERE a.pack_id = p.id AND a.kind = 'texture')
          AND NOT EXISTS (SELECT 1 FROM jobs j WHERE j.pack_id = p.id AND j.status IN ('queued', 'running'));",
+    // 48: meshopt-compressed glTF and GLB models are drawn. Packs with a glTF or GLB model that has no thumbnail
+    // are analyzed again.
+    "UPDATE packs SET status = 'ingesting'
+       WHERE status = 'ready' AND archived_at IS NULL
+         AND EXISTS (SELECT 1 FROM assets a WHERE a.pack_id = packs.id AND a.kind = 'model'
+                     AND a.ext IN ('gltf', 'glb') AND a.thumb_hash IS NULL)
+         AND NOT EXISTS (SELECT 1 FROM jobs j WHERE j.pack_id = packs.id AND j.status IN ('queued', 'running'));
+     INSERT INTO jobs (kind, pack_id, payload, run_after, created_at, updated_at)
+       SELECT 'retag', id, '{\"then_llm\":false}', strftime('%Y-%m-%dT%H:%M:%SZ', 'now'),
+              strftime('%Y-%m-%dT%H:%M:%SZ', 'now'), strftime('%Y-%m-%dT%H:%M:%SZ', 'now')
+       FROM packs p WHERE p.status = 'ingesting'
+         AND NOT EXISTS (SELECT 1 FROM jobs j WHERE j.pack_id = p.id AND j.status IN ('queued', 'running'));",
 ];
 
 /// How many automatic pre-upgrade backups to keep in `<data dir>/backups`.
@@ -1953,7 +1965,7 @@ mod tests {
     fn ascii_fbx_and_3ds_packs_are_read_again() {
         let dir = tempfile::tempdir().unwrap();
         let mut conn = baseline_db(dir.path());
-        migrate(&mut conn, &dir.path().join("backups"), &MIGRATIONS[..MIGRATIONS.len() - 2]).unwrap();
+        migrate(&mut conn, &dir.path().join("backups"), &MIGRATIONS[..MIGRATIONS.len() - 3]).unwrap();
         conn.execute_batch(
             "PRAGMA foreign_keys = OFF;
              INSERT INTO packs (id, name, status, created_at) VALUES
@@ -1992,7 +2004,7 @@ mod tests {
     fn packs_that_may_have_atlases_are_looked_through() {
         let dir = tempfile::tempdir().unwrap();
         let mut conn = baseline_db(dir.path());
-        migrate(&mut conn, &dir.path().join("backups"), &MIGRATIONS[..MIGRATIONS.len() - 1]).unwrap();
+        migrate(&mut conn, &dir.path().join("backups"), &MIGRATIONS[..MIGRATIONS.len() - 2]).unwrap();
         conn.execute_batch(
             "PRAGMA foreign_keys = OFF;
              INSERT INTO packs (id, name, status, created_at) VALUES
@@ -2017,6 +2029,35 @@ mod tests {
             .unwrap();
         let jobs: Vec<(&str, &str)> = jobs.iter().map(|(k, p)| (k.as_str(), p.as_str())).collect();
         assert_eq!(jobs, [("ingest", "busy"), ("materials", "sheet")]);
+    }
+
+    /// Packs with a glTF or GLB model that has no thumbnail are analyzed again, now meshopt-compressed ones are drawn.
+    #[test]
+    fn gltf_packs_without_thumbnails_are_read_again() {
+        let dir = tempfile::tempdir().unwrap();
+        let mut conn = baseline_db(dir.path());
+        migrate(&mut conn, &dir.path().join("backups"), &MIGRATIONS[..MIGRATIONS.len() - 1]).unwrap();
+        conn.execute_batch(
+            "PRAGMA foreign_keys = OFF;
+             INSERT INTO packs (id, name, status, created_at) VALUES
+               ('opt', 'Compressed', 'ready', 'x'), ('drawn', 'Drawn', 'ready', 'x'), ('clip', 'Clips', 'ready', 'x');
+             INSERT INTO assets (id, pack_id, blob_hash, path, name, ext, kind, meta, thumb_hash, created_at, updated_at)
+             VALUES
+               ('a', 'opt', 'h1', 'ship.glb', 'ship', 'glb', 'model', '{}', NULL, 'x', 'x'),
+               ('b', 'drawn', 'h2', 'rock.gltf', 'rock', 'gltf', 'model', '{}', 't2', 'x', 'x'),
+               ('c', 'clip', 'h3', 'walk.glb', 'walk', 'glb', 'animation', '{}', NULL, 'x', 'x');",
+        )
+        .unwrap();
+        migrate(&mut conn, &dir.path().join("backups"), MIGRATIONS).unwrap();
+        let jobs: Vec<(String, String)> = conn
+            .prepare("SELECT kind, pack_id FROM jobs WHERE pack_id <> 'p1' ORDER BY pack_id, kind")
+            .unwrap()
+            .query_map([], |r| Ok((r.get(0)?, r.get(1)?)))
+            .unwrap()
+            .collect::<rusqlite::Result<_>>()
+            .unwrap();
+        let jobs: Vec<(&str, &str)> = jobs.iter().map(|(k, p)| (k.as_str(), p.as_str())).collect();
+        assert_eq!(jobs, [("retag", "opt")]);
     }
 
     #[test]

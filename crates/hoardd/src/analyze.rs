@@ -4,7 +4,7 @@
 
 use std::fs::File;
 use std::io::{BufRead, BufReader, Read};
-use std::path::Path;
+use std::path::{Path, PathBuf};
 use std::sync::atomic::{AtomicBool, AtomicU8, Ordering};
 use std::sync::{Mutex, OnceLock};
 
@@ -136,17 +136,52 @@ pub(crate) fn thumb_mime(bytes: &[u8]) -> &'static str {
     if bytes.starts_with(&[0xFF, 0xD8, 0xFF]) { "image/jpeg" } else { "image/png" }
 }
 
+/// A glTF/GLB the renderer can read: a meshopt-compressed one is decoded by mithril into a plain GLB (its images
+/// taken in) in a temporary folder, anything else is read where it is.
+struct Drawable {
+    path: PathBuf,
+    _dir: Option<tempfile::TempDir>,
+}
+
+fn drawable(path: &Path) -> anyhow::Result<Drawable> {
+    let doc = glb_json(path).or_else(|_| anyhow::Ok(serde_json::from_slice::<Value>(&std::fs::read(path)?)?))?;
+    let meshopt = doc
+        .get("extensionsUsed")
+        .and_then(Value::as_array)
+        .is_some_and(|e| e.iter().filter_map(Value::as_str).any(|e| mithril::gltf::MESHOPT_EXTENSIONS.contains(&e)));
+    if !meshopt {
+        return Ok(Drawable { path: path.to_owned(), _dir: None });
+    }
+    let bytes = std::fs::read(path)?;
+    let folder = path.parent().context("no folder")?;
+    let glb = mithril::gltf::pack_glb_decompressed(&bytes, mithril::gltf::files_in(folder))
+        .or_else(|_| mithril::gltf::decompress(&bytes))
+        .context("decoding meshopt compression")?;
+    let dir = tempfile::tempdir()?;
+    let plain = dir.path().join("model.glb");
+    std::fs::write(&plain, glb)?;
+    Ok(Drawable { path: plain, _dir: Some(dir) })
+}
+
 /// Thumbnail, plus the multi-view sheet when enabled. A model that crashes the renderer gets a `thumb_error` in
 /// its facts, which Settings → Issues lists.
 fn render_model_thumb(path: &Path, a: &mut Analysis) {
     let Some(r) = renderer() else { return };
+    let model = match drawable(path) {
+        Ok(model) => model,
+        Err(e) => {
+            tracing::debug!(path = %path.display(), error = %format!("{e:#}"), "no model thumbnail");
+            return;
+        }
+    };
+    let file = model.path.as_path();
     let guard = r.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
     // wgpu panics on what it finds invalid; that costs this model its thumbnail, not the whole pack its ingest.
     let drawn = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
-        let img = guard.render_file(path, THUMB_SIZE)?;
+        let img = guard.render_file(file, THUMB_SIZE)?;
         let views = VIEWS_ENABLED
             .load(Ordering::Relaxed)
-            .then(|| guard.render_views_file(path, THUMB_SIZE).ok().and_then(|v| thumb_bytes(v, false).ok()))
+            .then(|| guard.render_views_file(file, THUMB_SIZE).ok().and_then(|v| thumb_bytes(v, false).ok()))
             .flatten();
         anyhow::Ok((thumb_bytes(img, false).ok(), views))
     }));
@@ -165,6 +200,8 @@ fn render_model_thumb(path: &Path, a: &mut Analysis) {
 /// A thumbnail of a glTF/GLB model as it is; `None` when no renderer is running.
 pub(crate) fn gltf_thumb(path: &Path) -> anyhow::Result<Option<Vec<u8>>> {
     let Some(r) = renderer() else { return Ok(None) };
+    let model = drawable(path)?;
+    let path = model.path.as_path();
     let guard = r.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
     let drawn = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| guard.render_file(path, THUMB_SIZE)))
         .map_err(|_| anyhow::anyhow!("the renderer failed on this model"))??;
@@ -176,6 +213,8 @@ pub(crate) fn gltf_thumb(path: &Path) -> anyhow::Result<Option<Vec<u8>>> {
 pub(crate) fn gltf_thumb_dressed(path: &Path, color: &[u8]) -> anyhow::Result<Option<Vec<u8>>> {
     let Some(r) = renderer() else { return Ok(None) };
     let color = image::load_from_memory(color)?.to_rgba8();
+    let model = drawable(path)?;
+    let path = model.path.as_path();
     let guard = r.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
     let drawn = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
         match guard.render_file_dressed(path, THUMB_SIZE, color)? {
@@ -381,8 +420,8 @@ fn analyze_music(path: &Path, ext: &str, a: &mut Analysis) -> anyhow::Result<()>
 /// (WMA, CAF, AAC/M4A, Opus, …) are decoded by ffmpeg into a temporary WAV, when ffmpeg is ready.
 fn analyze_sound(path: &Path, ext: &str, a: &mut Analysis) -> anyhow::Result<()> {
     let dir = tempfile::tempdir()?;
-    let mut decoded: Option<Option<std::path::PathBuf>> = None;
-    let mut via_ffmpeg = || -> Option<std::path::PathBuf> {
+    let mut decoded: Option<Option<PathBuf>> = None;
+    let mut via_ffmpeg = || -> Option<PathBuf> {
         decoded
             .get_or_insert_with(|| {
                 let tool = crate::ffmpeg::tool()?;
@@ -1290,7 +1329,7 @@ mod tests {
         assert!(image::load_from_memory(&kept).unwrap().color().has_alpha());
     }
 
-    fn wav_of(samples: &[f32], rate: u32) -> std::path::PathBuf {
+    fn wav_of(samples: &[f32], rate: u32) -> PathBuf {
         let audio = crate::audio::Audio {
             samples: samples.iter().map(|s| (s * 32767.0) as i32).collect(),
             channels: 1,

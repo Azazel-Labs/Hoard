@@ -10,7 +10,6 @@ use std::io::{Cursor, Write};
 use std::path::Path;
 
 use anyhow::{Context, Result, bail, ensure};
-use base64::Engine as _;
 use hoard_core::FormatOption;
 use image::DynamicImage;
 use serde_json::{Value, json};
@@ -355,16 +354,15 @@ fn glb_to_gltf_zip(path: &Path) -> Result<Output> {
     Ok(Output { bytes: out, ext: "zip" })
 }
 
-/// `.gltf` (with its external or embedded buffers and images) → one `.glb`.
+/// `.gltf` (with its external or embedded buffers and images) → one `.glb`. Meshopt compression is kept.
 fn gltf_to_glb(path: &Path) -> Result<Output> {
-    Ok(Output { bytes: build_glb(path, true)?.0, ext: "glb" })
+    Ok(Output { bytes: build_glb(path, true)?, ext: "glb" })
 }
 
 /// `.gltf` → `.glb` with its buffers packed in, its images left where they are (a GLB may point at image files
-/// beside it, as the glTF did): the same model in one file instead of two. Returns the GLB and the buffer files it
-/// took in, relative to the glTF's folder. Refused for what can't move losslessly: a buffer without a URI, or
-/// meshopt compression (whose extension points at buffers itself).
-pub(crate) fn gltf_buffers_to_glb(path: &Path) -> Result<(Vec<u8>, Vec<String>)> {
+/// beside it, as the glTF did): the same model in one file instead of two, meshopt compression and all. Refused
+/// for what can't move losslessly, such as a buffer without a URI.
+pub(crate) fn gltf_buffers_to_glb(path: &Path) -> Result<Vec<u8>> {
     build_glb(path, false)
 }
 
@@ -389,101 +387,61 @@ fn gltf_uris(doc: &Value, key: &str) -> Vec<String> {
         .collect()
 }
 
-fn build_glb(path: &Path, images: bool) -> Result<(Vec<u8>, Vec<String>)> {
+/// Packs a `.gltf` and the files it reads (from its own folder, never outside it) into a GLB with mithril, which
+/// re-points meshopt-compressed buffer views as it goes. With `images` false, image files stay beside the GLB.
+fn build_glb(path: &Path, images: bool) -> Result<Vec<u8>> {
     let dir = path.parent().context("no folder")?;
     let mut doc: Value = serde_json::from_slice(&std::fs::read(path)?)?;
-    let used = std::cell::RefCell::new(Vec::new());
-    let read_uri = |uri: &str| -> Result<Vec<u8>> {
-        if let Some(data) = uri.strip_prefix("data:") {
-            let (_, b64) = data.split_once(";base64,").context("data URI isn't base64")?;
-            return Ok(base64::engine::general_purpose::STANDARD.decode(b64)?);
-        }
-        let rel = percent_decode(uri);
-        ensure!(!rel.contains("..") && !rel.starts_with('/'), "glTF points outside its pack: {uri}");
-        let bytes =
-            std::fs::read(dir.join(&rel)).with_context(|| format!("glTF file {rel} is missing from the pack"))?;
-        used.borrow_mut().push(rel);
-        Ok(bytes)
+    // A buffer must say where its bytes are, unless it's a meshopt fallback (which decoders never read).
+    let fallback = |b: &Value| {
+        mithril::gltf::MESHOPT_EXTENSIONS
+            .iter()
+            .any(|n| b.pointer(&format!("/extensions/{n}/fallback")) == Some(&json!(true)))
     };
+    let buffers = doc.get("buffers").and_then(Value::as_array).map(Vec::as_slice).unwrap_or_default();
+    ensure!(buffers.iter().all(|b| b.get("uri").is_some() || fallback(b)), "a glTF buffer has no URI");
+    // Image files that stay put: their URIs are set aside while the rest is packed, then put back.
+    let mut kept = Vec::new();
     if !images {
-        let meshopt = doc
-            .get("extensionsUsed")
-            .and_then(Value::as_array)
-            .is_some_and(|e| e.iter().filter_map(Value::as_str).any(|e| e.contains("meshopt")));
-        ensure!(!meshopt, "meshopt-compressed glTF points at its buffers itself");
-        let buffers = doc.get("buffers").and_then(Value::as_array).map(Vec::as_slice).unwrap_or_default();
-        ensure!(buffers.iter().all(|b| b.get("uri").is_some()), "a glTF buffer has no URI");
-    }
-    let pad = |v: &mut Vec<u8>| v.resize(v.len().div_ceil(4) * 4, 0);
-
-    // One BIN: every buffer back to back, 4-byte aligned; buffer views re-pointed at it.
-    let mut bin = Vec::new();
-    let mut offsets = Vec::new();
-    for b in doc.get("buffers").and_then(Value::as_array).cloned().unwrap_or_default() {
-        offsets.push(bin.len());
-        if let Some(uri) = b.get("uri").and_then(Value::as_str) {
-            bin.extend(read_uri(uri)?);
+        for (i, img) in doc.get_mut("images").and_then(Value::as_array_mut).into_iter().flatten().enumerate() {
+            let external = img.get("uri").and_then(Value::as_str).is_some_and(|uri| !uri.starts_with("data:"));
+            if let Some(obj) = img.as_object_mut().filter(|_| external) {
+                kept.push((i, obj.remove("uri")));
+            }
         }
-        pad(&mut bin);
     }
-    let views = doc.get_mut("bufferViews").and_then(Value::as_array_mut);
-    for v in views.into_iter().flatten() {
-        let buf = v.get("buffer").and_then(Value::as_u64).unwrap_or(0) as usize;
-        let off =
-            v.get("byteOffset").and_then(Value::as_u64).unwrap_or(0) as usize + offsets.get(buf).copied().unwrap_or(0);
-        v["buffer"] = json!(0);
-        v["byteOffset"] = json!(off);
+    let mut read = mithril::gltf::files_in(dir);
+    let glb = mithril::gltf::pack_glb(&serde_json::to_vec(&doc)?, |uri| {
+        read(uri).map_err(|e| match e {
+            mithril::Error::Io(_) => mithril::Error::InvalidInput(format!("glTF file {uri} is missing from the pack")),
+            e @ mithril::Error::InvalidInput(_) => e,
+        })
+    })?;
+    if kept.is_empty() {
+        return Ok(glb);
     }
-    let buffers_used = used.borrow().clone();
-    // Images with URIs move into the BIN too.
-    let mut new_views = Vec::new();
-    let view_base = doc.get("bufferViews").and_then(Value::as_array).map_or(0, Vec::len);
-    for img in doc.get_mut("images").and_then(Value::as_array_mut).into_iter().flatten().filter(|_| images) {
-        let Some(uri) = img.get("uri").and_then(Value::as_str).map(str::to_owned) else { continue };
-        let bytes = read_uri(&uri)?;
-        let mime = if bytes.starts_with(b"\x89PNG") {
-            "image/png"
-        } else if bytes.starts_with(&[0xFF, 0xD8]) {
-            "image/jpeg"
-        } else if bytes.get(8..12) == Some(b"WEBP") {
-            "image/webp"
-        } else {
-            bail!("glTF image {uri} isn't PNG, JPEG or WebP")
-        };
-        new_views.push(json!({ "buffer": 0, "byteOffset": bin.len(), "byteLength": bytes.len() }));
-        bin.extend(bytes);
-        pad(&mut bin);
-        let obj = img.as_object_mut().context("bad image entry")?;
-        obj.remove("uri");
-        obj.insert("bufferView".into(), json!(view_base + new_views.len() - 1));
-        obj.insert("mimeType".into(), json!(mime));
+    // Put the image URIs back into the GLB's JSON chunk.
+    let json_len = u32::from_le_bytes(glb.get(12..16).context("short GLB")?.try_into()?) as usize;
+    let mut json: Value = serde_json::from_slice(glb.get(20..20 + json_len).context("short GLB")?)?;
+    for (i, uri) in kept {
+        if let (Some(img), Some(uri)) = (json.pointer_mut(&format!("/images/{i}")).and_then(Value::as_object_mut), uri)
+        {
+            img.insert("uri".into(), uri);
+        }
     }
-    if !new_views.is_empty() {
-        let views = doc.as_object_mut().context("bad glTF")?.entry("bufferViews").or_insert_with(|| json!([]));
-        views.as_array_mut().context("bad bufferViews")?.extend(new_views);
-    }
-    if bin.is_empty() {
-        doc.as_object_mut().context("bad glTF")?.remove("buffers");
-    } else {
-        doc["buffers"] = json!([{ "byteLength": bin.len() }]);
-    }
-
-    let mut json_bytes = serde_json::to_vec(&doc)?;
-    json_bytes.resize(json_bytes.len().div_ceil(4) * 4, b' ');
-    let total = 12 + 8 + json_bytes.len() + if bin.is_empty() { 0 } else { 8 + bin.len() };
+    let mut text = serde_json::to_vec(&json)?;
+    text.resize(text.len().div_ceil(4) * 4, b' ');
+    let rest = &glb[20 + json_len..];
+    let total = 20 + text.len() + rest.len();
     let mut out = Vec::with_capacity(total);
     out.extend_from_slice(b"glTF");
     out.extend_from_slice(&2u32.to_le_bytes());
     out.extend_from_slice(&u32::try_from(total)?.to_le_bytes());
-    out.extend_from_slice(&u32::try_from(json_bytes.len())?.to_le_bytes());
+    out.extend_from_slice(&u32::try_from(text.len())?.to_le_bytes());
     out.extend_from_slice(b"JSON");
-    out.extend(json_bytes);
-    if !bin.is_empty() {
-        out.extend_from_slice(&u32::try_from(bin.len())?.to_le_bytes());
-        out.extend_from_slice(b"BIN\0");
-        out.extend(bin);
-    }
-    Ok((out, buffers_used))
+    out.extend(text);
+    out.extend_from_slice(rest);
+    Ok(out)
 }
 
 fn percent_decode(s: &str) -> String {

@@ -1,6 +1,7 @@
 // Fixture files made in code, so the suite needs nothing checked in and no network: PNGs, a zip, an OBJ with its
 // material and texture, a glTF, JSON and plain text.
 import { deflateSync } from 'node:zlib'
+import { MeshoptEncoder } from 'meshoptimizer/encoder'
 
 const CRC_TABLE = (() => {
   const t = new Uint32Array(256)
@@ -205,6 +206,76 @@ export function quadGltf(bin: string): { gltf: Buffer; bin: Buffer } {
     ],
   }
   return { gltf: Buffer.from(JSON.stringify(gltf, null, 2)), bin: data }
+}
+
+/** A red square compressed with EXT_meshopt_compression, as a GLB, or as a `.gltf` reading `<bin>` beside it. */
+export async function meshoptQuad(bin?: string): Promise<{ model: Buffer; bin: Buffer }> {
+  await MeshoptEncoder.ready
+  const positions = new Float32Array([-1, 0, 0, 1, 0, 0, 1, 2, 0, -1, 2, 0])
+  const uvs = new Float32Array([0, 1, 1, 1, 1, 0, 0, 0])
+  const indices = new Uint32Array([0, 1, 2, 0, 2, 3])
+  const views: { data: ArrayBufferView; count: number; stride: number; mode: string; target: number }[] = [
+    { data: positions, count: 4, stride: 12, mode: 'ATTRIBUTES', target: 34962 },
+    { data: uvs, count: 4, stride: 8, mode: 'ATTRIBUTES', target: 34962 },
+    { data: indices, count: 6, stride: 4, mode: 'TRIANGLES', target: 34963 },
+  ]
+  const packed: Buffer[] = []
+  let at = 0
+  let plain = 0
+  const bufferViews = views.map((v) => {
+    const raw = new Uint8Array(v.data.buffer, v.data.byteOffset, v.data.byteLength)
+    const enc = Buffer.from(MeshoptEncoder.encodeGltfBuffer(raw, v.count, v.stride, v.mode))
+    const padded = Buffer.concat([enc, Buffer.alloc((4 - (enc.length % 4)) % 4)])
+    const view = {
+      buffer: 1,
+      byteOffset: plain,
+      byteLength: raw.length,
+      ...(v.mode === 'ATTRIBUTES' ? { byteStride: v.stride } : {}),
+      target: v.target,
+      extensions: {
+        EXT_meshopt_compression: { buffer: 0, byteOffset: at, byteLength: enc.length, byteStride: v.stride, count: v.count, mode: v.mode },
+      },
+    }
+    packed.push(padded)
+    at += padded.length
+    plain += raw.length
+    return view
+  })
+  const data = Buffer.concat(packed)
+  const gltf = {
+    asset: { version: '2.0', generator: 'hoard e2e' },
+    extensionsUsed: ['EXT_meshopt_compression'],
+    extensionsRequired: ['EXT_meshopt_compression'],
+    scene: 0,
+    scenes: [{ nodes: [0] }],
+    nodes: [{ mesh: 0, name: 'sign' }],
+    meshes: [{ name: 'sign', primitives: [{ attributes: { POSITION: 0, TEXCOORD_0: 1 }, indices: 2, material: 0 }] }],
+    materials: [{ name: 'red', pbrMetallicRoughness: { baseColorFactor: [0.9, 0.2, 0.2, 1] } }],
+    buffers: [
+      { ...(bin ? { uri: bin } : {}), byteLength: data.length },
+      { byteLength: plain, extensions: { EXT_meshopt_compression: { fallback: true } } },
+    ],
+    bufferViews,
+    accessors: [
+      { bufferView: 0, componentType: 5126, count: 4, type: 'VEC3', min: [-1, 0, 0], max: [1, 2, 0] },
+      { bufferView: 1, componentType: 5126, count: 4, type: 'VEC2' },
+      { bufferView: 2, componentType: 5125, count: 6, type: 'SCALAR' },
+    ],
+  }
+  if (bin) return { model: Buffer.from(JSON.stringify(gltf, null, 2)), bin: data }
+  let json = Buffer.from(JSON.stringify(gltf))
+  json = Buffer.concat([json, Buffer.alloc((4 - (json.length % 4)) % 4, 0x20)])
+  const header = Buffer.alloc(12)
+  header.write('glTF', 0)
+  header.writeUInt32LE(2, 4)
+  header.writeUInt32LE(12 + 8 + json.length + 8 + data.length, 8)
+  const chunk = (body: Buffer, type: string) => {
+    const h = Buffer.alloc(8)
+    h.writeUInt32LE(body.length, 0)
+    h.write(type, 4, 'latin1')
+    return Buffer.concat([h, body])
+  }
+  return { model: Buffer.concat([header, chunk(json, 'JSON'), chunk(data, 'BIN\0')]), bin: data }
 }
 
 /** A row of `n` squares, each a mesh of its own in a node of its own, all in one material: the viewer draws them as

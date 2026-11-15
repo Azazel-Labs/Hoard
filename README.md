@@ -229,8 +229,8 @@ software rasterizer (`apt install mesa-vulkan-drivers`). Without any adapter, ev
    is rebuilt into its original `Assets/…` tree. `__MACOSX` and `.DS_Store` are dropped; Unity `.meta` files are read
    for their GUIDs (so materials and prefabs link to their textures) and then dropped, along with Godot `.import`
    files. Wrapper folders are collapsed and the innermost folder's name becomes the pack name. A `.gltf` becomes a
-   `.glb` with its `.bin` packed in when nothing is lost (no other glTF reads that `.bin`); its textures stay files
-   beside it. Watched folders are never changed.
+   `.glb` with its `.bin` packed in when nothing is lost (no other glTF reads that `.bin`), meshopt compression and
+   all; its textures stay files beside it. Watched folders are never changed.
 2. **Store.** Each file's BLAKE3 hash is its name in blob storage, so a file shared by ten packs is stored once,
    corruption is detectable, and blobs never change (cache them forever, back them up with any sync tool).
 3. **Analyze.**
@@ -285,9 +285,10 @@ software rasterizer (`apt install mesa-vulkan-drivers`). Without any adapter, ev
      MagicaVoxel `.vox`, which Hoard reads itself (voxels keep their palette colors). Thumbnails are drawn the way the
      3D viewer shows the model: textures from the file, an OBJ's MTL, or found in the pack by name; tone mapping;
      cut-outs and see-through surfaces, glass included (glTF's transmission, where the metal parts of the same
-     material stay solid); framed tightly from the same angle every time. FBX geometry, node
-     transforms, materials and embedded or nearby textures are read natively (axis and unit settings become glTF's
-     Y-up meters), from binary FBX and from the text form (ASCII FBX 7) that Asset Forge and some exporters write;
+     material stay solid); framed tightly from the same angle every time. glTF and GLB compressed with meshopt
+     (`EXT_meshopt_compression`, `KHR_meshopt_compression`) are decoded for the thumbnail and the 3D viewer. FBX
+     geometry, node transforms, materials and embedded or nearby textures are read natively (axis and unit settings
+     become glTF's Y-up meters), from binary FBX and from the text form (ASCII FBX 7) that Asset Forge and some exporters write;
      Blender, which reads only binary FBX, is handed a binary copy. 3DS meshes, materials, smoothing groups and
      textures are read natively too, since Blender stopped shipping its 3DS importer in 4.2.
    - 3D-print files (`.3mf`): meshes, components and build plates, read natively, with their colors: the 3MF

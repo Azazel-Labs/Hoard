@@ -1,5 +1,5 @@
 import { LARGE, LARGE_PX, MODELS, TEXTURES } from './support/seed'
-import { paintedCube3mf, partsGltf } from './support/files'
+import { meshoptQuad, paintedCube3mf, partsGltf } from './support/files'
 import { assetsOf, signedIn, uploadPack, waitIdle, waitReady } from './support/api'
 import { doubleClick, expect, openPack, test, tile, unique } from './support/test'
 
@@ -76,6 +76,45 @@ test.describe('full-screen viewers', () => {
     await page.keyboard.press('Escape')
     await expect(viewer).toBeHidden()
     await api.delete(`/api/packs/${pack.id}`)
+  })
+
+  // Meshopt-compressed models are drawn for thumbnails and in the viewer, and a compressed glTF beside its buffer
+  // becomes a GLB that is still compressed.
+  test('a meshopt-compressed model has a thumbnail and opens in the viewer', async ({ page, baseURL }) => {
+    const api = await signedIn(baseURL!)
+    const name = `E2E Meshopt ${unique()}`
+    const board = await meshoptQuad()
+    const sign = await meshoptQuad('Sign.bin')
+    const pack = await uploadPack(api, name, [
+      { relpath: 'Board.glb', data: board.model },
+      { relpath: 'Sign/Sign.gltf', data: sign.model },
+      { relpath: 'Sign/Sign.bin', data: sign.bin },
+    ])
+    try {
+      await waitReady(api, [pack.id])
+      const assets = await assetsOf(api, pack.id)
+      expect(assets.map((a) => a.path).sort()).toEqual(['Board.glb', 'Sign/Sign.glb'])
+      for (const a of assets) {
+        const full = (await (await api.get(`/api/assets/${a.id}`)).json()) as { has_thumb: boolean; meta: Record<string, unknown> }
+        expect(full.meta).toMatchObject({ triangles: 2, meshes: 1 })
+        expect(full.has_thumb).toBe(true)
+      }
+      const packed = await (await api.get(`/api/assets/${assets.find((a) => a.path === 'Sign/Sign.glb')!.id}/file`)).body()
+      expect(packed.subarray(0, 4).toString()).toBe('glTF')
+      expect(packed.toString('latin1')).toContain('EXT_meshopt_compression')
+
+      await openPack(page, pack.id, name, '&sort=name')
+      for (const model of ['Board', 'Sign']) {
+        await doubleClick(page, tile(page, model))
+        const viewer = page.getByRole('dialog', { name: `View ${model} in 3D` })
+        await expect(viewer.getByText(/2 tris · 1 mesh/)).toBeVisible({ timeout: 20_000 })
+        await expect(viewer.getByText(/Couldn't show this model/)).toHaveCount(0)
+        await page.keyboard.press('Escape')
+        await expect(viewer).toBeHidden()
+      }
+    } finally {
+      await api.delete(`/api/packs/${pack.id}`)
+    }
   })
 
   test('the 3D viewer shows a model other ways, and its scene information', async ({ page, seed }) => {

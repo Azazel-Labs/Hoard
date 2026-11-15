@@ -203,7 +203,7 @@ fn pack_gltfs(root: &Path, files: &[PathBuf], keep: &HashSet<String>) -> usize {
         if shared || keep.contains(rel) || keep.contains(&glb) || root.join(&glb).exists() {
             continue;
         }
-        let (bytes, _) = match crate::formats::gltf_buffers_to_glb(&root.join(rel)) {
+        let bytes = match crate::formats::gltf_buffers_to_glb(&root.join(rel)) {
             Ok(out) => out,
             Err(e) => {
                 tracing::debug!(file = %rel, error = %format!("{e:#}"), "glTF kept as it is");
@@ -1233,5 +1233,54 @@ mod tests {
         assert!(doc["buffers"][0].get("uri").is_none());
         assert_eq!(&glb[20 + json_len + 4..20 + json_len + 8], b"BIN\0");
         assert_eq!(&glb[20 + json_len + 8..], &tri[..]);
+    }
+
+    /// A GLB's JSON and binary chunk.
+    fn glb_chunks(glb: &[u8]) -> (serde_json::Value, Vec<u8>) {
+        let json_len = u32::from_le_bytes(glb[12..16].try_into().unwrap()) as usize;
+        let doc = serde_json::from_slice(&glb[20..20 + json_len]).unwrap();
+        (doc, glb.get(20 + json_len + 8..).unwrap_or_default().to_vec())
+    }
+
+    #[test]
+    fn meshopt_gltf_packed_into_glb_stays_compressed() {
+        // A meshopt-compressed triangle, as a .gltf reading its compressed buffer from m.bin.
+        let tri: Vec<u8> = [0f32, 0., 0., 1., 0., 0., 0., 1., 0.].iter().flat_map(|f| f.to_le_bytes()).collect();
+        let mut plain = serde_json::from_str::<serde_json::Value>(&tri_gltf("x", "x")).unwrap();
+        plain.as_object_mut().unwrap().remove("images");
+        plain["buffers"] = serde_json::json!([{ "byteLength": 36 }]);
+        let mut json = serde_json::to_vec(&plain).unwrap();
+        json.resize(json.len().div_ceil(4) * 4, b' ');
+        let mut glb = b"glTF".to_vec();
+        glb.extend(2u32.to_le_bytes());
+        glb.extend(u32::try_from(20 + json.len() + 8 + 36).unwrap().to_le_bytes());
+        glb.extend(u32::try_from(json.len()).unwrap().to_le_bytes());
+        glb.extend(b"JSON");
+        glb.extend(json);
+        glb.extend(36u32.to_le_bytes());
+        glb.extend(b"BIN\0");
+        glb.extend(&tri);
+        let compressed = mithril::gltf::compress(&glb).unwrap();
+        let (mut doc, bin) = glb_chunks(&compressed);
+        assert!(doc["extensionsUsed"].to_string().contains("meshopt"));
+        doc["buffers"][0]["uri"] = "m.bin".into();
+        doc["images"] = serde_json::json!([{ "uri": "m.png" }]);
+
+        let dir = tempfile::tempdir().unwrap();
+        let root = dir.path();
+        fs::write(root.join("m.gltf"), doc.to_string()).unwrap();
+        fs::write(root.join("m.bin"), &bin).unwrap();
+        fs::write(root.join("m.png"), b"\x89PNG").unwrap();
+        assert_eq!(pack_gltfs(root, &listed(root).unwrap(), &HashSet::new()), 1);
+        let mut left: Vec<String> = listed(root).unwrap().iter().map(|f| rel_of(root, f)).collect();
+        left.sort();
+        assert_eq!(left, ["m.glb", "m.png"]);
+        let packed = fs::read(root.join("m.glb")).unwrap();
+        let (doc, _) = glb_chunks(&packed);
+        assert!(doc["extensionsUsed"].to_string().contains("meshopt"));
+        assert_eq!(doc["images"][0]["uri"], "m.png");
+        // It decodes to the triangle it started as.
+        let (_, decoded) = glb_chunks(&mithril::gltf::decompress(&packed).unwrap());
+        assert_eq!(&decoded[..36], &tri[..]);
     }
 }

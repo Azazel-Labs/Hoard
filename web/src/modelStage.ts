@@ -136,12 +136,20 @@ function visCamColors(buf: ArrayBuffer, geom: THREE.BufferGeometry) {
   geom.setAttribute('color', new THREE.BufferAttribute(colors, 3))
 }
 
+/** A glTF loader that also reads meshopt-compressed models (EXT_meshopt_compression / KHR_meshopt_compression). */
+async function gltfLoader(manager: THREE.LoadingManager) {
+  const [{ GLTFLoader }, { MeshoptDecoder }] = await Promise.all([
+    import('three/addons/loaders/GLTFLoader.js'),
+    import('three/addons/libs/meshopt_decoder.module.js'),
+  ])
+  return new GLTFLoader(manager).setMeshoptDecoder(MeshoptDecoder)
+}
+
 async function loadModel(url: string, ext: string, manager: THREE.LoadingManager): Promise<Loaded> {
   switch (ext) {
     case 'glb':
     case 'gltf': {
-      const { GLTFLoader } = await import('three/addons/loaders/GLTFLoader.js')
-      const g = await new GLTFLoader(manager).loadAsync(url)
+      const g = await (await gltfLoader(manager)).loadAsync(url)
       return { object: g.scene, animations: g.animations }
     }
     case 'fbx': {
@@ -201,7 +209,7 @@ async function loadModel(url: string, ext: string, manager: THREE.LoadingManager
     case 'server-glb': {
       // The server reads 3DS, 3MF (slicers' filament colors and painting included) and USD, and hands them over as a GLB. A
       // conversion still running answers 202 after waiting a while: ask again, for up to ten minutes or so.
-      const { GLTFLoader } = await import('three/addons/loaders/GLTFLoader.js')
+      const loader = await gltfLoader(manager)
       for (let tries = 0; tries < 20; tries++) {
         const res = await fetch(url)
         if (res.status === 202) continue
@@ -209,7 +217,7 @@ async function loadModel(url: string, ext: string, manager: THREE.LoadingManager
           const body = (await res.json().catch(() => ({}))) as { error?: string }
           throw new Error(body.error ?? `HTTP ${res.status}`)
         }
-        const g = await new GLTFLoader(manager).parseAsync(await res.arrayBuffer(), '')
+        const g = await loader.parseAsync(await res.arrayBuffer(), '')
         return { object: g.scene, animations: g.animations }
       }
       throw new Error(t('model-error-converting'))

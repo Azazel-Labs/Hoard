@@ -82,6 +82,9 @@ test.describe('full-screen viewers', () => {
   // becomes a GLB that is still compressed.
   test('a meshopt-compressed model has a thumbnail and opens in the viewer', async ({ page, baseURL }) => {
     const api = await signedIn(baseURL!)
+    // The server draws thumbnails only where it has a model renderer.
+    const stats = (await (await api.get('/api/stats')).json()) as { renderer?: string }
+    const drawn = /^(gpu|cpu):/.test(stats.renderer ?? '')
     const name = `E2E Meshopt ${unique()}`
     const board = await meshoptQuad()
     const sign = await meshoptQuad('Sign.bin')
@@ -92,12 +95,13 @@ test.describe('full-screen viewers', () => {
     ])
     try {
       await waitReady(api, [pack.id])
+      await waitIdle(api)
       const assets = await assetsOf(api, pack.id)
       expect(assets.map((a) => a.path).sort()).toEqual(['Board.glb', 'Sign/Sign.glb'])
       for (const a of assets) {
         const full = (await (await api.get(`/api/assets/${a.id}`)).json()) as { has_thumb: boolean; meta: Record<string, unknown> }
         expect(full.meta).toMatchObject({ triangles: 2, meshes: 1 })
-        expect(full.has_thumb).toBe(true)
+        expect(full.has_thumb).toBe(drawn)
       }
       const packed = await (await api.get(`/api/assets/${assets.find((a) => a.path === 'Sign/Sign.glb')!.id}/file`)).body()
       expect(packed.subarray(0, 4).toString()).toBe('glTF')

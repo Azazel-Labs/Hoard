@@ -332,9 +332,12 @@ Open **Settings** in the portal and set Blender to **Automatic**: Hoard uses a B
 downloads Blender 4.5 LTS from Blender's mirrors into `<data>/tools/blender` (about 350 MB, checksum verified), and
 queues conversion for packs ingested before it was on. **This program** points at a Blender you installed yourself.
 Blender 4.5 is used because Blender 5 dropped
-Collada (.dae) import. After each ingest, a `convert` job exports .blend/.fbx/.dae/.usd*/.ply/.stl/.3ds/.abc/.x3d to GLB with the asset's linked textures laid out
-beside it, stores the GLB as a derivative, and renders a thumbnail from it. Conversion runs with a 3-minute timeout per
-file, and failures are logged without blocking anything. The originals are never modified.
+Collada (.dae) import. After each ingest, a `convert` job exports .blend/.fbx/.dae/.usd*/.ply/.stl/.abc/.x3d to GLB with the asset's linked textures laid out
+beside it, stores the GLB as a derivative, and renders a thumbnail from it. An ASCII FBX is rewritten as binary
+first, since Blender reads only binary. Conversion runs with a 3-minute timeout per file, and failures are listed in
+Issues without blocking anything: the Blender version, the step that failed and Blender's message, taken from a marked
+line the export script prints. Blender's full output for each conversion is logged at debug level
+(`RUST_LOG=hoardd::convert=debug`). The originals are never modified.
 
 ## Unreal content
 

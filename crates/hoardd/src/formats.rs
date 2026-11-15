@@ -71,7 +71,7 @@ pub(crate) fn options(ext: &str, derivatives: &[String]) -> Vec<FormatOption> {
         }
     }
     match ext.as_str() {
-        "stl" | "ply" | "vox" | "obj" | "fbx" | "3mf" | "usd" | "usda" | "usdc" | "usdz" => {
+        "stl" | "ply" | "vox" | "obj" | "fbx" | "3ds" | "3mf" | "usd" | "usda" | "usdc" | "usdz" => {
             out.push(opt("glb", "GLB (textures embedded)", false));
         }
         "ttf" | "otf" => {

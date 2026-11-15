@@ -14,32 +14,76 @@ use rusqlite::{Connection, params};
 
 use crate::{AppState, analyze, db, issues, jobs};
 
-/// Extensions worth sending through Blender.
+/// Extensions worth sending through Blender. 3DS isn't one: Hoard reads it itself (`tds`), and Blender's importer for
+/// it isn't shipped since 4.2.
 pub(crate) const CONVERTIBLE: &[&str] =
-    &["blend", "fbx", "dae", "3ds", "usd", "usda", "usdc", "usdz", "ply", "stl", "abc", "x3d"];
+    &["blend", "fbx", "dae", "usd", "usda", "usdc", "usdz", "ply", "stl", "abc", "x3d"];
 const TIMEOUT: Duration = Duration::from_secs(180);
 
-/// Blender-side script: import by extension, export everything as one GLB.
+/// Blender-side script: import by extension, export everything as one GLB. A step that fails says why on one
+/// line starting `HOARD-ERROR `, which is what the server records: Blender's own last words on a failed script are
+/// the whole script echoed back.
 const EXPORT_SCRIPT: &str = r#"
-import sys, bpy
+import os, sys, bpy
 src, dst = sys.argv[sys.argv.index("--") + 1:][:2]
 ext = src.rsplit(".", 1)[-1].lower()
+name = os.path.basename(src)
+
+def fail(what, why):
+    why = str(why).replace(src, name).replace(src.replace("\\", "/"), name)
+    why = " ".join(why.split())
+    if why.startswith("Error: "):
+        why = why[len("Error: "):]
+    sys.stderr.write("HOARD-ERROR " + what + ": " + why + "\n")
+    sys.stderr.flush()
+    raise SystemExit(1)
+
+def run(what, op):
+    try:
+        result = op()
+    except Exception as e:
+        if "could not be found" in str(e):
+            fail(what, "this Blender has no importer for ." + ext + " files")
+        fail(what, e)
+    if "FINISHED" not in result:
+        fail(what, "Blender stopped without saying why")
+
 if ext == "blend":
-    bpy.ops.wm.open_mainfile(filepath=src)
+    run("couldn't open it", lambda: bpy.ops.wm.open_mainfile(filepath=src))
 else:
     bpy.ops.wm.read_factory_settings(use_empty=True)
     importers = {
         "fbx": lambda: bpy.ops.import_scene.fbx(filepath=src),
         "dae": lambda: bpy.ops.wm.collada_import(filepath=src),
-        "3ds": lambda: bpy.ops.import_scene.max3ds(filepath=src),
         "ply": lambda: bpy.ops.wm.ply_import(filepath=src),
         "stl": lambda: bpy.ops.wm.stl_import(filepath=src),
         "abc": lambda: bpy.ops.wm.alembic_import(filepath=src),
         "x3d": lambda: bpy.ops.import_scene.x3d(filepath=src),
     }
-    importers.get(ext, lambda: bpy.ops.wm.usd_import(filepath=src))()
-bpy.ops.export_scene.gltf(filepath=dst, export_format="GLB", export_animations=True, export_apply=True)
+    run("couldn't import it", importers.get(ext, lambda: bpy.ops.wm.usd_import(filepath=src)))
+run("couldn't export a GLB",
+    lambda: bpy.ops.export_scene.gltf(filepath=dst, export_format="GLB", export_animations=True, export_apply=True))
 "#;
+
+/// Why a conversion failed, from what Blender wrote to stderr: the script's `HOARD-ERROR` line, or else (a crash,
+/// or Blender failing to start) its last few lines, leaving out the script it echoes back.
+fn blender_error(stderr: &str) -> String {
+    if let Some(why) = stderr.lines().rev().find_map(|l| l.strip_prefix("HOARD-ERROR ")) {
+        return why.trim().to_owned();
+    }
+    let mut lines = Vec::new();
+    let mut echo = false;
+    for l in stderr.lines() {
+        if l.starts_with("Error: script failed, expr:") {
+            echo = !l.trim_end().ends_with("exiting.");
+        } else if echo {
+            echo = !l.trim_end().ends_with("', exiting.");
+        } else if !l.trim().is_empty() {
+            lines.push(l.trim());
+        }
+    }
+    lines[lines.len().saturating_sub(3)..].join(" | ")
+}
 
 /// Find or fetch Blender for the current setting. When it becomes ready because the setting was just changed
 /// (`changed`) or because it was just downloaded, packs that were ingested without it get their conversions queued.
@@ -113,7 +157,7 @@ struct Todo {
 }
 
 pub(crate) async fn convert_pack(state: &AppState, pack_id: &str) -> Result<()> {
-    let blender = crate::blender::tool().context("Blender isn't available; turn it on in Settings")?.path;
+    let blender = crate::blender::tool().context("Blender isn't available; turn it on in Settings")?;
     let pid = pack_id.to_owned();
     let todo: Vec<Todo> = db::call(&state.pool, move |c| {
         let mut stmt = c.prepare(
@@ -188,7 +232,7 @@ pub(crate) fn thumbs_from_conversions(state: &AppState, rt: &tokio::runtime::Han
     Ok(())
 }
 
-async fn convert_one(state: &AppState, blender: &Path, t: &Todo) -> Result<()> {
+async fn convert_one(state: &AppState, blender: &crate::blender::Tool, t: &Todo) -> Result<()> {
     let work = state.cfg.tmp_dir().join(format!("convert-{}", t.id));
     tokio::fs::create_dir_all(&work).await?;
     let result = async {
@@ -201,8 +245,11 @@ async fn convert_one(state: &AppState, blender: &Path, t: &Todo) -> Result<()> {
             state.blobs.download_to(&f.hash, &dest).await?;
         }
         let src = work.join(&t.path);
+        if t.path.to_ascii_lowercase().ends_with(".fbx") {
+            ascii_fbx_to_binary(&src).await?;
+        }
         let out = work.join("__hoard_out.glb");
-        let mut cmd = crate::heavy::command(blender);
+        let mut cmd = crate::heavy::command(&blender.path);
         cmd.arg("-b")
             .arg("--factory-startup")
             .arg("--python-exit-code")
@@ -213,11 +260,17 @@ async fn convert_one(state: &AppState, blender: &Path, t: &Todo) -> Result<()> {
             .arg(&src)
             .arg(&out)
             .kill_on_drop(true);
-        let output = tokio::time::timeout(TIMEOUT, cmd.output()).await.context("Blender timed out")??;
-        if !output.status.success() || !out.is_file() {
-            let tail: String =
-                String::from_utf8_lossy(&output.stderr).lines().rev().take(8).collect::<Vec<_>>().join(" | ");
-            bail!("Blender exited with {}: {tail}", output.status);
+        let version = &blender.version;
+        let output = tokio::time::timeout(TIMEOUT, cmd.output())
+            .await
+            .with_context(|| format!("{version} took more than {} minutes", TIMEOUT.as_secs() / 60))??;
+        let stderr = String::from_utf8_lossy(&output.stderr);
+        tracing::debug!(asset = %t.path, status = %output.status, %stderr, "Blender's output");
+        if !output.status.success() {
+            bail!("{version} {}", blender_error(&stderr));
+        }
+        if !out.is_file() {
+            bail!("{version} finished without writing a GLB");
         }
         let glb = tokio::fs::read(&out).await?;
 
@@ -262,4 +315,32 @@ async fn convert_one(state: &AppState, blender: &Path, t: &Todo) -> Result<()> {
     .await;
     tokio::fs::remove_dir_all(&work).await.ok();
     result
+}
+
+/// Blender reads only binary FBX, so an ASCII one is rewritten in place (in the work folder) first.
+async fn ascii_fbx_to_binary(src: &Path) -> Result<()> {
+    let data = tokio::fs::read(src).await?;
+    if !crate::fbx_ascii::is_ascii(&data) {
+        return Ok(());
+    }
+    let binary = crate::heavy::run("ascii fbx", move || crate::fbx_ascii::to_binary(&data))
+        .await?
+        .context("couldn't read this ASCII FBX file")?;
+    tokio::fs::write(src, binary).await?;
+    Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn blender_errors_are_the_marked_line_or_its_last_words() {
+        let marked = "Read prefs\nTraceback (most recent call last):\n  File x\nHOARD-ERROR couldn't import it: ASCII FBX \
+                      files are not supported 'a.fbx'\nError: script failed, expr: '\nimport os\n', exiting.\n";
+        assert_eq!(blender_error(marked), "couldn't import it: ASCII FBX files are not supported 'a.fbx'");
+        let crashed = "Read prefs\nWriting: C:\\tmp\\blender.crash.txt\nSegmentation fault\n\
+                       Error: script failed, expr: '\nimport os, sys\nrun(1)\n', exiting.\n";
+        assert_eq!(blender_error(crashed), "Read prefs | Writing: C:\\tmp\\blender.crash.txt | Segmentation fault");
+    }
 }

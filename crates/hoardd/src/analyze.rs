@@ -258,7 +258,7 @@ pub(crate) fn analyze(path: &Path, root: &Path, kind: AssetKind, ext: &str) -> A
             a.title = f.title;
             a.thumb = f.thumb.and_then(|t| thumb_bytes(t, false).ok());
         }),
-        AssetKind::Model if matches!(ext, "stl" | "ply" | "vox" | "3mf" | "usd" | "usda" | "usdc" | "usdz") => {
+        AssetKind::Model if matches!(ext, "stl" | "ply" | "vox" | "3ds" | "3mf" | "usd" | "usda" | "usdc" | "usdz") => {
             analyze_mesh(path, root, ext, &mut a)
         }
         AssetKind::Model | AssetKind::Animation => analyze_model(path, ext, &mut a.meta).map(|()| {
@@ -267,7 +267,7 @@ pub(crate) fn analyze(path: &Path, root: &Path, kind: AssetKind, ext: &str) -> A
             if matches!(ext, "gltf" | "glb") && has_mesh {
                 render_model_thumb(path, &mut a);
             } else if matches!(ext, "obj" | "fbx") {
-                // Hoard reads OBJ (with its MTL) and binary FBX itself, finding their textures in the pack: render
+                // Hoard reads OBJ (with its MTL) and FBX itself, finding their textures in the pack: render
                 // a thumbnail from the GLB it makes.
                 if let Err(e) = mesh_thumb(path, root, ext, &mut a) {
                     tracing::debug!(path = %path.display(), error = %format!("{e:#}"), "no model thumbnail");

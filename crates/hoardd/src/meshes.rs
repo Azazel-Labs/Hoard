@@ -1,5 +1,6 @@
 //! Model formats read natively: STL (binary and ASCII), PLY (ASCII and binary), `MagicaVoxel` `.vox`, OBJ (with its
-//! MTL materials and textures), binary FBX (see `fbx`), 3MF (see `threemf`) and USD (see `usd`). Each becomes a GLB, which feeds the thumbnail renderer
+//! MTL materials and textures), FBX (see `fbx`, and `fbx_ascii` for the text form), 3DS (see `tds`), 3MF (see
+//! `threemf`) and USD (see `usd`). Each becomes a GLB, which feeds the thumbnail renderer
 //! and "download as GLB"; textures are embedded so the GLB stands on its own.
 
 #![expect(clippy::many_single_char_names, clippy::similar_names, reason = "geometry code: a/b/c, u/v, x/y/z")]
@@ -10,7 +11,7 @@ use std::path::Path;
 use anyhow::{Context, Result, bail, ensure};
 use serde_json::{Map, Value, json};
 
-pub(crate) const EXTS: &[&str] = &["stl", "ply", "vox", "obj", "fbx", "3mf", "usd", "usda", "usdc", "usdz"];
+pub(crate) const EXTS: &[&str] = &["stl", "ply", "vox", "obj", "fbx", "3ds", "3mf", "usd", "usda", "usdc", "usdz"];
 pub(crate) const MAX_TRIANGLES: usize = 4_000_000;
 const MAX_VOXELS: usize = 4_000_000;
 
@@ -75,6 +76,11 @@ pub(crate) fn load(path: &Path, ext: &str, root: &Path) -> Result<(Option<Mesh>,
         "ply" => ply(&std::fs::read(path)?),
         "vox" => vox(&std::fs::read(path)?),
         "3mf" => crate::threemf::load(path),
+        "3ds" => {
+            let mut mesh = crate::tds::load(path, root)?;
+            guess_color_texture(&mut mesh, path, root);
+            Ok(counts(mesh))
+        }
         "usd" | "usda" | "usdc" | "usdz" => {
             Ok(crate::usd::load(path, root)?.map_or_else(|| (None, Map::new()), counts))
         }
@@ -111,7 +117,7 @@ fn linear_colors(path: &Path, ext: &str) -> bool {
     }
 }
 
-fn srgb_to_linear(c: f32) -> f32 {
+pub(crate) fn srgb_to_linear(c: f32) -> f32 {
     if c <= 0.040_45 { c / 12.92 } else { ((c + 0.055) / 1.055).powf(2.4) }
 }
 

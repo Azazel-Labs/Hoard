@@ -276,13 +276,15 @@ software rasterizer (`apt install mesa-vulkan-drivers`). Without any adapter, ev
      points, ACID tempo, root note and one-shot flag, cue markers, and RF64 for files over 4 GB. Embedded titles
      become the asset's name, and embedded descriptions show as "From the file".
    - Models: glTF/GLB mesh, material, animation and skin counts, vertex/triangle counts; OBJ counts; FBX version
-     plus skin and animation detection; a wgpu-rendered thumbnail for glTF/GLB/OBJ/FBX, and for STL, PLY and
+     plus skin and animation detection; a wgpu-rendered thumbnail for glTF/GLB/OBJ/FBX, and for STL, PLY, 3DS and
      MagicaVoxel `.vox`, which Hoard reads itself (voxels keep their palette colors). Thumbnails are drawn the way the
      3D viewer shows the model: textures from the file, an OBJ's MTL, or found in the pack by name; tone mapping;
      cut-outs and see-through surfaces, glass included (glTF's transmission, where the metal parts of the same
-     material stay solid); framed tightly from the same angle every time. Binary FBX geometry, node
+     material stay solid); framed tightly from the same angle every time. FBX geometry, node
      transforms, materials and embedded or nearby textures are read natively (axis and unit settings become glTF's
-     Y-up meters); ASCII FBX needs Blender.
+     Y-up meters), from binary FBX and from the text form (ASCII FBX 7) that Asset Forge and some exporters write;
+     Blender, which reads only binary FBX, is handed a binary copy. 3DS meshes, materials, smoothing groups and
+     textures are read natively too, since Blender stopped shipping its 3DS importer in 4.2.
    - 3D-print files (`.3mf`): meshes, components and build plates, read natively, with their colors: the 3MF
      materials extension's base materials and color groups, and from Bambu Studio, OrcaSlicer and PrusaSlicer
      projects the filament colors, which filament each object and part prints in, and filaments painted onto the
@@ -365,9 +367,10 @@ software rasterizer (`apt install mesa-vulkan-drivers`). Without any adapter, ev
    - **Descriptions.** Each kind is kept apart: a person's own (written in the asset panel or over MCP), the AI's,
      the file's embedded one and the pack's store page. Search covers all of them, and re-running the AI updates
      its description without touching yours.
-7. **Convert (optional).** With Blender switched on (in Settings), .blend/.fbx/.dae/.usd/.ply/.stl/.3ds
+7. **Convert (optional).** With Blender switched on (in Settings), .blend/.fbx/.dae/.usd/.ply/.stl
    files are exported to GLB by headless Blender, with their linked textures laid out beside them. The GLB is stored as a derivative that feeds
-   thumbnails, the browser preview and downloads.
+   thumbnails, the browser preview and downloads. A file Blender can't convert is listed in Issues with the Blender
+   version and the step that failed (opening, importing or exporting) in Blender's own words.
 
 Tags carry their source (`meta`, `rule`, `ai`, `human`). Human tags always win, and re-running the offline
 tagger after improving the vocabulary (`POST /api/packs/{id}/retag`) replaces only `rule`/`meta` tags.
@@ -447,7 +450,7 @@ and Opus use ffmpeg's reference encoders (LAME, libvorbis, libopus), as do sourc
 | MOD, XM, S3M, IT, MIDI | the same audio formats, rendered |
 | glTF | GLB (buffers and textures packed in) |
 | GLB | glTF + .bin (zipped) |
-| OBJ (with MTL and textures), binary FBX, STL, PLY, MagicaVoxel, 3MF (with its colors), USD | GLB with textures embedded |
+| OBJ (with MTL and textures), FBX (binary and ASCII), 3DS, STL, PLY, MagicaVoxel, 3MF (with its colors), USD | GLB with textures embedded |
 | TTF/OTF | WOFF2, WOFF |
 | WOFF, WOFF2 | TTF/OTF and each other |
 | anything else Blender converted (Settings → Blender) | GLB |

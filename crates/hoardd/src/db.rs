@@ -394,6 +394,28 @@ const MIGRATIONS: &[&str] = &[
        FROM assets a WHERE a.kind = 'vector';
      UPDATE locations SET kinds = json_insert(kinds, '$[#]', 'vector')
        WHERE EXISTS (SELECT 1 FROM json_each(locations.kinds) WHERE value = 'texture');",
+    // 46: Hoard reads ASCII FBX (and hands Blender a binary copy) and 3DS (no longer sent to Blender, whose 3DS
+    // importer isn't shipped since 4.2). Packs with either are analyzed again, for thumbnails; packs where Blender
+    // refused an FBX are converted again; and the 3DS conversion failures are gone.
+    "UPDATE packs SET status = 'ingesting'
+       WHERE status = 'ready' AND archived_at IS NULL
+         AND EXISTS (SELECT 1 FROM assets a WHERE a.pack_id = packs.id
+                     AND (a.ext = '3ds' OR (a.ext = 'fbx' AND json_extract(a.meta, '$.fbx_ascii'))))
+         AND NOT EXISTS (SELECT 1 FROM jobs j WHERE j.pack_id = packs.id AND j.status IN ('queued', 'running'));
+     INSERT INTO jobs (kind, pack_id, payload, run_after, created_at, updated_at)
+       SELECT 'retag', id, '{\"then_llm\":false}', strftime('%Y-%m-%dT%H:%M:%SZ', 'now'),
+              strftime('%Y-%m-%dT%H:%M:%SZ', 'now'), strftime('%Y-%m-%dT%H:%M:%SZ', 'now')
+       FROM packs p WHERE p.status = 'ingesting'
+         AND NOT EXISTS (SELECT 1 FROM jobs j WHERE j.pack_id = p.id AND j.status IN ('queued', 'running'));
+     INSERT INTO jobs (kind, pack_id, payload, run_after, created_at, updated_at)
+       SELECT 'convert', p.id, '{}', strftime('%Y-%m-%dT%H:%M:%SZ', 'now'), strftime('%Y-%m-%dT%H:%M:%SZ', 'now'),
+              strftime('%Y-%m-%dT%H:%M:%SZ', 'now')
+       FROM packs p WHERE p.status IN ('ready', 'ingesting') AND p.archived_at IS NULL
+         AND EXISTS (SELECT 1 FROM issues i WHERE i.kind = 'convert' AND i.pack_id = p.id
+                     AND lower(i.subject) LIKE '%.fbx')
+         AND NOT EXISTS (SELECT 1 FROM jobs j WHERE j.pack_id = p.id AND j.kind = 'convert'
+                           AND j.status IN ('queued', 'running'));
+     DELETE FROM issues WHERE kind = 'convert' AND lower(subject) LIKE '%.3ds';",
 ];
 
 /// How many automatic pre-upgrade backups to keep in `<data dir>/backups`.
@@ -1872,7 +1894,8 @@ mod tests {
     fn favorites_and_vector_art_survive_their_upgrades() {
         let dir = tempfile::tempdir().unwrap();
         let mut conn = baseline_db(dir.path());
-        migrate(&mut conn, &dir.path().join("backups"), &MIGRATIONS[..MIGRATIONS.len() - 3]).unwrap();
+        // Through 42 (the list starts at 9), before favorites were renamed.
+        migrate(&mut conn, &dir.path().join("backups"), &MIGRATIONS[..34]).unwrap();
         conn.execute_batch(
             "PRAGMA foreign_keys = OFF;
              INSERT INTO users (id, username, password_hash, created_at) VALUES (1, 'ann', '', 'x');
@@ -1913,6 +1936,46 @@ mod tests {
         let stars: i64 =
             conn.query_row("SELECT COUNT(*) FROM favorites WHERE asset_id = 'svg'", [], |r| r.get(0)).unwrap();
         assert_eq!(stars, 1);
+    }
+
+    /// Packs with ASCII FBX or 3DS files are read again; FBX files Blender refused are converted again, and the 3DS
+    /// failures go, since Blender isn't asked about 3DS any more.
+    #[test]
+    fn ascii_fbx_and_3ds_packs_are_read_again() {
+        let dir = tempfile::tempdir().unwrap();
+        let mut conn = baseline_db(dir.path());
+        migrate(&mut conn, &dir.path().join("backups"), &MIGRATIONS[..MIGRATIONS.len() - 1]).unwrap();
+        conn.execute_batch(
+            "PRAGMA foreign_keys = OFF;
+             INSERT INTO packs (id, name, status, created_at) VALUES
+               ('kit', 'Space Kit', 'ready', 'x'), ('iso', 'Isometric', 'ready', 'x'), ('obj', 'Plain', 'ready', 'x');
+             INSERT INTO assets (id, pack_id, blob_hash, path, name, ext, kind, meta, created_at, updated_at) VALUES
+               ('a', 'kit', 'h1', 'Models/station.fbx', 'station', 'fbx', 'model', '{\"fbx_ascii\":true}', 'x', 'x'),
+               ('b', 'iso', 'h2', 'car.3ds', 'car', '3ds', 'model', '{}', 'x', 'x'),
+               ('c', 'obj', 'h3', 'rock.fbx', 'rock', 'fbx', 'model', '{}', 'x', 'x');
+             INSERT INTO issues (key, kind, pack_id, subject, message, first_at, last_at) VALUES
+               ('k1', 'convert', 'kit', 'Models/station.fbx', 'Blender exited', 'x', 'x'),
+               ('k2', 'convert', 'iso', 'car.3ds', 'Blender exited', 'x', 'x');",
+        )
+        .unwrap();
+        migrate(&mut conn, &dir.path().join("backups"), MIGRATIONS).unwrap();
+        let jobs: Vec<(String, String)> = conn
+            .prepare("SELECT kind, pack_id FROM jobs WHERE pack_id <> 'p1' ORDER BY pack_id, kind")
+            .unwrap()
+            .query_map([], |r| Ok((r.get(0)?, r.get(1)?)))
+            .unwrap()
+            .collect::<rusqlite::Result<_>>()
+            .unwrap();
+        let jobs: Vec<(&str, &str)> = jobs.iter().map(|(k, p)| (k.as_str(), p.as_str())).collect();
+        assert_eq!(jobs, [("retag", "iso"), ("convert", "kit"), ("retag", "kit")]);
+        let issues: Vec<String> = conn
+            .prepare("SELECT subject FROM issues")
+            .unwrap()
+            .query_map([], |r| r.get(0))
+            .unwrap()
+            .flatten()
+            .collect();
+        assert_eq!(issues, ["Models/station.fbx"]);
     }
 
     #[test]

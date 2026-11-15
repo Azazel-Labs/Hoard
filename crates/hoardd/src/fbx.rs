@@ -180,14 +180,13 @@ struct Objects<'a> {
 }
 
 pub(crate) fn load(path: &Path, root: &Path) -> Result<Mesh> {
-    let file = std::io::BufReader::new(std::fs::File::open(path)?);
-    let head = std::fs::read(path).map(|d| d.get(..20).map(<[u8]>::to_vec).unwrap_or_default()).unwrap_or_default();
-    ensure!(
-        head.starts_with(b"Kaydara FBX Binary"),
-        "only binary FBX files can be read (this one is ASCII or not FBX)"
-    );
-    let fbxcel::tree::any::AnyTree::V7400(_, tree, _) = fbxcel::tree::any::AnyTree::from_seekable_reader(file)
-        .map_err(|e| anyhow::anyhow!("not a readable FBX file: {e}"))?
+    let mut data = std::fs::read(path)?;
+    if crate::fbx_ascii::is_ascii(&data) {
+        data = crate::fbx_ascii::to_binary(&data).context("couldn't read this ASCII FBX file")?;
+    }
+    let fbxcel::tree::any::AnyTree::V7400(_, tree, _) =
+        fbxcel::tree::any::AnyTree::from_seekable_reader(std::io::Cursor::new(data))
+            .map_err(|e| anyhow::anyhow!("not a readable FBX file: {e}"))?
     else {
         bail!("unsupported FBX version")
     };
@@ -687,13 +686,92 @@ mod tests {
         assert!(doc["meshes"][0]["primitives"][0]["attributes"]["TEXCOORD_0"].is_number());
     }
 
+    /// `z_up_fbx` as ASCII FBX, the way Asset Forge writes it.
+    fn z_up_ascii_fbx() -> String {
+        use base64::Engine as _;
+        let png = base64::engine::general_purpose::STANDARD.encode(png([10, 200, 30]));
+        let (head, tail) = png.split_at(png.len() / 2);
+        format!(
+            r#"; FBX 7.3.0 project file
+FBXHeaderExtension:  {{
+	FBXHeaderVersion: 1003
+	FBXVersion: 7300
+}}
+GlobalSettings:  {{
+	Version: 1000
+	Properties70:  {{
+		P: "UpAxis", "int", "Integer", "",2
+		P: "UpAxisSign", "int", "Integer", "",1
+		P: "FrontAxis", "int", "Integer", "",1
+		P: "FrontAxisSign", "int", "Integer", "",-1
+		P: "CoordAxis", "int", "Integer", "",0
+		P: "CoordAxisSign", "int", "Integer", "",1
+		P: "UnitScaleFactor", "double", "Number", "",1
+	}}
+}}
+Objects:  {{
+	Geometry: 10, "Geometry::Quad", "Mesh" {{
+		Vertices: *12 {{
+			a: 0,0,0,100,0,0,100,100,0,0,100,0
+		}}
+		PolygonVertexIndex: *4 {{
+			a: 0,1,2,-4
+		}}
+		LayerElementUV: 0 {{
+			MappingInformationType: "ByPolygonVertex"
+			ReferenceInformationType: "IndexToDirect"
+			UV: *8 {{
+				a: 0,0,1,0,1,1,0,1
+			}}
+			UVIndex: *4 {{
+				a: 0,1,2,3
+			}}
+		}}
+	}}
+	Model: 20, "Model::Floor", "Mesh" {{
+		Properties70:  {{
+			P: "Lcl Translation", "Lcl Translation", "", "A",0,0,100
+		}}
+	}}
+	Material: 30, "Material::Stone", "" {{
+		Properties70:  {{
+			P: "DiffuseColor", "Color", "", "A",0.5,0.4,0.3
+		}}
+	}}
+	Texture: 40, "Texture::StoneTex", "" {{
+		RelativeFilename: "C:\art\stone.png"
+	}}
+	Video: 50, "Video::StoneVideo", "Clip" {{
+		Content: , "{head}",
+			"{tail}"
+	}}
+}}
+Connections:  {{
+	;Geometry::Quad, Model::Floor
+	C: "OO",10,20
+	C: "OO",20,0
+	C: "OO",30,20
+	C: "OP",40,30, "DiffuseColor"
+	C: "OO",50,40
+}}
+"#
+        )
+    }
+
     #[test]
-    fn ascii_fbx_is_refused_clearly() {
+    fn ascii_fbx_reads_like_binary() {
         let dir = tempfile::tempdir().unwrap();
-        let p = dir.path().join("a.fbx");
-        std::fs::write(&p, "; FBX 7.4.0 project file\nFBXHeaderExtension: {\n}\n").unwrap();
-        let err = load(&p, dir.path()).err().unwrap();
-        assert!(format!("{err}").contains("binary"), "{err}");
+        let (a, b) = (dir.path().join("ascii.fbx"), dir.path().join("binary.fbx"));
+        std::fs::write(&a, z_up_ascii_fbx()).unwrap();
+        std::fs::write(&b, z_up_fbx()).unwrap();
+        let (a, b) = (load(&a, dir.path()).unwrap(), load(&b, dir.path()).unwrap());
+        assert_eq!(a.triangles(), 2);
+        assert_eq!(a.prims[0].positions, b.prims[0].positions);
+        assert_eq!(a.prims[0].normals, b.prims[0].normals);
+        assert_eq!(a.prims[0].uvs, b.prims[0].uvs);
+        assert_eq!(a.materials[a.prims[0].material].name, "Stone");
+        assert_eq!(a.materials[a.prims[0].material].color_image, Some(0));
+        assert_eq!(a.images.len(), 1);
     }
 }
 

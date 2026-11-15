@@ -23,7 +23,8 @@ use crate::tools::{self, Slot, Status};
 pub(crate) struct Tool {
     pub(crate) path: PathBuf,
     /// E.g. `Blender 4.5.16 LTS`.
-    version: String,
+    /// As it names itself: `Blender 4.5.16 LTS`.
+    pub(crate) version: String,
 }
 
 static SLOT: Slot<Tool> = Slot::new();

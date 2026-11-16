@@ -154,12 +154,14 @@ fn drawable(path: &Path) -> anyhow::Result<Drawable> {
         .get("extensionsUsed")
         .and_then(Value::as_array)
         .is_some_and(|e| e.iter().filter_map(Value::as_str).any(|e| ENCODINGS.contains(&e)));
-    if !encoded {
+    // A pack whose models are turned has them drawn turned (see `meshes::facing`).
+    let facing = crate::meshes::current_facing();
+    if !encoded && facing.is_upright() {
         return Ok(Drawable { path: path.to_owned(), _dir: None });
     }
     let glb = path.extension().is_some_and(|e| e.eq_ignore_ascii_case("glb"));
     let ext = if glb { "glb" } else { "gltf" };
-    let glb = crate::meshes::plain_glb(path, ext).context("decoding a compressed glTF")?;
+    let glb = crate::meshes::plain_glb(path, ext, facing).context("rewriting a glTF to draw")?;
     let dir = tempfile::tempdir()?;
     let plain = dir.path().join("model.glb");
     std::fs::write(&plain, glb)?;

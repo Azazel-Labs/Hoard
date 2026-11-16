@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "d908dee70be58463293398f44b458c417ab4a595a2301ca075526df22168e1d1"
+source = "031ae9796de89847770a20e2fa79115c9c8ec9e3764ab428ee6f31e570c680bd"
 translation = "c88d703960d058d6250f7f64595fd09c211cb193c33a147d0762312f6890a946"
 
 [messages.account-add]
@@ -5852,6 +5852,46 @@ translation = "tom Collada-fil"
 source = "No browser loader for .{ $ext }"
 translation = "Ingen inläsare i webbläsaren för .{ $ext }"
 
+[messages.model-facing-failed]
+source = "Couldn't turn the pack's models: { $error }"
+translation = "Kunde inte vrida paketets modeller: { $error }"
+
+[messages.model-facing-save]
+source = "Use for this pack"
+translation = "Använd för paketet"
+
+[messages.model-facing-save-title]
+source = "Turn every model in { $pack } this way. Their thumbnails are drawn again; downloads stay as they were made."
+translation = "Vrid alla modeller i { $pack } så här. Deras miniatyrbilder ritas om; nedladdningar förblir som de gjordes."
+
+[messages.model-facing-saved]
+source = "Every model in { $pack } now faces this way. Their thumbnails are being drawn again."
+translation = "Alla modeller i { $pack } är nu vända så här. Deras miniatyrbilder ritas om."
+
+[messages.model-facing-tip]
+source = "Tip a quarter"
+translation = "Tippa en kvart"
+
+[messages.model-facing-tip-title]
+source = "Tip the model's top a quarter turn toward its front, to stand up one lying down"
+translation = "Tippa modellens ovansida ett kvarts varv framåt, för att resa upp en som ligger ner"
+
+[messages.model-facing-turn]
+source = "Turn a quarter"
+translation = "Vrid en kvart"
+
+[messages.model-facing-turn-title]
+source = "Turn the model a quarter turn counterclockwise, seen from above"
+translation = "Vrid modellen ett kvarts varv moturs, sett ovanifrån"
+
+[messages.model-facing-undo]
+source = "Undo"
+translation = "Ångra"
+
+[messages.model-facing-undo-title]
+source = "Back to how the pack's models are turned"
+translation = "Tillbaka till hur paketets modeller är vridna"
+
 [messages.model-frame]
 source = "Frame"
 translation = "Rama in"
@@ -5891,6 +5931,10 @@ translation = "Bakgrund"
 [messages.model-group-camera]
 source = "Camera"
 translation = "Kamera"
+
+[messages.model-group-facing]
+source = "Facing"
+translation = "Riktning"
 
 [messages.model-group-shading]
 source = "Shading"

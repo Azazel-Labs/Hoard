@@ -75,6 +75,8 @@ export interface Asset {
   material?: MaterialInfo | null
   /** Materials made from texture maps that this texture is one of, or this model uses. */
   materials?: MaterialInfo[]
+  /** Detail view of a model only: how its pack's models are turned, when they are. */
+  facing?: Facing
 }
 
 /** A material made from texture maps that share a name (Rock_BaseColor.png, Rock_Normal.png, …). */
@@ -283,7 +285,19 @@ export interface Pack {
   archived_at?: string | null
   /** Assets of each kind in it. */
   kinds?: Partial<Record<AssetKind, number>>
+  /** How its models are turned to face forward and stand up. */
+  facing?: Facing
 }
+
+/** How a pack's models are turned, in quarter turns: `turn` counterclockwise seen from above, then `tilt`, the top
+ *  tipped toward the viewer (applied first). Thumbnails and the 3D viewer show them turned; downloads are as made. */
+export interface Facing {
+  turn: number
+  tilt: number
+}
+
+/** Facings set in this tab, by pack: a model opened again shows the new one before its record catches up. */
+export const packFacings = new Map<string, Facing>()
 
 export interface Facet { value: string; count: number }
 
@@ -956,6 +970,16 @@ export const api = {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ name }),
     }),
+  /** Turn every model in a pack; their thumbnails are drawn again. */
+  setPackFacing: async (id: string, facing: Facing) => {
+    const pack = await request<Pack>(`/api/packs/${id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ facing }),
+    })
+    packFacings.set(id, pack.facing ?? facing)
+    return pack
+  },
   retagPack: (id: string, body: { rules?: boolean; llm?: boolean }) =>
     request<void>(`/api/packs/${id}/retag`, {
       method: 'POST',

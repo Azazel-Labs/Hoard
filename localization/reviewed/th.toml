@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "d908dee70be58463293398f44b458c417ab4a595a2301ca075526df22168e1d1"
+source = "031ae9796de89847770a20e2fa79115c9c8ec9e3764ab428ee6f31e570c680bd"
 translation = "4b240abbf21b9e5a3573cb5600cede4f95b8fdc50ad26369cfcd10d567b19ce3"
 
 [messages.account-add]
@@ -5728,6 +5728,46 @@ translation = "ไฟล์ Collada ว่างเปล่า"
 source = "No browser loader for .{ $ext }"
 translation = "เบราว์เซอร์ไม่มีตัวโหลดสำหรับ .{ $ext }"
 
+[messages.model-facing-failed]
+source = "Couldn't turn the pack's models: { $error }"
+translation = "หมุนโมเดลของแพ็กไม่ได้: { $error }"
+
+[messages.model-facing-save]
+source = "Use for this pack"
+translation = "ใช้กับแพ็กนี้"
+
+[messages.model-facing-save-title]
+source = "Turn every model in { $pack } this way. Their thumbnails are drawn again; downloads stay as they were made."
+translation = "หมุนทุกโมเดลใน { $pack } แบบนี้ ภาพย่อจะถูกวาดใหม่ ส่วนไฟล์ดาวน์โหลดยังคงเหมือนตอนที่สร้างไว้"
+
+[messages.model-facing-saved]
+source = "Every model in { $pack } now faces this way. Their thumbnails are being drawn again."
+translation = "ตอนนี้ทุกโมเดลใน { $pack } หันไปทางนี้แล้ว กำลังวาดภาพย่อใหม่"
+
+[messages.model-facing-tip]
+source = "Tip a quarter"
+translation = "เอียง 90°"
+
+[messages.model-facing-tip-title]
+source = "Tip the model's top a quarter turn toward its front, to stand up one lying down"
+translation = "เอียงด้านบนของโมเดลไปทางด้านหน้า 90° เพื่อตั้งโมเดลที่นอนอยู่ให้ยืนขึ้น"
+
+[messages.model-facing-turn]
+source = "Turn a quarter"
+translation = "หมุน 90°"
+
+[messages.model-facing-turn-title]
+source = "Turn the model a quarter turn counterclockwise, seen from above"
+translation = "หมุนโมเดลทวนเข็มนาฬิกา 90° เมื่อมองจากด้านบน"
+
+[messages.model-facing-undo]
+source = "Undo"
+translation = "เลิกทำ"
+
+[messages.model-facing-undo-title]
+source = "Back to how the pack's models are turned"
+translation = "กลับไปเป็นการหมุนเดิมของโมเดลในแพ็ก"
+
 [messages.model-frame]
 source = "Frame"
 translation = "จัดกรอบ"
@@ -5767,6 +5807,10 @@ translation = "พื้นหลัง"
 [messages.model-group-camera]
 source = "Camera"
 translation = "กล้อง"
+
+[messages.model-group-facing]
+source = "Facing"
+translation = "ทิศทาง"
 
 [messages.model-group-shading]
 source = "Shading"

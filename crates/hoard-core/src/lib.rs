@@ -226,6 +226,9 @@ pub struct Asset {
     /// Materials made from texture maps that this texture is one of, or this model uses. Detail view only.
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub materials: Vec<MaterialInfo>,
+    /// For a model: how its pack's models are turned to be shown, when they are. Detail view only.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub facing: Option<Facing>,
 }
 
 /// One color of an asset's palette.
@@ -619,6 +622,45 @@ pub struct Pack {
     /// How many assets of each kind it holds (`model`, `texture`, …), for filtering the list of packs.
     #[serde(default)]
     pub kinds: std::collections::BTreeMap<String, u64>,
+    /// How its models are turned to be shown standing and facing forward.
+    #[serde(default)]
+    pub facing: Facing,
+}
+
+/// How a pack's models are turned to be shown standing up and facing forward, for files that don't say which way
+/// is up or front (OBJ, STL, PLY, 3DS, Collada), or say it wrongly: a tip about the side-to-side axis, then a turn
+/// about the up axis, each a multiple of 90 degrees. Thumbnails and the 3D viewer show the models turned; their
+/// files and downloads are left as they were made.
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Serialize, Deserialize)]
+pub struct Facing {
+    /// Degrees about the up axis, counterclockwise seen from above: 0, 90, 180 or 270.
+    #[serde(default)]
+    pub turn: i32,
+    /// Degrees about the side-to-side axis, the top tipping toward the viewer: 0, 90, 180 or 270.
+    #[serde(default)]
+    pub tilt: i32,
+}
+
+impl Facing {
+    /// Each angle brought to a quarter turn in 0..360 (rounded down).
+    pub fn new(turn: i64, tilt: i64) -> Self {
+        let quarter = |deg: i64| (deg.rem_euclid(360) / 90 * 90) as i32;
+        Self { turn: quarter(turn), tilt: quarter(tilt) }
+    }
+
+    /// Shown as made.
+    pub fn is_upright(self) -> bool {
+        self == Self::default()
+    }
+
+    /// The glTF rotation (`[x, y, z, w]`) that tips, then turns: the turn about Y times the tip about X.
+    pub fn quaternion(self) -> [f64; 4] {
+        let (sy, cy) = (f64::from(self.turn).to_radians() / 2.0).sin_cos();
+        let (sx, cx) = (f64::from(self.tilt).to_radians() / 2.0).sin_cos();
+        // Quarter turns' halves have sines and cosines of 0, ±½, ±√½ and ±1: rounding leaves no specks.
+        let snap = |v: f64| (v * 1e9).round() / 1e9 + 0.0;
+        [snap(cy * sx), snap(cx * sy), snap(-sy * sx), snap(cy * cx)]
+    }
 }
 
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
@@ -872,5 +914,35 @@ mod tests {
         assert_eq!(normalize_tag("Genre: Lo Fi"), Some("genre:lo-fi".into()));
         assert_eq!(normalize_tag("sfx/explosion"), Some("sfx/explosion".into()));
         assert_eq!(normalize_tag(":"), None);
+    }
+
+    /// Rotate `point` by the unit quaternion `[x, y, z, w]`: p + 2w(q×p) + 2q×(q×p).
+    fn rotate(quat: [f64; 4], point: [f64; 3]) -> [f64; 3] {
+        let cross = |a: [f64; 3], b: [f64; 3]| {
+            [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]]
+        };
+        let axis = [quat[0], quat[1], quat[2]];
+        let once = cross(axis, point);
+        let twice = cross(axis, once);
+        let rotated: [f64; 3] = std::array::from_fn(|i| point[i] + 2.0 * (quat[3] * once[i] + twice[i]));
+        rotated.map(|c| (c * 1e6).round() / 1e6 + 0.0)
+    }
+
+    #[test]
+    fn facing_snaps_to_quarter_turns_and_turns_as_described() {
+        assert_eq!(Facing::new(-90, 450), Facing { turn: 270, tilt: 90 });
+        assert_eq!(Facing::new(100, 0), Facing { turn: 90, tilt: 0 });
+        assert!(Facing::new(360, -360).is_upright());
+        assert_eq!(Facing::default().quaternion(), [0.0, 0.0, 0.0, 1.0]);
+        // Turning half way round faces a model's back to the viewer.
+        assert_eq!(Facing::new(180, 0).quaternion(), [0.0, 1.0, 0.0, 0.0]);
+        // A quarter turn counterclockwise seen from above takes the front (+Z) to the right (+X).
+        assert_eq!(rotate(Facing::new(90, 0).quaternion(), [0.0, 0.0, 1.0]), [1.0, 0.0, 0.0]);
+        // Tipping a quarter brings the top (+Y) toward the viewer (+Z).
+        assert_eq!(rotate(Facing::new(0, 90).quaternion(), [0.0, 1.0, 0.0]), [0.0, 0.0, 1.0]);
+        // A model lying with its top toward the viewer stands up tipped three quarters.
+        assert_eq!(rotate(Facing::new(0, 270).quaternion(), [0.0, 0.0, 1.0]), [0.0, 1.0, 0.0]);
+        // Tipped, then turned: the tip happens first, in the model's own frame.
+        assert_eq!(rotate(Facing::new(90, 90).quaternion(), [0.0, 1.0, 0.0]), [1.0, 0.0, 0.0]);
     }
 }

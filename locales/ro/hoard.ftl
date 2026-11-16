@@ -1832,6 +1832,17 @@ model-missing-count =
        *[other] { $count } de texturi negăsite
     }
 model-guessed = Texturi potrivite după nume; fișierul nu numește niciuna.
+model-group-facing = Orientare
+model-facing-turn = Rotire cu un sfert
+model-facing-turn-title = Rotiți modelul cu un sfert de tură în sens antiorar, privit de sus
+model-facing-tip = Înclinare cu un sfert
+model-facing-tip-title = Înclinați partea de sus a modelului cu un sfert de tură spre față, pentru a ridica în picioare un model culcat
+model-facing-save = Aplicare la pachet
+model-facing-save-title = Rotiți astfel toate modelele din { $pack }. Miniaturile lor sunt desenate din nou; descărcările rămân cum au fost făcute.
+model-facing-undo = Anulați
+model-facing-undo-title = Înapoi la felul în care sunt rotite modelele pachetului
+model-facing-saved = Toate modelele din { $pack } sunt acum orientate așa. Miniaturile lor sunt desenate din nou.
+model-facing-failed = Modelele pachetului nu au putut fi rotite: { $error }
 model-keys-mouse = Trageți pentru orbitare · trageți cu clic dreapta pentru deplasare · derulați pentru zoom · dublu clic pentru încadrare
 model-key-frame = încadrare
 model-key-reset = resetare

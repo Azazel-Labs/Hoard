@@ -908,11 +908,15 @@ pub(crate) fn ingest_pack(state: &AppState, rt: &Handle, pack_id: &str, auto_nam
 
     // All that's kept of a file once its batch is written: its references, to link up at the end.
     let mut refs = HashMap::new();
+    let facing = db::pack_facing(&conn, pack_id)?;
     let left_out = pipeline(
         pack_id,
         &jobs,
         |(_, rel)| rel,
-        |(local, rel)| analyze_one(local.clone(), &root, rel.clone(), None).with_context(|| rel.clone()),
+        |(local, rel)| {
+            crate::meshes::facing(facing, || analyze_one(local.clone(), &root, rel.clone(), None))
+                .with_context(|| rel.clone())
+        },
         |mut batch, done| {
             for it in &mut batch {
                 apply_pack_rules(it, &sets, license);
@@ -1000,6 +1004,24 @@ pub(crate) fn finish_rules_stage(
 /// Re-run the offline tagger over an existing pack (after vocabulary improvements, say).
 /// Replaces `rule`/`meta` tags; leaves `human` and `llm` tags alone. Like ingest, it works a batch at a time:
 /// each file is fetched, analyzed, written and deleted again before the queue moves far past it.
+/// Fetch the files a model depends on (its MTL, its textures, its buffers) into `dir`, at their places in the pack.
+fn fetch_dependencies(state: &AppState, rt: &Handle, id: &str, dir: &Path) -> Result<()> {
+    let deps = {
+        let conn = state.pool.get()?;
+        let ids = db::dependency_closure(&conn, id, false)?;
+        db::bundle_files(&conn, &ids)?
+    };
+    for f in deps.iter().filter(|f| f.id != id) {
+        let Some(p) = safe_rel_path(&f.path) else { continue };
+        let dest = dir.join(p);
+        if let Some(parent) = dest.parent() {
+            fs::create_dir_all(parent)?;
+        }
+        rt.block_on(state.blobs.download_to(&f.hash, &dest)).with_context(|| f.path.clone())?;
+    }
+    Ok(())
+}
+
 pub(crate) fn retag_pack(state: &AppState, rt: &Handle, pack_id: &str) -> Result<()> {
     struct Row {
         id: String,
@@ -1009,8 +1031,10 @@ pub(crate) fn retag_pack(state: &AppState, rt: &Handle, pack_id: &str) -> Result
         kind: String,
     }
     let mut conn = state.pool.get()?;
-    // A watched pack's files are read from its folder; they're never copied in.
-    let watched = crate::locations::watched_root(&conn, pack_id)?.is_some();
+    // A watched pack's files are read from its folder; they're never copied in. Models are drawn turned as the
+    // pack's are.
+    let (watched, facing) =
+        (crate::locations::watched_root(&conn, pack_id)?.is_some(), db::pack_facing(&conn, pack_id)?);
     let rows: Vec<Row> = {
         let mut stmt = conn.prepare(&format!(
             "SELECT id, path, blob_hash, human_edited, kind FROM assets a WHERE pack_id = ?1 AND NOT {} AND NOT {}
@@ -1064,26 +1088,15 @@ pub(crate) fn retag_pack(state: &AppState, rt: &Handle, pack_id: &str) -> Result
             let rel = safe_rel_path(&r.rel).with_context(|| format!("unsafe path in pack: {}", r.rel))?;
             let local = dir.join(&rel);
             if matches!(ext_of(&r.rel).as_str(), "obj" | "fbx" | "gltf") {
-                let deps = {
-                    let conn = state.pool.get()?;
-                    let ids = db::dependency_closure(&conn, &r.id, false)?;
-                    db::bundle_files(&conn, &ids)?
-                };
-                for f in deps.iter().filter(|f| f.id != r.id) {
-                    let Some(p) = safe_rel_path(&f.path) else { continue };
-                    let dest = dir.join(p);
-                    if let Some(parent) = dest.parent() {
-                        fs::create_dir_all(parent)?;
-                    }
-                    rt.block_on(state.blobs.download_to(&f.hash, &dest)).with_context(|| f.path.clone())?;
-                }
+                fetch_dependencies(state, rt, &r.id, &dir)?;
             }
             if let Some(parent) = local.parent() {
                 fs::create_dir_all(parent)?;
             }
             rt.block_on(state.blobs.download_to(&r.hash, &local)).with_context(|| r.rel.clone())?;
             let blob = StoredBlob { hash: r.hash.clone(), size: fs::metadata(&local)?.len() };
-            let mut item = analyze_one(local, &dir, r.rel.clone(), Some(blob)).with_context(|| r.rel.clone())?;
+            let mut item = crate::meshes::facing(facing, || analyze_one(local, &dir, r.rel.clone(), Some(blob)))
+                .with_context(|| r.rel.clone())?;
             if let Some(o) = origins.get(&r.id) {
                 carry_origin(&mut item, o);
             }

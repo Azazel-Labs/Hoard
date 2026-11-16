@@ -398,6 +398,12 @@ the new name instead. "Allow the old name again" undoes that.
 **Renaming packs.** More → Rename on the packs page. Filters, links and collections refer to a pack by its id and
 rescans match it by its folder, so only the name you see changes.
 
+**Turning a pack's models.** OBJ, STL, PLY, 3DS and Collada files don't say which way is forward, and some don't say
+which way is up, so a pack's models can come in facing away or lying down. In the 3D viewer, Facing → Turn a quarter
+spins the model about its up axis and Tip a quarter tips its top toward its front; Use for this pack turns every
+model in the pack that way. Their thumbnails are drawn again (ones a browser drew too) and the 3D viewer shows them
+turned. Downloads stay as they were made.
+
 **Finding packs.** The packs page searches names, stores, licenses, descriptions and tags (every word has to
 match), filters by what a pack holds, its status and its store, and sorts by date, name, size or asset count.
 
@@ -1060,7 +1066,7 @@ browser session's changes must also carry an `X-Hoard` header, which pages on ot
 | GET | `/api/packs` | all packs |
 | POST 🔒 | `/api/packs` | upload a pack in one request (multipart) |
 | GET | `/api/packs/{id}` | one pack and its status |
-| PATCH 🔒 | `/api/packs/{id}` | rename it (`{name}`) |
+| PATCH 🔒 | `/api/packs/{id}` | rename it (`{name}`), turn its models (`{facing: {turn, tilt}}`, quarter turns in degrees) |
 | DELETE 🔒 | `/api/packs/{id}` | delete it (blobs go at the next `gc`); admins only |
 | POST 🔒 | `/api/packs/{id}/retag` | run the tagger again |
 | POST 🔒 | `/api/packs/{id}/read-files` | read the pack's store files again (name, tags, description) |

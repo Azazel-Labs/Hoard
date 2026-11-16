@@ -3,9 +3,11 @@
 // answer "what is this model made of" (wireframe, textures off, lighting without the environment, a floor grid),
 // against different backgrounds, with its clips. A menu on the left shows it other ways: plainly lit, one map at a
 // time, as clay, with a UV checker or each mesh in its own color, and the scene's counts and size. Textures come as
-// light previews (at most 2048 px) unless "Full-resolution textures" is on.
+// light previews (at most 2048 px) unless "Full-resolution textures" is on. Someone who may edit can turn the model
+// to face forward and stand up, and have every model in its pack turned that way.
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
-import type { Asset } from '../api'
+import { api, type Asset, type Facing } from '../api'
+import { mayEdit } from '../auth'
 import { formatNumber, t } from '../i18n'
 // Types only: the scene (and three.js with it) loads once the dialog is open, so it shows straight away.
 import type { Background, MapMode, ModelStage, SceneStats, StageInfo, ViewMode } from '../modelStage'
@@ -58,6 +60,14 @@ const fullTextures = ref(false)
 const mode = ref<ViewMode>('final')
 const stats = ref<SceneStats | null>(null)
 const showInfo = ref(false)
+/** How the model is turned on screen, and how its pack's models are. */
+const facing = ref<Facing>({ turn: 0, tilt: 0 })
+const packFacing = ref<Facing>({ turn: 0, tilt: 0 })
+const facingChanged = computed(
+  () => facing.value.turn !== packFacing.value.turn || facing.value.tilt !== packFacing.value.tilt,
+)
+const savingFacing = ref(false)
+const facingNote = ref('')
 // Folded away on a narrow screen, where it would cover the model.
 const menuOpen = ref(!matchMedia('(max-width: 700px)').matches)
 let stage: ModelStage | null = null
@@ -111,6 +121,8 @@ async function open() {
     if (stage !== s) return
     info.value = i
     missing.value = i.missing
+    if (again && facingChanged.value) s.setFacing(facing.value)
+    else facing.value = packFacing.value = i.facing
     count()
     void s.texturesSettled().then(count)
     if (!available(mode.value)) mode.value = 'final'
@@ -170,6 +182,39 @@ function closeInfo() {
 
 function pickMode(m: ViewMode) {
   if (available(m)) mode.value = m
+}
+
+/** Try another facing: a quarter turn about the up axis, or the top tipped a quarter toward the front. */
+function turnBy(turn: number, tilt: number) {
+  facing.value = { turn: (facing.value.turn + turn) % 360, tilt: (facing.value.tilt + tilt) % 360 }
+  facingNote.value = ''
+  showFacing()
+}
+
+/** Turn the model on screen as `facing` says; its height, length and width change with it. */
+function showFacing() {
+  if (!stage) return
+  stage.setFacing(facing.value)
+  stats.value = stage.sceneStats()
+}
+
+function undoFacing() {
+  facing.value = { ...packFacing.value }
+  facingNote.value = ''
+  showFacing()
+}
+
+async function saveFacing() {
+  savingFacing.value = true
+  try {
+    const pack = await api.setPackFacing(props.asset.pack_id, facing.value)
+    packFacing.value = { ...(pack.facing ?? facing.value) }
+    facingNote.value = t('model-facing-saved', { pack: props.asset.pack_name })
+  } catch (e) {
+    facingNote.value = t('model-facing-failed', { error: (e as Error).message })
+  } finally {
+    savingFacing.value = false
+  }
 }
 
 const cycleBg = () => (bg.value = BACKGROUNDS[(BACKGROUNDS.indexOf(bg.value) + 1) % BACKGROUNDS.length])
@@ -313,6 +358,29 @@ function onKey(e: KeyboardEvent) {
               <span>{{ t('model-info') }}</span><kbd aria-hidden="true">I</kbd>
             </button>
           </div>
+          <div v-if="mayEdit()" class="section" role="group" :aria-label="t('model-group-facing')">
+            <span class="label" aria-hidden="true">{{ t('model-group-facing') }}</span>
+            <button type="button" :title="t('model-facing-turn-title')" @click="turnBy(90, 0)">
+              <span>{{ t('model-facing-turn') }}</span>
+            </button>
+            <button type="button" :title="t('model-facing-tip-title')" @click="turnBy(0, 90)">
+              <span>{{ t('model-facing-tip') }}</span>
+            </button>
+            <template v-if="facingChanged">
+              <button
+                type="button"
+                class="save"
+                :title="t('model-facing-save-title', { pack: asset.pack_name })"
+                :disabled="savingFacing"
+                @click="saveFacing"
+              >
+                <span>{{ t('model-facing-save') }}</span>
+              </button>
+              <button type="button" :title="t('model-facing-undo-title')" @click="undoFacing">
+                <span>{{ t('model-facing-undo') }}</span>
+              </button>
+            </template>
+          </div>
         </template>
       </nav>
       <section v-if="status === 'ready' && showInfo && stats" class="scene-info" aria-labelledby="scene-info-title">
@@ -338,7 +406,8 @@ function onKey(e: KeyboardEvent) {
       <p v-if="status === 'viewer'" class="msg">{{ t('model-loading-viewer') }}</p>
       <p v-else-if="status === 'loading'" class="msg">{{ t('model-loading') }}</p>
       <p v-else-if="status === 'error'" class="msg err">{{ t('model-show-failed', { error }) }}</p>
-      <p v-if="missing.length" class="note" :title="missing.join('\n')">
+      <p v-if="facingNote" class="note" role="status">{{ facingNote }}</p>
+      <p v-else-if="missing.length" class="note" :title="missing.join('\n')">
         {{
           missing.length === 1
             ? t('model-missing-one', { name: missing[0] })
@@ -391,6 +460,7 @@ function onKey(e: KeyboardEvent) {
   background: var(--k-model); vertical-align: 0.1em;
 }
 .modes .fold { color: var(--text); font-weight: 600; }
+.modes .save { color: var(--text); font-weight: 600; }
 .modes kbd { color: var(--faint); font-size: 0.68rem; line-height: 1.3; }
 .section { display: flex; flex-direction: column; gap: 1px; padding-top: 0.3rem; margin-top: 0.3rem; border-top: 1px solid var(--line); }
 .label { padding: 0 0.5rem 0.15rem; color: var(--faint); font-size: 0.68rem; letter-spacing: 0.04em; text-transform: uppercase; }

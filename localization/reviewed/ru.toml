@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "d908dee70be58463293398f44b458c417ab4a595a2301ca075526df22168e1d1"
+source = "031ae9796de89847770a20e2fa79115c9c8ec9e3764ab428ee6f31e570c680bd"
 translation = "95443a48d777d86011fe11040c214e6d115790b94418d4e3ec20dd07fca486c8"
 
 [messages.account-add]
@@ -5960,6 +5960,46 @@ translation = "пустой файл Collada"
 source = "No browser loader for .{ $ext }"
 translation = "Браузер не умеет загружать .{ $ext }"
 
+[messages.model-facing-failed]
+source = "Couldn't turn the pack's models: { $error }"
+translation = "Не удалось повернуть модели пака: { $error }"
+
+[messages.model-facing-save]
+source = "Use for this pack"
+translation = "Применить к паку"
+
+[messages.model-facing-save-title]
+source = "Turn every model in { $pack } this way. Their thumbnails are drawn again; downloads stay as they were made."
+translation = "Повернуть так все модели в паке { $pack }. Их миниатюры будут перерисованы; загрузки останутся такими, какими были созданы."
+
+[messages.model-facing-saved]
+source = "Every model in { $pack } now faces this way. Their thumbnails are being drawn again."
+translation = "Все модели в паке { $pack } теперь повёрнуты так. Их миниатюры перерисовываются."
+
+[messages.model-facing-tip]
+source = "Tip a quarter"
+translation = "Наклонить на четверть"
+
+[messages.model-facing-tip-title]
+source = "Tip the model's top a quarter turn toward its front, to stand up one lying down"
+translation = "Наклонить верх модели на четверть оборота вперёд, чтобы поставить лежащую модель"
+
+[messages.model-facing-turn]
+source = "Turn a quarter"
+translation = "Повернуть на четверть"
+
+[messages.model-facing-turn-title]
+source = "Turn the model a quarter turn counterclockwise, seen from above"
+translation = "Повернуть модель на четверть оборота против часовой стрелки, если смотреть сверху"
+
+[messages.model-facing-undo]
+source = "Undo"
+translation = "Отменить"
+
+[messages.model-facing-undo-title]
+source = "Back to how the pack's models are turned"
+translation = "Вернуться к тому, как повёрнуты модели пака"
+
 [messages.model-frame]
 source = "Frame"
 translation = "Вписать"
@@ -5999,6 +6039,10 @@ translation = "Фон"
 [messages.model-group-camera]
 source = "Camera"
 translation = "Камера"
+
+[messages.model-group-facing]
+source = "Facing"
+translation = "Ориентация"
 
 [messages.model-group-shading]
 source = "Shading"

@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "d908dee70be58463293398f44b458c417ab4a595a2301ca075526df22168e1d1"
+source = "031ae9796de89847770a20e2fa79115c9c8ec9e3764ab428ee6f31e570c680bd"
 translation = "c88ccd005fc6325aa6e221408cf6717fbfee2dabbc4de8cac4e99bd7fe8f0b6e"
 
 [messages.account-add]
@@ -5852,6 +5852,46 @@ translation = "leere Collada-Datei"
 source = "No browser loader for .{ $ext }"
 translation = "Kein Browser-Loader für .{ $ext }"
 
+[messages.model-facing-failed]
+source = "Couldn't turn the pack's models: { $error }"
+translation = "Die Modelle des Pakets konnten nicht gedreht werden: { $error }"
+
+[messages.model-facing-save]
+source = "Use for this pack"
+translation = "Auf Paket anwenden"
+
+[messages.model-facing-save-title]
+source = "Turn every model in { $pack } this way. Their thumbnails are drawn again; downloads stay as they were made."
+translation = "Alle Modelle in { $pack } so drehen. Ihre Vorschaubilder werden neu gezeichnet; Downloads bleiben, wie sie erstellt wurden."
+
+[messages.model-facing-saved]
+source = "Every model in { $pack } now faces this way. Their thumbnails are being drawn again."
+translation = "Alle Modelle in { $pack } sind jetzt so ausgerichtet. Ihre Vorschaubilder werden neu gezeichnet."
+
+[messages.model-facing-tip]
+source = "Tip a quarter"
+translation = "Viertel kippen"
+
+[messages.model-facing-tip-title]
+source = "Tip the model's top a quarter turn toward its front, to stand up one lying down"
+translation = "Die Oberseite des Modells eine Vierteldrehung nach vorn kippen, um ein liegendes Modell aufzustellen"
+
+[messages.model-facing-turn]
+source = "Turn a quarter"
+translation = "Viertel drehen"
+
+[messages.model-facing-turn-title]
+source = "Turn the model a quarter turn counterclockwise, seen from above"
+translation = "Das Modell, von oben gesehen, eine Vierteldrehung gegen den Uhrzeigersinn drehen"
+
+[messages.model-facing-undo]
+source = "Undo"
+translation = "Rückgängig"
+
+[messages.model-facing-undo-title]
+source = "Back to how the pack's models are turned"
+translation = "Zurück zur bisherigen Ausrichtung der Modelle des Pakets"
+
 [messages.model-frame]
 source = "Frame"
 translation = "Einpassen"
@@ -5891,6 +5931,10 @@ translation = "Hintergrund"
 [messages.model-group-camera]
 source = "Camera"
 translation = "Kamera"
+
+[messages.model-group-facing]
+source = "Facing"
+translation = "Ausrichtung"
 
 [messages.model-group-shading]
 source = "Shading"

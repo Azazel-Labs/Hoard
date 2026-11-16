@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "d908dee70be58463293398f44b458c417ab4a595a2301ca075526df22168e1d1"
+source = "031ae9796de89847770a20e2fa79115c9c8ec9e3764ab428ee6f31e570c680bd"
 translation = "59247f4fd3e0712c726e47580a3cc9e4e63dfcef4ff7b34a653c6b6a2a4ee38c"
 
 [messages.account-add]
@@ -5742,6 +5742,46 @@ translation = "boş Collada dosyası"
 source = "No browser loader for .{ $ext }"
 translation = ".{ $ext } için tarayıcıda yükleyici yok"
 
+[messages.model-facing-failed]
+source = "Couldn't turn the pack's models: { $error }"
+translation = "Paketin modelleri döndürülemedi: { $error }"
+
+[messages.model-facing-save]
+source = "Use for this pack"
+translation = "Bu pakette kullan"
+
+[messages.model-facing-save-title]
+source = "Turn every model in { $pack } this way. Their thumbnails are drawn again; downloads stay as they were made."
+translation = "{ $pack } paketindeki tüm modelleri böyle döndür. Küçük resimleri yeniden çizilir; indirmeler oluşturuldukları gibi kalır."
+
+[messages.model-facing-saved]
+source = "Every model in { $pack } now faces this way. Their thumbnails are being drawn again."
+translation = "{ $pack } paketindeki tüm modeller artık bu yöne bakıyor. Küçük resimleri yeniden çiziliyor."
+
+[messages.model-facing-tip]
+source = "Tip a quarter"
+translation = "Çeyrek eğ"
+
+[messages.model-facing-tip-title]
+source = "Tip the model's top a quarter turn toward its front, to stand up one lying down"
+translation = "Yatan bir modeli ayağa kaldırmak için modelin üstünü önüne doğru çeyrek tur eğ"
+
+[messages.model-facing-turn]
+source = "Turn a quarter"
+translation = "Çeyrek döndür"
+
+[messages.model-facing-turn-title]
+source = "Turn the model a quarter turn counterclockwise, seen from above"
+translation = "Modeli yukarıdan bakıldığında saat yönünün tersine çeyrek tur döndür"
+
+[messages.model-facing-undo]
+source = "Undo"
+translation = "Geri al"
+
+[messages.model-facing-undo-title]
+source = "Back to how the pack's models are turned"
+translation = "Paketin modellerinin döndürülme biçimine geri dön"
+
 [messages.model-frame]
 source = "Frame"
 translation = "Çerçevele"
@@ -5781,6 +5821,10 @@ translation = "Arka plan"
 [messages.model-group-camera]
 source = "Camera"
 translation = "Kamera"
+
+[messages.model-group-facing]
+source = "Facing"
+translation = "Yön"
 
 [messages.model-group-shading]
 source = "Shading"

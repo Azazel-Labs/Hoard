@@ -1880,6 +1880,18 @@ model-missing-some = { $count } textures not found: { $names }
 model-missing-more = { $count } textures not found: { $names }…
 model-missing-count = { $count } textures not found
 model-guessed = Textures matched by name; the file names none.
+# Turning a model to face forward and stand up, for every model in its pack (left menu of the 3D viewer).
+model-group-facing = Facing
+model-facing-turn = Turn a quarter
+model-facing-turn-title = Turn the model a quarter turn counterclockwise, seen from above
+model-facing-tip = Tip a quarter
+model-facing-tip-title = Tip the model's top a quarter turn toward its front, to stand up one lying down
+model-facing-save = Use for this pack
+model-facing-save-title = Turn every model in { $pack } this way. Their thumbnails are drawn again; downloads stay as they were made.
+model-facing-undo = Undo
+model-facing-undo-title = Back to how the pack's models are turned
+model-facing-saved = Every model in { $pack } now faces this way. Their thumbnails are being drawn again.
+model-facing-failed = Couldn't turn the pack's models: { $error }
 # The full-screen viewer's key help along the bottom; the words after each key.
 model-keys-mouse = Drag to orbit · right-drag to pan · scroll to zoom · double-click to frame
 model-key-frame = frame

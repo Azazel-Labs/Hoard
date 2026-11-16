@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "d908dee70be58463293398f44b458c417ab4a595a2301ca075526df22168e1d1"
+source = "031ae9796de89847770a20e2fa79115c9c8ec9e3764ab428ee6f31e570c680bd"
 translation = "259239ab239601949cc6a70972021dcb09218f2bed3d1964197e9079006c5785"
 
 [messages.account-add]
@@ -5872,6 +5872,46 @@ translation = "tyhjä Collada-tiedosto"
 source = "No browser loader for .{ $ext }"
 translation = ".{ $ext }-tiedostoille ei ole selaimen lataajaa"
 
+[messages.model-facing-failed]
+source = "Couldn't turn the pack's models: { $error }"
+translation = "Paketin mallien kääntäminen epäonnistui: { $error }"
+
+[messages.model-facing-save]
+source = "Use for this pack"
+translation = "Käytä koko paketissa"
+
+[messages.model-facing-save-title]
+source = "Turn every model in { $pack } this way. Their thumbnails are drawn again; downloads stay as they were made."
+translation = "Käännä näin kaikki paketin { $pack } mallit. Niiden pikkukuvat piirretään uudelleen; lataukset pysyvät sellaisina kuin ne tehtiin."
+
+[messages.model-facing-saved]
+source = "Every model in { $pack } now faces this way. Their thumbnails are being drawn again."
+translation = "Kaikki paketin { $pack } mallit ovat nyt tässä asennossa. Niiden pikkukuvia piirretään uudelleen."
+
+[messages.model-facing-tip]
+source = "Tip a quarter"
+translation = "Kallista neljännes"
+
+[messages.model-facing-tip-title]
+source = "Tip the model's top a quarter turn toward its front, to stand up one lying down"
+translation = "Kallista mallin yläosaa neljänneskierros eteenpäin, jotta makaava malli nousee pystyyn"
+
+[messages.model-facing-turn]
+source = "Turn a quarter"
+translation = "Käännä neljännes"
+
+[messages.model-facing-turn-title]
+source = "Turn the model a quarter turn counterclockwise, seen from above"
+translation = "Käännä mallia neljänneskierros vastapäivään ylhäältä katsottuna"
+
+[messages.model-facing-undo]
+source = "Undo"
+translation = "Kumoa"
+
+[messages.model-facing-undo-title]
+source = "Back to how the pack's models are turned"
+translation = "Takaisin siihen, miten paketin mallit on käännetty"
+
 [messages.model-frame]
 source = "Frame"
 translation = "Rajaa"
@@ -5911,6 +5951,10 @@ translation = "Tausta"
 [messages.model-group-camera]
 source = "Camera"
 translation = "Kamera"
+
+[messages.model-group-facing]
+source = "Facing"
+translation = "Suunta"
 
 [messages.model-group-shading]
 source = "Shading"

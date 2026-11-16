@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "d908dee70be58463293398f44b458c417ab4a595a2301ca075526df22168e1d1"
+source = "031ae9796de89847770a20e2fa79115c9c8ec9e3764ab428ee6f31e570c680bd"
 translation = "863d09bc1e828f14f8cf00c118caee84558c0ecf852401afe0ac271a50ad1d87"
 
 [messages.account-add]
@@ -5852,6 +5852,46 @@ translation = "tom Collada-fil"
 source = "No browser loader for .{ $ext }"
 translation = "Ingen browserindlæser til .{ $ext }"
 
+[messages.model-facing-failed]
+source = "Couldn't turn the pack's models: { $error }"
+translation = "Kunne ikke dreje pakkens modeller: { $error }"
+
+[messages.model-facing-save]
+source = "Use for this pack"
+translation = "Brug til pakken"
+
+[messages.model-facing-save-title]
+source = "Turn every model in { $pack } this way. Their thumbnails are drawn again; downloads stay as they were made."
+translation = "Drej alle modeller i { $pack } sådan. Deres miniaturer tegnes igen; downloads forbliver, som de blev lavet."
+
+[messages.model-facing-saved]
+source = "Every model in { $pack } now faces this way. Their thumbnails are being drawn again."
+translation = "Alle modeller i { $pack } vender nu sådan. Deres miniaturer tegnes igen."
+
+[messages.model-facing-tip]
+source = "Tip a quarter"
+translation = "Vip en kvart"
+
+[messages.model-facing-tip-title]
+source = "Tip the model's top a quarter turn toward its front, to stand up one lying down"
+translation = "Vip modellens top en kvart omgang frem, så en liggende model kommer til at stå op"
+
+[messages.model-facing-turn]
+source = "Turn a quarter"
+translation = "Drej en kvart"
+
+[messages.model-facing-turn-title]
+source = "Turn the model a quarter turn counterclockwise, seen from above"
+translation = "Drej modellen en kvart omgang mod uret, set oppefra"
+
+[messages.model-facing-undo]
+source = "Undo"
+translation = "Fortryd"
+
+[messages.model-facing-undo-title]
+source = "Back to how the pack's models are turned"
+translation = "Tilbage til, hvordan pakkens modeller er drejet"
+
 [messages.model-frame]
 source = "Frame"
 translation = "Indram"
@@ -5891,6 +5931,10 @@ translation = "Baggrund"
 [messages.model-group-camera]
 source = "Camera"
 translation = "Kamera"
+
+[messages.model-group-facing]
+source = "Facing"
+translation = "Retning"
 
 [messages.model-group-shading]
 source = "Shading"

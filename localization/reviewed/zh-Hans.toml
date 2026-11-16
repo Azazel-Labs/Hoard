@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "d908dee70be58463293398f44b458c417ab4a595a2301ca075526df22168e1d1"
+source = "031ae9796de89847770a20e2fa79115c9c8ec9e3764ab428ee6f31e570c680bd"
 translation = "081091cee166500a8e077d0cbf615782270fdd54d17e6a1da8ca8892c18792ea"
 
 [messages.account-add]
@@ -5742,6 +5742,46 @@ translation = "Collada 文件为空"
 source = "No browser loader for .{ $ext }"
 translation = "浏览器没有 .{ $ext } 的加载器"
 
+[messages.model-facing-failed]
+source = "Couldn't turn the pack's models: { $error }"
+translation = "无法旋转资源包的模型：{ $error }"
+
+[messages.model-facing-save]
+source = "Use for this pack"
+translation = "用于此资源包"
+
+[messages.model-facing-save-title]
+source = "Turn every model in { $pack } this way. Their thumbnails are drawn again; downloads stay as they were made."
+translation = "将 { $pack } 中的所有模型都这样旋转。它们的缩略图会重新绘制；下载内容保持生成时的样子。"
+
+[messages.model-facing-saved]
+source = "Every model in { $pack } now faces this way. Their thumbnails are being drawn again."
+translation = "{ $pack } 中的所有模型现在都是这个朝向。正在重新绘制它们的缩略图。"
+
+[messages.model-facing-tip]
+source = "Tip a quarter"
+translation = "前倾 90°"
+
+[messages.model-facing-tip-title]
+source = "Tip the model's top a quarter turn toward its front, to stand up one lying down"
+translation = "将模型顶部向前倾倒 90°，让躺着的模型立起来"
+
+[messages.model-facing-turn]
+source = "Turn a quarter"
+translation = "旋转 90°"
+
+[messages.model-facing-turn-title]
+source = "Turn the model a quarter turn counterclockwise, seen from above"
+translation = "从上方看，将模型逆时针旋转 90°"
+
+[messages.model-facing-undo]
+source = "Undo"
+translation = "撤销"
+
+[messages.model-facing-undo-title]
+source = "Back to how the pack's models are turned"
+translation = "恢复资源包中模型原来的朝向"
+
 [messages.model-frame]
 source = "Frame"
 translation = "框选"
@@ -5781,6 +5821,10 @@ translation = "背景"
 [messages.model-group-camera]
 source = "Camera"
 translation = "相机"
+
+[messages.model-group-facing]
+source = "Facing"
+translation = "朝向"
 
 [messages.model-group-shading]
 source = "Shading"

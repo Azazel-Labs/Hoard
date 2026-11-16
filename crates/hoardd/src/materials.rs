@@ -562,8 +562,13 @@ fn name_from_sidecars(sidecars: &[Sidecar], found: &mut [Found]) {
 
 /// Find the pack's materials and bring the library in line: new ones added, changed ones updated (keeping their
 /// id, tags people gave them and collections), ones whose maps are gone removed; then the thumbnails of models that
-/// wear one redrawn with it on. Returns how many materials it has.
+/// wear one redrawn with it on, turned as the pack's models are. Returns how many materials it has.
 pub(crate) fn detect_pack(state: &AppState, rt: &Handle, conn: &mut Connection, pack_id: &str) -> Result<usize> {
+    let facing = db::pack_facing(conn, pack_id)?;
+    crate::meshes::facing(facing, || detect_turned(state, rt, conn, pack_id))
+}
+
+fn detect_turned(state: &AppState, rt: &Handle, conn: &mut Connection, pack_id: &str) -> Result<usize> {
     // First, so materials take their color map's AI tags.
     if let Err(e) = crate::provenance::backfill(state, rt, conn, pack_id) {
         tracing::warn!(pack = pack_id, error = %format!("{e:#}"), "could not read images' provenance");

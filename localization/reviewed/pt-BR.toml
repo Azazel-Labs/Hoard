@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "d908dee70be58463293398f44b458c417ab4a595a2301ca075526df22168e1d1"
+source = "031ae9796de89847770a20e2fa79115c9c8ec9e3764ab428ee6f31e570c680bd"
 translation = "d8d9875506f46c0ba1aa2df698fbfea92f9ccdcbbe2e18cd3d9fe53664c2a9b6"
 
 [messages.account-add]
@@ -5855,6 +5855,46 @@ translation = "arquivo Collada vazio"
 source = "No browser loader for .{ $ext }"
 translation = "Não há carregador no navegador para .{ $ext }"
 
+[messages.model-facing-failed]
+source = "Couldn't turn the pack's models: { $error }"
+translation = "Não foi possível girar os modelos do pacote: { $error }"
+
+[messages.model-facing-save]
+source = "Use for this pack"
+translation = "Usar neste pacote"
+
+[messages.model-facing-save-title]
+source = "Turn every model in { $pack } this way. Their thumbnails are drawn again; downloads stay as they were made."
+translation = "Girar assim todos os modelos de { $pack }. As miniaturas deles são desenhadas de novo; os downloads ficam como foram feitos."
+
+[messages.model-facing-saved]
+source = "Every model in { $pack } now faces this way. Their thumbnails are being drawn again."
+translation = "Todos os modelos de { $pack } agora estão virados assim. As miniaturas deles estão sendo desenhadas de novo."
+
+[messages.model-facing-tip]
+source = "Tip a quarter"
+translation = "Inclinar um quarto"
+
+[messages.model-facing-tip-title]
+source = "Tip the model's top a quarter turn toward its front, to stand up one lying down"
+translation = "Inclinar o topo do modelo um quarto de volta para a frente, para pôr de pé um modelo deitado"
+
+[messages.model-facing-turn]
+source = "Turn a quarter"
+translation = "Girar um quarto"
+
+[messages.model-facing-turn-title]
+source = "Turn the model a quarter turn counterclockwise, seen from above"
+translation = "Girar o modelo um quarto de volta no sentido anti-horário, visto de cima"
+
+[messages.model-facing-undo]
+source = "Undo"
+translation = "Desfazer"
+
+[messages.model-facing-undo-title]
+source = "Back to how the pack's models are turned"
+translation = "Voltar a como os modelos do pacote estão girados"
+
 [messages.model-frame]
 source = "Frame"
 translation = "Enquadrar"
@@ -5894,6 +5934,10 @@ translation = "Fundo"
 [messages.model-group-camera]
 source = "Camera"
 translation = "Câmera"
+
+[messages.model-group-facing]
+source = "Facing"
+translation = "Orientação"
 
 [messages.model-group-shading]
 source = "Shading"

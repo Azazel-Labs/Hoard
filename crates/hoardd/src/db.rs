@@ -561,6 +561,10 @@ const MIGRATIONS: &[&str] = &[
               strftime('%Y-%m-%dT%H:%M:%SZ', 'now'), strftime('%Y-%m-%dT%H:%M:%SZ', 'now')
        FROM packs p WHERE p.status = 'ingesting'
          AND NOT EXISTS (SELECT 1 FROM jobs j WHERE j.pack_id = p.id AND j.status IN ('queued', 'running'));",
+    // 56: a pack's models can be turned to stand up and face forward (`Facing`), for files that don't say which
+    // way is which.
+    "ALTER TABLE packs ADD COLUMN model_turn INTEGER NOT NULL DEFAULT 0;
+     ALTER TABLE packs ADD COLUMN model_tilt INTEGER NOT NULL DEFAULT 0;",
 ];
 
 /// How many automatic pre-upgrade backups to keep in `<data dir>/backups`.
@@ -869,7 +873,7 @@ const PACK_COLS: &str = "p.id, p.name, p.status, p.source, p.license, p.descript
     c.store, c.store_url, c.license_tier,
     (SELECT COUNT(*) FROM assets a WHERE a.pack_id = p.id AND a.ext IN ('uasset', 'umap')),
     (SELECT COUNT(*) FROM asset_origin o JOIN assets a ON a.id = o.asset_id WHERE a.pack_id = p.id),
-    p.archived_at";
+    p.archived_at, p.model_turn, p.model_tilt";
 
 fn pack_from_row(r: &Row<'_>) -> rusqlite::Result<Pack> {
     let tags: String = r.get(6)?;
@@ -897,7 +901,16 @@ fn pack_from_row(r: &Row<'_>) -> rusqlite::Result<Pack> {
         unreal_converted: r.get::<_, i64>(18)? as u64,
         archived_at: r.get(19)?,
         kinds: std::collections::BTreeMap::new(),
+        facing: hoard_core::Facing::new(r.get(20)?, r.get(21)?),
     })
+}
+
+/// How the pack's models are turned to be shown; upright for a pack that's gone.
+pub(crate) fn pack_facing(conn: &Connection, pack_id: &str) -> Result<hoard_core::Facing> {
+    let angles: Option<(i64, i64)> = conn
+        .query_row("SELECT model_turn, model_tilt FROM packs WHERE id = ?1", [pack_id], |r| Ok((r.get(0)?, r.get(1)?)))
+        .optional()?;
+    Ok(angles.map_or_else(hoard_core::Facing::default, |(turn, tilt)| hoard_core::Facing::new(turn, tilt)))
 }
 
 /// Fill in each pack's count of assets by kind.
@@ -1134,6 +1147,7 @@ fn asset_from_row(r: &Row<'_>) -> rusqlite::Result<Asset> {
         palette: Vec::new(),
         material: None,
         materials: Vec::new(),
+        facing: None,
     })
 }
 
@@ -1187,6 +1201,9 @@ pub(crate) fn get_asset(conn: &Connection, id: &str) -> Result<Option<Asset>> {
     asset.derivatives = stmt.query_map([&asset.id], |r| r.get(0))?.collect::<rusqlite::Result<_>>()?;
     asset.formats = crate::formats::options(&asset.ext, &asset.derivatives);
     asset.family = family(conn, &asset.id)?;
+    if asset.kind == AssetKind::Model {
+        asset.facing = Some(pack_facing(conn, &asset.pack_id)?).filter(|f| !f.is_upright());
+    }
     let mut stmt = conn.prepare(
         "SELECT a.id, a.name, a.pack_id, p.name, a.path FROM assets a JOIN packs p ON p.id = a.pack_id
          WHERE a.blob_hash = ?1 AND a.id != ?2 ORDER BY p.name, a.path LIMIT 50",
@@ -2397,6 +2414,18 @@ mod tests {
         };
         assert_eq!(strings("SELECT asset_id || ':' || kind FROM derivatives"), ["c:as:view:0:glb"]);
         assert_eq!(strings("SELECT kind || ':' || pack_id FROM jobs WHERE pack_id <> 'p1'"), ["retag:print"]);
+    }
+
+    #[test]
+    fn packs_face_their_models_forward_until_turned() {
+        let dir = tempfile::tempdir().unwrap();
+        let mut conn = baseline_db(dir.path());
+        migrate(&mut conn, &dir.path().join("backups"), &MIGRATIONS[..48]).unwrap();
+        assert!(pack_facing(&conn, "p1").unwrap().is_upright());
+        conn.execute("UPDATE packs SET model_turn = 180, model_tilt = 270 WHERE id = 'p1'", []).unwrap();
+        assert_eq!(pack_facing(&conn, "p1").unwrap(), hoard_core::Facing { turn: 180, tilt: 270 });
+        assert_eq!(get_pack(&conn, "p1").unwrap().unwrap().facing.turn, 180);
+        assert!(pack_facing(&conn, "missing").unwrap().is_upright());
     }
 
     #[test]

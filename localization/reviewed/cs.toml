@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "d908dee70be58463293398f44b458c417ab4a595a2301ca075526df22168e1d1"
+source = "031ae9796de89847770a20e2fa79115c9c8ec9e3764ab428ee6f31e570c680bd"
 translation = "10350137b75664600f5b80d67d4b7dc6a218245ed458fa59bceed92a7a09d3d2"
 
 [messages.account-add]
@@ -5929,6 +5929,46 @@ translation = "prázdný soubor Collada"
 source = "No browser loader for .{ $ext }"
 translation = "Prohlížeč nemá zavaděč pro .{ $ext }"
 
+[messages.model-facing-failed]
+source = "Couldn't turn the pack's models: { $error }"
+translation = "Modely balíčku se nepodařilo otočit: { $error }"
+
+[messages.model-facing-save]
+source = "Use for this pack"
+translation = "Použít pro balíček"
+
+[messages.model-facing-save-title]
+source = "Turn every model in { $pack } this way. Their thumbnails are drawn again; downloads stay as they were made."
+translation = "Takto otočit všechny modely v balíčku { $pack }. Jejich miniatury se vykreslí znovu; stahování zůstanou tak, jak byla vytvořena."
+
+[messages.model-facing-saved]
+source = "Every model in { $pack } now faces this way. Their thumbnails are being drawn again."
+translation = "Všechny modely v balíčku { $pack } jsou teď natočené takto. Jejich miniatury se vykreslují znovu."
+
+[messages.model-facing-tip]
+source = "Tip a quarter"
+translation = "Naklonit o čtvrt"
+
+[messages.model-facing-tip-title]
+source = "Tip the model's top a quarter turn toward its front, to stand up one lying down"
+translation = "Naklonit vršek modelu o čtvrt otáčky dopředu, aby ležící model stál"
+
+[messages.model-facing-turn]
+source = "Turn a quarter"
+translation = "Otočit o čtvrt"
+
+[messages.model-facing-turn-title]
+source = "Turn the model a quarter turn counterclockwise, seen from above"
+translation = "Otočit model o čtvrt otáčky proti směru hodinových ručiček při pohledu shora"
+
+[messages.model-facing-undo]
+source = "Undo"
+translation = "Zpět"
+
+[messages.model-facing-undo-title]
+source = "Back to how the pack's models are turned"
+translation = "Zpět k tomu, jak jsou modely balíčku otočené"
+
 [messages.model-frame]
 source = "Frame"
 translation = "Zaměřit"
@@ -5968,6 +6008,10 @@ translation = "Pozadí"
 [messages.model-group-camera]
 source = "Camera"
 translation = "Kamera"
+
+[messages.model-group-facing]
+source = "Facing"
+translation = "Natočení"
 
 [messages.model-group-shading]
 source = "Shading"

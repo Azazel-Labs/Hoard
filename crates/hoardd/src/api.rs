@@ -411,9 +411,12 @@ async fn get_pack(State(state): State<AppState>, Path(id): Path<String>) -> ApiR
 #[derive(Deserialize)]
 struct PackPatch {
     name: Option<String>,
+    facing: Option<hoard_core::Facing>,
 }
 
-/// Rename a pack. Everything refers to packs by id, so searches, links and collections carry on as they were.
+/// Rename a pack, or turn its models. Everything refers to packs by id, so searches, links and collections carry on
+/// as they were. Models turned are drawn again: the thumbnails browsers drew of them give way to the server's until a
+/// browser draws them again.
 async fn patch_pack(
     State(state): State<AppState>,
     Path(id): Path<String>,
@@ -423,16 +426,41 @@ async fn patch_pack(
     if name.as_deref() == Some("") {
         return Err(AppError::bad_request(tr!("error-pack-needs-name")));
     }
+    let facing = patch.facing.map(|f| hoard_core::Facing::new(f.turn.into(), f.tilt.into()));
     let id2 = id.clone();
-    db::call(&state.pool, move |c| {
+    let pack = db::call(&state.pool, move |c| {
+        let tx = c.transaction()?;
         if let Some(name) = &name {
-            c.execute("UPDATE packs SET name = ?2 WHERE id = ?1", params![id2, name])?;
+            tx.execute("UPDATE packs SET name = ?2 WHERE id = ?1", params![id2, name])?;
         }
-        db::get_pack(c, &id2)
+        if let Some(f) = facing
+            && db::get_pack(&tx, &id2)?.is_some_and(|p| p.facing != f)
+        {
+            tx.execute(
+                "UPDATE packs SET model_turn = ?2, model_tilt = ?3 WHERE id = ?1",
+                params![id2, f.turn, f.tilt],
+            )?;
+            tx.execute(
+                "UPDATE assets SET thumb_source = NULL WHERE pack_id = ?1 AND kind = 'model' AND thumb_source IS NOT NULL",
+                [&id2],
+            )?;
+            let queued: bool = tx.query_row(
+                "SELECT EXISTS (SELECT 1 FROM jobs WHERE kind = ?1 AND pack_id = ?2 AND status = 'queued')",
+                params![jobs::RETAG, id2],
+                |r| r.get(0),
+            )?;
+            if !queued {
+                db::set_pack_status(&tx, &id2, hoard_core::PackStatus::Ingesting, None)?;
+                db::enqueue(&tx, jobs::RETAG, Some(&id2), &json!({ "then_llm": false }))?;
+            }
+        }
+        let pack = db::get_pack(&tx, &id2)?;
+        tx.commit()?;
+        Ok(pack)
     })
-    .await?
-    .map(Json)
-    .ok_or_else(|| AppError::not_found(tr!("error-pack-not-found", id = id)))
+    .await?;
+    state.wake.notify_one();
+    pack.map(Json).ok_or_else(|| AppError::not_found(tr!("error-pack-not-found", id = id)))
 }
 
 async fn delete_pack(State(state): State<AppState>, Path(id): Path<String>) -> ApiResult<StatusCode> {
@@ -1592,7 +1620,12 @@ async fn asset_as(
     };
     let disposition =
         (p.download != Some(0)).then(|| format!("attachment; filename=\"{}\"", name.replace(['"', '\\'], "_")));
-    serve_blob(&state, &ready.hash, &headers, &mime, disposition).await
+    let mut resp = serve_blob(&state, &ready.hash, &headers, &mime, disposition).await?;
+    // The address names the asset, not the bytes, which are made again when the way Hoard makes them changes (a
+    // pack's models turned, a newer reader): the browser asks each time and is told when its copy still stands.
+    let cache = if state.settings.get().guest_browsing { "public, no-cache" } else { "private, no-cache" };
+    resp.headers_mut().insert(header::CACHE_CONTROL, HeaderValue::from_static(cache));
+    Ok(resp)
 }
 
 /// Start (or look in on) a conversion without downloading it: `{"state": "ready" | "queued" | "converting" |

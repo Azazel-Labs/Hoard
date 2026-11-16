@@ -8,7 +8,7 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js'
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js'
 import { TGALoader } from 'three/addons/loaders/TGALoader.js'
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js'
-import { api, asUrl, liteUrl, packFileUrl, thumbUrl, type Asset, type AssetLink } from './api'
+import { api, asUrl, liteUrl, packFileUrl, packFacings, thumbUrl, type Asset, type AssetLink, type Facing } from './api'
 import { t } from './i18n'
 import { applyToModel } from './materialMaps'
 
@@ -58,6 +58,8 @@ export interface StageInfo {
   missing: string[]
   /** Textures picked by name ("Barrel_Albedo.png" for "Barrel.fbx") for a model that names none. */
   guessed: number
+  /** How the model is turned, as its pack's models are. */
+  facing: Facing
 }
 
 export interface StageOptions {
@@ -278,7 +280,9 @@ export class ModelStage {
   private key = new THREE.DirectionalLight(0xffffff, 2)
   private envMap: THREE.Texture | null = null
   private grid: THREE.GridHelper | null = null
+  /** The model, inside a group that turns it as its pack's models face (`setFacing`). */
   private object: THREE.Object3D | null = null
+  private facing: Facing = { turn: 0, tilt: 0 }
   private mixer: THREE.AnimationMixer | null = null
   private clips = new Map<string, THREE.AnimationClip>()
   private action: THREE.AnimationAction | null = null
@@ -533,8 +537,11 @@ export class ModelStage {
     for (const name of missing ?? []) if (!this.missing.includes(name)) this.missing.push(name)
     if (missing?.length) this.onMissing?.([...this.missing])
 
-    this.object = object
-    this.scene.add(object)
+    const turner = new THREE.Group()
+    turner.add(object)
+    this.object = turner
+    this.scene.add(turner)
+    this.turn(packFacings.get(full.pack_id) ?? full.facing ?? { turn: 0, tilt: 0 })
     this.frameHome()
     this.counts = { triangles: Math.round(triangles), vertices }
     this.bounds().box.getSize(this.size)
@@ -575,7 +582,26 @@ export class ModelStage {
       clips: [...this.clips.keys()].sort((a, b) => Number(/idle/i.test(b)) - Number(/idle/i.test(a))),
       missing: [...this.missing],
       guessed,
+      facing: { ...this.facing },
     }
+  }
+
+  private turn(facing: Facing) {
+    this.facing = { turn: facing.turn, tilt: facing.tilt }
+    this.object!.rotation.set((facing.tilt * Math.PI) / 180, (facing.turn * Math.PI) / 180, 0, 'YXZ')
+    this.object!.updateMatrixWorld(true)
+  }
+
+  /** Turn the model (to try a facing before giving it to the pack) and look at it afresh from the front. */
+  setFacing(facing: Facing) {
+    if (!this.object) return
+    this.turn(facing)
+    const grid = this.grid?.visible ?? false
+    this.frameHome()
+    if (this.grid) this.grid.visible = grid
+    this.bounds().box.getSize(this.size)
+    this.redraw()
+    if (this.paused) this.renderOnce()
   }
 
   private track(m: AnyMaterial) {

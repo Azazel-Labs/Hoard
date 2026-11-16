@@ -176,6 +176,58 @@ test.describe('full-screen viewers', () => {
     await expect(viewer).toBeHidden()
   })
 
+  // A pack whose models lie down is stood up from the viewer, and they stay stood up when opened again.
+  test('a model turned in the viewer turns every model in its pack', async ({ page, baseURL }) => {
+    test.slow()
+    const api = await signedIn(baseURL!)
+    const name = `E2E Facing ${unique()}`
+    // A box 2 wide, 4 tall and 2 deep.
+    const corners = [0, 1, 2, 3, 4, 5, 6, 7].map((i) => `v ${(i & 1) * 2} ${((i >> 1) & 1) * 4} ${((i >> 2) & 1) * 2}`)
+    const faces = ['1 2 4 3', '5 7 8 6', '1 5 6 2', '3 4 8 7', '1 3 7 5', '2 6 8 4'].map((f) => `f ${f}`)
+    const pack = await uploadPack(api, name, [{ relpath: 'Post.obj', data: Buffer.from([...corners, ...faces].join('\n')) }])
+    await waitReady(api, [pack.id])
+    await openPack(page, pack.id, name)
+    await doubleClick(page, tile(page, 'Post'))
+    const viewer = page.getByRole('dialog', { name: 'View Post in 3D' })
+    await expect(viewer.getByText(/12 tris/)).toBeVisible({ timeout: 20_000 })
+    const facing = viewer.getByRole('group', { name: 'Facing' })
+    const save = facing.getByRole('button', { name: 'Use for this pack' })
+    await expect(save).toHaveCount(0)
+    await page.keyboard.press('i')
+    const info = viewer.getByRole('region', { name: 'Scene information' })
+    const row = (label: string) => info.locator('dl > div').filter({ has: page.getByText(label, { exact: true }) }).locator('dd')
+    await expect(row('Height')).toHaveText('4 units')
+
+    // Trying a facing and taking it back leaves the pack alone.
+    await facing.getByRole('button', { name: 'Turn a quarter' }).click()
+    await facing.getByRole('button', { name: 'Undo' }).click()
+    await expect(save).toHaveCount(0)
+
+    await facing.getByRole('button', { name: 'Tip a quarter' }).click()
+    await expect(row('Height')).toHaveText('2 units')
+    await expect(row('Length')).toHaveText('4 units')
+    await save.click()
+    await expect(viewer.getByRole('status')).toContainText(`Every model in ${name} now faces this way`)
+    await expect(save).toHaveCount(0)
+    const turned = (await (await api.get(`/api/packs/${pack.id}`)).json()) as { facing: { turn: number; tilt: number } }
+    expect(turned.facing).toEqual({ turn: 0, tilt: 90 })
+    await waitReady(api, [pack.id])
+    await page.keyboard.press('Escape')
+    await expect(viewer).toBeHidden()
+
+    // The model's record says how its pack turns it, and the viewer shows it so.
+    const [model] = await assetsOf(api, pack.id)
+    const full = (await (await api.get(`/api/assets/${model.id}`)).json()) as { facing?: { turn: number; tilt: number } }
+    expect(full.facing).toEqual({ turn: 0, tilt: 90 })
+    await page.reload()
+    await doubleClick(page, tile(page, 'Post'))
+    await expect(viewer.getByText(/12 tris/)).toBeVisible({ timeout: 20_000 })
+    await page.keyboard.press('i')
+    await expect(row('Height')).toHaveText('2 units')
+    await page.keyboard.press('Escape')
+    await api.delete(`/api/packs/${pack.id}`)
+  })
+
   test('a glTF model opens the 3D viewer too', async ({ page, seed }) => {
     await openPack(page, seed.packs[MODELS], MODELS, '&sort=name')
     await doubleClick(page, tile(page, 'Triangle'))

@@ -5,11 +5,12 @@
 //! so the thumbnail renderer can draw them; their download GLB is packed from the file as it is. Every one of them
 //! reaches the 3D viewer as a plain GLB with web-ready textures ([`view_glb`]).
 
-use std::cell::RefCell;
+use std::cell::{Cell, RefCell};
 use std::collections::BTreeMap;
 use std::path::{Path, PathBuf};
 
 use anyhow::Result;
+use hoard_core::Facing;
 use polysmelt::assets::{Assets, Folder};
 use polysmelt::document::{Keep, Pose};
 use serde_json::{Map, Value};
@@ -128,12 +129,57 @@ pub(crate) fn glb(path: &Path, ext: &str, root: &Path) -> Result<Vec<u8>> {
 }
 
 /// A glTF rewritten as plain glTF in a GLB, for a reader without meshopt, Draco or quantization (the thumbnail
-/// renderer): polysmelt decodes those and takes the images in. Animations, cameras and lights are left out.
-pub(crate) fn plain_glb(path: &Path, ext: &str) -> Result<Vec<u8>> {
+/// renderer): polysmelt decodes those and takes the images in, and its scene is turned by `facing`. Animations,
+/// cameras and lights are left out.
+pub(crate) fn plain_glb(path: &Path, ext: &str, facing: Facing) -> Result<Vec<u8>> {
     let folder = path.parent().unwrap_or(Path::new("."));
     let mut doc = polysmelt::formats::load(path, ext, &Pack::new(folder), Keep::MESHES)?;
     doc.decode()?;
+    turn(&mut doc.json, facing);
     Ok(doc.to_glb()?)
+}
+
+thread_local! {
+    /// How the models this thread draws are turned: their pack's [`Facing`], while [`facing`] runs.
+    static FACING: Cell<Facing> = const { Cell::new(Facing { turn: 0, tilt: 0 }) };
+}
+
+/// Run `f` with the models this thread draws turned by `facing` (their pack's), as thumbnails show them.
+pub(crate) fn facing<R>(facing: Facing, f: impl FnOnce() -> R) -> R {
+    struct Restore(Facing);
+    impl Drop for Restore {
+        fn drop(&mut self) {
+            FACING.set(self.0);
+        }
+    }
+    let _restore = Restore(FACING.replace(facing));
+    f()
+}
+
+/// How the models this thread draws are turned.
+pub(crate) fn current_facing() -> Facing {
+    FACING.get()
+}
+
+/// Turn a glTF's scenes by `facing`: each scene's root nodes go under one node that turns them.
+pub(crate) fn turn(gltf: &mut Map<String, Value>, facing: Facing) {
+    if facing.is_upright() {
+        return;
+    }
+    let scenes = gltf.get("scenes").and_then(Value::as_array).map_or(0, Vec::len);
+    for s in 0..scenes {
+        let roots = gltf["scenes"][s]["nodes"].take();
+        if roots.as_array().is_none_or(Vec::is_empty) {
+            gltf["scenes"][s]["nodes"] = roots;
+            continue;
+        }
+        let Some(nodes) = gltf.entry("nodes").or_insert_with(|| Value::Array(Vec::new())).as_array_mut() else {
+            return;
+        };
+        nodes.push(serde_json::json!({ "name": "Facing", "children": roots, "rotation": facing.quaternion() }));
+        let root = nodes.len() - 1;
+        gltf["scenes"][s]["nodes"] = serde_json::json!([root]);
+    }
 }
 
 /// A model as the 3D viewer shows it: its whole document as a plain GLB, Draco, meshopt and quantization decoded,
@@ -212,6 +258,25 @@ mod tests {
         assert_eq!(mesh.images[0].mime, "image/png");
         assert_eq!(mesh.materials[0].color_image, Some(0));
         assert!(to_glb(&mesh).unwrap().starts_with(b"glTF"));
+    }
+
+    #[test]
+    fn turning_puts_each_scenes_roots_under_one_turned_node() {
+        let mut gltf = serde_json::json!({
+            "scenes": [{ "nodes": [0, 1] }, { "nodes": [] }],
+            "nodes": [{ "mesh": 0 }, { "mesh": 1 }],
+        });
+        let map = gltf.as_object_mut().unwrap();
+        turn(map, Facing::default());
+        assert_eq!(map["scenes"][0]["nodes"], serde_json::json!([0, 1]));
+        turn(map, Facing::new(180, 0));
+        assert_eq!(map["scenes"][0]["nodes"], serde_json::json!([2]));
+        assert_eq!(map["nodes"][2]["children"], serde_json::json!([0, 1]));
+        assert_eq!(map["nodes"][2]["rotation"], serde_json::json!([0.0, 1.0, 0.0, 0.0]));
+        assert_eq!(map["scenes"][1]["nodes"], serde_json::json!([]));
+        assert_eq!(map["nodes"].as_array().unwrap().len(), 3);
+        assert_eq!(facing(Facing::new(90, 0), current_facing), Facing::new(90, 0));
+        assert!(current_facing().is_upright());
     }
 
     #[test]

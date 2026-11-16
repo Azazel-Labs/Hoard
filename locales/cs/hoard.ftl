@@ -1818,6 +1818,17 @@ model-missing-count =
        *[other] { $count } textur nenalezeno
     }
 model-guessed = Textury přiřazené podle názvu; soubor žádné neuvádí.
+model-group-facing = Natočení
+model-facing-turn = Otočit o čtvrt
+model-facing-turn-title = Otočit model o čtvrt otáčky proti směru hodinových ručiček při pohledu shora
+model-facing-tip = Naklonit o čtvrt
+model-facing-tip-title = Naklonit vršek modelu o čtvrt otáčky dopředu, aby ležící model stál
+model-facing-save = Použít pro balíček
+model-facing-save-title = Takto otočit všechny modely v balíčku { $pack }. Jejich miniatury se vykreslí znovu; stahování zůstanou tak, jak byla vytvořena.
+model-facing-undo = Zpět
+model-facing-undo-title = Zpět k tomu, jak jsou modely balíčku otočené
+model-facing-saved = Všechny modely v balíčku { $pack } jsou teď natočené takto. Jejich miniatury se vykreslují znovu.
+model-facing-failed = Modely balíčku se nepodařilo otočit: { $error }
 model-keys-mouse = Tažením otáčíte · tažením pravým tlačítkem posouváte · kolečkem přibližujete · dvojklikem zaměříte
 model-key-frame = zaměřit
 model-key-reset = obnovit

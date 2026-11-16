@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "d908dee70be58463293398f44b458c417ab4a595a2301ca075526df22168e1d1"
+source = "031ae9796de89847770a20e2fa79115c9c8ec9e3764ab428ee6f31e570c680bd"
 translation = "9623d06b66e29668f0289abc1d1e06c1781f9bf7186ed083bd7c8595a4396f0b"
 
 [messages.account-add]
@@ -5855,6 +5855,46 @@ translation = "leeg Collada-bestand"
 source = "No browser loader for .{ $ext }"
 translation = "Geen browserloader voor .{ $ext }"
 
+[messages.model-facing-failed]
+source = "Couldn't turn the pack's models: { $error }"
+translation = "Kon de modellen van het pakket niet draaien: { $error }"
+
+[messages.model-facing-save]
+source = "Use for this pack"
+translation = "Op pakket toepassen"
+
+[messages.model-facing-save-title]
+source = "Turn every model in { $pack } this way. Their thumbnails are drawn again; downloads stay as they were made."
+translation = "Alle modellen in { $pack } zo draaien. Hun miniaturen worden opnieuw getekend; downloads blijven zoals ze gemaakt zijn."
+
+[messages.model-facing-saved]
+source = "Every model in { $pack } now faces this way. Their thumbnails are being drawn again."
+translation = "Alle modellen in { $pack } staan nu zo. Hun miniaturen worden opnieuw getekend."
+
+[messages.model-facing-tip]
+source = "Tip a quarter"
+translation = "Kwartslag kantelen"
+
+[messages.model-facing-tip-title]
+source = "Tip the model's top a quarter turn toward its front, to stand up one lying down"
+translation = "De bovenkant van het model een kwartslag naar voren kantelen, om een liggend model rechtop te zetten"
+
+[messages.model-facing-turn]
+source = "Turn a quarter"
+translation = "Kwartslag draaien"
+
+[messages.model-facing-turn-title]
+source = "Turn the model a quarter turn counterclockwise, seen from above"
+translation = "Het model een kwartslag tegen de klok in draaien, van bovenaf gezien"
+
+[messages.model-facing-undo]
+source = "Undo"
+translation = "Ongedaan maken"
+
+[messages.model-facing-undo-title]
+source = "Back to how the pack's models are turned"
+translation = "Terug naar hoe de modellen van het pakket gedraaid zijn"
+
 [messages.model-frame]
 source = "Frame"
 translation = "In beeld"
@@ -5894,6 +5934,10 @@ translation = "Achtergrond"
 [messages.model-group-camera]
 source = "Camera"
 translation = "Camera"
+
+[messages.model-group-facing]
+source = "Facing"
+translation = "Richting"
 
 [messages.model-group-shading]
 source = "Shading"

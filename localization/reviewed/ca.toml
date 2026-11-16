@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "d908dee70be58463293398f44b458c417ab4a595a2301ca075526df22168e1d1"
+source = "031ae9796de89847770a20e2fa79115c9c8ec9e3764ab428ee6f31e570c680bd"
 translation = "a8e90c6c6ba195832f26ec8d98ede39bfedc68c80bc69fd376aa7b993e381133"
 
 [messages.account-add]
@@ -5852,6 +5852,46 @@ translation = "fitxer Collada buit"
 source = "No browser loader for .{ $ext }"
 translation = "No hi ha cap carregador del navegador per a .{ $ext }"
 
+[messages.model-facing-failed]
+source = "Couldn't turn the pack's models: { $error }"
+translation = "No s'han pogut girar els models del paquet: { $error }"
+
+[messages.model-facing-save]
+source = "Use for this pack"
+translation = "Aplica al paquet"
+
+[messages.model-facing-save-title]
+source = "Turn every model in { $pack } this way. Their thumbnails are drawn again; downloads stay as they were made."
+translation = "Gira així tots els models de { $pack }. Les miniatures es tornen a dibuixar; les baixades es queden com es van fer."
+
+[messages.model-facing-saved]
+source = "Every model in { $pack } now faces this way. Their thumbnails are being drawn again."
+translation = "Ara tots els models de { $pack } estan orientats així. S'estan tornant a dibuixar les miniatures."
+
+[messages.model-facing-tip]
+source = "Tip a quarter"
+translation = "Inclina un quart"
+
+[messages.model-facing-tip-title]
+source = "Tip the model's top a quarter turn toward its front, to stand up one lying down"
+translation = "Inclina la part de dalt del model un quart de volta cap endavant, per posar dret un model ajagut"
+
+[messages.model-facing-turn]
+source = "Turn a quarter"
+translation = "Gira un quart"
+
+[messages.model-facing-turn-title]
+source = "Turn the model a quarter turn counterclockwise, seen from above"
+translation = "Gira el model un quart de volta en sentit antihorari, vist des de dalt"
+
+[messages.model-facing-undo]
+source = "Undo"
+translation = "Desfés"
+
+[messages.model-facing-undo-title]
+source = "Back to how the pack's models are turned"
+translation = "Torna a com estan girats els models del paquet"
+
 [messages.model-frame]
 source = "Frame"
 translation = "Enquadra"
@@ -5891,6 +5931,10 @@ translation = "Fons"
 [messages.model-group-camera]
 source = "Camera"
 translation = "Càmera"
+
+[messages.model-group-facing]
+source = "Facing"
+translation = "Orientació"
 
 [messages.model-group-shading]
 source = "Shading"

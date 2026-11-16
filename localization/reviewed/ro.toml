@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "d908dee70be58463293398f44b458c417ab4a595a2301ca075526df22168e1d1"
+source = "031ae9796de89847770a20e2fa79115c9c8ec9e3764ab428ee6f31e570c680bd"
 translation = "81f454b4be3578d38a286a9258dbbc3cf47ad1586e8852a5a6c519b04af263db"
 
 [messages.account-add]
@@ -5940,6 +5940,46 @@ translation = "fișier Collada gol"
 source = "No browser loader for .{ $ext }"
 translation = "Niciun încărcător de browser pentru .{ $ext }"
 
+[messages.model-facing-failed]
+source = "Couldn't turn the pack's models: { $error }"
+translation = "Modelele pachetului nu au putut fi rotite: { $error }"
+
+[messages.model-facing-save]
+source = "Use for this pack"
+translation = "Aplicare la pachet"
+
+[messages.model-facing-save-title]
+source = "Turn every model in { $pack } this way. Their thumbnails are drawn again; downloads stay as they were made."
+translation = "Rotiți astfel toate modelele din { $pack }. Miniaturile lor sunt desenate din nou; descărcările rămân cum au fost făcute."
+
+[messages.model-facing-saved]
+source = "Every model in { $pack } now faces this way. Their thumbnails are being drawn again."
+translation = "Toate modelele din { $pack } sunt acum orientate așa. Miniaturile lor sunt desenate din nou."
+
+[messages.model-facing-tip]
+source = "Tip a quarter"
+translation = "Înclinare cu un sfert"
+
+[messages.model-facing-tip-title]
+source = "Tip the model's top a quarter turn toward its front, to stand up one lying down"
+translation = "Înclinați partea de sus a modelului cu un sfert de tură spre față, pentru a ridica în picioare un model culcat"
+
+[messages.model-facing-turn]
+source = "Turn a quarter"
+translation = "Rotire cu un sfert"
+
+[messages.model-facing-turn-title]
+source = "Turn the model a quarter turn counterclockwise, seen from above"
+translation = "Rotiți modelul cu un sfert de tură în sens antiorar, privit de sus"
+
+[messages.model-facing-undo]
+source = "Undo"
+translation = "Anulați"
+
+[messages.model-facing-undo-title]
+source = "Back to how the pack's models are turned"
+translation = "Înapoi la felul în care sunt rotite modelele pachetului"
+
 [messages.model-frame]
 source = "Frame"
 translation = "Încadrare"
@@ -5979,6 +6019,10 @@ translation = "Fundal"
 [messages.model-group-camera]
 source = "Camera"
 translation = "Cameră"
+
+[messages.model-group-facing]
+source = "Facing"
+translation = "Orientare"
 
 [messages.model-group-shading]
 source = "Shading"

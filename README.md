@@ -286,7 +286,11 @@ software rasterizer (`apt install mesa-vulkan-drivers`). Without any adapter, ev
      3D viewer shows the model: textures from the file, an OBJ's MTL, or found in the pack by name; tone mapping;
      cut-outs and see-through surfaces, glass included (glTF's transmission, where the metal parts of the same
      material stay solid); framed tightly from the same angle every time. glTF and GLB compressed with meshopt
-     (`EXT_meshopt_compression`, `KHR_meshopt_compression`) are decoded for the thumbnail and the 3D viewer. FBX
+     (`EXT_meshopt_compression`, `KHR_meshopt_compression`) are decoded for the thumbnail and the 3D viewer. The 3D
+     viewer is handed every model as a plain GLB Hoard makes of it: the whole scene (hierarchy, skins, morph targets,
+     animation, materials) with any compression decoded, and its textures as JPEG, or PNG where they're see-through,
+     at most 2048 px a side, so the browser reads nothing but GLB. A model only Blender reads shows from Blender's GLB
+     of it. Texture files a model names that its pack lacks are named under the viewer. FBX
      geometry, node transforms, materials and embedded or nearby textures are read natively (axis and unit settings
      become glTF's Y-up meters), from binary FBX and from the text form (ASCII FBX 7) that Asset Forge and some exporters write.
      3DS meshes, materials, smoothing groups and
@@ -433,7 +437,8 @@ thumbnails in this browser opens each model out of sight, one at a time, with pr
 
 **Big textures.** The image viewer opens a big texture as its light preview and shows both sizes (pixels and bytes).
 Zooming in past the preview's pixels, Full resolution or F loads the file itself. The 3D viewers load light previews
-of textures too; the full-screen viewer's Full-res switch (H) loads every texture file as it is. The detail panel
+of the textures they put on a model themselves (a material's maps, ones found by name); the full-screen viewer's
+Full-res switch (H) loads those files as they are. The detail panel
 shows the size of each linked file and of each download.
 
 ## Getting assets into an engine

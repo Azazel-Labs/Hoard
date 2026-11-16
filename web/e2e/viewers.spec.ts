@@ -34,6 +34,8 @@ test.describe('full-screen viewers', () => {
 
   // The server reads it, filaments and painting included, and the viewer shows the GLB it makes.
   test('a painted 3MF print shows its filament colors', async ({ page, baseURL }) => {
+    // A pack to upload and process, then the viewer's GLB to make.
+    test.slow()
     const api = await signedIn(baseURL!)
     const pack = await uploadPack(api, 'E2E Painted 3MF', [{ relpath: 'Painted_Cube.3mf', data: paintedCube3mf() }])
     await waitReady(api, [pack.id])
@@ -56,6 +58,8 @@ test.describe('full-screen viewers', () => {
   // Parts that share a material are drawn as one mesh, so a model of thousands turns smoothly; they still count, and
   // still show apart in the geometry view.
   test('a model of many parts counts each part', async ({ page, baseURL }) => {
+    // A pack to upload and process, then the viewer's GLB to make.
+    test.slow()
     const api = await signedIn(baseURL!)
     const name = `E2E Parts ${unique()}`
     const pack = await uploadPack(api, name, [{ relpath: 'Parts.gltf', data: partsGltf(4) }])
@@ -81,6 +85,8 @@ test.describe('full-screen viewers', () => {
   // Meshopt-compressed models are drawn for thumbnails and in the viewer, and a compressed glTF beside its buffer
   // becomes a GLB that is still compressed.
   test('a meshopt-compressed model has a thumbnail and opens in the viewer', async ({ page, baseURL }) => {
+    // A pack to upload and process, then the viewer's GLB to make.
+    test.slow()
     const api = await signedIn(baseURL!)
     // The server draws thumbnails only where it has a model renderer.
     const stats = (await (await api.get('/api/stats')).json()) as { renderer?: string }

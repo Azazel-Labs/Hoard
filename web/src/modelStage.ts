@@ -69,9 +69,8 @@ export interface StageOptions {
 type Loaded = {
   object: THREE.Object3D
   animations: THREE.AnimationClip[]
-  /** Material colors were written as linear values (Blender's FBX exporter), not the sRGB the loaders
-   *  assume: read as sRGB they come out far too dark, a dark green skin turning black. */
-  linearColors?: boolean
+  /** Image files the model names that its pack doesn't have. */
+  missing?: string[]
 }
 
 /** What the browser decodes itself; TGA has a loader of its own below. */
@@ -110,83 +109,16 @@ async function textureLinks(asset: Asset): Promise<{ named: AssetLink[]; guesses
   return { named, guesses, full }
 }
 
-/** Facet colors the way VisCAM and SolidView write them in a binary STL (three.js reads only Materialise's): the
- *  top bit of a facet's attribute marks it colored, blue in the low bits. Nothing says a file does this and other
- *  tools leave junk there, so it takes two colors or more. The server reads them the same way. */
-function visCamColors(buf: ArrayBuffer, geom: THREE.BufferGeometry) {
-  if (buf.byteLength < 84) return
-  const view = new DataView(buf)
-  const n = view.getUint32(80, true)
-  if (84 + n * 50 !== buf.byteLength || geom.attributes.position.count !== n * 3) return
-  const attrs = new Uint16Array(n)
-  const seen = new Set<number>()
-  for (let i = 0; i < n; i++) {
-    attrs[i] = view.getUint16(84 + i * 50 + 48, true)
-    if (attrs[i] & 0x8000) seen.add(attrs[i])
-  }
-  if (seen.size < 2) return
-  const colors = new Float32Array(n * 9)
-  const c = new THREE.Color()
-  for (let i = 0; i < n; i++) {
-    const a = attrs[i]
-    if (a & 0x8000) c.setRGB(((a >> 10) & 0x1f) / 31, ((a >> 5) & 0x1f) / 31, (a & 0x1f) / 31, THREE.SRGBColorSpace)
-    else c.set(0xb8c0d0)
-    for (let k = 0; k < 3; k++) c.toArray(colors, i * 9 + k * 3)
-  }
-  geom.setAttribute('color', new THREE.BufferAttribute(colors, 3))
-}
-
-/** A glTF loader that also reads meshopt-compressed models (EXT_meshopt_compression / KHR_meshopt_compression). */
+/** The server's GLBs are plain glTF: nothing compressed, every texture a JPEG or PNG. */
 async function gltfLoader(manager: THREE.LoadingManager) {
-  const [{ GLTFLoader }, { MeshoptDecoder }] = await Promise.all([
-    import('three/addons/loaders/GLTFLoader.js'),
-    import('three/addons/libs/meshopt_decoder.module.js'),
-  ])
-  return new GLTFLoader(manager).setMeshoptDecoder(MeshoptDecoder)
+  const { GLTFLoader } = await import('three/addons/loaders/GLTFLoader.js')
+  return new GLTFLoader(manager)
 }
 
 async function loadModel(url: string, ext: string, manager: THREE.LoadingManager): Promise<Loaded> {
   switch (ext) {
-    case 'glb':
-    case 'gltf': {
-      const g = await (await gltfLoader(manager)).loadAsync(url)
-      return { object: g.scene, animations: g.animations }
-    }
-    case 'fbx': {
-      const { FBXLoader } = await import('three/addons/loaders/FBXLoader.js')
-      const res = await fetch(url)
-      if (!res.ok) throw new Error(`HTTP ${res.status}`)
-      const buf = await res.arrayBuffer()
-      const o = new FBXLoader(manager).parse(buf, url.slice(0, url.lastIndexOf('/') + 1))
-      // The creator is named in the header, near the start of the file.
-      const head = new TextDecoder('latin1').decode(buf.slice(0, 65536))
-      return { object: o, animations: o.animations, linearColors: head.includes('Blender') }
-    }
-    case 'stl': {
-      const { STLLoader } = await import('three/addons/loaders/STLLoader.js')
-      const res = await fetch(url)
-      if (!res.ok) throw new Error(`HTTP ${res.status}`)
-      const buf = await res.arrayBuffer()
-      const geom = new STLLoader(manager).parse(buf)
-      // Some exporters leave the facet normals zero (they're optional): work them out, as the server does.
-      const normals = geom.attributes.normal?.array
-      if (!normals || normals.some((_, i) => i % 3 === 0 && !normals[i] && !normals[i + 1] && !normals[i + 2])) geom.computeVertexNormals()
-      if (!geom.attributes.color) visCamColors(buf, geom)
-      const material = new THREE.MeshStandardMaterial({ color: 0xb8c0d0, roughness: 0.6, vertexColors: !!geom.attributes.color })
-      if (geom.attributes.color) material.color.set(0xffffff)
-      return { object: new THREE.Mesh(geom, material), animations: [] }
-    }
-    case 'ply': {
-      const { PLYLoader } = await import('three/addons/loaders/PLYLoader.js')
-      const geom = await new PLYLoader(manager).loadAsync(url)
-      if (!geom.attributes.normal) geom.computeVertexNormals()
-      const material = new THREE.MeshStandardMaterial({ color: 0xb8c0d0, roughness: 0.6, vertexColors: !!geom.attributes.color })
-      if (geom.attributes.color) material.color.set(0xffffff) // the file's own colors, not tinted gray
-      return { object: new THREE.Mesh(geom, material), animations: [] }
-    }
     case 'server-glb': {
-      // The server reads OBJ, 3DS, 3MF (slicers' filament colors and painting included) and USD, and hands them over as a GLB. A
-      // conversion still running answers 202 after waiting a while: ask again, for up to ten minutes or so.
+      // A conversion still running answers 202 after waiting a while: ask again, for up to ten minutes or so.
       const loader = await gltfLoader(manager)
       for (let tries = 0; tries < 20; tries++) {
         const res = await fetch(url)
@@ -196,7 +128,8 @@ async function loadModel(url: string, ext: string, manager: THREE.LoadingManager
           throw new Error(body.error ?? `HTTP ${res.status}`)
         }
         const g = await loader.parseAsync(await res.arrayBuffer(), '')
-        return { object: g.scene, animations: g.animations }
+        const extras = g.asset?.extras as { missing_textures?: string[] } | undefined
+        return { object: g.scene, animations: g.animations, missing: extras?.missing_textures ?? [] }
       }
       throw new Error(t('model-error-converting'))
     }
@@ -211,14 +144,13 @@ async function loadModel(url: string, ext: string, manager: THREE.LoadingManager
   }
 }
 
-/** Formats the server reads and hands over as a GLB: ones the browser has no loader for, and OBJ, whose loader
- *  fans each polygon out from its first corner, which spills a concave one (SketchUp's) over its neighbors. */
-const SERVER_GLB = new Set(['obj', '3ds', '3mf', 'usd', 'usda', 'usdc', 'usdz'])
-
+/** Every model is shown from the GLB the server makes of it (`view_glb` in hoardd's meshes.rs): polysmelt reads the
+ *  file, decodes any compression and re-encodes the textures as JPEG or PNG, so the browser reads nothing but plain
+ *  GLB. A model only Blender reads comes from Blender's GLB of it; a Collada file Blender hasn't converted (it isn't
+ *  set up) is read by three.js's own loader. */
 function sourceFor(a: Asset | AssetLink, packId: string, derivatives: string[] = []): { url: string; ext: string } {
-  if (derivatives.includes('glb')) return { url: `/api/assets/${a.id}/derivative/glb`, ext: 'glb' }
-  if (SERVER_GLB.has(extOf(a.path))) return { url: `/api/assets/${a.id}/as/glb?download=0&wait=30`, ext: 'server-glb' }
-  return { url: packFileUrl(packId, a.path), ext: extOf(a.path) }
+  if (extOf(a.path) === 'dae' && !derivatives.includes('glb')) return { url: packFileUrl(packId, a.path), ext: 'dae' }
+  return { url: `/api/assets/${a.id}/as/view?download=0&wait=30`, ext: 'server-glb' }
 }
 
 /** Texture slots a material can carry; the "textures off" switch empties them and puts them back. */
@@ -442,8 +374,9 @@ export class ModelStage {
     controls.addEventListener('change', () => this.redraw(100))
     this.controls = controls
 
-    // Every file the loaders ask for passes through here: textures are matched to the pack's files by name (FBX
-    // and MTL files often carry the artist's absolute path, or point at a PSD where the pack ships a PNG).
+    // Every file a loader asks for passes through here (the server's GLBs carry their textures; a Collada file read
+    // here names its own): textures are matched to the pack's files by name, as they often carry the artist's absolute
+    // path, or point at a PSD where the pack ships a PNG.
     const { named, guesses, full } = await textureLinks(asset)
     const byName = new Map<string, AssetLink>()
     const byStem = new Map<string, AssetLink>()
@@ -503,7 +436,7 @@ export class ModelStage {
     }
 
     const src = sourceFor(full, full.pack_id, full.derivatives)
-    const { object, animations, linearColors } = await loadModel(src.url, src.ext, manager)
+    const { object, animations, missing } = await loadModel(src.url, src.ext, manager)
     if (this.disposed) {
       disposeObject(object)
       throw new Error('closed')
@@ -523,14 +456,10 @@ export class ModelStage {
         vertices += g.attributes.position?.count ?? 0
       }
       const list = (Array.isArray(mesh.material) ? mesh.material : [mesh.material]).map((m) => {
-        // Meshes share materials: convert each once, so they stay shared and the color fix isn't applied twice.
+        // Meshes share materials: convert each once, so they stay shared.
         let s = converted.get(m)
         if (!s) {
           s = toStandard(m) as AnyMaterial
-          if (linearColors) {
-            s.color?.convertLinearToSRGB()
-            ;(s as THREE.MeshStandardMaterial).emissive?.convertLinearToSRGB()
-          }
           converted.set(m, s)
         }
         sanitize(s, mesh.geometry)
@@ -546,7 +475,7 @@ export class ModelStage {
 
     // A model that names no textures, next to textures named after it: try them on.
     let guessed = 0
-    this.flipY = src.ext !== 'glb' && src.ext !== 'gltf'
+    this.flipY = src.ext === 'dae'
     // Or a material made from maps that share its name: its maps by role.
     const material = textured.any ? undefined : full.materials?.[0]
     if (material) {
@@ -580,6 +509,9 @@ export class ModelStage {
     } else if (!textured.any && guesses.length && !this.colored()) {
       guessed = this.applyGuesses(guesses, asset.pack_id, this.flipY, manager)
     }
+
+    for (const name of missing ?? []) if (!this.missing.includes(name)) this.missing.push(name)
+    if (missing?.length) this.onMissing?.([...this.missing])
 
     this.object = object
     this.scene.add(object)

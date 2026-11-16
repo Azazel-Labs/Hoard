@@ -19,7 +19,7 @@ use crate::i18n::tr;
 use crate::{analyze, sources};
 
 /// Image formats we can read pixels from.
-const IMAGE_IN: &[&str] = &[
+pub(crate) const IMAGE_IN: &[&str] = &[
     "png", "jpg", "jpeg", "gif", "bmp", "tga", "webp", "tif", "tiff", "hdr", "exr", "psd", "psb", "kra", "ora", "dds",
     "ktx2", "basis", "svg", "svgz", "ai", "aseprite", "ase",
 ];
@@ -171,6 +171,9 @@ pub(crate) fn convert(
             })
         }
         "glb" if src == "gltf" => gltf_to_glb(local),
+        "view" if polysmelt::formats::EXTENSIONS.contains(&src.as_str()) => {
+            Ok(Output { bytes: crate::meshes::view_glb(local, &src, root)?, ext: "glb" })
+        }
         _ => bail!("can't convert .{src} to {format}"),
     }
 }
@@ -309,7 +312,7 @@ fn encode_image(img: &DynamicImage, format: &str) -> Result<Output> {
 }
 
 /// The JSON and BIN chunks of a GLB.
-fn read_glb(data: &[u8]) -> Result<(Value, Vec<u8>)> {
+pub(crate) fn read_glb(data: &[u8]) -> Result<(Value, Vec<u8>)> {
     ensure!(data.len() >= 20 && &data[..4] == b"glTF", "not a GLB file");
     let mut pos = 12;
     let (mut json, mut bin) = (None, Vec::new());
@@ -464,6 +467,8 @@ fn percent_decode(s: &str) -> String {
 
 /// Conversions running at once; more wait their turn (shown as queued).
 static SLOTS: tokio::sync::Semaphore = tokio::sync::Semaphore::const_new(2);
+/// The 3D viewer's GLBs have slots of their own: someone looking at a model doesn't wait behind downloads.
+static VIEW_SLOTS: tokio::sync::Semaphore = tokio::sync::Semaphore::const_new(4);
 
 /// Sizes a client may ask for: powers of two from 64 to 16384.
 pub(crate) fn valid_max(max: u32) -> bool {
@@ -628,11 +633,15 @@ pub(crate) async fn request(
     .await
     .map_err(fail)?
     .ok_or(Refused::NotFound)?;
-    let (path, ext, hash, meta, derivs) = info;
+    let (mut path, mut ext, mut hash, meta, derivs) = info;
     let file = path.rsplit('/').next().unwrap_or(&path).to_owned();
     let stem = file.rsplit_once('.').map_or(file.as_str(), |(s, _)| s).to_owned();
     let names: Vec<String> = derivs.iter().map(|(k, _)| k.clone()).collect();
-    let allowed = options(&ext, &names).iter().any(|o| o.format == format)
+    // The 3D viewer's GLB, of any model polysmelt reads or Blender converted. Not offered for download.
+    let readable = polysmelt::formats::EXTENSIONS.contains(&ext.to_ascii_lowercase().as_str());
+    let view = format == "view" && max.is_none() && (readable || names.iter().any(|n| n == "glb"));
+    let allowed = view
+        || options(&ext, &names).iter().any(|o| o.format == format)
         || (max.is_some() && resizable_as_itself(&ext) == Some(format));
     if !allowed {
         return Err(Refused::Unsupported(tr!("error-cant-download-as", ext = ext, format = format)));
@@ -646,6 +655,13 @@ pub(crate) async fn request(
         return Ok(Lookup::Ready(Ready { hash: glb.1.clone(), ext: "glb".into(), stem }));
     }
     let key = format!("as:{format}:{}", max.unwrap_or(0));
+    // A model only Blender reads is shown from the GLB Blender made of it.
+    if view && !readable {
+        let glb = derivs.iter().find(|(k, _)| k == "glb").ok_or(Refused::NotFound)?;
+        path = format!("{path}.glb");
+        ext = "glb".into();
+        hash.clone_from(&glb.1);
+    }
     // Cached as `as:<format>:<max>:<output ext>`: a WOFF unwraps to .ttf or .otf, a glTF zips.
     let prefix = format!("{key}:");
     if let Some((k, h)) = derivs.iter().find(|(k, _)| k.starts_with(&prefix)) {
@@ -710,6 +726,7 @@ fn format_name(format: &str) -> String {
         "jpg" => "JPEG".into(),
         "tiff" => "TIFF".into(),
         "exr" => "OpenEXR".into(),
+        "view" => "GLB for the viewer".into(),
         other => other.to_ascii_uppercase(),
     }
 }
@@ -752,7 +769,7 @@ impl Job {
         activity: &std::sync::Arc<crate::activity::Handle>,
     ) -> Result<Ready> {
         use crate::db;
-        let _slot = SLOTS.acquire().await?;
+        let _slot = if self.format == "view" { VIEW_SLOTS.acquire().await? } else { SLOTS.acquire().await? };
         activity.queued(false);
         tx.send_replace(Stage::Working(0.0));
         let state = &self.state;

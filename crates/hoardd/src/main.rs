@@ -63,6 +63,7 @@ mod textures;
 mod tools;
 mod updates;
 mod uploads;
+mod webglb;
 
 use std::sync::Arc;
 use std::time::Duration;

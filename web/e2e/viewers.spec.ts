@@ -154,7 +154,8 @@ test.describe('full-screen viewers', () => {
     await expect(row('Materials')).toHaveText('1')
     await expect(row('Textures')).toHaveText('1')
     await expect(row('Triangles')).toHaveText('12')
-    await expect(row('Vertices')).toHaveText('36')
+    // Hoard's GLB of the OBJ shares each face's corners: four per side.
+    await expect(row('Vertices')).toHaveText('24')
     // OBJ says nothing of its units.
     await expect(row('Height')).toHaveText('2 units')
     await expect(row('Width')).toHaveText('2 units')

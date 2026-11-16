@@ -90,6 +90,26 @@ test.describe('Asset details', () => {
     await expect(panel).toHaveCount(0)
   })
 
+  test('Share copies a link that opens the asset', async ({ page, context, seed }) => {
+    await context.grantPermissions(['clipboard-read', 'clipboard-write'])
+    await openPack(page, seed.packs[MODELS], MODELS, '&sort=name')
+    await tile(page, 'Crate').first().click()
+    const panel = page.getByRole('complementary', { name: 'Asset details' })
+    await expect(panel.getByRole('heading', { level: 2 })).toHaveText('Crate')
+
+    await panel.getByRole('button', { name: 'Share' }).click()
+    await expect(panel.getByRole('status').filter({ hasText: /^Copied link$/ })).toBeAttached()
+    const link = await page.evaluate(() => navigator.clipboard.readText())
+    expect(link).toMatch(/^http:\/\/[^#?]+\/#asset=[\w-]+$/)
+
+    // Opened somewhere else, with nothing else in the address, it shows the same asset.
+    const other = await context.newPage()
+    await other.goto(link)
+    const opened = other.getByRole('complementary', { name: 'Asset details' })
+    await expect(opened.getByRole('heading', { level: 2 })).toHaveText('Crate')
+    await other.close()
+  })
+
   test('the panel is as wide as you drag it, remembered after a reload; double-click goes back to the width that fits', async ({ page, seed }) => {
     await page.setViewportSize({ width: 1600, height: 800 })
     await openPack(page, seed.packs[MODELS], MODELS, '&sort=name')

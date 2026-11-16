@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "5facbc5c6e9deb1e85e85d796c5a66c74f60e9b8857afda31b896d4a805194c0"
+source = "5c99d56e8fcba92ad147ac882cd0ba16d49a48bf2b65e0729b148d4a399d5d50"
 translation = "4d4f0096cc29f03f0fe2a94d855b0ef2f60194198f01e480a5d3926c58b74326"
 
 [messages.account-add]
@@ -1634,6 +1634,10 @@ translation = "Hash gekopieer"
 source = "Copied id"
 translation = "ID gekopieer"
 
+[messages.asset-copied-link]
+source = "Copied link"
+translation = "Skakel gekopieer"
+
 [messages.asset-copied-toml]
 source = "Copied toml"
 translation = "toml gekopieer"
@@ -2261,6 +2265,14 @@ translation = "Stoor"
 [messages.asset-save-error]
 source = "Couldn't save: { $error }"
 translation = "Kon nie stoor nie: { $error }"
+
+[messages.asset-share]
+source = "Share"
+translation = "Deel"
+
+[messages.asset-share-title]
+source = "Share a link to this asset (whoever opens it signs in to Hoard first)"
+translation = "Deel 'n skakel na hierdie bate (wie dit oopmaak, meld eers by Hoard aan)"
 
 [messages.asset-show-more]
 source = "Show { $count } more"

@@ -1476,6 +1476,7 @@ asset-play-error = Couldn't play this file: { $error }
 asset-copied-hash = Copied hash
 asset-copied-toml = Copied toml
 asset-copied-id = Copied id
+asset-copied-link = Copied link
 # "This file was <file name>" then one of these: its Unreal class ($class) and the engine version that saved it ($engine).
 asset-origin-before = This file was
 asset-origin-class-engine = , a { $class } saved by UE { $engine }.
@@ -1497,6 +1498,9 @@ asset-next = Next asset
 asset-favorite = Favorite
 asset-favorite-on-title = In your favorites (F takes it out)
 asset-favorite-off-title = Add to your favorites (F)
+# The button that shares a link to the asset (on a phone, the share sheet; elsewhere it copies the link).
+asset-share = Share
+asset-share-title = Share a link to this asset (whoever opens it signs in to Hoard first)
 asset-layout-panel = Show in a side panel
 asset-layout-page = Show full page
 asset-layout-page-title = Show full page: a big preview beside the details

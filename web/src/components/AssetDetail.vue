@@ -396,9 +396,10 @@ const tomlSnippet = computed(
 )
 
 /** What the copy buttons put on the clipboard, for the "Copied …" note. */
-type Copyable = 'hash' | 'toml' | 'id'
+type Copyable = 'hash' | 'toml' | 'id' | 'link'
 function copiedNote(what: string): string {
   switch (what) {
+    case 'link': return t('asset-copied-link')
     case 'hash': return t('asset-copied-hash')
     case 'toml': return t('asset-copied-toml')
     case 'id': return t('asset-copied-id')
@@ -423,6 +424,23 @@ const originHow = computed(() => {
   if (o.method === 'editor') return o.notes ? t('asset-origin-editor-notes', { date, notes: o.notes }) : t('asset-origin-editor', { date })
   return o.notes ? t('asset-origin-hoard-notes', { date, notes: o.notes }) : t('asset-origin-hoard', { date })
 })
+
+/**
+ * Shares a link that opens this asset: the share sheet on a phone or tablet, the clipboard elsewhere (where a share
+ * sheet is more in the way than copying). Whoever follows it signs in to Hoard first.
+ */
+async function share() {
+  const url = `${location.origin}${location.pathname}#asset=${props.asset.id}`
+  if (navigator.share && matchMedia('(pointer: coarse)').matches) {
+    try {
+      await navigator.share({ title: props.asset.name, url })
+      return
+    } catch (e) {
+      if ((e as DOMException).name === 'AbortError') return
+    }
+  }
+  await copy(url, 'link')
+}
 
 async function copy(text: string, what: Copyable) {
   if (await copyText(text)) {
@@ -757,6 +775,24 @@ onBeforeUnmount(() => unswipe())
           >
             <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M8 1.9l1.8 3.7 4.1.6-3 2.9.7 4.1L8 11.3l-3.6 1.9.7-4.1-3-2.9 4.1-.6z" :fill="starred ? 'currentColor' : 'none'" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round" /></svg>
           </button>
+          <span class="copywrap">
+            <button
+              class="btn ghost icon share"
+              type="button"
+              :aria-label="t('asset-share')"
+              :title="t('asset-share-title')"
+              @click="share"
+            >
+              <svg
+                viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"
+                fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"
+              >
+                <path d="M8 10V1.75M5 4.5 8 1.5l3 3" />
+                <path d="M5.5 7H4a1 1 0 0 0-1 1v5.25a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V8a1 1 0 0 0-1-1h-1.5" />
+              </svg>
+            </button>
+            <span v-if="copied === 'link'" class="copytip below" aria-hidden="true">{{ copiedNote('link') }}</span>
+          </span>
           <button
             class="btn ghost icon layout"
             type="button"
@@ -1450,6 +1486,8 @@ footer {
   100% { opacity: 0; transform: translate(-50%, 0); }
 }
 @media (prefers-reduced-motion: reduce) { .copytip { animation: none; } }
+/* At the top of the panel there's no room above, so the link's note drops below its button. */
+.copytip.below { top: calc(100% + 6px); bottom: auto; }
 .familycheck { margin-top: 0.5rem; }
 .cols .tags { align-items: center; }
 .colchip { gap: 0.35em; }

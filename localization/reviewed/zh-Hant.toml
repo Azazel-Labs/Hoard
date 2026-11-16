@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "5facbc5c6e9deb1e85e85d796c5a66c74f60e9b8857afda31b896d4a805194c0"
+source = "5c99d56e8fcba92ad147ac882cd0ba16d49a48bf2b65e0729b148d4a399d5d50"
 translation = "fb5e10cd5eddfc860efb3785bb465796b700258c43d207b08bd9f3334aa5d6c8"
 
 [messages.account-add]
@@ -1578,6 +1578,10 @@ translation = "已複製雜湊值"
 source = "Copied id"
 translation = "已複製 ID"
 
+[messages.asset-copied-link]
+source = "Copied link"
+translation = "已複製連結"
+
 [messages.asset-copied-toml]
 source = "Copied toml"
 translation = "已複製 toml"
@@ -2191,6 +2195,14 @@ translation = "儲存"
 [messages.asset-save-error]
 source = "Couldn't save: { $error }"
 translation = "無法儲存：{ $error }"
+
+[messages.asset-share]
+source = "Share"
+translation = "分享"
+
+[messages.asset-share-title]
+source = "Share a link to this asset (whoever opens it signs in to Hoard first)"
+translation = "分享此素材的連結（開啟的人需先登入 Hoard）"
 
 [messages.asset-show-more]
 source = "Show { $count } more"

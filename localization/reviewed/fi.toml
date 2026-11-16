@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "5facbc5c6e9deb1e85e85d796c5a66c74f60e9b8857afda31b896d4a805194c0"
+source = "5c99d56e8fcba92ad147ac882cd0ba16d49a48bf2b65e0729b148d4a399d5d50"
 translation = "259239ab239601949cc6a70972021dcb09218f2bed3d1964197e9079006c5785"
 
 [messages.account-add]
@@ -1638,6 +1638,10 @@ translation = "Tiiviste kopioitu"
 source = "Copied id"
 translation = "ID kopioitu"
 
+[messages.asset-copied-link]
+source = "Copied link"
+translation = "Linkki kopioitu"
+
 [messages.asset-copied-toml]
 source = "Copied toml"
 translation = "toml kopioitu"
@@ -2265,6 +2269,14 @@ translation = "Tallenna"
 [messages.asset-save-error]
 source = "Couldn't save: { $error }"
 translation = "Tallennus epäonnistui: { $error }"
+
+[messages.asset-share]
+source = "Share"
+translation = "Jaa"
+
+[messages.asset-share-title]
+source = "Share a link to this asset (whoever opens it signs in to Hoard first)"
+translation = "Jaa linkki tähän resurssiin (avaaja kirjautuu ensin Hoardiin)"
 
 [messages.asset-show-more]
 source = "Show { $count } more"

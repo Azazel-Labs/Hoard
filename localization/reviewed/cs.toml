@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "5facbc5c6e9deb1e85e85d796c5a66c74f60e9b8857afda31b896d4a805194c0"
+source = "5c99d56e8fcba92ad147ac882cd0ba16d49a48bf2b65e0729b148d4a399d5d50"
 translation = "10350137b75664600f5b80d67d4b7dc6a218245ed458fa59bceed92a7a09d3d2"
 
 [messages.account-add]
@@ -1664,6 +1664,10 @@ translation = "Hash zkopírován"
 source = "Copied id"
 translation = "ID zkopírováno"
 
+[messages.asset-copied-link]
+source = "Copied link"
+translation = "Odkaz zkopírován"
+
 [messages.asset-copied-toml]
 source = "Copied toml"
 translation = "Toml zkopírován"
@@ -2296,6 +2300,14 @@ translation = "Uložit"
 [messages.asset-save-error]
 source = "Couldn't save: { $error }"
 translation = "Nepodařilo se uložit: { $error }"
+
+[messages.asset-share]
+source = "Share"
+translation = "Sdílet"
+
+[messages.asset-share-title]
+source = "Share a link to this asset (whoever opens it signs in to Hoard first)"
+translation = "Sdílet odkaz na tento asset (kdo ho otevře, se nejdřív přihlásí do Hoardu)"
 
 [messages.asset-show-more]
 source = "Show { $count } more"

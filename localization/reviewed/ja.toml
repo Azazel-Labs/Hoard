@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "5facbc5c6e9deb1e85e85d796c5a66c74f60e9b8857afda31b896d4a805194c0"
+source = "5c99d56e8fcba92ad147ac882cd0ba16d49a48bf2b65e0729b148d4a399d5d50"
 translation = "110cc1215f00a6312d4fe13a655f9cc3553e284205745fc0ce70ae25601e1bd5"
 
 [messages.account-add]
@@ -1575,6 +1575,10 @@ translation = "ハッシュをコピーしました"
 source = "Copied id"
 translation = "ID をコピーしました"
 
+[messages.asset-copied-link]
+source = "Copied link"
+translation = "リンクをコピーしました"
+
 [messages.asset-copied-toml]
 source = "Copied toml"
 translation = "toml をコピーしました"
@@ -2188,6 +2192,14 @@ translation = "保存"
 [messages.asset-save-error]
 source = "Couldn't save: { $error }"
 translation = "保存できませんでした: { $error }"
+
+[messages.asset-share]
+source = "Share"
+translation = "共有"
+
+[messages.asset-share-title]
+source = "Share a link to this asset (whoever opens it signs in to Hoard first)"
+translation = "このアセットへのリンクを共有（開いた人はまず Hoard にサインインします）"
 
 [messages.asset-show-more]
 source = "Show { $count } more"

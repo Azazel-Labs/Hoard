@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "5facbc5c6e9deb1e85e85d796c5a66c74f60e9b8857afda31b896d4a805194c0"
+source = "5c99d56e8fcba92ad147ac882cd0ba16d49a48bf2b65e0729b148d4a399d5d50"
 translation = "a8e90c6c6ba195832f26ec8d98ede39bfedc68c80bc69fd376aa7b993e381133"
 
 [messages.account-add]
@@ -1634,6 +1634,10 @@ translation = "S'ha copiat el hash"
 source = "Copied id"
 translation = "S'ha copiat l'ID"
 
+[messages.asset-copied-link]
+source = "Copied link"
+translation = "S'ha copiat l'enllaç"
+
 [messages.asset-copied-toml]
 source = "Copied toml"
 translation = "S'ha copiat el toml"
@@ -2261,6 +2265,14 @@ translation = "Desa"
 [messages.asset-save-error]
 source = "Couldn't save: { $error }"
 translation = "No s'ha pogut desar: { $error }"
+
+[messages.asset-share]
+source = "Share"
+translation = "Comparteix"
+
+[messages.asset-share-title]
+source = "Share a link to this asset (whoever opens it signs in to Hoard first)"
+translation = "Comparteix un enllaç a aquest recurs (qui l'obri inicia la sessió a Hoard primer)"
 
 [messages.asset-show-more]
 source = "Show { $count } more"

@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "5facbc5c6e9deb1e85e85d796c5a66c74f60e9b8857afda31b896d4a805194c0"
+source = "5c99d56e8fcba92ad147ac882cd0ba16d49a48bf2b65e0729b148d4a399d5d50"
 translation = "c88d703960d058d6250f7f64595fd09c211cb193c33a147d0762312f6890a946"
 
 [messages.account-add]
@@ -1634,6 +1634,10 @@ translation = "Kopierade hash"
 source = "Copied id"
 translation = "Kopierade id"
 
+[messages.asset-copied-link]
+source = "Copied link"
+translation = "Kopierade länk"
+
 [messages.asset-copied-toml]
 source = "Copied toml"
 translation = "Kopierade toml"
@@ -2261,6 +2265,14 @@ translation = "Spara"
 [messages.asset-save-error]
 source = "Couldn't save: { $error }"
 translation = "Kunde inte spara: { $error }"
+
+[messages.asset-share]
+source = "Share"
+translation = "Dela"
+
+[messages.asset-share-title]
+source = "Share a link to this asset (whoever opens it signs in to Hoard first)"
+translation = "Dela en länk till den här resursen (den som öppnar den loggar först in i Hoard)"
 
 [messages.asset-show-more]
 source = "Show { $count } more"

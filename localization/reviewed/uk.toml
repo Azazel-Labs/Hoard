@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "5facbc5c6e9deb1e85e85d796c5a66c74f60e9b8857afda31b896d4a805194c0"
+source = "5c99d56e8fcba92ad147ac882cd0ba16d49a48bf2b65e0729b148d4a399d5d50"
 translation = "29bbdd56d3912619e12475d6d444595ec6d389a2b27582eeb623a3b8e037c6e8"
 
 [messages.account-add]
@@ -1689,6 +1689,10 @@ translation = "Хеш скопійовано"
 source = "Copied id"
 translation = "ID скопійовано"
 
+[messages.asset-copied-link]
+source = "Copied link"
+translation = "Посилання скопійовано"
+
 [messages.asset-copied-toml]
 source = "Copied toml"
 translation = "toml скопійовано"
@@ -2332,6 +2336,14 @@ translation = "Зберегти"
 [messages.asset-save-error]
 source = "Couldn't save: { $error }"
 translation = "Не вдалося зберегти: { $error }"
+
+[messages.asset-share]
+source = "Share"
+translation = "Поділитися"
+
+[messages.asset-share-title]
+source = "Share a link to this asset (whoever opens it signs in to Hoard first)"
+translation = "Поділитися посиланням на цей ресурс (той, хто його відкриє, спершу увійде в Hoard)"
 
 [messages.asset-show-more]
 source = "Show { $count } more"

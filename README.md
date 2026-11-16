@@ -700,6 +700,9 @@ beside the active filters keeps what you're looking at under a name, there and i
 saving the same name again replaces it. An account that can only look has them too, and an access token or a
 connected app uses its maker's.
 
+To send someone an asset, the share button beside the star in its details copies a link that opens it (on a phone or
+tablet it brings up the share sheet instead). Whoever opens it signs in to Hoard first.
+
 ## The archive
 
 Archiving a pack or an asset (from its menu, its details, or a selection) takes it out of search, the counts and the

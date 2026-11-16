@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "5facbc5c6e9deb1e85e85d796c5a66c74f60e9b8857afda31b896d4a805194c0"
+source = "5c99d56e8fcba92ad147ac882cd0ba16d49a48bf2b65e0729b148d4a399d5d50"
 translation = "1581395c8432b4483fe865fdc22709574cd26d8b97ba7fc8d233f48a0c99f43a"
 
 [messages.account-add]
@@ -1642,6 +1642,10 @@ translation = "Hash copiado"
 source = "Copied id"
 translation = "ID copiado"
 
+[messages.asset-copied-link]
+source = "Copied link"
+translation = "Enlace copiado"
+
 [messages.asset-copied-toml]
 source = "Copied toml"
 translation = "toml copiado"
@@ -2269,6 +2273,14 @@ translation = "Guardar"
 [messages.asset-save-error]
 source = "Couldn't save: { $error }"
 translation = "No se ha podido guardar: { $error }"
+
+[messages.asset-share]
+source = "Share"
+translation = "Compartir"
+
+[messages.asset-share-title]
+source = "Share a link to this asset (whoever opens it signs in to Hoard first)"
+translation = "Compartir un enlace a este recurso (quien lo abra inicia sesión en Hoard primero)"
 
 [messages.asset-show-more]
 source = "Show { $count } more"

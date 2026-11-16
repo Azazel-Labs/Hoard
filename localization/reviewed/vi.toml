@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "5facbc5c6e9deb1e85e85d796c5a66c74f60e9b8857afda31b896d4a805194c0"
+source = "5c99d56e8fcba92ad147ac882cd0ba16d49a48bf2b65e0729b148d4a399d5d50"
 translation = "1a4df50b438ca81d05a8082fa6c6f1912acf6742fdc06a0acf388c1b5773abb6"
 
 [messages.account-add]
@@ -1578,6 +1578,10 @@ translation = "Đã sao chép mã băm"
 source = "Copied id"
 translation = "Đã sao chép id"
 
+[messages.asset-copied-link]
+source = "Copied link"
+translation = "Đã sao chép liên kết"
+
 [messages.asset-copied-toml]
 source = "Copied toml"
 translation = "Đã sao chép toml"
@@ -2185,6 +2189,14 @@ translation = "Lưu"
 [messages.asset-save-error]
 source = "Couldn't save: { $error }"
 translation = "Không thể lưu: { $error }"
+
+[messages.asset-share]
+source = "Share"
+translation = "Chia sẻ"
+
+[messages.asset-share-title]
+source = "Share a link to this asset (whoever opens it signs in to Hoard first)"
+translation = "Chia sẻ liên kết tới tài nguyên này (người mở sẽ đăng nhập Hoard trước)"
 
 [messages.asset-show-more]
 source = "Show { $count } more"

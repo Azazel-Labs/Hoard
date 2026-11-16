@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "5facbc5c6e9deb1e85e85d796c5a66c74f60e9b8857afda31b896d4a805194c0"
+source = "5c99d56e8fcba92ad147ac882cd0ba16d49a48bf2b65e0729b148d4a399d5d50"
 translation = "0f5f60477c12405f48c36f12294f911af5de0204e2fd60e70ff31e1354ed1fa5"
 
 [messages.account-add]
@@ -1646,6 +1646,10 @@ translation = "Το hash αντιγράφηκε"
 source = "Copied id"
 translation = "Το ID αντιγράφηκε"
 
+[messages.asset-copied-link]
+source = "Copied link"
+translation = "Ο σύνδεσμος αντιγράφηκε"
+
 [messages.asset-copied-toml]
 source = "Copied toml"
 translation = "Το toml αντιγράφηκε"
@@ -2273,6 +2277,14 @@ translation = "Αποθήκευση"
 [messages.asset-save-error]
 source = "Couldn't save: { $error }"
 translation = "Δεν ήταν δυνατή η αποθήκευση: { $error }"
+
+[messages.asset-share]
+source = "Share"
+translation = "Κοινή χρήση"
+
+[messages.asset-share-title]
+source = "Share a link to this asset (whoever opens it signs in to Hoard first)"
+translation = "Κοινή χρήση συνδέσμου προς αυτό το στοιχείο (όποιος τον ανοίξει συνδέεται πρώτα στο Hoard)"
 
 [messages.asset-show-more]
 source = "Show { $count } more"

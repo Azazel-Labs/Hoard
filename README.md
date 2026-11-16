@@ -362,10 +362,12 @@ software rasterizer (`apt install mesa-vulkan-drivers`). Without any adapter, ev
      matches at once ("Search again" searches afresh). Turn it off in Settings → Adding packs → "Look up store pages
      automatically".
 5. **Link.** glTF buffers/images, OBJ → MTL → textures, FBX texture paths (absolute artist paths are matched by file
-   name), DAE images, `.blend` external textures and linked libraries (`//` paths resolved relative to the file),
-   `Model@Clip.fbx` animation clips, and name-based guesses for models that reference nothing (from the model's own
-   part of the pack: its folder's parent and below, so `Models/` and `Textures/` side by side, and only painted on a
-   model whose materials have no colors of their own). Game-engine and tool files link too: Unity materials,
+   name, the one nearest the model when several share it), DAE images, `.blend` external textures and linked
+   libraries (`//` paths resolved relative to the file), `Model@Clip.fbx` animation clips, and name-based guesses for
+   models that reference nothing (from the model's own part of the pack: its folder's parent and below, beside or
+   above the model or in a folder named for textures, so `Models/` and `Textures/` side by side but never a 2D
+   sprite of the same name, and only painted on a model whose materials have no colors of their own). Game-engine
+   and tool files link too: Unity materials,
    prefabs, scenes and controllers through their GUIDs; Tiled maps → tilesets → images;
    LDtk projects; BMFont `.fnt` → page images; Spine/libGDX `.atlas` → pages; TexturePacker JSON; Godot
    `.tres`/`.tscn` resources; and Unreal package imports.

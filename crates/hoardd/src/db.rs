@@ -523,6 +523,31 @@ const MIGRATIONS: &[&str] = &[
         AND EXISTS (SELECT 1 FROM assets a WHERE a.pack_id = p.id AND a.ext = 'mat')
         AND NOT EXISTS (SELECT 1 FROM jobs j WHERE j.kind = 'materials' AND j.pack_id = p.id
                           AND j.status IN ('queued', 'running'));",
+    // 54: polysmelt 0.11.3 takes a texture found by name only from beside or above the model or from a folder named
+    // for textures, picks the nearest of several the same way every time, finds `../` and absolute paths' textures
+    // nearest the model, embeds a texture named twice once, refuses ASCII FBX written with decimal commas, and widens
+    // indices WebGL 2 would draw as a restart. Every 3D viewer and GLB download is made again when next asked for,
+    // and models that might have been painted with a texture found by name are drawn again.
+    "DELETE FROM derivatives WHERE kind LIKE 'as:view:%' OR kind LIKE 'as:glb:%';
+     CREATE TEMP TABLE named AS SELECT id, pack_id, kind, ext,
+            lower(substr(path, length(rtrim(path, replace(path, '/', ''))) + 1)) AS file
+       FROM assets WHERE kind = 'texture' OR (kind = 'model' AND ext IN ('obj', 'fbx', '3ds'));
+     CREATE INDEX temp.named_file ON named(pack_id, kind, file);
+     CREATE TEMP TABLE guessed AS SELECT m.id, m.pack_id FROM
+         (SELECT id, pack_id, substr(file, 1, length(file) - length(ext) - 1) AS stem FROM temp.named
+           WHERE kind = 'model') m
+       WHERE length(m.stem) >= 3 AND EXISTS (SELECT 1 FROM temp.named t
+         WHERE t.pack_id = m.pack_id AND t.kind = 'texture' AND t.file >= m.stem AND t.file < m.stem || char(1114111));
+     DROP TABLE temp.named;
+     UPDATE packs SET status = 'ingesting'
+       WHERE status = 'ready' AND archived_at IS NULL AND id IN (SELECT pack_id FROM temp.guessed)
+         AND NOT EXISTS (SELECT 1 FROM jobs j WHERE j.pack_id = packs.id AND j.status IN ('queued', 'running'));
+     DROP TABLE temp.guessed;
+     INSERT INTO jobs (kind, pack_id, payload, run_after, created_at, updated_at)
+       SELECT 'retag', id, '{\"then_llm\":false}', strftime('%Y-%m-%dT%H:%M:%SZ', 'now'),
+              strftime('%Y-%m-%dT%H:%M:%SZ', 'now'), strftime('%Y-%m-%dT%H:%M:%SZ', 'now')
+       FROM packs p WHERE p.status = 'ingesting'
+         AND NOT EXISTS (SELECT 1 FROM jobs j WHERE j.pack_id = p.id AND j.status IN ('queued', 'running'));",
 ];
 
 /// How many automatic pre-upgrade backups to keep in `<data dir>/backups`.
@@ -2303,6 +2328,38 @@ mod tests {
             .collect();
         assert_eq!(jobs, ["materials:busy", "materials:kit"]);
         conn.execute("INSERT INTO unity_remaps VALUES ('kit', 'Crate.fbx', 'lambert2', 'g')", []).unwrap();
+    }
+
+    /// Every 3D viewer and GLB download is made again, and models that might have been painted with a texture found
+    /// by name are drawn again.
+    #[test]
+    fn viewers_and_glbs_are_made_again_and_guessed_models_drawn_again() {
+        let dir = tempfile::tempdir().unwrap();
+        let mut conn = baseline_db(dir.path());
+        migrate(&mut conn, &dir.path().join("backups"), &MIGRATIONS[..45]).unwrap();
+        conn.execute_batch(
+            "PRAGMA foreign_keys = OFF;
+             INSERT INTO packs (id, name, status, created_at) VALUES
+               ('kit', 'Kit', 'ready', 'x'), ('plain', 'Plain', 'ready', 'x');
+             INSERT INTO assets (id, pack_id, blob_hash, path, name, ext, kind, meta, created_at, updated_at) VALUES
+               ('s', 'kit', 'h1', 'Kit3D/Models/Stairs.fbx', 'Stairs', 'fbx', 'model', '{}', 'x', 'x'),
+               ('t', 'kit', 'h2', 'Kit2D/stairs_0.png', 'stairs 0', 'png', 'texture', '{}', 'x', 'x'),
+               ('c', 'plain', 'h3', 'tree.glb', 'tree', 'glb', 'model', '{}', 'x', 'x'),
+               ('w', 'plain', 'h4', 'wood.png', 'wood', 'png', 'texture', '{}', 'x', 'x');
+             INSERT INTO derivatives (asset_id, kind, blob_hash, created_at) VALUES
+               ('s', 'as:glb:0:glb', 'g1', 'x'), ('s', 'as:stl:0:stl', 'g2', 'x'), ('c', 'as:view:0:glb', 'g3', 'x'),
+               ('w', 'as:webp:0:webp', 'g4', 'x');",
+        )
+        .unwrap();
+        migrate(&mut conn, &dir.path().join("backups"), &MIGRATIONS[..46]).unwrap();
+        let strings = |sql: &str| -> Vec<String> {
+            conn.prepare(sql).unwrap().query_map([], |r| r.get(0)).unwrap().flatten().collect()
+        };
+        assert_eq!(
+            strings("SELECT asset_id || ':' || kind FROM derivatives ORDER BY asset_id, kind"),
+            ["s:as:stl:0:stl", "w:as:webp:0:webp"]
+        );
+        assert_eq!(strings("SELECT kind || ':' || pack_id FROM jobs WHERE pack_id <> 'p1'"), ["retag:kit"]);
     }
 
     #[test]

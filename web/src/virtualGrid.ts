@@ -18,6 +18,9 @@ export function useVirtualGrid(opts: {
   const gap = ref(0)
   const firstRow = ref(0)
   const lastRow = ref(8)
+  /** The last tile height seen, and the column width it was seen at: a screenful of placeholders, with no tile
+   *  among them to measure, keeps the height the tiles had. */
+  let tileHeight = { width: 0, height: 0 }
 
   function measure() {
     const grid = opts.grid.value
@@ -28,8 +31,10 @@ export function useVirtualGrid(opts: {
     gap.value = parseFloat(style.rowGap) || 0
     const tile = grid.querySelector<HTMLElement>(':scope > .tile')
     const colWidth = (grid.clientWidth - (parseFloat(style.columnGap) || 0) * (columns.value - 1)) / columns.value
+    if (tile?.offsetHeight) tileHeight = { width: colWidth, height: tile.offsetHeight }
     // Before any tile exists, a square image plus two lines of text is close enough.
-    pitch.value = (tile?.offsetHeight || colWidth + 48) + gap.value
+    const height = Math.abs(tileHeight.width - colWidth) < 0.5 ? tileHeight.height : colWidth + 48
+    pitch.value = height + gap.value
   }
 
   function update() {
@@ -69,11 +74,16 @@ export function useVirtualGrid(opts: {
   const rows = computed(() => Math.ceil(opts.count() / columns.value))
   const start = computed(() => Math.min(firstRow.value, rows.value) * columns.value)
   const end = computed(() => Math.min(opts.count(), (lastRow.value + 1) * columns.value))
-  /** Padding standing in for the rows above and below the rendered ones. */
+  /** Padding standing in for the rows above and below the rendered ones, and the height of a row (`--row-h`) for
+   *  whatever stands in for a tile not loaded yet. */
   const padding = computed(() => {
     const above = Math.min(firstRow.value, rows.value)
     const below = Math.max(0, rows.value - lastRow.value - 1)
-    return { paddingTop: `${above * pitch.value}px`, paddingBottom: `${below * pitch.value}px` }
+    return {
+      paddingTop: `${above * pitch.value}px`,
+      paddingBottom: `${below * pitch.value}px`,
+      '--row-h': `${pitch.value - gap.value}px`,
+    }
   })
 
   /** Scroll just enough that item `i` is on screen, and render its row now so it can take focus. */

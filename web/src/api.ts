@@ -838,6 +838,8 @@ export interface SearchParams {
   sort?: string
   limit?: number
   offset?: number
+  /** false leaves out the kind and tag counts, for a later page. */
+  facets?: boolean
   hide_supporting?: boolean
   collection?: string
   /** Only what this project (name) has. */
@@ -952,6 +954,7 @@ export const api = {
     if (p.sort) qs.set('sort', p.sort)
     qs.set('limit', String(p.limit ?? 60))
     if (p.offset) qs.set('offset', String(p.offset))
+    if (p.facets === false) qs.set('facets', 'false')
     if (p.hide_supporting) qs.set('hide_supporting', 'true')
     if (p.collection) qs.set('collection', p.collection)
     if (p.project) qs.set('project', p.project)

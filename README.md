@@ -282,10 +282,11 @@ software rasterizer (`apt install mesa-vulkan-drivers`). Without any adapter, ev
      become the asset's name, and embedded descriptions show as "From the file".
    - Models: glTF/GLB mesh, material, animation and skin counts, vertex/triangle counts; OBJ counts; FBX version
      plus skin and animation detection; a wgpu-rendered thumbnail for glTF/GLB/OBJ/FBX, and for STL, PLY, 3DS and
-     MagicaVoxel `.vox`, which Hoard reads itself (voxels keep their palette colors). Thumbnails are drawn the way the
-     3D viewer shows the model: textures from the file, an OBJ's MTL, or found in the pack by name; tone mapping;
-     cut-outs and see-through surfaces, glass included (glTF's transmission, where the metal parts of the same
-     material stay solid); framed tightly from the same angle every time. glTF and GLB compressed with meshopt
+     MagicaVoxel `.vox`, which Hoard reads itself (voxels keep their palette colors, and STL is stood up from the Z up
+     of 3D printing). Thumbnails are drawn the way the 3D viewer shows the model: textures from the file, an OBJ's
+     MTL, or found in the pack by name; tone mapping; cut-outs and see-through surfaces, glass included (glTF's
+     transmission, where the metal parts of the same material stay solid); framed tightly from the same angle every
+     time. glTF and GLB compressed with meshopt
      (`EXT_meshopt_compression`, `KHR_meshopt_compression`) are decoded for the thumbnail and the 3D viewer. The 3D
      viewer is handed every model as a plain GLB Hoard makes of it: the whole scene (hierarchy, skins, morph targets,
      animation, materials) with any compression decoded, and its textures as JPEG, or PNG where they're see-through,

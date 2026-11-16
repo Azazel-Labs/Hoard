@@ -548,6 +548,19 @@ const MIGRATIONS: &[&str] = &[
               strftime('%Y-%m-%dT%H:%M:%SZ', 'now'), strftime('%Y-%m-%dT%H:%M:%SZ', 'now')
        FROM packs p WHERE p.status = 'ingesting'
          AND NOT EXISTS (SELECT 1 FROM jobs j WHERE j.pack_id = p.id AND j.status IN ('queued', 'running'));",
+    // 55: polysmelt 0.12.0 turns STL models from Z up, as printing has them, to Y up. Their 3D viewers and GLB
+    // downloads are made again when next asked for, and packs with STL models are drawn again.
+    "DELETE FROM derivatives WHERE (kind LIKE 'as:view:%' OR kind LIKE 'as:glb:%')
+       AND asset_id IN (SELECT id FROM assets WHERE ext = 'stl');
+     UPDATE packs SET status = 'ingesting'
+       WHERE status = 'ready' AND archived_at IS NULL
+         AND EXISTS (SELECT 1 FROM assets a WHERE a.pack_id = packs.id AND a.ext = 'stl' AND a.kind = 'model')
+         AND NOT EXISTS (SELECT 1 FROM jobs j WHERE j.pack_id = packs.id AND j.status IN ('queued', 'running'));
+     INSERT INTO jobs (kind, pack_id, payload, run_after, created_at, updated_at)
+       SELECT 'retag', id, '{\"then_llm\":false}', strftime('%Y-%m-%dT%H:%M:%SZ', 'now'),
+              strftime('%Y-%m-%dT%H:%M:%SZ', 'now'), strftime('%Y-%m-%dT%H:%M:%SZ', 'now')
+       FROM packs p WHERE p.status = 'ingesting'
+         AND NOT EXISTS (SELECT 1 FROM jobs j WHERE j.pack_id = p.id AND j.status IN ('queued', 'running'));",
 ];
 
 /// How many automatic pre-upgrade backups to keep in `<data dir>/backups`.
@@ -2360,6 +2373,30 @@ mod tests {
             ["s:as:stl:0:stl", "w:as:webp:0:webp"]
         );
         assert_eq!(strings("SELECT kind || ':' || pack_id FROM jobs WHERE pack_id <> 'p1'"), ["retag:kit"]);
+    }
+
+    #[test]
+    fn stl_models_are_drawn_again_standing_up() {
+        let dir = tempfile::tempdir().unwrap();
+        let mut conn = baseline_db(dir.path());
+        migrate(&mut conn, &dir.path().join("backups"), &MIGRATIONS[..46]).unwrap();
+        conn.execute_batch(
+            "PRAGMA foreign_keys = OFF;
+             INSERT INTO packs (id, name, status, created_at) VALUES
+               ('print', 'Print', 'ready', 'x'), ('plain', 'Plain', 'ready', 'x');
+             INSERT INTO assets (id, pack_id, blob_hash, path, name, ext, kind, meta, created_at, updated_at) VALUES
+               ('s', 'print', 'h1', 'bracket.stl', 'bracket', 'stl', 'model', '{}', 'x', 'x'),
+               ('c', 'plain', 'h3', 'tree.glb', 'tree', 'glb', 'model', '{}', 'x', 'x');
+             INSERT INTO derivatives (asset_id, kind, blob_hash, created_at) VALUES
+               ('s', 'as:glb:0:glb', 'g1', 'x'), ('s', 'as:view:0:glb', 'g2', 'x'), ('c', 'as:view:0:glb', 'g3', 'x');",
+        )
+        .unwrap();
+        migrate(&mut conn, &dir.path().join("backups"), &MIGRATIONS[..47]).unwrap();
+        let strings = |sql: &str| -> Vec<String> {
+            conn.prepare(sql).unwrap().query_map([], |r| r.get(0)).unwrap().flatten().collect()
+        };
+        assert_eq!(strings("SELECT asset_id || ':' || kind FROM derivatives"), ["c:as:view:0:glb"]);
+        assert_eq!(strings("SELECT kind || ':' || pack_id FROM jobs WHERE pack_id <> 'p1'"), ["retag:print"]);
     }
 
     #[test]

@@ -476,6 +476,29 @@ const MIGRATIONS: &[&str] = &[
               strftime('%Y-%m-%dT%H:%M:%SZ', 'now'), strftime('%Y-%m-%dT%H:%M:%SZ', 'now')
        FROM packs p WHERE p.status = 'ingesting'
          AND NOT EXISTS (SELECT 1 FROM jobs j WHERE j.pack_id = p.id AND j.status IN ('queued', 'running'));",
+    // 51: polysmelt paints a texture found by name only on a model whose materials are plain, and takes it only from
+    // the model's part of the pack. Models with a texture whose file name starts with theirs (any that might have
+    // been painted) are drawn again and their GLB downloads made again.
+    "CREATE TEMP TABLE named AS SELECT id, pack_id, kind, ext,
+            lower(substr(path, length(rtrim(path, replace(path, '/', ''))) + 1)) AS file
+       FROM assets WHERE kind = 'texture' OR (kind = 'model' AND ext IN ('obj', 'fbx', '3ds'));
+     CREATE INDEX temp.named_file ON named(pack_id, kind, file);
+     CREATE TEMP TABLE guessed AS SELECT m.id, m.pack_id FROM
+         (SELECT id, pack_id, substr(file, 1, length(file) - length(ext) - 1) AS stem FROM temp.named
+           WHERE kind = 'model') m
+       WHERE length(m.stem) >= 3 AND EXISTS (SELECT 1 FROM temp.named t
+         WHERE t.pack_id = m.pack_id AND t.kind = 'texture' AND t.file >= m.stem AND t.file < m.stem || char(1114111));
+     DROP TABLE temp.named;
+     DELETE FROM derivatives WHERE kind LIKE 'as:glb:%' AND asset_id IN (SELECT id FROM temp.guessed);
+     UPDATE packs SET status = 'ingesting'
+       WHERE status = 'ready' AND archived_at IS NULL AND id IN (SELECT pack_id FROM temp.guessed)
+         AND NOT EXISTS (SELECT 1 FROM jobs j WHERE j.pack_id = packs.id AND j.status IN ('queued', 'running'));
+     DROP TABLE temp.guessed;
+     INSERT INTO jobs (kind, pack_id, payload, run_after, created_at, updated_at)
+       SELECT 'retag', id, '{\"then_llm\":false}', strftime('%Y-%m-%dT%H:%M:%SZ', 'now'),
+              strftime('%Y-%m-%dT%H:%M:%SZ', 'now'), strftime('%Y-%m-%dT%H:%M:%SZ', 'now')
+       FROM packs p WHERE p.status = 'ingesting'
+         AND NOT EXISTS (SELECT 1 FROM jobs j WHERE j.pack_id = p.id AND j.status IN ('queued', 'running'));",
 ];
 
 /// How many automatic pre-upgrade backups to keep in `<data dir>/backups`.
@@ -2169,6 +2192,37 @@ mod tests {
             strings("SELECT kind || ':' || pack_id FROM jobs WHERE pack_id <> 'p1' ORDER BY pack_id"),
             ["retag:kit", "retag:unity"]
         );
+    }
+
+    /// Models that might have been painted with a texture found by name are drawn again, and their GLB downloads
+    /// made again.
+    #[test]
+    fn models_named_like_a_texture_are_drawn_again() {
+        let dir = tempfile::tempdir().unwrap();
+        let mut conn = baseline_db(dir.path());
+        migrate(&mut conn, &dir.path().join("backups"), &MIGRATIONS[..42]).unwrap();
+        conn.execute_batch(
+            "PRAGMA foreign_keys = OFF;
+             INSERT INTO packs (id, name, status, created_at) VALUES
+               ('kit', 'Kit', 'ready', 'x'), ('plain', 'Plain', 'ready', 'x');
+             INSERT INTO assets (id, pack_id, blob_hash, path, name, ext, kind, meta, created_at, updated_at) VALUES
+               ('s', 'kit', 'h1', 'Kit3D/Models/Stairs.fbx', 'Stairs', 'fbx', 'model', '{}', 'x', 'x'),
+               ('t', 'kit', 'h2', 'Kit2D/stairs_0.png', 'stairs 0', 'png', 'texture', '{}', 'x', 'x'),
+               ('c', 'plain', 'h3', 'crate.obj', 'crate', 'obj', 'model', '{}', 'x', 'x'),
+               ('w', 'plain', 'h4', 'wood.png', 'wood', 'png', 'texture', '{}', 'x', 'x');
+             INSERT INTO derivatives (asset_id, kind, blob_hash, created_at) VALUES
+               ('s', 'as:glb:0', 'g1', 'x'), ('s', 'as:stl:0', 'g2', 'x'), ('c', 'as:glb:0', 'g3', 'x');",
+        )
+        .unwrap();
+        migrate(&mut conn, &dir.path().join("backups"), &MIGRATIONS[..43]).unwrap();
+        let strings = |sql: &str| -> Vec<String> {
+            conn.prepare(sql).unwrap().query_map([], |r| r.get(0)).unwrap().flatten().collect()
+        };
+        assert_eq!(
+            strings("SELECT asset_id || ':' || kind FROM derivatives ORDER BY asset_id, kind"),
+            ["c:as:glb:0", "s:as:stl:0"]
+        );
+        assert_eq!(strings("SELECT kind || ':' || pack_id FROM jobs WHERE pack_id <> 'p1'"), ["retag:kit"]);
     }
 
     #[test]

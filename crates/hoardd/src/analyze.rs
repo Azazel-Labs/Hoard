@@ -1211,7 +1211,7 @@ fn analyze_model(path: &Path, root: &Path, ext: &str, meta: &mut Map<String, Val
             };
             gltf_stats(&json, meta);
             // The triangles the scene draws (strips and fans, meshes placed more than once, points and lines
-            // apart), when polysmelt can read it: not glTF 1.0.
+            // apart), when polysmelt can read it.
             match crate::meshes::facts(path, ext, root) {
                 Ok(facts) => {
                     meta.insert("triangles".into(), json!(0));
@@ -1342,10 +1342,10 @@ mod tests {
         assert_eq!(meta["vertices"], json!(4));
         assert_eq!(meta["meshes"], json!(1));
 
-        // What polysmelt refuses (glTF 1.0) is still counted from the JSON.
-        let mut old = doc.clone();
-        old["asset"]["version"] = json!("1.0");
-        std::fs::write(&path, serde_json::to_vec(&old).unwrap()).unwrap();
+        // What polysmelt can't read (its buffer is missing) is still counted from the JSON.
+        let mut broken = doc.clone();
+        broken["buffers"][0]["uri"] = json!("missing.bin");
+        std::fs::write(&path, serde_json::to_vec(&broken).unwrap()).unwrap();
         let mut meta = Map::new();
         analyze_model(&path, dir.path(), "gltf", &mut meta).unwrap();
         assert_eq!(meta["triangles"], json!(1));

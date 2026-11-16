@@ -65,7 +65,7 @@ xmrsplayer = "0.15"
 midly = "0.5"
 rustysynth = "1"
 # Model formats (STL, PLY, VOX, OBJ, FBX, 3DS, 3MF, USD, and glTF with Draco) read natively for thumbnails and GLB copies.
-polysmelt = "0.8"
+polysmelt = "0.11.1"
 ddsfile = "0.6"
 texture2ddecoder = "0.1"
 ktx2 = "0.5"

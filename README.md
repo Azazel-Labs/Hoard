@@ -364,10 +364,11 @@ software rasterizer (`apt install mesa-vulkan-drivers`). Without any adapter, ev
 5. **Link.** glTF buffers/images, OBJ → MTL → textures, FBX texture paths (absolute artist paths are matched by file
    name), DAE images, `.blend` external textures and linked libraries (`//` paths resolved relative to the file),
    `Model@Clip.fbx` animation clips, and name-based guesses for models that reference nothing (from the model's own
-   part of the pack: its folder's parent and below, so `Models/` and `Textures/` side by side). Game-engine and
-   tool files link too: Unity materials, prefabs, scenes and controllers through their GUIDs; Tiled maps → tilesets
-   → images; LDtk projects; BMFont `.fnt` → page images; Spine/libGDX `.atlas` → pages; TexturePacker JSON;
-   Godot `.tres`/`.tscn` resources; and Unreal package imports.
+   part of the pack: its folder's parent and below, so `Models/` and `Textures/` side by side, and only painted on a
+   model whose materials have no colors of their own). Game-engine and tool files link too: Unity materials,
+   prefabs, scenes and controllers through their GUIDs; Tiled maps → tilesets → images;
+   LDtk projects; BMFont `.fnt` → page images; Spine/libGDX `.atlas` → pages; TexturePacker JSON; Godot
+   `.tres`/`.tscn` resources; and Unreal package imports.
 6. **Tag (LLM, optional).** Any OpenAI-compatible endpoint (OpenAI, OpenRouter, Ollama, llama.cpp, vLLM, LM Studio),
    or a ChatGPT plan through "Sign in with ChatGPT", gets the pack context, paths, metadata and rule tags, and returns names, a description of one to three
    sentences (for music: mood, instruments, tempo and where it fits), extra tags, UCS subcategories and

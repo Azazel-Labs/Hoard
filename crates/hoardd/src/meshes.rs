@@ -82,6 +82,7 @@ pub(crate) fn facts(path: &Path, ext: &str, root: &Path) -> Result<Map<String, V
         morph_targets: false,
         materials: false,
         textures: false,
+        image_bytes: false,
         cameras: false,
         lights: false,
         extras: false,

@@ -2308,7 +2308,7 @@ settings-look-hint = Comutați între luminos și întunecat (sau urmați sistem
 
 ## SettingsPage.vue: Instrumente
 
-settings-blender-what = Convertește în fundal modelele .blend, .fbx, .dae, .usd, .ply, .stl și .3ds în glTF, ca să primească miniaturi și o previzualizare 3D. Pachetele adăugate cât timp era dezactivat sunt convertite după ce este gata.
+settings-blender-what = Convertește în fundal modelele .blend, .dae, .abc și .x3d în glTF, ca să primească miniaturi și o previzualizare 3D. Pachetele adăugate cât timp era dezactivat sunt convertite după ce este gata.
 settings-blender-download = Folosește un Blender instalat sau descarcă Blender 4.5 LTS (aproximativ 400 MB) de pe o oglindă blender.org.
 settings-ffmpeg-what = Codifică descărcările MP3, OGG și Opus și citește sunetul pe care Hoard nu îl poate decoda singur (AAC, M4A, WMA, …).
 settings-ffmpeg-download = Folosește un ffmpeg de sistem cu codificatoarele potrivite sau descarcă un build static (aproximativ 80 MB).

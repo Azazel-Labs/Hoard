@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "ee7422704f0ad93118aaa97a00db3ba17d1d79fddf5bfd3b05bba10a82128d4d"
+source = "fc92f8dc849a93f6bd71f4574b0acf4b0222ed7e975e9f8d94c28e98efc7b33a"
 translation = "30e8f29d5a5413b518bc3d4463f4fe90103622d446d3a937f1fa04d45817b813"
 
 [messages.account-add]
@@ -7817,8 +7817,8 @@ source = "Uses an installed Blender, or downloads Blender 4.5 LTS (about 400 MB)
 translation = "Користи инсталирани Blender или преузима Blender 4.5 LTS (око 400 MB) са огледала blender.org."
 
 [messages.settings-blender-what]
-source = "Converts .blend, .fbx, .dae, .usd, .ply, .stl and .3ds models to glTF in the background, so they get thumbnails and a 3D preview. Packs added while it was off are converted once it’s ready."
-translation = "У позадини претвара моделе .blend, .fbx, .dae, .usd, .ply, .stl и .3ds у glTF, тако да добију сличице и 3D преглед. Пакети додати док је био искључен претварају се чим буде спреман."
+source = "Converts .blend, .dae, .abc and .x3d models to glTF in the background, so they get thumbnails and a 3D preview. Packs added while it was off are converted once it’s ready."
+translation = "У позадини претвара моделе .blend, .dae, .abc и .x3d у glTF, тако да добију сличице и 3D преглед. Пакети додати док је био искључен претварају се чим буде спреман."
 
 [messages.settings-chatgpt-account]
 source = "Account"

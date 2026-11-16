@@ -2294,7 +2294,7 @@ settings-look-hint = Mezi světlým a tmavým (nebo podle systému) přepínáte
 
 ## SettingsPage.vue: Nástroje
 
-settings-blender-what = Na pozadí převádí modely .blend, .fbx, .dae, .usd, .ply, .stl a .3ds do glTF, aby dostaly miniatury a 3D náhled. Balíčky přidané, když byl vypnutý, se převedou, jakmile bude připravený.
+settings-blender-what = Na pozadí převádí modely .blend, .dae, .abc a .x3d do glTF, aby dostaly miniatury a 3D náhled. Balíčky přidané, když byl vypnutý, se převedou, jakmile bude připravený.
 settings-blender-download = Použije nainstalovaný Blender, nebo stáhne Blender 4.5 LTS (asi 400 MB) ze zrcadla blender.org.
 settings-ffmpeg-what = Kóduje stahování v MP3, OGG a Opus a čte zvuk, který Hoard sám dekódovat neumí (AAC, M4A, WMA, …).
 settings-ffmpeg-download = Použije systémový ffmpeg se správnými enkodéry, nebo stáhne statický build (asi 80 MB).

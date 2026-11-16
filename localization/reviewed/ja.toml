@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "ee7422704f0ad93118aaa97a00db3ba17d1d79fddf5bfd3b05bba10a82128d4d"
+source = "fc92f8dc849a93f6bd71f4574b0acf4b0222ed7e975e9f8d94c28e98efc7b33a"
 translation = "110cc1215f00a6312d4fe13a655f9cc3553e284205745fc0ce70ae25601e1bd5"
 
 [messages.account-add]
@@ -7598,8 +7598,8 @@ source = "Uses an installed Blender, or downloads Blender 4.5 LTS (about 400 MB)
 translation = "インストール済みの Blender を使うか、blender.org のミラーから Blender 4.5 LTS（約 400 MB）をダウンロードします。"
 
 [messages.settings-blender-what]
-source = "Converts .blend, .fbx, .dae, .usd, .ply, .stl and .3ds models to glTF in the background, so they get thumbnails and a 3D preview. Packs added while it was off are converted once it’s ready."
-translation = ".blend、.fbx、.dae、.usd、.ply、.stl、.3ds のモデルをバックグラウンドで glTF に変換し、サムネイルと 3D プレビューを作れるようにします。オフの間に追加したパックは、準備ができしだい変換されます。"
+source = "Converts .blend, .dae, .abc and .x3d models to glTF in the background, so they get thumbnails and a 3D preview. Packs added while it was off are converted once it’s ready."
+translation = ".blend、.dae、.abc、.x3d のモデルをバックグラウンドで glTF に変換し、サムネイルと 3D プレビューを作れるようにします。オフの間に追加したパックは、準備ができしだい変換されます。"
 
 [messages.settings-chatgpt-account]
 source = "Account"

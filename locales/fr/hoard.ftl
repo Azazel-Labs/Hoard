@@ -2148,7 +2148,7 @@ settings-look-hint = Passez du clair au sombre (ou suivez le système) depuis la
 
 ## SettingsPage.vue : Outils
 
-settings-blender-what = Convertit en arrière-plan les modèles .blend, .fbx, .dae, .usd, .ply, .stl et .3ds en glTF, pour qu’ils aient des miniatures et un aperçu 3D. Les packs ajoutés pendant qu’il était désactivé sont convertis dès qu’il est prêt.
+settings-blender-what = Convertit en arrière-plan les modèles .blend, .dae, .abc et .x3d en glTF, pour qu’ils aient des miniatures et un aperçu 3D. Les packs ajoutés pendant qu’il était désactivé sont convertis dès qu’il est prêt.
 settings-blender-download = Utilise un Blender installé, ou télécharge Blender 4.5 LTS (environ 400 Mo) depuis un miroir de blender.org.
 settings-ffmpeg-what = Encode les téléchargements en MP3, OGG et Opus, et lit l’audio que Hoard ne sait pas décoder lui-même (AAC, M4A, WMA…).
 settings-ffmpeg-download = Utilise un ffmpeg du système doté des bons encodeurs, ou télécharge une version statique (environ 80 Mo).

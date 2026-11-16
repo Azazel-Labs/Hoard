@@ -2203,7 +2203,7 @@ settings-look-hint = Пребацујте између светле и тамн�
 
 ## SettingsPage.vue: Алати
 
-settings-blender-what = У позадини претвара моделе .blend, .fbx, .dae, .usd, .ply, .stl и .3ds у glTF, тако да добију сличице и 3D преглед. Пакети додати док је био искључен претварају се чим буде спреман.
+settings-blender-what = У позадини претвара моделе .blend, .dae, .abc и .x3d у glTF, тако да добију сличице и 3D преглед. Пакети додати док је био искључен претварају се чим буде спреман.
 settings-blender-download = Користи инсталирани Blender или преузима Blender 4.5 LTS (око 400 MB) са огледала blender.org.
 settings-ffmpeg-what = Кодира MP3, OGG и Opus преузимања и чита звук који Hoard не може сам да декодира (AAC, M4A, WMA, …).
 settings-ffmpeg-download = Користи системски ffmpeg с одговарајућим кодерима или преузима статичку верзију (око 80 MB).

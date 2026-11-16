@@ -1941,7 +1941,7 @@ settings-look-hint = Beralih antara terang dan gelap (atau ikuti sistem) dari bi
 
 ## SettingsPage.vue: Alat
 
-settings-blender-what = Mengonversi model .blend, .fbx, .dae, .usd, .ply, .stl, dan .3ds ke glTF di latar belakang, agar mendapat gambar mini dan pratinjau 3D. Paket yang ditambahkan selagi fitur ini mati dikonversi setelah siap.
+settings-blender-what = Mengonversi model .blend, .dae, .abc, dan .x3d ke glTF di latar belakang, agar mendapat gambar mini dan pratinjau 3D. Paket yang ditambahkan selagi fitur ini mati dikonversi setelah siap.
 settings-blender-download = Memakai Blender yang terpasang, atau mengunduh Blender 4.5 LTS (sekitar 400 MB) dari mirror blender.org.
 settings-ffmpeg-what = Meng-encode unduhan MP3, OGG, dan Opus, serta membaca audio yang tidak dapat didekode Hoard sendiri (AAC, M4A, WMA, …).
 settings-ffmpeg-download = Memakai ffmpeg sistem dengan encoder yang sesuai, atau mengunduh build statis (sekitar 80 MB).

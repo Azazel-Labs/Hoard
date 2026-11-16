@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "ee7422704f0ad93118aaa97a00db3ba17d1d79fddf5bfd3b05bba10a82128d4d"
+source = "fc92f8dc849a93f6bd71f4574b0acf4b0222ed7e975e9f8d94c28e98efc7b33a"
 translation = "863d09bc1e828f14f8cf00c118caee84558c0ecf852401afe0ac271a50ad1d87"
 
 [messages.account-add]
@@ -7753,8 +7753,8 @@ source = "Uses an installed Blender, or downloads Blender 4.5 LTS (about 400 MB)
 translation = "Bruger en installeret Blender eller downloader Blender 4.5 LTS (ca. 400 MB) fra et blender.org-spejl."
 
 [messages.settings-blender-what]
-source = "Converts .blend, .fbx, .dae, .usd, .ply, .stl and .3ds models to glTF in the background, so they get thumbnails and a 3D preview. Packs added while it was off are converted once it’s ready."
-translation = "Konverterer .blend-, .fbx-, .dae-, .usd-, .ply-, .stl- og .3ds-modeller til glTF i baggrunden, så de får miniaturer og en 3D-forhåndsvisning. Pakker, der blev tilføjet, mens den var slået fra, konverteres, når den er klar."
+source = "Converts .blend, .dae, .abc and .x3d models to glTF in the background, so they get thumbnails and a 3D preview. Packs added while it was off are converted once it’s ready."
+translation = "Konverterer .blend-, .dae-, .abc- og .x3d-modeller til glTF i baggrunden, så de får miniaturer og en 3D-forhåndsvisning. Pakker, der blev tilføjet, mens den var slået fra, konverteres, når den er klar."
 
 [messages.settings-chatgpt-account]
 source = "Account"

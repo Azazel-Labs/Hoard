@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "ee7422704f0ad93118aaa97a00db3ba17d1d79fddf5bfd3b05bba10a82128d4d"
+source = "fc92f8dc849a93f6bd71f4574b0acf4b0222ed7e975e9f8d94c28e98efc7b33a"
 translation = "29bbdd56d3912619e12475d6d444595ec6d389a2b27582eeb623a3b8e037c6e8"
 
 [messages.account-add]
@@ -7955,8 +7955,8 @@ source = "Uses an installed Blender, or downloads Blender 4.5 LTS (about 400 MB)
 translation = "Використовує встановлений Blender або завантажує Blender 4.5 LTS (близько 400 МБ) із дзеркала blender.org."
 
 [messages.settings-blender-what]
-source = "Converts .blend, .fbx, .dae, .usd, .ply, .stl and .3ds models to glTF in the background, so they get thumbnails and a 3D preview. Packs added while it was off are converted once it’s ready."
-translation = "У фоновому режимі перетворює моделі .blend, .fbx, .dae, .usd, .ply, .stl і .3ds на glTF, щоб вони отримали мініатюри й 3D-перегляд. Пакети, додані, поки він був вимкнений, перетворюються, щойно він буде готовий."
+source = "Converts .blend, .dae, .abc and .x3d models to glTF in the background, so they get thumbnails and a 3D preview. Packs added while it was off are converted once it’s ready."
+translation = "У фоновому режимі перетворює моделі .blend, .dae, .abc і .x3d на glTF, щоб вони отримали мініатюри й 3D-перегляд. Пакети, додані, поки він був вимкнений, перетворюються, щойно він буде готовий."
 
 [messages.settings-chatgpt-account]
 source = "Account"

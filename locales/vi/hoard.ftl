@@ -1937,7 +1937,7 @@ settings-look-hint = Chuyển giữa sáng và tối (hoặc theo hệ thống) 
 
 ## Cài đặt: Công cụ
 
-settings-blender-what = Chuyển đổi mô hình .blend, .fbx, .dae, .usd, .ply, .stl và .3ds sang glTF trong nền, để chúng có ảnh thu nhỏ và bản xem trước 3D. Các gói được thêm khi công cụ đang tắt sẽ được chuyển đổi khi nó sẵn sàng.
+settings-blender-what = Chuyển đổi mô hình .blend, .dae, .abc và .x3d sang glTF trong nền, để chúng có ảnh thu nhỏ và bản xem trước 3D. Các gói được thêm khi công cụ đang tắt sẽ được chuyển đổi khi nó sẵn sàng.
 settings-blender-download = Dùng Blender đã cài, hoặc tải Blender 4.5 LTS (khoảng 400 MB) từ một máy chủ phản chiếu của blender.org.
 settings-ffmpeg-what = Mã hóa bản tải xuống MP3, OGG và Opus, và đọc âm thanh mà Hoard không tự giải mã được (AAC, M4A, WMA, …).
 settings-ffmpeg-download = Dùng ffmpeg của hệ thống có đủ bộ mã hóa, hoặc tải một bản build tĩnh (khoảng 80 MB).

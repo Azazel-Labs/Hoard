@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "ee7422704f0ad93118aaa97a00db3ba17d1d79fddf5bfd3b05bba10a82128d4d"
+source = "fc92f8dc849a93f6bd71f4574b0acf4b0222ed7e975e9f8d94c28e98efc7b33a"
 translation = "4b240abbf21b9e5a3573cb5600cede4f95b8fdc50ad26369cfcd10d567b19ce3"
 
 [messages.account-add]
@@ -7587,8 +7587,8 @@ source = "Uses an installed Blender, or downloads Blender 4.5 LTS (about 400 MB)
 translation = "ใช้ Blender ที่ติดตั้งไว้ หรือดาวน์โหลด Blender 4.5 LTS (ประมาณ 400 MB) จากมิเรอร์ของ blender.org"
 
 [messages.settings-blender-what]
-source = "Converts .blend, .fbx, .dae, .usd, .ply, .stl and .3ds models to glTF in the background, so they get thumbnails and a 3D preview. Packs added while it was off are converted once it’s ready."
-translation = "แปลงโมเดล .blend, .fbx, .dae, .usd, .ply, .stl และ .3ds เป็น glTF ในเบื้องหลัง เพื่อให้มีภาพย่อและตัวอย่าง 3 มิติ แพ็กที่เพิ่มขณะที่ปิดอยู่จะถูกแปลงเมื่อพร้อม"
+source = "Converts .blend, .dae, .abc and .x3d models to glTF in the background, so they get thumbnails and a 3D preview. Packs added while it was off are converted once it’s ready."
+translation = "แปลงโมเดล .blend, .dae, .abc และ .x3d เป็น glTF ในเบื้องหลัง เพื่อให้มีภาพย่อและตัวอย่าง 3 มิติ แพ็กที่เพิ่มขณะที่ปิดอยู่จะถูกแปลงเมื่อพร้อม"
 
 [messages.settings-chatgpt-account]
 source = "Account"

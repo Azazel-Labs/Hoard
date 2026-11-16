@@ -2375,7 +2375,7 @@ settings-look-hint = Switch between light and dark (or follow the system) from t
 
 ## SettingsPage.vue: Tools
 
-settings-blender-what = Converts .blend, .fbx, .dae, .usd, .ply, .stl and .3ds models to glTF in the background, so they get thumbnails and a 3D preview. Packs added while it was off are converted once it’s ready.
+settings-blender-what = Converts .blend, .dae, .abc and .x3d models to glTF in the background, so they get thumbnails and a 3D preview. Packs added while it was off are converted once it’s ready.
 settings-blender-download = Uses an installed Blender, or downloads Blender 4.5 LTS (about 400 MB) from a blender.org mirror.
 settings-ffmpeg-what = Encodes MP3, OGG and Opus downloads, and reads audio Hoard can’t decode itself (AAC, M4A, WMA, …).
 settings-ffmpeg-download = Uses a system ffmpeg with the right encoders, or downloads a static build (about 80 MB).

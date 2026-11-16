@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "ee7422704f0ad93118aaa97a00db3ba17d1d79fddf5bfd3b05bba10a82128d4d"
+source = "fc92f8dc849a93f6bd71f4574b0acf4b0222ed7e975e9f8d94c28e98efc7b33a"
 translation = "259239ab239601949cc6a70972021dcb09218f2bed3d1964197e9079006c5785"
 
 [messages.account-add]
@@ -7800,8 +7800,8 @@ source = "Uses an installed Blender, or downloads Blender 4.5 LTS (about 400 MB)
 translation = "Käyttää asennettua Blenderiä tai lataa Blender 4.5 LTS:n (noin 400 Mt) blender.orgin peilipalvelimelta."
 
 [messages.settings-blender-what]
-source = "Converts .blend, .fbx, .dae, .usd, .ply, .stl and .3ds models to glTF in the background, so they get thumbnails and a 3D preview. Packs added while it was off are converted once it’s ready."
-translation = "Muuntaa .blend-, .fbx-, .dae-, .usd-, .ply-, .stl- ja .3ds-mallit taustalla glTF-muotoon, jotta ne saavat pikkukuvat ja 3D-esikatselun. Kun se oli pois päältä lisätyt paketit muunnetaan, kun se on valmis."
+source = "Converts .blend, .dae, .abc and .x3d models to glTF in the background, so they get thumbnails and a 3D preview. Packs added while it was off are converted once it’s ready."
+translation = "Muuntaa .blend-, .dae-, .abc- ja .x3d-mallit taustalla glTF-muotoon, jotta ne saavat pikkukuvat ja 3D-esikatselun. Kun se oli pois päältä lisätyt paketit muunnetaan, kun se on valmis."
 
 [messages.settings-chatgpt-account]
 source = "Account"

@@ -1951,7 +1951,7 @@ settings-look-hint = Açık ve koyu arasında (ya da sistemi izlemek için) üst
 
 ## SettingsPage.vue: Tools
 
-settings-blender-what = .blend, .fbx, .dae, .usd, .ply, .stl ve .3ds modellerini arka planda glTF’ye dönüştürür; böylece küçük resim ve 3B önizleme alırlar. Kapalıyken eklenen paketler, hazır olduğunda dönüştürülür.
+settings-blender-what = .blend, .dae, .abc ve .x3d modellerini arka planda glTF’ye dönüştürür; böylece küçük resim ve 3B önizleme alırlar. Kapalıyken eklenen paketler, hazır olduğunda dönüştürülür.
 settings-blender-download = Kurulu bir Blender kullanır ya da bir blender.org yansısından Blender 4.5 LTS (yaklaşık 400 MB) indirir.
 settings-ffmpeg-what = MP3, OGG ve Opus indirmelerini kodlar ve Hoard’un kendisinin çözemediği sesleri (AAC, M4A, WMA, …) okur.
 settings-ffmpeg-download = Doğru kodlayıcılara sahip bir sistem ffmpeg’i kullanır ya da statik bir derleme (yaklaşık 80 MB) indirir.

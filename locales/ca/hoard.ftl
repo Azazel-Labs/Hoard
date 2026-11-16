@@ -2112,7 +2112,7 @@ settings-look-hint = Canvieu entre clar i fosc (o seguiu el sistema) des de la b
 
 ## SettingsPage.vue: Eines
 
-settings-blender-what = Converteix models .blend, .fbx, .dae, .usd, .ply, .stl i .3ds a glTF en segon pla, perquè tinguin miniatures i previsualització 3D. Els paquets afegits mentre estava desactivat es converteixen quan estigui a punt.
+settings-blender-what = Converteix models .blend, .dae, .abc i .x3d a glTF en segon pla, perquè tinguin miniatures i previsualització 3D. Els paquets afegits mentre estava desactivat es converteixen quan estigui a punt.
 settings-blender-download = Fa servir un Blender instal·lat, o baixa Blender 4.5 LTS (uns 400 MB) d'un mirall de blender.org.
 settings-ffmpeg-what = Codifica les baixades en MP3, OGG i Opus, i llegeix l'àudio que Hoard no pot descodificar per si mateix (AAC, M4A, WMA…).
 settings-ffmpeg-download = Fa servir un ffmpeg del sistema amb els codificadors adequats, o baixa una versió estàtica (uns 80 MB).

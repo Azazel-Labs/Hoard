@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "ee7422704f0ad93118aaa97a00db3ba17d1d79fddf5bfd3b05bba10a82128d4d"
+source = "fc92f8dc849a93f6bd71f4574b0acf4b0222ed7e975e9f8d94c28e98efc7b33a"
 translation = "1a4df50b438ca81d05a8082fa6c6f1912acf6742fdc06a0acf388c1b5773abb6"
 
 [messages.account-add]
@@ -7584,8 +7584,8 @@ source = "Uses an installed Blender, or downloads Blender 4.5 LTS (about 400 MB)
 translation = "Dùng Blender đã cài, hoặc tải Blender 4.5 LTS (khoảng 400 MB) từ một máy chủ phản chiếu của blender.org."
 
 [messages.settings-blender-what]
-source = "Converts .blend, .fbx, .dae, .usd, .ply, .stl and .3ds models to glTF in the background, so they get thumbnails and a 3D preview. Packs added while it was off are converted once it’s ready."
-translation = "Chuyển đổi mô hình .blend, .fbx, .dae, .usd, .ply, .stl và .3ds sang glTF trong nền, để chúng có ảnh thu nhỏ và bản xem trước 3D. Các gói được thêm khi công cụ đang tắt sẽ được chuyển đổi khi nó sẵn sàng."
+source = "Converts .blend, .dae, .abc and .x3d models to glTF in the background, so they get thumbnails and a 3D preview. Packs added while it was off are converted once it’s ready."
+translation = "Chuyển đổi mô hình .blend, .dae, .abc và .x3d sang glTF trong nền, để chúng có ảnh thu nhỏ và bản xem trước 3D. Các gói được thêm khi công cụ đang tắt sẽ được chuyển đổi khi nó sẵn sàng."
 
 [messages.settings-chatgpt-account]
 source = "Account"

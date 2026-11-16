@@ -2191,7 +2191,7 @@ settings-look-hint = Vaihda vaalean ja tumman välillä (tai seuraa järjestelm�
 
 ## Asetukset: Työkalut
 
-settings-blender-what = Muuntaa .blend-, .fbx-, .dae-, .usd-, .ply-, .stl- ja .3ds-mallit taustalla glTF-muotoon, jotta ne saavat pikkukuvat ja 3D-esikatselun. Kun se oli pois päältä lisätyt paketit muunnetaan, kun se on valmis.
+settings-blender-what = Muuntaa .blend-, .dae-, .abc- ja .x3d-mallit taustalla glTF-muotoon, jotta ne saavat pikkukuvat ja 3D-esikatselun. Kun se oli pois päältä lisätyt paketit muunnetaan, kun se on valmis.
 settings-blender-download = Käyttää asennettua Blenderiä tai lataa Blender 4.5 LTS:n (noin 400 Mt) blender.orgin peilipalvelimelta.
 settings-ffmpeg-what = Koodaa MP3-, OGG- ja Opus-lataukset ja lukee äänen, jota Hoard ei itse osaa purkaa (AAC, M4A, WMA, …).
 settings-ffmpeg-download = Käyttää järjestelmän ffmpegiä, jossa on oikeat kooderit, tai lataa staattisen version (noin 80 Mt).

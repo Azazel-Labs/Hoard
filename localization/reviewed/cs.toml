@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "ee7422704f0ad93118aaa97a00db3ba17d1d79fddf5bfd3b05bba10a82128d4d"
+source = "fc92f8dc849a93f6bd71f4574b0acf4b0222ed7e975e9f8d94c28e98efc7b33a"
 translation = "10350137b75664600f5b80d67d4b7dc6a218245ed458fa59bceed92a7a09d3d2"
 
 [messages.account-add]
@@ -7887,8 +7887,8 @@ source = "Uses an installed Blender, or downloads Blender 4.5 LTS (about 400 MB)
 translation = "Použije nainstalovaný Blender, nebo stáhne Blender 4.5 LTS (asi 400 MB) ze zrcadla blender.org."
 
 [messages.settings-blender-what]
-source = "Converts .blend, .fbx, .dae, .usd, .ply, .stl and .3ds models to glTF in the background, so they get thumbnails and a 3D preview. Packs added while it was off are converted once it’s ready."
-translation = "Na pozadí převádí modely .blend, .fbx, .dae, .usd, .ply, .stl a .3ds do glTF, aby dostaly miniatury a 3D náhled. Balíčky přidané, když byl vypnutý, se převedou, jakmile bude připravený."
+source = "Converts .blend, .dae, .abc and .x3d models to glTF in the background, so they get thumbnails and a 3D preview. Packs added while it was off are converted once it’s ready."
+translation = "Na pozadí převádí modely .blend, .dae, .abc a .x3d do glTF, aby dostaly miniatury a 3D náhled. Balíčky přidané, když byl vypnutý, se převedou, jakmile bude připravený."
 
 [messages.settings-chatgpt-account]
 source = "Account"

@@ -1937,7 +1937,7 @@ settings-look-hint = ライトとダーク（またはシステムに合わせ�
 
 ## SettingsPage.vue: ツール
 
-settings-blender-what = .blend、.fbx、.dae、.usd、.ply、.stl、.3ds のモデルをバックグラウンドで glTF に変換し、サムネイルと 3D プレビューを作れるようにします。オフの間に追加したパックは、準備ができしだい変換されます。
+settings-blender-what = .blend、.dae、.abc、.x3d のモデルをバックグラウンドで glTF に変換し、サムネイルと 3D プレビューを作れるようにします。オフの間に追加したパックは、準備ができしだい変換されます。
 settings-blender-download = インストール済みの Blender を使うか、blender.org のミラーから Blender 4.5 LTS（約 400 MB）をダウンロードします。
 settings-ffmpeg-what = MP3、OGG、Opus のダウンロードをエンコードし、Hoard が自分でデコードできない音声（AAC、M4A、WMA など）を読み取ります。
 settings-ffmpeg-download = 必要なエンコーダーを備えたシステムの ffmpeg を使うか、静的ビルド（約 80 MB）をダウンロードします。

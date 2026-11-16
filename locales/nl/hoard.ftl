@@ -2105,7 +2105,7 @@ settings-look-hint = Wissel tussen licht en donker (of volg het systeem) via de 
 
 ## SettingsPage.vue: Hulpprogramma's
 
-settings-blender-what = Converteert .blend-, .fbx-, .dae-, .usd-, .ply-, .stl- en .3ds-modellen op de achtergrond naar glTF, zodat ze miniaturen en een 3D-voorbeeld krijgen. Pakketten die zijn toegevoegd terwijl het uit stond, worden geconverteerd zodra het klaar is.
+settings-blender-what = Converteert .blend-, .dae-, .abc- en .x3d-modellen op de achtergrond naar glTF, zodat ze miniaturen en een 3D-voorbeeld krijgen. Pakketten die zijn toegevoegd terwijl het uit stond, worden geconverteerd zodra het klaar is.
 settings-blender-download = Gebruikt een geïnstalleerde Blender, of downloadt Blender 4.5 LTS (ongeveer 400 MB) van een mirror van blender.org.
 settings-ffmpeg-what = Codeert MP3-, OGG- en Opus-downloads, en leest audio die Hoard zelf niet kan decoderen (AAC, M4A, WMA, …).
 settings-ffmpeg-download = Gebruikt een ffmpeg van het systeem met de juiste encoders, of downloadt een statische build (ongeveer 80 MB).

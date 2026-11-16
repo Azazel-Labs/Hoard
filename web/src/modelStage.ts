@@ -69,7 +69,7 @@ export interface StageOptions {
 type Loaded = {
   object: THREE.Object3D
   animations: THREE.AnimationClip[]
-  /** Material colors were written as linear values (Blender's OBJ and FBX exporters), not the sRGB the loaders
+  /** Material colors were written as linear values (Blender's FBX exporter), not the sRGB the loaders
    *  assume: read as sRGB they come out far too dark, a dark green skin turning black. */
   linearColors?: boolean
 }
@@ -162,28 +162,6 @@ async function loadModel(url: string, ext: string, manager: THREE.LoadingManager
       const head = new TextDecoder('latin1').decode(buf.slice(0, 65536))
       return { object: o, animations: o.animations, linearColors: head.includes('Blender') }
     }
-    case 'obj': {
-      const [{ OBJLoader }, { MTLLoader }] = await Promise.all([
-        import('three/addons/loaders/OBJLoader.js'),
-        import('three/addons/loaders/MTLLoader.js'),
-      ])
-      const res = await fetch(url)
-      if (!res.ok) throw new Error(`HTTP ${res.status}`)
-      const text = await res.text()
-      const loader = new OBJLoader(manager)
-      const mtl = text.match(/^mtllib\s+(.+)$/m)?.[1]?.trim()
-      if (mtl) {
-        try {
-          const base = url.slice(0, url.lastIndexOf('/') + 1)
-          const materials = await new MTLLoader(manager).setPath(base).loadAsync(mtl)
-          materials.preload()
-          loader.setMaterials(materials)
-        } catch {
-          // Missing MTL: fall back to the default material.
-        }
-      }
-      return { object: loader.parse(text), animations: [], linearColors: /^# Blender/m.test(text.slice(0, 500)) }
-    }
     case 'stl': {
       const { STLLoader } = await import('three/addons/loaders/STLLoader.js')
       const res = await fetch(url)
@@ -207,7 +185,7 @@ async function loadModel(url: string, ext: string, manager: THREE.LoadingManager
       return { object: new THREE.Mesh(geom, material), animations: [] }
     }
     case 'server-glb': {
-      // The server reads 3DS, 3MF (slicers' filament colors and painting included) and USD, and hands them over as a GLB. A
+      // The server reads OBJ, 3DS, 3MF (slicers' filament colors and painting included) and USD, and hands them over as a GLB. A
       // conversion still running answers 202 after waiting a while: ask again, for up to ten minutes or so.
       const loader = await gltfLoader(manager)
       for (let tries = 0; tries < 20; tries++) {
@@ -233,8 +211,9 @@ async function loadModel(url: string, ext: string, manager: THREE.LoadingManager
   }
 }
 
-/** Formats the browser has no loader for, which the server reads and hands over as a GLB. */
-const SERVER_GLB = new Set(['3ds', '3mf', 'usd', 'usda', 'usdc', 'usdz'])
+/** Formats the server reads and hands over as a GLB: ones the browser has no loader for, and OBJ, whose loader
+ *  fans each polygon out from its first corner, which spills a concave one (SketchUp's) over its neighbors. */
+const SERVER_GLB = new Set(['obj', '3ds', '3mf', 'usd', 'usda', 'usdc', 'usdz'])
 
 function sourceFor(a: Asset | AssetLink, packId: string, derivatives: string[] = []): { url: string; ext: string } {
   if (derivatives.includes('glb')) return { url: `/api/assets/${a.id}/derivative/glb`, ext: 'glb' }
@@ -598,7 +577,9 @@ export class ModelStage {
       )
       this.stopMaps = applied.stop
       guessed = applied.count
-    } else if (!textured.any && guesses.length) guessed = this.applyGuesses(guesses, asset.pack_id, this.flipY, manager)
+    } else if (!textured.any && guesses.length && !this.colored()) {
+      guessed = this.applyGuesses(guesses, asset.pack_id, this.flipY, manager)
+    }
 
     this.object = object
     this.scene.add(object)
@@ -650,6 +631,17 @@ export class ModelStage {
     const maps: Partial<Record<MapSlot, THREE.Texture | null>> = {}
     for (const slot of MAP_SLOTS) if (m[slot]) maps[slot] = m[slot]
     this.materials.set(m, maps)
+  }
+
+  /** Whether the model paints its surfaces with colors of its own (Kenney's kits: tire gray, paint red), so a
+   *  texture found by name (most likely a 2D sprite of it) would only cover them up. */
+  private colored(): boolean {
+    const colors = new Set<number>()
+    for (const m of this.materials.keys()) {
+      const c = m.color?.getHex()
+      if (c !== undefined && c !== 0xffffff) colors.add(c)
+    }
+    return colors.size > 1
   }
 
   private applyGuesses(guesses: AssetLink[], packId: string, flipY: boolean, manager: THREE.LoadingManager): number {

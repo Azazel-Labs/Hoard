@@ -437,6 +437,29 @@ const MIGRATIONS: &[&str] = &[
               strftime('%Y-%m-%dT%H:%M:%SZ', 'now'), strftime('%Y-%m-%dT%H:%M:%SZ', 'now')
        FROM packs p WHERE p.status = 'ingesting'
          AND NOT EXISTS (SELECT 1 FROM jobs j WHERE j.pack_id = p.id AND j.status IN ('queued', 'running'));",
+    // 49: Blender converts only the formats Hoard can't read (.blend, Collada, Alembic, X3D). Its FBX importer
+    // made textures with an alpha channel see-through, so the GLBs it made of anything else are dropped (Hoard
+    // builds its own) and their conversion failures go. The browser now shows OBJ through Hoard's GLB too, since
+    // its own OBJ reader spilled concave polygons over their neighbors. Thumbnails the browser drew from either
+    // are drawn again.
+    "CREATE TEMP TABLE redraw AS SELECT id, pack_id FROM assets a
+       WHERE a.thumb_source IS NOT NULL AND a.kind = 'model'
+         AND (a.ext = 'obj' OR (a.ext NOT IN ('blend', 'dae', 'abc', 'x3d')
+              AND EXISTS (SELECT 1 FROM derivatives d WHERE d.asset_id = a.id AND d.kind = 'glb')));
+     UPDATE assets SET thumb_source = NULL WHERE id IN (SELECT id FROM temp.redraw);
+     UPDATE packs SET status = 'ingesting'
+       WHERE status = 'ready' AND archived_at IS NULL AND id IN (SELECT pack_id FROM temp.redraw)
+         AND NOT EXISTS (SELECT 1 FROM jobs j WHERE j.pack_id = packs.id AND j.status IN ('queued', 'running'));
+     DROP TABLE temp.redraw;
+     INSERT INTO jobs (kind, pack_id, payload, run_after, created_at, updated_at)
+       SELECT 'retag', id, '{\"then_llm\":false}', strftime('%Y-%m-%dT%H:%M:%SZ', 'now'),
+              strftime('%Y-%m-%dT%H:%M:%SZ', 'now'), strftime('%Y-%m-%dT%H:%M:%SZ', 'now')
+       FROM packs p WHERE p.status = 'ingesting'
+         AND NOT EXISTS (SELECT 1 FROM jobs j WHERE j.pack_id = p.id AND j.status IN ('queued', 'running'));
+     DELETE FROM derivatives WHERE kind = 'glb'
+       AND asset_id IN (SELECT id FROM assets WHERE ext NOT IN ('blend', 'dae', 'abc', 'x3d'));
+     DELETE FROM issues WHERE kind = 'convert' AND lower(subject) NOT LIKE '%.blend'
+       AND lower(subject) NOT LIKE '%.dae' AND lower(subject) NOT LIKE '%.abc' AND lower(subject) NOT LIKE '%.x3d';",
 ];
 
 /// How many automatic pre-upgrade backups to keep in `<data dir>/backups`.
@@ -1964,7 +1987,7 @@ mod tests {
     fn ascii_fbx_and_3ds_packs_are_read_again() {
         let dir = tempfile::tempdir().unwrap();
         let mut conn = baseline_db(dir.path());
-        migrate(&mut conn, &dir.path().join("backups"), &MIGRATIONS[..MIGRATIONS.len() - 3]).unwrap();
+        migrate(&mut conn, &dir.path().join("backups"), &MIGRATIONS[..37]).unwrap();
         conn.execute_batch(
             "PRAGMA foreign_keys = OFF;
              INSERT INTO packs (id, name, status, created_at) VALUES
@@ -1978,7 +2001,7 @@ mod tests {
                ('k2', 'convert', 'iso', 'car.3ds', 'Blender exited', 'x', 'x');",
         )
         .unwrap();
-        migrate(&mut conn, &dir.path().join("backups"), MIGRATIONS).unwrap();
+        migrate(&mut conn, &dir.path().join("backups"), &MIGRATIONS[..38]).unwrap();
         let jobs: Vec<(String, String)> = conn
             .prepare("SELECT kind, pack_id FROM jobs WHERE pack_id <> 'p1' ORDER BY pack_id, kind")
             .unwrap()
@@ -2003,7 +2026,7 @@ mod tests {
     fn packs_that_may_have_atlases_are_looked_through() {
         let dir = tempfile::tempdir().unwrap();
         let mut conn = baseline_db(dir.path());
-        migrate(&mut conn, &dir.path().join("backups"), &MIGRATIONS[..MIGRATIONS.len() - 2]).unwrap();
+        migrate(&mut conn, &dir.path().join("backups"), &MIGRATIONS[..38]).unwrap();
         conn.execute_batch(
             "PRAGMA foreign_keys = OFF;
              INSERT INTO packs (id, name, status, created_at) VALUES
@@ -2018,7 +2041,7 @@ mod tests {
                VALUES ('ingest', 'busy', '{}', 'x', 'x', 'x');",
         )
         .unwrap();
-        migrate(&mut conn, &dir.path().join("backups"), MIGRATIONS).unwrap();
+        migrate(&mut conn, &dir.path().join("backups"), &MIGRATIONS[..39]).unwrap();
         let jobs: Vec<(String, String)> = conn
             .prepare("SELECT kind, pack_id FROM jobs WHERE pack_id <> 'p1' ORDER BY pack_id, kind")
             .unwrap()
@@ -2035,7 +2058,7 @@ mod tests {
     fn gltf_packs_without_thumbnails_are_read_again() {
         let dir = tempfile::tempdir().unwrap();
         let mut conn = baseline_db(dir.path());
-        migrate(&mut conn, &dir.path().join("backups"), &MIGRATIONS[..MIGRATIONS.len() - 1]).unwrap();
+        migrate(&mut conn, &dir.path().join("backups"), &MIGRATIONS[..39]).unwrap();
         conn.execute_batch(
             "PRAGMA foreign_keys = OFF;
              INSERT INTO packs (id, name, status, created_at) VALUES
@@ -2047,7 +2070,7 @@ mod tests {
                ('c', 'clip', 'h3', 'walk.glb', 'walk', 'glb', 'animation', '{}', NULL, 'x', 'x');",
         )
         .unwrap();
-        migrate(&mut conn, &dir.path().join("backups"), MIGRATIONS).unwrap();
+        migrate(&mut conn, &dir.path().join("backups"), &MIGRATIONS[..40]).unwrap();
         let jobs: Vec<(String, String)> = conn
             .prepare("SELECT kind, pack_id FROM jobs WHERE pack_id <> 'p1' ORDER BY pack_id, kind")
             .unwrap()
@@ -2057,6 +2080,45 @@ mod tests {
             .unwrap();
         let jobs: Vec<(&str, &str)> = jobs.iter().map(|(k, p)| (k.as_str(), p.as_str())).collect();
         assert_eq!(jobs, [("retag", "opt")]);
+    }
+
+    /// Blender's GLBs of formats Hoard reads itself are dropped, and the browser thumbnails drawn from them, or from
+    /// an OBJ, are drawn again; a .blend keeps its GLB and its conversion failures.
+    #[test]
+    fn blender_glbs_of_formats_hoard_reads_are_dropped() {
+        let dir = tempfile::tempdir().unwrap();
+        let mut conn = baseline_db(dir.path());
+        migrate(&mut conn, &dir.path().join("backups"), &MIGRATIONS[..40]).unwrap();
+        conn.execute_batch(
+            "PRAGMA foreign_keys = OFF;
+             INSERT INTO packs (id, name, status, created_at) VALUES
+               ('astro', 'Astronaut', 'ready', 'x'), ('scene', 'Scenes', 'ready', 'x'), ('city', 'City', 'ready', 'x');
+             INSERT INTO assets (id, pack_id, blob_hash, path, name, ext, kind, meta, thumb_source, created_at,
+                                 updated_at) VALUES
+               ('a', 'astro', 'h1', 'Astronaut.fbx', 'Astronaut', 'fbx', 'model', '{}', 'browser', 'x', 'x'),
+               ('b', 'scene', 'h2', 'room.blend', 'room', 'blend', 'model', '{}', 'browser', 'x', 'x'),
+               ('c', 'city', 'h3', 'road.obj', 'road', 'obj', 'model', '{}', 'browser-partial', 'x', 'x');
+             INSERT INTO derivatives (asset_id, kind, blob_hash, created_at) VALUES
+               ('a', 'glb', 'g1', 'x'), ('b', 'glb', 'g2', 'x');
+             INSERT INTO issues (key, kind, pack_id, subject, message, first_at, last_at) VALUES
+               ('k1', 'convert', 'astro', 'Helmet.FBX', 'Blender exited', 'x', 'x'),
+               ('k2', 'convert', 'scene', 'hall.blend', 'Blender exited', 'x', 'x');",
+        )
+        .unwrap();
+        migrate(&mut conn, &dir.path().join("backups"), &MIGRATIONS[..41]).unwrap();
+        let strings = |sql: &str| -> Vec<String> {
+            conn.prepare(sql).unwrap().query_map([], |r| r.get(0)).unwrap().flatten().collect()
+        };
+        assert_eq!(strings("SELECT asset_id FROM derivatives"), ["b"]);
+        assert_eq!(
+            strings("SELECT id || ':' || coalesce(thumb_source, '-') FROM assets ORDER BY id"),
+            ["a:-", "b:browser", "c:-"]
+        );
+        assert_eq!(
+            strings("SELECT kind || ':' || pack_id FROM jobs WHERE pack_id <> 'p1' ORDER BY pack_id"),
+            ["retag:astro", "retag:city"]
+        );
+        assert_eq!(strings("SELECT subject FROM issues"), ["hall.blend"]);
     }
 
     #[test]

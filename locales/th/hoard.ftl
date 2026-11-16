@@ -1940,7 +1940,7 @@ settings-look-hint = สลับระหว่างสว่างและ�
 
 ## SettingsPage.vue: Tools
 
-settings-blender-what = แปลงโมเดล .blend, .fbx, .dae, .usd, .ply, .stl และ .3ds เป็น glTF ในเบื้องหลัง เพื่อให้มีภาพย่อและตัวอย่าง 3 มิติ แพ็กที่เพิ่มขณะที่ปิดอยู่จะถูกแปลงเมื่อพร้อม
+settings-blender-what = แปลงโมเดล .blend, .dae, .abc และ .x3d เป็น glTF ในเบื้องหลัง เพื่อให้มีภาพย่อและตัวอย่าง 3 มิติ แพ็กที่เพิ่มขณะที่ปิดอยู่จะถูกแปลงเมื่อพร้อม
 settings-blender-download = ใช้ Blender ที่ติดตั้งไว้ หรือดาวน์โหลด Blender 4.5 LTS (ประมาณ 400 MB) จากมิเรอร์ของ blender.org
 settings-ffmpeg-what = เข้ารหัสไฟล์ดาวน์โหลด MP3, OGG และ Opus และอ่านเสียงที่ Hoard ถอดรหัสเองไม่ได้ (AAC, M4A, WMA, …)
 settings-ffmpeg-download = ใช้ ffmpeg ของระบบที่มีตัวเข้ารหัสที่ถูกต้อง หรือดาวน์โหลดบิลด์แบบสแตติก (ประมาณ 80 MB)

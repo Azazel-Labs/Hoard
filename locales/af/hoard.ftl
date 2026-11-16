@@ -2105,7 +2105,7 @@ settings-look-hint = Wissel tussen lig en donker (of volg die stelsel) vanuit di
 
 ## SettingsPage.vue: Gereedskap
 
-settings-blender-what = Skakel .blend-, .fbx-, .dae-, .usd-, .ply-, .stl- en .3ds-modelle in die agtergrond na glTF om, sodat hulle duimnaels en 'n 3D-voorskou kry. Pakke wat bygevoeg is terwyl dit af was, word omgeskakel sodra dit gereed is.
+settings-blender-what = Skakel .blend-, .dae-, .abc- en .x3d-modelle in die agtergrond na glTF om, sodat hulle duimnaels en 'n 3D-voorskou kry. Pakke wat bygevoeg is terwyl dit af was, word omgeskakel sodra dit gereed is.
 settings-blender-download = Gebruik 'n geïnstalleerde Blender, of laai Blender 4.5 LTS (omtrent 400 MB) van 'n blender.org-spieël af.
 settings-ffmpeg-what = Enkodeer MP3-, OGG- en Opus-aflaaie, en lees klank wat Hoard nie self kan dekodeer nie (AAC, M4A, WMA, …).
 settings-ffmpeg-download = Gebruik 'n stelsel-ffmpeg met die regte enkodeerders, of laai 'n statiese bou (omtrent 80 MB) af.

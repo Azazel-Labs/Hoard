@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "ee7422704f0ad93118aaa97a00db3ba17d1d79fddf5bfd3b05bba10a82128d4d"
+source = "fc92f8dc849a93f6bd71f4574b0acf4b0222ed7e975e9f8d94c28e98efc7b33a"
 translation = "81f454b4be3578d38a286a9258dbbc3cf47ad1586e8852a5a6c519b04af263db"
 
 [messages.account-add]
@@ -7892,8 +7892,8 @@ source = "Uses an installed Blender, or downloads Blender 4.5 LTS (about 400 MB)
 translation = "Folosește un Blender instalat sau descarcă Blender 4.5 LTS (aproximativ 400 MB) de pe o oglindă blender.org."
 
 [messages.settings-blender-what]
-source = "Converts .blend, .fbx, .dae, .usd, .ply, .stl and .3ds models to glTF in the background, so they get thumbnails and a 3D preview. Packs added while it was off are converted once it’s ready."
-translation = "Convertește în fundal modelele .blend, .fbx, .dae, .usd, .ply, .stl și .3ds în glTF, ca să primească miniaturi și o previzualizare 3D. Pachetele adăugate cât timp era dezactivat sunt convertite după ce este gata."
+source = "Converts .blend, .dae, .abc and .x3d models to glTF in the background, so they get thumbnails and a 3D preview. Packs added while it was off are converted once it’s ready."
+translation = "Convertește în fundal modelele .blend, .dae, .abc și .x3d în glTF, ca să primească miniaturi și o previzualizare 3D. Pachetele adăugate cât timp era dezactivat sunt convertite după ce este gata."
 
 [messages.settings-chatgpt-account]
 source = "Account"

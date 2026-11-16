@@ -288,8 +288,8 @@ software rasterizer (`apt install mesa-vulkan-drivers`). Without any adapter, ev
      material stay solid); framed tightly from the same angle every time. glTF and GLB compressed with meshopt
      (`EXT_meshopt_compression`, `KHR_meshopt_compression`) are decoded for the thumbnail and the 3D viewer. FBX
      geometry, node transforms, materials and embedded or nearby textures are read natively (axis and unit settings
-     become glTF's Y-up meters), from binary FBX and from the text form (ASCII FBX 7) that Asset Forge and some exporters write;
-     Blender, which reads only binary FBX, is handed a binary copy. 3DS meshes, materials, smoothing groups and
+     become glTF's Y-up meters), from binary FBX and from the text form (ASCII FBX 7) that Asset Forge and some exporters write.
+     3DS meshes, materials, smoothing groups and
      textures are read natively too, since Blender stopped shipping its 3DS importer in 4.2.
    - 3D-print files (`.3mf`): meshes, components and build plates, read natively, with their colors: the 3MF
      materials extension's base materials and color groups, and from Bambu Studio, OrcaSlicer and PrusaSlicer
@@ -373,8 +373,8 @@ software rasterizer (`apt install mesa-vulkan-drivers`). Without any adapter, ev
    - **Descriptions.** Each kind is kept apart: a person's own (written in the asset panel or over MCP), the AI's,
      the file's embedded one and the pack's store page. Search covers all of them, and re-running the AI updates
      its description without touching yours.
-7. **Convert (optional).** With Blender switched on (in Settings), .blend/.fbx/.dae/.usd/.ply/.stl
-   files are exported to GLB by headless Blender, with their linked textures laid out beside them. The GLB is stored as a derivative that feeds
+7. **Convert (optional).** With Blender switched on (in Settings), the model formats Hoard can't read itself (.blend,
+   Collada, Alembic and X3D) are exported to GLB by headless Blender, with their linked textures laid out beside them. The GLB is stored as a derivative that feeds
    thumbnails, the browser preview and downloads. A file Blender can't convert is listed in Issues with the Blender
    version and the step that failed (opening, importing or exporting) in Blender's own words.
 
@@ -459,7 +459,7 @@ and Opus use ffmpeg's reference encoders (LAME, libvorbis, libopus), as do sourc
 | OBJ (with MTL and textures), FBX (binary and ASCII), 3DS, STL, PLY, MagicaVoxel, 3MF (with its colors), USD | GLB with textures embedded |
 | TTF/OTF | WOFF2, WOFF |
 | WOFF, WOFF2 | TTF/OTF and each other |
-| anything else Blender converted (Settings → Blender) | GLB |
+| .blend, Collada, Alembic, X3D, once Blender converted them (Settings → Blender) | GLB |
 
 `GET /api/assets/{id}/as/{format}[?max=1024]`; the asset detail lists the formats on offer. 16-bit images stay
 16-bit; HDR going into an 8-bit format is tone-mapped rather than clipped.

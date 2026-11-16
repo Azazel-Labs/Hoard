@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "ee7422704f0ad93118aaa97a00db3ba17d1d79fddf5bfd3b05bba10a82128d4d"
+source = "fc92f8dc849a93f6bd71f4574b0acf4b0222ed7e975e9f8d94c28e98efc7b33a"
 translation = "59247f4fd3e0712c726e47580a3cc9e4e63dfcef4ff7b34a653c6b6a2a4ee38c"
 
 [messages.account-add]
@@ -7598,8 +7598,8 @@ source = "Uses an installed Blender, or downloads Blender 4.5 LTS (about 400 MB)
 translation = "Kurulu bir Blender kullanır ya da bir blender.org yansısından Blender 4.5 LTS (yaklaşık 400 MB) indirir."
 
 [messages.settings-blender-what]
-source = "Converts .blend, .fbx, .dae, .usd, .ply, .stl and .3ds models to glTF in the background, so they get thumbnails and a 3D preview. Packs added while it was off are converted once it’s ready."
-translation = ".blend, .fbx, .dae, .usd, .ply, .stl ve .3ds modellerini arka planda glTF’ye dönüştürür; böylece küçük resim ve 3B önizleme alırlar. Kapalıyken eklenen paketler, hazır olduğunda dönüştürülür."
+source = "Converts .blend, .dae, .abc and .x3d models to glTF in the background, so they get thumbnails and a 3D preview. Packs added while it was off are converted once it’s ready."
+translation = ".blend, .dae, .abc ve .x3d modellerini arka planda glTF’ye dönüştürür; böylece küçük resim ve 3B önizleme alırlar. Kapalıyken eklenen paketler, hazır olduğunda dönüştürülür."
 
 [messages.settings-chatgpt-account]
 source = "Account"

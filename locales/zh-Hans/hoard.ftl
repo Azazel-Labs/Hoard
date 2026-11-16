@@ -1937,7 +1937,7 @@ settings-look-hint = 可在顶栏中切换浅色和深色（或跟随系统）�
 
 ## SettingsPage.vue: 工具
 
-settings-blender-what = 在后台将 .blend、.fbx、.dae、.usd、.ply、.stl 和 .3ds 模型转换为 glTF，使它们获得缩略图和 3D 预览。关闭期间添加的资源包会在它就绪后转换。
+settings-blender-what = 在后台将 .blend、.dae、.abc 和 .x3d 模型转换为 glTF，使它们获得缩略图和 3D 预览。关闭期间添加的资源包会在它就绪后转换。
 settings-blender-download = 使用已安装的 Blender，或从 blender.org 镜像下载 Blender 4.5 LTS（约 400 MB）。
 settings-ffmpeg-what = 编码 MP3、OGG 和 Opus 下载，并读取 Hoard 自身无法解码的音频（AAC、M4A、WMA 等）。
 settings-ffmpeg-download = 使用带有所需编码器的系统 ffmpeg，或下载静态构建版本（约 80 MB）。

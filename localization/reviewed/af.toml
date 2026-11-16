@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "ee7422704f0ad93118aaa97a00db3ba17d1d79fddf5bfd3b05bba10a82128d4d"
+source = "fc92f8dc849a93f6bd71f4574b0acf4b0222ed7e975e9f8d94c28e98efc7b33a"
 translation = "4d4f0096cc29f03f0fe2a94d855b0ef2f60194198f01e480a5d3926c58b74326"
 
 [messages.account-add]
@@ -7751,8 +7751,8 @@ source = "Uses an installed Blender, or downloads Blender 4.5 LTS (about 400 MB)
 translation = "Gebruik 'n geïnstalleerde Blender, of laai Blender 4.5 LTS (omtrent 400 MB) van 'n blender.org-spieël af."
 
 [messages.settings-blender-what]
-source = "Converts .blend, .fbx, .dae, .usd, .ply, .stl and .3ds models to glTF in the background, so they get thumbnails and a 3D preview. Packs added while it was off are converted once it’s ready."
-translation = "Skakel .blend-, .fbx-, .dae-, .usd-, .ply-, .stl- en .3ds-modelle in die agtergrond na glTF om, sodat hulle duimnaels en 'n 3D-voorskou kry. Pakke wat bygevoeg is terwyl dit af was, word omgeskakel sodra dit gereed is."
+source = "Converts .blend, .dae, .abc and .x3d models to glTF in the background, so they get thumbnails and a 3D preview. Packs added while it was off are converted once it’s ready."
+translation = "Skakel .blend-, .dae-, .abc- en .x3d-modelle in die agtergrond na glTF om, sodat hulle duimnaels en 'n 3D-voorskou kry. Pakke wat bygevoeg is terwyl dit af was, word omgeskakel sodra dit gereed is."
 
 [messages.settings-chatgpt-account]
 source = "Account"

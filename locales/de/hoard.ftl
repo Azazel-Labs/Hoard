@@ -2105,7 +2105,7 @@ settings-look-hint = Wechseln Sie in der oberen Leiste zwischen hell und dunkel 
 
 ## SettingsPage.vue: Werkzeuge
 
-settings-blender-what = Wandelt .blend-, .fbx-, .dae-, .usd-, .ply-, .stl- und .3ds-Modelle im Hintergrund in glTF um, damit sie Vorschaubilder und eine 3D-Vorschau bekommen. Pakete, die hinzugefügt wurden, während es aus war, werden umgewandelt, sobald es bereit ist.
+settings-blender-what = Wandelt .blend-, .dae-, .abc- und .x3d-Modelle im Hintergrund in glTF um, damit sie Vorschaubilder und eine 3D-Vorschau bekommen. Pakete, die hinzugefügt wurden, während es aus war, werden umgewandelt, sobald es bereit ist.
 settings-blender-download = Verwendet ein installiertes Blender oder lädt Blender 4.5 LTS (etwa 400 MB) von einem blender.org-Mirror herunter.
 settings-ffmpeg-what = Kodiert MP3-, OGG- und Opus-Downloads und liest Audio, das Hoard nicht selbst dekodieren kann (AAC, M4A, WMA, …).
 settings-ffmpeg-download = Verwendet ein System-ffmpeg mit den passenden Encodern oder lädt einen statischen Build herunter (etwa 80 MB).

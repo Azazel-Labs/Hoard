@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "ee7422704f0ad93118aaa97a00db3ba17d1d79fddf5bfd3b05bba10a82128d4d"
+source = "fc92f8dc849a93f6bd71f4574b0acf4b0222ed7e975e9f8d94c28e98efc7b33a"
 translation = "2f8e0243c537d10d0109179222f88f5ebc41ecf0a0c4d3f3ab8c3b6749cc57e1"
 
 [messages.account-add]
@@ -7768,8 +7768,8 @@ source = "Uses an installed Blender, or downloads Blender 4.5 LTS (about 400 MB)
 translation = "Usa un Blender installato, oppure scarica Blender 4.5 LTS (circa 400 MB) da un mirror di blender.org."
 
 [messages.settings-blender-what]
-source = "Converts .blend, .fbx, .dae, .usd, .ply, .stl and .3ds models to glTF in the background, so they get thumbnails and a 3D preview. Packs added while it was off are converted once it’s ready."
-translation = "Converte i modelli .blend, .fbx, .dae, .usd, .ply, .stl e .3ds in glTF in background, così ricevono miniature e un'anteprima 3D. I pacchetti aggiunti mentre era disattivato vengono convertiti appena è pronto."
+source = "Converts .blend, .dae, .abc and .x3d models to glTF in the background, so they get thumbnails and a 3D preview. Packs added while it was off are converted once it’s ready."
+translation = "Converte i modelli .blend, .dae, .abc e .x3d in glTF in background, così ricevono miniature e un'anteprima 3D. I pacchetti aggiunti mentre era disattivato vengono convertiti appena è pronto."
 
 [messages.settings-chatgpt-account]
 source = "Account"

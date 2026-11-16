@@ -2107,7 +2107,7 @@ settings-look-hint = Skift mellem lyst og mørkt (eller følg systemet) fra topb
 
 ## SettingsPage.vue: Værktøjer
 
-settings-blender-what = Konverterer .blend-, .fbx-, .dae-, .usd-, .ply-, .stl- og .3ds-modeller til glTF i baggrunden, så de får miniaturer og en 3D-forhåndsvisning. Pakker, der blev tilføjet, mens den var slået fra, konverteres, når den er klar.
+settings-blender-what = Konverterer .blend-, .dae-, .abc- og .x3d-modeller til glTF i baggrunden, så de får miniaturer og en 3D-forhåndsvisning. Pakker, der blev tilføjet, mens den var slået fra, konverteres, når den er klar.
 settings-blender-download = Bruger en installeret Blender eller downloader Blender 4.5 LTS (ca. 400 MB) fra et blender.org-spejl.
 settings-ffmpeg-what = Koder MP3-, OGG- og Opus-downloads og læser lyd, som Hoard ikke selv kan afkode (AAC, M4A, WMA, …).
 settings-ffmpeg-download = Bruger en ffmpeg på systemet med de rette encodere eller downloader et statisk build (ca. 80 MB).

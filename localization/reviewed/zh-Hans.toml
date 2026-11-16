@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "ee7422704f0ad93118aaa97a00db3ba17d1d79fddf5bfd3b05bba10a82128d4d"
+source = "fc92f8dc849a93f6bd71f4574b0acf4b0222ed7e975e9f8d94c28e98efc7b33a"
 translation = "081091cee166500a8e077d0cbf615782270fdd54d17e6a1da8ca8892c18792ea"
 
 [messages.account-add]
@@ -7598,8 +7598,8 @@ source = "Uses an installed Blender, or downloads Blender 4.5 LTS (about 400 MB)
 translation = "使用已安装的 Blender，或从 blender.org 镜像下载 Blender 4.5 LTS（约 400 MB）。"
 
 [messages.settings-blender-what]
-source = "Converts .blend, .fbx, .dae, .usd, .ply, .stl and .3ds models to glTF in the background, so they get thumbnails and a 3D preview. Packs added while it was off are converted once it’s ready."
-translation = "在后台将 .blend、.fbx、.dae、.usd、.ply、.stl 和 .3ds 模型转换为 glTF，使它们获得缩略图和 3D 预览。关闭期间添加的资源包会在它就绪后转换。"
+source = "Converts .blend, .dae, .abc and .x3d models to glTF in the background, so they get thumbnails and a 3D preview. Packs added while it was off are converted once it’s ready."
+translation = "在后台将 .blend、.dae、.abc 和 .x3d 模型转换为 glTF，使它们获得缩略图和 3D 预览。关闭期间添加的资源包会在它就绪后转换。"
 
 [messages.settings-chatgpt-account]
 source = "Account"

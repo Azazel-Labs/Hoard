@@ -1947,7 +1947,7 @@ settings-look-hint = A világos és a sötét mód (vagy a rendszer követése) 
 
 ## SettingsPage.vue: Eszközök
 
-settings-blender-what = A .blend, .fbx, .dae, .usd, .ply, .stl és .3ds modelleket a háttérben glTF-re alakítja, így bélyegképet és 3D-előnézetet kapnak. A kikapcsolt állapotában hozzáadott csomagok átalakítása megtörténik, amint elkészül.
+settings-blender-what = A .blend, .dae, .abc és .x3d modelleket a háttérben glTF-re alakítja, így bélyegképet és 3D-előnézetet kapnak. A kikapcsolt állapotában hozzáadott csomagok átalakítása megtörténik, amint elkészül.
 settings-blender-download = Telepített Blendert használ, vagy letölti a Blender 4.5 LTS-t (kb. 400 MB) egy blender.org-tükörről.
 settings-ffmpeg-what = MP3-, OGG- és Opus-letöltéseket kódol, és beolvassa azokat a hangokat, amelyeket a Hoard maga nem tud dekódolni (AAC, M4A, WMA, …).
 settings-ffmpeg-download = A rendszer megfelelő kódolókkal rendelkező ffmpeg-jét használja, vagy letölt egy statikus buildet (kb. 80 MB).

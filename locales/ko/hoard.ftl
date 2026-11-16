@@ -1910,7 +1910,7 @@ settings-look-hint = 상단 바에서 밝게와 어둡게(또는 시스템 설�
 
 ## SettingsPage.vue: 도구
 
-settings-blender-what = .blend, .fbx, .dae, .usd, .ply, .stl, .3ds 모델을 백그라운드에서 glTF로 변환해서 썸네일과 3D 미리보기를 만듭니다. 꺼져 있을 때 추가된 팩은 준비되면 변환합니다.
+settings-blender-what = .blend, .dae, .abc, .x3d 모델을 백그라운드에서 glTF로 변환해서 썸네일과 3D 미리보기를 만듭니다. 꺼져 있을 때 추가된 팩은 준비되면 변환합니다.
 settings-blender-download = 설치된 Blender를 사용하거나, blender.org 미러에서 Blender 4.5 LTS(약 400 MB)를 다운로드합니다.
 settings-ffmpeg-what = MP3, OGG, Opus 다운로드를 인코딩하고, Hoard가 직접 디코딩할 수 없는 오디오(AAC, M4A, WMA 등)를 읽습니다.
 settings-ffmpeg-download = 필요한 인코더가 있는 시스템 ffmpeg를 사용하거나, 정적 빌드(약 80 MB)를 다운로드합니다.

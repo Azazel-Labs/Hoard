@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "ee7422704f0ad93118aaa97a00db3ba17d1d79fddf5bfd3b05bba10a82128d4d"
+source = "fc92f8dc849a93f6bd71f4574b0acf4b0222ed7e975e9f8d94c28e98efc7b33a"
 translation = "8d9ccd00d7a48e165bb0fba20cf5559e2b3c83fd67e4695b2578383ddd6588b7"
 
 [messages.account-add]
@@ -7560,8 +7560,8 @@ source = "Uses an installed Blender, or downloads Blender 4.5 LTS (about 400 MB)
 translation = "설치된 Blender를 사용하거나, blender.org 미러에서 Blender 4.5 LTS(약 400 MB)를 다운로드합니다."
 
 [messages.settings-blender-what]
-source = "Converts .blend, .fbx, .dae, .usd, .ply, .stl and .3ds models to glTF in the background, so they get thumbnails and a 3D preview. Packs added while it was off are converted once it’s ready."
-translation = ".blend, .fbx, .dae, .usd, .ply, .stl, .3ds 모델을 백그라운드에서 glTF로 변환해서 썸네일과 3D 미리보기를 만듭니다. 꺼져 있을 때 추가된 팩은 준비되면 변환합니다."
+source = "Converts .blend, .dae, .abc and .x3d models to glTF in the background, so they get thumbnails and a 3D preview. Packs added while it was off are converted once it’s ready."
+translation = ".blend, .dae, .abc, .x3d 모델을 백그라운드에서 glTF로 변환해서 썸네일과 3D 미리보기를 만듭니다. 꺼져 있을 때 추가된 팩은 준비되면 변환합니다."
 
 [messages.settings-chatgpt-account]
 source = "Account"

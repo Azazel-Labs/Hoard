@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "ee7422704f0ad93118aaa97a00db3ba17d1d79fddf5bfd3b05bba10a82128d4d"
+source = "fc92f8dc849a93f6bd71f4574b0acf4b0222ed7e975e9f8d94c28e98efc7b33a"
 translation = "ccba37da8ec8145aa968edd58860423f7d19917225e3adb17048481993a88680"
 
 [messages.account-add]
@@ -7588,8 +7588,8 @@ source = "Uses an installed Blender, or downloads Blender 4.5 LTS (about 400 MB)
 translation = "Memakai Blender yang terpasang, atau mengunduh Blender 4.5 LTS (sekitar 400 MB) dari mirror blender.org."
 
 [messages.settings-blender-what]
-source = "Converts .blend, .fbx, .dae, .usd, .ply, .stl and .3ds models to glTF in the background, so they get thumbnails and a 3D preview. Packs added while it was off are converted once it’s ready."
-translation = "Mengonversi model .blend, .fbx, .dae, .usd, .ply, .stl, dan .3ds ke glTF di latar belakang, agar mendapat gambar mini dan pratinjau 3D. Paket yang ditambahkan selagi fitur ini mati dikonversi setelah siap."
+source = "Converts .blend, .dae, .abc and .x3d models to glTF in the background, so they get thumbnails and a 3D preview. Packs added while it was off are converted once it’s ready."
+translation = "Mengonversi model .blend, .dae, .abc, dan .x3d ke glTF di latar belakang, agar mendapat gambar mini dan pratinjau 3D. Paket yang ditambahkan selagi fitur ini mati dikonversi setelah siap."
 
 [messages.settings-chatgpt-account]
 source = "Account"

@@ -1,12 +1,11 @@
 //! Optional conversion of authoring formats to GLB with headless Blender.
 //!
-//! Rust can't read .blend at all, and FBX/USD/DAE support is patchy, while Blender imports all of them and
-//! has an excellent glTF exporter. So for those formats Hoard materializes the asset plus its linked files
+//! Hoard reads most model formats itself (polysmelt, see `meshes`), but not .blend, Collada, Alembic or X3D, which
+//! Blender imports and exports with its glTF exporter. So for those formats Hoard materializes the asset plus its linked files
 //! (so textures resolve) in a temp folder, runs `blender -b` with a tiny export script, and stores the GLB
 //! as a *derivative* of the original. The derivative feeds the thumbnail renderer and the browser preview,
 //! and is downloadable for engines that want glTF. The original is never touched.
 
-use std::path::Path;
 use std::time::Duration;
 
 use anyhow::{Context, Result, bail};
@@ -14,10 +13,9 @@ use rusqlite::{Connection, params};
 
 use crate::{AppState, analyze, db, issues, jobs};
 
-/// Extensions worth sending through Blender. 3DS isn't one: Hoard reads it itself (`tds`), and Blender's importer for
-/// it isn't shipped since 4.2.
-pub(crate) const CONVERTIBLE: &[&str] =
-    &["blend", "fbx", "dae", "usd", "usda", "usdc", "usdz", "ply", "stl", "abc", "x3d"];
+/// Extensions worth sending through Blender: the model formats Hoard can't read itself. FBX isn't one: Blender's
+/// importer turns a texture with an alpha channel into a see-through material even when the FBX says not to use it.
+pub(crate) const CONVERTIBLE: &[&str] = &["blend", "dae", "abc", "x3d"];
 const TIMEOUT: Duration = Duration::from_secs(180);
 
 /// Blender-side script: import by extension, export everything as one GLB. A step that fails says why on one
@@ -53,14 +51,11 @@ if ext == "blend":
 else:
     bpy.ops.wm.read_factory_settings(use_empty=True)
     importers = {
-        "fbx": lambda: bpy.ops.import_scene.fbx(filepath=src),
         "dae": lambda: bpy.ops.wm.collada_import(filepath=src),
-        "ply": lambda: bpy.ops.wm.ply_import(filepath=src),
-        "stl": lambda: bpy.ops.wm.stl_import(filepath=src),
         "abc": lambda: bpy.ops.wm.alembic_import(filepath=src),
         "x3d": lambda: bpy.ops.import_scene.x3d(filepath=src),
     }
-    run("couldn't import it", importers.get(ext, lambda: bpy.ops.wm.usd_import(filepath=src)))
+    run("couldn't import it", importers[ext])
 run("couldn't export a GLB",
     lambda: bpy.ops.export_scene.gltf(filepath=dst, export_format="GLB", export_animations=True, export_apply=True))
 "#;
@@ -245,9 +240,6 @@ async fn convert_one(state: &AppState, blender: &crate::blender::Tool, t: &Todo)
             state.blobs.download_to(&f.hash, &dest).await?;
         }
         let src = work.join(&t.path);
-        if t.path.to_ascii_lowercase().ends_with(".fbx") {
-            ascii_fbx_to_binary(&src).await?;
-        }
         let out = work.join("__hoard_out.glb");
         let mut cmd = crate::heavy::command(&blender.path);
         cmd.arg("-b")
@@ -317,28 +309,15 @@ async fn convert_one(state: &AppState, blender: &crate::blender::Tool, t: &Todo)
     result
 }
 
-/// Blender reads only binary FBX, so an ASCII one is rewritten in place (in the work folder) first.
-async fn ascii_fbx_to_binary(src: &Path) -> Result<()> {
-    let data = tokio::fs::read(src).await?;
-    if !polysmelt::formats::fbx_ascii::is_ascii(&data) {
-        return Ok(());
-    }
-    let binary = crate::heavy::run("ascii fbx", move || polysmelt::formats::fbx_ascii::to_binary(&data))
-        .await?
-        .context("couldn't read this ASCII FBX file")?;
-    tokio::fs::write(src, binary).await?;
-    Ok(())
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
 
     #[test]
     fn blender_errors_are_the_marked_line_or_its_last_words() {
-        let marked = "Read prefs\nTraceback (most recent call last):\n  File x\nHOARD-ERROR couldn't import it: ASCII FBX \
-                      files are not supported 'a.fbx'\nError: script failed, expr: '\nimport os\n', exiting.\n";
-        assert_eq!(blender_error(marked), "couldn't import it: ASCII FBX files are not supported 'a.fbx'");
+        let marked = "Read prefs\nTraceback (most recent call last):\n  File x\nHOARD-ERROR couldn't import it: no \
+                      geometry in 'a.dae'\nError: script failed, expr: '\nimport os\n', exiting.\n";
+        assert_eq!(blender_error(marked), "couldn't import it: no geometry in 'a.dae'");
         let crashed = "Read prefs\nWriting: C:\\tmp\\blender.crash.txt\nSegmentation fault\n\
                        Error: script failed, expr: '\nimport os, sys\nrun(1)\n', exiting.\n";
         assert_eq!(blender_error(crashed), "Read prefs | Writing: C:\\tmp\\blender.crash.txt | Segmentation fault");

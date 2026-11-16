@@ -2301,7 +2301,7 @@ settings-look-hint = Tryb jasny lub ciemny (albo zgodny z systemem) można prze�
 
 ## SettingsPage.vue: Tools
 
-settings-blender-what = Konwertuje w tle modele .blend, .fbx, .dae, .usd, .ply, .stl i .3ds do glTF, by miały miniatury i podgląd 3D. Paczki dodane, gdy był wyłączony, zostaną przekonwertowane, gdy będzie gotowy.
+settings-blender-what = Konwertuje w tle modele .blend, .dae, .abc i .x3d do glTF, by miały miniatury i podgląd 3D. Paczki dodane, gdy był wyłączony, zostaną przekonwertowane, gdy będzie gotowy.
 settings-blender-download = Używa zainstalowanego Blendera lub pobiera Blender 4.5 LTS (ok. 400 MB) z serwera lustrzanego blender.org.
 settings-ffmpeg-what = Koduje pobrania w formatach MP3, OGG i Opus oraz odczytuje dźwięk, którego Hoard nie potrafi sam zdekodować (AAC, M4A, WMA, …).
 settings-ffmpeg-download = Używa systemowego ffmpeg z odpowiednimi koderami lub pobiera statyczną kompilację (ok. 80 MB).

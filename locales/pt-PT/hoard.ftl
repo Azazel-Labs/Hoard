@@ -2112,7 +2112,7 @@ settings-look-hint = Alterne entre claro e escuro (ou siga o sistema) na barra s
 
 ## SettingsPage.vue: Ferramentas
 
-settings-blender-what = Converte modelos .blend, .fbx, .dae, .usd, .ply, .stl e .3ds para glTF em segundo plano, para que tenham miniaturas e pré-visualização 3D. Os pacotes adicionados enquanto estava desligado são convertidos quando estiver pronto.
+settings-blender-what = Converte modelos .blend, .dae, .abc e .x3d para glTF em segundo plano, para que tenham miniaturas e pré-visualização 3D. Os pacotes adicionados enquanto estava desligado são convertidos quando estiver pronto.
 settings-blender-download = Usa um Blender instalado, ou transfere o Blender 4.5 LTS (cerca de 400 MB) de um espelho do blender.org.
 settings-ffmpeg-what = Codifica as transferências em MP3, OGG e Opus, e lê áudio que o Hoard não consegue descodificar sozinho (AAC, M4A, WMA, …).
 settings-ffmpeg-download = Usa um ffmpeg do sistema com os codificadores certos, ou transfere uma build estática (cerca de 80 MB).

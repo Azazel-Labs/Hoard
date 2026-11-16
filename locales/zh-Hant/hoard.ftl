@@ -1943,7 +1943,7 @@ settings-look-hint = 可以從頂端列切換淺色與深色（或跟隨系統�
 
 ## 設定：工具
 
-settings-blender-what = 在背景將 .blend、.fbx、.dae、.usd、.ply、.stl 與 .3ds 模型轉換為 glTF，讓它們有縮圖與 3D 預覽。在它關閉期間新增的素材包，會在它就緒後轉換。
+settings-blender-what = 在背景將 .blend、.dae、.abc 與 .x3d 模型轉換為 glTF，讓它們有縮圖與 3D 預覽。在它關閉期間新增的素材包，會在它就緒後轉換。
 settings-blender-download = 使用已安裝的 Blender，或從 blender.org 的鏡像站下載 Blender 4.5 LTS（約 400 MB）。
 settings-ffmpeg-what = 編碼 MP3、OGG 與 Opus 下載檔案，並讀取 Hoard 本身無法解碼的音訊（AAC、M4A、WMA…）。
 settings-ffmpeg-download = 使用系統中具備所需編碼器的 ffmpeg，或下載靜態建置版本（約 80 MB）。

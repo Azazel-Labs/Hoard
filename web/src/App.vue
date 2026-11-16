@@ -15,6 +15,7 @@ import ActivityIndicator from './components/ActivityIndicator.vue'
 import { looksLikeFolderOfPacks, splitPerSubfolder } from './uploader'
 import UploadQueue from './components/UploadQueue.vue'
 import AssetDetail from './components/AssetDetail.vue'
+import SelectionBag from './components/SelectionBag.vue'
 import AssetTile from './components/AssetTile.vue'
 import CollectionPicker from './components/CollectionPicker.vue'
 import PacksView from './components/PacksView.vue'
@@ -405,10 +406,16 @@ watch([appEl, sideEl], ([a, s]) => {
   if (s) roomObserver.observe(s)
 })
 watch(gridEl, () => nextTick(measureRoom))
-narrow.addEventListener('change', measureRoom)
+/** Whether the screen is phone-narrow, where the panel covers the grid. */
+const isNarrow = ref(narrow.matches)
+const onNarrow = () => {
+  isNarrow.value = narrow.matches
+  measureRoom()
+}
+narrow.addEventListener('change', onNarrow)
 onBeforeUnmount(() => {
   roomObserver.disconnect()
-  narrow.removeEventListener('change', measureRoom)
+  narrow.removeEventListener('change', onNarrow)
 })
 /** The panel's width while its edge is being dragged. */
 const detailDrag = ref<number | null>(null)
@@ -743,6 +750,24 @@ const checkedWithSource = computed(
 const selectionUrl = computed(() =>
   selectionZipUrl(checked.value, true, preferSources.value && checkedWithSource.value > 0),
 )
+const glbSelectionUrl = computed(() => selectionZipUrl(checked.value, false, false, true))
+
+/** The selected assets as last seen, so the bag keeps them when the grid shows something else. */
+const checkedSeen = shallowRef(new Map<string, Asset>())
+watch([checked, items], () => {
+  const seen = new Map<string, Asset>()
+  const loaded = new Map(items.value.map((a) => [a.id, a]))
+  for (const id of checked.value) {
+    const a = loaded.get(id) ?? checkedSeen.value.get(id)
+    if (a) seen.set(id, a)
+  }
+  checkedSeen.value = seen
+})
+const bagAssets = computed(() => [...checkedSeen.value.values()])
+/** With assets picked, the panel shows them all (the bag) instead of one; phones keep the bar's buttons. */
+const bagShown = computed(() => checked.value.length > 0 && view.value === 'library' && !isNarrow.value)
+/** Whether a panel is beside the grid: the open asset's, or the bag. */
+const sidePanel = computed(() => view.value === 'library' && (bagShown.value || (!!selected.value && !prefs.detailPage)))
 
 // ------------------------------------------------------------------ uploads
 
@@ -1273,8 +1298,8 @@ const commands = computed<Command[]>(() => {
     ref="appEl"
     class="app"
     :class="{
-      'with-detail': selected && view === 'library' && !prefs.detailPage,
-      'page-detail': selected && view === 'library' && prefs.detailPage,
+      'with-detail': sidePanel,
+      'page-detail': selected && view === 'library' && prefs.detailPage && !bagShown,
       'filters-open': showFilters,
       fitted: !!fit,
     }"
@@ -1690,7 +1715,7 @@ const commands = computed<Command[]>(() => {
       </main>
 
       <div
-        v-if="selected && view === 'library' && fit && !prefs.detailPage"
+        v-if="sidePanel && fit"
         class="detail-resize"
         :class="{ dragging: detailDrag !== null }"
         role="separator"
@@ -1703,8 +1728,21 @@ const commands = computed<Command[]>(() => {
         @dblclick="prefs.detailWidth = null"
         @keydown="resizeBy"
       />
+      <SelectionBag
+        v-if="bagShown"
+        v-model:prefer-sources="preferSources"
+        class="detail-pane"
+        :assets="bagAssets"
+        :count="checked.length"
+        :zip-url="selectionUrl"
+        :glb-url="glbSelectionUrl"
+        :with-source="checkedWithSource"
+        @remove="(id) => (checked = checked.filter((x) => x !== id))"
+        @clear="checked = []; selectMode = false"
+        @credits="creditsForChecked"
+      />
       <AssetDetail
-        v-if="selected"
+        v-else-if="selected"
         class="detail-pane"
         :asset="selected"
         :position="position"
@@ -1728,11 +1766,11 @@ const commands = computed<Command[]>(() => {
       />
 
       <Transition name="rise">
-      <div v-if="selecting" class="selbar" role="region" :aria-label="t('app-selected-label')">
+      <div v-if="selecting" class="selbar" :class="{ beside: sidePanel }" role="region" :aria-label="t('app-selected-label')">
         <strong>{{ checked.length ? t('app-selected', { count: checked.length }) : t('app-pick-assets') }}</strong>
-        <a v-if="checked.length" class="btn primary" :href="selectionUrl" download>{{ t('app-download-zip') }}</a>
-        <button v-if="checked.length" type="button" class="btn" :title="t('app-credits-title')" @click="creditsForChecked">{{ t('app-credits') }}</button>
-        <label v-if="checkedWithSource" class="srccheck" :title="t('app-prefer-sources-title')">
+        <a v-if="checked.length && !bagShown" class="btn primary" :href="selectionUrl" download>{{ t('app-download-zip') }}</a>
+        <button v-if="checked.length && !bagShown" type="button" class="btn" :title="t('app-credits-title')" @click="creditsForChecked">{{ t('app-credits') }}</button>
+        <label v-if="checkedWithSource && !bagShown" class="srccheck" :title="t('app-prefer-sources-title')">
           <input v-model="preferSources" type="checkbox" /> {{ t('app-prefer-sources', { count: checkedWithSource }) }}
         </label>
         <template v-if="editor">
@@ -2055,6 +2093,12 @@ const commands = computed<Command[]>(() => {
   display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap; max-width: calc(100vw - 2rem);
   padding: 0.6rem 0.75rem 0.6rem 1rem; border: 1px solid var(--muted); border-radius: var(--r-tile);
   background: var(--raised); box-shadow: 0 10px 30px var(--shadow); font-size: var(--step--1);
+}
+/* With a panel open, the bar centers over the grid so it doesn't cover the panel. */
+@media (min-width: 901px) {
+  .selbar.beside {
+    left: calc(50% - var(--detail-w, 420px) / 2); max-width: calc(100vw - var(--detail-w, 420px) - 2rem);
+  }
 }
 .rise-enter-active { transition: opacity var(--dur-2) var(--ease-out), transform var(--dur-3) var(--ease-pop); }
 .rise-leave-active { transition: opacity var(--dur-2) var(--ease-out), transform var(--dur-2) var(--ease-out); }

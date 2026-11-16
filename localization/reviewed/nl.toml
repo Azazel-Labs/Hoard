@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "5c99d56e8fcba92ad147ac882cd0ba16d49a48bf2b65e0729b148d4a399d5d50"
+source = "339be9333600a92c96be78b536be6b769ef996ecc7538f193b4f0b0409d2e921"
 translation = "9623d06b66e29668f0289abc1d1e06c1781f9bf7186ed083bd7c8595a4396f0b"
 
 [messages.account-add]
@@ -2853,6 +2853,40 @@ translation = "(leeg: het ID-token zegt wie het is)"
 [messages.auth-userinfo-url]
 source = "User info address"
 translation = "Adres voor gebruikersgegevens"
+
+[messages.bag-clear]
+source = "Clear the selection"
+translation = "Selectie wissen"
+
+[messages.bag-glb-download]
+source = "Download GLB zip"
+translation = "GLB-zip downloaden"
+
+[messages.bag-glb-heading]
+source = "Models as GLB"
+translation = "Modellen als GLB"
+
+[messages.bag-glb-text]
+source = """
+Every model as a .glb file standing Y up and facing forward, its textures as separate files in a textures folder
+    the models share. Everything else goes in as it is."""
+translation = "Elk model als .glb-bestand, rechtop met Y omhoog en naar voren gericht, met zijn textures als losse bestanden in een map textures die de modellen delen. Al het andere gaat erin zoals het is."
+
+[messages.bag-more]
+source = "and { $count } more"
+translation = "en nog { $count }"
+
+[messages.bag-plain-heading]
+source = "Files as they are"
+translation = "Bestanden zoals ze zijn"
+
+[messages.bag-plain-text]
+source = "Each file as it was imported, with what it needs, in a folder for each pack."
+translation = "Elk bestand zoals het geïmporteerd is, met wat het nodig heeft, in een map per pakket."
+
+[messages.bag-remove]
+source = "Take { $name } out of the selection"
+translation = "{ $name } uit de selectie halen"
 
 [messages.collections-add]
 source = "Add to collection"

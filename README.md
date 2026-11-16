@@ -469,8 +469,12 @@ shows the size of each linked file and of each download.
 **Bundles.** Every asset with links has a "Download with N linked files (.zip)" button, built on the fly, that keeps
 the original relative layout. Unzip it and `crate.gltf` still finds `crate.bin` and `textures/crate_albedo.png`.
 Whole packs download as one zip too, and so does any selection: Ctrl/Cmd-click, Shift-click or press X on tiles
-(long-press on a phone), then "Download zip" gets them all with their dependencies, one folder per pack. Zips are
-streamed as they're written, so even a multi-gigabyte pack starts downloading at once.
+(long-press on a phone). The panel beside the grid then lists what's picked, how many and how big, with a button to
+take each out. "Download zip" gets them all with their dependencies, one folder per pack. "Download GLB zip" gets
+every model as a GLB standing Y up and facing forward (turned the way its pack's models face), its textures as
+separate files in one `textures` folder the models share, each texture once, and everything else as it is. Zips are
+streamed as they're written, so even a multi-gigabyte pack starts downloading at once (a GLB zip converts its
+models as it goes).
 
 **Download as.** The detail panel's "Download as" converts on request (the first download makes and caches it, so
 later ones are instant). Cached conversions are kept up to a limit (Settings → Performance → Converted downloads, 10 GB
@@ -482,12 +486,16 @@ and Opus use ffmpeg's reference encoders (LAME, libvorbis, libopus), as do sourc
 | PNG, JPEG, WebP, TGA, TIFF, BMP, GIF, EXR, HDR, PSD/PSB (full composite), Krita, OpenRaster, DDS, KTX2, SVG, Illustrator, Aseprite | PNG, JPEG, WebP (lossless), TGA, TIFF, plus EXR for HDR sources; optionally scaled down to 4096…64 px, including in the original format |
 | WAV, FLAC, OGG Vorbis, MP3, AIFF, and with ffmpeg also AAC/M4A, Opus, WMA, CAF, WavPack, APE, MKA | WAV (16 or 24-bit, as the source), FLAC, MP3 (VBR ~190 kbps), OGG Vorbis (q5), Opus (128 kbps) |
 | MOD, XM, S3M, IT, MIDI | the same audio formats, rendered |
-| glTF | GLB (buffers and textures packed in) |
+| glTF, GLB | GLB + textures (zipped) |
 | GLB | glTF + .bin (zipped) |
-| OBJ (with MTL and textures), FBX (binary and ASCII), 3DS, STL, PLY, MagicaVoxel, 3MF (with its colors), USD | GLB with textures embedded |
+| OBJ (with MTL and textures), FBX (binary and ASCII), 3DS, STL, PLY, MagicaVoxel, 3MF (with its colors), USD | GLB + textures (zipped) |
 | TTF/OTF | WOFF2, WOFF |
 | WOFF, WOFF2 | TTF/OTF and each other |
-| .blend, Collada, Alembic, X3D, once Blender converted them (Settings → Blender) | GLB |
+| .blend, Collada, Alembic, X3D, once Blender converted them (Settings → Blender) | GLB + textures (zipped) |
+
+A GLB download keeps its textures out of the GLB: the zip holds `<name>.glb` and a `textures` folder it points at, the
+textures named as the model's own files were. A model without textures comes as a plain `.glb`. Models are turned
+the way their pack's models face (see Facing in the 3D viewer).
 
 `GET /api/assets/{id}/as/{format}[?max=1024]`; the asset detail lists the formats on offer. 16-bit images stay
 16-bit; HDR going into an 8-bit format is tone-mapped rather than clipped.
@@ -769,7 +777,7 @@ store page, then the store itself (a Fab pack without one is under Fab's Standar
 when Hoard doesn't know a license, the file says how many packs to check by hand.
 
 - **Packs page:** More → Download credits on a pack, and Credits on a collection.
-- **A selection:** select tiles, then Credits next to "Download zip". It covers the packs of everything selected
+- **A selection:** select tiles, then Credits beside "Download zip". It covers the packs of everything selected
   and what it needs.
 - **Zips:** every pack, collection and selection zip has `CREDITS.md` at its root.
 - **Your game project:** `hoard credits` covers what `hoard.toml` selects (`--pack` and `--collection` name others
@@ -1061,7 +1069,7 @@ browser session's changes must also carry an `X-Hoard` header, which pages on ot
 | GET | `/api/assets/{id}/as/{format}` | download converted (`?max=` size, `?wait=` seconds); `/status` to follow a slow one |
 | GET | `/api/assets/{id}/bundle.zip` | the asset and everything it needs (`?animations=1`) |
 | POST 🔒 | `/api/assets/{id}/replace?ext=` | swap in a new file (body is the file) |
-| GET | `/api/bundle.zip?ids=a,b,c` | a selection as one zip (`&deps=0`, `&sources=1`) |
+| GET | `/api/bundle.zip?ids=a,b,c` | a selection as one zip (`&deps=0`, `&sources=1`, `&glb=1` for models as GLBs) |
 | POST | `/api/manifest` | a flat file list (hash, path, URL) for `ids` or a search, with `include_deps`; what engine tools pull from |
 | POST | `/api/credits` | credits for `packs` (ids or names), `collections`, asset `ids` and `selections` (manifest requests); `?format=md` for `CREDITS.md` |
 | GET | `/api/blobs/{hash}` | raw content by BLAKE3 hash |

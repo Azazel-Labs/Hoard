@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "5c99d56e8fcba92ad147ac882cd0ba16d49a48bf2b65e0729b148d4a399d5d50"
+source = "339be9333600a92c96be78b536be6b769ef996ecc7538f193b4f0b0409d2e921"
 translation = "fb5e10cd5eddfc860efb3785bb465796b700258c43d207b08bd9f3334aa5d6c8"
 
 [messages.account-add]
@@ -2775,6 +2775,40 @@ translation = "（留空：由 ID 權杖表明身分）"
 [messages.auth-userinfo-url]
 source = "User info address"
 translation = "使用者資訊網址"
+
+[messages.bag-clear]
+source = "Clear the selection"
+translation = "清除選取"
+
+[messages.bag-glb-download]
+source = "Download GLB zip"
+translation = "下載 GLB zip"
+
+[messages.bag-glb-heading]
+source = "Models as GLB"
+translation = "模型轉為 GLB"
+
+[messages.bag-glb-text]
+source = """
+Every model as a .glb file standing Y up and facing forward, its textures as separate files in a textures folder
+    the models share. Everything else goes in as it is."""
+translation = "每個模型都轉為 .glb 檔案，Y 軸朝上、面向前方，材質貼圖以獨立檔案放在模型共用的 textures 資料夾裡。其他檔案原樣放入。"
+
+[messages.bag-more]
+source = "and { $count } more"
+translation = "還有 { $count } 個"
+
+[messages.bag-plain-heading]
+source = "Files as they are"
+translation = "檔案保持原樣"
+
+[messages.bag-plain-text]
+source = "Each file as it was imported, with what it needs, in a folder for each pack."
+translation = "每個檔案保持匯入時的樣子，連同所需的檔案，依素材包各放一個資料夾。"
+
+[messages.bag-remove]
+source = "Take { $name } out of the selection"
+translation = "將 { $name } 移出選取"
 
 [messages.collections-add]
 source = "Add to collection"

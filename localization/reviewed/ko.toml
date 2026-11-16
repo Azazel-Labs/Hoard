@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "5c99d56e8fcba92ad147ac882cd0ba16d49a48bf2b65e0729b148d4a399d5d50"
+source = "339be9333600a92c96be78b536be6b769ef996ecc7538f193b4f0b0409d2e921"
 translation = "8d9ccd00d7a48e165bb0fba20cf5559e2b3c83fd67e4695b2578383ddd6588b7"
 
 [messages.account-add]
@@ -2766,6 +2766,40 @@ translation = "(비우면 ID 토큰으로 사용자를 확인)"
 [messages.auth-userinfo-url]
 source = "User info address"
 translation = "사용자 정보 주소"
+
+[messages.bag-clear]
+source = "Clear the selection"
+translation = "선택 비우기"
+
+[messages.bag-glb-download]
+source = "Download GLB zip"
+translation = "GLB zip 다운로드"
+
+[messages.bag-glb-heading]
+source = "Models as GLB"
+translation = "모델을 GLB로"
+
+[messages.bag-glb-text]
+source = """
+Every model as a .glb file standing Y up and facing forward, its textures as separate files in a textures folder
+    the models share. Everything else goes in as it is."""
+translation = "모든 모델을 Y축이 위, 앞쪽을 향하도록 세운 .glb 파일로 만들고, 텍스처는 모델들이 함께 쓰는 textures 폴더에 별도 파일로 넣습니다. 나머지는 그대로 들어갑니다."
+
+[messages.bag-more]
+source = "and { $count } more"
+translation = "외 { $count }개"
+
+[messages.bag-plain-heading]
+source = "Files as they are"
+translation = "파일 그대로"
+
+[messages.bag-plain-text]
+source = "Each file as it was imported, with what it needs, in a folder for each pack."
+translation = "각 파일을 가져온 그대로, 필요한 파일과 함께 팩마다 폴더에 넣습니다."
+
+[messages.bag-remove]
+source = "Take { $name } out of the selection"
+translation = "{ $name }을(를) 선택에서 빼기"
 
 [messages.collections-add]
 source = "Add to collection"

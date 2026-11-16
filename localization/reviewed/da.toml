@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "5c99d56e8fcba92ad147ac882cd0ba16d49a48bf2b65e0729b148d4a399d5d50"
+source = "339be9333600a92c96be78b536be6b769ef996ecc7538f193b4f0b0409d2e921"
 translation = "863d09bc1e828f14f8cf00c118caee84558c0ecf852401afe0ac271a50ad1d87"
 
 [messages.account-add]
@@ -2853,6 +2853,40 @@ translation = "(tom: ID-tokenet siger, hvem det er)"
 [messages.auth-userinfo-url]
 source = "User info address"
 translation = "Adresse til brugeroplysninger"
+
+[messages.bag-clear]
+source = "Clear the selection"
+translation = "Ryd markeringen"
+
+[messages.bag-glb-download]
+source = "Download GLB zip"
+translation = "Download GLB-zip"
+
+[messages.bag-glb-heading]
+source = "Models as GLB"
+translation = "Modeller som GLB"
+
+[messages.bag-glb-text]
+source = """
+Every model as a .glb file standing Y up and facing forward, its textures as separate files in a textures folder
+    the models share. Everything else goes in as it is."""
+translation = "Hver model som en .glb-fil, der står med Y op og vender fremad, med sine teksturer som separate filer i en textures-mappe, som modellerne deler. Alt andet kommer med, som det er."
+
+[messages.bag-more]
+source = "and { $count } more"
+translation = "og { $count } mere"
+
+[messages.bag-plain-heading]
+source = "Files as they are"
+translation = "Filer, som de er"
+
+[messages.bag-plain-text]
+source = "Each file as it was imported, with what it needs, in a folder for each pack."
+translation = "Hver fil, som den blev importeret, med det, den skal bruge, i en mappe for hver pakke."
+
+[messages.bag-remove]
+source = "Take { $name } out of the selection"
+translation = "Fjern { $name } fra markeringen"
 
 [messages.collections-add]
 source = "Add to collection"

@@ -30,11 +30,13 @@ struct Pack {
     guess: bool,
     /// Image files looked up, by lowercase file name: whether each was found.
     images: RefCell<BTreeMap<String, (String, bool)>>,
+    /// The file each texture came from, by its bytes as written into the model.
+    names: RefCell<crate::glbfiles::Names>,
 }
 
 impl Pack {
     fn new(root: &Path) -> Self {
-        Self { folder: Folder::new(root), guess: true, images: RefCell::default() }
+        Self { folder: Folder::new(root), guess: true, images: RefCell::default(), names: RefCell::default() }
     }
 
     /// The image files the model named that aren't in the pack. A reader may try a texture under several names (an
@@ -58,7 +60,11 @@ impl Assets for Pack {
     }
 
     fn image(&self, bytes: &[u8], name: &Path) -> Option<Image> {
-        image_from_bytes(bytes, name)
+        let img = image_from_bytes(bytes, name)?;
+        if let Some(stem) = name.file_stem().map(|s| s.to_string_lossy().into_owned()) {
+            self.names.borrow_mut().entry(*blake3::hash(&img.bytes).as_bytes()).or_insert(stem);
+        }
+        Some(img)
     }
 
     fn color_texture_for(&self, model: &Path) -> Option<PathBuf> {
@@ -121,11 +127,12 @@ pub(crate) fn material_names(path: &Path, ext: &str) -> Result<Vec<String>> {
 }
 
 /// A model in another format as a GLB for download: its whole document (hierarchy, skins, morph targets, animation,
-/// materials and embedded textures), not just the mesh it draws.
-pub(crate) fn glb(path: &Path, ext: &str, root: &Path) -> Result<Vec<u8>> {
-    let doc = polysmelt::formats::load(path, ext, &Pack::new(root), Keep::ALL)?;
+/// materials and embedded textures), not just the mesh it draws, with the file each texture came from.
+pub(crate) fn glb(path: &Path, ext: &str, root: &Path) -> Result<(Vec<u8>, crate::glbfiles::Names)> {
+    let pack = Pack::new(root);
+    let doc = polysmelt::formats::load(path, ext, &pack, Keep::ALL)?;
     anyhow::ensure!(doc.counts().triangles > 0, "this model has no surfaces to export");
-    Ok(doc.to_glb()?)
+    Ok((doc.to_glb()?, pack.names.into_inner()))
 }
 
 /// A glTF rewritten as plain glTF in a GLB, for a reader without meshopt, Draco or quantization (the thumbnail

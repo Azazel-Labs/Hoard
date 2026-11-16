@@ -6,6 +6,7 @@
 //! encoders when ffmpeg is ready (pure-Rust MP3 and Opus otherwise), and formats only ffmpeg reads (AAC/M4A, Opus,
 //! WMA, …) are offered once it is. Models Blender converted also offer that GLB.
 
+use std::collections::BTreeMap;
 use std::io::{Cursor, Write};
 use std::path::Path;
 
@@ -32,6 +33,9 @@ const AUDIO_IN: &[&str] = &["wav", "wave", "ogg", "oga", "flac", "mp3", "aif", "
 fn opt(format: &str, label: &str, resizable: bool) -> FormatOption {
     FormatOption { format: format.to_owned(), label: label.to_owned(), resizable }
 }
+
+/// A model as a GLB with its textures as files beside it, turned the way its pack's models face.
+const GLB_LABEL: &str = "GLB + textures (zip)";
 
 /// What this asset can be downloaded as, besides itself.
 pub(crate) fn options(ext: &str, derivatives: &[String]) -> Vec<FormatOption> {
@@ -70,8 +74,8 @@ pub(crate) fn options(ext: &str, derivatives: &[String]) -> Vec<FormatOption> {
         }
     }
     match ext.as_str() {
-        "stl" | "ply" | "vox" | "obj" | "fbx" | "3ds" | "3mf" | "usd" | "usda" | "usdc" | "usdz" => {
-            out.push(opt("glb", "GLB (textures embedded)", false));
+        "stl" | "ply" | "vox" | "obj" | "fbx" | "3ds" | "3mf" | "usd" | "usda" | "usdc" | "usdz" | "gltf" => {
+            out.push(opt("glb", GLB_LABEL, false));
         }
         "ttf" | "otf" => {
             out.push(opt("woff2", "WOFF2 (for the web)", false));
@@ -85,9 +89,13 @@ pub(crate) fn options(ext: &str, derivatives: &[String]) -> Vec<FormatOption> {
             out.push(opt("ttf", "TTF / OTF", false));
             out.push(opt("woff", "WOFF", false));
         }
-        "glb" => out.push(opt("gltf", "glTF (.gltf + .bin, zipped)", false)),
-        "gltf" => out.push(opt("glb", "GLB (one file)", false)),
-        _ if derivatives.iter().any(|d| d == "glb") => out.push(opt("glb", "GLB (converted by Blender)", false)),
+        "glb" => {
+            out.push(opt("glb", GLB_LABEL, false));
+            out.push(opt("gltf", "glTF (.gltf + .bin, zipped)", false));
+        }
+        _ if derivatives.iter().any(|d| d == "glb") => {
+            out.push(opt("glb", "GLB + textures (zip, converted by Blender)", false));
+        }
         _ => {}
     }
     out
@@ -160,7 +168,17 @@ pub(crate) fn convert(
         }
         "gltf" if src == "glb" => glb_to_gltf_zip(local),
         "glb" if crate::meshes::rebuilt_as_glb(&src) => {
-            Ok(Output { bytes: crate::meshes::glb(local, &src, root)?, ext: "glb" })
+            let (glb, names) = crate::meshes::glb(local, &src, root)?;
+            crate::glbfiles::split_output(&glb, crate::meshes::current_facing(), &file_stem(local), &names)
+        }
+        "glb" if src == "gltf" => {
+            let glb = build_glb(local, true)?;
+            let names = gltf_image_names(local, root);
+            crate::glbfiles::split_output(&glb, crate::meshes::current_facing(), &file_stem(local), &names)
+        }
+        "glb" if src == "glb" => {
+            let glb = std::fs::read(local)?;
+            crate::glbfiles::split_output(&glb, crate::meshes::current_facing(), &file_stem(local), &BTreeMap::new())
         }
         "ttf" | "woff" | "woff2" if crate::fonts::EXTS.contains(&src.as_str()) => {
             let sfnt = crate::fonts::sfnt(local, &src)?;
@@ -170,7 +188,6 @@ pub(crate) fn convert(
                 _ => Output { ext: if crate::fonts::is_cff(&sfnt) { "otf" } else { "ttf" }, bytes: sfnt },
             })
         }
-        "glb" if src == "gltf" => gltf_to_glb(local),
         "view" if polysmelt::formats::EXTENSIONS.contains(&src.as_str()) => {
             Ok(Output { bytes: crate::meshes::view_glb(local, &src, root)?, ext: "glb" })
         }
@@ -355,9 +372,37 @@ fn glb_to_gltf_zip(path: &Path) -> Result<Output> {
     Ok(Output { bytes: out, ext: "zip" })
 }
 
-/// `.gltf` (with its external or embedded buffers and images) → one `.glb`. Meshopt compression is kept.
-fn gltf_to_glb(path: &Path) -> Result<Output> {
-    Ok(Output { bytes: build_glb(path, true)?, ext: "glb" })
+/// A file's name without its extension.
+fn file_stem(path: &Path) -> String {
+    path.file_stem().map_or_else(|| "model".to_owned(), |s| s.to_string_lossy().into_owned())
+}
+
+/// The files a `.gltf`'s images are read from, by their bytes. Only files inside `root` are read.
+fn gltf_image_names(path: &Path, root: &Path) -> crate::glbfiles::Names {
+    let dir = path.parent().unwrap_or(Path::new("."));
+    let Ok(doc) = std::fs::read(path).map_err(anyhow::Error::from).and_then(|b| Ok(serde_json::from_slice(&b)?)) else {
+        return BTreeMap::new();
+    };
+    gltf_image_files(&doc)
+        .into_iter()
+        .filter_map(|rel| {
+            let mut file = std::path::PathBuf::new();
+            for part in dir.join(&rel).components() {
+                match part {
+                    std::path::Component::ParentDir => {
+                        file.pop();
+                    }
+                    std::path::Component::CurDir => {}
+                    p => file.push(p),
+                }
+            }
+            if !file.starts_with(root) {
+                return None;
+            }
+            let stem = file.file_stem()?.to_string_lossy().into_owned();
+            Some((*blake3::hash(&std::fs::read(&file).ok()?).as_bytes(), stem))
+        })
+        .collect()
 }
 
 /// `.gltf` → `.glb` with its buffers packed in, its images left where they are (a GLB may point at image files
@@ -619,21 +664,21 @@ pub(crate) async fn request(
     let fail = |e: anyhow::Error| Refused::Failed(format!("{e:#}"));
     let id = asset_id.to_owned();
     let info = db::call(&state.pool, move |c| {
-        let row: Option<(String, String, String, String)> = rusqlite::OptionalExtension::optional(c.query_row(
-            "SELECT path, ext, blob_hash, meta FROM assets WHERE id = ?1",
-            [&id],
-            |r| Ok((r.get(0)?, r.get(1)?, r.get(2)?, r.get(3)?)),
-        ))?;
-        let Some((path, ext, hash, meta)) = row else { return Ok(None) };
+        let row: Option<(String, String, String, String, String)> = rusqlite::OptionalExtension::optional(
+            c.query_row("SELECT path, ext, blob_hash, meta, pack_id FROM assets WHERE id = ?1", [&id], |r| {
+                Ok((r.get(0)?, r.get(1)?, r.get(2)?, r.get(3)?, r.get(4)?))
+            }),
+        )?;
+        let Some((path, ext, hash, meta, pack_id)) = row else { return Ok(None) };
         let mut stmt = c.prepare("SELECT kind, blob_hash FROM derivatives WHERE asset_id = ?1")?;
         let derivs: Vec<(String, String)> =
             stmt.query_map([&id], |r| Ok((r.get(0)?, r.get(1)?)))?.collect::<rusqlite::Result<_>>()?;
-        Ok(Some((path, ext, hash, meta, derivs)))
+        Ok(Some((path, ext, hash, meta, derivs, db::pack_facing(c, &pack_id)?)))
     })
     .await
     .map_err(fail)?
     .ok_or(Refused::NotFound)?;
-    let (mut path, mut ext, mut hash, meta, derivs) = info;
+    let (mut path, mut ext, mut hash, meta, derivs, facing) = info;
     let file = path.rsplit('/').next().unwrap_or(&path).to_owned();
     let stem = file.rsplit_once('.').map_or(file.as_str(), |(s, _)| s).to_owned();
     let names: Vec<String> = derivs.iter().map(|(k, _)| k.clone()).collect();
@@ -649,16 +694,16 @@ pub(crate) async fn request(
     if max.is_some() && !(IMAGE_IN.contains(&ext.to_ascii_lowercase().as_str())) {
         return Err(Refused::Unsupported(tr!("error-only-images-resize")));
     }
-    // Blender's GLB is already there.
-    if format == "glb" && ext != "gltf" && !crate::meshes::rebuilt_as_glb(&ext.to_ascii_lowercase()) {
+    // A GLB download is turned the way the pack's models face, and made again when that changes.
+    let key = if format == "glb" {
+        format!("as:glb~{}~{}:0", facing.turn, facing.tilt)
+    } else {
+        format!("as:{format}:{}", max.unwrap_or(0))
+    };
+    // A model only Blender reads is shown, and downloaded as a GLB, from the GLB Blender made of it.
+    if (view || format == "glb") && !readable {
         let glb = derivs.iter().find(|(k, _)| k == "glb").ok_or(Refused::NotFound)?;
-        return Ok(Lookup::Ready(Ready { hash: glb.1.clone(), ext: "glb".into(), stem }));
-    }
-    let key = format!("as:{format}:{}", max.unwrap_or(0));
-    // A model only Blender reads is shown from the GLB Blender made of it.
-    if view && !readable {
-        let glb = derivs.iter().find(|(k, _)| k == "glb").ok_or(Refused::NotFound)?;
-        path = format!("{path}.glb");
+        path = format!("{}.glb", path.rsplit_once('.').map_or(path.as_str(), |(s, _)| s));
         ext = "glb".into();
         hash.clone_from(&glb.1);
     }
@@ -687,6 +732,7 @@ pub(crate) async fn request(
         max,
         key,
         stem,
+        facing,
         duration: serde_json::from_str::<Value>(&meta).ok().and_then(|m| m.get("duration_secs")?.as_f64()),
     };
     tokio::spawn(async move {
@@ -759,6 +805,8 @@ struct Job {
     max: Option<u32>,
     key: String,
     stem: String,
+    /// How the pack's models are turned (see [`crate::meshes::facing`]).
+    facing: hoard_core::Facing,
     duration: Option<f64>,
 }
 
@@ -801,8 +849,8 @@ impl Job {
                 state.blobs.download_to(&f.hash, &dest).await?;
             }
             let local = work.join(crate::ingest::safe_rel_path(&self.path).context("unsafe path in pack")?);
-            let (src, fmt, max, duration, root) =
-                (self.ext.clone(), self.format.clone(), self.max, self.duration, work.clone());
+            let (src, fmt, max, duration, root, facing) =
+                (self.ext.clone(), self.format.clone(), self.max, self.duration, work.clone(), self.facing);
             let progress_tx = tx.clone();
             let shown = std::sync::Arc::clone(activity);
             let out = crate::heavy::run("convert", move || {
@@ -815,7 +863,9 @@ impl Job {
                         shown.progress(p);
                     }
                 };
-                convert(&local, &root, &src, &fmt, max, &Progress { duration, report: &report })
+                crate::meshes::facing(facing, || {
+                    convert(&local, &root, &src, &fmt, max, &Progress { duration, report: &report })
+                })
             })
             .await??;
             let out_ext = out.ext;
@@ -977,6 +1027,7 @@ mod tests {
 
     #[test]
     fn gltf_and_glb_round_trip() {
+        use std::io::Read;
         let dir = tempfile::tempdir().unwrap();
         let png = png_bytes(&DynamicImage::ImageRgba8(image::RgbaImage::from_pixel(2, 2, image::Rgba([9, 8, 7, 255]))));
         std::fs::create_dir_all(dir.path().join("tex")).unwrap();
@@ -991,17 +1042,22 @@ mod tests {
         let gltf = dir.path().join("crate.gltf");
         std::fs::write(&gltf, serde_json::to_vec(&doc).unwrap()).unwrap();
 
-        let glb = convert(&gltf, gltf.parent().unwrap(), "gltf", "glb", None, &Progress::NONE).unwrap();
-        let (doc2, bin) = read_glb(&glb.bytes).unwrap();
-        assert_eq!(&bin[2..6], &[3, 4, 5, 6]);
-        let img_view = doc2["images"][0]["bufferView"].as_u64().unwrap() as usize;
-        let v = &doc2["bufferViews"][img_view];
-        let start = v["byteOffset"].as_u64().unwrap() as usize;
-        assert_eq!(&bin[start..start + png.len()], png.as_slice());
-        assert_eq!(doc2["images"][0]["mimeType"], "image/png");
+        // Packed into one GLB, its textures beside it under the names of their files.
+        let out = convert(&gltf, gltf.parent().unwrap(), "gltf", "glb", None, &Progress::NONE).unwrap();
+        assert_eq!(out.ext, "zip");
+        let mut zip = zip::ZipArchive::new(Cursor::new(out.bytes)).unwrap();
+        let mut tex = Vec::new();
+        zip.by_name("textures/crate_albedo.png").unwrap().read_to_end(&mut tex).unwrap();
+        assert_eq!(tex, png);
+        let mut glb = Vec::new();
+        zip.by_name("crate.glb").unwrap().read_to_end(&mut glb).unwrap();
+        let (doc2, bin) = read_glb(&glb).unwrap();
+        assert_eq!(&bin[..4], &[3, 4, 5, 6]);
+        assert_eq!(doc2["images"][0]["uri"], "textures/crate_albedo.png");
 
+        // A GLB with its textures inside unpacks to a glTF and its .bin.
         let glb_path = dir.path().join("crate.glb");
-        std::fs::write(&glb_path, &glb.bytes).unwrap();
+        std::fs::write(&glb_path, build_glb(&gltf, true).unwrap()).unwrap();
         let zipped = convert(&glb_path, glb_path.parent().unwrap(), "glb", "gltf", None, &Progress::NONE).unwrap();
         let mut zip = zip::ZipArchive::new(Cursor::new(zipped.bytes)).unwrap();
         let names: Vec<String> =

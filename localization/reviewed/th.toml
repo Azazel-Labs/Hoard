@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "5c99d56e8fcba92ad147ac882cd0ba16d49a48bf2b65e0729b148d4a399d5d50"
+source = "339be9333600a92c96be78b536be6b769ef996ecc7538f193b4f0b0409d2e921"
 translation = "4b240abbf21b9e5a3573cb5600cede4f95b8fdc50ad26369cfcd10d567b19ce3"
 
 [messages.account-add]
@@ -2772,6 +2772,40 @@ translation = "(เว้นว่าง: ID token จะระบุว่า�
 [messages.auth-userinfo-url]
 source = "User info address"
 translation = "ที่อยู่ข้อมูลผู้ใช้"
+
+[messages.bag-clear]
+source = "Clear the selection"
+translation = "ล้างที่เลือก"
+
+[messages.bag-glb-download]
+source = "Download GLB zip"
+translation = "ดาวน์โหลด zip ของ GLB"
+
+[messages.bag-glb-heading]
+source = "Models as GLB"
+translation = "โมเดลเป็น GLB"
+
+[messages.bag-glb-text]
+source = """
+Every model as a .glb file standing Y up and facing forward, its textures as separate files in a textures folder
+    the models share. Everything else goes in as it is."""
+translation = "ทุกโมเดลเป็นไฟล์ .glb ที่ตั้งตรงโดยให้แกน Y ชี้ขึ้นและหันไปด้านหน้า พร้อมเท็กซ์เจอร์เป็นไฟล์แยกในโฟลเดอร์ textures ที่โมเดลใช้ร่วมกัน ส่วนไฟล์อื่นใส่ไปตามเดิม"
+
+[messages.bag-more]
+source = "and { $count } more"
+translation = "และอีก { $count } รายการ"
+
+[messages.bag-plain-heading]
+source = "Files as they are"
+translation = "ไฟล์ตามเดิม"
+
+[messages.bag-plain-text]
+source = "Each file as it was imported, with what it needs, in a folder for each pack."
+translation = "แต่ละไฟล์ตามที่นำเข้ามา พร้อมไฟล์ที่ต้องใช้ ในโฟลเดอร์แยกตามแพ็ก"
+
+[messages.bag-remove]
+source = "Take { $name } out of the selection"
+translation = "นำ { $name } ออกจากที่เลือก"
 
 [messages.collections-add]
 source = "Add to collection"

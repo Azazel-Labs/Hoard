@@ -1213,6 +1213,9 @@ struct SelectionParams {
     /// Swap in recovered source files where an asset has one (an Unreal `SoundWave`'s WAV instead of the .uasset).
     #[serde(default)]
     sources: Option<u8>,
+    /// Every model as a GLB with its textures beside it (see [`glb_bundle`]).
+    #[serde(default)]
+    glb: Option<u8>,
 }
 
 const MAX_SELECTION: usize = 1000;
@@ -1223,6 +1226,9 @@ async fn selection_bundle(State(state): State<AppState>, Query(p): Query<Selecti
     let ids: Vec<String> = p.ids.split(',').map(str::trim).filter(|s| !s.is_empty()).map(str::to_owned).collect();
     if ids.is_empty() || ids.len() > MAX_SELECTION {
         return Err(AppError::bad_request(tr!("error-selection-size", max = MAX_SELECTION)));
+    }
+    if p.glb.is_some_and(|g| g != 0) {
+        return glb_bundle(&state, ids).await;
     }
     let opts = ZipOptions {
         deps: p.deps.is_none_or(|d| d != 0),
@@ -1299,6 +1305,158 @@ async fn zip_assets(state: &AppState, ids: Vec<String>, opts: ZipOptions, name: 
         .collect();
     let root = name.replace(['/', '\\', '"'], "_");
     Ok(crate::bundle::zip_response(state, &root, entries, Some(credits))?)
+}
+
+/// One file of a [`glb_bundle`].
+struct GlbItem {
+    id: String,
+    /// Its file name.
+    file: String,
+    hash: String,
+    size: u64,
+    /// Whether it's a model that can be made a GLB.
+    glb: bool,
+}
+
+/// How many models are converted ahead of the one being written, so the zip doesn't wait on each in turn.
+const GLB_AHEAD: usize = 3;
+/// How long one model is waited for before its own file goes in instead.
+const GLB_WAIT: std::time::Duration = std::time::Duration::from_mins(30);
+
+/// Several assets in one zip, every model as a GLB standing Y up and facing +Z (turned the way its pack's models
+/// face), its textures in a `textures` folder the models share, each texture once. Anything else, and a model that
+/// can't be converted, goes in as it is. The zip streams as the models are converted.
+async fn glb_bundle(state: &AppState, ids: Vec<String>) -> ApiResult<Response> {
+    let (items, credits) = db::call(&state.pool, move |c| {
+        let mut stmt = c.prepare(
+            "SELECT a.id, a.path, a.ext, a.blob_hash, b.size, a.pack_id
+             FROM assets a JOIN blobs b ON b.hash = a.blob_hash WHERE a.id = ?1",
+        )?;
+        let mut derivs = c.prepare("SELECT kind FROM derivatives WHERE asset_id = ?1")?;
+        let mut items = Vec::new();
+        let mut packs = BTreeSet::new();
+        let mut seen = std::collections::HashSet::new();
+        for id in ids.iter().filter(|id| seen.insert(id.as_str())) {
+            let row = stmt
+                .query_row([id], |r| {
+                    Ok((
+                        r.get::<_, String>(0)?,
+                        r.get::<_, String>(1)?,
+                        r.get::<_, String>(2)?,
+                        r.get::<_, String>(3)?,
+                        r.get::<_, i64>(4)?,
+                        r.get::<_, String>(5)?,
+                    ))
+                })
+                .optional()?;
+            let Some((id, path, ext, hash, size, pack)) = row else { continue };
+            let kinds: Vec<String> = derivs.query_map([&id], |r| r.get(0))?.collect::<rusqlite::Result<_>>()?;
+            let glb = crate::formats::options(&ext, &kinds).iter().any(|o| o.format == "glb");
+            let file = path.rsplit('/').next().unwrap_or(&path).to_owned();
+            packs.insert(pack);
+            items.push(GlbItem { id, file, hash, size: u64::try_from(size).unwrap_or(0), glb });
+        }
+        let credits = crate::credits::markdown(&crate::credits::for_packs(c, &packs)?);
+        Ok((items, credits))
+    })
+    .await?;
+    if items.is_empty() {
+        return Err(AppError::not_found(tr!("error-those-assets-not-found")));
+    }
+    let st = std::sync::Arc::clone(state);
+    let root = "hoard-glb";
+    Ok(crate::bundle::zip_stream(state, root, move |sink| fill_glb_bundle(&st, sink, root, &items, &credits))?)
+}
+
+/// Write a [`glb_bundle`]'s files.
+fn fill_glb_bundle(
+    state: &AppState,
+    sink: &mut crate::bundle::Sink<'_>,
+    root: &str,
+    items: &[GlbItem],
+    credits: &str,
+) -> anyhow::Result<()> {
+    use crate::glbfiles::{Shelf, TEXTURES};
+    let mut files = Shelf::default();
+    let mut textures = Shelf::default();
+    files.name(TEXTURES);
+    let credits_name = files.name("CREDITS.md");
+    sink.bytes(&format!("{root}/{credits_name}"), credits.as_bytes())?;
+    let total = items.len() as f32;
+    sink.activity.detail(format!("{} files", items.len()));
+    for (i, item) in items.iter().enumerate() {
+        // Ask for the next few now: each is converted (or found ready) while the ones before it are written.
+        for next in items[i..].iter().filter(|x| x.glb).take(GLB_AHEAD) {
+            sink.rt().block_on(crate::formats::request(state, &next.id, "glb", None)).ok();
+        }
+        sink.activity.progress(i as f32 / total);
+        if item.glb {
+            match sink.rt().block_on(converted_glb(state, &item.id)) {
+                Ok(ready) => {
+                    let bytes = sink.read(&ready.hash)?;
+                    let own = if ready.ext == "zip" {
+                        unzip_glb(&bytes)?
+                    } else {
+                        crate::glbfiles::Split { glb: bytes.to_vec(), textures: Vec::new() }
+                    };
+                    let mut rename = std::collections::BTreeMap::new();
+                    for (name, data) in own.textures {
+                        let (placed, new) = textures.place(&name, &data);
+                        if new {
+                            sink.bytes(&format!("{root}/{TEXTURES}/{placed}"), &data)?;
+                        }
+                        if placed != name {
+                            rename.insert(name, placed);
+                        }
+                    }
+                    let glb = crate::glbfiles::rename_textures(&own.glb, &rename)?;
+                    let name = files.name(&format!("{}.glb", crate::glbfiles::clean(&ready.stem)));
+                    sink.bytes(&format!("{root}/{name}"), &glb)?;
+                    continue;
+                }
+                Err(e) => tracing::warn!(asset = %item.id, error = %format!("{e:#}"), "couldn't make a GLB to zip"),
+            }
+        }
+        let name = files.name(&item.file);
+        sink.blob(&format!("{root}/{name}"), &item.hash, item.size, |_| i as f32 / total)?;
+    }
+    Ok(())
+}
+
+/// An asset's GLB download, waiting for it to be made.
+async fn converted_glb(state: &AppState, id: &str) -> anyhow::Result<crate::formats::Ready> {
+    use crate::formats::{Lookup, Refused, Stage};
+    let lookup = crate::formats::request(state, id, "glb", None).await.map_err(|r| match r {
+        Refused::NotFound => anyhow::anyhow!("not found"),
+        Refused::Unsupported(m) | Refused::Failed(m) => anyhow::anyhow!(m),
+    })?;
+    match lookup {
+        Lookup::Ready(r) => Ok(r),
+        Lookup::Pending(rx) => match crate::formats::wait(rx, GLB_WAIT).await {
+            Stage::Done(r) => Ok(r),
+            Stage::Failed(m) => Err(anyhow::anyhow!(m)),
+            _ => Err(anyhow::anyhow!("still converting after {} minutes", GLB_WAIT.as_secs() / 60)),
+        },
+    }
+}
+
+/// A GLB download's zip: the GLB, and its textures by file name.
+fn unzip_glb(bytes: &[u8]) -> anyhow::Result<crate::glbfiles::Split> {
+    use std::io::Read;
+    let mut zip = zip::ZipArchive::new(std::io::Cursor::new(bytes))?;
+    let (mut glb, mut textures) = (None, Vec::new());
+    for i in 0..zip.len() {
+        let mut f = zip.by_index(i)?;
+        let name = f.name().unwrap_or_default().into_owned();
+        let mut data = Vec::new();
+        f.read_to_end(&mut data)?;
+        if let Some(t) = name.strip_prefix(&format!("{}/", crate::glbfiles::TEXTURES)) {
+            textures.push((t.to_owned(), data));
+        } else if name.to_ascii_lowercase().ends_with(".glb") {
+            glb = Some(data);
+        }
+    }
+    Ok(crate::glbfiles::Split { glb: glb.context("the GLB's zip has no GLB")?, textures })
 }
 
 // ---------------------------------------------------------------------------------------------
@@ -1609,7 +1767,7 @@ async fn asset_as(
     let map_stem = db::call(&state.pool, move |c| crate::naming::stem_of(c, &names.texture_names, &id2)).await?;
     let stem = map_stem.as_deref().unwrap_or(&ready.stem);
     let name = match (ready.ext.as_str(), p.max) {
-        ("zip", _) => format!("{stem}.gltf.zip"),
+        ("zip", _) => format!("{stem}.{format}.zip"),
         (e, Some(m)) => format!("{stem}_{m}.{e}"),
         (e, None) => format!("{stem}.{e}"),
     };

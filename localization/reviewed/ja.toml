@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "5c99d56e8fcba92ad147ac882cd0ba16d49a48bf2b65e0729b148d4a399d5d50"
+source = "339be9333600a92c96be78b536be6b769ef996ecc7538f193b4f0b0409d2e921"
 translation = "110cc1215f00a6312d4fe13a655f9cc3553e284205745fc0ce70ae25601e1bd5"
 
 [messages.account-add]
@@ -2775,6 +2775,40 @@ translation = "（空欄: ID トークンで本人を判断）"
 [messages.auth-userinfo-url]
 source = "User info address"
 translation = "ユーザー情報アドレス"
+
+[messages.bag-clear]
+source = "Clear the selection"
+translation = "選択を解除"
+
+[messages.bag-glb-download]
+source = "Download GLB zip"
+translation = "GLB の zip をダウンロード"
+
+[messages.bag-glb-heading]
+source = "Models as GLB"
+translation = "モデルを GLB で"
+
+[messages.bag-glb-text]
+source = """
+Every model as a .glb file standing Y up and facing forward, its textures as separate files in a textures folder
+    the models share. Everything else goes in as it is."""
+translation = "すべてのモデルを Y 軸を上・正面を前に向けた .glb ファイルにし、テクスチャはモデル共通の textures フォルダーに別ファイルとして入れます。それ以外のファイルはそのまま入ります。"
+
+[messages.bag-more]
+source = "and { $count } more"
+translation = "ほか { $count } 件"
+
+[messages.bag-plain-heading]
+source = "Files as they are"
+translation = "ファイルをそのまま"
+
+[messages.bag-plain-text]
+source = "Each file as it was imported, with what it needs, in a folder for each pack."
+translation = "各ファイルを取り込んだときのまま、必要なファイルと一緒に、パックごとのフォルダーに入れます。"
+
+[messages.bag-remove]
+source = "Take { $name } out of the selection"
+translation = "{ $name } を選択から外す"
 
 [messages.collections-add]
 source = "Add to collection"

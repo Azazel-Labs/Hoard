@@ -106,6 +106,17 @@ pub(crate) fn zip_response(
         .into_iter()
         .collect();
     let entries: Vec<Entry> = entries.into_iter().map(|e| Entry { name: format!("{root}/{}", e.name), ..e }).collect();
+    zip_stream(state, &root, move |sink| write_zip(sink, extra, entries))
+}
+
+/// Stream a zip called `<root>.zip` whose files `fill` adds to the [`Sink`] as it makes them, on a low-priority
+/// thread. The download starts at once.
+pub(crate) fn zip_stream(
+    state: &AppState,
+    root: &str,
+    fill: impl FnOnce(&mut Sink<'_>) -> Result<()> + Send + 'static,
+) -> Result<Response> {
+    let root = root.replace(['"', '\\', '/'], "_");
     let blobs = state.blobs.clone();
     let rt = tokio::runtime::Handle::current();
     let (tx, mut rx) = tokio::sync::mpsc::channel::<std::io::Result<Bytes>>(8);
@@ -113,7 +124,8 @@ pub(crate) fn zip_response(
     let activity = crate::activity::start("zip", format!("Zipping {root}"), None);
     crate::heavy::spawn("zip", move || {
         let out = ChannelWriter { tx, buf: Vec::with_capacity(CHUNK) };
-        let result = write_zip(&rt, &blobs, extra, entries, out, &activity);
+        let mut sink = Sink::new(&rt, &blobs, out, &activity);
+        let result = fill(&mut sink).and_then(|()| sink.finish());
         if let Err(e) = result {
             // Fail the response rather than end it cleanly, so the client knows the zip is incomplete.
             if !e.chain().any(|c| {
@@ -136,35 +148,61 @@ pub(crate) fn zip_response(
 const CREDITS: &str = "CREDITS.md";
 
 /// Write `extra` (small files made on the spot), then the blobs `entries` name.
-fn write_zip(
-    rt: &tokio::runtime::Handle,
-    blobs: &crate::blobs::BlobStore,
-    extra: Vec<(String, Vec<u8>)>,
-    entries: Vec<Entry>,
-    out: ChannelWriter,
-    activity: &crate::activity::Handle,
-) -> Result<()> {
+fn write_zip(sink: &mut Sink<'_>, extra: Vec<(String, Vec<u8>)>, entries: Vec<Entry>) -> Result<()> {
     let total: u64 = entries.iter().map(|e| e.size).sum::<u64>().max(1);
     let (count, mut written) = (entries.len(), 0u64);
-    activity.detail(format!("{count} files"));
-    let mut zip = zip::ZipWriter::new_stream(out);
-    let mut seen = std::collections::HashSet::new();
+    sink.activity.detail(format!("{count} files"));
     for (name, data) in extra {
-        let opts = SimpleFileOptions::default().last_modified_time(zip::DateTime::default_for_write());
-        zip.start_file(name.as_str(), opts)?;
-        zip.write_all(&data)?;
-        seen.insert(name);
+        sink.bytes(&name, &data)?;
     }
     for Entry { name, hash, size, unity_guid } in entries {
-        if !seen.insert(name.clone()) {
-            continue;
-        }
-        if let Some(guid) = unity_guid {
+        if let Some(guid) = unity_guid
+            && !sink.has(&name)
+        {
             // A minimal .meta: Unity keeps the GUID (so materials still find their textures) and fills in the
             // importer settings itself.
-            let opts = SimpleFileOptions::default().last_modified_time(zip::DateTime::default_for_write());
-            zip.start_file(format!("{name}.meta"), opts)?;
-            zip.write_all(format!("fileFormatVersion: 2\nguid: {guid}\n").as_bytes())?;
+            sink.bytes(&format!("{name}.meta"), format!("fileFormatVersion: 2\nguid: {guid}\n").as_bytes())?;
+        }
+        sink.blob(&name, &hash, size, |n| {
+            written += n;
+            written as f32 / total as f32
+        })?;
+    }
+    Ok(())
+}
+
+/// A zip being streamed: files go in as they're added, each name once.
+pub(crate) struct Sink<'a> {
+    zip: zip::ZipWriter<zip::write::StreamWriter<ChannelWriter>>,
+    rt: &'a tokio::runtime::Handle,
+    blobs: &'a crate::blobs::BlobStore,
+    seen: std::collections::HashSet<String>,
+    pub(crate) activity: &'a crate::activity::Handle,
+}
+
+impl<'a> Sink<'a> {
+    fn new(
+        rt: &'a tokio::runtime::Handle,
+        blobs: &'a crate::blobs::BlobStore,
+        out: ChannelWriter,
+        activity: &'a crate::activity::Handle,
+    ) -> Self {
+        Self { zip: zip::ZipWriter::new_stream(out), rt, blobs, seen: std::collections::HashSet::new(), activity }
+    }
+
+    /// The runtime, for waiting on async work from the zipping thread.
+    pub(crate) fn rt(&self) -> &tokio::runtime::Handle {
+        self.rt
+    }
+
+    /// Whether a file of this name is in the zip already.
+    pub(crate) fn has(&self, name: &str) -> bool {
+        self.seen.contains(name)
+    }
+
+    fn start(&mut self, name: &str, size: u64) -> Result<bool> {
+        if !self.seen.insert(name.to_owned()) {
+            return Ok(false);
         }
         let ext = name.rsplit_once('.').map_or_default(|(_, e)| e.to_lowercase());
         let method =
@@ -173,20 +211,51 @@ fn write_zip(
             .compression_method(method)
             .large_file(size >= u64::from(u32::MAX))
             .last_modified_time(zip::DateTime::default_for_write());
-        zip.start_file(name, opts)?;
+        self.zip.start_file(name, opts)?;
+        Ok(true)
+    }
+
+    /// Add a file made on the spot. A name already in the zip is skipped.
+    pub(crate) fn bytes(&mut self, name: &str, data: &[u8]) -> Result<()> {
+        if self.start(name, data.len() as u64)? {
+            self.zip.write_all(data)?;
+        }
+        Ok(())
+    }
+
+    /// Add a stored file, telling `progress` how many bytes went in each time and showing the share it answers. A
+    /// name already in the zip is skipped.
+    pub(crate) fn blob(
+        &mut self,
+        name: &str,
+        hash: &str,
+        size: u64,
+        mut progress: impl FnMut(u64) -> f32,
+    ) -> Result<()> {
+        if !self.start(name, size)? {
+            return Ok(());
+        }
         // Read in the runtime, write outside it: the writer waits on the connection.
-        let Some(mut read) = rt.block_on(blobs.read(&hash, None))? else {
+        let Some(mut read) = self.rt.block_on(self.blobs.read(hash, None))? else {
             anyhow::bail!("blob {hash} missing from storage")
         };
-        while let Some(chunk) = rt.block_on(read.stream.next()) {
+        while let Some(chunk) = self.rt.block_on(read.stream.next()) {
             let chunk = chunk?;
-            written += chunk.len() as u64;
-            zip.write_all(&chunk)?;
-            activity.progress(written as f32 / total as f32);
+            self.zip.write_all(&chunk)?;
+            self.activity.progress(progress(chunk.len() as u64));
         }
+        Ok(())
     }
-    zip.finish()?.flush()?;
-    Ok(())
+
+    /// The stored file's bytes, for a file that has to be changed on the way in.
+    pub(crate) fn read(&self, hash: &str) -> Result<Bytes> {
+        self.rt.block_on(self.blobs.read_all(hash))
+    }
+
+    fn finish(self) -> Result<()> {
+        self.zip.finish()?.flush()?;
+        Ok(())
+    }
 }
 
 #[cfg(test)]
@@ -211,7 +280,9 @@ mod tests {
         let writer = std::thread::spawn(move || {
             let shown = crate::activity::start("zip", "Zipping test", None);
             let extra = vec![("root/CREDITS.md".to_owned(), b"# Credits\n".to_vec())];
-            write_zip(&rt, &blobs, extra, entries, ChannelWriter { tx, buf: Vec::new() }, &shown).unwrap();
+            let mut sink = Sink::new(&rt, &blobs, ChannelWriter { tx, buf: Vec::new() }, &shown);
+            write_zip(&mut sink, extra, entries).unwrap();
+            sink.finish().unwrap();
         });
         let mut bytes = Vec::new();
         while let Some(chunk) = rx.recv().await {

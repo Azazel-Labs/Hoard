@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "5c99d56e8fcba92ad147ac882cd0ba16d49a48bf2b65e0729b148d4a399d5d50"
+source = "339be9333600a92c96be78b536be6b769ef996ecc7538f193b4f0b0409d2e921"
 translation = "1a4df50b438ca81d05a8082fa6c6f1912acf6742fdc06a0acf388c1b5773abb6"
 
 [messages.account-add]
@@ -2769,6 +2769,40 @@ translation = "(để trống: ID token cho biết đó là ai)"
 [messages.auth-userinfo-url]
 source = "User info address"
 translation = "Địa chỉ thông tin người dùng"
+
+[messages.bag-clear]
+source = "Clear the selection"
+translation = "Bỏ chọn tất cả"
+
+[messages.bag-glb-download]
+source = "Download GLB zip"
+translation = "Tải xuống zip GLB"
+
+[messages.bag-glb-heading]
+source = "Models as GLB"
+translation = "Mô hình dạng GLB"
+
+[messages.bag-glb-text]
+source = """
+Every model as a .glb file standing Y up and facing forward, its textures as separate files in a textures folder
+    the models share. Everything else goes in as it is."""
+translation = "Mỗi mô hình là một tệp .glb đứng thẳng với trục Y hướng lên và quay về phía trước, các texture của nó là những tệp riêng trong thư mục textures mà các mô hình dùng chung. Mọi thứ khác được giữ nguyên."
+
+[messages.bag-more]
+source = "and { $count } more"
+translation = "và { $count } mục nữa"
+
+[messages.bag-plain-heading]
+source = "Files as they are"
+translation = "Tệp giữ nguyên"
+
+[messages.bag-plain-text]
+source = "Each file as it was imported, with what it needs, in a folder for each pack."
+translation = "Mỗi tệp giữ nguyên như khi nhập, kèm những gì nó cần, trong một thư mục cho mỗi gói."
+
+[messages.bag-remove]
+source = "Take { $name } out of the selection"
+translation = "Bỏ { $name } khỏi lựa chọn"
 
 [messages.collections-add]
 source = "Add to collection"

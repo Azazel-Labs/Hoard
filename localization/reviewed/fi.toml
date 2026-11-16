@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "5c99d56e8fcba92ad147ac882cd0ba16d49a48bf2b65e0729b148d4a399d5d50"
+source = "339be9333600a92c96be78b536be6b769ef996ecc7538f193b4f0b0409d2e921"
 translation = "259239ab239601949cc6a70972021dcb09218f2bed3d1964197e9079006c5785"
 
 [messages.account-add]
@@ -2861,6 +2861,40 @@ translation = "(tyhjä: ID-tunnus kertoo, kuka se on)"
 [messages.auth-userinfo-url]
 source = "User info address"
 translation = "Käyttäjätieto-osoite"
+
+[messages.bag-clear]
+source = "Clear the selection"
+translation = "Tyhjennä valinta"
+
+[messages.bag-glb-download]
+source = "Download GLB zip"
+translation = "Lataa GLB-zip"
+
+[messages.bag-glb-heading]
+source = "Models as GLB"
+translation = "Mallit GLB-muodossa"
+
+[messages.bag-glb-text]
+source = """
+Every model as a .glb file standing Y up and facing forward, its textures as separate files in a textures folder
+    the models share. Everything else goes in as it is."""
+translation = "Jokainen malli .glb-tiedostona Y ylöspäin seisten ja eteenpäin katsoen, sen tekstuurit erillisinä tiedostoina textures-kansiossa, jonka mallit jakavat. Kaikki muu menee mukaan sellaisenaan."
+
+[messages.bag-more]
+source = "and { $count } more"
+translation = "ja { $count } lisää"
+
+[messages.bag-plain-heading]
+source = "Files as they are"
+translation = "Tiedostot sellaisenaan"
+
+[messages.bag-plain-text]
+source = "Each file as it was imported, with what it needs, in a folder for each pack."
+translation = "Jokainen tiedosto sellaisena kuin se tuotiin, tarvitsemiensa kanssa, omassa kansiossaan pakettia kohden."
+
+[messages.bag-remove]
+source = "Take { $name } out of the selection"
+translation = "Poista { $name } valinnasta"
 
 [messages.collections-add]
 source = "Add to collection"

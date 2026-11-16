@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "5c99d56e8fcba92ad147ac882cd0ba16d49a48bf2b65e0729b148d4a399d5d50"
+source = "339be9333600a92c96be78b536be6b769ef996ecc7538f193b4f0b0409d2e921"
 translation = "59247f4fd3e0712c726e47580a3cc9e4e63dfcef4ff7b34a653c6b6a2a4ee38c"
 
 [messages.account-add]
@@ -2782,6 +2782,40 @@ translation = "(boş: kim olduğunu kimlik belirteci söyler)"
 [messages.auth-userinfo-url]
 source = "User info address"
 translation = "Kullanıcı bilgisi adresi"
+
+[messages.bag-clear]
+source = "Clear the selection"
+translation = "Seçimi temizle"
+
+[messages.bag-glb-download]
+source = "Download GLB zip"
+translation = "GLB zip’ini indir"
+
+[messages.bag-glb-heading]
+source = "Models as GLB"
+translation = "GLB olarak modeller"
+
+[messages.bag-glb-text]
+source = """
+Every model as a .glb file standing Y up and facing forward, its textures as separate files in a textures folder
+    the models share. Everything else goes in as it is."""
+translation = "Her model, Y yukarıda ve öne bakacak şekilde duran bir .glb dosyası olarak; dokuları ise modellerin ortak kullandığı bir textures klasöründe ayrı dosyalar olarak. Geri kalan her şey olduğu gibi girer."
+
+[messages.bag-more]
+source = "and { $count } more"
+translation = "ve { $count } tane daha"
+
+[messages.bag-plain-heading]
+source = "Files as they are"
+translation = "Dosyalar olduğu gibi"
+
+[messages.bag-plain-text]
+source = "Each file as it was imported, with what it needs, in a folder for each pack."
+translation = "Her dosya içe aktarıldığı gibi, ihtiyaç duyduklarıyla birlikte, her paket için bir klasörde."
+
+[messages.bag-remove]
+source = "Take { $name } out of the selection"
+translation = "{ $name } öğesini seçimden çıkar"
 
 [messages.collections-add]
 source = "Add to collection"

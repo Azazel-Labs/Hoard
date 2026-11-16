@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "5c99d56e8fcba92ad147ac882cd0ba16d49a48bf2b65e0729b148d4a399d5d50"
+source = "339be9333600a92c96be78b536be6b769ef996ecc7538f193b4f0b0409d2e921"
 translation = "a8e90c6c6ba195832f26ec8d98ede39bfedc68c80bc69fd376aa7b993e381133"
 
 [messages.account-add]
@@ -2853,6 +2853,40 @@ translation = "(buit: el testimoni d'identitat diu qui és)"
 [messages.auth-userinfo-url]
 source = "User info address"
 translation = "Adreça de la informació d'usuari"
+
+[messages.bag-clear]
+source = "Clear the selection"
+translation = "Buida la selecció"
+
+[messages.bag-glb-download]
+source = "Download GLB zip"
+translation = "Baixa el zip GLB"
+
+[messages.bag-glb-heading]
+source = "Models as GLB"
+translation = "Models com a GLB"
+
+[messages.bag-glb-text]
+source = """
+Every model as a .glb file standing Y up and facing forward, its textures as separate files in a textures folder
+    the models share. Everything else goes in as it is."""
+translation = "Cada model com a fitxer .glb dret amb la Y amunt i mirant endavant, amb les textures com a fitxers a part en una carpeta textures que comparteixen els models. Tota la resta hi va tal com és."
+
+[messages.bag-more]
+source = "and { $count } more"
+translation = "i { $count } més"
+
+[messages.bag-plain-heading]
+source = "Files as they are"
+translation = "Fitxers tal com són"
+
+[messages.bag-plain-text]
+source = "Each file as it was imported, with what it needs, in a folder for each pack."
+translation = "Cada fitxer tal com es va importar, amb el que necessita, en una carpeta per a cada paquet."
+
+[messages.bag-remove]
+source = "Take { $name } out of the selection"
+translation = "Treu { $name } de la selecció"
 
 [messages.collections-add]
 source = "Add to collection"

@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "5c99d56e8fcba92ad147ac882cd0ba16d49a48bf2b65e0729b148d4a399d5d50"
+source = "339be9333600a92c96be78b536be6b769ef996ecc7538f193b4f0b0409d2e921"
 translation = "10350137b75664600f5b80d67d4b7dc6a218245ed458fa59bceed92a7a09d3d2"
 
 [messages.account-add]
@@ -2890,6 +2890,40 @@ translation = "(prázdné: kdo to je, řekne ID token)"
 [messages.auth-userinfo-url]
 source = "User info address"
 translation = "Adresa informací o uživateli"
+
+[messages.bag-clear]
+source = "Clear the selection"
+translation = "Zrušit výběr"
+
+[messages.bag-glb-download]
+source = "Download GLB zip"
+translation = "Stáhnout GLB zip"
+
+[messages.bag-glb-heading]
+source = "Models as GLB"
+translation = "Modely jako GLB"
+
+[messages.bag-glb-text]
+source = """
+Every model as a .glb file standing Y up and facing forward, its textures as separate files in a textures folder
+    the models share. Everything else goes in as it is."""
+translation = "Každý model jako soubor .glb stojící osou Y nahoru a otočený dopředu, jeho textury jako samostatné soubory ve složce textures, kterou modely sdílejí. Vše ostatní jde dovnitř tak, jak je."
+
+[messages.bag-more]
+source = "and { $count } more"
+translation = "a další ({ $count })"
+
+[messages.bag-plain-heading]
+source = "Files as they are"
+translation = "Soubory tak, jak jsou"
+
+[messages.bag-plain-text]
+source = "Each file as it was imported, with what it needs, in a folder for each pack."
+translation = "Každý soubor tak, jak byl importován, s tím, co potřebuje, ve složce pro každý balíček."
+
+[messages.bag-remove]
+source = "Take { $name } out of the selection"
+translation = "Odebrat { $name } z výběru"
 
 [messages.collections-add]
 source = "Add to collection"

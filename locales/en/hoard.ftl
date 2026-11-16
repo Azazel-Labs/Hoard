@@ -688,6 +688,18 @@ app-credits = Credits
 app-prefer-sources-title = Unreal SoundWaves and textures whose original file Hoard recovered
 # $count is how many of the selected assets have a recovered file.
 app-prefer-sources = Recovered WAV/PNG instead of .uasset ({ $count })
+# The panel that lists the selected assets and offers to download them together.
+bag-clear = Clear the selection
+bag-glb-heading = Models as GLB
+bag-glb-text =
+    Every model as a .glb file standing Y up and facing forward, its textures as separate files in a textures folder
+    the models share. Everything else goes in as it is.
+bag-glb-download = Download GLB zip
+bag-plain-heading = Files as they are
+bag-plain-text = Each file as it was imported, with what it needs, in a folder for each pack.
+bag-remove = Take { $name } out of the selection
+# $count is how many more are selected than the list shows.
+bag-more = and { $count } more
 app-bulk-tag-label = A tag to add to, or take off, the selected assets
 app-bulk-tag-placeholder = Tag
 app-bulk-tag-add-title = Add this tag to every selected asset

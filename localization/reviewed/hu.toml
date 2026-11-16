@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "5c99d56e8fcba92ad147ac882cd0ba16d49a48bf2b65e0729b148d4a399d5d50"
+source = "339be9333600a92c96be78b536be6b769ef996ecc7538f193b4f0b0409d2e921"
 translation = "6df14cb1c2fd71b68aa0783404db89869e1b0987d799ee6e09c8222a98701df5"
 
 [messages.account-add]
@@ -2778,6 +2778,40 @@ translation = "(üresen: az azonosítótoken mondja meg, ki az)"
 [messages.auth-userinfo-url]
 source = "User info address"
 translation = "Felhasználóiadat-cím"
+
+[messages.bag-clear]
+source = "Clear the selection"
+translation = "Kijelölés törlése"
+
+[messages.bag-glb-download]
+source = "Download GLB zip"
+translation = "GLB zip letöltése"
+
+[messages.bag-glb-heading]
+source = "Models as GLB"
+translation = "Modellek GLB-ként"
+
+[messages.bag-glb-text]
+source = """
+Every model as a .glb file standing Y up and facing forward, its textures as separate files in a textures folder
+    the models share. Everything else goes in as it is."""
+translation = "Minden modell .glb fájlként, Y tengellyel felfelé állva és előre nézve, a textúrái külön fájlként egy textures mappában, amelyen a modellek osztoznak. Minden más úgy kerül bele, ahogy van."
+
+[messages.bag-more]
+source = "and { $count } more"
+translation = "és még { $count }"
+
+[messages.bag-plain-heading]
+source = "Files as they are"
+translation = "Fájlok úgy, ahogy vannak"
+
+[messages.bag-plain-text]
+source = "Each file as it was imported, with what it needs, in a folder for each pack."
+translation = "Minden fájl úgy, ahogy importálva lett, azzal, amire szüksége van, csomagonként egy mappában."
+
+[messages.bag-remove]
+source = "Take { $name } out of the selection"
+translation = "{ $name } kivétele a kijelölésből"
 
 [messages.collections-add]
 source = "Add to collection"

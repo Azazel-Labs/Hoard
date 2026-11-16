@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "5c99d56e8fcba92ad147ac882cd0ba16d49a48bf2b65e0729b148d4a399d5d50"
+source = "339be9333600a92c96be78b536be6b769ef996ecc7538f193b4f0b0409d2e921"
 translation = "81f454b4be3578d38a286a9258dbbc3cf47ad1586e8852a5a6c519b04af263db"
 
 [messages.account-add]
@@ -2915,6 +2915,40 @@ translation = "(gol: tokenul ID spune cine este)"
 [messages.auth-userinfo-url]
 source = "User info address"
 translation = "Adresa informațiilor despre utilizator"
+
+[messages.bag-clear]
+source = "Clear the selection"
+translation = "Goliți selecția"
+
+[messages.bag-glb-download]
+source = "Download GLB zip"
+translation = "Descărcați zip-ul GLB"
+
+[messages.bag-glb-heading]
+source = "Models as GLB"
+translation = "Modele ca GLB"
+
+[messages.bag-glb-text]
+source = """
+Every model as a .glb file standing Y up and facing forward, its textures as separate files in a textures folder
+    the models share. Everything else goes in as it is."""
+translation = "Fiecare model ca fișier .glb, în picioare cu Y în sus și orientat înainte, cu texturile ca fișiere separate într-un dosar textures comun modelelor. Restul intră așa cum este."
+
+[messages.bag-more]
+source = "and { $count } more"
+translation = "și încă { $count }"
+
+[messages.bag-plain-heading]
+source = "Files as they are"
+translation = "Fișiere așa cum sunt"
+
+[messages.bag-plain-text]
+source = "Each file as it was imported, with what it needs, in a folder for each pack."
+translation = "Fiecare fișier așa cum a fost importat, cu ce îi trebuie, într-un dosar pentru fiecare pachet."
+
+[messages.bag-remove]
+source = "Take { $name } out of the selection"
+translation = "Scoateți { $name } din selecție"
 
 [messages.collections-add]
 source = "Add to collection"

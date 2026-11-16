@@ -629,8 +629,8 @@ pub struct Pack {
 
 /// How a pack's models are turned to be shown standing up and facing forward, for files that don't say which way
 /// is up or front (OBJ, STL, PLY, 3DS, Collada), or say it wrongly: a tip about the side-to-side axis, then a turn
-/// about the up axis, each a multiple of 90 degrees. Thumbnails and the 3D viewer show the models turned; their
-/// files and downloads are left as they were made.
+/// about the up axis, each a multiple of 90 degrees. Thumbnails, the 3D viewer and GLB downloads show the models
+/// turned; their files are left as they were made.
 #[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Serialize, Deserialize)]
 pub struct Facing {
     /// Degrees about the up axis, counterclockwise seen from above: 0, 90, 180 or 270.

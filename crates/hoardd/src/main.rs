@@ -23,6 +23,7 @@ mod ffmpeg;
 mod fonts;
 mod format_wizard;
 mod formats;
+mod glbfiles;
 mod gpu_hint;
 mod heavy;
 mod https;

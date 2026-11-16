@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "5c99d56e8fcba92ad147ac882cd0ba16d49a48bf2b65e0729b148d4a399d5d50"
+source = "339be9333600a92c96be78b536be6b769ef996ecc7538f193b4f0b0409d2e921"
 translation = "c88ccd005fc6325aa6e221408cf6717fbfee2dabbc4de8cac4e99bd7fe8f0b6e"
 
 [messages.account-add]
@@ -2853,6 +2853,40 @@ translation = "(leer: Das ID-Token sagt, wer es ist)"
 [messages.auth-userinfo-url]
 source = "User info address"
 translation = "Benutzerinfo-Adresse"
+
+[messages.bag-clear]
+source = "Clear the selection"
+translation = "Auswahl aufheben"
+
+[messages.bag-glb-download]
+source = "Download GLB zip"
+translation = "GLB-Zip herunterladen"
+
+[messages.bag-glb-heading]
+source = "Models as GLB"
+translation = "Modelle als GLB"
+
+[messages.bag-glb-text]
+source = """
+Every model as a .glb file standing Y up and facing forward, its textures as separate files in a textures folder
+    the models share. Everything else goes in as it is."""
+translation = "Jedes Modell als .glb-Datei, mit Y nach oben stehend und nach vorn gerichtet, seine Texturen als eigene Dateien in einem Ordner textures, den sich die Modelle teilen. Alles andere kommt so hinein, wie es ist."
+
+[messages.bag-more]
+source = "and { $count } more"
+translation = "und { $count } weitere"
+
+[messages.bag-plain-heading]
+source = "Files as they are"
+translation = "Dateien, wie sie sind"
+
+[messages.bag-plain-text]
+source = "Each file as it was imported, with what it needs, in a folder for each pack."
+translation = "Jede Datei, wie sie importiert wurde, mit allem, was sie braucht, in einem Ordner pro Paket."
+
+[messages.bag-remove]
+source = "Take { $name } out of the selection"
+translation = "{ $name } aus der Auswahl nehmen"
 
 [messages.collections-add]
 source = "Add to collection"

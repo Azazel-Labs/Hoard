@@ -1277,9 +1277,10 @@ export const bundleUrl = (a: Asset, animations = false) => `/api/assets/${a.id}/
 export const packZipUrl = (packId: string) => `/api/packs/${packId}/bundle.zip`
 export const collectionZipUrl = (id: string, sources = false) =>
   `/api/collections/${id}/bundle.zip${sources ? '?sources=1' : ''}`
-/** Several assets in one zip, each with what it needs (one folder per pack when they come from several). */
-export const selectionZipUrl = (ids: string[], deps = true, sources = false) =>
-  `/api/bundle.zip?ids=${ids.join(',')}${deps ? '' : '&deps=0'}${sources ? '&sources=1' : ''}`
+/** Several assets in one zip, each with what it needs (one folder per pack when they come from several). With
+ *  `glb`, every model is a GLB standing Y up and facing forward, the textures beside them in one shared folder. */
+export const selectionZipUrl = (ids: string[], deps = true, sources = false, glb = false) =>
+  `/api/bundle.zip?ids=${ids.join(',')}${deps ? '' : '&deps=0'}${sources ? '&sources=1' : ''}${glb ? '&glb=1' : ''}`
 /** CREDITS.md for a pack, or for the packs a collection's assets come from. */
 export const packCreditsUrl = (packId: string) => `/api/packs/${packId}/credits?format=md`
 export const collectionCreditsUrl = (id: string) => `/api/collections/${id}/credits?format=md`

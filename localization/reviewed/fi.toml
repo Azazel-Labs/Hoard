@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "031ae9796de89847770a20e2fa79115c9c8ec9e3764ab428ee6f31e570c680bd"
+source = "5facbc5c6e9deb1e85e85d796c5a66c74f60e9b8857afda31b896d4a805194c0"
 translation = "259239ab239601949cc6a70972021dcb09218f2bed3d1964197e9079006c5785"
 
 [messages.account-add]
@@ -7198,6 +7198,158 @@ translation = "ulkoasu väri appearance color"
 [messages.palette-title]
 source = "Command palette"
 translation = "Komentopaletti"
+
+[messages.profiler]
+source = "Profiler"
+translation = "Profiloija"
+
+[messages.profiler-average]
+source = "Average"
+translation = "Keskiarvo"
+
+[messages.profiler-count]
+source = "Requests"
+translation = "Pyynnöt"
+
+[messages.profiler-cpu]
+source = "Processor use"
+translation = "Suorittimen käyttö"
+
+[messages.profiler-cpu-hoard]
+source = "Hoard"
+translation = "Hoard"
+
+[messages.profiler-cpu-machine]
+source = "Whole machine"
+translation = "Koko kone"
+
+[messages.profiler-cpu-summary]
+source = "Hoard is using { $hoard } of the processors, and the whole machine { $machine }."
+translation = "Hoard käyttää { $hoard } suorittimista ja koko kone { $machine }."
+
+[messages.profiler-failed]
+source = "Couldn’t read the profiler: { $error }"
+translation = "Profiloijan luku epäonnistui: { $error }"
+
+[messages.profiler-memory]
+source = "Memory"
+translation = "Muisti"
+
+[messages.profiler-p95]
+source = "Slowest 5%"
+translation = "Hitain 5 %"
+
+[messages.profiler-part-db]
+source = "Database"
+translation = "Tietokanta"
+
+[messages.profiler-part-db-title]
+source = "Waiting for the database and running its queries"
+translation = "Tietokannan odottaminen ja sen kyselyjen suorittaminen"
+
+[messages.profiler-part-disk]
+source = "Disk"
+translation = "Levy"
+
+[messages.profiler-part-disk-title]
+source = "Reading stored files, and compressing what’s sent"
+translation = "Tallennettujen tiedostojen lukeminen ja lähetettävän pakkaaminen"
+
+[messages.profiler-part-other]
+source = "Other"
+translation = "Muu"
+
+[messages.profiler-part-other-title]
+source = "Working out the answer"
+translation = "Vastauksen laatiminen"
+
+[messages.profiler-part-send]
+source = "Sending"
+translation = "Lähetys"
+
+[messages.profiler-part-send-title]
+source = "Waiting while the network takes what was sent"
+translation = "Odottaminen, kun verkko ottaa vastaan lähetettyä"
+
+[messages.profiler-portal]
+source = "the interface’s own files"
+translation = "käyttöliittymän omat tiedostot"
+
+[messages.profiler-request-count]
+source = """
+{ $count ->
+        [one] { $count } request
+       *[other] { $count } requests
+    }"""
+translation = """
+{ $count ->
+        [one] { $count } pyyntö
+       *[other] { $count } pyyntöä
+    }"""
+
+[messages.profiler-requests]
+source = "Time serving requests"
+translation = "Pyyntöjen käsittelyaika"
+
+[messages.profiler-requests-none]
+source = "No requests in the last ten minutes."
+translation = "Ei pyyntöjä viimeisten kymmenen minuutin aikana."
+
+[messages.profiler-requests-what]
+source = "Each bar is ten seconds of requests, their time split by where it went."
+translation = "Jokainen palkki on kymmenen sekunnin pyynnöt, ja niiden aika on jaettu sen mukaan, mihin se kului."
+
+[messages.profiler-route]
+source = "Route"
+translation = "Reitti"
+
+[messages.profiler-routes]
+source = "By route"
+translation = "Reiteittäin"
+
+[messages.profiler-sent]
+source = "Sent"
+translation = "Lähetetty"
+
+[messages.profiler-serving]
+source = "Requests in progress"
+translation = "Käynnissä olevat pyynnöt"
+
+[messages.profiler-slowest]
+source = "Slowest: { $route }, { $time }"
+translation = "Hitain: { $route }, { $time }"
+
+[messages.profiler-split]
+source = "Where the time went"
+translation = "Mihin aika kului"
+
+[messages.profiler-starting]
+source = "The first readings arrive in a moment."
+translation = "Ensimmäiset lukemat tulevat hetken kuluttua."
+
+[messages.profiler-what]
+source = "What Hoard has been doing over the last ten minutes, updated every two seconds while you watch. It’s kept in memory only and starts over when Hoard restarts."
+translation = "Mitä Hoard on tehnyt viimeisten kymmenen minuutin aikana, päivittyen kahden sekunnin välein, kun katsot. Tiedot pidetään vain muistissa ja alkavat alusta, kun Hoard käynnistyy uudelleen."
+
+[messages.profiler-working]
+source = "Working on"
+translation = "Työn alla"
+
+[messages.profiler-working-more]
+source = """
+{ $count ->
+        [one] And one more.
+       *[other] And { $count } more.
+    }"""
+translation = """
+{ $count ->
+        [one] Ja yksi muu.
+       *[other] Ja { $count } muuta.
+    }"""
+
+[messages.profiler-working-none]
+source = "Nothing ran in the background."
+translation = "Taustalla ei ajettu mitään."
 
 [messages.projects-favorite-add-failed]
 source = "Couldn't add to your favorites: { $error }"

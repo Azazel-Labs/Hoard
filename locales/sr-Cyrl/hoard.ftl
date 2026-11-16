@@ -2401,6 +2401,53 @@ settings-public-url = Јавна адреса
 settings-public-url-placeholder = Из адресе прегледача (нпр. https://hoard.example.com)
 settings-public-url-default = из адресе прегледача
 
+## ProfilerPanel.vue: профилер на врху Подешавања → Перформансе
+
+profiler = Профилер
+profiler-what = Шта је Hoard радио у последњих десет минута, освежено на сваке две секунде док гледате. Чува се само у меморији и почиње изнова кад се Hoard поново покрене.
+profiler-starting = Прва мерења стижу за тренутак.
+profiler-failed = Није могуће прочитати профилер: { $error }
+profiler-cpu = Коришћење процесора
+profiler-cpu-hoard = Hoard
+profiler-cpu-machine = Цела машина
+profiler-cpu-summary = Hoard користи { $hoard } процесора, а цела машина { $machine }.
+profiler-memory = Меморија
+profiler-serving = Захтеви у току
+profiler-working = Ради на
+profiler-working-none = Ништа није радило у позадини.
+profiler-working-more =
+    { $count ->
+        [one] И још { $count }.
+        [few] И још { $count }.
+       *[other] И још { $count }.
+    }
+profiler-requests = Време опслуживања захтева
+profiler-requests-what = Свака трака је десет секунди захтева, а њихово време је подељено према томе где је отишло.
+profiler-part-db = База података
+profiler-part-db-title = Чекање на базу података и извршавање њених упита
+profiler-part-disk = Диск
+profiler-part-disk-title = Читање сачуваних датотека и компресовање онога што се шаље
+profiler-part-send = Слање
+profiler-part-send-title = Чекање док мрежа преузме оно што је послато
+profiler-part-other = Остало
+profiler-part-other-title = Припрема одговора
+profiler-request-count =
+    { $count ->
+        [one] { $count } захтев
+        [few] { $count } захтева
+       *[other] { $count } захтева
+    }
+profiler-requests-none = Нема захтева у последњих десет минута.
+profiler-slowest = Најспорији: { $route }, { $time }
+profiler-routes = По рути
+profiler-route = Рута
+profiler-count = Захтеви
+profiler-average = Просек
+profiler-p95 = Најспоријих 5%
+profiler-split = Где је отишло време
+profiler-sent = Послато
+profiler-portal = сопствене датотеке интерфејса
+
 ## SettingsPage.vue: Перформансе
 
 settings-render = 3D сличице

@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "031ae9796de89847770a20e2fa79115c9c8ec9e3764ab428ee6f31e570c680bd"
+source = "5facbc5c6e9deb1e85e85d796c5a66c74f60e9b8857afda31b896d4a805194c0"
 translation = "4b240abbf21b9e5a3573cb5600cede4f95b8fdc50ad26369cfcd10d567b19ce3"
 
 [messages.account-add]
@@ -6997,6 +6997,156 @@ translation = "รูปลักษณ์ สี appearance color"
 [messages.palette-title]
 source = "Command palette"
 translation = "แผงคำสั่ง"
+
+[messages.profiler]
+source = "Profiler"
+translation = "โปรไฟเลอร์"
+
+[messages.profiler-average]
+source = "Average"
+translation = "เฉลี่ย"
+
+[messages.profiler-count]
+source = "Requests"
+translation = "คำขอ"
+
+[messages.profiler-cpu]
+source = "Processor use"
+translation = "การใช้โปรเซสเซอร์"
+
+[messages.profiler-cpu-hoard]
+source = "Hoard"
+translation = "Hoard"
+
+[messages.profiler-cpu-machine]
+source = "Whole machine"
+translation = "ทั้งเครื่อง"
+
+[messages.profiler-cpu-summary]
+source = "Hoard is using { $hoard } of the processors, and the whole machine { $machine }."
+translation = "Hoard ใช้โปรเซสเซอร์ { $hoard } และทั้งเครื่องใช้ { $machine }"
+
+[messages.profiler-failed]
+source = "Couldn’t read the profiler: { $error }"
+translation = "อ่านโปรไฟเลอร์ไม่ได้: { $error }"
+
+[messages.profiler-memory]
+source = "Memory"
+translation = "หน่วยความจำ"
+
+[messages.profiler-p95]
+source = "Slowest 5%"
+translation = "ช้าที่สุด 5%"
+
+[messages.profiler-part-db]
+source = "Database"
+translation = "ฐานข้อมูล"
+
+[messages.profiler-part-db-title]
+source = "Waiting for the database and running its queries"
+translation = "รอฐานข้อมูลและเรียกใช้คิวรีของฐานข้อมูล"
+
+[messages.profiler-part-disk]
+source = "Disk"
+translation = "ดิสก์"
+
+[messages.profiler-part-disk-title]
+source = "Reading stored files, and compressing what’s sent"
+translation = "อ่านไฟล์ที่จัดเก็บไว้ และบีบอัดสิ่งที่ส่ง"
+
+[messages.profiler-part-other]
+source = "Other"
+translation = "อื่น ๆ"
+
+[messages.profiler-part-other-title]
+source = "Working out the answer"
+translation = "เตรียมคำตอบ"
+
+[messages.profiler-part-send]
+source = "Sending"
+translation = "การส่ง"
+
+[messages.profiler-part-send-title]
+source = "Waiting while the network takes what was sent"
+translation = "รอขณะที่เครือข่ายรับสิ่งที่ส่งไป"
+
+[messages.profiler-portal]
+source = "the interface’s own files"
+translation = "ไฟล์ของอินเทอร์เฟซเอง"
+
+[messages.profiler-request-count]
+source = """
+{ $count ->
+        [one] { $count } request
+       *[other] { $count } requests
+    }"""
+translation = """
+{ $count ->
+       *[other] { $count } คำขอ
+    }"""
+
+[messages.profiler-requests]
+source = "Time serving requests"
+translation = "เวลาที่ใช้ให้บริการคำขอ"
+
+[messages.profiler-requests-none]
+source = "No requests in the last ten minutes."
+translation = "ไม่มีคำขอในสิบนาทีที่ผ่านมา"
+
+[messages.profiler-requests-what]
+source = "Each bar is ten seconds of requests, their time split by where it went."
+translation = "แต่ละแท่งคือคำขอในช่วงสิบวินาที โดยแบ่งเวลาตามส่วนที่เวลาถูกใช้ไป"
+
+[messages.profiler-route]
+source = "Route"
+translation = "เส้นทาง"
+
+[messages.profiler-routes]
+source = "By route"
+translation = "ตามเส้นทาง"
+
+[messages.profiler-sent]
+source = "Sent"
+translation = "ส่งแล้ว"
+
+[messages.profiler-serving]
+source = "Requests in progress"
+translation = "คำขอที่กำลังดำเนินการ"
+
+[messages.profiler-slowest]
+source = "Slowest: { $route }, { $time }"
+translation = "ช้าที่สุด: { $route }, { $time }"
+
+[messages.profiler-split]
+source = "Where the time went"
+translation = "เวลาหมดไปกับอะไร"
+
+[messages.profiler-starting]
+source = "The first readings arrive in a moment."
+translation = "ค่าที่วัดได้ชุดแรกจะมาถึงในอีกสักครู่"
+
+[messages.profiler-what]
+source = "What Hoard has been doing over the last ten minutes, updated every two seconds while you watch. It’s kept in memory only and starts over when Hoard restarts."
+translation = "สิ่งที่ Hoard ทำในช่วงสิบนาทีที่ผ่านมา อัปเดตทุกสองวินาทีขณะที่คุณดูอยู่ เก็บไว้ในหน่วยความจำเท่านั้นและเริ่มใหม่เมื่อ Hoard รีสตาร์ต"
+
+[messages.profiler-working]
+source = "Working on"
+translation = "กำลังทำงาน"
+
+[messages.profiler-working-more]
+source = """
+{ $count ->
+        [one] And one more.
+       *[other] And { $count } more.
+    }"""
+translation = """
+{ $count ->
+       *[other] และอีก { $count } รายการ
+    }"""
+
+[messages.profiler-working-none]
+source = "Nothing ran in the background."
+translation = "ไม่มีงานใดทำงานในเบื้องหลัง"
 
 [messages.projects-favorite-add-failed]
 source = "Couldn't add to your favorites: { $error }"

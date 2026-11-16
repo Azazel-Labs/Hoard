@@ -45,6 +45,7 @@ mod music;
 mod naming;
 mod oauth;
 mod previews;
+mod profiler;
 mod projects;
 mod provenance;
 mod relocate;
@@ -206,6 +207,7 @@ async fn main() -> Result<()> {
         tokio::spawn(async move { formats::log_trim(&st).await });
     }
     scan::spawn_rescans(&state);
+    profiler::start();
 
     let mut app = api::router(&state);
     let web = &state.cfg.web_dir;
@@ -219,6 +221,7 @@ async fn main() -> Result<()> {
         .layer(middleware::from_fn(i18n::negotiate))
         .layer(middleware::from_fn(cache_headers))
         .layer(CompressionLayer::new().br(true).zstd(true).gzip(true).compress_when(compressible()))
+        .layer(middleware::from_fn(profiler::record))
         .layer(TraceLayer::new_for_http())
         .with_state(Arc::clone(&state));
 

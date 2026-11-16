@@ -2128,6 +2128,49 @@ settings-public-url = Địa chỉ công khai
 settings-public-url-placeholder = Lấy từ địa chỉ trình duyệt (ví dụ https://hoard.example.com)
 settings-public-url-default = lấy từ địa chỉ trình duyệt
 
+## Cài đặt: Hiệu năng, trình phân tích hiệu năng ở đầu trang
+
+profiler = Trình phân tích hiệu năng
+profiler-what = Những gì Hoard đã làm trong mười phút qua, cập nhật mỗi hai giây khi bạn đang xem. Dữ liệu chỉ được giữ trong bộ nhớ và bắt đầu lại khi Hoard khởi động lại.
+profiler-starting = Các số đo đầu tiên sẽ có trong giây lát.
+profiler-failed = Không thể đọc trình phân tích hiệu năng: { $error }
+profiler-cpu = Mức dùng bộ xử lý
+profiler-cpu-hoard = Hoard
+profiler-cpu-machine = Toàn bộ máy
+profiler-cpu-summary = Hoard đang dùng { $hoard } bộ xử lý, còn toàn bộ máy dùng { $machine }.
+profiler-memory = Bộ nhớ
+profiler-serving = Yêu cầu đang xử lý
+profiler-working = Đang làm
+profiler-working-none = Không có gì chạy trong nền.
+profiler-working-more =
+    { $count ->
+       *[other] Và { $count } việc khác.
+    }
+profiler-requests = Thời gian phục vụ yêu cầu
+profiler-requests-what = Mỗi cột là mười giây yêu cầu, với thời gian được chia theo nơi nó được dùng.
+profiler-part-db = Cơ sở dữ liệu
+profiler-part-db-title = Chờ cơ sở dữ liệu và chạy các truy vấn của nó
+profiler-part-disk = Ổ đĩa
+profiler-part-disk-title = Đọc các tệp đã lưu và nén những gì được gửi
+profiler-part-send = Gửi
+profiler-part-send-title = Chờ trong khi mạng nhận những gì đã gửi
+profiler-part-other = Khác
+profiler-part-other-title = Tính toán câu trả lời
+profiler-request-count =
+    { $count ->
+       *[other] { $count } yêu cầu
+    }
+profiler-requests-none = Không có yêu cầu nào trong mười phút qua.
+profiler-slowest = Chậm nhất: { $route }, { $time }
+profiler-routes = Theo tuyến
+profiler-route = Tuyến
+profiler-count = Yêu cầu
+profiler-average = Trung bình
+profiler-p95 = 5% chậm nhất
+profiler-split = Thời gian đã dùng vào đâu
+profiler-sent = Đã gửi
+profiler-portal = các tệp của chính giao diện
+
 ## Cài đặt: Hiệu năng
 
 settings-render = Ảnh thu nhỏ 3D

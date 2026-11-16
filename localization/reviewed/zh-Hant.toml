@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "031ae9796de89847770a20e2fa79115c9c8ec9e3764ab428ee6f31e570c680bd"
+source = "5facbc5c6e9deb1e85e85d796c5a66c74f60e9b8857afda31b896d4a805194c0"
 translation = "fb5e10cd5eddfc860efb3785bb465796b700258c43d207b08bd9f3334aa5d6c8"
 
 [messages.account-add]
@@ -7000,6 +7000,156 @@ translation = "外觀 顏色 appearance color"
 [messages.palette-title]
 source = "Command palette"
 translation = "命令面板"
+
+[messages.profiler]
+source = "Profiler"
+translation = "效能分析器"
+
+[messages.profiler-average]
+source = "Average"
+translation = "平均"
+
+[messages.profiler-count]
+source = "Requests"
+translation = "請求數"
+
+[messages.profiler-cpu]
+source = "Processor use"
+translation = "處理器使用率"
+
+[messages.profiler-cpu-hoard]
+source = "Hoard"
+translation = "Hoard"
+
+[messages.profiler-cpu-machine]
+source = "Whole machine"
+translation = "整台機器"
+
+[messages.profiler-cpu-summary]
+source = "Hoard is using { $hoard } of the processors, and the whole machine { $machine }."
+translation = "Hoard 正在使用 { $hoard } 的處理器，整台機器則為 { $machine }。"
+
+[messages.profiler-failed]
+source = "Couldn’t read the profiler: { $error }"
+translation = "無法讀取效能分析器：{ $error }"
+
+[messages.profiler-memory]
+source = "Memory"
+translation = "記憶體"
+
+[messages.profiler-p95]
+source = "Slowest 5%"
+translation = "最慢的 5%"
+
+[messages.profiler-part-db]
+source = "Database"
+translation = "資料庫"
+
+[messages.profiler-part-db-title]
+source = "Waiting for the database and running its queries"
+translation = "等待資料庫並執行其查詢"
+
+[messages.profiler-part-disk]
+source = "Disk"
+translation = "磁碟"
+
+[messages.profiler-part-disk-title]
+source = "Reading stored files, and compressing what’s sent"
+translation = "讀取儲存的檔案，並壓縮要傳送的內容"
+
+[messages.profiler-part-other]
+source = "Other"
+translation = "其他"
+
+[messages.profiler-part-other-title]
+source = "Working out the answer"
+translation = "產生回應"
+
+[messages.profiler-part-send]
+source = "Sending"
+translation = "傳送"
+
+[messages.profiler-part-send-title]
+source = "Waiting while the network takes what was sent"
+translation = "等待網路接收已傳送的內容"
+
+[messages.profiler-portal]
+source = "the interface’s own files"
+translation = "介面本身的檔案"
+
+[messages.profiler-request-count]
+source = """
+{ $count ->
+        [one] { $count } request
+       *[other] { $count } requests
+    }"""
+translation = """
+{ $count ->
+       *[other] { $count } 個請求
+    }"""
+
+[messages.profiler-requests]
+source = "Time serving requests"
+translation = "處理請求的時間"
+
+[messages.profiler-requests-none]
+source = "No requests in the last ten minutes."
+translation = "過去十分鐘沒有請求。"
+
+[messages.profiler-requests-what]
+source = "Each bar is ten seconds of requests, their time split by where it went."
+translation = "每根長條代表十秒內的請求，時間依去向分開。"
+
+[messages.profiler-route]
+source = "Route"
+translation = "路由"
+
+[messages.profiler-routes]
+source = "By route"
+translation = "依路由"
+
+[messages.profiler-sent]
+source = "Sent"
+translation = "已傳送"
+
+[messages.profiler-serving]
+source = "Requests in progress"
+translation = "進行中的請求"
+
+[messages.profiler-slowest]
+source = "Slowest: { $route }, { $time }"
+translation = "最慢：{ $route }，{ $time }"
+
+[messages.profiler-split]
+source = "Where the time went"
+translation = "時間去向"
+
+[messages.profiler-starting]
+source = "The first readings arrive in a moment."
+translation = "第一批讀數馬上就到。"
+
+[messages.profiler-what]
+source = "What Hoard has been doing over the last ten minutes, updated every two seconds while you watch. It’s kept in memory only and starts over when Hoard restarts."
+translation = "Hoard 在過去十分鐘內做了什麼，你檢視時每兩秒更新一次。資料只保存在記憶體中，Hoard 重新啟動後會從頭開始。"
+
+[messages.profiler-working]
+source = "Working on"
+translation = "正在處理"
+
+[messages.profiler-working-more]
+source = """
+{ $count ->
+        [one] And one more.
+       *[other] And { $count } more.
+    }"""
+translation = """
+{ $count ->
+       *[other] 還有 { $count } 項。
+    }"""
+
+[messages.profiler-working-none]
+source = "Nothing ran in the background."
+translation = "背景沒有執行任何工作。"
 
 [messages.projects-favorite-add-failed]
 source = "Couldn't add to your favorites: { $error }"

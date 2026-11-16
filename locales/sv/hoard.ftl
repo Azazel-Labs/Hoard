@@ -2305,6 +2305,51 @@ settings-public-url = Offentlig adress
 settings-public-url-placeholder = Från webbläsarens adress (t.ex. https://hoard.example.com)
 settings-public-url-default = från webbläsarens adress
 
+## ProfilerPanel.vue: profileraren överst i Inställningar → Prestanda
+
+profiler = Profilerare
+profiler-what = Vad Hoard har gjort de senaste tio minuterna, uppdaterat varannan sekund medan du tittar. Det sparas bara i minnet och börjar om när Hoard startar om.
+profiler-starting = De första mätvärdena kommer om en stund.
+profiler-failed = Kunde inte läsa profileraren: { $error }
+profiler-cpu = Processoranvändning
+profiler-cpu-hoard = Hoard
+profiler-cpu-machine = Hela maskinen
+profiler-cpu-summary = Hoard använder { $hoard } av processorerna, och hela maskinen { $machine }.
+profiler-memory = Minne
+profiler-serving = Pågående begäranden
+profiler-working = Arbetar med
+profiler-working-none = Inget kördes i bakgrunden.
+profiler-working-more =
+    { $count ->
+        [one] Och en till.
+       *[other] Och { $count } till.
+    }
+profiler-requests = Tid för att hantera begäranden
+profiler-requests-what = Varje stapel är tio sekunders begäranden, med tiden uppdelad efter vart den gick.
+profiler-part-db = Databas
+profiler-part-db-title = Väntar på databasen och kör dess frågor
+profiler-part-disk = Disk
+profiler-part-disk-title = Läser lagrade filer och komprimerar det som skickas
+profiler-part-send = Sändning
+profiler-part-send-title = Väntar medan nätverket tar emot det som skickats
+profiler-part-other = Övrigt
+profiler-part-other-title = Räknar ut svaret
+profiler-request-count =
+    { $count ->
+        [one] { $count } begäran
+       *[other] { $count } begäranden
+    }
+profiler-requests-none = Inga begäranden de senaste tio minuterna.
+profiler-slowest = Långsammast: { $route }, { $time }
+profiler-routes = Per rutt
+profiler-route = Rutt
+profiler-count = Begäranden
+profiler-average = Medel
+profiler-p95 = Långsammaste 5 %
+profiler-split = Vart tiden gick
+profiler-sent = Skickat
+profiler-portal = gränssnittets egna filer
+
 ## SettingsPage.vue: Prestanda
 
 settings-render = 3D-miniatyrbilder

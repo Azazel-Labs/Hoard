@@ -2304,6 +2304,51 @@ settings-public-url = Offentlig adresse
 settings-public-url-placeholder = Fra nettleserens adresse (f.eks. https://hoard.example.com)
 settings-public-url-default = fra nettleserens adresse
 
+## ProfilerPanel.vue: profileringen øverst i Innstillinger → Ytelse
+
+profiler = Profilering
+profiler-what = Hva Hoard har gjort de siste ti minuttene, oppdatert hvert andre sekund mens du ser på. Det holdes bare i minnet og nullstilles når Hoard starter på nytt.
+profiler-starting = De første målingene kommer om et øyeblikk.
+profiler-failed = Kunne ikke lese profileringen: { $error }
+profiler-cpu = Prosessorbruk
+profiler-cpu-hoard = Hoard
+profiler-cpu-machine = Hele maskinen
+profiler-cpu-summary = Hoard bruker { $hoard } av prosessorene, og hele maskinen { $machine }.
+profiler-memory = Minne
+profiler-serving = Forespørsler som pågår
+profiler-working = Jobber med
+profiler-working-none = Ingenting kjørte i bakgrunnen.
+profiler-working-more =
+    { $count ->
+        [one] Og én til.
+       *[other] Og { $count } til.
+    }
+profiler-requests = Tid brukt på forespørsler
+profiler-requests-what = Hver stolpe er ti sekunder med forespørsler, med tiden fordelt etter hvor den gikk.
+profiler-part-db = Database
+profiler-part-db-title = Venter på databasen og kjører spørringene dens
+profiler-part-disk = Disk
+profiler-part-disk-title = Leser lagrede filer og komprimerer det som sendes
+profiler-part-send = Sending
+profiler-part-send-title = Venter mens nettverket tar imot det som ble sendt
+profiler-part-other = Annet
+profiler-part-other-title = Finner fram til svaret
+profiler-request-count =
+    { $count ->
+        [one] { $count } forespørsel
+       *[other] { $count } forespørsler
+    }
+profiler-requests-none = Ingen forespørsler de siste ti minuttene.
+profiler-slowest = Tregest: { $route }, { $time }
+profiler-routes = Etter rute
+profiler-route = Rute
+profiler-count = Forespørsler
+profiler-average = Gjennomsnitt
+profiler-p95 = Tregeste 5 %
+profiler-split = Hvor tiden gikk
+profiler-sent = Sendt
+profiler-portal = grensesnittets egne filer
+
 ## SettingsPage.vue: Ytelse
 
 settings-render = 3D-miniatyrbilder

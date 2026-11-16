@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "031ae9796de89847770a20e2fa79115c9c8ec9e3764ab428ee6f31e570c680bd"
+source = "5facbc5c6e9deb1e85e85d796c5a66c74f60e9b8857afda31b896d4a805194c0"
 translation = "6df14cb1c2fd71b68aa0783404db89869e1b0987d799ee6e09c8222a98701df5"
 
 [messages.account-add]
@@ -7004,6 +7004,158 @@ translation = "megjelenés szín appearance color"
 [messages.palette-title]
 source = "Command palette"
 translation = "Parancspaletta"
+
+[messages.profiler]
+source = "Profiler"
+translation = "Profilozó"
+
+[messages.profiler-average]
+source = "Average"
+translation = "Átlag"
+
+[messages.profiler-count]
+source = "Requests"
+translation = "Kérések"
+
+[messages.profiler-cpu]
+source = "Processor use"
+translation = "Processzorhasználat"
+
+[messages.profiler-cpu-hoard]
+source = "Hoard"
+translation = "Hoard"
+
+[messages.profiler-cpu-machine]
+source = "Whole machine"
+translation = "Az egész gép"
+
+[messages.profiler-cpu-summary]
+source = "Hoard is using { $hoard } of the processors, and the whole machine { $machine }."
+translation = "A Hoard processzorhasználata { $hoard }, az egész gépé { $machine }."
+
+[messages.profiler-failed]
+source = "Couldn’t read the profiler: { $error }"
+translation = "Nem sikerült beolvasni a profilozót: { $error }"
+
+[messages.profiler-memory]
+source = "Memory"
+translation = "Memória"
+
+[messages.profiler-p95]
+source = "Slowest 5%"
+translation = "Leglassabb 5%"
+
+[messages.profiler-part-db]
+source = "Database"
+translation = "Adatbázis"
+
+[messages.profiler-part-db-title]
+source = "Waiting for the database and running its queries"
+translation = "Várakozás az adatbázisra és a lekérdezései futtatása"
+
+[messages.profiler-part-disk]
+source = "Disk"
+translation = "Lemez"
+
+[messages.profiler-part-disk-title]
+source = "Reading stored files, and compressing what’s sent"
+translation = "A tárolt fájlok olvasása és az elküldöttek tömörítése"
+
+[messages.profiler-part-other]
+source = "Other"
+translation = "Egyéb"
+
+[messages.profiler-part-other-title]
+source = "Working out the answer"
+translation = "A válasz kidolgozása"
+
+[messages.profiler-part-send]
+source = "Sending"
+translation = "Küldés"
+
+[messages.profiler-part-send-title]
+source = "Waiting while the network takes what was sent"
+translation = "Várakozás, amíg a hálózat átveszi az elküldötteket"
+
+[messages.profiler-portal]
+source = "the interface’s own files"
+translation = "a felület saját fájljai"
+
+[messages.profiler-request-count]
+source = """
+{ $count ->
+        [one] { $count } request
+       *[other] { $count } requests
+    }"""
+translation = """
+{ $count ->
+        [one] { $count } kérés
+       *[other] { $count } kérés
+    }"""
+
+[messages.profiler-requests]
+source = "Time serving requests"
+translation = "Kérések kiszolgálásával töltött idő"
+
+[messages.profiler-requests-none]
+source = "No requests in the last ten minutes."
+translation = "Nem volt kérés az elmúlt tíz percben."
+
+[messages.profiler-requests-what]
+source = "Each bar is ten seconds of requests, their time split by where it went."
+translation = "Minden oszlop tíz másodpercnyi kérés, az idejük aszerint felosztva, hogy mire ment el."
+
+[messages.profiler-route]
+source = "Route"
+translation = "Útvonal"
+
+[messages.profiler-routes]
+source = "By route"
+translation = "Útvonalanként"
+
+[messages.profiler-sent]
+source = "Sent"
+translation = "Elküldve"
+
+[messages.profiler-serving]
+source = "Requests in progress"
+translation = "Folyamatban lévő kérések"
+
+[messages.profiler-slowest]
+source = "Slowest: { $route }, { $time }"
+translation = "Leglassabb: { $route }, { $time }"
+
+[messages.profiler-split]
+source = "Where the time went"
+translation = "Mire ment el az idő"
+
+[messages.profiler-starting]
+source = "The first readings arrive in a moment."
+translation = "Az első mérések egy pillanat múlva érkeznek."
+
+[messages.profiler-what]
+source = "What Hoard has been doing over the last ten minutes, updated every two seconds while you watch. It’s kept in memory only and starts over when Hoard restarts."
+translation = "Mit csinált a Hoard az elmúlt tíz percben, kétmásodpercenként frissítve, amíg nézi. Csak a memóriában tárolódik, és a Hoard újraindulásakor elölről kezdődik."
+
+[messages.profiler-working]
+source = "Working on"
+translation = "Folyamatban"
+
+[messages.profiler-working-more]
+source = """
+{ $count ->
+        [one] And one more.
+       *[other] And { $count } more.
+    }"""
+translation = """
+{ $count ->
+        [one] És még egy.
+       *[other] És még { $count }.
+    }"""
+
+[messages.profiler-working-none]
+source = "Nothing ran in the background."
+translation = "A háttérben semmi sem futott."
 
 [messages.projects-favorite-add-failed]
 source = "Couldn't add to your favorites: { $error }"

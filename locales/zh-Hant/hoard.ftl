@@ -2134,6 +2134,49 @@ settings-public-url = 公開網址
 settings-public-url-placeholder = 取自瀏覽器的網址（例如 https://hoard.example.com）
 settings-public-url-default = 取自瀏覽器的網址
 
+## 設定：效能頂部的效能分析器
+
+profiler = 效能分析器
+profiler-what = Hoard 在過去十分鐘內做了什麼，你檢視時每兩秒更新一次。資料只保存在記憶體中，Hoard 重新啟動後會從頭開始。
+profiler-starting = 第一批讀數馬上就到。
+profiler-failed = 無法讀取效能分析器：{ $error }
+profiler-cpu = 處理器使用率
+profiler-cpu-hoard = Hoard
+profiler-cpu-machine = 整台機器
+profiler-cpu-summary = Hoard 正在使用 { $hoard } 的處理器，整台機器則為 { $machine }。
+profiler-memory = 記憶體
+profiler-serving = 進行中的請求
+profiler-working = 正在處理
+profiler-working-none = 背景沒有執行任何工作。
+profiler-working-more =
+    { $count ->
+       *[other] 還有 { $count } 項。
+    }
+profiler-requests = 處理請求的時間
+profiler-requests-what = 每根長條代表十秒內的請求，時間依去向分開。
+profiler-part-db = 資料庫
+profiler-part-db-title = 等待資料庫並執行其查詢
+profiler-part-disk = 磁碟
+profiler-part-disk-title = 讀取儲存的檔案，並壓縮要傳送的內容
+profiler-part-send = 傳送
+profiler-part-send-title = 等待網路接收已傳送的內容
+profiler-part-other = 其他
+profiler-part-other-title = 產生回應
+profiler-request-count =
+    { $count ->
+       *[other] { $count } 個請求
+    }
+profiler-requests-none = 過去十分鐘沒有請求。
+profiler-slowest = 最慢：{ $route }，{ $time }
+profiler-routes = 依路由
+profiler-route = 路由
+profiler-count = 請求數
+profiler-average = 平均
+profiler-p95 = 最慢的 5%
+profiler-split = 時間去向
+profiler-sent = 已傳送
+profiler-portal = 介面本身的檔案
+
 ## 設定：效能
 
 settings-render = 3D 縮圖

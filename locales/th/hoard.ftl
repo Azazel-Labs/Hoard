@@ -2131,6 +2131,49 @@ settings-public-url = ที่อยู่สาธารณะ
 settings-public-url-placeholder = จากที่อยู่ของเบราว์เซอร์ (เช่น https://hoard.example.com)
 settings-public-url-default = จากที่อยู่ของเบราว์เซอร์
 
+## ProfilerPanel.vue: the profiler at the top of Settings → Performance
+
+profiler = โปรไฟเลอร์
+profiler-what = สิ่งที่ Hoard ทำในช่วงสิบนาทีที่ผ่านมา อัปเดตทุกสองวินาทีขณะที่คุณดูอยู่ เก็บไว้ในหน่วยความจำเท่านั้นและเริ่มใหม่เมื่อ Hoard รีสตาร์ต
+profiler-starting = ค่าที่วัดได้ชุดแรกจะมาถึงในอีกสักครู่
+profiler-failed = อ่านโปรไฟเลอร์ไม่ได้: { $error }
+profiler-cpu = การใช้โปรเซสเซอร์
+profiler-cpu-hoard = Hoard
+profiler-cpu-machine = ทั้งเครื่อง
+profiler-cpu-summary = Hoard ใช้โปรเซสเซอร์ { $hoard } และทั้งเครื่องใช้ { $machine }
+profiler-memory = หน่วยความจำ
+profiler-serving = คำขอที่กำลังดำเนินการ
+profiler-working = กำลังทำงาน
+profiler-working-none = ไม่มีงานใดทำงานในเบื้องหลัง
+profiler-working-more =
+    { $count ->
+       *[other] และอีก { $count } รายการ
+    }
+profiler-requests = เวลาที่ใช้ให้บริการคำขอ
+profiler-requests-what = แต่ละแท่งคือคำขอในช่วงสิบวินาที โดยแบ่งเวลาตามส่วนที่เวลาถูกใช้ไป
+profiler-part-db = ฐานข้อมูล
+profiler-part-db-title = รอฐานข้อมูลและเรียกใช้คิวรีของฐานข้อมูล
+profiler-part-disk = ดิสก์
+profiler-part-disk-title = อ่านไฟล์ที่จัดเก็บไว้ และบีบอัดสิ่งที่ส่ง
+profiler-part-send = การส่ง
+profiler-part-send-title = รอขณะที่เครือข่ายรับสิ่งที่ส่งไป
+profiler-part-other = อื่น ๆ
+profiler-part-other-title = เตรียมคำตอบ
+profiler-request-count =
+    { $count ->
+       *[other] { $count } คำขอ
+    }
+profiler-requests-none = ไม่มีคำขอในสิบนาทีที่ผ่านมา
+profiler-slowest = ช้าที่สุด: { $route }, { $time }
+profiler-routes = ตามเส้นทาง
+profiler-route = เส้นทาง
+profiler-count = คำขอ
+profiler-average = เฉลี่ย
+profiler-p95 = ช้าที่สุด 5%
+profiler-split = เวลาหมดไปกับอะไร
+profiler-sent = ส่งแล้ว
+profiler-portal = ไฟล์ของอินเทอร์เฟซเอง
+
 ## SettingsPage.vue: Performance
 
 settings-render = ภาพย่อ 3 มิติ

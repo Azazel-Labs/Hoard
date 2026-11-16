@@ -2142,6 +2142,51 @@ settings-public-url = Genel adres
 settings-public-url-placeholder = Tarayıcının adresinden (örn. https://hoard.example.com)
 settings-public-url-default = tarayıcının adresinden
 
+## ProfilerPanel.vue: the profiler at the top of Settings → Performance
+
+profiler = Profil oluşturucu
+profiler-what = Hoard’un son on dakikada yaptıkları; siz izlerken iki saniyede bir güncellenir. Yalnızca bellekte tutulur ve Hoard yeniden başladığında sıfırlanır.
+profiler-starting = İlk ölçümler birazdan gelecek.
+profiler-failed = Profil oluşturucu okunamadı: { $error }
+profiler-cpu = İşlemci kullanımı
+profiler-cpu-hoard = Hoard
+profiler-cpu-machine = Tüm makine
+profiler-cpu-summary = Hoard işlemcilerin { $hoard } kadarını, tüm makine ise { $machine } kadarını kullanıyor.
+profiler-memory = Bellek
+profiler-serving = Süren istekler
+profiler-working = Üzerinde çalışılan
+profiler-working-none = Arka planda hiçbir şey çalışmadı.
+profiler-working-more =
+    { $count ->
+        [one] Ve bir tane daha.
+       *[other] Ve { $count } tane daha.
+    }
+profiler-requests = İstekleri karşılamaya harcanan süre
+profiler-requests-what = Her çubuk on saniyelik isteği gösterir; süreleri nereye gittiğine göre bölünmüştür.
+profiler-part-db = Veritabanı
+profiler-part-db-title = Veritabanını bekleme ve sorgularını çalıştırma
+profiler-part-disk = Disk
+profiler-part-disk-title = Depolanan dosyaları okuma ve gönderileni sıkıştırma
+profiler-part-send = Gönderme
+profiler-part-send-title = Ağın gönderileni almasını bekleme
+profiler-part-other = Diğer
+profiler-part-other-title = Yanıtı hazırlama
+profiler-request-count =
+    { $count ->
+        [one] { $count } istek
+       *[other] { $count } istek
+    }
+profiler-requests-none = Son on dakikada istek yok.
+profiler-slowest = En yavaş: { $route }, { $time }
+profiler-routes = Rotaya göre
+profiler-route = Rota
+profiler-count = İstekler
+profiler-average = Ortalama
+profiler-p95 = En yavaş %5
+profiler-split = Süre nereye gitti
+profiler-sent = Gönderilen
+profiler-portal = arayüzün kendi dosyaları
+
 ## SettingsPage.vue: Performance
 
 settings-render = 3B küçük resimler

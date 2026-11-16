@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "031ae9796de89847770a20e2fa79115c9c8ec9e3764ab428ee6f31e570c680bd"
+source = "5facbc5c6e9deb1e85e85d796c5a66c74f60e9b8857afda31b896d4a805194c0"
 translation = "10350137b75664600f5b80d67d4b7dc6a218245ed458fa59bceed92a7a09d3d2"
 
 [messages.account-add]
@@ -7277,6 +7277,162 @@ translation = "vzhled barva appearance color"
 [messages.palette-title]
 source = "Command palette"
 translation = "Paleta příkazů"
+
+[messages.profiler]
+source = "Profiler"
+translation = "Profiler"
+
+[messages.profiler-average]
+source = "Average"
+translation = "Průměr"
+
+[messages.profiler-count]
+source = "Requests"
+translation = "Požadavky"
+
+[messages.profiler-cpu]
+source = "Processor use"
+translation = "Využití procesoru"
+
+[messages.profiler-cpu-hoard]
+source = "Hoard"
+translation = "Hoard"
+
+[messages.profiler-cpu-machine]
+source = "Whole machine"
+translation = "Celý počítač"
+
+[messages.profiler-cpu-summary]
+source = "Hoard is using { $hoard } of the processors, and the whole machine { $machine }."
+translation = "Hoard využívá { $hoard } procesorů a celý počítač { $machine }."
+
+[messages.profiler-failed]
+source = "Couldn’t read the profiler: { $error }"
+translation = "Profiler se nepodařilo přečíst: { $error }"
+
+[messages.profiler-memory]
+source = "Memory"
+translation = "Paměť"
+
+[messages.profiler-p95]
+source = "Slowest 5%"
+translation = "Nejpomalejších 5 %"
+
+[messages.profiler-part-db]
+source = "Database"
+translation = "Databáze"
+
+[messages.profiler-part-db-title]
+source = "Waiting for the database and running its queries"
+translation = "Čekání na databázi a provádění jejích dotazů"
+
+[messages.profiler-part-disk]
+source = "Disk"
+translation = "Disk"
+
+[messages.profiler-part-disk-title]
+source = "Reading stored files, and compressing what’s sent"
+translation = "Čtení uložených souborů a komprese toho, co se odesílá"
+
+[messages.profiler-part-other]
+source = "Other"
+translation = "Ostatní"
+
+[messages.profiler-part-other-title]
+source = "Working out the answer"
+translation = "Sestavování odpovědi"
+
+[messages.profiler-part-send]
+source = "Sending"
+translation = "Odesílání"
+
+[messages.profiler-part-send-title]
+source = "Waiting while the network takes what was sent"
+translation = "Čekání, než síť převezme to, co se odeslalo"
+
+[messages.profiler-portal]
+source = "the interface’s own files"
+translation = "vlastní soubory rozhraní"
+
+[messages.profiler-request-count]
+source = """
+{ $count ->
+        [one] { $count } request
+       *[other] { $count } requests
+    }"""
+translation = """
+{ $count ->
+        [one] { $count } požadavek
+        [few] { $count } požadavky
+        [many] { $count } požadavku
+       *[other] { $count } požadavků
+    }"""
+
+[messages.profiler-requests]
+source = "Time serving requests"
+translation = "Čas obsluhy požadavků"
+
+[messages.profiler-requests-none]
+source = "No requests in the last ten minutes."
+translation = "Za posledních deset minut žádné požadavky."
+
+[messages.profiler-requests-what]
+source = "Each bar is ten seconds of requests, their time split by where it went."
+translation = "Každý sloupec představuje deset sekund požadavků, jejichž čas je rozdělený podle toho, kam šel."
+
+[messages.profiler-route]
+source = "Route"
+translation = "Cesta"
+
+[messages.profiler-routes]
+source = "By route"
+translation = "Podle cesty"
+
+[messages.profiler-sent]
+source = "Sent"
+translation = "Odesláno"
+
+[messages.profiler-serving]
+source = "Requests in progress"
+translation = "Probíhající požadavky"
+
+[messages.profiler-slowest]
+source = "Slowest: { $route }, { $time }"
+translation = "Nejpomalejší: { $route }, { $time }"
+
+[messages.profiler-split]
+source = "Where the time went"
+translation = "Kam šel čas"
+
+[messages.profiler-starting]
+source = "The first readings arrive in a moment."
+translation = "První měření dorazí za okamžik."
+
+[messages.profiler-what]
+source = "What Hoard has been doing over the last ten minutes, updated every two seconds while you watch. It’s kept in memory only and starts over when Hoard restarts."
+translation = "Co Hoard dělal za posledních deset minut, aktualizováno každé dvě sekundy, dokud se díváte. Uchovává se jen v paměti a po restartu Hoardu začíná znovu."
+
+[messages.profiler-working]
+source = "Working on"
+translation = "Pracuje na"
+
+[messages.profiler-working-more]
+source = """
+{ $count ->
+        [one] And one more.
+       *[other] And { $count } more.
+    }"""
+translation = """
+{ $count ->
+        [one] A ještě jedna.
+        [few] A ještě { $count }.
+        [many] A ještě { $count }.
+       *[other] A ještě { $count }.
+    }"""
+
+[messages.profiler-working-none]
+source = "Nothing ran in the background."
+translation = "Na pozadí nic neběželo."
 
 [messages.projects-favorite-add-failed]
 source = "Couldn't add to your favorites: { $error }"

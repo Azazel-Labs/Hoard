@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "031ae9796de89847770a20e2fa79115c9c8ec9e3764ab428ee6f31e570c680bd"
+source = "5facbc5c6e9deb1e85e85d796c5a66c74f60e9b8857afda31b896d4a805194c0"
 translation = "81f454b4be3578d38a286a9258dbbc3cf47ad1586e8852a5a6c519b04af263db"
 
 [messages.account-add]
@@ -7287,6 +7287,160 @@ translation = "aspect culoare appearance color"
 [messages.palette-title]
 source = "Command palette"
 translation = "Paleta de comenzi"
+
+[messages.profiler]
+source = "Profiler"
+translation = "Profiler"
+
+[messages.profiler-average]
+source = "Average"
+translation = "Medie"
+
+[messages.profiler-count]
+source = "Requests"
+translation = "Cereri"
+
+[messages.profiler-cpu]
+source = "Processor use"
+translation = "Utilizarea procesorului"
+
+[messages.profiler-cpu-hoard]
+source = "Hoard"
+translation = "Hoard"
+
+[messages.profiler-cpu-machine]
+source = "Whole machine"
+translation = "Întreaga mașină"
+
+[messages.profiler-cpu-summary]
+source = "Hoard is using { $hoard } of the processors, and the whole machine { $machine }."
+translation = "Hoard folosește { $hoard } din procesoare, iar întreaga mașină { $machine }."
+
+[messages.profiler-failed]
+source = "Couldn’t read the profiler: { $error }"
+translation = "Profilerul nu a putut fi citit: { $error }"
+
+[messages.profiler-memory]
+source = "Memory"
+translation = "Memorie"
+
+[messages.profiler-p95]
+source = "Slowest 5%"
+translation = "Cele mai lente 5%"
+
+[messages.profiler-part-db]
+source = "Database"
+translation = "Bază de date"
+
+[messages.profiler-part-db-title]
+source = "Waiting for the database and running its queries"
+translation = "Așteptarea bazei de date și rularea interogărilor ei"
+
+[messages.profiler-part-disk]
+source = "Disk"
+translation = "Disc"
+
+[messages.profiler-part-disk-title]
+source = "Reading stored files, and compressing what’s sent"
+translation = "Citirea fișierelor stocate și comprimarea a ceea ce se trimite"
+
+[messages.profiler-part-other]
+source = "Other"
+translation = "Altele"
+
+[messages.profiler-part-other-title]
+source = "Working out the answer"
+translation = "Elaborarea răspunsului"
+
+[messages.profiler-part-send]
+source = "Sending"
+translation = "Trimitere"
+
+[messages.profiler-part-send-title]
+source = "Waiting while the network takes what was sent"
+translation = "Așteptarea cât timp rețeaua preia ce s-a trimis"
+
+[messages.profiler-portal]
+source = "the interface’s own files"
+translation = "fișierele proprii ale interfeței"
+
+[messages.profiler-request-count]
+source = """
+{ $count ->
+        [one] { $count } request
+       *[other] { $count } requests
+    }"""
+translation = """
+{ $count ->
+        [one] { $count } cerere
+        [few] { $count } cereri
+       *[other] { $count } de cereri
+    }"""
+
+[messages.profiler-requests]
+source = "Time serving requests"
+translation = "Timp petrecut servind cereri"
+
+[messages.profiler-requests-none]
+source = "No requests in the last ten minutes."
+translation = "Nicio cerere în ultimele zece minute."
+
+[messages.profiler-requests-what]
+source = "Each bar is ten seconds of requests, their time split by where it went."
+translation = "Fiecare bară înseamnă zece secunde de cereri, cu timpul împărțit după unde s-a dus."
+
+[messages.profiler-route]
+source = "Route"
+translation = "Rută"
+
+[messages.profiler-routes]
+source = "By route"
+translation = "Pe rută"
+
+[messages.profiler-sent]
+source = "Sent"
+translation = "Trimis"
+
+[messages.profiler-serving]
+source = "Requests in progress"
+translation = "Cereri în curs"
+
+[messages.profiler-slowest]
+source = "Slowest: { $route }, { $time }"
+translation = "Cea mai lentă: { $route }, { $time }"
+
+[messages.profiler-split]
+source = "Where the time went"
+translation = "Unde s-a dus timpul"
+
+[messages.profiler-starting]
+source = "The first readings arrive in a moment."
+translation = "Primele citiri sosesc într-o clipă."
+
+[messages.profiler-what]
+source = "What Hoard has been doing over the last ten minutes, updated every two seconds while you watch. It’s kept in memory only and starts over when Hoard restarts."
+translation = "Ce a făcut Hoard în ultimele zece minute, actualizat la fiecare două secunde cât timp priviți. Se păstrează doar în memorie și o ia de la capăt când Hoard repornește."
+
+[messages.profiler-working]
+source = "Working on"
+translation = "Lucrează la"
+
+[messages.profiler-working-more]
+source = """
+{ $count ->
+        [one] And one more.
+       *[other] And { $count } more.
+    }"""
+translation = """
+{ $count ->
+        [one] Și încă una.
+        [few] Și încă { $count }.
+       *[other] Și încă { $count }.
+    }"""
+
+[messages.profiler-working-none]
+source = "Nothing ran in the background."
+translation = "Nimic nu a rulat în fundal."
 
 [messages.projects-favorite-add-failed]
 source = "Couldn't add to your favorites: { $error }"

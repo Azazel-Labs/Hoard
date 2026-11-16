@@ -2501,6 +2501,55 @@ settings-public-url = Adres publiczny
 settings-public-url-placeholder = Z adresu w przeglądarce (np. https://hoard.example.com)
 settings-public-url-default = z adresu w przeglądarce
 
+## ProfilerPanel.vue: the profiler at the top of Settings → Performance
+
+profiler = Profiler
+profiler-what = Co Hoard robił przez ostatnie dziesięć minut, odświeżane co dwie sekundy, gdy strona jest otwarta. Dane są trzymane tylko w pamięci i zaczynają się od nowa po ponownym uruchomieniu Hoard.
+profiler-starting = Pierwsze odczyty pojawią się za chwilę.
+profiler-failed = Nie udało się odczytać profilera: { $error }
+profiler-cpu = Użycie procesora
+profiler-cpu-hoard = Hoard
+profiler-cpu-machine = Cały komputer
+profiler-cpu-summary = Hoard używa { $hoard } procesorów, a cały komputer { $machine }.
+profiler-memory = Pamięć
+profiler-serving = Trwające żądania
+profiler-working = W toku
+profiler-working-none = Nic nie działało w tle.
+profiler-working-more =
+    { $count ->
+        [one] I jeszcze jedno.
+        [few] I jeszcze { $count }.
+        [many] I jeszcze { $count }.
+       *[other] I jeszcze { $count }.
+    }
+profiler-requests = Czas obsługi żądań
+profiler-requests-what = Każdy słupek to dziesięć sekund żądań, a ich czas jest podzielony według tego, na co poszedł.
+profiler-part-db = Baza danych
+profiler-part-db-title = Oczekiwanie na bazę danych i wykonywanie jej zapytań
+profiler-part-disk = Dysk
+profiler-part-disk-title = Odczyt zapisanych plików i kompresja tego, co jest wysyłane
+profiler-part-send = Wysyłanie
+profiler-part-send-title = Oczekiwanie, aż sieć odbierze to, co wysłano
+profiler-part-other = Inne
+profiler-part-other-title = Przygotowanie odpowiedzi
+profiler-request-count =
+    { $count ->
+        [one] { $count } żądanie
+        [few] { $count } żądania
+        [many] { $count } żądań
+       *[other] { $count } żądania
+    }
+profiler-requests-none = Brak żądań w ostatnich dziesięciu minutach.
+profiler-slowest = Najwolniejsze: { $route }, { $time }
+profiler-routes = Według ścieżki
+profiler-route = Ścieżka
+profiler-count = Żądania
+profiler-average = Średnio
+profiler-p95 = Najwolniejsze 5%
+profiler-split = Na co poszedł czas
+profiler-sent = Wysłano
+profiler-portal = własne pliki interfejsu
+
 ## SettingsPage.vue: Performance
 
 settings-render = Miniatury 3D

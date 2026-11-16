@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "031ae9796de89847770a20e2fa79115c9c8ec9e3764ab428ee6f31e570c680bd"
+source = "5facbc5c6e9deb1e85e85d796c5a66c74f60e9b8857afda31b896d4a805194c0"
 translation = "1a4df50b438ca81d05a8082fa6c6f1912acf6742fdc06a0acf388c1b5773abb6"
 
 [messages.account-add]
@@ -6994,6 +6994,156 @@ translation = "giao diện màu appearance color"
 [messages.palette-title]
 source = "Command palette"
 translation = "Bảng lệnh"
+
+[messages.profiler]
+source = "Profiler"
+translation = "Trình phân tích hiệu năng"
+
+[messages.profiler-average]
+source = "Average"
+translation = "Trung bình"
+
+[messages.profiler-count]
+source = "Requests"
+translation = "Yêu cầu"
+
+[messages.profiler-cpu]
+source = "Processor use"
+translation = "Mức dùng bộ xử lý"
+
+[messages.profiler-cpu-hoard]
+source = "Hoard"
+translation = "Hoard"
+
+[messages.profiler-cpu-machine]
+source = "Whole machine"
+translation = "Toàn bộ máy"
+
+[messages.profiler-cpu-summary]
+source = "Hoard is using { $hoard } of the processors, and the whole machine { $machine }."
+translation = "Hoard đang dùng { $hoard } bộ xử lý, còn toàn bộ máy dùng { $machine }."
+
+[messages.profiler-failed]
+source = "Couldn’t read the profiler: { $error }"
+translation = "Không thể đọc trình phân tích hiệu năng: { $error }"
+
+[messages.profiler-memory]
+source = "Memory"
+translation = "Bộ nhớ"
+
+[messages.profiler-p95]
+source = "Slowest 5%"
+translation = "5% chậm nhất"
+
+[messages.profiler-part-db]
+source = "Database"
+translation = "Cơ sở dữ liệu"
+
+[messages.profiler-part-db-title]
+source = "Waiting for the database and running its queries"
+translation = "Chờ cơ sở dữ liệu và chạy các truy vấn của nó"
+
+[messages.profiler-part-disk]
+source = "Disk"
+translation = "Ổ đĩa"
+
+[messages.profiler-part-disk-title]
+source = "Reading stored files, and compressing what’s sent"
+translation = "Đọc các tệp đã lưu và nén những gì được gửi"
+
+[messages.profiler-part-other]
+source = "Other"
+translation = "Khác"
+
+[messages.profiler-part-other-title]
+source = "Working out the answer"
+translation = "Tính toán câu trả lời"
+
+[messages.profiler-part-send]
+source = "Sending"
+translation = "Gửi"
+
+[messages.profiler-part-send-title]
+source = "Waiting while the network takes what was sent"
+translation = "Chờ trong khi mạng nhận những gì đã gửi"
+
+[messages.profiler-portal]
+source = "the interface’s own files"
+translation = "các tệp của chính giao diện"
+
+[messages.profiler-request-count]
+source = """
+{ $count ->
+        [one] { $count } request
+       *[other] { $count } requests
+    }"""
+translation = """
+{ $count ->
+       *[other] { $count } yêu cầu
+    }"""
+
+[messages.profiler-requests]
+source = "Time serving requests"
+translation = "Thời gian phục vụ yêu cầu"
+
+[messages.profiler-requests-none]
+source = "No requests in the last ten minutes."
+translation = "Không có yêu cầu nào trong mười phút qua."
+
+[messages.profiler-requests-what]
+source = "Each bar is ten seconds of requests, their time split by where it went."
+translation = "Mỗi cột là mười giây yêu cầu, với thời gian được chia theo nơi nó được dùng."
+
+[messages.profiler-route]
+source = "Route"
+translation = "Tuyến"
+
+[messages.profiler-routes]
+source = "By route"
+translation = "Theo tuyến"
+
+[messages.profiler-sent]
+source = "Sent"
+translation = "Đã gửi"
+
+[messages.profiler-serving]
+source = "Requests in progress"
+translation = "Yêu cầu đang xử lý"
+
+[messages.profiler-slowest]
+source = "Slowest: { $route }, { $time }"
+translation = "Chậm nhất: { $route }, { $time }"
+
+[messages.profiler-split]
+source = "Where the time went"
+translation = "Thời gian đã dùng vào đâu"
+
+[messages.profiler-starting]
+source = "The first readings arrive in a moment."
+translation = "Các số đo đầu tiên sẽ có trong giây lát."
+
+[messages.profiler-what]
+source = "What Hoard has been doing over the last ten minutes, updated every two seconds while you watch. It’s kept in memory only and starts over when Hoard restarts."
+translation = "Những gì Hoard đã làm trong mười phút qua, cập nhật mỗi hai giây khi bạn đang xem. Dữ liệu chỉ được giữ trong bộ nhớ và bắt đầu lại khi Hoard khởi động lại."
+
+[messages.profiler-working]
+source = "Working on"
+translation = "Đang làm"
+
+[messages.profiler-working-more]
+source = """
+{ $count ->
+        [one] And one more.
+       *[other] And { $count } more.
+    }"""
+translation = """
+{ $count ->
+       *[other] Và { $count } việc khác.
+    }"""
+
+[messages.profiler-working-none]
+source = "Nothing ran in the background."
+translation = "Không có gì chạy trong nền."
 
 [messages.projects-favorite-add-failed]
 source = "Couldn't add to your favorites: { $error }"

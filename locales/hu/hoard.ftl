@@ -2138,6 +2138,51 @@ settings-public-url = Nyilvános cím
 settings-public-url-placeholder = A böngésző címéből (pl. https://hoard.example.com)
 settings-public-url-default = a böngésző címéből
 
+## ProfilerPanel.vue: a profilozó a Beállítások → Teljesítmény tetején
+
+profiler = Profilozó
+profiler-what = Mit csinált a Hoard az elmúlt tíz percben, kétmásodpercenként frissítve, amíg nézi. Csak a memóriában tárolódik, és a Hoard újraindulásakor elölről kezdődik.
+profiler-starting = Az első mérések egy pillanat múlva érkeznek.
+profiler-failed = Nem sikerült beolvasni a profilozót: { $error }
+profiler-cpu = Processzorhasználat
+profiler-cpu-hoard = Hoard
+profiler-cpu-machine = Az egész gép
+profiler-cpu-summary = A Hoard processzorhasználata { $hoard }, az egész gépé { $machine }.
+profiler-memory = Memória
+profiler-serving = Folyamatban lévő kérések
+profiler-working = Folyamatban
+profiler-working-none = A háttérben semmi sem futott.
+profiler-working-more =
+    { $count ->
+        [one] És még egy.
+       *[other] És még { $count }.
+    }
+profiler-requests = Kérések kiszolgálásával töltött idő
+profiler-requests-what = Minden oszlop tíz másodpercnyi kérés, az idejük aszerint felosztva, hogy mire ment el.
+profiler-part-db = Adatbázis
+profiler-part-db-title = Várakozás az adatbázisra és a lekérdezései futtatása
+profiler-part-disk = Lemez
+profiler-part-disk-title = A tárolt fájlok olvasása és az elküldöttek tömörítése
+profiler-part-send = Küldés
+profiler-part-send-title = Várakozás, amíg a hálózat átveszi az elküldötteket
+profiler-part-other = Egyéb
+profiler-part-other-title = A válasz kidolgozása
+profiler-request-count =
+    { $count ->
+        [one] { $count } kérés
+       *[other] { $count } kérés
+    }
+profiler-requests-none = Nem volt kérés az elmúlt tíz percben.
+profiler-slowest = Leglassabb: { $route }, { $time }
+profiler-routes = Útvonalanként
+profiler-route = Útvonal
+profiler-count = Kérések
+profiler-average = Átlag
+profiler-p95 = Leglassabb 5%
+profiler-split = Mire ment el az idő
+profiler-sent = Elküldve
+profiler-portal = a felület saját fájljai
+
 ## SettingsPage.vue: Teljesítmény
 
 settings-render = 3D-bélyegképek

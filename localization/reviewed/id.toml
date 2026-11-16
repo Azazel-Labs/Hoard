@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "031ae9796de89847770a20e2fa79115c9c8ec9e3764ab428ee6f31e570c680bd"
+source = "5facbc5c6e9deb1e85e85d796c5a66c74f60e9b8857afda31b896d4a805194c0"
 translation = "ccba37da8ec8145aa968edd58860423f7d19917225e3adb17048481993a88680"
 
 [messages.account-add]
@@ -6998,6 +6998,156 @@ translation = "tampilan warna appearance color"
 [messages.palette-title]
 source = "Command palette"
 translation = "Palet perintah"
+
+[messages.profiler]
+source = "Profiler"
+translation = "Profiler"
+
+[messages.profiler-average]
+source = "Average"
+translation = "Rata-rata"
+
+[messages.profiler-count]
+source = "Requests"
+translation = "Permintaan"
+
+[messages.profiler-cpu]
+source = "Processor use"
+translation = "Penggunaan prosesor"
+
+[messages.profiler-cpu-hoard]
+source = "Hoard"
+translation = "Hoard"
+
+[messages.profiler-cpu-machine]
+source = "Whole machine"
+translation = "Seluruh mesin"
+
+[messages.profiler-cpu-summary]
+source = "Hoard is using { $hoard } of the processors, and the whole machine { $machine }."
+translation = "Hoard memakai { $hoard } dari prosesor, dan seluruh mesin { $machine }."
+
+[messages.profiler-failed]
+source = "Couldn’t read the profiler: { $error }"
+translation = "Tidak dapat membaca profiler: { $error }"
+
+[messages.profiler-memory]
+source = "Memory"
+translation = "Memori"
+
+[messages.profiler-p95]
+source = "Slowest 5%"
+translation = "5% paling lambat"
+
+[messages.profiler-part-db]
+source = "Database"
+translation = "Basis data"
+
+[messages.profiler-part-db-title]
+source = "Waiting for the database and running its queries"
+translation = "Menunggu basis data dan menjalankan kuerinya"
+
+[messages.profiler-part-disk]
+source = "Disk"
+translation = "Disk"
+
+[messages.profiler-part-disk-title]
+source = "Reading stored files, and compressing what’s sent"
+translation = "Membaca berkas tersimpan, dan memampatkan apa yang dikirim"
+
+[messages.profiler-part-other]
+source = "Other"
+translation = "Lainnya"
+
+[messages.profiler-part-other-title]
+source = "Working out the answer"
+translation = "Menyusun jawaban"
+
+[messages.profiler-part-send]
+source = "Sending"
+translation = "Mengirim"
+
+[messages.profiler-part-send-title]
+source = "Waiting while the network takes what was sent"
+translation = "Menunggu selagi jaringan menerima apa yang dikirim"
+
+[messages.profiler-portal]
+source = "the interface’s own files"
+translation = "berkas antarmuka itu sendiri"
+
+[messages.profiler-request-count]
+source = """
+{ $count ->
+        [one] { $count } request
+       *[other] { $count } requests
+    }"""
+translation = """
+{ $count ->
+       *[other] { $count } permintaan
+    }"""
+
+[messages.profiler-requests]
+source = "Time serving requests"
+translation = "Waktu melayani permintaan"
+
+[messages.profiler-requests-none]
+source = "No requests in the last ten minutes."
+translation = "Tidak ada permintaan dalam sepuluh menit terakhir."
+
+[messages.profiler-requests-what]
+source = "Each bar is ten seconds of requests, their time split by where it went."
+translation = "Setiap batang adalah sepuluh detik permintaan, dengan waktunya dibagi menurut ke mana waktu itu terpakai."
+
+[messages.profiler-route]
+source = "Route"
+translation = "Rute"
+
+[messages.profiler-routes]
+source = "By route"
+translation = "Per rute"
+
+[messages.profiler-sent]
+source = "Sent"
+translation = "Terkirim"
+
+[messages.profiler-serving]
+source = "Requests in progress"
+translation = "Permintaan yang sedang berjalan"
+
+[messages.profiler-slowest]
+source = "Slowest: { $route }, { $time }"
+translation = "Paling lambat: { $route }, { $time }"
+
+[messages.profiler-split]
+source = "Where the time went"
+translation = "Ke mana waktunya terpakai"
+
+[messages.profiler-starting]
+source = "The first readings arrive in a moment."
+translation = "Pembacaan pertama tiba sebentar lagi."
+
+[messages.profiler-what]
+source = "What Hoard has been doing over the last ten minutes, updated every two seconds while you watch. It’s kept in memory only and starts over when Hoard restarts."
+translation = "Apa yang dikerjakan Hoard selama sepuluh menit terakhir, diperbarui setiap dua detik selagi Anda melihat. Hanya disimpan di memori dan dimulai lagi dari awal saat Hoard dimulai ulang."
+
+[messages.profiler-working]
+source = "Working on"
+translation = "Sedang mengerjakan"
+
+[messages.profiler-working-more]
+source = """
+{ $count ->
+        [one] And one more.
+       *[other] And { $count } more.
+    }"""
+translation = """
+{ $count ->
+       *[other] Dan { $count } lagi.
+    }"""
+
+[messages.profiler-working-none]
+source = "Nothing ran in the background."
+translation = "Tidak ada yang berjalan di latar belakang."
 
 [messages.projects-favorite-add-failed]
 source = "Couldn't add to your favorites: { $error }"

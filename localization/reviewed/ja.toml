@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "031ae9796de89847770a20e2fa79115c9c8ec9e3764ab428ee6f31e570c680bd"
+source = "5facbc5c6e9deb1e85e85d796c5a66c74f60e9b8857afda31b896d4a805194c0"
 translation = "110cc1215f00a6312d4fe13a655f9cc3553e284205745fc0ce70ae25601e1bd5"
 
 [messages.account-add]
@@ -7008,6 +7008,156 @@ translation = "外観 色 appearance color"
 [messages.palette-title]
 source = "Command palette"
 translation = "コマンドパレット"
+
+[messages.profiler]
+source = "Profiler"
+translation = "プロファイラー"
+
+[messages.profiler-average]
+source = "Average"
+translation = "平均"
+
+[messages.profiler-count]
+source = "Requests"
+translation = "リクエスト数"
+
+[messages.profiler-cpu]
+source = "Processor use"
+translation = "プロセッサー使用率"
+
+[messages.profiler-cpu-hoard]
+source = "Hoard"
+translation = "Hoard"
+
+[messages.profiler-cpu-machine]
+source = "Whole machine"
+translation = "マシン全体"
+
+[messages.profiler-cpu-summary]
+source = "Hoard is using { $hoard } of the processors, and the whole machine { $machine }."
+translation = "Hoard はプロセッサーの { $hoard } を使用しており、マシン全体では { $machine } です。"
+
+[messages.profiler-failed]
+source = "Couldn’t read the profiler: { $error }"
+translation = "プロファイラーを読み取れませんでした: { $error }"
+
+[messages.profiler-memory]
+source = "Memory"
+translation = "メモリ"
+
+[messages.profiler-p95]
+source = "Slowest 5%"
+translation = "遅い方から 5%"
+
+[messages.profiler-part-db]
+source = "Database"
+translation = "データベース"
+
+[messages.profiler-part-db-title]
+source = "Waiting for the database and running its queries"
+translation = "データベースの待機とクエリの実行"
+
+[messages.profiler-part-disk]
+source = "Disk"
+translation = "ディスク"
+
+[messages.profiler-part-disk-title]
+source = "Reading stored files, and compressing what’s sent"
+translation = "保存されたファイルの読み取りと、送信データの圧縮"
+
+[messages.profiler-part-other]
+source = "Other"
+translation = "その他"
+
+[messages.profiler-part-other-title]
+source = "Working out the answer"
+translation = "応答の作成"
+
+[messages.profiler-part-send]
+source = "Sending"
+translation = "送信"
+
+[messages.profiler-part-send-title]
+source = "Waiting while the network takes what was sent"
+translation = "送信したデータをネットワークが受け取るまでの待機"
+
+[messages.profiler-portal]
+source = "the interface’s own files"
+translation = "インターフェース自体のファイル"
+
+[messages.profiler-request-count]
+source = """
+{ $count ->
+        [one] { $count } request
+       *[other] { $count } requests
+    }"""
+translation = """
+{ $count ->
+       *[other] { $count } 件のリクエスト
+    }"""
+
+[messages.profiler-requests]
+source = "Time serving requests"
+translation = "リクエストの処理時間"
+
+[messages.profiler-requests-none]
+source = "No requests in the last ten minutes."
+translation = "直近 10 分間にリクエストはありません。"
+
+[messages.profiler-requests-what]
+source = "Each bar is ten seconds of requests, their time split by where it went."
+translation = "各棒は 10 秒間のリクエストで、その時間を使われた内容ごとに分けて示します。"
+
+[messages.profiler-route]
+source = "Route"
+translation = "ルート"
+
+[messages.profiler-routes]
+source = "By route"
+translation = "ルート別"
+
+[messages.profiler-sent]
+source = "Sent"
+translation = "送信量"
+
+[messages.profiler-serving]
+source = "Requests in progress"
+translation = "処理中のリクエスト"
+
+[messages.profiler-slowest]
+source = "Slowest: { $route }, { $time }"
+translation = "最も遅いもの: { $route }、{ $time }"
+
+[messages.profiler-split]
+source = "Where the time went"
+translation = "時間の内訳"
+
+[messages.profiler-starting]
+source = "The first readings arrive in a moment."
+translation = "まもなく最初の計測値が表示されます。"
+
+[messages.profiler-what]
+source = "What Hoard has been doing over the last ten minutes, updated every two seconds while you watch. It’s kept in memory only and starts over when Hoard restarts."
+translation = "直近 10 分間に Hoard が行っていたことです。表示中は 2 秒ごとに更新されます。メモリ上にのみ保持され、Hoard を再起動すると最初からやり直しになります。"
+
+[messages.profiler-working]
+source = "Working on"
+translation = "実行中"
+
+[messages.profiler-working-more]
+source = """
+{ $count ->
+        [one] And one more.
+       *[other] And { $count } more.
+    }"""
+translation = """
+{ $count ->
+       *[other] ほか { $count } 件。
+    }"""
+
+[messages.profiler-working-none]
+source = "Nothing ran in the background."
+translation = "バックグラウンドで実行されたものはありません。"
 
 [messages.projects-favorite-add-failed]
 source = "Couldn't add to your favorites: { $error }"

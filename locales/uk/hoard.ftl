@@ -2589,6 +2589,55 @@ settings-public-url = Публічна адреса
 settings-public-url-placeholder = З адреси браузера (напр. https://hoard.example.com)
 settings-public-url-default = з адреси браузера
 
+## ProfilerPanel.vue: профілювальник угорі сторінки «Налаштування → Продуктивність»
+
+profiler = Профілювальник
+profiler-what = Що Hoard робив за останні десять хвилин; оновлюється кожні дві секунди, поки ви дивитеся. Зберігається лише в пам’яті й починається заново після перезапуску Hoard.
+profiler-starting = Перші показники з’являться за мить.
+profiler-failed = Не вдалося прочитати профілювальник: { $error }
+profiler-cpu = Завантаження процесора
+profiler-cpu-hoard = Hoard
+profiler-cpu-machine = Уся машина
+profiler-cpu-summary = Hoard використовує { $hoard } процесорів, а вся машина — { $machine }.
+profiler-memory = Пам’ять
+profiler-serving = Запити в роботі
+profiler-working = У роботі
+profiler-working-none = У фоні нічого не виконувалося.
+profiler-working-more =
+    { $count ->
+        [one] І ще { $count }.
+        [few] І ще { $count }.
+        [many] І ще { $count }.
+       *[other] І ще { $count }.
+    }
+profiler-requests = Час обслуговування запитів
+profiler-requests-what = Кожен стовпчик — це десять секунд запитів, а їхній час розподілено за тим, на що він пішов.
+profiler-part-db = База даних
+profiler-part-db-title = Очікування бази даних і виконання її запитів
+profiler-part-disk = Диск
+profiler-part-disk-title = Читання збережених файлів і стиснення того, що надсилається
+profiler-part-send = Надсилання
+profiler-part-send-title = Очікування, поки мережа прийме надіслане
+profiler-part-other = Інше
+profiler-part-other-title = Підготовка відповіді
+profiler-request-count =
+    { $count ->
+        [one] { $count } запит
+        [few] { $count } запити
+        [many] { $count } запитів
+       *[other] { $count } запиту
+    }
+profiler-requests-none = За останні десять хвилин запитів не було.
+profiler-slowest = Найповільніший: { $route }, { $time }
+profiler-routes = За маршрутами
+profiler-route = Маршрут
+profiler-count = Запити
+profiler-average = Середнє
+profiler-p95 = Найповільніші 5%
+profiler-split = Куди пішов час
+profiler-sent = Надіслано
+profiler-portal = власні файли інтерфейсу
+
 ## SettingsPage.vue: Продуктивність
 
 settings-render = 3D-мініатюри

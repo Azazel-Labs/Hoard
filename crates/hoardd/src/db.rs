@@ -853,12 +853,12 @@ where
 {
     let pool = pool.clone();
     let language = crate::i18n::current();
-    tokio::task::spawn_blocking(move || {
+    crate::profiler::db(tokio::task::spawn_blocking(move || {
         crate::i18n::blocking(language, || {
             let mut conn = pool.get()?;
             f(&mut conn)
         })
-    })
+    }))
     .await?
 }
 

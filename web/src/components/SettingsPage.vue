@@ -38,6 +38,7 @@ import IssuesPanel from './IssuesPanel.vue'
 import AccountPanel from './AccountPanel.vue'
 import AuthPanel from './AuthPanel.vue'
 import HttpsPanel from './HttpsPanel.vue'
+import ProfilerPanel from './ProfilerPanel.vue'
 import TagsPanel from './TagsPanel.vue'
 import StoreFormatsPanel from './StoreFormatsPanel.vue'
 import ResetButton from './ResetButton.vue'
@@ -1365,6 +1366,7 @@ onBeforeUnmount(() => {
           </template>
 
           <template v-else-if="current === 'performance'">
+            <ProfilerPanel />
             <section>
               <div class="sh"><h3>{{ t('settings-render') }}</h3></div>
               <p v-if="gpuNote" class="status" :data-state="gpuNote.state" role="status" :title="stats?.renderer">

@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "031ae9796de89847770a20e2fa79115c9c8ec9e3764ab428ee6f31e570c680bd"
+source = "5facbc5c6e9deb1e85e85d796c5a66c74f60e9b8857afda31b896d4a805194c0"
 translation = "30e8f29d5a5413b518bc3d4463f4fe90103622d446d3a937f1fa04d45817b813"
 
 [messages.account-add]
@@ -7212,6 +7212,160 @@ translation = "изглед боја appearance color"
 [messages.palette-title]
 source = "Command palette"
 translation = "Палета команди"
+
+[messages.profiler]
+source = "Profiler"
+translation = "Профилер"
+
+[messages.profiler-average]
+source = "Average"
+translation = "Просек"
+
+[messages.profiler-count]
+source = "Requests"
+translation = "Захтеви"
+
+[messages.profiler-cpu]
+source = "Processor use"
+translation = "Коришћење процесора"
+
+[messages.profiler-cpu-hoard]
+source = "Hoard"
+translation = "Hoard"
+
+[messages.profiler-cpu-machine]
+source = "Whole machine"
+translation = "Цела машина"
+
+[messages.profiler-cpu-summary]
+source = "Hoard is using { $hoard } of the processors, and the whole machine { $machine }."
+translation = "Hoard користи { $hoard } процесора, а цела машина { $machine }."
+
+[messages.profiler-failed]
+source = "Couldn’t read the profiler: { $error }"
+translation = "Није могуће прочитати профилер: { $error }"
+
+[messages.profiler-memory]
+source = "Memory"
+translation = "Меморија"
+
+[messages.profiler-p95]
+source = "Slowest 5%"
+translation = "Најспоријих 5%"
+
+[messages.profiler-part-db]
+source = "Database"
+translation = "База података"
+
+[messages.profiler-part-db-title]
+source = "Waiting for the database and running its queries"
+translation = "Чекање на базу података и извршавање њених упита"
+
+[messages.profiler-part-disk]
+source = "Disk"
+translation = "Диск"
+
+[messages.profiler-part-disk-title]
+source = "Reading stored files, and compressing what’s sent"
+translation = "Читање сачуваних датотека и компресовање онога што се шаље"
+
+[messages.profiler-part-other]
+source = "Other"
+translation = "Остало"
+
+[messages.profiler-part-other-title]
+source = "Working out the answer"
+translation = "Припрема одговора"
+
+[messages.profiler-part-send]
+source = "Sending"
+translation = "Слање"
+
+[messages.profiler-part-send-title]
+source = "Waiting while the network takes what was sent"
+translation = "Чекање док мрежа преузме оно што је послато"
+
+[messages.profiler-portal]
+source = "the interface’s own files"
+translation = "сопствене датотеке интерфејса"
+
+[messages.profiler-request-count]
+source = """
+{ $count ->
+        [one] { $count } request
+       *[other] { $count } requests
+    }"""
+translation = """
+{ $count ->
+        [one] { $count } захтев
+        [few] { $count } захтева
+       *[other] { $count } захтева
+    }"""
+
+[messages.profiler-requests]
+source = "Time serving requests"
+translation = "Време опслуживања захтева"
+
+[messages.profiler-requests-none]
+source = "No requests in the last ten minutes."
+translation = "Нема захтева у последњих десет минута."
+
+[messages.profiler-requests-what]
+source = "Each bar is ten seconds of requests, their time split by where it went."
+translation = "Свака трака је десет секунди захтева, а њихово време је подељено према томе где је отишло."
+
+[messages.profiler-route]
+source = "Route"
+translation = "Рута"
+
+[messages.profiler-routes]
+source = "By route"
+translation = "По рути"
+
+[messages.profiler-sent]
+source = "Sent"
+translation = "Послато"
+
+[messages.profiler-serving]
+source = "Requests in progress"
+translation = "Захтеви у току"
+
+[messages.profiler-slowest]
+source = "Slowest: { $route }, { $time }"
+translation = "Најспорији: { $route }, { $time }"
+
+[messages.profiler-split]
+source = "Where the time went"
+translation = "Где је отишло време"
+
+[messages.profiler-starting]
+source = "The first readings arrive in a moment."
+translation = "Прва мерења стижу за тренутак."
+
+[messages.profiler-what]
+source = "What Hoard has been doing over the last ten minutes, updated every two seconds while you watch. It’s kept in memory only and starts over when Hoard restarts."
+translation = "Шта је Hoard радио у последњих десет минута, освежено на сваке две секунде док гледате. Чува се само у меморији и почиње изнова кад се Hoard поново покрене."
+
+[messages.profiler-working]
+source = "Working on"
+translation = "Ради на"
+
+[messages.profiler-working-more]
+source = """
+{ $count ->
+        [one] And one more.
+       *[other] And { $count } more.
+    }"""
+translation = """
+{ $count ->
+        [one] И још { $count }.
+        [few] И још { $count }.
+       *[other] И још { $count }.
+    }"""
+
+[messages.profiler-working-none]
+source = "Nothing ran in the background."
+translation = "Ништа није радило у позадини."
 
 [messages.projects-favorite-add-failed]
 source = "Couldn't add to your favorites: { $error }"

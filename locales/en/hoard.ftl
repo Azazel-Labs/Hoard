@@ -2588,6 +2588,55 @@ settings-public-url = Public address
 settings-public-url-placeholder = From the browser’s address (e.g. https://hoard.example.com)
 settings-public-url-default = from the browser’s address
 
+## ProfilerPanel.vue: the profiler at the top of Settings → Performance
+
+profiler = Profiler
+profiler-what = What Hoard has been doing over the last ten minutes, updated every two seconds while you watch. It’s kept in memory only and starts over when Hoard restarts.
+profiler-starting = The first readings arrive in a moment.
+profiler-failed = Couldn’t read the profiler: { $error }
+profiler-cpu = Processor use
+profiler-cpu-hoard = Hoard
+profiler-cpu-machine = Whole machine
+# Read out for the processor chart; $hoard and $machine are percentages like "12%".
+profiler-cpu-summary = Hoard is using { $hoard } of the processors, and the whole machine { $machine }.
+profiler-memory = Memory
+profiler-serving = Requests in progress
+profiler-working = Working on
+profiler-working-none = Nothing ran in the background.
+profiler-working-more =
+    { $count ->
+        [one] And one more.
+       *[other] And { $count } more.
+    }
+profiler-requests = Time serving requests
+profiler-requests-what = Each bar is ten seconds of requests, their time split by where it went.
+# Where a request’s time goes. Each has a longer explanation shown on hover.
+profiler-part-db = Database
+profiler-part-db-title = Waiting for the database and running its queries
+profiler-part-disk = Disk
+profiler-part-disk-title = Reading stored files, and compressing what’s sent
+profiler-part-send = Sending
+profiler-part-send-title = Waiting while the network takes what was sent
+profiler-part-other = Other
+profiler-part-other-title = Working out the answer
+profiler-request-count =
+    { $count ->
+        [one] { $count } request
+       *[other] { $count } requests
+    }
+profiler-requests-none = No requests in the last ten minutes.
+# The slowest request in a ten-second bar; $route is like "GET /api/assets/{id}", $time like "120 ms".
+profiler-slowest = Slowest: { $route }, { $time }
+profiler-routes = By route
+profiler-route = Route
+profiler-count = Requests
+profiler-average = Average
+profiler-p95 = Slowest 5%
+profiler-split = Where the time went
+profiler-sent = Sent
+# Stands in for a route name: the web pages, scripts and pictures of Hoard’s own interface.
+profiler-portal = the interface’s own files
+
 ## SettingsPage.vue: Performance
 
 settings-render = 3D thumbnails

@@ -932,6 +932,13 @@ links to its pack or file, and says how often it happened and when. Fix the caus
 (scan the folder again, re-analyze the pack, retry the job), one at a time or a whole kind at once, or dismiss it.
 An issue that's fixed by the next scan or analysis goes away on its own. `GET /api/admin/issues` has the same list.
 
+**Profiler.** The top of Settings → Performance shows what Hoard has been doing over the last ten minutes, updated
+every two seconds while you watch: how much of the processors Hoard and the whole machine are using, and its memory;
+what it's working on (each ingest, thumbnail run, analysis or other job as a lane across the same clock); and the time
+spent serving requests, ten seconds to a bar, split into the database, reading from disk, sending to the browser and
+everything else. Below that each route has its count, average, slowest 5%, where its time went and how much it sent.
+It's kept in memory only and starts over when Hoard restarts. `GET /api/admin/profile?after=` has the same samples.
+
 **Thumbnails.** Settings → Performance → Thumbnails picks how thumbnails and model views are stored: Smaller, Balanced
 (the default) or Sharper JPEG, or Lossless PNG. Anything with transparency (model renders, waveforms, font
 specimens, cut-out sprites) and pixel art always stays PNG, and so does a picture whose PNG is about as small as the
@@ -1140,6 +1147,7 @@ browser session's changes must also carry an `X-Hoard` header, which pages on ot
 | GET | `/api/stats` | counts, storage, renderer, a newer release if there is one |
 | GET | `/api/activity` | background work in progress |
 | GET | `/api/admin/jobs` | the job queue |
+| GET 🔒 | `/api/admin/profile?after=` | the profiler: processor and memory use each second, what's running, and each request's time in the database, on disk and sending, for the last ten minutes or since `after` |
 | GET 🔒, PUT 🔒 | `/api/admin/settings` | Settings: read, or change some (`null` goes back to the flag) |
 | GET 🔒 | `/api/admin/update` | this version, the newer release if one is out, whether Hoard is idle and what's keeping it busy, the last call to the update address |
 | POST 🔒 | `/api/admin/update/hook` | call the update address now |

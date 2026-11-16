@@ -2387,6 +2387,51 @@ settings-public-url = Julkinen osoite
 settings-public-url-placeholder = Selaimen osoitteesta (esim. https://hoard.example.com)
 settings-public-url-default = selaimen osoitteesta
 
+## Asetukset: Suorituskyky, profiloija sivun yläosassa
+
+profiler = Profiloija
+profiler-what = Mitä Hoard on tehnyt viimeisten kymmenen minuutin aikana, päivittyen kahden sekunnin välein, kun katsot. Tiedot pidetään vain muistissa ja alkavat alusta, kun Hoard käynnistyy uudelleen.
+profiler-starting = Ensimmäiset lukemat tulevat hetken kuluttua.
+profiler-failed = Profiloijan luku epäonnistui: { $error }
+profiler-cpu = Suorittimen käyttö
+profiler-cpu-hoard = Hoard
+profiler-cpu-machine = Koko kone
+profiler-cpu-summary = Hoard käyttää { $hoard } suorittimista ja koko kone { $machine }.
+profiler-memory = Muisti
+profiler-serving = Käynnissä olevat pyynnöt
+profiler-working = Työn alla
+profiler-working-none = Taustalla ei ajettu mitään.
+profiler-working-more =
+    { $count ->
+        [one] Ja yksi muu.
+       *[other] Ja { $count } muuta.
+    }
+profiler-requests = Pyyntöjen käsittelyaika
+profiler-requests-what = Jokainen palkki on kymmenen sekunnin pyynnöt, ja niiden aika on jaettu sen mukaan, mihin se kului.
+profiler-part-db = Tietokanta
+profiler-part-db-title = Tietokannan odottaminen ja sen kyselyjen suorittaminen
+profiler-part-disk = Levy
+profiler-part-disk-title = Tallennettujen tiedostojen lukeminen ja lähetettävän pakkaaminen
+profiler-part-send = Lähetys
+profiler-part-send-title = Odottaminen, kun verkko ottaa vastaan lähetettyä
+profiler-part-other = Muu
+profiler-part-other-title = Vastauksen laatiminen
+profiler-request-count =
+    { $count ->
+        [one] { $count } pyyntö
+       *[other] { $count } pyyntöä
+    }
+profiler-requests-none = Ei pyyntöjä viimeisten kymmenen minuutin aikana.
+profiler-slowest = Hitain: { $route }, { $time }
+profiler-routes = Reiteittäin
+profiler-route = Reitti
+profiler-count = Pyynnöt
+profiler-average = Keskiarvo
+profiler-p95 = Hitain 5 %
+profiler-split = Mihin aika kului
+profiler-sent = Lähetetty
+profiler-portal = käyttöliittymän omat tiedostot
+
 ## Asetukset: Suorituskyky
 
 settings-render = 3D-pikkukuvat

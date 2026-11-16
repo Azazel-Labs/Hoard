@@ -301,6 +301,43 @@ export const packFacings = new Map<string, Facing>()
 
 export interface Facet { value: string; count: number }
 
+/** One second of the server, for the profiler: processor use in percent of every core (Hoard's and the whole
+ *  machine's), Hoard's memory in bytes, requests in progress, and what was running. Times are Unix milliseconds. */
+export interface ProfileSample {
+  seq: number
+  at: number
+  hoard: number
+  machine: number
+  memory: number
+  serving: number
+  running: { kind: string; label: string }[]
+}
+
+/** One request served: its route (empty for the portal's own files), then its time in milliseconds, in all and in
+ *  the database, the disk and sending. */
+export interface ProfileServed {
+  seq: number
+  at: number
+  method: string
+  route: string
+  status: number
+  total: number
+  db: number
+  disk: number
+  send: number
+  bytes: number
+}
+
+/** The profiler's last ten minutes (`keep`), or what's new since the `seq` passed back. */
+export interface Profile {
+  seq: number
+  now: number
+  cores: number
+  keep: number
+  samples: ProfileSample[]
+  served: ProfileServed[]
+}
+
 export interface SearchResult {
   items: Asset[]
   total: number
@@ -1067,6 +1104,7 @@ export const api = {
   dropTagAlias: (tag: string) => request<void>(`/api/tags/aliases?tag=${encodeURIComponent(tag)}`, { method: 'DELETE' }),
   activity: () => request<{ items: ActivityItem[] }>('/api/activity'),
   settings: () => request<Settings>('/api/admin/settings'),
+  profile: (after: number) => request<Profile>(`/api/admin/profile?after=${after}`),
   updateStatus: () => request<UpdateStatus>('/api/admin/update'),
   /** Call the update address now, to see that it's wired up. */
   callUpdateHook: () => request<UpdateHookCall>('/api/admin/update/hook', { method: 'POST' }),

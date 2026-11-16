@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "031ae9796de89847770a20e2fa79115c9c8ec9e3764ab428ee6f31e570c680bd"
+source = "5facbc5c6e9deb1e85e85d796c5a66c74f60e9b8857afda31b896d4a805194c0"
 translation = "0f5f60477c12405f48c36f12294f911af5de0204e2fd60e70ff31e1354ed1fa5"
 
 [messages.account-add]
@@ -7212,6 +7212,158 @@ translation = "εμφάνιση χρώμα appearance color"
 [messages.palette-title]
 source = "Command palette"
 translation = "Παλέτα εντολών"
+
+[messages.profiler]
+source = "Profiler"
+translation = "Αναλυτής επιδόσεων"
+
+[messages.profiler-average]
+source = "Average"
+translation = "Μέσος όρος"
+
+[messages.profiler-count]
+source = "Requests"
+translation = "Αιτήματα"
+
+[messages.profiler-cpu]
+source = "Processor use"
+translation = "Χρήση επεξεργαστή"
+
+[messages.profiler-cpu-hoard]
+source = "Hoard"
+translation = "Hoard"
+
+[messages.profiler-cpu-machine]
+source = "Whole machine"
+translation = "Όλο το μηχάνημα"
+
+[messages.profiler-cpu-summary]
+source = "Hoard is using { $hoard } of the processors, and the whole machine { $machine }."
+translation = "Το Hoard χρησιμοποιεί το { $hoard } των επεξεργαστών και όλο το μηχάνημα το { $machine }."
+
+[messages.profiler-failed]
+source = "Couldn’t read the profiler: { $error }"
+translation = "Δεν ήταν δυνατή η ανάγνωση του αναλυτή επιδόσεων: { $error }"
+
+[messages.profiler-memory]
+source = "Memory"
+translation = "Μνήμη"
+
+[messages.profiler-p95]
+source = "Slowest 5%"
+translation = "Πιο αργό 5%"
+
+[messages.profiler-part-db]
+source = "Database"
+translation = "Βάση δεδομένων"
+
+[messages.profiler-part-db-title]
+source = "Waiting for the database and running its queries"
+translation = "Αναμονή για τη βάση δεδομένων και εκτέλεση των ερωτημάτων της"
+
+[messages.profiler-part-disk]
+source = "Disk"
+translation = "Δίσκος"
+
+[messages.profiler-part-disk-title]
+source = "Reading stored files, and compressing what’s sent"
+translation = "Ανάγνωση αποθηκευμένων αρχείων και συμπίεση όσων στέλνονται"
+
+[messages.profiler-part-other]
+source = "Other"
+translation = "Άλλο"
+
+[messages.profiler-part-other-title]
+source = "Working out the answer"
+translation = "Υπολογισμός της απάντησης"
+
+[messages.profiler-part-send]
+source = "Sending"
+translation = "Αποστολή"
+
+[messages.profiler-part-send-title]
+source = "Waiting while the network takes what was sent"
+translation = "Αναμονή όσο το δίκτυο παραλαμβάνει όσα στάλθηκαν"
+
+[messages.profiler-portal]
+source = "the interface’s own files"
+translation = "τα αρχεία της ίδιας της διεπαφής"
+
+[messages.profiler-request-count]
+source = """
+{ $count ->
+        [one] { $count } request
+       *[other] { $count } requests
+    }"""
+translation = """
+{ $count ->
+        [one] { $count } αίτημα
+       *[other] { $count } αιτήματα
+    }"""
+
+[messages.profiler-requests]
+source = "Time serving requests"
+translation = "Χρόνος εξυπηρέτησης αιτημάτων"
+
+[messages.profiler-requests-none]
+source = "No requests in the last ten minutes."
+translation = "Κανένα αίτημα τα τελευταία δέκα λεπτά."
+
+[messages.profiler-requests-what]
+source = "Each bar is ten seconds of requests, their time split by where it went."
+translation = "Κάθε μπάρα είναι δέκα δευτερόλεπτα αιτημάτων, με τον χρόνο τους χωρισμένο ανάλογα με το πού πήγε."
+
+[messages.profiler-route]
+source = "Route"
+translation = "Διαδρομή"
+
+[messages.profiler-routes]
+source = "By route"
+translation = "Ανά διαδρομή"
+
+[messages.profiler-sent]
+source = "Sent"
+translation = "Στάλθηκαν"
+
+[messages.profiler-serving]
+source = "Requests in progress"
+translation = "Αιτήματα σε εξέλιξη"
+
+[messages.profiler-slowest]
+source = "Slowest: { $route }, { $time }"
+translation = "Πιο αργό: { $route }, { $time }"
+
+[messages.profiler-split]
+source = "Where the time went"
+translation = "Πού πήγε ο χρόνος"
+
+[messages.profiler-starting]
+source = "The first readings arrive in a moment."
+translation = "Οι πρώτες μετρήσεις έρχονται σε λίγο."
+
+[messages.profiler-what]
+source = "What Hoard has been doing over the last ten minutes, updated every two seconds while you watch. It’s kept in memory only and starts over when Hoard restarts."
+translation = "Τι έκανε το Hoard τα τελευταία δέκα λεπτά, με ενημέρωση κάθε δύο δευτερόλεπτα όσο το παρακολουθείτε. Κρατιέται μόνο στη μνήμη και ξεκινά από την αρχή όταν το Hoard επανεκκινείται."
+
+[messages.profiler-working]
+source = "Working on"
+translation = "Εργάζεται σε"
+
+[messages.profiler-working-more]
+source = """
+{ $count ->
+        [one] And one more.
+       *[other] And { $count } more.
+    }"""
+translation = """
+{ $count ->
+        [one] Και μία ακόμη.
+       *[other] Και { $count } ακόμη.
+    }"""
+
+[messages.profiler-working-none]
+source = "Nothing ran in the background."
+translation = "Τίποτα δεν εκτελέστηκε στο παρασκήνιο."
 
 [messages.projects-favorite-add-failed]
 source = "Couldn't add to your favorites: { $error }"

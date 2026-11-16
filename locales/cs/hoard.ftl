@@ -2492,6 +2492,55 @@ settings-public-url = Veřejná adresa
 settings-public-url-placeholder = Z adresy prohlížeče (např. https://hoard.example.com)
 settings-public-url-default = z adresy prohlížeče
 
+## ProfilerPanel.vue: profiler v horní části Nastavení → Výkon
+
+profiler = Profiler
+profiler-what = Co Hoard dělal za posledních deset minut, aktualizováno každé dvě sekundy, dokud se díváte. Uchovává se jen v paměti a po restartu Hoardu začíná znovu.
+profiler-starting = První měření dorazí za okamžik.
+profiler-failed = Profiler se nepodařilo přečíst: { $error }
+profiler-cpu = Využití procesoru
+profiler-cpu-hoard = Hoard
+profiler-cpu-machine = Celý počítač
+profiler-cpu-summary = Hoard využívá { $hoard } procesorů a celý počítač { $machine }.
+profiler-memory = Paměť
+profiler-serving = Probíhající požadavky
+profiler-working = Pracuje na
+profiler-working-none = Na pozadí nic neběželo.
+profiler-working-more =
+    { $count ->
+        [one] A ještě jedna.
+        [few] A ještě { $count }.
+        [many] A ještě { $count }.
+       *[other] A ještě { $count }.
+    }
+profiler-requests = Čas obsluhy požadavků
+profiler-requests-what = Každý sloupec představuje deset sekund požadavků, jejichž čas je rozdělený podle toho, kam šel.
+profiler-part-db = Databáze
+profiler-part-db-title = Čekání na databázi a provádění jejích dotazů
+profiler-part-disk = Disk
+profiler-part-disk-title = Čtení uložených souborů a komprese toho, co se odesílá
+profiler-part-send = Odesílání
+profiler-part-send-title = Čekání, než síť převezme to, co se odeslalo
+profiler-part-other = Ostatní
+profiler-part-other-title = Sestavování odpovědi
+profiler-request-count =
+    { $count ->
+        [one] { $count } požadavek
+        [few] { $count } požadavky
+        [many] { $count } požadavku
+       *[other] { $count } požadavků
+    }
+profiler-requests-none = Za posledních deset minut žádné požadavky.
+profiler-slowest = Nejpomalejší: { $route }, { $time }
+profiler-routes = Podle cesty
+profiler-route = Cesta
+profiler-count = Požadavky
+profiler-average = Průměr
+profiler-p95 = Nejpomalejších 5 %
+profiler-split = Kam šel čas
+profiler-sent = Odesláno
+profiler-portal = vlastní soubory rozhraní
+
 ## SettingsPage.vue: Výkon
 
 settings-render = 3D miniatury

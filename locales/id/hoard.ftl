@@ -2132,6 +2132,49 @@ settings-public-url = Alamat publik
 settings-public-url-placeholder = Dari alamat browser (mis. https://hoard.example.com)
 settings-public-url-default = dari alamat browser
 
+## ProfilerPanel.vue: profiler di bagian atas Pengaturan → Performa
+
+profiler = Profiler
+profiler-what = Apa yang dikerjakan Hoard selama sepuluh menit terakhir, diperbarui setiap dua detik selagi Anda melihat. Hanya disimpan di memori dan dimulai lagi dari awal saat Hoard dimulai ulang.
+profiler-starting = Pembacaan pertama tiba sebentar lagi.
+profiler-failed = Tidak dapat membaca profiler: { $error }
+profiler-cpu = Penggunaan prosesor
+profiler-cpu-hoard = Hoard
+profiler-cpu-machine = Seluruh mesin
+profiler-cpu-summary = Hoard memakai { $hoard } dari prosesor, dan seluruh mesin { $machine }.
+profiler-memory = Memori
+profiler-serving = Permintaan yang sedang berjalan
+profiler-working = Sedang mengerjakan
+profiler-working-none = Tidak ada yang berjalan di latar belakang.
+profiler-working-more =
+    { $count ->
+       *[other] Dan { $count } lagi.
+    }
+profiler-requests = Waktu melayani permintaan
+profiler-requests-what = Setiap batang adalah sepuluh detik permintaan, dengan waktunya dibagi menurut ke mana waktu itu terpakai.
+profiler-part-db = Basis data
+profiler-part-db-title = Menunggu basis data dan menjalankan kuerinya
+profiler-part-disk = Disk
+profiler-part-disk-title = Membaca berkas tersimpan, dan memampatkan apa yang dikirim
+profiler-part-send = Mengirim
+profiler-part-send-title = Menunggu selagi jaringan menerima apa yang dikirim
+profiler-part-other = Lainnya
+profiler-part-other-title = Menyusun jawaban
+profiler-request-count =
+    { $count ->
+       *[other] { $count } permintaan
+    }
+profiler-requests-none = Tidak ada permintaan dalam sepuluh menit terakhir.
+profiler-slowest = Paling lambat: { $route }, { $time }
+profiler-routes = Per rute
+profiler-route = Rute
+profiler-count = Permintaan
+profiler-average = Rata-rata
+profiler-p95 = 5% paling lambat
+profiler-split = Ke mana waktunya terpakai
+profiler-sent = Terkirim
+profiler-portal = berkas antarmuka itu sendiri
+
 ## SettingsPage.vue: Performa
 
 settings-render = Gambar mini 3D

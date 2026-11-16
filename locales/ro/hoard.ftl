@@ -2506,6 +2506,53 @@ settings-public-url = Adresă publică
 settings-public-url-placeholder = Din adresa browserului (de ex. https://hoard.example.com)
 settings-public-url-default = din adresa browserului
 
+## ProfilerPanel.vue: profilerul din partea de sus a Setări → Performanță
+
+profiler = Profiler
+profiler-what = Ce a făcut Hoard în ultimele zece minute, actualizat la fiecare două secunde cât timp priviți. Se păstrează doar în memorie și o ia de la capăt când Hoard repornește.
+profiler-starting = Primele citiri sosesc într-o clipă.
+profiler-failed = Profilerul nu a putut fi citit: { $error }
+profiler-cpu = Utilizarea procesorului
+profiler-cpu-hoard = Hoard
+profiler-cpu-machine = Întreaga mașină
+profiler-cpu-summary = Hoard folosește { $hoard } din procesoare, iar întreaga mașină { $machine }.
+profiler-memory = Memorie
+profiler-serving = Cereri în curs
+profiler-working = Lucrează la
+profiler-working-none = Nimic nu a rulat în fundal.
+profiler-working-more =
+    { $count ->
+        [one] Și încă una.
+        [few] Și încă { $count }.
+       *[other] Și încă { $count }.
+    }
+profiler-requests = Timp petrecut servind cereri
+profiler-requests-what = Fiecare bară înseamnă zece secunde de cereri, cu timpul împărțit după unde s-a dus.
+profiler-part-db = Bază de date
+profiler-part-db-title = Așteptarea bazei de date și rularea interogărilor ei
+profiler-part-disk = Disc
+profiler-part-disk-title = Citirea fișierelor stocate și comprimarea a ceea ce se trimite
+profiler-part-send = Trimitere
+profiler-part-send-title = Așteptarea cât timp rețeaua preia ce s-a trimis
+profiler-part-other = Altele
+profiler-part-other-title = Elaborarea răspunsului
+profiler-request-count =
+    { $count ->
+        [one] { $count } cerere
+        [few] { $count } cereri
+       *[other] { $count } de cereri
+    }
+profiler-requests-none = Nicio cerere în ultimele zece minute.
+profiler-slowest = Cea mai lentă: { $route }, { $time }
+profiler-routes = Pe rută
+profiler-route = Rută
+profiler-count = Cereri
+profiler-average = Medie
+profiler-p95 = Cele mai lente 5%
+profiler-split = Unde s-a dus timpul
+profiler-sent = Trimis
+profiler-portal = fișierele proprii ale interfeței
+
 ## SettingsPage.vue: Performanță
 
 settings-render = Miniaturi 3D

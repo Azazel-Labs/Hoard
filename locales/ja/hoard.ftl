@@ -2128,6 +2128,49 @@ settings-public-url = 公開アドレス
 settings-public-url-placeholder = ブラウザーのアドレスから（例: https://hoard.example.com）
 settings-public-url-default = ブラウザーのアドレスから
 
+## ProfilerPanel.vue: 設定 → パフォーマンスの上部にあるプロファイラー
+
+profiler = プロファイラー
+profiler-what = 直近 10 分間に Hoard が行っていたことです。表示中は 2 秒ごとに更新されます。メモリ上にのみ保持され、Hoard を再起動すると最初からやり直しになります。
+profiler-starting = まもなく最初の計測値が表示されます。
+profiler-failed = プロファイラーを読み取れませんでした: { $error }
+profiler-cpu = プロセッサー使用率
+profiler-cpu-hoard = Hoard
+profiler-cpu-machine = マシン全体
+profiler-cpu-summary = Hoard はプロセッサーの { $hoard } を使用しており、マシン全体では { $machine } です。
+profiler-memory = メモリ
+profiler-serving = 処理中のリクエスト
+profiler-working = 実行中
+profiler-working-none = バックグラウンドで実行されたものはありません。
+profiler-working-more =
+    { $count ->
+       *[other] ほか { $count } 件。
+    }
+profiler-requests = リクエストの処理時間
+profiler-requests-what = 各棒は 10 秒間のリクエストで、その時間を使われた内容ごとに分けて示します。
+profiler-part-db = データベース
+profiler-part-db-title = データベースの待機とクエリの実行
+profiler-part-disk = ディスク
+profiler-part-disk-title = 保存されたファイルの読み取りと、送信データの圧縮
+profiler-part-send = 送信
+profiler-part-send-title = 送信したデータをネットワークが受け取るまでの待機
+profiler-part-other = その他
+profiler-part-other-title = 応答の作成
+profiler-request-count =
+    { $count ->
+       *[other] { $count } 件のリクエスト
+    }
+profiler-requests-none = 直近 10 分間にリクエストはありません。
+profiler-slowest = 最も遅いもの: { $route }、{ $time }
+profiler-routes = ルート別
+profiler-route = ルート
+profiler-count = リクエスト数
+profiler-average = 平均
+profiler-p95 = 遅い方から 5%
+profiler-split = 時間の内訳
+profiler-sent = 送信量
+profiler-portal = インターフェース自体のファイル
+
 ## SettingsPage.vue: パフォーマンス
 
 settings-render = 3D サムネイル

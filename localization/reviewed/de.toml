@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "031ae9796de89847770a20e2fa79115c9c8ec9e3764ab428ee6f31e570c680bd"
+source = "5facbc5c6e9deb1e85e85d796c5a66c74f60e9b8857afda31b896d4a805194c0"
 translation = "c88ccd005fc6325aa6e221408cf6717fbfee2dabbc4de8cac4e99bd7fe8f0b6e"
 
 [messages.account-add]
@@ -7153,6 +7153,158 @@ translation = "darstellung farbe appearance color"
 [messages.palette-title]
 source = "Command palette"
 translation = "Befehlspalette"
+
+[messages.profiler]
+source = "Profiler"
+translation = "Profiler"
+
+[messages.profiler-average]
+source = "Average"
+translation = "Durchschnitt"
+
+[messages.profiler-count]
+source = "Requests"
+translation = "Anfragen"
+
+[messages.profiler-cpu]
+source = "Processor use"
+translation = "Prozessorauslastung"
+
+[messages.profiler-cpu-hoard]
+source = "Hoard"
+translation = "Hoard"
+
+[messages.profiler-cpu-machine]
+source = "Whole machine"
+translation = "Gesamter Rechner"
+
+[messages.profiler-cpu-summary]
+source = "Hoard is using { $hoard } of the processors, and the whole machine { $machine }."
+translation = "Hoard nutzt { $hoard } der Prozessoren, der gesamte Rechner { $machine }."
+
+[messages.profiler-failed]
+source = "Couldn’t read the profiler: { $error }"
+translation = "Der Profiler konnte nicht gelesen werden: { $error }"
+
+[messages.profiler-memory]
+source = "Memory"
+translation = "Arbeitsspeicher"
+
+[messages.profiler-p95]
+source = "Slowest 5%"
+translation = "Langsamste 5 %"
+
+[messages.profiler-part-db]
+source = "Database"
+translation = "Datenbank"
+
+[messages.profiler-part-db-title]
+source = "Waiting for the database and running its queries"
+translation = "Warten auf die Datenbank und Ausführen ihrer Abfragen"
+
+[messages.profiler-part-disk]
+source = "Disk"
+translation = "Datenträger"
+
+[messages.profiler-part-disk-title]
+source = "Reading stored files, and compressing what’s sent"
+translation = "Lesen gespeicherter Dateien und Komprimieren des Gesendeten"
+
+[messages.profiler-part-other]
+source = "Other"
+translation = "Sonstiges"
+
+[messages.profiler-part-other-title]
+source = "Working out the answer"
+translation = "Erarbeiten der Antwort"
+
+[messages.profiler-part-send]
+source = "Sending"
+translation = "Senden"
+
+[messages.profiler-part-send-title]
+source = "Waiting while the network takes what was sent"
+translation = "Warten, bis das Netzwerk das Gesendete abnimmt"
+
+[messages.profiler-portal]
+source = "the interface’s own files"
+translation = "die eigenen Dateien der Oberfläche"
+
+[messages.profiler-request-count]
+source = """
+{ $count ->
+        [one] { $count } request
+       *[other] { $count } requests
+    }"""
+translation = """
+{ $count ->
+        [one] { $count } Anfrage
+       *[other] { $count } Anfragen
+    }"""
+
+[messages.profiler-requests]
+source = "Time serving requests"
+translation = "Zeit für Anfragen"
+
+[messages.profiler-requests-none]
+source = "No requests in the last ten minutes."
+translation = "Keine Anfragen in den letzten zehn Minuten."
+
+[messages.profiler-requests-what]
+source = "Each bar is ten seconds of requests, their time split by where it went."
+translation = "Jeder Balken steht für zehn Sekunden Anfragen, ihre Zeit danach aufgeteilt, wohin sie ging."
+
+[messages.profiler-route]
+source = "Route"
+translation = "Route"
+
+[messages.profiler-routes]
+source = "By route"
+translation = "Nach Route"
+
+[messages.profiler-sent]
+source = "Sent"
+translation = "Gesendet"
+
+[messages.profiler-serving]
+source = "Requests in progress"
+translation = "Laufende Anfragen"
+
+[messages.profiler-slowest]
+source = "Slowest: { $route }, { $time }"
+translation = "Am langsamsten: { $route }, { $time }"
+
+[messages.profiler-split]
+source = "Where the time went"
+translation = "Wohin die Zeit ging"
+
+[messages.profiler-starting]
+source = "The first readings arrive in a moment."
+translation = "Die ersten Messwerte kommen gleich."
+
+[messages.profiler-what]
+source = "What Hoard has been doing over the last ten minutes, updated every two seconds while you watch. It’s kept in memory only and starts over when Hoard restarts."
+translation = "Was Hoard in den letzten zehn Minuten getan hat, alle zwei Sekunden aktualisiert, solange Sie zusehen. Es wird nur im Arbeitsspeicher gehalten und beginnt von vorn, wenn Hoard neu startet."
+
+[messages.profiler-working]
+source = "Working on"
+translation = "In Arbeit"
+
+[messages.profiler-working-more]
+source = """
+{ $count ->
+        [one] And one more.
+       *[other] And { $count } more.
+    }"""
+translation = """
+{ $count ->
+        [one] Und eine weitere.
+       *[other] Und { $count } weitere.
+    }"""
+
+[messages.profiler-working-none]
+source = "Nothing ran in the background."
+translation = "Im Hintergrund lief nichts."
 
 [messages.projects-favorite-add-failed]
 source = "Couldn't add to your favorites: { $error }"

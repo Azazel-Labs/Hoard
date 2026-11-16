@@ -2301,6 +2301,51 @@ settings-public-url = Openbaar adres
 settings-public-url-placeholder = Uit het adres van de browser (bijv. https://hoard.example.com)
 settings-public-url-default = uit het adres van de browser
 
+## ProfilerPanel.vue: de profiler bovenaan Instellingen → Prestaties
+
+profiler = Profiler
+profiler-what = Wat Hoard de afgelopen tien minuten heeft gedaan, elke twee seconden bijgewerkt terwijl je kijkt. Het wordt alleen in het geheugen bewaard en begint opnieuw als Hoard herstart.
+profiler-starting = De eerste metingen komen zo binnen.
+profiler-failed = Kon de profiler niet lezen: { $error }
+profiler-cpu = Processorgebruik
+profiler-cpu-hoard = Hoard
+profiler-cpu-machine = Hele machine
+profiler-cpu-summary = Hoard gebruikt { $hoard } van de processors, en de hele machine { $machine }.
+profiler-memory = Geheugen
+profiler-serving = Lopende verzoeken
+profiler-working = Bezig met
+profiler-working-none = Er liep niets op de achtergrond.
+profiler-working-more =
+    { $count ->
+        [one] En nog één.
+       *[other] En nog { $count }.
+    }
+profiler-requests = Tijd besteed aan verzoeken
+profiler-requests-what = Elke balk is tien seconden aan verzoeken, met hun tijd verdeeld naar waar die naartoe ging.
+profiler-part-db = Database
+profiler-part-db-title = Wachten op de database en het uitvoeren van queries
+profiler-part-disk = Schijf
+profiler-part-disk-title = Opgeslagen bestanden lezen en comprimeren wat wordt verstuurd
+profiler-part-send = Versturen
+profiler-part-send-title = Wachten terwijl het netwerk overneemt wat is verstuurd
+profiler-part-other = Overig
+profiler-part-other-title = Het antwoord uitwerken
+profiler-request-count =
+    { $count ->
+        [one] { $count } verzoek
+       *[other] { $count } verzoeken
+    }
+profiler-requests-none = Geen verzoeken in de afgelopen tien minuten.
+profiler-slowest = Traagste: { $route }, { $time }
+profiler-routes = Per route
+profiler-route = Route
+profiler-count = Verzoeken
+profiler-average = Gemiddeld
+profiler-p95 = Traagste 5%
+profiler-split = Waar de tijd naartoe ging
+profiler-sent = Verstuurd
+profiler-portal = de eigen bestanden van de interface
+
 ## SettingsPage.vue: Prestaties
 
 settings-render = 3D-miniaturen

@@ -2128,6 +2128,49 @@ settings-public-url = 公开地址
 settings-public-url-placeholder = 取自浏览器地址（例如 https://hoard.example.com）
 settings-public-url-default = 取自浏览器地址
 
+## ProfilerPanel.vue: 设置 → 性能顶部的性能分析器
+
+profiler = 性能分析器
+profiler-what = Hoard 在过去十分钟里做了什么，你查看时每两秒更新一次。数据只保存在内存中，Hoard 重启后会从头开始。
+profiler-starting = 第一批读数马上就到。
+profiler-failed = 无法读取性能分析器：{ $error }
+profiler-cpu = 处理器使用率
+profiler-cpu-hoard = Hoard
+profiler-cpu-machine = 整台机器
+profiler-cpu-summary = Hoard 正在使用 { $hoard } 的处理器，整台机器为 { $machine }。
+profiler-memory = 内存
+profiler-serving = 进行中的请求
+profiler-working = 正在处理
+profiler-working-none = 后台没有运行任何任务。
+profiler-working-more =
+    { $count ->
+       *[other] 还有 { $count } 项。
+    }
+profiler-requests = 处理请求的时间
+profiler-requests-what = 每根柱代表十秒内的请求，其时间按去向拆分。
+profiler-part-db = 数据库
+profiler-part-db-title = 等待数据库并执行其查询
+profiler-part-disk = 磁盘
+profiler-part-disk-title = 读取存储的文件，并压缩要发送的内容
+profiler-part-send = 发送
+profiler-part-send-title = 等待网络接收已发送的内容
+profiler-part-other = 其他
+profiler-part-other-title = 生成响应
+profiler-request-count =
+    { $count ->
+       *[other] { $count } 个请求
+    }
+profiler-requests-none = 过去十分钟没有请求。
+profiler-slowest = 最慢：{ $route }，{ $time }
+profiler-routes = 按路由
+profiler-route = 路由
+profiler-count = 请求数
+profiler-average = 平均
+profiler-p95 = 最慢的 5%
+profiler-split = 时间去向
+profiler-sent = 已发送
+profiler-portal = 界面自身的文件
+
 ## SettingsPage.vue: 性能
 
 settings-render = 3D 缩略图

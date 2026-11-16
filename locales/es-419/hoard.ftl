@@ -2308,6 +2308,51 @@ settings-public-url = Dirección pública
 settings-public-url-placeholder = La del navegador (p. ej. https://hoard.example.com)
 settings-public-url-default = la del navegador
 
+## ProfilerPanel.vue: el perfilador en la parte superior de Configuración → Rendimiento
+
+profiler = Perfilador
+profiler-what = Lo que Hoard ha estado haciendo en los últimos diez minutos, actualizado cada dos segundos mientras lo miras. Solo se guarda en memoria y empieza de nuevo cuando Hoard se reinicia.
+profiler-starting = Las primeras lecturas llegan en un momento.
+profiler-failed = No se pudo leer el perfilador: { $error }
+profiler-cpu = Uso del procesador
+profiler-cpu-hoard = Hoard
+profiler-cpu-machine = Toda la máquina
+profiler-cpu-summary = Hoard está usando el { $hoard } de los procesadores, y toda la máquina, el { $machine }.
+profiler-memory = Memoria
+profiler-serving = Solicitudes en curso
+profiler-working = Trabajando en
+profiler-working-none = No se ejecutó nada en segundo plano.
+profiler-working-more =
+    { $count ->
+        [one] Y una más.
+       *[other] Y { $count } más.
+    }
+profiler-requests = Tiempo atendiendo solicitudes
+profiler-requests-what = Cada barra son diez segundos de solicitudes, con su tiempo repartido según adónde se fue.
+profiler-part-db = Base de datos
+profiler-part-db-title = Esperando a la base de datos y ejecutando sus consultas
+profiler-part-disk = Disco
+profiler-part-disk-title = Leyendo archivos guardados y comprimiendo lo que se envía
+profiler-part-send = Envío
+profiler-part-send-title = Esperando mientras la red recibe lo enviado
+profiler-part-other = Otro
+profiler-part-other-title = Preparando la respuesta
+profiler-request-count =
+    { $count ->
+        [one] { $count } solicitud
+       *[other] { $count } solicitudes
+    }
+profiler-requests-none = Ninguna solicitud en los últimos diez minutos.
+profiler-slowest = La más lenta: { $route }, { $time }
+profiler-routes = Por ruta
+profiler-route = Ruta
+profiler-count = Solicitudes
+profiler-average = Promedio
+profiler-p95 = El 5% más lento
+profiler-split = Adónde se fue el tiempo
+profiler-sent = Enviado
+profiler-portal = los archivos propios de la interfaz
+
 ## SettingsPage.vue: Rendimiento
 
 settings-render = Miniaturas 3D

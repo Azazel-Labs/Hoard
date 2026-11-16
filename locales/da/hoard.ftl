@@ -2302,6 +2302,51 @@ settings-public-url = Offentlig adresse
 settings-public-url-placeholder = Fra browserens adresse (f.eks. https://hoard.example.com)
 settings-public-url-default = fra browserens adresse
 
+## ProfilerPanel.vue: profileringen øverst i Indstillinger → Ydeevne
+
+profiler = Profilering
+profiler-what = Hvad Hoard har lavet de seneste ti minutter, opdateret hvert andet sekund, mens du ser på. Det gemmes kun i hukommelsen og starter forfra, når Hoard genstarter.
+profiler-starting = De første målinger kommer om et øjeblik.
+profiler-failed = Kunne ikke læse profileringen: { $error }
+profiler-cpu = Processorforbrug
+profiler-cpu-hoard = Hoard
+profiler-cpu-machine = Hele maskinen
+profiler-cpu-summary = Hoard bruger { $hoard } af processorerne, og hele maskinen { $machine }.
+profiler-memory = Hukommelse
+profiler-serving = Forespørgsler i gang
+profiler-working = Arbejder på
+profiler-working-none = Intet kørte i baggrunden.
+profiler-working-more =
+    { $count ->
+        [one] Og én mere.
+       *[other] Og { $count } mere.
+    }
+profiler-requests = Tid brugt på forespørgsler
+profiler-requests-what = Hver søjle er ti sekunders forespørgsler, med tiden fordelt efter, hvor den gik hen.
+profiler-part-db = Database
+profiler-part-db-title = Venter på databasen og kører dens opslag
+profiler-part-disk = Disk
+profiler-part-disk-title = Læser gemte filer og komprimerer det, der sendes
+profiler-part-send = Afsendelse
+profiler-part-send-title = Venter, mens netværket tager imod det sendte
+profiler-part-other = Andet
+profiler-part-other-title = Regner svaret ud
+profiler-request-count =
+    { $count ->
+        [one] { $count } forespørgsel
+       *[other] { $count } forespørgsler
+    }
+profiler-requests-none = Ingen forespørgsler de seneste ti minutter.
+profiler-slowest = Langsomst: { $route }, { $time }
+profiler-routes = Efter rute
+profiler-route = Rute
+profiler-count = Forespørgsler
+profiler-average = Gennemsnit
+profiler-p95 = Langsomste 5 %
+profiler-split = Hvor tiden gik hen
+profiler-sent = Sendt
+profiler-portal = grænsefladens egne filer
+
 ## SettingsPage.vue: Ydeevne
 
 settings-render = 3D-miniaturer

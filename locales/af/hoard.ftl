@@ -2300,6 +2300,51 @@ settings-public-url = Publieke adres
 settings-public-url-placeholder = Uit die blaaier se adres (bv. https://hoard.example.com)
 settings-public-url-default = uit die blaaier se adres
 
+## ProfilerPanel.vue: die profileerder bo-aan Instellings → Werkverrigting
+
+profiler = Profileerder
+profiler-what = Wat Hoard die afgelope tien minute gedoen het, elke twee sekondes bygewerk terwyl jy kyk. Dit word net in die geheue gehou en begin oor wanneer Hoard herbegin.
+profiler-starting = Die eerste lesings kom binne 'n oomblik.
+profiler-failed = Kon nie die profileerder lees nie: { $error }
+profiler-cpu = Verwerkergebruik
+profiler-cpu-hoard = Hoard
+profiler-cpu-machine = Hele masjien
+profiler-cpu-summary = Hoard gebruik { $hoard } van die verwerkers, en die hele masjien { $machine }.
+profiler-memory = Geheue
+profiler-serving = Versoeke aan die gang
+profiler-working = Besig met
+profiler-working-none = Niks het in die agtergrond geloop nie.
+profiler-working-more =
+    { $count ->
+        [one] En nog een.
+       *[other] En nog { $count }.
+    }
+profiler-requests = Tyd aan versoeke bestee
+profiler-requests-what = Elke staaf is tien sekondes se versoeke, hul tyd verdeel volgens waarheen dit gegaan het.
+profiler-part-db = Databasis
+profiler-part-db-title = Wag vir die databasis en voer sy navrae uit
+profiler-part-disk = Skyf
+profiler-part-disk-title = Lees gestoorde lêers, en pers saam wat gestuur word
+profiler-part-send = Stuur
+profiler-part-send-title = Wag terwyl die netwerk neem wat gestuur is
+profiler-part-other = Ander
+profiler-part-other-title = Werk die antwoord uit
+profiler-request-count =
+    { $count ->
+        [one] { $count } versoek
+       *[other] { $count } versoeke
+    }
+profiler-requests-none = Geen versoeke in die afgelope tien minute nie.
+profiler-slowest = Stadigste: { $route }, { $time }
+profiler-routes = Volgens roete
+profiler-route = Roete
+profiler-count = Versoeke
+profiler-average = Gemiddeld
+profiler-p95 = Stadigste 5%
+profiler-split = Waarheen die tyd gegaan het
+profiler-sent = Gestuur
+profiler-portal = die koppelvlak se eie lêers
+
 ## SettingsPage.vue: Werkverrigting
 
 settings-render = 3D-duimnaels

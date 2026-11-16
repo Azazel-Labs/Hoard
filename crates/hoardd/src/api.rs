@@ -97,6 +97,7 @@ pub(crate) fn router(state: &AppState) -> Router<AppState> {
         .route("/api/admin/chatgpt/sign-out", post(crate::chatgpt::sign_out_route))
         .route("/api/admin/chatgpt/models", get(crate::chatgpt::list_models))
         .route("/api/admin/jobs", get(admin_jobs))
+        .route("/api/admin/profile", get(crate::profiler::handler))
         .merge(crate::format_wizard::router())
         .merge(crate::auth::admin_router())
         .merge(crate::signin::admin_router())
@@ -1012,7 +1013,7 @@ pub(crate) async fn serve_blob(
     }
     let range = parse_range(headers);
     let partial = range.is_some();
-    let read = match state.blobs.read(hash, range).await {
+    let read = match crate::profiler::disk(state.blobs.read(hash, range)).await {
         Ok(Some(r)) => r,
         Ok(None) => return Err(AppError::not_found(tr!("error-blob-not-found", hash = hash))),
         Err(_) if partial => return Ok(StatusCode::RANGE_NOT_SATISFIABLE.into_response()),

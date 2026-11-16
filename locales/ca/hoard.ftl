@@ -2307,6 +2307,51 @@ settings-public-url = Adreça pública
 settings-public-url-placeholder = De l'adreça del navegador (p. ex. https://hoard.example.com)
 settings-public-url-default = de l'adreça del navegador
 
+## ProfilerPanel.vue: el perfilador a dalt de Configuració → Rendiment
+
+profiler = Perfilador
+profiler-what = El que ha fet Hoard els darrers deu minuts, actualitzat cada dos segons mentre ho mireu. Només es guarda a la memòria i torna a començar quan Hoard es reinicia.
+profiler-starting = Les primeres lectures arriben d'aquí a un moment.
+profiler-failed = No s'ha pogut llegir el perfilador: { $error }
+profiler-cpu = Ús del processador
+profiler-cpu-hoard = Hoard
+profiler-cpu-machine = Tota la màquina
+profiler-cpu-summary = Hoard fa servir el { $hoard } dels processadors, i tota la màquina, el { $machine }.
+profiler-memory = Memòria
+profiler-serving = Sol·licituds en curs
+profiler-working = Treballant en
+profiler-working-none = No s'ha executat res en segon pla.
+profiler-working-more =
+    { $count ->
+        [one] I una més.
+       *[other] I { $count } més.
+    }
+profiler-requests = Temps atenent sol·licituds
+profiler-requests-what = Cada barra són deu segons de sol·licituds, amb el temps repartit segons on ha anat.
+profiler-part-db = Base de dades
+profiler-part-db-title = Esperant la base de dades i executant-ne les consultes
+profiler-part-disk = Disc
+profiler-part-disk-title = Llegint fitxers desats i comprimint el que s'envia
+profiler-part-send = Enviament
+profiler-part-send-title = Esperant mentre la xarxa recull el que s'ha enviat
+profiler-part-other = Altres
+profiler-part-other-title = Elaborant la resposta
+profiler-request-count =
+    { $count ->
+        [one] { $count } sol·licitud
+       *[other] { $count } sol·licituds
+    }
+profiler-requests-none = Cap sol·licitud en els darrers deu minuts.
+profiler-slowest = La més lenta: { $route }, { $time }
+profiler-routes = Per ruta
+profiler-route = Ruta
+profiler-count = Sol·licituds
+profiler-average = Mitjana
+profiler-p95 = El 5 % més lent
+profiler-split = On ha anat el temps
+profiler-sent = Enviat
+profiler-portal = els fitxers de la mateixa interfície
+
 ## SettingsPage.vue: Rendiment
 
 settings-render = Miniatures 3D

@@ -2344,6 +2344,51 @@ settings-public-url = Adresse publique
 settings-public-url-placeholder = D’après l’adresse du navigateur (p. ex. https://hoard.example.com)
 settings-public-url-default = d’après l’adresse du navigateur
 
+## ProfilerPanel.vue : le profileur en haut de Paramètres → Performances
+
+profiler = Profileur
+profiler-what = Ce que Hoard a fait ces dix dernières minutes, mis à jour toutes les deux secondes pendant que vous regardez. Ces données ne sont gardées qu’en mémoire et repartent de zéro quand Hoard redémarre.
+profiler-starting = Les premières mesures arrivent dans un instant.
+profiler-failed = Impossible de lire le profileur : { $error }
+profiler-cpu = Utilisation du processeur
+profiler-cpu-hoard = Hoard
+profiler-cpu-machine = Machine entière
+profiler-cpu-summary = Hoard utilise { $hoard } des processeurs, et la machine entière { $machine }.
+profiler-memory = Mémoire
+profiler-serving = Requêtes en cours
+profiler-working = En cours
+profiler-working-none = Rien n’a tourné en arrière-plan.
+profiler-working-more =
+    { $count ->
+        [one] Et encore une.
+       *[other] Et encore { $count }.
+    }
+profiler-requests = Temps passé à servir les requêtes
+profiler-requests-what = Chaque barre représente dix secondes de requêtes, leur temps réparti selon l’endroit où il est passé.
+profiler-part-db = Base de données
+profiler-part-db-title = Attente de la base de données et exécution de ses requêtes SQL
+profiler-part-disk = Disque
+profiler-part-disk-title = Lecture des fichiers stockés et compression de ce qui est envoyé
+profiler-part-send = Envoi
+profiler-part-send-title = Attente pendant que le réseau prend ce qui a été envoyé
+profiler-part-other = Autre
+profiler-part-other-title = Élaboration de la réponse
+profiler-request-count =
+    { $count ->
+        [one] { $count } requête
+       *[other] { $count } requêtes
+    }
+profiler-requests-none = Aucune requête ces dix dernières minutes.
+profiler-slowest = La plus lente : { $route }, { $time }
+profiler-routes = Par route
+profiler-route = Route
+profiler-count = Requêtes
+profiler-average = Moyenne
+profiler-p95 = 5 % les plus lentes
+profiler-split = Où le temps est passé
+profiler-sent = Envoyé
+profiler-portal = les fichiers de l’interface elle-même
+
 ## SettingsPage.vue : Performances
 
 settings-render = Miniatures 3D

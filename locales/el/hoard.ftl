@@ -2384,6 +2384,51 @@ settings-public-url = Δημόσια διεύθυνση
 settings-public-url-placeholder = Από τη διεύθυνση του προγράμματος περιήγησης (π.χ. https://hoard.example.com)
 settings-public-url-default = από τη διεύθυνση του προγράμματος περιήγησης
 
+## ProfilerPanel.vue: the profiler at the top of Settings → Performance
+
+profiler = Αναλυτής επιδόσεων
+profiler-what = Τι έκανε το Hoard τα τελευταία δέκα λεπτά, με ενημέρωση κάθε δύο δευτερόλεπτα όσο το παρακολουθείτε. Κρατιέται μόνο στη μνήμη και ξεκινά από την αρχή όταν το Hoard επανεκκινείται.
+profiler-starting = Οι πρώτες μετρήσεις έρχονται σε λίγο.
+profiler-failed = Δεν ήταν δυνατή η ανάγνωση του αναλυτή επιδόσεων: { $error }
+profiler-cpu = Χρήση επεξεργαστή
+profiler-cpu-hoard = Hoard
+profiler-cpu-machine = Όλο το μηχάνημα
+profiler-cpu-summary = Το Hoard χρησιμοποιεί το { $hoard } των επεξεργαστών και όλο το μηχάνημα το { $machine }.
+profiler-memory = Μνήμη
+profiler-serving = Αιτήματα σε εξέλιξη
+profiler-working = Εργάζεται σε
+profiler-working-none = Τίποτα δεν εκτελέστηκε στο παρασκήνιο.
+profiler-working-more =
+    { $count ->
+        [one] Και μία ακόμη.
+       *[other] Και { $count } ακόμη.
+    }
+profiler-requests = Χρόνος εξυπηρέτησης αιτημάτων
+profiler-requests-what = Κάθε μπάρα είναι δέκα δευτερόλεπτα αιτημάτων, με τον χρόνο τους χωρισμένο ανάλογα με το πού πήγε.
+profiler-part-db = Βάση δεδομένων
+profiler-part-db-title = Αναμονή για τη βάση δεδομένων και εκτέλεση των ερωτημάτων της
+profiler-part-disk = Δίσκος
+profiler-part-disk-title = Ανάγνωση αποθηκευμένων αρχείων και συμπίεση όσων στέλνονται
+profiler-part-send = Αποστολή
+profiler-part-send-title = Αναμονή όσο το δίκτυο παραλαμβάνει όσα στάλθηκαν
+profiler-part-other = Άλλο
+profiler-part-other-title = Υπολογισμός της απάντησης
+profiler-request-count =
+    { $count ->
+        [one] { $count } αίτημα
+       *[other] { $count } αιτήματα
+    }
+profiler-requests-none = Κανένα αίτημα τα τελευταία δέκα λεπτά.
+profiler-slowest = Πιο αργό: { $route }, { $time }
+profiler-routes = Ανά διαδρομή
+profiler-route = Διαδρομή
+profiler-count = Αιτήματα
+profiler-average = Μέσος όρος
+profiler-p95 = Πιο αργό 5%
+profiler-split = Πού πήγε ο χρόνος
+profiler-sent = Στάλθηκαν
+profiler-portal = τα αρχεία της ίδιας της διεπαφής
+
 ## SettingsPage.vue: Performance
 
 settings-render = Μικρογραφίες 3D

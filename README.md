@@ -363,7 +363,8 @@ software rasterizer (`apt install mesa-vulkan-drivers`). Without any adapter, ev
      automatically".
 5. **Link.** glTF buffers/images, OBJ → MTL → textures, FBX texture paths (absolute artist paths are matched by file
    name), DAE images, `.blend` external textures and linked libraries (`//` paths resolved relative to the file),
-   `Model@Clip.fbx` animation clips, and name-based guesses for models that reference nothing. Game-engine and
+   `Model@Clip.fbx` animation clips, and name-based guesses for models that reference nothing (from the model's own
+   part of the pack: its folder's parent and below, so `Models/` and `Textures/` side by side). Game-engine and
    tool files link too: Unity materials, prefabs, scenes and controllers through their GUIDs; Tiled maps → tilesets
    → images; LDtk projects; BMFont `.fnt` → page images; Spine/libGDX `.atlas` → pages; TexturePacker JSON;
    Godot `.tres`/`.tscn` resources; and Unreal package imports.
@@ -404,6 +405,11 @@ Megascans, Poly Haven, ambientCG, Substance and Unreal (`T_Rock_N`), and knows b
 DirectX), roughness, gloss, metalness, ambient occlusion, height, bump, cavity, specular, opacity, emissive and packed
 maps (ORM, ARM, MRA, RMA). The same set in several sizes (`Rock_2K_…`, `Rock_4K_…`, or `2K/` and `4K/` folders) is
 one material. It takes a color map plus one more, or two other kinds of map.
+
+A Unity material (`.mat`, text or binary) becomes one too: its textures are found through the GUIDs their `.meta` files
+give them, and its color, metalness, smoothness, glow, cutout and tiling are kept as the material's look, which the
+sphere thumbnail and the 3D viewers draw it with. A `.mat` with only a color (Kenney's kits) is a swatch of that
+color. The `.mat` itself is hidden behind the material, and a set of maps found by name that it uses gives way to it.
 
 - **In the grid**, a material searches, filters, tags and collects like any asset. Its maps are hidden; "Show" next
   to "supporting files hidden" brings them back.

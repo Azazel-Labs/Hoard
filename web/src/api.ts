@@ -89,6 +89,22 @@ export interface MaterialInfo {
   physical_size?: [number, number]
   /** How far its height map reaches, in meters, when the store says. */
   displacement?: number
+  /** The settings its maps are drawn with, when it was read from an engine's material (a Unity .mat). */
+  look?: MaterialLook
+}
+
+/** An engine material's settings: colors are linear, factors 0..1. */
+export interface MaterialLook {
+  base_color?: [number, number, number, number]
+  metallic?: number
+  roughness?: number
+  emissive?: [number, number, number]
+  alpha_mode?: 'mask' | 'blend'
+  alpha_cutoff?: number
+  normal_scale?: number
+  occlusion_strength?: number
+  uv_scale?: [number, number]
+  uv_offset?: [number, number]
 }
 
 export type MapRole =

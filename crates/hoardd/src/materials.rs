@@ -11,13 +11,18 @@
 //! A store's JSON beside the maps (a Megascans `<id>.json`) names the material, says what each listed map is where
 //! the file name doesn't, and gives a surface's real size and height, which the material's facts carry.
 //!
+//! A Unity material (`.mat`, text or binary) is read into one: its textures found through the GUIDs their `.meta`
+//! files give them, and its color, metal, smoothness, glow, cutout and tiling kept as the material's look, which
+//! its thumbnail and the 3D viewer draw it with. The `.mat` goes behind the material as its source file, and a
+//! set found by name that shares a map with it gives way to it.
+//!
 //! Detection runs after a pack is ingested or re-tagged, and as a `materials` job for packs from before it existed.
 
 use std::collections::{BTreeMap, BTreeSet, HashMap, HashSet};
 use std::path::{Path, PathBuf};
 
 use anyhow::{Context as _, Result};
-use hoard_core::{AssetKind, MaterialInfo, MaterialMap, TagSource};
+use hoard_core::{AssetKind, MaterialInfo, MaterialLook, MaterialMap, TagSource};
 use rusqlite::{Connection, OptionalExtension, params};
 use tokio::runtime::Handle;
 
@@ -372,7 +377,7 @@ pub(crate) fn role_of_word(word: &str) -> Option<Role> {
 }
 
 /// One material found among a pack's textures.
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq)]
 pub(crate) struct Found {
     /// The material's own path: `<folder>/<name>.material`.
     pub(crate) path: String,
@@ -381,6 +386,10 @@ pub(crate) struct Found {
     pub(crate) key: String,
     /// (index into the candidates, role, resolution), by role then largest first.
     pub(crate) maps: Vec<(usize, Role, Option<String>)>,
+    /// How an engine's material says to draw the maps.
+    pub(crate) look: Option<MaterialLook>,
+    /// The engine's material it was read from (a Unity `.mat`): its asset id and path.
+    pub(crate) source: Option<(String, String)>,
 }
 
 fn dir_of(path: &str) -> &str {
@@ -471,7 +480,8 @@ pub(crate) fn find(textures: &[Candidate<'_>]) -> Vec<Found> {
             })
             .collect();
         maps.sort_by(|a, b| a.1.cmp(&b.1).then(b.3.cmp(&a.3)).then(textures[a.0].path.cmp(textures[b.0].path)));
-        out.push(Found { path, name, key, maps: maps.into_iter().map(|(i, r, res, _)| (i, r, res)).collect() });
+        let maps = maps.into_iter().map(|(i, r, res, _)| (i, r, res)).collect();
+        out.push(Found { path, name, key, maps, look: None, source: None });
     }
     out
 }
@@ -582,6 +592,9 @@ impl Made {
         resolutions.sort_by_key(|r| std::cmp::Reverse(res_px(r)));
         resolutions.dedup();
         let mut meta = serde_json::json!({ "material_maps": f.maps.len(), "roles": roles, "resolutions": resolutions });
+        if let Some(look) = &f.look {
+            meta["look"] = serde_json::to_value(look).unwrap_or_default();
+        }
         if let Some(size) = self.physical_size {
             meta["physical_size"] = serde_json::json!(size);
         }
@@ -616,7 +629,95 @@ fn descriptor(
     if let Some(d) = displacement {
         descriptor["displacement_m"] = serde_json::json!(d);
     }
+    if let Some(look) = &f.look {
+        descriptor["look"] = serde_json::to_value(look).unwrap_or_default();
+    }
+    if let Some((_, source)) = &f.source {
+        descriptor["source"] = serde_json::json!(db::strip_dir(source, dir));
+    }
     descriptor
+}
+
+/// The pack's Unity materials (`.mat`), each with the textures it points at through their `.meta` GUIDs and the
+/// look it gives them. A file that isn't a material Hoard can read is left as it is.
+fn unity_materials(
+    state: &AppState,
+    rt: &Handle,
+    conn: &Connection,
+    pack_id: &str,
+    textures: &[Texture],
+) -> Result<Vec<Found>> {
+    let files: Vec<(String, String, String)> = conn
+        .prepare("SELECT id, path, blob_hash FROM assets WHERE pack_id = ?1 AND ext = 'mat' ORDER BY path")?
+        .query_map([pack_id], |r| Ok((r.get(0)?, r.get(1)?, r.get(2)?)))?
+        .collect::<rusqlite::Result<_>>()?;
+    if files.is_empty() {
+        return Ok(Vec::new());
+    }
+    let guids: HashMap<String, String> = conn
+        .prepare("SELECT guid, path FROM unity_guids WHERE pack_id = ?1")?
+        .query_map([pack_id], |r| Ok((r.get(0)?, r.get(1)?)))?
+        .collect::<rusqlite::Result<_>>()?;
+    let by_path: HashMap<&str, usize> = textures.iter().enumerate().map(|(i, t)| (t.path.as_str(), i)).collect();
+    let mut out = Vec::new();
+    for (id, path, hash) in files {
+        let bytes = rt.block_on(state.blobs.read_all(&hash))?;
+        let mat = match crate::unitymat::parse(&bytes) {
+            Ok(m) => m,
+            Err(e) => {
+                tracing::debug!(file = %path, error = %format!("{e:#}"), "not a Unity material Hoard reads");
+                continue;
+            }
+        };
+        let mut maps: Vec<(usize, Role, Option<String>)> = mat
+            .maps()
+            .into_iter()
+            .filter_map(|(role, guid)| {
+                let &i = by_path.get(guids.get(guid)?.as_str())?;
+                Some((i, role, textures[i].size_px.map(resolution_label)))
+            })
+            .collect();
+        maps.sort_by_key(|(_, role, _)| *role);
+        let smoothness = mat
+            .smoothness_in()
+            .and_then(|s| maps.iter().find(|(_, role, _)| *role == s.role))
+            .and_then(|(i, ..)| mean_alpha(state, rt, &textures[*i]));
+        let look = mat.look(smoothness);
+        let (dir, stem) = (dir_of(&path), stem_of(&path));
+        let base = Some(mat.name.trim()).filter(|n| !n.is_empty()).unwrap_or(stem);
+        let key = tokens(base).into_iter().map(|t| t.text).collect::<Vec<_>>().join("_");
+        out.push(Found {
+            path: if dir.is_empty() { format!("{stem}.material") } else { format!("{dir}/{stem}.material") },
+            name: material_name(base, dir),
+            key,
+            maps,
+            look: Some(look).filter(|l| *l != MaterialLook::default()),
+            source: Some((id, path.clone())),
+        });
+    }
+    Ok(out)
+}
+
+/// How opaque a texture is on average, from its thumbnail: where Unity keeps a material's smoothness.
+fn mean_alpha(state: &AppState, rt: &Handle, t: &Texture) -> Option<f32> {
+    let bytes = rt.block_on(state.blobs.read_all(t.thumb.as_ref()?)).ok()?;
+    let img = image::load_from_memory(&bytes).ok()?.to_rgba8();
+    let n = (img.width() * img.height()).max(1);
+    Some(img.pixels().map(|p| f32::from(p[3])).sum::<f32>() / 255.0 / n as f32)
+}
+
+/// Put the Unity materials first, in place of any set found by name that shares a map or a path with one.
+fn prefer_unity(found: Vec<Found>, unity: Vec<Found>) -> Vec<Found> {
+    let paths: HashSet<String> = unity.iter().map(|f| f.path.to_lowercase()).collect();
+    let used: HashSet<usize> = unity.iter().flat_map(|f| f.maps.iter().map(|(i, ..)| *i)).collect();
+    let mut seen = HashSet::new();
+    let mut out: Vec<Found> = unity.into_iter().filter(|f| seen.insert(f.path.to_lowercase())).collect();
+    out.extend(
+        found
+            .into_iter()
+            .filter(|f| !paths.contains(&f.path.to_lowercase()) && !f.maps.iter().any(|(i, ..)| used.contains(i))),
+    );
+    out
 }
 
 /// The materials in a pack's textures, made into assets, and the models that use them linked.
@@ -653,6 +754,7 @@ fn find_materials(state: &AppState, rt: &Handle, conn: &mut Connection, pack_id:
         .collect();
     let mut found = find(&candidates);
     name_from_sidecars(&sidecars, &mut found);
+    let found = prefer_unity(found, unity_materials(state, rt, conn, pack_id, &textures)?);
     let existing: HashMap<String, (String, String, bool, bool)> = {
         let mut stmt = conn.prepare(&format!(
             "SELECT a.path, a.id, a.blob_hash, a.thumb_hash IS NOT NULL, {IS_MATERIAL} FROM assets a WHERE a.pack_id = ?1
@@ -736,7 +838,11 @@ fn find_materials(state: &AppState, rt: &Handle, conn: &mut Connection, pack_id:
                 f.name,
                 category,
                 meta.to_string(),
-                format!("{} material pbr", tagger::fts_words(&f.path)),
+                format!(
+                    "{} material pbr{}",
+                    tagger::fts_words(&f.path),
+                    if f.source.is_some() { " unity" } else { "" }
+                ),
                 m.thumb.as_ref().map(|t| t.hash.clone()),
                 now,
             ],
@@ -760,6 +866,7 @@ fn find_materials(state: &AppState, rt: &Handle, conn: &mut Connection, pack_id:
                 params![id, t],
             )?;
         }
+        link_source(&tx, &id, f)?;
     }
     // Materials whose maps are gone (or no longer form a set).
     for (id, _, _, synthetic) in existing.values() {
@@ -771,6 +878,22 @@ fn find_materials(state: &AppState, rt: &Handle, conn: &mut Connection, pack_id:
     tie_up(&tx, pack_id, &were_maps)?;
     tx.commit()?;
     Ok(made.len())
+}
+
+/// The engine's material a material was read from goes behind it.
+fn link_source(tx: &Connection, id: &str, f: &Found) -> Result<()> {
+    tx.execute(
+        "DELETE FROM asset_links WHERE from_id = ?1 AND rel = 'sidecar'
+           AND to_id IN (SELECT id FROM assets WHERE ext = 'mat')",
+        [id],
+    )?;
+    if let Some((source, _)) = &f.source {
+        tx.execute(
+            "INSERT INTO asset_links (from_id, to_id, rel) VALUES (?1, ?2, 'sidecar') ON CONFLICT DO NOTHING",
+            params![id, source],
+        )?;
+    }
+    Ok(())
 }
 
 /// Once a pack's materials are in: name their maps, put the materials on the models, and group the pack's files.
@@ -1026,11 +1149,14 @@ fn res_px(r: &str) -> u32 {
 fn material_tags(tx: &Connection, textures: &[Texture], f: &Found) -> Result<TagSet> {
     const DROP_PREFIX: &[&str] = &["map:", "set:", "format:", "depth:", "res:"];
     const DROP: &[&str] = &["pot", "square", "alpha", "spritesheet", "frames", "hdr", "hdri", "sky", "layered"];
-    let lead = f.maps.iter().find(|(_, r, _)| *r == Role::BaseColor).unwrap_or(&f.maps[0]);
+    let lead = f.maps.iter().find(|(_, r, _)| *r == Role::BaseColor).or(f.maps.first());
     let mut stmt = tx.prepare_cached("SELECT tag, source, confidence FROM asset_tags WHERE asset_id = ?1")?;
-    let rows: Vec<(String, String, f64)> = stmt
-        .query_map([&textures[lead.0].id], |r| Ok((r.get(0)?, r.get(1)?, r.get(2)?)))?
-        .collect::<rusqlite::Result<_>>()?;
+    let rows: Vec<(String, String, f64)> = match lead {
+        Some(lead) => stmt
+            .query_map([&textures[lead.0].id], |r| Ok((r.get(0)?, r.get(1)?, r.get(2)?)))?
+            .collect::<rusqlite::Result<_>>()?,
+        None => Vec::new(),
+    };
     let mut tags = TagSet::default();
     for (tag, source, confidence) in rows {
         if DROP_PREFIX.iter().any(|p| tag.starts_with(p)) || DROP.contains(&tag.as_str()) {
@@ -1167,7 +1293,7 @@ fn mark_owned(tx: &Connection, pack_id: &str) -> Result<()> {
 
 /// Shade a sphere from the maps' thumbnails. None when there's nothing to shade it with.
 fn render_thumb(state: &AppState, rt: &Handle, textures: &[Texture], f: &Found) -> Result<Option<Vec<u8>>> {
-    use hoard_render::sphere::{Maps, Packed, render_sphere};
+    use hoard_render::sphere::{Alpha, Factors, Maps, Packed, render_sphere};
     // The first map of each role that has a thumbnail (they're ordered largest first).
     let mut by_role: HashMap<Role, image::RgbaImage> = HashMap::new();
     for (i, role, _) in &f.maps {
@@ -1183,9 +1309,24 @@ fn render_thumb(state: &AppState, rt: &Handle, textures: &[Texture], f: &Found) 
             Err(e) => tracing::debug!(map = %textures[*i].path, error = %e, "unreadable map thumbnail"),
         }
     }
-    if by_role.is_empty() {
+    if by_role.is_empty() && f.look.is_none() {
         return Ok(None);
     }
+    let factors = f.look.as_ref().map_or_else(Factors::default, |l| Factors {
+        base_color: l.base_color,
+        metallic: l.metallic,
+        roughness: l.roughness,
+        emissive: l.emissive,
+        alpha: match l.alpha_mode.as_deref() {
+            Some("mask") => Alpha::Mask(l.alpha_cutoff.unwrap_or(0.5)),
+            Some("blend") => Alpha::Blend,
+            _ => Alpha::Opaque,
+        },
+        uv_scale: l.uv_scale.unwrap_or([1.0, 1.0]),
+        uv_offset: l.uv_offset.unwrap_or([0.0, 0.0]),
+        normal_scale: l.normal_scale.unwrap_or(1.0),
+        occlusion_strength: l.occlusion_strength.unwrap_or(1.0),
+    });
     let mut take = |r: Role| by_role.remove(&r);
     let (normal, normal_dx) = match take(Role::Normal) {
         Some(n) => (Some(n), false),
@@ -1212,6 +1353,7 @@ fn render_thumb(state: &AppState, rt: &Handle, textures: &[Texture], f: &Found) 
         opacity: take(Role::Opacity),
         emissive: take(Role::Emissive),
         packed,
+        factors,
     };
     let img = render_sphere(&maps, THUMB_SIZE);
     Ok(Some(crate::analyze::png_bytes(img)?))
@@ -1255,16 +1397,17 @@ fn info(conn: &Connection, id: &str) -> Result<Option<MaterialInfo>> {
     maps.sort_by(|a, b| {
         order(a).cmp(&order(b)).then(b.width.unwrap_or(0).cmp(&a.width.unwrap_or(0))).then(a.path.cmp(&b.path))
     });
-    Ok(Some(MaterialInfo { id: id.to_owned(), name, path, has_thumb, maps, physical_size, displacement }))
+    let look = serde_json::from_value::<MaterialLook>(meta["look"].clone()).ok();
+    Ok(Some(MaterialInfo { id: id.to_owned(), name, path, has_thumb, maps, physical_size, displacement, look }))
 }
 
 /// Fill in an asset's material facts: a material's maps, or the materials a texture is part of or a model uses
 /// (through a map it links to, or linked by name).
 pub(crate) fn attach(conn: &Connection, asset: &mut hoard_core::Asset) -> Result<()> {
-    let is_material: bool =
-        conn.query_row("SELECT EXISTS (SELECT 1 FROM material_maps WHERE material_id = ?1)", [&asset.id], |r| {
-            r.get(0)
-        })?;
+    let is_material = conn
+        .query_row(&format!("SELECT {IS_MATERIAL} FROM assets a WHERE a.id = ?1"), [&asset.id], |r| r.get(0))
+        .optional()?
+        .unwrap_or(false);
     if is_material {
         asset.material = info(conn, &asset.id)?;
         return Ok(());
@@ -1324,7 +1467,14 @@ mod tests {
         ];
         let mut found: Vec<Found> = ["Plate/Plate.material", "Iron/Rusty.material", "Other/Thing.material"]
             .into_iter()
-            .map(|p| Found { path: p.to_owned(), name: "x".to_owned(), key: String::new(), maps: Vec::new() })
+            .map(|p| Found {
+                path: p.to_owned(),
+                name: "x".to_owned(),
+                key: String::new(),
+                maps: Vec::new(),
+                look: None,
+                source: None,
+            })
             .collect();
         name_from_sidecars(&sidecars, &mut found);
         assert_eq!(found.iter().map(|f| f.name.as_str()).collect::<Vec<_>>(), ["Metal Plate", "Rusty Iron", "x"]);

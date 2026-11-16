@@ -566,14 +566,18 @@ export class ModelStage {
   }
 
   /** Whether the model paints its surfaces with colors of its own (Kenney's kits: tire gray, paint red), so a
-   *  texture found by name (most likely a 2D sprite of it) would only cover them up. */
+   *  texture found by name (most likely a 2D sprite of it) would only cover them up: two colors besides white, or
+   *  one that isn't a gray (a white body with orange trim). */
   private colored(): boolean {
     const colors = new Set<number>()
+    let hue = false
     for (const m of this.materials.keys()) {
-      const c = m.color?.getHex()
-      if (c !== undefined && c !== 0xffffff) colors.add(c)
+      const c = m.color
+      if (!c || c.getHex() === 0xffffff) continue
+      colors.add(c.getHex())
+      hue ||= Math.max(c.r, c.g, c.b) - Math.min(c.r, c.g, c.b) > 0.05
     }
-    return colors.size > 1
+    return colors.size > 1 || hue
   }
 
   private applyGuesses(guesses: AssetLink[], packId: string, flipY: boolean, manager: THREE.LoadingManager): number {

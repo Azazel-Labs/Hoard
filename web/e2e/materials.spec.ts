@@ -1,3 +1,4 @@
+import { createHash } from 'node:crypto'
 import { MEGASCANS } from './support/seed'
 import { checker, MEGASCANS_FOLDER, quadGltf, zipNames } from './support/files'
 import type { Page } from '@playwright/test'
@@ -185,6 +186,52 @@ test.describe('materials', () => {
     const model = assets.find((a) => a.kind === 'model')!
     const full = (await (await api.get(`/api/assets/${model.id}`)).json()) as { meta: { thumb_dressed?: string } }
     expect(full.meta.thumb_dressed).toBeTruthy()
+    await api.delete(`/api/packs/${pack.id}`)
+  })
+
+  // A Unity material is read into one: its texture found through the GUID the texture's .meta gives it, its color,
+  // smoothness and tiling kept as its look, and the .mat itself hidden behind it.
+  test('a Unity .mat becomes a material with its texture and color, the .mat behind it', async ({ baseURL }) => {
+    const api = await signedIn(baseURL!)
+    const guid = createHash('md5').update('e2e-unity-planks').digest('hex')
+    const mat =
+      '%YAML 1.1\n%TAG !u! tag:unity3d.com,2011:\n--- !u!21 &2100000\nMaterial:\n  m_Name: Planks\n' +
+      '  m_SavedProperties:\n' +
+      `    m_TexEnvs:\n    - _MainTex:\n        m_Texture: {fileID: 2800000, guid: ${guid}, type: 3}\n` +
+      '        m_Scale: {x: 2, y: 2}\n        m_Offset: {x: 0, y: 0}\n' +
+      '    m_Floats:\n    - _Glossiness: 0.25\n    - _Metallic: 0\n' +
+      '    m_Colors:\n    - _Color: {r: 1, g: 0.5, b: 0, a: 1}\n'
+    const pack = await uploadPack(api, 'E2E Unity Material', [
+      { relpath: 'Mats/Planks.mat', data: Buffer.from(mat) },
+      { relpath: 'Textures/wood_grain.png', data: checker(64, [180, 140, 90], [120, 90, 60], 8) },
+      {
+        relpath: 'Textures/wood_grain.png.meta',
+        data: Buffer.from(`fileFormatVersion: 2\nguid: ${guid}\nTextureImporter:\n  userData: \n`),
+      },
+    ])
+    await waitReady(api, [pack.id])
+    await waitIdle(api)
+    const assets = (await assetsOf(api, pack.id)) as (Asset & { path: string })[]
+    const material = assets.find((a) => a.path === 'Mats/Planks.material')
+    expect(material, assets.map((a) => a.path).join(', ')).toBeTruthy()
+    const { material: info } = (await (await api.get(`/api/assets/${material!.id}`)).json()) as {
+      material: {
+        name: string
+        maps: { role: string; path: string }[]
+        look?: { base_color?: number[]; roughness?: number; uv_scale?: number[] }
+      }
+    }
+    expect(info.name).toBe('Planks')
+    expect(info.maps.map((m) => [m.role, m.path])).toEqual([['base_color', 'Textures/wood_grain.png']])
+    expect(info.look?.base_color?.[0]).toBeCloseTo(1)
+    expect(info.look?.base_color?.[2]).toBeCloseTo(0)
+    expect(info.look?.roughness).toBeCloseTo(0.75)
+    expect(info.look?.uv_scale).toEqual([2, 2])
+    // With supporting files left out, the .mat is behind the material.
+    const shown = await api.get('/api/assets', { params: { pack: pack.id, hide_supporting: true, facets: false } })
+    const paths = ((await shown.json()) as { items: (Asset & { path: string })[] }).items.map((a) => a.path)
+    expect(paths).toContain('Mats/Planks.material')
+    expect(paths).not.toContain('Mats/Planks.mat')
     await api.delete(`/api/packs/${pack.id}`)
   })
 })

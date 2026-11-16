@@ -4,7 +4,8 @@
 //! coordinates, tangent frame), its maps sampled and lit with the usual metal/roughness model: a GGX key light
 //! plus a soft sky and ground. Gloss maps are inverted to roughness, DirectX normal maps have their green flipped,
 //! packed maps (ORM, MRA, RMA) are unpacked, and a height or bump map stands in for a missing normal map. Four
-//! samples a pixel smooth the edge, which is left transparent.
+//! samples a pixel smooth the edge, which is left transparent. An engine material's numbers (tint, metal, roughness,
+//! glow, cutout, tiling) are applied on top of its maps, or stand in for them.
 #![expect(
     clippy::many_single_char_names,
     clippy::similar_names,
@@ -47,6 +48,57 @@ pub struct Maps {
     /// sRGB color.
     pub emissive: Option<RgbaImage>,
     pub packed: Option<(RgbaImage, Packed)>,
+    /// What an engine's material says to draw them with (a Unity `.mat`).
+    pub factors: Factors,
+}
+
+/// How a material's surface lets light through.
+#[derive(Debug, Clone, Copy, Default, PartialEq)]
+pub enum Alpha {
+    /// Solid, save where an opacity map says otherwise.
+    #[default]
+    Opaque,
+    /// Cut out where the color's alpha is under this.
+    Mask(f32),
+    /// See-through by the color's alpha.
+    Blend,
+}
+
+/// The numbers a material's maps are drawn with, as glTF and game engines give them.
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct Factors {
+    /// Linear RGBA multiplying the color map, or the color itself without one.
+    pub base_color: Option<[f32; 4]>,
+    /// Used where no map says how metal it is.
+    pub metallic: Option<f32>,
+    /// Used where no map says how rough it is.
+    pub roughness: Option<f32>,
+    /// Linear, multiplying the emissive map, or the glow itself without one.
+    pub emissive: Option<[f32; 3]>,
+    pub alpha: Alpha,
+    /// Tiling and offset of the texture coordinates.
+    pub uv_scale: [f32; 2],
+    pub uv_offset: [f32; 2],
+    /// How far the normal map tilts the surface.
+    pub normal_scale: f32,
+    /// How much of the occlusion map's darkening shows.
+    pub occlusion_strength: f32,
+}
+
+impl Default for Factors {
+    fn default() -> Self {
+        Self {
+            base_color: None,
+            metallic: None,
+            roughness: None,
+            emissive: None,
+            alpha: Alpha::Opaque,
+            uv_scale: [1.0, 1.0],
+            uv_offset: [0.0, 0.0],
+            normal_scale: 1.0,
+            occlusion_strength: 1.0,
+        }
+    }
 }
 
 /// Times the texture wraps around the sphere: twice around and once top to bottom keeps square texels square.
@@ -154,17 +206,27 @@ impl<'a> Shader<'a> {
             return None;
         }
         let n = Vec3::new(x, y, (1.0 - r2).sqrt());
-        let u = (n.x.atan2(n.z) / (2.0 * PI) + 0.5) * TILE_U;
-        let v = n.y.clamp(-1.0, 1.0).acos() / PI;
+        let fac = &self.maps.factors;
+        let u = (n.x.atan2(n.z) / (2.0 * PI) + 0.5) * TILE_U * fac.uv_scale[0] + fac.uv_offset[0];
+        // Offsets are given with v up; the sphere's v runs down from the top.
+        let v = n.y.clamp(-1.0, 1.0).acos() / PI * fac.uv_scale[1] - fac.uv_offset[1];
         // Along increasing u, and toward the top of the texture (the north pole).
         let tangent = Vec3::new(n.z, 0.0, -n.x).try_normalize().unwrap_or(Vec3::X);
         let bitangent = n.cross(tangent);
         let m = self.maps;
 
-        let base = Self::tex(m.base_color.as_ref()).map_or(Vec3::splat(0.6), |t| self.srgb(t.sample(u, v)));
+        let tint = fac.base_color.unwrap_or([1.0; 4]);
+        let (base, base_alpha) = match Self::tex(m.base_color.as_ref()) {
+            Some(t) => {
+                let s = t.sample(u, v);
+                (self.srgb(s) * Vec3::new(tint[0], tint[1], tint[2]), s[3] / 255.0 * tint[3])
+            }
+            None if fac.base_color.is_some() => (Vec3::new(tint[0], tint[1], tint[2]), tint[3]),
+            None => (Vec3::splat(0.6), 1.0),
+        };
         let packed =
             m.packed.as_ref().and_then(|(img, layout)| Self::tex(Some(img)).map(|t| (t.sample(u, v), *layout)));
-        let (mut ao, mut rough, mut metal) = (1.0, 0.6, 0.0);
+        let (mut ao, mut rough, mut metal) = (1.0, fac.roughness.unwrap_or(0.6), fac.metallic.unwrap_or(0.0));
         if let Some((s, layout)) = packed {
             let c = |i: usize| s[i] / 255.0;
             (ao, rough, metal) = match layout {
@@ -186,6 +248,7 @@ impl<'a> Shader<'a> {
         if let Some(t) = Self::tex(m.cavity.as_ref()) {
             ao *= 0.5 + 0.5 * t.value(u, v);
         }
+        let ao = 1.0 + fac.occlusion_strength * (ao - 1.0);
         let rough = rough.clamp(0.045, 1.0);
 
         let shading_normal = if let Some(t) = Self::tex(m.normal.as_ref()) {
@@ -194,6 +257,8 @@ impl<'a> Shader<'a> {
             if m.normal_dx {
                 tn.y = -tn.y;
             }
+            tn.x *= fac.normal_scale;
+            tn.y *= fac.normal_scale;
             (tangent * tn.x + bitangent * tn.y + n * tn.z.max(0.05)).try_normalize().unwrap_or(n)
         } else if let Some(t) = Self::tex(m.height.as_ref()) {
             let (du, dv) = t.texel_size();
@@ -236,10 +301,17 @@ impl<'a> Shader<'a> {
         let spec_occlusion = ao.powf(0.5 + rough);
         color += diffuse * irradiance * ao + env * (f0 * scale + Vec3::splat(bias)) * spec_occlusion;
 
-        if let Some(t) = Self::tex(m.emissive.as_ref()) {
-            color += self.srgb(t.sample(u, v)) * 1.5;
+        let glow = fac.emissive.map(Vec3::from_array);
+        match Self::tex(m.emissive.as_ref()) {
+            Some(t) => color += self.srgb(t.sample(u, v)) * glow.unwrap_or(Vec3::ONE) * 1.5,
+            None => color += glow.unwrap_or(Vec3::ZERO) * 1.5,
         }
-        let alpha = Self::tex(m.opacity.as_ref()).map_or(1.0, |t| t.value(u, v));
+        let opacity = Self::tex(m.opacity.as_ref()).map(|t| t.value(u, v));
+        let alpha = match fac.alpha {
+            Alpha::Opaque => opacity.unwrap_or(1.0),
+            Alpha::Blend => opacity.unwrap_or(base_alpha),
+            Alpha::Mask(cutoff) => f32::from(u8::from(opacity.unwrap_or(base_alpha) >= cutoff)),
+        };
         Some((aces(color), alpha))
     }
 }
@@ -332,6 +404,17 @@ mod tests {
             ..Maps::default()
         };
         assert_eq!(render_sphere(&packed, 32), render_sphere(&separate, 32));
+    }
+
+    #[test]
+    fn factors_tint_and_cut_out() {
+        let red = Factors { base_color: Some([0.8, 0.02, 0.02, 1.0]), ..Factors::default() };
+        let img = render_sphere(&Maps { factors: red, ..Maps::default() }, 32);
+        let mid = img.get_pixel(16, 16);
+        assert!(mid[0] > mid[1] * 2, "a color without a map is drawn in that color: {mid:?}");
+        let hole = Factors { base_color: Some([1.0, 1.0, 1.0, 0.2]), alpha: Alpha::Mask(0.5), ..Factors::default() };
+        let img = render_sphere(&Maps { base_color: Some(flat([90, 90, 90])), factors: hole, ..Maps::default() }, 32);
+        assert_eq!(img.get_pixel(16, 16)[3], 0, "under the cutoff it's cut away");
     }
 
     #[test]

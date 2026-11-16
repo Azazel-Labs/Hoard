@@ -6,7 +6,8 @@
 //! - DAE: `<init_from>` image paths
 //! - .blend: external image paths and linked libraries (other .blend files)
 //! - animations: the Unity/Mixamo `Model@Clip.fbx` naming convention
-//! - guesses: textures whose name starts with the model's name, for models that reference nothing
+//! - guesses: textures whose name starts with the model's name, for models that reference nothing, from the model's
+//!   own part of the pack (its folder's parent and below: `Models/` and `Textures/` side by side)
 //!
 //! Extraction happens per file during analysis (`extract_refs`); resolution needs the whole pack, so it
 //! runs after the assets are inserted (`link_pack`).
@@ -394,6 +395,17 @@ fn stem(p: &str) -> &str {
     file.rsplit_once('.').map_or(file, |(s, _)| s)
 }
 
+/// Whether a texture may be the one a model that names none wears: it's named after the model (`Barrel.fbx`,
+/// `Barrel_Albedo.png`) and sits in the model's own part of the pack, its folder's parent or below, so a "stairs"
+/// sprite in a 2D kit elsewhere in a bundle isn't painted on a 3D kit's stairs.
+fn guessable(model: &str, texture: &str) -> bool {
+    let (ms, ts) = (stem(model).to_lowercase(), stem(texture).to_lowercase());
+    let named = ts == ms || ts.strip_prefix(&ms).is_some_and(|rest| rest.starts_with(['_', '-', ' ', '.']));
+    let parent = |p: &str| p.rsplit_once(['/', '\\']).map_or(String::new(), |(d, _)| d.to_lowercase());
+    let (home, td) = (parent(&parent(model)), parent(texture));
+    named && (home.is_empty() || td == home || td.strip_prefix(&home).is_some_and(|rest| rest.starts_with(['/', '\\'])))
+}
+
 #[derive(Debug)]
 struct PackAsset {
     id: String,
@@ -532,18 +544,13 @@ pub(crate) fn link_pack(conn: &Connection, pack_id: &str, refs: &HashMap<String,
         if stem(&assets[m].path).contains('@') || references_something {
             continue;
         }
-        let ms = stem(&assets[m].path).to_lowercase();
-        if ms.len() < 3 {
+        if stem(&assets[m].path).len() < 3 {
             continue;
         }
         let guesses = assets
             .iter()
             .enumerate()
-            .filter(|(_, a)| a.kind == AssetKind::Texture)
-            .filter(|(_, a)| {
-                let ts = stem(&a.path).to_lowercase();
-                ts == ms || ts.strip_prefix(&ms).is_some_and(|rest| rest.starts_with(['_', '-', ' ', '.']))
-            })
+            .filter(|(_, a)| a.kind == AssetKind::Texture && guessable(&assets[m].path, &a.path))
             .map(|(i, _)| i)
             .take(MAX_GUESSES)
             .collect::<Vec<_>>();
@@ -563,6 +570,19 @@ pub(crate) fn link_pack(conn: &Connection, pack_id: &str, refs: &HashMap<String,
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn guesses_come_from_the_models_part_of_the_pack() {
+        assert!(guessable("Kit/Models/Barrel.fbx", "Kit/Textures/Barrel_Albedo.png"));
+        assert!(guessable("Kit/Models/Barrel.fbx", "Kit/Models/barrel.png"));
+        assert!(guessable("Models/Barrel.fbx", "Elsewhere/Barrel.png"));
+        assert!(!guessable("Kit/Models/Barrel.fbx", "Kit/Textures/Barrels.png"));
+        assert!(!guessable(
+            "Archive/Space Kit/Models/stairs.fbx",
+            "2D assets/Isometric Town/PNG/stairs_stone_01_0.png"
+        ));
+        assert!(!guessable("Archive/Space Kit/Models/stairs.fbx", "Archive/Space Kit Extra/stairs.png"));
+    }
 
     #[test]
     fn joins() {

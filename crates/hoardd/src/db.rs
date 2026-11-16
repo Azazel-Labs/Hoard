@@ -460,6 +460,22 @@ const MIGRATIONS: &[&str] = &[
        AND asset_id IN (SELECT id FROM assets WHERE ext NOT IN ('blend', 'dae', 'abc', 'x3d'));
      DELETE FROM issues WHERE kind = 'convert' AND lower(subject) NOT LIKE '%.blend'
        AND lower(subject) NOT LIKE '%.dae' AND lower(subject) NOT LIKE '%.abc' AND lower(subject) NOT LIKE '%.x3d';",
+    // 50: Unity materials (.mat) are read into materials, and a texture is guessed for a model only from the model's
+    // own part of the pack. Packs with either are read again; thumbnails the browser drew with a guessed texture on
+    // are drawn again.
+    "CREATE TEMP TABLE redo AS SELECT DISTINCT a.pack_id FROM assets a
+       WHERE a.ext = 'mat' OR EXISTS (SELECT 1 FROM asset_links l WHERE l.from_id = a.id AND l.rel = 'guess');
+     UPDATE assets SET thumb_source = NULL WHERE thumb_source IS NOT NULL
+       AND EXISTS (SELECT 1 FROM asset_links l WHERE l.from_id = assets.id AND l.rel = 'guess');
+     UPDATE packs SET status = 'ingesting'
+       WHERE status = 'ready' AND archived_at IS NULL AND id IN (SELECT pack_id FROM temp.redo)
+         AND NOT EXISTS (SELECT 1 FROM jobs j WHERE j.pack_id = packs.id AND j.status IN ('queued', 'running'));
+     DROP TABLE temp.redo;
+     INSERT INTO jobs (kind, pack_id, payload, run_after, created_at, updated_at)
+       SELECT 'retag', id, '{\"then_llm\":false}', strftime('%Y-%m-%dT%H:%M:%SZ', 'now'),
+              strftime('%Y-%m-%dT%H:%M:%SZ', 'now'), strftime('%Y-%m-%dT%H:%M:%SZ', 'now')
+       FROM packs p WHERE p.status = 'ingesting'
+         AND NOT EXISTS (SELECT 1 FROM jobs j WHERE j.pack_id = p.id AND j.status IN ('queued', 'running'));",
 ];
 
 /// How many automatic pre-upgrade backups to keep in `<data dir>/backups`.
@@ -2119,6 +2135,40 @@ mod tests {
             ["retag:astro", "retag:city"]
         );
         assert_eq!(strings("SELECT subject FROM issues"), ["hall.blend"]);
+    }
+
+    /// Packs with Unity materials or guessed textures are read again, and a browser thumbnail drawn with a guessed
+    /// texture on is drawn again.
+    #[test]
+    fn packs_with_unity_materials_or_guessed_textures_are_read_again() {
+        let dir = tempfile::tempdir().unwrap();
+        let mut conn = baseline_db(dir.path());
+        migrate(&mut conn, &dir.path().join("backups"), &MIGRATIONS[..41]).unwrap();
+        conn.execute_batch(
+            "PRAGMA foreign_keys = OFF;
+             INSERT INTO packs (id, name, status, created_at) VALUES
+               ('unity', 'Unity', 'ready', 'x'), ('kit', 'Kit', 'ready', 'x'), ('plain', 'Plain', 'ready', 'x');
+             INSERT INTO assets (id, pack_id, blob_hash, path, name, ext, kind, meta, thumb_source, created_at,
+                                 updated_at) VALUES
+               ('m', 'unity', 'h1', 'Wood.mat', 'Wood', 'mat', 'other', '{}', NULL, 'x', 'x'),
+               ('s', 'kit', 'h2', 'stairs.fbx', 'stairs', 'fbx', 'model', '{}', 'browser', 'x', 'x'),
+               ('t', 'kit', 'h3', 'stairs_0.png', 'stairs 0', 'png', 'texture', '{}', NULL, 'x', 'x'),
+               ('c', 'plain', 'h4', 'crate.obj', 'crate', 'obj', 'model', '{}', 'browser', 'x', 'x');
+             INSERT INTO asset_links (from_id, to_id, rel) VALUES ('s', 't', 'guess');",
+        )
+        .unwrap();
+        migrate(&mut conn, &dir.path().join("backups"), &MIGRATIONS[..42]).unwrap();
+        let strings = |sql: &str| -> Vec<String> {
+            conn.prepare(sql).unwrap().query_map([], |r| r.get(0)).unwrap().flatten().collect()
+        };
+        assert_eq!(
+            strings("SELECT id || ':' || coalesce(thumb_source, '-') FROM assets WHERE kind = 'model' ORDER BY id"),
+            ["c:browser", "s:-"]
+        );
+        assert_eq!(
+            strings("SELECT kind || ':' || pack_id FROM jobs WHERE pack_id <> 'p1' ORDER BY pack_id"),
+            ["retag:kit", "retag:unity"]
+        );
     }
 
     #[test]

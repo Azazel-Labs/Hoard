@@ -61,6 +61,7 @@ mod store_search;
 mod tagger;
 mod textures;
 mod tools;
+mod unitymat;
 mod updates;
 mod uploads;
 mod webglb;

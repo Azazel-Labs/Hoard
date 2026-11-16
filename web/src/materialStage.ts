@@ -4,7 +4,7 @@
 import * as THREE from 'three/webgpu'
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js'
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js'
-import type { MapRole, MaterialInfo } from './api'
+import type { MapRole, MaterialInfo, MaterialLook } from './api'
 import { loadMaps, SLOT_PROP, type MapSet, type Slot } from './materialMaps'
 import type { Background } from './modelStage'
 
@@ -25,6 +25,7 @@ export class MaterialStage {
   private shape: Shape = 'sphere'
   private set: MapSet | null = null
   private off = new Set<MapRole>()
+  private look: MaterialLook | null = null
   private repeat = 1
   private displacement = 0.03
   private stop: (() => void) | null = null
@@ -46,6 +47,7 @@ export class MaterialStage {
   /** Set up the renderer and start loading the maps. Resolves once the first frame can draw; maps keep arriving. */
   async load(info: MaterialInfo, packId: string, max: number): Promise<void> {
     const el = this.host
+    this.look = info.look ?? null
     const renderer = new THREE.WebGPURenderer({ antialias: true, alpha: true })
     await renderer.init()
     if (this.disposed) {
@@ -125,7 +127,10 @@ export class MaterialStage {
         tex = set.textures.height
       }
       if (tex) {
-        tex.repeat.set(this.repeat, this.repeat)
+        const [sx, sy] = this.look?.uv_scale ?? [1, 1]
+        const [ox, oy] = this.look?.uv_offset ?? [0, 0]
+        tex.repeat.set(this.repeat * sx, this.repeat * sy)
+        tex.offset.set(ox, oy)
         tex.updateMatrix()
       }
       if ((m[prop] ?? null) !== tex) {
@@ -133,14 +138,25 @@ export class MaterialStage {
         m[prop] = tex
       }
     }
-    m.normalScale.set(1, set?.normalDx ? -1 : 1)
+    const look = this.look
+    const ns = look?.normal_scale ?? 1
+    m.normalScale.set(ns, set?.normalDx ? -ns : ns)
+    m.aoMapIntensity = look?.occlusion_strength ?? 1
     m.displacementScale = this.displacement
     m.displacementBias = -this.displacement / 2
+    // An engine material's color tints its color map (or is the color, without one); the numbers are linear.
+    const [r, g, b, a] = look?.base_color ?? [1, 1, 1, 1]
+    m.color.setRGB(r, g, b, THREE.LinearSRGBColorSpace)
     // With no roughness map a plain surface reads best a little rough; with no metal map, not metal.
-    m.roughness = m.roughnessMap ? 1 : 0.6
-    m.metalness = m.metalnessMap ? 1 : 0
-    m.emissive.set(m.emissiveMap ? 0xffffff : 0x000000)
-    m.alphaTest = m.alphaMap ? 0.5 : 0
+    m.roughness = m.roughnessMap ? 1 : (look?.roughness ?? 0.6)
+    m.metalness = m.metalnessMap ? 1 : (look?.metallic ?? 0)
+    if (look?.emissive) m.emissive.setRGB(...look.emissive, THREE.LinearSRGBColorSpace)
+    else m.emissive.set(m.emissiveMap ? 0xffffff : 0x000000)
+    const blend = look?.alpha_mode === 'blend'
+    if (m.transparent !== blend) changed = true
+    m.transparent = blend
+    m.opacity = blend ? a : 1
+    m.alphaTest = look?.alpha_mode === 'mask' ? (look.alpha_cutoff ?? 0.5) : m.alphaMap ? 0.5 : 0
     m.side = m.alphaMap || this.shape === 'plane' ? THREE.DoubleSide : THREE.FrontSide
     if (changed) m.needsUpdate = true
     if (this.paused) this.renderOnce()

@@ -253,6 +253,41 @@ pub struct MaterialInfo {
     /// How far its height map reaches, in meters, when the store says.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub displacement: Option<f32>,
+    /// The settings its maps are drawn with, when it was read from an engine's material (a Unity `.mat`).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub look: Option<MaterialLook>,
+}
+
+/// How a material read from an engine's file draws its maps, in glTF's terms. Anything unset is as a material
+/// made from maps alone draws it.
+#[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize)]
+pub struct MaterialLook {
+    /// Linear RGBA, multiplied into the color map (or the color itself, without one).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub base_color: Option<[f32; 4]>,
+    /// 0..=1, where there's no metalness map.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub metallic: Option<f32>,
+    /// 0..=1, where there's no roughness map.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub roughness: Option<f32>,
+    /// Linear RGB light it gives off, multiplied into the emissive map (or the light itself, without one).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub emissive: Option<[f32; 3]>,
+    /// `mask` (cut out where the color's alpha is under `alpha_cutoff`) or `blend` (see-through by it).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub alpha_mode: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub alpha_cutoff: Option<f32>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub normal_scale: Option<f32>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub occlusion_strength: Option<f32>,
+    /// Times the maps repeat across the surface, and how far they're moved, in U and V.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub uv_scale: Option<[f32; 2]>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub uv_offset: Option<[f32; 2]>,
 }
 
 /// One texture of a material and what it's for.

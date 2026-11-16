@@ -220,7 +220,9 @@ export function applyToModel(
         }
       }
       if (set.normalDx && mat.normalScale) mat.normalScale.set(1, -1)
-      mat.color?.set(0xffffff)
+      const tint = info.look?.base_color
+      if (tint) mat.color?.setRGB(tint[0], tint[1], tint[2], THREE.LinearSRGBColorSpace)
+      else mat.color?.set(0xffffff)
       if (set.textures.emissive && mat.emissive) mat.emissive.set(0xffffff)
       if (set.textures.opacity) {
         mat.alphaTest = 0.5

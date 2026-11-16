@@ -4095,14 +4095,16 @@ dependencies = [
 
 [[package]]
 name = "polysmelt"
-version = "0.2.0"
+version = "0.8.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5f4901abd9c9d2ff27220c1603dbe12dfdb9370ec4fd98583d40286ca4e99d9c"
+checksum = "268fa13296722785ed93661f04006cb61bf2e59e2ef896362a699879c6ce7de8"
 dependencies = [
  "base64 0.22.1",
  "bytemuck",
  "draco-core",
  "fbxcel",
+ "flate2",
+ "image-webp",
  "openusd",
  "openusd-schemas",
  "quick-xml",

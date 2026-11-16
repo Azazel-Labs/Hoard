@@ -223,7 +223,7 @@ impl TextureNames {
 }
 
 /// "Stand Wood Old 05" -> "StandWoodOld05": words run together, each starting with a capital.
-fn run_together(name: &str) -> String {
+pub(crate) fn run_together(name: &str) -> String {
     name.split(|c: char| !c.is_alphanumeric())
         .filter(|w| !w.is_empty())
         .map(|w| {

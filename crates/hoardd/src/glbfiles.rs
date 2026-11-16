@@ -23,7 +23,7 @@ pub(crate) struct Split {
 }
 
 /// Turn `glb` by `facing` and move its embedded images out to files, named after the files they came from (`names`),
-/// the images' own names, or `stem` and a number. The images' bytes leave the BIN chunk, unless something else in
+/// the images' own names, the material and slot that use them (`Wood_BaseColor`), or `stem` and a number. The images' bytes leave the BIN chunk, unless something else in
 /// it would have to move too (meshopt compression, a second buffer), when only the images' references change.
 pub(crate) fn split(glb: &[u8], facing: Facing, stem: &str, names: &Names) -> Result<Split> {
     let (doc, mut bin) = crate::formats::read_glb(glb)?;
@@ -34,6 +34,7 @@ pub(crate) fn split(glb: &[u8], facing: Facing, stem: &str, names: &Names) -> Re
     let mut textures: Vec<(String, Vec<u8>)> = Vec::new();
     let mut moved = BTreeSet::new();
     let mut used = BTreeSet::new();
+    let slots = slot_names(&doc, stem);
     let images = doc.get_mut("images").and_then(Value::as_array_mut).map_or_default(std::mem::take);
     let mut out_images = Vec::with_capacity(images.len());
     for (i, mut img) in images.into_iter().enumerate() {
@@ -42,7 +43,8 @@ pub(crate) fn split(glb: &[u8], facing: Facing, stem: &str, names: &Names) -> Re
         if let (Some(v), Some(bytes), Some(obj)) = (view, bytes, img.as_object_mut()) {
             let ext = image_ext(obj.get("mimeType").and_then(Value::as_str), bytes);
             let file = names.get(blake3::hash(bytes).as_bytes()).map(String::as_str);
-            let base = file.or_else(|| obj.get("name").and_then(Value::as_str)).map(clean).filter(|n| !n.is_empty());
+            let own = obj.get("name").and_then(Value::as_str).filter(|n| !generic(n));
+            let base = file.or(own).or(slots.get(&i).map(String::as_str)).map(clean).filter(|n| !n.is_empty());
             let base = base.unwrap_or_else(|| format!("{}_{i}", clean(stem)));
             let name = place(&mut textures, &base, ext, bytes);
             obj.remove("bufferView");
@@ -65,6 +67,63 @@ pub(crate) fn split(glb: &[u8], facing: Facing, stem: &str, names: &Names) -> Re
         bin = compact(&mut doc, &views, &bin, &dropped)?;
     }
     Ok(Split { glb: write_glb(&doc, &bin)?, textures })
+}
+
+/// A name for each image a material uses, by image: the material's name run together (the model's `stem` when it
+/// has none) and the slot it fills, in the suffixes Hoard names maps with (`Wood_BaseColor`, `Wood_AO`). Metal and
+/// roughness packed with occlusion in one image is `ORM`. An image in several slots takes the first.
+fn slot_names(doc: &Map<String, Value>, stem: &str) -> BTreeMap<usize, String> {
+    use crate::materials::Role;
+    let list = |key: &str| doc.get(key).and_then(Value::as_array).map_or(&[][..], Vec::as_slice);
+    let (textures, materials) = (list("textures"), list("materials"));
+    // The image a texture shows: its own source, or one an extension gives (KTX2, WebP, DDS).
+    let image = |slot: &Value| -> Option<usize> {
+        let t = textures.get(slot.get("index")?.as_u64()? as usize)?;
+        let ext = t.get("extensions").and_then(Value::as_object);
+        let source = t.get("source").or_else(|| ext?.values().find_map(|e| e.get("source")));
+        source?.as_u64().map(|s| s as usize)
+    };
+    let mut out = BTreeMap::new();
+    for m in materials {
+        let name = m.get("name").and_then(Value::as_str).map(crate::naming::run_together).filter(|n| !n.is_empty());
+        let name = name.unwrap_or_else(|| crate::naming::run_together(stem));
+        let occlusion = m.get("occlusionTexture").and_then(image);
+        let metal = m.get("pbrMetallicRoughness").and_then(|p| p.get("metallicRoughnessTexture")).and_then(image);
+        let packed = occlusion.is_some() && occlusion == metal;
+        let mut found = Vec::new();
+        texture_slots(m, &mut found);
+        for (key, slot) in found {
+            let Some(img) = image(slot) else { continue };
+            let suffix = match key {
+                "occlusion" | "metallicRoughness" if packed => Role::Orm.suffix().to_owned(),
+                "occlusion" => Role::Ao.suffix().to_owned(),
+                "baseColor" | "diffuse" => Role::BaseColor.suffix().to_owned(),
+                "normal" => Role::Normal.suffix().to_owned(),
+                "emissive" => Role::Emissive.suffix().to_owned(),
+                k => k[..1].to_ascii_uppercase() + &k[1..],
+            };
+            out.entry(img).or_insert_with(|| format!("{name}_{suffix}"));
+        }
+    }
+    out
+}
+
+/// The texture slots in a material, core and extensions alike (`baseColorTexture`, `clearcoatNormalTexture`, …), as
+/// the slot's name without `Texture` and the slot, in the order they're written.
+fn texture_slots<'a>(v: &'a Value, out: &mut Vec<(&'a str, &'a Value)>) {
+    let Value::Object(map) = v else { return };
+    for (key, value) in map {
+        match key.strip_suffix("Texture") {
+            Some(slot) if !slot.is_empty() && value.get("index").is_some() => out.push((slot, value)),
+            _ => texture_slots(value, out),
+        }
+    }
+}
+
+/// A name an exporter makes up rather than one somebody gave: `Image`, `image_3`, `Texture0`.
+fn generic(name: &str) -> bool {
+    let word = name.trim().trim_end_matches(|c: char| c.is_ascii_digit() || matches!(c, '_' | '-' | ' ' | '.'));
+    ["image", "img", "texture", "tex", ""].iter().any(|g| word.eq_ignore_ascii_case(g))
 }
 
 /// `split`, as one file: the GLB alone when it has no textures, otherwise a zip of `<stem>.glb` and [`TEXTURES`].
@@ -362,6 +421,44 @@ mod tests {
         let names = Names::from([(*blake3::hash(PNG).as_bytes(), "T_Crate_D".to_owned())]);
         let s = split(&glb_with_image(), Facing::default(), "Crate", &names).unwrap();
         assert_eq!(s.textures[0].0, "T_Crate_D.png");
+    }
+
+    /// [`glb_with_image`] with its image's name taken off and the material named `material`.
+    fn unnamed(material: Value) -> Vec<u8> {
+        let (doc, bin) = crate::formats::read_glb(&glb_with_image()).unwrap();
+        let mut doc = doc.as_object().unwrap().clone();
+        doc["images"][0].as_object_mut().unwrap().remove("name");
+        doc["materials"][0] = material;
+        write_glb(&doc, &bin).unwrap()
+    }
+
+    #[test]
+    fn an_unnamed_image_is_named_by_its_material_and_slot() {
+        let names = |material: Value| {
+            let s = split(&unnamed(material), Facing::default(), "Crate", &Names::new()).unwrap();
+            s.textures.into_iter().map(|t| t.0).collect::<Vec<_>>()
+        };
+        let base = json!({ "name": "old wood", "pbrMetallicRoughness": { "baseColorTexture": { "index": 0 } } });
+        assert_eq!(names(base), ["OldWood_BaseColor.png"]);
+        // No material name: the model's.
+        assert_eq!(names(json!({ "normalTexture": { "index": 0 } })), ["Crate_Normal.png"]);
+        // Occlusion in the metal-roughness image.
+        let orm = json!({ "name": "Rock", "occlusionTexture": { "index": 0 },
+                          "pbrMetallicRoughness": { "metallicRoughnessTexture": { "index": 0 } } });
+        assert_eq!(names(orm), ["Rock_ORM.png"]);
+        let mr = json!({ "name": "Rock", "pbrMetallicRoughness": { "metallicRoughnessTexture": { "index": 0 } } });
+        assert_eq!(names(mr), ["Rock_MetallicRoughness.png"]);
+        let coat = json!({ "name": "Paint",
+                           "extensions": { "KHR_materials_clearcoat": { "clearcoatNormalTexture": { "index": 0 } } } });
+        assert_eq!(names(coat), ["Paint_ClearcoatNormal.png"]);
+        // Used by nothing: the model's name and a number.
+        assert_eq!(names(json!({})), ["Crate_0.png"]);
+    }
+
+    #[test]
+    fn made_up_image_names_give_way_to_the_slot() {
+        assert!(generic("Image") && generic("image_3") && generic("Texture0") && generic("tex-12"));
+        assert!(!generic("Wood Planks") && !generic("Texture Wood"));
     }
 
     #[test]

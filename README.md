@@ -494,8 +494,10 @@ and Opus use ffmpeg's reference encoders (LAME, libvorbis, libopus), as do sourc
 | .blend, Collada, Alembic, X3D, once Blender converted them (Settings → Blender) | GLB + textures (zipped) |
 
 A GLB download keeps its textures out of the GLB: the zip holds `<name>.glb` and a `textures` folder it points at, the
-textures named as the model's own files were. A model without textures comes as a plain `.glb`. Models are turned
-the way their pack's models face (see Facing in the 3D viewer).
+textures named as the model's own files were. A texture that was only ever inside a GLB takes the name it was given
+there, or else its material's and the slot it fills, the way Hoard names maps (`Wood_BaseColor.png`, `Rock_ORM.png`).
+A model without textures comes as a plain `.glb`. Models are turned the way their pack's models face (see Facing in
+the 3D viewer).
 
 `GET /api/assets/{id}/as/{format}[?max=1024]`; the asset detail lists the formats on offer. 16-bit images stay
 16-bit; HDR going into an 8-bit format is tone-mapped rather than clipped.

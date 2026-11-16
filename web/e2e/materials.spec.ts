@@ -234,4 +234,51 @@ test.describe('materials', () => {
     expect(paths).not.toContain('Mats/Planks.mat')
     await api.delete(`/api/packs/${pack.id}`)
   })
+
+  // An OBJ's .mtl colors with no maps (as SketchUp exports them) become swatches the OBJ wears: one worn by two models
+  // stays in the grid, one only the road wears is part of it, and the .mtl is drawn as its colors.
+  test("a .mtl's colors become swatch materials its OBJs wear", async ({ baseURL }) => {
+    const api = await signedIn(baseURL!)
+    const quad = (mtl: string, use: string) =>
+      Buffer.from(`mtllib ${mtl}\nv 0 0 0\nv 1 0 0\nv 1 1 0\nv 0 1 0\nusemtl ${use}\nf 1 2 3 4\n`)
+    const pack = await uploadPack(api, 'E2E MTL Swatches', [
+      { relpath: 'road.obj', data: quad('road.mtl', 'Stone') },
+      {
+        relpath: 'road.mtl',
+        data: Buffer.from(
+          '# Exported from SketchUp\nnewmtl Asphalt\nKa 0 0 0\nKd 0.411765 0.411765 0.411765\n\n' +
+            'newmtl Stone\nKd 0.847059 0.827451 0.749020\n',
+        ),
+      },
+      { relpath: 'car.obj', data: quad('car.mtl', 'Paint') },
+      {
+        relpath: 'car.mtl',
+        data: Buffer.from('newmtl Asphalt\nKd 0.411765 0.411765 0.411765\nnewmtl Paint\nKd 1 0 0\n'),
+      },
+    ])
+    await waitReady(api, [pack.id])
+    await waitIdle(api)
+    const assets = (await assetsOf(api, pack.id)) as (Asset & { path: string; has_thumb: boolean })[]
+    const byPath = (p: string) => assets.find((a) => a.path === p)
+    const swatches = assets.filter((a) => a.path.endsWith('.material')).map((a) => a.path)
+    expect(swatches.sort()).toEqual(['Asphalt.material', 'Paint.material', 'Stone.material'])
+    const { material: info } = (await (await api.get(`/api/assets/${byPath('Asphalt.material')!.id}`)).json()) as {
+      material: { maps: unknown[]; look?: { base_color?: number[] } }
+    }
+    expect(info.maps).toEqual([])
+    expect(info.look?.base_color?.[0]).toBeCloseTo(0.141, 2)
+    const road = (await (await api.get(`/api/assets/${byPath('road.obj')!.id}`)).json()) as {
+      links: { rel: string; path: string }[]
+    }
+    expect(road.links.filter((l) => l.rel === 'material').map((l) => l.path).sort()).toEqual([
+      'Asphalt.material',
+      'Stone.material',
+      'road.mtl',
+    ])
+    expect(byPath('road.mtl')!.has_thumb).toBe(true)
+    const shown = await api.get('/api/assets', { params: { pack: pack.id, hide_supporting: true, facets: false } })
+    const paths = ((await shown.json()) as { items: (Asset & { path: string })[] }).items.map((a) => a.path).sort()
+    expect(paths).toEqual(['Asphalt.material', 'car.obj', 'road.obj'])
+    await api.delete(`/api/packs/${pack.id}`)
+  })
 })

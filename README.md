@@ -412,6 +412,10 @@ give them, and its color, metalness, smoothness, glow, cutout and tiling are kep
 sphere thumbnail and the 3D viewers draw it with. A `.mat` with only a color (Kenney's kits) is a swatch of that
 color. The `.mat` itself is hidden behind the material, and a set of maps found by name that it uses gives way to it.
 
+An OBJ's `.mtl` colors with no maps (as SketchUp exports them) become swatches too, worn by the OBJs whose `.mtl` names
+them. The same name and color in several `.mtl` files of a folder is one swatch. The `.mtl` itself shows its materials
+side by side as its thumbnail.
+
 - **In the grid**, a material searches, filters, tags and collects like any asset. Its maps are hidden; "Show" next
   to "supporting files hidden" brings them back.
 - **In the detail panel**, the material turns in a live preview, with its maps listed by kind and size. Click one to

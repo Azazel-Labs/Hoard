@@ -103,7 +103,11 @@ async function textureLinks(asset: Asset): Promise<{ named: AssetLink[]; guesses
   const full = asset.links.length ? asset : await api.asset(asset.id).catch(() => asset)
   const named = full.links.filter((l) => l.rel === 'texture' || (l.kind === 'texture' && l.rel !== 'guess'))
   const guesses = full.links.filter((l) => l.rel === 'guess')
-  const materials = full.links.filter((l) => l.rel === 'material' || l.kind === 'material').slice(0, 8)
+  // Material files (an MTL, with its maps) before Hoard's materials, which may be only colors (an MTL's swatches).
+  const materials = full.links
+    .filter((l) => l.rel === 'material' || l.kind === 'material')
+    .sort((a, b) => Number(extOf(a.path) === 'material') - Number(extOf(b.path) === 'material'))
+    .slice(0, 8)
   const more = await Promise.all(materials.map((m) => api.asset(m.id).then((a) => a.links).catch(() => [])))
   for (const list of more) named.push(...list.filter((l) => l.kind === 'texture'))
   return { named, guesses, full }

@@ -499,6 +499,14 @@ const MIGRATIONS: &[&str] = &[
               strftime('%Y-%m-%dT%H:%M:%SZ', 'now'), strftime('%Y-%m-%dT%H:%M:%SZ', 'now')
        FROM packs p WHERE p.status = 'ingesting'
          AND NOT EXISTS (SELECT 1 FROM jobs j WHERE j.pack_id = p.id AND j.status IN ('queued', 'running'));",
+    // 52: Wavefront materials with a color and no maps become swatches, and `.mtl` files are drawn as their
+    // materials. Packs with `.mtl` files look for materials again.
+    "INSERT INTO jobs (kind, pack_id, payload, run_after, created_at, updated_at)
+       SELECT 'materials', p.id, '{}', strftime('%Y-%m-%dT%H:%M:%SZ', 'now'), strftime('%Y-%m-%dT%H:%M:%SZ', 'now'),
+              strftime('%Y-%m-%dT%H:%M:%SZ', 'now')
+       FROM packs p WHERE p.status = 'ready'
+        AND EXISTS (SELECT 1 FROM assets a WHERE a.pack_id = p.id AND a.ext = 'mtl')
+        AND NOT EXISTS (SELECT 1 FROM jobs j WHERE j.kind = 'materials' AND j.pack_id = p.id);",
 ];
 
 /// How many automatic pre-upgrade backups to keep in `<data dir>/backups`.
@@ -2223,6 +2231,32 @@ mod tests {
             ["c:as:glb:0", "s:as:stl:0"]
         );
         assert_eq!(strings("SELECT kind || ':' || pack_id FROM jobs WHERE pack_id <> 'p1'"), ["retag:kit"]);
+    }
+
+    /// Packs with `.mtl` files look for materials again.
+    #[test]
+    fn packs_with_mtl_files_look_for_materials_again() {
+        let dir = tempfile::tempdir().unwrap();
+        let mut conn = baseline_db(dir.path());
+        migrate(&mut conn, &dir.path().join("backups"), &MIGRATIONS[..43]).unwrap();
+        conn.execute_batch(
+            "PRAGMA foreign_keys = OFF;
+             INSERT INTO packs (id, name, status, created_at) VALUES
+               ('city', 'City', 'ready', 'x'), ('plain', 'Plain', 'ready', 'x');
+             INSERT INTO assets (id, pack_id, blob_hash, path, name, ext, kind, meta, created_at, updated_at) VALUES
+               ('m', 'city', 'h1', 'road.mtl', 'road', 'mtl', 'material', '{}', 'x', 'x'),
+               ('w', 'plain', 'h2', 'wood.png', 'wood', 'png', 'texture', '{}', 'x', 'x');",
+        )
+        .unwrap();
+        migrate(&mut conn, &dir.path().join("backups"), &MIGRATIONS[..44]).unwrap();
+        let jobs: Vec<String> = conn
+            .prepare("SELECT kind || ':' || pack_id FROM jobs WHERE pack_id <> 'p1'")
+            .unwrap()
+            .query_map([], |r| r.get(0))
+            .unwrap()
+            .flatten()
+            .collect();
+        assert_eq!(jobs, ["materials:city"]);
     }
 
     #[test]

@@ -16,6 +16,10 @@
 //! its thumbnail and the 3D viewer draw it with. The `.mat` goes behind the material as its source file, and a
 //! set found by name that shares a map with it gives way to it.
 //!
+//! A Wavefront material (`newmtl` in an OBJ's `.mtl`) with a color and no maps (as SketchUp exports them) is one too, a
+//! swatch, worn by the OBJs whose `.mtl` defines it; the same name and color in several `.mtl` files of a folder is
+//! one material. The `.mtl` itself is drawn as its materials side by side.
+//!
 //! Detection runs after a pack is ingested or re-tagged, and as a `materials` job for packs from before it existed.
 
 use std::collections::{BTreeMap, BTreeSet, HashMap, HashSet};
@@ -388,8 +392,8 @@ pub(crate) struct Found {
     pub(crate) maps: Vec<(usize, Role, Option<String>)>,
     /// How an engine's material says to draw the maps.
     pub(crate) look: Option<MaterialLook>,
-    /// The engine's material it was read from (a Unity `.mat`): its asset id and path.
-    pub(crate) source: Option<(String, String)>,
+    /// The engine's materials it was read from (a Unity `.mat`, or the `.mtl` files defining it): asset id and path.
+    pub(crate) sources: Vec<(String, String)>,
 }
 
 fn dir_of(path: &str) -> &str {
@@ -481,7 +485,7 @@ pub(crate) fn find(textures: &[Candidate<'_>]) -> Vec<Found> {
             .collect();
         maps.sort_by(|a, b| a.1.cmp(&b.1).then(b.3.cmp(&a.3)).then(textures[a.0].path.cmp(textures[b.0].path)));
         let maps = maps.into_iter().map(|(i, r, res, _)| (i, r, res)).collect();
-        out.push(Found { path, name, key, maps, look: None, source: None });
+        out.push(Found { path, name, key, maps, look: None, sources: Vec::new() });
     }
     out
 }
@@ -632,7 +636,7 @@ fn descriptor(
     if let Some(look) = &f.look {
         descriptor["look"] = serde_json::to_value(look).unwrap_or_default();
     }
-    if let Some((_, source)) = &f.source {
+    if let Some((_, source)) = f.sources.first() {
         descriptor["source"] = serde_json::json!(db::strip_dir(source, dir));
     }
     descriptor
@@ -692,10 +696,118 @@ fn unity_materials(
             key,
             maps,
             look: Some(look).filter(|l| *l != MaterialLook::default()),
-            source: Some((id, path.clone())),
+            sources: vec![(id, path.clone())],
         });
     }
     Ok(out)
+}
+
+/// The pack's Wavefront materials with a color and no maps, as swatches. The same name and color in several `.mtl`
+/// files of one folder is one material with each of them as a source; the same name in another color is another,
+/// its file named after the `.mtl` too.
+fn mtl_materials(state: &AppState, rt: &Handle, conn: &Connection, pack_id: &str) -> Result<Vec<Found>> {
+    let files: Vec<(String, String, String)> = conn
+        .prepare("SELECT id, path, blob_hash FROM assets WHERE pack_id = ?1 AND ext = 'mtl' ORDER BY path")?
+        .query_map([pack_id], |r| Ok((r.get(0)?, r.get(1)?, r.get(2)?)))?
+        .collect::<rusqlite::Result<_>>()?;
+    let mut out: Vec<Found> = Vec::new();
+    let mut by_name: HashMap<(String, String), Vec<usize>> = HashMap::new();
+    for (id, path, hash) in files {
+        let bytes = rt.block_on(state.blobs.read_all(&hash))?;
+        let dir = dir_of(&path);
+        for m in crate::mtlmat::parse(&String::from_utf8_lossy(&bytes)) {
+            if !m.maps.is_empty() {
+                continue;
+            }
+            let base = Some(m.name.trim().replace(['/', '\\'], "_")).filter(|n| !n.is_empty());
+            let base = base.unwrap_or_else(|| stem_of(&path).to_owned());
+            let look = Some(m.look);
+            let same = by_name.entry((dir.to_lowercase(), base.to_lowercase())).or_default();
+            if let Some(&i) = same.iter().find(|&&i| out[i].look == look) {
+                if !out[i].sources.iter().any(|(s, _)| *s == id) {
+                    out[i].sources.push((id.clone(), path.clone()));
+                }
+                continue;
+            }
+            let file = if same.is_empty() { base.clone() } else { format!("{base} ({})", stem_of(&path)) };
+            same.push(out.len());
+            out.push(Found {
+                path: if dir.is_empty() { format!("{file}.material") } else { format!("{dir}/{file}.material") },
+                name: material_name(&base, dir),
+                key: tokens(&base).into_iter().map(|t| t.text).collect::<Vec<_>>().join("_"),
+                maps: Vec::new(),
+                look,
+                sources: vec![(id.clone(), path.clone())],
+            });
+        }
+    }
+    Ok(out)
+}
+
+/// Each `.mtl` without a thumbnail drawn as its materials side by side (up to nine), with the maps it links.
+fn draw_mtls(state: &AppState, rt: &Handle, conn: &Connection, pack_id: &str, textures: &[Texture]) -> Result<()> {
+    let files: Vec<(String, String, String)> = conn
+        .prepare(
+            "SELECT id, path, blob_hash FROM assets WHERE pack_id = ?1 AND ext = 'mtl' AND thumb_hash IS NULL
+             ORDER BY path",
+        )?
+        .query_map([pack_id], |r| Ok((r.get(0)?, r.get(1)?, r.get(2)?)))?
+        .collect::<rusqlite::Result<_>>()?;
+    let by_id: HashMap<&str, usize> = textures.iter().enumerate().map(|(i, t)| (t.id.as_str(), i)).collect();
+    let mut linked = conn.prepare_cached("SELECT to_id FROM asset_links WHERE from_id = ?1 AND rel = 'texture'")?;
+    for (id, path, hash) in files {
+        let bytes = rt.block_on(state.blobs.read_all(&hash))?;
+        let defs = crate::mtlmat::parse(&String::from_utf8_lossy(&bytes));
+        if defs.is_empty() {
+            continue;
+        }
+        let maps: Vec<usize> = linked
+            .query_map([&id], |r| r.get::<_, String>(0))?
+            .filter_map(|t| by_id.get(t.ok()?.as_str()).copied())
+            .collect();
+        let file_of = |p: &str| p.rsplit(['/', '\\']).next().unwrap_or(p).to_lowercase();
+        let found: Vec<Found> = defs
+            .into_iter()
+            .take(9)
+            .map(|m| Found {
+                path: String::new(),
+                name: m.name,
+                key: String::new(),
+                maps: m
+                    .maps
+                    .iter()
+                    .filter_map(|(role, file)| {
+                        let i = *maps.iter().find(|&&i| file_of(&textures[i].path) == file_of(file))?;
+                        Some((i, *role, None))
+                    })
+                    .collect(),
+                look: Some(m.look),
+                sources: Vec::new(),
+            })
+            .collect();
+        let cols: u32 = match found.len() {
+            1 => 1,
+            2..=4 => 2,
+            _ => 3,
+        };
+        let cell = THUMB_SIZE / cols;
+        let rows = found.len().div_ceil(cols as usize) as u32;
+        let mut sheet = image::RgbaImage::new(THUMB_SIZE, THUMB_SIZE);
+        let top = (THUMB_SIZE - rows * cell) / 2;
+        for (n, f) in found.iter().enumerate() {
+            let Some(img) = sphere(state, rt, textures, f, cell)? else { continue };
+            let (c, r) = (n as u32 % cols, n as u32 / cols);
+            // A last row that's short is centered.
+            let in_row = if r + 1 == rows { found.len() as u32 - r * cols } else { cols };
+            let left = (THUMB_SIZE - in_row * cell) / 2;
+            image::imageops::overlay(&mut sheet, &img, i64::from(left + c * cell), i64::from(top + r * cell));
+        }
+        let png = crate::analyze::png_bytes(sheet)?;
+        if let Err(e) = replace_thumb(state, rt, conn, &id, png, "meta") {
+            tracing::debug!(file = %path, error = %format!("{e:#}"), "could not draw an MTL file");
+        }
+    }
+    Ok(())
 }
 
 /// How opaque a texture is on average, from its thumbnail: where Unity keeps a material's smoothness.
@@ -706,8 +818,9 @@ fn mean_alpha(state: &AppState, rt: &Handle, t: &Texture) -> Option<f32> {
     Some(img.pixels().map(|p| f32::from(p[3])).sum::<f32>() / 255.0 / n as f32)
 }
 
-/// Put the Unity materials first, in place of any set found by name that shares a map or a path with one.
-fn prefer_unity(found: Vec<Found>, unity: Vec<Found>) -> Vec<Found> {
+/// Put the Unity materials first, in place of any set found by name that shares a map or a path with one; then the
+/// Wavefront swatches whose paths are still free.
+fn prefer_engines(found: Vec<Found>, unity: Vec<Found>, mtl: Vec<Found>) -> Vec<Found> {
     let paths: HashSet<String> = unity.iter().map(|f| f.path.to_lowercase()).collect();
     let used: HashSet<usize> = unity.iter().flat_map(|f| f.maps.iter().map(|(i, ..)| *i)).collect();
     let mut seen = HashSet::new();
@@ -716,6 +829,10 @@ fn prefer_unity(found: Vec<Found>, unity: Vec<Found>) -> Vec<Found> {
         found
             .into_iter()
             .filter(|f| !paths.contains(&f.path.to_lowercase()) && !f.maps.iter().any(|(i, ..)| used.contains(i))),
+    );
+    let taken: HashSet<String> = out.iter().map(|f| f.path.to_lowercase()).collect();
+    out.extend(
+        mtl.into_iter().filter(|f| !taken.contains(&f.path.to_lowercase()) && seen.insert(f.path.to_lowercase())),
     );
     out
 }
@@ -754,7 +871,11 @@ fn find_materials(state: &AppState, rt: &Handle, conn: &mut Connection, pack_id:
         .collect();
     let mut found = find(&candidates);
     name_from_sidecars(&sidecars, &mut found);
-    let found = prefer_unity(found, unity_materials(state, rt, conn, pack_id, &textures)?);
+    let unity = unity_materials(state, rt, conn, pack_id, &textures)?;
+    let found = prefer_engines(found, unity, mtl_materials(state, rt, conn, pack_id)?);
+    if let Err(e) = draw_mtls(state, rt, conn, pack_id, &textures) {
+        tracing::warn!(pack = pack_id, error = %format!("{e:#}"), "could not draw MTL files");
+    }
     let existing: HashMap<String, (String, String, bool, bool)> = {
         let mut stmt = conn.prepare(&format!(
             "SELECT a.path, a.id, a.blob_hash, a.thumb_hash IS NOT NULL, {IS_MATERIAL} FROM assets a WHERE a.pack_id = ?1
@@ -838,11 +959,7 @@ fn find_materials(state: &AppState, rt: &Handle, conn: &mut Connection, pack_id:
                 f.name,
                 category,
                 meta.to_string(),
-                format!(
-                    "{} material pbr{}",
-                    tagger::fts_words(&f.path),
-                    if f.source.is_some() { " unity" } else { "" }
-                ),
+                format!("{} material pbr{}", tagger::fts_words(&f.path), engine_words(f)),
                 m.thumb.as_ref().map(|t| t.hash.clone()),
                 now,
             ],
@@ -880,14 +997,23 @@ fn find_materials(state: &AppState, rt: &Handle, conn: &mut Connection, pack_id:
     Ok(made.len())
 }
 
-/// The engine's material a material was read from goes behind it.
+/// Search words for where a material was read from.
+fn engine_words(f: &Found) -> &'static str {
+    match f.sources.first().map(|(_, p)| p.rsplit('.').next().unwrap_or("").to_ascii_lowercase()).as_deref() {
+        Some("mat") => " unity",
+        Some("mtl") => " mtl swatch color",
+        _ => "",
+    }
+}
+
+/// The engine's materials a material was read from go behind it.
 fn link_source(tx: &Connection, id: &str, f: &Found) -> Result<()> {
     tx.execute(
         "DELETE FROM asset_links WHERE from_id = ?1 AND rel = 'sidecar'
-           AND to_id IN (SELECT id FROM assets WHERE ext = 'mat')",
+           AND to_id IN (SELECT id FROM assets WHERE ext IN ('mat', 'mtl'))",
         [id],
     )?;
-    if let Some((source, _)) = &f.source {
+    for (source, _) in &f.sources {
         tx.execute(
             "INSERT INTO asset_links (from_id, to_id, rel) VALUES (?1, ?2, 'sidecar') ON CONFLICT DO NOTHING",
             params![id, source],
@@ -1186,9 +1312,10 @@ fn material_tags(tx: &Connection, textures: &[Texture], f: &Found) -> Result<Tag
     Ok(tags)
 }
 
-/// Link the pack's models to the materials made for them, by name: `Barrel.fbx` or `vlkhcbxia_LOD0.fbx` in the
-/// material's folder (or above it) to the `Barrel` or `vlkhcbxia` material. A model that links to a material's maps
-/// shows the material already; this is for the models that name no textures.
+/// Link the pack's models to the materials made for them: an OBJ to the swatches its `.mtl` defines, and by name,
+/// `Barrel.fbx` or `vlkhcbxia_LOD0.fbx` in the material's folder (or above it) to the `Barrel` or `vlkhcbxia`
+/// material. A model that links to a material's maps shows the material already; naming is for the models that name
+/// no textures.
 fn link_models(tx: &Connection, pack_id: &str) -> Result<()> {
     tx.execute(
         &format!(
@@ -1197,10 +1324,25 @@ fn link_models(tx: &Connection, pack_id: &str) -> Result<()> {
         ),
         [pack_id],
     )?;
+    tx.execute(
+        &format!(
+            "INSERT INTO asset_links (from_id, to_id, rel)
+             SELECT o.from_id, a.id, 'material' FROM assets a
+               JOIN asset_links s ON s.from_id = a.id AND s.rel = 'sidecar'
+               JOIN assets f ON f.id = s.to_id AND f.ext = 'mtl'
+               JOIN asset_links o ON o.to_id = f.id AND o.rel = 'material'
+              WHERE a.pack_id = ?1 AND {IS_MATERIAL}
+             ON CONFLICT DO NOTHING"
+        ),
+        [pack_id],
+    )?;
+    // Swatches go only where a `.mtl` puts them: a color has no name to match by.
     let materials: Vec<(String, String, String)> = {
         let mut stmt = tx.prepare(&format!(
             "SELECT a.id, a.path, (SELECT group_concat(m.texture_id) FROM material_maps m WHERE m.material_id = a.id)
-             FROM assets a WHERE a.pack_id = ?1 AND {IS_MATERIAL}"
+             FROM assets a WHERE a.pack_id = ?1 AND {IS_MATERIAL}
+               AND NOT EXISTS (SELECT 1 FROM asset_links s JOIN assets f ON f.id = s.to_id AND f.ext = 'mtl'
+                                WHERE s.from_id = a.id AND s.rel = 'sidecar')"
         ))?;
         stmt.query_map([pack_id], |r| Ok((r.get(0)?, r.get(1)?, r.get::<_, Option<String>>(2)?.unwrap_or_default())))?
             .collect::<rusqlite::Result<_>>()?
@@ -1293,6 +1435,17 @@ fn mark_owned(tx: &Connection, pack_id: &str) -> Result<()> {
 
 /// Shade a sphere from the maps' thumbnails. None when there's nothing to shade it with.
 fn render_thumb(state: &AppState, rt: &Handle, textures: &[Texture], f: &Found) -> Result<Option<Vec<u8>>> {
+    sphere(state, rt, textures, f, THUMB_SIZE)?.map(crate::analyze::png_bytes).transpose()
+}
+
+/// [`render_thumb`]'s sphere, `size` pixels square.
+fn sphere(
+    state: &AppState,
+    rt: &Handle,
+    textures: &[Texture],
+    f: &Found,
+    size: u32,
+) -> Result<Option<image::RgbaImage>> {
     use hoard_render::sphere::{Alpha, Factors, Maps, Packed, render_sphere};
     // The first map of each role that has a thumbnail (they're ordered largest first).
     let mut by_role: HashMap<Role, image::RgbaImage> = HashMap::new();
@@ -1355,8 +1508,7 @@ fn render_thumb(state: &AppState, rt: &Handle, textures: &[Texture], f: &Found) 
         packed,
         factors,
     };
-    let img = render_sphere(&maps, THUMB_SIZE);
-    Ok(Some(crate::analyze::png_bytes(img)?))
+    Ok(Some(render_sphere(&maps, size)))
 }
 
 /// One material with its maps, for an asset's detail.
@@ -1473,7 +1625,7 @@ mod tests {
                 key: String::new(),
                 maps: Vec::new(),
                 look: None,
-                source: None,
+                sources: Vec::new(),
             })
             .collect();
         name_from_sidecars(&sidecars, &mut found);

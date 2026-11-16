@@ -40,6 +40,7 @@ mod materials;
 mod mcp;
 mod me;
 mod meshes;
+mod mtlmat;
 mod music;
 mod naming;
 mod oauth;

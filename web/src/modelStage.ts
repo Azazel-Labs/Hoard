@@ -480,34 +480,50 @@ export class ModelStage {
     // A model that names no textures, next to textures named after it: try them on.
     let guessed = 0
     this.flipY = src.ext === 'dae'
+    const onMaps = () => {
+      // A view built from the maps that were there shows the new ones only once built again.
+      if (this.views) this.buildViews()
+      this.redraw()
+      this.onTexturesChanged?.()
+    }
+    // The material's maps count as the model's textures: a thumbnail waits for them, and one that fails is missing.
+    const track = (name: string) => {
+      this.pending++
+      return (ok: boolean) => {
+        this.pending = Math.max(0, this.pending - 1)
+        this.redraw()
+        if (!ok && !this.missing.includes(name)) {
+          this.missing.push(name)
+          this.onMissing?.([...this.missing])
+        }
+        this.checkSettled()
+      }
+    }
+    // Materials that go in the model's slots (Unity's, by an FBX's material names): each on the slots it names
+    // that have no color map of their own.
+    const slotted = (full.materials ?? []).filter((m) => m.slots?.length)
     // Or a material made from maps that share its name: its maps by role.
-    const material = textured.any ? undefined : full.materials?.[0]
-    if (material) {
-      const applied = applyToModel(
-        material,
-        asset.pack_id,
-        this.flipY,
-        this.materials,
-        () => {
-          // A view built from the maps that were there shows the new ones only once built again.
-          if (this.views) this.buildViews()
-          this.redraw()
-          this.onTexturesChanged?.()
-        },
-        // The material's maps count as the model's textures: a thumbnail waits for them, and one that fails is missing.
-        (name) => {
-          this.pending++
-          return (ok) => {
-            this.pending = Math.max(0, this.pending - 1)
-            this.redraw()
-            if (!ok && !this.missing.includes(name)) {
-              this.missing.push(name)
-              this.onMissing?.([...this.missing])
-            }
-            this.checkSettled()
-          }
-        },
-      )
+    const material = textured.any || slotted.length ? undefined : full.materials?.[0]
+    if (slotted.length) {
+      const stops: (() => void)[] = []
+      for (const info of slotted) {
+        const wear = new Map(
+          [...this.materials].filter(([m]) => info.slots!.includes(m.name) && !(m as THREE.MeshStandardMaterial).map),
+        )
+        if (!wear.size) continue
+        const tint = info.look?.base_color
+        for (const m of wear.keys()) {
+          const lit = m as THREE.MeshStandardMaterial
+          if (tint) lit.color?.setRGB(tint[0], tint[1], tint[2], THREE.LinearSRGBColorSpace)
+        }
+        if (!info.maps.length) continue
+        const applied = applyToModel(info, asset.pack_id, this.flipY, wear, onMaps, track)
+        stops.push(applied.stop)
+        guessed = Math.max(guessed, applied.count)
+      }
+      this.stopMaps = () => stops.forEach((stop) => stop())
+    } else if (material) {
+      const applied = applyToModel(material, asset.pack_id, this.flipY, this.materials, onMaps, track)
       this.stopMaps = applied.stop
       guessed = applied.count
     } else if (!textured.any && guesses.length && !this.colored()) {

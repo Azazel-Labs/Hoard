@@ -281,4 +281,94 @@ test.describe('materials', () => {
     expect(paths).toEqual(['Asphalt.material', 'car.obj', 'road.obj'])
     await api.delete(`/api/packs/${pack.id}`)
   })
+
+  // Unity puts a .mat in each of an FBX's material slots: the one named after the slot, or the one the FBX's .meta
+  // remaps the slot to. The model wears each in its slot.
+  test("an FBX's material slots wear the Unity materials named for them", async ({ baseURL }) => {
+    const api = await signedIn(baseURL!)
+    const guid = (s: string) => createHash('md5').update(`e2e-unity-slots-${s}`).digest('hex')
+    const meta = (g: string, rest = '') => Buffer.from(`fileFormatVersion: 2\nguid: ${g}\n${rest}`)
+    const mat = (name: string, extra: string) =>
+      Buffer.from(
+        `%YAML 1.1\n%TAG !u! tag:unity3d.com,2011:\n--- !u!21 &2100000\nMaterial:\n  m_Name: ${name}\n` +
+          `  m_SavedProperties:\n${extra}`,
+      )
+    // A cube with two materials: Paint on two faces, lambert2 on the rest.
+    const fbx = [
+      '; FBX 7.5.0 project file',
+      'FBXHeaderExtension:  {',
+      '\tFBXVersion: 7400',
+      '}',
+      'Objects:  {',
+      '\tGeometry: 1, "Geometry::Cube", "Mesh" {',
+      '\t\tVertices: *24 {',
+      '\t\t\ta: 0,0,0,100,0,0,0,100,0,100,100,0,0,0,100,100,0,100,0,100,100,100,100,100',
+      '\t\t}',
+      '\t\tPolygonVertexIndex: *24 {',
+      '\t\t\ta: 0,2,3,-2,4,5,7,-7,0,1,5,-5,2,6,7,-4,0,4,6,-3,1,3,7,-6',
+      '\t\t}',
+      '\t\tLayerElementMaterial: 0 {',
+      '\t\t\tMappingInformationType: "ByPolygon"',
+      '\t\t\tReferenceInformationType: "IndexToDirect"',
+      '\t\t\tMaterials: *6 {',
+      '\t\t\t\ta: 0,0,1,1,1,1',
+      '\t\t\t}',
+      '\t\t}',
+      '\t\tLayer: 0 {',
+      '\t\t\tLayerElement:  {',
+      '\t\t\t\tType: "LayerElementMaterial"',
+      '\t\t\t\tTypedIndex: 0',
+      '\t\t\t}',
+      '\t\t}',
+      '\t}',
+      '\tModel: 10, "Model::Cube", "Mesh" {',
+      '\t}',
+      '\tMaterial: 20, "Material::Paint", "" {',
+      '\t\tShadingModel: "lambert"',
+      '\t}',
+      '\tMaterial: 21, "Material::lambert2", "" {',
+      '\t\tShadingModel: "lambert"',
+      '\t}',
+      '}',
+      'Connections:  {',
+      '\tC: "OO", 10, 0',
+      '\tC: "OO", 1, 10',
+      '\tC: "OO", 20, 10',
+      '\tC: "OO", 21, 10',
+      '}',
+      '',
+    ].join('\n')
+    const remap =
+      'ModelImporter:\n  externalObjects:\n  - first:\n      type: UnityEngine:Material\n' +
+      '      assembly: UnityEngine.CoreModule\n      name: lambert2\n' +
+      `    second: {fileID: 2100000, guid: ${guid('brick')}, type: 2}\n  materials:\n    materialImportMode: 1\n`
+    const pack = await uploadPack(api, 'E2E Unity Slots', [
+      { relpath: 'Models/Crate.fbx', data: Buffer.from(fbx) },
+      { relpath: 'Models/Crate.fbx.meta', data: meta(guid('crate'), remap) },
+      { relpath: 'Materials/Paint.mat', data: mat('Paint', '    m_Colors:\n    - _Color: {r: 1, g: 0, b: 0, a: 1}\n') },
+      { relpath: 'Materials/Paint.mat.meta', data: meta(guid('paint')) },
+      {
+        relpath: 'Materials/Wall_Brick.mat',
+        data: mat(
+          'Wall_Brick',
+          `    m_TexEnvs:\n    - _MainTex:\n        m_Texture: {fileID: 2800000, guid: ${guid('tex')}, type: 3}\n`,
+        ),
+      },
+      { relpath: 'Materials/Wall_Brick.mat.meta', data: meta(guid('brick')) },
+      { relpath: 'Textures/brick.png', data: checker(64, [170, 60, 40], [120, 40, 30], 8) },
+      { relpath: 'Textures/brick.png.meta', data: meta(guid('tex'), 'TextureImporter:\n') },
+    ])
+    await waitReady(api, [pack.id])
+    await waitIdle(api)
+    const assets = (await assetsOf(api, pack.id)) as (Asset & { path: string })[]
+    const crate = assets.find((a) => a.path === 'Models/Crate.fbx')!
+    const full = (await (await api.get(`/api/assets/${crate.id}`)).json()) as {
+      materials: { path: string; slots?: string[] }[]
+    }
+    expect(full.materials.map((m) => [m.path, m.slots]).sort()).toEqual([
+      ['Materials/Paint.material', ['Paint']],
+      ['Materials/Wall_Brick.material', ['lambert2']],
+    ])
+    await api.delete(`/api/packs/${pack.id}`)
+  })
 })

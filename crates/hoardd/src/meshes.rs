@@ -90,6 +90,35 @@ pub(crate) fn facts(path: &Path, ext: &str, root: &Path) -> Result<Map<String, V
     Ok(polysmelt::formats::load(path, ext, &Pack::new(root), nothing)?.facts)
 }
 
+/// The names of a model's materials, in its order, each once: what an engine's materials are matched to (Unity
+/// gives an FBX's material slots the `.mat` files of their names). Textures aren't looked for.
+pub(crate) fn material_names(path: &Path, ext: &str) -> Result<Vec<String>> {
+    let names_only = Keep {
+        animations: false,
+        skins: false,
+        morph_targets: false,
+        materials: true,
+        textures: false,
+        image_bytes: false,
+        cameras: false,
+        lights: false,
+        extras: false,
+    };
+    let folder = path.parent().unwrap_or(Path::new("."));
+    let pack = Pack { guess: false, ..Pack::new(folder) };
+    let doc = polysmelt::formats::load(path, ext, &pack, names_only)?;
+    let mut names: Vec<String> = Vec::new();
+    for m in doc.json.get("materials").and_then(Value::as_array).into_iter().flatten() {
+        let Some(name) = m.get("name").and_then(Value::as_str).map(str::trim).filter(|n| !n.is_empty()) else {
+            continue;
+        };
+        if !names.iter().any(|n| n == name) {
+            names.push(name.to_owned());
+        }
+    }
+    Ok(names)
+}
+
 /// A model in another format as a GLB for download: its whole document (hierarchy, skins, morph targets, animation,
 /// materials and embedded textures), not just the mesh it draws.
 pub(crate) fn glb(path: &Path, ext: &str, root: &Path) -> Result<Vec<u8>> {
@@ -206,6 +235,68 @@ mod tests {
         let (json, _) = crate::formats::read_glb(&view_glb(&obj, "obj", dir.path()).unwrap()).unwrap();
         assert_eq!(json["images"][0]["mimeType"], "image/jpeg");
         assert_eq!(json["asset"]["extras"]["missing_textures"], serde_json::json!(["moss.png"]));
+    }
+
+    /// A cube in ASCII FBX with two materials, `Paint` on two faces and `Steel` on the rest.
+    pub(crate) const TWO_MATERIAL_FBX: &str = r#"; FBX 7.5.0 project file
+FBXHeaderExtension:  {
+	FBXHeaderVersion: 1003
+	FBXVersion: 7400
+}
+Objects:  {
+	Geometry: 1, "Geometry::Cube", "Mesh" {
+		Vertices: *24 {
+			a: 0,0,0,100,0,0,0,100,0,100,100,0,0,0,100,100,0,100,0,100,100,100,100,100
+		}
+		PolygonVertexIndex: *24 {
+			a: 0,2,3,-2,4,5,7,-7,0,1,5,-5,2,6,7,-4,0,4,6,-3,1,3,7,-6
+		}
+		LayerElementMaterial: 0 {
+			Version: 101
+			Name: ""
+			MappingInformationType: "ByPolygon"
+			ReferenceInformationType: "IndexToDirect"
+			Materials: *6 {
+				a: 0,0,1,1,1,1
+			}
+		}
+		Layer: 0 {
+			Version: 100
+			LayerElement:  {
+				Type: "LayerElementMaterial"
+				TypedIndex: 0
+			}
+		}
+	}
+	Model: 10, "Model::Cube", "Mesh" {
+		Version: 232
+	}
+	Material: 20, "Material::Paint", "" {
+		Version: 102
+		ShadingModel: "lambert"
+	}
+	Material: 21, "Material::Steel", "" {
+		Version: 102
+		ShadingModel: "lambert"
+	}
+}
+Connections:  {
+	C: "OO", 10, 0
+	C: "OO", 1, 10
+	C: "OO", 20, 10
+	C: "OO", 21, 10
+}
+"#;
+
+    #[test]
+    fn an_fbxs_material_names() {
+        let dir = tempfile::tempdir().unwrap();
+        let fbx = dir.path().join("crate.fbx");
+        std::fs::write(&fbx, TWO_MATERIAL_FBX).unwrap();
+        assert_eq!(material_names(&fbx, "fbx").unwrap(), ["Paint", "Steel"]);
+        let (Some(mesh), _) = load(&fbx, "fbx", dir.path()).unwrap() else { panic!("no mesh") };
+        let names: Vec<&str> = mesh.materials.iter().map(|m| m.name.as_str()).collect();
+        assert_eq!(names, ["Paint", "Steel"], "the mesh's materials keep the names the slots are matched by");
     }
 
     #[test]

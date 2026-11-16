@@ -60,15 +60,62 @@ pub(crate) fn unity_guid(text: &str) -> Option<&str> {
     (line.len() == 32 && line.bytes().all(|b| b.is_ascii_hexdigit())).then_some(line)
 }
 
-/// GUIDs of the pack's files, from the `.meta` files beside them: `(path relative to root, guid)`.
-fn harvest_unity_guids(root: &Path, files: &[PathBuf]) -> Vec<(String, String)> {
+/// The materials a Unity model importer puts in its model's material slots (`externalObjects`): each slot's name and
+/// the GUID of the `.mat` it wears.
+pub(crate) fn unity_remaps(text: &str) -> Vec<(String, String)> {
     let mut out = Vec::new();
+    let (mut inside, mut material, mut name) = (false, false, None::<String>);
+    for line in text.lines() {
+        let t = line.trim();
+        if t.starts_with("externalObjects:") {
+            inside = !t.ends_with("{}");
+            continue;
+        }
+        if !inside {
+            continue;
+        }
+        // The list ends where a key no deeper than `externalObjects` starts.
+        if !line.starts_with("  -") && !line.starts_with("   ") && !t.is_empty() {
+            break;
+        }
+        if t.starts_with("- first:") {
+            (material, name) = (false, None);
+        } else if let Some(ty) = t.strip_prefix("type:") {
+            material |= ty.trim() == "UnityEngine:Material";
+        } else if let Some(n) = t.strip_prefix("name:") {
+            name = Some(n.trim().trim_matches(['\'', '"']).to_owned());
+        } else if let Some(second) = t.strip_prefix("second:")
+            && material
+            && let Some(n) = name.take().filter(|n| !n.is_empty())
+            && let Some(g) = second.split_once("guid:").map(|(_, g)| g.trim_start())
+            && let Some(g) = g.get(..32).filter(|g| g.bytes().all(|b| b.is_ascii_hexdigit()))
+        {
+            out.push((n, g.to_ascii_lowercase()));
+        }
+    }
+    out
+}
+
+/// Unity's facts about the pack's files, from the `.meta` files beside them.
+#[derive(Default)]
+struct UnityMeta {
+    /// `(path relative to root, guid)`.
+    guids: Vec<(String, String)>,
+    /// `(model's path, material slot, the .mat's guid)`.
+    remaps: Vec<(String, String, String)>,
+}
+
+fn harvest_unity_meta(root: &Path, files: &[PathBuf]) -> UnityMeta {
+    let mut out = UnityMeta::default();
     for f in files {
         let rel = rel_of(root, f);
         let Some(target) = rel.strip_suffix(".meta").filter(|_| is_sidecar(&rel)) else { continue };
         let Ok(text) = fs::read_to_string(f) else { continue };
         if let Some(g) = unity_guid(&text) {
-            out.push((target.to_owned(), g.to_ascii_lowercase()));
+            out.guids.push((target.to_owned(), g.to_ascii_lowercase()));
+        }
+        for (slot, guid) in unity_remaps(&text) {
+            out.remaps.push((target.to_owned(), slot, guid));
         }
     }
     out
@@ -825,7 +872,7 @@ pub(crate) fn ingest_pack(state: &AppState, rt: &Handle, pack_id: &str, auto_nam
     };
 
     let mut files = listed(&root)?;
-    let guids = harvest_unity_guids(&root, &files);
+    let UnityMeta { guids, remaps } = harvest_unity_meta(&root, &files);
     let known = db::known_paths(&conn, pack_id)?;
     if watched.is_none() {
         let keep: HashSet<String> = known.iter().cloned().chain(guids.iter().map(|(path, _)| path.clone())).collect();
@@ -897,6 +944,15 @@ pub(crate) fn ingest_pack(state: &AppState, rt: &Handle, pack_id: &str, auto_nam
         tx.execute(
             "INSERT INTO unity_guids (pack_id, guid, path) VALUES (?1, ?2, ?3) ON CONFLICT DO NOTHING",
             params![pack_id, guid, path],
+        )?;
+    }
+    for (path, _) in &guids {
+        tx.execute("DELETE FROM unity_remaps WHERE pack_id = ?1 AND path = ?2", params![pack_id, path])?;
+    }
+    for (path, slot, guid) in &remaps {
+        tx.execute(
+            "INSERT INTO unity_remaps (pack_id, path, slot, guid) VALUES (?1, ?2, ?3, ?4) ON CONFLICT DO NOTHING",
+            params![pack_id, path, slot, guid],
         )?;
     }
     let n_links = links::link_pack(&tx, pack_id, &refs)?;
@@ -1163,6 +1219,44 @@ mod tests {
         assert_eq!(unity_guid("fileFormatVersion: 2\nguid: nothex\n"), None);
         assert!(!is_junk("Assets/thing.png.meta"));
         assert!(!is_junk("Assets/thing.png"));
+    }
+
+    #[test]
+    fn a_model_importers_material_slots() {
+        let meta = "fileFormatVersion: 2
+guid: 0f8c1d2e3a4b5c6d7e8f901a2b3c4d5e
+ModelImporter:
+  serializedVersion: 19301
+  internalIDToNameTable: []
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: lambert2
+    second: {fileID: 2100000, guid: 6E0D5F4D4A0B6A64A8B0D3E9E6B9C2A1, type: 2}
+  - first:
+      type: UnityEngine:AnimationClip
+      assembly: UnityEngine.AnimationModule
+      name: Take 001
+    second: {fileID: 7400000, guid: 11111111111111111111111111111111, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: 'Glass #2'
+    second: {fileID: 2100000, guid: 22222222222222222222222222222222, type: 2}
+  materials:
+    materialImportMode: 1
+    name: notaslot
+    second: {fileID: 2100000, guid: 33333333333333333333333333333333, type: 2}
+";
+        assert_eq!(
+            unity_remaps(meta),
+            [
+                ("lambert2".to_owned(), "6e0d5f4d4a0b6a64a8b0d3e9e6b9c2a1".to_owned()),
+                ("Glass #2".to_owned(), "22222222222222222222222222222222".to_owned()),
+            ]
+        );
+        assert_eq!(unity_remaps("ModelImporter:\n  externalObjects: {}\n  materials:\n").len(), 0);
     }
 
     /// A one-triangle glTF reading `bin` for its buffer and `png` for its color map.

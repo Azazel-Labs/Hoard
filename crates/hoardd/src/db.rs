@@ -507,6 +507,22 @@ const MIGRATIONS: &[&str] = &[
        FROM packs p WHERE p.status = 'ready'
         AND EXISTS (SELECT 1 FROM assets a WHERE a.pack_id = p.id AND a.ext = 'mtl')
         AND NOT EXISTS (SELECT 1 FROM jobs j WHERE j.kind = 'materials' AND j.pack_id = p.id);",
+    // 53: a model wears the Unity materials its material slots name, or that its importer's `.meta` puts in them
+    // (`unity_remaps`, read as packs are unpacked). Packs with `.mat` files look for materials again.
+    "CREATE TABLE IF NOT EXISTS unity_remaps (
+         pack_id TEXT NOT NULL REFERENCES packs(id) ON DELETE CASCADE,
+         path    TEXT NOT NULL,
+         slot    TEXT NOT NULL,
+         guid    TEXT NOT NULL,
+         PRIMARY KEY (pack_id, path, slot)
+     ) WITHOUT ROWID;
+     INSERT INTO jobs (kind, pack_id, payload, run_after, created_at, updated_at)
+       SELECT 'materials', p.id, '{}', strftime('%Y-%m-%dT%H:%M:%SZ', 'now'), strftime('%Y-%m-%dT%H:%M:%SZ', 'now'),
+              strftime('%Y-%m-%dT%H:%M:%SZ', 'now')
+       FROM packs p WHERE p.status = 'ready'
+        AND EXISTS (SELECT 1 FROM assets a WHERE a.pack_id = p.id AND a.ext = 'mat')
+        AND NOT EXISTS (SELECT 1 FROM jobs j WHERE j.kind = 'materials' AND j.pack_id = p.id
+                          AND j.status IN ('queued', 'running'));",
 ];
 
 /// How many automatic pre-upgrade backups to keep in `<data dir>/backups`.
@@ -2257,6 +2273,36 @@ mod tests {
             .flatten()
             .collect();
         assert_eq!(jobs, ["materials:city"]);
+    }
+
+    /// Packs with Unity `.mat` files look for materials again, unless already about to.
+    #[test]
+    fn packs_with_unity_materials_look_for_materials_again() {
+        let dir = tempfile::tempdir().unwrap();
+        let mut conn = baseline_db(dir.path());
+        migrate(&mut conn, &dir.path().join("backups"), &MIGRATIONS[..44]).unwrap();
+        conn.execute_batch(
+            "PRAGMA foreign_keys = OFF;
+             INSERT INTO packs (id, name, status, created_at) VALUES
+               ('kit', 'Kit', 'ready', 'x'), ('busy', 'Busy', 'ready', 'x'), ('plain', 'Plain', 'ready', 'x');
+             INSERT INTO assets (id, pack_id, blob_hash, path, name, ext, kind, meta, created_at, updated_at) VALUES
+               ('m', 'kit', 'h1', 'Wood.mat', 'Wood', 'mat', 'other', '{}', 'x', 'x'),
+               ('b', 'busy', 'h2', 'Rock.mat', 'Rock', 'mat', 'other', '{}', 'x', 'x'),
+               ('w', 'plain', 'h3', 'wood.png', 'wood', 'png', 'texture', '{}', 'x', 'x');
+             INSERT INTO jobs (kind, pack_id, payload, status, run_after, created_at, updated_at)
+               VALUES ('materials', 'busy', '{}', 'queued', 'x', 'x', 'x');",
+        )
+        .unwrap();
+        migrate(&mut conn, &dir.path().join("backups"), &MIGRATIONS[..45]).unwrap();
+        let jobs: Vec<String> = conn
+            .prepare("SELECT kind || ':' || pack_id FROM jobs WHERE pack_id <> 'p1' ORDER BY id")
+            .unwrap()
+            .query_map([], |r| r.get(0))
+            .unwrap()
+            .flatten()
+            .collect();
+        assert_eq!(jobs, ["materials:busy", "materials:kit"]);
+        conn.execute("INSERT INTO unity_remaps VALUES ('kit', 'Crate.fbx', 'lambert2', 'g')", []).unwrap();
     }
 
     #[test]

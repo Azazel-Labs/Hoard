@@ -844,24 +844,7 @@ fn find_materials(state: &AppState, rt: &Handle, conn: &mut Connection, pack_id:
         &[crate::issues::MATERIALS, crate::issues::MATERIAL_THUMB],
         crate::issues::At::pack(pack_id),
     );
-    let textures: Vec<Texture> = {
-        let mut stmt = conn.prepare(&format!(
-            "SELECT a.id, a.path, a.blob_hash, a.thumb_hash,
-                    MAX(COALESCE(json_extract(a.meta, '$.width'), 0), COALESCE(json_extract(a.meta, '$.height'), 0))
-             FROM assets a WHERE a.pack_id = ?1 AND a.kind = 'texture' AND NOT {} ORDER BY a.path",
-            crate::atlas::IS_SPRITE
-        ))?;
-        stmt.query_map([pack_id], |r| {
-            Ok(Texture {
-                id: r.get(0)?,
-                path: r.get(1)?,
-                hash: r.get(2)?,
-                thumb: r.get(3)?,
-                size_px: r.get::<_, Option<i64>>(4)?.and_then(|n| u32::try_from(n).ok()).filter(|&n| n > 0),
-            })
-        })?
-        .collect::<rusqlite::Result<_>>()?
-    };
+    let textures = pack_textures(conn, pack_id)?;
     let sidecars = rt.block_on(crate::sidecar::pack_sidecars(state, pack_id))?;
     let listed = listed_roles(&textures, &sidecars);
     let candidates: Vec<Candidate<'_>> = textures
@@ -872,6 +855,11 @@ fn find_materials(state: &AppState, rt: &Handle, conn: &mut Connection, pack_id:
     let mut found = find(&candidates);
     name_from_sidecars(&sidecars, &mut found);
     let unity = unity_materials(state, rt, conn, pack_id, &textures)?;
+    if !unity.is_empty()
+        && let Err(e) = read_material_names(state, rt, conn, pack_id)
+    {
+        tracing::warn!(pack = pack_id, error = %format!("{e:#}"), "could not read models' material names");
+    }
     let found = prefer_engines(found, unity, mtl_materials(state, rt, conn, pack_id)?);
     if let Err(e) = draw_mtls(state, rt, conn, pack_id, &textures) {
         tracing::warn!(pack = pack_id, error = %format!("{e:#}"), "could not draw MTL files");
@@ -997,6 +985,28 @@ fn find_materials(state: &AppState, rt: &Handle, conn: &mut Connection, pack_id:
     Ok(made.len())
 }
 
+/// The pack's textures (sprites apart), by path.
+fn pack_textures(conn: &Connection, pack_id: &str) -> Result<Vec<Texture>> {
+    let mut stmt = conn.prepare(&format!(
+        "SELECT a.id, a.path, a.blob_hash, a.thumb_hash,
+                MAX(COALESCE(json_extract(a.meta, '$.width'), 0), COALESCE(json_extract(a.meta, '$.height'), 0))
+         FROM assets a WHERE a.pack_id = ?1 AND a.kind = 'texture' AND NOT {} ORDER BY a.path",
+        crate::atlas::IS_SPRITE
+    ))?;
+    let textures = stmt
+        .query_map([pack_id], |r| {
+            Ok(Texture {
+                id: r.get(0)?,
+                path: r.get(1)?,
+                hash: r.get(2)?,
+                thumb: r.get(3)?,
+                size_px: r.get::<_, Option<i64>>(4)?.and_then(|n| u32::try_from(n).ok()).filter(|&n| n > 0),
+            })
+        })?
+        .collect::<rusqlite::Result<_>>()?;
+    Ok(textures)
+}
+
 /// Search words for where a material was read from.
 fn engine_words(f: &Found) -> &'static str {
     match f.sources.first().map(|(_, p)| p.rsplit('.').next().unwrap_or("").to_ascii_lowercase()).as_deref() {
@@ -1047,16 +1057,41 @@ fn dress_models(state: &AppState, rt: &Handle, conn: &Connection, pack_id: &str)
               WHERE o.pack_id = ?1 AND o.kind = 'model' AND o.ext IN ('fbx', 'obj', 'glb', 'gltf', 'stl', 'ply')
                 AND o.thumb_source IS NULL AND o.thumb_hash IS NOT NULL
                 AND o.thumb_hash IS NOT json_extract(o.meta, '$.thumb_dressed')
+                AND json_extract(o.meta, '$.material_slots') IS NULL
               GROUP BY o.id",
         )?
         .query_map([pack_id], |r| Ok((r.get(0)?, r.get(1)?, r.get(2)?)))?
         .collect::<rusqlite::Result<_>>()?;
-    if todo.is_empty() || crate::analyze::renderer().is_none() {
+    let slotted: Vec<(String, String, String)> = conn
+        .prepare(
+            "SELECT id, ext, json_extract(meta, '$.material_slots') FROM assets
+              WHERE pack_id = ?1 AND kind = 'model' AND ext IN ('fbx', 'obj', '3ds')
+                AND thumb_source IS NULL AND thumb_hash IS NOT NULL
+                AND thumb_hash IS NOT json_extract(meta, '$.thumb_dressed')
+                AND json_extract(meta, '$.material_slots') IS NOT NULL",
+        )?
+        .query_map([pack_id], |r| Ok((r.get(0)?, r.get(1)?, r.get(2)?)))?
+        .collect::<rusqlite::Result<_>>()?;
+    if (todo.is_empty() && slotted.is_empty()) || crate::analyze::renderer().is_none() {
         return Ok(0);
     }
     std::fs::create_dir_all(state.cfg.tmp_dir())?;
     let work = tempfile::Builder::new().prefix("dress-").tempdir_in(state.cfg.tmp_dir())?;
     let mut done = 0;
+    for (id, ext, slots) in slotted {
+        let dir = work.path().join(&id);
+        let dressed = dress_slots(state, rt, conn, &id, &ext, &slots, &dir);
+        std::fs::remove_dir_all(&dir).ok();
+        match dressed {
+            Ok(Some(thumb)) => {
+                if replace_thumb(state, rt, conn, &id, thumb, "json_set(meta, '$.thumb_dressed', ?2)")? {
+                    done += 1;
+                }
+            }
+            Ok(None) => {}
+            Err(e) => tracing::debug!(asset = %id, error = %format!("{e:#}"), "model thumbnail kept undressed"),
+        }
+    }
     for (id, ext, color) in todo {
         let dir = work.path().join(&id);
         let dressed = (|| -> Result<Option<Vec<u8>>> {
@@ -1100,6 +1135,94 @@ fn dress_models(state: &AppState, rt: &Handle, conn: &Connection, pack_id: &str)
         tracing::info!(pack = pack_id, models = done, "model thumbnails redrawn with their materials");
     }
     Ok(done)
+}
+
+/// A model's thumbnail drawn with the material in each of its slots (`material_slots`, see [`link_unity_slots`]):
+/// a slot with a color map of its own keeps it, the others take their material's color map and color. `None` when
+/// that changes nothing.
+fn dress_slots(
+    state: &AppState,
+    rt: &Handle,
+    conn: &Connection,
+    id: &str,
+    ext: &str,
+    slots: &str,
+    dir: &Path,
+) -> Result<Option<Vec<u8>>> {
+    let slots: HashMap<String, String> = serde_json::from_str(slots)?;
+    let file = fetch_model(state, rt, conn, id, dir)?;
+    let (Some(mut mesh), _) = crate::meshes::load(&file, ext, dir)? else { return Ok(None) };
+    let mut paint = conn.prepare_cached(
+        "SELECT (SELECT t.thumb_hash FROM material_maps m JOIN assets t ON t.id = m.texture_id
+                  WHERE m.material_id = a.id AND m.role = 'base_color' AND t.thumb_hash IS NOT NULL
+                  ORDER BY COALESCE(json_extract(t.meta, '$.width'), 0) DESC LIMIT 1),
+                json_extract(a.meta, '$.look.base_color')
+         FROM assets a WHERE a.id = ?1",
+    )?;
+    let mut images: HashMap<String, usize> = HashMap::new();
+    let mut changed = false;
+    for m in &mut mesh.materials {
+        let Some(mat_id) = slots.get(&m.name).filter(|_| m.color_image.is_none()) else { continue };
+        let Some((map, tint)) = paint
+            .query_row([mat_id], |r| Ok((r.get::<_, Option<String>>(0)?, r.get::<_, Option<String>>(1)?)))
+            .optional()?
+        else {
+            continue;
+        };
+        let tint = tint.and_then(|t| serde_json::from_str::<[f32; 4]>(&t).ok());
+        if map.is_none() && tint.is_none() {
+            continue;
+        }
+        if let Some(hash) = map {
+            if !images.contains_key(&hash) {
+                let bytes = rt.block_on(state.blobs.read_all(&hash))?.to_vec();
+                let mime = crate::analyze::thumb_mime(&bytes);
+                mesh.images.push(crate::meshes::Image { bytes, mime });
+                images.insert(hash.clone(), mesh.images.len() - 1);
+            }
+            m.color_image = images.get(&hash).copied();
+        }
+        m.color = tint.unwrap_or([1.0, 1.0, 1.0, m.color[3]]);
+        changed = true;
+    }
+    if !changed {
+        return Ok(None);
+    }
+    crate::analyze::mesh_thumb_bytes(&mesh, &file)
+}
+
+/// The names of the material slots of the pack's models in formats Unity imports and Hoard reads (FBX, OBJ, 3DS),
+/// as `material_names` in their meta, for the ones not read yet: what Unity's materials are matched to. A model
+/// that can't be read gets none.
+fn read_material_names(state: &AppState, rt: &Handle, conn: &Connection, pack_id: &str) -> Result<()> {
+    let todo: Vec<(String, String, String)> = conn
+        .prepare(
+            "SELECT id, ext, blob_hash FROM assets WHERE pack_id = ?1 AND kind = 'model'
+                AND ext IN ('fbx', 'obj', '3ds') AND json_type(meta, '$.material_names') IS NULL",
+        )?
+        .query_map([pack_id], |r| Ok((r.get(0)?, r.get(1)?, r.get(2)?)))?
+        .collect::<rusqlite::Result<_>>()?;
+    if todo.is_empty() {
+        return Ok(());
+    }
+    std::fs::create_dir_all(state.cfg.tmp_dir())?;
+    let work = tempfile::Builder::new().prefix("slots-").tempdir_in(state.cfg.tmp_dir())?;
+    for (id, ext, hash) in todo {
+        let file = work.path().join(format!("model.{ext}"));
+        let names = rt
+            .block_on(state.blobs.download_to(&hash, &file))
+            .and_then(|()| crate::meshes::material_names(&file, &ext))
+            .unwrap_or_else(|e| {
+                tracing::debug!(asset = %id, error = %format!("{e:#}"), "material names not read");
+                Vec::new()
+            });
+        std::fs::remove_file(&file).ok();
+        conn.execute(
+            "UPDATE assets SET meta = json_set(meta, '$.material_names', json(?2)) WHERE id = ?1",
+            params![id, serde_json::to_string(&names)?],
+        )?;
+    }
+    Ok(())
 }
 
 /// A model's file with the files it needs (a glTF's buffers and images, an OBJ's MTL), where the pack has them,
@@ -1336,16 +1459,21 @@ fn link_models(tx: &Connection, pack_id: &str) -> Result<()> {
         ),
         [pack_id],
     )?;
+    let slotted = link_unity_slots(tx, pack_id)?;
     // Swatches go only where a `.mtl` puts them: a color has no name to match by.
-    let materials: Vec<(String, String, String)> = {
+    let materials: Vec<(String, String, String, bool)> = {
         let mut stmt = tx.prepare(&format!(
-            "SELECT a.id, a.path, (SELECT group_concat(m.texture_id) FROM material_maps m WHERE m.material_id = a.id)
+            "SELECT a.id, a.path, (SELECT group_concat(m.texture_id) FROM material_maps m WHERE m.material_id = a.id),
+                    EXISTS (SELECT 1 FROM asset_links s JOIN assets f ON f.id = s.to_id AND f.ext = 'mat'
+                             WHERE s.from_id = a.id AND s.rel = 'sidecar')
              FROM assets a WHERE a.pack_id = ?1 AND {IS_MATERIAL}
                AND NOT EXISTS (SELECT 1 FROM asset_links s JOIN assets f ON f.id = s.to_id AND f.ext = 'mtl'
                                 WHERE s.from_id = a.id AND s.rel = 'sidecar')"
         ))?;
-        stmt.query_map([pack_id], |r| Ok((r.get(0)?, r.get(1)?, r.get::<_, Option<String>>(2)?.unwrap_or_default())))?
-            .collect::<rusqlite::Result<_>>()?
+        stmt.query_map([pack_id], |r| {
+            Ok((r.get(0)?, r.get(1)?, r.get::<_, Option<String>>(2)?.unwrap_or_default(), r.get(3)?))
+        })?
+        .collect::<rusqlite::Result<_>>()?
     };
     if materials.is_empty() {
         return Ok(());
@@ -1364,7 +1492,11 @@ fn link_models(tx: &Connection, pack_id: &str) -> Result<()> {
         }
         let words: Vec<String> = tokens(stem_of(model_path)).into_iter().map(|t| t.text).collect();
         let model_dir = dir_key(dir_of(model_path));
-        for (mat_id, mat_path, maps) in &materials {
+        for (mat_id, mat_path, maps, unity) in &materials {
+            // A model whose slots wear Unity's materials wears no others of Unity's by its file name.
+            if *unity && slotted.contains(model_id) {
+                continue;
+            }
             let key: Vec<String> = tokens(stem_of(mat_path)).into_iter().map(|t| t.text).collect();
             let mat_dir = dir_key(dir_of(mat_path));
             let near = model_dir == mat_dir || mat_dir.starts_with(&format!("{model_dir}/")) || model_dir.is_empty();
@@ -1379,6 +1511,95 @@ fn link_models(tx: &Connection, pack_id: &str) -> Result<()> {
         }
     }
     Ok(())
+}
+
+/// Unity puts a `.mat` in each of a model's material slots: the one its importer's `.meta` names for the slot
+/// (`unity_remaps`), or else one named after the slot (or after the model and the slot, `Crate-Paint`), the
+/// nearest to the model where several are. Each model wearing them is linked to them, and `material_slots` in its
+/// meta says which slot wears which (by material id), for drawing it. Returns the models that wear any.
+fn link_unity_slots(tx: &Connection, pack_id: &str) -> Result<HashSet<String>> {
+    tx.execute(
+        "UPDATE assets SET meta = json_remove(meta, '$.material_slots')
+          WHERE pack_id = ?1 AND kind = 'model' AND json_extract(meta, '$.material_slots') IS NOT NULL",
+        [pack_id],
+    )?;
+    let unity: Vec<(String, String)> = tx
+        .prepare(&format!(
+            "SELECT a.id, f.path FROM assets a
+               JOIN asset_links s ON s.from_id = a.id AND s.rel = 'sidecar'
+               JOIN assets f ON f.id = s.to_id AND f.ext = 'mat'
+              WHERE a.pack_id = ?1 AND {IS_MATERIAL} ORDER BY f.path"
+        ))?
+        .query_map([pack_id], |r| Ok((r.get(0)?, r.get(1)?)))?
+        .collect::<rusqlite::Result<_>>()?;
+    let mut slotted = HashSet::new();
+    if unity.is_empty() {
+        return Ok(slotted);
+    }
+    let by_file: HashMap<&str, &str> = unity.iter().map(|(id, path)| (path.as_str(), id.as_str())).collect();
+    let guids: HashMap<String, String> = tx
+        .prepare("SELECT guid, path FROM unity_guids WHERE pack_id = ?1")?
+        .query_map([pack_id], |r| Ok((r.get(0)?, r.get(1)?)))?
+        .collect::<rusqlite::Result<_>>()?;
+    let remaps: HashMap<(String, String), String> = tx
+        .prepare("SELECT path, slot, guid FROM unity_remaps WHERE pack_id = ?1")?
+        .query_map([pack_id], |r| Ok(((r.get(0)?, r.get(1)?), r.get(2)?)))?
+        .collect::<rusqlite::Result<_>>()?;
+    let words = |s: &str| tokens(s).into_iter().map(|t| t.text).collect::<Vec<_>>();
+    let unity_words: Vec<Vec<String>> = unity.iter().map(|(_, path)| words(stem_of(path))).collect();
+    let models: Vec<(String, String, String)> = tx
+        .prepare(
+            "SELECT id, path, json_extract(meta, '$.material_names') FROM assets
+              WHERE pack_id = ?1 AND kind = 'model' AND json_array_length(meta, '$.material_names') > 0",
+        )?
+        .query_map([pack_id], |r| Ok((r.get(0)?, r.get(1)?, r.get(2)?)))?
+        .collect::<rusqlite::Result<_>>()?;
+    let mut insert = tx.prepare_cached(
+        "INSERT INTO asset_links (from_id, to_id, rel) VALUES (?1, ?2, 'material') ON CONFLICT DO NOTHING",
+    )?;
+    let mut save =
+        tx.prepare_cached("UPDATE assets SET meta = json_set(meta, '$.material_slots', json(?2)) WHERE id = ?1")?;
+    for (model_id, model_path, names) in models {
+        let names: Vec<String> = serde_json::from_str(&names).unwrap_or_default();
+        let model_words = words(stem_of(&model_path));
+        let model_dir: Vec<&str> = dir_of(&model_path).split('/').filter(|s| !s.is_empty()).collect();
+        let mut slots = serde_json::Map::new();
+        for name in names {
+            let remapped = remaps
+                .get(&(model_path.clone(), name.clone()))
+                .and_then(|g| guids.get(g))
+                .and_then(|p| by_file.get(p.as_str()).copied());
+            let by_name = || {
+                let key = words(&name);
+                if key.is_empty() {
+                    return None;
+                }
+                let both: Vec<String> = model_words.iter().chain(&key).cloned().collect();
+                (0..unity.len())
+                    .filter(|&i| unity_words[i] == key || unity_words[i] == both)
+                    // The nearest: the most folders shared with the model, then the first by path.
+                    .max_by_key(|&i| {
+                        let shared = dir_of(&unity[i].1)
+                            .split('/')
+                            .filter(|s| !s.is_empty())
+                            .zip(&model_dir)
+                            .take_while(|(a, b)| a.eq_ignore_ascii_case(b))
+                            .count();
+                        (shared, std::cmp::Reverse(i))
+                    })
+                    .map(|i| unity[i].0.as_str())
+            };
+            if let Some(mat_id) = remapped.or_else(by_name) {
+                insert.execute(params![model_id, mat_id])?;
+                slots.insert(name, mat_id.into());
+            }
+        }
+        if !slots.is_empty() {
+            save.execute(params![model_id, serde_json::Value::Object(slots).to_string()])?;
+            slotted.insert(model_id);
+        }
+    }
+    Ok(slotted)
 }
 
 /// The object a model is of: its folder and name without an LOD number, so `Rock_LOD0.fbx` and `Rock_LOD3.fbx` are
@@ -1550,7 +1771,17 @@ fn info(conn: &Connection, id: &str) -> Result<Option<MaterialInfo>> {
         order(a).cmp(&order(b)).then(b.width.unwrap_or(0).cmp(&a.width.unwrap_or(0))).then(a.path.cmp(&b.path))
     });
     let look = serde_json::from_value::<MaterialLook>(meta["look"].clone()).ok();
-    Ok(Some(MaterialInfo { id: id.to_owned(), name, path, has_thumb, maps, physical_size, displacement, look }))
+    Ok(Some(MaterialInfo {
+        id: id.to_owned(),
+        name,
+        path,
+        has_thumb,
+        maps,
+        physical_size,
+        displacement,
+        look,
+        slots: Vec::new(),
+    }))
 }
 
 /// Fill in an asset's material facts: a material's maps, or the materials a texture is part of or a model uses
@@ -1571,11 +1802,14 @@ pub(crate) fn attach(conn: &Connection, asset: &mut hoard_core::Asset) -> Result
              WHERE l.from_id = ?1
            UNION SELECT l.to_id FROM asset_links l JOIN assets a ON a.id = l.to_id
              WHERE l.from_id = ?1 AND l.rel = 'material' AND {IS_MATERIAL}
-         ) LIMIT 8"
+         ) LIMIT 16"
     ))?;
     let ids: Vec<String> = stmt.query_map([&asset.id], |r| r.get(0))?.collect::<rusqlite::Result<_>>()?;
+    let slots: BTreeMap<String, String> =
+        asset.meta.get("material_slots").and_then(|s| serde_json::from_value(s.clone()).ok()).unwrap_or_default();
     for id in ids {
-        if let Some(m) = info(conn, &id)? {
+        if let Some(mut m) = info(conn, &id)? {
+            m.slots = slots.iter().filter(|(_, mat)| **mat == id).map(|(slot, _)| slot.clone()).collect();
             asset.materials.push(m);
         }
     }
@@ -1848,5 +2082,56 @@ mod tests {
         assert_eq!(owner("rockmat").as_deref(), Some("lod0"), "the rock's LODs are one object; LOD0 owns it");
         assert_eq!(owner("sharedmat"), None, "two objects share it");
         assert_eq!(owner("lonemat"), None, "nothing uses it any more");
+    }
+
+    #[test]
+    fn unity_materials_go_in_the_slots_they_are_named_for() {
+        let c = Connection::open_in_memory().unwrap();
+        c.execute_batch(
+            r#"CREATE TABLE assets (id TEXT PRIMARY KEY, pack_id TEXT, path TEXT, ext TEXT, kind TEXT, meta TEXT);
+               CREATE TABLE asset_links (from_id TEXT, to_id TEXT, rel TEXT, PRIMARY KEY (from_id, to_id, rel));
+               CREATE TABLE unity_guids (pack_id TEXT, guid TEXT, path TEXT);
+               CREATE TABLE unity_remaps (pack_id TEXT, path TEXT, slot TEXT, guid TEXT);
+               INSERT INTO assets VALUES
+                 ('paint', 'p', 'Kit/Materials/Paint.material', 'material', 'material', '{"material_maps":1}'),
+                 ('paint.mat', 'p', 'Kit/Materials/Paint.mat', 'mat', 'other', '{}'),
+                 ('far', 'p', 'Other/Paint.material', 'material', 'material', '{"material_maps":1}'),
+                 ('far.mat', 'p', 'Other/Paint.mat', 'mat', 'other', '{}'),
+                 ('brick', 'p', 'Kit/Materials/Wall_Brick.material', 'material', 'material', '{"material_maps":1}'),
+                 ('brick.mat', 'p', 'Kit/Materials/Wall_Brick.mat', 'mat', 'other', '{}'),
+                 ('wood', 'p', 'Kit/Materials/Barrel-Wood.material', 'material', 'material', '{"material_maps":0}'),
+                 ('wood.mat', 'p', 'Kit/Materials/Barrel-Wood.mat', 'mat', 'other', '{}'),
+                 ('crate', 'p', 'Kit/Models/Crate.fbx', 'fbx', 'model',
+                  '{"material_names":["Paint","lambert2","Steel"],"material_slots":{"Old":"gone"}}'),
+                 ('barrel', 'p', 'Kit/Models/Barrel.fbx', 'fbx', 'model', '{"material_names":["Wood"]}'),
+                 ('plain', 'p', 'Kit/Models/Plain.fbx', 'fbx', 'model', '{"material_names":[]}');
+               INSERT INTO asset_links VALUES
+                 ('paint', 'paint.mat', 'sidecar'), ('far', 'far.mat', 'sidecar'), ('brick', 'brick.mat', 'sidecar'),
+                 ('wood', 'wood.mat', 'sidecar');
+               INSERT INTO unity_guids VALUES ('p', 'gw', 'Kit/Materials/Wall_Brick.mat');
+               INSERT INTO unity_remaps VALUES ('p', 'Kit/Models/Crate.fbx', 'lambert2', 'gw');"#,
+        )
+        .unwrap();
+        let slotted = link_unity_slots(&c, "p").unwrap();
+        assert_eq!(slotted, HashSet::from(["crate".to_owned(), "barrel".to_owned()]));
+        let slots = |id: &str| -> Option<String> {
+            c.query_row("SELECT json_extract(meta, '$.material_slots') FROM assets WHERE id = ?1", [id], |r| r.get(0))
+                .unwrap()
+        };
+        assert_eq!(
+            slots("crate").as_deref(),
+            Some(r#"{"Paint":"paint","lambert2":"brick"}"#),
+            "the nearest Paint, the .meta's material for lambert2, and nothing for Steel"
+        );
+        assert_eq!(slots("barrel").as_deref(), Some(r#"{"Wood":"wood"}"#), "named after the model and the slot");
+        assert_eq!(slots("plain"), None);
+        let worn: Vec<String> = c
+            .prepare("SELECT from_id || '>' || to_id FROM asset_links WHERE rel = 'material' ORDER BY 1")
+            .unwrap()
+            .query_map([], |r| r.get(0))
+            .unwrap()
+            .collect::<rusqlite::Result<_>>()
+            .unwrap();
+        assert_eq!(worn, ["barrel>wood", "crate>brick", "crate>paint"]);
     }
 }

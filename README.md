@@ -227,10 +227,10 @@ software rasterizer (`apt install mesa-vulkan-drivers`). Without any adapter, ev
 1. **Unpack.** Archives are expanded server-side (zip, tar, tar.gz, and Unity's `.unitypackage`; nested ones too,
    3 levels deep), with `..`/absolute-path rejection and limits on expanded size and file count. A `.unitypackage`
    is rebuilt into its original `Assets/…` tree. `__MACOSX` and `.DS_Store` are dropped; Unity `.meta` files are read
-   for their GUIDs (so materials and prefabs link to their textures) and then dropped, along with Godot `.import`
-   files. Wrapper folders are collapsed and the innermost folder's name becomes the pack name. A `.gltf` becomes a
-   `.glb` with its `.bin` packed in when nothing is lost (no other glTF reads that `.bin`), meshopt compression and
-   all; its textures stay files beside it. Watched folders are never changed.
+   for their GUIDs and a model's material slots (so materials, prefabs and models link to theirs) and then dropped,
+   along with Godot `.import` files. Wrapper folders are collapsed and the innermost folder's name becomes the pack
+   name. A `.gltf` becomes a `.glb` with its `.bin` packed in when nothing is lost (no other glTF reads that `.bin`),
+   meshopt compression and all; its textures stay files beside it. Watched folders are never changed.
 2. **Store.** Each file's BLAKE3 hash is its name in blob storage, so a file shared by ten packs is stored once,
    corruption is detectable, and blobs never change (cache them forever, back them up with any sync tool).
 3. **Analyze.**
@@ -411,6 +411,9 @@ A Unity material (`.mat`, text or binary) becomes one too: its textures are foun
 give them, and its color, metalness, smoothness, glow, cutout and tiling are kept as the material's look, which the
 sphere thumbnail and the 3D viewers draw it with. A `.mat` with only a color (Kenney's kits) is a swatch of that
 color. The `.mat` itself is hidden behind the material, and a set of maps found by name that it uses gives way to it.
+An FBX, OBJ or 3DS model's material slots wear the Unity materials named after them (`Paint`, or `Crate_Paint` for
+`Crate.fbx`; the nearest one when several share a name), or the ones its `.meta` puts in them, each slot drawn in its
+own in the thumbnail and the 3D viewer.
 
 An OBJ's `.mtl` colors with no maps (as SketchUp exports them) become swatches too, worn by the OBJs whose `.mtl` names
 them. The same name and color in several `.mtl` files of a folder is one swatch. The `.mtl` itself shows its materials

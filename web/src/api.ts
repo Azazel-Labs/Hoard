@@ -91,6 +91,8 @@ export interface MaterialInfo {
   displacement?: number
   /** The settings its maps are drawn with, when it was read from an engine's material (a Unity .mat). */
   look?: MaterialLook
+  /** On a model's materials: the model's material slots it goes in (a Unity .mat in an FBX's slot). */
+  slots?: string[]
 }
 
 /** An engine material's settings: colors are linear, factors 0..1. */

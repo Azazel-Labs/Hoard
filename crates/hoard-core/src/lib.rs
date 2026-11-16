@@ -256,6 +256,10 @@ pub struct MaterialInfo {
     /// The settings its maps are drawn with, when it was read from an engine's material (a Unity `.mat`).
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub look: Option<MaterialLook>,
+    /// On a model's materials: the model's material slots this one goes in (Unity's `.mat` for an FBX's slot).
+    /// Empty when it goes on the whole model.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub slots: Vec<String>,
 }
 
 /// How a material read from an engine's file draws its maps, in glTF's terms. Anything unset is as a material

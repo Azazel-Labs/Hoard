@@ -10,14 +10,29 @@ test.describe('profiler', () => {
     })
     await expect(panel.getByText('Whole machine')).toBeVisible()
 
-    // A few requests of a route the page doesn't ask for itself show up in the table within a poll or two.
+    // Requests are recorded by route, with their time split up. (Other tests running alongside fill the table's top
+    // routes, so these are checked in what the panel reads rather than looked for in the table.)
     await page.evaluate(async () => {
       for (let i = 0; i < 3; i++) await fetch('/api/tags?limit=1')
     })
-    const row = panel.getByRole('row').filter({ has: page.getByRole('rowheader', { name: 'GET /api/tags' }) })
-    await expect(row).toBeVisible({ timeout: 10_000 })
-    await expect(row.getByRole('cell').first()).toHaveText(/^[3-9]$|^\d{2,}$/)
-    await expect(row.getByRole('img', { name: /^Database \d+%, Disk \d+%, Sending \d+%, Other \d+%$/ })).toBeVisible()
+    type Served = { route: string; method: string; status: number; total: number }
+    let served: Served[] = []
+    await expect
+      .poll(async () => {
+        served = await page.evaluate(async () => {
+          const profile = await (await fetch('/api/admin/profile?after=0')).json()
+          return profile.served.filter((r: { route: string }) => r.route === '/api/tags')
+        })
+        return served.length
+      })
+      .toBeGreaterThanOrEqual(3)
+    expect(served[0]).toMatchObject({ method: 'GET', status: 200 })
+    for (const r of served) expect(r.total).toBeGreaterThan(0)
+
+    const row = panel.getByRole('row').filter({ has: page.getByRole('rowheader', { name: /^(GET|POST|PUT|DELETE) / }) })
+    await expect(row.first()).toBeVisible({ timeout: 10_000 })
+    const split = /^Database \d+%, Disk \d+%, Sending \d+%, Other \d+%$/
+    await expect(row.first().getByRole('img', { name: split })).toBeVisible()
     await expect(panel.getByRole('img', { name: /\d+ requests · Database \d+% · Disk/ })).toBeVisible()
 
     // Hovering the processor chart reads out that second.

@@ -756,13 +756,16 @@ onBeforeUnmount(() => unswipe())
           <span class="pack">{{ asset.pack_name }}</span>
         </p>
         <div class="nav">
-          <button class="btn ghost icon" type="button" :aria-label="t('asset-previous')" :disabled="!position?.hasPrev" @click="$emit('step', -1)">
-            <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M10 3 5 8l5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" /></svg>
-          </button>
-          <span v-if="position" class="pos mono">{{ position.index + 1 }}/{{ position.total }}</span>
-          <button class="btn ghost icon" type="button" :aria-label="t('asset-next')" :disabled="!position?.hasNext" @click="$emit('step', 1)">
-            <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="m6 3 5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" /></svg>
-          </button>
+          <!-- Stepping through results by button is for the full page; the side panel steps with the arrow keys. -->
+          <template v-if="page">
+            <button class="btn ghost icon" type="button" :aria-label="t('asset-previous')" :disabled="!position?.hasPrev" @click="$emit('step', -1)">
+              <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M10 3 5 8l5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" /></svg>
+            </button>
+            <span v-if="position" class="pos mono">{{ position.index + 1 }}/{{ position.total }}</span>
+            <button class="btn ghost icon" type="button" :aria-label="t('asset-next')" :disabled="!position?.hasNext" @click="$emit('step', 1)">
+              <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="m6 3 5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" /></svg>
+            </button>
+          </template>
           <button
             v-if="canStar()"
             class="btn ghost icon star"

@@ -7,20 +7,100 @@
 
 [English](../../README.md) · [Afrikaans](README.af.md) · [Català](README.ca.md) · [Čeština](README.cs.md) · [Dansk](README.da.md) · [Deutsch](README.de.md) · [Ελληνικά](README.el.md) · [Español (Latinoamérica)](README.es-419.md) · [Español (España)](README.es-ES.md) · [Suomi](README.fi.md) · [Français](README.fr.md) · [Magyar](README.hu.md) · [Bahasa Indonesia](README.id.md) · [Italiano](README.it.md) · [日本語](README.ja.md) · [한국어](README.ko.md) · [Norsk bokmål](README.nb.md) · [Nederlands](README.nl.md) · [Polski](README.pl.md) · [Português (Brasil)](README.pt-BR.md) · [Português (Portugal)](README.pt-PT.md) · [Română](README.ro.md) · [Русский](README.ru.md) · [Српски](README.sr-Cyrl.md) · [Svenska](README.sv.md) · [ไทย](README.th.md) · [Türkçe](README.tr.md) · [Українська](README.uk.md) · Tiếng Việt · [简体中文](README.zh-Hans.md) · [繁體中文](README.zh-Hant.md)
 
-Một thư viện tài nguyên tự lưu trữ cho phát triển game. Hãy thả vào cả gói tài nguyên (tệp zip, tarball, thư mục), và
-Hoard sẽ lưu mỗi tệp đúng một lần theo mã băm, nhận biết từng tệp là gì, gắn thẻ cho nó, liên kết mesh với texture và
-hoạt ảnh của chúng, và cho phép tìm kiếm tất cả từ một cổng web, một CLI, một endpoint MCP cho agent, và lệnh
-`hoard sync` dựa trên lockfile, kéo về đúng những tệp mà dự án game của bạn cần.
+<h3 align="center">Mọi gói tài nguyên bạn sở hữu, đều tìm kiếm được, xem trước được và chỉ cách game của bạn một cú nhấp.</h3>
 
-Hãy nghĩ về nó như một cửa hàng tài nguyên không có quầy thanh toán.
+Hoard là một thư viện tài nguyên game tự lưu trữ. Hãy thả vào một tệp zip, một gói Unity, một bản tải về từ Fab hay một
+thư mục mười nghìn tệp, và Hoard sẽ bắt tay vào việc. Mô hình xoay trong 3D cùng texture của chúng, các map texture rời
+trở thành vật liệu, âm thanh vẽ ra dạng sóng, bảng sprite phát hoạt ảnh của chúng, và mọi thứ đều được gắn thẻ, nên chỉ
+cần gõ `footsteps gravel` hay `rigged low-poly` là tìm thấy. Rồi nó đi thẳng vào Godot, Unity hoặc Unreal cùng mọi thứ
+nó cần.
+
+Không thuê bao, không tải lên đám mây của ai cả, không tính phí theo từng người dùng: một image Docker trên máy của
+chính bạn, và nó thuộc về bạn. Hãy nghĩ về nó như một cửa hàng tài nguyên không có quầy thanh toán.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="../img/hero-dark.webp">
-  <img alt="Thư viện Hoard: mô hình và vật liệu xếp thành lưới, với một rương báu đang mở trong bản xem trước 3D bên cạnh thẻ và các lựa chọn tải xuống của nó" src="../img/hero-light.webp">
+  <img alt="Thư viện Hoard: các mô hình 3D xếp thành lưới, với một rương báu đang mở trong bản xem trước 3D bên cạnh thẻ và các lựa chọn tải xuống của nó" src="../img/hero-light.webp">
 </picture>
 
-<sub>Thư viện demo là tác phẩm CC0: mô hình từ [Poly Haven](https://polyhaven.com) (glTF và USD) và bề mặt từ
-[ambientCG](https://ambientcg.com). `node web/scripts/readme-images.mts` tạo ra những hình này và thẻ mạng xã hội.</sub>
+### Xem mọi thứ trước khi dùng
+
+Mô hình mở ra trong 3D cùng texture, vật liệu và hoạt ảnh của chúng. FBX, glTF, OBJ, USD, SketchUp, 3MF, STL và voxel
+được chính Hoard đọc, không cần cài ứng dụng 3D nào; tệp Blender đi qua Blender chạy headless (không giao diện), còn gói
+Unreal hiển thị những gì trình biên tập đã lưu về chúng, mà không cần Unreal. Ảnh thu nhỏ được vẽ trên máy chủ, đóng
+khung giống nhau mọi lần, nên có thể lướt qua cả một gói chỉ trong nháy mắt.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="../img/page-dark.webp">
+  <img alt="Một chiếc đèn chùm hiển thị toàn trang: khung xem 3D lớn bên cạnh thông tin, thẻ, texture liên kết và các lựa chọn tải xuống của nó" src="../img/page-light.webp">
+</picture>
+
+### Map texture rời trở thành vật liệu
+
+`Rock_BaseColor.png`, `Rock_Normal.png` và `Rock_Roughness.png` trở thành một vật liệu Rock duy nhất trên một quả cầu
+được chiếu sáng. Hoard hiểu cách đặt tên của Megascans, Poly Haven, ambientCG, Substance và Unreal, kể cả các map được
+đóng gói chung, và cả tệp `.mat` của Unity. Trình xem toàn màn hình hiển thị vật liệu trên hình cầu, hình lập phương
+hoặc mặt phẳng, theo tỉ lệ thực, và từng map có thể bật hoặc tắt.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="../img/material-dark.webp">
+  <img alt="Một vật liệu gạch trong trình xem toàn màn hình, trên hình cầu, với các công tắc cho map màu, normal, độ nhám và độ cao" src="../img/material-light.webp">
+</picture>
+
+### Bảng sprite phát được hoạt ảnh
+
+Atlas từ TexturePacker, Starling, libGDX, Cocos2d và Godot trở thành một bảng sprite duy nhất phát hoạt ảnh và liệt kê
+các sprite của nó. Tải xuống bản đóng gói lại cho engine bạn đang dùng: mười định dạng, mỗi định dạng chỉ nhận những gì
+nó có thể chứa.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="../img/sheet-dark.webp">
+  <img alt="Một bảng sprite nhân vật hiển thị toàn trang, một hoạt ảnh của nó đang phát bên cạnh thẻ và các định dạng tải xuống" src="../img/sheet-light.webp">
+</picture>
+
+### Âm thanh bạn nhìn thấy được
+
+Mỗi âm thanh có một dạng sóng được tô màu theo độ sáng của âm, nên một cú đánh sắc gọn và một đoạn âm thanh nền dài
+trông khác nhau trước cả khi bạn phát chúng. Siêu dữ liệu của thư viện âm thanh được đọc (danh mục UCS, các trường của
+Soundminer và BaseHead, điểm lặp, tempo, nốt gốc), còn nhạc MIDI và tracker được kết xuất để phát như mọi âm thanh khác.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="../img/sound-dark.webp">
+  <img alt="Một lưới hiệu ứng âm thanh vẽ thành các dạng sóng có màu, với một hiệu ứng đang mở hiển thị trình phát, thẻ và các bản thu của nó" src="../img/sound-light.webp">
+</picture>
+
+### Tìm kiếm hiểu mọi thứ là gì
+
+Hoard tự gắn thẻ mọi thứ, ngoại tuyến: `tileable`, `res:2k`, `poly:low`, `rigged`, `loop`, `bpm:120`, `license:cc0`, và
+một danh mục từ cây phân loại tài nguyên game. Tìm theo từ khóa, theo màu sắc hoặc theo những gì một bức ảnh thể hiện,
+và yêu cầu bất kỳ texture hay âm thanh nào cho “Thêm nữa giống thế này”. Trỏ Hoard tới bất kỳ mô hình AI tương thích
+OpenAI nào, chạy cục bộ hay được lưu trữ, và nó cũng sẽ viết tên và mô tả.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="../img/search-dark.webp">
+  <img alt="Tìm kiếm gỗ: một chiếc bàn gỗ, vỏ cây, ván gỗ và một bề mặt gỗ cùng hiện ra, với bộ lọc theo loại và thẻ bên cạnh" src="../img/search-light.webp">
+</picture>
+
+### Thẳng vào engine của bạn
+
+- **Plugin engine** cho Godot 4, Unity và Unreal Engine 5: duyệt thư viện ngay trong trình biên tập và nhấn Thêm vào dự
+  án. Mô hình đến cùng texture của nó, đúng chỗ, đã được nhập.
+- **`hoard sync`** kéo đúng những tệp mà một dự án chỉ định vào dự án đó, được ghim trong lockfile, để mọi đồng đội và
+  máy build đều nhận được đúng những byte giống nhau.
+- **Tải xuống dưới dạng** GLB, PNG, WAV, MP3 hoặc một định dạng bảng sprite, chuyển đổi tức thì, với tên texture theo
+  quy ước của studio bạn.
+- **Agent AI** tìm kiếm, kiểm tra và lấy tài nguyên qua MCP.
+
+### Lưu một lần, giữ an toàn
+
+Mỗi tệp được lưu một lần theo mã băm BLAKE3, nên cùng một texture trong năm gói chỉ chiếm chỗ của một, và dữ liệu hỏng
+không thể lọt qua mà không bị phát hiện. Hãy lưu trên ổ đĩa cục bộ hoặc bất kỳ bucket S3 nào. Các thư mục bạn trỏ Hoard
+tới chỉ được đọc, không bao giờ bị thay đổi. Tài khoản, token chỉ đọc, đăng nhập một lần (SSO), HTTPS và HTTP/3 đều có
+sẵn.
+
+<sub>Thư viện demo là tác phẩm CC0: mô hình từ [Poly Haven](https://polyhaven.com) (glTF và USD), bề mặt từ
+[ambientCG](https://ambientcg.com), và âm thanh, bảng sprite cùng phông chữ từ [Kenney](https://kenney.nl).
+`node web/scripts/readme-images.mts` tạo ra những hình này và thẻ mạng xã hội.</sub>
 
 ## Cài đặt bằng Docker
 
@@ -118,7 +198,7 @@ Hoặc thả tệp zip vào cổng web.
 ## Phần còn lại của README này
 
 Những gì xảy ra với một gói, đưa tài nguyên vào engine, gói Unreal, tìm kiếm, ghi công, MCP, lưu trữ, HTTPS, cấu hình,
-bảo mật, tài khoản và API được mô tả trong [README tiếng Anh](../../README.md).
+bảo mật, tài khoản, API cùng thông tin và số liệu được mô tả trong [README tiếng Anh](../../README.md).
 
 ## Bản dịch
 

@@ -7,22 +7,102 @@
 
 [English](../../README.md) · [Afrikaans](README.af.md) · [Català](README.ca.md) · [Čeština](README.cs.md) · [Dansk](README.da.md) · [Deutsch](README.de.md) · [Ελληνικά](README.el.md) · [Español (Latinoamérica)](README.es-419.md) · [Español (España)](README.es-ES.md) · [Suomi](README.fi.md) · [Français](README.fr.md) · [Magyar](README.hu.md) · [Bahasa Indonesia](README.id.md) · [Italiano](README.it.md) · [日本語](README.ja.md) · [한국어](README.ko.md) · [Norsk bokmål](README.nb.md) · Nederlands · [Polski](README.pl.md) · [Português (Brasil)](README.pt-BR.md) · [Português (Portugal)](README.pt-PT.md) · [Română](README.ro.md) · [Русский](README.ru.md) · [Српски](README.sr-Cyrl.md) · [Svenska](README.sv.md) · [ไทย](README.th.md) · [Türkçe](README.tr.md) · [Українська](README.uk.md) · [Tiếng Việt](README.vi.md) · [简体中文](README.zh-Hans.md) · [繁體中文](README.zh-Hant.md)
 
-Een assetbibliotheek voor gameontwikkeling die je zelf host. Zet er complete assetpakketten in (zips, tarballs,
-mappen), en Hoard slaat elk bestand één keer op aan de hand van zijn hash, zoekt uit wat elk bestand is, tagt het,
-koppelt meshes aan hun texturen en animaties, en maakt alles doorzoekbaar via een webportaal, een CLI, een
-MCP-endpoint voor agents, en een `hoard sync` op basis van een lockfile die precies de bestanden ophaalt die je
-gameproject nodig heeft.
+<h3 align="center">Elk assetpakket dat je hebt, doorzoekbaar, te bekijken en één klik van je game verwijderd.</h3>
 
-Zie het als een assetstore zonder kassa.
+Hoard is een assetbibliotheek voor games die je zelf host. Zet er een zip, een Unity-pakket, een Fab-download of een
+map met tienduizend bestanden in, en Hoard gaat aan de slag. Modellen draaien in 3D met hun texturen, losse
+texturemaps worden materialen, geluiden tekenen hun golfvorm, spritesheets spelen hun animaties af, en alles krijgt
+tags, zodat je het vindt door `footsteps gravel` of `rigged low-poly` te typen. Daarna belandt het in Godot, Unity of
+Unreal, met alles wat het nodig heeft.
+
+Geen abonnement, geen upload naar andermans cloud, geen prijs per gebruiker: één Docker-image op je eigen machine, en
+het is van jou. Zie het als een assetstore zonder kassa.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="../img/hero-dark.webp">
-  <img alt="De Hoard-bibliotheek: modellen en materialen in een raster, met een geopende schatkist in het 3D-voorbeeld naast de tags en downloads ervan" src="../img/hero-light.webp">
+  <img alt="De Hoard-bibliotheek: 3D-modellen in een raster, met een geopende schatkist in het 3D-voorbeeld naast de tags en downloads ervan" src="../img/hero-light.webp">
 </picture>
 
-<sub>De demobibliotheek bestaat uit CC0-art: modellen van [Poly Haven](https://polyhaven.com) (glTF en USD) en
-oppervlakken van [ambientCG](https://ambientcg.com). `node web/scripts/readme-images.mts` maakt deze afbeeldingen en
-de social card.</sub>
+### Bekijk alles voordat je het gebruikt
+
+Modellen openen in 3D met hun texturen, materialen en animaties. FBX, glTF, OBJ, USD, SketchUp, 3MF, STL en voxels
+leest Hoard zelf, zonder dat er een 3D-programma geïnstalleerd hoeft te zijn; Blender-bestanden komen binnen via
+headless Blender, en Unreal-pakketten laten zien wat de editor erover heeft opgeslagen, zonder Unreal. Miniaturen
+worden op de server getekend, elke keer op dezelfde manier in beeld gebracht, zodat je een heel pakket in één
+oogopslag doorziet.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="../img/page-dark.webp">
+  <img alt="Een kroonluchter op een volledige pagina: een grote 3D-weergave naast de gegevens, tags, gekoppelde texturen en downloads ervan" src="../img/page-light.webp">
+</picture>
+
+### Losse texturemaps worden materialen
+
+`Rock_BaseColor.png`, `Rock_Normal.png` en `Rock_Roughness.png` worden één Rock-materiaal op een belichte bol. Hoard
+kent de naamgeving van Megascans, Poly Haven, ambientCG, Substance en Unreal, gecombineerde maps inbegrepen, en ook
+Unity-`.mat`-bestanden. De schermvullende viewer toont een materiaal op een bol, kubus of vlak, op ware grootte, en
+elke map kan los aan en uit.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="../img/material-dark.webp">
+  <img alt="Een bakstenen materiaal in de schermvullende viewer, op een bol, met schakelaars voor de kleur-, normal-, roughness- en hoogtemap ervan" src="../img/material-light.webp">
+</picture>
+
+### Spritesheets die afspelen
+
+Atlassen uit TexturePacker, Starling, libGDX, Cocos2d en Godot worden één spritesheet die zijn animaties afspeelt en
+zijn sprites opsomt. Download hem opnieuw verpakt voor welke engine je ook gebruikt: tien formaten, die elk alleen
+krijgen wat ze kunnen bevatten.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="../img/sheet-dark.webp">
+  <img alt="Een spritesheet van een personage op een volledige pagina, met een van de animaties die afspeelt naast de tags en downloadformaten ervan" src="../img/sheet-light.webp">
+</picture>
+
+### Geluiden die je kunt zien
+
+Elk geluid krijgt een golfvorm die gekleurd is naar hoe helder het klinkt, zodat een scherpe klap en een lange
+ambience er anders uitzien voordat je ze afspeelt. Metadata van geluidsbibliotheken wordt gelezen (UCS-categorieën,
+velden van Soundminer en BaseHead, looppunten, tempo, grondtoon), en MIDI- en trackermuziek wordt gerenderd zodat die
+afspeelt zoals elk ander geluid.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="../img/sound-dark.webp">
+  <img alt="Een raster van geluidseffecten getekend als gekleurde golfvormen, met één geopend dat zijn speler, tags en takes toont" src="../img/sound-light.webp">
+</picture>
+
+### Zoeken dat weet wat dingen zijn
+
+Hoard tagt alles zelf, offline: `tileable`, `res:2k`, `poly:low`, `rigged`, `loop`, `bpm:120`, `license:cc0`, en een
+categorie uit een boom voor game-assets. Zoek op woorden, op kleur of op wat een afbeelding laat zien, en vraag bij
+elke textuur of elk geluid om “Meer zoals dit”. Wijs het een OpenAI-compatibel model aan, lokaal of gehost, en het
+schrijft ook namen en beschrijvingen.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="../img/search-dark.webp">
+  <img alt="Een zoekopdracht naar hout: een houten tafel, schors, planken en een houtoppervlak bij elkaar, met filters op soort en tag ernaast" src="../img/search-light.webp">
+</picture>
+
+### Rechtstreeks in je engine
+
+- **Engine-plugins** voor Godot 4, Unity en Unreal Engine 5: blader door de bibliotheek in de editor en druk op
+  Toevoegen aan project. Het model komt mee met zijn texturen, op de juiste plek, geïmporteerd.
+- **`hoard sync`** haalt precies de bestanden binnen die een project noemt, vastgelegd in een lockfile, zodat elke
+  teamgenoot en elke buildmachine dezelfde bytes krijgt.
+- **Downloaden als** GLB, PNG, WAV, MP3 of een spritesheetformaat, ter plekke geconverteerd, met texturenamen volgens
+  de conventie van je studio.
+- **AI-agents** zoeken, inspecteren en halen assets op via MCP.
+
+### Eén keer opgeslagen, veilig bewaard
+
+Elk bestand wordt één keer opgeslagen aan de hand van zijn BLAKE3-hash, zodat dezelfde textuur in vijf bundels de
+ruimte van één inneemt, en beschadiging niet onopgemerkt kan blijven. Bewaar het op een lokale schijf of in een
+willekeurige S3-bucket. Mappen waar je Hoard op richt worden gelezen, nooit gewijzigd. Accounts, alleen-lezentokens,
+single sign-on, HTTPS en HTTP/3 zijn ingebouwd.
+
+<sub>De demobibliotheek bestaat uit CC0-art: modellen van [Poly Haven](https://polyhaven.com) (glTF en USD),
+oppervlakken van [ambientCG](https://ambientcg.com), en geluiden, spritesheets en lettertypen van
+[Kenney](https://kenney.nl). `node web/scripts/readme-images.mts` maakt deze afbeeldingen en de social card.</sub>
 
 ## Installeren met Docker
 
@@ -123,7 +203,8 @@ Of zet de zip neer in het portaal.
 ## De rest van deze README
 
 Wat er met een pakket gebeurt, assets in een engine krijgen, Unreal-pakketten, zoeken, vermeldingen, MCP, opslag,
-HTTPS, configuratie, beveiliging, accounts en de API worden beschreven in de [Engelse README](../../README.md).
+HTTPS, configuratie, beveiliging, accounts, de API en feiten en cijfers worden beschreven in de
+[Engelse README](../../README.md).
 
 ## Vertalingen
 

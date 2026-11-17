@@ -9,43 +9,98 @@
 English · [Afrikaans](docs/i18n/README.af.md) · [Català](docs/i18n/README.ca.md) · [Čeština](docs/i18n/README.cs.md) · [Dansk](docs/i18n/README.da.md) · [Deutsch](docs/i18n/README.de.md) · [Ελληνικά](docs/i18n/README.el.md) · [Español (Latinoamérica)](docs/i18n/README.es-419.md) · [Español (España)](docs/i18n/README.es-ES.md) · [Suomi](docs/i18n/README.fi.md) · [Français](docs/i18n/README.fr.md) · [Magyar](docs/i18n/README.hu.md) · [Bahasa Indonesia](docs/i18n/README.id.md) · [Italiano](docs/i18n/README.it.md) · [日本語](docs/i18n/README.ja.md) · [한국어](docs/i18n/README.ko.md) · [Norsk bokmål](docs/i18n/README.nb.md) · [Nederlands](docs/i18n/README.nl.md) · [Polski](docs/i18n/README.pl.md) · [Português (Brasil)](docs/i18n/README.pt-BR.md) · [Português (Portugal)](docs/i18n/README.pt-PT.md) · [Română](docs/i18n/README.ro.md) · [Русский](docs/i18n/README.ru.md) · [Српски](docs/i18n/README.sr-Cyrl.md) · [Svenska](docs/i18n/README.sv.md) · [ไทย](docs/i18n/README.th.md) · [Türkçe](docs/i18n/README.tr.md) · [Українська](docs/i18n/README.uk.md) · [Tiếng Việt](docs/i18n/README.vi.md) · [简体中文](docs/i18n/README.zh-Hans.md) · [繁體中文](docs/i18n/README.zh-Hant.md)
 <!-- languages:end -->
 
-A self-hosted asset library for game development. Drop in whole asset packs (zips, tarballs, folders), and Hoard
-stores every file once by its hash, works out what each file is, tags it, links meshes to their textures and
-animations, and makes all of it searchable from a web portal, a CLI, an MCP endpoint for agents, and a lockfile-based
-`hoard sync` that pulls exactly the files your game project needs.
+<h3 align="center">Every asset pack you own, searchable, previewable and one click from your game.</h3>
 
-Think of it as an asset store with no checkout.
+Hoard is a self-hosted library for game assets. Drop in a zip, a Unity package, a Fab download or a folder of ten
+thousand files, and Hoard gets to work. Models turn in 3D with their textures, loose texture maps become materials,
+sounds draw their waveforms, sprite sheets play their animations, and everything gets tagged, so typing
+`footsteps gravel` or `rigged low-poly` finds it. Then it lands in Godot, Unity or Unreal with everything it needs.
+
+No subscription, no upload to anyone's cloud, no per-seat pricing: one Docker image on your own machine, and it's
+yours. Think of it as an asset store with no checkout.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/img/hero-dark.webp">
-  <img alt="The Hoard library: models and materials in a grid, with a treasure chest open in the 3D preview beside its tags and downloads" src="docs/img/hero-light.webp">
+  <img alt="The Hoard library: 3D models in a grid, with a treasure chest open in the 3D preview beside its tags and downloads" src="docs/img/hero-light.webp">
 </picture>
 
-<sub>The demo library is CC0 art: models from [Poly Haven](https://polyhaven.com) (glTF and USD) and surfaces from
-[ambientCG](https://ambientcg.com). `node web/scripts/readme-images.mts` makes these pictures and the social card.</sub>
+### See everything before you use it
 
-```mermaid
-flowchart TB
-    web["<b>Web portal</b> (Vue 3 + Vite)<br/>drop packs · search · facets · 3D/audio preview<br/>tag editing · linked assets · bundle downloads"]
-    cli["<b>hoard CLI</b><br/>search · upload · sync + hoard.lock"]
-    mcp["<b>MCP clients</b><br/>search · inspect · bundle links"]
+Models open in 3D with their textures, materials and animations. FBX, glTF, OBJ, USD, SketchUp, 3MF, STL and
+voxels are read by Hoard itself, with no 3D app installed; Blender files come in through headless Blender, and
+Unreal packages show what the editor saved about them, without Unreal. Thumbnails are drawn on the server, framed
+the same way every time, so a whole pack can be skimmed at a glance.
 
-    subgraph hoardd["hoardd (Rust, axum)"]
-        direction TB
-        ingest["<b>ingest</b><br/>unpack (zip-slip/bomb guards) → analyze (image, audio, glTF/OBJ/FBX) → tag → link → store"]
-        jobs["<b>jobs</b><br/>durable SQLite queue · rule tagger · LLM tagger · Blender convert · integrity scrub"]
-        render["<b>render</b><br/>headless wgpu thumbnails for glTF/GLB/OBJ (GPU or Mesa lavapipe)"]
-    end
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/img/page-dark.webp">
+  <img alt="A chandelier shown full page: a large 3D view beside its facts, tags, linked textures and downloads" src="docs/img/page-light.webp">
+</picture>
 
-    db[("<b>metadata</b><br/>SQLite (WAL) + FTS5")]
-    blobs[("<b>blobs</b><br/>content-addressed (BLAKE3)<br/>local disk or any S3 bucket")]
+### Loose texture maps become materials
 
-    web -- "REST /api/*" --> hoardd
-    cli -- "REST /api/*" --> hoardd
-    mcp -- "POST /mcp" --> hoardd
-    hoardd --> db
-    hoardd --> blobs
-```
+`Rock_BaseColor.png`, `Rock_Normal.png` and `Rock_Roughness.png` become one Rock material on a lit sphere. Hoard
+reads the naming of Megascans, Poly Haven, ambientCG, Substance and Unreal, packed maps included, and Unity `.mat`
+files too. The full-screen viewer shows a material on a sphere, cube or plane, at its real-world scale, with each
+map switched on and off.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/img/material-dark.webp">
+  <img alt="A brick material in the full-screen viewer, on a sphere, with switches for its color, normal, roughness and height maps" src="docs/img/material-light.webp">
+</picture>
+
+### Sprite sheets that play
+
+Atlases from TexturePacker, Starling, libGDX, Cocos2d and Godot become one sprite sheet that plays its animations
+and lists its sprites. Download it repacked for whichever engine you're using: ten formats, each told only what it
+can hold.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/img/sheet-dark.webp">
+  <img alt="A character sprite sheet shown full page, one of its animations playing beside its tags and download formats" src="docs/img/sheet-light.webp">
+</picture>
+
+### Sounds you can see
+
+Every sound gets a waveform colored by how bright it sounds, so a sharp hit and a long ambience look different
+before you play them. Sound library metadata is read (UCS categories, Soundminer and BaseHead fields, loop points,
+tempo, root note), and MIDI and tracker music are rendered so they play like any other sound.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/img/sound-dark.webp">
+  <img alt="A grid of sound effects drawn as colored waveforms, with one open showing its player, tags and takes" src="docs/img/sound-light.webp">
+</picture>
+
+### Search that knows what things are
+
+Hoard tags everything itself, offline: `tileable`, `res:2k`, `poly:low`, `rigged`, `loop`, `bpm:120`,
+`license:cc0`, and a category from a game-asset tree. Search by words, by color or by what a picture shows, and
+ask any texture or sound for "More like this". Point it at any OpenAI-compatible model, local or hosted, and it
+writes names and descriptions too.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/img/search-dark.webp">
+  <img alt="A search for wood: a wooden table, bark, planks and a wood surface together, with filters by kind and tag beside them" src="docs/img/search-light.webp">
+</picture>
+
+### Straight into your engine
+
+- **Engine plugins** for Godot 4, Unity and Unreal Engine 5: browse the library inside the editor and press Add to
+  project. The model comes with its textures, in the right place, imported.
+- **`hoard sync`** pulls exactly the files a project names into it, pinned in a lockfile, so every teammate and
+  build machine gets the same bytes.
+- **Download as** GLB, PNG, WAV, MP3 or a sprite sheet format, converted on the fly, with texture names in your
+  studio's convention.
+- **AI agents** search, inspect and fetch assets over MCP.
+
+### Stored once, kept safe
+
+Every file is stored once by its BLAKE3 hash, so the same texture in five bundles takes the space of one, and
+corruption can't go unnoticed. Keep it on local disk or any S3 bucket. Folders you point Hoard at are read, never
+changed. Accounts, read-only tokens, single sign-on, HTTPS and HTTP/3 are built in.
+
+<sub>The demo library is CC0 art: models from [Poly Haven](https://polyhaven.com) (glTF and USD), surfaces from
+[ambientCG](https://ambientcg.com), and sounds, sprite sheets and fonts from [Kenney](https://kenney.nl).
+`node web/scripts/readme-images.mts` makes these pictures and the social card.</sub>
 
 ## Install with Docker
 
@@ -1293,6 +1348,22 @@ headless Chromium; and the Docker image, its compose files and the viewer's WebG
 and in daily use.
 
 What's planned next is in [docs/roadmap.md](docs/roadmap.md).
+
+## Facts and figures
+
+| | |
+|---|---|
+| File types recognized | 156 extensions in 13 kinds, from PNG and WAV to `.uasset` and `.skp` |
+| Read natively, no other app | glTF/GLB, FBX (binary and ASCII), OBJ, STL, PLY, 3DS, MagicaVoxel, 3MF, USD/USDA/USDC/USDZ, SketchUp 3 to today, Unreal packages from UE 4.x to 5.7, PSD/PSB, Krita, OpenRaster, Aseprite, DDS, KTX2, Basis, EXR, HDR, SVG, Illustrator, TTF/OTF/WOFF2, WAV/BWF/RF64, OGG, FLAC, MP3, AIFF, MIDI, MOD/XM/S3M/IT |
+| Archives unpacked | zip, tar, tar.gz and `.unitypackage`, nested up to 3 deep |
+| Download as | 6 image formats, 5 audio formats, GLB or glTF for models, TTF, WOFF or WOFF2 for fonts, 10 sprite sheet formats |
+| Engine plugins | Godot 4, Unity 2021.3+, Unreal Engine 5 |
+| Ways in | web portal, `hoard` CLI, `hoard sync` with a lockfile, REST API, MCP for AI agents |
+| Languages | 31, each with all 2,571 of the portal's and server's messages |
+| Runs on | one Docker image for amd64 and arm64; binaries for Linux (x86-64 and ARM), macOS (Apple silicon) and Windows |
+| Built with | Rust (axum, wgpu) and Vue 3; SQLite with full-text search; BLAKE3 content-addressed storage on disk or S3 |
+| Tested by | 350+ Rust tests and 90 end-to-end browser tests, on every push |
+| License | MIT-0: no attribution needed |
 
 ## Translations
 

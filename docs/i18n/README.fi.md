@@ -7,21 +7,102 @@
 
 [English](../../README.md) · [Afrikaans](README.af.md) · [Català](README.ca.md) · [Čeština](README.cs.md) · [Dansk](README.da.md) · [Deutsch](README.de.md) · [Ελληνικά](README.el.md) · [Español (Latinoamérica)](README.es-419.md) · [Español (España)](README.es-ES.md) · Suomi · [Français](README.fr.md) · [Magyar](README.hu.md) · [Bahasa Indonesia](README.id.md) · [Italiano](README.it.md) · [日本語](README.ja.md) · [한국어](README.ko.md) · [Norsk bokmål](README.nb.md) · [Nederlands](README.nl.md) · [Polski](README.pl.md) · [Português (Brasil)](README.pt-BR.md) · [Português (Portugal)](README.pt-PT.md) · [Română](README.ro.md) · [Русский](README.ru.md) · [Српски](README.sr-Cyrl.md) · [Svenska](README.sv.md) · [ไทย](README.th.md) · [Türkçe](README.tr.md) · [Українська](README.uk.md) · [Tiếng Việt](README.vi.md) · [简体中文](README.zh-Hans.md) · [繁體中文](README.zh-Hant.md)
 
-Itse ylläpidettävä resurssikirjasto pelinkehitykseen. Pudota sisään kokonaisia resurssipaketteja (zipit, tar-paketit,
-kansiot), ja Hoard tallentaa jokaisen tiedoston kerran sen tiivisteen perusteella, selvittää, mikä kukin tiedosto on,
-merkitsee sen tunnisteilla, linkittää verkot niiden tekstuureihin ja animaatioihin ja tekee kaikesta haettavaa
-verkkoportaalista, komentoriviltä, agenteille tarkoitetusta MCP-päätepisteestä sekä lukitustiedostoon perustuvalla
-`hoard sync` -komennolla, joka hakee juuri ne tiedostot, joita peliprojektisi tarvitsee.
+<h3 align="center">Jokainen omistamasi resurssipaketti haettavana, esikatseltavana ja yhden klikkauksen päässä pelistäsi.</h3>
 
-Ajattele sitä resurssikauppana ilman kassaa.
+Hoard on itse ylläpidettävä kirjasto pelien resursseille. Pudota sisään zip, Unity-paketti, Fabista ladattu paketti tai
+kymmenentuhannen tiedoston kansio, ja Hoard ryhtyy töihin. Mallit pyörivät 3D:nä tekstuureineen, irralliset
+tekstuurikartat kootaan materiaaleiksi, äänet piirtävät aaltomuotonsa, sprite-arkit toistavat animaationsa, ja kaikki
+saa tunnisteet, joten löydät etsimäsi kirjoittamalla `footsteps gravel` tai `rigged low-poly`. Sitten se päätyy
+Godotiin, Unityyn tai Unrealiin kaiken tarvitsemansa kanssa.
+
+Ei tilausta, ei latausta kenenkään pilveen, ei käyttäjäkohtaista hinnoittelua: yksi Docker-image omalla koneellasi, ja
+se on sinun. Ajattele sitä resurssikauppana ilman kassaa.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="../img/hero-dark.webp">
-  <img alt="Hoard-kirjasto: malleja ja materiaaleja ruudukossa, ja aarrearkku avoinna 3D-esikatselussa tunnisteidensa ja latausten vieressä" src="../img/hero-light.webp">
+  <img alt="Hoard-kirjasto: 3D-malleja ruudukossa ja aarrearkku avoinna 3D-esikatselussa tunnisteidensa ja latausten vieressä" src="../img/hero-light.webp">
 </picture>
 
-<sub>Esittelykirjaston grafiikka on CC0-lisensoitua: mallit [Poly Havenista](https://polyhaven.com) (glTF ja USD) ja pinnat
-[ambientCG:stä](https://ambientcg.com). `node web/scripts/readme-images.mts` tekee nämä kuvat ja some-kortin.</sub>
+### Näe kaikki ennen kuin käytät sitä
+
+Mallit avautuvat 3D:nä tekstuureineen, materiaaleineen ja animaatioineen. Hoard lukee itse FBX-, glTF-, OBJ-, USD-,
+SketchUp-, 3MF- ja STL-tiedostot sekä vokselit ilman asennettua 3D-ohjelmaa; Blender-tiedostot tuodaan ilman
+käyttöliittymää ajettavan Blenderin kautta, ja Unreal-paketeista näkyy, mitä editori on tallentanut niistä, ilman
+Unrealia. Pikkukuvat piirretään palvelimella ja rajataan joka kerta samalla tavalla, joten koko paketin voi silmäillä
+yhdellä vilkaisulla.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="../img/page-dark.webp">
+  <img alt="Kattokruunu koko sivun näkymässä: suuri 3D-näkymä sen tietojen, tunnisteiden, linkitettyjen tekstuurien ja latausten vieressä" src="../img/page-light.webp">
+</picture>
+
+### Irralliset tekstuurikartat muuttuvat materiaaleiksi
+
+`Rock_BaseColor.png`, `Rock_Normal.png` ja `Rock_Roughness.png` muuttuvat yhdeksi Rock-materiaaliksi valaistulla
+pallolla. Hoard tuntee Megascansin, Poly Havenin, ambientCG:n, Substancen ja Unrealin nimeämistavat, pakatut kartat
+mukaan lukien, ja lukee myös Unityn `.mat`-tiedostot. Koko näytön katseluohjelma näyttää materiaalin pallolla, kuutiolla
+tai tasolla sen todellisessa mittakaavassa, ja jokaisen kartan voi kytkeä päälle ja pois.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="../img/material-dark.webp">
+  <img alt="Tiilimateriaali koko näytön katseluohjelmassa pallon pinnalla, ja kytkimet sen väri-, normaali-, karheus- ja korkeuskartoille" src="../img/material-light.webp">
+</picture>
+
+### Sprite-arkit, jotka toistavat animaationsa
+
+TexturePackerin, Starlingin, libGDX:n, Cocos2d:n ja Godotin atlakset muuttuvat yhdeksi sprite-arkiksi, joka toistaa
+animaationsa ja luettelee spritensä. Lataa se uudelleen pakattuna juuri sille moottorille, jota käytät: kymmenen
+formaattia, ja kullekin kerrotaan vain se, mitä se pystyy sisältämään.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="../img/sheet-dark.webp">
+  <img alt="Hahmon sprite-arkki koko sivun näkymässä, yksi sen animaatioista toistumassa tunnisteiden ja latausformaattien vieressä" src="../img/sheet-light.webp">
+</picture>
+
+### Äänet, jotka näet
+
+Jokainen ääni saa aaltomuodon, joka on väritetty sen mukaan, kuinka kirkkaalta ääni kuulostaa, joten terävä isku ja
+pitkä taustaääni näyttävät erilaisilta jo ennen kuin soitat niitä. Äänikirjastojen metatiedot luetaan (UCS-luokat,
+Soundminerin ja BaseHeadin kentät, silmukkapisteet, tempo, pohjasävel), ja MIDI- ja tracker-musiikki renderöidään niin,
+että se soi kuten mikä tahansa muu ääni.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="../img/sound-dark.webp">
+  <img alt="Ruudukko ääniefektejä värillisinä aaltomuotoina, ja yksi niistä avattuna soittimineen, tunnisteineen ja ottoineen" src="../img/sound-light.webp">
+</picture>
+
+### Haku, joka tietää, mitä asiat ovat
+
+Hoard merkitsee kaiken tunnisteilla itse, ilman verkkoyhteyttä: `tileable`, `res:2k`, `poly:low`, `rigged`, `loop`,
+`bpm:120`, `license:cc0` sekä luokan peliresurssien luokkapuusta. Hae sanoilla, värillä tai sillä, mitä kuvassa näkyy,
+ja pyydä mistä tahansa tekstuurista tai äänestä ”Lisää samankaltaisia”. Osoita se mihin tahansa OpenAI-yhteensopivaan
+malliin, paikalliseen tai pilvessä toimivaan, niin se kirjoittaa myös nimet ja kuvaukset.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="../img/search-dark.webp">
+  <img alt="Haku sanalla wood: puinen pöytä, kaarnaa, lankkuja ja puupinta yhdessä, ja niiden vieressä suodattimet tyypin ja tunnisteen mukaan" src="../img/search-light.webp">
+</picture>
+
+### Suoraan pelimoottoriisi
+
+- **Moottorilaajennukset** Godot 4:lle, Unitylle ja Unreal Engine 5:lle: selaa kirjastoa editorin sisällä ja paina Lisää
+  projektiin. Malli tulee tekstuureineen, oikeaan paikkaan ja valmiiksi tuotuna.
+- **`hoard sync`** hakee projektiin juuri ne tiedostot, jotka projekti nimeää, lukitustiedostoon kiinnitettyinä, joten
+  jokainen tiimiläinen ja käännöskone saa täsmälleen samat tavut.
+- **Lataa muodossa** GLB, PNG, WAV, MP3 tai sprite-arkkiformaatti, muunnettuna lennossa ja tekstuurien nimet studiosi
+  käytännön mukaisina.
+- **Tekoälyagentit** hakevat, tarkastelevat ja noutavat resursseja MCP:n kautta.
+
+### Tallennettu kerran, pidetty turvassa
+
+Jokainen tiedosto tallennetaan kerran sen BLAKE3-tiivisteen perusteella, joten sama tekstuuri viidessä paketissa vie
+vain yhden tekstuurin verran tilaa, eikä tietojen vioittuminen voi jäädä huomaamatta. Säilytä tiedostot paikallisella
+levyllä tai missä tahansa S3-säilössä. Kansiot, joihin Hoardin osoitat, luetaan mutta niitä ei koskaan muuteta. Tilit,
+vain luku -tunnukset, kertakirjautuminen, HTTPS ja HTTP/3 ovat valmiina mukana.
+
+<sub>Esittelykirjaston grafiikka on CC0-lisensoitua: mallit [Poly Havenista](https://polyhaven.com) (glTF ja USD),
+pinnat [ambientCG:stä](https://ambientcg.com) sekä äänet, sprite-arkit ja fontit [Kenneyltä](https://kenney.nl).
+`node web/scripts/readme-images.mts` tekee nämä kuvat ja some-kortin.</sub>
 
 ## Asennus Dockerilla
 
@@ -120,7 +201,7 @@ Tai pudota zip portaaliin.
 ## Tämän README:n loppuosa
 
 Mitä paketille tapahtuu, resurssien vienti pelimoottoriin, Unreal-paketit, haku, tekijätiedot, MCP, tallennus, HTTPS,
-asetukset, tietoturva, tilit ja API kuvataan [englanninkielisessä README:ssä](../../README.md).
+asetukset, tietoturva, tilit, API sekä faktat ja luvut kuvataan [englanninkielisessä README:ssä](../../README.md).
 
 ## Käännökset
 

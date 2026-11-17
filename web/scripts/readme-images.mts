@@ -1,18 +1,18 @@
-// Makes the README's hero screenshots and the GitHub social preview card (docs/img/).
+// Makes the README's screenshots and the GitHub social preview card (docs/img/).
 //
 //   cargo build --release -p hoardd && (cd web && npm run build && node scripts/readme-images.mts)
 //
-// It fetches a demo library of CC0 art (models from Poly Haven, as glTF and USD, surfaces from ambientCG) into
-// target/readme-assets
-// (once; later runs reuse it), starts a throwaway hoardd on its own data folder, uploads the art as packs, waits for
-// thumbnails, then screenshots the portal in dark and light and lays the card out around the dark one.
+// It fetches a demo library of CC0 art (models from Poly Haven, as glTF and USD, surfaces from ambientCG, sounds,
+// sprite sheets and fonts from Kenney by way of OpenGameArt) into target/readme-assets (once; later runs reuse it),
+// starts a throwaway hoardd on its own data folder, uploads the art as packs, waits for thumbnails, then screenshots
+// the portal in dark and light and lays the card out around the dark hero.
 import { execFileSync, spawn, type ChildProcess } from 'node:child_process'
 import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs'
 import { createServer } from 'node:net'
 import { tmpdir } from 'node:os'
 import { dirname, join, relative, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { chromium, request, type APIRequestContext, type Browser } from '@playwright/test'
+import { chromium, request, type APIRequestContext, type Browser, type Page } from '@playwright/test'
 
 const web = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 const repo = resolve(web, '..')
@@ -39,6 +39,13 @@ const USD_MODELS = ['Drill_01', 'boombox', 'brass_vase_01', 'Rockingchair_01', '
 const SURFACES = [
   'Bricks113A', 'Planks040', 'PavingStones152', 'Fabric086', 'Bark016', 'Wood096', 'Ground111', 'Concrete049',
   'Asphalt033', 'Tiles141', 'Grass005', 'Metal063', 'Rock064', 'Gravel043', 'Clay005',
+]
+/** Kenney's CC0 packs as OpenGameArt keeps them: the pack's name, its zip, and which of its files to add. */
+const KENNEY: { pack: string; zip: string; keep: RegExp }[] = [
+  { pack: 'Kenney Toon Characters', zip: 'kenney_toonCharacters1.zip', keep: /\/Tilesheet\/[^/]+HD\.(png|xml)$/ },
+  { pack: 'Kenney Interface Sounds', zip: 'kenney_interfaceSounds.zip', keep: /(\.ogg|License\.txt)$/ },
+  { pack: 'Kenney RPG Audio', zip: 'RPGsounds_Kenney.zip', keep: /\.ogg$/ },
+  { pack: 'Kenney Fonts', zip: 'ken_fonts.zip', keep: /\.(ttf|txt)$/ },
 ]
 /** The asset the hero opens. */
 const HERO = 'treasure_chest'
@@ -81,6 +88,12 @@ async function fetchArt(): Promise<void> {
     const zip = join(cache, 'ambientcg', `${id}_1K-JPG.zip`)
     await download(`https://ambientcg.com/get?file=${id}_1K-JPG.zip`, zip)
     const dir = join(cache, 'ambientcg', `${id}_1K-JPG`)
+    if (!existsSync(dir) || !readdirSync(dir).length) unzip(zip, dir)
+  }
+  for (const k of KENNEY) {
+    const zip = join(cache, 'kenney', k.zip)
+    await download(`https://opengameart.org/sites/default/files/${k.zip}`, zip)
+    const dir = zip.replace(/\.zip$/, '')
     if (!existsSync(dir) || !readdirSync(dir).length) unzip(zip, dir)
   }
 }
@@ -163,7 +176,16 @@ async function startServer(root: string): Promise<{ url: string; child: ChildPro
   throw new Error('hoardd did not start')
 }
 
-async function fillLibrary(url: string, root: string): Promise<{ api: APIRequestContext; hero: string }> {
+/** The demo assets each shot opens, by kind and a word of their name. */
+type Picks = Record<'hero' | 'page' | 'material' | 'sheet' | 'sound', string>
+
+async function find(api: APIRequestContext, q: string, kind: string): Promise<string> {
+  const found = (await (await api.get('/api/assets', { params: { q, kind, limit: 5 } })).json()) as { items: { id: string }[] }
+  if (!found.items.length) throw new Error(`no ${kind} called ${q}`)
+  return found.items[0].id
+}
+
+async function fillLibrary(url: string, root: string): Promise<{ api: APIRequestContext; picks: Picks }> {
   const anon = await request.newContext({ baseURL: url, extraHTTPHeaders: HEADERS })
   await anon.post('/api/auth/setup', { data: { username: USER, password: PASSWORD } })
   await anon.dispose()
@@ -182,11 +204,19 @@ async function fillLibrary(url: string, root: string): Promise<{ api: APIRequest
   ids.push(await upload(api, 'Poly Haven USD', USD_MODELS.flatMap((m) => files(join(usd, m))), usd))
   const surfaces = join(cache, 'ambientcg')
   ids.push(await upload(api, 'ambientCG Surfaces', SURFACES.flatMap((s) => surfaceMaps(join(surfaces, `${s}_1K-JPG`))), surfaces))
-  await settle(api, ids)
-  const found = (await (await api.get('/api/assets', { params: { q: HERO.replaceAll('_', ' '), kind: 'model', limit: 5 } })).json()) as {
-    items: { id: string }[]
+  for (const k of KENNEY) {
+    const dir = join(cache, 'kenney', k.zip.replace(/\.zip$/, ''))
+    ids.push(await upload(api, k.pack, files(dir).filter((f) => k.keep.test(f.replaceAll('\\', '/'))), dir))
   }
-  return { api, hero: found.items[0].id }
+  await settle(api, ids)
+  const picks: Picks = {
+    hero: await find(api, HERO.replaceAll('_', ' '), 'model'),
+    page: await find(api, 'chandelier', 'model'),
+    material: await find(api, 'Bricks113A', 'material'),
+    sheet: await find(api, 'femaleAdventurer', 'sheet'),
+    sound: await find(api, 'book flip 1', 'audio'),
+  }
+  return { api, picks }
 }
 
 /** Re-encode a PNG as WebP in the browser (Chromium encodes WebP; Node doesn't without a dependency). */
@@ -209,20 +239,61 @@ async function webp(browser: Browser, png: Buffer, quality = 0.9): Promise<Buffe
   return Buffer.from(data.split(',')[1], 'base64')
 }
 
-async function shoot(browser: Browser, api: APIRequestContext, url: string, hero: string, scheme: 'dark' | 'light'): Promise<Buffer> {
+/** A screenshot: where it opens, and what it does there before the picture is taken. */
+type Shot = { name: string; path: (p: Picks) => string; act?: (page: Page) => Promise<void> }
+
+const panel = (page: Page) => page.getByRole('complementary', { name: 'Asset details' })
+
+// By name, so models and surfaces mix (newest would be the surfaces, whose materials are made last).
+const SHOTS: Shot[] = [
+  // The library with the treasure chest open beside it.
+  { name: 'hero', path: (p) => `/?sort=name&kind=model#asset=${p.hero}` },
+  // A model over the whole page: the 3D viewer big, its facts and downloads beside it.
+  {
+    name: 'page',
+    path: (p) => `/?sort=name#asset=${p.page}`,
+    act: async (page) => {
+      await panel(page).getByRole('button', { name: 'Show full page' }).click()
+    },
+  },
+  // A surface in the full-screen material viewer.
+  {
+    name: 'material',
+    path: (p) => `/?sort=name&kind=material#asset=${p.material}`,
+    act: async (page) => {
+      await panel(page).getByRole('button', { name: 'Open the full-screen material viewer' }).click()
+      await page.getByRole('dialog').getByRole('group', { name: 'Maps' }).waitFor({ timeout: 60_000 })
+    },
+  },
+  // A sprite sheet over the whole page, its animation playing beside its sprites.
+  {
+    name: 'sheet',
+    path: (p) => `/?sort=name&kind=sheet#asset=${p.sheet}`,
+    act: async (page) => {
+      await panel(page).getByRole('button', { name: 'Show full page' }).click()
+    },
+  },
+  // Sounds: a grid of waveforms and one sound open.
+  { name: 'sound', path: (p) => `/?sort=name&kind=audio#asset=${p.sound}` },
+  // A search across kinds: models, materials and textures that are wood.
+  { name: 'search', path: () => `/?q=wood` },
+]
+
+async function shoot(browser: Browser, api: APIRequestContext, url: string, picks: Picks, shot: Shot, scheme: 'dark' | 'light'): Promise<Buffer> {
   const ctx = await browser.newContext({
     baseURL: url,
     storageState: await api.storageState(),
     viewport: { width: 1440, height: 860 },
     deviceScaleFactor: 2,
     colorScheme: scheme,
+    reducedMotion: 'no-preference',
   })
   const page = await ctx.newPage()
-  // By name, so models and surfaces mix (newest would be the surfaces, whose materials are made last).
-  await page.goto(`/?sort=name#asset=${hero}`)
-  await page.getByRole('complementary', { name: 'Asset details' }).waitFor()
+  await page.goto(shot.path(picks))
+  if (shot.path(picks).includes('#asset=')) await panel(page).waitFor()
   await page.waitForLoadState('networkidle')
-  // Thumbnails decoded, and the 3D preview given time to load its textures and draw.
+  await shot.act?.(page)
+  // Thumbnails decoded, and the 3D previews given time to load their textures and draw.
   await page.waitForFunction(() => [...document.images].every((i) => i.complete))
   await page.waitForTimeout(4000)
   const png = await page.screenshot()
@@ -253,7 +324,7 @@ function card(shot: Buffer): string {
   <div class="text">
     <div class="brand">${icon}<h1>Hoard</h1></div>
     <p>A self-hosted asset library for game development.</p>
-    <ul><li>Search</li><li>3D preview</li><li>Auto-tagging</li><li>hoard sync</li><li>MCP</li></ul>
+    <ul><li>3D preview</li><li>Materials</li><li>Sprite sheets</li><li>Sounds</li><li>Auto-tagging</li><li>Engine plugins</li><li>MCP</li></ul>
   </div>
   <div class="shot"><img src="data:image/png;base64,${shot.toString('base64')}"></div>
 </body></html>`
@@ -266,23 +337,31 @@ async function main(): Promise<void> {
   const { url, child } = await startServer(root)
   const browser = await chromium.launch({ args: ['--use-angle=default', '--ignore-gpu-blocklist'] })
   try {
-    const { api, hero } = await fillLibrary(url, root)
+    const { api, picks } = await fillLibrary(url, root)
     mkdirSync(out, { recursive: true })
-    const dark = await shoot(browser, api, url, hero, 'dark')
-    const light = await shoot(browser, api, url, hero, 'light')
-    writeFileSync(join(cache, 'last-dark.png'), dark)
-    writeFileSync(join(cache, 'last-light.png'), light)
-    writeFileSync(join(out, 'hero-dark.webp'), await webp(browser, dark))
-    writeFileSync(join(out, 'hero-light.webp'), await webp(browser, light))
-    const page = await browser.newPage({ viewport: { width: 1280, height: 640 } })
-    await page.setContent(card(dark))
-    await page.evaluate(() => document.fonts.ready)
-    writeFileSync(join(out, 'social.png'), await page.screenshot())
-    await page.close()
-    await api.dispose()
-    for (const f of ['hero-dark.webp', 'hero-light.webp', 'social.png']) {
-      console.log(`${f}: ${Math.round(statSync(join(out, f)).size / 1024)} KB`)
+    const made: string[] = []
+    let hero: Buffer | undefined
+    // Only some of them when named: `node scripts/readme-images.mts sheet sound`.
+    const only = process.argv.slice(2)
+    for (const shot of SHOTS.filter((s) => !only.length || only.includes(s.name))) {
+      for (const scheme of ['dark', 'light'] as const) {
+        const png = await shoot(browser, api, url, picks, shot, scheme)
+        writeFileSync(join(cache, `last-${shot.name}-${scheme}.png`), png)
+        writeFileSync(join(out, `${shot.name}-${scheme}.webp`), await webp(browser, png))
+        made.push(`${shot.name}-${scheme}.webp`)
+        if (shot.name === 'hero' && scheme === 'dark') hero = png
+      }
     }
+    if (hero) {
+      const page = await browser.newPage({ viewport: { width: 1280, height: 640 } })
+      await page.setContent(card(hero))
+      await page.evaluate(() => document.fonts.ready)
+      writeFileSync(join(out, 'social.png'), await page.screenshot())
+      await page.close()
+      made.push('social.png')
+    }
+    await api.dispose()
+    for (const f of made) console.log(`${f}: ${Math.round(statSync(join(out, f)).size / 1024)} KB`)
   } finally {
     await browser.close()
     child.kill()

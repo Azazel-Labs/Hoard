@@ -7,20 +7,100 @@
 
 [English](../../README.md) · [Afrikaans](README.af.md) · [Català](README.ca.md) · [Čeština](README.cs.md) · [Dansk](README.da.md) · [Deutsch](README.de.md) · [Ελληνικά](README.el.md) · [Español (Latinoamérica)](README.es-419.md) · [Español (España)](README.es-ES.md) · [Suomi](README.fi.md) · [Français](README.fr.md) · [Magyar](README.hu.md) · [Bahasa Indonesia](README.id.md) · [Italiano](README.it.md) · [日本語](README.ja.md) · [한국어](README.ko.md) · [Norsk bokmål](README.nb.md) · [Nederlands](README.nl.md) · [Polski](README.pl.md) · [Português (Brasil)](README.pt-BR.md) · [Português (Portugal)](README.pt-PT.md) · [Română](README.ro.md) · [Русский](README.ru.md) · [Српски](README.sr-Cyrl.md) · Svenska · [ไทย](README.th.md) · [Türkçe](README.tr.md) · [Українська](README.uk.md) · [Tiếng Việt](README.vi.md) · [简体中文](README.zh-Hans.md) · [繁體中文](README.zh-Hant.md)
 
-Ett resursbibliotek för spelutveckling som du driftar själv. Släpp in hela resurspaket (zip-filer, tarballs, mappar), så
-lagrar Hoard varje fil en gång utifrån dess hash, listar ut vad varje fil är, taggar den, kopplar mesher till deras
-texturer och animationer, och gör allt sökbart från en webbportal, ett CLI, en MCP-slutpunkt för agenter och en
-låsfilsbaserad `hoard sync` som hämtar exakt de filer som ditt spelprojekt behöver.
+<h3 align="center">Alla resurspaket du äger: sökbara, förhandsvisade och ett klick från ditt spel.</h3>
 
-Se det som en resursbutik utan kassa.
+Hoard är ett resursbibliotek för spel som du driftar själv. Släpp in en zip-fil, ett Unity-paket, en nedladdning från
+Fab eller en mapp med tiotusen filer, så sätter Hoard igång. Modeller snurrar i 3D med sina texturer, lösa texturkartor
+blir material, ljud ritar upp sina vågformer, spriteark spelar sina animationer och allt taggas, så att du hittar det
+genom att skriva `footsteps gravel` eller `rigged low-poly`. Sedan landar det i Godot, Unity eller Unreal med allt det
+behöver.
+
+Ingen prenumeration, ingen uppladdning till någon annans moln, inget pris per användare: en Docker-avbild på din egen
+dator, och den är din. Se det som en resursbutik utan kassa.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="../img/hero-dark.webp">
-  <img alt="Hoard-biblioteket: modeller och material i ett rutnät, med en öppen skattkista i 3D-förhandsvisningen bredvid dess taggar och nedladdningar" src="../img/hero-light.webp">
+  <img alt="Hoard-biblioteket: 3D-modeller i ett rutnät, med en öppen skattkista i 3D-förhandsvisningen bredvid dess taggar och nedladdningar" src="../img/hero-light.webp">
 </picture>
 
-<sub>Demobiblioteket består av CC0-grafik: modeller från [Poly Haven](https://polyhaven.com) (glTF och USD) och ytor från
-[ambientCG](https://ambientcg.com). `node web/scripts/readme-images.mts` skapar de här bilderna och delningsbilden.</sub>
+### Se allt innan du använder det
+
+Modeller öppnas i 3D med sina texturer, material och animationer. FBX, glTF, OBJ, USD, SketchUp, 3MF, STL och voxlar
+läses av Hoard själv, utan att något 3D-program behöver vara installerat; Blender-filer kommer in via Blender utan
+gränssnitt (headless), och Unreal-paket visar vad redigeraren sparade om dem, utan Unreal. Miniatyrer ritas på servern
+och ramas in på samma sätt varje gång, så att ett helt paket kan skummas igenom med en blick.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="../img/page-dark.webp">
+  <img alt="En ljuskrona visad på helsida: en stor 3D-vy bredvid dess fakta, taggar, länkade texturer och nedladdningar" src="../img/page-light.webp">
+</picture>
+
+### Lösa texturkartor blir material
+
+`Rock_BaseColor.png`, `Rock_Normal.png` och `Rock_Roughness.png` blir ett enda Rock-material på en belyst sfär. Hoard
+förstår namngivningen från Megascans, Poly Haven, ambientCG, Substance och Unreal, packade kartor inräknade, och Unitys
+`.mat`-filer också. Helskärmsvisaren visar ett material på en sfär, en kub eller ett plan, i dess verkliga skala, där
+varje karta kan slås på och av.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="../img/material-dark.webp">
+  <img alt="Ett tegelmaterial i helskärmsvisaren, på en sfär, med reglage för färg-, normal-, grovhets- och höjdkartorna" src="../img/material-light.webp">
+</picture>
+
+### Spriteark som spelas upp
+
+Atlaser från TexturePacker, Starling, libGDX, Cocos2d och Godot blir ett enda spriteark som spelar upp sina animationer
+och listar sina sprites. Ladda ner det ompackat för den motor du använder: tio format, där vart och ett bara får det som
+det kan rymma.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="../img/sheet-dark.webp">
+  <img alt="Ett spriteark för en figur visat på helsida, där en av dess animationer spelas upp bredvid taggarna och nedladdningsformaten" src="../img/sheet-light.webp">
+</picture>
+
+### Ljud du kan se
+
+Varje ljud får en vågform som färgas efter hur ljust det låter, så att ett skarpt slag och en lång ambiens ser olika ut
+innan du spelar upp dem. Metadata från ljudbibliotek läses (UCS-kategorier, fält från Soundminer och BaseHead,
+looppunkter, tempo, grundton), och MIDI- och trackermusik renderas så att den spelas upp som vilket annat ljud som
+helst.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="../img/sound-dark.webp">
+  <img alt="Ett rutnät med ljudeffekter ritade som färgade vågformer, där ett är öppet och visar sin spelare, sina taggar och tagningar" src="../img/sound-light.webp">
+</picture>
+
+### Sökning som vet vad saker är
+
+Hoard taggar allt själv, offline: `tileable`, `res:2k`, `poly:low`, `rigged`, `loop`, `bpm:120`, `license:cc0`, och en
+kategori ur ett träd för spelresurser. Sök med ord, efter färg eller efter vad en bild föreställer, och be vilken textur
+eller vilket ljud som helst om ”Fler som den här”. Peka Hoard mot valfri OpenAI-kompatibel modell, lokal eller i molnet,
+så skriver den namn och beskrivningar också.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="../img/search-dark.webp">
+  <img alt="En sökning efter trä: ett träbord, bark, plankor och en träyta tillsammans, med filter efter typ och tagg bredvid" src="../img/search-light.webp">
+</picture>
+
+### Direkt in i din spelmotor
+
+- **Motorplugins** för Godot 4, Unity och Unreal Engine 5: bläddra i biblioteket inifrån redigeraren och tryck på Lägg
+  till i projekt. Modellen kommer med sina texturer, på rätt plats, importerad.
+- **`hoard sync`** hämtar in exakt de filer som ett projekt namnger, låsta i en låsfil, så att varje lagkamrat och
+  byggmaskin får samma byte.
+- **Ladda ner som** GLB, PNG, WAV, MP3 eller ett spritearkformat, konverterat i farten, med texturnamn enligt din
+  studios konvention.
+- **AI-agenter** söker efter, inspekterar och hämtar resurser via MCP.
+
+### Lagras en gång, hålls säkert
+
+Varje fil lagras en gång utifrån sin BLAKE3-hash, så att samma textur i fem paket bara tar upp platsen för en, och
+korruption kan inte gå obemärkt förbi. Förvara biblioteket på lokal disk eller i valfri S3-bucket. Mappar som du pekar
+Hoard mot läses men ändras aldrig. Konton, skrivskyddade token, enkel inloggning (SSO), HTTPS och HTTP/3 är inbyggda.
+
+<sub>Demobiblioteket består av CC0-grafik: modeller från [Poly Haven](https://polyhaven.com) (glTF och USD), ytor från
+[ambientCG](https://ambientcg.com), och ljud, spriteark och typsnitt från [Kenney](https://kenney.nl).
+`node web/scripts/readme-images.mts` skapar de här bilderna och delningsbilden.</sub>
 
 ## Installera med Docker
 
@@ -114,7 +194,7 @@ Eller släpp zip-filen på portalen.
 ## Resten av den här README-filen
 
 Vad som händer med ett paket, att få in resurser i en spelmotor, Unreal-paket, sökning, krediteringar, MCP, lagring, HTTPS,
-konfiguration, säkerhet, konton och API:t beskrivs i den [engelska README-filen](../../README.md).
+konfiguration, säkerhet, konton, API:t samt fakta och siffror beskrivs i den [engelska README-filen](../../README.md).
 
 ## Översättningar
 

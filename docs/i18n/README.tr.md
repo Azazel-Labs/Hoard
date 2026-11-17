@@ -7,21 +7,102 @@
 
 [English](../../README.md) · [Afrikaans](README.af.md) · [Català](README.ca.md) · [Čeština](README.cs.md) · [Dansk](README.da.md) · [Deutsch](README.de.md) · [Ελληνικά](README.el.md) · [Español (Latinoamérica)](README.es-419.md) · [Español (España)](README.es-ES.md) · [Suomi](README.fi.md) · [Français](README.fr.md) · [Magyar](README.hu.md) · [Bahasa Indonesia](README.id.md) · [Italiano](README.it.md) · [日本語](README.ja.md) · [한국어](README.ko.md) · [Norsk bokmål](README.nb.md) · [Nederlands](README.nl.md) · [Polski](README.pl.md) · [Português (Brasil)](README.pt-BR.md) · [Português (Portugal)](README.pt-PT.md) · [Română](README.ro.md) · [Русский](README.ru.md) · [Српски](README.sr-Cyrl.md) · [Svenska](README.sv.md) · [ไทย](README.th.md) · Türkçe · [Українська](README.uk.md) · [Tiếng Việt](README.vi.md) · [简体中文](README.zh-Hans.md) · [繁體中文](README.zh-Hant.md)
 
-Oyun geliştirme için kendi sunucunuzda barındırdığınız bir varlık kütüphanesi. Varlık paketlerini olduğu gibi bırakın
-(zip’ler, tarball’lar, klasörler); Hoard her dosyayı karmasına göre bir kez saklar, her dosyanın ne olduğunu çıkarır,
-onu etiketler, mesh’leri dokularına ve animasyonlarına bağlar ve hepsini bir web portalından, bir CLI’dan, ajanlar
-için bir MCP uç noktasından ve oyun projenizin tam olarak ihtiyaç duyduğu dosyaları çeken, kilit dosyasına dayalı
-`hoard sync` komutundan aranabilir kılar.
+<h3 align="center">Sahip olduğunuz her varlık paketi: aranabilir, önizlenebilir ve oyununuza bir tık uzaklıkta.</h3>
 
-Onu ödeme adımı olmayan bir varlık mağazası gibi düşünün.
+Hoard, oyun varlıkları için kendi sunucunuzda barındırdığınız bir kütüphanedir. Bir zip, bir Unity paketi, bir Fab
+indirmesi ya da on bin dosyalık bir klasör bırakın, Hoard hemen işe koyulur. Modeller dokularıyla birlikte 3B olarak
+döner, dağınık doku haritaları malzemeye dönüşür, sesler dalga biçimlerini çizer, sprite sayfaları animasyonlarını
+oynatır ve her şey etiketlenir; böylece `footsteps gravel` ya da `rigged low-poly` yazmanız onu bulmaya yeter. Ardından
+ihtiyaç duyduğu her şeyle birlikte Godot, Unity ya da Unreal projenize iner.
+
+Abonelik yok, kimsenin bulutuna yükleme yok, kullanıcı başına ücret yok: kendi makinenizde tek bir Docker imajı ve
+tamamen sizin. Onu ödeme adımı olmayan bir varlık mağazası gibi düşünün.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="../img/hero-dark.webp">
-  <img alt="Hoard kütüphanesi: bir ızgarada modeller ve malzemeler; yanda, etiketleri ve indirmeleriyle birlikte 3B önizlemede açık bir hazine sandığı" src="../img/hero-light.webp">
+  <img alt="Hoard kütüphanesi: bir ızgarada 3B modeller; yanda, etiketleri ve indirmeleriyle birlikte 3B önizlemede açık bir hazine sandığı" src="../img/hero-light.webp">
 </picture>
 
-<sub>Tanıtım kütüphanesi CC0 çizimlerden oluşur: [Poly Haven](https://polyhaven.com)’den modeller (glTF ve USD) ve
-[ambientCG](https://ambientcg.com)’den yüzeyler. Bu resimleri ve sosyal medya kartını `node web/scripts/readme-images.mts` oluşturur.</sub>
+### Kullanmadan önce her şeyi görün
+
+Modeller dokuları, malzemeleri ve animasyonlarıyla birlikte 3B olarak açılır. FBX, glTF, OBJ, USD, SketchUp, 3MF, STL ve
+voksel dosyalarını, hiçbir 3B uygulaması kurulu olmadan Hoard’un kendisi okur; Blender dosyaları arayüzsüz (headless)
+Blender aracılığıyla gelir, Unreal paketleri ise Unreal olmadan, düzenleyicinin onlar hakkında kaydettiklerini gösterir.
+Küçük resimler sunucuda, her seferinde aynı şekilde çerçevelenerek çizilir; böylece bir paketin tamamına bir bakışta göz
+gezdirilebilir.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="../img/page-dark.webp">
+  <img alt="Tam sayfada gösterilen bir avize: bilgilerinin, etiketlerinin, bağlı dokularının ve indirmelerinin yanında büyük bir 3B görünüm" src="../img/page-light.webp">
+</picture>
+
+### Dağınık doku haritaları malzemeye dönüşür
+
+`Rock_BaseColor.png`, `Rock_Normal.png` ve `Rock_Roughness.png`, ışıklandırılmış bir küre üzerinde tek bir Rock
+malzemesi olur. Hoard, paketlenmiş haritalar dahil Megascans, Poly Haven, ambientCG, Substance ve Unreal
+adlandırmalarını, ayrıca Unity `.mat` dosyalarını da okur. Tam ekran görüntüleyici bir malzemeyi küre, küp ya da düzlem
+üzerinde, gerçek dünya ölçeğinde gösterir; her harita ayrı ayrı açılıp kapatılabilir.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="../img/material-dark.webp">
+  <img alt="Tam ekran görüntüleyicide, bir küre üzerinde tuğla malzemesi; renk, normal, pürüzlülük ve yükseklik haritaları için anahtarlarla" src="../img/material-light.webp">
+</picture>
+
+### Oynayan sprite sayfaları
+
+TexturePacker, Starling, libGDX, Cocos2d ve Godot atlasları, animasyonlarını oynatan ve sprite’larını listeleyen tek bir
+sprite sayfası olur. Hangi motoru kullanıyorsanız onun için yeniden paketlenmiş olarak indirin: on biçim, her birine
+yalnızca taşıyabildiği bilgiler verilir.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="../img/sheet-dark.webp">
+  <img alt="Tam sayfada gösterilen bir karakter sprite sayfası; animasyonlarından biri, etiketlerinin ve indirme biçimlerinin yanında oynuyor" src="../img/sheet-light.webp">
+</picture>
+
+### Görebileceğiniz sesler
+
+Her ses, kulağa ne kadar parlak geldiğine göre renklendirilmiş bir dalga biçimi alır; böylece keskin bir vuruş ile uzun
+bir ortam sesi, siz onları çalmadan önce farklı görünür. Ses kütüphanesi meta verileri okunur (UCS kategorileri,
+Soundminer ve BaseHead alanları, döngü noktaları, tempo, kök nota); MIDI ve tracker müziği de diğer her ses gibi
+çalınabilmesi için sese dönüştürülür.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="../img/sound-dark.webp">
+  <img alt="Renkli dalga biçimleri olarak çizilmiş ses efektlerinden oluşan bir ızgara; biri açık ve oynatıcısını, etiketlerini ve kayıtlarını gösteriyor" src="../img/sound-light.webp">
+</picture>
+
+### Neyin ne olduğunu bilen arama
+
+Hoard her şeyi kendisi, çevrimdışı olarak etiketler: `tileable`, `res:2k`, `poly:low`, `rigged`, `loop`, `bpm:120`,
+`license:cc0` ve oyun varlıklarına özgü bir ağaçtan bir kategori. Kelimelerle, renge göre ya da bir resmin ne
+gösterdiğine göre arayın ve herhangi bir doku ya da sesten “Buna benzerler”i isteyin. Hoard’u yerel ya da barındırılan,
+OpenAI uyumlu herhangi bir modele yönlendirin; adları ve açıklamaları da o yazsın.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="../img/search-dark.webp">
+  <img alt="Ahşap için bir arama: ahşap bir masa, ağaç kabuğu, kalaslar ve bir ahşap yüzey bir arada; yanlarında türe ve etikete göre filtreler" src="../img/search-light.webp">
+</picture>
+
+### Doğrudan motorunuza
+
+- **Motor eklentileri** Godot 4, Unity ve Unreal Engine 5 için: kütüphaneye düzenleyicinin içinden göz atın ve Projeye
+  ekle’ye basın. Model, dokularıyla birlikte, doğru yere ve içe aktarılmış olarak gelir.
+- **`hoard sync`**, bir projenin adını verdiği dosyaları tam olarak projeye çeker ve bir kilit dosyasına sabitler;
+  böylece her ekip arkadaşı ve derleme makinesi aynı baytları alır.
+- **Farklı indir**: GLB, PNG, WAV, MP3 ya da bir sprite sayfası biçimi; anında dönüştürülür, doku adları stüdyonuzun
+  adlandırma kuralına uyar.
+- **Yapay zekâ ajanları** MCP üzerinden varlıkları arar, inceler ve getirir.
+
+### Bir kez saklanır, güvende tutulur
+
+Her dosya BLAKE3 karmasına göre bir kez saklanır; böylece beş pakette bulunan aynı doku tek bir dokunun yerini kaplar ve
+bozulma fark edilmeden kalamaz. Kütüphaneyi yerel diskte ya da herhangi bir S3 kovasında tutun. Hoard’u yönlendirdiğiniz
+klasörler okunur, asla değiştirilmez. Hesaplar, salt okunur erişim belirteçleri, tek oturum açma (SSO), HTTPS ve HTTP/3
+yerleşik olarak gelir.
+
+<sub>Tanıtım kütüphanesi CC0 çizimlerden oluşur: [Poly Haven](https://polyhaven.com)’den modeller (glTF ve USD),
+[ambientCG](https://ambientcg.com)’den yüzeyler ve [Kenney](https://kenney.nl)’den sesler, sprite sayfaları ve yazı
+tipleri. Bu resimleri ve sosyal medya kartını `node web/scripts/readme-images.mts` oluşturur.</sub>
 
 ## Docker ile kurulum
 
@@ -118,7 +199,7 @@ Ya da zip’i portala bırakın.
 ## Bu README’nin geri kalanı
 
 Bir pakete ne olduğu, varlıkları bir motora aktarma, Unreal paketleri, arama, emeği geçenler, MCP, depolama, HTTPS,
-yapılandırma, güvenlik, hesaplar ve API [İngilizce README](../../README.md)’de anlatılır.
+yapılandırma, güvenlik, hesaplar, API, temel bilgiler ve rakamlar [İngilizce README](../../README.md)’de anlatılır.
 
 ## Çeviriler
 

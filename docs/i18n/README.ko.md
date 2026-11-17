@@ -7,20 +7,96 @@
 
 [English](../../README.md) · [Afrikaans](README.af.md) · [Català](README.ca.md) · [Čeština](README.cs.md) · [Dansk](README.da.md) · [Deutsch](README.de.md) · [Ελληνικά](README.el.md) · [Español (Latinoamérica)](README.es-419.md) · [Español (España)](README.es-ES.md) · [Suomi](README.fi.md) · [Français](README.fr.md) · [Magyar](README.hu.md) · [Bahasa Indonesia](README.id.md) · [Italiano](README.it.md) · [日本語](README.ja.md) · 한국어 · [Norsk bokmål](README.nb.md) · [Nederlands](README.nl.md) · [Polski](README.pl.md) · [Português (Brasil)](README.pt-BR.md) · [Português (Portugal)](README.pt-PT.md) · [Română](README.ro.md) · [Русский](README.ru.md) · [Српски](README.sr-Cyrl.md) · [Svenska](README.sv.md) · [ไทย](README.th.md) · [Türkçe](README.tr.md) · [Українська](README.uk.md) · [Tiếng Việt](README.vi.md) · [简体中文](README.zh-Hans.md) · [繁體中文](README.zh-Hant.md)
 
-게임 개발을 위한 셀프 호스팅 에셋 라이브러리입니다. 에셋 팩을 통째로(zip, tarball, 폴더) 넣으면 Hoard가 모든 파일을
-해시 기준으로 한 번만 저장하고, 각 파일이 무엇인지 알아내 태그를 붙이고, 메시를 텍스처 및 애니메이션과 연결합니다.
-그리고 이 모든 것을 웹 포털, CLI, 에이전트용 MCP 엔드포인트에서 검색할 수 있게 하며, lockfile 기반의
-`hoard sync`로 게임 프로젝트에 필요한 파일만 정확히 받아 올 수 있습니다.
+<h3 align="center">가지고 있는 모든 에셋 팩을 검색하고, 미리 보고, 클릭 한 번으로 게임에 넣으세요.</h3>
 
-결제 절차가 없는 에셋 스토어라고 생각하면 됩니다.
+Hoard는 게임 에셋을 위한 셀프 호스팅 라이브러리입니다. zip, Unity 패키지, Fab 다운로드, 파일 만 개가 든 폴더를 넣으면
+Hoard가 일을 시작합니다. 모델은 텍스처와 함께 3D로 돌아가고, 흩어진 텍스처 맵은 머티리얼이 되고, 사운드는 파형을 그리고,
+스프라이트 시트는 애니메이션을 재생하며, 모든 것에 태그가 붙으므로 `footsteps gravel`이나 `rigged low-poly`를 입력하면
+찾을 수 있습니다. 그런 다음 필요한 모든 것을 갖춘 채 Godot, Unity, Unreal로 들어갑니다.
+
+구독도, 누군가의 클라우드로 업로드하는 일도, 사용자당 요금도 없습니다. 내 컴퓨터에 Docker 이미지 하나만 있으면 온전히 내
+것이 됩니다. 결제 절차가 없는 에셋 스토어라고 생각하면 됩니다.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="../img/hero-dark.webp">
-  <img alt="Hoard 라이브러리: 모델과 머티리얼이 그리드로 표시되고, 3D 미리보기에서 열린 보물 상자 옆에 태그와 다운로드가 보입니다" src="../img/hero-light.webp">
+  <img alt="Hoard 라이브러리: 3D 모델이 그리드로 표시되고, 3D 미리보기에서 열린 보물 상자 옆에 태그와 다운로드가 보입니다" src="../img/hero-light.webp">
 </picture>
 
+### 쓰기 전에 모든 것을 확인하세요
+
+모델은 텍스처, 머티리얼, 애니메이션과 함께 3D로 열립니다. FBX, glTF, OBJ, USD, SketchUp, 3MF, STL과 복셀은 3D 앱을
+설치하지 않아도 Hoard가 직접 읽습니다. Blender 파일은 헤드리스 Blender를 통해 들어오고, Unreal 패키지는 Unreal 없이도
+에디터가 저장해 둔 정보를 보여 줍니다. 썸네일은 서버에서 매번 같은 구도로 그려지므로 팩 전체를 한눈에 훑어볼 수
+있습니다.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="../img/page-dark.webp">
+  <img alt="전체 페이지로 표시된 샹들리에: 큰 3D 뷰 옆에 정보, 태그, 연결된 텍스처, 다운로드가 있습니다" src="../img/page-light.webp">
+</picture>
+
+### 흩어진 텍스처 맵이 머티리얼로
+
+`Rock_BaseColor.png`, `Rock_Normal.png`, `Rock_Roughness.png`는 조명을 받은 구 위의 Rock 머티리얼 하나가 됩니다. Hoard는
+패킹된 맵을 포함해 Megascans, Poly Haven, ambientCG, Substance, Unreal의 이름 규칙을 읽고, Unity `.mat` 파일도 읽습니다.
+전체 화면 뷰어는 머티리얼을 구, 큐브, 평면 위에 실제 크기로 보여 주며, 각 맵을 켜고 끌 수 있습니다.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="../img/material-dark.webp">
+  <img alt="전체 화면 뷰어에서 구에 적용된 벽돌 머티리얼과 컬러, 노멀, 러프니스, 높이 맵 스위치" src="../img/material-light.webp">
+</picture>
+
+### 재생되는 스프라이트 시트
+
+TexturePacker, Starling, libGDX, Cocos2d, Godot의 아틀라스는 애니메이션을 재생하고 스프라이트 목록을 보여 주는
+스프라이트 시트 하나가 됩니다. 사용하는 엔진에 맞게 다시 패킹해서 다운로드하세요. 10가지 형식이 있으며, 각 형식에는 그
+형식이 담을 수 있는 정보만 전달됩니다.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="../img/sheet-dark.webp">
+  <img alt="전체 페이지로 표시된 캐릭터 스프라이트 시트. 애니메이션 하나가 재생되고 옆에 태그와 다운로드 형식이 있습니다" src="../img/sheet-light.webp">
+</picture>
+
+### 눈으로 보는 사운드
+
+모든 사운드에는 소리가 얼마나 밝은지에 따라 색이 입혀진 파형이 붙으므로, 날카로운 타격음과 긴 앰비언스는 재생하기 전부터
+다르게 보입니다. 사운드 라이브러리 메타데이터(UCS 카테고리, Soundminer와 BaseHead 필드, 루프 포인트, 템포, 루트 노트)를
+읽고, MIDI와 트래커 음악은 렌더링해서 다른 사운드처럼 재생할 수 있습니다.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="../img/sound-dark.webp">
+  <img alt="색칠된 파형으로 그려진 효과음 그리드. 하나가 열려 플레이어, 태그, 테이크를 보여 줍니다" src="../img/sound-light.webp">
+</picture>
+
+### 무엇인지 아는 검색
+
+Hoard는 모든 것에 오프라인으로 직접 태그를 붙입니다. `tileable`, `res:2k`, `poly:low`, `rigged`, `loop`, `bpm:120`,
+`license:cc0`, 그리고 게임 에셋 분류 트리의 카테고리까지요. 단어, 색상, 그림에 보이는 내용으로 검색하고, 어떤 텍스처나
+사운드에서든 ‘비슷한 것 더 보기’를 요청하세요. 로컬이든 호스팅이든 OpenAI 호환 모델을 연결하면 이름과 설명도 써 줍니다.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="../img/search-dark.webp">
+  <img alt="wood 검색: 나무 테이블, 나무껍질, 판자, 나무 표면이 함께 나오고 옆에 종류와 태그별 필터가 있습니다" src="../img/search-light.webp">
+</picture>
+
+### 엔진으로 바로
+
+- **엔진 플러그인**은 Godot 4, Unity, Unreal Engine 5용입니다. 에디터 안에서 라이브러리를 둘러보고 ‘프로젝트에 추가’를
+  누르세요. 모델이 텍스처와 함께 올바른 위치에 임포트되어 들어옵니다.
+- **`hoard sync`** 명령은 프로젝트가 지정한 파일만 정확히 가져와 lockfile에 고정하므로, 모든 팀원과 빌드 머신이 같은
+  바이트를 받습니다.
+- **다른 형식으로 다운로드**: GLB, PNG, WAV, MP3 또는 스프라이트 시트 형식으로 즉석에서 변환되며, 텍스처 이름은
+  스튜디오의 규칙을 따릅니다.
+- **AI 에이전트**는 MCP로 에셋을 검색하고, 살펴보고, 가져옵니다.
+
+### 한 번 저장하고, 안전하게 보관
+
+모든 파일은 BLAKE3 해시 기준으로 한 번만 저장되므로, 번들 다섯 개에 든 같은 텍스처도 하나만큼의 공간만 차지하고, 손상이
+생겨도 놓치지 않습니다. 로컬 디스크나 어떤 S3 버킷에든 보관할 수 있습니다. Hoard에 지정한 폴더는 읽기만 하고 절대
+변경하지 않습니다. 계정, 읽기 전용 토큰, 싱글 사인온, HTTPS, HTTP/3가 기본으로 들어 있습니다.
+
 <sub>데모 라이브러리는 CC0 작품입니다. 모델은 [Poly Haven](https://polyhaven.com)(glTF 및 USD), 표면은
-[ambientCG](https://ambientcg.com)에서 가져왔습니다. `node web/scripts/readme-images.mts`가 이 그림들과 소셜 카드를 만듭니다.</sub>
+[ambientCG](https://ambientcg.com), 사운드, 스프라이트 시트, 글꼴은 [Kenney](https://kenney.nl)에서 가져왔습니다.
+`node web/scripts/readme-images.mts`가 이 그림들과 소셜 카드를 만듭니다.</sub>
 
 ## Docker로 설치
 
@@ -113,7 +189,7 @@ python3 tools/make_sample_pack.py /tmp/sample       # needs Pillow + numpy; ffmp
 ## 이 README의 나머지 내용
 
 팩이 어떻게 처리되는지, 엔진으로 에셋 가져오기, Unreal 팩, 검색, 크레디트, MCP, 스토리지, HTTPS,
-구성, 보안, 계정, API는 [영어 README](../../README.md)에 설명되어 있습니다.
+구성, 보안, 계정, API, 사실과 수치는 [영어 README](../../README.md)에 설명되어 있습니다.
 
 ## 번역
 

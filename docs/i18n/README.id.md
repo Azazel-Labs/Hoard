@@ -7,21 +7,101 @@
 
 [English](../../README.md) · [Afrikaans](README.af.md) · [Català](README.ca.md) · [Čeština](README.cs.md) · [Dansk](README.da.md) · [Deutsch](README.de.md) · [Ελληνικά](README.el.md) · [Español (Latinoamérica)](README.es-419.md) · [Español (España)](README.es-ES.md) · [Suomi](README.fi.md) · [Français](README.fr.md) · [Magyar](README.hu.md) · Bahasa Indonesia · [Italiano](README.it.md) · [日本語](README.ja.md) · [한국어](README.ko.md) · [Norsk bokmål](README.nb.md) · [Nederlands](README.nl.md) · [Polski](README.pl.md) · [Português (Brasil)](README.pt-BR.md) · [Português (Portugal)](README.pt-PT.md) · [Română](README.ro.md) · [Русский](README.ru.md) · [Српски](README.sr-Cyrl.md) · [Svenska](README.sv.md) · [ไทย](README.th.md) · [Türkçe](README.tr.md) · [Українська](README.uk.md) · [Tiếng Việt](README.vi.md) · [简体中文](README.zh-Hans.md) · [繁體中文](README.zh-Hant.md)
 
-Pustaka aset self-hosted untuk pengembangan game. Masukkan paket aset utuh (zip, tarball, folder), dan Hoard
-menyimpan setiap berkas sekali berdasarkan hash-nya, mengenali apa setiap berkas itu, memberinya tag, menautkan mesh
-ke tekstur dan animasinya, dan membuat semuanya dapat dicari dari portal web, CLI, endpoint MCP untuk agen, dan
-`hoard sync` berbasis lockfile yang menarik tepat berkas yang dibutuhkan proyek game Anda.
+<h3 align="center">Setiap paket aset yang Anda miliki, dapat dicari, dapat dipratinjau, dan hanya sekali klik dari game Anda.</h3>
 
-Anggap saja toko aset tanpa kasir.
+Hoard adalah pustaka self-hosted untuk aset game. Masukkan zip, paket Unity, unduhan Fab, atau folder berisi sepuluh
+ribu berkas, dan Hoard langsung bekerja. Model berputar dalam 3D dengan teksturnya, map tekstur yang lepas menjadi
+material, suara menggambar bentuk gelombangnya, lembar sprite memutar animasinya, dan semuanya diberi tag, sehingga
+mengetik `footsteps gravel` atau `rigged low-poly` langsung menemukannya. Lalu aset itu masuk ke Godot, Unity, atau
+Unreal beserta semua yang dibutuhkannya.
+
+Tanpa langganan, tanpa unggahan ke cloud siapa pun, tanpa harga per pengguna: satu image Docker di mesin Anda sendiri,
+dan itu milik Anda. Anggap saja toko aset tanpa kasir.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="../img/hero-dark.webp">
-  <img alt="Pustaka Hoard: model dan material dalam kisi, dengan peti harta terbuka di pratinjau 3D di samping tag dan unduhannya" src="../img/hero-light.webp">
+  <img alt="Pustaka Hoard: model 3D dalam kisi, dengan peti harta terbuka di pratinjau 3D di samping tag dan unduhannya" src="../img/hero-light.webp">
 </picture>
 
-<sub>Pustaka demo berisi karya CC0: model dari [Poly Haven](https://polyhaven.com) (glTF dan USD) dan permukaan dari
-[ambientCG](https://ambientcg.com). `node web/scripts/readme-images.mts` membuat gambar-gambar ini dan kartu
-media sosialnya.</sub>
+### Lihat semuanya sebelum Anda memakainya
+
+Model terbuka dalam 3D dengan tekstur, material, dan animasinya. FBX, glTF, OBJ, USD, SketchUp, 3MF, STL, dan voxel
+dibaca oleh Hoard sendiri, tanpa aplikasi 3D yang terpasang; berkas Blender masuk melalui Blender headless (tanpa
+antarmuka), dan paket Unreal menampilkan apa yang disimpan editor tentangnya, tanpa Unreal. Thumbnail digambar di
+server, dibingkai dengan cara yang sama setiap kali, sehingga seluruh paket bisa ditelusuri sekilas.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="../img/page-dark.webp">
+  <img alt="Sebuah lampu gantung ditampilkan satu halaman penuh: tampilan 3D besar di samping fakta, tag, tekstur tertaut, dan unduhannya" src="../img/page-light.webp">
+</picture>
+
+### Map tekstur yang lepas menjadi material
+
+`Rock_BaseColor.png`, `Rock_Normal.png`, dan `Rock_Roughness.png` menjadi satu material Rock pada bola yang diterangi.
+Hoard memahami penamaan Megascans, Poly Haven, ambientCG, Substance, dan Unreal, termasuk map yang dikemas, serta
+membaca berkas `.mat` Unity juga. Penampil layar penuh menampilkan material pada bola, kubus, atau bidang, dalam skala
+dunia nyatanya, dengan setiap map bisa dinyalakan dan dimatikan.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="../img/material-dark.webp">
+  <img alt="Material bata di penampil layar penuh, pada bola, dengan sakelar untuk map warna, normal, kekasaran, dan ketinggiannya" src="../img/material-light.webp">
+</picture>
+
+### Lembar sprite yang bisa diputar
+
+Atlas dari TexturePacker, Starling, libGDX, Cocos2d, dan Godot menjadi satu lembar sprite yang memutar animasinya dan
+mencantumkan sprite-nya. Unduh dalam bentuk dikemas ulang untuk engine apa pun yang Anda pakai: sepuluh format,
+masing-masing hanya diberi apa yang bisa ditampungnya.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="../img/sheet-dark.webp">
+  <img alt="Lembar sprite karakter ditampilkan satu halaman penuh, salah satu animasinya diputar di samping tag dan format unduhannya" src="../img/sheet-light.webp">
+</picture>
+
+### Suara yang bisa Anda lihat
+
+Setiap suara mendapat bentuk gelombang yang diwarnai menurut seberapa cerah bunyinya, sehingga pukulan tajam dan
+ambience panjang terlihat berbeda sebelum Anda memutarnya. Metadata pustaka suara dibaca (kategori UCS, kolom Soundminer
+dan BaseHead, titik loop, tempo, nada dasar), dan musik MIDI serta tracker dirender agar bisa diputar seperti suara
+lainnya.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="../img/sound-dark.webp">
+  <img alt="Kisi efek suara yang digambar sebagai bentuk gelombang berwarna, dengan satu yang terbuka menampilkan pemutar, tag, dan take-nya" src="../img/sound-light.webp">
+</picture>
+
+### Pencarian yang tahu apa itu apa
+
+Hoard memberi tag pada semuanya sendiri, secara offline: `tileable`, `res:2k`, `poly:low`, `rigged`, `loop`, `bpm:120`,
+`license:cc0`, dan sebuah kategori dari pohon aset game. Cari dengan kata, dengan warna, atau dengan apa yang
+ditampilkan sebuah gambar, dan minta “Lainnya yang mirip ini” untuk tekstur atau suara apa pun. Arahkan ke model apa pun
+yang kompatibel dengan OpenAI, lokal atau dihosting, dan Hoard juga menuliskan nama dan deskripsi.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="../img/search-dark.webp">
+  <img alt="Pencarian wood: meja kayu, kulit kayu, papan, dan permukaan kayu bersama-sama, dengan filter jenis dan tag di sampingnya" src="../img/search-light.webp">
+</picture>
+
+### Langsung ke engine Anda
+
+- **Plugin engine** untuk Godot 4, Unity, dan Unreal Engine 5: jelajahi pustaka di dalam editor lalu tekan Tambahkan ke
+  proyek. Model datang dengan teksturnya, di tempat yang tepat, sudah diimpor.
+- **`hoard sync`** menarik tepat berkas yang disebutkan sebuah proyek ke dalam proyek itu, dikunci dalam lockfile,
+  sehingga setiap rekan tim dan mesin build mendapat byte yang sama.
+- **Unduh sebagai** GLB, PNG, WAV, MP3, atau format lembar sprite, dikonversi seketika, dengan nama tekstur mengikuti
+  konvensi studio Anda.
+- **Agen AI** mencari, memeriksa, dan mengambil aset melalui MCP.
+
+### Disimpan sekali, dijaga tetap aman
+
+Setiap berkas disimpan sekali berdasarkan hash BLAKE3-nya, sehingga tekstur yang sama di lima bundel hanya memakan ruang
+satu tekstur, dan kerusakan data tidak mungkin luput dari perhatian. Simpan di disk lokal atau bucket S3 mana pun.
+Folder yang Anda tunjukkan ke Hoard hanya dibaca, tidak pernah diubah. Akun, token hanya-baca, single sign-on, HTTPS,
+dan HTTP/3 sudah tersedia bawaan.
+
+<sub>Pustaka demo berisi karya CC0: model dari [Poly Haven](https://polyhaven.com) (glTF dan USD), permukaan dari
+[ambientCG](https://ambientcg.com), serta suara, lembar sprite, dan font dari [Kenney](https://kenney.nl).
+`node web/scripts/readme-images.mts` membuat gambar-gambar ini dan kartu media sosialnya.</sub>
 
 ## Memasang dengan Docker
 
@@ -121,7 +201,7 @@ Atau jatuhkan zip-nya ke portal.
 ## Sisa README ini
 
 Apa yang terjadi pada sebuah paket, memasukkan aset ke engine, paket Unreal, pencarian, kredit, MCP, penyimpanan,
-HTTPS, konfigurasi, keamanan, akun, dan API dijelaskan di [README bahasa Inggris](../../README.md).
+HTTPS, konfigurasi, keamanan, akun, API, serta fakta dan angka dijelaskan di [README bahasa Inggris](../../README.md).
 
 ## Terjemahan
 

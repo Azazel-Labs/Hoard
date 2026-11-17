@@ -7,22 +7,101 @@
 
 [English](../../README.md) · [Afrikaans](README.af.md) · [Català](README.ca.md) · [Čeština](README.cs.md) · [Dansk](README.da.md) · [Deutsch](README.de.md) · [Ελληνικά](README.el.md) · [Español (Latinoamérica)](README.es-419.md) · [Español (España)](README.es-ES.md) · [Suomi](README.fi.md) · [Français](README.fr.md) · [Magyar](README.hu.md) · [Bahasa Indonesia](README.id.md) · [Italiano](README.it.md) · [日本語](README.ja.md) · [한국어](README.ko.md) · [Norsk bokmål](README.nb.md) · [Nederlands](README.nl.md) · Polski · [Português (Brasil)](README.pt-BR.md) · [Português (Portugal)](README.pt-PT.md) · [Română](README.ro.md) · [Русский](README.ru.md) · [Српски](README.sr-Cyrl.md) · [Svenska](README.sv.md) · [ไทย](README.th.md) · [Türkçe](README.tr.md) · [Українська](README.uk.md) · [Tiếng Việt](README.vi.md) · [简体中文](README.zh-Hans.md) · [繁體中文](README.zh-Hant.md)
 
-Samodzielnie hostowana biblioteka zasobów do tworzenia gier. Wystarczy wrzucić całe paczki zasobów (pliki zip,
-archiwa tar, foldery), a Hoard przechowa każdy plik raz, według jego skrótu, rozpozna, czym jest każdy plik, otaguje
-go, powiąże siatki z ich teksturami i animacjami oraz udostępni wszystko do przeszukiwania z portalu WWW, z CLI,
-z endpointu MCP dla agentów i przez opartą na pliku blokady komendę `hoard sync`, która pobiera dokładnie te pliki,
-których potrzebuje projekt gry.
+<h3 align="center">Każda posiadana paczka zasobów: do przeszukania, do podejrzenia i o jedno kliknięcie od gry.</h3>
 
-To coś jak sklep z zasobami, tylko bez kasy.
+Hoard to samodzielnie hostowana biblioteka zasobów do gier. Wystarczy wrzucić plik zip, paczkę Unity, pobranie z Fab
+albo folder z dziesięcioma tysiącami plików, a Hoard zabiera się do pracy. Modele obracają się w 3D razem
+z teksturami, luźne mapy tekstur stają się materiałami, dźwięki rysują swoje przebiegi, arkusze sprite’ów odtwarzają
+swoje animacje, a wszystko dostaje tagi, więc wystarczy wpisać `footsteps gravel` albo `rigged low-poly`, żeby to
+znaleźć. Potem trafia to do Godota, Unity lub Unreala ze wszystkim, czego potrzebuje.
+
+Bez abonamentu, bez wysyłania czegokolwiek do cudzej chmury, bez opłat za stanowisko: jeden obraz Dockera na własnym
+komputerze, i to na własność. To coś jak sklep z zasobami, tylko bez kasy.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="../img/hero-dark.webp">
-  <img alt="Biblioteka Hoard: modele i materiały w siatce, a obok otwarta skrzynia ze skarbem w podglądzie 3D, wraz z jej tagami i pobraniami" src="../img/hero-light.webp">
+  <img alt="Biblioteka Hoard: modele 3D w siatce, a obok otwarta skrzynia ze skarbem w podglądzie 3D, wraz z jej tagami i pobraniami" src="../img/hero-light.webp">
 </picture>
 
-<sub>Biblioteka demonstracyjna to grafiki na licencji CC0: modele z [Poly Haven](https://polyhaven.com) (glTF i USD)
-i powierzchnie z [ambientCG](https://ambientcg.com). `node web/scripts/readme-images.mts` tworzy te obrazy i kartę
-do mediów społecznościowych.</sub>
+### Wszystko widać, zanim się tego użyje
+
+Modele otwierają się w 3D z teksturami, materiałami i animacjami. FBX, glTF, OBJ, USD, SketchUp, 3MF, STL i woksele
+Hoard czyta sam, bez instalowania żadnego programu 3D; pliki Blendera przechodzą przez Blendera w trybie headless,
+a paczki Unreal pokazują to, co zapisał o nich edytor, bez Unreala. Miniatury są rysowane na serwerze i za każdym
+razem kadrowane tak samo, więc całą paczkę da się przejrzeć jednym rzutem oka.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="../img/page-dark.webp">
+  <img alt="Żyrandol na całej stronie: duży widok 3D obok jego danych, tagów, powiązanych tekstur i pobrań" src="../img/page-light.webp">
+</picture>
+
+### Luźne mapy tekstur stają się materiałami
+
+`Rock_BaseColor.png`, `Rock_Normal.png` i `Rock_Roughness.png` stają się jednym materiałem Rock na oświetlonej kuli.
+Hoard rozumie nazewnictwo Megascans, Poly Haven, ambientCG, Substance i Unreal, łącznie ze spakowanymi mapami, a także
+pliki `.mat` z Unity. Pełnoekranowa przeglądarka pokazuje materiał na kuli, sześcianie lub płaszczyźnie,
+w rzeczywistej skali, a każdą mapę można włączyć i wyłączyć.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="../img/material-dark.webp">
+  <img alt="Materiał z cegieł w pełnoekranowej przeglądarce, na kuli, z przełącznikami map koloru, normalnych, chropowatości i wysokości" src="../img/material-light.webp">
+</picture>
+
+### Arkusze sprite’ów, które się odtwarzają
+
+Atlasy z TexturePacker, Starling, libGDX, Cocos2d i Godot stają się jednym arkuszem sprite’ów, który odtwarza swoje
+animacje i wymienia swoje sprite’y. Można go pobrać przepakowanego dla dowolnego silnika: dziesięć formatów, a każdy
+dostaje tylko to, co potrafi pomieścić.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="../img/sheet-dark.webp">
+  <img alt="Arkusz sprite’ów postaci na całej stronie, z jedną z jego animacji odtwarzaną obok tagów i formatów pobierania" src="../img/sheet-light.webp">
+</picture>
+
+### Dźwięki, które widać
+
+Każdy dźwięk dostaje przebieg pokolorowany według tego, jak jasno brzmi, więc ostre uderzenie i długi ambient wyglądają
+inaczej, zanim się je odtworzy. Odczytywane są metadane bibliotek dźwięków (kategorie UCS, pola Soundminer i BaseHead,
+punkty pętli, tempo, dźwięk podstawowy), a muzyka MIDI i trackerowa jest renderowana, więc odtwarza się jak każdy inny
+dźwięk.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="../img/sound-dark.webp">
+  <img alt="Siatka efektów dźwiękowych narysowanych jako kolorowe przebiegi, z jednym otwartym, pokazującym odtwarzacz, tagi i ujęcia" src="../img/sound-light.webp">
+</picture>
+
+### Wyszukiwanie, które wie, czym są rzeczy
+
+Hoard sam taguje wszystko, offline: `tileable`, `res:2k`, `poly:low`, `rigged`, `loop`, `bpm:120`, `license:cc0`
+oraz kategorię z drzewa zasobów do gier. Można szukać po słowach, po kolorze albo po tym, co pokazuje obraz, a przy
+każdej teksturze lub dźwięku poprosić o „Więcej podobnych”. Po wskazaniu dowolnego modelu zgodnego z OpenAI,
+lokalnego lub hostowanego, Hoard pisze też nazwy i opisy.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="../img/search-dark.webp">
+  <img alt="Wyszukiwanie drewna: drewniany stół, kora, deski i drewniana powierzchnia razem, a obok filtry według rodzaju i tagu" src="../img/search-light.webp">
+</picture>
+
+### Prosto do silnika
+
+- **Wtyczki do silników** Godot 4, Unity i Unreal Engine 5: bibliotekę przegląda się w edytorze i naciska Dodaj
+  do projektu. Model trafia na miejsce razem z teksturami, od razu zaimportowany.
+- **`hoard sync`** ściąga do projektu dokładnie te pliki, które on wymienia, przypięte w pliku blokady, więc każdy
+  członek zespołu i każda maszyna budująca dostaje te same bajty.
+- **Pobierz jako** GLB, PNG, WAV, MP3 lub format arkusza sprite’ów, z konwersją w locie i z nazwami tekstur zgodnymi
+  z konwencją studia.
+- **Agenci AI** wyszukują, sprawdzają i pobierają zasoby przez MCP.
+
+### Zapisane raz, bezpiecznie przechowane
+
+Każdy plik jest zapisywany raz, według skrótu BLAKE3, więc ta sama tekstura w pięciu pakietach zajmuje miejsce jednej,
+a uszkodzenie nie może przejść niezauważone. Wszystko można trzymać na dysku lokalnym albo w dowolnym kubełku S3.
+Foldery wskazane Hoardowi są tylko odczytywane, nigdy zmieniane. Konta, tokeny tylko do odczytu, logowanie
+jednokrotne (SSO), HTTPS i HTTP/3 są wbudowane.
+
+<sub>Biblioteka demonstracyjna to grafiki na licencji CC0: modele z [Poly Haven](https://polyhaven.com) (glTF i USD),
+powierzchnie z [ambientCG](https://ambientcg.com) oraz dźwięki, arkusze sprite’ów i fonty z [Kenney](https://kenney.nl).
+`node web/scripts/readme-images.mts` tworzy te obrazy i kartę do mediów społecznościowych.</sub>
 
 ## Instalacja przez Dockera
 
@@ -121,7 +200,8 @@ Można też upuścić plik zip na portal.
 ## Reszta tego README
 
 Co dzieje się z paczką, przenoszenie zasobów do silnika, paczki Unreal, wyszukiwanie, lista autorów, MCP,
-przechowywanie, HTTPS, konfiguracja, bezpieczeństwo, konta i API są opisane w [angielskim README](../../README.md).
+przechowywanie, HTTPS, konfiguracja, bezpieczeństwo, konta, API oraz fakty i liczby są opisane w
+[angielskim README](../../README.md).
 
 ## Tłumaczenia
 

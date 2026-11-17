@@ -7,22 +7,102 @@
 
 [English](../../README.md) · [Afrikaans](README.af.md) · [Català](README.ca.md) · [Čeština](README.cs.md) · [Dansk](README.da.md) · [Deutsch](README.de.md) · [Ελληνικά](README.el.md) · [Español (Latinoamérica)](README.es-419.md) · [Español (España)](README.es-ES.md) · [Suomi](README.fi.md) · [Français](README.fr.md) · [Magyar](README.hu.md) · [Bahasa Indonesia](README.id.md) · [Italiano](README.it.md) · [日本語](README.ja.md) · [한국어](README.ko.md) · [Norsk bokmål](README.nb.md) · [Nederlands](README.nl.md) · [Polski](README.pl.md) · [Português (Brasil)](README.pt-BR.md) · [Português (Portugal)](README.pt-PT.md) · Română · [Русский](README.ru.md) · [Српски](README.sr-Cyrl.md) · [Svenska](README.sv.md) · [ไทย](README.th.md) · [Türkçe](README.tr.md) · [Українська](README.uk.md) · [Tiếng Việt](README.vi.md) · [简体中文](README.zh-Hans.md) · [繁體中文](README.zh-Hant.md)
 
-O bibliotecă de resurse găzduită de dvs., pentru dezvoltarea de jocuri. Adăugați pachete întregi de resurse (zip-uri,
-tarballuri, dosare), iar Hoard stochează fiecare fișier o singură dată, după hash, își dă seama ce este fiecare fișier,
-îl etichetează, leagă mesh-urile de texturile și animațiile lor și face totul căutabil dintr-un portal web, dintr-un
-CLI, dintr-un endpoint MCP pentru agenți și prin `hoard sync`, bazat pe un lockfile, care aduce exact fișierele de care
-are nevoie proiectul dvs. de joc.
+<h3 align="center">Fiecare pachet de resurse pe care îl dețineți, căutabil, previzualizabil și la un clic de jocul dvs.</h3>
 
-Gândiți-vă la el ca la un magazin de resurse fără casă de marcat.
+Hoard este o bibliotecă de resurse pentru jocuri, găzduită de dvs. Adăugați un zip, un pachet Unity, o descărcare de pe
+Fab sau un dosar cu zece mii de fișiere, iar Hoard se apucă de treabă. Modelele se rotesc în 3D cu texturile lor,
+hărțile de textură răzlețe devin materiale, sunetele își desenează forma de undă, foile de sprite-uri își redau
+animațiile și totul primește etichete, așa că tastând `footsteps gravel` sau `rigged low-poly` găsiți ce căutați. Apoi
+ajunge în Godot, Unity sau Unreal cu tot ce îi trebuie.
+
+Fără abonament, fără încărcare în cloudul nimănui, fără preț pe utilizator: o singură imagine Docker pe propriul
+calculator și e a dvs. Gândiți-vă la el ca la un magazin de resurse fără casă de marcat.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="../img/hero-dark.webp">
-  <img alt="Biblioteca Hoard: modele și materiale într-o grilă, cu un cufăr cu comori deschis în previzualizarea 3D, lângă etichetele și descărcările sale" src="../img/hero-light.webp">
+  <img alt="Biblioteca Hoard: modele 3D într-o grilă, cu un cufăr cu comori deschis în previzualizarea 3D, lângă etichetele și descărcările sale" src="../img/hero-light.webp">
 </picture>
 
-<sub>Biblioteca demonstrativă conține grafică CC0: modele de pe [Poly Haven](https://polyhaven.com) (glTF și USD) și
-suprafețe de pe [ambientCG](https://ambientcg.com). `node web/scripts/readme-images.mts` creează aceste imagini și
-cardul pentru rețelele sociale.</sub>
+### Vedeți totul înainte de a-l folosi
+
+Modelele se deschid în 3D cu texturile, materialele și animațiile lor. FBX, glTF, OBJ, USD, SketchUp, 3MF, STL și
+voxelii sunt citiți chiar de Hoard, fără nicio aplicație 3D instalată; fișierele Blender intră prin Blender rulat
+headless, iar pachetele Unreal arată ce a salvat editorul despre ele, fără Unreal. Miniaturile sunt desenate pe server,
+încadrate de fiecare dată la fel, așa că un pachet întreg poate fi parcurs dintr-o privire.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="../img/page-dark.webp">
+  <img alt="Un candelabru afișat pe toată pagina: o vizualizare 3D mare lângă datele, etichetele, texturile legate și descărcările sale" src="../img/page-light.webp">
+</picture>
+
+### Hărțile de textură răzlețe devin materiale
+
+`Rock_BaseColor.png`, `Rock_Normal.png` și `Rock_Roughness.png` devin un singur material Rock pe o sferă luminată. Hoard
+înțelege denumirile din Megascans, Poly Haven, ambientCG, Substance și Unreal, inclusiv hărțile împachetate, precum și
+fișierele `.mat` din Unity. Vizualizatorul pe tot ecranul arată un material pe o sferă, un cub sau un plan, la scara
+reală, iar fiecare hartă poate fi pornită și oprită.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="../img/material-dark.webp">
+  <img alt="Un material de cărămidă în vizualizatorul pe tot ecranul, pe o sferă, cu comutatoare pentru hărțile de culoare, normale, rugozitate și înălțime" src="../img/material-light.webp">
+</picture>
+
+### Foi de sprite-uri care se redau
+
+Atlasele din TexturePacker, Starling, libGDX, Cocos2d și Godot devin o singură foaie de sprite-uri care își redă
+animațiile și își listează sprite-urile. Descărcați-o reîmpachetată pentru motorul de joc pe care îl folosiți: zece
+formate, fiecare primind doar ce poate cuprinde.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="../img/sheet-dark.webp">
+  <img alt="O foaie de sprite-uri a unui personaj afișată pe toată pagina, cu una dintre animații redându-se lângă etichetele și formatele de descărcare" src="../img/sheet-light.webp">
+</picture>
+
+### Sunete pe care le puteți vedea
+
+Fiecare sunet primește o formă de undă colorată după cât de luminos sună, așa că o lovitură scurtă și o ambianță lungă
+arată diferit înainte să le redați. Sunt citite metadatele bibliotecilor de sunete (categorii UCS, câmpuri Soundminer și
+BaseHead, puncte de buclă, tempo, nota fundamentală), iar muzica MIDI și cea de tracker sunt randate, ca să se redea ca
+orice alt sunet.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="../img/sound-dark.webp">
+  <img alt="O grilă de efecte sonore desenate ca forme de undă colorate, cu unul deschis care își arată playerul, etichetele și take-urile" src="../img/sound-light.webp">
+</picture>
+
+### O căutare care știe ce sunt lucrurile
+
+Hoard etichetează totul singur, offline: `tileable`, `res:2k`, `poly:low`, `rigged`, `loop`, `bpm:120`, `license:cc0`
+și o categorie dintr-un arbore de resurse pentru jocuri. Căutați după cuvinte, după culoare sau după ce arată o imagine
+și cereți oricărei texturi sau oricărui sunet „Mai multe ca aceasta”. Îndreptați-l spre orice model compatibil cu
+OpenAI, local sau găzduit, și va scrie, de asemenea, nume și descrieri.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="../img/search-dark.webp">
+  <img alt="O căutare după lemn: o masă de lemn, scoarță, scânduri și o suprafață de lemn împreună, cu filtre după tip și etichetă alături" src="../img/search-light.webp">
+</picture>
+
+### Direct în motorul de joc
+
+- **Pluginuri de motor** pentru Godot 4, Unity și Unreal Engine 5: răsfoiți biblioteca din editor și apăsați Adăugați
+  la proiect. Modelul vine cu texturile sale, la locul potrivit, importat.
+- **`hoard sync`** aduce într-un proiect exact fișierele pe care acesta le numește, fixate într-un lockfile, ca fiecare
+  coleg de echipă și fiecare mașină de build să primească aceiași octeți.
+- **Descărcați ca** GLB, PNG, WAV, MP3 sau un format de foaie de sprite-uri, convertit pe loc, cu numele texturilor
+  după convenția studioului dvs.
+- **Agenții AI** caută, inspectează și preiau resurse prin MCP.
+
+### Stocat o dată, păstrat în siguranță
+
+Fiecare fișier este stocat o singură dată, după hash-ul său BLAKE3, așa că aceeași textură din cinci pachete ocupă
+spațiul uneia singure, iar coruperea nu poate trece neobservată. Păstrați totul pe discul local sau în orice bucket S3.
+Dosarele spre care îndreptați Hoard sunt citite, niciodată modificate. Conturile, tokenurile doar pentru citire,
+autentificarea unică (single sign-on), HTTPS și HTTP/3 sunt incluse.
+
+<sub>Biblioteca demonstrativă conține grafică CC0: modele de pe [Poly Haven](https://polyhaven.com) (glTF și USD),
+suprafețe de pe [ambientCG](https://ambientcg.com) și sunete, foi de sprite-uri și fonturi de la
+[Kenney](https://kenney.nl). `node web/scripts/readme-images.mts` creează aceste imagini și cardul pentru rețelele
+sociale.</sub>
 
 ## Instalare cu Docker
 
@@ -123,7 +203,8 @@ Sau plasați arhiva zip în portal.
 ## Restul acestui README
 
 Ce se întâmplă cu un pachet, cum ajung resursele într-un motor de joc, pachetele Unreal, căutarea, creditele, MCP,
-stocarea, HTTPS, configurarea, securitatea, conturile și API-ul sunt descrise în [README-ul în engleză](../../README.md).
+stocarea, HTTPS, configurarea, securitatea, conturile, API-ul, precum și datele și cifrele sunt descrise în
+[README-ul în engleză](../../README.md).
 
 ## Traduceri
 

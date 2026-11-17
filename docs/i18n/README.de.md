@@ -7,21 +7,102 @@
 
 [English](../../README.md) · [Afrikaans](README.af.md) · [Català](README.ca.md) · [Čeština](README.cs.md) · [Dansk](README.da.md) · Deutsch · [Ελληνικά](README.el.md) · [Español (Latinoamérica)](README.es-419.md) · [Español (España)](README.es-ES.md) · [Suomi](README.fi.md) · [Français](README.fr.md) · [Magyar](README.hu.md) · [Bahasa Indonesia](README.id.md) · [Italiano](README.it.md) · [日本語](README.ja.md) · [한국어](README.ko.md) · [Norsk bokmål](README.nb.md) · [Nederlands](README.nl.md) · [Polski](README.pl.md) · [Português (Brasil)](README.pt-BR.md) · [Português (Portugal)](README.pt-PT.md) · [Română](README.ro.md) · [Русский](README.ru.md) · [Српски](README.sr-Cyrl.md) · [Svenska](README.sv.md) · [ไทย](README.th.md) · [Türkçe](README.tr.md) · [Українська](README.uk.md) · [Tiếng Việt](README.vi.md) · [简体中文](README.zh-Hans.md) · [繁體中文](README.zh-Hant.md)
 
-Eine selbst gehostete Asset-Bibliothek für die Spieleentwicklung. Legen Sie ganze Asset-Pakete ab (Zips, Tarballs,
-Ordner), und Hoard speichert jede Datei einmal anhand ihres Hashes, erkennt, was jede Datei ist, taggt sie, verknüpft
-Meshes mit ihren Texturen und Animationen und macht alles durchsuchbar: über ein Webportal, eine CLI, einen
-MCP-Endpunkt für Agents und ein Lockfile-basiertes `hoard sync`, das genau die Dateien holt, die Ihr Spielprojekt
-braucht.
+<h3 align="center">Jedes Asset-Paket, das Sie besitzen: durchsuchbar, mit Vorschau und nur einen Klick von Ihrem Spiel entfernt.</h3>
 
-Stellen Sie es sich als Asset-Store ohne Kasse vor.
+Hoard ist eine selbst gehostete Bibliothek für Spiele-Assets. Legen Sie ein Zip, ein Unity-Paket, einen Fab-Download
+oder einen Ordner mit zehntausend Dateien ab, und Hoard macht sich an die Arbeit. Modelle drehen sich in 3D mit ihren
+Texturen, lose Textur-Maps werden zu Materialien, Sounds zeichnen ihre Wellenformen, Spritesheets spielen ihre
+Animationen ab, und alles bekommt Tags, sodass Sie es finden, wenn Sie `footsteps gravel` oder `rigged low-poly`
+eintippen. Danach landet es mit allem, was es braucht, in Godot, Unity oder Unreal.
+
+Kein Abo, kein Upload in irgendjemandes Cloud, keine Preise pro Arbeitsplatz: ein Docker-Image auf Ihrem eigenen
+Rechner, und es gehört Ihnen. Stellen Sie es sich als Asset-Store ohne Kasse vor.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="../img/hero-dark.webp">
-  <img alt="Die Hoard-Bibliothek: Modelle und Materialien in einem Raster, daneben eine geöffnete Schatztruhe in der 3D-Vorschau mit ihren Tags und Downloads" src="../img/hero-light.webp">
+  <img alt="Die Hoard-Bibliothek: 3D-Modelle in einem Raster, daneben eine geöffnete Schatztruhe in der 3D-Vorschau mit ihren Tags und Downloads" src="../img/hero-light.webp">
 </picture>
 
-<sub>Die Demo-Bibliothek besteht aus CC0-Kunst: Modelle von [Poly Haven](https://polyhaven.com) (glTF und USD) und Oberflächen von
-[ambientCG](https://ambientcg.com). `node web/scripts/readme-images.mts` erstellt diese Bilder und die Social-Media-Karte.</sub>
+### Alles sehen, bevor Sie es verwenden
+
+Modelle öffnen sich in 3D mit ihren Texturen, Materialien und Animationen. FBX, glTF, OBJ, USD, SketchUp, 3MF, STL und
+Voxel liest Hoard selbst, ganz ohne installierte 3D-Software; Blender-Dateien kommen über ein Headless-Blender herein,
+und Unreal-Pakete zeigen, was der Editor über sie gespeichert hat, ohne Unreal. Vorschaubilder werden auf dem Server
+gezeichnet, jedes Mal gleich gerahmt, sodass sich ein ganzes Paket auf einen Blick überfliegen lässt.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="../img/page-dark.webp">
+  <img alt="Ein Kronleuchter auf einer ganzen Seite: eine große 3D-Ansicht neben seinen Eckdaten, Tags, verknüpften Texturen und Downloads" src="../img/page-light.webp">
+</picture>
+
+### Lose Textur-Maps werden zu Materialien
+
+`Rock_BaseColor.png`, `Rock_Normal.png` und `Rock_Roughness.png` werden zu einem einzigen Rock-Material auf einer
+beleuchteten Kugel. Hoard versteht die Benennung von Megascans, Poly Haven, ambientCG, Substance und Unreal, gepackte
+Maps eingeschlossen, und auch `.mat`-Dateien aus Unity. Der Vollbild-Viewer zeigt ein Material auf einer Kugel, einem
+Würfel oder einer Ebene, in seiner realen Größe, und jede Map lässt sich ein- und ausschalten.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="../img/material-dark.webp">
+  <img alt="Ein Ziegelmaterial im Vollbild-Viewer auf einer Kugel, mit Schaltern für seine Farb-, Normal-, Roughness- und Height-Map" src="../img/material-light.webp">
+</picture>
+
+### Spritesheets, die sich abspielen
+
+Atlanten aus TexturePacker, Starling, libGDX, Cocos2d und Godot werden zu einem Spritesheet, das seine Animationen
+abspielt und seine Sprites auflistet. Laden Sie es neu gepackt für die Engine herunter, die Sie gerade verwenden: zehn
+Formate, und jedes bekommt nur, was es auch aufnehmen kann.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="../img/sheet-dark.webp">
+  <img alt="Ein Charakter-Spritesheet auf einer ganzen Seite, eine seiner Animationen läuft neben seinen Tags und Download-Formaten" src="../img/sheet-light.webp">
+</picture>
+
+### Sounds, die man sehen kann
+
+Jeder Sound bekommt eine Wellenform, die danach eingefärbt ist, wie hell er klingt, sodass ein harter Schlag und eine
+lange Atmo unterschiedlich aussehen, bevor Sie sie abspielen. Metadaten von Soundbibliotheken werden gelesen
+(UCS-Kategorien, Soundminer- und BaseHead-Felder, Loop-Punkte, Tempo, Grundton), und MIDI- und Tracker-Musik wird
+gerendert, sodass sie sich wie jeder andere Sound abspielen lässt.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="../img/sound-dark.webp">
+  <img alt="Ein Raster aus Soundeffekten, als farbige Wellenformen gezeichnet, einer davon geöffnet mit seinem Player, seinen Tags und Takes" src="../img/sound-light.webp">
+</picture>
+
+### Eine Suche, die weiß, was Dinge sind
+
+Hoard taggt alles selbst, offline: `tileable`, `res:2k`, `poly:low`, `rigged`, `loop`, `bpm:120`, `license:cc0` und eine
+Kategorie aus einem Baum für Spiele-Assets. Suchen Sie nach Wörtern, nach Farbe oder danach, was ein Bild zeigt, und
+fragen Sie jede Textur und jeden Sound nach „Mehr davon“. Verbinden Sie es mit einem beliebigen OpenAI-kompatiblen
+Modell, lokal oder gehostet, und es schreibt auch Namen und Beschreibungen.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="../img/search-dark.webp">
+  <img alt="Eine Suche nach „wood“: ein Holztisch, Rinde, Planken und eine Holzoberfläche beieinander, daneben Filter nach Art und Tag" src="../img/search-light.webp">
+</picture>
+
+### Direkt in Ihre Engine
+
+- **Engine-Plugins** für Godot 4, Unity und Unreal Engine 5: Durchsuchen Sie die Bibliothek im Editor und drücken Sie
+  Zum Projekt hinzufügen. Das Modell kommt mit seinen Texturen, am richtigen Ort, importiert.
+- **`hoard sync`** holt genau die Dateien in ein Projekt, die es benennt, festgehalten in einem Lockfile, sodass jedes
+  Teammitglied und jede Build-Maschine dieselben Bytes bekommt.
+- **Herunterladen als** GLB, PNG, WAV, MP3 oder ein Spritesheet-Format, im Handumdrehen konvertiert, mit Texturnamen
+  nach der Konvention Ihres Studios.
+- **KI-Agents** suchen, untersuchen und holen Assets über MCP.
+
+### Einmal gespeichert, sicher aufbewahrt
+
+Jede Datei wird einmal anhand ihres BLAKE3-Hashes gespeichert, sodass dieselbe Textur in fünf Bundles nur den Platz
+einer einzigen belegt und Beschädigungen nicht unbemerkt bleiben können. Bewahren Sie alles auf einer lokalen Festplatte
+oder in einem beliebigen S3-Bucket auf. Ordner, auf die Sie Hoard ansetzen, werden gelesen, nie verändert. Konten,
+schreibgeschützte Tokens, Single Sign-on, HTTPS und HTTP/3 sind eingebaut.
+
+<sub>Die Demo-Bibliothek besteht aus CC0-Kunst: Modelle von [Poly Haven](https://polyhaven.com) (glTF und USD),
+Oberflächen von [ambientCG](https://ambientcg.com) sowie Sounds, Spritesheets und Schriften von
+[Kenney](https://kenney.nl). `node web/scripts/readme-images.mts` erstellt diese Bilder und die
+Social-Media-Karte.</sub>
 
 ## Installation mit Docker
 
@@ -124,7 +205,8 @@ Oder legen Sie das Zip im Portal ab.
 ## Der Rest dieses README
 
 Was mit einem Paket geschieht, wie Assets in eine Engine kommen, Unreal-Pakete, Suche, Credits, MCP, Speicher, HTTPS,
-Konfiguration, Sicherheit, Konten und die API werden im [englischen README](../../README.md) beschrieben.
+Konfiguration, Sicherheit, Konten, die API sowie Zahlen und Fakten werden im [englischen README](../../README.md)
+beschrieben.
 
 ## Übersetzungen
 

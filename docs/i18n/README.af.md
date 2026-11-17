@@ -7,20 +7,97 @@
 
 [English](../../README.md) · Afrikaans · [Català](README.ca.md) · [Čeština](README.cs.md) · [Dansk](README.da.md) · [Deutsch](README.de.md) · [Ελληνικά](README.el.md) · [Español (Latinoamérica)](README.es-419.md) · [Español (España)](README.es-ES.md) · [Suomi](README.fi.md) · [Français](README.fr.md) · [Magyar](README.hu.md) · [Bahasa Indonesia](README.id.md) · [Italiano](README.it.md) · [日本語](README.ja.md) · [한국어](README.ko.md) · [Norsk bokmål](README.nb.md) · [Nederlands](README.nl.md) · [Polski](README.pl.md) · [Português (Brasil)](README.pt-BR.md) · [Português (Portugal)](README.pt-PT.md) · [Română](README.ro.md) · [Русский](README.ru.md) · [Српски](README.sr-Cyrl.md) · [Svenska](README.sv.md) · [ไทย](README.th.md) · [Türkçe](README.tr.md) · [Українська](README.uk.md) · [Tiếng Việt](README.vi.md) · [简体中文](README.zh-Hans.md) · [繁體中文](README.zh-Hant.md)
 
-'n Selfgehuisveste batebiblioteek vir speletjie-ontwikkeling. Los hele batepakke in (zips, tarballs, vouers), en Hoard
-stoor elke lêer een keer volgens sy hash, werk uit wat elke lêer is, etiketteer dit, koppel mase aan hul teksture en
-animasies, en maak alles deursoekbaar vanaf 'n webportaal, 'n CLI, 'n MCP-eindpunt vir agente, en 'n `hoard sync` wat
-op 'n lockfile gebaseer is en presies die lêers aftrek wat jou speletjieprojek nodig het.
+<h3 align="center">Elke batepak wat jy besit: deursoekbaar, met 'n voorskou, en net een klik van jou speletjie af.</h3>
 
-Dink daaraan as 'n batewinkel sonder 'n betaalpunt.
+Hoard is 'n selfgehuisveste biblioteek vir speletjiebates. Los 'n zip, 'n Unity-pakket, 'n Fab-aflaai of 'n vouer met
+tienduisend lêers in, en Hoard spring aan die werk. Modelle draai in 3D met hul teksture, los tekstuurkaarte word
+materiale, klanke teken hul golfvorms, sprite-blaaie speel hul animasies, en alles kry etikette, sodat jy dit vind deur
+`footsteps gravel` of `rigged low-poly` te tik. Dan beland dit in Godot, Unity of Unreal met alles wat dit nodig het.
+
+Geen intekening nie, geen oplaai na iemand se wolk nie, geen pryse per gebruiker nie: een Docker-beeld op jou eie
+masjien, en dit is joune. Dink daaraan as 'n batewinkel sonder 'n betaalpunt.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="../img/hero-dark.webp">
-  <img alt="Die Hoard-biblioteek: modelle en materiale in 'n rooster, met 'n oop skatkis in die 3D-voorskou langs sy etikette en aflaaie" src="../img/hero-light.webp">
+  <img alt="Die Hoard-biblioteek: 3D-modelle in 'n rooster, met 'n oop skatkis in die 3D-voorskou langs sy etikette en aflaaie" src="../img/hero-light.webp">
 </picture>
 
-<sub>Die demobiblioteek is CC0-kuns: modelle van [Poly Haven](https://polyhaven.com) (glTF en USD) en oppervlakke van
-[ambientCG](https://ambientcg.com). `node web/scripts/readme-images.mts` maak hierdie prente en die sosiale kaart.</sub>
+### Sien alles voordat jy dit gebruik
+
+Modelle maak in 3D oop met hul teksture, materiale en animasies. FBX, glTF, OBJ, USD, SketchUp, 3MF, STL en voxels word
+deur Hoard self gelees, sonder dat enige 3D-toepassing geïnstalleer hoef te wees; Blender-lêers kom deur 'n koplose
+Blender in, en Unreal-pakke wys wat die redigeerder oor hulle gestoor het, sonder Unreal. Duimnaelskete word op die
+bediener geteken, elke keer op dieselfde manier geraam, sodat jy 'n hele pak in een oogopslag kan deurblaai.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="../img/page-dark.webp">
+  <img alt="'n Kandelaar op 'n volle bladsy: 'n groot 3D-aansig langs sy feite, etikette, gekoppelde teksture en aflaaie" src="../img/page-light.webp">
+</picture>
+
+### Los tekstuurkaarte word materiale
+
+`Rock_BaseColor.png`, `Rock_Normal.png` en `Rock_Roughness.png` word een Rock-materiaal op 'n beligte sfeer. Hoard lees
+die naamgewing van Megascans, Poly Haven, ambientCG, Substance en Unreal, gepakte kaarte ingesluit, en ook Unity se
+`.mat`-lêers. Die volskermkyker wys 'n materiaal op 'n sfeer, kubus of vlak, op sy werklike skaal, en elke kaart kan
+aan- en afgeskakel word.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="../img/material-dark.webp">
+  <img alt="'n Baksteenmateriaal in die volskermkyker, op 'n sfeer, met skakelaars vir sy kleur-, normaal-, grofheid- en hoogtekaarte" src="../img/material-light.webp">
+</picture>
+
+### Sprite-blaaie wat speel
+
+Atlasse van TexturePacker, Starling, libGDX, Cocos2d en Godot word een sprite-blad wat sy animasies speel en sy sprites
+lys. Laai dit herverpak af vir watter enjin jy ook al gebruik: tien formate, en elkeen kry net wat dit kan hou.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="../img/sheet-dark.webp">
+  <img alt="'n Karakter se sprite-blad op 'n volle bladsy, met een van sy animasies wat langs sy etikette en aflaaiformate speel" src="../img/sheet-light.webp">
+</picture>
+
+### Klanke wat jy kan sien
+
+Elke klank kry 'n golfvorm wat gekleur is volgens hoe helder dit klink, sodat 'n skerp slag en 'n lang agtergrondklank
+anders lyk voordat jy hulle speel. Klankbiblioteek-metadata word gelees (UCS-kategorieë, Soundminer- en BaseHead-velde,
+luspunte, tempo, grondnoot), en MIDI- en tracker-musiek word weergegee sodat dit soos enige ander klank speel.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="../img/sound-dark.webp">
+  <img alt="'n Rooster klankeffekte wat as gekleurde golfvorms geteken is, met een oop wat sy speler, etikette en opnames wys" src="../img/sound-light.webp">
+</picture>
+
+### Soektog wat weet wat dinge is
+
+Hoard etiketteer alles self, vanlyn: `tileable`, `res:2k`, `poly:low`, `rigged`, `loop`, `bpm:120`, `license:cc0`, en 'n
+kategorie uit 'n boom vir speletjiebates. Soek met woorde, volgens kleur of volgens wat 'n prent wys, en vra enige
+tekstuur of klank vir “Meer soos hierdie”. Koppel dit aan enige OpenAI-versoenbare model, plaaslik of aanlyn, en dit
+skryf ook name en beskrywings.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="../img/search-dark.webp">
+  <img alt="'n Soektog na “wood”: 'n houttafel, bas, planke en 'n houtoppervlak saam, met filters volgens soort en etiket langsaan" src="../img/search-light.webp">
+</picture>
+
+### Reguit in jou enjin
+
+- **Enjin-inproppe** vir Godot 4, Unity en Unreal Engine 5: blaai deur die biblioteek binne die redigeerder en druk Voeg
+  by projek. Die model kom met sy teksture, op die regte plek, ingevoer.
+- **`hoard sync`** trek presies die lêers wat 'n projek noem daarin in, vasgepen in 'n lockfile, sodat elke spanmaat en
+  elke boumasjien dieselfde grepe kry.
+- **Laai af as** GLB, PNG, WAV, MP3 of 'n sprite-bladformaat, terstond omgeskakel, met tekstuurname volgens jou ateljee
+  se konvensie.
+- **KI-agente** soek, ondersoek en haal bates oor MCP.
+
+### Een keer gestoor, veilig bewaar
+
+Elke lêer word een keer volgens sy BLAKE3-hash gestoor, sodat dieselfde tekstuur in vyf bundels net die spasie van een
+opneem, en korrupsie nie ongemerk kan bly nie. Hou dit op 'n plaaslike skyf of in enige S3-houer. Vouers waarna jy Hoard
+wys, word gelees, nooit verander nie. Rekeninge, leesalleen-tokens, enkelaanmelding, HTTPS en HTTP/3 is ingebou.
+
+<sub>Die demobiblioteek is CC0-kuns: modelle van [Poly Haven](https://polyhaven.com) (glTF en USD), oppervlakke van
+[ambientCG](https://ambientcg.com), en klanke, sprite-blaaie en lettertipes van [Kenney](https://kenney.nl).
+`node web/scripts/readme-images.mts` maak hierdie prente en die sosiale kaart.</sub>
 
 ## Installeer met Docker
 
@@ -117,7 +194,8 @@ Of los die zip op die portaal.
 ## Die res van hierdie README
 
 Wat met 'n pak gebeur, bates in 'n enjin kry, Unreal-pakke, soektog, erkennings, MCP, berging, HTTPS,
-konfigurasie, sekuriteit, rekeninge en die API word in die [Engelse README](../../README.md) beskryf.
+konfigurasie, sekuriteit, rekeninge, die API, en feite en syfers word in die [Engelse README](../../README.md)
+beskryf.
 
 ## Vertalings
 

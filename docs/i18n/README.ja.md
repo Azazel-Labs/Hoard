@@ -7,20 +7,106 @@
 
 [English](../../README.md) · [Afrikaans](README.af.md) · [Català](README.ca.md) · [Čeština](README.cs.md) · [Dansk](README.da.md) · [Deutsch](README.de.md) · [Ελληνικά](README.el.md) · [Español (Latinoamérica)](README.es-419.md) · [Español (España)](README.es-ES.md) · [Suomi](README.fi.md) · [Français](README.fr.md) · [Magyar](README.hu.md) · [Bahasa Indonesia](README.id.md) · [Italiano](README.it.md) · 日本語 · [한국어](README.ko.md) · [Norsk bokmål](README.nb.md) · [Nederlands](README.nl.md) · [Polski](README.pl.md) · [Português (Brasil)](README.pt-BR.md) · [Português (Portugal)](README.pt-PT.md) · [Română](README.ro.md) · [Русский](README.ru.md) · [Српски](README.sr-Cyrl.md) · [Svenska](README.sv.md) · [ไทย](README.th.md) · [Türkçe](README.tr.md) · [Українська](README.uk.md) · [Tiếng Việt](README.vi.md) · [简体中文](README.zh-Hans.md) · [繁體中文](README.zh-Hant.md)
 
-ゲーム開発のためのセルフホスト型アセットライブラリです。アセットパックを丸ごと（zip、tarball、フォルダー）放り込むと、Hoard
-はすべてのファイルをハッシュで 1 回だけ保存し、各ファイルが何であるかを判別してタグを付け、メッシュをテクスチャや
-アニメーションと結び付けます。そのすべてを、Web ポータル、CLI、エージェント向けの MCP エンドポイント、そしてゲームプロジェクトに必要なファイルだけを正確に取得するロックファイルベースの
-`hoard sync` から検索できるようにします。
+<h3 align="center">持っているすべてのアセットパックを、検索でき、プレビューでき、ワンクリックでゲームへ。</h3>
 
+Hoard はゲームアセットのためのセルフホスト型ライブラリです。zip、Unity パッケージ、Fab のダウンロード、
+1 万個のファイルが入ったフォルダーを放り込めば、Hoard が作業に取りかかります。モデルはテクスチャ付きの 3D で回転し、
+バラバラのテクスチャマップはマテリアルにまとまり、サウンドは波形を描き、スプライトシートはアニメーションを再生し、
+すべてにタグが付くので、`footsteps gravel` や `rigged low-poly` と入力すれば見つかります。
+そして必要なものをすべて揃えて Godot、Unity、Unreal に届きます。
+
+サブスクリプションも、誰かのクラウドへのアップロードも、シート単位の料金もありません。
+自分のマシン上の Docker イメージ 1 つだけで、それはあなたのものです。
 チェックアウトのないアセットストアだと考えてください。
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="../img/hero-dark.webp">
-  <img alt="Hoard のライブラリ: モデルとマテリアルがグリッドに並び、横の 3D プレビューには開いた宝箱と、そのタグとダウンロードが表示されています" src="../img/hero-light.webp">
+  <img alt="Hoard のライブラリ: 3D モデルがグリッドに並び、3D プレビューには開いた宝箱と、そのタグとダウンロードが表示されています" src="../img/hero-light.webp">
 </picture>
 
-<sub>デモライブラリは CC0 のアートです。モデルは [Poly Haven](https://polyhaven.com)（glTF と USD）、サーフェスは
-[ambientCG](https://ambientcg.com) のものです。これらの画像とソーシャルカードは `node web/scripts/readme-images.mts` で作成しています。</sub>
+### 使う前にすべてを確認
+
+モデルはテクスチャ、マテリアル、アニメーション付きの 3D で開きます。FBX、glTF、OBJ、USD、SketchUp、3MF、STL、
+ボクセルは、3D アプリをインストールしなくても Hoard 自身が読み込みます。
+Blender ファイルはヘッドレスの Blender を通して取り込まれ、Unreal パッケージは Unreal なしでも、
+エディターが保存した情報を表示します。サムネイルはサーバー上で毎回同じ構図で描画されるので、
+パック全体をひと目で見渡せます。
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="../img/page-dark.webp">
+  <img alt="シャンデリアの全ページ表示: 大きな 3D ビューの横に、その情報、タグ、リンクされたテクスチャ、ダウンロードが並んでいます" src="../img/page-light.webp">
+</picture>
+
+### バラバラのテクスチャマップがマテリアルに
+
+`Rock_BaseColor.png`、`Rock_Normal.png`、`Rock_Roughness.png` は、
+ライティングされた球の上の 1 つの Rock マテリアルになります。Hoard は Megascans、Poly Haven、ambientCG、Substance、
+Unreal の命名規則をパック済みマップも含めて読み取り、Unity の `.mat` ファイルにも対応します。
+フルスクリーンビューアーでは、マテリアルを球、立方体、平面の上に実寸のスケールで表示し、
+各マップのオン・オフを切り替えられます。
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="../img/material-dark.webp">
+  <img alt="フルスクリーンビューアーで球に適用されたレンガのマテリアル。カラー、ノーマル、ラフネス、ハイトの各マップのスイッチ付き" src="../img/material-light.webp">
+</picture>
+
+### 再生できるスプライトシート
+
+TexturePacker、Starling、libGDX、Cocos2d、Godot のアトラスは、アニメーションを再生し、
+含まれるスプライトを一覧表示する 1 つのスプライトシートになります。
+使っているエンジンに合わせて再パックしてダウンロードできます。形式は 10 種類で、
+それぞれにはその形式が保持できる情報だけが渡されます。
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="../img/sheet-dark.webp">
+  <img alt="キャラクターのスプライトシートの全ページ表示。アニメーションの 1 つが再生され、その横にタグとダウンロード形式が並んでいます" src="../img/sheet-light.webp">
+</picture>
+
+### 目で見えるサウンド
+
+すべてのサウンドには、音の明るさに応じて色付けされた波形が付くので、
+鋭い打撃音と長い環境音は再生する前から見た目で区別できます。サウンドライブラリのメタデータ（UCS カテゴリ、
+Soundminer と BaseHead のフィールド、ループポイント、テンポ、ルートノート）を読み取り、
+MIDI やトラッカー音楽はレンダリングして、ほかのサウンドと同じように再生できるようにします。
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="../img/sound-dark.webp">
+  <img alt="色付きの波形で描かれた効果音のグリッド。1 つが開かれ、プレーヤー、タグ、テイクが表示されています" src="../img/sound-light.webp">
+</picture>
+
+### 中身を理解する検索
+
+Hoard はすべてのものにオフラインで自動的にタグを付けます。`tileable`、`res:2k`、`poly:low`、`rigged`、`loop`、
+`bpm:120`、`license:cc0` といったタグと、ゲームアセットの分類ツリーに基づくカテゴリです。言葉、色、
+画像に写っているもので検索でき、どのテクスチャやサウンドでも「これに似たもの」を探せます。ローカルでもホスト型でも、
+OpenAI 互換のモデルを指定すれば、名前と説明も書いてくれます。
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="../img/search-dark.webp">
+  <img alt="wood の検索結果: 木のテーブル、樹皮、板、木の表面が一緒に並び、横に種類とタグのフィルターがあります" src="../img/search-light.webp">
+</picture>
+
+### エンジンへ直接
+
+- **エンジンプラグイン** は Godot 4、Unity、Unreal Engine 5 に対応しています。エディター内でライブラリを閲覧し、
+  「プロジェクトに追加」を押すと、モデルがテクスチャと一緒に正しい場所へインポートされます。
+- **`hoard sync`** は、プロジェクトが指定したファイルだけを正確に取り込み、ロックファイルで固定するので、
+  チームメンバー全員とビルドマシンが同じバイト列を受け取ります。
+- **形式を指定してダウンロード**: GLB、PNG、WAV、MP3、スプライトシート形式にその場で変換し、
+  テクスチャ名はスタジオの命名規則に合わせられます。
+- **AI エージェント** は MCP を通じてアセットを検索、調査、取得できます。
+
+### 一度だけ保存し、安全に保管
+
+すべてのファイルは BLAKE3 ハッシュで 1 回だけ保存されるので、
+5 つのバンドルに入った同じテクスチャも 1 つ分の容量しか使わず、データの破損も見逃されません。
+保存先はローカルディスクでも、任意の S3 バケットでもかまいません。Hoard に指定したフォルダーは読み取るだけで、
+決して変更しません。アカウント、読み取り専用トークン、シングルサインオン、HTTPS、HTTP/3 を標準で備えています。
+
+<sub>デモライブラリは CC0 のアートです。モデルは [Poly Haven](https://polyhaven.com)（glTF と USD）、
+サーフェスは [ambientCG](https://ambientcg.com)、サウンド、スプライトシート、
+フォントは [Kenney](https://kenney.nl) のものです。
+これらの画像とソーシャルカードは `node web/scripts/readme-images.mts` で作成しています。</sub>
 
 ## Docker でインストール
 
@@ -114,7 +200,7 @@ python3 tools/make_sample_pack.py /tmp/sample       # needs Pillow + numpy; ffmp
 ## この README の続き
 
 パックに起きること、アセットをエンジンに取り込む方法、Unreal パック、検索、クレジット、MCP、ストレージ、HTTPS、
-構成、セキュリティ、アカウント、API については、[英語の README](../../README.md) で説明しています。
+構成、セキュリティ、アカウント、API、ファクトと数値については、[英語の README](../../README.md) で説明しています。
 
 ## 翻訳
 

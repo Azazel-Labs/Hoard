@@ -7,20 +7,99 @@
 
 [English](../../README.md) · [Afrikaans](README.af.md) · [Català](README.ca.md) · Čeština · [Dansk](README.da.md) · [Deutsch](README.de.md) · [Ελληνικά](README.el.md) · [Español (Latinoamérica)](README.es-419.md) · [Español (España)](README.es-ES.md) · [Suomi](README.fi.md) · [Français](README.fr.md) · [Magyar](README.hu.md) · [Bahasa Indonesia](README.id.md) · [Italiano](README.it.md) · [日本語](README.ja.md) · [한국어](README.ko.md) · [Norsk bokmål](README.nb.md) · [Nederlands](README.nl.md) · [Polski](README.pl.md) · [Português (Brasil)](README.pt-BR.md) · [Português (Portugal)](README.pt-PT.md) · [Română](README.ro.md) · [Русский](README.ru.md) · [Српски](README.sr-Cyrl.md) · [Svenska](README.sv.md) · [ไทย](README.th.md) · [Türkçe](README.tr.md) · [Українська](README.uk.md) · [Tiếng Việt](README.vi.md) · [简体中文](README.zh-Hans.md) · [繁體中文](README.zh-Hant.md)
 
-Knihovna assetů pro vývoj her, kterou si provozujete sami. Vhoďte do ní celé balíčky assetů (zipy, tarbally, složky)
-a Hoard uloží každý soubor jen jednou podle jeho hashe, zjistí, co který soubor je, oštítkuje ho, propojí meshe s jejich
-texturami a animacemi a vše zpřístupní k hledání z webového portálu, z CLI, přes endpoint MCP pro agenty a pomocí
-`hoard sync` založeného na lockfilu, který stáhne přesně ty soubory, které váš herní projekt potřebuje.
+<h3 align="center">Každý balíček assetů, který vlastníte: prohledávatelný, s náhledem a jedno kliknutí od vaší hry.</h3>
 
-Představte si ho jako obchod s assety bez pokladny.
+Hoard je knihovna herních assetů, kterou si provozujete sami. Vhoďte do ní zip, balíček pro Unity, soubor stažený z Fabu
+nebo složku s deseti tisíci soubory a Hoard se pustí do práce. Modely se otáčejí ve 3D se svými texturami, z volných
+texturových map se stanou materiály, zvuky vykreslí svůj průběh, listy spritů přehrají své animace a vše dostane štítky,
+takže když napíšete `footsteps gravel` nebo `rigged low-poly`, najdete to. Pak to přistane v Godotu, Unity nebo Unrealu
+se vším, co potřebuje.
+
+Žádné předplatné, žádné nahrávání do cizího cloudu, žádné ceny za uživatele: jeden image pro Docker na vašem vlastním
+počítači a je váš. Představte si ho jako obchod s assety bez pokladny.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="../img/hero-dark.webp">
-  <img alt="Knihovna Hoardu: modely a materiály v mřížce, vedle toho otevřená truhla s pokladem ve 3D náhledu se svými štítky a stahováním" src="../img/hero-light.webp">
+  <img alt="Knihovna Hoardu: 3D modely v mřížce, vedle toho otevřená truhla s pokladem ve 3D náhledu se svými štítky a stahováním" src="../img/hero-light.webp">
 </picture>
 
-<sub>Ukázková knihovna je grafika pod CC0: modely z [Poly Haven](https://polyhaven.com) (glTF a USD) a povrchy z
-[ambientCG](https://ambientcg.com). `node web/scripts/readme-images.mts` vytváří tyto obrázky i kartu pro sociální sítě.</sub>
+### Uvidíte všechno dřív, než to použijete
+
+Modely se otevírají ve 3D se svými texturami, materiály a animacemi. FBX, glTF, OBJ, USD, SketchUp, 3MF, STL a voxely
+čte Hoard sám, bez nainstalované 3D aplikace; soubory Blenderu přicházejí přes Blender spuštěný bez rozhraní a balíčky z
+Unrealu ukazují, co o nich editor uložil, a to bez Unrealu. Náhledy se kreslí na serveru, pokaždé stejně zarámované,
+takže celý balíček přelétnete jediným pohledem.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="../img/page-dark.webp">
+  <img alt="Lustr na celé stránce: velký 3D pohled vedle jeho údajů, štítků, propojených textur a stahování" src="../img/page-light.webp">
+</picture>
+
+### Z volných texturových map se stanou materiály
+
+`Rock_BaseColor.png`, `Rock_Normal.png` a `Rock_Roughness.png` se stanou jedním materiálem Rock na osvětlené kouli.
+Hoard rozumí pojmenování z Megascans, Poly Haven, ambientCG, Substance a Unrealu, včetně sloučených map, a také souborům
+`.mat` z Unity. Celoobrazovkový prohlížeč ukáže materiál na kouli, krychli nebo rovině, ve skutečném měřítku, a každou
+mapu lze zapnout a vypnout.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="../img/material-dark.webp">
+  <img alt="Cihlový materiál v celoobrazovkovém prohlížeči na kouli, s přepínači pro mapy barvy, normál, drsnosti a výšky" src="../img/material-light.webp">
+</picture>
+
+### Listy spritů, které se přehrávají
+
+Atlasy z nástrojů TexturePacker, Starling, libGDX, Cocos2d a Godot se stanou jedním listem spritů, který přehrává své
+animace a vypisuje své sprity. Stáhněte si ho znovu zabalený pro engine, který právě používáte: deset formátů a každému
+se předá jen to, co dokáže pojmout.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="../img/sheet-dark.webp">
+  <img alt="List spritů postavy na celé stránce, jedna z jeho animací se přehrává vedle jeho štítků a formátů ke stažení" src="../img/sheet-light.webp">
+</picture>
+
+### Zvuky, které uvidíte
+
+Každý zvuk dostane průběh obarvený podle toho, jak jasně zní, takže ostrý úder a dlouhá atmosféra vypadají jinak ještě
+předtím, než je přehrajete. Čtou se metadata zvukových knihoven (kategorie UCS, pole Soundminer a BaseHead, body smyčky,
+tempo, základní tón) a hudba MIDI a z trackerů se vyrenderuje, takže se přehrává jako jakýkoli jiný zvuk.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="../img/sound-dark.webp">
+  <img alt="Mřížka zvukových efektů vykreslených jako barevné průběhy, jeden z nich otevřený s přehrávačem, štítky a variantami nahrávky" src="../img/sound-light.webp">
+</picture>
+
+### Hledání, které ví, co věci jsou
+
+Hoard vše oštítkuje sám, offline: `tileable`, `res:2k`, `poly:low`, `rigged`, `loop`, `bpm:120`, `license:cc0` a
+kategorii ze stromu herních assetů. Hledejte podle slov, podle barvy nebo podle toho, co obrázek ukazuje, a u kterékoli
+textury nebo zvuku si řekněte o „Další podobné“. Napojte ho na libovolný model kompatibilní s OpenAI, místní nebo
+hostovaný, a bude psát i názvy a popisy.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="../img/search-dark.webp">
+  <img alt="Hledání „wood“: dřevěný stůl, kůra, prkna a dřevěný povrch pohromadě, vedle nich filtry podle druhu a štítku" src="../img/search-light.webp">
+</picture>
+
+### Přímo do vašeho enginu
+
+- **Pluginy pro enginy** Godot 4, Unity a Unreal Engine 5: procházejte knihovnu přímo v editoru a stiskněte Přidat do
+  projektu. Model dorazí se svými texturami, na správné místo a naimportovaný.
+- **`hoard sync`** stáhne do projektu přesně ty soubory, které projekt uvádí, zafixované v lockfilu, takže každý člen
+  týmu i každý build server dostane tytéž bajty.
+- **Stáhnout jako** GLB, PNG, WAV, MP3 nebo formát listu spritů, převedené za běhu, s názvy textur podle konvence vašeho
+  studia.
+- **AI agenti** hledají, prohlížejí a stahují assety přes MCP.
+
+### Uloženo jednou, v bezpečí
+
+Každý soubor se uloží jen jednou podle svého hashe BLAKE3, takže stejná textura v pěti balících zabere místo jedné a
+poškození nemůže zůstat nepovšimnuto. Ukládejte na místní disk nebo do libovolného bucketu S3. Složky, na které Hoard
+nasměrujete, se jen čtou, nikdy nemění. Účty, tokeny jen pro čtení, jednotné přihlášení, HTTPS a HTTP/3 jsou vestavěné.
+
+<sub>Ukázková knihovna je grafika pod CC0: modely z [Poly Haven](https://polyhaven.com) (glTF a USD), povrchy z
+[ambientCG](https://ambientcg.com) a zvuky, listy spritů a písma od [Kenney](https://kenney.nl).
+`node web/scripts/readme-images.mts` vytváří tyto obrázky i kartu pro sociální sítě.</sub>
 
 ## Instalace přes Docker
 
@@ -115,7 +194,7 @@ Nebo zip přetáhněte na portál.
 ## Zbytek tohoto README
 
 Co se s balíčkem děje, jak dostat assety do enginu, balíčky z Unrealu, hledání, poděkování, MCP, úložiště, HTTPS,
-konfiguraci, zabezpečení, účty a API popisuje [anglické README](../../README.md).
+konfiguraci, zabezpečení, účty, API a fakta a čísla popisuje [anglické README](../../README.md).
 
 ## Překlady
 

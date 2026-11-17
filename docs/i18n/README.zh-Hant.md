@@ -7,18 +7,74 @@
 
 [English](../../README.md) · [Afrikaans](README.af.md) · [Català](README.ca.md) · [Čeština](README.cs.md) · [Dansk](README.da.md) · [Deutsch](README.de.md) · [Ελληνικά](README.el.md) · [Español (Latinoamérica)](README.es-419.md) · [Español (España)](README.es-ES.md) · [Suomi](README.fi.md) · [Français](README.fr.md) · [Magyar](README.hu.md) · [Bahasa Indonesia](README.id.md) · [Italiano](README.it.md) · [日本語](README.ja.md) · [한국어](README.ko.md) · [Norsk bokmål](README.nb.md) · [Nederlands](README.nl.md) · [Polski](README.pl.md) · [Português (Brasil)](README.pt-BR.md) · [Português (Portugal)](README.pt-PT.md) · [Română](README.ro.md) · [Русский](README.ru.md) · [Српски](README.sr-Cyrl.md) · [Svenska](README.sv.md) · [ไทย](README.th.md) · [Türkçe](README.tr.md) · [Українська](README.uk.md) · [Tiếng Việt](README.vi.md) · [简体中文](README.zh-Hans.md) · 繁體中文
 
-一套自行架設的遊戲開發素材庫。直接放入整個素材包（zip、tarball、資料夾），Hoard 就會依雜湊值將每個檔案只儲存一次，判斷每個檔案是什麼、為它加上標籤、將網格連結到它們的貼圖與動畫，並讓這一切都能透過網頁入口、CLI、供代理程式使用的 MCP 端點，以及以鎖定檔為基礎、只拉取你的遊戲專案所需檔案的
-`hoard sync` 進行搜尋。
+<h3 align="center">你擁有的每一個素材包，都能搜尋、預覽，而且離你的遊戲只差一次點擊。</h3>
 
-你可以把它想成一個不用結帳的素材商店。
+Hoard 是一套自行架設的遊戲素材庫。放入一個 zip、一個 Unity 套件、一份 Fab 下載內容，或一個裝著上萬個檔案的資料夾，Hoard 就會開始工作。模型帶著貼圖在 3D 中旋轉，零散的貼圖檔會組成材質，聲音會畫出自己的波形，精靈圖表會播放自己的動畫，而一切都會加上標籤，所以輸入 `footsteps gravel` 或 `rigged low-poly` 就能找到。接著它就會帶著所需的一切進入 Godot、Unity 或 Unreal。
+
+不用訂閱，不必上傳到任何人的雲端，也不按席次計價：在你自己的機器上跑一個 Docker 映像檔，它就完全屬於你。你可以把它想成一個不用結帳的素材商店。
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="../img/hero-dark.webp">
-  <img alt="Hoard 素材庫：格狀排列的模型與材質，旁邊的 3D 預覽中開啟著一個寶箱，並列出它的標籤與下載選項" src="../img/hero-light.webp">
+  <img alt="Hoard 素材庫：格狀排列的 3D 模型，旁邊的 3D 預覽中開啟著一個寶箱，並列出它的標籤與下載選項" src="../img/hero-light.webp">
 </picture>
 
-<sub>示範素材庫中的都是 CC0 作品：模型來自 [Poly Haven](https://polyhaven.com)（glTF 與 USD），表面材質來自
-[ambientCG](https://ambientcg.com)。這些圖片與社群預覽卡是由 `node web/scripts/readme-images.mts` 產生的。</sub>
+### 使用之前，先看個清楚
+
+模型會連同貼圖、材質與動畫一起在 3D 中開啟。FBX、glTF、OBJ、USD、SketchUp、3MF、STL 與體素由 Hoard 自行讀取，不需安裝任何 3D 應用程式；Blender 檔案透過無介面（headless）的 Blender 匯入，Unreal 套件則不需要 Unreal，就能顯示編輯器為它們儲存的資訊。縮圖在伺服器上繪製，每次都以相同方式取景，整個素材包一眼就能瀏覽完畢。
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="../img/page-dark.webp">
+  <img alt="以整頁顯示的吊燈：大型 3D 檢視旁列出它的資訊、標籤、連結的貼圖與下載選項" src="../img/page-light.webp">
+</picture>
+
+### 零散的貼圖變成材質
+
+`Rock_BaseColor.png`、`Rock_Normal.png` 與 `Rock_Roughness.png` 會合成一個 Rock 材質，呈現在受光照的球體上。Hoard 看得懂 Megascans、Poly Haven、ambientCG、Substance 與 Unreal 的命名方式（包括打包貼圖），也能讀取 Unity 的 `.mat` 檔案。全螢幕檢視器可將材質呈現在球體、立方體或平面上，以真實世界的比例顯示，每張貼圖都能個別開關。
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="../img/material-dark.webp">
+  <img alt="全螢幕檢視器中的磚牆材質，呈現在球體上，並附有顏色、法線、粗糙度與高度貼圖的開關" src="../img/material-light.webp">
+</picture>
+
+### 會動的精靈圖表
+
+來自 TexturePacker、Starling、libGDX、Cocos2d 與 Godot 的圖集會變成一份精靈圖表，能播放其中的動畫並列出其中的精靈。你可以下載專為所用引擎重新打包的版本：共十種格式，每種格式只會寫入它能容納的內容。
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="../img/sheet-dark.webp">
+  <img alt="以整頁顯示的角色精靈圖表，其中一段動畫正在播放，旁邊是它的標籤與下載格式" src="../img/sheet-light.webp">
+</picture>
+
+### 看得見的聲音
+
+每個聲音都有一條依音色明亮程度上色的波形，因此清脆的打擊聲和綿長的環境音在播放之前看起來就不一樣。Hoard 會讀取音效庫的中繼資料（UCS 分類、Soundminer 與 BaseHead 欄位、循環點、速度、根音），並將 MIDI 與 tracker 音樂算繪出來，讓它們像其他聲音一樣播放。
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="../img/sound-dark.webp">
+  <img alt="以彩色波形呈現的音效格狀列表，其中一個已開啟，顯示它的播放器、標籤與各個錄音版本" src="../img/sound-light.webp">
+</picture>
+
+### 懂得東西是什麼的搜尋
+
+Hoard 會離線自動為一切加上標籤：`tileable`、`res:2k`、`poly:low`、`rigged`、`loop`、`bpm:120`、`license:cc0`，以及來自遊戲素材分類樹的類別。可以依文字、依顏色或依圖片內容搜尋，也能請任何貼圖或聲音找出「更多類似項目」。接上任何與 OpenAI 相容的模型，無論是本機執行或雲端託管，它還能撰寫名稱與描述。
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="../img/search-dark.webp">
+  <img alt="搜尋木頭：木桌、樹皮、木板與木質表面一起出現，旁邊是依種類與標籤篩選的選項" src="../img/search-light.webp">
+</picture>
+
+### 直接送進你的引擎
+
+- **引擎外掛**支援 Godot 4、Unity 與 Unreal Engine 5：在編輯器中瀏覽素材庫，按下「加入專案」即可。模型會連同貼圖一起放到正確的位置，並完成匯入。
+- **`hoard sync`** 會將專案指定的檔案精確拉取到專案中，並固定在鎖定檔裡，讓每位隊友與每台建置機器都拿到完全相同的位元組。
+- **下載為** GLB、PNG、WAV、MP3 或某種精靈圖表格式，即時轉換，貼圖名稱也會依照你工作室的命名慣例。
+- **AI 代理程式**可透過 MCP 搜尋、檢視與取得素材。
+
+### 只存一次，妥善保管
+
+每個檔案依其 BLAKE3 雜湊值只儲存一次，因此五個素材包中的同一張貼圖只佔一份空間，任何損毀也不會被忽略。可以存放在本機磁碟或任何 S3 儲存貯體中。你指定給 Hoard 的資料夾只會被讀取，絕不會被修改。帳號、唯讀權杖、單一登入、HTTPS 與 HTTP/3 都已內建。
+
+<sub>示範素材庫中的都是 CC0 作品：模型來自 [Poly Haven](https://polyhaven.com)（glTF 與 USD），表面材質來自 [ambientCG](https://ambientcg.com)，聲音、精靈圖表與字型來自 [Kenney](https://kenney.nl)。這些圖片與社群預覽卡是由 `node web/scripts/readme-images.mts` 產生的。</sub>
 
 ## 使用 Docker 安裝
 
@@ -96,7 +152,7 @@ python3 tools/make_sample_pack.py /tmp/sample       # needs Pillow + numpy; ffmp
 
 ## 本 README 的其餘內容
 
-素材包會經過哪些處理、如何將素材匯入引擎、Unreal 素材包、搜尋、致謝名單、MCP、儲存空間、HTTPS、組態設定、安全性、帳號與 API 等內容，都在[英文版 README](../../README.md) 中說明。
+素材包會經過哪些處理、如何將素材匯入引擎、Unreal 素材包、搜尋、致謝名單、MCP、儲存空間、HTTPS、組態設定、安全性、帳號、API 與概況數據等內容，都在[英文版 README](../../README.md) 中說明。
 
 ## 翻譯
 

@@ -7,22 +7,101 @@
 
 [English](../../README.md) · [Afrikaans](README.af.md) · Català · [Čeština](README.cs.md) · [Dansk](README.da.md) · [Deutsch](README.de.md) · [Ελληνικά](README.el.md) · [Español (Latinoamérica)](README.es-419.md) · [Español (España)](README.es-ES.md) · [Suomi](README.fi.md) · [Français](README.fr.md) · [Magyar](README.hu.md) · [Bahasa Indonesia](README.id.md) · [Italiano](README.it.md) · [日本語](README.ja.md) · [한국어](README.ko.md) · [Norsk bokmål](README.nb.md) · [Nederlands](README.nl.md) · [Polski](README.pl.md) · [Português (Brasil)](README.pt-BR.md) · [Português (Portugal)](README.pt-PT.md) · [Română](README.ro.md) · [Русский](README.ru.md) · [Српски](README.sr-Cyrl.md) · [Svenska](README.sv.md) · [ไทย](README.th.md) · [Türkçe](README.tr.md) · [Українська](README.uk.md) · [Tiếng Việt](README.vi.md) · [简体中文](README.zh-Hans.md) · [繁體中文](README.zh-Hant.md)
 
-Una biblioteca de recursos autoallotjada per al desenvolupament de videojocs. Hi deixeu anar paquets de recursos sencers
-(zips, tarballs, carpetes) i Hoard desa cada fitxer una sola vegada pel seu hash, esbrina què és cada fitxer, l'etiqueta,
-enllaça les malles amb les seves textures i animacions, i fa que tot es pugui cercar des d'un portal web, una CLI, un
-punt d'accés MCP per a agents i un `hoard sync` basat en un fitxer de bloqueig que baixa exactament els fitxers que
-necessita el vostre projecte de joc.
+<h3 align="center">Tots els paquets de recursos que teniu, cercables, previsualitzables i a un clic del vostre joc.</h3>
 
-Penseu-hi com una botiga de recursos sense caixa per pagar.
+Hoard és una biblioteca autoallotjada de recursos per a videojocs. Hi deixeu anar un zip, un paquet d'Unity, una baixada
+de Fab o una carpeta amb deu mil fitxers, i Hoard es posa a treballar. Els models giren en 3D amb les seves textures,
+els mapes de textura solts es converteixen en materials, els sons dibuixen les seves formes d'ona, els fulls de sprites
+reprodueixen les seves animacions i tot queda etiquetat, de manera que només cal escriure `footsteps gravel` o
+`rigged low-poly` per trobar-ho. Després arriba a Godot, Unity o Unreal amb tot el que necessita.
+
+Sense subscripció, sense pujar res al núvol de ningú, sense preus per usuari: una imatge de Docker a la vostra pròpia
+màquina, i és vostra. Penseu-hi com una botiga de recursos sense caixa per pagar.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="../img/hero-dark.webp">
-  <img alt="La biblioteca de Hoard: models i materials en una graella, amb un cofre del tresor obert a la previsualització 3D al costat de les seves etiquetes i baixades" src="../img/hero-light.webp">
+  <img alt="La biblioteca de Hoard: models 3D en una graella, amb un cofre del tresor obert a la previsualització 3D al costat de les seves etiquetes i baixades" src="../img/hero-light.webp">
 </picture>
 
-<sub>La biblioteca de demostració és art CC0: models de [Poly Haven](https://polyhaven.com) (glTF i USD) i superfícies
-d'[ambientCG](https://ambientcg.com). `node web/scripts/readme-images.mts` genera aquestes imatges i la targeta per a
-xarxes socials.</sub>
+### Vegeu-ho tot abans de fer-ho servir
+
+Els models s'obren en 3D amb les seves textures, materials i animacions. Hoard mateix llegeix FBX, glTF, OBJ, USD,
+SketchUp, 3MF, STL i vòxels, sense cap aplicació 3D instal·lada; els fitxers de Blender entren a través d'un Blender
+sense interfície, i els paquets d'Unreal mostren el que l'editor en va desar, sense Unreal. Les miniatures es dibuixen
+al servidor, enquadrades sempre de la mateixa manera, de manera que es pot repassar tot un paquet d'un cop d'ull.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="../img/page-dark.webp">
+  <img alt="Una aranya de llums a pàgina completa: una vista 3D gran al costat de les seves dades, etiquetes, textures enllaçades i baixades" src="../img/page-light.webp">
+</picture>
+
+### Els mapes de textura solts es converteixen en materials
+
+`Rock_BaseColor.png`, `Rock_Normal.png` i `Rock_Roughness.png` es converteixen en un sol material Rock sobre una esfera
+il·luminada. Hoard entén la nomenclatura de Megascans, Poly Haven, ambientCG, Substance i Unreal, inclosos els mapes
+empaquetats, i també els fitxers `.mat` d'Unity. El visualitzador a pantalla completa mostra un material sobre una
+esfera, un cub o un pla, a la seva escala real, i cada mapa es pot activar i desactivar.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="../img/material-dark.webp">
+  <img alt="Un material de maó al visualitzador a pantalla completa, sobre una esfera, amb interruptors per als seus mapes de color, normals, rugositat i alçada" src="../img/material-light.webp">
+</picture>
+
+### Fulls de sprites que es reprodueixen
+
+Els atles de TexturePacker, Starling, libGDX, Cocos2d i Godot es converteixen en un sol full de sprites que reprodueix
+les seves animacions i llista els seus sprites. Baixeu-lo reempaquetat per al motor que feu servir: deu formats, i a
+cadascun només se li dona el que pot contenir.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="../img/sheet-dark.webp">
+  <img alt="El full de sprites d'un personatge a pàgina completa, amb una de les seves animacions reproduint-se al costat de les seves etiquetes i formats de baixada" src="../img/sheet-light.webp">
+</picture>
+
+### Sons que es poden veure
+
+Cada so té una forma d'ona acolorida segons com de brillant sona, de manera que un cop sec i un ambient llarg es veuen
+diferents abans de reproduir-los. Es llegeixen les metadades de les biblioteques de so (categories UCS, camps de
+Soundminer i BaseHead, punts de bucle, tempo, nota fonamental), i la música MIDI i de tracker es renderitza perquè es
+reprodueixi com qualsevol altre so.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="../img/sound-dark.webp">
+  <img alt="Una graella d'efectes de so dibuixats com a formes d'ona de colors, amb un d'ells obert que mostra el seu reproductor, etiquetes i preses" src="../img/sound-light.webp">
+</picture>
+
+### Una cerca que sap què és cada cosa
+
+Hoard ho etiqueta tot ell mateix, sense connexió: `tileable`, `res:2k`, `poly:low`, `rigged`, `loop`, `bpm:120`,
+`license:cc0`, i una categoria d'un arbre de recursos per a videojocs. Cerqueu per paraules, per color o pel que mostra
+una imatge, i demaneu a qualsevol textura o so «Més com aquest». Connecteu-lo a qualsevol model compatible amb OpenAI,
+local o allotjat, i també escriurà noms i descripcions.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="../img/search-dark.webp">
+  <img alt="Una cerca de «wood»: una taula de fusta, escorça, taulons i una superfície de fusta junts, amb filtres per tipus i etiqueta al costat" src="../img/search-light.webp">
+</picture>
+
+### Directament al vostre motor
+
+- **Complements de motor** per a Godot 4, Unity i Unreal Engine 5: navegueu per la biblioteca dins de l'editor i premeu
+  Afegeix al projecte. El model arriba amb les seves textures, al lloc correcte, importat.
+- **`hoard sync`** porta a un projecte exactament els fitxers que aquest indica, fixats en un fitxer de bloqueig, de
+  manera que tots els companys d'equip i totes les màquines de compilació reben els mateixos bytes.
+- **Baixa com a** GLB, PNG, WAV, MP3 o un format de full de sprites, convertit al moment, amb noms de textura segons la
+  convenció del vostre estudi.
+- **Els agents d'IA** cerquen, inspeccionen i obtenen recursos per MCP.
+
+### Desat una vegada, ben protegit
+
+Cada fitxer es desa una sola vegada pel seu hash BLAKE3, de manera que la mateixa textura en cinc paquets ocupa l'espai
+d'una sola, i cap corrupció no pot passar desapercebuda. Guardeu-ho en un disc local o en qualsevol bucket S3. Les
+carpetes que indiqueu a Hoard es llegeixen, però no es modifiquen mai. Els comptes, els tokens de només lectura, l'inici
+de sessió únic, HTTPS i HTTP/3 hi són integrats.
+
+<sub>La biblioteca de demostració és art CC0: models de [Poly Haven](https://polyhaven.com) (glTF i USD), superfícies
+d'[ambientCG](https://ambientcg.com), i sons, fulls de sprites i tipus de lletra de [Kenney](https://kenney.nl).
+`node web/scripts/readme-images.mts` genera aquestes imatges i la targeta per a xarxes socials.</sub>
 
 ## Instal·lació amb Docker
 
@@ -122,7 +201,7 @@ O deixeu anar el zip al portal.
 ## La resta d'aquest README
 
 Què li passa a un paquet, com portar els recursos a un motor, els paquets d'Unreal, la cerca, els crèdits, MCP,
-l'emmagatzematge, HTTPS, la configuració, la seguretat, els comptes i l'API es descriuen al
+l'emmagatzematge, HTTPS, la configuració, la seguretat, els comptes, l'API i les dades i xifres es descriuen al
 [README en anglès](../../README.md).
 
 ## Traduccions

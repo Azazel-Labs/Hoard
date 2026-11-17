@@ -7,22 +7,101 @@
 
 [English](../../README.md) · [Afrikaans](README.af.md) · [Català](README.ca.md) · [Čeština](README.cs.md) · [Dansk](README.da.md) · [Deutsch](README.de.md) · [Ελληνικά](README.el.md) · [Español (Latinoamérica)](README.es-419.md) · [Español (España)](README.es-ES.md) · [Suomi](README.fi.md) · [Français](README.fr.md) · Magyar · [Bahasa Indonesia](README.id.md) · [Italiano](README.it.md) · [日本語](README.ja.md) · [한국어](README.ko.md) · [Norsk bokmål](README.nb.md) · [Nederlands](README.nl.md) · [Polski](README.pl.md) · [Português (Brasil)](README.pt-BR.md) · [Português (Portugal)](README.pt-PT.md) · [Română](README.ro.md) · [Русский](README.ru.md) · [Српски](README.sr-Cyrl.md) · [Svenska](README.sv.md) · [ไทย](README.th.md) · [Türkçe](README.tr.md) · [Українська](README.uk.md) · [Tiếng Việt](README.vi.md) · [简体中文](README.zh-Hans.md) · [繁體中文](README.zh-Hant.md)
 
-Saját szerveren futó assetkönyvtár játékfejlesztéshez. Dobjon be teljes assetcsomagokat (zipeket, tarballokat,
-mappákat), és a Hoard minden fájlt egyszer tárol a hash-e alapján, kideríti, mi az egyes fájl, felcímkézi, a hálókat
-összekapcsolja a textúráikkal és animációikkal, és mindezt kereshetővé teszi egy webes portálon, egy CLI-n, egy
-ügynököknek szóló MCP-végponton és egy lockfájl-alapú `hoard sync` paranccsal, amely pontosan azokat a fájlokat
-tölti le, amelyekre a játékprojektjének szüksége van.
+<h3 align="center">Minden assetcsomagja kereshető, előnézetben megnézhető, és egy kattintásnyira van a játékától.</h3>
 
-Olyan, mint egy assetáruház, csak pénztár nélkül.
+A Hoard saját szerveren futó könyvtár játékassetekhez. Dobjon be egy zipet, egy Unity-csomagot, egy Fab-letöltést vagy
+egy tízezer fájlt tartalmazó mappát, és a Hoard munkához lát. A modellek a textúráikkal együtt forognak 3D-ben, a
+különálló textúratérképekből anyagok lesznek, a hangok kirajzolják a hullámformájukat, a spritelapok lejátsszák az
+animációikat, és minden címkét kap, így a `footsteps gravel` vagy a `rigged low-poly` beírására előkerül. Aztán
+mindazzal együtt érkezik a Godotba, a Unitybe vagy az Unrealbe, amire szüksége van.
+
+Nincs előfizetés, nincs feltöltés senki felhőjébe, nincs felhasználónkénti díj: egyetlen Docker-image a saját gépén, és
+az az Öné. Olyan, mint egy assetáruház, csak pénztár nélkül.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="../img/hero-dark.webp">
-  <img alt="A Hoard könyvtára: modellek és anyagok rácsban, a 3D-előnézetben egy nyitott kincsesláda a címkéi és letöltései mellett" src="../img/hero-light.webp">
+  <img alt="A Hoard könyvtára: 3D-modellek rácsban, a 3D-előnézetben egy nyitott kincsesláda a címkéi és letöltései mellett" src="../img/hero-light.webp">
 </picture>
 
-<sub>A bemutatókönyvtár CC0 grafikákból áll: modellek a [Poly Havenről](https://polyhaven.com) (glTF és USD) és
-felületek az [ambientCG-ről](https://ambientcg.com). A `node web/scripts/readme-images.mts` készíti ezeket a képeket
-és a közösségimédia-kártyát.</sub>
+### Lásson mindent, mielőtt használja
+
+A modellek 3D-ben nyílnak meg a textúráikkal, anyagaikkal és animációikkal. Az FBX, glTF, OBJ, USD, SketchUp, 3MF és STL
+fájlokat, valamint a voxeleket maga a Hoard olvassa be, telepített 3D-alkalmazás nélkül; a Blender-fájlok felület nélkül
+futó Blenderen keresztül érkeznek, az Unreal-csomagoknál pedig látszik, mit mentett róluk a szerkesztő, Unreal nélkül. A
+bélyegképeket a szerver rajzolja, mindig ugyanúgy keretezve, így egy teljes csomagot egy pillantással át lehet futni.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="../img/page-dark.webp">
+  <img alt="Egy csillár teljes oldalas nézetben: nagy 3D-nézet az adatai, címkéi, kapcsolt textúrái és letöltései mellett" src="../img/page-light.webp">
+</picture>
+
+### A különálló textúratérképekből anyagok lesznek
+
+A `Rock_BaseColor.png`, a `Rock_Normal.png` és a `Rock_Roughness.png` egyetlen Rock anyaggá áll össze egy megvilágított
+gömbön. A Hoard érti a Megascans, a Poly Haven, az ambientCG, a Substance és az Unreal elnevezési szokásait, az
+összecsomagolt térképeket is beleértve, és a Unity `.mat` fájljait is beolvassa. A teljes képernyős nézegető gömbön,
+kockán vagy síkon mutatja az anyagot, valós méretarányban, és minden térkép külön be- és kikapcsolható.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="../img/material-dark.webp">
+  <img alt="Téglaanyag a teljes képernyős nézegetőben egy gömbön, a szín-, normál-, érdesség- és magasságtérképek kapcsolóival" src="../img/material-light.webp">
+</picture>
+
+### Lejátszható spritelapok
+
+A TexturePacker, a Starling, a libGDX, a Cocos2d és a Godot atlaszaiból egyetlen spritelap lesz, amely lejátssza az
+animációit és felsorolja a spritejait. Töltse le újracsomagolva ahhoz a motorhoz, amelyet éppen használ: tíz formátum,
+és mindegyik csak azt kapja meg, amit tárolni tud.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="../img/sheet-dark.webp">
+  <img alt="Egy karakter spritelapja teljes oldalas nézetben, az egyik animációja lejátszás közben a címkéi és letöltési formátumai mellett" src="../img/sheet-light.webp">
+</picture>
+
+### Látható hangok
+
+Minden hang kap egy hullámformát, amelynek színe attól függ, mennyire fényesen szól, így egy éles ütés és egy hosszú
+atmoszféra már lejátszás előtt is másképp néz ki. A Hoard beolvassa a hangkönyvtárak metaadatait (UCS-kategóriák,
+Soundminer- és BaseHead-mezők, looppontok, tempó, alaphang), a MIDI- és trackerzenét pedig lerendereli, így az is úgy
+szól, mint bármely más hang.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="../img/sound-dark.webp">
+  <img alt="Hangeffektek rácsa színes hullámformákként, az egyik megnyitva a lejátszójával, címkéivel és felvételeivel" src="../img/sound-light.webp">
+</picture>
+
+### Keresés, amely tudja, mi micsoda
+
+A Hoard mindent maga címkéz fel, offline: `tileable`, `res:2k`, `poly:low`, `rigged`, `loop`, `bpm:120`, `license:cc0`,
+valamint egy kategória egy játékasset-fából. Keressen szavakkal, színnel vagy azzal, ami egy képen látható, és kérjen
+bármely textúrához vagy hanghoz „Több ilyen” találatot. Irányítsa bármely OpenAI-kompatibilis modellre, helyire vagy
+felhőben futóra, és neveket meg leírásokat is ír.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="../img/search-dark.webp">
+  <img alt="Keresés a wood szóra: egy faasztal, fakéreg, deszkák és egy fafelület együtt, mellettük típus és címke szerinti szűrők" src="../img/search-light.webp">
+</picture>
+
+### Egyenesen a játékmotorba
+
+- **Motorbővítmények** a Godot 4-hez, a Unityhez és az Unreal Engine 5-höz: böngéssze a könyvtárat a szerkesztőn belül,
+  és nyomja meg a Hozzáadás a projekthez gombot. A modell a textúráival együtt, a megfelelő helyre, importálva érkezik.
+- A **`hoard sync`** pontosan azokat a fájlokat húzza be egy projektbe, amelyeket a projekt megnevez, egy lockfájlban
+  rögzítve, így minden csapattag és buildgép ugyanazokat a bájtokat kapja.
+- **Letöltés másként**: GLB, PNG, WAV, MP3 vagy spritelap-formátum, menet közben átalakítva, a textúrák neveit a
+  stúdiója konvenciója szerint adva.
+- **MI-ügynökök** keresnek, vizsgálnak meg és töltenek le asseteket MCP-n keresztül.
+
+### Egyszer tárolva, biztonságban
+
+Minden fájl egyszer tárolódik a BLAKE3-hash-e alapján, így ugyanaz a textúra öt csomagban is csak egynyi helyet foglal,
+és a sérülés nem maradhat észrevétlen. Tárolhatja helyi lemezen vagy bármilyen S3-bucketben. Azokat a mappákat,
+amelyekre a Hoardot ráirányítja, csak olvassa, sosem módosítja. Fiókok, csak olvasható tokenek, egyszeri bejelentkezés,
+HTTPS és HTTP/3 beépítve.
+
+<sub>A bemutatókönyvtár CC0 grafikákból áll: modellek a [Poly Havenről](https://polyhaven.com) (glTF és USD), felületek
+az [ambientCG-ről](https://ambientcg.com), hangok, spritelapok és betűtípusok pedig a [Kenneytől](https://kenney.nl). A
+`node web/scripts/readme-images.mts` készíti ezeket a képeket és a közösségimédia-kártyát.</sub>
 
 ## Telepítés Dockerrel
 
@@ -121,8 +200,8 @@ Vagy dobja a zipet a portálra.
 ## A README többi része
 
 Hogy mi történik egy csomaggal, hogyan kerülnek az assetek egy játékmotorba, valamint az Unreal-csomagok, a keresés,
-a forrásmegjelölés, az MCP, a tárolás, a HTTPS, a konfiguráció, a biztonság, a fiókok és az API leírása az
-[angol README-ben](../../README.md) található.
+a forrásmegjelölés, az MCP, a tárolás, a HTTPS, a konfiguráció, a biztonság, a fiókok, az API,
+továbbá a tények és számok leírása az [angol README-ben](../../README.md) található.
 
 ## Fordítások
 

@@ -7,19 +7,92 @@
 
 [English](../../README.md) · [Afrikaans](README.af.md) · [Català](README.ca.md) · [Čeština](README.cs.md) · [Dansk](README.da.md) · [Deutsch](README.de.md) · [Ελληνικά](README.el.md) · [Español (Latinoamérica)](README.es-419.md) · [Español (España)](README.es-ES.md) · [Suomi](README.fi.md) · [Français](README.fr.md) · [Magyar](README.hu.md) · [Bahasa Indonesia](README.id.md) · [Italiano](README.it.md) · [日本語](README.ja.md) · [한국어](README.ko.md) · [Norsk bokmål](README.nb.md) · [Nederlands](README.nl.md) · [Polski](README.pl.md) · [Português (Brasil)](README.pt-BR.md) · [Português (Portugal)](README.pt-PT.md) · [Română](README.ro.md) · [Русский](README.ru.md) · [Српски](README.sr-Cyrl.md) · [Svenska](README.sv.md) · [ไทย](README.th.md) · [Türkçe](README.tr.md) · [Українська](README.uk.md) · [Tiếng Việt](README.vi.md) · 简体中文 · [繁體中文](README.zh-Hant.md)
 
-一个面向游戏开发的自托管资源库。把整个资源包（zip、tar 包、文件夹）丢进来，Hoard 会按哈希值将每个文件只存储一次，
-识别每个文件是什么，为它打标签，把网格与其纹理和动画关联起来，并让这一切都可以通过 Web 门户、CLI、供智能体使用的 MCP
-端点进行搜索，还可以通过基于锁文件、能精确拉取你的游戏项目所需文件的 `hoard sync` 获取。
+<h3 align="center">你拥有的每一个资源包，都可搜索、可预览，离你的游戏只有一键之遥。</h3>
 
+Hoard 是一个自托管的游戏资源库。丢进一个 zip、一个 Unity 包、一份 Fab 下载或一个装着上万个文件的文件夹，Hoard
+就会开始工作。模型带着纹理在 3D 中旋转，零散的纹理贴图变成材质，声音画出自己的波形，精灵图集播放自己的动画，
+一切都会被打上标签，所以输入 `footsteps gravel` 或 `rigged low-poly` 就能找到。然后它会带着所需的一切进入 Godot、Unity
+或 Unreal。
+
+没有订阅，不上传到任何人的云端，不按席位收费：在你自己的机器上运行一个 Docker 镜像，它就完全属于你。
 可以把它看作一个无需结账的资源商店。
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="../img/hero-dark.webp">
-  <img alt="Hoard 资源库：模型和材质以网格排列，旁边的 3D 预览中打开着一个宝箱，并显示其标签和下载选项" src="../img/hero-light.webp">
+  <img alt="Hoard 资源库：3D 模型以网格排列，旁边的 3D 预览中打开着一个宝箱，并显示其标签和下载选项" src="../img/hero-light.webp">
 </picture>
 
+### 用之前先看个清楚
+
+模型在 3D 中打开，带有纹理、材质和动画。FBX、glTF、OBJ、USD、SketchUp、3MF、STL 和体素由 Hoard 自己读取，无需安装任何 3D
+软件；Blender 文件通过无界面（headless）的 Blender 导入，Unreal 包则无需 Unreal 就能显示编辑器为它们保存的信息。
+缩略图在服务器上绘制，每次都以同样的方式取景，因此整个资源包一眼就能浏览完。
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="../img/page-dark.webp">
+  <img alt="整页显示的一盏吊灯：大幅 3D 视图旁边是它的信息、标签、关联纹理和下载选项" src="../img/page-light.webp">
+</picture>
+
+### 零散的纹理贴图变成材质
+
+`Rock_BaseColor.png`、`Rock_Normal.png` 和 `Rock_Roughness.png` 会合成一个 Rock 材质，显示在一个受光照的球体上。Hoard
+能读懂 Megascans、Poly Haven、ambientCG、Substance 和 Unreal 的命名方式（包括打包贴图），也能读取 Unity 的 `.mat` 文件。
+全屏查看器可将材质显示在球体、立方体或平面上，按真实世界尺寸呈现，每张贴图都可单独开关。
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="../img/material-dark.webp">
+  <img alt="全屏查看器中的一种砖块材质，显示在球体上，并带有颜色、法线、粗糙度和高度贴图的开关" src="../img/material-light.webp">
+</picture>
+
+### 会播放的精灵图集
+
+来自 TexturePacker、Starling、libGDX、Cocos2d 和 Godot 的图集会变成一个精灵图集，可播放其中的动画并列出其中的精灵。
+你可以为所用的引擎下载重新打包后的版本：共十种格式，每种格式只写入它能容纳的内容。
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="../img/sheet-dark.webp">
+  <img alt="整页显示的一个角色精灵图集，其中一段动画正在播放，旁边是它的标签和下载格式" src="../img/sheet-light.webp">
+</picture>
+
+### 看得见的声音
+
+每个声音都有一条按音色明亮程度着色的波形，所以清脆的打击声和绵长的环境声在播放之前看起来就不一样。Hoard
+会读取音效库元数据（UCS 分类、Soundminer 和 BaseHead 字段、循环点、速度、根音），并将 MIDI 和 tracker 音乐渲染出来，
+让它们像其他声音一样播放。
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="../img/sound-dark.webp">
+  <img alt="以彩色波形呈现的音效网格，其中一个已打开，显示其播放器、标签和各个录音版本" src="../img/sound-light.webp">
+</picture>
+
+### 知道内容是什么的搜索
+
+Hoard 会离线自动为一切打标签：`tileable`、`res:2k`、`poly:low`、`rigged`、`loop`、`bpm:120`、`license:cc0`，
+以及来自游戏资源分类树的类别。可以按文字、按颜色或按图片内容搜索，还能让任意纹理或声音给出“更多类似内容”。接入任何兼容
+OpenAI 的模型，无论是本地的还是托管的，它还能撰写名称和描述。
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="../img/search-dark.webp">
+  <img alt="搜索木材：木桌、树皮、木板和木质表面同时出现，旁边是按种类和标签筛选的选项" src="../img/search-light.webp">
+</picture>
+
+### 直接进入你的引擎
+
+- **引擎插件**支持 Godot 4、Unity 和 Unreal Engine 5：在编辑器中浏览资源库，按下“添加到项目”即可。
+  模型会连同纹理一起放到正确的位置并完成导入。
+- **`hoard sync`** 会把项目指定的文件精确拉取到项目中，并锁定在锁文件里，让每位队友和每台构建机器得到完全相同的字节。
+- **下载为** GLB、PNG、WAV、MP3 或某种精灵图集格式，实时转换，纹理名称遵循你工作室的命名约定。
+- **AI 智能体**可通过 MCP 搜索、检查和获取资源。
+
+### 只存一次，安全保管
+
+每个文件按其 BLAKE3 哈希只存储一次，因此五个资源包中的同一张纹理只占一份空间，而且任何损坏都不会被忽视。
+可以存放在本地磁盘或任意 S3 存储桶中。你指向 Hoard 的文件夹只会被读取，绝不会被修改。账户、只读令牌、单点登录、HTTPS 和
+HTTP/3 均为内置功能。
+
 <sub>演示资源库中的都是 CC0 作品：模型来自 [Poly Haven](https://polyhaven.com)（glTF 和 USD），表面材质来自
-[ambientCG](https://ambientcg.com)。这些图片和社交卡片由 `node web/scripts/readme-images.mts` 生成。</sub>
+[ambientCG](https://ambientcg.com)，声音、精灵图集和字体来自 [Kenney](https://kenney.nl)。这些图片和社交卡片由
+`node web/scripts/readme-images.mts` 生成。</sub>
 
 ## 使用 Docker 安装
 
@@ -113,7 +186,7 @@ python3 tools/make_sample_pack.py /tmp/sample       # needs Pillow + numpy; ffmp
 ## 本 README 的其余部分
 
 资源包的处理过程、将资源导入引擎、Unreal 资源包、搜索、致谢、MCP、存储、HTTPS、
-配置、安全、账户和 API 均在[英文 README](../../README.md) 中介绍。
+配置、安全、账户、API 以及概况与数据均在[英文 README](../../README.md) 中介绍。
 
 ## 翻译
 

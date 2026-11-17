@@ -504,6 +504,15 @@ const UPPER: &[&str] = &[
     "ik", "fk", "id", "tv", "ufo", "gui", "orm", "arm", "mra",
 ];
 
+/// What an asset is called when it's found: the title its file gives itself, unless that title says nothing a name
+/// could (a track number, `TITLE=1`), and otherwise its file name made readable.
+pub(crate) fn asset_name(title: Option<&str>, rel: &str) -> String {
+    match title.map(str::trim).filter(|t| t.chars().any(char::is_alphabetic)) {
+        Some(t) => t.to_owned(),
+        None => display_name(&name_stem(rel)),
+    }
+}
+
 pub(crate) fn display_name(stem: &str) -> String {
     let mut words: Vec<String> = Vec::new();
     for t in tokenize(stem) {
@@ -1052,6 +1061,14 @@ pub(crate) fn is_license_file(rel_path: &str) -> bool {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn a_title_thats_only_a_number_doesnt_name_an_asset() {
+        assert_eq!(asset_name(Some("1"), "OGG/footstep00.ogg"), "Footstep 00");
+        assert_eq!(asset_name(Some(" 07 "), "OGG/footstep07.ogg"), "Footstep 07");
+        assert_eq!(asset_name(None, "OGG/footstep00.ogg"), "Footstep 00");
+        assert_eq!(asset_name(Some("Door creak 2"), "door_02.wav"), "Door creak 2");
+    }
 
     #[test]
     fn tokenizes_paths() {

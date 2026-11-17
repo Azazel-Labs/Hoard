@@ -813,7 +813,7 @@ fn insert_asset(
             pack_id,
             item.blob.hash,
             item.rel,
-            item.analysis.title.clone().unwrap_or_else(|| tagger::display_name(&tagger::name_stem(&item.rel))),
+            tagger::asset_name(item.analysis.title.as_deref(), &item.rel),
             item.ext,
             item.kind.as_str(),
             item.category,

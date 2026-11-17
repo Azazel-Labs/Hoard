@@ -652,6 +652,31 @@ const MIGRATIONS: &[&str] = &[
               strftime('%Y-%m-%dT%H:%M:%SZ', 'now'), strftime('%Y-%m-%dT%H:%M:%SZ', 'now')
        FROM packs p WHERE p.status = 'ingesting'
          AND NOT EXISTS (SELECT 1 FROM jobs j WHERE j.pack_id = p.id AND j.status IN ('queued', 'running'));",
+    // 63: a sound whose file gives it a title that's only a number (Kenney's footsteps all say TITLE=1) was called
+    // that number. Such names, where nobody typed them, become the file's name made readable: `footstep00.ogg` is
+    // "Footstep 00".
+    "CREATE TEMP TABLE numbered AS
+       WITH f AS (SELECT id, COALESCE(ext, '') AS ext,
+                         substr(path, length(rtrim(path, replace(path, '/', ''))) + 1) AS file
+                    FROM assets WHERE human_edited = 0 AND name NOT GLOB '*[^0-9 ._#-]*'),
+            s AS (SELECT id, trim(replace(replace(replace(
+                    CASE WHEN ext <> '' AND lower(file) LIKE '%.' || lower(ext)
+                         THEN substr(file, 1, length(file) - length(ext) - 1) ELSE file END,
+                    '_', ' '), '-', ' '), '.', ' ')) AS stem FROM f),
+            d AS (SELECT id, stem, rtrim(stem, '0123456789') AS head FROM s WHERE stem GLOB '*[A-Za-z]*')
+       SELECT id, CASE WHEN head <> stem AND substr(head, -1) <> ' ' THEN head || ' ' || substr(stem, length(head) + 1)
+                       ELSE stem END AS name FROM d;
+     UPDATE assets SET name = (SELECT upper(substr(n.name, 1, 1)) || lower(substr(n.name, 2)) FROM numbered n
+                                WHERE n.id = assets.id)
+       WHERE id IN (SELECT id FROM numbered);
+     DELETE FROM assets_fts WHERE asset_id IN (SELECT id FROM numbered);
+     INSERT INTO assets_fts (asset_id, name, words, category, description, tags)
+       SELECT a.id, a.name, a.words, COALESCE(a.category, ''),
+              concat_ws(' ', a.description, a.source_description, a.ai_description),
+              COALESCE((SELECT group_concat(replace(replace(tag, ':', ' '), '-', ' '), ' ')
+                        FROM asset_tags t WHERE t.asset_id = a.id), '')
+       FROM assets a WHERE a.id IN (SELECT id FROM numbered);
+     DROP TABLE numbered;",
 ];
 
 /// How many automatic pre-upgrade backups to keep in `<data dir>/backups`.
@@ -2205,6 +2230,40 @@ mod tests {
             .query_row("SELECT count(*) FROM assets_fts WHERE assets_fts MATCH 'animated'", [], |r| r.get(0))
             .unwrap();
         assert_eq!(stale, 0);
+    }
+
+    /// Sounds named after a title that was only a number are named after their files instead, unless someone named
+    /// them, and a title in letters no number could be stays.
+    #[test]
+    fn names_that_are_only_a_number_become_the_file_name() {
+        let dir = tempfile::tempdir().unwrap();
+        let mut conn = baseline_db(dir.path());
+        migrate(&mut conn, &dir.path().join("backups"), &MIGRATIONS[..MIGRATIONS.len() - 1]).unwrap();
+        conn.execute_batch(
+            "PRAGMA foreign_keys = OFF;
+             INSERT INTO assets (id, pack_id, blob_hash, path, name, ext, kind, meta, created_at, updated_at,
+                                 human_edited) VALUES
+               ('a', 'p1', 'h1', 'OGG/footstep00.ogg', '1', 'ogg', 'audio', '{}', 'x', 'x', 0),
+               ('b', 'p1', 'h2', 'Door_Creak-2.WAV', '07', 'wav', 'audio', '{}', 'x', 'x', 0),
+               ('c', 'p1', 'h3', 'OGG/footstep01.ogg', '2', 'ogg', 'audio', '{}', 'x', 'x', 1),
+               ('d', 'p1', 'h4', 'rain.ogg', '雨', 'ogg', 'audio', '{}', 'x', 'x', 0),
+               ('e', 'p1', 'h5', '01.ogg', '1', 'ogg', 'audio', '{}', 'x', 'x', 0);
+             INSERT INTO assets_fts (asset_id, name) VALUES ('a', '1');",
+        )
+        .unwrap();
+        migrate(&mut conn, &dir.path().join("backups"), MIGRATIONS).unwrap();
+        let name = |id: &str| -> String {
+            conn.query_row("SELECT name FROM assets WHERE id = ?1", [id], |r| r.get(0)).unwrap()
+        };
+        assert_eq!(name("a"), "Footstep 00");
+        assert_eq!(name("b"), "Door creak 2");
+        assert_eq!(name("c"), "2");
+        assert_eq!(name("d"), "雨");
+        assert_eq!(name("e"), "1");
+        let found: String = conn
+            .query_row("SELECT asset_id FROM assets_fts WHERE assets_fts MATCH 'footstep'", [], |r| r.get(0))
+            .unwrap();
+        assert_eq!(found, "a");
     }
 
     /// Favorites keep their stars across the table's new name, and drawings become vector art, taken by the

@@ -167,18 +167,17 @@ pub(crate) fn convert(
             convert_audio(local, &src, format, progress)
         }
         "gltf" if src == "glb" => glb_to_gltf_zip(local),
-        "glb" if crate::meshes::rebuilt_as_glb(&src) => {
-            let (glb, names) = crate::meshes::glb(local, &src, root)?;
-            crate::glbfiles::split_output(&glb, crate::meshes::current_facing(), &file_stem(local), &names)
-        }
-        "glb" if src == "gltf" => {
-            let glb = build_glb(local, true)?;
-            let names = gltf_image_names(local, root);
-            crate::glbfiles::split_output(&glb, crate::meshes::current_facing(), &file_stem(local), &names)
-        }
-        "glb" if src == "glb" => {
-            let glb = std::fs::read(local)?;
-            crate::glbfiles::split_output(&glb, crate::meshes::current_facing(), &file_stem(local), &BTreeMap::new())
+        // Textures named as Settings names maps, wherever they came from.
+        "glb" if crate::meshes::rebuilt_as_glb(&src) || src == "gltf" || src == "glb" => {
+            let (glb, found) = match src.as_str() {
+                "gltf" => (build_glb(local, true)?, gltf_image_files_found(local, root)),
+                "glb" => (std::fs::read(local)?, BTreeMap::new()),
+                _ => crate::meshes::glb(local, &src, root)?,
+            };
+            let naming = crate::naming::current_for_download();
+            let names = crate::glbfiles::names_of(found, root, &naming.maps);
+            let facing = crate::meshes::current_facing();
+            crate::glbfiles::split_output(&glb, facing, &file_stem(local), &names, &naming.names)
         }
         "ttf" | "woff" | "woff2" if crate::fonts::EXTS.contains(&src.as_str()) => {
             let sfnt = crate::fonts::sfnt(local, &src)?;
@@ -378,7 +377,7 @@ fn file_stem(path: &Path) -> String {
 }
 
 /// The files a `.gltf`'s images are read from, by their bytes. Only files inside `root` are read.
-fn gltf_image_names(path: &Path, root: &Path) -> crate::glbfiles::Names {
+fn gltf_image_files_found(path: &Path, root: &Path) -> crate::glbfiles::Found {
     let dir = path.parent().unwrap_or(Path::new("."));
     let Ok(doc) = std::fs::read(path).map_err(anyhow::Error::from).and_then(|b| Ok(serde_json::from_slice(&b)?)) else {
         return BTreeMap::new();
@@ -399,8 +398,7 @@ fn gltf_image_names(path: &Path, root: &Path) -> crate::glbfiles::Names {
             if !file.starts_with(root) {
                 return None;
             }
-            let stem = file.file_stem()?.to_string_lossy().into_owned();
-            Some((*blake3::hash(&std::fs::read(&file).ok()?).as_bytes(), stem))
+            Some((*blake3::hash(&std::fs::read(&file).ok()?).as_bytes(), file))
         })
         .collect()
 }
@@ -663,6 +661,7 @@ pub(crate) async fn request(
     use crate::db;
     let fail = |e: anyhow::Error| Refused::Failed(format!("{e:#}"));
     let id = asset_id.to_owned();
+    let (settings, glb) = (state.settings.get(), format == "glb");
     let info = db::call(&state.pool, move |c| {
         let row: Option<(String, String, String, String, String)> = rusqlite::OptionalExtension::optional(
             c.query_row("SELECT path, ext, blob_hash, meta, pack_id FROM assets WHERE id = ?1", [&id], |r| {
@@ -673,12 +672,18 @@ pub(crate) async fn request(
         let mut stmt = c.prepare("SELECT kind, blob_hash FROM derivatives WHERE asset_id = ?1")?;
         let derivs: Vec<(String, String)> =
             stmt.query_map([&id], |r| Ok((r.get(0)?, r.get(1)?)))?.collect::<rusqlite::Result<_>>()?;
-        Ok(Some((path, ext, hash, meta, derivs, db::pack_facing(c, &pack_id)?)))
+        // A GLB's textures are named by the convention, so it's made again when that changes.
+        let naming = if glb {
+            crate::naming::ForDownload::of_pack(c, &settings.texture_names, &pack_id)?
+        } else {
+            crate::naming::ForDownload::default()
+        };
+        Ok(Some((path, ext, hash, meta, derivs, db::pack_facing(c, &pack_id)?, naming)))
     })
     .await
     .map_err(fail)?
     .ok_or(Refused::NotFound)?;
-    let (mut path, mut ext, mut hash, meta, derivs, facing) = info;
+    let (mut path, mut ext, mut hash, meta, derivs, facing, naming) = info;
     let file = path.rsplit('/').next().unwrap_or(&path).to_owned();
     let stem = file.rsplit_once('.').map_or(file.as_str(), |(s, _)| s).to_owned();
     let names: Vec<String> = derivs.iter().map(|(k, _)| k.clone()).collect();
@@ -694,9 +699,10 @@ pub(crate) async fn request(
     if max.is_some() && !(IMAGE_IN.contains(&ext.to_ascii_lowercase().as_str())) {
         return Err(Refused::Unsupported(tr!("error-only-images-resize")));
     }
-    // A GLB download is turned the way the pack's models face, and made again when that changes.
+    // A GLB download is turned the way the pack's models face and names its textures by the convention, and is made
+    // again when either changes.
     let key = if format == "glb" {
-        format!("as:glb~{}~{}:0", facing.turn, facing.tilt)
+        format!("as:glb~{}~{}~{}:0", facing.turn, facing.tilt, naming.mark())
     } else {
         format!("as:{format}:{}", max.unwrap_or(0))
     };
@@ -733,6 +739,7 @@ pub(crate) async fn request(
         key,
         stem,
         facing,
+        naming,
         duration: serde_json::from_str::<Value>(&meta).ok().and_then(|m| m.get("duration_secs")?.as_f64()),
     };
     tokio::spawn(async move {
@@ -807,6 +814,8 @@ struct Job {
     stem: String,
     /// How the pack's models are turned (see [`crate::meshes::facing`]).
     facing: hoard_core::Facing,
+    /// How a GLB's textures are named (see [`crate::naming::for_download`]).
+    naming: crate::naming::ForDownload,
     duration: Option<f64>,
 }
 
@@ -851,6 +860,7 @@ impl Job {
             let local = work.join(crate::ingest::safe_rel_path(&self.path).context("unsafe path in pack")?);
             let (src, fmt, max, duration, root, facing) =
                 (self.ext.clone(), self.format.clone(), self.max, self.duration, work.clone(), self.facing);
+            let naming = self.naming.clone();
             let progress_tx = tx.clone();
             let shown = std::sync::Arc::clone(activity);
             let out = crate::heavy::run("convert", move || {
@@ -863,8 +873,10 @@ impl Job {
                         shown.progress(p);
                     }
                 };
-                crate::meshes::facing(facing, || {
-                    convert(&local, &root, &src, &fmt, max, &Progress { duration, report: &report })
+                crate::naming::for_download(naming, || {
+                    crate::meshes::facing(facing, || {
+                        convert(&local, &root, &src, &fmt, max, &Progress { duration, report: &report })
+                    })
                 })
             })
             .await??;

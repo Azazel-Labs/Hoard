@@ -7,7 +7,10 @@
 //! - Downloads, bundles and manifests give each map a file name by the convention in Settings ([`TextureNames`]):
 //!   `StandWoodOld05_AO.jpg` by default. The files themselves are never renamed; only what's sent is. A map that a
 //!   file sent with it refers to by name (an OBJ's MTL, a glTF) keeps its name, so the reference still works.
+//! - A model downloaded as a GLB names the textures beside it the same way ([`ForDownload`]): a map by the
+//!   convention, and an image that was only ever inside a model by its material and the slot it fills.
 
+use std::cell::RefCell;
 use std::collections::{BTreeMap, HashSet};
 
 use anyhow::Result;
@@ -211,7 +214,12 @@ impl TextureNames {
 
     /// The file name (without extension) for a map of `material` for `role`, at `size` when the set has several.
     pub(crate) fn stem(&self, material: &str, role: Role, size: Option<&str>) -> String {
-        let mut out = self.pattern.replace("{name}", &run_together(material)).replace("{map}", self.suffix(role));
+        self.stem_with(material, self.suffix(role), size)
+    }
+
+    /// [`Self::stem`] with a suffix of its own, for a map that isn't one of the roles (a glTF's clearcoat).
+    pub(crate) fn stem_with(&self, material: &str, suffix: &str, size: Option<&str>) -> String {
+        let mut out = self.pattern.replace("{name}", &run_together(material)).replace("{map}", suffix);
         match size {
             Some(s) if out.contains("{size}") => out = out.replace("{size}", s),
             Some(s) => out = format!("{out}_{s}"),
@@ -285,6 +293,71 @@ pub(crate) fn file_name(conn: &Connection, names: &TextureNames, id: &str, path:
         Some(ext) => format!("{stem}.{ext}"),
         None => stem,
     }))
+}
+
+/// The convention's file name (without extension) for each map in a pack, by its path in the pack.
+pub(crate) fn pack_stems(conn: &Connection, names: &TextureNames, pack_id: &str) -> Result<BTreeMap<String, String>> {
+    if !names.on {
+        return Ok(BTreeMap::new());
+    }
+    let mut stmt = conn.prepare(
+        "SELECT DISTINCT t.id, t.path FROM material_maps mm JOIN assets t ON t.id = mm.texture_id WHERE t.pack_id = ?1",
+    )?;
+    let maps: Vec<(String, String)> =
+        stmt.query_map([pack_id], |r| Ok((r.get(0)?, r.get(1)?)))?.collect::<rusqlite::Result<_>>()?;
+    let mut out = BTreeMap::new();
+    for (id, path) in maps {
+        if let Some(stem) = stem_of(conn, names, &id)? {
+            out.insert(path, stem);
+        }
+    }
+    Ok(out)
+}
+
+/// How a model converted for download names the textures it hands out beside it.
+#[derive(Clone, Debug, Default, PartialEq, Eq, Serialize)]
+pub(crate) struct ForDownload {
+    /// The convention, for images named by their material and slot; the one out of the box when naming is off,
+    /// since those images have no name of their own to keep.
+    pub(crate) names: TextureNames,
+    /// The pack's maps' file names under the convention, by their paths in the pack ([`pack_stems`]).
+    pub(crate) maps: BTreeMap<String, String>,
+}
+
+impl ForDownload {
+    /// What a download from `pack_id` is named by, under the convention in Settings.
+    pub(crate) fn of_pack(conn: &Connection, names: &TextureNames, pack_id: &str) -> Result<Self> {
+        let maps = pack_stems(conn, names, pack_id)?;
+        Ok(Self { names: if names.on { names.clone() } else { TextureNames::default() }, maps })
+    }
+
+    /// A short mark of these names, so a download made under other names is made again.
+    pub(crate) fn mark(&self) -> String {
+        let json = serde_json::to_vec(self).unwrap_or_default();
+        blake3::hash(&json).to_hex()[..12].to_owned()
+    }
+}
+
+thread_local! {
+    /// How the conversion on this thread names its textures, while [`for_download`] runs.
+    static FOR_DOWNLOAD: RefCell<ForDownload> = RefCell::default();
+}
+
+/// Run `f` with conversions on this thread naming their textures by `names`.
+pub(crate) fn for_download<R>(names: ForDownload, f: impl FnOnce() -> R) -> R {
+    struct Restore(ForDownload);
+    impl Drop for Restore {
+        fn drop(&mut self) {
+            FOR_DOWNLOAD.set(std::mem::take(&mut self.0));
+        }
+    }
+    let _restore = Restore(FOR_DOWNLOAD.replace(names));
+    f()
+}
+
+/// How the conversion on this thread names its textures.
+pub(crate) fn current_for_download() -> ForDownload {
+    FOR_DOWNLOAD.with_borrow(Clone::clone)
 }
 
 /// Every role's suffix under `names`, for Settings.

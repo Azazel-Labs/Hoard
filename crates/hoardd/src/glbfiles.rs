@@ -4,16 +4,39 @@
 
 use std::collections::{BTreeMap, BTreeSet};
 use std::io::{Cursor, Write};
+use std::path::{Path, PathBuf};
 
 use anyhow::{Context, Result};
 use hoard_core::Facing;
 use serde_json::{Map, Value, json};
+
+use crate::naming::TextureNames;
 
 /// The folder textures go in, beside the models.
 pub(crate) const TEXTURES: &str = "textures";
 
 /// The file a texture came from (its name without the extension), by the BLAKE3 hash of its bytes.
 pub(crate) type Names = BTreeMap<[u8; 32], String>;
+
+/// The file each texture came from, by the BLAKE3 hash of its bytes.
+pub(crate) type Found = BTreeMap<[u8; 32], PathBuf>;
+
+/// [`Names`] for the files in `found`: a map of the pack (in `maps`, by its path under `root`) by the convention,
+/// any other file by its own name.
+pub(crate) fn names_of(found: Found, root: &Path, maps: &BTreeMap<String, String>) -> Names {
+    let named = |file: &Path| {
+        let rel = file.strip_prefix(root).ok()?;
+        let rel: Vec<String> = rel.components().map(|c| c.as_os_str().to_string_lossy().into_owned()).collect();
+        maps.get(&rel.join("/")).cloned()
+    };
+    found
+        .into_iter()
+        .filter_map(|(hash, file)| {
+            let stem = named(&file).or_else(|| Some(file.file_stem()?.to_string_lossy().into_owned()))?;
+            Some((hash, stem))
+        })
+        .collect()
+}
 
 /// A model as a GLB whose images are files in [`TEXTURES`], each named once.
 pub(crate) struct Split {
@@ -23,9 +46,10 @@ pub(crate) struct Split {
 }
 
 /// Turn `glb` by `facing` and move its embedded images out to files, named after the files they came from (`names`),
-/// the images' own names, the material and slot that use them (`Wood_BaseColor`), or `stem` and a number. The images' bytes leave the BIN chunk, unless something else in
+/// the images' own names, the material and slot that use them by the `convention` (`Wood_BaseColor`), or `stem` and
+/// a number. The images' bytes leave the BIN chunk, unless something else in
 /// it would have to move too (meshopt compression, a second buffer), when only the images' references change.
-pub(crate) fn split(glb: &[u8], facing: Facing, stem: &str, names: &Names) -> Result<Split> {
+pub(crate) fn split(glb: &[u8], facing: Facing, stem: &str, names: &Names, convention: &TextureNames) -> Result<Split> {
     let (doc, mut bin) = crate::formats::read_glb(glb)?;
     let Value::Object(mut doc) = doc else { anyhow::bail!("the GLB's JSON isn't an object") };
     crate::meshes::turn(&mut doc, facing);
@@ -34,7 +58,7 @@ pub(crate) fn split(glb: &[u8], facing: Facing, stem: &str, names: &Names) -> Re
     let mut textures: Vec<(String, Vec<u8>)> = Vec::new();
     let mut moved = BTreeSet::new();
     let mut used = BTreeSet::new();
-    let slots = slot_names(&doc, stem);
+    let slots = slot_names(&doc, stem, convention);
     let images = doc.get_mut("images").and_then(Value::as_array_mut).map_or_default(std::mem::take);
     let mut out_images = Vec::with_capacity(images.len());
     for (i, mut img) in images.into_iter().enumerate() {
@@ -69,10 +93,11 @@ pub(crate) fn split(glb: &[u8], facing: Facing, stem: &str, names: &Names) -> Re
     Ok(Split { glb: write_glb(&doc, &bin)?, textures })
 }
 
-/// A name for each image a material uses, by image: the material's name run together (the model's `stem` when it
-/// has none) and the slot it fills, in the suffixes Hoard names maps with (`Wood_BaseColor`, `Wood_AO`). Metal and
-/// roughness packed with occlusion in one image is `ORM`. An image in several slots takes the first.
-fn slot_names(doc: &Map<String, Value>, stem: &str) -> BTreeMap<usize, String> {
+/// A name for each image a material uses, by image: the material's name (the model's `stem` when it has none) and
+/// the slot it fills, named by the `convention` as Hoard names maps (`Wood_BaseColor`, `Wood_AO`). Metal and
+/// roughness packed with occlusion in one image is `ORM`; a slot that isn't one of the roles is called by its own
+/// name (`ClearcoatNormal`). An image in several slots takes the first.
+fn slot_names(doc: &Map<String, Value>, stem: &str, convention: &TextureNames) -> BTreeMap<usize, String> {
     use crate::materials::Role;
     let list = |key: &str| doc.get(key).and_then(Value::as_array).map_or(&[][..], Vec::as_slice);
     let (textures, materials) = (list("textures"), list("materials"));
@@ -85,8 +110,8 @@ fn slot_names(doc: &Map<String, Value>, stem: &str) -> BTreeMap<usize, String> {
     };
     let mut out = BTreeMap::new();
     for m in materials {
-        let name = m.get("name").and_then(Value::as_str).map(crate::naming::run_together).filter(|n| !n.is_empty());
-        let name = name.unwrap_or_else(|| crate::naming::run_together(stem));
+        let named = m.get("name").and_then(Value::as_str).filter(|n| n.chars().any(char::is_alphanumeric));
+        let name = named.unwrap_or(stem);
         let occlusion = m.get("occlusionTexture").and_then(image);
         let metal = m.get("pbrMetallicRoughness").and_then(|p| p.get("metallicRoughnessTexture")).and_then(image);
         let packed = occlusion.is_some() && occlusion == metal;
@@ -94,15 +119,19 @@ fn slot_names(doc: &Map<String, Value>, stem: &str) -> BTreeMap<usize, String> {
         texture_slots(m, &mut found);
         for (key, slot) in found {
             let Some(img) = image(slot) else { continue };
-            let suffix = match key {
-                "occlusion" | "metallicRoughness" if packed => Role::Orm.suffix().to_owned(),
-                "occlusion" => Role::Ao.suffix().to_owned(),
-                "baseColor" | "diffuse" => Role::BaseColor.suffix().to_owned(),
-                "normal" => Role::Normal.suffix().to_owned(),
-                "emissive" => Role::Emissive.suffix().to_owned(),
-                k => k[..1].to_ascii_uppercase() + &k[1..],
+            let role = match key {
+                "occlusion" | "metallicRoughness" if packed => Some(Role::Orm),
+                "occlusion" => Some(Role::Ao),
+                "baseColor" | "diffuse" => Some(Role::BaseColor),
+                "normal" => Some(Role::Normal),
+                "emissive" => Some(Role::Emissive),
+                "specular" => Some(Role::Specular),
+                _ => None,
             };
-            out.entry(img).or_insert_with(|| format!("{name}_{suffix}"));
+            out.entry(img).or_insert_with(|| match role {
+                Some(r) => convention.stem(name, r, None),
+                None => convention.stem_with(name, &(key[..1].to_ascii_uppercase() + &key[1..]), None),
+            });
         }
     }
     out
@@ -127,8 +156,14 @@ fn generic(name: &str) -> bool {
 }
 
 /// `split`, as one file: the GLB alone when it has no textures, otherwise a zip of `<stem>.glb` and [`TEXTURES`].
-pub(crate) fn split_output(glb: &[u8], facing: Facing, stem: &str, names: &Names) -> Result<crate::formats::Output> {
-    let s = split(glb, facing, stem, names)?;
+pub(crate) fn split_output(
+    glb: &[u8],
+    facing: Facing,
+    stem: &str,
+    names: &Names,
+    convention: &TextureNames,
+) -> Result<crate::formats::Output> {
+    let s = split(glb, facing, stem, names, convention)?;
     if s.textures.is_empty() {
         return Ok(crate::formats::Output { bytes: s.glb, ext: "glb" });
     }
@@ -383,7 +418,7 @@ mod tests {
 
     #[test]
     fn images_move_out_and_the_bin_shrinks() {
-        let s = split(&glb_with_image(), Facing::default(), "Crate", &Names::new()).unwrap();
+        let s = split(&glb_with_image(), Facing::default(), "Crate", &Names::new(), &TextureNames::default()).unwrap();
         assert_eq!(s.textures, vec![("Wood_Planks.png".to_owned(), PNG.to_vec())]);
         let (doc, bin) = crate::formats::read_glb(&s.glb).unwrap();
         assert_eq!(doc["images"][0], json!({ "name": "Wood Planks", "uri": "textures/Wood_Planks.png" }));
@@ -397,7 +432,7 @@ mod tests {
 
     #[test]
     fn a_turned_pack_turns_the_model() {
-        let s = split(&glb_with_image(), Facing::new(90, 0), "Crate", &Names::new()).unwrap();
+        let s = split(&glb_with_image(), Facing::new(90, 0), "Crate", &Names::new(), &TextureNames::default()).unwrap();
         let (doc, _) = crate::formats::read_glb(&s.glb).unwrap();
         let root = doc["scenes"][0]["nodes"][0].as_u64().unwrap() as usize;
         assert_eq!(doc["nodes"][root]["name"], "Facing");
@@ -406,7 +441,8 @@ mod tests {
 
     #[test]
     fn the_output_is_a_zip_only_with_textures() {
-        let out = split_output(&glb_with_image(), Facing::default(), "Crate", &Names::new()).unwrap();
+        let out = split_output(&glb_with_image(), Facing::default(), "Crate", &Names::new(), &TextureNames::default())
+            .unwrap();
         assert_eq!(out.ext, "zip");
         let mut zip = zip::ZipArchive::new(Cursor::new(out.bytes)).unwrap();
         let names: Vec<String> = zip.file_names().map(|n| n.unwrap().into_owned()).collect();
@@ -415,11 +451,14 @@ mod tests {
 
         let plain = json!({ "asset": { "version": "2.0" } });
         let glb = write_glb(plain.as_object().unwrap(), &[]).unwrap();
-        assert_eq!(split_output(&glb, Facing::default(), "Empty", &Names::new()).unwrap().ext, "glb");
+        assert_eq!(
+            split_output(&glb, Facing::default(), "Empty", &Names::new(), &TextureNames::default()).unwrap().ext,
+            "glb"
+        );
 
         // Named after the file the texture came from, over the image's own name.
         let names = Names::from([(*blake3::hash(PNG).as_bytes(), "T_Crate_D".to_owned())]);
-        let s = split(&glb_with_image(), Facing::default(), "Crate", &names).unwrap();
+        let s = split(&glb_with_image(), Facing::default(), "Crate", &names, &TextureNames::default()).unwrap();
         assert_eq!(s.textures[0].0, "T_Crate_D.png");
     }
 
@@ -435,7 +474,8 @@ mod tests {
     #[test]
     fn an_unnamed_image_is_named_by_its_material_and_slot() {
         let names = |material: Value| {
-            let s = split(&unnamed(material), Facing::default(), "Crate", &Names::new()).unwrap();
+            let s =
+                split(&unnamed(material), Facing::default(), "Crate", &Names::new(), &TextureNames::default()).unwrap();
             s.textures.into_iter().map(|t| t.0).collect::<Vec<_>>()
         };
         let base = json!({ "name": "old wood", "pbrMetallicRoughness": { "baseColorTexture": { "index": 0 } } });
@@ -453,6 +493,36 @@ mod tests {
         assert_eq!(names(coat), ["Paint_ClearcoatNormal.png"]);
         // Used by nothing: the model's name and a number.
         assert_eq!(names(json!({})), ["Crate_0.png"]);
+    }
+
+    #[test]
+    fn slot_names_follow_the_convention_in_settings() {
+        let convention = TextureNames {
+            pattern: "T_{name}_{map}".into(),
+            maps: BTreeMap::from([("base_color".to_owned(), "BC".to_owned())]),
+            ..TextureNames::default()
+        };
+        let base = json!({ "name": "old wood", "pbrMetallicRoughness": { "baseColorTexture": { "index": 0 } } });
+        let s = split(&unnamed(base), Facing::default(), "Crate", &Names::new(), &convention).unwrap();
+        assert_eq!(s.textures[0].0, "T_OldWood_BC.png");
+        // A slot that isn't a role keeps its own suffix, in the pattern.
+        let coat = json!({ "name": "Paint",
+                           "extensions": { "KHR_materials_clearcoat": { "clearcoatTexture": { "index": 0 } } } });
+        let s = split(&unnamed(coat), Facing::default(), "Crate", &Names::new(), &convention).unwrap();
+        assert_eq!(s.textures[0].0, "T_Paint_Clearcoat.png");
+    }
+
+    #[test]
+    fn a_packs_maps_are_named_by_the_convention_and_other_files_by_their_own() {
+        let root = Path::new("work");
+        let found = Found::from([
+            ([1; 32], root.join("tex").join("wood_diff_4k.png")),
+            ([2; 32], root.join("bark.jpg")),
+            ([3; 32], PathBuf::from("elsewhere/leaf.png")),
+        ]);
+        let maps = BTreeMap::from([("tex/wood_diff_4k.png".to_owned(), "Wood_BC".to_owned())]);
+        let names = names_of(found, root, &maps);
+        assert_eq!(names.values().collect::<Vec<_>>(), ["Wood_BC", "bark", "leaf"]);
     }
 
     #[test]
@@ -483,7 +553,7 @@ mod tests {
 
     #[test]
     fn renaming_points_images_at_the_new_files() {
-        let s = split(&glb_with_image(), Facing::default(), "Crate", &Names::new()).unwrap();
+        let s = split(&glb_with_image(), Facing::default(), "Crate", &Names::new(), &TextureNames::default()).unwrap();
         let rename = BTreeMap::from([("Wood_Planks.png".to_owned(), "Wood_Planks_2.png".to_owned())]);
         let (doc, _) = crate::formats::read_glb(&rename_textures(&s.glb, &rename).unwrap()).unwrap();
         assert_eq!(doc["images"][0]["uri"], "textures/Wood_Planks_2.png");

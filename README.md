@@ -1240,14 +1240,15 @@ by Blender, Photoshop or Krita. USD reading was checked against Poly Haven's USD
 and packed as a `.usdz`) and ambientCG's material-only USDC.
 
 Written but not yet run against the real thing: files saved by real Blender/Photoshop/Krita (please throw some
-at it), Blender 5.0's new .blend header, Blender conversion, the Docker image and compose files, Garage/RustFS
-specifically, Cloudflare Tunnel/Access, the viewer's WebGPU path on real hardware, and LLM vision mode.
+at it), Blender 5.0's new .blend header, Blender conversion, Garage/RustFS specifically, Cloudflare Tunnel/Access,
+and LLM vision mode.
 
 Also exercised: resumable browser and CLI imports of 1.1 GB with an interrupted, resumed run and duplicate refusal;
 HTTPS with HTTP/2 and HTTP/3 in Chrome (page, thumbnails and uploads over h3); WAV library metadata, variant
 families, duplicate detection, pack context with store-page fetching, contact sheets and multi-view renders against
-a mock LLM; MCP inline previews; and browser-drawn model thumbnails, light previews and the full-resolution swap in
-headless Chromium.
+a mock LLM; MCP inline previews; browser-drawn model thumbnails, light previews and the full-resolution swap in
+headless Chromium; and the Docker image, its compose files and the viewer's WebGPU path on real hardware, deployed
+and in daily use.
 
 What's planned next is in [docs/roadmap.md](docs/roadmap.md).
 

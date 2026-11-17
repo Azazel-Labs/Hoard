@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "42480b75a5b6ffe5e9a5e23b3bad0c8e5f5a1104f51660808e921f9a7cdc8e09"
+source = "9528abfcd928f040f086a2f54bd71118058471d032fdd351f2a4f0e86b8dfb1f"
 translation = "863d09bc1e828f14f8cf00c118caee84558c0ecf852401afe0ac271a50ad1d87"
 
 [messages.account-add]
@@ -2258,6 +2258,38 @@ translation = "Klik for at omdøbe"
 source = "{ $role } map"
 translation = "map for { $role }"
 
+[messages.asset-rule-converted]
+source = "Converted by a rule"
+translation = "Konverteret af en regel"
+
+[messages.asset-rule-kept-until]
+source = "The original is kept until { $date }."
+translation = "Originalen gemmes indtil { $date }."
+
+[messages.asset-rule-let-go]
+source = "The original was deleted once the time Settings keeps originals was up."
+translation = "Originalen blev slettet, da den tid, originaler gemmes ifølge Indstillinger, var gået."
+
+[messages.asset-rule-put-back]
+source = "Put the original back"
+translation = "Gendan originalen"
+
+[messages.asset-rule-put-back-body]
+source = "The converted file is deleted and the original takes its place, with its tags, collections and links. The conversion rules leave it alone from then on."
+translation = "Den konverterede fil slettes, og originalen tager dens plads med sine tags, samlinger og links. Konverteringsreglerne lader den være fremover."
+
+[messages.asset-rule-put-back-done]
+source = "{ $file } is back"
+translation = "{ $file } er tilbage"
+
+[messages.asset-rule-put-back-title]
+source = "Put back { $file }?"
+translation = "Gendan { $file }?"
+
+[messages.asset-rule-was]
+source = "A conversion rule made this { $format } on { $date } from"
+translation = "En konverteringsregel lavede denne { $format } den { $date } ud fra"
+
 [messages.asset-save]
 source = "Save"
 translation = "Gem"
@@ -3220,9 +3252,37 @@ translation = "forbindelsen blev ikke fundet"
 source = "Converted downloads: at least 100 MB"
 translation = "Konverterede downloads: mindst 100 MB"
 
+[messages.error-conversion-cant-undo]
+source = "This file wasn’t converted by a rule, or its original has been deleted."
+translation = "Denne fil blev ikke konverteret af en regel, eller dens original er blevet slettet."
+
 [messages.error-conversion-failed]
 source = "couldn't convert to { $format }: { $reason }"
 translation = "kunne ikke konvertere til { $format }: { $reason }"
+
+[messages.error-conversion-keep-days]
+source = "Conversion rules: keep originals for 1 to { $max } days"
+translation = "Konverteringsregler: originaler kan beholdes i 1 til { $max } dage"
+
+[messages.error-conversion-no-source]
+source = "Conversion rules: each rule needs at least one format to convert"
+translation = "Konverteringsregler: hver regel skal have mindst ét format at konvertere"
+
+[messages.error-conversion-path-taken]
+source = "Another file is at { $path } now, so the original can’t go back there."
+translation = "Der ligger en anden fil på { $path } nu, så originalen kan ikke komme tilbage dertil."
+
+[messages.error-conversion-source]
+source = "Conversion rules: .{ $ext } files can’t be converted to { $format }"
+translation = "Konverteringsregler: .{ $ext }-filer kan ikke konverteres til { $format }"
+
+[messages.error-conversion-target]
+source = "Conversion rules: Hoard can’t convert files to { $format }"
+translation = "Konverteringsregler: Hoard kan ikke konvertere filer til { $format }"
+
+[messages.error-conversion-twice]
+source = "Conversion rules: .{ $ext } is in two rules"
+translation = "Konverteringsregler: .{ $ext } er med i to regler"
 
 [messages.error-credits-collection]
 source = "collection { $key }"
@@ -7586,6 +7646,14 @@ translation = "De er i biblioteket, men uden de oplysninger, tags eller den mini
 source = "Re-analyze pack"
 translation = "Analysér pakken igen"
 
+[messages.server-issues-reformat]
+source = "Files a conversion rule couldn’t convert"
+translation = "Filer, en konverteringsregel ikke kunne konvertere"
+
+[messages.server-issues-reformat-blurb]
+source = "They’re left as they were."
+translation = "De er ladt, som de var."
+
 [messages.server-issues-render]
 source = "Models the thumbnail renderer failed on"
 translation = "Modeller, som miniature-rendereren fejlede på"
@@ -7657,6 +7725,10 @@ translation = "Finder materialer i { $pack }"
 [messages.server-job-read-files]
 source = "Reading the files of { $pack }"
 translation = "Læser filerne i { $pack }"
+
+[messages.server-job-reformat]
+source = "Converting files in { $pack } by the conversion rules"
+translation = "Konverterer filer i { $pack } efter konverteringsreglerne"
 
 [messages.server-job-relocate]
 source = "Moving files between library locations"
@@ -8155,6 +8227,234 @@ translation = "Kunne ikke hente modellen: { $detail }. Prøver igen hver time."
 [messages.settings-clip-what]
 source = "Type what you’re after (“mossy rock”, “sci-fi door”, “wooden barrel”) and pictures that show it turn up beside names that have the words. “More like this” finds things of the same kind, not only the same colors."
 translation = "Skriv, hvad du leder efter (»mossy rock«, »sci-fi door«, »wooden barrel«), så dukker billeder, der viser det, op ved siden af navne, der indeholder ordene. »Mere som dette« finder ting af samme slags, ikke kun med de samme farver."
+
+[messages.settings-conv]
+source = "Conversion rules"
+translation = "Konverteringsregler"
+
+[messages.settings-conv-add]
+source = "Add a rule"
+translation = "Tilføj en regel"
+
+[messages.settings-conv-ask-body]
+source = """
+{ $packs ->
+        [one] It’s in one pack.
+       *[other] They’re in { $packs } packs.
+    } Each original is kept for { $days } days, and until then it can be put back from its page."""
+translation = """
+{ $packs ->
+        [one] Den ligger i én pakke.
+       *[other] De ligger i { $packs } pakker.
+    } Hver original gemmes i { $days } dage, og indtil da kan den gendannes fra sin side."""
+
+[messages.settings-conv-ask-busy]
+source = """
+{ $count ->
+        [one] One is in a pack still being added; it’s converted once that’s done.
+       *[other] { $count } are in packs still being added; they’re converted once that’s done.
+    }"""
+translation = """
+{ $count ->
+        [one] Én ligger i en pakke, der stadig er ved at blive tilføjet; den konverteres, når det er færdigt.
+       *[other] { $count } ligger i pakker, der stadig er ved at blive tilføjet; de konverteres, når det er færdigt.
+    }"""
+
+[messages.settings-conv-ask-convert]
+source = """
+{ $count ->
+        [one] Convert it
+       *[other] Convert { $count } files
+    }"""
+translation = """
+{ $count ->
+        [one] Konvertér den
+       *[other] Konvertér { $count } filer
+    }"""
+
+[messages.settings-conv-ask-list]
+source = "Files that would be converted"
+translation = "Filer, der ville blive konverteret"
+
+[messages.settings-conv-ask-more]
+source = "…and { $count } more"
+translation = "…og { $count } til"
+
+[messages.settings-conv-ask-new]
+source = "Save, only new packs"
+translation = "Gem, kun nye pakker"
+
+[messages.settings-conv-ask-save-convert]
+source = """
+{ $count ->
+        [one] Save and convert it
+       *[other] Save and convert { $count } files
+    }"""
+translation = """
+{ $count ->
+        [one] Gem og konvertér den
+       *[other] Gem og konvertér { $count } filer
+    }"""
+
+[messages.settings-conv-ask-skipped]
+source = "Left as they are:"
+translation = "Bliver, som de er:"
+
+[messages.settings-conv-ask-title]
+source = """
+{ $count ->
+        [one] Convert one file already in the library?
+       *[other] Convert { $count } files already in the library?
+    }"""
+translation = """
+{ $count ->
+        [one] Konvertér én fil, der allerede er i biblioteket?
+       *[other] Konvertér { $count } filer, der allerede er i biblioteket?
+    }"""
+
+[messages.settings-conv-converting]
+source = """
+{ $count ->
+        [one] Converting one file in the background
+       *[other] Converting { $count } files in the background
+    }"""
+translation = """
+{ $count ->
+        [one] Konverterer én fil i baggrunden
+       *[other] Konverterer { $count } filer i baggrunden
+    }"""
+
+[messages.settings-conv-existing]
+source = "Convert files already in the library"
+translation = "Konvertér filer, der allerede er i biblioteket"
+
+[messages.settings-conv-from]
+source = "From"
+translation = "Fra"
+
+[messages.settings-conv-keep]
+source = "Keep originals for"
+translation = "Behold originaler i"
+
+[messages.settings-conv-keep-days]
+source = """
+{ $count ->
+        [one] day
+       *[other] days
+    }"""
+translation = """
+{ $count ->
+        [one] dag
+       *[other] dage
+    }"""
+
+[messages.settings-conv-keep-what]
+source = "Until then, a converted file’s page can put the original back. Textures aren’t copied into a converted model: it points at the image files beside it. A model’s .mtl or .bin files stay."
+translation = "Indtil da kan originalen gendannes fra den konverterede fils side. Teksturer kopieres ikke ind i en konverteret model: den peger på billedfilerne ved siden af. En models .mtl- eller .bin-filer bliver liggende."
+
+[messages.settings-conv-nothing]
+source = "Nothing in the library needs converting."
+translation = "Intet i biblioteket skal konverteres."
+
+[messages.settings-conv-remove]
+source = "Remove"
+translation = "Fjern"
+
+[messages.settings-conv-remove-label]
+source = "Remove rule { $n }"
+translation = "Fjern regel { $n }"
+
+[messages.settings-conv-revert]
+source = "Undo changes"
+translation = "Fortryd ændringer"
+
+[messages.settings-conv-rule-on]
+source = "On"
+translation = "Til"
+
+[messages.settings-conv-save]
+source = "Save rules"
+translation = "Gem regler"
+
+[messages.settings-conv-saved]
+source = "Conversion rules saved. They apply to packs added from now on."
+translation = "Konverteringsregler gemt. De gælder for pakker, der tilføjes fra nu af."
+
+[messages.settings-conv-skip-beside]
+source = """
+{ $count ->
+        [one] one file whose converted copy is in its pack already
+       *[other] { $count } files whose converted copies are in their packs already
+    }"""
+translation = """
+{ $count ->
+        [one] én fil, hvis konverterede kopi allerede er i dens pakke
+       *[other] { $count } filer, hvis konverterede kopier allerede er i deres pakker
+    }"""
+
+[messages.settings-conv-skip-blender]
+source = """
+{ $count ->
+        [one] one file Blender hasn’t read yet (Settings → Tools)
+       *[other] { $count } files Blender hasn’t read yet (Settings → Tools)
+    }"""
+translation = """
+{ $count ->
+        [one] én fil, som Blender ikke har læst endnu (Indstillinger → Værktøjer)
+       *[other] { $count } filer, som Blender ikke har læst endnu (Indstillinger → Værktøjer)
+    }"""
+
+[messages.settings-conv-skip-unity]
+source = """
+{ $count ->
+        [one] one file a Unity project knows by its name
+       *[other] { $count } files a Unity project knows by their names
+    }"""
+translation = """
+{ $count ->
+        [one] én fil, som et Unity-projekt kender ved navn
+       *[other] { $count } filer, som et Unity-projekt kender ved navn
+    }"""
+
+[messages.settings-conv-skip-used]
+source = """
+{ $count ->
+        [one] one file a scene or another file names
+       *[other] { $count } files a scene or another file names
+    }"""
+translation = """
+{ $count ->
+        [one] én fil, som en scene eller en anden fil henviser til
+       *[other] { $count } filer, som en scene eller en anden fil henviser til
+    }"""
+
+[messages.settings-conv-skip-watched]
+source = """
+{ $count ->
+        [one] one file in a watched folder
+       *[other] { $count } files in watched folders
+    }"""
+translation = """
+{ $count ->
+        [one] én fil i en overvåget mappe
+       *[other] { $count } filer i overvågede mapper
+    }"""
+
+[messages.settings-conv-taken]
+source = "Another rule converts this format"
+translation = "En anden regel konverterer allerede dette format"
+
+[messages.settings-conv-to]
+source = "Convert to"
+translation = "Konvertér til"
+
+[messages.settings-conv-upright]
+source = "Turn models upright as they’re converted (Y up, facing +Z), the way the pack’s models are shown"
+translation = "Rejs modellerne op, når de konverteres (Y op, vender mod +Z), sådan som pakkens modeller vises"
+
+[messages.settings-conv-what]
+source = "Convert files Hoard keeps to one format, such as every OBJ and FBX to GLB, so the library is all alike. The converted file takes the original’s place, with its name, tags, collections and links. Files in watched folders are never changed."
+translation = "Konverterer filer, som Hoard opbevarer, til ét format, f.eks. alle OBJ og FBX til GLB, så biblioteket er ensartet. Den konverterede fil tager originalens plads med dens navn, tags, samlinger og links. Filer i overvågede mapper ændres aldrig."
 
 [messages.settings-conversion-cache]
 source = "Converted downloads"

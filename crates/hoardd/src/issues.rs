@@ -33,6 +33,8 @@ pub(crate) const MATERIAL_THUMB: &str = "material_thumb";
 pub(crate) const CONVERT: &str = "convert";
 /// A watched folder that can't be read, or that came up empty.
 pub(crate) const FOLDER: &str = "folder";
+/// A file a conversion rule couldn't convert, so it was left as it was.
+pub(crate) const REFORMAT: &str = "reformat";
 
 /// Where an issue happened: a pack (and a file in it), or a library location (and a folder in it).
 #[derive(Debug, Clone, Copy, Default)]
@@ -178,6 +180,17 @@ const GROUPS: &[Group] = &[
         kind: CONVERT,
         text: || {
             (tr!("server-issues-convert"), tr!("server-issues-convert-blurb"), Some(tr!("server-issues-convert-again")))
+        },
+        dismiss: true,
+    },
+    Group {
+        kind: REFORMAT,
+        text: || {
+            (
+                tr!("server-issues-reformat"),
+                tr!("server-issues-reformat-blurb"),
+                Some(tr!("server-issues-convert-again")),
+            )
         },
         dismiss: true,
     },
@@ -546,6 +559,7 @@ fn redo_recorded(c: &Connection, id: &str) -> Result<Option<Redo>> {
         STORE_FILES => row.pack.map(|p| Redo::Queue(jobs::READ_FILES, p)),
         MATERIALS | MATERIAL_THUMB => row.pack.map(|p| Redo::Queue(jobs::MATERIALS, p)),
         CONVERT => row.pack.map(Redo::Convert),
+        REFORMAT => row.pack.map(|p| Redo::Queue(jobs::REFORMAT, p)),
         _ => None,
     })
 }

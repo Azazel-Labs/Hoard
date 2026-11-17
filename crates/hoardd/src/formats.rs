@@ -433,7 +433,7 @@ fn gltf_uris(doc: &Value, key: &str) -> Vec<String> {
 
 /// Packs a `.gltf` and the files it reads (from its own folder, never outside it) into a GLB with polysmelt, which
 /// re-points meshopt-compressed buffer views as it goes. With `images` false, image files stay beside the GLB.
-fn build_glb(path: &Path, images: bool) -> Result<Vec<u8>> {
+pub(crate) fn build_glb(path: &Path, images: bool) -> Result<Vec<u8>> {
     let dir = path.parent().context("no folder")?;
     let mut doc: Value = serde_json::from_slice(&std::fs::read(path)?)?;
     // A buffer must say where its bytes are, unless it's a meshopt fallback (which decoders never read).
@@ -678,7 +678,7 @@ pub(crate) async fn request(
         } else {
             crate::naming::ForDownload::default()
         };
-        Ok(Some((path, ext, hash, meta, derivs, db::pack_facing(c, &pack_id)?, naming)))
+        Ok(Some((path, ext, hash, meta, derivs, db::asset_facing(c, &id, &pack_id)?, naming)))
     })
     .await
     .map_err(fail)?

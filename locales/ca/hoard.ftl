@@ -224,6 +224,14 @@ error-no-soundfont = No hi ha cap SoundFont a { $path } al servidor
 error-workers = Processos en segon pla: entre 1 i { $max }
 error-ai-batch = Recursos per sol·licitud d'IA: entre 1 i 200
 error-conversion-cache = Baixades convertides: almenys 100 MB
+error-conversion-keep-days = Regles de conversió: els originals s'han de conservar entre 1 i { $max } dies
+error-conversion-target = Regles de conversió: Hoard no pot convertir fitxers a { $format }
+error-conversion-no-source = Regles de conversió: cada regla necessita com a mínim un format per convertir
+# $ext is a file extension, like obj; $format is what it would become, like glb.
+error-conversion-source = Regles de conversió: els fitxers .{ $ext } no es poden convertir a { $format }
+error-conversion-twice = Regles de conversió: .{ $ext } és a dues regles
+error-conversion-cant-undo = Aquest fitxer no l'ha convertit cap regla, o se n'ha eliminat l'original.
+error-conversion-path-taken = Ara hi ha un altre fitxer a { $path }, així que l'original no hi pot tornar.
 error-limits-zero = Els límits no poden ser zero
 error-settings-object = s'esperava un objecte JSON de configuració
 error-bad-setting = configuració incorrecta: { $reason }
@@ -346,6 +354,8 @@ server-issues-convert = Models que Blender no ha pogut convertir
 server-issues-convert-blurb = No tenen còpia GLB, així que no es poden mostrar en 3D.
 server-issues-unreal = Paquets d'Unreal que no s'han pogut convertir
 server-issues-unreal-blurb = La pàgina d'Unreal del paquet té la resta dels seus paquets d'Unreal.
+server-issues-reformat = Fitxers que una regla de conversió no ha pogut convertir
+server-issues-reformat-blurb = S'han deixat tal com eren.
 server-issues-materials = Paquets dels quals no s'han pogut deduir els materials
 server-issues-materials-blurb = Totes les textures hi són; simplement no estan agrupades en materials.
 server-issues-material-thumb = Materials sense miniatura
@@ -367,6 +377,7 @@ server-job-retag = Tornant a etiquetar { $pack }
 server-job-llm-tag = Etiquetant { $pack } amb IA
 server-job-convert = Convertint { $pack } amb Blender
 server-job-unreal = Convertint els paquets d'Unreal de { $pack }
+server-job-reformat = Convertint els fitxers de { $pack } segons les regles de conversió
 server-job-scan = Escanejant una carpeta vigilada
 server-job-relocate = Movent fitxers entre ubicacions de la biblioteca
 server-job-looks = Deduint colors i aspecte
@@ -1414,6 +1425,15 @@ asset-variants = Variants ({ $count } preses)
 asset-copies = Còpies idèntiques
 asset-copies-note = Els mateixos bytes es desen un sol cop; aquests paquets també inclouen aquest fitxer.
 asset-unreal-converted = Convertit des d'Unreal
+asset-rule-converted = Convertit per una regla
+# Followed by the original file's name: "A conversion rule made this GLB on 3 May 2026 from tree.obj".
+asset-rule-was = Una regla de conversió va crear aquest { $format } el { $date } a partir de
+asset-rule-kept-until = L'original es conserva fins al { $date }.
+asset-rule-put-back = Restaura l'original
+asset-rule-put-back-title = Voleu restaurar { $file }?
+asset-rule-put-back-body = El fitxer convertit s'elimina i l'original n'ocupa el lloc, amb les seves etiquetes, col·leccions i enllaços. A partir d'aleshores, les regles de conversió ja no el toquen.
+asset-rule-put-back-done = S'ha restaurat { $file }
+asset-rule-let-go = L'original es va eliminar quan es va acabar el temps durant el qual es conserven els originals segons la Configuració.
 asset-unreal-package = Del paquet d'Unreal
 asset-ue-needs-editor-before = A l'espera d'Unreal Editor: { $reason }. En una màquina amb Unreal instal·lat, executeu
 asset-ue-needs-editor-after = i tornarà en FBX.
@@ -2306,6 +2326,90 @@ settings-store-lookup = Cerca automàticament les pàgines de botiga
 settings-unreal = Paquets d'Unreal
 settings-unreal-reset = Paquets d'Unreal: torna al valor per defecte
 settings-unreal-what = Què s'ha de fer amb els fitxers .uasset.
+settings-conv = Regles de conversió
+settings-conv-what = Converteix els fitxers que desa Hoard a un sol format, com ara tots els OBJ i FBX a GLB, perquè la biblioteca sigui homogènia. El fitxer convertit ocupa el lloc de l'original i en conserva el nom, les etiquetes, les col·leccions i els enllaços. Els fitxers de les carpetes vigilades no es modifiquen mai.
+# A checkbox that turns one conversion rule on or off.
+settings-conv-rule-on = Activa
+settings-conv-to = Converteix a
+# Heading over the file formats a rule converts.
+settings-conv-from = De
+settings-conv-remove = Elimina
+settings-conv-remove-label = Elimina la regla { $n }
+settings-conv-taken = Una altra regla ja converteix aquest format
+settings-conv-upright = Posa els models drets en convertir-los (amb la Y amunt i mirant cap a +Z), tal com es mostren els models del paquet
+settings-conv-add = Afegeix una regla
+# Before a number of days: "Keep originals for [30] days".
+settings-conv-keep = Conserva els originals durant
+settings-conv-keep-days =
+    { $count ->
+        [one] dia
+       *[other] dies
+    }
+settings-conv-keep-what = Fins aleshores, des de la pàgina d'un fitxer convertit es pot restaurar l'original. Les textures no es copien dins d'un model convertit: el model fa referència als fitxers d'imatge que té al costat. Els fitxers .mtl o .bin d'un model es mantenen.
+settings-conv-save = Desa les regles
+settings-conv-revert = Desfés els canvis
+settings-conv-existing = Converteix els fitxers que ja són a la biblioteca
+settings-conv-saved = S'han desat les regles de conversió. S'apliquen als paquets que s'afegeixin a partir d'ara.
+settings-conv-converting =
+    { $count ->
+        [one] Convertint un fitxer en segon pla
+       *[other] Convertint { $count } fitxers en segon pla
+    }
+settings-conv-nothing = No cal convertir res de la biblioteca.
+settings-conv-ask-title =
+    { $count ->
+        [one] Voleu convertir un fitxer que ja és a la biblioteca?
+       *[other] Voleu convertir { $count } fitxers que ja són a la biblioteca?
+    }
+settings-conv-ask-body =
+    { $packs ->
+        [one] És en un paquet.
+       *[other] Són en { $packs } paquets.
+    } Cada original es conserva { $days } dies i, fins aleshores, es pot restaurar des de la seva pàgina.
+settings-conv-ask-busy =
+    { $count ->
+        [one] N'hi ha un en un paquet que encara s'està afegint; es convertirà quan acabi.
+       *[other] N'hi ha { $count } en paquets que encara s'estan afegint; es convertiran quan acabin.
+    }
+settings-conv-ask-list = Fitxers que es convertirien
+settings-conv-ask-more = …i { $count } més
+settings-conv-ask-skipped = Es deixen tal com són:
+settings-conv-skip-watched =
+    { $count ->
+        [one] un fitxer en una carpeta vigilada
+       *[other] { $count } fitxers en carpetes vigilades
+    }
+settings-conv-skip-unity =
+    { $count ->
+        [one] un fitxer que un projecte d'Unity coneix pel nom
+       *[other] { $count } fitxers que un projecte d'Unity coneix pel nom
+    }
+settings-conv-skip-used =
+    { $count ->
+        [one] un fitxer al qual fa referència una escena o un altre fitxer
+       *[other] { $count } fitxers als quals fa referència una escena o un altre fitxer
+    }
+settings-conv-skip-beside =
+    { $count ->
+        [one] un fitxer que ja té la còpia convertida al seu paquet
+       *[other] { $count } fitxers que ja tenen la còpia convertida al seu paquet
+    }
+settings-conv-skip-blender =
+    { $count ->
+        [one] un fitxer que Blender encara no ha llegit (Configuració → Eines)
+       *[other] { $count } fitxers que Blender encara no ha llegit (Configuració → Eines)
+    }
+settings-conv-ask-new = Desa, només paquets nous
+settings-conv-ask-save-convert =
+    { $count ->
+        [one] Desa i converteix-lo
+       *[other] Desa i converteix { $count } fitxers
+    }
+settings-conv-ask-convert =
+    { $count ->
+        [one] Converteix-lo
+       *[other] Converteix { $count } fitxers
+    }
 settings-unreal-off = Deixa'ls com estan
 settings-unreal-off-hint = Convertiu-los des de la pàgina d'un paquet quan vulgueu.
 settings-unreal-keep = Converteix i conserva els originals

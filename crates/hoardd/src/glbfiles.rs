@@ -104,6 +104,51 @@ pub(crate) fn split(glb: &[u8], facing: Facing, stem: &str, names: &Names, conve
     Ok(Split { glb: write_glb(&doc, &bin)?, textures })
 }
 
+/// Turn `glb` by `facing` and point its embedded images that are files already beside it at those files instead:
+/// `files` maps the BLAKE3 hash of an image's bytes to the URI to use (relative to the GLB, percent-encoded). Images
+/// not in `files` stay inside. Their bytes leave the BIN chunk as [`split`]'s do. Returns the GLB and how many images
+/// now point at files.
+pub(crate) fn link(glb: &[u8], facing: Facing, files: &BTreeMap<[u8; 32], String>) -> Result<(Vec<u8>, usize)> {
+    let (doc, mut bin) = crate::formats::read_glb(glb)?;
+    let Value::Object(mut doc) = doc else { anyhow::bail!("the GLB's JSON isn't an object") };
+    crate::meshes::turn(&mut doc, facing);
+    let views = doc.get("bufferViews").and_then(Value::as_array).cloned().unwrap_or_default();
+    let mut moved = BTreeSet::new();
+    for img in doc.get_mut("images").and_then(Value::as_array_mut).into_iter().flatten() {
+        let view = img.get("bufferView").and_then(Value::as_u64).map(|v| v as usize);
+        let bytes = view.and_then(|v| view_bytes(&views, &bin, v));
+        let uri = bytes.and_then(|b| files.get(blake3::hash(b).as_bytes()));
+        if let (Some(v), Some(uri), Some(obj)) = (view, uri, img.as_object_mut()) {
+            obj.remove("bufferView");
+            obj.remove("mimeType");
+            obj.insert("uri".into(), json!(uri));
+            moved.insert(v);
+        }
+    }
+    let linked = moved.len();
+    let mut used = BTreeSet::new();
+    refs(&Value::Object(doc.clone()), &mut used);
+    let dropped: BTreeSet<usize> = moved.difference(&used).copied().collect();
+    let buffers = doc.get("buffers").and_then(Value::as_array).map_or(0, Vec::len);
+    let simple =
+        buffers == 1 && views.iter().all(|v| v.get("extensions").is_none() && v.get("buffer") == Some(&json!(0)));
+    if simple && !dropped.is_empty() {
+        bin = compact(&mut doc, &views, &bin, &dropped)?;
+    }
+    Ok((write_glb(&doc, &bin)?, linked))
+}
+
+/// A path relative to the folder of `from` (both `/`-separated paths in a pack), percent-encoded as a glTF URI.
+pub(crate) fn relative_uri(from: &str, to: &str) -> String {
+    let dir: Vec<&str> = from.split('/').collect();
+    let dir = &dir[..dir.len().saturating_sub(1)];
+    let target: Vec<&str> = to.split('/').collect();
+    let common = dir.iter().zip(&target).take_while(|(a, b)| a == b).count();
+    let mut parts: Vec<String> = vec!["..".to_owned(); dir.len() - common];
+    parts.extend(target[common..].iter().map(|p| crate::store_search::percent_encode(p)));
+    parts.join("/")
+}
+
 /// A name for each image a material uses, by image: the material's name (the model's `stem` when it has none) and
 /// the slot it fills, named by the `convention` as Hoard names maps (`Wood_BaseColor`, `Wood_AO`). Metal and
 /// roughness packed with occlusion in one image is `ORM`; a slot that isn't one of the roles takes its suffix from
@@ -442,6 +487,27 @@ mod tests {
         assert_eq!(bin.len(), 36);
         assert_eq!(doc["buffers"][0]["byteLength"], 36);
         assert_eq!(f32::from_le_bytes(bin[12..16].try_into().unwrap()), 1.0);
+    }
+
+    #[test]
+    fn images_that_are_files_beside_the_model_are_pointed_at() {
+        let glb = glb_with_image();
+        let files = BTreeMap::from([(*blake3::hash(PNG).as_bytes(), "../Textures/wood%20grain.png".to_owned())]);
+        let (out, linked) = link(&glb, Facing::default(), &files).unwrap();
+        assert_eq!(linked, 1);
+        assert!(out.len() < glb.len(), "the image left the BIN chunk");
+        let (doc, _) = crate::formats::read_glb(&out).unwrap();
+        assert_eq!(doc["images"][0]["uri"], "../Textures/wood%20grain.png");
+        assert!(doc["images"][0].get("bufferView").is_none());
+        let (_, none) = link(&glb, Facing::default(), &BTreeMap::new()).unwrap();
+        assert_eq!(none, 0, "an image that isn't a file in the pack stays inside");
+    }
+
+    #[test]
+    fn relative_uris_climb_out_of_the_models_folder() {
+        assert_eq!(relative_uri("Models/OBJ/tree.obj", "Models/OBJ/bark.png"), "bark.png");
+        assert_eq!(relative_uri("Models/OBJ/tree.obj", "Textures/wood grain.png"), "../../Textures/wood%20grain.png");
+        assert_eq!(relative_uri("tree.obj", "Textures/a.png"), "Textures/a.png");
     }
 
     #[test]

@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "42480b75a5b6ffe5e9a5e23b3bad0c8e5f5a1104f51660808e921f9a7cdc8e09"
+source = "9528abfcd928f040f086a2f54bd71118058471d032fdd351f2a4f0e86b8dfb1f"
 translation = "6df14cb1c2fd71b68aa0783404db89869e1b0987d799ee6e09c8222a98701df5"
 
 [messages.account-add]
@@ -2191,6 +2191,38 @@ translation = "Kattintson az átnevezéshez"
 source = "{ $role } map"
 translation = "térkép: { $role }"
 
+[messages.asset-rule-converted]
+source = "Converted by a rule"
+translation = "Szabály alakította át"
+
+[messages.asset-rule-kept-until]
+source = "The original is kept until { $date }."
+translation = "Az eredeti megmarad eddig: { $date }."
+
+[messages.asset-rule-let-go]
+source = "The original was deleted once the time Settings keeps originals was up."
+translation = "Az eredeti törlődött, amikor lejárt a Beállításokban megadott megőrzési idő."
+
+[messages.asset-rule-put-back]
+source = "Put the original back"
+translation = "Az eredeti visszaállítása"
+
+[messages.asset-rule-put-back-body]
+source = "The converted file is deleted and the original takes its place, with its tags, collections and links. The conversion rules leave it alone from then on."
+translation = "Az átalakított fájl törlődik, és az eredeti visszakerül a helyére a címkéivel, gyűjteményeivel és hivatkozásaival együtt. Az átalakítási szabályok ezután nem nyúlnak hozzá."
+
+[messages.asset-rule-put-back-done]
+source = "{ $file } is back"
+translation = "{ $file } visszaállítva"
+
+[messages.asset-rule-put-back-title]
+source = "Put back { $file }?"
+translation = "Visszaállítja ezt: { $file }?"
+
+[messages.asset-rule-was]
+source = "A conversion rule made this { $format } on { $date } from"
+translation = "Egy átalakítási szabály készítette ezt a { $format } fájlt ({ $date }) ebből:"
+
 [messages.asset-save]
 source = "Save"
 translation = "Mentés"
@@ -3145,9 +3177,37 @@ translation = "a kapcsolat nem található"
 source = "Converted downloads: at least 100 MB"
 translation = "Átalakított letöltések: legalább 100 MB"
 
+[messages.error-conversion-cant-undo]
+source = "This file wasn’t converted by a rule, or its original has been deleted."
+translation = "Ezt a fájlt nem szabály alakította át, vagy az eredetijét már törölték."
+
 [messages.error-conversion-failed]
 source = "couldn't convert to { $format }: { $reason }"
 translation = "az átalakítás sikertelen ({ $format }): { $reason }"
+
+[messages.error-conversion-keep-days]
+source = "Conversion rules: keep originals for 1 to { $max } days"
+translation = "Átalakítási szabályok: az eredetiek 1–{ $max } napig őrizhetők meg"
+
+[messages.error-conversion-no-source]
+source = "Conversion rules: each rule needs at least one format to convert"
+translation = "Átalakítási szabályok: minden szabályhoz legalább egy átalakítandó formátum kell"
+
+[messages.error-conversion-path-taken]
+source = "Another file is at { $path } now, so the original can’t go back there."
+translation = "Már egy másik fájl van itt: { $path }, így az eredeti nem kerülhet vissza oda."
+
+[messages.error-conversion-source]
+source = "Conversion rules: .{ $ext } files can’t be converted to { $format }"
+translation = "Átalakítási szabályok: a .{ $ext } fájlok nem alakíthatók { $format } formátumra"
+
+[messages.error-conversion-target]
+source = "Conversion rules: Hoard can’t convert files to { $format }"
+translation = "Átalakítási szabályok: a Hoard nem tud fájlokat { $format } formátumra alakítani"
+
+[messages.error-conversion-twice]
+source = "Conversion rules: .{ $ext } is in two rules"
+translation = "Átalakítási szabályok: a .{ $ext } két szabályban is szerepel"
 
 [messages.error-credits-collection]
 source = "collection { $key }"
@@ -7431,6 +7491,14 @@ translation = "Bekerültek a könyvtárba, de azok az adatok, címkék és bély
 source = "Re-analyze pack"
 translation = "Csomag újraelemzése"
 
+[messages.server-issues-reformat]
+source = "Files a conversion rule couldn’t convert"
+translation = "Fájlok, amelyeket egy átalakítási szabály nem tudott átalakítani"
+
+[messages.server-issues-reformat-blurb]
+source = "They’re left as they were."
+translation = "Változatlanul maradtak."
+
 [messages.server-issues-render]
 source = "Models the thumbnail renderer failed on"
 translation = "Modellek, amelyeknél a bélyegkép-renderelő hibát jelzett"
@@ -7502,6 +7570,10 @@ translation = "Anyagok keresése: { $pack }"
 [messages.server-job-read-files]
 source = "Reading the files of { $pack }"
 translation = "Fájlok beolvasása: { $pack }"
+
+[messages.server-job-reformat]
+source = "Converting files in { $pack } by the conversion rules"
+translation = "Fájlok átalakítása az átalakítási szabályok szerint: { $pack }"
 
 [messages.server-job-relocate]
 source = "Moving files between library locations"
@@ -7996,6 +8068,234 @@ translation = "Nem sikerült beszerezni a modellt: { $detail }. Óránként újr
 [messages.settings-clip-what]
 source = "Type what you’re after (“mossy rock”, “sci-fi door”, “wooden barrel”) and pictures that show it turn up beside names that have the words. “More like this” finds things of the same kind, not only the same colors."
 translation = "Írja be, amit keres (angolul, pl. „mossy rock”, „sci-fi door”, „wooden barrel”), és az ezt ábrázoló képek megjelennek a szavakat tartalmazó nevek mellett. A „Több ilyen” ugyanolyan fajtájú dolgokat talál, nem csak ugyanolyan színűeket."
+
+[messages.settings-conv]
+source = "Conversion rules"
+translation = "Átalakítási szabályok"
+
+[messages.settings-conv-add]
+source = "Add a rule"
+translation = "Szabály hozzáadása"
+
+[messages.settings-conv-ask-body]
+source = """
+{ $packs ->
+        [one] It’s in one pack.
+       *[other] They’re in { $packs } packs.
+    } Each original is kept for { $days } days, and until then it can be put back from its page."""
+translation = """
+{ $packs ->
+        [one] Egy csomagban van.
+       *[other] { $packs } csomagban vannak.
+    } Minden eredeti { $days } napig megmarad, és addig az oldaláról visszaállítható."""
+
+[messages.settings-conv-ask-busy]
+source = """
+{ $count ->
+        [one] One is in a pack still being added; it’s converted once that’s done.
+       *[other] { $count } are in packs still being added; they’re converted once that’s done.
+    }"""
+translation = """
+{ $count ->
+        [one] Egy még hozzáadás alatt álló csomagban van; akkor alakul át, amikor ez befejeződik.
+       *[other] { $count } még hozzáadás alatt álló csomagokban van; akkor alakulnak át, amikor ez befejeződik.
+    }"""
+
+[messages.settings-conv-ask-convert]
+source = """
+{ $count ->
+        [one] Convert it
+       *[other] Convert { $count } files
+    }"""
+translation = """
+{ $count ->
+        [one] Átalakítás
+       *[other] { $count } fájl átalakítása
+    }"""
+
+[messages.settings-conv-ask-list]
+source = "Files that would be converted"
+translation = "Az átalakítandó fájlok"
+
+[messages.settings-conv-ask-more]
+source = "…and { $count } more"
+translation = "…és még { $count }"
+
+[messages.settings-conv-ask-new]
+source = "Save, only new packs"
+translation = "Mentés, csak az új csomagokra"
+
+[messages.settings-conv-ask-save-convert]
+source = """
+{ $count ->
+        [one] Save and convert it
+       *[other] Save and convert { $count } files
+    }"""
+translation = """
+{ $count ->
+        [one] Mentés és átalakítás
+       *[other] Mentés és { $count } fájl átalakítása
+    }"""
+
+[messages.settings-conv-ask-skipped]
+source = "Left as they are:"
+translation = "Változatlanul maradnak:"
+
+[messages.settings-conv-ask-title]
+source = """
+{ $count ->
+        [one] Convert one file already in the library?
+       *[other] Convert { $count } files already in the library?
+    }"""
+translation = """
+{ $count ->
+        [one] Átalakít egy fájlt, amely már a könyvtárban van?
+       *[other] Átalakít { $count } fájlt, amely már a könyvtárban van?
+    }"""
+
+[messages.settings-conv-converting]
+source = """
+{ $count ->
+        [one] Converting one file in the background
+       *[other] Converting { $count } files in the background
+    }"""
+translation = """
+{ $count ->
+        [one] Egy fájl átalakítása a háttérben
+       *[other] { $count } fájl átalakítása a háttérben
+    }"""
+
+[messages.settings-conv-existing]
+source = "Convert files already in the library"
+translation = "A könyvtárban már meglévő fájlok átalakítása"
+
+[messages.settings-conv-from]
+source = "From"
+translation = "Forrásformátumok"
+
+[messages.settings-conv-keep]
+source = "Keep originals for"
+translation = "Az eredetiek megőrzése"
+
+[messages.settings-conv-keep-days]
+source = """
+{ $count ->
+        [one] day
+       *[other] days
+    }"""
+translation = """
+{ $count ->
+        [one] napig
+       *[other] napig
+    }"""
+
+[messages.settings-conv-keep-what]
+source = "Until then, a converted file’s page can put the original back. Textures aren’t copied into a converted model: it points at the image files beside it. A model’s .mtl or .bin files stay."
+translation = "Addig az átalakított fájl oldaláról visszaállítható az eredeti. A textúrák nem másolódnak bele az átalakított modellbe: az a mellette lévő képfájlokra hivatkozik. A modell .mtl vagy .bin fájljai megmaradnak."
+
+[messages.settings-conv-nothing]
+source = "Nothing in the library needs converting."
+translation = "A könyvtárban semmit sem kell átalakítani."
+
+[messages.settings-conv-remove]
+source = "Remove"
+translation = "Eltávolítás"
+
+[messages.settings-conv-remove-label]
+source = "Remove rule { $n }"
+translation = "{ $n }. szabály eltávolítása"
+
+[messages.settings-conv-revert]
+source = "Undo changes"
+translation = "Módosítások visszavonása"
+
+[messages.settings-conv-rule-on]
+source = "On"
+translation = "Bekapcsolva"
+
+[messages.settings-conv-save]
+source = "Save rules"
+translation = "Szabályok mentése"
+
+[messages.settings-conv-saved]
+source = "Conversion rules saved. They apply to packs added from now on."
+translation = "Átalakítási szabályok mentve. A mostantól hozzáadott csomagokra vonatkoznak."
+
+[messages.settings-conv-skip-beside]
+source = """
+{ $count ->
+        [one] one file whose converted copy is in its pack already
+       *[other] { $count } files whose converted copies are in their packs already
+    }"""
+translation = """
+{ $count ->
+        [one] egy fájl, amelynek átalakított másolata már a csomagjában van
+       *[other] { $count } fájl, amelynek átalakított másolata már a csomagjában van
+    }"""
+
+[messages.settings-conv-skip-blender]
+source = """
+{ $count ->
+        [one] one file Blender hasn’t read yet (Settings → Tools)
+       *[other] { $count } files Blender hasn’t read yet (Settings → Tools)
+    }"""
+translation = """
+{ $count ->
+        [one] egy fájl, amelyet a Blender még nem olvasott be (Beállítások → Eszközök)
+       *[other] { $count } fájl, amelyet a Blender még nem olvasott be (Beállítások → Eszközök)
+    }"""
+
+[messages.settings-conv-skip-unity]
+source = """
+{ $count ->
+        [one] one file a Unity project knows by its name
+       *[other] { $count } files a Unity project knows by their names
+    }"""
+translation = """
+{ $count ->
+        [one] egy fájl, amelyet egy Unity-projekt a nevéről ismer
+       *[other] { $count } fájl, amelyet egy Unity-projekt a nevéről ismer
+    }"""
+
+[messages.settings-conv-skip-used]
+source = """
+{ $count ->
+        [one] one file a scene or another file names
+       *[other] { $count } files a scene or another file names
+    }"""
+translation = """
+{ $count ->
+        [one] egy fájl, amelyet egy jelenet vagy egy másik fájl megnevez
+       *[other] { $count } fájl, amelyet egy jelenet vagy egy másik fájl megnevez
+    }"""
+
+[messages.settings-conv-skip-watched]
+source = """
+{ $count ->
+        [one] one file in a watched folder
+       *[other] { $count } files in watched folders
+    }"""
+translation = """
+{ $count ->
+        [one] egy fájl figyelt mappában
+       *[other] { $count } fájl figyelt mappákban
+    }"""
+
+[messages.settings-conv-taken]
+source = "Another rule converts this format"
+translation = "Ezt a formátumot egy másik szabály alakítja át"
+
+[messages.settings-conv-to]
+source = "Convert to"
+translation = "Célformátum"
+
+[messages.settings-conv-upright]
+source = "Turn models upright as they’re converted (Y up, facing +Z), the way the pack’s models are shown"
+translation = "A modellek felállítása átalakításkor (Y felfelé, előre +Z irányba), ahogy a csomag modelljei megjelennek"
+
+[messages.settings-conv-what]
+source = "Convert files Hoard keeps to one format, such as every OBJ and FBX to GLB, so the library is all alike. The converted file takes the original’s place, with its name, tags, collections and links. Files in watched folders are never changed."
+translation = "A Hoard által tárolt fájlok átalakítása egyetlen formátumra, például minden OBJ és FBX fájlé GLB-re, hogy a könyvtár egységes legyen. Az átalakított fájl átveszi az eredeti helyét, megtartva a nevét, címkéit, gyűjteményeit és hivatkozásait. A figyelt mappákban lévő fájlok soha nem változnak."
 
 [messages.settings-conversion-cache]
 source = "Converted downloads"

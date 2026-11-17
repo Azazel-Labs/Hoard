@@ -12,6 +12,7 @@ use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::{LazyLock, Mutex, PoisonError};
 
 use anyhow::{Context, Result, anyhow};
+use hoard_core::Facing;
 use polysmelt::document::{Document, Pose};
 use rusqlite::{OptionalExtension, params};
 use serde_json::{Map, Value, json};
@@ -171,7 +172,7 @@ async fn fetch(state: &AppState, id: &str, work: &Path) -> Result<Local> {
 /// Make one animation's motion thumbnail, and its still from the middle of the clip when it has none.
 async fn make(state: &AppState, t: &Todo) -> Result<()> {
     let (id, pack) = (t.id.clone(), t.pack_id.clone());
-    let (body, facing) = db::call(&state.pool, move |c| {
+    let (body, facings) = db::call(&state.pool, move |c| {
         let body: Option<String> = c
             .query_row(
                 "SELECT l.from_id FROM asset_links l JOIN assets m ON m.id = l.from_id
@@ -180,7 +181,12 @@ async fn make(state: &AppState, t: &Todo) -> Result<()> {
                 |r| r.get(0),
             )
             .optional()?;
-        Ok((body, db::pack_facing(c, &pack)?))
+        let clip_facing = db::asset_facing(c, &id, &pack)?;
+        let body_facing = match &body {
+            Some(b) => db::asset_facing(c, b, &pack)?,
+            None => clip_facing,
+        };
+        Ok((body, (clip_facing, body_facing)))
     })
     .await?;
     let work = state.cfg.tmp_dir().join(format!("motion-{}", uuid::Uuid::now_v7()));
@@ -190,7 +196,7 @@ async fn make(state: &AppState, t: &Todo) -> Result<()> {
             Some(b) => Some(fetch(state, b, &work.join("body")).await?),
             None => None,
         };
-        let (webp, still) = crate::heavy::run("motion", move || draw(&clip, body.as_ref(), facing)).await??;
+        let (webp, still) = crate::heavy::run("motion", move || draw(&clip, body.as_ref(), facings)).await??;
         let motion = state.blobs.put_cache_bytes(webp).await?;
         let still = state.blobs.put_cache_bytes(still).await?;
         let id = t.id.clone();
@@ -220,16 +226,17 @@ async fn make(state: &AppState, t: &Todo) -> Result<()> {
 }
 
 /// The clip's frames, drawn and encoded: the animated WebP, and its middle frame as a still thumbnail.
-fn draw(clip: &Local, body: Option<&Local>, facing: hoard_core::Facing) -> Result<(Vec<u8>, Vec<u8>)> {
+/// `facings` turn the clip's own mesh and the character's: each its own way (see [`db::asset_facing`]).
+fn draw(clip: &Local, body: Option<&Local>, facings: (Facing, Facing)) -> Result<(Vec<u8>, Vec<u8>)> {
     let from = crate::meshes::posable(&clip.path, &clip.ext, &clip.root)?;
     let (index, secs) = take(&from.json).context("it has no clip to play")?;
-    let (mut doc, index) = if from.counts().triangles > 0 {
-        (from, index)
+    let (mut doc, index, facing) = if from.counts().triangles > 0 {
+        (from, index, facings.0)
     } else {
         let body = body.context("it fits no character to play on")?;
         let mut doc = crate::meshes::posable(&body.path, &body.ext, &body.root)?;
         let index = transplant(&from, index, &mut doc)?.context("it moves none of the character's bones")?;
-        (doc, index)
+        (doc, index, facings.1)
     };
     crate::meshes::turn(&mut doc.json, facing);
     let (frames, ms) = frames(&doc, index, secs)?;

@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "42480b75a5b6ffe5e9a5e23b3bad0c8e5f5a1104f51660808e921f9a7cdc8e09"
+source = "9528abfcd928f040f086a2f54bd71118058471d032fdd351f2a4f0e86b8dfb1f"
 translation = "259239ab239601949cc6a70972021dcb09218f2bed3d1964197e9079006c5785"
 
 [messages.account-add]
@@ -2262,6 +2262,38 @@ translation = "Napsauta nimetäksesi uudelleen"
 source = "{ $role } map"
 translation = "kartta: { $role }"
 
+[messages.asset-rule-converted]
+source = "Converted by a rule"
+translation = "Muunnettu säännöllä"
+
+[messages.asset-rule-kept-until]
+source = "The original is kept until { $date }."
+translation = "Alkuperäinen säilytetään { $date } asti."
+
+[messages.asset-rule-let-go]
+source = "The original was deleted once the time Settings keeps originals was up."
+translation = "Alkuperäinen poistettiin, kun Asetuksissa määritetty alkuperäisten säilytysaika päättyi."
+
+[messages.asset-rule-put-back]
+source = "Put the original back"
+translation = "Palauta alkuperäinen"
+
+[messages.asset-rule-put-back-body]
+source = "The converted file is deleted and the original takes its place, with its tags, collections and links. The conversion rules leave it alone from then on."
+translation = "Muunnettu tiedosto poistetaan, ja alkuperäinen palaa sen paikalle tunnisteineen, kokoelmineen ja linkkeineen. Muunnossäännöt eivät sen jälkeen enää koske siihen."
+
+[messages.asset-rule-put-back-done]
+source = "{ $file } is back"
+translation = "{ $file } on palautettu"
+
+[messages.asset-rule-put-back-title]
+source = "Put back { $file }?"
+translation = "Palautetaanko { $file }?"
+
+[messages.asset-rule-was]
+source = "A conversion rule made this { $format } on { $date } from"
+translation = "Muunnossääntö teki tämän { $format }-tiedoston { $date } tiedostosta"
+
 [messages.asset-save]
 source = "Save"
 translation = "Tallenna"
@@ -3228,9 +3260,37 @@ translation = "yhteyttä ei löydy"
 source = "Converted downloads: at least 100 MB"
 translation = "Muunnetut lataukset: vähintään 100 Mt"
 
+[messages.error-conversion-cant-undo]
+source = "This file wasn’t converted by a rule, or its original has been deleted."
+translation = "Tätä tiedostoa ei muunnettu säännöllä, tai sen alkuperäinen on poistettu."
+
 [messages.error-conversion-failed]
 source = "couldn't convert to { $format }: { $reason }"
 translation = "muunnos muotoon { $format } epäonnistui: { $reason }"
+
+[messages.error-conversion-keep-days]
+source = "Conversion rules: keep originals for 1 to { $max } days"
+translation = "Muunnossäännöt: alkuperäisiä voi säilyttää 1–{ $max } päivää"
+
+[messages.error-conversion-no-source]
+source = "Conversion rules: each rule needs at least one format to convert"
+translation = "Muunnossäännöt: jokaisessa säännössä on oltava vähintään yksi muunnettava muoto"
+
+[messages.error-conversion-path-taken]
+source = "Another file is at { $path } now, so the original can’t go back there."
+translation = "Polussa { $path } on nyt toinen tiedosto, joten alkuperäistä ei voi palauttaa sinne."
+
+[messages.error-conversion-source]
+source = "Conversion rules: .{ $ext } files can’t be converted to { $format }"
+translation = "Muunnossäännöt: .{ $ext }-tiedostoja ei voi muuntaa muotoon { $format }"
+
+[messages.error-conversion-target]
+source = "Conversion rules: Hoard can’t convert files to { $format }"
+translation = "Muunnossäännöt: Hoard ei osaa muuntaa tiedostoja muotoon { $format }"
+
+[messages.error-conversion-twice]
+source = "Conversion rules: .{ $ext } is in two rules"
+translation = "Muunnossäännöt: .{ $ext } on kahdessa säännössä"
 
 [messages.error-credits-collection]
 source = "collection { $key }"
@@ -7633,6 +7693,14 @@ translation = "Ne ovat kirjastossa, mutta ilman tietoja, tunnisteita tai pikkuku
 source = "Re-analyze pack"
 translation = "Analysoi paketti uudelleen"
 
+[messages.server-issues-reformat]
+source = "Files a conversion rule couldn’t convert"
+translation = "Tiedostot, joita muunnossääntö ei pystynyt muuntamaan"
+
+[messages.server-issues-reformat-blurb]
+source = "They’re left as they were."
+translation = "Ne on jätetty ennalleen."
+
 [messages.server-issues-render]
 source = "Models the thumbnail renderer failed on"
 translation = "Mallit, joiden pikkukuvan piirto epäonnistui"
@@ -7704,6 +7772,10 @@ translation = "Etsitään materiaaleja: { $pack }"
 [messages.server-job-read-files]
 source = "Reading the files of { $pack }"
 translation = "Luetaan tiedostoja: { $pack }"
+
+[messages.server-job-reformat]
+source = "Converting files in { $pack } by the conversion rules"
+translation = "Muunnetaan tiedostoja muunnossääntöjen mukaan: { $pack }"
 
 [messages.server-job-relocate]
 source = "Moving files between library locations"
@@ -8203,6 +8275,234 @@ translation = "Mallia ei saatu: { $detail }. Yritetään uudelleen tunnin välei
 [messages.settings-clip-what]
 source = "Type what you’re after (“mossy rock”, “sci-fi door”, “wooden barrel”) and pictures that show it turn up beside names that have the words. “More like this” finds things of the same kind, not only the same colors."
 translation = "Kirjoita, mitä etsit (”mossy rock”, ”sci-fi door”, ”wooden barrel”), niin sitä esittävät kuvat näkyvät sanat sisältävien nimien rinnalla. ”Lisää samankaltaisia” löytää samantyyppisiä asioita, ei vain samanvärisiä."
+
+[messages.settings-conv]
+source = "Conversion rules"
+translation = "Muunnossäännöt"
+
+[messages.settings-conv-add]
+source = "Add a rule"
+translation = "Lisää sääntö"
+
+[messages.settings-conv-ask-body]
+source = """
+{ $packs ->
+        [one] It’s in one pack.
+       *[other] They’re in { $packs } packs.
+    } Each original is kept for { $days } days, and until then it can be put back from its page."""
+translation = """
+{ $packs ->
+        [one] Se on yhdessä paketissa.
+       *[other] Ne ovat { $packs } paketissa.
+    } Jokainen alkuperäinen säilytetään { $days } päivää, ja siihen asti sen voi palauttaa sen sivulta."""
+
+[messages.settings-conv-ask-busy]
+source = """
+{ $count ->
+        [one] One is in a pack still being added; it’s converted once that’s done.
+       *[other] { $count } are in packs still being added; they’re converted once that’s done.
+    }"""
+translation = """
+{ $count ->
+        [one] Yksi on paketissa, jota vielä lisätään; se muunnetaan, kun lisäys on valmis.
+       *[other] { $count } on paketeissa, joita vielä lisätään; ne muunnetaan, kun lisäys on valmis.
+    }"""
+
+[messages.settings-conv-ask-convert]
+source = """
+{ $count ->
+        [one] Convert it
+       *[other] Convert { $count } files
+    }"""
+translation = """
+{ $count ->
+        [one] Muunna se
+       *[other] Muunna { $count } tiedostoa
+    }"""
+
+[messages.settings-conv-ask-list]
+source = "Files that would be converted"
+translation = "Tiedostot, jotka muunnettaisiin"
+
+[messages.settings-conv-ask-more]
+source = "…and { $count } more"
+translation = "…ja { $count } lisää"
+
+[messages.settings-conv-ask-new]
+source = "Save, only new packs"
+translation = "Tallenna, vain uudet paketit"
+
+[messages.settings-conv-ask-save-convert]
+source = """
+{ $count ->
+        [one] Save and convert it
+       *[other] Save and convert { $count } files
+    }"""
+translation = """
+{ $count ->
+        [one] Tallenna ja muunna se
+       *[other] Tallenna ja muunna { $count } tiedostoa
+    }"""
+
+[messages.settings-conv-ask-skipped]
+source = "Left as they are:"
+translation = "Jätetään ennalleen:"
+
+[messages.settings-conv-ask-title]
+source = """
+{ $count ->
+        [one] Convert one file already in the library?
+       *[other] Convert { $count } files already in the library?
+    }"""
+translation = """
+{ $count ->
+        [one] Muunnetaanko yksi kirjastossa jo oleva tiedosto?
+       *[other] Muunnetaanko { $count } kirjastossa jo olevaa tiedostoa?
+    }"""
+
+[messages.settings-conv-converting]
+source = """
+{ $count ->
+        [one] Converting one file in the background
+       *[other] Converting { $count } files in the background
+    }"""
+translation = """
+{ $count ->
+        [one] Muunnetaan yhtä tiedostoa taustalla
+       *[other] Muunnetaan { $count } tiedostoa taustalla
+    }"""
+
+[messages.settings-conv-existing]
+source = "Convert files already in the library"
+translation = "Muunna kirjastossa jo olevat tiedostot"
+
+[messages.settings-conv-from]
+source = "From"
+translation = "Lähtömuodot"
+
+[messages.settings-conv-keep]
+source = "Keep originals for"
+translation = "Säilytä alkuperäiset"
+
+[messages.settings-conv-keep-days]
+source = """
+{ $count ->
+        [one] day
+       *[other] days
+    }"""
+translation = """
+{ $count ->
+        [one] päivän
+       *[other] päivää
+    }"""
+
+[messages.settings-conv-keep-what]
+source = "Until then, a converted file’s page can put the original back. Textures aren’t copied into a converted model: it points at the image files beside it. A model’s .mtl or .bin files stay."
+translation = "Siihen asti muunnetun tiedoston sivulta voi palauttaa alkuperäisen. Tekstuureja ei kopioida muunnettuun malliin: se viittaa vieressään oleviin kuvatiedostoihin. Mallin .mtl- tai .bin-tiedostot jäävät paikalleen."
+
+[messages.settings-conv-nothing]
+source = "Nothing in the library needs converting."
+translation = "Kirjastossa ei ole mitään muunnettavaa."
+
+[messages.settings-conv-remove]
+source = "Remove"
+translation = "Poista"
+
+[messages.settings-conv-remove-label]
+source = "Remove rule { $n }"
+translation = "Poista sääntö { $n }"
+
+[messages.settings-conv-revert]
+source = "Undo changes"
+translation = "Kumoa muutokset"
+
+[messages.settings-conv-rule-on]
+source = "On"
+translation = "Käytössä"
+
+[messages.settings-conv-save]
+source = "Save rules"
+translation = "Tallenna säännöt"
+
+[messages.settings-conv-saved]
+source = "Conversion rules saved. They apply to packs added from now on."
+translation = "Muunnossäännöt tallennettu. Niitä sovelletaan tästä lähtien lisättäviin paketteihin."
+
+[messages.settings-conv-skip-beside]
+source = """
+{ $count ->
+        [one] one file whose converted copy is in its pack already
+       *[other] { $count } files whose converted copies are in their packs already
+    }"""
+translation = """
+{ $count ->
+        [one] yksi tiedosto, jonka muunnettu kopio on jo sen paketissa
+       *[other] { $count } tiedostoa, joiden muunnetut kopiot ovat jo niiden paketeissa
+    }"""
+
+[messages.settings-conv-skip-blender]
+source = """
+{ $count ->
+        [one] one file Blender hasn’t read yet (Settings → Tools)
+       *[other] { $count } files Blender hasn’t read yet (Settings → Tools)
+    }"""
+translation = """
+{ $count ->
+        [one] yksi tiedosto, jota Blender ei ole vielä lukenut (Asetukset → Työkalut)
+       *[other] { $count } tiedostoa, joita Blender ei ole vielä lukenut (Asetukset → Työkalut)
+    }"""
+
+[messages.settings-conv-skip-unity]
+source = """
+{ $count ->
+        [one] one file a Unity project knows by its name
+       *[other] { $count } files a Unity project knows by their names
+    }"""
+translation = """
+{ $count ->
+        [one] yksi tiedosto, jonka Unity-projekti tuntee nimeltä
+       *[other] { $count } tiedostoa, jotka Unity-projekti tuntee nimeltä
+    }"""
+
+[messages.settings-conv-skip-used]
+source = """
+{ $count ->
+        [one] one file a scene or another file names
+       *[other] { $count } files a scene or another file names
+    }"""
+translation = """
+{ $count ->
+        [one] yksi tiedosto, jonka kohtaus tai toinen tiedosto mainitsee nimeltä
+       *[other] { $count } tiedostoa, jotka kohtaus tai toinen tiedosto mainitsee nimeltä
+    }"""
+
+[messages.settings-conv-skip-watched]
+source = """
+{ $count ->
+        [one] one file in a watched folder
+       *[other] { $count } files in watched folders
+    }"""
+translation = """
+{ $count ->
+        [one] yksi tiedosto valvotussa kansiossa
+       *[other] { $count } tiedostoa valvotuissa kansioissa
+    }"""
+
+[messages.settings-conv-taken]
+source = "Another rule converts this format"
+translation = "Toinen sääntö muuntaa jo tämän muodon"
+
+[messages.settings-conv-to]
+source = "Convert to"
+translation = "Muunna muotoon"
+
+[messages.settings-conv-upright]
+source = "Turn models upright as they’re converted (Y up, facing +Z), the way the pack’s models are shown"
+translation = "Käännä mallit pystyyn muunnettaessa (Y ylös, etupuoli kohti +Z) samalla tavalla kuin paketin mallit näytetään"
+
+[messages.settings-conv-what]
+source = "Convert files Hoard keeps to one format, such as every OBJ and FBX to GLB, so the library is all alike. The converted file takes the original’s place, with its name, tags, collections and links. Files in watched folders are never changed."
+translation = "Muunna Hoardin säilyttämät tiedostot yhteen muotoon, esimerkiksi kaikki OBJ- ja FBX-tiedostot GLB-muotoon, jotta kirjasto on yhtenäinen. Muunnettu tiedosto korvaa alkuperäisen ja säilyttää sen nimen, tunnisteet, kokoelmat ja linkit. Valvottujen kansioiden tiedostoja ei koskaan muuteta."
 
 [messages.settings-conversion-cache]
 source = "Converted downloads"

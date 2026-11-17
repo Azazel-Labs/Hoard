@@ -224,6 +224,14 @@ error-no-soundfont = Unter { $path } gibt es auf dem Server keinen SoundFont
 error-workers = Hintergrund-Worker: zwischen 1 und { $max }
 error-ai-batch = Assets pro KI-Anfrage: zwischen 1 und 200
 error-conversion-cache = Umgewandelte Downloads: mindestens 100 MB
+error-conversion-keep-days = Umwandlungsregeln: Originale 1 bis { $max } Tage behalten
+error-conversion-target = Umwandlungsregeln: Hoard kann Dateien nicht in { $format } umwandeln
+error-conversion-no-source = Umwandlungsregeln: Jede Regel braucht mindestens ein Format, das sie umwandelt
+# $ext is a file extension, like obj; $format is what it would become, like glb.
+error-conversion-source = Umwandlungsregeln: .{ $ext }-Dateien können nicht in { $format } umgewandelt werden
+error-conversion-twice = Umwandlungsregeln: .{ $ext } steht in zwei Regeln
+error-conversion-cant-undo = Diese Datei wurde nicht von einer Regel umgewandelt, oder ihr Original wurde schon gelöscht.
+error-conversion-path-taken = Unter { $path } liegt jetzt eine andere Datei, daher kann das Original nicht dorthin zurück.
 error-limits-zero = Limits dürfen nicht null sein
 error-settings-object = ein JSON-Objekt mit Einstellungen erwartet
 error-bad-setting = ungültige Einstellung: { $reason }
@@ -350,6 +358,8 @@ server-issues-convert = Modelle, die Blender nicht umwandeln konnte
 server-issues-convert-blurb = Sie haben keine GLB-Kopie und können daher nicht in 3D angezeigt werden.
 server-issues-unreal = Unreal-Packages, die nicht umgewandelt werden konnten
 server-issues-unreal-blurb = Die Unreal-Seite des Pakets zeigt seine übrigen Packages.
+server-issues-reformat = Dateien, die eine Umwandlungsregel nicht umwandeln konnte
+server-issues-reformat-blurb = Sie bleiben, wie sie waren.
 server-issues-materials = Pakete, deren Materialien nicht ermittelt werden konnten
 server-issues-materials-blurb = Ihre Texturen sind alle da; sie sind nur nicht zu Materialien gruppiert.
 server-issues-material-thumb = Materialien ohne Vorschaubild
@@ -371,6 +381,7 @@ server-job-retag = { $pack } wird neu getaggt
 server-job-llm-tag = { $pack } wird mit KI getaggt
 server-job-convert = { $pack } wird mit Blender umgewandelt
 server-job-unreal = Unreal-Packages in { $pack } werden umgewandelt
+server-job-reformat = Dateien in { $pack } werden nach den Umwandlungsregeln umgewandelt
 server-job-scan = Ein überwachter Ordner wird gescannt
 server-job-relocate = Dateien werden zwischen Speicherorten verschoben
 server-job-looks = Farben und Aussehen werden ermittelt
@@ -1408,6 +1419,15 @@ asset-variants = Varianten ({ $count } Takes)
 asset-copies = Identische Kopien
 asset-copies-note = Gleiche Bytes werden nur einmal gespeichert; diese Pakete enthalten die Datei ebenfalls.
 asset-unreal-converted = Aus Unreal umgewandelt
+asset-rule-converted = Von einer Regel umgewandelt
+# Followed by the original file's name: "A conversion rule made this GLB on 3 May 2026 from tree.obj".
+asset-rule-was = Am { $date } von einer Umwandlungsregel als { $format } erstellt aus
+asset-rule-kept-until = Das Original wird bis { $date } aufbewahrt.
+asset-rule-put-back = Original wiederherstellen
+asset-rule-put-back-title = { $file } wiederherstellen?
+asset-rule-put-back-body = Die umgewandelte Datei wird gelöscht, und das Original tritt mit seinen Tags, Sammlungen und Verknüpfungen an ihre Stelle. Die Umwandlungsregeln lassen es von da an in Ruhe.
+asset-rule-put-back-done = { $file } ist wieder da
+asset-rule-let-go = Das Original wurde gelöscht, als die in den Einstellungen festgelegte Aufbewahrungszeit für Originale abgelaufen war.
 asset-unreal-package = Aus dem Unreal-Package
 asset-ue-needs-editor-before = Wartet auf den Unreal Editor: { $reason }. Führen Sie auf einem Rechner mit installiertem Unreal
 asset-ue-needs-editor-after = aus, dann kommt es als FBX zurück.
@@ -2300,6 +2320,90 @@ settings-store-lookup = Store-Seiten automatisch nachschlagen
 settings-unreal = Unreal-Packages
 settings-unreal-reset = Unreal-Packages: auf Standard zurücksetzen
 settings-unreal-what = Was mit .uasset-Dateien geschehen soll.
+settings-conv = Umwandlungsregeln
+settings-conv-what = Wandelt die Dateien, die Hoard speichert, in ein Format um, etwa alle OBJ und FBX in GLB, damit die Bibliothek einheitlich ist. Die umgewandelte Datei tritt an die Stelle des Originals und behält dessen Namen, Tags, Sammlungen und Verknüpfungen. Dateien in überwachten Ordnern werden nie verändert.
+# A checkbox that turns one conversion rule on or off.
+settings-conv-rule-on = Aktiv
+settings-conv-to = Umwandeln in
+# Heading over the file formats a rule converts.
+settings-conv-from = Aus
+settings-conv-remove = Entfernen
+settings-conv-remove-label = Regel { $n } entfernen
+settings-conv-taken = Eine andere Regel wandelt dieses Format schon um
+settings-conv-upright = Modelle beim Umwandeln aufrichten (Y nach oben, nach +Z gerichtet), so wie die Modelle des Pakets angezeigt werden
+settings-conv-add = Regel hinzufügen
+# Before a number of days: "Keep originals for [30] days".
+settings-conv-keep = Originale behalten für
+settings-conv-keep-days =
+    { $count ->
+        [one] Tag
+       *[other] Tage
+    }
+settings-conv-keep-what = Bis dahin lässt sich das Original über die Seite der umgewandelten Datei wiederherstellen. Texturen werden nicht in ein umgewandeltes Modell kopiert: Es verweist auf die Bilddateien daneben. Die .mtl- oder .bin-Dateien eines Modells bleiben erhalten.
+settings-conv-save = Regeln speichern
+settings-conv-revert = Änderungen verwerfen
+settings-conv-existing = Dateien umwandeln, die schon in der Bibliothek sind
+settings-conv-saved = Umwandlungsregeln gespeichert. Sie gelten für Pakete, die ab jetzt hinzugefügt werden.
+settings-conv-converting =
+    { $count ->
+        [one] Eine Datei wird im Hintergrund umgewandelt
+       *[other] { $count } Dateien werden im Hintergrund umgewandelt
+    }
+settings-conv-nothing = In der Bibliothek muss nichts umgewandelt werden.
+settings-conv-ask-title =
+    { $count ->
+        [one] Eine Datei umwandeln, die schon in der Bibliothek ist?
+       *[other] { $count } Dateien umwandeln, die schon in der Bibliothek sind?
+    }
+settings-conv-ask-body =
+    { $packs ->
+        [one] Sie liegt in einem Paket.
+       *[other] Sie liegen in { $packs } Paketen.
+    } Jedes Original wird { $days } Tage aufbewahrt und lässt sich bis dahin über seine Seite wiederherstellen.
+settings-conv-ask-busy =
+    { $count ->
+        [one] Eine liegt in einem Paket, das noch hinzugefügt wird; sie wird umgewandelt, sobald das fertig ist.
+       *[other] { $count } liegen in Paketen, die noch hinzugefügt werden; sie werden umgewandelt, sobald das fertig ist.
+    }
+settings-conv-ask-list = Dateien, die umgewandelt würden
+settings-conv-ask-more = …und { $count } weitere
+settings-conv-ask-skipped = Bleiben, wie sie sind:
+settings-conv-skip-watched =
+    { $count ->
+        [one] eine Datei in einem überwachten Ordner
+       *[other] { $count } Dateien in überwachten Ordnern
+    }
+settings-conv-skip-unity =
+    { $count ->
+        [one] eine Datei, die ein Unity-Projekt unter ihrem Namen kennt
+       *[other] { $count } Dateien, die ein Unity-Projekt unter ihren Namen kennt
+    }
+settings-conv-skip-used =
+    { $count ->
+        [one] eine Datei, auf die eine Szene oder eine andere Datei verweist
+       *[other] { $count } Dateien, auf die eine Szene oder eine andere Datei verweist
+    }
+settings-conv-skip-beside =
+    { $count ->
+        [one] eine Datei, deren umgewandelte Kopie schon in ihrem Paket liegt
+       *[other] { $count } Dateien, deren umgewandelte Kopien schon in ihren Paketen liegen
+    }
+settings-conv-skip-blender =
+    { $count ->
+        [one] eine Datei, die Blender noch nicht gelesen hat (Einstellungen → Werkzeuge)
+       *[other] { $count } Dateien, die Blender noch nicht gelesen hat (Einstellungen → Werkzeuge)
+    }
+settings-conv-ask-new = Speichern, nur neue Pakete
+settings-conv-ask-save-convert =
+    { $count ->
+        [one] Speichern und umwandeln
+       *[other] Speichern und { $count } Dateien umwandeln
+    }
+settings-conv-ask-convert =
+    { $count ->
+        [one] Umwandeln
+       *[other] { $count } Dateien umwandeln
+    }
 settings-unreal-off = Unverändert lassen
 settings-unreal-off-hint = Bei Bedarf auf der Seite eines Pakets umwandeln.
 settings-unreal-keep = Umwandeln, Originale behalten

@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "42480b75a5b6ffe5e9a5e23b3bad0c8e5f5a1104f51660808e921f9a7cdc8e09"
+source = "9528abfcd928f040f086a2f54bd71118058471d032fdd351f2a4f0e86b8dfb1f"
 translation = "8d9ccd00d7a48e165bb0fba20cf5559e2b3c83fd67e4695b2578383ddd6588b7"
 
 [messages.account-add]
@@ -2179,6 +2179,38 @@ translation = "클릭해서 이름 바꾸기"
 source = "{ $role } map"
 translation = "{ $role } 맵"
 
+[messages.asset-rule-converted]
+source = "Converted by a rule"
+translation = "규칙으로 변환됨"
+
+[messages.asset-rule-kept-until]
+source = "The original is kept until { $date }."
+translation = "원본은 { $date }까지 보관됩니다."
+
+[messages.asset-rule-let-go]
+source = "The original was deleted once the time Settings keeps originals was up."
+translation = "설정에서 정한 원본 보관 기간이 지나서 원본이 삭제되었습니다."
+
+[messages.asset-rule-put-back]
+source = "Put the original back"
+translation = "원본 되돌리기"
+
+[messages.asset-rule-put-back-body]
+source = "The converted file is deleted and the original takes its place, with its tags, collections and links. The conversion rules leave it alone from then on."
+translation = "변환된 파일은 삭제되고 원본이 태그, 컬렉션, 링크와 함께 그 자리로 돌아옵니다. 그 후로는 변환 규칙이 이 파일을 건드리지 않습니다."
+
+[messages.asset-rule-put-back-done]
+source = "{ $file } is back"
+translation = "{ $file }을(를) 되돌렸습니다"
+
+[messages.asset-rule-put-back-title]
+source = "Put back { $file }?"
+translation = "{ $file }을(를) 되돌릴까요?"
+
+[messages.asset-rule-was]
+source = "A conversion rule made this { $format } on { $date } from"
+translation = "{ $date }에 변환 규칙이 이 { $format } 파일을 만들었습니다. 원본:"
+
 [messages.asset-save]
 source = "Save"
 translation = "저장"
@@ -3133,9 +3165,37 @@ translation = "연결을 찾을 수 없습니다"
 source = "Converted downloads: at least 100 MB"
 translation = "변환된 다운로드: 100 MB 이상"
 
+[messages.error-conversion-cant-undo]
+source = "This file wasn’t converted by a rule, or its original has been deleted."
+translation = "이 파일은 규칙으로 변환된 파일이 아니거나 원본이 삭제되었습니다."
+
 [messages.error-conversion-failed]
 source = "couldn't convert to { $format }: { $reason }"
 translation = "{ $format }(으)로 변환할 수 없습니다: { $reason }"
+
+[messages.error-conversion-keep-days]
+source = "Conversion rules: keep originals for 1 to { $max } days"
+translation = "변환 규칙: 원본은 1~{ $max }일 동안 보관할 수 있습니다"
+
+[messages.error-conversion-no-source]
+source = "Conversion rules: each rule needs at least one format to convert"
+translation = "변환 규칙: 각 규칙에는 변환할 형식이 하나 이상 있어야 합니다"
+
+[messages.error-conversion-path-taken]
+source = "Another file is at { $path } now, so the original can’t go back there."
+translation = "지금 { $path }에 다른 파일이 있어서 원본을 그곳으로 되돌릴 수 없습니다."
+
+[messages.error-conversion-source]
+source = "Conversion rules: .{ $ext } files can’t be converted to { $format }"
+translation = "변환 규칙: .{ $ext } 파일은 { $format }(으)로 변환할 수 없습니다"
+
+[messages.error-conversion-target]
+source = "Conversion rules: Hoard can’t convert files to { $format }"
+translation = "변환 규칙: Hoard는 파일을 { $format }(으)로 변환할 수 없습니다"
+
+[messages.error-conversion-twice]
+source = "Conversion rules: .{ $ext } is in two rules"
+translation = "변환 규칙: .{ $ext }이(가) 두 규칙에 들어 있습니다"
 
 [messages.error-credits-collection]
 source = "collection { $key }"
@@ -7395,6 +7455,14 @@ translation = "라이브러리에는 있지만, 파일을 읽어서 얻는 정�
 source = "Re-analyze pack"
 translation = "팩 다시 분석"
 
+[messages.server-issues-reformat]
+source = "Files a conversion rule couldn’t convert"
+translation = "변환 규칙으로 변환하지 못한 파일"
+
+[messages.server-issues-reformat-blurb]
+source = "They’re left as they were."
+translation = "원래대로 남겨 두었습니다."
+
 [messages.server-issues-render]
 source = "Models the thumbnail renderer failed on"
 translation = "썸네일 렌더러가 실패한 모델"
@@ -7466,6 +7534,10 @@ translation = "{ $pack }에서 머티리얼 찾는 중"
 [messages.server-job-read-files]
 source = "Reading the files of { $pack }"
 translation = "{ $pack }의 파일 읽는 중"
+
+[messages.server-job-reformat]
+source = "Converting files in { $pack } by the conversion rules"
+translation = "변환 규칙에 따라 { $pack }의 파일 변환하는 중"
 
 [messages.server-job-relocate]
 source = "Moving files between library locations"
@@ -7957,6 +8029,222 @@ translation = "모델을 가져오지 못했습니다: { $detail }. 1시간마�
 [messages.settings-clip-what]
 source = "Type what you’re after (“mossy rock”, “sci-fi door”, “wooden barrel”) and pictures that show it turn up beside names that have the words. “More like this” finds things of the same kind, not only the same colors."
 translation = "찾는 것을 입력하면(“mossy rock”, “sci-fi door”, “wooden barrel”) 이름에 그 단어가 들어간 것과 함께 그 내용이 담긴 그림이 나타납니다. “비슷한 것 더 보기”는 색상뿐 아니라 종류가 같은 것도 찾습니다."
+
+[messages.settings-conv]
+source = "Conversion rules"
+translation = "변환 규칙"
+
+[messages.settings-conv-add]
+source = "Add a rule"
+translation = "규칙 추가"
+
+[messages.settings-conv-ask-body]
+source = """
+{ $packs ->
+        [one] It’s in one pack.
+       *[other] They’re in { $packs } packs.
+    } Each original is kept for { $days } days, and until then it can be put back from its page."""
+translation = """
+{ $packs ->
+       *[other] 팩 { $packs }개에 들어 있습니다.
+    } 각 원본은 { $days }일 동안 보관되며, 그때까지는 해당 페이지에서 되돌릴 수 있습니다."""
+
+[messages.settings-conv-ask-busy]
+source = """
+{ $count ->
+        [one] One is in a pack still being added; it’s converted once that’s done.
+       *[other] { $count } are in packs still being added; they’re converted once that’s done.
+    }"""
+translation = """
+{ $count ->
+       *[other] { $count }개는 아직 추가 중인 팩에 있습니다. 추가가 끝나면 변환됩니다.
+    }"""
+
+[messages.settings-conv-ask-convert]
+source = """
+{ $count ->
+        [one] Convert it
+       *[other] Convert { $count } files
+    }"""
+translation = """
+{ $count ->
+       *[other] 파일 { $count }개 변환
+    }"""
+
+[messages.settings-conv-ask-list]
+source = "Files that would be converted"
+translation = "변환될 파일"
+
+[messages.settings-conv-ask-more]
+source = "…and { $count } more"
+translation = "…외 { $count }개"
+
+[messages.settings-conv-ask-new]
+source = "Save, only new packs"
+translation = "저장, 새 팩에만 적용"
+
+[messages.settings-conv-ask-save-convert]
+source = """
+{ $count ->
+        [one] Save and convert it
+       *[other] Save and convert { $count } files
+    }"""
+translation = """
+{ $count ->
+       *[other] 저장하고 파일 { $count }개 변환
+    }"""
+
+[messages.settings-conv-ask-skipped]
+source = "Left as they are:"
+translation = "그대로 둘 파일:"
+
+[messages.settings-conv-ask-title]
+source = """
+{ $count ->
+        [one] Convert one file already in the library?
+       *[other] Convert { $count } files already in the library?
+    }"""
+translation = """
+{ $count ->
+       *[other] 라이브러리에 이미 있는 파일 { $count }개를 변환할까요?
+    }"""
+
+[messages.settings-conv-converting]
+source = """
+{ $count ->
+        [one] Converting one file in the background
+       *[other] Converting { $count } files in the background
+    }"""
+translation = """
+{ $count ->
+       *[other] 백그라운드에서 파일 { $count }개 변환하는 중
+    }"""
+
+[messages.settings-conv-existing]
+source = "Convert files already in the library"
+translation = "라이브러리에 이미 있는 파일 변환"
+
+[messages.settings-conv-from]
+source = "From"
+translation = "원본 형식"
+
+[messages.settings-conv-keep]
+source = "Keep originals for"
+translation = "원본 보관 기간"
+
+[messages.settings-conv-keep-days]
+source = """
+{ $count ->
+        [one] day
+       *[other] days
+    }"""
+translation = """
+{ $count ->
+       *[other] 일
+    }"""
+
+[messages.settings-conv-keep-what]
+source = "Until then, a converted file’s page can put the original back. Textures aren’t copied into a converted model: it points at the image files beside it. A model’s .mtl or .bin files stay."
+translation = "그때까지는 변환된 파일의 페이지에서 원본을 되돌릴 수 있습니다. 텍스처는 변환된 모델에 복사되지 않으며, 모델은 옆에 있는 이미지 파일을 가리킵니다. 모델의 .mtl 또는 .bin 파일은 그대로 남습니다."
+
+[messages.settings-conv-nothing]
+source = "Nothing in the library needs converting."
+translation = "라이브러리에 변환할 파일이 없습니다."
+
+[messages.settings-conv-remove]
+source = "Remove"
+translation = "제거"
+
+[messages.settings-conv-remove-label]
+source = "Remove rule { $n }"
+translation = "규칙 { $n } 제거"
+
+[messages.settings-conv-revert]
+source = "Undo changes"
+translation = "변경 사항 취소"
+
+[messages.settings-conv-rule-on]
+source = "On"
+translation = "켜기"
+
+[messages.settings-conv-save]
+source = "Save rules"
+translation = "규칙 저장"
+
+[messages.settings-conv-saved]
+source = "Conversion rules saved. They apply to packs added from now on."
+translation = "변환 규칙을 저장했습니다. 지금부터 추가하는 팩에 적용됩니다."
+
+[messages.settings-conv-skip-beside]
+source = """
+{ $count ->
+        [one] one file whose converted copy is in its pack already
+       *[other] { $count } files whose converted copies are in their packs already
+    }"""
+translation = """
+{ $count ->
+       *[other] 변환된 사본이 이미 팩에 있는 파일 { $count }개
+    }"""
+
+[messages.settings-conv-skip-blender]
+source = """
+{ $count ->
+        [one] one file Blender hasn’t read yet (Settings → Tools)
+       *[other] { $count } files Blender hasn’t read yet (Settings → Tools)
+    }"""
+translation = """
+{ $count ->
+       *[other] Blender가 아직 읽지 않은 파일 { $count }개(설정 → 도구)
+    }"""
+
+[messages.settings-conv-skip-unity]
+source = """
+{ $count ->
+        [one] one file a Unity project knows by its name
+       *[other] { $count } files a Unity project knows by their names
+    }"""
+translation = """
+{ $count ->
+       *[other] Unity 프로젝트가 이름으로 참조하는 파일 { $count }개
+    }"""
+
+[messages.settings-conv-skip-used]
+source = """
+{ $count ->
+        [one] one file a scene or another file names
+       *[other] { $count } files a scene or another file names
+    }"""
+translation = """
+{ $count ->
+       *[other] 장면이나 다른 파일이 이름으로 참조하는 파일 { $count }개
+    }"""
+
+[messages.settings-conv-skip-watched]
+source = """
+{ $count ->
+        [one] one file in a watched folder
+       *[other] { $count } files in watched folders
+    }"""
+translation = """
+{ $count ->
+       *[other] 감시 폴더의 파일 { $count }개
+    }"""
+
+[messages.settings-conv-taken]
+source = "Another rule converts this format"
+translation = "다른 규칙이 이미 이 형식을 변환합니다"
+
+[messages.settings-conv-to]
+source = "Convert to"
+translation = "변환할 형식"
+
+[messages.settings-conv-upright]
+source = "Turn models upright as they’re converted (Y up, facing +Z), the way the pack’s models are shown"
+translation = "변환할 때 팩의 모델을 표시하는 방식대로 모델을 똑바로 세우기(Y 위쪽, +Z 방향)"
+
+[messages.settings-conv-what]
+source = "Convert files Hoard keeps to one format, such as every OBJ and FBX to GLB, so the library is all alike. The converted file takes the original’s place, with its name, tags, collections and links. Files in watched folders are never changed."
+translation = "Hoard가 보관하는 파일을 하나의 형식으로 변환해서 라이브러리를 통일합니다. 예를 들어 모든 OBJ와 FBX를 GLB로 바꿉니다. 변환된 파일은 원본을 대신하며 이름, 태그, 컬렉션, 링크를 그대로 유지합니다. 감시 폴더의 파일은 절대 바꾸지 않습니다."
 
 [messages.settings-conversion-cache]
 source = "Converted downloads"

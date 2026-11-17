@@ -224,6 +224,14 @@ error-no-soundfont = Palvelimella ei ole SoundFontia polussa { $path }
 error-workers = Taustatyöntekijät: 1–{ $max }
 error-ai-batch = Resursseja tekoälypyyntöä kohden: 1–200
 error-conversion-cache = Muunnetut lataukset: vähintään 100 Mt
+error-conversion-keep-days = Muunnossäännöt: alkuperäisiä voi säilyttää 1–{ $max } päivää
+error-conversion-target = Muunnossäännöt: Hoard ei osaa muuntaa tiedostoja muotoon { $format }
+error-conversion-no-source = Muunnossäännöt: jokaisessa säännössä on oltava vähintään yksi muunnettava muoto
+# $ext is a file extension, like obj; $format is what it would become, like glb.
+error-conversion-source = Muunnossäännöt: .{ $ext }-tiedostoja ei voi muuntaa muotoon { $format }
+error-conversion-twice = Muunnossäännöt: .{ $ext } on kahdessa säännössä
+error-conversion-cant-undo = Tätä tiedostoa ei muunnettu säännöllä, tai sen alkuperäinen on poistettu.
+error-conversion-path-taken = Polussa { $path } on nyt toinen tiedosto, joten alkuperäistä ei voi palauttaa sinne.
 error-limits-zero = Rajat eivät voi olla nolla
 error-settings-object = odotettiin asetusten JSON-objektia
 error-bad-setting = virheellinen asetus: { $reason }
@@ -354,6 +362,8 @@ server-issues-convert = Mallit, joita Blender ei voinut muuntaa
 server-issues-convert-blurb = Niillä ei ole GLB-kopiota, joten niitä ei voi näyttää 3D:nä.
 server-issues-unreal = Unreal-paketit, joita ei voitu muuntaa
 server-issues-unreal-blurb = Paketin Unreal-sivulla ovat sen muut paketit.
+server-issues-reformat = Tiedostot, joita muunnossääntö ei pystynyt muuntamaan
+server-issues-reformat-blurb = Ne on jätetty ennalleen.
 server-issues-materials = Paketit, joiden materiaaleja ei saatu selvitettyä
 server-issues-materials-blurb = Niiden tekstuurit ovat kaikki tallessa; niitä ei vain ole ryhmitelty materiaaleiksi.
 server-issues-material-thumb = Materiaalit ilman pikkukuvaa
@@ -375,6 +385,7 @@ server-job-retag = Päivitetään tunnisteita: { $pack }
 server-job-llm-tag = Lisätään tunnisteita tekoälyllä: { $pack }
 server-job-convert = Muunnetaan Blenderillä: { $pack }
 server-job-unreal = Muunnetaan Unreal-paketteja: { $pack }
+server-job-reformat = Muunnetaan tiedostoja muunnossääntöjen mukaan: { $pack }
 server-job-scan = Tarkistetaan valvottua kansiota
 server-job-relocate = Siirretään tiedostoja kirjaston sijaintien välillä
 server-job-looks = Selvitetään värejä ja ulkonäköä
@@ -1462,6 +1473,15 @@ asset-variants =
 asset-copies = Identtiset kopiot
 asset-copies-note = Samat tavut tallennetaan kerran; nämäkin paketit sisältävät tämän tiedoston.
 asset-unreal-converted = Muunnettu Unrealista
+asset-rule-converted = Muunnettu säännöllä
+# Followed by the original file's name: "A conversion rule made this GLB on 3 May 2026 from tree.obj".
+asset-rule-was = Muunnossääntö teki tämän { $format }-tiedoston { $date } tiedostosta
+asset-rule-kept-until = Alkuperäinen säilytetään { $date } asti.
+asset-rule-put-back = Palauta alkuperäinen
+asset-rule-put-back-title = Palautetaanko { $file }?
+asset-rule-put-back-body = Muunnettu tiedosto poistetaan, ja alkuperäinen palaa sen paikalle tunnisteineen, kokoelmineen ja linkkeineen. Muunnossäännöt eivät sen jälkeen enää koske siihen.
+asset-rule-put-back-done = { $file } on palautettu
+asset-rule-let-go = Alkuperäinen poistettiin, kun Asetuksissa määritetty alkuperäisten säilytysaika päättyi.
 asset-unreal-package = Unreal-paketista
 asset-ue-needs-editor-before = Odottaa Unreal Editoria: { $reason }. Aja koneella, jolle Unreal on asennettu,
 asset-ue-needs-editor-after = niin se palautuu FBX-muodossa.
@@ -2386,6 +2406,90 @@ settings-store-lookup = Hae kauppasivut automaattisesti
 settings-unreal = Unreal-paketit
 settings-unreal-reset = Unreal-paketit: palauta oletus
 settings-unreal-what = Mitä .uasset-tiedostoille tehdään.
+settings-conv = Muunnossäännöt
+settings-conv-what = Muunna Hoardin säilyttämät tiedostot yhteen muotoon, esimerkiksi kaikki OBJ- ja FBX-tiedostot GLB-muotoon, jotta kirjasto on yhtenäinen. Muunnettu tiedosto korvaa alkuperäisen ja säilyttää sen nimen, tunnisteet, kokoelmat ja linkit. Valvottujen kansioiden tiedostoja ei koskaan muuteta.
+# A checkbox that turns one conversion rule on or off.
+settings-conv-rule-on = Käytössä
+settings-conv-to = Muunna muotoon
+# Heading over the file formats a rule converts.
+settings-conv-from = Lähtömuodot
+settings-conv-remove = Poista
+settings-conv-remove-label = Poista sääntö { $n }
+settings-conv-taken = Toinen sääntö muuntaa jo tämän muodon
+settings-conv-upright = Käännä mallit pystyyn muunnettaessa (Y ylös, etupuoli kohti +Z) samalla tavalla kuin paketin mallit näytetään
+settings-conv-add = Lisää sääntö
+# Before a number of days: "Keep originals for [30] days".
+settings-conv-keep = Säilytä alkuperäiset
+settings-conv-keep-days =
+    { $count ->
+        [one] päivän
+       *[other] päivää
+    }
+settings-conv-keep-what = Siihen asti muunnetun tiedoston sivulta voi palauttaa alkuperäisen. Tekstuureja ei kopioida muunnettuun malliin: se viittaa vieressään oleviin kuvatiedostoihin. Mallin .mtl- tai .bin-tiedostot jäävät paikalleen.
+settings-conv-save = Tallenna säännöt
+settings-conv-revert = Kumoa muutokset
+settings-conv-existing = Muunna kirjastossa jo olevat tiedostot
+settings-conv-saved = Muunnossäännöt tallennettu. Niitä sovelletaan tästä lähtien lisättäviin paketteihin.
+settings-conv-converting =
+    { $count ->
+        [one] Muunnetaan yhtä tiedostoa taustalla
+       *[other] Muunnetaan { $count } tiedostoa taustalla
+    }
+settings-conv-nothing = Kirjastossa ei ole mitään muunnettavaa.
+settings-conv-ask-title =
+    { $count ->
+        [one] Muunnetaanko yksi kirjastossa jo oleva tiedosto?
+       *[other] Muunnetaanko { $count } kirjastossa jo olevaa tiedostoa?
+    }
+settings-conv-ask-body =
+    { $packs ->
+        [one] Se on yhdessä paketissa.
+       *[other] Ne ovat { $packs } paketissa.
+    } Jokainen alkuperäinen säilytetään { $days } päivää, ja siihen asti sen voi palauttaa sen sivulta.
+settings-conv-ask-busy =
+    { $count ->
+        [one] Yksi on paketissa, jota vielä lisätään; se muunnetaan, kun lisäys on valmis.
+       *[other] { $count } on paketeissa, joita vielä lisätään; ne muunnetaan, kun lisäys on valmis.
+    }
+settings-conv-ask-list = Tiedostot, jotka muunnettaisiin
+settings-conv-ask-more = …ja { $count } lisää
+settings-conv-ask-skipped = Jätetään ennalleen:
+settings-conv-skip-watched =
+    { $count ->
+        [one] yksi tiedosto valvotussa kansiossa
+       *[other] { $count } tiedostoa valvotuissa kansioissa
+    }
+settings-conv-skip-unity =
+    { $count ->
+        [one] yksi tiedosto, jonka Unity-projekti tuntee nimeltä
+       *[other] { $count } tiedostoa, jotka Unity-projekti tuntee nimeltä
+    }
+settings-conv-skip-used =
+    { $count ->
+        [one] yksi tiedosto, jonka kohtaus tai toinen tiedosto mainitsee nimeltä
+       *[other] { $count } tiedostoa, jotka kohtaus tai toinen tiedosto mainitsee nimeltä
+    }
+settings-conv-skip-beside =
+    { $count ->
+        [one] yksi tiedosto, jonka muunnettu kopio on jo sen paketissa
+       *[other] { $count } tiedostoa, joiden muunnetut kopiot ovat jo niiden paketeissa
+    }
+settings-conv-skip-blender =
+    { $count ->
+        [one] yksi tiedosto, jota Blender ei ole vielä lukenut (Asetukset → Työkalut)
+       *[other] { $count } tiedostoa, joita Blender ei ole vielä lukenut (Asetukset → Työkalut)
+    }
+settings-conv-ask-new = Tallenna, vain uudet paketit
+settings-conv-ask-save-convert =
+    { $count ->
+        [one] Tallenna ja muunna se
+       *[other] Tallenna ja muunna { $count } tiedostoa
+    }
+settings-conv-ask-convert =
+    { $count ->
+        [one] Muunna se
+       *[other] Muunna { $count } tiedostoa
+    }
 settings-unreal-off = Jätä ennalleen
 settings-unreal-off-hint = Muunna paketin sivulta, kun haluat.
 settings-unreal-keep = Muunna, säilytä alkuperäiset

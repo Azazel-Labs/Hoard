@@ -224,6 +224,14 @@ error-no-soundfont = Tidak ada SoundFont di { $path } pada server
 error-workers = Pekerja latar belakang: antara 1 dan { $max }
 error-ai-batch = Aset per permintaan AI: antara 1 dan 200
 error-conversion-cache = Unduhan hasil konversi: minimal 100 MB
+error-conversion-keep-days = Aturan konversi: simpan berkas asli selama 1 sampai { $max } hari
+error-conversion-target = Aturan konversi: Hoard tidak dapat mengonversi berkas ke { $format }
+error-conversion-no-source = Aturan konversi: setiap aturan memerlukan setidaknya satu format untuk dikonversi
+# $ext is a file extension, like obj; $format is what it would become, like glb.
+error-conversion-source = Aturan konversi: berkas .{ $ext } tidak dapat dikonversi ke { $format }
+error-conversion-twice = Aturan konversi: .{ $ext } ada di dua aturan
+error-conversion-cant-undo = Berkas ini tidak dikonversi oleh aturan, atau berkas aslinya sudah dihapus.
+error-conversion-path-taken = Sekarang ada berkas lain di { $path }, jadi berkas asli tidak dapat dikembalikan ke sana.
 error-limits-zero = Batas tidak boleh nol
 error-settings-object = seharusnya objek JSON berisi pengaturan
 error-bad-setting = pengaturan tidak valid: { $reason }
@@ -346,6 +354,8 @@ server-issues-convert = Model yang tidak dapat dikonversi Blender
 server-issues-convert-blurb = Model itu tidak punya salinan GLB, jadi tidak dapat ditampilkan dalam 3D.
 server-issues-unreal = Paket Unreal yang tidak dapat dikonversi
 server-issues-unreal-blurb = Halaman Unreal milik paket berisi paket Unreal lainnya.
+server-issues-reformat = Berkas yang tidak dapat dikonversi oleh aturan konversi
+server-issues-reformat-blurb = Berkas tersebut dibiarkan seperti semula.
 server-issues-materials = Paket yang materialnya tidak dapat dikenali
 server-issues-materials-blurb = Semua teksturnya ada; hanya saja tidak dikelompokkan menjadi material.
 server-issues-material-thumb = Material tanpa gambar mini
@@ -367,6 +377,7 @@ server-job-retag = Memberi tag ulang { $pack }
 server-job-llm-tag = Memberi tag { $pack } dengan AI
 server-job-convert = Mengonversi { $pack } dengan Blender
 server-job-unreal = Mengonversi paket Unreal di { $pack }
+server-job-reformat = Mengonversi berkas di { $pack } sesuai aturan konversi
 server-job-scan = Memindai folder pantauan
 server-job-relocate = Memindahkan berkas antarlokasi pustaka
 server-job-looks = Menentukan warna dan tampilan
@@ -1307,6 +1318,15 @@ asset-variants = Varian ({ $count } versi)
 asset-copies = Salinan identik
 asset-copies-note = Byte yang sama disimpan sekali; paket-paket ini juga menyertakan berkas ini.
 asset-unreal-converted = Dikonversi dari Unreal
+asset-rule-converted = Dikonversi oleh aturan
+# Followed by the original file's name: "A conversion rule made this GLB on 3 May 2026 from tree.obj".
+asset-rule-was = Aturan konversi membuat { $format } ini pada { $date } dari
+asset-rule-kept-until = Berkas asli disimpan sampai { $date }.
+asset-rule-put-back = Kembalikan berkas asli
+asset-rule-put-back-title = Kembalikan { $file }?
+asset-rule-put-back-body = Berkas hasil konversi dihapus dan berkas asli kembali ke tempatnya, beserta tag, koleksi, dan tautannya. Sejak itu aturan konversi tidak akan mengubahnya lagi.
+asset-rule-put-back-done = { $file } sudah dikembalikan
+asset-rule-let-go = Berkas asli dihapus setelah masa simpan berkas asli yang diatur di Pengaturan habis.
 asset-unreal-package = Dari paket Unreal
 asset-ue-needs-editor-before = Menunggu Unreal Editor: { $reason }. Di mesin yang terpasang Unreal, jalankan
 asset-ue-needs-editor-after = dan hasilnya kembali sebagai FBX.
@@ -2131,6 +2151,78 @@ settings-store-lookup = Cari halaman toko secara otomatis
 settings-unreal = Paket Unreal
 settings-unreal-reset = Paket Unreal: kembali ke bawaan
 settings-unreal-what = Apa yang dilakukan dengan berkas .uasset.
+settings-conv = Aturan konversi
+settings-conv-what = Konversi berkas yang disimpan Hoard ke satu format, misalnya semua OBJ dan FBX ke GLB, agar seluruh pustaka seragam. Berkas hasil konversi menggantikan berkas asli, dengan nama, tag, koleksi, dan tautannya. Berkas di folder pantauan tidak pernah diubah.
+# A checkbox that turns one conversion rule on or off.
+settings-conv-rule-on = Aktif
+settings-conv-to = Konversi ke
+# Heading over the file formats a rule converts.
+settings-conv-from = Dari
+settings-conv-remove = Hapus
+settings-conv-remove-label = Hapus aturan { $n }
+settings-conv-taken = Aturan lain sudah mengonversi format ini
+settings-conv-upright = Tegakkan model saat dikonversi (Y ke atas, menghadap +Z), seperti cara model paket ditampilkan
+settings-conv-add = Tambah aturan
+# Before a number of days: "Keep originals for [30] days".
+settings-conv-keep = Simpan berkas asli selama
+settings-conv-keep-days =
+    { $count ->
+       *[other] hari
+    }
+settings-conv-keep-what = Sampai saat itu, halaman berkas hasil konversi dapat mengembalikan berkas asli. Tekstur tidak disalin ke dalam model hasil konversi: model merujuk ke berkas gambar di sebelahnya. Berkas .mtl atau .bin milik model tetap ada.
+settings-conv-save = Simpan aturan
+settings-conv-revert = Urungkan perubahan
+settings-conv-existing = Konversi berkas yang sudah ada di pustaka
+settings-conv-saved = Aturan konversi disimpan. Aturan ini berlaku untuk paket yang ditambahkan mulai sekarang.
+settings-conv-converting =
+    { $count ->
+       *[other] Mengonversi { $count } berkas di latar belakang
+    }
+settings-conv-nothing = Tidak ada yang perlu dikonversi di pustaka.
+settings-conv-ask-title =
+    { $count ->
+       *[other] Konversi { $count } berkas yang sudah ada di pustaka?
+    }
+settings-conv-ask-body =
+    { $packs ->
+       *[other] Berkas tersebut ada di { $packs } paket.
+    } Setiap berkas asli disimpan selama { $days } hari, dan sampai saat itu dapat dikembalikan dari halamannya.
+settings-conv-ask-busy =
+    { $count ->
+       *[other] { $count } berkas ada di paket yang masih ditambahkan; berkas tersebut dikonversi setelah penambahannya selesai.
+    }
+settings-conv-ask-list = Berkas yang akan dikonversi
+settings-conv-ask-more = …dan { $count } lagi
+settings-conv-ask-skipped = Dibiarkan seperti semula:
+settings-conv-skip-watched =
+    { $count ->
+       *[other] { $count } berkas di folder pantauan
+    }
+settings-conv-skip-unity =
+    { $count ->
+       *[other] { $count } berkas yang dikenal proyek Unity dari namanya
+    }
+settings-conv-skip-used =
+    { $count ->
+       *[other] { $count } berkas yang disebut namanya oleh adegan atau berkas lain
+    }
+settings-conv-skip-beside =
+    { $count ->
+       *[other] { $count } berkas yang salinan hasil konversinya sudah ada di paketnya
+    }
+settings-conv-skip-blender =
+    { $count ->
+       *[other] { $count } berkas yang belum dibaca Blender (Pengaturan → Alat)
+    }
+settings-conv-ask-new = Simpan, hanya paket baru
+settings-conv-ask-save-convert =
+    { $count ->
+       *[other] Simpan dan konversi { $count } berkas
+    }
+settings-conv-ask-convert =
+    { $count ->
+       *[other] Konversi { $count } berkas
+    }
 settings-unreal-off = Biarkan apa adanya
 settings-unreal-off-hint = Konversi dari halaman paket kapan pun Anda mau.
 settings-unreal-keep = Konversi, simpan aslinya

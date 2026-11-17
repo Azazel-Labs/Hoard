@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "42480b75a5b6ffe5e9a5e23b3bad0c8e5f5a1104f51660808e921f9a7cdc8e09"
+source = "9528abfcd928f040f086a2f54bd71118058471d032fdd351f2a4f0e86b8dfb1f"
 translation = "1a4df50b438ca81d05a8082fa6c6f1912acf6742fdc06a0acf388c1b5773abb6"
 
 [messages.account-add]
@@ -2182,6 +2182,38 @@ translation = "Nhấp để đổi tên"
 source = "{ $role } map"
 translation = "map { $role }"
 
+[messages.asset-rule-converted]
+source = "Converted by a rule"
+translation = "Đã chuyển đổi bởi quy tắc"
+
+[messages.asset-rule-kept-until]
+source = "The original is kept until { $date }."
+translation = "Tệp gốc được giữ đến { $date }."
+
+[messages.asset-rule-let-go]
+source = "The original was deleted once the time Settings keeps originals was up."
+translation = "Tệp gốc đã bị xóa khi hết thời gian giữ tệp gốc trong Cài đặt."
+
+[messages.asset-rule-put-back]
+source = "Put the original back"
+translation = "Đưa tệp gốc trở lại"
+
+[messages.asset-rule-put-back-body]
+source = "The converted file is deleted and the original takes its place, with its tags, collections and links. The conversion rules leave it alone from then on."
+translation = "Tệp đã chuyển đổi bị xóa và tệp gốc thế chỗ, kèm theo thẻ, bộ sưu tập và liên kết của nó. Từ đó trở đi, các quy tắc chuyển đổi không động đến nó nữa."
+
+[messages.asset-rule-put-back-done]
+source = "{ $file } is back"
+translation = "Đã đưa { $file } trở lại"
+
+[messages.asset-rule-put-back-title]
+source = "Put back { $file }?"
+translation = "Đưa { $file } trở lại?"
+
+[messages.asset-rule-was]
+source = "A conversion rule made this { $format } on { $date } from"
+translation = "Một quy tắc chuyển đổi đã tạo tệp { $format } này vào { $date } từ"
+
 [messages.asset-save]
 source = "Save"
 translation = "Lưu"
@@ -3136,9 +3168,37 @@ translation = "không tìm thấy kết nối"
 source = "Converted downloads: at least 100 MB"
 translation = "Bản tải xuống đã chuyển đổi: ít nhất 100 MB"
 
+[messages.error-conversion-cant-undo]
+source = "This file wasn’t converted by a rule, or its original has been deleted."
+translation = "Tệp này không được chuyển đổi bởi quy tắc, hoặc tệp gốc của nó đã bị xóa."
+
 [messages.error-conversion-failed]
 source = "couldn't convert to { $format }: { $reason }"
 translation = "không thể chuyển đổi sang { $format }: { $reason }"
+
+[messages.error-conversion-keep-days]
+source = "Conversion rules: keep originals for 1 to { $max } days"
+translation = "Quy tắc chuyển đổi: giữ tệp gốc từ 1 đến { $max } ngày"
+
+[messages.error-conversion-no-source]
+source = "Conversion rules: each rule needs at least one format to convert"
+translation = "Quy tắc chuyển đổi: mỗi quy tắc cần ít nhất một định dạng để chuyển đổi"
+
+[messages.error-conversion-path-taken]
+source = "Another file is at { $path } now, so the original can’t go back there."
+translation = "Hiện đã có tệp khác ở { $path }, nên không thể đưa tệp gốc về lại đó."
+
+[messages.error-conversion-source]
+source = "Conversion rules: .{ $ext } files can’t be converted to { $format }"
+translation = "Quy tắc chuyển đổi: không thể chuyển đổi tệp .{ $ext } sang { $format }"
+
+[messages.error-conversion-target]
+source = "Conversion rules: Hoard can’t convert files to { $format }"
+translation = "Quy tắc chuyển đổi: Hoard không thể chuyển đổi tệp sang { $format }"
+
+[messages.error-conversion-twice]
+source = "Conversion rules: .{ $ext } is in two rules"
+translation = "Quy tắc chuyển đổi: .{ $ext } nằm trong hai quy tắc"
 
 [messages.error-credits-collection]
 source = "collection { $key }"
@@ -7419,6 +7479,14 @@ translation = "Chúng có trong thư viện, nhưng không có thông tin, thẻ
 source = "Re-analyze pack"
 translation = "Phân tích lại gói"
 
+[messages.server-issues-reformat]
+source = "Files a conversion rule couldn’t convert"
+translation = "Tệp mà quy tắc chuyển đổi không thể chuyển đổi"
+
+[messages.server-issues-reformat-blurb]
+source = "They’re left as they were."
+translation = "Chúng được giữ nguyên như cũ."
+
 [messages.server-issues-render]
 source = "Models the thumbnail renderer failed on"
 translation = "Mô hình mà trình kết xuất ảnh thu nhỏ gặp lỗi"
@@ -7490,6 +7558,10 @@ translation = "Đang tìm vật liệu trong { $pack }"
 [messages.server-job-read-files]
 source = "Reading the files of { $pack }"
 translation = "Đang đọc các tệp của { $pack }"
+
+[messages.server-job-reformat]
+source = "Converting files in { $pack } by the conversion rules"
+translation = "Đang chuyển đổi tệp trong { $pack } theo quy tắc chuyển đổi"
 
 [messages.server-job-relocate]
 source = "Moving files between library locations"
@@ -7984,6 +8056,222 @@ translation = "Không lấy được mô hình: { $detail }. Sẽ thử lại m�
 [messages.settings-clip-what]
 source = "Type what you’re after (“mossy rock”, “sci-fi door”, “wooden barrel”) and pictures that show it turn up beside names that have the words. “More like this” finds things of the same kind, not only the same colors."
 translation = "Nhập thứ bạn đang tìm (“mossy rock”, “sci-fi door”, “wooden barrel”) và những ảnh thể hiện nó sẽ hiện ra cạnh những tên có các từ đó. “Thêm nữa giống thế này” tìm những thứ cùng loại, không chỉ cùng màu."
+
+[messages.settings-conv]
+source = "Conversion rules"
+translation = "Quy tắc chuyển đổi"
+
+[messages.settings-conv-add]
+source = "Add a rule"
+translation = "Thêm quy tắc"
+
+[messages.settings-conv-ask-body]
+source = """
+{ $packs ->
+        [one] It’s in one pack.
+       *[other] They’re in { $packs } packs.
+    } Each original is kept for { $days } days, and until then it can be put back from its page."""
+translation = """
+{ $packs ->
+       *[other] Chúng nằm trong { $packs } gói.
+    } Mỗi tệp gốc được giữ { $days } ngày, và cho đến lúc đó có thể đưa trở lại từ trang của nó."""
+
+[messages.settings-conv-ask-busy]
+source = """
+{ $count ->
+        [one] One is in a pack still being added; it’s converted once that’s done.
+       *[other] { $count } are in packs still being added; they’re converted once that’s done.
+    }"""
+translation = """
+{ $count ->
+       *[other] { $count } tệp nằm trong các gói vẫn đang được thêm; chúng sẽ được chuyển đổi khi việc đó xong.
+    }"""
+
+[messages.settings-conv-ask-convert]
+source = """
+{ $count ->
+        [one] Convert it
+       *[other] Convert { $count } files
+    }"""
+translation = """
+{ $count ->
+       *[other] Chuyển đổi { $count } tệp
+    }"""
+
+[messages.settings-conv-ask-list]
+source = "Files that would be converted"
+translation = "Các tệp sẽ được chuyển đổi"
+
+[messages.settings-conv-ask-more]
+source = "…and { $count } more"
+translation = "…và { $count } tệp khác"
+
+[messages.settings-conv-ask-new]
+source = "Save, only new packs"
+translation = "Lưu, chỉ gói mới"
+
+[messages.settings-conv-ask-save-convert]
+source = """
+{ $count ->
+        [one] Save and convert it
+       *[other] Save and convert { $count } files
+    }"""
+translation = """
+{ $count ->
+       *[other] Lưu và chuyển đổi { $count } tệp
+    }"""
+
+[messages.settings-conv-ask-skipped]
+source = "Left as they are:"
+translation = "Giữ nguyên:"
+
+[messages.settings-conv-ask-title]
+source = """
+{ $count ->
+        [one] Convert one file already in the library?
+       *[other] Convert { $count } files already in the library?
+    }"""
+translation = """
+{ $count ->
+       *[other] Chuyển đổi { $count } tệp đã có trong thư viện?
+    }"""
+
+[messages.settings-conv-converting]
+source = """
+{ $count ->
+        [one] Converting one file in the background
+       *[other] Converting { $count } files in the background
+    }"""
+translation = """
+{ $count ->
+       *[other] Đang chuyển đổi { $count } tệp trong nền
+    }"""
+
+[messages.settings-conv-existing]
+source = "Convert files already in the library"
+translation = "Chuyển đổi các tệp đã có trong thư viện"
+
+[messages.settings-conv-from]
+source = "From"
+translation = "Từ"
+
+[messages.settings-conv-keep]
+source = "Keep originals for"
+translation = "Giữ tệp gốc trong"
+
+[messages.settings-conv-keep-days]
+source = """
+{ $count ->
+        [one] day
+       *[other] days
+    }"""
+translation = """
+{ $count ->
+       *[other] ngày
+    }"""
+
+[messages.settings-conv-keep-what]
+source = "Until then, a converted file’s page can put the original back. Textures aren’t copied into a converted model: it points at the image files beside it. A model’s .mtl or .bin files stay."
+translation = "Cho đến lúc đó, trang của tệp đã chuyển đổi có thể đưa tệp gốc trở lại. Texture không được sao chép vào mô hình đã chuyển đổi: mô hình trỏ tới các tệp ảnh nằm cạnh nó. Các tệp .mtl hoặc .bin của mô hình vẫn được giữ lại."
+
+[messages.settings-conv-nothing]
+source = "Nothing in the library needs converting."
+translation = "Không có gì trong thư viện cần chuyển đổi."
+
+[messages.settings-conv-remove]
+source = "Remove"
+translation = "Gỡ"
+
+[messages.settings-conv-remove-label]
+source = "Remove rule { $n }"
+translation = "Gỡ quy tắc { $n }"
+
+[messages.settings-conv-revert]
+source = "Undo changes"
+translation = "Hoàn tác thay đổi"
+
+[messages.settings-conv-rule-on]
+source = "On"
+translation = "Bật"
+
+[messages.settings-conv-save]
+source = "Save rules"
+translation = "Lưu quy tắc"
+
+[messages.settings-conv-saved]
+source = "Conversion rules saved. They apply to packs added from now on."
+translation = "Đã lưu quy tắc chuyển đổi. Chúng áp dụng cho các gói được thêm từ bây giờ."
+
+[messages.settings-conv-skip-beside]
+source = """
+{ $count ->
+        [one] one file whose converted copy is in its pack already
+       *[other] { $count } files whose converted copies are in their packs already
+    }"""
+translation = """
+{ $count ->
+       *[other] { $count } tệp có bản đã chuyển đổi nằm sẵn trong gói của nó
+    }"""
+
+[messages.settings-conv-skip-blender]
+source = """
+{ $count ->
+        [one] one file Blender hasn’t read yet (Settings → Tools)
+       *[other] { $count } files Blender hasn’t read yet (Settings → Tools)
+    }"""
+translation = """
+{ $count ->
+       *[other] { $count } tệp Blender chưa đọc (Cài đặt → Công cụ)
+    }"""
+
+[messages.settings-conv-skip-unity]
+source = """
+{ $count ->
+        [one] one file a Unity project knows by its name
+       *[other] { $count } files a Unity project knows by their names
+    }"""
+translation = """
+{ $count ->
+       *[other] { $count } tệp mà một dự án Unity biết theo tên
+    }"""
+
+[messages.settings-conv-skip-used]
+source = """
+{ $count ->
+        [one] one file a scene or another file names
+       *[other] { $count } files a scene or another file names
+    }"""
+translation = """
+{ $count ->
+       *[other] { $count } tệp được một cảnh hoặc tệp khác nhắc đến theo tên
+    }"""
+
+[messages.settings-conv-skip-watched]
+source = """
+{ $count ->
+        [one] one file in a watched folder
+       *[other] { $count } files in watched folders
+    }"""
+translation = """
+{ $count ->
+       *[other] { $count } tệp trong thư mục theo dõi
+    }"""
+
+[messages.settings-conv-taken]
+source = "Another rule converts this format"
+translation = "Một quy tắc khác đã chuyển đổi định dạng này"
+
+[messages.settings-conv-to]
+source = "Convert to"
+translation = "Chuyển đổi sang"
+
+[messages.settings-conv-upright]
+source = "Turn models upright as they’re converted (Y up, facing +Z), the way the pack’s models are shown"
+translation = "Dựng thẳng mô hình khi chuyển đổi (Y hướng lên, quay về +Z), theo cách các mô hình của gói được hiển thị"
+
+[messages.settings-conv-what]
+source = "Convert files Hoard keeps to one format, such as every OBJ and FBX to GLB, so the library is all alike. The converted file takes the original’s place, with its name, tags, collections and links. Files in watched folders are never changed."
+translation = "Chuyển đổi các tệp Hoard lưu giữ sang một định dạng, chẳng hạn mọi tệp OBJ và FBX sang GLB, để cả thư viện đồng nhất. Tệp đã chuyển đổi thế chỗ tệp gốc, giữ nguyên tên, thẻ, bộ sưu tập và liên kết của nó. Tệp trong thư mục theo dõi không bao giờ bị thay đổi."
 
 [messages.settings-conversion-cache]
 source = "Converted downloads"

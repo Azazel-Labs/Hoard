@@ -147,10 +147,36 @@ export interface AssetOrigin {
   class: string | null
   engine: string | null
   dependencies: string[]
-  /** `native` (Hoard's reader) or `editor` (Unreal Editor export). */
+  /** `native` (Hoard's reader), `editor` (Unreal Editor export) or `rule` (a conversion rule). */
   method: string
   notes: string | null
   converted_at: string
+  /** A conversion rule's original: when it's deleted, until which the file can be put back. */
+  kept_until?: string
+}
+
+/** Files of the formats in `from` are converted to `to` (Settings → Adding packs → Conversion rules). */
+export interface ConversionRule {
+  on: boolean
+  from: string[]
+  to: string
+  /** Turned as they're written to stand Y up and face +Z, the way their pack's models are shown. */
+  upright: boolean
+}
+export interface ConversionRules { rules: ConversionRule[]; keep_days: number }
+
+/** What saving some conversion rules would do to files already in the library. */
+export interface ConversionPreview {
+  files: number
+  packs: number
+  /** Files each rule would convert, by the rule's index. */
+  by_rule: number[]
+  /** Of `files`, those in packs still being added, converted once they're done. */
+  busy: number
+  /** Files a rule matches but leaves as they are, by why. */
+  skipped: Partial<Record<'watched' | 'unity' | 'used' | 'beside' | 'blender', number>>
+  /** The first files, by pack and path, and what each becomes. */
+  sample: { id: string; pack_id: string; pack: string; path: string; to: string }[]
 }
 
 export interface UnrealStatus { status: 'needs_editor' | 'unsupported' | 'failed'; class: string | null; reason: string }
@@ -799,6 +825,7 @@ export interface Settings {
   update_hook: { url: string; has_auth: boolean }
   /** How texture maps are named in downloads, zips and manifests. `maps` has every role's suffix. */
   texture_names: TextureNames & { default: TextureNames; saved: boolean }
+  conversion_rules: ConversionRules & { default_keep_days: number; targets: { to: string; from: string[] }[] }
 }
 
 /** A store file format: built in, or one of the data folder's (`custom`), which can be changed or removed. */
@@ -903,6 +930,7 @@ export interface SettingsPatch {
   soundfont?: string | null
   clip?: boolean | null
   texture_names?: TextureNames | null
+  conversion_rules?: ConversionRules | null
 }
 
 export interface SearchParams {
@@ -1114,6 +1142,16 @@ export const api = {
   updateStatus: () => request<UpdateStatus>('/api/admin/update'),
   /** Call the update address now, to see that it's wired up. */
   callUpdateHook: () => request<UpdateHookCall>('/api/admin/update/hook', { method: 'POST' }),
+  previewConversions: (rules: ConversionRules) =>
+    request<ConversionPreview>('/api/admin/conversions/preview', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ rules }),
+    }),
+  /** Convert the files already in the library that the saved rules match; returns how many packs were queued. */
+  runConversions: () => request<{ packs: number }>('/api/admin/conversions/run', { method: 'POST' }),
+  /** Put back the file a conversion rule replaced. */
+  unconvert: (id: string) => request<{ pack_id: string }>(`/api/assets/${id}/unconvert`, { method: 'POST' }),
   saveSettings: (patch: SettingsPatch) =>
     request<Settings>('/api/admin/settings', {
       method: 'PUT',

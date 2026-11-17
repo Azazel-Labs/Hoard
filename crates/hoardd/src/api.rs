@@ -78,6 +78,9 @@ pub(crate) fn router(state: &AppState) -> Router<AppState> {
         .route("/api/admin/issues/retry", post(crate::issues::retry))
         .route("/api/admin/issues/dismiss", post(crate::issues::dismiss))
         .route("/api/admin/settings", get(get_settings).put(put_settings))
+        .route("/api/admin/conversions/preview", post(conversions_preview))
+        .route("/api/admin/conversions/run", post(conversions_run))
+        .route("/api/assets/{id}/unconvert", post(unconvert_asset))
         .route("/api/admin/update", get(crate::updates::status_handler))
         .route("/api/admin/update/hook", post(crate::updates::call_handler))
         .route("/api/admin/locations", get(locations::list_locations).post(locations::create_location))
@@ -722,10 +725,13 @@ async fn search_assets(
 
 async fn get_asset(State(state): State<AppState>, Path(id): Path<String>) -> ApiResult<Json<Asset>> {
     let id2 = id.clone();
-    db::call(&state.pool, move |c| db::get_asset(c, &id2))
+    let mut asset = db::call(&state.pool, move |c| db::get_asset(c, &id2))
         .await?
-        .map(Json)
-        .ok_or_else(|| AppError::not_found(tr!("error-asset-not-found", id = id)))
+        .ok_or_else(|| AppError::not_found(tr!("error-asset-not-found", id = id)))?;
+    if let Some(o) = &mut asset.origin {
+        o.kept_until = crate::reformat::kept_until(o, state.settings.get().conversion_rules.keep_days);
+    }
+    Ok(Json(asset))
 }
 
 async fn patch_asset(
@@ -1981,6 +1987,39 @@ async fn asset_original(
         .await
 }
 
+#[derive(Deserialize)]
+struct PreviewBody {
+    rules: crate::reformat::Rules,
+}
+
+/// What a change to the conversion rules would do to files already in the library, before it's saved.
+async fn conversions_preview(State(state): State<AppState>, Json(body): Json<PreviewBody>) -> ApiResult<Json<Value>> {
+    body.rules.check().map_err(AppError::bad_request)?;
+    Ok(Json(db::call(&state.pool, move |c| crate::reformat::preview(c, &body.rules)).await?))
+}
+
+/// Convert the files already in the library that the saved rules match.
+async fn conversions_run(State(state): State<AppState>) -> ApiResult<Json<Value>> {
+    let st = std::sync::Arc::clone(&state);
+    let packs = db::call(&state.pool, move |c| crate::reformat::run_existing(&st, c)).await?;
+    Ok(Json(json!({ "packs": packs })))
+}
+
+/// Put back the file a conversion rule replaced, while its original is kept.
+async fn unconvert_asset(State(state): State<AppState>, Path(id): Path<String>) -> ApiResult<Json<Value>> {
+    let pack = db::call(&state.pool, move |c| {
+        Ok(match crate::reformat::put_back(c, &id) {
+            Ok(p) => Ok(p),
+            Err(Ok(msg)) => Err(msg),
+            Err(Err(e)) => return Err(e),
+        })
+    })
+    .await?
+    .map_err(AppError::bad_request)?;
+    state.wake.notify_one();
+    Ok(Json(json!({ "pack_id": pack })))
+}
+
 // ---------------------------------------------------------------------------------------------
 // Admin
 
@@ -2191,6 +2230,15 @@ fn settings_json_sync(state: &AppState) -> Value {
             "endings": now.texture_names.endings,
             "default": crate::naming::defaults(),
             "saved": saved.texture_names.is_some(),
+        },
+        // Files converted in place, and the formats each target can be made from.
+        "conversion_rules": {
+            "rules": now.conversion_rules.rules,
+            "keep_days": now.conversion_rules.keep_days,
+            "default_keep_days": crate::reformat::DEFAULT_KEEP_DAYS,
+            "targets": crate::reformat::TARGETS.iter()
+                .map(|t| json!({ "to": t, "from": crate::reformat::sources(t) }))
+                .collect::<Vec<_>>(),
         },
     })
 }

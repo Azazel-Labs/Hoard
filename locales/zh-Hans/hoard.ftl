@@ -224,6 +224,14 @@ error-no-soundfont = 服务器上的 { $path } 处没有 SoundFont
 error-workers = 后台工作线程：1 到 { $max } 之间
 error-ai-batch = 每次 AI 请求的资源数：1 到 200 之间
 error-conversion-cache = 转换后的下载：至少 100 MB
+error-conversion-keep-days = 转换规则：原始文件保留 1 到 { $max } 天
+error-conversion-target = 转换规则：Hoard 无法将文件转换为 { $format }
+error-conversion-no-source = 转换规则：每条规则至少需要一种要转换的格式
+# $ext is a file extension, like obj; $format is what it would become, like glb.
+error-conversion-source = 转换规则：.{ $ext } 文件无法转换为 { $format }
+error-conversion-twice = 转换规则：.{ $ext } 出现在两条规则中
+error-conversion-cant-undo = 此文件不是由规则转换的，或者其原始文件已被删除。
+error-conversion-path-taken = { $path } 处现在有另一个文件，因此原始文件无法放回原处。
 error-limits-zero = 限制不能为零
 error-settings-object = 设置应为 JSON 对象
 error-bad-setting = 设置有误：{ $reason }
@@ -346,6 +354,8 @@ server-issues-convert = Blender 无法转换的模型
 server-issues-convert-blurb = 它们没有 GLB 副本，因此无法以 3D 显示。
 server-issues-unreal = 无法转换的 Unreal 包
 server-issues-unreal-blurb = 资源包的 Unreal 页面中有其余的包。
+server-issues-reformat = 转换规则无法转换的文件
+server-issues-reformat-blurb = 它们保持原样。
 server-issues-materials = 无法识别材质的资源包
 server-issues-materials-blurb = 它们的纹理都在，只是没有归入材质。
 server-issues-material-thumb = 没有缩略图的材质
@@ -367,6 +377,7 @@ server-job-retag = 正在重新为 { $pack } 打标签
 server-job-llm-tag = 正在用 AI 为 { $pack } 打标签
 server-job-convert = 正在用 Blender 转换 { $pack }
 server-job-unreal = 正在转换 { $pack } 中的 Unreal 包
+server-job-reformat = 正在按转换规则转换 { $pack } 中的文件
 server-job-scan = 正在扫描监视文件夹
 server-job-relocate = 正在资源库位置之间移动文件
 server-job-looks = 正在分析颜色和外观
@@ -1303,6 +1314,15 @@ asset-variants = 变体（{ $count } 个版本）
 asset-copies = 完全相同的副本
 asset-copies-note = 相同的字节只存储一次；这些资源包中也包含此文件。
 asset-unreal-converted = 从 Unreal 转换
+asset-rule-converted = 由规则转换
+# Followed by the original file's name: "A conversion rule made this GLB on 3 May 2026 from tree.obj".
+asset-rule-was = 转换规则于 { $date } 生成了此 { $format }，来源：
+asset-rule-kept-until = 原始文件保留至 { $date }。
+asset-rule-put-back = 恢复原始文件
+asset-rule-put-back-title = 恢复 { $file }？
+asset-rule-put-back-body = 转换后的文件会被删除，原始文件连同其标签、合集和链接回到原位。此后转换规则不会再处理它。
+asset-rule-put-back-done = 已恢复 { $file }
+asset-rule-let-go = 原始文件已在“设置”中设定的保留期限到期后删除。
 asset-unreal-package = 来自 Unreal 包
 asset-ue-needs-editor-before = 等待 Unreal Editor：{ $reason }。请在安装了 Unreal 的机器上运行
 asset-ue-needs-editor-after = ，它会以 FBX 格式返回。
@@ -2127,6 +2147,78 @@ settings-store-lookup = 自动查找商店页面
 settings-unreal = Unreal 包
 settings-unreal-reset = Unreal 包：恢复默认值
 settings-unreal-what = 如何处理 .uasset 文件。
+settings-conv = 转换规则
+settings-conv-what = 将 Hoard 保存的文件转换为同一种格式，例如把所有 OBJ 和 FBX 转为 GLB，使整个资源库格式统一。转换后的文件会取代原始文件，并保留其名称、标签、合集和链接。监视文件夹中的文件永远不会被更改。
+# A checkbox that turns one conversion rule on or off.
+settings-conv-rule-on = 启用
+settings-conv-to = 转换为
+# Heading over the file formats a rule converts.
+settings-conv-from = 源格式
+settings-conv-remove = 移除
+settings-conv-remove-label = 移除规则 { $n }
+settings-conv-taken = 另一条规则已在转换此格式
+settings-conv-upright = 转换时将模型摆正（Y 轴朝上，面向 +Z），与资源包中模型的显示方式一致
+settings-conv-add = 添加规则
+# Before a number of days: "Keep originals for [30] days".
+settings-conv-keep = 原始文件保留
+settings-conv-keep-days =
+    { $count ->
+       *[other] 天
+    }
+settings-conv-keep-what = 在此之前，可在转换后文件的页面上恢复原始文件。纹理不会复制到转换后的模型中：模型引用其旁边的图像文件。模型的 .mtl 或 .bin 文件会保留。
+settings-conv-save = 保存规则
+settings-conv-revert = 撤销更改
+settings-conv-existing = 转换资源库中已有的文件
+settings-conv-saved = 转换规则已保存。它们将应用于此后添加的资源包。
+settings-conv-converting =
+    { $count ->
+       *[other] 正在后台转换 { $count } 个文件
+    }
+settings-conv-nothing = 资源库中没有需要转换的文件。
+settings-conv-ask-title =
+    { $count ->
+       *[other] 要转换资源库中已有的 { $count } 个文件吗？
+    }
+settings-conv-ask-body =
+    { $packs ->
+       *[other] 它们位于 { $packs } 个资源包中。
+    }每个原始文件保留 { $days } 天，在此期间可从其页面恢复。
+settings-conv-ask-busy =
+    { $count ->
+       *[other] 其中 { $count } 个位于仍在添加中的资源包里，添加完成后即会转换。
+    }
+settings-conv-ask-list = 将要转换的文件
+settings-conv-ask-more = ……以及另外 { $count } 个
+settings-conv-ask-skipped = 保持原样：
+settings-conv-skip-watched =
+    { $count ->
+       *[other] 监视文件夹中的 { $count } 个文件
+    }
+settings-conv-skip-unity =
+    { $count ->
+       *[other] Unity 项目按名称引用的 { $count } 个文件
+    }
+settings-conv-skip-used =
+    { $count ->
+       *[other] 被场景或其他文件按名称引用的 { $count } 个文件
+    }
+settings-conv-skip-beside =
+    { $count ->
+       *[other] 转换后的副本已在其资源包中的 { $count } 个文件
+    }
+settings-conv-skip-blender =
+    { $count ->
+       *[other] Blender 尚未读取的 { $count } 个文件（设置 → 工具）
+    }
+settings-conv-ask-new = 保存，仅用于新资源包
+settings-conv-ask-save-convert =
+    { $count ->
+       *[other] 保存并转换 { $count } 个文件
+    }
+settings-conv-ask-convert =
+    { $count ->
+       *[other] 转换 { $count } 个文件
+    }
 settings-unreal-off = 保持原样
 settings-unreal-off-hint = 需要时可在资源包页面中转换。
 settings-unreal-keep = 转换并保留原始文件

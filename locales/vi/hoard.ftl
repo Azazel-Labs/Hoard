@@ -224,6 +224,14 @@ error-no-soundfont = Không có SoundFont tại { $path } trên máy chủ
 error-workers = Tiến trình nền: từ 1 đến { $max }
 error-ai-batch = Số tài nguyên mỗi yêu cầu AI: từ 1 đến 200
 error-conversion-cache = Bản tải xuống đã chuyển đổi: ít nhất 100 MB
+error-conversion-keep-days = Quy tắc chuyển đổi: giữ tệp gốc từ 1 đến { $max } ngày
+error-conversion-target = Quy tắc chuyển đổi: Hoard không thể chuyển đổi tệp sang { $format }
+error-conversion-no-source = Quy tắc chuyển đổi: mỗi quy tắc cần ít nhất một định dạng để chuyển đổi
+# $ext is a file extension, like obj; $format is what it would become, like glb.
+error-conversion-source = Quy tắc chuyển đổi: không thể chuyển đổi tệp .{ $ext } sang { $format }
+error-conversion-twice = Quy tắc chuyển đổi: .{ $ext } nằm trong hai quy tắc
+error-conversion-cant-undo = Tệp này không được chuyển đổi bởi quy tắc, hoặc tệp gốc của nó đã bị xóa.
+error-conversion-path-taken = Hiện đã có tệp khác ở { $path }, nên không thể đưa tệp gốc về lại đó.
 error-limits-zero = Giới hạn không được bằng 0
 error-settings-object = cần một đối tượng JSON chứa các cài đặt
 error-bad-setting = cài đặt không hợp lệ: { $reason }
@@ -346,6 +354,8 @@ server-issues-convert = Mô hình Blender không thể chuyển đổi
 server-issues-convert-blurb = Chúng không có bản sao GLB, nên không thể hiển thị ở dạng 3D.
 server-issues-unreal = Gói Unreal không thể chuyển đổi
 server-issues-unreal-blurb = Trang Unreal của gói có các package còn lại của nó.
+server-issues-reformat = Tệp mà quy tắc chuyển đổi không thể chuyển đổi
+server-issues-reformat-blurb = Chúng được giữ nguyên như cũ.
 server-issues-materials = Gói không xác định được vật liệu
 server-issues-materials-blurb = Các texture của chúng vẫn đầy đủ; chỉ là chưa được nhóm thành vật liệu.
 server-issues-material-thumb = Vật liệu không có ảnh thu nhỏ
@@ -367,6 +377,7 @@ server-job-retag = Đang gắn thẻ lại { $pack }
 server-job-llm-tag = Đang gắn thẻ { $pack } bằng AI
 server-job-convert = Đang chuyển đổi { $pack } bằng Blender
 server-job-unreal = Đang chuyển đổi các package Unreal trong { $pack }
+server-job-reformat = Đang chuyển đổi tệp trong { $pack } theo quy tắc chuyển đổi
 server-job-scan = Đang quét một thư mục theo dõi
 server-job-relocate = Đang chuyển tệp giữa các vị trí thư viện
 server-job-looks = Đang xác định màu sắc và diện mạo
@@ -1303,6 +1314,15 @@ asset-variants = Biến thể ({ $count } phiên bản)
 asset-copies = Bản sao giống hệt
 asset-copies-note = Cùng một nội dung chỉ được lưu một lần; các gói này cũng có tệp này.
 asset-unreal-converted = Đã chuyển đổi từ Unreal
+asset-rule-converted = Đã chuyển đổi bởi quy tắc
+# Followed by the original file's name: "A conversion rule made this GLB on 3 May 2026 from tree.obj".
+asset-rule-was = Một quy tắc chuyển đổi đã tạo tệp { $format } này vào { $date } từ
+asset-rule-kept-until = Tệp gốc được giữ đến { $date }.
+asset-rule-put-back = Đưa tệp gốc trở lại
+asset-rule-put-back-title = Đưa { $file } trở lại?
+asset-rule-put-back-body = Tệp đã chuyển đổi bị xóa và tệp gốc thế chỗ, kèm theo thẻ, bộ sưu tập và liên kết của nó. Từ đó trở đi, các quy tắc chuyển đổi không động đến nó nữa.
+asset-rule-put-back-done = Đã đưa { $file } trở lại
+asset-rule-let-go = Tệp gốc đã bị xóa khi hết thời gian giữ tệp gốc trong Cài đặt.
 asset-unreal-package = Từ package Unreal
 asset-ue-needs-editor-before = Đang chờ Unreal Editor: { $reason }. Trên một máy có cài Unreal, hãy chạy
 asset-ue-needs-editor-after = và nó sẽ trở lại dưới dạng FBX.
@@ -2127,6 +2147,78 @@ settings-store-lookup = Tự động tra cứu trang cửa hàng
 settings-unreal = Package Unreal
 settings-unreal-reset = Package Unreal: về mặc định
 settings-unreal-what = Làm gì với tệp .uasset.
+settings-conv = Quy tắc chuyển đổi
+settings-conv-what = Chuyển đổi các tệp Hoard lưu giữ sang một định dạng, chẳng hạn mọi tệp OBJ và FBX sang GLB, để cả thư viện đồng nhất. Tệp đã chuyển đổi thế chỗ tệp gốc, giữ nguyên tên, thẻ, bộ sưu tập và liên kết của nó. Tệp trong thư mục theo dõi không bao giờ bị thay đổi.
+# A checkbox that turns one conversion rule on or off.
+settings-conv-rule-on = Bật
+settings-conv-to = Chuyển đổi sang
+# Heading over the file formats a rule converts.
+settings-conv-from = Từ
+settings-conv-remove = Gỡ
+settings-conv-remove-label = Gỡ quy tắc { $n }
+settings-conv-taken = Một quy tắc khác đã chuyển đổi định dạng này
+settings-conv-upright = Dựng thẳng mô hình khi chuyển đổi (Y hướng lên, quay về +Z), theo cách các mô hình của gói được hiển thị
+settings-conv-add = Thêm quy tắc
+# Before a number of days: "Keep originals for [30] days".
+settings-conv-keep = Giữ tệp gốc trong
+settings-conv-keep-days =
+    { $count ->
+       *[other] ngày
+    }
+settings-conv-keep-what = Cho đến lúc đó, trang của tệp đã chuyển đổi có thể đưa tệp gốc trở lại. Texture không được sao chép vào mô hình đã chuyển đổi: mô hình trỏ tới các tệp ảnh nằm cạnh nó. Các tệp .mtl hoặc .bin của mô hình vẫn được giữ lại.
+settings-conv-save = Lưu quy tắc
+settings-conv-revert = Hoàn tác thay đổi
+settings-conv-existing = Chuyển đổi các tệp đã có trong thư viện
+settings-conv-saved = Đã lưu quy tắc chuyển đổi. Chúng áp dụng cho các gói được thêm từ bây giờ.
+settings-conv-converting =
+    { $count ->
+       *[other] Đang chuyển đổi { $count } tệp trong nền
+    }
+settings-conv-nothing = Không có gì trong thư viện cần chuyển đổi.
+settings-conv-ask-title =
+    { $count ->
+       *[other] Chuyển đổi { $count } tệp đã có trong thư viện?
+    }
+settings-conv-ask-body =
+    { $packs ->
+       *[other] Chúng nằm trong { $packs } gói.
+    } Mỗi tệp gốc được giữ { $days } ngày, và cho đến lúc đó có thể đưa trở lại từ trang của nó.
+settings-conv-ask-busy =
+    { $count ->
+       *[other] { $count } tệp nằm trong các gói vẫn đang được thêm; chúng sẽ được chuyển đổi khi việc đó xong.
+    }
+settings-conv-ask-list = Các tệp sẽ được chuyển đổi
+settings-conv-ask-more = …và { $count } tệp khác
+settings-conv-ask-skipped = Giữ nguyên:
+settings-conv-skip-watched =
+    { $count ->
+       *[other] { $count } tệp trong thư mục theo dõi
+    }
+settings-conv-skip-unity =
+    { $count ->
+       *[other] { $count } tệp mà một dự án Unity biết theo tên
+    }
+settings-conv-skip-used =
+    { $count ->
+       *[other] { $count } tệp được một cảnh hoặc tệp khác nhắc đến theo tên
+    }
+settings-conv-skip-beside =
+    { $count ->
+       *[other] { $count } tệp có bản đã chuyển đổi nằm sẵn trong gói của nó
+    }
+settings-conv-skip-blender =
+    { $count ->
+       *[other] { $count } tệp Blender chưa đọc (Cài đặt → Công cụ)
+    }
+settings-conv-ask-new = Lưu, chỉ gói mới
+settings-conv-ask-save-convert =
+    { $count ->
+       *[other] Lưu và chuyển đổi { $count } tệp
+    }
+settings-conv-ask-convert =
+    { $count ->
+       *[other] Chuyển đổi { $count } tệp
+    }
 settings-unreal-off = Giữ nguyên
 settings-unreal-off-hint = Chuyển đổi từ trang của gói khi bạn muốn.
 settings-unreal-keep = Chuyển đổi, giữ tệp gốc

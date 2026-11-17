@@ -224,6 +224,14 @@ error-no-soundfont = 서버의 { $path }에 SoundFont가 없습니다
 error-workers = 백그라운드 작업자: 1에서 { $max } 사이
 error-ai-batch = AI 요청당 에셋 수: 1에서 200 사이
 error-conversion-cache = 변환된 다운로드: 100 MB 이상
+error-conversion-keep-days = 변환 규칙: 원본은 1~{ $max }일 동안 보관할 수 있습니다
+error-conversion-target = 변환 규칙: Hoard는 파일을 { $format }(으)로 변환할 수 없습니다
+error-conversion-no-source = 변환 규칙: 각 규칙에는 변환할 형식이 하나 이상 있어야 합니다
+# $ext is a file extension, like obj; $format is what it would become, like glb.
+error-conversion-source = 변환 규칙: .{ $ext } 파일은 { $format }(으)로 변환할 수 없습니다
+error-conversion-twice = 변환 규칙: .{ $ext }이(가) 두 규칙에 들어 있습니다
+error-conversion-cant-undo = 이 파일은 규칙으로 변환된 파일이 아니거나 원본이 삭제되었습니다.
+error-conversion-path-taken = 지금 { $path }에 다른 파일이 있어서 원본을 그곳으로 되돌릴 수 없습니다.
 error-limits-zero = 한도는 0일 수 없습니다
 error-settings-object = 설정의 JSON 객체가 필요합니다
 error-bad-setting = 잘못된 설정: { $reason }
@@ -346,6 +354,8 @@ server-issues-convert = Blender가 변환하지 못한 모델
 server-issues-convert-blurb = GLB 사본이 없어서 3D로 표시할 수 없습니다.
 server-issues-unreal = 변환하지 못한 Unreal 패키지
 server-issues-unreal-blurb = 나머지 패키지는 팩의 Unreal 페이지에 있습니다.
+server-issues-reformat = 변환 규칙으로 변환하지 못한 파일
+server-issues-reformat-blurb = 원래대로 남겨 두었습니다.
 server-issues-materials = 머티리얼을 알아내지 못한 팩
 server-issues-materials-blurb = 텍스처는 모두 있지만 머티리얼로 묶이지 않았을 뿐입니다.
 server-issues-material-thumb = 썸네일이 없는 머티리얼
@@ -367,6 +377,7 @@ server-job-retag = { $pack } 다시 태그하는 중
 server-job-llm-tag = AI로 { $pack } 태그하는 중
 server-job-convert = Blender로 { $pack } 변환하는 중
 server-job-unreal = { $pack }의 Unreal 패키지 변환하는 중
+server-job-reformat = 변환 규칙에 따라 { $pack }의 파일 변환하는 중
 server-job-scan = 감시 폴더 검사하는 중
 server-job-relocate = 라이브러리 위치 간에 파일 옮기는 중
 server-job-looks = 색상과 외형 분석하는 중
@@ -1279,6 +1290,15 @@ asset-variants = 변형({ $count }가지)
 asset-copies = 동일한 사본
 asset-copies-note = 같은 바이트는 한 번만 저장됩니다. 이 팩들에도 이 파일이 들어 있습니다.
 asset-unreal-converted = Unreal에서 변환됨
+asset-rule-converted = 규칙으로 변환됨
+# Followed by the original file's name: "A conversion rule made this GLB on 3 May 2026 from tree.obj".
+asset-rule-was = { $date }에 변환 규칙이 이 { $format } 파일을 만들었습니다. 원본:
+asset-rule-kept-until = 원본은 { $date }까지 보관됩니다.
+asset-rule-put-back = 원본 되돌리기
+asset-rule-put-back-title = { $file }을(를) 되돌릴까요?
+asset-rule-put-back-body = 변환된 파일은 삭제되고 원본이 태그, 컬렉션, 링크와 함께 그 자리로 돌아옵니다. 그 후로는 변환 규칙이 이 파일을 건드리지 않습니다.
+asset-rule-put-back-done = { $file }을(를) 되돌렸습니다
+asset-rule-let-go = 설정에서 정한 원본 보관 기간이 지나서 원본이 삭제되었습니다.
 asset-unreal-package = Unreal 패키지에서 가져옴
 asset-ue-needs-editor-before = Unreal Editor 대기 중: { $reason }. Unreal이 설치된 컴퓨터에서 다음을 실행하면
 asset-ue-needs-editor-after = FBX로 돌아옵니다.
@@ -2097,6 +2117,78 @@ settings-store-lookup = 스토어 페이지 자동으로 찾기
 settings-unreal = Unreal 패키지
 settings-unreal-reset = Unreal 패키지: 기본값으로
 settings-unreal-what = .uasset 파일을 어떻게 할지 정합니다.
+settings-conv = 변환 규칙
+settings-conv-what = Hoard가 보관하는 파일을 하나의 형식으로 변환해서 라이브러리를 통일합니다. 예를 들어 모든 OBJ와 FBX를 GLB로 바꿉니다. 변환된 파일은 원본을 대신하며 이름, 태그, 컬렉션, 링크를 그대로 유지합니다. 감시 폴더의 파일은 절대 바꾸지 않습니다.
+# A checkbox that turns one conversion rule on or off.
+settings-conv-rule-on = 켜기
+settings-conv-to = 변환할 형식
+# Heading over the file formats a rule converts.
+settings-conv-from = 원본 형식
+settings-conv-remove = 제거
+settings-conv-remove-label = 규칙 { $n } 제거
+settings-conv-taken = 다른 규칙이 이미 이 형식을 변환합니다
+settings-conv-upright = 변환할 때 팩의 모델을 표시하는 방식대로 모델을 똑바로 세우기(Y 위쪽, +Z 방향)
+settings-conv-add = 규칙 추가
+# Before a number of days: "Keep originals for [30] days".
+settings-conv-keep = 원본 보관 기간
+settings-conv-keep-days =
+    { $count ->
+       *[other] 일
+    }
+settings-conv-keep-what = 그때까지는 변환된 파일의 페이지에서 원본을 되돌릴 수 있습니다. 텍스처는 변환된 모델에 복사되지 않으며, 모델은 옆에 있는 이미지 파일을 가리킵니다. 모델의 .mtl 또는 .bin 파일은 그대로 남습니다.
+settings-conv-save = 규칙 저장
+settings-conv-revert = 변경 사항 취소
+settings-conv-existing = 라이브러리에 이미 있는 파일 변환
+settings-conv-saved = 변환 규칙을 저장했습니다. 지금부터 추가하는 팩에 적용됩니다.
+settings-conv-converting =
+    { $count ->
+       *[other] 백그라운드에서 파일 { $count }개 변환하는 중
+    }
+settings-conv-nothing = 라이브러리에 변환할 파일이 없습니다.
+settings-conv-ask-title =
+    { $count ->
+       *[other] 라이브러리에 이미 있는 파일 { $count }개를 변환할까요?
+    }
+settings-conv-ask-body =
+    { $packs ->
+       *[other] 팩 { $packs }개에 들어 있습니다.
+    } 각 원본은 { $days }일 동안 보관되며, 그때까지는 해당 페이지에서 되돌릴 수 있습니다.
+settings-conv-ask-busy =
+    { $count ->
+       *[other] { $count }개는 아직 추가 중인 팩에 있습니다. 추가가 끝나면 변환됩니다.
+    }
+settings-conv-ask-list = 변환될 파일
+settings-conv-ask-more = …외 { $count }개
+settings-conv-ask-skipped = 그대로 둘 파일:
+settings-conv-skip-watched =
+    { $count ->
+       *[other] 감시 폴더의 파일 { $count }개
+    }
+settings-conv-skip-unity =
+    { $count ->
+       *[other] Unity 프로젝트가 이름으로 참조하는 파일 { $count }개
+    }
+settings-conv-skip-used =
+    { $count ->
+       *[other] 장면이나 다른 파일이 이름으로 참조하는 파일 { $count }개
+    }
+settings-conv-skip-beside =
+    { $count ->
+       *[other] 변환된 사본이 이미 팩에 있는 파일 { $count }개
+    }
+settings-conv-skip-blender =
+    { $count ->
+       *[other] Blender가 아직 읽지 않은 파일 { $count }개(설정 → 도구)
+    }
+settings-conv-ask-new = 저장, 새 팩에만 적용
+settings-conv-ask-save-convert =
+    { $count ->
+       *[other] 저장하고 파일 { $count }개 변환
+    }
+settings-conv-ask-convert =
+    { $count ->
+       *[other] 파일 { $count }개 변환
+    }
 settings-unreal-off = 그대로 두기
 settings-unreal-off-hint = 원할 때 팩 페이지에서 변환하세요.
 settings-unreal-keep = 변환하고 원본 유지

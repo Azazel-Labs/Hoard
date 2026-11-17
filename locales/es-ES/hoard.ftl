@@ -224,6 +224,14 @@ error-no-soundfont = No hay ninguna SoundFont en { $path } en el servidor
 error-workers = Procesos en segundo plano: entre 1 y { $max }
 error-ai-batch = Recursos por petición a la IA: entre 1 y 200
 error-conversion-cache = Descargas convertidas: al menos 100 MB
+error-conversion-keep-days = Reglas de conversión: los originales deben conservarse entre 1 y { $max } días
+error-conversion-target = Reglas de conversión: Hoard no puede convertir archivos a { $format }
+error-conversion-no-source = Reglas de conversión: cada regla necesita al menos un formato que convertir
+# $ext is a file extension, like obj; $format is what it would become, like glb.
+error-conversion-source = Reglas de conversión: los archivos .{ $ext } no se pueden convertir a { $format }
+error-conversion-twice = Reglas de conversión: .{ $ext } está en dos reglas
+error-conversion-cant-undo = Ninguna regla ha convertido este archivo, o ya se ha eliminado su original.
+error-conversion-path-taken = Ahora hay otro archivo en { $path }, así que el original no puede volver ahí.
 error-limits-zero = Los límites no pueden ser cero
 error-settings-object = se esperaba un objeto JSON de ajustes
 error-bad-setting = ajuste no válido: { $reason }
@@ -354,6 +362,8 @@ server-issues-convert = Modelos que Blender no ha podido convertir
 server-issues-convert-blurb = No tienen copia en GLB, así que no se pueden mostrar en 3D.
 server-issues-unreal = Paquetes de Unreal que no se han podido convertir
 server-issues-unreal-blurb = La página de Unreal del paquete tiene el resto de sus paquetes.
+server-issues-reformat = Archivos que una regla de conversión no ha podido convertir
+server-issues-reformat-blurb = Se han dejado como estaban.
 server-issues-materials = Paquetes cuyos materiales no se han podido deducir
 server-issues-materials-blurb = Sus texturas están todas; simplemente no están agrupadas en materiales.
 server-issues-material-thumb = Materiales sin miniatura
@@ -375,6 +385,7 @@ server-job-retag = Volviendo a etiquetar { $pack }
 server-job-llm-tag = Etiquetando { $pack } con IA
 server-job-convert = Convirtiendo { $pack } con Blender
 server-job-unreal = Convirtiendo paquetes de Unreal en { $pack }
+server-job-reformat = Convirtiendo los archivos de { $pack } según las reglas de conversión
 server-job-scan = Escaneando una carpeta vigilada
 server-job-relocate = Moviendo archivos entre ubicaciones de la biblioteca
 server-job-looks = Analizando colores y aspecto
@@ -1451,6 +1462,15 @@ asset-variants = Variantes ({ $count } tomas)
 asset-copies = Copias idénticas
 asset-copies-note = Los mismos bytes se guardan una sola vez; estos paquetes también incluyen este archivo.
 asset-unreal-converted = Convertido desde Unreal
+asset-rule-converted = Convertido por una regla
+# Followed by the original file's name: "A conversion rule made this GLB on 3 May 2026 from tree.obj".
+asset-rule-was = Una regla de conversión creó este { $format } el { $date } a partir de
+asset-rule-kept-until = El original se conserva hasta el { $date }.
+asset-rule-put-back = Restaurar el original
+asset-rule-put-back-title = ¿Restaurar { $file }?
+asset-rule-put-back-body = El archivo convertido se elimina y el original ocupa su lugar, con sus etiquetas, colecciones y enlaces. A partir de entonces, las reglas de conversión no lo vuelven a tocar.
+asset-rule-put-back-done = Se ha restaurado { $file }
+asset-rule-let-go = El original se eliminó cuando venció el plazo durante el que se conservan los originales según Ajustes.
 asset-unreal-package = Del paquete de Unreal
 asset-ue-needs-editor-before = A la espera de Unreal Editor: { $reason }. En una máquina con Unreal instalado, ejecuta
 asset-ue-needs-editor-after = y vuelve como FBX.
@@ -2352,6 +2372,90 @@ settings-store-lookup = Buscar páginas de tienda automáticamente
 settings-unreal = Paquetes de Unreal
 settings-unreal-reset = Paquetes de Unreal: se ha vuelto al valor predeterminado
 settings-unreal-what = Qué hacer con los archivos .uasset.
+settings-conv = Reglas de conversión
+settings-conv-what = Convierte los archivos que guarda Hoard a un solo formato, como todos los OBJ y FBX a GLB, para que la biblioteca sea uniforme. El archivo convertido ocupa el lugar del original y conserva su nombre, etiquetas, colecciones y enlaces. Los archivos de las carpetas vigiladas nunca se modifican.
+# A checkbox that turns one conversion rule on or off.
+settings-conv-rule-on = Activada
+settings-conv-to = Convertir a
+# Heading over the file formats a rule converts.
+settings-conv-from = De
+settings-conv-remove = Quitar
+settings-conv-remove-label = Quitar la regla { $n }
+settings-conv-taken = Otra regla ya convierte este formato
+settings-conv-upright = Poner los modelos de pie al convertirlos (con la Y hacia arriba y mirando hacia +Z), como se muestran los modelos del paquete
+settings-conv-add = Añadir una regla
+# Before a number of days: "Keep originals for [30] days".
+settings-conv-keep = Conservar los originales durante
+settings-conv-keep-days =
+    { $count ->
+        [one] día
+       *[other] días
+    }
+settings-conv-keep-what = Hasta entonces, desde la página de un archivo convertido se puede restaurar el original. Las texturas no se copian dentro de un modelo convertido: este apunta a los archivos de imagen que tiene al lado. Los archivos .mtl o .bin de un modelo se quedan.
+settings-conv-save = Guardar reglas
+settings-conv-revert = Deshacer los cambios
+settings-conv-existing = Convertir los archivos que ya están en la biblioteca
+settings-conv-saved = Reglas de conversión guardadas. Se aplican a los paquetes que se añadan a partir de ahora.
+settings-conv-converting =
+    { $count ->
+        [one] Convirtiendo un archivo en segundo plano
+       *[other] Convirtiendo { $count } archivos en segundo plano
+    }
+settings-conv-nothing = No hay nada en la biblioteca que necesite convertirse.
+settings-conv-ask-title =
+    { $count ->
+        [one] ¿Convertir un archivo que ya está en la biblioteca?
+       *[other] ¿Convertir { $count } archivos que ya están en la biblioteca?
+    }
+settings-conv-ask-body =
+    { $packs ->
+        [one] Está en un paquete.
+       *[other] Están en { $packs } paquetes.
+    } Cada original se conserva { $days } días y, hasta entonces, se puede restaurar desde su página.
+settings-conv-ask-busy =
+    { $count ->
+        [one] Uno está en un paquete que todavía se está añadiendo; se convertirá cuando termine.
+       *[other] { $count } están en paquetes que todavía se están añadiendo; se convertirán cuando terminen.
+    }
+settings-conv-ask-list = Archivos que se convertirían
+settings-conv-ask-more = …y { $count } más
+settings-conv-ask-skipped = Se dejan como están:
+settings-conv-skip-watched =
+    { $count ->
+        [one] un archivo en una carpeta vigilada
+       *[other] { $count } archivos en carpetas vigiladas
+    }
+settings-conv-skip-unity =
+    { $count ->
+        [one] un archivo que un proyecto de Unity conoce por su nombre
+       *[other] { $count } archivos que un proyecto de Unity conoce por sus nombres
+    }
+settings-conv-skip-used =
+    { $count ->
+        [one] un archivo al que hace referencia una escena u otro archivo
+       *[other] { $count } archivos a los que hace referencia una escena u otro archivo
+    }
+settings-conv-skip-beside =
+    { $count ->
+        [one] un archivo cuya copia convertida ya está en su paquete
+       *[other] { $count } archivos cuyas copias convertidas ya están en sus paquetes
+    }
+settings-conv-skip-blender =
+    { $count ->
+        [one] un archivo que Blender aún no ha leído (Ajustes → Herramientas)
+       *[other] { $count } archivos que Blender aún no ha leído (Ajustes → Herramientas)
+    }
+settings-conv-ask-new = Guardar, solo paquetes nuevos
+settings-conv-ask-save-convert =
+    { $count ->
+        [one] Guardar y convertirlo
+       *[other] Guardar y convertir { $count } archivos
+    }
+settings-conv-ask-convert =
+    { $count ->
+        [one] Convertirlo
+       *[other] Convertir { $count } archivos
+    }
 settings-unreal-off = Dejarlos como están
 settings-unreal-off-hint = Conviértelos desde la página de un paquete cuando quieras.
 settings-unreal-keep = Convertir y conservar los originales

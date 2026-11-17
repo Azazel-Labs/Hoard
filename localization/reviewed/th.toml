@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "42480b75a5b6ffe5e9a5e23b3bad0c8e5f5a1104f51660808e921f9a7cdc8e09"
+source = "9528abfcd928f040f086a2f54bd71118058471d032fdd351f2a4f0e86b8dfb1f"
 translation = "4b240abbf21b9e5a3573cb5600cede4f95b8fdc50ad26369cfcd10d567b19ce3"
 
 [messages.account-add]
@@ -2185,6 +2185,38 @@ translation = "คลิกเพื่อเปลี่ยนชื่อ"
 source = "{ $role } map"
 translation = "แมป { $role }"
 
+[messages.asset-rule-converted]
+source = "Converted by a rule"
+translation = "แปลงโดยกฎ"
+
+[messages.asset-rule-kept-until]
+source = "The original is kept until { $date }."
+translation = "เก็บต้นฉบับไว้จนถึง { $date }"
+
+[messages.asset-rule-let-go]
+source = "The original was deleted once the time Settings keeps originals was up."
+translation = "ต้นฉบับถูกลบไปแล้วเมื่อครบระยะเวลาเก็บต้นฉบับที่กำหนดไว้ในการตั้งค่า"
+
+[messages.asset-rule-put-back]
+source = "Put the original back"
+translation = "นำต้นฉบับกลับมา"
+
+[messages.asset-rule-put-back-body]
+source = "The converted file is deleted and the original takes its place, with its tags, collections and links. The conversion rules leave it alone from then on."
+translation = "ไฟล์ที่แปลงแล้วจะถูกลบ และต้นฉบับจะกลับมาแทนที่ พร้อมแท็ก คอลเลกชัน และลิงก์ของไฟล์ หลังจากนี้กฎการแปลงจะไม่แตะต้องไฟล์นี้อีก"
+
+[messages.asset-rule-put-back-done]
+source = "{ $file } is back"
+translation = "นำ { $file } กลับมาแล้ว"
+
+[messages.asset-rule-put-back-title]
+source = "Put back { $file }?"
+translation = "นำ { $file } กลับมาหรือไม่?"
+
+[messages.asset-rule-was]
+source = "A conversion rule made this { $format } on { $date } from"
+translation = "กฎการแปลงสร้าง { $format } นี้เมื่อ { $date } จาก"
+
 [messages.asset-save]
 source = "Save"
 translation = "บันทึก"
@@ -3139,9 +3171,37 @@ translation = "ไม่พบการเชื่อมต่อ"
 source = "Converted downloads: at least 100 MB"
 translation = "การดาวน์โหลดที่แปลงแล้ว: อย่างน้อย 100 MB"
 
+[messages.error-conversion-cant-undo]
+source = "This file wasn’t converted by a rule, or its original has been deleted."
+translation = "ไฟล์นี้ไม่ได้ถูกแปลงโดยกฎ หรือไฟล์ต้นฉบับถูกลบไปแล้ว"
+
 [messages.error-conversion-failed]
 source = "couldn't convert to { $format }: { $reason }"
 translation = "แปลงเป็น { $format } ไม่ได้: { $reason }"
+
+[messages.error-conversion-keep-days]
+source = "Conversion rules: keep originals for 1 to { $max } days"
+translation = "กฎการแปลง: เก็บต้นฉบับไว้ได้ 1 ถึง { $max } วัน"
+
+[messages.error-conversion-no-source]
+source = "Conversion rules: each rule needs at least one format to convert"
+translation = "กฎการแปลง: กฎแต่ละข้อต้องมีรูปแบบที่จะแปลงอย่างน้อยหนึ่งรูปแบบ"
+
+[messages.error-conversion-path-taken]
+source = "Another file is at { $path } now, so the original can’t go back there."
+translation = "ตอนนี้มีไฟล์อื่นอยู่ที่ { $path } จึงนำต้นฉบับกลับไปไว้ที่นั่นไม่ได้"
+
+[messages.error-conversion-source]
+source = "Conversion rules: .{ $ext } files can’t be converted to { $format }"
+translation = "กฎการแปลง: แปลงไฟล์ .{ $ext } เป็น { $format } ไม่ได้"
+
+[messages.error-conversion-target]
+source = "Conversion rules: Hoard can’t convert files to { $format }"
+translation = "กฎการแปลง: Hoard แปลงไฟล์เป็น { $format } ไม่ได้"
+
+[messages.error-conversion-twice]
+source = "Conversion rules: .{ $ext } is in two rules"
+translation = "กฎการแปลง: .{ $ext } อยู่ในกฎสองข้อ"
 
 [messages.error-credits-collection]
 source = "collection { $key }"
@@ -7422,6 +7482,14 @@ translation = "ไฟล์เหล่านี้อยู่ในคลั�
 source = "Re-analyze pack"
 translation = "วิเคราะห์แพ็กใหม่"
 
+[messages.server-issues-reformat]
+source = "Files a conversion rule couldn’t convert"
+translation = "ไฟล์ที่กฎการแปลงแปลงไม่ได้"
+
+[messages.server-issues-reformat-blurb]
+source = "They’re left as they were."
+translation = "ไฟล์เหล่านี้ถูกปล่อยไว้ตามเดิม"
+
 [messages.server-issues-render]
 source = "Models the thumbnail renderer failed on"
 translation = "โมเดลที่ตัวเรนเดอร์ภาพย่อทำงานล้มเหลว"
@@ -7493,6 +7561,10 @@ translation = "กำลังค้นหาแมทีเรียลใน {
 [messages.server-job-read-files]
 source = "Reading the files of { $pack }"
 translation = "กำลังอ่านไฟล์ของ { $pack }"
+
+[messages.server-job-reformat]
+source = "Converting files in { $pack } by the conversion rules"
+translation = "กำลังแปลงไฟล์ใน { $pack } ตามกฎการแปลง"
 
 [messages.server-job-relocate]
 source = "Moving files between library locations"
@@ -7987,6 +8059,222 @@ translation = "รับโมเดลไม่ได้: { $detail } จะล
 [messages.settings-clip-what]
 source = "Type what you’re after (“mossy rock”, “sci-fi door”, “wooden barrel”) and pictures that show it turn up beside names that have the words. “More like this” finds things of the same kind, not only the same colors."
 translation = "พิมพ์สิ่งที่คุณต้องการ (“หินมีมอส”, “ประตูไซไฟ”, “ถังไม้”) แล้วรูปภาพที่แสดงสิ่งนั้นจะปรากฏข้างรายการที่มีคำเหล่านั้นในชื่อ “คล้ายกับรายการนี้” จะค้นหาสิ่งที่เป็นประเภทเดียวกัน ไม่ใช่แค่สีเดียวกัน"
+
+[messages.settings-conv]
+source = "Conversion rules"
+translation = "กฎการแปลง"
+
+[messages.settings-conv-add]
+source = "Add a rule"
+translation = "เพิ่มกฎ"
+
+[messages.settings-conv-ask-body]
+source = """
+{ $packs ->
+        [one] It’s in one pack.
+       *[other] They’re in { $packs } packs.
+    } Each original is kept for { $days } days, and until then it can be put back from its page."""
+translation = """
+{ $packs ->
+       *[other] ไฟล์เหล่านี้อยู่ใน { $packs } แพ็ก
+    } ต้นฉบับแต่ละไฟล์จะถูกเก็บไว้ { $days } วัน และระหว่างนั้นนำกลับมาได้จากหน้าของไฟล์"""
+
+[messages.settings-conv-ask-busy]
+source = """
+{ $count ->
+        [one] One is in a pack still being added; it’s converted once that’s done.
+       *[other] { $count } are in packs still being added; they’re converted once that’s done.
+    }"""
+translation = """
+{ $count ->
+       *[other] { $count } ไฟล์อยู่ในแพ็กที่ยังเพิ่มไม่เสร็จ จะถูกแปลงเมื่อเพิ่มเสร็จแล้ว
+    }"""
+
+[messages.settings-conv-ask-convert]
+source = """
+{ $count ->
+        [one] Convert it
+       *[other] Convert { $count } files
+    }"""
+translation = """
+{ $count ->
+       *[other] แปลง { $count } ไฟล์
+    }"""
+
+[messages.settings-conv-ask-list]
+source = "Files that would be converted"
+translation = "ไฟล์ที่จะถูกแปลง"
+
+[messages.settings-conv-ask-more]
+source = "…and { $count } more"
+translation = "…และอีก { $count } ไฟล์"
+
+[messages.settings-conv-ask-new]
+source = "Save, only new packs"
+translation = "บันทึก ใช้กับแพ็กใหม่เท่านั้น"
+
+[messages.settings-conv-ask-save-convert]
+source = """
+{ $count ->
+        [one] Save and convert it
+       *[other] Save and convert { $count } files
+    }"""
+translation = """
+{ $count ->
+       *[other] บันทึกและแปลง { $count } ไฟล์
+    }"""
+
+[messages.settings-conv-ask-skipped]
+source = "Left as they are:"
+translation = "ปล่อยไว้ตามเดิม:"
+
+[messages.settings-conv-ask-title]
+source = """
+{ $count ->
+        [one] Convert one file already in the library?
+       *[other] Convert { $count } files already in the library?
+    }"""
+translation = """
+{ $count ->
+       *[other] แปลงไฟล์ { $count } ไฟล์ที่อยู่ในคลังแล้วหรือไม่?
+    }"""
+
+[messages.settings-conv-converting]
+source = """
+{ $count ->
+        [one] Converting one file in the background
+       *[other] Converting { $count } files in the background
+    }"""
+translation = """
+{ $count ->
+       *[other] กำลังแปลงไฟล์ { $count } ไฟล์ในเบื้องหลัง
+    }"""
+
+[messages.settings-conv-existing]
+source = "Convert files already in the library"
+translation = "แปลงไฟล์ที่อยู่ในคลังแล้ว"
+
+[messages.settings-conv-from]
+source = "From"
+translation = "จาก"
+
+[messages.settings-conv-keep]
+source = "Keep originals for"
+translation = "เก็บต้นฉบับไว้"
+
+[messages.settings-conv-keep-days]
+source = """
+{ $count ->
+        [one] day
+       *[other] days
+    }"""
+translation = """
+{ $count ->
+       *[other] วัน
+    }"""
+
+[messages.settings-conv-keep-what]
+source = "Until then, a converted file’s page can put the original back. Textures aren’t copied into a converted model: it points at the image files beside it. A model’s .mtl or .bin files stay."
+translation = "ระหว่างนี้ หน้าของไฟล์ที่แปลงแล้วสามารถนำต้นฉบับกลับมาได้ เท็กซ์เจอร์จะไม่ถูกคัดลอกเข้าไปในโมเดลที่แปลงแล้ว โมเดลจะชี้ไปยังไฟล์ภาพที่อยู่ข้างๆ ส่วนไฟล์ .mtl หรือ .bin ของโมเดลยังคงอยู่"
+
+[messages.settings-conv-nothing]
+source = "Nothing in the library needs converting."
+translation = "ไม่มีอะไรในคลังที่ต้องแปลง"
+
+[messages.settings-conv-remove]
+source = "Remove"
+translation = "นำออก"
+
+[messages.settings-conv-remove-label]
+source = "Remove rule { $n }"
+translation = "นำกฎข้อที่ { $n } ออก"
+
+[messages.settings-conv-revert]
+source = "Undo changes"
+translation = "เลิกทำการเปลี่ยนแปลง"
+
+[messages.settings-conv-rule-on]
+source = "On"
+translation = "เปิด"
+
+[messages.settings-conv-save]
+source = "Save rules"
+translation = "บันทึกกฎ"
+
+[messages.settings-conv-saved]
+source = "Conversion rules saved. They apply to packs added from now on."
+translation = "บันทึกกฎการแปลงแล้ว กฎจะใช้กับแพ็กที่เพิ่มต่อจากนี้"
+
+[messages.settings-conv-skip-beside]
+source = """
+{ $count ->
+        [one] one file whose converted copy is in its pack already
+       *[other] { $count } files whose converted copies are in their packs already
+    }"""
+translation = """
+{ $count ->
+       *[other] { $count } ไฟล์ที่มีสำเนาที่แปลงแล้วอยู่ในแพ็กของไฟล์อยู่แล้ว
+    }"""
+
+[messages.settings-conv-skip-blender]
+source = """
+{ $count ->
+        [one] one file Blender hasn’t read yet (Settings → Tools)
+       *[other] { $count } files Blender hasn’t read yet (Settings → Tools)
+    }"""
+translation = """
+{ $count ->
+       *[other] { $count } ไฟล์ที่ Blender ยังไม่ได้อ่าน (การตั้งค่า → เครื่องมือ)
+    }"""
+
+[messages.settings-conv-skip-unity]
+source = """
+{ $count ->
+        [one] one file a Unity project knows by its name
+       *[other] { $count } files a Unity project knows by their names
+    }"""
+translation = """
+{ $count ->
+       *[other] { $count } ไฟล์ที่โปรเจกต์ Unity อ้างอิงตามชื่อ
+    }"""
+
+[messages.settings-conv-skip-used]
+source = """
+{ $count ->
+        [one] one file a scene or another file names
+       *[other] { $count } files a scene or another file names
+    }"""
+translation = """
+{ $count ->
+       *[other] { $count } ไฟล์ที่ฉากหรือไฟล์อื่นอ้างถึงตามชื่อ
+    }"""
+
+[messages.settings-conv-skip-watched]
+source = """
+{ $count ->
+        [one] one file in a watched folder
+       *[other] { $count } files in watched folders
+    }"""
+translation = """
+{ $count ->
+       *[other] { $count } ไฟล์ในโฟลเดอร์ที่เฝ้าดู
+    }"""
+
+[messages.settings-conv-taken]
+source = "Another rule converts this format"
+translation = "มีกฎอื่นแปลงรูปแบบนี้อยู่แล้ว"
+
+[messages.settings-conv-to]
+source = "Convert to"
+translation = "แปลงเป็น"
+
+[messages.settings-conv-upright]
+source = "Turn models upright as they’re converted (Y up, facing +Z), the way the pack’s models are shown"
+translation = "ตั้งโมเดลให้ตรงขณะแปลง (Y ขึ้น หันไปทาง +Z) แบบเดียวกับที่แสดงโมเดลของแพ็ก"
+
+[messages.settings-conv-what]
+source = "Convert files Hoard keeps to one format, such as every OBJ and FBX to GLB, so the library is all alike. The converted file takes the original’s place, with its name, tags, collections and links. Files in watched folders are never changed."
+translation = "แปลงไฟล์ที่ Hoard เก็บไว้ให้เป็นรูปแบบเดียว เช่น แปลง OBJ และ FBX ทั้งหมดเป็น GLB เพื่อให้ทั้งคลังเป็นแบบเดียวกัน ไฟล์ที่แปลงแล้วจะแทนที่ต้นฉบับ โดยคงชื่อ แท็ก คอลเลกชัน และลิงก์ไว้ ไฟล์ในโฟลเดอร์ที่เฝ้าดูจะไม่ถูกเปลี่ยนเลย"
 
 [messages.settings-conversion-cache]
 source = "Converted downloads"

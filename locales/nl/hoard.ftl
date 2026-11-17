@@ -224,6 +224,14 @@ error-no-soundfont = Er staat geen SoundFont op { $path } op de server
 error-workers = Achtergrondprocessen: tussen 1 en { $max }
 error-ai-batch = Assets per AI-verzoek: tussen 1 en 200
 error-conversion-cache = Geconverteerde downloads: minstens 100 MB
+error-conversion-keep-days = Conversieregels: bewaar originelen 1 tot { $max } dagen
+error-conversion-target = Conversieregels: Hoard kan geen bestanden naar { $format } converteren
+error-conversion-no-source = Conversieregels: elke regel heeft minstens één formaat nodig om te converteren
+# $ext is a file extension, like obj; $format is what it would become, like glb.
+error-conversion-source = Conversieregels: .{ $ext }-bestanden kunnen niet naar { $format } worden geconverteerd
+error-conversion-twice = Conversieregels: .{ $ext } staat in twee regels
+error-conversion-cant-undo = Dit bestand is niet door een regel geconverteerd, of het origineel is al verwijderd.
+error-conversion-path-taken = Op { $path } staat nu een ander bestand, dus het origineel kan daar niet terug.
 error-limits-zero = Limieten kunnen niet nul zijn
 error-settings-object = verwachtte een JSON-object met instellingen
 error-bad-setting = ongeldige instelling: { $reason }
@@ -346,6 +354,8 @@ server-issues-convert = Modellen die Blender niet kon converteren
 server-issues-convert-blurb = Ze hebben geen GLB-kopie, dus ze kunnen niet in 3D worden getoond.
 server-issues-unreal = Unreal-packages die niet konden worden geconverteerd
 server-issues-unreal-blurb = De Unreal-pagina van het pakket heeft de rest van de packages.
+server-issues-reformat = Bestanden die een conversieregel niet kon converteren
+server-issues-reformat-blurb = Ze blijven zoals ze waren.
 server-issues-materials = Pakketten waarvan de materialen niet konden worden uitgezocht
 server-issues-materials-blurb = De texturen zijn er allemaal; ze zijn alleen niet in materialen gegroepeerd.
 server-issues-material-thumb = Materialen zonder miniatuur
@@ -367,6 +377,7 @@ server-job-retag = { $pack } opnieuw taggen
 server-job-llm-tag = { $pack } taggen met AI
 server-job-convert = { $pack } converteren met Blender
 server-job-unreal = Unreal-packages in { $pack } converteren
+server-job-reformat = Bestanden in { $pack } converteren volgens de conversieregels
 server-job-scan = Een bewaakte map scannen
 server-job-relocate = Bestanden tussen bibliotheeklocaties verplaatsen
 server-job-looks = Kleuren en uiterlijk uitzoeken
@@ -1408,6 +1419,15 @@ asset-variants = Varianten ({ $count } versies)
 asset-copies = Identieke kopieën
 asset-copies-note = Dezelfde bytes worden één keer opgeslagen; deze pakketten leveren dit bestand ook mee.
 asset-unreal-converted = Geconverteerd vanuit Unreal
+asset-rule-converted = Geconverteerd door een regel
+# Followed by the original file's name: "A conversion rule made this GLB on 3 May 2026 from tree.obj".
+asset-rule-was = Een conversieregel heeft deze { $format } op { $date } gemaakt van
+asset-rule-kept-until = Het origineel wordt bewaard tot { $date }.
+asset-rule-put-back = Het origineel terugzetten
+asset-rule-put-back-title = { $file } terugzetten?
+asset-rule-put-back-body = Het geconverteerde bestand wordt verwijderd en het origineel neemt zijn plaats weer in, met zijn tags, collecties en links. De conversieregels laten het daarna met rust.
+asset-rule-put-back-done = { $file } is terug
+asset-rule-let-go = Het origineel is verwijderd toen de bewaartermijn voor originelen uit Instellingen voorbij was.
 asset-unreal-package = Uit de Unreal-package
 asset-ue-needs-editor-before = Wachten op Unreal Editor: { $reason }. Voer op een computer met Unreal
 asset-ue-needs-editor-after = uit, dan komt het terug als FBX.
@@ -2300,6 +2320,90 @@ settings-store-lookup = Storepagina's automatisch opzoeken
 settings-unreal = Unreal-packages
 settings-unreal-reset = Unreal-packages: terug naar de standaardwaarde
 settings-unreal-what = Wat er met .uasset-bestanden moet gebeuren.
+settings-conv = Conversieregels
+settings-conv-what = Converteer bestanden die Hoard zelf bewaart naar één formaat, zoals elke OBJ en FBX naar GLB, zodat de hele bibliotheek gelijk is. Het geconverteerde bestand neemt de plaats van het origineel in, met zijn naam, tags, collecties en links. Bestanden in bewaakte mappen worden nooit gewijzigd.
+# A checkbox that turns one conversion rule on or off.
+settings-conv-rule-on = Aan
+settings-conv-to = Converteren naar
+# Heading over the file formats a rule converts.
+settings-conv-from = Van
+settings-conv-remove = Verwijderen
+settings-conv-remove-label = Regel { $n } verwijderen
+settings-conv-taken = Een andere regel converteert dit formaat al
+settings-conv-upright = Modellen bij het converteren rechtop zetten (Y omhoog, kijkend naar +Z), zoals de modellen van het pakket worden getoond
+settings-conv-add = Een regel toevoegen
+# Before a number of days: "Keep originals for [30] days".
+settings-conv-keep = Originelen bewaren gedurende
+settings-conv-keep-days =
+    { $count ->
+        [one] dag
+       *[other] dagen
+    }
+settings-conv-keep-what = Tot dan kan de pagina van een geconverteerd bestand het origineel terugzetten. Texturen worden niet in een geconverteerd model gekopieerd: het verwijst naar de afbeeldingsbestanden ernaast. De .mtl- of .bin-bestanden van een model blijven staan.
+settings-conv-save = Regels opslaan
+settings-conv-revert = Wijzigingen ongedaan maken
+settings-conv-existing = Bestanden converteren die al in de bibliotheek staan
+settings-conv-saved = Conversieregels opgeslagen. Ze gelden voor pakketten die vanaf nu worden toegevoegd.
+settings-conv-converting =
+    { $count ->
+        [one] Eén bestand wordt op de achtergrond geconverteerd
+       *[other] { $count } bestanden worden op de achtergrond geconverteerd
+    }
+settings-conv-nothing = Niets in de bibliotheek hoeft te worden geconverteerd.
+settings-conv-ask-title =
+    { $count ->
+        [one] Eén bestand converteren dat al in de bibliotheek staat?
+       *[other] { $count } bestanden converteren die al in de bibliotheek staan?
+    }
+settings-conv-ask-body =
+    { $packs ->
+        [one] Het staat in één pakket.
+       *[other] Ze staan in { $packs } pakketten.
+    } Elk origineel wordt { $days } dagen bewaard, en tot dan kan het vanaf zijn pagina worden teruggezet.
+settings-conv-ask-busy =
+    { $count ->
+        [one] Eén staat in een pakket dat nog wordt toegevoegd; het wordt geconverteerd zodra dat klaar is.
+       *[other] { $count } staan in pakketten die nog worden toegevoegd; ze worden geconverteerd zodra dat klaar is.
+    }
+settings-conv-ask-list = Bestanden die zouden worden geconverteerd
+settings-conv-ask-more = …en nog { $count }
+settings-conv-ask-skipped = Blijven zoals ze zijn:
+settings-conv-skip-watched =
+    { $count ->
+        [one] één bestand in een bewaakte map
+       *[other] { $count } bestanden in bewaakte mappen
+    }
+settings-conv-skip-unity =
+    { $count ->
+        [one] één bestand dat een Unity-project bij zijn naam kent
+       *[other] { $count } bestanden die een Unity-project bij hun naam kent
+    }
+settings-conv-skip-used =
+    { $count ->
+        [one] één bestand waar een scène of een ander bestand naar verwijst
+       *[other] { $count } bestanden waar een scène of een ander bestand naar verwijst
+    }
+settings-conv-skip-beside =
+    { $count ->
+        [one] één bestand waarvan de geconverteerde kopie al in zijn pakket staat
+       *[other] { $count } bestanden waarvan de geconverteerde kopieën al in hun pakketten staan
+    }
+settings-conv-skip-blender =
+    { $count ->
+        [one] één bestand dat Blender nog niet heeft gelezen (Instellingen → Hulpprogramma's)
+       *[other] { $count } bestanden die Blender nog niet heeft gelezen (Instellingen → Hulpprogramma's)
+    }
+settings-conv-ask-new = Opslaan, alleen nieuwe pakketten
+settings-conv-ask-save-convert =
+    { $count ->
+        [one] Opslaan en het converteren
+       *[other] Opslaan en { $count } bestanden converteren
+    }
+settings-conv-ask-convert =
+    { $count ->
+        [one] Het converteren
+       *[other] { $count } bestanden converteren
+    }
 settings-unreal-off = Laten zoals ze zijn
 settings-unreal-off-hint = Converteer vanaf de pagina van een pakket wanneer je wilt.
 settings-unreal-keep = Converteren, originelen bewaren

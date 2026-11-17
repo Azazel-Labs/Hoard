@@ -984,6 +984,12 @@ pub(crate) fn ingest_pack(state: &AppState, rt: &Handle, pack_id: &str, auto_nam
         db::set_pack_status(&conn, pack_id, PackStatus::Analyzing, None)?;
         return Ok(());
     }
+    let then = crate::reformat::Request { then_llm: Some(true), changed: false };
+    if crate::reformat::maybe_enqueue(state, &conn, pack_id, then)? {
+        // So does converting what the conversion rules match.
+        db::set_pack_status(&conn, pack_id, PackStatus::Analyzing, None)?;
+        return Ok(());
+    }
     finish_rules_stage(state, &conn, pack_id, true)
 }
 
@@ -1035,9 +1041,10 @@ pub(crate) fn retag_pack(state: &AppState, rt: &Handle, pack_id: &str) -> Result
     }
     let mut conn = state.pool.get()?;
     // A watched pack's files are read from its folder; they're never copied in. Models are drawn turned as the
-    // pack's are.
+    // pack's are, but for the ones a conversion rule already turned upright.
     let (watched, facing) =
         (crate::locations::watched_root(&conn, pack_id)?.is_some(), db::pack_facing(&conn, pack_id)?);
+    let upright = db::upright_models(&conn, pack_id)?;
     let rows: Vec<Row> = {
         let mut stmt = conn.prepare(&format!(
             "SELECT id, path, blob_hash, human_edited, kind FROM assets a WHERE pack_id = ?1 AND NOT {} AND NOT {}
@@ -1098,6 +1105,7 @@ pub(crate) fn retag_pack(state: &AppState, rt: &Handle, pack_id: &str) -> Result
             }
             rt.block_on(state.blobs.download_to(&r.hash, &local)).with_context(|| r.rel.clone())?;
             let blob = StoredBlob { hash: r.hash.clone(), size: fs::metadata(&local)?.len() };
+            let facing = if upright.contains(&r.id) { hoard_core::Facing::default() } else { facing };
             let mut item = crate::meshes::facing(facing, || analyze_one(local, &dir, r.rel.clone(), Some(blob)))
                 .with_context(|| r.rel.clone())?;
             if let Some(o) = origins.get(&r.id) {

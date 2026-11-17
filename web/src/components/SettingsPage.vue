@@ -52,6 +52,7 @@ import ProfilerPanel from './ProfilerPanel.vue'
 import TagsPanel from './TagsPanel.vue'
 import StoreFormatsPanel from './StoreFormatsPanel.vue'
 import ResetButton from './ResetButton.vue'
+import ConversionRules from './ConversionRules.vue'
 import SettingsGlyph from './SettingsGlyph.vue'
 import SizeInput from './SizeInput.vue'
 
@@ -1266,6 +1267,7 @@ onBeforeUnmount(() => {
               </label>
             </div>
             </section>
+            <ConversionRules :settings="s.conversion_rules" :busy="busy" @saved="take" @unauthorized="emit('unauthorized')" />
           </template>
 
           <template v-else-if="current === 'downloads'">

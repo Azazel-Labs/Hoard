@@ -10,7 +10,7 @@ import CollectionPicker from './CollectionPicker.vue'
 import { playableUrl, player, sourceExt, sourceUrl, stop as stopPreview } from '../player'
 import KindGlyph from './KindGlyph.vue'
 import TagChip from './TagChip.vue'
-import { copyText, daysAgo, showOk, swipeToClose } from '../ui'
+import { confirmDialog, copyText, daysAgo, showOk, swipeToClose } from '../ui'
 import { may, mayEdit } from '../auth'
 import { canStar, mine, toggleFavorite } from '../mine'
 import { MAX_STORE_FILE, TEXT_EXTS } from '../storeFormats'
@@ -416,6 +416,30 @@ const originTail = computed(() => {
   if (o.engine) return t('asset-origin-engine', { engine: o.engine })
   return t('asset-origin-end')
 })
+/** A conversion rule made it (Settings → Adding packs), rather than Unreal's packages. */
+const byRule = computed(() => origin.value?.method === 'rule')
+const puttingBack = ref(false)
+/** Undo the conversion rule: the original file takes the asset back, and the rules leave it alone from then on. */
+async function putBack() {
+  const o = origin.value
+  if (!o) return
+  const ok = await confirmDialog({
+    title: t('asset-rule-put-back-title', { file: originFile.value }),
+    body: t('asset-rule-put-back-body'),
+    confirm: t('asset-rule-put-back'),
+  })
+  if (!ok) return
+  puttingBack.value = true
+  try {
+    await api.unconvert(props.asset.id)
+    emit('updated', await api.asset(props.asset.id))
+    showOk(t('asset-rule-put-back-done', { file: originFile.value }))
+  } catch (e) {
+    emit('error', (e as Error).message)
+  } finally {
+    puttingBack.value = false
+  }
+}
 /** Who converted it, when, and any notes. */
 const originHow = computed(() => {
   const o = origin.value
@@ -1154,8 +1178,24 @@ onBeforeUnmount(() => unswipe())
     </section>
 
     <section v-if="origin || ueStatus || recovered || ueTags.length" class="unreal">
-      <h3>{{ origin ? t('asset-unreal-converted') : t('asset-unreal-package') }}</h3>
-      <template v-if="origin">
+      <h3>{{ byRule ? t('asset-rule-converted') : origin ? t('asset-unreal-converted') : t('asset-unreal-package') }}</h3>
+      <div v-if="origin && byRule" data-testid="rule-origin">
+        <p class="origin-note">
+          {{ t('asset-rule-was', { date: formatDate(origin.converted_at), format: asset.ext.toUpperCase() }) }}
+          <span class="mono">{{ originFile }}</span>
+        </p>
+        <p class="legend">
+          <template v-if="origin.original_kept">
+            {{ origin.kept_until ? t('asset-rule-kept-until', { date: formatDate(origin.kept_until) }) : '' }}
+            <a class="btn" :href="originalUrl(asset)">{{ t('asset-origin-download', { ext: origin.ext }) }}</a>
+            <button v-if="may('admin')" type="button" class="btn" :disabled="puttingBack" data-testid="rule-put-back" @click="putBack">
+              {{ t('asset-rule-put-back') }}
+            </button>
+          </template>
+          <template v-else>{{ t('asset-rule-let-go') }}</template>
+        </p>
+      </div>
+      <template v-else-if="origin">
         <p class="origin-note">
           {{ t('asset-origin-before') }} <span class="mono">{{ originFile }}</span>{{ originTail }}
           {{ originHow }}

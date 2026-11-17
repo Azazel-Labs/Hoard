@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "42480b75a5b6ffe5e9a5e23b3bad0c8e5f5a1104f51660808e921f9a7cdc8e09"
+source = "9528abfcd928f040f086a2f54bd71118058471d032fdd351f2a4f0e86b8dfb1f"
 translation = "10350137b75664600f5b80d67d4b7dc6a218245ed458fa59bceed92a7a09d3d2"
 
 [messages.account-add]
@@ -2293,6 +2293,38 @@ translation = "Kliknutím přejmenujete"
 source = "{ $role } map"
 translation = "mapa typu { $role }"
 
+[messages.asset-rule-converted]
+source = "Converted by a rule"
+translation = "Převedeno pravidlem"
+
+[messages.asset-rule-kept-until]
+source = "The original is kept until { $date }."
+translation = "Originál se uchovává do { $date }."
+
+[messages.asset-rule-let-go]
+source = "The original was deleted once the time Settings keeps originals was up."
+translation = "Originál byl smazán, jakmile uplynula doba, po kterou se podle Nastavení originály uchovávají."
+
+[messages.asset-rule-put-back]
+source = "Put the original back"
+translation = "Vrátit originál"
+
+[messages.asset-rule-put-back-body]
+source = "The converted file is deleted and the original takes its place, with its tags, collections and links. The conversion rules leave it alone from then on."
+translation = "Převedený soubor se smaže a jeho místo zaujme originál i se svými štítky, kolekcemi a odkazy. Pravidla převodu ho od té doby nechají být."
+
+[messages.asset-rule-put-back-done]
+source = "{ $file } is back"
+translation = "{ $file } je zpět"
+
+[messages.asset-rule-put-back-title]
+source = "Put back { $file }?"
+translation = "Vrátit { $file }?"
+
+[messages.asset-rule-was]
+source = "A conversion rule made this { $format } on { $date } from"
+translation = "Toto { $format } vytvořilo pravidlo převodu { $date } ze souboru"
+
 [messages.asset-save]
 source = "Save"
 translation = "Uložit"
@@ -3257,9 +3289,37 @@ translation = "připojení nebylo nalezeno"
 source = "Converted downloads: at least 100 MB"
 translation = "Převedená stahování: alespoň 100 MB"
 
+[messages.error-conversion-cant-undo]
+source = "This file wasn’t converted by a rule, or its original has been deleted."
+translation = "Tento soubor nepřevedlo pravidlo, nebo už byl jeho originál smazán."
+
 [messages.error-conversion-failed]
 source = "couldn't convert to { $format }: { $reason }"
 translation = "převod do { $format } se nezdařil: { $reason }"
+
+[messages.error-conversion-keep-days]
+source = "Conversion rules: keep originals for 1 to { $max } days"
+translation = "Pravidla převodu: originály lze uchovávat 1 až { $max } dní"
+
+[messages.error-conversion-no-source]
+source = "Conversion rules: each rule needs at least one format to convert"
+translation = "Pravidla převodu: každé pravidlo potřebuje alespoň jeden formát k převodu"
+
+[messages.error-conversion-path-taken]
+source = "Another file is at { $path } now, so the original can’t go back there."
+translation = "Na { $path } je teď jiný soubor, takže se tam originál nemůže vrátit."
+
+[messages.error-conversion-source]
+source = "Conversion rules: .{ $ext } files can’t be converted to { $format }"
+translation = "Pravidla převodu: soubory .{ $ext } nelze převést do { $format }"
+
+[messages.error-conversion-target]
+source = "Conversion rules: Hoard can’t convert files to { $format }"
+translation = "Pravidla převodu: Hoard neumí převádět soubory do { $format }"
+
+[messages.error-conversion-twice]
+source = "Conversion rules: .{ $ext } is in two rules"
+translation = "Pravidla převodu: .{ $ext } je ve dvou pravidlech"
 
 [messages.error-credits-collection]
 source = "collection { $key }"
@@ -7723,6 +7783,14 @@ translation = "Jsou v knihovně, ale bez údajů, štítků a miniatury, které 
 source = "Re-analyze pack"
 translation = "Znovu analyzovat balíček"
 
+[messages.server-issues-reformat]
+source = "Files a conversion rule couldn’t convert"
+translation = "Soubory, které pravidlo převodu nedokázalo převést"
+
+[messages.server-issues-reformat-blurb]
+source = "They’re left as they were."
+translation = "Zůstaly tak, jak byly."
+
 [messages.server-issues-render]
 source = "Models the thumbnail renderer failed on"
 translation = "Modely, u kterých vykreslování miniatur selhalo"
@@ -7794,6 +7862,10 @@ translation = "Hledání materiálů: { $pack }"
 [messages.server-job-read-files]
 source = "Reading the files of { $pack }"
 translation = "Čtení souborů: { $pack }"
+
+[messages.server-job-reformat]
+source = "Converting files in { $pack } by the conversion rules"
+translation = "Převod souborů podle pravidel převodu: { $pack }"
 
 [messages.server-job-relocate]
 source = "Moving files between library locations"
@@ -8295,6 +8367,258 @@ translation = "Model se nepodařilo získat: { $detail }. Zkouší se to znovu k
 [messages.settings-clip-what]
 source = "Type what you’re after (“mossy rock”, “sci-fi door”, “wooden barrel”) and pictures that show it turn up beside names that have the words. “More like this” finds things of the same kind, not only the same colors."
 translation = "Napište, co hledáte („mossy rock“, „sci-fi door“, „wooden barrel“), a obrázky, které to zobrazují, se objeví vedle názvů obsahujících tato slova. „Další podobné“ najde věci stejného druhu, nejen stejných barev."
+
+[messages.settings-conv]
+source = "Conversion rules"
+translation = "Pravidla převodu"
+
+[messages.settings-conv-add]
+source = "Add a rule"
+translation = "Přidat pravidlo"
+
+[messages.settings-conv-ask-body]
+source = """
+{ $packs ->
+        [one] It’s in one pack.
+       *[other] They’re in { $packs } packs.
+    } Each original is kept for { $days } days, and until then it can be put back from its page."""
+translation = """
+{ $packs ->
+        [one] Je v jednom balíčku.
+        [few] Jsou v { $packs } balíčcích.
+        [many] Jsou v { $packs } balíčku.
+       *[other] Jsou v { $packs } balíčcích.
+    } Každý originál se uchovává { $days } dní a do té doby ho lze vrátit z jeho stránky."""
+
+[messages.settings-conv-ask-busy]
+source = """
+{ $count ->
+        [one] One is in a pack still being added; it’s converted once that’s done.
+       *[other] { $count } are in packs still being added; they’re converted once that’s done.
+    }"""
+translation = """
+{ $count ->
+        [one] Jeden je v balíčku, který se ještě přidává; převede se, až to bude hotové.
+        [few] { $count } jsou v balíčcích, které se ještě přidávají; převedou se, až to bude hotové.
+        [many] { $count } je v balíčcích, které se ještě přidávají; převedou se, až to bude hotové.
+       *[other] { $count } je v balíčcích, které se ještě přidávají; převedou se, až to bude hotové.
+    }"""
+
+[messages.settings-conv-ask-convert]
+source = """
+{ $count ->
+        [one] Convert it
+       *[other] Convert { $count } files
+    }"""
+translation = """
+{ $count ->
+        [one] Převést ho
+        [few] Převést { $count } soubory
+        [many] Převést { $count } souboru
+       *[other] Převést { $count } souborů
+    }"""
+
+[messages.settings-conv-ask-list]
+source = "Files that would be converted"
+translation = "Soubory, které by se převedly"
+
+[messages.settings-conv-ask-more]
+source = "…and { $count } more"
+translation = "…a ještě { $count }"
+
+[messages.settings-conv-ask-new]
+source = "Save, only new packs"
+translation = "Uložit, jen nové balíčky"
+
+[messages.settings-conv-ask-save-convert]
+source = """
+{ $count ->
+        [one] Save and convert it
+       *[other] Save and convert { $count } files
+    }"""
+translation = """
+{ $count ->
+        [one] Uložit a převést ho
+        [few] Uložit a převést { $count } soubory
+        [many] Uložit a převést { $count } souboru
+       *[other] Uložit a převést { $count } souborů
+    }"""
+
+[messages.settings-conv-ask-skipped]
+source = "Left as they are:"
+translation = "Zůstanou tak, jak jsou:"
+
+[messages.settings-conv-ask-title]
+source = """
+{ $count ->
+        [one] Convert one file already in the library?
+       *[other] Convert { $count } files already in the library?
+    }"""
+translation = """
+{ $count ->
+        [one] Převést jeden soubor, který už je v knihovně?
+        [few] Převést { $count } soubory, které už jsou v knihovně?
+        [many] Převést { $count } souboru, které už jsou v knihovně?
+       *[other] Převést { $count } souborů, které už jsou v knihovně?
+    }"""
+
+[messages.settings-conv-converting]
+source = """
+{ $count ->
+        [one] Converting one file in the background
+       *[other] Converting { $count } files in the background
+    }"""
+translation = """
+{ $count ->
+        [one] Na pozadí se převádí jeden soubor
+        [few] Na pozadí se převádějí { $count } soubory
+        [many] Na pozadí se převádí { $count } souboru
+       *[other] Na pozadí se převádí { $count } souborů
+    }"""
+
+[messages.settings-conv-existing]
+source = "Convert files already in the library"
+translation = "Převést soubory, které už jsou v knihovně"
+
+[messages.settings-conv-from]
+source = "From"
+translation = "Z"
+
+[messages.settings-conv-keep]
+source = "Keep originals for"
+translation = "Uchovávat originály"
+
+[messages.settings-conv-keep-days]
+source = """
+{ $count ->
+        [one] day
+       *[other] days
+    }"""
+translation = """
+{ $count ->
+        [one] den
+        [few] dny
+        [many] dne
+       *[other] dní
+    }"""
+
+[messages.settings-conv-keep-what]
+source = "Until then, a converted file’s page can put the original back. Textures aren’t copied into a converted model: it points at the image files beside it. A model’s .mtl or .bin files stay."
+translation = "Do té doby lze na stránce převedeného souboru vrátit originál. Textury se do převedeného modelu nekopírují: model odkazuje na obrázky vedle sebe. Soubory .mtl nebo .bin modelu zůstávají."
+
+[messages.settings-conv-nothing]
+source = "Nothing in the library needs converting."
+translation = "V knihovně není nic, co by bylo potřeba převést."
+
+[messages.settings-conv-remove]
+source = "Remove"
+translation = "Odebrat"
+
+[messages.settings-conv-remove-label]
+source = "Remove rule { $n }"
+translation = "Odebrat pravidlo { $n }"
+
+[messages.settings-conv-revert]
+source = "Undo changes"
+translation = "Vrátit změny"
+
+[messages.settings-conv-rule-on]
+source = "On"
+translation = "Zapnuto"
+
+[messages.settings-conv-save]
+source = "Save rules"
+translation = "Uložit pravidla"
+
+[messages.settings-conv-saved]
+source = "Conversion rules saved. They apply to packs added from now on."
+translation = "Pravidla převodu uložena. Platí pro balíčky přidané od teď."
+
+[messages.settings-conv-skip-beside]
+source = """
+{ $count ->
+        [one] one file whose converted copy is in its pack already
+       *[other] { $count } files whose converted copies are in their packs already
+    }"""
+translation = """
+{ $count ->
+        [one] jeden soubor, jehož převedená kopie už je v jeho balíčku
+        [few] { $count } soubory, jejichž převedené kopie už jsou v jejich balíčcích
+        [many] { $count } souboru, jejichž převedené kopie už jsou v jejich balíčcích
+       *[other] { $count } souborů, jejichž převedené kopie už jsou v jejich balíčcích
+    }"""
+
+[messages.settings-conv-skip-blender]
+source = """
+{ $count ->
+        [one] one file Blender hasn’t read yet (Settings → Tools)
+       *[other] { $count } files Blender hasn’t read yet (Settings → Tools)
+    }"""
+translation = """
+{ $count ->
+        [one] jeden soubor, který Blender ještě nenačetl (Nastavení → Nástroje)
+        [few] { $count } soubory, které Blender ještě nenačetl (Nastavení → Nástroje)
+        [many] { $count } souboru, které Blender ještě nenačetl (Nastavení → Nástroje)
+       *[other] { $count } souborů, které Blender ještě nenačetl (Nastavení → Nástroje)
+    }"""
+
+[messages.settings-conv-skip-unity]
+source = """
+{ $count ->
+        [one] one file a Unity project knows by its name
+       *[other] { $count } files a Unity project knows by their names
+    }"""
+translation = """
+{ $count ->
+        [one] jeden soubor, který projekt Unity zná podle názvu
+        [few] { $count } soubory, které projekt Unity zná podle názvů
+        [many] { $count } souboru, které projekt Unity zná podle názvů
+       *[other] { $count } souborů, které projekt Unity zná podle názvů
+    }"""
+
+[messages.settings-conv-skip-used]
+source = """
+{ $count ->
+        [one] one file a scene or another file names
+       *[other] { $count } files a scene or another file names
+    }"""
+translation = """
+{ $count ->
+        [one] jeden soubor, na který odkazuje scéna nebo jiný soubor
+        [few] { $count } soubory, na které odkazuje scéna nebo jiný soubor
+        [many] { $count } souboru, na které odkazuje scéna nebo jiný soubor
+       *[other] { $count } souborů, na které odkazuje scéna nebo jiný soubor
+    }"""
+
+[messages.settings-conv-skip-watched]
+source = """
+{ $count ->
+        [one] one file in a watched folder
+       *[other] { $count } files in watched folders
+    }"""
+translation = """
+{ $count ->
+        [one] jeden soubor ve sledované složce
+        [few] { $count } soubory ve sledovaných složkách
+        [many] { $count } souboru ve sledovaných složkách
+       *[other] { $count } souborů ve sledovaných složkách
+    }"""
+
+[messages.settings-conv-taken]
+source = "Another rule converts this format"
+translation = "Tento formát už převádí jiné pravidlo"
+
+[messages.settings-conv-to]
+source = "Convert to"
+translation = "Převést do"
+
+[messages.settings-conv-upright]
+source = "Turn models upright as they’re converted (Y up, facing +Z), the way the pack’s models are shown"
+translation = "Při převodu postavit modely nastojato (osou Y nahoru, otočené k +Z), tak jak se zobrazují modely balíčku"
+
+[messages.settings-conv-what]
+source = "Convert files Hoard keeps to one format, such as every OBJ and FBX to GLB, so the library is all alike. The converted file takes the original’s place, with its name, tags, collections and links. Files in watched folders are never changed."
+translation = "Převádí soubory, které Hoard uchovává, do jednoho formátu, například všechny OBJ a FBX do GLB, aby byla knihovna jednotná. Převedený soubor zaujme místo originálu i s jeho názvem, štítky, kolekcemi a odkazy. Soubory ve sledovaných složkách se nikdy nemění."
 
 [messages.settings-conversion-cache]
 source = "Converted downloads"

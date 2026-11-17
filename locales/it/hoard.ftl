@@ -224,6 +224,14 @@ error-no-soundfont = Non c'è nessun SoundFont in { $path } sul server
 error-workers = Processi in background: da 1 a { $max }
 error-ai-batch = Asset per richiesta all'IA: da 1 a 200
 error-conversion-cache = Download convertiti: almeno 100 MB
+error-conversion-keep-days = Regole di conversione: conserva gli originali da 1 a { $max } giorni
+error-conversion-target = Regole di conversione: Hoard non sa convertire file in { $format }
+error-conversion-no-source = Regole di conversione: ogni regola ha bisogno di almeno un formato da convertire
+# $ext is a file extension, like obj; $format is what it would become, like glb.
+error-conversion-source = Regole di conversione: i file .{ $ext } non possono essere convertiti in { $format }
+error-conversion-twice = Regole di conversione: .{ $ext } è in due regole
+error-conversion-cant-undo = Questo file non è stato convertito da una regola, oppure il suo originale è stato eliminato.
+error-conversion-path-taken = Ora in { $path } c'è un altro file, quindi l'originale non può tornare lì.
 error-limits-zero = I limiti non possono essere zero
 error-settings-object = era atteso un oggetto JSON di impostazioni
 error-bad-setting = impostazione non valida: { $reason }
@@ -354,6 +362,8 @@ server-issues-convert = Modelli che Blender non è riuscito a convertire
 server-issues-convert-blurb = Non hanno una copia GLB, quindi non possono essere mostrati in 3D.
 server-issues-unreal = Package Unreal che non è stato possibile convertire
 server-issues-unreal-blurb = La pagina Unreal del pacchetto ha il resto dei suoi package.
+server-issues-reformat = File che una regola di conversione non è riuscita a convertire
+server-issues-reformat-blurb = Sono rimasti com'erano.
 server-issues-materials = Pacchetti i cui materiali non è stato possibile ricostruire
 server-issues-materials-blurb = Le loro texture ci sono tutte; semplicemente non sono raggruppate in materiali.
 server-issues-material-thumb = Materiali senza miniatura
@@ -375,6 +385,7 @@ server-job-retag = Nuovi tag per { $pack }
 server-job-llm-tag = Tag con IA per { $pack }
 server-job-convert = Conversione di { $pack } con Blender
 server-job-unreal = Conversione dei package Unreal in { $pack }
+server-job-reformat = Conversione dei file in { $pack } secondo le regole di conversione
 server-job-scan = Scansione di una cartella monitorata
 server-job-relocate = Spostamento dei file tra le posizioni della libreria
 server-job-looks = Analisi di colori e aspetto
@@ -1422,6 +1433,15 @@ asset-variants = Varianti ({ $count } versioni)
 asset-copies = Copie identiche
 asset-copies-note = Gli stessi byte sono salvati una volta sola; anche questi pacchetti includono questo file.
 asset-unreal-converted = Convertito da Unreal
+asset-rule-converted = Convertito da una regola
+# Followed by the original file's name: "A conversion rule made this GLB on 3 May 2026 from tree.obj".
+asset-rule-was = Una regola di conversione ha creato questo { $format } il { $date } da
+asset-rule-kept-until = L'originale è conservato fino al { $date }.
+asset-rule-put-back = Ripristina l'originale
+asset-rule-put-back-title = Ripristinare { $file }?
+asset-rule-put-back-body = Il file convertito viene eliminato e l'originale riprende il suo posto, con i suoi tag, le raccolte e i collegamenti. Da quel momento le regole di conversione non lo toccano più.
+asset-rule-put-back-done = { $file } è stato ripristinato
+asset-rule-let-go = L'originale è stato eliminato allo scadere del tempo per cui le Impostazioni conservano gli originali.
 asset-unreal-package = Dal package Unreal
 asset-ue-needs-editor-before = In attesa di Unreal Editor: { $reason }. Su una macchina con Unreal installato, esegui
 asset-ue-needs-editor-after = e tornerà come FBX.
@@ -2314,6 +2334,90 @@ settings-store-lookup = Cerca automaticamente le pagine degli store
 settings-unreal = Package Unreal
 settings-unreal-reset = Package Unreal: ripristina il predefinito
 settings-unreal-what = Cosa fare con i file .uasset.
+settings-conv = Regole di conversione
+settings-conv-what = Converti i file che Hoard conserva in un unico formato, ad esempio tutti gli OBJ e FBX in GLB, così la libreria è uniforme. Il file convertito prende il posto dell'originale, con il suo nome, i tag, le raccolte e i collegamenti. I file nelle cartelle monitorate non vengono mai modificati.
+# A checkbox that turns one conversion rule on or off.
+settings-conv-rule-on = Attiva
+settings-conv-to = Converti in
+# Heading over the file formats a rule converts.
+settings-conv-from = Da
+settings-conv-remove = Rimuovi
+settings-conv-remove-label = Rimuovi la regola { $n }
+settings-conv-taken = Un'altra regola converte già questo formato
+settings-conv-upright = Raddrizza i modelli durante la conversione (Y in alto, rivolti verso +Z), come vengono mostrati i modelli del pacchetto
+settings-conv-add = Aggiungi una regola
+# Before a number of days: "Keep originals for [30] days".
+settings-conv-keep = Conserva gli originali per
+settings-conv-keep-days =
+    { $count ->
+        [one] giorno
+       *[other] giorni
+    }
+settings-conv-keep-what = Fino ad allora, dalla pagina di un file convertito si può ripristinare l'originale. Le texture non vengono copiate in un modello convertito: punta ai file immagine che ha accanto. I file .mtl o .bin di un modello restano.
+settings-conv-save = Salva le regole
+settings-conv-revert = Annulla le modifiche
+settings-conv-existing = Converti i file già presenti nella libreria
+settings-conv-saved = Regole di conversione salvate. Si applicano ai pacchetti aggiunti da ora in poi.
+settings-conv-converting =
+    { $count ->
+        [one] Conversione di un file in background
+       *[other] Conversione di { $count } file in background
+    }
+settings-conv-nothing = Nella libreria non c'è niente da convertire.
+settings-conv-ask-title =
+    { $count ->
+        [one] Convertire un file già presente nella libreria?
+       *[other] Convertire { $count } file già presenti nella libreria?
+    }
+settings-conv-ask-body =
+    { $packs ->
+        [one] Si trova in un pacchetto.
+       *[other] Si trovano in { $packs } pacchetti.
+    } Ogni originale viene conservato per { $days } giorni, e fino ad allora può essere ripristinato dalla sua pagina.
+settings-conv-ask-busy =
+    { $count ->
+        [one] Uno è in un pacchetto ancora in fase di aggiunta; verrà convertito quando l'aggiunta sarà finita.
+       *[other] { $count } sono in pacchetti ancora in fase di aggiunta; verranno convertiti quando l'aggiunta sarà finita.
+    }
+settings-conv-ask-list = File che verrebbero convertiti
+settings-conv-ask-more = …e altri { $count }
+settings-conv-ask-skipped = Lasciati come sono:
+settings-conv-skip-watched =
+    { $count ->
+        [one] un file in una cartella monitorata
+       *[other] { $count } file in cartelle monitorate
+    }
+settings-conv-skip-unity =
+    { $count ->
+        [one] un file che un progetto Unity conosce per nome
+       *[other] { $count } file che un progetto Unity conosce per nome
+    }
+settings-conv-skip-used =
+    { $count ->
+        [one] un file nominato da una scena o da un altro file
+       *[other] { $count } file nominati da una scena o da un altro file
+    }
+settings-conv-skip-beside =
+    { $count ->
+        [one] un file la cui copia convertita è già nel suo pacchetto
+       *[other] { $count } file le cui copie convertite sono già nei loro pacchetti
+    }
+settings-conv-skip-blender =
+    { $count ->
+        [one] un file che Blender non ha ancora letto (Impostazioni → Strumenti)
+       *[other] { $count } file che Blender non ha ancora letto (Impostazioni → Strumenti)
+    }
+settings-conv-ask-new = Salva, solo nuovi pacchetti
+settings-conv-ask-save-convert =
+    { $count ->
+        [one] Salva e convertilo
+       *[other] Salva e converti { $count } file
+    }
+settings-conv-ask-convert =
+    { $count ->
+        [one] Convertilo
+       *[other] Converti { $count } file
+    }
 settings-unreal-off = Lascia così
 settings-unreal-off-hint = Converti dalla pagina di un pacchetto quando vuoi.
 settings-unreal-keep = Converti, conserva gli originali

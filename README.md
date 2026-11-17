@@ -698,6 +698,27 @@ Content folder directly. Cooked packages from shipped games are recognized but c
 Check the license before moving content between engines: Fab's Standard License allows use in other engines and
 tools, but some Epic-made content is licensed for Unreal Engine only.
 
+## Conversion rules
+
+Conversion rules make a library all alike: every OBJ, FBX, 3DS, USD, STL, PLY, glTF, Collada or Blender file converted
+to GLB, say, and turned upright (Y up, facing +Z) on the way. Set them in Settings → Adding packs → Conversion rules
+(admins only, none by default). Each rule names the formats it converts and what to; a format can be in one rule.
+
+A rule converts files in packs Hoard keeps. Files in watched folders are never changed, and neither are files
+something else finds by name: a scene or model that names them, a Unity project's `.meta` file, or a GLB of the same
+name beside them. Each converted file takes the original's place, with its id, name (`tree.obj` becomes
+`tree.glb`), tags, collections, links and family. Its textures aren't copied into it: the GLB points at the image
+files beside it in the pack, so they're stored once. An OBJ's `.mtl` and a glTF's `.bin` stay as they were.
+
+Rules apply to packs added from then on, after analysis. When saving rules that match files already in the
+library, Settings says how many files in how many packs they'd convert, lists them, says what's left alone and why,
+and converts them only on "Save and convert". "Convert files already in the library" asks the same at any time.
+Formats only Blender reads (`.blend`, `.dae`, `.abc`, `.x3d`) wait for Blender's conversion (Settings → Tools).
+
+The original is kept for 30 days (1 to 365 in Settings). Until then a converted asset's page shows where it came
+from, offers the original for download, and can put it back, after which rules leave that file alone. A file a rule
+can't convert is listed under Settings → Issues and stays as it was.
+
 ## Collections
 
 A collection is a hand-picked set of assets from any packs, like everything chosen for one level. Select tiles
@@ -1080,6 +1101,7 @@ browser session's changes must also carry an `X-Hoard` header, which pages on ot
 | GET | `/api/assets/{id}/as/{format}` | download converted (`?max=` size, `?wait=` seconds); `/status` to follow a slow one |
 | GET | `/api/assets/{id}/bundle.zip` | the asset and everything it needs (`?animations=1`) |
 | POST 🔒 | `/api/assets/{id}/replace?ext=` | swap in a new file (body is the file) |
+| POST 🔒 | `/api/assets/{id}/unconvert` | put back the original a conversion rule replaced |
 | GET | `/api/bundle.zip?ids=a,b,c` | a selection as one zip (`&deps=0`, `&sources=1`, `&glb=1` for models as GLBs) |
 | POST | `/api/manifest` | a flat file list (hash, path, URL) for `ids` or a search, with `include_deps`; what engine tools pull from |
 | POST | `/api/credits` | credits for `packs` (ids or names), `collections`, asset `ids` and `selections` (manifest requests); `?format=md` for `CREDITS.md` |
@@ -1171,6 +1193,8 @@ browser session's changes must also carry an `X-Hoard` header, which pages on ot
 | GET | `/api/admin/jobs` | the job queue |
 | GET 🔒 | `/api/admin/profile?after=` | the profiler: processor and memory use each second, what's running, and each request's time in the database, on disk and sending, for the last ten minutes or since `after` |
 | GET 🔒, PUT 🔒 | `/api/admin/settings` | Settings: read, or change some (`null` goes back to the flag) |
+| POST 🔒 | `/api/admin/conversions/preview` | what conversion rules (`{"rules": …}`) would convert in the library, and what they'd leave alone |
+| POST 🔒 | `/api/admin/conversions/run` | convert files already in the library by the saved rules |
 | GET 🔒 | `/api/admin/update` | this version, the newer release if one is out, whether Hoard is idle and what's keeping it busy, the last call to the update address |
 | POST 🔒 | `/api/admin/update/hook` | call the update address now |
 | GET, POST 🔒 | `/api/admin/store-formats` | the store file formats, and files that look like a store's that none reads; `{toml, replaces?}` saves one in the data folder and reads the packs with such a file again |

@@ -224,6 +224,14 @@ error-no-soundfont = Sunucuda şu yolda SoundFont yok: { $path }
 error-workers = Arka plan çalışanları: 1 ile { $max } arası
 error-ai-batch = Yapay zekâ isteği başına varlık: 1 ile 200 arası
 error-conversion-cache = Dönüştürülmüş indirmeler: en az 100 MB
+error-conversion-keep-days = Dönüştürme kuralları: özgünler 1 ile { $max } gün arasında tutulmalı
+error-conversion-target = Dönüştürme kuralları: Hoard dosyaları { $format } biçimine dönüştüremez
+error-conversion-no-source = Dönüştürme kuralları: her kuralın dönüştüreceği en az bir biçim olmalı
+# $ext is a file extension, like obj; $format is what it would become, like glb.
+error-conversion-source = Dönüştürme kuralları: .{ $ext } dosyaları { $format } biçimine dönüştürülemez
+error-conversion-twice = Dönüştürme kuralları: .{ $ext } iki kuralda birden var
+error-conversion-cant-undo = Bu dosya bir kuralla dönüştürülmedi ya da özgün dosyası silindi.
+error-conversion-path-taken = { $path } konumunda artık başka bir dosya var, bu yüzden özgün dosya oraya geri konamaz.
 error-limits-zero = Sınırlar sıfır olamaz
 error-settings-object = ayarlardan oluşan bir JSON nesnesi bekleniyordu
 error-bad-setting = hatalı ayar: { $reason }
@@ -346,6 +354,8 @@ server-issues-convert = Blender’ın dönüştüremediği modeller
 server-issues-convert-blurb = GLB kopyaları yok, bu yüzden 3B olarak gösterilemezler.
 server-issues-unreal = Dönüştürülemeyen Unreal paketleri
 server-issues-unreal-blurb = Paketin diğer Unreal paketleri, paketin Unreal sayfasında.
+server-issues-reformat = Bir dönüştürme kuralının dönüştüremediği dosyalar
+server-issues-reformat-blurb = Oldukları gibi bırakıldılar.
 server-issues-materials = Malzemeleri çıkarılamayan paketler
 server-issues-materials-blurb = Dokuların hepsi orada; yalnızca malzemeler hâlinde gruplanmamışlar.
 server-issues-material-thumb = Küçük resmi olmayan malzemeler
@@ -367,6 +377,7 @@ server-job-retag = Yeniden etiketleniyor: { $pack }
 server-job-llm-tag = Yapay zekâ ile etiketleniyor: { $pack }
 server-job-convert = Blender ile dönüştürülüyor: { $pack }
 server-job-unreal = Unreal paketleri dönüştürülüyor: { $pack }
+server-job-reformat = Dönüştürme kurallarına göre dosyalar dönüştürülüyor: { $pack }
 server-job-scan = İzlenen bir klasör taranıyor
 server-job-relocate = Dosyalar kütüphane konumları arasında taşınıyor
 server-job-looks = Renkler ve görünümler çıkarılıyor
@@ -1313,6 +1324,15 @@ asset-variants = Varyantlar ({ $count } adet)
 asset-copies = Özdeş kopyalar
 asset-copies-note = Aynı baytlar bir kez saklanır; bu paketler de bu dosyayı içeriyor.
 asset-unreal-converted = Unreal’dan dönüştürüldü
+asset-rule-converted = Bir kuralla dönüştürüldü
+# Followed by the original file's name: "A conversion rule made this GLB on 3 May 2026 from tree.obj".
+asset-rule-was = Bir dönüştürme kuralı bu { $format } dosyasını { $date } tarihinde şu dosyadan oluşturdu:
+asset-rule-kept-until = Özgün dosya { $date } tarihine kadar tutulur.
+asset-rule-put-back = Özgün dosyayı geri koy
+asset-rule-put-back-title = { $file } geri konsun mu?
+asset-rule-put-back-body = Dönüştürülen dosya silinir ve özgün dosya; etiketleri, koleksiyonları ve bağlantılarıyla birlikte onun yerini alır. Dönüştürme kuralları bundan sonra ona dokunmaz.
+asset-rule-put-back-done = { $file } geri geldi
+asset-rule-let-go = Özgün dosya, Ayarlar’da belirlenen saklama süresi dolunca silindi.
 asset-unreal-package = Unreal paketinden
 asset-ue-needs-editor-before = Unreal Editor bekleniyor: { $reason }. Unreal kurulu bir makinede
 asset-ue-needs-editor-after = komutunu çalıştırın; dosya FBX olarak geri gelir.
@@ -2141,6 +2161,90 @@ settings-store-lookup = Mağaza sayfalarını otomatik olarak ara
 settings-unreal = Unreal paketleri
 settings-unreal-reset = Unreal paketleri: varsayılana dön
 settings-unreal-what = .uasset dosyalarıyla ne yapılacağı.
+settings-conv = Dönüştürme kuralları
+settings-conv-what = Hoard’un sakladığı dosyaları tek bir biçime dönüştürün; örneğin tüm OBJ ve FBX dosyalarını GLB’ye. Böylece kütüphanedeki her şey aynı biçimde olur. Dönüştürülen dosya; adı, etiketleri, koleksiyonları ve bağlantılarıyla özgün dosyanın yerini alır. İzlenen klasörlerdeki dosyalar hiçbir zaman değiştirilmez.
+# A checkbox that turns one conversion rule on or off.
+settings-conv-rule-on = Açık
+settings-conv-to = Şuna dönüştür
+# Heading over the file formats a rule converts.
+settings-conv-from = Kaynak biçimler
+settings-conv-remove = Kaldır
+settings-conv-remove-label = { $n }. kuralı kaldır
+settings-conv-taken = Bu biçimi başka bir kural dönüştürüyor
+settings-conv-upright = Modelleri dönüştürürken paketin modellerinin gösterildiği gibi dik çevir (Y yukarı, +Z’ye bakan)
+settings-conv-add = Kural ekle
+# Before a number of days: "Keep originals for [30] days".
+settings-conv-keep = Özgünleri sakla:
+settings-conv-keep-days =
+    { $count ->
+        [one] gün
+       *[other] gün
+    }
+settings-conv-keep-what = O zamana kadar özgün dosya, dönüştürülen dosyanın sayfasından geri konabilir. Dokular dönüştürülen modelin içine kopyalanmaz: model, yanındaki görüntü dosyalarını kullanır. Bir modelin .mtl ya da .bin dosyaları yerinde kalır.
+settings-conv-save = Kuralları kaydet
+settings-conv-revert = Değişiklikleri geri al
+settings-conv-existing = Kütüphanede zaten olan dosyaları dönüştür
+settings-conv-saved = Dönüştürme kuralları kaydedildi. Bundan sonra eklenen paketlere uygulanırlar.
+settings-conv-converting =
+    { $count ->
+        [one] Arka planda bir dosya dönüştürülüyor
+       *[other] Arka planda { $count } dosya dönüştürülüyor
+    }
+settings-conv-nothing = Kütüphanede dönüştürülmesi gereken bir şey yok.
+settings-conv-ask-title =
+    { $count ->
+        [one] Kütüphanede zaten olan bir dosya dönüştürülsün mü?
+       *[other] Kütüphanede zaten olan { $count } dosya dönüştürülsün mü?
+    }
+settings-conv-ask-body =
+    { $packs ->
+        [one] Bir pakette.
+       *[other] { $packs } pakette.
+    } Her özgün dosya { $days } gün tutulur ve o zamana kadar sayfasından geri konabilir.
+settings-conv-ask-busy =
+    { $count ->
+        [one] Biri hâlâ eklenmekte olan bir pakette; ekleme bitince dönüştürülür.
+       *[other] { $count } tanesi hâlâ eklenmekte olan paketlerde; ekleme bitince dönüştürülürler.
+    }
+settings-conv-ask-list = Dönüştürülecek dosyalar
+settings-conv-ask-more = …ve { $count } tane daha
+settings-conv-ask-skipped = Olduğu gibi bırakılanlar:
+settings-conv-skip-watched =
+    { $count ->
+        [one] izlenen bir klasördeki bir dosya
+       *[other] izlenen klasörlerdeki { $count } dosya
+    }
+settings-conv-skip-unity =
+    { $count ->
+        [one] bir Unity projesinin adıyla tanıdığı bir dosya
+       *[other] bir Unity projesinin adlarıyla tanıdığı { $count } dosya
+    }
+settings-conv-skip-used =
+    { $count ->
+        [one] bir sahnenin ya da başka bir dosyanın adını andığı bir dosya
+       *[other] bir sahnenin ya da başka bir dosyanın adını andığı { $count } dosya
+    }
+settings-conv-skip-beside =
+    { $count ->
+        [one] dönüştürülmüş kopyası zaten paketinde olan bir dosya
+       *[other] dönüştürülmüş kopyaları zaten paketlerinde olan { $count } dosya
+    }
+settings-conv-skip-blender =
+    { $count ->
+        [one] Blender’ın henüz okumadığı bir dosya (Ayarlar → Araçlar)
+       *[other] Blender’ın henüz okumadığı { $count } dosya (Ayarlar → Araçlar)
+    }
+settings-conv-ask-new = Kaydet, yalnızca yeni paketler
+settings-conv-ask-save-convert =
+    { $count ->
+        [one] Kaydet ve dönüştür
+       *[other] Kaydet ve { $count } dosyayı dönüştür
+    }
+settings-conv-ask-convert =
+    { $count ->
+        [one] Dönüştür
+       *[other] { $count } dosyayı dönüştür
+    }
 settings-unreal-off = Olduğu gibi bırak
 settings-unreal-off-hint = İstediğinizde bir paketin sayfasından dönüştürün.
 settings-unreal-keep = Dönüştür, özgünleri tut

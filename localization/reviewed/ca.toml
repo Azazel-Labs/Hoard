@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "42480b75a5b6ffe5e9a5e23b3bad0c8e5f5a1104f51660808e921f9a7cdc8e09"
+source = "9528abfcd928f040f086a2f54bd71118058471d032fdd351f2a4f0e86b8dfb1f"
 translation = "a8e90c6c6ba195832f26ec8d98ede39bfedc68c80bc69fd376aa7b993e381133"
 
 [messages.account-add]
@@ -2258,6 +2258,38 @@ translation = "Feu clic per canviar el nom"
 source = "{ $role } map"
 translation = "mapa: { $role }"
 
+[messages.asset-rule-converted]
+source = "Converted by a rule"
+translation = "Convertit per una regla"
+
+[messages.asset-rule-kept-until]
+source = "The original is kept until { $date }."
+translation = "L'original es conserva fins al { $date }."
+
+[messages.asset-rule-let-go]
+source = "The original was deleted once the time Settings keeps originals was up."
+translation = "L'original es va eliminar quan es va acabar el temps durant el qual es conserven els originals segons la Configuració."
+
+[messages.asset-rule-put-back]
+source = "Put the original back"
+translation = "Restaura l'original"
+
+[messages.asset-rule-put-back-body]
+source = "The converted file is deleted and the original takes its place, with its tags, collections and links. The conversion rules leave it alone from then on."
+translation = "El fitxer convertit s'elimina i l'original n'ocupa el lloc, amb les seves etiquetes, col·leccions i enllaços. A partir d'aleshores, les regles de conversió ja no el toquen."
+
+[messages.asset-rule-put-back-done]
+source = "{ $file } is back"
+translation = "S'ha restaurat { $file }"
+
+[messages.asset-rule-put-back-title]
+source = "Put back { $file }?"
+translation = "Voleu restaurar { $file }?"
+
+[messages.asset-rule-was]
+source = "A conversion rule made this { $format } on { $date } from"
+translation = "Una regla de conversió va crear aquest { $format } el { $date } a partir de"
+
 [messages.asset-save]
 source = "Save"
 translation = "Desa"
@@ -3220,9 +3252,37 @@ translation = "no s'ha trobat la connexió"
 source = "Converted downloads: at least 100 MB"
 translation = "Baixades convertides: almenys 100 MB"
 
+[messages.error-conversion-cant-undo]
+source = "This file wasn’t converted by a rule, or its original has been deleted."
+translation = "Aquest fitxer no l'ha convertit cap regla, o se n'ha eliminat l'original."
+
 [messages.error-conversion-failed]
 source = "couldn't convert to { $format }: { $reason }"
 translation = "no s'ha pogut convertir a { $format }: { $reason }"
+
+[messages.error-conversion-keep-days]
+source = "Conversion rules: keep originals for 1 to { $max } days"
+translation = "Regles de conversió: els originals s'han de conservar entre 1 i { $max } dies"
+
+[messages.error-conversion-no-source]
+source = "Conversion rules: each rule needs at least one format to convert"
+translation = "Regles de conversió: cada regla necessita com a mínim un format per convertir"
+
+[messages.error-conversion-path-taken]
+source = "Another file is at { $path } now, so the original can’t go back there."
+translation = "Ara hi ha un altre fitxer a { $path }, així que l'original no hi pot tornar."
+
+[messages.error-conversion-source]
+source = "Conversion rules: .{ $ext } files can’t be converted to { $format }"
+translation = "Regles de conversió: els fitxers .{ $ext } no es poden convertir a { $format }"
+
+[messages.error-conversion-target]
+source = "Conversion rules: Hoard can’t convert files to { $format }"
+translation = "Regles de conversió: Hoard no pot convertir fitxers a { $format }"
+
+[messages.error-conversion-twice]
+source = "Conversion rules: .{ $ext } is in two rules"
+translation = "Regles de conversió: .{ $ext } és a dues regles"
 
 [messages.error-credits-collection]
 source = "collection { $key }"
@@ -7590,6 +7650,14 @@ translation = "Són a la biblioteca, però sense les dades, les etiquetes ni la 
 source = "Re-analyze pack"
 translation = "Torna a analitzar el paquet"
 
+[messages.server-issues-reformat]
+source = "Files a conversion rule couldn’t convert"
+translation = "Fitxers que una regla de conversió no ha pogut convertir"
+
+[messages.server-issues-reformat-blurb]
+source = "They’re left as they were."
+translation = "S'han deixat tal com eren."
+
 [messages.server-issues-render]
 source = "Models the thumbnail renderer failed on"
 translation = "Models en què ha fallat el renderitzador de miniatures"
@@ -7661,6 +7729,10 @@ translation = "Cercant materials a { $pack }"
 [messages.server-job-read-files]
 source = "Reading the files of { $pack }"
 translation = "Llegint els fitxers de { $pack }"
+
+[messages.server-job-reformat]
+source = "Converting files in { $pack } by the conversion rules"
+translation = "Convertint els fitxers de { $pack } segons les regles de conversió"
 
 [messages.server-job-relocate]
 source = "Moving files between library locations"
@@ -8159,6 +8231,234 @@ translation = "No s'ha pogut obtenir el model: { $detail }. Es torna a provar ca
 [messages.settings-clip-what]
 source = "Type what you’re after (“mossy rock”, “sci-fi door”, “wooden barrel”) and pictures that show it turn up beside names that have the words. “More like this” finds things of the same kind, not only the same colors."
 translation = "Escriviu el que busqueu («roca molsosa», «porta de ciència-ficció», «barril de fusta») i les imatges que ho mostren apareixen al costat dels noms que contenen les paraules. «Més com aquest» troba coses del mateix tipus, no només dels mateixos colors."
+
+[messages.settings-conv]
+source = "Conversion rules"
+translation = "Regles de conversió"
+
+[messages.settings-conv-add]
+source = "Add a rule"
+translation = "Afegeix una regla"
+
+[messages.settings-conv-ask-body]
+source = """
+{ $packs ->
+        [one] It’s in one pack.
+       *[other] They’re in { $packs } packs.
+    } Each original is kept for { $days } days, and until then it can be put back from its page."""
+translation = """
+{ $packs ->
+        [one] És en un paquet.
+       *[other] Són en { $packs } paquets.
+    } Cada original es conserva { $days } dies i, fins aleshores, es pot restaurar des de la seva pàgina."""
+
+[messages.settings-conv-ask-busy]
+source = """
+{ $count ->
+        [one] One is in a pack still being added; it’s converted once that’s done.
+       *[other] { $count } are in packs still being added; they’re converted once that’s done.
+    }"""
+translation = """
+{ $count ->
+        [one] N'hi ha un en un paquet que encara s'està afegint; es convertirà quan acabi.
+       *[other] N'hi ha { $count } en paquets que encara s'estan afegint; es convertiran quan acabin.
+    }"""
+
+[messages.settings-conv-ask-convert]
+source = """
+{ $count ->
+        [one] Convert it
+       *[other] Convert { $count } files
+    }"""
+translation = """
+{ $count ->
+        [one] Converteix-lo
+       *[other] Converteix { $count } fitxers
+    }"""
+
+[messages.settings-conv-ask-list]
+source = "Files that would be converted"
+translation = "Fitxers que es convertirien"
+
+[messages.settings-conv-ask-more]
+source = "…and { $count } more"
+translation = "…i { $count } més"
+
+[messages.settings-conv-ask-new]
+source = "Save, only new packs"
+translation = "Desa, només paquets nous"
+
+[messages.settings-conv-ask-save-convert]
+source = """
+{ $count ->
+        [one] Save and convert it
+       *[other] Save and convert { $count } files
+    }"""
+translation = """
+{ $count ->
+        [one] Desa i converteix-lo
+       *[other] Desa i converteix { $count } fitxers
+    }"""
+
+[messages.settings-conv-ask-skipped]
+source = "Left as they are:"
+translation = "Es deixen tal com són:"
+
+[messages.settings-conv-ask-title]
+source = """
+{ $count ->
+        [one] Convert one file already in the library?
+       *[other] Convert { $count } files already in the library?
+    }"""
+translation = """
+{ $count ->
+        [one] Voleu convertir un fitxer que ja és a la biblioteca?
+       *[other] Voleu convertir { $count } fitxers que ja són a la biblioteca?
+    }"""
+
+[messages.settings-conv-converting]
+source = """
+{ $count ->
+        [one] Converting one file in the background
+       *[other] Converting { $count } files in the background
+    }"""
+translation = """
+{ $count ->
+        [one] Convertint un fitxer en segon pla
+       *[other] Convertint { $count } fitxers en segon pla
+    }"""
+
+[messages.settings-conv-existing]
+source = "Convert files already in the library"
+translation = "Converteix els fitxers que ja són a la biblioteca"
+
+[messages.settings-conv-from]
+source = "From"
+translation = "De"
+
+[messages.settings-conv-keep]
+source = "Keep originals for"
+translation = "Conserva els originals durant"
+
+[messages.settings-conv-keep-days]
+source = """
+{ $count ->
+        [one] day
+       *[other] days
+    }"""
+translation = """
+{ $count ->
+        [one] dia
+       *[other] dies
+    }"""
+
+[messages.settings-conv-keep-what]
+source = "Until then, a converted file’s page can put the original back. Textures aren’t copied into a converted model: it points at the image files beside it. A model’s .mtl or .bin files stay."
+translation = "Fins aleshores, des de la pàgina d'un fitxer convertit es pot restaurar l'original. Les textures no es copien dins d'un model convertit: el model fa referència als fitxers d'imatge que té al costat. Els fitxers .mtl o .bin d'un model es mantenen."
+
+[messages.settings-conv-nothing]
+source = "Nothing in the library needs converting."
+translation = "No cal convertir res de la biblioteca."
+
+[messages.settings-conv-remove]
+source = "Remove"
+translation = "Elimina"
+
+[messages.settings-conv-remove-label]
+source = "Remove rule { $n }"
+translation = "Elimina la regla { $n }"
+
+[messages.settings-conv-revert]
+source = "Undo changes"
+translation = "Desfés els canvis"
+
+[messages.settings-conv-rule-on]
+source = "On"
+translation = "Activa"
+
+[messages.settings-conv-save]
+source = "Save rules"
+translation = "Desa les regles"
+
+[messages.settings-conv-saved]
+source = "Conversion rules saved. They apply to packs added from now on."
+translation = "S'han desat les regles de conversió. S'apliquen als paquets que s'afegeixin a partir d'ara."
+
+[messages.settings-conv-skip-beside]
+source = """
+{ $count ->
+        [one] one file whose converted copy is in its pack already
+       *[other] { $count } files whose converted copies are in their packs already
+    }"""
+translation = """
+{ $count ->
+        [one] un fitxer que ja té la còpia convertida al seu paquet
+       *[other] { $count } fitxers que ja tenen la còpia convertida al seu paquet
+    }"""
+
+[messages.settings-conv-skip-blender]
+source = """
+{ $count ->
+        [one] one file Blender hasn’t read yet (Settings → Tools)
+       *[other] { $count } files Blender hasn’t read yet (Settings → Tools)
+    }"""
+translation = """
+{ $count ->
+        [one] un fitxer que Blender encara no ha llegit (Configuració → Eines)
+       *[other] { $count } fitxers que Blender encara no ha llegit (Configuració → Eines)
+    }"""
+
+[messages.settings-conv-skip-unity]
+source = """
+{ $count ->
+        [one] one file a Unity project knows by its name
+       *[other] { $count } files a Unity project knows by their names
+    }"""
+translation = """
+{ $count ->
+        [one] un fitxer que un projecte d'Unity coneix pel nom
+       *[other] { $count } fitxers que un projecte d'Unity coneix pel nom
+    }"""
+
+[messages.settings-conv-skip-used]
+source = """
+{ $count ->
+        [one] one file a scene or another file names
+       *[other] { $count } files a scene or another file names
+    }"""
+translation = """
+{ $count ->
+        [one] un fitxer al qual fa referència una escena o un altre fitxer
+       *[other] { $count } fitxers als quals fa referència una escena o un altre fitxer
+    }"""
+
+[messages.settings-conv-skip-watched]
+source = """
+{ $count ->
+        [one] one file in a watched folder
+       *[other] { $count } files in watched folders
+    }"""
+translation = """
+{ $count ->
+        [one] un fitxer en una carpeta vigilada
+       *[other] { $count } fitxers en carpetes vigilades
+    }"""
+
+[messages.settings-conv-taken]
+source = "Another rule converts this format"
+translation = "Una altra regla ja converteix aquest format"
+
+[messages.settings-conv-to]
+source = "Convert to"
+translation = "Converteix a"
+
+[messages.settings-conv-upright]
+source = "Turn models upright as they’re converted (Y up, facing +Z), the way the pack’s models are shown"
+translation = "Posa els models drets en convertir-los (amb la Y amunt i mirant cap a +Z), tal com es mostren els models del paquet"
+
+[messages.settings-conv-what]
+source = "Convert files Hoard keeps to one format, such as every OBJ and FBX to GLB, so the library is all alike. The converted file takes the original’s place, with its name, tags, collections and links. Files in watched folders are never changed."
+translation = "Converteix els fitxers que desa Hoard a un sol format, com ara tots els OBJ i FBX a GLB, perquè la biblioteca sigui homogènia. El fitxer convertit ocupa el lloc de l'original i en conserva el nom, les etiquetes, les col·leccions i els enllaços. Els fitxers de les carpetes vigilades no es modifiquen mai."
 
 [messages.settings-conversion-cache]
 source = "Converted downloads"

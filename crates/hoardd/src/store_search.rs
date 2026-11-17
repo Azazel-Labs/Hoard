@@ -1029,7 +1029,7 @@ fn url_with(base: &str, key: &str, value: &str) -> String {
     reqwest::Url::parse_with_params(base, [(key, value)]).map_or_else(|_| base.to_owned(), String::from)
 }
 
-fn percent_encode(s: &str) -> String {
+pub(crate) fn percent_encode(s: &str) -> String {
     let mut out = String::with_capacity(s.len() * 3);
     for b in s.bytes() {
         if b.is_ascii_alphanumeric() || matches!(b, b'-' | b'_' | b'.' | b'~') {

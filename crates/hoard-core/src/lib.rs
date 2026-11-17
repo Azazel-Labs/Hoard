@@ -343,10 +343,13 @@ pub struct AssetOrigin {
     pub engine: Option<String>,
     #[serde(default)]
     pub dependencies: Vec<String>,
-    /// `native` (Hoard's own reader) or `editor` (exported by Unreal Editor).
+    /// `native` (Hoard's own reader), `editor` (exported by Unreal Editor) or `rule` (a conversion rule).
     pub method: String,
     pub notes: Option<String>,
     pub converted_at: String,
+    /// When a conversion rule's original is deleted (RFC 3339); until then it can be put back.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub kept_until: Option<String>,
 }
 
 /// Why an Unreal package hasn't been converted.

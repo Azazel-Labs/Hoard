@@ -51,6 +51,7 @@ mod previews;
 mod profiler;
 mod projects;
 mod provenance;
+mod reformat;
 mod relocate;
 mod scan;
 mod server;
@@ -211,6 +212,7 @@ async fn main() -> Result<()> {
         tokio::spawn(async move { formats::log_trim(&st).await });
     }
     scan::spawn_rescans(&state);
+    reformat::spawn_expiry(&state);
     profiler::start();
 
     let mut app = api::router(&state);

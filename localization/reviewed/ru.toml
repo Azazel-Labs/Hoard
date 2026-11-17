@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "42480b75a5b6ffe5e9a5e23b3bad0c8e5f5a1104f51660808e921f9a7cdc8e09"
+source = "9528abfcd928f040f086a2f54bd71118058471d032fdd351f2a4f0e86b8dfb1f"
 translation = "95443a48d777d86011fe11040c214e6d115790b94418d4e3ec20dd07fca486c8"
 
 [messages.account-add]
@@ -2328,6 +2328,38 @@ translation = "Нажмите, чтобы переименовать"
 source = "{ $role } map"
 translation = "карта { $role }"
 
+[messages.asset-rule-converted]
+source = "Converted by a rule"
+translation = "Преобразован правилом"
+
+[messages.asset-rule-kept-until]
+source = "The original is kept until { $date }."
+translation = "Оригинал хранится до { $date }."
+
+[messages.asset-rule-let-go]
+source = "The original was deleted once the time Settings keeps originals was up."
+translation = "Оригинал удалён, когда истёк срок хранения оригиналов, заданный в настройках."
+
+[messages.asset-rule-put-back]
+source = "Put the original back"
+translation = "Вернуть оригинал"
+
+[messages.asset-rule-put-back-body]
+source = "The converted file is deleted and the original takes its place, with its tags, collections and links. The conversion rules leave it alone from then on."
+translation = "Преобразованный файл удаляется, а его место занимает оригинал — с тегами, коллекциями и ссылками. После этого правила преобразования его больше не трогают."
+
+[messages.asset-rule-put-back-done]
+source = "{ $file } is back"
+translation = "{ $file } возвращён"
+
+[messages.asset-rule-put-back-title]
+source = "Put back { $file }?"
+translation = "Вернуть { $file }?"
+
+[messages.asset-rule-was]
+source = "A conversion rule made this { $format } on { $date } from"
+translation = "Правило преобразования создало этот файл { $format } { $date } из"
+
 [messages.asset-save]
 source = "Save"
 translation = "Сохранить"
@@ -3294,9 +3326,37 @@ translation = "подключение не найдено"
 source = "Converted downloads: at least 100 MB"
 translation = "Преобразованные загрузки: не меньше 100 МБ"
 
+[messages.error-conversion-cant-undo]
+source = "This file wasn’t converted by a rule, or its original has been deleted."
+translation = "Этот файл не был преобразован правилом, или его оригинал уже удалён."
+
 [messages.error-conversion-failed]
 source = "couldn't convert to { $format }: { $reason }"
 translation = "не удалось преобразовать в { $format }: { $reason }"
+
+[messages.error-conversion-keep-days]
+source = "Conversion rules: keep originals for 1 to { $max } days"
+translation = "Правила преобразования: оригиналы можно хранить от 1 до { $max } дней"
+
+[messages.error-conversion-no-source]
+source = "Conversion rules: each rule needs at least one format to convert"
+translation = "Правила преобразования: в каждом правиле нужен хотя бы один формат для преобразования"
+
+[messages.error-conversion-path-taken]
+source = "Another file is at { $path } now, so the original can’t go back there."
+translation = "По пути { $path } теперь лежит другой файл, поэтому оригинал нельзя туда вернуть."
+
+[messages.error-conversion-source]
+source = "Conversion rules: .{ $ext } files can’t be converted to { $format }"
+translation = "Правила преобразования: файлы .{ $ext } нельзя преобразовать в { $format }"
+
+[messages.error-conversion-target]
+source = "Conversion rules: Hoard can’t convert files to { $format }"
+translation = "Правила преобразования: Hoard не умеет преобразовывать файлы в { $format }"
+
+[messages.error-conversion-twice]
+source = "Conversion rules: .{ $ext } is in two rules"
+translation = "Правила преобразования: .{ $ext } есть в двух правилах"
 
 [messages.error-credits-collection]
 source = "collection { $key }"
@@ -7770,6 +7830,14 @@ translation = "Они есть в библиотеке, но без сведен
 source = "Re-analyze pack"
 translation = "Проанализировать пак заново"
 
+[messages.server-issues-reformat]
+source = "Files a conversion rule couldn’t convert"
+translation = "Файлы, которые правило преобразования не смогло преобразовать"
+
+[messages.server-issues-reformat-blurb]
+source = "They’re left as they were."
+translation = "Они оставлены как были."
+
 [messages.server-issues-render]
 source = "Models the thumbnail renderer failed on"
 translation = "Модели, на которых сломался рендер миниатюр"
@@ -7841,6 +7909,10 @@ translation = "Поиск материалов: { $pack }"
 [messages.server-job-read-files]
 source = "Reading the files of { $pack }"
 translation = "Чтение файлов: { $pack }"
+
+[messages.server-job-reformat]
+source = "Converting files in { $pack } by the conversion rules"
+translation = "Преобразование файлов по правилам преобразования: { $pack }"
 
 [messages.server-job-relocate]
 source = "Moving files between library locations"
@@ -8344,6 +8416,263 @@ translation = "Не удалось получить модель: { $detail }. �
 [messages.settings-clip-what]
 source = "Type what you’re after (“mossy rock”, “sci-fi door”, “wooden barrel”) and pictures that show it turn up beside names that have the words. “More like this” finds things of the same kind, not only the same colors."
 translation = "Введите, что ищете («mossy rock», «sci-fi door», «wooden barrel»), и картинки, на которых это есть, появятся рядом с названиями, где есть эти слова. «Похожие» находит вещи того же рода, а не только тех же цветов."
+
+[messages.settings-conv]
+source = "Conversion rules"
+translation = "Правила преобразования"
+
+[messages.settings-conv-add]
+source = "Add a rule"
+translation = "Добавить правило"
+
+[messages.settings-conv-ask-body]
+source = """
+{ $packs ->
+        [one] It’s in one pack.
+       *[other] They’re in { $packs } packs.
+    } Each original is kept for { $days } days, and until then it can be put back from its page."""
+translation = """
+{ $packs ->
+        [one] Всё это в { $packs } паке.
+        [few] Всё это в { $packs } паках.
+        [many] Всё это в { $packs } паках.
+       *[other] Всё это в { $packs } пака.
+    } Каждый оригинал хранится { $days ->
+        [one] { $days } день
+        [few] { $days } дня
+        [many] { $days } дней
+       *[other] { $days } дня
+    }, и до тех пор его можно вернуть с его страницы."""
+
+[messages.settings-conv-ask-busy]
+source = """
+{ $count ->
+        [one] One is in a pack still being added; it’s converted once that’s done.
+       *[other] { $count } are in packs still being added; they’re converted once that’s done.
+    }"""
+translation = """
+{ $count ->
+        [one] { $count } файл — в паке, который ещё добавляется; он будет преобразован, когда это закончится.
+        [few] { $count } файла — в паках, которые ещё добавляются; они будут преобразованы, когда это закончится.
+        [many] { $count } файлов — в паках, которые ещё добавляются; они будут преобразованы, когда это закончится.
+       *[other] { $count } файла — в паках, которые ещё добавляются; они будут преобразованы, когда это закончится.
+    }"""
+
+[messages.settings-conv-ask-convert]
+source = """
+{ $count ->
+        [one] Convert it
+       *[other] Convert { $count } files
+    }"""
+translation = """
+{ $count ->
+        [one] Преобразовать { $count } файл
+        [few] Преобразовать { $count } файла
+        [many] Преобразовать { $count } файлов
+       *[other] Преобразовать { $count } файла
+    }"""
+
+[messages.settings-conv-ask-list]
+source = "Files that would be converted"
+translation = "Файлы, которые будут преобразованы"
+
+[messages.settings-conv-ask-more]
+source = "…and { $count } more"
+translation = "…и ещё { $count }"
+
+[messages.settings-conv-ask-new]
+source = "Save, only new packs"
+translation = "Сохранить, только новые паки"
+
+[messages.settings-conv-ask-save-convert]
+source = """
+{ $count ->
+        [one] Save and convert it
+       *[other] Save and convert { $count } files
+    }"""
+translation = """
+{ $count ->
+        [one] Сохранить и преобразовать { $count } файл
+        [few] Сохранить и преобразовать { $count } файла
+        [many] Сохранить и преобразовать { $count } файлов
+       *[other] Сохранить и преобразовать { $count } файла
+    }"""
+
+[messages.settings-conv-ask-skipped]
+source = "Left as they are:"
+translation = "Останутся как есть:"
+
+[messages.settings-conv-ask-title]
+source = """
+{ $count ->
+        [one] Convert one file already in the library?
+       *[other] Convert { $count } files already in the library?
+    }"""
+translation = """
+{ $count ->
+        [one] Преобразовать { $count } файл, который уже в библиотеке?
+        [few] Преобразовать { $count } файла, которые уже в библиотеке?
+        [many] Преобразовать { $count } файлов, которые уже в библиотеке?
+       *[other] Преобразовать { $count } файла, которые уже в библиотеке?
+    }"""
+
+[messages.settings-conv-converting]
+source = """
+{ $count ->
+        [one] Converting one file in the background
+       *[other] Converting { $count } files in the background
+    }"""
+translation = """
+{ $count ->
+        [one] В фоне преобразуется { $count } файл
+        [few] В фоне преобразуются { $count } файла
+        [many] В фоне преобразуются { $count } файлов
+       *[other] В фоне преобразуются { $count } файла
+    }"""
+
+[messages.settings-conv-existing]
+source = "Convert files already in the library"
+translation = "Преобразовать файлы, которые уже в библиотеке"
+
+[messages.settings-conv-from]
+source = "From"
+translation = "Из"
+
+[messages.settings-conv-keep]
+source = "Keep originals for"
+translation = "Хранить оригиналы"
+
+[messages.settings-conv-keep-days]
+source = """
+{ $count ->
+        [one] day
+       *[other] days
+    }"""
+translation = """
+{ $count ->
+        [one] день
+        [few] дня
+        [many] дней
+       *[other] дня
+    }"""
+
+[messages.settings-conv-keep-what]
+source = "Until then, a converted file’s page can put the original back. Textures aren’t copied into a converted model: it points at the image files beside it. A model’s .mtl or .bin files stay."
+translation = "До тех пор на странице преобразованного файла можно вернуть оригинал. Текстуры не копируются в преобразованную модель: она ссылается на файлы изображений рядом с ней. Файлы .mtl и .bin модели остаются."
+
+[messages.settings-conv-nothing]
+source = "Nothing in the library needs converting."
+translation = "В библиотеке нечего преобразовывать."
+
+[messages.settings-conv-remove]
+source = "Remove"
+translation = "Удалить"
+
+[messages.settings-conv-remove-label]
+source = "Remove rule { $n }"
+translation = "Удалить правило { $n }"
+
+[messages.settings-conv-revert]
+source = "Undo changes"
+translation = "Отменить изменения"
+
+[messages.settings-conv-rule-on]
+source = "On"
+translation = "Включено"
+
+[messages.settings-conv-save]
+source = "Save rules"
+translation = "Сохранить правила"
+
+[messages.settings-conv-saved]
+source = "Conversion rules saved. They apply to packs added from now on."
+translation = "Правила преобразования сохранены. Они применяются к пакам, добавленным с этого момента."
+
+[messages.settings-conv-skip-beside]
+source = """
+{ $count ->
+        [one] one file whose converted copy is in its pack already
+       *[other] { $count } files whose converted copies are in their packs already
+    }"""
+translation = """
+{ $count ->
+        [one] { $count } файл, преобразованная копия которого уже есть в его паке
+        [few] { $count } файла, преобразованные копии которых уже есть в их паках
+        [many] { $count } файлов, преобразованные копии которых уже есть в их паках
+       *[other] { $count } файла, преобразованные копии которых уже есть в их паках
+    }"""
+
+[messages.settings-conv-skip-blender]
+source = """
+{ $count ->
+        [one] one file Blender hasn’t read yet (Settings → Tools)
+       *[other] { $count } files Blender hasn’t read yet (Settings → Tools)
+    }"""
+translation = """
+{ $count ->
+        [one] { $count } файл, который Blender ещё не прочитал («Настройки → Инструменты»)
+        [few] { $count } файла, которые Blender ещё не прочитал («Настройки → Инструменты»)
+        [many] { $count } файлов, которые Blender ещё не прочитал («Настройки → Инструменты»)
+       *[other] { $count } файла, которые Blender ещё не прочитал («Настройки → Инструменты»)
+    }"""
+
+[messages.settings-conv-skip-unity]
+source = """
+{ $count ->
+        [one] one file a Unity project knows by its name
+       *[other] { $count } files a Unity project knows by their names
+    }"""
+translation = """
+{ $count ->
+        [one] { $count } файл, который проект Unity знает по имени
+        [few] { $count } файла, которые проект Unity знает по имени
+        [many] { $count } файлов, которые проект Unity знает по имени
+       *[other] { $count } файла, которые проект Unity знает по имени
+    }"""
+
+[messages.settings-conv-skip-used]
+source = """
+{ $count ->
+        [one] one file a scene or another file names
+       *[other] { $count } files a scene or another file names
+    }"""
+translation = """
+{ $count ->
+        [one] { $count } файл, на который ссылается сцена или другой файл
+        [few] { $count } файла, на которые ссылается сцена или другой файл
+        [many] { $count } файлов, на которые ссылается сцена или другой файл
+       *[other] { $count } файла, на которые ссылается сцена или другой файл
+    }"""
+
+[messages.settings-conv-skip-watched]
+source = """
+{ $count ->
+        [one] one file in a watched folder
+       *[other] { $count } files in watched folders
+    }"""
+translation = """
+{ $count ->
+        [one] { $count } файл в отслеживаемой папке
+        [few] { $count } файла в отслеживаемых папках
+        [many] { $count } файлов в отслеживаемых папках
+       *[other] { $count } файла в отслеживаемых папках
+    }"""
+
+[messages.settings-conv-taken]
+source = "Another rule converts this format"
+translation = "Этот формат уже преобразует другое правило"
+
+[messages.settings-conv-to]
+source = "Convert to"
+translation = "Преобразовывать в"
+
+[messages.settings-conv-upright]
+source = "Turn models upright as they’re converted (Y up, facing +Z), the way the pack’s models are shown"
+translation = "Ставить модели вертикально при преобразовании (Y вверх, лицом к +Z), так, как показываются модели пака"
+
+[messages.settings-conv-what]
+source = "Convert files Hoard keeps to one format, such as every OBJ and FBX to GLB, so the library is all alike. The converted file takes the original’s place, with its name, tags, collections and links. Files in watched folders are never changed."
+translation = "Преобразует файлы, которые хранит Hoard, в один формат — например, все OBJ и FBX в GLB, — чтобы библиотека была единообразной. Преобразованный файл занимает место оригинала и сохраняет его имя, теги, коллекции и ссылки. Файлы в отслеживаемых папках никогда не изменяются."
 
 [messages.settings-conversion-cache]
 source = "Converted downloads"

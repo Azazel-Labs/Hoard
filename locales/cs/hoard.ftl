@@ -224,6 +224,14 @@ error-no-soundfont = Na serveru není na { $path } žádný SoundFont
 error-workers = Úlohy na pozadí: 1 až { $max }
 error-ai-batch = Assetů na jeden požadavek AI: 1 až 200
 error-conversion-cache = Převedená stahování: alespoň 100 MB
+error-conversion-keep-days = Pravidla převodu: originály lze uchovávat 1 až { $max } dní
+error-conversion-target = Pravidla převodu: Hoard neumí převádět soubory do { $format }
+error-conversion-no-source = Pravidla převodu: každé pravidlo potřebuje alespoň jeden formát k převodu
+# $ext is a file extension, like obj; $format is what it would become, like glb.
+error-conversion-source = Pravidla převodu: soubory .{ $ext } nelze převést do { $format }
+error-conversion-twice = Pravidla převodu: .{ $ext } je ve dvou pravidlech
+error-conversion-cant-undo = Tento soubor nepřevedlo pravidlo, nebo už byl jeho originál smazán.
+error-conversion-path-taken = Na { $path } je teď jiný soubor, takže se tam originál nemůže vrátit.
 error-limits-zero = Limity nemohou být nulové
 error-settings-object = očekáván objekt JSON s nastavením
 error-bad-setting = chybné nastavení: { $reason }
@@ -356,6 +364,8 @@ server-issues-convert = Modely, které Blender nedokázal převést
 server-issues-convert-blurb = Nemají kopii GLB, takže je nelze zobrazit ve 3D.
 server-issues-unreal = Soubory Unrealu, které nešlo převést
 server-issues-unreal-blurb = Ostatní soubory Unrealu najdete na stránce Unreal daného balíčku.
+server-issues-reformat = Soubory, které pravidlo převodu nedokázalo převést
+server-issues-reformat-blurb = Zůstaly tak, jak byly.
 server-issues-materials = Balíčky, jejichž materiály nešlo zjistit
 server-issues-materials-blurb = Textury jsou všechny na místě; jen nejsou seskupené do materiálů.
 server-issues-material-thumb = Materiály bez miniatury
@@ -377,6 +387,7 @@ server-job-retag = Nové štítkování: { $pack }
 server-job-llm-tag = Štítkování pomocí AI: { $pack }
 server-job-convert = Převod v Blenderu: { $pack }
 server-job-unreal = Převod souborů Unrealu: { $pack }
+server-job-reformat = Převod souborů podle pravidel převodu: { $pack }
 server-job-scan = Prohledávání sledované složky
 server-job-relocate = Přesouvání souborů mezi umístěními knihovny
 server-job-looks = Zjišťování barev a vzhledu
@@ -1513,6 +1524,15 @@ asset-variants = Varianty (verzí: { $count })
 asset-copies = Identické kopie
 asset-copies-note = Stejné bajty se ukládají jen jednou; tento soubor obsahují i tyto balíčky.
 asset-unreal-converted = Převedeno z Unrealu
+asset-rule-converted = Převedeno pravidlem
+# Followed by the original file's name: "A conversion rule made this GLB on 3 May 2026 from tree.obj".
+asset-rule-was = Toto { $format } vytvořilo pravidlo převodu { $date } ze souboru
+asset-rule-kept-until = Originál se uchovává do { $date }.
+asset-rule-put-back = Vrátit originál
+asset-rule-put-back-title = Vrátit { $file }?
+asset-rule-put-back-body = Převedený soubor se smaže a jeho místo zaujme originál i se svými štítky, kolekcemi a odkazy. Pravidla převodu ho od té doby nechají být.
+asset-rule-put-back-done = { $file } je zpět
+asset-rule-let-go = Originál byl smazán, jakmile uplynula doba, po kterou se podle Nastavení originály uchovávají.
 asset-unreal-package = Ze souboru Unrealu
 asset-ue-needs-editor-before = Čeká na Unreal Editor: { $reason }. Na počítači s nainstalovaným Unrealem spusťte
 asset-ue-needs-editor-after = a vrátí se jako FBX.
@@ -2491,6 +2511,114 @@ settings-store-lookup = Automaticky vyhledávat stránky v obchodech
 settings-unreal = Soubory Unrealu
 settings-unreal-reset = Soubory Unrealu: zpět na výchozí
 settings-unreal-what = Co dělat se soubory .uasset.
+settings-conv = Pravidla převodu
+settings-conv-what = Převádí soubory, které Hoard uchovává, do jednoho formátu, například všechny OBJ a FBX do GLB, aby byla knihovna jednotná. Převedený soubor zaujme místo originálu i s jeho názvem, štítky, kolekcemi a odkazy. Soubory ve sledovaných složkách se nikdy nemění.
+# A checkbox that turns one conversion rule on or off.
+settings-conv-rule-on = Zapnuto
+settings-conv-to = Převést do
+# Heading over the file formats a rule converts.
+settings-conv-from = Z
+settings-conv-remove = Odebrat
+settings-conv-remove-label = Odebrat pravidlo { $n }
+settings-conv-taken = Tento formát už převádí jiné pravidlo
+settings-conv-upright = Při převodu postavit modely nastojato (osou Y nahoru, otočené k +Z), tak jak se zobrazují modely balíčku
+settings-conv-add = Přidat pravidlo
+# Before a number of days: "Keep originals for [30] days".
+settings-conv-keep = Uchovávat originály
+settings-conv-keep-days =
+    { $count ->
+        [one] den
+        [few] dny
+        [many] dne
+       *[other] dní
+    }
+settings-conv-keep-what = Do té doby lze na stránce převedeného souboru vrátit originál. Textury se do převedeného modelu nekopírují: model odkazuje na obrázky vedle sebe. Soubory .mtl nebo .bin modelu zůstávají.
+settings-conv-save = Uložit pravidla
+settings-conv-revert = Vrátit změny
+settings-conv-existing = Převést soubory, které už jsou v knihovně
+settings-conv-saved = Pravidla převodu uložena. Platí pro balíčky přidané od teď.
+settings-conv-converting =
+    { $count ->
+        [one] Na pozadí se převádí jeden soubor
+        [few] Na pozadí se převádějí { $count } soubory
+        [many] Na pozadí se převádí { $count } souboru
+       *[other] Na pozadí se převádí { $count } souborů
+    }
+settings-conv-nothing = V knihovně není nic, co by bylo potřeba převést.
+settings-conv-ask-title =
+    { $count ->
+        [one] Převést jeden soubor, který už je v knihovně?
+        [few] Převést { $count } soubory, které už jsou v knihovně?
+        [many] Převést { $count } souboru, které už jsou v knihovně?
+       *[other] Převést { $count } souborů, které už jsou v knihovně?
+    }
+settings-conv-ask-body =
+    { $packs ->
+        [one] Je v jednom balíčku.
+        [few] Jsou v { $packs } balíčcích.
+        [many] Jsou v { $packs } balíčku.
+       *[other] Jsou v { $packs } balíčcích.
+    } Každý originál se uchovává { $days } dní a do té doby ho lze vrátit z jeho stránky.
+settings-conv-ask-busy =
+    { $count ->
+        [one] Jeden je v balíčku, který se ještě přidává; převede se, až to bude hotové.
+        [few] { $count } jsou v balíčcích, které se ještě přidávají; převedou se, až to bude hotové.
+        [many] { $count } je v balíčcích, které se ještě přidávají; převedou se, až to bude hotové.
+       *[other] { $count } je v balíčcích, které se ještě přidávají; převedou se, až to bude hotové.
+    }
+settings-conv-ask-list = Soubory, které by se převedly
+settings-conv-ask-more = …a ještě { $count }
+settings-conv-ask-skipped = Zůstanou tak, jak jsou:
+settings-conv-skip-watched =
+    { $count ->
+        [one] jeden soubor ve sledované složce
+        [few] { $count } soubory ve sledovaných složkách
+        [many] { $count } souboru ve sledovaných složkách
+       *[other] { $count } souborů ve sledovaných složkách
+    }
+settings-conv-skip-unity =
+    { $count ->
+        [one] jeden soubor, který projekt Unity zná podle názvu
+        [few] { $count } soubory, které projekt Unity zná podle názvů
+        [many] { $count } souboru, které projekt Unity zná podle názvů
+       *[other] { $count } souborů, které projekt Unity zná podle názvů
+    }
+settings-conv-skip-used =
+    { $count ->
+        [one] jeden soubor, na který odkazuje scéna nebo jiný soubor
+        [few] { $count } soubory, na které odkazuje scéna nebo jiný soubor
+        [many] { $count } souboru, na které odkazuje scéna nebo jiný soubor
+       *[other] { $count } souborů, na které odkazuje scéna nebo jiný soubor
+    }
+settings-conv-skip-beside =
+    { $count ->
+        [one] jeden soubor, jehož převedená kopie už je v jeho balíčku
+        [few] { $count } soubory, jejichž převedené kopie už jsou v jejich balíčcích
+        [many] { $count } souboru, jejichž převedené kopie už jsou v jejich balíčcích
+       *[other] { $count } souborů, jejichž převedené kopie už jsou v jejich balíčcích
+    }
+settings-conv-skip-blender =
+    { $count ->
+        [one] jeden soubor, který Blender ještě nenačetl (Nastavení → Nástroje)
+        [few] { $count } soubory, které Blender ještě nenačetl (Nastavení → Nástroje)
+        [many] { $count } souboru, které Blender ještě nenačetl (Nastavení → Nástroje)
+       *[other] { $count } souborů, které Blender ještě nenačetl (Nastavení → Nástroje)
+    }
+settings-conv-ask-new = Uložit, jen nové balíčky
+settings-conv-ask-save-convert =
+    { $count ->
+        [one] Uložit a převést ho
+        [few] Uložit a převést { $count } soubory
+        [many] Uložit a převést { $count } souboru
+       *[other] Uložit a převést { $count } souborů
+    }
+settings-conv-ask-convert =
+    { $count ->
+        [one] Převést ho
+        [few] Převést { $count } soubory
+        [many] Převést { $count } souboru
+       *[other] Převést { $count } souborů
+    }
 settings-unreal-off = Nechat, jak jsou
 settings-unreal-off-hint = Převeďte je ze stránky balíčku, až budete chtít.
 settings-unreal-keep = Převést, ponechat originály

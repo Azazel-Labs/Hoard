@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "42480b75a5b6ffe5e9a5e23b3bad0c8e5f5a1104f51660808e921f9a7cdc8e09"
+source = "9528abfcd928f040f086a2f54bd71118058471d032fdd351f2a4f0e86b8dfb1f"
 translation = "4d4f0096cc29f03f0fe2a94d855b0ef2f60194198f01e480a5d3926c58b74326"
 
 [messages.account-add]
@@ -2258,6 +2258,38 @@ translation = "Klik om te hernoem"
 source = "{ $role } map"
 translation = "kaart vir { $role }"
 
+[messages.asset-rule-converted]
+source = "Converted by a rule"
+translation = "Deur 'n reël omgeskakel"
+
+[messages.asset-rule-kept-until]
+source = "The original is kept until { $date }."
+translation = "Die oorspronklike word tot { $date } gehou."
+
+[messages.asset-rule-let-go]
+source = "The original was deleted once the time Settings keeps originals was up."
+translation = "Die oorspronklike is uitgevee toe die tyd wat Instellings oorspronklikes hou, verby was."
+
+[messages.asset-rule-put-back]
+source = "Put the original back"
+translation = "Sit die oorspronklike terug"
+
+[messages.asset-rule-put-back-body]
+source = "The converted file is deleted and the original takes its place, with its tags, collections and links. The conversion rules leave it alone from then on."
+translation = "Die omgeskakelde lêer word uitgevee en die oorspronklike neem sy plek in, met sy etikette, versamelings en skakels. Die omskakelreëls los dit voortaan uit."
+
+[messages.asset-rule-put-back-done]
+source = "{ $file } is back"
+translation = "{ $file } is terug"
+
+[messages.asset-rule-put-back-title]
+source = "Put back { $file }?"
+translation = "Sit { $file } terug?"
+
+[messages.asset-rule-was]
+source = "A conversion rule made this { $format } on { $date } from"
+translation = "'n Omskakelreël het hierdie { $format } op { $date } gemaak uit"
+
 [messages.asset-save]
 source = "Save"
 translation = "Stoor"
@@ -3220,9 +3252,37 @@ translation = "verbinding nie gevind nie"
 source = "Converted downloads: at least 100 MB"
 translation = "Omgeskakelde aflaaie: minstens 100 MB"
 
+[messages.error-conversion-cant-undo]
+source = "This file wasn’t converted by a rule, or its original has been deleted."
+translation = "Hierdie lêer is nie deur 'n reël omgeskakel nie, of sy oorspronklike is uitgevee."
+
 [messages.error-conversion-failed]
 source = "couldn't convert to { $format }: { $reason }"
 translation = "kon nie na { $format } omskakel nie: { $reason }"
+
+[messages.error-conversion-keep-days]
+source = "Conversion rules: keep originals for 1 to { $max } days"
+translation = "Omskakelreëls: hou oorspronklikes vir 1 tot { $max } dae"
+
+[messages.error-conversion-no-source]
+source = "Conversion rules: each rule needs at least one format to convert"
+translation = "Omskakelreëls: elke reël het minstens een formaat nodig om om te skakel"
+
+[messages.error-conversion-path-taken]
+source = "Another file is at { $path } now, so the original can’t go back there."
+translation = "Daar is nou 'n ander lêer by { $path }, dus kan die oorspronklike nie daarheen teruggaan nie."
+
+[messages.error-conversion-source]
+source = "Conversion rules: .{ $ext } files can’t be converted to { $format }"
+translation = "Omskakelreëls: .{ $ext }-lêers kan nie na { $format } omgeskakel word nie"
+
+[messages.error-conversion-target]
+source = "Conversion rules: Hoard can’t convert files to { $format }"
+translation = "Omskakelreëls: Hoard kan nie lêers na { $format } omskakel nie"
+
+[messages.error-conversion-twice]
+source = "Conversion rules: .{ $ext } is in two rules"
+translation = "Omskakelreëls: .{ $ext } is in twee reëls"
 
 [messages.error-credits-collection]
 source = "collection { $key }"
@@ -7584,6 +7644,14 @@ translation = "Hulle is in die biblioteek, maar sonder die feite, etikette of du
 source = "Re-analyze pack"
 translation = "Heranaliseer pak"
 
+[messages.server-issues-reformat]
+source = "Files a conversion rule couldn’t convert"
+translation = "Lêers wat 'n omskakelreël nie kon omskakel nie"
+
+[messages.server-issues-reformat-blurb]
+source = "They’re left as they were."
+translation = "Hulle is gelaat soos hulle was."
+
 [messages.server-issues-render]
 source = "Models the thumbnail renderer failed on"
 translation = "Modelle waarop die duimnaelweergewer misluk het"
@@ -7655,6 +7723,10 @@ translation = "Soek materiale in { $pack }"
 [messages.server-job-read-files]
 source = "Reading the files of { $pack }"
 translation = "Lees die lêers van { $pack }"
+
+[messages.server-job-reformat]
+source = "Converting files in { $pack } by the conversion rules"
+translation = "Skakel lêers in { $pack } volgens die omskakelreëls om"
 
 [messages.server-job-relocate]
 source = "Moving files between library locations"
@@ -8153,6 +8225,234 @@ translation = "Kon nie die model kry nie: { $detail }. Probeer elke uur weer."
 [messages.settings-clip-what]
 source = "Type what you’re after (“mossy rock”, “sci-fi door”, “wooden barrel”) and pictures that show it turn up beside names that have the words. “More like this” finds things of the same kind, not only the same colors."
 translation = "Tik waarna jy soek (“mossy rock”, “sci-fi door”, “wooden barrel”) en prente wat dit wys, verskyn langs name wat die woorde bevat. “Meer soos hierdie” vind dinge van dieselfde soort, nie net dieselfde kleure nie."
+
+[messages.settings-conv]
+source = "Conversion rules"
+translation = "Omskakelreëls"
+
+[messages.settings-conv-add]
+source = "Add a rule"
+translation = "Voeg 'n reël by"
+
+[messages.settings-conv-ask-body]
+source = """
+{ $packs ->
+        [one] It’s in one pack.
+       *[other] They’re in { $packs } packs.
+    } Each original is kept for { $days } days, and until then it can be put back from its page."""
+translation = """
+{ $packs ->
+        [one] Dit is in een pak.
+       *[other] Hulle is in { $packs } pakke.
+    } Elke oorspronklike word { $days } dae gehou, en tot dan kan dit vanaf sy bladsy teruggesit word."""
+
+[messages.settings-conv-ask-busy]
+source = """
+{ $count ->
+        [one] One is in a pack still being added; it’s converted once that’s done.
+       *[other] { $count } are in packs still being added; they’re converted once that’s done.
+    }"""
+translation = """
+{ $count ->
+        [one] Een is in 'n pak wat nog bygevoeg word; dit word omgeskakel sodra dit klaar is.
+       *[other] { $count } is in pakke wat nog bygevoeg word; hulle word omgeskakel sodra dit klaar is.
+    }"""
+
+[messages.settings-conv-ask-convert]
+source = """
+{ $count ->
+        [one] Convert it
+       *[other] Convert { $count } files
+    }"""
+translation = """
+{ $count ->
+        [one] Skakel dit om
+       *[other] Skakel { $count } lêers om
+    }"""
+
+[messages.settings-conv-ask-list]
+source = "Files that would be converted"
+translation = "Lêers wat omgeskakel sou word"
+
+[messages.settings-conv-ask-more]
+source = "…and { $count } more"
+translation = "…en nog { $count }"
+
+[messages.settings-conv-ask-new]
+source = "Save, only new packs"
+translation = "Stoor, net nuwe pakke"
+
+[messages.settings-conv-ask-save-convert]
+source = """
+{ $count ->
+        [one] Save and convert it
+       *[other] Save and convert { $count } files
+    }"""
+translation = """
+{ $count ->
+        [one] Stoor en skakel dit om
+       *[other] Stoor en skakel { $count } lêers om
+    }"""
+
+[messages.settings-conv-ask-skipped]
+source = "Left as they are:"
+translation = "Gelaat soos hulle is:"
+
+[messages.settings-conv-ask-title]
+source = """
+{ $count ->
+        [one] Convert one file already in the library?
+       *[other] Convert { $count } files already in the library?
+    }"""
+translation = """
+{ $count ->
+        [one] Skakel een lêer om wat reeds in die biblioteek is?
+       *[other] Skakel { $count } lêers om wat reeds in die biblioteek is?
+    }"""
+
+[messages.settings-conv-converting]
+source = """
+{ $count ->
+        [one] Converting one file in the background
+       *[other] Converting { $count } files in the background
+    }"""
+translation = """
+{ $count ->
+        [one] Skakel een lêer in die agtergrond om
+       *[other] Skakel { $count } lêers in die agtergrond om
+    }"""
+
+[messages.settings-conv-existing]
+source = "Convert files already in the library"
+translation = "Skakel lêers om wat reeds in die biblioteek is"
+
+[messages.settings-conv-from]
+source = "From"
+translation = "Van"
+
+[messages.settings-conv-keep]
+source = "Keep originals for"
+translation = "Hou oorspronklikes vir"
+
+[messages.settings-conv-keep-days]
+source = """
+{ $count ->
+        [one] day
+       *[other] days
+    }"""
+translation = """
+{ $count ->
+        [one] dag
+       *[other] dae
+    }"""
+
+[messages.settings-conv-keep-what]
+source = "Until then, a converted file’s page can put the original back. Textures aren’t copied into a converted model: it points at the image files beside it. A model’s .mtl or .bin files stay."
+translation = "Tot dan kan 'n omgeskakelde lêer se bladsy die oorspronklike terugsit. Teksture word nie in 'n omgeskakelde model gekopieer nie: dit verwys na die beeldlêers langsaan. 'n Model se .mtl- of .bin-lêers bly."
+
+[messages.settings-conv-nothing]
+source = "Nothing in the library needs converting."
+translation = "Niks in die biblioteek hoef omgeskakel te word nie."
+
+[messages.settings-conv-remove]
+source = "Remove"
+translation = "Verwyder"
+
+[messages.settings-conv-remove-label]
+source = "Remove rule { $n }"
+translation = "Verwyder reël { $n }"
+
+[messages.settings-conv-revert]
+source = "Undo changes"
+translation = "Ontdoen veranderinge"
+
+[messages.settings-conv-rule-on]
+source = "On"
+translation = "Aan"
+
+[messages.settings-conv-save]
+source = "Save rules"
+translation = "Stoor reëls"
+
+[messages.settings-conv-saved]
+source = "Conversion rules saved. They apply to packs added from now on."
+translation = "Omskakelreëls gestoor. Hulle geld vir pakke wat van nou af bygevoeg word."
+
+[messages.settings-conv-skip-beside]
+source = """
+{ $count ->
+        [one] one file whose converted copy is in its pack already
+       *[other] { $count } files whose converted copies are in their packs already
+    }"""
+translation = """
+{ $count ->
+        [one] een lêer waarvan die omgeskakelde kopie reeds in sy pak is
+       *[other] { $count } lêers waarvan die omgeskakelde kopieë reeds in hul pakke is
+    }"""
+
+[messages.settings-conv-skip-blender]
+source = """
+{ $count ->
+        [one] one file Blender hasn’t read yet (Settings → Tools)
+       *[other] { $count } files Blender hasn’t read yet (Settings → Tools)
+    }"""
+translation = """
+{ $count ->
+        [one] een lêer wat Blender nog nie gelees het nie (Instellings → Gereedskap)
+       *[other] { $count } lêers wat Blender nog nie gelees het nie (Instellings → Gereedskap)
+    }"""
+
+[messages.settings-conv-skip-unity]
+source = """
+{ $count ->
+        [one] one file a Unity project knows by its name
+       *[other] { $count } files a Unity project knows by their names
+    }"""
+translation = """
+{ $count ->
+        [one] een lêer wat 'n Unity-projek by sy naam ken
+       *[other] { $count } lêers wat 'n Unity-projek by hul name ken
+    }"""
+
+[messages.settings-conv-skip-used]
+source = """
+{ $count ->
+        [one] one file a scene or another file names
+       *[other] { $count } files a scene or another file names
+    }"""
+translation = """
+{ $count ->
+        [one] een lêer waarna 'n toneel of 'n ander lêer verwys
+       *[other] { $count } lêers waarna 'n toneel of 'n ander lêer verwys
+    }"""
+
+[messages.settings-conv-skip-watched]
+source = """
+{ $count ->
+        [one] one file in a watched folder
+       *[other] { $count } files in watched folders
+    }"""
+translation = """
+{ $count ->
+        [one] een lêer in 'n gemonitorde vouer
+       *[other] { $count } lêers in gemonitorde vouers
+    }"""
+
+[messages.settings-conv-taken]
+source = "Another rule converts this format"
+translation = "'n Ander reël skakel hierdie formaat reeds om"
+
+[messages.settings-conv-to]
+source = "Convert to"
+translation = "Skakel om na"
+
+[messages.settings-conv-upright]
+source = "Turn models upright as they’re converted (Y up, facing +Z), the way the pack’s models are shown"
+translation = "Rig modelle regop terwyl hulle omgeskakel word (Y op, wys na +Z), soos die pak se modelle gewys word"
+
+[messages.settings-conv-what]
+source = "Convert files Hoard keeps to one format, such as every OBJ and FBX to GLB, so the library is all alike. The converted file takes the original’s place, with its name, tags, collections and links. Files in watched folders are never changed."
+translation = "Skakel lêers wat Hoard hou na een formaat om, soos elke OBJ en FBX na GLB, sodat die biblioteek eenvormig is. Die omgeskakelde lêer neem die oorspronklike se plek in, met sy naam, etikette, versamelings en skakels. Lêers in gemonitorde vouers word nooit verander nie."
 
 [messages.settings-conversion-cache]
 source = "Converted downloads"

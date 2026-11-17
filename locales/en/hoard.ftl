@@ -257,6 +257,14 @@ error-no-soundfont = There's no SoundFont at { $path } on the server
 error-workers = Background workers: between 1 and { $max }
 error-ai-batch = Assets per AI request: between 1 and 200
 error-conversion-cache = Converted downloads: at least 100 MB
+error-conversion-keep-days = Conversion rules: keep originals for 1 to { $max } days
+error-conversion-target = Conversion rules: Hoard can’t convert files to { $format }
+error-conversion-no-source = Conversion rules: each rule needs at least one format to convert
+# $ext is a file extension, like obj; $format is what it would become, like glb.
+error-conversion-source = Conversion rules: .{ $ext } files can’t be converted to { $format }
+error-conversion-twice = Conversion rules: .{ $ext } is in two rules
+error-conversion-cant-undo = This file wasn’t converted by a rule, or its original has been deleted.
+error-conversion-path-taken = Another file is at { $path } now, so the original can’t go back there.
 error-limits-zero = Limits can't be zero
 error-settings-object = expected a JSON object of settings
 # $reason is what was wrong, in English from the JSON reader.
@@ -395,6 +403,8 @@ server-issues-convert = Models Blender couldn’t convert
 server-issues-convert-blurb = They have no GLB copy, so they can’t be shown in 3D.
 server-issues-unreal = Unreal packages that couldn’t be converted
 server-issues-unreal-blurb = The pack’s Unreal page has the rest of its packages.
+server-issues-reformat = Files a conversion rule couldn’t convert
+server-issues-reformat-blurb = They’re left as they were.
 server-issues-materials = Packs whose materials couldn’t be worked out
 server-issues-materials-blurb = Their textures are all there; they just aren’t grouped into materials.
 server-issues-material-thumb = Materials without a thumbnail
@@ -418,6 +428,7 @@ server-job-retag = Re-tagging { $pack }
 server-job-llm-tag = Tagging { $pack } with AI
 server-job-convert = Converting { $pack } with Blender
 server-job-unreal = Converting Unreal packages in { $pack }
+server-job-reformat = Converting files in { $pack } by the conversion rules
 server-job-scan = Scanning a watched folder
 server-job-relocate = Moving files between library locations
 server-job-looks = Working out colors and looks
@@ -1584,6 +1595,15 @@ asset-variants = Variants ({ $count } takes)
 asset-copies = Identical copies
 asset-copies-note = The same bytes are stored once; these packs ship this file too.
 asset-unreal-converted = Converted from Unreal
+asset-rule-converted = Converted by a rule
+# Followed by the original file's name: "A conversion rule made this GLB on 3 May 2026 from tree.obj".
+asset-rule-was = A conversion rule made this { $format } on { $date } from
+asset-rule-kept-until = The original is kept until { $date }.
+asset-rule-put-back = Put the original back
+asset-rule-put-back-title = Put back { $file }?
+asset-rule-put-back-body = The converted file is deleted and the original takes its place, with its tags, collections and links. The conversion rules leave it alone from then on.
+asset-rule-put-back-done = { $file } is back
+asset-rule-let-go = The original was deleted once the time Settings keeps originals was up.
 asset-unreal-package = From the Unreal package
 # "Waiting for Unreal Editor: <reason>. On a machine with Unreal installed, run <command> and it comes back as FBX."
 asset-ue-needs-editor-before = Waiting for Unreal Editor: { $reason }. On a machine with Unreal installed, run
@@ -2595,6 +2615,90 @@ settings-store-lookup = Look up store pages automatically
 settings-unreal = Unreal packages
 settings-unreal-reset = Unreal packages: back to the default
 settings-unreal-what = What to do with .uasset files.
+settings-conv = Conversion rules
+settings-conv-what = Convert files Hoard keeps to one format, such as every OBJ and FBX to GLB, so the library is all alike. The converted file takes the original’s place, with its name, tags, collections and links. Files in watched folders are never changed.
+# A checkbox that turns one conversion rule on or off.
+settings-conv-rule-on = On
+settings-conv-to = Convert to
+# Heading over the file formats a rule converts.
+settings-conv-from = From
+settings-conv-remove = Remove
+settings-conv-remove-label = Remove rule { $n }
+settings-conv-taken = Another rule converts this format
+settings-conv-upright = Turn models upright as they’re converted (Y up, facing +Z), the way the pack’s models are shown
+settings-conv-add = Add a rule
+# Before a number of days: "Keep originals for [30] days".
+settings-conv-keep = Keep originals for
+settings-conv-keep-days =
+    { $count ->
+        [one] day
+       *[other] days
+    }
+settings-conv-keep-what = Until then, a converted file’s page can put the original back. Textures aren’t copied into a converted model: it points at the image files beside it. A model’s .mtl or .bin files stay.
+settings-conv-save = Save rules
+settings-conv-revert = Undo changes
+settings-conv-existing = Convert files already in the library
+settings-conv-saved = Conversion rules saved. They apply to packs added from now on.
+settings-conv-converting =
+    { $count ->
+        [one] Converting one file in the background
+       *[other] Converting { $count } files in the background
+    }
+settings-conv-nothing = Nothing in the library needs converting.
+settings-conv-ask-title =
+    { $count ->
+        [one] Convert one file already in the library?
+       *[other] Convert { $count } files already in the library?
+    }
+settings-conv-ask-body =
+    { $packs ->
+        [one] It’s in one pack.
+       *[other] They’re in { $packs } packs.
+    } Each original is kept for { $days } days, and until then it can be put back from its page.
+settings-conv-ask-busy =
+    { $count ->
+        [one] One is in a pack still being added; it’s converted once that’s done.
+       *[other] { $count } are in packs still being added; they’re converted once that’s done.
+    }
+settings-conv-ask-list = Files that would be converted
+settings-conv-ask-more = …and { $count } more
+settings-conv-ask-skipped = Left as they are:
+settings-conv-skip-watched =
+    { $count ->
+        [one] one file in a watched folder
+       *[other] { $count } files in watched folders
+    }
+settings-conv-skip-unity =
+    { $count ->
+        [one] one file a Unity project knows by its name
+       *[other] { $count } files a Unity project knows by their names
+    }
+settings-conv-skip-used =
+    { $count ->
+        [one] one file a scene or another file names
+       *[other] { $count } files a scene or another file names
+    }
+settings-conv-skip-beside =
+    { $count ->
+        [one] one file whose converted copy is in its pack already
+       *[other] { $count } files whose converted copies are in their packs already
+    }
+settings-conv-skip-blender =
+    { $count ->
+        [one] one file Blender hasn’t read yet (Settings → Tools)
+       *[other] { $count } files Blender hasn’t read yet (Settings → Tools)
+    }
+settings-conv-ask-new = Save, only new packs
+settings-conv-ask-save-convert =
+    { $count ->
+        [one] Save and convert it
+       *[other] Save and convert { $count } files
+    }
+settings-conv-ask-convert =
+    { $count ->
+        [one] Convert it
+       *[other] Convert { $count } files
+    }
 settings-unreal-off = Leave as is
 settings-unreal-off-hint = Convert from a pack’s page when you want to.
 settings-unreal-keep = Convert, keep originals

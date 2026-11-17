@@ -224,6 +224,14 @@ error-no-soundfont = ไม่มี SoundFont ที่ { $path } บนเซ�
 error-workers = ตัวทำงานเบื้องหลัง: ตั้งแต่ 1 ถึง { $max }
 error-ai-batch = แอสเซ็ตต่อคำขอ AI: ตั้งแต่ 1 ถึง 200
 error-conversion-cache = การดาวน์โหลดที่แปลงแล้ว: อย่างน้อย 100 MB
+error-conversion-keep-days = กฎการแปลง: เก็บต้นฉบับไว้ได้ 1 ถึง { $max } วัน
+error-conversion-target = กฎการแปลง: Hoard แปลงไฟล์เป็น { $format } ไม่ได้
+error-conversion-no-source = กฎการแปลง: กฎแต่ละข้อต้องมีรูปแบบที่จะแปลงอย่างน้อยหนึ่งรูปแบบ
+# $ext is a file extension, like obj; $format is what it would become, like glb.
+error-conversion-source = กฎการแปลง: แปลงไฟล์ .{ $ext } เป็น { $format } ไม่ได้
+error-conversion-twice = กฎการแปลง: .{ $ext } อยู่ในกฎสองข้อ
+error-conversion-cant-undo = ไฟล์นี้ไม่ได้ถูกแปลงโดยกฎ หรือไฟล์ต้นฉบับถูกลบไปแล้ว
+error-conversion-path-taken = ตอนนี้มีไฟล์อื่นอยู่ที่ { $path } จึงนำต้นฉบับกลับไปไว้ที่นั่นไม่ได้
 error-limits-zero = ขีดจำกัดต้องไม่เป็นศูนย์
 error-settings-object = ต้องเป็นออบเจกต์ JSON ของการตั้งค่า
 error-bad-setting = การตั้งค่าไม่ถูกต้อง: { $reason }
@@ -346,6 +354,8 @@ server-issues-convert = โมเดลที่ Blender แปลงไม่�
 server-issues-convert-blurb = โมเดลเหล่านี้ไม่มีสำเนา GLB จึงแสดงแบบ 3 มิติไม่ได้
 server-issues-unreal = แพ็กเกจ Unreal ที่แปลงไม่ได้
 server-issues-unreal-blurb = หน้า Unreal ของแพ็กมีแพ็กเกจที่เหลือของแพ็กนั้น
+server-issues-reformat = ไฟล์ที่กฎการแปลงแปลงไม่ได้
+server-issues-reformat-blurb = ไฟล์เหล่านี้ถูกปล่อยไว้ตามเดิม
 server-issues-materials = แพ็กที่ระบุแมทีเรียลไม่ได้
 server-issues-materials-blurb = เท็กซ์เจอร์ทั้งหมดยังอยู่ครบ เพียงแต่ไม่ได้จัดกลุ่มเป็นแมทีเรียล
 server-issues-material-thumb = แมทีเรียลที่ไม่มีภาพย่อ
@@ -367,6 +377,7 @@ server-job-retag = กำลังติดแท็ก { $pack } ใหม่
 server-job-llm-tag = กำลังติดแท็ก { $pack } ด้วย AI
 server-job-convert = กำลังแปลง { $pack } ด้วย Blender
 server-job-unreal = กำลังแปลงแพ็กเกจ Unreal ใน { $pack }
+server-job-reformat = กำลังแปลงไฟล์ใน { $pack } ตามกฎการแปลง
 server-job-scan = กำลังสแกนโฟลเดอร์ที่เฝ้าดู
 server-job-relocate = กำลังย้ายไฟล์ระหว่างตำแหน่งคลัง
 server-job-looks = กำลังวิเคราะห์สีและลักษณะ
@@ -1303,6 +1314,15 @@ asset-variants = รูปแบบย่อย ({ $count } เวอร์ช�
 asset-copies = สำเนาที่เหมือนกันทุกประการ
 asset-copies-note = ข้อมูลชุดเดียวกันจัดเก็บเพียงครั้งเดียว แพ็กเหล่านี้ก็มีไฟล์นี้เช่นกัน
 asset-unreal-converted = แปลงจาก Unreal
+asset-rule-converted = แปลงโดยกฎ
+# Followed by the original file's name: "A conversion rule made this GLB on 3 May 2026 from tree.obj".
+asset-rule-was = กฎการแปลงสร้าง { $format } นี้เมื่อ { $date } จาก
+asset-rule-kept-until = เก็บต้นฉบับไว้จนถึง { $date }
+asset-rule-put-back = นำต้นฉบับกลับมา
+asset-rule-put-back-title = นำ { $file } กลับมาหรือไม่?
+asset-rule-put-back-body = ไฟล์ที่แปลงแล้วจะถูกลบ และต้นฉบับจะกลับมาแทนที่ พร้อมแท็ก คอลเลกชัน และลิงก์ของไฟล์ หลังจากนี้กฎการแปลงจะไม่แตะต้องไฟล์นี้อีก
+asset-rule-put-back-done = นำ { $file } กลับมาแล้ว
+asset-rule-let-go = ต้นฉบับถูกลบไปแล้วเมื่อครบระยะเวลาเก็บต้นฉบับที่กำหนดไว้ในการตั้งค่า
 asset-unreal-package = จากแพ็กเกจ Unreal
 asset-ue-needs-editor-before = กำลังรอ Unreal Editor: { $reason } บนเครื่องที่ติดตั้ง Unreal ให้เรียกใช้
 asset-ue-needs-editor-after = แล้วจะได้กลับมาเป็น FBX
@@ -2130,6 +2150,78 @@ settings-store-lookup = ค้นหาหน้าร้านค้าโด�
 settings-unreal = แพ็กเกจ Unreal
 settings-unreal-reset = แพ็กเกจ Unreal: กลับเป็นค่าเริ่มต้น
 settings-unreal-what = สิ่งที่จะทำกับไฟล์ .uasset
+settings-conv = กฎการแปลง
+settings-conv-what = แปลงไฟล์ที่ Hoard เก็บไว้ให้เป็นรูปแบบเดียว เช่น แปลง OBJ และ FBX ทั้งหมดเป็น GLB เพื่อให้ทั้งคลังเป็นแบบเดียวกัน ไฟล์ที่แปลงแล้วจะแทนที่ต้นฉบับ โดยคงชื่อ แท็ก คอลเลกชัน และลิงก์ไว้ ไฟล์ในโฟลเดอร์ที่เฝ้าดูจะไม่ถูกเปลี่ยนเลย
+# A checkbox that turns one conversion rule on or off.
+settings-conv-rule-on = เปิด
+settings-conv-to = แปลงเป็น
+# Heading over the file formats a rule converts.
+settings-conv-from = จาก
+settings-conv-remove = นำออก
+settings-conv-remove-label = นำกฎข้อที่ { $n } ออก
+settings-conv-taken = มีกฎอื่นแปลงรูปแบบนี้อยู่แล้ว
+settings-conv-upright = ตั้งโมเดลให้ตรงขณะแปลง (Y ขึ้น หันไปทาง +Z) แบบเดียวกับที่แสดงโมเดลของแพ็ก
+settings-conv-add = เพิ่มกฎ
+# Before a number of days: "Keep originals for [30] days".
+settings-conv-keep = เก็บต้นฉบับไว้
+settings-conv-keep-days =
+    { $count ->
+       *[other] วัน
+    }
+settings-conv-keep-what = ระหว่างนี้ หน้าของไฟล์ที่แปลงแล้วสามารถนำต้นฉบับกลับมาได้ เท็กซ์เจอร์จะไม่ถูกคัดลอกเข้าไปในโมเดลที่แปลงแล้ว โมเดลจะชี้ไปยังไฟล์ภาพที่อยู่ข้างๆ ส่วนไฟล์ .mtl หรือ .bin ของโมเดลยังคงอยู่
+settings-conv-save = บันทึกกฎ
+settings-conv-revert = เลิกทำการเปลี่ยนแปลง
+settings-conv-existing = แปลงไฟล์ที่อยู่ในคลังแล้ว
+settings-conv-saved = บันทึกกฎการแปลงแล้ว กฎจะใช้กับแพ็กที่เพิ่มต่อจากนี้
+settings-conv-converting =
+    { $count ->
+       *[other] กำลังแปลงไฟล์ { $count } ไฟล์ในเบื้องหลัง
+    }
+settings-conv-nothing = ไม่มีอะไรในคลังที่ต้องแปลง
+settings-conv-ask-title =
+    { $count ->
+       *[other] แปลงไฟล์ { $count } ไฟล์ที่อยู่ในคลังแล้วหรือไม่?
+    }
+settings-conv-ask-body =
+    { $packs ->
+       *[other] ไฟล์เหล่านี้อยู่ใน { $packs } แพ็ก
+    } ต้นฉบับแต่ละไฟล์จะถูกเก็บไว้ { $days } วัน และระหว่างนั้นนำกลับมาได้จากหน้าของไฟล์
+settings-conv-ask-busy =
+    { $count ->
+       *[other] { $count } ไฟล์อยู่ในแพ็กที่ยังเพิ่มไม่เสร็จ จะถูกแปลงเมื่อเพิ่มเสร็จแล้ว
+    }
+settings-conv-ask-list = ไฟล์ที่จะถูกแปลง
+settings-conv-ask-more = …และอีก { $count } ไฟล์
+settings-conv-ask-skipped = ปล่อยไว้ตามเดิม:
+settings-conv-skip-watched =
+    { $count ->
+       *[other] { $count } ไฟล์ในโฟลเดอร์ที่เฝ้าดู
+    }
+settings-conv-skip-unity =
+    { $count ->
+       *[other] { $count } ไฟล์ที่โปรเจกต์ Unity อ้างอิงตามชื่อ
+    }
+settings-conv-skip-used =
+    { $count ->
+       *[other] { $count } ไฟล์ที่ฉากหรือไฟล์อื่นอ้างถึงตามชื่อ
+    }
+settings-conv-skip-beside =
+    { $count ->
+       *[other] { $count } ไฟล์ที่มีสำเนาที่แปลงแล้วอยู่ในแพ็กของไฟล์อยู่แล้ว
+    }
+settings-conv-skip-blender =
+    { $count ->
+       *[other] { $count } ไฟล์ที่ Blender ยังไม่ได้อ่าน (การตั้งค่า → เครื่องมือ)
+    }
+settings-conv-ask-new = บันทึก ใช้กับแพ็กใหม่เท่านั้น
+settings-conv-ask-save-convert =
+    { $count ->
+       *[other] บันทึกและแปลง { $count } ไฟล์
+    }
+settings-conv-ask-convert =
+    { $count ->
+       *[other] แปลง { $count } ไฟล์
+    }
 settings-unreal-off = ปล่อยไว้ตามเดิม
 settings-unreal-off-hint = แปลงจากหน้าของแพ็กเมื่อคุณต้องการ
 settings-unreal-keep = แปลงและเก็บต้นฉบับไว้

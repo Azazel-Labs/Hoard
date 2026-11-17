@@ -224,6 +224,14 @@ error-no-soundfont = Na serwerze nie ma pliku SoundFont pod ścieżką { $path }
 error-workers = Procesy w tle: od 1 do { $max }
 error-ai-batch = Zasoby na jedno żądanie AI: od 1 do 200
 error-conversion-cache = Przekonwertowane pliki do pobrania: co najmniej 100 MB
+error-conversion-keep-days = Reguły konwersji: oryginały można przechowywać od 1 do { $max } dni
+error-conversion-target = Reguły konwersji: Hoard nie potrafi konwertować plików do { $format }
+error-conversion-no-source = Reguły konwersji: każda reguła musi mieć co najmniej jeden format do konwersji
+# $ext is a file extension, like obj; $format is what it would become, like glb.
+error-conversion-source = Reguły konwersji: plików .{ $ext } nie można przekonwertować do { $format }
+error-conversion-twice = Reguły konwersji: .{ $ext } występuje w dwóch regułach
+error-conversion-cant-undo = Ten plik nie został przekonwertowany przez regułę albo jego oryginał został już usunięty.
+error-conversion-path-taken = Pod { $path } jest teraz inny plik, więc oryginał nie może tam wrócić.
 error-limits-zero = Limity nie mogą wynosić zero
 error-settings-object = oczekiwano obiektu JSON z ustawieniami
 error-bad-setting = błędne ustawienie: { $reason }
@@ -358,6 +366,8 @@ server-issues-convert = Modele, których Blender nie przekonwertował
 server-issues-convert-blurb = Nie mają kopii GLB, więc nie można ich wyświetlić w 3D.
 server-issues-unreal = Pakiety Unreal, których nie udało się przekonwertować
 server-issues-unreal-blurb = Pozostałe pakiety są na stronie Unreal paczki.
+server-issues-reformat = Pliki, których reguła konwersji nie zdołała przekonwertować
+server-issues-reformat-blurb = Pozostawiono je bez zmian.
 server-issues-materials = Paczki, w których nie udało się ustalić materiałów
 server-issues-materials-blurb = Wszystkie tekstury są na miejscu; po prostu nie są pogrupowane w materiały.
 server-issues-material-thumb = Materiały bez miniatury
@@ -379,6 +389,7 @@ server-job-retag = Ponowne tagowanie: { $pack }
 server-job-llm-tag = Tagowanie AI: { $pack }
 server-job-convert = Konwersja w Blenderze: { $pack }
 server-job-unreal = Konwersja pakietów Unreal: { $pack }
+server-job-reformat = Konwersja plików według reguł konwersji: { $pack }
 server-job-scan = Skanowanie obserwowanego folderu
 server-job-relocate = Przenoszenie plików między lokalizacjami biblioteki
 server-job-looks = Ustalanie kolorów i wyglądu
@@ -1533,6 +1544,15 @@ asset-variants = Warianty ({ $count })
 asset-copies = Identyczne kopie
 asset-copies-note = Te same bajty są przechowywane raz; te paczki również zawierają ten plik.
 asset-unreal-converted = Przekonwertowano z Unreal
+asset-rule-converted = Przekonwertowano regułą
+# Followed by the original file's name: "A conversion rule made this GLB on 3 May 2026 from tree.obj".
+asset-rule-was = Reguła konwersji utworzyła ten plik { $format } dnia { $date } z pliku
+asset-rule-kept-until = Oryginał jest przechowywany do { $date }.
+asset-rule-put-back = Przywróć oryginał
+asset-rule-put-back-title = Przywrócić { $file }?
+asset-rule-put-back-body = Przekonwertowany plik zostanie usunięty, a jego miejsce zajmie oryginał, z jego tagami, kolekcjami i powiązaniami. Od tej pory reguły konwersji go pomijają.
+asset-rule-put-back-done = Przywrócono { $file }
+asset-rule-let-go = Oryginał został usunięty, gdy minął czas przechowywania oryginałów ustawiony w Ustawieniach.
 asset-unreal-package = Z pakietu Unreal
 asset-ue-needs-editor-before = Czeka na Unreal Editor: { $reason }. Na komputerze z zainstalowanym Unreal należy uruchomić
 asset-ue-needs-editor-after = , a plik wróci jako FBX.
@@ -2500,6 +2520,119 @@ settings-store-lookup = Automatycznie wyszukuj strony w sklepach
 settings-unreal = Pakiety Unreal
 settings-unreal-reset = Pakiety Unreal: przywrócono wartość domyślną
 settings-unreal-what = Co robić z plikami .uasset.
+settings-conv = Reguły konwersji
+settings-conv-what = Konwertuje pliki przechowywane przez Hoard do jednego formatu, np. każdy OBJ i FBX do GLB, by cała biblioteka była jednolita. Przekonwertowany plik zajmuje miejsce oryginału, z jego nazwą, tagami, kolekcjami i powiązaniami. Pliki w obserwowanych folderach nigdy nie są zmieniane.
+# A checkbox that turns one conversion rule on or off.
+settings-conv-rule-on = Włączona
+settings-conv-to = Konwertuj do
+# Heading over the file formats a rule converts.
+settings-conv-from = Z
+settings-conv-remove = Usuń
+settings-conv-remove-label = Usuń regułę { $n }
+settings-conv-taken = Ten format konwertuje już inna reguła
+settings-conv-upright = Ustawiaj modele pionowo podczas konwersji (Y w górę, przodem do +Z), tak jak są wyświetlane modele paczki
+settings-conv-add = Dodaj regułę
+# Before a number of days: "Keep originals for [30] days".
+settings-conv-keep = Przechowuj oryginały przez
+settings-conv-keep-days =
+    { $count ->
+        [one] dzień
+        [few] dni
+        [many] dni
+       *[other] dnia
+    }
+settings-conv-keep-what = Do tego czasu na stronie przekonwertowanego pliku można przywrócić oryginał. Tekstury nie są kopiowane do przekonwertowanego modelu: wskazuje on pliki obrazów leżące obok niego. Pliki .mtl i .bin modelu pozostają.
+settings-conv-save = Zapisz reguły
+settings-conv-revert = Cofnij zmiany
+settings-conv-existing = Konwertuj pliki, które są już w bibliotece
+settings-conv-saved = Zapisano reguły konwersji. Dotyczą paczek dodanych od teraz.
+settings-conv-converting =
+    { $count ->
+        [one] Konwersja jednego pliku w tle
+        [few] Konwersja { $count } plików w tle
+        [many] Konwersja { $count } plików w tle
+       *[other] Konwersja { $count } pliku w tle
+    }
+settings-conv-nothing = Nic w bibliotece nie wymaga konwersji.
+settings-conv-ask-title =
+    { $count ->
+        [one] Przekonwertować jeden plik, który jest już w bibliotece?
+        [few] Przekonwertować { $count } pliki, które są już w bibliotece?
+        [many] Przekonwertować { $count } plików, które są już w bibliotece?
+       *[other] Przekonwertować { $count } pliku, które są już w bibliotece?
+    }
+settings-conv-ask-body =
+    { $packs ->
+        [one] Wszystko jest w jednej paczce.
+        [few] Są w { $packs } paczkach.
+        [many] Są w { $packs } paczkach.
+       *[other] Są w { $packs } paczki.
+    } Każdy oryginał jest przechowywany przez { $days ->
+        [one] { $days } dzień
+        [few] { $days } dni
+        [many] { $days } dni
+       *[other] { $days } dnia
+    } i do tego czasu można go przywrócić z jego strony.
+settings-conv-ask-busy =
+    { $count ->
+        [one] Jeden plik jest w paczce, która jest jeszcze dodawana; zostanie przekonwertowany, gdy to się skończy.
+        [few] { $count } pliki są w paczkach, które są jeszcze dodawane; zostaną przekonwertowane, gdy to się skończy.
+        [many] { $count } plików jest w paczkach, które są jeszcze dodawane; zostaną przekonwertowane, gdy to się skończy.
+       *[other] { $count } pliku jest w paczkach, które są jeszcze dodawane; zostanie przekonwertowane, gdy to się skończy.
+    }
+settings-conv-ask-list = Pliki, które zostałyby przekonwertowane
+settings-conv-ask-more = …i jeszcze { $count }
+settings-conv-ask-skipped = Pozostawione bez zmian:
+settings-conv-skip-watched =
+    { $count ->
+        [one] jeden plik w obserwowanym folderze
+        [few] { $count } pliki w obserwowanych folderach
+        [many] { $count } plików w obserwowanych folderach
+       *[other] { $count } pliku w obserwowanych folderach
+    }
+settings-conv-skip-unity =
+    { $count ->
+        [one] jeden plik, który projekt Unity zna po nazwie
+        [few] { $count } pliki, które projekt Unity zna po nazwie
+        [many] { $count } plików, które projekt Unity zna po nazwie
+       *[other] { $count } pliku, które projekt Unity zna po nazwie
+    }
+settings-conv-skip-used =
+    { $count ->
+        [one] jeden plik, do którego odwołuje się scena lub inny plik
+        [few] { $count } pliki, do których odwołuje się scena lub inny plik
+        [many] { $count } plików, do których odwołuje się scena lub inny plik
+       *[other] { $count } pliku, do których odwołuje się scena lub inny plik
+    }
+settings-conv-skip-beside =
+    { $count ->
+        [one] jeden plik, którego przekonwertowana kopia jest już w jego paczce
+        [few] { $count } pliki, których przekonwertowane kopie są już w ich paczkach
+        [many] { $count } plików, których przekonwertowane kopie są już w ich paczkach
+       *[other] { $count } pliku, których przekonwertowane kopie są już w ich paczkach
+    }
+settings-conv-skip-blender =
+    { $count ->
+        [one] jeden plik, którego Blender jeszcze nie odczytał (Ustawienia → Narzędzia)
+        [few] { $count } pliki, których Blender jeszcze nie odczytał (Ustawienia → Narzędzia)
+        [many] { $count } plików, których Blender jeszcze nie odczytał (Ustawienia → Narzędzia)
+       *[other] { $count } pliku, których Blender jeszcze nie odczytał (Ustawienia → Narzędzia)
+    }
+settings-conv-ask-new = Zapisz, tylko nowe paczki
+settings-conv-ask-save-convert =
+    { $count ->
+        [one] Zapisz i przekonwertuj go
+        [few] Zapisz i przekonwertuj { $count } pliki
+        [many] Zapisz i przekonwertuj { $count } plików
+       *[other] Zapisz i przekonwertuj { $count } pliku
+    }
+settings-conv-ask-convert =
+    { $count ->
+        [one] Przekonwertuj go
+        [few] Przekonwertuj { $count } pliki
+        [many] Przekonwertuj { $count } plików
+       *[other] Przekonwertuj { $count } pliku
+    }
 settings-unreal-off = Pozostaw bez zmian
 settings-unreal-off-hint = Konwersja ze strony paczki, gdy będzie potrzebna.
 settings-unreal-keep = Konwertuj, zachowaj oryginały

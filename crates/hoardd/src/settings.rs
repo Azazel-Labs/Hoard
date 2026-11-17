@@ -120,6 +120,9 @@ pub(crate) struct Saved {
     /// How texture maps are named in downloads, bundles and manifests.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub(crate) texture_names: Option<crate::naming::TextureNames>,
+    /// Settings → Conversion: files converted in place to the format a rule names.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub(crate) conversion_rules: Option<crate::reformat::Rules>,
     /// Settings → Authentication: signing in through a directory or OAuth, and how long sessions last.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub(crate) auth: Option<crate::signin::AuthConfig>,
@@ -161,6 +164,7 @@ pub(crate) struct Effective {
     pub(crate) thumb_quality: ThumbQuality,
     pub(crate) conversion_cache_mb: u64,
     pub(crate) texture_names: crate::naming::TextureNames,
+    pub(crate) conversion_rules: crate::reformat::Rules,
     pub(crate) auth: crate::signin::AuthConfig,
 }
 
@@ -236,6 +240,7 @@ impl Saved {
             thumb_quality: self.thumb_quality.unwrap_or_default(),
             conversion_cache_mb: self.conversion_cache_mb.unwrap_or(DEFAULT_CONVERSION_CACHE_MB),
             texture_names: self.texture_names.clone().unwrap_or_default(),
+            conversion_rules: self.conversion_rules.clone().unwrap_or_default(),
             auth: self.auth.clone().unwrap_or_default(),
         }
     }
@@ -295,6 +300,7 @@ impl Saved {
         if let Some(names) = &self.texture_names {
             names.check()?;
         }
+        effective.conversion_rules.check()?;
         Ok(())
     }
 }

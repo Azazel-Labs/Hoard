@@ -17,6 +17,8 @@ pub(crate) const RETAG: &str = "retag";
 pub(crate) const LLM_TAG: &str = "llm_tag";
 pub(crate) const CONVERT: &str = "convert";
 pub(crate) const UNREAL: &str = "unreal_convert";
+/// Convert the files the conversion rules match in a pack (see [`crate::reformat`]).
+pub(crate) const REFORMAT: &str = "reformat";
 pub(crate) const SCAN: &str = "scan_location";
 pub(crate) const RELOCATE: &str = "relocate";
 pub(crate) const LOOKS: &str = "looks";
@@ -78,6 +80,7 @@ pub(crate) fn job_label(kind: &str, pack: Option<&str>) -> String {
         LLM_TAG => tr!("server-job-llm-tag", pack = pack),
         CONVERT => tr!("server-job-convert", pack = pack),
         UNREAL => tr!("server-job-unreal", pack = pack),
+        REFORMAT => tr!("server-job-reformat", pack = pack),
         SCAN => tr!("server-job-scan"),
         RELOCATE => tr!("server-job-relocate"),
         LOOKS => tr!("server-job-looks"),
@@ -107,6 +110,7 @@ async fn run(state: &AppState, job: db::JobRow) {
         LLM_TAG => LLM_TAG,
         CONVERT => CONVERT,
         UNREAL => UNREAL,
+        REFORMAT => REFORMAT,
         SCAN => SCAN,
         RELOCATE => RELOCATE,
         LOOKS => LOOKS,
@@ -143,6 +147,10 @@ async fn run(state: &AppState, job: db::JobRow) {
         UNREAL => {
             let req = serde_json::from_value(job.payload.clone()).unwrap_or_default();
             crate::extract::convert_pack(state, &pack_id, req).await.map(|_| ())
+        }
+        REFORMAT => {
+            let req = serde_json::from_value(job.payload.clone()).unwrap_or_default();
+            crate::reformat::run_job(state, &pack_id, req).await
         }
         SCAN => match job.payload.get("location").and_then(serde_json::Value::as_i64) {
             Some(loc) => blocking(state, move |s, _| crate::scan::scan(s, loc).map(|_| ())).await,
@@ -190,7 +198,7 @@ async fn run(state: &AppState, job: db::JobRow) {
     }
     tracing::info!(id = job.id, kind = %job.kind, ok = result.is_ok(), secs = started.elapsed().as_secs_f32(), "job finished");
     // New or changed thumbnails get their colors and look worked out.
-    if result.is_ok() && matches!(job.kind.as_str(), INGEST | RETAG | CONVERT | UNREAL | SCAN | MATERIALS) {
+    if result.is_ok() && matches!(job.kind.as_str(), INGEST | RETAG | CONVERT | UNREAL | REFORMAT | SCAN | MATERIALS) {
         crate::looks::schedule(state).await;
     }
 }

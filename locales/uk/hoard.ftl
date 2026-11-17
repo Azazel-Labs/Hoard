@@ -224,6 +224,14 @@ error-no-soundfont = На сервері немає SoundFont за шляхом 
 error-workers = Фонові обробники: від 1 до { $max }
 error-ai-batch = Ресурсів на запит до ШІ: від 1 до 200
 error-conversion-cache = Перетворені завантаження: щонайменше 100 МБ
+error-conversion-keep-days = Правила перетворення: зберігати оригінали від 1 до { $max } днів
+error-conversion-target = Правила перетворення: Hoard не вміє перетворювати файли на { $format }
+error-conversion-no-source = Правила перетворення: кожному правилу потрібен принаймні один формат, який воно перетворює
+# $ext is a file extension, like obj; $format is what it would become, like glb.
+error-conversion-source = Правила перетворення: файли .{ $ext } не можна перетворити на { $format }
+error-conversion-twice = Правила перетворення: .{ $ext } є у двох правилах
+error-conversion-cant-undo = Цей файл не було перетворено правилом, або його оригінал уже видалено.
+error-conversion-path-taken = За шляхом { $path } тепер інший файл, тож оригінал не можна туди повернути.
 error-limits-zero = Обмеження не можуть дорівнювати нулю
 error-settings-object = очікувався JSON-об’єкт налаштувань
 error-bad-setting = неправильне налаштування: { $reason }
@@ -358,6 +366,8 @@ server-issues-convert = Моделі, які Blender не зміг перетв�
 server-issues-convert-blurb = У них немає копії GLB, тож їх не можна показати в 3D.
 server-issues-unreal = Пакунки Unreal, які не вдалося перетворити
 server-issues-unreal-blurb = Решта пакунків є на сторінці Unreal цього пакета.
+server-issues-reformat = Файли, які правило перетворення не змогло перетворити
+server-issues-reformat-blurb = Їх залишено як були.
 server-issues-materials = Пакети, матеріали яких не вдалося визначити
 server-issues-materials-blurb = Усі їхні текстури на місці; їх просто не згруповано в матеріали.
 server-issues-material-thumb = Матеріали без мініатюри
@@ -379,6 +389,7 @@ server-job-retag = Повторне тегування: { $pack }
 server-job-llm-tag = Тегування за допомогою ШІ: { $pack }
 server-job-convert = Перетворення в Blender: { $pack }
 server-job-unreal = Перетворення пакунків Unreal: { $pack }
+server-job-reformat = Перетворення файлів за правилами перетворення: { $pack }
 server-job-scan = Сканування відстежуваної теки
 server-job-relocate = Переміщення файлів між розташуваннями бібліотеки
 server-job-looks = Визначення кольорів і вигляду
@@ -1586,6 +1597,15 @@ asset-variants = Варіанти ({ $count })
 asset-copies = Ідентичні копії
 asset-copies-note = Однакові байти зберігаються один раз; цей файл є і в цих пакетах.
 asset-unreal-converted = Перетворено з Unreal
+asset-rule-converted = Перетворено правилом
+# Followed by the original file's name: "A conversion rule made this GLB on 3 May 2026 from tree.obj".
+asset-rule-was = Правило перетворення створило цей { $format } { $date } з файлу
+asset-rule-kept-until = Оригінал зберігається до { $date }.
+asset-rule-put-back = Повернути оригінал
+asset-rule-put-back-title = Повернути { $file }?
+asset-rule-put-back-body = Перетворений файл видаляється, а оригінал займає його місце разом зі своїми тегами, колекціями та посиланнями. Відтепер правила перетворення його не чіпають.
+asset-rule-put-back-done = { $file } повернуто
+asset-rule-let-go = Оригінал видалено, коли минув строк зберігання оригіналів, заданий у «Налаштуваннях».
 asset-unreal-package = З пакунка Unreal
 asset-ue-needs-editor-before = Чекає на Unreal Editor: { $reason }. На комп’ютері з установленим Unreal виконайте
 asset-ue-needs-editor-after = і файл повернеться як FBX.
@@ -2588,6 +2608,114 @@ settings-store-lookup = Автоматично шукати сторінки м�
 settings-unreal = Пакунки Unreal
 settings-unreal-reset = Пакунки Unreal: повернуто типове значення
 settings-unreal-what = Що робити з файлами .uasset.
+settings-conv = Правила перетворення
+settings-conv-what = Перетворюйте файли, які зберігає Hoard, на один формат, наприклад усі OBJ і FBX на GLB, щоб уся бібліотека була однорідною. Перетворений файл займає місце оригіналу разом з його назвою, тегами, колекціями та посиланнями. Файли у відстежуваних теках ніколи не змінюються.
+# A checkbox that turns one conversion rule on or off.
+settings-conv-rule-on = Увімкнено
+settings-conv-to = Перетворювати на
+# Heading over the file formats a rule converts.
+settings-conv-from = З форматів
+settings-conv-remove = Вилучити
+settings-conv-remove-label = Вилучити правило { $n }
+settings-conv-taken = Цей формат уже перетворює інше правило
+settings-conv-upright = Ставити моделі вертикально під час перетворення (Y вгору, обличчям до +Z), як показано моделі пакета
+settings-conv-add = Додати правило
+# Before a number of days: "Keep originals for [30] days".
+settings-conv-keep = Зберігати оригінали
+settings-conv-keep-days =
+    { $count ->
+        [one] день
+        [few] дні
+        [many] днів
+       *[other] дня
+    }
+settings-conv-keep-what = До того часу на сторінці перетвореного файлу можна повернути оригінал. Текстури не копіюються в перетворену модель: вона посилається на файли зображень поруч із нею. Файли .mtl чи .bin моделі залишаються.
+settings-conv-save = Зберегти правила
+settings-conv-revert = Скасувати зміни
+settings-conv-existing = Перетворити файли, що вже є в бібліотеці
+settings-conv-saved = Правила перетворення збережено. Вони застосовуються до пакетів, доданих відтепер.
+settings-conv-converting =
+    { $count ->
+        [one] У фоновому режимі перетворюється { $count } файл
+        [few] У фоновому режимі перетворюються { $count } файли
+        [many] У фоновому режимі перетворюється { $count } файлів
+       *[other] У фоновому режимі перетворюється { $count } файлу
+    }
+settings-conv-nothing = У бібліотеці немає нічого, що треба перетворити.
+settings-conv-ask-title =
+    { $count ->
+        [one] Перетворити { $count } файл, що вже є в бібліотеці?
+        [few] Перетворити { $count } файли, що вже є в бібліотеці?
+        [many] Перетворити { $count } файлів, що вже є в бібліотеці?
+       *[other] Перетворити { $count } файлу, що вже є в бібліотеці?
+    }
+settings-conv-ask-body =
+    { $packs ->
+        [one] Це стосується { $packs } пакета.
+        [few] Це стосується { $packs } пакетів.
+        [many] Це стосується { $packs } пакетів.
+       *[other] Це стосується { $packs } пакета.
+    } Кожен оригінал зберігається { $days } дн., і до того часу його можна повернути з його сторінки.
+settings-conv-ask-busy =
+    { $count ->
+        [one] { $count } з них у пакеті, який ще додається; його перетворять, щойно це завершиться.
+        [few] { $count } з них у пакетах, які ще додаються; їх перетворять, щойно це завершиться.
+        [many] { $count } з них у пакетах, які ще додаються; їх перетворять, щойно це завершиться.
+       *[other] { $count } з них у пакетах, які ще додаються; їх перетворять, щойно це завершиться.
+    }
+settings-conv-ask-list = Файли, які буде перетворено
+settings-conv-ask-more = …і ще { $count }
+settings-conv-ask-skipped = Залишаться як є:
+settings-conv-skip-watched =
+    { $count ->
+        [one] { $count } файл у відстежуваній теці
+        [few] { $count } файли у відстежуваних теках
+        [many] { $count } файлів у відстежуваних теках
+       *[other] { $count } файлу у відстежуваних теках
+    }
+settings-conv-skip-unity =
+    { $count ->
+        [one] { $count } файл, який проєкт Unity знає за назвою
+        [few] { $count } файли, які проєкт Unity знає за назвами
+        [many] { $count } файлів, які проєкт Unity знає за назвами
+       *[other] { $count } файлу, які проєкт Unity знає за назвами
+    }
+settings-conv-skip-used =
+    { $count ->
+        [one] { $count } файл, на який за назвою посилається сцена чи інший файл
+        [few] { $count } файли, на які за назвою посилається сцена чи інший файл
+        [many] { $count } файлів, на які за назвою посилається сцена чи інший файл
+       *[other] { $count } файлу, на які за назвою посилається сцена чи інший файл
+    }
+settings-conv-skip-beside =
+    { $count ->
+        [one] { $count } файл, перетворена копія якого вже є в його пакеті
+        [few] { $count } файли, перетворені копії яких уже є в їхніх пакетах
+        [many] { $count } файлів, перетворені копії яких уже є в їхніх пакетах
+       *[other] { $count } файлу, перетворені копії яких уже є в їхніх пакетах
+    }
+settings-conv-skip-blender =
+    { $count ->
+        [one] { $count } файл, який Blender ще не прочитав («Налаштування → Інструменти»)
+        [few] { $count } файли, які Blender ще не прочитав («Налаштування → Інструменти»)
+        [many] { $count } файлів, які Blender ще не прочитав («Налаштування → Інструменти»)
+       *[other] { $count } файлу, які Blender ще не прочитав («Налаштування → Інструменти»)
+    }
+settings-conv-ask-new = Зберегти, лише нові пакети
+settings-conv-ask-save-convert =
+    { $count ->
+        [one] Зберегти й перетворити { $count } файл
+        [few] Зберегти й перетворити { $count } файли
+        [many] Зберегти й перетворити { $count } файлів
+       *[other] Зберегти й перетворити { $count } файлу
+    }
+settings-conv-ask-convert =
+    { $count ->
+        [one] Перетворити { $count } файл
+        [few] Перетворити { $count } файли
+        [many] Перетворити { $count } файлів
+       *[other] Перетворити { $count } файлу
+    }
 settings-unreal-off = Залишати як є
 settings-unreal-off-hint = Перетворюйте зі сторінки пакета, коли захочете.
 settings-unreal-keep = Перетворювати, зберігати оригінали

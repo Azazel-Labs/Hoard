@@ -224,6 +224,14 @@ error-no-soundfont = Det finnes ingen SoundFont på { $path } på serveren
 error-workers = Bakgrunnsarbeidere: mellom 1 og { $max }
 error-ai-batch = Ressurser per AI-forespørsel: mellom 1 og 200
 error-conversion-cache = Konverterte nedlastinger: minst 100 MB
+error-conversion-keep-days = Konverteringsregler: behold originaler i 1 til { $max } dager
+error-conversion-target = Konverteringsregler: Hoard kan ikke konvertere filer til { $format }
+error-conversion-no-source = Konverteringsregler: hver regel trenger minst ett format å konvertere
+# $ext is a file extension, like obj; $format is what it would become, like glb.
+error-conversion-source = Konverteringsregler: .{ $ext }-filer kan ikke konverteres til { $format }
+error-conversion-twice = Konverteringsregler: .{ $ext } er med i to regler
+error-conversion-cant-undo = Denne filen ble ikke konvertert av en regel, eller originalen er slettet.
+error-conversion-path-taken = Det ligger en annen fil på { $path } nå, så originalen kan ikke flyttes tilbake dit.
 error-limits-zero = Grenser kan ikke være null
 error-settings-object = forventet et JSON-objekt med innstillinger
 error-bad-setting = ugyldig innstilling: { $reason }
@@ -346,6 +354,8 @@ server-issues-convert = Modeller Blender ikke kunne konvertere
 server-issues-convert-blurb = De har ingen GLB-kopi, så de kan ikke vises i 3D.
 server-issues-unreal = Unreal-pakkefiler som ikke kunne konverteres
 server-issues-unreal-blurb = Pakkens Unreal-side har resten av pakkefilene.
+server-issues-reformat = Filer en konverteringsregel ikke kunne konvertere
+server-issues-reformat-blurb = De er latt være som de var.
 server-issues-materials = Pakker der materialene ikke kunne finnes ut av
 server-issues-materials-blurb = Teksturene er der alle sammen; de er bare ikke gruppert i materialer.
 server-issues-material-thumb = Materialer uten miniatyrbilde
@@ -367,6 +377,7 @@ server-job-retag = Tagger { $pack } på nytt
 server-job-llm-tag = Tagger { $pack } med AI
 server-job-convert = Konverterer { $pack } med Blender
 server-job-unreal = Konverterer Unreal-pakkefiler i { $pack }
+server-job-reformat = Konverterer filer i { $pack } etter konverteringsreglene
 server-job-scan = Skanner en overvåket mappe
 server-job-relocate = Flytter filer mellom biblioteksplasseringer
 server-job-looks = Finner ut farger og utseende
@@ -1410,6 +1421,15 @@ asset-variants = Varianter ({ $count } versjoner)
 asset-copies = Identiske kopier
 asset-copies-note = De samme bytene lagres én gang; disse pakkene inneholder også denne filen.
 asset-unreal-converted = Konvertert fra Unreal
+asset-rule-converted = Konvertert av en regel
+# Followed by the original file's name: "A conversion rule made this GLB on 3 May 2026 from tree.obj".
+asset-rule-was = En konverteringsregel laget denne { $format }-filen { $date } fra
+asset-rule-kept-until = Originalen beholdes til { $date }.
+asset-rule-put-back = Legg tilbake originalen
+asset-rule-put-back-title = Legge tilbake { $file }?
+asset-rule-put-back-body = Den konverterte filen slettes, og originalen tar plassen sin tilbake, med tagger, samlinger og lenker. Konverteringsreglene lar den være i fred fra da av.
+asset-rule-put-back-done = { $file } er tilbake
+asset-rule-let-go = Originalen ble slettet da tiden Innstillinger beholder originaler i, var ute.
 asset-unreal-package = Fra Unreal-pakkefilen
 asset-ue-needs-editor-before = Venter på Unreal Editor: { $reason }. På en maskin med Unreal installert kjører du
 asset-ue-needs-editor-after = så kommer den tilbake som FBX.
@@ -2303,6 +2323,90 @@ settings-store-lookup = Slå opp butikksider automatisk
 settings-unreal = Unreal-pakkefiler
 settings-unreal-reset = Unreal-pakkefiler: tilbake til standard
 settings-unreal-what = Hva som skal gjøres med .uasset-filer.
+settings-conv = Konverteringsregler
+settings-conv-what = Konverter filer Hoard tar vare på til ett format, for eksempel alle OBJ og FBX til GLB, så biblioteket blir ensartet. Den konverterte filen tar originalens plass, med navn, tagger, samlinger og lenker. Filer i overvåkede mapper endres aldri.
+# A checkbox that turns one conversion rule on or off.
+settings-conv-rule-on = På
+settings-conv-to = Konverter til
+# Heading over the file formats a rule converts.
+settings-conv-from = Fra
+settings-conv-remove = Fjern
+settings-conv-remove-label = Fjern regel { $n }
+settings-conv-taken = En annen regel konverterer dette formatet
+settings-conv-upright = Snu modellene opprett når de konverteres (Y opp, vendt mot +Z), slik pakkens modeller vises
+settings-conv-add = Legg til en regel
+# Before a number of days: "Keep originals for [30] days".
+settings-conv-keep = Behold originaler i
+settings-conv-keep-days =
+    { $count ->
+        [one] dag
+       *[other] dager
+    }
+settings-conv-keep-what = Fram til da kan siden til en konvertert fil legge tilbake originalen. Teksturer kopieres ikke inn i en konvertert modell: den peker på bildefilene ved siden av seg. En modells .mtl- eller .bin-filer blir liggende.
+settings-conv-save = Lagre regler
+settings-conv-revert = Angre endringer
+settings-conv-existing = Konverter filer som allerede er i biblioteket
+settings-conv-saved = Konverteringsregler lagret. De gjelder for pakker som legges til fra nå av.
+settings-conv-converting =
+    { $count ->
+        [one] Konverterer én fil i bakgrunnen
+       *[other] Konverterer { $count } filer i bakgrunnen
+    }
+settings-conv-nothing = Ingenting i biblioteket trenger å konverteres.
+settings-conv-ask-title =
+    { $count ->
+        [one] Konvertere én fil som allerede er i biblioteket?
+       *[other] Konvertere { $count } filer som allerede er i biblioteket?
+    }
+settings-conv-ask-body =
+    { $packs ->
+        [one] Den er i én pakke.
+       *[other] De er i { $packs } pakker.
+    } Hver original beholdes i { $days } dager, og fram til da kan den legges tilbake fra siden sin.
+settings-conv-ask-busy =
+    { $count ->
+        [one] Én er i en pakke som fortsatt legges til; den konverteres når det er ferdig.
+       *[other] { $count } er i pakker som fortsatt legges til; de konverteres når det er ferdig.
+    }
+settings-conv-ask-list = Filer som ville blitt konvertert
+settings-conv-ask-more = …og { $count } til
+settings-conv-ask-skipped = Latt være som de er:
+settings-conv-skip-watched =
+    { $count ->
+        [one] én fil i en overvåket mappe
+       *[other] { $count } filer i overvåkede mapper
+    }
+settings-conv-skip-unity =
+    { $count ->
+        [one] én fil et Unity-prosjekt kjenner ved navn
+       *[other] { $count } filer et Unity-prosjekt kjenner ved navn
+    }
+settings-conv-skip-used =
+    { $count ->
+        [one] én fil en scene eller en annen fil nevner ved navn
+       *[other] { $count } filer en scene eller en annen fil nevner ved navn
+    }
+settings-conv-skip-beside =
+    { $count ->
+        [one] én fil der den konverterte kopien allerede er i pakken
+       *[other] { $count } filer der de konverterte kopiene allerede er i pakkene
+    }
+settings-conv-skip-blender =
+    { $count ->
+        [one] én fil Blender ikke har lest ennå (Innstillinger → Verktøy)
+       *[other] { $count } filer Blender ikke har lest ennå (Innstillinger → Verktøy)
+    }
+settings-conv-ask-new = Lagre, bare nye pakker
+settings-conv-ask-save-convert =
+    { $count ->
+        [one] Lagre og konverter den
+       *[other] Lagre og konverter { $count } filer
+    }
+settings-conv-ask-convert =
+    { $count ->
+        [one] Konverter den
+       *[other] Konverter { $count } filer
+    }
 settings-unreal-off = La være som de er
 settings-unreal-off-hint = Konverter fra en pakkes side når du vil.
 settings-unreal-keep = Konverter, behold originalene

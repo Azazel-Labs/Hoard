@@ -224,6 +224,14 @@ error-no-soundfont = На серверу нема SoundFont-а на { $path }
 error-workers = Позадински радници: између 1 и { $max }
 error-ai-batch = Ресурса по ВИ захтеву: између 1 и 200
 error-conversion-cache = Претворена преузимања: најмање 100 MB
+error-conversion-keep-days = Правила претварања: оригинали се чувају од 1 до { $max } дана
+error-conversion-target = Правила претварања: Hoard не може да претвара датотеке у { $format }
+error-conversion-no-source = Правила претварања: свако правило мора да има бар један формат за претварање
+# $ext is a file extension, like obj; $format is what it would become, like glb.
+error-conversion-source = Правила претварања: .{ $ext } датотеке не могу да се претворе у { $format }
+error-conversion-twice = Правила претварања: .{ $ext } је у два правила
+error-conversion-cant-undo = Ову датотеку није претворило правило или је њен оригинал већ обрисан.
+error-conversion-path-taken = На { $path } је сада друга датотека, па оригинал не може да се врати тамо.
 error-limits-zero = Ограничења не могу бити нула
 error-settings-object = очекиван је JSON објекат с подешавањима
 error-bad-setting = неисправно подешавање: { $reason }
@@ -356,6 +364,8 @@ server-issues-convert = Модели које Blender није успео да �
 server-issues-convert-blurb = Немају GLB копију, па не могу да се прикажу у 3D-у.
 server-issues-unreal = Unreal пакети који нису могли да се претворе
 server-issues-unreal-blurb = Unreal страница пакета садржи остале његове Unreal пакете.
+server-issues-reformat = Датотеке које правило претварања није могло да претвори
+server-issues-reformat-blurb = Остављене су какве су биле.
 server-issues-materials = Пакети чији материјали нису могли да се утврде
 server-issues-materials-blurb = Све текстуре су ту; само нису груписане у материјале.
 server-issues-material-thumb = Материјали без сличице
@@ -377,6 +387,7 @@ server-job-retag = Поновно означавање: { $pack }
 server-job-llm-tag = Означавање помоћу ВИ: { $pack }
 server-job-convert = Претварање помоћу Blender-а: { $pack }
 server-job-unreal = Претварање Unreal пакета: { $pack }
+server-job-reformat = Претварање датотека по правилима претварања: { $pack }
 server-job-scan = Скенирање праћене фасцикле
 server-job-relocate = Премештање датотека између локација библиотеке
 server-job-looks = Утврђивање боја и изгледа
@@ -1459,6 +1470,15 @@ asset-variants = Варијанте (верзија: { $count })
 asset-copies = Идентичне копије
 asset-copies-note = Исти бајтови се чувају једном; ови пакети такође садрже ову датотеку.
 asset-unreal-converted = Претворено из Unreal-а
+asset-rule-converted = Претворено правилом
+# Followed by the original file's name: "A conversion rule made this GLB on 3 May 2026 from tree.obj".
+asset-rule-was = Правило претварања направило је ову датотеку { $format } { $date } од
+asset-rule-kept-until = Оригинал се чува до { $date }.
+asset-rule-put-back = Врати оригинал
+asset-rule-put-back-title = Вратити { $file }?
+asset-rule-put-back-body = Претворена датотека се брише, а њено место заузима оригинал, с његовим ознакама, колекцијама и везама. Правила претварања га од тада не дирају.
+asset-rule-put-back-done = Враћено: { $file }
+asset-rule-let-go = Оригинал је обрисан кад је истекло време чувања оригинала задато у Подешавањима.
 asset-unreal-package = Из Unreal пакета
 asset-ue-needs-editor-before = Чека Unreal Editor: { $reason }. На рачунару са инсталираним Unreal-ом покрените
 asset-ue-needs-editor-after = и вратиће се као FBX.
@@ -2400,6 +2420,106 @@ settings-store-lookup = Аутоматски тражи странице про�
 settings-unreal = Unreal пакети
 settings-unreal-reset = Unreal пакети: врати на подразумевано
 settings-unreal-what = Шта радити с .uasset датотекама.
+settings-conv = Правила претварања
+settings-conv-what = Претвара датотеке које Hoard чува у један формат, нпр. сваки OBJ и FBX у GLB, тако да цела библиотека буде уједначена. Претворена датотека заузима место оригинала, с његовим именом, ознакама, колекцијама и везама. Датотеке у праћеним фасциклама се никад не мењају.
+# A checkbox that turns one conversion rule on or off.
+settings-conv-rule-on = Укључено
+settings-conv-to = Претвори у
+# Heading over the file formats a rule converts.
+settings-conv-from = Из
+settings-conv-remove = Уклони
+settings-conv-remove-label = Уклони правило { $n }
+settings-conv-taken = Овај формат већ претвара друго правило
+settings-conv-upright = Усправи моделе при претварању (Y нагоре, окренути ка +Z), онако како се приказују модели пакета
+settings-conv-add = Додај правило
+# Before a number of days: "Keep originals for [30] days".
+settings-conv-keep = Чувај оригинале
+settings-conv-keep-days =
+    { $count ->
+        [one] дан
+        [few] дана
+       *[other] дана
+    }
+settings-conv-keep-what = До тада се оригинал може вратити са странице претворене датотеке. Текстуре се не копирају у претворени модел: он упућује на датотеке слика поред себе. Датотеке .mtl или .bin модела остају.
+settings-conv-save = Сачувај правила
+settings-conv-revert = Опозови измене
+settings-conv-existing = Претвори датотеке које су већ у библиотеци
+settings-conv-saved = Правила претварања су сачувана. Примењују се на пакете додате од сада.
+settings-conv-converting =
+    { $count ->
+        [one] У позадини се претвара { $count } датотека
+        [few] У позадини се претварају { $count } датотеке
+       *[other] У позадини се претвара { $count } датотека
+    }
+settings-conv-nothing = Ништа у библиотеци не треба претварати.
+settings-conv-ask-title =
+    { $count ->
+        [one] Претворити { $count } датотеку која је већ у библиотеци?
+        [few] Претворити { $count } датотеке које су већ у библиотеци?
+       *[other] Претворити { $count } датотека које су већ у библиотеци?
+    }
+settings-conv-ask-body =
+    { $packs ->
+        [one] Све је у { $packs } пакету.
+        [few] Све је у { $packs } пакета.
+       *[other] Све је у { $packs } пакета.
+    } Сваки оригинал се чува { $days ->
+        [one] { $days } дан
+        [few] { $days } дана
+       *[other] { $days } дана
+    } и до тада може да се врати са своје странице.
+settings-conv-ask-busy =
+    { $count ->
+        [one] { $count } датотека је у пакету који се још додаје; претвориће се кад то буде готово.
+        [few] { $count } датотеке су у пакетима који се још додају; претвориће се кад то буде готово.
+       *[other] { $count } датотека је у пакетима који се још додају; претвориће се кад то буде готово.
+    }
+settings-conv-ask-list = Датотеке које би биле претворене
+settings-conv-ask-more = …и још { $count }
+settings-conv-ask-skipped = Остају какве јесу:
+settings-conv-skip-watched =
+    { $count ->
+        [one] { $count } датотека у праћеној фасцикли
+        [few] { $count } датотеке у праћеним фасциклама
+       *[other] { $count } датотека у праћеним фасциклама
+    }
+settings-conv-skip-unity =
+    { $count ->
+        [one] { $count } датотека коју Unity пројекат зна по имену
+        [few] { $count } датотеке које Unity пројекат зна по имену
+       *[other] { $count } датотека које Unity пројекат зна по имену
+    }
+settings-conv-skip-used =
+    { $count ->
+        [one] { $count } датотека коју помиње сцена или друга датотека
+        [few] { $count } датотеке које помиње сцена или друга датотека
+       *[other] { $count } датотека које помиње сцена или друга датотека
+    }
+settings-conv-skip-beside =
+    { $count ->
+        [one] { $count } датотека чија је претворена копија већ у њеном пакету
+        [few] { $count } датотеке чије су претворене копије већ у њиховим пакетима
+       *[other] { $count } датотека чије су претворене копије већ у њиховим пакетима
+    }
+settings-conv-skip-blender =
+    { $count ->
+        [one] { $count } датотека коју Blender још није прочитао (Подешавања → Алати)
+        [few] { $count } датотеке које Blender још није прочитао (Подешавања → Алати)
+       *[other] { $count } датотека које Blender још није прочитао (Подешавања → Алати)
+    }
+settings-conv-ask-new = Сачувај, само нови пакети
+settings-conv-ask-save-convert =
+    { $count ->
+        [one] Сачувај и претвори { $count } датотеку
+        [few] Сачувај и претвори { $count } датотеке
+       *[other] Сачувај и претвори { $count } датотека
+    }
+settings-conv-ask-convert =
+    { $count ->
+        [one] Претвори { $count } датотеку
+        [few] Претвори { $count } датотеке
+       *[other] Претвори { $count } датотека
+    }
 settings-unreal-off = Остави какве јесу
 settings-unreal-off-hint = Претварајте са странице пакета кад пожелите.
 settings-unreal-keep = Претвори, задржи оригинале

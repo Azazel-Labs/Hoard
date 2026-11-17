@@ -617,6 +617,13 @@ const MIGRATIONS: &[&str] = &[
                       AND json_extract(a.meta, '$.material_slots') IS NOT NULL)
         AND NOT EXISTS (SELECT 1 FROM jobs j WHERE j.kind = 'materials' AND j.pack_id = p.id
                           AND j.status IN ('queued', 'running'));",
+    // 60: conversion rules (`reformat.rs`). A model a rule converted was turned upright as it was written
+    // (`upright`), so its pack's facing no longer applies to it; one put back as it was (`kept_formats`) is left
+    // alone by the rules from then on.
+    "ALTER TABLE asset_origin ADD COLUMN upright INTEGER NOT NULL DEFAULT 0;
+     CREATE TABLE IF NOT EXISTS kept_formats (
+         asset_id TEXT PRIMARY KEY REFERENCES assets(id) ON DELETE CASCADE
+     ) WITHOUT ROWID;",
 ];
 
 /// How many automatic pre-upgrade backups to keep in `<data dir>/backups`.
@@ -957,6 +964,25 @@ fn pack_from_row(r: &Row<'_>) -> rusqlite::Result<Pack> {
     })
 }
 
+/// How a model is turned to be shown: its pack's way ([`pack_facing`]), unless a conversion rule turned it upright
+/// as it wrote the file.
+pub(crate) fn asset_facing(conn: &Connection, asset_id: &str, pack_id: &str) -> Result<hoard_core::Facing> {
+    let upright: bool = conn.query_row(
+        "SELECT EXISTS (SELECT 1 FROM asset_origin WHERE asset_id = ?1 AND upright = 1)",
+        [asset_id],
+        |r| r.get(0),
+    )?;
+    if upright { Ok(hoard_core::Facing::default()) } else { pack_facing(conn, pack_id) }
+}
+
+/// The models in a pack a conversion rule turned upright as it wrote them (see [`asset_facing`]).
+pub(crate) fn upright_models(conn: &Connection, pack_id: &str) -> Result<std::collections::HashSet<String>> {
+    let mut stmt = conn.prepare_cached(
+        "SELECT o.asset_id FROM asset_origin o JOIN assets a ON a.id = o.asset_id WHERE a.pack_id = ?1 AND o.upright = 1",
+    )?;
+    Ok(stmt.query_map([pack_id], |r| r.get(0))?.collect::<rusqlite::Result<_>>()?)
+}
+
 /// How the pack's models are turned to be shown; upright for a pack that's gone.
 pub(crate) fn pack_facing(conn: &Connection, pack_id: &str) -> Result<hoard_core::Facing> {
     let angles: Option<(i64, i64)> = conn
@@ -1256,7 +1282,7 @@ pub(crate) fn get_asset(conn: &Connection, id: &str) -> Result<Option<Asset>> {
     asset.formats = crate::formats::options(&asset.ext, &asset.derivatives);
     asset.family = family(conn, &asset.id)?;
     if asset.kind == AssetKind::Model {
-        asset.facing = Some(pack_facing(conn, &asset.pack_id)?).filter(|f| !f.is_upright());
+        asset.facing = Some(asset_facing(conn, &asset.id, &asset.pack_id)?).filter(|f| !f.is_upright());
     }
     let mut stmt = conn.prepare(
         "SELECT a.id, a.name, a.pack_id, p.name, a.path FROM assets a JOIN packs p ON p.id = a.pack_id
@@ -2026,6 +2052,15 @@ pub(crate) fn finish_job(conn: &Connection, id: i64, error: Option<&str>, retry_
     Ok(())
 }
 
+/// An empty library with the whole schema, for other modules' tests.
+#[cfg(test)]
+pub(crate) fn test_library() -> Connection {
+    let dir = tempfile::tempdir().expect("temp dir");
+    let mut conn = Connection::open_in_memory().expect("in-memory database");
+    migrate(&mut conn, dir.path(), MIGRATIONS).expect("schema");
+    conn
+}
+
 /// After a crash, anything left `running` gets another go.
 pub(crate) fn requeue_stale_jobs(conn: &Connection) -> Result<usize> {
     Ok(conn.execute("UPDATE jobs SET status = 'queued' WHERE status = 'running'", [])?)
@@ -2108,7 +2143,7 @@ mod tests {
     fn folder_guesses_the_file_contradicts_are_taken_back() {
         let dir = tempfile::tempdir().unwrap();
         let mut conn = baseline_db(dir.path());
-        migrate(&mut conn, &dir.path().join("backups"), &MIGRATIONS[..MIGRATIONS.len() - 2]).unwrap();
+        migrate(&mut conn, &dir.path().join("backups"), &MIGRATIONS[..49]).unwrap();
         conn.execute_batch(
             "PRAGMA foreign_keys = OFF;
              INSERT INTO assets (id, pack_id, blob_hash, path, name, ext, kind, meta, created_at, updated_at) VALUES

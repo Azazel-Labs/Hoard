@@ -1094,7 +1094,7 @@ fn dress_models(state: &AppState, rt: &Handle, conn: &Connection, pack_id: &str)
     let mut done = 0;
     for (id, ext, slots) in slotted {
         let dir = work.path().join(&id);
-        let dressed = dress_slots(state, rt, conn, &id, &ext, &slots, &dir);
+        let dressed = turned_as(conn, &id, || dress_slots(state, rt, conn, &id, &ext, &slots, &dir))?;
         std::fs::remove_dir_all(&dir).ok();
         match dressed {
             Ok(Some(thumb)) => {
@@ -1109,7 +1109,7 @@ fn dress_models(state: &AppState, rt: &Handle, conn: &Connection, pack_id: &str)
     }
     for (id, ext, color) in todo {
         let dir = work.path().join(&id);
-        let dressed = (|| -> Result<Option<Vec<u8>>> {
+        let dressed = turned_as(conn, &id, || -> Result<Option<Vec<u8>>> {
             let file = fetch_model(state, rt, conn, &id, &dir)?;
             if matches!(ext.as_str(), "glb" | "gltf") {
                 let color = rt.block_on(state.blobs.read_all(&color))?;
@@ -1132,7 +1132,7 @@ fn dress_models(state: &AppState, rt: &Handle, conn: &Connection, pack_id: &str)
                 m.color = [1.0, 1.0, 1.0, m.color[3]];
             }
             crate::analyze::mesh_thumb_bytes(&mesh, &file)
-        })();
+        })?;
         std::fs::remove_dir_all(&dir).ok();
         let thumb = match dressed {
             Ok(Some(t)) => t,
@@ -1150,11 +1150,11 @@ fn dress_models(state: &AppState, rt: &Handle, conn: &Connection, pack_id: &str)
     for (id, ext) in redress {
         if !dressed_ids.contains(&id) {
             let dir = work.path().join(&id);
-            let plain = (|| -> Result<Option<Vec<u8>>> {
+            let plain = turned_as(conn, &id, || -> Result<Option<Vec<u8>>> {
                 let file = fetch_model(state, rt, conn, &id, &dir)?;
                 let (Some(mesh), _) = crate::meshes::load(&file, &ext, &dir)? else { return Ok(None) };
                 crate::analyze::mesh_thumb_bytes(&mesh, &file)
-            })();
+            })?;
             std::fs::remove_dir_all(&dir).ok();
             match plain {
                 Ok(Some(thumb)) => {
@@ -1264,7 +1264,17 @@ fn read_material_names(state: &AppState, rt: &Handle, conn: &Connection, pack_id
 
 /// A model's file with the files it needs (a glTF's buffers and images, an OBJ's MTL), where the pack has them,
 /// downloaded into `dir`; the model's own file's path.
-fn fetch_model(state: &AppState, rt: &Handle, conn: &Connection, id: &str, dir: &Path) -> Result<PathBuf> {
+/// Run `f`, which draws model `id`, with the model turned its own way: upright when a conversion rule turned it so
+/// as it wrote the file, otherwise as its pack's models are (see [`db::asset_facing`]).
+fn turned_as<R>(conn: &Connection, id: &str, f: impl FnOnce() -> R) -> Result<R> {
+    let upright: bool =
+        conn.query_row("SELECT EXISTS (SELECT 1 FROM asset_origin WHERE asset_id = ?1 AND upright = 1)", [id], |r| {
+            r.get(0)
+        })?;
+    Ok(if upright { crate::meshes::facing(hoard_core::Facing::default(), f) } else { f() })
+}
+
+pub(crate) fn fetch_model(state: &AppState, rt: &Handle, conn: &Connection, id: &str, dir: &Path) -> Result<PathBuf> {
     let files = db::bundle_files(conn, &db::dependency_closure(conn, id, false)?)?;
     let mut file = None;
     for f in &files {
@@ -1324,7 +1334,7 @@ fn redraw_glass(state: &AppState, rt: &Handle, conn: &Connection, pack_id: &str)
                 return Ok(None);
             }
             let file = fetch_model(state, rt, conn, &id, &dir)?;
-            crate::analyze::gltf_thumb(&file)
+            turned_as(conn, &id, || crate::analyze::gltf_thumb(&file))?
         })();
         std::fs::remove_dir_all(&dir).ok();
         let redrawn = match drawn {

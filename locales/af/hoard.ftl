@@ -224,6 +224,14 @@ error-no-soundfont = Daar is geen SoundFont by { $path } op die bediener nie
 error-workers = Agtergrondwerkers: tussen 1 en { $max }
 error-ai-batch = Bates per KI-versoek: tussen 1 en 200
 error-conversion-cache = Omgeskakelde aflaaie: minstens 100 MB
+error-conversion-keep-days = Omskakelreëls: hou oorspronklikes vir 1 tot { $max } dae
+error-conversion-target = Omskakelreëls: Hoard kan nie lêers na { $format } omskakel nie
+error-conversion-no-source = Omskakelreëls: elke reël het minstens een formaat nodig om om te skakel
+# $ext is a file extension, like obj; $format is what it would become, like glb.
+error-conversion-source = Omskakelreëls: .{ $ext }-lêers kan nie na { $format } omgeskakel word nie
+error-conversion-twice = Omskakelreëls: .{ $ext } is in twee reëls
+error-conversion-cant-undo = Hierdie lêer is nie deur 'n reël omgeskakel nie, of sy oorspronklike is uitgevee.
+error-conversion-path-taken = Daar is nou 'n ander lêer by { $path }, dus kan die oorspronklike nie daarheen teruggaan nie.
 error-limits-zero = Limiete kan nie nul wees nie
 error-settings-object = 'n JSON-objek met instellings is verwag
 error-bad-setting = foutiewe instelling: { $reason }
@@ -346,6 +354,8 @@ server-issues-convert = Modelle wat Blender nie kon omskakel nie
 server-issues-convert-blurb = Hulle het geen GLB-kopie nie, dus kan hulle nie in 3D gewys word nie.
 server-issues-unreal = Unreal-pakkette wat nie omgeskakel kon word nie
 server-issues-unreal-blurb = Die pak se Unreal-bladsy het die res van sy pakkette.
+server-issues-reformat = Lêers wat 'n omskakelreël nie kon omskakel nie
+server-issues-reformat-blurb = Hulle is gelaat soos hulle was.
 server-issues-materials = Pakke waarvan die materiale nie uitgewerk kon word nie
 server-issues-materials-blurb = Hul teksture is almal daar; hulle is net nie in materiale gegroepeer nie.
 server-issues-material-thumb = Materiale sonder 'n duimnael
@@ -367,6 +377,7 @@ server-job-retag = Her-etiketteer { $pack }
 server-job-llm-tag = Etiketteer { $pack } met KI
 server-job-convert = Skakel { $pack } om met Blender
 server-job-unreal = Skakel Unreal-pakkette in { $pack } om
+server-job-reformat = Skakel lêers in { $pack } volgens die omskakelreëls om
 server-job-scan = Skandeer 'n gemonitorde vouer
 server-job-relocate = Skuif lêers tussen biblioteekliggings
 server-job-looks = Werk kleure en voorkoms uit
@@ -1408,6 +1419,15 @@ asset-variants = Variante ({ $count } weergawes)
 asset-copies = Identiese kopieë
 asset-copies-note = Dieselfde grepe word een keer gestoor; hierdie pakke bevat ook hierdie lêer.
 asset-unreal-converted = Uit Unreal omgeskakel
+asset-rule-converted = Deur 'n reël omgeskakel
+# Followed by the original file's name: "A conversion rule made this GLB on 3 May 2026 from tree.obj".
+asset-rule-was = 'n Omskakelreël het hierdie { $format } op { $date } gemaak uit
+asset-rule-kept-until = Die oorspronklike word tot { $date } gehou.
+asset-rule-put-back = Sit die oorspronklike terug
+asset-rule-put-back-title = Sit { $file } terug?
+asset-rule-put-back-body = Die omgeskakelde lêer word uitgevee en die oorspronklike neem sy plek in, met sy etikette, versamelings en skakels. Die omskakelreëls los dit voortaan uit.
+asset-rule-put-back-done = { $file } is terug
+asset-rule-let-go = Die oorspronklike is uitgevee toe die tyd wat Instellings oorspronklikes hou, verby was.
 asset-unreal-package = Uit die Unreal-pakket
 asset-ue-needs-editor-before = Wag vir Unreal Editor: { $reason }. Op 'n masjien met Unreal geïnstalleer, voer
 asset-ue-needs-editor-after = uit, en dit kom as FBX terug.
@@ -2299,6 +2319,90 @@ settings-store-lookup = Soek winkelbladsye outomaties op
 settings-unreal = Unreal-pakkette
 settings-unreal-reset = Unreal-pakkette: terug na die verstek
 settings-unreal-what = Wat om met .uasset-lêers te doen.
+settings-conv = Omskakelreëls
+settings-conv-what = Skakel lêers wat Hoard hou na een formaat om, soos elke OBJ en FBX na GLB, sodat die biblioteek eenvormig is. Die omgeskakelde lêer neem die oorspronklike se plek in, met sy naam, etikette, versamelings en skakels. Lêers in gemonitorde vouers word nooit verander nie.
+# A checkbox that turns one conversion rule on or off.
+settings-conv-rule-on = Aan
+settings-conv-to = Skakel om na
+# Heading over the file formats a rule converts.
+settings-conv-from = Van
+settings-conv-remove = Verwyder
+settings-conv-remove-label = Verwyder reël { $n }
+settings-conv-taken = 'n Ander reël skakel hierdie formaat reeds om
+settings-conv-upright = Rig modelle regop terwyl hulle omgeskakel word (Y op, wys na +Z), soos die pak se modelle gewys word
+settings-conv-add = Voeg 'n reël by
+# Before a number of days: "Keep originals for [30] days".
+settings-conv-keep = Hou oorspronklikes vir
+settings-conv-keep-days =
+    { $count ->
+        [one] dag
+       *[other] dae
+    }
+settings-conv-keep-what = Tot dan kan 'n omgeskakelde lêer se bladsy die oorspronklike terugsit. Teksture word nie in 'n omgeskakelde model gekopieer nie: dit verwys na die beeldlêers langsaan. 'n Model se .mtl- of .bin-lêers bly.
+settings-conv-save = Stoor reëls
+settings-conv-revert = Ontdoen veranderinge
+settings-conv-existing = Skakel lêers om wat reeds in die biblioteek is
+settings-conv-saved = Omskakelreëls gestoor. Hulle geld vir pakke wat van nou af bygevoeg word.
+settings-conv-converting =
+    { $count ->
+        [one] Skakel een lêer in die agtergrond om
+       *[other] Skakel { $count } lêers in die agtergrond om
+    }
+settings-conv-nothing = Niks in die biblioteek hoef omgeskakel te word nie.
+settings-conv-ask-title =
+    { $count ->
+        [one] Skakel een lêer om wat reeds in die biblioteek is?
+       *[other] Skakel { $count } lêers om wat reeds in die biblioteek is?
+    }
+settings-conv-ask-body =
+    { $packs ->
+        [one] Dit is in een pak.
+       *[other] Hulle is in { $packs } pakke.
+    } Elke oorspronklike word { $days } dae gehou, en tot dan kan dit vanaf sy bladsy teruggesit word.
+settings-conv-ask-busy =
+    { $count ->
+        [one] Een is in 'n pak wat nog bygevoeg word; dit word omgeskakel sodra dit klaar is.
+       *[other] { $count } is in pakke wat nog bygevoeg word; hulle word omgeskakel sodra dit klaar is.
+    }
+settings-conv-ask-list = Lêers wat omgeskakel sou word
+settings-conv-ask-more = …en nog { $count }
+settings-conv-ask-skipped = Gelaat soos hulle is:
+settings-conv-skip-watched =
+    { $count ->
+        [one] een lêer in 'n gemonitorde vouer
+       *[other] { $count } lêers in gemonitorde vouers
+    }
+settings-conv-skip-unity =
+    { $count ->
+        [one] een lêer wat 'n Unity-projek by sy naam ken
+       *[other] { $count } lêers wat 'n Unity-projek by hul name ken
+    }
+settings-conv-skip-used =
+    { $count ->
+        [one] een lêer waarna 'n toneel of 'n ander lêer verwys
+       *[other] { $count } lêers waarna 'n toneel of 'n ander lêer verwys
+    }
+settings-conv-skip-beside =
+    { $count ->
+        [one] een lêer waarvan die omgeskakelde kopie reeds in sy pak is
+       *[other] { $count } lêers waarvan die omgeskakelde kopieë reeds in hul pakke is
+    }
+settings-conv-skip-blender =
+    { $count ->
+        [one] een lêer wat Blender nog nie gelees het nie (Instellings → Gereedskap)
+       *[other] { $count } lêers wat Blender nog nie gelees het nie (Instellings → Gereedskap)
+    }
+settings-conv-ask-new = Stoor, net nuwe pakke
+settings-conv-ask-save-convert =
+    { $count ->
+        [one] Stoor en skakel dit om
+       *[other] Stoor en skakel { $count } lêers om
+    }
+settings-conv-ask-convert =
+    { $count ->
+        [one] Skakel dit om
+       *[other] Skakel { $count } lêers om
+    }
 settings-unreal-off = Los soos dit is
 settings-unreal-off-hint = Skakel om vanaf 'n pak se bladsy wanneer jy wil.
 settings-unreal-keep = Skakel om, hou oorspronklikes

@@ -224,6 +224,14 @@ error-no-soundfont = サーバーの { $path } に SoundFont がありません
 error-workers = バックグラウンドワーカー: 1～{ $max }
 error-ai-batch = AI リクエストあたりのアセット数: 1～200
 error-conversion-cache = 変換済みダウンロード: 100 MB 以上
+error-conversion-keep-days = 変換ルール: 元のファイルの保存期間は 1〜{ $max } 日の範囲で指定してください
+error-conversion-target = 変換ルール: Hoard はファイルを { $format } に変換できません
+error-conversion-no-source = 変換ルール: 各ルールには変換する形式が 1 つ以上必要です
+# $ext is a file extension, like obj; $format is what it would become, like glb.
+error-conversion-source = 変換ルール: .{ $ext } ファイルは { $format } に変換できません
+error-conversion-twice = 変換ルール: .{ $ext } が 2 つのルールに含まれています
+error-conversion-cant-undo = このファイルはルールで変換されたものではないか、元のファイルが削除されています。
+error-conversion-path-taken = 現在 { $path } には別のファイルがあるため、元のファイルをそこに戻せません。
 error-limits-zero = 上限を 0 にはできません
 error-settings-object = 設定の JSON オブジェクトが必要です
 error-bad-setting = 不正な設定: { $reason }
@@ -346,6 +354,8 @@ server-issues-convert = Blender で変換できなかったモデル
 server-issues-convert-blurb = GLB のコピーがないため、3D で表示できません。
 server-issues-unreal = 変換できなかった Unreal パッケージ
 server-issues-unreal-blurb = パックの Unreal ページに残りのパッケージがあります。
+server-issues-reformat = 変換ルールで変換できなかったファイル
+server-issues-reformat-blurb = 元のまま残されています。
 server-issues-materials = マテリアルを特定できなかったパック
 server-issues-materials-blurb = テクスチャはすべてありますが、マテリアルにまとめられていません。
 server-issues-material-thumb = サムネイルのないマテリアル
@@ -367,6 +377,7 @@ server-job-retag = { $pack } のタグを付け直し中
 server-job-llm-tag = AI で { $pack } にタグ付け中
 server-job-convert = Blender で { $pack } を変換中
 server-job-unreal = { $pack } の Unreal パッケージを変換中
+server-job-reformat = 変換ルールに従って { $pack } のファイルを変換中
 server-job-scan = 監視フォルダーをスキャン中
 server-job-relocate = ライブラリの保存場所の間でファイルを移動中
 server-job-looks = 色と見た目を分析中
@@ -1303,6 +1314,15 @@ asset-variants = バリエーション（{ $count } 種類）
 asset-copies = 同一のコピー
 asset-copies-note = 同じバイト列は 1 回だけ保存されます。これらのパックにもこのファイルが含まれています。
 asset-unreal-converted = Unreal から変換
+asset-rule-converted = ルールで変換
+# Followed by the original file's name: "A conversion rule made this GLB on 3 May 2026 from tree.obj".
+asset-rule-was = { $date } に変換ルールがこの { $format } を作成しました。元のファイル:
+asset-rule-kept-until = 元のファイルは { $date } まで保存されます。
+asset-rule-put-back = 元のファイルに戻す
+asset-rule-put-back-title = { $file } を元に戻しますか？
+asset-rule-put-back-body = 変換したファイルは削除され、元のファイルがタグ、コレクション、リンクを引き継いでその場所に戻ります。以後、変換ルールはこのファイルを変更しません。
+asset-rule-put-back-done = { $file } を元に戻しました
+asset-rule-let-go = 設定で指定された元のファイルの保存期間が過ぎたため、元のファイルは削除されました。
 asset-unreal-package = Unreal パッケージから
 asset-ue-needs-editor-before = Unreal Editor を待っています: { $reason }。Unreal をインストールしたマシンで
 asset-ue-needs-editor-after = を実行すると、FBX として戻ってきます。
@@ -2127,6 +2147,78 @@ settings-store-lookup = ストアページを自動で検索する
 settings-unreal = Unreal パッケージ
 settings-unreal-reset = Unreal パッケージ: 既定値に戻す
 settings-unreal-what = .uasset ファイルの扱い方です。
+settings-conv = 変換ルール
+settings-conv-what = Hoard が保管するファイルを 1 つの形式に変換して、ライブラリをそろえます。たとえば OBJ と FBX をすべて GLB にします。変換したファイルは元のファイルと置き換わり、名前、タグ、コレクション、リンクを引き継ぎます。監視フォルダー内のファイルは変更されません。
+# A checkbox that turns one conversion rule on or off.
+settings-conv-rule-on = オン
+settings-conv-to = 変換先
+# Heading over the file formats a rule converts.
+settings-conv-from = 変換元
+settings-conv-remove = 削除
+settings-conv-remove-label = ルール { $n } を削除
+settings-conv-taken = この形式は別のルールで変換されます
+settings-conv-upright = 変換時に、パックのモデルの表示と同じようにモデルを立てる（Y が上、+Z 向き）
+settings-conv-add = ルールを追加
+# Before a number of days: "Keep originals for [30] days".
+settings-conv-keep = 元のファイルの保存期間
+settings-conv-keep-days =
+    { $count ->
+       *[other] 日
+    }
+settings-conv-keep-what = それまでは、変換したファイルのページから元のファイルに戻せます。テクスチャは変換したモデルにコピーされず、モデルは隣にある画像ファイルを参照します。モデルの .mtl や .bin ファイルは残ります。
+settings-conv-save = ルールを保存
+settings-conv-revert = 変更を元に戻す
+settings-conv-existing = ライブラリにあるファイルを変換
+settings-conv-saved = 変換ルールを保存しました。今後追加するパックに適用されます。
+settings-conv-converting =
+    { $count ->
+       *[other] バックグラウンドで { $count } 件のファイルを変換中
+    }
+settings-conv-nothing = ライブラリに変換が必要なものはありません。
+settings-conv-ask-title =
+    { $count ->
+       *[other] ライブラリにある { $count } 件のファイルを変換しますか？
+    }
+settings-conv-ask-body =
+    { $packs ->
+       *[other] { $packs } 個のパックにあります。
+    }元のファイルはそれぞれ { $days } 日間保存され、それまではページから元に戻せます。
+settings-conv-ask-busy =
+    { $count ->
+       *[other] { $count } 件はまだ追加中のパックにあります。追加が終わりしだい変換されます。
+    }
+settings-conv-ask-list = 変換されるファイル
+settings-conv-ask-more = …ほか { $count } 件
+settings-conv-ask-skipped = そのまま残すもの:
+settings-conv-skip-watched =
+    { $count ->
+       *[other] 監視フォルダー内のファイル { $count } 件
+    }
+settings-conv-skip-unity =
+    { $count ->
+       *[other] Unity プロジェクトが名前で参照しているファイル { $count } 件
+    }
+settings-conv-skip-used =
+    { $count ->
+       *[other] シーンや別のファイルが名前で参照しているファイル { $count } 件
+    }
+settings-conv-skip-beside =
+    { $count ->
+       *[other] 変換済みのコピーがすでにパック内にあるファイル { $count } 件
+    }
+settings-conv-skip-blender =
+    { $count ->
+       *[other] Blender がまだ読み込んでいないファイル { $count } 件（設定 → ツール）
+    }
+settings-conv-ask-new = 保存（新しいパックのみ）
+settings-conv-ask-save-convert =
+    { $count ->
+       *[other] 保存して { $count } 件のファイルを変換
+    }
+settings-conv-ask-convert =
+    { $count ->
+       *[other] { $count } 件のファイルを変換
+    }
 settings-unreal-off = そのままにする
 settings-unreal-off-hint = 必要なときにパックのページから変換します。
 settings-unreal-keep = 変換して元のファイルを残す

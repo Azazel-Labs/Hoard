@@ -309,7 +309,13 @@ pub(crate) async fn convert_pack(state: &AppState, pack_id: &str, mut req: Reque
         let (n, bytes) = jobs::gc(state).await?;
         tracing::info!(released, blobs = n, bytes, "discarded kept originals");
     }
-    after_changes(state, pack_id, sum.converted + sum.merged + sum.dropped > 0, req.then_llm).await?;
+    let changed = sum.converted + sum.merged + sum.dropped > 0;
+    // What Unreal packages became may be what a conversion rule converts; that job reads the pack again after.
+    let then = crate::reformat::Request { then_llm: req.then_llm, changed };
+    let (s, pid) = (std::sync::Arc::clone(state), pack_id.to_owned());
+    if !db::call(&state.pool, move |c| crate::reformat::maybe_enqueue(&s, c, &pid, then)).await? {
+        after_changes(state, pack_id, changed, req.then_llm).await?;
+    }
     tracing::info!(pack = pack_id, ?sum, "Unreal conversion finished");
     Ok(sum)
 }
@@ -415,6 +421,7 @@ pub(crate) fn origin_of(conn: &Connection, asset_id: &str) -> Result<Option<Asse
                     method: r.get(6)?,
                     notes: r.get::<_, Option<String>>(7)?.filter(|n| !n.is_empty()),
                     converted_at: r.get(8)?,
+                    kept_until: None,
                 })
             },
         )

@@ -181,7 +181,7 @@ pub(crate) async fn convert_pack(state: &AppState, pack_id: &str) -> Result<()> 
             failures.push((t.path.clone(), format!("{e:#}")));
         }
     }
-    let (pid, n_failed) = (pack_id.to_owned(), failures.len());
+    let (pid, n_failed, st) = (pack_id.to_owned(), failures.len(), std::sync::Arc::clone(state));
     db::call(&state.pool, move |c| {
         issues::clear(c, &[issues::CONVERT], issues::At::pack(&pid));
         for (path, why) in &failures {
@@ -191,6 +191,11 @@ pub(crate) async fn convert_pack(state: &AppState, pack_id: &str) -> Result<()> 
         let tx = c.transaction()?;
         crate::animations::sort_pack(&tx, &pid)?;
         tx.commit()?;
+        // A conversion rule may take what Blender made, once the pack's been read (adding it does this itself).
+        let status: String = c.query_row("SELECT status FROM packs WHERE id = ?1", [&pid], |r| r.get(0))?;
+        if status != hoard_core::PackStatus::Ingesting.as_str() {
+            crate::reformat::maybe_enqueue(&st, c, &pid, crate::reformat::Request::default())?;
+        }
         Ok(())
     })
     .await?;

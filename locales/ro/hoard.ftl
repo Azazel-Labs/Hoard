@@ -224,6 +224,14 @@ error-no-soundfont = Nu există niciun SoundFont la { $path } pe server
 error-workers = Procese de fundal: între 1 și { $max }
 error-ai-batch = Resurse per cerere AI: între 1 și 200
 error-conversion-cache = Descărcări convertite: cel puțin 100 MB
+error-conversion-keep-days = Reguli de conversie: originalele se păstrează între 1 și { $max } de zile
+error-conversion-target = Reguli de conversie: Hoard nu poate converti fișiere în { $format }
+error-conversion-no-source = Reguli de conversie: fiecare regulă are nevoie de cel puțin un format de convertit
+# $ext is a file extension, like obj; $format is what it would become, like glb.
+error-conversion-source = Reguli de conversie: fișierele .{ $ext } nu pot fi convertite în { $format }
+error-conversion-twice = Reguli de conversie: .{ $ext } apare în două reguli
+error-conversion-cant-undo = Acest fișier nu a fost convertit de o regulă sau originalul său a fost deja șters.
+error-conversion-path-taken = Acum există alt fișier la { $path }, așa că originalul nu se poate întoarce acolo.
 error-limits-zero = Limitele nu pot fi zero
 error-settings-object = se aștepta un obiect JSON de setări
 error-bad-setting = setare greșită: { $reason }
@@ -356,6 +364,8 @@ server-issues-convert = Modele pe care Blender nu le-a putut converti
 server-issues-convert-blurb = Nu au o copie GLB, deci nu pot fi afișate în 3D.
 server-issues-unreal = Pachete Unreal care nu au putut fi convertite
 server-issues-unreal-blurb = Pagina Unreal a pachetului conține restul pachetelor sale Unreal.
+server-issues-reformat = Fișiere pe care o regulă de conversie nu le-a putut converti
+server-issues-reformat-blurb = Rămân așa cum erau.
 server-issues-materials = Pachete ale căror materiale nu au putut fi deduse
 server-issues-materials-blurb = Toate texturile lor sunt acolo; doar că nu sunt grupate în materiale.
 server-issues-material-thumb = Materiale fără miniatură
@@ -377,6 +387,7 @@ server-job-retag = Se reetichetează { $pack }
 server-job-llm-tag = Se etichetează { $pack } cu AI
 server-job-convert = Se convertește { $pack } cu Blender
 server-job-unreal = Se convertesc pachetele Unreal din { $pack }
+server-job-reformat = Se convertesc fișierele din { $pack } după regulile de conversie
 server-job-scan = Se scanează un dosar urmărit
 server-job-relocate = Se mută fișiere între locațiile bibliotecii
 server-job-looks = Se determină culorile și aspectul
@@ -1538,6 +1549,15 @@ asset-variants =
 asset-copies = Copii identice
 asset-copies-note = Aceiași octeți sunt stocați o singură dată; și aceste pachete conțin acest fișier.
 asset-unreal-converted = Convertit din Unreal
+asset-rule-converted = Convertit de o regulă
+# Followed by the original file's name: "A conversion rule made this GLB on 3 May 2026 from tree.obj".
+asset-rule-was = O regulă de conversie a creat acest { $format } pe { $date } din
+asset-rule-kept-until = Originalul este păstrat până pe { $date }.
+asset-rule-put-back = Restaurați originalul
+asset-rule-put-back-title = Restaurați { $file }?
+asset-rule-put-back-body = Fișierul convertit este șters, iar originalul îi ia locul, cu etichetele, colecțiile și linkurile sale. De atunci încolo, regulile de conversie nu se mai ating de el.
+asset-rule-put-back-done = { $file } a fost restaurat
+asset-rule-let-go = Originalul a fost șters după ce a expirat perioada de păstrare a originalelor din Setări.
 asset-unreal-package = Din pachetul Unreal
 asset-ue-needs-editor-before = Se așteaptă Unreal Editor: { $reason }. Pe un computer cu Unreal instalat, rulați
 asset-ue-needs-editor-after = și revine ca FBX.
@@ -2505,6 +2525,106 @@ settings-store-lookup = Căutați automat paginile de magazin
 settings-unreal = Pachete Unreal
 settings-unreal-reset = Pachete Unreal: înapoi la valoarea implicită
 settings-unreal-what = Ce să se facă cu fișierele .uasset.
+settings-conv = Reguli de conversie
+settings-conv-what = Convertiți fișierele păstrate de Hoard într-un singur format, de exemplu toate OBJ și FBX în GLB, ca biblioteca să fie uniformă. Fișierul convertit ia locul originalului, cu numele, etichetele, colecțiile și linkurile sale. Fișierele din dosarele urmărite nu sunt modificate niciodată.
+# A checkbox that turns one conversion rule on or off.
+settings-conv-rule-on = Activă
+settings-conv-to = Convertiți în
+# Heading over the file formats a rule converts.
+settings-conv-from = Din
+settings-conv-remove = Eliminați
+settings-conv-remove-label = Eliminați regula { $n }
+settings-conv-taken = O altă regulă convertește deja acest format
+settings-conv-upright = Îndreptați modelele la conversie (Y în sus, cu fața spre +Z), așa cum sunt afișate modelele pachetului
+settings-conv-add = Adăugați o regulă
+# Before a number of days: "Keep originals for [30] days".
+settings-conv-keep = Păstrați originalele timp de
+settings-conv-keep-days =
+    { $count ->
+        [one] zi
+        [few] zile
+       *[other] de zile
+    }
+settings-conv-keep-what = Până atunci, pagina unui fișier convertit poate restaura originalul. Texturile nu sunt copiate în modelul convertit: acesta trimite la fișierele de imagine de lângă el. Fișierele .mtl sau .bin ale unui model rămân.
+settings-conv-save = Salvați regulile
+settings-conv-revert = Anulați modificările
+settings-conv-existing = Convertiți fișierele aflate deja în bibliotecă
+settings-conv-saved = Regulile de conversie au fost salvate. Se aplică pachetelor adăugate de acum înainte.
+settings-conv-converting =
+    { $count ->
+        [one] Se convertește un fișier în fundal
+        [few] Se convertesc { $count } fișiere în fundal
+       *[other] Se convertesc { $count } de fișiere în fundal
+    }
+settings-conv-nothing = Nimic din bibliotecă nu trebuie convertit.
+settings-conv-ask-title =
+    { $count ->
+        [one] Convertiți un fișier aflat deja în bibliotecă?
+        [few] Convertiți { $count } fișiere aflate deja în bibliotecă?
+       *[other] Convertiți { $count } de fișiere aflate deja în bibliotecă?
+    }
+settings-conv-ask-body =
+    { $packs ->
+        [one] Se află într-un singur pachet.
+        [few] Se află în { $packs } pachete.
+       *[other] Se află în { $packs } de pachete.
+    } Fiecare original este păstrat { $days ->
+        [one] { $days } zi
+        [few] { $days } zile
+       *[other] { $days } de zile
+    }, iar până atunci poate fi restaurat din pagina sa.
+settings-conv-ask-busy =
+    { $count ->
+        [one] Unul se află într-un pachet care încă se adaugă; va fi convertit după ce se termină.
+        [few] { $count } se află în pachete care încă se adaugă; vor fi convertite după ce se termină.
+       *[other] { $count } se află în pachete care încă se adaugă; vor fi convertite după ce se termină.
+    }
+settings-conv-ask-list = Fișiere care ar fi convertite
+settings-conv-ask-more = …și încă { $count }
+settings-conv-ask-skipped = Rămân așa cum sunt:
+settings-conv-skip-watched =
+    { $count ->
+        [one] un fișier dintr-un dosar urmărit
+        [few] { $count } fișiere din dosare urmărite
+       *[other] { $count } de fișiere din dosare urmărite
+    }
+settings-conv-skip-unity =
+    { $count ->
+        [one] un fișier pe care un proiect Unity îl cunoaște după nume
+        [few] { $count } fișiere pe care un proiect Unity le cunoaște după nume
+       *[other] { $count } de fișiere pe care un proiect Unity le cunoaște după nume
+    }
+settings-conv-skip-used =
+    { $count ->
+        [one] un fișier menționat de o scenă sau de alt fișier
+        [few] { $count } fișiere menționate de o scenă sau de alt fișier
+       *[other] { $count } de fișiere menționate de o scenă sau de alt fișier
+    }
+settings-conv-skip-beside =
+    { $count ->
+        [one] un fișier a cărui copie convertită se află deja în pachetul său
+        [few] { $count } fișiere ale căror copii convertite se află deja în pachetele lor
+       *[other] { $count } de fișiere ale căror copii convertite se află deja în pachetele lor
+    }
+settings-conv-skip-blender =
+    { $count ->
+        [one] un fișier pe care Blender nu l-a citit încă (Setări → Instrumente)
+        [few] { $count } fișiere pe care Blender nu le-a citit încă (Setări → Instrumente)
+       *[other] { $count } de fișiere pe care Blender nu le-a citit încă (Setări → Instrumente)
+    }
+settings-conv-ask-new = Salvați, doar pachete noi
+settings-conv-ask-save-convert =
+    { $count ->
+        [one] Salvați și convertiți-l
+        [few] Salvați și convertiți { $count } fișiere
+       *[other] Salvați și convertiți { $count } de fișiere
+    }
+settings-conv-ask-convert =
+    { $count ->
+        [one] Convertiți-l
+        [few] Convertiți { $count } fișiere
+       *[other] Convertiți { $count } de fișiere
+    }
 settings-unreal-off = Lăsați-le așa
 settings-unreal-off-hint = Convertiți din pagina unui pachet când doriți.
 settings-unreal-keep = Convertiți, păstrați originalele

@@ -224,6 +224,14 @@ error-no-soundfont = Nincs SoundFont a szerveren ezen az útvonalon: { $path }
 error-workers = Háttérfolyamatok: 1 és { $max } között
 error-ai-batch = Assetek MI-kérésenként: 1 és 200 között
 error-conversion-cache = Átalakított letöltések: legalább 100 MB
+error-conversion-keep-days = Átalakítási szabályok: az eredetiek 1–{ $max } napig őrizhetők meg
+error-conversion-target = Átalakítási szabályok: a Hoard nem tud fájlokat { $format } formátumra alakítani
+error-conversion-no-source = Átalakítási szabályok: minden szabályhoz legalább egy átalakítandó formátum kell
+# $ext is a file extension, like obj; $format is what it would become, like glb.
+error-conversion-source = Átalakítási szabályok: a .{ $ext } fájlok nem alakíthatók { $format } formátumra
+error-conversion-twice = Átalakítási szabályok: a .{ $ext } két szabályban is szerepel
+error-conversion-cant-undo = Ezt a fájlt nem szabály alakította át, vagy az eredetijét már törölték.
+error-conversion-path-taken = Már egy másik fájl van itt: { $path }, így az eredeti nem kerülhet vissza oda.
 error-limits-zero = A korlátok nem lehetnek nullák
 error-settings-object = a beállításoknak JSON-objektumban kell érkezniük
 error-bad-setting = hibás beállítás: { $reason }
@@ -346,6 +354,8 @@ server-issues-convert = Modellek, amelyeket a Blender nem tudott átalakítani
 server-issues-convert-blurb = Nincs GLB-másolatuk, így nem jeleníthetők meg 3D-ben.
 server-issues-unreal = Unreal-csomagfájlok, amelyeket nem sikerült átalakítani
 server-issues-unreal-blurb = A csomag Unreal oldalán látható a többi csomagfájl.
+server-issues-reformat = Fájlok, amelyeket egy átalakítási szabály nem tudott átalakítani
+server-issues-reformat-blurb = Változatlanul maradtak.
 server-issues-materials = Csomagok, amelyek anyagait nem sikerült kikövetkeztetni
 server-issues-materials-blurb = A textúráik mind megvannak, csak nincsenek anyagokba csoportosítva.
 server-issues-material-thumb = Anyagok bélyegkép nélkül
@@ -367,6 +377,7 @@ server-job-retag = Újracímkézés: { $pack }
 server-job-llm-tag = Címkézés MI-vel: { $pack }
 server-job-convert = Átalakítás Blenderrel: { $pack }
 server-job-unreal = Unreal-csomagfájlok átalakítása: { $pack }
+server-job-reformat = Fájlok átalakítása az átalakítási szabályok szerint: { $pack }
 server-job-scan = Figyelt mappa vizsgálata
 server-job-relocate = Fájlok áthelyezése a tárolási helyek között
 server-job-looks = Színek és megjelenés elemzése
@@ -1313,6 +1324,15 @@ asset-variants = Változatok ({ $count } verzió)
 asset-copies = Azonos másolatok
 asset-copies-note = Az azonos bájtok egyszer vannak tárolva; ezek a csomagok is tartalmazzák ezt a fájlt.
 asset-unreal-converted = Unrealből átalakítva
+asset-rule-converted = Szabály alakította át
+# Followed by the original file's name: "A conversion rule made this GLB on 3 May 2026 from tree.obj".
+asset-rule-was = Egy átalakítási szabály készítette ezt a { $format } fájlt ({ $date }) ebből:
+asset-rule-kept-until = Az eredeti megmarad eddig: { $date }.
+asset-rule-put-back = Az eredeti visszaállítása
+asset-rule-put-back-title = Visszaállítja ezt: { $file }?
+asset-rule-put-back-body = Az átalakított fájl törlődik, és az eredeti visszakerül a helyére a címkéivel, gyűjteményeivel és hivatkozásaival együtt. Az átalakítási szabályok ezután nem nyúlnak hozzá.
+asset-rule-put-back-done = { $file } visszaállítva
+asset-rule-let-go = Az eredeti törlődött, amikor lejárt a Beállításokban megadott megőrzési idő.
 asset-unreal-package = Az Unreal-csomagfájlból
 asset-ue-needs-editor-before = Unreal Editorra vár: { $reason }. Egy olyan gépen, ahol telepítve van az Unreal, futtassa ezt:
 asset-ue-needs-editor-after = – így FBX-ként érkezik vissza.
@@ -2137,6 +2157,90 @@ settings-store-lookup = Áruházi oldalak automatikus keresése
 settings-unreal = Unreal-csomagfájlok
 settings-unreal-reset = Unreal-csomagfájlok: vissza az alapértelmezéshez
 settings-unreal-what = Mi történjen a .uasset fájlokkal.
+settings-conv = Átalakítási szabályok
+settings-conv-what = A Hoard által tárolt fájlok átalakítása egyetlen formátumra, például minden OBJ és FBX fájlé GLB-re, hogy a könyvtár egységes legyen. Az átalakított fájl átveszi az eredeti helyét, megtartva a nevét, címkéit, gyűjteményeit és hivatkozásait. A figyelt mappákban lévő fájlok soha nem változnak.
+# A checkbox that turns one conversion rule on or off.
+settings-conv-rule-on = Bekapcsolva
+settings-conv-to = Célformátum
+# Heading over the file formats a rule converts.
+settings-conv-from = Forrásformátumok
+settings-conv-remove = Eltávolítás
+settings-conv-remove-label = { $n }. szabály eltávolítása
+settings-conv-taken = Ezt a formátumot egy másik szabály alakítja át
+settings-conv-upright = A modellek felállítása átalakításkor (Y felfelé, előre +Z irányba), ahogy a csomag modelljei megjelennek
+settings-conv-add = Szabály hozzáadása
+# Before a number of days: "Keep originals for [30] days".
+settings-conv-keep = Az eredetiek megőrzése
+settings-conv-keep-days =
+    { $count ->
+        [one] napig
+       *[other] napig
+    }
+settings-conv-keep-what = Addig az átalakított fájl oldaláról visszaállítható az eredeti. A textúrák nem másolódnak bele az átalakított modellbe: az a mellette lévő képfájlokra hivatkozik. A modell .mtl vagy .bin fájljai megmaradnak.
+settings-conv-save = Szabályok mentése
+settings-conv-revert = Módosítások visszavonása
+settings-conv-existing = A könyvtárban már meglévő fájlok átalakítása
+settings-conv-saved = Átalakítási szabályok mentve. A mostantól hozzáadott csomagokra vonatkoznak.
+settings-conv-converting =
+    { $count ->
+        [one] Egy fájl átalakítása a háttérben
+       *[other] { $count } fájl átalakítása a háttérben
+    }
+settings-conv-nothing = A könyvtárban semmit sem kell átalakítani.
+settings-conv-ask-title =
+    { $count ->
+        [one] Átalakít egy fájlt, amely már a könyvtárban van?
+       *[other] Átalakít { $count } fájlt, amely már a könyvtárban van?
+    }
+settings-conv-ask-body =
+    { $packs ->
+        [one] Egy csomagban van.
+       *[other] { $packs } csomagban vannak.
+    } Minden eredeti { $days } napig megmarad, és addig az oldaláról visszaállítható.
+settings-conv-ask-busy =
+    { $count ->
+        [one] Egy még hozzáadás alatt álló csomagban van; akkor alakul át, amikor ez befejeződik.
+       *[other] { $count } még hozzáadás alatt álló csomagokban van; akkor alakulnak át, amikor ez befejeződik.
+    }
+settings-conv-ask-list = Az átalakítandó fájlok
+settings-conv-ask-more = …és még { $count }
+settings-conv-ask-skipped = Változatlanul maradnak:
+settings-conv-skip-watched =
+    { $count ->
+        [one] egy fájl figyelt mappában
+       *[other] { $count } fájl figyelt mappákban
+    }
+settings-conv-skip-unity =
+    { $count ->
+        [one] egy fájl, amelyet egy Unity-projekt a nevéről ismer
+       *[other] { $count } fájl, amelyet egy Unity-projekt a nevéről ismer
+    }
+settings-conv-skip-used =
+    { $count ->
+        [one] egy fájl, amelyet egy jelenet vagy egy másik fájl megnevez
+       *[other] { $count } fájl, amelyet egy jelenet vagy egy másik fájl megnevez
+    }
+settings-conv-skip-beside =
+    { $count ->
+        [one] egy fájl, amelynek átalakított másolata már a csomagjában van
+       *[other] { $count } fájl, amelynek átalakított másolata már a csomagjában van
+    }
+settings-conv-skip-blender =
+    { $count ->
+        [one] egy fájl, amelyet a Blender még nem olvasott be (Beállítások → Eszközök)
+       *[other] { $count } fájl, amelyet a Blender még nem olvasott be (Beállítások → Eszközök)
+    }
+settings-conv-ask-new = Mentés, csak az új csomagokra
+settings-conv-ask-save-convert =
+    { $count ->
+        [one] Mentés és átalakítás
+       *[other] Mentés és { $count } fájl átalakítása
+    }
+settings-conv-ask-convert =
+    { $count ->
+        [one] Átalakítás
+       *[other] { $count } fájl átalakítása
+    }
 settings-unreal-off = Maradjanak, ahogy vannak
 settings-unreal-off-hint = Átalakítás a csomag oldaláról, amikor szeretné.
 settings-unreal-keep = Átalakítás, az eredetiek megtartásával

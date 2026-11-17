@@ -224,6 +224,14 @@ error-no-soundfont = Δεν υπάρχει SoundFont στο { $path } στον �
 error-workers = Εργάτες παρασκηνίου: από 1 έως { $max }
 error-ai-batch = Στοιχεία ανά αίτημα AI: από 1 έως 200
 error-conversion-cache = Λήψεις που μετατράπηκαν: τουλάχιστον 100 MB
+error-conversion-keep-days = Κανόνες μετατροπής: τα πρωτότυπα διατηρούνται από 1 έως { $max } ημέρες
+error-conversion-target = Κανόνες μετατροπής: το Hoard δεν μπορεί να μετατρέψει αρχεία σε { $format }
+error-conversion-no-source = Κανόνες μετατροπής: κάθε κανόνας χρειάζεται τουλάχιστον μία μορφή για μετατροπή
+# $ext is a file extension, like obj; $format is what it would become, like glb.
+error-conversion-source = Κανόνες μετατροπής: τα αρχεία .{ $ext } δεν μπορούν να μετατραπούν σε { $format }
+error-conversion-twice = Κανόνες μετατροπής: το .{ $ext } υπάρχει σε δύο κανόνες
+error-conversion-cant-undo = Αυτό το αρχείο δεν μετατράπηκε από κανόνα ή το πρωτότυπό του έχει διαγραφεί.
+error-conversion-path-taken = Στη θέση { $path } βρίσκεται τώρα άλλο αρχείο, οπότε το πρωτότυπο δεν μπορεί να επιστρέψει εκεί.
 error-limits-zero = Τα όρια δεν μπορούν να είναι μηδέν
 error-settings-object = αναμενόταν ένα αντικείμενο JSON με ρυθμίσεις
 error-bad-setting = λανθασμένη ρύθμιση: { $reason }
@@ -350,6 +358,8 @@ server-issues-convert = Μοντέλα που το Blender δεν μπόρεσε
 server-issues-convert-blurb = Δεν έχουν αντίγραφο GLB, οπότε δεν μπορούν να εμφανιστούν σε 3D.
 server-issues-unreal = Πακέτα Unreal που δεν ήταν δυνατό να μετατραπούν
 server-issues-unreal-blurb = Η σελίδα Unreal του πακέτου έχει τα υπόλοιπα πακέτα του.
+server-issues-reformat = Αρχεία που ένας κανόνας μετατροπής δεν μπόρεσε να μετατρέψει
+server-issues-reformat-blurb = Έμειναν όπως ήταν.
 server-issues-materials = Πακέτα των οποίων τα υλικά δεν ήταν δυνατό να προσδιοριστούν
 server-issues-materials-blurb = Οι υφές τους είναι όλες εκεί· απλώς δεν έχουν ομαδοποιηθεί σε υλικά.
 server-issues-material-thumb = Υλικά χωρίς μικρογραφία
@@ -371,6 +381,7 @@ server-job-retag = Νέες ετικέτες: { $pack }
 server-job-llm-tag = Ετικέτες με AI: { $pack }
 server-job-convert = Μετατροπή με Blender: { $pack }
 server-job-unreal = Μετατροπή πακέτων Unreal: { $pack }
+server-job-reformat = Μετατροπή αρχείων με τους κανόνες μετατροπής: { $pack }
 server-job-scan = Σάρωση παρακολουθούμενου φακέλου
 server-job-relocate = Μετακίνηση αρχείων μεταξύ τοποθεσιών βιβλιοθήκης
 server-job-looks = Ανάλυση χρωμάτων και εμφάνισης
@@ -1458,6 +1469,15 @@ asset-variants = Παραλλαγές ({ $count } εκδοχές)
 asset-copies = Πανομοιότυπα αντίγραφα
 asset-copies-note = Τα ίδια byte αποθηκεύονται μία φορά· αυτά τα πακέτα περιέχουν επίσης αυτό το αρχείο.
 asset-unreal-converted = Μετατράπηκε από Unreal
+asset-rule-converted = Μετατράπηκε από κανόνα
+# Followed by the original file's name: "A conversion rule made this GLB on 3 May 2026 from tree.obj".
+asset-rule-was = Ένας κανόνας μετατροπής δημιούργησε αυτό το { $format } στις { $date } από το
+asset-rule-kept-until = Το πρωτότυπο διατηρείται έως τις { $date }.
+asset-rule-put-back = Επαναφορά του πρωτοτύπου
+asset-rule-put-back-title = Να επανέλθει το { $file };
+asset-rule-put-back-body = Το αρχείο που μετατράπηκε διαγράφεται και το πρωτότυπο παίρνει τη θέση του, με τις ετικέτες, τις συλλογές και τους συνδέσμους του. Από εκεί και πέρα οι κανόνες μετατροπής το αφήνουν ήσυχο.
+asset-rule-put-back-done = Το { $file } επανήλθε
+asset-rule-let-go = Το πρωτότυπο διαγράφηκε όταν έληξε ο χρόνος διατήρησης των πρωτοτύπων που ορίζεται στις Ρυθμίσεις.
 asset-unreal-package = Από το πακέτο Unreal
 asset-ue-needs-editor-before = Αναμονή για το Unreal Editor: { $reason }. Σε έναν υπολογιστή με εγκατεστημένο το Unreal, εκτελέστε
 asset-ue-needs-editor-after = και επιστρέφει ως FBX.
@@ -2383,6 +2403,90 @@ settings-store-lookup = Αυτόματη αναζήτηση σελίδων κα�
 settings-unreal = Πακέτα Unreal
 settings-unreal-reset = Πακέτα Unreal: επαναφορά στην προεπιλογή
 settings-unreal-what = Τι να γίνεται με τα αρχεία .uasset.
+settings-conv = Κανόνες μετατροπής
+settings-conv-what = Μετατρέπει τα αρχεία που κρατά το Hoard σε μία μορφή, π.χ. όλα τα OBJ και FBX σε GLB, ώστε η βιβλιοθήκη να είναι ομοιόμορφη. Το αρχείο που μετατράπηκε παίρνει τη θέση του πρωτοτύπου, με το όνομα, τις ετικέτες, τις συλλογές και τους συνδέσμους του. Τα αρχεία σε παρακολουθούμενους φακέλους δεν αλλάζουν ποτέ.
+# A checkbox that turns one conversion rule on or off.
+settings-conv-rule-on = Ενεργός
+settings-conv-to = Μετατροπή σε
+# Heading over the file formats a rule converts.
+settings-conv-from = Από
+settings-conv-remove = Κατάργηση
+settings-conv-remove-label = Κατάργηση κανόνα { $n }
+settings-conv-taken = Άλλος κανόνας μετατρέπει ήδη αυτή τη μορφή
+settings-conv-upright = Όρθωση των μοντέλων κατά τη μετατροπή (με τον Y προς τα πάνω, στραμμένα προς +Z), όπως εμφανίζονται τα μοντέλα του πακέτου
+settings-conv-add = Προσθήκη κανόνα
+# Before a number of days: "Keep originals for [30] days".
+settings-conv-keep = Διατήρηση πρωτοτύπων για
+settings-conv-keep-days =
+    { $count ->
+        [one] ημέρα
+       *[other] ημέρες
+    }
+settings-conv-keep-what = Μέχρι τότε, το πρωτότυπο μπορεί να επανέλθει από τη σελίδα του αρχείου που μετατράπηκε. Οι υφές δεν αντιγράφονται μέσα σε ένα μοντέλο που μετατράπηκε: παραπέμπει στα αρχεία εικόνων δίπλα του. Τα αρχεία .mtl ή .bin ενός μοντέλου παραμένουν.
+settings-conv-save = Αποθήκευση κανόνων
+settings-conv-revert = Αναίρεση αλλαγών
+settings-conv-existing = Μετατροπή αρχείων που υπάρχουν ήδη στη βιβλιοθήκη
+settings-conv-saved = Οι κανόνες μετατροπής αποθηκεύτηκαν. Ισχύουν για πακέτα που προστίθενται από εδώ και πέρα.
+settings-conv-converting =
+    { $count ->
+        [one] Μετατροπή ενός αρχείου στο παρασκήνιο
+       *[other] Μετατροπή { $count } αρχείων στο παρασκήνιο
+    }
+settings-conv-nothing = Τίποτα στη βιβλιοθήκη δεν χρειάζεται μετατροπή.
+settings-conv-ask-title =
+    { $count ->
+        [one] Να μετατραπεί ένα αρχείο που υπάρχει ήδη στη βιβλιοθήκη;
+       *[other] Να μετατραπούν { $count } αρχεία που υπάρχουν ήδη στη βιβλιοθήκη;
+    }
+settings-conv-ask-body =
+    { $packs ->
+        [one] Βρίσκεται σε ένα πακέτο.
+       *[other] Βρίσκονται σε { $packs } πακέτα.
+    } Κάθε πρωτότυπο διατηρείται για { $days } ημέρες και μέχρι τότε μπορεί να επανέλθει από τη σελίδα του.
+settings-conv-ask-busy =
+    { $count ->
+        [one] Ένα βρίσκεται σε πακέτο που προστίθεται ακόμη· θα μετατραπεί μόλις ολοκληρωθεί η προσθήκη.
+       *[other] { $count } βρίσκονται σε πακέτα που προστίθενται ακόμη· θα μετατραπούν μόλις ολοκληρωθεί η προσθήκη.
+    }
+settings-conv-ask-list = Αρχεία που θα μετατρέπονταν
+settings-conv-ask-more = …και { $count } ακόμη
+settings-conv-ask-skipped = Μένουν όπως είναι:
+settings-conv-skip-watched =
+    { $count ->
+        [one] ένα αρχείο σε παρακολουθούμενο φάκελο
+       *[other] { $count } αρχεία σε παρακολουθούμενους φακέλους
+    }
+settings-conv-skip-unity =
+    { $count ->
+        [one] ένα αρχείο που ένα έργο Unity γνωρίζει με το όνομά του
+       *[other] { $count } αρχεία που ένα έργο Unity γνωρίζει με τα ονόματά τους
+    }
+settings-conv-skip-used =
+    { $count ->
+        [one] ένα αρχείο στο οποίο παραπέμπει μια σκηνή ή άλλο αρχείο
+       *[other] { $count } αρχεία στα οποία παραπέμπει μια σκηνή ή άλλο αρχείο
+    }
+settings-conv-skip-beside =
+    { $count ->
+        [one] ένα αρχείο του οποίου το αντίγραφο μετατροπής βρίσκεται ήδη στο πακέτο του
+       *[other] { $count } αρχεία των οποίων τα αντίγραφα μετατροπής βρίσκονται ήδη στα πακέτα τους
+    }
+settings-conv-skip-blender =
+    { $count ->
+        [one] ένα αρχείο που το Blender δεν έχει διαβάσει ακόμη (Ρυθμίσεις → Εργαλεία)
+       *[other] { $count } αρχεία που το Blender δεν έχει διαβάσει ακόμη (Ρυθμίσεις → Εργαλεία)
+    }
+settings-conv-ask-new = Αποθήκευση, μόνο νέα πακέτα
+settings-conv-ask-save-convert =
+    { $count ->
+        [one] Αποθήκευση και μετατροπή
+       *[other] Αποθήκευση και μετατροπή { $count } αρχείων
+    }
+settings-conv-ask-convert =
+    { $count ->
+        [one] Μετατροπή
+       *[other] Μετατροπή { $count } αρχείων
+    }
 settings-unreal-off = Να μένουν ως έχουν
 settings-unreal-off-hint = Μετατρέψτε τα από τη σελίδα ενός πακέτου όταν θέλετε.
 settings-unreal-keep = Μετατροπή, διατήρηση πρωτοτύπων

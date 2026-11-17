@@ -126,7 +126,22 @@ pub(crate) struct Saved {
     /// Settings → Authentication: signing in through a directory or OAuth, and how long sessions last.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub(crate) auth: Option<crate::signin::AuthConfig>,
+    /// Settings → Locations → S3: the service `s3://bucket` locations are in. An empty address means AWS itself.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub(crate) s3_endpoint: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub(crate) s3_region: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub(crate) s3_access_key: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub(crate) s3_secret_key: Option<String>,
+    /// Extra headers on every request, one `Name=value` a line (Cloudflare Access's, say). Empty: none.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub(crate) s3_headers: Option<String>,
 }
+
+/// The saved settings that are secrets: sealed in the desktop app (see [`crate::secrets`]).
+const SECRETS: &[&str] = &["llm_api_key", "update_hook_auth", "s3_access_key", "s3_secret_key", "s3_headers"];
 
 /// Reads a retired setting and throws it away.
 fn ignore<'de, D: serde::Deserializer<'de>>(d: D) -> Result<(), D::Error> {
@@ -166,6 +181,7 @@ pub(crate) struct Effective {
     pub(crate) texture_names: crate::naming::TextureNames,
     pub(crate) conversion_rules: crate::reformat::Rules,
     pub(crate) auth: crate::signin::AuthConfig,
+    pub(crate) s3: crate::blobs::S3,
 }
 
 impl Effective {
@@ -242,6 +258,16 @@ impl Saved {
             texture_names: self.texture_names.clone().unwrap_or_default(),
             conversion_rules: self.conversion_rules.clone().unwrap_or_default(),
             auth: self.auth.clone().unwrap_or_default(),
+            s3: crate::blobs::S3 {
+                endpoint: pick(&self.s3_endpoint, &cfg.s3_endpoint).map(|e| e.trim_end_matches('/').to_owned()),
+                region: self.s3_region.as_deref().and_then(non_empty).unwrap_or_else(|| cfg.s3_region.clone()),
+                access_key: pick(&self.s3_access_key, &cfg.s3_access_key),
+                secret_key: pick(&self.s3_secret_key, &cfg.s3_secret_key),
+                headers: match &self.s3_headers {
+                    Some(h) => h.lines().filter_map(non_empty).collect(),
+                    None => cfg.s3_headers.clone(),
+                },
+            },
         }
     }
 
@@ -301,6 +327,13 @@ impl Saved {
             names.check()?;
         }
         effective.conversion_rules.check()?;
+        if let Some(url) = self.s3_endpoint.as_deref().map(str::trim)
+            && !url.is_empty()
+            && !is_http(url)
+        {
+            return Err(tr!("error-s3-address"));
+        }
+        effective.s3.header_map().map_err(|e| e.to_string())?;
         Ok(())
     }
 }
@@ -320,7 +353,13 @@ impl Store {
             conn.query_row("SELECT value FROM settings WHERE key = ?1", [KEY], |r| r.get(0)).optional()?;
         let saved = match text {
             // A setting this build doesn't know (saved by a newer one) is dropped rather than refusing to start.
-            Some(t) => serde_json::from_str::<Value>(&t).ok().and_then(|v| lenient(&v)).unwrap_or_default(),
+            Some(t) => serde_json::from_str::<Value>(&t)
+                .ok()
+                .and_then(|mut v| {
+                    crate::secrets::open(&mut v, SECRETS);
+                    lenient(&v)
+                })
+                .unwrap_or_default(),
             None => Saved::default(),
         };
         let effective = Arc::new(saved.over(cfg));
@@ -358,7 +397,9 @@ impl Store {
             serde_json::from_value(merged).map_err(|e| Ok(tr!("error-bad-setting", reason = e.to_string())))?;
         let effective = Arc::new(next.over(cfg));
         next.check(&effective).map_err(Ok)?;
-        let text = serde_json::to_string(&next).map_err(|e| Err(e.into()))?;
+        let mut text = serde_json::to_value(&next).map_err(|e| Err(e.into()))?;
+        crate::secrets::seal(&mut text, SECRETS).map_err(|e| Ok(e.to_string()))?;
+        let text = text.to_string();
         conn.execute(
             "INSERT INTO settings (key, value) VALUES (?1, ?2) ON CONFLICT (key) DO UPDATE SET value = excluded.value",
             [KEY, text.as_str()],

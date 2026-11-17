@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "6b1cad733e7c2f6f9f760a91d1879b4b0d4363e36add843001d846f75104d47e"
+source = "b5640bb76c06fe83cd9cc9bd88a06dd911fb0251db9b0880ec94831503ff6fb0"
 translation = "e8f1824318368dd9463f11794aac317d9861b7c556ec7c58e30c5afcbadb5ef6"
 
 [messages.account-add]
@@ -3443,6 +3443,10 @@ translation = "ใช้ใบรับรองหรือคีย์นี�
 source = "make another location the catch-all instead"
 translation = "ให้ตั้งตำแหน่งอื่นเป็นที่รับทุกอย่างแทน"
 
+[messages.error-keychain]
+source = "couldn't keep it in the system's keychain: { $reason }"
+translation = "เก็บไว้ในที่เก็บรหัสผ่านของระบบไม่ได้: { $reason }"
+
 [messages.error-ldap-base-dn]
 source = "Say where people's entries are (the base DN)"
 translation = "ระบุว่ารายการของผู้ใช้อยู่ที่ใด (base DN)"
@@ -3870,6 +3874,14 @@ translation = "ext ต้องเป็นนามสกุลไฟล์แ�
 [messages.error-role]
 source = "A role is view, edit or admin"
 translation = "บทบาทต้องเป็น view, edit หรือ admin"
+
+[messages.error-s3-address]
+source = "the S3 address must start with http:// or https://"
+translation = "ที่อยู่ S3 ต้องขึ้นต้นด้วย http:// หรือ https://"
+
+[messages.error-s3-header]
+source = """an extra S3 header looks like Name=value, and "{ $header }" isn't one"""
+translation = "ส่วนหัว S3 เพิ่มเติมมีรูปแบบเป็น Name=value แต่ “{ $header }” ไม่ใช่รูปแบบนี้"
 
 [messages.error-s3-path]
 source = "an S3 location looks like s3://bucket"
@@ -5226,13 +5238,25 @@ translation = "โฟลเดอร์บนเซิร์ฟเวอร์"
 source = "Folder"
 translation = "โฟลเดอร์"
 
+[messages.locations-folder-hint-cloud]
+source = "A folder that Dropbox, Google Drive, OneDrive or iCloud Drive keeps in sync works too, and so does s3://bucket-name for a bucket in S3 storage."
+translation = "ใช้โฟลเดอร์ที่ Dropbox, Google Drive, OneDrive หรือ iCloud Drive ซิงค์ไว้ก็ได้ และใช้ s3://bucket-name สำหรับบักเก็ตในที่เก็บข้อมูล S3 ก็ได้เช่นกัน"
+
 [messages.locations-folder-hint-managed]
 source = "Hoard creates it if it isn't there. In Docker, this is a folder you've mounted into the container."
 translation = "Hoard จะสร้างโฟลเดอร์ให้หากยังไม่มี ใน Docker นี่คือโฟลเดอร์ที่คุณเมานต์เข้าไปในคอนเทนเนอร์"
 
+[messages.locations-folder-hint-managed-desktop]
+source = "Hoard creates it if it isn't there."
+translation = "Hoard จะสร้างโฟลเดอร์ให้หากยังไม่มี"
+
 [messages.locations-folder-hint-watched]
 source = "In Docker, mount the folder into the container first (read-only is fine), then pick it here."
 translation = "ใน Docker ให้เมานต์โฟลเดอร์เข้าไปในคอนเทนเนอร์ก่อน (แบบอ่านอย่างเดียวก็ได้) แล้วเลือกที่นี่"
+
+[messages.locations-folder-hint-watched-desktop]
+source = "Hoard only reads it: nothing in it is changed."
+translation = "Hoard อ่านโฟลเดอร์นี้อย่างเดียว ไม่มีสิ่งใดในนั้นถูกเปลี่ยนแปลง"
 
 [messages.locations-folder-placeholder]
 source = "The folder your packs are in"
@@ -5357,6 +5381,62 @@ translation = "นำ { $name } ออกหรือไม่?"
 [messages.locations-removed]
 source = "Removed { $name }"
 translation = "นำ { $name } ออกแล้ว"
+
+[messages.locations-s3-access-key]
+source = "Access key ID"
+translation = "รหัสคีย์การเข้าถึง"
+
+[messages.locations-s3-endpoint]
+source = "Address"
+translation = "ที่อยู่"
+
+[messages.locations-s3-endpoint-placeholder]
+source = "Empty for AWS; e.g. https://s3.eu-central-003.backblazeb2.com"
+translation = "เว้นว่างไว้สำหรับ AWS เช่น https://s3.eu-central-003.backblazeb2.com"
+
+[messages.locations-s3-headers]
+source = "Extra headers"
+translation = "ส่วนหัวเพิ่มเติม"
+
+[messages.locations-s3-headers-placeholder]
+source = "Name=value, one a line (for Cloudflare Access, say)"
+translation = "Name=value บรรทัดละหนึ่งรายการ (เช่น สำหรับ Cloudflare Access)"
+
+[messages.locations-s3-hint]
+source = "A location at s3://bucket-name is a bucket in this service: AWS, or any S3-compatible one (Backblaze B2, Cloudflare R2, Wasabi, MinIO, Garage on a NAS)."
+translation = "ตำแหน่ง s3://bucket-name คือบักเก็ตในบริการนี้ ซึ่งเป็น AWS หรือบริการใดก็ได้ที่เข้ากันได้กับ S3 (Backblaze B2, Cloudflare R2, Wasabi, MinIO, Garage บน NAS)"
+
+[messages.locations-s3-kept]
+source = "Saved (type to replace)"
+translation = "บันทึกแล้ว (พิมพ์เพื่อแทนที่)"
+
+[messages.locations-s3-region]
+source = "Region"
+translation = "ภูมิภาค"
+
+[messages.locations-s3-save-failed]
+source = "Couldn't save S3 storage"
+translation = "บันทึกที่เก็บข้อมูล S3 ไม่ได้"
+
+[messages.locations-s3-saved]
+source = "S3 storage saved"
+translation = "บันทึกที่เก็บข้อมูล S3 แล้ว"
+
+[messages.locations-s3-secret-key]
+source = "Secret access key"
+translation = "คีย์การเข้าถึงลับ"
+
+[messages.locations-s3-secrets]
+source = "The keys and headers are kept with the server's settings, and never shown again."
+translation = "คีย์และส่วนหัวจะเก็บไว้กับการตั้งค่าของเซิร์ฟเวอร์ และจะไม่แสดงอีก"
+
+[messages.locations-s3-secrets-desktop]
+source = "The keys and headers are kept in this computer's keychain, and never shown again."
+translation = "คีย์และส่วนหัวจะเก็บไว้ในที่เก็บรหัสผ่านของคอมพิวเตอร์เครื่องนี้ และจะไม่แสดงอีก"
+
+[messages.locations-s3-title]
+source = "S3 storage"
+translation = "ที่เก็บข้อมูล S3"
 
 [messages.locations-save]
 source = "Save"

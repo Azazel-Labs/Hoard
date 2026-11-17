@@ -68,6 +68,9 @@ error-wrong-setup-code = Det är inte installationskoden som servern fick i HOAR
 error-wrong-password = Namnet och lösenordet stämmer inte överens
 error-folder-missing = { $path } finns inte (en disk som inte är monterad?)
 error-s3-path = en S3-plats ser ut som s3://bucket
+error-s3-address = S3-adressen måste börja med http:// eller https://
+error-s3-header = ett extra S3-huvud ser ut som Name=value, och ”{ $header }” är inte ett sådant
+error-keychain = kunde inte spara det i systemets nyckelring: { $reason }
 error-not-built = den här kopian av Hoard är byggd utan { $feature }
 error-openai-auth-unreachable = kunde inte nå auth.openai.com
 error-openai-unexpected = oväntat svar från OpenAI
@@ -823,7 +826,10 @@ locations-folder = Mapp på servern
 locations-folder-desktop = Mapp
 locations-folder-placeholder = Mappen som dina paket ligger i
 locations-folder-hint-managed = Hoard skapar den om den inte finns. I Docker är det här en mapp som du har monterat i containern.
+locations-folder-hint-managed-desktop = Hoard skapar den om den inte finns.
 locations-folder-hint-watched = I Docker monterar du först mappen i containern (skrivskyddad går bra) och väljer den sedan här.
+locations-folder-hint-watched-desktop = Hoard läser bara den: inget i den ändras.
+locations-folder-hint-cloud = En mapp som Dropbox, Google Drive, OneDrive eller iCloud Drive synkroniserar fungerar också, och likaså s3://bucket-name för en bucket i S3-lagringen.
 locations-name = Namn
 locations-name-placeholder-managed = Bibliotek
 locations-name-placeholder-watched = Mina paket
@@ -899,6 +905,20 @@ locations-rebalance = Flytta lagrade filer så att de stämmer
 locations-rebalance-hint = Efter att du har ändrat vad en plats tar: filer som redan har lagrats flyttas till platsen som deras typ nu hör till.
 locations-add-title = Lägg till en plats
 locations-add-hint = En annan disk för vissa typer av filer, eller en mapp med paket som du redan har.
+locations-s3-title = S3-lagring
+locations-s3-hint = En plats på s3://bucket-name är en bucket i den här tjänsten: AWS eller någon S3-kompatibel tjänst (Backblaze B2, Cloudflare R2, Wasabi, MinIO, Garage på en NAS).
+locations-s3-endpoint = Adress
+locations-s3-endpoint-placeholder = Tomt för AWS; t.ex. https://s3.eu-central-003.backblazeb2.com
+locations-s3-region = Region
+locations-s3-access-key = Åtkomstnyckel-ID
+locations-s3-secret-key = Hemlig åtkomstnyckel
+locations-s3-headers = Extra huvuden
+locations-s3-headers-placeholder = Name=value, ett per rad (till exempel för Cloudflare Access)
+locations-s3-kept = Sparad (skriv för att ersätta)
+locations-s3-secrets = Nycklarna och huvudena sparas med serverns inställningar och visas aldrig igen.
+locations-s3-secrets-desktop = Nycklarna och huvudena sparas i den här datorns nyckelring och visas aldrig igen.
+locations-s3-saved = S3-lagringen har sparats
+locations-s3-save-failed = Kunde inte spara S3-lagringen
 locations-add-more = Lägg till en plats…
 
 ## IssuesPanel.vue

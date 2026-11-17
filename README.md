@@ -956,11 +956,17 @@ address in Settings → Connection so returned links are absolute.
 ## Storage, and splitting it from the web server
 
 Each library location Hoard keeps is a folder, or an S3-compatible bucket: give the location's folder as
-`s3://<bucket>` and set the `HOARD_S3_*` variables for the endpoint and keys. The bucket can be Garage, RustFS, SeaweedFS or VersityGW on a NAS, or R2/B2/AWS. Downloads are streamed through the server with HTTP
-Range support (audio and video seek), and immutable caching headers let the browser keep them (and a CDN too, when
-guest browsing is on: otherwise they're marked private, so a shared cache never hands them out).
-`HOARD_S3_HEADERS` adds headers to every storage request, e.g. Cloudflare Access service-token headers when the NAS's
-S3 endpoint sits behind Access.
+`s3://<bucket>` and enter the service's address and keys in Settings → Library locations → S3 storage (the `HOARD_S3_*`
+variables are the defaults until something is saved there). The bucket can be Garage, RustFS, SeaweedFS or VersityGW on
+a NAS, or R2/B2/AWS. Downloads are streamed through the server with HTTP Range support (audio and video seek), and
+immutable caching headers let the browser keep them (and a CDN too, when guest browsing is on: otherwise they're marked
+private, so a shared cache never hands them out). Extra headers go on every storage request, e.g. Cloudflare Access
+service-token headers when the NAS's S3 endpoint sits behind Access. A folder that Dropbox, Google Drive, OneDrive or
+iCloud Drive keeps in sync is a folder like any other.
+
+The keys, headers and other secrets typed into Settings are kept with the server's settings. The desktop app seals them
+with a key it keeps in the system's keychain (Windows Credential Manager, the macOS keychain, the Secret Service on
+Linux), so a copy of the library folder doesn't carry them readable.
 
 [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) covers the setups. The recommended one is everything on the NAS, reachable
 from anywhere only through Cloudflare One private routing (or Tailscale), with no public hostname

@@ -21,7 +21,7 @@ jobs:
       - run: cargo fmt --all -- --check
       - run: cargo clippy --workspace --all-targets --locked -- -D warnings
       - run: cargo test --workspace --locked
-      # The server as the desktop app builds it: without LDAP, HTTPS or S3.
+      # The server with every feature left out (no LDAP, HTTPS, S3 or keychain); the workspace build above has them all.
       - run: cargo clippy -p hoardd --all-targets --no-default-features --locked -- -D warnings
       # Every message the server and portal use is in English with the same variables, every translation's review
       # record is current, and the catalogs are formatted (see docs/translations.md).

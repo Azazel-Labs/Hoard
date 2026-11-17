@@ -68,6 +68,9 @@ error-wrong-setup-code = Itu bukan kode penyiapan yang diberikan ke server di HO
 error-wrong-password = Nama dan kata sandi itu tidak cocok
 error-folder-missing = { $path } tidak ada (disk yang belum dipasang?)
 error-s3-path = lokasi S3 berbentuk s3://bucket
+error-s3-address = alamat S3 harus diawali http:// atau https://
+error-s3-header = header S3 tambahan berbentuk Name=value, dan “{ $header }” tidak berbentuk begitu
+error-keychain = tidak dapat menyimpannya di keychain sistem: { $reason }
 error-not-built = salinan Hoard ini dibuat tanpa { $feature }
 error-openai-auth-unreachable = tidak dapat menghubungi auth.openai.com
 error-openai-unexpected = jawaban tak terduga dari OpenAI
@@ -787,7 +790,10 @@ locations-folder = Folder di server
 locations-folder-desktop = Folder
 locations-folder-placeholder = Folder tempat paket Anda berada
 locations-folder-hint-managed = Hoard membuatnya jika belum ada. Di Docker, ini adalah folder yang sudah Anda pasang ke dalam container.
+locations-folder-hint-managed-desktop = Hoard membuatnya jika belum ada.
 locations-folder-hint-watched = Di Docker, pasang dulu folder ke dalam container (hanya-baca tidak masalah), lalu pilih di sini.
+locations-folder-hint-watched-desktop = Hoard hanya membacanya: tidak ada isinya yang diubah.
+locations-folder-hint-cloud = Folder yang disinkronkan oleh Dropbox, Google Drive, OneDrive, atau iCloud Drive juga bisa, begitu pula s3://bucket-name untuk bucket di penyimpanan S3.
 locations-name = Nama
 locations-name-placeholder-managed = Pustaka
 locations-name-placeholder-watched = Paket saya
@@ -855,6 +861,20 @@ locations-rebalance = Pindahkan berkas tersimpan agar sesuai
 locations-rebalance-hint = Setelah mengubah apa yang diterima lokasi: berkas yang sudah tersimpan dipindahkan ke lokasi tujuan jenisnya saat ini.
 locations-add-title = Tambahkan lokasi
 locations-add-hint = Disk lain untuk jenis berkas tertentu, atau folder berisi paket yang sudah Anda punya.
+locations-s3-title = Penyimpanan S3
+locations-s3-hint = Lokasi s3://bucket-name adalah bucket di layanan ini: AWS, atau layanan apa pun yang kompatibel dengan S3 (Backblaze B2, Cloudflare R2, Wasabi, MinIO, Garage di NAS).
+locations-s3-endpoint = Alamat
+locations-s3-endpoint-placeholder = Kosongkan untuk AWS; mis. https://s3.eu-central-003.backblazeb2.com
+locations-s3-region = Wilayah
+locations-s3-access-key = ID kunci akses
+locations-s3-secret-key = Kunci akses rahasia
+locations-s3-headers = Header tambahan
+locations-s3-headers-placeholder = Name=value, satu per baris (misalnya untuk Cloudflare Access)
+locations-s3-kept = Tersimpan (ketik untuk mengganti)
+locations-s3-secrets = Kunci dan header disimpan bersama pengaturan server, dan tidak pernah ditampilkan lagi.
+locations-s3-secrets-desktop = Kunci dan header disimpan di keychain komputer ini, dan tidak pernah ditampilkan lagi.
+locations-s3-saved = Pengaturan penyimpanan S3 tersimpan
+locations-s3-save-failed = Tidak dapat menyimpan pengaturan penyimpanan S3
 locations-add-more = Tambahkan lokasi…
 
 ## IssuesPanel.vue

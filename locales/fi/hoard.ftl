@@ -68,6 +68,9 @@ error-wrong-setup-code = Tämä ei ole palvelimelle HOARD_SETUP_CODE-muuttujassa
 error-wrong-password = Nimi ja salasana eivät täsmää
 error-folder-missing = { $path } puuttuu (onko levy liittämättä?)
 error-s3-path = S3-sijainti on muotoa s3://bucket
+error-s3-address = S3-osoitteen alun on oltava http:// tai https://
+error-s3-header = ylimääräinen S3-otsake on muotoa Name=value, eikä ”{ $header }” ole sellainen
+error-keychain = sitä ei voitu tallentaa järjestelmän avainnippuun: { $reason }
 error-not-built = tämä Hoardin kopio on käännetty ilman { $feature } -tukea
 error-openai-auth-unreachable = auth.openai.com ei vastaa
 error-openai-unexpected = odottamaton vastaus OpenAI:lta
@@ -847,7 +850,10 @@ locations-folder = Kansio palvelimella
 locations-folder-desktop = Kansio
 locations-folder-placeholder = Kansio, jossa pakettisi ovat
 locations-folder-hint-managed = Hoard luo sen, jos sitä ei ole. Dockerissa tämä on kansio, jonka olet liittänyt konttiin.
+locations-folder-hint-managed-desktop = Hoard luo sen, jos sitä ei ole.
 locations-folder-hint-watched = Liitä kansio Dockerissa ensin konttiin (pelkkä lukuoikeus riittää) ja valitse se sitten tästä.
+locations-folder-hint-watched-desktop = Hoard vain lukee sitä: mitään sen sisällä ei muuteta.
+locations-folder-hint-cloud = Myös kansio, jonka synkronoinnista huolehtii Dropbox, Google Drive, OneDrive tai iCloud Drive, käy, samoin s3://bucket-name S3-tallennustilassa olevalle bucketille.
 locations-name = Nimi
 locations-name-placeholder-managed = Kirjasto
 locations-name-placeholder-watched = Omat paketit
@@ -923,6 +929,20 @@ locations-rebalance = Siirrä tallennetut tiedostot vastaavasti
 locations-rebalance-hint = Kun olet muuttanut, mitä sijainti ottaa: jo tallennetut tiedostot siirtyvät sijaintiin, johon niiden tyyppi nyt kuuluu.
 locations-add-title = Lisää sijainti
 locations-add-hint = Toinen levy joillekin tiedostotyypeille tai kansio paketeista, jotka sinulla jo on.
+locations-s3-title = S3-tallennustila
+locations-s3-hint = Sijainti s3://bucket-name on bucket tässä palvelussa: AWS tai mikä tahansa S3-yhteensopiva (Backblaze B2, Cloudflare R2, Wasabi, MinIO, Garage NAS-laitteella).
+locations-s3-endpoint = Osoite
+locations-s3-endpoint-placeholder = Tyhjä, jos AWS; esim. https://s3.eu-central-003.backblazeb2.com
+locations-s3-region = Alue
+locations-s3-access-key = Käyttöavaimen tunnus
+locations-s3-secret-key = Salainen käyttöavain
+locations-s3-headers = Lisäotsakkeet
+locations-s3-headers-placeholder = Name=value, yksi riviä kohden (esimerkiksi Cloudflare Access -palvelua varten)
+locations-s3-kept = Tallennettu (kirjoita korvataksesi)
+locations-s3-secrets = Avaimet ja otsakkeet tallennetaan palvelimen asetusten mukana, eikä niitä näytetä enää koskaan.
+locations-s3-secrets-desktop = Avaimet ja otsakkeet tallennetaan tämän tietokoneen avainnippuun, eikä niitä näytetä enää koskaan.
+locations-s3-saved = S3-tallennustilan asetukset tallennettu
+locations-s3-save-failed = S3-tallennustilan tallennus epäonnistui
 locations-add-more = Lisää sijainti…
 
 ## Ongelmat

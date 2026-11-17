@@ -68,6 +68,9 @@ error-wrong-setup-code = Đó không phải mã thiết lập đã cấp cho má
 error-wrong-password = Tên và mật khẩu không khớp
 error-folder-missing = { $path } không tồn tại (ổ đĩa chưa được gắn?)
 error-s3-path = vị trí S3 có dạng s3://bucket
+error-s3-address = địa chỉ S3 phải bắt đầu bằng http:// hoặc https://
+error-s3-header = header S3 bổ sung có dạng Name=value, và “{ $header }” không phải dạng đó
+error-keychain = không thể lưu vào kho mật khẩu của hệ thống: { $reason }
 error-not-built = bản Hoard này được dựng mà không có { $feature }
 error-openai-auth-unreachable = không thể kết nối tới auth.openai.com
 error-openai-unexpected = OpenAI trả lời không như mong đợi
@@ -790,7 +793,10 @@ locations-folder = Thư mục trên máy chủ
 locations-folder-desktop = Thư mục
 locations-folder-placeholder = Thư mục chứa các gói của bạn
 locations-folder-hint-managed = Hoard sẽ tạo thư mục nếu chưa có. Trong Docker, đây là thư mục bạn đã gắn vào container.
+locations-folder-hint-managed-desktop = Hoard sẽ tạo thư mục nếu chưa có.
 locations-folder-hint-watched = Trong Docker, hãy gắn thư mục vào container trước (chỉ đọc cũng được), rồi chọn nó ở đây.
+locations-folder-hint-watched-desktop = Hoard chỉ đọc thư mục: không có gì trong đó bị thay đổi.
+locations-folder-hint-cloud = Thư mục được Dropbox, Google Drive, OneDrive hoặc iCloud Drive đồng bộ cũng được, và s3://bucket-name cho một bucket trong kho lưu trữ S3 cũng vậy.
 locations-name = Tên
 locations-name-placeholder-managed = Thư viện
 locations-name-placeholder-watched = Gói của tôi
@@ -858,6 +864,20 @@ locations-rebalance = Chuyển tệp đã lưu cho khớp
 locations-rebalance-hint = Sau khi thay đổi những gì một vị trí nhận: tệp đã lưu sẽ chuyển sang vị trí mà loại của chúng giờ thuộc về.
 locations-add-title = Thêm vị trí
 locations-add-hint = Một ổ đĩa khác cho một số loại tệp, hoặc một thư mục chứa các gói bạn đã có.
+locations-s3-title = Kho lưu trữ S3
+locations-s3-hint = Vị trí s3://bucket-name là một bucket trong dịch vụ này: AWS, hoặc bất kỳ dịch vụ tương thích S3 nào (Backblaze B2, Cloudflare R2, Wasabi, MinIO, Garage trên NAS).
+locations-s3-endpoint = Địa chỉ
+locations-s3-endpoint-placeholder = Để trống cho AWS; ví dụ https://s3.eu-central-003.backblazeb2.com
+locations-s3-region = Vùng
+locations-s3-access-key = ID khóa truy cập
+locations-s3-secret-key = Khóa truy cập bí mật
+locations-s3-headers = Header bổ sung
+locations-s3-headers-placeholder = Name=value, mỗi dòng một mục (ví dụ cho Cloudflare Access)
+locations-s3-kept = Đã lưu (nhập để thay thế)
+locations-s3-secrets = Khóa và header được lưu cùng cài đặt của máy chủ, và sẽ không bao giờ hiện lại.
+locations-s3-secrets-desktop = Khóa và header được lưu trong kho mật khẩu của máy tính này, và sẽ không bao giờ hiện lại.
+locations-s3-saved = Đã lưu kho lưu trữ S3
+locations-s3-save-failed = Không thể lưu kho lưu trữ S3
 locations-add-more = Thêm vị trí…
 
 ## Bảng sự cố

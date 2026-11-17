@@ -185,7 +185,7 @@ mod tests {
         let dir = tempfile::tempdir().unwrap();
         let (cfg, pool) = setup(dir.path());
         let lib = add(&pool, dir.path(), "lib", &[], true);
-        let blobs = BlobStore::open(&cfg, pool.clone()).unwrap();
+        let blobs = BlobStore::open(&cfg, pool.clone(), crate::blobs::S3::default()).unwrap();
         let sound = blobs.put_bytes(b"a sound".to_vec(), AssetKind::Audio).await.unwrap().hash;
         let model = blobs.put_bytes(b"a model".to_vec(), AssetKind::Model).await.unwrap().hash;
         {

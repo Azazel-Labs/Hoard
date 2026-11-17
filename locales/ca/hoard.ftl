@@ -68,6 +68,9 @@ error-wrong-setup-code = Aquest no és el codi de configuració donat al servido
 error-wrong-password = El nom i la contrasenya no coincideixen
 error-folder-missing = { $path } no hi és (un disc que no està muntat?)
 error-s3-path = una ubicació S3 té la forma s3://bucket
+error-s3-address = l'adreça S3 ha de començar per http:// o https://
+error-s3-header = una capçalera S3 addicional té la forma Name=value, i «{ $header }» no ho és
+error-keychain = no s'ha pogut desar al clauer del sistema: { $reason }
 error-not-built = aquesta còpia de Hoard s'ha compilat sense { $feature }
 error-openai-auth-unreachable = no s'ha pogut connectar amb auth.openai.com
 error-openai-unexpected = resposta inesperada d'OpenAI
@@ -823,7 +826,10 @@ locations-folder = Carpeta del servidor
 locations-folder-desktop = Carpeta
 locations-folder-placeholder = La carpeta on són els vostres paquets
 locations-folder-hint-managed = Hoard la crea si no existeix. A Docker, és una carpeta que heu muntat al contenidor.
+locations-folder-hint-managed-desktop = Hoard la crea si no existeix.
 locations-folder-hint-watched = A Docker, primer munteu la carpeta al contenidor (només de lectura ja va bé) i després trieu-la aquí.
+locations-folder-hint-watched-desktop = Hoard només la llegeix: no s'hi canvia res.
+locations-folder-hint-cloud = També serveix una carpeta que Dropbox, Google Drive, OneDrive o iCloud Drive mantinguin sincronitzada, i s3://bucket-name per a un bucket de l'emmagatzematge S3.
 locations-name = Nom
 locations-name-placeholder-managed = Biblioteca
 locations-name-placeholder-watched = Els meus paquets
@@ -899,6 +905,20 @@ locations-rebalance = Mou els fitxers desats perquè hi coincideixin
 locations-rebalance-hint = Després de canviar el que accepta una ubicació: els fitxers ja desats es mouen a la ubicació on va ara el seu tipus.
 locations-add-title = Afegeix una ubicació
 locations-add-hint = Un altre disc per a alguns tipus de fitxers, o una carpeta de paquets que ja teniu.
+locations-s3-title = Emmagatzematge S3
+locations-s3-hint = Una ubicació s3://bucket-name és un bucket d'aquest servei: AWS o qualsevol de compatible amb S3 (Backblaze B2, Cloudflare R2, Wasabi, MinIO, Garage en un NAS).
+locations-s3-endpoint = Adreça
+locations-s3-endpoint-placeholder = Buida per a AWS; p. ex. https://s3.eu-central-003.backblazeb2.com
+locations-s3-region = Regió
+locations-s3-access-key = ID de la clau d'accés
+locations-s3-secret-key = Clau d'accés secreta
+locations-s3-headers = Capçaleres addicionals
+locations-s3-headers-placeholder = Name=value, una per línia (per a Cloudflare Access, per exemple)
+locations-s3-kept = Desat (escriviu per substituir-lo)
+locations-s3-secrets = Les claus i les capçaleres es guarden amb la configuració del servidor i no es tornen a mostrar mai.
+locations-s3-secrets-desktop = Les claus i les capçaleres es guarden al clauer d'aquest ordinador i no es tornen a mostrar mai.
+locations-s3-saved = S'ha desat l'emmagatzematge S3
+locations-s3-save-failed = No s'ha pogut desar l'emmagatzematge S3
 locations-add-more = Afegeix una ubicació…
 
 ## IssuesPanel.vue

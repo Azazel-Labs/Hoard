@@ -68,6 +68,9 @@ error-wrong-setup-code = Das ist nicht der Einrichtungscode, der dem Server in H
 error-wrong-password = Name und Passwort passen nicht zusammen
 error-folder-missing = { $path } ist nicht vorhanden (ein nicht eingehängtes Laufwerk?)
 error-s3-path = ein S3-Speicherort sieht so aus: s3://bucket
+error-s3-address = die S3-Adresse muss mit http:// oder https:// beginnen
+error-s3-header = ein zusätzlicher S3-Header hat die Form Name=value, und „{ $header }“ ist keiner
+error-keychain = konnte es nicht im Schlüsselbund des Systems ablegen: { $reason }
 error-not-built = diese Hoard-Version wurde ohne { $feature } erstellt
 error-openai-auth-unreachable = auth.openai.com ist nicht erreichbar
 error-openai-unexpected = unerwartete Antwort von OpenAI
@@ -827,7 +830,10 @@ locations-folder = Ordner auf dem Server
 locations-folder-desktop = Ordner
 locations-folder-placeholder = Der Ordner mit Ihren Paketen
 locations-folder-hint-managed = Hoard erstellt ihn, falls er nicht existiert. In Docker ist das ein Ordner, den Sie in den Container eingehängt haben.
+locations-folder-hint-managed-desktop = Hoard erstellt ihn, falls er nicht existiert.
 locations-folder-hint-watched = Hängen Sie den Ordner in Docker zuerst in den Container ein (schreibgeschützt genügt) und wählen Sie ihn dann hier aus.
+locations-folder-hint-watched-desktop = Hoard liest ihn nur: Darin wird nichts geändert.
+locations-folder-hint-cloud = Ein Ordner, den Dropbox, Google Drive, OneDrive oder iCloud Drive synchron hält, geht auch, ebenso s3://bucket-name für einen Bucket im S3-Speicher.
 locations-name = Name
 locations-name-placeholder-managed = Bibliothek
 locations-name-placeholder-watched = Meine Pakete
@@ -903,6 +909,20 @@ locations-rebalance = Gespeicherte Dateien entsprechend verschieben
 locations-rebalance-hint = Nachdem Sie geändert haben, was ein Speicherort aufnimmt: Bereits gespeicherte Dateien werden an den Speicherort verschoben, zu dem ihre Art jetzt gehört.
 locations-add-title = Speicherort hinzufügen
 locations-add-hint = Ein weiteres Laufwerk für bestimmte Dateiarten oder ein Ordner mit Paketen, die Sie schon haben.
+locations-s3-title = S3-Speicher
+locations-s3-hint = Ein Speicherort unter s3://bucket-name ist ein Bucket in diesem Dienst: AWS oder ein beliebiger S3-kompatibler (Backblaze B2, Cloudflare R2, Wasabi, MinIO, Garage auf einem NAS).
+locations-s3-endpoint = Adresse
+locations-s3-endpoint-placeholder = Leer für AWS; z. B. https://s3.eu-central-003.backblazeb2.com
+locations-s3-region = Region
+locations-s3-access-key = Zugriffsschlüssel-ID
+locations-s3-secret-key = Geheimer Zugriffsschlüssel
+locations-s3-headers = Zusätzliche Header
+locations-s3-headers-placeholder = Name=value, einer pro Zeile (etwa für Cloudflare Access)
+locations-s3-kept = Gespeichert (zum Ersetzen tippen)
+locations-s3-secrets = Die Schlüssel und Header werden mit den Einstellungen des Servers gespeichert und nie wieder angezeigt.
+locations-s3-secrets-desktop = Die Schlüssel und Header werden im Schlüsselbund dieses Computers gespeichert und nie wieder angezeigt.
+locations-s3-saved = S3-Speicher gespeichert
+locations-s3-save-failed = Der S3-Speicher konnte nicht gespeichert werden
 locations-add-more = Speicherort hinzufügen…
 
 ## IssuesPanel.vue

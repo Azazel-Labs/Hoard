@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "6b1cad733e7c2f6f9f760a91d1879b4b0d4363e36add843001d846f75104d47e"
+source = "b5640bb76c06fe83cd9cc9bd88a06dd911fb0251db9b0880ec94831503ff6fb0"
 translation = "873b493392ac19a4818133a8d941b69ecf2fcc97948bd30249bcd2805164b799"
 
 [messages.account-add]
@@ -3443,6 +3443,10 @@ translation = "证书或密钥无法使用"
 source = "make another location the catch-all instead"
 translation = "请改为将另一个位置设为兜底位置"
 
+[messages.error-keychain]
+source = "couldn't keep it in the system's keychain: { $reason }"
+translation = "无法保存到系统钥匙串：{ $reason }"
+
 [messages.error-ldap-base-dn]
 source = "Say where people's entries are (the base DN)"
 translation = "请指明用户条目所在的位置（base DN）"
@@ -3870,6 +3874,14 @@ translation = "ext 必须是简短的文件扩展名"
 [messages.error-role]
 source = "A role is view, edit or admin"
 translation = "角色只能是 view、edit 或 admin"
+
+[messages.error-s3-address]
+source = "the S3 address must start with http:// or https://"
+translation = "S3 地址必须以 http:// 或 https:// 开头"
+
+[messages.error-s3-header]
+source = """an extra S3 header looks like Name=value, and "{ $header }" isn't one"""
+translation = "额外的 S3 标头格式应为 Name=value，而“{ $header }”不是"
 
 [messages.error-s3-path]
 source = "an S3 location looks like s3://bucket"
@@ -5240,13 +5252,25 @@ translation = "服务器上的文件夹"
 source = "Folder"
 translation = "文件夹"
 
+[messages.locations-folder-hint-cloud]
+source = "A folder that Dropbox, Google Drive, OneDrive or iCloud Drive keeps in sync works too, and so does s3://bucket-name for a bucket in S3 storage."
+translation = "也可以使用由 Dropbox、Google Drive、OneDrive 或 iCloud Drive 同步的文件夹；S3 存储中的存储桶则可使用 s3://bucket-name。"
+
 [messages.locations-folder-hint-managed]
 source = "Hoard creates it if it isn't there. In Docker, this is a folder you've mounted into the container."
 translation = "如果文件夹不存在，Hoard 会创建它。在 Docker 中，这是你挂载到容器中的文件夹。"
 
+[messages.locations-folder-hint-managed-desktop]
+source = "Hoard creates it if it isn't there."
+translation = "如果文件夹不存在，Hoard 会创建它。"
+
 [messages.locations-folder-hint-watched]
 source = "In Docker, mount the folder into the container first (read-only is fine), then pick it here."
 translation = "在 Docker 中，请先将文件夹挂载到容器中（只读即可），然后在这里选择它。"
+
+[messages.locations-folder-hint-watched-desktop]
+source = "Hoard only reads it: nothing in it is changed."
+translation = "Hoard 只读取该文件夹，不会更改其中的任何内容。"
 
 [messages.locations-folder-placeholder]
 source = "The folder your packs are in"
@@ -5371,6 +5395,62 @@ translation = "移除 { $name }？"
 [messages.locations-removed]
 source = "Removed { $name }"
 translation = "已移除 { $name }"
+
+[messages.locations-s3-access-key]
+source = "Access key ID"
+translation = "访问密钥 ID"
+
+[messages.locations-s3-endpoint]
+source = "Address"
+translation = "地址"
+
+[messages.locations-s3-endpoint-placeholder]
+source = "Empty for AWS; e.g. https://s3.eu-central-003.backblazeb2.com"
+translation = "AWS 留空；例如 https://s3.eu-central-003.backblazeb2.com"
+
+[messages.locations-s3-headers]
+source = "Extra headers"
+translation = "额外标头"
+
+[messages.locations-s3-headers-placeholder]
+source = "Name=value, one a line (for Cloudflare Access, say)"
+translation = "Name=value，每行一个（例如用于 Cloudflare Access）"
+
+[messages.locations-s3-hint]
+source = "A location at s3://bucket-name is a bucket in this service: AWS, or any S3-compatible one (Backblaze B2, Cloudflare R2, Wasabi, MinIO, Garage on a NAS)."
+translation = "s3://bucket-name 位置是此服务中的一个存储桶：AWS，或任何兼容 S3 的服务（Backblaze B2、Cloudflare R2、Wasabi、MinIO、NAS 上的 Garage）。"
+
+[messages.locations-s3-kept]
+source = "Saved (type to replace)"
+translation = "已保存（输入以替换）"
+
+[messages.locations-s3-region]
+source = "Region"
+translation = "区域"
+
+[messages.locations-s3-save-failed]
+source = "Couldn't save S3 storage"
+translation = "无法保存 S3 存储"
+
+[messages.locations-s3-saved]
+source = "S3 storage saved"
+translation = "已保存 S3 存储"
+
+[messages.locations-s3-secret-key]
+source = "Secret access key"
+translation = "秘密访问密钥"
+
+[messages.locations-s3-secrets]
+source = "The keys and headers are kept with the server's settings, and never shown again."
+translation = "密钥和标头会随服务器设置一起保存，且不会再显示。"
+
+[messages.locations-s3-secrets-desktop]
+source = "The keys and headers are kept in this computer's keychain, and never shown again."
+translation = "密钥和标头保存在这台电脑的钥匙串中，且不会再显示。"
+
+[messages.locations-s3-title]
+source = "S3 storage"
+translation = "S3 存储"
 
 [messages.locations-save]
 source = "Save"

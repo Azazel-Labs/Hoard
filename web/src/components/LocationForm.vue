@@ -84,7 +84,7 @@ async function submit() {
       <div>
         <FolderPicker id="loc-path" v-model="path" :placeholder="mode === 'managed' ? suggested : t('locations-folder-placeholder')" @unauthorized="emit('unauthorized')" />
         <p class="hint">
-          <template v-if="mode === 'managed'">{{ t('locations-folder-hint-managed') }}</template>
+          <template v-if="mode === 'managed'">{{ t('locations-folder-hint-managed') }} {{ t('locations-folder-hint-cloud') }}</template>
           <template v-else>{{ t('locations-folder-hint-watched') }}</template>
         </p>
       </div>

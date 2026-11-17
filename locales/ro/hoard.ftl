@@ -68,6 +68,9 @@ error-wrong-setup-code = Acesta nu este codul de configurare dat serverului în 
 error-wrong-password = Numele și parola nu se potrivesc
 error-folder-missing = { $path } nu există (un disc care nu este montat?)
 error-s3-path = o locație S3 arată așa: s3://bucket
+error-s3-address = adresa S3 trebuie să înceapă cu http:// sau https://
+error-s3-header = un antet S3 suplimentar arată așa: Name=value, iar „{ $header }” nu este unul
+error-keychain = nu a putut fi păstrat în depozitul de chei al sistemului: { $reason }
 error-not-built = această copie Hoard a fost compilată fără { $feature }
 error-openai-auth-unreachable = auth.openai.com nu a putut fi accesat
 error-openai-unexpected = răspuns neașteptat de la OpenAI
@@ -862,7 +865,10 @@ locations-folder = Dosar pe server
 locations-folder-desktop = Dosar
 locations-folder-placeholder = Dosarul în care sunt pachetele dvs.
 locations-folder-hint-managed = Hoard îl creează dacă nu există. În Docker, acesta este un dosar pe care l-ați montat în container.
+locations-folder-hint-managed-desktop = Hoard îl creează dacă nu există.
 locations-folder-hint-watched = În Docker, montați mai întâi dosarul în container (doar citire este suficient), apoi alegeți-l aici.
+locations-folder-hint-watched-desktop = Hoard doar îl citește: nimic din el nu este modificat.
+locations-folder-hint-cloud = Merge și un dosar sincronizat de Dropbox, Google Drive, OneDrive sau iCloud Drive, la fel și s3://bucket-name pentru un bucket din stocarea S3.
 locations-name = Nume
 locations-name-placeholder-managed = Bibliotecă
 locations-name-placeholder-watched = Pachetele mele
@@ -940,6 +946,20 @@ locations-rebalance = Mutați fișierele stocate în consecință
 locations-rebalance-hint = După ce schimbați ce preia o locație: fișierele deja stocate se mută în locația în care merge acum tipul lor.
 locations-add-title = Adăugați o locație
 locations-add-hint = Alt disc pentru unele tipuri de fișiere sau un dosar de pachete pe care îl aveți deja.
+locations-s3-title = Stocare S3
+locations-s3-hint = O locație s3://bucket-name este un bucket din acest serviciu: AWS sau orice serviciu compatibil S3 (Backblaze B2, Cloudflare R2, Wasabi, MinIO, Garage pe un NAS).
+locations-s3-endpoint = Adresă
+locations-s3-endpoint-placeholder = Goală pentru AWS; de ex. https://s3.eu-central-003.backblazeb2.com
+locations-s3-region = Regiune
+locations-s3-access-key = ID cheie de acces
+locations-s3-secret-key = Cheie de acces secretă
+locations-s3-headers = Anteturi suplimentare
+locations-s3-headers-placeholder = Name=value, câte unul pe rând (de exemplu pentru Cloudflare Access)
+locations-s3-kept = Salvat (tastați pentru a înlocui)
+locations-s3-secrets = Cheile și anteturile sunt păstrate în setările serverului și nu mai sunt afișate niciodată.
+locations-s3-secrets-desktop = Cheile și anteturile sunt păstrate în depozitul de chei al acestui computer și nu mai sunt afișate niciodată.
+locations-s3-saved = Stocarea S3 a fost salvată
+locations-s3-save-failed = Stocarea S3 nu a putut fi salvată
 locations-add-more = Adăugați o locație…
 
 ## IssuesPanel.vue

@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "6b1cad733e7c2f6f9f760a91d1879b4b0d4363e36add843001d846f75104d47e"
+source = "b5640bb76c06fe83cd9cc9bd88a06dd911fb0251db9b0880ec94831503ff6fb0"
 translation = "44a6ce43f1150d13b559f0d2f3c7a3bde279162222700ef1936bf1b708f11352"
 
 [messages.account-add]
@@ -3532,6 +3532,10 @@ translation = "No se puede usar el certificado o la clave"
 source = "make another location the catch-all instead"
 translation = "haz que otra ubicación sea la de reserva para todo"
 
+[messages.error-keychain]
+source = "couldn't keep it in the system's keychain: { $reason }"
+translation = "no se ha podido guardar en el llavero del sistema: { $reason }"
+
 [messages.error-ldap-base-dn]
 source = "Say where people's entries are (the base DN)"
 translation = "Indica dónde están las entradas de las personas (el DN base)"
@@ -3963,6 +3967,14 @@ translation = "ext debe ser una extensión de archivo corta"
 [messages.error-role]
 source = "A role is view, edit or admin"
 translation = "Un rol es view, edit o admin"
+
+[messages.error-s3-address]
+source = "the S3 address must start with http:// or https://"
+translation = "la dirección de S3 debe empezar por http:// o https://"
+
+[messages.error-s3-header]
+source = """an extra S3 header looks like Name=value, and "{ $header }" isn't one"""
+translation = "una cabecera S3 adicional tiene la forma Name=value, y «{ $header }» no lo es"
 
 [messages.error-s3-path]
 source = "an S3 location looks like s3://bucket"
@@ -5358,13 +5370,25 @@ translation = "Carpeta en el servidor"
 source = "Folder"
 translation = "Carpeta"
 
+[messages.locations-folder-hint-cloud]
+source = "A folder that Dropbox, Google Drive, OneDrive or iCloud Drive keeps in sync works too, and so does s3://bucket-name for a bucket in S3 storage."
+translation = "También vale una carpeta que Dropbox, Google Drive, OneDrive o iCloud Drive mantengan sincronizada, y s3://bucket-name para un bucket del almacenamiento S3."
+
 [messages.locations-folder-hint-managed]
 source = "Hoard creates it if it isn't there. In Docker, this is a folder you've mounted into the container."
 translation = "Hoard la crea si no existe. En Docker, es una carpeta que has montado en el contenedor."
 
+[messages.locations-folder-hint-managed-desktop]
+source = "Hoard creates it if it isn't there."
+translation = "Hoard la crea si no existe."
+
 [messages.locations-folder-hint-watched]
 source = "In Docker, mount the folder into the container first (read-only is fine), then pick it here."
 translation = "En Docker, primero monta la carpeta en el contenedor (de solo lectura vale) y luego elígela aquí."
+
+[messages.locations-folder-hint-watched-desktop]
+source = "Hoard only reads it: nothing in it is changed."
+translation = "Hoard solo la lee: no se cambia nada de lo que contiene."
 
 [messages.locations-folder-placeholder]
 source = "The folder your packs are in"
@@ -5493,6 +5517,62 @@ translation = "¿Quitar { $name }?"
 [messages.locations-removed]
 source = "Removed { $name }"
 translation = "Se ha quitado { $name }"
+
+[messages.locations-s3-access-key]
+source = "Access key ID"
+translation = "ID de clave de acceso"
+
+[messages.locations-s3-endpoint]
+source = "Address"
+translation = "Dirección"
+
+[messages.locations-s3-endpoint-placeholder]
+source = "Empty for AWS; e.g. https://s3.eu-central-003.backblazeb2.com"
+translation = "Vacía para AWS; p. ej. https://s3.eu-central-003.backblazeb2.com"
+
+[messages.locations-s3-headers]
+source = "Extra headers"
+translation = "Cabeceras adicionales"
+
+[messages.locations-s3-headers-placeholder]
+source = "Name=value, one a line (for Cloudflare Access, say)"
+translation = "Name=value, una por línea (por ejemplo, para Cloudflare Access)"
+
+[messages.locations-s3-hint]
+source = "A location at s3://bucket-name is a bucket in this service: AWS, or any S3-compatible one (Backblaze B2, Cloudflare R2, Wasabi, MinIO, Garage on a NAS)."
+translation = "Una ubicación en s3://bucket-name es un bucket de este servicio: AWS o cualquiera compatible con S3 (Backblaze B2, Cloudflare R2, Wasabi, MinIO, Garage en un NAS)."
+
+[messages.locations-s3-kept]
+source = "Saved (type to replace)"
+translation = "Guardado (escribe para sustituirlo)"
+
+[messages.locations-s3-region]
+source = "Region"
+translation = "Región"
+
+[messages.locations-s3-save-failed]
+source = "Couldn't save S3 storage"
+translation = "No se ha podido guardar el almacenamiento S3"
+
+[messages.locations-s3-saved]
+source = "S3 storage saved"
+translation = "Almacenamiento S3 guardado"
+
+[messages.locations-s3-secret-key]
+source = "Secret access key"
+translation = "Clave de acceso secreta"
+
+[messages.locations-s3-secrets]
+source = "The keys and headers are kept with the server's settings, and never shown again."
+translation = "Las claves y las cabeceras se guardan con los ajustes del servidor y no se vuelven a mostrar."
+
+[messages.locations-s3-secrets-desktop]
+source = "The keys and headers are kept in this computer's keychain, and never shown again."
+translation = "Las claves y las cabeceras se guardan en el llavero de este ordenador y no se vuelven a mostrar."
+
+[messages.locations-s3-title]
+source = "S3 storage"
+translation = "Almacenamiento S3"
 
 [messages.locations-save]
 source = "Save"

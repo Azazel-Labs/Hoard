@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "6b1cad733e7c2f6f9f760a91d1879b4b0d4363e36add843001d846f75104d47e"
+source = "b5640bb76c06fe83cd9cc9bd88a06dd911fb0251db9b0880ec94831503ff6fb0"
 translation = "245449697e0a895e830ec6ffecd944a7e66baf856861dd47e0078bd8808a6ca7"
 
 [messages.account-add]
@@ -3536,6 +3536,10 @@ translation = "Το πιστοποιητικό ή το κλειδί δεν μπ�
 source = "make another location the catch-all instead"
 translation = "ορίστε πρώτα άλλη τοποθεσία ως τοποθεσία για όλα τα υπόλοιπα"
 
+[messages.error-keychain]
+source = "couldn't keep it in the system's keychain: { $reason }"
+translation = "δεν ήταν δυνατή η φύλαξή του στην κλειδοθήκη του συστήματος: { $reason }"
+
 [messages.error-ldap-base-dn]
 source = "Say where people's entries are (the base DN)"
 translation = "Πείτε πού βρίσκονται οι καταχωρίσεις των χρηστών (το base DN)"
@@ -3963,6 +3967,14 @@ translation = "το ext πρέπει να είναι σύντομη επέκτα
 [messages.error-role]
 source = "A role is view, edit or admin"
 translation = "Ένας ρόλος είναι view, edit ή admin"
+
+[messages.error-s3-address]
+source = "the S3 address must start with http:// or https://"
+translation = "η διεύθυνση S3 πρέπει να ξεκινά με http:// ή https://"
+
+[messages.error-s3-header]
+source = """an extra S3 header looks like Name=value, and "{ $header }" isn't one"""
+translation = "μια επιπλέον κεφαλίδα S3 έχει τη μορφή Name=value, και το «{ $header }» δεν είναι τέτοια"
 
 [messages.error-s3-path]
 source = "an S3 location looks like s3://bucket"
@@ -5367,13 +5379,25 @@ translation = "Φάκελος στον διακομιστή"
 source = "Folder"
 translation = "Φάκελος"
 
+[messages.locations-folder-hint-cloud]
+source = "A folder that Dropbox, Google Drive, OneDrive or iCloud Drive keeps in sync works too, and so does s3://bucket-name for a bucket in S3 storage."
+translation = "Λειτουργεί επίσης ένας φάκελος που συγχρονίζει το Dropbox, το Google Drive, το OneDrive ή το iCloud Drive, όπως και το s3://bucket-name για ένα bucket στον χώρο αποθήκευσης S3."
+
 [messages.locations-folder-hint-managed]
 source = "Hoard creates it if it isn't there. In Docker, this is a folder you've mounted into the container."
 translation = "Το Hoard τον δημιουργεί αν δεν υπάρχει. Στο Docker, είναι ένας φάκελος που έχετε προσαρτήσει στο container."
 
+[messages.locations-folder-hint-managed-desktop]
+source = "Hoard creates it if it isn't there."
+translation = "Το Hoard τον δημιουργεί αν δεν υπάρχει."
+
 [messages.locations-folder-hint-watched]
 source = "In Docker, mount the folder into the container first (read-only is fine), then pick it here."
 translation = "Στο Docker, προσαρτήστε πρώτα τον φάκελο στο container (αρκεί μόνο για ανάγνωση) και μετά επιλέξτε τον εδώ."
+
+[messages.locations-folder-hint-watched-desktop]
+source = "Hoard only reads it: nothing in it is changed."
+translation = "Το Hoard μόνο τον διαβάζει: τίποτα μέσα του δεν αλλάζει."
 
 [messages.locations-folder-placeholder]
 source = "The folder your packs are in"
@@ -5502,6 +5526,62 @@ translation = "Να καταργηθεί το { $name };"
 [messages.locations-removed]
 source = "Removed { $name }"
 translation = "Καταργήθηκε: { $name }"
+
+[messages.locations-s3-access-key]
+source = "Access key ID"
+translation = "Αναγνωριστικό κλειδιού πρόσβασης"
+
+[messages.locations-s3-endpoint]
+source = "Address"
+translation = "Διεύθυνση"
+
+[messages.locations-s3-endpoint-placeholder]
+source = "Empty for AWS; e.g. https://s3.eu-central-003.backblazeb2.com"
+translation = "Κενό για το AWS· π.χ. https://s3.eu-central-003.backblazeb2.com"
+
+[messages.locations-s3-headers]
+source = "Extra headers"
+translation = "Επιπλέον κεφαλίδες"
+
+[messages.locations-s3-headers-placeholder]
+source = "Name=value, one a line (for Cloudflare Access, say)"
+translation = "Name=value, μία ανά γραμμή (π.χ. για το Cloudflare Access)"
+
+[messages.locations-s3-hint]
+source = "A location at s3://bucket-name is a bucket in this service: AWS, or any S3-compatible one (Backblaze B2, Cloudflare R2, Wasabi, MinIO, Garage on a NAS)."
+translation = "Μια τοποθεσία s3://bucket-name είναι ένα bucket σε αυτή την υπηρεσία: το AWS ή οποιαδήποτε συμβατή με S3 (Backblaze B2, Cloudflare R2, Wasabi, MinIO, Garage σε NAS)."
+
+[messages.locations-s3-kept]
+source = "Saved (type to replace)"
+translation = "Αποθηκεύτηκε (πληκτρολογήστε για αντικατάσταση)"
+
+[messages.locations-s3-region]
+source = "Region"
+translation = "Περιοχή"
+
+[messages.locations-s3-save-failed]
+source = "Couldn't save S3 storage"
+translation = "Δεν ήταν δυνατή η αποθήκευση των ρυθμίσεων S3"
+
+[messages.locations-s3-saved]
+source = "S3 storage saved"
+translation = "Οι ρυθμίσεις S3 αποθηκεύτηκαν"
+
+[messages.locations-s3-secret-key]
+source = "Secret access key"
+translation = "Μυστικό κλειδί πρόσβασης"
+
+[messages.locations-s3-secrets]
+source = "The keys and headers are kept with the server's settings, and never shown again."
+translation = "Τα κλειδιά και οι κεφαλίδες φυλάσσονται μαζί με τις ρυθμίσεις του διακομιστή και δεν εμφανίζονται ποτέ ξανά."
+
+[messages.locations-s3-secrets-desktop]
+source = "The keys and headers are kept in this computer's keychain, and never shown again."
+translation = "Τα κλειδιά και οι κεφαλίδες φυλάσσονται στην κλειδοθήκη αυτού του υπολογιστή και δεν εμφανίζονται ποτέ ξανά."
+
+[messages.locations-s3-title]
+source = "S3 storage"
+translation = "Χώρος αποθήκευσης S3"
 
 [messages.locations-save]
 source = "Save"

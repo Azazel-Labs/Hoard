@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "6b1cad733e7c2f6f9f760a91d1879b4b0d4363e36add843001d846f75104d47e"
+source = "b5640bb76c06fe83cd9cc9bd88a06dd911fb0251db9b0880ec94831503ff6fb0"
 translation = "31c4bf22efc6b6b6dbf2f8581e36c40fdd93e1eb2dd2759b7ddcb2e1a95398ee"
 
 [messages.account-add]
@@ -3524,6 +3524,10 @@ translation = "Certifikatet eller nøglen kan ikke bruges"
 source = "make another location the catch-all instead"
 translation = "gør i stedet en anden placering til opsamlingsstedet"
 
+[messages.error-keychain]
+source = "couldn't keep it in the system's keychain: { $reason }"
+translation = "kunne ikke gemme det i systemets nøglering: { $reason }"
+
 [messages.error-ldap-base-dn]
 source = "Say where people's entries are (the base DN)"
 translation = "Angiv, hvor folks poster ligger (base DN)"
@@ -3951,6 +3955,14 @@ translation = "ext skal være et kort filtypenavn"
 [messages.error-role]
 source = "A role is view, edit or admin"
 translation = "En rolle er view, edit eller admin"
+
+[messages.error-s3-address]
+source = "the S3 address must start with http:// or https://"
+translation = "S3-adressen skal starte med http:// eller https://"
+
+[messages.error-s3-header]
+source = """an extra S3 header looks like Name=value, and "{ $header }" isn't one"""
+translation = "en ekstra S3-header ser ud som Name=value, og »{ $header }« er ikke en"
 
 [messages.error-s3-path]
 source = "an S3 location looks like s3://bucket"
@@ -5338,13 +5350,25 @@ translation = "Mappe på serveren"
 source = "Folder"
 translation = "Mappe"
 
+[messages.locations-folder-hint-cloud]
+source = "A folder that Dropbox, Google Drive, OneDrive or iCloud Drive keeps in sync works too, and so does s3://bucket-name for a bucket in S3 storage."
+translation = "En mappe, som Dropbox, Google Drive, OneDrive eller iCloud Drive holder synkroniseret, virker også, og det gør s3://bucket-name også for en bucket i S3-lager."
+
 [messages.locations-folder-hint-managed]
 source = "Hoard creates it if it isn't there. In Docker, this is a folder you've mounted into the container."
 translation = "Hoard opretter den, hvis den ikke findes. I Docker er det en mappe, du har monteret i containeren."
 
+[messages.locations-folder-hint-managed-desktop]
+source = "Hoard creates it if it isn't there."
+translation = "Hoard opretter den, hvis den ikke findes."
+
 [messages.locations-folder-hint-watched]
 source = "In Docker, mount the folder into the container first (read-only is fine), then pick it here."
 translation = "I Docker skal du først montere mappen i containeren (skrivebeskyttet er fint) og så vælge den her."
+
+[messages.locations-folder-hint-watched-desktop]
+source = "Hoard only reads it: nothing in it is changed."
+translation = "Hoard læser den kun: intet i den bliver ændret."
 
 [messages.locations-folder-placeholder]
 source = "The folder your packs are in"
@@ -5473,6 +5497,62 @@ translation = "Fjern { $name }?"
 [messages.locations-removed]
 source = "Removed { $name }"
 translation = "Fjernede { $name }"
+
+[messages.locations-s3-access-key]
+source = "Access key ID"
+translation = "Adgangsnøgle-id"
+
+[messages.locations-s3-endpoint]
+source = "Address"
+translation = "Adresse"
+
+[messages.locations-s3-endpoint-placeholder]
+source = "Empty for AWS; e.g. https://s3.eu-central-003.backblazeb2.com"
+translation = "Tom for AWS; f.eks. https://s3.eu-central-003.backblazeb2.com"
+
+[messages.locations-s3-headers]
+source = "Extra headers"
+translation = "Ekstra headere"
+
+[messages.locations-s3-headers-placeholder]
+source = "Name=value, one a line (for Cloudflare Access, say)"
+translation = "Name=value, én pr. linje (f.eks. til Cloudflare Access)"
+
+[messages.locations-s3-hint]
+source = "A location at s3://bucket-name is a bucket in this service: AWS, or any S3-compatible one (Backblaze B2, Cloudflare R2, Wasabi, MinIO, Garage on a NAS)."
+translation = "En placering på s3://bucket-name er en bucket i denne tjeneste: AWS eller en hvilken som helst S3-kompatibel (Backblaze B2, Cloudflare R2, Wasabi, MinIO, Garage på en NAS)."
+
+[messages.locations-s3-kept]
+source = "Saved (type to replace)"
+translation = "Gemt (skriv for at erstatte)"
+
+[messages.locations-s3-region]
+source = "Region"
+translation = "Region"
+
+[messages.locations-s3-save-failed]
+source = "Couldn't save S3 storage"
+translation = "Kunne ikke gemme S3-lager"
+
+[messages.locations-s3-saved]
+source = "S3 storage saved"
+translation = "S3-lager gemt"
+
+[messages.locations-s3-secret-key]
+source = "Secret access key"
+translation = "Hemmelig adgangsnøgle"
+
+[messages.locations-s3-secrets]
+source = "The keys and headers are kept with the server's settings, and never shown again."
+translation = "Nøglerne og headerne gemmes sammen med serverens indstillinger og vises aldrig igen."
+
+[messages.locations-s3-secrets-desktop]
+source = "The keys and headers are kept in this computer's keychain, and never shown again."
+translation = "Nøglerne og headerne gemmes i denne computers nøglering og vises aldrig igen."
+
+[messages.locations-s3-title]
+source = "S3 storage"
+translation = "S3-lager"
 
 [messages.locations-save]
 source = "Save"

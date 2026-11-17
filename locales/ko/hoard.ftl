@@ -68,6 +68,9 @@ error-wrong-setup-code = HOARD_SETUP_CODE로 서버에 지정한 설정 코드�
 error-wrong-password = 이름과 비밀번호가 일치하지 않습니다
 error-folder-missing = { $path }이(가) 없습니다(마운트되지 않은 디스크인가요?)
 error-s3-path = S3 위치는 s3://bucket 형태입니다
+error-s3-address = S3 주소는 http:// 또는 https://로 시작해야 합니다
+error-s3-header = 추가 S3 헤더는 Name=value 형태인데, “{ $header }”은(는) 그렇지 않습니다
+error-keychain = 시스템 키체인에 보관하지 못했습니다: { $reason }
 error-not-built = 이 Hoard는 { $feature } 없이 빌드되었습니다
 error-openai-auth-unreachable = auth.openai.com에 연결할 수 없습니다
 error-openai-unexpected = OpenAI에서 예상치 못한 응답이 왔습니다
@@ -787,7 +790,10 @@ locations-folder = 서버의 폴더
 locations-folder-desktop = 폴더
 locations-folder-placeholder = 팩이 들어 있는 폴더
 locations-folder-hint-managed = 폴더가 없으면 Hoard가 만듭니다. Docker에서는 컨테이너에 마운트한 폴더입니다.
+locations-folder-hint-managed-desktop = 폴더가 없으면 Hoard가 만듭니다.
 locations-folder-hint-watched = Docker에서는 먼저 폴더를 컨테이너에 마운트한 다음(읽기 전용도 괜찮습니다) 여기서 고르세요.
+locations-folder-hint-watched-desktop = Hoard는 읽기만 하며, 안의 어떤 것도 바꾸지 않습니다.
+locations-folder-hint-cloud = Dropbox, Google Drive, OneDrive, iCloud Drive가 동기화하는 폴더도 되고, S3 스토리지의 버킷이라면 s3://bucket-name도 됩니다.
 locations-name = 이름
 locations-name-placeholder-managed = 라이브러리
 locations-name-placeholder-watched = 내 팩
@@ -855,6 +861,20 @@ locations-rebalance = 저장된 파일을 설정에 맞게 옮기기
 locations-rebalance-hint = 위치가 받는 종류를 바꾼 뒤에 사용하세요. 이미 저장된 파일이 지금 그 종류가 가는 위치로 옮겨집니다.
 locations-add-title = 위치 추가
 locations-add-hint = 일부 종류의 파일을 둘 다른 디스크, 또는 이미 가지고 있는 팩 폴더입니다.
+locations-s3-title = S3 스토리지
+locations-s3-hint = s3://bucket-name 위치는 이 서비스의 버킷입니다. AWS 또는 S3 호환 서비스(Backblaze B2, Cloudflare R2, Wasabi, MinIO, NAS의 Garage)를 쓸 수 있습니다.
+locations-s3-endpoint = 주소
+locations-s3-endpoint-placeholder = AWS는 비워 두세요. 예: https://s3.eu-central-003.backblazeb2.com
+locations-s3-region = 리전
+locations-s3-access-key = 액세스 키 ID
+locations-s3-secret-key = 비밀 액세스 키
+locations-s3-headers = 추가 헤더
+locations-s3-headers-placeholder = 한 줄에 하나씩 Name=value(예: Cloudflare Access용)
+locations-s3-kept = 저장됨(입력하면 교체)
+locations-s3-secrets = 키와 헤더는 서버 설정과 함께 보관되며 다시 표시되지 않습니다.
+locations-s3-secrets-desktop = 키와 헤더는 이 컴퓨터의 키체인에 보관되며 다시 표시되지 않습니다.
+locations-s3-saved = S3 스토리지를 저장했습니다
+locations-s3-save-failed = S3 스토리지를 저장하지 못했습니다
 locations-add-more = 위치 추가…
 
 ## IssuesPanel.vue

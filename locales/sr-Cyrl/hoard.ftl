@@ -68,6 +68,9 @@ error-wrong-setup-code = То није код за подешавање који
 error-wrong-password = Име и лозинка се не поклапају
 error-folder-missing = { $path } не постоји (диск који није монтиран?)
 error-s3-path = S3 локација изгледа као s3://bucket
+error-s3-address = S3 адреса мора да почиње са http:// или https://
+error-s3-header = додатно S3 заглавље изгледа као Name=value, а „{ $header }“ није такво
+error-keychain = није могуће сачувати у системском складишту лозинки: { $reason }
 error-not-built = ова копија Hoard-а је направљена без { $feature }
 error-openai-auth-unreachable = auth.openai.com није доступан
 error-openai-unexpected = неочекиван одговор од OpenAI-ја
@@ -842,7 +845,10 @@ locations-folder = Фасцикла на серверу
 locations-folder-desktop = Фасцикла
 locations-folder-placeholder = Фасцикла у којој су ваши пакети
 locations-folder-hint-managed = Hoard је прави ако не постоји. У Docker-у, ово је фасцикла коју сте монтирали у контејнер.
+locations-folder-hint-managed-desktop = Hoard је прави ако не постоји.
 locations-folder-hint-watched = У Docker-у прво монтирајте фасциклу у контејнер (само за читање је у реду), па је изаберите овде.
+locations-folder-hint-watched-desktop = Hoard је само чита: ништа у њој се не мења.
+locations-folder-hint-cloud = Може и фасцикла коју синхронизује Dropbox, Google Drive, OneDrive или iCloud Drive, као и s3://bucket-name за бакет у S3 складишту.
 locations-name = Назив
 locations-name-placeholder-managed = Библиотека
 locations-name-placeholder-watched = Моји пакети
@@ -915,6 +921,20 @@ locations-rebalance = Премести сачуване датотеке у ск
 locations-rebalance-hint = Након промене онога што локација прима: већ сачуване датотеке премештају се на локацију на коју њихова врста сада иде.
 locations-add-title = Додај локацију
 locations-add-hint = Још један диск за неке врсте датотека или фасцикла с пакетима коју већ имате.
+locations-s3-title = S3 складиште
+locations-s3-hint = Локација s3://bucket-name је бакет у овом сервису: AWS или било ком сервису компатибилном са S3 (Backblaze B2, Cloudflare R2, Wasabi, MinIO, Garage на NAS-у).
+locations-s3-endpoint = Адреса
+locations-s3-endpoint-placeholder = Празно за AWS; нпр. https://s3.eu-central-003.backblazeb2.com
+locations-s3-region = Регион
+locations-s3-access-key = ИД приступног кључа
+locations-s3-secret-key = Тајни приступни кључ
+locations-s3-headers = Додатна заглавља
+locations-s3-headers-placeholder = Name=value, једно по реду (на пример за Cloudflare Access)
+locations-s3-kept = Сачувано (куцајте да замените)
+locations-s3-secrets = Кључеви и заглавља чувају се у подешавањима сервера и више се не приказују.
+locations-s3-secrets-desktop = Кључеви и заглавља чувају се у складишту лозинки овог рачунара и више се не приказују.
+locations-s3-saved = S3 складиште је сачувано
+locations-s3-save-failed = Није могуће сачувати S3 складиште
 locations-add-more = Додај локацију…
 
 ## IssuesPanel.vue

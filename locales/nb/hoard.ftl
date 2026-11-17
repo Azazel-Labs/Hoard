@@ -68,6 +68,9 @@ error-wrong-setup-code = Det er ikke oppsettkoden serveren fikk i HOARD_SETUP_CO
 error-wrong-password = Navnet og passordet stemmer ikke overens
 error-folder-missing = { $path } finnes ikke (en disk som ikke er montert?)
 error-s3-path = en S3-plassering ser ut som s3://bucket
+error-s3-address = S3-adressen må begynne med http:// eller https://
+error-s3-header = en ekstra S3-header ser ut som Name=value, og «{ $header }» er ikke det
+error-keychain = kunne ikke lagre det i systemets nøkkelring: { $reason }
 error-not-built = denne kopien av Hoard er bygget uten { $feature }
 error-openai-auth-unreachable = kunne ikke nå auth.openai.com
 error-openai-unexpected = uventet svar fra OpenAI
@@ -823,7 +826,10 @@ locations-folder = Mappe på serveren
 locations-folder-desktop = Mappe
 locations-folder-placeholder = Mappen pakkene dine ligger i
 locations-folder-hint-managed = Hoard oppretter den hvis den ikke finnes. I Docker er dette en mappe du har montert inn i containeren.
+locations-folder-hint-managed-desktop = Hoard oppretter den hvis den ikke finnes.
 locations-folder-hint-watched = I Docker monterer du først mappen inn i containeren (skrivebeskyttet går fint), og velger den så her.
+locations-folder-hint-watched-desktop = Hoard bare leser den: ingenting i den endres.
+locations-folder-hint-cloud = En mappe som Dropbox, Google Drive, OneDrive eller iCloud Drive holder synkronisert, fungerer også, det samme gjør s3://bucket-name for en bucket i S3-lagring.
 locations-name = Navn
 locations-name-placeholder-managed = Bibliotek
 locations-name-placeholder-watched = Mine pakker
@@ -899,6 +905,20 @@ locations-rebalance = Flytt lagrede filer så de stemmer
 locations-rebalance-hint = Etter at du har endret hva en plassering tar: filer som allerede er lagret, flyttes til plasseringen typen deres nå hører til.
 locations-add-title = Legg til en plassering
 locations-add-hint = En annen disk for noen typer filer, eller en mappe med pakker du allerede har.
+locations-s3-title = S3-lagring
+locations-s3-hint = En plassering på s3://bucket-name er en bucket i denne tjenesten: AWS, eller en hvilken som helst S3-kompatibel tjeneste (Backblaze B2, Cloudflare R2, Wasabi, MinIO, Garage på en NAS).
+locations-s3-endpoint = Adresse
+locations-s3-endpoint-placeholder = Tom for AWS; f.eks. https://s3.eu-central-003.backblazeb2.com
+locations-s3-region = Region
+locations-s3-access-key = Tilgangsnøkkel-ID
+locations-s3-secret-key = Hemmelig tilgangsnøkkel
+locations-s3-headers = Ekstra headere
+locations-s3-headers-placeholder = Name=value, én per linje (for eksempel for Cloudflare Access)
+locations-s3-kept = Lagret (skriv for å erstatte)
+locations-s3-secrets = Nøklene og headerne lagres sammen med serverens innstillinger, og vises aldri igjen.
+locations-s3-secrets-desktop = Nøklene og headerne lagres i denne datamaskinens nøkkelring, og vises aldri igjen.
+locations-s3-saved = Innstillingene for S3-lagring er lagret
+locations-s3-save-failed = Kunne ikke lagre innstillingene for S3-lagring
 locations-add-more = Legg til en plassering …
 
 ## IssuesPanel.vue

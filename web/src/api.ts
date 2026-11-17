@@ -825,6 +825,7 @@ export interface Settings {
   clip: ImageSearchSetting
   /** Called once a newer release is out and the server is idle. The Authorization header is never sent back. */
   update_hook: { url: string; has_auth: boolean }
+  s3: S3Setting
   /** How texture maps are named in downloads, zips and manifests. `maps` has every role's suffix. */
   texture_names: TextureNames & { default: TextureNames; saved: boolean }
   conversion_rules: ConversionRules & { default_keep_days: number; targets: { to: string; from: string[] }[] }
@@ -901,6 +902,19 @@ export interface ImageSearchSetting {
   total: number
 }
 
+/** The S3 service `s3://bucket` locations are in. The secret key and the headers are never sent back. */
+export interface S3Setting {
+  /** Empty: AWS itself. */
+  endpoint: string
+  region: string
+  access_key: string
+  has_secret_key: boolean
+  has_headers: boolean
+  saved: boolean
+  /** This copy of Hoard can reach S3 at all. */
+  built: boolean
+}
+
 /** How thumbnails are stored: JPEG at three qualities, or PNG. Transparent ones and pixel art are always PNG. */
 export type ThumbQuality = 'small' | 'balanced' | 'sharp' | 'lossless'
 
@@ -933,6 +947,12 @@ export interface SettingsPatch {
   clip?: boolean | null
   texture_names?: TextureNames | null
   conversion_rules?: ConversionRules | null
+  s3_endpoint?: string | null
+  s3_region?: string | null
+  s3_access_key?: string | null
+  s3_secret_key?: string | null
+  /** One `Name=value` a line. */
+  s3_headers?: string | null
 }
 
 export interface SearchParams {

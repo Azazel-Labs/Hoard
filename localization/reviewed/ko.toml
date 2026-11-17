@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "6b1cad733e7c2f6f9f760a91d1879b4b0d4363e36add843001d846f75104d47e"
+source = "b5640bb76c06fe83cd9cc9bd88a06dd911fb0251db9b0880ec94831503ff6fb0"
 translation = "69cd6d1af3f8944f480e6c0cff8e495f2b2f3fa82cea8897c240bd053c301e2b"
 
 [messages.account-add]
@@ -3437,6 +3437,10 @@ translation = "인증서나 키를 사용할 수 없습니다"
 source = "make another location the catch-all instead"
 translation = "대신 다른 위치를 기본 위치로 지정하세요"
 
+[messages.error-keychain]
+source = "couldn't keep it in the system's keychain: { $reason }"
+translation = "시스템 키체인에 보관하지 못했습니다: { $reason }"
+
 [messages.error-ldap-base-dn]
 source = "Say where people's entries are (the base DN)"
 translation = "사용자 항목이 있는 위치(base DN)를 지정하세요"
@@ -3864,6 +3868,14 @@ translation = "ext는 짧은 파일 확장자여야 합니다"
 [messages.error-role]
 source = "A role is view, edit or admin"
 translation = "역할은 view, edit, admin 중 하나입니다"
+
+[messages.error-s3-address]
+source = "the S3 address must start with http:// or https://"
+translation = "S3 주소는 http:// 또는 https://로 시작해야 합니다"
+
+[messages.error-s3-header]
+source = """an extra S3 header looks like Name=value, and "{ $header }" isn't one"""
+translation = "추가 S3 헤더는 Name=value 형태인데, “{ $header }”은(는) 그렇지 않습니다"
 
 [messages.error-s3-path]
 source = "an S3 location looks like s3://bucket"
@@ -5220,13 +5232,25 @@ translation = "서버의 폴더"
 source = "Folder"
 translation = "폴더"
 
+[messages.locations-folder-hint-cloud]
+source = "A folder that Dropbox, Google Drive, OneDrive or iCloud Drive keeps in sync works too, and so does s3://bucket-name for a bucket in S3 storage."
+translation = "Dropbox, Google Drive, OneDrive, iCloud Drive가 동기화하는 폴더도 되고, S3 스토리지의 버킷이라면 s3://bucket-name도 됩니다."
+
 [messages.locations-folder-hint-managed]
 source = "Hoard creates it if it isn't there. In Docker, this is a folder you've mounted into the container."
 translation = "폴더가 없으면 Hoard가 만듭니다. Docker에서는 컨테이너에 마운트한 폴더입니다."
 
+[messages.locations-folder-hint-managed-desktop]
+source = "Hoard creates it if it isn't there."
+translation = "폴더가 없으면 Hoard가 만듭니다."
+
 [messages.locations-folder-hint-watched]
 source = "In Docker, mount the folder into the container first (read-only is fine), then pick it here."
 translation = "Docker에서는 먼저 폴더를 컨테이너에 마운트한 다음(읽기 전용도 괜찮습니다) 여기서 고르세요."
+
+[messages.locations-folder-hint-watched-desktop]
+source = "Hoard only reads it: nothing in it is changed."
+translation = "Hoard는 읽기만 하며, 안의 어떤 것도 바꾸지 않습니다."
 
 [messages.locations-folder-placeholder]
 source = "The folder your packs are in"
@@ -5351,6 +5375,62 @@ translation = "{ $name }을(를) 제거할까요?"
 [messages.locations-removed]
 source = "Removed { $name }"
 translation = "{ $name }을(를) 제거했습니다"
+
+[messages.locations-s3-access-key]
+source = "Access key ID"
+translation = "액세스 키 ID"
+
+[messages.locations-s3-endpoint]
+source = "Address"
+translation = "주소"
+
+[messages.locations-s3-endpoint-placeholder]
+source = "Empty for AWS; e.g. https://s3.eu-central-003.backblazeb2.com"
+translation = "AWS는 비워 두세요. 예: https://s3.eu-central-003.backblazeb2.com"
+
+[messages.locations-s3-headers]
+source = "Extra headers"
+translation = "추가 헤더"
+
+[messages.locations-s3-headers-placeholder]
+source = "Name=value, one a line (for Cloudflare Access, say)"
+translation = "한 줄에 하나씩 Name=value(예: Cloudflare Access용)"
+
+[messages.locations-s3-hint]
+source = "A location at s3://bucket-name is a bucket in this service: AWS, or any S3-compatible one (Backblaze B2, Cloudflare R2, Wasabi, MinIO, Garage on a NAS)."
+translation = "s3://bucket-name 위치는 이 서비스의 버킷입니다. AWS 또는 S3 호환 서비스(Backblaze B2, Cloudflare R2, Wasabi, MinIO, NAS의 Garage)를 쓸 수 있습니다."
+
+[messages.locations-s3-kept]
+source = "Saved (type to replace)"
+translation = "저장됨(입력하면 교체)"
+
+[messages.locations-s3-region]
+source = "Region"
+translation = "리전"
+
+[messages.locations-s3-save-failed]
+source = "Couldn't save S3 storage"
+translation = "S3 스토리지를 저장하지 못했습니다"
+
+[messages.locations-s3-saved]
+source = "S3 storage saved"
+translation = "S3 스토리지를 저장했습니다"
+
+[messages.locations-s3-secret-key]
+source = "Secret access key"
+translation = "비밀 액세스 키"
+
+[messages.locations-s3-secrets]
+source = "The keys and headers are kept with the server's settings, and never shown again."
+translation = "키와 헤더는 서버 설정과 함께 보관되며 다시 표시되지 않습니다."
+
+[messages.locations-s3-secrets-desktop]
+source = "The keys and headers are kept in this computer's keychain, and never shown again."
+translation = "키와 헤더는 이 컴퓨터의 키체인에 보관되며 다시 표시되지 않습니다."
+
+[messages.locations-s3-title]
+source = "S3 storage"
+translation = "S3 스토리지"
 
 [messages.locations-save]
 source = "Save"

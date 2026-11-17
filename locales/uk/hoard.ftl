@@ -68,6 +68,9 @@ error-wrong-setup-code = Це не той код налаштування, як�
 error-wrong-password = Ім’я та пароль не збігаються
 error-folder-missing = { $path } не знайдено (диск не змонтовано?)
 error-s3-path = розташування S3 має вигляд s3://bucket
+error-s3-address = адреса S3 має починатися з http:// або https://
+error-s3-header = додатковий заголовок S3 має вигляд Name=value, а «{ $header }» — ні
+error-keychain = не вдалося зберегти в системному сховищі паролів: { $reason }
 error-not-built = цю копію Hoard зібрано без { $feature }
 error-openai-auth-unreachable = не вдалося зв’язатися з auth.openai.com
 error-openai-unexpected = неочікувана відповідь від OpenAI
@@ -890,7 +893,10 @@ locations-folder = Тека на сервері
 locations-folder-desktop = Тека
 locations-folder-placeholder = Тека, де лежать ваші пакети
 locations-folder-hint-managed = Hoard створить її, якщо її немає. У Docker це тека, яку ви змонтували в контейнер.
+locations-folder-hint-managed-desktop = Hoard створить її, якщо її немає.
 locations-folder-hint-watched = У Docker спершу змонтуйте теку в контейнер (можна лише для читання), а потім виберіть її тут.
+locations-folder-hint-watched-desktop = Hoard лише читає її: нічого в ній не змінюється.
+locations-folder-hint-cloud = Підійде й тека, яку синхронізує Dropbox, Google Drive, OneDrive чи iCloud Drive, а також s3://bucket-name для бакета у сховищі S3.
 locations-name = Назва
 locations-name-placeholder-managed = Бібліотека
 locations-name-placeholder-watched = Мої пакети
@@ -970,6 +976,20 @@ locations-rebalance = Перемістити збережені файли ві�
 locations-rebalance-hint = Після зміни того, що бере розташування: уже збережені файли переміщуються туди, куди тепер іде їхній тип.
 locations-add-title = Додати розташування
 locations-add-hint = Інший диск для деяких типів файлів або тека з пакетами, які у вас уже є.
+locations-s3-title = Сховище S3
+locations-s3-hint = Розташування s3://bucket-name — це бакет у цьому сервісі: AWS або будь-якому сумісному з S3 (Backblaze B2, Cloudflare R2, Wasabi, MinIO, Garage на NAS).
+locations-s3-endpoint = Адреса
+locations-s3-endpoint-placeholder = Порожньо для AWS; напр. https://s3.eu-central-003.backblazeb2.com
+locations-s3-region = Регіон
+locations-s3-access-key = Ідентифікатор ключа доступу
+locations-s3-secret-key = Секретний ключ доступу
+locations-s3-headers = Додаткові заголовки
+locations-s3-headers-placeholder = Name=value, по одному в рядку (скажімо, для Cloudflare Access)
+locations-s3-kept = Збережено (введіть, щоб замінити)
+locations-s3-secrets = Ключі й заголовки зберігаються в налаштуваннях сервера й більше ніколи не показуються.
+locations-s3-secrets-desktop = Ключі й заголовки зберігаються в сховищі паролів цього комп’ютера й більше ніколи не показуються.
+locations-s3-saved = Сховище S3 збережено
+locations-s3-save-failed = Не вдалося зберегти сховище S3
 locations-add-more = Додати розташування…
 
 ## IssuesPanel.vue

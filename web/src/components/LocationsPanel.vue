@@ -6,6 +6,7 @@ import { confirmDialog, showError, showOk } from '../ui'
 import { formatDate, t } from '../i18n'
 import KindChips from './KindChips.vue'
 import LocationForm from './LocationForm.vue'
+import S3Panel from './S3Panel.vue'
 
 const emit = defineEmits<{ unauthorized: []; changed: [] }>()
 
@@ -245,6 +246,8 @@ async function created(l: LibraryLocation) {
           <button type="button" class="btn" @click="adding = true">{{ t('locations-add-more') }}</button>
         </template>
       </section>
+
+      <S3Panel @unauthorized="emit('unauthorized')" @changed="load" />
     </template>
   </div>
 </template>

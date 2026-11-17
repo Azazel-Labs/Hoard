@@ -68,6 +68,9 @@ error-wrong-setup-code = Ez nem az a beállítási kód, amelyet a szerver a HOA
 error-wrong-password = A név és a jelszó nem egyezik
 error-folder-missing = { $path } nem található (talán nincs csatlakoztatva a lemez?)
 error-s3-path = egy S3-hely így néz ki: s3://bucket
+error-s3-address = az S3-cím http:// vagy https:// kezdetű legyen
+error-s3-header = egy további S3-fejléc így néz ki: Name=value, a „{ $header }” viszont nem ilyen
+error-keychain = nem sikerült megőrizni a rendszer jelszótárolójában: { $reason }
 error-not-built = a Hoard ezen példánya { $feature } nélkül készült
 error-openai-auth-unreachable = nem sikerült elérni: auth.openai.com
 error-openai-unexpected = váratlan válasz az OpenAI-tól
@@ -791,7 +794,10 @@ locations-folder = Mappa a szerveren
 locations-folder-desktop = Mappa
 locations-folder-placeholder = A mappa, amelyben a csomagjai vannak
 locations-folder-hint-managed = Ha nem létezik, a Hoard létrehozza. Dockerben ez egy olyan mappa, amelyet a konténerbe csatolt.
+locations-folder-hint-managed-desktop = Ha nem létezik, a Hoard létrehozza.
 locations-folder-hint-watched = Dockerben előbb csatolja a mappát a konténerbe (csak olvashatóként is jó), majd válassza ki itt.
+locations-folder-hint-watched-desktop = A Hoard csak olvassa: semmi sem változik benne.
+locations-folder-hint-cloud = Egy Dropbox, Google Drive, OneDrive vagy iCloud Drive által szinkronizált mappa is megfelel, ahogy egy S3-tárhely bucketjéhez az s3://bucket-name is.
 locations-name = Név
 locations-name-placeholder-managed = Könyvtár
 locations-name-placeholder-watched = Saját csomagok
@@ -859,6 +865,20 @@ locations-rebalance = Tárolt fájlok áthelyezése
 locations-rebalance-hint = Miután módosította, mit fogad egy hely: a már tárolt fájlok átkerülnek arra a helyre, ahová a típusuk most tartozik.
 locations-add-title = Hely hozzáadása
 locations-add-hint = Egy másik lemez bizonyos fájltípusokhoz, vagy egy már meglévő, csomagokat tartalmazó mappa.
+locations-s3-title = S3-tárhely
+locations-s3-hint = Az s3://bucket-name helyek ennek a szolgáltatásnak a bucketjei: az AWS-é vagy bármely S3-kompatibilis szolgáltatásé (Backblaze B2, Cloudflare R2, Wasabi, MinIO, Garage egy NAS-on).
+locations-s3-endpoint = Cím
+locations-s3-endpoint-placeholder = AWS esetén üres; pl. https://s3.eu-central-003.backblazeb2.com
+locations-s3-region = Régió
+locations-s3-access-key = Hozzáférési kulcs azonosítója
+locations-s3-secret-key = Titkos hozzáférési kulcs
+locations-s3-headers = További fejlécek
+locations-s3-headers-placeholder = Name=value, soronként egy (például a Cloudflare Accesshez)
+locations-s3-kept = Mentve (gépeljen a cseréhez)
+locations-s3-secrets = A kulcsok és a fejlécek a szerver beállításai között tárolódnak, és többé nem jelennek meg.
+locations-s3-secrets-desktop = A kulcsok és a fejlécek ennek a számítógépnek a jelszótárolójában tárolódnak, és többé nem jelennek meg.
+locations-s3-saved = S3-tárhely mentve
+locations-s3-save-failed = Nem sikerült menteni az S3-tárhelyet
 locations-add-more = Hely hozzáadása…
 
 ## Problémák panel

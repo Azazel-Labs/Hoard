@@ -68,6 +68,9 @@ error-wrong-setup-code = 這不是在 HOARD_SETUP_CODE 中提供給伺服器的�
 error-wrong-password = 名稱與密碼不符
 error-folder-missing = { $path } 不存在（磁碟沒有掛載？）
 error-s3-path = S3 位置的格式為 s3://bucket
+error-s3-address = S3 網址必須以 http:// 或 https:// 開頭
+error-s3-header = 額外的 S3 標頭格式應為 Name=value，而「{ $header }」不是
+error-keychain = 無法存放到系統鑰匙圈：{ $reason }
 error-not-built = 此 Hoard 建置時未包含 { $feature }
 error-openai-auth-unreachable = 無法連線到 auth.openai.com
 error-openai-unexpected = OpenAI 傳回了非預期的回應
@@ -790,7 +793,10 @@ locations-folder = 伺服器上的資料夾
 locations-folder-desktop = 資料夾
 locations-folder-placeholder = 存放素材包的資料夾
 locations-folder-hint-managed = 如果資料夾不存在，Hoard 會建立它。在 Docker 中，這是你掛載到容器內的資料夾。
+locations-folder-hint-managed-desktop = 如果資料夾不存在，Hoard 會建立它。
 locations-folder-hint-watched = 在 Docker 中，請先將資料夾掛載到容器內（唯讀也可以），然後在這裡選擇它。
+locations-folder-hint-watched-desktop = Hoard 只會讀取這個資料夾，不會變更其中的任何內容。
+locations-folder-hint-cloud = 也可以使用由 Dropbox、Google Drive、OneDrive 或 iCloud Drive 同步的資料夾；S3 儲存空間中的儲存貯體則可使用 s3://bucket-name。
 locations-name = 名稱
 locations-name-placeholder-managed = 素材庫
 locations-name-placeholder-watched = 我的素材包
@@ -858,6 +864,20 @@ locations-rebalance = 移動已儲存的檔案以符合設定
 locations-rebalance-hint = 變更位置接收的類型後：已儲存的檔案會移到其類型現在對應的位置。
 locations-add-title = 新增位置
 locations-add-hint = 用來存放某些類型檔案的另一個磁碟，或是你現有的素材包資料夾。
+locations-s3-title = S3 儲存空間
+locations-s3-hint = s3://bucket-name 位置是這個服務中的儲存貯體：AWS，或任何相容 S3 的服務（Backblaze B2、Cloudflare R2、Wasabi、MinIO、NAS 上的 Garage）。
+locations-s3-endpoint = 網址
+locations-s3-endpoint-placeholder = AWS 請留空；例如 https://s3.eu-central-003.backblazeb2.com
+locations-s3-region = 區域
+locations-s3-access-key = 存取金鑰 ID
+locations-s3-secret-key = 私密存取金鑰
+locations-s3-headers = 額外標頭
+locations-s3-headers-placeholder = Name=value，每行一個（例如用於 Cloudflare Access）
+locations-s3-kept = 已儲存（輸入以取代）
+locations-s3-secrets = 金鑰與標頭會隨伺服器設定一起儲存，且不會再顯示。
+locations-s3-secrets-desktop = 金鑰與標頭會儲存在這台電腦的鑰匙圈中，且不會再顯示。
+locations-s3-saved = 已儲存 S3 儲存空間
+locations-s3-save-failed = 無法儲存 S3 儲存空間
 locations-add-more = 新增位置…
 
 ## 問題面板

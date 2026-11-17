@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "6b1cad733e7c2f6f9f760a91d1879b4b0d4363e36add843001d846f75104d47e"
+source = "b5640bb76c06fe83cd9cc9bd88a06dd911fb0251db9b0880ec94831503ff6fb0"
 translation = "350734632d3feaca2ecadf6f20c2a312781550f84d8209672d7a7dee846c8673"
 
 [messages.account-add]
@@ -3443,6 +3443,10 @@ translation = "Sertifikat atau kunci tidak dapat dipakai"
 source = "make another location the catch-all instead"
 translation = "jadikan lokasi lain sebagai lokasi penampung"
 
+[messages.error-keychain]
+source = "couldn't keep it in the system's keychain: { $reason }"
+translation = "tidak dapat menyimpannya di keychain sistem: { $reason }"
+
 [messages.error-ldap-base-dn]
 source = "Say where people's entries are (the base DN)"
 translation = "Sebutkan tempat entri orang-orang berada (base DN)"
@@ -3870,6 +3874,14 @@ translation = "ext harus ekstensi berkas yang pendek"
 [messages.error-role]
 source = "A role is view, edit or admin"
 translation = "Peran berupa view, edit atau admin"
+
+[messages.error-s3-address]
+source = "the S3 address must start with http:// or https://"
+translation = "alamat S3 harus diawali http:// atau https://"
+
+[messages.error-s3-header]
+source = """an extra S3 header looks like Name=value, and "{ $header }" isn't one"""
+translation = "header S3 tambahan berbentuk Name=value, dan “{ $header }” tidak berbentuk begitu"
 
 [messages.error-s3-path]
 source = "an S3 location looks like s3://bucket"
@@ -5230,13 +5242,25 @@ translation = "Folder di server"
 source = "Folder"
 translation = "Folder"
 
+[messages.locations-folder-hint-cloud]
+source = "A folder that Dropbox, Google Drive, OneDrive or iCloud Drive keeps in sync works too, and so does s3://bucket-name for a bucket in S3 storage."
+translation = "Folder yang disinkronkan oleh Dropbox, Google Drive, OneDrive, atau iCloud Drive juga bisa, begitu pula s3://bucket-name untuk bucket di penyimpanan S3."
+
 [messages.locations-folder-hint-managed]
 source = "Hoard creates it if it isn't there. In Docker, this is a folder you've mounted into the container."
 translation = "Hoard membuatnya jika belum ada. Di Docker, ini adalah folder yang sudah Anda pasang ke dalam container."
 
+[messages.locations-folder-hint-managed-desktop]
+source = "Hoard creates it if it isn't there."
+translation = "Hoard membuatnya jika belum ada."
+
 [messages.locations-folder-hint-watched]
 source = "In Docker, mount the folder into the container first (read-only is fine), then pick it here."
 translation = "Di Docker, pasang dulu folder ke dalam container (hanya-baca tidak masalah), lalu pilih di sini."
+
+[messages.locations-folder-hint-watched-desktop]
+source = "Hoard only reads it: nothing in it is changed."
+translation = "Hoard hanya membacanya: tidak ada isinya yang diubah."
 
 [messages.locations-folder-placeholder]
 source = "The folder your packs are in"
@@ -5361,6 +5385,62 @@ translation = "Hapus { $name }?"
 [messages.locations-removed]
 source = "Removed { $name }"
 translation = "{ $name } dihapus"
+
+[messages.locations-s3-access-key]
+source = "Access key ID"
+translation = "ID kunci akses"
+
+[messages.locations-s3-endpoint]
+source = "Address"
+translation = "Alamat"
+
+[messages.locations-s3-endpoint-placeholder]
+source = "Empty for AWS; e.g. https://s3.eu-central-003.backblazeb2.com"
+translation = "Kosongkan untuk AWS; mis. https://s3.eu-central-003.backblazeb2.com"
+
+[messages.locations-s3-headers]
+source = "Extra headers"
+translation = "Header tambahan"
+
+[messages.locations-s3-headers-placeholder]
+source = "Name=value, one a line (for Cloudflare Access, say)"
+translation = "Name=value, satu per baris (misalnya untuk Cloudflare Access)"
+
+[messages.locations-s3-hint]
+source = "A location at s3://bucket-name is a bucket in this service: AWS, or any S3-compatible one (Backblaze B2, Cloudflare R2, Wasabi, MinIO, Garage on a NAS)."
+translation = "Lokasi s3://bucket-name adalah bucket di layanan ini: AWS, atau layanan apa pun yang kompatibel dengan S3 (Backblaze B2, Cloudflare R2, Wasabi, MinIO, Garage di NAS)."
+
+[messages.locations-s3-kept]
+source = "Saved (type to replace)"
+translation = "Tersimpan (ketik untuk mengganti)"
+
+[messages.locations-s3-region]
+source = "Region"
+translation = "Wilayah"
+
+[messages.locations-s3-save-failed]
+source = "Couldn't save S3 storage"
+translation = "Tidak dapat menyimpan pengaturan penyimpanan S3"
+
+[messages.locations-s3-saved]
+source = "S3 storage saved"
+translation = "Pengaturan penyimpanan S3 tersimpan"
+
+[messages.locations-s3-secret-key]
+source = "Secret access key"
+translation = "Kunci akses rahasia"
+
+[messages.locations-s3-secrets]
+source = "The keys and headers are kept with the server's settings, and never shown again."
+translation = "Kunci dan header disimpan bersama pengaturan server, dan tidak pernah ditampilkan lagi."
+
+[messages.locations-s3-secrets-desktop]
+source = "The keys and headers are kept in this computer's keychain, and never shown again."
+translation = "Kunci dan header disimpan di keychain komputer ini, dan tidak pernah ditampilkan lagi."
+
+[messages.locations-s3-title]
+source = "S3 storage"
+translation = "Penyimpanan S3"
 
 [messages.locations-save]
 source = "Save"

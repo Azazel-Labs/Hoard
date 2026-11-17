@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "6b1cad733e7c2f6f9f760a91d1879b4b0d4363e36add843001d846f75104d47e"
+source = "b5640bb76c06fe83cd9cc9bd88a06dd911fb0251db9b0880ec94831503ff6fb0"
 translation = "bebd6e0323837a7f37a315e04ec9fc5dd57df26e650774013cb270eed8cfb850"
 
 [messages.account-add]
@@ -3586,6 +3586,10 @@ translation = "Certificatul sau cheia nu pot fi folosite"
 source = "make another location the catch-all instead"
 translation = "faceți în schimb altă locație implicită"
 
+[messages.error-keychain]
+source = "couldn't keep it in the system's keychain: { $reason }"
+translation = "nu a putut fi păstrat în depozitul de chei al sistemului: { $reason }"
+
 [messages.error-ldap-base-dn]
 source = "Say where people's entries are (the base DN)"
 translation = "Spuneți unde se află intrările persoanelor (base DN)"
@@ -4018,6 +4022,14 @@ translation = "ext trebuie să fie o extensie scurtă de fișier"
 [messages.error-role]
 source = "A role is view, edit or admin"
 translation = "Un rol este view, edit sau admin"
+
+[messages.error-s3-address]
+source = "the S3 address must start with http:// or https://"
+translation = "adresa S3 trebuie să înceapă cu http:// sau https://"
+
+[messages.error-s3-header]
+source = """an extra S3 header looks like Name=value, and "{ $header }" isn't one"""
+translation = "un antet S3 suplimentar arată așa: Name=value, iar „{ $header }” nu este unul"
 
 [messages.error-s3-path]
 source = "an S3 location looks like s3://bucket"
@@ -5423,13 +5435,25 @@ translation = "Dosar pe server"
 source = "Folder"
 translation = "Dosar"
 
+[messages.locations-folder-hint-cloud]
+source = "A folder that Dropbox, Google Drive, OneDrive or iCloud Drive keeps in sync works too, and so does s3://bucket-name for a bucket in S3 storage."
+translation = "Merge și un dosar sincronizat de Dropbox, Google Drive, OneDrive sau iCloud Drive, la fel și s3://bucket-name pentru un bucket din stocarea S3."
+
 [messages.locations-folder-hint-managed]
 source = "Hoard creates it if it isn't there. In Docker, this is a folder you've mounted into the container."
 translation = "Hoard îl creează dacă nu există. În Docker, acesta este un dosar pe care l-ați montat în container."
 
+[messages.locations-folder-hint-managed-desktop]
+source = "Hoard creates it if it isn't there."
+translation = "Hoard îl creează dacă nu există."
+
 [messages.locations-folder-hint-watched]
 source = "In Docker, mount the folder into the container first (read-only is fine), then pick it here."
 translation = "În Docker, montați mai întâi dosarul în container (doar citire este suficient), apoi alegeți-l aici."
+
+[messages.locations-folder-hint-watched-desktop]
+source = "Hoard only reads it: nothing in it is changed."
+translation = "Hoard doar îl citește: nimic din el nu este modificat."
 
 [messages.locations-folder-placeholder]
 source = "The folder your packs are in"
@@ -5559,6 +5583,62 @@ translation = "Eliminați { $name }?"
 [messages.locations-removed]
 source = "Removed { $name }"
 translation = "{ $name } a fost eliminată"
+
+[messages.locations-s3-access-key]
+source = "Access key ID"
+translation = "ID cheie de acces"
+
+[messages.locations-s3-endpoint]
+source = "Address"
+translation = "Adresă"
+
+[messages.locations-s3-endpoint-placeholder]
+source = "Empty for AWS; e.g. https://s3.eu-central-003.backblazeb2.com"
+translation = "Goală pentru AWS; de ex. https://s3.eu-central-003.backblazeb2.com"
+
+[messages.locations-s3-headers]
+source = "Extra headers"
+translation = "Anteturi suplimentare"
+
+[messages.locations-s3-headers-placeholder]
+source = "Name=value, one a line (for Cloudflare Access, say)"
+translation = "Name=value, câte unul pe rând (de exemplu pentru Cloudflare Access)"
+
+[messages.locations-s3-hint]
+source = "A location at s3://bucket-name is a bucket in this service: AWS, or any S3-compatible one (Backblaze B2, Cloudflare R2, Wasabi, MinIO, Garage on a NAS)."
+translation = "O locație s3://bucket-name este un bucket din acest serviciu: AWS sau orice serviciu compatibil S3 (Backblaze B2, Cloudflare R2, Wasabi, MinIO, Garage pe un NAS)."
+
+[messages.locations-s3-kept]
+source = "Saved (type to replace)"
+translation = "Salvat (tastați pentru a înlocui)"
+
+[messages.locations-s3-region]
+source = "Region"
+translation = "Regiune"
+
+[messages.locations-s3-save-failed]
+source = "Couldn't save S3 storage"
+translation = "Stocarea S3 nu a putut fi salvată"
+
+[messages.locations-s3-saved]
+source = "S3 storage saved"
+translation = "Stocarea S3 a fost salvată"
+
+[messages.locations-s3-secret-key]
+source = "Secret access key"
+translation = "Cheie de acces secretă"
+
+[messages.locations-s3-secrets]
+source = "The keys and headers are kept with the server's settings, and never shown again."
+translation = "Cheile și anteturile sunt păstrate în setările serverului și nu mai sunt afișate niciodată."
+
+[messages.locations-s3-secrets-desktop]
+source = "The keys and headers are kept in this computer's keychain, and never shown again."
+translation = "Cheile și anteturile sunt păstrate în depozitul de chei al acestui computer și nu mai sunt afișate niciodată."
+
+[messages.locations-s3-title]
+source = "S3 storage"
+translation = "Stocare S3"
 
 [messages.locations-save]
 source = "Save"

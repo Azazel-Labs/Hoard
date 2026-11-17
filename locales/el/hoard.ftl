@@ -68,6 +68,9 @@ error-wrong-setup-code = Αυτός δεν είναι ο κωδικός ρύθμ
 error-wrong-password = Το όνομα και ο κωδικός πρόσβασης δεν ταιριάζουν
 error-folder-missing = Το { $path } δεν υπάρχει (μήπως ένας δίσκος δεν είναι προσαρτημένος;)
 error-s3-path = μια τοποθεσία S3 μοιάζει με s3://bucket
+error-s3-address = η διεύθυνση S3 πρέπει να ξεκινά με http:// ή https://
+error-s3-header = μια επιπλέον κεφαλίδα S3 έχει τη μορφή Name=value, και το «{ $header }» δεν είναι τέτοια
+error-keychain = δεν ήταν δυνατή η φύλαξή του στην κλειδοθήκη του συστήματος: { $reason }
 error-not-built = αυτό το αντίγραφο του Hoard δημιουργήθηκε χωρίς { $feature }
 error-openai-auth-unreachable = δεν ήταν δυνατή η πρόσβαση στο auth.openai.com
 error-openai-unexpected = απρόσμενη απάντηση από το OpenAI
@@ -843,7 +846,10 @@ locations-folder = Φάκελος στον διακομιστή
 locations-folder-desktop = Φάκελος
 locations-folder-placeholder = Ο φάκελος όπου βρίσκονται τα πακέτα σας
 locations-folder-hint-managed = Το Hoard τον δημιουργεί αν δεν υπάρχει. Στο Docker, είναι ένας φάκελος που έχετε προσαρτήσει στο container.
+locations-folder-hint-managed-desktop = Το Hoard τον δημιουργεί αν δεν υπάρχει.
 locations-folder-hint-watched = Στο Docker, προσαρτήστε πρώτα τον φάκελο στο container (αρκεί μόνο για ανάγνωση) και μετά επιλέξτε τον εδώ.
+locations-folder-hint-watched-desktop = Το Hoard μόνο τον διαβάζει: τίποτα μέσα του δεν αλλάζει.
+locations-folder-hint-cloud = Λειτουργεί επίσης ένας φάκελος που συγχρονίζει το Dropbox, το Google Drive, το OneDrive ή το iCloud Drive, όπως και το s3://bucket-name για ένα bucket στον χώρο αποθήκευσης S3.
 locations-name = Όνομα
 locations-name-placeholder-managed = Βιβλιοθήκη
 locations-name-placeholder-watched = Τα πακέτα μου
@@ -919,6 +925,20 @@ locations-rebalance = Μετακίνηση αποθηκευμένων αρχεί
 locations-rebalance-hint = Αφού αλλάξετε τι δέχεται μια τοποθεσία: τα ήδη αποθηκευμένα αρχεία μετακινούνται στην τοποθεσία όπου πηγαίνει πλέον ο τύπος τους.
 locations-add-title = Προσθήκη τοποθεσίας
 locations-add-hint = Ένας άλλος δίσκος για κάποιους τύπους αρχείων ή ένας φάκελος με πακέτα που ήδη έχετε.
+locations-s3-title = Χώρος αποθήκευσης S3
+locations-s3-hint = Μια τοποθεσία s3://bucket-name είναι ένα bucket σε αυτή την υπηρεσία: το AWS ή οποιαδήποτε συμβατή με S3 (Backblaze B2, Cloudflare R2, Wasabi, MinIO, Garage σε NAS).
+locations-s3-endpoint = Διεύθυνση
+locations-s3-endpoint-placeholder = Κενό για το AWS· π.χ. https://s3.eu-central-003.backblazeb2.com
+locations-s3-region = Περιοχή
+locations-s3-access-key = Αναγνωριστικό κλειδιού πρόσβασης
+locations-s3-secret-key = Μυστικό κλειδί πρόσβασης
+locations-s3-headers = Επιπλέον κεφαλίδες
+locations-s3-headers-placeholder = Name=value, μία ανά γραμμή (π.χ. για το Cloudflare Access)
+locations-s3-kept = Αποθηκεύτηκε (πληκτρολογήστε για αντικατάσταση)
+locations-s3-secrets = Τα κλειδιά και οι κεφαλίδες φυλάσσονται μαζί με τις ρυθμίσεις του διακομιστή και δεν εμφανίζονται ποτέ ξανά.
+locations-s3-secrets-desktop = Τα κλειδιά και οι κεφαλίδες φυλάσσονται στην κλειδοθήκη αυτού του υπολογιστή και δεν εμφανίζονται ποτέ ξανά.
+locations-s3-saved = Οι ρυθμίσεις S3 αποθηκεύτηκαν
+locations-s3-save-failed = Δεν ήταν δυνατή η αποθήκευση των ρυθμίσεων S3
 locations-add-more = Προσθήκη τοποθεσίας…
 
 ## IssuesPanel.vue

@@ -2190,6 +2190,18 @@ fn settings_json_sync(state: &AppState) -> Value {
             "url": now.update_hook_url.as_deref().unwrap_or(""),
             "has_auth": now.update_hook_auth.is_some(),
         },
+        // How `s3://` locations are reached. The secret key and the headers are never sent back.
+        "s3": {
+            "endpoint": now.s3.endpoint.as_deref().unwrap_or(""),
+            "region": now.s3.region,
+            "access_key": now.s3.access_key.as_deref().unwrap_or(""),
+            "has_secret_key": now.s3.secret_key.is_some(),
+            "has_headers": !now.s3.headers.is_empty(),
+            "saved": saved.s3_endpoint.is_some() || saved.s3_region.is_some() || saved.s3_access_key.is_some()
+                || saved.s3_secret_key.is_some()
+                || saved.s3_headers.is_some(),
+            "built": cfg!(feature = "s3"),
+        },
         // Server options that used to need a restart. `default` is what the flags (or env) give.
         "options": {
             "workers": option(now.workers, cfg.workers, saved.workers.is_some()),
@@ -2361,6 +2373,11 @@ async fn put_settings(State(state): State<AppState>, Json(patch): Json<Value>) -
         crate::store_lookup::start(&state).await;
     }
     crate::music::configure(after.soundfont.clone());
+    if after.s3 != before.s3
+        && let Err(e) = state.blobs.set_s3(after.s3.clone()).await
+    {
+        tracing::warn!(error = %format!("{e:#}"), "couldn't open the library locations again");
+    }
     if after.workers > before.workers {
         state.wake.notify_waiters();
     }

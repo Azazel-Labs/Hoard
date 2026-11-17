@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "6b1cad733e7c2f6f9f760a91d1879b4b0d4363e36add843001d846f75104d47e"
+source = "b5640bb76c06fe83cd9cc9bd88a06dd911fb0251db9b0880ec94831503ff6fb0"
 translation = "2527e9f56ab5c8df494194a991415b39cb739087c123b76b087586ebd500c880"
 
 [messages.account-add]
@@ -3561,6 +3561,10 @@ translation = "Certifikát nebo klíč nelze použít"
 source = "make another location the catch-all instead"
 translation = "místo toho udělejte záchytným umístěním jiné umístění"
 
+[messages.error-keychain]
+source = "couldn't keep it in the system's keychain: { $reason }"
+translation = "nepodařilo se to uložit do systémové klíčenky: { $reason }"
+
 [messages.error-ldap-base-dn]
 source = "Say where people's entries are (the base DN)"
 translation = "Uveďte, kde jsou záznamy lidí (base DN)"
@@ -3993,6 +3997,14 @@ translation = "ext musí být krátká přípona souboru"
 [messages.error-role]
 source = "A role is view, edit or admin"
 translation = "Role je view, edit nebo admin"
+
+[messages.error-s3-address]
+source = "the S3 address must start with http:// or https://"
+translation = "adresa S3 musí začínat http:// nebo https://"
+
+[messages.error-s3-header]
+source = """an extra S3 header looks like Name=value, and "{ $header }" isn't one"""
+translation = "další hlavička S3 vypadá jako Name=value a „{ $header }“ taková není"
 
 [messages.error-s3-path]
 source = "an S3 location looks like s3://bucket"
@@ -5412,13 +5424,25 @@ translation = "Složka na serveru"
 source = "Folder"
 translation = "Složka"
 
+[messages.locations-folder-hint-cloud]
+source = "A folder that Dropbox, Google Drive, OneDrive or iCloud Drive keeps in sync works too, and so does s3://bucket-name for a bucket in S3 storage."
+translation = "Funguje i složka, kterou synchronizuje Dropbox, Google Drive, OneDrive nebo iCloud Drive, a také s3://bucket-name pro bucket v úložišti S3."
+
 [messages.locations-folder-hint-managed]
 source = "Hoard creates it if it isn't there. In Docker, this is a folder you've mounted into the container."
 translation = "Hoard ji vytvoří, pokud neexistuje. V Dockeru je to složka, kterou jste připojili do kontejneru."
 
+[messages.locations-folder-hint-managed-desktop]
+source = "Hoard creates it if it isn't there."
+translation = "Hoard ji vytvoří, pokud neexistuje."
+
 [messages.locations-folder-hint-watched]
 source = "In Docker, mount the folder into the container first (read-only is fine), then pick it here."
 translation = "V Dockeru nejprve připojte složku do kontejneru (stačí jen pro čtení) a pak ji vyberte tady."
+
+[messages.locations-folder-hint-watched-desktop]
+source = "Hoard only reads it: nothing in it is changed."
+translation = "Hoard ji jen čte: nic v ní se nemění."
 
 [messages.locations-folder-placeholder]
 source = "The folder your packs are in"
@@ -5548,6 +5572,62 @@ translation = "Odebrat { $name }?"
 [messages.locations-removed]
 source = "Removed { $name }"
 translation = "Odebráno: { $name }"
+
+[messages.locations-s3-access-key]
+source = "Access key ID"
+translation = "ID přístupového klíče"
+
+[messages.locations-s3-endpoint]
+source = "Address"
+translation = "Adresa"
+
+[messages.locations-s3-endpoint-placeholder]
+source = "Empty for AWS; e.g. https://s3.eu-central-003.backblazeb2.com"
+translation = "Pro AWS prázdné; např. https://s3.eu-central-003.backblazeb2.com"
+
+[messages.locations-s3-headers]
+source = "Extra headers"
+translation = "Další hlavičky"
+
+[messages.locations-s3-headers-placeholder]
+source = "Name=value, one a line (for Cloudflare Access, say)"
+translation = "Name=value, jedna na řádek (třeba pro Cloudflare Access)"
+
+[messages.locations-s3-hint]
+source = "A location at s3://bucket-name is a bucket in this service: AWS, or any S3-compatible one (Backblaze B2, Cloudflare R2, Wasabi, MinIO, Garage on a NAS)."
+translation = "Umístění s3://bucket-name je bucket v této službě: AWS nebo jakékoli službě kompatibilní s S3 (Backblaze B2, Cloudflare R2, Wasabi, MinIO, Garage na NAS)."
+
+[messages.locations-s3-kept]
+source = "Saved (type to replace)"
+translation = "Uloženo (psaním nahradíte)"
+
+[messages.locations-s3-region]
+source = "Region"
+translation = "Region"
+
+[messages.locations-s3-save-failed]
+source = "Couldn't save S3 storage"
+translation = "Úložiště S3 se nepodařilo uložit"
+
+[messages.locations-s3-saved]
+source = "S3 storage saved"
+translation = "Úložiště S3 uloženo"
+
+[messages.locations-s3-secret-key]
+source = "Secret access key"
+translation = "Tajný přístupový klíč"
+
+[messages.locations-s3-secrets]
+source = "The keys and headers are kept with the server's settings, and never shown again."
+translation = "Klíče a hlavičky se ukládají s nastavením serveru a už se nikdy nezobrazí."
+
+[messages.locations-s3-secrets-desktop]
+source = "The keys and headers are kept in this computer's keychain, and never shown again."
+translation = "Klíče a hlavičky se ukládají do klíčenky tohoto počítače a už se nikdy nezobrazí."
+
+[messages.locations-s3-title]
+source = "S3 storage"
+translation = "Úložiště S3"
 
 [messages.locations-save]
 source = "Save"

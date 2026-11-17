@@ -68,6 +68,9 @@ error-wrong-setup-code = 这不是通过 HOARD_SETUP_CODE 提供给服务器的�
 error-wrong-password = 用户名和密码不匹配
 error-folder-missing = { $path } 不存在（磁盘未挂载？）
 error-s3-path = S3 位置的格式类似 s3://bucket
+error-s3-address = S3 地址必须以 http:// 或 https:// 开头
+error-s3-header = 额外的 S3 标头格式应为 Name=value，而“{ $header }”不是
+error-keychain = 无法保存到系统钥匙串：{ $reason }
 error-not-built = 此 Hoard 构建时未包含 { $feature }
 error-openai-auth-unreachable = 无法连接到 auth.openai.com
 error-openai-unexpected = OpenAI 返回了意外的响应
@@ -790,7 +793,10 @@ locations-folder = 服务器上的文件夹
 locations-folder-desktop = 文件夹
 locations-folder-placeholder = 资源包所在的文件夹
 locations-folder-hint-managed = 如果文件夹不存在，Hoard 会创建它。在 Docker 中，这是你挂载到容器中的文件夹。
+locations-folder-hint-managed-desktop = 如果文件夹不存在，Hoard 会创建它。
 locations-folder-hint-watched = 在 Docker 中，请先将文件夹挂载到容器中（只读即可），然后在这里选择它。
+locations-folder-hint-watched-desktop = Hoard 只读取该文件夹，不会更改其中的任何内容。
+locations-folder-hint-cloud = 也可以使用由 Dropbox、Google Drive、OneDrive 或 iCloud Drive 同步的文件夹；S3 存储中的存储桶则可使用 s3://bucket-name。
 locations-name = 名称
 locations-name-placeholder-managed = 资源库
 locations-name-placeholder-watched = 我的资源包
@@ -858,6 +864,20 @@ locations-rebalance = 移动已存储的文件以匹配
 locations-rebalance-hint = 更改位置接收的类型后使用：已存储的文件会移到其类型现在对应的位置。
 locations-add-title = 添加位置
 locations-add-hint = 用于存放某些类型文件的另一块磁盘，或你已有的资源包文件夹。
+locations-s3-title = S3 存储
+locations-s3-hint = s3://bucket-name 位置是此服务中的一个存储桶：AWS，或任何兼容 S3 的服务（Backblaze B2、Cloudflare R2、Wasabi、MinIO、NAS 上的 Garage）。
+locations-s3-endpoint = 地址
+locations-s3-endpoint-placeholder = AWS 留空；例如 https://s3.eu-central-003.backblazeb2.com
+locations-s3-region = 区域
+locations-s3-access-key = 访问密钥 ID
+locations-s3-secret-key = 秘密访问密钥
+locations-s3-headers = 额外标头
+locations-s3-headers-placeholder = Name=value，每行一个（例如用于 Cloudflare Access）
+locations-s3-kept = 已保存（输入以替换）
+locations-s3-secrets = 密钥和标头会随服务器设置一起保存，且不会再显示。
+locations-s3-secrets-desktop = 密钥和标头保存在这台电脑的钥匙串中，且不会再显示。
+locations-s3-saved = 已保存 S3 存储
+locations-s3-save-failed = 无法保存 S3 存储
 locations-add-more = 添加位置…
 
 ## IssuesPanel.vue

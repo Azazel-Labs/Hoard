@@ -68,6 +68,9 @@ error-wrong-setup-code = Dit is nie die opstelkode wat in HOARD_SETUP_CODE aan d
 error-wrong-password = Daardie naam en wagwoord pas nie bymekaar nie
 error-folder-missing = { $path } is nie daar nie ('n skyf wat nie gekoppel is nie?)
 error-s3-path = 'n S3-ligging lyk soos s3://bucket
+error-s3-address = die S3-adres moet met http:// of https:// begin
+error-s3-header = 'n ekstra S3-kopreël lyk soos Name=value, en “{ $header }” is nie een nie
+error-keychain = kon dit nie in die stelsel se sleutelring bewaar nie: { $reason }
 error-not-built = hierdie kopie van Hoard is sonder { $feature } gebou
 error-openai-auth-unreachable = kon nie auth.openai.com bereik nie
 error-openai-unexpected = onverwagte antwoord van OpenAI
@@ -823,7 +826,10 @@ locations-folder = Vouer op die bediener
 locations-folder-desktop = Vouer
 locations-folder-placeholder = Die vouer waarin jou pakke is
 locations-folder-hint-managed = Hoard skep dit as dit nie daar is nie. In Docker is dit 'n vouer wat jy in die houer gekoppel het.
+locations-folder-hint-managed-desktop = Hoard skep dit as dit nie daar is nie.
 locations-folder-hint-watched = In Docker, koppel eers die vouer in die houer (net-lees is goed), en kies dit dan hier.
+locations-folder-hint-watched-desktop = Hoard lees dit net: niks daarin word verander nie.
+locations-folder-hint-cloud = 'n Vouer wat Dropbox, Google Drive, OneDrive of iCloud Drive gesinchroniseer hou, werk ook, en so ook s3://bucket-name vir 'n bucket in S3-berging.
 locations-name = Naam
 locations-name-placeholder-managed = Biblioteek
 locations-name-placeholder-watched = My pakke
@@ -899,6 +905,20 @@ locations-rebalance = Skuif gestoorde lêers om te pas
 locations-rebalance-hint = Nadat jy verander het wat 'n ligging neem: lêers wat reeds gestoor is, skuif na die ligging waarheen hul soort nou gaan.
 locations-add-title = Voeg 'n ligging by
 locations-add-hint = Nog 'n skyf vir sommige soorte lêers, of 'n vouer met pakke wat jy reeds het.
+locations-s3-title = S3-berging
+locations-s3-hint = 'n Ligging by s3://bucket-name is 'n bucket in hierdie diens: AWS, of enige S3-versoenbare een (Backblaze B2, Cloudflare R2, Wasabi, MinIO, Garage op 'n NAS).
+locations-s3-endpoint = Adres
+locations-s3-endpoint-placeholder = Leeg vir AWS; bv. https://s3.eu-central-003.backblazeb2.com
+locations-s3-region = Streek
+locations-s3-access-key = Toegangsleutel-ID
+locations-s3-secret-key = Geheime toegangsleutel
+locations-s3-headers = Ekstra kopreëls
+locations-s3-headers-placeholder = Name=value, een per reël (vir Cloudflare Access, byvoorbeeld)
+locations-s3-kept = Gestoor (tik om te vervang)
+locations-s3-secrets = Die sleutels en kopreëls word saam met die bediener se instellings bewaar en nooit weer gewys nie.
+locations-s3-secrets-desktop = Die sleutels en kopreëls word in hierdie rekenaar se sleutelring bewaar en nooit weer gewys nie.
+locations-s3-saved = S3-berging gestoor
+locations-s3-save-failed = Kon nie S3-berging stoor nie
 locations-add-more = Voeg 'n ligging by…
 
 ## IssuesPanel.vue

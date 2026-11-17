@@ -76,6 +76,11 @@ error-wrong-setup-code = That isn't the setup code given to the server in HOARD_
 error-wrong-password = That name and password don't match
 error-folder-missing = { $path } isn't there (a disk that isn't mounted?)
 error-s3-path = an S3 location looks like s3://bucket
+error-s3-address = the S3 address must start with http:// or https://
+# { $header } is the name of an extra S3 header the person typed, or what they typed before "=".
+error-s3-header = an extra S3 header looks like Name=value, and "{ $header }" isn't one
+# Saving a password or key in the desktop app, which keeps them in the system's keychain (Windows Credential Manager, the macOS keychain, the Secret Service on Linux).
+error-keychain = couldn't keep it in the system's keychain: { $reason }
 error-not-built = this copy of Hoard was built without { $feature }
 error-openai-auth-unreachable = couldn't reach auth.openai.com
 error-openai-unexpected = unexpected answer from OpenAI
@@ -928,7 +933,10 @@ locations-folder = Folder on the server
 locations-folder-desktop = Folder
 locations-folder-placeholder = The folder your packs are in
 locations-folder-hint-managed = Hoard creates it if it isn't there. In Docker, this is a folder you've mounted into the container.
+locations-folder-hint-managed-desktop = Hoard creates it if it isn't there.
 locations-folder-hint-watched = In Docker, mount the folder into the container first (read-only is fine), then pick it here.
+locations-folder-hint-watched-desktop = Hoard only reads it: nothing in it is changed.
+locations-folder-hint-cloud = A folder that Dropbox, Google Drive, OneDrive or iCloud Drive keeps in sync works too, and so does s3://bucket-name for a bucket in S3 storage.
 locations-name = Name
 # Example names for a new location, shown grayed out in its name field.
 locations-name-placeholder-managed = Library
@@ -1010,6 +1018,21 @@ locations-rebalance = Move stored files to match
 locations-rebalance-hint = After changing what a location takes: files already stored move to the location their kind goes to now.
 locations-add-title = Add a location
 locations-add-hint = Another disk for some kinds of files, or a folder of packs you already have.
+locations-s3-title = S3 storage
+locations-s3-hint = A location at s3://bucket-name is a bucket in this service: AWS, or any S3-compatible one (Backblaze B2, Cloudflare R2, Wasabi, MinIO, Garage on a NAS).
+locations-s3-endpoint = Address
+locations-s3-endpoint-placeholder = Empty for AWS; e.g. https://s3.eu-central-003.backblazeb2.com
+locations-s3-region = Region
+locations-s3-access-key = Access key ID
+locations-s3-secret-key = Secret access key
+locations-s3-headers = Extra headers
+locations-s3-headers-placeholder = Name=value, one a line (for Cloudflare Access, say)
+# Placeholder of the secret key and headers fields once they are saved.
+locations-s3-kept = Saved (type to replace)
+locations-s3-secrets = The keys and headers are kept with the server's settings, and never shown again.
+locations-s3-secrets-desktop = The keys and headers are kept in this computer's keychain, and never shown again.
+locations-s3-saved = S3 storage saved
+locations-s3-save-failed = Couldn't save S3 storage
 locations-add-more = Add a location…
 
 ## IssuesPanel.vue

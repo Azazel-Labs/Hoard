@@ -68,6 +68,9 @@ error-wrong-setup-code = HOARD_SETUP_CODE でサーバーに指定されたセ�
 error-wrong-password = 名前とパスワードが一致しません
 error-folder-missing = { $path } がありません（ディスクがマウントされていない可能性があります）
 error-s3-path = S3 の保存場所は s3://bucket の形式です
+error-s3-address = S3 のアドレスは http:// または https:// で始めてください
+error-s3-header = 追加の S3 ヘッダーは Name=value の形式ですが、「{ $header }」はそうなっていません
+error-keychain = システムのキーチェーンに保管できませんでした: { $reason }
 error-not-built = この Hoard は { $feature } なしでビルドされています
 error-openai-auth-unreachable = auth.openai.com に接続できませんでした
 error-openai-unexpected = OpenAI から予期しない応答がありました
@@ -787,7 +790,10 @@ locations-folder = サーバー上のフォルダー
 locations-folder-desktop = フォルダー
 locations-folder-placeholder = パックが入っているフォルダー
 locations-folder-hint-managed = フォルダーがなければ Hoard が作成します。Docker では、コンテナーにマウントしたフォルダーを指定します。
+locations-folder-hint-managed-desktop = フォルダーがなければ Hoard が作成します。
 locations-folder-hint-watched = Docker では、先にフォルダーをコンテナーにマウントしてから（読み取り専用で構いません）、ここで選んでください。
+locations-folder-hint-watched-desktop = Hoard は読み取るだけで、中のものは何も変更しません。
+locations-folder-hint-cloud = Dropbox、Google Drive、OneDrive、iCloud Drive が同期しているフォルダーも使えます。S3 ストレージのバケットなら s3://bucket-name も使えます。
 locations-name = 名前
 locations-name-placeholder-managed = ライブラリ
 locations-name-placeholder-watched = マイパック
@@ -855,6 +861,20 @@ locations-rebalance = 保存済みのファイルを合わせて移動
 locations-rebalance-hint = 保存場所が受け取る種類を変更した後に使います。保存済みのファイルが、その種類の新しい保存場所へ移動します。
 locations-add-title = 保存場所を追加
 locations-add-hint = 一部の種類のファイル用の別のディスク、または既存のパックのフォルダーです。
+locations-s3-title = S3 ストレージ
+locations-s3-hint = s3://bucket-name の保存場所は、このサービスのバケットです。AWS のほか、S3 互換のサービス（Backblaze B2、Cloudflare R2、Wasabi、MinIO、NAS 上の Garage）も使えます。
+locations-s3-endpoint = アドレス
+locations-s3-endpoint-placeholder = AWS なら空欄。例: https://s3.eu-central-003.backblazeb2.com
+locations-s3-region = リージョン
+locations-s3-access-key = アクセスキー ID
+locations-s3-secret-key = シークレットアクセスキー
+locations-s3-headers = 追加ヘッダー
+locations-s3-headers-placeholder = 1 行に 1 つ Name=value（Cloudflare Access 用など）
+locations-s3-kept = 保存済み（入力すると置き換え）
+locations-s3-secrets = キーとヘッダーはサーバーの設定と一緒に保管され、二度と表示されません。
+locations-s3-secrets-desktop = キーとヘッダーはこのコンピューターのキーチェーンに保管され、二度と表示されません。
+locations-s3-saved = S3 ストレージを保存しました
+locations-s3-save-failed = S3 ストレージを保存できませんでした
 locations-add-more = 保存場所を追加…
 
 ## IssuesPanel.vue

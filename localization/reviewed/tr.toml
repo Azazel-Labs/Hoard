@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "6b1cad733e7c2f6f9f760a91d1879b4b0d4363e36add843001d846f75104d47e"
+source = "b5640bb76c06fe83cd9cc9bd88a06dd911fb0251db9b0880ec94831503ff6fb0"
 translation = "a6a0b4ea85434114d93073c120e4cb6ca7177a7e996b41b17e25341ba33e0b75"
 
 [messages.account-add]
@@ -3453,6 +3453,10 @@ translation = "Sertifika ya da anahtar kullanılamıyor"
 source = "make another location the catch-all instead"
 translation = "bunun yerine başka bir konumu genel konum yapın"
 
+[messages.error-keychain]
+source = "couldn't keep it in the system's keychain: { $reason }"
+translation = "sistemin anahtar zincirinde saklanamadı: { $reason }"
+
 [messages.error-ldap-base-dn]
 source = "Say where people's entries are (the base DN)"
 translation = "Kişilerin kayıtlarının nerede olduğunu belirtin (temel DN)"
@@ -3880,6 +3884,14 @@ translation = "ext kısa bir dosya uzantısı olmalı"
 [messages.error-role]
 source = "A role is view, edit or admin"
 translation = "Rol view, edit ya da admin olur"
+
+[messages.error-s3-address]
+source = "the S3 address must start with http:// or https://"
+translation = "S3 adresi http:// veya https:// ile başlamalıdır"
+
+[messages.error-s3-header]
+source = """an extra S3 header looks like Name=value, and "{ $header }" isn't one"""
+translation = "ek bir S3 üst bilgisi Name=value biçimindedir ve “{ $header }” böyle değil"
 
 [messages.error-s3-path]
 source = "an S3 location looks like s3://bucket"
@@ -5240,13 +5252,25 @@ translation = "Sunucudaki klasör"
 source = "Folder"
 translation = "Klasör"
 
+[messages.locations-folder-hint-cloud]
+source = "A folder that Dropbox, Google Drive, OneDrive or iCloud Drive keeps in sync works too, and so does s3://bucket-name for a bucket in S3 storage."
+translation = "Dropbox, Google Drive, OneDrive ya da iCloud Drive’ın eşitlediği bir klasör de olur; S3 depolamadaki bir bucket için s3://bucket-name de."
+
 [messages.locations-folder-hint-managed]
 source = "Hoard creates it if it isn't there. In Docker, this is a folder you've mounted into the container."
 translation = "Yoksa Hoard onu oluşturur. Docker’da bu, kapsayıcıya bağladığınız bir klasördür."
 
+[messages.locations-folder-hint-managed-desktop]
+source = "Hoard creates it if it isn't there."
+translation = "Yoksa Hoard onu oluşturur."
+
 [messages.locations-folder-hint-watched]
 source = "In Docker, mount the folder into the container first (read-only is fine), then pick it here."
 translation = "Docker’da önce klasörü kapsayıcıya bağlayın (salt okunur olabilir), sonra burada seçin."
+
+[messages.locations-folder-hint-watched-desktop]
+source = "Hoard only reads it: nothing in it is changed."
+translation = "Hoard onu yalnızca okur: içindeki hiçbir şey değiştirilmez."
 
 [messages.locations-folder-placeholder]
 source = "The folder your packs are in"
@@ -5371,6 +5395,62 @@ translation = "{ $name } kaldırılsın mı?"
 [messages.locations-removed]
 source = "Removed { $name }"
 translation = "Kaldırıldı: { $name }"
+
+[messages.locations-s3-access-key]
+source = "Access key ID"
+translation = "Erişim anahtarı kimliği"
+
+[messages.locations-s3-endpoint]
+source = "Address"
+translation = "Adres"
+
+[messages.locations-s3-endpoint-placeholder]
+source = "Empty for AWS; e.g. https://s3.eu-central-003.backblazeb2.com"
+translation = "AWS için boş bırakın; örn. https://s3.eu-central-003.backblazeb2.com"
+
+[messages.locations-s3-headers]
+source = "Extra headers"
+translation = "Ek üst bilgiler"
+
+[messages.locations-s3-headers-placeholder]
+source = "Name=value, one a line (for Cloudflare Access, say)"
+translation = "Name=value, her satıra bir tane (örneğin Cloudflare Access için)"
+
+[messages.locations-s3-hint]
+source = "A location at s3://bucket-name is a bucket in this service: AWS, or any S3-compatible one (Backblaze B2, Cloudflare R2, Wasabi, MinIO, Garage on a NAS)."
+translation = "s3://bucket-name biçimindeki bir konum, bu hizmetteki bir bucket’tır: AWS ya da S3 uyumlu herhangi bir hizmet (Backblaze B2, Cloudflare R2, Wasabi, MinIO, NAS üzerinde Garage)."
+
+[messages.locations-s3-kept]
+source = "Saved (type to replace)"
+translation = "Kaydedildi (değiştirmek için yazın)"
+
+[messages.locations-s3-region]
+source = "Region"
+translation = "Bölge"
+
+[messages.locations-s3-save-failed]
+source = "Couldn't save S3 storage"
+translation = "S3 depolama kaydedilemedi"
+
+[messages.locations-s3-saved]
+source = "S3 storage saved"
+translation = "S3 depolama kaydedildi"
+
+[messages.locations-s3-secret-key]
+source = "Secret access key"
+translation = "Gizli erişim anahtarı"
+
+[messages.locations-s3-secrets]
+source = "The keys and headers are kept with the server's settings, and never shown again."
+translation = "Anahtarlar ve üst bilgiler sunucunun ayarlarıyla birlikte saklanır ve bir daha gösterilmez."
+
+[messages.locations-s3-secrets-desktop]
+source = "The keys and headers are kept in this computer's keychain, and never shown again."
+translation = "Anahtarlar ve üst bilgiler bu bilgisayarın anahtar zincirinde saklanır ve bir daha gösterilmez."
+
+[messages.locations-s3-title]
+source = "S3 storage"
+translation = "S3 depolama"
 
 [messages.locations-save]
 source = "Save"

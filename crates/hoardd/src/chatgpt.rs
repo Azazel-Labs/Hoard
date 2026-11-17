@@ -83,7 +83,13 @@ impl Account {
 fn load(c: &rusqlite::Connection) -> Result<Account> {
     let text: Option<String> =
         c.query_row("SELECT value FROM settings WHERE key = ?1", [SETTINGS_KEY], |r| r.get(0)).optional()?;
-    let mut account: Account = text.and_then(|t| serde_json::from_str(&t).ok()).unwrap_or_default();
+    let mut account: Account = text
+        .and_then(|t| serde_json::from_str::<Value>(&t).ok())
+        .and_then(|mut v| {
+            crate::secrets::open(&mut v, TOKENS);
+            serde_json::from_value(v).ok()
+        })
+        .unwrap_or_default();
     if account.host_id.is_empty() {
         account.host_id = format!("urn:uuid:{}", uuid::Uuid::new_v4());
         save(c, &account)?;
@@ -91,10 +97,15 @@ fn load(c: &rusqlite::Connection) -> Result<Account> {
     Ok(account)
 }
 
+/// The account's secrets: sealed in the desktop app (see [`crate::secrets`]).
+const TOKENS: &[&str] = &["id_token", "access_token", "refresh_token"];
+
 fn save(c: &rusqlite::Connection, account: &Account) -> Result<()> {
+    let mut value = serde_json::to_value(account)?;
+    crate::secrets::seal(&mut value, TOKENS)?;
     c.execute(
         "INSERT INTO settings (key, value) VALUES (?1, ?2) ON CONFLICT (key) DO UPDATE SET value = excluded.value",
-        [SETTINGS_KEY, &serde_json::to_string(account)?],
+        [SETTINGS_KEY, &value.to_string()],
     )?;
     Ok(())
 }

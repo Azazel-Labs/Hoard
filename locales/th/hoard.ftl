@@ -68,6 +68,9 @@ error-wrong-setup-code = นี่ไม่ใช่รหัสตั้งค�
 error-wrong-password = ชื่อและรหัสผ่านไม่ตรงกัน
 error-folder-missing = ไม่พบ { $path } (ดิสก์ที่ยังไม่ได้เมานต์หรือเปล่า?)
 error-s3-path = ตำแหน่ง S3 มีรูปแบบเป็น s3://bucket
+error-s3-address = ที่อยู่ S3 ต้องขึ้นต้นด้วย http:// หรือ https://
+error-s3-header = ส่วนหัว S3 เพิ่มเติมมีรูปแบบเป็น Name=value แต่ “{ $header }” ไม่ใช่รูปแบบนี้
+error-keychain = เก็บไว้ในที่เก็บรหัสผ่านของระบบไม่ได้: { $reason }
 error-not-built = Hoard ชุดนี้สร้างโดยไม่มี { $feature }
 error-openai-auth-unreachable = เชื่อมต่อ auth.openai.com ไม่ได้
 error-openai-unexpected = คำตอบจาก OpenAI ไม่เป็นไปตามที่คาดไว้
@@ -787,7 +790,10 @@ locations-folder = โฟลเดอร์บนเซิร์ฟเวอร�
 locations-folder-desktop = โฟลเดอร์
 locations-folder-placeholder = โฟลเดอร์ที่แพ็กของคุณอยู่
 locations-folder-hint-managed = Hoard จะสร้างโฟลเดอร์ให้หากยังไม่มี ใน Docker นี่คือโฟลเดอร์ที่คุณเมานต์เข้าไปในคอนเทนเนอร์
+locations-folder-hint-managed-desktop = Hoard จะสร้างโฟลเดอร์ให้หากยังไม่มี
 locations-folder-hint-watched = ใน Docker ให้เมานต์โฟลเดอร์เข้าไปในคอนเทนเนอร์ก่อน (แบบอ่านอย่างเดียวก็ได้) แล้วเลือกที่นี่
+locations-folder-hint-watched-desktop = Hoard อ่านโฟลเดอร์นี้อย่างเดียว ไม่มีสิ่งใดในนั้นถูกเปลี่ยนแปลง
+locations-folder-hint-cloud = ใช้โฟลเดอร์ที่ Dropbox, Google Drive, OneDrive หรือ iCloud Drive ซิงค์ไว้ก็ได้ และใช้ s3://bucket-name สำหรับบักเก็ตในที่เก็บข้อมูล S3 ก็ได้เช่นกัน
 locations-name = ชื่อ
 locations-name-placeholder-managed = คลัง
 locations-name-placeholder-watched = แพ็กของฉัน
@@ -855,6 +861,20 @@ locations-rebalance = ย้ายไฟล์ที่จัดเก็บไ�
 locations-rebalance-hint = หลังจากเปลี่ยนสิ่งที่ตำแหน่งรับ: ไฟล์ที่จัดเก็บไว้แล้วจะย้ายไปยังตำแหน่งที่ประเภทของไฟล์นั้นต้องไปในตอนนี้
 locations-add-title = เพิ่มตำแหน่ง
 locations-add-hint = ดิสก์อีกตัวสำหรับไฟล์บางประเภท หรือโฟลเดอร์ของแพ็กที่คุณมีอยู่แล้ว
+locations-s3-title = ที่เก็บข้อมูล S3
+locations-s3-hint = ตำแหน่ง s3://bucket-name คือบักเก็ตในบริการนี้ ซึ่งเป็น AWS หรือบริการใดก็ได้ที่เข้ากันได้กับ S3 (Backblaze B2, Cloudflare R2, Wasabi, MinIO, Garage บน NAS)
+locations-s3-endpoint = ที่อยู่
+locations-s3-endpoint-placeholder = เว้นว่างไว้สำหรับ AWS เช่น https://s3.eu-central-003.backblazeb2.com
+locations-s3-region = ภูมิภาค
+locations-s3-access-key = รหัสคีย์การเข้าถึง
+locations-s3-secret-key = คีย์การเข้าถึงลับ
+locations-s3-headers = ส่วนหัวเพิ่มเติม
+locations-s3-headers-placeholder = Name=value บรรทัดละหนึ่งรายการ (เช่น สำหรับ Cloudflare Access)
+locations-s3-kept = บันทึกแล้ว (พิมพ์เพื่อแทนที่)
+locations-s3-secrets = คีย์และส่วนหัวจะเก็บไว้กับการตั้งค่าของเซิร์ฟเวอร์ และจะไม่แสดงอีก
+locations-s3-secrets-desktop = คีย์และส่วนหัวจะเก็บไว้ในที่เก็บรหัสผ่านของคอมพิวเตอร์เครื่องนี้ และจะไม่แสดงอีก
+locations-s3-saved = บันทึกที่เก็บข้อมูล S3 แล้ว
+locations-s3-save-failed = บันทึกที่เก็บข้อมูล S3 ไม่ได้
 locations-add-more = เพิ่มตำแหน่ง…
 
 ## IssuesPanel.vue

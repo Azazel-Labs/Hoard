@@ -6,7 +6,8 @@
 //! - blobs never change, so CDN / browser caches can keep them forever, and backups are a plain sync.
 //!
 //! Where a file goes is set by the library locations (see `locations.rs`): a managed location is a folder on this
-//! machine, or an S3-compatible bucket (`s3://bucket`, using the server's `HOARD_S3_*` settings), and new files go
+//! machine, or an S3-compatible bucket (`s3://bucket`, reached with Settings → Locations → S3, or the `HOARD_S3_*`
+//! variables), and new files go
 //! to the one that takes their kind, else the catch-all. A watched location isn't a blob store at all: its files
 //! stay where they are, and a read of one of them finds it through the database by its hash.
 //!
@@ -47,8 +48,49 @@ pub(crate) struct BlobStore {
     fs: Arc<LocalFileSystem>,
     libs: Arc<RwLock<Arc<Libraries>>>,
     traffic: Arc<Mutex<Traffic>>,
-    cfg: Arc<Config>,
+    /// How `s3://` locations are reached.
+    s3: Arc<RwLock<S3>>,
     pool: db::Pool,
+}
+
+/// The S3 service `s3://bucket` locations are in: the settings over the `HOARD_S3_*` variables.
+#[derive(Clone, Default, PartialEq, Eq)]
+pub(crate) struct S3 {
+    /// `None`: AWS itself.
+    pub(crate) endpoint: Option<String>,
+    pub(crate) region: String,
+    pub(crate) access_key: Option<String>,
+    pub(crate) secret_key: Option<String>,
+    /// `Name=value`.
+    pub(crate) headers: Vec<String>,
+}
+
+impl fmt::Debug for S3 {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("S3")
+            .field("endpoint", &self.endpoint)
+            .field("region", &self.region)
+            .field("access_key", &self.access_key)
+            .field("secret_key", &self.secret_key.as_ref().map(|_| "…"))
+            .field("headers", &self.headers.len())
+            .finish()
+    }
+}
+
+impl S3 {
+    /// The extra headers sent with every request.
+    pub(crate) fn header_map(&self) -> Result<http::HeaderMap> {
+        let mut headers = http::HeaderMap::new();
+        for h in &self.headers {
+            let bad = || anyhow::anyhow!(tr!("error-s3-header", header = h.split('=').next().unwrap_or_default()));
+            let (name, value) = h.split_once('=').ok_or_else(bad)?;
+            headers.insert(
+                http::HeaderName::from_bytes(name.trim().as_bytes()).map_err(|_| bad())?,
+                http::HeaderValue::from_str(value.trim()).map_err(|_| bad())?,
+            );
+        }
+        Ok(headers)
+    }
 }
 
 impl fmt::Debug for BlobStore {
@@ -150,7 +192,7 @@ pub(crate) fn s3_bucket(path: &str) -> Option<&str> {
 
 /// Open the store of a managed location. A folder must already exist: one on a disk that isn't mounted right now
 /// shouldn't be quietly recreated on the disk underneath.
-pub(crate) fn open_store(cfg: &Config, path: &str) -> Result<(Arc<dyn ObjectStore>, bool)> {
+pub(crate) fn open_store(s3: &S3, path: &str) -> Result<(Arc<dyn ObjectStore>, bool)> {
     let Some(bucket) = s3_bucket(path) else {
         let dir = FsPath::new(path);
         if !dir.is_dir() {
@@ -161,52 +203,44 @@ pub(crate) fn open_store(cfg: &Config, path: &str) -> Result<(Arc<dyn ObjectStor
     if bucket.is_empty() || bucket.contains('/') {
         bail!(tr!("error-s3-path"));
     }
-    Ok((open_s3(cfg, bucket)?, true))
+    Ok((open_s3(s3, bucket)?, true))
 }
 
-/// A bucket's store, with the S3 settings Hoard was started with.
+/// A bucket's store.
 #[cfg(feature = "s3")]
-fn open_s3(cfg: &Config, bucket: &str) -> Result<Arc<dyn ObjectStore>> {
+fn open_s3(s3: &S3, bucket: &str) -> Result<Arc<dyn ObjectStore>> {
     let mut b = object_store::aws::AmazonS3Builder::new()
         .with_bucket_name(bucket)
-        .with_region(&cfg.s3_region)
+        .with_region(&s3.region)
         // Self-hosted servers want path-style URLs: http://nas:3900/bucket/key
         .with_virtual_hosted_style_request(false);
-    if let Some(ep) = &cfg.s3_endpoint {
+    if let Some(ep) = &s3.endpoint {
         b = b.with_endpoint(ep).with_allow_http(ep.starts_with("http://"));
     }
-    if let (Some(k), Some(s)) = (&cfg.s3_access_key, &cfg.s3_secret_key) {
+    if let (Some(k), Some(s)) = (&s3.access_key, &s3.secret_key) {
         b = b.with_access_key_id(k).with_secret_access_key(s);
     }
-    if !cfg.s3_headers.is_empty() {
-        let mut headers = http::HeaderMap::new();
-        for h in &cfg.s3_headers {
-            let (name, value) = h.split_once('=').context("HOARD_S3_HEADERS entries look like Name=value")?;
-            headers.insert(
-                http::HeaderName::from_bytes(name.trim().as_bytes())?,
-                http::HeaderValue::from_str(value.trim())?,
-            );
-        }
-        b = b.with_client_options(object_store::ClientOptions::new().with_default_headers(headers));
+    if !s3.headers.is_empty() {
+        b = b.with_client_options(object_store::ClientOptions::new().with_default_headers(s3.header_map()?));
     }
     Ok(Arc::new(b.build()?))
 }
 
 #[cfg(not(feature = "s3"))]
-fn open_s3(_cfg: &Config, _bucket: &str) -> Result<Arc<dyn ObjectStore>> {
+fn open_s3(_s3: &S3, _bucket: &str) -> Result<Arc<dyn ObjectStore>> {
     bail!(tr!("error-not-built", feature = "S3"))
 }
 
-fn describe(cfg: &Config, path: &str) -> String {
+fn describe(s3: &S3, path: &str) -> String {
     match s3_bucket(path) {
-        Some(bucket) => format!("s3:{}/{bucket}", cfg.s3_endpoint.as_deref().unwrap_or("aws")),
+        Some(bucket) => format!("s3:{}/{bucket}", s3.endpoint.as_deref().unwrap_or("aws")),
         None => format!("local:{path}"),
     }
 }
 
 impl BlobStore {
     /// Open the cache store and every library location in the database.
-    pub(crate) fn open(cfg: &Config, pool: db::Pool) -> Result<Self> {
+    pub(crate) fn open(cfg: &Config, pool: db::Pool, s3: S3) -> Result<Self> {
         let thumbs = cfg.thumbs_dir();
         std::fs::create_dir_all(&thumbs).with_context(|| format!("create {}", thumbs.display()))?;
         let cache = Arc::new(LocalFileSystem::new_with_prefix(&thumbs)?);
@@ -215,7 +249,7 @@ impl BlobStore {
             fs: Arc::new(LocalFileSystem::new()),
             libs: Arc::default(),
             traffic: Arc::default(),
-            cfg: Arc::new(cfg.clone()),
+            s3: Arc::new(RwLock::new(s3)),
             pool,
         };
         store.reload()?;
@@ -225,17 +259,18 @@ impl BlobStore {
     /// Re-read the library locations, after one is added, changed or removed.
     pub(crate) fn reload(&self) -> Result<()> {
         let locations = crate::locations::list(&*self.pool.get()?)?;
+        let s3 = self.s3.read().unwrap_or_else(PoisonError::into_inner).clone();
         let mut libs = Libraries::default();
         for l in &locations {
             match l.mode {
-                Mode::Managed => match open_store(&self.cfg, &l.path) {
+                Mode::Managed => match open_store(&s3, &l.path) {
                     Ok((store, remote)) => libs.managed.push(Managed {
                         id: l.id,
                         store,
                         kinds: l.kinds.clone(),
                         catch_all: l.catch_all,
                         remote,
-                        label: describe(&self.cfg, &l.path),
+                        label: describe(&s3, &l.path),
                         dir: s3_bucket(&l.path).is_none().then(|| PathBuf::from(&l.path)),
                     }),
                     Err(e) => {
@@ -247,6 +282,12 @@ impl BlobStore {
         }
         *self.libs.write().unwrap_or_else(PoisonError::into_inner) = Arc::new(libs);
         Ok(())
+    }
+
+    /// Reach `s3://` locations this way from now on (the S3 settings changed), and open them again.
+    pub(crate) async fn set_s3(&self, s3: S3) -> Result<()> {
+        *self.s3.write().unwrap_or_else(PoisonError::into_inner) = s3;
+        self.refresh().await
     }
 
     /// [`reload`](Self::reload) off the async threads: it opens folders, which can stall on a sleeping share.
@@ -603,7 +644,7 @@ pub(crate) mod tests {
     async fn files_go_to_the_location_for_their_kind_and_thumbnails_to_the_cache() {
         let dir = tempfile::tempdir().unwrap();
         let (cfg, pool) = setup(dir.path());
-        let blobs = BlobStore::open(&cfg, pool.clone()).unwrap();
+        let blobs = BlobStore::open(&cfg, pool.clone(), S3::default()).unwrap();
         assert!(!blobs.can_store());
         let nowhere = blobs.put_bytes(b"nowhere".to_vec(), AssetKind::Audio).await.unwrap();
         assert!(on_disk(dir.path(), "cache/thumbs", &nowhere.hash));
@@ -640,7 +681,7 @@ pub(crate) mod tests {
         let dir = tempfile::tempdir().unwrap();
         let (cfg, pool) = setup(dir.path());
         add(&pool, dir.path(), "library", &[], true);
-        let blobs = BlobStore::open(&cfg, pool).unwrap();
+        let blobs = BlobStore::open(&cfg, pool, S3::default()).unwrap();
         let staged = dir.path().join("staged.png");
         std::fs::write(&staged, b"unpacked once").unwrap();
         let blob = BlobStore::hash_file(&staged).unwrap();

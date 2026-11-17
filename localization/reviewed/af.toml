@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "6b1cad733e7c2f6f9f760a91d1879b4b0d4363e36add843001d846f75104d47e"
+source = "b5640bb76c06fe83cd9cc9bd88a06dd911fb0251db9b0880ec94831503ff6fb0"
 translation = "4da394ce6600d89e32b4a693d6a75b618faa39bee39a09e239f9d190ec04ae2b"
 
 [messages.account-add]
@@ -3524,6 +3524,10 @@ translation = "Die sertifikaat of sleutel kan nie gebruik word nie"
 source = "make another location the catch-all instead"
 translation = "maak eerder 'n ander ligging die vang-alles"
 
+[messages.error-keychain]
+source = "couldn't keep it in the system's keychain: { $reason }"
+translation = "kon dit nie in die stelsel se sleutelring bewaar nie: { $reason }"
+
 [messages.error-ldap-base-dn]
 source = "Say where people's entries are (the base DN)"
 translation = "Sê waar mense se inskrywings is (die basis-DN)"
@@ -3951,6 +3955,14 @@ translation = "ext moet 'n kort lêeruitbreiding wees"
 [messages.error-role]
 source = "A role is view, edit or admin"
 translation = "'n Rol is view, edit of admin"
+
+[messages.error-s3-address]
+source = "the S3 address must start with http:// or https://"
+translation = "die S3-adres moet met http:// of https:// begin"
+
+[messages.error-s3-header]
+source = """an extra S3 header looks like Name=value, and "{ $header }" isn't one"""
+translation = "'n ekstra S3-kopreël lyk soos Name=value, en “{ $header }” is nie een nie"
 
 [messages.error-s3-path]
 source = "an S3 location looks like s3://bucket"
@@ -5338,13 +5350,25 @@ translation = "Vouer op die bediener"
 source = "Folder"
 translation = "Vouer"
 
+[messages.locations-folder-hint-cloud]
+source = "A folder that Dropbox, Google Drive, OneDrive or iCloud Drive keeps in sync works too, and so does s3://bucket-name for a bucket in S3 storage."
+translation = "'n Vouer wat Dropbox, Google Drive, OneDrive of iCloud Drive gesinchroniseer hou, werk ook, en so ook s3://bucket-name vir 'n bucket in S3-berging."
+
 [messages.locations-folder-hint-managed]
 source = "Hoard creates it if it isn't there. In Docker, this is a folder you've mounted into the container."
 translation = "Hoard skep dit as dit nie daar is nie. In Docker is dit 'n vouer wat jy in die houer gekoppel het."
 
+[messages.locations-folder-hint-managed-desktop]
+source = "Hoard creates it if it isn't there."
+translation = "Hoard skep dit as dit nie daar is nie."
+
 [messages.locations-folder-hint-watched]
 source = "In Docker, mount the folder into the container first (read-only is fine), then pick it here."
 translation = "In Docker, koppel eers die vouer in die houer (net-lees is goed), en kies dit dan hier."
+
+[messages.locations-folder-hint-watched-desktop]
+source = "Hoard only reads it: nothing in it is changed."
+translation = "Hoard lees dit net: niks daarin word verander nie."
 
 [messages.locations-folder-placeholder]
 source = "The folder your packs are in"
@@ -5473,6 +5497,62 @@ translation = "Verwyder { $name }?"
 [messages.locations-removed]
 source = "Removed { $name }"
 translation = "{ $name } verwyder"
+
+[messages.locations-s3-access-key]
+source = "Access key ID"
+translation = "Toegangsleutel-ID"
+
+[messages.locations-s3-endpoint]
+source = "Address"
+translation = "Adres"
+
+[messages.locations-s3-endpoint-placeholder]
+source = "Empty for AWS; e.g. https://s3.eu-central-003.backblazeb2.com"
+translation = "Leeg vir AWS; bv. https://s3.eu-central-003.backblazeb2.com"
+
+[messages.locations-s3-headers]
+source = "Extra headers"
+translation = "Ekstra kopreëls"
+
+[messages.locations-s3-headers-placeholder]
+source = "Name=value, one a line (for Cloudflare Access, say)"
+translation = "Name=value, een per reël (vir Cloudflare Access, byvoorbeeld)"
+
+[messages.locations-s3-hint]
+source = "A location at s3://bucket-name is a bucket in this service: AWS, or any S3-compatible one (Backblaze B2, Cloudflare R2, Wasabi, MinIO, Garage on a NAS)."
+translation = "'n Ligging by s3://bucket-name is 'n bucket in hierdie diens: AWS, of enige S3-versoenbare een (Backblaze B2, Cloudflare R2, Wasabi, MinIO, Garage op 'n NAS)."
+
+[messages.locations-s3-kept]
+source = "Saved (type to replace)"
+translation = "Gestoor (tik om te vervang)"
+
+[messages.locations-s3-region]
+source = "Region"
+translation = "Streek"
+
+[messages.locations-s3-save-failed]
+source = "Couldn't save S3 storage"
+translation = "Kon nie S3-berging stoor nie"
+
+[messages.locations-s3-saved]
+source = "S3 storage saved"
+translation = "S3-berging gestoor"
+
+[messages.locations-s3-secret-key]
+source = "Secret access key"
+translation = "Geheime toegangsleutel"
+
+[messages.locations-s3-secrets]
+source = "The keys and headers are kept with the server's settings, and never shown again."
+translation = "Die sleutels en kopreëls word saam met die bediener se instellings bewaar en nooit weer gewys nie."
+
+[messages.locations-s3-secrets-desktop]
+source = "The keys and headers are kept in this computer's keychain, and never shown again."
+translation = "Die sleutels en kopreëls word in hierdie rekenaar se sleutelring bewaar en nooit weer gewys nie."
+
+[messages.locations-s3-title]
+source = "S3 storage"
+translation = "S3-berging"
 
 [messages.locations-save]
 source = "Save"

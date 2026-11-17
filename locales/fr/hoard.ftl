@@ -68,6 +68,9 @@ error-wrong-setup-code = Ce n’est pas le code de configuration donné au serve
 error-wrong-password = Ce nom et ce mot de passe ne correspondent pas
 error-folder-missing = { $path } est introuvable (un disque non monté ?)
 error-s3-path = un emplacement S3 s’écrit s3://bucket
+error-s3-address = l’adresse S3 doit commencer par http:// ou https://
+error-s3-header = un en-tête S3 supplémentaire s’écrit Name=value, et « { $header } » n’en est pas un
+error-keychain = impossible de l’enregistrer dans le trousseau du système : { $reason }
 error-not-built = cette copie de Hoard a été compilée sans { $feature }
 error-openai-auth-unreachable = impossible de joindre auth.openai.com
 error-openai-unexpected = réponse inattendue d’OpenAI
@@ -839,7 +842,10 @@ locations-folder = Dossier sur le serveur
 locations-folder-desktop = Dossier
 locations-folder-placeholder = Le dossier où se trouvent vos packs
 locations-folder-hint-managed = Hoard le crée s’il n’existe pas. Avec Docker, c’est un dossier que vous avez monté dans le conteneur.
+locations-folder-hint-managed-desktop = Hoard le crée s’il n’existe pas.
 locations-folder-hint-watched = Avec Docker, montez d’abord le dossier dans le conteneur (en lecture seule, c’est très bien), puis choisissez-le ici.
+locations-folder-hint-watched-desktop = Hoard ne fait que le lire : rien n’y est modifié.
+locations-folder-hint-cloud = Un dossier que Dropbox, Google Drive, OneDrive ou iCloud Drive garde synchronisé convient aussi, tout comme s3://bucket-name pour un bucket du stockage S3.
 locations-name = Nom
 locations-name-placeholder-managed = Bibliothèque
 locations-name-placeholder-watched = Mes packs
@@ -915,6 +921,20 @@ locations-rebalance = Déplacer les fichiers stockés en conséquence
 locations-rebalance-hint = Après avoir changé ce qu’un emplacement prend : les fichiers déjà stockés vont dans l’emplacement qui prend désormais leur type.
 locations-add-title = Ajouter un emplacement
 locations-add-hint = Un autre disque pour certains types de fichiers, ou un dossier de packs que vous avez déjà.
+locations-s3-title = Stockage S3
+locations-s3-hint = Un emplacement s3://bucket-name est un bucket de ce service : AWS, ou tout service compatible S3 (Backblaze B2, Cloudflare R2, Wasabi, MinIO, Garage sur un NAS).
+locations-s3-endpoint = Adresse
+locations-s3-endpoint-placeholder = Vide pour AWS ; p. ex. https://s3.eu-central-003.backblazeb2.com
+locations-s3-region = Région
+locations-s3-access-key = ID de clé d’accès
+locations-s3-secret-key = Clé d’accès secrète
+locations-s3-headers = En-têtes supplémentaires
+locations-s3-headers-placeholder = Name=value, un par ligne (pour Cloudflare Access, par exemple)
+locations-s3-kept = Enregistré (tapez pour remplacer)
+locations-s3-secrets = Les clés et les en-têtes sont conservés avec les paramètres du serveur et ne sont plus jamais affichés.
+locations-s3-secrets-desktop = Les clés et les en-têtes sont conservés dans le trousseau de cet ordinateur et ne sont plus jamais affichés.
+locations-s3-saved = Stockage S3 enregistré
+locations-s3-save-failed = Impossible d’enregistrer le stockage S3
 locations-add-more = Ajouter un emplacement…
 
 ## IssuesPanel.vue

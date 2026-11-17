@@ -68,6 +68,9 @@ error-wrong-setup-code = Это не тот код настройки, что з
 error-wrong-password = Имя и пароль не совпадают
 error-folder-missing = { $path } не найден (диск не подключён?)
 error-s3-path = место хранения S3 выглядит так: s3://bucket
+error-s3-address = адрес S3 должен начинаться с http:// или https://
+error-s3-header = дополнительный заголовок S3 выглядит как Name=value, а «{ $header }» — нет
+error-keychain = не удалось сохранить в системном хранилище паролей: { $reason }
 error-not-built = эта копия Hoard собрана без { $feature }
 error-openai-auth-unreachable = не удалось связаться с auth.openai.com
 error-openai-unexpected = неожиданный ответ от OpenAI
@@ -871,7 +874,10 @@ locations-folder = Папка на сервере
 locations-folder-desktop = Папка
 locations-folder-placeholder = Папка, в которой лежат ваши паки
 locations-folder-hint-managed = Hoard создаст её, если её нет. В Docker это папка, которую вы подключили в контейнер.
+locations-folder-hint-managed-desktop = Hoard создаст её, если её нет.
 locations-folder-hint-watched = В Docker сначала подключите папку в контейнер (можно только для чтения), затем выберите её здесь.
+locations-folder-hint-watched-desktop = Hoard только читает её: ничего в ней не меняется.
+locations-folder-hint-cloud = Подойдёт и папка, которую синхронизирует Dropbox, Google Drive, OneDrive или iCloud Drive, а также s3://bucket-name для бакета в хранилище S3.
 locations-name = Название
 locations-name-placeholder-managed = Библиотека
 locations-name-placeholder-watched = Мои паки
@@ -951,6 +957,20 @@ locations-rebalance = Перенести сохранённые файлы
 locations-rebalance-hint = После изменения того, что берёт место хранения: уже сохранённые файлы переносятся туда, куда теперь идёт их вид.
 locations-add-title = Добавить место хранения
 locations-add-hint = Другой диск для некоторых видов файлов или уже существующая папка с паками.
+locations-s3-title = Хранилище S3
+locations-s3-hint = Место хранения s3://bucket-name — это бакет в этом сервисе: AWS или любом совместимом с S3 (Backblaze B2, Cloudflare R2, Wasabi, MinIO, Garage на NAS).
+locations-s3-endpoint = Адрес
+locations-s3-endpoint-placeholder = Пусто для AWS; например, https://s3.eu-central-003.backblazeb2.com
+locations-s3-region = Регион
+locations-s3-access-key = Идентификатор ключа доступа
+locations-s3-secret-key = Секретный ключ доступа
+locations-s3-headers = Дополнительные заголовки
+locations-s3-headers-placeholder = Name=value, по одному на строку (например, для Cloudflare Access)
+locations-s3-kept = Сохранено (введите, чтобы заменить)
+locations-s3-secrets = Ключи и заголовки хранятся в настройках сервера и больше не показываются.
+locations-s3-secrets-desktop = Ключи и заголовки хранятся в хранилище паролей этого компьютера и больше не показываются.
+locations-s3-saved = Хранилище S3 сохранено
+locations-s3-save-failed = Не удалось сохранить хранилище S3
 locations-add-more = Добавить место хранения…
 
 ## IssuesPanel.vue

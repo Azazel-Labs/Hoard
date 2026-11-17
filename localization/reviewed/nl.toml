@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "6b1cad733e7c2f6f9f760a91d1879b4b0d4363e36add843001d846f75104d47e"
+source = "b5640bb76c06fe83cd9cc9bd88a06dd911fb0251db9b0880ec94831503ff6fb0"
 translation = "bc38f0b4a30e81ce6ce221bf48472f8956f8955cd51d754776e5e4fc43213a73"
 
 [messages.account-add]
@@ -3524,6 +3524,10 @@ translation = "Het certificaat of de sleutel kan niet worden gebruikt"
 source = "make another location the catch-all instead"
 translation = "maak in plaats daarvan een andere locatie de opvanglocatie"
 
+[messages.error-keychain]
+source = "couldn't keep it in the system's keychain: { $reason }"
+translation = "kon het niet bewaren in de sleutelhanger van het systeem: { $reason }"
+
 [messages.error-ldap-base-dn]
 source = "Say where people's entries are (the base DN)"
 translation = "Geef aan waar de gegevens van mensen staan (de base DN)"
@@ -3951,6 +3955,14 @@ translation = "ext moet een korte bestandsextensie zijn"
 [messages.error-role]
 source = "A role is view, edit or admin"
 translation = "Een rol is view, edit of admin"
+
+[messages.error-s3-address]
+source = "the S3 address must start with http:// or https://"
+translation = "het S3-adres moet beginnen met http:// of https://"
+
+[messages.error-s3-header]
+source = """an extra S3 header looks like Name=value, and "{ $header }" isn't one"""
+translation = "een extra S3-header ziet eruit als Name=value, en “{ $header }” is dat niet"
 
 [messages.error-s3-path]
 source = "an S3 location looks like s3://bucket"
@@ -5341,13 +5353,25 @@ translation = "Map op de server"
 source = "Folder"
 translation = "Map"
 
+[messages.locations-folder-hint-cloud]
+source = "A folder that Dropbox, Google Drive, OneDrive or iCloud Drive keeps in sync works too, and so does s3://bucket-name for a bucket in S3 storage."
+translation = "Een map die Dropbox, Google Drive, OneDrive of iCloud Drive synchroniseert werkt ook, net als s3://bucket-name voor een bucket in S3-opslag."
+
 [messages.locations-folder-hint-managed]
 source = "Hoard creates it if it isn't there. In Docker, this is a folder you've mounted into the container."
 translation = "Hoard maakt hem aan als hij er niet is. In Docker is dit een map die je in de container hebt gekoppeld."
 
+[messages.locations-folder-hint-managed-desktop]
+source = "Hoard creates it if it isn't there."
+translation = "Hoard maakt hem aan als hij er niet is."
+
 [messages.locations-folder-hint-watched]
 source = "In Docker, mount the folder into the container first (read-only is fine), then pick it here."
 translation = "Koppel de map in Docker eerst in de container (alleen-lezen is prima) en kies hem dan hier."
+
+[messages.locations-folder-hint-watched-desktop]
+source = "Hoard only reads it: nothing in it is changed."
+translation = "Hoard leest hem alleen: er wordt niets in gewijzigd."
 
 [messages.locations-folder-placeholder]
 source = "The folder your packs are in"
@@ -5476,6 +5500,62 @@ translation = "{ $name } verwijderen?"
 [messages.locations-removed]
 source = "Removed { $name }"
 translation = "{ $name } verwijderd"
+
+[messages.locations-s3-access-key]
+source = "Access key ID"
+translation = "Toegangssleutel-ID"
+
+[messages.locations-s3-endpoint]
+source = "Address"
+translation = "Adres"
+
+[messages.locations-s3-endpoint-placeholder]
+source = "Empty for AWS; e.g. https://s3.eu-central-003.backblazeb2.com"
+translation = "Leeg voor AWS; bijv. https://s3.eu-central-003.backblazeb2.com"
+
+[messages.locations-s3-headers]
+source = "Extra headers"
+translation = "Extra headers"
+
+[messages.locations-s3-headers-placeholder]
+source = "Name=value, one a line (for Cloudflare Access, say)"
+translation = "Name=value, één per regel (bijvoorbeeld voor Cloudflare Access)"
+
+[messages.locations-s3-hint]
+source = "A location at s3://bucket-name is a bucket in this service: AWS, or any S3-compatible one (Backblaze B2, Cloudflare R2, Wasabi, MinIO, Garage on a NAS)."
+translation = "Een locatie op s3://bucket-name is een bucket in deze dienst: AWS, of een andere S3-compatibele dienst (Backblaze B2, Cloudflare R2, Wasabi, MinIO, Garage op een NAS)."
+
+[messages.locations-s3-kept]
+source = "Saved (type to replace)"
+translation = "Opgeslagen (typ om te vervangen)"
+
+[messages.locations-s3-region]
+source = "Region"
+translation = "Regio"
+
+[messages.locations-s3-save-failed]
+source = "Couldn't save S3 storage"
+translation = "Kon de instellingen voor S3-opslag niet opslaan"
+
+[messages.locations-s3-saved]
+source = "S3 storage saved"
+translation = "Instellingen voor S3-opslag opgeslagen"
+
+[messages.locations-s3-secret-key]
+source = "Secret access key"
+translation = "Geheime toegangssleutel"
+
+[messages.locations-s3-secrets]
+source = "The keys and headers are kept with the server's settings, and never shown again."
+translation = "De sleutels en headers worden bewaard bij de instellingen van de server en nooit meer getoond."
+
+[messages.locations-s3-secrets-desktop]
+source = "The keys and headers are kept in this computer's keychain, and never shown again."
+translation = "De sleutels en headers worden bewaard in de sleutelhanger van deze computer en nooit meer getoond."
+
+[messages.locations-s3-title]
+source = "S3 storage"
+translation = "S3-opslag"
 
 [messages.locations-save]
 source = "Save"

@@ -68,6 +68,9 @@ error-wrong-setup-code = To nie jest kod konfiguracji podany serwerowi w HOARD_S
 error-wrong-password = Nazwa i hasło nie pasują do siebie
 error-folder-missing = { $path } nie istnieje (niezamontowany dysk?)
 error-s3-path = lokalizacja S3 wygląda tak: s3://bucket
+error-s3-address = adres S3 musi zaczynać się od http:// lub https://
+error-s3-header = dodatkowy nagłówek S3 wygląda tak: Name=value, a „{ $header }” taki nie jest
+error-keychain = nie udało się zachować tego w systemowym pęku kluczy: { $reason }
 error-not-built = ta kopia Hoarda została zbudowana bez { $feature }
 error-openai-auth-unreachable = nie udało się połączyć z auth.openai.com
 error-openai-unexpected = nieoczekiwana odpowiedź od OpenAI
@@ -865,7 +868,10 @@ locations-folder = Folder na serwerze
 locations-folder-desktop = Folder
 locations-folder-placeholder = Folder z paczkami
 locations-folder-hint-managed = Hoard utworzy go, jeśli nie istnieje. W Dockerze jest to folder zamontowany w kontenerze.
+locations-folder-hint-managed-desktop = Hoard utworzy go, jeśli nie istnieje.
 locations-folder-hint-watched = W Dockerze należy najpierw zamontować folder w kontenerze (może być tylko do odczytu), a potem wybrać go tutaj.
+locations-folder-hint-watched-desktop = Hoard tylko go odczytuje: nic w nim nie jest zmieniane.
+locations-folder-hint-cloud = Pasuje też folder synchronizowany przez Dropbox, Google Drive, OneDrive lub iCloud Drive, a także s3://bucket-name dla zasobnika w magazynie S3.
 locations-name = Nazwa
 locations-name-placeholder-managed = Biblioteka
 locations-name-placeholder-watched = Moje paczki
@@ -945,6 +951,20 @@ locations-rebalance = Przenieś zapisane pliki zgodnie z ustawieniami
 locations-rebalance-hint = Po zmianie tego, co przyjmuje lokalizacja: już zapisane pliki zostaną przeniesione do lokalizacji, do której teraz trafia ich rodzaj.
 locations-add-title = Dodaj lokalizację
 locations-add-hint = Inny dysk dla niektórych rodzajów plików albo istniejący folder z paczkami.
+locations-s3-title = Magazyn S3
+locations-s3-hint = Lokalizacja s3://bucket-name to zasobnik w tej usłudze: AWS lub dowolnej usłudze zgodnej z S3 (Backblaze B2, Cloudflare R2, Wasabi, MinIO, Garage na serwerze NAS).
+locations-s3-endpoint = Adres
+locations-s3-endpoint-placeholder = Puste dla AWS; np. https://s3.eu-central-003.backblazeb2.com
+locations-s3-region = Region
+locations-s3-access-key = Identyfikator klucza dostępu
+locations-s3-secret-key = Tajny klucz dostępu
+locations-s3-headers = Dodatkowe nagłówki
+locations-s3-headers-placeholder = Name=value, jeden w wierszu (np. dla Cloudflare Access)
+locations-s3-kept = Zapisano (wpisz, aby zastąpić)
+locations-s3-secrets = Klucze i nagłówki są przechowywane razem z ustawieniami serwera i nigdy więcej nie są wyświetlane.
+locations-s3-secrets-desktop = Klucze i nagłówki są przechowywane w pęku kluczy tego komputera i nigdy więcej nie są wyświetlane.
+locations-s3-saved = Zapisano magazyn S3
+locations-s3-save-failed = Nie udało się zapisać magazynu S3
 locations-add-more = Dodaj lokalizację…
 
 ## IssuesPanel.vue

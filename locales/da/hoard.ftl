@@ -68,6 +68,9 @@ error-wrong-setup-code = Det er ikke den opsætningskode, serveren har fået i H
 error-wrong-password = Navnet og adgangskoden passer ikke sammen
 error-folder-missing = { $path } findes ikke (en disk, der ikke er monteret?)
 error-s3-path = en S3-placering ser ud som s3://bucket
+error-s3-address = S3-adressen skal starte med http:// eller https://
+error-s3-header = en ekstra S3-header ser ud som Name=value, og »{ $header }« er ikke en
+error-keychain = kunne ikke gemme det i systemets nøglering: { $reason }
 error-not-built = denne kopi af Hoard er bygget uden { $feature }
 error-openai-auth-unreachable = kunne ikke nå auth.openai.com
 error-openai-unexpected = uventet svar fra OpenAI
@@ -823,7 +826,10 @@ locations-folder = Mappe på serveren
 locations-folder-desktop = Mappe
 locations-folder-placeholder = Den mappe, dine pakker ligger i
 locations-folder-hint-managed = Hoard opretter den, hvis den ikke findes. I Docker er det en mappe, du har monteret i containeren.
+locations-folder-hint-managed-desktop = Hoard opretter den, hvis den ikke findes.
 locations-folder-hint-watched = I Docker skal du først montere mappen i containeren (skrivebeskyttet er fint) og så vælge den her.
+locations-folder-hint-watched-desktop = Hoard læser den kun: intet i den bliver ændret.
+locations-folder-hint-cloud = En mappe, som Dropbox, Google Drive, OneDrive eller iCloud Drive holder synkroniseret, virker også, og det gør s3://bucket-name også for en bucket i S3-lager.
 locations-name = Navn
 locations-name-placeholder-managed = Bibliotek
 locations-name-placeholder-watched = Mine pakker
@@ -899,6 +905,20 @@ locations-rebalance = Flyt gemte filer, så de passer
 locations-rebalance-hint = Efter du har ændret, hvad en placering tager: filer, der allerede er gemt, flyttes til den placering, deres type nu hører til.
 locations-add-title = Tilføj en placering
 locations-add-hint = En anden disk til nogle typer filer, eller en mappe med pakker, du allerede har.
+locations-s3-title = S3-lager
+locations-s3-hint = En placering på s3://bucket-name er en bucket i denne tjeneste: AWS eller en hvilken som helst S3-kompatibel (Backblaze B2, Cloudflare R2, Wasabi, MinIO, Garage på en NAS).
+locations-s3-endpoint = Adresse
+locations-s3-endpoint-placeholder = Tom for AWS; f.eks. https://s3.eu-central-003.backblazeb2.com
+locations-s3-region = Region
+locations-s3-access-key = Adgangsnøgle-id
+locations-s3-secret-key = Hemmelig adgangsnøgle
+locations-s3-headers = Ekstra headere
+locations-s3-headers-placeholder = Name=value, én pr. linje (f.eks. til Cloudflare Access)
+locations-s3-kept = Gemt (skriv for at erstatte)
+locations-s3-secrets = Nøglerne og headerne gemmes sammen med serverens indstillinger og vises aldrig igen.
+locations-s3-secrets-desktop = Nøglerne og headerne gemmes i denne computers nøglering og vises aldrig igen.
+locations-s3-saved = S3-lager gemt
+locations-s3-save-failed = Kunne ikke gemme S3-lager
 locations-add-more = Tilføj en placering…
 
 ## IssuesPanel.vue

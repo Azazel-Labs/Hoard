@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "6b1cad733e7c2f6f9f760a91d1879b4b0d4363e36add843001d846f75104d47e"
+source = "b5640bb76c06fe83cd9cc9bd88a06dd911fb0251db9b0880ec94831503ff6fb0"
 translation = "7c39e4f5954fdfdfd70e4dab75e79850e646d6dd0114d075e0aca59bbf762a20"
 
 [messages.account-add]
@@ -3440,6 +3440,10 @@ translation = "Không thể dùng chứng chỉ hoặc khóa này"
 source = "make another location the catch-all instead"
 translation = "hãy đặt một vị trí khác làm vị trí chứa mọi loại"
 
+[messages.error-keychain]
+source = "couldn't keep it in the system's keychain: { $reason }"
+translation = "không thể lưu vào kho mật khẩu của hệ thống: { $reason }"
+
 [messages.error-ldap-base-dn]
 source = "Say where people's entries are (the base DN)"
 translation = "Hãy cho biết các mục của người dùng nằm ở đâu (base DN)"
@@ -3867,6 +3871,14 @@ translation = "ext phải là một phần mở rộng tệp ngắn"
 [messages.error-role]
 source = "A role is view, edit or admin"
 translation = "Vai trò là view, edit hoặc admin"
+
+[messages.error-s3-address]
+source = "the S3 address must start with http:// or https://"
+translation = "địa chỉ S3 phải bắt đầu bằng http:// hoặc https://"
+
+[messages.error-s3-header]
+source = """an extra S3 header looks like Name=value, and "{ $header }" isn't one"""
+translation = "header S3 bổ sung có dạng Name=value, và “{ $header }” không phải dạng đó"
 
 [messages.error-s3-path]
 source = "an S3 location looks like s3://bucket"
@@ -5226,13 +5238,25 @@ translation = "Thư mục trên máy chủ"
 source = "Folder"
 translation = "Thư mục"
 
+[messages.locations-folder-hint-cloud]
+source = "A folder that Dropbox, Google Drive, OneDrive or iCloud Drive keeps in sync works too, and so does s3://bucket-name for a bucket in S3 storage."
+translation = "Thư mục được Dropbox, Google Drive, OneDrive hoặc iCloud Drive đồng bộ cũng được, và s3://bucket-name cho một bucket trong kho lưu trữ S3 cũng vậy."
+
 [messages.locations-folder-hint-managed]
 source = "Hoard creates it if it isn't there. In Docker, this is a folder you've mounted into the container."
 translation = "Hoard sẽ tạo thư mục nếu chưa có. Trong Docker, đây là thư mục bạn đã gắn vào container."
 
+[messages.locations-folder-hint-managed-desktop]
+source = "Hoard creates it if it isn't there."
+translation = "Hoard sẽ tạo thư mục nếu chưa có."
+
 [messages.locations-folder-hint-watched]
 source = "In Docker, mount the folder into the container first (read-only is fine), then pick it here."
 translation = "Trong Docker, hãy gắn thư mục vào container trước (chỉ đọc cũng được), rồi chọn nó ở đây."
+
+[messages.locations-folder-hint-watched-desktop]
+source = "Hoard only reads it: nothing in it is changed."
+translation = "Hoard chỉ đọc thư mục: không có gì trong đó bị thay đổi."
 
 [messages.locations-folder-placeholder]
 source = "The folder your packs are in"
@@ -5357,6 +5381,62 @@ translation = "Gỡ { $name }?"
 [messages.locations-removed]
 source = "Removed { $name }"
 translation = "Đã gỡ { $name }"
+
+[messages.locations-s3-access-key]
+source = "Access key ID"
+translation = "ID khóa truy cập"
+
+[messages.locations-s3-endpoint]
+source = "Address"
+translation = "Địa chỉ"
+
+[messages.locations-s3-endpoint-placeholder]
+source = "Empty for AWS; e.g. https://s3.eu-central-003.backblazeb2.com"
+translation = "Để trống cho AWS; ví dụ https://s3.eu-central-003.backblazeb2.com"
+
+[messages.locations-s3-headers]
+source = "Extra headers"
+translation = "Header bổ sung"
+
+[messages.locations-s3-headers-placeholder]
+source = "Name=value, one a line (for Cloudflare Access, say)"
+translation = "Name=value, mỗi dòng một mục (ví dụ cho Cloudflare Access)"
+
+[messages.locations-s3-hint]
+source = "A location at s3://bucket-name is a bucket in this service: AWS, or any S3-compatible one (Backblaze B2, Cloudflare R2, Wasabi, MinIO, Garage on a NAS)."
+translation = "Vị trí s3://bucket-name là một bucket trong dịch vụ này: AWS, hoặc bất kỳ dịch vụ tương thích S3 nào (Backblaze B2, Cloudflare R2, Wasabi, MinIO, Garage trên NAS)."
+
+[messages.locations-s3-kept]
+source = "Saved (type to replace)"
+translation = "Đã lưu (nhập để thay thế)"
+
+[messages.locations-s3-region]
+source = "Region"
+translation = "Vùng"
+
+[messages.locations-s3-save-failed]
+source = "Couldn't save S3 storage"
+translation = "Không thể lưu kho lưu trữ S3"
+
+[messages.locations-s3-saved]
+source = "S3 storage saved"
+translation = "Đã lưu kho lưu trữ S3"
+
+[messages.locations-s3-secret-key]
+source = "Secret access key"
+translation = "Khóa truy cập bí mật"
+
+[messages.locations-s3-secrets]
+source = "The keys and headers are kept with the server's settings, and never shown again."
+translation = "Khóa và header được lưu cùng cài đặt của máy chủ, và sẽ không bao giờ hiện lại."
+
+[messages.locations-s3-secrets-desktop]
+source = "The keys and headers are kept in this computer's keychain, and never shown again."
+translation = "Khóa và header được lưu trong kho mật khẩu của máy tính này, và sẽ không bao giờ hiện lại."
+
+[messages.locations-s3-title]
+source = "S3 storage"
+translation = "Kho lưu trữ S3"
 
 [messages.locations-save]
 source = "Save"

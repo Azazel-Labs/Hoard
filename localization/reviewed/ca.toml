@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "6b1cad733e7c2f6f9f760a91d1879b4b0d4363e36add843001d846f75104d47e"
+source = "b5640bb76c06fe83cd9cc9bd88a06dd911fb0251db9b0880ec94831503ff6fb0"
 translation = "88ba45aa74cd9501df2926434c2acf7a027b1b150e20ada811686cb9e070c548"
 
 [messages.account-add]
@@ -3524,6 +3524,10 @@ translation = "El certificat o la clau no es poden fer servir"
 source = "make another location the catch-all instead"
 translation = "feu que una altra ubicació sigui la general"
 
+[messages.error-keychain]
+source = "couldn't keep it in the system's keychain: { $reason }"
+translation = "no s'ha pogut desar al clauer del sistema: { $reason }"
+
 [messages.error-ldap-base-dn]
 source = "Say where people's entries are (the base DN)"
 translation = "Indiqueu on són les entrades de les persones (el DN base)"
@@ -3951,6 +3955,14 @@ translation = "ext ha de ser una extensió de fitxer curta"
 [messages.error-role]
 source = "A role is view, edit or admin"
 translation = "Un rol és view, edit o admin"
+
+[messages.error-s3-address]
+source = "the S3 address must start with http:// or https://"
+translation = "l'adreça S3 ha de començar per http:// o https://"
+
+[messages.error-s3-header]
+source = """an extra S3 header looks like Name=value, and "{ $header }" isn't one"""
+translation = "una capçalera S3 addicional té la forma Name=value, i «{ $header }» no ho és"
 
 [messages.error-s3-path]
 source = "an S3 location looks like s3://bucket"
@@ -5338,13 +5350,25 @@ translation = "Carpeta del servidor"
 source = "Folder"
 translation = "Carpeta"
 
+[messages.locations-folder-hint-cloud]
+source = "A folder that Dropbox, Google Drive, OneDrive or iCloud Drive keeps in sync works too, and so does s3://bucket-name for a bucket in S3 storage."
+translation = "També serveix una carpeta que Dropbox, Google Drive, OneDrive o iCloud Drive mantinguin sincronitzada, i s3://bucket-name per a un bucket de l'emmagatzematge S3."
+
 [messages.locations-folder-hint-managed]
 source = "Hoard creates it if it isn't there. In Docker, this is a folder you've mounted into the container."
 translation = "Hoard la crea si no existeix. A Docker, és una carpeta que heu muntat al contenidor."
 
+[messages.locations-folder-hint-managed-desktop]
+source = "Hoard creates it if it isn't there."
+translation = "Hoard la crea si no existeix."
+
 [messages.locations-folder-hint-watched]
 source = "In Docker, mount the folder into the container first (read-only is fine), then pick it here."
 translation = "A Docker, primer munteu la carpeta al contenidor (només de lectura ja va bé) i després trieu-la aquí."
+
+[messages.locations-folder-hint-watched-desktop]
+source = "Hoard only reads it: nothing in it is changed."
+translation = "Hoard només la llegeix: no s'hi canvia res."
 
 [messages.locations-folder-placeholder]
 source = "The folder your packs are in"
@@ -5473,6 +5497,62 @@ translation = "Voleu eliminar { $name }?"
 [messages.locations-removed]
 source = "Removed { $name }"
 translation = "S'ha eliminat { $name }"
+
+[messages.locations-s3-access-key]
+source = "Access key ID"
+translation = "ID de la clau d'accés"
+
+[messages.locations-s3-endpoint]
+source = "Address"
+translation = "Adreça"
+
+[messages.locations-s3-endpoint-placeholder]
+source = "Empty for AWS; e.g. https://s3.eu-central-003.backblazeb2.com"
+translation = "Buida per a AWS; p. ex. https://s3.eu-central-003.backblazeb2.com"
+
+[messages.locations-s3-headers]
+source = "Extra headers"
+translation = "Capçaleres addicionals"
+
+[messages.locations-s3-headers-placeholder]
+source = "Name=value, one a line (for Cloudflare Access, say)"
+translation = "Name=value, una per línia (per a Cloudflare Access, per exemple)"
+
+[messages.locations-s3-hint]
+source = "A location at s3://bucket-name is a bucket in this service: AWS, or any S3-compatible one (Backblaze B2, Cloudflare R2, Wasabi, MinIO, Garage on a NAS)."
+translation = "Una ubicació s3://bucket-name és un bucket d'aquest servei: AWS o qualsevol de compatible amb S3 (Backblaze B2, Cloudflare R2, Wasabi, MinIO, Garage en un NAS)."
+
+[messages.locations-s3-kept]
+source = "Saved (type to replace)"
+translation = "Desat (escriviu per substituir-lo)"
+
+[messages.locations-s3-region]
+source = "Region"
+translation = "Regió"
+
+[messages.locations-s3-save-failed]
+source = "Couldn't save S3 storage"
+translation = "No s'ha pogut desar l'emmagatzematge S3"
+
+[messages.locations-s3-saved]
+source = "S3 storage saved"
+translation = "S'ha desat l'emmagatzematge S3"
+
+[messages.locations-s3-secret-key]
+source = "Secret access key"
+translation = "Clau d'accés secreta"
+
+[messages.locations-s3-secrets]
+source = "The keys and headers are kept with the server's settings, and never shown again."
+translation = "Les claus i les capçaleres es guarden amb la configuració del servidor i no es tornen a mostrar mai."
+
+[messages.locations-s3-secrets-desktop]
+source = "The keys and headers are kept in this computer's keychain, and never shown again."
+translation = "Les claus i les capçaleres es guarden al clauer d'aquest ordinador i no es tornen a mostrar mai."
+
+[messages.locations-s3-title]
+source = "S3 storage"
+translation = "Emmagatzematge S3"
 
 [messages.locations-save]
 source = "Save"

@@ -68,6 +68,9 @@ error-wrong-setup-code = Bu, sunucuya HOARD_SETUP_CODE ile verilen kurulum kodu 
 error-wrong-password = Bu ad ve parola eşleşmiyor
 error-folder-missing = { $path } orada değil (bağlanmamış bir disk mi?)
 error-s3-path = bir S3 konumu s3://bucket biçimindedir
+error-s3-address = S3 adresi http:// veya https:// ile başlamalıdır
+error-s3-header = ek bir S3 üst bilgisi Name=value biçimindedir ve “{ $header }” böyle değil
+error-keychain = sistemin anahtar zincirinde saklanamadı: { $reason }
 error-not-built = Hoard'un bu kopyası { $feature } olmadan derlendi
 error-openai-auth-unreachable = auth.openai.com adresine ulaşılamadı
 error-openai-unexpected = OpenAI beklenmeyen bir yanıt verdi
@@ -791,7 +794,10 @@ locations-folder = Sunucudaki klasör
 locations-folder-desktop = Klasör
 locations-folder-placeholder = Paketlerinizin bulunduğu klasör
 locations-folder-hint-managed = Yoksa Hoard onu oluşturur. Docker’da bu, kapsayıcıya bağladığınız bir klasördür.
+locations-folder-hint-managed-desktop = Yoksa Hoard onu oluşturur.
 locations-folder-hint-watched = Docker’da önce klasörü kapsayıcıya bağlayın (salt okunur olabilir), sonra burada seçin.
+locations-folder-hint-watched-desktop = Hoard onu yalnızca okur: içindeki hiçbir şey değiştirilmez.
+locations-folder-hint-cloud = Dropbox, Google Drive, OneDrive ya da iCloud Drive’ın eşitlediği bir klasör de olur; S3 depolamadaki bir bucket için s3://bucket-name de.
 locations-name = Ad
 locations-name-placeholder-managed = Kütüphane
 locations-name-placeholder-watched = Paketlerim
@@ -859,6 +865,20 @@ locations-rebalance = Saklanan dosyaları buna göre taşı
 locations-rebalance-hint = Bir konumun aldığı türleri değiştirdikten sonra: zaten saklanan dosyalar, türlerinin artık gittiği konuma taşınır.
 locations-add-title = Bir konum ekle
 locations-add-hint = Bazı dosya türleri için başka bir disk ya da zaten sahip olduğunuz bir paket klasörü.
+locations-s3-title = S3 depolama
+locations-s3-hint = s3://bucket-name biçimindeki bir konum, bu hizmetteki bir bucket’tır: AWS ya da S3 uyumlu herhangi bir hizmet (Backblaze B2, Cloudflare R2, Wasabi, MinIO, NAS üzerinde Garage).
+locations-s3-endpoint = Adres
+locations-s3-endpoint-placeholder = AWS için boş bırakın; örn. https://s3.eu-central-003.backblazeb2.com
+locations-s3-region = Bölge
+locations-s3-access-key = Erişim anahtarı kimliği
+locations-s3-secret-key = Gizli erişim anahtarı
+locations-s3-headers = Ek üst bilgiler
+locations-s3-headers-placeholder = Name=value, her satıra bir tane (örneğin Cloudflare Access için)
+locations-s3-kept = Kaydedildi (değiştirmek için yazın)
+locations-s3-secrets = Anahtarlar ve üst bilgiler sunucunun ayarlarıyla birlikte saklanır ve bir daha gösterilmez.
+locations-s3-secrets-desktop = Anahtarlar ve üst bilgiler bu bilgisayarın anahtar zincirinde saklanır ve bir daha gösterilmez.
+locations-s3-saved = S3 depolama kaydedildi
+locations-s3-save-failed = S3 depolama kaydedilemedi
 locations-add-more = Bir konum ekle…
 
 ## IssuesPanel.vue

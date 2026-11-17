@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "6b1cad733e7c2f6f9f760a91d1879b4b0d4363e36add843001d846f75104d47e"
+source = "b5640bb76c06fe83cd9cc9bd88a06dd911fb0251db9b0880ec94831503ff6fb0"
 translation = "9d239012f3d9767ce11a2f38d15494b7968d4e6dd744eb8ef9d8c13faf7bf59d"
 
 [messages.account-add]
@@ -3532,6 +3532,10 @@ translation = "Varmennetta tai avainta ei voi käyttää"
 source = "make another location the catch-all instead"
 translation = "tee sen sijaan jostain toisesta sijainnista kaiken vastaanottava sijainti"
 
+[messages.error-keychain]
+source = "couldn't keep it in the system's keychain: { $reason }"
+translation = "sitä ei voitu tallentaa järjestelmän avainnippuun: { $reason }"
+
 [messages.error-ldap-base-dn]
 source = "Say where people's entries are (the base DN)"
 translation = "Kerro, missä käyttäjien merkinnät ovat (base DN)"
@@ -3963,6 +3967,14 @@ translation = "ext-arvon on oltava lyhyt tiedostopääte"
 [messages.error-role]
 source = "A role is view, edit or admin"
 translation = "Rooli on view, edit tai admin"
+
+[messages.error-s3-address]
+source = "the S3 address must start with http:// or https://"
+translation = "S3-osoitteen alun on oltava http:// tai https://"
+
+[messages.error-s3-header]
+source = """an extra S3 header looks like Name=value, and "{ $header }" isn't one"""
+translation = "ylimääräinen S3-otsake on muotoa Name=value, eikä ”{ $header }” ole sellainen"
 
 [messages.error-s3-path]
 source = "an S3 location looks like s3://bucket"
@@ -5358,13 +5370,25 @@ translation = "Kansio palvelimella"
 source = "Folder"
 translation = "Kansio"
 
+[messages.locations-folder-hint-cloud]
+source = "A folder that Dropbox, Google Drive, OneDrive or iCloud Drive keeps in sync works too, and so does s3://bucket-name for a bucket in S3 storage."
+translation = "Myös kansio, jonka synkronoinnista huolehtii Dropbox, Google Drive, OneDrive tai iCloud Drive, käy, samoin s3://bucket-name S3-tallennustilassa olevalle bucketille."
+
 [messages.locations-folder-hint-managed]
 source = "Hoard creates it if it isn't there. In Docker, this is a folder you've mounted into the container."
 translation = "Hoard luo sen, jos sitä ei ole. Dockerissa tämä on kansio, jonka olet liittänyt konttiin."
 
+[messages.locations-folder-hint-managed-desktop]
+source = "Hoard creates it if it isn't there."
+translation = "Hoard luo sen, jos sitä ei ole."
+
 [messages.locations-folder-hint-watched]
 source = "In Docker, mount the folder into the container first (read-only is fine), then pick it here."
 translation = "Liitä kansio Dockerissa ensin konttiin (pelkkä lukuoikeus riittää) ja valitse se sitten tästä."
+
+[messages.locations-folder-hint-watched-desktop]
+source = "Hoard only reads it: nothing in it is changed."
+translation = "Hoard vain lukee sitä: mitään sen sisällä ei muuteta."
 
 [messages.locations-folder-placeholder]
 source = "The folder your packs are in"
@@ -5493,6 +5517,62 @@ translation = "Poistetaanko sijainti { $name }?"
 [messages.locations-removed]
 source = "Removed { $name }"
 translation = "Poistettu: { $name }"
+
+[messages.locations-s3-access-key]
+source = "Access key ID"
+translation = "Käyttöavaimen tunnus"
+
+[messages.locations-s3-endpoint]
+source = "Address"
+translation = "Osoite"
+
+[messages.locations-s3-endpoint-placeholder]
+source = "Empty for AWS; e.g. https://s3.eu-central-003.backblazeb2.com"
+translation = "Tyhjä, jos AWS; esim. https://s3.eu-central-003.backblazeb2.com"
+
+[messages.locations-s3-headers]
+source = "Extra headers"
+translation = "Lisäotsakkeet"
+
+[messages.locations-s3-headers-placeholder]
+source = "Name=value, one a line (for Cloudflare Access, say)"
+translation = "Name=value, yksi riviä kohden (esimerkiksi Cloudflare Access -palvelua varten)"
+
+[messages.locations-s3-hint]
+source = "A location at s3://bucket-name is a bucket in this service: AWS, or any S3-compatible one (Backblaze B2, Cloudflare R2, Wasabi, MinIO, Garage on a NAS)."
+translation = "Sijainti s3://bucket-name on bucket tässä palvelussa: AWS tai mikä tahansa S3-yhteensopiva (Backblaze B2, Cloudflare R2, Wasabi, MinIO, Garage NAS-laitteella)."
+
+[messages.locations-s3-kept]
+source = "Saved (type to replace)"
+translation = "Tallennettu (kirjoita korvataksesi)"
+
+[messages.locations-s3-region]
+source = "Region"
+translation = "Alue"
+
+[messages.locations-s3-save-failed]
+source = "Couldn't save S3 storage"
+translation = "S3-tallennustilan tallennus epäonnistui"
+
+[messages.locations-s3-saved]
+source = "S3 storage saved"
+translation = "S3-tallennustilan asetukset tallennettu"
+
+[messages.locations-s3-secret-key]
+source = "Secret access key"
+translation = "Salainen käyttöavain"
+
+[messages.locations-s3-secrets]
+source = "The keys and headers are kept with the server's settings, and never shown again."
+translation = "Avaimet ja otsakkeet tallennetaan palvelimen asetusten mukana, eikä niitä näytetä enää koskaan."
+
+[messages.locations-s3-secrets-desktop]
+source = "The keys and headers are kept in this computer's keychain, and never shown again."
+translation = "Avaimet ja otsakkeet tallennetaan tämän tietokoneen avainnippuun, eikä niitä näytetä enää koskaan."
+
+[messages.locations-s3-title]
+source = "S3 storage"
+translation = "S3-tallennustila"
 
 [messages.locations-save]
 source = "Save"

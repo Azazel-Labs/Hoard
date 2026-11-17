@@ -68,6 +68,9 @@ error-wrong-setup-code = To není instalační kód zadaný serveru v HOARD_SETU
 error-wrong-password = Jméno a heslo k sobě nepatří
 error-folder-missing = { $path } neexistuje (není připojený disk?)
 error-s3-path = umístění S3 vypadá jako s3://bucket
+error-s3-address = adresa S3 musí začínat http:// nebo https://
+error-s3-header = další hlavička S3 vypadá jako Name=value a „{ $header }“ taková není
+error-keychain = nepodařilo se to uložit do systémové klíčenky: { $reason }
 error-not-built = tato kopie Hoardu byla sestavena bez { $feature }
 error-openai-auth-unreachable = nepodařilo se spojit s auth.openai.com
 error-openai-unexpected = neočekávaná odpověď od OpenAI
@@ -857,7 +860,10 @@ locations-folder = Složka na serveru
 locations-folder-desktop = Složka
 locations-folder-placeholder = Složka, ve které jsou vaše balíčky
 locations-folder-hint-managed = Hoard ji vytvoří, pokud neexistuje. V Dockeru je to složka, kterou jste připojili do kontejneru.
+locations-folder-hint-managed-desktop = Hoard ji vytvoří, pokud neexistuje.
 locations-folder-hint-watched = V Dockeru nejprve připojte složku do kontejneru (stačí jen pro čtení) a pak ji vyberte tady.
+locations-folder-hint-watched-desktop = Hoard ji jen čte: nic v ní se nemění.
+locations-folder-hint-cloud = Funguje i složka, kterou synchronizuje Dropbox, Google Drive, OneDrive nebo iCloud Drive, a také s3://bucket-name pro bucket v úložišti S3.
 locations-name = Název
 locations-name-placeholder-managed = Knihovna
 locations-name-placeholder-watched = Moje balíčky
@@ -935,6 +941,20 @@ locations-rebalance = Přesunout uložené soubory podle nastavení
 locations-rebalance-hint = Po změně toho, co umístění přijímá: už uložené soubory se přesunou do umístění, kam teď patří jejich druh.
 locations-add-title = Přidat umístění
 locations-add-hint = Další disk pro některé druhy souborů nebo složka s balíčky, které už máte.
+locations-s3-title = Úložiště S3
+locations-s3-hint = Umístění s3://bucket-name je bucket v této službě: AWS nebo jakékoli službě kompatibilní s S3 (Backblaze B2, Cloudflare R2, Wasabi, MinIO, Garage na NAS).
+locations-s3-endpoint = Adresa
+locations-s3-endpoint-placeholder = Pro AWS prázdné; např. https://s3.eu-central-003.backblazeb2.com
+locations-s3-region = Region
+locations-s3-access-key = ID přístupového klíče
+locations-s3-secret-key = Tajný přístupový klíč
+locations-s3-headers = Další hlavičky
+locations-s3-headers-placeholder = Name=value, jedna na řádek (třeba pro Cloudflare Access)
+locations-s3-kept = Uloženo (psaním nahradíte)
+locations-s3-secrets = Klíče a hlavičky se ukládají s nastavením serveru a už se nikdy nezobrazí.
+locations-s3-secrets-desktop = Klíče a hlavičky se ukládají do klíčenky tohoto počítače a už se nikdy nezobrazí.
+locations-s3-saved = Úložiště S3 uloženo
+locations-s3-save-failed = Úložiště S3 se nepodařilo uložit
 locations-add-more = Přidat umístění…
 
 ## IssuesPanel.vue

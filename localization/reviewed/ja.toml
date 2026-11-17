@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "6b1cad733e7c2f6f9f760a91d1879b4b0d4363e36add843001d846f75104d47e"
+source = "b5640bb76c06fe83cd9cc9bd88a06dd911fb0251db9b0880ec94831503ff6fb0"
 translation = "a12d196c1380419c5ca102eccb546c3fac8ada060b25df474391d37285d67766"
 
 [messages.account-add]
@@ -3446,6 +3446,10 @@ translation = "証明書または鍵を使用できません"
 source = "make another location the catch-all instead"
 translation = "代わりに別の保存場所を受け皿にしてください"
 
+[messages.error-keychain]
+source = "couldn't keep it in the system's keychain: { $reason }"
+translation = "システムのキーチェーンに保管できませんでした: { $reason }"
+
 [messages.error-ldap-base-dn]
 source = "Say where people's entries are (the base DN)"
 translation = "ユーザーのエントリーがある場所（ベース DN）を指定してください"
@@ -3873,6 +3877,14 @@ translation = "ext は短いファイル拡張子でなければなりません"
 [messages.error-role]
 source = "A role is view, edit or admin"
 translation = "ロールは view、edit、admin のいずれかです"
+
+[messages.error-s3-address]
+source = "the S3 address must start with http:// or https://"
+translation = "S3 のアドレスは http:// または https:// で始めてください"
+
+[messages.error-s3-header]
+source = """an extra S3 header looks like Name=value, and "{ $header }" isn't one"""
+translation = "追加の S3 ヘッダーは Name=value の形式ですが、「{ $header }」はそうなっていません"
 
 [messages.error-s3-path]
 source = "an S3 location looks like s3://bucket"
@@ -5240,13 +5252,25 @@ translation = "サーバー上のフォルダー"
 source = "Folder"
 translation = "フォルダー"
 
+[messages.locations-folder-hint-cloud]
+source = "A folder that Dropbox, Google Drive, OneDrive or iCloud Drive keeps in sync works too, and so does s3://bucket-name for a bucket in S3 storage."
+translation = "Dropbox、Google Drive、OneDrive、iCloud Drive が同期しているフォルダーも使えます。S3 ストレージのバケットなら s3://bucket-name も使えます。"
+
 [messages.locations-folder-hint-managed]
 source = "Hoard creates it if it isn't there. In Docker, this is a folder you've mounted into the container."
 translation = "フォルダーがなければ Hoard が作成します。Docker では、コンテナーにマウントしたフォルダーを指定します。"
 
+[messages.locations-folder-hint-managed-desktop]
+source = "Hoard creates it if it isn't there."
+translation = "フォルダーがなければ Hoard が作成します。"
+
 [messages.locations-folder-hint-watched]
 source = "In Docker, mount the folder into the container first (read-only is fine), then pick it here."
 translation = "Docker では、先にフォルダーをコンテナーにマウントしてから（読み取り専用で構いません）、ここで選んでください。"
+
+[messages.locations-folder-hint-watched-desktop]
+source = "Hoard only reads it: nothing in it is changed."
+translation = "Hoard は読み取るだけで、中のものは何も変更しません。"
 
 [messages.locations-folder-placeholder]
 source = "The folder your packs are in"
@@ -5371,6 +5395,62 @@ translation = "{ $name } を削除しますか？"
 [messages.locations-removed]
 source = "Removed { $name }"
 translation = "{ $name } を削除しました"
+
+[messages.locations-s3-access-key]
+source = "Access key ID"
+translation = "アクセスキー ID"
+
+[messages.locations-s3-endpoint]
+source = "Address"
+translation = "アドレス"
+
+[messages.locations-s3-endpoint-placeholder]
+source = "Empty for AWS; e.g. https://s3.eu-central-003.backblazeb2.com"
+translation = "AWS なら空欄。例: https://s3.eu-central-003.backblazeb2.com"
+
+[messages.locations-s3-headers]
+source = "Extra headers"
+translation = "追加ヘッダー"
+
+[messages.locations-s3-headers-placeholder]
+source = "Name=value, one a line (for Cloudflare Access, say)"
+translation = "1 行に 1 つ Name=value（Cloudflare Access 用など）"
+
+[messages.locations-s3-hint]
+source = "A location at s3://bucket-name is a bucket in this service: AWS, or any S3-compatible one (Backblaze B2, Cloudflare R2, Wasabi, MinIO, Garage on a NAS)."
+translation = "s3://bucket-name の保存場所は、このサービスのバケットです。AWS のほか、S3 互換のサービス（Backblaze B2、Cloudflare R2、Wasabi、MinIO、NAS 上の Garage）も使えます。"
+
+[messages.locations-s3-kept]
+source = "Saved (type to replace)"
+translation = "保存済み（入力すると置き換え）"
+
+[messages.locations-s3-region]
+source = "Region"
+translation = "リージョン"
+
+[messages.locations-s3-save-failed]
+source = "Couldn't save S3 storage"
+translation = "S3 ストレージを保存できませんでした"
+
+[messages.locations-s3-saved]
+source = "S3 storage saved"
+translation = "S3 ストレージを保存しました"
+
+[messages.locations-s3-secret-key]
+source = "Secret access key"
+translation = "シークレットアクセスキー"
+
+[messages.locations-s3-secrets]
+source = "The keys and headers are kept with the server's settings, and never shown again."
+translation = "キーとヘッダーはサーバーの設定と一緒に保管され、二度と表示されません。"
+
+[messages.locations-s3-secrets-desktop]
+source = "The keys and headers are kept in this computer's keychain, and never shown again."
+translation = "キーとヘッダーはこのコンピューターのキーチェーンに保管され、二度と表示されません。"
+
+[messages.locations-s3-title]
+source = "S3 storage"
+translation = "S3 ストレージ"
 
 [messages.locations-save]
 source = "Save"

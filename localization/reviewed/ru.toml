@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "6b1cad733e7c2f6f9f760a91d1879b4b0d4363e36add843001d846f75104d47e"
+source = "b5640bb76c06fe83cd9cc9bd88a06dd911fb0251db9b0880ec94831503ff6fb0"
 translation = "cbb01f8f1d57e740769fc4cd136e1d4678a5e455637ccee5b21b5e4c157ff105"
 
 [messages.account-add]
@@ -3598,6 +3598,10 @@ translation = "Сертификат или ключ нельзя использ�
 source = "make another location the catch-all instead"
 translation = "сделайте местом для всего остального другое место хранения"
 
+[messages.error-keychain]
+source = "couldn't keep it in the system's keychain: { $reason }"
+translation = "не удалось сохранить в системном хранилище паролей: { $reason }"
+
 [messages.error-ldap-base-dn]
 source = "Say where people's entries are (the base DN)"
 translation = "Укажите, где находятся записи пользователей (base DN)"
@@ -4031,6 +4035,14 @@ translation = "ext должен быть коротким расширением
 [messages.error-role]
 source = "A role is view, edit or admin"
 translation = "Роль — это view, edit или admin"
+
+[messages.error-s3-address]
+source = "the S3 address must start with http:// or https://"
+translation = "адрес S3 должен начинаться с http:// или https://"
+
+[messages.error-s3-header]
+source = """an extra S3 header looks like Name=value, and "{ $header }" isn't one"""
+translation = "дополнительный заголовок S3 выглядит как Name=value, а «{ $header }» — нет"
 
 [messages.error-s3-path]
 source = "an S3 location looks like s3://bucket"
@@ -5440,13 +5452,25 @@ translation = "Папка на сервере"
 source = "Folder"
 translation = "Папка"
 
+[messages.locations-folder-hint-cloud]
+source = "A folder that Dropbox, Google Drive, OneDrive or iCloud Drive keeps in sync works too, and so does s3://bucket-name for a bucket in S3 storage."
+translation = "Подойдёт и папка, которую синхронизирует Dropbox, Google Drive, OneDrive или iCloud Drive, а также s3://bucket-name для бакета в хранилище S3."
+
 [messages.locations-folder-hint-managed]
 source = "Hoard creates it if it isn't there. In Docker, this is a folder you've mounted into the container."
 translation = "Hoard создаст её, если её нет. В Docker это папка, которую вы подключили в контейнер."
 
+[messages.locations-folder-hint-managed-desktop]
+source = "Hoard creates it if it isn't there."
+translation = "Hoard создаст её, если её нет."
+
 [messages.locations-folder-hint-watched]
 source = "In Docker, mount the folder into the container first (read-only is fine), then pick it here."
 translation = "В Docker сначала подключите папку в контейнер (можно только для чтения), затем выберите её здесь."
+
+[messages.locations-folder-hint-watched-desktop]
+source = "Hoard only reads it: nothing in it is changed."
+translation = "Hoard только читает её: ничего в ней не меняется."
 
 [messages.locations-folder-placeholder]
 source = "The folder your packs are in"
@@ -5577,6 +5601,62 @@ translation = "Удалить { $name }?"
 [messages.locations-removed]
 source = "Removed { $name }"
 translation = "{ $name } удалено"
+
+[messages.locations-s3-access-key]
+source = "Access key ID"
+translation = "Идентификатор ключа доступа"
+
+[messages.locations-s3-endpoint]
+source = "Address"
+translation = "Адрес"
+
+[messages.locations-s3-endpoint-placeholder]
+source = "Empty for AWS; e.g. https://s3.eu-central-003.backblazeb2.com"
+translation = "Пусто для AWS; например, https://s3.eu-central-003.backblazeb2.com"
+
+[messages.locations-s3-headers]
+source = "Extra headers"
+translation = "Дополнительные заголовки"
+
+[messages.locations-s3-headers-placeholder]
+source = "Name=value, one a line (for Cloudflare Access, say)"
+translation = "Name=value, по одному на строку (например, для Cloudflare Access)"
+
+[messages.locations-s3-hint]
+source = "A location at s3://bucket-name is a bucket in this service: AWS, or any S3-compatible one (Backblaze B2, Cloudflare R2, Wasabi, MinIO, Garage on a NAS)."
+translation = "Место хранения s3://bucket-name — это бакет в этом сервисе: AWS или любом совместимом с S3 (Backblaze B2, Cloudflare R2, Wasabi, MinIO, Garage на NAS)."
+
+[messages.locations-s3-kept]
+source = "Saved (type to replace)"
+translation = "Сохранено (введите, чтобы заменить)"
+
+[messages.locations-s3-region]
+source = "Region"
+translation = "Регион"
+
+[messages.locations-s3-save-failed]
+source = "Couldn't save S3 storage"
+translation = "Не удалось сохранить хранилище S3"
+
+[messages.locations-s3-saved]
+source = "S3 storage saved"
+translation = "Хранилище S3 сохранено"
+
+[messages.locations-s3-secret-key]
+source = "Secret access key"
+translation = "Секретный ключ доступа"
+
+[messages.locations-s3-secrets]
+source = "The keys and headers are kept with the server's settings, and never shown again."
+translation = "Ключи и заголовки хранятся в настройках сервера и больше не показываются."
+
+[messages.locations-s3-secrets-desktop]
+source = "The keys and headers are kept in this computer's keychain, and never shown again."
+translation = "Ключи и заголовки хранятся в хранилище паролей этого компьютера и больше не показываются."
+
+[messages.locations-s3-title]
+source = "S3 storage"
+translation = "Хранилище S3"
 
 [messages.locations-save]
 source = "Save"

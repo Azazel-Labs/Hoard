@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "6b1cad733e7c2f6f9f760a91d1879b4b0d4363e36add843001d846f75104d47e"
+source = "b5640bb76c06fe83cd9cc9bd88a06dd911fb0251db9b0880ec94831503ff6fb0"
 translation = "2f78c230d8a023dbe3f8aee93033428187e95f973d76a21d9bdc02564cdbdb48"
 
 [messages.account-add]
@@ -3536,6 +3536,10 @@ translation = "Сертификат или кључ не могу да се ко
 source = "make another location the catch-all instead"
 translation = "уместо тога одредите другу локацију за све остало"
 
+[messages.error-keychain]
+source = "couldn't keep it in the system's keychain: { $reason }"
+translation = "није могуће сачувати у системском складишту лозинки: { $reason }"
+
 [messages.error-ldap-base-dn]
 source = "Say where people's entries are (the base DN)"
 translation = "Наведите где се налазе уноси корисника (base DN)"
@@ -3968,6 +3972,14 @@ translation = "ext мора бити кратка екстензија дато�
 [messages.error-role]
 source = "A role is view, edit or admin"
 translation = "Улога је view, edit или admin"
+
+[messages.error-s3-address]
+source = "the S3 address must start with http:// or https://"
+translation = "S3 адреса мора да почиње са http:// или https://"
+
+[messages.error-s3-header]
+source = """an extra S3 header looks like Name=value, and "{ $header }" isn't one"""
+translation = "додатно S3 заглавље изгледа као Name=value, а „{ $header }“ није такво"
 
 [messages.error-s3-path]
 source = "an S3 location looks like s3://bucket"
@@ -5369,13 +5381,25 @@ translation = "Фасцикла на серверу"
 source = "Folder"
 translation = "Фасцикла"
 
+[messages.locations-folder-hint-cloud]
+source = "A folder that Dropbox, Google Drive, OneDrive or iCloud Drive keeps in sync works too, and so does s3://bucket-name for a bucket in S3 storage."
+translation = "Може и фасцикла коју синхронизује Dropbox, Google Drive, OneDrive или iCloud Drive, као и s3://bucket-name за бакет у S3 складишту."
+
 [messages.locations-folder-hint-managed]
 source = "Hoard creates it if it isn't there. In Docker, this is a folder you've mounted into the container."
 translation = "Hoard је прави ако не постоји. У Docker-у, ово је фасцикла коју сте монтирали у контејнер."
 
+[messages.locations-folder-hint-managed-desktop]
+source = "Hoard creates it if it isn't there."
+translation = "Hoard је прави ако не постоји."
+
 [messages.locations-folder-hint-watched]
 source = "In Docker, mount the folder into the container first (read-only is fine), then pick it here."
 translation = "У Docker-у прво монтирајте фасциклу у контејнер (само за читање је у реду), па је изаберите овде."
+
+[messages.locations-folder-hint-watched-desktop]
+source = "Hoard only reads it: nothing in it is changed."
+translation = "Hoard је само чита: ништа у њој се не мења."
 
 [messages.locations-folder-placeholder]
 source = "The folder your packs are in"
@@ -5505,6 +5529,62 @@ translation = "Уклонити { $name }?"
 [messages.locations-removed]
 source = "Removed { $name }"
 translation = "Уклоњено: { $name }"
+
+[messages.locations-s3-access-key]
+source = "Access key ID"
+translation = "ИД приступног кључа"
+
+[messages.locations-s3-endpoint]
+source = "Address"
+translation = "Адреса"
+
+[messages.locations-s3-endpoint-placeholder]
+source = "Empty for AWS; e.g. https://s3.eu-central-003.backblazeb2.com"
+translation = "Празно за AWS; нпр. https://s3.eu-central-003.backblazeb2.com"
+
+[messages.locations-s3-headers]
+source = "Extra headers"
+translation = "Додатна заглавља"
+
+[messages.locations-s3-headers-placeholder]
+source = "Name=value, one a line (for Cloudflare Access, say)"
+translation = "Name=value, једно по реду (на пример за Cloudflare Access)"
+
+[messages.locations-s3-hint]
+source = "A location at s3://bucket-name is a bucket in this service: AWS, or any S3-compatible one (Backblaze B2, Cloudflare R2, Wasabi, MinIO, Garage on a NAS)."
+translation = "Локација s3://bucket-name је бакет у овом сервису: AWS или било ком сервису компатибилном са S3 (Backblaze B2, Cloudflare R2, Wasabi, MinIO, Garage на NAS-у)."
+
+[messages.locations-s3-kept]
+source = "Saved (type to replace)"
+translation = "Сачувано (куцајте да замените)"
+
+[messages.locations-s3-region]
+source = "Region"
+translation = "Регион"
+
+[messages.locations-s3-save-failed]
+source = "Couldn't save S3 storage"
+translation = "Није могуће сачувати S3 складиште"
+
+[messages.locations-s3-saved]
+source = "S3 storage saved"
+translation = "S3 складиште је сачувано"
+
+[messages.locations-s3-secret-key]
+source = "Secret access key"
+translation = "Тајни приступни кључ"
+
+[messages.locations-s3-secrets]
+source = "The keys and headers are kept with the server's settings, and never shown again."
+translation = "Кључеви и заглавља чувају се у подешавањима сервера и више се не приказују."
+
+[messages.locations-s3-secrets-desktop]
+source = "The keys and headers are kept in this computer's keychain, and never shown again."
+translation = "Кључеви и заглавља чувају се у складишту лозинки овог рачунара и више се не приказују."
+
+[messages.locations-s3-title]
+source = "S3 storage"
+translation = "S3 складиште"
 
 [messages.locations-save]
 source = "Save"

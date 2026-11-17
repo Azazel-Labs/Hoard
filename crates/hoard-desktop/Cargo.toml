@@ -11,8 +11,8 @@ rust-version.workspace = true
 workspace = true
 
 [dependencies]
-# The server without what only a team's server needs (LDAP, HTTPS certificates, S3).
-hoardd = { path = "../hoardd", default-features = false }
+# The server without what only a team's server needs (LDAP, HTTPS certificates), with secrets in the keychain.
+hoardd = { path = "../hoardd", default-features = false, features = ["s3", "keychain"] }
 anyhow.workspace = true
 serde_json.workspace = true
 tokio.workspace = true

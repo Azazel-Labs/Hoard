@@ -240,7 +240,7 @@ async fn probe(state: &AppState, new: &NewLocation, others: &[Location]) -> Resu
         if new.mode == Mode::Watched {
             return Err(AppError::bad_request(tr!("error-watched-is-folder")));
         }
-        let (store, _) = crate::blobs::open_store(&state.cfg, &path).map_err(AppError::bad_request)?;
+        let (store, _) = crate::blobs::open_store(&state.settings.get().s3, &path).map_err(AppError::bad_request)?;
         if let Some(Err(e)) = store.list(None).next().await {
             return Err(AppError::bad_request(tr!("error-cant-reach", path = path, reason = e.to_string())));
         }

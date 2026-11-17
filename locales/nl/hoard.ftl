@@ -68,6 +68,9 @@ error-wrong-setup-code = Dat is niet de installatiecode die de server in HOARD_S
 error-wrong-password = Die naam en dat wachtwoord horen niet bij elkaar
 error-folder-missing = { $path } is er niet (een schijf die niet gekoppeld is?)
 error-s3-path = een S3-locatie ziet eruit als s3://bucket
+error-s3-address = het S3-adres moet beginnen met http:// of https://
+error-s3-header = een extra S3-header ziet eruit als Name=value, en “{ $header }” is dat niet
+error-keychain = kon het niet bewaren in de sleutelhanger van het systeem: { $reason }
 error-not-built = deze kopie van Hoard is gebouwd zonder { $feature }
 error-openai-auth-unreachable = kon auth.openai.com niet bereiken
 error-openai-unexpected = onverwacht antwoord van OpenAI
@@ -823,7 +826,10 @@ locations-folder = Map op de server
 locations-folder-desktop = Map
 locations-folder-placeholder = De map waarin je pakketten staan
 locations-folder-hint-managed = Hoard maakt hem aan als hij er niet is. In Docker is dit een map die je in de container hebt gekoppeld.
+locations-folder-hint-managed-desktop = Hoard maakt hem aan als hij er niet is.
 locations-folder-hint-watched = Koppel de map in Docker eerst in de container (alleen-lezen is prima) en kies hem dan hier.
+locations-folder-hint-watched-desktop = Hoard leest hem alleen: er wordt niets in gewijzigd.
+locations-folder-hint-cloud = Een map die Dropbox, Google Drive, OneDrive of iCloud Drive synchroniseert werkt ook, net als s3://bucket-name voor een bucket in S3-opslag.
 locations-name = Naam
 locations-name-placeholder-managed = Bibliotheek
 locations-name-placeholder-watched = Mijn pakketten
@@ -899,6 +905,20 @@ locations-rebalance = Opgeslagen bestanden mee verplaatsen
 locations-rebalance-hint = Na het wijzigen van wat een locatie aanneemt: bestanden die al zijn opgeslagen, gaan naar de locatie waar hun soort nu naartoe gaat.
 locations-add-title = Een locatie toevoegen
 locations-add-hint = Een andere schijf voor sommige soorten bestanden, of een map met pakketten die je al hebt.
+locations-s3-title = S3-opslag
+locations-s3-hint = Een locatie op s3://bucket-name is een bucket in deze dienst: AWS, of een andere S3-compatibele dienst (Backblaze B2, Cloudflare R2, Wasabi, MinIO, Garage op een NAS).
+locations-s3-endpoint = Adres
+locations-s3-endpoint-placeholder = Leeg voor AWS; bijv. https://s3.eu-central-003.backblazeb2.com
+locations-s3-region = Regio
+locations-s3-access-key = Toegangssleutel-ID
+locations-s3-secret-key = Geheime toegangssleutel
+locations-s3-headers = Extra headers
+locations-s3-headers-placeholder = Name=value, één per regel (bijvoorbeeld voor Cloudflare Access)
+locations-s3-kept = Opgeslagen (typ om te vervangen)
+locations-s3-secrets = De sleutels en headers worden bewaard bij de instellingen van de server en nooit meer getoond.
+locations-s3-secrets-desktop = De sleutels en headers worden bewaard in de sleutelhanger van deze computer en nooit meer getoond.
+locations-s3-saved = Instellingen voor S3-opslag opgeslagen
+locations-s3-save-failed = Kon de instellingen voor S3-opslag niet opslaan
 locations-add-more = Een locatie toevoegen…
 
 ## IssuesPanel.vue

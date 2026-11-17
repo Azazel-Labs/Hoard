@@ -68,6 +68,7 @@ mod provenance;
 mod reformat;
 mod relocate;
 mod scan;
+mod secrets;
 mod server;
 mod settings;
 mod sheet;
@@ -156,17 +157,18 @@ pub async fn run(cfg: Config) -> Result<()> {
     }
     if cfg.desktop {
         i18n::for_desktop();
+        secrets::for_desktop();
         desktop::ensure_owner(&*pool.get()?)?;
     }
     if let Some(loc) = locations::adopt_existing(&*pool.get()?, &cfg)? {
         tracing::info!(path = %loc.path, "your files stay where they are, as the library location \"Library\"");
     }
     store_formats::load(&cfg.data_dir.join("formats"));
-    let blobs = BlobStore::open(&cfg, pool.clone())?;
-    let requeued = db::requeue_stale_jobs(&*pool.get()?)?;
-    maintenance::mark_interrupted(&*pool.get()?)?;
     let settings = settings::Store::load(&cfg, &*pool.get()?)?;
     let effective = settings.get();
+    let blobs = BlobStore::open(&cfg, pool.clone(), effective.s3.clone())?;
+    let requeued = db::requeue_stale_jobs(&*pool.get()?)?;
+    maintenance::mark_interrupted(&*pool.get()?)?;
     analyze::set_render_enabled(effective.render, effective.llm_vision && effective.llm_enabled());
     analyze::set_thumb_quality(effective.thumb_quality);
     music::configure(effective.soundfont.clone());

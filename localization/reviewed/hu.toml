@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "6b1cad733e7c2f6f9f760a91d1879b4b0d4363e36add843001d846f75104d47e"
+source = "b5640bb76c06fe83cd9cc9bd88a06dd911fb0251db9b0880ec94831503ff6fb0"
 translation = "7987db5b0f3a9cdd626bf9f356c2383cfea3c41e3dfe0c3abced61e76a05b8e3"
 
 [messages.account-add]
@@ -3449,6 +3449,10 @@ translation = "A tanúsítvány vagy a kulcs nem használható"
 source = "make another location the catch-all instead"
 translation = "előbb tegyen meg egy másik helyet gyűjtőhelynek"
 
+[messages.error-keychain]
+source = "couldn't keep it in the system's keychain: { $reason }"
+translation = "nem sikerült megőrizni a rendszer jelszótárolójában: { $reason }"
+
 [messages.error-ldap-base-dn]
 source = "Say where people's entries are (the base DN)"
 translation = "Adja meg, hol találhatók a felhasználók bejegyzései (base DN)"
@@ -3876,6 +3880,14 @@ translation = "az ext értéke rövid fájlkiterjesztés legyen"
 [messages.error-role]
 source = "A role is view, edit or admin"
 translation = "A szerepkör lehet view, edit vagy admin"
+
+[messages.error-s3-address]
+source = "the S3 address must start with http:// or https://"
+translation = "az S3-cím http:// vagy https:// kezdetű legyen"
+
+[messages.error-s3-header]
+source = """an extra S3 header looks like Name=value, and "{ $header }" isn't one"""
+translation = "egy további S3-fejléc így néz ki: Name=value, a „{ $header }” viszont nem ilyen"
 
 [messages.error-s3-path]
 source = "an S3 location looks like s3://bucket"
@@ -5236,13 +5248,25 @@ translation = "Mappa a szerveren"
 source = "Folder"
 translation = "Mappa"
 
+[messages.locations-folder-hint-cloud]
+source = "A folder that Dropbox, Google Drive, OneDrive or iCloud Drive keeps in sync works too, and so does s3://bucket-name for a bucket in S3 storage."
+translation = "Egy Dropbox, Google Drive, OneDrive vagy iCloud Drive által szinkronizált mappa is megfelel, ahogy egy S3-tárhely bucketjéhez az s3://bucket-name is."
+
 [messages.locations-folder-hint-managed]
 source = "Hoard creates it if it isn't there. In Docker, this is a folder you've mounted into the container."
 translation = "Ha nem létezik, a Hoard létrehozza. Dockerben ez egy olyan mappa, amelyet a konténerbe csatolt."
 
+[messages.locations-folder-hint-managed-desktop]
+source = "Hoard creates it if it isn't there."
+translation = "Ha nem létezik, a Hoard létrehozza."
+
 [messages.locations-folder-hint-watched]
 source = "In Docker, mount the folder into the container first (read-only is fine), then pick it here."
 translation = "Dockerben előbb csatolja a mappát a konténerbe (csak olvashatóként is jó), majd válassza ki itt."
+
+[messages.locations-folder-hint-watched-desktop]
+source = "Hoard only reads it: nothing in it is changed."
+translation = "A Hoard csak olvassa: semmi sem változik benne."
 
 [messages.locations-folder-placeholder]
 source = "The folder your packs are in"
@@ -5367,6 +5391,62 @@ translation = "Eltávolítja ezt a helyet: { $name }?"
 [messages.locations-removed]
 source = "Removed { $name }"
 translation = "Eltávolítva: { $name }"
+
+[messages.locations-s3-access-key]
+source = "Access key ID"
+translation = "Hozzáférési kulcs azonosítója"
+
+[messages.locations-s3-endpoint]
+source = "Address"
+translation = "Cím"
+
+[messages.locations-s3-endpoint-placeholder]
+source = "Empty for AWS; e.g. https://s3.eu-central-003.backblazeb2.com"
+translation = "AWS esetén üres; pl. https://s3.eu-central-003.backblazeb2.com"
+
+[messages.locations-s3-headers]
+source = "Extra headers"
+translation = "További fejlécek"
+
+[messages.locations-s3-headers-placeholder]
+source = "Name=value, one a line (for Cloudflare Access, say)"
+translation = "Name=value, soronként egy (például a Cloudflare Accesshez)"
+
+[messages.locations-s3-hint]
+source = "A location at s3://bucket-name is a bucket in this service: AWS, or any S3-compatible one (Backblaze B2, Cloudflare R2, Wasabi, MinIO, Garage on a NAS)."
+translation = "Az s3://bucket-name helyek ennek a szolgáltatásnak a bucketjei: az AWS-é vagy bármely S3-kompatibilis szolgáltatásé (Backblaze B2, Cloudflare R2, Wasabi, MinIO, Garage egy NAS-on)."
+
+[messages.locations-s3-kept]
+source = "Saved (type to replace)"
+translation = "Mentve (gépeljen a cseréhez)"
+
+[messages.locations-s3-region]
+source = "Region"
+translation = "Régió"
+
+[messages.locations-s3-save-failed]
+source = "Couldn't save S3 storage"
+translation = "Nem sikerült menteni az S3-tárhelyet"
+
+[messages.locations-s3-saved]
+source = "S3 storage saved"
+translation = "S3-tárhely mentve"
+
+[messages.locations-s3-secret-key]
+source = "Secret access key"
+translation = "Titkos hozzáférési kulcs"
+
+[messages.locations-s3-secrets]
+source = "The keys and headers are kept with the server's settings, and never shown again."
+translation = "A kulcsok és a fejlécek a szerver beállításai között tárolódnak, és többé nem jelennek meg."
+
+[messages.locations-s3-secrets-desktop]
+source = "The keys and headers are kept in this computer's keychain, and never shown again."
+translation = "A kulcsok és a fejlécek ennek a számítógépnek a jelszótárolójában tárolódnak, és többé nem jelennek meg."
+
+[messages.locations-s3-title]
+source = "S3 storage"
+translation = "S3-tárhely"
 
 [messages.locations-save]
 source = "Save"

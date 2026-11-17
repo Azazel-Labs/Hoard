@@ -368,9 +368,8 @@ software rasterizer (`apt install mesa-vulkan-drivers`). Without any adapter, ev
      colors. Guides, proxies and hidden meshes are left out; a file of materials alone has no thumbnail. The 3D viewer
      shows the GLB Hoard makes from it.
    - SketchUp (`.skp`), from SketchUp 3 through today's: faces, groups and components, layers and tags (hidden ones
-     left out), colors and textures, read natively by Hoard's own port of the MIT-licensed
-     [openskp](https://github.com/iamahsanmehmood/openskp) reader (`crates/hoard-skp`), since SketchUp's SDK has no
-     Linux build. Edges without a face, guides, text and dimensions aren't drawn. The thumbnail, the 3D viewer and
+     left out), colors and textures, read natively by polysmelt's port of the MIT-licensed
+     [openskp](https://github.com/iamahsanmehmood/openskp) reader, since SketchUp's SDK has no Linux build. Edges without a face, guides, text and dimensions aren't drawn. The thumbnail, the 3D viewer and
      "download as GLB" all use the GLB Hoard makes from it, in meters with Y up.
    - Unreal packages (`.uasset`, `.umap`), read without Unreal: see [Unreal packs](#unreal-packs).
    - Source files:
@@ -1320,7 +1319,6 @@ crates/hoard-render   headless wgpu renderer: glTF/GLB/OBJ in, thumbnail out (`c
 crates/hoardd         the server; formats/ describes the files stores ship beside their art (Megascans, Sketchfab)
 crates/hoard          the CLI
 crates/hoard-unreal   Unreal package reader and converters (textures, sounds, materials, data tables)
-crates/hoard-skp      SketchUp .skp reader, to GLB (a port of openskp's MIT reader)
 xtask/                `cargo xtask`: dev servers, checks, local model downloads and serving, Unreal export
 integrations/godot    the Godot 4 editor plugin (addons/hoard) and its headless test script
 integrations/unity    the Unity editor package (com.hoard.browser) and a .NET harness that runs its code without Unity

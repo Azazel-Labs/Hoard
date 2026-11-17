@@ -62,7 +62,7 @@ test.describe('full-screen viewers', () => {
     const stats = (await (await api.get('/api/stats')).json()) as { renderer?: string }
     const drawn = /^(gpu|cpu):/.test(stats.renderer ?? '')
     const name = `E2E SketchUp ${unique()}`
-    const skp = readFileSync(new URL('../../crates/hoard-skp/tests/data/legacy_v2020_textured.skp', import.meta.url))
+    const skp = readFileSync(new URL('../../crates/hoardd/tests/data/legacy_v3_textured.skp', import.meta.url))
     const pack = await uploadPack(api, name, [{ relpath: 'Shed.skp', data: skp }])
     try {
       await waitReady(api, [pack.id])

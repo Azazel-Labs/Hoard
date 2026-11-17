@@ -2334,16 +2334,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "hoard-skp"
-version = "1.2.0"
-dependencies = [
- "anyhow",
- "flate2",
- "gltf",
- "serde_json",
-]
-
-[[package]]
 name = "hoard-unreal"
 version = "1.2.0"
 dependencies = [
@@ -2386,7 +2376,6 @@ dependencies = [
  "hayro",
  "hoard-core",
  "hoard-render",
- "hoard-skp",
  "hoard-unreal",
  "http",
  "http-body",
@@ -4145,9 +4134,9 @@ dependencies = [
 
 [[package]]
 name = "polysmelt"
-version = "0.12.0"
+version = "0.13.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9e80f798776fb730046338476b4ce600c29be7bf9b947561bd0edf0aae199b9f"
+checksum = "989b0b3a96270688f0fd2d598e87c5ce2323277b72d9768f0613a19f364b70c5"
 dependencies = [
  "base64 0.22.1",
  "bytemuck",

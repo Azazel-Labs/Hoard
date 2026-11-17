@@ -1,6 +1,6 @@
 [workspace]
 resolver = "3"
-members = ["crates/hoard-core", "crates/hoard-unreal", "crates/hoard-skp", "crates/hoardd", "crates/hoard", "crates/hoard-render", "xtask"]
+members = ["crates/hoard-core", "crates/hoard-unreal", "crates/hoardd", "crates/hoard", "crates/hoard-render", "xtask"]
 
 [workspace.package]
 # Only what a local build reports. Releases are git tags (auto-release.yml tags every push to main that passes ci) and
@@ -15,7 +15,6 @@ repository = "https://github.com/Azazel-Labs/Hoard"
 hoard-core = { path = "crates/hoard-core" }
 hoard-render = { path = "crates/hoard-render" }
 hoard-unreal = { path = "crates/hoard-unreal" }
-hoard-skp = { path = "crates/hoard-skp" }
 anyhow = "1"
 blake3 = "1.8"
 clap = { version = "4.6", features = ["derive", "env"] }

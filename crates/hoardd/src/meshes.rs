@@ -1,7 +1,7 @@
 //! Models read natively, by [polysmelt]: STL, PLY, `MagicaVoxel` `.vox`, OBJ (with its MTL materials and textures),
-//! FBX (binary and ASCII), 3DS, 3MF and USD, and SketchUp `.skp` by [`hoard_skp`], which makes a GLB of it first. Each becomes a GLB, which feeds the thumbnail renderer and "download
-//! as GLB"; textures are embedded so the GLB stands on its own, re-encoded as PNG from anything Hoard can decode.
-//! glTF and GLB are read too, for the triangles they draw, and decoded into plain glTF when compressed or quantized
+//! FBX (binary and ASCII), 3DS, 3MF, USD and SketchUp `.skp`. Each becomes a GLB, which feeds the thumbnail renderer
+//! and "download as GLB"; textures are embedded so the GLB stands on its own, re-encoded as PNG from anything Hoard
+//! can decode. glTF and GLB are read too, for the triangles they draw, and decoded into plain glTF when compressed or quantized
 //! so the thumbnail renderer can draw them; their download GLB is packed from the file as it is. Every one of them
 //! reaches the 3D viewer as a plain GLB with web-ready textures ([`view_glb`]).
 
@@ -28,15 +28,9 @@ pub(crate) fn rebuilt_as_glb(ext: &str) -> bool {
     reads(ext) && !matches!(ext, "gltf" | "glb")
 }
 
-/// Read a model: a SketchUp file as the GLB [`hoard_skp`] makes of it (its textures are inside), anything else by
-/// polysmelt.
+/// Read a model with polysmelt.
 fn open(path: &Path, ext: &str, assets: &dyn Assets, keep: Keep) -> Result<polysmelt::document::Document<'static>> {
-    if ext != "skp" {
-        return Ok(polysmelt::formats::load(path, ext, assets, keep)?);
-    }
-    let glb = hoard_skp::to_glb(&std::fs::read(path)?)?;
-    let name = path.to_string_lossy();
-    Ok(polysmelt::formats::load_bytes(&glb, &name, "glb", assets, keep)?.into_owned())
+    Ok(polysmelt::formats::load(path, ext, assets, keep)?)
 }
 
 /// A pack laid out in a folder: polysmelt finds the files a model points at, and Hoard decodes the textures.
@@ -438,7 +432,7 @@ Connections:  {
     fn a_sketchup_model_reads_like_any_other() {
         let dir = tempfile::tempdir().unwrap();
         let skp = dir.path().join("box.skp");
-        let fixture = Path::new(env!("CARGO_MANIFEST_DIR")).join("../hoard-skp/tests/data/legacy_v2020_textured.skp");
+        let fixture = Path::new(env!("CARGO_MANIFEST_DIR")).join("tests/data/legacy_v3_textured.skp");
         std::fs::copy(fixture, &skp).unwrap();
         assert!(reads("skp") && rebuilt_as_glb("skp"));
         let facts = facts(&skp, "skp", dir.path()).unwrap();

@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "cf23321f0b5a4c0def865b770a270a499d16f94b002a515b0ea85331683559fc"
+source = "47a3448b14f74c042c962d95a8da3ad506368f14f81b265581c06b24339ed881"
 translation = "110cc1215f00a6312d4fe13a655f9cc3553e284205745fc0ce70ae25601e1bd5"
 
 [messages.account-add]
@@ -503,6 +503,14 @@ translation = "シェーダー"
 [messages.api-kind-shader-name]
 source = "shaders"
 translation = "シェーダー"
+
+[messages.api-kind-sheet]
+source = "Sprite sheets"
+translation = "スプライトシート"
+
+[messages.api-kind-sheet-name]
+source = "sprite sheets"
+translation = "スプライトシート"
 
 [messages.api-kind-texture]
 source = "Textures"
@@ -1695,10 +1703,6 @@ translation = "お気に入りに追加済み（F で外す）"
 source = "File"
 translation = "ファイル"
 
-[messages.asset-in-atlas]
-source = "In atlas"
-translation = "アトラス"
-
 [messages.asset-in-pack]
 source = "in"
 translation = "·"
@@ -1742,6 +1746,10 @@ translation = "マテリアルのプレビュー"
 [messages.asset-lazy-material-viewer]
 source = "the material viewer"
 translation = "マテリアルビューアー"
+
+[messages.asset-lazy-sheet-view]
+source = "the sprite sheet viewer"
+translation = "スプライトシートビューアー"
 
 [messages.asset-lazy-sprite-player]
 source = "the sprite player"
@@ -2164,10 +2172,6 @@ translation = "マテリアルファイル"
 [messages.asset-rel-sidecar]
 source = "store details"
 translation = "ストア情報"
-
-[messages.asset-rel-sprite]
-source = "sprite"
-translation = "スプライト"
 
 [messages.asset-rel-texture]
 source = "texture"
@@ -9066,6 +9070,91 @@ translation = '{ " " }を監視しています。パックは見つかりしだ�
 [messages.setup-watched-before]
 source = 'Hoard is watching{ " " }'
 translation = 'Hoard は{ " " }'
+
+[messages.sheet-animations]
+source = """
+{ $count ->
+        [one] { $count } animation
+       *[other] { $count } animations
+    }"""
+translation = """
+{ $count ->
+       *[other] アニメーション { $count } 個
+    }"""
+
+[messages.sheet-failed]
+source = "This sheet can't be read."
+translation = "このシートは読み込めません。"
+
+[messages.sheet-find]
+source = "Find a sprite"
+translation = "スプライトを検索"
+
+[messages.sheet-loading]
+source = "Loading the sheet…"
+translation = "シートを読み込み中…"
+
+[messages.sheet-no-match]
+source = "No sprite has that in its name."
+translation = "名前にそれを含むスプライトはありません。"
+
+[messages.sheet-note-clockwise]
+source = "Sprites turned clockwise and trimmed. It can't hold animations: frames go by their numbered names."
+translation = "スプライトは時計回りに回転・トリミングされます。アニメーションは保持できないため、フレームは番号付きの名前で並びます。"
+
+[messages.sheet-note-frames]
+source = "Every sprite upright on its whole canvas, each a PNG named after it."
+translation = "すべてのスプライトを正立させ、キャンバス全体のまま、それぞれの名前を付けた PNG にします。"
+
+[messages.sheet-note-godot-frames]
+source = "Sprites never turned, their trim kept as margins, with animations and each frame's time."
+translation = "スプライトは回転されず、トリミングした分は余白として残り、アニメーションと各フレームの時間も含まれます。"
+
+[messages.sheet-note-godot-tileset]
+source = "Tiles never turned or trimmed, on a grid of the tile size, keeping the images when they're on one already."
+translation = "タイルは回転もトリミングもされず、タイルサイズのグリッドに並びます。画像がすでにグリッドになっている場合はそのまま使います。"
+
+[messages.sheet-note-grid]
+source = "Every sprite upright on its whole canvas, in cells all one size, for anything that cuts a sheet into a grid."
+translation = "すべてのスプライトを正立させ、キャンバス全体のまま同じサイズのセルに並べます。シートをグリッドで切り分けるツールならどれでも読めます。"
+
+[messages.sheet-note-hoard]
+source = "Hoard's own: the pages as they are, sprites turned any way and trimmed, with animations and each frame's time."
+translation = "Hoard 独自の形式です。ページはそのままで、スプライトは任意の向きに回転・トリミングされ、アニメーションと各フレームの時間も含まれます。"
+
+[messages.sheet-note-libgdx]
+source = "Sprites turned counter-clockwise and trimmed. It can't hold animations: frames go by their numbered names."
+translation = "スプライトは反時計回りに回転・トリミングされます。アニメーションは保持できないため、フレームは番号付きの名前で並びます。"
+
+[messages.sheet-note-texturepacker]
+source = "Sprites turned clockwise and trimmed, with animations by name, as PixiJS and Phaser read them."
+translation = "スプライトは時計回りに回転・トリミングされ、アニメーションは名前付きで、PixiJS や Phaser が読める形になります。"
+
+[messages.sheet-pages]
+source = """
+{ $count ->
+        [one] { $count } page
+       *[other] { $count } pages
+    }"""
+translation = """
+{ $count ->
+       *[other] { $count } ページ
+    }"""
+
+[messages.sheet-showing]
+source = "Showing { $shown } of { $total }"
+translation = "{ $total } 件中 { $shown } 件を表示"
+
+[messages.sheet-sprites]
+source = """
+{ $count ->
+        [one] { $count } sprite
+       *[other] { $count } sprites
+    }"""
+translation = """
+{ $count ->
+       *[other] スプライト { $count } 個
+    }"""
 
 [messages.shortcuts-actual-pixels]
 source = "Actual pixels"

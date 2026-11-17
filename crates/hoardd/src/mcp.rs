@@ -324,7 +324,7 @@ fn search_tools() -> Value {
                 "type": "object",
                 "properties": {
                     "query": { "type": "string", "description": "Words to search for, e.g. 'grass footsteps'." },
-                    "kind": { "type": "string", "enum": ["texture", "vector", "audio", "model", "animation", "font", "shader", "material", "video", "document", "data", "other"] },
+                    "kind": { "type": "string", "enum": ["texture", "vector", "sheet", "audio", "model", "animation", "font", "shader", "material", "video", "document", "data", "other"] },
                     "tags": { "type": "array", "items": { "type": "string" }, "description": "All must match, e.g. ['sfx', 'material:stone']." },
                     "pack_id": { "type": "string" },
                     "collection": { "type": "string", "description": "Only assets in this collection (id or name)." },

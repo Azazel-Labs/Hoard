@@ -986,6 +986,10 @@ pub(crate) fn categorize(kind: AssetKind, tags: &TagSet) -> String {
             "textures",
         ),
         AssetKind::Vector => pick(&[("icon", "ui/icons"), ("ui", "ui"), ("character", "vector/characters")], "vector"),
+        AssetKind::Sheet => pick(
+            &[("icon", "ui/icons"), ("ui", "ui"), ("tileset", "tilesets"), ("character", "sprites/character")],
+            "sprites",
+        ),
         AssetKind::Model => pick(
             &[
                 ("character", "models/characters"),

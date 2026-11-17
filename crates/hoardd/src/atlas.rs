@@ -13,8 +13,9 @@
 
 use std::collections::{HashMap, HashSet};
 
-use anyhow::{Context as _, Result};
+use anyhow::Result;
 use hoard_core::{AssetKind, TagSource};
+#[cfg(test)]
 use image::{RgbaImage, imageops};
 use quick_xml::events::{BytesStart, Event};
 use rusqlite::{Connection, params};
@@ -56,18 +57,38 @@ pub(crate) struct Page {
     pub(crate) sprites: Vec<Sprite>,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Default)]
 pub(crate) struct Atlas {
     pub(crate) format: &'static str,
     pub(crate) pages: Vec<Page>,
+    /// The animations the file names (Aseprite's tags, a Godot `SpriteFrames`'s animations).
+    pub(crate) animations: Vec<Anim>,
+    /// A tile set's tile size: its sprites are cells of a grid.
+    pub(crate) tile: Option<[u32; 2]>,
 }
 
-/// A sprite cut from an atlas, as SQL over an asset `a`.
-pub(crate) const IS_SPRITE: &str = "(json_extract(a.meta, '$.sprite') IS NOT NULL)";
+/// An animation: sprites shown one after another.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub(crate) struct Anim {
+    pub(crate) name: String,
+    pub(crate) frames: Vec<Frame>,
+    pub(crate) looped: bool,
+}
+
+/// One frame of an animation: a sprite (by page, and its place in the page) and how long it shows.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) struct Frame {
+    pub(crate) page: usize,
+    pub(crate) sprite: usize,
+    pub(crate) ms: u32,
+}
+
+/// How long a frame shows when the file doesn't say.
+pub(crate) const FRAME_MS: u32 = 100;
 
 /// Bigger files aren't atlases.
 const MAX_FILE: i64 = 8 << 20;
-/// Sprites one pack's atlases may make, all told.
+/// An atlas with more sprites than this isn't read.
 const MAX_SPRITES: usize = 20_000;
 /// Pages and sprites bigger than this (in either direction) aren't cut.
 const MAX_SIDE: u32 = 16_384;
@@ -80,10 +101,36 @@ pub(crate) fn parse(ext: &str, text: &str) -> Option<Atlas> {
         "json" => texture_packer(&serde_json::from_str(text).ok()?),
         "atlas" => libgdx(text),
         "plist" => cocos(&plist(text)?),
+        "tres" => godot(text),
         _ => None,
     }?;
-    let pages: Vec<Page> = atlas.pages.into_iter().filter(|p| !p.image.is_empty() && !p.sprites.is_empty()).collect();
-    (!pages.is_empty()).then_some(Atlas { pages, ..atlas })
+    // Pages with nothing on them are left out, and the animations follow the pages that stay.
+    let mut moved = Vec::with_capacity(atlas.pages.len());
+    let mut pages = Vec::new();
+    for p in atlas.pages {
+        if p.image.is_empty() || p.sprites.is_empty() {
+            moved.push(None);
+        } else {
+            moved.push(Some(pages.len()));
+            pages.push(p);
+        }
+    }
+    let animations = atlas
+        .animations
+        .into_iter()
+        .filter_map(|a| {
+            let frames: Vec<Frame> = a
+                .frames
+                .into_iter()
+                .filter_map(|f| {
+                    let page = (*moved.get(f.page)?)?;
+                    (f.sprite < pages[page].sprites.len()).then_some(Frame { page, ..f })
+                })
+                .collect();
+            (!frames.is_empty()).then_some(Anim { frames, ..a })
+        })
+        .collect();
+    (!pages.is_empty()).then_some(Atlas { pages, animations, ..atlas })
 }
 
 fn attrs(e: &BytesStart<'_>) -> HashMap<String, String> {
@@ -168,7 +215,7 @@ fn starling(text: &str) -> Option<Atlas> {
             _ => {}
         }
     }
-    Some(Atlas { format: "starling", pages: vec![page?] })
+    Some(Atlas { format: "starling", pages: vec![page?], ..Atlas::default() })
 }
 
 fn field(v: &Value, k: &str) -> Option<f64> {
@@ -205,15 +252,87 @@ fn tp_frames(frames: &Value) -> Vec<Sprite> {
 }
 
 /// TexturePacker's JSON (and Aseprite's, which is the same): `{"frames": …, "meta": {"image": …}}`, or a multipack's
-/// `{"textures": [{"image": …, "frames": [...]}]}`.
+/// `{"textures": [{"image": …, "frames": [...]}]}`. Aseprite's adds each frame's `duration` and, in `meta`, the
+/// `frameTags` that are its animations (`from` and `to` counting frames in order, played `forward`, `reverse` or
+/// `pingpong`).
 fn texture_packer(v: &Value) -> Option<Atlas> {
     let image = |o: &Value| o.get("image").and_then(Value::as_str).map(str::to_owned);
-    let pages = if let Some(textures) = v.get("textures").and_then(Value::as_array) {
-        textures.iter().filter_map(|t| Some(Page { image: image(t)?, sprites: tp_frames(t.get("frames")?) })).collect()
-    } else {
-        vec![Page { image: image(v.get("meta")?)?, sprites: tp_frames(v.get("frames")?) }]
+    if let Some(textures) = v.get("textures").and_then(Value::as_array) {
+        let pages = textures
+            .iter()
+            .filter_map(|t| Some(Page { image: image(t)?, sprites: tp_frames(t.get("frames")?) }))
+            .collect();
+        return Some(Atlas { format: "texturepacker", pages, ..Atlas::default() });
+    }
+    let meta = v.get("meta")?;
+    let frames = v.get("frames")?;
+    let Some(tags) = meta.get("frameTags").and_then(Value::as_array).filter(|t| !t.is_empty()) else {
+        let pages = vec![Page { image: image(meta)?, sprites: tp_frames(frames) }];
+        return Some(Atlas { format: "texturepacker", pages, ..Atlas::default() });
     };
-    Some(Atlas { format: "texturepacker", pages })
+    // Aseprite: frames in the order it wrote them (a hash's are read sorted, so put back by their numbers).
+    let mut list: Vec<(String, &Value)> = match frames {
+        Value::Object(m) => m.iter().map(|(k, f)| (k.clone(), f)).collect(),
+        Value::Array(a) => {
+            a.iter().map(|f| (f.get("filename").and_then(Value::as_str).unwrap_or("").to_owned(), f)).collect()
+        }
+        _ => return None,
+    };
+    if frames.is_object() {
+        list.sort_by_cached_key(|(name, _)| natural(name));
+    }
+    let mut sprites = Vec::new();
+    let mut at = Vec::new();
+    for (name, f) in &list {
+        let ms = field(f, "duration").map_or(FRAME_MS, |d| d.clamp(1.0, 60_000.0) as u32);
+        at.push(tp_frame(name, f).map(|s| {
+            sprites.push(s);
+            (sprites.len() - 1, ms)
+        }));
+    }
+    let animations = tags
+        .iter()
+        .filter_map(|t| {
+            let (from, to) = (field(t, "from")? as usize, field(t, "to")? as usize);
+            let ids: Vec<usize> = (from..=to.min(list.len().saturating_sub(1))).collect();
+            let order: Vec<usize> = match t.get("direction").and_then(Value::as_str) {
+                Some("reverse") => ids.into_iter().rev().collect(),
+                Some("pingpong") => {
+                    let back: Vec<usize> =
+                        ids.iter().rev().skip(1).take(ids.len().saturating_sub(2)).copied().collect();
+                    ids.into_iter().chain(back).collect()
+                }
+                _ => ids,
+            };
+            let frames: Vec<Frame> = order
+                .into_iter()
+                .filter_map(|i| at.get(i).copied().flatten())
+                .map(|(sprite, ms)| Frame { page: 0, sprite, ms })
+                .collect();
+            Some(Anim { name: t.get("name")?.as_str()?.to_owned(), frames, looped: true })
+        })
+        .collect();
+    Some(Atlas { format: "aseprite", pages: vec![Page { image: image(meta)?, sprites }], animations, tile: None })
+}
+
+/// A name for sorting the way people count: `walk 2` before `walk 10`.
+pub(crate) fn natural(s: &str) -> Vec<(String, u64)> {
+    let mut out = Vec::new();
+    let mut text = String::new();
+    let mut digits = String::new();
+    for c in s.chars() {
+        if c.is_ascii_digit() {
+            digits.push(c);
+        } else {
+            if !digits.is_empty() {
+                out.push((std::mem::take(&mut text), digits.parse().unwrap_or(u64::MAX)));
+                digits.clear();
+            }
+            text.extend(c.to_lowercase());
+        }
+    }
+    out.push((text, if digits.is_empty() { 0 } else { digits.parse().unwrap_or(u64::MAX) }));
+    out
 }
 
 /// libGDX's and Spine's `.atlas`: a page's image file on a line of its own (first, or after a blank line), then its
@@ -322,7 +441,7 @@ fn libgdx(text: &str) -> Option<Atlas> {
     if let (Some(r), Some(p)) = (region.take(), pages.last_mut()) {
         finish(r, p);
     }
-    Some(Atlas { format: "libgdx", pages })
+    Some(Atlas { format: "libgdx", pages, ..Atlas::default() })
 }
 
 /// An XML property list as JSON: dicts as objects, arrays as arrays, strings, numbers and booleans as themselves
@@ -479,11 +598,209 @@ fn cocos(v: &Value) -> Option<Atlas> {
             trim,
         });
     }
-    Some(Atlas { format: "cocos2d", pages: vec![Page { image, sprites }] })
+    Some(Atlas { format: "cocos2d", pages: vec![Page { image, sprites }], ..Atlas::default() })
+}
+
+/// Godot's `SpriteFrames` and `TileSet` resources (`.tres`, Godot 3 and 4). A page is an image the resource names,
+/// as it names it (`res://…`).
+fn godot(text: &str) -> Option<Atlas> {
+    let res = crate::godot::parse(text)?;
+    match res.kind()?.as_str() {
+        "SpriteFrames" => godot_frames(&res),
+        "TileSet" => godot_tiles(&res),
+        _ => None,
+    }
+}
+
+/// The pages of a Godot resource, one per image it names, in the order they're first used.
+struct GodotPages {
+    paths: HashMap<String, String>,
+    pages: Vec<Page>,
+    by_ext: HashMap<String, usize>,
+}
+
+impl GodotPages {
+    fn new(res: &crate::godot::Resource) -> Self {
+        GodotPages { paths: res.ext_paths(), pages: Vec::new(), by_ext: HashMap::new() }
+    }
+
+    /// The page an `ExtResource(…)` is, `None` when the resource doesn't name it.
+    fn of(&mut self, v: &crate::godot::Val) -> Option<usize> {
+        let id = v.reference("ExtResource")?;
+        if let Some(&i) = self.by_ext.get(&id) {
+            return Some(i);
+        }
+        let image = self.paths.get(&id)?.clone();
+        self.pages.push(Page { image, sprites: Vec::new() });
+        self.by_ext.insert(id, self.pages.len() - 1);
+        Some(self.pages.len() - 1)
+    }
+
+    fn add(&mut self, page: usize, sprite: Sprite) -> usize {
+        self.pages[page].sprites.push(sprite);
+        self.pages[page].sprites.len() - 1
+    }
+}
+
+/// A rectangle from Godot's numbers (`Rect2(x, y, w, h)`).
+fn godot_rect(v: Option<&crate::godot::Val>) -> Option<[u32; 4]> {
+    match v?.nums()[..] {
+        [x, y, w, h, ..] => Some([px(x)?, px(y)?, px(w)?, px(h)?]),
+        _ => None,
+    }
+}
+
+fn godot_pair(v: Option<&crate::godot::Val>, or: [u32; 2]) -> [u32; 2] {
+    match v.map(crate::godot::Val::nums).as_deref() {
+        Some([a, b, ..]) => [px(*a).unwrap_or(or[0]), px(*b).unwrap_or(or[1])],
+        _ => or,
+    }
+}
+
+/// A file's name without its folders or extension.
+fn godot_stem(path: &str) -> String {
+    let file = path.rsplit(['/', '\\']).next().unwrap_or(path);
+    file.rsplit_once('.').map_or(file, |(s, _)| s).to_owned()
+}
+
+/// `SpriteFrames`: `animations`, each a `name`, a `speed` (frames a second), whether it loops, and its frames: an
+/// `AtlasTexture` (a `region` of an image, with a `margin` for the trimmed canvas) or a whole image, which Godot 4
+/// gives as `{"duration": …, "texture": …}` (the duration in frames). A sprite taking a whole image has an empty
+/// rectangle until its image's size is known.
+fn godot_frames(res: &crate::godot::Resource) -> Option<Atlas> {
+    use crate::godot::Val;
+    let Val::Arr(list) = res.main()?.prop("animations")? else { return None };
+    let mut pages = GodotPages::new(res);
+    let mut seen: HashMap<String, Frame> = HashMap::new();
+    let mut animations = Vec::new();
+    for a in list {
+        let name = a.get("name").and_then(Val::str).unwrap_or("default").to_owned();
+        let speed = a.get("speed").and_then(Val::num).filter(|s| *s > 0.0 && s.is_finite()).unwrap_or(5.0);
+        let looped = a.get("loop").and_then(Val::num).is_none_or(|l| l != 0.0);
+        let Some(Val::Arr(frames)) = a.get("frames") else { continue };
+        let mut out = Vec::new();
+        for (n, f) in frames.iter().enumerate() {
+            let (texture, duration) = match f.get("texture") {
+                Some(t) => (t, f.get("duration").and_then(Val::num).filter(|d| *d > 0.0).unwrap_or(1.0)),
+                None => (f, 1.0),
+            };
+            let ms = (1000.0 * duration / speed).round().clamp(1.0, 60_000.0) as u32;
+            let key = texture
+                .reference("SubResource")
+                .map(|s| format!("sub:{s}"))
+                .or_else(|| texture.reference("ExtResource").map(|e| format!("ext:{e}")));
+            let Some(key) = key else { continue };
+            if let Some(&frame) = seen.get(&key) {
+                out.push(Frame { ms, ..frame });
+                continue;
+            }
+            let placed = if let Some(id) = texture.reference("SubResource") {
+                let sub = res.sub(&id).filter(|s| s.attr_str("type").as_deref() == Some("AtlasTexture"));
+                sub.and_then(|sub| {
+                    let page = pages.of(sub.prop("atlas")?)?;
+                    let rect = godot_rect(sub.prop("region"))?;
+                    let trim = godot_rect(sub.prop("margin")).and_then(|[l, t, mw, mh]| {
+                        trim_of([rect[2] + mw, rect[3] + mh], [i64::from(l), i64::from(t)], [rect[2], rect[3]])
+                    });
+                    let sprite = Sprite { name: format!("{name}_{n}"), rect, turn: Turn::Upright, trim };
+                    Some((page, pages.add(page, sprite)))
+                })
+            } else {
+                pages.of(texture).map(|page| {
+                    let sprite = Sprite {
+                        name: godot_stem(&pages.pages[page].image),
+                        rect: [0, 0, 0, 0],
+                        turn: Turn::Upright,
+                        trim: None,
+                    };
+                    (page, pages.add(page, sprite))
+                })
+            };
+            let Some((page, sprite)) = placed else { continue };
+            let frame = Frame { page, sprite, ms };
+            seen.insert(key, frame);
+            out.push(frame);
+        }
+        if !out.is_empty() {
+            animations.push(Anim { name, frames: out, looped });
+        }
+    }
+    Some(Atlas { format: "godot-spriteframes", pages: pages.pages, animations, tile: None })
+}
+
+/// `TileSet`. Godot 4's: `sources/N`, each a `TileSetAtlasSource` naming its image, the tile size
+/// (`texture_region_size`), `margins` and `separation`, and a `X:Y/0` line per tile (`X:Y/size_in_atlas` for one
+/// bigger than a cell). Godot 3's: numbered tiles (`N/texture`, `N/region`, `N/tile_mode`): a single tile is its
+/// region, an autotile or atlas tile is cut into `N/autotile/tile_size` cells `N/autotile/spacing` apart.
+fn godot_tiles(res: &crate::godot::Resource) -> Option<Atlas> {
+    use crate::godot::Val;
+    let main = res.main()?;
+    let mut pages = GodotPages::new(res);
+    let mut tile = None;
+    let sources: Vec<&crate::godot::Section> = main
+        .props
+        .iter()
+        .filter(|(k, _)| k.starts_with("sources/"))
+        .filter_map(|(_, v)| res.sub(&v.reference("SubResource")?))
+        .filter(|s| s.attr_str("type").as_deref() == Some("TileSetAtlasSource"))
+        .collect();
+    for (si, src) in sources.iter().enumerate() {
+        let Some(page) = src.prop("texture").and_then(|t| pages.of(t)) else { continue };
+        let [rw, rh] = godot_pair(src.prop("texture_region_size"), [16, 16]);
+        let [mx, my] = godot_pair(src.prop("margins"), [0, 0]);
+        let [sx, sy] = godot_pair(src.prop("separation"), [0, 0]);
+        if rw == 0 || rh == 0 {
+            continue;
+        }
+        tile.get_or_insert([rw, rh]);
+        for (k, _) in &src.props {
+            let Some((coords, "0")) = k.split_once('/') else { continue };
+            let Some((x, y)) = coords.split_once(':') else { continue };
+            let (Ok(x), Ok(y)) = (x.parse::<u32>(), y.parse::<u32>()) else { continue };
+            let [w, h] = godot_pair(src.prop(&format!("{coords}/size_in_atlas")), [1, 1]);
+            let (w, h) = (w.max(1), h.max(1));
+            let rect = [mx + x * (rw + sx), my + y * (rh + sy), rw * w + sx * (w - 1), rh * h + sy * (h - 1)];
+            let name = if sources.len() > 1 { format!("tile_{si}_{x}_{y}") } else { format!("tile_{x}_{y}") };
+            pages.add(page, Sprite { name, rect, turn: Turn::Upright, trim: None });
+        }
+    }
+    // Godot 3: tiles numbered by the first part of their keys.
+    let mut ids: Vec<u64> = main.props.iter().filter_map(|(k, _)| k.strip_suffix("/texture")?.parse().ok()).collect();
+    ids.sort_unstable();
+    ids.dedup();
+    for id in ids {
+        let prop = |k: &str| main.prop(&format!("{id}/{k}"));
+        let Some(page) = prop("texture").and_then(|t| pages.of(t)) else { continue };
+        let name = prop("name").and_then(Val::str).map_or_else(|| format!("tile_{id}"), str::to_owned);
+        let region = godot_rect(prop("region")).unwrap_or([0, 0, 0, 0]);
+        let mode = prop("tile_mode").and_then(Val::num).unwrap_or(0.0);
+        if mode == 0.0 {
+            if region[2] > 0 && region[3] > 0 {
+                tile.get_or_insert([region[2], region[3]]);
+            }
+            pages.add(page, Sprite { name, rect: region, turn: Turn::Upright, trim: None });
+            continue;
+        }
+        let [tw, th] = godot_pair(prop("autotile/tile_size"), [16, 16]);
+        let gap = prop("autotile/spacing").and_then(Val::num).and_then(px).unwrap_or(0);
+        if tw == 0 || th == 0 || region[2] == 0 || region[3] == 0 {
+            continue;
+        }
+        tile.get_or_insert([tw, th]);
+        let (cols, rows) = ((region[2] + gap) / (tw + gap), (region[3] + gap) / (th + gap));
+        for r in 0..rows {
+            for c in 0..cols {
+                let rect = [region[0] + c * (tw + gap), region[1] + r * (th + gap), tw, th];
+                pages.add(page, Sprite { name: format!("{name}_{c}_{r}"), rect, turn: Turn::Upright, trim: None });
+            }
+        }
+    }
+    Some(Atlas { format: "godot-tileset", pages: pages.pages, animations: Vec::new(), tile })
 }
 
 /// A sprite as it was before packing: cut from its page, turned upright and put back on its untrimmed canvas.
 /// `None` when it isn't inside the page.
+#[cfg(test)]
 pub(crate) fn cut(page: &RgbaImage, s: &Sprite) -> Option<RgbaImage> {
     let [x, y, w, h] = s.rect;
     if w == 0 || h == 0 || x.checked_add(w)? > page.width() || y.checked_add(h)? > page.height() {
@@ -505,49 +822,6 @@ pub(crate) fn cut(page: &RgbaImage, s: &Sprite) -> Option<RgbaImage> {
     Some(canvas)
 }
 
-/// The same picture, whatever the file: its size and pixels, with the color of fully transparent ones left out.
-fn pixel_hash(img: &RgbaImage) -> blake3::Hash {
-    let mut h = blake3::Hasher::new();
-    h.update(&img.width().to_le_bytes());
-    h.update(&img.height().to_le_bytes());
-    for p in img.pixels() {
-        h.update(&if p[3] == 0 { [0; 4] } else { p.0 });
-    }
-    h.finalize()
-}
-
-/// Where a sprite is kept: `<atlas folder>/<atlas name>/<sprite name>.png`, the sprite's folders kept and anything
-/// climbing out of them dropped.
-fn sprite_path(atlas: &str, name: &str) -> Option<String> {
-    let base = atlas.rsplit_once('.').map_or(atlas, |(b, _)| b);
-    let parts: Vec<&str> =
-        name.split(['/', '\\']).map(str::trim).filter(|p| !p.is_empty() && *p != "." && *p != "..").collect();
-    let (last, dirs) = parts.split_last()?;
-    let stem = image_stem(last);
-    if stem.is_empty() {
-        return None;
-    }
-    let mut out = base.to_owned();
-    for d in dirs {
-        out.push('/');
-        out.push_str(d);
-    }
-    Some(format!("{out}/{stem}.png"))
-}
-
-/// A sprite's name without the extension of the file it was packed from (`hero.png`, `walk 0.aseprite`).
-fn image_stem(name: &str) -> &str {
-    match name.rsplit_once('.') {
-        Some((stem, ext))
-            if AssetKind::from_ext(&ext.to_lowercase()) == AssetKind::Texture
-                || matches!(ext.to_lowercase().as_str(), "ase" | "aseprite" | "psd") =>
-        {
-            stem
-        }
-        _ => name,
-    }
-}
-
 /// `a/b/../c.png` → `a/c.png`.
 fn normalize(path: &str) -> String {
     let mut out: Vec<&str> = Vec::new();
@@ -567,252 +841,212 @@ fn dir_of(path: &str) -> &str {
     path.rsplit_once('/').map_or("", |(d, _)| d)
 }
 
-fn stem_of(path: &str) -> &str {
-    let file = path.rsplit('/').next().unwrap_or(path);
-    file.rsplit_once('.').map_or(file, |(s, _)| s)
+/// The pack's image an atlas file names. As named, relative to the file; a Godot `res://` path from the Godot
+/// project's root, which is the file's folder or one above it; or else, for an atlas of one page, the image beside
+/// it with its name (a page renamed after packing).
+fn find_page(by_path: &HashMap<String, usize>, file_path: &str, image: &str, one_page: bool) -> Option<usize> {
+    if let Some(rest) = image.strip_prefix("res://") {
+        let want = normalize(rest).to_lowercase();
+        let mut dir = dir_of(file_path);
+        loop {
+            let at = if dir.is_empty() { want.clone() } else { format!("{}/{want}", dir.to_lowercase()) };
+            if let Some(&i) = by_path.get(&at) {
+                return Some(i);
+            }
+            if dir.is_empty() {
+                return None;
+            }
+            dir = dir_of(dir);
+        }
+    }
+    let at = normalize(&format!("{}/{image}", dir_of(file_path)));
+    by_path.get(&at.to_lowercase()).copied().or_else(|| {
+        let ext = crate::ingest::ext_of(image);
+        let base = file_path.rsplit_once('.').map_or(file_path, |(b, _)| b);
+        one_page.then(|| by_path.get(&format!("{base}.{ext}").to_lowercase()).copied()).flatten()
+    })
 }
 
 // ---------------------------------------------------------------------------------------------
 // The library side
+
+/// The files atlases are read from, as SQL.
+const EXTS: &str = "'xml', 'json', 'atlas', 'plist', 'tres'";
 
 #[derive(Debug)]
 struct Texture {
     id: String,
     path: String,
     hash: String,
+    /// From its meta; 0 when it doesn't say.
     size: [u32; 2],
-    bytes: i64,
-    /// Cut from an atlas earlier.
-    cut: bool,
 }
 
-/// What became of one sprite.
-enum Placed {
-    /// The pack has it already, as this texture.
-    Loose(String),
-    /// Kept as a sprite of its own.
-    Own(Box<Made>),
-}
-
-/// A sprite of its own, ready to write.
-struct Made {
-    path: String,
-    name: String,
-    blob: crate::blobs::StoredBlob,
-    /// Read again (it's new or its pixels changed): its facts, thumbnail and tags. Otherwise the row stands.
-    item: Option<(crate::ingest::Item, Option<crate::blobs::StoredBlob>)>,
-    sprite: Value,
-}
-
-/// One atlas found in the pack.
+/// An atlas file found to be a sheet.
 struct Found {
     file_id: String,
-    page_id: String,
-    page_path: String,
     file_path: String,
     format: &'static str,
-    sprites: Vec<Placed>,
+    /// Its pages, by texture.
+    pages: Vec<usize>,
+    sprites: usize,
+    /// The sheet written again (new, or changed): it, its summary, the words its sprites add, its thumbnail.
+    new: Option<New>,
 }
 
-/// Find the pack's atlases and bring the library in line: each sprite linked from its page, as the loose image the
-/// pack has of it or as a sprite of its own (added, updated, or removed when its atlas is gone). Returns how many
-/// atlases it has.
+struct New {
+    blob: crate::blobs::StoredBlob,
+    summary: Value,
+    words: String,
+    thumb: Option<crate::blobs::StoredBlob>,
+}
+
+/// Find the pack's atlas files and bring the library in line: each is a `sheet`, kept with it as a sheet (see
+/// [`crate::spritesheet`]) and linked to its pages (`texture`, so its download brings them), which say in their meta
+/// which atlas they're a page of. A file that isn't an atlas any more is what its extension says again. Returns how
+/// many sheets the pack has.
 pub(crate) fn detect_pack(state: &AppState, rt: &Handle, conn: &mut Connection, pack_id: &str) -> Result<usize> {
-    let files: Vec<(String, String, String, String)> = {
+    // Each candidate, with the sheet it was (if it was one) and whether it has a thumbnail.
+    type Candidate = (String, String, String, String, Option<String>, bool);
+    let files: Vec<Candidate> = {
         let mut stmt = conn.prepare(&format!(
-            "SELECT a.id, a.path, a.blob_hash, a.ext FROM assets a JOIN blobs b ON b.hash = a.blob_hash
-              WHERE a.pack_id = ?1 AND a.ext IN ('xml', 'json', 'atlas', 'plist') AND b.size <= {MAX_FILE}
+            "SELECT a.id, a.path, a.blob_hash, a.ext,
+                    CASE WHEN a.kind = 'sheet' THEN d.blob_hash END, a.thumb_hash IS NOT NULL
+               FROM assets a JOIN blobs b ON b.hash = a.blob_hash
+               LEFT JOIN derivatives d ON d.asset_id = a.id AND d.kind = 'sheet'
+              WHERE a.pack_id = ?1 AND lower(a.ext) IN ({EXTS}) AND b.size <= {MAX_FILE}
               ORDER BY a.path"
         ))?;
-        stmt.query_map([pack_id], |r| Ok((r.get(0)?, r.get(1)?, r.get(2)?, r.get(3)?)))?
+        stmt.query_map([pack_id], |r| Ok((r.get(0)?, r.get(1)?, r.get(2)?, r.get(3)?, r.get(4)?, r.get(5)?)))?
             .collect::<rusqlite::Result<_>>()?
     };
     let textures: Vec<Texture> = {
-        let mut stmt = conn.prepare(&format!(
+        let mut stmt = conn.prepare(
             "SELECT a.id, a.path, a.blob_hash, COALESCE(json_extract(a.meta, '$.width'), 0),
-                    COALESCE(json_extract(a.meta, '$.height'), 0), COALESCE(b.size, 0), {IS_SPRITE}
-               FROM assets a LEFT JOIN blobs b ON b.hash = a.blob_hash
-              WHERE a.pack_id = ?1 AND a.kind = 'texture' ORDER BY a.path"
-        ))?;
+                    COALESCE(json_extract(a.meta, '$.height'), 0)
+               FROM assets a WHERE a.pack_id = ?1 AND a.kind = 'texture' ORDER BY a.path",
+        )?;
         stmt.query_map([pack_id], |r| {
             Ok(Texture {
                 id: r.get(0)?,
                 path: r.get(1)?,
                 hash: r.get(2)?,
                 size: [r.get::<_, f64>(3)? as u32, r.get::<_, f64>(4)? as u32],
-                bytes: r.get(5)?,
-                cut: r.get(6)?,
             })
         })?
         .collect::<rusqlite::Result<_>>()?
     };
     let by_path: HashMap<String, usize> =
-        textures.iter().enumerate().filter(|(_, t)| !t.cut).map(|(i, t)| (t.path.to_lowercase(), i)).collect();
-    let cut_before: HashMap<&str, (&str, &str)> =
-        textures.iter().filter(|t| t.cut).map(|t| (t.path.as_str(), (t.id.as_str(), t.hash.as_str()))).collect();
-    let taken: HashSet<String> = {
-        let mut stmt =
-            conn.prepare(&format!("SELECT lower(a.path) FROM assets a WHERE a.pack_id = ?1 AND NOT {IS_SPRITE}"))?;
-        stmt.query_map([pack_id], |r| r.get(0))?.collect::<rusqlite::Result<_>>()?
-    };
-    let license: Vec<String> = {
-        let mut stmt = conn.prepare("SELECT 'license:' || license FROM packs WHERE id = ?1 AND license IS NOT NULL")?;
-        stmt.query_map([pack_id], |r| r.get(0))?.collect::<rusqlite::Result<_>>()?
-    };
-
-    let mut loose = Loose { textures: &textures, hashes: HashMap::new(), by_size: HashMap::new() };
-    let mut found: Vec<Found> = Vec::new();
-    let mut paths = HashSet::new();
-    let mut count = 0;
-    let work = tempfile::Builder::new().prefix("atlas-").tempdir_in({
-        std::fs::create_dir_all(state.cfg.tmp_dir())?;
-        state.cfg.tmp_dir()
-    })?;
-    for (file_id, file_path, hash, ext) in &files {
-        let text = rt.block_on(state.blobs.read_all(hash))?;
-        let Some(atlas) = parse(ext, &String::from_utf8_lossy(&text)) else { continue };
-        let one_page = atlas.pages.len() == 1;
-        for page in atlas.pages {
-            let at = normalize(&format!("{}/{}", dir_of(file_path), page.image));
-            // As named, or else beside the atlas with the atlas's name (a page renamed after packing).
-            let page_idx = by_path.get(&at.to_lowercase()).copied().or_else(|| {
-                let ext = crate::ingest::ext_of(&page.image);
-                let base = file_path.rsplit_once('.').map_or(file_path.as_str(), |(b, _)| b);
-                one_page.then(|| by_path.get(&format!("{base}.{ext}").to_lowercase()).copied()).flatten()
-            });
-            let Some(page_idx) = page_idx else {
-                tracing::debug!(atlas = %file_path, page = %page.image, "atlas page not in the pack");
-                continue;
-            };
-            let page_tex = &textures[page_idx];
-            let img = match rt
-                .block_on(state.blobs.read_all(&page_tex.hash))
-                .and_then(|b| Ok(image::load_from_memory(&b)?.to_rgba8()))
-            {
-                Ok(img) if img.width() <= MAX_SIDE && img.height() <= MAX_SIDE => img,
-                Ok(_) => continue,
-                Err(e) => {
-                    tracing::debug!(atlas = %file_path, page = %page_tex.path, error = %format!("{e:#}"), "atlas page unreadable");
-                    continue;
-                }
-            };
-            let mut placed = Vec::new();
-            for s in &page.sprites {
-                if count >= MAX_SPRITES {
-                    break;
-                }
-                let Some(sprite) = cut(&img, s) else { continue };
-                let Some(path) = sprite_path(file_path, &s.name) else { continue };
-                count += 1;
-                if let Some(t) = loose.find(state, rt, &sprite, &path, page_idx) {
-                    placed.push(Placed::Loose(t.to_owned()));
-                    continue;
-                }
-                if taken.contains(&path.to_lowercase()) || !paths.insert(path.to_lowercase()) {
-                    continue;
-                }
-                let png = crate::analyze::png_bytes(sprite)?;
-                let blob_hash = blake3::hash(&png).to_hex().to_string();
-                let meta = json!({
-                    "atlas": file_path,
-                    "page": page_tex.path,
-                    "rect": s.rect,
-                    "rotated": s.turn != Turn::Upright,
-                });
-                let name = tagger::display_name(&tagger::name_stem(&path));
-                if cut_before.get(path.as_str()).is_some_and(|(_, h)| *h == blob_hash) {
-                    let blob = crate::blobs::StoredBlob { hash: blob_hash, size: png.len() as u64 };
-                    placed.push(Placed::Own(Box::new(Made { path, name, blob, item: None, sprite: meta })));
-                    continue;
-                }
-                let local = work.path().join("sprite.png");
-                std::fs::write(&local, &png)?;
-                let blob = rt.block_on(state.blobs.put_bytes(png, AssetKind::Texture))?;
-                let mut item = crate::ingest::analyze_one(local, work.path(), path.clone(), Some(blob.clone()))
-                    .with_context(|| format!("{path}: could not read the sprite"))?;
-                let thumb = match item.analysis.thumb.take() {
-                    Some(t) => Some(rt.block_on(state.blobs.put_cache_bytes(t))?),
-                    None => None,
-                };
-                placed.push(Placed::Own(Box::new(Made { path, name, blob, item: Some((item, thumb)), sprite: meta })));
-            }
-            found.push(Found {
-                file_id: file_id.clone(),
-                page_id: page_tex.id.clone(),
-                page_path: page_tex.path.clone(),
-                file_path: file_path.clone(),
-                format: atlas.format,
-                sprites: placed,
-            });
+        textures.iter().enumerate().map(|(i, t)| (t.path.to_lowercase(), i)).collect();
+    // Sizes read from the images themselves, for those whose meta doesn't say.
+    let mut sizes: HashMap<usize, Option<[u32; 2]>> = HashMap::new();
+    let mut found = Vec::new();
+    for (file_id, file_path, hash, ext, was, has_thumb) in files {
+        let text = rt.block_on(state.blobs.read_all(&hash))?;
+        let Some(atlas) = parse(&ext.to_lowercase(), &String::from_utf8_lossy(&text)) else { continue };
+        if atlas.pages.iter().map(|p| p.sprites.len()).sum::<usize>() > MAX_SPRITES {
+            tracing::debug!(atlas = %file_path, "atlas has too many sprites to read");
+            continue;
         }
+        let one_page = atlas.pages.len() == 1;
+        let pages: Vec<Option<crate::spritesheet::Page>> = atlas
+            .pages
+            .iter()
+            .map(|p| {
+                let Some(i) = find_page(&by_path, &file_path, &p.image, one_page) else {
+                    tracing::debug!(atlas = %file_path, page = %p.image, "atlas page not in the pack");
+                    return None;
+                };
+                let t = &textures[i];
+                let size = if t.size[0] > 0 && t.size[1] > 0 {
+                    t.size
+                } else {
+                    (*sizes.entry(i).or_insert_with(|| {
+                        let bytes = rt.block_on(state.blobs.read_all(&t.hash)).ok()?;
+                        let (w, h) = image::ImageReader::new(std::io::Cursor::new(&bytes[..]))
+                            .with_guessed_format()
+                            .ok()?
+                            .into_dimensions()
+                            .ok()?;
+                        Some([w, h])
+                    }))?
+                };
+                Some(crate::spritesheet::Page {
+                    image: t.path.clone(),
+                    size,
+                    asset: Some(t.id.clone()),
+                    hash: Some(t.hash.clone()),
+                })
+            })
+            .collect();
+        let Some(sheet) = crate::spritesheet::Sheet::from_atlas(&atlas, &pages) else { continue };
+        let page_ids: Vec<usize> =
+            sheet.pages.iter().filter_map(|p| by_path.get(&p.image.to_lowercase()).copied()).collect();
+        let json = serde_json::to_vec(&sheet)?;
+        let sheet_hash = blake3::hash(&json).to_hex().to_string();
+        let mut f = Found {
+            file_id,
+            file_path,
+            format: atlas.format,
+            pages: page_ids,
+            sprites: sheet.sprites.len(),
+            new: None,
+        };
+        if was.as_deref() == Some(sheet_hash.as_str()) && has_thumb {
+            found.push(f);
+            continue;
+        }
+        let thumb =
+            sheet_thumbnail(state, rt, &sheet).map(|b| rt.block_on(state.blobs.put_cache_bytes(b))).transpose()?;
+        let mut words: Vec<String> = Vec::new();
+        let mut seen = HashSet::new();
+        for s in sheet.sprites.iter().take(MAX_WORDS) {
+            for w in tagger::fts_words(&s.name).split_whitespace() {
+                if seen.insert(w.to_owned()) {
+                    words.push(w.to_owned());
+                }
+            }
+        }
+        let blob = rt.block_on(state.blobs.put_bytes(json, AssetKind::Sheet))?;
+        f.new = Some(New { blob, summary: sheet.summary(), words: words.join(" "), thumb });
+        found.push(f);
     }
-    drop(work);
     let n = found.len();
-    write(conn, pack_id, found, &license)?;
+    write(conn, pack_id, &textures, &found)?;
     Ok(n)
 }
 
-/// The pack's loose textures, to find a sprite among: by its pixels (each hashed when a sprite of its size comes
-/// along), or by its name and shape.
-struct Loose<'a> {
-    textures: &'a [Texture],
-    hashes: HashMap<usize, Option<blake3::Hash>>,
-    by_size: HashMap<[u32; 2], Vec<usize>>,
-}
+/// Sprites whose names a sheet adds to its words, at most.
+const MAX_WORDS: usize = 500;
 
-/// Loose images bigger than this aren't read to compare with sprites.
-const MAX_LOOSE: i64 = 16 << 20;
-
-impl Loose<'_> {
-    fn find(&mut self, state: &AppState, rt: &Handle, sprite: &RgbaImage, path: &str, page: usize) -> Option<&str> {
-        if self.by_size.is_empty() {
-            for (i, t) in self.textures.iter().enumerate() {
-                if !t.cut && i != page && t.size[0] > 0 && t.bytes <= MAX_LOOSE {
-                    self.by_size.entry(t.size).or_default().push(i);
-                }
-            }
-            if self.by_size.is_empty() {
-                self.by_size.insert([0, 0], Vec::new());
-            }
+/// A sheet's thumbnail, from the pages its first sprites are on.
+fn sheet_thumbnail(state: &AppState, rt: &Handle, sheet: &crate::spritesheet::Sheet) -> Option<Vec<u8>> {
+    let mut pages = HashMap::new();
+    for i in crate::spritesheet::shown_sprites(sheet) {
+        let p = sheet.sprites[i].page;
+        if pages.contains_key(&p) {
+            continue;
         }
-        let size = [sprite.width(), sprite.height()];
-        if let Some(same) = self.by_size.get(&size) {
-            let want = pixel_hash(sprite);
-            for &i in same {
-                let got = *self.hashes.entry(i).or_insert_with(|| {
-                    let bytes = rt.block_on(state.blobs.read_all(&self.textures[i].hash)).ok()?;
-                    Some(pixel_hash(&image::load_from_memory(&bytes).ok()?.to_rgba8()))
-                });
-                if got == Some(want) {
-                    return Some(&self.textures[i].id);
-                }
-            }
+        let page = &sheet.pages[p];
+        if page.size[0] > MAX_SIDE || page.size[1] > MAX_SIDE {
+            continue;
         }
-        // The same name and shape: a loose copy at another scale, or saved another way.
-        let stem = stem_of(path).to_lowercase();
-        let ratio = f64::from(size[0]) / f64::from(size[1].max(1));
-        self.textures
-            .iter()
-            .enumerate()
-            .find(|(i, t)| {
-                !t.cut
-                    && *i != page
-                    && t.size[1] > 0
-                    && stem_of(&t.path).to_lowercase() == stem
-                    && (f64::from(t.size[0]) / f64::from(t.size[1]) - ratio).abs() <= ratio * 0.02
-            })
-            .map(|(_, t)| t.id.as_str())
+        let Some(hash) = &page.hash else { continue };
+        let img = rt.block_on(state.blobs.read_all(hash)).ok().and_then(|b| image::load_from_memory(&b).ok());
+        if let Some(img) = img {
+            pages.insert(p, img.to_rgba8());
+        }
     }
+    let (img, exact) = crate::spritesheet::thumbnail(sheet, &pages)?;
+    crate::analyze::thumb_bytes(img, exact).ok()
 }
 
-/// Write what was found: sprites added or updated, pages marked and linked to their sprites, atlas files linked to
-/// their pages, and sprites whose atlas is gone removed.
-fn write(conn: &mut Connection, pack_id: &str, found: Vec<Found>, license: &[String]) -> Result<()> {
+/// Write what was found: each sheet's file a `sheet` (its sheet, thumbnail, words and category brought up to date if
+/// it changed) linked to its pages, the pages marked, and files that were sheets and aren't any more put back.
+fn write(conn: &mut Connection, pack_id: &str, textures: &[Texture], found: &[Found]) -> Result<()> {
     let marked: bool = conn.query_row(
-        &format!(
-            "SELECT EXISTS (SELECT 1 FROM assets a WHERE a.pack_id = ?1
-                              AND ({IS_SPRITE} OR json_extract(a.meta, '$.atlas') IS NOT NULL))"
-        ),
+        "SELECT EXISTS (SELECT 1 FROM assets a WHERE a.pack_id = ?1
+                          AND (a.kind = 'sheet' OR json_extract(a.meta, '$.atlas') IS NOT NULL))",
         [pack_id],
         |r| r.get(0),
     )?;
@@ -821,115 +1055,88 @@ fn write(conn: &mut Connection, pack_id: &str, found: Vec<Found>, license: &[Str
     }
     let now = db::now();
     let tx = conn.transaction()?;
-    let existing: HashMap<String, String> = {
-        let mut stmt =
-            tx.prepare(&format!("SELECT a.path, a.id FROM assets a WHERE a.pack_id = ?1 AND {IS_SPRITE}"))?;
-        stmt.query_map([pack_id], |r| Ok((r.get(0)?, r.get(1)?)))?.collect::<rusqlite::Result<_>>()?
+    let before: Vec<(String, String, String)> = {
+        let mut stmt = tx.prepare("SELECT id, path, ext FROM assets WHERE pack_id = ?1 AND kind = 'sheet'")?;
+        stmt.query_map([pack_id], |r| Ok((r.get(0)?, r.get(1)?, r.get(2)?)))?.collect::<rusqlite::Result<_>>()?
     };
-    tx.execute(
-        "DELETE FROM asset_links WHERE rel = 'sprite' AND from_id IN (SELECT id FROM assets WHERE pack_id = ?1)",
-        [pack_id],
-    )?;
     tx.execute(
         "UPDATE assets SET meta = json_remove(meta, '$.atlas')
           WHERE pack_id = ?1 AND json_extract(meta, '$.atlas') IS NOT NULL",
         [pack_id],
     )?;
+    let tags_of = |id: &str| -> Result<tagger::TagSet> {
+        let mut set = tagger::TagSet::default();
+        let mut stmt = tx.prepare_cached("SELECT tag, source, confidence FROM asset_tags WHERE asset_id = ?1")?;
+        let rows =
+            stmt.query_map([id], |r| Ok((r.get::<_, String>(0)?, r.get::<_, String>(1)?, r.get::<_, f64>(2)?)))?;
+        for row in rows {
+            let (tag, source, confidence) = row?;
+            set.add(&tag, TagSource::parse(&source), confidence as f32);
+        }
+        Ok(set)
+    };
     let mut kept = HashSet::new();
-    let mut link =
-        tx.prepare_cached("INSERT INTO asset_links (from_id, to_id, rel) VALUES (?1, ?2, ?3) ON CONFLICT DO NOTHING")?;
-    let mut mark = tx.prepare_cached("UPDATE assets SET meta = json_set(meta, '$.atlas', json(?2)) WHERE id = ?1")?;
     for f in found {
-        link.execute(params![f.file_id, f.page_id, "texture"])?;
-        mark.execute(params![
-            f.page_id,
-            json!({ "file": f.file_path, "format": f.format, "sprites": f.sprites.len() }).to_string()
-        ])?;
-        for p in f.sprites {
-            let id = match p {
-                Placed::Loose(id) => id,
-                Placed::Own(m) => {
-                    let id = existing.get(&m.path).cloned().unwrap_or_else(|| uuid::Uuid::now_v7().to_string());
-                    write_sprite(&tx, pack_id, &id, *m, &f.page_path, license, &now)?;
-                    kept.insert(id.clone());
-                    id
-                }
-            };
-            link.execute(params![f.page_id, id, "sprite"])?;
+        kept.insert(f.file_id.clone());
+        for &p in &f.pages {
+            tx.execute(
+                "INSERT INTO asset_links (from_id, to_id, rel) VALUES (?1, ?2, 'texture') ON CONFLICT DO NOTHING",
+                params![f.file_id, textures[p].id],
+            )?;
+            tx.execute(
+                "UPDATE assets SET meta = json_set(meta, '$.atlas', json(?2)) WHERE id = ?1",
+                params![
+                    textures[p].id,
+                    json!({ "file": f.file_path, "format": f.format, "sprites": f.sprites }).to_string()
+                ],
+            )?;
         }
+        let Some(new) = &f.new else { continue };
+        for b in [Some(&new.blob), new.thumb.as_ref()].into_iter().flatten() {
+            tx.execute(
+                "INSERT INTO blobs (hash, size, created_at) VALUES (?1, ?2, ?3) ON CONFLICT (hash) DO NOTHING",
+                params![b.hash, b.size as i64, now],
+            )?;
+        }
+        tx.execute(
+            "INSERT INTO derivatives (asset_id, kind, blob_hash, created_at) VALUES (?1, 'sheet', ?2, ?3)
+             ON CONFLICT (asset_id, kind) DO UPDATE SET blob_hash = excluded.blob_hash, created_at = excluded.created_at",
+            params![f.file_id, new.blob.hash, now],
+        )?;
+        let category = tagger::categorize(AssetKind::Sheet, &tags_of(&f.file_id)?);
+        tx.execute(
+            "UPDATE assets SET kind = 'sheet', meta = json_set(meta, '$.sheet', json(?2)), words = ?3,
+                    thumb_hash = COALESCE(?4, thumb_hash), updated_at = ?5,
+                    category = CASE WHEN human_edited THEN category ELSE ?6 END
+              WHERE id = ?1",
+            params![
+                f.file_id,
+                new.summary.to_string(),
+                format!("{} sprite sheet {}", tagger::fts_words(&f.file_path), new.words),
+                new.thumb.as_ref().map(|t| t.hash.clone()),
+                now,
+                category,
+            ],
+        )?;
+        db::reindex_asset(&tx, &f.file_id)?;
     }
-    drop((link, mark));
-    for id in existing.values() {
-        if !kept.contains(id) {
-            tx.execute("DELETE FROM assets_fts WHERE asset_id = ?1", [id])?;
-            tx.execute("DELETE FROM assets WHERE id = ?1", [id])?;
+    for (id, path, ext) in before {
+        if kept.contains(&id) {
+            continue;
         }
+        let kind = AssetKind::from_ext(&ext.to_lowercase());
+        let category = tagger::categorize(kind, &tags_of(&id)?);
+        tx.execute("DELETE FROM derivatives WHERE asset_id = ?1 AND kind = 'sheet'", [&id])?;
+        tx.execute(
+            "UPDATE assets SET kind = ?2, meta = json_remove(meta, '$.sheet'), words = ?3, thumb_hash = NULL,
+                    updated_at = ?4, category = CASE WHEN human_edited THEN category ELSE ?5 END
+              WHERE id = ?1",
+            params![id, kind.as_str(), tagger::fts_words(&path), now, category],
+        )?;
+        db::reindex_asset(&tx, &id)?;
     }
     crate::links::assign_families(&tx, pack_id)?;
     tx.commit()?;
-    Ok(())
-}
-
-/// One sprite of its own into the library: a new row, or the row it had with its pixels, facts and tags brought up to
-/// date (a name or category someone gave it kept). One unchanged only has its meta's note of where it came from
-/// renewed.
-fn write_sprite(
-    tx: &rusqlite::Transaction<'_>,
-    pack_id: &str,
-    id: &str,
-    m: Made,
-    page: &str,
-    license: &[String],
-    now: &str,
-) -> Result<()> {
-    let Some((item, thumb)) = m.item else {
-        tx.execute(
-            "UPDATE assets SET meta = json_set(meta, '$.sprite', json(?2)) WHERE id = ?1",
-            params![id, m.sprite.to_string()],
-        )?;
-        return Ok(());
-    };
-    for b in [Some(&m.blob), thumb.as_ref()].into_iter().flatten() {
-        tx.execute(
-            "INSERT INTO blobs (hash, size, created_at) VALUES (?1, ?2, ?3) ON CONFLICT (hash) DO NOTHING",
-            params![b.hash, b.size as i64, now],
-        )?;
-    }
-    let mut meta = item.analysis.meta;
-    meta.insert("sprite".into(), m.sprite);
-    let mut tags = item.tags;
-    for l in license {
-        tags.add(l, TagSource::Rule, 0.9);
-    }
-    tags.add("sprite", TagSource::Rule, 0.9);
-    let category = tagger::categorize(AssetKind::Texture, &tags);
-    tx.execute(
-        "INSERT INTO assets (id, pack_id, blob_hash, path, name, ext, kind, category, meta, words, thumb_hash,
-                             created_at, updated_at)
-         VALUES (?1, ?2, ?3, ?4, ?5, 'png', 'texture', ?6, ?7, ?8, ?9, ?10, ?10)
-         ON CONFLICT (pack_id, path) DO UPDATE SET
-             blob_hash = excluded.blob_hash, meta = excluded.meta, words = excluded.words,
-             thumb_hash = COALESCE(excluded.thumb_hash, thumb_hash), updated_at = excluded.updated_at,
-             name = CASE WHEN human_edited THEN name ELSE excluded.name END,
-             category = CASE WHEN human_edited THEN category ELSE excluded.category END",
-        params![
-            id,
-            pack_id,
-            m.blob.hash,
-            m.path,
-            m.name,
-            category,
-            Value::Object(meta).to_string(),
-            format!("{} sprite {}", tagger::fts_words(&m.path), tagger::fts_words(page)),
-            thumb.as_ref().map(|t| t.hash.clone()),
-            now,
-        ],
-    )?;
-    tx.execute("DELETE FROM asset_tags WHERE asset_id = ?1 AND source IN ('rule', 'meta')", [id])?;
-    for s in tags.into_vec() {
-        db::upsert_tag(tx, id, &s.tag, s.source, s.confidence)?;
-    }
-    db::reindex_asset(tx, id)?;
     Ok(())
 }
 
@@ -1115,24 +1322,20 @@ mod tests {
     }
 
     #[test]
-    fn pixels_match_whatever_hides_under_transparency() {
-        let a = RgbaImage::from_pixel(2, 2, Rgba([255, 0, 0, 0]));
-        let b = RgbaImage::from_pixel(2, 2, Rgba([0, 255, 0, 0]));
-        assert_eq!(pixel_hash(&a), pixel_hash(&b));
-        assert_ne!(pixel_hash(&a), pixel_hash(&RgbaImage::from_pixel(2, 2, Rgba([0, 255, 0, 1]))));
-    }
-
-    #[test]
-    fn sprite_paths() {
-        assert_eq!(
-            sprite_path("Spritesheet/sheet.xml", "hero_0001").as_deref(),
-            Some("Spritesheet/sheet/hero_0001.png")
-        );
-        assert_eq!(sprite_path("a.json", "walk/01.png").as_deref(), Some("a/walk/01.png"));
-        assert_eq!(sprite_path("x/a.atlas", "../../etc/passwd").as_deref(), Some("x/a/etc/passwd.png"));
-        assert_eq!(sprite_path("a.json", "walk 0.aseprite").as_deref(), Some("a/walk 0.png"));
-        assert_eq!(sprite_path("a.json", "v1.2").as_deref(), Some("a/v1.2.png"));
-        assert_eq!(sprite_path("a.json", "/").as_deref(), None);
+    fn pages_found_as_named() {
+        let by_path: HashMap<String, usize> =
+            [("pack/img/a.png", 0), ("pack/sheets/b.png", 1), ("pack/godot/art/c.png", 2)]
+                .into_iter()
+                .map(|(p, i)| (p.to_owned(), i))
+                .collect();
         assert_eq!(normalize("Sheets/../img/./a.png"), "img/a.png");
+        assert_eq!(find_page(&by_path, "pack/sheets/a.json", "../img/A.png", false), Some(0));
+        // Renamed after packing: the atlas's own name, when it has one page.
+        assert_eq!(find_page(&by_path, "pack/sheets/b.xml", "atlas.png", true), Some(1));
+        assert_eq!(find_page(&by_path, "pack/sheets/b.xml", "atlas.png", false), None);
+        // Godot's, from the project's root above the resource.
+        assert_eq!(find_page(&by_path, "pack/godot/res/hero.tres", "res://art/c.png", false), Some(2));
+        assert_eq!(find_page(&by_path, "pack/godot/hero.tres", "res://art/c.png", false), Some(2));
+        assert_eq!(find_page(&by_path, "pack/godot/hero.tres", "res://art/d.png", false), None);
     }
 }

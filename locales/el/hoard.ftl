@@ -1285,6 +1285,7 @@ asset-lazy-image-viewer = προγράμματος προβολής εικόνω
 asset-lazy-material-preview = προεπισκόπησης υλικού
 asset-lazy-material-viewer = προγράμματος προβολής υλικών
 asset-lazy-sprite-player = προγράμματος αναπαραγωγής sprite
+asset-lazy-sheet-view = προγράμματος προβολής φύλλων sprite
 asset-rel-texture = υφή
 asset-rel-buffer = δεδομένα γεωμετρίας
 asset-rel-material = αρχείο υλικού
@@ -1293,7 +1294,6 @@ asset-rel-library = συνδεδεμένο αρχείο
 asset-rel-guess = μάλλον συνοδεύει
 asset-rel-sidecar = στοιχεία καταστήματος
 asset-rel-variant = παραλλαγή
-asset-rel-sprite = sprite
 asset-role-map = χάρτης { $role }
 asset-maps-count =
     { $count ->
@@ -1303,7 +1303,6 @@ asset-maps-count =
 asset-needs = Χρειάζεται
 asset-animations = Animation
 asset-sprites = Sprites
-asset-in-atlas = Στον άτλαντα
 asset-used-by = Χρησιμοποιείται από
 asset-conversion-failed = η μετατροπή απέτυχε
 asset-as-converting = Μετατροπή…
@@ -1577,6 +1576,42 @@ sprite-columns = Στήλες
 sprite-rows = Γραμμές
 sprite-fps-aria = Καρέ ανά δευτερόλεπτο
 sprite-fps = fps
+
+## The sprite sheet viewer (SheetView.vue) and its download formats (AssetDetail.vue)
+
+# Counts under the sheet's preview, joined with " · ".
+sheet-sprites =
+    { $count ->
+        [one] { $count } sprite
+       *[other] { $count } sprites
+    }
+sheet-pages =
+    { $count ->
+        [one] { $count } σελίδα
+       *[other] { $count } σελίδες
+    }
+sheet-animations =
+    { $count ->
+        [one] { $count } animation
+       *[other] { $count } animations
+    }
+# The box that narrows the list of sprites by name.
+sheet-find = Εύρεση sprite
+# Under the list of sprites when more match than it draws.
+sheet-showing = Εμφανίζονται { $shown } από { $total }
+sheet-no-match = Κανένα sprite δεν το έχει αυτό στο όνομά του.
+sheet-failed = Αυτό το φύλλο δεν μπορεί να διαβαστεί.
+sheet-loading = Φόρτωση φύλλου…
+# Under "Download as" when a sprite sheet format is picked: what the format can say, and so how the sheet comes out
+# in it. Sprites are turned to fit more on a page only in formats that can say so.
+sheet-note-hoard = Η δική μορφή του Hoard: οι σελίδες ως έχουν, τα sprites περιστραμμένα με οποιονδήποτε τρόπο και περικομμένα, με animations και τη διάρκεια κάθε καρέ.
+sheet-note-texturepacker = Sprites περιστραμμένα δεξιόστροφα και περικομμένα, με animations κατά όνομα, όπως τα διαβάζουν το PixiJS και το Phaser.
+sheet-note-clockwise = Sprites περιστραμμένα δεξιόστροφα και περικομμένα. Δεν μπορεί να περιέχει animations: τα καρέ ακολουθούν τα αριθμημένα ονόματά τους.
+sheet-note-libgdx = Sprites περιστραμμένα αριστερόστροφα και περικομμένα. Δεν μπορεί να περιέχει animations: τα καρέ ακολουθούν τα αριθμημένα ονόματά τους.
+sheet-note-godot-frames = Τα sprites δεν περιστρέφονται ποτέ και ό,τι περικόπηκε διατηρείται ως περιθώριο, με animations και τη διάρκεια κάθε καρέ.
+sheet-note-godot-tileset = Τα πλακίδια δεν περιστρέφονται ούτε περικόπτονται ποτέ, σε πλέγμα με το μέγεθος του πλακιδίου· οι εικόνες που είναι ήδη σε πλέγμα μένουν ως έχουν.
+sheet-note-grid = Κάθε sprite όρθιο σε ολόκληρο τον καμβά του, σε κελιά ίδιου μεγέθους, για οτιδήποτε κόβει ένα φύλλο σε πλέγμα.
+sheet-note-frames = Κάθε sprite όρθιο σε ολόκληρο τον καμβά του, το καθένα ως PNG με το όνομά του.
 
 ## TextViewer.vue, TextPreview.vue και text.ts
 
@@ -2621,6 +2656,7 @@ settings-update-check = Έλεγχος στο GitHub κάθε λίγες ώρε�
 
 api-kind-texture = Υφές
 api-kind-vector = Διανυσματικά
+api-kind-sheet = Φύλλα sprite
 api-kind-audio = Ήχος
 api-kind-model = Μοντέλα
 api-kind-animation = Animations
@@ -2633,6 +2669,7 @@ api-kind-data = Δεδομένα
 api-kind-other = Άλλα
 api-kind-texture-name = υφές
 api-kind-vector-name = διανυσματικά
+api-kind-sheet-name = φύλλα sprite
 api-kind-audio-name = ήχος
 api-kind-model-name = μοντέλα
 api-kind-animation-name = animations

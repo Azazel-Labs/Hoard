@@ -98,6 +98,10 @@ pub(crate) fn options(ext: &str, derivatives: &[String]) -> Vec<FormatOption> {
         }
         _ => {}
     }
+    // A sprite sheet, in the formats it can be written in.
+    if derivatives.iter().any(|d| d == "sheet") {
+        out.extend(crate::spritesheet::options());
+    }
     out
 }
 
@@ -701,11 +705,22 @@ pub(crate) async fn request(
     }
     // A GLB download is turned the way the pack's models face and names its textures by the convention, and is made
     // again when either changes.
+    let sheet = crate::spritesheet::is_format(format);
     let key = if format == "glb" {
         format!("as:glb~{}~{}~{}:0", facing.turn, facing.tilt, naming.mark())
+    } else if sheet {
+        // Made from the sheet, so made again when the sheet changes.
+        let (_, h) = derivs.iter().find(|(k, _)| k == "sheet").ok_or(Refused::NotFound)?;
+        format!("as:{format}~{}:0", &h[..h.len().min(16)])
     } else {
         format!("as:{format}:{}", max.unwrap_or(0))
     };
+    // A sprite sheet is written from Hoard's own sheet of it, beside its file.
+    if sheet {
+        let (_, h) = derivs.iter().find(|(k, _)| k == "sheet").ok_or(Refused::NotFound)?;
+        path = format!("{}.{}", path.rsplit_once('.').map_or(path.as_str(), |(s, _)| s), crate::spritesheet::EXT);
+        hash.clone_from(h);
+    }
     // A model only Blender reads is shown, and downloaded as a GLB, from the GLB Blender made of it.
     if (view || format == "glb") && !readable {
         let glb = derivs.iter().find(|(k, _)| k == "glb").ok_or(Refused::NotFound)?;
@@ -780,7 +795,7 @@ fn format_name(format: &str) -> String {
         "tiff" => "TIFF".into(),
         "exr" => "OpenEXR".into(),
         "view" => "GLB for the viewer".into(),
-        other => other.to_ascii_uppercase(),
+        other => crate::spritesheet::label(other).map_or_else(|| other.to_ascii_uppercase(), str::to_owned),
     }
 }
 
@@ -833,7 +848,38 @@ impl Job {
         let work = state.cfg.tmp_dir().join(format!("as-{}", uuid::Uuid::now_v7()));
         let result = async {
             // A .gltf, .obj or .fbx needs its buffers, materials and images beside it, at their pack-relative paths.
-            let files = if matches!(self.ext.to_ascii_lowercase().as_str(), "gltf" | "obj" | "fbx") {
+            let sheet = crate::spritesheet::is_format(&self.format);
+            let files = if sheet {
+                // The sheet, and its pages at their paths in the pack, as the library has them now.
+                let pages = crate::spritesheet::pages(&state.blobs.read_all(&self.hash).await?)?;
+                let me = db::BundleFile {
+                    id: self.asset_id.clone(),
+                    path: self.path.clone(),
+                    hash: self.hash.clone(),
+                    size: 0,
+                    unity_guid: None,
+                };
+                db::call(&state.pool, move |c| {
+                    let mut now = c.prepare("SELECT blob_hash FROM assets WHERE id = ?1")?;
+                    let mut files = vec![me];
+                    for p in pages {
+                        let current: Option<String> = match &p.asset {
+                            Some(id) => rusqlite::OptionalExtension::optional(now.query_row([id], |r| r.get(0)))?,
+                            None => None,
+                        };
+                        let Some(hash) = current.or(p.hash) else { continue };
+                        files.push(db::BundleFile {
+                            id: p.asset.unwrap_or_default(),
+                            path: p.image,
+                            hash,
+                            size: 0,
+                            unity_guid: None,
+                        });
+                    }
+                    Ok(files)
+                })
+                .await?
+            } else if matches!(self.ext.to_ascii_lowercase().as_str(), "gltf" | "obj" | "fbx") {
                 let id = self.asset_id.clone();
                 db::call(&state.pool, move |c| {
                     let ids = db::dependency_closure(c, &id, false)?;
@@ -873,6 +919,9 @@ impl Job {
                         shown.progress(p);
                     }
                 };
+                if sheet {
+                    return crate::spritesheet::export(&local, &root, &fmt);
+                }
                 crate::naming::for_download(naming, || {
                     crate::meshes::facing(facing, || {
                         convert(&local, &root, &src, &fmt, max, &Progress { duration, report: &report })

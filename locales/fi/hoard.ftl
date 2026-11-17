@@ -1285,6 +1285,7 @@ asset-lazy-image-viewer = kuvakatselin
 asset-lazy-material-preview = materiaalin esikatselu
 asset-lazy-material-viewer = materiaalikatselin
 asset-lazy-sprite-player = sprite-soitin
+asset-lazy-sheet-view = sprite-arkkikatselin
 asset-rel-texture = tekstuuri
 asset-rel-buffer = geometriadata
 asset-rel-material = materiaalitiedosto
@@ -1293,7 +1294,6 @@ asset-rel-library = linkitetty tiedosto
 asset-rel-guess = kuuluu luultavasti yhteen
 asset-rel-sidecar = kauppatiedot
 asset-rel-variant = muunnelma
-asset-rel-sprite = sprite
 asset-role-map = kartta: { $role }
 asset-maps-count =
     { $count ->
@@ -1303,7 +1303,6 @@ asset-maps-count =
 asset-needs = Tarvitsee
 asset-animations = Animaatiot
 asset-sprites = Spritet
-asset-in-atlas = Atlaksessa
 asset-used-by = Käyttäjät
 asset-conversion-failed = muunnos epäonnistui
 asset-as-converting = Muunnetaan…
@@ -1581,6 +1580,42 @@ sprite-columns = Sarakkeet
 sprite-rows = Rivit
 sprite-fps-aria = Ruutua sekunnissa
 sprite-fps = fps
+
+## Sprite-arkkikatselin ja sen latausmuodot
+
+# Counts under the sheet's preview, joined with " · ".
+sheet-sprites =
+    { $count ->
+        [one] { $count } sprite
+       *[other] { $count } spriteä
+    }
+sheet-pages =
+    { $count ->
+        [one] { $count } sivu
+       *[other] { $count } sivua
+    }
+sheet-animations =
+    { $count ->
+        [one] { $count } animaatio
+       *[other] { $count } animaatiota
+    }
+# The box that narrows the list of sprites by name.
+sheet-find = Etsi sprite
+# Under the list of sprites when more match than it draws.
+sheet-showing = Näytetään { $shown }/{ $total }
+sheet-no-match = Minkään spriten nimessä ei ole tätä.
+sheet-failed = Tätä arkkia ei voi lukea.
+sheet-loading = Ladataan arkkia…
+# Under "Download as" when a sprite sheet format is picked: what the format can say, and so how the sheet comes out
+# in it. Sprites are turned to fit more on a page only in formats that can say so.
+sheet-note-hoard = Hoardin oma muoto: sivut sellaisinaan, spritet käännettyinä mihin tahansa suuntaan ja rajattuina, mukana animaatiot ja jokaisen ruudun kesto.
+sheet-note-texturepacker = Spritet käännettyinä myötäpäivään ja rajattuina, animaatiot nimettyinä, niin kuin PixiJS ja Phaser ne lukevat.
+sheet-note-clockwise = Spritet käännettyinä myötäpäivään ja rajattuina. Animaatioita se ei tallenna: ruudut tunnistetaan numeroiduista nimistään.
+sheet-note-libgdx = Spritet käännettyinä vastapäivään ja rajattuina. Animaatioita se ei tallenna: ruudut tunnistetaan numeroiduista nimistään.
+sheet-note-godot-frames = Spritejä ei käännetä, ja rajaus säilyy reunuksina; mukana animaatiot ja jokaisen ruudun kesto.
+sheet-note-godot-tileset = Laattoja ei käännetä eikä rajata, ne asetellaan laatan kokoiseen ruudukkoon, ja kuvat säilyvät ennallaan, jos ne ovat jo ruudukossa.
+sheet-note-grid = Jokainen sprite pystyssä koko kuva-alallaan, samankokoisissa soluissa, mille tahansa ohjelmalle, joka leikkaa arkin ruudukoksi.
+sheet-note-frames = Jokainen sprite pystyssä koko kuva-alallaan, kukin omana PNG-kuvanaan, joka on nimetty spriten mukaan.
 
 ## Tekstikatselin
 
@@ -2624,6 +2659,7 @@ settings-update-check = Tarkista GitHubista muutaman tunnin välein, onko uutta 
 
 api-kind-texture = Tekstuurit
 api-kind-vector = Vektorigrafiikka
+api-kind-sheet = Sprite-arkit
 api-kind-audio = Ääni
 api-kind-model = Mallit
 api-kind-animation = Animaatiot
@@ -2636,6 +2672,7 @@ api-kind-data = Data
 api-kind-other = Muut
 api-kind-texture-name = tekstuurit
 api-kind-vector-name = vektorigrafiikka
+api-kind-sheet-name = sprite-arkit
 api-kind-audio-name = ääni
 api-kind-model-name = mallit
 api-kind-animation-name = animaatiot

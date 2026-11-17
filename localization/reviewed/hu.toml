@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "cf23321f0b5a4c0def865b770a270a499d16f94b002a515b0ea85331683559fc"
+source = "47a3448b14f74c042c962d95a8da3ad506368f14f81b265581c06b24339ed881"
 translation = "6df14cb1c2fd71b68aa0783404db89869e1b0987d799ee6e09c8222a98701df5"
 
 [messages.account-add]
@@ -503,6 +503,14 @@ translation = "Shaderek"
 [messages.api-kind-shader-name]
 source = "shaders"
 translation = "shaderek"
+
+[messages.api-kind-sheet]
+source = "Sprite sheets"
+translation = "Spritelapok"
+
+[messages.api-kind-sheet-name]
+source = "sprite sheets"
+translation = "spritelapok"
 
 [messages.api-kind-texture]
 source = "Textures"
@@ -1699,10 +1707,6 @@ translation = "A kedvencei között (az F eltávolítja)"
 source = "File"
 translation = "Fájl"
 
-[messages.asset-in-atlas]
-source = "In atlas"
-translation = "Atlaszban"
-
 [messages.asset-in-pack]
 source = "in"
 translation = "·"
@@ -1746,6 +1750,10 @@ translation = "anyagelőnézet"
 [messages.asset-lazy-material-viewer]
 source = "the material viewer"
 translation = "anyagmegjelenítő"
+
+[messages.asset-lazy-sheet-view]
+source = "the sprite sheet viewer"
+translation = "spritelap-megjelenítő"
 
 [messages.asset-lazy-sprite-player]
 source = "the sprite player"
@@ -2170,10 +2178,6 @@ translation = "anyagfájl"
 [messages.asset-rel-sidecar]
 source = "store details"
 translation = "áruházi adatok"
-
-[messages.asset-rel-sprite]
-source = "sprite"
-translation = "sprite"
 
 [messages.asset-rel-texture]
 source = "texture"
@@ -9076,6 +9080,94 @@ translation = "; a csomagok megjelennek, ahogy megtalálja őket. A feltöltésh
 [messages.setup-watched-before]
 source = 'Hoard is watching{ " " }'
 translation = 'A Hoard ezt a mappát figyeli:{ " " }'
+
+[messages.sheet-animations]
+source = """
+{ $count ->
+        [one] { $count } animation
+       *[other] { $count } animations
+    }"""
+translation = """
+{ $count ->
+        [one] { $count } animáció
+       *[other] { $count } animáció
+    }"""
+
+[messages.sheet-failed]
+source = "This sheet can't be read."
+translation = "Ez a lap nem olvasható."
+
+[messages.sheet-find]
+source = "Find a sprite"
+translation = "Sprite keresése"
+
+[messages.sheet-loading]
+source = "Loading the sheet…"
+translation = "Lap betöltése…"
+
+[messages.sheet-no-match]
+source = "No sprite has that in its name."
+translation = "Egyik sprite nevében sincs ilyen."
+
+[messages.sheet-note-clockwise]
+source = "Sprites turned clockwise and trimmed. It can't hold animations: frames go by their numbered names."
+translation = "A sprite-ok az óramutató járásával megegyezően elforgatva és körbevágva. Animációkat nem tud tárolni: a képkockákat a számozott nevük azonosítja."
+
+[messages.sheet-note-frames]
+source = "Every sprite upright on its whole canvas, each a PNG named after it."
+translation = "Minden sprite állítva, a teljes vásznával, mindegyik egy saját nevét viselő PNG-fájlban."
+
+[messages.sheet-note-godot-frames]
+source = "Sprites never turned, their trim kept as margins, with animations and each frame's time."
+translation = "A sprite-ok sosincsenek elforgatva, a levágott szélük margóként megmarad, animációkkal és minden képkocka idejével."
+
+[messages.sheet-note-godot-tileset]
+source = "Tiles never turned or trimmed, on a grid of the tile size, keeping the images when they're on one already."
+translation = "A csempék sosincsenek elforgatva vagy körbevágva, csempeméretű rácson állnak, és a képek változatlanok maradnak, ha már rácson vannak."
+
+[messages.sheet-note-grid]
+source = "Every sprite upright on its whole canvas, in cells all one size, for anything that cuts a sheet into a grid."
+translation = "Minden sprite állítva, a teljes vásznával, egyforma méretű cellákban, bármihez, ami rácsra vágja a lapot."
+
+[messages.sheet-note-hoard]
+source = "Hoard's own: the pages as they are, sprites turned any way and trimmed, with animations and each frame's time."
+translation = "A Hoard saját formátuma: az oldalak úgy, ahogy vannak, a sprite-ok bármilyen irányba elforgatva és körbevágva, animációkkal és minden képkocka idejével."
+
+[messages.sheet-note-libgdx]
+source = "Sprites turned counter-clockwise and trimmed. It can't hold animations: frames go by their numbered names."
+translation = "A sprite-ok az óramutató járásával ellentétesen elforgatva és körbevágva. Animációkat nem tud tárolni: a képkockákat a számozott nevük azonosítja."
+
+[messages.sheet-note-texturepacker]
+source = "Sprites turned clockwise and trimmed, with animations by name, as PixiJS and Phaser read them."
+translation = "A sprite-ok az óramutató járásával megegyezően elforgatva és körbevágva, név szerinti animációkkal, ahogy a PixiJS és a Phaser olvassa őket."
+
+[messages.sheet-pages]
+source = """
+{ $count ->
+        [one] { $count } page
+       *[other] { $count } pages
+    }"""
+translation = """
+{ $count ->
+        [one] { $count } oldal
+       *[other] { $count } oldal
+    }"""
+
+[messages.sheet-showing]
+source = "Showing { $shown } of { $total }"
+translation = "Megjelenítve: { $shown } / { $total }"
+
+[messages.sheet-sprites]
+source = """
+{ $count ->
+        [one] { $count } sprite
+       *[other] { $count } sprites
+    }"""
+translation = """
+{ $count ->
+        [one] { $count } sprite
+       *[other] { $count } sprite
+    }"""
 
 [messages.shortcuts-actual-pixels]
 source = "Actual pixels"

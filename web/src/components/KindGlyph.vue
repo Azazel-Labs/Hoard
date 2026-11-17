@@ -46,6 +46,13 @@ defineProps<{ kind: AssetKind; size?: number }>()
       <circle cx="19" cy="13" r="2" />
       <circle cx="21" cy="27" r="2" />
     </template>
+    <template v-else-if="kind === 'sheet'">
+      <rect x="6" y="6" width="28" height="28" rx="2" />
+      <rect x="10" y="10" width="9" height="9" rx="1" />
+      <rect x="22" y="10" width="8" height="13" rx="1" />
+      <rect x="10" y="22" width="9" height="8" rx="1" />
+      <path d="m23 30 3-4 3 4" />
+    </template>
     <template v-else-if="kind === 'video'">
       <rect x="6" y="10" width="28" height="20" rx="2" />
       <path d="M17 15v10l8-5Z" />

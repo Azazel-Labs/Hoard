@@ -1348,6 +1348,7 @@ asset-lazy-image-viewer = przeglądarki obrazów
 asset-lazy-material-preview = podglądu materiału
 asset-lazy-material-viewer = przeglądarki materiałów
 asset-lazy-sprite-player = odtwarzacza sprite’ów
+asset-lazy-sheet-view = przeglądarki arkuszy sprite’ów
 asset-rel-texture = tekstura
 asset-rel-buffer = dane geometrii
 asset-rel-material = plik materiału
@@ -1356,7 +1357,6 @@ asset-rel-library = powiązany plik
 asset-rel-guess = prawdopodobnie pasuje
 asset-rel-sidecar = informacje ze sklepu
 asset-rel-variant = wariant
-asset-rel-sprite = sprite
 asset-role-map = mapa: { $role }
 asset-maps-count =
     { $count ->
@@ -1368,7 +1368,6 @@ asset-maps-count =
 asset-needs = Wymaga
 asset-animations = Animacje
 asset-sprites = Sprite’y
-asset-in-atlas = W atlasie
 asset-used-by = Używany przez
 asset-conversion-failed = konwersja nie powiodła się
 asset-as-converting = Konwertowanie…
@@ -1658,6 +1657,48 @@ sprite-columns = Kolumny
 sprite-rows = Wiersze
 sprite-fps-aria = Klatki na sekundę
 sprite-fps = kl./s
+
+## Przeglądarka arkuszy sprite’ów (SheetView.vue) i jej formaty pobierania (AssetDetail.vue)
+
+# Counts under the sheet's preview, joined with " · ".
+sheet-sprites =
+    { $count ->
+        [one] { $count } sprite
+        [few] { $count } sprite’y
+        [many] { $count } sprite’ów
+       *[other] { $count } sprite’a
+    }
+sheet-pages =
+    { $count ->
+        [one] { $count } strona
+        [few] { $count } strony
+        [many] { $count } stron
+       *[other] { $count } strony
+    }
+sheet-animations =
+    { $count ->
+        [one] { $count } animacja
+        [few] { $count } animacje
+        [many] { $count } animacji
+       *[other] { $count } animacji
+    }
+# The box that narrows the list of sprites by name.
+sheet-find = Znajdź sprite’a
+# Under the list of sprites when more match than it draws.
+sheet-showing = Wyświetlono { $shown } z { $total }
+sheet-no-match = Żaden sprite nie ma tego w nazwie.
+sheet-failed = Nie można odczytać tego arkusza.
+sheet-loading = Wczytywanie arkusza…
+# Under "Download as" when a sprite sheet format is picked: what the format can say, and so how the sheet comes out
+# in it. Sprites are turned to fit more on a page only in formats that can say so.
+sheet-note-hoard = Własny format Hoard: strony bez zmian, sprite’y obrócone w dowolną stronę i przycięte, z animacjami i czasem każdej klatki.
+sheet-note-texturepacker = Sprite’y obrócone zgodnie z ruchem wskazówek zegara i przycięte, z animacjami według nazw, tak jak odczytują je PixiJS i Phaser.
+sheet-note-clockwise = Sprite’y obrócone zgodnie z ruchem wskazówek zegara i przycięte. Ten format nie obsługuje animacji: klatki rozpoznaje się po numerach w nazwach.
+sheet-note-libgdx = Sprite’y obrócone przeciwnie do ruchu wskazówek zegara i przycięte. Ten format nie obsługuje animacji: klatki rozpoznaje się po numerach w nazwach.
+sheet-note-godot-frames = Sprite’y nigdy nieobracane, a przycięte brzegi zachowane jako marginesy, z animacjami i czasem każdej klatki.
+sheet-note-godot-tileset = Kafelki nigdy nieobracane ani nieprzycinane, na siatce o rozmiarze kafelka; obrazy, które już są na siatce, zostają bez zmian.
+sheet-note-grid = Każdy sprite nieobrócony, na całym swoim płótnie, w jednakowych komórkach, dla każdego narzędzia, które tnie arkusz według siatki.
+sheet-note-frames = Każdy sprite nieobrócony, na całym swoim płótnie, każdy jako osobny plik PNG nazwany tak jak on.
 
 ## TextViewer.vue, TextPreview.vue i text.ts
 
@@ -2771,6 +2812,7 @@ settings-update-check = Sprawdzaj co kilka godzin w GitHub, czy jest nowa wersja
 
 api-kind-texture = Tekstury
 api-kind-vector = Grafika wektorowa
+api-kind-sheet = Arkusze sprite’ów
 api-kind-audio = Dźwięk
 api-kind-model = Modele
 api-kind-animation = Animacje
@@ -2783,6 +2825,7 @@ api-kind-data = Dane
 api-kind-other = Inne
 api-kind-texture-name = tekstury
 api-kind-vector-name = grafika wektorowa
+api-kind-sheet-name = arkusze sprite’ów
 api-kind-audio-name = dźwięk
 api-kind-model-name = modele
 api-kind-animation-name = animacje

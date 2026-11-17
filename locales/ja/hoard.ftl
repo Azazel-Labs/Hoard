@@ -1136,6 +1136,7 @@ asset-lazy-image-viewer = 画像ビューアー
 asset-lazy-material-preview = マテリアルのプレビュー
 asset-lazy-material-viewer = マテリアルビューアー
 asset-lazy-sprite-player = スプライトプレーヤー
+asset-lazy-sheet-view = スプライトシートビューアー
 asset-rel-texture = テクスチャ
 asset-rel-buffer = ジオメトリデータ
 asset-rel-material = マテリアルファイル
@@ -1144,13 +1145,11 @@ asset-rel-library = リンクされたファイル
 asset-rel-guess = 関連している可能性
 asset-rel-sidecar = ストア情報
 asset-rel-variant = バリエーション
-asset-rel-sprite = スプライト
 asset-role-map = { $role } マップ
 asset-maps-count = { $count } 個のマップ
 asset-needs = 必要なもの
 asset-animations = アニメーション
 asset-sprites = スプライト
-asset-in-atlas = アトラス
 asset-used-by = 使用元
 asset-conversion-failed = 変換に失敗しました
 asset-as-converting = 変換中…
@@ -1410,6 +1409,39 @@ sprite-columns = 列
 sprite-rows = 行
 sprite-fps-aria = 1 秒あたりのフレーム数
 sprite-fps = fps
+
+## スプライトシートビューアー（SheetView.vue）とそのダウンロード形式（AssetDetail.vue）
+
+# Counts under the sheet's preview, joined with " · ".
+sheet-sprites =
+    { $count ->
+       *[other] スプライト { $count } 個
+    }
+sheet-pages =
+    { $count ->
+       *[other] { $count } ページ
+    }
+sheet-animations =
+    { $count ->
+       *[other] アニメーション { $count } 個
+    }
+# The box that narrows the list of sprites by name.
+sheet-find = スプライトを検索
+# Under the list of sprites when more match than it draws.
+sheet-showing = { $total } 件中 { $shown } 件を表示
+sheet-no-match = 名前にそれを含むスプライトはありません。
+sheet-failed = このシートは読み込めません。
+sheet-loading = シートを読み込み中…
+# Under "Download as" when a sprite sheet format is picked: what the format can say, and so how the sheet comes out
+# in it. Sprites are turned to fit more on a page only in formats that can say so.
+sheet-note-hoard = Hoard 独自の形式です。ページはそのままで、スプライトは任意の向きに回転・トリミングされ、アニメーションと各フレームの時間も含まれます。
+sheet-note-texturepacker = スプライトは時計回りに回転・トリミングされ、アニメーションは名前付きで、PixiJS や Phaser が読める形になります。
+sheet-note-clockwise = スプライトは時計回りに回転・トリミングされます。アニメーションは保持できないため、フレームは番号付きの名前で並びます。
+sheet-note-libgdx = スプライトは反時計回りに回転・トリミングされます。アニメーションは保持できないため、フレームは番号付きの名前で並びます。
+sheet-note-godot-frames = スプライトは回転されず、トリミングした分は余白として残り、アニメーションと各フレームの時間も含まれます。
+sheet-note-godot-tileset = タイルは回転もトリミングもされず、タイルサイズのグリッドに並びます。画像がすでにグリッドになっている場合はそのまま使います。
+sheet-note-grid = すべてのスプライトを正立させ、キャンバス全体のまま同じサイズのセルに並べます。シートをグリッドで切り分けるツールならどれでも読めます。
+sheet-note-frames = すべてのスプライトを正立させ、キャンバス全体のまま、それぞれの名前を付けた PNG にします。
 
 ## TextViewer.vue、TextPreview.vue、text.ts
 
@@ -2351,6 +2383,7 @@ settings-update-check = 数時間ごとに GitHub で新しいリリースを確
 
 api-kind-texture = テクスチャ
 api-kind-vector = ベクターアート
+api-kind-sheet = スプライトシート
 api-kind-audio = オーディオ
 api-kind-model = モデル
 api-kind-animation = アニメーション
@@ -2363,6 +2396,7 @@ api-kind-data = データ
 api-kind-other = その他
 api-kind-texture-name = テクスチャ
 api-kind-vector-name = ベクターアート
+api-kind-sheet-name = スプライトシート
 api-kind-audio-name = オーディオ
 api-kind-model-name = モデル
 api-kind-animation-name = アニメーション

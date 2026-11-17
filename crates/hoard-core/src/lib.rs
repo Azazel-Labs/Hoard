@@ -24,6 +24,9 @@ pub enum AssetKind {
     Texture,
     /// Drawings made of shapes rather than pixels (SVG, Illustrator), which scale to any size.
     Vector,
+    /// Sprites packed into one or more images, with a file saying where each one is (a TexturePacker JSON, a
+    /// libGDX `.atlas`, a Godot `SpriteFrames` or `TileSet`…). Never decided by extension: found by reading the file.
+    Sheet,
     Audio,
     Model,
     Animation,
@@ -37,9 +40,10 @@ pub enum AssetKind {
 }
 
 impl AssetKind {
-    pub const ALL: [AssetKind; 12] = [
+    pub const ALL: [AssetKind; 13] = [
         AssetKind::Texture,
         AssetKind::Vector,
+        AssetKind::Sheet,
         AssetKind::Audio,
         AssetKind::Model,
         AssetKind::Animation,
@@ -56,6 +60,7 @@ impl AssetKind {
         match self {
             AssetKind::Texture => "texture",
             AssetKind::Vector => "vector",
+            AssetKind::Sheet => "sheet",
             AssetKind::Audio => "audio",
             AssetKind::Model => "model",
             AssetKind::Animation => "animation",

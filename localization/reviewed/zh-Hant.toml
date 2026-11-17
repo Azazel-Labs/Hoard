@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "cf23321f0b5a4c0def865b770a270a499d16f94b002a515b0ea85331683559fc"
+source = "47a3448b14f74c042c962d95a8da3ad506368f14f81b265581c06b24339ed881"
 translation = "fb5e10cd5eddfc860efb3785bb465796b700258c43d207b08bd9f3334aa5d6c8"
 
 [messages.account-add]
@@ -503,6 +503,14 @@ translation = "著色器"
 [messages.api-kind-shader-name]
 source = "shaders"
 translation = "著色器"
+
+[messages.api-kind-sheet]
+source = "Sprite sheets"
+translation = "精靈圖表"
+
+[messages.api-kind-sheet-name]
+source = "sprite sheets"
+translation = "精靈圖表"
 
 [messages.api-kind-texture]
 source = "Textures"
@@ -1698,10 +1706,6 @@ translation = "已在你的最愛中（按 F 移除）"
 source = "File"
 translation = "檔案"
 
-[messages.asset-in-atlas]
-source = "In atlas"
-translation = "所在圖集"
-
 [messages.asset-in-pack]
 source = "in"
 translation = "位於"
@@ -1745,6 +1749,10 @@ translation = "材質預覽"
 [messages.asset-lazy-material-viewer]
 source = "the material viewer"
 translation = "材質檢視器"
+
+[messages.asset-lazy-sheet-view]
+source = "the sprite sheet viewer"
+translation = "精靈圖表檢視器"
 
 [messages.asset-lazy-sprite-player]
 source = "the sprite player"
@@ -2167,10 +2175,6 @@ translation = "材質檔"
 [messages.asset-rel-sidecar]
 source = "store details"
 translation = "商店詳細資訊"
-
-[messages.asset-rel-sprite]
-source = "sprite"
-translation = "精靈"
 
 [messages.asset-rel-texture]
 source = "texture"
@@ -9058,6 +9062,91 @@ translation = '{ " " }；找到的素材包會陸續出現。若也要上傳，�
 [messages.setup-watched-before]
 source = 'Hoard is watching{ " " }'
 translation = 'Hoard 正在監看{ " " }'
+
+[messages.sheet-animations]
+source = """
+{ $count ->
+        [one] { $count } animation
+       *[other] { $count } animations
+    }"""
+translation = """
+{ $count ->
+       *[other] { $count } 個動畫
+    }"""
+
+[messages.sheet-failed]
+source = "This sheet can't be read."
+translation = "無法讀取這個圖表。"
+
+[messages.sheet-find]
+source = "Find a sprite"
+translation = "尋找精靈"
+
+[messages.sheet-loading]
+source = "Loading the sheet…"
+translation = "正在載入圖表…"
+
+[messages.sheet-no-match]
+source = "No sprite has that in its name."
+translation = "沒有名稱包含此內容的精靈。"
+
+[messages.sheet-note-clockwise]
+source = "Sprites turned clockwise and trimmed. It can't hold animations: frames go by their numbered names."
+translation = "精靈順時針旋轉並裁去透明邊緣。這個格式無法保存動畫：影格依編號名稱區分。"
+
+[messages.sheet-note-frames]
+source = "Every sprite upright on its whole canvas, each a PNG named after it."
+translation = "每個精靈都以完整畫布直立擺放，各自存成以其名稱命名的 PNG。"
+
+[messages.sheet-note-godot-frames]
+source = "Sprites never turned, their trim kept as margins, with animations and each frame's time."
+translation = "精靈一律不旋轉，裁去的部分保留為邊距，包含動畫和每個影格的時長。"
+
+[messages.sheet-note-godot-tileset]
+source = "Tiles never turned or trimmed, on a grid of the tile size, keeping the images when they're on one already."
+translation = "圖塊一律不旋轉也不裁切，依圖塊大小排列在格線上；圖片若已排成格線則維持原樣。"
+
+[messages.sheet-note-grid]
+source = "Every sprite upright on its whole canvas, in cells all one size, for anything that cuts a sheet into a grid."
+translation = "每個精靈都以完整畫布直立擺放，格子大小一致，適用於任何把圖表切成格線的工具。"
+
+[messages.sheet-note-hoard]
+source = "Hoard's own: the pages as they are, sprites turned any way and trimmed, with animations and each frame's time."
+translation = "Hoard 專屬格式：各頁維持原樣，精靈可任意旋轉並裁去透明邊緣，包含動畫和每個影格的時長。"
+
+[messages.sheet-note-libgdx]
+source = "Sprites turned counter-clockwise and trimmed. It can't hold animations: frames go by their numbered names."
+translation = "精靈逆時針旋轉並裁去透明邊緣。這個格式無法保存動畫：影格依編號名稱區分。"
+
+[messages.sheet-note-texturepacker]
+source = "Sprites turned clockwise and trimmed, with animations by name, as PixiJS and Phaser read them."
+translation = "精靈順時針旋轉並裁去透明邊緣，動畫依名稱保存，可供 PixiJS 和 Phaser 讀取。"
+
+[messages.sheet-pages]
+source = """
+{ $count ->
+        [one] { $count } page
+       *[other] { $count } pages
+    }"""
+translation = """
+{ $count ->
+       *[other] { $count } 頁
+    }"""
+
+[messages.sheet-showing]
+source = "Showing { $shown } of { $total }"
+translation = "顯示 { $shown }／{ $total } 個"
+
+[messages.sheet-sprites]
+source = """
+{ $count ->
+        [one] { $count } sprite
+       *[other] { $count } sprites
+    }"""
+translation = """
+{ $count ->
+       *[other] { $count } 個精靈
+    }"""
 
 [messages.shortcuts-actual-pixels]
 source = "Actual pixels"

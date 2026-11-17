@@ -234,9 +234,8 @@ fn catch_up(c: &Connection, pack_id: &str, dir: &Path) -> Result<bool> {
     let assets: Vec<(String, String, Option<String>)> = {
         let mut stmt = c.prepare(&format!(
             "SELECT a.id, a.path, o.path FROM assets a LEFT JOIN asset_origin o ON o.asset_id = a.id
-                  WHERE a.pack_id = ?1 AND NOT {} AND NOT {}",
-            crate::materials::IS_MATERIAL,
-            crate::atlas::IS_SPRITE
+                  WHERE a.pack_id = ?1 AND NOT {}",
+            crate::materials::IS_MATERIAL
         ))?;
         stmt.query_map([pack_id], |r| Ok((r.get(0)?, r.get(1)?, r.get(2)?)))?.collect::<rusqlite::Result<_>>()?
     };

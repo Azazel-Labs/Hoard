@@ -1235,6 +1235,7 @@ asset-lazy-image-viewer = die prentkyker
 asset-lazy-material-preview = die materiaalvoorskou
 asset-lazy-material-viewer = die materiaalkyker
 asset-lazy-sprite-player = die sprite-speler
+asset-lazy-sheet-view = die sprite-bladkyker
 asset-rel-texture = tekstuur
 asset-rel-buffer = geometriedata
 asset-rel-material = materiaallêer
@@ -1243,7 +1244,6 @@ asset-rel-library = gekoppelde lêer
 asset-rel-guess = hoort waarskynlik by
 asset-rel-sidecar = winkelbesonderhede
 asset-rel-variant = variant
-asset-rel-sprite = sprite
 asset-role-map = kaart vir { $role }
 asset-maps-count =
     { $count ->
@@ -1253,7 +1253,6 @@ asset-maps-count =
 asset-needs = Benodig
 asset-animations = Animasies
 asset-sprites = Sprites
-asset-in-atlas = In atlas
 asset-used-by = Gebruik deur
 asset-conversion-failed = omskakeling het misluk
 asset-as-converting = Skakel om…
@@ -1527,6 +1526,42 @@ sprite-columns = Kolomme
 sprite-rows = Rye
 sprite-fps-aria = Rame per sekonde
 sprite-fps = fps
+
+## The sprite sheet viewer (SheetView.vue) and its download formats (AssetDetail.vue)
+
+# Counts under the sheet's preview, joined with " · ".
+sheet-sprites =
+    { $count ->
+        [one] { $count } sprite
+       *[other] { $count } sprites
+    }
+sheet-pages =
+    { $count ->
+        [one] { $count } bladsy
+       *[other] { $count } bladsye
+    }
+sheet-animations =
+    { $count ->
+        [one] { $count } animasie
+       *[other] { $count } animasies
+    }
+# The box that narrows the list of sprites by name.
+sheet-find = Soek 'n sprite
+# Under the list of sprites when more match than it draws.
+sheet-showing = Wys { $shown } van { $total }
+sheet-no-match = Geen sprite het dit in sy naam nie.
+sheet-failed = Hierdie blad kan nie gelees word nie.
+sheet-loading = Laai die blad…
+# Under "Download as" when a sprite sheet format is picked: what the format can say, and so how the sheet comes out
+# in it. Sprites are turned to fit more on a page only in formats that can say so.
+sheet-note-hoard = Hoard se eie formaat: die bladsye soos hulle is, sprites enige kant toe gedraai en bygesny, met animasies en elke raam se tyd.
+sheet-note-texturepacker = Sprites kloksgewys gedraai en bygesny, met animasies volgens naam, soos PixiJS en Phaser dit lees.
+sheet-note-clockwise = Sprites kloksgewys gedraai en bygesny. Dit kan nie animasies hou nie: rame gaan volgens hul genommerde name.
+sheet-note-libgdx = Sprites antikloksgewys gedraai en bygesny. Dit kan nie animasies hou nie: rame gaan volgens hul genommerde name.
+sheet-note-godot-frames = Sprites word nooit gedraai nie en die weggesnyde rand bly as kantruimte behoue, met animasies en elke raam se tyd.
+sheet-note-godot-tileset = Teëls word nooit gedraai of bygesny nie, op 'n rooster van die teëlgrootte, en beelde wat reeds op een is, bly soos hulle is.
+sheet-note-grid = Elke sprite regop op sy hele doek, in selle wat almal ewe groot is, vir enigiets wat 'n blad in 'n rooster opsny.
+sheet-note-frames = Elke sprite regop op sy hele doek, elkeen 'n PNG wat na hom vernoem is.
 
 ## TextViewer.vue, TextPreview.vue en text.ts
 
@@ -2537,6 +2572,7 @@ settings-update-check = Kyk elke paar uur op GitHub vir 'n nuwe weergawe
 
 api-kind-texture = Teksture
 api-kind-vector = Vektorkuns
+api-kind-sheet = Sprite-blaaie
 api-kind-audio = Klank
 api-kind-model = Modelle
 api-kind-animation = Animasies
@@ -2549,6 +2585,7 @@ api-kind-data = Data
 api-kind-other = Ander
 api-kind-texture-name = teksture
 api-kind-vector-name = vektorkuns
+api-kind-sheet-name = sprite-blaaie
 api-kind-audio-name = klank
 api-kind-model-name = modelle
 api-kind-animation-name = animasies

@@ -1144,6 +1144,7 @@ asset-lazy-image-viewer = képmegjelenítő
 asset-lazy-material-preview = anyagelőnézet
 asset-lazy-material-viewer = anyagmegjelenítő
 asset-lazy-sprite-player = sprite-lejátszó
+asset-lazy-sheet-view = spritelap-megjelenítő
 asset-rel-texture = textúra
 asset-rel-buffer = geometriaadatok
 asset-rel-material = anyagfájl
@@ -1152,13 +1153,11 @@ asset-rel-library = kapcsolt fájl
 asset-rel-guess = valószínűleg hozzá tartozik
 asset-rel-sidecar = áruházi adatok
 asset-rel-variant = változat
-asset-rel-sprite = sprite
 asset-role-map = térkép: { $role }
 asset-maps-count = { $count } térkép
 asset-needs = Igényli
 asset-animations = Animációk
 asset-sprites = Sprite-ok
-asset-in-atlas = Atlaszban
 asset-used-by = Használja
 asset-conversion-failed = az átalakítás sikertelen
 asset-as-converting = Átalakítás…
@@ -1420,6 +1419,42 @@ sprite-columns = Oszlopok
 sprite-rows = Sorok
 sprite-fps-aria = Képkocka másodpercenként
 sprite-fps = fps
+
+## Spritelap-megjelenítő (SheetView.vue) és letöltési formátumai (AssetDetail.vue)
+
+# Counts under the sheet's preview, joined with " · ".
+sheet-sprites =
+    { $count ->
+        [one] { $count } sprite
+       *[other] { $count } sprite
+    }
+sheet-pages =
+    { $count ->
+        [one] { $count } oldal
+       *[other] { $count } oldal
+    }
+sheet-animations =
+    { $count ->
+        [one] { $count } animáció
+       *[other] { $count } animáció
+    }
+# The box that narrows the list of sprites by name.
+sheet-find = Sprite keresése
+# Under the list of sprites when more match than it draws.
+sheet-showing = Megjelenítve: { $shown } / { $total }
+sheet-no-match = Egyik sprite nevében sincs ilyen.
+sheet-failed = Ez a lap nem olvasható.
+sheet-loading = Lap betöltése…
+# Under "Download as" when a sprite sheet format is picked: what the format can say, and so how the sheet comes out
+# in it. Sprites are turned to fit more on a page only in formats that can say so.
+sheet-note-hoard = A Hoard saját formátuma: az oldalak úgy, ahogy vannak, a sprite-ok bármilyen irányba elforgatva és körbevágva, animációkkal és minden képkocka idejével.
+sheet-note-texturepacker = A sprite-ok az óramutató járásával megegyezően elforgatva és körbevágva, név szerinti animációkkal, ahogy a PixiJS és a Phaser olvassa őket.
+sheet-note-clockwise = A sprite-ok az óramutató járásával megegyezően elforgatva és körbevágva. Animációkat nem tud tárolni: a képkockákat a számozott nevük azonosítja.
+sheet-note-libgdx = A sprite-ok az óramutató járásával ellentétesen elforgatva és körbevágva. Animációkat nem tud tárolni: a képkockákat a számozott nevük azonosítja.
+sheet-note-godot-frames = A sprite-ok sosincsenek elforgatva, a levágott szélük margóként megmarad, animációkkal és minden képkocka idejével.
+sheet-note-godot-tileset = A csempék sosincsenek elforgatva vagy körbevágva, csempeméretű rácson állnak, és a képek változatlanok maradnak, ha már rácson vannak.
+sheet-note-grid = Minden sprite állítva, a teljes vásznával, egyforma méretű cellákban, bármihez, ami rácsra vágja a lapot.
+sheet-note-frames = Minden sprite állítva, a teljes vásznával, mindegyik egy saját nevét viselő PNG-fájlban.
 
 ## Szövegmegjelenítő
 
@@ -2375,6 +2410,7 @@ settings-update-check = Új kiadás keresése a GitHubon néhány óránként
 
 api-kind-texture = Textúrák
 api-kind-vector = Vektorgrafikák
+api-kind-sheet = Spritelapok
 api-kind-audio = Hang
 api-kind-model = Modellek
 api-kind-animation = Animációk
@@ -2387,6 +2423,7 @@ api-kind-data = Adatok
 api-kind-other = Egyéb
 api-kind-texture-name = textúrák
 api-kind-vector-name = vektorgrafikák
+api-kind-sheet-name = spritelapok
 api-kind-audio-name = hangok
 api-kind-model-name = modellek
 api-kind-animation-name = animációk

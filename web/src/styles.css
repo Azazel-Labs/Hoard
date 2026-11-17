@@ -92,6 +92,7 @@
   /* Kind colors, darker on light so text in them stays readable. */
   --k-texture: light-dark(#26806f, #5fb3a1);
   --k-vector: light-dark(#5157b8, #a3a7f0);
+  --k-sheet: light-dark(#a0457f, #e59bcb);
   --k-audio: light-dark(#8549b8, #c792ea);
   --k-model: light-dark(#9a6c0c, #e6b450);
   --k-animation: light-dark(#9c6230, #d9a679);

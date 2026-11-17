@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "cf23321f0b5a4c0def865b770a270a499d16f94b002a515b0ea85331683559fc"
+source = "47a3448b14f74c042c962d95a8da3ad506368f14f81b265581c06b24339ed881"
 translation = "1a4df50b438ca81d05a8082fa6c6f1912acf6742fdc06a0acf388c1b5773abb6"
 
 [messages.account-add]
@@ -503,6 +503,14 @@ translation = "Shader"
 [messages.api-kind-shader-name]
 source = "shaders"
 translation = "shader"
+
+[messages.api-kind-sheet]
+source = "Sprite sheets"
+translation = "Bảng sprite"
+
+[messages.api-kind-sheet-name]
+source = "sprite sheets"
+translation = "bảng sprite"
 
 [messages.api-kind-texture]
 source = "Textures"
@@ -1698,10 +1706,6 @@ translation = "Có trong mục yêu thích (F để bỏ ra)"
 source = "File"
 translation = "Tệp"
 
-[messages.asset-in-atlas]
-source = "In atlas"
-translation = "Trong atlas"
-
 [messages.asset-in-pack]
 source = "in"
 translation = "trong"
@@ -1745,6 +1749,10 @@ translation = "bản xem trước vật liệu"
 [messages.asset-lazy-material-viewer]
 source = "the material viewer"
 translation = "trình xem vật liệu"
+
+[messages.asset-lazy-sheet-view]
+source = "the sprite sheet viewer"
+translation = "trình xem bảng sprite"
 
 [messages.asset-lazy-sprite-player]
 source = "the sprite player"
@@ -2161,10 +2169,6 @@ translation = "tệp vật liệu"
 [messages.asset-rel-sidecar]
 source = "store details"
 translation = "thông tin cửa hàng"
-
-[messages.asset-rel-sprite]
-source = "sprite"
-translation = "sprite"
 
 [messages.asset-rel-texture]
 source = "texture"
@@ -9052,6 +9056,91 @@ translation = "; các gói sẽ hiện ra khi nó tìm thấy. Để tải lên 
 [messages.setup-watched-before]
 source = 'Hoard is watching{ " " }'
 translation = 'Hoard đang theo dõi{ " " }'
+
+[messages.sheet-animations]
+source = """
+{ $count ->
+        [one] { $count } animation
+       *[other] { $count } animations
+    }"""
+translation = """
+{ $count ->
+       *[other] { $count } hoạt ảnh
+    }"""
+
+[messages.sheet-failed]
+source = "This sheet can't be read."
+translation = "Không thể đọc bảng này."
+
+[messages.sheet-find]
+source = "Find a sprite"
+translation = "Tìm sprite"
+
+[messages.sheet-loading]
+source = "Loading the sheet…"
+translation = "Đang tải bảng…"
+
+[messages.sheet-no-match]
+source = "No sprite has that in its name."
+translation = "Không có sprite nào có tên chứa nội dung này."
+
+[messages.sheet-note-clockwise]
+source = "Sprites turned clockwise and trimmed. It can't hold animations: frames go by their numbered names."
+translation = "Sprite xoay theo chiều kim đồng hồ và được cắt viền trong suốt. Định dạng này không chứa được hoạt ảnh: khung hình được nhận theo tên có đánh số."
+
+[messages.sheet-note-frames]
+source = "Every sprite upright on its whole canvas, each a PNG named after it."
+translation = "Mỗi sprite đứng thẳng trên toàn bộ khung vẽ của nó, mỗi sprite là một tệp PNG mang tên của chính nó."
+
+[messages.sheet-note-godot-frames]
+source = "Sprites never turned, their trim kept as margins, with animations and each frame's time."
+translation = "Sprite không bao giờ bị xoay, phần viền đã cắt được giữ lại làm lề, kèm hoạt ảnh và thời gian của từng khung hình."
+
+[messages.sheet-note-godot-tileset]
+source = "Tiles never turned or trimmed, on a grid of the tile size, keeping the images when they're on one already."
+translation = "Ô không bao giờ bị xoay hay cắt viền, xếp trên lưới theo kích thước ô, và giữ nguyên ảnh nếu chúng đã nằm sẵn trên lưới."
+
+[messages.sheet-note-grid]
+source = "Every sprite upright on its whole canvas, in cells all one size, for anything that cuts a sheet into a grid."
+translation = "Mỗi sprite đứng thẳng trên toàn bộ khung vẽ của nó, trong các ô cùng kích thước, dùng cho bất kỳ công cụ nào cắt bảng thành lưới."
+
+[messages.sheet-note-hoard]
+source = "Hoard's own: the pages as they are, sprites turned any way and trimmed, with animations and each frame's time."
+translation = "Định dạng riêng của Hoard: giữ nguyên các trang, sprite xoay theo mọi hướng và được cắt viền trong suốt, kèm hoạt ảnh và thời gian của từng khung hình."
+
+[messages.sheet-note-libgdx]
+source = "Sprites turned counter-clockwise and trimmed. It can't hold animations: frames go by their numbered names."
+translation = "Sprite xoay ngược chiều kim đồng hồ và được cắt viền trong suốt. Định dạng này không chứa được hoạt ảnh: khung hình được nhận theo tên có đánh số."
+
+[messages.sheet-note-texturepacker]
+source = "Sprites turned clockwise and trimmed, with animations by name, as PixiJS and Phaser read them."
+translation = "Sprite xoay theo chiều kim đồng hồ và được cắt viền trong suốt, kèm hoạt ảnh theo tên, đúng như cách PixiJS và Phaser đọc."
+
+[messages.sheet-pages]
+source = """
+{ $count ->
+        [one] { $count } page
+       *[other] { $count } pages
+    }"""
+translation = """
+{ $count ->
+       *[other] { $count } trang
+    }"""
+
+[messages.sheet-showing]
+source = "Showing { $shown } of { $total }"
+translation = "Đang hiện { $shown } / { $total }"
+
+[messages.sheet-sprites]
+source = """
+{ $count ->
+        [one] { $count } sprite
+       *[other] { $count } sprites
+    }"""
+translation = """
+{ $count ->
+       *[other] { $count } sprite
+    }"""
 
 [messages.shortcuts-actual-pixels]
 source = "Actual pixels"

@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "cf23321f0b5a4c0def865b770a270a499d16f94b002a515b0ea85331683559fc"
+source = "47a3448b14f74c042c962d95a8da3ad506368f14f81b265581c06b24339ed881"
 translation = "81f454b4be3578d38a286a9258dbbc3cf47ad1586e8852a5a6c519b04af263db"
 
 [messages.account-add]
@@ -503,6 +503,14 @@ translation = "Shadere"
 [messages.api-kind-shader-name]
 source = "shaders"
 translation = "shadere"
+
+[messages.api-kind-sheet]
+source = "Sprite sheets"
+translation = "Foi de sprite-uri"
+
+[messages.api-kind-sheet-name]
+source = "sprite sheets"
+translation = "foi de sprite-uri"
 
 [messages.api-kind-texture]
 source = "Textures"
@@ -1809,10 +1817,6 @@ translation = "În favoritele dvs. (F o scoate)"
 source = "File"
 translation = "Fișier"
 
-[messages.asset-in-atlas]
-source = "In atlas"
-translation = "În atlas"
-
 [messages.asset-in-pack]
 source = "in"
 translation = "în"
@@ -1856,6 +1860,10 @@ translation = "previzualizarea materialului"
 [messages.asset-lazy-material-viewer]
 source = "the material viewer"
 translation = "vizualizatorul de materiale"
+
+[messages.asset-lazy-sheet-view]
+source = "the sprite sheet viewer"
+translation = "vizualizatorul de foi de sprite-uri"
 
 [messages.asset-lazy-sprite-player]
 source = "the sprite player"
@@ -2292,10 +2300,6 @@ translation = "fișier de material"
 [messages.asset-rel-sidecar]
 source = "store details"
 translation = "detalii de magazin"
-
-[messages.asset-rel-sprite]
-source = "sprite"
-translation = "sprite"
 
 [messages.asset-rel-texture]
 source = "texture"
@@ -9394,6 +9398,97 @@ translation = "; pachetele apar pe măsură ce le găsește. Pentru a putea și 
 [messages.setup-watched-before]
 source = 'Hoard is watching{ " " }'
 translation = 'Hoard urmărește{ " " }'
+
+[messages.sheet-animations]
+source = """
+{ $count ->
+        [one] { $count } animation
+       *[other] { $count } animations
+    }"""
+translation = """
+{ $count ->
+        [one] { $count } animație
+        [few] { $count } animații
+       *[other] { $count } de animații
+    }"""
+
+[messages.sheet-failed]
+source = "This sheet can't be read."
+translation = "Această foaie nu poate fi citită."
+
+[messages.sheet-find]
+source = "Find a sprite"
+translation = "Căutați un sprite"
+
+[messages.sheet-loading]
+source = "Loading the sheet…"
+translation = "Se încarcă foaia…"
+
+[messages.sheet-no-match]
+source = "No sprite has that in its name."
+translation = "Niciun sprite nu are asta în nume."
+
+[messages.sheet-note-clockwise]
+source = "Sprites turned clockwise and trimmed. It can't hold animations: frames go by their numbered names."
+translation = "Sprite-uri rotite în sensul acelor de ceasornic și decupate. Nu poate păstra animații: cadrele se recunosc după numele numerotate."
+
+[messages.sheet-note-frames]
+source = "Every sprite upright on its whole canvas, each a PNG named after it."
+translation = "Fiecare sprite drept, pe întreaga sa pânză, fiecare ca PNG cu numele lui."
+
+[messages.sheet-note-godot-frames]
+source = "Sprites never turned, their trim kept as margins, with animations and each frame's time."
+translation = "Sprite-uri niciodată rotite, cu decuparea păstrată ca margini, cu animații și durata fiecărui cadru."
+
+[messages.sheet-note-godot-tileset]
+source = "Tiles never turned or trimmed, on a grid of the tile size, keeping the images when they're on one already."
+translation = "Tile-uri niciodată rotite sau decupate, pe o grilă de mărimea unui tile, păstrând imaginile neschimbate când sunt deja pe o grilă."
+
+[messages.sheet-note-grid]
+source = "Every sprite upright on its whole canvas, in cells all one size, for anything that cuts a sheet into a grid."
+translation = "Fiecare sprite drept, pe întreaga sa pânză, în celule de aceeași mărime, pentru orice program care taie o foaie după o grilă."
+
+[messages.sheet-note-hoard]
+source = "Hoard's own: the pages as they are, sprites turned any way and trimmed, with animations and each frame's time."
+translation = "Formatul propriu Hoard: paginile așa cum sunt, sprite-uri rotite în orice sens și decupate, cu animații și durata fiecărui cadru."
+
+[messages.sheet-note-libgdx]
+source = "Sprites turned counter-clockwise and trimmed. It can't hold animations: frames go by their numbered names."
+translation = "Sprite-uri rotite în sens invers acelor de ceasornic și decupate. Nu poate păstra animații: cadrele se recunosc după numele numerotate."
+
+[messages.sheet-note-texturepacker]
+source = "Sprites turned clockwise and trimmed, with animations by name, as PixiJS and Phaser read them."
+translation = "Sprite-uri rotite în sensul acelor de ceasornic și decupate, cu animații după nume, așa cum le citesc PixiJS și Phaser."
+
+[messages.sheet-pages]
+source = """
+{ $count ->
+        [one] { $count } page
+       *[other] { $count } pages
+    }"""
+translation = """
+{ $count ->
+        [one] { $count } pagină
+        [few] { $count } pagini
+       *[other] { $count } de pagini
+    }"""
+
+[messages.sheet-showing]
+source = "Showing { $shown } of { $total }"
+translation = "Se afișează { $shown } din { $total }"
+
+[messages.sheet-sprites]
+source = """
+{ $count ->
+        [one] { $count } sprite
+       *[other] { $count } sprites
+    }"""
+translation = """
+{ $count ->
+        [one] { $count } sprite
+        [few] { $count } sprite-uri
+       *[other] { $count } de sprite-uri
+    }"""
 
 [messages.shortcuts-actual-pixels]
 source = "Actual pixels"

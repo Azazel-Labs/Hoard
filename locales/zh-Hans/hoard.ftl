@@ -1142,6 +1142,7 @@ asset-lazy-image-viewer = 图像查看器
 asset-lazy-material-preview = 材质预览
 asset-lazy-material-viewer = 材质查看器
 asset-lazy-sprite-player = 精灵播放器
+asset-lazy-sheet-view = 精灵图集查看器
 asset-rel-texture = 纹理
 asset-rel-buffer = 几何数据
 asset-rel-material = 材质文件
@@ -1150,13 +1151,11 @@ asset-rel-library = 链接文件
 asset-rel-guess = 可能相关
 asset-rel-sidecar = 商店详情
 asset-rel-variant = 变体
-asset-rel-sprite = 精灵
 asset-role-map = { $role }贴图
 asset-maps-count = { $count } 张贴图
 asset-needs = 依赖
 asset-animations = 动画
 asset-sprites = 精灵
-asset-in-atlas = 所在图集
 asset-used-by = 被使用于
 asset-conversion-failed = 转换失败
 asset-as-converting = 正在转换…
@@ -1410,6 +1409,39 @@ sprite-columns = 列数
 sprite-rows = 行数
 sprite-fps-aria = 每秒帧数
 sprite-fps = fps
+
+## The sprite sheet viewer (SheetView.vue) and its download formats (AssetDetail.vue)
+
+# Counts under the sheet's preview, joined with " · ".
+sheet-sprites =
+    { $count ->
+       *[other] { $count } 个精灵
+    }
+sheet-pages =
+    { $count ->
+       *[other] { $count } 页
+    }
+sheet-animations =
+    { $count ->
+       *[other] { $count } 个动画
+    }
+# The box that narrows the list of sprites by name.
+sheet-find = 查找精灵
+# Under the list of sprites when more match than it draws.
+sheet-showing = 显示 { $shown } / { $total } 个
+sheet-no-match = 没有名称中包含此内容的精灵。
+sheet-failed = 无法读取此图集。
+sheet-loading = 正在加载图集…
+# Under "Download as" when a sprite sheet format is picked: what the format can say, and so how the sheet comes out
+# in it. Sprites are turned to fit more on a page only in formats that can say so.
+sheet-note-hoard = Hoard 自有格式：各页保持原样，精灵可任意旋转并裁去透明边，包含动画和每帧时长。
+sheet-note-texturepacker = 精灵顺时针旋转并裁去透明边，动画按名称保存，可供 PixiJS 和 Phaser 读取。
+sheet-note-clockwise = 精灵顺时针旋转并裁去透明边。此格式无法保存动画：帧按编号名称区分。
+sheet-note-libgdx = 精灵逆时针旋转并裁去透明边。此格式无法保存动画：帧按编号名称区分。
+sheet-note-godot-frames = 精灵从不旋转，裁去的部分保留为边距，包含动画和每帧时长。
+sheet-note-godot-tileset = 图块从不旋转或裁剪，按图块大小排在网格上；图像若已排成网格则保持不变。
+sheet-note-grid = 每个精灵都以完整画布直立放置，单元格大小一致，适用于任何按网格切分图集的工具。
+sheet-note-frames = 每个精灵都以完整画布直立放置，各自保存为以其名称命名的 PNG。
 
 ## TextViewer.vue, TextPreview.vue and text.ts
 
@@ -2351,6 +2383,7 @@ settings-update-check = 每隔几小时检查 GitHub 上是否有新版本
 
 api-kind-texture = 纹理
 api-kind-vector = 矢量图
+api-kind-sheet = 精灵图集
 api-kind-audio = 音频
 api-kind-model = 模型
 api-kind-animation = 动画
@@ -2363,6 +2396,7 @@ api-kind-data = 数据
 api-kind-other = 其他
 api-kind-texture-name = 纹理
 api-kind-vector-name = 矢量图
+api-kind-sheet-name = 精灵图集
 api-kind-audio-name = 音频
 api-kind-model-name = 模型
 api-kind-animation-name = 动画

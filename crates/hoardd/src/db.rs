@@ -624,6 +624,21 @@ const MIGRATIONS: &[&str] = &[
      CREATE TABLE IF NOT EXISTS kept_formats (
          asset_id TEXT PRIMARY KEY REFERENCES assets(id) ON DELETE CASCADE
      ) WITHOUT ROWID;",
+    // 61: an atlas file is a sprite sheet (`spritesheet.rs`), kept whole, rather than its sprites cut into assets of
+    // their own. The sprites cut before are dropped, and packs with a file that may be an atlas (Godot's `.tres`
+    // now too) are looked through again.
+    "DELETE FROM assets_fts WHERE asset_id IN (SELECT id FROM assets WHERE json_extract(meta, '$.sprite') IS NOT NULL);
+     DELETE FROM assets WHERE json_extract(meta, '$.sprite') IS NOT NULL;
+     DELETE FROM asset_links WHERE rel = 'sprite';
+     INSERT INTO jobs (kind, pack_id, payload, run_after, created_at, updated_at)
+       SELECT 'materials', p.id, '{}', strftime('%Y-%m-%dT%H:%M:%SZ', 'now'), strftime('%Y-%m-%dT%H:%M:%SZ', 'now'),
+              strftime('%Y-%m-%dT%H:%M:%SZ', 'now')
+       FROM packs p WHERE p.status = 'ready'
+         AND EXISTS (SELECT 1 FROM assets a WHERE a.pack_id = p.id
+                       AND lower(a.ext) IN ('xml', 'json', 'atlas', 'plist', 'tres'))
+         AND EXISTS (SELECT 1 FROM assets a WHERE a.pack_id = p.id AND a.kind = 'texture')
+         AND NOT EXISTS (SELECT 1 FROM jobs j WHERE j.kind = 'materials' AND j.pack_id = p.id
+                           AND j.status IN ('queued', 'running'));",
 ];
 
 /// How many automatic pre-upgrade backups to keep in `<data dir>/backups`.

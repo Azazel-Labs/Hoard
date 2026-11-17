@@ -1118,6 +1118,7 @@ asset-lazy-image-viewer = 이미지 뷰어
 asset-lazy-material-preview = 머티리얼 미리보기
 asset-lazy-material-viewer = 머티리얼 뷰어
 asset-lazy-sprite-player = 스프라이트 플레이어
+asset-lazy-sheet-view = 스프라이트 시트 뷰어
 asset-rel-texture = 텍스처
 asset-rel-buffer = 지오메트리 데이터
 asset-rel-material = 머티리얼 파일
@@ -1126,13 +1127,11 @@ asset-rel-library = 연결된 파일
 asset-rel-guess = 함께 쓰는 것으로 보임
 asset-rel-sidecar = 스토어 정보
 asset-rel-variant = 변형
-asset-rel-sprite = 스프라이트
 asset-role-map = { $role } 맵
 asset-maps-count = 맵 { $count }개
 asset-needs = 필요한 파일
 asset-animations = 애니메이션
 asset-sprites = 스프라이트
-asset-in-atlas = 아틀라스
 asset-used-by = 사용하는 곳
 asset-conversion-failed = 변환 실패
 asset-as-converting = 변환 중…
@@ -1386,6 +1385,39 @@ sprite-columns = 열
 sprite-rows = 행
 sprite-fps-aria = 초당 프레임 수
 sprite-fps = fps
+
+## The sprite sheet viewer (SheetView.vue) and its download formats (AssetDetail.vue)
+
+# Counts under the sheet's preview, joined with " · ".
+sheet-sprites =
+    { $count ->
+       *[other] 스프라이트 { $count }개
+    }
+sheet-pages =
+    { $count ->
+       *[other] { $count }페이지
+    }
+sheet-animations =
+    { $count ->
+       *[other] 애니메이션 { $count }개
+    }
+# The box that narrows the list of sprites by name.
+sheet-find = 스프라이트 찾기
+# Under the list of sprites when more match than it draws.
+sheet-showing = { $total }개 중 { $shown }개 표시
+sheet-no-match = 이름에 그 내용이 들어간 스프라이트가 없습니다.
+sheet-failed = 이 시트를 읽을 수 없습니다.
+sheet-loading = 시트 불러오는 중…
+# Under "Download as" when a sprite sheet format is picked: what the format can say, and so how the sheet comes out
+# in it. Sprites are turned to fit more on a page only in formats that can say so.
+sheet-note-hoard = Hoard 전용 형식: 페이지는 그대로 두고, 스프라이트는 어느 방향으로든 회전하고 여백을 잘라 내며, 애니메이션과 각 프레임의 시간을 담습니다.
+sheet-note-texturepacker = 스프라이트를 시계 방향으로 회전하고 여백을 잘라 내며, 애니메이션을 이름별로 담아 PixiJS와 Phaser에서 읽을 수 있습니다.
+sheet-note-clockwise = 스프라이트를 시계 방향으로 회전하고 여백을 잘라 냅니다. 애니메이션은 담을 수 없어 프레임은 번호가 붙은 이름으로 구분됩니다.
+sheet-note-libgdx = 스프라이트를 시계 반대 방향으로 회전하고 여백을 잘라 냅니다. 애니메이션은 담을 수 없어 프레임은 번호가 붙은 이름으로 구분됩니다.
+sheet-note-godot-frames = 스프라이트는 회전하지 않고, 잘라 낸 여백은 마진으로 남기며, 애니메이션과 각 프레임의 시간을 담습니다.
+sheet-note-godot-tileset = 타일은 회전하거나 잘라 내지 않고 타일 크기의 격자에 배치하며, 이미 격자로 되어 있는 이미지는 그대로 둡니다.
+sheet-note-grid = 모든 스프라이트를 바로 세워 캔버스 전체 그대로 모두 같은 크기의 칸에 담습니다. 시트를 격자로 자르는 도구라면 무엇이든 읽을 수 있습니다.
+sheet-note-frames = 모든 스프라이트를 바로 세워 캔버스 전체 그대로, 각각 그 이름을 딴 PNG로 저장합니다.
 
 ## TextViewer.vue, TextPreview.vue, text.ts
 
@@ -2321,6 +2353,7 @@ settings-update-check = 몇 시간마다 GitHub에서 새 릴리스 확인
 
 api-kind-texture = 텍스처
 api-kind-vector = 벡터 아트
+api-kind-sheet = 스프라이트 시트
 api-kind-audio = 오디오
 api-kind-model = 모델
 api-kind-animation = 애니메이션
@@ -2333,6 +2366,7 @@ api-kind-data = 데이터
 api-kind-other = 기타
 api-kind-texture-name = 텍스처
 api-kind-vector-name = 벡터 아트
+api-kind-sheet-name = 스프라이트 시트
 api-kind-audio-name = 오디오
 api-kind-model-name = 모델
 api-kind-animation-name = 애니메이션

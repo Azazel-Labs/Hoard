@@ -1047,10 +1047,9 @@ pub(crate) fn retag_pack(state: &AppState, rt: &Handle, pack_id: &str) -> Result
     let upright = db::upright_models(&conn, pack_id)?;
     let rows: Vec<Row> = {
         let mut stmt = conn.prepare(&format!(
-            "SELECT id, path, blob_hash, human_edited, kind FROM assets a WHERE pack_id = ?1 AND NOT {} AND NOT {}
+            "SELECT id, path, blob_hash, human_edited, kind FROM assets a WHERE pack_id = ?1 AND NOT {}
                  ORDER BY path",
-            crate::materials::IS_MATERIAL,
-            crate::atlas::IS_SPRITE
+            crate::materials::IS_MATERIAL
         ))?;
         stmt.query_map([pack_id], |r| {
             Ok(Row { id: r.get(0)?, rel: r.get(1)?, hash: r.get(2)?, human: r.get::<_, i64>(3)? != 0, kind: r.get(4)? })

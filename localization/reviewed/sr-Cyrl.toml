@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "cf23321f0b5a4c0def865b770a270a499d16f94b002a515b0ea85331683559fc"
+source = "47a3448b14f74c042c962d95a8da3ad506368f14f81b265581c06b24339ed881"
 translation = "30e8f29d5a5413b518bc3d4463f4fe90103622d446d3a937f1fa04d45817b813"
 
 [messages.account-add]
@@ -503,6 +503,14 @@ translation = "Шејдери"
 [messages.api-kind-shader-name]
 source = "shaders"
 translation = "шејдери"
+
+[messages.api-kind-sheet]
+source = "Sprite sheets"
+translation = "Листови спрајтова"
+
+[messages.api-kind-sheet-name]
+source = "sprite sheets"
+translation = "листови спрајтова"
 
 [messages.api-kind-texture]
 source = "Textures"
@@ -1769,10 +1777,6 @@ translation = "У вашим омиљенима (F га уклања)"
 source = "File"
 translation = "Датотека"
 
-[messages.asset-in-atlas]
-source = "In atlas"
-translation = "У атласу"
-
 [messages.asset-in-pack]
 source = "in"
 translation = "у"
@@ -1816,6 +1820,10 @@ translation = "преглед материјала"
 [messages.asset-lazy-material-viewer]
 source = "the material viewer"
 translation = "прегледач материјала"
+
+[messages.asset-lazy-sheet-view]
+source = "the sprite sheet viewer"
+translation = "прегледач листова спрајтова"
 
 [messages.asset-lazy-sprite-player]
 source = "the sprite player"
@@ -2247,10 +2255,6 @@ translation = "датотека материјала"
 [messages.asset-rel-sidecar]
 source = "store details"
 translation = "подаци из продавнице"
-
-[messages.asset-rel-sprite]
-source = "sprite"
-translation = "спрајт"
 
 [messages.asset-rel-texture]
 source = "texture"
@@ -9319,6 +9323,97 @@ translation = "; пакети се појављују како их пронађ
 [messages.setup-watched-before]
 source = 'Hoard is watching{ " " }'
 translation = 'Hoard прати{ " " }'
+
+[messages.sheet-animations]
+source = """
+{ $count ->
+        [one] { $count } animation
+       *[other] { $count } animations
+    }"""
+translation = """
+{ $count ->
+        [one] { $count } анимација
+        [few] { $count } анимације
+       *[other] { $count } анимација
+    }"""
+
+[messages.sheet-failed]
+source = "This sheet can't be read."
+translation = "Овај лист не може да се прочита."
+
+[messages.sheet-find]
+source = "Find a sprite"
+translation = "Пронађи спрајт"
+
+[messages.sheet-loading]
+source = "Loading the sheet…"
+translation = "Учитавање листа…"
+
+[messages.sheet-no-match]
+source = "No sprite has that in its name."
+translation = "Ниједан спрајт нема то у имену."
+
+[messages.sheet-note-clockwise]
+source = "Sprites turned clockwise and trimmed. It can't hold animations: frames go by their numbered names."
+translation = "Спрајтови окренути у смеру казаљке на сату и опсечени. Не може да чува анимације: сличице се препознају по нумерисаним именима."
+
+[messages.sheet-note-frames]
+source = "Every sprite upright on its whole canvas, each a PNG named after it."
+translation = "Сваки спрајт усправан, на целом свом платну, сваки као засебан PNG назван по њему."
+
+[messages.sheet-note-godot-frames]
+source = "Sprites never turned, their trim kept as margins, with animations and each frame's time."
+translation = "Спрајтови никад окренути, оно што је опсечено чува се као маргине, с анимацијама и трајањем сваке сличице."
+
+[messages.sheet-note-godot-tileset]
+source = "Tiles never turned or trimmed, on a grid of the tile size, keeping the images when they're on one already."
+translation = "Плочице никад окренуте ни опсечене, на мрежи величине плочице; слике које су већ на мрежи остају какве јесу."
+
+[messages.sheet-note-grid]
+source = "Every sprite upright on its whole canvas, in cells all one size, for anything that cuts a sheet into a grid."
+translation = "Сваки спрајт усправан, на целом свом платну, у ћелијама исте величине, за све што лист сече по мрежи."
+
+[messages.sheet-note-hoard]
+source = "Hoard's own: the pages as they are, sprites turned any way and trimmed, with animations and each frame's time."
+translation = "Hoard-ов сопствени формат: странице какве јесу, спрајтови окренути на било коју страну и опсечени, с анимацијама и трајањем сваке сличице."
+
+[messages.sheet-note-libgdx]
+source = "Sprites turned counter-clockwise and trimmed. It can't hold animations: frames go by their numbered names."
+translation = "Спрајтови окренути супротно од смера казаљке на сату и опсечени. Не може да чува анимације: сличице се препознају по нумерисаним именима."
+
+[messages.sheet-note-texturepacker]
+source = "Sprites turned clockwise and trimmed, with animations by name, as PixiJS and Phaser read them."
+translation = "Спрајтови окренути у смеру казаљке на сату и опсечени, с анимацијама по имену, онако како их читају PixiJS и Phaser."
+
+[messages.sheet-pages]
+source = """
+{ $count ->
+        [one] { $count } page
+       *[other] { $count } pages
+    }"""
+translation = """
+{ $count ->
+        [one] { $count } страница
+        [few] { $count } странице
+       *[other] { $count } страница
+    }"""
+
+[messages.sheet-showing]
+source = "Showing { $shown } of { $total }"
+translation = "Приказано { $shown } од { $total }"
+
+[messages.sheet-sprites]
+source = """
+{ $count ->
+        [one] { $count } sprite
+       *[other] { $count } sprites
+    }"""
+translation = """
+{ $count ->
+        [one] { $count } спрајт
+        [few] { $count } спрајта
+       *[other] { $count } спрајтова
+    }"""
 
 [messages.shortcuts-actual-pixels]
 source = "Actual pixels"

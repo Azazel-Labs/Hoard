@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "cf23321f0b5a4c0def865b770a270a499d16f94b002a515b0ea85331683559fc"
+source = "47a3448b14f74c042c962d95a8da3ad506368f14f81b265581c06b24339ed881"
 translation = "59247f4fd3e0712c726e47580a3cc9e4e63dfcef4ff7b34a653c6b6a2a4ee38c"
 
 [messages.account-add]
@@ -503,6 +503,14 @@ translation = "Gölgelendiriciler"
 [messages.api-kind-shader-name]
 source = "shaders"
 translation = "gölgelendiriciler"
+
+[messages.api-kind-sheet]
+source = "Sprite sheets"
+translation = "Sprite sayfaları"
+
+[messages.api-kind-sheet-name]
+source = "sprite sheets"
+translation = "sprite sayfaları"
 
 [messages.api-kind-texture]
 source = "Textures"
@@ -1703,10 +1711,6 @@ translation = "Favorilerinizde (F ile çıkarılır)"
 source = "File"
 translation = "Dosya"
 
-[messages.asset-in-atlas]
-source = "In atlas"
-translation = "Atlasta"
-
 [messages.asset-in-pack]
 source = "in"
 translation = "·"
@@ -1750,6 +1754,10 @@ translation = "malzeme önizlemesi"
 [messages.asset-lazy-material-viewer]
 source = "the material viewer"
 translation = "malzeme görüntüleyici"
+
+[messages.asset-lazy-sheet-view]
+source = "the sprite sheet viewer"
+translation = "sprite sayfası görüntüleyici"
 
 [messages.asset-lazy-sprite-player]
 source = "the sprite player"
@@ -2174,10 +2182,6 @@ translation = "malzeme dosyası"
 [messages.asset-rel-sidecar]
 source = "store details"
 translation = "mağaza ayrıntıları"
-
-[messages.asset-rel-sprite]
-source = "sprite"
-translation = "sprite"
 
 [messages.asset-rel-texture]
 source = "texture"
@@ -9080,6 +9084,94 @@ translation = "; paketler o buldukça görünür. Yükleme de yapabilmek için A
 [messages.setup-watched-before]
 source = 'Hoard is watching{ " " }'
 translation = 'Hoard şu klasörü izliyor:{ " " }'
+
+[messages.sheet-animations]
+source = """
+{ $count ->
+        [one] { $count } animation
+       *[other] { $count } animations
+    }"""
+translation = """
+{ $count ->
+        [one] { $count } animasyon
+       *[other] { $count } animasyon
+    }"""
+
+[messages.sheet-failed]
+source = "This sheet can't be read."
+translation = "Bu sprite sayfası okunamıyor."
+
+[messages.sheet-find]
+source = "Find a sprite"
+translation = "Sprite bul"
+
+[messages.sheet-loading]
+source = "Loading the sheet…"
+translation = "Sprite sayfası yükleniyor…"
+
+[messages.sheet-no-match]
+source = "No sprite has that in its name."
+translation = "Adında bu geçen bir sprite yok."
+
+[messages.sheet-note-clockwise]
+source = "Sprites turned clockwise and trimmed. It can't hold animations: frames go by their numbered names."
+translation = "Sprite’lar saat yönünde döndürülmüş ve kırpılmış. Bu biçim animasyon tutamaz: kareler numaralı adlarıyla sıralanır."
+
+[messages.sheet-note-frames]
+source = "Every sprite upright on its whole canvas, each a PNG named after it."
+translation = "Her sprite kendi tuvalinin tamamında dik durur, her biri kendi adını taşıyan bir PNG olarak."
+
+[messages.sheet-note-godot-frames]
+source = "Sprites never turned, their trim kept as margins, with animations and each frame's time."
+translation = "Sprite’lar hiç döndürülmez, kırpılan kısım kenar boşluğu olarak korunur; animasyonlar ve her karenin süresiyle birlikte."
+
+[messages.sheet-note-godot-tileset]
+source = "Tiles never turned or trimmed, on a grid of the tile size, keeping the images when they're on one already."
+translation = "Karolar hiç döndürülmez ya da kırpılmaz, karo boyutunda bir ızgaraya dizilir; görseller zaten bir ızgaradaysa olduğu gibi kalır."
+
+[messages.sheet-note-grid]
+source = "Every sprite upright on its whole canvas, in cells all one size, for anything that cuts a sheet into a grid."
+translation = "Her sprite kendi tuvalinin tamamında dik durur, hepsi aynı boyutta hücrelerde; sayfayı ızgaraya bölen her araç için."
+
+[messages.sheet-note-hoard]
+source = "Hoard's own: the pages as they are, sprites turned any way and trimmed, with animations and each frame's time."
+translation = "Hoard’un kendi biçimi: sayfalar olduğu gibi, sprite’lar her yöne döndürülmüş ve kırpılmış; animasyonlar ve her karenin süresiyle birlikte."
+
+[messages.sheet-note-libgdx]
+source = "Sprites turned counter-clockwise and trimmed. It can't hold animations: frames go by their numbered names."
+translation = "Sprite’lar saat yönünün tersine döndürülmüş ve kırpılmış. Bu biçim animasyon tutamaz: kareler numaralı adlarıyla sıralanır."
+
+[messages.sheet-note-texturepacker]
+source = "Sprites turned clockwise and trimmed, with animations by name, as PixiJS and Phaser read them."
+translation = "Sprite’lar saat yönünde döndürülmüş ve kırpılmış, animasyonlar adlarıyla birlikte; PixiJS ve Phaser’ın okuduğu biçimde."
+
+[messages.sheet-pages]
+source = """
+{ $count ->
+        [one] { $count } page
+       *[other] { $count } pages
+    }"""
+translation = """
+{ $count ->
+        [one] { $count } sayfa
+       *[other] { $count } sayfa
+    }"""
+
+[messages.sheet-showing]
+source = "Showing { $shown } of { $total }"
+translation = "{ $total } sprite’tan { $shown } tanesi gösteriliyor"
+
+[messages.sheet-sprites]
+source = """
+{ $count ->
+        [one] { $count } sprite
+       *[other] { $count } sprites
+    }"""
+translation = """
+{ $count ->
+        [one] { $count } sprite
+       *[other] { $count } sprite
+    }"""
 
 [messages.shortcuts-actual-pixels]
 source = "Actual pixels"

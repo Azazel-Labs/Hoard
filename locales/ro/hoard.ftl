@@ -1342,6 +1342,7 @@ asset-lazy-image-viewer = vizualizatorul de imagini
 asset-lazy-material-preview = previzualizarea materialului
 asset-lazy-material-viewer = vizualizatorul de materiale
 asset-lazy-sprite-player = playerul de sprite-uri
+asset-lazy-sheet-view = vizualizatorul de foi de sprite-uri
 asset-rel-texture = textură
 asset-rel-buffer = date de geometrie
 asset-rel-material = fișier de material
@@ -1350,7 +1351,6 @@ asset-rel-library = fișier legat
 asset-rel-guess = probabil merge cu
 asset-rel-sidecar = detalii de magazin
 asset-rel-variant = variantă
-asset-rel-sprite = sprite
 asset-role-map = hartă de { $role }
 asset-maps-count =
     { $count ->
@@ -1361,7 +1361,6 @@ asset-maps-count =
 asset-needs = Are nevoie de
 asset-animations = Animații
 asset-sprites = Sprite-uri
-asset-in-atlas = În atlas
 asset-used-by = Folosit de
 asset-conversion-failed = conversia a eșuat
 asset-as-converting = Se convertește…
@@ -1660,6 +1659,45 @@ sprite-columns = Coloane
 sprite-rows = Rânduri
 sprite-fps-aria = Cadre pe secundă
 sprite-fps = fps
+
+## Vizualizatorul de foi de sprite-uri (SheetView.vue) și formatele sale de descărcare (AssetDetail.vue)
+
+# Counts under the sheet's preview, joined with " · ".
+sheet-sprites =
+    { $count ->
+        [one] { $count } sprite
+        [few] { $count } sprite-uri
+       *[other] { $count } de sprite-uri
+    }
+sheet-pages =
+    { $count ->
+        [one] { $count } pagină
+        [few] { $count } pagini
+       *[other] { $count } de pagini
+    }
+sheet-animations =
+    { $count ->
+        [one] { $count } animație
+        [few] { $count } animații
+       *[other] { $count } de animații
+    }
+# The box that narrows the list of sprites by name.
+sheet-find = Căutați un sprite
+# Under the list of sprites when more match than it draws.
+sheet-showing = Se afișează { $shown } din { $total }
+sheet-no-match = Niciun sprite nu are asta în nume.
+sheet-failed = Această foaie nu poate fi citită.
+sheet-loading = Se încarcă foaia…
+# Under "Download as" when a sprite sheet format is picked: what the format can say, and so how the sheet comes out
+# in it. Sprites are turned to fit more on a page only in formats that can say so.
+sheet-note-hoard = Formatul propriu Hoard: paginile așa cum sunt, sprite-uri rotite în orice sens și decupate, cu animații și durata fiecărui cadru.
+sheet-note-texturepacker = Sprite-uri rotite în sensul acelor de ceasornic și decupate, cu animații după nume, așa cum le citesc PixiJS și Phaser.
+sheet-note-clockwise = Sprite-uri rotite în sensul acelor de ceasornic și decupate. Nu poate păstra animații: cadrele se recunosc după numele numerotate.
+sheet-note-libgdx = Sprite-uri rotite în sens invers acelor de ceasornic și decupate. Nu poate păstra animații: cadrele se recunosc după numele numerotate.
+sheet-note-godot-frames = Sprite-uri niciodată rotite, cu decuparea păstrată ca margini, cu animații și durata fiecărui cadru.
+sheet-note-godot-tileset = Tile-uri niciodată rotite sau decupate, pe o grilă de mărimea unui tile, păstrând imaginile neschimbate când sunt deja pe o grilă.
+sheet-note-grid = Fiecare sprite drept, pe întreaga sa pânză, în celule de aceeași mărime, pentru orice program care taie o foaie după o grilă.
+sheet-note-frames = Fiecare sprite drept, pe întreaga sa pânză, fiecare ca PNG cu numele lui.
 
 ## TextViewer.vue, TextPreview.vue și text.ts
 
@@ -2761,6 +2799,7 @@ settings-update-check = Verificați GitHub la câteva ore pentru o versiune nou�
 
 api-kind-texture = Texturi
 api-kind-vector = Grafică vectorială
+api-kind-sheet = Foi de sprite-uri
 api-kind-audio = Audio
 api-kind-model = Modele
 api-kind-animation = Animații
@@ -2773,6 +2812,7 @@ api-kind-data = Date
 api-kind-other = Altele
 api-kind-texture-name = texturi
 api-kind-vector-name = grafică vectorială
+api-kind-sheet-name = foi de sprite-uri
 api-kind-audio-name = audio
 api-kind-model-name = modele
 api-kind-animation-name = animații

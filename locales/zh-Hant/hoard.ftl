@@ -1142,6 +1142,7 @@ asset-lazy-image-viewer = 圖片檢視器
 asset-lazy-material-preview = 材質預覽
 asset-lazy-material-viewer = 材質檢視器
 asset-lazy-sprite-player = 精靈圖播放器
+asset-lazy-sheet-view = 精靈圖表檢視器
 asset-rel-texture = 貼圖
 asset-rel-buffer = 幾何資料
 asset-rel-material = 材質檔
@@ -1150,13 +1151,11 @@ asset-rel-library = 連結的檔案
 asset-rel-guess = 可能搭配使用
 asset-rel-sidecar = 商店詳細資訊
 asset-rel-variant = 變體
-asset-rel-sprite = 精靈
 asset-role-map = { $role }貼圖
 asset-maps-count = { $count } 張貼圖
 asset-needs = 需要
 asset-animations = 動畫
 asset-sprites = 精靈
-asset-in-atlas = 所在圖集
 asset-used-by = 被使用於
 asset-conversion-failed = 轉換失敗
 asset-as-converting = 轉換中…
@@ -1416,6 +1415,39 @@ sprite-columns = 欄
 sprite-rows = 列
 sprite-fps-aria = 每秒影格數
 sprite-fps = fps
+
+## The sprite sheet viewer (SheetView.vue) and its download formats (AssetDetail.vue)
+
+# Counts under the sheet's preview, joined with " · ".
+sheet-sprites =
+    { $count ->
+       *[other] { $count } 個精靈
+    }
+sheet-pages =
+    { $count ->
+       *[other] { $count } 頁
+    }
+sheet-animations =
+    { $count ->
+       *[other] { $count } 個動畫
+    }
+# The box that narrows the list of sprites by name.
+sheet-find = 尋找精靈
+# Under the list of sprites when more match than it draws.
+sheet-showing = 顯示 { $shown }／{ $total } 個
+sheet-no-match = 沒有名稱包含此內容的精靈。
+sheet-failed = 無法讀取這個圖表。
+sheet-loading = 正在載入圖表…
+# Under "Download as" when a sprite sheet format is picked: what the format can say, and so how the sheet comes out
+# in it. Sprites are turned to fit more on a page only in formats that can say so.
+sheet-note-hoard = Hoard 專屬格式：各頁維持原樣，精靈可任意旋轉並裁去透明邊緣，包含動畫和每個影格的時長。
+sheet-note-texturepacker = 精靈順時針旋轉並裁去透明邊緣，動畫依名稱保存，可供 PixiJS 和 Phaser 讀取。
+sheet-note-clockwise = 精靈順時針旋轉並裁去透明邊緣。這個格式無法保存動畫：影格依編號名稱區分。
+sheet-note-libgdx = 精靈逆時針旋轉並裁去透明邊緣。這個格式無法保存動畫：影格依編號名稱區分。
+sheet-note-godot-frames = 精靈一律不旋轉，裁去的部分保留為邊距，包含動畫和每個影格的時長。
+sheet-note-godot-tileset = 圖塊一律不旋轉也不裁切，依圖塊大小排列在格線上；圖片若已排成格線則維持原樣。
+sheet-note-grid = 每個精靈都以完整畫布直立擺放，格子大小一致，適用於任何把圖表切成格線的工具。
+sheet-note-frames = 每個精靈都以完整畫布直立擺放，各自存成以其名稱命名的 PNG。
 
 ## 文字檢視器
 
@@ -2357,6 +2389,7 @@ settings-update-check = 每隔幾小時檢查 GitHub 是否有新版本
 
 api-kind-texture = 貼圖
 api-kind-vector = 向量圖
+api-kind-sheet = 精靈圖表
 api-kind-audio = 音訊
 api-kind-model = 模型
 api-kind-animation = 動畫
@@ -2369,6 +2402,7 @@ api-kind-data = 資料
 api-kind-other = 其他
 api-kind-texture-name = 貼圖
 api-kind-vector-name = 向量圖
+api-kind-sheet-name = 精靈圖表
 api-kind-audio-name = 音訊
 api-kind-model-name = 模型
 api-kind-animation-name = 動畫

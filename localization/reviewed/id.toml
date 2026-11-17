@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "cf23321f0b5a4c0def865b770a270a499d16f94b002a515b0ea85331683559fc"
+source = "47a3448b14f74c042c962d95a8da3ad506368f14f81b265581c06b24339ed881"
 translation = "ccba37da8ec8145aa968edd58860423f7d19917225e3adb17048481993a88680"
 
 [messages.account-add]
@@ -503,6 +503,14 @@ translation = "Shader"
 [messages.api-kind-shader-name]
 source = "shaders"
 translation = "shader"
+
+[messages.api-kind-sheet]
+source = "Sprite sheets"
+translation = "Lembar sprite"
+
+[messages.api-kind-sheet-name]
+source = "sprite sheets"
+translation = "lembar sprite"
 
 [messages.api-kind-texture]
 source = "Textures"
@@ -1695,10 +1703,6 @@ translation = "Ada di favorit Anda (F untuk mengeluarkannya)"
 source = "File"
 translation = "Berkas"
 
-[messages.asset-in-atlas]
-source = "In atlas"
-translation = "Di atlas"
-
 [messages.asset-in-pack]
 source = "in"
 translation = "di"
@@ -1742,6 +1746,10 @@ translation = "pratinjau material"
 [messages.asset-lazy-material-viewer]
 source = "the material viewer"
 translation = "penampil material"
+
+[messages.asset-lazy-sheet-view]
+source = "the sprite sheet viewer"
+translation = "penampil lembar sprite"
 
 [messages.asset-lazy-sprite-player]
 source = "the sprite player"
@@ -2164,10 +2172,6 @@ translation = "berkas material"
 [messages.asset-rel-sidecar]
 source = "store details"
 translation = "detail toko"
-
-[messages.asset-rel-sprite]
-source = "sprite"
-translation = "sprite"
 
 [messages.asset-rel-texture]
 source = "texture"
@@ -9056,6 +9060,91 @@ translation = "; paket muncul begitu ditemukan. Untuk juga mengunggah, tambahkan
 [messages.setup-watched-before]
 source = 'Hoard is watching{ " " }'
 translation = 'Hoard memantau{ " " }'
+
+[messages.sheet-animations]
+source = """
+{ $count ->
+        [one] { $count } animation
+       *[other] { $count } animations
+    }"""
+translation = """
+{ $count ->
+       *[other] { $count } animasi
+    }"""
+
+[messages.sheet-failed]
+source = "This sheet can't be read."
+translation = "Lembar ini tidak dapat dibaca."
+
+[messages.sheet-find]
+source = "Find a sprite"
+translation = "Cari sprite"
+
+[messages.sheet-loading]
+source = "Loading the sheet…"
+translation = "Memuat lembar…"
+
+[messages.sheet-no-match]
+source = "No sprite has that in its name."
+translation = "Tidak ada sprite yang namanya memuat itu."
+
+[messages.sheet-note-clockwise]
+source = "Sprites turned clockwise and trimmed. It can't hold animations: frames go by their numbered names."
+translation = "Sprite diputar searah jarum jam dan dipangkas. Format ini tidak dapat menyimpan animasi: bingkai dikenali dari nama bernomornya."
+
+[messages.sheet-note-frames]
+source = "Every sprite upright on its whole canvas, each a PNG named after it."
+translation = "Setiap sprite tegak pada seluruh kanvasnya, masing-masing sebagai PNG yang diberi nama sesuai sprite-nya."
+
+[messages.sheet-note-godot-frames]
+source = "Sprites never turned, their trim kept as margins, with animations and each frame's time."
+translation = "Sprite tidak pernah diputar, bagian yang dipangkas disimpan sebagai margin, dengan animasi dan durasi tiap bingkai."
+
+[messages.sheet-note-godot-tileset]
+source = "Tiles never turned or trimmed, on a grid of the tile size, keeping the images when they're on one already."
+translation = "Ubin tidak pernah diputar atau dipangkas, ditata pada kisi seukuran ubin, dan gambar dibiarkan apa adanya jika sudah berada pada kisi."
+
+[messages.sheet-note-grid]
+source = "Every sprite upright on its whole canvas, in cells all one size, for anything that cuts a sheet into a grid."
+translation = "Setiap sprite tegak pada seluruh kanvasnya, dalam sel yang semuanya berukuran sama, untuk apa pun yang memotong lembar menjadi kisi."
+
+[messages.sheet-note-hoard]
+source = "Hoard's own: the pages as they are, sprites turned any way and trimmed, with animations and each frame's time."
+translation = "Format milik Hoard sendiri: halaman apa adanya, sprite diputar ke arah mana pun dan dipangkas, dengan animasi dan durasi tiap bingkai."
+
+[messages.sheet-note-libgdx]
+source = "Sprites turned counter-clockwise and trimmed. It can't hold animations: frames go by their numbered names."
+translation = "Sprite diputar berlawanan arah jarum jam dan dipangkas. Format ini tidak dapat menyimpan animasi: bingkai dikenali dari nama bernomornya."
+
+[messages.sheet-note-texturepacker]
+source = "Sprites turned clockwise and trimmed, with animations by name, as PixiJS and Phaser read them."
+translation = "Sprite diputar searah jarum jam dan dipangkas, dengan animasi menurut nama, seperti yang dibaca PixiJS dan Phaser."
+
+[messages.sheet-pages]
+source = """
+{ $count ->
+        [one] { $count } page
+       *[other] { $count } pages
+    }"""
+translation = """
+{ $count ->
+       *[other] { $count } halaman
+    }"""
+
+[messages.sheet-showing]
+source = "Showing { $shown } of { $total }"
+translation = "Menampilkan { $shown } dari { $total }"
+
+[messages.sheet-sprites]
+source = """
+{ $count ->
+        [one] { $count } sprite
+       *[other] { $count } sprites
+    }"""
+translation = """
+{ $count ->
+       *[other] { $count } sprite
+    }"""
 
 [messages.shortcuts-actual-pixels]
 source = "Actual pixels"

@@ -1675,6 +1675,7 @@ async fn asset_derivative(
         "motion" => "webp".to_owned(),
         "source" => source_ext.unwrap_or_else(|| "bin".to_owned()),
         "preview" => "mp3".to_owned(),
+        "sheet" => "json".to_owned(),
         _ => "bin".to_owned(),
     };
     let mime = match ext.as_str() {

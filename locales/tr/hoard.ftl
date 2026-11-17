@@ -1144,6 +1144,7 @@ asset-lazy-image-viewer = görsel görüntüleyici
 asset-lazy-material-preview = malzeme önizlemesi
 asset-lazy-material-viewer = malzeme görüntüleyici
 asset-lazy-sprite-player = sprite oynatıcı
+asset-lazy-sheet-view = sprite sayfası görüntüleyici
 asset-rel-texture = doku
 asset-rel-buffer = geometri verisi
 asset-rel-material = malzeme dosyası
@@ -1152,13 +1153,11 @@ asset-rel-library = bağlantılı dosya
 asset-rel-guess = muhtemelen birlikte kullanılır
 asset-rel-sidecar = mağaza ayrıntıları
 asset-rel-variant = varyant
-asset-rel-sprite = sprite
 asset-role-map = { $role } haritası
 asset-maps-count = { $count } harita
 asset-needs = Gerektirdikleri
 asset-animations = Animasyonlar
 asset-sprites = Sprite’lar
-asset-in-atlas = Atlasta
 asset-used-by = Kullananlar
 asset-conversion-failed = dönüştürme başarısız oldu
 asset-as-converting = Dönüştürülüyor…
@@ -1424,6 +1423,42 @@ sprite-columns = Sütunlar
 sprite-rows = Satırlar
 sprite-fps-aria = Saniyedeki kare sayısı
 sprite-fps = fps
+
+## The sprite sheet viewer (SheetView.vue) and its download formats (AssetDetail.vue)
+
+# Counts under the sheet's preview, joined with " · ".
+sheet-sprites =
+    { $count ->
+        [one] { $count } sprite
+       *[other] { $count } sprite
+    }
+sheet-pages =
+    { $count ->
+        [one] { $count } sayfa
+       *[other] { $count } sayfa
+    }
+sheet-animations =
+    { $count ->
+        [one] { $count } animasyon
+       *[other] { $count } animasyon
+    }
+# The box that narrows the list of sprites by name.
+sheet-find = Sprite bul
+# Under the list of sprites when more match than it draws.
+sheet-showing = { $total } sprite’tan { $shown } tanesi gösteriliyor
+sheet-no-match = Adında bu geçen bir sprite yok.
+sheet-failed = Bu sprite sayfası okunamıyor.
+sheet-loading = Sprite sayfası yükleniyor…
+# Under "Download as" when a sprite sheet format is picked: what the format can say, and so how the sheet comes out
+# in it. Sprites are turned to fit more on a page only in formats that can say so.
+sheet-note-hoard = Hoard’un kendi biçimi: sayfalar olduğu gibi, sprite’lar her yöne döndürülmüş ve kırpılmış; animasyonlar ve her karenin süresiyle birlikte.
+sheet-note-texturepacker = Sprite’lar saat yönünde döndürülmüş ve kırpılmış, animasyonlar adlarıyla birlikte; PixiJS ve Phaser’ın okuduğu biçimde.
+sheet-note-clockwise = Sprite’lar saat yönünde döndürülmüş ve kırpılmış. Bu biçim animasyon tutamaz: kareler numaralı adlarıyla sıralanır.
+sheet-note-libgdx = Sprite’lar saat yönünün tersine döndürülmüş ve kırpılmış. Bu biçim animasyon tutamaz: kareler numaralı adlarıyla sıralanır.
+sheet-note-godot-frames = Sprite’lar hiç döndürülmez, kırpılan kısım kenar boşluğu olarak korunur; animasyonlar ve her karenin süresiyle birlikte.
+sheet-note-godot-tileset = Karolar hiç döndürülmez ya da kırpılmaz, karo boyutunda bir ızgaraya dizilir; görseller zaten bir ızgaradaysa olduğu gibi kalır.
+sheet-note-grid = Her sprite kendi tuvalinin tamamında dik durur, hepsi aynı boyutta hücrelerde; sayfayı ızgaraya bölen her araç için.
+sheet-note-frames = Her sprite kendi tuvalinin tamamında dik durur, her biri kendi adını taşıyan bir PNG olarak.
 
 ## TextViewer.vue, TextPreview.vue ve text.ts
 
@@ -2379,6 +2414,7 @@ settings-update-check = Yeni bir sürüm için birkaç saatte bir GitHub’ı de
 
 api-kind-texture = Dokular
 api-kind-vector = Vektör çizimler
+api-kind-sheet = Sprite sayfaları
 api-kind-audio = Ses
 api-kind-model = Modeller
 api-kind-animation = Animasyonlar
@@ -2391,6 +2427,7 @@ api-kind-data = Veri
 api-kind-other = Diğer
 api-kind-texture-name = dokular
 api-kind-vector-name = vektör çizimler
+api-kind-sheet-name = sprite sayfaları
 api-kind-audio-name = ses
 api-kind-model-name = modeller
 api-kind-animation-name = animasyonlar

@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "cf23321f0b5a4c0def865b770a270a499d16f94b002a515b0ea85331683559fc"
+source = "47a3448b14f74c042c962d95a8da3ad506368f14f81b265581c06b24339ed881"
 translation = "259239ab239601949cc6a70972021dcb09218f2bed3d1964197e9079006c5785"
 
 [messages.account-add]
@@ -503,6 +503,14 @@ translation = "Varjostimet"
 [messages.api-kind-shader-name]
 source = "shaders"
 translation = "varjostimet"
+
+[messages.api-kind-sheet]
+source = "Sprite sheets"
+translation = "Sprite-arkit"
+
+[messages.api-kind-sheet-name]
+source = "sprite sheets"
+translation = "sprite-arkit"
 
 [messages.api-kind-texture]
 source = "Textures"
@@ -1766,10 +1774,6 @@ translation = "Suosikeissasi (F poistaa sen)"
 source = "File"
 translation = "Tiedosto"
 
-[messages.asset-in-atlas]
-source = "In atlas"
-translation = "Atlaksessa"
-
 [messages.asset-in-pack]
 source = "in"
 translation = "paketissa"
@@ -1813,6 +1817,10 @@ translation = "materiaalin esikatselu"
 [messages.asset-lazy-material-viewer]
 source = "the material viewer"
 translation = "materiaalikatselin"
+
+[messages.asset-lazy-sheet-view]
+source = "the sprite sheet viewer"
+translation = "sprite-arkkikatselin"
 
 [messages.asset-lazy-sprite-player]
 source = "the sprite player"
@@ -2241,10 +2249,6 @@ translation = "materiaalitiedosto"
 [messages.asset-rel-sidecar]
 source = "store details"
 translation = "kauppatiedot"
-
-[messages.asset-rel-sprite]
-source = "sprite"
-translation = "sprite"
 
 [messages.asset-rel-texture]
 source = "texture"
@@ -9283,6 +9287,94 @@ translation = "; paketit ilmestyvät sitä mukaa kuin se löytää niitä. Jos h
 [messages.setup-watched-before]
 source = 'Hoard is watching{ " " }'
 translation = 'Hoard valvoo kansiota{ " " }'
+
+[messages.sheet-animations]
+source = """
+{ $count ->
+        [one] { $count } animation
+       *[other] { $count } animations
+    }"""
+translation = """
+{ $count ->
+        [one] { $count } animaatio
+       *[other] { $count } animaatiota
+    }"""
+
+[messages.sheet-failed]
+source = "This sheet can't be read."
+translation = "Tätä arkkia ei voi lukea."
+
+[messages.sheet-find]
+source = "Find a sprite"
+translation = "Etsi sprite"
+
+[messages.sheet-loading]
+source = "Loading the sheet…"
+translation = "Ladataan arkkia…"
+
+[messages.sheet-no-match]
+source = "No sprite has that in its name."
+translation = "Minkään spriten nimessä ei ole tätä."
+
+[messages.sheet-note-clockwise]
+source = "Sprites turned clockwise and trimmed. It can't hold animations: frames go by their numbered names."
+translation = "Spritet käännettyinä myötäpäivään ja rajattuina. Animaatioita se ei tallenna: ruudut tunnistetaan numeroiduista nimistään."
+
+[messages.sheet-note-frames]
+source = "Every sprite upright on its whole canvas, each a PNG named after it."
+translation = "Jokainen sprite pystyssä koko kuva-alallaan, kukin omana PNG-kuvanaan, joka on nimetty spriten mukaan."
+
+[messages.sheet-note-godot-frames]
+source = "Sprites never turned, their trim kept as margins, with animations and each frame's time."
+translation = "Spritejä ei käännetä, ja rajaus säilyy reunuksina; mukana animaatiot ja jokaisen ruudun kesto."
+
+[messages.sheet-note-godot-tileset]
+source = "Tiles never turned or trimmed, on a grid of the tile size, keeping the images when they're on one already."
+translation = "Laattoja ei käännetä eikä rajata, ne asetellaan laatan kokoiseen ruudukkoon, ja kuvat säilyvät ennallaan, jos ne ovat jo ruudukossa."
+
+[messages.sheet-note-grid]
+source = "Every sprite upright on its whole canvas, in cells all one size, for anything that cuts a sheet into a grid."
+translation = "Jokainen sprite pystyssä koko kuva-alallaan, samankokoisissa soluissa, mille tahansa ohjelmalle, joka leikkaa arkin ruudukoksi."
+
+[messages.sheet-note-hoard]
+source = "Hoard's own: the pages as they are, sprites turned any way and trimmed, with animations and each frame's time."
+translation = "Hoardin oma muoto: sivut sellaisinaan, spritet käännettyinä mihin tahansa suuntaan ja rajattuina, mukana animaatiot ja jokaisen ruudun kesto."
+
+[messages.sheet-note-libgdx]
+source = "Sprites turned counter-clockwise and trimmed. It can't hold animations: frames go by their numbered names."
+translation = "Spritet käännettyinä vastapäivään ja rajattuina. Animaatioita se ei tallenna: ruudut tunnistetaan numeroiduista nimistään."
+
+[messages.sheet-note-texturepacker]
+source = "Sprites turned clockwise and trimmed, with animations by name, as PixiJS and Phaser read them."
+translation = "Spritet käännettyinä myötäpäivään ja rajattuina, animaatiot nimettyinä, niin kuin PixiJS ja Phaser ne lukevat."
+
+[messages.sheet-pages]
+source = """
+{ $count ->
+        [one] { $count } page
+       *[other] { $count } pages
+    }"""
+translation = """
+{ $count ->
+        [one] { $count } sivu
+       *[other] { $count } sivua
+    }"""
+
+[messages.sheet-showing]
+source = "Showing { $shown } of { $total }"
+translation = "Näytetään { $shown }/{ $total }"
+
+[messages.sheet-sprites]
+source = """
+{ $count ->
+        [one] { $count } sprite
+       *[other] { $count } sprites
+    }"""
+translation = """
+{ $count ->
+        [one] { $count } sprite
+       *[other] { $count } spriteä
+    }"""
 
 [messages.shortcuts-actual-pixels]
 source = "Actual pixels"

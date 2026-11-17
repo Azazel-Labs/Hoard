@@ -990,14 +990,13 @@ fn find_materials(state: &AppState, rt: &Handle, conn: &mut Connection, pack_id:
     Ok(made.len())
 }
 
-/// The pack's textures (sprites apart), by path.
+/// The pack's textures, by path.
 fn pack_textures(conn: &Connection, pack_id: &str) -> Result<Vec<Texture>> {
-    let mut stmt = conn.prepare(&format!(
+    let mut stmt = conn.prepare(
         "SELECT a.id, a.path, a.blob_hash, a.thumb_hash,
                 MAX(COALESCE(json_extract(a.meta, '$.width'), 0), COALESCE(json_extract(a.meta, '$.height'), 0))
-         FROM assets a WHERE a.pack_id = ?1 AND a.kind = 'texture' AND NOT {} ORDER BY a.path",
-        crate::atlas::IS_SPRITE
-    ))?;
+         FROM assets a WHERE a.pack_id = ?1 AND a.kind = 'texture' ORDER BY a.path",
+    )?;
     let textures = stmt
         .query_map([pack_id], |r| {
             Ok(Texture {

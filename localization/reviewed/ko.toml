@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "cf23321f0b5a4c0def865b770a270a499d16f94b002a515b0ea85331683559fc"
+source = "47a3448b14f74c042c962d95a8da3ad506368f14f81b265581c06b24339ed881"
 translation = "8d9ccd00d7a48e165bb0fba20cf5559e2b3c83fd67e4695b2578383ddd6588b7"
 
 [messages.account-add]
@@ -503,6 +503,14 @@ translation = "셰이더"
 [messages.api-kind-shader-name]
 source = "shaders"
 translation = "셰이더"
+
+[messages.api-kind-sheet]
+source = "Sprite sheets"
+translation = "스프라이트 시트"
+
+[messages.api-kind-sheet-name]
+source = "sprite sheets"
+translation = "스프라이트 시트"
 
 [messages.api-kind-texture]
 source = "Textures"
@@ -1695,10 +1703,6 @@ translation = "즐겨찾기에 있음(F로 제거)"
 source = "File"
 translation = "파일"
 
-[messages.asset-in-atlas]
-source = "In atlas"
-translation = "아틀라스"
-
 [messages.asset-in-pack]
 source = "in"
 translation = "·"
@@ -1742,6 +1746,10 @@ translation = "머티리얼 미리보기"
 [messages.asset-lazy-material-viewer]
 source = "the material viewer"
 translation = "머티리얼 뷰어"
+
+[messages.asset-lazy-sheet-view]
+source = "the sprite sheet viewer"
+translation = "스프라이트 시트 뷰어"
 
 [messages.asset-lazy-sprite-player]
 source = "the sprite player"
@@ -2158,10 +2166,6 @@ translation = "머티리얼 파일"
 [messages.asset-rel-sidecar]
 source = "store details"
 translation = "스토어 정보"
-
-[messages.asset-rel-sprite]
-source = "sprite"
-translation = "스프라이트"
 
 [messages.asset-rel-texture]
 source = "texture"
@@ -9025,6 +9029,91 @@ translation = "을(를) 감시하고 있으며, 팩을 찾는 대로 표시합�
 [messages.setup-watched-before]
 source = 'Hoard is watching{ " " }'
 translation = 'Hoard가{ " " }'
+
+[messages.sheet-animations]
+source = """
+{ $count ->
+        [one] { $count } animation
+       *[other] { $count } animations
+    }"""
+translation = """
+{ $count ->
+       *[other] 애니메이션 { $count }개
+    }"""
+
+[messages.sheet-failed]
+source = "This sheet can't be read."
+translation = "이 시트를 읽을 수 없습니다."
+
+[messages.sheet-find]
+source = "Find a sprite"
+translation = "스프라이트 찾기"
+
+[messages.sheet-loading]
+source = "Loading the sheet…"
+translation = "시트 불러오는 중…"
+
+[messages.sheet-no-match]
+source = "No sprite has that in its name."
+translation = "이름에 그 내용이 들어간 스프라이트가 없습니다."
+
+[messages.sheet-note-clockwise]
+source = "Sprites turned clockwise and trimmed. It can't hold animations: frames go by their numbered names."
+translation = "스프라이트를 시계 방향으로 회전하고 여백을 잘라 냅니다. 애니메이션은 담을 수 없어 프레임은 번호가 붙은 이름으로 구분됩니다."
+
+[messages.sheet-note-frames]
+source = "Every sprite upright on its whole canvas, each a PNG named after it."
+translation = "모든 스프라이트를 바로 세워 캔버스 전체 그대로, 각각 그 이름을 딴 PNG로 저장합니다."
+
+[messages.sheet-note-godot-frames]
+source = "Sprites never turned, their trim kept as margins, with animations and each frame's time."
+translation = "스프라이트는 회전하지 않고, 잘라 낸 여백은 마진으로 남기며, 애니메이션과 각 프레임의 시간을 담습니다."
+
+[messages.sheet-note-godot-tileset]
+source = "Tiles never turned or trimmed, on a grid of the tile size, keeping the images when they're on one already."
+translation = "타일은 회전하거나 잘라 내지 않고 타일 크기의 격자에 배치하며, 이미 격자로 되어 있는 이미지는 그대로 둡니다."
+
+[messages.sheet-note-grid]
+source = "Every sprite upright on its whole canvas, in cells all one size, for anything that cuts a sheet into a grid."
+translation = "모든 스프라이트를 바로 세워 캔버스 전체 그대로 모두 같은 크기의 칸에 담습니다. 시트를 격자로 자르는 도구라면 무엇이든 읽을 수 있습니다."
+
+[messages.sheet-note-hoard]
+source = "Hoard's own: the pages as they are, sprites turned any way and trimmed, with animations and each frame's time."
+translation = "Hoard 전용 형식: 페이지는 그대로 두고, 스프라이트는 어느 방향으로든 회전하고 여백을 잘라 내며, 애니메이션과 각 프레임의 시간을 담습니다."
+
+[messages.sheet-note-libgdx]
+source = "Sprites turned counter-clockwise and trimmed. It can't hold animations: frames go by their numbered names."
+translation = "스프라이트를 시계 반대 방향으로 회전하고 여백을 잘라 냅니다. 애니메이션은 담을 수 없어 프레임은 번호가 붙은 이름으로 구분됩니다."
+
+[messages.sheet-note-texturepacker]
+source = "Sprites turned clockwise and trimmed, with animations by name, as PixiJS and Phaser read them."
+translation = "스프라이트를 시계 방향으로 회전하고 여백을 잘라 내며, 애니메이션을 이름별로 담아 PixiJS와 Phaser에서 읽을 수 있습니다."
+
+[messages.sheet-pages]
+source = """
+{ $count ->
+        [one] { $count } page
+       *[other] { $count } pages
+    }"""
+translation = """
+{ $count ->
+       *[other] { $count }페이지
+    }"""
+
+[messages.sheet-showing]
+source = "Showing { $shown } of { $total }"
+translation = "{ $total }개 중 { $shown }개 표시"
+
+[messages.sheet-sprites]
+source = """
+{ $count ->
+        [one] { $count } sprite
+       *[other] { $count } sprites
+    }"""
+translation = """
+{ $count ->
+       *[other] 스프라이트 { $count }개
+    }"""
 
 [messages.shortcuts-actual-pixels]
 source = "Actual pixels"

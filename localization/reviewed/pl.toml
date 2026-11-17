@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "cf23321f0b5a4c0def865b770a270a499d16f94b002a515b0ea85331683559fc"
+source = "47a3448b14f74c042c962d95a8da3ad506368f14f81b265581c06b24339ed881"
 translation = "90c0ed812beab84b13b964f798f3b808c3e8a1a1439ed69952ffc76f161eeeaa"
 
 [messages.account-add]
@@ -503,6 +503,14 @@ translation = "Shadery"
 [messages.api-kind-shader-name]
 source = "shaders"
 translation = "shadery"
+
+[messages.api-kind-sheet]
+source = "Sprite sheets"
+translation = "Arkusze sprite’ów"
+
+[messages.api-kind-sheet-name]
+source = "sprite sheets"
+translation = "arkusze sprite’ów"
 
 [messages.api-kind-texture]
 source = "Textures"
@@ -1802,10 +1810,6 @@ translation = "W ulubionych (F usuwa)"
 source = "File"
 translation = "Plik"
 
-[messages.asset-in-atlas]
-source = "In atlas"
-translation = "W atlasie"
-
 [messages.asset-in-pack]
 source = "in"
 translation = "w"
@@ -1849,6 +1853,10 @@ translation = "podglądu materiału"
 [messages.asset-lazy-material-viewer]
 source = "the material viewer"
 translation = "przeglądarki materiałów"
+
+[messages.asset-lazy-sheet-view]
+source = "the sprite sheet viewer"
+translation = "przeglądarki arkuszy sprite’ów"
 
 [messages.asset-lazy-sprite-player]
 source = "the sprite player"
@@ -2289,10 +2297,6 @@ translation = "plik materiału"
 [messages.asset-rel-sidecar]
 source = "store details"
 translation = "informacje ze sklepu"
-
-[messages.asset-rel-sprite]
-source = "sprite"
-translation = "sprite"
 
 [messages.asset-rel-texture]
 source = "texture"
@@ -9419,6 +9423,100 @@ translation = "; paczki pojawiają się w miarę ich znajdowania. Aby móc też 
 [messages.setup-watched-before]
 source = 'Hoard is watching{ " " }'
 translation = 'Hoard obserwuje folder{ " " }'
+
+[messages.sheet-animations]
+source = """
+{ $count ->
+        [one] { $count } animation
+       *[other] { $count } animations
+    }"""
+translation = """
+{ $count ->
+        [one] { $count } animacja
+        [few] { $count } animacje
+        [many] { $count } animacji
+       *[other] { $count } animacji
+    }"""
+
+[messages.sheet-failed]
+source = "This sheet can't be read."
+translation = "Nie można odczytać tego arkusza."
+
+[messages.sheet-find]
+source = "Find a sprite"
+translation = "Znajdź sprite’a"
+
+[messages.sheet-loading]
+source = "Loading the sheet…"
+translation = "Wczytywanie arkusza…"
+
+[messages.sheet-no-match]
+source = "No sprite has that in its name."
+translation = "Żaden sprite nie ma tego w nazwie."
+
+[messages.sheet-note-clockwise]
+source = "Sprites turned clockwise and trimmed. It can't hold animations: frames go by their numbered names."
+translation = "Sprite’y obrócone zgodnie z ruchem wskazówek zegara i przycięte. Ten format nie obsługuje animacji: klatki rozpoznaje się po numerach w nazwach."
+
+[messages.sheet-note-frames]
+source = "Every sprite upright on its whole canvas, each a PNG named after it."
+translation = "Każdy sprite nieobrócony, na całym swoim płótnie, każdy jako osobny plik PNG nazwany tak jak on."
+
+[messages.sheet-note-godot-frames]
+source = "Sprites never turned, their trim kept as margins, with animations and each frame's time."
+translation = "Sprite’y nigdy nieobracane, a przycięte brzegi zachowane jako marginesy, z animacjami i czasem każdej klatki."
+
+[messages.sheet-note-godot-tileset]
+source = "Tiles never turned or trimmed, on a grid of the tile size, keeping the images when they're on one already."
+translation = "Kafelki nigdy nieobracane ani nieprzycinane, na siatce o rozmiarze kafelka; obrazy, które już są na siatce, zostają bez zmian."
+
+[messages.sheet-note-grid]
+source = "Every sprite upright on its whole canvas, in cells all one size, for anything that cuts a sheet into a grid."
+translation = "Każdy sprite nieobrócony, na całym swoim płótnie, w jednakowych komórkach, dla każdego narzędzia, które tnie arkusz według siatki."
+
+[messages.sheet-note-hoard]
+source = "Hoard's own: the pages as they are, sprites turned any way and trimmed, with animations and each frame's time."
+translation = "Własny format Hoard: strony bez zmian, sprite’y obrócone w dowolną stronę i przycięte, z animacjami i czasem każdej klatki."
+
+[messages.sheet-note-libgdx]
+source = "Sprites turned counter-clockwise and trimmed. It can't hold animations: frames go by their numbered names."
+translation = "Sprite’y obrócone przeciwnie do ruchu wskazówek zegara i przycięte. Ten format nie obsługuje animacji: klatki rozpoznaje się po numerach w nazwach."
+
+[messages.sheet-note-texturepacker]
+source = "Sprites turned clockwise and trimmed, with animations by name, as PixiJS and Phaser read them."
+translation = "Sprite’y obrócone zgodnie z ruchem wskazówek zegara i przycięte, z animacjami według nazw, tak jak odczytują je PixiJS i Phaser."
+
+[messages.sheet-pages]
+source = """
+{ $count ->
+        [one] { $count } page
+       *[other] { $count } pages
+    }"""
+translation = """
+{ $count ->
+        [one] { $count } strona
+        [few] { $count } strony
+        [many] { $count } stron
+       *[other] { $count } strony
+    }"""
+
+[messages.sheet-showing]
+source = "Showing { $shown } of { $total }"
+translation = "Wyświetlono { $shown } z { $total }"
+
+[messages.sheet-sprites]
+source = """
+{ $count ->
+        [one] { $count } sprite
+       *[other] { $count } sprites
+    }"""
+translation = """
+{ $count ->
+        [one] { $count } sprite
+        [few] { $count } sprite’y
+        [many] { $count } sprite’ów
+       *[other] { $count } sprite’a
+    }"""
 
 [messages.shortcuts-actual-pixels]
 source = "Actual pixels"

@@ -1337,6 +1337,7 @@ asset-lazy-image-viewer = prohlížeč obrázků
 asset-lazy-material-preview = náhled materiálu
 asset-lazy-material-viewer = prohlížeč materiálů
 asset-lazy-sprite-player = přehrávač spritů
+asset-lazy-sheet-view = prohlížeč listů spritů
 asset-rel-texture = textura
 asset-rel-buffer = data geometrie
 asset-rel-material = soubor materiálu
@@ -1345,7 +1346,6 @@ asset-rel-library = propojený soubor
 asset-rel-guess = nejspíš patří k
 asset-rel-sidecar = údaje z obchodu
 asset-rel-variant = varianta
-asset-rel-sprite = sprite
 asset-role-map = mapa typu { $role }
 asset-maps-count =
     { $count ->
@@ -1356,7 +1356,6 @@ asset-maps-count =
 asset-needs = Potřebuje
 asset-animations = Animace
 asset-sprites = Sprity
-asset-in-atlas = V atlasu
 asset-used-by = Používá ho
 asset-conversion-failed = převod selhal
 asset-as-converting = Převádím…
@@ -1635,6 +1634,48 @@ sprite-columns = Sloupce
 sprite-rows = Řádky
 sprite-fps-aria = Snímků za sekundu
 sprite-fps = fps
+
+## The sprite sheet viewer (SheetView.vue) and its download formats (AssetDetail.vue)
+
+# Counts under the sheet's preview, joined with " · ".
+sheet-sprites =
+    { $count ->
+        [one] { $count } sprite
+        [few] { $count } sprity
+        [many] { $count } spritu
+       *[other] { $count } spritů
+    }
+sheet-pages =
+    { $count ->
+        [one] { $count } stránka
+        [few] { $count } stránky
+        [many] { $count } stránky
+       *[other] { $count } stránek
+    }
+sheet-animations =
+    { $count ->
+        [one] { $count } animace
+        [few] { $count } animace
+        [many] { $count } animace
+       *[other] { $count } animací
+    }
+# The box that narrows the list of sprites by name.
+sheet-find = Najít sprite
+# Under the list of sprites when more match than it draws.
+sheet-showing = Zobrazeno { $shown } z { $total }
+sheet-no-match = Žádný sprite tohle v názvu nemá.
+sheet-failed = Tento list nelze přečíst.
+sheet-loading = Načítám list…
+# Under "Download as" when a sprite sheet format is picked: what the format can say, and so how the sheet comes out
+# in it. Sprites are turned to fit more on a page only in formats that can say so.
+sheet-note-hoard = Vlastní formát Hoardu: stránky tak, jak jsou, sprity libovolně otočené a oříznuté, s animacemi a délkou každého snímku.
+sheet-note-texturepacker = Sprity otočené po směru hodinových ručiček a oříznuté, s animacemi podle názvu, tak jak je čtou PixiJS a Phaser.
+sheet-note-clockwise = Sprity otočené po směru hodinových ručiček a oříznuté. Animace v něm být nemohou: snímky se řídí svými číslovanými názvy.
+sheet-note-libgdx = Sprity otočené proti směru hodinových ručiček a oříznuté. Animace v něm být nemohou: snímky se řídí svými číslovanými názvy.
+sheet-note-godot-frames = Sprity se nikdy neotáčejí a oříznutá část zůstane jako okraje, s animacemi a délkou každého snímku.
+sheet-note-godot-tileset = Dlaždice se nikdy neotáčejí ani neořezávají, v mřížce o velikosti dlaždice; obrázky, které už v mřížce jsou, zůstanou, jak jsou.
+sheet-note-grid = Každý sprite vzpřímeně na celém svém plátně, v buňkách stejné velikosti, pro cokoli, co list rozřezává do mřížky.
+sheet-note-frames = Každý sprite vzpřímeně na celém svém plátně, každý jako PNG pojmenované po něm.
 
 ## TextViewer.vue, TextPreview.vue a text.ts
 
@@ -2757,6 +2798,7 @@ settings-update-check = Každých pár hodin kontrolovat na GitHubu novou verzi
 
 api-kind-texture = Textury
 api-kind-vector = Vektorová grafika
+api-kind-sheet = Listy spritů
 api-kind-audio = Zvuk
 api-kind-model = Modely
 api-kind-animation = Animace
@@ -2769,6 +2811,7 @@ api-kind-data = Data
 api-kind-other = Ostatní
 api-kind-texture-name = textury
 api-kind-vector-name = vektorová grafika
+api-kind-sheet-name = listy spritů
 api-kind-audio-name = zvuk
 api-kind-model-name = modely
 api-kind-animation-name = animace

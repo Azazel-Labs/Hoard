@@ -1142,6 +1142,7 @@ asset-lazy-image-viewer = trình xem ảnh
 asset-lazy-material-preview = bản xem trước vật liệu
 asset-lazy-material-viewer = trình xem vật liệu
 asset-lazy-sprite-player = trình phát sprite
+asset-lazy-sheet-view = trình xem bảng sprite
 asset-rel-texture = texture
 asset-rel-buffer = dữ liệu hình học
 asset-rel-material = tệp vật liệu
@@ -1150,13 +1151,11 @@ asset-rel-library = tệp liên kết
 asset-rel-guess = có lẽ đi kèm với
 asset-rel-sidecar = thông tin cửa hàng
 asset-rel-variant = biến thể
-asset-rel-sprite = sprite
 asset-role-map = map { $role }
 asset-maps-count = { $count } map
 asset-needs = Cần
 asset-animations = Hoạt ảnh
 asset-sprites = Sprite
-asset-in-atlas = Trong atlas
 asset-used-by = Được dùng bởi
 asset-conversion-failed = chuyển đổi thất bại
 asset-as-converting = Đang chuyển đổi…
@@ -1410,6 +1409,39 @@ sprite-columns = Cột
 sprite-rows = Hàng
 sprite-fps-aria = Khung hình mỗi giây
 sprite-fps = fps
+
+## The sprite sheet viewer (SheetView.vue) and its download formats (AssetDetail.vue)
+
+# Counts under the sheet's preview, joined with " · ".
+sheet-sprites =
+    { $count ->
+       *[other] { $count } sprite
+    }
+sheet-pages =
+    { $count ->
+       *[other] { $count } trang
+    }
+sheet-animations =
+    { $count ->
+       *[other] { $count } hoạt ảnh
+    }
+# The box that narrows the list of sprites by name.
+sheet-find = Tìm sprite
+# Under the list of sprites when more match than it draws.
+sheet-showing = Đang hiện { $shown } / { $total }
+sheet-no-match = Không có sprite nào có tên chứa nội dung này.
+sheet-failed = Không thể đọc bảng này.
+sheet-loading = Đang tải bảng…
+# Under "Download as" when a sprite sheet format is picked: what the format can say, and so how the sheet comes out
+# in it. Sprites are turned to fit more on a page only in formats that can say so.
+sheet-note-hoard = Định dạng riêng của Hoard: giữ nguyên các trang, sprite xoay theo mọi hướng và được cắt viền trong suốt, kèm hoạt ảnh và thời gian của từng khung hình.
+sheet-note-texturepacker = Sprite xoay theo chiều kim đồng hồ và được cắt viền trong suốt, kèm hoạt ảnh theo tên, đúng như cách PixiJS và Phaser đọc.
+sheet-note-clockwise = Sprite xoay theo chiều kim đồng hồ và được cắt viền trong suốt. Định dạng này không chứa được hoạt ảnh: khung hình được nhận theo tên có đánh số.
+sheet-note-libgdx = Sprite xoay ngược chiều kim đồng hồ và được cắt viền trong suốt. Định dạng này không chứa được hoạt ảnh: khung hình được nhận theo tên có đánh số.
+sheet-note-godot-frames = Sprite không bao giờ bị xoay, phần viền đã cắt được giữ lại làm lề, kèm hoạt ảnh và thời gian của từng khung hình.
+sheet-note-godot-tileset = Ô không bao giờ bị xoay hay cắt viền, xếp trên lưới theo kích thước ô, và giữ nguyên ảnh nếu chúng đã nằm sẵn trên lưới.
+sheet-note-grid = Mỗi sprite đứng thẳng trên toàn bộ khung vẽ của nó, trong các ô cùng kích thước, dùng cho bất kỳ công cụ nào cắt bảng thành lưới.
+sheet-note-frames = Mỗi sprite đứng thẳng trên toàn bộ khung vẽ của nó, mỗi sprite là một tệp PNG mang tên của chính nó.
 
 ## Trình xem văn bản
 
@@ -2351,6 +2383,7 @@ settings-update-check = Kiểm tra GitHub vài giờ một lần để tìm bả
 
 api-kind-texture = Texture
 api-kind-vector = Ảnh vector
+api-kind-sheet = Bảng sprite
 api-kind-audio = Âm thanh
 api-kind-model = Mô hình
 api-kind-animation = Hoạt ảnh
@@ -2363,6 +2396,7 @@ api-kind-data = Dữ liệu
 api-kind-other = Khác
 api-kind-texture-name = texture
 api-kind-vector-name = ảnh vector
+api-kind-sheet-name = bảng sprite
 api-kind-audio-name = âm thanh
 api-kind-model-name = mô hình
 api-kind-animation-name = hoạt ảnh

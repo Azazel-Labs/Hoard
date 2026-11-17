@@ -1136,6 +1136,7 @@ asset-lazy-image-viewer = ตัวแสดงภาพ
 asset-lazy-material-preview = ตัวอย่างแมทีเรียล
 asset-lazy-material-viewer = ตัวแสดงแมทีเรียล
 asset-lazy-sprite-player = ตัวเล่นสไปรต์
+asset-lazy-sheet-view = ตัวแสดงแผ่นสไปรต์
 asset-rel-texture = เท็กซ์เจอร์
 asset-rel-buffer = ข้อมูลเรขาคณิต
 asset-rel-material = ไฟล์แมทีเรียล
@@ -1144,13 +1145,11 @@ asset-rel-library = ไฟล์ที่ลิงก์
 asset-rel-guess = น่าจะใช้คู่กัน
 asset-rel-sidecar = รายละเอียดร้านค้า
 asset-rel-variant = รูปแบบย่อย
-asset-rel-sprite = สไปรต์
 asset-role-map = แมป { $role }
 asset-maps-count = { $count } แมป
 asset-needs = ต้องใช้
 asset-animations = แอนิเมชัน
 asset-sprites = สไปรต์
-asset-in-atlas = ในแอตลาส
 asset-used-by = ถูกใช้โดย
 asset-conversion-failed = การแปลงล้มเหลว
 asset-as-converting = กำลังแปลง…
@@ -1410,6 +1409,39 @@ sprite-columns = คอลัมน์
 sprite-rows = แถว
 sprite-fps-aria = เฟรมต่อวินาที
 sprite-fps = fps
+
+## The sprite sheet viewer (SheetView.vue) and its download formats (AssetDetail.vue)
+
+# Counts under the sheet's preview, joined with " · ".
+sheet-sprites =
+    { $count ->
+       *[other] { $count } สไปรต์
+    }
+sheet-pages =
+    { $count ->
+       *[other] { $count } หน้า
+    }
+sheet-animations =
+    { $count ->
+       *[other] { $count } แอนิเมชัน
+    }
+# The box that narrows the list of sprites by name.
+sheet-find = ค้นหาสไปรต์
+# Under the list of sprites when more match than it draws.
+sheet-showing = แสดง { $shown } จาก { $total }
+sheet-no-match = ไม่มีสไปรต์ที่มีคำนี้ในชื่อ
+sheet-failed = อ่านแผ่นภาพนี้ไม่ได้
+sheet-loading = กำลังโหลดแผ่นภาพ…
+# Under "Download as" when a sprite sheet format is picked: what the format can say, and so how the sheet comes out
+# in it. Sprites are turned to fit more on a page only in formats that can say so.
+sheet-note-hoard = รูปแบบของ Hoard เอง: ทุกหน้าคงไว้ตามเดิม สไปรต์หมุนได้ทุกทิศและตัดขอบโปร่งใสออก พร้อมแอนิเมชันและเวลาของแต่ละเฟรม
+sheet-note-texturepacker = สไปรต์หมุนตามเข็มนาฬิกาและตัดขอบโปร่งใสออก พร้อมแอนิเมชันตามชื่อ ในแบบที่ PixiJS และ Phaser อ่านได้
+sheet-note-clockwise = สไปรต์หมุนตามเข็มนาฬิกาและตัดขอบโปร่งใสออก รูปแบบนี้เก็บแอนิเมชันไม่ได้ เฟรมจึงเรียงตามชื่อที่มีหมายเลข
+sheet-note-libgdx = สไปรต์หมุนทวนเข็มนาฬิกาและตัดขอบโปร่งใสออก รูปแบบนี้เก็บแอนิเมชันไม่ได้ เฟรมจึงเรียงตามชื่อที่มีหมายเลข
+sheet-note-godot-frames = สไปรต์ไม่ถูกหมุนเลย ส่วนที่ตัดออกเก็บไว้เป็นระยะขอบ พร้อมแอนิเมชันและเวลาของแต่ละเฟรม
+sheet-note-godot-tileset = ไทล์ไม่ถูกหมุนหรือตัดขอบ วางบนกริดตามขนาดไทล์ และคงภาพเดิมไว้หากเรียงเป็นกริดอยู่แล้ว
+sheet-note-grid = สไปรต์ทุกตัวตั้งตรงบนผืนภาพเต็มของตัวเอง ในช่องขนาดเท่ากันทั้งหมด สำหรับโปรแกรมใดก็ตามที่ตัดแผ่นภาพเป็นกริด
+sheet-note-frames = สไปรต์ทุกตัวตั้งตรงบนผืนภาพเต็มของตัวเอง แต่ละตัวเป็นไฟล์ PNG ที่ตั้งชื่อตามสไปรต์นั้น
 
 ## TextViewer.vue, TextPreview.vue และ text.ts
 
@@ -2354,6 +2386,7 @@ settings-update-check = ตรวจหารุ่นใหม่บน GitHub 
 
 api-kind-texture = เท็กซ์เจอร์
 api-kind-vector = ภาพเวกเตอร์
+api-kind-sheet = แผ่นสไปรต์
 api-kind-audio = เสียง
 api-kind-model = โมเดล
 api-kind-animation = แอนิเมชัน
@@ -2366,6 +2399,7 @@ api-kind-data = ข้อมูล
 api-kind-other = อื่น ๆ
 api-kind-texture-name = เท็กซ์เจอร์
 api-kind-vector-name = ภาพเวกเตอร์
+api-kind-sheet-name = แผ่นสไปรต์
 api-kind-audio-name = เสียง
 api-kind-model-name = โมเดล
 api-kind-animation-name = แอนิเมชัน

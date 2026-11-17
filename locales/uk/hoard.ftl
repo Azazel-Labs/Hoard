@@ -1395,6 +1395,7 @@ asset-lazy-image-viewer = переглядач зображень
 asset-lazy-material-preview = попередній перегляд матеріалу
 asset-lazy-material-viewer = переглядач матеріалів
 asset-lazy-sprite-player = програвач спрайтів
+asset-lazy-sheet-view = переглядач аркушів спрайтів
 asset-rel-texture = текстура
 asset-rel-buffer = дані геометрії
 asset-rel-material = файл матеріалу
@@ -1403,7 +1404,6 @@ asset-rel-library = пов’язаний файл
 asset-rel-guess = імовірно, пов’язаний
 asset-rel-sidecar = відомості з магазину
 asset-rel-variant = варіант
-asset-rel-sprite = спрайт
 asset-role-map = карта { $role }
 asset-maps-count =
     { $count ->
@@ -1415,7 +1415,6 @@ asset-maps-count =
 asset-needs = Потребує
 asset-animations = Анімації
 asset-sprites = Спрайти
-asset-in-atlas = В атласі
 asset-used-by = Використовується в
 asset-conversion-failed = перетворення не вдалося
 asset-as-converting = Перетворення…
@@ -1711,6 +1710,48 @@ sprite-columns = Стовпці
 sprite-rows = Рядки
 sprite-fps-aria = Кадрів за секунду
 sprite-fps = кадр/с
+
+## The sprite sheet viewer (SheetView.vue) and its download formats (AssetDetail.vue)
+
+# Counts under the sheet's preview, joined with " · ".
+sheet-sprites =
+    { $count ->
+        [one] { $count } спрайт
+        [few] { $count } спрайти
+        [many] { $count } спрайтів
+       *[other] { $count } спрайта
+    }
+sheet-pages =
+    { $count ->
+        [one] { $count } сторінка
+        [few] { $count } сторінки
+        [many] { $count } сторінок
+       *[other] { $count } сторінки
+    }
+sheet-animations =
+    { $count ->
+        [one] { $count } анімація
+        [few] { $count } анімації
+        [many] { $count } анімацій
+       *[other] { $count } анімації
+    }
+# The box that narrows the list of sprites by name.
+sheet-find = Знайти спрайт
+# Under the list of sprites when more match than it draws.
+sheet-showing = Показано { $shown } з { $total }
+sheet-no-match = Жоден спрайт не має цього в назві.
+sheet-failed = Цей аркуш не вдається прочитати.
+sheet-loading = Завантаження аркуша…
+# Under "Download as" when a sprite sheet format is picked: what the format can say, and so how the sheet comes out
+# in it. Sprites are turned to fit more on a page only in formats that can say so.
+sheet-note-hoard = Власний формат Hoard: сторінки як є, спрайти повернуто будь-як і обрізано, з анімаціями й тривалістю кожного кадру.
+sheet-note-texturepacker = Спрайти повернуто за годинниковою стрілкою й обрізано, анімації — за назвами, як їх читають PixiJS і Phaser.
+sheet-note-clockwise = Спрайти повернуто за годинниковою стрілкою й обрізано. Анімацій формат не зберігає: кадри впізнаються за нумерованими назвами.
+sheet-note-libgdx = Спрайти повернуто проти годинникової стрілки й обрізано. Анімацій формат не зберігає: кадри впізнаються за нумерованими назвами.
+sheet-note-godot-frames = Спрайти ніколи не повертаються, а обрізане зберігається як поля, з анімаціями й тривалістю кожного кадру.
+sheet-note-godot-tileset = Плитки ніколи не повертаються й не обрізаються, лягають у сітку за розміром плитки, а зображення, що вже лежать у сітці, лишаються як є.
+sheet-note-grid = Кожен спрайт стоїть рівно на всьому своєму полотні, у клітинках однакового розміру, — для будь-чого, що ріже аркуш на сітку.
+sheet-note-frames = Кожен спрайт стоїть рівно на всьому своєму полотні, кожен — окремий PNG з його назвою.
 
 ## TextViewer.vue, TextPreview.vue і text.ts
 
@@ -2854,6 +2895,7 @@ settings-update-check = Перевіряти GitHub на нові випуски
 
 api-kind-texture = Текстури
 api-kind-vector = Векторна графіка
+api-kind-sheet = Аркуші спрайтів
 api-kind-audio = Аудіо
 api-kind-model = Моделі
 api-kind-animation = Анімації
@@ -2866,6 +2908,7 @@ api-kind-data = Дані
 api-kind-other = Інше
 api-kind-texture-name = текстури
 api-kind-vector-name = векторна графіка
+api-kind-sheet-name = аркуші спрайтів
 api-kind-audio-name = аудіо
 api-kind-model-name = моделі
 api-kind-animation-name = анімації

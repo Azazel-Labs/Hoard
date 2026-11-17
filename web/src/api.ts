@@ -3,14 +3,14 @@ import { formatNumber, language, t } from './i18n'
 import type { TextureNames } from './texnames'
 
 export type AssetKind =
-  | 'texture' | 'vector' | 'audio' | 'model' | 'animation' | 'font' | 'shader'
+  | 'texture' | 'vector' | 'sheet' | 'audio' | 'model' | 'animation' | 'font' | 'shader'
   | 'material' | 'video' | 'document' | 'data' | 'other'
 
 export type TagSource = 'meta' | 'rule' | 'ai' | 'human'
 
 export interface Tag { tag: string; source: TagSource; confidence: number }
 
-export type LinkRel = 'texture' | 'buffer' | 'material' | 'animation' | 'library' | 'guess' | 'sidecar' | 'variant' | 'sprite'
+export type LinkRel = 'texture' | 'buffer' | 'material' | 'animation' | 'library' | 'guess' | 'sidecar' | 'variant'
 
 export interface AssetLink {
   id: string
@@ -1016,6 +1016,30 @@ function post<T>(path: string, body: unknown): Promise<T> {
   return request<T>(path, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
 }
 
+/** A sprite sheet as Hoard keeps it (see crates/hoardd/src/spritesheet.rs). */
+export interface SheetData {
+  hoard_sheet: number
+  /** The format it was read from: `texturepacker`, `libgdx`, `godot-tileset`, … */
+  from: string
+  pages: { image: string; size: [number, number]; asset?: string }[]
+  sprites: SheetSprite[]
+  animations?: { name: string; frames: { sprite: number; ms: number }[]; loop: boolean }[]
+  tile?: [number, number]
+}
+
+export interface SheetSprite {
+  name: string
+  page: number
+  /** Where its pixels are on the page, as stored there (turned, if they are). */
+  rect: [number, number, number, number]
+  /** How far its stored pixels are turned clockwise from upright. */
+  turn?: number
+  /** Its size, upright, before its transparent margin was trimmed off. */
+  size: [number, number]
+  /** Where its pixels, upright, sit in that size. */
+  at?: [number, number]
+}
+
 export interface ThumbUpload { replaced: boolean; thumb_source: ThumbSource | null; thumb_rev?: string }
 
 export const api = {
@@ -1027,6 +1051,7 @@ export const api = {
       body: png,
     }),
   stats: () => request<Stats>('/api/stats'),
+  sheet: (id: string) => request<SheetData>(`/api/assets/${id}/derivative/sheet`),
   libraryStats: () => request<LibraryStats>('/api/stats/library'),
   packs: (archived = false) => request<Pack[]>(`/api/packs${archived ? '?archived=true' : ''}`),
   archive: (items: ArchiveItems) => post<ArchiveCount>('/api/archive', items),
@@ -1440,6 +1465,7 @@ export function formatDuration(secs: number): string {
 export const KIND_LABEL: Record<AssetKind, string> = {
   get texture() { return t('api-kind-texture') },
   get vector() { return t('api-kind-vector') },
+  get sheet() { return t('api-kind-sheet') },
   get audio() { return t('api-kind-audio') },
   get model() { return t('api-kind-model') },
   get animation() { return t('api-kind-animation') },
@@ -1456,6 +1482,7 @@ export const KIND_LABEL: Record<AssetKind, string> = {
 export const KIND_NAME: Record<AssetKind, string> = {
   get texture() { return t('api-kind-texture-name') },
   get vector() { return t('api-kind-vector-name') },
+  get sheet() { return t('api-kind-sheet-name') },
   get audio() { return t('api-kind-audio-name') },
   get model() { return t('api-kind-model-name') },
   get animation() { return t('api-kind-animation-name') },

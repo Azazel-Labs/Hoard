@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "cf23321f0b5a4c0def865b770a270a499d16f94b002a515b0ea85331683559fc"
+source = "47a3448b14f74c042c962d95a8da3ad506368f14f81b265581c06b24339ed881"
 translation = "4d4f0096cc29f03f0fe2a94d855b0ef2f60194198f01e480a5d3926c58b74326"
 
 [messages.account-add]
@@ -503,6 +503,14 @@ translation = "Shaders"
 [messages.api-kind-shader-name]
 source = "shaders"
 translation = "shaders"
+
+[messages.api-kind-sheet]
+source = "Sprite sheets"
+translation = "Sprite-blaaie"
+
+[messages.api-kind-sheet-name]
+source = "sprite sheets"
+translation = "sprite-blaaie"
 
 [messages.api-kind-texture]
 source = "Textures"
@@ -1762,10 +1770,6 @@ translation = "In jou gunstelinge (F haal dit uit)"
 source = "File"
 translation = "Lêer"
 
-[messages.asset-in-atlas]
-source = "In atlas"
-translation = "In atlas"
-
 [messages.asset-in-pack]
 source = "in"
 translation = "in"
@@ -1809,6 +1813,10 @@ translation = "die materiaalvoorskou"
 [messages.asset-lazy-material-viewer]
 source = "the material viewer"
 translation = "die materiaalkyker"
+
+[messages.asset-lazy-sheet-view]
+source = "the sprite sheet viewer"
+translation = "die sprite-bladkyker"
 
 [messages.asset-lazy-sprite-player]
 source = "the sprite player"
@@ -2237,10 +2245,6 @@ translation = "materiaallêer"
 [messages.asset-rel-sidecar]
 source = "store details"
 translation = "winkelbesonderhede"
-
-[messages.asset-rel-sprite]
-source = "sprite"
-translation = "sprite"
 
 [messages.asset-rel-texture]
 source = "texture"
@@ -9233,6 +9237,94 @@ translation = "; pakke verskyn soos dit hulle vind. Om ook op te laai, voeg 'n b
 [messages.setup-watched-before]
 source = 'Hoard is watching{ " " }'
 translation = 'Hoard monitor{ " " }'
+
+[messages.sheet-animations]
+source = """
+{ $count ->
+        [one] { $count } animation
+       *[other] { $count } animations
+    }"""
+translation = """
+{ $count ->
+        [one] { $count } animasie
+       *[other] { $count } animasies
+    }"""
+
+[messages.sheet-failed]
+source = "This sheet can't be read."
+translation = "Hierdie blad kan nie gelees word nie."
+
+[messages.sheet-find]
+source = "Find a sprite"
+translation = "Soek 'n sprite"
+
+[messages.sheet-loading]
+source = "Loading the sheet…"
+translation = "Laai die blad…"
+
+[messages.sheet-no-match]
+source = "No sprite has that in its name."
+translation = "Geen sprite het dit in sy naam nie."
+
+[messages.sheet-note-clockwise]
+source = "Sprites turned clockwise and trimmed. It can't hold animations: frames go by their numbered names."
+translation = "Sprites kloksgewys gedraai en bygesny. Dit kan nie animasies hou nie: rame gaan volgens hul genommerde name."
+
+[messages.sheet-note-frames]
+source = "Every sprite upright on its whole canvas, each a PNG named after it."
+translation = "Elke sprite regop op sy hele doek, elkeen 'n PNG wat na hom vernoem is."
+
+[messages.sheet-note-godot-frames]
+source = "Sprites never turned, their trim kept as margins, with animations and each frame's time."
+translation = "Sprites word nooit gedraai nie en die weggesnyde rand bly as kantruimte behoue, met animasies en elke raam se tyd."
+
+[messages.sheet-note-godot-tileset]
+source = "Tiles never turned or trimmed, on a grid of the tile size, keeping the images when they're on one already."
+translation = "Teëls word nooit gedraai of bygesny nie, op 'n rooster van die teëlgrootte, en beelde wat reeds op een is, bly soos hulle is."
+
+[messages.sheet-note-grid]
+source = "Every sprite upright on its whole canvas, in cells all one size, for anything that cuts a sheet into a grid."
+translation = "Elke sprite regop op sy hele doek, in selle wat almal ewe groot is, vir enigiets wat 'n blad in 'n rooster opsny."
+
+[messages.sheet-note-hoard]
+source = "Hoard's own: the pages as they are, sprites turned any way and trimmed, with animations and each frame's time."
+translation = "Hoard se eie formaat: die bladsye soos hulle is, sprites enige kant toe gedraai en bygesny, met animasies en elke raam se tyd."
+
+[messages.sheet-note-libgdx]
+source = "Sprites turned counter-clockwise and trimmed. It can't hold animations: frames go by their numbered names."
+translation = "Sprites antikloksgewys gedraai en bygesny. Dit kan nie animasies hou nie: rame gaan volgens hul genommerde name."
+
+[messages.sheet-note-texturepacker]
+source = "Sprites turned clockwise and trimmed, with animations by name, as PixiJS and Phaser read them."
+translation = "Sprites kloksgewys gedraai en bygesny, met animasies volgens naam, soos PixiJS en Phaser dit lees."
+
+[messages.sheet-pages]
+source = """
+{ $count ->
+        [one] { $count } page
+       *[other] { $count } pages
+    }"""
+translation = """
+{ $count ->
+        [one] { $count } bladsy
+       *[other] { $count } bladsye
+    }"""
+
+[messages.sheet-showing]
+source = "Showing { $shown } of { $total }"
+translation = "Wys { $shown } van { $total }"
+
+[messages.sheet-sprites]
+source = """
+{ $count ->
+        [one] { $count } sprite
+       *[other] { $count } sprites
+    }"""
+translation = """
+{ $count ->
+        [one] { $count } sprite
+       *[other] { $count } sprites
+    }"""
 
 [messages.shortcuts-actual-pixels]
 source = "Actual pixels"

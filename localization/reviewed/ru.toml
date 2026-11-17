@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "cf23321f0b5a4c0def865b770a270a499d16f94b002a515b0ea85331683559fc"
+source = "47a3448b14f74c042c962d95a8da3ad506368f14f81b265581c06b24339ed881"
 translation = "95443a48d777d86011fe11040c214e6d115790b94418d4e3ec20dd07fca486c8"
 
 [messages.account-add]
@@ -503,6 +503,14 @@ translation = "Шейдеры"
 [messages.api-kind-shader-name]
 source = "shaders"
 translation = "шейдеры"
+
+[messages.api-kind-sheet]
+source = "Sprite sheets"
+translation = "Листы спрайтов"
+
+[messages.api-kind-sheet-name]
+source = "sprite sheets"
+translation = "листы спрайтов"
 
 [messages.api-kind-texture]
 source = "Textures"
@@ -1826,10 +1834,6 @@ translation = "В вашем избранном (F — убрать)"
 source = "File"
 translation = "Файл"
 
-[messages.asset-in-atlas]
-source = "In atlas"
-translation = "В атласе"
-
 [messages.asset-in-pack]
 source = "in"
 translation = "из"
@@ -1873,6 +1877,10 @@ translation = "превью материала"
 [messages.asset-lazy-material-viewer]
 source = "the material viewer"
 translation = "просмотрщик материалов"
+
+[messages.asset-lazy-sheet-view]
+source = "the sprite sheet viewer"
+translation = "просмотрщик листов спрайтов"
 
 [messages.asset-lazy-sprite-player]
 source = "the sprite player"
@@ -2307,10 +2315,6 @@ translation = "файл материала"
 [messages.asset-rel-sidecar]
 source = "store details"
 translation = "сведения из магазина"
-
-[messages.asset-rel-sprite]
-source = "sprite"
-translation = "спрайт"
 
 [messages.asset-rel-texture]
 source = "texture"
@@ -9453,6 +9457,100 @@ translation = "; паки появляются по мере того, как о
 [messages.setup-watched-before]
 source = 'Hoard is watching{ " " }'
 translation = 'Hoard отслеживает{ " " }'
+
+[messages.sheet-animations]
+source = """
+{ $count ->
+        [one] { $count } animation
+       *[other] { $count } animations
+    }"""
+translation = """
+{ $count ->
+        [one] { $count } анимация
+        [few] { $count } анимации
+        [many] { $count } анимаций
+       *[other] { $count } анимации
+    }"""
+
+[messages.sheet-failed]
+source = "This sheet can't be read."
+translation = "Этот лист не удаётся прочитать."
+
+[messages.sheet-find]
+source = "Find a sprite"
+translation = "Найти спрайт"
+
+[messages.sheet-loading]
+source = "Loading the sheet…"
+translation = "Загружаем лист…"
+
+[messages.sheet-no-match]
+source = "No sprite has that in its name."
+translation = "Нет спрайтов с таким текстом в имени."
+
+[messages.sheet-note-clockwise]
+source = "Sprites turned clockwise and trimmed. It can't hold animations: frames go by their numbered names."
+translation = "Спрайты повёрнуты по часовой стрелке и обрезаны. Анимаций в этом формате нет: кадры различаются по номерам в именах."
+
+[messages.sheet-note-frames]
+source = "Every sprite upright on its whole canvas, each a PNG named after it."
+translation = "Каждый спрайт без поворота, на всём своём холсте, отдельным PNG с его именем."
+
+[messages.sheet-note-godot-frames]
+source = "Sprites never turned, their trim kept as margins, with animations and each frame's time."
+translation = "Спрайты не поворачиваются, обрезанное сохраняется как поля, с анимациями и длительностью каждого кадра."
+
+[messages.sheet-note-godot-tileset]
+source = "Tiles never turned or trimmed, on a grid of the tile size, keeping the images when they're on one already."
+translation = "Тайлы не поворачиваются и не обрезаются, лежат на сетке размером с тайл; изображения, которые уже на сетке, остаются как есть."
+
+[messages.sheet-note-grid]
+source = "Every sprite upright on its whole canvas, in cells all one size, for anything that cuts a sheet into a grid."
+translation = "Каждый спрайт без поворота, на всём своём холсте, в ячейках одного размера — для всего, что режет лист по сетке."
+
+[messages.sheet-note-hoard]
+source = "Hoard's own: the pages as they are, sprites turned any way and trimmed, with animations and each frame's time."
+translation = "Собственный формат Hoard: страницы как есть, спрайты повёрнуты как угодно и обрезаны, с анимациями и длительностью каждого кадра."
+
+[messages.sheet-note-libgdx]
+source = "Sprites turned counter-clockwise and trimmed. It can't hold animations: frames go by their numbered names."
+translation = "Спрайты повёрнуты против часовой стрелки и обрезаны. Анимаций в этом формате нет: кадры различаются по номерам в именах."
+
+[messages.sheet-note-texturepacker]
+source = "Sprites turned clockwise and trimmed, with animations by name, as PixiJS and Phaser read them."
+translation = "Спрайты повёрнуты по часовой стрелке и обрезаны, с анимациями по именам — так, как их читают PixiJS и Phaser."
+
+[messages.sheet-pages]
+source = """
+{ $count ->
+        [one] { $count } page
+       *[other] { $count } pages
+    }"""
+translation = """
+{ $count ->
+        [one] { $count } страница
+        [few] { $count } страницы
+        [many] { $count } страниц
+       *[other] { $count } страницы
+    }"""
+
+[messages.sheet-showing]
+source = "Showing { $shown } of { $total }"
+translation = "Показано { $shown } из { $total }"
+
+[messages.sheet-sprites]
+source = """
+{ $count ->
+        [one] { $count } sprite
+       *[other] { $count } sprites
+    }"""
+translation = """
+{ $count ->
+        [one] { $count } спрайт
+        [few] { $count } спрайта
+        [many] { $count } спрайтов
+       *[other] { $count } спрайта
+    }"""
 
 [messages.shortcuts-actual-pixels]
 source = "Actual pixels"

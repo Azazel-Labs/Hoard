@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "cf23321f0b5a4c0def865b770a270a499d16f94b002a515b0ea85331683559fc"
+source = "47a3448b14f74c042c962d95a8da3ad506368f14f81b265581c06b24339ed881"
 translation = "29bbdd56d3912619e12475d6d444595ec6d389a2b27582eeb623a3b8e037c6e8"
 
 [messages.account-add]
@@ -503,6 +503,14 @@ translation = "Шейдери"
 [messages.api-kind-shader-name]
 source = "shaders"
 translation = "шейдери"
+
+[messages.api-kind-sheet]
+source = "Sprite sheets"
+translation = "Аркуші спрайтів"
+
+[messages.api-kind-sheet-name]
+source = "sprite sheets"
+translation = "аркуші спрайтів"
 
 [messages.api-kind-texture]
 source = "Textures"
@@ -1827,10 +1835,6 @@ translation = "В обраному (F прибирає звідти)"
 source = "File"
 translation = "Файл"
 
-[messages.asset-in-atlas]
-source = "In atlas"
-translation = "В атласі"
-
 [messages.asset-in-pack]
 source = "in"
 translation = "у"
@@ -1874,6 +1878,10 @@ translation = "попередній перегляд матеріалу"
 [messages.asset-lazy-material-viewer]
 source = "the material viewer"
 translation = "переглядач матеріалів"
+
+[messages.asset-lazy-sheet-view]
+source = "the sprite sheet viewer"
+translation = "переглядач аркушів спрайтів"
 
 [messages.asset-lazy-sprite-player]
 source = "the sprite player"
@@ -2308,10 +2316,6 @@ translation = "файл матеріалу"
 [messages.asset-rel-sidecar]
 source = "store details"
 translation = "відомості з магазину"
-
-[messages.asset-rel-sprite]
-source = "sprite"
-translation = "спрайт"
 
 [messages.asset-rel-texture]
 source = "texture"
@@ -9468,6 +9472,100 @@ translation = "; пакети з’являтимуться в міру того
 [messages.setup-watched-before]
 source = 'Hoard is watching{ " " }'
 translation = 'Hoard відстежує{ " " }'
+
+[messages.sheet-animations]
+source = """
+{ $count ->
+        [one] { $count } animation
+       *[other] { $count } animations
+    }"""
+translation = """
+{ $count ->
+        [one] { $count } анімація
+        [few] { $count } анімації
+        [many] { $count } анімацій
+       *[other] { $count } анімації
+    }"""
+
+[messages.sheet-failed]
+source = "This sheet can't be read."
+translation = "Цей аркуш не вдається прочитати."
+
+[messages.sheet-find]
+source = "Find a sprite"
+translation = "Знайти спрайт"
+
+[messages.sheet-loading]
+source = "Loading the sheet…"
+translation = "Завантаження аркуша…"
+
+[messages.sheet-no-match]
+source = "No sprite has that in its name."
+translation = "Жоден спрайт не має цього в назві."
+
+[messages.sheet-note-clockwise]
+source = "Sprites turned clockwise and trimmed. It can't hold animations: frames go by their numbered names."
+translation = "Спрайти повернуто за годинниковою стрілкою й обрізано. Анімацій формат не зберігає: кадри впізнаються за нумерованими назвами."
+
+[messages.sheet-note-frames]
+source = "Every sprite upright on its whole canvas, each a PNG named after it."
+translation = "Кожен спрайт стоїть рівно на всьому своєму полотні, кожен — окремий PNG з його назвою."
+
+[messages.sheet-note-godot-frames]
+source = "Sprites never turned, their trim kept as margins, with animations and each frame's time."
+translation = "Спрайти ніколи не повертаються, а обрізане зберігається як поля, з анімаціями й тривалістю кожного кадру."
+
+[messages.sheet-note-godot-tileset]
+source = "Tiles never turned or trimmed, on a grid of the tile size, keeping the images when they're on one already."
+translation = "Плитки ніколи не повертаються й не обрізаються, лягають у сітку за розміром плитки, а зображення, що вже лежать у сітці, лишаються як є."
+
+[messages.sheet-note-grid]
+source = "Every sprite upright on its whole canvas, in cells all one size, for anything that cuts a sheet into a grid."
+translation = "Кожен спрайт стоїть рівно на всьому своєму полотні, у клітинках однакового розміру, — для будь-чого, що ріже аркуш на сітку."
+
+[messages.sheet-note-hoard]
+source = "Hoard's own: the pages as they are, sprites turned any way and trimmed, with animations and each frame's time."
+translation = "Власний формат Hoard: сторінки як є, спрайти повернуто будь-як і обрізано, з анімаціями й тривалістю кожного кадру."
+
+[messages.sheet-note-libgdx]
+source = "Sprites turned counter-clockwise and trimmed. It can't hold animations: frames go by their numbered names."
+translation = "Спрайти повернуто проти годинникової стрілки й обрізано. Анімацій формат не зберігає: кадри впізнаються за нумерованими назвами."
+
+[messages.sheet-note-texturepacker]
+source = "Sprites turned clockwise and trimmed, with animations by name, as PixiJS and Phaser read them."
+translation = "Спрайти повернуто за годинниковою стрілкою й обрізано, анімації — за назвами, як їх читають PixiJS і Phaser."
+
+[messages.sheet-pages]
+source = """
+{ $count ->
+        [one] { $count } page
+       *[other] { $count } pages
+    }"""
+translation = """
+{ $count ->
+        [one] { $count } сторінка
+        [few] { $count } сторінки
+        [many] { $count } сторінок
+       *[other] { $count } сторінки
+    }"""
+
+[messages.sheet-showing]
+source = "Showing { $shown } of { $total }"
+translation = "Показано { $shown } з { $total }"
+
+[messages.sheet-sprites]
+source = """
+{ $count ->
+        [one] { $count } sprite
+       *[other] { $count } sprites
+    }"""
+translation = """
+{ $count ->
+        [one] { $count } спрайт
+        [few] { $count } спрайти
+        [many] { $count } спрайтів
+       *[other] { $count } спрайта
+    }"""
 
 [messages.shortcuts-actual-pixels]
 source = "Actual pixels"

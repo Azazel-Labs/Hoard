@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "cf23321f0b5a4c0def865b770a270a499d16f94b002a515b0ea85331683559fc"
+source = "47a3448b14f74c042c962d95a8da3ad506368f14f81b265581c06b24339ed881"
 translation = "df6de75a6b6e17deee3ec95bb484e931fe8b2c48747a3d8119bdb1418a9cb2e9"
 
 [messages.account-add]
@@ -503,6 +503,14 @@ translation = "Shadere"
 [messages.api-kind-shader-name]
 source = "shaders"
 translation = "shadere"
+
+[messages.api-kind-sheet]
+source = "Sprite sheets"
+translation = "Spriteark"
+
+[messages.api-kind-sheet-name]
+source = "sprite sheets"
+translation = "spriteark"
 
 [messages.api-kind-texture]
 source = "Textures"
@@ -1762,10 +1770,6 @@ translation = "I favorittene dine (F fjerner den)"
 source = "File"
 translation = "Fil"
 
-[messages.asset-in-atlas]
-source = "In atlas"
-translation = "I atlas"
-
 [messages.asset-in-pack]
 source = "in"
 translation = "i"
@@ -1809,6 +1813,10 @@ translation = "materialforhåndsvisningen"
 [messages.asset-lazy-material-viewer]
 source = "the material viewer"
 translation = "materialvisningen"
+
+[messages.asset-lazy-sheet-view]
+source = "the sprite sheet viewer"
+translation = "spritearkvisningen"
 
 [messages.asset-lazy-sprite-player]
 source = "the sprite player"
@@ -2237,10 +2245,6 @@ translation = "materialfil"
 [messages.asset-rel-sidecar]
 source = "store details"
 translation = "butikkdetaljer"
-
-[messages.asset-rel-sprite]
-source = "sprite"
-translation = "sprite"
 
 [messages.asset-rel-texture]
 source = "texture"
@@ -9236,6 +9240,94 @@ translation = "; pakker dukker opp etter hvert som den finner dem. For også å 
 [messages.setup-watched-before]
 source = 'Hoard is watching{ " " }'
 translation = 'Hoard overvåker{ " " }'
+
+[messages.sheet-animations]
+source = """
+{ $count ->
+        [one] { $count } animation
+       *[other] { $count } animations
+    }"""
+translation = """
+{ $count ->
+        [one] { $count } animasjon
+       *[other] { $count } animasjoner
+    }"""
+
+[messages.sheet-failed]
+source = "This sheet can't be read."
+translation = "Dette arket kan ikke leses."
+
+[messages.sheet-find]
+source = "Find a sprite"
+translation = "Finn en sprite"
+
+[messages.sheet-loading]
+source = "Loading the sheet…"
+translation = "Laster arket …"
+
+[messages.sheet-no-match]
+source = "No sprite has that in its name."
+translation = "Ingen sprite har det i navnet."
+
+[messages.sheet-note-clockwise]
+source = "Sprites turned clockwise and trimmed. It can't hold animations: frames go by their numbered names."
+translation = "Sprites rotert med klokken og beskåret. Det kan ikke inneholde animasjoner: bildene følger de nummererte navnene sine."
+
+[messages.sheet-note-frames]
+source = "Every sprite upright on its whole canvas, each a PNG named after it."
+translation = "Hver sprite oppreist på hele lerretet sitt, hver som en PNG med spritens navn."
+
+[messages.sheet-note-godot-frames]
+source = "Sprites never turned, their trim kept as margins, with animations and each frame's time."
+translation = "Sprites roteres aldri, beskjæringen beholdes som marger, med animasjoner og varigheten til hvert bilde."
+
+[messages.sheet-note-godot-tileset]
+source = "Tiles never turned or trimmed, on a grid of the tile size, keeping the images when they're on one already."
+translation = "Fliser roteres og beskjæres aldri, de legges på et rutenett i flisstørrelsen, og bildene beholdes som de er når de allerede ligger på et."
+
+[messages.sheet-note-grid]
+source = "Every sprite upright on its whole canvas, in cells all one size, for anything that cuts a sheet into a grid."
+translation = "Hver sprite oppreist på hele lerretet sitt, i celler som alle er like store, for alt som deler et ark opp i et rutenett."
+
+[messages.sheet-note-hoard]
+source = "Hoard's own: the pages as they are, sprites turned any way and trimmed, with animations and each frame's time."
+translation = "Hoards eget format: sidene som de er, sprites rotert hvilken vei som helst og beskåret, med animasjoner og varigheten til hvert bilde."
+
+[messages.sheet-note-libgdx]
+source = "Sprites turned counter-clockwise and trimmed. It can't hold animations: frames go by their numbered names."
+translation = "Sprites rotert mot klokken og beskåret. Det kan ikke inneholde animasjoner: bildene følger de nummererte navnene sine."
+
+[messages.sheet-note-texturepacker]
+source = "Sprites turned clockwise and trimmed, with animations by name, as PixiJS and Phaser read them."
+translation = "Sprites rotert med klokken og beskåret, med animasjoner etter navn, slik PixiJS og Phaser leser dem."
+
+[messages.sheet-pages]
+source = """
+{ $count ->
+        [one] { $count } page
+       *[other] { $count } pages
+    }"""
+translation = """
+{ $count ->
+        [one] { $count } side
+       *[other] { $count } sider
+    }"""
+
+[messages.sheet-showing]
+source = "Showing { $shown } of { $total }"
+translation = "Viser { $shown } av { $total }"
+
+[messages.sheet-sprites]
+source = """
+{ $count ->
+        [one] { $count } sprite
+       *[other] { $count } sprites
+    }"""
+translation = """
+{ $count ->
+        [one] { $count } sprite
+       *[other] { $count } sprites
+    }"""
 
 [messages.shortcuts-actual-pixels]
 source = "Actual pixels"

@@ -30,6 +30,7 @@ const ImageViewer = lazy(() => import('./ImageViewer.vue'), () => t('asset-lazy-
 const MaterialPreview = lazy(() => import('./MaterialPreview.vue'), () => t('asset-lazy-material-preview'), 'model-slot')
 const MaterialViewer = lazy(() => import('./MaterialViewer.vue'), () => t('asset-lazy-material-viewer'), 'overlay')
 const SpritePlayer = lazy(() => import('./SpritePlayer.vue'), () => t('asset-lazy-sprite-player'))
+const SheetView = lazy(() => import('./SheetView.vue'), () => t('asset-lazy-sheet-view'))
 
 const props = defineProps<{
   asset: Asset
@@ -104,12 +105,8 @@ const REL_LABEL: Record<LinkRel, string> = {
   get guess() { return t('asset-rel-guess') },
   get sidecar() { return t('asset-rel-sidecar') },
   get variant() { return t('asset-rel-variant') },
-  get sprite() { return t('asset-rel-sprite') },
 }
-const needs = computed(() => props.asset.links.filter((l) => l.rel !== 'animation' && l.rel !== 'sprite'))
-// An atlas page lists the sprites cut from it, and a sprite names the page it's cut from: neither needs the other.
-const sprites = computed(() => props.asset.links.filter((l) => l.rel === 'sprite'))
-const inAtlas = computed(() => props.asset.linked_from.filter((l) => l.rel === 'sprite'))
+const needs = computed(() => props.asset.links.filter((l) => l.rel !== 'animation'))
 // A material made from texture maps lists its maps by role instead of as "Needs"; a texture or model that belongs
 // to one names it.
 const isMaterial = computed(() => isMaterialAsset(props.asset))
@@ -128,14 +125,12 @@ const mapsBytes = computed(() => material.value?.maps.reduce((n, m) => n + m.siz
 const anims = computed(() => props.asset.links.filter((l) => l.rel === 'animation'))
 // The materials it belongs to have a section of their own.
 const usedBy = computed(() =>
-  props.asset.linked_from.filter((l) => l.rel !== 'sprite' && !partOf.value.some((m) => m.id === l.id)),
+  props.asset.linked_from.filter((l) => !partOf.value.some((m) => m.id === l.id)),
 )
 const linkGroups = computed(() =>
   [
     { key: 'needs', title: t('asset-needs'), items: isMaterial.value ? [] : needs.value.filter((l) => !inMaterials.value.has(l.id)) },
     { key: 'animations', title: t('asset-animations'), items: anims.value },
-    { key: 'sprites', title: t('asset-sprites'), items: sprites.value },
-    { key: 'in-atlas', title: t('asset-in-atlas'), items: inAtlas.value },
     { key: 'used-by', title: t('asset-used-by'), items: usedBy.value },
   ].filter((g) => g.items.length),
 )
@@ -201,6 +196,7 @@ watch(
 )
 
 const isImage = computed(() => (props.asset.kind === 'texture' || props.asset.kind === 'vector') && props.asset.has_thumb)
+const isSheet = computed(() => props.asset.kind === 'sheet' && props.asset.derivatives.includes('sheet'))
 // Aseprite animations play from the start; a sprite sheet does when asked.
 const spritePlayable = computed(() => isImage.value && (animatedAseprite(props.asset) || spriteSheet(props.asset)))
 const animate = ref(false)
@@ -292,6 +288,20 @@ const asLabel = computed(() => {
   if (st) return t('asset-as-queued')
   return t('asset-download')
 })
+/** What a sprite sheet format can say, and so how the sheet comes out in it. */
+const SHEET_NOTE: Record<string, () => string> = {
+  'sheet-hoard': () => t('sheet-note-hoard'),
+  'sheet-tp-hash': () => t('sheet-note-texturepacker'),
+  'sheet-tp-array': () => t('sheet-note-texturepacker'),
+  'sheet-starling': () => t('sheet-note-clockwise'),
+  'sheet-cocos2d': () => t('sheet-note-clockwise'),
+  'sheet-libgdx': () => t('sheet-note-libgdx'),
+  'sheet-godot-frames': () => t('sheet-note-godot-frames'),
+  'sheet-godot-tileset': () => t('sheet-note-godot-tileset'),
+  'sheet-grid': () => t('sheet-note-grid'),
+  'sheet-frames': () => t('sheet-note-frames'),
+}
+const asNote = computed(() => SHEET_NOTE[asFormat.value]?.() ?? '')
 const showAs = computed(() => asFormats.value.length > 0 || (sameFormat.value !== null && sizeChoices.value.length > 0))
 
 const origin = computed(() => props.asset.origin ?? null)
@@ -871,6 +881,7 @@ onBeforeUnmount(() => unswipe())
       :paused="inspecting === 'material'"
       @expand="inspecting = 'material'"
     />
+    <SheetView v-else-if="isSheet" :asset="asset" :pixelated="pixelated" />
     <SpritePlayer v-else-if="spritePlayable && animate" :asset="asset" :pixelated="pixelated" />
     <button
       v-else-if="isImage"
@@ -1302,6 +1313,7 @@ onBeforeUnmount(() => unswipe())
         <span v-else class="ashint">{{ t('asset-as-hint') }}</span>
         <span v-if="asError" class="aserror" role="alert">{{ asError }}</span>
       </div>
+      <p v-if="showAs && asNote" class="asnote">{{ asNote }}</p>
       <div class="tools">
         <span class="copywrap">
           <button class="btn ghost" type="button" @click="copy(tomlSnippet, 'toml')">{{ t('asset-copy-toml') }}</button>
@@ -1460,6 +1472,7 @@ h3 { margin: 0 0 0.5rem; font-size: var(--step--1); font-weight: 650; color: var
 .asrow .field.size { flex: 0 1 8.5rem; }
 .asrow .btn { flex: none; }
 .ashint { color: var(--faint); }
+.asnote { margin: -0.2rem 0 0; font-size: var(--step--1); color: var(--muted); }
 .aserror { flex-basis: 100%; color: var(--danger); }
 .asrow .btn[aria-busy='true'] { cursor: progress; font-variant-numeric: tabular-nums; }
 .origin-note { margin: 0; font-size: var(--step--1); color: var(--muted); max-width: 52ch; }

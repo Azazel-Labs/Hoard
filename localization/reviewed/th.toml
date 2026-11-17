@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "cf23321f0b5a4c0def865b770a270a499d16f94b002a515b0ea85331683559fc"
+source = "47a3448b14f74c042c962d95a8da3ad506368f14f81b265581c06b24339ed881"
 translation = "4b240abbf21b9e5a3573cb5600cede4f95b8fdc50ad26369cfcd10d567b19ce3"
 
 [messages.account-add]
@@ -503,6 +503,14 @@ translation = "เชดเดอร์"
 [messages.api-kind-shader-name]
 source = "shaders"
 translation = "เชดเดอร์"
+
+[messages.api-kind-sheet]
+source = "Sprite sheets"
+translation = "แผ่นสไปรต์"
+
+[messages.api-kind-sheet-name]
+source = "sprite sheets"
+translation = "แผ่นสไปรต์"
 
 [messages.api-kind-texture]
 source = "Textures"
@@ -1695,10 +1703,6 @@ translation = "อยู่ในรายการโปรดของคุ�
 source = "File"
 translation = "ไฟล์"
 
-[messages.asset-in-atlas]
-source = "In atlas"
-translation = "ในแอตลาส"
-
 [messages.asset-in-pack]
 source = "in"
 translation = "ใน"
@@ -1742,6 +1746,10 @@ translation = "ตัวอย่างแมทีเรียล"
 [messages.asset-lazy-material-viewer]
 source = "the material viewer"
 translation = "ตัวแสดงแมทีเรียล"
+
+[messages.asset-lazy-sheet-view]
+source = "the sprite sheet viewer"
+translation = "ตัวแสดงแผ่นสไปรต์"
 
 [messages.asset-lazy-sprite-player]
 source = "the sprite player"
@@ -2164,10 +2172,6 @@ translation = "ไฟล์แมทีเรียล"
 [messages.asset-rel-sidecar]
 source = "store details"
 translation = "รายละเอียดร้านค้า"
-
-[messages.asset-rel-sprite]
-source = "sprite"
-translation = "สไปรต์"
 
 [messages.asset-rel-texture]
 source = "texture"
@@ -9055,6 +9059,91 @@ translation = '{ " " }แพ็กจะปรากฏเมื่อพบ ห
 [messages.setup-watched-before]
 source = 'Hoard is watching{ " " }'
 translation = 'Hoard กำลังเฝ้าดู{ " " }'
+
+[messages.sheet-animations]
+source = """
+{ $count ->
+        [one] { $count } animation
+       *[other] { $count } animations
+    }"""
+translation = """
+{ $count ->
+       *[other] { $count } แอนิเมชัน
+    }"""
+
+[messages.sheet-failed]
+source = "This sheet can't be read."
+translation = "อ่านแผ่นภาพนี้ไม่ได้"
+
+[messages.sheet-find]
+source = "Find a sprite"
+translation = "ค้นหาสไปรต์"
+
+[messages.sheet-loading]
+source = "Loading the sheet…"
+translation = "กำลังโหลดแผ่นภาพ…"
+
+[messages.sheet-no-match]
+source = "No sprite has that in its name."
+translation = "ไม่มีสไปรต์ที่มีคำนี้ในชื่อ"
+
+[messages.sheet-note-clockwise]
+source = "Sprites turned clockwise and trimmed. It can't hold animations: frames go by their numbered names."
+translation = "สไปรต์หมุนตามเข็มนาฬิกาและตัดขอบโปร่งใสออก รูปแบบนี้เก็บแอนิเมชันไม่ได้ เฟรมจึงเรียงตามชื่อที่มีหมายเลข"
+
+[messages.sheet-note-frames]
+source = "Every sprite upright on its whole canvas, each a PNG named after it."
+translation = "สไปรต์ทุกตัวตั้งตรงบนผืนภาพเต็มของตัวเอง แต่ละตัวเป็นไฟล์ PNG ที่ตั้งชื่อตามสไปรต์นั้น"
+
+[messages.sheet-note-godot-frames]
+source = "Sprites never turned, their trim kept as margins, with animations and each frame's time."
+translation = "สไปรต์ไม่ถูกหมุนเลย ส่วนที่ตัดออกเก็บไว้เป็นระยะขอบ พร้อมแอนิเมชันและเวลาของแต่ละเฟรม"
+
+[messages.sheet-note-godot-tileset]
+source = "Tiles never turned or trimmed, on a grid of the tile size, keeping the images when they're on one already."
+translation = "ไทล์ไม่ถูกหมุนหรือตัดขอบ วางบนกริดตามขนาดไทล์ และคงภาพเดิมไว้หากเรียงเป็นกริดอยู่แล้ว"
+
+[messages.sheet-note-grid]
+source = "Every sprite upright on its whole canvas, in cells all one size, for anything that cuts a sheet into a grid."
+translation = "สไปรต์ทุกตัวตั้งตรงบนผืนภาพเต็มของตัวเอง ในช่องขนาดเท่ากันทั้งหมด สำหรับโปรแกรมใดก็ตามที่ตัดแผ่นภาพเป็นกริด"
+
+[messages.sheet-note-hoard]
+source = "Hoard's own: the pages as they are, sprites turned any way and trimmed, with animations and each frame's time."
+translation = "รูปแบบของ Hoard เอง: ทุกหน้าคงไว้ตามเดิม สไปรต์หมุนได้ทุกทิศและตัดขอบโปร่งใสออก พร้อมแอนิเมชันและเวลาของแต่ละเฟรม"
+
+[messages.sheet-note-libgdx]
+source = "Sprites turned counter-clockwise and trimmed. It can't hold animations: frames go by their numbered names."
+translation = "สไปรต์หมุนทวนเข็มนาฬิกาและตัดขอบโปร่งใสออก รูปแบบนี้เก็บแอนิเมชันไม่ได้ เฟรมจึงเรียงตามชื่อที่มีหมายเลข"
+
+[messages.sheet-note-texturepacker]
+source = "Sprites turned clockwise and trimmed, with animations by name, as PixiJS and Phaser read them."
+translation = "สไปรต์หมุนตามเข็มนาฬิกาและตัดขอบโปร่งใสออก พร้อมแอนิเมชันตามชื่อ ในแบบที่ PixiJS และ Phaser อ่านได้"
+
+[messages.sheet-pages]
+source = """
+{ $count ->
+        [one] { $count } page
+       *[other] { $count } pages
+    }"""
+translation = """
+{ $count ->
+       *[other] { $count } หน้า
+    }"""
+
+[messages.sheet-showing]
+source = "Showing { $shown } of { $total }"
+translation = "แสดง { $shown } จาก { $total }"
+
+[messages.sheet-sprites]
+source = """
+{ $count ->
+        [one] { $count } sprite
+       *[other] { $count } sprites
+    }"""
+translation = """
+{ $count ->
+       *[other] { $count } สไปรต์
+    }"""
 
 [messages.shortcuts-actual-pixels]
 source = "Actual pixels"

@@ -259,11 +259,17 @@ software rasterizer (`apt install mesa-vulkan-drivers`). Without any adapter, ev
      sheet tagged `spritesheet` or `frames` plays when asked, cut into the frame size its name gives (`coin_16x16.png`)
      or where the see-through gutters between its frames are, skipping empty cells; the columns, rows and speed can be
      changed. With reduced motion asked for, they wait to be played.
-   - Sprite atlases (Starling/Sparrow XML, TexturePacker JSON including multipack, libGDX `.atlas` and Cocos2d
-     `.plist`): each sprite becomes an asset of its own, cut from its page, turned back upright and put back on its
-     untrimmed canvas, at `<atlas name>/<sprite name>.png` and tagged `sprite`. A sprite the pack also has as a loose
-     file (the same pixels, or the same name and shape) is that file instead of a copy. The page lists its sprites
-     and each sprite names the page it's from; the atlas file needs its page.
+   - Sprite sheets (Starling/Sparrow XML, TexturePacker JSON including multipack, libGDX `.atlas`, Cocos2d `.plist`,
+     and Godot `.tres` `SpriteFrames` and `TileSet` resources): the atlas file becomes a sprite sheet,
+     kept as a Hoard sheet (`.hoardsheet`, JSON) that names its pages, where each sprite is on them, how it's turned
+     and trimmed, and its animations (the file's own, or numbered names such as `walk_0`, `walk_1`). The pages stay
+     textures in the pack and the sprites aren't assets of their own. A sheet's details show its animations playing
+     and its sprites, which a name narrows down, each drawn upright on its whole canvas. It downloads as a Hoard
+     sheet, TexturePacker JSON (hash or array), Starling XML, libGDX `.atlas`, Cocos2d `.plist`, Godot
+     `SpriteFrames` or `TileSet`, a grid image or a PNG per sprite, each a zip with its images. A format gets what it
+     can say: sprites stay turned only in a format that turns them the same way (TexturePacker, Starling and Cocos2d
+     clockwise, libGDX counter-clockwise, a Hoard sheet any right angle), and are otherwise packed again upright;
+     trims stay only where the format keeps them, and animations only where it has them.
    - Fonts (TTF, OTF, TTC, WOFF, WOFF2): family and style (used as the name), designer, license, weight, italic, monospace,
      variable axes, glyph count and the writing systems covered, with an "Aa" specimen as the thumbnail. Symbol
      fonts show their first glyphs. Tagged `weight:bold`, `script:cyrillic`, `monospace`, `variable-font`, `icons`.
@@ -381,7 +387,7 @@ software rasterizer (`apt install mesa-vulkan-drivers`). Without any adapter, ev
    pointer is over it; turning it off deletes them. Game-engine
    and tool files link too: Unity materials,
    prefabs, scenes and controllers through their GUIDs; Tiled maps → tilesets → images;
-   LDtk projects; BMFont `.fnt` → page images; Spine/libGDX `.atlas` → pages; TexturePacker JSON; Godot
+   LDtk projects; BMFont `.fnt` → page images; sprite sheets → pages; Godot
    `.tres`/`.tscn` resources; and Unreal package imports.
 6. **Tag (LLM, optional).** Any OpenAI-compatible endpoint (OpenAI, OpenRouter, Ollama, llama.cpp, vLLM, LM Studio),
    or a ChatGPT plan through "Sign in with ChatGPT", gets the pack context, paths, metadata and rule tags, and returns names, a description of one to three

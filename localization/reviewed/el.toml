@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "cf23321f0b5a4c0def865b770a270a499d16f94b002a515b0ea85331683559fc"
+source = "47a3448b14f74c042c962d95a8da3ad506368f14f81b265581c06b24339ed881"
 translation = "0f5f60477c12405f48c36f12294f911af5de0204e2fd60e70ff31e1354ed1fa5"
 
 [messages.account-add]
@@ -503,6 +503,14 @@ translation = "Shaders"
 [messages.api-kind-shader-name]
 source = "shaders"
 translation = "shaders"
+
+[messages.api-kind-sheet]
+source = "Sprite sheets"
+translation = "Φύλλα sprite"
+
+[messages.api-kind-sheet-name]
+source = "sprite sheets"
+translation = "φύλλα sprite"
 
 [messages.api-kind-texture]
 source = "Textures"
@@ -1774,10 +1782,6 @@ translation = "Στα αγαπημένα σας (το F το αφαιρεί)"
 source = "File"
 translation = "Αρχείο"
 
-[messages.asset-in-atlas]
-source = "In atlas"
-translation = "Στον άτλαντα"
-
 [messages.asset-in-pack]
 source = "in"
 translation = "στο"
@@ -1821,6 +1825,10 @@ translation = "προεπισκόπησης υλικού"
 [messages.asset-lazy-material-viewer]
 source = "the material viewer"
 translation = "προγράμματος προβολής υλικών"
+
+[messages.asset-lazy-sheet-view]
+source = "the sprite sheet viewer"
+translation = "προγράμματος προβολής φύλλων sprite"
 
 [messages.asset-lazy-sprite-player]
 source = "the sprite player"
@@ -2249,10 +2257,6 @@ translation = "αρχείο υλικού"
 [messages.asset-rel-sidecar]
 source = "store details"
 translation = "στοιχεία καταστήματος"
-
-[messages.asset-rel-sprite]
-source = "sprite"
-translation = "sprite"
 
 [messages.asset-rel-texture]
 source = "texture"
@@ -9293,6 +9297,94 @@ translation = "· τα πακέτα εμφανίζονται καθώς τα β�
 [messages.setup-watched-before]
 source = 'Hoard is watching{ " " }'
 translation = 'Το Hoard παρακολουθεί το{ " " }'
+
+[messages.sheet-animations]
+source = """
+{ $count ->
+        [one] { $count } animation
+       *[other] { $count } animations
+    }"""
+translation = """
+{ $count ->
+        [one] { $count } animation
+       *[other] { $count } animations
+    }"""
+
+[messages.sheet-failed]
+source = "This sheet can't be read."
+translation = "Αυτό το φύλλο δεν μπορεί να διαβαστεί."
+
+[messages.sheet-find]
+source = "Find a sprite"
+translation = "Εύρεση sprite"
+
+[messages.sheet-loading]
+source = "Loading the sheet…"
+translation = "Φόρτωση φύλλου…"
+
+[messages.sheet-no-match]
+source = "No sprite has that in its name."
+translation = "Κανένα sprite δεν το έχει αυτό στο όνομά του."
+
+[messages.sheet-note-clockwise]
+source = "Sprites turned clockwise and trimmed. It can't hold animations: frames go by their numbered names."
+translation = "Sprites περιστραμμένα δεξιόστροφα και περικομμένα. Δεν μπορεί να περιέχει animations: τα καρέ ακολουθούν τα αριθμημένα ονόματά τους."
+
+[messages.sheet-note-frames]
+source = "Every sprite upright on its whole canvas, each a PNG named after it."
+translation = "Κάθε sprite όρθιο σε ολόκληρο τον καμβά του, το καθένα ως PNG με το όνομά του."
+
+[messages.sheet-note-godot-frames]
+source = "Sprites never turned, their trim kept as margins, with animations and each frame's time."
+translation = "Τα sprites δεν περιστρέφονται ποτέ και ό,τι περικόπηκε διατηρείται ως περιθώριο, με animations και τη διάρκεια κάθε καρέ."
+
+[messages.sheet-note-godot-tileset]
+source = "Tiles never turned or trimmed, on a grid of the tile size, keeping the images when they're on one already."
+translation = "Τα πλακίδια δεν περιστρέφονται ούτε περικόπτονται ποτέ, σε πλέγμα με το μέγεθος του πλακιδίου· οι εικόνες που είναι ήδη σε πλέγμα μένουν ως έχουν."
+
+[messages.sheet-note-grid]
+source = "Every sprite upright on its whole canvas, in cells all one size, for anything that cuts a sheet into a grid."
+translation = "Κάθε sprite όρθιο σε ολόκληρο τον καμβά του, σε κελιά ίδιου μεγέθους, για οτιδήποτε κόβει ένα φύλλο σε πλέγμα."
+
+[messages.sheet-note-hoard]
+source = "Hoard's own: the pages as they are, sprites turned any way and trimmed, with animations and each frame's time."
+translation = "Η δική μορφή του Hoard: οι σελίδες ως έχουν, τα sprites περιστραμμένα με οποιονδήποτε τρόπο και περικομμένα, με animations και τη διάρκεια κάθε καρέ."
+
+[messages.sheet-note-libgdx]
+source = "Sprites turned counter-clockwise and trimmed. It can't hold animations: frames go by their numbered names."
+translation = "Sprites περιστραμμένα αριστερόστροφα και περικομμένα. Δεν μπορεί να περιέχει animations: τα καρέ ακολουθούν τα αριθμημένα ονόματά τους."
+
+[messages.sheet-note-texturepacker]
+source = "Sprites turned clockwise and trimmed, with animations by name, as PixiJS and Phaser read them."
+translation = "Sprites περιστραμμένα δεξιόστροφα και περικομμένα, με animations κατά όνομα, όπως τα διαβάζουν το PixiJS και το Phaser."
+
+[messages.sheet-pages]
+source = """
+{ $count ->
+        [one] { $count } page
+       *[other] { $count } pages
+    }"""
+translation = """
+{ $count ->
+        [one] { $count } σελίδα
+       *[other] { $count } σελίδες
+    }"""
+
+[messages.sheet-showing]
+source = "Showing { $shown } of { $total }"
+translation = "Εμφανίζονται { $shown } από { $total }"
+
+[messages.sheet-sprites]
+source = """
+{ $count ->
+        [one] { $count } sprite
+       *[other] { $count } sprites
+    }"""
+translation = """
+{ $count ->
+        [one] { $count } sprite
+       *[other] { $count } sprites
+    }"""
 
 [messages.shortcuts-actual-pixels]
 source = "Actual pixels"

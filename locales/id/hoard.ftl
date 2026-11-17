@@ -1140,6 +1140,7 @@ asset-lazy-image-viewer = penampil gambar
 asset-lazy-material-preview = pratinjau material
 asset-lazy-material-viewer = penampil material
 asset-lazy-sprite-player = pemutar sprite
+asset-lazy-sheet-view = penampil lembar sprite
 asset-rel-texture = tekstur
 asset-rel-buffer = data geometri
 asset-rel-material = berkas material
@@ -1148,13 +1149,11 @@ asset-rel-library = berkas tertaut
 asset-rel-guess = mungkin terkait
 asset-rel-sidecar = detail toko
 asset-rel-variant = varian
-asset-rel-sprite = sprite
 asset-role-map = map { $role }
 asset-maps-count = { $count } map
 asset-needs = Memerlukan
 asset-animations = Animasi
 asset-sprites = Sprite
-asset-in-atlas = Di atlas
 asset-used-by = Dipakai oleh
 asset-conversion-failed = konversi gagal
 asset-as-converting = Mengonversi…
@@ -1414,6 +1413,39 @@ sprite-columns = Kolom
 sprite-rows = Baris
 sprite-fps-aria = Bingkai per detik
 sprite-fps = fps
+
+## Penampil lembar sprite (SheetView.vue) dan format unduhannya (AssetDetail.vue)
+
+# Counts under the sheet's preview, joined with " · ".
+sheet-sprites =
+    { $count ->
+       *[other] { $count } sprite
+    }
+sheet-pages =
+    { $count ->
+       *[other] { $count } halaman
+    }
+sheet-animations =
+    { $count ->
+       *[other] { $count } animasi
+    }
+# The box that narrows the list of sprites by name.
+sheet-find = Cari sprite
+# Under the list of sprites when more match than it draws.
+sheet-showing = Menampilkan { $shown } dari { $total }
+sheet-no-match = Tidak ada sprite yang namanya memuat itu.
+sheet-failed = Lembar ini tidak dapat dibaca.
+sheet-loading = Memuat lembar…
+# Under "Download as" when a sprite sheet format is picked: what the format can say, and so how the sheet comes out
+# in it. Sprites are turned to fit more on a page only in formats that can say so.
+sheet-note-hoard = Format milik Hoard sendiri: halaman apa adanya, sprite diputar ke arah mana pun dan dipangkas, dengan animasi dan durasi tiap bingkai.
+sheet-note-texturepacker = Sprite diputar searah jarum jam dan dipangkas, dengan animasi menurut nama, seperti yang dibaca PixiJS dan Phaser.
+sheet-note-clockwise = Sprite diputar searah jarum jam dan dipangkas. Format ini tidak dapat menyimpan animasi: bingkai dikenali dari nama bernomornya.
+sheet-note-libgdx = Sprite diputar berlawanan arah jarum jam dan dipangkas. Format ini tidak dapat menyimpan animasi: bingkai dikenali dari nama bernomornya.
+sheet-note-godot-frames = Sprite tidak pernah diputar, bagian yang dipangkas disimpan sebagai margin, dengan animasi dan durasi tiap bingkai.
+sheet-note-godot-tileset = Ubin tidak pernah diputar atau dipangkas, ditata pada kisi seukuran ubin, dan gambar dibiarkan apa adanya jika sudah berada pada kisi.
+sheet-note-grid = Setiap sprite tegak pada seluruh kanvasnya, dalam sel yang semuanya berukuran sama, untuk apa pun yang memotong lembar menjadi kisi.
+sheet-note-frames = Setiap sprite tegak pada seluruh kanvasnya, masing-masing sebagai PNG yang diberi nama sesuai sprite-nya.
 
 ## TextViewer.vue, TextPreview.vue dan text.ts
 
@@ -2355,6 +2387,7 @@ settings-update-check = Periksa GitHub setiap beberapa jam untuk rilis baru
 
 api-kind-texture = Tekstur
 api-kind-vector = Seni vektor
+api-kind-sheet = Lembar sprite
 api-kind-audio = Audio
 api-kind-model = Model
 api-kind-animation = Animasi
@@ -2367,6 +2400,7 @@ api-kind-data = Data
 api-kind-other = Lainnya
 api-kind-texture-name = tekstur
 api-kind-vector-name = seni vektor
+api-kind-sheet-name = lembar sprite
 api-kind-audio-name = audio
 api-kind-model-name = model
 api-kind-animation-name = animasi

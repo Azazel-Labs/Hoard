@@ -1283,6 +1283,7 @@ asset-lazy-image-viewer = прегледач слика
 asset-lazy-material-preview = преглед материјала
 asset-lazy-material-viewer = прегледач материјала
 asset-lazy-sprite-player = плејер спрајтова
+asset-lazy-sheet-view = прегледач листова спрајтова
 asset-rel-texture = текстура
 asset-rel-buffer = подаци геометрије
 asset-rel-material = датотека материјала
@@ -1291,7 +1292,6 @@ asset-rel-library = повезана датотека
 asset-rel-guess = вероватно иде уз
 asset-rel-sidecar = подаци из продавнице
 asset-rel-variant = варијанта
-asset-rel-sprite = спрајт
 asset-role-map = мапа типа { $role }
 asset-maps-count =
     { $count ->
@@ -1302,7 +1302,6 @@ asset-maps-count =
 asset-needs = Потребно
 asset-animations = Анимације
 asset-sprites = Спрајтови
-asset-in-atlas = У атласу
 asset-used-by = Користи га
 asset-conversion-failed = претварање није успело
 asset-as-converting = Претварање…
@@ -1581,6 +1580,45 @@ sprite-columns = Колоне
 sprite-rows = Редови
 sprite-fps-aria = Сличица у секунди
 sprite-fps = сл./с
+
+## Прегледач листова спрајтова (SheetView.vue) и његови формати за преузимање (AssetDetail.vue)
+
+# Counts under the sheet's preview, joined with " · ".
+sheet-sprites =
+    { $count ->
+        [one] { $count } спрајт
+        [few] { $count } спрајта
+       *[other] { $count } спрајтова
+    }
+sheet-pages =
+    { $count ->
+        [one] { $count } страница
+        [few] { $count } странице
+       *[other] { $count } страница
+    }
+sheet-animations =
+    { $count ->
+        [one] { $count } анимација
+        [few] { $count } анимације
+       *[other] { $count } анимација
+    }
+# The box that narrows the list of sprites by name.
+sheet-find = Пронађи спрајт
+# Under the list of sprites when more match than it draws.
+sheet-showing = Приказано { $shown } од { $total }
+sheet-no-match = Ниједан спрајт нема то у имену.
+sheet-failed = Овај лист не може да се прочита.
+sheet-loading = Учитавање листа…
+# Under "Download as" when a sprite sheet format is picked: what the format can say, and so how the sheet comes out
+# in it. Sprites are turned to fit more on a page only in formats that can say so.
+sheet-note-hoard = Hoard-ов сопствени формат: странице какве јесу, спрајтови окренути на било коју страну и опсечени, с анимацијама и трајањем сваке сличице.
+sheet-note-texturepacker = Спрајтови окренути у смеру казаљке на сату и опсечени, с анимацијама по имену, онако како их читају PixiJS и Phaser.
+sheet-note-clockwise = Спрајтови окренути у смеру казаљке на сату и опсечени. Не може да чува анимације: сличице се препознају по нумерисаним именима.
+sheet-note-libgdx = Спрајтови окренути супротно од смера казаљке на сату и опсечени. Не може да чува анимације: сличице се препознају по нумерисаним именима.
+sheet-note-godot-frames = Спрајтови никад окренути, оно што је опсечено чува се као маргине, с анимацијама и трајањем сваке сличице.
+sheet-note-godot-tileset = Плочице никад окренуте ни опсечене, на мрежи величине плочице; слике које су већ на мрежи остају какве јесу.
+sheet-note-grid = Сваки спрајт усправан, на целом свом платну, у ћелијама исте величине, за све што лист сече по мрежи.
+sheet-note-frames = Сваки спрајт усправан, на целом свом платну, сваки као засебан PNG назван по њему.
 
 ## TextViewer.vue, TextPreview.vue и text.ts
 
@@ -2656,6 +2694,7 @@ settings-update-check = Проверавај GitHub на сваких некол
 
 api-kind-texture = Текстуре
 api-kind-vector = Векторска графика
+api-kind-sheet = Листови спрајтова
 api-kind-audio = Звук
 api-kind-model = Модели
 api-kind-animation = Анимације
@@ -2668,6 +2707,7 @@ api-kind-data = Подаци
 api-kind-other = Остало
 api-kind-texture-name = текстуре
 api-kind-vector-name = векторска графика
+api-kind-sheet-name = листови спрајтова
 api-kind-audio-name = звук
 api-kind-model-name = модели
 api-kind-animation-name = анимације

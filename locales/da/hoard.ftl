@@ -1237,6 +1237,7 @@ asset-lazy-image-viewer = billedfremviseren
 asset-lazy-material-preview = materialeforhåndsvisningen
 asset-lazy-material-viewer = materialefremviseren
 asset-lazy-sprite-player = sprite-afspilleren
+asset-lazy-sheet-view = fremviseren til sprite-ark
 asset-rel-texture = tekstur
 asset-rel-buffer = geometridata
 asset-rel-material = materialefil
@@ -1245,7 +1246,6 @@ asset-rel-library = linket fil
 asset-rel-guess = hører nok sammen med
 asset-rel-sidecar = butiksoplysninger
 asset-rel-variant = variant
-asset-rel-sprite = sprite
 asset-role-map = map for { $role }
 asset-maps-count =
     { $count ->
@@ -1255,7 +1255,6 @@ asset-maps-count =
 asset-needs = Kræver
 asset-animations = Animationer
 asset-sprites = Sprites
-asset-in-atlas = I atlas
 asset-used-by = Bruges af
 asset-conversion-failed = konverteringen mislykkedes
 asset-as-converting = Konverterer…
@@ -1529,6 +1528,42 @@ sprite-columns = Kolonner
 sprite-rows = Rækker
 sprite-fps-aria = Billeder pr. sekund
 sprite-fps = fps
+
+## The sprite sheet viewer (SheetView.vue) and its download formats (AssetDetail.vue)
+
+# Counts under the sheet's preview, joined with " · ".
+sheet-sprites =
+    { $count ->
+        [one] { $count } sprite
+       *[other] { $count } sprites
+    }
+sheet-pages =
+    { $count ->
+        [one] { $count } side
+       *[other] { $count } sider
+    }
+sheet-animations =
+    { $count ->
+        [one] { $count } animation
+       *[other] { $count } animationer
+    }
+# The box that narrows the list of sprites by name.
+sheet-find = Find en sprite
+# Under the list of sprites when more match than it draws.
+sheet-showing = Viser { $shown } af { $total }
+sheet-no-match = Ingen sprite har det i sit navn.
+sheet-failed = Dette ark kan ikke læses.
+sheet-loading = Indlæser arket…
+# Under "Download as" when a sprite sheet format is picked: what the format can say, and so how the sheet comes out
+# in it. Sprites are turned to fit more on a page only in formats that can say so.
+sheet-note-hoard = Hoards eget format: siderne som de er, sprites drejet vilkårligt og beskåret, med animationer og hvert billedes varighed.
+sheet-note-texturepacker = Sprites drejet med uret og beskåret, med animationer efter navn, sådan som PixiJS og Phaser læser dem.
+sheet-note-clockwise = Sprites drejet med uret og beskåret. Det kan ikke rumme animationer: billederne følger deres nummererede navne.
+sheet-note-libgdx = Sprites drejet mod uret og beskåret. Det kan ikke rumme animationer: billederne følger deres nummererede navne.
+sheet-note-godot-frames = Sprites drejes aldrig, og det beskårne bevares som margener, med animationer og hvert billedes varighed.
+sheet-note-godot-tileset = Fliser drejes eller beskæres aldrig, i et gitter på flisestørrelsen, og billederne beholdes, hvis de allerede ligger i et.
+sheet-note-grid = Hver sprite opret på hele sit lærred, i celler af samme størrelse, til alt, der skærer et ark op i et gitter.
+sheet-note-frames = Hver sprite opret på hele sit lærred, hver som en PNG opkaldt efter den.
 
 ## TextViewer.vue, TextPreview.vue og text.ts
 
@@ -2539,6 +2574,7 @@ settings-update-check = Tjek GitHub for en ny udgivelse med nogle timers mellemr
 
 api-kind-texture = Teksturer
 api-kind-vector = Vektorgrafik
+api-kind-sheet = Sprite-ark
 api-kind-audio = Lyd
 api-kind-model = Modeller
 api-kind-animation = Animationer
@@ -2551,6 +2587,7 @@ api-kind-data = Data
 api-kind-other = Andet
 api-kind-texture-name = teksturer
 api-kind-vector-name = vektorgrafik
+api-kind-sheet-name = sprite-ark
 api-kind-audio-name = lyd
 api-kind-model-name = modeller
 api-kind-animation-name = animationer

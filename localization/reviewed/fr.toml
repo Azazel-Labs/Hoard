@@ -24,6 +24,10 @@ translation = "Claude et autres applications d’IA"
 source = "Connect Claude (or any MCP app) and it can search and fetch assets for you, and describe and tag what Hoard hasn’t yet. It signs in to Hoard the first time; you allow it here in the browser."
 translation = "Connectez Claude (ou toute application MCP) et il peut chercher et récupérer des ressources pour vous, et décrire et étiqueter ce que Hoard n’a pas encore traité. Il se connecte à Hoard la première fois ; vous l’autorisez ici, dans le navigateur."
 
+[messages.account-app-signin]
+source = "The Hoard app signs you in by itself, so there’s no password. Make an access token below for the engine plugins and the hoard command."
+translation = "L’application Hoard vous connecte elle-même, il n’y a donc pas de mot de passe. Créez ci-dessous un jeton d’accès pour les extensions des moteurs et la commande hoard."
+
 [messages.account-change-password]
 source = "Change password"
 translation = "Changer le mot de passe"
@@ -431,6 +435,10 @@ translation = "Activité en arrière-plan"
 [messages.activity-unreachable]
 source = "Can't reach the server"
 translation = "Impossible de joindre le serveur"
+
+[messages.activity-unreachable-desktop]
+source = "Hoard isn't answering"
+translation = "Hoard ne répond pas"
 
 [messages.api-kind-animation]
 source = "Animations"
@@ -1331,6 +1339,10 @@ translation = "pack"
 [messages.app-unreachable]
 source = "Couldn't reach the server: { $error }"
 translation = "Impossible de joindre le serveur : { $error }"
+
+[messages.app-unreachable-desktop]
+source = "Hoard isn't answering: { $error }"
+translation = "Hoard ne répond pas : { $error }"
 
 [messages.app-update]
 source = "Update"
@@ -3184,6 +3196,10 @@ translation = "cette connexion n’a pas été lancée ici, ou elle l’a été 
 source = "ChatGPT answered for a different registration of this server; start the sign-in again"
 translation = "ChatGPT a répondu pour un autre enregistrement de ce serveur ; relancez la connexion"
 
+[messages.error-chatgpt-other-registration-desktop]
+source = "ChatGPT answered for a different copy of Hoard; start the sign-in again"
+translation = "ChatGPT a répondu pour une autre copie de Hoard ; relancez la connexion"
+
 [messages.error-chatgpt-paste-address]
 source = "paste the whole address, starting with http://127.0.0.1"
 translation = "collez l’adresse entière, qui commence par http://127.0.0.1"
@@ -3220,9 +3236,17 @@ translation = "la requête a échoué"
 source = "ChatGPT signed this server out ({ $code }); sign in again from Settings → AI tagging"
 translation = "ChatGPT a déconnecté ce serveur ({ $code }) ; reconnectez-vous depuis Paramètres → Étiquetage par IA"
 
+[messages.error-chatgpt-signed-out-desktop]
+source = "ChatGPT signed Hoard out ({ $code }); sign in again from Settings → AI tagging"
+translation = "ChatGPT a déconnecté Hoard ({ $code }) ; reconnectez-vous depuis Paramètres → Étiquetage par IA"
+
 [messages.error-chatgpt-signed-out-problem]
 source = "ChatGPT signed this server out ({ $code }). Sign in again to keep tagging with your plan."
 translation = "ChatGPT a déconnecté ce serveur ({ $code }). Reconnectez-vous pour continuer l’étiquetage avec votre abonnement."
+
+[messages.error-chatgpt-signed-out-problem-desktop]
+source = "ChatGPT signed Hoard out ({ $code }). Sign in again to keep tagging with your plan."
+translation = "ChatGPT a déconnecté Hoard ({ $code }). Reconnectez-vous pour continuer l’étiquetage avec votre abonnement."
 
 [messages.error-chatgpt-unsupported]
 source = "ChatGPT plan usage doesn't support { $param } with this model"
@@ -3660,6 +3684,10 @@ translation = "il n’y a aucun autre emplacement de bibliothèque où déplacer
 source = "There's no SoundFont at { $path } on the server"
 translation = "Il n’y a pas de SoundFont à { $path } sur le serveur"
 
+[messages.error-no-soundfont-desktop]
+source = "There's no SoundFont at { $path }"
+translation = "Il n’y a pas de SoundFont à { $path }"
+
 [messages.error-not-a-hash]
 source = "not a blake3 hex hash"
 translation = "ce n’est pas un hachage blake3 en hexadécimal"
@@ -3687,6 +3715,10 @@ translation = "{ $url } n’est pas un serveur llama.cpp en mode routeur, il ne 
 [messages.error-not-started]
 source = "the server hasn't started"
 translation = "le serveur n’a pas démarré"
+
+[messages.error-not-started-desktop]
+source = "Hoard hasn't started"
+translation = "Hoard n’a pas démarré"
 
 [messages.error-not-watched]
 source = "{ $name } isn't a watched folder"
@@ -5317,6 +5349,10 @@ translation = "L’envoi de fichiers nécessite une bibliothèque gérée par Ho
 source = "Folder on the server"
 translation = "Dossier sur le serveur"
 
+[messages.locations-folder-desktop]
+source = "Folder"
+translation = "Dossier"
+
 [messages.locations-folder-hint-managed]
 source = "Hoard creates it if it isn't there. In Docker, this is a folder you've mounted into the container."
 translation = "Hoard le crée s’il n’existe pas. Avec Docker, c’est un dossier que vous avez monté dans le conteneur."
@@ -5984,6 +6020,10 @@ translation = "Voir { $name } en 3D"
 [messages.model-error-converting]
 source = "the server is still converting this model"
 translation = "le serveur est encore en train de convertir ce modèle"
+
+[messages.model-error-converting-desktop]
+source = "Hoard is still converting this model"
+translation = "Hoard est encore en train de convertir ce modèle"
 
 [messages.model-error-empty-collada]
 source = "empty Collada file"
@@ -6662,6 +6702,10 @@ translation = "Créer les miniatures dans ce navigateur"
 [messages.packs-make-thumbs-title]
 source = "Open each model in a 3D viewer out of sight, one at a time, and use its picture as the thumbnail where that's better than the server's"
 translation = "Ouvrir chaque modèle dans une visionneuse 3D invisible, un par un, et utiliser son image comme miniature quand elle est meilleure que celle du serveur"
+
+[messages.packs-make-thumbs-title-desktop]
+source = "Open each model in a 3D viewer out of sight, one at a time, and use its picture as the thumbnail where that's better than the one Hoard made"
+translation = "Ouvrir chaque modèle dans une visionneuse 3D invisible, un par un, et utiliser son image comme miniature quand elle est meilleure que celle créée par Hoard"
 
 [messages.packs-more]
 source = "More"
@@ -7533,6 +7577,10 @@ translation = "Rétablir la valeur par défaut, { $value }"
 source = "Reset to the default: { $value }"
 translation = "Rétablir la valeur par défaut : { $value }"
 
+[messages.root-desktop-reopen]
+source = "This window was signed out. Close Hoard and open it again to carry on."
+translation = "Cette fenêtre a été déconnectée. Fermez Hoard et rouvrez-le pour continuer."
+
 [messages.root-lazy-connect]
 source = "the app connection"
 translation = "la connexion de l’application"
@@ -7544,6 +7592,10 @@ translation = "Réessayer"
 [messages.root-unreachable]
 source = "Couldn’t reach the Hoard server: { $error }"
 translation = "Impossible de joindre le serveur Hoard : { $error }"
+
+[messages.root-unreachable-desktop]
+source = "Hoard isn’t answering: { $error }"
+translation = "Hoard ne répond pas : { $error }"
 
 [messages.server-back-to-settings]
 source = "Back to Settings"
@@ -8217,6 +8269,10 @@ translation = "Chercher d’après ce que montrent les images"
 source = "Uses OpenAI’s CLIP model, run on this server’s processor: nothing leaves it. Turning it on downloads the model ({ $size } MB) from Hugging Face, then learns every picture in the background at low priority. It takes 300 to 600 MB of memory while it works or someone searches. Turning it off deletes the model and keeps what it learned, for next time."
 translation = "Utilise le modèle CLIP d’OpenAI, exécuté sur le processeur de ce serveur : rien n’en sort. L’activer télécharge le modèle ({ $size } Mo) depuis Hugging Face, puis apprend chaque image en arrière-plan, en basse priorité. Il occupe de 300 à 600 Mo de mémoire pendant qu’il travaille ou que quelqu’un cherche. Le désactiver supprime le modèle et garde ce qu’il a appris, pour la prochaine fois."
 
+[messages.settings-clip-hint-desktop]
+source = "Uses OpenAI’s CLIP model, run on this computer’s processor: nothing leaves it. Turning it on downloads the model ({ $size } MB) from Hugging Face, then learns every picture in the background at low priority. It takes 300 to 600 MB of memory while it works or you search. Turning it off deletes the model and keeps what it learned, for next time."
+translation = "Utilise le modèle CLIP d’OpenAI, exécuté sur le processeur de cet ordinateur : rien n’en sort. L’activer télécharge le modèle ({ $size } Mo) depuis Hugging Face, puis apprend chaque image en arrière-plan, en basse priorité. Il occupe de 300 à 600 Mo de mémoire pendant qu’il travaille ou que vous cherchez. Le désactiver supprime le modèle et garde ce qu’il a appris, pour la prochaine fois."
+
 [messages.settings-clip-learning]
 source = "Ready: learning pictures, { $done } of { $total } so far"
 translation = "Prêt : apprentissage des images, { $done } sur { $total } jusqu’ici"
@@ -8516,6 +8572,10 @@ translation = "désactivé"
 source = "on"
 translation = "activé"
 
+[messages.settings-desktop-updates]
+source = "Hoard looks for a new release each time it starts, downloads it in the background, and installs it when you quit."
+translation = "Hoard cherche une nouvelle version à chaque démarrage, la télécharge en arrière-plan et l’installe quand vous le quittez."
+
 [messages.settings-ffmpeg-download]
 source = "Uses a system ffmpeg with the right encoders, or downloads a static build (about 80 MB)."
 translation = "Utilise un ffmpeg du système doté des bons encodeurs, ou télécharge une version statique (environ 80 Mo)."
@@ -8740,6 +8800,10 @@ translation = "Nom"
 source = "What this server is called in the top bar, the browser tab and on the sign-in page, so with more than one hoard you can tell which is which."
 translation = "Le nom de ce serveur dans la barre du haut, l’onglet du navigateur et sur la page de connexion, pour distinguer vos différents Hoard."
 
+[messages.settings-name-what-desktop]
+source = "What this library is called in the top bar."
+translation = "Le nom de cette bibliothèque dans la barre du haut."
+
 [messages.settings-option-saved]
 source = "{ $name }: { $value }"
 translation = "{ $name } : { $value }"
@@ -8808,6 +8872,10 @@ translation = "Général"
 source = "What this server is called, for everyone who uses it."
 translation = "Le nom de ce serveur, pour tous ceux qui l’utilisent."
 
+[messages.settings-page-general-blurb-desktop]
+source = "What this library is called."
+translation = "Le nom de cette bibliothèque."
+
 [messages.settings-page-issues]
 source = "Issues"
 translation = "Problèmes"
@@ -8832,6 +8900,10 @@ translation = "Emplacements de la bibliothèque"
 source = "The folders on the server that hold the library: ones Hoard keeps files in, and folders of packs it indexes where they are."
 translation = "Les dossiers du serveur qui contiennent la bibliothèque : ceux où Hoard range des fichiers, et les dossiers de packs qu’il indexe là où ils se trouvent."
 
+[messages.settings-page-locations-blurb-desktop]
+source = "The folders that hold the library: ones Hoard keeps files in, and folders of packs it indexes where they are."
+translation = "Les dossiers qui contiennent la bibliothèque : ceux où Hoard range des fichiers, et les dossiers de packs qu’il indexe là où ils se trouvent."
+
 [messages.settings-page-maintenance]
 source = "Maintenance"
 translation = "Maintenance"
@@ -8847,6 +8919,10 @@ translation = "Performances"
 [messages.settings-page-performance-blurb]
 source = "How hard the server works, how thumbnails are made and kept, and the most it takes in."
 translation = "L’intensité de travail du serveur, la façon dont les miniatures sont créées et conservées, et le maximum qu’il accepte."
+
+[messages.settings-page-performance-blurb-desktop]
+source = "How hard Hoard works, how thumbnails are made and kept, and the most it takes in."
+translation = "L’intensité de travail de Hoard, la façon dont les miniatures sont créées et conservées, et le maximum qu’il accepte."
 
 [messages.settings-page-search]
 source = "Image search"
@@ -8952,6 +9028,10 @@ translation = "SoundFont MIDI"
 source = "found on the server, or built-in"
 translation = "trouvé sur le serveur, ou intégré"
 
+[messages.settings-soundfont-default-desktop]
+source = "found on this computer, or built-in"
+translation = "trouvé sur cet ordinateur, ou intégré"
+
 [messages.settings-soundfont-file]
 source = "SoundFont file"
 translation = "Fichier SoundFont"
@@ -8959,6 +9039,10 @@ translation = "Fichier SoundFont"
 [messages.settings-soundfont-placeholder]
 source = "Found on the server, or built-in"
 translation = "Trouvé sur le serveur, ou intégré"
+
+[messages.settings-soundfont-placeholder-desktop]
+source = "Found on this computer, or built-in"
+translation = "Trouvé sur cet ordinateur, ou intégré"
 
 [messages.settings-soundfont-what]
 source = "The instruments MIDI files are played and converted with."
@@ -9228,6 +9312,10 @@ translation = "tâches à la fois (ingestion, étiquetage, conversions)"
 source = "Pick a folder on the server for Hoard to keep your packs in, or point it at a folder of packs you already have. You can add more locations, on other disks, from Settings later."
 translation = "Choisissez un dossier du serveur où Hoard rangera vos packs, ou indiquez-lui un dossier de packs que vous avez déjà. Vous pourrez ajouter d’autres emplacements, sur d’autres disques, plus tard depuis les Paramètres."
 
+[messages.setup-lede-desktop]
+source = "Pick a folder for Hoard to keep your packs in, or point it at a folder of packs you already have. You can add more locations, on other disks, from Settings later."
+translation = "Choisissez un dossier où Hoard rangera vos packs, ou indiquez-lui un dossier de packs que vous avez déjà. Vous pourrez ajouter d’autres emplacements, sur d’autres disques, plus tard depuis les Paramètres."
+
 [messages.setup-loading]
 source = "Loading…"
 translation = "Chargement…"
@@ -9263,6 +9351,10 @@ translation = "Réessayer"
 [messages.setup-unreachable]
 source = "Couldn't reach the server: { $error }"
 translation = "Impossible de joindre le serveur : { $error }"
+
+[messages.setup-unreachable-desktop]
+source = "Hoard isn't answering: { $error }"
+translation = "Hoard ne répond pas : { $error }"
 
 [messages.setup-watched-after]
 source = "; packs show up as it finds them. To upload as well, add a library Hoard keeps from Settings → Library locations."

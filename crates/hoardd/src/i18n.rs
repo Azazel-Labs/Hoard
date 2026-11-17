@@ -1,7 +1,17 @@
 //! The server's messages in the language each request asks for (its `Accept-Language`), from the Fluent catalogs in
 //! `locales/`, which the build checks and embeds. A message a catalog lacks falls back to English. Clients that don't
 //! say (the CLI, the engine plugins) get English.
-use std::{cell::Cell, collections::HashMap, sync::LazyLock};
+//!
+//! In the desktop app a message `id` is `id-desktop` where the catalogs have one: the same thing said without a
+//! server, accounts or other people in it.
+use std::{
+    cell::Cell,
+    collections::HashMap,
+    sync::{
+        LazyLock,
+        atomic::{AtomicBool, Ordering},
+    },
+};
 
 use axum::{extract::Request, http::header::ACCEPT_LANGUAGE, middleware::Next, response::Response};
 use fluent_bundle::{FluentArgs, FluentResource, FluentValue, concurrent::FluentBundle};
@@ -23,6 +33,14 @@ static BUNDLES: LazyLock<HashMap<&'static str, FluentBundle<FluentResource>>> = 
         })
         .collect()
 });
+
+/// Whether messages are the desktop app's (see [`for_desktop`]).
+static DESKTOP: AtomicBool = AtomicBool::new(false);
+
+/// Use the desktop app's wording from now on.
+pub(crate) fn for_desktop() {
+    DESKTOP.store(true, Ordering::Relaxed);
+}
 
 tokio::task_local! {
     static LANGUAGE: &'static str;
@@ -53,9 +71,11 @@ pub(crate) fn text(id: &str, args: &[(&str, FluentValue<'_>)]) -> String {
     for (name, value) in args {
         fluent.set(*name, value.clone());
     }
+    let desktop = DESKTOP.load(Ordering::Relaxed).then(|| format!("{id}-desktop"));
     for code in [current(), "en"] {
         let Some(bundle) = BUNDLES.get(code) else { continue };
-        if let Some(pattern) = bundle.get_message(id).and_then(|message| message.value()) {
+        let message = desktop.as_deref().and_then(|id| bundle.get_message(id)).or_else(|| bundle.get_message(id));
+        if let Some(pattern) = message.and_then(|message| message.value()) {
             let mut errors = Vec::new();
             return bundle.format_pattern(pattern, (!args.is_empty()).then_some(&fluent), &mut errors).into_owned();
         }

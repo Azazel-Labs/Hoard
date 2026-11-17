@@ -6,7 +6,7 @@ import {
 } from './api'
 import { canPreview, stop as stopPreview, toggle as togglePreview } from './player'
 import { prefs, toggleIn } from './prefs'
-import { askToSignIn, auth, may, mayEdit, signOut, siteName } from './auth'
+import { askToSignIn, auth, isDesktop, may, mayEdit, signOut, siteName } from './auth'
 import { forgetSearch, mine, saveSearch, setFavorite, toggleFavorite } from './mine'
 import { loadProjects, projects } from './projects'
 import { teach } from './storeFormats'
@@ -1260,7 +1260,7 @@ const commands = computed<Command[]>(() => {
   })
   if (auth.status?.signed_in) {
     out.push({ id: 'act:account', group: actions, label: t('palette-account'), keywords: t('palette-account-keywords'), run: () => openSettings('account') })
-    out.push({ id: 'act:signout', group: actions, label: t('palette-sign-out', { name: auth.status.user?.name ?? '' }), keywords: t('palette-sign-out-keywords'), run: signOut })
+    if (!isDesktop()) out.push({ id: 'act:signout', group: actions, label: t('palette-sign-out', { name: auth.status.user?.name ?? '' }), keywords: t('palette-sign-out-keywords'), run: signOut })
   } else {
     out.push({ id: 'act:signin', group: actions, label: t('palette-sign-in'), keywords: t('palette-sign-in-keywords'), run: askToSignIn })
   }

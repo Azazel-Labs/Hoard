@@ -24,6 +24,10 @@ translation = "Claude και άλλες εφαρμογές AI"
 source = "Connect Claude (or any MCP app) and it can search and fetch assets for you, and describe and tag what Hoard hasn’t yet. It signs in to Hoard the first time; you allow it here in the browser."
 translation = "Συνδέστε το Claude (ή οποιαδήποτε εφαρμογή MCP) και θα μπορεί να αναζητά και να φέρνει στοιχεία για εσάς, και να περιγράφει και να βάζει ετικέτες σε ό,τι δεν έχει κάνει ακόμη το Hoard. Συνδέεται στο Hoard την πρώτη φορά· εσείς το επιτρέπετε εδώ, στο πρόγραμμα περιήγησης."
 
+[messages.account-app-signin]
+source = "The Hoard app signs you in by itself, so there’s no password. Make an access token below for the engine plugins and the hoard command."
+translation = "Η εφαρμογή Hoard σας συνδέει μόνη της, οπότε δεν υπάρχει κωδικός. Δημιουργήστε παρακάτω ένα διακριτικό πρόσβασης για τα πρόσθετα των μηχανών και την εντολή hoard."
+
 [messages.account-change-password]
 source = "Change password"
 translation = "Αλλαγή κωδικού πρόσβασης"
@@ -431,6 +435,10 @@ translation = "Δραστηριότητα παρασκηνίου"
 [messages.activity-unreachable]
 source = "Can't reach the server"
 translation = "Δεν υπάρχει πρόσβαση στον διακομιστή"
+
+[messages.activity-unreachable-desktop]
+source = "Hoard isn't answering"
+translation = "Το Hoard δεν απαντά"
 
 [messages.api-kind-animation]
 source = "Animations"
@@ -1331,6 +1339,10 @@ translation = "πακέτο"
 [messages.app-unreachable]
 source = "Couldn't reach the server: { $error }"
 translation = "Δεν ήταν δυνατή η πρόσβαση στον διακομιστή: { $error }"
+
+[messages.app-unreachable-desktop]
+source = "Hoard isn't answering: { $error }"
+translation = "Το Hoard δεν απαντά: { $error }"
 
 [messages.app-update]
 source = "Update"
@@ -3184,6 +3196,10 @@ translation = "αυτή η σύνδεση δεν ξεκίνησε εδώ ή ξε
 source = "ChatGPT answered for a different registration of this server; start the sign-in again"
 translation = "Το ChatGPT απάντησε για διαφορετική εγγραφή αυτού του διακομιστή· ξεκινήστε ξανά τη σύνδεση"
 
+[messages.error-chatgpt-other-registration-desktop]
+source = "ChatGPT answered for a different copy of Hoard; start the sign-in again"
+translation = "Το ChatGPT απάντησε για διαφορετικό αντίγραφο του Hoard· ξεκινήστε ξανά τη σύνδεση"
+
 [messages.error-chatgpt-paste-address]
 source = "paste the whole address, starting with http://127.0.0.1"
 translation = "επικολλήστε ολόκληρη τη διεύθυνση, που αρχίζει με http://127.0.0.1"
@@ -3220,9 +3236,17 @@ translation = "το αίτημα απέτυχε"
 source = "ChatGPT signed this server out ({ $code }); sign in again from Settings → AI tagging"
 translation = "Το ChatGPT αποσύνδεσε αυτόν τον διακομιστή ({ $code })· συνδεθείτε ξανά από τις Ρυθμίσεις → Ετικέτες με AI"
 
+[messages.error-chatgpt-signed-out-desktop]
+source = "ChatGPT signed Hoard out ({ $code }); sign in again from Settings → AI tagging"
+translation = "Το ChatGPT αποσύνδεσε το Hoard ({ $code })· συνδεθείτε ξανά από τις Ρυθμίσεις → Ετικέτες με AI"
+
 [messages.error-chatgpt-signed-out-problem]
 source = "ChatGPT signed this server out ({ $code }). Sign in again to keep tagging with your plan."
 translation = "Το ChatGPT αποσύνδεσε αυτόν τον διακομιστή ({ $code }). Συνδεθείτε ξανά για να συνεχίσετε την προσθήκη ετικετών με τη συνδρομή σας."
+
+[messages.error-chatgpt-signed-out-problem-desktop]
+source = "ChatGPT signed Hoard out ({ $code }). Sign in again to keep tagging with your plan."
+translation = "Το ChatGPT αποσύνδεσε το Hoard ({ $code }). Συνδεθείτε ξανά για να συνεχίσετε την προσθήκη ετικετών με τη συνδρομή σας."
 
 [messages.error-chatgpt-unsupported]
 source = "ChatGPT plan usage doesn't support { $param } with this model"
@@ -3660,6 +3684,10 @@ translation = "δεν υπάρχει άλλη τοποθεσία βιβλιοθ�
 source = "There's no SoundFont at { $path } on the server"
 translation = "Δεν υπάρχει SoundFont στο { $path } στον διακομιστή"
 
+[messages.error-no-soundfont-desktop]
+source = "There's no SoundFont at { $path }"
+translation = "Δεν υπάρχει SoundFont στο { $path }"
+
 [messages.error-not-a-hash]
 source = "not a blake3 hex hash"
 translation = "δεν είναι δεκαεξαδικό hash blake3"
@@ -3687,6 +3715,10 @@ translation = "Το { $url } δεν είναι διακομιστής llama.cpp 
 [messages.error-not-started]
 source = "the server hasn't started"
 translation = "ο διακομιστής δεν έχει ξεκινήσει"
+
+[messages.error-not-started-desktop]
+source = "Hoard hasn't started"
+translation = "το Hoard δεν έχει ξεκινήσει"
 
 [messages.error-not-watched]
 source = "{ $name } isn't a watched folder"
@@ -5331,6 +5363,10 @@ translation = "Η μεταφόρτωση χρειάζεται μια βιβλι�
 source = "Folder on the server"
 translation = "Φάκελος στον διακομιστή"
 
+[messages.locations-folder-desktop]
+source = "Folder"
+translation = "Φάκελος"
+
 [messages.locations-folder-hint-managed]
 source = "Hoard creates it if it isn't there. In Docker, this is a folder you've mounted into the container."
 translation = "Το Hoard τον δημιουργεί αν δεν υπάρχει. Στο Docker, είναι ένας φάκελος που έχετε προσαρτήσει στο container."
@@ -5998,6 +6034,10 @@ translation = "Προβολή του { $name } σε 3D"
 [messages.model-error-converting]
 source = "the server is still converting this model"
 translation = "ο διακομιστής μετατρέπει ακόμη αυτό το μοντέλο"
+
+[messages.model-error-converting-desktop]
+source = "Hoard is still converting this model"
+translation = "το Hoard μετατρέπει ακόμη αυτό το μοντέλο"
 
 [messages.model-error-empty-collada]
 source = "empty Collada file"
@@ -6692,6 +6732,10 @@ translation = "Δημιουργία μικρογραφιών σε αυτό το 
 [messages.packs-make-thumbs-title]
 source = "Open each model in a 3D viewer out of sight, one at a time, and use its picture as the thumbnail where that's better than the server's"
 translation = "Άνοιγμα κάθε μοντέλου σε κρυφό πρόγραμμα προβολής 3D, ένα τη φορά, και χρήση της εικόνας του ως μικρογραφία όπου είναι καλύτερη από του διακομιστή"
+
+[messages.packs-make-thumbs-title-desktop]
+source = "Open each model in a 3D viewer out of sight, one at a time, and use its picture as the thumbnail where that's better than the one Hoard made"
+translation = "Άνοιγμα κάθε μοντέλου σε κρυφό πρόγραμμα προβολής 3D, ένα τη φορά, και χρήση της εικόνας του ως μικρογραφία όπου είναι καλύτερη από αυτήν που έφτιαξε το Hoard"
 
 [messages.packs-more]
 source = "More"
@@ -7563,6 +7607,10 @@ translation = "Επαναφορά στην προεπιλογή, { $value }"
 source = "Reset to the default: { $value }"
 translation = "Επαναφορά στην προεπιλογή: { $value }"
 
+[messages.root-desktop-reopen]
+source = "This window was signed out. Close Hoard and open it again to carry on."
+translation = "Αυτό το παράθυρο αποσυνδέθηκε. Κλείστε το Hoard και ανοίξτε το ξανά για να συνεχίσετε."
+
 [messages.root-lazy-connect]
 source = "the app connection"
 translation = "σύνδεσης εφαρμογής"
@@ -7574,6 +7622,10 @@ translation = "Δοκιμάστε ξανά"
 [messages.root-unreachable]
 source = "Couldn’t reach the Hoard server: { $error }"
 translation = "Δεν ήταν δυνατή η πρόσβαση στον διακομιστή Hoard: { $error }"
+
+[messages.root-unreachable-desktop]
+source = "Hoard isn’t answering: { $error }"
+translation = "Το Hoard δεν απαντά: { $error }"
 
 [messages.server-back-to-settings]
 source = "Back to Settings"
@@ -8247,6 +8299,10 @@ translation = "Αναζήτηση με βάση αυτό που δείχνουν
 source = "Uses OpenAI’s CLIP model, run on this server’s processor: nothing leaves it. Turning it on downloads the model ({ $size } MB) from Hugging Face, then learns every picture in the background at low priority. It takes 300 to 600 MB of memory while it works or someone searches. Turning it off deletes the model and keeps what it learned, for next time."
 translation = "Χρησιμοποιεί το μοντέλο CLIP της OpenAI, που εκτελείται στον επεξεργαστή αυτού του διακομιστή: τίποτα δεν φεύγει από αυτόν. Η ενεργοποίηση κατεβάζει το μοντέλο ({ $size } MB) από το Hugging Face και έπειτα μαθαίνει κάθε εικόνα στο παρασκήνιο με χαμηλή προτεραιότητα. Καταλαμβάνει 300 έως 600 MB μνήμης όσο δουλεύει ή όταν κάποιος κάνει αναζήτηση. Η απενεργοποίηση διαγράφει το μοντέλο και κρατά ό,τι έμαθε, για την επόμενη φορά."
 
+[messages.settings-clip-hint-desktop]
+source = "Uses OpenAI’s CLIP model, run on this computer’s processor: nothing leaves it. Turning it on downloads the model ({ $size } MB) from Hugging Face, then learns every picture in the background at low priority. It takes 300 to 600 MB of memory while it works or you search. Turning it off deletes the model and keeps what it learned, for next time."
+translation = "Χρησιμοποιεί το μοντέλο CLIP της OpenAI, που εκτελείται στον επεξεργαστή αυτού του υπολογιστή: τίποτα δεν φεύγει από αυτόν. Η ενεργοποίηση κατεβάζει το μοντέλο ({ $size } MB) από το Hugging Face και έπειτα μαθαίνει κάθε εικόνα στο παρασκήνιο με χαμηλή προτεραιότητα. Καταλαμβάνει 300 έως 600 MB μνήμης όσο δουλεύει ή όταν κάνετε αναζήτηση. Η απενεργοποίηση διαγράφει το μοντέλο και κρατά ό,τι έμαθε, για την επόμενη φορά."
+
 [messages.settings-clip-learning]
 source = "Ready: learning pictures, { $done } of { $total } so far"
 translation = "Έτοιμο: μαθαίνει εικόνες, { $done } από { $total } μέχρι στιγμής"
@@ -8546,6 +8602,10 @@ translation = "ανενεργό"
 source = "on"
 translation = "ενεργό"
 
+[messages.settings-desktop-updates]
+source = "Hoard looks for a new release each time it starts, downloads it in the background, and installs it when you quit."
+translation = "Το Hoard ψάχνει για νέα έκδοση κάθε φορά που ξεκινά, την κατεβάζει στο παρασκήνιο και την εγκαθιστά όταν το κλείνετε."
+
 [messages.settings-ffmpeg-download]
 source = "Uses a system ffmpeg with the right encoders, or downloads a static build (about 80 MB)."
 translation = "Χρησιμοποιεί ένα ffmpeg του συστήματος με τους κατάλληλους κωδικοποιητές ή κατεβάζει μια στατική έκδοση (περίπου 80 MB)."
@@ -8770,6 +8830,10 @@ translation = "Όνομα"
 source = "What this server is called in the top bar, the browser tab and on the sign-in page, so with more than one hoard you can tell which is which."
 translation = "Πώς λέγεται αυτός ο διακομιστής στην επάνω γραμμή, στην καρτέλα του προγράμματος περιήγησης και στη σελίδα σύνδεσης, ώστε με περισσότερα από ένα Hoard να ξεχωρίζετε ποιο είναι ποιο."
 
+[messages.settings-name-what-desktop]
+source = "What this library is called in the top bar."
+translation = "Πώς λέγεται αυτή η βιβλιοθήκη στην επάνω γραμμή."
+
 [messages.settings-option-saved]
 source = "{ $name }: { $value }"
 translation = "{ $name }: { $value }"
@@ -8838,6 +8902,10 @@ translation = "Γενικά"
 source = "What this server is called, for everyone who uses it."
 translation = "Πώς λέγεται αυτός ο διακομιστής, για όλους όσοι τον χρησιμοποιούν."
 
+[messages.settings-page-general-blurb-desktop]
+source = "What this library is called."
+translation = "Πώς λέγεται αυτή η βιβλιοθήκη."
+
 [messages.settings-page-issues]
 source = "Issues"
 translation = "Προβλήματα"
@@ -8862,6 +8930,10 @@ translation = "Τοποθεσίες βιβλιοθήκης"
 source = "The folders on the server that hold the library: ones Hoard keeps files in, and folders of packs it indexes where they are."
 translation = "Οι φάκελοι στον διακομιστή που περιέχουν τη βιβλιοθήκη: εκείνοι όπου το Hoard φυλάει αρχεία και φάκελοι με πακέτα που ευρετηριάζει εκεί όπου βρίσκονται."
 
+[messages.settings-page-locations-blurb-desktop]
+source = "The folders that hold the library: ones Hoard keeps files in, and folders of packs it indexes where they are."
+translation = "Οι φάκελοι που περιέχουν τη βιβλιοθήκη: εκείνοι όπου το Hoard φυλάει αρχεία και φάκελοι με πακέτα που ευρετηριάζει εκεί όπου βρίσκονται."
+
 [messages.settings-page-maintenance]
 source = "Maintenance"
 translation = "Συντήρηση"
@@ -8877,6 +8949,10 @@ translation = "Επιδόσεις"
 [messages.settings-page-performance-blurb]
 source = "How hard the server works, how thumbnails are made and kept, and the most it takes in."
 translation = "Πόσο εντατικά δουλεύει ο διακομιστής, πώς δημιουργούνται και φυλάσσονται οι μικρογραφίες και πόσα δέχεται το πολύ."
+
+[messages.settings-page-performance-blurb-desktop]
+source = "How hard Hoard works, how thumbnails are made and kept, and the most it takes in."
+translation = "Πόσο εντατικά δουλεύει το Hoard, πώς δημιουργούνται και φυλάσσονται οι μικρογραφίες και πόσα δέχεται το πολύ."
 
 [messages.settings-page-search]
 source = "Image search"
@@ -8982,6 +9058,10 @@ translation = "SoundFont για MIDI"
 source = "found on the server, or built-in"
 translation = "από τον διακομιστή ή το ενσωματωμένο"
 
+[messages.settings-soundfont-default-desktop]
+source = "found on this computer, or built-in"
+translation = "από αυτόν τον υπολογιστή ή το ενσωματωμένο"
+
 [messages.settings-soundfont-file]
 source = "SoundFont file"
 translation = "Αρχείο SoundFont"
@@ -8989,6 +9069,10 @@ translation = "Αρχείο SoundFont"
 [messages.settings-soundfont-placeholder]
 source = "Found on the server, or built-in"
 translation = "Από τον διακομιστή ή το ενσωματωμένο"
+
+[messages.settings-soundfont-placeholder-desktop]
+source = "Found on this computer, or built-in"
+translation = "Από αυτόν τον υπολογιστή ή το ενσωματωμένο"
 
 [messages.settings-soundfont-what]
 source = "The instruments MIDI files are played and converted with."
@@ -9258,6 +9342,10 @@ translation = "εργασίες ταυτόχρονα (εισαγωγή, ετικ
 source = "Pick a folder on the server for Hoard to keep your packs in, or point it at a folder of packs you already have. You can add more locations, on other disks, from Settings later."
 translation = "Επιλέξτε έναν φάκελο στον διακομιστή όπου το Hoard θα φυλάει τα πακέτα σας ή υποδείξτε έναν φάκελο με πακέτα που έχετε ήδη. Μπορείτε να προσθέσετε αργότερα κι άλλες τοποθεσίες, σε άλλους δίσκους, από τις Ρυθμίσεις."
 
+[messages.setup-lede-desktop]
+source = "Pick a folder for Hoard to keep your packs in, or point it at a folder of packs you already have. You can add more locations, on other disks, from Settings later."
+translation = "Επιλέξτε έναν φάκελο όπου το Hoard θα φυλάει τα πακέτα σας ή υποδείξτε έναν φάκελο με πακέτα που έχετε ήδη. Μπορείτε να προσθέσετε αργότερα κι άλλες τοποθεσίες, σε άλλους δίσκους, από τις Ρυθμίσεις."
+
 [messages.setup-loading]
 source = "Loading…"
 translation = "Φόρτωση…"
@@ -9293,6 +9381,10 @@ translation = "Δοκιμάστε ξανά"
 [messages.setup-unreachable]
 source = "Couldn't reach the server: { $error }"
 translation = "Δεν ήταν δυνατή η επικοινωνία με τον διακομιστή: { $error }"
+
+[messages.setup-unreachable-desktop]
+source = "Hoard isn't answering: { $error }"
+translation = "Το Hoard δεν απαντά: { $error }"
 
 [messages.setup-watched-after]
 source = "; packs show up as it finds them. To upload as well, add a library Hoard keeps from Settings → Library locations."

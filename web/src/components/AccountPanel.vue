@@ -3,7 +3,7 @@
 // scripts and programs, and whether people who aren't signed in may look around.
 import { computed, onMounted, reactive, ref } from 'vue'
 import { api, type AccessToken, type Account, type AccountSource, type Connection, type Role } from '../api'
-import { auth, may, refreshAuth, signOut } from '../auth'
+import { auth, isDesktop, may, refreshAuth, signOut } from '../auth'
 import { formatDate, t } from '../i18n'
 import { confirmDialog, copyText, showError, showOk } from '../ui'
 
@@ -177,14 +177,15 @@ const day = (at: string | null) => (at ? formatDate(at, { dateStyle: 'medium' })
     <section>
       <div class="sh">
         <h3>{{ t('account-you') }}</h3>
-        <button type="button" class="btn" @click="signOut">{{ t('account-sign-out') }}</button>
+        <button v-if="!isDesktop()" type="button" class="btn" @click="signOut">{{ t('account-sign-out') }}</button>
       </div>
       <p class="what">
         {{ t('account-signed-in-as-before') }}<strong>{{ auth.status?.user?.name }}</strong>{{
           myRole === 'admin' ? t('account-signed-in-as-admin') : myRole === 'edit' ? t('account-signed-in-as-edit') : t('account-signed-in-as-view')
         }}
       </p>
-      <p v-if="external" class="what">
+      <p v-if="isDesktop()" class="what">{{ t('account-app-signin') }}</p>
+      <p v-else-if="external" class="what">
         {{ auth.status?.user?.source === 'oauth' ? t('account-password-at-provider') : t('account-password-at-directory') }}
       </p>
       <form v-else class="grid" @submit.prevent="changePassword">
@@ -203,7 +204,7 @@ const day = (at: string | null) => (at ? formatDate(at, { dateStyle: 'medium' })
       </form>
     </section>
 
-    <section v-if="admin">
+    <section v-if="admin && !isDesktop()">
       <div class="sh"><h3>{{ t('account-people') }}</h3></div>
       <p class="what">
         {{ t('account-people-hint') }}
@@ -319,7 +320,7 @@ const day = (at: string | null) => (at ? formatDate(at, { dateStyle: 'medium' })
       </form>
     </section>
 
-    <section v-if="guest !== null">
+    <section v-if="guest !== null && !isDesktop()">
       <div class="sh"><h3>{{ t('account-guests') }}</h3></div>
       <label class="check">
         <input type="checkbox" :checked="guest" :disabled="busy" @change="setGuest(($event.target as HTMLInputElement).checked)" />

@@ -24,6 +24,10 @@ translation = "Claude và các ứng dụng AI khác"
 source = "Connect Claude (or any MCP app) and it can search and fetch assets for you, and describe and tag what Hoard hasn’t yet. It signs in to Hoard the first time; you allow it here in the browser."
 translation = "Kết nối Claude (hoặc bất kỳ ứng dụng MCP nào) và nó có thể tìm kiếm và lấy tài nguyên cho bạn, cũng như mô tả và gắn thẻ những gì Hoard chưa làm. Nó đăng nhập vào Hoard ở lần đầu tiên; bạn cho phép nó tại đây, trong trình duyệt."
 
+[messages.account-app-signin]
+source = "The Hoard app signs you in by itself, so there’s no password. Make an access token below for the engine plugins and the hoard command."
+translation = "Ứng dụng Hoard tự đăng nhập cho bạn nên không có mật khẩu. Hãy tạo mã truy cập bên dưới cho các plugin engine và lệnh hoard."
+
 [messages.account-change-password]
 source = "Change password"
 translation = "Đổi mật khẩu"
@@ -431,6 +435,10 @@ translation = "Hoạt động nền"
 [messages.activity-unreachable]
 source = "Can't reach the server"
 translation = "Không thể kết nối tới máy chủ"
+
+[messages.activity-unreachable-desktop]
+source = "Hoard isn't answering"
+translation = "Hoard không phản hồi"
 
 [messages.api-kind-animation]
 source = "Animations"
@@ -1286,6 +1294,10 @@ translation = "gói"
 [messages.app-unreachable]
 source = "Couldn't reach the server: { $error }"
 translation = "Không thể kết nối tới máy chủ: { $error }"
+
+[messages.app-unreachable-desktop]
+source = "Hoard isn't answering: { $error }"
+translation = "Hoard không phản hồi: { $error }"
 
 [messages.app-update]
 source = "Update"
@@ -3088,6 +3100,10 @@ translation = "lần đăng nhập này không được bắt đầu ở đây, 
 source = "ChatGPT answered for a different registration of this server; start the sign-in again"
 translation = "ChatGPT trả lời cho một lần đăng ký khác của máy chủ này; hãy bắt đầu đăng nhập lại"
 
+[messages.error-chatgpt-other-registration-desktop]
+source = "ChatGPT answered for a different copy of Hoard; start the sign-in again"
+translation = "ChatGPT trả lời cho một bản Hoard khác; hãy bắt đầu đăng nhập lại"
+
 [messages.error-chatgpt-paste-address]
 source = "paste the whole address, starting with http://127.0.0.1"
 translation = "hãy dán toàn bộ địa chỉ, bắt đầu bằng http://127.0.0.1"
@@ -3124,9 +3140,17 @@ translation = "yêu cầu thất bại"
 source = "ChatGPT signed this server out ({ $code }); sign in again from Settings → AI tagging"
 translation = "ChatGPT đã đăng xuất máy chủ này ({ $code }); hãy đăng nhập lại từ Cài đặt → Gắn thẻ AI"
 
+[messages.error-chatgpt-signed-out-desktop]
+source = "ChatGPT signed Hoard out ({ $code }); sign in again from Settings → AI tagging"
+translation = "ChatGPT đã đăng xuất Hoard ({ $code }); hãy đăng nhập lại từ Cài đặt → Gắn thẻ AI"
+
 [messages.error-chatgpt-signed-out-problem]
 source = "ChatGPT signed this server out ({ $code }). Sign in again to keep tagging with your plan."
 translation = "ChatGPT đã đăng xuất máy chủ này ({ $code }). Hãy đăng nhập lại để tiếp tục gắn thẻ bằng gói đăng ký của bạn."
+
+[messages.error-chatgpt-signed-out-problem-desktop]
+source = "ChatGPT signed Hoard out ({ $code }). Sign in again to keep tagging with your plan."
+translation = "ChatGPT đã đăng xuất Hoard ({ $code }). Hãy đăng nhập lại để tiếp tục gắn thẻ bằng gói đăng ký của bạn."
 
 [messages.error-chatgpt-unsupported]
 source = "ChatGPT plan usage doesn't support { $param } with this model"
@@ -3564,6 +3588,10 @@ translation = "không có vị trí thư viện nào khác để chuyển tệp 
 source = "There's no SoundFont at { $path } on the server"
 translation = "Không có SoundFont tại { $path } trên máy chủ"
 
+[messages.error-no-soundfont-desktop]
+source = "There's no SoundFont at { $path }"
+translation = "Không có SoundFont tại { $path }"
+
 [messages.error-not-a-hash]
 source = "not a blake3 hex hash"
 translation = "không phải mã băm blake3 dạng hex"
@@ -3591,6 +3619,10 @@ translation = "{ $url } không phải máy chủ llama.cpp ở chế độ route
 [messages.error-not-started]
 source = "the server hasn't started"
 translation = "máy chủ chưa khởi động"
+
+[messages.error-not-started-desktop]
+source = "Hoard hasn't started"
+translation = "Hoard chưa khởi động"
 
 [messages.error-not-watched]
 source = "{ $name } isn't a watched folder"
@@ -5190,6 +5222,10 @@ translation = "Tải lên cần một thư viện do Hoard quản lý. Bạn có
 source = "Folder on the server"
 translation = "Thư mục trên máy chủ"
 
+[messages.locations-folder-desktop]
+source = "Folder"
+translation = "Thư mục"
+
 [messages.locations-folder-hint-managed]
 source = "Hoard creates it if it isn't there. In Docker, this is a folder you've mounted into the container."
 translation = "Hoard sẽ tạo thư mục nếu chưa có. Trong Docker, đây là thư mục bạn đã gắn vào container."
@@ -5846,6 +5882,10 @@ translation = "Xem { $name } ở dạng 3D"
 source = "the server is still converting this model"
 translation = "máy chủ vẫn đang chuyển đổi mô hình này"
 
+[messages.model-error-converting-desktop]
+source = "Hoard is still converting this model"
+translation = "Hoard vẫn đang chuyển đổi mô hình này"
+
 [messages.model-error-empty-collada]
 source = "empty Collada file"
 translation = "tệp Collada trống"
@@ -6500,6 +6540,10 @@ translation = "Tạo ảnh thu nhỏ trong trình duyệt này"
 [messages.packs-make-thumbs-title]
 source = "Open each model in a 3D viewer out of sight, one at a time, and use its picture as the thumbnail where that's better than the server's"
 translation = "Mở từng mô hình trong một trình xem 3D ẩn, lần lượt từng cái, và dùng hình của nó làm ảnh thu nhỏ khi đẹp hơn ảnh của máy chủ"
+
+[messages.packs-make-thumbs-title-desktop]
+source = "Open each model in a 3D viewer out of sight, one at a time, and use its picture as the thumbnail where that's better than the one Hoard made"
+translation = "Mở từng mô hình trong một trình xem 3D ẩn, lần lượt từng cái, và dùng hình của nó làm ảnh thu nhỏ khi đẹp hơn ảnh do Hoard tạo"
 
 [messages.packs-more]
 source = "More"
@@ -7339,6 +7383,10 @@ translation = "Về mặc định, { $value }"
 source = "Reset to the default: { $value }"
 translation = "Về mặc định: { $value }"
 
+[messages.root-desktop-reopen]
+source = "This window was signed out. Close Hoard and open it again to carry on."
+translation = "Cửa sổ này đã bị đăng xuất. Hãy đóng Hoard rồi mở lại để tiếp tục."
+
 [messages.root-lazy-connect]
 source = "the app connection"
 translation = "kết nối ứng dụng"
@@ -7350,6 +7398,10 @@ translation = "Thử lại"
 [messages.root-unreachable]
 source = "Couldn’t reach the Hoard server: { $error }"
 translation = "Không thể kết nối tới máy chủ Hoard: { $error }"
+
+[messages.root-unreachable-desktop]
+source = "Hoard isn’t answering: { $error }"
+translation = "Hoard không phản hồi: { $error }"
 
 [messages.server-back-to-settings]
 source = "Back to Settings"
@@ -8019,6 +8071,10 @@ translation = "Tìm theo nội dung trong ảnh"
 source = "Uses OpenAI’s CLIP model, run on this server’s processor: nothing leaves it. Turning it on downloads the model ({ $size } MB) from Hugging Face, then learns every picture in the background at low priority. It takes 300 to 600 MB of memory while it works or someone searches. Turning it off deletes the model and keeps what it learned, for next time."
 translation = "Dùng mô hình CLIP của OpenAI, chạy trên bộ xử lý của máy chủ này: không có gì rời khỏi máy chủ. Khi bật, mô hình ({ $size } MB) sẽ được tải từ Hugging Face, rồi học mọi ảnh trong nền với mức ưu tiên thấp. Nó dùng 300 đến 600 MB bộ nhớ khi đang làm việc hoặc khi có người tìm kiếm. Khi tắt, mô hình bị xóa nhưng những gì nó đã học được giữ lại cho lần sau."
 
+[messages.settings-clip-hint-desktop]
+source = "Uses OpenAI’s CLIP model, run on this computer’s processor: nothing leaves it. Turning it on downloads the model ({ $size } MB) from Hugging Face, then learns every picture in the background at low priority. It takes 300 to 600 MB of memory while it works or you search. Turning it off deletes the model and keeps what it learned, for next time."
+translation = "Dùng mô hình CLIP của OpenAI, chạy trên bộ xử lý của máy tính này: không có gì rời khỏi máy. Khi bật, mô hình ({ $size } MB) sẽ được tải từ Hugging Face, rồi học mọi ảnh trong nền với mức ưu tiên thấp. Nó dùng 300 đến 600 MB bộ nhớ khi đang làm việc hoặc khi bạn tìm kiếm. Khi tắt, mô hình bị xóa nhưng những gì nó đã học được giữ lại cho lần sau."
+
 [messages.settings-clip-learning]
 source = "Ready: learning pictures, { $done } of { $total } so far"
 translation = "Sẵn sàng: đang học ảnh, đến giờ được { $done } / { $total }"
@@ -8305,6 +8361,10 @@ translation = "tắt"
 source = "on"
 translation = "bật"
 
+[messages.settings-desktop-updates]
+source = "Hoard looks for a new release each time it starts, downloads it in the background, and installs it when you quit."
+translation = "Mỗi lần khởi động, Hoard tìm bản phát hành mới, tải về ở chế độ nền và cài đặt khi bạn thoát."
+
 [messages.settings-ffmpeg-download]
 source = "Uses a system ffmpeg with the right encoders, or downloads a static build (about 80 MB)."
 translation = "Dùng ffmpeg của hệ thống có đủ bộ mã hóa, hoặc tải một bản build tĩnh (khoảng 80 MB)."
@@ -8529,6 +8589,10 @@ translation = "Tên"
 source = "What this server is called in the top bar, the browser tab and on the sign-in page, so with more than one hoard you can tell which is which."
 translation = "Tên của máy chủ này trên thanh trên cùng, tab trình duyệt và trang đăng nhập, để khi có nhiều máy chủ Hoard bạn biết cái nào là cái nào."
 
+[messages.settings-name-what-desktop]
+source = "What this library is called in the top bar."
+translation = "Tên của thư viện này trên thanh trên cùng."
+
 [messages.settings-option-saved]
 source = "{ $name }: { $value }"
 translation = "{ $name }: { $value }"
@@ -8597,6 +8661,10 @@ translation = "Chung"
 source = "What this server is called, for everyone who uses it."
 translation = "Tên của máy chủ này, cho mọi người dùng nó."
 
+[messages.settings-page-general-blurb-desktop]
+source = "What this library is called."
+translation = "Tên của thư viện này."
+
 [messages.settings-page-issues]
 source = "Issues"
 translation = "Sự cố"
@@ -8621,6 +8689,10 @@ translation = "Vị trí thư viện"
 source = "The folders on the server that hold the library: ones Hoard keeps files in, and folders of packs it indexes where they are."
 translation = "Các thư mục trên máy chủ chứa thư viện: nơi Hoard lưu tệp, và các thư mục chứa gói được lập chỉ mục tại chỗ."
 
+[messages.settings-page-locations-blurb-desktop]
+source = "The folders that hold the library: ones Hoard keeps files in, and folders of packs it indexes where they are."
+translation = "Các thư mục chứa thư viện: nơi Hoard lưu tệp, và các thư mục chứa gói được lập chỉ mục tại chỗ."
+
 [messages.settings-page-maintenance]
 source = "Maintenance"
 translation = "Bảo trì"
@@ -8636,6 +8708,10 @@ translation = "Hiệu năng"
 [messages.settings-page-performance-blurb]
 source = "How hard the server works, how thumbnails are made and kept, and the most it takes in."
 translation = "Máy chủ làm việc nặng đến đâu, ảnh thu nhỏ được tạo và lưu thế nào, và mức tối đa nó nhận vào."
+
+[messages.settings-page-performance-blurb-desktop]
+source = "How hard Hoard works, how thumbnails are made and kept, and the most it takes in."
+translation = "Hoard làm việc nặng đến đâu, ảnh thu nhỏ được tạo và lưu thế nào, và mức tối đa nó nhận vào."
 
 [messages.settings-page-search]
 source = "Image search"
@@ -8741,6 +8817,10 @@ translation = "SoundFont MIDI"
 source = "found on the server, or built-in"
 translation = "tìm thấy trên máy chủ, hoặc có sẵn"
 
+[messages.settings-soundfont-default-desktop]
+source = "found on this computer, or built-in"
+translation = "tìm thấy trên máy tính này, hoặc có sẵn"
+
 [messages.settings-soundfont-file]
 source = "SoundFont file"
 translation = "Tệp SoundFont"
@@ -8748,6 +8828,10 @@ translation = "Tệp SoundFont"
 [messages.settings-soundfont-placeholder]
 source = "Found on the server, or built-in"
 translation = "Tìm thấy trên máy chủ, hoặc có sẵn"
+
+[messages.settings-soundfont-placeholder-desktop]
+source = "Found on this computer, or built-in"
+translation = "Tìm thấy trên máy tính này, hoặc có sẵn"
 
 [messages.settings-soundfont-what]
 source = "The instruments MIDI files are played and converted with."
@@ -9017,6 +9101,10 @@ translation = "tác vụ cùng lúc (nhập, gắn thẻ, chuyển đổi)"
 source = "Pick a folder on the server for Hoard to keep your packs in, or point it at a folder of packs you already have. You can add more locations, on other disks, from Settings later."
 translation = "Chọn một thư mục trên máy chủ để Hoard lưu các gói của bạn, hoặc trỏ nó tới một thư mục chứa gói bạn đã có. Sau này bạn có thể thêm vị trí khác, trên ổ đĩa khác, từ Cài đặt."
 
+[messages.setup-lede-desktop]
+source = "Pick a folder for Hoard to keep your packs in, or point it at a folder of packs you already have. You can add more locations, on other disks, from Settings later."
+translation = "Chọn một thư mục để Hoard lưu các gói của bạn, hoặc trỏ nó tới một thư mục chứa gói bạn đã có. Sau này bạn có thể thêm vị trí khác, trên ổ đĩa khác, từ Cài đặt."
+
 [messages.setup-loading]
 source = "Loading…"
 translation = "Đang tải…"
@@ -9052,6 +9140,10 @@ translation = "Thử lại"
 [messages.setup-unreachable]
 source = "Couldn't reach the server: { $error }"
 translation = "Không thể kết nối tới máy chủ: { $error }"
+
+[messages.setup-unreachable-desktop]
+source = "Hoard isn't answering: { $error }"
+translation = "Hoard không phản hồi: { $error }"
 
 [messages.setup-watched-after]
 source = "; packs show up as it finds them. To upload as well, add a library Hoard keeps from Settings → Library locations."

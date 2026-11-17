@@ -1,7 +1,8 @@
 // The portal in the reader's language, from the same Fluent catalogs as the server (`locales/<code>/hoard.ftl`).
 // English is built in and is what any message a catalog lacks falls back to; the others load when picked.
 // `t('message-id', { name: value })` is the only way text reaches the page, so `cargo xtask translations check` can
-// find every message the portal uses and make sure the catalogs have it with the same variables.
+// find every message the portal uses and make sure the catalogs have it with the same variables. In the desktop app
+// a message `id` is `id-desktop` where the catalogs have one: the same thing said without a server in it.
 import { FluentBundle, FluentResource, type FluentVariable } from '@fluent/bundle'
 import { shallowRef } from 'vue'
 import english from '../../locales/en/hoard.ftl?raw'
@@ -22,11 +23,17 @@ function bundle(code: string, text: string): FluentBundle {
 
 const englishBundle = bundle('en', english)
 const current = shallowRef({ code: 'en', bundle: englishBundle })
+const desktop = shallowRef(false)
+
+/** Use the desktop app's wording (or not). */
+export function useDesktopWording(on: boolean): void {
+  desktop.value = on
+}
 
 /** A message in the current language. Reactive: text shown with it changes when the language does. */
 export function t(id: string, args?: Record<string, FluentVariable>): string {
   for (const b of [current.value.bundle, englishBundle]) {
-    const message = b.getMessage(id)
+    const message = (desktop.value ? b.getMessage(`${id}-desktop`) : undefined) ?? b.getMessage(id)
     if (message?.value) return b.formatPattern(message.value, args)
   }
   return id

@@ -28,6 +28,7 @@ use hyper_util::rt::{TokioExecutor, TokioIo};
 use hyper_util::server::graceful::{GracefulShutdown, Watcher};
 use tokio::io::{AsyncRead, AsyncWrite};
 use tokio::net::TcpStream;
+use tokio::sync::Notify;
 use tower::ServiceExt;
 
 use crate::config::Config;
@@ -40,6 +41,7 @@ const HANDSHAKE: Duration = Duration::from_secs(15);
 pub(crate) async fn serve(cfg: &Config, app: Router) -> Result<()> {
     let addr = cfg.listen;
     let listener = tokio::net::TcpListener::bind(addr).await.with_context(|| format!("listen on {addr}"))?;
+    crate::desktop::listening_on(listener.local_addr().unwrap_or(addr));
     let https = crate::https::on();
     tracing::info!(%addr, https, "listening: http/1.1 + h2c, and https with http/2 when it's on in Settings");
     crate::https::serving(app.clone());
@@ -141,7 +143,13 @@ pub(crate) async fn handle(app: Router, mut req: Request<Body>, remote: SocketAd
     resp
 }
 
+/// Stops the server as Ctrl+C does: the desktop app's way to quit.
+pub(crate) static STOP: Notify = Notify::const_new();
+
 async fn shutdown_signal() {
-    tokio::signal::ctrl_c().await.ok();
+    tokio::select! {
+        _ = tokio::signal::ctrl_c() => {}
+        () = STOP.notified() => {}
+    }
     tracing::info!("shutting down");
 }

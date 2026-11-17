@@ -24,6 +24,10 @@ translation = "Claude 與其他 AI 應用程式"
 source = "Connect Claude (or any MCP app) and it can search and fetch assets for you, and describe and tag what Hoard hasn’t yet. It signs in to Hoard the first time; you allow it here in the browser."
 translation = "連接 Claude（或任何 MCP 應用程式）後，它就能為你搜尋與取得素材，並為 Hoard 尚未處理的內容撰寫描述與加上標籤。它第一次會登入 Hoard，由你在這裡的瀏覽器中允許。"
 
+[messages.account-app-signin]
+source = "The Hoard app signs you in by itself, so there’s no password. Make an access token below for the engine plugins and the hoard command."
+translation = "Hoard 應用程式會自動為你登入，因此沒有密碼。可在下方為引擎外掛和 hoard 指令建立存取權杖。"
+
 [messages.account-change-password]
 source = "Change password"
 translation = "變更密碼"
@@ -431,6 +435,10 @@ translation = "背景活動"
 [messages.activity-unreachable]
 source = "Can't reach the server"
 translation = "無法連線到伺服器"
+
+[messages.activity-unreachable-desktop]
+source = "Hoard isn't answering"
+translation = "Hoard 沒有回應"
 
 [messages.api-kind-animation]
 source = "Animations"
@@ -1286,6 +1294,10 @@ translation = "素材包"
 [messages.app-unreachable]
 source = "Couldn't reach the server: { $error }"
 translation = "無法連線到伺服器：{ $error }"
+
+[messages.app-unreachable-desktop]
+source = "Hoard isn't answering: { $error }"
+translation = "Hoard 沒有回應：{ $error }"
 
 [messages.app-update]
 source = "Update"
@@ -3094,6 +3106,10 @@ translation = "這次登入不是從這裡開始的，或已經開始超過 15 �
 source = "ChatGPT answered for a different registration of this server; start the sign-in again"
 translation = "ChatGPT 回應的是這台伺服器的另一筆註冊；請重新登入"
 
+[messages.error-chatgpt-other-registration-desktop]
+source = "ChatGPT answered for a different copy of Hoard; start the sign-in again"
+translation = "ChatGPT 回應的是另一份 Hoard；請重新登入"
+
 [messages.error-chatgpt-paste-address]
 source = "paste the whole address, starting with http://127.0.0.1"
 translation = "請貼上完整網址，開頭是 http://127.0.0.1"
@@ -3130,9 +3146,17 @@ translation = "請求失敗"
 source = "ChatGPT signed this server out ({ $code }); sign in again from Settings → AI tagging"
 translation = "ChatGPT 已將這台伺服器登出（{ $code }）；請從「設定 → AI 標記」重新登入"
 
+[messages.error-chatgpt-signed-out-desktop]
+source = "ChatGPT signed Hoard out ({ $code }); sign in again from Settings → AI tagging"
+translation = "ChatGPT 已將 Hoard 登出（{ $code }）；請從「設定 → AI 標記」重新登入"
+
 [messages.error-chatgpt-signed-out-problem]
 source = "ChatGPT signed this server out ({ $code }). Sign in again to keep tagging with your plan."
 translation = "ChatGPT 已將這台伺服器登出（{ $code }）。請重新登入，以繼續用你的方案加上標籤。"
+
+[messages.error-chatgpt-signed-out-problem-desktop]
+source = "ChatGPT signed Hoard out ({ $code }). Sign in again to keep tagging with your plan."
+translation = "ChatGPT 已將 Hoard 登出（{ $code }）。請重新登入，以繼續用你的方案加上標籤。"
 
 [messages.error-chatgpt-unsupported]
 source = "ChatGPT plan usage doesn't support { $param } with this model"
@@ -3570,6 +3594,10 @@ translation = "沒有其他素材庫位置可以移入檔案：請先新增一�
 source = "There's no SoundFont at { $path } on the server"
 translation = "伺服器上的 { $path } 沒有 SoundFont"
 
+[messages.error-no-soundfont-desktop]
+source = "There's no SoundFont at { $path }"
+translation = "{ $path } 沒有 SoundFont"
+
 [messages.error-not-a-hash]
 source = "not a blake3 hex hash"
 translation = "不是 blake3 十六進位雜湊值"
@@ -3597,6 +3625,10 @@ translation = "{ $url } 不是路由模式的 llama.cpp 伺服器，因此無法
 [messages.error-not-started]
 source = "the server hasn't started"
 translation = "伺服器尚未啟動"
+
+[messages.error-not-started-desktop]
+source = "Hoard hasn't started"
+translation = "Hoard 尚未啟動"
 
 [messages.error-not-watched]
 source = "{ $name } isn't a watched folder"
@@ -5196,6 +5228,10 @@ translation = "上傳需要由 Hoard 管理的素材庫。你之後可以從「�
 source = "Folder on the server"
 translation = "伺服器上的資料夾"
 
+[messages.locations-folder-desktop]
+source = "Folder"
+translation = "資料夾"
+
 [messages.locations-folder-hint-managed]
 source = "Hoard creates it if it isn't there. In Docker, this is a folder you've mounted into the container."
 translation = "如果資料夾不存在，Hoard 會建立它。在 Docker 中，這是你掛載到容器內的資料夾。"
@@ -5852,6 +5888,10 @@ translation = "以 3D 檢視 { $name }"
 source = "the server is still converting this model"
 translation = "伺服器仍在轉換這個模型"
 
+[messages.model-error-converting-desktop]
+source = "Hoard is still converting this model"
+translation = "Hoard 仍在轉換這個模型"
+
 [messages.model-error-empty-collada]
 source = "empty Collada file"
 translation = "空的 Collada 檔案"
@@ -6506,6 +6546,10 @@ translation = "在這個瀏覽器中製作縮圖"
 [messages.packs-make-thumbs-title]
 source = "Open each model in a 3D viewer out of sight, one at a time, and use its picture as the thumbnail where that's better than the server's"
 translation = "在背景的 3D 檢視器中逐一開啟每個模型，若其畫面比伺服器產生的更好，就用來當作縮圖"
+
+[messages.packs-make-thumbs-title-desktop]
+source = "Open each model in a 3D viewer out of sight, one at a time, and use its picture as the thumbnail where that's better than the one Hoard made"
+translation = "在背景的 3D 檢視器中逐一開啟每個模型，若其畫面比 Hoard 產生的更好，就用來當作縮圖"
 
 [messages.packs-more]
 source = "More"
@@ -7345,6 +7389,10 @@ translation = "恢復預設值，{ $value }"
 source = "Reset to the default: { $value }"
 translation = "恢復預設值：{ $value }"
 
+[messages.root-desktop-reopen]
+source = "This window was signed out. Close Hoard and open it again to carry on."
+translation = "此視窗已登出。請關閉 Hoard 並重新開啟以繼續。"
+
 [messages.root-lazy-connect]
 source = "the app connection"
 translation = "應用程式連線"
@@ -7356,6 +7404,10 @@ translation = "再試一次"
 [messages.root-unreachable]
 source = "Couldn’t reach the Hoard server: { $error }"
 translation = "無法連線到 Hoard 伺服器：{ $error }"
+
+[messages.root-unreachable-desktop]
+source = "Hoard isn’t answering: { $error }"
+translation = "Hoard 沒有回應：{ $error }"
 
 [messages.server-back-to-settings]
 source = "Back to Settings"
@@ -8025,6 +8077,10 @@ translation = "依圖片內容搜尋"
 source = "Uses OpenAI’s CLIP model, run on this server’s processor: nothing leaves it. Turning it on downloads the model ({ $size } MB) from Hugging Face, then learns every picture in the background at low priority. It takes 300 to 600 MB of memory while it works or someone searches. Turning it off deletes the model and keeps what it learned, for next time."
 translation = "使用 OpenAI 的 CLIP 模型，在這台伺服器的處理器上執行：任何資料都不會離開伺服器。開啟後會從 Hugging Face 下載模型（{ $size } MB），然後以低優先順序在背景學習每張圖片。在它工作或有人搜尋時，會使用 300 到 600 MB 的記憶體。關閉後會刪除模型，但保留它學到的內容，供下次使用。"
 
+[messages.settings-clip-hint-desktop]
+source = "Uses OpenAI’s CLIP model, run on this computer’s processor: nothing leaves it. Turning it on downloads the model ({ $size } MB) from Hugging Face, then learns every picture in the background at low priority. It takes 300 to 600 MB of memory while it works or you search. Turning it off deletes the model and keeps what it learned, for next time."
+translation = "使用 OpenAI 的 CLIP 模型，在這台電腦的處理器上執行：任何資料都不會離開這台電腦。開啟後會從 Hugging Face 下載模型（{ $size } MB），然後以低優先順序在背景學習每張圖片。在它工作或你搜尋時，會使用 300 到 600 MB 的記憶體。關閉後會刪除模型，但保留它學到的內容，供下次使用。"
+
 [messages.settings-clip-learning]
 source = "Ready: learning pictures, { $done } of { $total } so far"
 translation = "就緒：正在學習圖片，目前已完成 { $done }／{ $total }"
@@ -8311,6 +8367,10 @@ translation = "關閉"
 source = "on"
 translation = "開啟"
 
+[messages.settings-desktop-updates]
+source = "Hoard looks for a new release each time it starts, downloads it in the background, and installs it when you quit."
+translation = "Hoard 每次啟動時都會尋找新版本，在背景下載，並在你結束時安裝。"
+
 [messages.settings-ffmpeg-download]
 source = "Uses a system ffmpeg with the right encoders, or downloads a static build (about 80 MB)."
 translation = "使用系統中具備所需編碼器的 ffmpeg，或下載靜態建置版本（約 80 MB）。"
@@ -8535,6 +8595,10 @@ translation = "名稱"
 source = "What this server is called in the top bar, the browser tab and on the sign-in page, so with more than one hoard you can tell which is which."
 translation = "這台伺服器在頂端列、瀏覽器分頁與登入頁面上顯示的名稱，讓你在有多個 Hoard 時能分辨。"
 
+[messages.settings-name-what-desktop]
+source = "What this library is called in the top bar."
+translation = "這個素材庫在頂端列上顯示的名稱。"
+
 [messages.settings-option-saved]
 source = "{ $name }: { $value }"
 translation = "{ $name }：{ $value }"
@@ -8603,6 +8667,10 @@ translation = "一般"
 source = "What this server is called, for everyone who uses it."
 translation = "這台伺服器的名稱，所有使用者都會看到。"
 
+[messages.settings-page-general-blurb-desktop]
+source = "What this library is called."
+translation = "這個素材庫的名稱。"
+
 [messages.settings-page-issues]
 source = "Issues"
 translation = "問題"
@@ -8627,6 +8695,10 @@ translation = "素材庫位置"
 source = "The folders on the server that hold the library: ones Hoard keeps files in, and folders of packs it indexes where they are."
 translation = "伺服器上存放素材庫的資料夾：包括 Hoard 存放檔案的資料夾，以及它在原位置建立索引的素材包資料夾。"
 
+[messages.settings-page-locations-blurb-desktop]
+source = "The folders that hold the library: ones Hoard keeps files in, and folders of packs it indexes where they are."
+translation = "存放素材庫的資料夾：包括 Hoard 存放檔案的資料夾，以及它在原位置建立索引的素材包資料夾。"
+
 [messages.settings-page-maintenance]
 source = "Maintenance"
 translation = "維護"
@@ -8642,6 +8714,10 @@ translation = "效能"
 [messages.settings-page-performance-blurb]
 source = "How hard the server works, how thumbnails are made and kept, and the most it takes in."
 translation = "伺服器的工作量、縮圖如何製作與保存，以及它可接收的上限。"
+
+[messages.settings-page-performance-blurb-desktop]
+source = "How hard Hoard works, how thumbnails are made and kept, and the most it takes in."
+translation = "Hoard 的工作量、縮圖如何製作與保存，以及它可接收的上限。"
 
 [messages.settings-page-search]
 source = "Image search"
@@ -8747,6 +8823,10 @@ translation = "MIDI SoundFont"
 source = "found on the server, or built-in"
 translation = "在伺服器上找到的，或內建的"
 
+[messages.settings-soundfont-default-desktop]
+source = "found on this computer, or built-in"
+translation = "在這台電腦上找到的，或內建的"
+
 [messages.settings-soundfont-file]
 source = "SoundFont file"
 translation = "SoundFont 檔案"
@@ -8754,6 +8834,10 @@ translation = "SoundFont 檔案"
 [messages.settings-soundfont-placeholder]
 source = "Found on the server, or built-in"
 translation = "在伺服器上找到的，或內建的"
+
+[messages.settings-soundfont-placeholder-desktop]
+source = "Found on this computer, or built-in"
+translation = "在這台電腦上找到的，或內建的"
 
 [messages.settings-soundfont-what]
 source = "The instruments MIDI files are played and converted with."
@@ -9023,6 +9107,10 @@ translation = "個同時進行的工作（匯入、標記、轉換）"
 source = "Pick a folder on the server for Hoard to keep your packs in, or point it at a folder of packs you already have. You can add more locations, on other disks, from Settings later."
 translation = "在伺服器上選擇一個資料夾，讓 Hoard 存放你的素材包，或指向你已經有素材包的資料夾。之後可以在設定中新增其他磁碟上的位置。"
 
+[messages.setup-lede-desktop]
+source = "Pick a folder for Hoard to keep your packs in, or point it at a folder of packs you already have. You can add more locations, on other disks, from Settings later."
+translation = "選擇一個資料夾，讓 Hoard 存放你的素材包，或指向你已經有素材包的資料夾。之後可以在設定中新增其他磁碟上的位置。"
+
 [messages.setup-loading]
 source = "Loading…"
 translation = "載入中…"
@@ -9058,6 +9146,10 @@ translation = "再試一次"
 [messages.setup-unreachable]
 source = "Couldn't reach the server: { $error }"
 translation = "無法連線到伺服器：{ $error }"
+
+[messages.setup-unreachable-desktop]
+source = "Hoard isn't answering: { $error }"
+translation = "Hoard 沒有回應：{ $error }"
 
 [messages.setup-watched-after]
 source = "; packs show up as it finds them. To upload as well, add a library Hoard keeps from Settings → Library locations."

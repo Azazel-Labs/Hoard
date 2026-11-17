@@ -171,6 +171,10 @@ pub struct Config {
     /// Assets per LLM request.
     #[arg(skip = 40_usize)]
     pub(crate) llm_batch: usize,
+
+    /// Run as the desktop app's server (see [`Config::desktop`]).
+    #[arg(skip)]
+    pub(crate) desktop: bool,
 }
 
 /// Settings that used to be read from the environment. They're changed in the portal's Settings now; a server
@@ -213,6 +217,29 @@ pub(crate) fn warn_retired_env() {
 }
 
 impl Config {
+    /// The desktop app's server: one person's library in `data_dir`, with thumbnails, tools and models in
+    /// `cache_dir`, the portal from `web_dir`, listening on `listen` (a loopback address). Nothing is read from the
+    /// command line or the environment.
+    #[must_use]
+    pub fn desktop(data_dir: PathBuf, cache_dir: PathBuf, web_dir: PathBuf, listen: SocketAddr) -> Self {
+        let mut cfg = Self::parse_from(["hoardd"]);
+        cfg.listen = listen;
+        cfg.data_dir = data_dir;
+        cfg.files_dir = None;
+        cfg.cache_dir = Some(cache_dir);
+        cfg.web_dir = web_dir;
+        cfg.setup_code = None;
+        cfg.reset_password = None;
+        cfg.https_off = false;
+        // The app updates itself.
+        cfg.update_check = false;
+        cfg.storage = StorageKind::Local;
+        // `cargo xtask llm`'s address, or a llama-server of your own on its default port.
+        "http://127.0.0.1:8080/v1".clone_into(&mut cfg.local_llm_url);
+        cfg.desktop = true;
+        cfg
+    }
+
     /// Where an install from before library locations kept its files with `--storage local`.
     pub(crate) fn blobs_dir(&self) -> PathBuf {
         self.files_dir.clone().unwrap_or_else(|| self.data_dir.join("blobs"))

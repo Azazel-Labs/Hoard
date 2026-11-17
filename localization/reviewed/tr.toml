@@ -24,6 +24,10 @@ translation = "Claude ve diğer yapay zekâ uygulamaları"
 source = "Connect Claude (or any MCP app) and it can search and fetch assets for you, and describe and tag what Hoard hasn’t yet. It signs in to Hoard the first time; you allow it here in the browser."
 translation = "Claude’u (ya da herhangi bir MCP uygulamasını) bağlayın; sizin için varlık arayıp getirebilir, Hoard’un henüz tanımlamadıklarını tanımlayıp etiketleyebilir. İlk seferde Hoard’da oturum açar; buna burada, tarayıcıda izin verirsiniz."
 
+[messages.account-app-signin]
+source = "The Hoard app signs you in by itself, so there’s no password. Make an access token below for the engine plugins and the hoard command."
+translation = "Hoard uygulaması oturumunuzu kendisi açar, bu yüzden parola yoktur. Motor eklentileri ve hoard komutu için aşağıdan bir erişim belirteci oluşturun."
+
 [messages.account-change-password]
 source = "Change password"
 translation = "Parolayı değiştir"
@@ -431,6 +435,10 @@ translation = "Arka plan etkinliği"
 [messages.activity-unreachable]
 source = "Can't reach the server"
 translation = "Sunucuya ulaşılamıyor"
+
+[messages.activity-unreachable-desktop]
+source = "Hoard isn't answering"
+translation = "Hoard yanıt vermiyor"
 
 [messages.api-kind-animation]
 source = "Animations"
@@ -1287,6 +1295,10 @@ translation = "paket"
 [messages.app-unreachable]
 source = "Couldn't reach the server: { $error }"
 translation = "Sunucuya ulaşılamadı: { $error }"
+
+[messages.app-unreachable-desktop]
+source = "Hoard isn't answering: { $error }"
+translation = "Hoard yanıt vermiyor: { $error }"
 
 [messages.app-update]
 source = "Update"
@@ -3101,6 +3113,10 @@ translation = "bu oturum açma işlemi burada başlatılmadı ya da 15 dakikadan
 source = "ChatGPT answered for a different registration of this server; start the sign-in again"
 translation = "ChatGPT, bu sunucunun başka bir kaydı için yanıt verdi; oturum açmayı yeniden başlatın"
 
+[messages.error-chatgpt-other-registration-desktop]
+source = "ChatGPT answered for a different copy of Hoard; start the sign-in again"
+translation = "ChatGPT, Hoard’un başka bir kopyası için yanıt verdi; oturum açmayı yeniden başlatın"
+
 [messages.error-chatgpt-paste-address]
 source = "paste the whole address, starting with http://127.0.0.1"
 translation = "http://127.0.0.1 ile başlayan adresin tamamını yapıştırın"
@@ -3137,9 +3153,17 @@ translation = "istek başarısız oldu"
 source = "ChatGPT signed this server out ({ $code }); sign in again from Settings → AI tagging"
 translation = "ChatGPT bu sunucunun oturumunu kapattı ({ $code }); Ayarlar → Yapay zekâ etiketleme bölümünden yeniden oturum açın"
 
+[messages.error-chatgpt-signed-out-desktop]
+source = "ChatGPT signed Hoard out ({ $code }); sign in again from Settings → AI tagging"
+translation = "ChatGPT, Hoard’un oturumunu kapattı ({ $code }); Ayarlar → Yapay zekâ etiketleme bölümünden yeniden oturum açın"
+
 [messages.error-chatgpt-signed-out-problem]
 source = "ChatGPT signed this server out ({ $code }). Sign in again to keep tagging with your plan."
 translation = "ChatGPT bu sunucunun oturumunu kapattı ({ $code }). Planınızla etiketlemeye devam etmek için yeniden oturum açın."
+
+[messages.error-chatgpt-signed-out-problem-desktop]
+source = "ChatGPT signed Hoard out ({ $code }). Sign in again to keep tagging with your plan."
+translation = "ChatGPT, Hoard’un oturumunu kapattı ({ $code }). Planınızla etiketlemeye devam etmek için yeniden oturum açın."
 
 [messages.error-chatgpt-unsupported]
 source = "ChatGPT plan usage doesn't support { $param } with this model"
@@ -3577,6 +3601,10 @@ translation = "dosyaların taşınacağı başka bir kütüphane konumu yok: ön
 source = "There's no SoundFont at { $path } on the server"
 translation = "Sunucuda şu yolda SoundFont yok: { $path }"
 
+[messages.error-no-soundfont-desktop]
+source = "There's no SoundFont at { $path }"
+translation = "Şu yolda SoundFont yok: { $path }"
+
 [messages.error-not-a-hash]
 source = "not a blake3 hex hash"
 translation = "bu bir blake3 onaltılık özeti değil"
@@ -3604,6 +3632,10 @@ translation = "{ $url } yönlendirici modunda bir llama.cpp sunucusu değil, bu 
 [messages.error-not-started]
 source = "the server hasn't started"
 translation = "sunucu başlamadı"
+
+[messages.error-not-started-desktop]
+source = "Hoard hasn't started"
+translation = "Hoard başlamadı"
 
 [messages.error-not-watched]
 source = "{ $name } isn't a watched folder"
@@ -5204,6 +5236,10 @@ translation = "Yükleme yapabilmek için Hoard’un tuttuğu bir kütüphane ger
 source = "Folder on the server"
 translation = "Sunucudaki klasör"
 
+[messages.locations-folder-desktop]
+source = "Folder"
+translation = "Klasör"
+
 [messages.locations-folder-hint-managed]
 source = "Hoard creates it if it isn't there. In Docker, this is a folder you've mounted into the container."
 translation = "Yoksa Hoard onu oluşturur. Docker’da bu, kapsayıcıya bağladığınız bir klasördür."
@@ -5860,6 +5896,10 @@ translation = "3B olarak görüntüle: { $name }"
 source = "the server is still converting this model"
 translation = "sunucu bu modeli hâlâ dönüştürüyor"
 
+[messages.model-error-converting-desktop]
+source = "Hoard is still converting this model"
+translation = "Hoard bu modeli hâlâ dönüştürüyor"
+
 [messages.model-error-empty-collada]
 source = "empty Collada file"
 translation = "boş Collada dosyası"
@@ -6514,6 +6554,10 @@ translation = "Küçük resimleri bu tarayıcıda oluştur"
 [messages.packs-make-thumbs-title]
 source = "Open each model in a 3D viewer out of sight, one at a time, and use its picture as the thumbnail where that's better than the server's"
 translation = "Her modeli tek tek, görünmeyen bir 3B görüntüleyicide açar ve sunucununkinden daha iyi olduğu yerde resmini küçük resim olarak kullanır"
+
+[messages.packs-make-thumbs-title-desktop]
+source = "Open each model in a 3D viewer out of sight, one at a time, and use its picture as the thumbnail where that's better than the one Hoard made"
+translation = "Her modeli tek tek, görünmeyen bir 3B görüntüleyicide açar ve Hoard’un oluşturduğundan daha iyi olduğu yerde resmini küçük resim olarak kullanır"
 
 [messages.packs-more]
 source = "More"
@@ -7355,6 +7399,10 @@ translation = "Varsayılana sıfırla, { $value }"
 source = "Reset to the default: { $value }"
 translation = "Varsayılana sıfırla: { $value }"
 
+[messages.root-desktop-reopen]
+source = "This window was signed out. Close Hoard and open it again to carry on."
+translation = "Bu pencerenin oturumu kapatıldı. Devam etmek için Hoard'u kapatıp yeniden açın."
+
 [messages.root-lazy-connect]
 source = "the app connection"
 translation = "uygulama bağlantısı"
@@ -7366,6 +7414,10 @@ translation = "Yeniden dene"
 [messages.root-unreachable]
 source = "Couldn’t reach the Hoard server: { $error }"
 translation = "Hoard sunucusuna ulaşılamadı: { $error }"
+
+[messages.root-unreachable-desktop]
+source = "Hoard isn’t answering: { $error }"
+translation = "Hoard yanıt vermiyor: { $error }"
 
 [messages.server-back-to-settings]
 source = "Back to Settings"
@@ -8035,6 +8087,10 @@ translation = "Resimlerin gösterdiğine göre ara"
 source = "Uses OpenAI’s CLIP model, run on this server’s processor: nothing leaves it. Turning it on downloads the model ({ $size } MB) from Hugging Face, then learns every picture in the background at low priority. It takes 300 to 600 MB of memory while it works or someone searches. Turning it off deletes the model and keeps what it learned, for next time."
 translation = "OpenAI’nin CLIP modelini kullanır ve bu sunucunun işlemcisinde çalışır: hiçbir şey dışarı çıkmaz. Açmak, modeli ({ $size } MB) Hugging Face’ten indirir, ardından her resmi arka planda düşük öncelikle öğrenir. Çalışırken ya da biri arama yaparken 300 ile 600 MB bellek kullanır. Kapatmak modeli siler, öğrendiklerini bir dahaki sefer için saklar."
 
+[messages.settings-clip-hint-desktop]
+source = "Uses OpenAI’s CLIP model, run on this computer’s processor: nothing leaves it. Turning it on downloads the model ({ $size } MB) from Hugging Face, then learns every picture in the background at low priority. It takes 300 to 600 MB of memory while it works or you search. Turning it off deletes the model and keeps what it learned, for next time."
+translation = "OpenAI’nin CLIP modelini kullanır ve bu bilgisayarın işlemcisinde çalışır: hiçbir şey dışarı çıkmaz. Açmak, modeli ({ $size } MB) Hugging Face’ten indirir, ardından her resmi arka planda düşük öncelikle öğrenir. Çalışırken ya da siz arama yaparken 300 ile 600 MB bellek kullanır. Kapatmak modeli siler, öğrendiklerini bir dahaki sefer için saklar."
+
 [messages.settings-clip-learning]
 source = "Ready: learning pictures, { $done } of { $total } so far"
 translation = "Hazır: resimler öğreniliyor, şimdiye kadar { $done } / { $total }"
@@ -8333,6 +8389,10 @@ translation = "kapalı"
 source = "on"
 translation = "açık"
 
+[messages.settings-desktop-updates]
+source = "Hoard looks for a new release each time it starts, downloads it in the background, and installs it when you quit."
+translation = "Hoard her açılışta yeni bir sürüm arar, arka planda indirir ve çıktığınızda kurar."
+
 [messages.settings-ffmpeg-download]
 source = "Uses a system ffmpeg with the right encoders, or downloads a static build (about 80 MB)."
 translation = "Doğru kodlayıcılara sahip bir sistem ffmpeg’i kullanır ya da statik bir derleme (yaklaşık 80 MB) indirir."
@@ -8557,6 +8617,10 @@ translation = "Ad"
 source = "What this server is called in the top bar, the browser tab and on the sign-in page, so with more than one hoard you can tell which is which."
 translation = "Bu sunucunun üst çubukta, tarayıcı sekmesinde ve oturum açma sayfasında görünen adı; böylece birden fazla Hoard varsa hangisinin hangisi olduğunu anlayabilirsiniz."
 
+[messages.settings-name-what-desktop]
+source = "What this library is called in the top bar."
+translation = "Bu kütüphanenin üst çubukta görünen adı."
+
 [messages.settings-option-saved]
 source = "{ $name }: { $value }"
 translation = "{ $name }: { $value }"
@@ -8625,6 +8689,10 @@ translation = "Genel"
 source = "What this server is called, for everyone who uses it."
 translation = "Bu sunucunun, onu kullanan herkes için adı."
 
+[messages.settings-page-general-blurb-desktop]
+source = "What this library is called."
+translation = "Bu kütüphanenin adı."
+
 [messages.settings-page-issues]
 source = "Issues"
 translation = "Sorunlar"
@@ -8649,6 +8717,10 @@ translation = "Kütüphane konumları"
 source = "The folders on the server that hold the library: ones Hoard keeps files in, and folders of packs it indexes where they are."
 translation = "Sunucuda kütüphaneyi tutan klasörler: Hoard’un dosya sakladığı klasörler ve paketleri bulundukları yerde dizinlediği klasörler."
 
+[messages.settings-page-locations-blurb-desktop]
+source = "The folders that hold the library: ones Hoard keeps files in, and folders of packs it indexes where they are."
+translation = "Kütüphaneyi tutan klasörler: Hoard’un dosya sakladığı klasörler ve paketleri bulundukları yerde dizinlediği klasörler."
+
 [messages.settings-page-maintenance]
 source = "Maintenance"
 translation = "Bakım"
@@ -8664,6 +8736,10 @@ translation = "Performans"
 [messages.settings-page-performance-blurb]
 source = "How hard the server works, how thumbnails are made and kept, and the most it takes in."
 translation = "Sunucunun ne kadar yoğun çalıştığı, küçük resimlerin nasıl oluşturulup saklandığı ve alabileceği en büyük boyutlar."
+
+[messages.settings-page-performance-blurb-desktop]
+source = "How hard Hoard works, how thumbnails are made and kept, and the most it takes in."
+translation = "Hoard’un ne kadar yoğun çalıştığı, küçük resimlerin nasıl oluşturulup saklandığı ve alabileceği en büyük boyutlar."
 
 [messages.settings-page-search]
 source = "Image search"
@@ -8769,6 +8845,10 @@ translation = "MIDI SoundFont"
 source = "found on the server, or built-in"
 translation = "sunucuda bulunan ya da yerleşik"
 
+[messages.settings-soundfont-default-desktop]
+source = "found on this computer, or built-in"
+translation = "bu bilgisayarda bulunan ya da yerleşik"
+
 [messages.settings-soundfont-file]
 source = "SoundFont file"
 translation = "SoundFont dosyası"
@@ -8776,6 +8856,10 @@ translation = "SoundFont dosyası"
 [messages.settings-soundfont-placeholder]
 source = "Found on the server, or built-in"
 translation = "Sunucuda bulunan ya da yerleşik"
+
+[messages.settings-soundfont-placeholder-desktop]
+source = "Found on this computer, or built-in"
+translation = "Bu bilgisayarda bulunan ya da yerleşik"
 
 [messages.settings-soundfont-what]
 source = "The instruments MIDI files are played and converted with."
@@ -9045,6 +9129,10 @@ translation = "aynı anda iş (içe alma, etiketleme, dönüştürmeler)"
 source = "Pick a folder on the server for Hoard to keep your packs in, or point it at a folder of packs you already have. You can add more locations, on other disks, from Settings later."
 translation = "Sunucuda Hoard’un paketlerinizi saklayacağı bir klasör seçin ya da onu zaten sahip olduğunuz bir paket klasörüne yönlendirin. Daha sonra Ayarlar’dan başka disklerde başka konumlar da ekleyebilirsiniz."
 
+[messages.setup-lede-desktop]
+source = "Pick a folder for Hoard to keep your packs in, or point it at a folder of packs you already have. You can add more locations, on other disks, from Settings later."
+translation = "Hoard’un paketlerinizi saklayacağı bir klasör seçin ya da onu zaten sahip olduğunuz bir paket klasörüne yönlendirin. Daha sonra Ayarlar’dan başka disklerde başka konumlar da ekleyebilirsiniz."
+
 [messages.setup-loading]
 source = "Loading…"
 translation = "Yükleniyor…"
@@ -9080,6 +9168,10 @@ translation = "Yeniden dene"
 [messages.setup-unreachable]
 source = "Couldn't reach the server: { $error }"
 translation = "Sunucuya ulaşılamadı: { $error }"
+
+[messages.setup-unreachable-desktop]
+source = "Hoard isn't answering: { $error }"
+translation = "Hoard yanıt vermiyor: { $error }"
 
 [messages.setup-watched-after]
 source = "; packs show up as it finds them. To upload as well, add a library Hoard keeps from Settings → Library locations."

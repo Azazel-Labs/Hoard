@@ -24,6 +24,10 @@ translation = "Claude en ander KI-toepe"
 source = "Connect Claude (or any MCP app) and it can search and fetch assets for you, and describe and tag what Hoard hasn’t yet. It signs in to Hoard the first time; you allow it here in the browser."
 translation = "Koppel Claude (of enige MCP-toep) en dit kan bates vir jou soek en haal, en beskryf en etiketteer wat Hoard nog nie het nie. Dit meld die eerste keer by Hoard aan; jy laat dit hier in die blaaier toe."
 
+[messages.account-app-signin]
+source = "The Hoard app signs you in by itself, so there’s no password. Make an access token below for the engine plugins and the hoard command."
+translation = "Die Hoard-app meld jou self aan, so daar is geen wagwoord nie. Maak hieronder ’n toegangsbewys vir die enjin-inproppe en die hoard-opdrag."
+
 [messages.account-change-password]
 source = "Change password"
 translation = "Verander wagwoord"
@@ -431,6 +435,10 @@ translation = "Agtergrondaktiwiteit"
 [messages.activity-unreachable]
 source = "Can't reach the server"
 translation = "Kan nie die bediener bereik nie"
+
+[messages.activity-unreachable-desktop]
+source = "Hoard isn't answering"
+translation = "Hoard antwoord nie"
 
 [messages.api-kind-animation]
 source = "Animations"
@@ -1319,6 +1327,10 @@ translation = "pak"
 [messages.app-unreachable]
 source = "Couldn't reach the server: { $error }"
 translation = "Kon nie die bediener bereik nie: { $error }"
+
+[messages.app-unreachable-desktop]
+source = "Hoard isn't answering: { $error }"
+translation = "Hoard antwoord nie: { $error }"
 
 [messages.app-update]
 source = "Update"
@@ -3172,6 +3184,10 @@ translation = "hierdie aanmelding is nie hier begin nie, of dit is meer as 15 mi
 source = "ChatGPT answered for a different registration of this server; start the sign-in again"
 translation = "ChatGPT het vir 'n ander registrasie van hierdie bediener geantwoord; begin die aanmelding weer"
 
+[messages.error-chatgpt-other-registration-desktop]
+source = "ChatGPT answered for a different copy of Hoard; start the sign-in again"
+translation = "ChatGPT het vir 'n ander kopie van Hoard geantwoord; begin die aanmelding weer"
+
 [messages.error-chatgpt-paste-address]
 source = "paste the whole address, starting with http://127.0.0.1"
 translation = "plak die hele adres, wat met http://127.0.0.1 begin"
@@ -3208,9 +3224,17 @@ translation = "die versoek het misluk"
 source = "ChatGPT signed this server out ({ $code }); sign in again from Settings → AI tagging"
 translation = "ChatGPT het hierdie bediener afgemeld ({ $code }); meld weer aan vanuit Instellings → KI-etikettering"
 
+[messages.error-chatgpt-signed-out-desktop]
+source = "ChatGPT signed Hoard out ({ $code }); sign in again from Settings → AI tagging"
+translation = "ChatGPT het Hoard afgemeld ({ $code }); meld weer aan vanuit Instellings → KI-etikettering"
+
 [messages.error-chatgpt-signed-out-problem]
 source = "ChatGPT signed this server out ({ $code }). Sign in again to keep tagging with your plan."
 translation = "ChatGPT het hierdie bediener afgemeld ({ $code }). Meld weer aan om aan te hou etiketteer met jou plan."
+
+[messages.error-chatgpt-signed-out-problem-desktop]
+source = "ChatGPT signed Hoard out ({ $code }). Sign in again to keep tagging with your plan."
+translation = "ChatGPT het Hoard afgemeld ({ $code }). Meld weer aan om aan te hou etiketteer met jou plan."
 
 [messages.error-chatgpt-unsupported]
 source = "ChatGPT plan usage doesn't support { $param } with this model"
@@ -3648,6 +3672,10 @@ translation = "daar is geen ander biblioteekligging om die lêers na te skuif ni
 source = "There's no SoundFont at { $path } on the server"
 translation = "Daar is geen SoundFont by { $path } op die bediener nie"
 
+[messages.error-no-soundfont-desktop]
+source = "There's no SoundFont at { $path }"
+translation = "Daar is geen SoundFont by { $path } nie"
+
 [messages.error-not-a-hash]
 source = "not a blake3 hex hash"
 translation = "nie 'n blake3-hekshash nie"
@@ -3675,6 +3703,10 @@ translation = "{ $url } is nie 'n llama.cpp-bediener in router-modus nie, dus ka
 [messages.error-not-started]
 source = "the server hasn't started"
 translation = "die bediener het nog nie begin nie"
+
+[messages.error-not-started-desktop]
+source = "Hoard hasn't started"
+translation = "Hoard het nog nie begin nie"
 
 [messages.error-not-watched]
 source = "{ $name } isn't a watched folder"
@@ -5302,6 +5334,10 @@ translation = "Oplaai het 'n biblioteek nodig wat Hoard hou. Jy kan later een by
 source = "Folder on the server"
 translation = "Vouer op die bediener"
 
+[messages.locations-folder-desktop]
+source = "Folder"
+translation = "Vouer"
+
 [messages.locations-folder-hint-managed]
 source = "Hoard creates it if it isn't there. In Docker, this is a folder you've mounted into the container."
 translation = "Hoard skep dit as dit nie daar is nie. In Docker is dit 'n vouer wat jy in die houer gekoppel het."
@@ -5969,6 +6005,10 @@ translation = "Bekyk { $name } in 3D"
 [messages.model-error-converting]
 source = "the server is still converting this model"
 translation = "die bediener skakel hierdie model nog om"
+
+[messages.model-error-converting-desktop]
+source = "Hoard is still converting this model"
+translation = "Hoard skakel hierdie model nog om"
 
 [messages.model-error-empty-collada]
 source = "empty Collada file"
@@ -6643,6 +6683,10 @@ translation = "Maak duimnaels in hierdie blaaier"
 [messages.packs-make-thumbs-title]
 source = "Open each model in a 3D viewer out of sight, one at a time, and use its picture as the thumbnail where that's better than the server's"
 translation = "Maak elke model een vir een buite sig in 'n 3D-kyker oop, en gebruik sy prent as die duimnael waar dit beter is as die bediener s'n"
+
+[messages.packs-make-thumbs-title-desktop]
+source = "Open each model in a 3D viewer out of sight, one at a time, and use its picture as the thumbnail where that's better than the one Hoard made"
+translation = "Maak elke model een vir een buite sig in 'n 3D-kyker oop, en gebruik sy prent as die duimnael waar dit beter is as die een wat Hoard gemaak het"
 
 [messages.packs-more]
 source = "More"
@@ -7504,6 +7548,10 @@ translation = "Terugstel na die verstek, { $value }"
 source = "Reset to the default: { $value }"
 translation = "Terugstel na die verstek: { $value }"
 
+[messages.root-desktop-reopen]
+source = "This window was signed out. Close Hoard and open it again to carry on."
+translation = "Hierdie venster is afgemeld. Maak Hoard toe en maak dit weer oop om voort te gaan."
+
 [messages.root-lazy-connect]
 source = "the app connection"
 translation = "die toepverbinding"
@@ -7515,6 +7563,10 @@ translation = "Probeer weer"
 [messages.root-unreachable]
 source = "Couldn’t reach the Hoard server: { $error }"
 translation = "Kon nie die Hoard-bediener bereik nie: { $error }"
+
+[messages.root-unreachable-desktop]
+source = "Hoard isn’t answering: { $error }"
+translation = "Hoard antwoord nie: { $error }"
 
 [messages.server-back-to-settings]
 source = "Back to Settings"
@@ -8188,6 +8240,10 @@ translation = "Soek volgens wat prente wys"
 source = "Uses OpenAI’s CLIP model, run on this server’s processor: nothing leaves it. Turning it on downloads the model ({ $size } MB) from Hugging Face, then learns every picture in the background at low priority. It takes 300 to 600 MB of memory while it works or someone searches. Turning it off deletes the model and keeps what it learned, for next time."
 translation = "Gebruik OpenAI se CLIP-model, wat op hierdie bediener se verwerker loop: niks verlaat dit nie. Om dit aan te skakel laai die model ({ $size } MB) van Hugging Face af, en leer dan elke prent in die agtergrond teen lae prioriteit. Dit neem 300 tot 600 MB geheue terwyl dit werk of iemand soek. Om dit af te skakel vee die model uit en hou wat dit geleer het, vir volgende keer."
 
+[messages.settings-clip-hint-desktop]
+source = "Uses OpenAI’s CLIP model, run on this computer’s processor: nothing leaves it. Turning it on downloads the model ({ $size } MB) from Hugging Face, then learns every picture in the background at low priority. It takes 300 to 600 MB of memory while it works or you search. Turning it off deletes the model and keeps what it learned, for next time."
+translation = "Gebruik OpenAI se CLIP-model, wat op hierdie rekenaar se verwerker loop: niks verlaat dit nie. Om dit aan te skakel laai die model ({ $size } MB) van Hugging Face af, en leer dan elke prent in die agtergrond teen lae prioriteit. Dit neem 300 tot 600 MB geheue terwyl dit werk of jy soek. Om dit af te skakel vee die model uit en hou wat dit geleer het, vir volgende keer."
+
 [messages.settings-clip-learning]
 source = "Ready: learning pictures, { $done } of { $total } so far"
 translation = "Gereed: leer prente, { $done } van { $total } tot dusver"
@@ -8486,6 +8542,10 @@ translation = "af"
 source = "on"
 translation = "aan"
 
+[messages.settings-desktop-updates]
+source = "Hoard looks for a new release each time it starts, downloads it in the background, and installs it when you quit."
+translation = "Hoard soek elke keer as dit begin na ’n nuwe weergawe, laai dit in die agtergrond af en installeer dit wanneer jy dit toemaak."
+
 [messages.settings-ffmpeg-download]
 source = "Uses a system ffmpeg with the right encoders, or downloads a static build (about 80 MB)."
 translation = "Gebruik 'n stelsel-ffmpeg met die regte enkodeerders, of laai 'n statiese bou (omtrent 80 MB) af."
@@ -8710,6 +8770,10 @@ translation = "Naam"
 source = "What this server is called in the top bar, the browser tab and on the sign-in page, so with more than one hoard you can tell which is which."
 translation = "Wat hierdie bediener in die boonste balk, die blaaieroortjie en op die aanmeldbladsy genoem word, sodat jy met meer as een hoard kan sien watter een watter is."
 
+[messages.settings-name-what-desktop]
+source = "What this library is called in the top bar."
+translation = "Wat hierdie biblioteek in die boonste balk genoem word."
+
 [messages.settings-option-saved]
 source = "{ $name }: { $value }"
 translation = "{ $name }: { $value }"
@@ -8778,6 +8842,10 @@ translation = "Algemeen"
 source = "What this server is called, for everyone who uses it."
 translation = "Wat hierdie bediener genoem word, vir almal wat dit gebruik."
 
+[messages.settings-page-general-blurb-desktop]
+source = "What this library is called."
+translation = "Wat hierdie biblioteek genoem word."
+
 [messages.settings-page-issues]
 source = "Issues"
 translation = "Probleme"
@@ -8802,6 +8870,10 @@ translation = "Biblioteekliggings"
 source = "The folders on the server that hold the library: ones Hoard keeps files in, and folders of packs it indexes where they are."
 translation = "Die vouers op die bediener wat die biblioteek bevat: dié waarin Hoard lêers hou, en vouers met pakke wat dit indekseer waar hulle is."
 
+[messages.settings-page-locations-blurb-desktop]
+source = "The folders that hold the library: ones Hoard keeps files in, and folders of packs it indexes where they are."
+translation = "Die vouers wat die biblioteek bevat: dié waarin Hoard lêers hou, en vouers met pakke wat dit indekseer waar hulle is."
+
 [messages.settings-page-maintenance]
 source = "Maintenance"
 translation = "Instandhouding"
@@ -8817,6 +8889,10 @@ translation = "Werkverrigting"
 [messages.settings-page-performance-blurb]
 source = "How hard the server works, how thumbnails are made and kept, and the most it takes in."
 translation = "Hoe hard die bediener werk, hoe duimnaels gemaak en gehou word, en die meeste wat dit inneem."
+
+[messages.settings-page-performance-blurb-desktop]
+source = "How hard Hoard works, how thumbnails are made and kept, and the most it takes in."
+translation = "Hoe hard Hoard werk, hoe duimnaels gemaak en gehou word, en die meeste wat dit inneem."
 
 [messages.settings-page-search]
 source = "Image search"
@@ -8922,6 +8998,10 @@ translation = "MIDI-SoundFont"
 source = "found on the server, or built-in"
 translation = "op die bediener gevind, of ingebou"
 
+[messages.settings-soundfont-default-desktop]
+source = "found on this computer, or built-in"
+translation = "op hierdie rekenaar gevind, of ingebou"
+
 [messages.settings-soundfont-file]
 source = "SoundFont file"
 translation = "SoundFont-lêer"
@@ -8929,6 +9009,10 @@ translation = "SoundFont-lêer"
 [messages.settings-soundfont-placeholder]
 source = "Found on the server, or built-in"
 translation = "Op die bediener gevind, of ingebou"
+
+[messages.settings-soundfont-placeholder-desktop]
+source = "Found on this computer, or built-in"
+translation = "Op hierdie rekenaar gevind, of ingebou"
 
 [messages.settings-soundfont-what]
 source = "The instruments MIDI files are played and converted with."
@@ -9198,6 +9282,10 @@ translation = "take gelyktydig (invoer, etikettering, omskakelings)"
 source = "Pick a folder on the server for Hoard to keep your packs in, or point it at a folder of packs you already have. You can add more locations, on other disks, from Settings later."
 translation = "Kies 'n vouer op die bediener waarin Hoard jou pakke hou, of wys dit na 'n vouer met pakke wat jy reeds het. Jy kan later meer liggings, op ander skywe, vanaf Instellings byvoeg."
 
+[messages.setup-lede-desktop]
+source = "Pick a folder for Hoard to keep your packs in, or point it at a folder of packs you already have. You can add more locations, on other disks, from Settings later."
+translation = "Kies 'n vouer waarin Hoard jou pakke hou, of wys dit na 'n vouer met pakke wat jy reeds het. Jy kan later meer liggings, op ander skywe, vanaf Instellings byvoeg."
+
 [messages.setup-loading]
 source = "Loading…"
 translation = "Laai…"
@@ -9233,6 +9321,10 @@ translation = "Probeer weer"
 [messages.setup-unreachable]
 source = "Couldn't reach the server: { $error }"
 translation = "Kon nie die bediener bereik nie: { $error }"
+
+[messages.setup-unreachable-desktop]
+source = "Hoard isn't answering: { $error }"
+translation = "Hoard antwoord nie: { $error }"
 
 [messages.setup-watched-after]
 source = "; packs show up as it finds them. To upload as well, add a library Hoard keeps from Settings → Library locations."

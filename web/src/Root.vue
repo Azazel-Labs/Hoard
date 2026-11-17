@@ -3,7 +3,7 @@
 import { onMounted } from 'vue'
 import App from './App.vue'
 import SignIn from './components/SignIn.vue'
-import { auth, canBrowse, refreshAuth } from './auth'
+import { auth, canBrowse, isDesktop, refreshAuth } from './auth'
 import { lazy } from './lazy'
 import { t } from './i18n'
 
@@ -25,6 +25,7 @@ async function signedIn() {
     <p>{{ t('root-unreachable', { error: auth.error }) }}</p>
     <button type="button" class="btn" @click="refreshAuth">{{ t('root-try-again') }}</button>
   </div>
+  <p v-else-if="isDesktop() && !auth.status?.signed_in" class="reopen" role="alert">{{ t('root-desktop-reopen') }}</p>
   <SignIn v-else-if="auth.status?.setup_needed" mode="setup" @done="signedIn" />
   <template v-else-if="auth.status && connecting">
     <ConnectApp v-if="auth.status.signed_in" />
@@ -40,4 +41,5 @@ async function signedIn() {
 <style scoped>
 .unreachable { display: grid; gap: 0.6rem; justify-items: start; max-width: 32rem; margin: 15vh auto; padding: 0 1rem; color: var(--danger); }
 .unreachable p { margin: 0; }
+.reopen { max-width: 32rem; margin: 15vh auto; padding: 0 1rem; color: var(--muted); }
 </style>

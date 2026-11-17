@@ -24,6 +24,10 @@ translation = "Claude とその他の AI アプリ"
 source = "Connect Claude (or any MCP app) and it can search and fetch assets for you, and describe and tag what Hoard hasn’t yet. It signs in to Hoard the first time; you allow it here in the browser."
 translation = "Claude（または任意の MCP アプリ）を接続すると、代わりにアセットを検索して取得したり、Hoard がまだ説明していないものに説明とタグを付けたりできます。最初に Hoard へのサインインがあり、ここでブラウザーから許可します。"
 
+[messages.account-app-signin]
+source = "The Hoard app signs you in by itself, so there’s no password. Make an access token below for the engine plugins and the hoard command."
+translation = "Hoard アプリが自動でサインインするので、パスワードはありません。エンジンのプラグインや hoard コマンド用のアクセストークンは下で作成できます。"
+
 [messages.account-change-password]
 source = "Change password"
 translation = "パスワードを変更"
@@ -431,6 +435,10 @@ translation = "バックグラウンド処理"
 [messages.activity-unreachable]
 source = "Can't reach the server"
 translation = "サーバーに接続できません"
+
+[messages.activity-unreachable-desktop]
+source = "Hoard isn't answering"
+translation = "Hoard が応答していません"
 
 [messages.api-kind-animation]
 source = "Animations"
@@ -1283,6 +1291,10 @@ translation = "パック"
 [messages.app-unreachable]
 source = "Couldn't reach the server: { $error }"
 translation = "サーバーに接続できませんでした: { $error }"
+
+[messages.app-unreachable-desktop]
+source = "Hoard isn't answering: { $error }"
+translation = "Hoard が応答していません: { $error }"
 
 [messages.app-update]
 source = "Update"
@@ -3094,6 +3106,10 @@ translation = "このサインインはここで開始されたものではな�
 source = "ChatGPT answered for a different registration of this server; start the sign-in again"
 translation = "ChatGPT がこのサーバーの別の登録に対して応答しました。サインインをやり直してください"
 
+[messages.error-chatgpt-other-registration-desktop]
+source = "ChatGPT answered for a different copy of Hoard; start the sign-in again"
+translation = "ChatGPT が Hoard の別のコピーに対して応答しました。サインインをやり直してください"
+
 [messages.error-chatgpt-paste-address]
 source = "paste the whole address, starting with http://127.0.0.1"
 translation = "http://127.0.0.1 で始まるアドレス全体を貼り付けてください"
@@ -3130,9 +3146,17 @@ translation = "リクエストに失敗しました"
 source = "ChatGPT signed this server out ({ $code }); sign in again from Settings → AI tagging"
 translation = "ChatGPT がこのサーバーをサインアウトしました（{ $code }）。設定 → AI タグ付け からもう一度サインインしてください"
 
+[messages.error-chatgpt-signed-out-desktop]
+source = "ChatGPT signed Hoard out ({ $code }); sign in again from Settings → AI tagging"
+translation = "ChatGPT が Hoard をサインアウトしました（{ $code }）。設定 → AI タグ付け からもう一度サインインしてください"
+
 [messages.error-chatgpt-signed-out-problem]
 source = "ChatGPT signed this server out ({ $code }). Sign in again to keep tagging with your plan."
 translation = "ChatGPT がこのサーバーをサインアウトしました（{ $code }）。プランでタグ付けを続けるには、もう一度サインインしてください。"
+
+[messages.error-chatgpt-signed-out-problem-desktop]
+source = "ChatGPT signed Hoard out ({ $code }). Sign in again to keep tagging with your plan."
+translation = "ChatGPT が Hoard をサインアウトしました（{ $code }）。プランでタグ付けを続けるには、もう一度サインインしてください。"
 
 [messages.error-chatgpt-unsupported]
 source = "ChatGPT plan usage doesn't support { $param } with this model"
@@ -3570,6 +3594,10 @@ translation = "ファイルの移動先となる別のライブラリの保存�
 source = "There's no SoundFont at { $path } on the server"
 translation = "サーバーの { $path } に SoundFont がありません"
 
+[messages.error-no-soundfont-desktop]
+source = "There's no SoundFont at { $path }"
+translation = "{ $path } に SoundFont がありません"
+
 [messages.error-not-a-hash]
 source = "not a blake3 hex hash"
 translation = "blake3 の 16 進ハッシュではありません"
@@ -3597,6 +3625,10 @@ translation = "{ $url } はルーターモードの llama.cpp サーバーでは
 [messages.error-not-started]
 source = "the server hasn't started"
 translation = "サーバーが起動していません"
+
+[messages.error-not-started-desktop]
+source = "Hoard hasn't started"
+translation = "Hoard が起動していません"
 
 [messages.error-not-watched]
 source = "{ $name } isn't a watched folder"
@@ -5204,6 +5236,10 @@ translation = "アップロードには Hoard が管理するライブラリが�
 source = "Folder on the server"
 translation = "サーバー上のフォルダー"
 
+[messages.locations-folder-desktop]
+source = "Folder"
+translation = "フォルダー"
+
 [messages.locations-folder-hint-managed]
 source = "Hoard creates it if it isn't there. In Docker, this is a folder you've mounted into the container."
 translation = "フォルダーがなければ Hoard が作成します。Docker では、コンテナーにマウントしたフォルダーを指定します。"
@@ -5860,6 +5896,10 @@ translation = "{ $name } を 3D で表示"
 source = "the server is still converting this model"
 translation = "サーバーがまだこのモデルを変換中です"
 
+[messages.model-error-converting-desktop]
+source = "Hoard is still converting this model"
+translation = "Hoard がまだこのモデルを変換中です"
+
 [messages.model-error-empty-collada]
 source = "empty Collada file"
 translation = "空の Collada ファイルです"
@@ -6514,6 +6554,10 @@ translation = "このブラウザーでサムネイルを作成"
 [messages.packs-make-thumbs-title]
 source = "Open each model in a 3D viewer out of sight, one at a time, and use its picture as the thumbnail where that's better than the server's"
 translation = "各モデルを見えない 3D ビューアーで 1 つずつ開き、サーバーのものより良い場合はその画像をサムネイルにします"
+
+[messages.packs-make-thumbs-title-desktop]
+source = "Open each model in a 3D viewer out of sight, one at a time, and use its picture as the thumbnail where that's better than the one Hoard made"
+translation = "各モデルを見えない 3D ビューアーで 1 つずつ開き、Hoard が作ったものより良い場合はその画像をサムネイルにします"
 
 [messages.packs-more]
 source = "More"
@@ -7353,6 +7397,10 @@ translation = "既定値（{ $value }）に戻す"
 source = "Reset to the default: { $value }"
 translation = "既定値に戻す: { $value }"
 
+[messages.root-desktop-reopen]
+source = "This window was signed out. Close Hoard and open it again to carry on."
+translation = "このウィンドウはサインアウトされました。続けるには Hoard を閉じてもう一度開いてください。"
+
 [messages.root-lazy-connect]
 source = "the app connection"
 translation = "アプリ接続"
@@ -7364,6 +7412,10 @@ translation = "再試行"
 [messages.root-unreachable]
 source = "Couldn’t reach the Hoard server: { $error }"
 translation = "Hoard サーバーに接続できませんでした: { $error }"
+
+[messages.root-unreachable-desktop]
+source = "Hoard isn’t answering: { $error }"
+translation = "Hoard が応答していません: { $error }"
 
 [messages.server-back-to-settings]
 source = "Back to Settings"
@@ -8033,6 +8085,10 @@ translation = "写っている内容で画像を検索"
 source = "Uses OpenAI’s CLIP model, run on this server’s processor: nothing leaves it. Turning it on downloads the model ({ $size } MB) from Hugging Face, then learns every picture in the background at low priority. It takes 300 to 600 MB of memory while it works or someone searches. Turning it off deletes the model and keeps what it learned, for next time."
 translation = "OpenAI の CLIP モデルをこのサーバーのプロセッサーで実行するので、外部には何も送られません。オンにすると Hugging Face からモデル（{ $size } MB）をダウンロードし、すべての画像をバックグラウンドで低い優先度で学習します。学習中や検索中は 300～600 MB のメモリを使います。オフにするとモデルは削除されますが、学習した内容は次回のために残ります。"
 
+[messages.settings-clip-hint-desktop]
+source = "Uses OpenAI’s CLIP model, run on this computer’s processor: nothing leaves it. Turning it on downloads the model ({ $size } MB) from Hugging Face, then learns every picture in the background at low priority. It takes 300 to 600 MB of memory while it works or you search. Turning it off deletes the model and keeps what it learned, for next time."
+translation = "OpenAI の CLIP モデルをこのコンピューターのプロセッサーで実行するので、外部には何も送られません。オンにすると Hugging Face からモデル（{ $size } MB）をダウンロードし、すべての画像をバックグラウンドで低い優先度で学習します。学習中や検索中は 300～600 MB のメモリを使います。オフにするとモデルは削除されますが、学習した内容は次回のために残ります。"
+
 [messages.settings-clip-learning]
 source = "Ready: learning pictures, { $done } of { $total } so far"
 translation = "準備完了: 画像を学習中です（{ $total } 枚中 { $done } 枚）"
@@ -8319,6 +8375,10 @@ translation = "オフ"
 source = "on"
 translation = "オン"
 
+[messages.settings-desktop-updates]
+source = "Hoard looks for a new release each time it starts, downloads it in the background, and installs it when you quit."
+translation = "Hoard は起動するたびに新しいリリースを探し、バックグラウンドでダウンロードして、終了するときにインストールします。"
+
 [messages.settings-ffmpeg-download]
 source = "Uses a system ffmpeg with the right encoders, or downloads a static build (about 80 MB)."
 translation = "必要なエンコーダーを備えたシステムの ffmpeg を使うか、静的ビルド（約 80 MB）をダウンロードします。"
@@ -8543,6 +8603,10 @@ translation = "名前"
 source = "What this server is called in the top bar, the browser tab and on the sign-in page, so with more than one hoard you can tell which is which."
 translation = "上部バー、ブラウザーのタブ、サインインページに表示されるこのサーバーの名前です。Hoard が複数あるときに見分けられます。"
 
+[messages.settings-name-what-desktop]
+source = "What this library is called in the top bar."
+translation = "上部バーに表示されるこのライブラリの名前です。"
+
 [messages.settings-option-saved]
 source = "{ $name }: { $value }"
 translation = "{ $name }: { $value }"
@@ -8611,6 +8675,10 @@ translation = "一般"
 source = "What this server is called, for everyone who uses it."
 translation = "このサーバーの名前です。使う人全員に表示されます。"
 
+[messages.settings-page-general-blurb-desktop]
+source = "What this library is called."
+translation = "このライブラリの名前です。"
+
 [messages.settings-page-issues]
 source = "Issues"
 translation = "問題"
@@ -8635,6 +8703,10 @@ translation = "ライブラリの保存場所"
 source = "The folders on the server that hold the library: ones Hoard keeps files in, and folders of packs it indexes where they are."
 translation = "ライブラリを置くサーバー上のフォルダーです。Hoard がファイルを保管するフォルダーと、その場でインデックスするパックのフォルダーがあります。"
 
+[messages.settings-page-locations-blurb-desktop]
+source = "The folders that hold the library: ones Hoard keeps files in, and folders of packs it indexes where they are."
+translation = "ライブラリを置くフォルダーです。Hoard がファイルを保管するフォルダーと、その場でインデックスするパックのフォルダーがあります。"
+
 [messages.settings-page-maintenance]
 source = "Maintenance"
 translation = "メンテナンス"
@@ -8650,6 +8722,10 @@ translation = "パフォーマンス"
 [messages.settings-page-performance-blurb]
 source = "How hard the server works, how thumbnails are made and kept, and the most it takes in."
 translation = "サーバーの稼働の度合い、サムネイルの作成と保存の方法、受け付ける上限です。"
+
+[messages.settings-page-performance-blurb-desktop]
+source = "How hard Hoard works, how thumbnails are made and kept, and the most it takes in."
+translation = "Hoard の稼働の度合い、サムネイルの作成と保存の方法、受け付ける上限です。"
 
 [messages.settings-page-search]
 source = "Image search"
@@ -8755,6 +8831,10 @@ translation = "MIDI SoundFont"
 source = "found on the server, or built-in"
 translation = "サーバー上で見つかったもの、または組み込み"
 
+[messages.settings-soundfont-default-desktop]
+source = "found on this computer, or built-in"
+translation = "このコンピューターで見つかったもの、または組み込み"
+
 [messages.settings-soundfont-file]
 source = "SoundFont file"
 translation = "SoundFont ファイル"
@@ -8762,6 +8842,10 @@ translation = "SoundFont ファイル"
 [messages.settings-soundfont-placeholder]
 source = "Found on the server, or built-in"
 translation = "サーバー上で見つかったもの、または組み込み"
+
+[messages.settings-soundfont-placeholder-desktop]
+source = "Found on this computer, or built-in"
+translation = "このコンピューターで見つかったもの、または組み込み"
 
 [messages.settings-soundfont-what]
 source = "The instruments MIDI files are played and converted with."
@@ -9031,6 +9115,10 @@ translation = "件のジョブを同時に実行（取り込み、タグ付け�
 source = "Pick a folder on the server for Hoard to keep your packs in, or point it at a folder of packs you already have. You can add more locations, on other disks, from Settings later."
 translation = "Hoard がパックを保存するサーバー上のフォルダーを選ぶか、すでにあるパックのフォルダーを指定してください。ほかのディスクの保存場所は、後で設定から追加できます。"
 
+[messages.setup-lede-desktop]
+source = "Pick a folder for Hoard to keep your packs in, or point it at a folder of packs you already have. You can add more locations, on other disks, from Settings later."
+translation = "Hoard がパックを保存するフォルダーを選ぶか、すでにあるパックのフォルダーを指定してください。ほかのディスクの保存場所は、後で設定から追加できます。"
+
 [messages.setup-loading]
 source = "Loading…"
 translation = "読み込み中…"
@@ -9066,6 +9154,10 @@ translation = "もう一度試す"
 [messages.setup-unreachable]
 source = "Couldn't reach the server: { $error }"
 translation = "サーバーに接続できませんでした: { $error }"
+
+[messages.setup-unreachable-desktop]
+source = "Hoard isn't answering: { $error }"
+translation = "Hoard が応答していません: { $error }"
 
 [messages.setup-watched-after]
 source = "; packs show up as it finds them. To upload as well, add a library Hoard keeps from Settings → Library locations."

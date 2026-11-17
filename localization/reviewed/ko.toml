@@ -24,6 +24,10 @@ translation = "Claude 및 다른 AI 앱"
 source = "Connect Claude (or any MCP app) and it can search and fetch assets for you, and describe and tag what Hoard hasn’t yet. It signs in to Hoard the first time; you allow it here in the browser."
 translation = "Claude(또는 MCP 앱)를 연결하면 대신 에셋을 검색하고 가져오며, Hoard가 아직 설명하거나 태그하지 않은 것을 설명하고 태그할 수 있습니다. 처음에 Hoard에 로그인하며, 여기 브라우저에서 허용하면 됩니다."
 
+[messages.account-app-signin]
+source = "The Hoard app signs you in by itself, so there’s no password. Make an access token below for the engine plugins and the hoard command."
+translation = "Hoard 앱이 알아서 로그인하므로 비밀번호가 없습니다. 엔진 플러그인과 hoard 명령에 쓸 액세스 토큰은 아래에서 만드세요."
+
 [messages.account-change-password]
 source = "Change password"
 translation = "비밀번호 변경"
@@ -431,6 +435,10 @@ translation = "백그라운드 작업"
 [messages.activity-unreachable]
 source = "Can't reach the server"
 translation = "서버에 연결할 수 없습니다"
+
+[messages.activity-unreachable-desktop]
+source = "Hoard isn't answering"
+translation = "Hoard가 응답하지 않습니다"
 
 [messages.api-kind-animation]
 source = "Animations"
@@ -1283,6 +1291,10 @@ translation = "팩"
 [messages.app-unreachable]
 source = "Couldn't reach the server: { $error }"
 translation = "서버에 연결할 수 없습니다: { $error }"
+
+[messages.app-unreachable-desktop]
+source = "Hoard isn't answering: { $error }"
+translation = "Hoard가 응답하지 않습니다: { $error }"
 
 [messages.app-update]
 source = "Update"
@@ -3085,6 +3097,10 @@ translation = "이 로그인은 여기서 시작되지 않았거나 시작한 �
 source = "ChatGPT answered for a different registration of this server; start the sign-in again"
 translation = "ChatGPT가 이 서버의 다른 등록에 대해 응답했습니다. 로그인을 다시 시작하세요"
 
+[messages.error-chatgpt-other-registration-desktop]
+source = "ChatGPT answered for a different copy of Hoard; start the sign-in again"
+translation = "ChatGPT가 다른 Hoard 사본에 대해 응답했습니다. 로그인을 다시 시작하세요"
+
 [messages.error-chatgpt-paste-address]
 source = "paste the whole address, starting with http://127.0.0.1"
 translation = "http://127.0.0.1로 시작하는 주소 전체를 붙여 넣으세요"
@@ -3121,9 +3137,17 @@ translation = "요청이 실패했습니다"
 source = "ChatGPT signed this server out ({ $code }); sign in again from Settings → AI tagging"
 translation = "ChatGPT가 이 서버를 로그아웃시켰습니다({ $code }). 설정 → AI 태깅에서 다시 로그인하세요"
 
+[messages.error-chatgpt-signed-out-desktop]
+source = "ChatGPT signed Hoard out ({ $code }); sign in again from Settings → AI tagging"
+translation = "ChatGPT가 Hoard를 로그아웃시켰습니다({ $code }). 설정 → AI 태깅에서 다시 로그인하세요"
+
 [messages.error-chatgpt-signed-out-problem]
 source = "ChatGPT signed this server out ({ $code }). Sign in again to keep tagging with your plan."
 translation = "ChatGPT가 이 서버를 로그아웃시켰습니다({ $code }). 요금제로 계속 태깅하려면 다시 로그인하세요."
+
+[messages.error-chatgpt-signed-out-problem-desktop]
+source = "ChatGPT signed Hoard out ({ $code }). Sign in again to keep tagging with your plan."
+translation = "ChatGPT가 Hoard를 로그아웃시켰습니다({ $code }). 요금제로 계속 태깅하려면 다시 로그인하세요."
 
 [messages.error-chatgpt-unsupported]
 source = "ChatGPT plan usage doesn't support { $param } with this model"
@@ -3561,6 +3585,10 @@ translation = "파일을 옮길 다른 라이브러리 위치가 없습니다. �
 source = "There's no SoundFont at { $path } on the server"
 translation = "서버의 { $path }에 SoundFont가 없습니다"
 
+[messages.error-no-soundfont-desktop]
+source = "There's no SoundFont at { $path }"
+translation = "{ $path }에 SoundFont가 없습니다"
+
 [messages.error-not-a-hash]
 source = "not a blake3 hex hash"
 translation = "blake3 16진수 해시가 아닙니다"
@@ -3588,6 +3616,10 @@ translation = "{ $url }은(는) 라우터 모드의 llama.cpp 서버가 아니�
 [messages.error-not-started]
 source = "the server hasn't started"
 translation = "서버가 시작되지 않았습니다"
+
+[messages.error-not-started-desktop]
+source = "Hoard hasn't started"
+translation = "Hoard가 시작되지 않았습니다"
 
 [messages.error-not-watched]
 source = "{ $name } isn't a watched folder"
@@ -5184,6 +5216,10 @@ translation = "업로드하려면 Hoard가 관리하는 라이브러리가 필�
 source = "Folder on the server"
 translation = "서버의 폴더"
 
+[messages.locations-folder-desktop]
+source = "Folder"
+translation = "폴더"
+
 [messages.locations-folder-hint-managed]
 source = "Hoard creates it if it isn't there. In Docker, this is a folder you've mounted into the container."
 translation = "폴더가 없으면 Hoard가 만듭니다. Docker에서는 컨테이너에 마운트한 폴더입니다."
@@ -5840,6 +5876,10 @@ translation = "{ $name } 3D로 보기"
 source = "the server is still converting this model"
 translation = "서버에서 아직 이 모델을 변환하는 중입니다"
 
+[messages.model-error-converting-desktop]
+source = "Hoard is still converting this model"
+translation = "Hoard가 아직 이 모델을 변환하는 중입니다"
+
 [messages.model-error-empty-collada]
 source = "empty Collada file"
 translation = "빈 Collada 파일입니다"
@@ -6494,6 +6534,10 @@ translation = "이 브라우저에서 썸네일 만들기"
 [messages.packs-make-thumbs-title]
 source = "Open each model in a 3D viewer out of sight, one at a time, and use its picture as the thumbnail where that's better than the server's"
 translation = "보이지 않는 3D 뷰어에서 모델을 하나씩 열고, 서버의 썸네일보다 나은 경우 그 그림을 썸네일로 사용합니다"
+
+[messages.packs-make-thumbs-title-desktop]
+source = "Open each model in a 3D viewer out of sight, one at a time, and use its picture as the thumbnail where that's better than the one Hoard made"
+translation = "보이지 않는 3D 뷰어에서 모델을 하나씩 열고, Hoard가 만든 썸네일보다 나은 경우 그 그림을 썸네일로 사용합니다"
 
 [messages.packs-more]
 source = "More"
@@ -7315,6 +7359,10 @@ translation = "기본값으로 되돌리기, { $value }"
 source = "Reset to the default: { $value }"
 translation = "기본값으로 되돌리기: { $value }"
 
+[messages.root-desktop-reopen]
+source = "This window was signed out. Close Hoard and open it again to carry on."
+translation = "이 창은 로그아웃되었습니다. 계속하려면 Hoard를 닫았다가 다시 여세요."
+
 [messages.root-lazy-connect]
 source = "the app connection"
 translation = "앱 연결"
@@ -7326,6 +7374,10 @@ translation = "다시 시도"
 [messages.root-unreachable]
 source = "Couldn’t reach the Hoard server: { $error }"
 translation = "Hoard 서버에 연결할 수 없습니다: { $error }"
+
+[messages.root-unreachable-desktop]
+source = "Hoard isn’t answering: { $error }"
+translation = "Hoard가 응답하지 않습니다: { $error }"
 
 [messages.server-back-to-settings]
 source = "Back to Settings"
@@ -7995,6 +8047,10 @@ translation = "그림 내용으로 검색"
 source = "Uses OpenAI’s CLIP model, run on this server’s processor: nothing leaves it. Turning it on downloads the model ({ $size } MB) from Hugging Face, then learns every picture in the background at low priority. It takes 300 to 600 MB of memory while it works or someone searches. Turning it off deletes the model and keeps what it learned, for next time."
 translation = "OpenAI의 CLIP 모델을 이 서버의 프로세서에서 실행하므로 아무것도 밖으로 나가지 않습니다. 켜면 Hugging Face에서 모델({ $size } MB)을 다운로드한 다음, 낮은 우선순위로 백그라운드에서 모든 그림을 학습합니다. 학습하거나 누군가 검색하는 동안 메모리를 300~600 MB 사용합니다. 끄면 모델은 삭제되지만 학습한 내용은 다음을 위해 남겨 둡니다."
 
+[messages.settings-clip-hint-desktop]
+source = "Uses OpenAI’s CLIP model, run on this computer’s processor: nothing leaves it. Turning it on downloads the model ({ $size } MB) from Hugging Face, then learns every picture in the background at low priority. It takes 300 to 600 MB of memory while it works or you search. Turning it off deletes the model and keeps what it learned, for next time."
+translation = "OpenAI의 CLIP 모델을 이 컴퓨터의 프로세서에서 실행하므로 아무것도 밖으로 나가지 않습니다. 켜면 Hugging Face에서 모델({ $size } MB)을 다운로드한 다음, 낮은 우선순위로 백그라운드에서 모든 그림을 학습합니다. 학습하거나 검색하는 동안 메모리를 300~600 MB 사용합니다. 끄면 모델은 삭제되지만 학습한 내용은 다음을 위해 남겨 둡니다."
+
 [messages.settings-clip-learning]
 source = "Ready: learning pictures, { $done } of { $total } so far"
 translation = "준비됨: 그림 학습 중, 지금까지 { $total }개 중 { $done }개"
@@ -8278,6 +8334,10 @@ translation = "꺼짐"
 source = "on"
 translation = "켜짐"
 
+[messages.settings-desktop-updates]
+source = "Hoard looks for a new release each time it starts, downloads it in the background, and installs it when you quit."
+translation = "Hoard는 시작할 때마다 새 릴리스를 찾아 백그라운드에서 내려받고, 종료할 때 설치합니다."
+
 [messages.settings-ffmpeg-download]
 source = "Uses a system ffmpeg with the right encoders, or downloads a static build (about 80 MB)."
 translation = "필요한 인코더가 있는 시스템 ffmpeg를 사용하거나, 정적 빌드(약 80 MB)를 다운로드합니다."
@@ -8502,6 +8562,10 @@ translation = "이름"
 source = "What this server is called in the top bar, the browser tab and on the sign-in page, so with more than one hoard you can tell which is which."
 translation = "상단 바, 브라우저 탭, 로그인 페이지에 표시되는 이 서버의 이름입니다. Hoard가 여러 개일 때 구분할 수 있습니다."
 
+[messages.settings-name-what-desktop]
+source = "What this library is called in the top bar."
+translation = "상단 바에 표시되는 이 라이브러리의 이름입니다."
+
 [messages.settings-option-saved]
 source = "{ $name }: { $value }"
 translation = "{ $name }: { $value }"
@@ -8570,6 +8634,10 @@ translation = "일반"
 source = "What this server is called, for everyone who uses it."
 translation = "이 서버를 사용하는 모든 사람에게 보이는 서버 이름입니다."
 
+[messages.settings-page-general-blurb-desktop]
+source = "What this library is called."
+translation = "이 라이브러리의 이름입니다."
+
 [messages.settings-page-issues]
 source = "Issues"
 translation = "문제"
@@ -8594,6 +8662,10 @@ translation = "라이브러리 위치"
 source = "The folders on the server that hold the library: ones Hoard keeps files in, and folders of packs it indexes where they are."
 translation = "라이브러리를 담는 서버의 폴더입니다. Hoard가 파일을 보관하는 폴더와, 제자리에서 색인하는 팩 폴더가 있습니다."
 
+[messages.settings-page-locations-blurb-desktop]
+source = "The folders that hold the library: ones Hoard keeps files in, and folders of packs it indexes where they are."
+translation = "라이브러리를 담는 폴더입니다. Hoard가 파일을 보관하는 폴더와, 제자리에서 색인하는 팩 폴더가 있습니다."
+
 [messages.settings-page-maintenance]
 source = "Maintenance"
 translation = "유지 관리"
@@ -8609,6 +8681,10 @@ translation = "성능"
 [messages.settings-page-performance-blurb]
 source = "How hard the server works, how thumbnails are made and kept, and the most it takes in."
 translation = "서버가 얼마나 일하는지, 썸네일을 만들고 보관하는 방식, 받을 수 있는 최대 크기입니다."
+
+[messages.settings-page-performance-blurb-desktop]
+source = "How hard Hoard works, how thumbnails are made and kept, and the most it takes in."
+translation = "Hoard가 얼마나 일하는지, 썸네일을 만들고 보관하는 방식, 받을 수 있는 최대 크기입니다."
 
 [messages.settings-page-search]
 source = "Image search"
@@ -8714,6 +8790,10 @@ translation = "MIDI SoundFont"
 source = "found on the server, or built-in"
 translation = "서버에서 찾거나 기본 제공"
 
+[messages.settings-soundfont-default-desktop]
+source = "found on this computer, or built-in"
+translation = "이 컴퓨터에서 찾거나 기본 제공"
+
 [messages.settings-soundfont-file]
 source = "SoundFont file"
 translation = "SoundFont 파일"
@@ -8721,6 +8801,10 @@ translation = "SoundFont 파일"
 [messages.settings-soundfont-placeholder]
 source = "Found on the server, or built-in"
 translation = "서버에서 찾거나 기본 제공"
+
+[messages.settings-soundfont-placeholder-desktop]
+source = "Found on this computer, or built-in"
+translation = "이 컴퓨터에서 찾거나 기본 제공"
 
 [messages.settings-soundfont-what]
 source = "The instruments MIDI files are played and converted with."
@@ -8990,6 +9074,10 @@ translation = "동시 작업 수(가져오기, 태깅, 변환)"
 source = "Pick a folder on the server for Hoard to keep your packs in, or point it at a folder of packs you already have. You can add more locations, on other disks, from Settings later."
 translation = "Hoard가 팩을 보관할 서버의 폴더를 고르거나, 이미 가지고 있는 팩 폴더를 지정하세요. 나중에 설정에서 다른 디스크의 위치를 더 추가할 수 있습니다."
 
+[messages.setup-lede-desktop]
+source = "Pick a folder for Hoard to keep your packs in, or point it at a folder of packs you already have. You can add more locations, on other disks, from Settings later."
+translation = "Hoard가 팩을 보관할 폴더를 고르거나, 이미 가지고 있는 팩 폴더를 지정하세요. 나중에 설정에서 다른 디스크의 위치를 더 추가할 수 있습니다."
+
 [messages.setup-loading]
 source = "Loading…"
 translation = "불러오는 중…"
@@ -9025,6 +9113,10 @@ translation = "다시 시도"
 [messages.setup-unreachable]
 source = "Couldn't reach the server: { $error }"
 translation = "서버에 연결하지 못했습니다: { $error }"
+
+[messages.setup-unreachable-desktop]
+source = "Hoard isn't answering: { $error }"
+translation = "Hoard가 응답하지 않습니다: { $error }"
 
 [messages.setup-watched-after]
 source = "; packs show up as it finds them. To upload as well, add a library Hoard keeps from Settings → Library locations."

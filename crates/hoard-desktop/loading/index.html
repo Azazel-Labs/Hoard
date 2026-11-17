@@ -1,0 +1,46 @@
+<!doctype html>
+<!-- What the window shows while the server inside the app starts (it goes on to the library in a moment), or why
+     it couldn't. -->
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Hoard</title>
+    <style>
+      :root { color-scheme: light dark; --bg: #f6f7f9; --text: #1c2230; --muted: #5b6475; --danger: #b3261e; }
+      @media (prefers-color-scheme: dark) { :root { --bg: #12161f; --text: #e6e9ef; --muted: #98a1b3; --danger: #f2b8b5; } }
+      html, body { height: 100%; margin: 0; }
+      body { display: grid; place-items: center; background: var(--bg); color: var(--text); font: 15px/1.5 system-ui, sans-serif; }
+      main { display: grid; justify-items: center; gap: 1.25rem; max-width: 36rem; padding: 0 1.5rem; text-align: center; }
+      svg { width: 72px; height: 72px; }
+      svg rect.tile { animation: pulse 1.2s ease-in-out infinite; }
+      svg rect.tile:nth-of-type(3) { animation-delay: 0.15s; }
+      svg rect.tile:nth-of-type(5) { animation-delay: 0.3s; }
+      svg rect.tile:nth-of-type(4) { animation-delay: 0.45s; }
+      @keyframes pulse { 50% { opacity: 0.35; } }
+      @media (prefers-reduced-motion: reduce) { svg rect.tile { animation: none; } }
+      .failed svg rect.tile { animation: none; opacity: 0.35; }
+      #error { display: none; margin: 0; color: var(--danger); white-space: pre-wrap; overflow-wrap: anywhere; }
+      .failed #error { display: block; }
+    </style>
+  </head>
+  <body>
+    <main>
+      <svg viewBox="0 0 32 32" aria-hidden="true">
+        <rect width="32" height="32" rx="7" fill="#1c2230" />
+        <rect class="tile" x="6" y="6" width="9" height="9" rx="2" fill="#5fb3a1" />
+        <rect class="tile" x="17" y="6" width="9" height="9" rx="2" fill="#c792ea" />
+        <rect class="tile" x="6" y="17" width="9" height="9" rx="2" fill="#e6b450" />
+        <rect class="tile" x="17" y="17" width="9" height="9" rx="2" fill="#7fb4e6" />
+      </svg>
+      <p id="error" role="alert"></p>
+    </main>
+    <script>
+      // The app calls this if the server couldn't start.
+      window.failed = (message) => {
+        document.getElementById('error').textContent = message
+        document.body.classList.add('failed')
+      }
+    </script>
+  </body>
+</html>

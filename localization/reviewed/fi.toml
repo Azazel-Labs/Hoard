@@ -24,6 +24,10 @@ translation = "Claude ja muut tekoälysovellukset"
 source = "Connect Claude (or any MCP app) and it can search and fetch assets for you, and describe and tag what Hoard hasn’t yet. It signs in to Hoard the first time; you allow it here in the browser."
 translation = "Yhdistä Claude (tai mikä tahansa MCP-sovellus), niin se voi hakea ja noutaa resursseja puolestasi sekä kuvailla ja merkitä tunnisteilla sen, mitä Hoard ei ole vielä tehnyt. Se kirjautuu Hoardiin ensimmäisellä kerralla; sinä sallit sen täällä selaimessa."
 
+[messages.account-app-signin]
+source = "The Hoard app signs you in by itself, so there’s no password. Make an access token below for the engine plugins and the hoard command."
+translation = "Hoard-sovellus kirjaa sinut sisään itse, joten salasanaa ei ole. Luo alla käyttöoikeustunnus pelimoottorien laajennuksille ja hoard-komennolle."
+
 [messages.account-change-password]
 source = "Change password"
 translation = "Vaihda salasana"
@@ -431,6 +435,10 @@ translation = "Taustatoiminta"
 [messages.activity-unreachable]
 source = "Can't reach the server"
 translation = "Palvelinta ei tavoiteta"
+
+[messages.activity-unreachable-desktop]
+source = "Hoard isn't answering"
+translation = "Hoard ei vastaa"
 
 [messages.api-kind-animation]
 source = "Animations"
@@ -1323,6 +1331,10 @@ translation = "paketti"
 [messages.app-unreachable]
 source = "Couldn't reach the server: { $error }"
 translation = "Palvelinta ei tavoitettu: { $error }"
+
+[messages.app-unreachable-desktop]
+source = "Hoard isn't answering: { $error }"
+translation = "Hoard ei vastaa: { $error }"
 
 [messages.app-update]
 source = "Update"
@@ -3180,6 +3192,10 @@ translation = "tätä kirjautumista ei aloitettu täällä, tai se aloitettiin y
 source = "ChatGPT answered for a different registration of this server; start the sign-in again"
 translation = "ChatGPT vastasi tämän palvelimen toiselle rekisteröinnille; aloita kirjautuminen uudelleen"
 
+[messages.error-chatgpt-other-registration-desktop]
+source = "ChatGPT answered for a different copy of Hoard; start the sign-in again"
+translation = "ChatGPT vastasi Hoardin toiselle kopiolle; aloita kirjautuminen uudelleen"
+
 [messages.error-chatgpt-paste-address]
 source = "paste the whole address, starting with http://127.0.0.1"
 translation = "liitä koko osoite, joka alkaa http://127.0.0.1"
@@ -3216,9 +3232,17 @@ translation = "pyyntö epäonnistui"
 source = "ChatGPT signed this server out ({ $code }); sign in again from Settings → AI tagging"
 translation = "ChatGPT kirjasi tämän palvelimen ulos ({ $code }); kirjaudu uudelleen kohdassa Asetukset → Tekoälytunnisteet"
 
+[messages.error-chatgpt-signed-out-desktop]
+source = "ChatGPT signed Hoard out ({ $code }); sign in again from Settings → AI tagging"
+translation = "ChatGPT kirjasi Hoardin ulos ({ $code }); kirjaudu uudelleen kohdassa Asetukset → Tekoälytunnisteet"
+
 [messages.error-chatgpt-signed-out-problem]
 source = "ChatGPT signed this server out ({ $code }). Sign in again to keep tagging with your plan."
 translation = "ChatGPT kirjasi tämän palvelimen ulos ({ $code }). Kirjaudu uudelleen, jotta tunnisteiden lisäys tilauksellasi jatkuu."
+
+[messages.error-chatgpt-signed-out-problem-desktop]
+source = "ChatGPT signed Hoard out ({ $code }). Sign in again to keep tagging with your plan."
+translation = "ChatGPT kirjasi Hoardin ulos ({ $code }). Kirjaudu uudelleen, jotta tunnisteiden lisäys tilauksellasi jatkuu."
 
 [messages.error-chatgpt-unsupported]
 source = "ChatGPT plan usage doesn't support { $param } with this model"
@@ -3660,6 +3684,10 @@ translation = "kirjastossa ei ole muuta sijaintia, johon tiedostot voisi siirtä
 source = "There's no SoundFont at { $path } on the server"
 translation = "Palvelimella ei ole SoundFontia polussa { $path }"
 
+[messages.error-no-soundfont-desktop]
+source = "There's no SoundFont at { $path }"
+translation = "Polussa { $path } ei ole SoundFontia"
+
 [messages.error-not-a-hash]
 source = "not a blake3 hex hash"
 translation = "ei ole blake3-heksatiiviste"
@@ -3687,6 +3715,10 @@ translation = "{ $url } ei ole router-tilassa toimiva llama.cpp-palvelin, joten 
 [messages.error-not-started]
 source = "the server hasn't started"
 translation = "palvelin ei ole käynnistynyt"
+
+[messages.error-not-started-desktop]
+source = "Hoard hasn't started"
+translation = "Hoard ei ole käynnistynyt"
 
 [messages.error-not-watched]
 source = "{ $name } isn't a watched folder"
@@ -5322,6 +5354,10 @@ translation = "Lähettäminen vaatii kirjaston, jota Hoard hoitaa. Voit lisätä
 source = "Folder on the server"
 translation = "Kansio palvelimella"
 
+[messages.locations-folder-desktop]
+source = "Folder"
+translation = "Kansio"
+
 [messages.locations-folder-hint-managed]
 source = "Hoard creates it if it isn't there. In Docker, this is a folder you've mounted into the container."
 translation = "Hoard luo sen, jos sitä ei ole. Dockerissa tämä on kansio, jonka olet liittänyt konttiin."
@@ -5989,6 +6025,10 @@ translation = "Näytä { $name } 3D:nä"
 [messages.model-error-converting]
 source = "the server is still converting this model"
 translation = "palvelin muuntaa tätä mallia vielä"
+
+[messages.model-error-converting-desktop]
+source = "Hoard is still converting this model"
+translation = "Hoard muuntaa tätä mallia vielä"
 
 [messages.model-error-empty-collada]
 source = "empty Collada file"
@@ -6674,6 +6714,10 @@ translation = "Tee pikkukuvat tässä selaimessa"
 [messages.packs-make-thumbs-title]
 source = "Open each model in a 3D viewer out of sight, one at a time, and use its picture as the thumbnail where that's better than the server's"
 translation = "Avaa jokainen malli vuorollaan näkymättömissä 3D-katselimessa ja käytä sen kuvaa pikkukuvana, jos se on parempi kuin palvelimen tekemä"
+
+[messages.packs-make-thumbs-title-desktop]
+source = "Open each model in a 3D viewer out of sight, one at a time, and use its picture as the thumbnail where that's better than the one Hoard made"
+translation = "Avaa jokainen malli vuorollaan näkymättömissä 3D-katselimessa ja käytä sen kuvaa pikkukuvana, jos se on parempi kuin Hoardin tekemä"
 
 [messages.packs-more]
 source = "More"
@@ -7553,6 +7597,10 @@ translation = "Palauta oletus, { $value }"
 source = "Reset to the default: { $value }"
 translation = "Palauta oletus: { $value }"
 
+[messages.root-desktop-reopen]
+source = "This window was signed out. Close Hoard and open it again to carry on."
+translation = "Tämä ikkuna kirjattiin ulos. Sulje Hoard ja avaa se uudelleen jatkaaksesi."
+
 [messages.root-lazy-connect]
 source = "the app connection"
 translation = "sovellusyhteys"
@@ -7564,6 +7612,10 @@ translation = "Yritä uudelleen"
 [messages.root-unreachable]
 source = "Couldn’t reach the Hoard server: { $error }"
 translation = "Hoard-palvelinta ei tavoitettu: { $error }"
+
+[messages.root-unreachable-desktop]
+source = "Hoard isn’t answering: { $error }"
+translation = "Hoard ei vastaa: { $error }"
 
 [messages.server-back-to-settings]
 source = "Back to Settings"
@@ -8237,6 +8289,10 @@ translation = "Hae kuvia sen mukaan, mitä ne esittävät"
 source = "Uses OpenAI’s CLIP model, run on this server’s processor: nothing leaves it. Turning it on downloads the model ({ $size } MB) from Hugging Face, then learns every picture in the background at low priority. It takes 300 to 600 MB of memory while it works or someone searches. Turning it off deletes the model and keeps what it learned, for next time."
 translation = "Käyttää OpenAI:n CLIP-mallia, jota ajetaan tämän palvelimen suorittimella: mitään ei lähde palvelimelta. Käyttöönotto lataa mallin ({ $size } Mt) Hugging Facesta ja opettelee sitten jokaisen kuvan taustalla matalalla prioriteetilla. Se vie 300–600 Mt muistia työskennellessään tai kun joku hakee. Käytöstä poisto poistaa mallin mutta säilyttää opitun seuraavaa kertaa varten."
 
+[messages.settings-clip-hint-desktop]
+source = "Uses OpenAI’s CLIP model, run on this computer’s processor: nothing leaves it. Turning it on downloads the model ({ $size } MB) from Hugging Face, then learns every picture in the background at low priority. It takes 300 to 600 MB of memory while it works or you search. Turning it off deletes the model and keeps what it learned, for next time."
+translation = "Käyttää OpenAI:n CLIP-mallia, jota ajetaan tämän tietokoneen suorittimella: mitään ei lähde tietokoneelta. Käyttöönotto lataa mallin ({ $size } Mt) Hugging Facesta ja opettelee sitten jokaisen kuvan taustalla matalalla prioriteetilla. Se vie 300–600 Mt muistia työskennellessään tai kun haet. Käytöstä poisto poistaa mallin mutta säilyttää opitun seuraavaa kertaa varten."
+
 [messages.settings-clip-learning]
 source = "Ready: learning pictures, { $done } of { $total } so far"
 translation = "Valmis: opetellaan kuvia, { $done }/{ $total } tähän mennessä"
@@ -8536,6 +8592,10 @@ translation = "pois"
 source = "on"
 translation = "päällä"
 
+[messages.settings-desktop-updates]
+source = "Hoard looks for a new release each time it starts, downloads it in the background, and installs it when you quit."
+translation = "Hoard etsii uutta versiota aina käynnistyessään, lataa sen taustalla ja asentaa sen, kun suljet sovelluksen."
+
 [messages.settings-ffmpeg-download]
 source = "Uses a system ffmpeg with the right encoders, or downloads a static build (about 80 MB)."
 translation = "Käyttää järjestelmän ffmpegiä, jossa on oikeat kooderit, tai lataa staattisen version (noin 80 Mt)."
@@ -8760,6 +8820,10 @@ translation = "Nimi"
 source = "What this server is called in the top bar, the browser tab and on the sign-in page, so with more than one hoard you can tell which is which."
 translation = "Mikä tämän palvelimen nimi on yläpalkissa, selaimen välilehdellä ja kirjautumissivulla, jotta useamman Hoardin kanssa tiedät, mikä on mikä."
 
+[messages.settings-name-what-desktop]
+source = "What this library is called in the top bar."
+translation = "Mikä tämän kirjaston nimi on yläpalkissa."
+
 [messages.settings-option-saved]
 source = "{ $name }: { $value }"
 translation = "{ $name }: { $value }"
@@ -8828,6 +8892,10 @@ translation = "Yleiset"
 source = "What this server is called, for everyone who uses it."
 translation = "Mikä tämän palvelimen nimi on kaikille sen käyttäjille."
 
+[messages.settings-page-general-blurb-desktop]
+source = "What this library is called."
+translation = "Mikä tämän kirjaston nimi on."
+
 [messages.settings-page-issues]
 source = "Issues"
 translation = "Ongelmat"
@@ -8852,6 +8920,10 @@ translation = "Kirjaston sijainnit"
 source = "The folders on the server that hold the library: ones Hoard keeps files in, and folders of packs it indexes where they are."
 translation = "Palvelimen kansiot, joissa kirjasto on: kansiot, joissa Hoard säilyttää tiedostoja, ja pakettikansiot, jotka se indeksoi paikoillaan."
 
+[messages.settings-page-locations-blurb-desktop]
+source = "The folders that hold the library: ones Hoard keeps files in, and folders of packs it indexes where they are."
+translation = "Kansiot, joissa kirjasto on: kansiot, joissa Hoard säilyttää tiedostoja, ja pakettikansiot, jotka se indeksoi paikoillaan."
+
 [messages.settings-page-maintenance]
 source = "Maintenance"
 translation = "Ylläpito"
@@ -8867,6 +8939,10 @@ translation = "Suorituskyky"
 [messages.settings-page-performance-blurb]
 source = "How hard the server works, how thumbnails are made and kept, and the most it takes in."
 translation = "Kuinka kovasti palvelin työskentelee, miten pikkukuvat tehdään ja säilytetään ja paljonko se enintään ottaa vastaan."
+
+[messages.settings-page-performance-blurb-desktop]
+source = "How hard Hoard works, how thumbnails are made and kept, and the most it takes in."
+translation = "Kuinka kovasti Hoard työskentelee, miten pikkukuvat tehdään ja säilytetään ja paljonko se enintään ottaa vastaan."
 
 [messages.settings-page-search]
 source = "Image search"
@@ -8972,6 +9048,10 @@ translation = "MIDI-SoundFont"
 source = "found on the server, or built-in"
 translation = "palvelimelta löytyvä tai sisäänrakennettu"
 
+[messages.settings-soundfont-default-desktop]
+source = "found on this computer, or built-in"
+translation = "tältä tietokoneelta löytyvä tai sisäänrakennettu"
+
 [messages.settings-soundfont-file]
 source = "SoundFont file"
 translation = "SoundFont-tiedosto"
@@ -8979,6 +9059,10 @@ translation = "SoundFont-tiedosto"
 [messages.settings-soundfont-placeholder]
 source = "Found on the server, or built-in"
 translation = "Palvelimelta löytyvä tai sisäänrakennettu"
+
+[messages.settings-soundfont-placeholder-desktop]
+source = "Found on this computer, or built-in"
+translation = "Tältä tietokoneelta löytyvä tai sisäänrakennettu"
 
 [messages.settings-soundfont-what]
 source = "The instruments MIDI files are played and converted with."
@@ -9248,6 +9332,10 @@ translation = "työtä kerrallaan (tuonti, tunnisteet, muunnokset)"
 source = "Pick a folder on the server for Hoard to keep your packs in, or point it at a folder of packs you already have. You can add more locations, on other disks, from Settings later."
 translation = "Valitse palvelimelta kansio, jossa Hoard säilyttää pakettisi, tai osoita sille kansio, jossa sinulla jo on paketteja. Voit lisätä myöhemmin sijainteja muille levyille Asetuksista."
 
+[messages.setup-lede-desktop]
+source = "Pick a folder for Hoard to keep your packs in, or point it at a folder of packs you already have. You can add more locations, on other disks, from Settings later."
+translation = "Valitse kansio, jossa Hoard säilyttää pakettisi, tai osoita sille kansio, jossa sinulla jo on paketteja. Voit lisätä myöhemmin sijainteja muille levyille Asetuksista."
+
 [messages.setup-loading]
 source = "Loading…"
 translation = "Ladataan…"
@@ -9283,6 +9371,10 @@ translation = "Yritä uudelleen"
 [messages.setup-unreachable]
 source = "Couldn't reach the server: { $error }"
 translation = "Palvelinta ei tavoitettu: { $error }"
+
+[messages.setup-unreachable-desktop]
+source = "Hoard isn't answering: { $error }"
+translation = "Hoard ei vastaa: { $error }"
 
 [messages.setup-watched-after]
 source = "; packs show up as it finds them. To upload as well, add a library Hoard keeps from Settings → Library locations."

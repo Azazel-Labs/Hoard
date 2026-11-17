@@ -19,6 +19,7 @@ mod context;
 mod convert;
 mod credits;
 mod db;
+mod desktop;
 #[cfg(feature = "ldap")]
 mod directory;
 #[cfg(not(feature = "ldap"))]
@@ -104,6 +105,7 @@ use tower_http::trace::TraceLayer;
 
 use crate::blobs::BlobStore;
 pub use crate::config::Config;
+pub use crate::desktop::{launch_url, listening, shut_down};
 
 #[derive(Debug)]
 pub(crate) struct Inner {
@@ -152,6 +154,10 @@ pub async fn run(cfg: Config) -> Result<()> {
         }
         return Ok(());
     }
+    if cfg.desktop {
+        i18n::for_desktop();
+        desktop::ensure_owner(&*pool.get()?)?;
+    }
     if let Some(loc) = locations::adopt_existing(&*pool.get()?, &cfg)? {
         tracing::info!(path = %loc.path, "your files stay where they are, as the library location \"Library\"");
     }
@@ -198,7 +204,7 @@ pub async fn run(cfg: Config) -> Result<()> {
     ffmpeg::start(&effective.ffmpeg, state.cfg.tools_dir());
     clip::start(&state, effective.clip);
     convert::start_blender(&state, false);
-    updates::start(effective.update_check);
+    updates::start(effective.update_check && !state.cfg.desktop);
     updates::start_hook(&state);
     analyze::warm_renderer();
     jobs::spawn_workers(&state);
@@ -225,12 +231,19 @@ pub async fn run(cfg: Config) -> Result<()> {
     profiler::start();
 
     let mut app = api::router(&state);
+    if state.cfg.desktop {
+        app = app.merge(desktop::router());
+    }
     let web = &state.cfg.web_dir;
     if web.join("index.html").is_file() {
         // SPA: unknown paths fall back to index.html so client-side routes work on reload.
         app = app.fallback_service(ServeDir::new(web).fallback(ServeFile::new(web.join("index.html"))));
     } else {
         tracing::warn!(dir = %web.display(), "web portal not built; serving API only (run `npm run build` in web/)");
+    }
+    if state.cfg.desktop {
+        // Everything, the portal's files too: a page elsewhere has no business reading them.
+        app = app.layer(middleware::from_fn(desktop::loopback_only));
     }
     let app = app
         .layer(middleware::from_fn(i18n::negotiate))

@@ -464,6 +464,8 @@ export interface AuthStatus {
   /** Ways to sign in besides Hoard's own accounts (Settings → Authentication). */
   /** `oauth` is the sign-in button's text, "" when it has none of its own (then it's the reader's "your account"). */
   sign_in?: { directory: string | null; oauth: string | null }
+  /** The desktop app's own server: one person, signed in by the app, on this computer only. */
+  desktop?: boolean
 }
 
 /** Who checks an account's sign-in: Hoard, a directory (LDAP or Active Directory) or an OAuth provider. */

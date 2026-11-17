@@ -22,7 +22,7 @@ import {
   type UnrealConvert,
   humanBytes,
 } from '../api'
-import { may, refreshAuth } from '../auth'
+import { isDesktop, may, refreshAuth } from '../auth'
 import { formatNumber, LANGUAGES, languageName, preferredCatalog, t } from '../i18n'
 import { prefs } from '../prefs'
 import { formatMiB } from '../sizes'
@@ -73,7 +73,7 @@ const s = ref<Settings | null>(null)
 const browserLanguages = navigator.languages
 // Labels and blurbs are getters, so they're in the language of the moment. `sep` starts a group in the list: what's
 // in the library, how things get into it, who gets in, and how the server is doing.
-const ALL_PAGES: { id: string; readonly label: string; readonly blurb: string; need?: Role; sep?: boolean }[] = [
+const ALL_PAGES: { id: string; readonly label: string; readonly blurb: string; need?: Role; sep?: boolean; server?: boolean }[] = [
   { id: 'general', need: 'admin', get label() { return t('settings-page-general') }, get blurb() { return t('settings-page-general-blurb') } },
   { id: 'appearance', get label() { return t('settings-page-appearance') }, get blurb() { return t('settings-page-appearance-blurb') } },
   { id: 'library', get label() { return t('settings-page-library') }, get blurb() { return t('settings-page-library-blurb') } },
@@ -86,14 +86,14 @@ const ALL_PAGES: { id: string; readonly label: string; readonly blurb: string; n
   { id: 'adding', need: 'admin', get label() { return t('settings-page-adding') }, get blurb() { return t('settings-page-adding-blurb') } },
   { id: 'downloads', need: 'admin', get label() { return t('settings-page-downloads') }, get blurb() { return t('settings-page-downloads-blurb') } },
   { id: 'account', sep: true, get label() { return t('settings-page-account') }, get blurb() { return t('settings-page-account-blurb') } },
-  { id: 'auth', need: 'admin', get label() { return t('settings-page-auth') }, get blurb() { return t('settings-page-auth-blurb') } },
-  { id: 'connection', need: 'admin', get label() { return t('settings-page-connection') }, get blurb() { return t('settings-page-connection-blurb') } },
+  { id: 'auth', need: 'admin', server: true, get label() { return t('settings-page-auth') }, get blurb() { return t('settings-page-auth-blurb') } },
+  { id: 'connection', need: 'admin', server: true, get label() { return t('settings-page-connection') }, get blurb() { return t('settings-page-connection-blurb') } },
   { id: 'performance', sep: true, need: 'admin', get label() { return t('settings-page-performance') }, get blurb() { return t('settings-page-performance-blurb') } },
   { id: 'issues', need: 'admin', get label() { return t('settings-page-issues') }, get blurb() { return t('settings-page-issues-blurb') } },
   { id: 'maintenance', need: 'admin', get label() { return t('settings-page-maintenance') }, get blurb() { return t('settings-page-maintenance-blurb') } },
 ]
-/** The pages this account may see: an admin sees them all. */
-const PAGES = computed(() => ALL_PAGES.filter((p) => !p.need || may(p.need)))
+/** The pages this account may see: an admin sees them all (but the desktop app has no server to set up). */
+const PAGES = computed(() => ALL_PAGES.filter((p) => (!p.need || may(p.need)) && !(p.server && isDesktop())))
 const current = computed(() => (PAGES.value.some((p) => p.id === props.section) ? props.section : 'appearance'))
 const page = computed(() => PAGES.value.find((p) => p.id === current.value)!)
 const paneEl = ref<HTMLElement | null>(null)
@@ -1566,7 +1566,8 @@ onBeforeUnmount(() => {
             <section>
               <div class="sh"><h3>{{ t('settings-updates') }}</h3></div>
               <p v-if="stats?.version" class="what">{{ t('settings-version', { version: stats.version }) }}</p>
-              <div class="switches">
+              <p v-if="isDesktop()" class="what">{{ t('settings-desktop-updates') }}</p>
+              <div v-else class="switches">
                 <div class="opt-row">
                   <label class="check">
                     <input
@@ -1580,7 +1581,7 @@ onBeforeUnmount(() => {
                   <ResetButton v-if="changed('update_check')" :to="onOff(s.options.update_check.default)" :disabled="busy" @reset="resetOpt('update_check')" />
                 </div>
               </div>
-              <UpdatesPanel :settings="s" @saved="take" @unauthorized="emit('unauthorized')" />
+              <UpdatesPanel v-if="!isDesktop()" :settings="s" @saved="take" @unauthorized="emit('unauthorized')" />
             </section>
             <MaintenancePanel @unauthorized="emit('unauthorized')" />
           </template>

@@ -352,8 +352,15 @@ fn check(root: &Path, directory: &Path) -> Result<()> {
             Some(_) => {}
         }
     }
-    for id in source.keys().filter(|id| !calls.messages.contains_key(*id)) {
-        errors.push(format!("{id:?} is in locales/en/{} but nothing uses it", catalog::FILE));
+    for (id, variables) in source.iter().filter(|(id, _)| !calls.messages.contains_key(*id)) {
+        // The desktop app's wording of a message, shown in its place there.
+        match id.strip_suffix("-desktop").and_then(|base| calls.messages.get(base).map(|call| (base, call))) {
+            Some((base, (arguments, _))) if !variables.is_subset(arguments) => {
+                errors.push(format!("{id:?} uses {variables:?}, but {base:?} is only given {arguments:?}"));
+            }
+            Some(_) => {}
+            None => errors.push(format!("{id:?} is in locales/en/{} but nothing uses it", catalog::FILE)),
+        }
     }
     if !errors.is_empty() {
         return Err(errors.join("\n").into());

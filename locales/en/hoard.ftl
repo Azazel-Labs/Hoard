@@ -93,6 +93,7 @@ error-chatgpt-canceled = the sign-in was canceled
 error-chatgpt-refused = ChatGPT refused the sign-in: { $reason }
 error-chatgpt-no-code = the address has no sign-in code; copy the whole address
 error-chatgpt-other-registration = ChatGPT answered for a different registration of this server; start the sign-in again
+error-chatgpt-other-registration-desktop = ChatGPT answered for a different copy of Hoard; start the sign-in again
 error-chatgpt-not-registered = ChatGPT didn't finish registering Hoard; start the sign-in again
 error-chatgpt-code-used = the sign-in code was already used or has expired; sign in again
 # $code is OpenAI's error code (invalid_request…).
@@ -104,7 +105,9 @@ error-chatgpt-problem = ChatGPT: { $problem }
 error-chatgpt-not-signed-in = not signed in to ChatGPT; sign in from Settings → AI tagging
 error-chatgpt-refresh-later = ChatGPT couldn't refresh the sign-in just now ({ $code }); it'll be tried again later
 error-chatgpt-signed-out-problem = ChatGPT signed this server out ({ $code }). Sign in again to keep tagging with your plan.
+error-chatgpt-signed-out-problem-desktop = ChatGPT signed Hoard out ({ $code }). Sign in again to keep tagging with your plan.
 error-chatgpt-signed-out = ChatGPT signed this server out ({ $code }); sign in again from Settings → AI tagging
+error-chatgpt-signed-out-desktop = ChatGPT signed Hoard out ({ $code }); sign in again from Settings → AI tagging
 error-openai-api-unreachable = couldn't reach api.openai.com
 error-openai-broke-off = the reply from OpenAI broke off
 error-chatgpt-kept-refusing = OpenAI kept refusing the ChatGPT sign-in; sign in again from Settings → AI tagging
@@ -128,6 +131,7 @@ error-credits-pack = pack { $key }
 error-credits-collection = collection { $key }
 error-format-too-long = the format is too long
 error-not-started = the server hasn't started
+error-not-started-desktop = Hoard hasn't started
 error-not-format-file = not a format's file: { $name }
 error-format-name = the name needs a letter or digit from A to Z or 0 to 9
 # $file is the example file's name.
@@ -255,6 +259,7 @@ error-public-address = The public address should start with http:// or https://
 error-update-hook-address = The address to call for updates should start with http:// or https://
 error-update-hook-auth = The Authorization header can't contain line breaks or other control characters
 error-no-soundfont = There's no SoundFont at { $path } on the server
+error-no-soundfont-desktop = There's no SoundFont at { $path }
 error-workers = Background workers: between 1 and { $max }
 error-ai-batch = Assets per AI request: between 1 and 200
 error-conversion-cache = Converted downloads: at least 100 MB
@@ -465,6 +470,8 @@ appearance-language-auto = Browser's ({ $name })
 
 # Shown instead of the portal when the server can't be reached; $error is what went wrong.
 root-unreachable = Couldn’t reach the Hoard server: { $error }
+root-unreachable-desktop = Hoard isn’t answering: { $error }
+root-desktop-reopen = This window was signed out. Close Hoard and open it again to carry on.
 root-try-again = Try again
 # Fills “Loading { $what }…” and “Couldn’t load { $what }.” while a page's code downloads.
 root-lazy-connect = the app connection
@@ -503,6 +510,7 @@ app-retry = Retry
 app-undo = Undo
 app-search-failed = Search failed: { $error }
 app-unreachable = Couldn't reach the server: { $error }
+app-unreachable-desktop = Hoard isn't answering: { $error }
 # Forgetting a project that `hoard sync` reported; $count is how many of its assets it listed.
 app-forget-project-title = Forget { $name }?
 app-forget-project-body = Hoard stops listing it where its { $count } assets are used, until its next hoard sync tells it again. Nothing in the project changes.
@@ -862,6 +870,7 @@ activity-label-running = Background activity: { $running } running
 activity-label-queued = Background activity: { $running } running, { $queued } queued
 activity-title = Background activity
 activity-unreachable = Can't reach the server
+activity-unreachable-desktop = Hoard isn't answering
 activity-empty = Nothing running. Imports, tagging, conversions and zip downloads show up here while they work.
 activity-queued = queued
 # How long a job has been running.
@@ -916,6 +925,7 @@ locations-mode-managed-hint = Packs you upload or import are copied into this fo
 locations-mode-watched = Index a folder I already have
 locations-mode-watched-hint = Each folder inside it becomes a pack. Hoard reads the files where they are and never changes, moves or deletes them, and picks up new folders as they appear.
 locations-folder = Folder on the server
+locations-folder-desktop = Folder
 locations-folder-placeholder = The folder your packs are in
 locations-folder-hint-managed = Hoard creates it if it isn't there. In Docker, this is a folder you've mounted into the container.
 locations-folder-hint-watched = In Docker, mount the folder into the container first (read-only is fine), then pick it here.
@@ -1290,6 +1300,7 @@ packs-retag-rules = Re-run offline tagger
 packs-retag-llm = Re-run LLM tagger
 packs-make-thumbs = Make thumbnails in this browser
 packs-make-thumbs-title = Open each model in a 3D viewer out of sight, one at a time, and use its picture as the thumbnail where that's better than the server's
+packs-make-thumbs-title-desktop = Open each model in a 3D viewer out of sight, one at a time, and use its picture as the thumbnail where that's better than the one Hoard made
 packs-read-files = Read the pack's files again
 packs-credits = Download credits
 packs-credits-title = CREDITS.md: who made the pack, its license and the credit line it asks for
@@ -1845,6 +1856,7 @@ model-loading = Loading model…
 model-show-failed = Couldn't show this model: { $error }
 model-preview-failed = Couldn't preview this model: { $error }
 model-error-converting = the server is still converting this model
+model-error-converting-desktop = Hoard is still converting this model
 model-error-empty-collada = empty Collada file
 # $ext is a file extension, like "max".
 model-error-no-loader = No browser loader for .{ $ext }
@@ -2410,6 +2422,7 @@ settings-load-failed = Couldn't load the settings: { $error }
 # The pages down the side of Settings, each with the sentence under its heading.
 settings-page-general = General
 settings-page-general-blurb = What this server is called, for everyone who uses it.
+settings-page-general-blurb-desktop = What this library is called.
 settings-page-appearance = Appearance
 settings-page-appearance-blurb = The themes this browser wears when it’s light and when it’s dark. Saved in this browser only.
 settings-page-library = Library
@@ -2420,6 +2433,7 @@ settings-page-store-files = Store files
 settings-page-store-files-blurb = The files stores put beside their art, which Hoard reads to name packs and credit their makers. Teach it ones it doesn’t know, and share what you taught it.
 settings-page-locations = Library locations
 settings-page-locations-blurb = The folders on the server that hold the library: ones Hoard keeps files in, and folders of packs it indexes where they are.
+settings-page-locations-blurb-desktop = The folders that hold the library: ones Hoard keeps files in, and folders of packs it indexes where they are.
 settings-page-tools = Tools
 settings-page-tools-blurb = Outside programs Hoard uses to convert and read files.
 settings-page-ai = AI tagging
@@ -2438,6 +2452,7 @@ settings-page-connection = Connection
 settings-page-connection-blurb = How browsers and apps reach Hoard: the address it’s known by, and HTTPS, which some browser features need.
 settings-page-performance = Performance
 settings-page-performance-blurb = How hard the server works, how thumbnails are made and kept, and the most it takes in.
+settings-page-performance-blurb-desktop = How hard Hoard works, how thumbnails are made and kept, and the most it takes in.
 settings-page-issues = Issues
 settings-page-issues-blurb = What went wrong opening or processing files: archives that wouldn’t unpack, files that couldn’t be read, jobs that failed. Try them again once the cause is fixed, or dismiss them.
 settings-page-maintenance = Maintenance
@@ -2507,7 +2522,9 @@ settings-soundfont = MIDI SoundFont
 settings-soundfont-what = The instruments MIDI files are played and converted with.
 settings-soundfont-file = SoundFont file
 settings-soundfont-placeholder = Found on the server, or built-in
+settings-soundfont-placeholder-desktop = Found on this computer, or built-in
 settings-soundfont-default = found on the server, or built-in
+settings-soundfont-default-desktop = found on this computer, or built-in
 
 ## SettingsPage.vue: Image search
 
@@ -2519,6 +2536,7 @@ settings-clip-what = Type what you’re after (“mossy rock”, “sci-fi door�
 settings-clip-toggle = Turn on image search
 # $size is the model's download size in MB.
 settings-clip-hint = Uses OpenAI’s CLIP model, run on this server’s processor: nothing leaves it. Turning it on downloads the model ({ $size } MB) from Hugging Face, then learns every picture in the background at low priority. It takes 300 to 600 MB of memory while it works or someone searches. Turning it off deletes the model and keeps what it learned, for next time.
+settings-clip-hint-desktop = Uses OpenAI’s CLIP model, run on this computer’s processor: nothing leaves it. Turning it on downloads the model ({ $size } MB) from Hugging Face, then learns every picture in the background at low priority. It takes 300 to 600 MB of memory while it works or you search. Turning it off deletes the model and keeps what it learned, for next time.
 settings-clip-looking = Looking for the model…
 settings-clip-downloading = Downloading the model… progress is in the activity indicator
 settings-clip-ready-empty = Ready. Pictures are learned as packs are added.
@@ -2779,6 +2797,7 @@ settings-tn-ending-remove-label = Remove { $ending }
 
 settings-name = Name
 settings-name-what = What this server is called in the top bar, the browser tab and on the sign-in page, so with more than one hoard you can tell which is which.
+settings-name-what-desktop = What this library is called in the top bar.
 settings-address = Address
 settings-address-what = The address people and apps use to reach Hoard, when it isn’t the one this browser is on: a reverse proxy’s, a tunnel’s or a tailnet name, like https://hoard.example.com. Links Hoard hands out (to Claude and other apps, in sign-in, on its certificate) use it.
 settings-public-url = Public address
@@ -2877,6 +2896,7 @@ settings-conversion-cache-unit = kept at most; the least recently used go first
 settings-updates = Updates
 settings-version = This is Hoard { $version }.
 settings-update-check = Check GitHub every few hours for a new release
+settings-desktop-updates = Hoard looks for a new release each time it starts, downloads it in the background, and installs it when you quit.
 
 ## Asset kinds (api.ts)
 
@@ -3237,6 +3257,7 @@ account-signed-in-as-before = Signed in as{ " " }
 account-signed-in-as-admin = , who is an admin.
 account-signed-in-as-edit = , who can change the library.
 account-signed-in-as-view = , who can look but not change anything.
+account-app-signin = The Hoard app signs you in by itself, so there’s no password. Make an access token below for the engine plugins and the hoard command.
 account-password-at-provider = Your password is kept by the provider you sign in with, so you change it there.
 account-password-at-directory = Your password is kept by the directory you sign in with, so you change it there.
 account-current-password = Current password
@@ -3339,7 +3360,9 @@ signin-forgot-3 = ) for a new one.
 
 setup-title = Where should your library live?
 setup-lede = Pick a folder on the server for Hoard to keep your packs in, or point it at a folder of packs you already have. You can add more locations, on other disks, from Settings later.
+setup-lede-desktop = Pick a folder for Hoard to keep your packs in, or point it at a folder of packs you already have. You can add more locations, on other disks, from Settings later.
 setup-unreachable = Couldn't reach the server: { $error }
+setup-unreachable-desktop = Hoard isn't answering: { $error }
 setup-try-again = Try again
 setup-loading = Loading…
 setup-start = Start the library

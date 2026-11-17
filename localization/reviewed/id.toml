@@ -24,6 +24,10 @@ translation = "Claude dan aplikasi AI lain"
 source = "Connect Claude (or any MCP app) and it can search and fetch assets for you, and describe and tag what Hoard hasn’t yet. It signs in to Hoard the first time; you allow it here in the browser."
 translation = "Hubungkan Claude (atau aplikasi MCP apa pun) dan aplikasi itu dapat mencari dan mengambil aset untuk Anda, serta mendeskripsikan dan memberi tag apa yang belum dilakukan Hoard. Aplikasi itu masuk ke Hoard saat pertama kali; Anda mengizinkannya di sini, di browser."
 
+[messages.account-app-signin]
+source = "The Hoard app signs you in by itself, so there’s no password. Make an access token below for the engine plugins and the hoard command."
+translation = "Aplikasi Hoard memasukkanmu sendiri, jadi tidak ada kata sandi. Buat token akses di bawah untuk plugin mesin dan perintah hoard."
+
 [messages.account-change-password]
 source = "Change password"
 translation = "Ubah kata sandi"
@@ -431,6 +435,10 @@ translation = "Aktivitas latar belakang"
 [messages.activity-unreachable]
 source = "Can't reach the server"
 translation = "Tidak dapat menghubungi server"
+
+[messages.activity-unreachable-desktop]
+source = "Hoard isn't answering"
+translation = "Hoard tidak merespons"
 
 [messages.api-kind-animation]
 source = "Animations"
@@ -1283,6 +1291,10 @@ translation = "paket"
 [messages.app-unreachable]
 source = "Couldn't reach the server: { $error }"
 translation = "Tidak dapat menghubungi server: { $error }"
+
+[messages.app-unreachable-desktop]
+source = "Hoard isn't answering: { $error }"
+translation = "Hoard tidak merespons: { $error }"
 
 [messages.app-update]
 source = "Update"
@@ -3091,6 +3103,10 @@ translation = "proses masuk ini tidak dimulai di sini, atau dimulai lebih dari 1
 source = "ChatGPT answered for a different registration of this server; start the sign-in again"
 translation = "ChatGPT menjawab untuk pendaftaran lain dari server ini; mulai proses masuk lagi"
 
+[messages.error-chatgpt-other-registration-desktop]
+source = "ChatGPT answered for a different copy of Hoard; start the sign-in again"
+translation = "ChatGPT menjawab untuk salinan Hoard yang lain; mulai proses masuk lagi"
+
 [messages.error-chatgpt-paste-address]
 source = "paste the whole address, starting with http://127.0.0.1"
 translation = "tempel seluruh alamat, yang diawali http://127.0.0.1"
@@ -3127,9 +3143,17 @@ translation = "permintaan gagal"
 source = "ChatGPT signed this server out ({ $code }); sign in again from Settings → AI tagging"
 translation = "ChatGPT mengeluarkan server ini ({ $code }); masuk lagi dari Pengaturan → Penandaan AI"
 
+[messages.error-chatgpt-signed-out-desktop]
+source = "ChatGPT signed Hoard out ({ $code }); sign in again from Settings → AI tagging"
+translation = "ChatGPT mengeluarkan Hoard ({ $code }); masuk lagi dari Pengaturan → Penandaan AI"
+
 [messages.error-chatgpt-signed-out-problem]
 source = "ChatGPT signed this server out ({ $code }). Sign in again to keep tagging with your plan."
 translation = "ChatGPT mengeluarkan server ini ({ $code }). Masuk lagi agar tetap dapat memberi tag dengan langganan Anda."
+
+[messages.error-chatgpt-signed-out-problem-desktop]
+source = "ChatGPT signed Hoard out ({ $code }). Sign in again to keep tagging with your plan."
+translation = "ChatGPT mengeluarkan Hoard ({ $code }). Masuk lagi agar tetap dapat memberi tag dengan langganan Anda."
 
 [messages.error-chatgpt-unsupported]
 source = "ChatGPT plan usage doesn't support { $param } with this model"
@@ -3567,6 +3591,10 @@ translation = "tidak ada lokasi pustaka lain untuk tujuan pemindahan berkas: tam
 source = "There's no SoundFont at { $path } on the server"
 translation = "Tidak ada SoundFont di { $path } pada server"
 
+[messages.error-no-soundfont-desktop]
+source = "There's no SoundFont at { $path }"
+translation = "Tidak ada SoundFont di { $path }"
+
 [messages.error-not-a-hash]
 source = "not a blake3 hex hash"
 translation = "bukan hash hex blake3"
@@ -3594,6 +3622,10 @@ translation = "{ $url } bukan server llama.cpp dalam mode router, jadi tidak dap
 [messages.error-not-started]
 source = "the server hasn't started"
 translation = "server belum dimulai"
+
+[messages.error-not-started-desktop]
+source = "Hoard hasn't started"
+translation = "Hoard belum dimulai"
 
 [messages.error-not-watched]
 source = "{ $name } isn't a watched folder"
@@ -5194,6 +5226,10 @@ translation = "Mengunggah memerlukan pustaka yang disimpan Hoard. Anda dapat men
 source = "Folder on the server"
 translation = "Folder di server"
 
+[messages.locations-folder-desktop]
+source = "Folder"
+translation = "Folder"
+
 [messages.locations-folder-hint-managed]
 source = "Hoard creates it if it isn't there. In Docker, this is a folder you've mounted into the container."
 translation = "Hoard membuatnya jika belum ada. Di Docker, ini adalah folder yang sudah Anda pasang ke dalam container."
@@ -5850,6 +5886,10 @@ translation = "Lihat { $name } dalam 3D"
 source = "the server is still converting this model"
 translation = "server masih mengonversi model ini"
 
+[messages.model-error-converting-desktop]
+source = "Hoard is still converting this model"
+translation = "Hoard masih mengonversi model ini"
+
 [messages.model-error-empty-collada]
 source = "empty Collada file"
 translation = "berkas Collada kosong"
@@ -6504,6 +6544,10 @@ translation = "Buat gambar mini di browser ini"
 [messages.packs-make-thumbs-title]
 source = "Open each model in a 3D viewer out of sight, one at a time, and use its picture as the thumbnail where that's better than the server's"
 translation = "Buka setiap model di penampil 3D tersembunyi, satu per satu, dan pakai gambarnya sebagai gambar mini jika lebih bagus daripada buatan server"
+
+[messages.packs-make-thumbs-title-desktop]
+source = "Open each model in a 3D viewer out of sight, one at a time, and use its picture as the thumbnail where that's better than the one Hoard made"
+translation = "Buka setiap model di penampil 3D tersembunyi, satu per satu, dan pakai gambarnya sebagai gambar mini jika lebih bagus daripada buatan Hoard"
 
 [messages.packs-more]
 source = "More"
@@ -7343,6 +7387,10 @@ translation = "Kembali ke bawaan, { $value }"
 source = "Reset to the default: { $value }"
 translation = "Kembali ke bawaan: { $value }"
 
+[messages.root-desktop-reopen]
+source = "This window was signed out. Close Hoard and open it again to carry on."
+translation = "Jendela ini telah keluar. Tutup Hoard lalu buka lagi untuk melanjutkan."
+
 [messages.root-lazy-connect]
 source = "the app connection"
 translation = "koneksi aplikasi"
@@ -7354,6 +7402,10 @@ translation = "Coba lagi"
 [messages.root-unreachable]
 source = "Couldn’t reach the Hoard server: { $error }"
 translation = "Tidak dapat menghubungi server Hoard: { $error }"
+
+[messages.root-unreachable-desktop]
+source = "Hoard isn’t answering: { $error }"
+translation = "Hoard tidak merespons: { $error }"
 
 [messages.server-back-to-settings]
 source = "Back to Settings"
@@ -8023,6 +8075,10 @@ translation = "Cari berdasarkan isi gambar"
 source = "Uses OpenAI’s CLIP model, run on this server’s processor: nothing leaves it. Turning it on downloads the model ({ $size } MB) from Hugging Face, then learns every picture in the background at low priority. It takes 300 to 600 MB of memory while it works or someone searches. Turning it off deletes the model and keeps what it learned, for next time."
 translation = "Memakai model CLIP dari OpenAI, dijalankan di prosesor server ini: tidak ada yang keluar dari server. Mengaktifkannya akan mengunduh model ({ $size } MB) dari Hugging Face, lalu mempelajari setiap gambar di latar belakang dengan prioritas rendah. Butuh memori 300 sampai 600 MB selagi bekerja atau saat seseorang mencari. Mematikannya akan menghapus model dan menyimpan apa yang sudah dipelajari, untuk lain kali."
 
+[messages.settings-clip-hint-desktop]
+source = "Uses OpenAI’s CLIP model, run on this computer’s processor: nothing leaves it. Turning it on downloads the model ({ $size } MB) from Hugging Face, then learns every picture in the background at low priority. It takes 300 to 600 MB of memory while it works or you search. Turning it off deletes the model and keeps what it learned, for next time."
+translation = "Memakai model CLIP dari OpenAI, dijalankan di prosesor komputer ini: tidak ada yang keluar dari komputer. Mengaktifkannya akan mengunduh model ({ $size } MB) dari Hugging Face, lalu mempelajari setiap gambar di latar belakang dengan prioritas rendah. Butuh memori 300 sampai 600 MB selagi bekerja atau saat Anda mencari. Mematikannya akan menghapus model dan menyimpan apa yang sudah dipelajari, untuk lain kali."
+
 [messages.settings-clip-learning]
 source = "Ready: learning pictures, { $done } of { $total } so far"
 translation = "Siap: mempelajari gambar, { $done } dari { $total } sejauh ini"
@@ -8309,6 +8365,10 @@ translation = "mati"
 source = "on"
 translation = "aktif"
 
+[messages.settings-desktop-updates]
+source = "Hoard looks for a new release each time it starts, downloads it in the background, and installs it when you quit."
+translation = "Hoard mencari rilis baru setiap kali dimulai, mengunduhnya di latar belakang, dan memasangnya saat kamu keluar."
+
 [messages.settings-ffmpeg-download]
 source = "Uses a system ffmpeg with the right encoders, or downloads a static build (about 80 MB)."
 translation = "Memakai ffmpeg sistem dengan encoder yang sesuai, atau mengunduh build statis (sekitar 80 MB)."
@@ -8533,6 +8593,10 @@ translation = "Nama"
 source = "What this server is called in the top bar, the browser tab and on the sign-in page, so with more than one hoard you can tell which is which."
 translation = "Nama server ini di bilah atas, tab browser, dan halaman masuk, agar jika ada lebih dari satu Hoard Anda dapat membedakannya."
 
+[messages.settings-name-what-desktop]
+source = "What this library is called in the top bar."
+translation = "Nama pustaka ini di bilah atas."
+
 [messages.settings-option-saved]
 source = "{ $name }: { $value }"
 translation = "{ $name }: { $value }"
@@ -8601,6 +8665,10 @@ translation = "Umum"
 source = "What this server is called, for everyone who uses it."
 translation = "Nama server ini, untuk semua orang yang memakainya."
 
+[messages.settings-page-general-blurb-desktop]
+source = "What this library is called."
+translation = "Nama pustaka ini."
+
 [messages.settings-page-issues]
 source = "Issues"
 translation = "Masalah"
@@ -8625,6 +8693,10 @@ translation = "Lokasi pustaka"
 source = "The folders on the server that hold the library: ones Hoard keeps files in, and folders of packs it indexes where they are."
 translation = "Folder di server yang menampung pustaka: folder tempat Hoard menyimpan berkas, dan folder berisi paket yang diindeksnya di tempat."
 
+[messages.settings-page-locations-blurb-desktop]
+source = "The folders that hold the library: ones Hoard keeps files in, and folders of packs it indexes where they are."
+translation = "Folder yang menampung pustaka: folder tempat Hoard menyimpan berkas, dan folder berisi paket yang diindeksnya di tempat."
+
 [messages.settings-page-maintenance]
 source = "Maintenance"
 translation = "Pemeliharaan"
@@ -8640,6 +8712,10 @@ translation = "Performa"
 [messages.settings-page-performance-blurb]
 source = "How hard the server works, how thumbnails are made and kept, and the most it takes in."
 translation = "Seberapa keras server bekerja, cara gambar mini dibuat dan disimpan, dan batas maksimum yang diterimanya."
+
+[messages.settings-page-performance-blurb-desktop]
+source = "How hard Hoard works, how thumbnails are made and kept, and the most it takes in."
+translation = "Seberapa keras Hoard bekerja, cara gambar mini dibuat dan disimpan, dan batas maksimum yang diterimanya."
 
 [messages.settings-page-search]
 source = "Image search"
@@ -8745,6 +8821,10 @@ translation = "SoundFont MIDI"
 source = "found on the server, or built-in"
 translation = "ditemukan di server, atau bawaan"
 
+[messages.settings-soundfont-default-desktop]
+source = "found on this computer, or built-in"
+translation = "ditemukan di komputer ini, atau bawaan"
+
 [messages.settings-soundfont-file]
 source = "SoundFont file"
 translation = "Berkas SoundFont"
@@ -8752,6 +8832,10 @@ translation = "Berkas SoundFont"
 [messages.settings-soundfont-placeholder]
 source = "Found on the server, or built-in"
 translation = "Ditemukan di server, atau bawaan"
+
+[messages.settings-soundfont-placeholder-desktop]
+source = "Found on this computer, or built-in"
+translation = "Ditemukan di komputer ini, atau bawaan"
 
 [messages.settings-soundfont-what]
 source = "The instruments MIDI files are played and converted with."
@@ -9021,6 +9105,10 @@ translation = "pekerjaan sekaligus (memasukkan, memberi tag, konversi)"
 source = "Pick a folder on the server for Hoard to keep your packs in, or point it at a folder of packs you already have. You can add more locations, on other disks, from Settings later."
 translation = "Pilih folder di server tempat Hoard menyimpan paket Anda, atau arahkan ke folder berisi paket yang sudah Anda miliki. Anda dapat menambahkan lokasi lain, di disk lain, dari Pengaturan nanti."
 
+[messages.setup-lede-desktop]
+source = "Pick a folder for Hoard to keep your packs in, or point it at a folder of packs you already have. You can add more locations, on other disks, from Settings later."
+translation = "Pilih folder tempat Hoard menyimpan paket Anda, atau arahkan ke folder berisi paket yang sudah Anda miliki. Anda dapat menambahkan lokasi lain, di disk lain, dari Pengaturan nanti."
+
 [messages.setup-loading]
 source = "Loading…"
 translation = "Memuat…"
@@ -9056,6 +9144,10 @@ translation = "Coba lagi"
 [messages.setup-unreachable]
 source = "Couldn't reach the server: { $error }"
 translation = "Tidak dapat menjangkau server: { $error }"
+
+[messages.setup-unreachable-desktop]
+source = "Hoard isn't answering: { $error }"
+translation = "Hoard tidak merespons: { $error }"
 
 [messages.setup-watched-after]
 source = "; packs show up as it finds them. To upload as well, add a library Hoard keeps from Settings → Library locations."

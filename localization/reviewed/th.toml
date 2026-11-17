@@ -24,6 +24,10 @@ translation = "Claude และแอป AI อื่น ๆ"
 source = "Connect Claude (or any MCP app) and it can search and fetch assets for you, and describe and tag what Hoard hasn’t yet. It signs in to Hoard the first time; you allow it here in the browser."
 translation = "เชื่อมต่อ Claude (หรือแอป MCP ใดก็ได้) แล้วแอปจะค้นหาและดึงแอสเซ็ตให้คุณ รวมถึงอธิบายและติดแท็กสิ่งที่ Hoard ยังไม่ได้ทำ แอปจะลงชื่อเข้าใช้ Hoard ในครั้งแรก โดยคุณอนุญาตที่นี่ในเบราว์เซอร์"
 
+[messages.account-app-signin]
+source = "The Hoard app signs you in by itself, so there’s no password. Make an access token below for the engine plugins and the hoard command."
+translation = "แอป Hoard ลงชื่อเข้าใช้ให้คุณเอง จึงไม่มีรหัสผ่าน สร้างโทเค็นการเข้าถึงด้านล่างสำหรับปลั๊กอินของเอนจินและคำสั่ง hoard"
+
 [messages.account-change-password]
 source = "Change password"
 translation = "เปลี่ยนรหัสผ่าน"
@@ -431,6 +435,10 @@ translation = "กิจกรรมเบื้องหลัง"
 [messages.activity-unreachable]
 source = "Can't reach the server"
 translation = "เชื่อมต่อเซิร์ฟเวอร์ไม่ได้"
+
+[messages.activity-unreachable-desktop]
+source = "Hoard isn't answering"
+translation = "Hoard ไม่ตอบสนอง"
 
 [messages.api-kind-animation]
 source = "Animations"
@@ -1283,6 +1291,10 @@ translation = "แพ็ก"
 [messages.app-unreachable]
 source = "Couldn't reach the server: { $error }"
 translation = "เชื่อมต่อเซิร์ฟเวอร์ไม่ได้: { $error }"
+
+[messages.app-unreachable-desktop]
+source = "Hoard isn't answering: { $error }"
+translation = "Hoard ไม่ตอบสนอง: { $error }"
 
 [messages.app-update]
 source = "Update"
@@ -3091,6 +3103,10 @@ translation = "การลงชื่อเข้าใช้นี้ไม�
 source = "ChatGPT answered for a different registration of this server; start the sign-in again"
 translation = "ChatGPT ตอบกลับสำหรับการลงทะเบียนอื่นของเซิร์ฟเวอร์นี้ ให้เริ่มลงชื่อเข้าใช้ใหม่"
 
+[messages.error-chatgpt-other-registration-desktop]
+source = "ChatGPT answered for a different copy of Hoard; start the sign-in again"
+translation = "ChatGPT ตอบกลับสำหรับสำเนา Hoard อื่น ให้เริ่มลงชื่อเข้าใช้ใหม่"
+
 [messages.error-chatgpt-paste-address]
 source = "paste the whole address, starting with http://127.0.0.1"
 translation = "วางที่อยู่ทั้งหมดที่ขึ้นต้นด้วย http://127.0.0.1"
@@ -3127,9 +3143,17 @@ translation = "คำขอไม่สำเร็จ"
 source = "ChatGPT signed this server out ({ $code }); sign in again from Settings → AI tagging"
 translation = "ChatGPT ลงชื่อออกเซิร์ฟเวอร์นี้แล้ว ({ $code }) ให้ลงชื่อเข้าใช้ใหม่จาก การตั้งค่า → การติดแท็กด้วย AI"
 
+[messages.error-chatgpt-signed-out-desktop]
+source = "ChatGPT signed Hoard out ({ $code }); sign in again from Settings → AI tagging"
+translation = "ChatGPT ลงชื่อออก Hoard แล้ว ({ $code }) ให้ลงชื่อเข้าใช้ใหม่จาก การตั้งค่า → การติดแท็กด้วย AI"
+
 [messages.error-chatgpt-signed-out-problem]
 source = "ChatGPT signed this server out ({ $code }). Sign in again to keep tagging with your plan."
 translation = "ChatGPT ลงชื่อออกเซิร์ฟเวอร์นี้แล้ว ({ $code }) ให้ลงชื่อเข้าใช้ใหม่เพื่อติดแท็กด้วยแพ็กเกจของคุณต่อไป"
+
+[messages.error-chatgpt-signed-out-problem-desktop]
+source = "ChatGPT signed Hoard out ({ $code }). Sign in again to keep tagging with your plan."
+translation = "ChatGPT ลงชื่อออก Hoard แล้ว ({ $code }) ให้ลงชื่อเข้าใช้ใหม่เพื่อติดแท็กด้วยแพ็กเกจของคุณต่อไป"
 
 [messages.error-chatgpt-unsupported]
 source = "ChatGPT plan usage doesn't support { $param } with this model"
@@ -3567,6 +3591,10 @@ translation = "ไม่มีตำแหน่งคลังอื่นใ�
 source = "There's no SoundFont at { $path } on the server"
 translation = "ไม่มี SoundFont ที่ { $path } บนเซิร์ฟเวอร์"
 
+[messages.error-no-soundfont-desktop]
+source = "There's no SoundFont at { $path }"
+translation = "ไม่มี SoundFont ที่ { $path }"
+
 [messages.error-not-a-hash]
 source = "not a blake3 hex hash"
 translation = "ไม่ใช่แฮช blake3 แบบเลขฐานสิบหก"
@@ -3594,6 +3622,10 @@ translation = "{ $url } ไม่ใช่เซิร์ฟเวอร์ llam
 [messages.error-not-started]
 source = "the server hasn't started"
 translation = "เซิร์ฟเวอร์ยังไม่เริ่มทำงาน"
+
+[messages.error-not-started-desktop]
+source = "Hoard hasn't started"
+translation = "Hoard ยังไม่เริ่มทำงาน"
 
 [messages.error-not-watched]
 source = "{ $name } isn't a watched folder"
@@ -5190,6 +5222,10 @@ translation = "การอัปโหลดต้องมีคลังท�
 source = "Folder on the server"
 translation = "โฟลเดอร์บนเซิร์ฟเวอร์"
 
+[messages.locations-folder-desktop]
+source = "Folder"
+translation = "โฟลเดอร์"
+
 [messages.locations-folder-hint-managed]
 source = "Hoard creates it if it isn't there. In Docker, this is a folder you've mounted into the container."
 translation = "Hoard จะสร้างโฟลเดอร์ให้หากยังไม่มี ใน Docker นี่คือโฟลเดอร์ที่คุณเมานต์เข้าไปในคอนเทนเนอร์"
@@ -5845,6 +5881,10 @@ translation = "ดู { $name } แบบ 3 มิติ"
 [messages.model-error-converting]
 source = "the server is still converting this model"
 translation = "เซิร์ฟเวอร์ยังแปลงโมเดลนี้อยู่"
+
+[messages.model-error-converting-desktop]
+source = "Hoard is still converting this model"
+translation = "Hoard ยังแปลงโมเดลนี้อยู่"
 
 [messages.model-error-empty-collada]
 source = "empty Collada file"
@@ -6503,6 +6543,10 @@ translation = "สร้างภาพย่อในเบราว์เซ�
 [messages.packs-make-thumbs-title]
 source = "Open each model in a 3D viewer out of sight, one at a time, and use its picture as the thumbnail where that's better than the server's"
 translation = "เปิดแต่ละโมเดลในตัวแสดงผล 3 มิติแบบซ่อนทีละรายการ แล้วใช้ภาพนั้นเป็นภาพย่อหากดีกว่าภาพของเซิร์ฟเวอร์"
+
+[messages.packs-make-thumbs-title-desktop]
+source = "Open each model in a 3D viewer out of sight, one at a time, and use its picture as the thumbnail where that's better than the one Hoard made"
+translation = "เปิดแต่ละโมเดลในตัวแสดงผล 3 มิติแบบซ่อนทีละรายการ แล้วใช้ภาพนั้นเป็นภาพย่อหากดีกว่าภาพที่ Hoard สร้าง"
 
 [messages.packs-more]
 source = "More"
@@ -7342,6 +7386,10 @@ translation = "รีเซ็ตเป็นค่าเริ่มต้น {
 source = "Reset to the default: { $value }"
 translation = "รีเซ็ตเป็นค่าเริ่มต้น: { $value }"
 
+[messages.root-desktop-reopen]
+source = "This window was signed out. Close Hoard and open it again to carry on."
+translation = "หน้าต่างนี้ออกจากระบบแล้ว ปิด Hoard แล้วเปิดใหม่อีกครั้งเพื่อใช้งานต่อ"
+
 [messages.root-lazy-connect]
 source = "the app connection"
 translation = "การเชื่อมต่อแอป"
@@ -7353,6 +7401,10 @@ translation = "ลองอีกครั้ง"
 [messages.root-unreachable]
 source = "Couldn’t reach the Hoard server: { $error }"
 translation = "เชื่อมต่อเซิร์ฟเวอร์ Hoard ไม่ได้: { $error }"
+
+[messages.root-unreachable-desktop]
+source = "Hoard isn’t answering: { $error }"
+translation = "Hoard ไม่ตอบสนอง: { $error }"
 
 [messages.server-back-to-settings]
 source = "Back to Settings"
@@ -8022,6 +8074,10 @@ translation = "ค้นหาจากสิ่งที่ปรากฏใ�
 source = "Uses OpenAI’s CLIP model, run on this server’s processor: nothing leaves it. Turning it on downloads the model ({ $size } MB) from Hugging Face, then learns every picture in the background at low priority. It takes 300 to 600 MB of memory while it works or someone searches. Turning it off deletes the model and keeps what it learned, for next time."
 translation = "ใช้โมเดล CLIP ของ OpenAI ที่ทำงานบนโปรเซสเซอร์ของเซิร์ฟเวอร์นี้: ไม่มีข้อมูลใดออกไปภายนอก การเปิดจะดาวน์โหลดโมเดล ({ $size } MB) จาก Hugging Face แล้วเรียนรู้รูปภาพทุกภาพในเบื้องหลังด้วยลำดับความสำคัญต่ำ ใช้หน่วยความจำ 300 ถึง 600 MB ขณะทำงานหรือขณะมีคนค้นหา การปิดจะลบโมเดลแต่เก็บสิ่งที่เรียนรู้ไว้ใช้ครั้งหน้า"
 
+[messages.settings-clip-hint-desktop]
+source = "Uses OpenAI’s CLIP model, run on this computer’s processor: nothing leaves it. Turning it on downloads the model ({ $size } MB) from Hugging Face, then learns every picture in the background at low priority. It takes 300 to 600 MB of memory while it works or you search. Turning it off deletes the model and keeps what it learned, for next time."
+translation = "ใช้โมเดล CLIP ของ OpenAI ที่ทำงานบนโปรเซสเซอร์ของคอมพิวเตอร์เครื่องนี้: ไม่มีข้อมูลใดออกไปภายนอก การเปิดจะดาวน์โหลดโมเดล ({ $size } MB) จาก Hugging Face แล้วเรียนรู้รูปภาพทุกภาพในเบื้องหลังด้วยลำดับความสำคัญต่ำ ใช้หน่วยความจำ 300 ถึง 600 MB ขณะทำงานหรือขณะที่คุณค้นหา การปิดจะลบโมเดลแต่เก็บสิ่งที่เรียนรู้ไว้ใช้ครั้งหน้า"
+
 [messages.settings-clip-learning]
 source = "Ready: learning pictures, { $done } of { $total } so far"
 translation = "พร้อม: กำลังเรียนรู้รูปภาพ { $done } จาก { $total } ภาพแล้ว"
@@ -8308,6 +8364,10 @@ translation = "ปิด"
 source = "on"
 translation = "เปิด"
 
+[messages.settings-desktop-updates]
+source = "Hoard looks for a new release each time it starts, downloads it in the background, and installs it when you quit."
+translation = "Hoard จะหารุ่นใหม่ทุกครั้งที่เปิด ดาวน์โหลดไว้เบื้องหลัง และติดตั้งเมื่อคุณปิดโปรแกรม"
+
 [messages.settings-ffmpeg-download]
 source = "Uses a system ffmpeg with the right encoders, or downloads a static build (about 80 MB)."
 translation = "ใช้ ffmpeg ของระบบที่มีตัวเข้ารหัสที่ถูกต้อง หรือดาวน์โหลดบิลด์แบบสแตติก (ประมาณ 80 MB)"
@@ -8532,6 +8592,10 @@ translation = "ชื่อ"
 source = "What this server is called in the top bar, the browser tab and on the sign-in page, so with more than one hoard you can tell which is which."
 translation = "ชื่อที่เรียกเซิร์ฟเวอร์นี้ในแถบด้านบน แท็บเบราว์เซอร์ และหน้าลงชื่อเข้าใช้ เพื่อให้แยกได้ว่าเป็นคลังไหนเมื่อมีมากกว่าหนึ่งแห่ง"
 
+[messages.settings-name-what-desktop]
+source = "What this library is called in the top bar."
+translation = "ชื่อที่เรียกคลังนี้ในแถบด้านบน"
+
 [messages.settings-option-saved]
 source = "{ $name }: { $value }"
 translation = "{ $name }: { $value }"
@@ -8600,6 +8664,10 @@ translation = "ทั่วไป"
 source = "What this server is called, for everyone who uses it."
 translation = "ชื่อที่เรียกเซิร์ฟเวอร์นี้ สำหรับทุกคนที่ใช้งาน"
 
+[messages.settings-page-general-blurb-desktop]
+source = "What this library is called."
+translation = "ชื่อที่เรียกคลังนี้"
+
 [messages.settings-page-issues]
 source = "Issues"
 translation = "ปัญหา"
@@ -8624,6 +8692,10 @@ translation = "ตำแหน่งคลัง"
 source = "The folders on the server that hold the library: ones Hoard keeps files in, and folders of packs it indexes where they are."
 translation = "โฟลเดอร์บนเซิร์ฟเวอร์ที่เก็บคลัง: โฟลเดอร์ที่ Hoard เก็บไฟล์ไว้ และโฟลเดอร์ของแพ็กที่ Hoard จัดทำดัชนีไว้ในที่เดิม"
 
+[messages.settings-page-locations-blurb-desktop]
+source = "The folders that hold the library: ones Hoard keeps files in, and folders of packs it indexes where they are."
+translation = "โฟลเดอร์ที่เก็บคลัง: โฟลเดอร์ที่ Hoard เก็บไฟล์ไว้ และโฟลเดอร์ของแพ็กที่ Hoard จัดทำดัชนีไว้ในที่เดิม"
+
 [messages.settings-page-maintenance]
 source = "Maintenance"
 translation = "การบำรุงรักษา"
@@ -8639,6 +8711,10 @@ translation = "ประสิทธิภาพ"
 [messages.settings-page-performance-blurb]
 source = "How hard the server works, how thumbnails are made and kept, and the most it takes in."
 translation = "เซิร์ฟเวอร์ทำงานหนักเพียงใด ภาพย่อถูกสร้างและเก็บอย่างไร และรับข้อมูลได้มากที่สุดเท่าใด"
+
+[messages.settings-page-performance-blurb-desktop]
+source = "How hard Hoard works, how thumbnails are made and kept, and the most it takes in."
+translation = "Hoard ทำงานหนักเพียงใด ภาพย่อถูกสร้างและเก็บอย่างไร และรับข้อมูลได้มากที่สุดเท่าใด"
 
 [messages.settings-page-search]
 source = "Image search"
@@ -8744,6 +8820,10 @@ translation = "SoundFont สำหรับ MIDI"
 source = "found on the server, or built-in"
 translation = "ที่พบบนเซิร์ฟเวอร์ หรือแบบในตัว"
 
+[messages.settings-soundfont-default-desktop]
+source = "found on this computer, or built-in"
+translation = "ที่พบบนคอมพิวเตอร์เครื่องนี้ หรือแบบในตัว"
+
 [messages.settings-soundfont-file]
 source = "SoundFont file"
 translation = "ไฟล์ SoundFont"
@@ -8751,6 +8831,10 @@ translation = "ไฟล์ SoundFont"
 [messages.settings-soundfont-placeholder]
 source = "Found on the server, or built-in"
 translation = "ที่พบบนเซิร์ฟเวอร์ หรือแบบในตัว"
+
+[messages.settings-soundfont-placeholder-desktop]
+source = "Found on this computer, or built-in"
+translation = "ที่พบบนคอมพิวเตอร์เครื่องนี้ หรือแบบในตัว"
 
 [messages.settings-soundfont-what]
 source = "The instruments MIDI files are played and converted with."
@@ -9020,6 +9104,10 @@ translation = "งานพร้อมกัน (นำเข้า ติด�
 source = "Pick a folder on the server for Hoard to keep your packs in, or point it at a folder of packs you already have. You can add more locations, on other disks, from Settings later."
 translation = "เลือกโฟลเดอร์บนเซิร์ฟเวอร์ให้ Hoard เก็บแพ็กของคุณ หรือชี้ไปยังโฟลเดอร์แพ็กที่คุณมีอยู่แล้ว คุณเพิ่มตำแหน่งอื่นบนดิสก์อื่นได้ภายหลังจากการตั้งค่า"
 
+[messages.setup-lede-desktop]
+source = "Pick a folder for Hoard to keep your packs in, or point it at a folder of packs you already have. You can add more locations, on other disks, from Settings later."
+translation = "เลือกโฟลเดอร์ให้ Hoard เก็บแพ็กของคุณ หรือชี้ไปยังโฟลเดอร์แพ็กที่คุณมีอยู่แล้ว คุณเพิ่มตำแหน่งอื่นบนดิสก์อื่นได้ภายหลังจากการตั้งค่า"
+
 [messages.setup-loading]
 source = "Loading…"
 translation = "กำลังโหลด…"
@@ -9055,6 +9143,10 @@ translation = "ลองใหม่"
 [messages.setup-unreachable]
 source = "Couldn't reach the server: { $error }"
 translation = "ติดต่อเซิร์ฟเวอร์ไม่ได้: { $error }"
+
+[messages.setup-unreachable-desktop]
+source = "Hoard isn't answering: { $error }"
+translation = "Hoard ไม่ตอบสนอง: { $error }"
 
 [messages.setup-watched-after]
 source = "; packs show up as it finds them. To upload as well, add a library Hoard keeps from Settings → Library locations."

@@ -24,6 +24,10 @@ translation = "Claude и друге ВИ апликације"
 source = "Connect Claude (or any MCP app) and it can search and fetch assets for you, and describe and tag what Hoard hasn’t yet. It signs in to Hoard the first time; you allow it here in the browser."
 translation = "Повежите Claude (или било коју MCP апликацију) и он може да претражује и доноси ресурсе за вас, као и да описује и означава оно што Hoard још није. Први пут се пријављује у Hoard; ви то дозвољавате овде у прегледачу."
 
+[messages.account-app-signin]
+source = "The Hoard app signs you in by itself, so there’s no password. Make an access token below for the engine plugins and the hoard command."
+translation = "Апликација Hoard вас сама пријављује, па лозинке нема. Испод направите приступни токен за прикључке погона и наредбу hoard."
+
 [messages.account-change-password]
 source = "Change password"
 translation = "Промени лозинку"
@@ -431,6 +435,10 @@ translation = "Позадинска активност"
 [messages.activity-unreachable]
 source = "Can't reach the server"
 translation = "Сервер није доступан"
+
+[messages.activity-unreachable-desktop]
+source = "Hoard isn't answering"
+translation = "Hoard не одговара"
 
 [messages.api-kind-animation]
 source = "Animations"
@@ -1323,6 +1331,10 @@ translation = "пакет"
 [messages.app-unreachable]
 source = "Couldn't reach the server: { $error }"
 translation = "Сервер није доступан: { $error }"
+
+[messages.app-unreachable-desktop]
+source = "Hoard isn't answering: { $error }"
+translation = "Hoard не одговара: { $error }"
 
 [messages.app-update]
 source = "Update"
@@ -3184,6 +3196,10 @@ translation = "ова пријава није започета овде или �
 source = "ChatGPT answered for a different registration of this server; start the sign-in again"
 translation = "ChatGPT је одговорио за другу регистрацију овог сервера; започните пријаву поново"
 
+[messages.error-chatgpt-other-registration-desktop]
+source = "ChatGPT answered for a different copy of Hoard; start the sign-in again"
+translation = "ChatGPT је одговорио за другу копију Hoard-а; започните пријаву поново"
+
 [messages.error-chatgpt-paste-address]
 source = "paste the whole address, starting with http://127.0.0.1"
 translation = "налепите целу адресу, која почиње са http://127.0.0.1"
@@ -3220,9 +3236,17 @@ translation = "захтев није успео"
 source = "ChatGPT signed this server out ({ $code }); sign in again from Settings → AI tagging"
 translation = "ChatGPT је одјавио овај сервер ({ $code }); пријавите се поново у Подешавања → Означавање помоћу ВИ"
 
+[messages.error-chatgpt-signed-out-desktop]
+source = "ChatGPT signed Hoard out ({ $code }); sign in again from Settings → AI tagging"
+translation = "ChatGPT је одјавио Hoard ({ $code }); пријавите се поново у Подешавања → Означавање помоћу ВИ"
+
 [messages.error-chatgpt-signed-out-problem]
 source = "ChatGPT signed this server out ({ $code }). Sign in again to keep tagging with your plan."
 translation = "ChatGPT је одјавио овај сервер ({ $code }). Пријавите се поново да бисте наставили означавање помоћу свог плана."
+
+[messages.error-chatgpt-signed-out-problem-desktop]
+source = "ChatGPT signed Hoard out ({ $code }). Sign in again to keep tagging with your plan."
+translation = "ChatGPT је одјавио Hoard ({ $code }). Пријавите се поново да бисте наставили означавање помоћу свог плана."
 
 [messages.error-chatgpt-unsupported]
 source = "ChatGPT plan usage doesn't support { $param } with this model"
@@ -3665,6 +3689,10 @@ translation = "нема друге локације библиотеке у ко
 source = "There's no SoundFont at { $path } on the server"
 translation = "На серверу нема SoundFont-а на { $path }"
 
+[messages.error-no-soundfont-desktop]
+source = "There's no SoundFont at { $path }"
+translation = "Нема SoundFont-а на { $path }"
+
 [messages.error-not-a-hash]
 source = "not a blake3 hex hash"
 translation = "ово није blake3 хеш у хексадецималном облику"
@@ -3692,6 +3720,10 @@ translation = "{ $url } није llama.cpp сервер у router режиму, 
 [messages.error-not-started]
 source = "the server hasn't started"
 translation = "сервер није покренут"
+
+[messages.error-not-started-desktop]
+source = "Hoard hasn't started"
+translation = "Hoard није покренут"
 
 [messages.error-not-watched]
 source = "{ $name } isn't a watched folder"
@@ -5333,6 +5365,10 @@ translation = "За отпремање је потребна библиотек�
 source = "Folder on the server"
 translation = "Фасцикла на серверу"
 
+[messages.locations-folder-desktop]
+source = "Folder"
+translation = "Фасцикла"
+
 [messages.locations-folder-hint-managed]
 source = "Hoard creates it if it isn't there. In Docker, this is a folder you've mounted into the container."
 translation = "Hoard је прави ако не постоји. У Docker-у, ово је фасцикла коју сте монтирали у контејнер."
@@ -5998,6 +6034,10 @@ translation = "Прикажи { $name } у 3D-у"
 [messages.model-error-converting]
 source = "the server is still converting this model"
 translation = "сервер још претвара овај модел"
+
+[messages.model-error-converting-desktop]
+source = "Hoard is still converting this model"
+translation = "Hoard још претвара овај модел"
 
 [messages.model-error-empty-collada]
 source = "empty Collada file"
@@ -6686,6 +6726,10 @@ translation = "Направи сличице у овом прегледачу"
 [messages.packs-make-thumbs-title]
 source = "Open each model in a 3D viewer out of sight, one at a time, and use its picture as the thumbnail where that's better than the server's"
 translation = "Отвара сваки модел у скривеном 3D прегледачу, један по један, и користи његову слику као сличицу где је боља од серверске"
+
+[messages.packs-make-thumbs-title-desktop]
+source = "Open each model in a 3D viewer out of sight, one at a time, and use its picture as the thumbnail where that's better than the one Hoard made"
+translation = "Отвара сваки модел у скривеном 3D прегледачу, један по један, и користи његову слику као сличицу где је боља од оне коју је направио Hoard"
 
 [messages.packs-more]
 source = "More"
@@ -7571,6 +7615,10 @@ translation = "Врати на подразумевано, { $value }"
 source = "Reset to the default: { $value }"
 translation = "Врати на подразумевано: { $value }"
 
+[messages.root-desktop-reopen]
+source = "This window was signed out. Close Hoard and open it again to carry on."
+translation = "Овај прозор је одјављен. Затворите Hoard и поново га отворите да бисте наставили."
+
 [messages.root-lazy-connect]
 source = "the app connection"
 translation = "веза апликације"
@@ -7582,6 +7630,10 @@ translation = "Покушај поново"
 [messages.root-unreachable]
 source = "Couldn’t reach the Hoard server: { $error }"
 translation = "Hoard сервер није доступан: { $error }"
+
+[messages.root-unreachable-desktop]
+source = "Hoard isn’t answering: { $error }"
+translation = "Hoard не одговара: { $error }"
 
 [messages.server-back-to-settings]
 source = "Back to Settings"
@@ -8256,6 +8308,10 @@ translation = "Претрага по ономе што слике приказу
 source = "Uses OpenAI’s CLIP model, run on this server’s processor: nothing leaves it. Turning it on downloads the model ({ $size } MB) from Hugging Face, then learns every picture in the background at low priority. It takes 300 to 600 MB of memory while it works or someone searches. Turning it off deletes the model and keeps what it learned, for next time."
 translation = "Користи OpenAI-јев модел CLIP, који ради на процесору овог сервера: ништа не напушта сервер. Укључивање преузима модел ({ $size } MB) са Hugging Face-а, а затим у позадини, ниским приоритетом, учи сваку слику. Заузима 300 до 600 MB меморије док ради или док неко претражује. Искључивање брише модел и чува оно што је научио, за следећи пут."
 
+[messages.settings-clip-hint-desktop]
+source = "Uses OpenAI’s CLIP model, run on this computer’s processor: nothing leaves it. Turning it on downloads the model ({ $size } MB) from Hugging Face, then learns every picture in the background at low priority. It takes 300 to 600 MB of memory while it works or you search. Turning it off deletes the model and keeps what it learned, for next time."
+translation = "Користи OpenAI-јев модел CLIP, који ради на процесору овог рачунара: ништа не напушта рачунар. Укључивање преузима модел ({ $size } MB) са Hugging Face-а, а затим у позадини, ниским приоритетом, учи сваку слику. Заузима 300 до 600 MB меморије док ради или док претражујете. Искључивање брише модел и чува оно што је научио, за следећи пут."
+
 [messages.settings-clip-learning]
 source = "Ready: learning pictures, { $done } of { $total } so far"
 translation = "Спремно: учи слике, до сада { $done } од { $total }"
@@ -8572,6 +8628,10 @@ translation = "искључено"
 source = "on"
 translation = "укључено"
 
+[messages.settings-desktop-updates]
+source = "Hoard looks for a new release each time it starts, downloads it in the background, and installs it when you quit."
+translation = "Hoard при сваком покретању тражи ново издање, преузима га у позадини и инсталира када изађете."
+
 [messages.settings-ffmpeg-download]
 source = "Uses a system ffmpeg with the right encoders, or downloads a static build (about 80 MB)."
 translation = "Користи системски ffmpeg с одговарајућим кодерима или преузима статичку верзију (око 80 MB)."
@@ -8796,6 +8856,10 @@ translation = "Назив"
 source = "What this server is called in the top bar, the browser tab and on the sign-in page, so with more than one hoard you can tell which is which."
 translation = "Како се овај сервер зове у горњој траци, на картици прегледача и на страници за пријаву, да бисте, ако имате више Hoard сервера, знали који је који."
 
+[messages.settings-name-what-desktop]
+source = "What this library is called in the top bar."
+translation = "Како се ова библиотека зове у горњој траци."
+
 [messages.settings-option-saved]
 source = "{ $name }: { $value }"
 translation = "{ $name }: { $value }"
@@ -8864,6 +8928,10 @@ translation = "Опште"
 source = "What this server is called, for everyone who uses it."
 translation = "Како се овај сервер зове, за све који га користе."
 
+[messages.settings-page-general-blurb-desktop]
+source = "What this library is called."
+translation = "Како се ова библиотека зове."
+
 [messages.settings-page-issues]
 source = "Issues"
 translation = "Проблеми"
@@ -8888,6 +8956,10 @@ translation = "Локације библиотеке"
 source = "The folders on the server that hold the library: ones Hoard keeps files in, and folders of packs it indexes where they are."
 translation = "Фасцикле на серверу које садрже библиотеку: оне у којима Hoard чува датотеке и фасцикле с пакетима које индексира тамо где јесу."
 
+[messages.settings-page-locations-blurb-desktop]
+source = "The folders that hold the library: ones Hoard keeps files in, and folders of packs it indexes where they are."
+translation = "Фасцикле које садрже библиотеку: оне у којима Hoard чува датотеке и фасцикле с пакетима које индексира тамо где јесу."
+
 [messages.settings-page-maintenance]
 source = "Maintenance"
 translation = "Одржавање"
@@ -8903,6 +8975,10 @@ translation = "Перформансе"
 [messages.settings-page-performance-blurb]
 source = "How hard the server works, how thumbnails are made and kept, and the most it takes in."
 translation = "Колико се сервер напреже, како се праве и чувају сличице и колико највише прима."
+
+[messages.settings-page-performance-blurb-desktop]
+source = "How hard Hoard works, how thumbnails are made and kept, and the most it takes in."
+translation = "Колико се Hoard напреже, како се праве и чувају сличице и колико највише прима."
 
 [messages.settings-page-search]
 source = "Image search"
@@ -9008,6 +9084,10 @@ translation = "MIDI SoundFont"
 source = "found on the server, or built-in"
 translation = "пронађен на серверу или уграђен"
 
+[messages.settings-soundfont-default-desktop]
+source = "found on this computer, or built-in"
+translation = "пронађен на овом рачунару или уграђен"
+
 [messages.settings-soundfont-file]
 source = "SoundFont file"
 translation = "SoundFont датотека"
@@ -9015,6 +9095,10 @@ translation = "SoundFont датотека"
 [messages.settings-soundfont-placeholder]
 source = "Found on the server, or built-in"
 translation = "Пронађен на серверу или уграђен"
+
+[messages.settings-soundfont-placeholder-desktop]
+source = "Found on this computer, or built-in"
+translation = "Пронађен на овом рачунару или уграђен"
 
 [messages.settings-soundfont-what]
 source = "The instruments MIDI files are played and converted with."
@@ -9284,6 +9368,10 @@ translation = "послова истовремено (увоз, означава
 source = "Pick a folder on the server for Hoard to keep your packs in, or point it at a folder of packs you already have. You can add more locations, on other disks, from Settings later."
 translation = "Изаберите фасциклу на серверу у којој ће Hoard чувати ваше пакете или га усмерите на фасциклу с пакетима коју већ имате. Касније можете да додате још локација, на другим дисковима, у Подешавањима."
 
+[messages.setup-lede-desktop]
+source = "Pick a folder for Hoard to keep your packs in, or point it at a folder of packs you already have. You can add more locations, on other disks, from Settings later."
+translation = "Изаберите фасциклу у којој ће Hoard чувати ваше пакете или га усмерите на фасциклу с пакетима коју већ имате. Касније можете да додате још локација, на другим дисковима, у Подешавањима."
+
 [messages.setup-loading]
 source = "Loading…"
 translation = "Учитавање…"
@@ -9319,6 +9407,10 @@ translation = "Покушај поново"
 [messages.setup-unreachable]
 source = "Couldn't reach the server: { $error }"
 translation = "Није могуће приступити серверу: { $error }"
+
+[messages.setup-unreachable-desktop]
+source = "Hoard isn't answering: { $error }"
+translation = "Hoard не одговара: { $error }"
 
 [messages.setup-watched-after]
 source = "; packs show up as it finds them. To upload as well, add a library Hoard keeps from Settings → Library locations."

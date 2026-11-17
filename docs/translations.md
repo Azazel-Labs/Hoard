@@ -23,6 +23,11 @@ Numbers and dates go through `formatNumber` and `formatDate`, so they're written
 Message IDs start with where they're shown (`settings-`, `upload-`, `error-`…). Give translators a comment above
 any message whose meaning isn't obvious from its words, saying where it appears and what each variable holds.
 
+The desktop app shows `message-id-desktop` in place of `message-id` wherever the catalogs have one, on the server and
+in the portal alike. Add one when a message talks about the server, accounts or other people, and say it for one
+person on their own computer instead ("Folder on the server" becomes "Folder"). It may use only the variables its
+message's calls pass.
+
 ## Changing English
 
 After changing English text, update each affected translation. The check reports the exact message IDs with their

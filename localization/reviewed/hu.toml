@@ -24,6 +24,10 @@ translation = "A Claude és más MI-alkalmazások"
 source = "Connect Claude (or any MCP app) and it can search and fetch assets for you, and describe and tag what Hoard hasn’t yet. It signs in to Hoard the first time; you allow it here in the browser."
 translation = "Csatlakoztassa a Claude-ot (vagy bármely MCP-alkalmazást), és assetekre kereshet és letöltheti őket Ön helyett, valamint leírhatja és felcímkézheti, amit a Hoard még nem. Első alkalommal bejelentkezik a Hoardba; ezt itt, a böngészőben engedélyezi."
 
+[messages.account-app-signin]
+source = "The Hoard app signs you in by itself, so there’s no password. Make an access token below for the engine plugins and the hoard command."
+translation = "A Hoard alkalmazás magától bejelentkeztet, ezért nincs jelszó. Alább hozz létre hozzáférési tokent a motorbővítményekhez és a hoard parancshoz."
+
 [messages.account-change-password]
 source = "Change password"
 translation = "Jelszó módosítása"
@@ -431,6 +435,10 @@ translation = "Háttértevékenység"
 [messages.activity-unreachable]
 source = "Can't reach the server"
 translation = "A szerver nem érhető el"
+
+[messages.activity-unreachable-desktop]
+source = "Hoard isn't answering"
+translation = "A Hoard nem válaszol"
 
 [messages.api-kind-animation]
 source = "Animations"
@@ -1287,6 +1295,10 @@ translation = "csomag"
 [messages.app-unreachable]
 source = "Couldn't reach the server: { $error }"
 translation = "Nem sikerült elérni a szervert: { $error }"
+
+[messages.app-unreachable-desktop]
+source = "Hoard isn't answering: { $error }"
+translation = "A Hoard nem válaszol: { $error }"
 
 [messages.app-update]
 source = "Update"
@@ -3097,6 +3109,10 @@ translation = "ezt a bejelentkezést nem itt indították, vagy több mint 15 pe
 source = "ChatGPT answered for a different registration of this server; start the sign-in again"
 translation = "a ChatGPT ennek a szervernek egy másik regisztrációjára válaszolt; indítsa újra a bejelentkezést"
 
+[messages.error-chatgpt-other-registration-desktop]
+source = "ChatGPT answered for a different copy of Hoard; start the sign-in again"
+translation = "a ChatGPT a Hoard egy másik példányának válaszolt; indítsa újra a bejelentkezést"
+
 [messages.error-chatgpt-paste-address]
 source = "paste the whole address, starting with http://127.0.0.1"
 translation = "illessze be a teljes címet, amely így kezdődik: http://127.0.0.1"
@@ -3133,9 +3149,17 @@ translation = "a kérés sikertelen"
 source = "ChatGPT signed this server out ({ $code }); sign in again from Settings → AI tagging"
 translation = "a ChatGPT kijelentkeztette ezt a szervert ({ $code }); jelentkezzen be újra a Beállítások → MI-címkézés oldalon"
 
+[messages.error-chatgpt-signed-out-desktop]
+source = "ChatGPT signed Hoard out ({ $code }); sign in again from Settings → AI tagging"
+translation = "a ChatGPT kijelentkeztette a Hoardot ({ $code }); jelentkezzen be újra a Beállítások → MI-címkézés oldalon"
+
 [messages.error-chatgpt-signed-out-problem]
 source = "ChatGPT signed this server out ({ $code }). Sign in again to keep tagging with your plan."
 translation = "A ChatGPT kijelentkeztette ezt a szervert ({ $code }). Jelentkezzen be újra, hogy továbbra is az előfizetésével címkézhessen."
+
+[messages.error-chatgpt-signed-out-problem-desktop]
+source = "ChatGPT signed Hoard out ({ $code }). Sign in again to keep tagging with your plan."
+translation = "A ChatGPT kijelentkeztette a Hoardot ({ $code }). Jelentkezzen be újra, hogy továbbra is az előfizetésével címkézhessen."
 
 [messages.error-chatgpt-unsupported]
 source = "ChatGPT plan usage doesn't support { $param } with this model"
@@ -3573,6 +3597,10 @@ translation = "nincs másik tárolási hely, ahová a fájlokat át lehetne hely
 source = "There's no SoundFont at { $path } on the server"
 translation = "Nincs SoundFont a szerveren ezen az útvonalon: { $path }"
 
+[messages.error-no-soundfont-desktop]
+source = "There's no SoundFont at { $path }"
+translation = "Nincs SoundFont ezen az útvonalon: { $path }"
+
 [messages.error-not-a-hash]
 source = "not a blake3 hex hash"
 translation = "nem blake3 hexadecimális hash"
@@ -3600,6 +3628,10 @@ translation = "{ $url } nem router módban futó llama.cpp szerver, ezért nem t
 [messages.error-not-started]
 source = "the server hasn't started"
 translation = "a szerver nem indult el"
+
+[messages.error-not-started-desktop]
+source = "Hoard hasn't started"
+translation = "A Hoard nem indult el"
 
 [messages.error-not-watched]
 source = "{ $name } isn't a watched folder"
@@ -5200,6 +5232,10 @@ translation = "A feltöltéshez olyan könyvtár kell, amelyet a Hoard kezel. K�
 source = "Folder on the server"
 translation = "Mappa a szerveren"
 
+[messages.locations-folder-desktop]
+source = "Folder"
+translation = "Mappa"
+
 [messages.locations-folder-hint-managed]
 source = "Hoard creates it if it isn't there. In Docker, this is a folder you've mounted into the container."
 translation = "Ha nem létezik, a Hoard létrehozza. Dockerben ez egy olyan mappa, amelyet a konténerbe csatolt."
@@ -5856,6 +5892,10 @@ translation = "3D-megtekintés: { $name }"
 source = "the server is still converting this model"
 translation = "a szerver még átalakítja ezt a modellt"
 
+[messages.model-error-converting-desktop]
+source = "Hoard is still converting this model"
+translation = "A Hoard még átalakítja ezt a modellt"
+
 [messages.model-error-empty-collada]
 source = "empty Collada file"
 translation = "üres Collada-fájl"
@@ -6510,6 +6550,10 @@ translation = "Bélyegképek készítése ebben a böngészőben"
 [messages.packs-make-thumbs-title]
 source = "Open each model in a 3D viewer out of sight, one at a time, and use its picture as the thumbnail where that's better than the server's"
 translation = "Minden modellt egyenként megnyit egy rejtett 3D-megjelenítőben, és a képét használja bélyegképként, ahol az jobb a szerverénél"
+
+[messages.packs-make-thumbs-title-desktop]
+source = "Open each model in a 3D viewer out of sight, one at a time, and use its picture as the thumbnail where that's better than the one Hoard made"
+translation = "Minden modellt egyenként megnyit egy rejtett 3D-megjelenítőben, és a képét használja bélyegképként, ahol az jobb a Hoard által készítettnél"
 
 [messages.packs-more]
 source = "More"
@@ -7351,6 +7395,10 @@ translation = "Visszaállítás az alapértékre, { $value }"
 source = "Reset to the default: { $value }"
 translation = "Visszaállítás az alapértékre: { $value }"
 
+[messages.root-desktop-reopen]
+source = "This window was signed out. Close Hoard and open it again to carry on."
+translation = "Ez az ablak kijelentkezett. A folytatáshoz zárd be a Hoardot, majd nyisd meg újra."
+
 [messages.root-lazy-connect]
 source = "the app connection"
 translation = "alkalmazáskapcsolat"
@@ -7362,6 +7410,10 @@ translation = "Újra"
 [messages.root-unreachable]
 source = "Couldn’t reach the Hoard server: { $error }"
 translation = "Nem sikerült elérni a Hoard szervert: { $error }"
+
+[messages.root-unreachable-desktop]
+source = "Hoard isn’t answering: { $error }"
+translation = "A Hoard nem válaszol: { $error }"
 
 [messages.server-back-to-settings]
 source = "Back to Settings"
@@ -8031,6 +8083,10 @@ translation = "Keresés a képek tartalma szerint"
 source = "Uses OpenAI’s CLIP model, run on this server’s processor: nothing leaves it. Turning it on downloads the model ({ $size } MB) from Hugging Face, then learns every picture in the background at low priority. It takes 300 to 600 MB of memory while it works or someone searches. Turning it off deletes the model and keeps what it learned, for next time."
 translation = "Az OpenAI CLIP modelljét használja, a szerver processzorán futtatva: semmi sem hagyja el a szervert. Bekapcsoláskor letölti a modellt ({ $size } MB) a Hugging Face-ről, majd a háttérben, alacsony prioritással megtanul minden képet. Munka vagy keresés közben 300–600 MB memóriát foglal. Kikapcsoláskor törli a modellt, de megtartja, amit megtanult, a következő alkalomra."
 
+[messages.settings-clip-hint-desktop]
+source = "Uses OpenAI’s CLIP model, run on this computer’s processor: nothing leaves it. Turning it on downloads the model ({ $size } MB) from Hugging Face, then learns every picture in the background at low priority. It takes 300 to 600 MB of memory while it works or you search. Turning it off deletes the model and keeps what it learned, for next time."
+translation = "Az OpenAI CLIP modelljét használja, ennek a számítógépnek a processzorán futtatva: semmi sem hagyja el a gépet. Bekapcsoláskor letölti a modellt ({ $size } MB) a Hugging Face-ről, majd a háttérben, alacsony prioritással megtanul minden képet. Munka vagy keresés közben 300–600 MB memóriát foglal. Kikapcsoláskor törli a modellt, de megtartja, amit megtanult, a következő alkalomra."
+
 [messages.settings-clip-learning]
 source = "Ready: learning pictures, { $done } of { $total } so far"
 translation = "Kész: képek tanulása, eddig { $done } / { $total }"
@@ -8329,6 +8385,10 @@ translation = "kikapcsolva"
 source = "on"
 translation = "bekapcsolva"
 
+[messages.settings-desktop-updates]
+source = "Hoard looks for a new release each time it starts, downloads it in the background, and installs it when you quit."
+translation = "A Hoard minden indításkor új kiadást keres, a háttérben letölti, és kilépéskor telepíti."
+
 [messages.settings-ffmpeg-download]
 source = "Uses a system ffmpeg with the right encoders, or downloads a static build (about 80 MB)."
 translation = "A rendszer megfelelő kódolókkal rendelkező ffmpeg-jét használja, vagy letölt egy statikus buildet (kb. 80 MB)."
@@ -8553,6 +8613,10 @@ translation = "Név"
 source = "What this server is called in the top bar, the browser tab and on the sign-in page, so with more than one hoard you can tell which is which."
 translation = "A szerver neve a felső sávban, a böngészőlapon és a bejelentkezési oldalon, hogy több hoard esetén meg lehessen különböztetni őket."
 
+[messages.settings-name-what-desktop]
+source = "What this library is called in the top bar."
+translation = "A könyvtár neve a felső sávban."
+
 [messages.settings-option-saved]
 source = "{ $name }: { $value }"
 translation = "{ $name }: { $value }"
@@ -8621,6 +8685,10 @@ translation = "Általános"
 source = "What this server is called, for everyone who uses it."
 translation = "A szerver neve mindenki számára, aki használja."
 
+[messages.settings-page-general-blurb-desktop]
+source = "What this library is called."
+translation = "A könyvtár neve."
+
 [messages.settings-page-issues]
 source = "Issues"
 translation = "Problémák"
@@ -8645,6 +8713,10 @@ translation = "Tárolási helyek"
 source = "The folders on the server that hold the library: ones Hoard keeps files in, and folders of packs it indexes where they are."
 translation = "A szerver mappái, amelyekben a könyvtár van: amelyekben a Hoard fájlokat tárol, és csomagmappák, amelyeket a helyükön indexel."
 
+[messages.settings-page-locations-blurb-desktop]
+source = "The folders that hold the library: ones Hoard keeps files in, and folders of packs it indexes where they are."
+translation = "A mappák, amelyekben a könyvtár van: amelyekben a Hoard fájlokat tárol, és csomagmappák, amelyeket a helyükön indexel."
+
 [messages.settings-page-maintenance]
 source = "Maintenance"
 translation = "Karbantartás"
@@ -8660,6 +8732,10 @@ translation = "Teljesítmény"
 [messages.settings-page-performance-blurb]
 source = "How hard the server works, how thumbnails are made and kept, and the most it takes in."
 translation = "Mennyire dolgozik keményen a szerver, hogyan készülnek és tárolódnak a bélyegképek, és legfeljebb mennyit fogad be."
+
+[messages.settings-page-performance-blurb-desktop]
+source = "How hard Hoard works, how thumbnails are made and kept, and the most it takes in."
+translation = "Mennyire dolgozik keményen a Hoard, hogyan készülnek és tárolódnak a bélyegképek, és legfeljebb mennyit fogad be."
 
 [messages.settings-page-search]
 source = "Image search"
@@ -8765,6 +8841,10 @@ translation = "MIDI-hangkészlet (SoundFont)"
 source = "found on the server, or built-in"
 translation = "a szerveren talált vagy a beépített"
 
+[messages.settings-soundfont-default-desktop]
+source = "found on this computer, or built-in"
+translation = "ezen a számítógépen talált vagy a beépített"
+
 [messages.settings-soundfont-file]
 source = "SoundFont file"
 translation = "SoundFont-fájl"
@@ -8772,6 +8852,10 @@ translation = "SoundFont-fájl"
 [messages.settings-soundfont-placeholder]
 source = "Found on the server, or built-in"
 translation = "A szerveren talált vagy a beépített"
+
+[messages.settings-soundfont-placeholder-desktop]
+source = "Found on this computer, or built-in"
+translation = "Ezen a számítógépen talált vagy a beépített"
 
 [messages.settings-soundfont-what]
 source = "The instruments MIDI files are played and converted with."
@@ -9041,6 +9125,10 @@ translation = "feladat egyszerre (beolvasás, címkézés, átalakítás)"
 source = "Pick a folder on the server for Hoard to keep your packs in, or point it at a folder of packs you already have. You can add more locations, on other disks, from Settings later."
 translation = "Válasszon egy mappát a szerveren, ahol a Hoard a csomagjait tárolja, vagy mutasson egy meglévő csomagmappára. Később a Beállításokban további helyeket adhat hozzá, más lemezeken is."
 
+[messages.setup-lede-desktop]
+source = "Pick a folder for Hoard to keep your packs in, or point it at a folder of packs you already have. You can add more locations, on other disks, from Settings later."
+translation = "Válasszon egy mappát, ahol a Hoard a csomagjait tárolja, vagy mutasson egy meglévő csomagmappára. Később a Beállításokban további helyeket adhat hozzá, más lemezeken is."
+
 [messages.setup-loading]
 source = "Loading…"
 translation = "Betöltés…"
@@ -9076,6 +9164,10 @@ translation = "Újra"
 [messages.setup-unreachable]
 source = "Couldn't reach the server: { $error }"
 translation = "Nem sikerült elérni a szervert: { $error }"
+
+[messages.setup-unreachable-desktop]
+source = "Hoard isn't answering: { $error }"
+translation = "A Hoard nem válaszol: { $error }"
 
 [messages.setup-watched-after]
 source = "; packs show up as it finds them. To upload as well, add a library Hoard keeps from Settings → Library locations."

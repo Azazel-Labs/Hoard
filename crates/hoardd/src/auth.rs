@@ -195,7 +195,7 @@ pub(crate) fn random_bytes<const N: usize>() -> Result<[u8; N]> {
     Ok(b)
 }
 
-fn hash_password(password: &str) -> Result<String> {
+pub(crate) fn hash_password(password: &str) -> Result<String> {
     Ok(Argon2::default().hash_password(password.as_bytes()).map_err(|e| anyhow!("hash password: {e}"))?.to_string())
 }
 
@@ -419,6 +419,7 @@ async fn status(State(state): State<AppState>, headers: HeaderMap) -> ApiResult<
         "guest_browsing": settings.guest_browsing,
         "name": settings.name,
         "sign_in": crate::signin::sign_in_options(&settings.auth),
+        "desktop": state.cfg.desktop,
     })))
 }
 

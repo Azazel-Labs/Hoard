@@ -2,6 +2,7 @@
 // `GET /api/auth/status` says, so the portal knows whether to show the library or the sign-in screen.
 import { reactive } from 'vue'
 import { api, whenSignInNeeded, type AuthStatus, type Role } from './api'
+import { useDesktopWording } from './i18n'
 
 export const auth = reactive({
   status: null as AuthStatus | null,
@@ -19,6 +20,7 @@ export function siteName(): string {
 export async function refreshAuth(): Promise<void> {
   try {
     auth.status = await api.authStatus()
+    rememberDesktop(isDesktop())
     auth.error = ''
     document.title = siteName()
   } catch (e) {
@@ -30,6 +32,30 @@ export async function refreshAuth(): Promise<void> {
 export function canBrowse(): boolean {
   const s = auth.status
   return !!s && !s.setup_needed && (s.signed_in || s.guest_browsing)
+}
+
+const DESKTOP_KEY = 'hoard-desktop'
+
+/** Whether this is the desktop app, remembered so its wording holds while the status can't be loaded. */
+function rememberDesktop(on: boolean): void {
+  useDesktopWording(on)
+  try {
+    if (on) localStorage.setItem(DESKTOP_KEY, '1')
+    else localStorage.removeItem(DESKTOP_KEY)
+  } catch {
+    // Without storage, the wording waits for the status.
+  }
+}
+
+try {
+  useDesktopWording(localStorage.getItem(DESKTOP_KEY) === '1')
+} catch {
+  // As above.
+}
+
+/** The desktop app: one person's library on their own computer, with no accounts, guests or server to set up. */
+export function isDesktop(): boolean {
+  return !!auth.status?.desktop
 }
 
 const RANK = { view: 0, edit: 1, admin: 2 } as const

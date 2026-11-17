@@ -639,6 +639,19 @@ const MIGRATIONS: &[&str] = &[
          AND EXISTS (SELECT 1 FROM assets a WHERE a.pack_id = p.id AND a.kind = 'texture')
          AND NOT EXISTS (SELECT 1 FROM jobs j WHERE j.kind = 'materials' AND j.pack_id = p.id
                            AND j.status IN ('queued', 'running'));",
+    // 62: OBJ thumbnails drawn before OBJ models were read and drawn as they are now may be wrong. Every OBJ model's
+    // thumbnail goes back to being the server's, packs with OBJ models are drawn again, and a browser draws its own
+    // afresh the next time the model is opened.
+    "UPDATE assets SET thumb_source = NULL WHERE kind = 'model' AND ext = 'obj' AND thumb_source IS NOT NULL;
+     UPDATE packs SET status = 'ingesting'
+       WHERE status = 'ready' AND archived_at IS NULL
+         AND EXISTS (SELECT 1 FROM assets a WHERE a.pack_id = packs.id AND a.kind = 'model' AND a.ext = 'obj')
+         AND NOT EXISTS (SELECT 1 FROM jobs j WHERE j.pack_id = packs.id AND j.status IN ('queued', 'running'));
+     INSERT INTO jobs (kind, pack_id, payload, run_after, created_at, updated_at)
+       SELECT 'retag', id, '{\"then_llm\":false}', strftime('%Y-%m-%dT%H:%M:%SZ', 'now'),
+              strftime('%Y-%m-%dT%H:%M:%SZ', 'now'), strftime('%Y-%m-%dT%H:%M:%SZ', 'now')
+       FROM packs p WHERE p.status = 'ingesting'
+         AND NOT EXISTS (SELECT 1 FROM jobs j WHERE j.pack_id = p.id AND j.status IN ('queued', 'running'));",
 ];
 
 /// How many automatic pre-upgrade backups to keep in `<data dir>/backups`.

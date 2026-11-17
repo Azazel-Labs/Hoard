@@ -1,0 +1,21 @@
+{
+    "FormatVersion": 1,
+    "Name": "Hoard",
+    "Version": 1,
+    "VersionName": "0.1.0",
+    "Author": "Hoard",
+    "Description": "Search a Hoard server from the editor's Hoard drawer and add assets to the project with what they need. Files land in Hoard/ beside the .lproject, pinned in hoard.toml and hoard.lock as `hoard sync` keeps them, and models, textures, sounds and fonts are imported under /Game/Content/Hoard.",
+    "Category": "Content",
+    "EnabledByDefault": true,
+    "EditorOnly": true,
+    "ContainsContent": false,
+    "SupportedPlatforms": [ "Windows", "Linux" ],
+    "Dependencies": [],
+    "Modules": [
+        {
+            "Name": "HoardEditor",
+            "Type": "Editor",
+            "LoadingPhase": "EditorInit"
+        }
+    ]
+}

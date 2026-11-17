@@ -76,6 +76,8 @@ jobs:
         if: steps.pw-cache.outputs.cache-hit == 'true'
         working-directory: web
         run: npx playwright install-deps chromium
+      - name: libcurl's headers, for the Lumina plugin's core
+        run: sudo apt-get install -y --no-install-recommends libcurl4-openssl-dev
       - run: npm run e2e
         working-directory: web
         env:

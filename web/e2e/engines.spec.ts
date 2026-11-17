@@ -2,6 +2,7 @@
 // `hoard sync --verify` must find every file already in place. Godot runs when GODOT_BIN names a Godot 4 executable (its
 // console build on Windows); Unity's package code runs on .NET when `dotnet` is installed, as it is on CI's runners;
 // Unreal runs when UNREAL_EDITOR names UnrealEditor-Cmd, building the plugin with that engine's UAT the first time.
+// Lumina's plugin core builds with the C++ compiler (CXX, or c++) and runs as a program, short of importing.
 // All need the hoard CLI built (`cargo build -p hoard`, or HOARD_CLI).
 import { createHash } from 'node:crypto'
 import { spawnSync, type SpawnSyncReturns } from 'node:child_process'
@@ -420,5 +421,37 @@ test('the Unreal plugin adds an asset with what it needs, where hoard sync would
       },
       run: (dir, env) => sentOutcome(unreal(dir, 'HoardSend', env), 'Unreal'),
     },
+  })
+})
+
+/** The Lumina plugin's core (all of it but drawing and importing) built with the test program, once per change: with
+ *  CXX, or c++ (clang++ on Windows), against libcurl, or WinHTTP on Windows. */
+function luminaCore(cxx: string): string {
+  const core = join(repo, 'integrations/lumina/Hoard/Source/HoardEditor')
+  const sources = [join(repo, 'integrations/lumina/test/add_assets.cpp'), join(core, 'HoardCore.cpp'), join(core, 'HoardHttp.cpp')]
+  const hash = createHash('sha256').update(cxx)
+  for (const f of [...sources, join(core, 'HoardCore.h')]) hash.update(readFileSync(f))
+  const exe = join(tmpdir(), `hoard-lumina-${hash.digest('hex').slice(0, 12)}${process.platform === 'win32' ? '.exe' : ''}`)
+  if (existsSync(exe)) return exe
+  const libs = process.platform === 'win32' ? ['-lwinhttp'] : ['-lcurl']
+  const built = spawnSync(cxx, ['-std=c++20', '-O1', `-I${core}`, ...sources, '-o', exe, ...libs], { encoding: 'utf8', timeout: 300_000 })
+  expect(built.status, `${built.stdout}\n${built.stderr}`).toBe(0)
+  return exe
+}
+
+test('the Lumina plugin adds an asset with what it needs, where hoard sync would, and says the project uses it', async ({ api, baseURL }) => {
+  const cxx = process.env.CXX ?? (process.platform === 'win32' ? 'clang++' : 'c++')
+  test.skip(spawnSync(cxx, ['--version']).status !== 0, `${cxx} is not installed`)
+  test.setTimeout(400_000)
+  const exe = luminaCore(cxx)
+  await roundTrip(api, baseURL!, {
+    engine: 'Lumina',
+    outDir: 'Hoard',
+    // With no hoard.toml the project goes by its folder's name, and the plugin makes one.
+    project: (dir) => basename(dir),
+    prepare(dir) {
+      writeFileSync(join(dir, `${basename(dir)}.lproject`), JSON.stringify({ Name: basename(dir) }))
+    },
+    run: (_dir, env) => outcome(spawnSync(exe, [], { env: { ...process.env, ...env }, encoding: 'utf8', timeout: 90_000 }), 'Lumina'),
   })
 })

@@ -196,6 +196,9 @@ server-role-emissive = 自发光
 server-role-translucency = 半透明
 error-texture-suffix-missing = 请为{ $map }贴图指定后缀
 error-texture-suffix-chars = { $map }贴图的后缀不能包含 < > : " / \ | ? 或 *
+error-texture-ending-missing = 每个自定义结尾都需要填写要查找的结尾
+error-texture-ending-chars = 自定义结尾不能包含 < > : " / \ | ? 或 *
+error-texture-ending-twice = { $ending } 在你的结尾中出现了两次
 error-oauth-no-client-id = 此链接没有 client_id。
 error-oauth-unknown-app = 此应用（已）未在此处注册。请从应用中重新开始连接。
 error-oauth-redirect = 该应用要求跳转回一个它未注册的地址。
@@ -1669,6 +1672,26 @@ texnames-placeholders = 命名模式可以使用 { "{" }name{ "}" }、{ "{" }map
 texnames-bad-characters = 名称不能包含 < > : " / \ | ? 或 *
 texnames-no-suffix = 请为{ $role }贴图指定后缀
 texnames-bad-suffix = { $role }贴图的后缀不能包含 < > : " / \ | ? 或 *
+texnames-slot-no-suffix = 请为“{ $slot }”指定后缀
+texnames-slot-bad-suffix = “{ $slot }”的后缀不能包含 < > : " / \ | ? 或 *
+texnames-ending-missing = 每个自定义结尾都需要填写要查找的结尾
+texnames-ending-bad = 自定义结尾不能包含 < > : " / \ | ? 或 *
+texnames-ending-twice = { $ending } 在你的结尾中出现了两次
+texnames-slot-metallic-roughness = 金属度和粗糙度
+texnames-slot-specular-color = 高光颜色
+texnames-slot-specular-glossiness = 高光和光泽度
+texnames-slot-clearcoat = 清漆
+texnames-slot-clearcoat-roughness = 清漆粗糙度
+texnames-slot-clearcoat-normal = 清漆法线
+texnames-slot-sheen-color = 绒光颜色
+texnames-slot-sheen-roughness = 绒光粗糙度
+texnames-slot-transmission = 透射
+texnames-slot-thickness = 厚度
+texnames-slot-diffuse-transmission = 漫透射
+texnames-slot-diffuse-transmission-color = 漫透射颜色
+texnames-slot-iridescence = 虹彩
+texnames-slot-iridescence-thickness = 虹彩厚度
+texnames-slot-anisotropy = 各向异性
 
 ## storeFormats.ts
 
@@ -2128,6 +2151,16 @@ settings-tn-hint-map = { " " }贴图用途，{ " " }
 settings-tn-hint-size = { " " }尺寸（当一套贴图有多种尺寸时；如果模式中省略，会加在末尾）。
 settings-tn-example = 示例
 settings-tn-suffixes = 各类贴图的后缀
+settings-tn-slots = 在 GLB 下载中，打包在模型内部、没有独立文件的纹理会以材质和它所占用的槽位命名，这些槽位也有后缀：
+settings-tn-endings = 自定义结尾
+settings-tn-endings-what = 不属于材质贴图的纹理会保留自己的名称，除非名称以下列结尾之一结束：_diff → _BC 会把 rock_diff.png 发送为 rock_BC.png。第二项留空即可去掉该结尾。
+settings-tn-ending-from = 结尾
+settings-tn-ending-from-example = _diff
+settings-tn-ending-to = 替换为
+settings-tn-ending-to-example = _BC
+settings-tn-ending-add = 添加结尾
+settings-tn-ending-remove = 移除
+settings-tn-ending-remove-label = 移除 { $ending }
 
 ## SettingsPage.vue: 常规和连接
 

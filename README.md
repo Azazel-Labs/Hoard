@@ -446,8 +446,10 @@ side by side as its thumbnail.
 - **Downloading** a material gives a zip of all its maps. A model that uses one brings the maps along. Maps go out
   named by a convention, `RockMoss_AO.jpg` by default, in downloads, zips, GLB downloads, `hoard sync` and to AI
   assistants; Settings → Downloads switches to short game-engine names (`T_RockMoss_AO.jpg`), takes a pattern of your
-  own with your own suffix for each kind of map, or turns it off. The files in the library are never renamed, and a
-  map that a model or MTL in the same download names by file keeps that name so the model still finds it.
+  own with your own suffix for each kind of map and each glTF material slot, or turns it off. Endings of your own
+  rename the textures that aren't maps: `_diff` → `_BC` sends `rock_diff.png` as `rock_BC.png`. The files in the
+  library are never renamed, and a texture that a model or MTL in the same download names by file keeps that name so
+  the model still finds it.
 
 New packs are looked through as they come in, and packs already in the library once after an upgrade. A rescan or
 "Re-run offline tagger" (packs page, More) looks again.
@@ -495,10 +497,10 @@ and Opus use ffmpeg's reference encoders (LAME, libvorbis, libopus), as do sourc
 
 A GLB download keeps its textures out of the GLB: the zip holds `<name>.glb` and a `textures` folder it points at.
 A texture Hoard knows as a map is named by the convention in Settings → Downloads, and any other keeps the name of the
-file it came from. One that was only ever inside a model takes the name it was given there, or else its material's and
-the slot it fills, by the same convention (`Wood_BaseColor.png`, `Rock_ORM.png`, or `Wood_BC.png` with your own
-suffixes). A model without textures comes as a plain `.glb`. Models are turned the way their pack's models face (see
-Facing in the 3D viewer).
+file it came from, with your own endings swapped. One that was only ever inside a model takes the name it was given
+there, or else its material's and the slot it fills, by the same convention (`Wood_BaseColor.png`, `Rock_ORM.png`,
+`Paint_ClearcoatNormal.png`, or `Wood_BC.png` with your own suffixes). A model without textures comes as a plain `.glb`.
+Models are turned the way their pack's models face (see Facing in the 3D viewer).
 
 `GET /api/assets/{id}/as/{format}[?max=1024]`; the asset detail lists the formats on offer. 16-bit images stay
 16-bit; HDR going into an 8-bit format is tone-mapped rather than clipped.

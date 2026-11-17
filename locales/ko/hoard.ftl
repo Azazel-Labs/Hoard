@@ -196,6 +196,9 @@ server-role-emissive = 이미시브
 server-role-translucency = 반투명
 error-texture-suffix-missing = { $map } 맵에 접미사를 지정하세요
 error-texture-suffix-chars = { $map } 맵의 접미사에는 < > : " / \ | ? * 를 쓸 수 없습니다
+error-texture-ending-missing = 직접 지정한 끝부분마다 찾을 끝부분을 입력해야 합니다
+error-texture-ending-chars = 직접 지정한 끝부분에는 < > : " / \ | ? * 를 쓸 수 없습니다
+error-texture-ending-twice = { $ending }이(가) 끝부분 목록에 두 번 있습니다
 error-oauth-no-client-id = 이 링크에 client_id가 없습니다.
 error-oauth-unknown-app = 이 앱은 여기에 등록되어 있지 않습니다(더 이상). 앱에서 연결을 다시 시작하세요.
 error-oauth-redirect = 앱이 등록하지 않은 주소로 돌려보내 달라고 요청했습니다.
@@ -1645,6 +1648,26 @@ texnames-placeholders = 패턴에는 { "{" }name{ "}" }, { "{" }map{ "}" }, { "{
 texnames-bad-characters = 이름에는 < > : " / \ | ? * 를 쓸 수 없습니다
 texnames-no-suffix = { $role } 맵에 접미사를 지정하세요
 texnames-bad-suffix = { $role } 맵의 접미사에는 < > : " / \ | ? * 를 쓸 수 없습니다
+texnames-slot-no-suffix = “{ $slot }”에 접미사를 지정하세요
+texnames-slot-bad-suffix = “{ $slot }”의 접미사에는 < > : " / \ | ? * 를 쓸 수 없습니다
+texnames-ending-missing = 직접 지정한 끝부분마다 찾을 끝부분을 입력해야 합니다
+texnames-ending-bad = 직접 지정한 끝부분에는 < > : " / \ | ? * 를 쓸 수 없습니다
+texnames-ending-twice = { $ending }이(가) 끝부분 목록에 두 번 있습니다
+texnames-slot-metallic-roughness = 메탈과 러프니스
+texnames-slot-specular-color = 스페큘러 색상
+texnames-slot-specular-glossiness = 스페큘러와 글로시니스
+texnames-slot-clearcoat = 클리어코트
+texnames-slot-clearcoat-roughness = 클리어코트 러프니스
+texnames-slot-clearcoat-normal = 클리어코트 노멀
+texnames-slot-sheen-color = 광택 색상
+texnames-slot-sheen-roughness = 광택 러프니스
+texnames-slot-transmission = 투과
+texnames-slot-thickness = 두께
+texnames-slot-diffuse-transmission = 확산 투과
+texnames-slot-diffuse-transmission-color = 확산 투과 색상
+texnames-slot-iridescence = 이리데선스
+texnames-slot-iridescence-thickness = 이리데선스 두께
+texnames-slot-anisotropy = 이방성
 
 ## storeFormats.ts
 
@@ -2098,6 +2121,16 @@ settings-tn-hint-map = { " " }맵의 용도,{ " " }
 settings-tn-hint-size = { " " }세트가 여러 크기로 제공될 때의 크기(패턴에 없으면 끝에 붙습니다).
 settings-tn-example = 예시
 settings-tn-suffixes = 맵 종류별 접미사
+settings-tn-slots = GLB 다운로드에서 자체 파일 없이 모델 안에 들어 있는 텍스처는 머티리얼과 그 텍스처가 채우는 슬롯에 따라 이름이 붙으며, 이 슬롯에도 접미사가 있습니다:
+settings-tn-endings = 직접 지정한 끝부분
+settings-tn-endings-what = 머티리얼의 맵이 아닌 텍스처는 원래 이름을 유지하지만, 다음 중 하나로 끝나면 바뀝니다. _diff → _BC는 rock_diff.png를 rock_BC.png로 보냅니다. 두 번째 칸을 비워 두면 끝부분을 없앱니다.
+settings-tn-ending-from = 끝부분
+settings-tn-ending-from-example = _diff
+settings-tn-ending-to = 바꿀 내용
+settings-tn-ending-to-example = _BC
+settings-tn-ending-add = 끝부분 추가
+settings-tn-ending-remove = 제거
+settings-tn-ending-remove-label = { $ending } 제거
 
 ## SettingsPage.vue: 일반 및 연결
 

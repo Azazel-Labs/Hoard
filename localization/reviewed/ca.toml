@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "a291e71b8315a85b796b394cd1cc26d480ac8ecd3bf12b797cf6319c57ccb07e"
+source = "140db2eb73736ff39922ac317725317468b02f342ce455ff2967c4a2f3b7a920"
 translation = "a8e90c6c6ba195832f26ec8d98ede39bfedc68c80bc69fd376aa7b993e381133"
 
 [messages.account-add]
@@ -3911,6 +3911,18 @@ translation = "no hi ha res a cercar; escriviu el nom del paquet"
 [messages.error-task-running]
 source = "“{ $task }” is already running"
 translation = "«{ $task }» ja s'està executant"
+
+[messages.error-texture-ending-chars]
+source = '''Endings of your own can't have < > : " / \ | ? or *'''
+translation = 'Les terminacions pròpies no poden contenir < > : " / \ | ? ni *'
+
+[messages.error-texture-ending-missing]
+source = "Each ending of your own needs the ending to look for"
+translation = "Cada terminació pròpia necessita la terminació que cal buscar"
+
+[messages.error-texture-ending-twice]
+source = "{ $ending } is in your endings twice"
+translation = "{ $ending } surt dues vegades a les vostres terminacions"
 
 [messages.error-texture-map-type]
 source = "There's no map type called { $role }"
@@ -8692,6 +8704,42 @@ translation = "El vostre"
 source = "Descriptive"
 translation = "Descriptiu"
 
+[messages.settings-tn-ending-add]
+source = "Add an ending"
+translation = "Afegeix una terminació"
+
+[messages.settings-tn-ending-from]
+source = "Ending"
+translation = "Terminació"
+
+[messages.settings-tn-ending-from-example]
+source = "_diff"
+translation = "_diff"
+
+[messages.settings-tn-ending-remove]
+source = "Remove"
+translation = "Treu"
+
+[messages.settings-tn-ending-remove-label]
+source = "Remove { $ending }"
+translation = "Treu { $ending }"
+
+[messages.settings-tn-ending-to]
+source = "Swap for"
+translation = "Canvia per"
+
+[messages.settings-tn-ending-to-example]
+source = "_BC"
+translation = "_BC"
+
+[messages.settings-tn-endings]
+source = "Endings of your own"
+translation = "Les vostres terminacions"
+
+[messages.settings-tn-endings-what]
+source = "A texture that isn’t one of a material’s maps keeps its own name, unless it ends in one of these: _diff → _BC sends rock_diff.png as rock_BC.png. Leave the second empty to drop the ending."
+translation = "Una textura que no és cap dels mapes d'un material conserva el seu nom, tret que acabi en una d'aquestes: _diff → _BC envia rock_diff.png com a rock_BC.png. Deixeu buida la segona per treure la terminació."
+
 [messages.settings-tn-example]
 source = "Example"
 translation = "Exemple"
@@ -8723,6 +8771,10 @@ translation = "S'han desat els noms de textura"
 [messages.settings-tn-short]
 source = "Short"
 translation = "Curt"
+
+[messages.settings-tn-slots]
+source = "In GLB downloads, a texture packed inside a model with no file of its own is named after the material and the slot it fills, and these slots have suffixes too:"
+translation = "A les baixades GLB, una textura empaquetada dins d'un model sense fitxer propi rep el nom del material i de la ranura que ocupa, i aquestes ranures també tenen sufixos:"
 
 [messages.settings-tn-style]
 source = "Style"
@@ -9659,6 +9711,18 @@ translation = 'Els noms no poden contenir < > : " / \ | ? ni *'
 source = 'The suffix for { $role } maps can’t have < > : " / \ | ? or *'
 translation = 'El sufix dels mapes de tipus { $role } no pot contenir < > : " / \ | ? ni *'
 
+[messages.texnames-ending-bad]
+source = 'Endings of your own can’t have < > : " / \ | ? or *'
+translation = 'Les terminacions pròpies no poden contenir < > : " / \ | ? ni *'
+
+[messages.texnames-ending-missing]
+source = "Each ending of your own needs the ending to look for"
+translation = "Cada terminació pròpia necessita la terminació que cal buscar"
+
+[messages.texnames-ending-twice]
+source = "{ $ending } is in your endings twice"
+translation = "{ $ending } surt dues vegades a les vostres terminacions"
+
 [messages.texnames-needs-map]
 source = 'The pattern needs { "{" }map{ "}" }, or every map of a material would get the same name'
 translation = """El patró necessita { "{" }map{ "}" }, o tots els mapes d'un material tindrien el mateix nom"""
@@ -9670,6 +9734,74 @@ translation = "Doneu un sufix als mapes de tipus { $role }"
 [messages.texnames-placeholders]
 source = 'The pattern can use { "{" }name{ "}" }, { "{" }map{ "}" } and { "{" }size{ "}" }'
 translation = 'El patró pot fer servir { "{" }name{ "}" }, { "{" }map{ "}" } i { "{" }size{ "}" }'
+
+[messages.texnames-slot-anisotropy]
+source = "Anisotropy"
+translation = "Anisotropia"
+
+[messages.texnames-slot-bad-suffix]
+source = 'The suffix for “{ $slot }” can’t have < > : " / \ | ? or *'
+translation = 'El sufix de «{ $slot }» no pot contenir < > : " / \ | ? ni *'
+
+[messages.texnames-slot-clearcoat]
+source = "Clearcoat"
+translation = "Vernís"
+
+[messages.texnames-slot-clearcoat-normal]
+source = "Clearcoat normal"
+translation = "Normals del vernís"
+
+[messages.texnames-slot-clearcoat-roughness]
+source = "Clearcoat roughness"
+translation = "Rugositat del vernís"
+
+[messages.texnames-slot-diffuse-transmission]
+source = "Diffuse transmission"
+translation = "Transmissió difusa"
+
+[messages.texnames-slot-diffuse-transmission-color]
+source = "Diffuse transmission color"
+translation = "Color de la transmissió difusa"
+
+[messages.texnames-slot-iridescence]
+source = "Iridescence"
+translation = "Iridescència"
+
+[messages.texnames-slot-iridescence-thickness]
+source = "Iridescence thickness"
+translation = "Gruix de la iridescència"
+
+[messages.texnames-slot-metallic-roughness]
+source = "Metal and roughness"
+translation = "Metall i rugositat"
+
+[messages.texnames-slot-no-suffix]
+source = "Give “{ $slot }” a suffix"
+translation = "Doneu un sufix a «{ $slot }»"
+
+[messages.texnames-slot-sheen-color]
+source = "Sheen color"
+translation = "Color del setinat"
+
+[messages.texnames-slot-sheen-roughness]
+source = "Sheen roughness"
+translation = "Rugositat del setinat"
+
+[messages.texnames-slot-specular-color]
+source = "Specular color"
+translation = "Color especular"
+
+[messages.texnames-slot-specular-glossiness]
+source = "Specular and glossiness"
+translation = "Especular i brillantor"
+
+[messages.texnames-slot-thickness]
+source = "Thickness"
+translation = "Gruix"
+
+[messages.texnames-slot-transmission]
+source = "Transmission"
+translation = "Transmissió"
 
 [messages.text-binary]
 source = "This file is binary, not text, so there's nothing to read here. Download it to open it in its own tool."

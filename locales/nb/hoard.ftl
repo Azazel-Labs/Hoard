@@ -196,6 +196,9 @@ server-role-emissive = emissiv
 server-role-translucency = gjennomskinnelighet
 error-texture-suffix-missing = Gi teksturer av typen { $map } et suffiks
 error-texture-suffix-chars = Suffikset for teksturer av typen { $map } kan ikke inneholde < > : " / \ | ? eller *
+error-texture-ending-missing = Hver egen endelse trenger endelsen det skal ses etter
+error-texture-ending-chars = Egne endelser kan ikke inneholde < > : " / \ | ? eller *
+error-texture-ending-twice = { $ending } står to ganger blant endelsene dine
 error-oauth-no-client-id = Denne lenken har ingen client_id.
 error-oauth-unknown-app = Denne appen er ikke registrert her (lenger). Start tilkoblingen på nytt fra appen.
 error-oauth-redirect = Appen ba om å bli sendt tilbake til en adresse den ikke har registrert.
@@ -1819,6 +1822,26 @@ texnames-placeholders = Mønsteret kan bruke { "{" }name{ "}" }, { "{" }map{ "}"
 texnames-bad-characters = Navn kan ikke inneholde < > : " / \ | ? eller *
 texnames-no-suffix = Gi teksturer av typen { $role } et suffiks
 texnames-bad-suffix = Suffikset for teksturer av typen { $role } kan ikke inneholde < > : " / \ | ? eller *
+texnames-slot-no-suffix = Gi «{ $slot }» et suffiks
+texnames-slot-bad-suffix = Suffikset for «{ $slot }» kan ikke inneholde < > : " / \ | ? eller *
+texnames-ending-missing = Hver egen endelse trenger endelsen det skal ses etter
+texnames-ending-bad = Egne endelser kan ikke inneholde < > : " / \ | ? eller *
+texnames-ending-twice = { $ending } står to ganger blant endelsene dine
+texnames-slot-metallic-roughness = Metall og ruhet
+texnames-slot-specular-color = Spekulær farge
+texnames-slot-specular-glossiness = Spekulær og glans
+texnames-slot-clearcoat = Klarlakk
+texnames-slot-clearcoat-roughness = Klarlakkruhet
+texnames-slot-clearcoat-normal = Klarlakknormal
+texnames-slot-sheen-color = Sheen-farge
+texnames-slot-sheen-roughness = Sheen-ruhet
+texnames-slot-transmission = Transmisjon
+texnames-slot-thickness = Tykkelse
+texnames-slot-diffuse-transmission = Diffus transmisjon
+texnames-slot-diffuse-transmission-color = Diffus transmisjonsfarge
+texnames-slot-iridescence = Iridescens
+texnames-slot-iridescence-thickness = Iridescenstykkelse
+texnames-slot-anisotropy = Anisotropi
 
 ## storeFormats.ts
 
@@ -2304,6 +2327,16 @@ settings-tn-hint-map = { " " }hva kartet er til,{ " " }
 settings-tn-hint-size = { " " }størrelsen når settet finnes i mer enn én (legges til på slutten hvis mønsteret utelater den).
 settings-tn-example = Eksempel
 settings-tn-suffixes = Suffikser for hver type kart
+settings-tn-slots = I GLB-nedlastinger får en tekstur som er pakket inn i en modell uten egen fil, navn etter materialet og sporet den fyller, og disse sporene har også suffikser:
+settings-tn-endings = Egne endelser
+settings-tn-endings-what = En tekstur som ikke er et av kartene til et materiale, beholder sitt eget navn, med mindre det slutter på en av disse: _diff → _BC sender rock_diff.png som rock_BC.png. La det andre feltet stå tomt for å fjerne endelsen.
+settings-tn-ending-from = Endelse
+settings-tn-ending-from-example = _diff
+settings-tn-ending-to = Bytt med
+settings-tn-ending-to-example = _BC
+settings-tn-ending-add = Legg til en endelse
+settings-tn-ending-remove = Fjern
+settings-tn-ending-remove-label = Fjern { $ending }
 
 ## SettingsPage.vue: Generelt og Tilkobling
 

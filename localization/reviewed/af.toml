@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "a291e71b8315a85b796b394cd1cc26d480ac8ecd3bf12b797cf6319c57ccb07e"
+source = "140db2eb73736ff39922ac317725317468b02f342ce455ff2967c4a2f3b7a920"
 translation = "4d4f0096cc29f03f0fe2a94d855b0ef2f60194198f01e480a5d3926c58b74326"
 
 [messages.account-add]
@@ -3911,6 +3911,18 @@ translation = "niks om na te soek nie; tik die pak se naam"
 [messages.error-task-running]
 source = "“{ $task }” is already running"
 translation = "“{ $task }” loop reeds"
+
+[messages.error-texture-ending-chars]
+source = '''Endings of your own can't have < > : " / \ | ? or *'''
+translation = 'Eie eindes kan nie < > : " / \ | ? of * bevat nie'
+
+[messages.error-texture-ending-missing]
+source = "Each ending of your own needs the ending to look for"
+translation = "Elke eie einde het die einde nodig waarna gesoek moet word"
+
+[messages.error-texture-ending-twice]
+source = "{ $ending } is in your endings twice"
+translation = "{ $ending } is twee keer in jou eindes"
 
 [messages.error-texture-map-type]
 source = "There's no map type called { $role }"
@@ -8686,6 +8698,42 @@ translation = "Jou eie"
 source = "Descriptive"
 translation = "Beskrywend"
 
+[messages.settings-tn-ending-add]
+source = "Add an ending"
+translation = "Voeg 'n einde by"
+
+[messages.settings-tn-ending-from]
+source = "Ending"
+translation = "Einde"
+
+[messages.settings-tn-ending-from-example]
+source = "_diff"
+translation = "_diff"
+
+[messages.settings-tn-ending-remove]
+source = "Remove"
+translation = "Verwyder"
+
+[messages.settings-tn-ending-remove-label]
+source = "Remove { $ending }"
+translation = "Verwyder { $ending }"
+
+[messages.settings-tn-ending-to]
+source = "Swap for"
+translation = "Vervang met"
+
+[messages.settings-tn-ending-to-example]
+source = "_BC"
+translation = "_BC"
+
+[messages.settings-tn-endings]
+source = "Endings of your own"
+translation = "Jou eie eindes"
+
+[messages.settings-tn-endings-what]
+source = "A texture that isn’t one of a material’s maps keeps its own name, unless it ends in one of these: _diff → _BC sends rock_diff.png as rock_BC.png. Leave the second empty to drop the ending."
+translation = "'n Tekstuur wat nie een van 'n materiaal se kaarte is nie, behou sy eie naam, tensy dit op een van hierdie eindig: _diff → _BC stuur rock_diff.png as rock_BC.png. Laat die tweede leeg om die einde weg te laat."
+
 [messages.settings-tn-example]
 source = "Example"
 translation = "Voorbeeld"
@@ -8717,6 +8765,10 @@ translation = "Tekstuurname gestoor"
 [messages.settings-tn-short]
 source = "Short"
 translation = "Kort"
+
+[messages.settings-tn-slots]
+source = "In GLB downloads, a texture packed inside a model with no file of its own is named after the material and the slot it fills, and these slots have suffixes too:"
+translation = "In GLB-aflaaie word 'n tekstuur wat sonder 'n eie lêer binne-in 'n model gepak is, benoem na die materiaal en die gleuf wat dit vul, en hierdie gleuwe het ook agtervoegsels:"
 
 [messages.settings-tn-style]
 source = "Style"
@@ -9652,6 +9704,18 @@ translation = 'Name kan nie < > : " / \ | ? of * bevat nie'
 source = 'The suffix for { $role } maps can’t have < > : " / \ | ? or *'
 translation = 'Die agtervoegsel van kaarte vir { $role } kan nie < > : " / \ | ? of * bevat nie'
 
+[messages.texnames-ending-bad]
+source = 'Endings of your own can’t have < > : " / \ | ? or *'
+translation = 'Eie eindes kan nie < > : " / \ | ? of * bevat nie'
+
+[messages.texnames-ending-missing]
+source = "Each ending of your own needs the ending to look for"
+translation = "Elke eie einde het die einde nodig waarna gesoek moet word"
+
+[messages.texnames-ending-twice]
+source = "{ $ending } is in your endings twice"
+translation = "{ $ending } is twee keer in jou eindes"
+
 [messages.texnames-needs-map]
 source = 'The pattern needs { "{" }map{ "}" }, or every map of a material would get the same name'
 translation = """Die patroon het { "{" }map{ "}" } nodig, anders kry elke kaart van 'n materiaal dieselfde naam"""
@@ -9663,6 +9727,74 @@ translation = "Gee kaarte vir { $role } 'n agtervoegsel"
 [messages.texnames-placeholders]
 source = 'The pattern can use { "{" }name{ "}" }, { "{" }map{ "}" } and { "{" }size{ "}" }'
 translation = 'Die patroon kan { "{" }name{ "}" }, { "{" }map{ "}" } en { "{" }size{ "}" } gebruik'
+
+[messages.texnames-slot-anisotropy]
+source = "Anisotropy"
+translation = "Anisotropie"
+
+[messages.texnames-slot-bad-suffix]
+source = 'The suffix for “{ $slot }” can’t have < > : " / \ | ? or *'
+translation = 'Die agtervoegsel vir “{ $slot }” kan nie < > : " / \ | ? of * bevat nie'
+
+[messages.texnames-slot-clearcoat]
+source = "Clearcoat"
+translation = "Vernislaag"
+
+[messages.texnames-slot-clearcoat-normal]
+source = "Clearcoat normal"
+translation = "Normaal van vernislaag"
+
+[messages.texnames-slot-clearcoat-roughness]
+source = "Clearcoat roughness"
+translation = "Grofheid van vernislaag"
+
+[messages.texnames-slot-diffuse-transmission]
+source = "Diffuse transmission"
+translation = "Diffuse deurlating"
+
+[messages.texnames-slot-diffuse-transmission-color]
+source = "Diffuse transmission color"
+translation = "Kleur van diffuse deurlating"
+
+[messages.texnames-slot-iridescence]
+source = "Iridescence"
+translation = "Irisering"
+
+[messages.texnames-slot-iridescence-thickness]
+source = "Iridescence thickness"
+translation = "Dikte van irisering"
+
+[messages.texnames-slot-metallic-roughness]
+source = "Metal and roughness"
+translation = "Metaal en grofheid"
+
+[messages.texnames-slot-no-suffix]
+source = "Give “{ $slot }” a suffix"
+translation = "Gee “{ $slot }” 'n agtervoegsel"
+
+[messages.texnames-slot-sheen-color]
+source = "Sheen color"
+translation = "Kleur van fluweelglans"
+
+[messages.texnames-slot-sheen-roughness]
+source = "Sheen roughness"
+translation = "Grofheid van fluweelglans"
+
+[messages.texnames-slot-specular-color]
+source = "Specular color"
+translation = "Spekulêre kleur"
+
+[messages.texnames-slot-specular-glossiness]
+source = "Specular and glossiness"
+translation = "Spekulêr en glans"
+
+[messages.texnames-slot-thickness]
+source = "Thickness"
+translation = "Dikte"
+
+[messages.texnames-slot-transmission]
+source = "Transmission"
+translation = "Deurlating"
 
 [messages.text-binary]
 source = "This file is binary, not text, so there's nothing to read here. Download it to open it in its own tool."

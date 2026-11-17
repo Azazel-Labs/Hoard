@@ -196,6 +196,9 @@ server-role-emissive = emissió
 server-role-translucency = translucidesa
 error-texture-suffix-missing = Doneu un sufix als mapes de tipus { $map }
 error-texture-suffix-chars = El sufix dels mapes de tipus { $map } no pot contenir < > : " / \ | ? ni *
+error-texture-ending-missing = Cada terminació pròpia necessita la terminació que cal buscar
+error-texture-ending-chars = Les terminacions pròpies no poden contenir < > : " / \ | ? ni *
+error-texture-ending-twice = { $ending } surt dues vegades a les vostres terminacions
 error-oauth-no-client-id = Aquest enllaç no té client_id.
 error-oauth-unknown-app = Aquesta aplicació no està registrada aquí (o ja no ho està). Torneu a començar la connexió des de l'aplicació.
 error-oauth-redirect = L'aplicació ha demanat tornar a una adreça que no ha registrat.
@@ -1823,6 +1826,26 @@ texnames-placeholders = El patró pot fer servir { "{" }name{ "}" }, { "{" }map{
 texnames-bad-characters = Els noms no poden contenir < > : " / \ | ? ni *
 texnames-no-suffix = Doneu un sufix als mapes de tipus { $role }
 texnames-bad-suffix = El sufix dels mapes de tipus { $role } no pot contenir < > : " / \ | ? ni *
+texnames-slot-no-suffix = Doneu un sufix a «{ $slot }»
+texnames-slot-bad-suffix = El sufix de «{ $slot }» no pot contenir < > : " / \ | ? ni *
+texnames-ending-missing = Cada terminació pròpia necessita la terminació que cal buscar
+texnames-ending-bad = Les terminacions pròpies no poden contenir < > : " / \ | ? ni *
+texnames-ending-twice = { $ending } surt dues vegades a les vostres terminacions
+texnames-slot-metallic-roughness = Metall i rugositat
+texnames-slot-specular-color = Color especular
+texnames-slot-specular-glossiness = Especular i brillantor
+texnames-slot-clearcoat = Vernís
+texnames-slot-clearcoat-roughness = Rugositat del vernís
+texnames-slot-clearcoat-normal = Normals del vernís
+texnames-slot-sheen-color = Color del setinat
+texnames-slot-sheen-roughness = Rugositat del setinat
+texnames-slot-transmission = Transmissió
+texnames-slot-thickness = Gruix
+texnames-slot-diffuse-transmission = Transmissió difusa
+texnames-slot-diffuse-transmission-color = Color de la transmissió difusa
+texnames-slot-iridescence = Iridescència
+texnames-slot-iridescence-thickness = Gruix de la iridescència
+texnames-slot-anisotropy = Anisotropia
 
 ## storeFormats.ts
 
@@ -2307,6 +2330,16 @@ settings-tn-hint-map = { " " }per a què serveix el mapa,{ " " }
 settings-tn-hint-size = { " " }la seva mida quan el joc ve en més d'una (s'afegeix al final si el patró no la inclou).
 settings-tn-example = Exemple
 settings-tn-suffixes = Sufixos per a cada tipus de mapa
+settings-tn-slots = A les baixades GLB, una textura empaquetada dins d'un model sense fitxer propi rep el nom del material i de la ranura que ocupa, i aquestes ranures també tenen sufixos:
+settings-tn-endings = Les vostres terminacions
+settings-tn-endings-what = Una textura que no és cap dels mapes d'un material conserva el seu nom, tret que acabi en una d'aquestes: _diff → _BC envia rock_diff.png com a rock_BC.png. Deixeu buida la segona per treure la terminació.
+settings-tn-ending-from = Terminació
+settings-tn-ending-from-example = _diff
+settings-tn-ending-to = Canvia per
+settings-tn-ending-to-example = _BC
+settings-tn-ending-add = Afegeix una terminació
+settings-tn-ending-remove = Treu
+settings-tn-ending-remove-label = Treu { $ending }
 
 ## SettingsPage.vue: General i Connexió
 

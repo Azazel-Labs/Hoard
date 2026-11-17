@@ -226,6 +226,9 @@ server-role-emissive = emissive
 server-role-translucency = translucency
 error-texture-suffix-missing = Give { $map } maps a suffix
 error-texture-suffix-chars = The suffix for { $map } maps can't have < > : " / \ | ? or *
+error-texture-ending-missing = Each ending of your own needs the ending to look for
+error-texture-ending-chars = Endings of your own can't have < > : " / \ | ? or *
+error-texture-ending-twice = { $ending } is in your endings twice
 # Connecting an app (an MCP client) to Hoard: shown on the page the app opened. client_id, response_type=code, PKCE
 # and S256 are OAuth's own words.
 error-oauth-no-client-id = This link has no client_id.
@@ -2042,6 +2045,30 @@ texnames-bad-characters = Names can’t have < > : " / \ | ? or *
 texnames-no-suffix = Give { $role } maps a suffix
 # $role is the kind of map in lower case, like “normal” or “base color”.
 texnames-bad-suffix = The suffix for { $role } maps can’t have < > : " / \ | ? or *
+# $slot is a slot below, like “Clearcoat normal”.
+texnames-slot-no-suffix = Give “{ $slot }” a suffix
+# $slot is a slot below, like “Clearcoat normal”.
+texnames-slot-bad-suffix = The suffix for “{ $slot }” can’t have < > : " / \ | ? or *
+texnames-ending-missing = Each ending of your own needs the ending to look for
+texnames-ending-bad = Endings of your own can’t have < > : " / \ | ? or *
+# $ending is what someone typed, like “_diff”.
+texnames-ending-twice = { $ending } is in your endings twice
+# The slots a glTF material has for a texture beyond the kinds of map: core glTF and its KHR_materials extensions.
+texnames-slot-metallic-roughness = Metal and roughness
+texnames-slot-specular-color = Specular color
+texnames-slot-specular-glossiness = Specular and glossiness
+texnames-slot-clearcoat = Clearcoat
+texnames-slot-clearcoat-roughness = Clearcoat roughness
+texnames-slot-clearcoat-normal = Clearcoat normal
+texnames-slot-sheen-color = Sheen color
+texnames-slot-sheen-roughness = Sheen roughness
+texnames-slot-transmission = Transmission
+texnames-slot-thickness = Thickness
+texnames-slot-diffuse-transmission = Diffuse transmission
+texnames-slot-diffuse-transmission-color = Diffuse transmission color
+texnames-slot-iridescence = Iridescence
+texnames-slot-iridescence-thickness = Iridescence thickness
+texnames-slot-anisotropy = Anisotropy
 
 ## storeFormats.ts
 
@@ -2593,6 +2620,19 @@ settings-tn-hint-map = { " " }what the map is for,{ " " }
 settings-tn-hint-size = { " " }its size when the set comes in more than one (added on the end if the pattern leaves it out).
 settings-tn-example = Example
 settings-tn-suffixes = Suffixes for each kind of map
+settings-tn-slots = In GLB downloads, a texture packed inside a model with no file of its own is named after the material and the slot it fills, and these slots have suffixes too:
+settings-tn-endings = Endings of your own
+settings-tn-endings-what = A texture that isn’t one of a material’s maps keeps its own name, unless it ends in one of these: _diff → _BC sends rock_diff.png as rock_BC.png. Leave the second empty to drop the ending.
+# The ending to look for at the end of a texture’s name.
+settings-tn-ending-from = Ending
+settings-tn-ending-from-example = _diff
+# What the ending is swapped for.
+settings-tn-ending-to = Swap for
+settings-tn-ending-to-example = _BC
+settings-tn-ending-add = Add an ending
+settings-tn-ending-remove = Remove
+# $ending is the ending the row looks for, like “_diff”.
+settings-tn-ending-remove-label = Remove { $ending }
 
 ## SettingsPage.vue: General and Connection
 

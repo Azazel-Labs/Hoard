@@ -196,6 +196,9 @@ server-role-emissive = 自發光
 server-role-translucency = 半透明
 error-texture-suffix-missing = 請為{ $map }貼圖設定字尾
 error-texture-suffix-chars = { $map }貼圖的字尾不能包含 < > : " / \ | ? 或 *
+error-texture-ending-missing = 每個自訂結尾都需要填寫要尋找的結尾
+error-texture-ending-chars = 自訂結尾不能包含 < > : " / \ | ? 或 *
+error-texture-ending-twice = { $ending } 在你的結尾中出現了兩次
 error-oauth-no-client-id = 這個連結沒有 client_id。
 error-oauth-unknown-app = 這個應用程式未在此註冊（或已不再註冊）。請從應用程式重新開始連線。
 error-oauth-redirect = 應用程式要求導回一個它沒有註冊過的網址。
@@ -1675,6 +1678,26 @@ texnames-placeholders = 樣式可以使用 { "{" }name{ "}" }、{ "{" }map{ "}" 
 texnames-bad-characters = 名稱不能包含 < > : " / \ | ? 或 *
 texnames-no-suffix = 請為{ $role }貼圖設定字尾
 texnames-bad-suffix = { $role }貼圖的字尾不能包含 < > : " / \ | ? 或 *
+texnames-slot-no-suffix = 請為「{ $slot }」設定字尾
+texnames-slot-bad-suffix = 「{ $slot }」的字尾不能包含 < > : " / \ | ? 或 *
+texnames-ending-missing = 每個自訂結尾都需要填寫要尋找的結尾
+texnames-ending-bad = 自訂結尾不能包含 < > : " / \ | ? 或 *
+texnames-ending-twice = { $ending } 在你的結尾中出現了兩次
+texnames-slot-metallic-roughness = 金屬度與粗糙度
+texnames-slot-specular-color = 鏡面反射顏色
+texnames-slot-specular-glossiness = 鏡面反射與光澤度
+texnames-slot-clearcoat = 清漆
+texnames-slot-clearcoat-roughness = 清漆粗糙度
+texnames-slot-clearcoat-normal = 清漆法線
+texnames-slot-sheen-color = 絨光顏色
+texnames-slot-sheen-roughness = 絨光粗糙度
+texnames-slot-transmission = 透射
+texnames-slot-thickness = 厚度
+texnames-slot-diffuse-transmission = 漫透射
+texnames-slot-diffuse-transmission-color = 漫透射顏色
+texnames-slot-iridescence = 虹彩
+texnames-slot-iridescence-thickness = 虹彩厚度
+texnames-slot-anisotropy = 異向性
 
 ## 商店格式
 
@@ -2134,6 +2157,16 @@ settings-tn-hint-map = { " " }是貼圖的用途，{ " " }
 settings-tn-hint-size = { " " }是組合有多種大小時的尺寸（如果樣式中沒有，會加在結尾）。
 settings-tn-example = 範例
 settings-tn-suffixes = 各種貼圖的字尾
+settings-tn-slots = 在 GLB 下載中，封裝在模型內、沒有獨立檔案的貼圖會以材質和它所填入的插槽命名，這些插槽也有字尾：
+settings-tn-endings = 自訂結尾
+settings-tn-endings-what = 若貼圖不是某個材質的貼圖之一，會保留自己的名稱，除非名稱以下列其中一個結尾結束：_diff → _BC 會把 rock_diff.png 傳送為 rock_BC.png。第二欄留空即可去掉該結尾。
+settings-tn-ending-from = 結尾
+settings-tn-ending-from-example = _diff
+settings-tn-ending-to = 替換為
+settings-tn-ending-to-example = _BC
+settings-tn-ending-add = 新增結尾
+settings-tn-ending-remove = 移除
+settings-tn-ending-remove-label = 移除 { $ending }
 
 ## 設定：一般與連線
 

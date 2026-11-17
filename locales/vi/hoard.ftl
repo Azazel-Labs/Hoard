@@ -196,6 +196,9 @@ server-role-emissive = phát sáng
 server-role-translucency = độ trong mờ
 error-texture-suffix-missing = Hãy đặt hậu tố cho map { $map }
 error-texture-suffix-chars = Hậu tố cho map { $map } không được chứa < > : " / \ | ? hoặc *
+error-texture-ending-missing = Mỗi đuôi tên riêng của bạn cần có đuôi tên cần tìm
+error-texture-ending-chars = Đuôi tên riêng không được chứa < > : " / \ | ? hoặc *
+error-texture-ending-twice = { $ending } xuất hiện hai lần trong các đuôi tên của bạn
 error-oauth-no-client-id = Liên kết này không có client_id.
 error-oauth-unknown-app = Ứng dụng này (không còn) được đăng ký ở đây. Hãy bắt đầu kết nối lại từ ứng dụng.
 error-oauth-redirect = Ứng dụng yêu cầu được chuyển về một địa chỉ mà nó chưa đăng ký.
@@ -1669,6 +1672,26 @@ texnames-placeholders = Mẫu có thể dùng { "{" }name{ "}" }, { "{" }map{ "}
 texnames-bad-characters = Tên không được chứa < > : " / \ | ? hoặc *
 texnames-no-suffix = Hãy đặt hậu tố cho map { $role }
 texnames-bad-suffix = Hậu tố cho map { $role } không được chứa < > : " / \ | ? hoặc *
+texnames-slot-no-suffix = Hãy đặt hậu tố cho “{ $slot }”
+texnames-slot-bad-suffix = Hậu tố cho “{ $slot }” không được chứa < > : " / \ | ? hoặc *
+texnames-ending-missing = Mỗi đuôi tên riêng của bạn cần có đuôi tên cần tìm
+texnames-ending-bad = Đuôi tên riêng không được chứa < > : " / \ | ? hoặc *
+texnames-ending-twice = { $ending } xuất hiện hai lần trong các đuôi tên của bạn
+texnames-slot-metallic-roughness = Kim loại và độ nhám
+texnames-slot-specular-color = Màu specular
+texnames-slot-specular-glossiness = Specular và độ bóng
+texnames-slot-clearcoat = Clearcoat
+texnames-slot-clearcoat-roughness = Độ nhám clearcoat
+texnames-slot-clearcoat-normal = Normal clearcoat
+texnames-slot-sheen-color = Màu sheen
+texnames-slot-sheen-roughness = Độ nhám sheen
+texnames-slot-transmission = Truyền sáng
+texnames-slot-thickness = Độ dày
+texnames-slot-diffuse-transmission = Truyền sáng khuếch tán
+texnames-slot-diffuse-transmission-color = Màu truyền sáng khuếch tán
+texnames-slot-iridescence = Ánh ngũ sắc
+texnames-slot-iridescence-thickness = Độ dày ánh ngũ sắc
+texnames-slot-anisotropy = Dị hướng
 
 ## Định dạng cửa hàng
 
@@ -2128,6 +2151,16 @@ settings-tn-hint-map = { " " }là công dụng của map,{ " " }
 settings-tn-hint-size = { " " }là kích thước khi bộ có nhiều kích thước (được thêm vào cuối nếu mẫu không có).
 settings-tn-example = Ví dụ
 settings-tn-suffixes = Hậu tố cho từng loại map
+settings-tn-slots = Trong bản tải xuống GLB, texture được đóng gói bên trong mô hình mà không có tệp riêng sẽ được đặt tên theo vật liệu và slot mà nó chiếm, và các slot này cũng có hậu tố:
+settings-tn-endings = Đuôi tên riêng
+settings-tn-endings-what = Texture không phải là một map của vật liệu sẽ giữ tên riêng của nó, trừ khi tên kết thúc bằng một trong các đuôi này: _diff → _BC gửi rock_diff.png thành rock_BC.png. Để trống ô thứ hai để bỏ đuôi tên.
+settings-tn-ending-from = Đuôi tên
+settings-tn-ending-from-example = _diff
+settings-tn-ending-to = Thay bằng
+settings-tn-ending-to-example = _BC
+settings-tn-ending-add = Thêm đuôi tên
+settings-tn-ending-remove = Bỏ
+settings-tn-ending-remove-label = Bỏ { $ending }
 
 ## Cài đặt: Chung và Kết nối
 

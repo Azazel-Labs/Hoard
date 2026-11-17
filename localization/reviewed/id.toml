@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "a291e71b8315a85b796b394cd1cc26d480ac8ecd3bf12b797cf6319c57ccb07e"
+source = "140db2eb73736ff39922ac317725317468b02f342ce455ff2967c4a2f3b7a920"
 translation = "ccba37da8ec8145aa968edd58860423f7d19917225e3adb17048481993a88680"
 
 [messages.account-add]
@@ -3830,6 +3830,18 @@ translation = "tidak ada yang dicari; ketik nama paket"
 [messages.error-task-running]
 source = "“{ $task }” is already running"
 translation = "“{ $task }” sudah berjalan"
+
+[messages.error-texture-ending-chars]
+source = '''Endings of your own can't have < > : " / \ | ? or *'''
+translation = 'Akhir nama buatan sendiri tidak boleh berisi < > : " / \ | ? atau *'
+
+[messages.error-texture-ending-missing]
+source = "Each ending of your own needs the ending to look for"
+translation = "Setiap akhir nama buatan sendiri perlu akhir nama yang dicari"
+
+[messages.error-texture-ending-twice]
+source = "{ $ending } is in your endings twice"
+translation = "{ $ending } ada dua kali dalam akhir nama Anda"
 
 [messages.error-texture-map-type]
 source = "There's no map type called { $role }"
@@ -8521,6 +8533,42 @@ translation = "Buatan sendiri"
 source = "Descriptive"
 translation = "Deskriptif"
 
+[messages.settings-tn-ending-add]
+source = "Add an ending"
+translation = "Tambahkan akhir nama"
+
+[messages.settings-tn-ending-from]
+source = "Ending"
+translation = "Akhir nama"
+
+[messages.settings-tn-ending-from-example]
+source = "_diff"
+translation = "_diff"
+
+[messages.settings-tn-ending-remove]
+source = "Remove"
+translation = "Hapus"
+
+[messages.settings-tn-ending-remove-label]
+source = "Remove { $ending }"
+translation = "Hapus { $ending }"
+
+[messages.settings-tn-ending-to]
+source = "Swap for"
+translation = "Ganti dengan"
+
+[messages.settings-tn-ending-to-example]
+source = "_BC"
+translation = "_BC"
+
+[messages.settings-tn-endings]
+source = "Endings of your own"
+translation = "Akhir nama buatan sendiri"
+
+[messages.settings-tn-endings-what]
+source = "A texture that isn’t one of a material’s maps keeps its own name, unless it ends in one of these: _diff → _BC sends rock_diff.png as rock_BC.png. Leave the second empty to drop the ending."
+translation = "Tekstur yang bukan salah satu map dari sebuah material tetap memakai namanya sendiri, kecuali namanya berakhir dengan salah satu dari ini: _diff → _BC mengirim rock_diff.png sebagai rock_BC.png. Kosongkan yang kedua untuk membuang akhir nama itu."
+
 [messages.settings-tn-example]
 source = "Example"
 translation = "Contoh"
@@ -8552,6 +8600,10 @@ translation = "Nama tekstur disimpan"
 [messages.settings-tn-short]
 source = "Short"
 translation = "Pendek"
+
+[messages.settings-tn-slots]
+source = "In GLB downloads, a texture packed inside a model with no file of its own is named after the material and the slot it fills, and these slots have suffixes too:"
+translation = "Dalam unduhan GLB, tekstur yang dikemas di dalam model tanpa berkas sendiri dinamai menurut material dan slot yang diisinya, dan slot ini juga punya akhiran:"
 
 [messages.settings-tn-style]
 source = "Style"
@@ -9475,6 +9527,18 @@ translation = 'Nama tidak boleh berisi < > : " / \ | ? atau *'
 source = 'The suffix for { $role } maps can’t have < > : " / \ | ? or *'
 translation = 'Akhiran untuk map { $role } tidak boleh berisi < > : " / \ | ? atau *'
 
+[messages.texnames-ending-bad]
+source = 'Endings of your own can’t have < > : " / \ | ? or *'
+translation = 'Akhir nama buatan sendiri tidak boleh berisi < > : " / \ | ? atau *'
+
+[messages.texnames-ending-missing]
+source = "Each ending of your own needs the ending to look for"
+translation = "Setiap akhir nama buatan sendiri perlu akhir nama yang dicari"
+
+[messages.texnames-ending-twice]
+source = "{ $ending } is in your endings twice"
+translation = "{ $ending } ada dua kali dalam akhir nama Anda"
+
 [messages.texnames-needs-map]
 source = 'The pattern needs { "{" }map{ "}" }, or every map of a material would get the same name'
 translation = 'Pola perlu { "{" }map{ "}" }, atau semua map dari satu material akan mendapat nama yang sama'
@@ -9486,6 +9550,74 @@ translation = "Beri akhiran untuk map { $role }"
 [messages.texnames-placeholders]
 source = 'The pattern can use { "{" }name{ "}" }, { "{" }map{ "}" } and { "{" }size{ "}" }'
 translation = 'Pola dapat memakai { "{" }name{ "}" }, { "{" }map{ "}" } dan { "{" }size{ "}" }'
+
+[messages.texnames-slot-anisotropy]
+source = "Anisotropy"
+translation = "Anisotropi"
+
+[messages.texnames-slot-bad-suffix]
+source = 'The suffix for “{ $slot }” can’t have < > : " / \ | ? or *'
+translation = 'Akhiran untuk “{ $slot }” tidak boleh berisi < > : " / \ | ? atau *'
+
+[messages.texnames-slot-clearcoat]
+source = "Clearcoat"
+translation = "Clearcoat"
+
+[messages.texnames-slot-clearcoat-normal]
+source = "Clearcoat normal"
+translation = "Normal clearcoat"
+
+[messages.texnames-slot-clearcoat-roughness]
+source = "Clearcoat roughness"
+translation = "Roughness clearcoat"
+
+[messages.texnames-slot-diffuse-transmission]
+source = "Diffuse transmission"
+translation = "Transmisi difus"
+
+[messages.texnames-slot-diffuse-transmission-color]
+source = "Diffuse transmission color"
+translation = "Warna transmisi difus"
+
+[messages.texnames-slot-iridescence]
+source = "Iridescence"
+translation = "Iridesensi"
+
+[messages.texnames-slot-iridescence-thickness]
+source = "Iridescence thickness"
+translation = "Ketebalan iridesensi"
+
+[messages.texnames-slot-metallic-roughness]
+source = "Metal and roughness"
+translation = "Metal dan roughness"
+
+[messages.texnames-slot-no-suffix]
+source = "Give “{ $slot }” a suffix"
+translation = "Beri akhiran untuk “{ $slot }”"
+
+[messages.texnames-slot-sheen-color]
+source = "Sheen color"
+translation = "Warna sheen"
+
+[messages.texnames-slot-sheen-roughness]
+source = "Sheen roughness"
+translation = "Roughness sheen"
+
+[messages.texnames-slot-specular-color]
+source = "Specular color"
+translation = "Warna spekular"
+
+[messages.texnames-slot-specular-glossiness]
+source = "Specular and glossiness"
+translation = "Spekular dan glossiness"
+
+[messages.texnames-slot-thickness]
+source = "Thickness"
+translation = "Ketebalan"
+
+[messages.texnames-slot-transmission]
+source = "Transmission"
+translation = "Transmisi"
 
 [messages.text-binary]
 source = "This file is binary, not text, so there's nothing to read here. Download it to open it in its own tool."

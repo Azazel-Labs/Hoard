@@ -196,6 +196,9 @@ server-role-emissive = Emission
 server-role-translucency = Transluzenz
 error-texture-suffix-missing = Geben Sie Maps vom Typ { $map } ein Suffix
 error-texture-suffix-chars = Das Suffix für Maps vom Typ { $map } darf kein < > : " / \ | ? oder * enthalten
+error-texture-ending-missing = Jede eigene Endung braucht die Endung, nach der gesucht wird
+error-texture-ending-chars = Eigene Endungen dürfen kein < > : " / \ | ? oder * enthalten
+error-texture-ending-twice = { $ending } steht zweimal in Ihren Endungen
 error-oauth-no-client-id = Dieser Link enthält keine client_id.
 error-oauth-unknown-app = Diese App ist hier nicht (mehr) registriert. Starten Sie die Verbindung erneut in der App.
 error-oauth-redirect = Die App wollte an eine Adresse zurückgeleitet werden, die sie nicht registriert hat.
@@ -1817,6 +1820,26 @@ texnames-placeholders = Das Muster kann { "{" }name{ "}" }, { "{" }map{ "}" } un
 texnames-bad-characters = Namen dürfen kein < > : " / \ | ? oder * enthalten
 texnames-no-suffix = Geben Sie Maps vom Typ „{ $role }“ ein Suffix
 texnames-bad-suffix = Das Suffix für Maps vom Typ „{ $role }“ darf kein < > : " / \ | ? oder * enthalten
+texnames-slot-no-suffix = Geben Sie „{ $slot }“ ein Suffix
+texnames-slot-bad-suffix = Das Suffix für „{ $slot }“ darf kein < > : " / \ | ? oder * enthalten
+texnames-ending-missing = Jede eigene Endung braucht die Endung, nach der gesucht wird
+texnames-ending-bad = Eigene Endungen dürfen kein < > : " / \ | ? oder * enthalten
+texnames-ending-twice = { $ending } steht zweimal in Ihren Endungen
+texnames-slot-metallic-roughness = Metall und Rauheit
+texnames-slot-specular-color = Specular-Farbe
+texnames-slot-specular-glossiness = Specular und Glanz
+texnames-slot-clearcoat = Clearcoat
+texnames-slot-clearcoat-roughness = Clearcoat-Rauheit
+texnames-slot-clearcoat-normal = Clearcoat-Normal
+texnames-slot-sheen-color = Sheen-Farbe
+texnames-slot-sheen-roughness = Sheen-Rauheit
+texnames-slot-transmission = Transmission
+texnames-slot-thickness = Dicke
+texnames-slot-diffuse-transmission = Diffuse Transmission
+texnames-slot-diffuse-transmission-color = Farbe der diffusen Transmission
+texnames-slot-iridescence = Irisieren
+texnames-slot-iridescence-thickness = Dicke des Irisierens
+texnames-slot-anisotropy = Anisotropie
 
 ## storeFormats.ts
 
@@ -2301,6 +2324,16 @@ settings-tn-hint-map = { " " }wofür die Map ist,{ " " }
 settings-tn-hint-size = { " " }ihre Größe, wenn es das Set in mehreren gibt (wird am Ende angehängt, wenn das Muster sie weglässt).
 settings-tn-example = Beispiel
 settings-tn-suffixes = Suffixe für jede Art von Map
+settings-tn-slots = In GLB-Downloads wird eine Textur, die ohne eigene Datei in ein Modell gepackt ist, nach dem Material und dem Slot benannt, den sie füllt, und auch diese Slots haben Suffixe:
+settings-tn-endings = Eigene Endungen
+settings-tn-endings-what = Eine Textur, die keine der Maps eines Materials ist, behält ihren eigenen Namen, außer er endet auf eine dieser Endungen: _diff → _BC liefert rock_diff.png als rock_BC.png aus. Lassen Sie das zweite Feld leer, um die Endung zu entfernen.
+settings-tn-ending-from = Endung
+settings-tn-ending-from-example = _diff
+settings-tn-ending-to = Ersetzen durch
+settings-tn-ending-to-example = _BC
+settings-tn-ending-add = Endung hinzufügen
+settings-tn-ending-remove = Entfernen
+settings-tn-ending-remove-label = { $ending } entfernen
 
 ## SettingsPage.vue: Allgemein und Verbindung
 

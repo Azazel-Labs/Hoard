@@ -1,6 +1,6 @@
 import { createHash } from 'node:crypto'
 import { MEGASCANS } from './support/seed'
-import { checker, MEGASCANS_FOLDER, quadGltf, zipNames } from './support/files'
+import { checker, crate, MEGASCANS_FOLDER, quadGltf, zipNames } from './support/files'
 import type { Page } from '@playwright/test'
 import { type Asset, assetsOf, signedIn, uploadPack, waitIdle, waitReady } from './support/api'
 import { doubleClick, expect, openPack, test } from './support/test'
@@ -150,6 +150,57 @@ test.describe('materials', () => {
         await api.put('/api/admin/settings', { data: { texture_names: null } })
       }
       await expect.poll(fileName).toContain('HistoricMiscellaneousStandWoodOld05_AO.png')
+    })
+
+    // A crate of its own, with a texture named so no other test's ending is this one.
+    test("an ending of your own renames a texture that isn't a map, alone and in a GLB zip", async ({
+      page,
+      baseURL,
+    }) => {
+      test.setTimeout(90_000)
+      const api = await signedIn(baseURL!)
+      const c = crate()
+      const pack = await uploadPack(api, 'E2E Endings', [
+        { relpath: 'crate.obj', data: c.obj },
+        { relpath: 'crate.mtl', data: Buffer.from(c.mtl.toString().replace('crate_diffuse', 'crate_paint')) },
+        { relpath: 'crate_paint.png', data: c.texture },
+      ])
+      await waitReady(api, [pack.id])
+      const assets = await assetsOf(api, pack.id)
+      const id = (path: string) => assets.find((a) => a.path === path)!.id
+      const texture = `/api/assets/${id('crate_paint.png')}/file?download=1`
+      const fileName = async () => (await api.get(texture)).headers()['content-disposition']
+      const glbZip = async () => {
+        const res = await api.get(`/api/bundle.zip?ids=${id('crate.obj')}&glb=1`, { timeout: 60_000 })
+        expect(res.ok(), `${res.status()}`).toBe(true)
+        return zipNames(await res.body()).filter((n) => n.includes('/textures/'))
+      }
+      expect(await glbZip()).toEqual(['hoard-glb/textures/crate_paint.png'])
+
+      await page.goto('/#settings/downloads')
+      const section = page.getByTestId('texture-names')
+      const endings = page.getByTestId('texture-endings')
+      try {
+        await endings.getByRole('button', { name: 'Add an ending' }).click()
+        await endings.getByLabel('Ending', { exact: true }).fill('_paint')
+        await endings.getByLabel('Swap for').fill('_P')
+        await endings.getByLabel('Swap for').press('Enter')
+        await expect.poll(fileName).toContain('crate_P.png')
+        // The GLB made before is made again with the new name.
+        expect(await glbZip()).toEqual(['hoard-glb/textures/crate_P.png'])
+
+        // The same ending twice is refused before it's saved.
+        await endings.getByRole('button', { name: 'Add an ending' }).click()
+        await endings.getByLabel('Ending', { exact: true }).last().fill('_PAINT')
+        await endings.getByLabel('Ending', { exact: true }).last().press('Enter')
+        await expect(section.getByRole('alert')).toContainText('_PAINT is in your endings twice')
+        await endings.getByRole('button', { name: 'Remove _PAINT', exact: true }).click()
+        await endings.getByRole('button', { name: 'Remove _paint', exact: true }).click()
+        await expect.poll(fileName).toContain('crate_paint.png')
+      } finally {
+        await api.put('/api/admin/settings', { data: { texture_names: null } })
+        await api.delete(`/api/packs/${pack.id}`)
+      }
     })
   })
 

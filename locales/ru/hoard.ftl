@@ -196,6 +196,9 @@ server-role-emissive = свечения
 server-role-translucency = просвечивания
 error-texture-suffix-missing = Задайте суффикс для карт { $map }
 error-texture-suffix-chars = В суффиксе для карт { $map } не может быть < > : " / \ | ? или *
+error-texture-ending-missing = Для каждого своего окончания нужно указать, какое окончание искать
+error-texture-ending-chars = В своих окончаниях не может быть < > : " / \ | ? или *
+error-texture-ending-twice = { $ending } встречается в ваших окончаниях дважды
 error-oauth-no-client-id = В этой ссылке нет client_id.
 error-oauth-unknown-app = Это приложение здесь не зарегистрировано (больше не зарегистрировано). Начните подключение заново из приложения.
 error-oauth-redirect = Приложение попросило вернуть его на адрес, который оно не регистрировало.
@@ -2003,6 +2006,26 @@ texnames-placeholders = В шаблоне можно использовать { 
 texnames-bad-characters = В названиях не может быть < > : " / \ | ? или *
 texnames-no-suffix = Задайте суффикс для карт { $role }
 texnames-bad-suffix = В суффиксе для карт { $role } не может быть < > : " / \ | ? или *
+texnames-slot-no-suffix = Задайте суффикс для «{ $slot }»
+texnames-slot-bad-suffix = В суффиксе для «{ $slot }» не может быть < > : " / \ | ? или *
+texnames-ending-missing = Для каждого своего окончания нужно указать, какое окончание искать
+texnames-ending-bad = В своих окончаниях не может быть < > : " / \ | ? или *
+texnames-ending-twice = { $ending } встречается в ваших окончаниях дважды
+texnames-slot-metallic-roughness = Металл и шероховатость
+texnames-slot-specular-color = Цвет отражения
+texnames-slot-specular-glossiness = Отражение и глянец
+texnames-slot-clearcoat = Лак
+texnames-slot-clearcoat-roughness = Шероховатость лака
+texnames-slot-clearcoat-normal = Нормали лака
+texnames-slot-sheen-color = Цвет отлива
+texnames-slot-sheen-roughness = Шероховатость отлива
+texnames-slot-transmission = Пропускание
+texnames-slot-thickness = Толщина
+texnames-slot-diffuse-transmission = Диффузное пропускание
+texnames-slot-diffuse-transmission-color = Цвет диффузного пропускания
+texnames-slot-iridescence = Радужность
+texnames-slot-iridescence-thickness = Толщина радужности
+texnames-slot-anisotropy = Анизотропия
 
 ## storeFormats.ts
 
@@ -2546,6 +2569,16 @@ settings-tn-hint-map = { " " }— назначение карты,{ " " }
 settings-tn-hint-size = { " " }— её размер, если набор есть в нескольких размерах (добавляется в конце, если шаблон его не содержит).
 settings-tn-example = Пример
 settings-tn-suffixes = Суффиксы для каждого вида карт
+settings-tn-slots = При скачивании GLB текстура, упакованная внутрь модели без собственного файла, получает название по материалу и слоту, который она занимает, и у этих слотов тоже есть суффиксы:
+settings-tn-endings = Свои окончания
+settings-tn-endings-what = Текстура, которая не относится к картам материала, сохраняет своё название, если только оно не оканчивается на одно из этих окончаний: _diff → _BC отдаёт rock_diff.png как rock_BC.png. Оставьте второе поле пустым, чтобы убрать окончание.
+settings-tn-ending-from = Окончание
+settings-tn-ending-from-example = _diff
+settings-tn-ending-to = Заменить на
+settings-tn-ending-to-example = _BC
+settings-tn-ending-add = Добавить окончание
+settings-tn-ending-remove = Убрать
+settings-tn-ending-remove-label = Убрать { $ending }
 
 ## SettingsPage.vue: общие и подключение
 

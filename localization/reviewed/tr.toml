@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "a291e71b8315a85b796b394cd1cc26d480ac8ecd3bf12b797cf6319c57ccb07e"
+source = "140db2eb73736ff39922ac317725317468b02f342ce455ff2967c4a2f3b7a920"
 translation = "59247f4fd3e0712c726e47580a3cc9e4e63dfcef4ff7b34a653c6b6a2a4ee38c"
 
 [messages.account-add]
@@ -3840,6 +3840,18 @@ translation = "aranacak bir şey yok; paketin adını yazın"
 [messages.error-task-running]
 source = "“{ $task }” is already running"
 translation = "“{ $task }” zaten çalışıyor"
+
+[messages.error-texture-ending-chars]
+source = '''Endings of your own can't have < > : " / \ | ? or *'''
+translation = 'Kendi ad sonlarınızda < > : " / \ | ? ya da * olamaz'
+
+[messages.error-texture-ending-missing]
+source = "Each ending of your own needs the ending to look for"
+translation = "Kendi ad sonlarınızın her biri için aranacak ad sonu gerekir"
+
+[messages.error-texture-ending-twice]
+source = "{ $ending } is in your endings twice"
+translation = "{ $ending } ad sonlarınızda iki kez var"
 
 [messages.error-texture-map-type]
 source = "There's no map type called { $role }"
@@ -8533,6 +8545,42 @@ translation = "Kendi biçeminiz"
 source = "Descriptive"
 translation = "Açıklayıcı"
 
+[messages.settings-tn-ending-add]
+source = "Add an ending"
+translation = "Ad sonu ekle"
+
+[messages.settings-tn-ending-from]
+source = "Ending"
+translation = "Ad sonu"
+
+[messages.settings-tn-ending-from-example]
+source = "_diff"
+translation = "_diff"
+
+[messages.settings-tn-ending-remove]
+source = "Remove"
+translation = "Kaldır"
+
+[messages.settings-tn-ending-remove-label]
+source = "Remove { $ending }"
+translation = "{ $ending } ad sonunu kaldır"
+
+[messages.settings-tn-ending-to]
+source = "Swap for"
+translation = "Yerine"
+
+[messages.settings-tn-ending-to-example]
+source = "_BC"
+translation = "_BC"
+
+[messages.settings-tn-endings]
+source = "Endings of your own"
+translation = "Kendi ad sonlarınız"
+
+[messages.settings-tn-endings-what]
+source = "A texture that isn’t one of a material’s maps keeps its own name, unless it ends in one of these: _diff → _BC sends rock_diff.png as rock_BC.png. Leave the second empty to drop the ending."
+translation = "Bir malzemenin haritalarından biri olmayan bir doku, bunlardan biriyle bitmedikçe kendi adını korur: _diff → _BC ile rock_diff.png, rock_BC.png olarak gönderilir. Ad sonunu atmak için ikincisini boş bırakın."
+
 [messages.settings-tn-example]
 source = "Example"
 translation = "Örnek"
@@ -8564,6 +8612,10 @@ translation = "Doku adları kaydedildi"
 [messages.settings-tn-short]
 source = "Short"
 translation = "Kısa"
+
+[messages.settings-tn-slots]
+source = "In GLB downloads, a texture packed inside a model with no file of its own is named after the material and the slot it fills, and these slots have suffixes too:"
+translation = "GLB indirmelerinde, bir modelin içine paketlenmiş ve kendi dosyası olmayan bir doku, malzemenin ve doldurduğu yuvanın adıyla adlandırılır; bu yuvaların da sonekleri vardır:"
 
 [messages.settings-tn-style]
 source = "Style"
@@ -9487,6 +9539,18 @@ translation = 'Adlarda < > : " / \ | ? ya da * olamaz'
 source = 'The suffix for { $role } maps can’t have < > : " / \ | ? or *'
 translation = '{ $role } haritalarının sonekinde < > : " / \ | ? ya da * olamaz'
 
+[messages.texnames-ending-bad]
+source = 'Endings of your own can’t have < > : " / \ | ? or *'
+translation = 'Kendi ad sonlarınızda < > : " / \ | ? ya da * olamaz'
+
+[messages.texnames-ending-missing]
+source = "Each ending of your own needs the ending to look for"
+translation = "Kendi ad sonlarınızın her biri için aranacak ad sonu gerekir"
+
+[messages.texnames-ending-twice]
+source = "{ $ending } is in your endings twice"
+translation = "{ $ending } ad sonlarınızda iki kez var"
+
 [messages.texnames-needs-map]
 source = 'The pattern needs { "{" }map{ "}" }, or every map of a material would get the same name'
 translation = 'Kalıpta { "{" }map{ "}" } olmalı, yoksa bir malzemenin tüm haritaları aynı adı alır'
@@ -9498,6 +9562,74 @@ translation = "{ $role } haritalarına bir sonek verin"
 [messages.texnames-placeholders]
 source = 'The pattern can use { "{" }name{ "}" }, { "{" }map{ "}" } and { "{" }size{ "}" }'
 translation = 'Kalıp { "{" }name{ "}" }, { "{" }map{ "}" } ve { "{" }size{ "}" } kullanabilir'
+
+[messages.texnames-slot-anisotropy]
+source = "Anisotropy"
+translation = "Anizotropi"
+
+[messages.texnames-slot-bad-suffix]
+source = 'The suffix for “{ $slot }” can’t have < > : " / \ | ? or *'
+translation = '“{ $slot }” için sonekte < > : " / \ | ? ya da * olamaz'
+
+[messages.texnames-slot-clearcoat]
+source = "Clearcoat"
+translation = "Şeffaf kaplama"
+
+[messages.texnames-slot-clearcoat-normal]
+source = "Clearcoat normal"
+translation = "Şeffaf kaplama normali"
+
+[messages.texnames-slot-clearcoat-roughness]
+source = "Clearcoat roughness"
+translation = "Şeffaf kaplama pürüzlülüğü"
+
+[messages.texnames-slot-diffuse-transmission]
+source = "Diffuse transmission"
+translation = "Dağınık geçirgenlik"
+
+[messages.texnames-slot-diffuse-transmission-color]
+source = "Diffuse transmission color"
+translation = "Dağınık geçirgenlik rengi"
+
+[messages.texnames-slot-iridescence]
+source = "Iridescence"
+translation = "Yanardönerlik"
+
+[messages.texnames-slot-iridescence-thickness]
+source = "Iridescence thickness"
+translation = "Yanardönerlik kalınlığı"
+
+[messages.texnames-slot-metallic-roughness]
+source = "Metal and roughness"
+translation = "Metal ve pürüzlülük"
+
+[messages.texnames-slot-no-suffix]
+source = "Give “{ $slot }” a suffix"
+translation = "“{ $slot }” için bir sonek verin"
+
+[messages.texnames-slot-sheen-color]
+source = "Sheen color"
+translation = "Parıltı rengi"
+
+[messages.texnames-slot-sheen-roughness]
+source = "Sheen roughness"
+translation = "Parıltı pürüzlülüğü"
+
+[messages.texnames-slot-specular-color]
+source = "Specular color"
+translation = "Yansıma rengi"
+
+[messages.texnames-slot-specular-glossiness]
+source = "Specular and glossiness"
+translation = "Yansıma ve parlaklık"
+
+[messages.texnames-slot-thickness]
+source = "Thickness"
+translation = "Kalınlık"
+
+[messages.texnames-slot-transmission]
+source = "Transmission"
+translation = "Geçirgenlik"
 
 [messages.text-binary]
 source = "This file is binary, not text, so there's nothing to read here. Download it to open it in its own tool."

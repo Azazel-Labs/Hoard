@@ -196,6 +196,9 @@ server-role-emissive = emisszió
 server-role-translucency = áttetszőség
 error-texture-suffix-missing = Adjon utótagot ennek a térképtípusnak: { $map }
 error-texture-suffix-chars = A térképtípus utótagja ({ $map }) nem tartalmazhatja ezeket: < > : " / \ | ? vagy *
+error-texture-ending-missing = Minden saját végződéshez meg kell adni a keresendő végződést
+error-texture-ending-chars = A saját végződések nem tartalmazhatják ezeket: < > : " / \ | ? vagy *
+error-texture-ending-twice = { $ending } kétszer szerepel a végződései között
 error-oauth-no-client-id = Ebben a linkben nincs client_id.
 error-oauth-unknown-app = Ez az alkalmazás nincs (már) regisztrálva itt. Kezdje újra a csatlakoztatást az alkalmazásból.
 error-oauth-redirect = Az alkalmazás olyan címre kérte a visszairányítást, amelyet nem regisztrált.
@@ -1679,6 +1682,26 @@ texnames-placeholders = A minta ezeket használhatja: { "{" }name{ "}" }, { "{" 
 texnames-bad-characters = A nevek nem tartalmazhatják ezeket: < > : " / \ | ? vagy *
 texnames-no-suffix = Adjon utótagot ennek a térképtípusnak: { $role }
 texnames-bad-suffix = A térképtípus utótagja ({ $role }) nem tartalmazhatja ezeket: < > : " / \ | ? vagy *
+texnames-slot-no-suffix = Adjon utótagot ennek a helynek: „{ $slot }”
+texnames-slot-bad-suffix = A hely utótagja („{ $slot }”) nem tartalmazhatja ezeket: < > : " / \ | ? vagy *
+texnames-ending-missing = Minden saját végződéshez meg kell adni a keresendő végződést
+texnames-ending-bad = A saját végződések nem tartalmazhatják ezeket: < > : " / \ | ? vagy *
+texnames-ending-twice = { $ending } kétszer szerepel a végződései között
+texnames-slot-metallic-roughness = Fémesség és érdesség
+texnames-slot-specular-color = Spekuláris szín
+texnames-slot-specular-glossiness = Spekuláris és fényesség
+texnames-slot-clearcoat = Lakkréteg
+texnames-slot-clearcoat-roughness = Lakkréteg érdessége
+texnames-slot-clearcoat-normal = Lakkréteg normálja
+texnames-slot-sheen-color = Selyemfény színe
+texnames-slot-sheen-roughness = Selyemfény érdessége
+texnames-slot-transmission = Áteresztés
+texnames-slot-thickness = Vastagság
+texnames-slot-diffuse-transmission = Szórt áteresztés
+texnames-slot-diffuse-transmission-color = Szórt áteresztés színe
+texnames-slot-iridescence = Irizálás
+texnames-slot-iridescence-thickness = Irizálás vastagsága
+texnames-slot-anisotropy = Anizotrópia
 
 ## Áruházi formátumok
 
@@ -2138,6 +2161,16 @@ settings-tn-hint-map = { " " }a térkép szerepe,{ " " }
 settings-tn-hint-size = { " " }a mérete, ha a készlet több méretben érkezik (a végére kerül, ha a minta kihagyja).
 settings-tn-example = Példa
 settings-tn-suffixes = Utótagok térképtípusonként
+settings-tn-slots = A GLB-letöltésekben a modellbe csomagolt, saját fájl nélküli textúra az anyagról és az általa kitöltött helyről kapja a nevét, és ezeknek a helyeknek is van utótagja:
+settings-tn-endings = Saját végződések
+settings-tn-endings-what = Az a textúra, amely nem egy anyag térképe, megtartja a saját nevét, hacsak nem ezek egyikére végződik: a _diff → _BC a rock_diff.png fájlt rock_BC.png néven küldi. Ha a másodikat üresen hagyja, a végződés elmarad.
+settings-tn-ending-from = Végződés
+settings-tn-ending-from-example = _diff
+settings-tn-ending-to = Csere erre
+settings-tn-ending-to-example = _BC
+settings-tn-ending-add = Végződés hozzáadása
+settings-tn-ending-remove = Eltávolítás
+settings-tn-ending-remove-label = Végződés eltávolítása: { $ending }
 
 ## SettingsPage.vue: Általános és Kapcsolat
 

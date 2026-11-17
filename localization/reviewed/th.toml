@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "a291e71b8315a85b796b394cd1cc26d480ac8ecd3bf12b797cf6319c57ccb07e"
+source = "140db2eb73736ff39922ac317725317468b02f342ce455ff2967c4a2f3b7a920"
 translation = "4b240abbf21b9e5a3573cb5600cede4f95b8fdc50ad26369cfcd10d567b19ce3"
 
 [messages.account-add]
@@ -3830,6 +3830,18 @@ translation = "ไม่มีอะไรให้ค้นหา ให้พ�
 [messages.error-task-running]
 source = "“{ $task }” is already running"
 translation = "“{ $task }” กำลังทำงานอยู่แล้ว"
+
+[messages.error-texture-ending-chars]
+source = '''Endings of your own can't have < > : " / \ | ? or *'''
+translation = 'ท้ายชื่อที่คุณกำหนดเองต้องไม่มี < > : " / \ | ? หรือ *'
+
+[messages.error-texture-ending-missing]
+source = "Each ending of your own needs the ending to look for"
+translation = "ท้ายชื่อที่คุณกำหนดเองแต่ละรายการต้องระบุท้ายชื่อที่จะค้นหา"
+
+[messages.error-texture-ending-twice]
+source = "{ $ending } is in your endings twice"
+translation = "{ $ending } อยู่ในท้ายชื่อของคุณสองครั้ง"
 
 [messages.error-texture-map-type]
 source = "There's no map type called { $role }"
@@ -8520,6 +8532,42 @@ translation = "แบบของคุณเอง"
 source = "Descriptive"
 translation = "แบบอธิบาย"
 
+[messages.settings-tn-ending-add]
+source = "Add an ending"
+translation = "เพิ่มท้ายชื่อ"
+
+[messages.settings-tn-ending-from]
+source = "Ending"
+translation = "ท้ายชื่อ"
+
+[messages.settings-tn-ending-from-example]
+source = "_diff"
+translation = "_diff"
+
+[messages.settings-tn-ending-remove]
+source = "Remove"
+translation = "นำออก"
+
+[messages.settings-tn-ending-remove-label]
+source = "Remove { $ending }"
+translation = "นำ { $ending } ออก"
+
+[messages.settings-tn-ending-to]
+source = "Swap for"
+translation = "เปลี่ยนเป็น"
+
+[messages.settings-tn-ending-to-example]
+source = "_BC"
+translation = "_BC"
+
+[messages.settings-tn-endings]
+source = "Endings of your own"
+translation = "ท้ายชื่อที่กำหนดเอง"
+
+[messages.settings-tn-endings-what]
+source = "A texture that isn’t one of a material’s maps keeps its own name, unless it ends in one of these: _diff → _BC sends rock_diff.png as rock_BC.png. Leave the second empty to drop the ending."
+translation = "เท็กซ์เจอร์ที่ไม่ใช่แมปของแมทีเรียลจะคงชื่อเดิมไว้ เว้นแต่ชื่อจะลงท้ายด้วยรายการใดรายการหนึ่งเหล่านี้: _diff → _BC จะส่ง rock_diff.png เป็น rock_BC.png ปล่อยช่องที่สองว่างไว้เพื่อตัดท้ายชื่อนั้นออก"
+
 [messages.settings-tn-example]
 source = "Example"
 translation = "ตัวอย่าง"
@@ -8551,6 +8599,10 @@ translation = "บันทึกชื่อเท็กซ์เจอร์�
 [messages.settings-tn-short]
 source = "Short"
 translation = "แบบสั้น"
+
+[messages.settings-tn-slots]
+source = "In GLB downloads, a texture packed inside a model with no file of its own is named after the material and the slot it fills, and these slots have suffixes too:"
+translation = "ในการดาวน์โหลด GLB เท็กซ์เจอร์ที่ฝังอยู่ในโมเดลโดยไม่มีไฟล์ของตัวเองจะได้ชื่อตามแมทีเรียลและสล็อตที่เท็กซ์เจอร์นั้นอยู่ และสล็อตเหล่านี้ก็มีคำต่อท้ายด้วย:"
 
 [messages.settings-tn-style]
 source = "Style"
@@ -9474,6 +9526,18 @@ translation = 'ชื่อต้องไม่มี < > : " / \ | ? หรื
 source = 'The suffix for { $role } maps can’t have < > : " / \ | ? or *'
 translation = 'คำต่อท้ายของแมป { $role } ต้องไม่มี < > : " / \ | ? หรือ *'
 
+[messages.texnames-ending-bad]
+source = 'Endings of your own can’t have < > : " / \ | ? or *'
+translation = 'ท้ายชื่อที่คุณกำหนดเองต้องไม่มี < > : " / \ | ? หรือ *'
+
+[messages.texnames-ending-missing]
+source = "Each ending of your own needs the ending to look for"
+translation = "ท้ายชื่อที่คุณกำหนดเองแต่ละรายการต้องระบุท้ายชื่อที่จะค้นหา"
+
+[messages.texnames-ending-twice]
+source = "{ $ending } is in your endings twice"
+translation = "{ $ending } อยู่ในท้ายชื่อของคุณสองครั้ง"
+
 [messages.texnames-needs-map]
 source = 'The pattern needs { "{" }map{ "}" }, or every map of a material would get the same name'
 translation = 'รูปแบบต้องมี { "{" }map{ "}" } ไม่เช่นนั้นทุกแมปของแมทีเรียลจะได้ชื่อเดียวกัน'
@@ -9485,6 +9549,74 @@ translation = "กำหนดคำต่อท้ายให้แมป { $r
 [messages.texnames-placeholders]
 source = 'The pattern can use { "{" }name{ "}" }, { "{" }map{ "}" } and { "{" }size{ "}" }'
 translation = 'รูปแบบใช้ { "{" }name{ "}" }, { "{" }map{ "}" } และ { "{" }size{ "}" } ได้'
+
+[messages.texnames-slot-anisotropy]
+source = "Anisotropy"
+translation = "แอนไอโซทรอปี"
+
+[messages.texnames-slot-bad-suffix]
+source = 'The suffix for “{ $slot }” can’t have < > : " / \ | ? or *'
+translation = 'คำต่อท้ายของ “{ $slot }” ต้องไม่มี < > : " / \ | ? หรือ *'
+
+[messages.texnames-slot-clearcoat]
+source = "Clearcoat"
+translation = "เคลียร์โค้ต"
+
+[messages.texnames-slot-clearcoat-normal]
+source = "Clearcoat normal"
+translation = "นอร์มอลของเคลียร์โค้ต"
+
+[messages.texnames-slot-clearcoat-roughness]
+source = "Clearcoat roughness"
+translation = "ความหยาบของเคลียร์โค้ต"
+
+[messages.texnames-slot-diffuse-transmission]
+source = "Diffuse transmission"
+translation = "การส่งผ่านแสงแบบกระจาย"
+
+[messages.texnames-slot-diffuse-transmission-color]
+source = "Diffuse transmission color"
+translation = "สีการส่งผ่านแสงแบบกระจาย"
+
+[messages.texnames-slot-iridescence]
+source = "Iridescence"
+translation = "ความเหลือบสี"
+
+[messages.texnames-slot-iridescence-thickness]
+source = "Iridescence thickness"
+translation = "ความหนาของชั้นเหลือบสี"
+
+[messages.texnames-slot-metallic-roughness]
+source = "Metal and roughness"
+translation = "โลหะและความหยาบ"
+
+[messages.texnames-slot-no-suffix]
+source = "Give “{ $slot }” a suffix"
+translation = "กำหนดคำต่อท้ายให้ “{ $slot }”"
+
+[messages.texnames-slot-sheen-color]
+source = "Sheen color"
+translation = "สีชีน"
+
+[messages.texnames-slot-sheen-roughness]
+source = "Sheen roughness"
+translation = "ความหยาบของชีน"
+
+[messages.texnames-slot-specular-color]
+source = "Specular color"
+translation = "สีสเปคคิวลาร์"
+
+[messages.texnames-slot-specular-glossiness]
+source = "Specular and glossiness"
+translation = "สเปคคิวลาร์และความเงา"
+
+[messages.texnames-slot-thickness]
+source = "Thickness"
+translation = "ความหนา"
+
+[messages.texnames-slot-transmission]
+source = "Transmission"
+translation = "การส่งผ่านแสง"
 
 [messages.text-binary]
 source = "This file is binary, not text, so there's nothing to read here. Download it to open it in its own tool."

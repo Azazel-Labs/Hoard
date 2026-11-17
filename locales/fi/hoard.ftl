@@ -196,6 +196,9 @@ server-role-emissive = hehku
 server-role-translucency = läpikuultavuus
 error-texture-suffix-missing = Anna pääte karttatyypille { $map }
 error-texture-suffix-chars = Karttatyypin { $map } päätteessä ei voi olla merkkejä < > : " / \ | ? tai *
+error-texture-ending-missing = Jokainen oma loppuosa tarvitsee etsittävän loppuosan
+error-texture-ending-chars = Omissa loppuosissa ei voi olla merkkejä < > : " / \ | ? tai *
+error-texture-ending-twice = { $ending } on loppuosissasi kahdesti
 error-oauth-no-client-id = Tässä linkissä ei ole client_id-arvoa.
 error-oauth-unknown-app = Tätä sovellusta ei ole (enää) rekisteröity tänne. Aloita yhdistäminen uudelleen sovelluksesta.
 error-oauth-redirect = Sovellus pyysi palautusta osoitteeseen, jota se ei rekisteröinyt.
@@ -1874,6 +1877,26 @@ texnames-placeholders = Mallissa voi käyttää kenttiä { "{" }name{ "}" }, { "
 texnames-bad-characters = Nimissä ei voi olla merkkejä < > : " / \ | ? tai *
 texnames-no-suffix = Anna pääte karttatyypille { $role }
 texnames-bad-suffix = Karttatyypin { $role } päätteessä ei voi olla merkkejä < > : " / \ | ? tai *
+texnames-slot-no-suffix = Anna paikalle ”{ $slot }” pääte
+texnames-slot-bad-suffix = Paikan ”{ $slot }” päätteessä ei voi olla merkkejä < > : " / \ | ? tai *
+texnames-ending-missing = Jokainen oma loppuosa tarvitsee etsittävän loppuosan
+texnames-ending-bad = Omissa loppuosissa ei voi olla merkkejä < > : " / \ | ? tai *
+texnames-ending-twice = { $ending } on loppuosissasi kahdesti
+texnames-slot-metallic-roughness = Metalli ja karheus
+texnames-slot-specular-color = Heijastavuuden väri
+texnames-slot-specular-glossiness = Heijastavuus ja kiilto
+texnames-slot-clearcoat = Lakka
+texnames-slot-clearcoat-roughness = Lakan karheus
+texnames-slot-clearcoat-normal = Lakan normaali
+texnames-slot-sheen-color = Sametinhohdon väri
+texnames-slot-sheen-roughness = Sametinhohdon karheus
+texnames-slot-transmission = Läpäisy
+texnames-slot-thickness = Paksuus
+texnames-slot-diffuse-transmission = Diffuusi läpäisy
+texnames-slot-diffuse-transmission-color = Diffuusin läpäisyn väri
+texnames-slot-iridescence = Irisointi
+texnames-slot-iridescence-thickness = Irisoinnin paksuus
+texnames-slot-anisotropy = Anisotropia
 
 ## Kauppatiedostojen muodot
 
@@ -2387,6 +2410,16 @@ settings-tn-hint-map = { " " }kartan käyttötarkoitus,{ " " }
 settings-tn-hint-size = { " " }sen koko, kun sarjasta on useita kokoja (lisätään loppuun, jos malli jättää sen pois).
 settings-tn-example = Esimerkki
 settings-tn-suffixes = Päätteet kullekin karttatyypille
+settings-tn-slots = GLB-latauksissa mallin sisään pakattu tekstuuri, jolla ei ole omaa tiedostoa, nimetään materiaalin ja sen täyttämän paikan mukaan, ja näilläkin paikoilla on päätteet:
+settings-tn-endings = Omat loppuosat
+settings-tn-endings-what = Tekstuuri, joka ei ole mikään materiaalin kartoista, säilyttää oman nimensä, ellei se pääty johonkin näistä: _diff → _BC lähettää tiedoston rock_diff.png nimellä rock_BC.png. Jätä jälkimmäinen tyhjäksi, niin loppuosa poistetaan.
+settings-tn-ending-from = Loppuosa
+settings-tn-ending-from-example = _diff
+settings-tn-ending-to = Tilalle
+settings-tn-ending-to-example = _BC
+settings-tn-ending-add = Lisää loppuosa
+settings-tn-ending-remove = Poista
+settings-tn-ending-remove-label = Poista { $ending }
 
 ## Asetukset: Yleiset ja Yhteys
 

@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "a291e71b8315a85b796b394cd1cc26d480ac8ecd3bf12b797cf6319c57ccb07e"
+source = "140db2eb73736ff39922ac317725317468b02f342ce455ff2967c4a2f3b7a920"
 translation = "81f454b4be3578d38a286a9258dbbc3cf47ad1586e8852a5a6c519b04af263db"
 
 [messages.account-add]
@@ -3978,6 +3978,18 @@ translation = "nimic de căutat; tastați numele pachetului"
 [messages.error-task-running]
 source = "“{ $task }” is already running"
 translation = "„{ $task }” rulează deja"
+
+[messages.error-texture-ending-chars]
+source = '''Endings of your own can't have < > : " / \ | ? or *'''
+translation = 'Terminațiile proprii nu pot conține < > : " / \ | ? sau *'
+
+[messages.error-texture-ending-missing]
+source = "Each ending of your own needs the ending to look for"
+translation = "Fiecare terminație proprie are nevoie de terminația de căutat"
+
+[messages.error-texture-ending-twice]
+source = "{ $ending } is in your endings twice"
+translation = "{ $ending } apare de două ori în terminațiile dvs."
 
 [messages.error-texture-map-type]
 source = "There's no map type called { $role }"
@@ -8831,6 +8843,42 @@ translation = "Propriul dvs."
 source = "Descriptive"
 translation = "Descriptiv"
 
+[messages.settings-tn-ending-add]
+source = "Add an ending"
+translation = "Adăugați o terminație"
+
+[messages.settings-tn-ending-from]
+source = "Ending"
+translation = "Terminație"
+
+[messages.settings-tn-ending-from-example]
+source = "_diff"
+translation = "_diff"
+
+[messages.settings-tn-ending-remove]
+source = "Remove"
+translation = "Eliminați"
+
+[messages.settings-tn-ending-remove-label]
+source = "Remove { $ending }"
+translation = "Eliminați { $ending }"
+
+[messages.settings-tn-ending-to]
+source = "Swap for"
+translation = "Înlocuiți cu"
+
+[messages.settings-tn-ending-to-example]
+source = "_BC"
+translation = "_BC"
+
+[messages.settings-tn-endings]
+source = "Endings of your own"
+translation = "Terminații proprii"
+
+[messages.settings-tn-endings-what]
+source = "A texture that isn’t one of a material’s maps keeps its own name, unless it ends in one of these: _diff → _BC sends rock_diff.png as rock_BC.png. Leave the second empty to drop the ending."
+translation = "O textură care nu este una dintre hărțile unui material își păstrează numele, cu excepția cazului în care se termină cu una dintre acestea: _diff → _BC trimite rock_diff.png ca rock_BC.png. Lăsați a doua goală pentru a elimina terminația."
+
 [messages.settings-tn-example]
 source = "Example"
 translation = "Exemplu"
@@ -8862,6 +8910,10 @@ translation = "Numele texturilor au fost salvate"
 [messages.settings-tn-short]
 source = "Short"
 translation = "Scurt"
+
+[messages.settings-tn-slots]
+source = "In GLB downloads, a texture packed inside a model with no file of its own is named after the material and the slot it fills, and these slots have suffixes too:"
+translation = "În descărcările GLB, o textură împachetată într-un model, fără un fișier propriu, primește numele materialului și al slotului pe care îl ocupă, iar aceste sloturi au și ele sufixe:"
 
 [messages.settings-tn-style]
 source = "Style"
@@ -9842,6 +9894,18 @@ translation = 'Numele nu pot conține < > : " / \ | ? sau *'
 source = 'The suffix for { $role } maps can’t have < > : " / \ | ? or *'
 translation = 'Sufixul pentru hărțile de { $role } nu poate conține < > : " / \ | ? sau *'
 
+[messages.texnames-ending-bad]
+source = 'Endings of your own can’t have < > : " / \ | ? or *'
+translation = 'Terminațiile proprii nu pot conține < > : " / \ | ? sau *'
+
+[messages.texnames-ending-missing]
+source = "Each ending of your own needs the ending to look for"
+translation = "Fiecare terminație proprie are nevoie de terminația de căutat"
+
+[messages.texnames-ending-twice]
+source = "{ $ending } is in your endings twice"
+translation = "{ $ending } apare de două ori în terminațiile dvs."
+
 [messages.texnames-needs-map]
 source = 'The pattern needs { "{" }map{ "}" }, or every map of a material would get the same name'
 translation = 'Șablonul are nevoie de { "{" }map{ "}" }, altfel toate hărțile unui material ar primi același nume'
@@ -9853,6 +9917,74 @@ translation = "Dați un sufix hărților de { $role }"
 [messages.texnames-placeholders]
 source = 'The pattern can use { "{" }name{ "}" }, { "{" }map{ "}" } and { "{" }size{ "}" }'
 translation = 'Șablonul poate folosi { "{" }name{ "}" }, { "{" }map{ "}" } și { "{" }size{ "}" }'
+
+[messages.texnames-slot-anisotropy]
+source = "Anisotropy"
+translation = "Anizotropie"
+
+[messages.texnames-slot-bad-suffix]
+source = 'The suffix for “{ $slot }” can’t have < > : " / \ | ? or *'
+translation = 'Sufixul pentru „{ $slot }” nu poate conține < > : " / \ | ? sau *'
+
+[messages.texnames-slot-clearcoat]
+source = "Clearcoat"
+translation = "Strat de lac"
+
+[messages.texnames-slot-clearcoat-normal]
+source = "Clearcoat normal"
+translation = "Normalele stratului de lac"
+
+[messages.texnames-slot-clearcoat-roughness]
+source = "Clearcoat roughness"
+translation = "Rugozitatea stratului de lac"
+
+[messages.texnames-slot-diffuse-transmission]
+source = "Diffuse transmission"
+translation = "Transmisie difuză"
+
+[messages.texnames-slot-diffuse-transmission-color]
+source = "Diffuse transmission color"
+translation = "Culoarea transmisiei difuze"
+
+[messages.texnames-slot-iridescence]
+source = "Iridescence"
+translation = "Irizare"
+
+[messages.texnames-slot-iridescence-thickness]
+source = "Iridescence thickness"
+translation = "Grosimea irizării"
+
+[messages.texnames-slot-metallic-roughness]
+source = "Metal and roughness"
+translation = "Metal și rugozitate"
+
+[messages.texnames-slot-no-suffix]
+source = "Give “{ $slot }” a suffix"
+translation = "Dați un sufix pentru „{ $slot }”"
+
+[messages.texnames-slot-sheen-color]
+source = "Sheen color"
+translation = "Culoarea satinării"
+
+[messages.texnames-slot-sheen-roughness]
+source = "Sheen roughness"
+translation = "Rugozitatea satinării"
+
+[messages.texnames-slot-specular-color]
+source = "Specular color"
+translation = "Culoare speculară"
+
+[messages.texnames-slot-specular-glossiness]
+source = "Specular and glossiness"
+translation = "Specularitate și luciu"
+
+[messages.texnames-slot-thickness]
+source = "Thickness"
+translation = "Grosime"
+
+[messages.texnames-slot-transmission]
+source = "Transmission"
+translation = "Transmisie"
 
 [messages.text-binary]
 source = "This file is binary, not text, so there's nothing to read here. Download it to open it in its own tool."

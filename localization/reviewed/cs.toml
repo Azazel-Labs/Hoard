@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "a291e71b8315a85b796b394cd1cc26d480ac8ecd3bf12b797cf6319c57ccb07e"
+source = "140db2eb73736ff39922ac317725317468b02f342ce455ff2967c4a2f3b7a920"
 translation = "10350137b75664600f5b80d67d4b7dc6a218245ed458fa59bceed92a7a09d3d2"
 
 [messages.account-add]
@@ -3953,6 +3953,18 @@ translation = "není co hledat; napište název balíčku"
 [messages.error-task-running]
 source = "“{ $task }” is already running"
 translation = "„{ $task }“ už běží"
+
+[messages.error-texture-ending-chars]
+source = '''Endings of your own can't have < > : " / \ | ? or *'''
+translation = 'Vlastní koncovky nemohou obsahovat < > : " / \ | ? ani *'
+
+[messages.error-texture-ending-missing]
+source = "Each ending of your own needs the ending to look for"
+translation = "Každá vlastní koncovka potřebuje koncovku, kterou má hledat"
+
+[messages.error-texture-ending-twice]
+source = "{ $ending } is in your endings twice"
+translation = "{ $ending } je ve vašich koncovkách dvakrát"
 
 [messages.error-texture-map-type]
 source = "There's no map type called { $role }"
@@ -8828,6 +8840,42 @@ translation = "Vlastní"
 source = "Descriptive"
 translation = "Popisný"
 
+[messages.settings-tn-ending-add]
+source = "Add an ending"
+translation = "Přidat koncovku"
+
+[messages.settings-tn-ending-from]
+source = "Ending"
+translation = "Koncovka"
+
+[messages.settings-tn-ending-from-example]
+source = "_diff"
+translation = "_diff"
+
+[messages.settings-tn-ending-remove]
+source = "Remove"
+translation = "Odebrat"
+
+[messages.settings-tn-ending-remove-label]
+source = "Remove { $ending }"
+translation = "Odebrat { $ending }"
+
+[messages.settings-tn-ending-to]
+source = "Swap for"
+translation = "Nahradit za"
+
+[messages.settings-tn-ending-to-example]
+source = "_BC"
+translation = "_BC"
+
+[messages.settings-tn-endings]
+source = "Endings of your own"
+translation = "Vlastní koncovky"
+
+[messages.settings-tn-endings-what]
+source = "A texture that isn’t one of a material’s maps keeps its own name, unless it ends in one of these: _diff → _BC sends rock_diff.png as rock_BC.png. Leave the second empty to drop the ending."
+translation = "Textura, která není žádnou z map materiálu, si ponechá svůj název, pokud nekončí jednou z těchto koncovek: _diff → _BC odešle rock_diff.png jako rock_BC.png. Nechte druhé pole prázdné, chcete-li koncovku odstranit."
+
 [messages.settings-tn-example]
 source = "Example"
 translation = "Příklad"
@@ -8859,6 +8907,10 @@ translation = "Názvy textur uloženy"
 [messages.settings-tn-short]
 source = "Short"
 translation = "Krátký"
+
+[messages.settings-tn-slots]
+source = "In GLB downloads, a texture packed inside a model with no file of its own is named after the material and the slot it fills, and these slots have suffixes too:"
+translation = "Při stahování GLB dostane textura zabalená uvnitř modelu bez vlastního souboru název podle materiálu a slotu, který vyplňuje, a i tyto sloty mají přípony:"
 
 [messages.settings-tn-style]
 source = "Style"
@@ -9834,6 +9886,18 @@ translation = 'Názvy nemohou obsahovat < > : " / \ | ? ani *'
 source = 'The suffix for { $role } maps can’t have < > : " / \ | ? or *'
 translation = 'Přípona pro mapy typu { $role } nemůže obsahovat < > : " / \ | ? ani *'
 
+[messages.texnames-ending-bad]
+source = 'Endings of your own can’t have < > : " / \ | ? or *'
+translation = 'Vlastní koncovky nemohou obsahovat < > : " / \ | ? ani *'
+
+[messages.texnames-ending-missing]
+source = "Each ending of your own needs the ending to look for"
+translation = "Každá vlastní koncovka potřebuje koncovku, kterou má hledat"
+
+[messages.texnames-ending-twice]
+source = "{ $ending } is in your endings twice"
+translation = "{ $ending } je ve vašich koncovkách dvakrát"
+
 [messages.texnames-needs-map]
 source = 'The pattern needs { "{" }map{ "}" }, or every map of a material would get the same name'
 translation = 'Vzor potřebuje { "{" }map{ "}" }, jinak by všechny mapy materiálu dostaly stejný název'
@@ -9845,6 +9909,74 @@ translation = "Zadejte příponu pro mapy typu { $role }"
 [messages.texnames-placeholders]
 source = 'The pattern can use { "{" }name{ "}" }, { "{" }map{ "}" } and { "{" }size{ "}" }'
 translation = 'Vzor může používat { "{" }name{ "}" }, { "{" }map{ "}" } a { "{" }size{ "}" }'
+
+[messages.texnames-slot-anisotropy]
+source = "Anisotropy"
+translation = "Anizotropie"
+
+[messages.texnames-slot-bad-suffix]
+source = 'The suffix for “{ $slot }” can’t have < > : " / \ | ? or *'
+translation = 'Přípona pro „{ $slot }“ nemůže obsahovat < > : " / \ | ? ani *'
+
+[messages.texnames-slot-clearcoat]
+source = "Clearcoat"
+translation = "Lak"
+
+[messages.texnames-slot-clearcoat-normal]
+source = "Clearcoat normal"
+translation = "Normála laku"
+
+[messages.texnames-slot-clearcoat-roughness]
+source = "Clearcoat roughness"
+translation = "Drsnost laku"
+
+[messages.texnames-slot-diffuse-transmission]
+source = "Diffuse transmission"
+translation = "Difuzní propustnost"
+
+[messages.texnames-slot-diffuse-transmission-color]
+source = "Diffuse transmission color"
+translation = "Barva difuzní propustnosti"
+
+[messages.texnames-slot-iridescence]
+source = "Iridescence"
+translation = "Irizace"
+
+[messages.texnames-slot-iridescence-thickness]
+source = "Iridescence thickness"
+translation = "Tloušťka irizace"
+
+[messages.texnames-slot-metallic-roughness]
+source = "Metal and roughness"
+translation = "Kov a drsnost"
+
+[messages.texnames-slot-no-suffix]
+source = "Give “{ $slot }” a suffix"
+translation = "Zadejte příponu pro „{ $slot }“"
+
+[messages.texnames-slot-sheen-color]
+source = "Sheen color"
+translation = "Barva sametového lesku"
+
+[messages.texnames-slot-sheen-roughness]
+source = "Sheen roughness"
+translation = "Drsnost sametového lesku"
+
+[messages.texnames-slot-specular-color]
+source = "Specular color"
+translation = "Barva spekulárního odrazu"
+
+[messages.texnames-slot-specular-glossiness]
+source = "Specular and glossiness"
+translation = "Spekulární odraz a lesk"
+
+[messages.texnames-slot-thickness]
+source = "Thickness"
+translation = "Tloušťka"
+
+[messages.texnames-slot-transmission]
+source = "Transmission"
+translation = "Propustnost"
 
 [messages.text-binary]
 source = "This file is binary, not text, so there's nothing to read here. Download it to open it in its own tool."

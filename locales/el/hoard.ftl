@@ -196,6 +196,9 @@ server-role-emissive = εκπομπής
 server-role-translucency = ημιδιαφάνειας
 error-texture-suffix-missing = Δώστε επίθημα στους χάρτες { $map }
 error-texture-suffix-chars = Το επίθημα για τους χάρτες { $map } δεν μπορεί να περιέχει < > : " / \ | ? ή *
+error-texture-ending-missing = Κάθε δική σας κατάληξη χρειάζεται την κατάληξη που θα αναζητηθεί
+error-texture-ending-chars = Οι δικές σας καταλήξεις δεν μπορούν να περιέχουν < > : " / \ | ? ή *
+error-texture-ending-twice = Η κατάληξη { $ending } υπάρχει δύο φορές στις καταλήξεις σας
 error-oauth-no-client-id = Αυτός ο σύνδεσμος δεν έχει client_id.
 error-oauth-unknown-app = Αυτή η εφαρμογή δεν είναι (πια) καταχωρισμένη εδώ. Ξεκινήστε ξανά τη σύνδεση από την εφαρμογή.
 error-oauth-redirect = Η εφαρμογή ζήτησε επιστροφή σε διεύθυνση που δεν έχει καταχωρίσει.
@@ -1879,6 +1882,26 @@ texnames-placeholders = Το μοτίβο μπορεί να χρησιμοποι
 texnames-bad-characters = Τα ονόματα δεν μπορούν να περιέχουν < > : " / \ | ? ή *
 texnames-no-suffix = Δώστε επίθημα στους χάρτες { $role }
 texnames-bad-suffix = Το επίθημα για τους χάρτες { $role } δεν μπορεί να περιέχει < > : " / \ | ? ή *
+texnames-slot-no-suffix = Δώστε επίθημα στην υποδοχή «{ $slot }»
+texnames-slot-bad-suffix = Το επίθημα για την υποδοχή «{ $slot }» δεν μπορεί να περιέχει < > : " / \ | ? ή *
+texnames-ending-missing = Κάθε δική σας κατάληξη χρειάζεται την κατάληξη που θα αναζητηθεί
+texnames-ending-bad = Οι δικές σας καταλήξεις δεν μπορούν να περιέχουν < > : " / \ | ? ή *
+texnames-ending-twice = Η κατάληξη { $ending } υπάρχει δύο φορές στις καταλήξεις σας
+texnames-slot-metallic-roughness = Μέταλλο και τραχύτητα
+texnames-slot-specular-color = Χρώμα κατοπτρισμού
+texnames-slot-specular-glossiness = Κατοπτρισμός και γυαλάδα
+texnames-slot-clearcoat = Βερνίκι
+texnames-slot-clearcoat-roughness = Τραχύτητα βερνικιού
+texnames-slot-clearcoat-normal = Normal βερνικιού
+texnames-slot-sheen-color = Χρώμα sheen
+texnames-slot-sheen-roughness = Τραχύτητα sheen
+texnames-slot-transmission = Μετάδοση
+texnames-slot-thickness = Πάχος
+texnames-slot-diffuse-transmission = Διάχυτη μετάδοση
+texnames-slot-diffuse-transmission-color = Χρώμα διάχυτης μετάδοσης
+texnames-slot-iridescence = Ιριδισμός
+texnames-slot-iridescence-thickness = Πάχος ιριδισμού
+texnames-slot-anisotropy = Ανισοτροπία
 
 ## storeFormats.ts
 
@@ -2384,6 +2407,16 @@ settings-tn-hint-map = { " " }σε τι χρησιμεύει ο χάρτης,{ "
 settings-tn-hint-size = { " " }το μέγεθός του, όταν το σετ διατίθεται σε περισσότερα από ένα μεγέθη (προστίθεται στο τέλος αν το μοτίβο το παραλείπει).
 settings-tn-example = Παράδειγμα
 settings-tn-suffixes = Επιθήματα για κάθε είδος χάρτη
+settings-tn-slots = Στις λήψεις GLB, μια υφή πακεταρισμένη μέσα σε μοντέλο χωρίς δικό της αρχείο ονομάζεται με βάση το υλικό και την υποδοχή που καλύπτει, και αυτές οι υποδοχές έχουν επίσης επιθήματα:
+settings-tn-endings = Δικές σας καταλήξεις
+settings-tn-endings-what = Μια υφή που δεν είναι κάποιος από τους χάρτες ενός υλικού κρατά το δικό της όνομα, εκτός αν τελειώνει σε μία από αυτές: το _diff → _BC στέλνει το rock_diff.png ως rock_BC.png. Αφήστε το δεύτερο κενό για να αφαιρεθεί η κατάληξη.
+settings-tn-ending-from = Κατάληξη
+settings-tn-ending-from-example = _diff
+settings-tn-ending-to = Αντικατάσταση με
+settings-tn-ending-to-example = _BC
+settings-tn-ending-add = Προσθήκη κατάληξης
+settings-tn-ending-remove = Αφαίρεση
+settings-tn-ending-remove-label = Αφαίρεση κατάληξης { $ending }
 
 ## SettingsPage.vue: General and Connection
 

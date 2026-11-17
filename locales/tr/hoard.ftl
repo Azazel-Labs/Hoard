@@ -196,6 +196,9 @@ server-role-emissive = ışıma
 server-role-translucency = yarı saydamlık
 error-texture-suffix-missing = { $map } haritalarına bir sonek verin
 error-texture-suffix-chars = { $map } haritalarının sonekinde < > : " / \ | ? ya da * olamaz
+error-texture-ending-missing = Kendi ad sonlarınızın her biri için aranacak ad sonu gerekir
+error-texture-ending-chars = Kendi ad sonlarınızda < > : " / \ | ? ya da * olamaz
+error-texture-ending-twice = { $ending } ad sonlarınızda iki kez var
 error-oauth-no-client-id = Bu bağlantıda client_id yok.
 error-oauth-unknown-app = Bu uygulama burada kayıtlı değil (artık değil). Bağlanmaya uygulamadan yeniden başlayın.
 error-oauth-redirect = Uygulama, kaydetmediği bir adrese geri gönderilmek istedi.
@@ -1683,6 +1686,26 @@ texnames-placeholders = Kalıp { "{" }name{ "}" }, { "{" }map{ "}" } ve { "{" }s
 texnames-bad-characters = Adlarda < > : " / \ | ? ya da * olamaz
 texnames-no-suffix = { $role } haritalarına bir sonek verin
 texnames-bad-suffix = { $role } haritalarının sonekinde < > : " / \ | ? ya da * olamaz
+texnames-slot-no-suffix = “{ $slot }” için bir sonek verin
+texnames-slot-bad-suffix = “{ $slot }” için sonekte < > : " / \ | ? ya da * olamaz
+texnames-ending-missing = Kendi ad sonlarınızın her biri için aranacak ad sonu gerekir
+texnames-ending-bad = Kendi ad sonlarınızda < > : " / \ | ? ya da * olamaz
+texnames-ending-twice = { $ending } ad sonlarınızda iki kez var
+texnames-slot-metallic-roughness = Metal ve pürüzlülük
+texnames-slot-specular-color = Yansıma rengi
+texnames-slot-specular-glossiness = Yansıma ve parlaklık
+texnames-slot-clearcoat = Şeffaf kaplama
+texnames-slot-clearcoat-roughness = Şeffaf kaplama pürüzlülüğü
+texnames-slot-clearcoat-normal = Şeffaf kaplama normali
+texnames-slot-sheen-color = Parıltı rengi
+texnames-slot-sheen-roughness = Parıltı pürüzlülüğü
+texnames-slot-transmission = Geçirgenlik
+texnames-slot-thickness = Kalınlık
+texnames-slot-diffuse-transmission = Dağınık geçirgenlik
+texnames-slot-diffuse-transmission-color = Dağınık geçirgenlik rengi
+texnames-slot-iridescence = Yanardönerlik
+texnames-slot-iridescence-thickness = Yanardönerlik kalınlığı
+texnames-slot-anisotropy = Anizotropi
 
 ## storeFormats.ts
 
@@ -2142,6 +2165,16 @@ settings-tn-hint-map = { " " }haritanın ne için olduğu,{ " " }
 settings-tn-hint-size = { " " }set birden fazla boyutta geliyorsa boyutu (desende yoksa sona eklenir).
 settings-tn-example = Örnek
 settings-tn-suffixes = Her harita türü için son ekler
+settings-tn-slots = GLB indirmelerinde, bir modelin içine paketlenmiş ve kendi dosyası olmayan bir doku, malzemenin ve doldurduğu yuvanın adıyla adlandırılır; bu yuvaların da sonekleri vardır:
+settings-tn-endings = Kendi ad sonlarınız
+settings-tn-endings-what = Bir malzemenin haritalarından biri olmayan bir doku, bunlardan biriyle bitmedikçe kendi adını korur: _diff → _BC ile rock_diff.png, rock_BC.png olarak gönderilir. Ad sonunu atmak için ikincisini boş bırakın.
+settings-tn-ending-from = Ad sonu
+settings-tn-ending-from-example = _diff
+settings-tn-ending-to = Yerine
+settings-tn-ending-to-example = _BC
+settings-tn-ending-add = Ad sonu ekle
+settings-tn-ending-remove = Kaldır
+settings-tn-ending-remove-label = { $ending } ad sonunu kaldır
 
 ## SettingsPage.vue: General and Connection
 

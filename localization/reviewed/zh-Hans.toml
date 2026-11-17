@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "a291e71b8315a85b796b394cd1cc26d480ac8ecd3bf12b797cf6319c57ccb07e"
+source = "140db2eb73736ff39922ac317725317468b02f342ce455ff2967c4a2f3b7a920"
 translation = "081091cee166500a8e077d0cbf615782270fdd54d17e6a1da8ca8892c18792ea"
 
 [messages.account-add]
@@ -3830,6 +3830,18 @@ translation = "没有可搜索的内容；请输入资源包的名称"
 [messages.error-task-running]
 source = "“{ $task }” is already running"
 translation = "“{ $task }”已在运行"
+
+[messages.error-texture-ending-chars]
+source = '''Endings of your own can't have < > : " / \ | ? or *'''
+translation = '自定义结尾不能包含 < > : " / \ | ? 或 *'
+
+[messages.error-texture-ending-missing]
+source = "Each ending of your own needs the ending to look for"
+translation = "每个自定义结尾都需要填写要查找的结尾"
+
+[messages.error-texture-ending-twice]
+source = "{ $ending } is in your endings twice"
+translation = "{ $ending } 在你的结尾中出现了两次"
 
 [messages.error-texture-map-type]
 source = "There's no map type called { $role }"
@@ -8531,6 +8543,42 @@ translation = "自定义"
 source = "Descriptive"
 translation = "描述性"
 
+[messages.settings-tn-ending-add]
+source = "Add an ending"
+translation = "添加结尾"
+
+[messages.settings-tn-ending-from]
+source = "Ending"
+translation = "结尾"
+
+[messages.settings-tn-ending-from-example]
+source = "_diff"
+translation = "_diff"
+
+[messages.settings-tn-ending-remove]
+source = "Remove"
+translation = "移除"
+
+[messages.settings-tn-ending-remove-label]
+source = "Remove { $ending }"
+translation = "移除 { $ending }"
+
+[messages.settings-tn-ending-to]
+source = "Swap for"
+translation = "替换为"
+
+[messages.settings-tn-ending-to-example]
+source = "_BC"
+translation = "_BC"
+
+[messages.settings-tn-endings]
+source = "Endings of your own"
+translation = "自定义结尾"
+
+[messages.settings-tn-endings-what]
+source = "A texture that isn’t one of a material’s maps keeps its own name, unless it ends in one of these: _diff → _BC sends rock_diff.png as rock_BC.png. Leave the second empty to drop the ending."
+translation = "不属于材质贴图的纹理会保留自己的名称，除非名称以下列结尾之一结束：_diff → _BC 会把 rock_diff.png 发送为 rock_BC.png。第二项留空即可去掉该结尾。"
+
 [messages.settings-tn-example]
 source = "Example"
 translation = "示例"
@@ -8562,6 +8610,10 @@ translation = "纹理名称已保存"
 [messages.settings-tn-short]
 source = "Short"
 translation = "简短"
+
+[messages.settings-tn-slots]
+source = "In GLB downloads, a texture packed inside a model with no file of its own is named after the material and the slot it fills, and these slots have suffixes too:"
+translation = "在 GLB 下载中，打包在模型内部、没有独立文件的纹理会以材质和它所占用的槽位命名，这些槽位也有后缀："
 
 [messages.settings-tn-style]
 source = "Style"
@@ -9485,6 +9537,18 @@ translation = '名称不能包含 < > : " / \ | ? 或 *'
 source = 'The suffix for { $role } maps can’t have < > : " / \ | ? or *'
 translation = '{ $role }贴图的后缀不能包含 < > : " / \ | ? 或 *'
 
+[messages.texnames-ending-bad]
+source = 'Endings of your own can’t have < > : " / \ | ? or *'
+translation = '自定义结尾不能包含 < > : " / \ | ? 或 *'
+
+[messages.texnames-ending-missing]
+source = "Each ending of your own needs the ending to look for"
+translation = "每个自定义结尾都需要填写要查找的结尾"
+
+[messages.texnames-ending-twice]
+source = "{ $ending } is in your endings twice"
+translation = "{ $ending } 在你的结尾中出现了两次"
+
 [messages.texnames-needs-map]
 source = 'The pattern needs { "{" }map{ "}" }, or every map of a material would get the same name'
 translation = '命名模式需要包含 { "{" }map{ "}" }，否则同一材质的所有贴图都会得到相同的名称'
@@ -9496,6 +9560,74 @@ translation = "请为{ $role }贴图指定后缀"
 [messages.texnames-placeholders]
 source = 'The pattern can use { "{" }name{ "}" }, { "{" }map{ "}" } and { "{" }size{ "}" }'
 translation = '命名模式可以使用 { "{" }name{ "}" }、{ "{" }map{ "}" } 和 { "{" }size{ "}" }'
+
+[messages.texnames-slot-anisotropy]
+source = "Anisotropy"
+translation = "各向异性"
+
+[messages.texnames-slot-bad-suffix]
+source = 'The suffix for “{ $slot }” can’t have < > : " / \ | ? or *'
+translation = '“{ $slot }”的后缀不能包含 < > : " / \ | ? 或 *'
+
+[messages.texnames-slot-clearcoat]
+source = "Clearcoat"
+translation = "清漆"
+
+[messages.texnames-slot-clearcoat-normal]
+source = "Clearcoat normal"
+translation = "清漆法线"
+
+[messages.texnames-slot-clearcoat-roughness]
+source = "Clearcoat roughness"
+translation = "清漆粗糙度"
+
+[messages.texnames-slot-diffuse-transmission]
+source = "Diffuse transmission"
+translation = "漫透射"
+
+[messages.texnames-slot-diffuse-transmission-color]
+source = "Diffuse transmission color"
+translation = "漫透射颜色"
+
+[messages.texnames-slot-iridescence]
+source = "Iridescence"
+translation = "虹彩"
+
+[messages.texnames-slot-iridescence-thickness]
+source = "Iridescence thickness"
+translation = "虹彩厚度"
+
+[messages.texnames-slot-metallic-roughness]
+source = "Metal and roughness"
+translation = "金属度和粗糙度"
+
+[messages.texnames-slot-no-suffix]
+source = "Give “{ $slot }” a suffix"
+translation = "请为“{ $slot }”指定后缀"
+
+[messages.texnames-slot-sheen-color]
+source = "Sheen color"
+translation = "绒光颜色"
+
+[messages.texnames-slot-sheen-roughness]
+source = "Sheen roughness"
+translation = "绒光粗糙度"
+
+[messages.texnames-slot-specular-color]
+source = "Specular color"
+translation = "高光颜色"
+
+[messages.texnames-slot-specular-glossiness]
+source = "Specular and glossiness"
+translation = "高光和光泽度"
+
+[messages.texnames-slot-thickness]
+source = "Thickness"
+translation = "厚度"
+
+[messages.texnames-slot-transmission]
+source = "Transmission"
+translation = "透射"
 
 [messages.text-binary]
 source = "This file is binary, not text, so there's nothing to read here. Download it to open it in its own tool."

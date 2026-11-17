@@ -8,14 +8,40 @@ export interface TextureNames {
   on: boolean
   /** `{name}` the material run together, `{map}` the map's suffix, `{size}` its size when the set has several. */
   pattern: string
-  /** Suffix by role. */
+  /** Suffix by role, and by glTF slot ([`SLOTS`]). */
   maps: Record<string, string>
+  /** Endings of your own: a texture that isn't a map whose name ends in `from` goes out with `to` instead. */
+  endings: Ending[]
 }
+
+export interface Ending { from: string; to: string }
 
 export const ROLES = Object.keys(ROLE_LABEL) as MapRole[]
 
+/** The slots a glTF material fills with a texture beyond the kinds of map, in words. What fills one inside a model
+ * is named after it in GLB downloads. Getters, so they're in the language of the moment. */
+export const SLOT_LABEL: Readonly<Record<string, string>> = {
+  get metallic_roughness() { return t('texnames-slot-metallic-roughness') },
+  get specular_color() { return t('texnames-slot-specular-color') },
+  get specular_glossiness() { return t('texnames-slot-specular-glossiness') },
+  get clearcoat() { return t('texnames-slot-clearcoat') },
+  get clearcoat_roughness() { return t('texnames-slot-clearcoat-roughness') },
+  get clearcoat_normal() { return t('texnames-slot-clearcoat-normal') },
+  get sheen_color() { return t('texnames-slot-sheen-color') },
+  get sheen_roughness() { return t('texnames-slot-sheen-roughness') },
+  get transmission() { return t('texnames-slot-transmission') },
+  get thickness() { return t('texnames-slot-thickness') },
+  get diffuse_transmission() { return t('texnames-slot-diffuse-transmission') },
+  get diffuse_transmission_color() { return t('texnames-slot-diffuse-transmission-color') },
+  get iridescence() { return t('texnames-slot-iridescence') },
+  get iridescence_thickness() { return t('texnames-slot-iridescence-thickness') },
+  get anisotropy() { return t('texnames-slot-anisotropy') },
+}
+
+export const SLOTS = Object.keys(SLOT_LABEL)
+
 /** Short suffixes, game-engine style: `T_Rock_BC`, `T_Rock_N`. */
-export const SHORT: { pattern: string; maps: Record<MapRole, string> } = {
+export const SHORT: { pattern: string; maps: Record<string, string> } = {
   pattern: 'T_{name}_{map}',
   maps: {
     base_color: 'BC',
@@ -35,8 +61,26 @@ export const SHORT: { pattern: string; maps: Record<MapRole, string> } = {
     opacity: 'O',
     emissive: 'E',
     translucency: 'T',
+    metallic_roughness: 'MR',
+    specular_color: 'SC',
+    specular_glossiness: 'SG',
+    clearcoat: 'CC',
+    clearcoat_roughness: 'CCR',
+    clearcoat_normal: 'CCN',
+    sheen_color: 'SHC',
+    sheen_roughness: 'SHR',
+    transmission: 'TR',
+    thickness: 'TH',
+    diffuse_transmission: 'DT',
+    diffuse_transmission_color: 'DTC',
+    iridescence: 'IR',
+    iridescence_thickness: 'IRT',
+    anisotropy: 'AN',
   },
 }
+
+/** The endings worth saving: a row left empty isn't one. */
+export const usedEndings = (endings: Ending[]) => endings.filter((e) => e.from.trim() || e.to.trim())
 
 /** "Stand Wood Old 05" -> "StandWoodOld05". */
 export const runTogether = (name: string) =>
@@ -67,6 +111,19 @@ export function problem(n: TextureNames): string | null {
     const s = n.maps[r] ?? ''
     if (!s.trim()) return t('texnames-no-suffix', { role: ROLE_NAME[r] })
     if (BAD.test(s)) return t('texnames-bad-suffix', { role: ROLE_NAME[r] })
+  }
+  for (const k of SLOTS) {
+    const s = n.maps[k] ?? ''
+    if (!s.trim()) return t('texnames-slot-no-suffix', { slot: SLOT_LABEL[k] })
+    if (BAD.test(s)) return t('texnames-slot-bad-suffix', { slot: SLOT_LABEL[k] })
+  }
+  const seen = new Set<string>()
+  for (const e of usedEndings(n.endings)) {
+    const from = e.from.trim()
+    if (!from) return t('texnames-ending-missing')
+    if (BAD.test(from) || BAD.test(e.to.trim())) return t('texnames-ending-bad')
+    if (seen.has(from.toLowerCase())) return t('texnames-ending-twice', { ending: from })
+    seen.add(from.toLowerCase())
   }
   return null
 }

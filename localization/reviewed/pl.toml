@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "a291e71b8315a85b796b394cd1cc26d480ac8ecd3bf12b797cf6319c57ccb07e"
+source = "140db2eb73736ff39922ac317725317468b02f342ce455ff2967c4a2f3b7a920"
 translation = "90c0ed812beab84b13b964f798f3b808c3e8a1a1439ed69952ffc76f161eeeaa"
 
 [messages.account-add]
@@ -3973,6 +3973,18 @@ translation = "brak frazy do wyszukania; należy wpisać nazwę paczki"
 [messages.error-task-running]
 source = "“{ $task }” is already running"
 translation = "„{ $task }” już trwa"
+
+[messages.error-texture-ending-chars]
+source = '''Endings of your own can't have < > : " / \ | ? or *'''
+translation = 'Własne końcówki nie mogą zawierać znaków < > : " / \ | ? ani *'
+
+[messages.error-texture-ending-missing]
+source = "Each ending of your own needs the ending to look for"
+translation = "Każda własna końcówka musi mieć końcówkę do wyszukania"
+
+[messages.error-texture-ending-twice]
+source = "{ $ending } is in your endings twice"
+translation = "{ $ending } występuje dwa razy wśród własnych końcówek"
 
 [messages.error-texture-map-type]
 source = "There's no map type called { $role }"
@@ -8843,6 +8855,42 @@ translation = "Własny"
 source = "Descriptive"
 translation = "Opisowy"
 
+[messages.settings-tn-ending-add]
+source = "Add an ending"
+translation = "Dodaj końcówkę"
+
+[messages.settings-tn-ending-from]
+source = "Ending"
+translation = "Końcówka"
+
+[messages.settings-tn-ending-from-example]
+source = "_diff"
+translation = "_diff"
+
+[messages.settings-tn-ending-remove]
+source = "Remove"
+translation = "Usuń"
+
+[messages.settings-tn-ending-remove-label]
+source = "Remove { $ending }"
+translation = "Usuń { $ending }"
+
+[messages.settings-tn-ending-to]
+source = "Swap for"
+translation = "Zamień na"
+
+[messages.settings-tn-ending-to-example]
+source = "_BC"
+translation = "_BC"
+
+[messages.settings-tn-endings]
+source = "Endings of your own"
+translation = "Własne końcówki"
+
+[messages.settings-tn-endings-what]
+source = "A texture that isn’t one of a material’s maps keeps its own name, unless it ends in one of these: _diff → _BC sends rock_diff.png as rock_BC.png. Leave the second empty to drop the ending."
+translation = "Tekstura, która nie jest jedną z map materiału, zachowuje własną nazwę, chyba że kończy się jedną z tych końcówek: _diff → _BC wysyła rock_diff.png jako rock_BC.png. Zostaw drugie pole puste, aby usunąć końcówkę."
+
 [messages.settings-tn-example]
 source = "Example"
 translation = "Przykład"
@@ -8874,6 +8922,10 @@ translation = "Zapisano nazwy tekstur"
 [messages.settings-tn-short]
 source = "Short"
 translation = "Krótki"
+
+[messages.settings-tn-slots]
+source = "In GLB downloads, a texture packed inside a model with no file of its own is named after the material and the slot it fills, and these slots have suffixes too:"
+translation = "W pobieranych plikach GLB tekstura spakowana w modelu bez własnego pliku dostaje nazwę od materiału i slotu, który wypełnia, a te sloty też mają sufiksy:"
 
 [messages.settings-tn-style]
 source = "Style"
@@ -9848,6 +9900,18 @@ translation = 'Nazwy nie mogą zawierać znaków < > : " / \ | ? ani *'
 source = 'The suffix for { $role } maps can’t have < > : " / \ | ? or *'
 translation = 'Sufiks map typu „{ $role }” nie może zawierać znaków < > : " / \ | ? ani *'
 
+[messages.texnames-ending-bad]
+source = 'Endings of your own can’t have < > : " / \ | ? or *'
+translation = 'Własne końcówki nie mogą zawierać znaków < > : " / \ | ? ani *'
+
+[messages.texnames-ending-missing]
+source = "Each ending of your own needs the ending to look for"
+translation = "Każda własna końcówka musi mieć końcówkę do wyszukania"
+
+[messages.texnames-ending-twice]
+source = "{ $ending } is in your endings twice"
+translation = "{ $ending } występuje dwa razy wśród własnych końcówek"
+
 [messages.texnames-needs-map]
 source = 'The pattern needs { "{" }map{ "}" }, or every map of a material would get the same name'
 translation = 'Wzorzec musi zawierać { "{" }map{ "}" }, inaczej każda mapa materiału dostanie tę samą nazwę'
@@ -9859,6 +9923,74 @@ translation = "Mapy typu „{ $role }” muszą mieć sufiks"
 [messages.texnames-placeholders]
 source = 'The pattern can use { "{" }name{ "}" }, { "{" }map{ "}" } and { "{" }size{ "}" }'
 translation = 'Wzorzec może zawierać { "{" }name{ "}" }, { "{" }map{ "}" } i { "{" }size{ "}" }'
+
+[messages.texnames-slot-anisotropy]
+source = "Anisotropy"
+translation = "Anizotropia"
+
+[messages.texnames-slot-bad-suffix]
+source = 'The suffix for “{ $slot }” can’t have < > : " / \ | ? or *'
+translation = 'Sufiks slotu „{ $slot }” nie może zawierać znaków < > : " / \ | ? ani *'
+
+[messages.texnames-slot-clearcoat]
+source = "Clearcoat"
+translation = "Lakier"
+
+[messages.texnames-slot-clearcoat-normal]
+source = "Clearcoat normal"
+translation = "Normalne lakieru"
+
+[messages.texnames-slot-clearcoat-roughness]
+source = "Clearcoat roughness"
+translation = "Chropowatość lakieru"
+
+[messages.texnames-slot-diffuse-transmission]
+source = "Diffuse transmission"
+translation = "Transmisja rozproszona"
+
+[messages.texnames-slot-diffuse-transmission-color]
+source = "Diffuse transmission color"
+translation = "Kolor transmisji rozproszonej"
+
+[messages.texnames-slot-iridescence]
+source = "Iridescence"
+translation = "Iryzacja"
+
+[messages.texnames-slot-iridescence-thickness]
+source = "Iridescence thickness"
+translation = "Grubość iryzacji"
+
+[messages.texnames-slot-metallic-roughness]
+source = "Metal and roughness"
+translation = "Metaliczność i chropowatość"
+
+[messages.texnames-slot-no-suffix]
+source = "Give “{ $slot }” a suffix"
+translation = "Slot „{ $slot }” musi mieć sufiks"
+
+[messages.texnames-slot-sheen-color]
+source = "Sheen color"
+translation = "Kolor połysku tkaniny"
+
+[messages.texnames-slot-sheen-roughness]
+source = "Sheen roughness"
+translation = "Chropowatość połysku tkaniny"
+
+[messages.texnames-slot-specular-color]
+source = "Specular color"
+translation = "Kolor odbicia"
+
+[messages.texnames-slot-specular-glossiness]
+source = "Specular and glossiness"
+translation = "Odbicie i połysk"
+
+[messages.texnames-slot-thickness]
+source = "Thickness"
+translation = "Grubość"
+
+[messages.texnames-slot-transmission]
+source = "Transmission"
+translation = "Transmisja"
 
 [messages.text-binary]
 source = "This file is binary, not text, so there's nothing to read here. Download it to open it in its own tool."

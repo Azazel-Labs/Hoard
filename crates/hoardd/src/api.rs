@@ -2186,6 +2186,7 @@ fn settings_json_sync(state: &AppState) -> Value {
             "on": now.texture_names.on,
             "pattern": now.texture_names.pattern,
             "maps": crate::naming::suffixes(&now.texture_names),
+            "endings": now.texture_names.endings,
             "default": crate::naming::defaults(),
             "saved": saved.texture_names.is_some(),
         },

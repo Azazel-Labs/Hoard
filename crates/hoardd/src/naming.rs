@@ -166,15 +166,58 @@ pub(crate) struct TextureNames {
     /// `{name}` is the material's name run together (`StandWoodOld05`), `{map}` the map's suffix, `{size}` its size
     /// (`4K`) when the set comes in more than one. Without `{size}`, a set in several sizes gets `_4K` on the end.
     pub(crate) pattern: String,
-    /// Suffixes by role (`base_color`, `ao`, …); a role not here uses [`Role::suffix`].
+    /// Suffixes by role (`base_color`, `ao`, …) or glTF slot ([`SLOTS`]); one not here uses its default.
     pub(crate) maps: BTreeMap<String, String>,
+    /// Endings of your own: a texture that isn't a map whose name ends in one goes out with it swapped.
+    pub(crate) endings: Vec<Ending>,
 }
 
 impl Default for TextureNames {
     fn default() -> Self {
-        Self { on: true, pattern: DEFAULT_PATTERN.to_owned(), maps: BTreeMap::new() }
+        Self { on: true, pattern: DEFAULT_PATTERN.to_owned(), maps: BTreeMap::new(), endings: Vec::new() }
     }
 }
+
+/// An ending swapped for another in a texture's name: `_diff` → `_BC` sends `Rock_diff.png` as `Rock_BC.png`.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub(crate) struct Ending {
+    pub(crate) from: String,
+    pub(crate) to: String,
+}
+
+/// A slot a glTF material has for a texture beyond the kinds of map Hoard finds materials by. What fills it in a
+/// model is named after it in GLB downloads, with a suffix Settings can change.
+pub(crate) struct Slot {
+    /// What Settings saves the suffix under.
+    pub(crate) key: &'static str,
+    /// The slot in glTF, without `Texture` (`clearcoatNormal` for `clearcoatNormalTexture`).
+    pub(crate) gltf: &'static str,
+    pub(crate) suffix: &'static str,
+}
+
+const fn slot(key: &'static str, gltf: &'static str, suffix: &'static str) -> Slot {
+    Slot { key, gltf, suffix }
+}
+
+/// The glTF slots named in GLB downloads, core and extensions (`KHR_materials_*`).
+pub(crate) const SLOTS: &[Slot] = &[
+    slot("metallic_roughness", "metallicRoughness", "MetallicRoughness"),
+    slot("specular_color", "specularColor", "SpecularColor"),
+    slot("specular_glossiness", "specularGlossiness", "SpecularGlossiness"),
+    slot("clearcoat", "clearcoat", "Clearcoat"),
+    slot("clearcoat_roughness", "clearcoatRoughness", "ClearcoatRoughness"),
+    slot("clearcoat_normal", "clearcoatNormal", "ClearcoatNormal"),
+    slot("sheen_color", "sheenColor", "SheenColor"),
+    slot("sheen_roughness", "sheenRoughness", "SheenRoughness"),
+    slot("transmission", "transmission", "Transmission"),
+    slot("thickness", "thickness", "Thickness"),
+    slot("diffuse_transmission", "diffuseTransmission", "DiffuseTransmission"),
+    slot("diffuse_transmission_color", "diffuseTransmissionColor", "DiffuseTransmissionColor"),
+    slot("iridescence", "iridescence", "Iridescence"),
+    slot("iridescence_thickness", "iridescenceThickness", "IridescenceThickness"),
+    slot("anisotropy", "anisotropy", "Anisotropy"),
+];
 
 pub(crate) const DEFAULT_PATTERN: &str = "{name}_{map}";
 
@@ -196,13 +239,32 @@ impl TextureNames {
         if rest.chars().any(bad_char) {
             return Err(tr!("error-texture-name-chars"));
         }
-        for (role, suffix) in &self.maps {
-            let Some(r) = Role::parse(role) else { return Err(tr!("error-texture-map-type", role = role)) };
+        for (key, suffix) in &self.maps {
+            let name = match Role::parse(key) {
+                Some(r) => r.name(),
+                None => match SLOTS.iter().find(|s| s.key == key) {
+                    Some(s) => s.gltf.to_owned(),
+                    None => return Err(tr!("error-texture-map-type", role = key)),
+                },
+            };
             if suffix.trim().is_empty() {
-                return Err(tr!("error-texture-suffix-missing", map = r.name()));
+                return Err(tr!("error-texture-suffix-missing", map = name));
             }
             if suffix.chars().any(bad_char) {
-                return Err(tr!("error-texture-suffix-chars", map = r.name()));
+                return Err(tr!("error-texture-suffix-chars", map = name));
+            }
+        }
+        let mut seen = HashSet::new();
+        for e in &self.endings {
+            let from = e.from.trim();
+            if from.is_empty() {
+                return Err(tr!("error-texture-ending-missing"));
+            }
+            if from.chars().chain(e.to.trim().chars()).any(bad_char) {
+                return Err(tr!("error-texture-ending-chars"));
+            }
+            if !seen.insert(from.to_lowercase()) {
+                return Err(tr!("error-texture-ending-twice", ending = from));
             }
         }
         Ok(())
@@ -210,6 +272,24 @@ impl TextureNames {
 
     fn suffix(&self, role: Role) -> &str {
         self.maps.get(role.as_str()).map_or(role.suffix(), |s| s.trim())
+    }
+
+    /// The suffix for a glTF slot ([`SLOTS`]).
+    pub(crate) fn slot_suffix<'a>(&'a self, slot: &'a Slot) -> &'a str {
+        self.maps.get(slot.key).map_or(slot.suffix, |s| s.trim())
+    }
+
+    /// `stem` with an ending of your own swapped, the longest that fits; `None` when none does.
+    pub(crate) fn rename_ending(&self, stem: &str) -> Option<String> {
+        self.endings
+            .iter()
+            .filter_map(|e| {
+                let from = e.from.trim();
+                let at = ending_at(stem, from)?;
+                (at > 0).then(|| (from.chars().count(), format!("{}{}", &stem[..at], e.to.trim())))
+            })
+            .max_by_key(|(n, _)| *n)
+            .map(|(_, s)| s)
     }
 
     /// The file name (without extension) for a map of `material` for `role`, at `size` when the set has several.
@@ -228,6 +308,16 @@ impl TextureNames {
         }
         out
     }
+}
+
+/// Where `ending` starts in `name`, matched without regard to case, or `None` when `name` doesn't end in it.
+fn ending_at(name: &str, ending: &str) -> Option<usize> {
+    let n = ending.chars().count();
+    if n == 0 {
+        return None;
+    }
+    let at = name.char_indices().rev().nth(n - 1)?.0;
+    (name[at..].to_lowercase() == ending.to_lowercase()).then_some(at)
 }
 
 /// "Stand Wood Old 05" -> "StandWoodOld05": words run together, each starting with a capital.
@@ -277,12 +367,24 @@ fn ext_of(file: &str) -> Option<&str> {
     file.rsplit_once('.').map(|(_, e)| e)
 }
 
-/// A map's file name without its extension, by the convention, or `None` when it isn't a map (or naming is off).
+/// A texture's file name without its extension as it's sent: a map's by the convention, another's with an ending of
+/// your own swapped; `None` to keep its own (or when naming is off).
 pub(crate) fn stem_of(conn: &Connection, names: &TextureNames, id: &str) -> Result<Option<String>> {
     if !names.on {
         return Ok(None);
     }
-    Ok(map_of(conn, id)?.map(|(material, role, size)| names.stem(&material, role, size.as_deref())))
+    if let Some((material, role, size)) = map_of(conn, id)? {
+        return Ok(Some(names.stem(&material, role, size.as_deref())));
+    }
+    if names.endings.is_empty() {
+        return Ok(None);
+    }
+    let texture: Option<String> =
+        conn.query_row("SELECT path FROM assets WHERE id = ?1 AND kind = 'texture'", [id], |r| r.get(0)).optional()?;
+    Ok(texture.and_then(|path| {
+        let (_, file) = split_path(&path);
+        names.rename_ending(file.rsplit_once('.').map_or(file, |(s, _)| s))
+    }))
 }
 
 /// A single map downloaded on its own: its file name by the convention, or `None` to keep its own.
@@ -360,19 +462,21 @@ pub(crate) fn current_for_download() -> ForDownload {
     FOR_DOWNLOAD.with_borrow(Clone::clone)
 }
 
-/// Every role's suffix under `names`, for Settings.
+/// Every role's and glTF slot's suffix under `names`, for Settings.
 pub(crate) fn suffixes(names: &TextureNames) -> BTreeMap<&'static str, String> {
-    ALL_ROLES.iter().map(|&r| (r.as_str(), names.suffix(r).to_owned())).collect()
+    let roles = ALL_ROLES.iter().map(|&r| (r.as_str(), names.suffix(r).to_owned()));
+    roles.chain(SLOTS.iter().map(|s| (s.key, names.slot_suffix(s).to_owned()))).collect()
 }
 
 /// The convention out of the box, for Settings to go back to.
 pub(crate) fn defaults() -> serde_json::Value {
     let d = TextureNames::default();
-    serde_json::json!({ "on": d.on, "pattern": d.pattern, "maps": suffixes(&d) })
+    serde_json::json!({ "on": d.on, "pattern": d.pattern, "maps": suffixes(&d), "endings": d.endings })
 }
 
-/// Rename the maps among `files` by the convention, in the folders they're in. A map another file here refers to by
-/// name keeps its name, and so does one whose new name another file already has.
+/// Rename the maps among `files` by the convention, and other textures by the endings of your own, in the folders
+/// they're in. A texture another file here refers to by name keeps its name, and so does one whose new name another
+/// file already has.
 pub(crate) fn apply(conn: &Connection, names: &TextureNames, files: &mut [BundleFile]) -> Result<()> {
     if !names.on || files.is_empty() {
         return Ok(());
@@ -448,7 +552,37 @@ mod tests {
         assert!(suffix.check().unwrap_err().contains("ambient occlusion"));
         let role = TextureNames { maps: BTreeMap::from([("shiny".into(), "S".into())]), ..names() };
         assert!(role.check().unwrap_err().contains("shiny"));
+        let slot = TextureNames { maps: BTreeMap::from([("sheen_color".into(), "S/C".into())]), ..names() };
+        assert!(slot.check().unwrap_err().contains("sheenColor"));
+        let slot = TextureNames { maps: BTreeMap::from([("sheen_color".into(), "SC".into())]), ..names() };
+        assert!(slot.check().is_ok());
+        let endings = |e: &[(&str, &str)]| TextureNames {
+            endings: e.iter().map(|(from, to)| Ending { from: (*from).into(), to: (*to).into() }).collect(),
+            ..names()
+        };
+        assert!(endings(&[(" ", "_BC")]).check().is_err(), "an ending to look for");
+        assert!(endings(&[("_d", "_B/C")]).check().is_err());
+        assert!(endings(&[("_diff", "_BC"), ("_DIFF", "_D")]).check().unwrap_err().contains("_DIFF"));
+        assert!(endings(&[("_diff", "_BC"), ("_d", "")]).check().is_ok(), "swapping for nothing drops it");
         assert!(names().check().is_ok());
+    }
+
+    #[test]
+    fn swaps_the_longest_ending_that_fits() {
+        let n = TextureNames {
+            endings: vec![
+                Ending { from: "_d".into(), to: "_BC".into() },
+                Ending { from: "_mask_d".into(), to: "_Mask".into() },
+                Ending { from: "_ü".into(), to: "_U".into() },
+            ],
+            ..names()
+        };
+        assert_eq!(n.rename_ending("Rock_D").as_deref(), Some("Rock_BC"), "whatever the case");
+        assert_eq!(n.rename_ending("Rock_mask_d").as_deref(), Some("Rock_Mask"));
+        assert_eq!(n.rename_ending("Grün_Ü").as_deref(), Some("Grün_U"));
+        assert_eq!(n.rename_ending("_d"), None, "a name that's only the ending keeps it");
+        assert_eq!(n.rename_ending("Rock_dx"), None);
+        assert_eq!(n.rename_ending("d"), None);
     }
 
     fn db() -> Connection {
@@ -517,6 +651,24 @@ mod tests {
         let mut off = vec![file("ao", "m/stand_xeokah_raw_8K_AO.jpg")];
         apply(&c, &TextureNames { on: false, ..names() }, &mut off).unwrap();
         assert_eq!(off[0].path, "m/stand_xeokah_raw_8K_AO.jpg");
+    }
+
+    #[test]
+    fn sends_a_texture_that_isnt_a_map_with_your_ending() {
+        let c = db();
+        c.execute_batch(
+            "ALTER TABLE assets ADD COLUMN kind TEXT;
+             UPDATE assets SET kind = 'texture' WHERE ext IN ('jpg', 'png');
+             INSERT INTO assets VALUES ('diff', 'p', 'rock diff', 'png', 'r/rock_diff.png', 0, 'texture'),
+                                       ('dobj', 'p', 'rock diff', 'obj', 'r/rock_diff.obj', 0, 'model');",
+        )
+        .unwrap();
+        let n = TextureNames { endings: vec![Ending { from: "_diff".into(), to: "_BC".into() }], ..names() };
+        assert_eq!(file_name(&c, &n, "diff", "r/rock_diff.png").unwrap().as_deref(), Some("rock_BC.png"));
+        assert_eq!(file_name(&c, &n, "dobj", "r/rock_diff.obj").unwrap(), None, "only textures");
+        let col = file_name(&c, &n, "col", "c/crate_col.png").unwrap();
+        assert_eq!(col.as_deref(), Some("Crate_BaseColor_1K.png"), "a map goes by the convention");
+        assert_eq!(file_name(&c, &TextureNames { on: false, ..n }, "diff", "r/rock_diff.png").unwrap(), None);
     }
 
     #[test]

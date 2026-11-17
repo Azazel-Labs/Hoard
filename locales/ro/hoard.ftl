@@ -196,6 +196,9 @@ server-role-emissive = emisie
 server-role-translucency = translucență
 error-texture-suffix-missing = Dați un sufix hărților de { $map }
 error-texture-suffix-chars = Sufixul pentru hărțile de { $map } nu poate conține < > : " / \ | ? sau *
+error-texture-ending-missing = Fiecare terminație proprie are nevoie de terminația de căutat
+error-texture-ending-chars = Terminațiile proprii nu pot conține < > : " / \ | ? sau *
+error-texture-ending-twice = { $ending } apare de două ori în terminațiile dvs.
 error-oauth-no-client-id = Acest link nu are client_id.
 error-oauth-unknown-app = Această aplicație nu este (mai) înregistrată aici. Începeți conectarea din nou din aplicație.
 error-oauth-redirect = Aplicația a cerut să fie trimisă înapoi la o adresă pe care nu a înregistrat-o.
@@ -1973,6 +1976,26 @@ texnames-placeholders = Șablonul poate folosi { "{" }name{ "}" }, { "{" }map{ "
 texnames-bad-characters = Numele nu pot conține < > : " / \ | ? sau *
 texnames-no-suffix = Dați un sufix hărților de { $role }
 texnames-bad-suffix = Sufixul pentru hărțile de { $role } nu poate conține < > : " / \ | ? sau *
+texnames-slot-no-suffix = Dați un sufix pentru „{ $slot }”
+texnames-slot-bad-suffix = Sufixul pentru „{ $slot }” nu poate conține < > : " / \ | ? sau *
+texnames-ending-missing = Fiecare terminație proprie are nevoie de terminația de căutat
+texnames-ending-bad = Terminațiile proprii nu pot conține < > : " / \ | ? sau *
+texnames-ending-twice = { $ending } apare de două ori în terminațiile dvs.
+texnames-slot-metallic-roughness = Metal și rugozitate
+texnames-slot-specular-color = Culoare speculară
+texnames-slot-specular-glossiness = Specularitate și luciu
+texnames-slot-clearcoat = Strat de lac
+texnames-slot-clearcoat-roughness = Rugozitatea stratului de lac
+texnames-slot-clearcoat-normal = Normalele stratului de lac
+texnames-slot-sheen-color = Culoarea satinării
+texnames-slot-sheen-roughness = Rugozitatea satinării
+texnames-slot-transmission = Transmisie
+texnames-slot-thickness = Grosime
+texnames-slot-diffuse-transmission = Transmisie difuză
+texnames-slot-diffuse-transmission-color = Culoarea transmisiei difuze
+texnames-slot-iridescence = Irizare
+texnames-slot-iridescence-thickness = Grosimea irizării
+texnames-slot-anisotropy = Anizotropie
 
 ## storeFormats.ts
 
@@ -2506,6 +2529,16 @@ settings-tn-hint-map = { " " }rolul hărții,{ " " }
 settings-tn-hint-size = { " " }mărimea ei când setul vine în mai multe mărimi (adăugată la sfârșit dacă șablonul o omite).
 settings-tn-example = Exemplu
 settings-tn-suffixes = Sufixe pentru fiecare tip de hartă
+settings-tn-slots = În descărcările GLB, o textură împachetată într-un model, fără un fișier propriu, primește numele materialului și al slotului pe care îl ocupă, iar aceste sloturi au și ele sufixe:
+settings-tn-endings = Terminații proprii
+settings-tn-endings-what = O textură care nu este una dintre hărțile unui material își păstrează numele, cu excepția cazului în care se termină cu una dintre acestea: _diff → _BC trimite rock_diff.png ca rock_BC.png. Lăsați a doua goală pentru a elimina terminația.
+settings-tn-ending-from = Terminație
+settings-tn-ending-from-example = _diff
+settings-tn-ending-to = Înlocuiți cu
+settings-tn-ending-to-example = _BC
+settings-tn-ending-add = Adăugați o terminație
+settings-tn-ending-remove = Eliminați
+settings-tn-ending-remove-label = Eliminați { $ending }
 
 ## SettingsPage.vue: General și Conexiune
 

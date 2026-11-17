@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "a291e71b8315a85b796b394cd1cc26d480ac8ecd3bf12b797cf6319c57ccb07e"
+source = "140db2eb73736ff39922ac317725317468b02f342ce455ff2967c4a2f3b7a920"
 translation = "259239ab239601949cc6a70972021dcb09218f2bed3d1964197e9079006c5785"
 
 [messages.account-add]
@@ -3923,6 +3923,18 @@ translation = "ei mitään haettavaa; kirjoita paketin nimi"
 [messages.error-task-running]
 source = "“{ $task }” is already running"
 translation = "”{ $task }” on jo käynnissä"
+
+[messages.error-texture-ending-chars]
+source = '''Endings of your own can't have < > : " / \ | ? or *'''
+translation = 'Omissa loppuosissa ei voi olla merkkejä < > : " / \ | ? tai *'
+
+[messages.error-texture-ending-missing]
+source = "Each ending of your own needs the ending to look for"
+translation = "Jokainen oma loppuosa tarvitsee etsittävän loppuosan"
+
+[messages.error-texture-ending-twice]
+source = "{ $ending } is in your endings twice"
+translation = "{ $ending } on loppuosissasi kahdesti"
 
 [messages.error-texture-map-type]
 source = "There's no map type called { $role }"
@@ -8736,6 +8748,42 @@ translation = "Oma"
 source = "Descriptive"
 translation = "Kuvaava"
 
+[messages.settings-tn-ending-add]
+source = "Add an ending"
+translation = "Lisää loppuosa"
+
+[messages.settings-tn-ending-from]
+source = "Ending"
+translation = "Loppuosa"
+
+[messages.settings-tn-ending-from-example]
+source = "_diff"
+translation = "_diff"
+
+[messages.settings-tn-ending-remove]
+source = "Remove"
+translation = "Poista"
+
+[messages.settings-tn-ending-remove-label]
+source = "Remove { $ending }"
+translation = "Poista { $ending }"
+
+[messages.settings-tn-ending-to]
+source = "Swap for"
+translation = "Tilalle"
+
+[messages.settings-tn-ending-to-example]
+source = "_BC"
+translation = "_BC"
+
+[messages.settings-tn-endings]
+source = "Endings of your own"
+translation = "Omat loppuosat"
+
+[messages.settings-tn-endings-what]
+source = "A texture that isn’t one of a material’s maps keeps its own name, unless it ends in one of these: _diff → _BC sends rock_diff.png as rock_BC.png. Leave the second empty to drop the ending."
+translation = "Tekstuuri, joka ei ole mikään materiaalin kartoista, säilyttää oman nimensä, ellei se pääty johonkin näistä: _diff → _BC lähettää tiedoston rock_diff.png nimellä rock_BC.png. Jätä jälkimmäinen tyhjäksi, niin loppuosa poistetaan."
+
 [messages.settings-tn-example]
 source = "Example"
 translation = "Esimerkki"
@@ -8767,6 +8815,10 @@ translation = "Tekstuurien nimet tallennettu"
 [messages.settings-tn-short]
 source = "Short"
 translation = "Lyhyt"
+
+[messages.settings-tn-slots]
+source = "In GLB downloads, a texture packed inside a model with no file of its own is named after the material and the slot it fills, and these slots have suffixes too:"
+translation = "GLB-latauksissa mallin sisään pakattu tekstuuri, jolla ei ole omaa tiedostoa, nimetään materiaalin ja sen täyttämän paikan mukaan, ja näilläkin paikoilla on päätteet:"
 
 [messages.settings-tn-style]
 source = "Style"
@@ -9727,6 +9779,18 @@ translation = 'Nimissä ei voi olla merkkejä < > : " / \ | ? tai *'
 source = 'The suffix for { $role } maps can’t have < > : " / \ | ? or *'
 translation = 'Karttatyypin { $role } päätteessä ei voi olla merkkejä < > : " / \ | ? tai *'
 
+[messages.texnames-ending-bad]
+source = 'Endings of your own can’t have < > : " / \ | ? or *'
+translation = 'Omissa loppuosissa ei voi olla merkkejä < > : " / \ | ? tai *'
+
+[messages.texnames-ending-missing]
+source = "Each ending of your own needs the ending to look for"
+translation = "Jokainen oma loppuosa tarvitsee etsittävän loppuosan"
+
+[messages.texnames-ending-twice]
+source = "{ $ending } is in your endings twice"
+translation = "{ $ending } on loppuosissasi kahdesti"
+
 [messages.texnames-needs-map]
 source = 'The pattern needs { "{" }map{ "}" }, or every map of a material would get the same name'
 translation = 'Mallissa on oltava { "{" }map{ "}" }, muuten materiaalin jokainen kartta saisi saman nimen'
@@ -9738,6 +9802,74 @@ translation = "Anna pääte karttatyypille { $role }"
 [messages.texnames-placeholders]
 source = 'The pattern can use { "{" }name{ "}" }, { "{" }map{ "}" } and { "{" }size{ "}" }'
 translation = 'Mallissa voi käyttää kenttiä { "{" }name{ "}" }, { "{" }map{ "}" } ja { "{" }size{ "}" }'
+
+[messages.texnames-slot-anisotropy]
+source = "Anisotropy"
+translation = "Anisotropia"
+
+[messages.texnames-slot-bad-suffix]
+source = 'The suffix for “{ $slot }” can’t have < > : " / \ | ? or *'
+translation = 'Paikan ”{ $slot }” päätteessä ei voi olla merkkejä < > : " / \ | ? tai *'
+
+[messages.texnames-slot-clearcoat]
+source = "Clearcoat"
+translation = "Lakka"
+
+[messages.texnames-slot-clearcoat-normal]
+source = "Clearcoat normal"
+translation = "Lakan normaali"
+
+[messages.texnames-slot-clearcoat-roughness]
+source = "Clearcoat roughness"
+translation = "Lakan karheus"
+
+[messages.texnames-slot-diffuse-transmission]
+source = "Diffuse transmission"
+translation = "Diffuusi läpäisy"
+
+[messages.texnames-slot-diffuse-transmission-color]
+source = "Diffuse transmission color"
+translation = "Diffuusin läpäisyn väri"
+
+[messages.texnames-slot-iridescence]
+source = "Iridescence"
+translation = "Irisointi"
+
+[messages.texnames-slot-iridescence-thickness]
+source = "Iridescence thickness"
+translation = "Irisoinnin paksuus"
+
+[messages.texnames-slot-metallic-roughness]
+source = "Metal and roughness"
+translation = "Metalli ja karheus"
+
+[messages.texnames-slot-no-suffix]
+source = "Give “{ $slot }” a suffix"
+translation = "Anna paikalle ”{ $slot }” pääte"
+
+[messages.texnames-slot-sheen-color]
+source = "Sheen color"
+translation = "Sametinhohdon väri"
+
+[messages.texnames-slot-sheen-roughness]
+source = "Sheen roughness"
+translation = "Sametinhohdon karheus"
+
+[messages.texnames-slot-specular-color]
+source = "Specular color"
+translation = "Heijastavuuden väri"
+
+[messages.texnames-slot-specular-glossiness]
+source = "Specular and glossiness"
+translation = "Heijastavuus ja kiilto"
+
+[messages.texnames-slot-thickness]
+source = "Thickness"
+translation = "Paksuus"
+
+[messages.texnames-slot-transmission]
+source = "Transmission"
+translation = "Läpäisy"
 
 [messages.text-binary]
 source = "This file is binary, not text, so there's nothing to read here. Download it to open it in its own tool."

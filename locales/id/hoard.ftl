@@ -196,6 +196,9 @@ server-role-emissive = emisif
 server-role-translucency = translusensi
 error-texture-suffix-missing = Beri akhiran untuk map { $map }
 error-texture-suffix-chars = Akhiran untuk map { $map } tidak boleh berisi < > : " / \ | ? atau *
+error-texture-ending-missing = Setiap akhir nama buatan sendiri perlu akhir nama yang dicari
+error-texture-ending-chars = Akhir nama buatan sendiri tidak boleh berisi < > : " / \ | ? atau *
+error-texture-ending-twice = { $ending } ada dua kali dalam akhir nama Anda
 error-oauth-no-client-id = Tautan ini tidak memiliki client_id.
 error-oauth-unknown-app = Aplikasi ini tidak (lagi) terdaftar di sini. Mulai menghubungkan lagi dari aplikasi.
 error-oauth-redirect = Aplikasi meminta dikembalikan ke alamat yang tidak didaftarkannya.
@@ -1673,6 +1676,26 @@ texnames-placeholders = Pola dapat memakai { "{" }name{ "}" }, { "{" }map{ "}" }
 texnames-bad-characters = Nama tidak boleh berisi < > : " / \ | ? atau *
 texnames-no-suffix = Beri akhiran untuk map { $role }
 texnames-bad-suffix = Akhiran untuk map { $role } tidak boleh berisi < > : " / \ | ? atau *
+texnames-slot-no-suffix = Beri akhiran untuk “{ $slot }”
+texnames-slot-bad-suffix = Akhiran untuk “{ $slot }” tidak boleh berisi < > : " / \ | ? atau *
+texnames-ending-missing = Setiap akhir nama buatan sendiri perlu akhir nama yang dicari
+texnames-ending-bad = Akhir nama buatan sendiri tidak boleh berisi < > : " / \ | ? atau *
+texnames-ending-twice = { $ending } ada dua kali dalam akhir nama Anda
+texnames-slot-metallic-roughness = Metal dan roughness
+texnames-slot-specular-color = Warna spekular
+texnames-slot-specular-glossiness = Spekular dan glossiness
+texnames-slot-clearcoat = Clearcoat
+texnames-slot-clearcoat-roughness = Roughness clearcoat
+texnames-slot-clearcoat-normal = Normal clearcoat
+texnames-slot-sheen-color = Warna sheen
+texnames-slot-sheen-roughness = Roughness sheen
+texnames-slot-transmission = Transmisi
+texnames-slot-thickness = Ketebalan
+texnames-slot-diffuse-transmission = Transmisi difus
+texnames-slot-diffuse-transmission-color = Warna transmisi difus
+texnames-slot-iridescence = Iridesensi
+texnames-slot-iridescence-thickness = Ketebalan iridesensi
+texnames-slot-anisotropy = Anisotropi
 
 ## storeFormats.ts
 
@@ -2132,6 +2155,16 @@ settings-tn-hint-map = { " " }kegunaan map,{ " " }
 settings-tn-hint-size = { " " }ukurannya jika set tersedia dalam lebih dari satu ukuran (ditambahkan di akhir jika pola tidak menyertakannya).
 settings-tn-example = Contoh
 settings-tn-suffixes = Akhiran untuk tiap jenis map
+settings-tn-slots = Dalam unduhan GLB, tekstur yang dikemas di dalam model tanpa berkas sendiri dinamai menurut material dan slot yang diisinya, dan slot ini juga punya akhiran:
+settings-tn-endings = Akhir nama buatan sendiri
+settings-tn-endings-what = Tekstur yang bukan salah satu map dari sebuah material tetap memakai namanya sendiri, kecuali namanya berakhir dengan salah satu dari ini: _diff → _BC mengirim rock_diff.png sebagai rock_BC.png. Kosongkan yang kedua untuk membuang akhir nama itu.
+settings-tn-ending-from = Akhir nama
+settings-tn-ending-from-example = _diff
+settings-tn-ending-to = Ganti dengan
+settings-tn-ending-to-example = _BC
+settings-tn-ending-add = Tambahkan akhir nama
+settings-tn-ending-remove = Hapus
+settings-tn-ending-remove-label = Hapus { $ending }
 
 ## SettingsPage.vue: Umum dan Koneksi
 

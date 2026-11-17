@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "a291e71b8315a85b796b394cd1cc26d480ac8ecd3bf12b797cf6319c57ccb07e"
+source = "140db2eb73736ff39922ac317725317468b02f342ce455ff2967c4a2f3b7a920"
 translation = "110cc1215f00a6312d4fe13a655f9cc3553e284205745fc0ce70ae25601e1bd5"
 
 [messages.account-add]
@@ -3833,6 +3833,18 @@ translation = "検索するものがありません。パックの名前を入�
 [messages.error-task-running]
 source = "“{ $task }” is already running"
 translation = "「{ $task }」はすでに実行中です"
+
+[messages.error-texture-ending-chars]
+source = '''Endings of your own can't have < > : " / \ | ? or *'''
+translation = '独自の末尾に < > : " / \ | ? * は使えません'
+
+[messages.error-texture-ending-missing]
+source = "Each ending of your own needs the ending to look for"
+translation = "独自の末尾にはそれぞれ、探す末尾を指定してください"
+
+[messages.error-texture-ending-twice]
+source = "{ $ending } is in your endings twice"
+translation = "{ $ending } が独自の末尾に 2 回含まれています"
 
 [messages.error-texture-map-type]
 source = "There's no map type called { $role }"
@@ -8531,6 +8543,42 @@ translation = "独自"
 source = "Descriptive"
 translation = "説明的"
 
+[messages.settings-tn-ending-add]
+source = "Add an ending"
+translation = "末尾を追加"
+
+[messages.settings-tn-ending-from]
+source = "Ending"
+translation = "末尾"
+
+[messages.settings-tn-ending-from-example]
+source = "_diff"
+translation = "_diff"
+
+[messages.settings-tn-ending-remove]
+source = "Remove"
+translation = "削除"
+
+[messages.settings-tn-ending-remove-label]
+source = "Remove { $ending }"
+translation = "{ $ending } を削除"
+
+[messages.settings-tn-ending-to]
+source = "Swap for"
+translation = "置き換え先"
+
+[messages.settings-tn-ending-to-example]
+source = "_BC"
+translation = "_BC"
+
+[messages.settings-tn-endings]
+source = "Endings of your own"
+translation = "独自の末尾"
+
+[messages.settings-tn-endings-what]
+source = "A texture that isn’t one of a material’s maps keeps its own name, unless it ends in one of these: _diff → _BC sends rock_diff.png as rock_BC.png. Leave the second empty to drop the ending."
+translation = "マテリアルのマップではないテクスチャは元の名前のままですが、次のいずれかで終わる場合は別です。_diff → _BC なら rock_diff.png は rock_BC.png として送られます。2 つ目を空欄にすると、その末尾を取り除きます。"
+
 [messages.settings-tn-example]
 source = "Example"
 translation = "例"
@@ -8562,6 +8610,10 @@ translation = "テクスチャ名を保存しました"
 [messages.settings-tn-short]
 source = "Short"
 translation = "短い"
+
+[messages.settings-tn-slots]
+source = "In GLB downloads, a texture packed inside a model with no file of its own is named after the material and the slot it fills, and these slots have suffixes too:"
+translation = "GLB のダウンロードでは、独自のファイルがなくモデル内に格納されたテクスチャは、マテリアルとそれが埋めるスロットにちなんだ名前になります。これらのスロットにもサフィックスがあります:"
 
 [messages.settings-tn-style]
 source = "Style"
@@ -9485,6 +9537,18 @@ translation = '名前に < > : " / \ | ? * は使えません'
 source = 'The suffix for { $role } maps can’t have < > : " / \ | ? or *'
 translation = '{ $role } マップのサフィックスに < > : " / \ | ? * は使えません'
 
+[messages.texnames-ending-bad]
+source = 'Endings of your own can’t have < > : " / \ | ? or *'
+translation = '独自の末尾に < > : " / \ | ? * は使えません'
+
+[messages.texnames-ending-missing]
+source = "Each ending of your own needs the ending to look for"
+translation = "独自の末尾にはそれぞれ、探す末尾を指定してください"
+
+[messages.texnames-ending-twice]
+source = "{ $ending } is in your endings twice"
+translation = "{ $ending } が独自の末尾に 2 回含まれています"
+
 [messages.texnames-needs-map]
 source = 'The pattern needs { "{" }map{ "}" }, or every map of a material would get the same name'
 translation = 'パターンには { "{" }map{ "}" } が必要です。ないと、マテリアルのすべてのマップが同じ名前になります'
@@ -9496,6 +9560,74 @@ translation = "{ $role } マップにサフィックスを指定してくださ�
 [messages.texnames-placeholders]
 source = 'The pattern can use { "{" }name{ "}" }, { "{" }map{ "}" } and { "{" }size{ "}" }'
 translation = 'パターンには { "{" }name{ "}" }、{ "{" }map{ "}" }、{ "{" }size{ "}" } を使えます'
+
+[messages.texnames-slot-anisotropy]
+source = "Anisotropy"
+translation = "異方性"
+
+[messages.texnames-slot-bad-suffix]
+source = 'The suffix for “{ $slot }” can’t have < > : " / \ | ? or *'
+translation = '「{ $slot }」のサフィックスに < > : " / \ | ? * は使えません'
+
+[messages.texnames-slot-clearcoat]
+source = "Clearcoat"
+translation = "クリアコート"
+
+[messages.texnames-slot-clearcoat-normal]
+source = "Clearcoat normal"
+translation = "クリアコートの法線"
+
+[messages.texnames-slot-clearcoat-roughness]
+source = "Clearcoat roughness"
+translation = "クリアコートのラフネス"
+
+[messages.texnames-slot-diffuse-transmission]
+source = "Diffuse transmission"
+translation = "拡散透過"
+
+[messages.texnames-slot-diffuse-transmission-color]
+source = "Diffuse transmission color"
+translation = "拡散透過カラー"
+
+[messages.texnames-slot-iridescence]
+source = "Iridescence"
+translation = "イリデセンス"
+
+[messages.texnames-slot-iridescence-thickness]
+source = "Iridescence thickness"
+translation = "イリデセンスの厚み"
+
+[messages.texnames-slot-metallic-roughness]
+source = "Metal and roughness"
+translation = "メタルとラフネス"
+
+[messages.texnames-slot-no-suffix]
+source = "Give “{ $slot }” a suffix"
+translation = "「{ $slot }」にサフィックスを指定してください"
+
+[messages.texnames-slot-sheen-color]
+source = "Sheen color"
+translation = "シーンカラー"
+
+[messages.texnames-slot-sheen-roughness]
+source = "Sheen roughness"
+translation = "シーンのラフネス"
+
+[messages.texnames-slot-specular-color]
+source = "Specular color"
+translation = "スペキュラーカラー"
+
+[messages.texnames-slot-specular-glossiness]
+source = "Specular and glossiness"
+translation = "スペキュラーとグロシネス"
+
+[messages.texnames-slot-thickness]
+source = "Thickness"
+translation = "厚み"
+
+[messages.texnames-slot-transmission]
+source = "Transmission"
+translation = "トランスミッション"
 
 [messages.text-binary]
 source = "This file is binary, not text, so there's nothing to read here. Download it to open it in its own tool."

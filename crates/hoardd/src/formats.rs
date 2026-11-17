@@ -175,7 +175,7 @@ pub(crate) fn convert(
                 _ => crate::meshes::glb(local, &src, root)?,
             };
             let naming = crate::naming::current_for_download();
-            let names = crate::glbfiles::names_of(found, root, &naming.maps);
+            let names = crate::glbfiles::names_of(found, root, &naming.maps, &naming.names);
             let facing = crate::meshes::current_facing();
             crate::glbfiles::split_output(&glb, facing, &file_stem(local), &names, &naming.names)
         }

@@ -196,6 +196,9 @@ server-role-emissive = emissie
 server-role-translucency = doorschijnendheid
 error-texture-suffix-missing = Geef maps voor { $map } een achtervoegsel
 error-texture-suffix-chars = Het achtervoegsel voor maps voor { $map } mag geen < > : " / \ | ? of * bevatten
+error-texture-ending-missing = Elke eigen uitgang heeft de uitgang nodig waarnaar gezocht wordt
+error-texture-ending-chars = Eigen uitgangen mogen geen < > : " / \ | ? of * bevatten
+error-texture-ending-twice = { $ending } staat twee keer in je uitgangen
 error-oauth-no-client-id = Deze link heeft geen client_id.
 error-oauth-unknown-app = Deze app is hier niet (meer) geregistreerd. Begin opnieuw met verbinden vanuit de app.
 error-oauth-redirect = De app vroeg om teruggestuurd te worden naar een adres dat hij niet heeft geregistreerd.
@@ -1817,6 +1820,26 @@ texnames-placeholders = Het patroon kan { "{" }name{ "}" }, { "{" }map{ "}" } en
 texnames-bad-characters = Namen mogen geen < > : " / \ | ? of * bevatten
 texnames-no-suffix = Geef maps voor { $role } een achtervoegsel
 texnames-bad-suffix = Het achtervoegsel voor maps voor { $role } mag geen < > : " / \ | ? of * bevatten
+texnames-slot-no-suffix = Geef “{ $slot }” een achtervoegsel
+texnames-slot-bad-suffix = Het achtervoegsel voor “{ $slot }” mag geen < > : " / \ | ? of * bevatten
+texnames-ending-missing = Elke eigen uitgang heeft de uitgang nodig waarnaar gezocht wordt
+texnames-ending-bad = Eigen uitgangen mogen geen < > : " / \ | ? of * bevatten
+texnames-ending-twice = { $ending } staat twee keer in je uitgangen
+texnames-slot-metallic-roughness = Metaal en ruwheid
+texnames-slot-specular-color = Specular-kleur
+texnames-slot-specular-glossiness = Specular en glans
+texnames-slot-clearcoat = Clearcoat
+texnames-slot-clearcoat-roughness = Clearcoat-ruwheid
+texnames-slot-clearcoat-normal = Clearcoat-normal
+texnames-slot-sheen-color = Sheen-kleur
+texnames-slot-sheen-roughness = Sheen-ruwheid
+texnames-slot-transmission = Transmissie
+texnames-slot-thickness = Dikte
+texnames-slot-diffuse-transmission = Diffuse transmissie
+texnames-slot-diffuse-transmission-color = Kleur diffuse transmissie
+texnames-slot-iridescence = Iridescentie
+texnames-slot-iridescence-thickness = Dikte iridescentie
+texnames-slot-anisotropy = Anisotropie
 
 ## storeFormats.ts
 
@@ -2301,6 +2324,16 @@ settings-tn-hint-map = { " " }waar de map voor is,{ " " }
 settings-tn-hint-size = { " " }de grootte als de set in meer dan één grootte komt (aan het eind toegevoegd als het patroon hem weglaat).
 settings-tn-example = Voorbeeld
 settings-tn-suffixes = Achtervoegsels per soort map
+settings-tn-slots = In GLB-downloads krijgt een textuur die zonder eigen bestand in een model is verpakt de naam van het materiaal en het slot dat hij vult, en ook deze slots hebben achtervoegsels:
+settings-tn-endings = Eigen uitgangen
+settings-tn-endings-what = Een textuur die geen map van een materiaal is, houdt zijn eigen naam, tenzij die op een van deze eindigt: _diff → _BC stuurt rock_diff.png als rock_BC.png. Laat het tweede leeg om de uitgang weg te laten.
+settings-tn-ending-from = Uitgang
+settings-tn-ending-from-example = _diff
+settings-tn-ending-to = Vervangen door
+settings-tn-ending-to-example = _BC
+settings-tn-ending-add = Een uitgang toevoegen
+settings-tn-ending-remove = Verwijderen
+settings-tn-ending-remove-label = { $ending } verwijderen
 
 ## SettingsPage.vue: Algemeen en Verbinding
 

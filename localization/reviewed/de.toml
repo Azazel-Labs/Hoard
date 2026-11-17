@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "a291e71b8315a85b796b394cd1cc26d480ac8ecd3bf12b797cf6319c57ccb07e"
+source = "140db2eb73736ff39922ac317725317468b02f342ce455ff2967c4a2f3b7a920"
 translation = "c88ccd005fc6325aa6e221408cf6717fbfee2dabbc4de8cac4e99bd7fe8f0b6e"
 
 [messages.account-add]
@@ -3911,6 +3911,18 @@ translation = "nichts zu suchen; geben Sie den Namen des Pakets ein"
 [messages.error-task-running]
 source = "“{ $task }” is already running"
 translation = "„{ $task }“ läuft bereits"
+
+[messages.error-texture-ending-chars]
+source = '''Endings of your own can't have < > : " / \ | ? or *'''
+translation = 'Eigene Endungen dürfen kein < > : " / \ | ? oder * enthalten'
+
+[messages.error-texture-ending-missing]
+source = "Each ending of your own needs the ending to look for"
+translation = "Jede eigene Endung braucht die Endung, nach der gesucht wird"
+
+[messages.error-texture-ending-twice]
+source = "{ $ending } is in your endings twice"
+translation = "{ $ending } steht zweimal in Ihren Endungen"
 
 [messages.error-texture-map-type]
 source = "There's no map type called { $role }"
@@ -8687,6 +8699,42 @@ translation = "Eigener"
 source = "Descriptive"
 translation = "Beschreibend"
 
+[messages.settings-tn-ending-add]
+source = "Add an ending"
+translation = "Endung hinzufügen"
+
+[messages.settings-tn-ending-from]
+source = "Ending"
+translation = "Endung"
+
+[messages.settings-tn-ending-from-example]
+source = "_diff"
+translation = "_diff"
+
+[messages.settings-tn-ending-remove]
+source = "Remove"
+translation = "Entfernen"
+
+[messages.settings-tn-ending-remove-label]
+source = "Remove { $ending }"
+translation = "{ $ending } entfernen"
+
+[messages.settings-tn-ending-to]
+source = "Swap for"
+translation = "Ersetzen durch"
+
+[messages.settings-tn-ending-to-example]
+source = "_BC"
+translation = "_BC"
+
+[messages.settings-tn-endings]
+source = "Endings of your own"
+translation = "Eigene Endungen"
+
+[messages.settings-tn-endings-what]
+source = "A texture that isn’t one of a material’s maps keeps its own name, unless it ends in one of these: _diff → _BC sends rock_diff.png as rock_BC.png. Leave the second empty to drop the ending."
+translation = "Eine Textur, die keine der Maps eines Materials ist, behält ihren eigenen Namen, außer er endet auf eine dieser Endungen: _diff → _BC liefert rock_diff.png als rock_BC.png aus. Lassen Sie das zweite Feld leer, um die Endung zu entfernen."
+
 [messages.settings-tn-example]
 source = "Example"
 translation = "Beispiel"
@@ -8718,6 +8766,10 @@ translation = "Texturnamen gespeichert"
 [messages.settings-tn-short]
 source = "Short"
 translation = "Kurz"
+
+[messages.settings-tn-slots]
+source = "In GLB downloads, a texture packed inside a model with no file of its own is named after the material and the slot it fills, and these slots have suffixes too:"
+translation = "In GLB-Downloads wird eine Textur, die ohne eigene Datei in ein Modell gepackt ist, nach dem Material und dem Slot benannt, den sie füllt, und auch diese Slots haben Suffixe:"
 
 [messages.settings-tn-style]
 source = "Style"
@@ -9653,6 +9705,18 @@ translation = 'Namen dürfen kein < > : " / \ | ? oder * enthalten'
 source = 'The suffix for { $role } maps can’t have < > : " / \ | ? or *'
 translation = 'Das Suffix für Maps vom Typ „{ $role }“ darf kein < > : " / \ | ? oder * enthalten'
 
+[messages.texnames-ending-bad]
+source = 'Endings of your own can’t have < > : " / \ | ? or *'
+translation = 'Eigene Endungen dürfen kein < > : " / \ | ? oder * enthalten'
+
+[messages.texnames-ending-missing]
+source = "Each ending of your own needs the ending to look for"
+translation = "Jede eigene Endung braucht die Endung, nach der gesucht wird"
+
+[messages.texnames-ending-twice]
+source = "{ $ending } is in your endings twice"
+translation = "{ $ending } steht zweimal in Ihren Endungen"
+
 [messages.texnames-needs-map]
 source = 'The pattern needs { "{" }map{ "}" }, or every map of a material would get the same name'
 translation = 'Das Muster braucht { "{" }map{ "}" }, sonst bekämen alle Maps eines Materials denselben Namen'
@@ -9664,6 +9728,74 @@ translation = "Geben Sie Maps vom Typ „{ $role }“ ein Suffix"
 [messages.texnames-placeholders]
 source = 'The pattern can use { "{" }name{ "}" }, { "{" }map{ "}" } and { "{" }size{ "}" }'
 translation = 'Das Muster kann { "{" }name{ "}" }, { "{" }map{ "}" } und { "{" }size{ "}" } verwenden'
+
+[messages.texnames-slot-anisotropy]
+source = "Anisotropy"
+translation = "Anisotropie"
+
+[messages.texnames-slot-bad-suffix]
+source = 'The suffix for “{ $slot }” can’t have < > : " / \ | ? or *'
+translation = 'Das Suffix für „{ $slot }“ darf kein < > : " / \ | ? oder * enthalten'
+
+[messages.texnames-slot-clearcoat]
+source = "Clearcoat"
+translation = "Clearcoat"
+
+[messages.texnames-slot-clearcoat-normal]
+source = "Clearcoat normal"
+translation = "Clearcoat-Normal"
+
+[messages.texnames-slot-clearcoat-roughness]
+source = "Clearcoat roughness"
+translation = "Clearcoat-Rauheit"
+
+[messages.texnames-slot-diffuse-transmission]
+source = "Diffuse transmission"
+translation = "Diffuse Transmission"
+
+[messages.texnames-slot-diffuse-transmission-color]
+source = "Diffuse transmission color"
+translation = "Farbe der diffusen Transmission"
+
+[messages.texnames-slot-iridescence]
+source = "Iridescence"
+translation = "Irisieren"
+
+[messages.texnames-slot-iridescence-thickness]
+source = "Iridescence thickness"
+translation = "Dicke des Irisierens"
+
+[messages.texnames-slot-metallic-roughness]
+source = "Metal and roughness"
+translation = "Metall und Rauheit"
+
+[messages.texnames-slot-no-suffix]
+source = "Give “{ $slot }” a suffix"
+translation = "Geben Sie „{ $slot }“ ein Suffix"
+
+[messages.texnames-slot-sheen-color]
+source = "Sheen color"
+translation = "Sheen-Farbe"
+
+[messages.texnames-slot-sheen-roughness]
+source = "Sheen roughness"
+translation = "Sheen-Rauheit"
+
+[messages.texnames-slot-specular-color]
+source = "Specular color"
+translation = "Specular-Farbe"
+
+[messages.texnames-slot-specular-glossiness]
+source = "Specular and glossiness"
+translation = "Specular und Glanz"
+
+[messages.texnames-slot-thickness]
+source = "Thickness"
+translation = "Dicke"
+
+[messages.texnames-slot-transmission]
+source = "Transmission"
+translation = "Transmission"
 
 [messages.text-binary]
 source = "This file is binary, not text, so there's nothing to read here. Download it to open it in its own tool."

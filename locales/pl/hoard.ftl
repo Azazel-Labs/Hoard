@@ -196,6 +196,9 @@ server-role-emissive = emisja
 server-role-translucency = półprzezroczystość
 error-texture-suffix-missing = Mapy typu „{ $map }” muszą mieć sufiks
 error-texture-suffix-chars = Sufiks map typu „{ $map }” nie może zawierać znaków < > : " / \ | ? ani *
+error-texture-ending-missing = Każda własna końcówka musi mieć końcówkę do wyszukania
+error-texture-ending-chars = Własne końcówki nie mogą zawierać znaków < > : " / \ | ? ani *
+error-texture-ending-twice = { $ending } występuje dwa razy wśród własnych końcówek
 error-oauth-no-client-id = Ten link nie zawiera client_id.
 error-oauth-unknown-app = Ta aplikacja nie jest (już) tu zarejestrowana. Należy ponownie rozpocząć łączenie w aplikacji.
 error-oauth-redirect = Aplikacja poprosiła o przekierowanie na adres, którego nie zarejestrowała.
@@ -1970,6 +1973,26 @@ texnames-placeholders = Wzorzec może zawierać { "{" }name{ "}" }, { "{" }map{ 
 texnames-bad-characters = Nazwy nie mogą zawierać znaków < > : " / \ | ? ani *
 texnames-no-suffix = Mapy typu „{ $role }” muszą mieć sufiks
 texnames-bad-suffix = Sufiks map typu „{ $role }” nie może zawierać znaków < > : " / \ | ? ani *
+texnames-slot-no-suffix = Slot „{ $slot }” musi mieć sufiks
+texnames-slot-bad-suffix = Sufiks slotu „{ $slot }” nie może zawierać znaków < > : " / \ | ? ani *
+texnames-ending-missing = Każda własna końcówka musi mieć końcówkę do wyszukania
+texnames-ending-bad = Własne końcówki nie mogą zawierać znaków < > : " / \ | ? ani *
+texnames-ending-twice = { $ending } występuje dwa razy wśród własnych końcówek
+texnames-slot-metallic-roughness = Metaliczność i chropowatość
+texnames-slot-specular-color = Kolor odbicia
+texnames-slot-specular-glossiness = Odbicie i połysk
+texnames-slot-clearcoat = Lakier
+texnames-slot-clearcoat-roughness = Chropowatość lakieru
+texnames-slot-clearcoat-normal = Normalne lakieru
+texnames-slot-sheen-color = Kolor połysku tkaniny
+texnames-slot-sheen-roughness = Chropowatość połysku tkaniny
+texnames-slot-transmission = Transmisja
+texnames-slot-thickness = Grubość
+texnames-slot-diffuse-transmission = Transmisja rozproszona
+texnames-slot-diffuse-transmission-color = Kolor transmisji rozproszonej
+texnames-slot-iridescence = Iryzacja
+texnames-slot-iridescence-thickness = Grubość iryzacji
+texnames-slot-anisotropy = Anizotropia
 
 ## storeFormats.ts
 
@@ -2501,6 +2524,16 @@ settings-tn-hint-map = { " " }to przeznaczenie mapy,{ " " }
 settings-tn-hint-size = { " " }to jej rozmiar, gdy zestaw występuje w kilku rozmiarach (dopisywany na końcu, jeśli wzorzec go pomija).
 settings-tn-example = Przykład
 settings-tn-suffixes = Sufiksy dla każdego rodzaju mapy
+settings-tn-slots = W pobieranych plikach GLB tekstura spakowana w modelu bez własnego pliku dostaje nazwę od materiału i slotu, który wypełnia, a te sloty też mają sufiksy:
+settings-tn-endings = Własne końcówki
+settings-tn-endings-what = Tekstura, która nie jest jedną z map materiału, zachowuje własną nazwę, chyba że kończy się jedną z tych końcówek: _diff → _BC wysyła rock_diff.png jako rock_BC.png. Zostaw drugie pole puste, aby usunąć końcówkę.
+settings-tn-ending-from = Końcówka
+settings-tn-ending-from-example = _diff
+settings-tn-ending-to = Zamień na
+settings-tn-ending-to-example = _BC
+settings-tn-ending-add = Dodaj końcówkę
+settings-tn-ending-remove = Usuń
+settings-tn-ending-remove-label = Usuń { $ending }
 
 ## SettingsPage.vue: General and Connection
 

@@ -196,6 +196,9 @@ server-role-emissive = emissie
 server-role-translucency = deurskynendheid
 error-texture-suffix-missing = Gee kaarte vir { $map } 'n agtervoegsel
 error-texture-suffix-chars = Die agtervoegsel van kaarte vir { $map } kan nie < > : " / \ | ? of * bevat nie
+error-texture-ending-missing = Elke eie einde het die einde nodig waarna gesoek moet word
+error-texture-ending-chars = Eie eindes kan nie < > : " / \ | ? of * bevat nie
+error-texture-ending-twice = { $ending } is twee keer in jou eindes
 error-oauth-no-client-id = Hierdie skakel het geen client_id nie.
 error-oauth-unknown-app = Hierdie toep is nie (meer) hier geregistreer nie. Begin weer vanuit die toep koppel.
 error-oauth-redirect = Die toep het gevra om teruggestuur te word na 'n adres wat dit nie geregistreer het nie.
@@ -1817,6 +1820,26 @@ texnames-placeholders = Die patroon kan { "{" }name{ "}" }, { "{" }map{ "}" } en
 texnames-bad-characters = Name kan nie < > : " / \ | ? of * bevat nie
 texnames-no-suffix = Gee kaarte vir { $role } 'n agtervoegsel
 texnames-bad-suffix = Die agtervoegsel van kaarte vir { $role } kan nie < > : " / \ | ? of * bevat nie
+texnames-slot-no-suffix = Gee “{ $slot }” 'n agtervoegsel
+texnames-slot-bad-suffix = Die agtervoegsel vir “{ $slot }” kan nie < > : " / \ | ? of * bevat nie
+texnames-ending-missing = Elke eie einde het die einde nodig waarna gesoek moet word
+texnames-ending-bad = Eie eindes kan nie < > : " / \ | ? of * bevat nie
+texnames-ending-twice = { $ending } is twee keer in jou eindes
+texnames-slot-metallic-roughness = Metaal en grofheid
+texnames-slot-specular-color = Spekulêre kleur
+texnames-slot-specular-glossiness = Spekulêr en glans
+texnames-slot-clearcoat = Vernislaag
+texnames-slot-clearcoat-roughness = Grofheid van vernislaag
+texnames-slot-clearcoat-normal = Normaal van vernislaag
+texnames-slot-sheen-color = Kleur van fluweelglans
+texnames-slot-sheen-roughness = Grofheid van fluweelglans
+texnames-slot-transmission = Deurlating
+texnames-slot-thickness = Dikte
+texnames-slot-diffuse-transmission = Diffuse deurlating
+texnames-slot-diffuse-transmission-color = Kleur van diffuse deurlating
+texnames-slot-iridescence = Irisering
+texnames-slot-iridescence-thickness = Dikte van irisering
+texnames-slot-anisotropy = Anisotropie
 
 ## storeFormats.ts
 
@@ -2300,6 +2323,16 @@ settings-tn-hint-map = { " " }waarvoor die kaart is,{ " " }
 settings-tn-hint-size = { " " }sy grootte wanneer die stel in meer as een kom (aan die einde bygevoeg as die patroon dit weglaat).
 settings-tn-example = Voorbeeld
 settings-tn-suffixes = Agtervoegsels vir elke soort kaart
+settings-tn-slots = In GLB-aflaaie word 'n tekstuur wat sonder 'n eie lêer binne-in 'n model gepak is, benoem na die materiaal en die gleuf wat dit vul, en hierdie gleuwe het ook agtervoegsels:
+settings-tn-endings = Jou eie eindes
+settings-tn-endings-what = 'n Tekstuur wat nie een van 'n materiaal se kaarte is nie, behou sy eie naam, tensy dit op een van hierdie eindig: _diff → _BC stuur rock_diff.png as rock_BC.png. Laat die tweede leeg om die einde weg te laat.
+settings-tn-ending-from = Einde
+settings-tn-ending-from-example = _diff
+settings-tn-ending-to = Vervang met
+settings-tn-ending-to-example = _BC
+settings-tn-ending-add = Voeg 'n einde by
+settings-tn-ending-remove = Verwyder
+settings-tn-ending-remove-label = Verwyder { $ending }
 
 ## SettingsPage.vue: Algemeen en Verbinding
 

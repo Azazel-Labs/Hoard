@@ -196,6 +196,9 @@ server-role-emissive = emissione
 server-role-translucency = traslucenza
 error-texture-suffix-missing = Assegna un suffisso alle mappe { $map }
 error-texture-suffix-chars = Il suffisso delle mappe { $map } non può contenere < > : " / \ | ? o *
+error-texture-ending-missing = Ogni terminazione personalizzata ha bisogno della terminazione da cercare
+error-texture-ending-chars = Le terminazioni personalizzate non possono contenere < > : " / \ | ? o *
+error-texture-ending-twice = { $ending } compare due volte tra le tue terminazioni
 error-oauth-no-client-id = Questo link non ha un client_id.
 error-oauth-unknown-app = Questa app non è registrata qui (o non lo è più). Ricomincia la connessione dall'app.
 error-oauth-redirect = L'app ha chiesto di essere rimandata a un indirizzo che non ha registrato.
@@ -1831,6 +1834,26 @@ texnames-placeholders = Lo schema può usare { "{" }name{ "}" }, { "{" }map{ "}"
 texnames-bad-characters = I nomi non possono contenere < > : " / \ | ? o *
 texnames-no-suffix = Assegna un suffisso alle mappe { $role }
 texnames-bad-suffix = Il suffisso delle mappe { $role } non può contenere < > : " / \ | ? o *
+texnames-slot-no-suffix = Assegna un suffisso a «{ $slot }»
+texnames-slot-bad-suffix = Il suffisso di «{ $slot }» non può contenere < > : " / \ | ? o *
+texnames-ending-missing = Ogni terminazione personalizzata ha bisogno della terminazione da cercare
+texnames-ending-bad = Le terminazioni personalizzate non possono contenere < > : " / \ | ? o *
+texnames-ending-twice = { $ending } compare due volte tra le tue terminazioni
+texnames-slot-metallic-roughness = Metallo e rugosità
+texnames-slot-specular-color = Colore speculare
+texnames-slot-specular-glossiness = Specularità e lucidità
+texnames-slot-clearcoat = Vernice trasparente
+texnames-slot-clearcoat-roughness = Rugosità della vernice trasparente
+texnames-slot-clearcoat-normal = Normal della vernice trasparente
+texnames-slot-sheen-color = Colore della lucentezza
+texnames-slot-sheen-roughness = Rugosità della lucentezza
+texnames-slot-transmission = Trasmissione
+texnames-slot-thickness = Spessore
+texnames-slot-diffuse-transmission = Trasmissione diffusa
+texnames-slot-diffuse-transmission-color = Colore della trasmissione diffusa
+texnames-slot-iridescence = Iridescenza
+texnames-slot-iridescence-thickness = Spessore dell'iridescenza
+texnames-slot-anisotropy = Anisotropia
 
 ## storeFormats.ts
 
@@ -2315,6 +2338,16 @@ settings-tn-hint-map = { " " }lo scopo della mappa,{ " " }
 settings-tn-hint-size = { " " }la sua dimensione quando il set ne ha più di una (aggiunta alla fine se lo schema non la include).
 settings-tn-example = Esempio
 settings-tn-suffixes = Suffissi per ogni tipo di mappa
+settings-tn-slots = Nei download GLB, una texture inclusa in un modello senza un file proprio prende il nome dal materiale e dallo slot che occupa, e anche questi slot hanno un suffisso:
+settings-tn-endings = Terminazioni personalizzate
+settings-tn-endings-what = Una texture che non è una delle mappe di un materiale mantiene il suo nome, a meno che non finisca con una di queste: _diff → _BC invia rock_diff.png come rock_BC.png. Lascia vuoto il secondo campo per eliminare la terminazione.
+settings-tn-ending-from = Terminazione
+settings-tn-ending-from-example = _diff
+settings-tn-ending-to = Sostituisci con
+settings-tn-ending-to-example = _BC
+settings-tn-ending-add = Aggiungi una terminazione
+settings-tn-ending-remove = Rimuovi
+settings-tn-ending-remove-label = Rimuovi { $ending }
 
 ## SettingsPage.vue: Generali e Connessione
 

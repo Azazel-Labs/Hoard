@@ -4,7 +4,7 @@
 // server's: Blender and ffmpeg (downloaded if need be), the AI service that tags packs, what happens to Unreal
 // packages, and the server's switches and limits. Those are saved on the server and in effect at once. Anything not
 // at its default has a turn-back arrow beside it that resets it.
-import { computed, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue'
+import { computed, nextTick, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue'
 import {
   ApiError,
   api,
@@ -27,7 +27,17 @@ import { formatNumber, LANGUAGES, languageName, preferredCatalog, t } from '../i
 import { prefs } from '../prefs'
 import { formatMiB } from '../sizes'
 import { ROLE_LABEL } from '../materials'
-import { ROLES, SHORT, problem as namesProblem, stem as mapStem, type TextureNames } from '../texnames'
+import {
+  ROLES,
+  SHORT,
+  SLOTS,
+  SLOT_LABEL,
+  problem as namesProblem,
+  stem as mapStem,
+  usedEndings,
+  type Ending,
+  type TextureNames,
+} from '../texnames'
 import { DARK_THEMES, LIGHT_THEMES, previewScheme, themeFor, usedScheme } from '../theme'
 import { confirmDialog, showError, showOk } from '../ui'
 import LibraryStats from './LibraryStats.vue'
@@ -549,15 +559,18 @@ function saveOpt(k: OptKey) {
 const resetOpt = (k: AnyOpt) => save({ [k]: null } as SettingsPatch, t('settings-back-to-default'))
 
 // Texture names: edited here, saved when a field is left (or Enter), checked first the way the server checks.
-const names = reactive<TextureNames>({ on: true, pattern: '{name}_{map}', maps: {} })
+const names = reactive<TextureNames>({ on: true, pattern: '{name}_{map}', maps: {}, endings: [] })
 const namesError = computed(() => (names.on ? namesProblem(names) : null))
+const endingsKey = (e: Ending[]) => JSON.stringify(usedEndings(e).map((x) => [x.from.trim(), x.to.trim()]))
+const sameMaps = (a: TextureNames, b: Pick<TextureNames, 'pattern' | 'maps'>) =>
+  a.pattern === b.pattern && [...ROLES, ...SLOTS].every((r) => (a.maps[r] ?? '').trim() === (b.maps[r] ?? '').trim())
 const sameNames = (a: TextureNames, b: TextureNames) =>
-  a.on === b.on && a.pattern === b.pattern && ROLES.every((r) => (a.maps[r] ?? '').trim() === (b.maps[r] ?? '').trim())
-/** Which preset the convention is, if it's one. */
+  a.on === b.on && sameMaps(a, b) && endingsKey(a.endings) === endingsKey(b.endings)
+/** Which preset the pattern and suffixes are, if they're one. */
 const namesPreset = computed(() => {
   const d = s.value?.texture_names.default
-  if (d && sameNames({ ...names, on: true }, { ...d, on: true })) return 'descriptive'
-  if (sameNames({ ...names, on: true }, { ...SHORT, on: true })) return 'short'
+  if (d && sameMaps(names, d)) return 'descriptive'
+  if (sameMaps(names, SHORT)) return 'short'
   return 'custom'
 })
 const namesExample = computed(() =>
@@ -572,7 +585,23 @@ function saveNames() {
   const cur = s.value
   if (!cur || namesError.value) return
   if (sameNames(names, cur.texture_names)) return
-  void save({ texture_names: { on: names.on, pattern: names.pattern.trim(), maps: { ...names.maps } } }, t('settings-tn-saved'))
+  const endings = usedEndings(names.endings).map((e) => ({ from: e.from.trim(), to: e.to.trim() }))
+  const next = { on: names.on, pattern: names.pattern.trim(), maps: { ...names.maps }, endings }
+  void save({ texture_names: next }, t('settings-tn-saved'))
+}
+function addEnding() {
+  names.endings.push({ from: '', to: '' })
+  void nextTick(() => document.getElementById(`tn-from-${names.endings.length - 1}`)?.focus())
+}
+/** A row is saved once it's left (or on Enter), not between its two fields, so a save coming back can't undo what's
+ * typed in the second. */
+function leaveEnding(ev: FocusEvent) {
+  const row = ev.currentTarget as HTMLElement
+  if (!(ev.relatedTarget instanceof Node && row.contains(ev.relatedTarget))) saveNames()
+}
+function removeEnding(i: number) {
+  names.endings.splice(i, 1)
+  saveNames()
 }
 function useNames(preset: 'descriptive' | 'short') {
   const d = s.value?.texture_names.default
@@ -606,7 +635,9 @@ function take(next: Settings) {
     opts,
     Object.fromEntries(OPT_KEYS.map((k) => [k, next.options[k].value])),
   )
-  Object.assign(names, { on: next.texture_names.on, pattern: next.texture_names.pattern, maps: { ...next.texture_names.maps } })
+  const tn = next.texture_names
+  const endings = tn.endings.map((e) => ({ ...e }))
+  Object.assign(names, { on: tn.on, pattern: tn.pattern, maps: { ...tn.maps }, endings })
   schedulePoll()
 }
 
@@ -1312,7 +1343,64 @@ onBeforeUnmount(() => {
                       </div>
                     </template>
                   </div>
+                  <p class="what tn-slots">{{ t('settings-tn-slots') }}</p>
+                  <div class="llm opts">
+                    <template v-for="k in SLOTS" :key="k">
+                      <label :for="`tn-${k}`">{{ SLOT_LABEL[k] }}</label>
+                      <div class="key">
+                        <input
+                          :id="`tn-${k}`"
+                          v-model="names.maps[k]"
+                          class="field mono short"
+                          spellcheck="false"
+                          :disabled="busy"
+                          @change="saveNames"
+                          @keydown.enter.prevent="saveNames"
+                        />
+                      </div>
+                    </template>
+                  </div>
                 </details>
+                <div class="tn-endings" data-testid="texture-endings">
+                  <h4>{{ t('settings-tn-endings') }}</h4>
+                  <p class="what">{{ t('settings-tn-endings-what') }}</p>
+                  <ul v-if="names.endings.length">
+                    <li v-for="(e, i) in names.endings" :key="i" @focusout="leaveEnding">
+                      <input
+                        :id="`tn-from-${i}`"
+                        v-model="e.from"
+                        class="field mono"
+                        spellcheck="false"
+                        :aria-label="t('settings-tn-ending-from')"
+                        :placeholder="t('settings-tn-ending-from-example')"
+                        :disabled="busy"
+                        @keydown.enter.prevent="saveNames"
+                      />
+                      <span aria-hidden="true">→</span>
+                      <input
+                        v-model="e.to"
+                        class="field mono"
+                        spellcheck="false"
+                        :aria-label="t('settings-tn-ending-to')"
+                        :placeholder="t('settings-tn-ending-to-example')"
+                        :disabled="busy"
+                        @keydown.enter.prevent="saveNames"
+                      />
+                      <button
+                        type="button"
+                        class="btn ghost"
+                        :disabled="busy"
+                        :aria-label="t('settings-tn-ending-remove-label', { ending: e.from.trim() || '…' })"
+                        @click="removeEnding(i)"
+                      >
+                        {{ t('settings-tn-ending-remove') }}
+                      </button>
+                    </li>
+                  </ul>
+                  <button type="button" class="btn" :disabled="busy" @click="addEnding">
+                    {{ t('settings-tn-ending-add') }}
+                  </button>
+                </div>
               </template>
             </section>
           </template>
@@ -1638,6 +1726,13 @@ progress.learn { display: block; width: 100%; max-width: 28rem; height: 0.35rem;
 .tn-maps summary:hover { color: var(--text); }
 .tn-maps[open] summary { margin-bottom: 0.7rem; }
 .llm .key .field.short { max-width: 10rem; }
+.tn-slots { margin: 1rem 0 0.6rem; }
+.tn-endings { margin-top: 0.9rem; padding-top: 0.8rem; border-top: 1px solid var(--line); }
+.tn-endings h4 { margin: 0 0 0.3rem; font-size: var(--step--1); font-weight: 550; }
+.tn-endings ul { list-style: none; margin: 0 0 0.6rem; padding: 0; display: grid; gap: 0.4rem; }
+.tn-endings li { display: flex; gap: 0.5rem; align-items: center; }
+.tn-endings li .field { flex: 1 1 0; min-width: 0; max-width: 12rem; }
+.tn-endings li > span { color: var(--muted); }
 
 .choices { display: grid; gap: 0.4rem; }
 .choices label {

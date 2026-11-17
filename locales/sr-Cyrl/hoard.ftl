@@ -196,6 +196,9 @@ server-role-emissive = емисија
 server-role-translucency = провидност
 error-texture-suffix-missing = Дајте суфикс мапама типа { $map }
 error-texture-suffix-chars = Суфикс за мапе типа { $map } не може да садржи < > : " / \ | ? или *
+error-texture-ending-missing = Сваки ваш завршетак мора да наведе завршетак који се тражи
+error-texture-ending-chars = Ваши завршеци не могу да садрже < > : " / \ | ? или *
+error-texture-ending-twice = { $ending } се двапут налази у вашим завршецима
 error-oauth-no-client-id = Ова веза нема client_id.
 error-oauth-unknown-app = Ова апликација није (више) регистрована овде. Почните повезивање поново из апликације.
 error-oauth-redirect = Апликација је тражила да буде враћена на адресу коју није регистровала.
@@ -1883,6 +1886,26 @@ texnames-placeholders = Шаблон може да користи { "{" }name{ "
 texnames-bad-characters = Називи не могу да садрже < > : " / \ | ? или *
 texnames-no-suffix = Дајте суфикс мапама типа { $role }
 texnames-bad-suffix = Суфикс за мапе типа { $role } не може да садржи < > : " / \ | ? или *
+texnames-slot-no-suffix = Дајте суфикс за „{ $slot }“
+texnames-slot-bad-suffix = Суфикс за „{ $slot }“ не може да садржи < > : " / \ | ? или *
+texnames-ending-missing = Сваки ваш завршетак мора да наведе завршетак који се тражи
+texnames-ending-bad = Ваши завршеци не могу да садрже < > : " / \ | ? или *
+texnames-ending-twice = { $ending } се двапут налази у вашим завршецима
+texnames-slot-metallic-roughness = Металност и храпавост
+texnames-slot-specular-color = Боја спекулара
+texnames-slot-specular-glossiness = Спекулар и сјај
+texnames-slot-clearcoat = Лак
+texnames-slot-clearcoat-roughness = Храпавост лака
+texnames-slot-clearcoat-normal = Нормала лака
+texnames-slot-sheen-color = Боја сатенског сјаја
+texnames-slot-sheen-roughness = Храпавост сатенског сјаја
+texnames-slot-transmission = Трансмисија
+texnames-slot-thickness = Дебљина
+texnames-slot-diffuse-transmission = Дифузна трансмисија
+texnames-slot-diffuse-transmission-color = Боја дифузне трансмисије
+texnames-slot-iridescence = Иридесценција
+texnames-slot-iridescence-thickness = Дебљина иридесценције
+texnames-slot-anisotropy = Анизотропија
 
 ## storeFormats.ts
 
@@ -2401,6 +2424,16 @@ settings-tn-hint-map = { " " }намена мапе,{ " " }
 settings-tn-hint-size = { " " }њена величина кад сет долази у више величина (додаје се на крај ако је шаблон изостави).
 settings-tn-example = Пример
 settings-tn-suffixes = Суфикси за сваку врсту мапе
+settings-tn-slots = У GLB преузимањима, текстура упакована у модел без сопствене датотеке добија назив по материјалу и слоту који попуњава, а и ти слотови имају суфиксе:
+settings-tn-endings = Ваши завршеци
+settings-tn-endings-what = Текстура која није једна од мапа материјала задржава свој назив, осим ако се завршава једним од ових: _diff → _BC шаље rock_diff.png као rock_BC.png. Оставите друго поље празно да бисте уклонили завршетак.
+settings-tn-ending-from = Завршетак
+settings-tn-ending-from-example = _diff
+settings-tn-ending-to = Замени са
+settings-tn-ending-to-example = _BC
+settings-tn-ending-add = Додај завршетак
+settings-tn-ending-remove = Уклони
+settings-tn-ending-remove-label = Уклони { $ending }
 
 ## SettingsPage.vue: Опште и Веза
 

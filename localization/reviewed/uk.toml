@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "a291e71b8315a85b796b394cd1cc26d480ac8ecd3bf12b797cf6319c57ccb07e"
+source = "140db2eb73736ff39922ac317725317468b02f342ce455ff2967c4a2f3b7a920"
 translation = "29bbdd56d3912619e12475d6d444595ec6d389a2b27582eeb623a3b8e037c6e8"
 
 [messages.account-add]
@@ -3992,6 +3992,18 @@ translation = "немає чого шукати; введіть назву па�
 [messages.error-task-running]
 source = "“{ $task }” is already running"
 translation = "«{ $task }» уже виконується"
+
+[messages.error-texture-ending-chars]
+source = '''Endings of your own can't have < > : " / \ | ? or *'''
+translation = 'Власні закінчення не можуть містити < > : " / \ | ? або *'
+
+[messages.error-texture-ending-missing]
+source = "Each ending of your own needs the ending to look for"
+translation = "Кожне власне закінчення має містити закінчення, яке слід шукати"
+
+[messages.error-texture-ending-twice]
+source = "{ $ending } is in your endings twice"
+translation = "{ $ending } двічі є серед ваших закінчень"
 
 [messages.error-texture-map-type]
 source = "There's no map type called { $role }"
@@ -8897,6 +8909,42 @@ translation = "Власний"
 source = "Descriptive"
 translation = "Описовий"
 
+[messages.settings-tn-ending-add]
+source = "Add an ending"
+translation = "Додати закінчення"
+
+[messages.settings-tn-ending-from]
+source = "Ending"
+translation = "Закінчення"
+
+[messages.settings-tn-ending-from-example]
+source = "_diff"
+translation = "_diff"
+
+[messages.settings-tn-ending-remove]
+source = "Remove"
+translation = "Прибрати"
+
+[messages.settings-tn-ending-remove-label]
+source = "Remove { $ending }"
+translation = "Прибрати { $ending }"
+
+[messages.settings-tn-ending-to]
+source = "Swap for"
+translation = "Замінити на"
+
+[messages.settings-tn-ending-to-example]
+source = "_BC"
+translation = "_BC"
+
+[messages.settings-tn-endings]
+source = "Endings of your own"
+translation = "Власні закінчення"
+
+[messages.settings-tn-endings-what]
+source = "A texture that isn’t one of a material’s maps keeps its own name, unless it ends in one of these: _diff → _BC sends rock_diff.png as rock_BC.png. Leave the second empty to drop the ending."
+translation = "Текстура, яка не є однією з карт матеріалу, зберігає власну назву, якщо тільки та не закінчується на одне з цих: _diff → _BC надсилає rock_diff.png як rock_BC.png. Залиште друге поле порожнім, щоб прибрати закінчення."
+
 [messages.settings-tn-example]
 source = "Example"
 translation = "Приклад"
@@ -8928,6 +8976,10 @@ translation = "Назви текстур збережено"
 [messages.settings-tn-short]
 source = "Short"
 translation = "Короткий"
+
+[messages.settings-tn-slots]
+source = "In GLB downloads, a texture packed inside a model with no file of its own is named after the material and the slot it fills, and these slots have suffixes too:"
+translation = "У завантаженнях GLB текстура, упакована всередину моделі без власного файлу, отримує назву за матеріалом і слотом, який вона займає, і ці слоти теж мають суфікси:"
 
 [messages.settings-tn-style]
 source = "Style"
@@ -9920,6 +9972,18 @@ translation = 'Назви не можуть містити < > : " / \ | ? аб�
 source = 'The suffix for { $role } maps can’t have < > : " / \ | ? or *'
 translation = 'Суфікс для карт { $role } не може містити < > : " / \ | ? або *'
 
+[messages.texnames-ending-bad]
+source = 'Endings of your own can’t have < > : " / \ | ? or *'
+translation = 'Власні закінчення не можуть містити < > : " / \ | ? або *'
+
+[messages.texnames-ending-missing]
+source = "Each ending of your own needs the ending to look for"
+translation = "Кожне власне закінчення має містити закінчення, яке слід шукати"
+
+[messages.texnames-ending-twice]
+source = "{ $ending } is in your endings twice"
+translation = "{ $ending } двічі є серед ваших закінчень"
+
 [messages.texnames-needs-map]
 source = 'The pattern needs { "{" }map{ "}" }, or every map of a material would get the same name'
 translation = 'Шаблону потрібен { "{" }map{ "}" }, інакше всі карти матеріалу отримають однакову назву'
@@ -9931,6 +9995,74 @@ translation = "Задайте суфікс для карт { $role }"
 [messages.texnames-placeholders]
 source = 'The pattern can use { "{" }name{ "}" }, { "{" }map{ "}" } and { "{" }size{ "}" }'
 translation = 'Шаблон може використовувати { "{" }name{ "}" }, { "{" }map{ "}" } і { "{" }size{ "}" }'
+
+[messages.texnames-slot-anisotropy]
+source = "Anisotropy"
+translation = "Анізотропія"
+
+[messages.texnames-slot-bad-suffix]
+source = 'The suffix for “{ $slot }” can’t have < > : " / \ | ? or *'
+translation = 'Суфікс для «{ $slot }» не може містити < > : " / \ | ? або *'
+
+[messages.texnames-slot-clearcoat]
+source = "Clearcoat"
+translation = "Лак"
+
+[messages.texnames-slot-clearcoat-normal]
+source = "Clearcoat normal"
+translation = "Нормалі лаку"
+
+[messages.texnames-slot-clearcoat-roughness]
+source = "Clearcoat roughness"
+translation = "Шорсткість лаку"
+
+[messages.texnames-slot-diffuse-transmission]
+source = "Diffuse transmission"
+translation = "Розсіяне пропускання"
+
+[messages.texnames-slot-diffuse-transmission-color]
+source = "Diffuse transmission color"
+translation = "Колір розсіяного пропускання"
+
+[messages.texnames-slot-iridescence]
+source = "Iridescence"
+translation = "Райдужність"
+
+[messages.texnames-slot-iridescence-thickness]
+source = "Iridescence thickness"
+translation = "Товщина райдужності"
+
+[messages.texnames-slot-metallic-roughness]
+source = "Metal and roughness"
+translation = "Металевість і шорсткість"
+
+[messages.texnames-slot-no-suffix]
+source = "Give “{ $slot }” a suffix"
+translation = "Задайте суфікс для «{ $slot }»"
+
+[messages.texnames-slot-sheen-color]
+source = "Sheen color"
+translation = "Колір відливу"
+
+[messages.texnames-slot-sheen-roughness]
+source = "Sheen roughness"
+translation = "Шорсткість відливу"
+
+[messages.texnames-slot-specular-color]
+source = "Specular color"
+translation = "Колір дзеркальності"
+
+[messages.texnames-slot-specular-glossiness]
+source = "Specular and glossiness"
+translation = "Дзеркальність і глянець"
+
+[messages.texnames-slot-thickness]
+source = "Thickness"
+translation = "Товщина"
+
+[messages.texnames-slot-transmission]
+source = "Transmission"
+translation = "Пропускання"
 
 [messages.text-binary]
 source = "This file is binary, not text, so there's nothing to read here. Download it to open it in its own tool."

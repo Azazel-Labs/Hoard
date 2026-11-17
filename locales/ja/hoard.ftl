@@ -196,6 +196,9 @@ server-role-emissive = エミッシブ
 server-role-translucency = 半透明
 error-texture-suffix-missing = { $map } マップにサフィックスを指定してください
 error-texture-suffix-chars = { $map } マップのサフィックスに < > : " / \ | ? * は使えません
+error-texture-ending-missing = 独自の末尾にはそれぞれ、探す末尾を指定してください
+error-texture-ending-chars = 独自の末尾に < > : " / \ | ? * は使えません
+error-texture-ending-twice = { $ending } が独自の末尾に 2 回含まれています
 error-oauth-no-client-id = このリンクには client_id がありません。
 error-oauth-unknown-app = このアプリはここに登録されていません（または登録が解除されています）。アプリから接続をやり直してください。
 error-oauth-redirect = アプリが、登録していないアドレスへの戻りを求めました。
@@ -1669,6 +1672,26 @@ texnames-placeholders = パターンには { "{" }name{ "}" }、{ "{" }map{ "}" 
 texnames-bad-characters = 名前に < > : " / \ | ? * は使えません
 texnames-no-suffix = { $role } マップにサフィックスを指定してください
 texnames-bad-suffix = { $role } マップのサフィックスに < > : " / \ | ? * は使えません
+texnames-slot-no-suffix = 「{ $slot }」にサフィックスを指定してください
+texnames-slot-bad-suffix = 「{ $slot }」のサフィックスに < > : " / \ | ? * は使えません
+texnames-ending-missing = 独自の末尾にはそれぞれ、探す末尾を指定してください
+texnames-ending-bad = 独自の末尾に < > : " / \ | ? * は使えません
+texnames-ending-twice = { $ending } が独自の末尾に 2 回含まれています
+texnames-slot-metallic-roughness = メタルとラフネス
+texnames-slot-specular-color = スペキュラーカラー
+texnames-slot-specular-glossiness = スペキュラーとグロシネス
+texnames-slot-clearcoat = クリアコート
+texnames-slot-clearcoat-roughness = クリアコートのラフネス
+texnames-slot-clearcoat-normal = クリアコートの法線
+texnames-slot-sheen-color = シーンカラー
+texnames-slot-sheen-roughness = シーンのラフネス
+texnames-slot-transmission = トランスミッション
+texnames-slot-thickness = 厚み
+texnames-slot-diffuse-transmission = 拡散透過
+texnames-slot-diffuse-transmission-color = 拡散透過カラー
+texnames-slot-iridescence = イリデセンス
+texnames-slot-iridescence-thickness = イリデセンスの厚み
+texnames-slot-anisotropy = 異方性
 
 ## storeFormats.ts
 
@@ -2128,6 +2151,16 @@ settings-tn-hint-map = { " " }はマップの用途、{ " " }
 settings-tn-hint-size = { " " }はセットに複数のサイズがある場合のサイズです（パターンにない場合は末尾に追加されます）。
 settings-tn-example = 例
 settings-tn-suffixes = マップの種類ごとのサフィックス
+settings-tn-slots = GLB のダウンロードでは、独自のファイルがなくモデル内に格納されたテクスチャは、マテリアルとそれが埋めるスロットにちなんだ名前になります。これらのスロットにもサフィックスがあります:
+settings-tn-endings = 独自の末尾
+settings-tn-endings-what = マテリアルのマップではないテクスチャは元の名前のままですが、次のいずれかで終わる場合は別です。_diff → _BC なら rock_diff.png は rock_BC.png として送られます。2 つ目を空欄にすると、その末尾を取り除きます。
+settings-tn-ending-from = 末尾
+settings-tn-ending-from-example = _diff
+settings-tn-ending-to = 置き換え先
+settings-tn-ending-to-example = _BC
+settings-tn-ending-add = 末尾を追加
+settings-tn-ending-remove = 削除
+settings-tn-ending-remove-label = { $ending } を削除
 
 ## SettingsPage.vue: 一般と接続
 

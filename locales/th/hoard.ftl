@@ -196,6 +196,9 @@ server-role-emissive = การเปล่งแสง
 server-role-translucency = ความโปร่งแสง
 error-texture-suffix-missing = กำหนดคำต่อท้ายให้แมป { $map }
 error-texture-suffix-chars = คำต่อท้ายของแมป { $map } ต้องไม่มี < > : " / \ | ? หรือ *
+error-texture-ending-missing = ท้ายชื่อที่คุณกำหนดเองแต่ละรายการต้องระบุท้ายชื่อที่จะค้นหา
+error-texture-ending-chars = ท้ายชื่อที่คุณกำหนดเองต้องไม่มี < > : " / \ | ? หรือ *
+error-texture-ending-twice = { $ending } อยู่ในท้ายชื่อของคุณสองครั้ง
 error-oauth-no-client-id = ลิงก์นี้ไม่มี client_id
 error-oauth-unknown-app = แอปนี้ไม่ได้ลงทะเบียนไว้ที่นี่ (แล้ว) ให้เริ่มเชื่อมต่อใหม่จากแอป
 error-oauth-redirect = แอปขอให้ส่งกลับไปยังที่อยู่ที่ไม่ได้ลงทะเบียนไว้
@@ -1672,6 +1675,26 @@ texnames-placeholders = รูปแบบใช้ { "{" }name{ "}" }, { "{" }m
 texnames-bad-characters = ชื่อต้องไม่มี < > : " / \ | ? หรือ *
 texnames-no-suffix = กำหนดคำต่อท้ายให้แมป { $role }
 texnames-bad-suffix = คำต่อท้ายของแมป { $role } ต้องไม่มี < > : " / \ | ? หรือ *
+texnames-slot-no-suffix = กำหนดคำต่อท้ายให้ “{ $slot }”
+texnames-slot-bad-suffix = คำต่อท้ายของ “{ $slot }” ต้องไม่มี < > : " / \ | ? หรือ *
+texnames-ending-missing = ท้ายชื่อที่คุณกำหนดเองแต่ละรายการต้องระบุท้ายชื่อที่จะค้นหา
+texnames-ending-bad = ท้ายชื่อที่คุณกำหนดเองต้องไม่มี < > : " / \ | ? หรือ *
+texnames-ending-twice = { $ending } อยู่ในท้ายชื่อของคุณสองครั้ง
+texnames-slot-metallic-roughness = โลหะและความหยาบ
+texnames-slot-specular-color = สีสเปคคิวลาร์
+texnames-slot-specular-glossiness = สเปคคิวลาร์และความเงา
+texnames-slot-clearcoat = เคลียร์โค้ต
+texnames-slot-clearcoat-roughness = ความหยาบของเคลียร์โค้ต
+texnames-slot-clearcoat-normal = นอร์มอลของเคลียร์โค้ต
+texnames-slot-sheen-color = สีชีน
+texnames-slot-sheen-roughness = ความหยาบของชีน
+texnames-slot-transmission = การส่งผ่านแสง
+texnames-slot-thickness = ความหนา
+texnames-slot-diffuse-transmission = การส่งผ่านแสงแบบกระจาย
+texnames-slot-diffuse-transmission-color = สีการส่งผ่านแสงแบบกระจาย
+texnames-slot-iridescence = ความเหลือบสี
+texnames-slot-iridescence-thickness = ความหนาของชั้นเหลือบสี
+texnames-slot-anisotropy = แอนไอโซทรอปี
 
 ## storeFormats.ts
 
@@ -2131,6 +2154,16 @@ settings-tn-hint-map = { " " }คือหน้าที่ของแมป{ 
 settings-tn-hint-size = { " " }คือขนาดเมื่อชุดนั้นมีมากกว่าหนึ่งขนาด (จะต่อท้ายให้หากรูปแบบไม่ได้ใส่ไว้)
 settings-tn-example = ตัวอย่าง
 settings-tn-suffixes = คำต่อท้ายสำหรับแมปแต่ละชนิด
+settings-tn-slots = ในการดาวน์โหลด GLB เท็กซ์เจอร์ที่ฝังอยู่ในโมเดลโดยไม่มีไฟล์ของตัวเองจะได้ชื่อตามแมทีเรียลและสล็อตที่เท็กซ์เจอร์นั้นอยู่ และสล็อตเหล่านี้ก็มีคำต่อท้ายด้วย:
+settings-tn-endings = ท้ายชื่อที่กำหนดเอง
+settings-tn-endings-what = เท็กซ์เจอร์ที่ไม่ใช่แมปของแมทีเรียลจะคงชื่อเดิมไว้ เว้นแต่ชื่อจะลงท้ายด้วยรายการใดรายการหนึ่งเหล่านี้: _diff → _BC จะส่ง rock_diff.png เป็น rock_BC.png ปล่อยช่องที่สองว่างไว้เพื่อตัดท้ายชื่อนั้นออก
+settings-tn-ending-from = ท้ายชื่อ
+settings-tn-ending-from-example = _diff
+settings-tn-ending-to = เปลี่ยนเป็น
+settings-tn-ending-to-example = _BC
+settings-tn-ending-add = เพิ่มท้ายชื่อ
+settings-tn-ending-remove = นำออก
+settings-tn-ending-remove-label = นำ { $ending } ออก
 
 ## SettingsPage.vue: General and Connection
 

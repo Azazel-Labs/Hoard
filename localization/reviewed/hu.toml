@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "a291e71b8315a85b796b394cd1cc26d480ac8ecd3bf12b797cf6319c57ccb07e"
+source = "140db2eb73736ff39922ac317725317468b02f342ce455ff2967c4a2f3b7a920"
 translation = "6df14cb1c2fd71b68aa0783404db89869e1b0987d799ee6e09c8222a98701df5"
 
 [messages.account-add]
@@ -3836,6 +3836,18 @@ translation = "nincs mit keresni; írja be a csomag nevét"
 [messages.error-task-running]
 source = "“{ $task }” is already running"
 translation = "„{ $task }” már fut"
+
+[messages.error-texture-ending-chars]
+source = '''Endings of your own can't have < > : " / \ | ? or *'''
+translation = 'A saját végződések nem tartalmazhatják ezeket: < > : " / \ | ? vagy *'
+
+[messages.error-texture-ending-missing]
+source = "Each ending of your own needs the ending to look for"
+translation = "Minden saját végződéshez meg kell adni a keresendő végződést"
+
+[messages.error-texture-ending-twice]
+source = "{ $ending } is in your endings twice"
+translation = "{ $ending } kétszer szerepel a végződései között"
 
 [messages.error-texture-map-type]
 source = "There's no map type called { $role }"
@@ -8529,6 +8541,42 @@ translation = "Saját"
 source = "Descriptive"
 translation = "Leíró"
 
+[messages.settings-tn-ending-add]
+source = "Add an ending"
+translation = "Végződés hozzáadása"
+
+[messages.settings-tn-ending-from]
+source = "Ending"
+translation = "Végződés"
+
+[messages.settings-tn-ending-from-example]
+source = "_diff"
+translation = "_diff"
+
+[messages.settings-tn-ending-remove]
+source = "Remove"
+translation = "Eltávolítás"
+
+[messages.settings-tn-ending-remove-label]
+source = "Remove { $ending }"
+translation = "Végződés eltávolítása: { $ending }"
+
+[messages.settings-tn-ending-to]
+source = "Swap for"
+translation = "Csere erre"
+
+[messages.settings-tn-ending-to-example]
+source = "_BC"
+translation = "_BC"
+
+[messages.settings-tn-endings]
+source = "Endings of your own"
+translation = "Saját végződések"
+
+[messages.settings-tn-endings-what]
+source = "A texture that isn’t one of a material’s maps keeps its own name, unless it ends in one of these: _diff → _BC sends rock_diff.png as rock_BC.png. Leave the second empty to drop the ending."
+translation = "Az a textúra, amely nem egy anyag térképe, megtartja a saját nevét, hacsak nem ezek egyikére végződik: a _diff → _BC a rock_diff.png fájlt rock_BC.png néven küldi. Ha a másodikat üresen hagyja, a végződés elmarad."
+
 [messages.settings-tn-example]
 source = "Example"
 translation = "Példa"
@@ -8560,6 +8608,10 @@ translation = "Textúranevek mentve"
 [messages.settings-tn-short]
 source = "Short"
 translation = "Rövid"
+
+[messages.settings-tn-slots]
+source = "In GLB downloads, a texture packed inside a model with no file of its own is named after the material and the slot it fills, and these slots have suffixes too:"
+translation = "A GLB-letöltésekben a modellbe csomagolt, saját fájl nélküli textúra az anyagról és az általa kitöltött helyről kapja a nevét, és ezeknek a helyeknek is van utótagja:"
 
 [messages.settings-tn-style]
 source = "Style"
@@ -9483,6 +9535,18 @@ translation = 'A nevek nem tartalmazhatják ezeket: < > : " / \ | ? vagy *'
 source = 'The suffix for { $role } maps can’t have < > : " / \ | ? or *'
 translation = 'A térképtípus utótagja ({ $role }) nem tartalmazhatja ezeket: < > : " / \ | ? vagy *'
 
+[messages.texnames-ending-bad]
+source = 'Endings of your own can’t have < > : " / \ | ? or *'
+translation = 'A saját végződések nem tartalmazhatják ezeket: < > : " / \ | ? vagy *'
+
+[messages.texnames-ending-missing]
+source = "Each ending of your own needs the ending to look for"
+translation = "Minden saját végződéshez meg kell adni a keresendő végződést"
+
+[messages.texnames-ending-twice]
+source = "{ $ending } is in your endings twice"
+translation = "{ $ending } kétszer szerepel a végződései között"
+
 [messages.texnames-needs-map]
 source = 'The pattern needs { "{" }map{ "}" }, or every map of a material would get the same name'
 translation = 'A mintában szerepelnie kell ennek: { "{" }map{ "}" }, különben egy anyag minden térképe ugyanazt a nevet kapná'
@@ -9494,6 +9558,74 @@ translation = "Adjon utótagot ennek a térképtípusnak: { $role }"
 [messages.texnames-placeholders]
 source = 'The pattern can use { "{" }name{ "}" }, { "{" }map{ "}" } and { "{" }size{ "}" }'
 translation = 'A minta ezeket használhatja: { "{" }name{ "}" }, { "{" }map{ "}" } és { "{" }size{ "}" }'
+
+[messages.texnames-slot-anisotropy]
+source = "Anisotropy"
+translation = "Anizotrópia"
+
+[messages.texnames-slot-bad-suffix]
+source = 'The suffix for “{ $slot }” can’t have < > : " / \ | ? or *'
+translation = 'A hely utótagja („{ $slot }”) nem tartalmazhatja ezeket: < > : " / \ | ? vagy *'
+
+[messages.texnames-slot-clearcoat]
+source = "Clearcoat"
+translation = "Lakkréteg"
+
+[messages.texnames-slot-clearcoat-normal]
+source = "Clearcoat normal"
+translation = "Lakkréteg normálja"
+
+[messages.texnames-slot-clearcoat-roughness]
+source = "Clearcoat roughness"
+translation = "Lakkréteg érdessége"
+
+[messages.texnames-slot-diffuse-transmission]
+source = "Diffuse transmission"
+translation = "Szórt áteresztés"
+
+[messages.texnames-slot-diffuse-transmission-color]
+source = "Diffuse transmission color"
+translation = "Szórt áteresztés színe"
+
+[messages.texnames-slot-iridescence]
+source = "Iridescence"
+translation = "Irizálás"
+
+[messages.texnames-slot-iridescence-thickness]
+source = "Iridescence thickness"
+translation = "Irizálás vastagsága"
+
+[messages.texnames-slot-metallic-roughness]
+source = "Metal and roughness"
+translation = "Fémesség és érdesség"
+
+[messages.texnames-slot-no-suffix]
+source = "Give “{ $slot }” a suffix"
+translation = "Adjon utótagot ennek a helynek: „{ $slot }”"
+
+[messages.texnames-slot-sheen-color]
+source = "Sheen color"
+translation = "Selyemfény színe"
+
+[messages.texnames-slot-sheen-roughness]
+source = "Sheen roughness"
+translation = "Selyemfény érdessége"
+
+[messages.texnames-slot-specular-color]
+source = "Specular color"
+translation = "Spekuláris szín"
+
+[messages.texnames-slot-specular-glossiness]
+source = "Specular and glossiness"
+translation = "Spekuláris és fényesség"
+
+[messages.texnames-slot-thickness]
+source = "Thickness"
+translation = "Vastagság"
+
+[messages.texnames-slot-transmission]
+source = "Transmission"
+translation = "Áteresztés"
 
 [messages.text-binary]
 source = "This file is binary, not text, so there's nothing to read here. Download it to open it in its own tool."

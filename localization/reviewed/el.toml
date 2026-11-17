@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "a291e71b8315a85b796b394cd1cc26d480ac8ecd3bf12b797cf6319c57ccb07e"
+source = "140db2eb73736ff39922ac317725317468b02f342ce455ff2967c4a2f3b7a920"
 translation = "0f5f60477c12405f48c36f12294f911af5de0204e2fd60e70ff31e1354ed1fa5"
 
 [messages.account-add]
@@ -3923,6 +3923,18 @@ translation = "τίποτα προς αναζήτηση· πληκτρολογή
 [messages.error-task-running]
 source = "“{ $task }” is already running"
 translation = "Η εργασία «{ $task }» εκτελείται ήδη"
+
+[messages.error-texture-ending-chars]
+source = '''Endings of your own can't have < > : " / \ | ? or *'''
+translation = 'Οι δικές σας καταλήξεις δεν μπορούν να περιέχουν < > : " / \ | ? ή *'
+
+[messages.error-texture-ending-missing]
+source = "Each ending of your own needs the ending to look for"
+translation = "Κάθε δική σας κατάληξη χρειάζεται την κατάληξη που θα αναζητηθεί"
+
+[messages.error-texture-ending-twice]
+source = "{ $ending } is in your endings twice"
+translation = "Η κατάληξη { $ending } υπάρχει δύο φορές στις καταλήξεις σας"
 
 [messages.error-texture-map-type]
 source = "There's no map type called { $role }"
@@ -8746,6 +8758,42 @@ translation = "Δικό σας"
 source = "Descriptive"
 translation = "Περιγραφικό"
 
+[messages.settings-tn-ending-add]
+source = "Add an ending"
+translation = "Προσθήκη κατάληξης"
+
+[messages.settings-tn-ending-from]
+source = "Ending"
+translation = "Κατάληξη"
+
+[messages.settings-tn-ending-from-example]
+source = "_diff"
+translation = "_diff"
+
+[messages.settings-tn-ending-remove]
+source = "Remove"
+translation = "Αφαίρεση"
+
+[messages.settings-tn-ending-remove-label]
+source = "Remove { $ending }"
+translation = "Αφαίρεση κατάληξης { $ending }"
+
+[messages.settings-tn-ending-to]
+source = "Swap for"
+translation = "Αντικατάσταση με"
+
+[messages.settings-tn-ending-to-example]
+source = "_BC"
+translation = "_BC"
+
+[messages.settings-tn-endings]
+source = "Endings of your own"
+translation = "Δικές σας καταλήξεις"
+
+[messages.settings-tn-endings-what]
+source = "A texture that isn’t one of a material’s maps keeps its own name, unless it ends in one of these: _diff → _BC sends rock_diff.png as rock_BC.png. Leave the second empty to drop the ending."
+translation = "Μια υφή που δεν είναι κάποιος από τους χάρτες ενός υλικού κρατά το δικό της όνομα, εκτός αν τελειώνει σε μία από αυτές: το _diff → _BC στέλνει το rock_diff.png ως rock_BC.png. Αφήστε το δεύτερο κενό για να αφαιρεθεί η κατάληξη."
+
 [messages.settings-tn-example]
 source = "Example"
 translation = "Παράδειγμα"
@@ -8777,6 +8825,10 @@ translation = "Τα ονόματα υφών αποθηκεύτηκαν"
 [messages.settings-tn-short]
 source = "Short"
 translation = "Σύντομο"
+
+[messages.settings-tn-slots]
+source = "In GLB downloads, a texture packed inside a model with no file of its own is named after the material and the slot it fills, and these slots have suffixes too:"
+translation = "Στις λήψεις GLB, μια υφή πακεταρισμένη μέσα σε μοντέλο χωρίς δικό της αρχείο ονομάζεται με βάση το υλικό και την υποδοχή που καλύπτει, και αυτές οι υποδοχές έχουν επίσης επιθήματα:"
 
 [messages.settings-tn-style]
 source = "Style"
@@ -9733,6 +9785,18 @@ translation = 'Τα ονόματα δεν μπορούν να περιέχουν
 source = 'The suffix for { $role } maps can’t have < > : " / \ | ? or *'
 translation = 'Το επίθημα για τους χάρτες { $role } δεν μπορεί να περιέχει < > : " / \ | ? ή *'
 
+[messages.texnames-ending-bad]
+source = 'Endings of your own can’t have < > : " / \ | ? or *'
+translation = 'Οι δικές σας καταλήξεις δεν μπορούν να περιέχουν < > : " / \ | ? ή *'
+
+[messages.texnames-ending-missing]
+source = "Each ending of your own needs the ending to look for"
+translation = "Κάθε δική σας κατάληξη χρειάζεται την κατάληξη που θα αναζητηθεί"
+
+[messages.texnames-ending-twice]
+source = "{ $ending } is in your endings twice"
+translation = "Η κατάληξη { $ending } υπάρχει δύο φορές στις καταλήξεις σας"
+
 [messages.texnames-needs-map]
 source = 'The pattern needs { "{" }map{ "}" }, or every map of a material would get the same name'
 translation = 'Το μοτίβο χρειάζεται το { "{" }map{ "}" }, αλλιώς όλοι οι χάρτες ενός υλικού θα έπαιρναν το ίδιο όνομα'
@@ -9744,6 +9808,74 @@ translation = "Δώστε επίθημα στους χάρτες { $role }"
 [messages.texnames-placeholders]
 source = 'The pattern can use { "{" }name{ "}" }, { "{" }map{ "}" } and { "{" }size{ "}" }'
 translation = 'Το μοτίβο μπορεί να χρησιμοποιεί τα { "{" }name{ "}" }, { "{" }map{ "}" } και { "{" }size{ "}" }'
+
+[messages.texnames-slot-anisotropy]
+source = "Anisotropy"
+translation = "Ανισοτροπία"
+
+[messages.texnames-slot-bad-suffix]
+source = 'The suffix for “{ $slot }” can’t have < > : " / \ | ? or *'
+translation = 'Το επίθημα για την υποδοχή «{ $slot }» δεν μπορεί να περιέχει < > : " / \ | ? ή *'
+
+[messages.texnames-slot-clearcoat]
+source = "Clearcoat"
+translation = "Βερνίκι"
+
+[messages.texnames-slot-clearcoat-normal]
+source = "Clearcoat normal"
+translation = "Normal βερνικιού"
+
+[messages.texnames-slot-clearcoat-roughness]
+source = "Clearcoat roughness"
+translation = "Τραχύτητα βερνικιού"
+
+[messages.texnames-slot-diffuse-transmission]
+source = "Diffuse transmission"
+translation = "Διάχυτη μετάδοση"
+
+[messages.texnames-slot-diffuse-transmission-color]
+source = "Diffuse transmission color"
+translation = "Χρώμα διάχυτης μετάδοσης"
+
+[messages.texnames-slot-iridescence]
+source = "Iridescence"
+translation = "Ιριδισμός"
+
+[messages.texnames-slot-iridescence-thickness]
+source = "Iridescence thickness"
+translation = "Πάχος ιριδισμού"
+
+[messages.texnames-slot-metallic-roughness]
+source = "Metal and roughness"
+translation = "Μέταλλο και τραχύτητα"
+
+[messages.texnames-slot-no-suffix]
+source = "Give “{ $slot }” a suffix"
+translation = "Δώστε επίθημα στην υποδοχή «{ $slot }»"
+
+[messages.texnames-slot-sheen-color]
+source = "Sheen color"
+translation = "Χρώμα sheen"
+
+[messages.texnames-slot-sheen-roughness]
+source = "Sheen roughness"
+translation = "Τραχύτητα sheen"
+
+[messages.texnames-slot-specular-color]
+source = "Specular color"
+translation = "Χρώμα κατοπτρισμού"
+
+[messages.texnames-slot-specular-glossiness]
+source = "Specular and glossiness"
+translation = "Κατοπτρισμός και γυαλάδα"
+
+[messages.texnames-slot-thickness]
+source = "Thickness"
+translation = "Πάχος"
+
+[messages.texnames-slot-transmission]
+source = "Transmission"
+translation = "Μετάδοση"
 
 [messages.text-binary]
 source = "This file is binary, not text, so there's nothing to read here. Download it to open it in its own tool."

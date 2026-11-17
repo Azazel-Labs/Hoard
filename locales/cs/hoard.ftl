@@ -196,6 +196,9 @@ server-role-emissive = emise
 server-role-translucency = průsvitnost
 error-texture-suffix-missing = Zadejte příponu pro mapy typu { $map }
 error-texture-suffix-chars = Přípona pro mapy typu { $map } nemůže obsahovat < > : " / \ | ? ani *
+error-texture-ending-missing = Každá vlastní koncovka potřebuje koncovku, kterou má hledat
+error-texture-ending-chars = Vlastní koncovky nemohou obsahovat < > : " / \ | ? ani *
+error-texture-ending-twice = { $ending } je ve vašich koncovkách dvakrát
 error-oauth-no-client-id = V tomto odkazu chybí client_id.
 error-oauth-unknown-app = Tato aplikace tu není (už) registrovaná. Zahajte připojení znovu z aplikace.
 error-oauth-redirect = Aplikace požádala o návrat na adresu, kterou nezaregistrovala.
@@ -1959,6 +1962,26 @@ texnames-placeholders = Vzor může používat { "{" }name{ "}" }, { "{" }map{ "
 texnames-bad-characters = Názvy nemohou obsahovat < > : " / \ | ? ani *
 texnames-no-suffix = Zadejte příponu pro mapy typu { $role }
 texnames-bad-suffix = Přípona pro mapy typu { $role } nemůže obsahovat < > : " / \ | ? ani *
+texnames-slot-no-suffix = Zadejte příponu pro „{ $slot }“
+texnames-slot-bad-suffix = Přípona pro „{ $slot }“ nemůže obsahovat < > : " / \ | ? ani *
+texnames-ending-missing = Každá vlastní koncovka potřebuje koncovku, kterou má hledat
+texnames-ending-bad = Vlastní koncovky nemohou obsahovat < > : " / \ | ? ani *
+texnames-ending-twice = { $ending } je ve vašich koncovkách dvakrát
+texnames-slot-metallic-roughness = Kov a drsnost
+texnames-slot-specular-color = Barva spekulárního odrazu
+texnames-slot-specular-glossiness = Spekulární odraz a lesk
+texnames-slot-clearcoat = Lak
+texnames-slot-clearcoat-roughness = Drsnost laku
+texnames-slot-clearcoat-normal = Normála laku
+texnames-slot-sheen-color = Barva sametového lesku
+texnames-slot-sheen-roughness = Drsnost sametového lesku
+texnames-slot-transmission = Propustnost
+texnames-slot-thickness = Tloušťka
+texnames-slot-diffuse-transmission = Difuzní propustnost
+texnames-slot-diffuse-transmission-color = Barva difuzní propustnosti
+texnames-slot-iridescence = Irizace
+texnames-slot-iridescence-thickness = Tloušťka irizace
+texnames-slot-anisotropy = Anizotropie
 
 ## storeFormats.ts
 
@@ -2492,6 +2515,16 @@ settings-tn-hint-map = { " " }k čemu mapa slouží,{ " " }
 settings-tn-hint-size = { " " }její velikost, když sada existuje ve více velikostech (přidá se na konec, pokud ji vzor vynechá).
 settings-tn-example = Příklad
 settings-tn-suffixes = Přípony pro jednotlivé druhy map
+settings-tn-slots = Při stahování GLB dostane textura zabalená uvnitř modelu bez vlastního souboru název podle materiálu a slotu, který vyplňuje, a i tyto sloty mají přípony:
+settings-tn-endings = Vlastní koncovky
+settings-tn-endings-what = Textura, která není žádnou z map materiálu, si ponechá svůj název, pokud nekončí jednou z těchto koncovek: _diff → _BC odešle rock_diff.png jako rock_BC.png. Nechte druhé pole prázdné, chcete-li koncovku odstranit.
+settings-tn-ending-from = Koncovka
+settings-tn-ending-from-example = _diff
+settings-tn-ending-to = Nahradit za
+settings-tn-ending-to-example = _BC
+settings-tn-ending-add = Přidat koncovku
+settings-tn-ending-remove = Odebrat
+settings-tn-ending-remove-label = Odebrat { $ending }
 
 ## SettingsPage.vue: Obecné a Připojení
 

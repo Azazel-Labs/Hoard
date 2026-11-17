@@ -22,8 +22,8 @@ pub(crate) type Names = BTreeMap<[u8; 32], String>;
 pub(crate) type Found = BTreeMap<[u8; 32], PathBuf>;
 
 /// [`Names`] for the files in `found`: a map of the pack (in `maps`, by its path under `root`) by the convention,
-/// any other file by its own name.
-pub(crate) fn names_of(found: Found, root: &Path, maps: &BTreeMap<String, String>) -> Names {
+/// any other file by its own name, with an ending of your own swapped (`convention`).
+pub(crate) fn names_of(found: Found, root: &Path, maps: &BTreeMap<String, String>, convention: &TextureNames) -> Names {
     let named = |file: &Path| {
         let rel = file.strip_prefix(root).ok()?;
         let rel: Vec<String> = rel.components().map(|c| c.as_os_str().to_string_lossy().into_owned()).collect();
@@ -32,10 +32,19 @@ pub(crate) fn names_of(found: Found, root: &Path, maps: &BTreeMap<String, String
     found
         .into_iter()
         .filter_map(|(hash, file)| {
-            let stem = named(&file).or_else(|| Some(file.file_stem()?.to_string_lossy().into_owned()))?;
+            let stem = match named(&file) {
+                Some(stem) => stem,
+                None => own_name(&file.file_stem()?.to_string_lossy(), convention),
+            };
             Some((hash, stem))
         })
         .collect()
+}
+
+/// A texture's own name as it goes out: with an ending of your own swapped, when naming is on and one fits.
+fn own_name(name: &str, convention: &TextureNames) -> String {
+    let renamed = convention.on.then(|| convention.rename_ending(name)).flatten();
+    renamed.unwrap_or_else(|| name.to_owned())
 }
 
 /// A model as a GLB whose images are files in [`TEXTURES`], each named once.
@@ -68,7 +77,9 @@ pub(crate) fn split(glb: &[u8], facing: Facing, stem: &str, names: &Names, conve
             let ext = image_ext(obj.get("mimeType").and_then(Value::as_str), bytes);
             let file = names.get(blake3::hash(bytes).as_bytes()).map(String::as_str);
             let own = obj.get("name").and_then(Value::as_str).filter(|n| !generic(n));
-            let base = file.or(own).or(slots.get(&i).map(String::as_str)).map(clean).filter(|n| !n.is_empty());
+            let own = own.map(|n| own_name(n, convention));
+            let base = file.or(own.as_deref()).or(slots.get(&i).map(String::as_str));
+            let base = base.map(clean).filter(|n| !n.is_empty());
             let base = base.unwrap_or_else(|| format!("{}_{i}", clean(stem)));
             let name = place(&mut textures, &base, ext, bytes);
             obj.remove("bufferView");
@@ -95,8 +106,8 @@ pub(crate) fn split(glb: &[u8], facing: Facing, stem: &str, names: &Names, conve
 
 /// A name for each image a material uses, by image: the material's name (the model's `stem` when it has none) and
 /// the slot it fills, named by the `convention` as Hoard names maps (`Wood_BaseColor`, `Wood_AO`). Metal and
-/// roughness packed with occlusion in one image is `ORM`; a slot that isn't one of the roles is called by its own
-/// name (`ClearcoatNormal`). An image in several slots takes the first.
+/// roughness packed with occlusion in one image is `ORM`; a slot that isn't one of the roles takes its suffix from
+/// [`crate::naming::SLOTS`] (`ClearcoatNormal`), or its own name. An image in several slots takes the first.
 fn slot_names(doc: &Map<String, Value>, stem: &str, convention: &TextureNames) -> BTreeMap<usize, String> {
     use crate::materials::Role;
     let list = |key: &str| doc.get(key).and_then(Value::as_array).map_or(&[][..], Vec::as_slice);
@@ -130,7 +141,10 @@ fn slot_names(doc: &Map<String, Value>, stem: &str, convention: &TextureNames) -
             };
             out.entry(img).or_insert_with(|| match role {
                 Some(r) => convention.stem(name, r, None),
-                None => convention.stem_with(name, &(key[..1].to_ascii_uppercase() + &key[1..]), None),
+                None => match crate::naming::SLOTS.iter().find(|s| s.gltf == key) {
+                    Some(s) => convention.stem_with(name, convention.slot_suffix(s), None),
+                    None => convention.stem_with(name, &(key[..1].to_ascii_uppercase() + &key[1..]), None),
+                },
             });
         }
     }
@@ -508,8 +522,13 @@ mod tests {
         // A slot that isn't a role keeps its own suffix, in the pattern.
         let coat = json!({ "name": "Paint",
                            "extensions": { "KHR_materials_clearcoat": { "clearcoatTexture": { "index": 0 } } } });
-        let s = split(&unnamed(coat), Facing::default(), "Crate", &Names::new(), &convention).unwrap();
+        let s = split(&unnamed(coat.clone()), Facing::default(), "Crate", &Names::new(), &convention).unwrap();
         assert_eq!(s.textures[0].0, "T_Paint_Clearcoat.png");
+        // ...unless Settings gives the slot one.
+        let convention =
+            TextureNames { maps: BTreeMap::from([("clearcoat".to_owned(), "CC".to_owned())]), ..convention };
+        let s = split(&unnamed(coat), Facing::default(), "Crate", &Names::new(), &convention).unwrap();
+        assert_eq!(s.textures[0].0, "T_Paint_CC.png");
     }
 
     #[test]
@@ -521,7 +540,16 @@ mod tests {
             ([3; 32], PathBuf::from("elsewhere/leaf.png")),
         ]);
         let maps = BTreeMap::from([("tex/wood_diff_4k.png".to_owned(), "Wood_BC".to_owned())]);
-        let names = names_of(found, root, &maps);
+        let names = names_of(found.clone(), root, &maps, &TextureNames::default());
+        assert_eq!(names.values().collect::<Vec<_>>(), ["Wood_BC", "bark", "leaf"]);
+
+        // An ending of your own, on the files that aren't maps; not when naming is off.
+        let ending = crate::naming::Ending { from: "f".into(), to: "f_BC".into() };
+        let endings = TextureNames { endings: vec![ending], ..TextureNames::default() };
+        let names = names_of(found.clone(), root, &maps, &endings);
+        assert_eq!(names.values().collect::<Vec<_>>(), ["Wood_BC", "bark", "leaf_BC"]);
+        let off = TextureNames { on: false, ..endings };
+        let names = names_of(found, root, &maps, &off);
         assert_eq!(names.values().collect::<Vec<_>>(), ["Wood_BC", "bark", "leaf"]);
     }
 

@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "a291e71b8315a85b796b394cd1cc26d480ac8ecd3bf12b797cf6319c57ccb07e"
+source = "140db2eb73736ff39922ac317725317468b02f342ce455ff2967c4a2f3b7a920"
 translation = "8d9ccd00d7a48e165bb0fba20cf5559e2b3c83fd67e4695b2578383ddd6588b7"
 
 [messages.account-add]
@@ -3824,6 +3824,18 @@ translation = "검색할 내용이 없습니다. 팩 이름을 입력하세요"
 [messages.error-task-running]
 source = "“{ $task }” is already running"
 translation = "“{ $task }” 작업이 이미 실행 중입니다"
+
+[messages.error-texture-ending-chars]
+source = '''Endings of your own can't have < > : " / \ | ? or *'''
+translation = '직접 지정한 끝부분에는 < > : " / \ | ? * 를 쓸 수 없습니다'
+
+[messages.error-texture-ending-missing]
+source = "Each ending of your own needs the ending to look for"
+translation = "직접 지정한 끝부분마다 찾을 끝부분을 입력해야 합니다"
+
+[messages.error-texture-ending-twice]
+source = "{ $ending } is in your endings twice"
+translation = "{ $ending }이(가) 끝부분 목록에 두 번 있습니다"
 
 [messages.error-texture-map-type]
 source = "There's no map type called { $role }"
@@ -8490,6 +8502,42 @@ translation = "직접 지정"
 source = "Descriptive"
 translation = "설명형"
 
+[messages.settings-tn-ending-add]
+source = "Add an ending"
+translation = "끝부분 추가"
+
+[messages.settings-tn-ending-from]
+source = "Ending"
+translation = "끝부분"
+
+[messages.settings-tn-ending-from-example]
+source = "_diff"
+translation = "_diff"
+
+[messages.settings-tn-ending-remove]
+source = "Remove"
+translation = "제거"
+
+[messages.settings-tn-ending-remove-label]
+source = "Remove { $ending }"
+translation = "{ $ending } 제거"
+
+[messages.settings-tn-ending-to]
+source = "Swap for"
+translation = "바꿀 내용"
+
+[messages.settings-tn-ending-to-example]
+source = "_BC"
+translation = "_BC"
+
+[messages.settings-tn-endings]
+source = "Endings of your own"
+translation = "직접 지정한 끝부분"
+
+[messages.settings-tn-endings-what]
+source = "A texture that isn’t one of a material’s maps keeps its own name, unless it ends in one of these: _diff → _BC sends rock_diff.png as rock_BC.png. Leave the second empty to drop the ending."
+translation = "머티리얼의 맵이 아닌 텍스처는 원래 이름을 유지하지만, 다음 중 하나로 끝나면 바뀝니다. _diff → _BC는 rock_diff.png를 rock_BC.png로 보냅니다. 두 번째 칸을 비워 두면 끝부분을 없앱니다."
+
 [messages.settings-tn-example]
 source = "Example"
 translation = "예시"
@@ -8521,6 +8569,10 @@ translation = "텍스처 이름을 저장했습니다"
 [messages.settings-tn-short]
 source = "Short"
 translation = "짧게"
+
+[messages.settings-tn-slots]
+source = "In GLB downloads, a texture packed inside a model with no file of its own is named after the material and the slot it fills, and these slots have suffixes too:"
+translation = "GLB 다운로드에서 자체 파일 없이 모델 안에 들어 있는 텍스처는 머티리얼과 그 텍스처가 채우는 슬롯에 따라 이름이 붙으며, 이 슬롯에도 접미사가 있습니다:"
 
 [messages.settings-tn-style]
 source = "Style"
@@ -9441,6 +9493,18 @@ translation = '이름에는 < > : " / \ | ? * 를 쓸 수 없습니다'
 source = 'The suffix for { $role } maps can’t have < > : " / \ | ? or *'
 translation = '{ $role } 맵의 접미사에는 < > : " / \ | ? * 를 쓸 수 없습니다'
 
+[messages.texnames-ending-bad]
+source = 'Endings of your own can’t have < > : " / \ | ? or *'
+translation = '직접 지정한 끝부분에는 < > : " / \ | ? * 를 쓸 수 없습니다'
+
+[messages.texnames-ending-missing]
+source = "Each ending of your own needs the ending to look for"
+translation = "직접 지정한 끝부분마다 찾을 끝부분을 입력해야 합니다"
+
+[messages.texnames-ending-twice]
+source = "{ $ending } is in your endings twice"
+translation = "{ $ending }이(가) 끝부분 목록에 두 번 있습니다"
+
 [messages.texnames-needs-map]
 source = 'The pattern needs { "{" }map{ "}" }, or every map of a material would get the same name'
 translation = '패턴에는 { "{" }map{ "}" }이 있어야 합니다. 그렇지 않으면 머티리얼의 모든 맵이 같은 이름을 갖게 됩니다'
@@ -9452,6 +9516,74 @@ translation = "{ $role } 맵에 접미사를 지정하세요"
 [messages.texnames-placeholders]
 source = 'The pattern can use { "{" }name{ "}" }, { "{" }map{ "}" } and { "{" }size{ "}" }'
 translation = '패턴에는 { "{" }name{ "}" }, { "{" }map{ "}" }, { "{" }size{ "}" }를 사용할 수 있습니다'
+
+[messages.texnames-slot-anisotropy]
+source = "Anisotropy"
+translation = "이방성"
+
+[messages.texnames-slot-bad-suffix]
+source = 'The suffix for “{ $slot }” can’t have < > : " / \ | ? or *'
+translation = '“{ $slot }”의 접미사에는 < > : " / \ | ? * 를 쓸 수 없습니다'
+
+[messages.texnames-slot-clearcoat]
+source = "Clearcoat"
+translation = "클리어코트"
+
+[messages.texnames-slot-clearcoat-normal]
+source = "Clearcoat normal"
+translation = "클리어코트 노멀"
+
+[messages.texnames-slot-clearcoat-roughness]
+source = "Clearcoat roughness"
+translation = "클리어코트 러프니스"
+
+[messages.texnames-slot-diffuse-transmission]
+source = "Diffuse transmission"
+translation = "확산 투과"
+
+[messages.texnames-slot-diffuse-transmission-color]
+source = "Diffuse transmission color"
+translation = "확산 투과 색상"
+
+[messages.texnames-slot-iridescence]
+source = "Iridescence"
+translation = "이리데선스"
+
+[messages.texnames-slot-iridescence-thickness]
+source = "Iridescence thickness"
+translation = "이리데선스 두께"
+
+[messages.texnames-slot-metallic-roughness]
+source = "Metal and roughness"
+translation = "메탈과 러프니스"
+
+[messages.texnames-slot-no-suffix]
+source = "Give “{ $slot }” a suffix"
+translation = "“{ $slot }”에 접미사를 지정하세요"
+
+[messages.texnames-slot-sheen-color]
+source = "Sheen color"
+translation = "광택 색상"
+
+[messages.texnames-slot-sheen-roughness]
+source = "Sheen roughness"
+translation = "광택 러프니스"
+
+[messages.texnames-slot-specular-color]
+source = "Specular color"
+translation = "스페큘러 색상"
+
+[messages.texnames-slot-specular-glossiness]
+source = "Specular and glossiness"
+translation = "스페큘러와 글로시니스"
+
+[messages.texnames-slot-thickness]
+source = "Thickness"
+translation = "두께"
+
+[messages.texnames-slot-transmission]
+source = "Transmission"
+translation = "투과"
 
 [messages.text-binary]
 source = "This file is binary, not text, so there's nothing to read here. Download it to open it in its own tool."

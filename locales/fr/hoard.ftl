@@ -196,6 +196,9 @@ server-role-emissive = émission
 server-role-translucency = translucidité
 error-texture-suffix-missing = Donnez un suffixe aux cartes de type { $map }
 error-texture-suffix-chars = Le suffixe des cartes de type { $map } ne peut pas contenir < > : " / \ | ? ou *
+error-texture-ending-missing = Chaque terminaison personnalisée doit indiquer la terminaison à rechercher
+error-texture-ending-chars = Les terminaisons personnalisées ne peuvent pas contenir < > : " / \ | ? ou *
+error-texture-ending-twice = { $ending } figure deux fois dans vos terminaisons
 error-oauth-no-client-id = Ce lien n’a pas de client_id.
 error-oauth-unknown-app = Cette application n’est pas (ou plus) enregistrée ici. Relancez la connexion depuis l’application.
 error-oauth-redirect = L’application a demandé à être renvoyée vers une adresse qu’elle n’a pas enregistrée.
@@ -1847,6 +1850,26 @@ texnames-placeholders = Le modèle peut utiliser { "{" }name{ "}" }, { "{" }map{
 texnames-bad-characters = Les noms ne peuvent pas contenir < > : " / \ | ? ou *
 texnames-no-suffix = Donnez un suffixe aux cartes { $role }
 texnames-bad-suffix = Le suffixe des cartes { $role } ne peut pas contenir < > : " / \ | ? ou *
+texnames-slot-no-suffix = Donnez un suffixe à « { $slot } »
+texnames-slot-bad-suffix = Le suffixe de « { $slot } » ne peut pas contenir < > : " / \ | ? ou *
+texnames-ending-missing = Chaque terminaison personnalisée doit indiquer la terminaison à rechercher
+texnames-ending-bad = Les terminaisons personnalisées ne peuvent pas contenir < > : " / \ | ? ou *
+texnames-ending-twice = { $ending } figure deux fois dans vos terminaisons
+texnames-slot-metallic-roughness = Métal et rugosité
+texnames-slot-specular-color = Couleur spéculaire
+texnames-slot-specular-glossiness = Spéculaire et brillance
+texnames-slot-clearcoat = Vernis
+texnames-slot-clearcoat-roughness = Rugosité du vernis
+texnames-slot-clearcoat-normal = Normale du vernis
+texnames-slot-sheen-color = Couleur du lustre
+texnames-slot-sheen-roughness = Rugosité du lustre
+texnames-slot-transmission = Transmission
+texnames-slot-thickness = Épaisseur
+texnames-slot-diffuse-transmission = Transmission diffuse
+texnames-slot-diffuse-transmission-color = Couleur de transmission diffuse
+texnames-slot-iridescence = Irisation
+texnames-slot-iridescence-thickness = Épaisseur d’irisation
+texnames-slot-anisotropy = Anisotropie
 
 ## storeFormats.ts
 
@@ -2344,6 +2367,16 @@ settings-tn-hint-map = { " " }le rôle de la carte,{ " " }
 settings-tn-hint-size = { " " }sa taille quand le jeu existe en plusieurs (ajoutée à la fin si le modèle de nom l’omet).
 settings-tn-example = Exemple
 settings-tn-suffixes = Suffixes pour chaque type de carte
+settings-tn-slots = Dans les téléchargements GLB, une texture intégrée à un modèle sans fichier propre est nommée d’après le matériau et l’emplacement qu’elle occupe, et ces emplacements ont aussi des suffixes :
+settings-tn-endings = Terminaisons personnalisées
+settings-tn-endings-what = Une texture qui n’est pas l’une des cartes d’un matériau garde son propre nom, sauf s’il se termine par l’une de celles-ci : _diff → _BC envoie rock_diff.png sous le nom rock_BC.png. Laissez la seconde vide pour supprimer la terminaison.
+settings-tn-ending-from = Terminaison
+settings-tn-ending-from-example = _diff
+settings-tn-ending-to = Remplacer par
+settings-tn-ending-to-example = _BC
+settings-tn-ending-add = Ajouter une terminaison
+settings-tn-ending-remove = Retirer
+settings-tn-ending-remove-label = Retirer { $ending }
 
 ## SettingsPage.vue : Général et Connexion
 

@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "a291e71b8315a85b796b394cd1cc26d480ac8ecd3bf12b797cf6319c57ccb07e"
+source = "140db2eb73736ff39922ac317725317468b02f342ce455ff2967c4a2f3b7a920"
 translation = "30e8f29d5a5413b518bc3d4463f4fe90103622d446d3a937f1fa04d45817b813"
 
 [messages.account-add]
@@ -3928,6 +3928,18 @@ translation = "нема шта да се тражи; унесите назив �
 [messages.error-task-running]
 source = "“{ $task }” is already running"
 translation = "„{ $task }“ је већ покренут"
+
+[messages.error-texture-ending-chars]
+source = '''Endings of your own can't have < > : " / \ | ? or *'''
+translation = 'Ваши завршеци не могу да садрже < > : " / \ | ? или *'
+
+[messages.error-texture-ending-missing]
+source = "Each ending of your own needs the ending to look for"
+translation = "Сваки ваш завршетак мора да наведе завршетак који се тражи"
+
+[messages.error-texture-ending-twice]
+source = "{ $ending } is in your endings twice"
+translation = "{ $ending } се двапут налази у вашим завршецима"
 
 [messages.error-texture-map-type]
 source = "There's no map type called { $role }"
@@ -8756,6 +8768,42 @@ translation = "Ваш"
 source = "Descriptive"
 translation = "Описни"
 
+[messages.settings-tn-ending-add]
+source = "Add an ending"
+translation = "Додај завршетак"
+
+[messages.settings-tn-ending-from]
+source = "Ending"
+translation = "Завршетак"
+
+[messages.settings-tn-ending-from-example]
+source = "_diff"
+translation = "_diff"
+
+[messages.settings-tn-ending-remove]
+source = "Remove"
+translation = "Уклони"
+
+[messages.settings-tn-ending-remove-label]
+source = "Remove { $ending }"
+translation = "Уклони { $ending }"
+
+[messages.settings-tn-ending-to]
+source = "Swap for"
+translation = "Замени са"
+
+[messages.settings-tn-ending-to-example]
+source = "_BC"
+translation = "_BC"
+
+[messages.settings-tn-endings]
+source = "Endings of your own"
+translation = "Ваши завршеци"
+
+[messages.settings-tn-endings-what]
+source = "A texture that isn’t one of a material’s maps keeps its own name, unless it ends in one of these: _diff → _BC sends rock_diff.png as rock_BC.png. Leave the second empty to drop the ending."
+translation = "Текстура која није једна од мапа материјала задржава свој назив, осим ако се завршава једним од ових: _diff → _BC шаље rock_diff.png као rock_BC.png. Оставите друго поље празно да бисте уклонили завршетак."
+
 [messages.settings-tn-example]
 source = "Example"
 translation = "Пример"
@@ -8787,6 +8835,10 @@ translation = "Називи текстура су сачувани"
 [messages.settings-tn-short]
 source = "Short"
 translation = "Кратки"
+
+[messages.settings-tn-slots]
+source = "In GLB downloads, a texture packed inside a model with no file of its own is named after the material and the slot it fills, and these slots have suffixes too:"
+translation = "У GLB преузимањима, текстура упакована у модел без сопствене датотеке добија назив по материјалу и слоту који попуњава, а и ти слотови имају суфиксе:"
 
 [messages.settings-tn-style]
 source = "Style"
@@ -9752,6 +9804,18 @@ translation = 'Називи не могу да садрже < > : " / \ | ? ил
 source = 'The suffix for { $role } maps can’t have < > : " / \ | ? or *'
 translation = 'Суфикс за мапе типа { $role } не може да садржи < > : " / \ | ? или *'
 
+[messages.texnames-ending-bad]
+source = 'Endings of your own can’t have < > : " / \ | ? or *'
+translation = 'Ваши завршеци не могу да садрже < > : " / \ | ? или *'
+
+[messages.texnames-ending-missing]
+source = "Each ending of your own needs the ending to look for"
+translation = "Сваки ваш завршетак мора да наведе завршетак који се тражи"
+
+[messages.texnames-ending-twice]
+source = "{ $ending } is in your endings twice"
+translation = "{ $ending } се двапут налази у вашим завршецима"
+
 [messages.texnames-needs-map]
 source = 'The pattern needs { "{" }map{ "}" }, or every map of a material would get the same name'
 translation = 'Шаблон мора да садржи { "{" }map{ "}" }, иначе би све мапе једног материјала добиле исти назив'
@@ -9763,6 +9827,74 @@ translation = "Дајте суфикс мапама типа { $role }"
 [messages.texnames-placeholders]
 source = 'The pattern can use { "{" }name{ "}" }, { "{" }map{ "}" } and { "{" }size{ "}" }'
 translation = 'Шаблон може да користи { "{" }name{ "}" }, { "{" }map{ "}" } и { "{" }size{ "}" }'
+
+[messages.texnames-slot-anisotropy]
+source = "Anisotropy"
+translation = "Анизотропија"
+
+[messages.texnames-slot-bad-suffix]
+source = 'The suffix for “{ $slot }” can’t have < > : " / \ | ? or *'
+translation = 'Суфикс за „{ $slot }“ не може да садржи < > : " / \ | ? или *'
+
+[messages.texnames-slot-clearcoat]
+source = "Clearcoat"
+translation = "Лак"
+
+[messages.texnames-slot-clearcoat-normal]
+source = "Clearcoat normal"
+translation = "Нормала лака"
+
+[messages.texnames-slot-clearcoat-roughness]
+source = "Clearcoat roughness"
+translation = "Храпавост лака"
+
+[messages.texnames-slot-diffuse-transmission]
+source = "Diffuse transmission"
+translation = "Дифузна трансмисија"
+
+[messages.texnames-slot-diffuse-transmission-color]
+source = "Diffuse transmission color"
+translation = "Боја дифузне трансмисије"
+
+[messages.texnames-slot-iridescence]
+source = "Iridescence"
+translation = "Иридесценција"
+
+[messages.texnames-slot-iridescence-thickness]
+source = "Iridescence thickness"
+translation = "Дебљина иридесценције"
+
+[messages.texnames-slot-metallic-roughness]
+source = "Metal and roughness"
+translation = "Металност и храпавост"
+
+[messages.texnames-slot-no-suffix]
+source = "Give “{ $slot }” a suffix"
+translation = "Дајте суфикс за „{ $slot }“"
+
+[messages.texnames-slot-sheen-color]
+source = "Sheen color"
+translation = "Боја сатенског сјаја"
+
+[messages.texnames-slot-sheen-roughness]
+source = "Sheen roughness"
+translation = "Храпавост сатенског сјаја"
+
+[messages.texnames-slot-specular-color]
+source = "Specular color"
+translation = "Боја спекулара"
+
+[messages.texnames-slot-specular-glossiness]
+source = "Specular and glossiness"
+translation = "Спекулар и сјај"
+
+[messages.texnames-slot-thickness]
+source = "Thickness"
+translation = "Дебљина"
+
+[messages.texnames-slot-transmission]
+source = "Transmission"
+translation = "Трансмисија"
 
 [messages.text-binary]
 source = "This file is binary, not text, so there's nothing to read here. Download it to open it in its own tool."

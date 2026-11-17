@@ -1237,11 +1237,11 @@ wgpu thumbnails on lavapipe; link discovery and bundle zips; `hoard sync` includ
 portal including the three.js viewer on its WebGL2 fallback; and source-format previews and links, checked against
 spec-built .blend (raw and zstd), PSD, Krita and EXR files. These were generated from the formats' specs, not saved
 by Blender, Photoshop or Krita. USD reading was checked against Poly Haven's USDC models (with their textures,
-and packed as a `.usdz`) and ambientCG's material-only USDC.
+and packed as a `.usdz`) and ambientCG's material-only USDC. .blend reading, including Blender 5.0's new header,
+was also checked against the 18 .blend files that ship with Blender 5.0.1 (saved by Blender 4.3 to 5.0, all zstd).
 
-Written but not yet run against the real thing: files saved by real Blender/Photoshop/Krita (please throw some
-at it), Blender 5.0's new .blend header, Blender conversion, Garage/RustFS specifically, Cloudflare Tunnel/Access,
-and LLM vision mode.
+Written but not yet run against the real thing: files saved by real Photoshop/Krita (please throw some at it),
+Blender conversion, Garage/RustFS specifically, Cloudflare Tunnel/Access, and LLM vision mode.
 
 Also exercised: resumable browser and CLI imports of 1.1 GB with an interrupted, resumed run and duplicate refusal;
 HTTPS with HTTP/2 and HTTP/3 in Chrome (page, thumbnails and uploads over h3); WAV library metadata, variant

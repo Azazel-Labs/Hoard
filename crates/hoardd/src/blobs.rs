@@ -83,6 +83,8 @@ pub(crate) struct Managed {
     catch_all: bool,
     remote: bool,
     label: String,
+    /// The folder, for a location on this machine.
+    dir: Option<PathBuf>,
 }
 
 impl Libraries {
@@ -224,6 +226,7 @@ impl BlobStore {
                         catch_all: l.catch_all,
                         remote,
                         label: describe(&self.cfg, &l.path),
+                        dir: s3_bucket(&l.path).is_none().then(|| PathBuf::from(&l.path)),
                     }),
                     Err(e) => {
                         tracing::warn!(location = %l.name, error = %e, "can't open this library location; skipping it");
@@ -311,12 +314,22 @@ impl BlobStore {
 
     /// Upload a local file (streamed, multipart for big files) to the location that takes its kind. Skips the
     /// upload if any managed location already has the blob, which is what makes re-uploading the same pack cheap.
+    ///
+    /// A folder on the same disk as the file gets a hard link to it instead of a copy, so an unpacked upload's
+    /// files are each written once: making 100,000 small files is what takes the time, and on Windows each new one
+    /// is scanned. The file must not change afterwards, which an unpacked upload's don't: they're deleted once
+    /// they're in.
     pub(crate) async fn put_file(&self, path: &FsPath, blob: &StoredBlob, kind: AssetKind) -> Result<()> {
         let libs = self.libs();
         if libs.holds(&blob.hash).await? {
             return Ok(());
         }
         let (target, _writing) = self.claim(&libs, kind).with_context(no_library)?;
+        if let Some(dir) = &target.dir
+            && link_into(dir, path, &blob.hash).await
+        {
+            return Ok(());
+        }
         write_file(&target.store, path, &key(&blob.hash)).await
     }
 
@@ -524,6 +537,18 @@ async fn write_file(store: &Arc<dyn ObjectStore>, path: &FsPath, to: &Path) -> R
     Ok(())
 }
 
+/// Hard-link `path` into the folder location `dir` as the blob `hash`. False when it can't be (another disk, a file
+/// system without hard links, a link already there), and the caller copies instead.
+async fn link_into(dir: &FsPath, path: &FsPath, hash: &str) -> bool {
+    let to = dir.join(&hash[0..2]).join(&hash[2..4]).join(hash);
+    let from = path.to_path_buf();
+    tokio::task::spawn_blocking(move || {
+        to.parent().is_some_and(|p| std::fs::create_dir_all(p).is_ok()) && std::fs::hard_link(&from, &to).is_ok()
+    })
+    .await
+    .unwrap_or(false)
+}
+
 pub(crate) async fn exists_in(store: &dyn ObjectStore, hash: &str) -> Result<bool> {
     match store.head(&key(hash)).await {
         Ok(_) => Ok(true),
@@ -598,5 +623,27 @@ pub(crate) mod tests {
         blobs.delete(&sound.hash).await.unwrap();
         assert_eq!(blobs.verify(&thumb.hash).await.unwrap(), None);
         assert_eq!(blobs.verify(&sound.hash).await.unwrap(), None);
+    }
+
+    #[tokio::test]
+    async fn an_unpacked_file_is_linked_into_a_folder_on_the_same_disk_not_copied() {
+        let dir = tempfile::tempdir().unwrap();
+        let (cfg, pool) = setup(dir.path());
+        add(&pool, dir.path(), "library", &[], true);
+        let blobs = BlobStore::open(&cfg, pool).unwrap();
+        let staged = dir.path().join("staged.png");
+        std::fs::write(&staged, b"unpacked once").unwrap();
+        let blob = BlobStore::hash_file(&staged).unwrap();
+        blobs.put_file(&staged, &blob, AssetKind::Texture).await.unwrap();
+        assert!(on_disk(dir.path(), "library", &blob.hash));
+        #[cfg(unix)]
+        {
+            use std::os::unix::fs::MetadataExt as _;
+            assert_eq!(std::fs::metadata(&staged).unwrap().nlink(), 2);
+        }
+        // The unpacked file goes once it's in; the library's stays.
+        std::fs::remove_file(&staged).unwrap();
+        assert_eq!(&blobs.read_all(&blob.hash).await.unwrap()[..], b"unpacked once");
+        assert_eq!(blobs.verify(&blob.hash).await.unwrap(), Some(true));
     }
 }

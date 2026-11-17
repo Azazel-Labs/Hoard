@@ -2,8 +2,9 @@
 //! priority, so requests are always served first even while a pack ingests on every core. Threads and child
 //! processes (ffmpeg, Blender) started from a heavy thread inherit its priority.
 //!
-//! Priority is lowered on Linux, per thread. Elsewhere heavy work still runs off the request threads, at normal
-//! priority.
+//! On Linux the thread's nice value is raised. On Windows the thread runs below normal, and external programs are
+//! started in the below-normal priority class, since a Windows child doesn't take its priority from the thread that
+//! started it. Elsewhere heavy work still runs off the request threads, at normal priority.
 
 use anyhow::{Result, bail};
 
@@ -20,7 +21,16 @@ pub(crate) fn lower_priority() {
             rustix::process::setpriority_process(Some(tid), NICE).ok();
         }
     }
+    #[cfg(windows)]
+    {
+        use thread_priority::{ThreadPriority, WinAPIThreadPriority, set_current_thread_priority};
+        set_current_thread_priority(ThreadPriority::Os(WinAPIThreadPriority::BelowNormal.into())).ok();
+    }
 }
+
+/// Windows' `BELOW_NORMAL_PRIORITY_CLASS`, for programs started from heavy work.
+#[cfg(windows)]
+const BELOW_NORMAL_PRIORITY_CLASS: u32 = 0x0000_4000;
 
 /// Run `f` on a new low-priority thread and wait for it without tying up the async runtime.
 pub(crate) async fn run<T, F>(name: &str, f: F) -> Result<T>
@@ -63,7 +73,24 @@ pub(crate) fn command(program: impl AsRef<std::ffi::OsStr>) -> tokio::process::C
         }
         None => tokio::process::Command::new(program),
     };
+    #[cfg(windows)]
+    cmd.creation_flags(BELOW_NORMAL_PRIORITY_CLASS);
     cmd.kill_on_drop(true);
+    cmd
+}
+
+/// [`command`] for code that waits on the program from a thread rather than a future.
+pub(crate) fn blocking_command(program: impl AsRef<std::ffi::OsStr>) -> std::process::Command {
+    let mut cmd = match nice_path() {
+        Some(nice) => {
+            let mut c = std::process::Command::new(nice);
+            c.arg("-n").arg(NICE.to_string()).arg(program);
+            c
+        }
+        None => std::process::Command::new(program),
+    };
+    #[cfg(windows)]
+    std::os::windows::process::CommandExt::creation_flags(&mut cmd, BELOW_NORMAL_PRIORITY_CLASS);
     cmd
 }
 
@@ -92,6 +119,12 @@ mod tests {
         {
             let nice = run("test", || rustix::process::getpriority_process(Some(rustix::thread::gettid())).unwrap());
             assert!(nice.await.unwrap() >= NICE);
+        }
+        #[cfg(windows)]
+        {
+            use thread_priority::{ThreadPriority, WinAPIThreadPriority, get_current_thread_priority};
+            let below = ThreadPriority::Os(WinAPIThreadPriority::BelowNormal.into());
+            assert_eq!(run("test", get_current_thread_priority).await.unwrap().unwrap(), below);
         }
         assert!(run("boom", || panic!("x")).await.is_err());
     }

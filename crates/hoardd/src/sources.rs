@@ -163,7 +163,17 @@ pub(crate) fn read_blend(path: &Path, scan_paths: bool) -> Result<BlendInfo> {
             [b'I', b'M', 0, 0] | [b'L', b'I', 0, 0] if scan_paths && len <= 64 << 10 => {
                 let data = r.vec(len as usize)?;
                 let is_lib = code[0] == b'L';
-                for s in c_strings(&data) {
+                let mut strings = c_strings(&data);
+                // The block's own ID name, such as "IMrock.png" or "LIprops.blend", isn't a path.
+                if let Some(i) = strings.iter().position(|s| s.as_bytes().starts_with(&code[..2])) {
+                    strings.remove(i);
+                }
+                // Nor is the tail of an older, longer string left in a buffer, such as "ops.blend".
+                let tails: Vec<bool> = strings
+                    .iter()
+                    .map(|s| strings.iter().any(|o| o.len() > s.len() && o.ends_with(s.as_str())))
+                    .collect();
+                for (s, _) in strings.into_iter().zip(tails).filter(|(_, tail)| !tail) {
                     // Not Path::extension: on Windows, Blender's relative "//dir/file.png" parses as a UNC prefix.
                     let name = s.rsplit(['/', '\\']).next().unwrap_or(&s);
                     let ext = name.rsplit_once('.').map(|(_, e)| format!(".{}", e.to_lowercase()));
@@ -690,11 +700,12 @@ mod tests {
         }
         block(&mut out, b"TEST", &test);
         let mut im = vec![0u8; 16];
-        im.extend_from_slice(b"IMrock\0");
+        im.extend_from_slice(b"IMrock.png\0");
         im.extend_from_slice(b"//textures/rock_albedo.png\0");
         im.extend_from_slice(&[0u8; 32]);
         block(&mut out, &[b'I', b'M', 0, 0], &im);
-        block(&mut out, &[b'L', b'I', 0, 0], b"\0\0//../shared/props.blend\0\0");
+        // As Blender writes them: the ID name, the path, and what's left of a longer string after it.
+        block(&mut out, &[b'L', b'I', 0, 0], b"\0\0LIprops.blend\0\0//../shared/props.blend\0ops.blend\0\0");
         block(&mut out, b"ENDB", &[]);
         if compress { zstd::encode_all(&out[..], 3).unwrap() } else { out }
     }

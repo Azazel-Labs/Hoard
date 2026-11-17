@@ -115,3 +115,7 @@ lzma-rust2 = { version = "0.25", default-features = false, features = ["std", "x
 
 [target.'cfg(target_os = "linux")'.dependencies]
 rustix = { version = "1", features = ["process", "thread"] }
+
+# Lowering a heavy thread's priority on Windows needs a system call, and `unsafe` is forbidden here.
+[target.'cfg(windows)'.dependencies]
+thread-priority = "3.1"

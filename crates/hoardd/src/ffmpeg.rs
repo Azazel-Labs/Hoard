@@ -396,7 +396,7 @@ pub(crate) fn encode_wav(
 fn run(tool: &Tool, args: &[std::ffi::OsString], duration: Option<f64>, progress: &(dyn Fn(f32) + Sync)) -> Result<()> {
     // Generous: ffmpeg is far faster than real time, but the machine may be busy ingesting.
     let limit = Duration::from_secs_f64(duration.map_or(600.0, |d| (d * 2.0).clamp(120.0, 3600.0)));
-    let mut child = std::process::Command::new(&tool.path)
+    let mut child = crate::heavy::blocking_command(&tool.path)
         .args(args)
         .stdin(Stdio::null())
         .stdout(Stdio::piped())

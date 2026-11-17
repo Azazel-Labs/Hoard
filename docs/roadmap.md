@@ -38,20 +38,36 @@ tagging gets against the plan's weekly cap. Claude is harder (checked 2026-11-12
   thumbnails. Plan limits assume ordinary individual use, so tagging a large library this way may run into them.
   Policy: <https://code.claude.com/docs/en/legal-and-compliance>
 
-## Imports without the staging copy
+## Animations as their own thing
 
-An upload is unpacked into a staging folder, then each file is hashed and copied again into the library. For packs
-of many small files the cost is creating files, not reading them: the Kenney all-in-one (92,000 files in a 529 MB
-zip) took nine minutes just to unpack on Windows with Defender scanning each new file, where a plain single-threaded
-extract manages about 150 files a second on the same machine. Reading entries straight out of the archive into the
-library would create each file once instead of twice. Nested archives, and analysis that needs neighboring files
-(a model next to its textures), are what make it more than a small change.
+Animation packs often come as one file per animation, each a whole character: `Knight_Walk.blend`, `Knight_Run.blend`,
+`Knight_Idle.blend`, all the same rig and mesh with one action each. Hoard shows them as that many copies of the same
+model. Only `Knight@Run.fbx` naming and Unity/Unreal references link a clip to its model today.
 
-## Lower priority for heavy work on Windows
+The plan:
 
-Unpacking, analysis and thumbnail rendering run at a lower priority on Linux so the server and the machine stay
-responsive. On Windows they run at normal priority, because setting thread priority there needs a system call and
-the code base forbids `unsafe`. A small, well-kept crate (such as `thread-priority`) would do it.
+- **Read the rig and clips of every rigged model.** glTF has them, polysmelt reads FBX skins and takes into the same
+  form, and a .blend's are in the GLB Blender makes of it. For each file, keep:
+  - a fingerprint of the skeleton: its bone names, with prefixes like `mixamorig:` and `Armature|` taken off, and
+    which is whose parent
+  - a fingerprint of the mesh: vertex and triangle counts and bounds
+  - each clip's name, length and the bones it moves, and whether the root travels or it plays in place
+- **Decide what each file is, pack by pack.** Files with the same skeleton and mesh are one character. The one with
+  no clip, or else the one whose name is the others' common part (`Knight`), stays a model. The rest become
+  animations of it, linked as they are now. A file with a skeleton and clips but no mesh is already an animation.
+  A file with one mesh and many takes stays one model with its clips listed.
+- **Link across packs by skeleton.** An animation fits any character whose skeleton has the bones it moves (same
+  names once the prefixes are off), so a Mixamo clip fits every Mixamo character and an Unreal Mannequin clip every
+  Mannequin. Characters list "Animations that fit"; animations list "Characters it fits". The same pack comes first.
+- **Show them as animations.** An animation's details play it in a loop on its character, with a picker to put it
+  on any other character it fits; three.js plays a clip on any skinned mesh whose bones have the same names. Its
+  thumbnail is drawn mid-clip, not in the rest pose, so a grid of them isn't a grid of the same pose, and its tile
+  shows the length. A character's details list its animations, each played in the viewer when picked.
+- **Download them either way.** An animation comes with or without its character's mesh, and a character with or
+  without its animations, as `?animations=1` does now.
+
+Still open: how sure a mesh match has to be (the same character can be saved with different modifiers), and whether
+each clip in a many-take file should be an entry of its own in search.
 
 ## Ideas
 

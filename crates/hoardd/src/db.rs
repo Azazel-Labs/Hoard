@@ -584,6 +584,39 @@ const MIGRATIONS: &[&str] = &[
               strftime('%Y-%m-%dT%H:%M:%SZ', 'now'), strftime('%Y-%m-%dT%H:%M:%SZ', 'now')
        FROM packs p WHERE p.status = 'ingesting'
          AND NOT EXISTS (SELECT 1 FROM jobs j WHERE j.pack_id = p.id AND j.status IN ('queued', 'running'));",
+    // 58: a model whose file says it has no clips (or no skin) isn't tagged animated (or rigged) for its folders'
+    // names, as every hat in "Animated Characters Bundle" was.
+    "CREATE TEMP TABLE guessed AS
+       SELECT t.asset_id, t.tag FROM asset_tags t JOIN assets a ON a.id = t.asset_id
+        WHERE a.kind = 'model' AND t.source = 'rule'
+          AND ((t.tag = 'animated'
+                AND (json_type(a.meta, '$.animations') IS NOT NULL OR json_type(a.meta, '$.has_animation') IS NOT NULL)
+                AND COALESCE(json_extract(a.meta, '$.animations'), 0) = 0
+                AND COALESCE(json_extract(a.meta, '$.has_animation'), 0) = 0)
+            OR (t.tag = 'rigged'
+                AND (json_type(a.meta, '$.skins') IS NOT NULL OR json_type(a.meta, '$.has_deformers') IS NOT NULL)
+                AND COALESCE(json_extract(a.meta, '$.skins'), 0) = 0
+                AND COALESCE(json_extract(a.meta, '$.has_deformers'), 0) = 0));
+     DELETE FROM asset_tags WHERE (asset_id, tag) IN (SELECT asset_id, tag FROM guessed);
+     DELETE FROM assets_fts WHERE asset_id IN (SELECT asset_id FROM guessed);
+     INSERT INTO assets_fts (asset_id, name, words, category, description, tags)
+       SELECT a.id, a.name, a.words, COALESCE(a.category, ''),
+              concat_ws(' ', a.description, a.source_description, a.ai_description),
+              COALESCE((SELECT group_concat(replace(replace(tag, ':', ' '), '-', ' '), ' ')
+                        FROM asset_tags t WHERE t.asset_id = a.id), '')
+       FROM assets a WHERE a.id IN (SELECT DISTINCT asset_id FROM guessed);
+     DROP TABLE guessed;",
+    // 59: a model wears a Unity material named after its slot only from its own Unity project, or its own part of
+    // the pack, not from another kit in the same bundle, as Kenney's characters all wore one kit's skin. Packs where
+    // models wear such materials look for materials again, which redraws the thumbnails dressed in the wrong one.
+    "INSERT INTO jobs (kind, pack_id, payload, run_after, created_at, updated_at)
+       SELECT 'materials', p.id, '{}', strftime('%Y-%m-%dT%H:%M:%SZ', 'now'), strftime('%Y-%m-%dT%H:%M:%SZ', 'now'),
+              strftime('%Y-%m-%dT%H:%M:%SZ', 'now')
+       FROM packs p WHERE p.status = 'ready'
+        AND EXISTS (SELECT 1 FROM assets a WHERE a.pack_id = p.id AND a.kind = 'model'
+                      AND json_extract(a.meta, '$.material_slots') IS NOT NULL)
+        AND NOT EXISTS (SELECT 1 FROM jobs j WHERE j.kind = 'materials' AND j.pack_id = p.id
+                          AND j.status IN ('queued', 'running'));",
 ];
 
 /// How many automatic pre-upgrade backups to keep in `<data dir>/backups`.
@@ -2068,6 +2101,47 @@ mod tests {
         assert_eq!(name, "Forest");
         let settings: i64 = conn.query_row("SELECT COUNT(*) FROM settings", [], |r| r.get(0)).unwrap();
         assert_eq!(settings, 0);
+    }
+
+    /// Models whose files say they have no clips, or no skin, lose the animated or rigged their folders gave them.
+    #[test]
+    fn folder_guesses_the_file_contradicts_are_taken_back() {
+        let dir = tempfile::tempdir().unwrap();
+        let mut conn = baseline_db(dir.path());
+        migrate(&mut conn, &dir.path().join("backups"), &MIGRATIONS[..MIGRATIONS.len() - 2]).unwrap();
+        conn.execute_batch(
+            "PRAGMA foreign_keys = OFF;
+             INSERT INTO assets (id, pack_id, blob_hash, path, name, ext, kind, meta, created_at, updated_at) VALUES
+               ('cap', 'p1', 'h1', 'Animated/cap.fbx', 'cap', 'fbx', 'model',
+                '{\"has_animation\":false,\"has_deformers\":false}', 'x', 'x'),
+               ('body', 'p1', 'h2', 'Animated/body.fbx', 'body', 'fbx', 'model',
+                '{\"has_animation\":false,\"has_deformers\":true}', 'x', 'x'),
+               ('door', 'p1', 'h3', 'Animated/door.glb', 'door', 'glb', 'model', '{\"animations\":1}', 'x', 'x'),
+               ('src', 'p1', 'h4', 'Animated/src.blend', 'src', 'blend', 'model', '{}', 'x', 'x');
+             INSERT INTO asset_tags (asset_id, tag, source, confidence) VALUES
+               ('cap', 'animated', 'rule', 0.6), ('cap', 'rigged', 'rule', 0.6), ('body', 'animated', 'rule', 0.6),
+               ('body', 'rigged', 'meta', 0.9), ('door', 'animated', 'rule', 0.6), ('src', 'animated', 'rule', 0.6);
+             INSERT INTO assets_fts (asset_id, name, tags) VALUES ('cap', 'cap', 'animated rigged');",
+        )
+        .unwrap();
+        migrate(&mut conn, &dir.path().join("backups"), MIGRATIONS).unwrap();
+        let tags = |id: &str| -> String {
+            conn.query_row(
+                "SELECT COALESCE(group_concat(tag, ','), '')
+                   FROM (SELECT tag FROM asset_tags WHERE asset_id = ?1 ORDER BY tag)",
+                [id],
+                |r| r.get(0),
+            )
+            .unwrap()
+        };
+        assert_eq!(tags("cap"), "");
+        assert_eq!(tags("body"), "rigged");
+        assert_eq!(tags("door"), "animated");
+        assert_eq!(tags("src"), "animated");
+        let stale: i64 = conn
+            .query_row("SELECT count(*) FROM assets_fts WHERE assets_fts MATCH 'animated'", [], |r| r.get(0))
+            .unwrap();
+        assert_eq!(stale, 0);
     }
 
     /// Favorites keep their stars across the table's new name, and drawings become vector art, taken by the

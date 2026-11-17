@@ -378,6 +378,12 @@ impl TagSet {
     pub(crate) fn remove(&mut self, tag: &str) {
         self.inner.remove(tag);
     }
+    /// Takes back a tag guessed from the path when the file itself says otherwise.
+    fn drop_guess(&mut self, tag: &str) {
+        if self.inner.get(tag).is_some_and(|(s, _)| *s == TagSource::Rule) {
+            self.inner.remove(tag);
+        }
+    }
     pub(crate) fn remove_prefix(&mut self, prefix: &str) {
         self.inner.retain(|k, _| !k.starts_with(prefix));
     }
@@ -874,15 +880,20 @@ pub(crate) fn meta_tags(
             if let Some(v) = meta.get("blender_version").and_then(|v| v.as_str()) {
                 tags.add(&format!("blender:{v}"), TagSource::Meta, 1.0);
             }
-            if num("skins").unwrap_or(0.0) > 0.0
-                || meta.get("has_deformers").and_then(serde_json::Value::as_bool) == Some(true)
+            // What the file says beats what its folders suggest: a hat in "Animated Characters Bundle/Accessories"
+            // isn't animated. Files that don't say (no metadata for these keys) keep the guess.
+            let says = |count: &str, flag: &str| {
+                let (n, f) = (num(count), meta.get(flag).and_then(serde_json::Value::as_bool));
+                (n.is_some() || f.is_some()).then(|| n.unwrap_or(0.0) > 0.0 || f == Some(true))
+            };
+            for (tag, yes) in
+                [("rigged", says("skins", "has_deformers")), ("animated", says("animations", "has_animation"))]
             {
-                tags.add("rigged", TagSource::Meta, 0.9);
-            }
-            if num("animations").unwrap_or(0.0) > 0.0
-                || meta.get("has_animation").and_then(serde_json::Value::as_bool) == Some(true)
-            {
-                tags.add("animated", TagSource::Meta, 0.9);
+                match yes {
+                    Some(true) => tags.add(tag, TagSource::Meta, 0.9),
+                    Some(false) => tags.drop_guess(tag),
+                    None => {}
+                }
             }
             if let Some(tris) = num("triangles") {
                 let bucket = match tris as u64 {
@@ -1089,6 +1100,24 @@ mod tests {
         let meta = serde_json::json!({ "artist": "Kenney Vleugels" });
         meta_tags(AssetKind::Audio, "ogg", meta.as_object().unwrap(), &mut t);
         assert!(t.has("artist:kenney-vleugels"));
+    }
+
+    #[test]
+    fn a_model_that_says_it_has_no_animation_isnt_animated_by_its_folder() {
+        let tagged = |path: &str, meta: serde_json::Value| {
+            let mut t = TagSet::default();
+            vocab_tags(path, AssetKind::Model, &mut t);
+            meta_tags(AssetKind::Model, "fbx", meta.as_object().unwrap(), &mut t);
+            (t.has("animated"), t.has("rigged"))
+        };
+        let hat = serde_json::json!({ "has_animation": false, "has_deformers": false });
+        assert_eq!(tagged("Animated Characters Bundle/Accessories/cap.fbx", hat), (false, false));
+        let body = serde_json::json!({ "has_animation": false, "has_deformers": true });
+        assert_eq!(tagged("Animated Characters Bundle/Models/characterMedium.fbx", body), (false, true));
+        let clip = serde_json::json!({ "animations": 2, "skins": 0 });
+        assert_eq!(tagged("Rigged/door.glb", clip), (true, false));
+        // A file that says nothing about it keeps the guess.
+        assert_eq!(tagged("Animated Characters Bundle/Source/accessories.blend", serde_json::json!({})), (true, false));
     }
 
     #[test]

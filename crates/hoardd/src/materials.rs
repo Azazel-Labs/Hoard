@@ -1049,7 +1049,8 @@ fn tie_up(tx: &Connection, pack_id: &str, were_maps: &[(String, String)]) -> Res
 /// Models whose file names no textures but which wear a material (by name, or through its maps beside them) get a
 /// white thumbnail when they're read, before the material is found. Render them again with the material's color
 /// map on, as the 3D viewers show them: FBX, OBJ, glTF, GLB, STL and PLY. A thumbnail a browser drew is left alone,
-/// and one already dressed isn't redone.
+/// and one already dressed isn't redone, unless the model's materials changed since (marked `redress`): then it's
+/// dressed in its new ones, or drawn plain again when it wears none.
 fn dress_models(state: &AppState, rt: &Handle, conn: &Connection, pack_id: &str) -> Result<usize> {
     let todo: Vec<(String, String, String)> = conn
         .prepare(
@@ -1077,9 +1078,17 @@ fn dress_models(state: &AppState, rt: &Handle, conn: &Connection, pack_id: &str)
         )?
         .query_map([pack_id], |r| Ok((r.get(0)?, r.get(1)?, r.get(2)?)))?
         .collect::<rusqlite::Result<_>>()?;
-    if (todo.is_empty() && slotted.is_empty()) || crate::analyze::renderer().is_none() {
+    let redress: Vec<(String, String)> = conn
+        .prepare(
+            "SELECT id, ext FROM assets
+              WHERE pack_id = ?1 AND kind = 'model' AND json_extract(meta, '$.redress') IS NOT NULL",
+        )?
+        .query_map([pack_id], |r| Ok((r.get(0)?, r.get(1)?)))?
+        .collect::<rusqlite::Result<_>>()?;
+    if (todo.is_empty() && slotted.is_empty() && redress.is_empty()) || crate::analyze::renderer().is_none() {
         return Ok(0);
     }
+    let mut dressed_ids = HashSet::new();
     std::fs::create_dir_all(state.cfg.tmp_dir())?;
     let work = tempfile::Builder::new().prefix("dress-").tempdir_in(state.cfg.tmp_dir())?;
     let mut done = 0;
@@ -1091,6 +1100,7 @@ fn dress_models(state: &AppState, rt: &Handle, conn: &Connection, pack_id: &str)
             Ok(Some(thumb)) => {
                 if replace_thumb(state, rt, conn, &id, thumb, "json_set(meta, '$.thumb_dressed', ?2)")? {
                     done += 1;
+                    dressed_ids.insert(id);
                 }
             }
             Ok(None) => {}
@@ -1134,7 +1144,29 @@ fn dress_models(state: &AppState, rt: &Handle, conn: &Connection, pack_id: &str)
         };
         if replace_thumb(state, rt, conn, &id, thumb, "json_set(meta, '$.thumb_dressed', ?2)")? {
             done += 1;
+            dressed_ids.insert(id);
         }
+    }
+    for (id, ext) in redress {
+        if !dressed_ids.contains(&id) {
+            let dir = work.path().join(&id);
+            let plain = (|| -> Result<Option<Vec<u8>>> {
+                let file = fetch_model(state, rt, conn, &id, &dir)?;
+                let (Some(mesh), _) = crate::meshes::load(&file, &ext, &dir)? else { return Ok(None) };
+                crate::analyze::mesh_thumb_bytes(&mesh, &file)
+            })();
+            std::fs::remove_dir_all(&dir).ok();
+            match plain {
+                Ok(Some(thumb)) => {
+                    if replace_thumb(state, rt, conn, &id, thumb, "json_remove(meta, '$.thumb_dressed')")? {
+                        done += 1;
+                    }
+                }
+                Ok(None) => {}
+                Err(e) => tracing::debug!(asset = %id, error = %format!("{e:#}"), "model thumbnail kept as it was"),
+            }
+        }
+        conn.execute("UPDATE assets SET meta = json_remove(meta, '$.redress') WHERE id = ?1", [&id])?;
     }
     if done > 0 {
         tracing::info!(pack = pack_id, models = done, "model thumbnails redrawn with their materials");
@@ -1519,10 +1551,19 @@ fn link_models(tx: &Connection, pack_id: &str) -> Result<()> {
 }
 
 /// Unity puts a `.mat` in each of a model's material slots: the one its importer's `.meta` names for the slot
-/// (`unity_remaps`), or else one named after the slot (or after the model and the slot, `Crate-Paint`), the
-/// nearest to the model where several are. Each model wearing them is linked to them, and `material_slots` in its
-/// meta says which slot wears which (by material id), for drawing it. Returns the models that wear any.
+/// (`unity_remaps`), or else one named after the slot (or after the model and the slot, `Crate-Paint`) within the
+/// model's reach (see [`slot_reach`]), the nearest to the model where several are. Each model wearing them is linked
+/// to them, and `material_slots` in its meta says which slot wears which (by material id), for drawing it. Returns
+/// the models that wear any.
 fn link_unity_slots(tx: &Connection, pack_id: &str) -> Result<HashSet<String>> {
+    let worn: HashMap<String, serde_json::Value> = tx
+        .prepare(
+            "SELECT id, json_extract(meta, '$.material_slots') FROM assets
+              WHERE pack_id = ?1 AND kind = 'model' AND json_extract(meta, '$.material_slots') IS NOT NULL",
+        )?
+        .query_map([pack_id], |r| Ok((r.get::<_, String>(0)?, r.get::<_, String>(1)?)))?
+        .filter_map(|r| r.map(|(id, s)| serde_json::from_str(&s).ok().map(|v| (id, v))).transpose())
+        .collect::<rusqlite::Result<_>>()?;
     tx.execute(
         "UPDATE assets SET meta = json_remove(meta, '$.material_slots')
           WHERE pack_id = ?1 AND kind = 'model' AND json_extract(meta, '$.material_slots') IS NOT NULL",
@@ -1538,7 +1579,15 @@ fn link_unity_slots(tx: &Connection, pack_id: &str) -> Result<HashSet<String>> {
         .query_map([pack_id], |r| Ok((r.get(0)?, r.get(1)?)))?
         .collect::<rusqlite::Result<_>>()?;
     let mut slotted = HashSet::new();
+    // A thumbnail dressed in materials a model no longer wears is drawn again (see [`dress_models`]).
+    let mut changed = tx.prepare_cached(
+        "UPDATE assets SET meta = json_set(json_remove(meta, '$.thumb_dressed'), '$.redress', 1)
+          WHERE id = ?1 AND thumb_hash IS json_extract(meta, '$.thumb_dressed')",
+    )?;
     if unity.is_empty() {
+        for id in worn.keys() {
+            changed.execute([id])?;
+        }
         return Ok(slotted);
     }
     let by_file: HashMap<&str, &str> = unity.iter().map(|(id, path)| (path.as_str(), id.as_str())).collect();
@@ -1568,6 +1617,7 @@ fn link_unity_slots(tx: &Connection, pack_id: &str) -> Result<HashSet<String>> {
         let names: Vec<String> = serde_json::from_str(&names).unwrap_or_default();
         let model_words = words(stem_of(&model_path));
         let model_dir: Vec<&str> = dir_of(&model_path).split('/').filter(|s| !s.is_empty()).collect();
+        let reach = slot_reach(&model_dir);
         let mut slots = serde_json::Map::new();
         for name in names {
             let remapped = remaps
@@ -1582,6 +1632,7 @@ fn link_unity_slots(tx: &Connection, pack_id: &str) -> Result<HashSet<String>> {
                 let both: Vec<String> = model_words.iter().chain(&key).cloned().collect();
                 (0..unity.len())
                     .filter(|&i| unity_words[i] == key || unity_words[i] == both)
+                    .filter(|&i| reach.is_empty() || within(dir_of(&unity[i].1), &reach))
                     // The nearest: the most folders shared with the model, then the first by path.
                     .max_by_key(|&i| {
                         let shared = dir_of(&unity[i].1)
@@ -1599,12 +1650,33 @@ fn link_unity_slots(tx: &Connection, pack_id: &str) -> Result<HashSet<String>> {
                 slots.insert(name, mat_id.into());
             }
         }
-        if !slots.is_empty() {
-            save.execute(params![model_id, serde_json::Value::Object(slots).to_string()])?;
+        let slots = (!slots.is_empty()).then_some(serde_json::Value::Object(slots));
+        if worn.contains_key(&model_id) && worn.get(&model_id) != slots.as_ref() {
+            changed.execute([&model_id])?;
+        }
+        if let Some(slots) = slots {
+            save.execute(params![model_id, slots.to_string()])?;
             slotted.insert(model_id);
         }
     }
     Ok(slotted)
+}
+
+/// Where a material named after a model's slot may come from. In a Unity project, the project (the folder holding
+/// its `Assets`), as Unity looks for one no further; elsewhere, the model's own part of the pack, its folder's parent
+/// and below. Either way a bundle's other kits are out of reach: "skin" in one character kit isn't another's.
+fn slot_reach(model_dir: &[&str]) -> String {
+    let end = match model_dir.iter().rposition(|s| s.eq_ignore_ascii_case("assets")) {
+        Some(i) => i + 1,
+        None => model_dir.len().saturating_sub(1),
+    };
+    model_dir[..end].join("/")
+}
+
+/// Whether `dir` is `root` or a folder inside it, ignoring case.
+fn within(dir: &str, root: &str) -> bool {
+    dir.get(..root.len()).is_some_and(|head| head.eq_ignore_ascii_case(root))
+        && (dir.len() == root.len() || dir.as_bytes()[root.len()] == b'/')
 }
 
 /// The object a model is of: its folder and name without an LOD number, so `Rock_LOD0.fbx` and `Rock_LOD3.fbx` are
@@ -2114,7 +2186,8 @@ mod tests {
                  ('paint', 'paint.mat', 'sidecar'), ('far', 'far.mat', 'sidecar'), ('brick', 'brick.mat', 'sidecar'),
                  ('wood', 'wood.mat', 'sidecar');
                INSERT INTO unity_guids VALUES ('p', 'gw', 'Kit/Materials/Wall_Brick.mat');
-               INSERT INTO unity_remaps VALUES ('p', 'Kit/Models/Crate.fbx', 'lambert2', 'gw');"#,
+               INSERT INTO unity_remaps VALUES ('p', 'Kit/Models/Crate.fbx', 'lambert2', 'gw');
+               ALTER TABLE assets ADD COLUMN thumb_hash TEXT;"#,
         )
         .unwrap();
         let slotted = link_unity_slots(&c, "p").unwrap();
@@ -2138,5 +2211,54 @@ mod tests {
             .collect::<rusqlite::Result<_>>()
             .unwrap();
         assert_eq!(worn, ["barrel>wood", "crate>brick", "crate>paint"]);
+    }
+
+    #[test]
+    fn a_kit_doesnt_wear_another_kits_material_of_the_same_name() {
+        let c = Connection::open_in_memory().unwrap();
+        c.execute_batch(
+            r#"CREATE TABLE assets (id TEXT PRIMARY KEY, pack_id TEXT, path TEXT, ext TEXT, kind TEXT, meta TEXT);
+               CREATE TABLE asset_links (from_id TEXT, to_id TEXT, rel TEXT, PRIMARY KEY (from_id, to_id, rel));
+               CREATE TABLE unity_guids (pack_id TEXT, guid TEXT, path TEXT);
+               CREATE TABLE unity_remaps (pack_id TEXT, path TEXT, slot TEXT, guid TEXT);
+               INSERT INTO assets VALUES
+                 ('heroes', 'p', 'Heroes/Unity/Assets/Materials/skin.material', 'material', 'material',
+                  '{"material_maps":1}'),
+                 ('heroes.mat', 'p', 'Heroes/Unity/Assets/Materials/skin.mat', 'mat', 'other', '{}'),
+                 ('zombies', 'p', 'Zombies/Unity/Assets/Materials/skin.material', 'material', 'material',
+                  '{"material_maps":1}'),
+                 ('zombies.mat', 'p', 'Zombies/Unity/Assets/Materials/skin.mat', 'mat', 'other', '{}'),
+                 ('zombie', 'p', 'Zombies/Unity/Assets/Models/zombie.fbx', 'fbx', 'model',
+                  '{"material_names":["skin"]}'),
+                 ('loose', 'p', 'Zombies/Models/zombie.fbx', 'fbx', 'model', '{"material_names":["skin"]}'),
+                 ('bundle', 'p', 'Bundle/Models/character.fbx', 'fbx', 'model', '{"material_names":["skin"]}');
+               INSERT INTO asset_links VALUES
+                 ('heroes', 'heroes.mat', 'sidecar'), ('zombies', 'zombies.mat', 'sidecar');
+               ALTER TABLE assets ADD COLUMN thumb_hash TEXT;
+               UPDATE assets SET thumb_hash = 'h', meta = json_set(meta, '$.thumb_dressed', 'h',
+                   '$.material_slots',
+                   json(CASE id WHEN 'loose' THEN '{"skin":"zombies"}' ELSE '{"skin":"heroes"}' END))
+                WHERE id IN ('zombie', 'loose', 'bundle');"#,
+        )
+        .unwrap();
+        link_unity_slots(&c, "p").unwrap();
+        let slots = |id: &str| -> Option<String> {
+            c.query_row("SELECT json_extract(meta, '$.material_slots') FROM assets WHERE id = ?1", [id], |r| r.get(0))
+                .unwrap()
+        };
+        assert_eq!(slots("zombie").as_deref(), Some(r#"{"skin":"zombies"}"#), "its own project's, not the first");
+        assert_eq!(slots("loose").as_deref(), Some(r#"{"skin":"zombies"}"#), "within its part of the pack");
+        assert_eq!(slots("bundle"), None, "no kit of its own has a skin");
+        let redress: Vec<String> = c
+            .prepare(
+                "SELECT id FROM assets
+                  WHERE json_extract(meta, '$.redress') AND meta ->> 'thumb_dressed' IS NULL ORDER BY id",
+            )
+            .unwrap()
+            .query_map([], |r| r.get(0))
+            .unwrap()
+            .collect::<rusqlite::Result<_>>()
+            .unwrap();
+        assert_eq!(redress, ["bundle", "zombie"], "drawn again: their materials changed, the loose one's didn't");
     }
 }

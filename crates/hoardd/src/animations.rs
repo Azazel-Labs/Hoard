@@ -17,7 +17,7 @@ use serde_json::Value;
 use crate::{AppState, db};
 
 /// A take shorter than this is a pose (Blender's "Targeting Pose", a frame or two long), not a clip.
-const POSE_SECS: f64 = 0.1;
+pub(crate) const POSE_SECS: f64 = 0.1;
 
 /// A model's skeleton and clips.
 #[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize)]
@@ -55,7 +55,7 @@ impl Rig {
 
 /// A node's name as clips are matched by it: without a namespace or path (`mixamorig:Hips` and `Armature|Hips` are
 /// `hips`), lowercase. Leaf markers (`Head_end`) and an importer's wrapper (`RootNode`) aren't bones.
-fn bone(name: &str) -> Option<String> {
+pub(crate) fn bone(name: &str) -> Option<String> {
     let name = name.rsplit([':', '|']).next().unwrap_or(name).trim().to_lowercase();
     (!name.is_empty() && !name.ends_with("_end") && name != "rootnode").then_some(name)
 }

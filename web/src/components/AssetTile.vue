@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { canStar, mine, toggleFavorite } from '../mine'
 import { computed, ref, watch } from 'vue'
-import { formatDuration, looksAlike, thumbUrl, type Asset } from '../api'
+import { formatDuration, looksAlike, motionUrl, thumbUrl, type Asset } from '../api'
 import { canPreview, player, toggle } from '../player'
 import KindGlyph from './KindGlyph.vue'
 import { noteTileClick } from '../viewers'
@@ -29,9 +29,10 @@ const loaded = ref(false)
 watch(() => thumbUrl(props.asset), () => (loaded.value = false))
 const playing = computed(() => isCurrent.value && player.playing)
 const starred = computed(() => mine.favorites.has(props.asset.id))
-// Animated pictures move while the pointer is over them (unless motion is unwelcome).
+// Animated pictures, and animations with a movie of them playing, move while the pointer is over them (unless
+// motion is unwelcome).
 const hovering = ref(false)
-const moving = computed(() => (hovering.value ? animatedSrc(props.asset, PLAY_ON_TILE) : null))
+const moving = computed(() => (hovering.value ? (animatedSrc(props.asset, PLAY_ON_TILE) ?? motionUrl(props.asset)) : null))
 function hoverPlay(on: boolean, e: PointerEvent) {
   if (on && (e.pointerType !== 'mouse' || matchMedia('(prefers-reduced-motion: reduce)').matches)) return
   hovering.value = on

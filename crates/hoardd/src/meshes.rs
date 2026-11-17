@@ -91,6 +91,13 @@ pub(crate) fn load_rigged(
     Ok((doc.flatten(Pose::Rest)?, rig))
 }
 
+/// A model's document to pose: its meshes, skins, materials, textures and clips, any compression decoded.
+pub(crate) fn posable(path: &Path, ext: &str, root: &Path) -> Result<polysmelt::document::Document<'static>> {
+    let mut doc = polysmelt::formats::load(path, ext, &Pack::new(root), Keep { animations: true, ..Keep::MESHES })?;
+    doc.decode()?;
+    Ok(doc)
+}
+
 /// The facts about a model without drawing its mesh. A glTF's are counted from its JSON, so nothing in its buffers
 /// (Draco, meshopt, textures) is decoded.
 pub(crate) fn facts(path: &Path, ext: &str, root: &Path) -> Result<Map<String, Value>> {

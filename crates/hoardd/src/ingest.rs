@@ -1178,6 +1178,10 @@ pub(crate) fn retag_pack(state: &AppState, rt: &Handle, pack_id: &str) -> Result
     fs::remove_dir_all(&work).ok();
     convert::thumbs_from_conversions(state, rt, pack_id)?;
     crate::animations::rigs_from_conversions(state, rt, pack_id)?;
+    {
+        let _in_runtime = rt.enter();
+        crate::motion::kick(state);
+    }
     crate::materials::detect_logged(state, rt, &mut conn, pack_id);
     read_pack_files(state, rt, pack_id, false, None);
     Ok(())

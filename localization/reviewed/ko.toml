@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "4de4db31ccf28d651f4e28ef8dc91d1de5dde05c824cc4f46b22bab2976d14f9"
+source = "42480b75a5b6ffe5e9a5e23b3bad0c8e5f5a1104f51660808e921f9a7cdc8e09"
 translation = "8d9ccd00d7a48e165bb0fba20cf5559e2b3c83fd67e4695b2578383ddd6588b7"
 
 [messages.account-add]
@@ -8189,6 +8189,14 @@ translation = "끄기"
 [messages.settings-mode-path]
 source = "This program"
 translation = "이 프로그램"
+
+[messages.settings-motion-thumbs]
+source = "Moving thumbnails for animations"
+translation = "애니메이션 움직이는 썸네일"
+
+[messages.settings-motion-thumbs-what]
+source = "Each animation also gets a short looping movie of it playing, shown while you point at its tile. They take about 40 KB each and a while to make for a big library. Turning this off deletes them."
+translation = "각 애니메이션에 타일을 가리키면 재생되는 짧은 반복 영상도 만듭니다. 하나에 약 40KB이고, 큰 라이브러리에서는 만드는 데 시간이 걸립니다. 끄면 삭제됩니다."
 
 [messages.settings-name]
 source = "Name"

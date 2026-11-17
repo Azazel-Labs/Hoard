@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "4de4db31ccf28d651f4e28ef8dc91d1de5dde05c824cc4f46b22bab2976d14f9"
+source = "42480b75a5b6ffe5e9a5e23b3bad0c8e5f5a1104f51660808e921f9a7cdc8e09"
 translation = "0c2279289914500c806c34b278258619d96231851442b76e0ecd1000c5c086d1"
 
 [messages.account-add]
@@ -8415,6 +8415,14 @@ translation = "Désactivé"
 [messages.settings-mode-path]
 source = "This program"
 translation = "Ce programme"
+
+[messages.settings-motion-thumbs]
+source = "Moving thumbnails for animations"
+translation = "Miniatures animées pour les animations"
+
+[messages.settings-motion-thumbs-what]
+source = "Each animation also gets a short looping movie of it playing, shown while you point at its tile. They take about 40 KB each and a while to make for a big library. Turning this off deletes them."
+translation = "Chaque animation reçoit aussi un court film en boucle, joué quand vous pointez sa vignette. Ils pèsent environ 40 Ko chacun et prennent un moment à créer pour une grande bibliothèque. Désactiver l'option les supprime."
 
 [messages.settings-name]
 source = "Name"

@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "4de4db31ccf28d651f4e28ef8dc91d1de5dde05c824cc4f46b22bab2976d14f9"
+source = "42480b75a5b6ffe5e9a5e23b3bad0c8e5f5a1104f51660808e921f9a7cdc8e09"
 translation = "110cc1215f00a6312d4fe13a655f9cc3553e284205745fc0ce70ae25601e1bd5"
 
 [messages.account-add]
@@ -8230,6 +8230,14 @@ translation = "オフ"
 [messages.settings-mode-path]
 source = "This program"
 translation = "このプログラム"
+
+[messages.settings-motion-thumbs]
+source = "Moving thumbnails for animations"
+translation = "アニメーションの動くサムネイル"
+
+[messages.settings-motion-thumbs-what]
+source = "Each animation also gets a short looping movie of it playing, shown while you point at its tile. They take about 40 KB each and a while to make for a big library. Turning this off deletes them."
+translation = "各アニメーションに、タイルにポインターを合わせると再生される短いループ動画も作ります。1 本あたり約 40 KB で、大きなライブラリでは作成にしばらくかかります。オフにすると削除されます。"
 
 [messages.settings-name]
 source = "Name"

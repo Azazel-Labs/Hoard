@@ -1128,7 +1128,8 @@ pub(crate) fn purge_archived(
 
 const ASSET_COLS: &str = "a.id, a.pack_id, p.name, a.name, a.path, a.ext, a.kind, a.category, a.description,
     a.blob_hash, b.size, a.thumb_hash IS NOT NULL, a.meta, a.created_at, a.updated_at, a.source_description,
-    a.ai_description, COALESCE(a.archived_at, p.archived_at), substr(a.thumb_hash, 1, 12), a.thumb_source";
+    a.ai_description, COALESCE(a.archived_at, p.archived_at), substr(a.thumb_hash, 1, 12), a.thumb_source,
+    a.kind = 'animation' AND EXISTS (SELECT 1 FROM derivatives d WHERE d.asset_id = a.id AND d.kind = 'motion')";
 
 fn asset_from_row(r: &Row<'_>) -> rusqlite::Result<Asset> {
     let meta: String = r.get(12)?;
@@ -1149,6 +1150,7 @@ fn asset_from_row(r: &Row<'_>) -> rusqlite::Result<Asset> {
         has_thumb: r.get(11)?,
         thumb_rev: r.get(18)?,
         thumb_source: r.get(19)?,
+        has_motion: r.get(20)?,
         meta: serde_json::from_str(&meta).unwrap_or_default(),
         tags: Vec::new(),
         created_at: r.get(13)?,

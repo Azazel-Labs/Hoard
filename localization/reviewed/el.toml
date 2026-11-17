@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "4de4db31ccf28d651f4e28ef8dc91d1de5dde05c824cc4f46b22bab2976d14f9"
+source = "42480b75a5b6ffe5e9a5e23b3bad0c8e5f5a1104f51660808e921f9a7cdc8e09"
 translation = "0f5f60477c12405f48c36f12294f911af5de0204e2fd60e70ff31e1354ed1fa5"
 
 [messages.account-add]
@@ -8445,6 +8445,14 @@ translation = "Ανενεργό"
 [messages.settings-mode-path]
 source = "This program"
 translation = "Αυτό το πρόγραμμα"
+
+[messages.settings-motion-thumbs]
+source = "Moving thumbnails for animations"
+translation = "Κινούμενες μικρογραφίες για κινήσεις"
+
+[messages.settings-motion-thumbs-what]
+source = "Each animation also gets a short looping movie of it playing, shown while you point at its tile. They take about 40 KB each and a while to make for a big library. Turning this off deletes them."
+translation = "Κάθε κίνηση παίρνει και μια σύντομη ταινία σε επανάληψη, που παίζει όσο δείχνεις το πλακίδιό της. Πιάνουν περίπου 40 KB η καθεμία και θέλουν λίγη ώρα για μια μεγάλη βιβλιοθήκη. Αν το απενεργοποιήσεις, διαγράφονται."
 
 [messages.settings-name]
 source = "Name"

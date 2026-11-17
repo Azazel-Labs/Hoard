@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "4de4db31ccf28d651f4e28ef8dc91d1de5dde05c824cc4f46b22bab2976d14f9"
+source = "42480b75a5b6ffe5e9a5e23b3bad0c8e5f5a1104f51660808e921f9a7cdc8e09"
 translation = "90c0ed812beab84b13b964f798f3b808c3e8a1a1439ed69952ffc76f161eeeaa"
 
 [messages.account-add]
@@ -8542,6 +8542,14 @@ translation = "Wyłączone"
 [messages.settings-mode-path]
 source = "This program"
 translation = "Ten program"
+
+[messages.settings-motion-thumbs]
+source = "Moving thumbnails for animations"
+translation = "Ruchome miniatury animacji"
+
+[messages.settings-motion-thumbs-what]
+source = "Each animation also gets a short looping movie of it playing, shown while you point at its tile. They take about 40 KB each and a while to make for a big library. Turning this off deletes them."
+translation = "Każda animacja dostaje też krótki film w pętli, odtwarzany, gdy wskażesz jej kafelek. Każdy zajmuje około 40 KB, a w dużej bibliotece ich tworzenie chwilę trwa. Wyłączenie usuwa je."
 
 [messages.settings-name]
 source = "Name"

@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "4de4db31ccf28d651f4e28ef8dc91d1de5dde05c824cc4f46b22bab2976d14f9"
+source = "42480b75a5b6ffe5e9a5e23b3bad0c8e5f5a1104f51660808e921f9a7cdc8e09"
 translation = "863d09bc1e828f14f8cf00c118caee84558c0ecf852401afe0ac271a50ad1d87"
 
 [messages.account-add]
@@ -8387,6 +8387,14 @@ translation = "Fra"
 [messages.settings-mode-path]
 source = "This program"
 translation = "Dette program"
+
+[messages.settings-motion-thumbs]
+source = "Moving thumbnails for animations"
+translation = "Levende miniaturer for animationer"
+
+[messages.settings-motion-thumbs-what]
+source = "Each animation also gets a short looping movie of it playing, shown while you point at its tile. They take about 40 KB each and a while to make for a big library. Turning this off deletes them."
+translation = "Hver animation får også en kort film i loop, der afspilles, mens du peger på dens felt. De fylder omkring 40 KB hver og tager et stykke tid at lave for et stort bibliotek. Slår du det fra, slettes de."
 
 [messages.settings-name]
 source = "Name"

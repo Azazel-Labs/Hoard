@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "4de4db31ccf28d651f4e28ef8dc91d1de5dde05c824cc4f46b22bab2976d14f9"
+source = "42480b75a5b6ffe5e9a5e23b3bad0c8e5f5a1104f51660808e921f9a7cdc8e09"
 translation = "59247f4fd3e0712c726e47580a3cc9e4e63dfcef4ff7b34a653c6b6a2a4ee38c"
 
 [messages.account-add]
@@ -8232,6 +8232,14 @@ translation = "Kapalı"
 [messages.settings-mode-path]
 source = "This program"
 translation = "Bu program"
+
+[messages.settings-motion-thumbs]
+source = "Moving thumbnails for animations"
+translation = "Animasyonlar için hareketli küçük resimler"
+
+[messages.settings-motion-thumbs-what]
+source = "Each animation also gets a short looping movie of it playing, shown while you point at its tile. They take about 40 KB each and a while to make for a big library. Turning this off deletes them."
+translation = "Her animasyon ayrıca kutucuğunun üzerine geldiğinizde oynayan kısa, döngülü bir film de alır. Her biri yaklaşık 40 KB yer kaplar ve büyük bir kütüphanede oluşturulması biraz sürer. Kapatmak onları siler."
 
 [messages.settings-name]
 source = "Name"

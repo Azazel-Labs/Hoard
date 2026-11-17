@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "4de4db31ccf28d651f4e28ef8dc91d1de5dde05c824cc4f46b22bab2976d14f9"
+source = "42480b75a5b6ffe5e9a5e23b3bad0c8e5f5a1104f51660808e921f9a7cdc8e09"
 translation = "95443a48d777d86011fe11040c214e6d115790b94418d4e3ec20dd07fca486c8"
 
 [messages.account-add]
@@ -8576,6 +8576,14 @@ translation = "Выкл."
 [messages.settings-mode-path]
 source = "This program"
 translation = "Эта программа"
+
+[messages.settings-motion-thumbs]
+source = "Moving thumbnails for animations"
+translation = "Движущиеся миниатюры анимаций"
+
+[messages.settings-motion-thumbs-what]
+source = "Each animation also gets a short looping movie of it playing, shown while you point at its tile. They take about 40 KB each and a while to make for a big library. Turning this off deletes them."
+translation = "Каждая анимация также получает короткий зацикленный ролик, который играет, пока вы наводите указатель на её плитку. Каждый занимает около 40 КБ, а для большой библиотеки их создание занимает время. При выключении они удаляются."
 
 [messages.settings-name]
 source = "Name"

@@ -87,6 +87,7 @@ bytes = "1"
 tower = { version = "0.5", features = ["util"] }
 symphonia = { version = "0.6", default-features = false, features = ["wav", "pcm", "ogg", "vorbis", "flac", "mp3", "aiff", "adpcm"] }
 tempfile = "3.27.0"
+webp = { version = "0.3.1", default-features = false }
 sha2 = "0.11"
 lzma-rust2 = { version = "0.25", default-features = false, features = ["std", "xz"] }
 argon2 = "0.6.0"

@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "4de4db31ccf28d651f4e28ef8dc91d1de5dde05c824cc4f46b22bab2976d14f9"
+source = "42480b75a5b6ffe5e9a5e23b3bad0c8e5f5a1104f51660808e921f9a7cdc8e09"
 translation = "6df14cb1c2fd71b68aa0783404db89869e1b0987d799ee6e09c8222a98701df5"
 
 [messages.account-add]
@@ -8228,6 +8228,14 @@ translation = "Ki"
 [messages.settings-mode-path]
 source = "This program"
 translation = "Ez a program"
+
+[messages.settings-motion-thumbs]
+source = "Moving thumbnails for animations"
+translation = "Mozgó bélyegképek az animációkhoz"
+
+[messages.settings-motion-thumbs-what]
+source = "Each animation also gets a short looping movie of it playing, shown while you point at its tile. They take about 40 KB each and a while to make for a big library. Turning this off deletes them."
+translation = "Minden animáció kap egy rövid, ismétlődő mozgóképet is, amely akkor játszódik, amikor a csempéjére mutatsz. Darabonként kb. 40 KB-ot foglalnak, és nagy könyvtárnál eltart egy ideig az elkészítésük. Kikapcsoláskor törlődnek."
 
 [messages.settings-name]
 source = "Name"

@@ -1499,6 +1499,21 @@ onBeforeUnmount(() => {
                   <span><strong>{{ q.label }}</strong><small>{{ q.hint }}</small></span>
                 </label>
               </div>
+              <div class="switches motion">
+                <div class="opt-row">
+                  <label class="check">
+                    <input
+                      type="checkbox"
+                      :checked="s.options.motion_thumbs.value"
+                      :disabled="busy"
+                      @change="save({ motion_thumbs: ($event.target as HTMLInputElement).checked })"
+                    />
+                    {{ t('settings-motion-thumbs') }}
+                  </label>
+                  <ResetButton v-if="changed('motion_thumbs')" :to="onOff(s.options.motion_thumbs.default)" :disabled="busy" @reset="resetOpt('motion_thumbs')" />
+                </div>
+              </div>
+              <p class="what">{{ t('settings-motion-thumbs-what') }}</p>
             </section>
 
             <section>
@@ -1714,6 +1729,7 @@ progress.learn { display: block; width: 100%; max-width: 28rem; height: 0.35rem;
 .mlist .acts { display: flex; gap: 0.4rem; flex: none; }
 @media (max-width: 30rem) { .mlist li { flex-direction: column; align-items: stretch; } }
 .switches { display: grid; gap: 0.35rem; margin-bottom: 0.8rem; font-size: var(--step--1); }
+.switches.motion { margin: 0.9rem 0 0.2rem; }
 .switches .check { display: inline-flex; gap: 0.6rem; align-items: center; font-weight: 550; cursor: pointer; }
 @media (max-width: 30rem) { .llm { grid-template-columns: minmax(0, 1fr); } .llm > span:empty { display: none; } }
 

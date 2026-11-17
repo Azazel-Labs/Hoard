@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "4de4db31ccf28d651f4e28ef8dc91d1de5dde05c824cc4f46b22bab2976d14f9"
+source = "42480b75a5b6ffe5e9a5e23b3bad0c8e5f5a1104f51660808e921f9a7cdc8e09"
 translation = "4d4f0096cc29f03f0fe2a94d855b0ef2f60194198f01e480a5d3926c58b74326"
 
 [messages.account-add]
@@ -8385,6 +8385,14 @@ translation = "Af"
 [messages.settings-mode-path]
 source = "This program"
 translation = "Hierdie program"
+
+[messages.settings-motion-thumbs]
+source = "Moving thumbnails for animations"
+translation = "Bewegende duimnaels vir animasies"
+
+[messages.settings-motion-thumbs-what]
+source = "Each animation also gets a short looping movie of it playing, shown while you point at its tile. They take about 40 KB each and a while to make for a big library. Turning this off deletes them."
+translation = "Elke animasie kry ook 'n kort fliek wat herhaal, gewys terwyl jy na sy teël wys. Hulle neem omtrent 40 KB elk en 'n ruk om vir 'n groot biblioteek te maak. As jy dit afskakel, word hulle uitgevee."
 
 [messages.settings-name]
 source = "Name"

@@ -42,6 +42,7 @@ mod materials;
 mod mcp;
 mod me;
 mod meshes;
+mod motion;
 mod mtlmat;
 mod music;
 mod naming;
@@ -191,6 +192,7 @@ async fn main() -> Result<()> {
     updates::start_hook(&state);
     analyze::warm_renderer();
     jobs::spawn_workers(&state);
+    motion::kick(&state);
     {
         let st = Arc::clone(&state);
         tokio::spawn(async move { looks::schedule(&st).await });

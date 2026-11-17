@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "4de4db31ccf28d651f4e28ef8dc91d1de5dde05c824cc4f46b22bab2976d14f9"
+source = "42480b75a5b6ffe5e9a5e23b3bad0c8e5f5a1104f51660808e921f9a7cdc8e09"
 translation = "fb5e10cd5eddfc860efb3785bb465796b700258c43d207b08bd9f3334aa5d6c8"
 
 [messages.account-add]
@@ -8222,6 +8222,14 @@ translation = "關閉"
 [messages.settings-mode-path]
 source = "This program"
 translation = "指定程式"
+
+[messages.settings-motion-thumbs]
+source = "Moving thumbnails for animations"
+translation = "動畫的動態縮圖"
+
+[messages.settings-motion-thumbs-what]
+source = "Each animation also gets a short looping movie of it playing, shown while you point at its tile. They take about 40 KB each and a while to make for a big library. Turning this off deletes them."
+translation = "每個動畫還會產生一段循環播放的短片，指向其圖塊時播放。每段約 40 KB，大型資源庫需要一段時間才能產生完。關閉後會刪除它們。"
 
 [messages.settings-name]
 source = "Name"

@@ -415,7 +415,24 @@ impl Renderer {
         self.render(&bake(&doc, &buffers), &gltf_images(&images), size, THREE_QUARTER)
     }
 
-    #[expect(clippy::too_many_lines, reason = "one linear setup of the frame, its passes and the readback")]
+    /// Render the frames of a clip, each a self-contained GLB of the model posed at one moment, from one camera that
+    /// frames the model wherever it goes during the clip, so it moves in the picture and the picture doesn't move.
+    /// The frames are one model posed, so they share its textures: those are read from the first.
+    pub fn render_frames(&self, frames: &[Vec<u8>], size: u32) -> Result<Vec<image::RgbaImage>> {
+        let Some((first, rest)) = frames.split_first() else { return Ok(Vec::new()) };
+        let (doc, buffers, images) = gltf::import_slice(first).context("parse glTF")?;
+        let mut posed = vec![bake(&doc, &buffers)];
+        for f in rest {
+            let g = gltf::Gltf::from_slice(f).context("parse glTF")?;
+            let buffers = gltf::import_buffers(&g.document, None, g.blob).context("read glTF buffers")?;
+            posed.push(bake(&g.document, &buffers));
+        }
+        let images = gltf_images(&images);
+        let all: Vec<&Draw> = posed.iter().flatten().collect();
+        let (globals, eye) = camera(&all, THREE_QUARTER).context("model has no vertices")?;
+        posed.iter().map(|draws| self.render_from(draws, &images, size, globals, eye)).collect()
+    }
+
     fn render(
         &self,
         draws: &[Draw],
@@ -423,10 +440,23 @@ impl Renderer {
         size: u32,
         dir: Vec3,
     ) -> Result<image::RgbaImage> {
+        let all: Vec<&Draw> = draws.iter().collect();
+        let (globals, eye) = camera(&all, dir).context("model has no vertices")?;
+        self.render_from(draws, images, size, globals, eye)
+    }
+
+    #[expect(clippy::too_many_lines, reason = "one linear setup of the frame, its passes and the readback")]
+    fn render_from(
+        &self,
+        draws: &[Draw],
+        images: &[Option<image::RgbaImage>],
+        size: u32,
+        globals: Globals,
+        eye: Vec3,
+    ) -> Result<image::RgbaImage> {
         if draws.is_empty() {
             bail!("model has no triangle geometry");
         }
-        let (globals, eye) = camera(draws, dir).context("model has no vertices")?;
 
         let d = &self.device;
         let globals_buf = d.create_buffer_init(&wgpu::util::BufferInitDescriptor {
@@ -642,7 +672,7 @@ fn centroid(d: &Draw) -> Vec3 {
 ///
 /// The browser takes the same picture when it upgrades a thumbnail (`snapshot` in `modelStage.ts`); keep the two
 /// in step.
-fn camera(draws: &[Draw], dir: Vec3) -> Option<(Globals, Vec3)> {
+fn camera(draws: &[&Draw], dir: Vec3) -> Option<(Globals, Vec3)> {
     let (center, radius) = bounds(draws)?;
     let dir = dir.normalize();
     let fov = 35f32.to_radians();
@@ -833,7 +863,7 @@ fn flat_normals(positions: &[Vec3], indices: &[u32]) -> Vec<Vec3> {
     normals.into_iter().map(Vec3::normalize_or_zero).collect()
 }
 
-fn bounds(draws: &[Draw]) -> Option<(Vec3, f32)> {
+fn bounds(draws: &[&Draw]) -> Option<(Vec3, f32)> {
     let mut min = Vec3::splat(f32::INFINITY);
     let mut max = Vec3::splat(f32::NEG_INFINITY);
     for v in draws.iter().flat_map(|d| &d.vertices) {

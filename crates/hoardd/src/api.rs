@@ -226,7 +226,7 @@ async fn stats(State(state): State<AppState>) -> ApiResult<Json<Stats>> {
             preview_bytes: one(
                 "SELECT COALESCE(SUM(size), 0) FROM blobs WHERE hash IN (
                    SELECT thumb_hash FROM assets WHERE thumb_hash IS NOT NULL
-                   UNION SELECT blob_hash FROM derivatives WHERE kind IN ('views', 'preview'))",
+                   UNION SELECT blob_hash FROM derivatives WHERE kind IN ('views', 'preview', 'motion'))",
             )?,
         })
     })
@@ -1666,6 +1666,7 @@ async fn asset_derivative(
     let ext = match kind.as_str() {
         "glb" => "glb".to_owned(),
         "views" => "png".to_owned(),
+        "motion" => "webp".to_owned(),
         "source" => source_ext.unwrap_or_else(|| "bin".to_owned()),
         "preview" => "mp3".to_owned(),
         _ => "bin".to_owned(),
@@ -2158,6 +2159,7 @@ fn settings_json_sync(state: &AppState) -> Value {
             "update_check": option(now.update_check, cfg.update_check, saved.update_check.is_some()),
             "guest_browsing": option(now.guest_browsing, false, saved.guest_browsing.is_some()),
             "store_lookup": option(now.store_lookup, true, saved.store_lookup.is_some()),
+            "motion_thumbs": option(now.motion_thumbs, false, saved.motion_thumbs.is_some()),
             "thumb_quality": option(
                 now.thumb_quality,
                 crate::settings::ThumbQuality::default(),
@@ -2295,6 +2297,16 @@ async fn put_settings(State(state): State<AppState>, Json(patch): Json<Value>) -
         if !after.clip {
             crate::clip::remove_files(&state).await;
         }
+    }
+    if after.motion_thumbs && !before.motion_thumbs {
+        crate::motion::kick(&state);
+    } else if before.motion_thumbs && !after.motion_thumbs {
+        let st = std::sync::Arc::clone(&state);
+        tokio::spawn(async move {
+            if let Err(e) = crate::motion::remove_all(&st).await {
+                tracing::warn!(error = %format!("{e:#}"), "couldn't remove motion thumbnails");
+            }
+        });
     }
     if after.store_lookup && !before.store_lookup {
         crate::store_lookup::start(&state).await;

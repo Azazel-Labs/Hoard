@@ -182,6 +182,10 @@ pub struct Asset {
     /// missing). Re-analysis keeps these; a better one replaces a worse one, never the other way.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub thumb_source: Option<String>,
+    /// An animation has a short looping movie of it playing (`/derivative/motion`, an animated WebP), shown when its
+    /// tile is hovered. Made only while the "Moving thumbnails" setting is on.
+    #[serde(default, skip_serializing_if = "std::ops::Not::not")]
+    pub has_motion: bool,
     pub meta: Value,
     pub tags: Vec<Tag>,
     pub created_at: String,

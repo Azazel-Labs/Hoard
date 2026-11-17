@@ -47,6 +47,9 @@ export interface Asset {
   /** Changes whenever the thumbnail does; `thumbUrl` puts it in the URL so a new thumbnail isn't hidden behind the
    *  browser's cached copy of the old one. */
   thumb_rev?: string | null
+  /** An animation has a short looping movie of it playing (`motionUrl`), made while the Moving thumbnails setting
+   *  is on. */
+  has_motion?: boolean
   meta: Record<string, unknown>
   tags: Tag[]
   created_at: string
@@ -779,6 +782,8 @@ export interface Settings {
     /** Search the stores for packs' pages in the background. */
     store_lookup: OptionSetting<boolean>
     thumb_quality: OptionSetting<ThumbQuality>
+    /** Make a short looping movie of each animation for its tile. Off by default: it takes space and time. */
+    motion_thumbs: OptionSetting<boolean>
     /** Most space cached "Download as" conversions may take, in MiB. */
     conversion_cache_mb: OptionSetting<number>
     /** What the portal calls this server. */
@@ -891,6 +896,7 @@ export interface SettingsPatch {
   guest_browsing?: boolean | null
   store_lookup?: boolean | null
   thumb_quality?: ThumbQuality | null
+  motion_thumbs?: boolean | null
   conversion_cache_mb?: number | null
   name?: string | null
   public_url?: string | null
@@ -1271,6 +1277,9 @@ export const RESIZABLE_AS_ITSELF: Record<string, string> = {
 export const originalUrl = (a: { id: string }) => `/api/assets/${a.id}/original`
 export const thumbUrl = (a: { id: string; thumb_rev?: string | null }) =>
   `/api/assets/${a.id}/thumb${a.thumb_rev ? `?v=${a.thumb_rev}` : ''}`
+/** An animation's looping movie (an animated WebP), when the server has made one. */
+export const motionUrl = (a: { id: string; has_motion?: boolean; thumb_rev?: string | null }) =>
+  a.has_motion ? `/api/assets/${a.id}/derivative/motion${a.thumb_rev ? `?v=${a.thumb_rev}` : ''}` : null
 /** An image at most 2048 px on its longer side (the image itself when it's that small and browsers read it). */
 export const liteUrl = (a: { id: string }) => `/api/assets/${a.id}/lite`
 export const bundleUrl = (a: Asset, animations = false) => `/api/assets/${a.id}/bundle.zip${animations ? '?animations=1' : ''}`

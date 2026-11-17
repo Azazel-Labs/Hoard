@@ -15,8 +15,8 @@ de textura sueltos se convierten en materiales, los sonidos dibujan sus formas d
 sus animaciones y todo queda etiquetado, así que lo encuentras con solo escribir `footsteps gravel` o `rigged low-poly`.
 Después llega a Godot, Unity o Unreal con todo lo que necesita.
 
-Sin suscripción, sin subir nada a la nube de nadie, sin precios por usuario: una imagen de Docker en tu propia máquina,
-y es tuya. Piénsalo como una tienda de recursos sin caja.
+Sin suscripción, sin subir nada a la nube de nadie, sin precios por usuario: una imagen de Docker en tu propio servidor,
+o una aplicación en tu propia computadora, y es tuya. Piénsalo como una tienda de recursos sin caja.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="../img/hero-dark.webp">
@@ -100,9 +100,31 @@ una, y ninguna corrupción puede pasar inadvertida. Guárdalo en un disco local 
 que le indicas a Hoard se leen, nunca se modifican. Cuentas, tokens de solo lectura, inicio de sesión único, HTTPS y
 HTTP/3 vienen incluidos.
 
+### O simplemente en tu computadora
+
+¿No tienes un servidor? La aplicación de escritorio para Windows, macOS y Linux es la misma biblioteca en su propia
+ventana. Instálala, elige una carpeta y funciona sin conexión: sin cuentas, contraseñas ni configuración de servidor,
+nada a lo que pueda llegar el resto de la red, y las claves que escribas se guardan en el llavero del sistema. Las
+versiones nuevas se descargan en segundo plano y se instalan cuando la cierras.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="../img/desktop-dark.webp">
+  <img alt="La aplicación de escritorio de Hoard en una ventana de Windows: los modelos de la biblioteca en una cuadrícula, con un farol abierto en la vista previa 3D junto a sus etiquetas y descargas" src="../img/desktop-light.webp">
+</picture>
+
 <sub>La biblioteca de demostración es arte CC0: modelos de [Poly Haven](https://polyhaven.com) (glTF y USD), superficies
 de [ambientCG](https://ambientcg.com) y sonidos, hojas de sprites y fuentes de [Kenney](https://kenney.nl).
 `node web/scripts/readme-images.mts` genera estas imágenes y la tarjeta para redes sociales.</sub>
+
+## Instalar la aplicación de escritorio
+
+Descárgala desde la [versión más reciente](https://github.com/Azazel-Labs/Hoard/releases/latest): el `.msi` para
+Windows, el `.dmg` para macOS en Apple silicon, el `.AppImage` o el `.deb` para Linux. Los instaladores todavía no están
+firmados por Apple ni por Microsoft, así que Windows pregunta antes de ejecutar el `.msi` (Más información → Ejecutar de
+todas formas) y macOS antes de abrir la aplicación por primera vez (Configuración del Sistema → Privacidad y seguridad →
+Abrir de todos modos).
+
+La primera vez que se abre, pregunta dónde va la biblioteca. Todo lo demás está en Configuración, como en un servidor.
 
 ## Instalar con Docker
 

@@ -15,8 +15,8 @@ materialer, lyde tegner deres bølgeformer, sprite-ark afspiller deres animation
 det ved at skrive `footsteps gravel` eller `rigged low-poly`. Derefter lander det i Godot, Unity eller Unreal med alt,
 hvad det har brug for.
 
-Intet abonnement, ingen upload til andres sky, ingen pris pr. bruger: ét Docker-image på din egen maskine, og det er
-dit. Tænk på det som en asset-butik uden kasse.
+Intet abonnement, ingen upload til andres sky, ingen pris pr. bruger: ét Docker-image på din egen server, eller en app
+på din egen computer, og det er dit. Tænk på det som en asset-butik uden kasse.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="../img/hero-dark.webp">
@@ -96,9 +96,31 @@ Hver fil gemmes én gang efter sin BLAKE3-hash, så den samme tekstur i fem bund
 kan gå ubemærket hen. Hav det på en lokal disk eller i en hvilken som helst S3-bucket. Mapper, du peger Hoard på, bliver
 læst, aldrig ændret. Konti, skrivebeskyttede tokens, single sign-on, HTTPS og HTTP/3 er indbygget.
 
+### Eller bare på din computer
+
+Kører du ikke en server? Desktopappen til Windows, macOS og Linux er det samme bibliotek i sit eget vindue. Installér
+den, vælg en mappe, og den virker offline: ingen konti, adgangskoder eller serverindstillinger, intet som resten af
+netværket kan nå, og de nøgler, du indtaster, gemmes i systemets nøglering. Nye versioner hentes i baggrunden og
+installeres, når den afsluttes.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="../img/desktop-dark.webp">
+  <img alt="Hoard-desktopappen i et Windows-vindue: bibliotekets modeller i et gitter, med en lanterne åben i 3D-forhåndsvisningen ved siden af dens tags og downloads" src="../img/desktop-light.webp">
+</picture>
+
 <sub>Demobiblioteket er CC0-grafik: modeller fra [Poly Haven](https://polyhaven.com) (glTF og USD), overflader fra
 [ambientCG](https://ambientcg.com) og lyde, sprite-ark og skrifttyper fra [Kenney](https://kenney.nl).
 `node web/scripts/readme-images.mts` laver disse billeder og det sociale kort.</sub>
+
+## Installation af desktopappen
+
+Hent den fra den [seneste udgivelse](https://github.com/Azazel-Labs/Hoard/releases/latest): `.msi` til Windows, `.dmg`
+til macOS på Apple silicon, `.AppImage` eller `.deb` til Linux. Installationsprogrammerne er endnu ikke signeret af
+Apple eller Microsoft, så Windows spørger, før `.msi`-filen køres (Flere oplysninger → Kør alligevel), og macOS, før
+appen åbnes første gang (Systemindstillinger → Anonymitet & sikkerhed → Åbn alligevel).
+
+Første gang den åbner, spørger den, hvor biblioteket skal ligge. Alt andet findes under Indstillinger, ligesom på en
+server.
 
 ## Installation med Docker
 

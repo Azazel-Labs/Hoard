@@ -14,8 +14,8 @@ Hoard가 일을 시작합니다. 모델은 텍스처와 함께 3D로 돌아가�
 스프라이트 시트는 애니메이션을 재생하며, 모든 것에 태그가 붙으므로 `footsteps gravel`이나 `rigged low-poly`를 입력하면
 찾을 수 있습니다. 그런 다음 필요한 모든 것을 갖춘 채 Godot, Unity, Unreal로 들어갑니다.
 
-구독도, 누군가의 클라우드로 업로드하는 일도, 사용자당 요금도 없습니다. 내 컴퓨터에 Docker 이미지 하나만 있으면 온전히 내
-것이 됩니다. 결제 절차가 없는 에셋 스토어라고 생각하면 됩니다.
+구독도, 누군가의 클라우드로 업로드하는 일도, 사용자당 요금도 없습니다. 내 서버의 Docker 이미지 하나, 또는 내 컴퓨터의 앱
+하나만 있으면 온전히 내 것이 됩니다. 결제 절차가 없는 에셋 스토어라고 생각하면 됩니다.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="../img/hero-dark.webp">
@@ -94,9 +94,29 @@ Hoard는 모든 것에 오프라인으로 직접 태그를 붙입니다. `tileab
 생겨도 놓치지 않습니다. 로컬 디스크나 어떤 S3 버킷에든 보관할 수 있습니다. Hoard에 지정한 폴더는 읽기만 하고 절대
 변경하지 않습니다. 계정, 읽기 전용 토큰, 싱글 사인온, HTTPS, HTTP/3가 기본으로 들어 있습니다.
 
+### 아니면 그냥 내 컴퓨터에서
+
+서버를 운영하지 않나요? Windows, macOS, Linux용 데스크톱 앱은 같은 라이브러리를 전용 창에 띄웁니다. 설치하고 폴더를
+고르면 오프라인으로 동작합니다. 계정도, 비밀번호도, 서버 설정도 없고, 네트워크의 다른 기기에서는 아무것도 접근할 수
+없으며, 입력한 키는 시스템 키체인에 보관됩니다. 새 버전은 백그라운드에서 내려받고 앱을 종료할 때 설치됩니다.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="../img/desktop-dark.webp">
+  <img alt="Windows 창에서 실행한 Hoard 데스크톱 앱: 라이브러리의 모델이 그리드로 표시되고, 3D 미리보기에서 열린 랜턴 옆에 태그와 다운로드가 보입니다" src="../img/desktop-light.webp">
+</picture>
+
 <sub>데모 라이브러리는 CC0 작품입니다. 모델은 [Poly Haven](https://polyhaven.com)(glTF 및 USD), 표면은
 [ambientCG](https://ambientcg.com), 사운드, 스프라이트 시트, 글꼴은 [Kenney](https://kenney.nl)에서 가져왔습니다.
 `node web/scripts/readme-images.mts`가 이 그림들과 소셜 카드를 만듭니다.</sub>
+
+## 데스크톱 앱 설치
+
+[최신 릴리스](https://github.com/Azazel-Labs/Hoard/releases/latest)에서 내려받으세요. Windows는 `.msi`, Apple 실리콘
+Mac의 macOS는 `.dmg`, Linux는 `.AppImage` 또는 `.deb`입니다. 설치 프로그램은 아직 Apple이나 Microsoft의 서명을 받지
+않았으므로, Windows는 `.msi`를 실행하기 전에(추가 정보 → 실행), macOS는 앱을 처음 열기 전에(시스템 설정 → 개인정보 보호
+및 보안 → 그래도 열기) 확인을 요청합니다.
+
+처음 열면 라이브러리를 어디에 둘지 묻습니다. 나머지는 서버에서와 마찬가지로 모두 설정에 있습니다.
 
 ## Docker로 설치
 

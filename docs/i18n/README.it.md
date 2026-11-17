@@ -16,7 +16,7 @@ animazioni, e tutto riceve dei tag, così basta scrivere `footsteps gravel` o `r
 in Godot, Unity o Unreal con tutto ciò che gli serve.
 
 Nessun abbonamento, nessun caricamento sul cloud di qualcun altro, nessun prezzo per postazione: un'unica immagine
-Docker sulla tua macchina, ed è tua. Pensalo come uno store di asset senza la cassa.
+Docker sul tuo server, o un'app sul tuo computer, ed è tua. Pensalo come uno store di asset senza la cassa.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="../img/hero-dark.webp">
@@ -100,9 +100,30 @@ spazio di una sola, e nessuna corruzione può passare inosservata. Tienilo su di
 cartelle che indichi a Hoard vengono lette, mai modificate. Account, token di sola lettura, single sign-on, HTTPS e
 HTTP/3 sono integrati.
 
+### Oppure solo sul tuo computer
+
+Non hai un server? L'app desktop per Windows, macOS e Linux è la stessa libreria in una finestra tutta sua. Installala,
+scegli una cartella e funziona offline: niente account, password o impostazioni del server, niente che il resto della
+rete possa raggiungere, e le chiavi che inserisci conservate nel portachiavi di sistema. Le nuove versioni si scaricano
+in background e si installano quando la chiudi.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="../img/desktop-dark.webp">
+  <img alt="L'app desktop di Hoard in una finestra di Windows: i modelli della libreria in una griglia, con una lanterna aperta nell'anteprima 3D accanto ai suoi tag e download" src="../img/desktop-light.webp">
+</picture>
+
 <sub>La libreria di esempio è arte CC0: modelli da [Poly Haven](https://polyhaven.com) (glTF e USD), superfici da
 [ambientCG](https://ambientcg.com), e suoni, fogli di sprite e font da [Kenney](https://kenney.nl).
 `node web/scripts/readme-images.mts` crea queste immagini e la social card.</sub>
+
+## Installazione dell'app desktop
+
+Scaricala dall'[ultima versione](https://github.com/Azazel-Labs/Hoard/releases/latest): il file `.msi` per Windows, il
+`.dmg` per macOS su Apple silicon, l'`.AppImage` o il `.deb` per Linux. Gli installer non sono ancora firmati da Apple o
+Microsoft, quindi Windows chiede conferma prima di eseguire il file `.msi` (Ulteriori informazioni → Esegui comunque) e
+macOS prima di aprire l'app la prima volta (Impostazioni di Sistema → Privacy e sicurezza → Apri comunque).
+
+La prima volta che si apre, chiede dove mettere la libreria. Tutto il resto è nelle Impostazioni, come su un server.
 
 ## Installazione con Docker
 

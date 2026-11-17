@@ -15,8 +15,8 @@ döner, dağınık doku haritaları malzemeye dönüşür, sesler dalga biçimle
 oynatır ve her şey etiketlenir; böylece `footsteps gravel` ya da `rigged low-poly` yazmanız onu bulmaya yeter. Ardından
 ihtiyaç duyduğu her şeyle birlikte Godot, Unity ya da Unreal projenize iner.
 
-Abonelik yok, kimsenin bulutuna yükleme yok, kullanıcı başına ücret yok: kendi makinenizde tek bir Docker imajı ve
-tamamen sizin. Onu ödeme adımı olmayan bir varlık mağazası gibi düşünün.
+Abonelik yok, kimsenin bulutuna yükleme yok, kullanıcı başına ücret yok: kendi sunucunuzda tek bir Docker imajı ya da
+kendi bilgisayarınızda bir uygulama ve tamamen sizin. Onu ödeme adımı olmayan bir varlık mağazası gibi düşünün.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="../img/hero-dark.webp">
@@ -100,9 +100,30 @@ bozulma fark edilmeden kalamaz. Kütüphaneyi yerel diskte ya da herhangi bir S3
 klasörler okunur, asla değiştirilmez. Hesaplar, salt okunur erişim belirteçleri, tek oturum açma (SSO), HTTPS ve HTTP/3
 yerleşik olarak gelir.
 
+### Ya da yalnızca bilgisayarınızda
+
+Sunucu çalıştırmıyor musunuz? Windows, macOS ve Linux için masaüstü uygulaması, kendi penceresinde aynı kütüphanedir.
+Kurup bir klasör seçtiğinizde çevrimdışı çalışır: hesap, parola ya da sunucu ayarı yok, ağın geri kalanının
+erişebileceği hiçbir şey yok ve girdiğiniz anahtarlar sistemin anahtar zincirinde saklanır. Yeni sürümler arka planda
+iner ve uygulamadan çıktığınızda kurulur.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="../img/desktop-dark.webp">
+  <img alt="Bir Windows penceresinde Hoard masaüstü uygulaması: bir ızgarada kütüphanenin modelleri; yanda, etiketleri ve indirmeleriyle birlikte 3B önizlemede açık bir fener" src="../img/desktop-light.webp">
+</picture>
+
 <sub>Tanıtım kütüphanesi CC0 çizimlerden oluşur: [Poly Haven](https://polyhaven.com)’den modeller (glTF ve USD),
 [ambientCG](https://ambientcg.com)’den yüzeyler ve [Kenney](https://kenney.nl)’den sesler, sprite sayfaları ve yazı
 tipleri. Bu resimleri ve sosyal medya kartını `node web/scripts/readme-images.mts` oluşturur.</sub>
+
+## Masaüstü uygulamasının kurulumu
+
+Uygulamayı [en son sürümden](https://github.com/Azazel-Labs/Hoard/releases/latest) indirin: Windows için `.msi`, Apple
+silicon’lı macOS için `.dmg`, Linux için `.AppImage` ya da `.deb`. Kurulum dosyaları henüz Apple ya da Microsoft
+tarafından imzalanmadığı için Windows `.msi` dosyasını çalıştırmadan önce (Ek bilgi → Yine de çalıştır), macOS ise
+uygulamayı ilk kez açmadan önce (Sistem Ayarları → Gizlilik ve Güvenlik → Yine de Aç) sorar.
+
+İlk açıldığında kütüphanenin nereye konacağını sorar. Geri kalan her şey, sunucuda olduğu gibi Ayarlar’dadır.
 
 ## Docker ile kurulum
 

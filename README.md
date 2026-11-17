@@ -16,8 +16,8 @@ thousand files, and Hoard gets to work. Models turn in 3D with their textures, l
 sounds draw their waveforms, sprite sheets play their animations, and everything gets tagged, so typing
 `footsteps gravel` or `rigged low-poly` finds it. Then it lands in Godot, Unity or Unreal with everything it needs.
 
-No subscription, no upload to anyone's cloud, no per-seat pricing: one Docker image on your own machine, and it's
-yours. Think of it as an asset store with no checkout.
+No subscription, no upload to anyone's cloud, no per-seat pricing: one Docker image on your own server, or an app on
+your own computer, and it's yours. Think of it as an asset store with no checkout.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/img/hero-dark.webp">
@@ -98,9 +98,30 @@ Every file is stored once by its BLAKE3 hash, so the same texture in five bundle
 corruption can't go unnoticed. Keep it on local disk or any S3 bucket. Folders you point Hoard at are read, never
 changed. Accounts, read-only tokens, single sign-on, HTTPS and HTTP/3 are built in.
 
+### Or just on your computer
+
+Not running a server? The desktop app for Windows, macOS and Linux is the same library in a window of its own.
+Install it, pick a folder, and it works offline: no accounts, passwords or server settings, nothing the rest of the
+network can reach, and the keys you type in kept in the system's keychain. New versions download in the background
+and install when it quits.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/img/desktop-dark.webp">
+  <img alt="The Hoard desktop app in a Windows window: the library's models in a grid, with a lantern open in the 3D preview beside its tags and downloads" src="docs/img/desktop-light.webp">
+</picture>
+
 <sub>The demo library is CC0 art: models from [Poly Haven](https://polyhaven.com) (glTF and USD), surfaces from
 [ambientCG](https://ambientcg.com), and sounds, sprite sheets and fonts from [Kenney](https://kenney.nl).
 `node web/scripts/readme-images.mts` makes these pictures and the social card.</sub>
+
+## Install the desktop app
+
+Download it from the [latest release](https://github.com/Azazel-Labs/Hoard/releases/latest): the `.msi` for
+Windows, the `.dmg` for macOS on Apple silicon, the `.AppImage` or `.deb` for Linux. The installers aren't signed by
+Apple or Microsoft yet, so Windows asks before running the `.msi` (More info → Run anyway) and macOS before opening the
+app the first time (System Settings → Privacy & Security → Open Anyway).
+
+The first time it opens, it asks where the library goes. Everything else is in Settings, as on a server.
 
 ## Install with Docker
 

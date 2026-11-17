@@ -15,8 +15,8 @@ material, suara menggambar bentuk gelombangnya, lembar sprite memutar animasinya
 mengetik `footsteps gravel` atau `rigged low-poly` langsung menemukannya. Lalu aset itu masuk ke Godot, Unity, atau
 Unreal beserta semua yang dibutuhkannya.
 
-Tanpa langganan, tanpa unggahan ke cloud siapa pun, tanpa harga per pengguna: satu image Docker di mesin Anda sendiri,
-dan itu milik Anda. Anggap saja toko aset tanpa kasir.
+Tanpa langganan, tanpa unggahan ke cloud siapa pun, tanpa harga per pengguna: satu image Docker di server Anda sendiri,
+atau sebuah aplikasi di komputer Anda sendiri, dan itu milik Anda. Anggap saja toko aset tanpa kasir.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="../img/hero-dark.webp">
@@ -99,9 +99,31 @@ satu tekstur, dan kerusakan data tidak mungkin luput dari perhatian. Simpan di d
 Folder yang Anda tunjukkan ke Hoard hanya dibaca, tidak pernah diubah. Akun, token hanya-baca, single sign-on, HTTPS,
 dan HTTP/3 sudah tersedia bawaan.
 
+### Atau cukup di komputer Anda
+
+Tidak menjalankan server? Aplikasi desktop untuk Windows, macOS, dan Linux adalah pustaka yang sama dalam jendelanya
+sendiri. Pasang, pilih sebuah folder, dan aplikasi itu bekerja secara offline: tanpa akun, kata sandi, atau pengaturan
+server, tidak ada yang bisa dijangkau dari bagian lain jaringan, dan kunci yang Anda ketikkan disimpan di keychain
+sistem. Versi baru diunduh di latar belakang dan dipasang saat aplikasi ditutup.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="../img/desktop-dark.webp">
+  <img alt="Aplikasi desktop Hoard di jendela Windows: model-model pustaka dalam kisi, dengan lentera yang dibuka di pratinjau 3D di samping tag dan unduhannya" src="../img/desktop-light.webp">
+</picture>
+
 <sub>Pustaka demo berisi karya CC0: model dari [Poly Haven](https://polyhaven.com) (glTF dan USD), permukaan dari
 [ambientCG](https://ambientcg.com), serta suara, lembar sprite, dan font dari [Kenney](https://kenney.nl).
 `node web/scripts/readme-images.mts` membuat gambar-gambar ini dan kartu media sosialnya.</sub>
+
+## Memasang aplikasi desktop
+
+Unduh dari [rilis terbaru](https://github.com/Azazel-Labs/Hoard/releases/latest): `.msi` untuk Windows, `.dmg` untuk
+macOS di Apple silicon, `.AppImage` atau `.deb` untuk Linux. Penginstalnya belum ditandatangani oleh Apple atau
+Microsoft, jadi Windows akan bertanya sebelum menjalankan `.msi` (More info → Run anyway) dan macOS sebelum membuka
+aplikasinya untuk pertama kali (System Settings → Privacy & Security → Open Anyway).
+
+Saat pertama kali dibuka, aplikasi akan menanyakan di mana pustaka disimpan. Semua hal lainnya ada di Pengaturan, sama
+seperti di server.
 
 ## Memasang dengan Docker
 

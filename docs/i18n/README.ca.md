@@ -15,8 +15,9 @@ els mapes de textura solts es converteixen en materials, els sons dibuixen les s
 reprodueixen les seves animacions i tot queda etiquetat, de manera que només cal escriure `footsteps gravel` o
 `rigged low-poly` per trobar-ho. Després arriba a Godot, Unity o Unreal amb tot el que necessita.
 
-Sense subscripció, sense pujar res al núvol de ningú, sense preus per usuari: una imatge de Docker a la vostra pròpia
-màquina, i és vostra. Penseu-hi com una botiga de recursos sense caixa per pagar.
+Sense subscripció, sense pujar res al núvol de ningú, sense preus per usuari: una imatge de Docker al vostre propi
+servidor, o una aplicació al vostre propi ordinador, i és vostra. Penseu-hi com una botiga de recursos sense caixa per
+pagar.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="../img/hero-dark.webp">
@@ -99,9 +100,30 @@ d'una sola, i cap corrupció no pot passar desapercebuda. Guardeu-ho en un disc 
 carpetes que indiqueu a Hoard es llegeixen, però no es modifiquen mai. Els comptes, els tokens de només lectura, l'inici
 de sessió únic, HTTPS i HTTP/3 hi són integrats.
 
+### O simplement al vostre ordinador
+
+No teniu cap servidor? L'aplicació d'escriptori per a Windows, macOS i Linux és la mateixa biblioteca en una finestra
+pròpia. Instal·leu-la, trieu una carpeta i funciona sense connexió: sense comptes, contrasenyes ni configuració de
+servidor, res a què pugui accedir la resta de la xarxa, i les claus que hi escriviu es guarden al clauer del sistema.
+Les versions noves es baixen en segon pla i s'instal·len quan es tanca.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="../img/desktop-dark.webp">
+  <img alt="L'aplicació d'escriptori de Hoard en una finestra de Windows: els models de la biblioteca en una graella, amb un fanal obert a la previsualització 3D al costat de les seves etiquetes i baixades" src="../img/desktop-light.webp">
+</picture>
+
 <sub>La biblioteca de demostració és art CC0: models de [Poly Haven](https://polyhaven.com) (glTF i USD), superfícies
 d'[ambientCG](https://ambientcg.com), i sons, fulls de sprites i tipus de lletra de [Kenney](https://kenney.nl).
 `node web/scripts/readme-images.mts` genera aquestes imatges i la targeta per a xarxes socials.</sub>
+
+## Instal·lació de l'aplicació d'escriptori
+
+Baixeu-la de la [versió més recent](https://github.com/Azazel-Labs/Hoard/releases/latest): el `.msi` per a Windows, el
+`.dmg` per a macOS amb Apple silicon, el `.AppImage` o el `.deb` per a Linux. Els instal·ladors encara no estan signats
+per Apple ni per Microsoft, així que Windows demana confirmació abans d'executar el `.msi` (More info → Run anyway) i
+macOS abans d'obrir l'aplicació la primera vegada (System Settings → Privacy & Security → Open Anyway).
+
+La primera vegada que s'obre, pregunta on va la biblioteca. Tota la resta és a Configuració, com en un servidor.
 
 ## Instal·lació amb Docker
 

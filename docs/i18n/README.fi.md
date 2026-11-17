@@ -15,8 +15,8 @@ tekstuurikartat kootaan materiaaleiksi, äänet piirtävät aaltomuotonsa, sprit
 saa tunnisteet, joten löydät etsimäsi kirjoittamalla `footsteps gravel` tai `rigged low-poly`. Sitten se päätyy
 Godotiin, Unityyn tai Unrealiin kaiken tarvitsemansa kanssa.
 
-Ei tilausta, ei latausta kenenkään pilveen, ei käyttäjäkohtaista hinnoittelua: yksi Docker-image omalla koneellasi, ja
-se on sinun. Ajattele sitä resurssikauppana ilman kassaa.
+Ei tilausta, ei latausta kenenkään pilveen, ei käyttäjäkohtaista hinnoittelua: yksi Docker-image omalla palvelimellasi
+tai sovellus omalla tietokoneellasi, ja se on sinun. Ajattele sitä resurssikauppana ilman kassaa.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="../img/hero-dark.webp">
@@ -100,9 +100,31 @@ vain yhden tekstuurin verran tilaa, eikä tietojen vioittuminen voi jäädä huo
 levyllä tai missä tahansa S3-säilössä. Kansiot, joihin Hoardin osoitat, luetaan mutta niitä ei koskaan muuteta. Tilit,
 vain luku -tunnukset, kertakirjautuminen, HTTPS ja HTTP/3 ovat valmiina mukana.
 
+### Tai vain omalla tietokoneellasi
+
+Eikö sinulla ole palvelinta? Työpöytäsovellus Windowsille, macOS:lle ja Linuxille on sama kirjasto omassa ikkunassaan.
+Asenna se, valitse kansio, ja se toimii ilman verkkoyhteyttä: ei tilejä, salasanoja eikä palvelinasetuksia, ei mitään,
+mihin muu verkko pääsisi käsiksi, ja kirjoittamasi avaimet säilyvät järjestelmän avainnipussa. Uudet versiot latautuvat
+taustalla ja asentuvat, kun sovellus suljetaan.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="../img/desktop-dark.webp">
+  <img alt="Hoardin työpöytäsovellus Windows-ikkunassa: kirjaston mallit ruudukossa ja lyhty avoinna 3D-esikatselussa tunnisteidensa ja latausten vieressä" src="../img/desktop-light.webp">
+</picture>
+
 <sub>Esittelykirjaston grafiikka on CC0-lisensoitua: mallit [Poly Havenista](https://polyhaven.com) (glTF ja USD),
 pinnat [ambientCG:stä](https://ambientcg.com) sekä äänet, sprite-arkit ja fontit [Kenneyltä](https://kenney.nl).
 `node web/scripts/readme-images.mts` tekee nämä kuvat ja some-kortin.</sub>
+
+## Työpöytäsovelluksen asennus
+
+Lataa se [uusimmasta julkaisusta](https://github.com/Azazel-Labs/Hoard/releases/latest): `.msi` Windowsille, `.dmg`
+Apple silicon -koneiden macOS:lle, `.AppImage` tai `.deb` Linuxille. Apple tai Microsoft ei ole vielä allekirjoittanut
+asennusohjelmia, joten Windows kysyy ennen `.msi`:n suorittamista (Lisätietoja → Suorita silti) ja macOS ennen
+sovelluksen ensimmäistä avaamista (Järjestelmäasetukset → Yksityisyys ja suojaus → Avaa silti).
+
+Kun sovellus avataan ensimmäisen kerran, se kysyy, mihin kirjasto tulee. Kaikki muu on Asetuksissa, kuten
+palvelimellakin.
 
 ## Asennus Dockerilla
 

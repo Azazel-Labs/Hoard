@@ -5,7 +5,8 @@
 // It fetches a demo library of CC0 art (models from Poly Haven, as glTF and USD, surfaces from ambientCG, sounds,
 // sprite sheets and fonts from Kenney by way of OpenGameArt) into target/readme-assets (once; later runs reuse it),
 // starts a throwaway hoardd on its own data folder, uploads the art as packs, waits for thumbnails, then screenshots
-// the portal in dark and light and lays the card out around the dark hero.
+// the portal in dark and light and lays the card out around the dark hero. The desktop shot is the portal as the
+// desktop app shows it, drawn in a Windows 11 window.
 import { execFileSync, spawn, type ChildProcess } from 'node:child_process'
 import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs'
 import { createServer } from 'node:net'
@@ -177,7 +178,7 @@ async function startServer(root: string): Promise<{ url: string; child: ChildPro
 }
 
 /** The demo assets each shot opens, by kind and a word of their name. */
-type Picks = Record<'hero' | 'page' | 'material' | 'sheet' | 'sound', string>
+type Picks = Record<'hero' | 'page' | 'material' | 'sheet' | 'sound' | 'desktop', string>
 
 async function find(api: APIRequestContext, q: string, kind: string): Promise<string> {
   const found = (await (await api.get('/api/assets', { params: { q, kind, limit: 5 } })).json()) as { items: { id: string }[] }
@@ -215,6 +216,7 @@ async function fillLibrary(url: string, root: string): Promise<{ api: APIRequest
     material: await find(api, 'Bricks113A', 'material'),
     sheet: await find(api, 'femaleAdventurer', 'sheet'),
     sound: await find(api, 'book flip 1', 'audio'),
+    desktop: await find(api, 'lantern', 'model'),
   }
   return { api, picks }
 }
@@ -239,8 +241,8 @@ async function webp(browser: Browser, png: Buffer, quality = 0.9): Promise<Buffe
   return Buffer.from(data.split(',')[1], 'base64')
 }
 
-/** A screenshot: where it opens, and what it does there before the picture is taken. */
-type Shot = { name: string; path: (p: Picks) => string; act?: (page: Page) => Promise<void> }
+/** A screenshot: where it opens, what it does there before the picture is taken, and whether it's the desktop app. */
+type Shot = { name: string; path: (p: Picks) => string; act?: (page: Page) => Promise<void>; desktop?: boolean }
 
 const panel = (page: Page) => page.getByRole('complementary', { name: 'Asset details' })
 
@@ -277,6 +279,8 @@ const SHOTS: Shot[] = [
   { name: 'sound', path: (p) => `/?sort=name&kind=audio#asset=${p.sound}` },
   // A search across kinds: models, materials and textures that are wood.
   { name: 'search', path: () => `/?q=wood` },
+  // The desktop app's window: the library on this computer, a lantern open.
+  { name: 'desktop', path: (p) => `/?sort=name#asset=${p.desktop}`, desktop: true },
 ]
 
 async function shoot(browser: Browser, api: APIRequestContext, url: string, picks: Picks, shot: Shot, scheme: 'dark' | 'light'): Promise<Buffer> {
@@ -289,6 +293,13 @@ async function shoot(browser: Browser, api: APIRequestContext, url: string, pick
     reducedMotion: 'no-preference',
   })
   const page = await ctx.newPage()
+  // The desktop app's portal is this one told it's the desktop app: no accounts, guests or server settings.
+  if (shot.desktop) {
+    await page.route('**/api/auth/status', async (route) => {
+      const res = await route.fetch()
+      await route.fulfill({ response: res, json: { ...(await res.json()), desktop: true } })
+    })
+  }
   await page.goto(shot.path(picks))
   if (shot.path(picks).includes('#asset=')) await panel(page).waitFor()
   await page.waitForLoadState('networkidle')
@@ -298,6 +309,41 @@ async function shoot(browser: Browser, api: APIRequestContext, url: string, pick
   await page.waitForTimeout(4000)
   const png = await page.screenshot()
   await ctx.close()
+  return shot.desktop ? framed(browser, png, scheme) : png
+}
+
+/** Where the window sits in the desktop shot, around the 1440 × 860 portal and its 32 px title bar. */
+const MARGIN = 56
+const TITLE_BAR = 32
+
+/** The portal in a Windows 11 window titled Hoard, its title bar following the color scheme, on a plain backdrop. */
+async function framed(browser: Browser, shot: Buffer, scheme: 'dark' | 'light'): Promise<Buffer> {
+  const icon = readFileSync(join(web, 'public/favicon.svg'), 'utf8')
+  const dark = scheme === 'dark'
+  const glyph = (d: string) => `<span><svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1">${d}</svg></span>`
+  const page = await browser.newPage({ viewport: { width: 1440 + 2 * MARGIN, height: 860 + TITLE_BAR + 2 * MARGIN }, deviceScaleFactor: 2 })
+  await page.setContent(`<!doctype html><html><head><style>
+  * { box-sizing: border-box; margin: 0; }
+  body { height: 100vh; overflow: hidden; display: grid; place-items: center;
+         background: ${dark ? 'radial-gradient(120% 140% at 0% 0%, #2b3550 0%, #171c28 55%, #10141c 100%)' : 'radial-gradient(120% 140% at 0% 0%, #eef3fa 0%, #d9e2ef 55%, #c7d3e4 100%)'}; }
+  .win { width: 1440px; border-radius: 8px; overflow: hidden; background: ${dark ? '#202020' : '#f3f3f3'};
+         box-shadow: 0 0 0 1px ${dark ? '#ffffff26' : '#0000001f'}, 0 24px 64px ${dark ? '#000a' : '#1c27404d'}, 0 4px 14px ${dark ? '#0006' : '#1c274026'}; }
+  .bar { height: ${TITLE_BAR}px; display: flex; align-items: center; color: ${dark ? '#ffffff' : '#000000'};
+         font: 12px 'Segoe UI Variable Text', 'Segoe UI', system-ui, sans-serif; }
+  .bar > svg { width: 16px; height: 16px; margin: 0 8px 0 12px; }
+  .caps { margin-left: auto; display: flex; height: 100%; }
+  .caps span { width: 46px; display: grid; place-items: center; }
+  .caps svg { width: 10px; height: 10px; }
+  .shot { display: block; width: 1440px; height: 860px; }
+</style></head><body><div class="win">
+  <div class="bar">${icon}<span>Hoard</span><div class="caps">
+    ${glyph('<path d="M0 5.5h10"/>')}${glyph('<rect x="0.5" y="0.5" width="9" height="9" rx="1.5"/>')}${glyph('<path d="M0.5 0.5l9 9M9.5 0.5l-9 9"/>')}
+  </div></div>
+  <img class="shot" src="data:image/png;base64,${shot.toString('base64')}">
+</div></body></html>`)
+  await page.waitForFunction(() => [...document.images].every((i) => i.complete))
+  const png = await page.screenshot()
+  await page.close()
   return png
 }
 

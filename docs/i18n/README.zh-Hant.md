@@ -11,7 +11,7 @@
 
 Hoard 是一套自行架設的遊戲素材庫。放入一個 zip、一個 Unity 套件、一份 Fab 下載內容，或一個裝著上萬個檔案的資料夾，Hoard 就會開始工作。模型帶著貼圖在 3D 中旋轉，零散的貼圖檔會組成材質，聲音會畫出自己的波形，精靈圖表會播放自己的動畫，而一切都會加上標籤，所以輸入 `footsteps gravel` 或 `rigged low-poly` 就能找到。接著它就會帶著所需的一切進入 Godot、Unity 或 Unreal。
 
-不用訂閱，不必上傳到任何人的雲端，也不按席次計價：在你自己的機器上跑一個 Docker 映像檔，它就完全屬於你。你可以把它想成一個不用結帳的素材商店。
+不用訂閱，不必上傳到任何人的雲端，也不按席次計價：在你自己的伺服器上跑一個 Docker 映像檔，或在你自己的電腦上裝一個應用程式，它就完全屬於你。你可以把它想成一個不用結帳的素材商店。
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="../img/hero-dark.webp">
@@ -74,7 +74,22 @@ Hoard 會離線自動為一切加上標籤：`tileable`、`res:2k`、`poly:low`�
 
 每個檔案依其 BLAKE3 雜湊值只儲存一次，因此五個素材包中的同一張貼圖只佔一份空間，任何損毀也不會被忽略。可以存放在本機磁碟或任何 S3 儲存貯體中。你指定給 Hoard 的資料夾只會被讀取，絕不會被修改。帳號、唯讀權杖、單一登入、HTTPS 與 HTTP/3 都已內建。
 
+### 或者，就在你的電腦上
+
+沒有架設伺服器？適用於 Windows、macOS 與 Linux 的桌面應用程式就是同一個素材庫，只是有自己的視窗。安裝後選一個資料夾，就能離線使用：沒有帳號、密碼或伺服器設定，網路上的其他裝置都存取不到它，你輸入的金鑰也會存放在系統鑰匙圈中。新版本會在背景下載，並在你結束程式時安裝。
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="../img/desktop-dark.webp">
+  <img alt="Windows 視窗中的 Hoard 桌面應用程式：格狀排列的素材庫模型，旁邊的 3D 預覽中開啟著一盞燈籠，並列出它的標籤與下載選項" src="../img/desktop-light.webp">
+</picture>
+
 <sub>示範素材庫中的都是 CC0 作品：模型來自 [Poly Haven](https://polyhaven.com)（glTF 與 USD），表面材質來自 [ambientCG](https://ambientcg.com)，聲音、精靈圖表與字型來自 [Kenney](https://kenney.nl)。這些圖片與社群預覽卡是由 `node web/scripts/readme-images.mts` 產生的。</sub>
+
+## 安裝桌面應用程式
+
+從[最新版本](https://github.com/Azazel-Labs/Hoard/releases/latest)下載：Windows 用 `.msi`，Apple 晶片的 macOS 用 `.dmg`，Linux 用 `.AppImage` 或 `.deb`。安裝程式尚未經過 Apple 或 Microsoft 簽署，因此 Windows 會在執行 `.msi` 前詢問（其他資訊 → 仍要執行），macOS 則會在第一次開啟應用程式前詢問（系統設定 → 隱私權與安全性 → 強制打開）。
+
+第一次開啟時，它會詢問素材庫要放在哪裡。其他一切都在「設定」中，就像在伺服器上一樣。
 
 ## 使用 Docker 安裝
 

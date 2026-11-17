@@ -15,8 +15,8 @@ textura soltos viram materiais, os sons desenham suas formas de onda, as folhas 
 ganha tags, então digitar `footsteps gravel` ou `rigged low-poly` encontra o que você procura. Depois, cada asset chega
 ao Godot, ao Unity ou ao Unreal com tudo de que precisa.
 
-Sem assinatura, sem upload para a nuvem de ninguém, sem preço por usuário: uma imagem Docker na sua própria máquina, e
-ela é sua. Pense nele como uma loja de assets sem caixa.
+Sem assinatura, sem upload para a nuvem de ninguém, sem preço por usuário: uma imagem Docker no seu próprio servidor, ou
+um app no seu próprio computador, e ele é seu. Pense nele como uma loja de assets sem caixa.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="../img/hero-dark.webp">
@@ -99,9 +99,31 @@ uma só, e nenhuma corrupção passa despercebida. Mantenha tudo em disco local 
 as quais você aponta o Hoard são lidas, nunca alteradas. Contas, tokens somente leitura, login único (single sign-on),
 HTTPS e HTTP/3 já vêm embutidos.
 
+### Ou só no seu computador
+
+Não roda um servidor? O app de desktop para Windows, macOS e Linux é a mesma biblioteca em uma janela própria. Instale,
+escolha uma pasta e ele funciona offline: sem contas, senhas ou configurações de servidor, nada que o resto da rede
+consiga alcançar, e as chaves que você digita guardadas no chaveiro do sistema. Novas versões são baixadas em segundo
+plano e instaladas quando você o fecha.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="../img/desktop-dark.webp">
+  <img alt="O app de desktop do Hoard em uma janela do Windows: os modelos da biblioteca em uma grade, com uma lanterna aberta na prévia 3D ao lado das tags e dos downloads dela" src="../img/desktop-light.webp">
+</picture>
+
 <sub>A biblioteca de demonstração é arte CC0: modelos do [Poly Haven](https://polyhaven.com) (glTF e USD), superfícies do
 [ambientCG](https://ambientcg.com) e sons, folhas de sprites e fontes do [Kenney](https://kenney.nl).
 `node web/scripts/readme-images.mts` gera estas imagens e o cartão social.</sub>
+
+## Instalar o app de desktop
+
+Baixe na [versão mais recente](https://github.com/Azazel-Labs/Hoard/releases/latest): o `.msi` para Windows, o `.dmg`
+para macOS em Macs com Apple silicon, o `.AppImage` ou o `.deb` para Linux. Os instaladores ainda não são assinados pela
+Apple nem pela Microsoft, então o Windows pergunta antes de executar o `.msi` (Mais informações → Executar assim mesmo)
+e o macOS antes de abrir o app pela primeira vez (Ajustes do Sistema → Privacidade e Segurança → Abrir Mesmo Assim).
+
+Na primeira vez que abre, ele pergunta onde a biblioteca vai ficar. Todo o resto fica em Configurações, como em um
+servidor.
 
 ## Instalar com Docker
 

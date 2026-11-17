@@ -16,7 +16,7 @@ swoje animacje, a wszystko dostaje tagi, więc wystarczy wpisać `footsteps grav
 znaleźć. Potem trafia to do Godota, Unity lub Unreala ze wszystkim, czego potrzebuje.
 
 Bez abonamentu, bez wysyłania czegokolwiek do cudzej chmury, bez opłat za stanowisko: jeden obraz Dockera na własnym
-komputerze, i to na własność. To coś jak sklep z zasobami, tylko bez kasy.
+serwerze albo aplikacja na własnym komputerze, i to na własność. To coś jak sklep z zasobami, tylko bez kasy.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="../img/hero-dark.webp">
@@ -99,9 +99,31 @@ a uszkodzenie nie może przejść niezauważone. Wszystko można trzymać na dys
 Foldery wskazane Hoardowi są tylko odczytywane, nigdy zmieniane. Konta, tokeny tylko do odczytu, logowanie
 jednokrotne (SSO), HTTPS i HTTP/3 są wbudowane.
 
+### Albo po prostu na komputerze
+
+Bez serwera? Aplikacja desktopowa dla Windows, macOS i Linuksa to ta sama biblioteka we własnym oknie. Wystarczy ją
+zainstalować i wybrać folder, a działa offline: bez kont, haseł i ustawień serwera, bez niczego, do czego mogłaby
+dotrzeć reszta sieci, a wpisane klucze trafiają do systemowego pęku kluczy. Nowe wersje pobierają się w tle i instalują
+przy zamykaniu aplikacji.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="../img/desktop-dark.webp">
+  <img alt="Aplikacja desktopowa Hoard w oknie Windows: modele z biblioteki w siatce, a obok otwarta w podglądzie 3D latarnia, wraz z jej tagami i pobraniami" src="../img/desktop-light.webp">
+</picture>
+
 <sub>Biblioteka demonstracyjna to grafiki na licencji CC0: modele z [Poly Haven](https://polyhaven.com) (glTF i USD),
 powierzchnie z [ambientCG](https://ambientcg.com) oraz dźwięki, arkusze sprite’ów i fonty z [Kenney](https://kenney.nl).
 `node web/scripts/readme-images.mts` tworzy te obrazy i kartę do mediów społecznościowych.</sub>
+
+## Instalacja aplikacji desktopowej
+
+Można ją pobrać z [najnowszego wydania](https://github.com/Azazel-Labs/Hoard/releases/latest): plik `.msi` dla Windows,
+`.dmg` dla macOS na Macach z układem Apple, `.AppImage` lub `.deb` dla Linuksa. Instalatory nie są jeszcze podpisane
+przez Apple ani Microsoft, więc Windows pyta przed uruchomieniem pliku `.msi` (Więcej informacji → Uruchom mimo to), a
+macOS przed pierwszym otwarciem aplikacji (Ustawienia systemowe → Prywatność i ochrona → Otwórz mimo to).
+
+Przy pierwszym otwarciu aplikacja pyta, gdzie ma trafić biblioteka. Wszystko inne jest w Ustawieniach, tak jak na
+serwerze.
 
 ## Instalacja przez Dockera
 

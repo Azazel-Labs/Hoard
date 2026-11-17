@@ -16,7 +16,8 @@ de sprites jouent leurs animations, et tout reçoit des étiquettes : il suffit
 `rigged low-poly` pour le trouver. Ensuite, la ressource arrive dans Godot, Unity ou Unreal avec tout ce qu’il lui faut.
 
 Pas d’abonnement, pas d’envoi vers le cloud de qui que ce soit, pas de tarif par poste : une seule image Docker sur
-votre propre machine, et elle est à vous. Voyez-le comme une boutique de ressources sans passage en caisse.
+votre propre serveur, ou une application sur votre propre ordinateur, et elle est à vous. Voyez-le comme une boutique de
+ressources sans passage en caisse.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="../img/hero-dark.webp">
@@ -101,10 +102,33 @@ la place d’une seule, et aucune corruption ne peut passer inaperçue. Gardez t
 quel bucket S3. Les dossiers que vous indiquez à Hoard sont lus, jamais modifiés. Comptes, jetons en lecture seule,
 authentification unique, HTTPS et HTTP/3 sont intégrés.
 
+### Ou simplement sur votre ordinateur
+
+Pas de serveur ? L’application de bureau pour Windows, macOS et Linux, c’est la même bibliothèque dans sa propre
+fenêtre. Installez-la, choisissez un dossier, et elle fonctionne hors ligne : pas de comptes, de mots de passe ni de
+paramètres de serveur, rien que le reste du réseau puisse atteindre, et les clés que vous saisissez sont conservées dans
+le trousseau du système. Les nouvelles versions se téléchargent en arrière-plan et s’installent quand vous la quittez.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="../img/desktop-dark.webp">
+  <img alt="L’application de bureau Hoard dans une fenêtre Windows : les modèles de la bibliothèque en grille, avec une lanterne ouverte dans l’aperçu 3D à côté de ses étiquettes et téléchargements" src="../img/desktop-light.webp">
+</picture>
+
 <sub>La bibliothèque de démonstration est faite d’œuvres CC0 : des modèles de [Poly Haven](https://polyhaven.com) (glTF
 et USD), des surfaces de [ambientCG](https://ambientcg.com), et des sons, planches de sprites et polices de
 [Kenney](https://kenney.nl). `node web/scripts/readme-images.mts` crée ces images et la carte pour les réseaux
 sociaux.</sub>
+
+## Installer l’application de bureau
+
+Téléchargez-la depuis la [dernière version](https://github.com/Azazel-Labs/Hoard/releases/latest) : le `.msi` pour
+Windows, le `.dmg` pour macOS sur Apple silicon, le `.AppImage` ou le `.deb` pour Linux. Les installateurs ne sont pas
+encore signés par Apple ni par Microsoft : Windows demande donc une confirmation avant d’exécuter le `.msi`
+(Informations complémentaires → Exécuter quand même) et macOS avant d’ouvrir l’application la première fois (Réglages
+Système → Confidentialité et sécurité → Ouvrir quand même).
+
+La première fois qu’elle s’ouvre, elle demande où mettre la bibliothèque. Tout le reste se trouve dans les Paramètres,
+comme sur un serveur.
 
 ## Installer avec Docker
 

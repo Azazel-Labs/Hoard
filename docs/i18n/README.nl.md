@@ -15,8 +15,8 @@ texturemaps worden materialen, geluiden tekenen hun golfvorm, spritesheets spele
 tags, zodat je het vindt door `footsteps gravel` of `rigged low-poly` te typen. Daarna belandt het in Godot, Unity of
 Unreal, met alles wat het nodig heeft.
 
-Geen abonnement, geen upload naar andermans cloud, geen prijs per gebruiker: één Docker-image op je eigen machine, en
-het is van jou. Zie het als een assetstore zonder kassa.
+Geen abonnement, geen upload naar andermans cloud, geen prijs per gebruiker: één Docker-image op je eigen server, of een
+app op je eigen computer, en het is van jou. Zie het als een assetstore zonder kassa.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="../img/hero-dark.webp">
@@ -100,9 +100,31 @@ ruimte van één inneemt, en beschadiging niet onopgemerkt kan blijven. Bewaar h
 willekeurige S3-bucket. Mappen waar je Hoard op richt worden gelezen, nooit gewijzigd. Accounts, alleen-lezentokens,
 single sign-on, HTTPS en HTTP/3 zijn ingebouwd.
 
+### Of gewoon op je computer
+
+Draai je geen server? De desktop-app voor Windows, macOS en Linux is dezelfde bibliotheek in een eigen venster.
+Installeer hem, kies een map en hij werkt offline: geen accounts, wachtwoorden of serverinstellingen, niets wat de rest
+van het netwerk kan bereiken, en de sleutels die je invoert bewaard in de sleutelhanger van het systeem. Nieuwe versies
+worden op de achtergrond gedownload en geïnstalleerd wanneer je de app afsluit.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="../img/desktop-dark.webp">
+  <img alt="De Hoard-desktop-app in een Windows-venster: de modellen uit de bibliotheek in een raster, met een lantaarn geopend in het 3D-voorbeeld naast de tags en downloads ervan" src="../img/desktop-light.webp">
+</picture>
+
 <sub>De demobibliotheek bestaat uit CC0-art: modellen van [Poly Haven](https://polyhaven.com) (glTF en USD),
 oppervlakken van [ambientCG](https://ambientcg.com), en geluiden, spritesheets en lettertypen van
 [Kenney](https://kenney.nl). `node web/scripts/readme-images.mts` maakt deze afbeeldingen en de social card.</sub>
+
+## De desktop-app installeren
+
+Download hem van de [nieuwste release](https://github.com/Azazel-Labs/Hoard/releases/latest): de `.msi` voor Windows, de
+`.dmg` voor macOS op een Mac met Apple-chip, de `.AppImage` of `.deb` voor Linux. De installatieprogramma's zijn nog
+niet door Apple of Microsoft ondertekend, dus Windows vraagt het eerst voordat het de `.msi` uitvoert (Meer informatie →
+Toch uitvoeren) en macOS voordat de app de eerste keer opent (Systeeminstellingen → Privacy en beveiliging → Open toch).
+
+De eerste keer dat hij opent, vraagt hij waar de bibliotheek moet komen. Al het andere staat in Instellingen, net als op
+een server.
 
 ## Installeren met Docker
 

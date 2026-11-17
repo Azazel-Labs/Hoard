@@ -15,8 +15,8 @@ Texturen, lose Textur-Maps werden zu Materialien, Sounds zeichnen ihre Wellenfor
 Animationen ab, und alles bekommt Tags, sodass Sie es finden, wenn Sie `footsteps gravel` oder `rigged low-poly`
 eintippen. Danach landet es mit allem, was es braucht, in Godot, Unity oder Unreal.
 
-Kein Abo, kein Upload in irgendjemandes Cloud, keine Preise pro Arbeitsplatz: ein Docker-Image auf Ihrem eigenen
-Rechner, und es gehört Ihnen. Stellen Sie es sich als Asset-Store ohne Kasse vor.
+Kein Abo, kein Upload in irgendjemandes Cloud, keine Preise pro Arbeitsplatz: ein Docker-Image auf Ihrem eigenen Server
+oder eine App auf Ihrem eigenen Computer, und es gehört Ihnen. Stellen Sie es sich als Asset-Store ohne Kasse vor.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="../img/hero-dark.webp">
@@ -99,10 +99,33 @@ einer einzigen belegt und Beschädigungen nicht unbemerkt bleiben können. Bewah
 oder in einem beliebigen S3-Bucket auf. Ordner, auf die Sie Hoard ansetzen, werden gelesen, nie verändert. Konten,
 schreibgeschützte Tokens, Single Sign-on, HTTPS und HTTP/3 sind eingebaut.
 
+### Oder einfach auf Ihrem Computer
+
+Sie betreiben keinen Server? Die Desktop-App für Windows, macOS und Linux ist dieselbe Bibliothek in einem eigenen
+Fenster. Installieren Sie sie, wählen Sie einen Ordner, und sie funktioniert offline: keine Konten, Passwörter oder
+Servereinstellungen, nichts, was der Rest des Netzwerks erreichen kann, und die Schlüssel, die Sie eingeben, liegen im
+Schlüsselbund des Systems. Neue Versionen werden im Hintergrund heruntergeladen und beim Beenden installiert.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="../img/desktop-dark.webp">
+  <img alt="Die Hoard-Desktop-App in einem Windows-Fenster: die Modelle der Bibliothek in einem Raster, daneben eine geöffnete Laterne in der 3D-Vorschau mit ihren Tags und Downloads" src="../img/desktop-light.webp">
+</picture>
+
 <sub>Die Demo-Bibliothek besteht aus CC0-Kunst: Modelle von [Poly Haven](https://polyhaven.com) (glTF und USD),
 Oberflächen von [ambientCG](https://ambientcg.com) sowie Sounds, Spritesheets und Schriften von
 [Kenney](https://kenney.nl). `node web/scripts/readme-images.mts` erstellt diese Bilder und die
 Social-Media-Karte.</sub>
+
+## Installation der Desktop-App
+
+Laden Sie sie aus dem [neuesten Release](https://github.com/Azazel-Labs/Hoard/releases/latest) herunter: die `.msi` für
+Windows, die `.dmg` für macOS auf Apple silicon, das `.AppImage` oder die `.deb` für Linux. Die Installer sind noch
+nicht von Apple oder Microsoft signiert, daher fragt Windows nach, bevor es die `.msi` ausführt (Weitere Informationen →
+Trotzdem ausführen), und macOS, bevor es die App zum ersten Mal öffnet (Systemeinstellungen → Datenschutz & Sicherheit →
+Dennoch öffnen).
+
+Beim ersten Start fragt sie, wo die Bibliothek liegen soll. Alles andere finden Sie in den Einstellungen, wie auf einem
+Server.
 
 ## Installation mit Docker
 

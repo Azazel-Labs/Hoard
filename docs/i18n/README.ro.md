@@ -15,8 +15,8 @@ hărțile de textură răzlețe devin materiale, sunetele își desenează forma
 animațiile și totul primește etichete, așa că tastând `footsteps gravel` sau `rigged low-poly` găsiți ce căutați. Apoi
 ajunge în Godot, Unity sau Unreal cu tot ce îi trebuie.
 
-Fără abonament, fără încărcare în cloudul nimănui, fără preț pe utilizator: o singură imagine Docker pe propriul
-calculator și e a dvs. Gândiți-vă la el ca la un magazin de resurse fără casă de marcat.
+Fără abonament, fără încărcare în cloudul nimănui, fără preț pe utilizator: o singură imagine Docker pe propriul server
+sau o aplicație pe propriul calculator și e a dvs. Gândiți-vă la el ca la un magazin de resurse fără casă de marcat.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="../img/hero-dark.webp">
@@ -99,10 +99,31 @@ spațiul uneia singure, iar coruperea nu poate trece neobservată. Păstrați to
 Dosarele spre care îndreptați Hoard sunt citite, niciodată modificate. Conturile, tokenurile doar pentru citire,
 autentificarea unică (single sign-on), HTTPS și HTTP/3 sunt incluse.
 
+### Sau doar pe calculatorul dvs.
+
+Nu rulați un server? Aplicația desktop pentru Windows, macOS și Linux este aceeași bibliotecă, într-o fereastră proprie.
+Instalați-o, alegeți un dosar și funcționează offline: fără conturi, parole sau setări de server, nimic la care să poată
+ajunge restul rețelei, iar cheile pe care le introduceți sunt păstrate în depozitul de chei al sistemului. Versiunile
+noi se descarcă în fundal și se instalează când închideți aplicația.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="../img/desktop-dark.webp">
+  <img alt="Aplicația desktop Hoard într-o fereastră Windows: modelele bibliotecii într-o grilă, cu un felinar deschis în previzualizarea 3D, lângă etichetele și descărcările sale" src="../img/desktop-light.webp">
+</picture>
+
 <sub>Biblioteca demonstrativă conține grafică CC0: modele de pe [Poly Haven](https://polyhaven.com) (glTF și USD),
 suprafețe de pe [ambientCG](https://ambientcg.com) și sunete, foi de sprite-uri și fonturi de la
 [Kenney](https://kenney.nl). `node web/scripts/readme-images.mts` creează aceste imagini și cardul pentru rețelele
 sociale.</sub>
+
+## Instalarea aplicației desktop
+
+Descărcați-o din [cea mai nouă versiune](https://github.com/Azazel-Labs/Hoard/releases/latest): `.msi` pentru Windows,
+`.dmg` pentru macOS pe Apple silicon, `.AppImage` sau `.deb` pentru Linux. Programele de instalare nu sunt încă semnate
+de Apple sau Microsoft, așa că Windows întreabă înainte de a rula `.msi` (More info → Run anyway), iar macOS înainte de
+a deschide aplicația prima dată (Configurări sistem → Confidențialitate și securitate → Deschide oricum).
+
+La prima deschidere, vă întreabă unde să fie biblioteca. Tot restul este în Setări, ca pe un server.
 
 ## Instalare cu Docker
 

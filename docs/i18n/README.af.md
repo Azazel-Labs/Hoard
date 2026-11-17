@@ -15,7 +15,7 @@ materiale, klanke teken hul golfvorms, sprite-blaaie speel hul animasies, en all
 `footsteps gravel` of `rigged low-poly` te tik. Dan beland dit in Godot, Unity of Unreal met alles wat dit nodig het.
 
 Geen intekening nie, geen oplaai na iemand se wolk nie, geen pryse per gebruiker nie: een Docker-beeld op jou eie
-masjien, en dit is joune. Dink daaraan as 'n batewinkel sonder 'n betaalpunt.
+bediener, of 'n toep op jou eie rekenaar, en dit is joune. Dink daaraan as 'n batewinkel sonder 'n betaalpunt.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="../img/hero-dark.webp">
@@ -95,9 +95,31 @@ Elke lêer word een keer volgens sy BLAKE3-hash gestoor, sodat dieselfde tekstuu
 opneem, en korrupsie nie ongemerk kan bly nie. Hou dit op 'n plaaslike skyf of in enige S3-houer. Vouers waarna jy Hoard
 wys, word gelees, nooit verander nie. Rekeninge, leesalleen-tokens, enkelaanmelding, HTTPS en HTTP/3 is ingebou.
 
+### Of net op jou rekenaar
+
+Bestuur jy nie 'n bediener nie? Die rekenaartoep vir Windows, macOS en Linux is dieselfde biblioteek in 'n eie venster.
+Installeer dit, kies 'n vouer, en dit werk vanlyn: geen rekeninge, wagwoorde of bedienerinstellings nie, niks wat die
+res van die netwerk kan bereik nie, en die sleutels wat jy intik word in die stelsel se sleutelring bewaar. Nuwe
+weergawes laai in die agtergrond af en word geïnstalleer wanneer dit toemaak.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="../img/desktop-dark.webp">
+  <img alt="Die Hoard-rekenaartoep in 'n Windows-venster: die biblioteek se modelle in 'n rooster, met 'n lantern oop in die 3D-voorskou langs sy etikette en aflaaie" src="../img/desktop-light.webp">
+</picture>
+
 <sub>Die demobiblioteek is CC0-kuns: modelle van [Poly Haven](https://polyhaven.com) (glTF en USD), oppervlakke van
 [ambientCG](https://ambientcg.com), en klanke, sprite-blaaie en lettertipes van [Kenney](https://kenney.nl).
 `node web/scripts/readme-images.mts` maak hierdie prente en die sosiale kaart.</sub>
+
+## Installeer die rekenaartoep
+
+Laai dit af van die [nuutste vrystelling](https://github.com/Azazel-Labs/Hoard/releases/latest): die `.msi` vir Windows,
+die `.dmg` vir macOS op Apple silicon, die `.AppImage` of `.deb` vir Linux. Die installeerders is nog nie deur Apple of
+Microsoft onderteken nie, so Windows vra voordat dit die `.msi` laat loop (More info → Run anyway) en macOS voordat dit
+die toep die eerste keer oopmaak (System Settings → Privacy & Security → Open Anyway).
+
+Die eerste keer dat dit oopmaak, vra dit waar die biblioteek moet kom. Alles anders is in Instellings, soos op 'n
+bediener.
 
 ## Installeer met Docker
 

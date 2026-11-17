@@ -14,8 +14,8 @@ Hoard 是一个自托管的游戏资源库。丢进一个 zip、一个 Unity 包
 一切都会被打上标签，所以输入 `footsteps gravel` 或 `rigged low-poly` 就能找到。然后它会带着所需的一切进入 Godot、Unity
 或 Unreal。
 
-没有订阅，不上传到任何人的云端，不按席位收费：在你自己的机器上运行一个 Docker 镜像，它就完全属于你。
-可以把它看作一个无需结账的资源商店。
+没有订阅，不上传到任何人的云端，不按席位收费：在你自己的服务器上运行一个 Docker 镜像，或在你自己的电脑上运行一个应用，
+它就完全属于你。可以把它看作一个无需结账的资源商店。
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="../img/hero-dark.webp">
@@ -90,9 +90,28 @@ OpenAI 的模型，无论是本地的还是托管的，它还能撰写名称和�
 可以存放在本地磁盘或任意 S3 存储桶中。你指向 Hoard 的文件夹只会被读取，绝不会被修改。账户、只读令牌、单点登录、HTTPS 和
 HTTP/3 均为内置功能。
 
+### 或者，就在你的电脑上
+
+没有运行服务器？适用于 Windows、macOS 和 Linux 的桌面应用就是同一个资源库，只是在它自己的窗口里。安装它，选一个文件夹，
+它就能离线工作：没有账户、密码或服务器设置，网络中的其他设备访问不到它，你输入的密钥也保存在系统钥匙串中。
+新版本会在后台下载，并在你退出时安装。
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="../img/desktop-dark.webp">
+  <img alt="Windows 窗口中的 Hoard 桌面应用：资源库中的模型以网格排列，旁边的 3D 预览中打开着一盏灯笼，并显示其标签和下载选项" src="../img/desktop-light.webp">
+</picture>
+
 <sub>演示资源库中的都是 CC0 作品：模型来自 [Poly Haven](https://polyhaven.com)（glTF 和 USD），表面材质来自
 [ambientCG](https://ambientcg.com)，声音、精灵图集和字体来自 [Kenney](https://kenney.nl)。这些图片和社交卡片由
 `node web/scripts/readme-images.mts` 生成。</sub>
+
+## 安装桌面应用
+
+从[最新版本](https://github.com/Azazel-Labs/Hoard/releases/latest)下载：Windows 用 `.msi`，Apple 芯片的 macOS 用 `.dmg`，
+Linux 用 `.AppImage` 或 `.deb`。安装程序尚未经过 Apple 或 Microsoft 签名，因此 Windows 会在运行 `.msi` 前询问
+（更多信息 → 仍要运行），macOS 会在首次打开应用前询问（系统设置 → 隐私与安全性 → 仍要打开）。
+
+首次打开时，它会询问资源库放在哪里。其他一切都在“设置”中，和服务器上一样。
 
 ## 使用 Docker 安装
 

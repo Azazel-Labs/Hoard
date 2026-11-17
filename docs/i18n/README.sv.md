@@ -16,7 +16,7 @@ genom att skriva `footsteps gravel` eller `rigged low-poly`. Sedan landar det i 
 behöver.
 
 Ingen prenumeration, ingen uppladdning till någon annans moln, inget pris per användare: en Docker-avbild på din egen
-dator, och den är din. Se det som en resursbutik utan kassa.
+server, eller en app på din egen dator, och den är din. Se det som en resursbutik utan kassa.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="../img/hero-dark.webp">
@@ -98,9 +98,31 @@ Varje fil lagras en gång utifrån sin BLAKE3-hash, så att samma textur i fem p
 korruption kan inte gå obemärkt förbi. Förvara biblioteket på lokal disk eller i valfri S3-bucket. Mappar som du pekar
 Hoard mot läses men ändras aldrig. Konton, skrivskyddade token, enkel inloggning (SSO), HTTPS och HTTP/3 är inbyggda.
 
+### Eller bara på din dator
+
+Kör du ingen server? Skrivbordsappen för Windows, macOS och Linux är samma bibliotek i ett eget fönster. Installera den,
+välj en mapp, och den fungerar offline: inga konton, lösenord eller serverinställningar, inget som resten av nätverket
+kan nå, och nycklarna du skriver in sparas i systemets nyckelring. Nya versioner laddas ner i bakgrunden och installeras
+när du avslutar appen.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="../img/desktop-dark.webp">
+  <img alt="Hoards skrivbordsapp i ett Windows-fönster: bibliotekets modeller i ett rutnät, med en lykta öppen i 3D-förhandsvisningen bredvid dess taggar och nedladdningar" src="../img/desktop-light.webp">
+</picture>
+
 <sub>Demobiblioteket består av CC0-grafik: modeller från [Poly Haven](https://polyhaven.com) (glTF och USD), ytor från
 [ambientCG](https://ambientcg.com), och ljud, spriteark och typsnitt från [Kenney](https://kenney.nl).
 `node web/scripts/readme-images.mts` skapar de här bilderna och delningsbilden.</sub>
+
+## Installera skrivbordsappen
+
+Ladda ner den från [den senaste versionen](https://github.com/Azazel-Labs/Hoard/releases/latest): `.msi` för Windows,
+`.dmg` för macOS på Apple silicon, `.AppImage` eller `.deb` för Linux. Installationsprogrammen är ännu inte signerade av
+Apple eller Microsoft, så Windows frågar innan `.msi` körs (Mer information → Kör ändå) och macOS innan appen öppnas
+första gången (Systeminställningar → Integritet och säkerhet → Öppna ändå).
+
+Första gången den öppnas frågar den var biblioteket ska ligga. Allt annat finns i Inställningar, precis som på en
+server.
 
 ## Installera med Docker
 

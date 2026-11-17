@@ -15,8 +15,8 @@ os mapas de textura soltos tornam-se materiais, os sons desenham as suas formas 
 reproduzem as suas animações, e tudo recebe etiquetas, para que escrever `footsteps gravel` ou `rigged low-poly` o
 encontre. Depois, chega ao Godot, ao Unity ou ao Unreal com tudo aquilo de que precisa.
 
-Sem subscrição, sem envio para a nuvem de ninguém, sem preço por utilizador: uma imagem Docker na sua própria máquina,
-e é sua. Pense nele como uma loja de recursos sem caixa de pagamento.
+Sem subscrição, sem envio para a nuvem de ninguém, sem preço por utilizador: uma imagem Docker no seu próprio servidor,
+ou uma aplicação no seu próprio computador, e é sua. Pense nele como uma loja de recursos sem caixa de pagamento.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="../img/hero-dark.webp">
@@ -99,9 +99,31 @@ de uma só, e a corrupção não pode passar despercebida. Guarde tudo num disco
 para onde aponta o Hoard são lidas, nunca alteradas. Contas, tokens só de leitura, início de sessão único, HTTPS e
 HTTP/3 vêm incorporados.
 
+### Ou apenas no seu computador
+
+Não tem um servidor? A aplicação de ambiente de trabalho para Windows, macOS e Linux é a mesma biblioteca numa janela
+própria. Instale-a, escolha uma pasta e funciona sem ligação à Internet: sem contas, palavras-passe nem definições de
+servidor, nada que o resto da rede consiga alcançar, e as chaves que introduz guardadas no porta-chaves do sistema. As
+novas versões são transferidas em segundo plano e instaladas quando a fecha.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="../img/desktop-dark.webp">
+  <img alt="A aplicação de ambiente de trabalho do Hoard numa janela do Windows: os modelos da biblioteca numa grelha, com uma lanterna aberta na pré-visualização 3D ao lado das suas etiquetas e transferências" src="../img/desktop-light.webp">
+</picture>
+
 <sub>A biblioteca de demonstração é arte CC0: modelos do [Poly Haven](https://polyhaven.com) (glTF e USD), superfícies do
 [ambientCG](https://ambientcg.com), e sons, folhas de sprites e tipos de letra do [Kenney](https://kenney.nl).
 O `node web/scripts/readme-images.mts` cria estas imagens e o cartão para redes sociais.</sub>
+
+## Instalar a aplicação de ambiente de trabalho
+
+Transfira-a da [versão mais recente](https://github.com/Azazel-Labs/Hoard/releases/latest): o `.msi` para Windows, o
+`.dmg` para macOS em Macs com Apple silicon, o `.AppImage` ou o `.deb` para Linux. Os instaladores ainda não estão
+assinados pela Apple nem pela Microsoft, por isso o Windows pergunta antes de executar o `.msi` (Mais informações →
+Executar mesmo assim) e o macOS antes de abrir a aplicação pela primeira vez (Definições do Sistema → Privacidade e
+segurança → Abrir mesmo assim).
+
+Da primeira vez que abre, pergunta onde fica a biblioteca. Tudo o resto está nas Definições, tal como num servidor.
 
 ## Instalar com o Docker
 

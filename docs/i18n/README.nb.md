@@ -15,8 +15,8 @@ materialer, lyder tegner bølgeformene sine, spriteark spiller animasjonene sine
 ved å skrive `footsteps gravel` eller `rigged low-poly`. Deretter havner det i Godot, Unity eller Unreal med alt det
 trenger.
 
-Ingen abonnement, ingen opplasting til noens sky, ingen pris per bruker: ett Docker-image på din egen maskin, og det er
-ditt. Tenk på det som en ressursbutikk uten kasse.
+Ingen abonnement, ingen opplasting til noens sky, ingen pris per bruker: ett Docker-image på din egen server, eller en
+app på din egen datamaskin, og det er ditt. Tenk på det som en ressursbutikk uten kasse.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="../img/hero-dark.webp">
@@ -96,9 +96,30 @@ Hver fil lagres én gang etter BLAKE3-hashen sin, så den samme teksturen i fem 
 kan ikke gå ubemerket hen. Ha det på lokal disk eller i en hvilken som helst S3-bøtte. Mapper du peker Hoard mot, leses,
 men endres aldri. Kontoer, skrivebeskyttede tokener, enkel pålogging, HTTPS og HTTP/3 er innebygd.
 
+### Eller bare på datamaskinen din
+
+Kjører du ikke en server? Skrivebordsappen for Windows, macOS og Linux er det samme biblioteket i et eget vindu.
+Installer den, velg en mappe, og den virker uten nett: ingen kontoer, passord eller serverinnstillinger, ingenting
+resten av nettverket kan nå, og nøklene du skriver inn lagres i systemets nøkkelring. Nye versjoner lastes ned i
+bakgrunnen og installeres når du avslutter.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="../img/desktop-dark.webp">
+  <img alt="Hoard-skrivebordsappen i et Windows-vindu: bibliotekets modeller i et rutenett, med en lykt åpen i 3D-forhåndsvisningen ved siden av taggene og nedlastingene" src="../img/desktop-light.webp">
+</picture>
+
 <sub>Demobiblioteket er CC0-kunst: modeller fra [Poly Haven](https://polyhaven.com) (glTF og USD), overflater fra
 [ambientCG](https://ambientcg.com), og lyder, spriteark og fonter fra [Kenney](https://kenney.nl).
 `node web/scripts/readme-images.mts` lager disse bildene og delingskortet.</sub>
+
+## Installere skrivebordsappen
+
+Last den ned fra [siste versjon](https://github.com/Azazel-Labs/Hoard/releases/latest): `.msi` for Windows, `.dmg` for
+macOS på Mac med Apple-chip, `.AppImage` eller `.deb` for Linux. Installasjonsprogrammene er ikke signert av Apple eller
+Microsoft ennå, så Windows spør før det kjører `.msi`-filen (Mer informasjon → Kjør likevel), og macOS før appen åpnes
+første gang (Systeminnstillinger → Personvern og sikkerhet → Åpne likevel).
+
+Første gang den åpnes, spør den hvor biblioteket skal ligge. Alt annet ligger i Innstillinger, som på en server.
 
 ## Installere med Docker
 

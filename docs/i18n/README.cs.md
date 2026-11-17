@@ -16,7 +16,7 @@ takže když napíšete `footsteps gravel` nebo `rigged low-poly`, najdete to. P
 se vším, co potřebuje.
 
 Žádné předplatné, žádné nahrávání do cizího cloudu, žádné ceny za uživatele: jeden image pro Docker na vašem vlastním
-počítači a je váš. Představte si ho jako obchod s assety bez pokladny.
+serveru, nebo aplikace na vašem vlastním počítači, a patří vám. Představte si ho jako obchod s assety bez pokladny.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="../img/hero-dark.webp">
@@ -97,9 +97,30 @@ Každý soubor se uloží jen jednou podle svého hashe BLAKE3, takže stejná t
 poškození nemůže zůstat nepovšimnuto. Ukládejte na místní disk nebo do libovolného bucketu S3. Složky, na které Hoard
 nasměrujete, se jen čtou, nikdy nemění. Účty, tokeny jen pro čtení, jednotné přihlášení, HTTPS a HTTP/3 jsou vestavěné.
 
+### Nebo prostě na vašem počítači
+
+Neprovozujete server? Desktopová aplikace pro Windows, macOS a Linux je stejná knihovna ve vlastním okně. Nainstalujte
+ji, vyberte složku a funguje offline: žádné účty, hesla ani nastavení serveru, nic, na co by dosáhl zbytek sítě, a
+klíče, které zadáte, zůstávají v systémové klíčence. Nové verze se stahují na pozadí a instalují se, když aplikaci
+ukončíte.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="../img/desktop-dark.webp">
+  <img alt="Desktopová aplikace Hoard v okně Windows: modely knihovny v mřížce, vedle toho otevřená lucerna ve 3D náhledu se svými štítky a stahováním" src="../img/desktop-light.webp">
+</picture>
+
 <sub>Ukázková knihovna je grafika pod CC0: modely z [Poly Haven](https://polyhaven.com) (glTF a USD), povrchy z
 [ambientCG](https://ambientcg.com) a zvuky, listy spritů a písma od [Kenney](https://kenney.nl).
 `node web/scripts/readme-images.mts` vytváří tyto obrázky i kartu pro sociální sítě.</sub>
+
+## Instalace desktopové aplikace
+
+Stáhněte si ji z [nejnovějšího vydání](https://github.com/Azazel-Labs/Hoard/releases/latest): `.msi` pro Windows, `.dmg`
+pro macOS na Apple silicon, `.AppImage` nebo `.deb` pro Linux. Instalátory zatím nejsou podepsané společnostmi Apple ani
+Microsoft, takže Windows se před spuštěním `.msi` zeptají (Další informace → Přesto spustit) a macOS před prvním
+otevřením aplikace (Nastavení systému → Soukromí a zabezpečení → Přesto otevřít).
+
+Při prvním spuštění se zeptá, kam knihovnu uložit. Všechno ostatní najdete v Nastavení, stejně jako na serveru.
 
 ## Instalace přes Docker
 

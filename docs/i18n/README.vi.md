@@ -15,8 +15,9 @@ trở thành vật liệu, âm thanh vẽ ra dạng sóng, bảng sprite phát h
 cần gõ `footsteps gravel` hay `rigged low-poly` là tìm thấy. Rồi nó đi thẳng vào Godot, Unity hoặc Unreal cùng mọi thứ
 nó cần.
 
-Không thuê bao, không tải lên đám mây của ai cả, không tính phí theo từng người dùng: một image Docker trên máy của
-chính bạn, và nó thuộc về bạn. Hãy nghĩ về nó như một cửa hàng tài nguyên không có quầy thanh toán.
+Không thuê bao, không tải lên đám mây của ai cả, không tính phí theo từng người dùng: một image Docker trên máy chủ của
+chính bạn, hoặc một ứng dụng trên máy tính của chính bạn, và nó thuộc về bạn. Hãy nghĩ về nó như một cửa hàng tài nguyên
+không có quầy thanh toán.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="../img/hero-dark.webp">
@@ -98,9 +99,30 @@ không thể lọt qua mà không bị phát hiện. Hãy lưu trên ổ đĩa c
 tới chỉ được đọc, không bao giờ bị thay đổi. Tài khoản, token chỉ đọc, đăng nhập một lần (SSO), HTTPS và HTTP/3 đều có
 sẵn.
 
+### Hoặc chỉ trên máy tính của bạn
+
+Không chạy máy chủ? Ứng dụng desktop cho Windows, macOS và Linux là cùng một thư viện trong cửa sổ riêng. Hãy cài đặt,
+chọn một thư mục, và nó hoạt động ngoại tuyến: không tài khoản, mật khẩu hay cài đặt máy chủ, không có gì mà phần còn
+lại của mạng có thể truy cập, và các khóa bạn nhập được giữ trong kho mật khẩu của hệ thống. Phiên bản mới được tải về ở
+chế độ nền và cài đặt khi bạn thoát ứng dụng.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="../img/desktop-dark.webp">
+  <img alt="Ứng dụng desktop Hoard trong một cửa sổ Windows: các mô hình của thư viện xếp thành lưới, với một chiếc đèn lồng đang mở trong bản xem trước 3D bên cạnh thẻ và các lựa chọn tải xuống của nó" src="../img/desktop-light.webp">
+</picture>
+
 <sub>Thư viện demo là tác phẩm CC0: mô hình từ [Poly Haven](https://polyhaven.com) (glTF và USD), bề mặt từ
 [ambientCG](https://ambientcg.com), và âm thanh, bảng sprite cùng phông chữ từ [Kenney](https://kenney.nl).
 `node web/scripts/readme-images.mts` tạo ra những hình này và thẻ mạng xã hội.</sub>
+
+## Cài đặt ứng dụng desktop
+
+Tải về từ [bản phát hành mới nhất](https://github.com/Azazel-Labs/Hoard/releases/latest): `.msi` cho Windows, `.dmg` cho
+macOS trên Apple silicon, `.AppImage` hoặc `.deb` cho Linux. Các trình cài đặt chưa được Apple hay Microsoft ký, nên
+Windows sẽ hỏi trước khi chạy `.msi` (Thông tin thêm → Vẫn chạy) và macOS sẽ hỏi trước khi mở ứng dụng lần đầu (Cài đặt
+hệ thống → Quyền riêng tư & Bảo mật → Vẫn mở).
+
+Lần đầu mở, ứng dụng sẽ hỏi bạn muốn đặt thư viện ở đâu. Mọi thứ khác nằm trong Cài đặt, như trên máy chủ.
 
 ## Cài đặt bằng Docker
 

@@ -15,8 +15,8 @@ különálló textúratérképekből anyagok lesznek, a hangok kirajzolják a hu
 animációikat, és minden címkét kap, így a `footsteps gravel` vagy a `rigged low-poly` beírására előkerül. Aztán
 mindazzal együtt érkezik a Godotba, a Unitybe vagy az Unrealbe, amire szüksége van.
 
-Nincs előfizetés, nincs feltöltés senki felhőjébe, nincs felhasználónkénti díj: egyetlen Docker-image a saját gépén, és
-az az Öné. Olyan, mint egy assetáruház, csak pénztár nélkül.
+Nincs előfizetés, nincs feltöltés senki felhőjébe, nincs felhasználónkénti díj: egyetlen Docker-image a saját szerverén,
+vagy egy alkalmazás a saját számítógépén, és az az Öné. Olyan, mint egy assetáruház, csak pénztár nélkül.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="../img/hero-dark.webp">
@@ -99,9 +99,30 @@ Minden fájl egyszer tárolódik a BLAKE3-hash-e alapján, így ugyanaz a textú
 amelyekre a Hoardot ráirányítja, csak olvassa, sosem módosítja. Fiókok, csak olvasható tokenek, egyszeri bejelentkezés,
 HTTPS és HTTP/3 beépítve.
 
+### Vagy csak a saját számítógépén
+
+Nem futtat szervert? A Windowsra, macOS-re és Linuxra készült asztali alkalmazás ugyanaz a könyvtár, a saját ablakában.
+Telepítse, válasszon egy mappát, és internet nélkül is működik: nincsenek fiókok, jelszavak vagy szerverbeállítások, a
+hálózat többi része semmit sem ér el belőle, a beírt kulcsokat pedig a rendszer jelszótárolója őrzi. Az új verziók a
+háttérben töltődnek le, és kilépéskor települnek.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="../img/desktop-dark.webp">
+  <img alt="A Hoard asztali alkalmazása egy Windows-ablakban: a könyvtár modelljei rácsban, a 3D-előnézetben egy lámpás a címkéi és letöltései mellett" src="../img/desktop-light.webp">
+</picture>
+
 <sub>A bemutatókönyvtár CC0 grafikákból áll: modellek a [Poly Havenről](https://polyhaven.com) (glTF és USD), felületek
 az [ambientCG-ről](https://ambientcg.com), hangok, spritelapok és betűtípusok pedig a [Kenneytől](https://kenney.nl). A
 `node web/scripts/readme-images.mts` készíti ezeket a képeket és a közösségimédia-kártyát.</sub>
+
+## Az asztali alkalmazás telepítése
+
+Töltse le a [legújabb kiadásból](https://github.com/Azazel-Labs/Hoard/releases/latest): Windowsra az `.msi`, Apple
+chipes Macen futó macOS-re a `.dmg`, Linuxra az `.AppImage` vagy a `.deb` fájlt. A telepítőket az Apple és a Microsoft
+még nem írta alá, ezért a Windows rákérdez, mielőtt futtatná az `.msi` fájlt (További információ → Futtatás mindenképp),
+a macOS pedig az alkalmazás első megnyitása előtt (System Settings → Privacy & Security → Open Anyway).
+
+Első megnyitáskor megkérdezi, hová kerüljön a könyvtár. Minden más a Beállításokban van, ahogy a szerveren is.
 
 ## Telepítés Dockerrel
 

@@ -505,11 +505,18 @@ const UPPER: &[&str] = &[
 ];
 
 /// What an asset is called when it's found: the title its file gives itself, unless that title says nothing a name
-/// could (a track number, `TITLE=1`), and otherwise its file name made readable.
+/// could (a track number, `TITLE=1`) or is only the file's name again (`TITLE=bookFlip1`), and otherwise its file
+/// name made readable ("Book flip 1").
 pub(crate) fn asset_name(title: Option<&str>, rel: &str) -> String {
-    match title.map(str::trim).filter(|t| t.chars().any(char::is_alphabetic)) {
+    let stem = name_stem(rel);
+    let file = rel.rsplit('/').next().unwrap_or(rel);
+    let said = |t: &&str| {
+        let words = tokenize(t);
+        t.chars().any(char::is_alphabetic) && words != tokenize(&stem) && words != tokenize(file)
+    };
+    match title.map(str::trim).filter(said) {
         Some(t) => t.to_owned(),
-        None => display_name(&name_stem(rel)),
+        None => display_name(&stem),
     }
 }
 
@@ -1068,6 +1075,13 @@ mod tests {
         assert_eq!(asset_name(Some(" 07 "), "OGG/footstep07.ogg"), "Footstep 07");
         assert_eq!(asset_name(None, "OGG/footstep00.ogg"), "Footstep 00");
         assert_eq!(asset_name(Some("Door creak 2"), "door_02.wav"), "Door creak 2");
+    }
+
+    #[test]
+    fn a_title_thats_only_the_file_name_is_made_readable_like_it() {
+        assert_eq!(asset_name(Some("bookFlip1"), "OGG/bookFlip1.ogg"), "Book flip 1");
+        assert_eq!(asset_name(Some("book_flip_1.ogg"), "OGG/bookFlip1.ogg"), "Book flip 1");
+        assert_eq!(asset_name(Some("Book Flip"), "OGG/bookFlip1.ogg"), "Book Flip");
     }
 
     #[test]

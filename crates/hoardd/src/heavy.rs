@@ -81,6 +81,7 @@ pub(crate) fn command(program: impl AsRef<std::ffi::OsStr>) -> tokio::process::C
 
 /// [`command`] for code that waits on the program from a thread rather than a future.
 pub(crate) fn blocking_command(program: impl AsRef<std::ffi::OsStr>) -> std::process::Command {
+    #[cfg_attr(not(windows), expect(unused_mut, reason = "only Windows sets a flag on it"))]
     let mut cmd = match nice_path() {
         Some(nice) => {
             let mut c = std::process::Command::new(nice);

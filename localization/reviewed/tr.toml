@@ -6140,6 +6140,10 @@ translation = "Oynat"
 source = "Play (Space)"
 translation = "Oynat (Space)"
 
+[messages.model-plays-on]
+source = "Plays on"
+translation = "Oynatılacak karakter"
+
 [messages.model-preview-failed]
 source = "Couldn't preview this model: { $error }"
 translation = "Bu modelin önizlemesi gösterilemedi: { $error }"

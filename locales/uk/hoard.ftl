@@ -1843,6 +1843,7 @@ model-pause = Призупинити
 model-play = Відтворити
 model-animation-clip = Кліп анімації
 model-animation = Анімація
+model-plays-on = Відтворювати на
 model-close-title = Закрити (Esc)
 model-full-screen = На весь екран
 model-open-full-screen = Відкрити 3D-переглядач на весь екран

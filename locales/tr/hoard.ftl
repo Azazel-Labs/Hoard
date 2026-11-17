@@ -1516,6 +1516,7 @@ model-pause = Duraklat
 model-play = Oynat
 model-animation-clip = Animasyon klibi
 model-animation = Animasyon
+model-plays-on = Oynatılacak karakter
 model-close-title = Kapat (Esc)
 model-full-screen = Tam ekran
 model-open-full-screen = Tam ekran 3B görüntüleyiciyi aç

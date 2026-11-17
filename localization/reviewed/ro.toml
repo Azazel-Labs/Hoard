@@ -6358,6 +6358,10 @@ translation = "Redare"
 source = "Play (Space)"
 translation = "Redare (Space)"
 
+[messages.model-plays-on]
+source = "Plays on"
+translation = "Redă pe"
+
 [messages.model-preview-failed]
 source = "Couldn't preview this model: { $error }"
 translation = "Acest model nu a putut fi previzualizat: { $error }"

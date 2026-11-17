@@ -6126,6 +6126,10 @@ translation = "Phát"
 source = "Play (Space)"
 translation = "Phát (Space)"
 
+[messages.model-plays-on]
+source = "Plays on"
+translation = "Phát trên"
+
 [messages.model-preview-failed]
 source = "Couldn't preview this model: { $error }"
 translation = "Không thể xem trước mô hình này: { $error }"

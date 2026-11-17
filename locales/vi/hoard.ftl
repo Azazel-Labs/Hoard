@@ -1502,6 +1502,7 @@ model-pause = Tạm dừng
 model-play = Phát
 model-animation-clip = Đoạn hoạt ảnh
 model-animation = Hoạt ảnh
+model-plays-on = Phát trên
 model-close-title = Đóng (Esc)
 model-full-screen = Toàn màn hình
 model-open-full-screen = Mở trình xem 3D toàn màn hình

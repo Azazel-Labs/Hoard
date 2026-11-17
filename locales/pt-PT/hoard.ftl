@@ -1648,6 +1648,7 @@ model-pause = Pausar
 model-play = Reproduzir
 model-animation-clip = Clipe de animação
 model-animation = Animação
+model-plays-on = Reproduzir em
 model-close-title = Fechar (Esc)
 model-full-screen = Ecrã inteiro
 model-open-full-screen = Abrir o visualizador 3D em ecrã inteiro

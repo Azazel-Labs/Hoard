@@ -6385,6 +6385,10 @@ translation = "Відтворити"
 source = "Play (Space)"
 translation = "Відтворити (пробіл)"
 
+[messages.model-plays-on]
+source = "Plays on"
+translation = "Відтворювати на"
+
 [messages.model-preview-failed]
 source = "Couldn't preview this model: { $error }"
 translation = "Не вдалося показати попередній перегляд цієї моделі: { $error }"

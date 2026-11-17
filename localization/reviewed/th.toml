@@ -6129,6 +6129,10 @@ translation = "เล่น"
 source = "Play (Space)"
 translation = "เล่น (Space)"
 
+[messages.model-plays-on]
+source = "Plays on"
+translation = "เล่นบนตัวละคร"
+
 [messages.model-preview-failed]
 source = "Couldn't preview this model: { $error }"
 translation = "แสดงตัวอย่างโมเดลนี้ไม่ได้: { $error }"

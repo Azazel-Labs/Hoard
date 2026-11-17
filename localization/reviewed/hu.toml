@@ -6136,6 +6136,10 @@ translation = "Lejátszás"
 source = "Play (Space)"
 translation = "Lejátszás (Szóköz)"
 
+[messages.model-plays-on]
+source = "Plays on"
+translation = "Lejátszás ezen"
+
 [messages.model-preview-failed]
 source = "Couldn't preview this model: { $error }"
 translation = "Nem sikerült előnézetet készíteni ehhez a modellhez: { $error }"

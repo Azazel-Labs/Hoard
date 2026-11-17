@@ -6348,6 +6348,10 @@ translation = "Přehrát"
 source = "Play (Space)"
 translation = "Přehrát (mezerník)"
 
+[messages.model-plays-on]
+source = "Plays on"
+translation = "Přehrát na"
+
 [messages.model-preview-failed]
 source = "Couldn't preview this model: { $error }"
 translation = "Náhled tohoto modelu se nepodařilo zobrazit: { $error }"

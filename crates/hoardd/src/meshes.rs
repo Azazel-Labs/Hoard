@@ -209,7 +209,9 @@ pub(crate) fn view_glb(path: &Path, ext: &str, root: &Path) -> Result<Vec<u8>> {
     let mut doc = polysmelt::formats::load(path, ext, &pack, Keep::ALL)?;
     doc.decode()?;
     let c = doc.counts();
-    anyhow::ensure!(c.triangles + c.points + c.lines > 0, "this model draws nothing");
+    // A file of clips with no mesh is an animation: the viewer plays it on a character it fits.
+    let clips = doc.json.get("animations").and_then(Value::as_array).is_some_and(|a| !a.is_empty());
+    anyhow::ensure!(clips || c.triangles + c.points + c.lines > 0, "this model draws nothing");
     let missing = pack.missing();
     if !missing.is_empty()
         && let Some(asset) = doc.json.get_mut("asset").and_then(Value::as_object_mut)
@@ -318,6 +320,31 @@ mod tests {
         let (json, _) = crate::formats::read_glb(&view_glb(&obj, "obj", dir.path()).unwrap()).unwrap();
         assert_eq!(json["images"][0]["mimeType"], "image/jpeg");
         assert_eq!(json["asset"]["extras"]["missing_textures"], serde_json::json!(["moss.png"]));
+    }
+
+    /// A file of clips and no mesh reaches the viewer, which plays it on a character; a file of nothing doesn't.
+    #[test]
+    fn the_viewer_gets_clips_without_a_mesh() {
+        let dir = tempfile::tempdir().unwrap();
+        let clip = dir.path().join("run.gltf");
+        // Two key times, and a translation at each.
+        let data = "data:application/octet-stream;base64,AAAAAAAAgD8AAAAAAAAAAAAAAAAAAAAAAACAPwAAAAA=";
+        let doc = |animations: &str| {
+            format!(
+                r#"{{"asset":{{"version":"2.0"}},"scene":0,"scenes":[{{"nodes":[0]}}],"nodes":[{{"name":"Root"}}],
+                "buffers":[{{"byteLength":32,"uri":"{data}"}}],
+                "bufferViews":[{{"buffer":0,"byteLength":8}},{{"buffer":0,"byteOffset":8,"byteLength":24}}],
+                "accessors":[{{"bufferView":0,"componentType":5126,"count":2,"type":"SCALAR","min":[0],"max":[1]}},
+                {{"bufferView":1,"componentType":5126,"count":2,"type":"VEC3"}}],"animations":{animations}}}"#
+            )
+        };
+        let run = r#"[{"name":"Run","samplers":[{"input":0,"output":1}],
+            "channels":[{"sampler":0,"target":{"node":0,"path":"translation"}}]}]"#;
+        std::fs::write(&clip, doc(run)).unwrap();
+        let (json, _) = crate::formats::read_glb(&view_glb(&clip, "gltf", dir.path()).unwrap()).unwrap();
+        assert_eq!(json["animations"][0]["name"], "Run");
+        std::fs::write(&clip, doc("[]")).unwrap();
+        assert!(view_glb(&clip, "gltf", dir.path()).is_err());
     }
 
     /// A cube in ASCII FBX with two materials, `Paint` on two faces and `Steel` on the rest.

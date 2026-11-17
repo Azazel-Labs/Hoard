@@ -1644,6 +1644,7 @@ model-pause = Pause
 model-play = Spill av
 model-animation-clip = Animasjonsklipp
 model-animation = Animasjon
+model-plays-on = Spilles av på
 model-close-title = Lukk (Esc)
 model-full-screen = Fullskjerm
 model-open-full-screen = Åpne 3D-visningen i fullskjerm

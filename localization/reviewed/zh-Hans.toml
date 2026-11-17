@@ -6140,6 +6140,10 @@ translation = "播放"
 source = "Play (Space)"
 translation = "播放（Space）"
 
+[messages.model-plays-on]
+source = "Plays on"
+translation = "播放于角色"
+
 [messages.model-preview-failed]
 source = "Couldn't preview this model: { $error }"
 translation = "无法预览此模型：{ $error }"

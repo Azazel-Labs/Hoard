@@ -6120,6 +6120,10 @@ translation = "재생"
 source = "Play (Space)"
 translation = "재생(Space)"
 
+[messages.model-plays-on]
+source = "Plays on"
+translation = "재생할 캐릭터"
+
 [messages.model-preview-failed]
 source = "Couldn't preview this model: { $error }"
 translation = "이 모델을 미리 보지 못했습니다: { $error }"

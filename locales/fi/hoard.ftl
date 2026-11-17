@@ -1699,6 +1699,7 @@ model-pause = Tauko
 model-play = Toista
 model-animation-clip = Animaatioleike
 model-animation = Animaatio
+model-plays-on = Toista hahmolla
 model-close-title = Sulje (Esc)
 model-full-screen = Koko näyttö
 model-open-full-screen = Avaa 3D-katselin koko näytölle

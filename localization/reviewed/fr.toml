@@ -6269,6 +6269,10 @@ translation = "Lecture"
 source = "Play (Space)"
 translation = "Lecture (Espace)"
 
+[messages.model-plays-on]
+source = "Plays on"
+translation = "Jouée sur"
+
 [messages.model-preview-failed]
 source = "Couldn't preview this model: { $error }"
 translation = "Impossible de prévisualiser ce modèle : { $error }"

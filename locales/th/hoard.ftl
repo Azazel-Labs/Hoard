@@ -1502,6 +1502,7 @@ model-pause = หยุดชั่วคราว
 model-play = เล่น
 model-animation-clip = คลิปแอนิเมชัน
 model-animation = แอนิเมชัน
+model-plays-on = เล่นบนตัวละคร
 model-close-title = ปิด (Esc)
 model-full-screen = เต็มจอ
 model-open-full-screen = เปิดตัวแสดงผล 3 มิติแบบเต็มจอ

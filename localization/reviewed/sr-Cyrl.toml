@@ -6284,6 +6284,10 @@ translation = "Пусти"
 source = "Play (Space)"
 translation = "Пусти (Space)"
 
+[messages.model-plays-on]
+source = "Plays on"
+translation = "Пусти на"
+
 [messages.model-preview-failed]
 source = "Couldn't preview this model: { $error }"
 translation = "Није могуће прегледати овај модел: { $error }"

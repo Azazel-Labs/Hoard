@@ -6130,6 +6130,10 @@ translation = "Putar"
 source = "Play (Space)"
 translation = "Putar (Spasi)"
 
+[messages.model-plays-on]
+source = "Plays on"
+translation = "Diputar pada"
+
 [messages.model-preview-failed]
 source = "Couldn't preview this model: { $error }"
 translation = "Tidak dapat menampilkan pratinjau model ini: { $error }"

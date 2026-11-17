@@ -6254,6 +6254,10 @@ translation = "Afspil"
 source = "Play (Space)"
 translation = "Afspil (mellemrum)"
 
+[messages.model-plays-on]
+source = "Plays on"
+translation = "Afspilles på"
+
 [messages.model-preview-failed]
 source = "Couldn't preview this model: { $error }"
 translation = "Kunne ikke vise en forhåndsvisning af denne model: { $error }"

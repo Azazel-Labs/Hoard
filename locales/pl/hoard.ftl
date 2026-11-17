@@ -1791,6 +1791,7 @@ model-pause = Wstrzymaj
 model-play = Odtwórz
 model-animation-clip = Klip animacji
 model-animation = Animacja
+model-plays-on = Odtwarzaj na
 model-close-title = Zamknij (Esc)
 model-full-screen = Pełny ekran
 model-open-full-screen = Otwórz przeglądarkę 3D na pełnym ekranie

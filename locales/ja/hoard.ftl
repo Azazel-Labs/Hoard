@@ -1502,6 +1502,7 @@ model-pause = 一時停止
 model-play = 再生
 model-animation-clip = アニメーションクリップ
 model-animation = アニメーション
+model-plays-on = 再生するキャラクター
 model-close-title = 閉じる（Esc）
 model-full-screen = 全画面
 model-open-full-screen = 全画面の 3D ビューアーを開く

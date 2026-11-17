@@ -55,6 +55,8 @@ const grid = ref(false)
 const spin = ref(false)
 const bg = ref<Background>('checker')
 const clip = ref('')
+/** For an animation: the character it plays on, when the person picked one of several. */
+const on = ref('')
 const playing = ref(true)
 const fullTextures = ref(false)
 const mode = ref<ViewMode>('final')
@@ -117,7 +119,7 @@ async function open() {
   }
   s.onTexturesChanged = count
   try {
-    const i = await s.load(props.asset)
+    const i = await s.load(props.asset, { on: on.value })
     if (stage !== s) return
     info.value = i
     missing.value = i.missing
@@ -157,6 +159,10 @@ onBeforeUnmount(() => {
   stage?.dispose()
 })
 watch(fullTextures, () => void open())
+function playOn(id: string) {
+  on.value = id
+  void open()
+}
 
 watch(wireframe, (on) => stage?.setWireframe(on))
 watch(textures, (on) => stage?.setTextures(on))
@@ -321,6 +327,12 @@ function onKey(e: KeyboardEvent) {
           <span class="visually-hidden">{{ t('model-animation-clip') }}</span>
           <select v-model="clip">
             <option v-for="c in info.clips" :key="c" :value="c">{{ c }}</option>
+          </select>
+        </label>
+        <label v-if="info.wearers.length > 1">
+          <span class="visually-hidden">{{ t('model-plays-on') }}</span>
+          <select :value="info.on" @change="playOn(($event.target as HTMLSelectElement).value)">
+            <option v-for="w in info.wearers" :key="w.id" :value="w.id">{{ w.name }}</option>
           </select>
         </label>
       </div>

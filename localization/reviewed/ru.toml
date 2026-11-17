@@ -6382,6 +6382,10 @@ translation = "Воспроизвести"
 source = "Play (Space)"
 translation = "Воспроизвести (пробел)"
 
+[messages.model-plays-on]
+source = "Plays on"
+translation = "Воспроизводить на"
+
 [messages.model-preview-failed]
 source = "Couldn't preview this model: { $error }"
 translation = "Не удалось сделать превью этой модели: { $error }"

@@ -1502,6 +1502,7 @@ model-pause = 暂停
 model-play = 播放
 model-animation-clip = 动画片段
 model-animation = 动画
+model-plays-on = 播放于角色
 model-close-title = 关闭（Esc）
 model-full-screen = 全屏
 model-open-full-screen = 打开全屏 3D 查看器

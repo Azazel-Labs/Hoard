@@ -1642,6 +1642,7 @@ model-pause = Pouseer
 model-play = Speel
 model-animation-clip = Animasiegreep
 model-animation = Animasie
+model-plays-on = Speel op
 model-close-title = Sluit (Esc)
 model-full-screen = Volle skerm
 model-open-full-screen = Maak die volskerm-3D-kyker oop

@@ -6254,6 +6254,10 @@ translation = "Speel"
 source = "Play (Space)"
 translation = "Speel (Spasie)"
 
+[messages.model-plays-on]
+source = "Plays on"
+translation = "Speel op"
+
 [messages.model-preview-failed]
 source = "Couldn't preview this model: { $error }"
 translation = "Kon nie 'n voorskou van hierdie model wys nie: { $error }"

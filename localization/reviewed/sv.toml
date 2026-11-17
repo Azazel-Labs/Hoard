@@ -6254,6 +6254,10 @@ translation = "Spela upp"
 source = "Play (Space)"
 translation = "Spela upp (blanksteg)"
 
+[messages.model-plays-on]
+source = "Plays on"
+translation = "Spelas på"
+
 [messages.model-preview-failed]
 source = "Couldn't preview this model: { $error }"
 translation = "Kunde inte förhandsvisa modellen: { $error }"

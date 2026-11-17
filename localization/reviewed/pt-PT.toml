@@ -6257,6 +6257,10 @@ translation = "Reproduzir"
 source = "Play (Space)"
 translation = "Reproduzir (Espaço)"
 
+[messages.model-plays-on]
+source = "Plays on"
+translation = "Reproduzir em"
+
 [messages.model-preview-failed]
 source = "Couldn't preview this model: { $error }"
 translation = "Não foi possível pré-visualizar este modelo: { $error }"

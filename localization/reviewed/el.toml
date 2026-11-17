@@ -6295,6 +6295,10 @@ translation = "Αναπαραγωγή"
 source = "Play (Space)"
 translation = "Αναπαραγωγή (Space)"
 
+[messages.model-plays-on]
+source = "Plays on"
+translation = "Αναπαραγωγή σε"
+
 [messages.model-preview-failed]
 source = "Couldn't preview this model: { $error }"
 translation = "Δεν ήταν δυνατή η προεπισκόπηση αυτού του μοντέλου: { $error }"

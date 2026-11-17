@@ -6140,6 +6140,10 @@ translation = "再生"
 source = "Play (Space)"
 translation = "再生（Space）"
 
+[messages.model-plays-on]
+source = "Plays on"
+translation = "再生するキャラクター"
+
 [messages.model-preview-failed]
 source = "Couldn't preview this model: { $error }"
 translation = "このモデルをプレビューできませんでした: { $error }"

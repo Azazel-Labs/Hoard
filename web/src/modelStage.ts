@@ -60,7 +60,18 @@ export interface StageInfo {
   guessed: number
   /** How the model is turned, as its pack's models are. */
   facing: Facing
+  /** For an animation: the characters it fits, and the one it plays on (`LoadOptions.on`), or none. */
+  wearers: AssetLink[]
+  on: string
 }
+
+export interface LoadOptions {
+  /** For an animation: the character to play it on (its id), of those it fits. The first, if not given. */
+  on?: string
+}
+
+/** Clips shorter than this hold a pose ("Targeting Pose"), as the server reckons them (`animations::POSE_SECS`). */
+const POSE_SECS = 0.1
 
 export interface StageOptions {
   /** Textures as their files are, however big. Otherwise each comes as its light preview (at most 2048 px, see
@@ -286,6 +297,8 @@ export class ModelStage {
   private mixer: THREE.AnimationMixer | null = null
   private clips = new Map<string, THREE.AnimationClip>()
   private action: THREE.AnimationAction | null = null
+  /** An animation played on a character: its thumbnail shows it mid-clip. */
+  private wearing = false
   private resizeObs: ResizeObserver | null = null
   private timer = new THREE.Timer()
   private materials = new Map<AnyMaterial, Partial<Record<MapSlot, THREE.Texture | null>>>()
@@ -344,7 +357,7 @@ export class ModelStage {
   }
 
   /** Set up the renderer and load the asset. Resolves once the first frame can draw. */
-  async load(asset: Asset): Promise<StageInfo> {
+  async load(asset: Asset, opts: LoadOptions = {}): Promise<StageInfo> {
     const el = this.host
     const renderer = new THREE.WebGPURenderer({ antialias: true, alpha: true })
     await renderer.init()
@@ -385,7 +398,21 @@ export class ModelStage {
     // Every file a loader asks for passes through here (the server's GLBs carry their textures; a Collada file read
     // here names its own): textures are matched to the pack's files by name, as they often carry the artist's absolute
     // path, or point at a PSD where the pack ships a PNG.
-    const { named, guesses, full } = await textureLinks(asset)
+    let { named, guesses, full } = await textureLinks(asset)
+    // An animation plays on a character it fits: the character is what's drawn, and only the animation's clips play.
+    let clipLinks = full.links.filter((l) => l.rel === 'animation')
+    const wearers =
+      full.kind === 'animation' ? full.linked_from.filter((l) => l.rel === 'animation' && l.kind === 'model') : []
+    const wearer = wearers.find((w) => w.id === opts.on) ?? wearers[0]
+    const body = wearer && (await api.asset(wearer.id).catch(() => null))
+    if (this.disposed) throw new Error('closed')
+    if (body) {
+      const { id, name, path, kind, has_thumb } = full
+      const own: AssetLink = { id, name, path, kind, rel: 'animation', has_thumb }
+      ;({ named, guesses, full } = await textureLinks(body))
+      clipLinks = [own]
+      this.wearing = true
+    }
     const byName = new Map<string, AssetLink>()
     const byStem = new Map<string, AssetLink>()
     for (const t of [...named, ...guesses]) {
@@ -395,7 +422,7 @@ export class ModelStage {
       if (!prev || (!BROWSER_IMAGES.has(extOf(prev.path)) && BROWSER_IMAGES.has(extOf(t.path)))) byStem.set(stemOf(t.path), t)
     }
     const byPath = new Map([...named, ...guesses].map((t) => [t.path.toLowerCase(), t]))
-    const packFiles = `/api/packs/${asset.pack_id}/files/`
+    const packFiles = `/api/packs/${full.pack_id}/files/`
     /** The file name each rewritten URL was asked for by, to name what failed. */
     const askedAs = new Map<string, string>()
     const manager = new THREE.LoadingManager()
@@ -418,7 +445,7 @@ export class ModelStage {
         ? url
         : tgaForOther
           ? `${asUrl(hit, 'png', 2048)}&download=0&wait=60`
-          : textureUrl(hit, asset.pack_id, this.fullTextures)
+          : textureUrl(hit, full.pack_id, this.fullTextures)
       askedAs.set(out, path.split(/[\\/]/).pop()!)
       return out
     })
@@ -479,7 +506,7 @@ export class ModelStage {
     })
     this.meshCount = this.meshes.length
     // Nothing moves in a model without animation, so its meshes can be drawn together.
-    if (!animations.length && !full.links.some((l) => l.rel === 'animation')) this.meshes = mergeStill(object, this.meshes)
+    if (!animations.length && !clipLinks.length) this.meshes = mergeStill(object, this.meshes)
 
     // A model that names no textures, next to textures named after it: try them on.
     let guessed = 0
@@ -521,17 +548,17 @@ export class ModelStage {
           if (tint) lit.color?.setRGB(tint[0], tint[1], tint[2], THREE.LinearSRGBColorSpace)
         }
         if (!info.maps.length) continue
-        const applied = applyToModel(info, asset.pack_id, this.flipY, wear, onMaps, track)
+        const applied = applyToModel(info, full.pack_id, this.flipY, wear, onMaps, track)
         stops.push(applied.stop)
         guessed = Math.max(guessed, applied.count)
       }
       this.stopMaps = () => stops.forEach((stop) => stop())
     } else if (material) {
-      const applied = applyToModel(material, asset.pack_id, this.flipY, this.materials, onMaps, track)
+      const applied = applyToModel(material, full.pack_id, this.flipY, this.materials, onMaps, track)
       this.stopMaps = applied.stop
       guessed = applied.count
     } else if (!textured.any && guesses.length && !this.colored()) {
-      guessed = this.applyGuesses(guesses, asset.pack_id, this.flipY, manager)
+      guessed = this.applyGuesses(guesses, full.pack_id, this.flipY, manager)
     }
 
     for (const name of missing ?? []) if (!this.missing.includes(name)) this.missing.push(name)
@@ -547,17 +574,21 @@ export class ModelStage {
     this.bounds().box.getSize(this.size)
     this.meters = ['glb', 'gltf'].includes(extOf(full.path))
 
-    // Clips embedded in the file plus linked clip files ("Knight@Run.fbx").
-    animations.forEach((c, i) => this.clips.set(c.name || `clip ${i + 1}`, c))
+    // Clips embedded in the file plus linked clip files ("Knight@Run.fbx"); a character wearing an animation plays
+    // only that.
+    if (!this.wearing) animations.forEach((c, i) => this.clips.set(c.name || `clip ${i + 1}`, c))
     // Clip files only lend their animation: don't fetch their textures.
     const clipManager = new THREE.LoadingManager()
     clipManager.setURLModifier((url) => (IMAGE_EXTS.has(extOf(url.split(/[?#]/)[0])) ? BLANK_PNG : url))
-    for (const link of full.links.filter((l) => l.rel === 'animation')) {
+    for (const link of clipLinks) {
       try {
         const s = sourceFor(link, full.pack_id)
         const loaded = await loadModel(s.url, s.ext, clipManager)
         const label = link.path.split('/').pop()!.replace(/\.[^.]+$/, '').split('@').pop()!
-        loaded.animations.forEach((c, i) => this.clips.set(loaded.animations.length > 1 ? `${label} ${i + 1}` : label, c))
+        // A pose saved beside the clip (Blender's "Targeting Pose") isn't one to play.
+        const takes = loaded.animations.filter((c) => c.duration >= POSE_SECS)
+        const list = takes.length ? takes : loaded.animations
+        list.forEach((c, i) => this.clips.set(list.length > 1 ? `${label} ${i + 1}` : label, c))
         disposeObject(loaded.object)
       } catch {
         // A clip that won't load shouldn't break the preview.
@@ -583,6 +614,8 @@ export class ModelStage {
       missing: [...this.missing],
       guessed,
       facing: { ...this.facing },
+      wearers,
+      on: body ? body.id : '',
     }
   }
 
@@ -987,6 +1020,24 @@ export class ModelStage {
     this.redraw()
   }
 
+  /** An animation's character posed halfway through the clip, so a grid of thumbnails isn't a grid of the same
+   *  rest pose; the returned function puts it back. */
+  private midClip(): (() => void) | null {
+    const clip = this.action?.getClip() ?? this.clips.values().next().value
+    if (!this.wearing || !this.mixer || !clip) return null
+    const mixer = this.mixer
+    const fresh = !this.action
+    const action = this.action ?? mixer.clipAction(clip).play()
+    const time = action.time
+    action.time = clip.duration / 2
+    mixer.update(0)
+    return () => {
+      if (fresh) action.stop()
+      else action.time = time
+      mixer.update(0)
+    }
+  }
+
   /** Play a clip by name ('' stops). */
   playClip(name: string) {
     if (!this.mixer) return
@@ -1035,6 +1086,7 @@ export class ModelStage {
       wireframe: this.wireframeOn,
     }
     this.showViews(false)
+    const posed = this.midClip()
     if (!this.envOn) this.setEnvironment(true)
     if (!this.texturesOn) this.setTextures(true)
     if (saved.wireframe) this.setWireframe(false)
@@ -1073,6 +1125,7 @@ export class ModelStage {
       if (!saved.env) this.setEnvironment(false)
       if (!saved.textures) this.setTextures(false)
       if (saved.wireframe) this.setWireframe(true)
+      posed?.()
       this.showViews(true)
       this.applyLook()
       this.renderOnce()

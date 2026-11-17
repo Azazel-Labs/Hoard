@@ -18,6 +18,8 @@ const error = ref('')
 const info = ref<StageInfo | null>(null)
 const missing = ref<string[]>([])
 const activeClip = ref('')
+/** For an animation: the character it plays on, when the person picked one of several. */
+const on = ref('')
 let stage: ModelStage | null = null
 
 async function setup() {
@@ -41,14 +43,14 @@ async function setup() {
   stage = s
   s.onMissing = (names) => (missing.value = names)
   try {
-    const i = await s.load(props.asset)
+    const i = await s.load(props.asset, { on: on.value })
     if (stage !== s) return
     info.value = i
     missing.value = i.missing
     activeClip.value = i.clips[0] ?? ''
     s.setPaused(!!props.paused)
     status.value = 'ready'
-    if (wantsBrowserThumb(props.asset)) void offerThumb(s, props.asset)
+    if (!on.value && wantsBrowserThumb(props.asset)) void offerThumb(s, props.asset)
   } catch (e) {
     if (stage !== s) return
     status.value = 'error'
@@ -72,7 +74,18 @@ function teardown() {
 
 watch(activeClip, (name) => stage?.playClip(name))
 watch(() => props.paused, (p) => stage?.setPaused(!!p))
-watch(() => props.asset.id, setup)
+function playOn(id: string) {
+  on.value = id
+  void setup()
+}
+
+watch(
+  () => props.asset.id,
+  () => {
+    on.value = ''
+    void setup()
+  },
+)
 onMounted(setup)
 onBeforeUnmount(teardown)
 </script>
@@ -91,6 +104,12 @@ onBeforeUnmount(teardown)
         <span class="visually-hidden">{{ t('model-animation') }}</span>
         <select v-model="activeClip" class="field">
           <option v-for="c in info.clips" :key="c" :value="c">{{ c }}</option>
+        </select>
+      </label>
+      <label v-if="info.wearers.length > 1">
+        <span class="visually-hidden">{{ t('model-plays-on') }}</span>
+        <select class="field" :value="info.on" @change="playOn(($event.target as HTMLSelectElement).value)">
+          <option v-for="w in info.wearers" :key="w.id" :value="w.id">{{ w.name }}</option>
         </select>
       </label>
       <p v-if="missing.length" class="missing" :title="missing.join('\n')">

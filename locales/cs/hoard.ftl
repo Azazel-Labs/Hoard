@@ -1766,6 +1766,7 @@ model-pause = Pozastavit
 model-play = Přehrát
 model-animation-clip = Klip animace
 model-animation = Animace
+model-plays-on = Přehrát na
 model-close-title = Zavřít (Esc)
 model-full-screen = Celá obrazovka
 model-open-full-screen = Otevřít 3D prohlížeč na celé obrazovce

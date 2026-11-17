@@ -13,7 +13,7 @@ import sys
 
 # Each platform's update, by how its file name ends, as Tauri's updater names the platforms.
 PLATFORMS = {
-    'windows-x86_64': '_x64_en-US.msi',
+    'windows-x86_64': '_x64-setup.exe',
     'darwin-aarch64': '_aarch64.app.tar.gz',
     'linux-x86_64': '_amd64.AppImage',
 }

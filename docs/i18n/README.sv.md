@@ -116,13 +116,18 @@ när du avslutar appen.
 
 ## Installera skrivbordsappen
 
-Ladda ner den från [den senaste versionen](https://github.com/Azazel-Labs/Hoard/releases/latest): `.msi` för Windows,
-`.dmg` för macOS på Apple silicon, `.AppImage` eller `.deb` för Linux. Installationsprogrammen är ännu inte signerade av
-Apple eller Microsoft, så Windows frågar innan `.msi` körs (Mer information → Kör ändå) och macOS innan appen öppnas
-första gången (Systeminställningar → Integritet och säkerhet → Öppna ändå).
+Ladda ner den från [den senaste versionen](https://github.com/Azazel-Labs/Hoard/releases/latest): `-setup.exe` för
+Windows, `.dmg` för macOS på Apple silicon, `.AppImage` eller `.deb` för Linux. På Windows installeras den bara för dig,
+utan att be om administratörsbehörighet. Installationsprogrammen är ännu inte signerade av Apple eller Microsoft, så
+Windows frågar innan installationsprogrammet körs (Mer information → Kör ändå) och macOS innan appen öppnas första
+gången (Systeminställningar → Integritet och säkerhet → Öppna ändå).
 
 Första gången den öppnas frågar den var biblioteket ska ligga. Allt annat finns i Inställningar, precis som på en
 server.
+
+Sedan håller den sig uppdaterad på egen hand, utan att du behöver klicka på något: en ny version laddas ner i bakgrunden
+och installeras när du avslutar, så nästa gång du öppnar Hoard är det den nya versionen. En `.deb` uppdateras genom att
+man installerar nästa.
 
 ## Installera med Docker
 

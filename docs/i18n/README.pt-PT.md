@@ -117,13 +117,17 @@ O `node web/scripts/readme-images.mts` cria estas imagens e o cartão para redes
 
 ## Instalar a aplicação de ambiente de trabalho
 
-Transfira-a da [versão mais recente](https://github.com/Azazel-Labs/Hoard/releases/latest): o `.msi` para Windows, o
-`.dmg` para macOS em Macs com Apple silicon, o `.AppImage` ou o `.deb` para Linux. Os instaladores ainda não estão
-assinados pela Apple nem pela Microsoft, por isso o Windows pergunta antes de executar o `.msi` (Mais informações →
-Executar mesmo assim) e o macOS antes de abrir a aplicação pela primeira vez (Definições do Sistema → Privacidade e
-segurança → Abrir mesmo assim).
+Transfira-a da [versão mais recente](https://github.com/Azazel-Labs/Hoard/releases/latest): o `-setup.exe` para Windows,
+o `.dmg` para macOS em Macs com Apple silicon, o `.AppImage` ou o `.deb` para Linux. No Windows, é instalada apenas para
+si, sem pedir permissões de administrador. Os instaladores ainda não estão assinados pela Apple nem pela Microsoft, por
+isso o Windows pergunta antes de executar o instalador (Mais informações → Executar mesmo assim) e o macOS antes de
+abrir a aplicação pela primeira vez (Definições do Sistema → Privacidade e segurança → Abrir mesmo assim).
 
 Da primeira vez que abre, pergunta onde fica a biblioteca. Tudo o resto está nas Definições, tal como num servidor.
+
+A partir daí mantém-se atualizada sozinha, sem ter de clicar em nada: uma nova versão é transferida em segundo plano e
+instalada quando sair, por isso da próxima vez que abrir o Hoard já é a nova versão. Um `.deb` atualiza-se instalando o
+seguinte.
 
 ## Instalar com o Docker
 

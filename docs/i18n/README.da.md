@@ -114,13 +114,18 @@ installeres, når den afsluttes.
 
 ## Installation af desktopappen
 
-Hent den fra den [seneste udgivelse](https://github.com/Azazel-Labs/Hoard/releases/latest): `.msi` til Windows, `.dmg`
-til macOS på Apple silicon, `.AppImage` eller `.deb` til Linux. Installationsprogrammerne er endnu ikke signeret af
-Apple eller Microsoft, så Windows spørger, før `.msi`-filen køres (Flere oplysninger → Kør alligevel), og macOS, før
-appen åbnes første gang (Systemindstillinger → Anonymitet & sikkerhed → Åbn alligevel).
+Hent den fra den [seneste udgivelse](https://github.com/Azazel-Labs/Hoard/releases/latest): `-setup.exe` til Windows,
+`.dmg` til macOS på Apple silicon, `.AppImage` eller `.deb` til Linux. På Windows installeres den kun for dig, uden at
+der spørges efter en administrator. Installationsprogrammerne er endnu ikke signeret af Apple eller Microsoft, så
+Windows spørger, før installationsprogrammet køres (Flere oplysninger → Kør alligevel), og macOS, før appen åbnes første
+gang (Systemindstillinger → Anonymitet & sikkerhed → Åbn alligevel).
 
 Første gang den åbner, spørger den, hvor biblioteket skal ligge. Alt andet findes under Indstillinger, ligesom på en
 server.
+
+Derefter holder den sig selv opdateret, uden at du skal klikke på noget: en ny udgivelse hentes i baggrunden og
+installeres, når du lukker appen, så næste gang du åbner Hoard, er det den nye version. En `.deb` opdateres ved at
+installere den næste.
 
 ## Installation med Docker
 

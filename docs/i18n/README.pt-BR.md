@@ -117,13 +117,18 @@ plano e instaladas quando você o fecha.
 
 ## Instalar o app de desktop
 
-Baixe na [versão mais recente](https://github.com/Azazel-Labs/Hoard/releases/latest): o `.msi` para Windows, o `.dmg`
-para macOS em Macs com Apple silicon, o `.AppImage` ou o `.deb` para Linux. Os instaladores ainda não são assinados pela
-Apple nem pela Microsoft, então o Windows pergunta antes de executar o `.msi` (Mais informações → Executar assim mesmo)
-e o macOS antes de abrir o app pela primeira vez (Ajustes do Sistema → Privacidade e Segurança → Abrir Mesmo Assim).
+Baixe na [versão mais recente](https://github.com/Azazel-Labs/Hoard/releases/latest): o `-setup.exe` para Windows, o
+`.dmg` para macOS em Macs com Apple silicon, o `.AppImage` ou o `.deb` para Linux. No Windows, ele é instalado só para
+você, sem pedir permissão de administrador. Os instaladores ainda não são assinados pela Apple nem pela Microsoft, então
+o Windows pergunta antes de executar o instalador (Mais informações → Executar assim mesmo) e o macOS antes de abrir o
+app pela primeira vez (Ajustes do Sistema → Privacidade e Segurança → Abrir Mesmo Assim).
 
 Na primeira vez que abre, ele pergunta onde a biblioteca vai ficar. Todo o resto fica em Configurações, como em um
 servidor.
+
+Depois disso, ele se mantém atualizado sozinho, sem você precisar clicar em nada: uma nova versão é baixada em segundo
+plano e instalada quando você fecha o app, então da próxima vez que abrir o Hoard, já é a nova versão. Um `.deb` é
+atualizado instalando o próximo.
 
 ## Instalar com Docker
 

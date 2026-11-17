@@ -87,9 +87,11 @@ Hoard ติดแท็กทุกอย่างเองแบบออฟ�
 
 ## ติดตั้งแอปเดสก์ท็อป
 
-ดาวน์โหลดได้จาก[รุ่นล่าสุด](https://github.com/Azazel-Labs/Hoard/releases/latest): ไฟล์ `.msi` สำหรับ Windows, `.dmg` สำหรับ macOS บน Apple silicon และ `.AppImage` หรือ `.deb` สำหรับ Linux ตัวติดตั้งยังไม่ได้เซ็นโดย Apple หรือ Microsoft ดังนั้น Windows จะถามก่อนเรียกใช้ `.msi` (More info → Run anyway) และ macOS จะถามก่อนเปิดแอปครั้งแรก (System Settings → Privacy & Security → Open Anyway)
+ดาวน์โหลดได้จาก[รุ่นล่าสุด](https://github.com/Azazel-Labs/Hoard/releases/latest): ไฟล์ `-setup.exe` สำหรับ Windows, `.dmg` สำหรับ macOS บน Apple silicon และ `.AppImage` หรือ `.deb` สำหรับ Linux บน Windows แอปจะติดตั้งให้เฉพาะคุณคนเดียว โดยไม่ต้องขอสิทธิ์ผู้ดูแลระบบ ตัวติดตั้งยังไม่ได้เซ็นโดย Apple หรือ Microsoft ดังนั้น Windows จะถามก่อนเรียกใช้ตัวติดตั้ง (More info → Run anyway) และ macOS จะถามก่อนเปิดแอปครั้งแรก (System Settings → Privacy & Security → Open Anyway)
 
 เมื่อเปิดครั้งแรก แอปจะถามว่าจะให้คลังอยู่ที่ไหน ส่วนอย่างอื่นทั้งหมดอยู่ในการตั้งค่า เหมือนบนเซิร์ฟเวอร์
+
+หลังจากนั้นแอปจะอัปเดตตัวเองโดยที่คุณไม่ต้องกดอะไรเลย รุ่นใหม่จะดาวน์โหลดอยู่เบื้องหลังและติดตั้งเมื่อคุณปิดแอป ครั้งต่อไปที่คุณเปิด Hoard ก็จะเป็นรุ่นใหม่แล้ว ส่วน `.deb` อัปเดตได้ด้วยการติดตั้งไฟล์รุ่นถัดไป
 
 ## ติดตั้งด้วย Docker
 

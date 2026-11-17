@@ -107,11 +107,15 @@ HTTP/3 均为内置功能。
 
 ## 安装桌面应用
 
-从[最新版本](https://github.com/Azazel-Labs/Hoard/releases/latest)下载：Windows 用 `.msi`，Apple 芯片的 macOS 用 `.dmg`，
-Linux 用 `.AppImage` 或 `.deb`。安装程序尚未经过 Apple 或 Microsoft 签名，因此 Windows 会在运行 `.msi` 前询问
-（更多信息 → 仍要运行），macOS 会在首次打开应用前询问（系统设置 → 隐私与安全性 → 仍要打开）。
+从[最新版本](https://github.com/Azazel-Labs/Hoard/releases/latest)下载：Windows 用 `-setup.exe`，Apple 芯片的 macOS 用
+`.dmg`，Linux 用 `.AppImage` 或 `.deb`。在 Windows 上，它只为你一人安装，无需管理员权限。安装程序尚未经过 Apple 或
+Microsoft 签名，因此 Windows 会在运行安装程序前询问（更多信息 → 仍要运行），macOS 会在首次打开应用前询问
+（系统设置 → 隐私与安全性 → 仍要打开）。
 
 首次打开时，它会询问资源库放在哪里。其他一切都在“设置”中，和服务器上一样。
+
+此后它会自动保持最新，什么都不用点：新版本会在后台下载，并在你退出时安装，下次打开 Hoard 时就已经是新版本了。
+`.deb` 则通过安装下一个版本来更新。
 
 ## 使用 Docker 安装
 

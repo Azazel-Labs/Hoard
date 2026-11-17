@@ -111,12 +111,16 @@ Hoard는 모든 것에 오프라인으로 직접 태그를 붙입니다. `tileab
 
 ## 데스크톱 앱 설치
 
-[최신 릴리스](https://github.com/Azazel-Labs/Hoard/releases/latest)에서 내려받으세요. Windows는 `.msi`, Apple 실리콘
-Mac의 macOS는 `.dmg`, Linux는 `.AppImage` 또는 `.deb`입니다. 설치 프로그램은 아직 Apple이나 Microsoft의 서명을 받지
-않았으므로, Windows는 `.msi`를 실행하기 전에(추가 정보 → 실행), macOS는 앱을 처음 열기 전에(시스템 설정 → 개인정보 보호
-및 보안 → 그래도 열기) 확인을 요청합니다.
+[최신 릴리스](https://github.com/Azazel-Labs/Hoard/releases/latest)에서 내려받으세요. Windows는 `-setup.exe`, Apple
+실리콘 Mac의 macOS는 `.dmg`, Linux는 `.AppImage` 또는 `.deb`입니다. Windows에서는 관리자 권한을 요구하지 않고 현재
+사용자에게만 설치됩니다. 설치 프로그램은 아직 Apple이나 Microsoft의 서명을 받지 않았으므로, Windows는 설치 프로그램을
+실행하기 전에(추가 정보 → 실행), macOS는 앱을 처음 열기 전에(시스템 설정 → 개인정보 보호 및 보안 → 그래도 열기) 확인을
+요청합니다.
 
 처음 열면 라이브러리를 어디에 둘지 묻습니다. 나머지는 서버에서와 마찬가지로 모두 설정에 있습니다.
+
+그 뒤로는 아무것도 누를 필요 없이 스스로 최신 상태를 유지합니다. 새 릴리스는 백그라운드에서 내려받고 앱을 종료할 때
+설치되므로, 다음에 Hoard를 열면 새 버전이 실행됩니다. `.deb`는 다음 버전을 설치하면 업데이트됩니다.
 
 ## Docker로 설치
 

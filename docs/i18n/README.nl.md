@@ -118,13 +118,18 @@ oppervlakken van [ambientCG](https://ambientcg.com), en geluiden, spritesheets e
 
 ## De desktop-app installeren
 
-Download hem van de [nieuwste release](https://github.com/Azazel-Labs/Hoard/releases/latest): de `.msi` voor Windows, de
-`.dmg` voor macOS op een Mac met Apple-chip, de `.AppImage` of `.deb` voor Linux. De installatieprogramma's zijn nog
-niet door Apple of Microsoft ondertekend, dus Windows vraagt het eerst voordat het de `.msi` uitvoert (Meer informatie →
-Toch uitvoeren) en macOS voordat de app de eerste keer opent (Systeeminstellingen → Privacy en beveiliging → Open toch).
+Download hem van de [nieuwste release](https://github.com/Azazel-Labs/Hoard/releases/latest): de `-setup.exe` voor
+Windows, de `.dmg` voor macOS op een Mac met Apple-chip, de `.AppImage` of `.deb` voor Linux. Op Windows installeert hij
+alleen voor jou, zonder om beheerdersrechten te vragen. De installatieprogramma's zijn nog niet door Apple of Microsoft
+ondertekend, dus Windows vraagt het eerst voordat het installatieprogramma wordt uitgevoerd (Meer informatie → Toch
+uitvoeren) en macOS voordat de app de eerste keer opent (Systeeminstellingen → Privacy en beveiliging → Open toch).
 
 De eerste keer dat hij opent, vraagt hij waar de bibliotheek moet komen. Al het andere staat in Instellingen, net als op
 een server.
+
+Daarna houdt hij zichzelf up-to-date, zonder dat je ergens op hoeft te klikken: een nieuwe release wordt op de
+achtergrond gedownload en geïnstalleerd zodra je hem afsluit, dus de volgende keer dat je Hoard opent, is het de nieuwe
+versie. Een `.deb` werk je bij door de volgende te installeren.
 
 ## Installeren met Docker
 

@@ -116,12 +116,16 @@ and install when it quits.
 
 ## Install the desktop app
 
-Download it from the [latest release](https://github.com/Azazel-Labs/Hoard/releases/latest): the `.msi` for
-Windows, the `.dmg` for macOS on Apple silicon, the `.AppImage` or `.deb` for Linux. The installers aren't signed by
-Apple or Microsoft yet, so Windows asks before running the `.msi` (More info → Run anyway) and macOS before opening the
-app the first time (System Settings → Privacy & Security → Open Anyway).
+Download it from the [latest release](https://github.com/Azazel-Labs/Hoard/releases/latest): the `-setup.exe` for
+Windows, the `.dmg` for macOS on Apple silicon, the `.AppImage` or `.deb` for Linux. On Windows it installs for you
+alone, without asking for an administrator. The installers aren't signed by Apple or Microsoft yet, so Windows asks
+before running the installer (More info → Run anyway) and macOS before opening the app the first time (System Settings
+→ Privacy & Security → Open Anyway).
 
 The first time it opens, it asks where the library goes. Everything else is in Settings, as on a server.
+
+After that it keeps itself up to date, with nothing to click: a new release downloads in the background and installs
+when you quit, so the next time you open Hoard it's the new version. A `.deb` is updated by installing the next one.
 
 ## Install with Docker
 

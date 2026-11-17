@@ -117,13 +117,18 @@ sistem. Versi baru diunduh di latar belakang dan dipasang saat aplikasi ditutup.
 
 ## Memasang aplikasi desktop
 
-Unduh dari [rilis terbaru](https://github.com/Azazel-Labs/Hoard/releases/latest): `.msi` untuk Windows, `.dmg` untuk
-macOS di Apple silicon, `.AppImage` atau `.deb` untuk Linux. Penginstalnya belum ditandatangani oleh Apple atau
-Microsoft, jadi Windows akan bertanya sebelum menjalankan `.msi` (More info → Run anyway) dan macOS sebelum membuka
-aplikasinya untuk pertama kali (System Settings → Privacy & Security → Open Anyway).
+Unduh dari [rilis terbaru](https://github.com/Azazel-Labs/Hoard/releases/latest): `-setup.exe` untuk Windows, `.dmg`
+untuk macOS di Apple silicon, `.AppImage` atau `.deb` untuk Linux. Di Windows, aplikasi ini terpasang hanya untuk Anda,
+tanpa meminta akses administrator. Penginstalnya belum ditandatangani oleh Apple atau Microsoft, jadi Windows akan
+bertanya sebelum menjalankan penginstal (More info → Run anyway) dan macOS sebelum membuka aplikasinya untuk pertama
+kali (System Settings → Privacy & Security → Open Anyway).
 
 Saat pertama kali dibuka, aplikasi akan menanyakan di mana pustaka disimpan. Semua hal lainnya ada di Pengaturan, sama
 seperti di server.
+
+Setelah itu, aplikasi akan memperbarui dirinya sendiri tanpa perlu Anda mengeklik apa pun: rilis baru diunduh di latar
+belakang dan dipasang saat Anda keluar, jadi saat berikutnya Anda membuka Hoard, versinya sudah yang baru. `.deb`
+diperbarui dengan memasang versi berikutnya.
 
 ## Memasang dengan Docker
 

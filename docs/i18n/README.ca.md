@@ -118,12 +118,17 @@ d'[ambientCG](https://ambientcg.com), i sons, fulls de sprites i tipus de lletra
 
 ## Instal·lació de l'aplicació d'escriptori
 
-Baixeu-la de la [versió més recent](https://github.com/Azazel-Labs/Hoard/releases/latest): el `.msi` per a Windows, el
-`.dmg` per a macOS amb Apple silicon, el `.AppImage` o el `.deb` per a Linux. Els instal·ladors encara no estan signats
-per Apple ni per Microsoft, així que Windows demana confirmació abans d'executar el `.msi` (More info → Run anyway) i
-macOS abans d'obrir l'aplicació la primera vegada (System Settings → Privacy & Security → Open Anyway).
+Baixeu-la de la [versió més recent](https://github.com/Azazel-Labs/Hoard/releases/latest): el `-setup.exe` per a
+Windows, el `.dmg` per a macOS amb Apple silicon, el `.AppImage` o el `.deb` per a Linux. A Windows s'instal·la només
+per al vostre usuari, sense demanar permisos d'administrador. Els instal·ladors encara no estan signats per Apple ni per
+Microsoft, així que Windows demana confirmació abans d'executar l'instal·lador (More info → Run anyway) i macOS abans
+d'obrir l'aplicació la primera vegada (System Settings → Privacy & Security → Open Anyway).
 
 La primera vegada que s'obre, pregunta on va la biblioteca. Tota la resta és a Configuració, com en un servidor.
+
+Després es manté al dia tota sola, sense haver de fer clic enlloc: una versió nova es baixa en segon pla i s'instal·la
+quan la tanqueu, de manera que la pròxima vegada que obriu Hoard ja és la versió nova. Un `.deb` s'actualitza
+instal·lant el següent.
 
 ## Instal·lació amb Docker
 

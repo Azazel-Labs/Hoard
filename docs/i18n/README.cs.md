@@ -115,12 +115,16 @@ ukončíte.
 
 ## Instalace desktopové aplikace
 
-Stáhněte si ji z [nejnovějšího vydání](https://github.com/Azazel-Labs/Hoard/releases/latest): `.msi` pro Windows, `.dmg`
-pro macOS na Apple silicon, `.AppImage` nebo `.deb` pro Linux. Instalátory zatím nejsou podepsané společnostmi Apple ani
-Microsoft, takže Windows se před spuštěním `.msi` zeptají (Další informace → Přesto spustit) a macOS před prvním
-otevřením aplikace (Nastavení systému → Soukromí a zabezpečení → Přesto otevřít).
+Stáhněte si ji z [nejnovějšího vydání](https://github.com/Azazel-Labs/Hoard/releases/latest): `-setup.exe` pro Windows,
+`.dmg` pro macOS na Apple silicon, `.AppImage` nebo `.deb` pro Linux. Ve Windows se nainstaluje jen pro vás a o
+oprávnění správce nežádá. Instalátory zatím nejsou podepsané společnostmi Apple ani Microsoft, takže Windows se před
+spuštěním instalátoru zeptají (Další informace → Přesto spustit) a macOS před prvním otevřením aplikace (Nastavení
+systému → Soukromí a zabezpečení → Přesto otevřít).
 
 Při prvním spuštění se zeptá, kam knihovnu uložit. Všechno ostatní najdete v Nastavení, stejně jako na serveru.
+
+Pak se sama udržuje aktuální a nemusíte na nic klikat: nová verze se stáhne na pozadí a nainstaluje se, když aplikaci
+ukončíte, takže až Hoard příště otevřete, poběží už nová verze. Balíček `.deb` aktualizujete instalací dalšího.
 
 ## Instalace přes Docker
 

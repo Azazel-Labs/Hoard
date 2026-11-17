@@ -5,7 +5,12 @@
 //! plugins, the `hoard` CLI and MCP clients reach it at that address, with an access token made in Settings → Account.
 //!
 //! The library lives in the app's data folder; thumbnails, downloaded tools and models in its cache folder; the log
-//! in its log folder. An update found at start downloads in the background and installs when the app quits.
+//! in its log folder.
+//!
+//! Updates need nothing from the person using it: the app looks for one when it starts and every few hours, downloads
+//! it in the background, and installs it with no window when the app quits, so the next start is the new version. On
+//! Windows the app is installed for the one user, in their own folders, so installing an update doesn't ask for an
+//! administrator. A copy installed from the .deb is left to the package manager.
 
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
@@ -26,6 +31,8 @@ use tauri_plugin_updater::{Update, UpdaterExt as _};
 const FIRST_PORT: u16 = 4627;
 /// How long quitting waits for the server to finish what it's doing.
 const STOP_WAIT: Duration = Duration::from_secs(10);
+/// How often the app looks for an update while it's open, after looking when it starts.
+const UPDATE_CHECK: Duration = Duration::from_hours(6);
 /// A log bigger than this starts over when the app does.
 const LOG_LIMIT: u64 = 16 * 1024 * 1024;
 
@@ -112,8 +119,17 @@ fn start(app: &AppHandle) -> Result<()> {
     });
     let app = app.clone();
     tauri::async_runtime::spawn(async move {
-        if let Err(e) = fetch_update(&app).await {
-            tracing::info!(error = %format!("{e:#}"), "couldn't check for an update");
+        // A .deb is updated by the package manager, with the next .deb.
+        if tauri::utils::platform::bundle_type() == Some(tauri::utils::config::BundleType::Deb) {
+            return;
+        }
+        loop {
+            match fetch_update(&app).await {
+                Ok(true) => break,
+                Ok(false) => {}
+                Err(e) => tracing::info!(error = %format!("{e:#}"), "couldn't check for an update"),
+            }
+            tokio::time::sleep(UPDATE_CHECK).await;
         }
     });
     Ok(())
@@ -161,7 +177,8 @@ fn stop() {
     let pending = PENDING.lock().unwrap_or_else(PoisonError::into_inner).take();
     if let Some((update, bytes)) = pending {
         tracing::info!(version = %update.version, "installing the update");
-        if let Err(e) = update.install(bytes) {
+        // Quietly, with no window, and without opening the app again: it was quitting.
+        if let Err(e) = update.restart_after_install(false).install(bytes) {
             tracing::warn!(error = %e, "couldn't install the update");
         }
     }
@@ -274,15 +291,16 @@ fn log_file(path: &Path) -> std::io::Result<File> {
 }
 
 /// Download an update, if there is one, to install when the app quits.
-async fn fetch_update(app: &AppHandle) -> Result<()> {
+/// Look for an update and download it, to install when the app quits. True if there was one.
+async fn fetch_update(app: &AppHandle) -> Result<bool> {
     let Some(update) = app.updater()?.check().await? else {
-        return Ok(());
+        return Ok(false);
     };
     tracing::info!(version = %update.version, "downloading an update");
     let bytes = update.download(|_, _| {}, || {}).await?;
     tracing::info!(version = %update.version, "the update installs when Hoard quits");
     *PENDING.lock().unwrap_or_else(PoisonError::into_inner) = Some((update, bytes));
-    Ok(())
+    Ok(true)
 }
 
 #[cfg(test)]

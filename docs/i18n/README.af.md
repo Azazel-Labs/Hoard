@@ -113,13 +113,18 @@ weergawes laai in die agtergrond af en word geïnstalleer wanneer dit toemaak.
 
 ## Installeer die rekenaartoep
 
-Laai dit af van die [nuutste vrystelling](https://github.com/Azazel-Labs/Hoard/releases/latest): die `.msi` vir Windows,
-die `.dmg` vir macOS op Apple silicon, die `.AppImage` of `.deb` vir Linux. Die installeerders is nog nie deur Apple of
-Microsoft onderteken nie, so Windows vra voordat dit die `.msi` laat loop (More info → Run anyway) en macOS voordat dit
-die toep die eerste keer oopmaak (System Settings → Privacy & Security → Open Anyway).
+Laai dit af van die [nuutste vrystelling](https://github.com/Azazel-Labs/Hoard/releases/latest): die `-setup.exe` vir
+Windows, die `.dmg` vir macOS op Apple silicon, die `.AppImage` of `.deb` vir Linux. Op Windows installeer dit net vir
+jou, sonder om 'n administrateur te vra. Die installeerders is nog nie deur Apple of Microsoft onderteken nie, so
+Windows vra voordat dit die installeerder laat loop (More info → Run anyway) en macOS voordat dit die toep die eerste
+keer oopmaak (System Settings → Privacy & Security → Open Anyway).
 
 Die eerste keer dat dit oopmaak, vra dit waar die biblioteek moet kom. Alles anders is in Instellings, soos op 'n
 bediener.
+
+Daarna hou dit homself op datum, sonder dat jy iets hoef te klik: 'n nuwe vrystelling word in die agtergrond afgelaai en
+geïnstalleer wanneer jy die toep toemaak, so die volgende keer dat jy Hoard oopmaak, is dit die nuwe weergawe. 'n `.deb`
+word bygewerk deur die volgende een te installeer.
 
 ## Installeer met Docker
 

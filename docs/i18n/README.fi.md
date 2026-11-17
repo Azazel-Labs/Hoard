@@ -118,13 +118,18 @@ pinnat [ambientCG:stä](https://ambientcg.com) sekä äänet, sprite-arkit ja fo
 
 ## Työpöytäsovelluksen asennus
 
-Lataa se [uusimmasta julkaisusta](https://github.com/Azazel-Labs/Hoard/releases/latest): `.msi` Windowsille, `.dmg`
-Apple silicon -koneiden macOS:lle, `.AppImage` tai `.deb` Linuxille. Apple tai Microsoft ei ole vielä allekirjoittanut
-asennusohjelmia, joten Windows kysyy ennen `.msi`:n suorittamista (Lisätietoja → Suorita silti) ja macOS ennen
-sovelluksen ensimmäistä avaamista (Järjestelmäasetukset → Yksityisyys ja suojaus → Avaa silti).
+Lataa se [uusimmasta julkaisusta](https://github.com/Azazel-Labs/Hoard/releases/latest): `-setup.exe` Windowsille,
+`.dmg` Apple silicon -koneiden macOS:lle, `.AppImage` tai `.deb` Linuxille. Windowsissa se asentuu vain sinulle eikä
+pyydä järjestelmänvalvojan oikeuksia. Apple tai Microsoft ei ole vielä allekirjoittanut asennusohjelmia, joten Windows
+kysyy ennen asennusohjelman suorittamista (Lisätietoja → Suorita silti) ja macOS ennen sovelluksen ensimmäistä avaamista
+(Järjestelmäasetukset → Yksityisyys ja suojaus → Avaa silti).
 
 Kun sovellus avataan ensimmäisen kerran, se kysyy, mihin kirjasto tulee. Kaikki muu on Asetuksissa, kuten
 palvelimellakin.
+
+Sen jälkeen sovellus pitää itsensä ajan tasalla, eikä sinun tarvitse klikata mitään: uusi julkaisu latautuu taustalla ja
+asentuu, kun suljet sovelluksen, joten kun seuraavan kerran avaat Hoardin, se on jo uusi versio. `.deb`-paketti
+päivitetään asentamalla seuraava.
 
 ## Asennus Dockerilla
 

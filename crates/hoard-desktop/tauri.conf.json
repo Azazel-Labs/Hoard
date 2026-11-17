@@ -13,13 +13,18 @@
   },
   "bundle": {
     "active": true,
-    "targets": ["msi", "app", "dmg", "appimage", "deb"],
+    "targets": ["nsis", "app", "dmg", "appimage", "deb"],
     "icon": ["icons/32x32.png", "icons/128x128.png", "icons/128x128@2x.png", "icons/icon.icns", "icons/icon.ico"],
     "category": "DeveloperTool",
     "shortDescription": "A searchable library for your game assets",
     "longDescription": "Hoard keeps your models, textures, materials, sounds, music, fonts and sprite sheets in one searchable library, with previews of everything, and hands them to your game engine.",
     "copyright": "Azazel Labs",
     "licenseFile": "../../LICENSE",
+    "windows": {
+      "nsis": {
+        "installMode": "currentUser"
+      }
+    },
     "macOS": {
       "minimumSystemVersion": "12.0"
     },
@@ -34,7 +39,7 @@
       "endpoints": ["https://github.com/Azazel-Labs/Hoard/releases/latest/download/latest.json"],
       "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IEVERUIzNTlCRTY0RjU4MjAKUldRZ1dFL21telhyN1hYSUJKVW5KanEvZUovZTc0NzM4VTBETkdzL0NrbmFXODhvT3RrOVlWOVEK",
       "windows": {
-        "installMode": "passive"
+        "installMode": "quiet"
       }
     }
   }

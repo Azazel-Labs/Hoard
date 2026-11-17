@@ -100,7 +100,7 @@ jobs:
           name: bin-${{ matrix.target }}
           path: hoard-*.*z*
 
-  # The desktop app (crates/hoard-desktop): an .msi, a .dmg, an AppImage and a .deb. With the TAURI_SIGNING_PRIVATE_KEY
+  # The desktop app (crates/hoard-desktop): a Windows installer (.exe), a .dmg, an AppImage and a .deb. With the TAURI_SIGNING_PRIVATE_KEY
   # secret (and TAURI_SIGNING_PRIVATE_KEY_PASSWORD, if the key has one) each also gets a signed update, which installed
   # copies find through the release's latest.json; without it the installers are built alone.
   desktop:
@@ -111,7 +111,7 @@ jobs:
         include:
           - { os: ubuntu-24.04, target: x86_64-unknown-linux-gnu, bundles: "appimage,deb" }
           - { os: macos-15, target: aarch64-apple-darwin, bundles: "app,dmg" }
-          - { os: windows-2025, target: x86_64-pc-windows-msvc, bundles: msi }
+          - { os: windows-2025, target: x86_64-pc-windows-msvc, bundles: nsis }
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v7
@@ -143,7 +143,7 @@ jobs:
             echo "::warning::TAURI_SIGNING_PRIVATE_KEY isn't set, so the installers are built without updates"
           fi
           version="$HOARD_VERSION"
-          # An .msi's version is numbers only.
+          # A Windows installer's version is numbers only.
           [ "$RUNNER_OS" = Windows ] && version="${version%%-*}"
           # The tag's version, the portal's files beside the app, and the updates when they can be signed.
           config="$(printf '{"version":"%s","bundle":{"resources":{"../../web/dist/":"web/"},"createUpdaterArtifacts":%s}}' "$version" "$updates")"
@@ -154,7 +154,7 @@ jobs:
           b=target/release/bundle
           mkdir out
           shopt -s nullglob
-          cp $b/msi/*.msi* $b/dmg/*.dmg $b/appimage/*.AppImage* $b/deb/*.deb out/
+          cp $b/nsis/*.exe* $b/dmg/*.dmg $b/appimage/*.AppImage* $b/deb/*.deb out/
           # macOS's update is named Hoard.app.tar.gz: give it the version and architecture the others have.
           for f in $b/macos/Hoard.app.tar.gz*; do
             cp "$f" "out/Hoard_${{ needs.check-version.outputs.version }}_aarch64.${f##*/Hoard.}"
@@ -189,7 +189,7 @@ jobs:
         run: |
           v="${{ needs.check-version.outputs.version }}"
           bash scripts/release-notes.sh "$TAG" > notes.md
-          printf '\n### Desktop app\n\nThe `.msi` for Windows, the `.dmg` for macOS on Apple silicon, the `.AppImage` or `.deb` for Linux.\n' >> notes.md
+          printf '\n### Desktop app\n\nThe `-setup.exe` for Windows, the `.dmg` for macOS on Apple silicon, the `.AppImage` or `.deb` for Linux.\n' >> notes.md
           printf '\n### Container image\n\n```sh\ndocker pull ghcr.io/%s:%s\n```\n' "${GITHUB_REPOSITORY,,}" "$v" >> notes.md
           # latest.json carries the updates' signatures.
           rm -f dist/*.sig

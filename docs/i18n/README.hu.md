@@ -117,12 +117,17 @@ az [ambientCG-ről](https://ambientcg.com), hangok, spritelapok és betűtípuso
 
 ## Az asztali alkalmazás telepítése
 
-Töltse le a [legújabb kiadásból](https://github.com/Azazel-Labs/Hoard/releases/latest): Windowsra az `.msi`, Apple
-chipes Macen futó macOS-re a `.dmg`, Linuxra az `.AppImage` vagy a `.deb` fájlt. A telepítőket az Apple és a Microsoft
-még nem írta alá, ezért a Windows rákérdez, mielőtt futtatná az `.msi` fájlt (További információ → Futtatás mindenképp),
-a macOS pedig az alkalmazás első megnyitása előtt (System Settings → Privacy & Security → Open Anyway).
+Töltse le a [legújabb kiadásból](https://github.com/Azazel-Labs/Hoard/releases/latest): Windowsra a `-setup.exe`, Apple
+chipes Macen futó macOS-re a `.dmg`, Linuxra az `.AppImage` vagy a `.deb` fájlt. Windowson csak az Ön számára települ,
+és nem kér rendszergazdai jogosultságot. A telepítőket az Apple és a Microsoft még nem írta alá, ezért a Windows
+rákérdez, mielőtt futtatná a telepítőt (További információ → Futtatás mindenképp), a macOS pedig az alkalmazás első
+megnyitása előtt (System Settings → Privacy & Security → Open Anyway).
 
 Első megnyitáskor megkérdezi, hová kerüljön a könyvtár. Minden más a Beállításokban van, ahogy a szerveren is.
+
+Ezután magától naprakész marad, semmire sem kell kattintania: az új kiadás a háttérben letöltődik, és kilépéskor
+települ, így amikor legközelebb megnyitja a Hoardot, már az új verzió indul el. A `.deb` csomagot a következő
+telepítésével lehet frissíteni.
 
 ## Telepítés Dockerrel
 

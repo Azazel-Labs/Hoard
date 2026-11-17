@@ -118,13 +118,17 @@ de [ambientCG](https://ambientcg.com) y sonidos, hojas de sprites y fuentes de [
 
 ## Instalar la aplicación de escritorio
 
-Descárgala desde la [versión más reciente](https://github.com/Azazel-Labs/Hoard/releases/latest): el `.msi` para
-Windows, el `.dmg` para macOS en Apple silicon, el `.AppImage` o el `.deb` para Linux. Los instaladores todavía no están
-firmados por Apple ni por Microsoft, así que Windows pregunta antes de ejecutar el `.msi` (Más información → Ejecutar de
-todas formas) y macOS antes de abrir la aplicación por primera vez (Configuración del Sistema → Privacidad y seguridad →
-Abrir de todos modos).
+Descárgala desde la [versión más reciente](https://github.com/Azazel-Labs/Hoard/releases/latest): el `-setup.exe` para
+Windows, el `.dmg` para macOS en Apple silicon, el `.AppImage` o el `.deb` para Linux. En Windows se instala solo para
+ti, sin pedir permisos de administrador. Los instaladores todavía no están firmados por Apple ni por Microsoft, así que
+Windows pregunta antes de ejecutar el instalador (Más información → Ejecutar de todas formas) y macOS antes de abrir la
+aplicación por primera vez (Configuración del Sistema → Privacidad y seguridad → Abrir de todos modos).
 
 La primera vez que se abre, pregunta dónde va la biblioteca. Todo lo demás está en Configuración, como en un servidor.
+
+Después se mantiene actualizada sola, sin que tengas que hacer clic en nada: una versión nueva se descarga en segundo
+plano y se instala cuando la cierras, así que la próxima vez que abras Hoard ya es la versión nueva. Un `.deb` se
+actualiza instalando el siguiente.
 
 ## Instalar con Docker
 

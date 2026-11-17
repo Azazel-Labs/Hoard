@@ -114,12 +114,17 @@ bakgrunnen og installeres når du avslutter.
 
 ## Installere skrivebordsappen
 
-Last den ned fra [siste versjon](https://github.com/Azazel-Labs/Hoard/releases/latest): `.msi` for Windows, `.dmg` for
-macOS på Mac med Apple-chip, `.AppImage` eller `.deb` for Linux. Installasjonsprogrammene er ikke signert av Apple eller
-Microsoft ennå, så Windows spør før det kjører `.msi`-filen (Mer informasjon → Kjør likevel), og macOS før appen åpnes
-første gang (Systeminnstillinger → Personvern og sikkerhet → Åpne likevel).
+Last den ned fra [siste versjon](https://github.com/Azazel-Labs/Hoard/releases/latest): `-setup.exe` for Windows, `.dmg`
+for macOS på Mac med Apple-chip, `.AppImage` eller `.deb` for Linux. På Windows installeres den bare for deg, uten å be
+om administratortilgang. Installasjonsprogrammene er ikke signert av Apple eller Microsoft ennå, så Windows spør før det
+kjører installasjonsprogrammet (Mer informasjon → Kjør likevel), og macOS før appen åpnes første gang
+(Systeminnstillinger → Personvern og sikkerhet → Åpne likevel).
 
 Første gang den åpnes, spør den hvor biblioteket skal ligge. Alt annet ligger i Innstillinger, som på en server.
+
+Etter det holder den seg oppdatert av seg selv, uten at du trenger å klikke på noe: en ny versjon lastes ned i
+bakgrunnen og installeres når du avslutter, så neste gang du åpner Hoard, er det den nye versjonen. En `.deb` oppdateres
+ved å installere den neste.
 
 ## Installere med Docker
 

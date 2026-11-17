@@ -117,13 +117,18 @@ powierzchnie z [ambientCG](https://ambientcg.com) oraz dźwięki, arkusze sprite
 
 ## Instalacja aplikacji desktopowej
 
-Można ją pobrać z [najnowszego wydania](https://github.com/Azazel-Labs/Hoard/releases/latest): plik `.msi` dla Windows,
-`.dmg` dla macOS na Macach z układem Apple, `.AppImage` lub `.deb` dla Linuksa. Instalatory nie są jeszcze podpisane
-przez Apple ani Microsoft, więc Windows pyta przed uruchomieniem pliku `.msi` (Więcej informacji → Uruchom mimo to), a
-macOS przed pierwszym otwarciem aplikacji (Ustawienia systemowe → Prywatność i ochrona → Otwórz mimo to).
+Można ją pobrać z [najnowszego wydania](https://github.com/Azazel-Labs/Hoard/releases/latest): plik `-setup.exe` dla
+Windows, `.dmg` dla macOS na Macach z układem Apple, `.AppImage` lub `.deb` dla Linuksa. W Windows instaluje się tylko
+dla bieżącego użytkownika, bez proszenia o uprawnienia administratora. Instalatory nie są jeszcze podpisane przez Apple
+ani Microsoft, więc Windows pyta przed uruchomieniem instalatora (Więcej informacji → Uruchom mimo to), a macOS przed
+pierwszym otwarciem aplikacji (Ustawienia systemowe → Prywatność i ochrona → Otwórz mimo to).
 
 Przy pierwszym otwarciu aplikacja pyta, gdzie ma trafić biblioteka. Wszystko inne jest w Ustawieniach, tak jak na
 serwerze.
+
+Później aplikacja sama dba o aktualizacje i nie trzeba niczego klikać: nowa wersja pobiera się w tle i instaluje przy
+zamknięciu, więc przy następnym otwarciu Hoard działa już w nowej wersji. Pakiet `.deb` aktualizuje się, instalując
+kolejny.
 
 ## Instalacja przez Dockera
 

@@ -87,9 +87,11 @@ Hoard 會離線自動為一切加上標籤：`tileable`、`res:2k`、`poly:low`�
 
 ## 安裝桌面應用程式
 
-從[最新版本](https://github.com/Azazel-Labs/Hoard/releases/latest)下載：Windows 用 `.msi`，Apple 晶片的 macOS 用 `.dmg`，Linux 用 `.AppImage` 或 `.deb`。安裝程式尚未經過 Apple 或 Microsoft 簽署，因此 Windows 會在執行 `.msi` 前詢問（其他資訊 → 仍要執行），macOS 則會在第一次開啟應用程式前詢問（系統設定 → 隱私權與安全性 → 強制打開）。
+從[最新版本](https://github.com/Azazel-Labs/Hoard/releases/latest)下載：Windows 用 `-setup.exe`，Apple 晶片的 macOS 用 `.dmg`，Linux 用 `.AppImage` 或 `.deb`。在 Windows 上，它只會為你一個人安裝，不需要系統管理員權限。安裝程式尚未經過 Apple 或 Microsoft 簽署，因此 Windows 會在執行安裝程式前詢問（其他資訊 → 仍要執行），macOS 則會在第一次開啟應用程式前詢問（系統設定 → 隱私權與安全性 → 強制打開）。
 
 第一次開啟時，它會詢問素材庫要放在哪裡。其他一切都在「設定」中，就像在伺服器上一樣。
+
+之後它會自動保持最新，什麼都不用點：新版本會在背景下載，並在你結束應用程式時安裝，下次開啟 Hoard 時就已經是新版本了。`.deb` 則要安裝下一版來更新。
 
 ## 使用 Docker 安裝
 

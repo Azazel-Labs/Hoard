@@ -118,12 +118,17 @@ tipleri. Bu resimleri ve sosyal medya kartını `node web/scripts/readme-images.
 
 ## Masaüstü uygulamasının kurulumu
 
-Uygulamayı [en son sürümden](https://github.com/Azazel-Labs/Hoard/releases/latest) indirin: Windows için `.msi`, Apple
-silicon’lı macOS için `.dmg`, Linux için `.AppImage` ya da `.deb`. Kurulum dosyaları henüz Apple ya da Microsoft
-tarafından imzalanmadığı için Windows `.msi` dosyasını çalıştırmadan önce (Ek bilgi → Yine de çalıştır), macOS ise
-uygulamayı ilk kez açmadan önce (Sistem Ayarları → Gizlilik ve Güvenlik → Yine de Aç) sorar.
+Uygulamayı [en son sürümden](https://github.com/Azazel-Labs/Hoard/releases/latest) indirin: Windows için `-setup.exe`,
+Apple silicon’lı macOS için `.dmg`, Linux için `.AppImage` ya da `.deb`. Windows’ta yalnızca sizin için kurulur ve
+yönetici izni istemez. Kurulum dosyaları henüz Apple ya da Microsoft tarafından imzalanmadığı için Windows kurulum
+dosyasını çalıştırmadan önce (Ek bilgi → Yine de çalıştır), macOS ise uygulamayı ilk kez açmadan önce (Sistem Ayarları →
+Gizlilik ve Güvenlik → Yine de Aç) sorar.
 
 İlk açıldığında kütüphanenin nereye konacağını sorar. Geri kalan her şey, sunucuda olduğu gibi Ayarlar’dadır.
+
+Sonrasında hiçbir şeye tıklamanıza gerek kalmadan kendini güncel tutar: yeni sürüm arka planda indirilir ve uygulamadan
+çıktığınızda kurulur, böylece Hoard’u bir sonraki açışınızda yeni sürüm karşınızda olur. `.deb` paketi ise bir sonrakini
+kurarak güncellenir.
 
 ## Docker ile kurulum
 

@@ -117,12 +117,17 @@ Hoard сам означава све, ван мреже: `tileable`, `res:2k`, `
 
 ## Инсталација десктоп апликације
 
-Преузмите је из [најновијег издања](https://github.com/Azazel-Labs/Hoard/releases/latest): `.msi` за Windows, `.dmg` за
-macOS на Apple silicon рачунарима, `.AppImage` или `.deb` за Linux. Инсталационе програме Apple и Microsoft још нису
-потписали, па Windows пита пре покретања `.msi` датотеке (More info → Run anyway), а macOS пре првог отварања апликације
-(System Settings → Privacy & Security → Open Anyway).
+Преузмите је из [најновијег издања](https://github.com/Azazel-Labs/Hoard/releases/latest): `-setup.exe` за Windows,
+`.dmg` за macOS на Apple silicon рачунарима, `.AppImage` или `.deb` за Linux. На Windows-у се инсталира само за вас, без
+тражења администраторских права. Инсталационе програме Apple и Microsoft још нису потписали, па Windows пита пре
+покретања инсталационог програма (More info → Run anyway), а macOS пре првог отварања апликације (System Settings →
+Privacy & Security → Open Anyway).
 
 Када се први пут отвори, пита где ће бити библиотека. Све остало је у Подешавањима, као на серверу.
+
+После тога се сама ажурира, без потребе да било шта кликнете: ново издање се преузима у позадини и инсталира када
+изађете из апликације, тако да следећи пут када отворите Hoard већ ради нова верзија. `.deb` се ажурира инсталирањем
+следећег.
 
 ## Инсталација помоћу Docker-а
 

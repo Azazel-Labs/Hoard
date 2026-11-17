@@ -118,12 +118,17 @@ sociale.</sub>
 
 ## Instalarea aplicației desktop
 
-Descărcați-o din [cea mai nouă versiune](https://github.com/Azazel-Labs/Hoard/releases/latest): `.msi` pentru Windows,
-`.dmg` pentru macOS pe Apple silicon, `.AppImage` sau `.deb` pentru Linux. Programele de instalare nu sunt încă semnate
-de Apple sau Microsoft, așa că Windows întreabă înainte de a rula `.msi` (More info → Run anyway), iar macOS înainte de
-a deschide aplicația prima dată (Configurări sistem → Confidențialitate și securitate → Deschide oricum).
+Descărcați-o din [cea mai nouă versiune](https://github.com/Azazel-Labs/Hoard/releases/latest): `-setup.exe` pentru
+Windows, `.dmg` pentru macOS pe Apple silicon, `.AppImage` sau `.deb` pentru Linux. Pe Windows se instalează doar pentru
+dumneavoastră, fără să ceară drepturi de administrator. Programele de instalare nu sunt încă semnate de Apple sau
+Microsoft, așa că Windows întreabă înainte de a rula programul de instalare (More info → Run anyway), iar macOS înainte
+de a deschide aplicația prima dată (Configurări sistem → Confidențialitate și securitate → Deschide oricum).
 
 La prima deschidere, vă întreabă unde să fie biblioteca. Tot restul este în Setări, ca pe un server.
+
+După aceea se actualizează singură, fără să fie nevoie să apăsați nimic: o versiune nouă se descarcă în fundal și se
+instalează când închideți aplicația, așa că data viitoare când deschideți Hoard, rulează deja versiunea nouă. Un `.deb`
+se actualizează instalându-l pe următorul.
 
 ## Instalare cu Docker
 

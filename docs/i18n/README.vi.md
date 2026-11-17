@@ -117,12 +117,16 @@ chế độ nền và cài đặt khi bạn thoát ứng dụng.
 
 ## Cài đặt ứng dụng desktop
 
-Tải về từ [bản phát hành mới nhất](https://github.com/Azazel-Labs/Hoard/releases/latest): `.msi` cho Windows, `.dmg` cho
-macOS trên Apple silicon, `.AppImage` hoặc `.deb` cho Linux. Các trình cài đặt chưa được Apple hay Microsoft ký, nên
-Windows sẽ hỏi trước khi chạy `.msi` (Thông tin thêm → Vẫn chạy) và macOS sẽ hỏi trước khi mở ứng dụng lần đầu (Cài đặt
-hệ thống → Quyền riêng tư & Bảo mật → Vẫn mở).
+Tải về từ [bản phát hành mới nhất](https://github.com/Azazel-Labs/Hoard/releases/latest): `-setup.exe` cho Windows,
+`.dmg` cho macOS trên Apple silicon, `.AppImage` hoặc `.deb` cho Linux. Trên Windows, ứng dụng chỉ cài cho riêng bạn và
+không cần quyền quản trị viên. Các trình cài đặt chưa được Apple hay Microsoft ký, nên Windows sẽ hỏi trước khi chạy
+trình cài đặt (Thông tin thêm → Vẫn chạy) và macOS sẽ hỏi trước khi mở ứng dụng lần đầu (Cài đặt hệ thống → Quyền riêng
+tư & Bảo mật → Vẫn mở).
 
 Lần đầu mở, ứng dụng sẽ hỏi bạn muốn đặt thư viện ở đâu. Mọi thứ khác nằm trong Cài đặt, như trên máy chủ.
+
+Sau đó ứng dụng tự cập nhật mà bạn không cần bấm gì: bản phát hành mới được tải về ở chế độ nền và được cài khi bạn
+thoát, nên lần sau mở Hoard, bạn đã có phiên bản mới. Gói `.deb` được cập nhật bằng cách cài bản tiếp theo.
 
 ## Cài đặt bằng Docker
 

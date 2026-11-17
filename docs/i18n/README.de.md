@@ -118,14 +118,19 @@ Social-Media-Karte.</sub>
 
 ## Installation der Desktop-App
 
-Laden Sie sie aus dem [neuesten Release](https://github.com/Azazel-Labs/Hoard/releases/latest) herunter: die `.msi` für
-Windows, die `.dmg` für macOS auf Apple silicon, das `.AppImage` oder die `.deb` für Linux. Die Installer sind noch
-nicht von Apple oder Microsoft signiert, daher fragt Windows nach, bevor es die `.msi` ausführt (Weitere Informationen →
+Laden Sie sie aus dem [neuesten Release](https://github.com/Azazel-Labs/Hoard/releases/latest) herunter: die
+`-setup.exe` für Windows, die `.dmg` für macOS auf Apple silicon, das `.AppImage` oder die `.deb` für Linux. Unter
+Windows wird sie nur für Sie installiert, ohne nach einem Administrator zu fragen. Die Installer sind noch nicht von
+Apple oder Microsoft signiert, daher fragt Windows nach, bevor es den Installer ausführt (Weitere Informationen →
 Trotzdem ausführen), und macOS, bevor es die App zum ersten Mal öffnet (Systemeinstellungen → Datenschutz & Sicherheit →
 Dennoch öffnen).
 
 Beim ersten Start fragt sie, wo die Bibliothek liegen soll. Alles andere finden Sie in den Einstellungen, wie auf einem
 Server.
+
+Danach hält sie sich selbst auf dem neuesten Stand, ohne dass Sie etwas anklicken müssen: Ein neues Release wird im
+Hintergrund heruntergeladen und beim Beenden installiert, sodass Sie beim nächsten Öffnen von Hoard schon die neue
+Version haben. Eine `.deb` wird aktualisiert, indem Sie die nächste installieren.
 
 ## Installation mit Docker
 

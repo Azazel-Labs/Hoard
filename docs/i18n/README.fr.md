@@ -121,14 +121,19 @@ sociaux.</sub>
 
 ## Installer l’application de bureau
 
-Téléchargez-la depuis la [dernière version](https://github.com/Azazel-Labs/Hoard/releases/latest) : le `.msi` pour
-Windows, le `.dmg` pour macOS sur Apple silicon, le `.AppImage` ou le `.deb` pour Linux. Les installateurs ne sont pas
-encore signés par Apple ni par Microsoft : Windows demande donc une confirmation avant d’exécuter le `.msi`
-(Informations complémentaires → Exécuter quand même) et macOS avant d’ouvrir l’application la première fois (Réglages
-Système → Confidentialité et sécurité → Ouvrir quand même).
+Téléchargez-la depuis la [dernière version](https://github.com/Azazel-Labs/Hoard/releases/latest) : le `-setup.exe` pour
+Windows, le `.dmg` pour macOS sur Apple silicon, le `.AppImage` ou le `.deb` pour Linux. Sous Windows, elle s’installe
+uniquement pour vous, sans demander de droits d’administrateur. Les installateurs ne sont pas encore signés par Apple ni
+par Microsoft : Windows demande donc une confirmation avant d’exécuter le programme d’installation (Informations
+complémentaires → Exécuter quand même) et macOS avant d’ouvrir l’application la première fois (Réglages Système →
+Confidentialité et sécurité → Ouvrir quand même).
 
 La première fois qu’elle s’ouvre, elle demande où mettre la bibliothèque. Tout le reste se trouve dans les Paramètres,
 comme sur un serveur.
+
+Ensuite, elle se tient à jour toute seule, sans rien avoir à cliquer : une nouvelle version se télécharge en
+arrière-plan et s’installe quand vous quittez l’application, si bien qu’à la prochaine ouverture de Hoard, c’est déjà la
+nouvelle version. Un `.deb` se met à jour en installant le suivant.
 
 ## Installer avec Docker
 

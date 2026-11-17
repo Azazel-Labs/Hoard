@@ -68,6 +68,7 @@ error-wrong-setup-code = To není instalační kód zadaný serveru v HOARD_SETU
 error-wrong-password = Jméno a heslo k sobě nepatří
 error-folder-missing = { $path } neexistuje (není připojený disk?)
 error-s3-path = umístění S3 vypadá jako s3://bucket
+error-not-built = tato kopie Hoardu byla sestavena bez { $feature }
 error-openai-auth-unreachable = nepodařilo se spojit s auth.openai.com
 error-openai-unexpected = neočekávaná odpověď od OpenAI
 error-openai-answered = OpenAI odpověděl { $status }: { $reason }

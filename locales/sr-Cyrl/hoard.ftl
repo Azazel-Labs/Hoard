@@ -68,6 +68,7 @@ error-wrong-setup-code = То није код за подешавање који
 error-wrong-password = Име и лозинка се не поклапају
 error-folder-missing = { $path } не постоји (диск који није монтиран?)
 error-s3-path = S3 локација изгледа као s3://bucket
+error-not-built = ова копија Hoard-а је направљена без { $feature }
 error-openai-auth-unreachable = auth.openai.com није доступан
 error-openai-unexpected = неочекиван одговор од OpenAI-ја
 error-openai-answered = OpenAI је одговорио { $status }: { $reason }

@@ -68,6 +68,7 @@ error-wrong-setup-code = Bu, sunucuya HOARD_SETUP_CODE ile verilen kurulum kodu 
 error-wrong-password = Bu ad ve parola eşleşmiyor
 error-folder-missing = { $path } orada değil (bağlanmamış bir disk mi?)
 error-s3-path = bir S3 konumu s3://bucket biçimindedir
+error-not-built = Hoard'un bu kopyası { $feature } olmadan derlendi
 error-openai-auth-unreachable = auth.openai.com adresine ulaşılamadı
 error-openai-unexpected = OpenAI beklenmeyen bir yanıt verdi
 error-openai-answered = OpenAI yanıtı { $status }: { $reason }

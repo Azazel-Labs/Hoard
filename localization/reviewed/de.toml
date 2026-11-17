@@ -3656,6 +3656,10 @@ translation = "kein blake3-Hash in Hexadezimalschreibweise"
 source = "not a picture Hoard can read: { $reason }"
 translation = "kein Bild, das Hoard lesen kann: { $reason }"
 
+[messages.error-not-built]
+source = "this copy of Hoard was built without { $feature }"
+translation = "diese Hoard-Version wurde ohne { $feature } erstellt"
+
 [messages.error-not-format-file]
 source = "not a format's file: { $name }"
 translation = "keine Datei eines Formats: { $name }"

@@ -3578,6 +3578,10 @@ translation = "不是 blake3 十六進位雜湊值"
 source = "not a picture Hoard can read: { $reason }"
 translation = "不是 Hoard 可以讀取的圖片：{ $reason }"
 
+[messages.error-not-built]
+source = "this copy of Hoard was built without { $feature }"
+translation = "此 Hoard 建置時未包含 { $feature }"
+
 [messages.error-not-format-file]
 source = "not a format's file: { $name }"
 translation = "不是格式檔案：{ $name }"

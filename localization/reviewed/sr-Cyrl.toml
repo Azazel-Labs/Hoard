@@ -3673,6 +3673,10 @@ translation = "ово није blake3 хеш у хексадецималном �
 source = "not a picture Hoard can read: { $reason }"
 translation = "није слика коју Hoard може да прочита: { $reason }"
 
+[messages.error-not-built]
+source = "this copy of Hoard was built without { $feature }"
+translation = "ова копија Hoard-а је направљена без { $feature }"
+
 [messages.error-not-format-file]
 source = "not a format's file: { $name }"
 translation = "није датотека формата: { $name }"

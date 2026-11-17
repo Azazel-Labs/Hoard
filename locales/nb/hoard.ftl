@@ -68,6 +68,7 @@ error-wrong-setup-code = Det er ikke oppsettkoden serveren fikk i HOARD_SETUP_CO
 error-wrong-password = Navnet og passordet stemmer ikke overens
 error-folder-missing = { $path } finnes ikke (en disk som ikke er montert?)
 error-s3-path = en S3-plassering ser ut som s3://bucket
+error-not-built = denne kopien av Hoard er bygget uten { $feature }
 error-openai-auth-unreachable = kunne ikke nå auth.openai.com
 error-openai-unexpected = uventet svar fra OpenAI
 error-openai-answered = OpenAI svarte { $status }: { $reason }

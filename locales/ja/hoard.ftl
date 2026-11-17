@@ -68,6 +68,7 @@ error-wrong-setup-code = HOARD_SETUP_CODE でサーバーに指定されたセ�
 error-wrong-password = 名前とパスワードが一致しません
 error-folder-missing = { $path } がありません（ディスクがマウントされていない可能性があります）
 error-s3-path = S3 の保存場所は s3://bucket の形式です
+error-not-built = この Hoard は { $feature } なしでビルドされています
 error-openai-auth-unreachable = auth.openai.com に接続できませんでした
 error-openai-unexpected = OpenAI から予期しない応答がありました
 error-openai-answered = OpenAI の応答は { $status } でした: { $reason }

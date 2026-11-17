@@ -3723,6 +3723,10 @@ translation = "nu este un hash blake3 hexazecimal"
 source = "not a picture Hoard can read: { $reason }"
 translation = "nu este o imagine pe care Hoard o poate citi: { $reason }"
 
+[messages.error-not-built]
+source = "this copy of Hoard was built without { $feature }"
+translation = "această copie Hoard a fost compilată fără { $feature }"
+
 [messages.error-not-format-file]
 source = "not a format's file: { $name }"
 translation = "nu este fișierul unui format: { $name }"

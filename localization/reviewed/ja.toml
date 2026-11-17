@@ -3578,6 +3578,10 @@ translation = "blake3 の 16 進ハッシュではありません"
 source = "not a picture Hoard can read: { $reason }"
 translation = "Hoard が読める画像ではありません: { $reason }"
 
+[messages.error-not-built]
+source = "this copy of Hoard was built without { $feature }"
+translation = "この Hoard は { $feature } なしでビルドされています"
+
 [messages.error-not-format-file]
 source = "not a format's file: { $name }"
 translation = "フォーマットのファイルではありません: { $name }"

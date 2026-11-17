@@ -68,6 +68,7 @@ error-wrong-setup-code = Ez nem az a beállítási kód, amelyet a szerver a HOA
 error-wrong-password = A név és a jelszó nem egyezik
 error-folder-missing = { $path } nem található (talán nincs csatlakoztatva a lemez?)
 error-s3-path = egy S3-hely így néz ki: s3://bucket
+error-not-built = a Hoard ezen példánya { $feature } nélkül készült
 error-openai-auth-unreachable = nem sikerült elérni: auth.openai.com
 error-openai-unexpected = váratlan válasz az OpenAI-tól
 error-openai-answered = az OpenAI válasza: { $status }: { $reason }

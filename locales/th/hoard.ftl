@@ -68,6 +68,7 @@ error-wrong-setup-code = นี่ไม่ใช่รหัสตั้งค�
 error-wrong-password = ชื่อและรหัสผ่านไม่ตรงกัน
 error-folder-missing = ไม่พบ { $path } (ดิสก์ที่ยังไม่ได้เมานต์หรือเปล่า?)
 error-s3-path = ตำแหน่ง S3 มีรูปแบบเป็น s3://bucket
+error-not-built = Hoard ชุดนี้สร้างโดยไม่มี { $feature }
 error-openai-auth-unreachable = เชื่อมต่อ auth.openai.com ไม่ได้
 error-openai-unexpected = คำตอบจาก OpenAI ไม่เป็นไปตามที่คาดไว้
 error-openai-answered = OpenAI ตอบกลับ { $status }: { $reason }

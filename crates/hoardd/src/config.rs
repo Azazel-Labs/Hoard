@@ -28,7 +28,7 @@ pub(crate) enum UnrealConvert {
 #[derive(Debug, Clone, Parser)]
 #[command(version = hoard_core::VERSION, about)]
 #[expect(clippy::struct_excessive_bools, reason = "each bool is an independent command-line switch")]
-pub(crate) struct Config {
+pub struct Config {
     /// Address to listen on.
     #[arg(long, env = "HOARD_LISTEN", default_value = "127.0.0.1:4627")]
     pub(crate) listen: SocketAddr,

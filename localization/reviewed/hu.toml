@@ -3581,6 +3581,10 @@ translation = "nem blake3 hexadecimális hash"
 source = "not a picture Hoard can read: { $reason }"
 translation = "nem olyan kép, amelyet a Hoard be tud olvasni: { $reason }"
 
+[messages.error-not-built]
+source = "this copy of Hoard was built without { $feature }"
+translation = "a Hoard ezen példánya { $feature } nélkül készült"
+
 [messages.error-not-format-file]
 source = "not a format's file: { $name }"
 translation = "nem egy formátum fájlja: { $name }"

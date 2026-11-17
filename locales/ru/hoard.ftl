@@ -68,6 +68,7 @@ error-wrong-setup-code = Это не тот код настройки, что з
 error-wrong-password = Имя и пароль не совпадают
 error-folder-missing = { $path } не найден (диск не подключён?)
 error-s3-path = место хранения S3 выглядит так: s3://bucket
+error-not-built = эта копия Hoard собрана без { $feature }
 error-openai-auth-unreachable = не удалось связаться с auth.openai.com
 error-openai-unexpected = неожиданный ответ от OpenAI
 error-openai-answered = OpenAI ответил { $status }: { $reason }

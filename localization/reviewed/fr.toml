@@ -3668,6 +3668,10 @@ translation = "ce n’est pas un hachage blake3 en hexadécimal"
 source = "not a picture Hoard can read: { $reason }"
 translation = "ce n’est pas une image que Hoard peut lire : { $reason }"
 
+[messages.error-not-built]
+source = "this copy of Hoard was built without { $feature }"
+translation = "cette copie de Hoard a été compilée sans { $feature }"
+
 [messages.error-not-format-file]
 source = "not a format's file: { $name }"
 translation = "ce n’est pas un fichier de format : { $name }"

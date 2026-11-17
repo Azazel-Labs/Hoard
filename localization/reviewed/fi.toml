@@ -3668,6 +3668,10 @@ translation = "ei ole blake3-heksatiiviste"
 source = "not a picture Hoard can read: { $reason }"
 translation = "Hoard ei pysty lukemaan kuvaa: { $reason }"
 
+[messages.error-not-built]
+source = "this copy of Hoard was built without { $feature }"
+translation = "tämä Hoardin kopio on käännetty ilman { $feature } -tukea"
+
 [messages.error-not-format-file]
 source = "not a format's file: { $name }"
 translation = "ei ole muodon tiedosto: { $name }"

@@ -3718,6 +3718,10 @@ translation = "to nie jest skrót blake3 w zapisie szesnastkowym"
 source = "not a picture Hoard can read: { $reason }"
 translation = "to nie jest obraz, który Hoard potrafi odczytać: { $reason }"
 
+[messages.error-not-built]
+source = "this copy of Hoard was built without { $feature }"
+translation = "ta kopia Hoarda została zbudowana bez { $feature }"
+
 [messages.error-not-format-file]
 source = "not a format's file: { $name }"
 translation = "to nie jest plik formatu: { $name }"

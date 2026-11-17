@@ -3585,6 +3585,10 @@ translation = "bu bir blake3 onaltılık özeti değil"
 source = "not a picture Hoard can read: { $reason }"
 translation = "Hoard’un okuyabildiği bir resim değil: { $reason }"
 
+[messages.error-not-built]
+source = "this copy of Hoard was built without { $feature }"
+translation = "Hoard'un bu kopyası { $feature } olmadan derlendi"
+
 [messages.error-not-format-file]
 source = "not a format's file: { $name }"
 translation = "bir biçim dosyası değil: { $name }"

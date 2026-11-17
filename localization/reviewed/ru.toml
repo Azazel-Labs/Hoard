@@ -3736,6 +3736,10 @@ translation = "это не шестнадцатеричный хеш blake3"
 source = "not a picture Hoard can read: { $reason }"
 translation = "Hoard не может прочитать эту картинку: { $reason }"
 
+[messages.error-not-built]
+source = "this copy of Hoard was built without { $feature }"
+translation = "эта копия Hoard собрана без { $feature }"
+
 [messages.error-not-format-file]
 source = "not a format's file: { $name }"
 translation = "это не файл формата: { $name }"

@@ -68,6 +68,7 @@ error-wrong-setup-code = Αυτός δεν είναι ο κωδικός ρύθμ
 error-wrong-password = Το όνομα και ο κωδικός πρόσβασης δεν ταιριάζουν
 error-folder-missing = Το { $path } δεν υπάρχει (μήπως ένας δίσκος δεν είναι προσαρτημένος;)
 error-s3-path = μια τοποθεσία S3 μοιάζει με s3://bucket
+error-not-built = αυτό το αντίγραφο του Hoard δημιουργήθηκε χωρίς { $feature }
 error-openai-auth-unreachable = δεν ήταν δυνατή η πρόσβαση στο auth.openai.com
 error-openai-unexpected = απρόσμενη απάντηση από το OpenAI
 error-openai-answered = Το OpenAI απάντησε { $status }: { $reason }

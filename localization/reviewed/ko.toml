@@ -3569,6 +3569,10 @@ translation = "blake3 16진수 해시가 아닙니다"
 source = "not a picture Hoard can read: { $reason }"
 translation = "Hoard가 읽을 수 있는 그림이 아닙니다: { $reason }"
 
+[messages.error-not-built]
+source = "this copy of Hoard was built without { $feature }"
+translation = "이 Hoard는 { $feature } 없이 빌드되었습니다"
+
 [messages.error-not-format-file]
 source = "not a format's file: { $name }"
 translation = "형식 파일이 아닙니다: { $name }"

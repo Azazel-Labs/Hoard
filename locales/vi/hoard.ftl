@@ -68,6 +68,7 @@ error-wrong-setup-code = Đó không phải mã thiết lập đã cấp cho má
 error-wrong-password = Tên và mật khẩu không khớp
 error-folder-missing = { $path } không tồn tại (ổ đĩa chưa được gắn?)
 error-s3-path = vị trí S3 có dạng s3://bucket
+error-not-built = bản Hoard này được dựng mà không có { $feature }
 error-openai-auth-unreachable = không thể kết nối tới auth.openai.com
 error-openai-unexpected = OpenAI trả lời không như mong đợi
 error-openai-answered = OpenAI trả lời { $status }: { $reason }

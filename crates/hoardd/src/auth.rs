@@ -589,7 +589,7 @@ async fn directory_login(
     password: &str,
 ) -> ApiResult<Option<(String, String, Role)>> {
     let Some(dir) = auth.directory() else { return Ok(None) };
-    let person = crate::signin::directory_sign_in(dir, name, password).await.map_err(|e| {
+    let person = crate::directory::directory_sign_in(dir, name, password).await.map_err(|e| {
         tracing::warn!(user = %name, "the directory couldn't check a sign-in: {e:#}");
         AppError::unavailable(tr!("error-directory-unavailable", reason = format!("{e:#}")))
     })?;

@@ -24,7 +24,6 @@ use bytes::Bytes;
 use futures_util::StreamExt;
 use futures_util::stream::BoxStream;
 use hoard_core::AssetKind;
-use object_store::aws::AmazonS3Builder;
 use object_store::buffered::BufWriter;
 use object_store::local::LocalFileSystem;
 use object_store::path::Path;
@@ -162,7 +161,13 @@ pub(crate) fn open_store(cfg: &Config, path: &str) -> Result<(Arc<dyn ObjectStor
     if bucket.is_empty() || bucket.contains('/') {
         bail!(tr!("error-s3-path"));
     }
-    let mut b = AmazonS3Builder::new()
+    Ok((open_s3(cfg, bucket)?, true))
+}
+
+/// A bucket's store, with the S3 settings Hoard was started with.
+#[cfg(feature = "s3")]
+fn open_s3(cfg: &Config, bucket: &str) -> Result<Arc<dyn ObjectStore>> {
+    let mut b = object_store::aws::AmazonS3Builder::new()
         .with_bucket_name(bucket)
         .with_region(&cfg.s3_region)
         // Self-hosted servers want path-style URLs: http://nas:3900/bucket/key
@@ -184,7 +189,12 @@ pub(crate) fn open_store(cfg: &Config, path: &str) -> Result<(Arc<dyn ObjectStor
         }
         b = b.with_client_options(object_store::ClientOptions::new().with_default_headers(headers));
     }
-    Ok((Arc::new(b.build()?), true))
+    Ok(Arc::new(b.build()?))
+}
+
+#[cfg(not(feature = "s3"))]
+fn open_s3(_cfg: &Config, _bucket: &str) -> Result<Arc<dyn ObjectStore>> {
+    bail!(tr!("error-not-built", feature = "S3"))
 }
 
 fn describe(cfg: &Config, path: &str) -> String {

@@ -3656,6 +3656,10 @@ translation = "ikke en blake3-hash i heks"
 source = "not a picture Hoard can read: { $reason }"
 translation = "ikke et bilde Hoard kan lese: { $reason }"
 
+[messages.error-not-built]
+source = "this copy of Hoard was built without { $feature }"
+translation = "denne kopien av Hoard er bygget uten { $feature }"
+
 [messages.error-not-format-file]
 source = "not a format's file: { $name }"
 translation = "ikke en formatfil: { $name }"

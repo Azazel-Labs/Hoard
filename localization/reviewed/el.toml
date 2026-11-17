@@ -3668,6 +3668,10 @@ translation = "δεν είναι δεκαεξαδικό hash blake3"
 source = "not a picture Hoard can read: { $reason }"
 translation = "δεν είναι εικόνα που μπορεί να διαβάσει το Hoard: { $reason }"
 
+[messages.error-not-built]
+source = "this copy of Hoard was built without { $feature }"
+translation = "αυτό το αντίγραφο του Hoard δημιουργήθηκε χωρίς { $feature }"
+
 [messages.error-not-format-file]
 source = "not a format's file: { $name }"
 translation = "δεν είναι αρχείο μορφής: { $name }"

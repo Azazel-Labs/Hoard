@@ -68,6 +68,7 @@ error-wrong-setup-code = Tämä ei ole palvelimelle HOARD_SETUP_CODE-muuttujassa
 error-wrong-password = Nimi ja salasana eivät täsmää
 error-folder-missing = { $path } puuttuu (onko levy liittämättä?)
 error-s3-path = S3-sijainti on muotoa s3://bucket
+error-not-built = tämä Hoardin kopio on käännetty ilman { $feature } -tukea
 error-openai-auth-unreachable = auth.openai.com ei vastaa
 error-openai-unexpected = odottamaton vastaus OpenAI:lta
 error-openai-answered = OpenAI vastasi { $status }: { $reason }

@@ -3572,6 +3572,10 @@ translation = "không phải mã băm blake3 dạng hex"
 source = "not a picture Hoard can read: { $reason }"
 translation = "không phải ảnh mà Hoard đọc được: { $reason }"
 
+[messages.error-not-built]
+source = "this copy of Hoard was built without { $feature }"
+translation = "bản Hoard này được dựng mà không có { $feature }"
+
 [messages.error-not-format-file]
 source = "not a format's file: { $name }"
 translation = "không phải tệp của định dạng: { $name }"

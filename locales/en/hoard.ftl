@@ -76,6 +76,7 @@ error-wrong-setup-code = That isn't the setup code given to the server in HOARD_
 error-wrong-password = That name and password don't match
 error-folder-missing = { $path } isn't there (a disk that isn't mounted?)
 error-s3-path = an S3 location looks like s3://bucket
+error-not-built = this copy of Hoard was built without { $feature }
 error-openai-auth-unreachable = couldn't reach auth.openai.com
 error-openai-unexpected = unexpected answer from OpenAI
 # $status is an HTTP status (429, or 429 Too Many Requests); $reason is the start of what OpenAI answered.

@@ -10,6 +10,16 @@ rust-version.workspace = true
 [lints]
 workspace = true
 
+# What a server for a team needs and the desktop app (one person, this computer only) leaves out.
+[features]
+default = ["ldap", "https", "s3"]
+# Settings → Authentication: signing in against LDAP or Active Directory.
+ldap = ["dep:ldap3", "dep:rustls-native-certs"]
+# Settings → Connection: HTTPS with Hoard's own certificate or an uploaded one, and HTTP/3.
+https = ["dep:tokio-rustls", "dep:rcgen", "dep:x509-parser", "dep:if-addrs", "dep:gethostname", "dep:quinn", "dep:h3", "dep:h3-quinn"]
+# Library locations in S3 buckets.
+s3 = ["object_store/aws"]
+
 [dependencies]
 hoard-core.workspace = true
 hoard-render.workspace = true
@@ -40,17 +50,17 @@ zstd = "0.14"
 # TLS, HTTP/2 and HTTP/3. All on rustls with the `ring` provider (no C toolchain needed).
 hyper = { version = "1", features = ["server", "http1", "http2"] }
 hyper-util = { version = "0.1", features = ["server-auto", "server-graceful", "service", "tokio"] }
-tokio-rustls = { version = "0.26", default-features = false, features = ["ring", "tls12", "logging"] }
+tokio-rustls = { optional = true, version = "0.26", default-features = false, features = ["ring", "tls12", "logging"] }
 rustls = { version = "0.23", default-features = false, features = ["ring", "std", "tls12", "logging"] }
 rustls-pki-types = { version = "1", features = ["std"] }
-rcgen = { version = "0.14", features = ["x509-parser"] }
-x509-parser = "0.18"
+rcgen = { optional = true, version = "0.14", features = ["x509-parser"] }
+x509-parser = { version = "0.18", optional = true }
 # Settings → HTTPS: the addresses Hoard's own certificate covers.
-if-addrs = "0.15"
-gethostname = "1"
-quinn = { version = "0.11", default-features = false, features = ["runtime-tokio", "rustls-ring"] }
-h3 = "0.0.8"
-h3-quinn = "0.0.10"
+if-addrs = { version = "0.15", optional = true }
+gethostname = { version = "1", optional = true }
+quinn = { optional = true, version = "0.11", default-features = false, features = ["runtime-tokio", "rustls-ring"] }
+h3 = { version = "0.0.8", optional = true }
+h3-quinn = { version = "0.0.10", optional = true }
 http = "1"
 http-body-util = "0.1"
 http-body = "1"
@@ -82,7 +92,7 @@ tokio-util = { version = "0.7", features = ["io"] }
 time = { version = "0.3", features = ["formatting", "macros", "parsing"] }
 regex = "1"
 toml = "1"
-object_store = { version = "0.14", features = ["aws"] }
+object_store = "0.14"
 bytes = "1"
 tower = { version = "0.5", features = ["util"] }
 symphonia = { version = "0.6", default-features = false, features = ["wav", "pcm", "ogg", "vorbis", "flac", "mp3", "aiff", "adpcm"] }
@@ -93,8 +103,8 @@ lzma-rust2 = { version = "0.25", default-features = false, features = ["std", "x
 argon2 = "0.6.0"
 getrandom = "0.4"
 # Settings → Authentication: signing in against LDAP or Active Directory.
-ldap3 = { version = "0.12", default-features = false, features = ["tls-rustls-ring"] }
-rustls-native-certs = "0.8"
+ldap3 = { optional = true, version = "0.12", default-features = false, features = ["tls-rustls-ring"] }
+rustls-native-certs = { version = "0.8", optional = true }
 # Settings: Image search runs CLIP on the CPU, in pure Rust.
 candle-core = "0.11"
 candle-nn = "0.11"

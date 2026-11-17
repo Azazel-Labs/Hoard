@@ -68,6 +68,7 @@ error-wrong-setup-code = Itu bukan kode penyiapan yang diberikan ke server di HO
 error-wrong-password = Nama dan kata sandi itu tidak cocok
 error-folder-missing = { $path } tidak ada (disk yang belum dipasang?)
 error-s3-path = lokasi S3 berbentuk s3://bucket
+error-not-built = salinan Hoard ini dibuat tanpa { $feature }
 error-openai-auth-unreachable = tidak dapat menghubungi auth.openai.com
 error-openai-unexpected = jawaban tak terduga dari OpenAI
 error-openai-answered = OpenAI menjawab { $status }: { $reason }

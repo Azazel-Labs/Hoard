@@ -1,0 +1,274 @@
+//! The Hoard asset server, as a library: [`run`] serves a library from a [`Config`]. The `hoardd` binary runs it
+//! from the command line, and the desktop app runs it inside its window.
+
+mod activity;
+mod analyze;
+mod animations;
+mod api;
+mod atlas;
+mod audio;
+mod auth;
+mod blender;
+mod blobs;
+mod bundle;
+mod chatgpt;
+mod check;
+mod clip;
+mod config;
+mod context;
+mod convert;
+mod credits;
+mod db;
+#[cfg(feature = "ldap")]
+mod directory;
+#[cfg(not(feature = "ldap"))]
+#[path = "directory_off.rs"]
+mod directory;
+mod error;
+mod extract;
+mod ffmpeg;
+mod fonts;
+mod format_wizard;
+mod formats;
+mod glbfiles;
+mod godot;
+mod gpu_hint;
+mod heavy;
+#[cfg(feature = "https")]
+mod http3;
+#[cfg(feature = "https")]
+mod https;
+#[cfg(not(feature = "https"))]
+#[path = "https_off.rs"]
+mod https;
+mod i18n;
+mod ingest;
+mod issues;
+mod jobs;
+mod links;
+mod llm;
+mod local_llm;
+mod locations;
+mod looks;
+mod maintenance;
+mod materials;
+mod mcp;
+mod me;
+mod meshes;
+mod motion;
+mod mtlmat;
+mod music;
+mod naming;
+mod oauth;
+mod previews;
+mod profiler;
+mod projects;
+mod provenance;
+mod reformat;
+mod relocate;
+mod scan;
+mod server;
+mod settings;
+mod sheet;
+mod sidecar;
+#[cfg(any(feature = "ldap", feature = "https"))]
+mod signature_only;
+mod signin;
+mod sounds;
+mod sources;
+mod spritesheet;
+mod store_formats;
+mod store_lookup;
+mod store_search;
+mod tagger;
+mod textures;
+mod tools;
+mod unitymat;
+mod updates;
+mod uploads;
+mod webglb;
+
+use std::sync::Arc;
+use std::time::Duration;
+
+use anyhow::{Context, Result};
+use axum::extract::Request;
+use axum::http::{HeaderValue, header};
+use axum::middleware::{self, Next};
+use axum::response::Response;
+use tokio::sync::Notify;
+use tower_http::compression::CompressionLayer;
+use tower_http::compression::predicate::{DefaultPredicate, NotForContentType, Predicate};
+use tower_http::services::{ServeDir, ServeFile};
+use tower_http::trace::TraceLayer;
+
+use crate::blobs::BlobStore;
+pub use crate::config::Config;
+
+#[derive(Debug)]
+pub(crate) struct Inner {
+    pub(crate) cfg: Config,
+    pub(crate) pool: db::Pool,
+    pub(crate) blobs: BlobStore,
+    /// Poked whenever a job is enqueued so idle workers wake immediately.
+    pub(crate) wake: Notify,
+    /// Upload files currently being written (one writer per file).
+    pub(crate) uploads_in_flight: std::sync::Mutex<std::collections::HashSet<String>>,
+    pub(crate) http: reqwest::Client,
+    /// Settings changed from the portal, over `cfg`. Read these, not `cfg`, for anything listed in [`settings::Saved`].
+    pub(crate) settings: settings::Store,
+    /// Every thumbnail's look, for "find by color" and "more like this".
+    pub(crate) looks: looks::Index,
+    /// Every thumbnail's CLIP embedding, for image search.
+    pub(crate) clip: clip::Index,
+    /// Every sound's acoustic descriptor, for "more like this" on sounds.
+    pub(crate) sounds: sounds::Index,
+}
+
+pub(crate) type AppState = Arc<Inner>;
+
+/// Serves the library `cfg` describes until the process is told to stop (Ctrl+C, or SIGTERM on Unix).
+///
+/// `--reset-password` and `--https-off` do their one thing and return instead.
+pub async fn run(cfg: Config) -> Result<()> {
+    config::warn_retired_env();
+    for dir in [cfg.data_dir.clone(), cfg.staging_dir(), cfg.tmp_dir()] {
+        std::fs::create_dir_all(&dir).with_context(|| format!("create {}", dir.display()))?;
+    }
+    let pool = db::open(&cfg.db_path(), &cfg.backups_dir())?;
+    if let Some(name) = &cfg.reset_password {
+        let (name, password) = auth::reset_password(&*pool.get()?, name)?;
+        #[expect(clippy::print_stdout, reason = "the new password is the command's output")]
+        {
+            println!("New password for {name}: {password}");
+        }
+        return Ok(());
+    }
+    if cfg.https_off {
+        https::turn_off(&*pool.get()?)?;
+        #[expect(clippy::print_stdout, reason = "the command's output")]
+        {
+            println!("HTTPS is off. Start Hoard again and set it up in Settings → Connection.");
+        }
+        return Ok(());
+    }
+    if let Some(loc) = locations::adopt_existing(&*pool.get()?, &cfg)? {
+        tracing::info!(path = %loc.path, "your files stay where they are, as the library location \"Library\"");
+    }
+    store_formats::load(&cfg.data_dir.join("formats"));
+    let blobs = BlobStore::open(&cfg, pool.clone())?;
+    let requeued = db::requeue_stale_jobs(&*pool.get()?)?;
+    maintenance::mark_interrupted(&*pool.get()?)?;
+    let settings = settings::Store::load(&cfg, &*pool.get()?)?;
+    let effective = settings.get();
+    analyze::set_render_enabled(effective.render, effective.llm_vision && effective.llm_enabled());
+    analyze::set_thumb_quality(effective.thumb_quality);
+    music::configure(effective.soundfont.clone());
+    let http = reqwest::Client::builder().timeout(Duration::from_secs(180)).build()?;
+
+    tracing::info!(
+        listen = %cfg.listen,
+        data = %cfg.data_dir.display(),
+        storage = %blobs.label(),
+        llm = effective.llm_label(),
+        blender = %effective.blender,
+        ffmpeg = %effective.ffmpeg,
+        requeued,
+        "starting hoardd"
+    );
+
+    let state: AppState = Arc::new(Inner {
+        cfg,
+        pool,
+        blobs,
+        wake: Notify::new(),
+        uploads_in_flight: std::sync::Mutex::default(),
+        http,
+        settings,
+        looks: looks::Index::default(),
+        clip: clip::Index::default(),
+        sounds: sounds::Index::default(),
+    });
+    tokio::spawn(signin::recheck_loop(Arc::clone(&state)));
+    match uploads::sweep_stale(&state) {
+        Ok(0) => {}
+        Ok(n) => tracing::info!(removed = n, "removed abandoned upload sessions"),
+        Err(e) => tracing::warn!(error = %e, "could not sweep old upload sessions"),
+    }
+    ffmpeg::start(&effective.ffmpeg, state.cfg.tools_dir());
+    clip::start(&state, effective.clip);
+    convert::start_blender(&state, false);
+    updates::start(effective.update_check);
+    updates::start_hook(&state);
+    analyze::warm_renderer();
+    jobs::spawn_workers(&state);
+    motion::kick(&state);
+    {
+        let st = Arc::clone(&state);
+        tokio::spawn(async move { looks::schedule(&st).await });
+    }
+    {
+        let st = Arc::clone(&state);
+        tokio::spawn(async move {
+            if let Err(e) = jobs::read_unread_files(&st).await {
+                tracing::warn!(error = %format!("{e:#}"), "could not queue reading packs' store files");
+            }
+            store_lookup::start(&st).await;
+        });
+    }
+    {
+        let st = Arc::clone(&state);
+        tokio::spawn(async move { formats::log_trim(&st).await });
+    }
+    scan::spawn_rescans(&state);
+    reformat::spawn_expiry(&state);
+    profiler::start();
+
+    let mut app = api::router(&state);
+    let web = &state.cfg.web_dir;
+    if web.join("index.html").is_file() {
+        // SPA: unknown paths fall back to index.html so client-side routes work on reload.
+        app = app.fallback_service(ServeDir::new(web).fallback(ServeFile::new(web.join("index.html"))));
+    } else {
+        tracing::warn!(dir = %web.display(), "web portal not built; serving API only (run `npm run build` in web/)");
+    }
+    let app = app
+        .layer(middleware::from_fn(i18n::negotiate))
+        .layer(middleware::from_fn(cache_headers))
+        .layer(CompressionLayer::new().br(true).zstd(true).gzip(true).compress_when(compressible()))
+        .layer(middleware::from_fn(profiler::record))
+        .layer(TraceLayer::new_for_http())
+        .with_state(Arc::clone(&state));
+
+    https::init(&state)?;
+    server::serve(&state.cfg, app).await?;
+    Ok(())
+}
+
+/// Compress text (JSON, JS, CSS, HTML, SVG), never media or binary downloads: they're already compressed, and
+/// on-the-fly compression would drop `Content-Length` and break `Range` requests on multi-GB files.
+fn compressible() -> impl Predicate {
+    DefaultPredicate::new()
+        .and(NotForContentType::new("application/octet-stream"))
+        .and(NotForContentType::new("application/zip"))
+        .and(NotForContentType::new("model/"))
+        .and(NotForContentType::const_new("audio/"))
+        .and(NotForContentType::const_new("video/"))
+}
+
+/// Cache headers for the portal's own files.
+/// Vite puts a content hash in every file name under `/assets/`, so those never change; `index.html` must always be
+/// revalidated so a new release is picked up.
+async fn cache_headers(req: Request, next: Next) -> Response {
+    let path = req.uri().path().to_owned();
+    let mut resp = next.run(req).await;
+    let headers = resp.headers_mut();
+    // Nothing is guessed at from its bytes, and no other site can show the portal in a frame to trick clicks on it.
+    headers.insert(header::X_CONTENT_TYPE_OPTIONS, HeaderValue::from_static("nosniff"));
+    headers.insert(header::X_FRAME_OPTIONS, HeaderValue::from_static("SAMEORIGIN"));
+    if !path.starts_with("/api/") && !path.starts_with("/mcp") && !headers.contains_key(header::CACHE_CONTROL) {
+        let value = if path.starts_with("/assets/") { "public, max-age=31536000, immutable" } else { "no-cache" };
+        headers.insert(header::CACHE_CONTROL, HeaderValue::from_static(value));
+    }
+    resp
+}

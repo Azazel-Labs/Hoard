@@ -68,6 +68,7 @@ error-wrong-setup-code = Acesta nu este codul de configurare dat serverului în 
 error-wrong-password = Numele și parola nu se potrivesc
 error-folder-missing = { $path } nu există (un disc care nu este montat?)
 error-s3-path = o locație S3 arată așa: s3://bucket
+error-not-built = această copie Hoard a fost compilată fără { $feature }
 error-openai-auth-unreachable = auth.openai.com nu a putut fi accesat
 error-openai-unexpected = răspuns neașteptat de la OpenAI
 error-openai-answered = OpenAI a răspuns { $status }: { $reason }

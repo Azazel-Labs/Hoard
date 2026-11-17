@@ -68,6 +68,7 @@ error-wrong-setup-code = 这不是通过 HOARD_SETUP_CODE 提供给服务器的�
 error-wrong-password = 用户名和密码不匹配
 error-folder-missing = { $path } 不存在（磁盘未挂载？）
 error-s3-path = S3 位置的格式类似 s3://bucket
+error-not-built = 此 Hoard 构建时未包含 { $feature }
 error-openai-auth-unreachable = 无法连接到 auth.openai.com
 error-openai-unexpected = OpenAI 返回了意外的响应
 error-openai-answered = OpenAI 返回 { $status }：{ $reason }

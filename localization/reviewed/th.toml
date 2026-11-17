@@ -3575,6 +3575,10 @@ translation = "ไม่ใช่แฮช blake3 แบบเลขฐานส
 source = "not a picture Hoard can read: { $reason }"
 translation = "ไม่ใช่ภาพที่ Hoard อ่านได้: { $reason }"
 
+[messages.error-not-built]
+source = "this copy of Hoard was built without { $feature }"
+translation = "Hoard ชุดนี้สร้างโดยไม่มี { $feature }"
+
 [messages.error-not-format-file]
 source = "not a format's file: { $name }"
 translation = "ไม่ใช่ไฟล์ของรูปแบบ: { $name }"

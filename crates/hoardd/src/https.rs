@@ -145,6 +145,11 @@ impl Https {
 // ---------------------------------------------------------------------------------------------
 // What the server asks
 
+/// Whether HTTPS is on.
+pub(crate) fn on() -> bool {
+    tls_config().is_some()
+}
+
 /// The TLS config for a new TCP connection, or `None` while HTTPS is off.
 pub(crate) fn tls_config() -> Option<Arc<ServerConfig>> {
     HTTPS.get()?.live().tls.clone()
@@ -351,9 +356,9 @@ fn apply_h3(h: &Https) {
     };
     let mut slot = h.h3.lock().unwrap_or_else(PoisonError::into_inner);
     let result = match (want, tls, slot.as_ref()) {
-        (true, Some(tls), Some(ep)) => crate::server::quic_config(tls).map(|q| ep.set_server_config(Some(q))),
+        (true, Some(tls), Some(ep)) => crate::http3::quic_config(tls).map(|q| ep.set_server_config(Some(q))),
         (true, Some(tls), None) => match h.app.get() {
-            Some(app) => crate::server::start_h3(h.listen, tls, app.clone()).map(|ep| *slot = Some(ep)),
+            Some(app) => crate::http3::start_h3(h.listen, tls, app.clone()).map(|ep| *slot = Some(ep)),
             None => Ok(()),
         },
         _ => {
@@ -730,7 +735,7 @@ async fn try_handshake(config: Arc<ServerConfig>) -> Result<()> {
     let mut client = rustls::ClientConfig::builder_with_provider(Arc::clone(&provider))
         .with_safe_default_protocol_versions()?
         .dangerous()
-        .with_custom_certificate_verifier(Arc::new(SignatureOnly(provider)))
+        .with_custom_certificate_verifier(Arc::new(crate::signature_only::SignatureOnly(provider)))
         .with_no_client_auth();
     client.alpn_protocols = vec![b"h2".to_vec()];
     let (a, b) = tokio::io::duplex(64 << 10);
@@ -742,45 +747,6 @@ async fn try_handshake(config: Arc<ServerConfig>) -> Result<()> {
     s.with_context(|| tr!("error-https-test-failed"))?;
     c.with_context(|| tr!("error-https-test-failed"))?;
     Ok(())
-}
-
-/// Checks the server's signature in the handshake, and nothing about who it is (that's not the question here).
-#[derive(Debug)]
-pub(crate) struct SignatureOnly(pub(crate) Arc<rustls::crypto::CryptoProvider>);
-
-impl rustls::client::danger::ServerCertVerifier for SignatureOnly {
-    fn verify_server_cert(
-        &self,
-        _end_entity: &CertificateDer<'_>,
-        _intermediates: &[CertificateDer<'_>],
-        _server_name: &ServerName<'_>,
-        _ocsp_response: &[u8],
-        _now: rustls_pki_types::UnixTime,
-    ) -> Result<rustls::client::danger::ServerCertVerified, rustls::Error> {
-        Ok(rustls::client::danger::ServerCertVerified::assertion())
-    }
-
-    fn verify_tls12_signature(
-        &self,
-        message: &[u8],
-        cert: &CertificateDer<'_>,
-        dss: &rustls::DigitallySignedStruct,
-    ) -> Result<rustls::client::danger::HandshakeSignatureValid, rustls::Error> {
-        rustls::crypto::verify_tls12_signature(message, cert, dss, &self.0.signature_verification_algorithms)
-    }
-
-    fn verify_tls13_signature(
-        &self,
-        message: &[u8],
-        cert: &CertificateDer<'_>,
-        dss: &rustls::DigitallySignedStruct,
-    ) -> Result<rustls::client::danger::HandshakeSignatureValid, rustls::Error> {
-        rustls::crypto::verify_tls13_signature(message, cert, dss, &self.0.signature_verification_algorithms)
-    }
-
-    fn supported_verify_schemes(&self) -> Vec<rustls::SignatureScheme> {
-        self.0.signature_verification_algorithms.supported_schemes()
-    }
 }
 
 // ---------------------------------------------------------------------------------------------

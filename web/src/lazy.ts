@@ -9,7 +9,8 @@ export function lazy<T extends Component>(load: () => Promise<{ default: T }>, w
   const name = () => (typeof what === 'function' ? what() : what)
   return defineAsyncComponent<T>({
     loader: load,
-    delay: 150,
+    // A viewer's slot holds its place from the start, so the panel doesn't jump when the viewer arrives.
+    delay: cls === 'model-slot' ? 0 : 150,
     loadingComponent: { render: () => h('p', { class: ['lazy-msg', cls], role: 'status' }, t('ui-lazy-loading', { what: name() })) },
     errorComponent: {
       render: () =>

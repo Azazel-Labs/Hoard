@@ -39,6 +39,9 @@ const props = defineProps<{
   collections: Collection[]
   /** Shown over the whole results area: the preview large on the left, the details beside it. */
   page?: boolean
+  /** False while `asset` is still the search hit it was opened from, before its full record (links, copies,
+   *  formats) arrives. */
+  full?: boolean
 }>()
 const emit = defineEmits<{
   close: []; updated: [Asset]; tag: [string]; error: [string]; open: [string]; step: [number]
@@ -72,19 +75,26 @@ const inCollections = computed(() => props.asset.collections ?? [])
 
 /** The projects whose last hoard sync had this asset. */
 const usedIn = ref<ProjectUse[]>([])
+/** Whether `usedIn` has been asked for this asset yet (answered or not). */
+const usageKnown = ref(false)
 watch(
   () => props.asset.id,
   async (id) => {
     usedIn.value = []
+    usageKnown.value = false
     try {
       const uses = (await api.usage({ assets: [id] })).projects
       if (props.asset.id === id) usedIn.value = uses
     } catch {
       // Not knowing where it's used isn't worth an error.
     }
+    if (props.asset.id === id) usageKnown.value = true
   },
   { immediate: true },
 )
+/** Everything below the collections waits for the full record and the projects using it, then shows at once, so
+ *  sections arriving one by one don't push each other (and what's being read) down the panel. */
+const settled = computed(() => props.full !== false && usageKnown.value)
 
 // The grid's quick preview and this panel's player shouldn't talk over each other.
 const audioEl = ref<HTMLAudioElement | null>(null)
@@ -1068,6 +1078,7 @@ onBeforeUnmount(() => unswipe())
       </div>
     </section>
 
+    <template v-if="settled">
     <section v-if="usedIn.length" class="used">
       <h3>{{ t('asset-used-in') }}</h3>
       <ul>
@@ -1327,6 +1338,7 @@ onBeforeUnmount(() => unswipe())
         <button v-if="!asset.archived_at && editor" class="btn ghost danger archive" type="button" :title="t('asset-archive-title')" @click="emit('archive')">{{ t('asset-archive') }}</button>
       </div>
     </footer>
+    </template>
     <span class="visually-hidden" role="status">{{ copied ? copiedNote(copied) : '' }}</span>
     </div>
   </aside>

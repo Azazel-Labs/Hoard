@@ -227,7 +227,12 @@ input.field:focus, textarea.field:focus {
   margin: 0; padding: 1rem; color: var(--muted); font-size: var(--step--1); text-align: center;
 }
 .lazy-msg.lazy-err { color: var(--danger); }
-.lazy-msg.model-slot { aspect-ratio: 4 / 3; border: 1px solid var(--line); border-radius: var(--r-tile); }
+.lazy-msg.model-slot {
+  aspect-ratio: 4 / 3; border: 1px solid var(--line); border-radius: var(--r-tile);
+  animation: lazy-say 0.2s 150ms both;
+}
+/* Its words wait a moment: most viewers arrive before anyone could read them. */
+@keyframes lazy-say { from { color: transparent; } }
 .lazy-msg.overlay { position: fixed; inset: auto 1rem 1rem auto; min-height: 0; z-index: 50; background: var(--panel); border: 1px solid var(--line); border-radius: var(--r-chip); box-shadow: var(--elev-1); }
 
 /* Popovers and menus (<Transition name="pop">): grow out of their anchor with a little overshoot. Each one sets

@@ -827,6 +827,8 @@ function onCreated() {
 
 /** The asset the detail panel is opening or showing; cleared on close so a late fetch can't reopen it. */
 let opening = ''
+/** The asset whose full record the detail panel has (not just the search hit it opened from). */
+const fullId = ref('')
 /** Show an asset in the detail panel. The panel slides in when it wasn't open; moving between assets just swaps. */
 function showDetail(a: Asset) {
   if (selected.value || view.value !== 'library') selected.value = a
@@ -841,6 +843,7 @@ async function openAsset(idOrAsset: string | Asset) {
   try {
     const full = await api.asset(id)
     if (opening === id) {
+      fullId.value = id
       if (selected.value) selected.value = full
       else showDetail(full)
     }
@@ -1748,6 +1751,7 @@ const commands = computed<Command[]>(() => {
         :position="position"
         :collections="collections"
         :page="prefs.detailPage"
+        :full="selected.id === fullId"
         @layout="prefs.detailPage = !prefs.detailPage"
         @close="closeDetail"
         @collect="(id, create) => addToCollection([selected!.id], create ? { create } : { id })"

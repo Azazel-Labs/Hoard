@@ -98,7 +98,9 @@ onBeforeUnmount(teardown)
     <button type="button" class="expand" :title="t('model-full-screen')" :aria-label="t('model-open-full-screen')" @click="emit('expand')">
       <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M2.5 6V2.5H6M10 2.5h3.5V6M13.5 10v3.5H10M6 13.5H2.5V10" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" /></svg>
     </button>
-    <div v-if="status === 'ready' && info" class="hud">
+    <!-- Always there, so the panel doesn't move when the model's details arrive. -->
+    <div class="hud">
+      <template v-if="status === 'ready' && info">
       <span class="mono">{{ t('model-triangles', { count: info.triangles }) }}</span>
       <label v-if="info.clips.length">
         <span class="visually-hidden">{{ t('model-animation') }}</span>
@@ -116,6 +118,7 @@ onBeforeUnmount(teardown)
         {{ missing.length === 1 ? t('model-missing-one', { name: missing[0] }) : t('model-missing-count', { count: missing.length }) }}
       </p>
       <p v-else-if="info.guessed" class="missing">{{ t('model-guessed') }}</p>
+      </template>
     </div>
   </div>
 </template>
@@ -137,7 +140,10 @@ onBeforeUnmount(teardown)
 }
 .expand:hover { color: var(--text); background: var(--raised); }
 .expand:active { scale: 0.92; }
-.hud { display: flex; flex-wrap: wrap; gap: 0.5rem 0.9rem; align-items: center; margin-top: 0.45rem; font-size: 0.78rem; color: var(--muted); }
+.hud {
+  display: flex; flex-wrap: wrap; gap: 0.5rem 0.9rem; align-items: center; min-height: 1.6rem; margin-top: 0.45rem;
+  font-size: 0.78rem; color: var(--muted);
+}
 .hud .field { width: auto; padding: 0.2em 0.4em; font-size: 0.78rem; }
 .missing { flex-basis: 100%; margin: 0; color: var(--faint); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 </style>

@@ -85,7 +85,7 @@ malliin, paikalliseen tai pilvessä toimivaan, niin se kirjoittaa myös nimet ja
 
 ### Suoraan pelimoottoriisi
 
-- **Moottorilaajennukset** Godot 4:lle, Unitylle ja Unreal Engine 5:lle: selaa kirjastoa editorin sisällä ja paina Lisää
+- **Moottorilaajennukset** Godot 4:lle, Unitylle, Unreal Engine 5:lle ja Luminalle: selaa kirjastoa editorin sisällä ja paina Lisää
   projektiin. Malli tulee tekstuureineen, oikeaan paikkaan ja valmiiksi tuotuna.
 - **`hoard sync`** hakee projektiin juuri ne tiedostot, jotka projekti nimeää, lukitustiedostoon kiinnitettyinä, joten
   jokainen tiimiläinen ja käännöskone saa täsmälleen samat tavut.

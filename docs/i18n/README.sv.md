@@ -84,7 +84,7 @@ så skriver den namn och beskrivningar också.
 
 ### Direkt in i din spelmotor
 
-- **Motorplugins** för Godot 4, Unity och Unreal Engine 5: bläddra i biblioteket inifrån redigeraren och tryck på Lägg
+- **Motorplugins** för Godot 4, Unity, Unreal Engine 5 och Lumina: bläddra i biblioteket inifrån redigeraren och tryck på Lägg
   till i projekt. Modellen kommer med sina texturer, på rätt plats, importerad.
 - **`hoard sync`** hämtar in exakt de filer som ett projekt namnger, låsta i en låsfil, så att varje lagkamrat och
   byggmaskin får samma byte.

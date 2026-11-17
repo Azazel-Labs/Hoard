@@ -82,7 +82,7 @@ det navn og beskrivelser også.
 
 ### Rett inn i motoren din
 
-- **Motorutvidelser** for Godot 4, Unity og Unreal Engine 5: bla gjennom biblioteket inne i editoren og trykk Legg til i
+- **Motorutvidelser** for Godot 4, Unity, Unreal Engine 5 og Lumina: bla gjennom biblioteket inne i editoren og trykk Legg til i
   prosjekt. Modellen kommer med teksturene sine, på riktig sted, importert.
 - **`hoard sync`** henter nøyaktig de filene et prosjekt navngir inn i prosjektet, låst i en låsefil, så hver lagkamerat
   og byggemaskin får de samme bytene.

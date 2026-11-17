@@ -85,7 +85,7 @@ OpenAI uyumlu herhangi bir modele yönlendirin; adları ve açıklamaları da o 
 
 ### Doğrudan motorunuza
 
-- **Motor eklentileri** Godot 4, Unity ve Unreal Engine 5 için: kütüphaneye düzenleyicinin içinden göz atın ve Projeye
+- **Motor eklentileri** Godot 4, Unity, Unreal Engine 5 ve Lumina için: kütüphaneye düzenleyicinin içinden göz atın ve Projeye
   ekle’ye basın. Model, dokularıyla birlikte, doğru yere ve içe aktarılmış olarak gelir.
 - **`hoard sync`**, bir projenin adını verdiği dosyaları tam olarak projeye çeker ve bir kilit dosyasına sabitler;
   böylece her ekip arkadaşı ve derleme makinesi aynı baytları alır.

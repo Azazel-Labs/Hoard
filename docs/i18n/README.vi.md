@@ -83,7 +83,7 @@ OpenAI nào, chạy cục bộ hay được lưu trữ, và nó cũng sẽ viế
 
 ### Thẳng vào engine của bạn
 
-- **Plugin engine** cho Godot 4, Unity và Unreal Engine 5: duyệt thư viện ngay trong trình biên tập và nhấn Thêm vào dự
+- **Plugin engine** cho Godot 4, Unity, Unreal Engine 5 và Lumina: duyệt thư viện ngay trong trình biên tập và nhấn Thêm vào dự
   án. Mô hình đến cùng texture của nó, đúng chỗ, đã được nhập.
 - **`hoard sync`** kéo đúng những tệp mà một dự án chỉ định vào dự án đó, được ghim trong lockfile, để mọi đồng đội và
   máy build đều nhận được đúng những byte giống nhau.

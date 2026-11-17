@@ -84,7 +84,7 @@ ou hospedado, e ele também escreve nomes e descrições.
 
 ### Direto para a sua engine
 
-- **Plugins de engine** para Godot 4, Unity e Unreal Engine 5: navegue pela biblioteca dentro do editor e clique em
+- **Plugins de engine** para Godot 4, Unity, Unreal Engine 5 e Lumina: navegue pela biblioteca dentro do editor e clique em
   Adicionar ao projeto. O modelo vem com as texturas, no lugar certo, já importado.
 - **`hoard sync`** traz para um projeto exatamente os arquivos que ele cita, fixados em um lockfile, para que cada
   colega de equipe e cada máquina de build receba os mesmos bytes.

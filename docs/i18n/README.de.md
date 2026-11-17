@@ -84,7 +84,7 @@ Modell, lokal oder gehostet, und es schreibt auch Namen und Beschreibungen.
 
 ### Direkt in Ihre Engine
 
-- **Engine-Plugins** für Godot 4, Unity und Unreal Engine 5: Durchsuchen Sie die Bibliothek im Editor und drücken Sie
+- **Engine-Plugins** für Godot 4, Unity, Unreal Engine 5 und Lumina: Durchsuchen Sie die Bibliothek im Editor und drücken Sie
   Zum Projekt hinzufügen. Das Modell kommt mit seinen Texturen, am richtigen Ort, importiert.
 - **`hoard sync`** holt genau die Dateien in ein Projekt, die es benennt, festgehalten in einem Lockfile, sodass jedes
   Teammitglied und jede Build-Maschine dieselben Bytes bekommt.

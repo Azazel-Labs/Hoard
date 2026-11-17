@@ -85,7 +85,7 @@ OpenAI, locale o in hosting, e scriverà anche nomi e descrizioni.
 
 ### Dritto nel tuo motore
 
-- **Plugin per i motori** Godot 4, Unity e Unreal Engine 5: sfoglia la libreria dentro l'editor e premi Aggiungi al
+- **Plugin per i motori** Godot 4, Unity, Unreal Engine 5 e Lumina: sfoglia la libreria dentro l'editor e premi Aggiungi al
   progetto. Il modello arriva con le sue texture, nel posto giusto, già importato.
 - **`hoard sync`** porta in un progetto esattamente i file che quel progetto indica, fissati in un lockfile, così ogni
   membro del team e ogni macchina di build riceve gli stessi byte.

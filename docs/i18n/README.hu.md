@@ -84,7 +84,7 @@ felhőben futóra, és neveket meg leírásokat is ír.
 
 ### Egyenesen a játékmotorba
 
-- **Motorbővítmények** a Godot 4-hez, a Unityhez és az Unreal Engine 5-höz: böngéssze a könyvtárat a szerkesztőn belül,
+- **Motorbővítmények** a Godot 4-hez, a Unityhez, az Unreal Engine 5-höz és a Luminához: böngéssze a könyvtárat a szerkesztőn belül,
   és nyomja meg a Hozzáadás a projekthez gombot. A modell a textúráival együtt, a megfelelő helyre, importálva érkezik.
 - A **`hoard sync`** pontosan azokat a fájlokat húzza be egy projektbe, amelyeket a projekt megnevez, egy lockfájlban
   rögzítve, így minden csapattag és buildgép ugyanazokat a bájtokat kapja.

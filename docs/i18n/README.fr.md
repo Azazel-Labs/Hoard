@@ -86,7 +86,7 @@ descriptions.
 
 ### Directement dans votre moteur
 
-- **Des plugins de moteur** pour Godot 4, Unity et Unreal Engine 5 : parcourez la bibliothèque dans l’éditeur et cliquez
+- **Des plugins de moteur** pour Godot 4, Unity, Unreal Engine 5 et Lumina : parcourez la bibliothèque dans l’éditeur et cliquez
   sur Ajouter au projet. Le modèle arrive avec ses textures, au bon endroit, importé.
 - **`hoard sync`** récupère dans un projet exactement les fichiers qu’il désigne, épinglés dans un fichier de
   verrouillage, pour que chaque coéquipier et chaque machine de build obtienne les mêmes octets.

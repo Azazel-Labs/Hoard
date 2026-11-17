@@ -84,7 +84,7 @@ OpenAI, local sau găzduit, și va scrie, de asemenea, nume și descrieri.
 
 ### Direct în motorul de joc
 
-- **Pluginuri de motor** pentru Godot 4, Unity și Unreal Engine 5: răsfoiți biblioteca din editor și apăsați Adăugați
+- **Pluginuri de motor** pentru Godot 4, Unity, Unreal Engine 5 și Lumina: răsfoiți biblioteca din editor și apăsați Adăugați
   la proiect. Modelul vine cu texturile sale, la locul potrivit, importat.
 - **`hoard sync`** aduce într-un proiect exact fișierele pe care acesta le numește, fixate într-un lockfile, ca fiecare
   coleg de echipă și fiecare mașină de build să primească aceiași octeți.

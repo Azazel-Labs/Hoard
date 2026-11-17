@@ -84,7 +84,7 @@ lokalnego lub hostowanego, Hoard pisze też nazwy i opisy.
 
 ### Prosto do silnika
 
-- **Wtyczki do silników** Godot 4, Unity i Unreal Engine 5: bibliotekę przegląda się w edytorze i naciska Dodaj
+- **Wtyczki do silników** Godot 4, Unity, Unreal Engine 5 i Lumina: bibliotekę przegląda się w edytorze i naciska Dodaj
   do projektu. Model trafia na miejsce razem z teksturami, od razu zaimportowany.
 - **`hoard sync`** ściąga do projektu dokładnie te pliki, które on wymienia, przypięte w pliku blokady, więc każdy
   członek zespołu i każda maszyna budująca dostaje te same bajty.

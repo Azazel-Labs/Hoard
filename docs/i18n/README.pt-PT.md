@@ -84,7 +84,7 @@ alojado, e também escreve nomes e descrições.
 
 ### Diretamente para o seu motor de jogo
 
-- **Plugins de motor de jogo** para Godot 4, Unity e Unreal Engine 5: navegue pela biblioteca dentro do editor e
+- **Plugins de motor de jogo** para Godot 4, Unity, Unreal Engine 5 e Lumina: navegue pela biblioteca dentro do editor e
   carregue em Adicionar ao projeto. O modelo vem com as suas texturas, no sítio certo, já importado.
 - **`hoard sync`** traz para um projeto exatamente os ficheiros que ele indica, fixados num lockfile, para que cada
   colega de equipa e cada máquina de compilação receba os mesmos bytes.

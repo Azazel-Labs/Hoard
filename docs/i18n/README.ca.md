@@ -84,7 +84,7 @@ local o allotjat, i també escriurà noms i descripcions.
 
 ### Directament al vostre motor
 
-- **Complements de motor** per a Godot 4, Unity i Unreal Engine 5: navegueu per la biblioteca dins de l'editor i premeu
+- **Complements de motor** per a Godot 4, Unity, Unreal Engine 5 i Lumina: navegueu per la biblioteca dins de l'editor i premeu
   Afegeix al projecte. El model arriba amb les seves textures, al lloc correcte, importat.
 - **`hoard sync`** porta a un projecte exactament els fitxers que aquest indica, fixats en un fitxer de bloqueig, de
   manera que tots els companys d'equip i totes les màquines de compilació reben els mateixos bytes.

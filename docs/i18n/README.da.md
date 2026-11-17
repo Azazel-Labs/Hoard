@@ -82,7 +82,7 @@ den også navne og beskrivelser.
 
 ### Direkte ind i din motor
 
-- **Motor-plugins** til Godot 4, Unity og Unreal Engine 5: gennemse biblioteket inde i editoren, og tryk på Føj til
+- **Motor-plugins** til Godot 4, Unity, Unreal Engine 5 og Lumina: gennemse biblioteket inde i editoren, og tryk på Føj til
   projekt. Modellen kommer med sine teksturer, på det rigtige sted, importeret.
 - **`hoard sync`** henter præcis de filer, et projekt angiver, ind i projektet, fastlåst i en lockfil, så alle på holdet
   og alle build-maskiner får de samme bytes.

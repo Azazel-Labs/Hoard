@@ -81,7 +81,7 @@ skryf ook name en beskrywings.
 
 ### Reguit in jou enjin
 
-- **Enjin-inproppe** vir Godot 4, Unity en Unreal Engine 5: blaai deur die biblioteek binne die redigeerder en druk Voeg
+- **Enjin-inproppe** vir Godot 4, Unity, Unreal Engine 5 en Lumina: blaai deur die biblioteek binne die redigeerder en druk Voeg
   by projek. Die model kom met sy teksture, op die regte plek, ingevoer.
 - **`hoard sync`** trek presies die lêers wat 'n projek noem daarin in, vasgepen in 'n lockfile, sodat elke spanmaat en
   elke boumasjien dieselfde grepe kry.

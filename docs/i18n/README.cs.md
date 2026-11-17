@@ -83,7 +83,7 @@ hostovaný, a bude psát i názvy a popisy.
 
 ### Přímo do vašeho enginu
 
-- **Pluginy pro enginy** Godot 4, Unity a Unreal Engine 5: procházejte knihovnu přímo v editoru a stiskněte Přidat do
+- **Pluginy pro enginy** Godot 4, Unity, Unreal Engine 5 a Lumina: procházejte knihovnu přímo v editoru a stiskněte Přidat do
   projektu. Model dorazí se svými texturami, na správné místo a naimportovaný.
 - **`hoard sync`** stáhne do projektu přesně ty soubory, které projekt uvádí, zafixované v lockfilu, takže každý člen
   týmu i každý build server dostane tytéž bajty.

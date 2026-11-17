@@ -84,7 +84,7 @@ yang kompatibel dengan OpenAI, lokal atau dihosting, dan Hoard juga menuliskan n
 
 ### Langsung ke engine Anda
 
-- **Plugin engine** untuk Godot 4, Unity, dan Unreal Engine 5: jelajahi pustaka di dalam editor lalu tekan Tambahkan ke
+- **Plugin engine** untuk Godot 4, Unity, Unreal Engine 5, dan Lumina: jelajahi pustaka di dalam editor lalu tekan Tambahkan ke
   proyek. Model datang dengan teksturnya, di tempat yang tepat, sudah diimpor.
 - **`hoard sync`** menarik tepat berkas yang disebutkan sebuah proyek ke dalam proyek itu, dikunci dalam lockfile,
   sehingga setiap rekan tim dan mesin build mendapat byte yang sama.

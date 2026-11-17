@@ -85,7 +85,7 @@ schrijft ook namen en beschrijvingen.
 
 ### Rechtstreeks in je engine
 
-- **Engine-plugins** voor Godot 4, Unity en Unreal Engine 5: blader door de bibliotheek in de editor en druk op
+- **Engine-plugins** voor Godot 4, Unity, Unreal Engine 5 en Lumina: blader door de bibliotheek in de editor en druk op
   Toevoegen aan project. Het model komt mee met zijn texturen, op de juiste plek, geïmporteerd.
 - **`hoard sync`** haalt precies de bestanden binnen die een project noemt, vastgelegd in een lockfile, zodat elke
   teamgenoot en elke buildmachine dezelfde bytes krijgt.

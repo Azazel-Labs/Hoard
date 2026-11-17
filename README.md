@@ -84,8 +84,8 @@ writes names and descriptions too.
 
 ### Straight into your engine
 
-- **Engine plugins** for Godot 4, Unity and Unreal Engine 5: browse the library inside the editor and press Add to
-  project. The model comes with its textures, in the right place, imported.
+- **Engine plugins** for Godot 4, Unity, Unreal Engine 5 and Lumina: browse the library inside the editor and press
+  Add to project. The model comes with its textures, in the right place, imported.
 - **`hoard sync`** pulls exactly the files a project names into it, pinned in a lockfile, so every teammate and
   build machine gets the same bytes.
 - **Download as** GLB, PNG, WAV, MP3 or a sprite sheet format, converted on the fly, with texture names in your
@@ -236,7 +236,8 @@ real `hoard sync --verify` must find everything in place, downloading nothing an
 package's code runs on .NET whenever `dotnet` is installed (so in CI); Godot's runs headless when `GODOT_BIN` names a
 Godot 4 executable; Unreal's runs as a commandlet (`-run=HoardAdd`) when `UNREAL_EDITOR` names `UnrealEditor-Cmd`,
 which also checks the model was imported. The Unreal plugin is built with that engine's UAT the first time, and again
-whenever its sources change. All use the hoard CLI under `target/` (`cargo build -p hoard`), or `HOARD_CLI`.
+whenever its sources change. Lumina's core (everything but drawing and importing) is built into a small program with
+the C++ compiler (`CXX`, or `c++`; `clang++` on Windows) against libcurl or WinHTTP, so it runs in CI too. All use the hoard CLI under `target/` (`cargo build -p hoard`), or `HOARD_CLI`.
 
 ### Local models for the tagger
 
@@ -700,6 +701,15 @@ downloaded is then imported into `/Game/Hoard`, in the same folders: models brin
 pictures, sounds and fonts come in on their own. Click, Ctrl-click and Shift-click pick results; double-click adds one. To send,
 right-click assets or folders in the Content Browser → Send to Hoard… (or select them and press Send… in the Hoard
 tab). It lists what will go before sending. Meshes, textures and sounds made in Unreal go as `.fbx`, `.png` and `.wav`.
+
+**Lumina.** Copy [integrations/lumina/Hoard/](integrations/lumina/Hoard/) into your project's `Plugins/` and build the
+project as usual; the plugin is C++ like the engine, and uses WinHTTP on Windows and libcurl on Linux. Then open the
+Hoard drawer from the editor's tools; the gear takes the server and token, kept in your own settings
+(`Hoard/lumina.json` under `%APPDATA%`, or `~/.config`), never in the project. Files go under `Hoard/` beside the
+`.lproject` (unless `hoard.toml` says otherwise), and what was just downloaded is imported into `/Game/Content/Hoard`,
+in the same folders: models bring their materials and textures, and pictures, sounds and fonts come in on their own.
+Adding again updates those assets in place, so what uses them still does. Click, Ctrl-click and Shift-click pick
+results; double-click adds one. It only adds: Lumina projects aren't sent to Hoard.
 
 ## Unreal packs
 
@@ -1315,6 +1325,7 @@ xtask/                `cargo xtask`: dev servers, checks, local model downloads 
 integrations/godot    the Godot 4 editor plugin (addons/hoard) and its headless test script
 integrations/unity    the Unity editor package (com.hoard.browser) and a .NET harness that runs its code without Unity
 integrations/unreal   the Unreal Engine 5 editor plugin (Hoard), with a HoardAdd commandlet for headless tests
+integrations/lumina   the Lumina editor plugin (Hoard), and a program that runs its core without the engine for tests
 web/                  Vue 3 + TypeScript portal (Vite); three.js viewer is lazy-loaded
 web/scripts/          readme-images.mts: the README's screenshots and the social card, in docs/img/
 .vscode/              tasks, debug configurations, settings and recommended extensions

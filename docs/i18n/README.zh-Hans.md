@@ -75,7 +75,7 @@ docker compose up -d        # open http://<host>:4627
 
 **更新。** 有新版本发布时，页眉会显示一个徽标。运行 `docker compose pull && docker compose up -d`
 即可更新；Hoard 会在启动时升级其数据库，并先在 `/config/backups` 中保存一份副本。将镜像标签改为
-`:0.8` 即可只获取补丁版本。如果想自动更新，又不希望 Hoard 在上传过程中重启，请在
+`:1.2` 即可只获取补丁版本。如果想自动更新，又不希望 Hoard 在上传过程中重启，请在
 **设置 → 维护 → 更新** 中填写一个要调用的地址：新版本发布且没有正在进行的任务时，Hoard 会调用它一次
 （Watchtower 的 HTTP API、Portainer webhook、脚本均可；参见 [docs/DEPLOYMENT.md](../DEPLOYMENT.md#updating)）。
 

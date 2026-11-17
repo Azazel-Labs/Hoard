@@ -81,7 +81,7 @@ Lokasi adalah folder apa pun yang dapat dilihat server, jadi di Docker, mount du
 
 **Memperbarui.** Bilah atas menampilkan lencana saat ada rilis yang lebih baru. Jalankan
 `docker compose pull && docker compose up -d` untuk mengambilnya; Hoard meningkatkan database-nya saat mulai, dengan
-menyimpan salinan di `/config/backups` lebih dulu. Ubah tag image ke `:0.8` untuk hanya mendapat rilis patch. Untuk
+menyimpan salinan di `/config/backups` lebih dulu. Ubah tag image ke `:1.2` untuk hanya mendapat rilis patch. Untuk
 memperbarui otomatis tanpa memulai ulang Hoard di tengah unggahan, berikan alamat untuk dipanggil di
 **Pengaturan → Pemeliharaan → Pembaruan**: Hoard memanggilnya begitu rilis keluar dan tidak ada yang sedang berjalan
 (HTTP API Watchtower, webhook Portainer, skrip; lihat [docs/DEPLOYMENT.md](../DEPLOYMENT.md#updating)).

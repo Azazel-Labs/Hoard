@@ -82,7 +82,7 @@ Een locatie is elke map die de server kan zien, dus mount hem in Docker eerst in
 
 **Bijwerken.** De bovenbalk toont een badge als er een nieuwere release is. Voer
 `docker compose pull && docker compose up -d` uit om die binnen te halen; Hoard werkt bij het starten zijn database
-bij en bewaart eerst een kopie in `/config/backups`. Wijzig de image-tag in `:0.8` om alleen patchreleases te krijgen.
+bij en bewaart eerst een kopie in `/config/backups`. Wijzig de image-tag in `:1.2` om alleen patchreleases te krijgen.
 Om automatisch bij te werken zonder dat Hoard midden in een upload herstart, geef je
 **Instellingen → Onderhoud → Updates** een adres om aan te roepen: Hoard roept het aan zodra er een release uit is en
 er niets gebeurt (de HTTP-API van Watchtower, een Portainer-webhook, een script; zie

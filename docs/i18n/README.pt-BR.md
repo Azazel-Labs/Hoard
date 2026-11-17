@@ -78,7 +78,7 @@ Um local é qualquer pasta que o servidor consegue ver; então, no Docker, monte
 
 **Atualização.** O cabeçalho mostra um selo quando existe uma versão mais nova. Execute `docker compose pull && docker compose up -d`
 para instalá-la; o Hoard atualiza o banco de dados ao iniciar, salvando antes uma cópia em `/config/backups`. Mude a tag
-da imagem para `:0.8` para receber só versões de correção. Para atualizar automaticamente sem reiniciar o Hoard no meio
+da imagem para `:1.2` para receber só versões de correção. Para atualizar automaticamente sem reiniciar o Hoard no meio
 de um envio, informe em **Configurações → Manutenção → Atualizações** um endereço a chamar: o Hoard o chama quando sai
 uma versão e nada está acontecendo (a API HTTP do Watchtower, um webhook do Portainer, um script; veja
 [docs/DEPLOYMENT.md](../DEPLOYMENT.md#updating)).

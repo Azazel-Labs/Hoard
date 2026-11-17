@@ -83,7 +83,7 @@ ein.
 
 **Aktualisieren.** In der Kopfzeile erscheint ein Hinweis, wenn es eine neuere Version gibt. Führen Sie
 `docker compose pull && docker compose up -d` aus, um sie zu übernehmen; Hoard aktualisiert seine Datenbank beim
-Start und legt vorher eine Kopie in `/config/backups` ab. Ändern Sie den Image-Tag auf `:0.8`, um nur Patch-Releases
+Start und legt vorher eine Kopie in `/config/backups` ab. Ändern Sie den Image-Tag auf `:1.2`, um nur Patch-Releases
 zu bekommen. Um automatisch zu aktualisieren, ohne Hoard mitten in einem Upload neu zu starten, geben Sie unter
 **Einstellungen → Wartung → Updates** eine Adresse zum Aufrufen an: Hoard ruft sie auf, sobald eine Version
 erschienen ist und gerade nichts läuft (die HTTP-API von Watchtower, ein Portainer-Webhook, ein Skript; siehe

@@ -83,7 +83,7 @@ Lokalizacją może być dowolny folder widoczny dla serwera, więc w Dockerze na
 **Aktualizacja.** Gdy dostępna jest nowsza wersja, w nagłówku pojawia się plakietka. Aby ją zainstalować, należy
 uruchomić `docker compose pull && docker compose up -d`; Hoard aktualizuje bazę danych przy uruchomieniu, najpierw
 zapisując jej kopię w `/config/backups`. Aby otrzymywać tylko wydania poprawkowe, należy zmienić tag obrazu na
-`:0.8`. Aby aktualizować automatycznie bez ponownego uruchamiania Hoard w trakcie przesyłania, należy podać w
+`:1.2`. Aby aktualizować automatycznie bez ponownego uruchamiania Hoard w trakcie przesyłania, należy podać w
 **Ustawienia → Konserwacja → Aktualizacje** adres do wywołania: Hoard wywoła go, gdy pojawi się nowa wersja i nic
 nie będzie się działo (API HTTP Watchtower, webhook Portainer, skrypt; zob. [docs/DEPLOYMENT.md](../DEPLOYMENT.md#updating)).
 

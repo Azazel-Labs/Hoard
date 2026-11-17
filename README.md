@@ -101,7 +101,7 @@ A location is any folder the server can see, so in Docker, mount it into the con
 
 **Updating.** The header shows a badge when a newer release exists. Run `docker compose pull && docker compose up -d`
 to take it; Hoard upgrades its database on start, saving a copy in `/config/backups` first. Change the image tag to
-`:0.8` to get patch releases only. To update automatically without restarting Hoard mid-upload, give
+`:1.2` to get patch releases only. To update automatically without restarting Hoard mid-upload, give
 **Settings → Maintenance → Updates** an address to call: Hoard calls it once a release is out and nothing is going on
 (Watchtower's HTTP API, a Portainer webhook, a script; see [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md#updating)).
 

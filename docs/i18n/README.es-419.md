@@ -80,7 +80,7 @@ Una ubicación es cualquier carpeta que el servidor pueda ver, así que en Docke
 
 **Actualizar.** La barra superior muestra una insignia cuando hay una versión más reciente. Ejecuta
 `docker compose pull && docker compose up -d` para instalarla; Hoard actualiza su base de datos al iniciar, y antes
-guarda una copia en `/config/backups`. Cambia la etiqueta de la imagen a `:0.8` para recibir solo versiones de
+guarda una copia en `/config/backups`. Cambia la etiqueta de la imagen a `:1.2` para recibir solo versiones de
 corrección. Para actualizar automáticamente sin reiniciar Hoard en medio de una subida, indica en
 **Configuración → Mantenimiento → Actualizaciones** una dirección a la que llamar: Hoard la llama cuando sale una
 versión y no hay nada en curso (la API HTTP de Watchtower, un webhook de Portainer, un script; consulta

@@ -75,7 +75,7 @@ docker compose up -d        # open http://<host>:4627
 
 **업데이트.** 새 릴리스가 있으면 헤더에 배지가 표시됩니다. `docker compose pull && docker compose up -d`를 실행하면
 적용되며, Hoard는 시작할 때 데이터베이스를 업그레이드하기 전에 `/config/backups`에 사본을 저장합니다. 패치 릴리스만
-받으려면 이미지 태그를 `:0.8`로 바꾸세요. 업로드 도중에 Hoard를 다시 시작하지 않고 자동으로 업데이트하려면
+받으려면 이미지 태그를 `:1.2`로 바꾸세요. 업로드 도중에 Hoard를 다시 시작하지 않고 자동으로 업데이트하려면
 **설정 → 유지 관리 → 업데이트**에 호출할 주소를 입력하세요. 릴리스가 나오고 진행 중인 작업이 없을 때 Hoard가
 그 주소를 호출합니다(Watchtower의 HTTP API, Portainer 웹훅, 스크립트 등. [docs/DEPLOYMENT.md](../DEPLOYMENT.md#updating) 참고).
 

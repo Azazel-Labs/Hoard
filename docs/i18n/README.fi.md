@@ -81,7 +81,7 @@ Sijainti on mikä tahansa kansio, jonka palvelin näkee, joten Dockerissa liitä
 
 **Päivittäminen.** Yläpalkissa näkyy merkki, kun uudempi versio on olemassa. Aja `docker compose pull && docker compose up -d`
 ottaaksesi sen käyttöön; Hoard päivittää tietokantansa käynnistyessään ja tallentaa ensin kopion kansioon
-`/config/backups`. Vaihda levykuvan tunnisteeksi `:0.8`, jos haluat vain korjausversiot. Päivittääksesi automaattisesti
+`/config/backups`. Vaihda levykuvan tunnisteeksi `:1.2`, jos haluat vain korjausversiot. Päivittääksesi automaattisesti
 käynnistämättä Hoardia uudelleen kesken lähetyksen anna kohtaan **Asetukset → Ylläpito → Päivitykset** kutsuttava
 osoite: Hoard kutsuu sitä, kun versio on julkaistu eikä mitään ole käynnissä (Watchtowerin HTTP API, Portainer-webhook,
 skripti; katso [docs/DEPLOYMENT.md](../DEPLOYMENT.md#updating)).

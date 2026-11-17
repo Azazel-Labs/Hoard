@@ -62,7 +62,7 @@ docker compose up -d        # open http://<host>:4627
 
 **更新。** 有較新的版本時，頂端列會顯示標記。執行 `docker compose pull && docker compose up -d`
 即可更新；Hoard 會在啟動時升級資料庫，並先在 `/config/backups` 中儲存一份副本。將映像檔標籤改為
-`:0.8` 就只會取得修補版本。若要自動更新，又不想讓 Hoard 在上傳途中重新啟動，請在
+`:1.2` 就只會取得修補版本。若要自動更新，又不想讓 Hoard 在上傳途中重新啟動，請在
 **設定 → 維護 → 更新** 中提供一個要呼叫的網址：Hoard 會在新版本推出且沒有任何工作進行時呼叫它（Watchtower 的 HTTP API、Portainer webhook、指令碼；請參閱 [docs/DEPLOYMENT.md](../DEPLOYMENT.md#updating)）。
 
 **GPU（選用）。** Hoard 能看到 GPU 時會用 GPU 算繪 3D 模型縮圖，看不到時則使用軟體算繪。素材包頁面會顯示使用的是哪一種（`GPU: ...` 或 `No GPU found`）。若要將 GPU 傳遞給容器，請加上適合你硬體的覆疊檔：

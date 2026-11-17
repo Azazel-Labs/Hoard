@@ -76,7 +76,7 @@ En plassering er hvilken som helst mappe serveren kan se, så i Docker må du f�
 
 **Oppdatering.** Topplinjen viser et merke når en nyere versjon finnes. Kjør `docker compose pull && docker compose up -d`
 for å ta den i bruk; Hoard oppgraderer databasen ved oppstart og lagrer først en kopi i `/config/backups`. Endre image-taggen til
-`:0.8` for bare å få feilrettingsversjoner. For å oppdatere automatisk uten at Hoard startes på nytt midt i en opplasting, gi
+`:1.2` for bare å få feilrettingsversjoner. For å oppdatere automatisk uten at Hoard startes på nytt midt i en opplasting, gi
 **Innstillinger → Vedlikehold → Oppdateringer** en adresse å kalle: Hoard kaller den når en ny versjon er ute og ingenting pågår
 (Watchtowers HTTP-API, en Portainer-webhook, et skript; se [docs/DEPLOYMENT.md](../DEPLOYMENT.md#updating)).
 

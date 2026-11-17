@@ -78,7 +78,7 @@ Vị trí là bất kỳ thư mục nào máy chủ nhìn thấy được, nên 
 
 **Cập nhật.** Thanh trên cùng hiện một huy hiệu khi có bản phát hành mới hơn. Chạy
 `docker compose pull && docker compose up -d` để cập nhật; Hoard nâng cấp cơ sở dữ liệu khi khởi động, sau khi lưu một
-bản sao vào `/config/backups`. Đổi tag của image thành `:0.8` để chỉ nhận các bản vá. Để tự động cập nhật mà không khởi
+bản sao vào `/config/backups`. Đổi tag của image thành `:1.2` để chỉ nhận các bản vá. Để tự động cập nhật mà không khởi
 động lại Hoard giữa lúc đang tải lên, hãy đưa cho **Cài đặt → Bảo trì → Cập nhật** một địa chỉ để gọi: Hoard gọi nó khi
 có bản phát hành và không có việc gì đang chạy (HTTP API của Watchtower, một webhook Portainer, một script; xem
 [docs/DEPLOYMENT.md](../DEPLOYMENT.md#updating)).

@@ -82,7 +82,7 @@ O locație este orice dosar pe care îl poate vedea serverul, așa că în Docke
 
 **Actualizare.** Bara de sus afișează o insignă când există o versiune mai nouă. Rulați
 `docker compose pull && docker compose up -d` pentru a o instala; Hoard își actualizează baza de date la pornire,
-salvând mai întâi o copie în `/config/backups`. Schimbați eticheta imaginii în `:0.8` pentru a primi doar versiunile
+salvând mai întâi o copie în `/config/backups`. Schimbați eticheta imaginii în `:1.2` pentru a primi doar versiunile
 de corecție. Pentru actualizare automată fără ca Hoard să fie repornit în mijlocul unei încărcări, dați în
 **Setări → Întreținere → Actualizări** o adresă de apelat: Hoard o apelează după ce apare o versiune și nu se întâmplă
 nimic (API-ul HTTP al Watchtower, un webhook Portainer, un script; vedeți

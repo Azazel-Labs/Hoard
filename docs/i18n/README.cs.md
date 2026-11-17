@@ -77,7 +77,7 @@ Umístění je jakákoli složka, kterou server vidí, takže v Dockeru ji nejd�
 
 **Aktualizace.** Když existuje novější verze, horní lišta zobrazí odznak. Spusťte `docker compose pull && docker compose up -d`
 a nainstalujete ji; Hoard při startu aktualizuje svou databázi a předtím uloží kopii do `/config/backups`. Změňte tag
-image na `:0.8`, chcete-li jen opravné verze. Chcete-li aktualizovat automaticky, aniž by se Hoard restartoval uprostřed
+image na `:1.2`, chcete-li jen opravné verze. Chcete-li aktualizovat automaticky, aniž by se Hoard restartoval uprostřed
 nahrávání, zadejte v **Nastavení → Údržba → Aktualizace** adresu k volání: Hoard ji zavolá, jakmile vyjde nová verze
 a nic se neděje (HTTP API Watchtoweru, webhook Portaineru, skript; viz [docs/DEPLOYMENT.md](../DEPLOYMENT.md#updating)).
 

@@ -80,7 +80,7 @@ Um local é qualquer pasta que o servidor consiga ver, por isso, no Docker, mont
 
 **Atualizar.** O cabeçalho mostra um distintivo quando existe uma versão mais recente. Execute
 `docker compose pull && docker compose up -d` para a obter; o Hoard atualiza a base de dados ao arrancar, guardando
-primeiro uma cópia em `/config/backups`. Altere a tag da imagem para `:0.8` para receber apenas versões de correção.
+primeiro uma cópia em `/config/backups`. Altere a tag da imagem para `:1.2` para receber apenas versões de correção.
 Para atualizar automaticamente sem reiniciar o Hoard a meio de um carregamento, indique em
 **Definições → Manutenção → Atualizações** um endereço a chamar: o Hoard chama-o quando sai uma versão e não está nada
 a decorrer (a API HTTP do Watchtower, um webhook do Portainer, um script; veja [docs/DEPLOYMENT.md](../DEPLOYMENT.md#updating)).

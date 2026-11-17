@@ -76,7 +76,7 @@ Un emplacement est n’importe quel dossier que le serveur peut voir : avec Doc
 
 **Mises à jour.** L’en-tête affiche un badge quand une version plus récente existe. Exécutez `docker compose pull && docker compose up -d`
 pour l’installer ; Hoard met à niveau sa base de données au démarrage, après en avoir enregistré une copie dans `/config/backups`. Changez l’étiquette de l’image en
-`:0.8` pour ne recevoir que les versions correctives. Pour mettre à jour automatiquement sans redémarrer Hoard en plein envoi, indiquez dans
+`:1.2` pour ne recevoir que les versions correctives. Pour mettre à jour automatiquement sans redémarrer Hoard en plein envoi, indiquez dans
 **Paramètres → Maintenance → Mises à jour** une adresse à appeler : Hoard l’appelle dès qu’une version est sortie et que rien n’est en cours
 (l’API HTTP de Watchtower, un webhook Portainer, un script ; voir [docs/DEPLOYMENT.md](../DEPLOYMENT.md#updating)).
 

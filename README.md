@@ -305,6 +305,11 @@ software rasterizer (`apt install mesa-vulkan-drivers`). Without any adapter, ev
      their UsdPreviewSurface materials and textures (from beside the file or inside the `.usdz`), or their display
      colors. Guides, proxies and hidden meshes are left out; a file of materials alone has no thumbnail. The 3D viewer
      shows the GLB Hoard makes from it.
+   - SketchUp (`.skp`), from SketchUp 3 through today's: faces, groups and components, layers and tags (hidden ones
+     left out), colors and textures, read natively by Hoard's own port of the MIT-licensed
+     [openskp](https://github.com/iamahsanmehmood/openskp) reader (`crates/hoard-skp`), since SketchUp's SDK has no
+     Linux build. Edges without a face, guides, text and dimensions aren't drawn. The thumbnail, the 3D viewer and
+     "download as GLB" all use the GLB Hoard makes from it, in meters with Y up.
    - Unreal packages (`.uasset`, `.umap`), read without Unreal: see [Unreal packs](#unreal-packs).
    - Source files:
      - `.blend`: Blender version, compression, and the preview Blender embeds in the file (read directly, gzip
@@ -496,7 +501,7 @@ and Opus use ffmpeg's reference encoders (LAME, libvorbis, libopus), as do sourc
 | MOD, XM, S3M, IT, MIDI | the same audio formats, rendered |
 | glTF, GLB | GLB + textures (zipped) |
 | GLB | glTF + .bin (zipped) |
-| OBJ (with MTL and textures), FBX (binary and ASCII), 3DS, STL, PLY, MagicaVoxel, 3MF (with its colors), USD | GLB + textures (zipped) |
+| OBJ (with MTL and textures), FBX (binary and ASCII), 3DS, STL, PLY, MagicaVoxel, 3MF (with its colors), USD, SketchUp | GLB + textures (zipped) |
 | TTF/OTF | WOFF2, WOFF |
 | WOFF, WOFF2 | TTF/OTF and each other |
 | .blend, Collada, Alembic, X3D, once Blender converted them (Settings → Blender) | GLB + textures (zipped) |
@@ -700,8 +705,8 @@ tools, but some Epic-made content is licensed for Unreal Engine only.
 
 ## Conversion rules
 
-Conversion rules make a library all alike: every OBJ, FBX, 3DS, USD, STL, PLY, glTF, Collada or Blender file converted
-to GLB, say, and turned upright (Y up, facing +Z) on the way. Set them in Settings → Adding packs → Conversion rules
+Conversion rules make a library all alike: every OBJ, FBX, 3DS, USD, STL, PLY, SketchUp, glTF, Collada or Blender
+file converted to GLB, say, and turned upright (Y up, facing +Z) on the way. Set them in Settings → Adding packs → Conversion rules
 (admins only, none by default). Each rule names the formats it converts and what to; a format can be in one rule.
 
 A rule converts files in packs Hoard keeps. Files in watched folders are never changed, and neither are files
@@ -1244,6 +1249,7 @@ crates/hoard-render   headless wgpu renderer: glTF/GLB/OBJ in, thumbnail out (`c
 crates/hoardd         the server; formats/ describes the files stores ship beside their art (Megascans, Sketchfab)
 crates/hoard          the CLI
 crates/hoard-unreal   Unreal package reader and converters (textures, sounds, materials, data tables)
+crates/hoard-skp      SketchUp .skp reader, to GLB (a port of openskp's MIT reader)
 xtask/                `cargo xtask`: dev servers, checks, local model downloads and serving, Unreal export
 integrations/godot    the Godot 4 editor plugin (addons/hoard) and its headless test script
 integrations/unity    the Unity editor package (com.hoard.browser) and a .NET harness that runs its code without Unity

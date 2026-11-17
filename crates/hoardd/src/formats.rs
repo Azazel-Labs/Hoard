@@ -74,7 +74,7 @@ pub(crate) fn options(ext: &str, derivatives: &[String]) -> Vec<FormatOption> {
         }
     }
     match ext.as_str() {
-        "stl" | "ply" | "vox" | "obj" | "fbx" | "3ds" | "3mf" | "usd" | "usda" | "usdc" | "usdz" | "gltf" => {
+        "stl" | "ply" | "vox" | "obj" | "fbx" | "3ds" | "3mf" | "usd" | "usda" | "usdc" | "usdz" | "gltf" | "skp" => {
             out.push(opt("glb", GLB_LABEL, false));
         }
         "ttf" | "otf" => {
@@ -187,7 +187,7 @@ pub(crate) fn convert(
                 _ => Output { ext: if crate::fonts::is_cff(&sfnt) { "otf" } else { "ttf" }, bytes: sfnt },
             })
         }
-        "view" if polysmelt::formats::EXTENSIONS.contains(&src.as_str()) => {
+        "view" if crate::meshes::reads(&src) => {
             Ok(Output { bytes: crate::meshes::view_glb(local, &src, root)?, ext: "glb" })
         }
         _ => bail!("can't convert .{src} to {format}"),
@@ -688,7 +688,7 @@ pub(crate) async fn request(
     let stem = file.rsplit_once('.').map_or(file.as_str(), |(s, _)| s).to_owned();
     let names: Vec<String> = derivs.iter().map(|(k, _)| k.clone()).collect();
     // The 3D viewer's GLB, of any model polysmelt reads or Blender converted. Not offered for download.
-    let readable = polysmelt::formats::EXTENSIONS.contains(&ext.to_ascii_lowercase().as_str());
+    let readable = crate::meshes::reads(&ext.to_ascii_lowercase());
     let view = format == "view" && max.is_none() && (readable || names.iter().any(|n| n == "glb"));
     let allowed = view
         || options(&ext, &names).iter().any(|o| o.format == format)

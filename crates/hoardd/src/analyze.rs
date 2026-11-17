@@ -304,7 +304,9 @@ pub(crate) fn analyze(path: &Path, root: &Path, kind: AssetKind, ext: &str) -> A
             a.title = f.title;
             a.thumb = f.thumb.and_then(|t| thumb_bytes(t, false).ok());
         }),
-        AssetKind::Model if matches!(ext, "stl" | "ply" | "vox" | "3ds" | "3mf" | "usd" | "usda" | "usdc" | "usdz") => {
+        AssetKind::Model
+            if matches!(ext, "stl" | "ply" | "vox" | "3ds" | "3mf" | "usd" | "usda" | "usdc" | "usdz" | "skp") =>
+        {
             analyze_mesh(path, root, ext, &mut a)
         }
         AssetKind::Model | AssetKind::Animation => analyze_model(path, root, ext, &mut a.meta).map(|rig| {

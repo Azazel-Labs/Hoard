@@ -1,5 +1,5 @@
 //! Models read natively, by [polysmelt]: STL, PLY, `MagicaVoxel` `.vox`, OBJ (with its MTL materials and textures),
-//! FBX (binary and ASCII), 3DS, 3MF and USD. Each becomes a GLB, which feeds the thumbnail renderer and "download
+//! FBX (binary and ASCII), 3DS, 3MF and USD, and SketchUp `.skp` by [`hoard_skp`], which makes a GLB of it first. Each becomes a GLB, which feeds the thumbnail renderer and "download
 //! as GLB"; textures are embedded so the GLB stands on its own, re-encoded as PNG from anything Hoard can decode.
 //! glTF and GLB are read too, for the triangles they draw, and decoded into plain glTF when compressed or quantized
 //! so the thumbnail renderer can draw them; their download GLB is packed from the file as it is. Every one of them
@@ -17,10 +17,26 @@ use serde_json::{Map, Value};
 
 pub(crate) use polysmelt::mesh::{Image, Material, Mesh, to_glb};
 
+/// Whether Hoard reads models in this format (lowercase, without the dot) itself, without Blender.
+pub(crate) fn reads(ext: &str) -> bool {
+    ext == "skp" || polysmelt::formats::EXTENSIONS.contains(&ext)
+}
+
 /// Whether a model in this format becomes a GLB by being read into a mesh. A glTF is packed as it is instead,
 /// keeping what a mesh leaves out (animation, skins, compression).
 pub(crate) fn rebuilt_as_glb(ext: &str) -> bool {
-    polysmelt::formats::EXTENSIONS.contains(&ext) && !matches!(ext, "gltf" | "glb")
+    reads(ext) && !matches!(ext, "gltf" | "glb")
+}
+
+/// Read a model: a SketchUp file as the GLB [`hoard_skp`] makes of it (its textures are inside), anything else by
+/// polysmelt.
+fn open(path: &Path, ext: &str, assets: &dyn Assets, keep: Keep) -> Result<polysmelt::document::Document<'static>> {
+    if ext != "skp" {
+        return Ok(polysmelt::formats::load(path, ext, assets, keep)?);
+    }
+    let glb = hoard_skp::to_glb(&std::fs::read(path)?)?;
+    let name = path.to_string_lossy();
+    Ok(polysmelt::formats::load_bytes(&glb, &name, "glb", assets, keep)?.into_owned())
 }
 
 /// A pack laid out in a folder: polysmelt finds the files a model points at, and Hoard decodes the textures.
@@ -76,7 +92,7 @@ impl Assets for Pack {
 /// the folder laid out like the pack, searched for textures the model points at by bare name or a foreign path.
 pub(crate) fn load(path: &Path, ext: &str, root: &Path) -> Result<(Option<Mesh>, Map<String, Value>)> {
     // What a rest-pose mesh needs: animations, cameras and lights are skipped.
-    let doc = polysmelt::formats::load(path, ext, &Pack::new(root), Keep::MESHES)?;
+    let doc = open(path, ext, &Pack::new(root), Keep::MESHES)?;
     Ok((doc.flatten(Pose::Rest)?, doc.facts))
 }
 
@@ -86,14 +102,14 @@ pub(crate) fn load_rigged(
     ext: &str,
     root: &Path,
 ) -> Result<(Option<Mesh>, Option<crate::animations::Rig>)> {
-    let doc = polysmelt::formats::load(path, ext, &Pack::new(root), Keep { animations: true, ..Keep::MESHES })?;
+    let doc = open(path, ext, &Pack::new(root), Keep { animations: true, ..Keep::MESHES })?;
     let rig = crate::animations::rig(&Value::Object(doc.json.clone()));
     Ok((doc.flatten(Pose::Rest)?, rig))
 }
 
 /// A model's document to pose: its meshes, skins, materials, textures and clips, any compression decoded.
 pub(crate) fn posable(path: &Path, ext: &str, root: &Path) -> Result<polysmelt::document::Document<'static>> {
-    let mut doc = polysmelt::formats::load(path, ext, &Pack::new(root), Keep { animations: true, ..Keep::MESHES })?;
+    let mut doc = open(path, ext, &Pack::new(root), Keep { animations: true, ..Keep::MESHES })?;
     doc.decode()?;
     Ok(doc)
 }
@@ -112,7 +128,7 @@ pub(crate) fn facts(path: &Path, ext: &str, root: &Path) -> Result<Map<String, V
         lights: false,
         extras: false,
     };
-    Ok(polysmelt::formats::load(path, ext, &Pack::new(root), nothing)?.facts)
+    Ok(open(path, ext, &Pack::new(root), nothing)?.facts)
 }
 
 /// The names of a model's materials, in its order, each once: what an engine's materials are matched to (Unity
@@ -131,7 +147,7 @@ pub(crate) fn material_names(path: &Path, ext: &str) -> Result<Vec<String>> {
     };
     let folder = path.parent().unwrap_or(Path::new("."));
     let pack = Pack { guess: false, ..Pack::new(folder) };
-    let doc = polysmelt::formats::load(path, ext, &pack, names_only)?;
+    let doc = open(path, ext, &pack, names_only)?;
     let mut names: Vec<String> = Vec::new();
     for m in doc.json.get("materials").and_then(Value::as_array).into_iter().flatten() {
         let Some(name) = m.get("name").and_then(Value::as_str).map(str::trim).filter(|n| !n.is_empty()) else {
@@ -148,7 +164,7 @@ pub(crate) fn material_names(path: &Path, ext: &str) -> Result<Vec<String>> {
 /// materials and embedded textures), not just the mesh it draws, with the file each texture came from.
 pub(crate) fn glb(path: &Path, ext: &str, root: &Path) -> Result<(Vec<u8>, crate::glbfiles::Found)> {
     let pack = Pack::new(root);
-    let doc = polysmelt::formats::load(path, ext, &pack, Keep::ALL)?;
+    let doc = open(path, ext, &pack, Keep::ALL)?;
     anyhow::ensure!(doc.counts().triangles > 0, "this model has no surfaces to export");
     Ok((doc.to_glb()?, pack.names.into_inner()))
 }
@@ -158,7 +174,7 @@ pub(crate) fn glb(path: &Path, ext: &str, root: &Path) -> Result<(Vec<u8>, crate
 /// cameras and lights are left out.
 pub(crate) fn plain_glb(path: &Path, ext: &str, facing: Facing) -> Result<Vec<u8>> {
     let folder = path.parent().unwrap_or(Path::new("."));
-    let mut doc = polysmelt::formats::load(path, ext, &Pack::new(folder), Keep::MESHES)?;
+    let mut doc = open(path, ext, &Pack::new(folder), Keep::MESHES)?;
     doc.decode()?;
     turn(&mut doc.json, facing);
     Ok(doc.to_glb()?)
@@ -213,7 +229,7 @@ pub(crate) fn turn(gltf: &mut Map<String, Value>, facing: Facing) {
 /// lacks are listed in `asset.extras.missing_textures`.
 pub(crate) fn view_glb(path: &Path, ext: &str, root: &Path) -> Result<Vec<u8>> {
     let pack = Pack { guess: false, ..Pack::new(root) };
-    let mut doc = polysmelt::formats::load(path, ext, &pack, Keep::ALL)?;
+    let mut doc = open(path, ext, &pack, Keep::ALL)?;
     doc.decode()?;
     let c = doc.counts();
     // A file of clips with no mesh is an animation: the viewer plays it on a character it fits.
@@ -414,6 +430,25 @@ Connections:  {
         let (Some(mesh), _) = load(&fbx, "fbx", dir.path()).unwrap() else { panic!("no mesh") };
         let names: Vec<&str> = mesh.materials.iter().map(|m| m.name.as_str()).collect();
         assert_eq!(names, ["Paint", "Steel"], "the mesh's materials keep the names the slots are matched by");
+    }
+
+    /// A SketchUp model is read like the formats polysmelt reads: facts, a mesh with its texture, the viewer's GLB
+    /// and the download's.
+    #[test]
+    fn a_sketchup_model_reads_like_any_other() {
+        let dir = tempfile::tempdir().unwrap();
+        let skp = dir.path().join("box.skp");
+        let fixture = Path::new(env!("CARGO_MANIFEST_DIR")).join("../hoard-skp/tests/data/legacy_v2020_textured.skp");
+        std::fs::copy(fixture, &skp).unwrap();
+        assert!(reads("skp") && rebuilt_as_glb("skp"));
+        let facts = facts(&skp, "skp", dir.path()).unwrap();
+        assert!(facts["triangles"].as_u64().unwrap() > 0, "{facts:?}");
+        let (Some(mesh), _) = load(&skp, "skp", dir.path()).unwrap() else { panic!("no mesh") };
+        assert_eq!(mesh.images.len(), 1, "its texture is inside it");
+        assert!(view_glb(&skp, "skp", dir.path()).unwrap().starts_with(b"glTF"));
+        let (glb, _) = glb(&skp, "skp", dir.path()).unwrap();
+        let (json, _) = crate::formats::read_glb(&glb).unwrap();
+        assert_eq!(json["images"].as_array().map(Vec::len), Some(1));
     }
 
     #[test]

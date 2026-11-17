@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs'
 import { LARGE, LARGE_PX, MODELS, TEXTURES } from './support/seed'
 import { meshoptQuad, paintedCube3mf, partsGltf } from './support/files'
 import { assetsOf, signedIn, uploadPack, waitIdle, waitReady } from './support/api'
@@ -53,6 +54,33 @@ test.describe('full-screen viewers', () => {
     await page.keyboard.press('Escape')
     await expect(viewer).toBeHidden()
     await api.delete(`/api/packs/${pack.id}`)
+  })
+
+  test('a SketchUp model has a thumbnail and opens in the viewer', async ({ page, baseURL }) => {
+    test.slow()
+    const api = await signedIn(baseURL!)
+    const stats = (await (await api.get('/api/stats')).json()) as { renderer?: string }
+    const drawn = /^(gpu|cpu):/.test(stats.renderer ?? '')
+    const name = `E2E SketchUp ${unique()}`
+    const skp = readFileSync(new URL('../../crates/hoard-skp/tests/data/legacy_v2020_textured.skp', import.meta.url))
+    const pack = await uploadPack(api, name, [{ relpath: 'Shed.skp', data: skp }])
+    try {
+      await waitReady(api, [pack.id])
+      await waitIdle(api)
+      const [model] = await assetsOf(api, pack.id)
+      expect(model.kind).toBe('model')
+      const full = (await (await api.get(`/api/assets/${model.id}`)).json()) as { has_thumb: boolean; meta: { triangles?: number } }
+      expect(full.meta.triangles).toBeGreaterThan(0)
+      expect(full.has_thumb).toBe(drawn)
+
+      await openPack(page, pack.id, name)
+      await doubleClick(page, tile(page, 'Shed'))
+      const viewer = page.getByRole('dialog', { name: 'View Shed in 3D' })
+      await expect(viewer.getByText(new RegExp(`${full.meta.triangles} tris`))).toBeVisible({ timeout: 20_000 })
+      await expect(viewer.getByText(/Couldn't show this model/)).toHaveCount(0)
+    } finally {
+      await api.delete(`/api/packs/${pack.id}`)
+    }
   })
 
   // Parts that share a material are drawn as one mesh, so a model of thousands turns smoothly; they still count, and

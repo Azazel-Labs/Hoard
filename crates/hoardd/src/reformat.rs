@@ -37,6 +37,7 @@ pub(crate) fn sources(to: &str) -> Vec<&'static str> {
     match to {
         "glb" => polysmelt::formats::EXTENSIONS
             .iter()
+            .chain(&["skp"])
             .chain(crate::convert::CONVERTIBLE)
             .copied()
             .filter(|e| *e != "glb")
@@ -239,7 +240,7 @@ fn plan(conn: &Connection, rules: &Rules, pack: Option<&str>) -> Result<Plan> {
             continue;
         };
         let to = renamed(&file.path, &r.to);
-        let blender_only = !polysmelt::formats::EXTENSIONS.contains(&file.ext.as_str());
+        let blender_only = !crate::meshes::reads(&file.ext);
         let skip = if file.watched {
             Some(Skip::Watched)
         } else if file.unity {
@@ -441,7 +442,7 @@ fn convert_one(
     dir: &Path,
 ) -> Result<Vec<u8>> {
     let glb = if let Some(hash) = &file.blender_glb
-        && !polysmelt::formats::EXTENSIONS.contains(&file.ext.as_str())
+        && !crate::meshes::reads(&file.ext)
     {
         rt.block_on(state.blobs.read_all(hash))?.to_vec()
     } else {

@@ -145,7 +145,7 @@ async fn fetch(state: &AppState, id: &str, work: &Path) -> Result<Local> {
         let (path, ext): (String, String) =
             c.query_row("SELECT path, ext FROM assets WHERE id = ?1", [&id2], |r| Ok((r.get(0)?, r.get(1)?)))?;
         let ext = ext.to_ascii_lowercase();
-        if polysmelt::formats::EXTENSIONS.contains(&ext.as_str()) {
+        if crate::meshes::reads(&ext) {
             let ids = db::dependency_closure(c, &id2, false)?;
             return Ok((path, ext, db::bundle_files(c, &ids)?));
         }

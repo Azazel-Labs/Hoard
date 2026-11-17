@@ -2334,6 +2334,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "hoard-skp"
+version = "1.1.0"
+dependencies = [
+ "anyhow",
+ "flate2",
+ "gltf",
+ "serde_json",
+]
+
+[[package]]
 name = "hoard-unreal"
 version = "1.1.0"
 dependencies = [
@@ -2376,6 +2386,7 @@ dependencies = [
  "hayro",
  "hoard-core",
  "hoard-render",
+ "hoard-skp",
  "hoard-unreal",
  "http",
  "http-body",

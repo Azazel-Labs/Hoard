@@ -389,8 +389,8 @@ const contentStyle = computed(() => ({
 .group button:active, .close:active { scale: 0.92; }
 .group button[aria-pressed='true'] { color: var(--text); background: var(--raised); box-shadow: inset 0 0 0 1px var(--line); }
 .zoom { min-width: 3.4rem; text-align: center; color: var(--text); font-size: 0.75rem; font-variant-numeric: tabular-nums; }
-.swatch { width: 1.75rem; padding: 0; }
-.swatch::after { content: ''; width: 0.9rem; height: 0.9rem; border-radius: 50%; border: 1px solid var(--line); }
+.group .swatch { width: 1.75rem; padding: 0; }
+.swatch::after { content: ''; flex: none; width: 0.9rem; height: 0.9rem; border-radius: 50%; border: 1px solid var(--line); }
 .swatch.checker::after { background: repeating-conic-gradient(#888 0 25%, #ccc 0 50%) 0 0 / 0.45rem 0.45rem; }
 .swatch.black::after { background: #000; }
 .swatch.gray::after { background: #808080; }

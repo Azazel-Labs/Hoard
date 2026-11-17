@@ -31,8 +31,8 @@
   color: var(--text); font: inherit; font-size: var(--step--1); cursor: pointer;
 }
 .group select:hover { background: var(--raised); }
-.swatch { width: 1.75rem; padding: 0; }
-.swatch::after { content: ''; width: 0.9rem; height: 0.9rem; border-radius: 50%; border: 1px solid var(--line); }
+.group .swatch { width: 1.75rem; padding: 0; }
+.swatch::after { content: ''; flex: none; width: 0.9rem; height: 0.9rem; border-radius: 50%; border: 1px solid var(--line); }
 .swatch.checker::after { background: repeating-conic-gradient(#888 0 25%, #ccc 0 50%) 0 0 / 0.45rem 0.45rem; }
 .swatch[aria-pressed='true']::after { outline: 2px solid var(--text); outline-offset: 1px; }
 .close { border: 1px solid var(--line); border-radius: var(--r-chip); }

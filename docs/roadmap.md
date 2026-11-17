@@ -40,22 +40,11 @@ tagging gets against the plan's weekly cap. Claude is harder (checked 2026-11-12
 
 ## Animations as their own thing
 
-Animation packs often come as one file per animation, each a whole character: `Knight_Walk.blend`, `Knight_Run.blend`,
-`Knight_Idle.blend`, all the same rig and mesh with one action each. Hoard shows them as that many copies of the same
-model. Only `Knight@Run.fbx` naming and Unity/Unreal references link a clip to its model today.
+Hoard keeps the skeleton and clips of every rigged model (`rigs`: bone names without their `mixamorig:` or
+`Armature|` prefixes, and each clip's name, length and the bones it moves), from glTF, from FBX through polysmelt and
+from the GLB Blender makes of a .blend. Within a pack, a file of clips with no mesh, or a copy of a character saved
+for one clip, becomes an animation linked to the characters it fits nearby. What's left:
 
-The plan:
-
-- **Read the rig and clips of every rigged model.** glTF has them, polysmelt reads FBX skins and takes into the same
-  form, and a .blend's are in the GLB Blender makes of it. For each file, keep:
-  - a fingerprint of the skeleton: its bone names, with prefixes like `mixamorig:` and `Armature|` taken off, and
-    which is whose parent
-  - a fingerprint of the mesh: vertex and triangle counts and bounds
-  - each clip's name, length and the bones it moves, and whether the root travels or it plays in place
-- **Decide what each file is, pack by pack.** Files with the same skeleton and mesh are one character. The one with
-  no clip, or else the one whose name is the others' common part (`Knight`), stays a model. The rest become
-  animations of it, linked as they are now. A file with a skeleton and clips but no mesh is already an animation.
-  A file with one mesh and many takes stays one model with its clips listed.
 - **Link across packs by skeleton.** An animation fits any character whose skeleton has the bones it moves (same
   names once the prefixes are off), so a Mixamo clip fits every Mixamo character and an Unreal Mannequin clip every
   Mannequin. Characters list "Animations that fit"; animations list "Characters it fits". The same pack comes first.
@@ -66,8 +55,8 @@ The plan:
 - **Download them either way.** An animation comes with or without its character's mesh, and a character with or
   without its animations, as `?animations=1` does now.
 
-Still open: how sure a mesh match has to be (the same character can be saved with different modifiers), and whether
-each clip in a many-take file should be an entry of its own in search.
+Still open: whether the root travels or a clip plays in place, and whether each clip in a many-take file should be
+an entry of its own in search.
 
 ## Ideas
 

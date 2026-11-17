@@ -364,10 +364,13 @@ software rasterizer (`apt install mesa-vulkan-drivers`). Without any adapter, ev
      automatically".
 5. **Link.** glTF buffers/images, OBJ → MTL → textures, FBX texture paths (absolute artist paths are matched by file
    name, the one nearest the model when several share it), DAE images, `.blend` external textures and linked
-   libraries (`//` paths resolved relative to the file), `Model@Clip.fbx` animation clips, and name-based guesses for
-   models that reference nothing (from the model's own part of the pack: its folder's parent and below, beside or
+   libraries (`//` paths resolved relative to the file), animation clips, and name-based guesses for models that
+   reference nothing (from the model's own part of the pack: its folder's parent and below, beside or
    above the model or in a folder named for textures, so `Models/` and `Textures/` side by side but never a 2D
-   sprite of the same name, and only painted on a model whose materials have no colors of their own). Game-engine
+   sprite of the same name, and only painted on a model whose materials have no colors of their own). A file of
+   clips with no mesh, or a copy of a character saved for one clip (`run.blend` holding "Run"), becomes an animation
+   linked to the characters it fits, those whose bones it moves in its part of the pack, where a Unity package's
+   copy of a character gets the copies of the clips beside it; so does `Model@Clip.fbx`. Game-engine
    and tool files link too: Unity materials,
    prefabs, scenes and controllers through their GUIDs; Tiled maps → tilesets → images;
    LDtk projects; BMFont `.fnt` → page images; Spine/libGDX `.atlas` → pages; TexturePacker JSON; Godot

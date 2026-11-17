@@ -2,6 +2,7 @@
 
 mod activity;
 mod analyze;
+mod animations;
 mod api;
 mod atlas;
 mod audio;

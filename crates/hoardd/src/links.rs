@@ -5,7 +5,7 @@
 //! - FBX: texture file names embedded in the binary (absolute artist paths are matched by file name)
 //! - DAE: `<init_from>` image paths
 //! - .blend: external image paths and linked libraries (other .blend files)
-//! - animations: the Unity/Mixamo `Model@Clip.fbx` naming convention
+//! - animations: clips and the characters they fit, by skeleton or `Model@Clip.fbx` name (see [`crate::animations`])
 //! - guesses: textures whose name starts with the model's name, for models that reference nothing, from the model's
 //!   own part of the pack (its folder's parent and below: `Models/` and `Textures/` side by side)
 //!
@@ -525,18 +525,7 @@ pub(crate) fn link_pack(conn: &Connection, pack_id: &str, refs: &HashMap<String,
         }
     }
 
-    // "Knight@Run.fbx" is an animation clip for "Knight.fbx" (or any model format with that stem).
     let models: Vec<usize> = (0..assets.len()).filter(|&i| assets[i].kind == AssetKind::Model).collect();
-    for &clip in &models {
-        let s = stem(&assets[clip].path);
-        let Some((base, _)) = s.split_once('@') else { continue };
-        for &m in &models {
-            if m != clip && stem(&assets[m].path).eq_ignore_ascii_case(base) {
-                links.insert((m, clip, LinkRel::Animation));
-            }
-        }
-    }
-
     // Models that reference no textures: guess from names ("Barrel.fbx" + "Barrel_Albedo.png").
     for &m in &models {
         let references_something =
@@ -564,6 +553,8 @@ pub(crate) fn link_pack(conn: &Connection, pack_id: &str, refs: &HashMap<String,
     for (f, t, rel) in &links {
         stmt.execute(params![assets[*f].id, assets[*t].id, rel.as_str()])?;
     }
+    // Which models are animations, and the characters they play on.
+    crate::animations::sort_pack(conn, pack_id)?;
     Ok(links.len())
 }
 

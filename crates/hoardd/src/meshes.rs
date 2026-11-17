@@ -80,6 +80,17 @@ pub(crate) fn load(path: &Path, ext: &str, root: &Path) -> Result<(Option<Mesh>,
     Ok((doc.flatten(Pose::Rest)?, doc.facts))
 }
 
+/// A model's rest-pose mesh, as [`load`] gives it, and its skeleton and clips (see [`crate::animations`]).
+pub(crate) fn load_rigged(
+    path: &Path,
+    ext: &str,
+    root: &Path,
+) -> Result<(Option<Mesh>, Option<crate::animations::Rig>)> {
+    let doc = polysmelt::formats::load(path, ext, &Pack::new(root), Keep { animations: true, ..Keep::MESHES })?;
+    let rig = crate::animations::rig(&Value::Object(doc.json.clone()));
+    Ok((doc.flatten(Pose::Rest)?, rig))
+}
+
 /// The facts about a model without drawing its mesh. A glTF's are counted from its JSON, so nothing in its buffers
 /// (Draco, meshopt, textures) is decoded.
 pub(crate) fn facts(path: &Path, ext: &str, root: &Path) -> Result<Map<String, Value>> {

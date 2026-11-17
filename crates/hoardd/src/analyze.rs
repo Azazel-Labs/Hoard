@@ -256,6 +256,8 @@ pub(crate) struct Analysis {
     /// A light preview of an image too big or too foreign for browsers to show as it is, stored as the `lite`
     /// derivative.
     pub(crate) lite: Option<Vec<u8>>,
+    /// A model's skeleton and clips, kept in `rigs`.
+    pub(crate) rig: Option<crate::animations::Rig>,
 }
 
 /// Overall level of decoded audio.
@@ -305,7 +307,8 @@ pub(crate) fn analyze(path: &Path, root: &Path, kind: AssetKind, ext: &str) -> A
         AssetKind::Model if matches!(ext, "stl" | "ply" | "vox" | "3ds" | "3mf" | "usd" | "usda" | "usdc" | "usdz") => {
             analyze_mesh(path, root, ext, &mut a)
         }
-        AssetKind::Model | AssetKind::Animation => analyze_model(path, root, ext, &mut a.meta).map(|()| {
+        AssetKind::Model | AssetKind::Animation => analyze_model(path, root, ext, &mut a.meta).map(|rig| {
+            a.rig = rig;
             // Animation-only glTF clips have no meshes to draw.
             let has_mesh = a.meta.get("meshes").and_then(Value::as_u64).is_none_or(|n| n > 0);
             if matches!(ext, "gltf" | "glb") && has_mesh {
@@ -492,7 +495,8 @@ fn analyze_mesh(path: &Path, root: &Path, ext: &str, a: &mut Analysis) -> anyhow
 
 /// Thumbnail for a model Hoard converts itself (OBJ, FBX), keeping the facts the stats pass found.
 fn mesh_thumb(path: &Path, root: &Path, ext: &str, a: &mut Analysis) -> anyhow::Result<()> {
-    let (mesh, _) = crate::meshes::load(path, ext, root)?;
+    let (mesh, rig) = crate::meshes::load_rigged(path, ext, root)?;
+    a.rig = rig;
     match mesh {
         Some(m) => render_mesh(&m, path, ext, a),
         None => Ok(()),
@@ -1203,7 +1207,13 @@ fn draw_waveform(bars: &[Bar]) -> anyhow::Result<Vec<u8>> {
 // ---------------------------------------------------------------------------------------------
 // Models
 
-fn analyze_model(path: &Path, root: &Path, ext: &str, meta: &mut Map<String, Value>) -> anyhow::Result<()> {
+fn analyze_model(
+    path: &Path,
+    root: &Path,
+    ext: &str,
+    meta: &mut Map<String, Value>,
+) -> anyhow::Result<Option<crate::animations::Rig>> {
+    let mut rig = None;
     match ext {
         "gltf" | "glb" => {
             let json = if ext == "glb" {
@@ -1212,6 +1222,7 @@ fn analyze_model(path: &Path, root: &Path, ext: &str, meta: &mut Map<String, Val
                 serde_json::from_reader(BufReader::new(File::open(path)?))?
             };
             gltf_stats(&json, meta);
+            rig = crate::animations::rig(&json);
             // The triangles the scene draws (strips and fans, meshes placed more than once, points and lines
             // apart), when polysmelt can read it.
             match crate::meshes::facts(path, ext, root) {
@@ -1228,7 +1239,7 @@ fn analyze_model(path: &Path, root: &Path, ext: &str, meta: &mut Map<String, Val
         "fbx" => fbx_stats(path, meta)?,
         _ => {}
     }
-    Ok(())
+    Ok(rig)
 }
 
 fn glb_json(path: &Path) -> anyhow::Result<Value> {

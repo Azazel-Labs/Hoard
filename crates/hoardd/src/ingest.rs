@@ -829,6 +829,9 @@ fn insert_asset(
     }
     write_tags(tx, &id, item.tags)?;
     db::reindex_asset(tx, &id)?;
+    if let Some(rig) = &item.analysis.rig {
+        crate::animations::store(tx, &id, Some(rig))?;
+    }
     store_derivative(tx, &id, "views", views.as_ref(), now)?;
     store_derivative(tx, &id, "source", source.as_ref(), now)?;
     store_derivative(tx, &id, "preview", preview.as_ref(), now)?;
@@ -1141,6 +1144,10 @@ pub(crate) fn retag_pack(state: &AppState, rt: &Handle, pack_id: &str) -> Result
                 )?;
                 write_tags(&tx, &id, item.tags)?;
                 db::reindex_asset(&tx, &id)?;
+                // A converted model's rig comes from its conversion, and stays.
+                if item.analysis.rig.is_some() || !convert::CONVERTIBLE.contains(&item.ext.as_str()) {
+                    crate::animations::store(&tx, &id, item.analysis.rig.as_ref())?;
+                }
                 store_derivative(&tx, &id, "views", views.as_ref(), &now)?;
                 store_derivative(&tx, &id, "source", source.as_ref(), &now)?;
                 store_derivative(&tx, &id, "preview", preview.as_ref(), &now)?;
@@ -1170,6 +1177,7 @@ pub(crate) fn retag_pack(state: &AppState, rt: &Handle, pack_id: &str) -> Result
     tx.commit()?;
     fs::remove_dir_all(&work).ok();
     convert::thumbs_from_conversions(state, rt, pack_id)?;
+    crate::animations::rigs_from_conversions(state, rt, pack_id)?;
     crate::materials::detect_logged(state, rt, &mut conn, pack_id);
     read_pack_files(state, rt, pack_id, false, None);
     Ok(())

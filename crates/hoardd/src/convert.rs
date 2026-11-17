@@ -187,6 +187,10 @@ pub(crate) async fn convert_pack(state: &AppState, pack_id: &str) -> Result<()> 
         for (path, why) in &failures {
             issues::note(c, issues::CONVERT, issues::At::file(&pid, path), why);
         }
+        // What was converted may be a clip (`run.blend`) or a character clips play on.
+        let tx = c.transaction()?;
+        crate::animations::sort_pack(&tx, &pid)?;
+        tx.commit()?;
         Ok(())
     })
     .await?;
@@ -265,6 +269,7 @@ async fn convert_one(state: &AppState, blender: &crate::blender::Tool, t: &Todo)
             bail!("{version} finished without writing a GLB");
         }
         let glb = tokio::fs::read(&out).await?;
+        let rig = crate::animations::rig_of_glb(&glb);
 
         // Thumbnail from the converted model, if the original had none.
         let thumb = if t.has_thumb {
@@ -299,6 +304,7 @@ async fn convert_one(state: &AppState, blender: &crate::blender::Tool, t: &Todo)
                     params![id, tb.hash],
                 )?;
             }
+            crate::animations::store(&tx, &id, rig.as_ref())?;
             tx.commit()?;
             Ok(())
         })

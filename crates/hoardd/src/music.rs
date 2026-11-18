@@ -1,5 +1,5 @@
-//! Note-based music: tracker modules (MOD, XM, S3M, IT, MPTM), MIDI, and the chiptunes in [`crate::chiptune`]. All are
-//! rendered to audio, which gives them a waveform thumbnail, a playable preview and "download as"
+//! Note-based music: tracker modules (MOD, XM, S3M, IT, MPTM), MIDI, and the chiptunes in [`crate::chiptune`], plus the
+//! game audio banks in [`crate::gamebank`]. All are rendered to audio, which gives them a waveform thumbnail, a playable preview and "download as"
 //! WAV/FLAC/MP3/OGG/Opus, plus facts about the song.
 //!
 //! Modules play through `xmrsplayer` (pure Rust). MIDI renders with `rustysynth` (pure Rust) and a General MIDI
@@ -15,7 +15,8 @@ use serde_json::{Map, Value, json};
 
 use crate::audio::Audio;
 
-pub(crate) const EXTS: &[&str] = &["mod", "xm", "s3m", "it", "mptm", "mid", "midi", "nsf", "nsfe", "vgm", "vgz", "umx"];
+pub(crate) const EXTS: &[&str] =
+    &["mod", "xm", "s3m", "it", "mptm", "mid", "midi", "nsf", "nsfe", "vgm", "vgz", "umx", "fsb", "bank", "wem", "bnk"];
 const RATE: u32 = 44_100;
 
 /// Where to look for a General MIDI SoundFont when Settings doesn't name one (Debian/Ubuntu packages, macOS
@@ -86,6 +87,7 @@ pub(crate) fn render(path: &Path, ext: &str, max_secs: f32) -> Result<Rendered> 
     match ext {
         "mid" | "midi" => midi(&data, path, max_secs),
         _ if crate::chiptune::EXTS.contains(&ext) => crate::chiptune::render(&data, ext, max_secs),
+        _ if crate::gamebank::EXTS.contains(&ext) => crate::gamebank::render(&data, ext, max_secs),
         _ => module(&data, max_secs),
     }
 }
@@ -630,4 +632,8 @@ fn write_music_fixtures() {
     std::fs::write(out.join("overworld.nsf"), crate::chiptune::tests::tiny_nsf()).unwrap();
     std::fs::write(out.join("green-hill.vgm"), crate::chiptune::tests::tiny_vgm()).unwrap();
     std::fs::write(out.join("level.umx"), crate::chiptune::tests::tiny_umx()).unwrap();
+    std::fs::write(out.join("sfx.fsb"), crate::gamebank::tests::tiny_fsb()).unwrap();
+    std::fs::write(out.join("Master.bank"), crate::gamebank::tests::tiny_fmod_bank()).unwrap();
+    std::fs::write(out.join("voice.wem"), crate::gamebank::tests::tiny_wem()).unwrap();
+    std::fs::write(out.join("Init.bnk"), crate::gamebank::tests::tiny_bnk()).unwrap();
 }

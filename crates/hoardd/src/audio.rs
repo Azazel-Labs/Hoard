@@ -197,7 +197,7 @@ impl Audio {
 }
 
 /// At most two channels (MP3 and Opus): mono stays mono, more than two mix down to stereo.
-fn stereo_or_mono(pcm: &[f32], channels: usize) -> (Vec<f32>, usize) {
+pub(crate) fn stereo_or_mono(pcm: &[f32], channels: usize) -> (Vec<f32>, usize) {
     if channels <= 2 {
         return (pcm.to_vec(), channels);
     }

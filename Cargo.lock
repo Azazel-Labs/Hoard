@@ -3457,6 +3457,7 @@ dependencies = [
  "ktx2",
  "ldap3",
  "ldap3_proto",
+ "lewton",
  "lofty",
  "lzma-rust2",
  "midly",
@@ -3506,6 +3507,7 @@ dependencies = [
  "uuid",
  "webp",
  "windows-native-keyring-store",
+ "ww2ogg",
  "x509-parser",
  "xmrs",
  "xmrsplayer",
@@ -4511,6 +4513,17 @@ name = "lebe"
 version = "0.5.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7a79a3332a6609480d7d0c9eab957bca6b455b91bb84e66d19f5ff66294b85b8"
+
+[[package]]
+name = "lewton"
+version = "0.10.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "777b48df9aaab155475a83a7df3070395ea1ac6902f5cd062b8f2b028075c030"
+dependencies = [
+ "byteorder",
+ "ogg",
+ "tinyvec",
+]
 
 [[package]]
 name = "libappindicator"
@@ -5547,6 +5560,15 @@ dependencies = [
  "wasm-bindgen-futures",
  "web-time",
  "windows-sys 0.61.2",
+]
+
+[[package]]
+name = "ogg"
+version = "0.8.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "6951b4e8bf21c8193da321bcce9c9dd2e13c858fe078bf9054a288b419ae5d6e"
+dependencies = [
+ "byteorder",
 ]
 
 [[package]]
@@ -10172,6 +10194,17 @@ dependencies = [
  "windows-core",
  "windows-version",
  "x11-dl",
+]
+
+[[package]]
+name = "ww2ogg"
+version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a16960726d0260e04dabd2b0036fbdacecefec9d115dc4b953086c3809685a23"
+dependencies = [
+ "byteorder",
+ "lewton",
+ "thiserror 2.0.21",
 ]
 
 [[package]]

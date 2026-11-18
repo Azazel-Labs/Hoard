@@ -666,7 +666,7 @@ pub(crate) fn map_suffix(stem: &str) -> Option<MapHit> {
     None
 }
 
-/// MIDI, tracker modules and chiptunes are music by nature.
+/// MIDI, tracker modules and chiptunes are music by nature; game audio banks are named for their middleware.
 fn music_tags(ext: &str, tags: &mut TagSet) {
     match ext {
         "mod" | "xm" | "s3m" | "it" | "mptm" | "umx" => {
@@ -681,6 +681,8 @@ fn music_tags(ext: &str, tags: &mut TagSet) {
             tags.add("music", TagSource::Meta, 0.9);
             tags.add("chiptune", TagSource::Meta, 1.0);
         }
+        "fsb" | "bank" => tags.add("fmod", TagSource::Meta, 1.0),
+        "wem" | "bnk" => tags.add("wwise", TagSource::Meta, 1.0),
         _ => {}
     }
 }

@@ -34,6 +34,7 @@ mod ffmpeg;
 mod fonts;
 mod format_wizard;
 mod formats;
+mod gamebank;
 mod glbfiles;
 mod godot;
 mod gpu_hint;

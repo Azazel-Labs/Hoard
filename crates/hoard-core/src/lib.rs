@@ -91,9 +91,9 @@ impl AssetKind {
             | "jxl" | "avif" | "heic" | "heif" => AssetKind::Texture,
             // Vector art: SVG, Illustrator, Affinity Designer, EPS, dotLottie animations.
             "svg" | "svgz" | "ai" | "afdesign" | "eps" | "lottie" | "riv" => AssetKind::Vector,
-            // Audio, including DAW projects (Ableton, FL Studio, Reaper, Pro Tools, Logic, Cubase, Studio One).
+            // Audio, including game audio banks (FMOD, Wwise) and DAW projects (Ableton, FL Studio, Reaper, Pro Tools, Logic, Cubase, Studio One).
             "wav" | "ogg" | "oga" | "mp3" | "flac" | "aif" | "aiff" | "aifc" | "opus" | "m4a" | "aac" | "wma"
-            | "caf" | "wv" | "ape" | "mka" | "w64" | "au" | "mid" | "midi" | "xm" | "it" | "mod" | "s3m" | "mptm" | "umx" | "nsf" | "nsfe" | "vgm" | "vgz" | "als"
+            | "caf" | "wv" | "ape" | "mka" | "w64" | "au" | "mid" | "midi" | "xm" | "it" | "mod" | "s3m" | "mptm" | "umx" | "nsf" | "nsfe" | "vgm" | "vgz" | "fsb" | "bank" | "wem" | "bnk" | "als"
             | "flp" | "rpp" | "ptx" | "logicx" | "cpr" | "song" | "aup3" | "sfz" | "sf2" => AssetKind::Audio,
             // Models, including DCC scenes (Blender, Max, Maya, ZBrush, Cinema 4D, Houdini, Modo, SketchUp).
             "fbx" | "obj" | "gltf" | "glb" | "dae" | "blend" | "3ds" | "stl" | "ply" | "usd" | "usda" | "usdc"

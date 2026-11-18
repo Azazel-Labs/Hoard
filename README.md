@@ -63,8 +63,8 @@ can hold.
 
 Every sound gets a waveform colored by how bright it sounds, so a sharp hit and a long ambience look different
 before you play them. Sound library metadata is read (UCS categories, Soundminer and BaseHead fields, loop points,
-tempo, root note), MIDI, tracker music and chiptunes are rendered so they play like any other sound, and instruments
-(SFZ, SF2) play a few notes.
+tempo, root note), MIDI, tracker music, chiptunes and game audio banks (FMOD, Wwise) are rendered so they play like any
+other sound, and instruments (SFZ, SF2) play a few notes.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/img/sound-dark.webp">
@@ -389,6 +389,12 @@ software rasterizer (`apt install mesa-vulkan-drivers`). Without any adapter, ev
      made to its sound chips: Yamaha's FM chips (Mega Drive, arcade boards, MSX, PC-88/98, AdLib and Sound Blaster
      cards), the SN76489 and the AY-3-8910. Other chips are listed but stay silent. Both list the title, game,
      composer and the chips used.
+   - Game audio banks: FMOD sound banks (`.fsb`, and the FSB inside an FMOD Studio `.bank`), Wwise sounds (`.wem`) and
+     Wwise sound banks (`.bnk`) play their sounds one after another, with a short gap between them, for the waveform
+     and preview, and list the codec, how many sounds there are and, for FMOD, their names. PCM, Vorbis, MP3 and
+     FMOD's ADPCM play from FMOD banks; PCM, Vorbis and Wwise's two ADPCM codecs from Wwise. Console codecs (XMA,
+     ATRAC9, DSP and the like), Wwise's Opus and encrypted banks are named but don't play, and a Wwise bank that only
+     holds events (its sounds streamed from `.wem` files) says so.
    - Instruments: an SFZ (a text file mapping samples to keys) or an SF2 SoundFont plays a rising arpeggio and a chord
      (a beat, for a drum kit), for its waveform and preview, and lists the keys it covers, its regions or presets and
      its velocity layers. An SFZ's samples are linked to it, so they're downloaded with it and stay out of the grid.
@@ -627,7 +633,7 @@ and Opus use ffmpeg's reference encoders (LAME, libvorbis, libopus), as do sourc
 |---|---|
 | PNG, JPEG, WebP, TGA, TIFF, BMP, GIF, EXR, HDR, PSD/PSB (full composite), Krita, OpenRaster, GIMP, DDS, KTX, KTX2, PowerVR, VTF, ICO, QOI, PNM, PCX, JPEG XL, AVIF and HEIC (with ffmpeg), SVG, Illustrator, Aseprite | PNG, JPEG, WebP (lossless), TGA, TIFF, plus EXR for HDR sources; optionally scaled down to 4096…64 px, including in the original format |
 | WAV, FLAC, OGG Vorbis, Opus, MP3, AIFF, and with ffmpeg also AAC/M4A, WMA, CAF, WavPack, APE, MKA | WAV (16 or 24-bit, as the source), FLAC, MP3 (VBR ~190 kbps), OGG Vorbis (q5), Opus (128 kbps) |
-| MOD, XM, S3M, IT, MPTM, UMX, MIDI, NSF, VGM | the same audio formats, rendered |
+| MOD, XM, S3M, IT, MPTM, UMX, MIDI, NSF, VGM, FSB, FMOD and Wwise banks, WEM | the same audio formats, rendered |
 | glTF, GLB | GLB + textures (zipped) |
 | GLB | glTF + .bin (zipped) |
 | OBJ (with MTL and textures), FBX (binary and ASCII), 3DS, STL, PLY, MagicaVoxel, 3MF (with its colors), USD, SketchUp | GLB + textures (zipped) |
@@ -1477,7 +1483,7 @@ What's planned next is in [docs/roadmap.md](docs/roadmap.md).
 | | |
 |---|---|
 | File types recognized | 158 extensions in 13 kinds, from PNG and WAV to `.uasset` and `.skp` |
-| Read natively, no other app | glTF/GLB, FBX (binary and ASCII), OBJ, STL, PLY, 3DS, MagicaVoxel, 3MF, USD/USDA/USDC/USDZ, SketchUp 3 to today, Unreal packages from UE 4.x to 5.7, PSD/PSB, Krita, OpenRaster, Aseprite, DDS, KTX, KTX2, PowerVR, VTF, Basis, ICO, QOI, PNM, PCX, EXR, HDR, SVG, Illustrator, Lottie, Rive, TTF/OTF/WOFF2, WAV/BWF/RF64, OGG, Opus, FLAC, MP3, AIFF, MIDI, MOD/XM/S3M/IT/MPTM/UMX, NSF, VGM, SFZ, SF2 |
+| Read natively, no other app | glTF/GLB, FBX (binary and ASCII), OBJ, STL, PLY, 3DS, MagicaVoxel, 3MF, USD/USDA/USDC/USDZ, SketchUp 3 to today, Unreal packages from UE 4.x to 5.7, PSD/PSB, Krita, OpenRaster, Aseprite, DDS, KTX, KTX2, PowerVR, VTF, Basis, ICO, QOI, PNM, PCX, EXR, HDR, SVG, Illustrator, Lottie, Rive, TTF/OTF/WOFF2, WAV/BWF/RF64, OGG, Opus, FLAC, MP3, AIFF, MIDI, MOD/XM/S3M/IT/MPTM/UMX, NSF, VGM, FMOD banks (FSB, .bank), Wwise WEM and BNK, SFZ, SF2 |
 | Archives unpacked | zip, tar, tar.gz and `.unitypackage`, nested up to 3 deep |
 | Download as | 6 image formats, 5 audio formats, GLB or glTF for models, TTF, WOFF or WOFF2 for fonts, 10 sprite sheet formats |
 | Engine plugins | Godot 4, Unity 2021.3+, Unreal Engine 5 |

@@ -271,3 +271,62 @@ test('a VGM chiptune plays through its emulated sound chip and converts to WAV',
     await api.post('/api/archive/purge', { data: { packs: [pack.id] } })
   }
 })
+
+/** An FMOD sound bank (FSB5) holding two named quarter-second tones, 16-bit mono PCM at 44.1 kHz. */
+function fsb(): Buffer {
+  const tone = (hz: number) => {
+    const pcm = Buffer.alloc(2 * 11_025)
+    for (let i = 0; i < 11_025; i++) pcm.writeInt16LE(Math.round(Math.sin((2 * Math.PI * hz * i) / 44_100) * 12_000), 2 * i)
+    return pcm
+  }
+  const headers = Buffer.alloc(16)
+  const bodies: Buffer[] = []
+  let offset = 0
+  ;[tone(440), tone(660)].forEach((pcm, i) => {
+    // Frames from bit 34, the offset (in 32-byte units) from bit 7, rate index 8 (44.1 kHz) from bit 1.
+    headers.writeBigUInt64LE((BigInt(pcm.length / 2) << 34n) | (BigInt(offset / 32) << 7n) | (8n << 1n), 8 * i)
+    const padded = Buffer.alloc(Math.ceil(pcm.length / 32) * 32)
+    pcm.copy(padded)
+    bodies.push(padded)
+    offset += padded.length
+  })
+  const names = Buffer.alloc(32)
+  names.writeUInt32LE(8, 0)
+  names.writeUInt32LE(13, 4)
+  names.write('beep\0boop\0', 8)
+  const header = Buffer.alloc(0x3c)
+  header.write('FSB5', 0)
+  ;[1, 2, headers.length, names.length, offset, 2].forEach((v, i) => header.writeUInt32LE(v, 4 + 4 * i))
+  return Buffer.concat([header, headers, names, ...bodies])
+}
+
+test('an FMOD sound bank plays its sounds in turn, lists their names and converts to WAV', async ({ api }) => {
+  const pack = await uploadPack(api, `E2E Sound Bank ${unique()}`, [{ relpath: 'weapons.fsb', data: fsb() }])
+  try {
+    await waitReady(api, [pack.id])
+    const [asset] = await assetsOf(api, pack.id)
+    const detail = (await (await api.get(`/api/assets/${asset.id}`)).json()) as {
+      kind: string
+      has_thumb: boolean
+      meta: Record<string, unknown>
+      tags: { tag: string }[]
+    }
+    expect(detail.kind).toBe('audio')
+    expect(detail.has_thumb).toBe(true)
+    expect(detail.meta).toMatchObject({
+      container: 'FMOD sound bank',
+      codec: 'PCM',
+      sounds: 2,
+      sound_names: ['beep', 'boop'],
+      preview: 'mp3',
+    })
+    expect(detail.meta.duration_secs).toBeCloseTo(0.8, 1)
+    expect(detail.tags.map((t) => t.tag)).toContain('fmod')
+    const wav = await api.get(`/api/assets/${asset.id}/as/wav?wait=60`)
+    expect(wav.status()).toBe(200)
+    expect((await wav.body()).subarray(0, 4).toString()).toBe('RIFF')
+  } finally {
+    await api.post('/api/archive', { data: { packs: [pack.id] } })
+    await api.post('/api/archive/purge', { data: { packs: [pack.id] } })
+  }
+})

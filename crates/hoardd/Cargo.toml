@@ -48,7 +48,7 @@ quick-xml = "0.41"
 flate2 = "1.1"
 infer = "0.22"
 mime_guess = "2"
-image = { version = "0.25", default-features = false, features = ["png", "jpeg", "gif", "bmp", "tga", "webp", "tiff", "hdr", "exr"] }
+image = { version = "0.25", default-features = false, features = ["png", "jpeg", "gif", "bmp", "tga", "webp", "tiff", "hdr", "exr", "ico", "qoi", "pnm"] }
 zstd = "0.14"
 # TLS, HTTP/2 and HTTP/3. All on rustls with the `ring` provider (no C toolchain needed).
 hyper = { version = "1", features = ["server", "http1", "http2"] }

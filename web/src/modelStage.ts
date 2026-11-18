@@ -89,7 +89,7 @@ type Loaded = {
 /** What the browser decodes itself; TGA has a loader of its own below. */
 const BROWSER_IMAGES = new Set(['png', 'jpg', 'jpeg', 'gif', 'webp', 'bmp', 'avif'])
 /** What the server can turn into a PNG (see IMAGE_IN in hoardd's formats.rs). */
-const SERVER_IMAGES = new Set(['tif', 'tiff', 'psd', 'psb', 'dds', 'exr', 'hdr', 'kra', 'ora', 'ktx2', 'basis'])
+const SERVER_IMAGES = new Set(['tif', 'tiff', 'psd', 'psb', 'dds', 'exr', 'hdr', 'kra', 'ora', 'ktx', 'ktx2', 'basis', 'pvr', 'vtf'])
 const IMAGE_EXTS = new Set([...BROWSER_IMAGES, ...SERVER_IMAGES, 'tga'])
 
 const BLANK_PNG =

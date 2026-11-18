@@ -84,7 +84,8 @@ impl AssetKind {
             // Images, including layered/source formats (PSD/PSB, Krita, OpenRaster, GIMP, Clip Studio, Affinity Photo).
             "png" | "jpg" | "jpeg" | "tga" | "bmp" | "gif" | "webp" | "tif" | "tiff" | "psd" | "psb" | "dds"
             | "ktx" | "ktx2" | "exr" | "hdr" | "basis" | "aseprite" | "ase" | "kra" | "ora" | "xcf" | "clip"
-            | "afphoto" | "procreate" => AssetKind::Texture,
+            | "afphoto" | "procreate" | "pvr" | "vtf" | "pcx" | "ico" | "cur" | "qoi" | "ppm" | "pgm" | "pbm"
+            | "pnm" | "pam" => AssetKind::Texture,
             // Vector art: SVG, Illustrator, Affinity Designer, EPS, dotLottie animations.
             "svg" | "svgz" | "ai" | "afdesign" | "eps" | "lottie" | "riv" => AssetKind::Vector,
             // Audio, including DAW projects (Ableton, FL Studio, Reaper, Pro Tools, Logic, Cubase, Studio One).

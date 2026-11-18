@@ -22,7 +22,8 @@ use crate::{analyze, sources};
 /// Image formats we can read pixels from.
 pub(crate) const IMAGE_IN: &[&str] = &[
     "png", "jpg", "jpeg", "gif", "bmp", "tga", "webp", "tif", "tiff", "hdr", "exr", "psd", "psb", "kra", "ora", "dds",
-    "ktx2", "basis", "svg", "svgz", "ai", "aseprite", "ase",
+    "ktx", "ktx2", "basis", "pvr", "vtf", "svg", "svgz", "ai", "aseprite", "ase", "pcx", "ico", "cur", "qoi", "ppm",
+    "pgm", "pbm", "pnm", "pam",
 ];
 /// Rendered size for vector art when no size is asked for.
 const SVG_DEFAULT: u32 = 2048;

@@ -1,6 +1,11 @@
-//! Texture formats `image` doesn't read: GPU containers (DDS, KTX2) with block-compressed data, vector art (SVG,
-//! Illustrator) and pixel-art sources (Aseprite). Each decodes to an ordinary image (mip 0 of the first layer or face) for
+//! Texture formats `image` doesn't read: GPU containers (DDS, KTX and KTX2, PVR, Valve's VTF) with
+//! block-compressed data, vector art (SVG, Illustrator), pixel-art sources (Aseprite) and old paint formats (PCX). Each decodes to an ordinary image (mip 0 of the first layer or face) for
 //! thumbnails, color analysis and "download as", plus the container's own facts.
+
+mod ktx1;
+mod pcx;
+mod pvr;
+mod vtf;
 
 use std::io::Read;
 use std::path::Path;
@@ -19,7 +24,8 @@ pub(crate) struct Decoded {
 }
 
 /// Extensions handled here.
-pub(crate) const EXTS: &[&str] = &["dds", "ktx2", "basis", "svg", "svgz", "ai", "aseprite", "ase"];
+pub(crate) const EXTS: &[&str] =
+    &["dds", "ktx", "ktx2", "basis", "pvr", "vtf", "svg", "svgz", "ai", "aseprite", "ase", "pcx", "cur"];
 
 /// Vector art: drawn at whatever size it's asked for.
 pub(crate) const VECTOR: &[&str] = &["svg", "svgz", "ai"];
@@ -27,7 +33,16 @@ pub(crate) const VECTOR: &[&str] = &["svg", "svgz", "ai"];
 pub(crate) fn decode(path: &Path, ext: &str) -> Result<Decoded> {
     match ext {
         "dds" => dds(path),
+        "ktx" => ktx1::decode(&std::fs::read(path)?),
         "ktx2" => ktx2(path),
+        "pvr" => pvr::decode(&std::fs::read(path)?),
+        "vtf" => vtf::decode(&std::fs::read(path)?),
+        "pcx" => pcx::decode(&std::fs::read(path)?),
+        // Cursors are icons with a hotspot; the image library only knows them by the icon's signature.
+        "cur" => Ok(Decoded {
+            image: image::load_from_memory_with_format(&std::fs::read(path)?, image::ImageFormat::Ico)?,
+            facts: Map::new(),
+        }),
         "basis" => basis(&std::fs::read(path)?),
         "svg" | "svgz" => svg(path, 1024),
         // Browsers can't show Illustrator files, so this drawing is their preview too.
@@ -47,12 +62,14 @@ enum Layout {
     Bc5,
     Bc6 { signed: bool },
     Bc7,
+    Etc1,
     Etc2Rgb,
     Etc2Rgba1,
     Etc2Rgba8,
     EacR,
     EacRg,
     Astc { bw: usize, bh: usize },
+    Pvrtc { two_bit: bool },
     Rgba8,
     Bgra8,
     Bgrx8,
@@ -63,6 +80,77 @@ enum Layout {
     La8,
     Rgba16F,
     Rgba32F,
+}
+
+impl Layout {
+    /// What the format is called.
+    fn name(self) -> String {
+        match self {
+            Self::Bc1 => "BC1".into(),
+            Self::Bc2 => "BC2".into(),
+            Self::Bc3 => "BC3".into(),
+            Self::Bc4 => "BC4".into(),
+            Self::Bc5 => "BC5".into(),
+            Self::Bc6 { .. } => "BC6H".into(),
+            Self::Bc7 => "BC7".into(),
+            Self::Etc1 => "ETC1".into(),
+            Self::Etc2Rgb => "ETC2".into(),
+            Self::Etc2Rgba1 => "ETC2 (1-bit alpha)".into(),
+            Self::Etc2Rgba8 => "ETC2 (alpha)".into(),
+            Self::EacR => "EAC R11".into(),
+            Self::EacRg => "EAC RG11".into(),
+            Self::Astc { bw, bh } => format!("ASTC {bw}x{bh}"),
+            Self::Pvrtc { two_bit } => format!("PVRTC {}bpp", if two_bit { 2 } else { 4 }),
+            other => format!("{other:?}").to_uppercase(),
+        }
+    }
+
+    /// Bytes of a `w` x `h` image in this layout.
+    fn bytes(self, w: usize, h: usize) -> usize {
+        let blocks = |bw: usize, bh: usize, size: usize| w.div_ceil(bw) * h.div_ceil(bh) * size;
+        match self {
+            Self::Bc1 | Self::Bc4 | Self::Etc1 | Self::Etc2Rgb | Self::Etc2Rgba1 | Self::EacR => blocks(4, 4, 8),
+            Self::Bc2 | Self::Bc3 | Self::Bc5 | Self::Bc6 { .. } | Self::Bc7 | Self::Etc2Rgba8 | Self::EacRg => {
+                blocks(4, 4, 16)
+            }
+            Self::Astc { bw, bh } => blocks(bw, bh, 16),
+            // PVRTC works on at least two blocks each way.
+            Self::Pvrtc { two_bit: true } => w.div_ceil(8).max(2) * h.div_ceil(4).max(2) * 8,
+            Self::Pvrtc { two_bit: false } => w.div_ceil(4).max(2) * h.div_ceil(4).max(2) * 8,
+            Self::R8 => w * h,
+            Self::Rg8 | Self::La8 => w * h * 2,
+            Self::Rgb8 | Self::Bgr8 => w * h * 3,
+            Self::Rgba8 | Self::Bgra8 | Self::Bgrx8 => w * h * 4,
+            Self::Rgba16F => w * h * 8,
+            Self::Rgba32F => w * h * 16,
+        }
+    }
+}
+
+/// ASTC block sizes in the order KTX's and PVR's format numbers list them.
+const ASTC_BLOCKS: [(usize, usize); 14] = [
+    (4, 4),
+    (5, 4),
+    (5, 5),
+    (6, 5),
+    (6, 6),
+    (8, 5),
+    (8, 6),
+    (8, 8),
+    (10, 5),
+    (10, 6),
+    (10, 8),
+    (10, 10),
+    (12, 10),
+    (12, 12),
+];
+
+/// Facts every GPU container gives.
+fn gpu_facts(format: impl Into<String>, mips: u32) -> Map<String, Value> {
+    let mut facts = Map::new();
+    facts.insert("gpu_format".into(), json!(format.into()));
+    facts.insert("mip_levels".into(), json!(mips.max(1)));
+    facts
 }
 
 fn check_size(w: u32, h: u32) -> Result<(usize, usize)> {
@@ -126,7 +214,10 @@ fn decode_layout(data: &[u8], w: u32, h: u32, layout: Layout) -> Result<DynamicI
         Layout::Bc6 { signed: false } => block(t::decode_bc6_unsigned)?,
         Layout::Bc6 { signed: true } => block(t::decode_bc6_signed)?,
         Layout::Bc7 => block(t::decode_bc7)?,
+        Layout::Etc1 => block(t::decode_etc1)?,
         Layout::Etc2Rgb => block(t::decode_etc2_rgb)?,
+        Layout::Pvrtc { two_bit: true } => block(t::decode_pvrtc_2bpp)?,
+        Layout::Pvrtc { two_bit: false } => block(t::decode_pvrtc_4bpp)?,
         Layout::Etc2Rgba1 => block(t::decode_etc2_rgba1)?,
         Layout::Etc2Rgba8 => block(t::decode_etc2_rgba8)?,
         Layout::EacR => block(t::decode_eacr)?,
@@ -555,7 +646,7 @@ mod tests {
     }
 
     /// One BC1 block: color0 pure red, color1 pure blue, every texel index 0 (red) except the first row (1, blue).
-    const BC1_BLOCK: [u8; 8] = [0x00, 0xF8, 0x1F, 0x00, 0b0101_0101, 0, 0, 0];
+    pub(super) const BC1_BLOCK: [u8; 8] = [0x00, 0xF8, 0x1F, 0x00, 0b0101_0101, 0, 0, 0];
 
     #[test]
     fn dds_bc1_and_raw() {

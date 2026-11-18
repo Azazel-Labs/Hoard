@@ -79,8 +79,8 @@ tile sheets that come with only a note of their grid (Kenney's `Tilesheet.txt`).
 
 ## Images: more formats
 
-Hoard previews PNG, JPEG, GIF, BMP, TGA, WebP, TIFF, HDR, EXR, PSD/PSB, Krita, OpenRaster, DDS, KTX2, Basis,
-SVG, Illustrator and Aseprite. Some formats are filed as images but get no thumbnail, and some aren't recognized at
+Hoard previews PNG, JPEG, GIF, BMP, TGA, WebP, TIFF, HDR, EXR, PSD/PSB, Krita, OpenRaster, DDS, KTX and KTX2,
+PowerVR, VTF, Basis, ICO/CUR, QOI, PNM, PCX, SVG, Illustrator and Aseprite. Some formats are filed as images but get no thumbnail, and some aren't recognized at
 all. The most common first:
 
 - [ ] **Source files with a preview inside**: Clip Studio (`.clip`, a SQLite database with a canvas preview),
@@ -90,8 +90,8 @@ all. The most common first:
   the layers itself, as it does for Krita.
 - [ ] **AVIF, HEIC and JPEG XL**: newer formats, rare in asset packs so far. JPEG XL has a pure-Rust decoder.
   AVIF and HEIC would need dav1d and libheif, or could go through ffmpeg once it's downloaded.
-- [ ] **Small ones**: ICO/CUR, QOI, PCX and PNM (`.ppm`, `.pgm`, `.pbm`), most of them a decoder switched on
-  in the image library. Also KTX 1 and PVR textures, and Valve's VTF.
+- [x] **Small ones**: ICO/CUR, QOI and PNM (`.ppm`, `.pgm`, `.pbm`) through the image library, PCX read by Hoard,
+  and KTX 1, PowerVR and Valve's VTF textures decoded like DDS.
 - [ ] Camera raw files (`.dng`, `.cr2`, `.nef`) by their embedded JPEG. These are reference photos rather than
   game art.
 

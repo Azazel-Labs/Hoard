@@ -70,6 +70,7 @@ mod projects;
 mod provenance;
 mod reformat;
 mod relocate;
+mod rive;
 mod scan;
 mod secrets;
 mod server;

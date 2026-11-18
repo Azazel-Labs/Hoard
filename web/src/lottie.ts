@@ -3,6 +3,7 @@
 // fetched from beside it in the pack. The server can't draw these, so the browser makes their thumbnails.
 import lottie, { type AnimationItem } from 'lottie-web/build/player/lottie_light_canvas'
 import { api, packFileUrl, type Asset, type ThumbUpload } from './api'
+import { coverage } from './browserThumbs'
 
 type LottieImage = { u?: string; p?: string; e?: number }
 export type LottieDoc = { assets?: LottieImage[]; [k: string]: unknown }
@@ -58,16 +59,6 @@ export function mountLottie(container: HTMLElement, doc: LottieDoc, autoplay: bo
     anim.addEventListener('data_failed', () => fail(new Error('data_failed')))
     anim.addEventListener('error', () => fail(new Error('error')))
   })
-}
-
-/** How much of the picture is drawn on, to pick a frame that shows something (many animations start empty). */
-function coverage(canvas: HTMLCanvasElement): number {
-  const ctx = canvas.getContext('2d')
-  if (!ctx || !canvas.width || !canvas.height) return 0
-  const px = ctx.getImageData(0, 0, canvas.width, canvas.height).data
-  let n = 0
-  for (let i = 3; i < px.length; i += 16) if (px[i] > 16) n++
-  return n
 }
 
 /**

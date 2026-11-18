@@ -1,11 +1,11 @@
 // Thumbnails drawn by this browser. The 3D viewer draws a model with its textures, which the server's renderer can't
 // always find or read; once it has, the picture it makes replaces the server's thumbnail. The server keeps the best
-// one it's been given: a drawing with every texture beats one with some missing, which beats its own. Lottie
+// one it's been given: a drawing with every texture beats one with some missing, which beats its own. Lottie and Rive
 // animations, which the server can't draw at all, get theirs here too.
 import { reactive } from 'vue'
 import { api, type Asset, type ThumbSource, type ThumbUpload } from './api'
 import { auth } from './auth'
-import { isLottieAsset, isModelAsset } from './viewers'
+import { isLottieAsset, isModelAsset, isRiveAsset } from './viewers'
 // Types only: three.js loads with the viewer, not with this module.
 import type { ModelStage } from './modelStage'
 
@@ -19,7 +19,17 @@ export function canDrawThumbs(): boolean {
 
 /** Whether a drawing from this browser could improve on the thumbnail the asset has. */
 export function wantsBrowserThumb(a: Asset): boolean {
-  return canDrawThumbs() && (isModelAsset(a) || isLottieAsset(a)) && a.thumb_source !== 'browser'
+  return canDrawThumbs() && (isModelAsset(a) || isLottieAsset(a) || isRiveAsset(a)) && a.thumb_source !== 'browser'
+}
+
+/** How much of a canvas is drawn on, to tell a picture from an empty frame (many animations start empty). */
+export function coverage(canvas: HTMLCanvasElement): number {
+  const ctx = canvas.getContext('2d')
+  if (!ctx || !canvas.width || !canvas.height) return 0
+  const px = ctx.getImageData(0, 0, canvas.width, canvas.height).data
+  let n = 0
+  for (let i = 3; i < px.length; i += 16) if (px[i] > 16) n++
+  return n
 }
 
 /**
@@ -98,10 +108,10 @@ export async function makePackThumbs(packId: string, packName: string): Promise<
     for (const a of models) {
       if (canceled) break
       thumbRun.current = a.name
-      if (isLottieAsset(a)) {
+      if (isLottieAsset(a) || isRiveAsset(a)) {
         try {
-          const { drawLottieThumb } = await import('./lottie')
-          if ((await drawLottieThumb(a))?.replaced) thumbRun.improved++
+          const draw = isLottieAsset(a) ? (await import('./lottie')).drawLottieThumb : (await import('./rive')).drawRiveThumb
+          if ((await draw(a))?.replaced) thumbRun.improved++
         } catch {
           thumbRun.failed++
         }

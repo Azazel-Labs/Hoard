@@ -297,6 +297,7 @@ pub(crate) fn analyze(path: &Path, root: &Path, kind: AssetKind, ext: &str) -> A
         AssetKind::Texture if crate::textures::EXTS.contains(&ext) => analyze_decoded(path, ext, &mut a),
         AssetKind::Texture => analyze_image(path, ext, &mut a),
         AssetKind::Vector if ext == "lottie" => analyze_dotlottie(path, &mut a),
+        AssetKind::Vector if ext == "riv" => analyze_rive(path, &mut a),
         AssetKind::Vector if crate::textures::VECTOR.contains(&ext) => analyze_decoded(path, ext, &mut a),
         AssetKind::Audio if crate::music::EXTS.contains(&ext) => analyze_music(path, ext, &mut a),
         AssetKind::Audio => analyze_sound(path, ext, &mut a),
@@ -833,6 +834,14 @@ fn analyze_dotlottie(path: &Path, a: &mut Analysis) -> anyhow::Result<()> {
     anyhow::ensure!(std::fs::metadata(path)?.len() <= crate::lottie::MAX_FILE, "too big to read");
     let doc = crate::lottie::from_dotlottie(&std::fs::read(path)?)?;
     let facts = crate::lottie::facts(&doc).ok_or_else(|| anyhow::anyhow!("not a Lottie animation"))?;
+    a.meta.extend(facts);
+    Ok(())
+}
+
+fn analyze_rive(path: &Path, a: &mut Analysis) -> anyhow::Result<()> {
+    let mut head = Vec::new();
+    File::open(path)?.take(crate::rive::HEAD as u64).read_to_end(&mut head)?;
+    let facts = crate::rive::facts(&head).ok_or_else(|| anyhow::anyhow!("not a Rive file"))?;
     a.meta.extend(facts);
     Ok(())
 }

@@ -72,7 +72,7 @@ tile sheets that come with only a note of their grid (Kenney's `Tilesheet.txt`).
 - [ ] **DragonBones skeletons** (`_ske.json`) played on their atlas.
 - [x] **Lottie / Bodymovin** (`.json`, `.lottie`): vector animations, common for UI. Played in the details panel
   with lottie-web, the thumbnail drawn by the browser as the 3D viewer's is.
-- [ ] **Rive** (`.riv`), played with its free web runtime.
+- [x] **Rive** (`.riv`), played with its free web runtime, served with the app; the thumbnail drawn by the browser.
 - [ ] **Spine skeletons** (`.json`, `.skel`): the atlas is read already. Playing the rig needs Spine's runtime, whose
   license only covers people who hold a Spine license, which is the open question.
 - [ ] Rarer: Spriter `.scml`, Live2D `.moc3`, GameMaker `.yy`, Defold atlases.

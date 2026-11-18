@@ -268,9 +268,9 @@ pub(crate) async fn put_thumb(
         return Err(AppError::bad_request(tr!("error-thumbnail-too-big")));
     }
     let id2 = id.clone();
-    let (kind, current, old, lottie) = db::call(&state.pool, move |c| {
+    let (kind, current, old, plays) = db::call(&state.pool, move |c| {
         Ok(c.query_row(
-            "SELECT kind, thumb_source, thumb_hash, json_extract(meta, '$.lottie') IS NOT NULL FROM assets WHERE id = ?1",
+            "SELECT kind, thumb_source, thumb_hash, (json_extract(meta, '$.lottie') IS NOT NULL OR json_extract(meta, '$.rive') IS NOT NULL) FROM assets WHERE id = ?1",
             [&id2],
             |r| {
                 Ok((
@@ -285,8 +285,8 @@ pub(crate) async fn put_thumb(
     })
     .await?
     .ok_or_else(|| AppError::not_found(tr!("error-asset-not-found", id = id)))?;
-    // Models, and Lottie animations, which only a browser draws.
-    if !matches!(kind.as_str(), "model" | "animation") && !lottie {
+    // Models, and Lottie and Rive animations, which only a browser draws.
+    if !matches!(kind.as_str(), "model" | "animation") && !plays {
         return Err(AppError::bad_request(tr!("error-thumbnail-models-only")));
     }
     if rank(current.as_deref()) > rank(Some(source)) {

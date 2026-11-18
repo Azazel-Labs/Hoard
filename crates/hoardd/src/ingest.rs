@@ -1232,6 +1232,11 @@ mod tests {
     use super::*;
 
     #[test]
+    fn ext() {
+        assert_eq!(ext_of("a/b/Thing.PNG"), "png");
+    }
+
+    #[test]
     fn lettered_variants_and_drawings_are_not_map_sets() {
         let paths = [
             "Brick Pack/PNG/Special/extra_character_a.png",

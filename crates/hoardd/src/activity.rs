@@ -1,7 +1,7 @@
 //! What the server is doing in the background, for the portal's activity indicator: running jobs (ingest, tagging,
 //! Blender and Unreal conversion, scrub), "download as" conversions, zips being streamed, and the ffmpeg download.
 //! Work registers itself and gets a handle; dropping the handle removes the entry. Queued jobs come from the job
-//! table (see `api::activity`).
+//! table (see `api::stats::activity`).
 
 use std::collections::BTreeMap;
 use std::sync::atomic::{AtomicU64, Ordering};

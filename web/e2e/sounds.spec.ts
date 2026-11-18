@@ -1,5 +1,5 @@
 import { assetsOf, uploadPack, waitReady } from './support/api'
-import { sound } from './support/files'
+import { chords, sound } from './support/files'
 import { expect, openPack, test, tile, unique } from './support/test'
 
 test('a sound’s More like this finds what sounds like it, whatever it’s called', async ({ page, api }) => {
@@ -87,6 +87,66 @@ test('a sound’s envelope, tone and pitch are measured, shown in its details an
     await expect(row('Pitch')).toHaveText(/^falls \d\.\d octaves$/)
     await tile(page, at('rain.wav').name).click()
     await expect(row('Playback')).toHaveText('Loops cleanly')
+  } finally {
+    await api.post('/api/archive', { data: { packs: [pack.id] } })
+    await api.post('/api/archive/purge', { data: { packs: [pack.id] } })
+  }
+})
+
+test('music’s tempo and key are heard, shown in its details and searched by in the sidebar', async ({ page, api }) => {
+  const name = `E2E Music ${unique()}`
+  const pack = await uploadPack(api, name, [
+    { relpath: 'loop.wav', data: chords(120, 8) },
+    { relpath: 'rain.wav', data: sound('rain', 1) },
+  ])
+  try {
+    await waitReady(api, [pack.id])
+    const assets = await assetsOf(api, pack.id)
+    const loop = assets.find((a) => a.path === 'loop.wav')!
+    const detail = async () =>
+      (await (await api.get(`/api/assets/${loop.id}`)).json()) as { meta: Record<string, unknown>; tags: { tag: string }[] }
+    await expect.poll(async () => (await detail()).meta.measured_key, { timeout: 60_000 }).toBe('A minor')
+    const d = await detail()
+    expect(d.meta).toMatchObject({ measured_bpm: 120, measured_bpm_alt: 60 })
+    expect(d.tags.map((t) => t.tag)).toEqual(expect.arrayContaining(['bpm:120', 'key:a-minor']))
+
+    // By tempo, counted either way, and by key, with the keys that mix with it or without.
+    const found = async (q: string) =>
+      ((await (await api.get(`/api/assets?pack=${pack.id}&${q}`)).json()) as { items: { path: string }[] }).items.map((a) => a.path)
+    expect(await found('bpm_min=115&bpm_max=125')).toEqual(['loop.wav'])
+    expect(await found('bpm_max=65')).toEqual(['loop.wav'])
+    expect(await found('bpm_min=130')).toEqual([])
+    expect(await found('key=8A')).toEqual(['loop.wav'])
+    expect(await found('key=C%20major&compatible_keys=true')).toEqual(['loop.wav'])
+    expect(await found('key=C%20major')).toEqual([])
+
+    await openPack(page, pack.id, name)
+    await tile(page, loop.name).click()
+    const panel = page.getByRole('complementary', { name: 'Asset details' })
+    const row = (label: string) => panel.locator('dt', { hasText: new RegExp(`^${label}$`) }).locator('xpath=following-sibling::dd[1]')
+    await expect(row('Tempo')).toHaveText('about 120 BPM (or 60), as heard')
+    await expect(row('Key')).toHaveText('A minor (8A), as heard')
+
+    // The sidebar's Music section.
+    const loopTile = tile(page, loop.name)
+    const rainTile = tile(page, assets.find((a) => a.path === 'rain.wav')!.name)
+    const from = page.getByRole('spinbutton', { name: 'BPM' })
+    await from.fill('100')
+    await from.press('Enter')
+    await expect(rainTile).toBeHidden()
+    await expect(loopTile).toBeVisible()
+    await from.fill('130')
+    await from.press('Enter')
+    await expect(loopTile).toBeHidden()
+    await from.fill('')
+    await from.press('Enter')
+    await expect(rainTile).toBeVisible()
+    await page.getByRole('combobox', { name: 'Key' }).selectOption('e-minor')
+    await expect(rainTile).toBeHidden()
+    await expect(loopTile).toBeVisible()
+    await page.getByRole('checkbox', { name: 'And keys that mix with it' }).uncheck()
+    await expect(loopTile).toBeHidden()
+    await expect(page).toHaveURL(/[?&]key=e-minor&mix=0/)
   } finally {
     await api.post('/api/archive', { data: { packs: [pack.id] } })
     await api.post('/api/archive/purge', { data: { packs: [pack.id] } })

@@ -26,8 +26,11 @@ use serde_json::{Map, Value, json};
 
 use crate::{AppState, db};
 
+/// Sounds that die away at once but are at least this long (seconds) may still be music.
+const MUSIC_HIT_SECS: f32 = 4.0;
+
 /// Bump when the features change; rows from another version are worked out again by the next sounds job.
-pub(crate) const VERSION: i64 = 2;
+pub(crate) const VERSION: i64 = 3;
 /// The assets this covers.
 pub(crate) const KINDS_SQL: &str = "a.kind = 'audio'";
 
@@ -65,8 +68,20 @@ const BASS_HZ: f32 = 200.0;
 // Analysis
 
 /// The meta keys of the measured features.
-pub(crate) const FEATURES: [&str; 7] =
-    ["attack_ms", "tail_ms", "envelope", "brightness_hz", "noisiness", "sweep_octaves", "loops_cleanly"];
+pub(crate) const FEATURES: [&str; 12] = [
+    "attack_ms",
+    "tail_ms",
+    "envelope",
+    "brightness_hz",
+    "noisiness",
+    "sweep_octaves",
+    "loops_cleanly",
+    crate::rhythm::KEYS[0],
+    crate::rhythm::KEYS[1],
+    crate::rhythm::KEYS[2],
+    crate::rhythm::KEYS[3],
+    crate::rhythm::KEYS[4],
+];
 
 /// A file's descriptor and measured features, or None if it isn't audio this can decode (or is silent). `bytes` is
 /// the whole file or its first [`MAX_BYTES`].
@@ -209,6 +224,7 @@ fn rms(x: &[f32]) -> f32 {
 /// - `noisiness`: 0 for a pure tone, near 1 for white noise.
 /// - `sweep_octaves`: how far its brightness rises (or, below zero, falls) from start to end.
 /// - `loops_cleanly`: its end runs into its start without a jump in level or a click (only known for a whole file).
+/// - The tempo and key of music (see `rhythm::KEYS`).
 fn features(mono: &[f32], x: &[f32], sr: f32, frames: &[Frame], loudest: f32, whole: bool) -> Map<String, Value> {
     let mut m = Map::new();
     let secs = x.len() as f32 / sr;
@@ -268,6 +284,11 @@ fn features(mono: &[f32], x: &[f32], sr: f32, frames: &[Frame], loudest: f32, wh
 
     if whole && mono.len() as f32 >= 0.5 * sr && loops_cleanly(mono, sr) {
         m.insert("loops_cleanly".into(), json!(true));
+    }
+    // The tempo and key of music. A short sound that dies away at once has neither; music that starts on its loudest
+    // chord can look like one, so only short ones are passed over.
+    if envelope != Some("hit") || secs >= MUSIC_HIT_SECS {
+        m.extend(crate::rhythm::measure(x, sr, whole.then(|| mono.len() as f32 / sr)));
     }
     m
 }
@@ -744,15 +765,22 @@ fn put_features(c: &rusqlite::Connection, hash: &str, features: &Map<String, Val
         })?
         .collect::<rusqlite::Result<Vec<_>>>()?;
     let measured = crate::tagger::MEASURED_SOUND_TAGS;
+    let prefixes = crate::tagger::MUSIC_TAG_PREFIXES;
     let forget = format!(
-        "DELETE FROM asset_tags WHERE asset_id = ? AND source != 'human' AND tag IN ({})",
-        measured.map(|_| "?").join(", ")
+        "DELETE FROM asset_tags WHERE asset_id = ? AND source != 'human' AND (tag IN ({}) OR {})",
+        measured.map(|_| "?").join(", "),
+        prefixes.map(|_| "substr(tag, 1, length(?)) = ?").join(" OR ")
     );
     for (id, meta) in changed {
-        c.execute(&forget, rusqlite::params_from_iter(std::iter::once(id.as_str()).chain(measured)))?;
+        let by_prefix = prefixes.iter().flat_map(|p| [*p, *p]);
+        c.execute(&forget, rusqlite::params_from_iter(std::iter::once(id.as_str()).chain(measured).chain(by_prefix)))?;
+        let looped: bool =
+            c.query_row("SELECT EXISTS (SELECT 1 FROM asset_tags WHERE asset_id = ?1 AND tag = 'loop')", [&id], |r| {
+                r.get(0)
+            })?;
         let meta: Map<String, Value> = serde_json::from_str(&meta).unwrap_or_default();
-        for (tag, source, confidence) in crate::tagger::measured_sound_tags(&meta) {
-            db::upsert_tag(c, &id, tag, source, confidence)?;
+        for (tag, source, confidence) in crate::tagger::measured_sound_tags(&meta, looped) {
+            db::upsert_tag(c, &id, &tag, source, confidence)?;
         }
         db::reindex_asset(c, &id)?;
     }
@@ -922,8 +950,9 @@ mod tests {
     #[test]
     fn measured_features() {
         let num = |m: &Map<String, Value>, k: &str| m[k].as_f64().unwrap();
-        let tags =
-            |m: &Map<String, Value>| crate::tagger::measured_sound_tags(m).into_iter().map(|t| t.0).collect::<Vec<_>>();
+        let tags = |m: &Map<String, Value>| {
+            crate::tagger::measured_sound_tags(m, false).into_iter().map(|t| t.0).collect::<Vec<_>>()
+        };
 
         // A thud: a hit that's gone in a fifth of a second, neither bright nor dark, and doesn't loop.
         let thud = f(&thud(1, 0.3, 300.0));

@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "aece80cb9cad73b6e97bc1d3df37fcea840d003fe39572dd5c55703ef6233704"
+source = "b0d7dd201105b6da38b5de865a3e77a6c2f5d5ac2b3ab437da4b9b494bf2d0f8"
 translation = "cb51eeebee58ce4e694b9c22ec1e26a19090d24e80d9b74b0e431ca3fa274b7f"
 
 [messages.account-add]
@@ -916,6 +916,30 @@ translation = "소리를 철자로 적듯이 입력하세요 (예: whooom). 모�
 source = "Import folder"
 translation = "폴더 가져오기"
 
+[messages.app-key]
+source = "Key"
+translation = "조성"
+
+[messages.app-key-any]
+source = "Any key"
+translation = "모든 조성"
+
+[messages.app-key-major]
+source = "Major"
+translation = "장조"
+
+[messages.app-key-minor]
+source = "Minor"
+translation = "단조"
+
+[messages.app-key-mix]
+source = "And keys that mix with it"
+translation = "함께 믹스할 수 있는 조성 포함"
+
+[messages.app-key-mix-title]
+source = "Its relative major or minor and the keys a fifth either side, which DJs mix with it"
+translation = "나란한조와 5도 위아래의 조성으로, DJ가 함께 믹스하는 조성입니다"
+
 [messages.app-keys-hint]
 source = "Arrow keys move, Enter opens, Space plays a sound, X or Ctrl-click selects several (long-press on touch)."
 translation = "화살표 키로 이동, Enter로 열기, Space로 사운드 재생, X 또는 Ctrl+클릭으로 여러 개 선택(터치에서는 길게 누르기)."
@@ -947,6 +971,10 @@ translation = "라이브러리"
 [messages.app-loading-more]
 source = "Loading more"
 translation = "더 불러오는 중"
+
+[messages.app-music]
+source = "Music"
+translation = "음악"
 
 [messages.app-no-filters]
 source = "No filters for this search."
@@ -1299,6 +1327,26 @@ translation = "보조 파일 포함"
 [messages.app-supporting-title]
 source = "glTF buffers, material libraries, the maps of materials, materials only one model wears and the store files describing models. They come along when you download what uses them. A sprite sheet’s pages, and its sprites the pack has as separate images too, are shown with the sheet. An asset the pack has in several formats is shown once, in the format Hoard reads best."
 translation = "glTF 버퍼, 머티리얼 라이브러리, 머티리얼의 맵, 모델 하나만 쓰는 머티리얼, 모델을 설명하는 스토어 파일입니다. 이 파일들을 사용하는 것을 다운로드하면 함께 받아집니다. 스프라이트 시트의 페이지와, 팩에 별도 이미지로도 있는 그 스프라이트는 시트와 함께 표시됩니다. 팩에 여러 형식으로 있는 에셋은 Hoard가 가장 잘 읽는 형식으로 한 번만 표시됩니다."
+
+[messages.app-tempo]
+source = "BPM"
+translation = "BPM"
+
+[messages.app-tempo-max]
+source = "to"
+translation = "최대"
+
+[messages.app-tempo-max-title]
+source = "Music at this tempo or slower, in beats a minute"
+translation = "이 템포 이하인 음악, 분당 박자 수 기준"
+
+[messages.app-tempo-min]
+source = "from"
+translation = "최소"
+
+[messages.app-tempo-min-title]
+source = "Music at this tempo or faster, in beats a minute (half or double counts too)"
+translation = "이 템포 이상인 음악, 분당 박자 수 기준 (절반이나 두 배도 포함)"
 
 [messages.app-theme]
 source = "Theme"
@@ -1987,6 +2035,18 @@ translation = "장르"
 source = "HDR (preview is tone-mapped)"
 translation = "HDR(미리보기는 톤 매핑됨)"
 
+[messages.asset-meta-key]
+source = "Key"
+translation = "조성"
+
+[messages.asset-meta-key-heard]
+source = "{ $key }, as heard"
+translation = "{ $key }, 청취 기준"
+
+[messages.asset-meta-key-value]
+source = "{ $key } ({ $camelot })"
+translation = "{ $key } ({ $camelot })"
+
 [messages.asset-meta-keywords]
 source = "Keywords"
 translation = "키워드"
@@ -2130,6 +2190,14 @@ translation = "스테레오"
 [messages.asset-meta-tempo]
 source = "Tempo"
 translation = "템포"
+
+[messages.asset-meta-tempo-heard]
+source = "about { $bpm } BPM, as heard"
+translation = "약 { $bpm } BPM, 청취 기준"
+
+[messages.asset-meta-tempo-heard-or]
+source = "about { $bpm } BPM (or { $alt }), as heard"
+translation = "약 { $bpm } BPM (또는 { $alt }), 청취 기준"
 
 [messages.asset-meta-tiling]
 source = "Tiling"
@@ -6518,6 +6586,14 @@ translation = "와이어프레임"
 [messages.model-wireframe-title]
 source = "Wireframe (W), over any view"
 translation = "와이어프레임(W), 모든 보기 위에 표시"
+
+[messages.music-key-major]
+source = "{ $note } major"
+translation = "{ $note } 장조"
+
+[messages.music-key-minor]
+source = "{ $note } minor"
+translation = "{ $note } 단조"
 
 [messages.packs-added]
 source = "Added { $date }"

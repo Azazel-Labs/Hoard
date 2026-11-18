@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "aece80cb9cad73b6e97bc1d3df37fcea840d003fe39572dd5c55703ef6233704"
+source = "b0d7dd201105b6da38b5de865a3e77a6c2f5d5ac2b3ab437da4b9b494bf2d0f8"
 translation = "07555d54b3ba6bc94b6fcbf55672d1be5e77ca134c96e30754ee929b3a902828"
 
 [messages.account-add]
@@ -916,6 +916,30 @@ translation = "พิมพ์เสียงตามที่คุณจะ�
 source = "Import folder"
 translation = "นำเข้าโฟลเดอร์"
 
+[messages.app-key]
+source = "Key"
+translation = "คีย์"
+
+[messages.app-key-any]
+source = "Any key"
+translation = "คีย์ใดก็ได้"
+
+[messages.app-key-major]
+source = "Major"
+translation = "เมเจอร์"
+
+[messages.app-key-minor]
+source = "Minor"
+translation = "ไมเนอร์"
+
+[messages.app-key-mix]
+source = "And keys that mix with it"
+translation = "และคีย์ที่มิกซ์เข้ากันได้"
+
+[messages.app-key-mix-title]
+source = "Its relative major or minor and the keys a fifth either side, which DJs mix with it"
+translation = "คีย์เมเจอร์หรือไมเนอร์สัมพันธ์ และคีย์ที่ห่างกันขั้นคู่ห้าทั้งสองด้าน ซึ่งดีเจใช้มิกซ์ด้วยกัน"
+
 [messages.app-keys-hint]
 source = "Arrow keys move, Enter opens, Space plays a sound, X or Ctrl-click selects several (long-press on touch)."
 translation = "ปุ่มลูกศรเพื่อเลื่อน Enter เพื่อเปิด Space เพื่อเล่นเสียง X หรือ Ctrl-คลิกเพื่อเลือกหลายรายการ (กดค้างบนจอสัมผัส)"
@@ -947,6 +971,10 @@ translation = "คลัง"
 [messages.app-loading-more]
 source = "Loading more"
 translation = "กำลังโหลดเพิ่ม"
+
+[messages.app-music]
+source = "Music"
+translation = "เพลง"
 
 [messages.app-no-filters]
 source = "No filters for this search."
@@ -1299,6 +1327,26 @@ translation = "รวมไฟล์ประกอบด้วย"
 [messages.app-supporting-title]
 source = "glTF buffers, material libraries, the maps of materials, materials only one model wears and the store files describing models. They come along when you download what uses them. A sprite sheet’s pages, and its sprites the pack has as separate images too, are shown with the sheet. An asset the pack has in several formats is shown once, in the format Hoard reads best."
 translation = "บัฟเฟอร์ glTF, ไลบรารีแมทีเรียล, แมปของแมทีเรียล, แมทีเรียลที่มีโมเดลเดียวใช้ และไฟล์ร้านค้าที่อธิบายโมเดล ไฟล์เหล่านี้จะมาด้วยเมื่อคุณดาวน์โหลดสิ่งที่ใช้ไฟล์เหล่านี้ หน้าของสไปรต์ชีต และสไปรต์ของชีตที่แพ็กมีเป็นภาพแยกด้วย จะแสดงร่วมกับชีต แอสเซ็ตที่แพ็กมีหลายรูปแบบจะแสดงครั้งเดียว ในรูปแบบที่ Hoard อ่านได้ดีที่สุด"
+
+[messages.app-tempo]
+source = "BPM"
+translation = "BPM"
+
+[messages.app-tempo-max]
+source = "to"
+translation = "ถึง"
+
+[messages.app-tempo-max-title]
+source = "Music at this tempo or slower, in beats a minute"
+translation = "เพลงที่มีจังหวะเท่านี้หรือช้ากว่า เป็นจำนวนบีตต่อนาที"
+
+[messages.app-tempo-min]
+source = "from"
+translation = "จาก"
+
+[messages.app-tempo-min-title]
+source = "Music at this tempo or faster, in beats a minute (half or double counts too)"
+translation = "เพลงที่มีจังหวะเท่านี้หรือเร็วกว่า เป็นจำนวนบีตต่อนาที (นับครึ่งหรือสองเท่าด้วย)"
 
 [messages.app-theme]
 source = "Theme"
@@ -1990,6 +2038,18 @@ translation = "แนว"
 source = "HDR (preview is tone-mapped)"
 translation = "HDR (ตัวอย่างผ่านการปรับโทน)"
 
+[messages.asset-meta-key]
+source = "Key"
+translation = "คีย์"
+
+[messages.asset-meta-key-heard]
+source = "{ $key }, as heard"
+translation = "{ $key } จากการฟัง"
+
+[messages.asset-meta-key-value]
+source = "{ $key } ({ $camelot })"
+translation = "{ $key } ({ $camelot })"
+
 [messages.asset-meta-keywords]
 source = "Keywords"
 translation = "คำสำคัญ"
@@ -2136,6 +2196,14 @@ translation = "สเตอริโอ"
 [messages.asset-meta-tempo]
 source = "Tempo"
 translation = "จังหวะ"
+
+[messages.asset-meta-tempo-heard]
+source = "about { $bpm } BPM, as heard"
+translation = "ประมาณ { $bpm } BPM จากการฟัง"
+
+[messages.asset-meta-tempo-heard-or]
+source = "about { $bpm } BPM (or { $alt }), as heard"
+translation = "ประมาณ { $bpm } BPM (หรือ { $alt }) จากการฟัง"
 
 [messages.asset-meta-tiling]
 source = "Tiling"
@@ -6527,6 +6595,14 @@ translation = "โครงลวด"
 [messages.model-wireframe-title]
 source = "Wireframe (W), over any view"
 translation = "โครงลวด (W) ซ้อนบนมุมมองใดก็ได้"
+
+[messages.music-key-major]
+source = "{ $note } major"
+translation = "{ $note } เมเจอร์"
+
+[messages.music-key-minor]
+source = "{ $note } minor"
+translation = "{ $note } ไมเนอร์"
 
 [messages.packs-added]
 source = "Added { $date }"

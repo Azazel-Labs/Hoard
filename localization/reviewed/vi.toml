@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "aece80cb9cad73b6e97bc1d3df37fcea840d003fe39572dd5c55703ef6233704"
+source = "b0d7dd201105b6da38b5de865a3e77a6c2f5d5ac2b3ab437da4b9b494bf2d0f8"
 translation = "42d6d2350a51c56e55a07a75988a6748d9e232912ffffb903defbf54bfd56e2e"
 
 [messages.account-add]
@@ -919,6 +919,30 @@ translation = "Viết tiếng động theo cách bạn đánh vần: âm thanh g
 source = "Import folder"
 translation = "Nhập thư mục"
 
+[messages.app-key]
+source = "Key"
+translation = "Giọng"
+
+[messages.app-key-any]
+source = "Any key"
+translation = "Giọng bất kỳ"
+
+[messages.app-key-major]
+source = "Major"
+translation = "Trưởng"
+
+[messages.app-key-minor]
+source = "Minor"
+translation = "Thứ"
+
+[messages.app-key-mix]
+source = "And keys that mix with it"
+translation = "Và các giọng phối trộn được với nó"
+
+[messages.app-key-mix-title]
+source = "Its relative major or minor and the keys a fifth either side, which DJs mix with it"
+translation = "Giọng trưởng hoặc thứ song song của nó và các giọng cách một quãng năm ở hai bên, mà DJ thường trộn cùng"
+
 [messages.app-keys-hint]
 source = "Arrow keys move, Enter opens, Space plays a sound, X or Ctrl-click selects several (long-press on touch)."
 translation = "Phím mũi tên để di chuyển, Enter để mở, Space để phát âm thanh, X hoặc Ctrl-nhấp để chọn nhiều (nhấn giữ trên màn hình cảm ứng)."
@@ -950,6 +974,10 @@ translation = "Thư viện"
 [messages.app-loading-more]
 source = "Loading more"
 translation = "Đang tải thêm"
+
+[messages.app-music]
+source = "Music"
+translation = "Nhạc"
 
 [messages.app-no-filters]
 source = "No filters for this search."
@@ -1302,6 +1330,26 @@ translation = "Đang bao gồm tệp hỗ trợ"
 [messages.app-supporting-title]
 source = "glTF buffers, material libraries, the maps of materials, materials only one model wears and the store files describing models. They come along when you download what uses them. A sprite sheet’s pages, and its sprites the pack has as separate images too, are shown with the sheet. An asset the pack has in several formats is shown once, in the format Hoard reads best."
 translation = "Buffer glTF, thư viện vật liệu, các map của vật liệu, vật liệu chỉ một mô hình dùng và tệp cửa hàng mô tả mô hình. Chúng được tải kèm khi bạn tải xuống thứ dùng đến chúng. Các trang của một sprite sheet, và các sprite của nó mà gói cũng có dưới dạng ảnh riêng, được hiển thị cùng sheet. Một tài nguyên mà gói có ở nhiều định dạng được hiển thị một lần, ở định dạng Hoard đọc tốt nhất."
+
+[messages.app-tempo]
+source = "BPM"
+translation = "BPM"
+
+[messages.app-tempo-max]
+source = "to"
+translation = "đến"
+
+[messages.app-tempo-max-title]
+source = "Music at this tempo or slower, in beats a minute"
+translation = "Nhạc có nhịp độ này hoặc chậm hơn, tính theo phách mỗi phút"
+
+[messages.app-tempo-min]
+source = "from"
+translation = "từ"
+
+[messages.app-tempo-min-title]
+source = "Music at this tempo or faster, in beats a minute (half or double counts too)"
+translation = "Nhạc có nhịp độ này hoặc nhanh hơn, tính theo phách mỗi phút (tính cả nửa hoặc gấp đôi)"
 
 [messages.app-theme]
 source = "Theme"
@@ -1990,6 +2038,18 @@ translation = "Thể loại"
 source = "HDR (preview is tone-mapped)"
 translation = "HDR (bản xem trước đã được tone-map)"
 
+[messages.asset-meta-key]
+source = "Key"
+translation = "Giọng"
+
+[messages.asset-meta-key-heard]
+source = "{ $key }, as heard"
+translation = "{ $key }, đo khi nghe"
+
+[messages.asset-meta-key-value]
+source = "{ $key } ({ $camelot })"
+translation = "{ $key } ({ $camelot })"
+
 [messages.asset-meta-keywords]
 source = "Keywords"
 translation = "Từ khóa"
@@ -2133,6 +2193,14 @@ translation = "Stereo"
 [messages.asset-meta-tempo]
 source = "Tempo"
 translation = "Nhịp độ"
+
+[messages.asset-meta-tempo-heard]
+source = "about { $bpm } BPM, as heard"
+translation = "khoảng { $bpm } BPM, đo khi nghe"
+
+[messages.asset-meta-tempo-heard-or]
+source = "about { $bpm } BPM (or { $alt }), as heard"
+translation = "khoảng { $bpm } BPM (hoặc { $alt }), đo khi nghe"
 
 [messages.asset-meta-tiling]
 source = "Tiling"
@@ -6524,6 +6592,14 @@ translation = "Khung dây"
 [messages.model-wireframe-title]
 source = "Wireframe (W), over any view"
 translation = "Khung dây (W), chồng lên mọi chế độ xem"
+
+[messages.music-key-major]
+source = "{ $note } major"
+translation = "{ $note } trưởng"
+
+[messages.music-key-minor]
+source = "{ $note } minor"
+translation = "{ $note } thứ"
 
 [messages.packs-added]
 source = "Added { $date }"

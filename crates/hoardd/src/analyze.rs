@@ -421,6 +421,20 @@ fn analyze_music(path: &Path, ext: &str, a: &mut Analysis) -> anyhow::Result<()>
         a.title = facts.get("title").and_then(Value::as_str).map(str::to_owned);
     }
     a.meta.extend(facts);
+    // A tracker module's or chiptune's tempo and key, by ear (a MIDI file's come from its notes): the first half
+    // minute of it, as heard.
+    if !crate::instruments::EXTS.contains(&ext) && !matches!(ext, "mid" | "midi") {
+        let c = usize::from(audio.channels.max(1));
+        let scale = 1.0 / (1u32 << (audio.bits.clamp(8, 32) - 1)) as f32;
+        let mono: Vec<f32> = audio
+            .samples
+            .chunks_exact(c)
+            .take(30 * audio.rate as usize)
+            .map(|f| f.iter().map(|&s| s as f32 * scale).sum::<f32>() / c as f32)
+            .collect();
+        let heard = crate::sounds::listen(&mono, audio.rate).unwrap_or_default();
+        a.meta.extend(heard.into_iter().filter(|(k, _)| crate::rhythm::KEYS.contains(&k.as_str())));
+    }
     let dir = tempfile::tempdir()?;
     let wav = dir.path().join("render.wav");
     std::fs::write(&wav, crate::audio::write_wav(&audio))?;
@@ -1036,6 +1050,19 @@ fn analyze_audio(path: &Path, ext: &str, a: &mut Analysis) -> anyhow::Result<()>
             if let Some(v) = v.filter(|v| !v.trim().is_empty()) {
                 meta.insert(k.into(), json!(v.trim()));
             }
+        }
+        // The tempo and key a music file states (ID3's TBPM and TKEY, and the like), unless a WAV's ACID chunk did.
+        let bpm = [ItemKey::Bpm, ItemKey::IntegerBpm]
+            .into_iter()
+            .filter_map(|k| tag.get_string(k)?.trim().parse::<f64>().ok())
+            .find(|b| (20.0..=400.0).contains(b));
+        if let Some(bpm) = bpm
+            && !meta.contains_key("tempo_bpm")
+        {
+            meta.insert("tempo_bpm".into(), json!((bpm * 10.0).round() / 10.0));
+        }
+        if let Some(key) = tag.get_string(ItemKey::InitialKey).and_then(crate::rhythm::Key::parse) {
+            meta.insert("key".into(), json!(key.name()));
         }
     }
     if a.title.is_none() {

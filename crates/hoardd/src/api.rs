@@ -688,6 +688,17 @@ struct AssetsParams {
     /// Only the favorites of whoever asks.
     #[serde(default)]
     favorites: Option<bool>,
+    /// Music at this tempo or faster, or slower (BPM).
+    #[serde(default)]
+    bpm_min: Option<f32>,
+    #[serde(default)]
+    bpm_max: Option<f32>,
+    /// Music in this key (`a-minor`, `Am`, `8A`).
+    #[serde(default)]
+    key: Option<String>,
+    /// With `key`: the keys that mix with it too.
+    #[serde(default)]
+    compatible_keys: Option<bool>,
 }
 
 impl From<AssetsParams> for SearchQuery {
@@ -709,6 +720,10 @@ impl From<AssetsParams> for SearchQuery {
             similar: p.similar,
             color: p.color,
             imitation: p.imitation,
+            bpm_min: p.bpm_min,
+            bpm_max: p.bpm_max,
+            key: p.key,
+            compatible_keys: p.compatible_keys.unwrap_or(false),
             favorites_of: None,
         }
     }

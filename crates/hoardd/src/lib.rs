@@ -76,6 +76,7 @@ mod projects;
 mod provenance;
 mod reformat;
 mod relocate;
+mod rhythm;
 mod rive;
 mod scan;
 mod secrets;

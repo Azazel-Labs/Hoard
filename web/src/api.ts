@@ -983,6 +983,12 @@ export interface SearchParams {
   color?: string
   /** A word imitating a sound (`whooom`): sounds shaped like it, most alike first. */
   imitation?: string
+  /** Music at this tempo (BPM) or faster, or slower. */
+  bpm_min?: number
+  bpm_max?: number
+  /** Music in this key (`a-minor`), and with `compatible_keys` the keys that mix with it. */
+  key?: string
+  compatible_keys?: boolean
   /** Only the favorites of whoever's signed in. */
   favorites?: boolean
 }
@@ -1141,6 +1147,10 @@ export const api = {
     if (p.similar) qs.set('similar', p.similar)
     if (p.color) qs.set('color', p.color)
     if (p.imitation) qs.set('imitation', p.imitation)
+    if (p.bpm_min !== undefined) qs.set('bpm_min', String(p.bpm_min))
+    if (p.bpm_max !== undefined) qs.set('bpm_max', String(p.bpm_max))
+    if (p.key) qs.set('key', p.key)
+    if (p.compatible_keys) qs.set('compatible_keys', 'true')
     if (p.favorites) qs.set('favorites', 'true')
     return request<SearchResult>(`/api/assets?${qs}`).then((r) => ({ ...r, items: r.items.map(normalize) }))
   },

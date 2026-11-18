@@ -518,6 +518,18 @@ app-color-swatch = { $color }: assets with much { $lower } in them
 app-color-any = Any color
 app-color-pick = Pick any color
 app-color = Color
+app-music = Music
+app-tempo = BPM
+app-tempo-min = from
+app-tempo-max = to
+app-tempo-min-title = Music at this tempo or faster, in beats a minute (half or double counts too)
+app-tempo-max-title = Music at this tempo or slower, in beats a minute
+app-key = Key
+app-key-any = Any key
+app-key-major = Major
+app-key-minor = Minor
+app-key-mix = And keys that mix with it
+app-key-mix-title = Its relative major or minor and the keys a fifth either side, which DJs mix with it
 # The sidebar box for finding sounds by a word that imitates them ("whooom", "pew").
 app-imitation = Sounds like
 # Examples of imitation words; the reading is of English-style spelling, so keep them as they are.
@@ -1537,6 +1549,15 @@ asset-meta-pitch-falls =
 # Under Playback: the file's end runs into its start without a click, so it can be played in a loop.
 asset-meta-loops-cleanly = Loops cleanly
 asset-meta-tempo = Tempo
+asset-meta-tempo-heard = about { $bpm } BPM, as heard
+asset-meta-tempo-heard-or = about { $bpm } BPM (or { $alt }), as heard
+asset-meta-key = Key
+# A key and its place on the Camelot wheel, as DJs write keys: "A minor (8A)".
+asset-meta-key-value = { $key } ({ $camelot })
+asset-meta-key-heard = { $key }, as heard
+# A musical key: "E♭ major", "F♯ minor". The note is a letter name with ♭ or ♯.
+music-key-major = { $note } major
+music-key-minor = { $note } minor
 asset-meta-root-note = Root note
 asset-meta-cue-markers = Cue markers
 asset-meta-library = Library

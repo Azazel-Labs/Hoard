@@ -830,11 +830,17 @@ pub(crate) const MEASURED_SOUND_TAGS: [&str; 9] = [
     "pitch:falling",
 ];
 
+/// The kinds of tag a sound's tempo and key bring (`bpm:120`, `key:a-minor`, `bars:8`), whether the file states them
+/// or they were measured.
+pub(crate) const MUSIC_TAG_PREFIXES: [&str; 3] = ["bpm:", "key:", "bars:"];
+
 /// The tags a sound's measured features bring: its envelope, whether it's bright or dark, noisy or tonal, whether its
-/// pitch rises or falls by an octave or more, and `loop` (a guess) when it loops cleanly.
+/// pitch rises or falls by an octave or more, `loop` (a guess) when it loops cleanly, and its tempo, key and length
+/// in bars (see [`music_tags_of`]). `looped`: it's tagged a loop.
 pub(crate) fn measured_sound_tags(
     meta: &serde_json::Map<String, serde_json::Value>,
-) -> Vec<(&'static str, TagSource, f32)> {
+    looped: bool,
+) -> Vec<(String, TagSource, f32)> {
     let num = |k: &str| meta.get(k).and_then(serde_json::Value::as_f64);
     let mut out = Vec::new();
     match meta.get("envelope").and_then(|v| v.as_str()) {
@@ -858,9 +864,49 @@ pub(crate) fn measured_sound_tags(
         Some(o) if o <= -1.0 => out.push("pitch:falling"),
         _ => {}
     }
-    let mut out: Vec<_> = out.into_iter().map(|t| (t, TagSource::Meta, 1.0)).collect();
-    if meta.get("loops_cleanly").and_then(serde_json::Value::as_bool) == Some(true) {
-        out.push(("loop", TagSource::Rule, 0.6));
+    let mut out: Vec<_> = out.into_iter().map(|t| (t.to_owned(), TagSource::Meta, 1.0)).collect();
+    let loops_cleanly = meta.get("loops_cleanly").and_then(serde_json::Value::as_bool) == Some(true);
+    if loops_cleanly {
+        out.push(("loop".to_owned(), TagSource::Rule, 0.6));
+    }
+    out.extend(music_tags_of(meta, looped || loops_cleanly));
+    out
+}
+
+/// The tempo (`bpm:120`) and key (`key:a-minor`) a sound's file states, or else those measured of it (unless it's a
+/// one-shot), and how many bars long a loop is at that tempo, in 4/4 (`bars:8`), when that comes out whole.
+fn music_tags_of(meta: &serde_json::Map<String, serde_json::Value>, looped: bool) -> Vec<(String, TagSource, f32)> {
+    use serde_json::Value;
+    let num = |k: &str| meta.get(k).and_then(Value::as_f64);
+    let one_shot = meta.get("one_shot").and_then(Value::as_bool) == Some(true);
+    // A guess is as sure as the measuring was.
+    let guessed = |k: &str| (TagSource::Rule, 0.5 + 0.4 * num(k).unwrap_or(0.0).clamp(0.0, 1.0) as f32);
+    let mut out = Vec::new();
+    let tempo = match (num("tempo_bpm"), num("measured_bpm")) {
+        (Some(bpm), _) => Some((bpm, (TagSource::Meta, 1.0))),
+        (None, Some(bpm)) if !one_shot => Some((bpm, guessed("measured_bpm_confidence"))),
+        _ => None,
+    };
+    if let Some((bpm, (source, confidence))) = tempo.filter(|(bpm, _)| *bpm > 0.0) {
+        out.push((format!("bpm:{}", bpm.round() as u32), source, confidence));
+        let looped =
+            looped || meta.contains_key("loop_start") || meta.get("one_shot").and_then(Value::as_bool) == Some(false);
+        if let Some(secs) = num("duration_secs").filter(|_| looped) {
+            let bars = secs * bpm / 240.0;
+            if (0.95..=256.0).contains(&bars) && (bars - bars.round()).abs() <= 0.05 {
+                out.push((format!("bars:{}", bars.round() as u32), source, confidence));
+            }
+        }
+    }
+    let stated = meta.get("key").and_then(Value::as_str).and_then(crate::rhythm::Key::parse);
+    let heard = meta.get("measured_key").and_then(Value::as_str).and_then(crate::rhythm::Key::parse);
+    match (stated, heard) {
+        (Some(k), _) => out.push((k.tag(), TagSource::Meta, 1.0)),
+        (None, Some(k)) if !one_shot => {
+            let (source, confidence) = guessed("measured_key_confidence");
+            out.push((k.tag(), source, confidence));
+        }
+        _ => {}
     }
     out
 }
@@ -915,9 +961,6 @@ pub(crate) fn meta_tags(
             if meta.get("one_shot").and_then(serde_json::Value::as_bool) == Some(true) {
                 tags.add("one-shot", TagSource::Meta, 1.0);
             }
-            if let Some(bpm) = num("tempo_bpm") {
-                tags.add(&format!("bpm:{}", bpm.round() as u32), TagSource::Meta, 1.0);
-            }
             if let Some(k) = meta.get("root_note").and_then(|v| v.as_str()) {
                 tags.add(&format!("root:{k}"), TagSource::Meta, 1.0);
             }
@@ -942,8 +985,8 @@ pub(crate) fn meta_tags(
             if meta.get("clipped").and_then(serde_json::Value::as_bool) == Some(true) {
                 tags.add("clipped", TagSource::Meta, 1.0);
             }
-            for (tag, source, confidence) in measured_sound_tags(meta) {
-                tags.add(tag, source, confidence);
+            for (tag, source, confidence) in measured_sound_tags(meta, tags.has("loop")) {
+                tags.add(&tag, source, confidence);
             }
             ucs_from_rules(tags);
         }

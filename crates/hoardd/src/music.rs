@@ -303,6 +303,7 @@ fn read_midi(data: &[u8]) -> Result<(Vec<Note>, Map<String, Value>, f64)> {
     let mut programs = [0u8; 16];
     let mut used_programs = std::collections::BTreeSet::new();
     let (mut names, mut first_tempo, mut time_sig, mut drums_used) = (Vec::new(), None, None, false);
+    let mut signature = None;
     for (tick, _, kind) in events {
         secs += tick_secs(tempo_us, tick - last_tick);
         last_tick = tick;
@@ -319,6 +320,9 @@ fn read_midi(data: &[u8]) -> Result<(Vec<Note>, Map<String, Value>, f64)> {
             }
             TrackEventKind::Meta(MetaMessage::TimeSignature(num, den, _, _)) => {
                 time_sig.get_or_insert(format!("{num}/{}", 1u32 << den.min(6)));
+            }
+            TrackEventKind::Meta(MetaMessage::KeySignature(sharps, minor)) => {
+                signature.get_or_insert(crate::rhythm::Key::from_signature(sharps, minor));
             }
             TrackEventKind::Midi { channel, message } => {
                 let ch = channel.as_int();
@@ -367,6 +371,7 @@ fn read_midi(data: &[u8]) -> Result<(Vec<Note>, Map<String, Value>, f64)> {
     if let Some(ts) = time_sig {
         facts.insert("time_signature".into(), json!(ts));
     }
+    facts.extend(key_of(&notes, signature));
     if !names.is_empty() {
         facts.insert("track_names".into(), json!(names));
         facts.insert("title".into(), json!(names[0]));
@@ -378,6 +383,25 @@ fn read_midi(data: &[u8]) -> Result<(Vec<Note>, Map<String, Value>, f64)> {
     }
     facts.insert("notes".into(), json!(notes.len()));
     Ok((notes, facts, secs))
+}
+
+/// The key of a song's notes: how long each of the 12 is held (drums aside), against every key's profile. A key
+/// signature the file has is its key when it fits about as well as the best, since sequencers often put C major in
+/// whatever the song is; otherwise the best fit is a guess, with how well it fits.
+fn key_of(notes: &[Note], signature: Option<crate::rhythm::Key>) -> Map<String, Value> {
+    let mut held = [0f32; 12];
+    for n in notes.iter().filter(|n| !n.drums) {
+        held[usize::from(n.key % 12)] += (n.end - n.start).max(0.0) as f32;
+    }
+    let mut m = Map::new();
+    let Some((best, fit)) = crate::rhythm::Key::fit(&held) else { return m };
+    if let Some(stated) = signature.filter(|k| k.fits(&held) >= fit - 0.05) {
+        m.insert("key".into(), json!(stated.name()));
+    } else if fit >= 0.6 {
+        m.insert("measured_key".into(), json!(best.name()));
+        m.insert("measured_key_confidence".into(), json!((f64::from(fit) * 100.0).round() / 100.0));
+    }
+    m
 }
 
 fn midi(data: &[u8], path: &Path, max_secs: f32) -> Result<Rendered> {
@@ -559,6 +583,46 @@ pub(crate) mod tests {
         let audio = builtin_synth(&notes, 44_100 * 2);
         let loud = audio.iter().filter(|s| s.abs() > 0.01).count();
         assert!(loud > 44_100, "the notes sound: {loud}");
+    }
+
+    #[test]
+    fn the_key_of_a_song() {
+        use crate::rhythm::Key;
+        // An A minor tune: A C E, then D F A, then E G♯ B, with drums on every note, which don't count.
+        let notes: Vec<Note> = [[57, 60, 64], [62, 65, 69], [64, 68, 71], [57, 60, 64]]
+            .iter()
+            .enumerate()
+            .flat_map(|(i, chord)| {
+                let start = i as f64;
+                let tones = chord.iter().map(move |&key| Note {
+                    start,
+                    end: start + 1.0,
+                    key,
+                    velocity: 90,
+                    program: 0,
+                    drums: false,
+                });
+                tones.chain(std::iter::once(Note {
+                    start,
+                    end: start + 1.0,
+                    key: 42,
+                    velocity: 90,
+                    program: 0,
+                    drums: true,
+                }))
+            })
+            .collect();
+        let heard = key_of(&notes, None);
+        assert_eq!(heard["measured_key"], "A minor");
+        assert!(heard["measured_key_confidence"].as_f64().unwrap() >= 0.6);
+        // Its key signature (no sharps, minor) is its key.
+        assert_eq!(key_of(&notes, Key::parse("Am"))["key"], "A minor");
+        // A signature that doesn't fit it at all is a sequencer's default, and what was heard wins.
+        let far = key_of(&notes, Key::parse("F#"));
+        assert!(!far.contains_key("key"));
+        assert_eq!(far["measured_key"], "A minor");
+        // Drums alone have no key.
+        assert!(key_of(&notes.into_iter().filter(|n| n.drums).collect::<Vec<_>>(), None).is_empty());
     }
 
     #[test]

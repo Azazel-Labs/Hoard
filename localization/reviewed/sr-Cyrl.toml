@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "aece80cb9cad73b6e97bc1d3df37fcea840d003fe39572dd5c55703ef6233704"
+source = "b0d7dd201105b6da38b5de865a3e77a6c2f5d5ac2b3ab437da4b9b494bf2d0f8"
 translation = "c2a4a8051502263df10866a7bb372ad5cdada115fb8d6449130cdd2d1752dd61"
 
 [messages.account-add]
@@ -946,6 +946,30 @@ translation = "Напишите звук онако како бисте га с�
 source = "Import folder"
 translation = "Увези фасциклу"
 
+[messages.app-key]
+source = "Key"
+translation = "Тоналитет"
+
+[messages.app-key-any]
+source = "Any key"
+translation = "Било који тоналитет"
+
+[messages.app-key-major]
+source = "Major"
+translation = "Дур"
+
+[messages.app-key-minor]
+source = "Minor"
+translation = "Мол"
+
+[messages.app-key-mix]
+source = "And keys that mix with it"
+translation = "И тоналитети који се с њим мешају"
+
+[messages.app-key-mix-title]
+source = "Its relative major or minor and the keys a fifth either side, which DJs mix with it"
+translation = "Његов паралелни дур или мол и тоналитети квинту изнад и испод, које диџеји мешају с њим"
+
 [messages.app-keys-hint]
 source = "Arrow keys move, Enter opens, Space plays a sound, X or Ctrl-click selects several (long-press on touch)."
 translation = "Стрелице померају, Enter отвара, Space пушта звук, X или Ctrl-клик бира више (дуг притисак на екрану осетљивом на додир)."
@@ -977,6 +1001,10 @@ translation = "Библиотека"
 [messages.app-loading-more]
 source = "Loading more"
 translation = "Учитавање још"
+
+[messages.app-music]
+source = "Music"
+translation = "Музика"
 
 [messages.app-no-filters]
 source = "No filters for this search."
@@ -1339,6 +1367,26 @@ translation = "Укључујући пратеће датотеке"
 [messages.app-supporting-title]
 source = "glTF buffers, material libraries, the maps of materials, materials only one model wears and the store files describing models. They come along when you download what uses them. A sprite sheet’s pages, and its sprites the pack has as separate images too, are shown with the sheet. An asset the pack has in several formats is shown once, in the format Hoard reads best."
 translation = "glTF бафери, библиотеке материјала, мапе материјала, материјали које носи само један модел и датотеке продавница које описују моделе. Долазе уз оно што их користи када то преузмете. Странице листа спрајтова, и његови спрајтови које пакет има и као засебне слике, приказују се уз лист. Ресурс који пакет има у више формата приказује се једном, у формату који Hoard најбоље чита."
+
+[messages.app-tempo]
+source = "BPM"
+translation = "BPM"
+
+[messages.app-tempo-max]
+source = "to"
+translation = "до"
+
+[messages.app-tempo-max-title]
+source = "Music at this tempo or slower, in beats a minute"
+translation = "Музика у овом темпу или спорија, у ударцима у минути"
+
+[messages.app-tempo-min]
+source = "from"
+translation = "од"
+
+[messages.app-tempo-min-title]
+source = "Music at this tempo or faster, in beats a minute (half or double counts too)"
+translation = "Музика у овом темпу или бржа, у ударцима у минути (рачуна се и упола спорији или дупло бржи темпо)"
 
 [messages.app-theme]
 source = "Theme"
@@ -2071,6 +2119,18 @@ translation = "Жанр"
 source = "HDR (preview is tone-mapped)"
 translation = "HDR (преглед је тонски мапиран)"
 
+[messages.asset-meta-key]
+source = "Key"
+translation = "Тоналитет"
+
+[messages.asset-meta-key-heard]
+source = "{ $key }, as heard"
+translation = "{ $key }, по слуху"
+
+[messages.asset-meta-key-value]
+source = "{ $key } ({ $camelot })"
+translation = "{ $key } ({ $camelot })"
+
 [messages.asset-meta-keywords]
 source = "Keywords"
 translation = "Кључне речи"
@@ -2229,6 +2289,14 @@ translation = "Стерео"
 [messages.asset-meta-tempo]
 source = "Tempo"
 translation = "Темпо"
+
+[messages.asset-meta-tempo-heard]
+source = "about { $bpm } BPM, as heard"
+translation = "око { $bpm } BPM, по слуху"
+
+[messages.asset-meta-tempo-heard-or]
+source = "about { $bpm } BPM (or { $alt }), as heard"
+translation = "око { $bpm } BPM (или { $alt }), по слуху"
 
 [messages.asset-meta-tiling]
 source = "Tiling"
@@ -6710,6 +6778,14 @@ translation = "Жичани модел"
 [messages.model-wireframe-title]
 source = "Wireframe (W), over any view"
 translation = "Жичани модел (W), преко било ког приказа"
+
+[messages.music-key-major]
+source = "{ $note } major"
+translation = "{ $note }-дур"
+
+[messages.music-key-minor]
+source = "{ $note } minor"
+translation = "{ $note }-мол"
 
 [messages.packs-added]
 source = "Added { $date }"

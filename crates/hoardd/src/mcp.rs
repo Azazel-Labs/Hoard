@@ -373,7 +373,7 @@ fn search_tools() -> Value {
         {
             "name": "search_sounds",
             "title": "Find sounds by what they sound like",
-            "description": "Sounds ranked by how well what Hoard measured of them (how long, how sharply they start, whether they ring on or cut off, how bright and noisy, whether the pitch rises or falls, how loud) fits a word imitating them ('WHOOOM', 'pew', 'krssh'), a shape you describe, or both. Hoard reads the word itself and returns its reading as `reading`; any part of `shape` you give replaces that part of the reading, so give both when you know more than the spelling says (imitation 'whooom' with shape {seconds: 1.5, pitch: 'rising'} for a swelling whoosh). `query` and `tags` are words the sound's name, path or tags must have ('sci-fi', 'impact'): keep them few, or leave them out to search by sound alone. Each sound comes with what was measured, the same in words, and a link to listen to it.",
+            "description": "Sounds ranked by how well what Hoard measured of them (how long, how sharply they start, whether they ring on or cut off, how bright and noisy, whether the pitch rises or falls, how loud) fits a word imitating them ('WHOOOM', 'pew', 'krssh'), a shape you describe, or both. Hoard reads the word itself and returns its reading as `reading`; any part of `shape` you give replaces that part of the reading, so give both when you know more than the spelling says (imitation 'whooom' with shape {seconds: 1.5, pitch: 'rising'} for a swelling whoosh). `query` and `tags` are words the sound's name, path or tags must have ('sci-fi', 'impact'): keep them few, or leave them out to search by sound alone. `bpm_min`, `bpm_max` and `key` find music and loops by tempo and key. Each sound comes with what was measured, the same in words, and a link to listen to it.",
             "inputSchema": {
                 "type": "object",
                 "properties": {
@@ -393,6 +393,10 @@ fn search_tools() -> Value {
                     },
                     "query": { "type": "string", "description": "Optional words the sounds must also have. Given alone, with sound search on (an admin setting), it's also a description of the sound ('distant thunder roll', 'glassy UI blip'), matching sounds that sound like it whatever they're called." },
                     "tags": { "type": "array", "items": { "type": "string" }, "description": "All must match, e.g. ['sfx']." },
+                    "bpm_min": { "type": "number", "description": "Music and loops at this tempo or faster, as the file states it or as Hoard heard it (half or double counts too)." },
+                    "bpm_max": { "type": "number", "description": "Music and loops at this tempo or slower." },
+                    "key": { "type": "string", "description": "Music in this key: 'A minor', 'Am', 'F# major', 'E♭ major' or Camelot '8A'." },
+                    "compatible_keys": { "type": "boolean", "default": false, "description": "With `key`: also the keys that mix with it (its relative major or minor, and a fifth either side)." },
                     "pack_id": { "type": "string" },
                     "collection": { "type": "string", "description": "Only sounds in this collection (id or name)." },
                     "limit": { "type": "integer", "minimum": 1, "maximum": 100, "default": 20 }
@@ -821,9 +825,29 @@ fn shape_json(shape: &imitation::Shape) -> Value {
 }
 
 /// What a sound's measured features say, in words; nothing if it hasn't been listened to.
+/// A piece of music's tempo and key, in words: "120 BPM (or 60), 4 bars, in A minor (8A)".
+fn music_words(m: &Value) -> Vec<String> {
+    let num = |k: &str| m.get(k).and_then(Value::as_f64);
+    let mut words = Vec::new();
+    if let Some(bpm) = num("tempo_bpm") {
+        words.push(format!("{bpm:.0} BPM"));
+    } else if let Some(bpm) = num("measured_bpm") {
+        let alt = num("measured_bpm_alt").map_or_else(String::new, |a| format!(" (or {a:.0})"));
+        words.push(format!("about {bpm:.0} BPM{alt}"));
+    }
+    let key = m.get("key").or_else(|| m.get("measured_key")).and_then(Value::as_str);
+    if let Some(k) = key.and_then(crate::rhythm::Key::parse) {
+        words.push(format!("in {} ({})", k.name(), k.camelot()));
+    }
+    words
+}
+
 fn sound_words(m: &Value) -> Option<String> {
     let num = |k: &str| m.get(k).and_then(Value::as_f64);
-    let brightness = num("brightness_hz")?;
+    let music = music_words(m);
+    let Some(brightness) = num("brightness_hz") else {
+        return (!music.is_empty()).then(|| music.join(", "));
+    };
     let mut words: Vec<String> = Vec::new();
     if let Some(secs) = num("duration_secs") {
         words.push(if secs >= 10.0 { format!("{secs:.0} s long") } else { format!("{secs:.2} s long") });
@@ -873,12 +897,13 @@ fn sound_words(m: &Value) -> Option<String> {
     if m.get("loops_cleanly").and_then(Value::as_bool) == Some(true) {
         words.push("loops cleanly".into());
     }
+    words.extend(music);
     Some(words.join(", "))
 }
 
 /// One sound, for the sound tools: what was measured, in numbers and in words, and where to listen.
 fn sound_summary(base: &str, a: &hoard_core::Asset) -> Value {
-    let keys = ["duration_secs", "sample_rate", "channels", "rms_dbfs", "peak_dbfs"];
+    let keys = ["duration_secs", "sample_rate", "channels", "rms_dbfs", "peak_dbfs", "tempo_bpm", "key"];
     let measured: serde_json::Map<String, Value> = keys
         .iter()
         .chain(crate::sounds::FEATURES.iter())
@@ -918,11 +943,18 @@ async fn sounds_call(state: &AppState, name: &str, args: &Value, base: &str) -> 
                 tags: str_list(args, "tags").iter().filter_map(|t| hoard_core::normalize_tag(t)).collect(),
                 pack: str_arg(args, "pack_id"),
                 collection: str_arg(args, "collection"),
+                bpm_min: args.get("bpm_min").and_then(Value::as_f64).map(|b| b as f32),
+                bpm_max: args.get("bpm_max").and_then(Value::as_f64).map(|b| b as f32),
+                key: str_arg(args, "key"),
+                compatible_keys: args.get("compatible_keys").and_then(Value::as_bool).unwrap_or(false),
                 limit,
                 ..Default::default()
             };
-            if shape.is_empty() && q.q.is_none() && q.tags.is_empty() {
-                return Err(ToolError::Failed("give `imitation` (a word with letters), `shape` or `query`".into()));
+            let music = q.bpm_min.is_some() || q.bpm_max.is_some() || q.key.is_some();
+            if shape.is_empty() && q.q.is_none() && q.tags.is_empty() && !music {
+                return Err(ToolError::Failed(
+                    "give `imitation` (a word with letters), `shape`, `query`, a tempo or a key".into(),
+                ));
             }
             let rank = if !shape.is_empty() {
                 let scores = imitation::rank_shape(state, shape.clone()).await?;

@@ -29,6 +29,7 @@ import { confirmDialog, daysAgo, showError, showOk, swipeToClose, useTween, with
 import { useVirtualGrid } from './virtualGrid'
 import { lazy } from './lazy'
 import { formatNumber, t } from './i18n'
+import { findKey, KEYS, keyName } from './keys'
 
 // Opened now and then, so they load when first shown.
 const SettingsPage = lazy(() => import('./components/SettingsPage.vue'), () => t('app-lazy-settings'))
@@ -74,7 +75,15 @@ const filters = reactive({
   color: '',
   /** Sounds shaped like this word imitating them (`whooom`), most alike first. */
   imitation: '',
+  /** Music at this tempo (BPM) or faster, or slower; `''` for any. */
+  bpmMin: '' as number | '',
+  bpmMax: '' as number | '',
+  /** Music in this key (`a-minor`), and with `mixKeys` the keys that mix with it. */
+  key: '',
+  mixKeys: true,
 })
+/** The music filters, cleared. */
+const NO_MUSIC = { bpmMin: '', bpmMax: '', key: '' } as const
 /** Colors to search by in one click; the picker beside them does any other. */
 const COLOR_PRESETS: { hex: string; name: () => string }[] = [
   { hex: '#b8322a', name: () => t('app-color-red') }, { hex: '#e07b28', name: () => t('app-color-orange') },
@@ -152,6 +161,10 @@ function searchPage(page: number) {
       similar: filters.similar?.id,
       color: filters.color || undefined,
       imitation: filters.imitation || undefined,
+      bpm_min: filters.bpmMin === '' ? undefined : filters.bpmMin,
+      bpm_max: filters.bpmMax === '' ? undefined : filters.bpmMax,
+      key: filters.key || undefined,
+      compatible_keys: (filters.key && filters.mixKeys) || undefined,
       favorites: filters.favorites || undefined,
       project: filters.project || undefined,
       limit: PAGE,
@@ -253,6 +266,7 @@ watch(() => filters.q, () => {
 watch(() => [
   filters.kind, filters.tags.join(','), filters.pack?.id, filters.folder, filters.collection?.id, filters.sort, filters.similar?.id,
   filters.color, filters.imitation, filters.favorites, filters.project, prefs.showSupporting,
+  filters.bpmMin, filters.bpmMax, filters.key, filters.mixKeys,
 ], () => {
   checked.value = []
   runSearch()
@@ -302,7 +316,7 @@ function setView(v: View) {
 function browsePack(p: Named) {
   Object.assign(filters, {
     pack: { id: p.id, name: p.name }, folder: prefs.packFolders ? '' : null, collection: null, favorites: false, project: '',
-    kind: '', tags: [], q: '', similar: null, color: '', imitation: '',
+    kind: '', tags: [], q: '', similar: null, color: '', imitation: '', ...NO_MUSIC,
   })
   setView('library')
 }
@@ -310,7 +324,7 @@ function browsePack(p: Named) {
 function openFolder(pack: Named, folder: string) {
   Object.assign(filters, {
     pack: { id: pack.id, name: pack.name }, folder, collection: null, favorites: false, project: '', kind: '', tags: [], q: '',
-    similar: null, color: '', imitation: '',
+    similar: null, color: '', imitation: '', ...NO_MUSIC,
   })
   prefs.packFolders = true
   setView('library')
@@ -336,7 +350,7 @@ function intoFolder(name: string) {
 function browseCollection(c: Collection | Named) {
   const same = filters.collection?.id === c.id
   Object.assign(filters, {
-    collection: same ? null : { id: c.id, name: c.name }, pack: null, kind: '', tags: [], q: '', similar: null, color: '', imitation: '',
+    collection: same ? null : { id: c.id, name: c.name }, pack: null, kind: '', tags: [], q: '', similar: null, color: '', imitation: '', ...NO_MUSIC,
     favorites: false, project: '',
   })
   setView('library')
@@ -344,7 +358,7 @@ function browseCollection(c: Collection | Named) {
 }
 function browseProject(name: string) {
   const same = filters.project === name
-  Object.assign(filters, { project: same ? '' : name, favorites: false, collection: null, pack: null, kind: '', tags: [], q: '', similar: null, color: '', imitation: '' })
+  Object.assign(filters, { project: same ? '' : name, favorites: false, collection: null, pack: null, kind: '', tags: [], q: '', similar: null, color: '', imitation: '', ...NO_MUSIC })
   setView('library')
   showFilters.value = false
 }
@@ -365,7 +379,7 @@ async function forgetProject(p: Project) {
 }
 function browseFavorites() {
   const same = filters.favorites
-  Object.assign(filters, { favorites: !same, project: '', collection: null, pack: null, kind: '', tags: [], q: '', similar: null, color: '', imitation: '' })
+  Object.assign(filters, { favorites: !same, project: '', collection: null, pack: null, kind: '', tags: [], q: '', similar: null, color: '', imitation: '', ...NO_MUSIC })
   setView('library')
   showFilters.value = false
 }
@@ -390,6 +404,7 @@ async function startNaming() {
     filters.q.trim(), filters.kind, ...filters.tags, filters.pack?.name, filters.collection?.name,
     filters.similar && t('app-save-name-like', { name: filters.similar.name }), filters.color,
     heardNoise.value ? t('app-imitation-heard') : filters.imitation, filters.favorites && t('app-save-name-favorites'), filters.project,
+    tempoLabel.value && `${tempoLabel.value} BPM`, chosenKey.value && keyName(chosenKey.value),
   ].filter(Boolean).join(' · ').slice(0, 80)
   naming.value = true
   await nextTick()
@@ -544,15 +559,16 @@ function goHome() {
   mainEl.value?.scrollTo({ top: 0, behavior: 'smooth' })
 }
 function clearFilters() {
-  Object.assign(filters, { q: '', kind: '', tags: [], pack: null, folder: null, collection: null, favorites: false, project: '', similar: null, color: '', imitation: '' })
+  Object.assign(filters, { q: '', kind: '', tags: [], pack: null, folder: null, collection: null, favorites: false, project: '', similar: null, color: '', imitation: '', ...NO_MUSIC })
 }
 const hasFilters = computed(
-  () => !!(filters.q || filters.kind || filters.tags.length || filters.pack || filters.collection || filters.similar || filters.color || filters.imitation || filters.favorites || filters.project),
+  () => !!(filters.q || filters.kind || filters.tags.length || filters.pack || filters.collection || filters.similar || filters.color || filters.imitation || filters.favorites || filters.project ||
+    filters.bpmMin !== '' || filters.bpmMax !== '' || filters.key),
 )
 /** "More like this": everything that looks like an asset, across every pack, most alike first. */
 function findSimilar(a: Asset) {
   Object.assign(filters, {
-    similar: { id: a.id, name: a.name }, color: '', imitation: '', q: '', kind: '', tags: [], pack: null, collection: null, favorites: false, project: '', sort: '',
+    similar: { id: a.id, name: a.name }, color: '', imitation: '', ...NO_MUSIC, q: '', kind: '', tags: [], pack: null, collection: null, favorites: false, project: '', sort: '',
   })
   setView('library')
   mainEl.value?.scrollTo({ top: 0 })
@@ -567,6 +583,18 @@ function findColor(hex: string) {
 function pickColor(hex: string) {
   filters.color = filters.color === hex ? '' : hex
   if (filters.color) filters.imitation = ''
+}
+/** The tempo range being searched, in words ("90–120", "90+", "≤120"); `''` for any. */
+const tempoLabel = computed(() => {
+  const [lo, hi] = [filters.bpmMin, filters.bpmMax]
+  if (lo !== '' && hi !== '') return `${lo}–${hi}`
+  return lo !== '' ? `${lo}+` : hi !== '' ? `≤${hi}` : ''
+})
+const chosenKey = computed(() => (filters.key ? findKey(filters.key) : undefined))
+/** A tempo typed in the sidebar: a number, or nothing. */
+function bpmInput(e: Event): number | '' {
+  const v = (e.target as HTMLInputElement).valueAsNumber
+  return Number.isFinite(v) && v > 0 ? Math.round(v) : ''
 }
 /** How a noise made into the microphone travels as `imitation` (its shape, as the server measured it). */
 const HEARD = 'heard:'
@@ -1119,6 +1147,11 @@ function readUrl(search = location.search) {
   const color = u.get('color') ?? ''
   filters.color = /^#[0-9a-f]{6}$/i.test(color) ? color.toLowerCase() : ''
   filters.imitation = u.get('imitation') ?? ''
+  const bpm = (k: string) => (u.get(k) && Number.isFinite(Number(u.get(k))) ? Number(u.get(k)) : '')
+  filters.bpmMin = bpm('bpm_min')
+  filters.bpmMax = bpm('bpm_max')
+  filters.key = findKey(u.get('key') ?? '')?.value ?? ''
+  filters.mixKeys = u.get('mix') !== '0'
   filters.favorites = u.get('fav') === '1'
   filters.project = u.get('project') ?? ''
 }
@@ -1131,6 +1164,7 @@ function urlState() {
     place: [
       filters.kind, filters.tags.join(','), filters.sort, filters.pack?.id, filters.folder, filters.collection?.id,
       filters.similar?.id, filters.color, filters.imitation, filters.favorites, filters.project,
+      filters.bpmMin, filters.bpmMax, filters.key, filters.mixKeys,
     ].join('|'),
   }
 }
@@ -1159,6 +1193,12 @@ function filterQuery(): string {
   }
   if (filters.color) u.set('color', filters.color)
   if (filters.imitation) u.set('imitation', filters.imitation)
+  if (filters.bpmMin !== '') u.set('bpm_min', String(filters.bpmMin))
+  if (filters.bpmMax !== '') u.set('bpm_max', String(filters.bpmMax))
+  if (filters.key) {
+    u.set('key', filters.key)
+    if (!filters.mixKeys) u.set('mix', '0')
+  }
   if (filters.favorites) u.set('fav', '1')
   if (filters.project) u.set('project', filters.project)
   return u.toString()
@@ -1202,6 +1242,10 @@ watch(
     () => filters.imitation,
     () => filters.favorites,
     () => filters.project,
+    () => filters.bpmMin,
+    () => filters.bpmMax,
+    () => filters.key,
+    () => filters.mixKeys,
   ],
   writeUrl,
 )
@@ -1637,6 +1681,29 @@ const commands = computed<Command[]>(() => {
             </button>
           </form>
         </section>
+        <section class="music">
+          <h3>{{ t('app-music') }}</h3>
+          <div class="tempo">
+            <label for="bpm-min">{{ t('app-tempo') }}</label>
+            <input id="bpm-min" class="field" type="number" min="20" max="400" inputmode="numeric" :value="filters.bpmMin" :placeholder="t('app-tempo-min')" :title="t('app-tempo-min-title')" @change="filters.bpmMin = bpmInput($event)" />
+            <span aria-hidden="true">–</span>
+            <input id="bpm-max" class="field" type="number" min="20" max="400" inputmode="numeric" :value="filters.bpmMax" :placeholder="t('app-tempo-max')" :aria-label="t('app-tempo-max-title')" :title="t('app-tempo-max-title')" @change="filters.bpmMax = bpmInput($event)" />
+          </div>
+          <label class="visually-hidden" for="music-key">{{ t('app-key') }}</label>
+          <select id="music-key" v-model="filters.key" class="field">
+            <option value="">{{ t('app-key-any') }}</option>
+            <optgroup :label="t('app-key-major')">
+              <option v-for="k in KEYS.filter((k) => !k.minor)" :key="k.value" :value="k.value">{{ keyName(k) }} · {{ k.camelot }}</option>
+            </optgroup>
+            <optgroup :label="t('app-key-minor')">
+              <option v-for="k in KEYS.filter((k) => k.minor)" :key="k.value" :value="k.value">{{ keyName(k) }} · {{ k.camelot }}</option>
+            </optgroup>
+          </select>
+          <label v-if="filters.key" class="check" :title="t('app-key-mix-title')">
+            <input v-model="filters.mixKeys" type="checkbox" />
+            {{ t('app-key-mix') }}
+          </label>
+        </section>
         <p v-if="!kindFacets.length && !loading" class="side-empty">{{ t('app-no-filters') }}</p>
         <section v-if="kindFacets.length">
           <h3>{{ t('app-kind') }}</h3>
@@ -1714,6 +1781,8 @@ const commands = computed<Command[]>(() => {
             <TagChip v-if="filters.similar" :tag="`like:${filters.similar.name}`" removable @remove="filters.similar = null" />
             <TagChip v-if="filters.color" :tag="`color:${filters.color}`" :swatch="filters.color" removable @remove="filters.color = ''" />
             <TagChip v-if="filters.imitation" :tag="`sounds-like:${heardNoise ? t('app-imitation-heard') : filters.imitation}`" removable @remove="filters.imitation = ''" />
+            <TagChip v-if="tempoLabel" :tag="`bpm:${tempoLabel}`" removable @remove="Object.assign(filters, { bpmMin: '', bpmMax: '' })" />
+            <TagChip v-if="chosenKey" :tag="`key:${keyName(chosenKey)}${filters.mixKeys ? ' ±' : ''}`" removable @remove="filters.key = ''" />
             <TagChip v-if="filters.kind" :tag="`kind:${filters.kind}`" removable @remove="filters.kind = ''" />
             <TagChip v-for="t in filters.tags" :key="t" :tag="t" removable @remove="toggleTag(t)" />
             <button v-if="hasFilters" type="button" class="linkbtn" @click="clearFilters">{{ t('app-clear-all') }}</button>
@@ -2101,7 +2170,12 @@ const commands = computed<Command[]>(() => {
 .cname { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .side section + section { margin-top: 1rem; }
 .side h3 { margin: 0 0 0.4rem; font-size: 0.75rem; font-weight: 650; color: var(--faint); }
-.imitate + .side-empty { margin-top: 1rem; }
+.music + .side-empty { margin-top: 1rem; }
+.music .tempo { display: flex; gap: 0.3rem; align-items: center; margin-bottom: 0.35rem; }
+.music .tempo label { flex: none; font-size: 0.85em; color: var(--muted); }
+.music .tempo .field { flex: 1; min-width: 0; width: 0; }
+.music select { width: 100%; }
+.music .check { display: flex; gap: 0.35rem; align-items: center; margin-top: 0.35rem; font-size: 0.85em; color: var(--muted); }
 .imitate form { display: flex; gap: 0.3rem; align-items: center; }
 .imitate .field { flex: 1; min-width: 0; }
 .imitate .mic { flex: none; padding: 0.35rem; line-height: 0; }

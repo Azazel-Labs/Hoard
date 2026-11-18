@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "aece80cb9cad73b6e97bc1d3df37fcea840d003fe39572dd5c55703ef6233704"
+source = "b0d7dd201105b6da38b5de865a3e77a6c2f5d5ac2b3ab437da4b9b494bf2d0f8"
 translation = "bb45e4d0d59bdf1a2181c1158501e66a0c57e8041d0a982d6aed7e82f49657fa"
 
 [messages.account-add]
@@ -976,6 +976,30 @@ translation = "Напишите звук так, как произнесли б�
 source = "Import folder"
 translation = "Импортировать папку"
 
+[messages.app-key]
+source = "Key"
+translation = "Тональность"
+
+[messages.app-key-any]
+source = "Any key"
+translation = "Любая тональность"
+
+[messages.app-key-major]
+source = "Major"
+translation = "Мажор"
+
+[messages.app-key-minor]
+source = "Minor"
+translation = "Минор"
+
+[messages.app-key-mix]
+source = "And keys that mix with it"
+translation = "И тональности, которые с ней сводятся"
+
+[messages.app-key-mix-title]
+source = "Its relative major or minor and the keys a fifth either side, which DJs mix with it"
+translation = "Её параллельная мажорная или минорная тональность и тональности на квинту выше и ниже, с которыми её сводят диджеи"
+
 [messages.app-keys-hint]
 source = "Arrow keys move, Enter opens, Space plays a sound, X or Ctrl-click selects several (long-press on touch)."
 translation = "Стрелки — перемещение, Enter — открыть, пробел — проиграть звук, X или Ctrl+щелчок — выбрать несколько (на сенсорном экране — долгое нажатие)."
@@ -1007,6 +1031,10 @@ translation = "Библиотека"
 [messages.app-loading-more]
 source = "Loading more"
 translation = "Загружаем ещё"
+
+[messages.app-music]
+source = "Music"
+translation = "Музыка"
 
 [messages.app-no-filters]
 source = "No filters for this search."
@@ -1371,6 +1399,26 @@ translation = "Со вспомогательными файлами"
 [messages.app-supporting-title]
 source = "glTF buffers, material libraries, the maps of materials, materials only one model wears and the store files describing models. They come along when you download what uses them. A sprite sheet’s pages, and its sprites the pack has as separate images too, are shown with the sheet. An asset the pack has in several formats is shown once, in the format Hoard reads best."
 translation = "Буферы glTF, библиотеки материалов, карты материалов, материалы, которые носит только одна модель, и файлы магазинов с описанием моделей. Они скачиваются вместе с тем, что их использует. Страницы спрайт-листа и его спрайты, которые есть в наборе и отдельными картинками, показываются вместе с листом. Ресурс, который есть в наборе в нескольких форматах, показывается один раз, в формате, который Hoard читает лучше всего."
+
+[messages.app-tempo]
+source = "BPM"
+translation = "BPM"
+
+[messages.app-tempo-max]
+source = "to"
+translation = "до"
+
+[messages.app-tempo-max-title]
+source = "Music at this tempo or slower, in beats a minute"
+translation = "Музыка в этом темпе или медленнее, в ударах в минуту"
+
+[messages.app-tempo-min]
+source = "from"
+translation = "от"
+
+[messages.app-tempo-min-title]
+source = "Music at this tempo or faster, in beats a minute (half or double counts too)"
+translation = "Музыка в этом темпе или быстрее, в ударах в минуту (вдвое медленнее или быстрее тоже подходит)"
 
 [messages.app-theme]
 source = "Theme"
@@ -2130,6 +2178,18 @@ translation = "Жанр"
 source = "HDR (preview is tone-mapped)"
 translation = "HDR (в превью применена тональная компрессия)"
 
+[messages.asset-meta-key]
+source = "Key"
+translation = "Тональность"
+
+[messages.asset-meta-key-heard]
+source = "{ $key }, as heard"
+translation = "{ $key }, на слух"
+
+[messages.asset-meta-key-value]
+source = "{ $key } ({ $camelot })"
+translation = "{ $key } ({ $camelot })"
+
 [messages.asset-meta-keywords]
 source = "Keywords"
 translation = "Ключевые слова"
@@ -2291,6 +2351,14 @@ translation = "Стерео"
 [messages.asset-meta-tempo]
 source = "Tempo"
 translation = "Темп"
+
+[messages.asset-meta-tempo-heard]
+source = "about { $bpm } BPM, as heard"
+translation = "около { $bpm } BPM, на слух"
+
+[messages.asset-meta-tempo-heard-or]
+source = "about { $bpm } BPM (or { $alt }), as heard"
+translation = "около { $bpm } BPM (или { $alt }), на слух"
 
 [messages.asset-meta-tiling]
 source = "Tiling"
@@ -6809,6 +6877,14 @@ translation = "Каркас"
 [messages.model-wireframe-title]
 source = "Wireframe (W), over any view"
 translation = "Каркас (W) поверх любого вида"
+
+[messages.music-key-major]
+source = "{ $note } major"
+translation = "{ $note } мажор"
+
+[messages.music-key-minor]
+source = "{ $note } minor"
+translation = "{ $note } минор"
 
 [messages.packs-added]
 source = "Added { $date }"

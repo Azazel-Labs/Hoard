@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "aece80cb9cad73b6e97bc1d3df37fcea840d003fe39572dd5c55703ef6233704"
+source = "b0d7dd201105b6da38b5de865a3e77a6c2f5d5ac2b3ab437da4b9b494bf2d0f8"
 translation = "7d4815ead7ae4f48f80531d797b527d64fdb08460c91b5ac34cf8cada118334a"
 
 [messages.account-add]
@@ -919,6 +919,30 @@ translation = "照拼寫方式寫出聲音（例如 whooom）：形狀相近的�
 source = "Import folder"
 translation = "匯入資料夾"
 
+[messages.app-key]
+source = "Key"
+translation = "調性"
+
+[messages.app-key-any]
+source = "Any key"
+translation = "任何調性"
+
+[messages.app-key-major]
+source = "Major"
+translation = "大調"
+
+[messages.app-key-minor]
+source = "Minor"
+translation = "小調"
+
+[messages.app-key-mix]
+source = "And keys that mix with it"
+translation = "以及可與之混音的調"
+
+[messages.app-key-mix-title]
+source = "Its relative major or minor and the keys a fifth either side, which DJs mix with it"
+translation = "它的關係大調或小調，以及上下相差五度的調，DJ 會將它們混在一起"
+
 [messages.app-keys-hint]
 source = "Arrow keys move, Enter opens, Space plays a sound, X or Ctrl-click selects several (long-press on touch)."
 translation = "方向鍵移動、Enter 開啟、空白鍵播放音效、X 或 Ctrl+按一下可選取多個（觸控裝置請長按）。"
@@ -950,6 +974,10 @@ translation = "素材庫"
 [messages.app-loading-more]
 source = "Loading more"
 translation = "正在載入更多"
+
+[messages.app-music]
+source = "Music"
+translation = "音樂"
 
 [messages.app-no-filters]
 source = "No filters for this search."
@@ -1302,6 +1330,26 @@ translation = "包含輔助檔案"
 [messages.app-supporting-title]
 source = "glTF buffers, material libraries, the maps of materials, materials only one model wears and the store files describing models. They come along when you download what uses them. A sprite sheet’s pages, and its sprites the pack has as separate images too, are shown with the sheet. An asset the pack has in several formats is shown once, in the format Hoard reads best."
 translation = "glTF 緩衝區、材質庫、材質的貼圖、只有一個模型使用的材質，以及描述模型的商店檔案。下載使用它們的素材時會一併附上。 精靈圖集的頁面，以及套件中也以單獨圖片存在的精靈，會與圖集一起顯示。 套件中有多種格式的資源只顯示一次，使用 Hoard 讀取得最好的格式。"
+
+[messages.app-tempo]
+source = "BPM"
+translation = "BPM"
+
+[messages.app-tempo-max]
+source = "to"
+translation = "到"
+
+[messages.app-tempo-max-title]
+source = "Music at this tempo or slower, in beats a minute"
+translation = "此速度或更慢的音樂，單位為每分鐘拍數"
+
+[messages.app-tempo-min]
+source = "from"
+translation = "從"
+
+[messages.app-tempo-min-title]
+source = "Music at this tempo or faster, in beats a minute (half or double counts too)"
+translation = "此速度或更快的音樂，單位為每分鐘拍數（減半或加倍也算）"
 
 [messages.app-theme]
 source = "Theme"
@@ -1993,6 +2041,18 @@ translation = "類型"
 source = "HDR (preview is tone-mapped)"
 translation = "HDR（預覽經過色調映射）"
 
+[messages.asset-meta-key]
+source = "Key"
+translation = "調性"
+
+[messages.asset-meta-key-heard]
+source = "{ $key }, as heard"
+translation = "{ $key }，依音訊測得"
+
+[messages.asset-meta-key-value]
+source = "{ $key } ({ $camelot })"
+translation = "{ $key }（{ $camelot }）"
+
 [messages.asset-meta-keywords]
 source = "Keywords"
 translation = "關鍵字"
@@ -2139,6 +2199,14 @@ translation = "立體聲"
 [messages.asset-meta-tempo]
 source = "Tempo"
 translation = "節奏"
+
+[messages.asset-meta-tempo-heard]
+source = "about { $bpm } BPM, as heard"
+translation = "約 { $bpm } BPM，依音訊測得"
+
+[messages.asset-meta-tempo-heard-or]
+source = "about { $bpm } BPM (or { $alt }), as heard"
+translation = "約 { $bpm } BPM（或 { $alt }），依音訊測得"
 
 [messages.asset-meta-tiling]
 source = "Tiling"
@@ -6530,6 +6598,14 @@ translation = "線框"
 [messages.model-wireframe-title]
 source = "Wireframe (W), over any view"
 translation = "線框（W），可疊加在任何檢視上"
+
+[messages.music-key-major]
+source = "{ $note } major"
+translation = "{ $note } 大調"
+
+[messages.music-key-minor]
+source = "{ $note } minor"
+translation = "{ $note } 小調"
 
 [messages.packs-added]
 source = "Added { $date }"

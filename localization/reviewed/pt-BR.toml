@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "aece80cb9cad73b6e97bc1d3df37fcea840d003fe39572dd5c55703ef6233704"
+source = "b0d7dd201105b6da38b5de865a3e77a6c2f5d5ac2b3ab437da4b9b494bf2d0f8"
 translation = "2e34d91e4f4fa072a59dd9e9162a5d29e11be0c102c21984626feb8d9e7f9017"
 
 [messages.account-add]
@@ -948,6 +948,30 @@ translation = "Escreva o barulho que um som faz do jeito que você soletraria: o
 source = "Import folder"
 translation = "Importar pasta"
 
+[messages.app-key]
+source = "Key"
+translation = "Tom"
+
+[messages.app-key-any]
+source = "Any key"
+translation = "Qualquer tom"
+
+[messages.app-key-major]
+source = "Major"
+translation = "Maior"
+
+[messages.app-key-minor]
+source = "Minor"
+translation = "Menor"
+
+[messages.app-key-mix]
+source = "And keys that mix with it"
+translation = "E tons que combinam com ele"
+
+[messages.app-key-mix-title]
+source = "Its relative major or minor and the keys a fifth either side, which DJs mix with it"
+translation = "Seu relativo maior ou menor e os tons uma quinta acima e abaixo, que os DJs mixam com ele"
+
 [messages.app-keys-hint]
 source = "Arrow keys move, Enter opens, Space plays a sound, X or Ctrl-click selects several (long-press on touch)."
 translation = "As setas movem, Enter abre, Espaço toca um som, X ou Ctrl+clique seleciona vários (toque longo em telas sensíveis ao toque)."
@@ -979,6 +1003,10 @@ translation = "Biblioteca"
 [messages.app-loading-more]
 source = "Loading more"
 translation = "Carregando mais"
+
+[messages.app-music]
+source = "Music"
+translation = "Música"
 
 [messages.app-no-filters]
 source = "No filters for this search."
@@ -1335,6 +1363,26 @@ translation = "Incluindo arquivos de apoio"
 [messages.app-supporting-title]
 source = "glTF buffers, material libraries, the maps of materials, materials only one model wears and the store files describing models. They come along when you download what uses them. A sprite sheet’s pages, and its sprites the pack has as separate images too, are shown with the sheet. An asset the pack has in several formats is shown once, in the format Hoard reads best."
 translation = "Buffers glTF, bibliotecas de materiais, os mapas dos materiais, materiais que só um modelo usa e os arquivos de loja que descrevem modelos. Eles vêm junto quando você baixa o que os usa. As páginas de uma folha de sprites, e os sprites que o pacote também tem como imagens separadas, aparecem com a folha. Um recurso que o pacote tem em vários formatos aparece uma vez, no formato que o Hoard lê melhor."
+
+[messages.app-tempo]
+source = "BPM"
+translation = "BPM"
+
+[messages.app-tempo-max]
+source = "to"
+translation = "até"
+
+[messages.app-tempo-max-title]
+source = "Music at this tempo or slower, in beats a minute"
+translation = "Música neste andamento ou mais lenta, em batidas por minuto"
+
+[messages.app-tempo-min]
+source = "from"
+translation = "de"
+
+[messages.app-tempo-min-title]
+source = "Music at this tempo or faster, in beats a minute (half or double counts too)"
+translation = "Música neste andamento ou mais rápida, em batidas por minuto (metade ou dobro também contam)"
 
 [messages.app-theme]
 source = "Theme"
@@ -2062,6 +2110,18 @@ translation = "Gênero"
 source = "HDR (preview is tone-mapped)"
 translation = "HDR (a prévia tem tone mapping)"
 
+[messages.asset-meta-key]
+source = "Key"
+translation = "Tom"
+
+[messages.asset-meta-key-heard]
+source = "{ $key }, as heard"
+translation = "{ $key }, de ouvido"
+
+[messages.asset-meta-key-value]
+source = "{ $key } ({ $camelot })"
+translation = "{ $key } ({ $camelot })"
+
 [messages.asset-meta-keywords]
 source = "Keywords"
 translation = "Palavras-chave"
@@ -2217,6 +2277,14 @@ translation = "Estéreo"
 [messages.asset-meta-tempo]
 source = "Tempo"
 translation = "Andamento"
+
+[messages.asset-meta-tempo-heard]
+source = "about { $bpm } BPM, as heard"
+translation = "cerca de { $bpm } BPM, de ouvido"
+
+[messages.asset-meta-tempo-heard-or]
+source = "about { $bpm } BPM (or { $alt }), as heard"
+translation = "cerca de { $bpm } BPM (ou { $alt }), de ouvido"
 
 [messages.asset-meta-tiling]
 source = "Tiling"
@@ -6674,6 +6742,14 @@ translation = "Wireframe"
 [messages.model-wireframe-title]
 source = "Wireframe (W), over any view"
 translation = "Wireframe (W), sobre qualquer vista"
+
+[messages.music-key-major]
+source = "{ $note } major"
+translation = "{ $note } maior"
+
+[messages.music-key-minor]
+source = "{ $note } minor"
+translation = "{ $note } menor"
 
 [messages.packs-added]
 source = "Added { $date }"

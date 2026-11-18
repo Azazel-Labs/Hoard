@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "aece80cb9cad73b6e97bc1d3df37fcea840d003fe39572dd5c55703ef6233704"
+source = "b0d7dd201105b6da38b5de865a3e77a6c2f5d5ac2b3ab437da4b9b494bf2d0f8"
 translation = "9bd6df5ffb27941fd7574669812413d7eaa17a0920718334cfd6ce3df12e13f5"
 
 [messages.account-add]
@@ -948,6 +948,30 @@ translation = "Kirjoita äänen tekemä ääni niin kuin sen tavaisit: sen kalta
 source = "Import folder"
 translation = "Tuo kansio"
 
+[messages.app-key]
+source = "Key"
+translation = "Sävellaji"
+
+[messages.app-key-any]
+source = "Any key"
+translation = "Mikä tahansa sävellaji"
+
+[messages.app-key-major]
+source = "Major"
+translation = "Duuri"
+
+[messages.app-key-minor]
+source = "Minor"
+translation = "Molli"
+
+[messages.app-key-mix]
+source = "And keys that mix with it"
+translation = "Ja sävellajit, jotka sopivat miksattaviksi sen kanssa"
+
+[messages.app-key-mix-title]
+source = "Its relative major or minor and the keys a fifth either side, which DJs mix with it"
+translation = "Sen rinnakkaisduuri tai -molli ja kvintin päässä kummallakin puolella olevat sävellajit, joita DJ:t miksaavat sen kanssa"
+
 [messages.app-keys-hint]
 source = "Arrow keys move, Enter opens, Space plays a sound, X or Ctrl-click selects several (long-press on touch)."
 translation = "Nuolinäppäimet liikkuvat, Enter avaa, välilyönti soittaa äänen, X tai Ctrl-napsautus valitsee useita (kosketusnäytöllä pitkä painallus)."
@@ -979,6 +1003,10 @@ translation = "Kirjasto"
 [messages.app-loading-more]
 source = "Loading more"
 translation = "Ladataan lisää"
+
+[messages.app-music]
+source = "Music"
+translation = "Musiikki"
 
 [messages.app-no-filters]
 source = "No filters for this search."
@@ -1339,6 +1367,26 @@ translation = "Tukitiedostot mukana"
 [messages.app-supporting-title]
 source = "glTF buffers, material libraries, the maps of materials, materials only one model wears and the store files describing models. They come along when you download what uses them. A sprite sheet’s pages, and its sprites the pack has as separate images too, are shown with the sheet. An asset the pack has in several formats is shown once, in the format Hoard reads best."
 translation = "glTF-puskurit, materiaalikirjastot, materiaalien kartat, vain yhden mallin käyttämät materiaalit ja malleja kuvaavat kauppatiedostot. Ne tulevat mukana, kun lataat niitä käyttävän resurssin. Sprite-arkin sivut ja sen spritet, jotka paketissa on myös erillisinä kuvina, näytetään arkin yhteydessä. Resurssi, joka paketissa on useassa muodossa, näytetään kerran, siinä muodossa, jonka Hoard lukee parhaiten."
+
+[messages.app-tempo]
+source = "BPM"
+translation = "BPM"
+
+[messages.app-tempo-max]
+source = "to"
+translation = "asti"
+
+[messages.app-tempo-max-title]
+source = "Music at this tempo or slower, in beats a minute"
+translation = "Musiikki tässä tempossa tai hitaampi, iskuina minuutissa"
+
+[messages.app-tempo-min]
+source = "from"
+translation = "alkaen"
+
+[messages.app-tempo-min-title]
+source = "Music at this tempo or faster, in beats a minute (half or double counts too)"
+translation = "Musiikki tässä tempossa tai nopeampi, iskuina minuutissa (myös puolikas tai tuplatempo lasketaan)"
 
 [messages.app-theme]
 source = "Theme"
@@ -2066,6 +2114,18 @@ translation = "Lajityyppi"
 source = "HDR (preview is tone-mapped)"
 translation = "HDR (esikatselu on sävykartoitettu)"
 
+[messages.asset-meta-key]
+source = "Key"
+translation = "Sävellaji"
+
+[messages.asset-meta-key-heard]
+source = "{ $key }, as heard"
+translation = "{ $key }, kuulon perusteella"
+
+[messages.asset-meta-key-value]
+source = "{ $key } ({ $camelot })"
+translation = "{ $key } ({ $camelot })"
+
 [messages.asset-meta-keywords]
 source = "Keywords"
 translation = "Avainsanat"
@@ -2221,6 +2281,14 @@ translation = "Stereo"
 [messages.asset-meta-tempo]
 source = "Tempo"
 translation = "Tempo"
+
+[messages.asset-meta-tempo-heard]
+source = "about { $bpm } BPM, as heard"
+translation = "noin { $bpm } BPM, kuulon perusteella"
+
+[messages.asset-meta-tempo-heard-or]
+source = "about { $bpm } BPM (or { $alt }), as heard"
+translation = "noin { $bpm } BPM (tai { $alt }), kuulon perusteella"
 
 [messages.asset-meta-tiling]
 source = "Tiling"
@@ -6694,6 +6762,14 @@ translation = "Rautalanka"
 [messages.model-wireframe-title]
 source = "Wireframe (W), over any view"
 translation = "Rautalanka (W), minkä tahansa näkymän päällä"
+
+[messages.music-key-major]
+source = "{ $note } major"
+translation = "{ $note }-duuri"
+
+[messages.music-key-minor]
+source = "{ $note } minor"
+translation = "{ $note }-molli"
 
 [messages.packs-added]
 source = "Added { $date }"

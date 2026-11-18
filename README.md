@@ -391,7 +391,7 @@ software rasterizer (`apt install mesa-vulkan-drivers`). Without any adapter, ev
    - Music: tracker modules (MOD, XM, S3M, IT, OpenMPT's MPTM, and the module inside an Unreal UMX package), MIDI and
      chiptunes (NES NSF and NSFe, VGM and VGZ) are rendered to audio, so they get a waveform, a duration and an MP3
      preview that plays in the grid like any other sound. Modules list their title, channels, patterns and
-     instruments; MIDI lists tempo, tracks and General MIDI instruments. MIDI plays through a SoundFont
+     instruments; MIDI lists tempo, key, tracks and General MIDI instruments. MIDI plays through a SoundFont
      (the one picked in Settings, or a GM SoundFont found in the usual system places), falling back to a simple built-in synth.
    - Chiptunes: an NSF runs the game's own music code on an emulated NES, cartridge sound chips included, and plays
      its first song (for two and a half minutes when the file doesn't say how long). A VGM replays the writes a game
@@ -958,6 +958,25 @@ recording the way it measures every sound, without the room's noise either side,
 it. The recording isn't kept. In the API, `POST /api/imitation` with a WAV file answers with the `imitation` value
 to search with.
 
+### Tempo and key of music
+
+Music and loops get a tempo and a key, worked out by the same listening. The tempo comes from where notes and beats
+start, and the beat that fits them best, between 50 and 220 BPM with 70 to 180 preferred. Half or double the real
+tempo is the usual mistake, so the other reading is kept too: the details say "about 70 BPM (or 140), as heard", and
+a tempo search finds it either way. A loop whose length is a whole number of bars at that tempo gets it exactly, and
+its length in bars (`bars:8`, in 4/4). The key comes from how much of each of the 12 notes is heard, matched against
+major and minor key profiles, with its place on the Camelot wheel beside it, as DJs write keys: "A minor (8A)". A tempo
+or key the file states (a WAV's ACID chunk, an MP3's or FLAC's BPM and key fields, a MIDI file's tempo and key
+signature) wins over what's heard. MIDI files get their key from their notes, and tracker music from its rendering.
+Sounds that die away at once and are shorter than four seconds are skipped, so a footstep doesn't get a key, and so is
+anything under two seconds; a key needs eight seconds unless there's a beat. The first 30 seconds are what's listened
+to, so a track whose tempo or key changes partway gets the one it starts with, or the one there most of that time.
+
+They become tags, `bpm:120` and `key:a-minor`, and the sidebar's **Music** section searches by them: a tempo range,
+and a key, which also finds the keys that mix with it (its relative major or minor, and the keys a fifth either side)
+unless that's unticked. In the API they're `bpm_min`, `bpm_max`, `key` (written any way: `a-minor`, `Am`, `A minor`,
+`8A`) and `compatible_keys=true`; over MCP, the same arguments to `search_sounds`.
+
 ### Image search
 
 Settings → Image and sound search adds a model that knows what pictures show (OpenAI's CLIP, ViT-B/32). It's off
@@ -1040,7 +1059,7 @@ both connect.
 | `search_assets` | full-text + kind/tag/pack filters, with thumbnail and download URLs; `include_previews` returns the first 8 thumbnails as images |
 | `find_similar` | assets that look like a given one (colors, surface, near-copies), across every pack; same result shape as `search_assets` |
 | `find_by_color` | assets with much of a hex color in them, most of it first |
-| `search_sounds` | sounds ranked by how well what was measured of them fits a word imitating them (`imitation`: "WHOOOM", "pew") and the agent's own reading of it (`shape`: seconds, a sharp or soft attack, ringing on or cutting off, dark or bright, tonal or noisy, pitch falling or rising, loud), with how Hoard read the word; each sound comes with its measurements, the same in words and a link to listen |
+| `search_sounds` | sounds ranked by how well what was measured of them fits a word imitating them (`imitation`: "WHOOOM", "pew") and the agent's own reading of it (`shape`: seconds, a sharp or soft attack, ringing on or cutting off, dark or bright, tonal or noisy, pitch falling or rising, loud), with how Hoard read the word; or by tempo (`bpm_min`, `bpm_max`) and key (`key`, `compatible_keys`); each sound comes with its measurements, the same in words and a link to listen |
 | `describe_sound` | what one sound sounds like, as measured, in numbers and words |
 | `sounds_like` | the sounds that sound like a given one, described the same way |
 | `get_asset` | full detail: metadata, tags with sources, links, what uses it, variants, identical copies, the thumbnail's colors |

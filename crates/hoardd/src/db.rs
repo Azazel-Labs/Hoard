@@ -1890,6 +1890,36 @@ fn look_join(look: &LookRank) -> &'static str {
     }
 }
 
+/// Music by tempo, as its `bpm:` tag has it or (when its file states none) as the other way to count what was heard,
+/// and by key, as its `key:` tag has it.
+fn music_filter(q: &SearchQuery, f: &mut Filter) {
+    if q.bpm_min.is_some() || q.bpm_max.is_some() {
+        let (lo, hi) = (f64::from(q.bpm_min.unwrap_or(0.0)), f64::from(q.bpm_max.unwrap_or(10_000.0)));
+        f.clauses.push(
+            "(EXISTS (SELECT 1 FROM asset_tags t WHERE t.asset_id = a.id AND t.tag >= 'bpm:' AND t.tag < 'bpm;'
+                      AND CAST(substr(t.tag, 5) AS REAL) BETWEEN ? AND ?)
+              OR (json_extract(a.meta, '$.tempo_bpm') IS NULL
+                  AND json_extract(a.meta, '$.measured_bpm_alt') BETWEEN ? AND ?))"
+                .to_owned(),
+        );
+        f.params.extend([lo, hi, lo, hi].map(SqlValue::Real));
+    }
+    if let Some(key) = q.key.as_deref().filter(|k| !k.trim().is_empty()) {
+        match crate::rhythm::Key::parse(key) {
+            Some(k) => {
+                let keys = if q.compatible_keys { k.compatible().to_vec() } else { vec![k] };
+                f.clauses.push(format!(
+                    "EXISTS (SELECT 1 FROM asset_tags t WHERE t.asset_id = a.id AND t.tag IN ({}))",
+                    keys.iter().map(|_| "?").collect::<Vec<_>>().join(", ")
+                ));
+                f.params.extend(keys.iter().map(|k| SqlValue::Text(k.tag())));
+            }
+            // A key that isn't one matches nothing.
+            None => f.clauses.push("0".to_owned()),
+        }
+    }
+}
+
 fn build_filter(q: &SearchQuery, include_kind: bool, look: Option<&LookRank>) -> Filter {
     let mut f = Filter { join: String::new(), clauses: Vec::new(), params: Vec::new(), ranked: false };
     let fts = q.q.as_deref().and_then(fts_query);
@@ -1947,6 +1977,7 @@ fn build_filter(q: &SearchQuery, include_kind: bool, look: Option<&LookRank>) ->
     if q.hide_supporting {
         f.clauses.push(format!("NOT {SUPPORTING}"));
     }
+    music_filter(q, &mut f);
     f.clauses.push(
         match (q.archived, q.pack.as_deref().is_some_and(|p| !p.is_empty())) {
             (false, _) => LIVE,
@@ -2995,6 +3026,48 @@ mod tests {
         // Without a pack, a folder means nothing.
         let q = SearchQuery { folder: Some("UI".into()), ..Default::default() };
         assert_eq!(search(&conn, &q, false).unwrap().total, 9);
+    }
+
+    #[test]
+    fn music_by_tempo_and_key() {
+        let conn = test_library();
+        conn.execute_batch(
+            "INSERT INTO blobs (hash, size, created_at) VALUES ('h', 1, 'x');
+             INSERT INTO packs (id, name, status, created_at) VALUES ('p1', 'Loops', 'ready', 'x');
+             INSERT INTO assets (id, pack_id, blob_hash, path, name, ext, kind, meta, created_at, updated_at) VALUES
+               ('stated', 'p1', 'h', 'a.wav', 'a', 'wav', 'audio', '{\"tempo_bpm\": 128}', 'x', 'x'),
+               ('heard', 'p1', 'h', 'b.ogg', 'b', 'ogg', 'audio', '{\"measured_bpm\": 70, \"measured_bpm_alt\": 140}', 'x', 'x'),
+               ('relative', 'p1', 'h', 'c.ogg', 'c', 'ogg', 'audio', '{}', 'x', 'x'),
+               ('none', 'p1', 'h', 'd.ogg', 'd', 'ogg', 'audio', '{}', 'x', 'x');
+             INSERT INTO asset_tags (asset_id, tag, source, confidence) VALUES
+               ('stated', 'bpm:128', 'meta', 1.0), ('stated', 'key:a-minor', 'meta', 1.0),
+               ('heard', 'bpm:70', 'rule', 0.8), ('heard', 'key:e-minor', 'rule', 0.8),
+               ('relative', 'key:c-major', 'rule', 0.8), ('none', 'bpm', 'human', 1.0);",
+        )
+        .unwrap();
+        let find = |q: SearchQuery| {
+            let mut ids = search(&conn, &SearchQuery { sort: Some("name".into()), ..q }, false)
+                .unwrap()
+                .items
+                .into_iter()
+                .map(|a| a.id)
+                .collect::<Vec<_>>();
+            ids.sort();
+            ids
+        };
+        let bpm =
+            |lo: Option<f32>, hi: Option<f32>| find(SearchQuery { bpm_min: lo, bpm_max: hi, ..Default::default() });
+        assert_eq!(bpm(Some(120.0), Some(130.0)), ["stated"]);
+        // What was heard counts at half or double, as a tempo the file states doesn't.
+        assert_eq!(bpm(Some(135.0), None), ["heard"]);
+        assert_eq!(bpm(None, Some(100.0)), ["heard"]);
+        assert_eq!(bpm(Some(60.0), Some(64.0)), Vec::<String>::new());
+        let key =
+            |k: &str, compatible_keys| find(SearchQuery { key: Some(k.into()), compatible_keys, ..Default::default() });
+        assert_eq!(key("Am", false), ["stated"]);
+        assert_eq!(key("8A", true), ["heard", "relative", "stated"], "C major is its relative, E minor a fifth up");
+        assert_eq!(key("C major", false), ["relative"]);
+        assert_eq!(key("H minor", true), Vec::<String>::new(), "a key that isn't one matches nothing");
     }
 
     #[test]

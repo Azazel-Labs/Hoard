@@ -16,6 +16,7 @@ import { canStar, mine, toggleFavorite } from '../mine'
 import { MAX_STORE_FILE, TEXT_EXTS } from '../storeFormats'
 import { lazy } from '../lazy'
 import { formatDate, formatNumber, t } from '../i18n'
+import { findKey, keyName } from '../keys'
 import { isSkeletonAsset, isLottieAsset, isModelAsset, isRiveAsset, isTextAsset, takeViewRequest, viewRequest, viewerFor, type ViewerKind } from '../viewers'
 import { isMaterialAsset, resolutions, ROLE_LABEL, ROLE_NAME, sizeLabel } from '../materials'
 import { withThumb } from '../browserThumbs'
@@ -426,7 +427,16 @@ const metaRows = computed(() => {
     const octaves = Math.abs(sweep)
     rows.push([t('asset-meta-pitch'), sweep > 0 ? t('asset-meta-pitch-rises', { octaves }) : t('asset-meta-pitch-falls', { octaves })])
   }
-  if (num('tempo_bpm') !== undefined) rows.push([t('asset-meta-tempo'), `${m.tempo_bpm} BPM`])
+  if (num('tempo_bpm') !== undefined) rows.push([t('asset-meta-tempo'), `${m.tempo_bpm} BPM`, factTag('bpm')])
+  else if (num('measured_bpm') !== undefined) {
+    const [bpm, alt] = [num('measured_bpm')!, num('measured_bpm_alt')]
+    rows.push([t('asset-meta-tempo'), alt === undefined ? t('asset-meta-tempo-heard', { bpm }) : t('asset-meta-tempo-heard-or', { bpm, alt }), factTag('bpm')])
+  }
+  const key = findKey(String(m.key ?? m.measured_key ?? ''))
+  if (key) {
+    const value = t('asset-meta-key-value', { key: keyName(key), camelot: key.camelot })
+    rows.push([t('asset-meta-key'), m.key ? value : t('asset-meta-key-heard', { key: value }), factTag('key')])
+  }
   if (typeof m.root_note === 'string') rows.push([t('asset-meta-root-note'), m.root_note as string])
   if (num('cue_points')) rows.push([t('asset-meta-cue-markers'), String(m.cue_points)])
   if (typeof m.ucs_category === 'string') {

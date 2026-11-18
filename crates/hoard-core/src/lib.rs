@@ -746,6 +746,19 @@ pub struct SearchQuery {
     /// `similar` and `color`.
     #[serde(default)]
     pub imitation: Option<String>,
+    /// Music at this tempo (BPM) or faster, as its file states it or as heard (either way of counting it, half or
+    /// double).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub bpm_min: Option<f32>,
+    /// Music at this tempo (BPM) or slower.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub bpm_max: Option<f32>,
+    /// Music in this key, however it's written (`a-minor`, `A minor`, `Am`, `E♭ major`, `8A`).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub key: Option<String>,
+    /// With `key`: the keys that mix with it too (its relative major or minor, and the keys a fifth either side).
+    #[serde(default, skip_serializing_if = "std::ops::Not::not")]
+    pub compatible_keys: bool,
     /// Only this account's favorites. Set by the server for whoever asks, never sent.
     #[serde(skip)]
     pub favorites_of: Option<i64>,

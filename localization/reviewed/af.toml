@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "aece80cb9cad73b6e97bc1d3df37fcea840d003fe39572dd5c55703ef6233704"
+source = "b0d7dd201105b6da38b5de865a3e77a6c2f5d5ac2b3ab437da4b9b494bf2d0f8"
 translation = "b9203115cf8b13a0111214aa1af8cf4a9194f497abfd52d839917124a3498329"
 
 [messages.account-add]
@@ -948,6 +948,30 @@ translation = "Skryf die geluid wat ’n klank maak soos jy dit sou spel: klanke
 source = "Import folder"
 translation = "Voer vouer in"
 
+[messages.app-key]
+source = "Key"
+translation = "Toonsoort"
+
+[messages.app-key-any]
+source = "Any key"
+translation = "Enige toonsoort"
+
+[messages.app-key-major]
+source = "Major"
+translation = "Majeur"
+
+[messages.app-key-minor]
+source = "Minor"
+translation = "Mineur"
+
+[messages.app-key-mix]
+source = "And keys that mix with it"
+translation = "En toonsoorte wat daarmee meng"
+
+[messages.app-key-mix-title]
+source = "Its relative major or minor and the keys a fifth either side, which DJs mix with it"
+translation = "Sy verwante majeur of mineur en die toonsoorte ’n kwint aan weerskante, wat DJ’s daarmee meng"
+
 [messages.app-keys-hint]
 source = "Arrow keys move, Enter opens, Space plays a sound, X or Ctrl-click selects several (long-press on touch)."
 translation = "Pyltjiesleutels skuif, Enter maak oop, Spasie speel 'n klank, X of Ctrl-klik kies etlike (druk lank op raakskerms)."
@@ -979,6 +1003,10 @@ translation = "Biblioteek"
 [messages.app-loading-more]
 source = "Loading more"
 translation = "Laai meer"
+
+[messages.app-music]
+source = "Music"
+translation = "Musiek"
 
 [messages.app-no-filters]
 source = "No filters for this search."
@@ -1335,6 +1363,26 @@ translation = "Ondersteunende lêers ingesluit"
 [messages.app-supporting-title]
 source = "glTF buffers, material libraries, the maps of materials, materials only one model wears and the store files describing models. They come along when you download what uses them. A sprite sheet’s pages, and its sprites the pack has as separate images too, are shown with the sheet. An asset the pack has in several formats is shown once, in the format Hoard reads best."
 translation = "glTF-buffers, materiaalbiblioteke, die kaarte van materiale, materiale wat net een model dra en die winkellêers wat modelle beskryf. Hulle kom saam wanneer jy aflaai wat hulle gebruik. ’n Spritevel se bladsye, en sy sprites wat die pak ook as aparte prente het, word saam met die vel gewys. ’n Bate wat die pak in verskeie formate het, word een keer gewys, in die formaat wat Hoard die beste lees."
+
+[messages.app-tempo]
+source = "BPM"
+translation = "BPM"
+
+[messages.app-tempo-max]
+source = "to"
+translation = "tot"
+
+[messages.app-tempo-max-title]
+source = "Music at this tempo or slower, in beats a minute"
+translation = "Musiek teen hierdie tempo of stadiger, in slae per minuut"
+
+[messages.app-tempo-min]
+source = "from"
+translation = "van"
+
+[messages.app-tempo-min-title]
+source = "Music at this tempo or faster, in beats a minute (half or double counts too)"
+translation = "Musiek teen hierdie tempo of vinniger, in slae per minuut (die helfte of dubbel tel ook)"
 
 [messages.app-theme]
 source = "Theme"
@@ -2062,6 +2110,18 @@ translation = "Genre"
 source = "HDR (preview is tone-mapped)"
 translation = "HDR (voorskou is toonverwerk)"
 
+[messages.asset-meta-key]
+source = "Key"
+translation = "Toonsoort"
+
+[messages.asset-meta-key-heard]
+source = "{ $key }, as heard"
+translation = "{ $key }, op die gehoor"
+
+[messages.asset-meta-key-value]
+source = "{ $key } ({ $camelot })"
+translation = "{ $key } ({ $camelot })"
+
 [messages.asset-meta-keywords]
 source = "Keywords"
 translation = "Sleutelwoorde"
@@ -2217,6 +2277,14 @@ translation = "Stereo"
 [messages.asset-meta-tempo]
 source = "Tempo"
 translation = "Tempo"
+
+[messages.asset-meta-tempo-heard]
+source = "about { $bpm } BPM, as heard"
+translation = "sowat { $bpm } BPM, op die gehoor"
+
+[messages.asset-meta-tempo-heard-or]
+source = "about { $bpm } BPM (or { $alt }), as heard"
+translation = "sowat { $bpm } BPM (of { $alt }), op die gehoor"
 
 [messages.asset-meta-tiling]
 source = "Tiling"
@@ -6671,6 +6739,14 @@ translation = "Draadraam"
 [messages.model-wireframe-title]
 source = "Wireframe (W), over any view"
 translation = "Draadraam (W), oor enige aansig"
+
+[messages.music-key-major]
+source = "{ $note } major"
+translation = "{ $note } majeur"
+
+[messages.music-key-minor]
+source = "{ $note } minor"
+translation = "{ $note } mineur"
 
 [messages.packs-added]
 source = "Added { $date }"

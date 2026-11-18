@@ -452,6 +452,27 @@ export function sound(sort: 'thud' | 'zap' | 'rain', seed: number, rate = 22_050
   return wav(out, rate)
 }
 
+/** A loop of music: chords a beat each at `bpm` (i iv V i in A minor, MIDI notes), each struck and dying away, for
+ * `secs`. */
+export function chords(bpm = 120, secs = 8, rate = 22_050): Buffer {
+  const progression = [[57, 60, 64], [62, 65, 69], [64, 68, 71], [57, 60, 64]]
+  const out = new Array<number>(Math.round(secs * rate)).fill(0)
+  const beat = Math.round((60 / bpm) * rate)
+  for (let b = 0; b * beat < out.length; b++) {
+    for (const n of progression[b % progression.length]) {
+      const hz = 440 * 2 ** ((n - 69) / 12)
+      for (let i = 0; i < beat && b * beat + i < out.length; i++) {
+        const t = i / rate
+        const env = Math.min(t * 200, 1) * Math.exp(-t * 1.5)
+        let v = 0
+        for (let h = 1; h <= 4; h++) v += Math.sin(2 * Math.PI * hz * h * t) / h
+        out[b * beat + i] += 0.12 * env * v
+      }
+    }
+  }
+  return wav(out, rate)
+}
+
 /** Someone saying "pew" into a microphone, more or less: a falling whistle that starts at once and dies away, with
  * half a second of the room's hiss before it and a second after. */
 export function pew(rate = 48_000): Buffer {

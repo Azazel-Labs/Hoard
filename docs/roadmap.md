@@ -3,6 +3,39 @@
 What's planned or being weighed, roughly in order. Nothing here is promised; each item says what's settled and what
 isn't yet.
 
+## Sounds in the one search field
+
+The sidebar's "Sounds like" box (a written noise, or the microphone) and its music filters (tempo and key) sit above
+Kind and Subject, taking room on every search, though they only matter for sounds. Settled:
+
+- **Music filters only for sounds.** Tempo and key move below Kind and the tag groups, and only show while the search
+  is limited to sounds (Kind is Audio), or while one of them is set, so it can be cleared.
+- **The microphone in the search field.** The search field gets the microphone button; a recorded noise shows as
+  "Your noise" in the field, and searching anything else drops it.
+- **Written noises in the search field too.** With the search limited to sounds, the words in the search field also
+  find sounds shaped like them ("whooom", "pew"), beside the sounds whose names, tags or sound match the words, and the
+  sidebar box goes. Outside sounds the words search as they do now.
+
+Still open: whether a search not limited to sounds should notice a written noise by itself (a word that matches
+nothing and spells like one) and offer the sounds shaped like it.
+
+## Text and document thumbnails
+
+Text, JSON and PDF files show a generic icon. Planned:
+
+- **Text and code as a silhouette.** Each line is drawn as a bar from the left edge, indented as the line is and as
+  long as it is, colored by what's in it: keywords, strings, numbers, comments and punctuation each a color of their
+  own, on a dark ground. A file reads like a speckled gene sequence: its shape shows its indentation and density, its
+  colors what kind of text it is. JSON gets the same, colored by keys, strings, numbers and brackets.
+- **PDFs by their first page**, drawn the way an Illustrator file's is.
+
+## Maintainability: what's left
+
+The largest files have been split into folder modules. The rest are big but each about one thing; splitting them
+waits until they're next changed: `db/schema.rs` (1,620 lines, mostly the migrations, in order), `store_formats.rs`,
+`unitymat.rs`, `sidecar.rs`, `sources.rs`, `links.rs` and `materials/models.rs` (750 to 900 lines each), and on the
+web side `App.vue` (1,750), `AssetDetail.vue`, `PacksView.vue`, `skeleton2d.ts` and `AiPanel.vue` (700 to 870).
+
 ## Library locations: what's left
 
 The first-run setup and library locations are in. A server can keep files in several managed locations, routed by

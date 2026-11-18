@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "f1669a81c6df0aa65b7d1254acbfe377ffe38ce4f61e820fd439a52d951e4242"
+source = "f7e0e0b19af39ea3822145faba9be4d1ea835284f074aa72561dec35f36e1c83"
 translation = "72f8bea74267d1a6341481bb8f995cf690d50c49c33ba6825335f86fe2349868"
 
 [messages.account-add]
@@ -3715,6 +3715,14 @@ translation = "έχει ένα μόνο καρέ ή υπερβολικά πολ�
 [messages.error-full-path]
 source = "give a full path"
 translation = "δώστε πλήρη διαδρομή"
+
+[messages.error-hosted-address]
+source = "The image search service’s address should start with http:// or https://"
+translation = "Η διεύθυνση της υπηρεσίας αναζήτησης εικόνων πρέπει να αρχίζει με http:// ή https://"
+
+[messages.error-hosted-key]
+source = "Enter the API key for { $provider }"
+translation = "Εισαγάγετε το κλειδί API για το { $provider }"
 
 [messages.error-https-bad-name]
 source = "“{ $name }” isn't an address a certificate can hold"
@@ -8710,6 +8718,14 @@ translation = "Λήψη του μοντέλου… η πρόοδος φαίνε�
 source = "Search by what pictures show"
 translation = "Αναζήτηση με βάση αυτό που δείχνουν οι εικόνες"
 
+[messages.settings-clip-here]
+source = "This server: nothing leaves it"
+translation = "Αυτόν τον διακομιστή: τίποτα δεν φεύγει από αυτόν"
+
+[messages.settings-clip-here-desktop]
+source = "This computer: nothing leaves it"
+translation = "Αυτόν τον υπολογιστή: τίποτα δεν φεύγει από αυτόν"
+
 [messages.settings-clip-hint]
 source = "Uses Google’s SigLIP 2 model, run on this server’s processor: nothing leaves it. Turning it on downloads the model ({ $size } MB) from Hugging Face, then learns every picture in the background at low priority. It takes 350 to 750 MB of memory while it works or someone searches. Turning it off deletes the model and keeps what it learned, for next time."
 translation = "Χρησιμοποιεί το μοντέλο SigLIP 2 της Google, που εκτελείται στον επεξεργαστή αυτού του διακομιστή: τίποτα δεν φεύγει από αυτόν. Η ενεργοποίηση κατεβάζει το μοντέλο ({ $size } MB) από το Hugging Face και έπειτα μαθαίνει κάθε εικόνα στο παρασκήνιο με χαμηλή προτεραιότητα. Καταλαμβάνει 350 έως 750 MB μνήμης όσο δουλεύει ή όταν κάποιος κάνει αναζήτηση. Η απενεργοποίηση διαγράφει το μοντέλο και κρατά ό,τι έμαθε, για την επόμενη φορά."
@@ -8717,6 +8733,26 @@ translation = "Χρησιμοποιεί το μοντέλο SigLIP 2 της Goog
 [messages.settings-clip-hint-desktop]
 source = "Uses Google’s SigLIP 2 model, run on this computer’s processor: nothing leaves it. Turning it on downloads the model ({ $size } MB) from Hugging Face, then learns every picture in the background at low priority. It takes 350 to 750 MB of memory while it works or you search. Turning it off deletes the model and keeps what it learned, for next time."
 translation = "Χρησιμοποιεί το μοντέλο SigLIP 2 της Google, που εκτελείται στον επεξεργαστή αυτού του υπολογιστή: τίποτα δεν φεύγει από αυτόν. Η ενεργοποίηση κατεβάζει το μοντέλο ({ $size } MB) από το Hugging Face και έπειτα μαθαίνει κάθε εικόνα στο παρασκήνιο με χαμηλή προτεραιότητα. Καταλαμβάνει 350 έως 750 MB μνήμης όσο δουλεύει ή όταν κάνετε αναζήτηση. Η απενεργοποίηση διαγράφει το μοντέλο και κρατά ό,τι έμαθε, για την επόμενη φορά."
+
+[messages.settings-clip-hosted]
+source = "A hosted service"
+translation = "Μια φιλοξενούμενη υπηρεσία"
+
+[messages.settings-clip-hosted-hint]
+source = "Nothing is downloaded or run here: the service learns every picture, a batch at a time. Another service or model learns them all again, and what each one learned is kept, for switching back."
+translation = "Τίποτα δεν κατεβαίνει ούτε εκτελείται εδώ: η υπηρεσία μαθαίνει κάθε εικόνα, κατά παρτίδες. Μια άλλη υπηρεσία ή άλλο μοντέλο τις μαθαίνει όλες ξανά, και ό,τι έμαθε το καθένα κρατιέται, για να μπορείτε να επιστρέψετε."
+
+[messages.settings-clip-hosted-unavailable]
+source = "Couldn’t use { $service }: { $detail }. Trying again every hour."
+translation = "Δεν ήταν δυνατή η χρήση του { $service }: { $detail }. Νέα προσπάθεια κάθε ώρα."
+
+[messages.settings-clip-hosted-warning]
+source = "Pictures leave this server. A thumbnail of every picture in the library, and the words of every image search, are sent to { $service }, which charges for them and keeps them as its terms say."
+translation = "Οι εικόνες φεύγουν από αυτόν τον διακομιστή. Μια μικρογραφία κάθε εικόνας της βιβλιοθήκης και οι λέξεις κάθε αναζήτησης εικόνων στέλνονται στο { $service }, που χρεώνει γι’ αυτές και τις κρατά όπως ορίζουν οι όροι του."
+
+[messages.settings-clip-hosted-warning-desktop]
+source = "Pictures leave this computer. A thumbnail of every picture in the library, and the words of every image search, are sent to { $service }, which charges for them and keeps them as its terms say."
+translation = "Οι εικόνες φεύγουν από αυτόν τον υπολογιστή. Μια μικρογραφία κάθε εικόνας της βιβλιοθήκης και οι λέξεις κάθε αναζήτησης εικόνων στέλνονται στο { $service }, που χρεώνει γι’ αυτές και τις κρατά όπως ορίζουν οι όροι του."
 
 [messages.settings-clip-learning]
 source = "Ready: learning pictures, { $done } of { $total } so far"
@@ -8749,6 +8785,18 @@ translation = "Μέχρι το νέο μοντέλο να μάθει κάθε ε
 source = "Image search: back to the default"
 translation = "Αναζήτηση εικόνων: επαναφορά στην προεπιλογή"
 
+[messages.settings-clip-saved-here]
+source = "Image search: runs on this server"
+translation = "Αναζήτηση εικόνων: εκτελείται σε αυτόν τον διακομιστή"
+
+[messages.settings-clip-saved-here-desktop]
+source = "Image search: runs on this computer"
+translation = "Αναζήτηση εικόνων: εκτελείται σε αυτόν τον υπολογιστή"
+
+[messages.settings-clip-saved-hosted]
+source = "Image search: runs on { $service }"
+translation = "Αναζήτηση εικόνων: εκτελείται στο { $service }"
+
 [messages.settings-clip-saved-off]
 source = "Image search: off"
 translation = "Αναζήτηση εικόνων: ανενεργή"
@@ -8768,6 +8816,10 @@ translation = "Δεν ήταν δυνατή η λήψη του μοντέλου:
 [messages.settings-clip-what]
 source = "Type what you’re after (“mossy rock”, “sci-fi door”, “wooden barrel”) and pictures that show it turn up beside names that have the words. “More like this” finds things of the same kind, not only the same colors."
 translation = "Πληκτρολογήστε αυτό που ψάχνετε («mossy rock», «sci-fi door», «wooden barrel») και οι εικόνες που το δείχνουν εμφανίζονται δίπλα στα ονόματα που περιέχουν τις λέξεις. Το «Περισσότερα σαν αυτό» βρίσκει πράγματα του ίδιου είδους, όχι μόνο με τα ίδια χρώματα."
+
+[messages.settings-clip-where]
+source = "Runs on"
+translation = "Εκτελείται σε"
 
 [messages.settings-conv]
 source = "Conversion rules"

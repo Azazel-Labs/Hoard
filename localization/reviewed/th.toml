@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "f1669a81c6df0aa65b7d1254acbfe377ffe38ce4f61e820fd439a52d951e4242"
+source = "f7e0e0b19af39ea3822145faba9be4d1ea835284f074aa72561dec35f36e1c83"
 translation = "07555d54b3ba6bc94b6fcbf55672d1be5e77ca134c96e30754ee929b3a902828"
 
 [messages.account-add]
@@ -3614,6 +3614,14 @@ translation = "ไฟล์นี้มีเฟรมเดียว หรื�
 [messages.error-full-path]
 source = "give a full path"
 translation = "ระบุพาธเต็ม"
+
+[messages.error-hosted-address]
+source = "The image search service’s address should start with http:// or https://"
+translation = "ที่อยู่ของบริการค้นหาด้วยภาพควรขึ้นต้นด้วย http:// หรือ https://"
+
+[messages.error-hosted-key]
+source = "Enter the API key for { $provider }"
+translation = "ใส่คีย์ API ของ { $provider }"
 
 [messages.error-https-bad-name]
 source = "“{ $name }” isn't an address a certificate can hold"
@@ -8476,6 +8484,14 @@ translation = "กำลังดาวน์โหลดโมเดล… ด�
 source = "Search by what pictures show"
 translation = "ค้นหาจากสิ่งที่ปรากฏในภาพ"
 
+[messages.settings-clip-here]
+source = "This server: nothing leaves it"
+translation = "เซิร์ฟเวอร์นี้: ไม่มีอะไรออกไปข้างนอก"
+
+[messages.settings-clip-here-desktop]
+source = "This computer: nothing leaves it"
+translation = "คอมพิวเตอร์เครื่องนี้: ไม่มีอะไรออกไปข้างนอก"
+
 [messages.settings-clip-hint]
 source = "Uses Google’s SigLIP 2 model, run on this server’s processor: nothing leaves it. Turning it on downloads the model ({ $size } MB) from Hugging Face, then learns every picture in the background at low priority. It takes 350 to 750 MB of memory while it works or someone searches. Turning it off deletes the model and keeps what it learned, for next time."
 translation = "ใช้โมเดล SigLIP 2 ของ Google ที่ทำงานบนโปรเซสเซอร์ของเซิร์ฟเวอร์นี้: ไม่มีข้อมูลใดออกไปภายนอก การเปิดจะดาวน์โหลดโมเดล ({ $size } MB) จาก Hugging Face แล้วเรียนรู้รูปภาพทุกภาพในเบื้องหลังด้วยลำดับความสำคัญต่ำ ใช้หน่วยความจำ 350 ถึง 750 MB ขณะทำงานหรือขณะมีคนค้นหา การปิดจะลบโมเดลแต่เก็บสิ่งที่เรียนรู้ไว้ใช้ครั้งหน้า"
@@ -8483,6 +8499,26 @@ translation = "ใช้โมเดล SigLIP 2 ของ Google ที่ท�
 [messages.settings-clip-hint-desktop]
 source = "Uses Google’s SigLIP 2 model, run on this computer’s processor: nothing leaves it. Turning it on downloads the model ({ $size } MB) from Hugging Face, then learns every picture in the background at low priority. It takes 350 to 750 MB of memory while it works or you search. Turning it off deletes the model and keeps what it learned, for next time."
 translation = "ใช้โมเดล SigLIP 2 ของ Google ที่ทำงานบนโปรเซสเซอร์ของคอมพิวเตอร์เครื่องนี้: ไม่มีข้อมูลใดออกไปภายนอก การเปิดจะดาวน์โหลดโมเดล ({ $size } MB) จาก Hugging Face แล้วเรียนรู้รูปภาพทุกภาพในเบื้องหลังด้วยลำดับความสำคัญต่ำ ใช้หน่วยความจำ 350 ถึง 750 MB ขณะทำงานหรือขณะที่คุณค้นหา การปิดจะลบโมเดลแต่เก็บสิ่งที่เรียนรู้ไว้ใช้ครั้งหน้า"
+
+[messages.settings-clip-hosted]
+source = "A hosted service"
+translation = "บริการแบบโฮสต์"
+
+[messages.settings-clip-hosted-hint]
+source = "Nothing is downloaded or run here: the service learns every picture, a batch at a time. Another service or model learns them all again, and what each one learned is kept, for switching back."
+translation = "ไม่มีการดาวน์โหลดหรือเรียกใช้อะไรที่นี่ บริการจะเรียนรู้ทุกภาพทีละชุด บริการหรือโมเดลอื่นจะเรียนรู้ใหม่ทั้งหมด และสิ่งที่แต่ละตัวเรียนรู้ไว้จะถูกเก็บไว้เผื่อเปลี่ยนกลับ"
+
+[messages.settings-clip-hosted-unavailable]
+source = "Couldn’t use { $service }: { $detail }. Trying again every hour."
+translation = "ใช้ { $service } ไม่ได้: { $detail } จะลองใหม่ทุกชั่วโมง"
+
+[messages.settings-clip-hosted-warning]
+source = "Pictures leave this server. A thumbnail of every picture in the library, and the words of every image search, are sent to { $service }, which charges for them and keeps them as its terms say."
+translation = "ภาพจะออกจากเซิร์ฟเวอร์นี้ ภาพย่อของทุกภาพในคลัง และคำในการค้นหาด้วยภาพทุกครั้ง จะถูกส่งไปยัง { $service } ซึ่งคิดค่าบริการและเก็บไว้ตามข้อกำหนดของบริการนั้น"
+
+[messages.settings-clip-hosted-warning-desktop]
+source = "Pictures leave this computer. A thumbnail of every picture in the library, and the words of every image search, are sent to { $service }, which charges for them and keeps them as its terms say."
+translation = "ภาพจะออกจากคอมพิวเตอร์เครื่องนี้ ภาพย่อของทุกภาพในคลัง และคำในการค้นหาด้วยภาพทุกครั้ง จะถูกส่งไปยัง { $service } ซึ่งคิดค่าบริการและเก็บไว้ตามข้อกำหนดของบริการนั้น"
 
 [messages.settings-clip-learning]
 source = "Ready: learning pictures, { $done } of { $total } so far"
@@ -8514,6 +8550,18 @@ translation = "จนกว่าโมเดลใหม่จะเรีย�
 source = "Image search: back to the default"
 translation = "ค้นหาด้วยภาพ: กลับเป็นค่าเริ่มต้น"
 
+[messages.settings-clip-saved-here]
+source = "Image search: runs on this server"
+translation = "ค้นหาด้วยภาพ: ทำงานบนเซิร์ฟเวอร์นี้"
+
+[messages.settings-clip-saved-here-desktop]
+source = "Image search: runs on this computer"
+translation = "ค้นหาด้วยภาพ: ทำงานบนคอมพิวเตอร์เครื่องนี้"
+
+[messages.settings-clip-saved-hosted]
+source = "Image search: runs on { $service }"
+translation = "ค้นหาด้วยภาพ: ทำงานบน { $service }"
+
 [messages.settings-clip-saved-off]
 source = "Image search: off"
 translation = "ค้นหาด้วยภาพ: ปิด"
@@ -8533,6 +8581,10 @@ translation = "รับโมเดลไม่ได้: { $detail } จะล
 [messages.settings-clip-what]
 source = "Type what you’re after (“mossy rock”, “sci-fi door”, “wooden barrel”) and pictures that show it turn up beside names that have the words. “More like this” finds things of the same kind, not only the same colors."
 translation = "พิมพ์สิ่งที่คุณต้องการ (“หินมีมอส”, “ประตูไซไฟ”, “ถังไม้”) แล้วรูปภาพที่แสดงสิ่งนั้นจะปรากฏข้างรายการที่มีคำเหล่านั้นในชื่อ “คล้ายกับรายการนี้” จะค้นหาสิ่งที่เป็นประเภทเดียวกัน ไม่ใช่แค่สีเดียวกัน"
+
+[messages.settings-clip-where]
+source = "Runs on"
+translation = "ทำงานบน"
 
 [messages.settings-conv]
 source = "Conversion rules"

@@ -647,6 +647,7 @@ pub(crate) static SPEC: Spec = Spec {
     // A sound's "more like this" listens instead (see `sounds`).
     unrelated: 0.5,
     same: 0.95,
+    relative: false,
     lift: 0.24,
     margin: 0.12,
     sure: 0.33,

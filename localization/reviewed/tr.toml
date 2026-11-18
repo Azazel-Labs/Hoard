@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "f1669a81c6df0aa65b7d1254acbfe377ffe38ce4f61e820fd439a52d951e4242"
+source = "f7e0e0b19af39ea3822145faba9be4d1ea835284f074aa72561dec35f36e1c83"
 translation = "365b0fc7ff648476ee75c67213c00d18e7b3e0fb9f940664032b9c834c675ffb"
 
 [messages.account-add]
@@ -3624,6 +3624,14 @@ translation = "bunun tek karesi var ya da yerleştirilemeyecek kadar çok karesi
 [messages.error-full-path]
 source = "give a full path"
 translation = "tam bir yol verin"
+
+[messages.error-hosted-address]
+source = "The image search service’s address should start with http:// or https://"
+translation = "Görsel arama hizmetinin adresi http:// ya da https:// ile başlamalı"
+
+[messages.error-hosted-key]
+source = "Enter the API key for { $provider }"
+translation = "{ $provider } için API anahtarını girin"
 
 [messages.error-https-bad-name]
 source = "“{ $name }” isn't an address a certificate can hold"
@@ -8489,6 +8497,14 @@ translation = "Model indiriliyor… ilerleme etkinlik göstergesinde"
 source = "Search by what pictures show"
 translation = "Resimlerin gösterdiğine göre ara"
 
+[messages.settings-clip-here]
+source = "This server: nothing leaves it"
+translation = "Bu sunucuda: hiçbir şey dışarı çıkmaz"
+
+[messages.settings-clip-here-desktop]
+source = "This computer: nothing leaves it"
+translation = "Bu bilgisayarda: hiçbir şey dışarı çıkmaz"
+
 [messages.settings-clip-hint]
 source = "Uses Google’s SigLIP 2 model, run on this server’s processor: nothing leaves it. Turning it on downloads the model ({ $size } MB) from Hugging Face, then learns every picture in the background at low priority. It takes 350 to 750 MB of memory while it works or someone searches. Turning it off deletes the model and keeps what it learned, for next time."
 translation = "Google’ın SigLIP 2 modelini kullanır ve bu sunucunun işlemcisinde çalışır: hiçbir şey dışarı çıkmaz. Açmak, modeli ({ $size } MB) Hugging Face’ten indirir, ardından her resmi arka planda düşük öncelikle öğrenir. Çalışırken ya da biri arama yaparken 350 ile 750 MB bellek kullanır. Kapatmak modeli siler, öğrendiklerini bir dahaki sefer için saklar."
@@ -8496,6 +8512,26 @@ translation = "Google’ın SigLIP 2 modelini kullanır ve bu sunucunun işlemci
 [messages.settings-clip-hint-desktop]
 source = "Uses Google’s SigLIP 2 model, run on this computer’s processor: nothing leaves it. Turning it on downloads the model ({ $size } MB) from Hugging Face, then learns every picture in the background at low priority. It takes 350 to 750 MB of memory while it works or you search. Turning it off deletes the model and keeps what it learned, for next time."
 translation = "Google’ın SigLIP 2 modelini kullanır ve bu bilgisayarın işlemcisinde çalışır: hiçbir şey dışarı çıkmaz. Açmak, modeli ({ $size } MB) Hugging Face’ten indirir, ardından her resmi arka planda düşük öncelikle öğrenir. Çalışırken ya da siz arama yaparken 350 ile 750 MB bellek kullanır. Kapatmak modeli siler, öğrendiklerini bir dahaki sefer için saklar."
+
+[messages.settings-clip-hosted]
+source = "A hosted service"
+translation = "Barındırılan bir hizmette"
+
+[messages.settings-clip-hosted-hint]
+source = "Nothing is downloaded or run here: the service learns every picture, a batch at a time. Another service or model learns them all again, and what each one learned is kept, for switching back."
+translation = "Burada hiçbir şey indirilmez ya da çalıştırılmaz: hizmet her resmi parti parti öğrenir. Başka bir hizmet ya da model hepsini yeniden öğrenir ve her birinin öğrendikleri, geri dönmek için saklanır."
+
+[messages.settings-clip-hosted-unavailable]
+source = "Couldn’t use { $service }: { $detail }. Trying again every hour."
+translation = "{ $service } kullanılamadı: { $detail }. Her saat yeniden deneniyor."
+
+[messages.settings-clip-hosted-warning]
+source = "Pictures leave this server. A thumbnail of every picture in the library, and the words of every image search, are sent to { $service }, which charges for them and keeps them as its terms say."
+translation = "Resimler bu sunucudan çıkar. Kitaplıktaki her resmin küçük resmi ve her görsel aramanın sözcükleri { $service } hizmetine gönderilir; hizmet bunlar için ücret alır ve koşullarında yazdığı gibi saklar."
+
+[messages.settings-clip-hosted-warning-desktop]
+source = "Pictures leave this computer. A thumbnail of every picture in the library, and the words of every image search, are sent to { $service }, which charges for them and keeps them as its terms say."
+translation = "Resimler bu bilgisayardan çıkar. Kitaplıktaki her resmin küçük resmi ve her görsel aramanın sözcükleri { $service } hizmetine gönderilir; hizmet bunlar için ücret alır ve koşullarında yazdığı gibi saklar."
 
 [messages.settings-clip-learning]
 source = "Ready: learning pictures, { $done } of { $total } so far"
@@ -8527,6 +8563,18 @@ translation = "Yeni model her resmi öğrenene kadar aramalar eskisinin öğrend
 source = "Image search: back to the default"
 translation = "Görsel arama: varsayılana dön"
 
+[messages.settings-clip-saved-here]
+source = "Image search: runs on this server"
+translation = "Görsel arama: bu sunucuda çalışıyor"
+
+[messages.settings-clip-saved-here-desktop]
+source = "Image search: runs on this computer"
+translation = "Görsel arama: bu bilgisayarda çalışıyor"
+
+[messages.settings-clip-saved-hosted]
+source = "Image search: runs on { $service }"
+translation = "Görsel arama: { $service } üzerinde çalışıyor"
+
 [messages.settings-clip-saved-off]
 source = "Image search: off"
 translation = "Görsel arama: kapalı"
@@ -8546,6 +8594,10 @@ translation = "Model alınamadı: { $detail }. Her saat yeniden deneniyor."
 [messages.settings-clip-what]
 source = "Type what you’re after (“mossy rock”, “sci-fi door”, “wooden barrel”) and pictures that show it turn up beside names that have the words. “More like this” finds things of the same kind, not only the same colors."
 translation = "Aradığınızı yazın (“mossy rock”, “sci-fi door”, “wooden barrel”); onu gösteren resimler, adında bu sözcükler geçenlerin yanında çıkar. “Buna benzer daha fazla”, yalnızca aynı renkleri değil, aynı türden şeyleri bulur."
+
+[messages.settings-clip-where]
+source = "Runs on"
+translation = "Nerede çalışır"
 
 [messages.settings-conv]
 source = "Conversion rules"

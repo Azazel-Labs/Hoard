@@ -2205,6 +2205,18 @@ async fn settings_json(state: &AppState) -> Value {
     out["clip"] = model_json(now.clip, saved.clip.is_some(), image_search, crate::clip::DOWNLOAD_BYTES, pictures);
     // Searches use what the model before learned until every picture is relearned.
     out["clip"]["relearning"] = json!(crate::clip::relearning());
+    // A hosted service in place of the model here; its key is never sent back, only whether there is one.
+    let hosted = now.clip_hosted.as_ref();
+    out["clip"]["hosted"] = json!({
+        "provider": hosted.map_or("", |h| h.provider.id()),
+        "model": hosted.map_or("", |h| h.model.as_str()),
+        "url": hosted.and_then(|h| h.url.as_deref()).unwrap_or(""),
+        "has_key": saved.clip_hosted_key.as_deref().is_some_and(|k| !k.trim().is_empty()),
+        "providers": crate::hosted::Provider::ALL
+            .iter()
+            .map(|p| json!({ "id": p.id(), "name": p.name(), "model": p.default_model(), "url": p.base() }))
+            .collect::<Vec<_>>(),
+    });
     let sound_search = &crate::clap::describe();
     out["clap"] = model_json(now.clap, saved.clap.is_some(), sound_search, crate::clap::DOWNLOAD_BYTES, sounds);
     out
@@ -2415,9 +2427,10 @@ async fn put_settings(State(state): State<AppState>, Json(patch): Json<Value>) -
         tokio::spawn(async move { crate::formats::log_trim(&st).await });
     }
     crate::updates::set_enabled(after.update_check);
-    if before.clip != after.clip {
-        crate::clip::start(&state, after.clip);
-        if !after.clip {
+    if before.clip != after.clip || before.clip_hosted != after.clip_hosted {
+        crate::clip::start(&state, after.clip, after.clip_hosted.clone());
+        // Off, or a hosted service does the model's part: the model here goes.
+        if !after.clip || after.clip_hosted.is_some() {
             crate::clip::remove_files(&state).await;
         }
     }

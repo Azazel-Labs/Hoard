@@ -67,11 +67,3 @@ Spine skeletons exported as JSON play on their atlas in Hoard's own player. Stil
 
 - **Spine binary skeletons** (`.skel`): the same rig in Spine's binary export, read into the same player.
 
-## Near copies and a better "More like this"
-
-Near copies are listed on each asset and on their own Settings page. More like this ranks by colors and grain, and
-by what pictures show when image search (SigLIP 2) is on. Still to come:
-
-- **A hosted embedding service, as an option.** For a server too small to run the model: thumbnails go to a
-  multimodal embedding API the admin picks. Off by default, and Settings says plainly that it sends pictures away
-  from the server.

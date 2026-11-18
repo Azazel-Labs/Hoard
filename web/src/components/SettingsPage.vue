@@ -9,6 +9,7 @@ import {
   ApiError,
   api,
   type ChatGptStatus,
+  type HostedSearch,
   type LocalModel,
   type LocalModels,
   type ModelInfo,
@@ -634,6 +635,7 @@ function take(next: Settings) {
     vision: next.llm.vision,
     batch: next.llm.batch.value,
   })
+  takeHosted(next.clip.hosted)
   Object.assign(
     opts,
     Object.fromEntries(OPT_KEYS.map((k) => [k, next.options[k].value])),
@@ -676,6 +678,44 @@ async function save(patch: SettingsPatch, done?: string) {
 
 const toggleClip = (on: boolean) => save({ clip: on }, on ? t('settings-clip-saved-on') : t('settings-clip-saved-off'))
 const toggleClap = (on: boolean) => save({ clap: on }, on ? t('settings-clap-saved-on') : t('settings-clap-saved-off'))
+
+/** Image search through a hosted service, as typed; `on` is the "a hosted service" choice, saved or not. */
+const hosted = reactive({ on: false, provider: '', model: '', url: '', key: '' })
+const hostedSaved = computed(() => s.value?.clip.hosted)
+const hostedProvider = computed(() => hostedSaved.value?.providers.find((p) => p.id === hosted.provider))
+/** The saved key is only ever sent to the service and address it was saved for. */
+const hostedKeptKey = computed(() => {
+  const h = hostedSaved.value
+  return !!h?.has_key && h.provider === hosted.provider && trimUrl(h.url) === trimUrl(hosted.url)
+})
+const hostedDirty = computed(() => {
+  const h = hostedSaved.value
+  return (
+    !h?.provider || h.provider !== hosted.provider || h.model !== (hosted.model.trim() || hostedProvider.value?.model) ||
+    trimUrl(h.url) !== trimUrl(hosted.url) || !!hosted.key.trim()
+  )
+})
+function takeHosted(h: HostedSearch | undefined) {
+  Object.assign(hosted, { on: !!h?.provider, provider: h?.provider || h?.providers[0]?.id || '', model: h?.model ?? '', url: h?.url ?? '', key: '' })
+}
+function pickHostedProvider(id: string) {
+  // A model left at the last service's own follows to the new service's.
+  if (hosted.model.trim() === hostedProvider.value?.model) hosted.model = ''
+  hosted.provider = id
+}
+function runHere() {
+  hosted.on = false
+  if (hostedSaved.value?.provider) {
+    void save({ clip_hosted: '', clip_hosted_model: '', clip_hosted_key: '', clip_hosted_url: '' }, t('settings-clip-saved-here'))
+  }
+}
+function saveHosted() {
+  const p = hostedProvider.value
+  if (!p) return
+  const patch: SettingsPatch = { clip_hosted: p.id, clip_hosted_model: hosted.model.trim(), clip_hosted_url: trimUrl(hosted.url) }
+  if (hosted.key.trim()) patch.clip_hosted_key = hosted.key.trim()
+  void save(patch, t('settings-clip-saved-hosted', { service: p.name }))
+}
 
 function pick(k: ToolKey, m: Mode) {
   chosen[k] = m
@@ -777,7 +817,12 @@ function modelStatus(c: SearchModelSetting, which: 'clip' | 'clap'): string {
       }
       const { done, total } = c
       return which === 'clip' ? t('settings-clip-learning', { done, total }) : t('settings-clap-learning', { done, total })
-    case 'unavailable': return t('settings-clip-unavailable', { detail: c.detail })
+    case 'unavailable':
+      if (which === 'clip' && c.hosted?.provider) {
+        const service = c.hosted.providers.find((p) => p.id === c.hosted?.provider)?.name ?? c.hosted.provider
+        return t('settings-clip-hosted-unavailable', { service, detail: c.detail })
+      }
+      return t('settings-clip-unavailable', { detail: c.detail })
   }
 }
 
@@ -1022,7 +1067,50 @@ onBeforeUnmount(() => {
                 </label>
               </div>
             </div>
-            <p class="hint">{{ t('settings-clip-hint', { size: Math.round(s.clip.download_bytes / 1e6) }) }}</p>
+            <form v-if="s.clip.hosted" class="llm where" @submit.prevent="saveHosted">
+              <span id="clip-where" class="label">{{ t('settings-clip-where') }}</span>
+              <div class="choice" role="radiogroup" aria-labelledby="clip-where">
+                <label class="check">
+                  <input type="radio" name="clip-where" :checked="!hosted.on" :disabled="busy" @change="runHere" />
+                  {{ t('settings-clip-here') }}
+                </label>
+                <label class="check">
+                  <input type="radio" name="clip-where" data-testid="clip-hosted" :checked="hosted.on" :disabled="busy" @change="hosted.on = true" />
+                  {{ t('settings-clip-hosted') }}
+                </label>
+              </div>
+              <template v-if="hosted.on">
+                <span />
+                <p class="leaves" role="note" data-testid="clip-hosted-warning">
+                  {{ t('settings-clip-hosted-warning', { service: hostedProvider?.name ?? '' }) }}
+                </p>
+                <label for="clip-provider">{{ t('settings-ai-service') }}</label>
+                <select id="clip-provider" class="field" :value="hosted.provider" :disabled="busy" @change="pickHostedProvider(($event.target as HTMLSelectElement).value)">
+                  <option v-for="p in s.clip.hosted.providers" :key="p.id" :value="p.id">{{ p.name }}</option>
+                </select>
+                <label for="clip-model">{{ t('settings-ai-model') }}</label>
+                <input id="clip-model" v-model="hosted.model" class="field mono" type="text" spellcheck="false" autocomplete="off" :placeholder="hostedProvider?.model" />
+                <label for="clip-key">{{ t('settings-ai-key') }}</label>
+                <div class="key">
+                  <input
+                    id="clip-key"
+                    v-model="hosted.key"
+                    class="field mono"
+                    type="password"
+                    autocomplete="off"
+                    :placeholder="hostedKeptKey ? t('settings-ai-key-saved') : t('settings-ai-key-paste')"
+                  />
+                </div>
+                <label for="clip-url">{{ t('settings-ai-url') }}</label>
+                <input id="clip-url" v-model="hosted.url" class="field mono" type="url" spellcheck="false" :placeholder="hostedProvider?.url" />
+                <span />
+                <div class="row">
+                  <button class="btn primary" type="submit" :disabled="busy || !hostedDirty || !(hosted.key.trim() || hostedKeptKey)">{{ t('settings-save') }}</button>
+                </div>
+              </template>
+            </form>
+            <p v-if="s.clip.hosted?.provider" class="hint">{{ t('settings-clip-hosted-hint') }}</p>
+            <p v-else class="hint">{{ t('settings-clip-hint', { size: Math.round(s.clip.download_bytes / 1e6) }) }}</p>
             <p class="status" :data-state="s.clip.state" role="status" data-testid="clip-status">
               <span class="dot" aria-hidden="true" />
               <span class="text">{{ modelStatus(s.clip, 'clip') }}</span>
@@ -1746,6 +1834,14 @@ section > .sh + .status { margin: 0.35rem 0 0.8rem; }
 .llm .key .field { flex: 1; min-width: 0; max-width: 32rem; }
 .llm .check { display: inline-flex; gap: 0.45rem; align-items: center; color: var(--text); }
 .llm .row { display: flex; gap: 0.9rem; align-items: center; }
+/* Where image search runs: under its switch, the hosted service's fields only once one is chosen. */
+.where { margin-top: 0.9rem; }
+.where .choice { display: flex; flex-wrap: wrap; gap: 0.4rem 1.2rem; }
+.where .field:not(select) { max-width: 32rem; }
+.leaves {
+  margin: 0; padding: 0.5rem 0.75rem; border-radius: 8px; color: var(--text); line-height: 1.45;
+  border: 1px solid color-mix(in srgb, var(--danger) 35%, transparent); background: color-mix(in srgb, var(--danger) 8%, transparent);
+}
 .llm .row .status { margin: 0; }
 .llm .status, .llm .hint.inline { margin: 0; }
 /* Numbers and sizes are short: the unit sits right after them instead of across the row. */

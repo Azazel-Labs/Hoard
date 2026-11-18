@@ -51,6 +51,9 @@ error-empty-file = empty file
 error-imitation-silent = Nothing in the recording stands out from the background. Try again nearer the microphone.
 error-replace-duplicate = the converted file duplicates one already in the pack; the package was merged into it
 error-ai-address = The AI address should start with http:// or https://
+# $provider is the hosted image search service (Voyage AI, Cohere, Jina AI).
+error-hosted-key = Enter the API key for { $provider }
+error-hosted-address = The image search service’s address should start with http:// or https://
 error-local-llm-action = action is list, download or delete, and the last two need a model
 error-role = A role is view, edit or admin
 error-admin-only = only an admin can do this
@@ -2678,6 +2681,20 @@ settings-clip-learning = Ready: learning pictures, { $done } of { $total } so fa
 settings-clip-relearning = Until the new model has learned every picture, searches use what the old one learned.
 # $detail is why, from the server.
 settings-clip-unavailable = Couldn’t get the model: { $detail }. Trying again every hour.
+settings-clip-where = Runs on
+settings-clip-here = This server: nothing leaves it
+settings-clip-here-desktop = This computer: nothing leaves it
+settings-clip-hosted = A hosted service
+# $service is the hosted service (Voyage AI, Cohere, Jina AI).
+settings-clip-hosted-warning = Pictures leave this server. A thumbnail of every picture in the library, and the words of every image search, are sent to { $service }, which charges for them and keeps them as its terms say.
+settings-clip-hosted-warning-desktop = Pictures leave this computer. A thumbnail of every picture in the library, and the words of every image search, are sent to { $service }, which charges for them and keeps them as its terms say.
+settings-clip-hosted-hint = Nothing is downloaded or run here: the service learns every picture, a batch at a time. Another service or model learns them all again, and what each one learned is kept, for switching back.
+settings-clip-saved-here = Image search: runs on this server
+settings-clip-saved-here-desktop = Image search: runs on this computer
+# $service is the hosted service.
+settings-clip-saved-hosted = Image search: runs on { $service }
+# $service is the hosted service; $detail is why, from the server.
+settings-clip-hosted-unavailable = Couldn’t use { $service }: { $detail }. Trying again every hour.
 settings-clap-heading = Search by what sounds sound like
 settings-clap-reset = Sound search: back to the default
 settings-clap-saved-on = Sound search: on

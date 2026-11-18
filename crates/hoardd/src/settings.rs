@@ -112,6 +112,18 @@ pub(crate) struct Saved {
     /// Image search (SigLIP 2): search pictures by what they show. Off until turned on, as the model is a big download.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub(crate) clip: Option<bool>,
+    /// Image search through a hosted service (`voyage`, `cohere` or `jina`) instead of the model here, which sends
+    /// every thumbnail to it. Empty: here.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub(crate) clip_hosted: Option<String>,
+    /// Empty: the provider's usual model.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub(crate) clip_hosted_model: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub(crate) clip_hosted_key: Option<String>,
+    /// In place of the provider's own address, for a gateway in between. Empty: the provider's.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub(crate) clip_hosted_url: Option<String>,
     /// Sound search (CLAP): search sounds by what they sound like, in words. Off until turned on, like image search.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub(crate) clap: Option<bool>,
@@ -144,7 +156,8 @@ pub(crate) struct Saved {
 }
 
 /// The saved settings that are secrets: sealed in the desktop app (see [`crate::secrets`]).
-const SECRETS: &[&str] = &["llm_api_key", "update_hook_auth", "s3_access_key", "s3_secret_key", "s3_headers"];
+const SECRETS: &[&str] =
+    &["llm_api_key", "clip_hosted_key", "update_hook_auth", "s3_access_key", "s3_secret_key", "s3_headers"];
 
 /// Reads a retired setting and throws it away.
 fn ignore<'de, D: serde::Deserializer<'de>>(d: D) -> Result<(), D::Error> {
@@ -178,6 +191,8 @@ pub(crate) struct Effective {
     pub(crate) guest_browsing: bool,
     pub(crate) store_lookup: bool,
     pub(crate) clip: bool,
+    /// Where image search runs when it isn't here.
+    pub(crate) clip_hosted: Option<crate::hosted::Hosted>,
     pub(crate) clap: bool,
     pub(crate) motion_thumbs: bool,
     pub(crate) thumb_quality: ThumbQuality,
@@ -256,6 +271,22 @@ impl Saved {
             guest_browsing: self.guest_browsing.unwrap_or(false),
             store_lookup: self.store_lookup.unwrap_or(true),
             clip: self.clip.unwrap_or(false),
+            clip_hosted: self.clip_hosted.as_deref().and_then(crate::hosted::Provider::parse).map(|provider| {
+                crate::hosted::Hosted {
+                    provider,
+                    model: self
+                        .clip_hosted_model
+                        .as_deref()
+                        .and_then(non_empty)
+                        .unwrap_or_else(|| provider.default_model().to_owned()),
+                    key: self.clip_hosted_key.as_deref().and_then(non_empty).unwrap_or_default(),
+                    url: self
+                        .clip_hosted_url
+                        .as_deref()
+                        .and_then(non_empty)
+                        .map(|u| u.trim_end_matches('/').to_owned()),
+                }
+            }),
             clap: self.clap.unwrap_or(false),
             motion_thumbs: self.motion_thumbs.unwrap_or(false),
             thumb_quality: self.thumb_quality.unwrap_or_default(),
@@ -295,6 +326,20 @@ impl Saved {
         }
         if (effective.llm_chatgpt || effective.llm_url.is_some()) && effective.llm_model.is_none() {
             return Err(tr!("error-ai-model"));
+        }
+        if let Some(p) = self.clip_hosted.as_deref().map(str::trim)
+            && !p.is_empty()
+            && crate::hosted::Provider::parse(p).is_none()
+        {
+            return Err(tr!("error-bad-setting", reason = format!("clip_hosted: {p}")));
+        }
+        if let Some(h) = &effective.clip_hosted {
+            if h.key.is_empty() {
+                return Err(tr!("error-hosted-key", provider = h.provider.name()));
+            }
+            if h.url.as_deref().is_some_and(|u| !is_http(u)) {
+                return Err(tr!("error-hosted-address"));
+            }
         }
         if let Some(url) = self.public_url.as_deref().map(str::trim)
             && !url.is_empty()
@@ -495,6 +540,35 @@ mod tests {
                 .is_ok()
         );
         assert_eq!(store.get().unreal_convert, UnrealConvert::Replace);
+    }
+
+    #[test]
+    fn hosted_image_search_needs_a_known_provider_and_a_key() {
+        let cfg = cfg(&[]);
+        let c = db();
+        let store = Store::load(&cfg, &c).unwrap();
+        let msg = |v: Value| match store.update(&cfg, &c, &v) {
+            Err(Ok(m)) => m,
+            other => panic!("expected a refusal, got {other:?}"),
+        };
+        assert!(msg(json!({ "clip_hosted": "voyage" })).contains("Voyage AI"), "no key");
+        assert!(msg(json!({ "clip_hosted": "acme", "clip_hosted_key": "k" })).contains("acme"));
+        assert!(
+            msg(json!({ "clip_hosted": "jina", "clip_hosted_key": "k", "clip_hosted_url": "ftp://x" }))
+                .contains("http")
+        );
+        store
+            .update(&cfg, &c, &json!({ "clip_hosted": "cohere", "clip_hosted_key": " k ", "clip_hosted_model": "" }))
+            .unwrap();
+        let h = store.get().clip_hosted.clone().unwrap();
+        assert_eq!(
+            (h.provider, h.model.as_str(), h.key.as_str()),
+            (crate::hosted::Provider::Cohere, "embed-v4.0", "k")
+        );
+        assert!(!format!("{:?}", store.get()).contains("\"k\""), "the key stays out of logs");
+        assert!(SECRETS.contains(&"clip_hosted_key"));
+        store.update(&cfg, &c, &json!({ "clip_hosted": "" })).unwrap();
+        assert!(store.get().clip_hosted.is_none(), "empty: the model here");
     }
 
     #[test]

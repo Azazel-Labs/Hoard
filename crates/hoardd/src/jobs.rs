@@ -184,6 +184,8 @@ async fn run(state: &AppState, job: db::JobRow) {
                 LLM_TAG => (Some(msg.clone()), None, Some((PackStatus::Ready, format!("LLM tagging gave up: {msg}")))),
                 // Ingest moves files out of staging as it goes, so it isn't safely re-runnable.
                 INGEST | RETAG => (Some(msg.clone()), None, Some((PackStatus::Failed, msg))),
+                // A hosted service that said no (a wrong key, an outage past its retries) is asked again in an hour.
+                EMBED if crate::clip::is_hosted() => (Some(msg), Some(3600), None),
                 _ => (Some(msg), None, None),
             }
         }

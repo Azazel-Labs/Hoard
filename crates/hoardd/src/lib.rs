@@ -41,6 +41,7 @@ mod godot;
 mod gpu_hint;
 mod grid;
 mod heavy;
+mod hosted;
 #[cfg(feature = "https")]
 mod http3;
 #[cfg(feature = "https")]
@@ -227,7 +228,7 @@ pub async fn run(cfg: Config) -> Result<()> {
         Err(e) => tracing::warn!(error = %e, "could not sweep old upload sessions"),
     }
     ffmpeg::start(&effective.ffmpeg, state.cfg.tools_dir());
-    clip::start(&state, effective.clip);
+    clip::start(&state, effective.clip, effective.clip_hosted.clone());
     clap::start(&state, effective.clap);
     convert::start_blender(&state, false);
     updates::start(effective.update_check && !state.cfg.desktop);

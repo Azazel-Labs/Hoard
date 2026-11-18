@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "f1669a81c6df0aa65b7d1254acbfe377ffe38ce4f61e820fd439a52d951e4242"
+source = "f7e0e0b19af39ea3822145faba9be4d1ea835284f074aa72561dec35f36e1c83"
 translation = "c2a4a8051502263df10866a7bb372ad5cdada115fb8d6449130cdd2d1752dd61"
 
 [messages.account-add]
@@ -3717,6 +3717,14 @@ translation = "ово има једну сличицу или превише д�
 [messages.error-full-path]
 source = "give a full path"
 translation = "наведите пуну путању"
+
+[messages.error-hosted-address]
+source = "The image search service’s address should start with http:// or https://"
+translation = "Адреса услуге за претрагу слика треба да почиње са http:// или https://"
+
+[messages.error-hosted-key]
+source = "Enter the API key for { $provider }"
+translation = "Унесите API кључ за { $provider }"
 
 [messages.error-https-bad-name]
 source = "“{ $name }” isn't an address a certificate can hold"
@@ -8722,6 +8730,14 @@ translation = "Преузимање модела… напредак је у и�
 source = "Search by what pictures show"
 translation = "Претрага по ономе што слике приказују"
 
+[messages.settings-clip-here]
+source = "This server: nothing leaves it"
+translation = "На овом серверу: ништа не излази са њега"
+
+[messages.settings-clip-here-desktop]
+source = "This computer: nothing leaves it"
+translation = "На овом рачунару: ништа не излази са њега"
+
 [messages.settings-clip-hint]
 source = "Uses Google’s SigLIP 2 model, run on this server’s processor: nothing leaves it. Turning it on downloads the model ({ $size } MB) from Hugging Face, then learns every picture in the background at low priority. It takes 350 to 750 MB of memory while it works or someone searches. Turning it off deletes the model and keeps what it learned, for next time."
 translation = "Користи Google-ов модел SigLIP 2, који ради на процесору овог сервера: ништа не напушта сервер. Укључивање преузима модел ({ $size } MB) са Hugging Face-а, а затим у позадини, ниским приоритетом, учи сваку слику. Заузима 350 до 750 MB меморије док ради или док неко претражује. Искључивање брише модел и чува оно што је научио, за следећи пут."
@@ -8729,6 +8745,26 @@ translation = "Користи Google-ов модел SigLIP 2, који ради
 [messages.settings-clip-hint-desktop]
 source = "Uses Google’s SigLIP 2 model, run on this computer’s processor: nothing leaves it. Turning it on downloads the model ({ $size } MB) from Hugging Face, then learns every picture in the background at low priority. It takes 350 to 750 MB of memory while it works or you search. Turning it off deletes the model and keeps what it learned, for next time."
 translation = "Користи Google-ов модел SigLIP 2, који ради на процесору овог рачунара: ништа не напушта рачунар. Укључивање преузима модел ({ $size } MB) са Hugging Face-а, а затим у позадини, ниским приоритетом, учи сваку слику. Заузима 350 до 750 MB меморије док ради или док претражујете. Искључивање брише модел и чува оно што је научио, за следећи пут."
+
+[messages.settings-clip-hosted]
+source = "A hosted service"
+translation = "Код спољне услуге"
+
+[messages.settings-clip-hosted-hint]
+source = "Nothing is downloaded or run here: the service learns every picture, a batch at a time. Another service or model learns them all again, and what each one learned is kept, for switching back."
+translation = "Овде се ништа не преузима нити покреће: услуга учи сваку слику, у групама. Друга услуга или модел их све учи поново, а оно што је свака научила се чува, за повратак."
+
+[messages.settings-clip-hosted-unavailable]
+source = "Couldn’t use { $service }: { $detail }. Trying again every hour."
+translation = "Није могуће користити { $service }: { $detail }. Покушава се поново на сваких сат времена."
+
+[messages.settings-clip-hosted-warning]
+source = "Pictures leave this server. A thumbnail of every picture in the library, and the words of every image search, are sent to { $service }, which charges for them and keeps them as its terms say."
+translation = "Слике напуштају овај сервер. Сличица сваке слике у библиотеци и речи сваке претраге слика шаљу се услузи { $service }, која их наплаћује и чува онако како кажу њени услови."
+
+[messages.settings-clip-hosted-warning-desktop]
+source = "Pictures leave this computer. A thumbnail of every picture in the library, and the words of every image search, are sent to { $service }, which charges for them and keeps them as its terms say."
+translation = "Слике напуштају овај рачунар. Сличица сваке слике у библиотеци и речи сваке претраге слика шаљу се услузи { $service }, која их наплаћује и чува онако како кажу њени услови."
 
 [messages.settings-clip-learning]
 source = "Ready: learning pictures, { $done } of { $total } so far"
@@ -8762,6 +8798,18 @@ translation = "Док нови модел не научи сваку слику,
 source = "Image search: back to the default"
 translation = "Претрага слика: врати на подразумевано"
 
+[messages.settings-clip-saved-here]
+source = "Image search: runs on this server"
+translation = "Претрага слика: ради на овом серверу"
+
+[messages.settings-clip-saved-here-desktop]
+source = "Image search: runs on this computer"
+translation = "Претрага слика: ради на овом рачунару"
+
+[messages.settings-clip-saved-hosted]
+source = "Image search: runs on { $service }"
+translation = "Претрага слика: ради код услуге { $service }"
+
 [messages.settings-clip-saved-off]
 source = "Image search: off"
 translation = "Претрага слика: искључена"
@@ -8781,6 +8829,10 @@ translation = "Није могуће добити модел: { $detail }. По�
 [messages.settings-clip-what]
 source = "Type what you’re after (“mossy rock”, “sci-fi door”, “wooden barrel”) and pictures that show it turn up beside names that have the words. “More like this” finds things of the same kind, not only the same colors."
 translation = "Унесите шта тражите („mossy rock“, „sci-fi door“, „wooden barrel“) и слике које то приказују појавиће се поред назива који садрже те речи. „Још сличних“ проналази ствари исте врсте, а не само истих боја."
+
+[messages.settings-clip-where]
+source = "Runs on"
+translation = "Где ради"
 
 [messages.settings-conv]
 source = "Conversion rules"

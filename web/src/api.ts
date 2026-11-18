@@ -930,6 +930,17 @@ export interface SearchModelSetting {
   total: number
   /** Image search only: searches use what the model before learned until every picture is learned again. */
   relearning?: boolean
+  /** Image search only: a hosted service doing the model's part, when `provider` isn't empty. The key is never sent. */
+  hosted?: HostedSearch
+}
+
+export interface HostedSearch {
+  provider: string
+  model: string
+  /** Empty for the service's own address. */
+  url: string
+  has_key: boolean
+  providers: { id: string; name: string; model: string; url: string }[]
 }
 
 /** The S3 service `s3://bucket` locations are in. The secret key and the headers are never sent back. */
@@ -975,6 +986,11 @@ export interface SettingsPatch {
   public_url?: string | null
   soundfont?: string | null
   clip?: boolean | null
+  /** A hosted service for image search (voyage, cohere, jina), or empty for the model here; with its model, key and address. */
+  clip_hosted?: string | null
+  clip_hosted_model?: string | null
+  clip_hosted_key?: string | null
+  clip_hosted_url?: string | null
   clap?: boolean | null
   texture_names?: TextureNames | null
   conversion_rules?: ConversionRules | null

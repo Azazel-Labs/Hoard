@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "f1669a81c6df0aa65b7d1254acbfe377ffe38ce4f61e820fd439a52d951e4242"
+source = "f7e0e0b19af39ea3822145faba9be4d1ea835284f074aa72561dec35f36e1c83"
 translation = "b9203115cf8b13a0111214aa1af8cf4a9194f497abfd52d839917124a3498329"
 
 [messages.account-add]
@@ -3703,6 +3703,14 @@ translation = "dit het een raam, of te veel om uit te lê"
 [messages.error-full-path]
 source = "give a full path"
 translation = "gee 'n volle pad"
+
+[messages.error-hosted-address]
+source = "The image search service’s address should start with http:// or https://"
+translation = "Die adres van die beeldsoekdiens moet met http:// of https:// begin"
+
+[messages.error-hosted-key]
+source = "Enter the API key for { $provider }"
+translation = "Voer die API-sleutel vir { $provider } in"
 
 [messages.error-https-bad-name]
 source = "“{ $name }” isn't an address a certificate can hold"
@@ -8650,6 +8658,14 @@ translation = "Laai die model af… vordering is in die aktiwiteitsaanwyser"
 source = "Search by what pictures show"
 translation = "Soek volgens wat prente wys"
 
+[messages.settings-clip-here]
+source = "This server: nothing leaves it"
+translation = "Hierdie bediener: niks verlaat dit nie"
+
+[messages.settings-clip-here-desktop]
+source = "This computer: nothing leaves it"
+translation = "Hierdie rekenaar: niks verlaat dit nie"
+
 [messages.settings-clip-hint]
 source = "Uses Google’s SigLIP 2 model, run on this server’s processor: nothing leaves it. Turning it on downloads the model ({ $size } MB) from Hugging Face, then learns every picture in the background at low priority. It takes 350 to 750 MB of memory while it works or someone searches. Turning it off deletes the model and keeps what it learned, for next time."
 translation = "Gebruik Google se SigLIP 2-model, wat op hierdie bediener se verwerker loop: niks verlaat dit nie. Om dit aan te skakel laai die model ({ $size } MB) van Hugging Face af, en leer dan elke prent in die agtergrond teen lae prioriteit. Dit neem 350 tot 750 MB geheue terwyl dit werk of iemand soek. Om dit af te skakel vee die model uit en hou wat dit geleer het, vir volgende keer."
@@ -8657,6 +8673,26 @@ translation = "Gebruik Google se SigLIP 2-model, wat op hierdie bediener se verw
 [messages.settings-clip-hint-desktop]
 source = "Uses Google’s SigLIP 2 model, run on this computer’s processor: nothing leaves it. Turning it on downloads the model ({ $size } MB) from Hugging Face, then learns every picture in the background at low priority. It takes 350 to 750 MB of memory while it works or you search. Turning it off deletes the model and keeps what it learned, for next time."
 translation = "Gebruik Google se SigLIP 2-model, wat op hierdie rekenaar se verwerker loop: niks verlaat dit nie. Om dit aan te skakel laai die model ({ $size } MB) van Hugging Face af, en leer dan elke prent in die agtergrond teen lae prioriteit. Dit neem 350 tot 750 MB geheue terwyl dit werk of jy soek. Om dit af te skakel vee die model uit en hou wat dit geleer het, vir volgende keer."
+
+[messages.settings-clip-hosted]
+source = "A hosted service"
+translation = "'n Gehoste diens"
+
+[messages.settings-clip-hosted-hint]
+source = "Nothing is downloaded or run here: the service learns every picture, a batch at a time. Another service or model learns them all again, and what each one learned is kept, for switching back."
+translation = "Niks word hier afgelaai of uitgevoer nie: die diens leer elke prent, 'n bondel op 'n slag. 'n Ander diens of model leer hulle almal weer, en wat elkeen geleer het, word bewaar om terug te skakel."
+
+[messages.settings-clip-hosted-unavailable]
+source = "Couldn’t use { $service }: { $detail }. Trying again every hour."
+translation = "Kon nie { $service } gebruik nie: { $detail }. Probeer elke uur weer."
+
+[messages.settings-clip-hosted-warning]
+source = "Pictures leave this server. A thumbnail of every picture in the library, and the words of every image search, are sent to { $service }, which charges for them and keeps them as its terms say."
+translation = "Prente verlaat hierdie bediener. 'n Kleinkiekie van elke prent in die biblioteek, en die woorde van elke beeldsoektog, word na { $service } gestuur, wat daarvoor koste hef en dit bewaar soos sy voorwaardes bepaal."
+
+[messages.settings-clip-hosted-warning-desktop]
+source = "Pictures leave this computer. A thumbnail of every picture in the library, and the words of every image search, are sent to { $service }, which charges for them and keeps them as its terms say."
+translation = "Prente verlaat hierdie rekenaar. 'n Kleinkiekie van elke prent in die biblioteek, en die woorde van elke beeldsoektog, word na { $service } gestuur, wat daarvoor koste hef en dit bewaar soos sy voorwaardes bepaal."
 
 [messages.settings-clip-learning]
 source = "Ready: learning pictures, { $done } of { $total } so far"
@@ -8688,6 +8724,18 @@ translation = "Tot die nuwe model elke prent geleer het, gebruik soektogte wat d
 source = "Image search: back to the default"
 translation = "Beeldsoektog: terug na die verstek"
 
+[messages.settings-clip-saved-here]
+source = "Image search: runs on this server"
+translation = "Beeldsoektog: loop op hierdie bediener"
+
+[messages.settings-clip-saved-here-desktop]
+source = "Image search: runs on this computer"
+translation = "Beeldsoektog: loop op hierdie rekenaar"
+
+[messages.settings-clip-saved-hosted]
+source = "Image search: runs on { $service }"
+translation = "Beeldsoektog: loop op { $service }"
+
 [messages.settings-clip-saved-off]
 source = "Image search: off"
 translation = "Beeldsoektog: af"
@@ -8707,6 +8755,10 @@ translation = "Kon nie die model kry nie: { $detail }. Probeer elke uur weer."
 [messages.settings-clip-what]
 source = "Type what you’re after (“mossy rock”, “sci-fi door”, “wooden barrel”) and pictures that show it turn up beside names that have the words. “More like this” finds things of the same kind, not only the same colors."
 translation = "Tik waarna jy soek (“mossy rock”, “sci-fi door”, “wooden barrel”) en prente wat dit wys, verskyn langs name wat die woorde bevat. “Meer soos hierdie” vind dinge van dieselfde soort, nie net dieselfde kleure nie."
+
+[messages.settings-clip-where]
+source = "Runs on"
+translation = "Loop op"
 
 [messages.settings-conv]
 source = "Conversion rules"

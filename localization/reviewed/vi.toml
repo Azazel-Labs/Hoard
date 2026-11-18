@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "f1669a81c6df0aa65b7d1254acbfe377ffe38ce4f61e820fd439a52d951e4242"
+source = "f7e0e0b19af39ea3822145faba9be4d1ea835284f074aa72561dec35f36e1c83"
 translation = "42d6d2350a51c56e55a07a75988a6748d9e232912ffffb903defbf54bfd56e2e"
 
 [messages.account-add]
@@ -3611,6 +3611,14 @@ translation = "tệp này chỉ có một khung hình, hoặc có quá nhiều k
 [messages.error-full-path]
 source = "give a full path"
 translation = "hãy đưa đường dẫn đầy đủ"
+
+[messages.error-hosted-address]
+source = "The image search service’s address should start with http:// or https://"
+translation = "Địa chỉ của dịch vụ tìm kiếm hình ảnh phải bắt đầu bằng http:// hoặc https://"
+
+[messages.error-hosted-key]
+source = "Enter the API key for { $provider }"
+translation = "Nhập khóa API cho { $provider }"
 
 [messages.error-https-bad-name]
 source = "“{ $name }” isn't an address a certificate can hold"
@@ -8473,6 +8481,14 @@ translation = "Đang tải mô hình xuống… tiến độ hiện ở chỉ b�
 source = "Search by what pictures show"
 translation = "Tìm theo nội dung trong ảnh"
 
+[messages.settings-clip-here]
+source = "This server: nothing leaves it"
+translation = "Máy chủ này: không có gì rời khỏi nó"
+
+[messages.settings-clip-here-desktop]
+source = "This computer: nothing leaves it"
+translation = "Máy tính này: không có gì rời khỏi nó"
+
 [messages.settings-clip-hint]
 source = "Uses Google’s SigLIP 2 model, run on this server’s processor: nothing leaves it. Turning it on downloads the model ({ $size } MB) from Hugging Face, then learns every picture in the background at low priority. It takes 350 to 750 MB of memory while it works or someone searches. Turning it off deletes the model and keeps what it learned, for next time."
 translation = "Dùng mô hình SigLIP 2 của Google, chạy trên bộ xử lý của máy chủ này: không có gì rời khỏi máy chủ. Khi bật, mô hình ({ $size } MB) sẽ được tải từ Hugging Face, rồi học mọi ảnh trong nền với mức ưu tiên thấp. Nó dùng 350 đến 750 MB bộ nhớ khi đang làm việc hoặc khi có người tìm kiếm. Khi tắt, mô hình bị xóa nhưng những gì nó đã học được giữ lại cho lần sau."
@@ -8480,6 +8496,26 @@ translation = "Dùng mô hình SigLIP 2 của Google, chạy trên bộ xử lý
 [messages.settings-clip-hint-desktop]
 source = "Uses Google’s SigLIP 2 model, run on this computer’s processor: nothing leaves it. Turning it on downloads the model ({ $size } MB) from Hugging Face, then learns every picture in the background at low priority. It takes 350 to 750 MB of memory while it works or you search. Turning it off deletes the model and keeps what it learned, for next time."
 translation = "Dùng mô hình SigLIP 2 của Google, chạy trên bộ xử lý của máy tính này: không có gì rời khỏi máy. Khi bật, mô hình ({ $size } MB) sẽ được tải từ Hugging Face, rồi học mọi ảnh trong nền với mức ưu tiên thấp. Nó dùng 350 đến 750 MB bộ nhớ khi đang làm việc hoặc khi bạn tìm kiếm. Khi tắt, mô hình bị xóa nhưng những gì nó đã học được giữ lại cho lần sau."
+
+[messages.settings-clip-hosted]
+source = "A hosted service"
+translation = "Một dịch vụ được lưu trữ bên ngoài"
+
+[messages.settings-clip-hosted-hint]
+source = "Nothing is downloaded or run here: the service learns every picture, a batch at a time. Another service or model learns them all again, and what each one learned is kept, for switching back."
+translation = "Không có gì được tải xuống hay chạy ở đây: dịch vụ học từng hình, theo từng lô. Một dịch vụ hoặc mô hình khác sẽ học lại tất cả, và những gì mỗi bên đã học được giữ lại để chuyển về."
+
+[messages.settings-clip-hosted-unavailable]
+source = "Couldn’t use { $service }: { $detail }. Trying again every hour."
+translation = "Không dùng được { $service }: { $detail }. Sẽ thử lại mỗi giờ."
+
+[messages.settings-clip-hosted-warning]
+source = "Pictures leave this server. A thumbnail of every picture in the library, and the words of every image search, are sent to { $service }, which charges for them and keeps them as its terms say."
+translation = "Hình ảnh rời khỏi máy chủ này. Ảnh thu nhỏ của mọi hình trong thư viện, và từ ngữ của mọi lần tìm kiếm hình ảnh, được gửi đến { $service }, dịch vụ này tính phí và giữ chúng theo điều khoản của mình."
+
+[messages.settings-clip-hosted-warning-desktop]
+source = "Pictures leave this computer. A thumbnail of every picture in the library, and the words of every image search, are sent to { $service }, which charges for them and keeps them as its terms say."
+translation = "Hình ảnh rời khỏi máy tính này. Ảnh thu nhỏ của mọi hình trong thư viện, và từ ngữ của mọi lần tìm kiếm hình ảnh, được gửi đến { $service }, dịch vụ này tính phí và giữ chúng theo điều khoản của mình."
 
 [messages.settings-clip-learning]
 source = "Ready: learning pictures, { $done } of { $total } so far"
@@ -8511,6 +8547,18 @@ translation = "Cho đến khi mô hình mới học xong mọi ảnh, tìm kiế
 source = "Image search: back to the default"
 translation = "Tìm kiếm hình ảnh: về mặc định"
 
+[messages.settings-clip-saved-here]
+source = "Image search: runs on this server"
+translation = "Tìm kiếm hình ảnh: chạy trên máy chủ này"
+
+[messages.settings-clip-saved-here-desktop]
+source = "Image search: runs on this computer"
+translation = "Tìm kiếm hình ảnh: chạy trên máy tính này"
+
+[messages.settings-clip-saved-hosted]
+source = "Image search: runs on { $service }"
+translation = "Tìm kiếm hình ảnh: chạy trên { $service }"
+
 [messages.settings-clip-saved-off]
 source = "Image search: off"
 translation = "Tìm kiếm hình ảnh: tắt"
@@ -8530,6 +8578,10 @@ translation = "Không lấy được mô hình: { $detail }. Sẽ thử lại m�
 [messages.settings-clip-what]
 source = "Type what you’re after (“mossy rock”, “sci-fi door”, “wooden barrel”) and pictures that show it turn up beside names that have the words. “More like this” finds things of the same kind, not only the same colors."
 translation = "Nhập thứ bạn đang tìm (“mossy rock”, “sci-fi door”, “wooden barrel”) và những ảnh thể hiện nó sẽ hiện ra cạnh những tên có các từ đó. “Thêm nữa giống thế này” tìm những thứ cùng loại, không chỉ cùng màu."
+
+[messages.settings-clip-where]
+source = "Runs on"
+translation = "Chạy trên"
 
 [messages.settings-conv]
 source = "Conversion rules"

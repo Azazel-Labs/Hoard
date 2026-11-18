@@ -13,6 +13,10 @@
 //! Image search ran CLIP (`OpenAI`'s ViT-B/32) before. Where a library has CLIP's embeddings, searches keep using them,
 //! and CLIP's words half while its files are still there, until SigLIP 2 has relearned every thumbnail; then they and
 //! CLIP's files go.
+//!
+//! An admin can have a hosted service do the model's part instead (see `hosted`): then nothing is downloaded, and
+//! every thumbnail and every search's words are sent to it. Its embeddings are stored under its own model name, so
+//! switching back and forth keeps what each learned.
 
 use std::collections::HashMap;
 use std::io::{Read, Seek, SeekFrom};
@@ -28,7 +32,7 @@ use rusqlite::params;
 use serde::Deserialize;
 
 use crate::tools::{self, Slot, Status};
-use crate::{AppState, db, siglip};
+use crate::{AppState, db, hosted, siglip};
 
 /// What image search runs, stored with each embedding.
 pub(crate) const MODEL: &str = siglip::MODEL;
@@ -364,12 +368,29 @@ static STARTS: AtomicU64 = AtomicU64::new(0);
 /// CLIP's embeddings were deleted, and nothing writes them any more, so searches never go back to them.
 static CLIP_GONE: AtomicBool = AtomicBool::new(false);
 
+/// Image search through a hosted service, when Settings says so.
+static HOSTED: RwLock<Option<Arc<hosted::Client>>> = RwLock::new(None);
+
+fn hosted() -> Option<Arc<hosted::Client>> {
+    HOSTED.read().unwrap_or_else(PoisonError::into_inner).clone()
+}
+
+/// What the embeddings searches use are stored as: the hosted service's model, or SigLIP 2.
+pub(crate) fn model_id() -> String {
+    hosted().map_or_else(|| MODEL.to_owned(), |c| c.hosted.id())
+}
+
 pub(crate) fn is_ready() -> bool {
-    SLOT.ready().is_some()
+    hosted().is_some() || SLOT.ready().is_some()
+}
+
+/// Whether a hosted service does the model's part.
+pub(crate) fn is_hosted() -> bool {
+    hosted().is_some()
 }
 
 fn is_on() -> bool {
-    SLOT.describe(|_| String::new()) != "off"
+    hosted().is_some() || SLOT.describe(|_| String::new()) != "off"
 }
 
 /// Whether searches still use what CLIP learned, while SigLIP 2 relearns it.
@@ -379,6 +400,9 @@ pub(crate) fn relearning() -> bool {
 
 /// `off`, `looking`, `downloading`, `ready` or `unavailable: <why>`.
 pub(crate) fn describe() -> String {
+    if let Some(c) = hosted() {
+        return c.failed().map_or_else(|| "ready".into(), |why| format!("unavailable: {why}"));
+    }
     SLOT.describe(|_| "ready".into())
 }
 
@@ -387,17 +411,22 @@ fn clip_dir(state: &AppState) -> PathBuf {
     state.cfg.models_dir().join(CLIP_MODEL)
 }
 
-/// Turn image search on (find the model, downloading it if need be) or off. Calling it again drops whatever the
-/// last call was doing.
-pub(crate) fn start(state: &AppState, enabled: bool) {
+/// Turn image search on (find the model, downloading it if need be, or use the hosted service `remote`) or off.
+/// Calling it again drops whatever the last call was doing.
+pub(crate) fn start(state: &AppState, enabled: bool, remote: Option<hosted::Hosted>) {
     TEXT.clear();
     CLIP_TEXT.clear();
     let generation = STARTS.fetch_add(1, Ordering::Relaxed) + 1;
     RELEARNING.store(false, Ordering::Relaxed);
+    let client = remote.filter(|_| enabled).map(|h| Arc::new(hosted::Client::new(h)));
+    state.pictures.respec(client.as_ref().map_or(&SPEC, |c| hosted_spec(&c.hosted.id())));
+    (*HOSTED.write().unwrap_or_else(PoisonError::into_inner)).clone_from(&client);
     if !enabled {
         SLOT.restart(Status::Off);
         return;
     }
+    // Searches fall back on what CLIP learned only while SigLIP 2 here relearns it: CLIP is a model here too.
+    let local = client.is_none();
     let st = Arc::clone(state);
     tokio::spawn(async move {
         let kept = db::call(&st.pool, |c| {
@@ -409,10 +438,32 @@ pub(crate) fn start(state: &AppState, enabled: bool) {
             false
         });
         if STARTS.load(Ordering::Relaxed) == generation {
-            RELEARNING.store(kept, Ordering::Relaxed);
+            RELEARNING.store(kept && local, Ordering::Relaxed);
             CLIP_TEXT.unload_when_idle();
         }
     });
+    if client.is_some() {
+        SLOT.restart(Status::Off);
+        let st = Arc::clone(state);
+        tokio::spawn(async move {
+            // A try that failed waits an hour; with the service or its key changed, try now.
+            let now = db::now();
+            let soon = db::call(&st.pool, move |c| {
+                Ok(c.execute(
+                    "UPDATE jobs SET run_after = ?2 WHERE kind = ?1 AND status = 'queued' AND run_after > ?2",
+                    rusqlite::params![crate::jobs::EMBED, now],
+                )?)
+            })
+            .await;
+            match soon {
+                Ok(0) => {}
+                Ok(_) => st.wake.notify_one(),
+                Err(e) => tracing::warn!(error = ?e, "couldn't bring image search's next try forward"),
+            }
+            schedule(&st).await;
+        });
+        return;
+    }
     SIGLIP.fetch(state, &SLOT, |st| async move {
         TEXT.unload_when_idle();
         schedule(&st).await;
@@ -446,7 +497,7 @@ async fn relearned(state: &AppState) -> Result<()> {
     state.clip.forget();
     remove_clip_files(state).await;
     if n > 0 {
-        tracing::info!(pictures = n, "image search relearned every picture with SigLIP 2; CLIP's embeddings are gone");
+        tracing::info!(pictures = n, "image search relearned every picture; CLIP's embeddings are gone");
     }
     Ok(())
 }
@@ -543,7 +594,10 @@ static TEXT: Text<siglip::TextModel> = Text::new("image search", siglip::TextMod
 static CLIP_TEXT: Text<TextModel> = Text::new("image search (CLIP)", TextModel::load, TextModel::embed);
 
 /// The embedding of what was typed, or `None` while the model isn't ready.
-async fn embed_text(text: &str) -> Result<Option<Arc<Vec<f32>>>> {
+async fn embed_text(state: &AppState, text: &str) -> Result<Option<Arc<Vec<f32>>>> {
+    if let Some(c) = hosted() {
+        return Ok(Some(c.words(&state.http, text.trim()).await?));
+    }
     let Some(dir) = SLOT.ready() else { return Ok(None) };
     // Said the way it was taught, which matches pictures better than the bare words.
     let v = TEXT.embed(dir, format!("this is a photo of {}.", text.trim().to_lowercase())).await?;
@@ -594,13 +648,16 @@ pub(crate) struct Spec {
     /// Selects each hash and its vector, `?1` being the model.
     pub(crate) load: &'static str,
     pub(crate) model: &'static str,
-    /// How many numbers each embedding has.
+    /// How many numbers each embedding has; 0 for any.
     pub(crate) dims: usize,
     /// What it searches, for the log.
     pub(crate) what: &'static str,
-    /// The cosines of two unrelated pictures and of the same thing from another angle, for "more like this".
+    /// The cosines of two unrelated pictures and of the same thing from another angle, for "more like this"; NaN to
+    /// measure them against each picture.
     pub(crate) unrelated: f32,
     pub(crate) same: f32,
+    /// The text thresholds below are in standard deviations of each search's scores rather than in cosines.
+    pub(crate) relative: bool,
     /// How far above the median a text match must score, and how close to the best.
     pub(crate) lift: f32,
     pub(crate) margin: f32,
@@ -619,6 +676,7 @@ pub(crate) static SPEC: Spec = Spec {
     what: "image search",
     unrelated: SIGLIP_UNRELATED,
     same: SIGLIP_SAME,
+    relative: false,
     lift: SIGLIP_LIFT,
     margin: SIGLIP_MARGIN,
     sure: f32::INFINITY,
@@ -634,6 +692,7 @@ pub(crate) static CLIP_SPEC: Spec = Spec {
     what: "image search (CLIP)",
     unrelated: 0.5,
     same: 0.95,
+    relative: false,
     lift: CLIP_LIFT,
     margin: CLIP_MARGIN,
     sure: f32::INFINITY,
@@ -641,16 +700,58 @@ pub(crate) static CLIP_SPEC: Spec = Spec {
     strong: 0.1,
 };
 
+/// A hosted model's. Each model's scores sit differently and none can be measured here ahead of time, so a match is
+/// judged against the spread of each search's own scores. Made once per model, as an admin switches seldom.
+fn hosted_spec(id: &str) -> &'static Spec {
+    static SPECS: Mutex<Vec<&'static Spec>> = Mutex::new(Vec::new());
+    let mut specs = SPECS.lock().unwrap_or_else(PoisonError::into_inner);
+    if let Some(s) = specs.iter().find(|s| s.model == id) {
+        return s;
+    }
+    let spec: &'static Spec = Box::leak(Box::new(Spec {
+        load: SPEC.load,
+        model: Box::leak(id.to_owned().into_boxed_str()),
+        dims: 0,
+        what: "image search (hosted)",
+        unrelated: f32::NAN,
+        same: f32::NAN,
+        relative: true,
+        lift: HOSTED_LIFT,
+        margin: HOSTED_MARGIN,
+        sure: f32::INFINITY,
+        weak: HOSTED_WEAK,
+        strong: HOSTED_STRONG,
+    }));
+    specs.push(spec);
+    spec
+}
+
 /// Every embedding, in memory, loaded on first use and kept up to date by the job.
 #[derive(Debug)]
 pub(crate) struct Index {
-    spec: &'static Spec,
+    spec: RwLock<&'static Spec>,
     map: RwLock<Option<HashMap<String, Entry>>>,
 }
 
 impl Index {
     pub(crate) const fn new(spec: &'static Spec) -> Self {
-        Self { spec, map: RwLock::new(None) }
+        Self { spec: RwLock::new(spec), map: RwLock::new(None) }
+    }
+
+    fn spec(&self) -> &'static Spec {
+        *self.spec.read().unwrap_or_else(PoisonError::into_inner)
+    }
+
+    /// Search another model's embeddings from now on.
+    pub(crate) fn respec(&self, spec: &'static Spec) {
+        let changed = {
+            let mut cur = self.spec.write().unwrap_or_else(PoisonError::into_inner);
+            let old: &'static Spec = std::mem::replace(&mut *cur, spec);
+            !std::ptr::eq(old, spec)
+        };
+        if changed {
+            self.forget();
+        }
     }
 
     fn read<R>(&self, f: impl FnOnce(&HashMap<String, Entry>) -> R) -> Option<R> {
@@ -667,14 +768,14 @@ impl Index {
         if self.read(|_| ()).is_some() {
             return Ok(());
         }
-        let spec = self.spec;
+        let spec = self.spec();
         let loaded = db::call(&state.pool, move |c| {
             let mut stmt = c.prepare(spec.load)?;
             let rows = stmt
                 .query_map([spec.model], |r| Ok((r.get::<_, String>(0)?, r.get::<_, Vec<u8>>(1)?)))?
                 .filter_map(|row| {
                     let (hash, v) = row.ok()?;
-                    (v.len() == spec.dims).then_some(())?;
+                    (spec.dims == 0 || v.len() == spec.dims).then_some(())?;
                     Some((hash, Entry::new(v.into_iter().map(|b| b as i8).collect())?))
                 })
                 .collect::<HashMap<_, _>>();
@@ -682,7 +783,8 @@ impl Index {
         })
         .await?;
         let mut guard = self.map.write().unwrap_or_else(PoisonError::into_inner);
-        if guard.is_none() {
+        // Unless another model's were asked for meanwhile.
+        if guard.is_none() && std::ptr::eq(self.spec(), spec) {
             tracing::debug!(embeddings = loaded.len(), what = spec.what, "embeddings loaded");
             *guard = Some(loaded);
         }
@@ -700,18 +802,28 @@ impl Index {
 
     /// How much every thumbnail looks like `hash`'s by meaning, about 0..=1, or `None` when it has no embedding.
     pub(crate) fn similar(&self, hash: &str) -> Option<HashMap<String, f32>> {
+        let spec = self.spec();
         self.read(|m| {
             let target = m.get(hash)?;
-            let score =
-                |cosine: f32| ((cosine - self.spec.unrelated) / (self.spec.same - self.spec.unrelated)).clamp(0.0, 1.0);
-            Some(m.iter().map(|(h, e)| (h.clone(), score(target.cosine(e)))).collect())
+            let cosines: Vec<(&String, f32)> = m.iter().map(|(h, e)| (h, target.cosine(e))).collect();
+            let (unrelated, same) = if spec.unrelated.is_nan() {
+                // The typical picture's score against this one is what unrelated looks like.
+                let mut all: Vec<f32> = cosines.iter().map(|c| c.1).collect();
+                let mid = all.len() / 2;
+                let typical = *all.select_nth_unstable_by(mid, f32::total_cmp).1;
+                (typical, typical + HOSTED_SAME * (1.0 - typical))
+            } else {
+                (spec.unrelated, spec.same)
+            };
+            let score = |cosine: f32| ((cosine - unrelated) / (same - unrelated).max(1e-6)).clamp(0.0, 1.0);
+            Some(cosines.into_iter().map(|(h, c)| (h.clone(), score(c))).collect())
         })
         .flatten()
     }
 
     /// What matches a text embedding, best first, scored about 0..=0.5.
     pub(crate) fn matching(&self, q: &[f32]) -> Vec<(String, f32)> {
-        let spec = self.spec;
+        let spec = self.spec();
         self.read(|m| {
             let scored: Vec<(&String, f32)> = m.iter().map(|(h, e)| (h, e.cosine_f32(q))).collect();
             if scored.is_empty() {
@@ -722,13 +834,24 @@ impl Index {
             let mut all: Vec<f32> = scored.iter().map(|s| s.1).collect();
             let mid = all.len() / 2;
             let median = *all.select_nth_unstable_by(mid, f32::total_cmp).1;
+            let unit = if spec.relative {
+                let mean = all.iter().sum::<f32>() / all.len() as f32;
+                (all.iter().map(|x| (x - mean) * (x - mean)).sum::<f32>() / all.len() as f32).sqrt()
+            } else {
+                1.0
+            };
+            if unit <= 0.0 || unit.is_nan() {
+                return Vec::new();
+            }
+            let [lift, margin, sure, weak, strong] =
+                [spec.lift, spec.margin, spec.sure, spec.weak, spec.strong].map(|x| x * unit);
             let best = scored.iter().map(|s| s.1).fold(f32::MIN, f32::max);
-            let floor = (median + spec.lift).max((best - spec.margin).min(median + spec.sure));
+            let floor = (median + lift).max((best - margin).min(median + sure));
             let mut hits: Vec<(&String, f32)> = scored.into_iter().filter(|s| s.1 >= floor).collect();
             hits.sort_by(|a, b| b.1.total_cmp(&a.1));
             hits.truncate(TEXT_MAX);
             // A strong match counts double a word match in the name (0.25), a borderline one well under it.
-            let score = |lift: f32| ((lift - spec.weak) / (spec.strong - spec.weak)).clamp(0.0, 1.0) * 0.5;
+            let score = |above: f32| ((above - weak) / (strong - weak)).clamp(0.0, 1.0) * 0.5;
             hits.into_iter().map(|(h, c)| (h.clone(), score(c - median))).collect()
         })
         .unwrap_or_default()
@@ -753,7 +876,17 @@ const SIGLIP_MARGIN: f32 = 0.035;
 const SIGLIP_WEAK: f32 = 0.035;
 const SIGLIP_STRONG: f32 = 0.08;
 
-/// The index searches use: SigLIP 2's, or CLIP's while it's relearned.
+/// A hosted model's, in standard deviations of each search's scores, taken from SigLIP 2's: there a true text match
+/// stands 3 or more above the median and words with nothing to find peak around 2.7–3.2, so a lift of 3 keeps about
+/// what 0.045 does.
+const HOSTED_LIFT: f32 = 3.0;
+const HOSTED_MARGIN: f32 = 2.2;
+const HOSTED_WEAK: f32 = 2.8;
+const HOSTED_STRONG: f32 = 4.5;
+/// How far from a picture's typical score to a perfect one the same thing from another angle scores, from SigLIP 2's.
+const HOSTED_SAME: f32 = 0.83;
+
+/// The index searches use: SigLIP 2's (or the hosted model's), or CLIP's while it's relearned.
 fn index(state: &AppState) -> Option<&Index> {
     if relearning() {
         Some(&state.clip)
@@ -784,7 +917,7 @@ pub(crate) async fn search_text(state: &AppState, text: &str) -> Result<Vec<(Str
     if index.len() == 0 {
         return Ok(Vec::new());
     }
-    let q = if relearning() { embed_text_clip(state, text).await? } else { embed_text(text).await? };
+    let q = if relearning() { embed_text_clip(state, text).await? } else { embed_text(state, text).await? };
     let Some(q) = q else { return Ok(Vec::new()) };
     Ok(index.matching(&q))
 }
@@ -808,7 +941,7 @@ pub(crate) fn progress(conn: &rusqlite::Connection) -> Result<(u64, u64)> {
             "SELECT COUNT(*) FROM embeddings e WHERE e.model = ?1
                AND EXISTS (SELECT 1 FROM assets a WHERE a.thumb_hash = e.thumb_hash AND {kinds})"
         ),
-        [MODEL],
+        [model_id()],
         |r| r.get(0),
     )?;
     Ok((done as u64, total as u64))
@@ -820,6 +953,7 @@ pub(crate) async fn schedule(state: &AppState) {
         return;
     }
     let kinds = crate::looks::KINDS_SQL;
+    let model = model_id();
     let queued = db::call(&state.pool, move |c| {
         let waiting: bool = c.query_row(
             "SELECT EXISTS (SELECT 1 FROM jobs WHERE kind = ?1 AND status = 'queued')",
@@ -834,7 +968,7 @@ pub(crate) async fn schedule(state: &AppState) {
                 "SELECT EXISTS (SELECT 1 FROM assets a WHERE a.thumb_hash IS NOT NULL AND {kinds} AND {MISSING_SQL})
                      OR EXISTS (SELECT 1 FROM embeddings e WHERE {ORPHAN_SQL})"
             ),
-            [MODEL],
+            [&model],
             |r| r.get(0),
         )?;
         if work {
@@ -878,7 +1012,11 @@ pub(crate) fn in_pool<T: Send>(f: impl FnOnce() -> T + Send) -> T {
 
 /// Embed every thumbnail that has no embedding, and forget the ones nothing uses.
 pub(crate) async fn run_job(state: &AppState) -> Result<()> {
-    let Some(dir) = SLOT.ready() else { return Ok(()) };
+    let (remote, dir) = (hosted(), SLOT.ready());
+    if remote.is_none() && dir.is_none() {
+        return Ok(());
+    }
+    let id = model_id();
     state.pictures.ensure(state).await?;
     let gone: Vec<String> = db::call(&state.pool, |c| {
         let gone = c
@@ -902,14 +1040,14 @@ pub(crate) async fn run_job(state: &AppState) -> Result<()> {
     let mut unreadable = std::collections::HashSet::new();
     let mut done = 0usize;
     loop {
-        let skip = unreadable.clone();
+        let (skip, want) = (unreadable.clone(), id.clone());
         let todo: Vec<String> = db::call(&state.pool, move |c| {
             let rows = c
                 .prepare(&format!(
                     "SELECT DISTINCT a.thumb_hash FROM assets a
                       WHERE a.thumb_hash IS NOT NULL AND {kinds} AND {MISSING_SQL}"
                 ))?
-                .query_map([MODEL], |r| r.get(0))?
+                .query_map([want], |r| r.get(0))?
                 .collect::<rusqlite::Result<Vec<String>>>()?;
             Ok(rows.into_iter().filter(|h| !skip.contains(h)).collect())
         })
@@ -917,17 +1055,10 @@ pub(crate) async fn run_job(state: &AppState) -> Result<()> {
         if todo.is_empty() {
             return relearned(state).await;
         }
-        let model = if let Some(m) = &model {
-            Arc::clone(m)
-        } else {
-            let d = dir.clone();
-            let m = Arc::new(crate::heavy::run("clip-load", move || siglip::VisionModel::load(&d)).await??);
-            Arc::clone(model.insert(m))
-        };
         let total = done + todo.len();
         for chunk in todo.chunks(BATCH) {
-            // Switched off partway through: stop, keeping what's done.
-            if !is_ready() {
+            // Switched off or to another model partway through: stop, keeping what's done.
+            if !is_ready() || model_id() != id {
                 return Ok(());
             }
             crate::activity::job_progress(crate::jobs::EMBED, None, done, total, "pictures");
@@ -941,9 +1072,21 @@ pub(crate) async fn run_job(state: &AppState) -> Result<()> {
                     }
                 }
             }
-            let m = Arc::clone(&model);
-            let computed = crate::heavy::run("clip", move || in_pool(|| embed_all(&m, &pictures))).await??;
-            save(state, &computed).await?;
+            let computed = if let Some(c) = &remote {
+                let bytes: Vec<&[u8]> = pictures.iter().map(|(_, b)| b.as_ref()).collect();
+                let vs = c.pictures(&state.http, &bytes).await?;
+                pictures.iter().zip(vs).map(|((h, _), v)| (h.clone(), v.map(|v| quantize(&normalized(v))))).collect()
+            } else {
+                let m = if let Some(m) = &model {
+                    Arc::clone(m)
+                } else {
+                    let d = dir.clone().context("image search's model went")?;
+                    let m = Arc::new(crate::heavy::run("clip-load", move || siglip::VisionModel::load(&d)).await??);
+                    Arc::clone(model.insert(m))
+                };
+                crate::heavy::run("clip", move || in_pool(|| embed_all(&m, &pictures))).await??
+            };
+            save(state, &computed, &id).await?;
             done += chunk.len();
             state.pictures.write(|m| {
                 for (hash, v) in computed {
@@ -969,19 +1112,20 @@ fn embed_all(
     Ok(prepared.into_iter().map(|(h, p)| (h, p.and_then(|_| embedded.next()).map(|v| quantize(&v)))).collect())
 }
 
-async fn save(state: &AppState, computed: &[(String, Option<Vec<i8>>)]) -> Result<()> {
+async fn save(state: &AppState, computed: &[(String, Option<Vec<i8>>)], model: &str) -> Result<()> {
     let rows: Vec<(String, Vec<u8>)> = computed
         .iter()
         // Not a picture after all: an empty row, so it isn't tried again.
         .map(|(h, v)| (h.clone(), v.as_ref().map_or_default(|v| v.iter().map(|&x| x as u8).collect())))
         .collect();
+    let model = model.to_owned();
     db::call(&state.pool, move |c| {
         let tx = c.transaction()?;
         {
             let mut stmt =
                 tx.prepare("INSERT OR REPLACE INTO embeddings (thumb_hash, model, vector) VALUES (?1, ?2, ?3)")?;
             for (hash, v) in &rows {
-                stmt.execute(params![hash, MODEL, v])?;
+                stmt.execute(params![hash, model, v])?;
             }
         }
         tx.commit()?;
@@ -1026,5 +1170,30 @@ mod tests {
         assert_eq!(hits.len(), 1, "{hits:?}");
         assert_eq!(hits[0].0, "strong");
         assert!(hits[0].1 > 0.25, "a strong text match beats a name match alone");
+    }
+
+    #[test]
+    fn a_hosted_model_is_judged_by_each_search_s_spread() {
+        let entry = |x: f32| Entry::new(quantize(&normalized(vec![x, 1.0 - x, 0.1]))).unwrap();
+        let q = [1.0f32, 0.0, 0.0];
+        // Whatever level a model's scores sit at, what stands far above the rest is a match and the rest isn't.
+        for base in [0.2f32, 0.5] {
+            let index = Index::new(hosted_spec("test:model"));
+            let mut m: HashMap<String, Entry> =
+                (0..60).map(|i| (format!("t{i}"), entry(base + (i % 10) as f32 * 0.004))).collect();
+            m.insert("strong".into(), entry(base + 0.2));
+            *index.map.write().unwrap() = Some(m);
+            let hits = index.matching(&q);
+            assert_eq!(hits.iter().map(|h| h.0.as_str()).collect::<Vec<_>>(), ["strong"], "{base}: {hits:?}");
+            assert!(hits[0].1 > 0.25);
+            // More like this: measured against the typical picture's score for this one.
+            let like = index.similar("t0").unwrap();
+            assert!((like["t0"] - 1.0).abs() < 1e-3);
+            assert!(like["t1"] > 0.5 && like["strong"] < 0.1, "{like:?}");
+        }
+        assert!(std::ptr::eq(hosted_spec("test:model"), hosted_spec("test:model")), "made once per model");
+        let index = Index::new(&SPEC);
+        index.respec(hosted_spec("test:other"));
+        assert_eq!(index.spec().model, "test:other");
     }
 }

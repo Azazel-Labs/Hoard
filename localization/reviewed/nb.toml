@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "f1669a81c6df0aa65b7d1254acbfe377ffe38ce4f61e820fd439a52d951e4242"
+source = "f7e0e0b19af39ea3822145faba9be4d1ea835284f074aa72561dec35f36e1c83"
 translation = "233736fce877dd72d5c0840b380752036aeadf00268c938b28bf55f6d4bddad5"
 
 [messages.account-add]
@@ -3703,6 +3703,14 @@ translation = "denne har ett bilde, eller for mange til å legge ut"
 [messages.error-full-path]
 source = "give a full path"
 translation = "oppgi en full bane"
+
+[messages.error-hosted-address]
+source = "The image search service’s address should start with http:// or https://"
+translation = "Adressen til bildesøktjenesten må begynne med http:// eller https://"
+
+[messages.error-hosted-key]
+source = "Enter the API key for { $provider }"
+translation = "Skriv inn API-nøkkelen for { $provider }"
 
 [messages.error-https-bad-name]
 source = "“{ $name }” isn't an address a certificate can hold"
@@ -8653,6 +8661,14 @@ translation = "Laster ned modellen … fremdriften vises i aktivitetsindikatoren
 source = "Search by what pictures show"
 translation = "Søk etter hva bilder viser"
 
+[messages.settings-clip-here]
+source = "This server: nothing leaves it"
+translation = "Denne serveren: ingenting forlater den"
+
+[messages.settings-clip-here-desktop]
+source = "This computer: nothing leaves it"
+translation = "Denne datamaskinen: ingenting forlater den"
+
 [messages.settings-clip-hint]
 source = "Uses Google’s SigLIP 2 model, run on this server’s processor: nothing leaves it. Turning it on downloads the model ({ $size } MB) from Hugging Face, then learns every picture in the background at low priority. It takes 350 to 750 MB of memory while it works or someone searches. Turning it off deletes the model and keeps what it learned, for next time."
 translation = "Bruker Googles SigLIP 2-modell, kjørt på prosessoren til denne serveren: ingenting forlater den. Når du slår det på, lastes modellen ned ({ $size } MB) fra Hugging Face, og deretter lærer den alle bildene i bakgrunnen med lav prioritet. Den bruker 350 til 750 MB minne mens den jobber eller noen søker. Når du slår det av, slettes modellen, og det den har lært, beholdes til neste gang."
@@ -8660,6 +8676,26 @@ translation = "Bruker Googles SigLIP 2-modell, kjørt på prosessoren til denne 
 [messages.settings-clip-hint-desktop]
 source = "Uses Google’s SigLIP 2 model, run on this computer’s processor: nothing leaves it. Turning it on downloads the model ({ $size } MB) from Hugging Face, then learns every picture in the background at low priority. It takes 350 to 750 MB of memory while it works or you search. Turning it off deletes the model and keeps what it learned, for next time."
 translation = "Bruker Googles SigLIP 2-modell, kjørt på prosessoren til denne datamaskinen: ingenting forlater den. Når du slår det på, lastes modellen ned ({ $size } MB) fra Hugging Face, og deretter lærer den alle bildene i bakgrunnen med lav prioritet. Den bruker 350 til 750 MB minne mens den jobber eller du søker. Når du slår det av, slettes modellen, og det den har lært, beholdes til neste gang."
+
+[messages.settings-clip-hosted]
+source = "A hosted service"
+translation = "En vertsbasert tjeneste"
+
+[messages.settings-clip-hosted-hint]
+source = "Nothing is downloaded or run here: the service learns every picture, a batch at a time. Another service or model learns them all again, and what each one learned is kept, for switching back."
+translation = "Ingenting lastes ned eller kjøres her: tjenesten lærer hvert bilde, en bunke om gangen. En annen tjeneste eller modell lærer alle på nytt, og det hver av dem har lært, beholdes, så du kan bytte tilbake."
+
+[messages.settings-clip-hosted-unavailable]
+source = "Couldn’t use { $service }: { $detail }. Trying again every hour."
+translation = "Kunne ikke bruke { $service }: { $detail }. Prøver igjen hver time."
+
+[messages.settings-clip-hosted-warning]
+source = "Pictures leave this server. A thumbnail of every picture in the library, and the words of every image search, are sent to { $service }, which charges for them and keeps them as its terms say."
+translation = "Bilder forlater denne serveren. Et miniatyrbilde av hvert bilde i biblioteket og ordene i hvert bildesøk sendes til { $service }, som tar betalt for dem og oppbevarer dem slik vilkårene deres sier."
+
+[messages.settings-clip-hosted-warning-desktop]
+source = "Pictures leave this computer. A thumbnail of every picture in the library, and the words of every image search, are sent to { $service }, which charges for them and keeps them as its terms say."
+translation = "Bilder forlater denne datamaskinen. Et miniatyrbilde av hvert bilde i biblioteket og ordene i hvert bildesøk sendes til { $service }, som tar betalt for dem og oppbevarer dem slik vilkårene deres sier."
 
 [messages.settings-clip-learning]
 source = "Ready: learning pictures, { $done } of { $total } so far"
@@ -8692,6 +8728,18 @@ translation = "Til den nye modellen har lært alle bildene, bruker søk det den 
 source = "Image search: back to the default"
 translation = "Bildesøk: tilbake til standard"
 
+[messages.settings-clip-saved-here]
+source = "Image search: runs on this server"
+translation = "Bildesøk: kjører på denne serveren"
+
+[messages.settings-clip-saved-here-desktop]
+source = "Image search: runs on this computer"
+translation = "Bildesøk: kjører på denne datamaskinen"
+
+[messages.settings-clip-saved-hosted]
+source = "Image search: runs on { $service }"
+translation = "Bildesøk: kjører hos { $service }"
+
 [messages.settings-clip-saved-off]
 source = "Image search: off"
 translation = "Bildesøk: av"
@@ -8711,6 +8759,10 @@ translation = "Kunne ikke hente modellen: { $detail }. Prøver igjen hver time."
 [messages.settings-clip-what]
 source = "Type what you’re after (“mossy rock”, “sci-fi door”, “wooden barrel”) and pictures that show it turn up beside names that have the words. “More like this” finds things of the same kind, not only the same colors."
 translation = "Skriv hva du er ute etter («mossy rock», «sci-fi door», «wooden barrel»), så dukker bilder som viser det opp ved siden av navn som har ordene. «Mer som dette» finner ting av samme slag, ikke bare de samme fargene."
+
+[messages.settings-clip-where]
+source = "Runs on"
+translation = "Kjører på"
 
 [messages.settings-conv]
 source = "Conversion rules"

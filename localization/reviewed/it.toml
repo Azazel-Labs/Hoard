@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "f1669a81c6df0aa65b7d1254acbfe377ffe38ce4f61e820fd439a52d951e4242"
+source = "f7e0e0b19af39ea3822145faba9be4d1ea835284f074aa72561dec35f36e1c83"
 translation = "98b77849b047ba15c3fafc62f630455aa81fbcc62eed2bd82d45ed46bbdb7f90"
 
 [messages.account-add]
@@ -3703,6 +3703,14 @@ translation = "ha un solo fotogramma, o troppi da disporre"
 [messages.error-full-path]
 source = "give a full path"
 translation = "indica un percorso completo"
+
+[messages.error-hosted-address]
+source = "The image search service’s address should start with http:// or https://"
+translation = "L'indirizzo del servizio di ricerca per immagini deve iniziare con http:// o https://"
+
+[messages.error-hosted-key]
+source = "Enter the API key for { $provider }"
+translation = "Inserisci la chiave API di { $provider }"
 
 [messages.error-https-bad-name]
 source = "“{ $name }” isn't an address a certificate can hold"
@@ -8668,6 +8676,14 @@ translation = "Download del modello… l'avanzamento è nell'indicatore delle at
 source = "Search by what pictures show"
 translation = "Cerca in base a ciò che mostrano le immagini"
 
+[messages.settings-clip-here]
+source = "This server: nothing leaves it"
+translation = "Questo server: non ne esce nulla"
+
+[messages.settings-clip-here-desktop]
+source = "This computer: nothing leaves it"
+translation = "Questo computer: non ne esce nulla"
+
 [messages.settings-clip-hint]
 source = "Uses Google’s SigLIP 2 model, run on this server’s processor: nothing leaves it. Turning it on downloads the model ({ $size } MB) from Hugging Face, then learns every picture in the background at low priority. It takes 350 to 750 MB of memory while it works or someone searches. Turning it off deletes the model and keeps what it learned, for next time."
 translation = "Usa il modello SigLIP 2 di Google, eseguito sul processore di questo server: non esce niente. Attivandola, il modello ({ $size } MB) viene scaricato da Hugging Face, poi impara ogni immagine in background a bassa priorità. Occupa da 350 a 750 MB di memoria mentre lavora o qualcuno cerca. Disattivandola, il modello viene eliminato ma ciò che ha imparato resta, per la volta successiva."
@@ -8675,6 +8691,26 @@ translation = "Usa il modello SigLIP 2 di Google, eseguito sul processore di que
 [messages.settings-clip-hint-desktop]
 source = "Uses Google’s SigLIP 2 model, run on this computer’s processor: nothing leaves it. Turning it on downloads the model ({ $size } MB) from Hugging Face, then learns every picture in the background at low priority. It takes 350 to 750 MB of memory while it works or you search. Turning it off deletes the model and keeps what it learned, for next time."
 translation = "Usa il modello SigLIP 2 di Google, eseguito sul processore di questo computer: non esce niente. Attivandola, il modello ({ $size } MB) viene scaricato da Hugging Face, poi impara ogni immagine in background a bassa priorità. Occupa da 350 a 750 MB di memoria mentre lavora o mentre cerchi. Disattivandola, il modello viene eliminato ma ciò che ha imparato resta, per la volta successiva."
+
+[messages.settings-clip-hosted]
+source = "A hosted service"
+translation = "Un servizio in hosting"
+
+[messages.settings-clip-hosted-hint]
+source = "Nothing is downloaded or run here: the service learns every picture, a batch at a time. Another service or model learns them all again, and what each one learned is kept, for switching back."
+translation = "Qui non si scarica né si esegue nulla: il servizio impara ogni immagine, a lotti. Un altro servizio o modello le reimpara tutte, e ciò che ha imparato ciascuno viene conservato, per poter tornare indietro."
+
+[messages.settings-clip-hosted-unavailable]
+source = "Couldn’t use { $service }: { $detail }. Trying again every hour."
+translation = "Impossibile usare { $service }: { $detail }. Nuovo tentativo ogni ora."
+
+[messages.settings-clip-hosted-warning]
+source = "Pictures leave this server. A thumbnail of every picture in the library, and the words of every image search, are sent to { $service }, which charges for them and keeps them as its terms say."
+translation = "Le immagini escono da questo server. Una miniatura di ogni immagine della libreria, e le parole di ogni ricerca per immagini, vengono inviate a { $service }, che le fa pagare e le conserva secondo le sue condizioni."
+
+[messages.settings-clip-hosted-warning-desktop]
+source = "Pictures leave this computer. A thumbnail of every picture in the library, and the words of every image search, are sent to { $service }, which charges for them and keeps them as its terms say."
+translation = "Le immagini escono da questo computer. Una miniatura di ogni immagine della libreria, e le parole di ogni ricerca per immagini, vengono inviate a { $service }, che le fa pagare e le conserva secondo le sue condizioni."
 
 [messages.settings-clip-learning]
 source = "Ready: learning pictures, { $done } of { $total } so far"
@@ -8707,6 +8743,18 @@ translation = "Finché il nuovo modello non ha imparato tutte le immagini, le ri
 source = "Image search: back to the default"
 translation = "Ricerca per immagini: ripristina il predefinito"
 
+[messages.settings-clip-saved-here]
+source = "Image search: runs on this server"
+translation = "Ricerca per immagini: funziona su questo server"
+
+[messages.settings-clip-saved-here-desktop]
+source = "Image search: runs on this computer"
+translation = "Ricerca per immagini: funziona su questo computer"
+
+[messages.settings-clip-saved-hosted]
+source = "Image search: runs on { $service }"
+translation = "Ricerca per immagini: funziona su { $service }"
+
 [messages.settings-clip-saved-off]
 source = "Image search: off"
 translation = "Ricerca per immagini: disattivata"
@@ -8726,6 +8774,10 @@ translation = "Impossibile ottenere il modello: { $detail }. Nuovo tentativo ogn
 [messages.settings-clip-what]
 source = "Type what you’re after (“mossy rock”, “sci-fi door”, “wooden barrel”) and pictures that show it turn up beside names that have the words. “More like this” finds things of the same kind, not only the same colors."
 translation = "Scrivi ciò che cerchi («roccia muschiosa», «porta fantascientifica», «barile di legno») e le immagini che lo mostrano compaiono accanto ai nomi che contengono quelle parole. «Altri simili» trova cose dello stesso tipo, non solo degli stessi colori."
+
+[messages.settings-clip-where]
+source = "Runs on"
+translation = "Funziona su"
 
 [messages.settings-conv]
 source = "Conversion rules"

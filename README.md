@@ -1011,6 +1011,14 @@ A library that learned its pictures with OpenAI's CLIP, the model Hoard used bef
 learned while SigLIP 2 learns every picture again in the background. Then CLIP's embeddings and model files are
 deleted.
 
+A server too small to run the model can send the work to a hosted service instead: under "Runs on", pick "A hosted
+service", then Voyage AI, Cohere or Jina AI, and paste its API key. Nothing is downloaded or run on the server then,
+but **pictures leave it**: a thumbnail of every picture in the library, and the words of every image search, go to the
+service, which charges for them and keeps them as its terms say. Settings says so before anything is saved. The
+service learns every picture a batch at a time; if it says no (a wrong key, an outage), the job tries again every
+hour. Another service or model learns every picture again, and what each one learned is kept, so switching back is
+instant. The key stays on the server and is never sent to the browser.
+
 ### Sound search
 
 Settings → Image and sound search has a second model, for sounds (LAION's CLAP, HTSAT unfused). Like image search,

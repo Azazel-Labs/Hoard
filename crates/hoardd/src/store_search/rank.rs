@@ -73,7 +73,7 @@ pub(super) fn words(s: &str) -> Vec<String> {
 
 /// How well a title matches the query, 0 to 1: mostly how many of the query's words it has, a little how few
 /// other words.
-pub(super) fn score(query: &[String], title: &str) -> f32 {
+fn score(query: &[String], title: &str) -> f32 {
     let title = words(title);
     if query.is_empty() || title.is_empty() {
         return 0.0;

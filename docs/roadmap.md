@@ -137,4 +137,3 @@ on its own:
 
 - Embeddings for "find more like this" and near-duplicates (SigLIP 2 for images, or a multimodal embedding API).
 - BPM and key detection for music (Essentia).
-- An Unreal-friendly export layout.

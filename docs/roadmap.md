@@ -77,6 +77,24 @@ tile sheets that come with only a note of their grid (Kenney's `Tilesheet.txt`).
   license only covers people who hold a Spine license, which is the open question.
 - [ ] Rarer: Spriter `.scml`, Live2D `.moc3`, GameMaker `.yy`, Defold atlases.
 
+## Images: more formats
+
+Hoard previews PNG, JPEG, GIF, BMP, TGA, WebP, TIFF, HDR, EXR, PSD/PSB, Krita, OpenRaster, DDS, KTX2, Basis,
+SVG, Illustrator and Aseprite. Some formats are filed as images but get no thumbnail, and some aren't recognized at
+all. The most common first:
+
+- [ ] **Source files with a preview inside**: Clip Studio (`.clip`, a SQLite database with a canvas preview),
+  Procreate (`.procreate`, a zip with a thumbnail), Affinity Photo and Designer (`.afphoto`, `.afdesign`) and EPS
+  (a TIFF preview in its header, when it has one). All of these are recognized now, but none gets a picture.
+- [ ] **GIMP** (`.xcf`): recognized, but nothing is drawn. The format is documented, and Hoard would composite
+  the layers itself, as it does for Krita.
+- [ ] **AVIF, HEIC and JPEG XL**: newer formats, rare in asset packs so far. JPEG XL has a pure-Rust decoder.
+  AVIF and HEIC would need dav1d and libheif, or could go through ffmpeg once it's downloaded.
+- [ ] **Small ones**: ICO/CUR, QOI, PCX and PNM (`.ppm`, `.pgm`, `.pbm`), most of them a decoder switched on
+  in the image library. Also KTX 1 and PVR textures, and Valve's VTF.
+- [ ] Camera raw files (`.dng`, `.cr2`, `.nef`) by their embedded JPEG. These are reference photos rather than
+  game art.
+
 ## Sounds: more formats
 
 Hoard decodes WAV, FLAC, MP3, OGG Vorbis, AIFF and ADPCM itself, AAC/M4A, Opus, WMA, CAF, WavPack, APE and more through
@@ -113,5 +131,5 @@ on its own:
 
 - Embeddings for "find more like this" and near-duplicates (SigLIP 2 for images, or a multimodal embedding API).
 - BPM and key detection for music (Essentia).
-- Previews for more source formats (GIMP, Substance).
+- Previews for Substance source files (`.sbs`, `.spp`).
 - An Unreal-friendly export layout.

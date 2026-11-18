@@ -1,5 +1,6 @@
-//! Looking up packs' store pages in the background, one pack at a time. A page the pack's README links to, or a
-//! listing with exactly the title of the pack's Megascans file, is certain: it's attached as the pack's store page
+//! Looking up packs' store pages in the background, one pack at a time. A page the pack's README links to, a listing
+//! with exactly the title of the pack's Megascans file, or one with exactly the pack's name from the seller its files
+//! name, is certain: it's attached as the pack's store page
 //! (and marked as found automatically, so Store details can offer to take it off again). Anything less is kept as
 //! suggestions, so Store details shows them at once.
 //!

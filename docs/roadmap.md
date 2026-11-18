@@ -16,15 +16,11 @@ waits until they're next changed: `db/schema.rs` (1,620 lines, mostly the migrat
 `unitymat.rs`, `sidecar.rs`, `sources.rs`, `links.rs` and `materials/models.rs` (750 to 900 lines each), and on the
 web side `App.vue` (1,750), `AssetDetail.vue`, `PacksView.vue`, `skeleton2d.ts` and `AiPanel.vue` (700 to 870).
 
-## Store details filled in without asking
+## Store details for the Unity Asset Store and Humble Bundle
 
-"Store details" already searches Fab, itch.io, Kenney and OpenGameArt by the pack's name and lists likely matches to
-pick from. Still to come:
-
-- Filling them in when a pack is added, once a match is sure enough: an exact title from the seller named in the
-  README, say. How sure is sure enough is the open question.
-- The Unity Asset Store and Humble Bundle only get search links: one searches in the page's script, the other turns
-  away non-browser clients.
+Store details searches Fab, itch.io, Kenney and OpenGameArt, and a pack whose files name its listing gets it filled
+in without asking. The Unity Asset Store and Humble Bundle only get search links: one searches in the page's script,
+the other turns away non-browser clients.
 
 ## AI tagging with a Claude subscription
 

@@ -72,6 +72,9 @@ pub(crate) struct StoreMatch {
     /// The listing's technical details as plain text, where the store gives them in search results.
     #[serde(skip)]
     specs: Option<String>,
+    /// Its title is exactly what was searched for (the pack's name, or the product name in its files).
+    #[serde(skip)]
+    named: bool,
 }
 
 #[derive(Debug, Serialize)]
@@ -187,14 +190,18 @@ impl StoreMatch {
     pub(crate) fn license(&self) -> Option<&'static str> {
         self.license
     }
+    /// Whether the pack names this listing: it links to it, or has exactly its title in a store's file, or the
+    /// listing has exactly the pack's name and is sold by the seller the pack's files name.
     fn is_certain(&self) -> bool {
-        (self.score - 1.0).abs() < f32::EPSILON && self.why.iter().any(Why::is_certain)
+        let named_by_seller = self.named && self.why.iter().any(|w| matches!(w, Why::By { .. }));
+        (self.score - 1.0).abs() < f32::EPSILON && (named_by_seller || self.why.iter().any(Why::is_certain))
     }
 }
 
 impl StoreMatches {
-    /// The one listing the pack names itself (its README links to it, or it has the exact title of the pack's
-    /// Megascans file). None if no listing, or more than one, does.
+    /// The one listing the pack names itself (its README links to it, it has the exact title of the pack's
+    /// Megascans file, or it has exactly the pack's name and the seller its files name). None if no listing, or more
+    /// than one, does.
     pub(crate) fn certain(&self) -> Option<&StoreMatch> {
         let mut sure = self.matches.iter().filter(|m| m.is_certain());
         let first = sure.next()?;
@@ -456,6 +463,7 @@ fn found(store: &'static str, title: &str, url: String) -> Option<StoreMatch> {
         why: Vec::new(),
         formats: Vec::new(),
         specs: None,
+        named: false,
     })
 }
 

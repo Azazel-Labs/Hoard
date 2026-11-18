@@ -137,6 +137,7 @@ pub(super) fn rank(query: &str, clues: &Clues, matches: Vec<StoreMatch>) -> Vec<
             continue;
         }
         let by_name = others.iter().map(|o| 0.9 * score(o, &m.title)).fold(score(&primary, &m.title), f32::max);
+        m.named = same_title(query, &m.title);
         let mut s = by_name;
         if m.why.iter().any(|w| matches!(w, Why::Linked(_))) {
             s = 1.0;
@@ -278,6 +279,34 @@ mod tests {
         // The same words aren't enough: plain names have many listings.
         let plain = matches(rank("medieval village", &Clues::default(), vec![fab_match("Medieval Village", "A", &[])]));
         assert!((plain.matches[0].score - 1.0).abs() < f32::EPSILON && plain.certain().is_none());
+
+        // The pack's exact name from the seller its README names is; a longer title from them, or the exact name
+        // from someone else, isn't.
+        let by = Clues { sellers: vec![("Marco Maria Rossi".into(), Place::Readme)], ..Clues::default() };
+        let by_author = |title: &str, author: &str| {
+            let mut m = fab_match(title, author, &[]);
+            m.url = format!("{}-{}", m.url, squash(author));
+            m
+        };
+        let village = matches(rank(
+            "Medieval Village",
+            &by,
+            vec![
+                by_author("Medieval Village Props", "Marco Maria Rossi"),
+                by_author("Medieval Village", "Anatolii Umanets"),
+                by_author("Medieval Village", "Marco Maria Rossi"),
+            ],
+        ));
+        assert_eq!(village.certain().map(StoreMatch::author), Some(Some("Marco Maria Rossi")));
+        let others = matches(rank(
+            "Medieval Village",
+            &by,
+            vec![
+                by_author("Medieval Village Props", "Marco Maria Rossi"),
+                by_author("Medieval Village", "Anatolii Umanets"),
+            ],
+        ));
+        assert!(others.certain().is_none());
 
         // Two pages the README links to: which one is it?
         let mut two = matches(vec![fab_match("One", "A", &[]), fab_match("Two", "B", &["CC-BY"])]);

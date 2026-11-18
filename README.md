@@ -522,8 +522,9 @@ software rasterizer (`apt install mesa-vulkan-drivers`). Without any adapter, ev
      a store link and no text, from either place, Hoard fetches the page's title and description; the asset panel
      shows it as "From the <store> page".
    - **Store lookup.** New packs are looked up in the background, one every few seconds, newest first. When the pack
-     names its listing itself (its README or Sketchfab file links to it, or the listing has exactly the title in its
-     Megascans file), that listing becomes the pack's store page, with its seller and license. Store details says it
+     names its listing itself (its README or Sketchfab file links to it, the listing has exactly the title in its
+     Megascans file, or the listing has exactly the pack's name and is sold by the seller its README or folders name),
+     that listing becomes the pack's store page, with its seller and license. Store details says it
      was found automatically, and "Not this one" takes it off. Anything less certain is kept, so Store details lists the likely
      matches at once ("Search again" searches afresh). Turn it off in Settings → Adding packs → "Look up store pages
      automatically".

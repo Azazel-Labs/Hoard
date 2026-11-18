@@ -67,7 +67,50 @@ Spine skeletons exported as JSON play on their atlas in Hoard's own player. Stil
 
 - **Spine binary skeletons** (`.skel`): the same rig in Spine's binary export, read into the same player.
 
-## Ideas
+## Near copies and a better "More like this"
 
-- Embeddings for "find more like this" and near-duplicates (SigLIP 2 for images, or a multimodal embedding API).
-- BPM and key detection for music (Essentia).
+Byte-identical files are already stored once and listed as "Identical copies". More like this already catches
+near-copies by a perceptual hash, then ranks by colors and grain, and by what pictures show when image search (CLIP)
+is on. Still to come:
+
+- **Near copies, listed.** Beside "Identical copies", an asset's details list its near copies: the same picture at
+  another size or in another format (`rock_4k.png`, `rock_2k.jpg`, `rock.tga`), the same sound at another sample
+  rate or in another format, the same model in another format (an FBX and a GLB of one mesh: the same triangle and
+  bone counts, and renders that look alike). The best copy is marked (the biggest, lossless, most complete), so it's
+  clear which to download.
+- **A page of duplicates.** Groups of near copies across the library, the most wasted space first, so a bundle bought
+  twice, or the same CC0 set arriving in five bundles, shows up. Hoard points them out and never deletes anything on
+  its own, and watched folders are never touched.
+- **A better picture model.** SigLIP 2 in place of CLIP ViT-B/32: better at finding pictures from words and at
+  telling what's alike. Still run on the server through candle, and still off until an admin turns it on. After the
+  switch, what CLIP learned is relearned in the background, and search keeps using it until then.
+- **A hosted embedding service, as an option.** For a server too small to run the model: thumbnails go to a
+  multimodal embedding API the admin picks. Off by default, and Settings says plainly that it sends pictures away
+  from the server.
+
+Still open: which SigLIP 2 size (download and memory against how much better it finds things, measured on a real
+library), and how alike counts as a near copy for each kind. A recolored texture is a variant, not a copy.
+
+## Tempo and key of music
+
+Today a sound's tempo is only what a WAV's ACID chunk says, its root note only what its sampler chunk says, and MIDI
+and tracker files list the tempo they're written at. Still to come, measured from the sound itself:
+
+- **Tempo.** Onsets found in the sound's spectrum over time, and the beat period that fits them best, giving a BPM and
+  how sure it is. Half or double the real tempo is the usual mistake, so the common range (about 70 to 180) is
+  preferred and the other reading kept as a second guess. A file that states its tempo keeps it; measuring fills in
+  the rest.
+- **Key.** How much of each of the 12 notes is heard across the track, matched against major and minor key profiles:
+  "A minor", "E♭ major", with how sure it is. MIDI and tracker files get theirs from their notes, with no listening.
+- **Bars.** With the tempo, a loop's length in bars (`bars:8`, in 4/4), so loops that fit together can be found.
+- **Search.** `bpm:120` and `key:a-minor` tags, like today's tempo tag. A tempo range and a key in the sidebar, where
+  a key also finds the keys that go with it (its relative major or minor, and a fifth either side). The same in the
+  API and in MCP's `search_sounds`.
+- **Which sounds.** Music and loops: sounds tagged `music` or `loop`, and anything longer than a few seconds with a
+  steady beat. One-shots and effects are skipped, so a footstep doesn't get a key.
+- **Hoard's own code.** Written in Rust on the spectrum the sound job already works out. Essentia, the usual library,
+  is AGPL, which doesn't fit Hoard's MIT-0 license. Checked against the library's own ACID-tagged loops, whose tempo
+  and root note are known.
+
+Still open: whether to show Camelot notation (8A) for DJ-style mixing, and what to do with tracks whose tempo or key
+changes partway through.

@@ -533,14 +533,14 @@ app-key-major = Major
 app-key-minor = Minor
 app-key-mix = And keys that mix with it
 app-key-mix-title = Its relative major or minor and the keys a fifth either side, which DJs mix with it
-# The sidebar box for finding sounds by a word that imitates them ("whooom", "pew").
-app-imitation = Sounds like
+# Finding sounds by a word that imitates them ("whooom", "pew"), written in the search field while searching sounds,
+# or by a noise made into its microphone.
 # Examples of imitation words; the reading is of English-style spelling, so keep them as they are.
 app-imitation-placeholder = whooom, pew, krssh
 app-imitation-title = Write the noise a sound makes the way you'd spell it: sounds shaped like it come first
 app-imitation-record = Make the noise into the microphone: sounds shaped like it come first
 app-imitation-stop = Stop recording
-# Shown in the "Sounds like" box while it's searching by a noise made into the microphone.
+# The search field's hint while it's searching by a noise made into the microphone.
 app-imitation-heard = Your noise
 app-imitation-mic-failed = Couldn't record from the microphone: { $error }
 app-retry = Retry

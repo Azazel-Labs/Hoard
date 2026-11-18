@@ -470,7 +470,6 @@ app-key-major = Majeur
 app-key-minor = Mineur
 app-key-mix = En toonsoorten die erbij mixen
 app-key-mix-title = De parallelle majeur of mineur en de toonsoorten een kwint hoger en lager, die dj's ermee mixen
-app-imitation = Klinkt als
 app-imitation-placeholder = whooom, pew, krssh
 app-imitation-title = Schrijf het geluid zoals je het zou spellen: geluiden die erop lijken komen eerst
 app-imitation-record = Maak het geluid in de microfoon: geluiden die erop lijken komen eerst

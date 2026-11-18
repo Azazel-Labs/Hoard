@@ -480,7 +480,6 @@ app-key-major = Dur
 app-key-minor = Moll
 app-key-mix = A tóniny, které se s ní dají mixovat
 app-key-mix-title = Její paralelní durová nebo mollová tónina a tóniny o kvintu výš a níž, které s ní DJ mixují
-app-imitation = Zní jako
 app-imitation-placeholder = whooom, pew, krssh
 app-imitation-title = Napište zvuk tak, jak byste ho hláskovali: nejdřív se zobrazí zvuky, které se mu podobají
 app-imitation-record = Vydejte zvuk do mikrofonu: nejdřív se zobrazí zvuky, které se mu podobají

@@ -470,7 +470,6 @@ app-key-major = Maior
 app-key-minor = Menor
 app-key-mix = E tonalidades que combinam com ela
 app-key-mix-title = A sua relativa maior ou menor e as tonalidades uma quinta acima e abaixo, que os DJ misturam com ela
-app-imitation = Soa como
 app-imitation-placeholder = whooom, pew, krssh
 app-imitation-title = Escreva o barulho que um som faz tal como o soletraria: os parecidos aparecem primeiro
 app-imitation-record = Faça o barulho no microfone: os sons parecidos aparecem primeiro

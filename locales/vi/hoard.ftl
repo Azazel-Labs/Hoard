@@ -470,7 +470,6 @@ app-key-major = Trưởng
 app-key-minor = Thứ
 app-key-mix = Và các giọng phối trộn được với nó
 app-key-mix-title = Giọng trưởng hoặc thứ song song của nó và các giọng cách một quãng năm ở hai bên, mà DJ thường trộn cùng
-app-imitation = Nghe như
 app-imitation-placeholder = whooom, pew, krssh
 app-imitation-title = Viết tiếng động theo cách bạn đánh vần: âm thanh giống vậy sẽ hiện trước
 app-imitation-record = Tạo tiếng động vào micrô: âm thanh giống vậy sẽ hiện trước

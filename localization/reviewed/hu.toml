@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "f7e0e0b19af39ea3822145faba9be4d1ea835284f074aa72561dec35f36e1c83"
+source = "c3246003ee8c01828baa22b384070aba5a12c16495c14ac47693848c86bbf88d"
 translation = "230aa92a6033cfd0e81420ca5ef21ba788bfd9cbf50cc6964032f8c9499222bf"
 
 [messages.account-add]
@@ -887,10 +887,6 @@ translation = "Vissza a könyvtárhoz"
 [messages.app-home-version]
 source = "Hoard { $version } — back to the library"
 translation = "Hoard { $version } – vissza a könyvtárhoz"
-
-[messages.app-imitation]
-source = "Sounds like"
-translation = "Úgy szól, mint"
 
 [messages.app-imitation-heard]
 source = "Your noise"

@@ -1,19 +1,18 @@
 <script setup lang="ts">
 // The library's Filters column (a drawer on phones): your favorites and saved searches, projects, collections, color,
-// "sounds like", music, kinds and tags. Choosing a place to browse (a saved search, project, collection or your
+// kinds, tags and, searching sounds, music. Choosing a place to browse (a saved search, project, collection or your
 // favorites) is App's to do, since it also changes the view; the rest just sets the filters.
-import { computed, ref, shallowRef, watch } from 'vue'
-import { api, ApiError, type AssetKind, type Collection, type Facet, type Project, type SavedSearch } from '../api'
+import { computed } from 'vue'
+import { api, type AssetKind, type Collection, type Facet, type Project, type SavedSearch } from '../api'
 import { KIND_LABEL } from '../kinds'
 import { auth, mayEdit } from '../auth'
-import { filters, HEARD, heardNoise, savedNow } from '../filters'
+import { filters, savedNow } from '../filters'
 import { formatNumber, t } from '../i18n'
-import { KEYS, keyName } from '../keys'
 import { forgetSearch, mine } from '../mine'
 import { prefs, toggleIn } from '../prefs'
 import { loadProjects, projects } from '../projects'
-import { canRecord, record, type Recording } from '../record'
 import { confirmDialog, daysAgo, showError } from '../ui'
+import MusicFilters from './MusicFilters.vue'
 
 const props = defineProps<{ collections: Collection[]; kindFacets: Facet[]; tagFacets: Facet[]; loading: boolean }>()
 const emit = defineEmits<{
@@ -66,40 +65,6 @@ function pickColor(hex: string) {
   if (filters.color) filters.imitation = ''
 }
 
-/** A tempo typed in the sidebar: a number, or nothing. */
-function bpmInput(e: Event): number | '' {
-  const v = (e.target as HTMLInputElement).valueAsNumber
-  return Number.isFinite(v) && v > 0 ? Math.round(v) : ''
-}
-
-/** What's typed in the "Sounds like" box, set as the filter when it's sent. */
-const imitationDraft = ref('')
-watch(() => filters.imitation, (w) => (imitationDraft.value = w.startsWith(HEARD) ? '' : w), { immediate: true })
-/** A word imitating a sound ("whooom"): the sounds shaped like it, most alike first. */
-function imitate() {
-  const word = imitationDraft.value.trim()
-  Object.assign(filters, word ? { imitation: word, similar: null, color: '', sort: '' } : { imitation: '' })
-}
-/** The noise being made into the microphone, while it's recorded. */
-const listening = shallowRef<Recording | null>(null)
-const canListen = canRecord()
-/** Records a noise from the microphone (or stops recording it): the sounds shaped like it, most alike first. */
-async function listen() {
-  if (listening.value) {
-    listening.value.stop()
-    return
-  }
-  try {
-    const recording = await record()
-    listening.value = recording
-    const wav = await recording.done.finally(() => (listening.value = null))
-    const heard = await api.imitation(wav)
-    Object.assign(filters, { imitation: heard.imitation, similar: null, color: '', sort: '' })
-  } catch (e) {
-    showError(e instanceof ApiError ? e.message : t('app-imitation-mic-failed', { error: (e as Error).message }))
-  }
-}
-
 /** The heading of each tag group, by tag namespace (a function, so it follows a change of language). */
 const NS_LABEL = (): Record<string, string> => ({
   '': t('app-ns-subject'), style: t('app-ns-style'), theme: t('app-ns-theme'), material: t('app-ns-material'),
@@ -135,6 +100,13 @@ const tagGroups = computed(() => {
       return { ns, label: labels[ns] ?? ns, open, shown, hidden: open ? facets.length - shown.length : 0, all: facets.length }
     })
 })
+/** Tempo and key: only while searching sounds (Kind is Audio, or every result is a sound), or while one is set. */
+const showMusic = computed(
+  () =>
+    filters.kind === 'audio' ||
+    (props.kindFacets.length === 1 && props.kindFacets[0].value === 'audio') ||
+    filters.bpmMin !== '' || filters.bpmMax !== '' || !!filters.key,
+)
 const facetLabel = (ns: string, value: string) => (ns && ns !== 'tech' ? value.slice(ns.length + 1) : value)
 </script>
 
@@ -212,64 +184,6 @@ const facetLabel = (ns: string, value: string) => (ns && ns !== 'tech' ? value.s
         </label>
       </div>
     </section>
-    <section class="imitate">
-      <h3><label for="imitation">{{ t('app-imitation') }}</label></h3>
-      <form role="search" @submit.prevent="imitate">
-        <input
-          id="imitation"
-          v-model="imitationDraft"
-          class="field"
-          type="search"
-          maxlength="40"
-          autocomplete="off"
-          spellcheck="false"
-          :placeholder="heardNoise ? t('app-imitation-heard') : t('app-imitation-placeholder')"
-          :title="t('app-imitation-title')"
-          @search="imitate"
-        />
-        <button
-          v-if="canListen"
-          type="button"
-          class="btn ghost mic"
-          :class="{ on: listening }"
-          :aria-pressed="!!listening"
-          :title="listening ? t('app-imitation-stop') : t('app-imitation-record')"
-          @click="listen"
-        >
-          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <rect v-if="listening" x="7" y="7" width="10" height="10" rx="1.5" />
-            <template v-else>
-              <rect x="9" y="3" width="6" height="11" rx="3" />
-              <path d="M5 11a7 7 0 0 0 14 0M12 18v3" />
-            </template>
-          </svg>
-          <span class="visually-hidden">{{ listening ? t('app-imitation-stop') : t('app-imitation-record') }}</span>
-        </button>
-      </form>
-    </section>
-    <section class="music">
-      <h3>{{ t('app-music') }}</h3>
-      <div class="tempo">
-        <label for="bpm-min">{{ t('app-tempo') }}</label>
-        <input id="bpm-min" class="field" type="number" min="20" max="400" inputmode="numeric" :value="filters.bpmMin" :placeholder="t('app-tempo-min')" :title="t('app-tempo-min-title')" @change="filters.bpmMin = bpmInput($event)" />
-        <span aria-hidden="true">–</span>
-        <input id="bpm-max" class="field" type="number" min="20" max="400" inputmode="numeric" :value="filters.bpmMax" :placeholder="t('app-tempo-max')" :aria-label="t('app-tempo-max-title')" :title="t('app-tempo-max-title')" @change="filters.bpmMax = bpmInput($event)" />
-      </div>
-      <label class="visually-hidden" for="music-key">{{ t('app-key') }}</label>
-      <select id="music-key" v-model="filters.key" class="field">
-        <option value="">{{ t('app-key-any') }}</option>
-        <optgroup :label="t('app-key-major')">
-          <option v-for="k in KEYS.filter((k) => !k.minor)" :key="k.value" :value="k.value">{{ keyName(k) }} · {{ k.camelot }}</option>
-        </optgroup>
-        <optgroup :label="t('app-key-minor')">
-          <option v-for="k in KEYS.filter((k) => k.minor)" :key="k.value" :value="k.value">{{ keyName(k) }} · {{ k.camelot }}</option>
-        </optgroup>
-      </select>
-      <label v-if="filters.key" class="check" :title="t('app-key-mix-title')">
-        <input v-model="filters.mixKeys" type="checkbox" />
-        {{ t('app-key-mix') }}
-      </label>
-    </section>
     <p v-if="!kindFacets.length && !loading" class="side-empty">{{ t('app-no-filters') }}</p>
     <section v-if="kindFacets.length">
       <h3>{{ t('app-kind') }}</h3>
@@ -283,45 +197,49 @@ const facetLabel = (ns: string, value: string) => (ns && ns !== 'tech' ? value.s
         </li>
       </ul>
     </section>
-    <section v-for="g in tagGroups" :key="g.ns">
-      <h3>
-        <button
-          type="button"
-          class="group-head"
-          :aria-expanded="g.open"
-          @click="prefs.collapsed = toggleIn(prefs.collapsed, g.ns)"
-        >
-          <svg viewBox="0 0 10 10" width="9" height="9" aria-hidden="true"><path d="M3 2l4 3-4 3" fill="none" stroke="currentColor" stroke-width="1.5" /></svg>
-          {{ g.label }}
-          <span v-if="!g.open" class="n mono">{{ g.all }}</span>
-        </button>
-      </h3>
-      <div v-if="g.shown.length" class="facet-tags">
-        <button
-          v-for="f in g.shown"
-          :key="f.value"
-          type="button"
-          class="facet"
-          :class="{ long: facetLabel(g.ns, f.value).length > 30 }"
-          :title="facetLabel(g.ns, f.value).length > 30 ? facetLabel(g.ns, f.value) : undefined"
-          :aria-pressed="filters.tags.includes(f.value)"
-          @click="emit('tag', f.value)"
-        >
-          <span class="fl">{{ facetLabel(g.ns, f.value) }}</span><span class="n mono">{{ f.count }}</span>
-        </button>
-        <button v-if="g.hidden > 0" type="button" class="facet more-facets" @click="prefs.expanded = toggleIn(prefs.expanded, g.ns)">
-          {{ t('app-facets-more', { count: g.hidden }) }}
-        </button>
-        <button
-          v-else-if="prefs.expanded.includes(g.ns) && g.all > FACET_PREVIEW"
-          type="button"
-          class="facet more-facets"
-          @click="prefs.expanded = toggleIn(prefs.expanded, g.ns)"
-        >
-          {{ t('app-facets-fewer') }}
-        </button>
-      </div>
-    </section>
+    <MusicFilters v-if="showMusic && !tagGroups.some((g) => g.ns === '')" />
+    <template v-for="g in tagGroups" :key="g.ns">
+      <section>
+        <h3>
+          <button
+            type="button"
+            class="group-head"
+            :aria-expanded="g.open"
+            @click="prefs.collapsed = toggleIn(prefs.collapsed, g.ns)"
+          >
+            <svg viewBox="0 0 10 10" width="9" height="9" aria-hidden="true"><path d="M3 2l4 3-4 3" fill="none" stroke="currentColor" stroke-width="1.5" /></svg>
+            {{ g.label }}
+            <span v-if="!g.open" class="n mono">{{ g.all }}</span>
+          </button>
+        </h3>
+        <div v-if="g.shown.length" class="facet-tags">
+          <button
+            v-for="f in g.shown"
+            :key="f.value"
+            type="button"
+            class="facet"
+            :class="{ long: facetLabel(g.ns, f.value).length > 30 }"
+            :title="facetLabel(g.ns, f.value).length > 30 ? facetLabel(g.ns, f.value) : undefined"
+            :aria-pressed="filters.tags.includes(f.value)"
+            @click="emit('tag', f.value)"
+          >
+            <span class="fl">{{ facetLabel(g.ns, f.value) }}</span><span class="n mono">{{ f.count }}</span>
+          </button>
+          <button v-if="g.hidden > 0" type="button" class="facet more-facets" @click="prefs.expanded = toggleIn(prefs.expanded, g.ns)">
+            {{ t('app-facets-more', { count: g.hidden }) }}
+          </button>
+          <button
+            v-else-if="prefs.expanded.includes(g.ns) && g.all > FACET_PREVIEW"
+            type="button"
+            class="facet more-facets"
+            @click="prefs.expanded = toggleIn(prefs.expanded, g.ns)"
+          >
+            {{ t('app-facets-fewer') }}
+          </button>
+        </div>
+      </section>
+      <MusicFilters v-if="showMusic && g.ns === ''" />
+    </template>
   </aside>
 </template>
 
@@ -332,18 +250,6 @@ const facetLabel = (ns: string, value: string) => (ns && ns !== 'tech' ? value.s
 .cname { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .side section + section { margin-top: 1rem; }
 .side h3 { margin: 0 0 0.4rem; font-size: 0.75rem; font-weight: 650; color: var(--faint); }
-.music + .side-empty { margin-top: 1rem; }
-.music .tempo { display: flex; gap: 0.3rem; align-items: center; margin-bottom: 0.35rem; }
-.music .tempo label { flex: none; font-size: 0.85em; color: var(--muted); }
-.music .tempo .field { flex: 1; min-width: 0; width: 0; }
-.music select { width: 100%; }
-.music .check { display: flex; gap: 0.35rem; align-items: center; margin-top: 0.35rem; font-size: 0.85em; color: var(--muted); }
-.imitate form { display: flex; gap: 0.3rem; align-items: center; }
-.imitate .field { flex: 1; min-width: 0; }
-.imitate .mic { flex: none; padding: 0.35rem; line-height: 0; }
-.imitate .mic.on { color: var(--danger); animation: mic-pulse 1.2s ease-in-out infinite; }
-@keyframes mic-pulse { 50% { opacity: 0.45; } }
-@media (prefers-reduced-motion: reduce) { .imitate .mic.on { animation: none; } }
 .swatches { display: grid; grid-template-columns: repeat(auto-fill, minmax(1.45rem, 1fr)); gap: 0.3rem; }
 .sw {
   position: relative; aspect-ratio: 1; border: 0; padding: 0; border-radius: 50%; cursor: pointer;

@@ -480,7 +480,6 @@ app-key-major = Дур
 app-key-minor = Мол
 app-key-mix = И тоналитети који се с њим мешају
 app-key-mix-title = Његов паралелни дур или мол и тоналитети квинту изнад и испод, које диџеји мешају с њим
-app-imitation = Звучи као
 app-imitation-placeholder = whooom, pew, krssh
 app-imitation-title = Напишите звук онако како бисте га спеловали: први долазе звуци који му личе
 app-imitation-record = Направите звук у микрофон: први долазе звуци који му личе

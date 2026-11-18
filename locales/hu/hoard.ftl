@@ -470,7 +470,6 @@ app-key-major = Dúr
 app-key-minor = Moll
 app-key-mix = És a vele keverhető hangnemek
 app-key-mix-title = A párhuzamos dúr vagy moll hangneme és a kvinttel feljebb és lejjebb lévő hangnemek, amelyekkel a DJ-k keverik
-app-imitation = Úgy szól, mint
 app-imitation-placeholder = whooom, pew, krssh
 app-imitation-title = Írd le a hangot úgy, ahogy betűznéd: az ilyen hangzású hangok jönnek előre
 app-imitation-record = Add ki a hangot a mikrofonba: az ilyen hangzású hangok jönnek előre

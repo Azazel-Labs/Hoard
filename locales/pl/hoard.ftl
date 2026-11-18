@@ -482,7 +482,6 @@ app-key-major = Dur
 app-key-minor = Moll
 app-key-mix = I tonacje, które da się z nią zmiksować
 app-key-mix-title = Jej tonacja równoległa durowa lub molowa oraz tonacje o kwintę wyżej i niżej, z którymi DJ-e ją miksują
-app-imitation = Brzmi jak
 app-imitation-placeholder = whooom, pew, krssh
 app-imitation-title = Zapisz dźwięk tak, jak byś go przeliterował: najpierw pojawią się podobnie brzmiące
 app-imitation-record = Wydaj dźwięk do mikrofonu: najpierw pojawią się podobnie brzmiące

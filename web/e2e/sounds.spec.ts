@@ -171,13 +171,12 @@ test('a word imitating a sound finds the sounds shaped like it', async ({ page, 
     expect(await first('doom')).toBe('take_1.wav')
     expect(await first('shhhhhhh')).toBe('take_3.wav')
 
-    await openPack(page, pack.id, name, '&sort=name')
-    const box = page.getByRole('searchbox', { name: 'Sounds like' })
+    // Searching sounds, a word in the search field is also a written noise.
+    await openPack(page, pack.id, name, '&kind=audio')
+    const box = page.getByRole('searchbox', { name: 'Search assets' })
+    await expect(box).toHaveAttribute('placeholder', /pew/)
     await box.fill('pew')
-    await box.press('Enter')
-    await expect(page).toHaveURL(/[?&]imitation=pew/)
-    await expect(page.locator('.active')).toContainText('sounds-like:pew')
-    await expect(page.locator('.sort select option').first()).toHaveText('Sounds most like it')
+    await expect(page).toHaveURL(/[?&]q=pew/)
     await expect(page.locator('.grid button.hit').first()).toHaveAttribute('aria-label', /^Take 2,/)
   } finally {
     await api.post('/api/archive', { data: { packs: [pack.id] } })

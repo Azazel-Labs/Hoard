@@ -482,7 +482,6 @@ app-key-major = Мажор
 app-key-minor = Мінор
 app-key-mix = І тональності, що з нею зводяться
 app-key-mix-title = Її паралельна мажорна чи мінорна тональність і тональності на квінту вище й нижче, з якими її зводять діджеї
-app-imitation = Звучить як
 app-imitation-placeholder = whooom, pew, krssh
 app-imitation-title = Напишіть звук так, як вимовили б його по літерах: схожі звуки будуть першими
 app-imitation-record = Зобразіть звук у мікрофон: схожі звуки будуть першими

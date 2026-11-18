@@ -470,7 +470,6 @@ app-key-major = 長調
 app-key-minor = 短調
 app-key-mix = ミックスできる調も含める
 app-key-mix-title = 平行調と、5 度上下の調。DJ が一緒にミックスする調です
-app-imitation = こんな音
 app-imitation-placeholder = whooom, pew, krssh
 app-imitation-title = 音をそのまま文字で書いてください (例: whooom)。形が似た音から並びます
 app-imitation-record = マイクに向かって音を出してください。形が似た音から並びます

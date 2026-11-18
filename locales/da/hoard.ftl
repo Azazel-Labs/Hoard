@@ -470,7 +470,6 @@ app-key-major = Dur
 app-key-minor = Mol
 app-key-mix = Og tonearter, der kan mixes med den
 app-key-mix-title = Dens paralleltoneart i dur eller mol og tonearterne en kvint på hver side, som dj's mixer den med
-app-imitation = Lyder som
 app-imitation-placeholder = whooom, pew, krssh
 app-imitation-title = Skriv den lyd, noget siger, som du ville stave den: lyde, der ligner, kommer først
 app-imitation-record = Lav lyden i mikrofonen: lyde, der ligner, kommer først

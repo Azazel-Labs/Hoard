@@ -478,7 +478,6 @@ app-key-major = Maggiore
 app-key-minor = Minore
 app-key-mix = E tonalità che si mixano con essa
 app-key-mix-title = La relativa maggiore o minore e le tonalità a una quinta sopra e sotto, che i DJ mixano con essa
-app-imitation = Suona come
 app-imitation-placeholder = whooom, pew, krssh
 app-imitation-title = Scrivi il rumore che fa un suono come lo scriveresti: prima vengono i suoni simili
 app-imitation-record = Fai il rumore nel microfono: prima vengono i suoni simili

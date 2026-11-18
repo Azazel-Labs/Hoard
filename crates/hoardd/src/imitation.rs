@@ -263,7 +263,7 @@ pub(crate) fn score(shape: &Shape, m: &Measured) -> f32 {
 }
 
 /// Sounds scoring below this don't match at all.
-const FLOOR: f32 = 0.3;
+pub(crate) const FLOOR: f32 = 0.3;
 /// At most this many sounds match.
 const MAX: usize = 2000;
 

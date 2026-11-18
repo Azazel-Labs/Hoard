@@ -474,7 +474,6 @@ app-key-major = Dur
 app-key-minor = Moll
 app-key-mix = Und Tonarten, die dazu passen
 app-key-mix-title = Die Paralleltonart in Dur oder Moll und die Tonarten eine Quinte darüber und darunter, die DJs damit mischen
-app-imitation = Klingt wie
 app-imitation-placeholder = whooom, pew, krssh
 app-imitation-title = Schreib das Geräusch so, wie du es buchstabieren würdest: ähnlich klingende Sounds kommen zuerst
 app-imitation-record = Mach das Geräusch ins Mikrofon: ähnlich klingende Sounds kommen zuerst

@@ -22,6 +22,7 @@ import CollectionPicker from './components/CollectionPicker.vue'
 import PacksView from './components/PacksView.vue'
 import ActiveFilters from './components/ActiveFilters.vue'
 import FilterSidebar from './components/FilterSidebar.vue'
+import MicButton from './components/MicButton.vue'
 import FolderBar from './components/FolderBar.vue'
 import NothingHere from './components/NothingHere.vue'
 import ThemeSwitch from './components/ThemeSwitch.vue'
@@ -33,7 +34,7 @@ import { showError, showOk, swipeToClose, withTransition, type Command } from '.
 import { useVirtualGrid } from './virtualGrid'
 import { lazy } from './lazy'
 import { formatNumber, t } from './i18n'
-import { clearFilters, filterPlace, filterQuery, filters, filterSources, hasFilters, NO_MUSIC, readFilters, type Named } from './filters'
+import { clearFilters, filterPlace, filterQuery, filters, filterSources, hasFilters, heardNoise, NO_MUSIC, readFilters, type Named } from './filters'
 
 // Opened now and then, so they load when first shown.
 const SettingsPage = lazy(() => import('./components/SettingsPage.vue'), () => t('app-lazy-settings'))
@@ -223,7 +224,17 @@ function fillWindow() {
 }
 
 let debounce: ReturnType<typeof setTimeout> | undefined
+/** The search field's hint: the noise being searched by, or, searching sounds, that a noise can be written there too. */
+const searchPlaceholder = computed(() =>
+  heardNoise.value
+    ? t('app-imitation-heard')
+    : filters.kind === 'audio'
+      ? `${t('app-search-placeholder')} · ${t('app-imitation-placeholder')}`
+      : t('app-search-placeholder'),
+)
 watch(() => filters.q, () => {
+  // Words typed take the place of a noise made into the microphone.
+  if (filters.q.trim() && heardNoise.value) filters.imitation = ''
   clearTimeout(debounce)
   debounce = setTimeout(() => runSearch(), 200)
 })
@@ -1172,13 +1183,15 @@ const commands = computed<Command[]>(() => {
           v-model="filters.q"
           class="field"
           type="search"
-          :placeholder="t('app-search-placeholder')"
+          :placeholder="searchPlaceholder"
+          :title="filters.kind === 'audio' ? t('app-imitation-title') : undefined"
           autocomplete="off"
           enterkeyhint="search"
           @focus="view = 'library'"
           @keydown.down.prevent="moveFocus('ArrowRight')"
         />
         <kbd class="slash" aria-hidden="true">/</kbd>
+        <MicButton />
       </div>
 
       <nav class="views" :aria-label="t('app-views')">
@@ -1549,10 +1562,10 @@ const commands = computed<Command[]>(() => {
 .brand:hover rect:nth-of-type(3) { rotate: 6deg; translate: -1px 1px; transition-delay: 60ms; }
 .brand:hover rect:nth-of-type(4) { rotate: -12deg; scale: 0.9; transition-delay: 90ms; }
 .search { position: relative; flex: 1; max-width: 640px; }
-.search .field { background: var(--bg); padding: 0.55em 2.2em 0.55em 2.1em; }
+.search .field { background: var(--bg); padding: 0.55em 4.2em 0.55em 2.1em; }
 .search-icon { position: absolute; left: 0.7em; top: 50%; translate: 0 -50%; color: var(--faint); pointer-events: none; }
 .slash {
-  position: absolute; right: 0.55em; top: 50%; translate: 0 -50%; pointer-events: none;
+  position: absolute; right: 2.4em; top: 50%; translate: 0 -50%; pointer-events: none;
   padding: 0 0.4em; border: 1px solid var(--line); border-radius: 3px; color: var(--faint); font: inherit; font-size: 0.75rem;
 }
 .search:focus-within .slash { display: none; }

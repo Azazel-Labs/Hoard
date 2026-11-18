@@ -470,7 +470,6 @@ app-key-major = Major
 app-key-minor = Menor
 app-key-mix = I tonalitats que s'hi barregen bé
 app-key-mix-title = La seva relativa major o menor i les tonalitats a una quinta per sobre i per sota, que els DJ hi barregen
-app-imitation = Sona com
 app-imitation-placeholder = whooom, pew, krssh
 app-imitation-title = Escriu el soroll que fa un so tal com l'escriuries: primer surten els sons que s'hi assemblen
 app-imitation-record = Fes el soroll al micròfon: primer surten els sons que s'hi assemblen

@@ -470,7 +470,6 @@ app-key-major = Majör
 app-key-minor = Minör
 app-key-mix = Ve onunla mikslenebilen tonlar
 app-key-mix-title = Paralel majör ya da minörü ve bir beşli yukarıdaki ve aşağıdaki tonlar; DJ'ler onu bunlarla miksler
-app-imitation = Şöyle ses
 app-imitation-placeholder = whooom, pew, krssh
 app-imitation-title = Bir sesin çıkardığı gürültüyü hecelediğin gibi yaz: ona benzeyen sesler önce gelir
 app-imitation-record = Sesi mikrofona çıkar: ona benzeyen sesler önce gelir

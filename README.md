@@ -956,15 +956,16 @@ sustained sound, with how fast it starts and how long its tail rings), its tone 
 whether its pitch rises or falls and by how many octaves, and whether it loops cleanly. These are kept in the sound's
 metadata in the API and become the tags above, so `pitch:falling tone:tonal` finds falling zaps.
 
-**Sounds like**, in the sidebar, finds sounds by the noise they make, written the way you'd spell it: `WHOOOM`, `pew`,
-`krssh`. The word is read as the shape of a sound. A start like b, p, k or t is a sharp attack, and wh or h a soft one.
+With **Kind** set to Audio, a word in the search field also finds sounds by the noise they make, written the way you'd
+spell it: `WHOOOM`, `pew`, `krssh`. The word is read as the shape of a sound. A start like b, p, k or t is a sharp attack, and wh or h a soft one.
 Drawn-out letters make it longer. "oo" and "u" are low and dark, "ee" and "i" high and bright, and vowels that move
 from one to the other make the pitch rise or fall. s, sh and f are hiss. An m or n at the end rings on, and a k, t or p
 cuts it off. Capitals are loud. Sounds whose measurements fit that shape best come first, so `pew` finds falling
-lasers and `shhhhhh` long hiss. It's a reading of English spelling, not a model, and works with a pack, a folder or
-other filters set. In the API it's `imitation=<word>`.
+lasers and `shhhhhh` long hiss, after the sounds whose names, tags or sound match the word. It's a reading of English
+spelling, not a model, and works with a pack, a folder or other filters set. In the API it's `imitation=<word>` for
+the shape alone.
 
-The microphone button beside the box takes the noise itself: make it, up to six seconds, and press it again. The
+The microphone button in the search field takes the noise itself: make it, up to six seconds, and press it again. The
 browser asks for the microphone first, and only gives it to a page on HTTPS or this computer. Hoard measures the
 recording the way it measures every sound, without the room's noise either side, and finds the sounds shaped like
 it. The recording isn't kept. In the API, `POST /api/imitation` with a WAV file answers with the `imitation` value

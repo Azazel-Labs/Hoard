@@ -470,7 +470,6 @@ app-key-major = Majeur
 app-key-minor = Mineur
 app-key-mix = En toonsoorte wat daarmee meng
 app-key-mix-title = Sy verwante majeur of mineur en die toonsoorte ’n kwint aan weerskante, wat DJ’s daarmee meng
-app-imitation = Klink soos
 app-imitation-placeholder = whooom, pew, krssh
 app-imitation-title = Skryf die geluid wat ’n klank maak soos jy dit sou spel: klanke wat so klink, kom eerste
 app-imitation-record = Maak die geluid in die mikrofoon: klanke wat so klink, kom eerste

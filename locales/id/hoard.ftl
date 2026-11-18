@@ -470,7 +470,6 @@ app-key-major = Mayor
 app-key-minor = Minor
 app-key-mix = Dan kunci nada yang cocok dimiks dengannya
 app-key-mix-title = Relatif mayor atau minornya dan kunci nada satu kuint di atas dan di bawahnya, yang dimiks DJ dengannya
-app-imitation = Terdengar seperti
 app-imitation-placeholder = whooom, pew, krssh
 app-imitation-title = Tulis bunyi suara seperti kamu mengejanya: suara yang mirip muncul lebih dulu
 app-imitation-record = Buat bunyinya ke mikrofon: suara yang mirip muncul lebih dulu

@@ -478,7 +478,6 @@ app-key-major = Duuri
 app-key-minor = Molli
 app-key-mix = Ja sävellajit, jotka sopivat miksattaviksi sen kanssa
 app-key-mix-title = Sen rinnakkaisduuri tai -molli ja kvintin päässä kummallakin puolella olevat sävellajit, joita DJ:t miksaavat sen kanssa
-app-imitation = Kuulostaa
 app-imitation-placeholder = whooom, pew, krssh
 app-imitation-title = Kirjoita äänen tekemä ääni niin kuin sen tavaisit: sen kaltaiset äänet tulevat ensin
 app-imitation-record = Tee ääni mikrofoniin: sen kaltaiset äänet tulevat ensin

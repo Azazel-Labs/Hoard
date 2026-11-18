@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "f7e0e0b19af39ea3822145faba9be4d1ea835284f074aa72561dec35f36e1c83"
+source = "c3246003ee8c01828baa22b384070aba5a12c16495c14ac47693848c86bbf88d"
 translation = "eb892fd468da0132017d254b1ce31fa8af7e6f4331de9f469e15c94a37a8f607"
 
 [messages.account-add]
@@ -915,10 +915,6 @@ translation = "Tilbage til biblioteket"
 [messages.app-home-version]
 source = "Hoard { $version } — back to the library"
 translation = "Hoard { $version } — tilbage til biblioteket"
-
-[messages.app-imitation]
-source = "Sounds like"
-translation = "Lyder som"
 
 [messages.app-imitation-heard]
 source = "Your noise"

@@ -50,7 +50,7 @@ test('a noise made into the microphone finds the sounds shaped like it', async (
     await stop.click()
     await expect(page).toHaveURL(/[?&]imitation=heard%3A/)
     await expect(page.locator('.active')).toContainText('sounds-like:Your noise')
-    await expect(page.getByRole('searchbox', { name: 'Sounds like' })).toHaveAttribute('placeholder', 'Your noise')
+    await expect(page.getByRole('searchbox', { name: 'Search assets' })).toHaveAttribute('placeholder', 'Your noise')
     await expect(page.locator('.grid button.hit').first()).toHaveAttribute('aria-label', /^Take 2,/)
   } finally {
     await api.post('/api/archive', { data: { packs: [pack.id] } })

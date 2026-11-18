@@ -470,7 +470,6 @@ app-key-major = เมเจอร์
 app-key-minor = ไมเนอร์
 app-key-mix = และคีย์ที่มิกซ์เข้ากันได้
 app-key-mix-title = คีย์เมเจอร์หรือไมเนอร์สัมพันธ์ และคีย์ที่ห่างกันขั้นคู่ห้าทั้งสองด้าน ซึ่งดีเจใช้มิกซ์ด้วยกัน
-app-imitation = เสียงแบบ
 app-imitation-placeholder = whooom, pew, krssh
 app-imitation-title = พิมพ์เสียงตามที่คุณจะสะกด (เช่น whooom) เสียงที่มีรูปแบบคล้ายกันจะขึ้นก่อน
 app-imitation-record = ทำเสียงใส่ไมโครโฟน เสียงที่มีรูปแบบคล้ายกันจะขึ้นก่อน

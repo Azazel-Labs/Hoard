@@ -3,21 +3,11 @@
 What's planned or being weighed, roughly in order. Nothing here is promised; each item says what's settled and what
 isn't yet.
 
-## Sounds in the one search field
+## Written noises outside sound searches
 
-The sidebar's "Sounds like" box (a written noise, or the microphone) and its music filters (tempo and key) sit above
-Kind and Subject, taking room on every search, though they only matter for sounds. Settled:
-
-- **Music filters only for sounds.** Tempo and key move below Kind and the tag groups, and only show while the search
-  is limited to sounds (Kind is Audio), or while one of them is set, so it can be cleared.
-- **The microphone in the search field.** The search field gets the microphone button; a recorded noise shows as
-  "Your noise" in the field, and searching anything else drops it.
-- **Written noises in the search field too.** With the search limited to sounds, the words in the search field also
-  find sounds shaped like them ("whooom", "pew"), beside the sounds whose names, tags or sound match the words, and the
-  sidebar box goes. Outside sounds the words search as they do now.
-
-Still open: whether a search not limited to sounds should notice a written noise by itself (a word that matches
-nothing and spells like one) and offer the sounds shaped like it.
+Searching sounds (Kind is Audio), a word in the search field also finds the sounds shaped like it ("whooom", "pew"),
+and the microphone is in the search field. Still open: whether a search not limited to sounds should notice a written
+noise by itself (a word that matches nothing and spells like one) and offer the sounds shaped like it.
 
 ## Text and document thumbnails
 

@@ -187,10 +187,15 @@ async fn rank(state: &AppState, q: &SearchQuery) -> Result<Option<db::LookRank>>
             tracing::warn!(error = %format!("{e:#}"), "image search failed; searching names only");
             Vec::new()
         });
-        let sounds = sounds.unwrap_or_else(|e| {
+        let mut sounds = sounds.unwrap_or_else(|e| {
             tracing::warn!(error = %format!("{e:#}"), "sound search failed; searching names only");
             Vec::new()
         });
+        // Searching sounds, a single word may be a written noise ("whooom"): sounds shaped like it match too.
+        if q.kind.as_deref() == Some("audio") && !text.contains(char::is_whitespace) {
+            let shaped = crate::imitation::rank(state, text).await?;
+            sounds = with_shapes(sounds, shaped);
+        }
         let keys = match (pictures.is_empty(), sounds.is_empty()) {
             (true, true) => return Ok(None),
             (false, true) => db::Keys::Thumbs,
@@ -246,6 +251,23 @@ async fn rank(state: &AppState, q: &SearchQuery) -> Result<Option<db::LookRank>>
         blend: false,
         keys: db::Keys::Thumbs,
     }))
+}
+
+/// Sound search scores (by file) with how well each sound fits a written noise added. A fit (from the floor to 1)
+/// counts for at most 0.2, under a word in the name (0.25) or a close sound match, so the noise sorts the sounds the
+/// words found and brings in the rest after them.
+fn with_shapes(sounds: Vec<(String, f32)>, shaped: Vec<(String, f32)>) -> Vec<(String, f32)> {
+    use crate::imitation::FLOOR;
+    let mut by_file: HashMap<String, f32> = sounds.into_iter().collect();
+    for (file, fit) in shaped {
+        let add = (fit - FLOOR) / (1.0 - FLOOR) * 0.2;
+        if add > 0.0 {
+            *by_file.entry(file).or_default() += add;
+        }
+    }
+    let mut out: Vec<(String, f32)> = by_file.into_iter().collect();
+    out.sort_by(|a, b| b.1.total_cmp(&a.1).then_with(|| a.0.cmp(&b.0)));
+    out
 }
 
 const MISSING_SQL: &str =
@@ -466,6 +488,16 @@ mod tests {
 
     fn entry(img: &image::RgbaImage) -> Entry {
         Entry::from(analyze(&png(img)).unwrap()).unwrap()
+    }
+
+    #[test]
+    fn a_written_noise_sorts_the_sounds_the_words_found_then_adds_the_rest() {
+        let found = vec![("name.wav".to_owned(), 0.25), ("close.wav".to_owned(), 0.3)];
+        let shaped = vec![("name.wav".to_owned(), 1.0), ("shape.wav".to_owned(), 0.9), ("poor.wav".to_owned(), 0.2)];
+        let out = with_shapes(found, shaped);
+        let order: Vec<&str> = out.iter().map(|(f, _)| f.as_str()).collect();
+        assert_eq!(order, ["name.wav", "close.wav", "shape.wav"]);
+        assert!((out[0].1 - 0.45).abs() < 1e-6);
     }
 
     #[test]

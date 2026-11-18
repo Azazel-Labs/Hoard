@@ -470,7 +470,6 @@ app-key-major = 장조
 app-key-minor = 단조
 app-key-mix = 함께 믹스할 수 있는 조성 포함
 app-key-mix-title = 나란한조와 5도 위아래의 조성으로, DJ가 함께 믹스하는 조성입니다
-app-imitation = 이런 소리
 app-imitation-placeholder = whooom, pew, krssh
 app-imitation-title = 소리를 철자로 적듯이 입력하세요 (예: whooom). 모양이 비슷한 소리가 먼저 나옵니다
 app-imitation-record = 마이크에 대고 소리를 내세요. 모양이 비슷한 소리가 먼저 나옵니다

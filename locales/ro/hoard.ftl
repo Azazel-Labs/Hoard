@@ -480,7 +480,6 @@ app-key-major = Major
 app-key-minor = Minor
 app-key-mix = Și tonalitățile care se mixează cu ea
 app-key-mix-title = Relativa ei majoră sau minoră și tonalitățile aflate la o cvintă deasupra și dedesubt, pe care DJ-ii le mixează cu ea
-app-imitation = Sună ca
 app-imitation-placeholder = whooom, pew, krssh
 app-imitation-title = Scrie zgomotul pe care îl face un sunet așa cum l-ai silabisi: sunetele asemănătoare apar primele
 app-imitation-record = Fă zgomotul în microfon: sunetele asemănătoare apar primele

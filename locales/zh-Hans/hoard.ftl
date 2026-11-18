@@ -470,7 +470,6 @@ app-key-major = 大调
 app-key-minor = 小调
 app-key-mix = 以及可与之混音的调
 app-key-mix-title = 它的关系大调或小调，以及上下相差五度的调，DJ 会把它们混在一起
-app-imitation = 听起来像
 app-imitation-placeholder = whooom, pew, krssh
 app-imitation-title = 按拼写方式写出声音（如 whooom）：形状相近的声音排在前面
 app-imitation-record = 对着麦克风发出声音：形状相近的声音排在前面

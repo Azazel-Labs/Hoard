@@ -1,5 +1,5 @@
 import { type Asset, assetsOf, uploadPack, waitReady } from './support/api'
-import { png } from './support/files'
+import { hue, png } from './support/files'
 import { expect, openPack, test, tile, unique } from './support/test'
 
 const RED: [number, number, number, number] = [230, 60, 60, 255]
@@ -131,6 +131,82 @@ test('loose images that are a sheet’s sprites are kept with the sheet', async 
     await expect(panel.getByText('PNG/Default/button_red.png')).toBeVisible()
     const inSheet = panel.locator('section', { has: page.getByRole('heading', { name: 'In sprite sheet', exact: true }) })
     await expect(inSheet.getByRole('button', { name: new RegExp(sheet.name) })).toBeVisible()
+  } finally {
+    await api.post('/api/archive', { data: { packs: [pack.id] } })
+    await api.post('/api/archive/purge', { data: { packs: [pack.id] } })
+  }
+})
+
+// A tile sheet that comes with only a note of its grid, as Kenney's do, is a sprite sheet of its tiles: every image on
+// the grid (with the space between tiles, or packed without it) is a page, empty cells are left out, and the kit's
+// loose tiles are kept with it, by name (`tile_0001.png`) or by picture. One with a tile's name but another picture stays.
+test('a tile sheet described by a note of its grid becomes a sprite sheet of its tiles', async ({ page, api }) => {
+  test.setTimeout(120_000)
+  const name = `E2E Grid sheet ${unique()}`
+  // Three by two 8 px tiles, each its own color, the last cell empty.
+  const color = (cell: number): [number, number, number, number] => (cell < 5 ? [...hue(cell, 5), 255] : [0, 0, 0, 0])
+  const note = [
+    'Tilesheet information:',
+    '',
+    'Tile size                 •  8px × 8px',
+    'Space between tiles       •  1px × 1px',
+    '---',
+    'Total tiles (horizontal)  •  3 tiles',
+    'Total tiles (vertical)    •  2 tiles',
+  ].join('\n')
+  const spaced = png(26, 17, (x, y) => (x % 9 === 8 || y % 9 === 8 ? [0, 0, 0, 0] : color(Math.floor(y / 9) * 3 + Math.floor(x / 9))))
+  const packed = png(24, 16, (x, y) => color(Math.floor(y / 8) * 3 + Math.floor(x / 8)))
+  const solid = (cell: number) => png(8, 8, () => color(cell))
+  const pack = await uploadPack(api, name, [
+    { relpath: 'Kit/Tilesheet.txt', data: Buffer.from(note) },
+    { relpath: 'Kit/Tilemap/tilemap.png', data: spaced },
+    { relpath: 'Kit/Tilemap/tilemap_packed.png', data: packed },
+    { relpath: 'Kit/Tiles/tile_0000.png', data: solid(0) },
+    { relpath: 'Kit/Tiles/tile_0001.png', data: solid(1) },
+    { relpath: 'Kit/Tiles/tile_0003.png', data: png(8, 8, (x, y) => ((x + y) % 2 ? [0, 0, 0, 255] : [255, 255, 255, 255])) },
+    { relpath: 'Kit/PNG/flag.png', data: solid(4) },
+  ])
+  try {
+    await waitReady(api, [pack.id])
+    let assets: Asset[] = []
+    await expect
+      .poll(async () => (assets = await assetsOf(api, pack.id)).find((a) => a.path.endsWith('Tilesheet.txt'))?.kind, { timeout: 60_000 })
+      .toBe('sheet')
+    const at = (path: string) => assets.find((a) => a.path.endsWith(path))!
+    const sheet = at('Tilesheet.txt')
+    const detail = (await (await api.get(`/api/assets/${sheet.id}`)).json()) as {
+      meta: Record<string, unknown>
+      links: { id: string; rel: string }[]
+    }
+    expect(detail.meta.sheet).toMatchObject({ format: 'grid', sprites: 10, pages: 2 })
+    expect(detail.links.filter((l) => l.rel === 'texture').map((l) => l.id).sort()).toEqual(
+      [at('Tilemap/tilemap.png').id, at('Tilemap/tilemap_packed.png').id].sort(),
+    )
+    expect(detail.links.filter((l) => l.rel === 'sprite').map((l) => l.id).sort()).toEqual(
+      [at('Tiles/tile_0000.png').id, at('Tiles/tile_0001.png').id, at('PNG/flag.png').id].sort(),
+    )
+    const kept = await (await api.get(`/api/assets/${sheet.id}/derivative/sheet`)).json()
+    expect(kept.sprites.map((s: { name: string }) => s.name).slice(0, 5)).toEqual([
+      'tilemap/tile_0000',
+      'tilemap/tile_0001',
+      'tilemap/tile_0002',
+      'tilemap/tile_0003',
+      'tilemap/tile_0004',
+    ])
+    expect(kept.sprites[4]).toMatchObject({ rect: [9, 9, 8, 8] })
+
+    const shown = await api.get('/api/assets', { params: { pack: pack.id, limit: 500, facets: false, hide_supporting: true } })
+    const body = (await shown.json()) as { items: Asset[]; supporting_hidden?: number }
+    expect(body.items.map((a) => a.path.replace(/^Kit\//, '')).sort()).toEqual(['Tiles/tile_0003.png', 'Tilesheet.txt'])
+    expect(body.supporting_hidden).toBe(5)
+
+    await openPack(page, pack.id, name, '&sort=name')
+    const panel = page.getByRole('complementary', { name: 'Asset details' })
+    await tile(page, sheet.name).click()
+    const sprites = panel.locator('section', { has: page.getByRole('heading', { name: 'Sprites', exact: true }) })
+    await expect(sprites.getByRole('button')).toHaveCount(10)
+    const loose = panel.locator('section', { has: page.getByRole('heading', { name: 'Also as separate files', exact: true }) })
+    await expect(loose.getByRole('button')).toHaveCount(3)
   } finally {
     await api.post('/api/archive', { data: { packs: [pack.id] } })
     await api.post('/api/archive/purge', { data: { packs: [pack.id] } })

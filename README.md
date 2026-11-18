@@ -50,8 +50,8 @@ map switched on and off.
 
 ### Sprite sheets that play
 
-Atlases from TexturePacker, Starling, libGDX, Cocos2d and Godot become one sprite sheet that plays its animations
-and lists its sprites. Download it repacked for whichever engine you're using: ten formats, each told only what it
+Atlases from TexturePacker, Starling, libGDX, Cocos2d and Godot, and tile sheets that come with only a note of their
+grid, become one sprite sheet that plays its animations and lists its sprites. Download it repacked for whichever engine you're using: ten formats, each told only what it
 can hold.
 
 <picture>
@@ -346,7 +346,13 @@ software rasterizer (`apt install mesa-vulkan-drivers`). Without any adapter, ev
      and trimmed, and its animations (the file's own, or numbered names such as `walk_0`, `walk_1`). The pages stay
      textures in the pack, hidden with the sheet, and the sprites aren't assets of their own. Loose images in the pack
      with a sprite's name and picture (Kenney's `PNG/` folders beside each sheet) are linked from the sheet and hidden
-     with it too, listed in its details under "Also as separate files". A sheet's details show its animations playing
+     with it too, listed in its details under "Also as separate files". A tile sheet that comes with only a note of
+     its grid (Kenney's `Tilesheet.txt` or `Instructions.txt`: "Tile size 16px × 16px, space between tiles 1px") is a
+     sprite sheet too: the note becomes the sheet, every image beside or below it on that grid is a page (with the
+     space between tiles, packed without it, or twice the size), its cells are its sprites (`tile_0000`, empty cells
+     left out), and the kit's loose tiles are kept with it by name or, when they're named otherwise, by picture. A
+     note that doesn't count its tiles only takes images in a folder of sheets or named as one. A sheet's details
+     show its animations playing
      and its sprites, which a name narrows down, each drawn upright on its whole canvas. It downloads as a Hoard
      sheet, TexturePacker JSON (hash or array), Starling XML, libGDX `.atlas`, Cocos2d `.plist`, Godot
      `SpriteFrames` or `TileSet`, a grid image or a PNG per sprite, each a zip with its images. A format gets what it

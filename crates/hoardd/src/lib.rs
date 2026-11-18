@@ -35,6 +35,7 @@ mod formats;
 mod glbfiles;
 mod godot;
 mod gpu_hint;
+mod grid;
 mod heavy;
 #[cfg(feature = "https")]
 mod http3;

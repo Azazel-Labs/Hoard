@@ -702,6 +702,17 @@ const MIGRATIONS: &[&str] = &[
                      GROUP BY kind, stem HAVING COUNT(DISTINCT ext) > 1)
          AND NOT EXISTS (SELECT 1 FROM jobs j WHERE j.kind = 'materials' AND j.pack_id = p.id
                            AND j.status IN ('queued', 'running'));",
+    // 66: a tile sheet that comes with a note of its grid rather than an atlas (Kenney's `Tilesheet.txt`: "Tile size
+    // 16px × 16px, Space between tiles 1px") is a sprite sheet too, cut into its tiles. Packs with a text file and
+    // other images are looked through again.
+    "INSERT INTO jobs (kind, pack_id, payload, run_after, created_at, updated_at)
+       SELECT 'materials', p.id, '{}', strftime('%Y-%m-%dT%H:%M:%SZ', 'now'), strftime('%Y-%m-%dT%H:%M:%SZ', 'now'),
+              strftime('%Y-%m-%dT%H:%M:%SZ', 'now')
+       FROM packs p WHERE p.status = 'ready'
+         AND EXISTS (SELECT 1 FROM assets a WHERE a.pack_id = p.id AND lower(a.ext) = 'txt')
+         AND EXISTS (SELECT 1 FROM assets a WHERE a.pack_id = p.id AND a.kind = 'texture')
+         AND NOT EXISTS (SELECT 1 FROM jobs j WHERE j.kind = 'materials' AND j.pack_id = p.id
+                           AND j.status IN ('queued', 'running'));",
 ];
 
 /// How many automatic pre-upgrade backups to keep in `<data dir>/backups`.

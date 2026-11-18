@@ -900,26 +900,206 @@ struct New {
     thumb: Option<crate::blobs::StoredBlob>,
 }
 
-/// Find the pack's atlas files and bring the library in line: each is a `sheet`, kept with it as a sheet (see
-/// [`crate::spritesheet`]) and linked to its pages (`texture`, so its download brings them), which say in their meta
-/// which atlas they're a page of. A file that isn't an atlas any more is what its extension says again. Returns how
-/// many sheets the pack has.
+/// A file that may be a sheet: an atlas, or a note of a grid.
+struct Candidate {
+    id: String,
+    path: String,
+    hash: String,
+    /// Lowercased.
+    ext: String,
+    /// The sheet it was, if it was one.
+    was: Option<String>,
+    has_thumb: bool,
+    /// Whether its sprites' loose images were looked for.
+    matched: bool,
+}
+
+/// A file found to be this sheet: written again when it changed, its sprites' loose images looked for again when it
+/// changed or they never were.
+fn finish(
+    state: &AppState,
+    rt: &Handle,
+    c: Candidate,
+    atlas: &Atlas,
+    sheet: &crate::spritesheet::Sheet,
+    by_path: &HashMap<String, usize>,
+    loose: impl FnOnce() -> Vec<usize>,
+) -> Result<Found> {
+    let page_ids: Vec<usize> =
+        sheet.pages.iter().filter_map(|p| by_path.get(&p.image.to_lowercase()).copied()).collect();
+    let json = serde_json::to_vec(sheet)?;
+    let sheet_hash = blake3::hash(&json).to_hex().to_string();
+    let unchanged = c.was.as_deref() == Some(sheet_hash.as_str()) && c.has_thumb;
+    let mut f = Found {
+        file_id: c.id,
+        file_path: c.path,
+        format: atlas.format,
+        pages: page_ids,
+        sprites: sheet.sprites.len(),
+        new: None,
+        loose: (!unchanged || !c.matched).then(loose),
+    };
+    if unchanged {
+        return Ok(f);
+    }
+    let thumb = sheet_thumbnail(state, rt, sheet).map(|b| rt.block_on(state.blobs.put_cache_bytes(b))).transpose()?;
+    let mut words: Vec<String> = Vec::new();
+    let mut seen = HashSet::new();
+    for s in sheet.sprites.iter().take(MAX_WORDS) {
+        for w in tagger::fts_words(&s.name).split_whitespace() {
+            if seen.insert(w.to_owned()) {
+                words.push(w.to_owned());
+            }
+        }
+    }
+    let blob = rt.block_on(state.blobs.put_bytes(json, AssetKind::Sheet))?;
+    f.new = Some(New { blob, summary: sheet.summary(), words: words.join(" "), thumb });
+    Ok(f)
+}
+
+/// An image of the pack, unless it's too big to read.
+fn load_texture(state: &AppState, rt: &Handle, t: &Texture) -> Option<RgbaImage> {
+    if t.size[0] > MAX_SIDE || t.size[1] > MAX_SIDE {
+        return None;
+    }
+    let bytes = rt.block_on(state.blobs.read_all(&t.hash)).ok()?;
+    Some(image::load_from_memory(&bytes).ok()?.to_rgba8())
+}
+
+/// The images below a note's folder that are on the grid it describes and not already a sheet's pages, cut into their
+/// tiles: the atlas, each page's image (by texture), and the images.
+fn grid_pages(
+    state: &AppState,
+    rt: &Handle,
+    note: &crate::grid::Note,
+    note_path: &str,
+    textures: &[Texture],
+    claimed: &HashSet<usize>,
+) -> Option<(Atlas, Vec<usize>, Vec<RgbaImage>)> {
+    let dir = dir_of(note_path).to_lowercase();
+    let fits: Vec<(usize, crate::grid::Grid)> = textures
+        .iter()
+        .enumerate()
+        .filter(|(i, _)| !claimed.contains(i))
+        .filter_map(|(i, t)| {
+            let rel = if dir.is_empty() {
+                t.path.as_str()
+            } else {
+                let below = t.path.to_lowercase().strip_prefix(&format!("{dir}/"))?.len();
+                &t.path[t.path.len() - below..]
+            };
+            if !crate::grid::candidate(note, note_path, rel) {
+                return None;
+            }
+            Some((i, crate::grid::fit(note, rel.rsplit('/').next().unwrap_or(rel), t.size)?))
+        })
+        .collect();
+    let several = fits.len() > 1;
+    let (mut pages, mut page_textures, mut imgs, mut tiles) = (Vec::new(), Vec::new(), Vec::new(), Vec::new());
+    let mut total = 0;
+    for (i, grid) in fits {
+        let t = &textures[i];
+        let Some(img) = load_texture(state, rt, t) else { continue };
+        if [img.width(), img.height()] != t.size {
+            continue;
+        }
+        let stem = crate::spritesheet::image_stem(t.path.rsplit('/').next().unwrap_or(&t.path));
+        let page = crate::grid::page(&img, &grid, &t.path, several.then_some(stem));
+        if page.sprites.is_empty() || total + page.sprites.len() > MAX_SPRITES {
+            continue;
+        }
+        total += page.sprites.len();
+        pages.push(page);
+        page_textures.push(i);
+        imgs.push(img);
+        tiles.push(grid.tile);
+    }
+    (!pages.is_empty()).then(|| (crate::grid::atlas(pages, &tiles), page_textures, imgs))
+}
+
+/// The loose images in a note's kit that are its tiles: each of a tile's size, with the tile's name (`tile_0000`) or,
+/// failing that, its picture (Kenney's icons have names of their own: `arrow_clockwise.png`), give or take what saving
+/// it again changed. Of several, one with the tile's name is, then the closest.
+fn grid_loose(
+    atlas: &Atlas,
+    imgs: &[RgbaImage],
+    pages: &[usize],
+    textures: &[Texture],
+    kit: &str,
+    claimed: &HashSet<usize>,
+    load: impl Fn(&Texture) -> Option<RgbaImage>,
+) -> Vec<usize> {
+    let kit = kit.to_lowercase();
+    let sizes: HashSet<[u32; 2]> =
+        atlas.pages.iter().flat_map(|p| p.sprites.iter().map(|s| [s.rect[2], s.rect[3]])).collect();
+    let loose: Vec<(usize, String, RgbaImage, [u8; 64])> = textures
+        .iter()
+        .enumerate()
+        .filter(|(i, t)| {
+            !pages.contains(i)
+                && !claimed.contains(i)
+                && sizes.contains(&t.size)
+                && (kit.is_empty() || t.path.to_lowercase().starts_with(&format!("{kit}/")))
+        })
+        .take(MAX_SPRITES)
+        .filter_map(|(i, t)| {
+            let img = load(t)?;
+            let sig = crate::grid::signature(&img);
+            Some((i, sprite_key(&t.path), img, sig))
+        })
+        .collect();
+    let mut out = Vec::new();
+    if loose.is_empty() {
+        return out;
+    }
+    for (page, img) in atlas.pages.iter().zip(imgs) {
+        for s in &page.sprites {
+            let Some(tile) = cut(img, s) else { continue };
+            let sig = crate::grid::signature(&tile);
+            let key = sprite_key(&s.name);
+            let best = loose
+                .iter()
+                .filter(|(_, k, l, ls)| {
+                    l.dimensions() == tile.dimensions() && (*k == key || crate::grid::alike(&sig, ls))
+                })
+                .filter_map(|(i, k, l, _)| difference(&tile, l).map(|off| (*k != key, off, *i)))
+                .min();
+            out.extend(best.map(|(_, _, i)| i));
+        }
+    }
+    out.sort_unstable();
+    out.dedup();
+    out
+}
+
+/// Find the pack's atlas files and notes of a tile sheet's grid (see [`crate::grid`]), and bring the library in line:
+/// each is a `sheet`, kept with it as a sheet (see [`crate::spritesheet`]) and linked to its pages (`texture`, so its
+/// download brings them), which say in their meta which atlas they're a page of. A file that isn't an atlas any more
+/// is what its extension says again. Returns how many sheets the pack has.
 pub(crate) fn detect_pack(state: &AppState, rt: &Handle, conn: &mut Connection, pack_id: &str) -> Result<usize> {
-    // Each candidate, with the sheet it was (if it was one), whether it has a thumbnail and whether its sprites'
-    // loose images were looked for.
-    type Candidate = (String, String, String, String, Option<String>, bool, bool);
     let files: Vec<Candidate> = {
+        // Atlases first, so a note of a grid doesn't take their pages.
         let mut stmt = conn.prepare(&format!(
             "SELECT a.id, a.path, a.blob_hash, a.ext,
                     CASE WHEN a.kind = 'sheet' THEN d.blob_hash END, a.thumb_hash IS NOT NULL,
                     json_extract(a.meta, '$.loose') IS NOT NULL
                FROM assets a JOIN blobs b ON b.hash = a.blob_hash
                LEFT JOIN derivatives d ON d.asset_id = a.id AND d.kind = 'sheet'
-              WHERE a.pack_id = ?1 AND lower(a.ext) IN ({EXTS}) AND b.size <= {MAX_FILE}
-              ORDER BY a.path"
+              WHERE a.pack_id = ?1 AND (lower(a.ext) IN ({EXTS}) AND b.size <= {MAX_FILE}
+                                        OR lower(a.ext) = 'txt' AND b.size <= {})
+              ORDER BY lower(a.ext) = 'txt', a.path",
+            crate::grid::MAX_NOTE
         ))?;
         stmt.query_map([pack_id], |r| {
-            Ok((r.get(0)?, r.get(1)?, r.get(2)?, r.get(3)?, r.get(4)?, r.get(5)?, r.get(6)?))
+            Ok(Candidate {
+                id: r.get(0)?,
+                path: r.get(1)?,
+                hash: r.get(2)?,
+                ext: r.get::<_, String>(3)?.to_lowercase(),
+                was: r.get(4)?,
+                has_thumb: r.get(5)?,
+                matched: r.get(6)?,
+            })
         })?
         .collect::<rusqlite::Result<_>>()?
     };
@@ -947,12 +1127,42 @@ pub(crate) fn detect_pack(state: &AppState, rt: &Handle, conn: &mut Connection, 
     }
     // Sizes read from the images themselves, for those whose meta doesn't say.
     let mut sizes: HashMap<usize, Option<[u32; 2]>> = HashMap::new();
+    // The images already a sheet's pages.
+    let mut claimed: HashSet<usize> = HashSet::new();
     let mut found = Vec::new();
-    for (file_id, file_path, hash, ext, was, has_thumb, matched) in files {
-        let text = rt.block_on(state.blobs.read_all(&hash))?;
-        let Some(atlas) = parse(&ext.to_lowercase(), &String::from_utf8_lossy(&text)) else { continue };
+    for c in files {
+        let text = rt.block_on(state.blobs.read_all(&c.hash))?;
+        let text = String::from_utf8_lossy(&text);
+        if c.ext == "txt" {
+            let Some(note) = crate::grid::parse_note(&text) else { continue };
+            let Some((atlas, page_textures, imgs)) = grid_pages(state, rt, &note, &c.path, &textures, &claimed) else {
+                continue;
+            };
+            let pages: Vec<Option<crate::spritesheet::Page>> = page_textures
+                .iter()
+                .zip(&imgs)
+                .map(|(&i, img)| {
+                    let t = &textures[i];
+                    Some(crate::spritesheet::Page {
+                        image: t.path.clone(),
+                        size: [img.width(), img.height()],
+                        asset: Some(t.id.clone()),
+                        hash: Some(t.hash.clone()),
+                    })
+                })
+                .collect();
+            let Some(sheet) = crate::spritesheet::Sheet::from_atlas(&atlas, &pages) else { continue };
+            let kit = crate::grid::kit_dir(&c.path).to_owned();
+            let f = finish(state, rt, c, &atlas, &sheet, &by_path, || {
+                grid_loose(&atlas, &imgs, &page_textures, &textures, &kit, &claimed, |t| load_texture(state, rt, t))
+            })?;
+            claimed.extend(f.pages.iter().copied());
+            found.push(f);
+            continue;
+        }
+        let Some(atlas) = parse(&c.ext, &text) else { continue };
         if atlas.pages.iter().map(|p| p.sprites.len()).sum::<usize>() > MAX_SPRITES {
-            tracing::debug!(atlas = %file_path, "atlas has too many sprites to read");
+            tracing::debug!(atlas = %c.path, "atlas has too many sprites to read");
             continue;
         }
         let one_page = atlas.pages.len() == 1;
@@ -960,9 +1170,9 @@ pub(crate) fn detect_pack(state: &AppState, rt: &Handle, conn: &mut Connection, 
             .pages
             .iter()
             .map(|p| {
-                let found = find_page(&by_path, &file_path, &p.image, one_page);
+                let found = find_page(&by_path, &c.path, &p.image, one_page);
                 if found.is_none() {
-                    tracing::debug!(atlas = %file_path, page = %p.image, "atlas page not in the pack");
+                    tracing::debug!(atlas = %c.path, page = %p.image, "atlas page not in the pack");
                 }
                 found
             })
@@ -994,40 +1204,11 @@ pub(crate) fn detect_pack(state: &AppState, rt: &Handle, conn: &mut Connection, 
             })
             .collect();
         let Some(sheet) = crate::spritesheet::Sheet::from_atlas(&atlas, &pages) else { continue };
-        let page_ids: Vec<usize> =
-            sheet.pages.iter().filter_map(|p| by_path.get(&p.image.to_lowercase()).copied()).collect();
-        let json = serde_json::to_vec(&sheet)?;
-        let sheet_hash = blake3::hash(&json).to_hex().to_string();
-        let mut f = Found {
-            file_id,
-            file_path,
-            format: atlas.format,
-            pages: page_ids,
-            sprites: sheet.sprites.len(),
-            new: None,
-            loose: None,
-        };
-        let unchanged = was.as_deref() == Some(sheet_hash.as_str()) && has_thumb;
-        if !unchanged || !matched {
-            f.loose = Some(loose_copies(state, rt, &atlas, &page_textures, &textures, &by_stem, &f.file_path));
-        }
-        if unchanged {
-            found.push(f);
-            continue;
-        }
-        let thumb =
-            sheet_thumbnail(state, rt, &sheet).map(|b| rt.block_on(state.blobs.put_cache_bytes(b))).transpose()?;
-        let mut words: Vec<String> = Vec::new();
-        let mut seen = HashSet::new();
-        for s in sheet.sprites.iter().take(MAX_WORDS) {
-            for w in tagger::fts_words(&s.name).split_whitespace() {
-                if seen.insert(w.to_owned()) {
-                    words.push(w.to_owned());
-                }
-            }
-        }
-        let blob = rt.block_on(state.blobs.put_bytes(json, AssetKind::Sheet))?;
-        f.new = Some(New { blob, summary: sheet.summary(), words: words.join(" "), thumb });
+        let sheet_path = c.path.clone();
+        let f = finish(state, rt, c, &atlas, &sheet, &by_path, || {
+            loose_copies(state, rt, &atlas, &page_textures, &textures, &by_stem, &sheet_path)
+        })?;
+        claimed.extend(f.pages.iter().copied());
         found.push(f);
     }
     let n = found.len();
@@ -1061,13 +1242,7 @@ fn loose_copies(
 ) -> Vec<usize> {
     let sheet_words = path_words(sheet_path);
     let pages: HashSet<usize> = page_textures.iter().flatten().copied().collect();
-    let load = |t: &Texture| -> Option<RgbaImage> {
-        if t.size[0] > MAX_SIDE || t.size[1] > MAX_SIDE {
-            return None;
-        }
-        let bytes = rt.block_on(state.blobs.read_all(&t.hash)).ok()?;
-        Some(image::load_from_memory(&bytes).ok()?.to_rgba8())
-    };
+    let load = |t: &Texture| load_texture(state, rt, t);
     let mut out = Vec::new();
     for (page, &tex) in atlas.pages.iter().zip(page_textures) {
         let wanted: Vec<(&Sprite, &Vec<usize>)> =

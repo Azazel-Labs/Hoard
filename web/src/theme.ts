@@ -5,6 +5,7 @@
 import { ref, watch } from 'vue'
 import { t } from './i18n'
 import { prefs } from './prefs'
+import { withTransition } from './ui'
 
 export interface ThemeInfo {
   id: string
@@ -64,3 +65,27 @@ function apply() {
 watch(() => prefs.theme, () => (previewScheme.value = null))
 watch(() => [prefs.theme, prefs.lightTheme, prefs.darkTheme, previewScheme.value], apply, { immediate: true })
 lightQuery.addEventListener('change', apply)
+
+/** Light, dark, or whichever the system is. */
+export const SCHEMES = [
+  { value: 'system', label: () => t('app-theme-system') },
+  { value: 'light', label: () => t('app-theme-light') },
+  { value: 'dark', label: () => t('app-theme-dark') },
+] as const
+
+/** Change the theme with the new one spreading out in a circle from the button that was pressed. */
+export function setTheme(value: typeof prefs.theme, e?: MouseEvent) {
+  if (prefs.theme === value) return
+  // From the palette there's no button: spread from the theme switcher's current button instead.
+  const from = (e?.currentTarget as HTMLElement | undefined) ?? document.querySelector('.theme [aria-pressed="true"]')
+  const r = from?.getBoundingClientRect() ?? new DOMRect(innerWidth / 2, innerHeight / 2, 0, 0)
+  const x = r.left + r.width / 2
+  const y = r.top + r.height / 2
+  const reach = Math.hypot(Math.max(x, innerWidth - x), Math.max(y, innerHeight - y))
+  void withTransition(() => (prefs.theme = value), 'theme', () => {
+    document.documentElement.animate(
+      { clipPath: [`circle(0 at ${x}px ${y}px)`, `circle(${reach}px at ${x}px ${y}px)`] },
+      { duration: 520, easing: 'cubic-bezier(0.65, 0, 0.35, 1)', pseudoElement: '::view-transition-new(root)' },
+    )
+  })
+}

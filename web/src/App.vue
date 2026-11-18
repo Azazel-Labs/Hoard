@@ -7,10 +7,10 @@ import {
 import { canPreview, stop as stopPreview, toggle as togglePreview } from './player'
 import { prefs, toggleIn } from './prefs'
 import { askToSignIn, auth, isDesktop, may, mayEdit, signOut, siteName } from './auth'
-import { mine, saveSearch, setFavorite, toggleFavorite } from './mine'
+import { mine, setFavorite, toggleFavorite } from './mine'
 import { loadProjects, projects } from './projects'
 import { teach } from './storeFormats'
-import { DARK_THEMES, LIGHT_THEMES, themeFor } from './theme'
+import { DARK_THEMES, LIGHT_THEMES, SCHEMES, setTheme, themeFor } from './theme'
 import ActivityIndicator from './components/ActivityIndicator.vue'
 import { looksLikeFolderOfPacks, splitPerSubfolder } from './uploader'
 import UploadQueue from './components/UploadQueue.vue'
@@ -19,18 +19,20 @@ import SelectionBag from './components/SelectionBag.vue'
 import AssetTile from './components/AssetTile.vue'
 import CollectionPicker from './components/CollectionPicker.vue'
 import PacksView from './components/PacksView.vue'
+import ActiveFilters from './components/ActiveFilters.vue'
 import FilterSidebar from './components/FilterSidebar.vue'
-import TagChip from './components/TagChip.vue'
+import FolderBar from './components/FolderBar.vue'
+import NothingHere from './components/NothingHere.vue'
+import ThemeSwitch from './components/ThemeSwitch.vue'
 import UiLayer from './components/UiLayer.vue'
 import CommandPalette from './components/CommandPalette.vue'
 import InsecureNotice from './components/InsecureNotice.vue'
 import { archiveWithUndo, countText } from './archive'
-import { showError, showOk, swipeToClose, useTween, withTransition, type Command } from './ui'
+import { showError, showOk, swipeToClose, withTransition, type Command } from './ui'
 import { useVirtualGrid } from './virtualGrid'
 import { lazy } from './lazy'
 import { formatNumber, t } from './i18n'
-import { findKey, keyName } from './keys'
-import { filterPlace, filterQuery, filters, filterSources, heardNoise, NO_MUSIC, readFilters, savedNow, type Named } from './filters'
+import { clearFilters, filterPlace, filterQuery, filters, filterSources, hasFilters, NO_MUSIC, readFilters, type Named } from './filters'
 
 // Opened now and then, so they load when first shown.
 const SettingsPage = lazy(() => import('./components/SettingsPage.vue'), () => t('app-lazy-settings'))
@@ -40,11 +42,6 @@ const SetupWizard = lazy(() => import('./components/SetupWizard.vue'), () => t('
 
 type View = 'library' | 'packs' | 'settings' | 'archive'
 const PAGE = 100
-const THEMES = [
-  { value: 'system', label: () => t('app-theme-system') },
-  { value: 'light', label: () => t('app-theme-light') },
-  { value: 'dark', label: () => t('app-theme-dark') },
-] as const
 
 /** The view in the address: #packs, #archive, #settings/<page>; anything else is the library. */
 function viewFromHash(): { view: View; section: string } {
@@ -300,19 +297,6 @@ function openFolderOf(a: Asset, path: string) {
   openFolder({ id: a.pack_id, name: a.pack_name }, path)
   if (prefs.detailPage) closeDetail()
 }
-/** Browse the pack folder by folder, or everything in it at once. */
-function toggleFolders() {
-  prefs.packFolders = filters.folder === null
-  filters.folder = prefs.packFolders ? '' : null
-}
-/** The folder being browsed, step by step from the pack's top: each with the path to open it. */
-const crumbs = computed(() => {
-  const parts = (filters.folder ?? '').split('/').filter(Boolean)
-  return parts.map((name, i) => ({ name, path: parts.slice(0, i + 1).join('/') }))
-})
-function intoFolder(name: string) {
-  filters.folder = filters.folder ? `${filters.folder}/${name}` : name
-}
 function browseCollection(c: Collection | Named) {
   const same = filters.collection?.id === c.id
   Object.assign(filters, {
@@ -341,28 +325,6 @@ function applySearch(s: { query: string }) {
   readFilters(s.query)
   setView('library')
   showFilters.value = false
-}
-const naming = ref(false)
-const saveName = ref('')
-const saveNameEl = ref<HTMLInputElement | null>(null)
-async function startNaming() {
-  saveName.value = [
-    filters.q.trim(), filters.kind, ...filters.tags, filters.pack?.name, filters.collection?.name,
-    filters.similar && t('app-save-name-like', { name: filters.similar.name }), filters.color,
-    heardNoise.value ? t('app-imitation-heard') : filters.imitation, filters.favorites && t('app-save-name-favorites'), filters.project,
-    tempoLabel.value && `${tempoLabel.value} BPM`, chosenKey.value && keyName(chosenKey.value),
-  ].filter(Boolean).join(' · ').slice(0, 80)
-  naming.value = true
-  await nextTick()
-  saveNameEl.value?.select()
-}
-async function saveCurrent() {
-  const name = saveName.value.trim()
-  if (!name) return
-  if (await saveSearch(name, filterQuery())) {
-    naming.value = false
-    showOk(t('app-search-saved', { name }))
-  }
 }
 /** Every selected asset is a favorite already, so the button takes them out. */
 const allStarred = computed(() => checked.value.length > 0 && checked.value.every((id) => mine.favorites.has(id)))
@@ -504,13 +466,6 @@ function goHome() {
   setView('library')
   mainEl.value?.scrollTo({ top: 0, behavior: 'smooth' })
 }
-function clearFilters() {
-  Object.assign(filters, { q: '', kind: '', tags: [], pack: null, folder: null, collection: null, favorites: false, project: '', similar: null, color: '', imitation: '', ...NO_MUSIC })
-}
-const hasFilters = computed(
-  () => !!(filters.q || filters.kind || filters.tags.length || filters.pack || filters.collection || filters.similar || filters.color || filters.imitation || filters.favorites || filters.project ||
-    filters.bpmMin !== '' || filters.bpmMax !== '' || filters.key),
-)
 /** "More like this": everything that looks like an asset, across every pack, most alike first. */
 function findSimilar(a: Asset) {
   Object.assign(filters, {
@@ -525,13 +480,6 @@ function findColor(hex: string) {
   setView('library')
   mainEl.value?.scrollTo({ top: 0 })
 }
-/** The tempo range being searched, in words ("90–120", "90+", "≤120"); `''` for any. */
-const tempoLabel = computed(() => {
-  const [lo, hi] = [filters.bpmMin, filters.bpmMax]
-  if (lo !== '' && hi !== '') return `${lo}–${hi}`
-  return lo !== '' ? `${lo}+` : hi !== '' ? `≤${hi}` : ''
-})
-const chosenKey = computed(() => (filters.key ? findKey(filters.key) : undefined))
 const rankLabel = computed(() =>
   filters.imitation ? t('app-rank-imitation') : filters.similar ? t('app-rank-alike') : filters.color ? t('app-rank-color') : filters.q ? t('app-rank-match') : t('app-sort-newest'),
 )
@@ -680,7 +628,6 @@ async function bulkSetCategory() {
     },
   })
 }
-/** Archive what's selected: gone from the grid at once, with Undo on the toast. */
 /** CREDITS.md for the selected assets' packs (and the packs of what they need, as the zip has them). */
 async function creditsForChecked() {
   try {
@@ -689,6 +636,7 @@ async function creditsForChecked() {
     showError(t('app-credits-failed', { error: (e as Error).message }))
   }
 }
+/** Archive what's selected: gone from the grid at once, with Undo on the toast. */
 async function archiveChecked() {
   const ids = [...checked.value]
   if (!ids.length) return
@@ -1095,34 +1043,8 @@ async function onHistory() {
 }
 
 const busyPacks = computed(() => packs.value.filter(busy))
-const shownTotal = useTween(() => total.value)
 
-/** Change the theme with the new one spreading out in a circle from the button that was pressed. */
-function setTheme(value: typeof prefs.theme, e?: MouseEvent) {
-  if (prefs.theme === value) return
-  // From the palette there's no button: spread from the theme switcher's current button instead.
-  const from = (e?.currentTarget as HTMLElement | undefined) ?? document.querySelector('.theme [aria-pressed="true"]')
-  const r = from?.getBoundingClientRect() ?? new DOMRect(innerWidth / 2, innerHeight / 2, 0, 0)
-  const x = r.left + r.width / 2
-  const y = r.top + r.height / 2
-  const reach = Math.hypot(Math.max(x, innerWidth - x), Math.max(y, innerHeight - y))
-  void withTransition(() => (prefs.theme = value), 'theme', () => {
-    document.documentElement.animate(
-      { clipPath: [`circle(0 at ${x}px ${y}px)`, `circle(${reach}px at ${x}px ${y}px)`] },
-      { duration: 520, easing: 'cubic-bezier(0.65, 0, 0.35, 1)', pseudoElement: '::view-transition-new(root)' },
-    )
-  })
-}
 const firstLoad = computed(() => loading.value && !items.value.length)
-/** Said when a search finds nothing. */
-const noneText = computed(() => {
-  const query = filters.q.trim()
-  const narrowed = hasFilters.value && !!(filters.tags.length || filters.kind || filters.pack)
-  if (heardNoise.value) return t('app-none-heard')
-  if (filters.imitation) return t('app-none-imitation', { word: filters.imitation })
-  if (filters.q) return narrowed ? t('app-none-query-filters', { query }) : t('app-none-query', { query })
-  return narrowed ? t('app-none-filters') : t('app-none')
-})
 
 // ------------------------------------------------------------------ command palette
 
@@ -1180,7 +1102,7 @@ const commands = computed<Command[]>(() => {
   }
   if (member.value) out.push({ id: 'act:settings', group: actions, label: t('palette-settings'), keywords: t('palette-settings-keywords'), run: () => openSettings() })
   out.push({ id: 'act:keys', group: actions, label: t('palette-shortcuts'), hint: '?', keywords: t('palette-shortcuts-keywords'), run: () => (shortcutsOpen.value = true) })
-  for (const th of THEMES) {
+  for (const th of SCHEMES) {
     out.push({ id: `theme:${th.value}`, group: themeGroup, label: th.label(), hint: prefs.theme === th.value ? current : undefined, keywords: t('palette-theme-keywords'), run: () => setTheme(th.value) })
   }
   for (const th of LIGHT_THEMES) {
@@ -1277,31 +1199,7 @@ const commands = computed<Command[]>(() => {
           <span class="dot" aria-hidden="true" /><span class="wide-only">{{ t('app-update') }} </span>{{ stats.update.version }}
         </a>
         <ActivityIndicator />
-        <div class="theme" role="group" :aria-label="t('app-theme')">
-          <button
-            v-for="th in THEMES"
-            :key="th.value"
-            type="button"
-            :aria-pressed="prefs.theme === th.value"
-            :title="th.label()"
-            @click="setTheme(th.value, $event)"
-          >
-            <svg viewBox="0 0 16 16" width="15" height="15" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
-              <template v-if="th.value === 'light'">
-                <circle cx="8" cy="8" r="3" />
-                <path d="M8 1.5v1.6M8 12.9v1.6M1.5 8h1.6M12.9 8h1.6M3.4 3.4l1.1 1.1M11.5 11.5l1.1 1.1M3.4 12.6l1.1-1.1M11.5 4.5l1.1-1.1" />
-              </template>
-              <template v-else-if="th.value === 'dark'">
-                <path d="M13.2 10.1A5.6 5.6 0 0 1 5.9 2.8a5.6 5.6 0 1 0 7.3 7.3Z" />
-              </template>
-              <template v-else>
-                <rect x="1.8" y="2.5" width="12.4" height="8.5" rx="1.2" />
-                <path d="M5.5 14h5M8 11v3" />
-              </template>
-            </svg>
-            <span class="visually-hidden">{{ th.label() }}</span>
-          </button>
-        </div>
+        <ThemeSwitch />
         <button v-if="auth.status && !auth.status.signed_in" type="button" class="btn ghost" @click="askToSignIn">{{ t('app-sign-in') }}</button>
         <button
           v-if="archivedCount || view === 'archive'"
@@ -1386,33 +1284,7 @@ const commands = computed<Command[]>(() => {
           >
             {{ t('app-filters') }}<span v-if="filters.tags.length + (filters.kind ? 1 : 0)" class="badge">{{ filters.tags.length + (filters.kind ? 1 : 0) }}</span>
           </button>
-          <div class="active">
-            <span class="count">
-              <span aria-hidden="true">{{ firstLoad ? t('app-searching') : t('app-asset-count', { count: shownTotal }) }}</span>
-              <span class="visually-hidden" aria-live="polite">{{ firstLoad ? t('app-searching-live') : t('app-asset-count', { count: total }) }}</span>
-            </span>
-            <TagChip v-if="filters.pack" :tag="`pack:${filters.pack.name}`" removable @remove="filters.pack = null" />
-            <TagChip v-if="filters.collection" :tag="`collection:${filters.collection.name}`" removable @remove="filters.collection = null" />
-            <TagChip v-if="filters.favorites" tag="your:favorites" removable @remove="filters.favorites = false" />
-            <TagChip v-if="filters.project" :tag="`project:${filters.project}`" removable @remove="filters.project = ''" />
-            <TagChip v-if="filters.similar" :tag="`like:${filters.similar.name}`" removable @remove="filters.similar = null" />
-            <TagChip v-if="filters.color" :tag="`color:${filters.color}`" :swatch="filters.color" removable @remove="filters.color = ''" />
-            <TagChip v-if="filters.imitation" :tag="`sounds-like:${heardNoise ? t('app-imitation-heard') : filters.imitation}`" removable @remove="filters.imitation = ''" />
-            <TagChip v-if="tempoLabel" :tag="`bpm:${tempoLabel}`" removable @remove="Object.assign(filters, { bpmMin: '', bpmMax: '' })" />
-            <TagChip v-if="chosenKey" :tag="`key:${keyName(chosenKey)}${filters.mixKeys ? ' ±' : ''}`" removable @remove="filters.key = ''" />
-            <TagChip v-if="filters.kind" :tag="`kind:${filters.kind}`" removable @remove="filters.kind = ''" />
-            <TagChip v-for="t in filters.tags" :key="t" :tag="t" removable @remove="toggleTag(t)" />
-            <button v-if="hasFilters" type="button" class="linkbtn" @click="clearFilters">{{ t('app-clear-all') }}</button>
-            <template v-if="member && hasFilters && !savedNow">
-              <form v-if="naming" class="savesearch" @submit.prevent="saveCurrent">
-                <label class="visually-hidden" for="save-name">{{ t('app-save-name-label') }}</label>
-                <input id="save-name" ref="saveNameEl" v-model="saveName" class="field" maxlength="80" :placeholder="t('app-save-name-placeholder')" autocomplete="off" @keydown.esc.stop="naming = false" />
-                <button class="btn" type="submit" :disabled="!saveName.trim()">{{ t('app-save') }}</button>
-                <button class="btn ghost" type="button" @click="naming = false">{{ t('app-cancel') }}</button>
-              </form>
-              <button v-else type="button" class="linkbtn" :title="t('app-save-search-title')" @click="startNaming">{{ t('app-save-search') }}</button>
-            </template>
-          </div>
+          <ActiveFilters :first-load="firstLoad" :total="total" />
           <button
             v-if="items.length"
             type="button"
@@ -1458,81 +1330,14 @@ const commands = computed<Command[]>(() => {
           </template>
         </p>
 
-        <nav v-if="filters.pack" class="folderbar" :aria-label="t('app-folders-label')">
-          <button
-            type="button"
-            class="btn ghost folders-toggle"
-            :aria-pressed="filters.folder !== null"
-            :title="t('app-folders-title')"
-            @click="toggleFolders"
-          >
-            <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round">
-              <path d="M1.75 4.25a1 1 0 0 1 1-1h3.4l1.5 1.6h5.6a1 1 0 0 1 1 1v6.9a1 1 0 0 1-1 1H2.75a1 1 0 0 1-1-1Z" />
-            </svg>
-            <span>{{ t('app-folders') }}</span>
-          </button>
-          <ol v-if="filters.folder !== null" class="crumbs">
-            <li>
-              <button type="button" class="crumb" :aria-current="filters.folder ? undefined : 'location'" @click="filters.folder = ''">
-                {{ filters.pack.name }}
-              </button>
-            </li>
-            <li v-for="c in crumbs" :key="c.path">
-              <button type="button" class="crumb" :aria-current="c.path === filters.folder ? 'location' : undefined" @click="filters.folder = c.path">
-                {{ c.name }}
-              </button>
-            </li>
-          </ol>
-        </nav>
-        <ul v-if="filters.pack && filters.folder !== null && folders.length" class="subfolders">
-          <li v-for="f in folders" :key="f.value">
-            <button type="button" class="subfolder" @click="intoFolder(f.value)">
-              <svg viewBox="0 0 16 16" width="18" height="18" aria-hidden="true">
-                <path d="M1.75 4.25a1 1 0 0 1 1-1h3.4l1.5 1.6h5.6a1 1 0 0 1 1 1v6.9a1 1 0 0 1-1 1H2.75a1 1 0 0 1-1-1Z" />
-              </svg>
-              <span class="name">{{ f.value }}</span>
-              <span class="fcount">{{ t('app-asset-count', { count: f.count }) }}</span>
-            </button>
-          </li>
-        </ul>
+        <FolderBar :folders="folders" />
 
-        <div v-if="!loading && stats && stats.assets === 0" class="welcome">
-          <svg class="art crates" viewBox="0 0 140 112" width="150" height="120" aria-hidden="true">
-            <g class="c c1"><rect x="30" y="14" width="26" height="26" rx="5" fill="var(--k-texture)" /></g>
-            <g class="c c2"><rect x="64" y="2" width="26" height="26" rx="5" fill="var(--k-audio)" /></g>
-            <g class="c c3"><rect x="50" y="42" width="26" height="26" rx="5" fill="var(--k-model)" /></g>
-            <g class="c c4"><rect x="86" y="32" width="26" height="26" rx="5" fill="var(--k-font)" /></g>
-            <path d="M16 64h108l-10 40a6 6 0 0 1-5.8 4.5H31.8A6 6 0 0 1 26 104Z" fill="var(--panel)" stroke="var(--line)" stroke-width="2" stroke-linejoin="round" />
-            <path d="M14 64h112" stroke="var(--muted)" stroke-width="3" stroke-linecap="round" />
-            <path d="M56 86h28" stroke="var(--line)" stroke-width="3" stroke-linecap="round" />
-          </svg>
-          <h1>{{ t('app-welcome-title') }}</h1>
-          <p>
-            {{ t('app-welcome-before') }}<span class="mono">{{ t('app-welcome-example-1') }}</span>{{ t('app-welcome-or') }}<span class="mono">{{ t('app-welcome-example-2') }}</span>{{ t('app-welcome-after') }}
-          </p>
-          <div class="welcome-actions">
-            <button type="button" class="btn primary" @click="folderInput?.click()">{{ t('app-welcome-import-folder') }}</button>
-            <button type="button" class="btn" @click="fileInput?.click()">{{ t('app-welcome-choose-files') }}</button>
-          </div>
-        </div>
-        <div v-else-if="!loading && items.length === 0 && !folders.length" class="none">
-          <svg class="art" viewBox="0 0 124 92" width="124" height="92" aria-hidden="true">
-            <rect x="10" y="20" width="66" height="54" rx="7" fill="none" stroke="var(--line)" stroke-width="2" stroke-dasharray="6 5" />
-            <rect x="21" y="32" width="15" height="15" rx="3" fill="var(--k-texture)" opacity="0.3" />
-            <rect x="42" y="32" width="15" height="15" rx="3" fill="var(--k-audio)" opacity="0.3" />
-            <rect x="21" y="53" width="15" height="10" rx="3" fill="var(--k-model)" opacity="0.3" />
-            <g class="glass">
-              <circle cx="84" cy="44" r="17" fill="var(--bg)" stroke="var(--muted)" stroke-width="3" />
-              <path d="M78 38a8 8 0 0 1 9-3" stroke="var(--line)" stroke-width="2.5" stroke-linecap="round" fill="none" />
-              <path d="m96.5 56.5 13 13" stroke="var(--muted)" stroke-width="5.5" stroke-linecap="round" />
-            </g>
-          </svg>
-          <p v-if="filters.similar && !filters.q && !filters.kind && !filters.tags.length && !filters.color">
-            {{ t('app-none-similar', { name: filters.similar.name }) }}
-          </p>
-          <p v-else>{{ noneText }}</p>
-          <button v-if="hasFilters" type="button" class="btn" @click="clearFilters">{{ t('app-clear-search-filters') }}</button>
-        </div>
+        <NothingHere
+          v-if="!loading && ((stats && stats.assets === 0) || (items.length === 0 && !folders.length))"
+          :welcome="!!stats && stats.assets === 0"
+          @folder="folderInput?.click()"
+          @files="fileInput?.click()"
+        />
 
         <div ref="gridEl" class="grid" :class="{ selecting: checked.length > 0 }" :style="win.padding.value">
           <template v-if="firstLoad">
@@ -1751,13 +1556,6 @@ const commands = computed<Command[]>(() => {
 }
 .search:focus-within .slash { display: none; }
 .views { display: flex; gap: 0.15rem; }
-.theme { display: inline-flex; padding: 2px; gap: 1px; border: 1px solid var(--line); border-radius: var(--r-chip); }
-.theme button {
-  display: grid; place-items: center; width: 1.8rem; height: 1.6rem; padding: 0;
-  border: 0; border-radius: 3px; background: transparent; color: var(--faint); cursor: pointer;
-}
-.theme button:hover { color: var(--text); }
-.theme button[aria-pressed='true'] { background: var(--raised); color: var(--text); }
 .views button {
   position: relative; border: 0; background: none; padding: 0.4em 0.75em; cursor: pointer; border-radius: var(--r-chip);
   color: var(--muted); font-size: var(--step--1); font-weight: 550;
@@ -1781,8 +1579,6 @@ const commands = computed<Command[]>(() => {
 .tokenbar .field { max-width: 320px; }
 
 .side { grid-area: side; overflow-y: auto; padding: 1rem 0.9rem 2rem; border-right: 1px solid var(--line); }
-.savesearch { display: inline-flex; gap: 0.3rem; align-items: center; }
-.savesearch .field { width: 12rem; padding-block: 0.2rem; }
 
 /* Positioned, so screen-reader-only text far down the grid stays inside it rather than making the page itself
    scroll; and scrolling past the end stops here, never scrolling the whole app out of view. */
@@ -1808,12 +1604,6 @@ const commands = computed<Command[]>(() => {
   }
 }
 .active { display: flex; flex-wrap: wrap; gap: 0.35rem; align-items: center; flex: 1; min-width: 0; }
-.count { font-size: var(--step--1); color: var(--muted); margin-right: 0.35rem; font-variant-numeric: tabular-nums; }
-.linkbtn {
-  border: 0; background: none; padding: 0.1em 0.2em; cursor: pointer; font-size: var(--step--1);
-  color: var(--text); text-decoration: underline; text-decoration-color: var(--faint); text-underline-offset: 3px;
-}
-.linkbtn:hover { text-decoration-color: var(--text); }
 .size { display: flex; align-items: center; gap: 0.4rem; color: var(--faint); }
 .size input { width: 84px; accent-color: var(--muted); }
 .sort .field { width: auto; padding: 0.3em 0.5em; font-size: var(--step--1); }
@@ -1824,49 +1614,8 @@ const commands = computed<Command[]>(() => {
 }
 .supporting { margin: -0.25rem 0 0.9rem; font-size: 0.78rem; color: var(--faint); }
 .supporting .linkbtn { font-size: inherit; color: var(--muted); }
-.folderbar { display: flex; align-items: center; gap: 0.6rem; margin: -0.25rem 0 0.9rem; min-width: 0; }
-.folders-toggle { display: inline-flex; align-items: center; gap: 0.35rem; font-size: var(--step--1); padding: 0.25em 0.6em; }
-.folders-toggle[aria-pressed='true'] { background: var(--panel); border-color: var(--line); }
-.crumbs { display: flex; flex-wrap: wrap; align-items: center; margin: 0; padding: 0; list-style: none; min-width: 0; font-size: var(--step--1); }
-.crumbs li { display: flex; align-items: center; min-width: 0; }
-.crumbs li + li::before { content: '/'; color: var(--faint); padding: 0 0.15rem; }
-.crumb {
-  border: 0; background: none; padding: 0.15em 0.3em; border-radius: 4px; cursor: pointer; color: var(--muted);
-  overflow-wrap: anywhere; text-align: start;
-}
-.crumb:hover { color: var(--text); background: var(--panel); }
-.crumb[aria-current] { color: var(--text); font-weight: 600; }
-.subfolders {
-  display: grid; grid-template-columns: repeat(auto-fill, minmax(calc(var(--tile) * 1.4), 1fr)); gap: 0.5rem;
-  margin: 0 0 1.1rem; padding: 0; list-style: none;
-}
-.subfolder {
-  display: grid; grid-template-columns: auto 1fr; grid-template-rows: auto auto; column-gap: 0.55rem; align-items: center;
-  width: 100%; padding: 0.55rem 0.7rem; border: 1px solid var(--line); border-radius: 8px; background: var(--panel);
-  color: var(--text); cursor: pointer; text-align: start;
-}
-.subfolder:hover { border-color: var(--muted); }
-.subfolder svg { grid-row: span 2; fill: color-mix(in srgb, var(--muted) 35%, transparent); stroke: var(--muted); stroke-width: 1.2; stroke-linejoin: round; }
-.subfolder .name { font-size: var(--step--1); font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.subfolder .fcount { font-size: 0.72rem; color: var(--faint); font-variant-numeric: tabular-nums; }
 .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(var(--tile), 1fr)); gap: 1.1rem 0.9rem; }
-.none { color: var(--muted); padding: 3rem 0; display: flex; flex-direction: column; align-items: center; text-align: center; }
-.art { display: block; margin-bottom: 1rem; overflow: visible; }
-.welcome .art { margin-bottom: 1.25rem; }
-.glass { animation: hunt 3.2s var(--ease-in-out) infinite; }
-@keyframes hunt { 25% { translate: -14px -6px; } 50% { translate: -26px 6px; } 75% { translate: -8px 8px; } }
-.crates .c { animation: bob 2.6s var(--ease-in-out) infinite; }
-.crates .c2 { animation-delay: -0.6s; }
-.crates .c3 { animation-delay: -1.3s; }
-.crates .c4 { animation-delay: -1.9s; }
-.crates .c1 rect { rotate: -8deg; transform-box: fill-box; transform-origin: center; }
-.crates .c4 rect { rotate: 10deg; transform-box: fill-box; transform-origin: center; }
-.none p { margin: 0 0 0.9rem; }
 .hint { margin: 2.5rem 0 0; text-align: center; font-size: 0.75rem; color: var(--faint); }
-.welcome { max-width: 60ch; padding: 3rem 0; }
-.welcome h1 { margin: 0 0 0.75rem; font-size: var(--step-2); line-height: 1.2; font-variation-settings: 'CASL' 0.6; font-weight: 700; }
-.welcome p { color: var(--muted); margin: 0 0 1.25rem; }
-.welcome-actions { display: flex; gap: 0.5rem; }
 
 /* Placeholder tiles while the first page loads. */
 .skeleton {
@@ -1993,8 +1742,7 @@ const commands = computed<Command[]>(() => {
 }
 /* Fingers need bigger targets than pointers. */
 @media (pointer: coarse) {
-  .views button, .theme button { min-height: 44px; min-width: 44px; }
-  .linkbtn { padding-block: 0.6em; }
+  .views button { min-height: 44px; min-width: 44px; }
 }
 @media (max-width: 480px) {
   .wide-only { display: none; }

@@ -32,6 +32,16 @@ export const filters = reactive({
 /** The music filters, cleared. */
 export const NO_MUSIC = { bpmMin: '', bpmMax: '', key: '' } as const
 
+/** Anything narrowing the library at all. */
+export const hasFilters = computed(
+  () => !!(filters.q || filters.kind || filters.tags.length || filters.pack || filters.collection || filters.similar || filters.color || filters.imitation || filters.favorites || filters.project ||
+    filters.bpmMin !== '' || filters.bpmMax !== '' || filters.key),
+)
+/** Back to the whole library (the order chosen stays). */
+export function clearFilters() {
+  Object.assign(filters, { q: '', kind: '', tags: [], pack: null, folder: null, collection: null, favorites: false, project: '', similar: null, color: '', imitation: '', ...NO_MUSIC })
+}
+
 /** How a noise made into the microphone travels as `imitation` (its shape, as the server measured it). */
 export const HEARD = 'heard:'
 export const heardNoise = computed(() => filters.imitation.startsWith(HEARD))

@@ -190,6 +190,13 @@ button, input, select, textarea { font: inherit; color: inherit; }
 .btn[aria-busy='true'] { cursor: progress; }
 /* Fingers need bigger targets than pointers. */
 @media (pointer: coarse) { .btn { min-height: 44px; } }
+/* A button that reads as a link. */
+.linkbtn {
+  border: 0; background: none; padding: 0.1em 0.2em; cursor: pointer; font-size: var(--step--1);
+  color: var(--text); text-decoration: underline; text-decoration-color: var(--faint); text-underline-offset: 3px;
+}
+.linkbtn:hover { text-decoration-color: var(--text); }
+@media (pointer: coarse) { .linkbtn { padding-block: 0.6em; } }
 
 .chip {
   display: inline-flex; align-items: baseline; gap: 0.25em;

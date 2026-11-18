@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "2235081ab15c646057416458fa3f3b8e357859d17ba776ecef2a615dd3b3e7ec"
+source = "fd9a2306054c0253c201e64e5553d1e3bc549d09d74d0c1692e8c3ff495b3630"
 translation = "9bd6df5ffb27941fd7574669812413d7eaa17a0920718334cfd6ce3df12e13f5"
 
 [messages.account-add]
@@ -916,6 +916,18 @@ translation = "Takaisin kirjastoon"
 source = "Hoard { $version } — back to the library"
 translation = "Hoard { $version } – takaisin kirjastoon"
 
+[messages.app-imitation]
+source = "Sounds like"
+translation = "Kuulostaa"
+
+[messages.app-imitation-placeholder]
+source = "whooom, pew, krssh"
+translation = "whooom, pew, krssh"
+
+[messages.app-imitation-title]
+source = "Write the noise a sound makes the way you'd spell it: sounds shaped like it come first"
+translation = "Kirjoita äänen tekemä ääni niin kuin sen tavaisit: sen kaltaiset äänet tulevat ensin"
+
 [messages.app-import-folder]
 source = "Import folder"
 translation = "Tuo kansio"
@@ -963,6 +975,10 @@ translation = "Ei osumia."
 [messages.app-none-filters]
 source = "Nothing matches with these filters."
 translation = "Näillä suodattimilla ei ole osumia."
+
+[messages.app-none-imitation]
+source = "No measured sound is shaped much like “{ $word }” yet."
+translation = "Mikään mitattu ääni ei vielä kuulosta paljon tältä: ”{ $word }”."
 
 [messages.app-none-query]
 source = "Nothing matches “{ $query }”."
@@ -1127,6 +1143,10 @@ translation = "Samankaltaisimmat"
 [messages.app-rank-color]
 source = "Most of the color"
 translation = "Eniten väriä"
+
+[messages.app-rank-imitation]
+source = "Sounds most like it"
+translation = "Eniten sen kaltaiset"
 
 [messages.app-rank-match]
 source = "Best match"

@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "2235081ab15c646057416458fa3f3b8e357859d17ba776ecef2a615dd3b3e7ec"
+source = "fd9a2306054c0253c201e64e5553d1e3bc549d09d74d0c1692e8c3ff495b3630"
 translation = "d3e5845d6d4178bd5edbc2277e0e916981a0ddba412230b00124f99958cb1526"
 
 [messages.account-add]
@@ -916,6 +916,18 @@ translation = "Terug naar de bibliotheek"
 source = "Hoard { $version } — back to the library"
 translation = "Hoard { $version } — terug naar de bibliotheek"
 
+[messages.app-imitation]
+source = "Sounds like"
+translation = "Klinkt als"
+
+[messages.app-imitation-placeholder]
+source = "whooom, pew, krssh"
+translation = "whooom, pew, krssh"
+
+[messages.app-imitation-title]
+source = "Write the noise a sound makes the way you'd spell it: sounds shaped like it come first"
+translation = "Schrijf het geluid zoals je het zou spellen: geluiden die erop lijken komen eerst"
+
 [messages.app-import-folder]
 source = "Import folder"
 translation = "Map importeren"
@@ -963,6 +975,10 @@ translation = "Niets gevonden."
 [messages.app-none-filters]
 source = "Nothing matches with these filters."
 translation = "Niets gevonden met deze filters."
+
+[messages.app-none-imitation]
+source = "No measured sound is shaped much like “{ $word }” yet."
+translation = "Nog geen gemeten geluid klinkt echt als “{ $word }”."
 
 [messages.app-none-query]
 source = "Nothing matches “{ $query }”."
@@ -1127,6 +1143,10 @@ translation = "Meest gelijkend"
 [messages.app-rank-color]
 source = "Most of the color"
 translation = "Meeste van de kleur"
+
+[messages.app-rank-imitation]
+source = "Sounds most like it"
+translation = "Klinkt het meest zo"
 
 [messages.app-rank-match]
 source = "Best match"

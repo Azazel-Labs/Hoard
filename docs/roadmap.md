@@ -96,7 +96,7 @@ on its own:
 - [x] **Measured features**: each sound's duration, envelope (a sharp attack or a swell, how long the tail is),
   brightness, how noisy or tonal it is, whether its pitch rises or falls, its loudness and whether it loops cleanly.
   Kept with the sound, shown in its details, filterable in search and the API.
-- [ ] **Onomatopoeia**: a word read as the shape of a sound and scored against those features. A plosive start
+- [x] **Onomatopoeia**: a word read as the shape of a sound and scored against those features. A plosive start
   (b, p, k, t) is a sharp attack; long or repeated vowels are length; "oo"/"o" low and dark, "ee"/"i" high and
   bright; "sh", "s", "wh", "f" are noise and air; a trailing "m" or "n" a hum that fades; capitals are loud.
   "WHOOOM": airy start, long low middle, fading hum, loud.

@@ -516,6 +516,11 @@ app-color-swatch = { $color }: assets with much { $lower } in them
 app-color-any = Any color
 app-color-pick = Pick any color
 app-color = Color
+# The sidebar box for finding sounds by a word that imitates them ("whooom", "pew").
+app-imitation = Sounds like
+# Examples of imitation words; the reading is of English-style spelling, so keep them as they are.
+app-imitation-placeholder = whooom, pew, krssh
+app-imitation-title = Write the noise a sound makes the way you'd spell it: sounds shaped like it come first
 app-retry = Retry
 app-undo = Undo
 app-search-failed = Search failed: { $error }
@@ -536,6 +541,7 @@ app-search-saved = Saved “{ $name }”: it's in Filters, under Yours
 app-rank-alike = Most alike
 app-rank-color = Most of the color
 app-rank-match = Best match
+app-rank-imitation = Sounds most like it
 app-sort = Sort
 app-sort-newest = Newest
 app-sort-name = Name
@@ -708,6 +714,8 @@ app-welcome-choose-files = Choose files
 app-none-similar = Nothing else looks much like { $name } yet.
 app-none = Nothing matches.
 app-none-query = Nothing matches “{ $query }”.
+# $word is what was typed in the Sounds like box.
+app-none-imitation = No measured sound is shaped much like “{ $word }” yet.
 app-none-filters = Nothing matches with these filters.
 app-none-query-filters = Nothing matches “{ $query }” with these filters.
 app-clear-search-filters = Clear search and filters

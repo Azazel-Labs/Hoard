@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "2235081ab15c646057416458fa3f3b8e357859d17ba776ecef2a615dd3b3e7ec"
+source = "fd9a2306054c0253c201e64e5553d1e3bc549d09d74d0c1692e8c3ff495b3630"
 translation = "eb892fd468da0132017d254b1ce31fa8af7e6f4331de9f469e15c94a37a8f607"
 
 [messages.account-add]
@@ -916,6 +916,18 @@ translation = "Tilbage til biblioteket"
 source = "Hoard { $version } — back to the library"
 translation = "Hoard { $version } — tilbage til biblioteket"
 
+[messages.app-imitation]
+source = "Sounds like"
+translation = "Lyder som"
+
+[messages.app-imitation-placeholder]
+source = "whooom, pew, krssh"
+translation = "whooom, pew, krssh"
+
+[messages.app-imitation-title]
+source = "Write the noise a sound makes the way you'd spell it: sounds shaped like it come first"
+translation = "Skriv den lyd, noget siger, som du ville stave den: lyde, der ligner, kommer først"
+
 [messages.app-import-folder]
 source = "Import folder"
 translation = "Importér mappe"
@@ -963,6 +975,10 @@ translation = "Intet matcher."
 [messages.app-none-filters]
 source = "Nothing matches with these filters."
 translation = "Intet matcher med disse filtre."
+
+[messages.app-none-imitation]
+source = "No measured sound is shaped much like “{ $word }” yet."
+translation = "Ingen målt lyd lyder endnu meget som »{ $word }«."
 
 [messages.app-none-query]
 source = "Nothing matches “{ $query }”."
@@ -1127,6 +1143,10 @@ translation = "Mest ens"
 [messages.app-rank-color]
 source = "Most of the color"
 translation = "Mest af farven"
+
+[messages.app-rank-imitation]
+source = "Sounds most like it"
+translation = "Lyder mest som det"
 
 [messages.app-rank-match]
 source = "Best match"

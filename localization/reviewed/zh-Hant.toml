@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "2235081ab15c646057416458fa3f3b8e357859d17ba776ecef2a615dd3b3e7ec"
+source = "fd9a2306054c0253c201e64e5553d1e3bc549d09d74d0c1692e8c3ff495b3630"
 translation = "7d4815ead7ae4f48f80531d797b527d64fdb08460c91b5ac34cf8cada118334a"
 
 [messages.account-add]
@@ -887,6 +887,18 @@ translation = "返回素材庫"
 source = "Hoard { $version } — back to the library"
 translation = "Hoard { $version } — 返回素材庫"
 
+[messages.app-imitation]
+source = "Sounds like"
+translation = "聽起來像"
+
+[messages.app-imitation-placeholder]
+source = "whooom, pew, krssh"
+translation = "whooom, pew, krssh"
+
+[messages.app-imitation-title]
+source = "Write the noise a sound makes the way you'd spell it: sounds shaped like it come first"
+translation = "照拼寫方式寫出聲音（例如 whooom）：形狀相近的聲音排在前面"
+
 [messages.app-import-folder]
 source = "Import folder"
 translation = "匯入資料夾"
@@ -934,6 +946,10 @@ translation = "沒有符合的項目。"
 [messages.app-none-filters]
 source = "Nothing matches with these filters."
 translation = "沒有符合這些篩選條件的項目。"
+
+[messages.app-none-imitation]
+source = "No measured sound is shaped much like “{ $word }” yet."
+translation = "還沒有已測量的聲音聽起來像「{ $word }」。"
 
 [messages.app-none-query]
 source = "Nothing matches “{ $query }”."
@@ -1098,6 +1114,10 @@ translation = "最相似"
 [messages.app-rank-color]
 source = "Most of the color"
 translation = "顏色最多"
+
+[messages.app-rank-imitation]
+source = "Sounds most like it"
+translation = "聽起來最像"
 
 [messages.app-rank-match]
 source = "Best match"

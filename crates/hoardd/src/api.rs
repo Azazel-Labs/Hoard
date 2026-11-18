@@ -678,6 +678,9 @@ struct AssetsParams {
     /// `#rrggbb`: assets with much of this color.
     #[serde(default)]
     color: Option<String>,
+    /// A word imitating a sound (`whooom`): sounds shaped like it.
+    #[serde(default)]
+    imitation: Option<String>,
     /// Only the favorites of whoever asks.
     #[serde(default)]
     favorites: Option<bool>,
@@ -701,6 +704,7 @@ impl From<AssetsParams> for SearchQuery {
             archived: p.archived.unwrap_or(false),
             similar: p.similar,
             color: p.color,
+            imitation: p.imitation,
             favorites_of: None,
         }
     }

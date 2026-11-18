@@ -726,6 +726,10 @@ pub struct SearchQuery {
     /// Assets with much of this color (`#rrggbb`) in them, most first.
     #[serde(default)]
     pub color: Option<String>,
+    /// Sounds shaped like this word imitating them (`whooom`, `pew`, `krssh`), most alike first. In place of
+    /// `similar` and `color`.
+    #[serde(default)]
+    pub imitation: Option<String>,
     /// Only this account's favorites. Set by the server for whoever asks, never sent.
     #[serde(skip)]
     pub favorites_of: Option<i64>,

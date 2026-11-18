@@ -951,6 +951,40 @@ mod tests {
     }
 
     #[test]
+    fn a_word_finds_the_sound_it_imitates() {
+        let measured = |name: &'static str, x: Vec<f32>| {
+            let mut m = f(&x);
+            m.insert("duration_secs".into(), json!(x.len() as f32 / RATE as f32));
+            (name, crate::imitation::Measured::from_meta(&m).unwrap())
+        };
+        let sounds = [
+            measured("thud", thud(1, 0.3, 300.0)),
+            measured("zap", zap(2000.0, 300.0, 0.4)),
+            measured("rain", rain(3, 4.0)),
+            measured("riser", riser(5)),
+        ];
+        let best = |word: &str| {
+            let shape = crate::imitation::read(word).unwrap();
+            let mut scored: Vec<(&str, f32)> =
+                sounds.iter().map(|(n, m)| (*n, crate::imitation::score(&shape, m))).collect();
+            scored.sort_by(|a, b| b.1.total_cmp(&a.1));
+            scored
+        };
+        for (word, sound) in [
+            ("pew", "zap"),
+            ("peeoww", "zap"),
+            ("doom", "thud"),
+            ("bmp", "thud"),
+            ("shhhhhhh", "rain"),
+            ("sssssss", "rain"),
+            ("whoooeeee", "riser"),
+        ] {
+            let scored = best(word);
+            assert_eq!(scored[0].0, sound, "{word}: {scored:?}");
+        }
+    }
+
+    #[test]
     fn features_measured_later_reach_the_sounds_and_their_tags() {
         let c = db::test_library();
         c.execute_batch(

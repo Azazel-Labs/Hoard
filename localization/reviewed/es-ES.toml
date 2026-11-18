@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "2235081ab15c646057416458fa3f3b8e357859d17ba776ecef2a615dd3b3e7ec"
+source = "fd9a2306054c0253c201e64e5553d1e3bc549d09d74d0c1692e8c3ff495b3630"
 translation = "8b5fa45772f1b768715bb243cf724d7c57dc2f5208043d87b201e40c17dc1980"
 
 [messages.account-add]
@@ -920,6 +920,18 @@ translation = "Volver a la biblioteca"
 source = "Hoard { $version } — back to the library"
 translation = "Hoard { $version }: volver a la biblioteca"
 
+[messages.app-imitation]
+source = "Sounds like"
+translation = "Suena como"
+
+[messages.app-imitation-placeholder]
+source = "whooom, pew, krssh"
+translation = "whooom, pew, krssh"
+
+[messages.app-imitation-title]
+source = "Write the noise a sound makes the way you'd spell it: sounds shaped like it come first"
+translation = "Escribe el ruido que hace un sonido como lo deletrearías: primero salen los que se le parecen"
+
 [messages.app-import-folder]
 source = "Import folder"
 translation = "Importar carpeta"
@@ -967,6 +979,10 @@ translation = "No hay coincidencias."
 [messages.app-none-filters]
 source = "Nothing matches with these filters."
 translation = "No hay coincidencias con estos filtros."
+
+[messages.app-none-imitation]
+source = "No measured sound is shaped much like “{ $word }” yet."
+translation = "Todavía ningún sonido medido se parece mucho a «{ $word }»."
 
 [messages.app-none-query]
 source = "Nothing matches “{ $query }”."
@@ -1131,6 +1147,10 @@ translation = "Más parecidos"
 [messages.app-rank-color]
 source = "Most of the color"
 translation = "Con más de ese color"
+
+[messages.app-rank-imitation]
+source = "Sounds most like it"
+translation = "Los que más se parecen"
 
 [messages.app-rank-match]
 source = "Best match"

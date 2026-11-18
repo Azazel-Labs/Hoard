@@ -92,3 +92,35 @@ test('a sound’s envelope, tone and pitch are measured, shown in its details an
     await api.post('/api/archive/purge', { data: { packs: [pack.id] } })
   }
 })
+
+test('a word imitating a sound finds the sounds shaped like it', async ({ page, api }) => {
+  const name = `E2E Sound imitation ${unique()}`
+  // Named so the words can't help.
+  const pack = await uploadPack(api, name, [
+    { relpath: 'take_1.wav', data: sound('thud', 1) },
+    { relpath: 'take_2.wav', data: sound('zap', 1) },
+    { relpath: 'take_3.wav', data: sound('rain', 1) },
+  ])
+  try {
+    await waitReady(api, [pack.id])
+    const first = async (word: string) => {
+      const r = await api.get(`/api/assets?imitation=${encodeURIComponent(word)}&pack=${pack.id}`)
+      return ((await r.json()) as { items: { path: string }[] }).items[0]?.path
+    }
+    expect(await first('pew')).toBe('take_2.wav')
+    expect(await first('doom')).toBe('take_1.wav')
+    expect(await first('shhhhhhh')).toBe('take_3.wav')
+
+    await openPack(page, pack.id, name, '&sort=name')
+    const box = page.getByRole('searchbox', { name: 'Sounds like' })
+    await box.fill('pew')
+    await box.press('Enter')
+    await expect(page).toHaveURL(/[?&]imitation=pew/)
+    await expect(page.locator('.active')).toContainText('sounds-like:pew')
+    await expect(page.locator('.sort select option').first()).toHaveText('Sounds most like it')
+    await expect(page.locator('.grid button.hit').first()).toHaveAttribute('aria-label', /^Take 2,/)
+  } finally {
+    await api.post('/api/archive', { data: { packs: [pack.id] } })
+    await api.post('/api/archive/purge', { data: { packs: [pack.id] } })
+  }
+})

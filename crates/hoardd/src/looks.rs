@@ -727,13 +727,19 @@ fn color_score(palette: &[Swatch], lab: [f32; 3]) -> f32 {
 // ---------------------------------------------------------------------------------------------
 // Search
 
-/// A library search, ranked by look when it asks for "more like this" (`similar`) or a color (`color`).
+/// A library search, ranked by look when it asks for "more like this" (`similar`) or a color (`color`), or by sound
+/// for a word imitating one (`imitation`).
 pub(crate) async fn search(state: &AppState, q: SearchQuery, facets: bool) -> Result<db::SearchPage> {
     let rank = rank(state, &q).await?;
     db::call(&state.pool, move |c| db::search_ranked(c, &q, facets, rank.as_ref())).await
 }
 
 async fn rank(state: &AppState, q: &SearchQuery) -> Result<Option<db::LookRank>> {
+    // A word imitating a sound: the sounds shaped like it.
+    if let Some(word) = q.imitation.as_deref().filter(|w| !w.trim().is_empty()) {
+        let scores = crate::imitation::rank(state, word).await?;
+        return Ok(Some(db::LookRank { scores, exclude: None, blend: false, by_file: true }));
+    }
     let similar = q.similar.clone().filter(|s| !s.is_empty());
     let color = q.color.as_deref().filter(|c| !c.is_empty()).map(parse_hex);
     if similar.is_none() && color.is_none() {

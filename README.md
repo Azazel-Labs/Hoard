@@ -910,6 +910,14 @@ sustained sound, with how fast it starts and how long its tail rings), its tone 
 whether its pitch rises or falls and by how many octaves, and whether it loops cleanly. These are kept in the sound's
 metadata in the API and become the tags above, so `pitch:falling tone:tonal` finds falling zaps.
 
+**Sounds like**, in the sidebar, finds sounds by the noise they make, written the way you'd spell it: `WHOOOM`, `pew`,
+`krssh`. The word is read as the shape of a sound. A start like b, p, k or t is a sharp attack, and wh or h a soft one.
+Drawn-out letters make it longer. "oo" and "u" are low and dark, "ee" and "i" high and bright, and vowels that move
+from one to the other make the pitch rise or fall. s, sh and f are hiss. An m or n at the end rings on, and a k, t or p
+cuts it off. Capitals are loud. Sounds whose measurements fit that shape best come first, so `pew` finds falling
+lasers and `shhhhhh` long hiss. It's a reading of English spelling, not a model, and works with a pack, a folder or
+other filters set. In the API it's `imitation=<word>`.
+
 ### Image search
 
 Settings → Image search adds a model that does know what pictures show (OpenAI's CLIP, ViT-B/32). It's off until an
@@ -1223,7 +1231,7 @@ browser session's changes must also carry an `X-Hoard` header, which pages on ot
 
 | Method | Path | |
 |---|---|---|
-| GET | `/api/assets` | search: `q`, `kind`, `tags=a,b`, `pack`, `collection`, `ext`, `similar=<asset id>`, `color=<hex>`, `favorites=true` (whoever's asking), `project` (name or id), `sort`, `limit`, `offset`, `hide_supporting`; results plus kind/tag facets |
+| GET | `/api/assets` | search: `q`, `kind`, `tags=a,b`, `pack`, `collection`, `ext`, `similar=<asset id>`, `color=<hex>`, `imitation=<word>` (sounds shaped like it), `favorites=true` (whoever's asking), `project` (name or id), `sort`, `limit`, `offset`, `hide_supporting`; results plus kind/tag facets |
 | GET | `/api/assets/{id}` | one asset, with tags, metadata and dependencies |
 | PATCH 🔒 | `/api/assets/{id}` | rename, recategorize, describe, tag; `apply_to_family` for a whole variant family |
 | GET | `/api/assets/{id}/file` | the file (`?download=1` to save it) |

@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "2235081ab15c646057416458fa3f3b8e357859d17ba776ecef2a615dd3b3e7ec"
+source = "fd9a2306054c0253c201e64e5553d1e3bc549d09d74d0c1692e8c3ff495b3630"
 translation = "973d5a6f0a6763be6bbc6bb0a4a118df31a18ed5e5823c6c023d2d871324479b"
 
 [messages.account-add]
@@ -945,6 +945,18 @@ translation = "Назад до бібліотеки"
 source = "Hoard { $version } — back to the library"
 translation = "Hoard { $version } — назад до бібліотеки"
 
+[messages.app-imitation]
+source = "Sounds like"
+translation = "Звучить як"
+
+[messages.app-imitation-placeholder]
+source = "whooom, pew, krssh"
+translation = "whooom, pew, krssh"
+
+[messages.app-imitation-title]
+source = "Write the noise a sound makes the way you'd spell it: sounds shaped like it come first"
+translation = "Напишіть звук так, як вимовили б його по літерах: схожі звуки будуть першими"
+
 [messages.app-import-folder]
 source = "Import folder"
 translation = "Імпортувати теку"
@@ -992,6 +1004,10 @@ translation = "Нічого не знайдено."
 [messages.app-none-filters]
 source = "Nothing matches with these filters."
 translation = "З цими фільтрами нічого не знайдено."
+
+[messages.app-none-imitation]
+source = "No measured sound is shaped much like “{ $word }” yet."
+translation = "Жоден виміряний звук поки не схожий на «{ $word }»."
 
 [messages.app-none-query]
 source = "Nothing matches “{ $query }”."
@@ -1156,6 +1172,10 @@ translation = "Найбільш схожі"
 [messages.app-rank-color]
 source = "Most of the color"
 translation = "Найбільше цього кольору"
+
+[messages.app-rank-imitation]
+source = "Sounds most like it"
+translation = "Найбільш схожі"
 
 [messages.app-rank-match]
 source = "Best match"

@@ -979,6 +979,8 @@ export interface SearchParams {
   similar?: string
   /** `#rrggbb`: assets with much of this color. */
   color?: string
+  /** A word imitating a sound (`whooom`): sounds shaped like it, most alike first. */
+  imitation?: string
   /** Only the favorites of whoever's signed in. */
   favorites?: boolean
 }
@@ -1129,6 +1131,7 @@ export const api = {
     if (p.archived) qs.set('archived', 'true')
     if (p.similar) qs.set('similar', p.similar)
     if (p.color) qs.set('color', p.color)
+    if (p.imitation) qs.set('imitation', p.imitation)
     if (p.favorites) qs.set('favorites', 'true')
     return request<SearchResult>(`/api/assets?${qs}`).then((r) => ({ ...r, items: r.items.map(normalize) }))
   },

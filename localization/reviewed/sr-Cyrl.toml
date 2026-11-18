@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "2235081ab15c646057416458fa3f3b8e357859d17ba776ecef2a615dd3b3e7ec"
+source = "fd9a2306054c0253c201e64e5553d1e3bc549d09d74d0c1692e8c3ff495b3630"
 translation = "c2a4a8051502263df10866a7bb372ad5cdada115fb8d6449130cdd2d1752dd61"
 
 [messages.account-add]
@@ -914,6 +914,18 @@ translation = "Назад у библиотеку"
 source = "Hoard { $version } — back to the library"
 translation = "Hoard { $version } — назад у библиотеку"
 
+[messages.app-imitation]
+source = "Sounds like"
+translation = "Звучи као"
+
+[messages.app-imitation-placeholder]
+source = "whooom, pew, krssh"
+translation = "whooom, pew, krssh"
+
+[messages.app-imitation-title]
+source = "Write the noise a sound makes the way you'd spell it: sounds shaped like it come first"
+translation = "Напишите звук онако како бисте га спеловали: први долазе звуци који му личе"
+
 [messages.app-import-folder]
 source = "Import folder"
 translation = "Увези фасциклу"
@@ -961,6 +973,10 @@ translation = "Ништа се не подудара."
 [messages.app-none-filters]
 source = "Nothing matches with these filters."
 translation = "Ништа се не подудара с овим филтерима."
+
+[messages.app-none-imitation]
+source = "No measured sound is shaped much like “{ $word }” yet."
+translation = "Још ниједан измерени звук не звучи много као „{ $word }“."
 
 [messages.app-none-query]
 source = "Nothing matches “{ $query }”."
@@ -1125,6 +1141,10 @@ translation = "Најсличније"
 [messages.app-rank-color]
 source = "Most of the color"
 translation = "Највише те боје"
+
+[messages.app-rank-imitation]
+source = "Sounds most like it"
+translation = "Најсличнији"
 
 [messages.app-rank-match]
 source = "Best match"

@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "2235081ab15c646057416458fa3f3b8e357859d17ba776ecef2a615dd3b3e7ec"
+source = "fd9a2306054c0253c201e64e5553d1e3bc549d09d74d0c1692e8c3ff495b3630"
 translation = "42d6d2350a51c56e55a07a75988a6748d9e232912ffffb903defbf54bfd56e2e"
 
 [messages.account-add]
@@ -887,6 +887,18 @@ translation = "Quay lại thư viện"
 source = "Hoard { $version } — back to the library"
 translation = "Hoard { $version } — quay lại thư viện"
 
+[messages.app-imitation]
+source = "Sounds like"
+translation = "Nghe như"
+
+[messages.app-imitation-placeholder]
+source = "whooom, pew, krssh"
+translation = "whooom, pew, krssh"
+
+[messages.app-imitation-title]
+source = "Write the noise a sound makes the way you'd spell it: sounds shaped like it come first"
+translation = "Viết tiếng động theo cách bạn đánh vần: âm thanh giống vậy sẽ hiện trước"
+
 [messages.app-import-folder]
 source = "Import folder"
 translation = "Nhập thư mục"
@@ -934,6 +946,10 @@ translation = "Không có kết quả phù hợp."
 [messages.app-none-filters]
 source = "Nothing matches with these filters."
 translation = "Không có kết quả phù hợp với các bộ lọc này."
+
+[messages.app-none-imitation]
+source = "No measured sound is shaped much like “{ $word }” yet."
+translation = "Chưa có âm thanh nào đã đo nghe giống “{ $word }”."
 
 [messages.app-none-query]
 source = "Nothing matches “{ $query }”."
@@ -1098,6 +1114,10 @@ translation = "Giống nhất"
 [messages.app-rank-color]
 source = "Most of the color"
 translation = "Nhiều màu đó nhất"
+
+[messages.app-rank-imitation]
+source = "Sounds most like it"
+translation = "Giống nhất"
 
 [messages.app-rank-match]
 source = "Best match"

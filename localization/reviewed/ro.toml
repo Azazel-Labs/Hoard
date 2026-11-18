@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "2235081ab15c646057416458fa3f3b8e357859d17ba776ecef2a615dd3b3e7ec"
+source = "fd9a2306054c0253c201e64e5553d1e3bc549d09d74d0c1692e8c3ff495b3630"
 translation = "4153ba96d36b94b3768217f18b9520b9cc368f6074756e2f4f8bad12b6fcaaa8"
 
 [messages.account-add]
@@ -939,6 +939,18 @@ translation = "Înapoi la bibliotecă"
 source = "Hoard { $version } — back to the library"
 translation = "Hoard { $version } — înapoi la bibliotecă"
 
+[messages.app-imitation]
+source = "Sounds like"
+translation = "Sună ca"
+
+[messages.app-imitation-placeholder]
+source = "whooom, pew, krssh"
+translation = "whooom, pew, krssh"
+
+[messages.app-imitation-title]
+source = "Write the noise a sound makes the way you'd spell it: sounds shaped like it come first"
+translation = "Scrie zgomotul pe care îl face un sunet așa cum l-ai silabisi: sunetele asemănătoare apar primele"
+
 [messages.app-import-folder]
 source = "Import folder"
 translation = "Importați un dosar"
@@ -986,6 +998,10 @@ translation = "Nicio potrivire."
 [messages.app-none-filters]
 source = "Nothing matches with these filters."
 translation = "Nimic nu se potrivește cu aceste filtre."
+
+[messages.app-none-imitation]
+source = "No measured sound is shaped much like “{ $word }” yet."
+translation = "Niciun sunet măsurat nu sună încă prea mult ca „{ $word }”."
 
 [messages.app-none-query]
 source = "Nothing matches “{ $query }”."
@@ -1150,6 +1166,10 @@ translation = "Cele mai asemănătoare"
 [messages.app-rank-color]
 source = "Most of the color"
 translation = "Cel mai mult din culoare"
+
+[messages.app-rank-imitation]
+source = "Sounds most like it"
+translation = "Cele mai asemănătoare"
 
 [messages.app-rank-match]
 source = "Best match"

@@ -71,6 +71,8 @@ const filters = reactive({
   similar: null as Named | null,
   /** Assets with much of this color (hex), most of it first. */
   color: '',
+  /** Sounds shaped like this word imitating them (`whooom`), most alike first. */
+  imitation: '',
 })
 /** Colors to search by in one click; the picker beside them does any other. */
 const COLOR_PRESETS: { hex: string; name: () => string }[] = [
@@ -148,6 +150,7 @@ function searchPage(page: number) {
       sort: filters.sort || undefined,
       similar: filters.similar?.id,
       color: filters.color || undefined,
+      imitation: filters.imitation || undefined,
       favorites: filters.favorites || undefined,
       project: filters.project || undefined,
       limit: PAGE,
@@ -248,7 +251,7 @@ watch(() => filters.q, () => {
 })
 watch(() => [
   filters.kind, filters.tags.join(','), filters.pack?.id, filters.folder, filters.collection?.id, filters.sort, filters.similar?.id,
-  filters.color, filters.favorites, filters.project, prefs.showSupporting,
+  filters.color, filters.imitation, filters.favorites, filters.project, prefs.showSupporting,
 ], () => {
   checked.value = []
   runSearch()
@@ -298,7 +301,7 @@ function setView(v: View) {
 function browsePack(p: Named) {
   Object.assign(filters, {
     pack: { id: p.id, name: p.name }, folder: prefs.packFolders ? '' : null, collection: null, favorites: false, project: '',
-    kind: '', tags: [], q: '', similar: null, color: '',
+    kind: '', tags: [], q: '', similar: null, color: '', imitation: '',
   })
   setView('library')
 }
@@ -306,7 +309,7 @@ function browsePack(p: Named) {
 function openFolder(pack: Named, folder: string) {
   Object.assign(filters, {
     pack: { id: pack.id, name: pack.name }, folder, collection: null, favorites: false, project: '', kind: '', tags: [], q: '',
-    similar: null, color: '',
+    similar: null, color: '', imitation: '',
   })
   prefs.packFolders = true
   setView('library')
@@ -332,7 +335,7 @@ function intoFolder(name: string) {
 function browseCollection(c: Collection | Named) {
   const same = filters.collection?.id === c.id
   Object.assign(filters, {
-    collection: same ? null : { id: c.id, name: c.name }, pack: null, kind: '', tags: [], q: '', similar: null, color: '',
+    collection: same ? null : { id: c.id, name: c.name }, pack: null, kind: '', tags: [], q: '', similar: null, color: '', imitation: '',
     favorites: false, project: '',
   })
   setView('library')
@@ -340,7 +343,7 @@ function browseCollection(c: Collection | Named) {
 }
 function browseProject(name: string) {
   const same = filters.project === name
-  Object.assign(filters, { project: same ? '' : name, favorites: false, collection: null, pack: null, kind: '', tags: [], q: '', similar: null, color: '' })
+  Object.assign(filters, { project: same ? '' : name, favorites: false, collection: null, pack: null, kind: '', tags: [], q: '', similar: null, color: '', imitation: '' })
   setView('library')
   showFilters.value = false
 }
@@ -361,7 +364,7 @@ async function forgetProject(p: Project) {
 }
 function browseFavorites() {
   const same = filters.favorites
-  Object.assign(filters, { favorites: !same, project: '', collection: null, pack: null, kind: '', tags: [], q: '', similar: null, color: '' })
+  Object.assign(filters, { favorites: !same, project: '', collection: null, pack: null, kind: '', tags: [], q: '', similar: null, color: '', imitation: '' })
   setView('library')
   showFilters.value = false
 }
@@ -385,7 +388,7 @@ async function startNaming() {
   saveName.value = [
     filters.q.trim(), filters.kind, ...filters.tags, filters.pack?.name, filters.collection?.name,
     filters.similar && t('app-save-name-like', { name: filters.similar.name }), filters.color,
-    filters.favorites && t('app-save-name-favorites'), filters.project,
+    filters.imitation, filters.favorites && t('app-save-name-favorites'), filters.project,
   ].filter(Boolean).join(' · ').slice(0, 80)
   naming.value = true
   await nextTick()
@@ -540,15 +543,15 @@ function goHome() {
   mainEl.value?.scrollTo({ top: 0, behavior: 'smooth' })
 }
 function clearFilters() {
-  Object.assign(filters, { q: '', kind: '', tags: [], pack: null, folder: null, collection: null, favorites: false, project: '', similar: null, color: '' })
+  Object.assign(filters, { q: '', kind: '', tags: [], pack: null, folder: null, collection: null, favorites: false, project: '', similar: null, color: '', imitation: '' })
 }
 const hasFilters = computed(
-  () => !!(filters.q || filters.kind || filters.tags.length || filters.pack || filters.collection || filters.similar || filters.color || filters.favorites || filters.project),
+  () => !!(filters.q || filters.kind || filters.tags.length || filters.pack || filters.collection || filters.similar || filters.color || filters.imitation || filters.favorites || filters.project),
 )
 /** "More like this": everything that looks like an asset, across every pack, most alike first. */
 function findSimilar(a: Asset) {
   Object.assign(filters, {
-    similar: { id: a.id, name: a.name }, color: '', q: '', kind: '', tags: [], pack: null, collection: null, favorites: false, project: '', sort: '',
+    similar: { id: a.id, name: a.name }, color: '', imitation: '', q: '', kind: '', tags: [], pack: null, collection: null, favorites: false, project: '', sort: '',
   })
   setView('library')
   mainEl.value?.scrollTo({ top: 0 })
@@ -562,9 +565,18 @@ function findColor(hex: string) {
 /** A color from the sidebar: added to the filters already set, or taken off when it's the one set. */
 function pickColor(hex: string) {
   filters.color = filters.color === hex ? '' : hex
+  if (filters.color) filters.imitation = ''
+}
+/** What's typed in the sidebar's "Sounds like" box, set as the filter when it's sent. */
+const imitationDraft = ref('')
+watch(() => filters.imitation, (w) => (imitationDraft.value = w), { immediate: true })
+/** A word imitating a sound ("whooom"): the sounds shaped like it, most alike first. */
+function imitate() {
+  const word = imitationDraft.value.trim()
+  Object.assign(filters, word ? { imitation: word, similar: null, color: '', sort: '' } : { imitation: '' })
 }
 const rankLabel = computed(() =>
-  filters.similar ? t('app-rank-alike') : filters.color ? t('app-rank-color') : filters.q ? t('app-rank-match') : t('app-sort-newest'),
+  filters.imitation ? t('app-rank-imitation') : filters.similar ? t('app-rank-alike') : filters.color ? t('app-rank-color') : filters.q ? t('app-rank-match') : t('app-sort-newest'),
 )
 
 // ------------------------------------------------------------------ collections
@@ -1083,6 +1095,7 @@ function readUrl(search = location.search) {
   filters.similar = like ? { id: like, name: u.get('similar_name') ?? t('app-unnamed-asset') } : null
   const color = u.get('color') ?? ''
   filters.color = /^#[0-9a-f]{6}$/i.test(color) ? color.toLowerCase() : ''
+  filters.imitation = u.get('imitation') ?? ''
   filters.favorites = u.get('fav') === '1'
   filters.project = u.get('project') ?? ''
 }
@@ -1094,7 +1107,7 @@ function urlState() {
     asset: selected.value?.id ?? '',
     place: [
       filters.kind, filters.tags.join(','), filters.sort, filters.pack?.id, filters.folder, filters.collection?.id,
-      filters.similar?.id, filters.color, filters.favorites, filters.project,
+      filters.similar?.id, filters.color, filters.imitation, filters.favorites, filters.project,
     ].join('|'),
   }
 }
@@ -1122,6 +1135,7 @@ function filterQuery(): string {
     u.set('similar_name', filters.similar.name)
   }
   if (filters.color) u.set('color', filters.color)
+  if (filters.imitation) u.set('imitation', filters.imitation)
   if (filters.favorites) u.set('fav', '1')
   if (filters.project) u.set('project', filters.project)
   return u.toString()
@@ -1162,6 +1176,7 @@ watch(
     () => filters.collection?.id,
     () => filters.similar?.id,
     () => filters.color,
+    () => filters.imitation,
     () => filters.favorites,
     () => filters.project,
   ],
@@ -1250,6 +1265,7 @@ const firstLoad = computed(() => loading.value && !items.value.length)
 const noneText = computed(() => {
   const query = filters.q.trim()
   const narrowed = hasFilters.value && !!(filters.tags.length || filters.kind || filters.pack)
+  if (filters.imitation) return t('app-none-imitation', { word: filters.imitation })
   if (filters.q) return narrowed ? t('app-none-query-filters', { query }) : t('app-none-query', { query })
   return narrowed ? t('app-none-filters') : t('app-none')
 })
@@ -1562,6 +1578,23 @@ const commands = computed<Command[]>(() => {
             </label>
           </div>
         </section>
+        <section class="imitate">
+          <h3><label for="imitation">{{ t('app-imitation') }}</label></h3>
+          <form role="search" @submit.prevent="imitate">
+            <input
+              id="imitation"
+              v-model="imitationDraft"
+              class="field"
+              type="search"
+              maxlength="40"
+              autocomplete="off"
+              spellcheck="false"
+              :placeholder="t('app-imitation-placeholder')"
+              :title="t('app-imitation-title')"
+              @search="imitate"
+            />
+          </form>
+        </section>
         <p v-if="!kindFacets.length && !loading" class="side-empty">{{ t('app-no-filters') }}</p>
         <section v-if="kindFacets.length">
           <h3>{{ t('app-kind') }}</h3>
@@ -1638,6 +1671,7 @@ const commands = computed<Command[]>(() => {
             <TagChip v-if="filters.project" :tag="`project:${filters.project}`" removable @remove="filters.project = ''" />
             <TagChip v-if="filters.similar" :tag="`like:${filters.similar.name}`" removable @remove="filters.similar = null" />
             <TagChip v-if="filters.color" :tag="`color:${filters.color}`" :swatch="filters.color" removable @remove="filters.color = ''" />
+            <TagChip v-if="filters.imitation" :tag="`sounds-like:${filters.imitation}`" removable @remove="filters.imitation = ''" />
             <TagChip v-if="filters.kind" :tag="`kind:${filters.kind}`" removable @remove="filters.kind = ''" />
             <TagChip v-for="t in filters.tags" :key="t" :tag="t" removable @remove="toggleTag(t)" />
             <button v-if="hasFilters" type="button" class="linkbtn" @click="clearFilters">{{ t('app-clear-all') }}</button>
@@ -1675,7 +1709,7 @@ const commands = computed<Command[]>(() => {
             <span class="visually-hidden">{{ t('app-sort') }}</span>
             <select v-model="filters.sort" class="field">
               <option value="">{{ rankLabel }}</option>
-              <option v-if="filters.similar || filters.color" value="new">{{ t('app-sort-newest') }}</option>
+              <option v-if="filters.similar || filters.color || filters.imitation" value="new">{{ t('app-sort-newest') }}</option>
               <option value="name">{{ t('app-sort-name') }}</option>
               <option value="size">{{ t('app-sort-largest') }}</option>
               <option value="old">{{ t('app-sort-oldest') }}</option>
@@ -2025,7 +2059,8 @@ const commands = computed<Command[]>(() => {
 .cname { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .side section + section { margin-top: 1rem; }
 .side h3 { margin: 0 0 0.4rem; font-size: 0.75rem; font-weight: 650; color: var(--faint); }
-.colors + .side-empty { margin-top: 1rem; }
+.imitate + .side-empty { margin-top: 1rem; }
+.imitate .field { width: 100%; }
 .swatches { display: grid; grid-template-columns: repeat(auto-fill, minmax(1.45rem, 1fr)); gap: 0.3rem; }
 .sw {
   position: relative; aspect-ratio: 1; border: 0; padding: 0; border-radius: 50%; cursor: pointer;

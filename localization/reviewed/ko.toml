@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "2235081ab15c646057416458fa3f3b8e357859d17ba776ecef2a615dd3b3e7ec"
+source = "fd9a2306054c0253c201e64e5553d1e3bc549d09d74d0c1692e8c3ff495b3630"
 translation = "cb51eeebee58ce4e694b9c22ec1e26a19090d24e80d9b74b0e431ca3fa274b7f"
 
 [messages.account-add]
@@ -884,6 +884,18 @@ translation = "라이브러리로 돌아가기"
 source = "Hoard { $version } — back to the library"
 translation = "Hoard { $version } — 라이브러리로 돌아가기"
 
+[messages.app-imitation]
+source = "Sounds like"
+translation = "이런 소리"
+
+[messages.app-imitation-placeholder]
+source = "whooom, pew, krssh"
+translation = "whooom, pew, krssh"
+
+[messages.app-imitation-title]
+source = "Write the noise a sound makes the way you'd spell it: sounds shaped like it come first"
+translation = "소리를 철자로 적듯이 입력하세요 (예: whooom). 모양이 비슷한 소리가 먼저 나옵니다"
+
 [messages.app-import-folder]
 source = "Import folder"
 translation = "폴더 가져오기"
@@ -931,6 +943,10 @@ translation = "일치하는 항목이 없습니다."
 [messages.app-none-filters]
 source = "Nothing matches with these filters."
 translation = "이 필터와 일치하는 항목이 없습니다."
+
+[messages.app-none-imitation]
+source = "No measured sound is shaped much like “{ $word }” yet."
+translation = "아직 “{ $word }”와(과) 비슷한 측정된 소리가 없습니다."
 
 [messages.app-none-query]
 source = "Nothing matches “{ $query }”."
@@ -1095,6 +1111,10 @@ translation = "가장 비슷한 순"
 [messages.app-rank-color]
 source = "Most of the color"
 translation = "색상이 많은 순"
+
+[messages.app-rank-imitation]
+source = "Sounds most like it"
+translation = "소리가 비슷한 순"
 
 [messages.app-rank-match]
 source = "Best match"

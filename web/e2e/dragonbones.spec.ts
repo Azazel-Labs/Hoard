@@ -109,7 +109,7 @@ test('a DragonBones skeleton plays on its atlas in the details panel and gets a 
     // Opened, it plays; and the browser draws its thumbnail, which the server can't.
     await openPack(page, pack.id, name)
     await tile(page, 'Hero ske').click()
-    const player = page.locator('.dragonbones')
+    const player = page.locator('.skeleton2d')
     await expect(player.locator('canvas')).toBeVisible()
     await expect(player.getByTestId('frame-count')).toHaveText(/^\d+ \/ 24$/)
     await expect(player.getByRole('combobox')).toHaveValue('hero\u0000turn')

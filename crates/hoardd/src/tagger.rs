@@ -949,9 +949,9 @@ pub(crate) fn meta_tags(
         }
         AssetKind::Texture => texture_tags(ext, meta, tags),
         AssetKind::Vector => vector_tags(meta, tags),
-        // A DragonBones skeleton: a rigged 2D character.
-        AssetKind::Animation if meta.contains_key("dragonbones") => {
-            tags.add("dragonbones", TagSource::Meta, 1.0);
+        // A DragonBones or Spine skeleton: a rigged 2D character.
+        AssetKind::Animation if meta.contains_key("dragonbones") || meta.contains_key("spine") => {
+            tags.add(if meta.contains_key("spine") { "spine" } else { "dragonbones" }, TagSource::Meta, 1.0);
             tags.add("rigged", TagSource::Meta, 0.9);
             tags.add("2d", TagSource::Meta, 0.9);
         }

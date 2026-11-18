@@ -353,6 +353,11 @@ software rasterizer (`apt install mesa-vulkan-drivers`). Without any adapter, ev
      rate and size. Each is linked to its atlas (`_tex.json` and its image), so they're downloaded together, and plays
      in its details on that atlas, meshes, IK and the armatures nested in it included: any armature's animation is
      picked from a list, and paused it steps frame by frame. The browser draws its thumbnail.
+   - Spine skeletons (`.json`, from Spine 3.8 on) are animations too, with their Spine version, bones, slots, skins,
+     meshes, animations, frame rate and size. Each is linked to its libGDX atlas (`hero.atlas`, or the one atlas in its
+     folder), so they're downloaded together, and plays in its details on that atlas with Hoard's own player, written
+     from Spine's published format: meshes, weights, IK and transform constraints, clipping, deform keys, draw order
+     and blend modes included, each skin picked from the list with its animations. The browser draws its thumbnail.
    - Sprite sheets (Starling/Sparrow XML, TexturePacker JSON including multipack, libGDX `.atlas`, Cocos2d `.plist`,
      DragonBones texture atlases (`_tex.json`),
      Godot `.tres` `SpriteFrames` and `TileSet` resources, and Tiled tilesets, `.tsx` or JSON, their empty tiles left
@@ -608,7 +613,7 @@ signed in and open a model, once it's shown with its textures, the viewer's pict
 server's) becomes the asset's thumbnail. A picture with every texture is never replaced by one with some missing,
 and neither is replaced by the server's, including when the pack is re-analyzed. For a whole pack, More → Make
 thumbnails in this browser opens each model out of sight, one at a time, with progress and Cancel. Lottie
-animations, Rive files and DragonBones skeletons, which the server doesn't draw, get their thumbnails the same way.
+animations, Rive files and DragonBones and Spine skeletons, which the server doesn't draw, get their thumbnails the same way.
 
 **Big textures.** The image viewer opens a big texture as its light preview and shows both sizes (pixels and bytes).
 Zooming in past the preview's pixels, Full resolution or F loads the file itself. The 3D viewers load light previews
@@ -1487,7 +1492,7 @@ What's planned next is in [docs/roadmap.md](docs/roadmap.md).
 | | |
 |---|---|
 | File types recognized | 158 extensions in 13 kinds, from PNG and WAV to `.uasset` and `.skp` |
-| Read natively, no other app | glTF/GLB, FBX (binary and ASCII), OBJ, STL, PLY, 3DS, MagicaVoxel, 3MF, USD/USDA/USDC/USDZ, SketchUp 3 to today, Unreal packages from UE 4.x to 5.7, PSD/PSB, Krita, OpenRaster, Aseprite, DDS, KTX, KTX2, PowerVR, VTF, Basis, ICO, QOI, PNM, PCX, EXR, HDR, SVG, Illustrator, Lottie, Rive, DragonBones, TTF/OTF/WOFF2, WAV/BWF/RF64, OGG, Opus, FLAC, MP3, AIFF, MIDI, MOD/XM/S3M/IT/MPTM/UMX, NSF, VGM, FMOD banks (FSB, .bank), Wwise WEM and BNK, SFZ, SF2 |
+| Read natively, no other app | glTF/GLB, FBX (binary and ASCII), OBJ, STL, PLY, 3DS, MagicaVoxel, 3MF, USD/USDA/USDC/USDZ, SketchUp 3 to today, Unreal packages from UE 4.x to 5.7, PSD/PSB, Krita, OpenRaster, Aseprite, DDS, KTX, KTX2, PowerVR, VTF, Basis, ICO, QOI, PNM, PCX, EXR, HDR, SVG, Illustrator, Lottie, Rive, DragonBones, Spine (JSON), TTF/OTF/WOFF2, WAV/BWF/RF64, OGG, Opus, FLAC, MP3, AIFF, MIDI, MOD/XM/S3M/IT/MPTM/UMX, NSF, VGM, FMOD banks (FSB, .bank), Wwise WEM and BNK, SFZ, SF2 |
 | Archives unpacked | zip, tar, tar.gz and `.unitypackage`, nested up to 3 deep |
 | Download as | 6 image formats, 5 audio formats, GLB or glTF for models, TTF, WOFF or WOFF2 for fonts, 10 sprite sheet formats |
 | Engine plugins | Godot 4, Unity 2021.3+, Unreal Engine 5 |

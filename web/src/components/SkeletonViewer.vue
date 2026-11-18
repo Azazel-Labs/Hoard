@@ -1,10 +1,10 @@
 <script setup lang="ts">
-// Plays a DragonBones skeleton in the side panel: any of its armatures and animations, frame by frame when paused. For a
+// Plays a DragonBones or Spine skeleton in the side panel: any of its armatures (or skins) and animations, frame by frame when paused. For a
 // signed-in account, once it's up, a pose of it becomes the asset's thumbnail when the asset has none from a browser yet.
 import { computed, onBeforeUnmount, ref, watch } from 'vue'
 import type { Asset, ThumbUpload } from '../api'
 import { wantsBrowserThumb } from '../browserThumbs'
-import { choices, dragonBonesData, drawDragonBonesThumb, mountDragonBones, type Player, type Skeleton } from '../dragonbones'
+import { choices, drawSkeletonThumb, mountSkeleton, skeletonOf, type Player, type Skeleton } from '../skeleton2d'
 import { t } from '../i18n'
 
 const props = defineProps<{ asset: Asset }>()
@@ -33,9 +33,9 @@ async function load() {
   options.value = []
   const a = props.asset
   try {
-    const skeleton = await dragonBonesData(a)
+    const skeleton = await skeletonOf(a)
     if (my !== gen || !canvas.value) return
-    player = mountDragonBones(canvas.value, skeleton, playing.value)
+    player = mountSkeleton(canvas.value, skeleton, playing.value)
     player.onFrame = (f) => (frame.value = f)
     options.value = choices(skeleton)
     const first = skeleton.armatures[0]
@@ -50,7 +50,7 @@ async function load() {
 
 async function offerThumb(a: Asset, skeleton: Skeleton, my: number) {
   try {
-    const r = await drawDragonBonesThumb(a, skeleton)
+    const r = await drawSkeletonThumb(a, skeleton)
     if (r?.replaced && my === gen) emit('thumb', r)
   } catch {
     // The asset keeps the thumbnail it has; nothing the person asked for failed.
@@ -88,7 +88,7 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <div class="dragonbones">
+  <div class="skeleton2d">
     <div class="stage checker">
       <canvas ref="canvas" class="canvas" role="img" :aria-label="t('sprite-frame-aria', { name: asset.name, frame: frame + 1, count: total || 1 })" />
       <p v-if="status === 'loading'" class="note">{{ t('sprite-loading') }}</p>
@@ -121,7 +121,7 @@ onBeforeUnmount(() => {
 </template>
 
 <style scoped>
-.dragonbones { display: grid; gap: 0.5rem; }
+.skeleton2d { display: grid; gap: 0.5rem; }
 .stage {
   position: relative; display: grid; place-items: center; aspect-ratio: 4 / 3;
   border-radius: var(--r-tile); border: 1px solid var(--line); overflow: hidden;

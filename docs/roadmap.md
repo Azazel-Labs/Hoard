@@ -74,8 +74,10 @@ tile sheets that come with only a note of their grid (Kenney's `Tilesheet.txt`).
 - [x] **Lottie / Bodymovin** (`.json`, `.lottie`): vector animations, common for UI. Played in the details panel
   with lottie-web, the thumbnail drawn by the browser as the 3D viewer's is.
 - [x] **Rive** (`.riv`), played with its free web runtime, served with the app; the thumbnail drawn by the browser.
-- [ ] **Spine skeletons** (`.json`, `.skel`): the atlas is read already. Playing the rig needs Spine's runtime, whose
-  license only covers people who hold a Spine license, which is the open question.
+- [x] **Spine skeletons** (`.json`, 3.8 on) played on their atlas by Hoard's own player, written from Spine's
+  published format rather than Spine's runtime (whose license covers only Spine licensees): meshes, IK, transform
+  constraints, clipping and skins included, the thumbnail drawn by the browser.
+- [ ] **Spine binary skeletons** (`.skel`): the same rig in Spine's binary export, read into the same player.
 - [ ] Rarer: Spriter `.scml`, Live2D `.moc3`, GameMaker `.yy`, Defold atlases.
 
 ## Images: more formats

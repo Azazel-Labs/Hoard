@@ -7,6 +7,7 @@
 //! - .blend: external image paths and linked libraries (other .blend files)
 //! - SFZ: the samples it plays
 //! - DragonBones skeletons: their atlas (`hero_ske.json` → `hero_tex.json`, `hero_tex.png`)
+//! - Spine skeletons: their atlas (`spineboy-pro.json` → `spineboy.atlas`, or the only atlas in the folder)
 //! - animations: clips and the characters they fit, by skeleton or `Model@Clip.fbx` name (see [`crate::animations`])
 //! - guesses: textures whose name starts with the model's name, for models that reference nothing, from the model's
 //!   own part of the pack (its folder's parent and below: `Models/` and `Textures/` side by side)
@@ -161,7 +162,20 @@ fn json_refs(local: &Path) -> Option<Vec<Ref>> {
         out.push(Ref { target: sheet, rel: LinkRel::Library });
         out.push(Ref { target: image, rel: LinkRel::Texture });
     }
+    // Nor does a Spine one: its atlas is named after it, or is the only one in its folder.
+    if doc.get("skeleton").is_some_and(Value::is_object) && doc.get("bones").is_some_and(Value::is_array) {
+        out.extend(crate::spine::atlas_files(name).into_iter().map(|target| Ref { target, rel: LinkRel::Library }));
+        out.push(Ref { target: FOLDER_ATLAS.into(), rel: LinkRel::Library });
+    }
     Some(out)
+}
+
+/// A Spine skeleton's last resort: the only atlas in its folder, when none is named after it.
+const FOLDER_ATLAS: &str = "folder-atlas:";
+
+fn is_atlas(path: &str) -> bool {
+    let lower = path.to_lowercase();
+    Path::new(lower.strip_suffix(".txt").unwrap_or(&lower)).extension().is_some_and(|e| e == "atlas")
 }
 
 /// GUID references in a text-serialized Unity file (`{fileID: 2800000, guid: 0123…, type: 3}`). Resolved through
@@ -511,6 +525,8 @@ pub(crate) fn link_pack(conn: &Connection, pack_id: &str, refs: &HashMap<String,
     let by_id: HashMap<&str, usize> = assets.iter().enumerate().map(|(i, a)| (a.id.as_str(), i)).collect();
     for (id, list) in refs {
         let Some(&from) = by_id.get(id.as_str()) else { continue };
+        // Resolved last, once whatever the asset names has been.
+        let (fallbacks, list): (Vec<&Ref>, Vec<&Ref>) = list.iter().partition(|r| r.target == FOLDER_ATLAS);
         for r in list {
             if let Some(guid) = r.target.strip_prefix("unity-guid:") {
                 if let Some(&to) = unity.get(guid)
@@ -532,6 +548,15 @@ pub(crate) fn link_pack(conn: &Connection, pack_id: &str, refs: &HashMap<String,
                 && to != from
             {
                 links.insert((from, to, r.rel));
+            }
+        }
+        if !fallbacks.is_empty() && !links.iter().any(|&(f, t, _)| f == from && is_atlas(&assets[t].path)) {
+            let folder = |p: &str| p.rfind('/').map_or("", |i| &p[..i]).to_owned();
+            let here = folder(&assets[from].path);
+            let mut atlases =
+                (0..assets.len()).filter(|&i| is_atlas(&assets[i].path) && folder(&assets[i].path) == here);
+            if let (Some(to), None) = (atlases.next(), atlases.next()) {
+                links.insert((from, to, LinkRel::Library));
             }
         }
     }
@@ -606,6 +631,15 @@ mod tests {
         assert_eq!(atlas_refs(atlas)[0].target, "hero.png");
         let tres = r#"[ext_resource type="Texture2D" uid="uid://abc" path="res://art/rock.png" id="1"]"#;
         assert_eq!(attr_refs(tres, "path=")[0].target, "res://art/rock.png");
+    }
+
+    #[test]
+    fn a_spine_skeleton_names_its_atlas() {
+        let dir = tempfile::tempdir().unwrap();
+        let json = dir.path().join("hero-pro.json");
+        std::fs::write(&json, crate::spine::tests::skeleton().to_string()).unwrap();
+        let refs: Vec<String> = extract_refs(&json, "json").into_iter().map(|r| r.target).collect();
+        assert_eq!(refs, [FOLDER_ATLAS, "hero-pro.atlas", "hero-pro.atlas.txt", "hero.atlas", "hero.atlas.txt"]);
     }
 
     #[test]

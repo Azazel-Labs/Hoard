@@ -88,6 +88,7 @@ mod signature_only;
 mod signin;
 mod sounds;
 mod sources;
+mod spine;
 mod spritesheet;
 mod store_formats;
 mod store_lookup;

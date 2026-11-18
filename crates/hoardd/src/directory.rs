@@ -1,5 +1,5 @@
 //! Signing in against LDAP or Active Directory (the `ldap` feature): finding someone's entry, checking their password
-//! by binding as them, and reading their groups. What's asked for and when is in `signin.rs`.
+//! by binding as them, and reading their groups. What's asked for and when is in `signin`.
 
 use std::sync::{Arc, LazyLock};
 use std::time::Duration;

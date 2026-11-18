@@ -98,7 +98,7 @@ pub(crate) fn parse(ext: &str, text: &str) -> Option<Atlas> {
         "xml" => starling(text),
         "json" => {
             let v: Value = serde_json::from_str(text).ok()?;
-            texture_packer(&v).or_else(|| tiled_json(&v))
+            texture_packer(&v).or_else(|| tiled_json(&v)).or_else(|| dragonbones(&v))
         }
         "tsj" => tiled_json(&serde_json::from_str(text).ok()?),
         "tsx" => tiled(text),
@@ -436,6 +436,38 @@ fn starling(text: &str) -> Option<Atlas> {
         }
     }
     Some(Atlas { format: "starling", pages: vec![page?], ..Atlas::default() })
+}
+
+/// A DragonBones texture atlas (`…_tex.json`): `{"imagePath": …, "SubTexture": [{name, x, y, width, height, [frameX,
+/// frameY, frameWidth, frameHeight], [rotated]}]}`, Starling's fields as JSON. Its width and height are the sprite's
+/// upright, so a turned sprite's region in the page has them the other way round.
+fn dragonbones(v: &Value) -> Option<Atlas> {
+    let image = v.get("imagePath")?.as_str()?;
+    let mut sprites = Vec::new();
+    for t in v.get("SubTexture")?.as_array()? {
+        let get = |k: &str| field(t, k);
+        let (Some(x), Some(y), Some(w), Some(h)) =
+            (get("x").and_then(px), get("y").and_then(px), get("width").and_then(px), get("height").and_then(px))
+        else {
+            continue;
+        };
+        let rotated = t.get("rotated").and_then(Value::as_bool).unwrap_or(false);
+        let trim = match (get("frameWidth").and_then(px), get("frameHeight").and_then(px)) {
+            (Some(fw), Some(fh)) => trim_of(
+                [fw, fh],
+                [-get("frameX").unwrap_or(0.0).round() as i64, -get("frameY").unwrap_or(0.0).round() as i64],
+                [w, h],
+            ),
+            _ => None,
+        };
+        sprites.push(Sprite {
+            name: t.get("name").and_then(Value::as_str).unwrap_or_default().to_owned(),
+            rect: if rotated { [x, y, h, w] } else { [x, y, w, h] },
+            turn: if rotated { Turn::Clockwise } else { Turn::Upright },
+            trim,
+        });
+    }
+    Some(Atlas { format: "dragonbones", pages: vec![Page { image: image.to_owned(), sprites }], ..Atlas::default() })
 }
 
 fn field(v: &Value, k: &str) -> Option<f64> {
@@ -1762,6 +1794,22 @@ mod tests {
             }
         );
         assert!(parse("xml", "<root><SubTexture x='0'/></root>").is_none());
+    }
+
+    #[test]
+    fn dragonbones_texture_atlas() {
+        let text = r#"{"name":"Dragon","imagePath":"Dragon_tex.png","width":256,"height":256,"SubTexture":[
+            {"name":"parts/tailTip","x":1,"y":1,"width":108,"height":131,"frameX":-2,"frameY":-1,"frameWidth":112,"frameHeight":134},
+            {"name":"parts/wing","x":120,"y":1,"width":40,"height":20,"rotated":true}]}"#;
+        let atlas = parse("json", text).unwrap();
+        assert_eq!(atlas.format, "dragonbones");
+        assert_eq!(atlas.pages[0].image, "Dragon_tex.png");
+        let [tail, wing] = &atlas.pages[0].sprites[..] else { panic!() };
+        assert_eq!((tail.name.as_str(), tail.rect), ("parts/tailTip", [1, 1, 108, 131]));
+        assert_eq!(tail.trim, Some(Trim { size: [112, 134], at: [2, 1] }));
+        assert_eq!((wing.rect, wing.turn), ([120, 1, 20, 40], Turn::Clockwise));
+        // The skeleton beside it isn't an atlas.
+        assert!(parse("json", r#"{"frameRate":24,"name":"Dragon","version":"5.5","armature":[]}"#).is_none());
     }
 
     #[test]

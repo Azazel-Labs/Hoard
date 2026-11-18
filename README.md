@@ -50,7 +50,7 @@ map switched on and off.
 
 ### Sprite sheets that play
 
-Atlases from TexturePacker, Starling, libGDX, Cocos2d and Godot, Tiled tilesets, Unity images cut into sprites, and tile sheets that come with only a
+Atlases from TexturePacker, Starling, libGDX, Cocos2d, Godot and DragonBones, Tiled tilesets, Unity images cut into sprites, and tile sheets that come with only a
 note of their grid, become one sprite sheet that plays its animations and lists its sprites. Download it repacked for whichever engine you're using: ten formats, each told only what it
 can hold.
 
@@ -341,6 +341,7 @@ software rasterizer (`apt install mesa-vulkan-drivers`). Without any adapter, ev
      or where the see-through gutters between its frames are, skipping empty cells; the columns, rows and speed can be
      changed. With reduced motion asked for, they wait to be played.
    - Sprite sheets (Starling/Sparrow XML, TexturePacker JSON including multipack, libGDX `.atlas`, Cocos2d `.plist`,
+     DragonBones texture atlases (`_tex.json`),
      Godot `.tres` `SpriteFrames` and `TileSet` resources, and Tiled tilesets, `.tsx` or JSON, their empty tiles left
      out and their tiles' animations kept, and the `.meta` of a Unity image cut into sprites, which the pack keeps
      when other `.meta` files are left out): the atlas file becomes a sprite sheet,

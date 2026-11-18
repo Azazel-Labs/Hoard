@@ -68,7 +68,8 @@ tile sheets that come with only a note of their grid (Kenney's `Tilesheet.txt`).
   embedded in a `.tmx` map stay part of the map.
 - [x] **Unity sprite slicing**: Asset Store packs keep each sprite's rectangle in the image's `.png.meta`. That
   `.meta` is kept in the pack and becomes the sheet, its image the page.
-- [ ] **DragonBones texture atlases** (`_tex.json`) as sheets. Playing their skeletons (`_ske.json`) would come after.
+- [x] **DragonBones texture atlases** (`_tex.json`) as sheets.
+- [ ] **DragonBones skeletons** (`_ske.json`) played on their atlas.
 - [ ] **Lottie / Bodymovin** (`.json`, `.lottie`): vector animations, common for UI. Played in the details panel
   (lottie-web or dotLottie), the thumbnail drawn by the browser as the 3D viewer's is.
 - [ ] **Rive** (`.riv`), played with its free web runtime.

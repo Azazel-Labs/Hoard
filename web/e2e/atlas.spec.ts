@@ -256,7 +256,7 @@ test('a Tiled tileset becomes a sprite sheet of its tiles', async ({ api }) => {
   }
 })
 
-test("a Unity image cut into sprites becomes a sprite sheet of them", async ({ api }) => {
+test('a Unity image cut into sprites becomes a sprite sheet of them', async ({ api }) => {
   test.setTimeout(120_000)
   const name = `E2E Unity sprites ${unique()}`
   // A 32 px square: the top-left quarter red, the bottom strip blue.
@@ -302,6 +302,48 @@ ${sprite('hero_0', 0, 16, 16, 16)}${sprite('hero_1', 16, 0, 16, 8)}    outline: 
     expect(kept.sprites.map((s: { name: string; rect: number[] }) => [s.name, s.rect])).toEqual([
       ['hero_0', [0, 0, 16, 16]],
       ['hero_1', [16, 24, 16, 8]],
+    ])
+  } finally {
+    await api.post('/api/archive', { data: { packs: [pack.id] } })
+    await api.post('/api/archive/purge', { data: { packs: [pack.id] } })
+  }
+})
+
+test('a DragonBones texture atlas becomes a sprite sheet', async ({ api }) => {
+  test.setTimeout(120_000)
+  const name = `E2E DragonBones ${unique()}`
+  const image = png(64, 32, (x, y) => (x < 24 && y < 16 ? [255, 0, 0, 255] : x >= 32 && x < 40 ? [0, 255, 0, 255] : [0, 0, 0, 0]))
+  const tex = JSON.stringify({
+    name: 'Dragon',
+    imagePath: 'Dragon_tex.png',
+    width: 64,
+    height: 32,
+    SubTexture: [
+      { name: 'parts/body', x: 0, y: 0, width: 24, height: 16 },
+      // Turned: 32 wide and 8 high upright, 8 wide and 32 high in the page.
+      { name: 'parts/wing', x: 32, y: 0, width: 32, height: 8, rotated: true },
+    ],
+  })
+  const ske = JSON.stringify({ frameRate: 24, name: 'Dragon', version: '5.5', armature: [] })
+  const pack = await uploadPack(api, name, [
+    { relpath: 'Dragon/Dragon_tex.json', data: Buffer.from(tex) },
+    { relpath: 'Dragon/Dragon_tex.png', data: image },
+    { relpath: 'Dragon/Dragon_ske.json', data: Buffer.from(ske) },
+  ])
+  try {
+    await waitReady(api, [pack.id])
+    let assets: Asset[] = []
+    await expect
+      .poll(async () => (assets = await assetsOf(api, pack.id)).find((a) => a.path.endsWith('Dragon_tex.json'))?.kind, { timeout: 60_000 })
+      .toBe('sheet')
+    expect(assets.find((a) => a.path.endsWith('Dragon_ske.json'))?.kind).not.toBe('sheet')
+    const sheet = assets.find((a) => a.path.endsWith('Dragon_tex.json'))!
+    const detail = (await (await api.get(`/api/assets/${sheet.id}`)).json()) as { meta: Record<string, unknown> }
+    expect(detail.meta.sheet).toMatchObject({ format: 'dragonbones', sprites: 2, pages: 1 })
+    const kept = await (await api.get(`/api/assets/${sheet.id}/derivative/sheet`)).json()
+    expect(kept.sprites.map((s: { name: string; rect: number[]; size: number[] }) => [s.name, s.rect, s.size])).toEqual([
+      ['parts/body', [0, 0, 24, 16], [24, 16]],
+      ['parts/wing', [32, 0, 8, 32], [32, 8]],
     ])
   } finally {
     await api.post('/api/archive', { data: { packs: [pack.id] } })

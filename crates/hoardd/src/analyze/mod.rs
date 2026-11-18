@@ -147,7 +147,7 @@ pub(crate) fn thumb_mime(bytes: &[u8]) -> &'static str {
 
 /// Don't try to decode images bigger than this on disk (thumbnails of 30k² PSD exports aren't worth it).
 pub(crate) const MAX_IMAGE_DECODE_BYTES: u64 = 256 << 20;
-const THUMB_SIZE: u32 = 256;
+pub(crate) const THUMB_SIZE: u32 = 256;
 
 #[derive(Debug, Default)]
 pub(crate) struct Analysis {
@@ -199,6 +199,9 @@ pub(crate) fn analyze(path: &Path, root: &Path, kind: AssetKind, ext: &str) -> A
         AssetKind::Texture if matches!(ext, "psd" | "psb") => analyze_psd(path, &mut a),
         AssetKind::Texture if matches!(ext, "kra" | "ora") => analyze_layered_zip(path, &mut a),
         AssetKind::Model if ext == "blend" => analyze_blend(path, &mut a),
+        AssetKind::Document if ext == "pdf" => crate::textures::pdf_thumbnail(path, THUMB_SIZE).map(|page| {
+            a.thumb = page.and_then(|p| thumb_bytes(p, false).ok());
+        }),
         AssetKind::Texture if crate::textures::handles(ext) => analyze_decoded(path, ext, &mut a),
         AssetKind::Texture => analyze_image(path, ext, &mut a),
         AssetKind::Vector if ext == "lottie" => analyze_dotlottie(path, &mut a),
@@ -236,6 +239,15 @@ pub(crate) fn analyze(path: &Path, root: &Path, kind: AssetKind, ext: &str) -> A
     };
     if let Err(e) = result {
         a.meta.insert("analysis_error".into(), json!(format!("{e:#}")));
+    }
+    // Text with no picture of its own (code, data, prose): drawn as a silhouette of its lines.
+    let text_kind =
+        matches!(a.kind.unwrap_or(kind), AssetKind::Document | AssetKind::Data | AssetKind::Shader | AssetKind::Other);
+    if a.thumb.is_none() && text_kind && crate::text_thumbs::handles(ext) {
+        match crate::text_thumbs::thumbnail(path, ext, THUMB_SIZE) {
+            Ok(drawn) => a.thumb = drawn.and_then(|img| thumb_bytes(img, true).ok()),
+            Err(e) => tracing::debug!(path = %path.display(), error = %format!("{e:#}"), "no text thumbnail"),
+        }
     }
     if matches!(kind, AssetKind::Texture | AssetKind::Vector) {
         a.meta.extend(crate::provenance::scan(path));

@@ -4,7 +4,7 @@
 use std::path::Path;
 
 use anyhow::{Context, Result, ensure};
-use image::{DynamicImage, RgbaImage};
+use image::{DynamicImage, Rgba, RgbaImage};
 use serde_json::{Map, Value, json};
 
 use super::Decoded;
@@ -124,6 +124,21 @@ fn pdf_page(data: Vec<u8>, size: u32) -> Result<Option<Decoded>> {
     let rgba = pixmap.take_rgba8(ImageAlphaType::Alpha);
     let image = DynamicImage::ImageRgba8(RgbaImage::from_raw(pw, ph, rgba).context("size")?);
     Ok(Some(Decoded { image, facts: vector_facts(w, h) }))
+}
+
+/// A PDF document's first page drawn `size` pixels on its longer side, on white paper where it draws nothing.
+pub(crate) fn pdf_thumbnail(path: &Path, size: u32) -> Result<Option<RgbaImage>> {
+    ensure!(std::fs::metadata(path)?.len() <= crate::analyze::MAX_IMAGE_DECODE_BYTES, "too big to draw");
+    pdf_thumbnail_of(std::fs::read(path)?, size)
+}
+
+/// [`pdf_thumbnail`] of a PDF already read.
+pub(crate) fn pdf_thumbnail_of(data: Vec<u8>, size: u32) -> Result<Option<RgbaImage>> {
+    let Some(page) = pdf_page(data, size)? else { return Ok(None) };
+    let page = page.image.to_rgba8();
+    let mut paper = RgbaImage::from_pixel(page.width(), page.height(), Rgba([255, 255, 255, 255]));
+    image::imageops::overlay(&mut paper, &page, 0, 0);
+    Ok(Some(paper))
 }
 
 /// The JPEG preview an Adobe file keeps in its XMP metadata (`xmpGImg:image`, base64 with `&#xA;` line breaks).

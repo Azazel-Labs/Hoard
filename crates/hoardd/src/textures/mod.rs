@@ -25,8 +25,8 @@ use self::aseprite::aseprite;
 pub(crate) use self::aseprite::aseprite_sheet;
 use self::dds::dds;
 use self::ktx2::{basis, ktx2};
-pub(crate) use self::vector::vector;
 use self::vector::{illustrator, svg};
+pub(crate) use self::vector::{pdf_thumbnail, pdf_thumbnail_of, vector};
 
 /// Refuse to allocate decode buffers past this (16k x 16k).
 const MAX_PIXELS: usize = 268_435_456;

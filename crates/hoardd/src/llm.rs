@@ -342,6 +342,9 @@ async fn batch_sheet(state: &AppState, batch: &[Entry<'_>]) -> Option<String> {
 async fn sheet_png(state: &AppState, batch: &[Entry<'_>]) -> Option<Vec<u8>> {
     let mut tiles = Vec::new();
     for (i, e) in batch.iter().enumerate() {
+        if e.row.views.is_none() && crate::text_thumbs::is_silhouette(&e.row.path, &e.row.kind) {
+            continue;
+        }
         let Some(hash) = e.row.views.as_ref().or(e.row.thumb.as_ref()) else { continue };
         let Ok(bytes) = state.blobs.read_all(hash).await else { continue };
         let Ok(img) = image::load_from_memory(&bytes) else { continue };

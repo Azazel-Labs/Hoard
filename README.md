@@ -456,6 +456,11 @@ software rasterizer (`apt install mesa-vulkan-drivers`). Without any adapter, ev
      - Camera raw photos (DNG, Canon, Nikon, Sony, Fujifilm, Pentax, Olympus, Panasonic, Samsung): the largest JPEG
        the camera kept inside, turned the way the camera was held, with the camera's name.
      - Recognized by kind, without previews yet: Substance, ZBrush, Maya/Max, Houdini, C4D, DAW projects, and video.
+   - Text: code, shaders, scripts, JSON and other data, configs, markup and prose are drawn as a silhouette of their
+     lines, each a bar from the left edge as indented and as long as the line, colored by what it's made of
+     (keywords, strings, numbers, comments, punctuation, keys and tags), so a file reads like a speckled gene
+     sequence: its shape shows its indentation and density, its colors what kind of text it is. PDFs are shown by
+     their first page. Files added before Hoard drew these get theirs the next time it starts.
    - One asset in several formats: a model, sound or font the pack has more than once under the same name, beside
      itself (`house.skp` and `house.obj`) or in folders named after each format (Kenney's `Models/FBX format/` and
      `Models/OBJ format/`), is shown once, in the format Hoard reads best or that loses least (GLB, then glTF, FBX,

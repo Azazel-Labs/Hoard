@@ -35,9 +35,12 @@ pub(crate) use index::Index;
 /// Bump when the features change; rows from another version are recomputed by the next looks job.
 pub(crate) const VERSION: i64 = 1;
 
-/// Kinds whose thumbnails are pictures of the thing (not a waveform, a type specimen or a page).
-pub(crate) const KINDS_SQL: &str =
-    "a.kind IN ('texture', 'vector', 'model', 'material', 'animation', 'video', 'other')";
+/// Kinds whose thumbnails are pictures of the thing (not a waveform, a type specimen, a page or the silhouette of a
+/// script's lines, `text_thumbs`).
+pub(crate) const KINDS_SQL: &str = "(a.kind IN ('texture', 'vector', 'model', 'material', 'animation', 'video')
+     OR (a.kind = 'other' AND a.ext NOT IN ('c', 'h', 'cc', 'cpp', 'cxx', 'hpp', 'hh', 'cs', 'java', 'js', 'mjs', 'ts',
+         'rs', 'go', 'swift', 'kt', 'compute', 'fx', 'py', 'gd', 'sh', 'rb', 'ps1', 'lua', 'plist', 'cfg', 'godot', 'tsv',
+         'markdown', 'nfo', 'log')))";
 
 /// One color of a palette, in `OKLab`, with the share of the (opaque part of the) picture it covers.
 #[derive(Clone, Copy, Debug, PartialEq)]

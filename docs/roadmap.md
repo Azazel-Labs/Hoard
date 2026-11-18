@@ -9,16 +9,6 @@ Searching sounds (Kind is Audio), a word in the search field also finds the soun
 and the microphone is in the search field. Still open: whether a search not limited to sounds should notice a written
 noise by itself (a word that matches nothing and spells like one) and offer the sounds shaped like it.
 
-## Text and document thumbnails
-
-Text, JSON and PDF files show a generic icon. Planned:
-
-- **Text and code as a silhouette.** Each line is drawn as a bar from the left edge, indented as the line is and as
-  long as it is, colored by what's in it: keywords, strings, numbers, comments and punctuation each a color of their
-  own, on a dark ground. A file reads like a speckled gene sequence: its shape shows its indentation and density, its
-  colors what kind of text it is. JSON gets the same, colored by keys, strings, numbers and brackets.
-- **PDFs by their first page**, drawn the way an Illustrator file's is.
-
 ## Maintainability: what's left
 
 The largest files have been split into folder modules. The rest are big but each about one thing; splitting them

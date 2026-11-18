@@ -511,7 +511,8 @@ pub enum LinkRel {
     Sidecar,
     /// A sibling in the same variant family. Computed, never stored as a link.
     Variant,
-    /// A sprite packed in this atlas page. Not something the page needs: each sprite is in it already.
+    /// A loose image that is one of this sheet's sprites, saved on its own as well. Not something the sheet needs:
+    /// each sprite is in it already.
     Sprite,
 }
 

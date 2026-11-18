@@ -81,3 +81,58 @@ test('a sprite atlas becomes a sprite sheet that shows its sprites, plays their 
     await api.post('/api/archive/purge', { data: { packs: [pack.id] } })
   }
 })
+
+// A pack that has a sheet's sprites as loose images too (as Kenney's do) keeps them with the sheet: the sheet links
+// each one whose picture is its sprite's, and they and its page leave the grid. One with a sprite's name but another
+// picture, or the same sprite drawn at twice the size, stays.
+test('loose images that are a sheet’s sprites are kept with the sheet', async ({ page, api }) => {
+  test.setTimeout(120_000)
+  const name = `E2E Loose sprites ${unique()}`
+  const GREEN: [number, number, number, number] = [60, 200, 90, 255]
+  const xml = `<?xml version="1.0" encoding="UTF-8"?>
+<TextureAtlas imagePath="sheet.png">
+  <SubTexture name="button_red.png" x="0" y="0" width="16" height="16"/>
+  <SubTexture name="button_blue.png" x="16" y="0" width="16" height="16"/>
+</TextureAtlas>`
+  const pack = await uploadPack(api, name, [
+    { relpath: 'Spritesheet/sheet.png', data: png(32, 16, (x) => (x < 16 ? RED : BLUE)) },
+    { relpath: 'Spritesheet/atlas.xml', data: Buffer.from(xml) },
+    // Saved again: a few levels off.
+    { relpath: 'PNG/Default/button_red.png', data: png(16, 16, () => [236, 55, 64, 255]) },
+    { relpath: 'PNG/Double/button_red.png', data: png(32, 32, () => RED) },
+    { relpath: 'PNG/Default/button_blue.png', data: png(16, 16, () => GREEN) },
+  ])
+  try {
+    await waitReady(api, [pack.id])
+    let assets: Asset[] = []
+    await expect
+      .poll(async () => (assets = await assetsOf(api, pack.id)).find((a) => a.path.endsWith('atlas.xml'))?.kind, { timeout: 60_000 })
+      .toBe('sheet')
+    const at = (path: string) => assets.find((a) => a.path === path)!
+    const sheet = at('Spritesheet/atlas.xml')
+    const links = async (id: string) =>
+      ((await (await api.get(`/api/assets/${id}`)).json()) as { links: { id: string; rel: string }[] }).links
+    await expect.poll(async () => (await links(sheet.id)).filter((l) => l.rel === 'sprite').map((l) => l.id)).toEqual([
+      at('PNG/Default/button_red.png').id,
+    ])
+
+    const shown = await api.get('/api/assets', { params: { pack: pack.id, limit: 500, facets: false, hide_supporting: true } })
+    const body = (await shown.json()) as { items: Asset[]; supporting_hidden?: number }
+    expect(body.items.map((a) => a.path).sort()).toEqual(['PNG/Default/button_blue.png', 'PNG/Double/button_red.png', 'Spritesheet/atlas.xml'])
+    expect(body.supporting_hidden).toBe(2)
+
+    // The sheet lists its loose copy, and the copy names the sheet it's in.
+    await openPack(page, pack.id, name, '&sort=name')
+    const panel = page.getByRole('complementary', { name: 'Asset details' })
+    await tile(page, sheet.name).click()
+    const loose = panel.locator('section', { has: page.getByRole('heading', { name: 'Also as separate files', exact: true }) })
+    await expect(loose.getByRole('button')).toHaveCount(1)
+    await loose.getByRole('button').click()
+    await expect(panel.getByText('PNG/Default/button_red.png')).toBeVisible()
+    const inSheet = panel.locator('section', { has: page.getByRole('heading', { name: 'In sprite sheet', exact: true }) })
+    await expect(inSheet.getByRole('button', { name: new RegExp(sheet.name) })).toBeVisible()
+  } finally {
+    await api.post('/api/archive', { data: { packs: [pack.id] } })
+    await api.post('/api/archive/purge', { data: { packs: [pack.id] } })
+  }
+})

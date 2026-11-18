@@ -677,6 +677,17 @@ const MIGRATIONS: &[&str] = &[
                         FROM asset_tags t WHERE t.asset_id = a.id), '')
        FROM assets a WHERE a.id IN (SELECT id FROM numbered);
      DROP TABLE numbered;",
+    // 64: a sheet's sprites that the pack has as loose images too are linked from it (`sprite`) and shown with it,
+    // as its pages are, rather than each on its own in the grid. Packs with a sheet and other images are looked
+    // through again.
+    "INSERT INTO jobs (kind, pack_id, payload, run_after, created_at, updated_at)
+       SELECT 'materials', p.id, '{}', strftime('%Y-%m-%dT%H:%M:%SZ', 'now'), strftime('%Y-%m-%dT%H:%M:%SZ', 'now'),
+              strftime('%Y-%m-%dT%H:%M:%SZ', 'now')
+       FROM packs p WHERE p.status = 'ready'
+         AND EXISTS (SELECT 1 FROM assets a WHERE a.pack_id = p.id AND a.kind = 'sheet')
+         AND (SELECT COUNT(*) FROM assets a WHERE a.pack_id = p.id AND a.kind = 'texture') > 1
+         AND NOT EXISTS (SELECT 1 FROM jobs j WHERE j.kind = 'materials' AND j.pack_id = p.id
+                           AND j.status IN ('queued', 'running'));",
 ];
 
 /// How many automatic pre-upgrade backups to keep in `<data dir>/backups`.
@@ -1936,8 +1947,11 @@ pub(crate) const LIVE: &str =
 /// (a Megascans `<id>.json`) or a map of a material (its roughness
 /// map, say): not something you'd browse for. The material is, and it shows its maps, unless it's the material of
 /// one object only (`owned_by`, see `materials::mark_owned`): then it's part of that model, which shows it.
+/// A sprite sheet's pages, and the loose images it has its sprites as too, are shown with the sheet.
 pub(crate) const SUPPORTING: &str = "(EXISTS (SELECT 1 FROM asset_links l WHERE l.to_id = a.id
-     AND (l.rel IN ('buffer', 'sidecar') OR (l.rel = 'material' AND a.ext = 'mtl')))
+     AND (l.rel IN ('buffer', 'sidecar', 'sprite') OR (l.rel = 'material' AND a.ext = 'mtl')
+          OR (l.rel = 'texture' AND a.kind = 'texture'
+              AND EXISTS (SELECT 1 FROM assets s WHERE s.id = l.from_id AND s.kind = 'sheet'))))
      OR EXISTS (SELECT 1 FROM material_maps m WHERE m.texture_id = a.id)
      OR (a.ext = 'material' AND EXISTS (SELECT 1 FROM assets o WHERE o.id = json_extract(a.meta, '$.owned_by'))))";
 
@@ -2296,7 +2310,7 @@ mod tests {
     fn names_that_are_only_a_number_become_the_file_name() {
         let dir = tempfile::tempdir().unwrap();
         let mut conn = baseline_db(dir.path());
-        migrate(&mut conn, &dir.path().join("backups"), &MIGRATIONS[..MIGRATIONS.len() - 1]).unwrap();
+        migrate(&mut conn, &dir.path().join("backups"), &MIGRATIONS[..54]).unwrap();
         conn.execute_batch(
             "PRAGMA foreign_keys = OFF;
              INSERT INTO assets (id, pack_id, blob_hash, path, name, ext, kind, meta, created_at, updated_at,

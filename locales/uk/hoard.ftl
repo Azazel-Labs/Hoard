@@ -642,7 +642,7 @@ app-save-search = Зберегти пошук
 app-select-title = Виберіть кілька ресурсів, щоб разом додати теги, категорію, колекцію, завантажити або перенести в архів (X або Ctrl+клацання)
 app-select = Вибрати
 app-tile-size = Розмір плиток
-app-supporting-title = Буфери glTF, бібліотеки матеріалів, карти матеріалів, матеріали лише однієї моделі та файли магазинів, що описують моделі. Вони завантажуються разом із тим, що їх використовує.
+app-supporting-title = Буфери glTF, бібліотеки матеріалів, карти матеріалів, матеріали лише однієї моделі та файли магазинів, що описують моделі. Вони завантажуються разом із тим, що їх використовує. Сторінки спрайт-аркуша та його спрайти, що є в наборі й окремими зображеннями, показуються разом з аркушем.
 app-supporting-hidden =
     { $count ->
         [one] Приховано { $count } допоміжний файл
@@ -1443,6 +1443,7 @@ asset-rel-library = пов’язаний файл
 asset-rel-guess = імовірно, пов’язаний
 asset-rel-sidecar = відомості з магазину
 asset-rel-variant = варіант
+asset-rel-sprite = спрайт
 asset-role-map = карта { $role }
 asset-maps-count =
     { $count ->
@@ -1455,6 +1456,8 @@ asset-needs = Потребує
 asset-animations = Анімації
 asset-sprites = Спрайти
 asset-used-by = Використовується в
+asset-loose-sprites = Також окремими файлами
+asset-in-sheet = У спрайт-аркуші
 asset-conversion-failed = перетворення не вдалося
 asset-as-converting = Перетворення…
 asset-as-converting-percent = Перетворення… { $percent }%

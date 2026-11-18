@@ -1297,8 +1297,8 @@ source = "Including supporting files"
 translation = "Укључујући пратеће датотеке"
 
 [messages.app-supporting-title]
-source = "glTF buffers, material libraries, the maps of materials, materials only one model wears and the store files describing models. They come along when you download what uses them."
-translation = "glTF бафери, библиотеке материјала, мапе материјала, материјали које носи само један модел и датотеке продавница које описују моделе. Долазе уз оно што их користи када то преузмете."
+source = "glTF buffers, material libraries, the maps of materials, materials only one model wears and the store files describing models. They come along when you download what uses them. A sprite sheet’s pages, and its sprites the pack has as separate images too, are shown with the sheet."
+translation = "glTF бафери, библиотеке материјала, мапе материјала, материјали које носи само један модел и датотеке продавница које описују моделе. Долазе уз оно што их користи када то преузмете. Странице листа спрајтова, и његови спрајтови које пакет има и као засебне слике, приказују се уз лист."
 
 [messages.app-theme]
 source = "Theme"
@@ -1805,6 +1805,10 @@ translation = "Датотека"
 source = "in"
 translation = "у"
 
+[messages.asset-in-sheet]
+source = "In sprite sheet"
+translation = "У листу спрајтова"
+
 [messages.asset-include-animations]
 source = "Include animations in the .zip"
 translation = "Укључи анимације у .zip"
@@ -1864,6 +1868,10 @@ translation = "прегледач текста"
 [messages.asset-less]
 source = "Less"
 translation = "Мање"
+
+[messages.asset-loose-sprites]
+source = "Also as separate files"
+translation = "И као засебне датотеке"
 
 [messages.asset-maps]
 source = "Maps"
@@ -2283,6 +2291,10 @@ translation = "датотека материјала"
 [messages.asset-rel-sidecar]
 source = "store details"
 translation = "подаци из продавнице"
+
+[messages.asset-rel-sprite]
+source = "sprite"
+translation = "спрајт"
 
 [messages.asset-rel-texture]
 source = "texture"

@@ -1260,8 +1260,8 @@ source = "Including supporting files"
 translation = "包含輔助檔案"
 
 [messages.app-supporting-title]
-source = "glTF buffers, material libraries, the maps of materials, materials only one model wears and the store files describing models. They come along when you download what uses them."
-translation = "glTF 緩衝區、材質庫、材質的貼圖、只有一個模型使用的材質，以及描述模型的商店檔案。下載使用它們的素材時會一併附上。"
+source = "glTF buffers, material libraries, the maps of materials, materials only one model wears and the store files describing models. They come along when you download what uses them. A sprite sheet’s pages, and its sprites the pack has as separate images too, are shown with the sheet."
+translation = "glTF 緩衝區、材質庫、材質的貼圖、只有一個模型使用的材質，以及描述模型的商店檔案。下載使用它們的素材時會一併附上。 精靈圖集的頁面，以及套件中也以單獨圖片存在的精靈，會與圖集一起顯示。"
 
 [messages.app-theme]
 source = "Theme"
@@ -1734,6 +1734,10 @@ translation = "檔案"
 source = "in"
 translation = "位於"
 
+[messages.asset-in-sheet]
+source = "In sprite sheet"
+translation = "所在的精靈圖集"
+
 [messages.asset-include-animations]
 source = "Include animations in the .zip"
 translation = "在 .zip 中包含動畫"
@@ -1793,6 +1797,10 @@ translation = "文字檢視器"
 [messages.asset-less]
 source = "Less"
 translation = "收合"
+
+[messages.asset-loose-sprites]
+source = "Also as separate files"
+translation = "也有單獨的檔案"
 
 [messages.asset-maps]
 source = "Maps"
@@ -2203,6 +2211,10 @@ translation = "材質檔"
 [messages.asset-rel-sidecar]
 source = "store details"
 translation = "商店詳細資訊"
+
+[messages.asset-rel-sprite]
+source = "sprite"
+translation = "精靈"
 
 [messages.asset-rel-texture]
 source = "texture"

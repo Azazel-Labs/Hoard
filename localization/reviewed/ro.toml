@@ -1322,8 +1322,8 @@ source = "Including supporting files"
 translation = "Inclusiv fișierele auxiliare"
 
 [messages.app-supporting-title]
-source = "glTF buffers, material libraries, the maps of materials, materials only one model wears and the store files describing models. They come along when you download what uses them."
-translation = "Buffere glTF, biblioteci de materiale, hărțile materialelor, materiale purtate de un singur model și fișierele de magazin care descriu modele. Vin împreună cu ce le folosește atunci când descărcați."
+source = "glTF buffers, material libraries, the maps of materials, materials only one model wears and the store files describing models. They come along when you download what uses them. A sprite sheet’s pages, and its sprites the pack has as separate images too, are shown with the sheet."
+translation = "Buffere glTF, biblioteci de materiale, hărțile materialelor, materiale purtate de un singur model și fișierele de magazin care descriu modele. Vin împreună cu ce le folosește atunci când descărcați. Paginile unei foi de sprite-uri și sprite-urile ei pe care pachetul le are și ca imagini separate sunt afișate împreună cu foaia."
 
 [messages.app-theme]
 source = "Theme"
@@ -1845,6 +1845,10 @@ translation = "Fișier"
 source = "in"
 translation = "în"
 
+[messages.asset-in-sheet]
+source = "In sprite sheet"
+translation = "Într-o foaie de sprite-uri"
+
 [messages.asset-include-animations]
 source = "Include animations in the .zip"
 translation = "Includeți animațiile în .zip"
@@ -1904,6 +1908,10 @@ translation = "vizualizatorul de text"
 [messages.asset-less]
 source = "Less"
 translation = "Mai puțin"
+
+[messages.asset-loose-sprites]
+source = "Also as separate files"
+translation = "Și ca fișiere separate"
 
 [messages.asset-maps]
 source = "Maps"
@@ -2328,6 +2336,10 @@ translation = "fișier de material"
 [messages.asset-rel-sidecar]
 source = "store details"
 translation = "detalii de magazin"
+
+[messages.asset-rel-sprite]
+source = "sprite"
+translation = "sprite"
 
 [messages.asset-rel-texture]
 source = "texture"

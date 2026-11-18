@@ -1297,8 +1297,8 @@ source = "Including supporting files"
 translation = "Tukitiedostot mukana"
 
 [messages.app-supporting-title]
-source = "glTF buffers, material libraries, the maps of materials, materials only one model wears and the store files describing models. They come along when you download what uses them."
-translation = "glTF-puskurit, materiaalikirjastot, materiaalien kartat, vain yhden mallin käyttämät materiaalit ja malleja kuvaavat kauppatiedostot. Ne tulevat mukana, kun lataat niitä käyttävän resurssin."
+source = "glTF buffers, material libraries, the maps of materials, materials only one model wears and the store files describing models. They come along when you download what uses them. A sprite sheet’s pages, and its sprites the pack has as separate images too, are shown with the sheet."
+translation = "glTF-puskurit, materiaalikirjastot, materiaalien kartat, vain yhden mallin käyttämät materiaalit ja malleja kuvaavat kauppatiedostot. Ne tulevat mukana, kun lataat niitä käyttävän resurssin. Sprite-arkin sivut ja sen spritet, jotka paketissa on myös erillisinä kuvina, näytetään arkin yhteydessä."
 
 [messages.app-theme]
 source = "Theme"
@@ -1802,6 +1802,10 @@ translation = "Tiedosto"
 source = "in"
 translation = "paketissa"
 
+[messages.asset-in-sheet]
+source = "In sprite sheet"
+translation = "Sprite-arkissa"
+
 [messages.asset-include-animations]
 source = "Include animations in the .zip"
 translation = "Sisällytä animaatiot .zip-tiedostoon"
@@ -1861,6 +1865,10 @@ translation = "tekstikatselin"
 [messages.asset-less]
 source = "Less"
 translation = "Vähemmän"
+
+[messages.asset-loose-sprites]
+source = "Also as separate files"
+translation = "Myös erillisinä tiedostoina"
 
 [messages.asset-maps]
 source = "Maps"
@@ -2277,6 +2285,10 @@ translation = "materiaalitiedosto"
 [messages.asset-rel-sidecar]
 source = "store details"
 translation = "kauppatiedot"
+
+[messages.asset-rel-sprite]
+source = "sprite"
+translation = "sprite"
 
 [messages.asset-rel-texture]
 source = "texture"

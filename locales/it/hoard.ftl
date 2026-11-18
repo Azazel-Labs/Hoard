@@ -609,7 +609,7 @@ app-save-search = Salva ricerca
 app-select-title = Scegli più asset per assegnare tag, categorizzarli, raccoglierli, scaricarli o archiviarli insieme (X, o Ctrl+clic)
 app-select = Seleziona
 app-tile-size = Dimensione riquadri
-app-supporting-title = Buffer glTF, librerie di materiali, le mappe dei materiali, i materiali usati da un solo modello e i file degli store che descrivono i modelli. Vengono inclusi quando scarichi ciò che li usa.
+app-supporting-title = Buffer glTF, librerie di materiali, le mappe dei materiali, i materiali usati da un solo modello e i file degli store che descrivono i modelli. Vengono inclusi quando scarichi ciò che li usa. Le pagine di uno sprite sheet, e i suoi sprite che il pacchetto ha anche come immagini separate, sono mostrati con lo sheet.
 app-supporting-hidden =
     { $count ->
         [one] { $count } file di supporto nascosto
@@ -1297,6 +1297,7 @@ asset-rel-library = file collegato
 asset-rel-guess = probabilmente va con
 asset-rel-sidecar = dettagli dello store
 asset-rel-variant = variante
+asset-rel-sprite = sprite
 asset-role-map = mappa { $role }
 asset-maps-count =
     { $count ->
@@ -1307,6 +1308,8 @@ asset-needs = Richiede
 asset-animations = Animazioni
 asset-sprites = Sprite
 asset-used-by = Usato da
+asset-loose-sprites = Anche come file separati
+asset-in-sheet = In uno sprite sheet
 asset-conversion-failed = conversione non riuscita
 asset-as-converting = Conversione…
 asset-as-converting-percent = Conversione… { $percent }%

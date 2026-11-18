@@ -1317,8 +1317,8 @@ source = "Including supporting files"
 translation = "Včetně podpůrných souborů"
 
 [messages.app-supporting-title]
-source = "glTF buffers, material libraries, the maps of materials, materials only one model wears and the store files describing models. They come along when you download what uses them."
-translation = "Buffery glTF, knihovny materiálů, mapy materiálů, materiály, které nosí jen jeden model, a soubory obchodů popisující modely. Stáhnou se spolu s tím, co je používá."
+source = "glTF buffers, material libraries, the maps of materials, materials only one model wears and the store files describing models. They come along when you download what uses them. A sprite sheet’s pages, and its sprites the pack has as separate images too, are shown with the sheet."
+translation = "Buffery glTF, knihovny materiálů, mapy materiálů, materiály, které nosí jen jeden model, a soubory obchodů popisující modely. Stáhnou se spolu s tím, co je používá. Stránky spritesheetu a jeho sprity, které balíček má i jako samostatné obrázky, se zobrazují u spritesheetu."
 
 [messages.app-theme]
 source = "Theme"
@@ -1830,6 +1830,10 @@ translation = "Soubor"
 source = "in"
 translation = "v"
 
+[messages.asset-in-sheet]
+source = "In sprite sheet"
+translation = "Ve spritesheetu"
+
 [messages.asset-include-animations]
 source = "Include animations in the .zip"
 translation = "Zahrnout animace do .zip"
@@ -1889,6 +1893,10 @@ translation = "prohlížeč textu"
 [messages.asset-less]
 source = "Less"
 translation = "Méně"
+
+[messages.asset-loose-sprites]
+source = "Also as separate files"
+translation = "Také jako samostatné soubory"
 
 [messages.asset-maps]
 source = "Maps"
@@ -2308,6 +2316,10 @@ translation = "soubor materiálu"
 [messages.asset-rel-sidecar]
 source = "store details"
 translation = "údaje z obchodu"
+
+[messages.asset-rel-sprite]
+source = "sprite"
+translation = "sprite"
 
 [messages.asset-rel-texture]
 source = "texture"

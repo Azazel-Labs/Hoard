@@ -1257,8 +1257,8 @@ source = "Including supporting files"
 translation = "Termasuk berkas pendukung"
 
 [messages.app-supporting-title]
-source = "glTF buffers, material libraries, the maps of materials, materials only one model wears and the store files describing models. They come along when you download what uses them."
-translation = "Buffer glTF, pustaka material, map dari material, material yang hanya dipakai satu model, dan berkas toko yang menjelaskan model. Semuanya ikut terunduh saat Anda mengunduh yang memakainya."
+source = "glTF buffers, material libraries, the maps of materials, materials only one model wears and the store files describing models. They come along when you download what uses them. A sprite sheet’s pages, and its sprites the pack has as separate images too, are shown with the sheet."
+translation = "Buffer glTF, pustaka material, map dari material, material yang hanya dipakai satu model, dan berkas toko yang menjelaskan model. Semuanya ikut terunduh saat Anda mengunduh yang memakainya. Halaman lembar sprite, dan sprite-nya yang juga ada di paket sebagai gambar terpisah, ditampilkan bersama lembarnya."
 
 [messages.app-theme]
 source = "Theme"
@@ -1731,6 +1731,10 @@ translation = "Berkas"
 source = "in"
 translation = "di"
 
+[messages.asset-in-sheet]
+source = "In sprite sheet"
+translation = "Di lembar sprite"
+
 [messages.asset-include-animations]
 source = "Include animations in the .zip"
 translation = "Sertakan animasi dalam .zip"
@@ -1790,6 +1794,10 @@ translation = "penampil teks"
 [messages.asset-less]
 source = "Less"
 translation = "Lebih sedikit"
+
+[messages.asset-loose-sprites]
+source = "Also as separate files"
+translation = "Juga sebagai file terpisah"
 
 [messages.asset-maps]
 source = "Maps"
@@ -2200,6 +2208,10 @@ translation = "berkas material"
 [messages.asset-rel-sidecar]
 source = "store details"
 translation = "detail toko"
+
+[messages.asset-rel-sprite]
+source = "sprite"
+translation = "sprite"
 
 [messages.asset-rel-texture]
 source = "texture"

@@ -601,7 +601,7 @@ app-save-search = Stoor soektog
 app-select-title = Kies etlike bates om saam te etiketteer, te kategoriseer, te versamel, af te laai of te argiveer (X, of Ctrl-klik)
 app-select = Kies
 app-tile-size = Teëlgrootte
-app-supporting-title = glTF-buffers, materiaalbiblioteke, die kaarte van materiale, materiale wat net een model dra en die winkellêers wat modelle beskryf. Hulle kom saam wanneer jy aflaai wat hulle gebruik.
+app-supporting-title = glTF-buffers, materiaalbiblioteke, die kaarte van materiale, materiale wat net een model dra en die winkellêers wat modelle beskryf. Hulle kom saam wanneer jy aflaai wat hulle gebruik. ’n Spritevel se bladsye, en sy sprites wat die pak ook as aparte prente het, word saam met die vel gewys.
 app-supporting-hidden =
     { $count } ondersteunende { $count ->
         [one] lêer
@@ -1283,6 +1283,7 @@ asset-rel-library = gekoppelde lêer
 asset-rel-guess = hoort waarskynlik by
 asset-rel-sidecar = winkelbesonderhede
 asset-rel-variant = variant
+asset-rel-sprite = sprite
 asset-role-map = kaart vir { $role }
 asset-maps-count =
     { $count ->
@@ -1293,6 +1294,8 @@ asset-needs = Benodig
 asset-animations = Animasies
 asset-sprites = Sprites
 asset-used-by = Gebruik deur
+asset-loose-sprites = Ook as aparte lêers
+asset-in-sheet = In ’n spritevel
 asset-conversion-failed = omskakeling het misluk
 asset-as-converting = Skakel om…
 asset-as-converting-percent = Skakel om… { $percent }%

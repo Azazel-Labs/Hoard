@@ -601,7 +601,7 @@ app-save-search = Desa la cerca
 app-select-title = Trieu diversos recursos per etiquetar-los, categoritzar-los, afegir-los a una col·lecció, baixar-los o arxivar-los alhora (X, o Ctrl+clic)
 app-select = Selecciona
 app-tile-size = Mida de les miniatures
-app-supporting-title = Memòries intermèdies de glTF, biblioteques de materials, els mapes dels materials, materials que només porta un model i els fitxers de botiga que descriuen models. S'inclouen quan baixeu el que els fa servir.
+app-supporting-title = Memòries intermèdies de glTF, biblioteques de materials, els mapes dels materials, materials que només porta un model i els fitxers de botiga que descriuen models. S'inclouen quan baixeu el que els fa servir. Les pàgines d’un full de sprites, i els sprites que el paquet també té com a imatges soltes, es mostren amb el full.
 app-supporting-hidden =
     { $count ->
         [one] { $count } fitxer auxiliar amagat
@@ -1289,6 +1289,7 @@ asset-rel-library = fitxer enllaçat
 asset-rel-guess = probablement va amb
 asset-rel-sidecar = detalls de botiga
 asset-rel-variant = variant
+asset-rel-sprite = sprite
 asset-role-map = mapa: { $role }
 asset-maps-count =
     { $count ->
@@ -1299,6 +1300,8 @@ asset-needs = Necessita
 asset-animations = Animacions
 asset-sprites = Sprites
 asset-used-by = Utilitzat per
+asset-loose-sprites = També com a fitxers separats
+asset-in-sheet = En un full de sprites
 asset-conversion-failed = la conversió ha fallat
 asset-as-converting = S'està convertint…
 asset-as-converting-percent = S'està convertint… { $percent } %

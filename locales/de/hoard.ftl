@@ -605,7 +605,7 @@ app-save-search = Suche speichern
 app-select-title = Mehrere Assets auswählen, um sie gemeinsam zu taggen, zu kategorisieren, zu sammeln, herunterzuladen oder zu archivieren (X oder Ctrl-Klick)
 app-select = Auswählen
 app-tile-size = Kachelgröße
-app-supporting-title = glTF-Buffer, Materialbibliotheken, die Maps von Materialien, Materialien, die nur ein Modell trägt, und die Store-Dateien, die Modelle beschreiben. Sie kommen mit, wenn Sie herunterladen, was sie verwendet.
+app-supporting-title = glTF-Buffer, Materialbibliotheken, die Maps von Materialien, Materialien, die nur ein Modell trägt, und die Store-Dateien, die Modelle beschreiben. Sie kommen mit, wenn Sie herunterladen, was sie verwendet. Die Seiten eines Spritesheets und seine Sprites, die das Paket auch als einzelne Bilder hat, werden mit dem Spritesheet gezeigt.
 app-supporting-hidden =
     { $count } { $count ->
         [one] Begleitdatei
@@ -1283,6 +1283,7 @@ asset-rel-library = verknüpfte Datei
 asset-rel-guess = gehört wohl dazu
 asset-rel-sidecar = Store-Details
 asset-rel-variant = Variante
+asset-rel-sprite = Sprite
 asset-role-map = Map: { $role }
 asset-maps-count =
     { $count ->
@@ -1293,6 +1294,8 @@ asset-needs = Benötigt
 asset-animations = Animationen
 asset-sprites = Sprites
 asset-used-by = Verwendet von
+asset-loose-sprites = Auch als einzelne Dateien
+asset-in-sheet = In einem Spritesheet
 asset-conversion-failed = Umwandlung fehlgeschlagen
 asset-as-converting = Wird umgewandelt…
 asset-as-converting-percent = Wird umgewandelt… { $percent } %

@@ -635,7 +635,7 @@ app-save-search = Zapisz wyszukiwanie
 app-select-title = Zaznacz kilka zasobów, by razem je otagować, skategoryzować, dodać do kolekcji, pobrać lub zarchiwizować (X lub Ctrl+kliknięcie)
 app-select = Zaznacz
 app-tile-size = Rozmiar kafelków
-app-supporting-title = Bufory glTF, biblioteki materiałów, mapy materiałów, materiały używane tylko przez jeden model i pliki sklepów opisujące modele. Są pobierane razem z tym, co ich używa.
+app-supporting-title = Bufory glTF, biblioteki materiałów, mapy materiałów, materiały używane tylko przez jeden model i pliki sklepów opisujące modele. Są pobierane razem z tym, co ich używa. Strony arkusza sprite’ów oraz jego sprite’y, które paczka ma też jako osobne obrazy, są pokazywane razem z arkuszem.
 app-supporting-hidden =
     { $count ->
         [one] Ukryto { $count } plik pomocniczy
@@ -1396,6 +1396,7 @@ asset-rel-library = powiązany plik
 asset-rel-guess = prawdopodobnie pasuje
 asset-rel-sidecar = informacje ze sklepu
 asset-rel-variant = wariant
+asset-rel-sprite = sprite
 asset-role-map = mapa: { $role }
 asset-maps-count =
     { $count ->
@@ -1408,6 +1409,8 @@ asset-needs = Wymaga
 asset-animations = Animacje
 asset-sprites = Sprite’y
 asset-used-by = Używany przez
+asset-loose-sprites = Także jako osobne pliki
+asset-in-sheet = W arkuszu sprite’ów
 asset-conversion-failed = konwersja nie powiodła się
 asset-as-converting = Konwertowanie…
 asset-as-converting-percent = Konwertowanie… { $percent }%

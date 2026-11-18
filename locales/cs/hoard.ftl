@@ -629,7 +629,7 @@ app-save-search = Uložit hledání
 app-select-title = Vyberte několik assetů, které chcete společně oštítkovat, zařadit do kategorie, přidat do kolekce, stáhnout nebo archivovat (X nebo Ctrl+klik)
 app-select = Vybrat
 app-tile-size = Velikost dlaždic
-app-supporting-title = Buffery glTF, knihovny materiálů, mapy materiálů, materiály, které nosí jen jeden model, a soubory obchodů popisující modely. Stáhnou se spolu s tím, co je používá.
+app-supporting-title = Buffery glTF, knihovny materiálů, mapy materiálů, materiály, které nosí jen jeden model, a soubory obchodů popisující modely. Stáhnou se spolu s tím, co je používá. Stránky spritesheetu a jeho sprity, které balíček má i jako samostatné obrázky, se zobrazují u spritesheetu.
 app-supporting-hidden =
     { $count ->
         [one] { $count } podpůrný soubor je skrytý
@@ -1385,6 +1385,7 @@ asset-rel-library = propojený soubor
 asset-rel-guess = nejspíš patří k
 asset-rel-sidecar = údaje z obchodu
 asset-rel-variant = varianta
+asset-rel-sprite = sprite
 asset-role-map = mapa typu { $role }
 asset-maps-count =
     { $count ->
@@ -1396,6 +1397,8 @@ asset-needs = Potřebuje
 asset-animations = Animace
 asset-sprites = Sprity
 asset-used-by = Používá ho
+asset-loose-sprites = Také jako samostatné soubory
+asset-in-sheet = Ve spritesheetu
 asset-conversion-failed = převod selhal
 asset-as-converting = Převádím…
 asset-as-converting-percent = Převádím… { $percent } %

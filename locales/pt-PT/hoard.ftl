@@ -601,7 +601,7 @@ app-save-search = Guardar pesquisa
 app-select-title = Escolher vários recursos para etiquetar, categorizar, colecionar, transferir ou arquivar em conjunto (X, ou Ctrl-clique)
 app-select = Selecionar
 app-tile-size = Tamanho dos mosaicos
-app-supporting-title = Buffers glTF, bibliotecas de materiais, os mapas dos materiais, materiais usados por um só modelo e os ficheiros de loja que descrevem modelos. Vêm junto quando transfere o que os usa.
+app-supporting-title = Buffers glTF, bibliotecas de materiais, os mapas dos materiais, materiais usados por um só modelo e os ficheiros de loja que descrevem modelos. Vêm junto quando transfere o que os usa. As páginas de uma folha de sprites, e os sprites que o pacote também tem como imagens separadas, aparecem com a folha.
 app-supporting-hidden =
     { $count ->
         [one] { $count } ficheiro de apoio oculto
@@ -1289,6 +1289,7 @@ asset-rel-library = ficheiro ligado
 asset-rel-guess = provavelmente acompanha
 asset-rel-sidecar = detalhes de loja
 asset-rel-variant = variante
+asset-rel-sprite = sprite
 asset-role-map = mapa de { $role }
 asset-maps-count =
     { $count ->
@@ -1299,6 +1300,8 @@ asset-needs = Precisa de
 asset-animations = Animações
 asset-sprites = Sprites
 asset-used-by = Usado por
+asset-loose-sprites = Também como ficheiros separados
+asset-in-sheet = Numa folha de sprites
 asset-conversion-failed = a conversão falhou
 asset-as-converting = A converter…
 asset-as-converting-percent = A converter… { $percent }%

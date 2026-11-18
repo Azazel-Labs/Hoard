@@ -1305,8 +1305,8 @@ source = "Including supporting files"
 translation = "Με τα βοηθητικά αρχεία"
 
 [messages.app-supporting-title]
-source = "glTF buffers, material libraries, the maps of materials, materials only one model wears and the store files describing models. They come along when you download what uses them."
-translation = "Buffers glTF, βιβλιοθήκες υλικών, οι χάρτες των υλικών, υλικά που φοράει μόνο ένα μοντέλο και τα αρχεία καταστημάτων που περιγράφουν μοντέλα. Συμπεριλαμβάνονται όταν κατεβάζετε ό,τι τα χρησιμοποιεί."
+source = "glTF buffers, material libraries, the maps of materials, materials only one model wears and the store files describing models. They come along when you download what uses them. A sprite sheet’s pages, and its sprites the pack has as separate images too, are shown with the sheet."
+translation = "Buffers glTF, βιβλιοθήκες υλικών, οι χάρτες των υλικών, υλικά που φοράει μόνο ένα μοντέλο και τα αρχεία καταστημάτων που περιγράφουν μοντέλα. Συμπεριλαμβάνονται όταν κατεβάζετε ό,τι τα χρησιμοποιεί. Οι σελίδες ενός φύλλου sprite, και τα sprite του που το πακέτο έχει και ως ξεχωριστές εικόνες, εμφανίζονται μαζί με το φύλλο."
 
 [messages.app-theme]
 source = "Theme"
@@ -1810,6 +1810,10 @@ translation = "Αρχείο"
 source = "in"
 translation = "στο"
 
+[messages.asset-in-sheet]
+source = "In sprite sheet"
+translation = "Σε φύλλο sprite"
+
 [messages.asset-include-animations]
 source = "Include animations in the .zip"
 translation = "Συμπερίληψη των animation στο .zip"
@@ -1869,6 +1873,10 @@ translation = "προγράμματος προβολής κειμένου"
 [messages.asset-less]
 source = "Less"
 translation = "Λιγότερα"
+
+[messages.asset-loose-sprites]
+source = "Also as separate files"
+translation = "Και ως ξεχωριστά αρχεία"
 
 [messages.asset-maps]
 source = "Maps"
@@ -2285,6 +2293,10 @@ translation = "αρχείο υλικού"
 [messages.asset-rel-sidecar]
 source = "store details"
 translation = "στοιχεία καταστήματος"
+
+[messages.asset-rel-sprite]
+source = "sprite"
+translation = "sprite"
 
 [messages.asset-rel-texture]
 source = "texture"

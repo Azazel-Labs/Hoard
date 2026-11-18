@@ -601,7 +601,7 @@ app-save-search = Gem søgning
 app-select-title = Vælg flere assets, der skal tagges, kategoriseres, samles, downloades eller arkiveres sammen (X eller Ctrl-klik)
 app-select = Vælg
 app-tile-size = Feltstørrelse
-app-supporting-title = glTF-buffere, materialebiblioteker, materialers maps, materialer, som kun én model bærer, og de butiksfiler, der beskriver modeller. De kommer med, når du downloader det, der bruger dem.
+app-supporting-title = glTF-buffere, materialebiblioteker, materialers maps, materialer, som kun én model bærer, og de butiksfiler, der beskriver modeller. De kommer med, når du downloader det, der bruger dem. Et sprite-arks sider og de sprites, pakken også har som separate billeder, vises sammen med arket.
 app-supporting-hidden =
     { $count } { $count ->
         [one] understøttende fil
@@ -1285,6 +1285,7 @@ asset-rel-library = linket fil
 asset-rel-guess = hører nok sammen med
 asset-rel-sidecar = butiksoplysninger
 asset-rel-variant = variant
+asset-rel-sprite = sprite
 asset-role-map = map for { $role }
 asset-maps-count =
     { $count ->
@@ -1295,6 +1296,8 @@ asset-needs = Kræver
 asset-animations = Animationer
 asset-sprites = Sprites
 asset-used-by = Bruges af
+asset-loose-sprites = Også som separate filer
+asset-in-sheet = I et spriteark
 asset-conversion-failed = konverteringen mislykkedes
 asset-as-converting = Konverterer…
 asset-as-converting-percent = Konverterer… { $percent } %

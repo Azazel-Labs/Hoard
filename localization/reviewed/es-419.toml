@@ -1293,8 +1293,8 @@ source = "Including supporting files"
 translation = "Con archivos de apoyo"
 
 [messages.app-supporting-title]
-source = "glTF buffers, material libraries, the maps of materials, materials only one model wears and the store files describing models. They come along when you download what uses them."
-translation = "Búferes de glTF, bibliotecas de materiales, los mapas de los materiales, los materiales que usa un solo modelo y los archivos de tienda que describen modelos. Se incluyen al descargar lo que los usa."
+source = "glTF buffers, material libraries, the maps of materials, materials only one model wears and the store files describing models. They come along when you download what uses them. A sprite sheet’s pages, and its sprites the pack has as separate images too, are shown with the sheet."
+translation = "Búferes de glTF, bibliotecas de materiales, los mapas de los materiales, los materiales que usa un solo modelo y los archivos de tienda que describen modelos. Se incluyen al descargar lo que los usa. Las páginas de una hoja de sprites, y los sprites que el paquete también tiene como imágenes sueltas, se muestran con la hoja."
 
 [messages.app-theme]
 source = "Theme"
@@ -1798,6 +1798,10 @@ translation = "Archivo"
 source = "in"
 translation = "en"
 
+[messages.asset-in-sheet]
+source = "In sprite sheet"
+translation = "En una hoja de sprites"
+
 [messages.asset-include-animations]
 source = "Include animations in the .zip"
 translation = "Incluir animaciones en el .zip"
@@ -1857,6 +1861,10 @@ translation = "el visor de texto"
 [messages.asset-less]
 source = "Less"
 translation = "Menos"
+
+[messages.asset-loose-sprites]
+source = "Also as separate files"
+translation = "También como archivos separados"
 
 [messages.asset-maps]
 source = "Maps"
@@ -2273,6 +2281,10 @@ translation = "archivo de material"
 [messages.asset-rel-sidecar]
 source = "store details"
 translation = "datos de tienda"
+
+[messages.asset-rel-sprite]
+source = "sprite"
+translation = "sprite"
 
 [messages.asset-rel-texture]
 source = "texture"

@@ -681,7 +681,7 @@ app-save-search = Save search
 app-select-title = Pick several assets to tag, categorize, collect, download or archive together (X, or Ctrl-click)
 app-select = Select
 app-tile-size = Tile size
-app-supporting-title = glTF buffers, material libraries, the maps of materials, materials only one model wears and the store files describing models. They come along when you download what uses them.
+app-supporting-title = glTF buffers, material libraries, the maps of materials, materials only one model wears and the store files describing models. They come along when you download what uses them. A sprite sheet’s pages, and its sprites the pack has as separate images too, are shown with the sheet.
 app-supporting-hidden =
     { $count } supporting { $count ->
         [one] file
@@ -1435,6 +1435,8 @@ asset-rel-library = linked file
 asset-rel-guess = probably goes with
 asset-rel-sidecar = store details
 asset-rel-variant = variant
+# A sprite sheet and a loose image that is one of its sprites, saved on its own as well.
+asset-rel-sprite = sprite
 # Beside a material this texture belongs to: what kind of map it is in it. $role is the map's role, lowercase ("normal").
 asset-role-map = { $role } map
 # Beside a material a model wears: how many maps it has.
@@ -1448,6 +1450,9 @@ asset-needs = Needs
 asset-animations = Animations
 asset-sprites = Sprites
 asset-used-by = Used by
+# On a sprite sheet, its sprites the pack has as separate images too; on one of those, the sheet it is in.
+asset-loose-sprites = Also as separate files
+asset-in-sheet = In sprite sheet
 # "Download as": converting the file on the server.
 asset-conversion-failed = conversion failed
 asset-as-converting = Converting…

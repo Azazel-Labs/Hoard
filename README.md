@@ -344,7 +344,9 @@ software rasterizer (`apt install mesa-vulkan-drivers`). Without any adapter, ev
      and Godot `.tres` `SpriteFrames` and `TileSet` resources): the atlas file becomes a sprite sheet,
      kept as a Hoard sheet (`.hoardsheet`, JSON) that names its pages, where each sprite is on them, how it's turned
      and trimmed, and its animations (the file's own, or numbered names such as `walk_0`, `walk_1`). The pages stay
-     textures in the pack and the sprites aren't assets of their own. A sheet's details show its animations playing
+     textures in the pack, hidden with the sheet, and the sprites aren't assets of their own. Loose images in the pack
+     with a sprite's name and picture (Kenney's `PNG/` folders beside each sheet) are linked from the sheet and hidden
+     with it too, listed in its details under "Also as separate files". A sheet's details show its animations playing
      and its sprites, which a name narrows down, each drawn upright on its whole canvas. It downloads as a Hoard
      sheet, TexturePacker JSON (hash or array), Starling XML, libGDX `.atlas`, Cocos2d `.plist`, Godot
      `SpriteFrames` or `TileSet`, a grid image or a PNG per sprite, each a zip with its images. A format gets what it

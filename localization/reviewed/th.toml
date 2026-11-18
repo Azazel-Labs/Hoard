@@ -1257,8 +1257,8 @@ source = "Including supporting files"
 translation = "รวมไฟล์ประกอบด้วย"
 
 [messages.app-supporting-title]
-source = "glTF buffers, material libraries, the maps of materials, materials only one model wears and the store files describing models. They come along when you download what uses them."
-translation = "บัฟเฟอร์ glTF, ไลบรารีแมทีเรียล, แมปของแมทีเรียล, แมทีเรียลที่มีโมเดลเดียวใช้ และไฟล์ร้านค้าที่อธิบายโมเดล ไฟล์เหล่านี้จะมาด้วยเมื่อคุณดาวน์โหลดสิ่งที่ใช้ไฟล์เหล่านี้"
+source = "glTF buffers, material libraries, the maps of materials, materials only one model wears and the store files describing models. They come along when you download what uses them. A sprite sheet’s pages, and its sprites the pack has as separate images too, are shown with the sheet."
+translation = "บัฟเฟอร์ glTF, ไลบรารีแมทีเรียล, แมปของแมทีเรียล, แมทีเรียลที่มีโมเดลเดียวใช้ และไฟล์ร้านค้าที่อธิบายโมเดล ไฟล์เหล่านี้จะมาด้วยเมื่อคุณดาวน์โหลดสิ่งที่ใช้ไฟล์เหล่านี้ หน้าของสไปรต์ชีต และสไปรต์ของชีตที่แพ็กมีเป็นภาพแยกด้วย จะแสดงร่วมกับชีต"
 
 [messages.app-theme]
 source = "Theme"
@@ -1731,6 +1731,10 @@ translation = "ไฟล์"
 source = "in"
 translation = "ใน"
 
+[messages.asset-in-sheet]
+source = "In sprite sheet"
+translation = "อยู่ในสไปรต์ชีต"
+
 [messages.asset-include-animations]
 source = "Include animations in the .zip"
 translation = "รวมแอนิเมชันไว้ใน .zip"
@@ -1790,6 +1794,10 @@ translation = "ตัวแสดงข้อความ"
 [messages.asset-less]
 source = "Less"
 translation = "น้อยลง"
+
+[messages.asset-loose-sprites]
+source = "Also as separate files"
+translation = "มีเป็นไฟล์แยกด้วย"
 
 [messages.asset-maps]
 source = "Maps"
@@ -2200,6 +2208,10 @@ translation = "ไฟล์แมทีเรียล"
 [messages.asset-rel-sidecar]
 source = "store details"
 translation = "รายละเอียดร้านค้า"
+
+[messages.asset-rel-sprite]
+source = "sprite"
+translation = "สไปรต์"
 
 [messages.asset-rel-texture]
 source = "texture"

@@ -609,7 +609,7 @@ app-save-search = Enregistrer la recherche
 app-select-title = Choisir plusieurs ressources pour les étiqueter, catégoriser, mettre en collection, télécharger ou archiver ensemble (X, ou Ctrl-clic)
 app-select = Sélectionner
 app-tile-size = Taille des vignettes
-app-supporting-title = Tampons glTF, bibliothèques de matériaux, cartes des matériaux, matériaux portés par un seul modèle et fichiers de boutique décrivant des modèles. Ils sont inclus quand vous téléchargez ce qui les utilise.
+app-supporting-title = Tampons glTF, bibliothèques de matériaux, cartes des matériaux, matériaux portés par un seul modèle et fichiers de boutique décrivant des modèles. Ils sont inclus quand vous téléchargez ce qui les utilise. Les pages d’une feuille de sprites, et ses sprites que le pack contient aussi en images séparées, sont montrés avec la feuille.
 app-supporting-hidden =
     { $count ->
         [one] { $count } fichier annexe masqué
@@ -1313,6 +1313,7 @@ asset-rel-library = fichier lié
 asset-rel-guess = va probablement avec
 asset-rel-sidecar = informations de boutique
 asset-rel-variant = variante
+asset-rel-sprite = sprite
 asset-role-map = carte { $role }
 asset-maps-count =
     { $count ->
@@ -1323,6 +1324,8 @@ asset-needs = Nécessite
 asset-animations = Animations
 asset-sprites = Sprites
 asset-used-by = Utilisé par
+asset-loose-sprites = Aussi en fichiers séparés
+asset-in-sheet = Dans une feuille de sprites
 asset-conversion-failed = échec de la conversion
 asset-as-converting = Conversion…
 asset-as-converting-percent = Conversion… { $percent } %

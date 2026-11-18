@@ -1261,8 +1261,8 @@ source = "Including supporting files"
 translation = "Kiegészítő fájlokkal együtt"
 
 [messages.app-supporting-title]
-source = "glTF buffers, material libraries, the maps of materials, materials only one model wears and the store files describing models. They come along when you download what uses them."
-translation = "glTF-pufferek, anyagkönyvtárak, az anyagok térképei, csak egy modell által használt anyagok és a modelleket leíró áruházi fájlok. Velük együtt töltődnek le, amikor letölti az őket használó elemet."
+source = "glTF buffers, material libraries, the maps of materials, materials only one model wears and the store files describing models. They come along when you download what uses them. A sprite sheet’s pages, and its sprites the pack has as separate images too, are shown with the sheet."
+translation = "glTF-pufferek, anyagkönyvtárak, az anyagok térképei, csak egy modell által használt anyagok és a modelleket leíró áruházi fájlok. Velük együtt töltődnek le, amikor letölti az őket használó elemet. A sprite-lap oldalai és azon spritejai, amelyek a csomagban külön képként is megvannak, a lappal együtt jelennek meg."
 
 [messages.app-theme]
 source = "Theme"
@@ -1735,6 +1735,10 @@ translation = "Fájl"
 source = "in"
 translation = "·"
 
+[messages.asset-in-sheet]
+source = "In sprite sheet"
+translation = "Sprite-lapon"
+
 [messages.asset-include-animations]
 source = "Include animations in the .zip"
 translation = "Animációk hozzáadása a .zip fájlhoz"
@@ -1794,6 +1798,10 @@ translation = "szövegmegjelenítő"
 [messages.asset-less]
 source = "Less"
 translation = "Kevesebb"
+
+[messages.asset-loose-sprites]
+source = "Also as separate files"
+translation = "Külön fájlokként is"
 
 [messages.asset-maps]
 source = "Maps"
@@ -2206,6 +2214,10 @@ translation = "anyagfájl"
 [messages.asset-rel-sidecar]
 source = "store details"
 translation = "áruházi adatok"
+
+[messages.asset-rel-sprite]
+source = "sprite"
+translation = "sprite"
 
 [messages.asset-rel-texture]
 source = "texture"

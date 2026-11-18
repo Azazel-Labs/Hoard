@@ -634,7 +634,7 @@ app-save-search = Salvați căutarea
 app-select-title = Alegeți mai multe resurse pentru a le eticheta, categorisi, colecta, descărca sau arhiva împreună (X sau Ctrl-clic)
 app-select = Selectați
 app-tile-size = Mărimea dalelor
-app-supporting-title = Buffere glTF, biblioteci de materiale, hărțile materialelor, materiale purtate de un singur model și fișierele de magazin care descriu modele. Vin împreună cu ce le folosește atunci când descărcați.
+app-supporting-title = Buffere glTF, biblioteci de materiale, hărțile materialelor, materiale purtate de un singur model și fișierele de magazin care descriu modele. Vin împreună cu ce le folosește atunci când descărcați. Paginile unei foi de sprite-uri și sprite-urile ei pe care pachetul le are și ca imagini separate sunt afișate împreună cu foaia.
 app-supporting-hidden =
     { $count ->
         [one] { $count } fișier auxiliar ascuns
@@ -1390,6 +1390,7 @@ asset-rel-library = fișier legat
 asset-rel-guess = probabil merge cu
 asset-rel-sidecar = detalii de magazin
 asset-rel-variant = variantă
+asset-rel-sprite = sprite
 asset-role-map = hartă de { $role }
 asset-maps-count =
     { $count ->
@@ -1401,6 +1402,8 @@ asset-needs = Are nevoie de
 asset-animations = Animații
 asset-sprites = Sprite-uri
 asset-used-by = Folosit de
+asset-loose-sprites = Și ca fișiere separate
+asset-in-sheet = Într-o foaie de sprite-uri
 asset-conversion-failed = conversia a eșuat
 asset-as-converting = Se convertește…
 asset-as-converting-percent = Se convertește… { $percent }%

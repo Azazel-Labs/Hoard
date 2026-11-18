@@ -1257,8 +1257,8 @@ source = "Including supporting files"
 translation = "보조 파일 포함"
 
 [messages.app-supporting-title]
-source = "glTF buffers, material libraries, the maps of materials, materials only one model wears and the store files describing models. They come along when you download what uses them."
-translation = "glTF 버퍼, 머티리얼 라이브러리, 머티리얼의 맵, 모델 하나만 쓰는 머티리얼, 모델을 설명하는 스토어 파일입니다. 이 파일들을 사용하는 것을 다운로드하면 함께 받아집니다."
+source = "glTF buffers, material libraries, the maps of materials, materials only one model wears and the store files describing models. They come along when you download what uses them. A sprite sheet’s pages, and its sprites the pack has as separate images too, are shown with the sheet."
+translation = "glTF 버퍼, 머티리얼 라이브러리, 머티리얼의 맵, 모델 하나만 쓰는 머티리얼, 모델을 설명하는 스토어 파일입니다. 이 파일들을 사용하는 것을 다운로드하면 함께 받아집니다. 스프라이트 시트의 페이지와, 팩에 별도 이미지로도 있는 그 스프라이트는 시트와 함께 표시됩니다."
 
 [messages.app-theme]
 source = "Theme"
@@ -1731,6 +1731,10 @@ translation = "파일"
 source = "in"
 translation = "·"
 
+[messages.asset-in-sheet]
+source = "In sprite sheet"
+translation = "스프라이트 시트에 포함"
+
 [messages.asset-include-animations]
 source = "Include animations in the .zip"
 translation = ".zip에 애니메이션 포함"
@@ -1790,6 +1794,10 @@ translation = "텍스트 뷰어"
 [messages.asset-less]
 source = "Less"
 translation = "접기"
+
+[messages.asset-loose-sprites]
+source = "Also as separate files"
+translation = "별도 파일로도 있음"
 
 [messages.asset-maps]
 source = "Maps"
@@ -2194,6 +2202,10 @@ translation = "머티리얼 파일"
 [messages.asset-rel-sidecar]
 source = "store details"
 translation = "스토어 정보"
+
+[messages.asset-rel-sprite]
+source = "sprite"
+translation = "스프라이트"
 
 [messages.asset-rel-texture]
 source = "texture"

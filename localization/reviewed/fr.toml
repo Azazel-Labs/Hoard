@@ -1305,8 +1305,8 @@ source = "Including supporting files"
 translation = "Fichiers annexes inclus"
 
 [messages.app-supporting-title]
-source = "glTF buffers, material libraries, the maps of materials, materials only one model wears and the store files describing models. They come along when you download what uses them."
-translation = "Tampons glTF, bibliothèques de matériaux, cartes des matériaux, matériaux portés par un seul modèle et fichiers de boutique décrivant des modèles. Ils sont inclus quand vous téléchargez ce qui les utilise."
+source = "glTF buffers, material libraries, the maps of materials, materials only one model wears and the store files describing models. They come along when you download what uses them. A sprite sheet’s pages, and its sprites the pack has as separate images too, are shown with the sheet."
+translation = "Tampons glTF, bibliothèques de matériaux, cartes des matériaux, matériaux portés par un seul modèle et fichiers de boutique décrivant des modèles. Ils sont inclus quand vous téléchargez ce qui les utilise. Les pages d’une feuille de sprites, et ses sprites que le pack contient aussi en images séparées, sont montrés avec la feuille."
 
 [messages.app-theme]
 source = "Theme"
@@ -1810,6 +1810,10 @@ translation = "Fichier"
 source = "in"
 translation = "dans"
 
+[messages.asset-in-sheet]
+source = "In sprite sheet"
+translation = "Dans une feuille de sprites"
+
 [messages.asset-include-animations]
 source = "Include animations in the .zip"
 translation = "Inclure les animations dans le .zip"
@@ -1869,6 +1873,10 @@ translation = "la visionneuse de texte"
 [messages.asset-less]
 source = "Less"
 translation = "Moins"
+
+[messages.asset-loose-sprites]
+source = "Also as separate files"
+translation = "Aussi en fichiers séparés"
 
 [messages.asset-maps]
 source = "Maps"
@@ -2285,6 +2293,10 @@ translation = "fichier de matériau"
 [messages.asset-rel-sidecar]
 source = "store details"
 translation = "informations de boutique"
+
+[messages.asset-rel-sprite]
+source = "sprite"
+translation = "sprite"
 
 [messages.asset-rel-texture]
 source = "texture"

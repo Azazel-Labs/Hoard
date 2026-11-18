@@ -233,7 +233,7 @@ fn guess_animations(sprites: &[Sprite]) -> Vec<Anim> {
 }
 
 /// A sprite's name without the extension of the image it was packed from (`walk_01.png` → `walk_01`).
-fn image_stem(name: &str) -> &str {
+pub(crate) fn image_stem(name: &str) -> &str {
     match name.rsplit_once('.') {
         Some((stem, ext))
             if matches!(

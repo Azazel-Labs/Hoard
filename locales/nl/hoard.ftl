@@ -601,7 +601,7 @@ app-save-search = Zoekopdracht opslaan
 app-select-title = Kies meerdere assets om ze samen te taggen, te categoriseren, in een collectie te zetten, te downloaden of te archiveren (X, of Ctrl-klik)
 app-select = Selecteren
 app-tile-size = Tegelgrootte
-app-supporting-title = glTF-buffers, materiaalbibliotheken, de maps van materialen, materialen die maar één model draagt en de storebestanden die modellen beschrijven. Ze gaan mee als je downloadt wat ze gebruikt.
+app-supporting-title = glTF-buffers, materiaalbibliotheken, de maps van materialen, materialen die maar één model draagt en de storebestanden die modellen beschrijven. Ze gaan mee als je downloadt wat ze gebruikt. De pagina’s van een spritesheet, en de sprites die het pakket ook als losse afbeeldingen heeft, worden bij de spritesheet getoond.
 app-supporting-hidden =
     { $count } ondersteunende { $count ->
         [one] bestand
@@ -1283,6 +1283,7 @@ asset-rel-library = gelinkt bestand
 asset-rel-guess = hoort er waarschijnlijk bij
 asset-rel-sidecar = storegegevens
 asset-rel-variant = variant
+asset-rel-sprite = sprite
 asset-role-map = map voor { $role }
 asset-maps-count =
     { $count ->
@@ -1293,6 +1294,8 @@ asset-needs = Heeft nodig
 asset-animations = Animaties
 asset-sprites = Sprites
 asset-used-by = Gebruikt door
+asset-loose-sprites = Ook als losse bestanden
+asset-in-sheet = In een spritesheet
 asset-conversion-failed = conversie mislukt
 asset-as-converting = Converteren…
 asset-as-converting-percent = Converteren… { $percent }%

@@ -617,7 +617,7 @@ app-save-search = Αποθήκευση αναζήτησης
 app-select-title = Επιλέξτε πολλά στοιχεία για να τους δώσετε ετικέτες, κατηγορία, να τα βάλετε σε συλλογή, να τα κατεβάσετε ή να τα αρχειοθετήσετε μαζί (X ή Ctrl-κλικ)
 app-select = Επιλογή
 app-tile-size = Μέγεθος πλακιδίων
-app-supporting-title = Buffers glTF, βιβλιοθήκες υλικών, οι χάρτες των υλικών, υλικά που φοράει μόνο ένα μοντέλο και τα αρχεία καταστημάτων που περιγράφουν μοντέλα. Συμπεριλαμβάνονται όταν κατεβάζετε ό,τι τα χρησιμοποιεί.
+app-supporting-title = Buffers glTF, βιβλιοθήκες υλικών, οι χάρτες των υλικών, υλικά που φοράει μόνο ένα μοντέλο και τα αρχεία καταστημάτων που περιγράφουν μοντέλα. Συμπεριλαμβάνονται όταν κατεβάζετε ό,τι τα χρησιμοποιεί. Οι σελίδες ενός φύλλου sprite, και τα sprite του που το πακέτο έχει και ως ξεχωριστές εικόνες, εμφανίζονται μαζί με το φύλλο.
 app-supporting-hidden =
     { $count ->
         [one] { $count } βοηθητικό αρχείο κρυφό
@@ -1333,6 +1333,7 @@ asset-rel-library = συνδεδεμένο αρχείο
 asset-rel-guess = μάλλον συνοδεύει
 asset-rel-sidecar = στοιχεία καταστήματος
 asset-rel-variant = παραλλαγή
+asset-rel-sprite = sprite
 asset-role-map = χάρτης { $role }
 asset-maps-count =
     { $count ->
@@ -1343,6 +1344,8 @@ asset-needs = Χρειάζεται
 asset-animations = Animation
 asset-sprites = Sprites
 asset-used-by = Χρησιμοποιείται από
+asset-loose-sprites = Και ως ξεχωριστά αρχεία
+asset-in-sheet = Σε φύλλο sprite
 asset-conversion-failed = η μετατροπή απέτυχε
 asset-as-converting = Μετατροπή…
 asset-as-converting-percent = Μετατροπή… { $percent }%

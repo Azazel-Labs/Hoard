@@ -613,7 +613,7 @@ app-save-search = Tallenna haku
 app-select-title = Valitse useita resursseja lisätäksesi tunnisteita, luokitellaksesi, kerätäksesi, ladataksesi tai arkistoidaksesi ne yhdessä (X tai Ctrl-napsautus)
 app-select = Valitse
 app-tile-size = Ruutujen koko
-app-supporting-title = glTF-puskurit, materiaalikirjastot, materiaalien kartat, vain yhden mallin käyttämät materiaalit ja malleja kuvaavat kauppatiedostot. Ne tulevat mukana, kun lataat niitä käyttävän resurssin.
+app-supporting-title = glTF-puskurit, materiaalikirjastot, materiaalien kartat, vain yhden mallin käyttämät materiaalit ja malleja kuvaavat kauppatiedostot. Ne tulevat mukana, kun lataat niitä käyttävän resurssin. Sprite-arkin sivut ja sen spritet, jotka paketissa on myös erillisinä kuvina, näytetään arkin yhteydessä.
 app-supporting-hidden =
     { $count ->
         [one] { $count } tukitiedosto piilotettu
@@ -1333,6 +1333,7 @@ asset-rel-library = linkitetty tiedosto
 asset-rel-guess = kuuluu luultavasti yhteen
 asset-rel-sidecar = kauppatiedot
 asset-rel-variant = muunnelma
+asset-rel-sprite = sprite
 asset-role-map = kartta: { $role }
 asset-maps-count =
     { $count ->
@@ -1343,6 +1344,8 @@ asset-needs = Tarvitsee
 asset-animations = Animaatiot
 asset-sprites = Spritet
 asset-used-by = Käyttäjät
+asset-loose-sprites = Myös erillisinä tiedostoina
+asset-in-sheet = Sprite-arkissa
 asset-conversion-failed = muunnos epäonnistui
 asset-as-converting = Muunnetaan…
 asset-as-converting-percent = Muunnetaan… { $percent } %

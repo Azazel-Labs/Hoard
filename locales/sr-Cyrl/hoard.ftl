@@ -614,7 +614,7 @@ app-save-search = Сачувај претрагу
 app-select-title = Изаберите више ресурса да бисте их заједно означили, категорисали, додали у колекцију, преузели или архивирали (X или Ctrl-клик)
 app-select = Изабери
 app-tile-size = Величина плочица
-app-supporting-title = glTF бафери, библиотеке материјала, мапе материјала, материјали које носи само један модел и датотеке продавница које описују моделе. Долазе уз оно што их користи када то преузмете.
+app-supporting-title = glTF бафери, библиотеке материјала, мапе материјала, материјали које носи само један модел и датотеке продавница које описују моделе. Долазе уз оно што их користи када то преузмете. Странице листа спрајтова, и његови спрајтови које пакет има и као засебне слике, приказују се уз лист.
 app-supporting-hidden =
     { $count ->
         [one] Скривена је { $count } пратећа датотека
@@ -1331,6 +1331,7 @@ asset-rel-library = повезана датотека
 asset-rel-guess = вероватно иде уз
 asset-rel-sidecar = подаци из продавнице
 asset-rel-variant = варијанта
+asset-rel-sprite = спрајт
 asset-role-map = мапа типа { $role }
 asset-maps-count =
     { $count ->
@@ -1342,6 +1343,8 @@ asset-needs = Потребно
 asset-animations = Анимације
 asset-sprites = Спрајтови
 asset-used-by = Користи га
+asset-loose-sprites = И као засебне датотеке
+asset-in-sheet = У листу спрајтова
 asset-conversion-failed = претварање није успело
 asset-as-converting = Претварање…
 asset-as-converting-percent = Претварање… { $percent }%

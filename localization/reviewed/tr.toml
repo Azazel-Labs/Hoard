@@ -1261,8 +1261,8 @@ source = "Including supporting files"
 translation = "Yardımcı dosyalar dahil"
 
 [messages.app-supporting-title]
-source = "glTF buffers, material libraries, the maps of materials, materials only one model wears and the store files describing models. They come along when you download what uses them."
-translation = "glTF arabellekleri, malzeme kütüphaneleri, malzemelerin haritaları, yalnızca tek bir modelin kullandığı malzemeler ve modelleri tanımlayan mağaza dosyaları. Onları kullanan şeyi indirdiğinizde birlikte gelirler."
+source = "glTF buffers, material libraries, the maps of materials, materials only one model wears and the store files describing models. They come along when you download what uses them. A sprite sheet’s pages, and its sprites the pack has as separate images too, are shown with the sheet."
+translation = "glTF arabellekleri, malzeme kütüphaneleri, malzemelerin haritaları, yalnızca tek bir modelin kullandığı malzemeler ve modelleri tanımlayan mağaza dosyaları. Onları kullanan şeyi indirdiğinizde birlikte gelirler. Bir sprite sayfasının sayfaları ve paketin ayrı görseller olarak da içerdiği spriteları sayfayla birlikte gösterilir."
 
 [messages.app-theme]
 source = "Theme"
@@ -1739,6 +1739,10 @@ translation = "Dosya"
 source = "in"
 translation = "·"
 
+[messages.asset-in-sheet]
+source = "In sprite sheet"
+translation = "Bir sprite sayfasında"
+
 [messages.asset-include-animations]
 source = "Include animations in the .zip"
 translation = "Animasyonları .zip’e dahil et"
@@ -1798,6 +1802,10 @@ translation = "metin görüntüleyici"
 [messages.asset-less]
 source = "Less"
 translation = "Daha az"
+
+[messages.asset-loose-sprites]
+source = "Also as separate files"
+translation = "Ayrı dosyalar olarak da"
 
 [messages.asset-maps]
 source = "Maps"
@@ -2210,6 +2218,10 @@ translation = "malzeme dosyası"
 [messages.asset-rel-sidecar]
 source = "store details"
 translation = "mağaza ayrıntıları"
+
+[messages.asset-rel-sprite]
+source = "sprite"
+translation = "sprite"
 
 [messages.asset-rel-texture]
 source = "texture"

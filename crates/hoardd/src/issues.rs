@@ -611,7 +611,7 @@ pub(crate) async fn retry(State(state): State<AppState>, Json(chosen): Json<Pick
                         params![id, now],
                     )?;
                 }
-                Redo::Scan(loc) => crate::scan::enqueue(c, &st, *loc)?,
+                Redo::Scan(loc) => crate::scan::enqueue(c, &st, *loc, true)?,
                 Redo::Retag(pack) => {
                     if !db::job_pending(c, jobs::RETAG, Some(pack), None)? {
                         db::set_pack_status(c, pack, hoard_core::PackStatus::Ingesting, None)?;

@@ -365,7 +365,7 @@ pub(crate) async fn create_location(
     tracing::info!(name = %loc.name, path = %loc.path, mode = loc.mode.as_str(), "library location added");
     if loc.mode == Mode::Watched {
         let (s, id) = (std::sync::Arc::clone(&state), loc.id);
-        db::call(&state.pool, move |c| crate::scan::enqueue(c, &s, id)).await?;
+        db::call(&state.pool, move |c| crate::scan::enqueue(c, &s, id, true)).await?;
     }
     Ok((StatusCode::CREATED, Json(loc)))
 }
@@ -379,7 +379,7 @@ pub(crate) async fn scan_location(State(state): State<AppState>, UrlPath(id): Ur
         return Err(AppError::bad_request(tr!("error-not-watched", name = loc.name)));
     }
     let s = std::sync::Arc::clone(&state);
-    db::call(&state.pool, move |c| crate::scan::enqueue(c, &s, id)).await?;
+    db::call(&state.pool, move |c| crate::scan::enqueue(c, &s, id, true)).await?;
     Ok(StatusCode::ACCEPTED)
 }
 

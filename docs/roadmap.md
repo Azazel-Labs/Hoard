@@ -16,14 +16,6 @@ waits until they're next changed: `db/schema.rs` (1,620 lines, mostly the migrat
 `unitymat.rs`, `sidecar.rs`, `sources.rs`, `links.rs` and `materials/models.rs` (750 to 900 lines each), and on the
 web side `App.vue` (1,750), `AssetDetail.vue`, `PacksView.vue`, `skeleton2d.ts` and `AiPanel.vue` (700 to 870).
 
-## Library locations: what's left
-
-The first-run setup and library locations are in. A server can keep files in several managed locations, routed by
-asset kind, and move stored files between them. It can also index watched folders in place. Still to come:
-
-- Cheaper rescans: every 15 minutes, each watched pack's whole tree is walked. A big library on a slow share could
-  check folder modification times first.
-
 ## Store details filled in without asking
 
 "Store details" already searches Fab, itch.io, Kenney and OpenGameArt by the pack's name and lists likely matches to

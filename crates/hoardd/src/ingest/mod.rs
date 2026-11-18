@@ -27,7 +27,7 @@ use rules::{
 };
 use store::{Previews, insert_asset, insert_blob, save_readme, store_derivative, upload_all, write_tags};
 use unpack::{Budget, expand_archives, find_root, kept, listed, pack_gltfs, rel_of};
-pub(crate) use unpack::{pack_rels, safe_rel_path};
+pub(crate) use unpack::{is_junk, pack_rels, safe_rel_path};
 
 /// Threads for per-file work: every core, up to 8.
 fn workers() -> usize {

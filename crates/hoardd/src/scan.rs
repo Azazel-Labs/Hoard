@@ -1,11 +1,13 @@
 //! Watched folders: each folder inside a watched location is a pack, indexed where it sits. A scan adds a pack for
 //! each new folder, drops the packs whose folder has been gone for [`FORGET_MISSING_AFTER`], and catches up packs
 //! whose files changed. Every watched location is scanned at startup and every [`RESCAN_EVERY`] after, and from
-//! Settings on demand.
+//! Settings on demand. Most rescans are quick: a pack whose folders all have the modified time they had is left
+//! alone, as nothing in it was added, removed or renamed. A full one, at startup, on demand and every
+//! [`FULL_RESCAN_EVERY`], also looks at each file for ones edited where they sit (which leaves its folder's time be).
 
-use std::collections::{HashMap, HashSet};
+use std::collections::{BTreeMap, HashMap, HashSet};
 use std::path::Path;
-use std::time::Duration;
+use std::time::{Duration, Instant, UNIX_EPOCH};
 
 use anyhow::Result;
 use rusqlite::{Connection, params};
@@ -21,16 +23,25 @@ use crate::{db, ingest, issues, jobs};
 /// through most network shares, so this is a plain timer.
 const RESCAN_EVERY: Duration = Duration::from_mins(15);
 
+/// How often a rescan looks at every file, not just the folders' modified times.
+const FULL_RESCAN_EVERY: Duration = Duration::from_hours(24);
+
 /// How long a pack whose folder has gone missing is kept, with its tags and notes, before it's dropped. A folder
 /// that's missing is more often on a disk or share that's offline than deleted.
 const FORGET_MISSING_AFTER: Duration = Duration::from_hours(72);
 
-/// Queue a scan of a watched location, unless one is already waiting or running (two at once would both add the
-/// same new folders).
-pub(crate) fn enqueue(c: &Connection, state: &AppState, location: i64) -> Result<()> {
+/// Queue a scan of a watched location (a full one looks at every file), unless one is already waiting or running
+/// (two at once would both add the same new folders). A full scan asked for while a quick one waits makes it full.
+pub(crate) fn enqueue(c: &Connection, state: &AppState, location: i64, full: bool) -> Result<()> {
     if !db::job_pending(c, jobs::SCAN, None, Some(("location", location)))? {
-        db::enqueue(c, jobs::SCAN, None, &json!({ "location": location }))?;
+        db::enqueue(c, jobs::SCAN, None, &json!({ "location": location, "full": full }))?;
         state.wake.notify_one();
+    } else if full {
+        c.execute(
+            "UPDATE jobs SET payload = json_set(payload, '$.full', json('true'))
+              WHERE kind = ?1 AND status = 'queued' AND json_extract(payload, '$.location') = ?2",
+            params![jobs::SCAN, location],
+        )?;
     }
     Ok(())
 }
@@ -42,8 +53,13 @@ pub(crate) fn spawn_rescans(state: &AppState) {
     tokio::spawn(async move {
         let mut tick = tokio::time::interval(RESCAN_EVERY);
         tick.set_missed_tick_behavior(tokio::time::MissedTickBehavior::Delay);
+        let mut last_full: Option<Instant> = None;
         loop {
             tick.tick().await;
+            let full = last_full.is_none_or(|t| t.elapsed() >= FULL_RESCAN_EVERY);
+            if full {
+                last_full = Some(Instant::now());
+            }
             if let Err(e) = state.blobs.refresh().await {
                 tracing::warn!(error = %format!("{e:#}"), "couldn't reopen the library locations");
             }
@@ -54,7 +70,7 @@ pub(crate) fn spawn_rescans(state: &AppState) {
                     stmt.query_map([], |r| r.get(0))?.collect::<rusqlite::Result<_>>()?
                 };
                 for id in ids {
-                    enqueue(c, &s, id)?;
+                    enqueue(c, &s, id, full)?;
                 }
                 Ok(())
             })
@@ -95,15 +111,15 @@ pub(crate) struct Changes {
     pub(crate) renamed: usize,
 }
 
-pub(crate) fn scan(state: &AppState, location: i64) -> Result<Changes> {
-    let changes = sweep(&mut *state.pool.get()?, location)?;
+pub(crate) fn scan(state: &AppState, location: i64, full: bool) -> Result<Changes> {
+    let changes = sweep(&mut *state.pool.get()?, location, full)?;
     if changes != Changes::default() {
         state.wake.notify_one();
     }
     Ok(changes)
 }
 
-fn sweep(conn: &mut Connection, location: i64) -> Result<Changes> {
+fn sweep(conn: &mut Connection, location: i64, full: bool) -> Result<Changes> {
     let Some(loc) = locations::get(conn, location)? else { return Ok(Changes::default()) };
     if loc.mode != Mode::Watched {
         return Ok(Changes::default());
@@ -125,10 +141,12 @@ fn sweep(conn: &mut Connection, location: i64) -> Result<Changes> {
     };
     let existing: HashMap<String, Existing> = {
         let mut stmt = conn.prepare(
-            "SELECT folder, id, status, missing_since FROM packs WHERE location_id = ?1 AND folder IS NOT NULL",
+            "SELECT folder, id, status, missing_since, dir_times FROM packs
+              WHERE location_id = ?1 AND folder IS NOT NULL",
         )?;
         stmt.query_map([location], |r| {
-            Ok((r.get(0)?, Existing { id: r.get(1)?, status: r.get(2)?, missing_since: r.get(3)? }))
+            let (id, status, missing_since, dir_times) = (r.get(1)?, r.get(2)?, r.get(3)?, r.get(4)?);
+            Ok((r.get(0)?, Existing { id, status, missing_since, dir_times }))
         })?
         .collect::<rusqlite::Result<_>>()?
     };
@@ -213,6 +231,7 @@ fn sweep(conn: &mut Connection, location: i64) -> Result<Changes> {
             continue;
         }
         let touched = match pack.status.as_str() {
+            "ready" if !full && unchanged(pack.dir_times.as_deref(), &root.join(folder)) => false,
             "ready" => catch_up(conn, &pack.id, &root.join(folder))?,
             // A pack whose ingest failed (a share that dropped out halfway, say) is tried again.
             "failed" => {
@@ -269,6 +288,8 @@ struct Existing {
     id: String,
     status: String,
     missing_since: Option<String>,
+    /// The modified time of each of its folders when it was last caught up (see [`dir_times`]).
+    dir_times: Option<String>,
 }
 
 /// A pack for a new folder, queued for ingest (which reads the folder in place). False if the folder already has
@@ -290,6 +311,8 @@ fn add_pack(c: &Connection, location: i64, folder: &str) -> Result<bool> {
 /// Bring a ready pack in line with its folder: assets whose file is gone are dropped, new files are queued for
 /// ingest, and files changed where they sit are analyzed again. Returns whether anything changed.
 fn catch_up(c: &Connection, pack_id: &str, dir: &Path) -> Result<bool> {
+    // Taken before the files are listed, so a change made while they are is seen next time.
+    let times = dir_times(dir).ok().map(|t| serde_json::to_string(&t)).transpose()?;
     let Ok(on_disk) = ingest::pack_rels(dir) else { return Ok(false) };
     // An asset converted from one of the pack's files (an Unreal package's texture, say) has no file of its own in
     // the folder: it stays as long as the file it came from does.
@@ -327,7 +350,48 @@ fn catch_up(c: &Connection, pack_id: &str, dir: &Path) -> Result<bool> {
         );
         db::enqueue(c, jobs::RETAG, Some(pack_id), &json!({ "assets": changed, "then_llm": false }))?;
     }
+    c.execute("UPDATE packs SET dir_times = ?2 WHERE id = ?1", params![pack_id, times])?;
     Ok(added || !gone.is_empty() || !changed.is_empty())
+}
+
+/// The modified time (in nanoseconds) of each folder in a pack, the pack's own as `""`. Adding, removing or renaming
+/// a file changes its folder's time; editing one where it sits doesn't.
+fn dir_times(dir: &Path) -> Result<BTreeMap<String, i64>> {
+    fn walk(root: &Path, dir: &Path, out: &mut BTreeMap<String, i64>) -> Result<()> {
+        out.insert(rel_of(root, dir), modified_ns(dir)?);
+        for entry in std::fs::read_dir(dir)? {
+            let entry = entry?;
+            let path = entry.path();
+            if entry.file_type()?.is_dir() && !ingest::is_junk(&rel_of(root, &path)) {
+                walk(root, &path, out)?;
+            }
+        }
+        Ok(())
+    }
+    let mut out = BTreeMap::new();
+    walk(dir, dir, &mut out)?;
+    Ok(out)
+}
+
+fn rel_of(root: &Path, path: &Path) -> String {
+    let rel = path.strip_prefix(root).unwrap_or(path);
+    rel.components().map(|c| c.as_os_str().to_string_lossy()).collect::<Vec<_>>().join("/")
+}
+
+fn modified_ns(path: &Path) -> Result<i64> {
+    let t = std::fs::metadata(path)?.modified()?;
+    Ok(t.duration_since(UNIX_EPOCH).map_or(0, |d| i64::try_from(d.as_nanos()).unwrap_or(i64::MAX)))
+}
+
+/// Whether each folder of a pack still has the modified time it had when the pack was last caught up: if so, no file
+/// in it was added, removed or renamed since. Only its folders are looked at, not their files.
+fn unchanged(stored: Option<&str>, dir: &Path) -> bool {
+    let Some(times) = stored.and_then(|s| serde_json::from_str::<BTreeMap<String, i64>>(s).ok()) else { return false };
+    !times.is_empty()
+        && times.iter().all(|(rel, t)| {
+            let path = if rel.is_empty() { dir.to_path_buf() } else { dir.join(rel) };
+            modified_ns(&path).is_ok_and(|m| m == *t)
+        })
 }
 
 /// The assets of a pack whose file was changed where it sits: a size other than the one stored, or a modified time
@@ -439,7 +503,7 @@ mod tests {
             std::fs::write(kit.join(f), f).unwrap();
         }
         let mut c = pool.get().unwrap();
-        assert_eq!(sweep(&mut c, loc).unwrap(), Changes { added: 1, ..Changes::default() });
+        assert_eq!(sweep(&mut c, loc, true).unwrap(), Changes { added: 1, ..Changes::default() });
         let pack = ingested(&c, "Kit");
         // Foo.uasset was converted to the model it held; b.png was deleted for good.
         asset(&c, &pack, "conv", "Foo.fbx");
@@ -454,18 +518,18 @@ mod tests {
         c.execute("UPDATE assets SET archived_at = 'x' WHERE id = 'gone'", []).unwrap();
         db::purge_archived(&mut c, &[], &["gone".to_owned()], false).unwrap();
 
-        assert_eq!(sweep(&mut c, loc).unwrap(), Changes::default(), "nothing new: no ingest");
+        assert_eq!(sweep(&mut c, loc, true).unwrap(), Changes::default(), "nothing new: no ingest");
         assert!(!db::job_pending(&c, jobs::INGEST, Some(&pack), None).unwrap());
 
         std::fs::remove_file(kit.join("a.png")).unwrap();
         std::fs::write(kit.join("c.png"), "new").unwrap();
-        assert_eq!(sweep(&mut c, loc).unwrap(), Changes { updated: 1, ..Changes::default() });
+        assert_eq!(sweep(&mut c, loc, true).unwrap(), Changes { updated: 1, ..Changes::default() });
         assert_eq!(ids(&c, &pack), ["conv"], "the converted asset stays while its package is there");
         assert!(db::job_pending(&c, jobs::INGEST, Some(&pack), None).unwrap(), "c.png is queued");
 
         c.execute("DELETE FROM jobs", []).unwrap();
         std::fs::remove_file(kit.join("Foo.uasset")).unwrap();
-        sweep(&mut c, loc).unwrap();
+        sweep(&mut c, loc, true).unwrap();
         assert!(ids(&c, &pack).is_empty(), "and goes with it");
     }
 
@@ -479,7 +543,7 @@ mod tests {
             std::fs::write(kit.join(f), f).unwrap();
         }
         let mut c = pool.get().unwrap();
-        sweep(&mut c, loc).unwrap();
+        sweep(&mut c, loc, true).unwrap();
         let pack = ingested(&c, "Kit");
         asset(&c, &pack, "a", "a.png");
         let b_hash = crate::blobs::BlobStore::hash_file(&kit.join("b.png")).unwrap().hash;
@@ -491,7 +555,7 @@ mod tests {
             [],
         )
         .unwrap();
-        assert_eq!(sweep(&mut c, loc).unwrap(), Changes::default(), "as they were read");
+        assert_eq!(sweep(&mut c, loc, true).unwrap(), Changes::default(), "as they were read");
 
         // a.png is painted over; b.png is saved again as it was, and only looks newer. Both were read an hour ago.
         c.execute(
@@ -501,7 +565,7 @@ mod tests {
         .unwrap();
         std::fs::write(kit.join("a.png"), "a.png, painted over").unwrap();
         std::fs::write(kit.join("b.png"), "b.png").unwrap();
-        assert_eq!(sweep(&mut c, loc).unwrap(), Changes { updated: 1, ..Changes::default() });
+        assert_eq!(sweep(&mut c, loc, true).unwrap(), Changes { updated: 1, ..Changes::default() });
         let job: String = c
             .query_row("SELECT payload FROM jobs WHERE kind = ?1 AND pack_id = ?2", [jobs::RETAG, &pack], |r| r.get(0))
             .unwrap();
@@ -527,7 +591,11 @@ mod tests {
         assert_eq!(b, (b_hash.clone(), Some("thumb".to_owned())), "b.png is as it was");
 
         c.execute("DELETE FROM jobs", []).unwrap();
-        assert_eq!(sweep(&mut c, loc).unwrap(), Changes::default(), "and neither is read again until it changes again");
+        assert_eq!(
+            sweep(&mut c, loc, true).unwrap(),
+            Changes::default(),
+            "and neither is read again until it changes again"
+        );
     }
 
     #[test]
@@ -541,7 +609,7 @@ mod tests {
             std::fs::write(packs.join("Kit").join(f), f).unwrap();
         }
         let mut c = pool.get().unwrap();
-        sweep(&mut c, loc).unwrap();
+        sweep(&mut c, loc, true).unwrap();
         let pack = ingested(&c, "Kit");
         for f in files {
             asset(&c, &pack, f, f);
@@ -558,7 +626,7 @@ mod tests {
         // Renamed, with one file gone on the way: still mostly the same files.
         std::fs::rename(packs.join("Kit"), packs.join("Kit 2")).unwrap();
         std::fs::remove_file(packs.join("Kit 2/e.png")).unwrap();
-        assert_eq!(sweep(&mut c, loc).unwrap(), Changes { renamed: 1, ..Changes::default() });
+        assert_eq!(sweep(&mut c, loc, true).unwrap(), Changes { renamed: 1, ..Changes::default() });
         assert_eq!(folder_and_name(&c), ("Kit 2".to_owned(), "Kit 2".to_owned(), None));
         assert_eq!(pack_count(&c), 1);
         assert_eq!(ids(&c, &pack), ["a.png", "b.png", "c.png", "d.png"], "the missing file goes with the catch-up");
@@ -566,7 +634,7 @@ mod tests {
         // A pack named otherwise keeps its name.
         c.execute("UPDATE packs SET name = 'My kit' WHERE id = ?1", [&pack]).unwrap();
         std::fs::rename(packs.join("Kit 2"), packs.join("Kit 3")).unwrap();
-        assert_eq!(sweep(&mut c, loc).unwrap(), Changes { renamed: 1, ..Changes::default() });
+        assert_eq!(sweep(&mut c, loc, true).unwrap(), Changes { renamed: 1, ..Changes::default() });
         assert_eq!(folder_and_name(&c), ("Kit 3".to_owned(), "My kit".to_owned(), None));
 
         // A folder gone while another with other files turns up: the first is missing, the second a pack of its own.
@@ -575,9 +643,42 @@ mod tests {
         for f in ["a.png", "x.png", "y.png"] {
             std::fs::write(packs.join("Other").join(f), f).unwrap();
         }
-        assert_eq!(sweep(&mut c, loc).unwrap(), Changes { added: 1, ..Changes::default() });
+        assert_eq!(sweep(&mut c, loc, true).unwrap(), Changes { added: 1, ..Changes::default() });
         assert_eq!(pack_count(&c), 2);
         assert!(folder_and_name(&c).2.is_some(), "the old pack waits in case its folder comes back");
+    }
+
+    #[test]
+    fn a_quick_rescan_skips_packs_whose_folders_are_as_they_were() {
+        let dir = tempfile::tempdir().unwrap();
+        let (_cfg, pool) = setup(dir.path());
+        let loc = watched(&pool, dir.path(), &["Kit"]);
+        let kit = dir.path().join("packs/Kit");
+        std::fs::create_dir_all(kit.join("sub")).unwrap();
+        for f in ["a.png", "sub/s.png"] {
+            std::fs::write(kit.join(f), f).unwrap();
+        }
+        let mut c = pool.get().unwrap();
+        sweep(&mut c, loc, true).unwrap();
+        let pack = ingested(&c, "Kit");
+        asset(&c, &pack, "a", "a.png");
+        asset(&c, &pack, "s", "sub/s.png");
+        assert_eq!(sweep(&mut c, loc, true).unwrap(), Changes::default());
+        let times: String = c.query_row("SELECT dir_times FROM packs WHERE id = ?1", [&pack], |r| r.get(0)).unwrap();
+        let folders: Vec<String> = serde_json::from_str::<BTreeMap<String, i64>>(&times).unwrap().into_keys().collect();
+        assert_eq!(folders, ["", "sub"]);
+
+        // Edited where it sits: its folder's time stays, so only a full scan sees it.
+        std::fs::write(kit.join("a.png"), "a.png, painted over").unwrap();
+        assert_eq!(sweep(&mut c, loc, false).unwrap(), Changes::default());
+        assert_eq!(sweep(&mut c, loc, true).unwrap(), Changes { updated: 1, ..Changes::default() });
+        c.execute("DELETE FROM jobs", []).unwrap();
+        assert_eq!(sweep(&mut c, loc, false).unwrap(), Changes::default());
+
+        // A file added deep in the pack changes its folder's time, which a quick scan sees.
+        std::fs::write(kit.join("sub/t.png"), "new").unwrap();
+        assert_eq!(sweep(&mut c, loc, false).unwrap(), Changes { updated: 1, ..Changes::default() });
+        assert!(db::job_pending(&c, jobs::INGEST, Some(&pack), None).unwrap());
     }
 
     #[test]
@@ -586,7 +687,7 @@ mod tests {
         let (_cfg, pool) = setup(dir.path());
         let loc = watched(&pool, dir.path(), &["Kit", "Sounds", "Junk"]);
         let mut c = pool.get().unwrap();
-        sweep(&mut c, loc).unwrap();
+        sweep(&mut c, loc, true).unwrap();
         let kit = ingested(&c, "Kit");
         ingested(&c, "Sounds");
         let junk = ingested(&c, "Junk");
@@ -596,20 +697,20 @@ mod tests {
 
         let packs = dir.path().join("packs");
         std::fs::rename(packs.join("Kit"), dir.path().join("away")).unwrap();
-        assert_eq!(sweep(&mut c, loc).unwrap(), Changes::default());
+        assert_eq!(sweep(&mut c, loc, true).unwrap(), Changes::default());
         assert!(since(&c).is_some(), "kept, marked missing");
         std::fs::rename(dir.path().join("away"), packs.join("Kit")).unwrap();
-        sweep(&mut c, loc).unwrap();
+        sweep(&mut c, loc, true).unwrap();
         assert!(since(&c).is_none(), "back again");
 
         std::fs::rename(packs.join("Kit"), dir.path().join("away")).unwrap();
-        sweep(&mut c, loc).unwrap();
+        sweep(&mut c, loc, true).unwrap();
         c.execute("UPDATE packs SET missing_since = '2020-01-01T00:00:00Z' WHERE id = ?1", [&kit]).unwrap();
-        assert_eq!(sweep(&mut c, loc).unwrap(), Changes { removed: 1, ..Changes::default() });
+        assert_eq!(sweep(&mut c, loc, true).unwrap(), Changes { removed: 1, ..Changes::default() });
 
         c.execute("UPDATE packs SET archived_at = 'x' WHERE id = ?1", [&junk]).unwrap();
         db::purge_archived(&mut c, &[junk], &[], false).unwrap();
-        assert_eq!(sweep(&mut c, loc).unwrap(), Changes::default(), "a pack deleted for good isn't added back");
+        assert_eq!(sweep(&mut c, loc, true).unwrap(), Changes::default(), "a pack deleted for good isn't added back");
     }
 
     #[test]

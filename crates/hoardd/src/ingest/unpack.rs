@@ -29,7 +29,7 @@ pub(crate) fn safe_rel_path(raw: &str) -> Option<String> {
     if parts.is_empty() { None } else { Some(parts.join("/")) }
 }
 
-fn is_junk(rel: &str) -> bool {
+pub(crate) fn is_junk(rel: &str) -> bool {
     let file = rel.rsplit('/').next().unwrap_or(rel);
     rel.split('/').any(|c| matches!(c, "__MACOSX" | ".git" | ".svn" | ".hg"))
         || matches!(file, ".DS_Store" | "Thumbs.db" | "desktop.ini")

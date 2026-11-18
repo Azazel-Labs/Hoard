@@ -764,6 +764,9 @@ pub(super) const MIGRATIONS: &[&str] = &[
      INSERT INTO embeddings_by_model (thumb_hash, model, vector) SELECT thumb_hash, model, vector FROM embeddings;
      DROP TABLE embeddings;
      ALTER TABLE embeddings_by_model RENAME TO embeddings;",
+    // 74: watched packs: the modified time of each folder in them, so a rescan can tell the packs whose files were
+    // added, removed or renamed without listing them.
+    "ALTER TABLE packs ADD COLUMN dir_times TEXT;",
 ];
 
 /// How many automatic pre-upgrade backups to keep in `<data dir>/backups`.

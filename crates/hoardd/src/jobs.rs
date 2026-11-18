@@ -166,7 +166,10 @@ async fn run(state: &AppState, job: db::JobRow) {
             crate::reformat::run_job(state, &pack_id, req).await
         }
         SCAN => match job.payload.get("location").and_then(serde_json::Value::as_i64) {
-            Some(loc) => blocking(state, move |s, _| crate::scan::scan(s, loc).map(|_| ())).await,
+            Some(loc) => {
+                let full = job.payload.get("full").and_then(serde_json::Value::as_bool).unwrap_or(true);
+                blocking(state, move |s, _| crate::scan::scan(s, loc, full).map(|_| ())).await
+            }
             None => Err(anyhow::anyhow!("scan job without a location")),
         },
         RELOCATE => crate::relocate::run(state, serde_json::from_value(job.payload.clone()).unwrap_or_default()).await,

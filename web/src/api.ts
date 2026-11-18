@@ -1062,7 +1062,8 @@ export interface SheetSprite {
   at?: [number, number]
 }
 
-export interface ThumbUpload { replaced: boolean; thumb_source: ThumbSource | null; thumb_rev?: string }
+/** `palette` is the new thumbnail's, when it replaced the old one. */
+export interface ThumbUpload { replaced: boolean; thumb_source: ThumbSource | null; thumb_rev?: string; palette?: Swatch[] }
 
 export const api = {
   /** A model's thumbnail as this browser's 3D viewer drew it; kept unless the one there came from a better source. */

@@ -284,6 +284,7 @@ pub(crate) async fn put_thumb(
     })
     .await?
     .map_err(|e| AppError::bad_request(tr!("error-not-a-picture", reason = format!("{e:#}"))))?;
+    let drawn = bytes.clone();
     let blob = state.blobs.put_cache_bytes(bytes).await?;
     let (hash, size) = (blob.hash.clone(), i64::try_from(blob.size).unwrap_or(i64::MAX));
     let (id2, src) = (id.clone(), source.to_owned());
@@ -304,6 +305,16 @@ pub(crate) async fn put_thumb(
         Ok(n > 0)
     })
     .await?;
+    // Its colors and look, which the old thumbnail's were, so the palette stays put.
+    let mut palette = Vec::new();
+    if replaced {
+        match crate::looks::analyze_now(&state, blob.hash.clone(), drawn).await {
+            Ok(p) => palette = p,
+            Err(e) => {
+                tracing::warn!(asset = %id, error = %format!("{e:#}"), "couldn't work out a drawn thumbnail's look");
+            }
+        }
+    }
     if let Some(old) = old.filter(|o| replaced && *o != blob.hash) {
         let old_size = db::call(&state.pool, {
             let old = old.clone();
@@ -318,6 +329,7 @@ pub(crate) async fn put_thumb(
         "replaced": replaced,
         "thumb_source": if replaced { Some(source.to_owned()) } else { current },
         "thumb_rev": blob.hash.get(..12),
+        "palette": palette,
     })))
 }
 

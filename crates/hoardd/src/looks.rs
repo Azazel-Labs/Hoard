@@ -559,11 +559,15 @@ pub(crate) fn decode_palette(bytes: &[u8]) -> Vec<Swatch> {
 pub(crate) fn palette_of(conn: &rusqlite::Connection, thumb_hash: &str) -> Result<Vec<hoard_core::Swatch>> {
     let bytes: Option<Vec<u8>> =
         conn.query_row("SELECT palette FROM looks WHERE thumb_hash = ?1", [thumb_hash], |r| r.get(0)).optional()?;
-    Ok(bytes
-        .map_or_default(|b| decode_palette(&b))
+    Ok(shown(&bytes.unwrap_or_default()))
+}
+
+/// A stored palette as an asset's page shows it.
+fn shown(stored: &[u8]) -> Vec<hoard_core::Swatch> {
+    decode_palette(stored)
         .into_iter()
         .map(|s| hoard_core::Swatch { hex: hex(s.lab), share: (s.share * 100.0).round() / 100.0 })
-        .collect())
+        .collect()
 }
 
 // ---------------------------------------------------------------------------------------------
@@ -894,6 +898,22 @@ pub(crate) async fn run_job(state: &AppState) -> Result<()> {
         }
         crate::activity::job_progress(crate::jobs::LOOKS, None, done, total, "pictures");
     }
+}
+
+/// The look of a thumbnail that just arrived (one a browser drew), at once rather than with the next looks job, so
+/// its palette is there when the asset is shown again. The job still runs for what else waits (image search, the old
+/// thumbnail's look). Returns its palette.
+pub(crate) async fn analyze_now(state: &AppState, hash: String, bytes: Vec<u8>) -> Result<Vec<hoard_core::Swatch>> {
+    let features = crate::heavy::run("looks", move || analyze(&bytes)).await?;
+    let computed = [(hash, features)];
+    save(state, &computed).await?;
+    let [(hash, features)] = computed;
+    let palette = features.as_ref().map_or_default(|f| shown(&encode_palette(&f.palette)));
+    if let Some(f) = features {
+        state.looks.insert(hash, f);
+    }
+    schedule(state).await;
+    Ok(palette)
 }
 
 async fn save(state: &AppState, computed: &[(String, Option<Features>)]) -> Result<()> {

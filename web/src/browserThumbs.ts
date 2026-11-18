@@ -40,7 +40,9 @@ export async function drawThumb(stage: ModelStage, a: Asset): Promise<ThumbUploa
 
 /** The asset with a new thumbnail's details, for lists to show it. */
 export function withThumb(a: Asset, r: ThumbUpload): Asset {
-  return r.replaced ? { ...a, thumb_source: r.thumb_source, thumb_rev: r.thumb_rev ?? a.thumb_rev, has_thumb: true } : a
+  return r.replaced
+    ? { ...a, thumb_source: r.thumb_source, thumb_rev: r.thumb_rev ?? a.thumb_rev, has_thumb: true, palette: r.palette ?? a.palette }
+    : a
 }
 
 /** "Make thumbnails in this browser" for a pack: one run at a time, shown wherever the pack list is. */

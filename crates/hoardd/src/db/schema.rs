@@ -617,7 +617,7 @@ pub(super) const MIGRATIONS: &[&str] = &[
      CREATE TABLE IF NOT EXISTS kept_formats (
          asset_id TEXT PRIMARY KEY REFERENCES assets(id) ON DELETE CASCADE
      ) WITHOUT ROWID;",
-    // 61: an atlas file is a sprite sheet (`spritesheet.rs`), kept whole, rather than its sprites cut into assets of
+    // 61: an atlas file is a sprite sheet (`spritesheet`), kept whole, rather than its sprites cut into assets of
     // their own. The sprites cut before are dropped, and packs with a file that may be an atlas (Godot's `.tres`
     // now too) are looked through again.
     "DELETE FROM assets_fts WHERE asset_id IN (SELECT id FROM assets WHERE json_extract(meta, '$.sprite') IS NOT NULL);

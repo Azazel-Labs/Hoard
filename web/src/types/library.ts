@@ -471,7 +471,7 @@ export interface ArchiveCount { packs: number; assets: number }
 /** One edit to many assets at once. */
 export interface BulkEdit { ids: string[]; add_tags?: string[]; remove_tags?: string[]; category?: string }
 
-/** A sprite sheet as Hoard keeps it (see crates/hoardd/src/spritesheet.rs). */
+/** A sprite sheet as Hoard keeps it (see crates/hoardd/src/spritesheet/). */
 export interface SheetData {
   hoard_sheet: number
   /** The format it was read from: `texturepacker`, `libgdx`, `godot-tileset`, … */

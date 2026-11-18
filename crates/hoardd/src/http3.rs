@@ -1,4 +1,4 @@
-//! HTTP/3 (QUIC, UDP on the `--listen` port number), started by `https.rs` while it's on in Settings.
+//! HTTP/3 (QUIC, UDP on the `--listen` port number), started by `https` while it's on in Settings.
 
 use std::net::SocketAddr;
 use std::sync::Arc;

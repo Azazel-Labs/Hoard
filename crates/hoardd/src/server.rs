@@ -13,7 +13,7 @@
 //! - HTTP/3 (QUIC, UDP on the same port number), when turned on in Settings, advertised with `Alt-Svc` so browsers
 //!   switch to it after their first request.
 //!
-//! See `https.rs` for what plain HTTP does once HTTPS is on, and `http3.rs` for HTTP/3. Built without the `https`
+//! See `https` for what plain HTTP does once HTTPS is on, and `http3.rs` for HTTP/3. Built without the `https`
 //! feature (the desktop app), only plain HTTP is answered.
 
 use std::convert::Infallible;

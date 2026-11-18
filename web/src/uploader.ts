@@ -6,7 +6,8 @@
 //   wifi costs at most one part.
 // - The server recognizes a re-sent file list, so if the tab is closed, dropping the same folder again continues
 //   where it stopped, and packs that already finished aren't imported twice.
-import { ApiError, authHeaders, signInNeeded, type Pack, type UploadFile } from './api'
+import { ApiError, authHeaders, signInNeeded, type Pack } from './api'
+import type { UploadFile } from './drop'
 import { t } from './i18n'
 
 const SMALL = 4 * 1024 * 1024

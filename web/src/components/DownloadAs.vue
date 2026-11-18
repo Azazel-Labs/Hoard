@@ -2,7 +2,8 @@
 // "Download as": the asset in another format or smaller, made on the server (its progress on the button), or the
 // pack's own file in that format when it has one.
 import { computed, ref, watch } from 'vue'
-import { api, asUrl, fileUrl, humanBytes, RESIZABLE_AS_ITSELF, type Asset, type ConversionStatus } from '../api'
+import { api, asUrl, fileUrl, RESIZABLE_AS_ITSELF, type Asset, type ConversionStatus } from '../api'
+import { humanBytes } from '../format'
 import { extOf, formatsOf } from '../assetLinks'
 import { t } from '../i18n'
 

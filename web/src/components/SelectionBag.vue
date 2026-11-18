@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { humanBytes, KIND_LABEL, thumbUrl, type Asset, type AssetKind } from '../api'
+import { thumbUrl, type Asset, type AssetKind } from '../api'
+import { humanBytes } from '../format'
+import { KIND_LABEL } from '../kinds'
 import KindGlyph from './KindGlyph.vue'
 import { formatNumber, t } from '../i18n'
 

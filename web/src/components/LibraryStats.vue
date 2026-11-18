@@ -3,7 +3,9 @@
 // the biggest files), how it grew month by month, and how well it's tagged. Archived things aren't counted.
 // Bars are one series each and every one carries its name and value as text, so color is never the only label.
 import { computed, onMounted, ref } from 'vue'
-import { api, humanBytes, KIND_LABEL, type AssetKind, type LibraryStats, type Stats, type TagSource } from '../api'
+import { api, type AssetKind, type LibraryStats, type Stats, type TagSource } from '../api'
+import { humanBytes } from '../format'
+import { KIND_LABEL } from '../kinds'
 import { formatDate, formatNumber, t } from '../i18n'
 import KindGlyph from './KindGlyph.vue'
 

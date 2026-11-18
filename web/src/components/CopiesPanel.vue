@@ -2,7 +2,8 @@
 // Settings → Near copies: every set of files in the library that are the same picture, sound or model at another size,
 // rate or format, the most space taken by the ones that aren't the best first. It only lists them; nothing is deleted.
 import { onMounted, ref } from 'vue'
-import { api, ApiError, humanBytes, type CopyGroup } from '../api'
+import { api, ApiError, type CopyGroup } from '../api'
+import { humanBytes } from '../format'
 import { copyFacts } from '../copies'
 import { formatNumber, t } from '../i18n'
 import { showError } from '../ui'

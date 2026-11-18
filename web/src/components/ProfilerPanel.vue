@@ -5,7 +5,8 @@
 // database, the disk, sending and everything else, with a table by route. Every chart has its numbers on hover and
 // in words beside it, so color is never the only label.
 import { computed, onBeforeUnmount, onMounted, ref, shallowRef } from 'vue'
-import { api, humanBytes, type ProfileSample, type ProfileServed } from '../api'
+import { api, type ProfileSample, type ProfileServed } from '../api'
+import { humanBytes } from '../format'
 import { formatDate, formatNumber, t } from '../i18n'
 
 const POLL_MS = 2000

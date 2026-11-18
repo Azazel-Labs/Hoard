@@ -1,5 +1,6 @@
 // The facts a file states or was measured to have, worded for the detail panel.
-import { formatDuration, type Asset } from './api'
+import { type Asset } from './api'
+import { formatDuration } from './format'
 import { formatNumber, t } from './i18n'
 import { findKey, keyName } from './keys'
 import { resolutions, sizeLabel } from './materials'

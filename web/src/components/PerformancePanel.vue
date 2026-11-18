@@ -2,7 +2,8 @@
 // Performance: the profiler, rendering model thumbnails, their quality, and the limits on work, uploads and
 // the conversion cache.
 import { computed, onMounted, ref, watch } from 'vue'
-import { api, humanBytes, type Stats, type ThumbQuality } from '../api'
+import { api, type Stats, type ThumbQuality } from '../api'
+import { humanBytes } from '../format'
 import { formatNumber, t } from '../i18n'
 import { formatMiB } from '../sizes'
 import ProfilerPanel from './ProfilerPanel.vue'

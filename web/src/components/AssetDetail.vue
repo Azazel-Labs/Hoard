@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import {
-  api, bundleUrl, fileUrl, humanBytes, looksAlike, thumbUrl,
-  type Asset, type Collection, type CollectionRef, type Facet, type ProjectUse,
+  api, bundleUrl, fileUrl, thumbUrl, type Asset, type Collection, type CollectionRef, type Facet, type ProjectUse,
 } from '../api'
+import { humanBytes } from '../format'
+import { looksAlike } from '../kinds'
 import CollectionPicker from './CollectionPicker.vue'
 import { playableUrl } from '../player'
 import AssetLinks from './AssetLinks.vue'

@@ -2,7 +2,8 @@
 // The other files this asset goes with: a material's maps, the materials it's in, what it needs and what uses it,
 // its variants, and its copies elsewhere. Long lists show their first few.
 import { computed, ref, watch } from 'vue'
-import { humanBytes, thumbUrl, type Asset, type MaterialInfo, type MaterialMap } from '../api'
+import { thumbUrl, type Asset, type MaterialInfo, type MaterialMap } from '../api'
+import { humanBytes } from '../format'
 import { animsOf, formatsOf, linkLabel, needsOf } from '../assetLinks'
 import { copyFacts } from '../copies'
 import { t } from '../i18n'

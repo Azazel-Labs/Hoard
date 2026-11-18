@@ -2,7 +2,8 @@
 // Full-screen text viewer: JSON as a foldable tree (or re-indented, or as written), markdown as a document (or its
 // source), everything else with line numbers and light coloring. Big files show their first megabyte until asked for the rest.
 import { computed, onMounted, provide, ref } from 'vue'
-import { fileUrl, humanBytes, type Asset } from '../api'
+import { fileUrl, type Asset } from '../api'
+import { humanBytes } from '../format'
 import { renderMarkdown } from '../markdown'
 import { t } from '../i18n'
 import { LANG_LABEL, fetchText, highlightLines, langOf, reflowJson, type TextFile } from '../text'

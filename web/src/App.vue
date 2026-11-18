@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, shallowRef, watch } from 'vue'
 import {
-  api, downloadCredits, filesFromDrop, KIND_LABEL, KIND_NAME, selectionZipUrl,
-  type Asset, type AssetKind, type BulkEdit, type Collection, type Facet, type Pack, type Stats, type UploadFile,
+  api, downloadCredits, selectionZipUrl, type Asset, type AssetKind, type BulkEdit, type Collection, type Facet, type Pack, type Stats,
 } from './api'
+import { filesFromDrop, type UploadFile } from './drop'
+import { KIND_LABEL, KIND_NAME } from './kinds'
 import { canPreview, stop as stopPreview, toggle as togglePreview } from './player'
 import { prefs, toggleIn } from './prefs'
 import { askToSignIn, auth, isDesktop, may, mayEdit, signOut, siteName } from './auth'

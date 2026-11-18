@@ -1,5 +1,6 @@
 // Near copies (the same picture, sound or model at another size, rate or format): how one is described in a line.
-import { humanBytes, type NearCopy } from './api'
+import { type NearCopy } from './api'
+import { humanBytes } from './format'
 import { formatNumber, t } from './i18n'
 
 /** "PNG · 1.2 MB · 1024 × 1024", or "WAV · 70 KB · 22.05 kHz · 16-bit". */

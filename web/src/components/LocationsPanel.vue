@@ -1,7 +1,8 @@
 <script setup lang="ts">
 // Settings → Library locations: where the library's files live, and which kinds go where.
 import { computed, onMounted, reactive, ref } from 'vue'
-import { api, ApiError, KIND_LABEL, type AssetKind, type LibraryLocation, type LocationList } from '../api'
+import { api, ApiError, type AssetKind, type LibraryLocation, type LocationList } from '../api'
+import { KIND_LABEL } from '../kinds'
 import { confirmDialog, showError, showOk } from '../ui'
 import { formatDate, t } from '../i18n'
 import KindChips from './KindChips.vue'

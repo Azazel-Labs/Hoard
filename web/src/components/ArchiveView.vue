@@ -4,7 +4,9 @@ import { usageWarning } from '../projects'
 // The archive: Hoard's recycling bin. Archived packs and assets are out of search, the counts and the tag list, and
 // wait here until they're restored or deleted for good (which is when their files are freed).
 import { computed, onMounted, ref } from 'vue'
-import { api, humanBytes, KIND_LABEL, thumbUrl, type ArchiveItems, type Asset, type Pack } from '../api'
+import { api, thumbUrl, type ArchiveItems, type Asset, type Pack } from '../api'
+import { humanBytes } from '../format'
+import { KIND_LABEL } from '../kinds'
 import { countText } from '../archive'
 import { mayTry } from '../auth'
 import { confirmDialog, daysAgo, showError, showOk } from '../ui'

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 // Toggle chips for picking asset kinds (which kinds a library location takes).
-import { KIND_LABEL, type AssetKind } from '../api'
+import { type AssetKind } from '../api'
+import { KIND_LABEL } from '../kinds'
 import { t } from '../i18n'
 
 const model = defineModel<AssetKind[]>({ required: true })

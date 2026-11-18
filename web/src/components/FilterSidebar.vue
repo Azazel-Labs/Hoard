@@ -3,7 +3,8 @@
 // "sounds like", music, kinds and tags. Choosing a place to browse (a saved search, project, collection or your
 // favorites) is App's to do, since it also changes the view; the rest just sets the filters.
 import { computed, ref, shallowRef, watch } from 'vue'
-import { api, ApiError, KIND_LABEL, type AssetKind, type Collection, type Facet, type Project, type SavedSearch } from '../api'
+import { api, ApiError, type AssetKind, type Collection, type Facet, type Project, type SavedSearch } from '../api'
+import { KIND_LABEL } from '../kinds'
 import { auth, mayEdit } from '../auth'
 import { filters, HEARD, heardNoise, savedNow } from '../filters'
 import { formatNumber, t } from '../i18n'

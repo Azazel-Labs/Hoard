@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import { canStar, mine, toggleFavorite } from '../mine'
 import { computed, ref, watch } from 'vue'
-import { formatDuration, looksAlike, motionUrl, thumbUrl, type Asset } from '../api'
+import { motionUrl, thumbUrl, type Asset } from '../api'
+import { formatDuration } from '../format'
+import { looksAlike } from '../kinds'
 import { canPreview, player, toggle } from '../player'
 import KindGlyph from './KindGlyph.vue'
 import { noteTileClick } from '../viewers'

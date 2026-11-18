@@ -2,7 +2,9 @@
 // The import queue: packs upload one after another (each with several parallel requests inside), with live
 // speed/ETA, cancel and retry. Closing the tab mid-import warns first; re-dropping the same files resumes.
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
-import { ApiError, humanBytes, type Pack, type UploadFile } from '../api'
+import { ApiError, type Pack } from '../api'
+import type { UploadFile } from '../drop'
+import { humanBytes } from '../format'
 import { abandonUpload, AlreadyImported, uploadPackResumable } from '../uploader'
 import { formatNumber, t } from '../i18n'
 

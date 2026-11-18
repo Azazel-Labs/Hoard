@@ -3,7 +3,8 @@
 // the seams, against different backgrounds, or one channel at a time. A big image opens as its light preview (at most
 // 2048 px) and swaps to the file itself once zoomed in past the preview's pixels, or on "Full resolution".
 import { computed, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue'
-import { asUrl, fileUrl, humanBytes, liteUrl, thumbUrl, type Asset } from '../api'
+import { asUrl, fileUrl, liteUrl, thumbUrl, type Asset } from '../api'
+import { humanBytes } from '../format'
 import { t } from '../i18n'
 
 const props = defineProps<{ asset: Asset; pixelated?: boolean }>()

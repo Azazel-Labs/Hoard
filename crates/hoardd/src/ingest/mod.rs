@@ -359,7 +359,9 @@ fn fetch_dependencies(state: &AppState, rt: &Handle, id: &str, dir: &Path) -> Re
     Ok(())
 }
 
-pub(crate) fn retag_pack(state: &AppState, rt: &Handle, pack_id: &str) -> Result<()> {
+/// Analyze a pack's files again and redo their rule tags. `only`: just these assets (files changed where they sit in a
+/// watched folder), with the rest of the pack still read for its license and its texture sets.
+pub(crate) fn retag_pack(state: &AppState, rt: &Handle, pack_id: &str, only: Option<&HashSet<String>>) -> Result<()> {
     struct Row {
         id: String,
         rel: String,
@@ -384,11 +386,12 @@ pub(crate) fn retag_pack(state: &AppState, rt: &Handle, pack_id: &str) -> Result
         })?
         .collect::<rusqlite::Result<_>>()?
     };
+    let todo: Vec<&Row> = rows.iter().filter(|r| only.is_none_or(|o| o.contains(&r.id))).collect();
     let work = state.cfg.tmp_dir().join(format!("retag-{pack_id}"));
     fs::create_dir_all(&work)?;
     conn.execute(
         "UPDATE packs SET files_total = ?2, files_done = 0 WHERE id = ?1",
-        params![pack_id, rows.len() as i64],
+        params![pack_id, todo.len() as i64],
     )?;
 
     let origins = crate::extract::pack_origins(&conn, pack_id)?;
@@ -416,7 +419,7 @@ pub(crate) fn retag_pack(state: &AppState, rt: &Handle, pack_id: &str) -> Result
     let mut refs = HashMap::new();
     let unread = pipeline(
         pack_id,
-        &rows,
+        &todo,
         |r| &r.rel,
         |r| {
             // Each file is fetched into a folder of its own at its place in the pack; a model brings the files it
@@ -500,9 +503,10 @@ pub(crate) fn retag_pack(state: &AppState, rt: &Handle, pack_id: &str) -> Result
         },
     )?;
 
-    issues::read_again(&conn, pack_id, &unread)?;
+    let ids = serde_json::to_string(&todo.iter().map(|r| &r.id).collect::<Vec<_>>())?;
+    issues::read_again(&conn, pack_id, &ids, &unread)?;
     let tx = conn.transaction()?;
-    tx.execute("DELETE FROM asset_links WHERE from_id IN (SELECT id FROM assets WHERE pack_id = ?1)", [pack_id])?;
+    tx.execute("DELETE FROM asset_links WHERE from_id IN (SELECT value FROM json_each(?1))", [&ids])?;
     links::link_pack(&tx, pack_id, &refs)?;
     links::assign_families(&tx, pack_id)?;
     if let Some(l) = license {

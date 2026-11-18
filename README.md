@@ -173,7 +173,9 @@ it and drop a pack onto the portal. More locations come later, from **Settings â
 - **A watched folder** is a folder of packs you already have. Each folder inside it becomes a pack, indexed where it
   sits. Hoard never changes, moves or deletes anything there. Mount it read-only if you like. Hoard looks through it
   at startup and every 15 minutes after (or when you press **Scan now**), picking up new folders, files added to or
-  removed from a pack, and packs whose folder is gone. A folder that's suddenly empty or unreachable is taken for a
+  removed from a pack, files edited where they sit (a size or modified time that changed, then contents that hash
+  differently: each is read again, keeping its tags and notes, and its thumbnail and previews are made again), and
+  packs whose folder is gone. A folder that's suddenly empty or unreachable is taken for a
   disk that isn't mounted, and its packs are kept. A pack whose folder is missing is kept for three days, with its
   tags and notes, in case the folder comes back. Anything you delete for good from a watched pack stays deleted when
   the folder is rescanned, even though its files are still there.

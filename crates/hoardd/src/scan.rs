@@ -225,8 +225,8 @@ fn add_pack(c: &Connection, location: i64, folder: &str) -> Result<bool> {
     Ok(added > 0)
 }
 
-/// Bring a ready pack in line with its folder: assets whose file is gone are dropped, and new files are queued for
-/// ingest. Returns whether anything changed.
+/// Bring a ready pack in line with its folder: assets whose file is gone are dropped, new files are queued for
+/// ingest, and files changed where they sit are analyzed again. Returns whether anything changed.
 fn catch_up(c: &Connection, pack_id: &str, dir: &Path) -> Result<bool> {
     let Ok(on_disk) = ingest::pack_rels(dir) else { return Ok(false) };
     // An asset converted from one of the pack's files (an Unreal package's texture, say) has no file of its own in
@@ -256,7 +256,67 @@ fn catch_up(c: &Connection, pack_id: &str, dir: &Path) -> Result<bool> {
         // Ingesting looks again for materials; with nothing to ingest, a material may have lost a map.
         db::enqueue(c, jobs::MATERIALS, Some(pack_id), &json!({}))?;
     }
-    Ok(added || !gone.is_empty())
+    let changed = changed_in_place(c, pack_id, dir)?;
+    if !changed.is_empty() {
+        tracing::info!(
+            pack = pack_id,
+            files = changed.len(),
+            "watched files changed where they sit; reading them again"
+        );
+        db::enqueue(c, jobs::RETAG, Some(pack_id), &json!({ "assets": changed, "then_llm": false }))?;
+    }
+    Ok(added || !gone.is_empty() || !changed.is_empty())
+}
+
+/// The assets of a pack whose file was changed where it sits: a size other than the one stored, or a modified time
+/// after the asset was last read, with contents that hash differently. Each is pointed at its new contents, and
+/// what was made from the old ones (its thumbnail, previews and conversions) is let go, to be made again.
+fn changed_in_place(c: &Connection, pack_id: &str, dir: &Path) -> Result<Vec<String>> {
+    let assets: Vec<(String, String, String, i64, String)> = {
+        let mut stmt = c.prepare(&format!(
+            "SELECT a.id, a.path, a.blob_hash, b.size, a.updated_at FROM assets a JOIN blobs b ON b.hash = a.blob_hash
+              WHERE a.pack_id = ?1 AND NOT {}
+                AND NOT EXISTS (SELECT 1 FROM asset_origin o WHERE o.asset_id = a.id)",
+            crate::materials::IS_MATERIAL
+        ))?;
+        stmt.query_map([pack_id], |r| Ok((r.get(0)?, r.get(1)?, r.get(2)?, r.get(3)?, r.get(4)?)))?
+            .collect::<rusqlite::Result<_>>()?
+    };
+    let mut changed = Vec::new();
+    for (id, rel, hash, size, read_at) in assets {
+        let file = locations::watched_path(&dir.display().to_string(), None, &rel);
+        let Ok(meta) = std::fs::metadata(&file) else { continue };
+        let read_at = OffsetDateTime::parse(&read_at, &Rfc3339).ok();
+        let modified = meta.modified().ok().map(OffsetDateTime::from);
+        let newer = matches!((modified, read_at), (Some(m), Some(r)) if m > r);
+        if i64::try_from(meta.len()).ok() == Some(size) && !newer {
+            continue;
+        }
+        let blob = match crate::blobs::BlobStore::hash_file(&file) {
+            Ok(b) => b,
+            Err(e) => {
+                tracing::debug!(file = %file.display(), error = %format!("{e:#}"), "changed watched file can't be read");
+                continue;
+            }
+        };
+        let now = db::now();
+        if blob.hash == hash {
+            // Touched but the same: not looked at again until it's touched again.
+            c.execute("UPDATE assets SET updated_at = ?2 WHERE id = ?1", params![id, now])?;
+            continue;
+        }
+        c.execute(
+            "INSERT INTO blobs (hash, size, created_at) VALUES (?1, ?2, ?3) ON CONFLICT DO NOTHING",
+            params![blob.hash, blob.size as i64, now],
+        )?;
+        c.execute(
+            "UPDATE assets SET blob_hash = ?2, thumb_hash = NULL, thumb_source = NULL, updated_at = ?3 WHERE id = ?1",
+            params![id, blob.hash, now],
+        )?;
+        c.execute("DELETE FROM derivatives WHERE asset_id = ?1", [&id])?;
+        changed.push(id);
+    }
+    Ok(changed)
 }
 
 #[cfg(test)]
@@ -287,12 +347,17 @@ mod tests {
         id
     }
 
+    /// An asset read just now from a file holding its own path (as the files in these tests do).
     fn asset(c: &Connection, pack: &str, id: &str, path: &str) {
-        c.execute("INSERT OR IGNORE INTO blobs (hash, size, created_at) VALUES (?1, 1, '')", [id]).unwrap();
+        c.execute(
+            "INSERT OR IGNORE INTO blobs (hash, size, created_at) VALUES (?1, ?2, '')",
+            params![id, path.len() as i64],
+        )
+        .unwrap();
         c.execute(
             "INSERT INTO assets (id, pack_id, blob_hash, path, name, ext, kind, created_at, updated_at)
-             VALUES (?1, ?2, ?1, ?3, ?3, 'x', 'other', '', '')",
-            [id, pack, path],
+             VALUES (?1, ?2, ?1, ?3, ?3, 'x', 'other', '', ?4)",
+            params![id, pack, path, db::now()],
         )
         .unwrap();
     }
@@ -340,6 +405,67 @@ mod tests {
         std::fs::remove_file(kit.join("Foo.uasset")).unwrap();
         sweep(&mut c, loc).unwrap();
         assert!(ids(&c, &pack).is_empty(), "and goes with it");
+    }
+
+    #[test]
+    fn a_file_changed_where_it_sits_is_read_again_and_one_only_touched_is_not() {
+        let dir = tempfile::tempdir().unwrap();
+        let (_cfg, pool) = setup(dir.path());
+        let loc = watched(&pool, dir.path(), &["Kit"]);
+        let kit = dir.path().join("packs/Kit");
+        for f in ["a.png", "b.png"] {
+            std::fs::write(kit.join(f), f).unwrap();
+        }
+        let mut c = pool.get().unwrap();
+        sweep(&mut c, loc).unwrap();
+        let pack = ingested(&c, "Kit");
+        asset(&c, &pack, "a", "a.png");
+        let b_hash = crate::blobs::BlobStore::hash_file(&kit.join("b.png")).unwrap().hash;
+        asset(&c, &pack, &b_hash, "b.png");
+        c.execute("INSERT INTO blobs (hash, size, created_at) VALUES ('thumb', 1, '')", []).unwrap();
+        c.execute("UPDATE assets SET thumb_hash = 'thumb', thumb_source = 'browser'", []).unwrap();
+        c.execute(
+            "INSERT INTO derivatives (asset_id, kind, blob_hash, created_at) VALUES ('a', 'views', 'thumb', '')",
+            [],
+        )
+        .unwrap();
+        assert_eq!(sweep(&mut c, loc).unwrap(), Changes::default(), "as they were read");
+
+        // a.png is painted over; b.png is saved again as it was, and only looks newer. Both were read an hour ago.
+        c.execute(
+            "UPDATE assets SET updated_at = ?1",
+            [(OffsetDateTime::now_utc() - Duration::from_hours(1)).format(&Rfc3339).unwrap()],
+        )
+        .unwrap();
+        std::fs::write(kit.join("a.png"), "a.png, painted over").unwrap();
+        std::fs::write(kit.join("b.png"), "b.png").unwrap();
+        assert_eq!(sweep(&mut c, loc).unwrap(), Changes { updated: 1, ..Changes::default() });
+        let job: String = c
+            .query_row("SELECT payload FROM jobs WHERE kind = ?1 AND pack_id = ?2", [jobs::RETAG, &pack], |r| r.get(0))
+            .unwrap();
+        assert_eq!(
+            serde_json::from_str::<serde_json::Value>(&job).unwrap(),
+            json!({ "assets": ["a"], "then_llm": false })
+        );
+        let (hash, thumb, source): (String, Option<String>, Option<String>) = c
+            .query_row("SELECT blob_hash, thumb_hash, thumb_source FROM assets WHERE id = 'a'", [], |r| {
+                Ok((r.get(0)?, r.get(1)?, r.get(2)?))
+            })
+            .unwrap();
+        assert_eq!(hash, crate::blobs::BlobStore::hash_file(&kit.join("a.png")).unwrap().hash);
+        assert_eq!((thumb, source), (None, None), "its old pictures are let go");
+        let views: i64 =
+            c.query_row("SELECT COUNT(*) FROM derivatives WHERE asset_id = 'a'", [], |r| r.get(0)).unwrap();
+        assert_eq!(views, 0);
+        let b: (String, Option<String>) = c
+            .query_row("SELECT blob_hash, thumb_hash FROM assets WHERE id = ?1", [&b_hash], |r| {
+                Ok((r.get(0)?, r.get(1)?))
+            })
+            .unwrap();
+        assert_eq!(b, (b_hash.clone(), Some("thumb".to_owned())), "b.png is as it was");
+
+        c.execute("DELETE FROM jobs", []).unwrap();
+        assert_eq!(sweep(&mut c, loc).unwrap(), Changes::default(), "and neither is read again until it changes again");
     }
 
     #[test]

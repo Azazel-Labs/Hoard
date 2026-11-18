@@ -1,6 +1,7 @@
 //! Durable background job queue in SQLite. Jobs survive restarts; anything left `running` after a crash
 //! is re-queued at startup.
 
+use std::collections::HashSet;
 use std::time::Duration;
 
 use anyhow::Result;
@@ -140,9 +141,17 @@ async fn run(state: &AppState, job: db::JobRow) {
         }
         RETAG => {
             let then_llm = job.payload.get("then_llm").and_then(serde_json::Value::as_bool).unwrap_or(false);
+            // Just some of the pack's assets: files changed where they sit in a watched folder.
+            let only: Option<HashSet<String>> =
+                job.payload.get("assets").and_then(|a| serde_json::from_value(a.clone()).ok());
             blocking(state, move |s, rt| {
-                ingest::retag_pack(s, rt, &pack_id)?;
-                ingest::finish_rules_stage(s, &*s.pool.get()?, &pack_id, then_llm)
+                ingest::retag_pack(s, rt, &pack_id, only.as_ref())?;
+                let conn = s.pool.get()?;
+                if only.is_some() {
+                    // A changed model is converted again.
+                    crate::convert::maybe_enqueue(s, &conn, &pack_id)?;
+                }
+                ingest::finish_rules_stage(s, &conn, &pack_id, then_llm)
             })
             .await
         }

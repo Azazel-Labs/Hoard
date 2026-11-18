@@ -85,12 +85,13 @@ pub(crate) fn note_in(state: &AppState, kind: &str, at: At<'_>, message: &str) {
     }
 }
 
-/// After a pack's files were read again: those that failed are listed, the rest no longer are. Files that were left
-/// out when it was added aren't read again, so they stay listed.
-pub(crate) fn read_again(conn: &Connection, pack: &str, failed: &[(String, String)]) -> Result<()> {
+/// After a pack's files were read again (`ids`, the assets read, as a JSON array): those that failed are listed, the
+/// rest no longer are. Files that were left out when it was added aren't read again, so they stay listed.
+pub(crate) fn read_again(conn: &Connection, pack: &str, ids: &str, failed: &[(String, String)]) -> Result<()> {
     conn.execute(
-        "DELETE FROM issues WHERE kind = ?1 AND pack_id = ?2 AND subject IN (SELECT path FROM assets WHERE pack_id = ?2)",
-        params![FILE, pack],
+        "DELETE FROM issues WHERE kind = ?1 AND pack_id = ?2
+            AND subject IN (SELECT path FROM assets WHERE id IN (SELECT value FROM json_each(?3)))",
+        params![FILE, pack, ids],
     )?;
     for (path, why) in failed {
         note(conn, FILE, At::file(pack, path), why);

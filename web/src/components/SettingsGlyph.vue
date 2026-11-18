@@ -31,6 +31,11 @@ defineProps<{ page: string; size?: number }>()
       <rect x="6.9" y="3" width="2.2" height="10.5" rx="0.5" />
       <rect x="10.3" y="5.5" width="2.2" height="8" rx="0.5" />
     </template>
+    <template v-else-if="page === 'copies'">
+      <rect x="5.5" y="5.5" width="8" height="8" rx="1" />
+      <path d="M10.5 3.5V3a.5.5 0 0 0-.5-.5H3a.5.5 0 0 0-.5.5v7a.5.5 0 0 0 .5.5h.5" />
+      <path d="m7.5 11.5 1.8-2.2 1.3 1.4 1-1.1" />
+    </template>
     <template v-else-if="page === 'tags'">
       <path d="M2 3v4.2a1 1 0 0 0 .3.7l5.8 5.8a1 1 0 0 0 1.4 0l4.2-4.2a1 1 0 0 0 0-1.4L7.9 2.3a1 1 0 0 0-.7-.3H3a1 1 0 0 0-1 1Z" />
       <circle cx="5.2" cy="5.2" r="1" />

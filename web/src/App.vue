@@ -1368,6 +1368,7 @@ const commands = computed<Command[]>(() => {
     { id: 'go:packs', group: goTo, label: t('palette-packs'), hint: busyPacks.value.length ? t('app-packs-working', { count: busyPacks.value.length }) : undefined, run: () => setView('packs') },
     { id: 'go:archive', group: goTo, label: t('palette-archive'), hint: archivedCount.value ? formatNumber(archivedCount.value) : undefined, keywords: t('palette-archive-keywords'), run: () => setView('archive') },
     { id: 'go:stats', group: goTo, label: t('palette-stats'), keywords: t('palette-stats-keywords'), run: () => openSettings('library') },
+    { id: 'go:copies', group: goTo, label: t('palette-copies'), keywords: t('palette-copies-keywords'), run: () => openSettings('copies') },
     { id: 'go:search', group: goTo, label: t('palette-search'), hint: '/', run: () => { setView('library'); void nextTick(() => searchInput.value?.focus()) } },
   ]
   if (editor.value) {

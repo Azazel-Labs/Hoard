@@ -477,6 +477,14 @@ software rasterizer (`apt install mesa-vulkan-drivers`). Without any adapter, ev
      panel lists the other takes, and tag or category edits can apply to all of them at once.
    - **Duplicates.** Byte-identical files across packs (the same CC0 texture in five bundles) are stored once and
      listed under "Identical copies".
+   - **Near copies.** The same picture at another size or in another format (`rock_4k.png`, `rock_2k.jpg`), the same
+     sound at another sample rate or in another format, and the same model in another format (an FBX and a GLB with
+     the same triangles and animations, whose renders look alike) are listed under "Near copies". The best of them is
+     marked: the biggest, then lossless, then the most complete (a model with its textures and clips), so it's clear
+     which to download. Settings → Near copies lists every set in the library, the most space taken by the copies
+     that aren't the best first, so a bundle bought twice shows up. It only points them out: nothing is deleted, and
+     watched folders are never touched. A recolored texture or another take of a sound isn't a copy; it can be a
+     variant.
    - **Megascans files.** The `<id>.json` that comes with each Megascans asset names the pack (unless someone typed
      its name), adds its tags (`wood`, `furniture`, `color:brown`, …) to the pack and the asset, and gives the pack a
      short description: what it is, where it was scanned, its size, its maps and its levels of detail ("LOD0 to LOD5,
@@ -1066,7 +1074,7 @@ both connect.
 | `search_sounds` | sounds ranked by how well what was measured of them fits a word imitating them (`imitation`: "WHOOOM", "pew") and the agent's own reading of it (`shape`: seconds, a sharp or soft attack, ringing on or cutting off, dark or bright, tonal or noisy, pitch falling or rising, loud), with how Hoard read the word; or by tempo (`bpm_min`, `bpm_max`) and key (`key`, `compatible_keys`); each sound comes with its measurements, the same in words and a link to listen |
 | `describe_sound` | what one sound sounds like, as measured, in numbers and words |
 | `sounds_like` | the sounds that sound like a given one, described the same way |
-| `get_asset` | full detail: metadata, tags with sources, links, what uses it, variants, identical copies, the thumbnail's colors |
+| `get_asset` | full detail: metadata, tags with sources, links, what uses it, variants, identical copies, near copies (the best marked), the thumbnail's colors |
 | `get_bundle` | download URLs and save-as paths for an asset and everything it needs, plus a zip URL |
 | `list_packs`, `list_tags`, `list_collections` | browse the library, its tag vocabulary and collections (`search_assets` takes `collection` too) |
 | `get_credits` | who made the packs behind some packs, collections, assets or a search, their licenses and the credit lines they ask for (`markdown` for a ready `CREDITS.md`) |
@@ -1316,6 +1324,7 @@ browser session's changes must also carry an `X-Hoard` header, which pages on ot
 |---|---|---|
 | GET | `/api/assets` | search: `q`, `kind`, `tags=a,b`, `pack`, `collection`, `ext`, `similar=<asset id>`, `color=<hex>`, `imitation=<word>` (sounds shaped like it), `favorites=true` (whoever's asking), `project` (name or id), `sort`, `limit`, `offset`, `hide_supporting`; results plus kind/tag facets |
 | GET | `/api/assets/{id}` | one asset, with tags, metadata and dependencies |
+| GET | `/api/duplicates?offset=&limit=` | the library's sets of near copies, the best of each first, the most space taken by the rest first, and how much they take in all |
 | PATCH 🔒 | `/api/assets/{id}` | rename, recategorize, describe, tag; `apply_to_family` for a whole variant family |
 | GET | `/api/assets/{id}/file` | the file (`?download=1` to save it) |
 | GET | `/api/assets/{id}/thumb` | thumbnail (`?v=` its `thumb_rev`, for a URL that's cached for good) |

@@ -64,6 +64,8 @@ export interface Asset {
   family?: { key: string; size: number; members: AssetLink[] } | null
   /** Byte-identical files elsewhere in the library. */
   duplicates?: Duplicate[]
+  /** The same picture, sound or model elsewhere at another size, rate or format; the best of them marked. */
+  near_copies?: NearCopy[]
   /** Collections this asset is in. */
   collections?: CollectionRef[]
   /** What this file was converted from (an Unreal package). */
@@ -193,6 +195,29 @@ export interface UnrealPackStatus {
 }
 
 export interface Duplicate { id: string; name: string; pack_id: string; pack_name: string; path: string }
+
+/** One of a set of near copies: the same picture, sound or model at another size, rate or format. */
+export interface NearCopy {
+  id: string
+  name: string
+  pack_id: string
+  pack_name: string
+  path: string
+  ext: string
+  size: number
+  width?: number
+  height?: number
+  sample_rate?: number
+  bit_depth?: number
+  /** The one to keep: biggest, lossless, most complete. */
+  best: boolean
+}
+
+/** A set of near copies, the best first; `wasted` is what the rest take. */
+export interface CopyGroup { wasted: number; copies: NearCopy[] }
+
+/** A page of the library's sets of near copies (`GET /api/duplicates`), the most wasted first. */
+export interface CopyGroups { groups: CopyGroup[]; total: number; wasted: number }
 
 /** A hand-picked set of assets across packs ("Forest level props"). */
 /** A project that `hoard sync`s from here (`GET /api/projects`). */
@@ -1099,6 +1124,7 @@ export const api = {
   stats: () => request<Stats>('/api/stats'),
   sheet: (id: string) => request<SheetData>(`/api/assets/${id}/derivative/sheet`),
   libraryStats: () => request<LibraryStats>('/api/stats/library'),
+  duplicates: (offset = 0, limit = 50) => request<CopyGroups>(`/api/duplicates?offset=${offset}&limit=${limit}`),
   packs: (archived = false) => request<Pack[]>(`/api/packs${archived ? '?archived=true' : ''}`),
   archive: (items: ArchiveItems) => post<ArchiveCount>('/api/archive', items),
   restore: (items: ArchiveItems) => post<ArchiveCount>('/api/archive/restore', items),

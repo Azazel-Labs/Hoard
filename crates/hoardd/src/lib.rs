@@ -69,6 +69,7 @@ mod motion;
 mod mtlmat;
 mod music;
 mod naming;
+mod nearcopies;
 mod oauth;
 mod previews;
 mod profiler;
@@ -138,6 +139,8 @@ pub(crate) struct Inner {
     pub(crate) clip: clip::Index,
     /// Every sound's CLAP embedding, for searching sounds by what they sound like, in words.
     pub(crate) clap: clip::Index,
+    /// The library's sets of near copies, for the duplicates page.
+    pub(crate) near_copies: nearcopies::Cache,
     /// Every sound's acoustic descriptor, for "more like this" on sounds.
     pub(crate) sounds: sounds::Index,
 }
@@ -211,6 +214,7 @@ pub async fn run(cfg: Config) -> Result<()> {
         clip: clip::Index::new(&clip::SPEC),
         clap: clip::Index::new(&clap::SPEC),
         sounds: sounds::Index::default(),
+        near_copies: nearcopies::Cache::default(),
     });
     tokio::spawn(signin::recheck_loop(Arc::clone(&state)));
     match uploads::sweep_stale(&state) {

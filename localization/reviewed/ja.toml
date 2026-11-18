@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "b0d7dd201105b6da38b5de865a3e77a6c2f5d5ac2b3ab437da4b9b494bf2d0f8"
+source = "c6262505c2e6f7d3de91fb52af12e9fcb0e0a1eb7c63595921d1a6e793628485"
 translation = "869ed1fc3b055273469332423634413363dc2f8fea2bf697f2d9d0791df51865"
 
 [messages.account-add]
@@ -2249,6 +2249,22 @@ translation = "これに似たもの"
 source = "Name"
 translation = "名前"
 
+[messages.asset-near-best]
+source = "best"
+translation = "最良"
+
+[messages.asset-near-copies]
+source = "Near copies"
+translation = "ほぼ同じコピー"
+
+[messages.asset-near-copies-best]
+source = "The same thing at another size, rate or format. This one is the best copy."
+translation = "サイズ、サンプルレート、形式だけが違う同じものです。これが最良のコピーです。"
+
+[messages.asset-near-copies-note]
+source = "The same thing at another size, rate or format. The best copy is marked."
+translation = "サイズ、サンプルレート、形式だけが違う同じものです。最良のコピーに印が付いています。"
+
 [messages.asset-needs]
 source = "Needs"
 translation = "必要なもの"
@@ -3125,6 +3141,38 @@ translation = '{ " " }として、この Hoard のすべてを検索、ダウン
 [messages.connect-title]
 source = "Connect { $app }?"
 translation = "{ $app } を接続しますか？"
+
+[messages.copies-load-failed]
+source = "Couldn’t list near copies: { $error }"
+translation = "ほぼ同じコピーを一覧できませんでした: { $error }"
+
+[messages.copies-loading]
+source = "Looking for near copies…"
+translation = "ほぼ同じコピーを探しています…"
+
+[messages.copies-more]
+source = "Show more ({ $count } left)"
+translation = "さらに表示 (残り { $count })"
+
+[messages.copies-none]
+source = "No near copies: every picture, sound and model is only here once."
+translation = "ほぼ同じコピーはありません。どの画像・サウンド・モデルも 1 つだけです。"
+
+[messages.copies-set]
+source = "Set { $n }"
+translation = "セット { $n }"
+
+[messages.copies-set-wasted]
+source = "{ $size } in the copies that aren’t the best"
+translation = "最良でないコピーに { $size }"
+
+[messages.copies-sum]
+source = """
+{ $count ->
+        [one] One set of near copies. The copies that aren’t the best take { $size }.
+       *[other] { $count } sets of near copies. The copies that aren’t the best take { $size }.
+    }"""
+translation = "ほぼ同じコピーのセット: { $count }。最良でないコピーが { $size } を使っています。"
 
 [messages.error-account-exists]
 source = "There's already an account with that name"
@@ -7283,6 +7331,14 @@ translation = "リセット reset"
 source = "Clear the selection"
 translation = "選択を解除"
 
+[messages.palette-copies]
+source = "Near copies"
+translation = "ほぼ同じコピー"
+
+[messages.palette-copies-keywords]
+source = "duplicates same similar resized converted wasted space dedupe"
+translation = "重複 同じ 似た リサイズ 変換 無駄 容量 duplicates same similar resized converted wasted space dedupe"
+
 [messages.palette-dark-theme]
 source = "Dark theme: { $name }"
 translation = "ダークテーマ: { $name }"
@@ -9008,6 +9064,14 @@ translation = "接続"
 [messages.settings-page-connection-blurb]
 source = "How browsers and apps reach Hoard: the address it’s known by, and HTTPS, which some browser features need."
 translation = "ブラウザーやアプリが Hoard に接続する方法です。Hoard のアドレスと、ブラウザーの一部の機能に必要な HTTPS を設定します。"
+
+[messages.settings-page-copies]
+source = "Near copies"
+translation = "ほぼ同じコピー"
+
+[messages.settings-page-copies-blurb]
+source = "Files that are the same picture, sound or model at another size, rate or format, the most space taken first. The best of each set is marked; nothing is deleted."
+translation = "サイズ、サンプルレート、形式だけが違う同じ画像・サウンド・モデルのファイル。容量を多く使っているものから順に表示します。各セットの最良のものに印が付きます。何も削除しません。"
 
 [messages.settings-page-downloads]
 source = "Downloads"

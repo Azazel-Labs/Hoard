@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "b0d7dd201105b6da38b5de865a3e77a6c2f5d5ac2b3ab437da4b9b494bf2d0f8"
+source = "c6262505c2e6f7d3de91fb52af12e9fcb0e0a1eb7c63595921d1a6e793628485"
 translation = "973d5a6f0a6763be6bbc6bb0a4a118df31a18ed5e5823c6c023d2d871324479b"
 
 [messages.account-add]
@@ -2405,6 +2405,22 @@ translation = "Більше схожого"
 source = "Name"
 translation = "Назва"
 
+[messages.asset-near-best]
+source = "best"
+translation = "найкраща"
+
+[messages.asset-near-copies]
+source = "Near copies"
+translation = "Майже копії"
+
+[messages.asset-near-copies-best]
+source = "The same thing at another size, rate or format. This one is the best copy."
+translation = "Те саме в іншому розмірі, частоті дискретизації або форматі. Це найкраща копія."
+
+[messages.asset-near-copies-note]
+source = "The same thing at another size, rate or format. The best copy is marked."
+translation = "Те саме в іншому розмірі, частоті дискретизації або форматі. Найкращу копію позначено."
+
 [messages.asset-needs]
 source = "Needs"
 translation = "Потребує"
@@ -3290,6 +3306,38 @@ translation = ". Керувати обліковими записами чи т�
 [messages.connect-title]
 source = "Connect { $app }?"
 translation = "Підключити { $app }?"
+
+[messages.copies-load-failed]
+source = "Couldn’t list near copies: { $error }"
+translation = "Не вдалося показати майже копії: { $error }"
+
+[messages.copies-loading]
+source = "Looking for near copies…"
+translation = "Пошук майже копій…"
+
+[messages.copies-more]
+source = "Show more ({ $count } left)"
+translation = "Показати ще (залишилось { $count })"
+
+[messages.copies-none]
+source = "No near copies: every picture, sound and model is only here once."
+translation = "Майже копій немає: кожне зображення, звук і модель тут лише один раз."
+
+[messages.copies-set]
+source = "Set { $n }"
+translation = "Набір { $n }"
+
+[messages.copies-set-wasted]
+source = "{ $size } in the copies that aren’t the best"
+translation = "{ $size } у копіях, які не найкращі"
+
+[messages.copies-sum]
+source = """
+{ $count ->
+        [one] One set of near copies. The copies that aren’t the best take { $size }.
+       *[other] { $count } sets of near copies. The copies that aren’t the best take { $size }.
+    }"""
+translation = "Наборів майже копій: { $count }. Копії, які не найкращі, займають { $size }."
 
 [messages.error-account-exists]
 source = "There's already an account with that name"
@@ -7628,6 +7676,14 @@ translation = "скинути reset"
 source = "Clear the selection"
 translation = "Скасувати вибір"
 
+[messages.palette-copies]
+source = "Near copies"
+translation = "Майже копії"
+
+[messages.palette-copies-keywords]
+source = "duplicates same similar resized converted wasted space dedupe"
+translation = "дублікати однакові схожі зменшені конвертовані втрачене місце duplicates same similar resized converted wasted space dedupe"
+
 [messages.palette-dark-theme]
 source = "Dark theme: { $name }"
 translation = "Темна тема: { $name }"
@@ -9425,6 +9481,14 @@ translation = "Підключення"
 [messages.settings-page-connection-blurb]
 source = "How browsers and apps reach Hoard: the address it’s known by, and HTTPS, which some browser features need."
 translation = "Як браузери й застосунки звертаються до Hoard: адреса, за якою його знають, і HTTPS, потрібний для деяких функцій браузера."
+
+[messages.settings-page-copies]
+source = "Near copies"
+translation = "Майже копії"
+
+[messages.settings-page-copies-blurb]
+source = "Files that are the same picture, sound or model at another size, rate or format, the most space taken first. The best of each set is marked; nothing is deleted."
+translation = "Файли, що є тим самим зображенням, звуком або моделлю в іншому розмірі, частоті дискретизації або форматі; спершу ті, що займають найбільше місця. Найкращу в кожному наборі позначено; нічого не видаляється."
 
 [messages.settings-page-downloads]
 source = "Downloads"

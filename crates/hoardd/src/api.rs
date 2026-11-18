@@ -118,6 +118,7 @@ pub(crate) fn router(state: &AppState) -> Router<AppState> {
     let reads = Router::new()
         .route("/api/stats", get(stats))
         .route("/api/stats/library", get(library_stats))
+        .route("/api/duplicates", get(duplicates))
         .route("/api/packs", get(list_packs))
         .route("/api/packs/{id}", get(get_pack))
         .route("/api/packs/{id}/context", get(get_pack_context))
@@ -760,7 +761,33 @@ async fn get_asset(State(state): State<AppState>, Path(id): Path<String>) -> Api
     if let Some(o) = &mut asset.origin {
         o.kept_until = crate::reformat::kept_until(o, state.settings.get().conversion_rules.keep_days);
     }
+    asset.near_copies = crate::nearcopies::for_asset(&state, id).await?;
     Ok(Json(asset))
+}
+
+#[derive(Deserialize)]
+struct DuplicatesQuery {
+    #[serde(default)]
+    offset: usize,
+    #[serde(default = "default_duplicates_limit")]
+    limit: usize,
+}
+
+fn default_duplicates_limit() -> usize {
+    50
+}
+
+/// The library's sets of near copies, the most space taken by the copies that aren't the best first.
+async fn duplicates(
+    State(state): State<AppState>,
+    Query(q): Query<DuplicatesQuery>,
+) -> ApiResult<Json<hoard_core::CopyGroups>> {
+    let all = crate::nearcopies::groups(&state).await?;
+    Ok(Json(hoard_core::CopyGroups {
+        groups: all.iter().skip(q.offset).take(q.limit.min(200)).cloned().collect(),
+        total: all.len(),
+        wasted: all.iter().map(|g| g.wasted).sum(),
+    }))
 }
 
 async fn patch_asset(

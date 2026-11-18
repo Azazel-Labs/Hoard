@@ -192,7 +192,7 @@ fn tool_list(may_change: bool) -> Value {
         {
             "name": "get_asset",
             "title": "Get asset details",
-            "description": "Everything known about one asset: metadata (size, duration, poly count…), tags with their source, linked dependencies (textures, buffers, materials, animation clips), what uses it, and URLs.",
+            "description": "Everything known about one asset: metadata (size, duration, poly count…), tags with their source, linked dependencies (textures, buffers, materials, animation clips), what uses it, identical copies elsewhere, near copies (the same picture, sound or model at another size, rate or format, the best of them marked), and URLs.",
             "inputSchema": { "type": "object", "properties": { "id": { "type": "string" } }, "required": ["id"] },
             "annotations": read
         },
@@ -1029,6 +1029,11 @@ async fn call_tool(state: &AppState, name: &str, args: Value, base: &str) -> Res
             }
             if !a.duplicates.is_empty() {
                 v["identical_copies"] = json!(a.duplicates);
+            }
+            // A help, not the point: an asset still comes back if they can't be looked for.
+            let near = crate::nearcopies::for_asset(state, a.id.clone()).await.unwrap_or_default();
+            if !near.is_empty() {
+                v["near_copies"] = json!(near);
             }
             if !a.palette.is_empty() {
                 v["colors"] = json!(a.palette);

@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "b0d7dd201105b6da38b5de865a3e77a6c2f5d5ac2b3ab437da4b9b494bf2d0f8"
+source = "c6262505c2e6f7d3de91fb52af12e9fcb0e0a1eb7c63595921d1a6e793628485"
 translation = "230aa92a6033cfd0e81420ca5ef21ba788bfd9cbf50cc6964032f8c9499222bf"
 
 [messages.account-add]
@@ -2255,6 +2255,22 @@ translation = "Több ilyen"
 source = "Name"
 translation = "Név"
 
+[messages.asset-near-best]
+source = "best"
+translation = "legjobb"
+
+[messages.asset-near-copies]
+source = "Near copies"
+translation = "Majdnem azonos másolatok"
+
+[messages.asset-near-copies-best]
+source = "The same thing at another size, rate or format. This one is the best copy."
+translation = "Ugyanaz más méretben, mintavételezési frekvenciával vagy formátumban. Ez a legjobb másolat."
+
+[messages.asset-near-copies-note]
+source = "The same thing at another size, rate or format. The best copy is marked."
+translation = "Ugyanaz más méretben, mintavételezési frekvenciával vagy formátumban. A legjobb másolat meg van jelölve."
+
 [messages.asset-needs]
 source = "Needs"
 translation = "Igényli"
@@ -3128,6 +3144,38 @@ translation = ". Fiókokat és hozzáférési tokeneket nem kezelhet."
 [messages.connect-title]
 source = "Connect { $app }?"
 translation = "Csatlakoztatja ezt: { $app }?"
+
+[messages.copies-load-failed]
+source = "Couldn’t list near copies: { $error }"
+translation = "Nem sikerült listázni a majdnem azonos másolatokat: { $error }"
+
+[messages.copies-loading]
+source = "Looking for near copies…"
+translation = "Majdnem azonos másolatok keresése…"
+
+[messages.copies-more]
+source = "Show more ({ $count } left)"
+translation = "Több mutatása (még { $count })"
+
+[messages.copies-none]
+source = "No near copies: every picture, sound and model is only here once."
+translation = "Nincsenek majdnem azonos másolatok: minden kép, hang és modell csak egyszer van itt."
+
+[messages.copies-set]
+source = "Set { $n }"
+translation = "{ $n }. csoport"
+
+[messages.copies-set-wasted]
+source = "{ $size } in the copies that aren’t the best"
+translation = "{ $size } a nem legjobb másolatokban"
+
+[messages.copies-sum]
+source = """
+{ $count ->
+        [one] One set of near copies. The copies that aren’t the best take { $size }.
+       *[other] { $count } sets of near copies. The copies that aren’t the best take { $size }.
+    }"""
+translation = "Majdnem azonos másolatok csoportjai: { $count }. A nem legjobb másolatok { $size } helyet foglalnak."
 
 [messages.error-account-exists]
 source = "There's already an account with that name"
@@ -7279,6 +7327,14 @@ translation = "visszaállítás alaphelyzet reset"
 source = "Clear the selection"
 translation = "Kijelölés megszüntetése"
 
+[messages.palette-copies]
+source = "Near copies"
+translation = "Majdnem azonos másolatok"
+
+[messages.palette-copies-keywords]
+source = "duplicates same similar resized converted wasted space dedupe"
+translation = "duplikátumok azonos hasonló átméretezett konvertált pazarolt hely duplicates same similar resized converted wasted space dedupe"
+
 [messages.palette-dark-theme]
 source = "Dark theme: { $name }"
 translation = "Sötét téma: { $name }"
@@ -9018,6 +9074,14 @@ translation = "Kapcsolat"
 [messages.settings-page-connection-blurb]
 source = "How browsers and apps reach Hoard: the address it’s known by, and HTTPS, which some browser features need."
 translation = "Hogyan érik el a böngészők és az alkalmazások a Hoardot: a cím, amelyen ismert, és a HTTPS, amely egyes böngészőfunkciókhoz szükséges."
+
+[messages.settings-page-copies]
+source = "Near copies"
+translation = "Majdnem azonos másolatok"
+
+[messages.settings-page-copies-blurb]
+source = "Files that are the same picture, sound or model at another size, rate or format, the most space taken first. The best of each set is marked; nothing is deleted."
+translation = "Fájlok, amelyek ugyanaz a kép, hang vagy modell más méretben, mintavételezési frekvenciával vagy formátumban; elöl azok, amelyek a legtöbb helyet foglalják. Minden csoport legjobbja meg van jelölve; semmi sem törlődik."
 
 [messages.settings-page-downloads]
 source = "Downloads"

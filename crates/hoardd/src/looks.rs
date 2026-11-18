@@ -12,6 +12,9 @@
 //!   orientation histogram, surface statistics (contrast, detail at four scales, lightness spread, coverage), and
 //!   rotation-invariant local binary patterns at two radii (the "grain" of a texture).
 //! - **Perceptual hash**: 64 bits from the low frequencies of a 32×32 DCT, so near-copies rank first.
+//! - **Print**: a coarse 12×12 copy of the picture (color and opacity per cell), kept in the table only. Pictures that
+//!   look alike by the rest are near copies (see `nearcopies`) when their prints match too: a recolor or a moved part
+//!   changes the print where it's changed, a smaller size or a lossy format doesn't.
 //!
 //! Searching is brute force over an in-memory index (a few hundred bytes per thumbnail).
 
@@ -62,6 +65,8 @@ pub(crate) struct Features {
     pub(crate) palette: Vec<Swatch>,
     pub(crate) descriptor: Vec<i8>,
     pub(crate) phash: u64,
+    /// See [`print`].
+    pub(crate) print: Vec<u8>,
 }
 
 // ---------------------------------------------------------------------------------------------
@@ -190,7 +195,7 @@ pub(crate) fn analyze(bytes: &[u8]) -> Option<Features> {
     debug_assert_eq!(descriptor.len(), DIMS);
     let descriptor = descriptor.iter().map(|v| (v * 127.0).round().clamp(-127.0, 127.0) as i8).collect();
 
-    Some(Features { palette, descriptor, phash: phash(&work) })
+    Some(Features { palette, descriptor, phash: phash(&work), print: print(&work) })
 }
 
 /// L2-normalize a block and scale it by √weight, so its part of a dot product is `weight × cosine`.
@@ -525,6 +530,79 @@ fn phash(work: &Work) -> u64 {
     coef.iter().enumerate().fold(0u64, |h, (i, &c)| if c > median { h | (1 << i) } else { h })
 }
 
+/// A print's side, in cells.
+const PRINT: usize = 12;
+/// Prints at most this far apart on average (see [`print_distance`]) are of the same picture...
+const PRINT_MEAN: f32 = 0.012;
+/// ...as long as no cell is further apart than this: a part recolored or moved is a variant, not a copy.
+const PRINT_MAX: f32 = 0.05;
+
+/// A coarse copy of the picture: [`PRINT`] × [`PRINT`] cells (stretched to the picture's shape), each its mean color
+/// over mid gray where it's see-through, in `OKLab` (L × 255, a and b × 400 + 128), and its mean opacity × 255.
+fn print(work: &Work) -> Vec<u8> {
+    let mut sum = vec![[0f32; 4]; PRINT * PRINT];
+    let mut count = vec![0f32; PRINT * PRINT];
+    for y in 0..work.h {
+        for x in 0..work.w {
+            let i = y * work.w + x;
+            let (lab, a) = (work.lab[i], work.alpha[i]);
+            let cell = (y * PRINT / work.h) * PRINT + x * PRINT / work.w;
+            let s = &mut sum[cell];
+            s[0] += lab[0] * a + 0.5 * (1.0 - a);
+            s[1] += lab[1] * a;
+            s[2] += lab[2] * a;
+            s[3] += a;
+            count[cell] += 1.0;
+        }
+    }
+    sum.iter()
+        .zip(&count)
+        .flat_map(|(s, &n)| {
+            let n = n.max(1.0);
+            [s[0] / n * 255.0, s[1] / n * 400.0 + 128.0, s[2] / n * 400.0 + 128.0, s[3] / n * 255.0]
+                .map(|v| v.round().clamp(0.0, 255.0) as u8)
+        })
+        .collect()
+}
+
+/// How far apart two prints are, as the mean and the largest distance of a cell in `OKLab` (with a difference in
+/// opacity counted half). `None` when either isn't a print.
+fn print_distance(a: &[u8], b: &[u8]) -> Option<(f32, f32)> {
+    if a.len() != PRINT * PRINT * 4 || b.len() != a.len() {
+        return None;
+    }
+    let (mut sum, mut max) = (0f32, 0f32);
+    for (x, y) in a.as_chunks::<4>().0.iter().zip(b.as_chunks::<4>().0) {
+        let d = |i: usize, scale: f32| (f32::from(x[i]) - f32::from(y[i])) / scale;
+        let cell = (d(0, 255.0).powi(2) + d(1, 400.0).powi(2) + d(2, 400.0).powi(2)).sqrt() + 0.5 * d(3, 255.0).abs();
+        sum += cell;
+        max = max.max(cell);
+    }
+    Some((sum / (PRINT * PRINT) as f32, max))
+}
+
+/// Whether two prints are of the same picture (at another size, or saved another way). `loose` allows for a model
+/// rendered by another loader, which can shade it a little differently.
+pub(crate) fn same_print(a: &[u8], b: &[u8], loose: bool) -> bool {
+    let k = if loose { 2.0 } else { 1.0 };
+    print_distance(a, b).is_some_and(|(mean, max)| mean <= PRINT_MEAN * k && max <= PRINT_MAX * k)
+}
+
+/// The prints of these thumbnails (those that have one).
+pub(crate) fn prints(conn: &rusqlite::Connection, hashes: &[&str]) -> Result<HashMap<String, Vec<u8>>> {
+    let mut out = HashMap::new();
+    let mut stmt = conn.prepare_cached("SELECT print FROM looks WHERE thumb_hash = ?1 AND print IS NOT NULL")?;
+    for &h in hashes {
+        if out.contains_key(h) {
+            continue;
+        }
+        if let Some(p) = stmt.query_row([h], |r| r.get::<_, Vec<u8>>(0)).optional()? {
+            out.insert(h.to_owned(), p);
+        }
+    }
+    Ok(out)
+}
+
 // ---------------------------------------------------------------------------------------------
 // Storage
 
@@ -608,6 +686,12 @@ impl Entry {
 pub(crate) struct Index(RwLock<Option<HashMap<String, Entry>>>);
 
 impl Index {
+    /// An empty index that's loaded, for tests.
+    #[cfg(test)]
+    pub(crate) fn loaded() -> Self {
+        Self(RwLock::new(Some(HashMap::new())))
+    }
+
     fn read<R>(&self, f: impl FnOnce(&HashMap<String, Entry>) -> R) -> Option<R> {
         self.0.read().unwrap_or_else(PoisonError::into_inner).as_ref().map(f)
     }
@@ -635,6 +719,7 @@ impl Index {
                         palette: decode_palette(&palette),
                         descriptor: descriptor.into_iter().map(|b| b as i8).collect(),
                         phash: phash as u64,
+                        print: Vec::new(),
                     })?;
                     Some((hash, entry))
                 })
@@ -650,7 +735,7 @@ impl Index {
         Ok(())
     }
 
-    fn insert(&self, hash: String, features: Features) {
+    pub(crate) fn insert(&self, hash: String, features: Features) {
         if let Some(entry) = Entry::from(features) {
             self.write(|m| {
                 m.insert(hash, entry);
@@ -687,6 +772,54 @@ impl Index {
         .unwrap_or_default()
     }
 
+    /// Thumbnails that could be the same picture as `hash`'s: the perceptual hashes at most `bits` apart and the
+    /// descriptors at least `look` alike. Their prints decide (see [`same_print`]).
+    pub(crate) fn near(&self, hash: &str, bits: u32, look: f32) -> Vec<String> {
+        self.read(|m| {
+            let Some(target) = m.get(hash) else { return Vec::new() };
+            m.iter()
+                .filter(|(h, e)| h.as_str() != hash && close(target, e, bits, look))
+                .map(|(h, _)| h.clone())
+                .collect()
+        })
+        .unwrap_or_default()
+    }
+
+    /// Every pair of thumbnails that could be the same picture, as [`Index::near`] has them. The hashes are split in
+    /// `bits + 1` pieces: two at most `bits` apart have one piece the same, so only those sharing a piece are compared.
+    pub(crate) fn near_pairs(&self, bits: u32, look: f32) -> Vec<(String, String)> {
+        self.read(|m| {
+            let entries: Vec<(&String, &Entry)> = m.iter().filter(|(_, e)| !e.palette.is_empty()).collect();
+            let pieces = bits as usize + 1;
+            let mut pairs = std::collections::HashSet::new();
+            for piece in 0..pieces {
+                let (from, to) = (piece * 64 / pieces, (piece + 1) * 64 / pieces);
+                let mask = if to - from == 64 { u64::MAX } else { ((1u64 << (to - from)) - 1) << from };
+                let mut buckets: HashMap<u64, Vec<usize>> = HashMap::new();
+                for (i, (_, e)) in entries.iter().enumerate() {
+                    buckets.entry(e.phash & mask).or_default().push(i);
+                }
+                for bucket in buckets.values() {
+                    for (n, &i) in bucket.iter().enumerate() {
+                        for &j in &bucket[n + 1..] {
+                            let (a, b) = if entries[i].0 < entries[j].0 { (i, j) } else { (j, i) };
+                            if !pairs.contains(&(a, b)) && close(entries[a].1, entries[b].1, bits, look) {
+                                pairs.insert((a, b));
+                            }
+                        }
+                    }
+                }
+            }
+            pairs.into_iter().map(|(a, b)| (entries[a].0.clone(), entries[b].0.clone())).collect()
+        })
+        .unwrap_or_default()
+    }
+
+    /// Whether two thumbnails could be the same picture (see [`Index::near`]).
+    pub(crate) fn close(&self, a: &str, b: &str, bits: u32, look: f32) -> bool {
+        a == b || self.read(|m| m.get(a).zip(m.get(b)).is_some_and(|(x, y)| close(x, y, bits, look))).unwrap_or(false)
+    }
+
     /// Thumbnails with much of `lab` in them, most first.
     fn by_color(&self, lab: [f32; 3]) -> Vec<(String, f32)> {
         self.read(|m| top(m.iter().map(|(h, e)| (h, color_score(&e.palette, lab))), COLOR_FLOOR, COLOR_MAX))
@@ -709,6 +842,14 @@ fn similarity(a: &Entry, b: &Entry) -> f32 {
     let distance = (a.phash ^ b.phash).count_ones() as f32;
     let near_copy = ((20.0 - distance) / 20.0).clamp(0.0, 1.0);
     0.85 * descriptor + 0.15 * near_copy
+}
+
+/// Perceptual hashes at most `bits` apart and descriptors at least `look` alike (a cosine).
+fn close(a: &Entry, b: &Entry, bits: u32, look: f32) -> bool {
+    (a.phash ^ b.phash).count_ones() <= bits && {
+        let dot: i32 = a.descriptor.iter().zip(b.descriptor.iter()).map(|(x, y)| i32::from(*x) * i32::from(*y)).sum();
+        dot as f32 / (127.0 * 127.0) >= look
+    }
 }
 
 /// How much of a picture is close to `lab`: each palette color's share, counted less the further it is.
@@ -819,7 +960,8 @@ async fn rank(state: &AppState, q: &SearchQuery) -> Result<Option<db::LookRank>>
 // ---------------------------------------------------------------------------------------------
 // Background job
 
-const MISSING_SQL: &str = "NOT EXISTS (SELECT 1 FROM looks l WHERE l.thumb_hash = a.thumb_hash AND l.version = ?1)";
+const MISSING_SQL: &str =
+    "NOT EXISTS (SELECT 1 FROM looks l WHERE l.thumb_hash = a.thumb_hash AND l.version = ?1 AND l.print IS NOT NULL)";
 const ORPHAN_SQL: &str = "NOT EXISTS (SELECT 1 FROM assets a WHERE a.thumb_hash = l.thumb_hash)";
 
 /// Queue a looks job when some thumbnail has no look yet (or one no longer belongs to any asset).
@@ -936,7 +1078,9 @@ pub(crate) async fn analyze_now(state: &AppState, hash: String, bytes: Vec<u8>) 
 }
 
 async fn save(state: &AppState, computed: &[(String, Option<Features>)]) -> Result<()> {
-    let rows: Vec<(String, Vec<u8>, Vec<u8>, i64)> = computed
+    /// A thumbnail's hash, palette, descriptor, phash and print, as stored.
+    type Row = (String, Vec<u8>, Vec<u8>, i64, Vec<u8>);
+    let rows: Vec<Row> = computed
         .iter()
         .map(|(hash, f)| match f {
             Some(f) => (
@@ -944,19 +1088,21 @@ async fn save(state: &AppState, computed: &[(String, Option<Features>)]) -> Resu
                 encode_palette(&f.palette),
                 f.descriptor.iter().map(|&v| v as u8).collect(),
                 f.phash as i64,
+                f.print.clone(),
             ),
             // Not a picture after all: an empty row, so it isn't tried again.
-            None => (hash.clone(), Vec::new(), Vec::new(), 0),
+            None => (hash.clone(), Vec::new(), Vec::new(), 0, Vec::new()),
         })
         .collect();
     db::call(&state.pool, move |c| {
         let tx = c.transaction()?;
         {
             let mut stmt = tx.prepare(
-                "INSERT OR REPLACE INTO looks (thumb_hash, version, palette, descriptor, phash) VALUES (?1, ?2, ?3, ?4, ?5)",
+                "INSERT OR REPLACE INTO looks (thumb_hash, version, palette, descriptor, phash, print)
+                 VALUES (?1, ?2, ?3, ?4, ?5, ?6)",
             )?;
-            for (hash, palette, descriptor, phash) in &rows {
-                stmt.execute(params![hash, VERSION, palette, descriptor, phash])?;
+            for (hash, palette, descriptor, phash, print) in &rows {
+                stmt.execute(params![hash, VERSION, palette, descriptor, phash, print])?;
             }
         }
         tx.commit()?;
@@ -1104,6 +1250,80 @@ mod tests {
         // Only the perceptual hash (which is for near-copies) sees the turn.
         assert!(similarity(&planks, &planks_turned) > 0.75, "turning a texture doesn't change what it looks like");
         assert!(similarity(&rock_a, &blue_tiles) < SIMILAR_FLOOR);
+    }
+
+    /// Save as JPEG and read it back.
+    fn jpeg(img: &image::RgbaImage, quality: u8) -> image::RgbaImage {
+        let rgb = image::DynamicImage::ImageRgba8(img.clone()).to_rgb8();
+        let mut out = Vec::new();
+        image::codecs::jpeg::JpegEncoder::new_with_quality(&mut out, quality).encode_image(&rgb).unwrap();
+        image::load_from_memory(&out).unwrap().to_rgba8()
+    }
+
+    #[test]
+    fn prints_tell_a_copy_from_a_variant() {
+        let img = rock(5, [0.6, 0.5, 0.4]);
+        let print_of = |i: &image::RgbaImage| analyze(&png(i)).unwrap().print;
+        let at = |i: &image::RgbaImage, w: u32| image::imageops::resize(i, w, w, image::imageops::FilterType::Lanczos3);
+        let original = print_of(&img);
+        let dist = |other: &image::RgbaImage| print_distance(&original, &print_of(other)).unwrap();
+
+        // The same picture smaller, bigger or saved lossily is a copy.
+        for (what, copy) in [("smaller", at(&img, 64)), ("bigger", at(&img, 1024)), ("jpeg", jpeg(&img, 70))] {
+            assert!(same_print(&original, &print_of(&copy), false), "{what}: {:?}", dist(&copy));
+        }
+
+        // A recolor, a brighter version, a part painted over, the picture turned, or another rock is not.
+        let mut recolored = img.clone();
+        for p in recolored.pixels_mut() {
+            p.0 = [p[1], p[2], p[0], p[3]];
+        }
+        let mut brighter = img.clone();
+        for p in brighter.pixels_mut() {
+            p.0 = [p[0].saturating_add(30), p[1].saturating_add(30), p[2].saturating_add(30), p[3]];
+        }
+        let mut patched = img.clone();
+        for y in 100..140 {
+            for x in 100..140 {
+                patched.put_pixel(x, y, image::Rgba([200, 40, 40, 255]));
+            }
+        }
+        let turned = image::imageops::rotate90(&img);
+        let other = rock(6, [0.6, 0.5, 0.4]);
+        for (what, variant) in [
+            ("recolored", recolored),
+            ("brighter", brighter),
+            ("patched", patched),
+            ("turned", turned),
+            ("other", other),
+        ] {
+            assert!(!same_print(&original, &print_of(&variant), false), "{what}: {:?}", dist(&variant));
+        }
+
+        // A see-through picture against the same picture made solid is not.
+        let mut cutout = img.clone();
+        for (x, _, p) in cutout.enumerate_pixels_mut() {
+            if x < 128 {
+                p.0[3] = 0;
+            }
+        }
+        assert!(!same_print(&original, &print_of(&cutout), false));
+    }
+
+    #[test]
+    fn near_pairs_finds_what_near_finds() {
+        let index = Index::default();
+        *index.0.write().unwrap() = Some(HashMap::new());
+        let img = rock(5, [0.6, 0.5, 0.4]);
+        let small = image::imageops::resize(&img, 100, 100, image::imageops::FilterType::Triangle);
+        index.insert("a".into(), analyze(&png(&img)).unwrap());
+        index.insert("b".into(), analyze(&png(&small)).unwrap());
+        index.insert("c".into(), analyze(&png(&rock(6, [0.6, 0.5, 0.4]))).unwrap());
+        index.insert("d".into(), analyze(&png(&stripes(16, false, [150, 110, 70], [110, 75, 45]))).unwrap());
+        assert_eq!(index.near("a", 6, 0.9), vec!["b".to_owned()]);
+        assert_eq!(index.near_pairs(6, 0.9), vec![("a".to_owned(), "b".to_owned())]);
+        assert!(index.close("b", "a", 6, 0.9));
+        assert!(!index.close("a", "c", 6, 0.9));
     }
 
     #[test]

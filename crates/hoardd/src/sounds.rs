@@ -54,6 +54,8 @@ const CHARACTER_WEIGHTS: [f32; CHARACTER] = [2.0, 2.0, 1.0, 1.5, 1.0, 1.0, 1.0, 
 
 const SIMILAR_MAX: usize = 1000;
 const SIMILAR_FLOOR: f32 = 0.6;
+/// How alike two files' descriptors must be to compare their prints for a near copy.
+const NEAR_FLOOR: f32 = 0.9;
 /// A timbre band the file's rate can't hold.
 const UNKNOWN: f32 = f32::INFINITY;
 
@@ -83,9 +85,18 @@ pub(crate) const FEATURES: [&str; 12] = [
     crate::rhythm::KEYS[4],
 ];
 
-/// A file's descriptor and measured features, or None if it isn't audio this can decode (or is silent). `bytes` is
-/// the whole file or its first [`MAX_BYTES`].
-pub(crate) fn analyze(bytes: bytes::Bytes, ext: Option<&str>) -> Option<(Vec<i8>, Map<String, Value>)> {
+/// What listening to a file gives.
+#[derive(Clone, Debug)]
+pub(crate) struct Hearing {
+    pub(crate) descriptor: Vec<i8>,
+    /// See [`print`].
+    pub(crate) print: Vec<u8>,
+    pub(crate) features: Map<String, Value>,
+}
+
+/// A file's descriptor, print and measured features, or None if it isn't audio this can decode (or is silent).
+/// `bytes` is the whole file or its first [`MAX_BYTES`].
+pub(crate) fn analyze(bytes: bytes::Bytes, ext: Option<&str>) -> Option<Hearing> {
     let cut = bytes.len() as u64 >= MAX_BYTES;
     let (mono, rate, whole) = decode_mono(bytes, ext)?;
     hear(&mono, rate, whole && !cut)
@@ -96,12 +107,12 @@ pub(crate) fn measure(path: &std::path::Path, ext: &str) -> Option<Map<String, V
     use std::io::Read;
     let mut head = Vec::new();
     std::fs::File::open(path).ok()?.take(MAX_BYTES).read_to_end(&mut head).ok()?;
-    analyze(bytes::Bytes::from(head), Some(ext)).map(|(_, f)| f)
+    analyze(bytes::Bytes::from(head), Some(ext)).map(|h| h.features)
 }
 
 /// The measured features (see [`FEATURES`]) of mono samples at `rate`, taken as the start of something longer.
 pub(crate) fn listen(mono: &[f32], rate: u32) -> Option<Map<String, Value>> {
-    hear(mono, rate, false).map(|(_, f)| f)
+    hear(mono, rate, false).map(|h| h.features)
 }
 
 /// Up to [`MAX_SECS`] of a file, mixed to mono, and whether that's all of it.
@@ -132,8 +143,9 @@ pub(crate) fn decode_mono(bytes: bytes::Bytes, ext: Option<&str>) -> Option<(Vec
     Some((mono, rate, whole))
 }
 
-/// The descriptor and measured features of mono samples at `rate`; `whole` when they're the whole file, not its start.
-fn hear(mono: &[f32], rate: u32, whole: bool) -> Option<(Vec<i8>, Map<String, Value>)> {
+/// The descriptor, print and measured features of mono samples at `rate`; `whole` when they're the whole file, not its
+/// start.
+fn hear(mono: &[f32], rate: u32, whole: bool) -> Option<Hearing> {
     let sr = rate as f32;
     let peak = mono.iter().fold(0f32, |m, s| m.max(s.abs()));
     if peak < 1e-4 {
@@ -154,12 +166,12 @@ fn hear(mono: &[f32], rate: u32, whole: bool) -> Option<(Vec<i8>, Map<String, Va
     }
     let descriptor = descriptor(&x, sr, &frames, &voiced, secs);
     let features = features(mono, &x, sr, &frames, loudest, whole);
-    Some((descriptor, features))
+    Some(Hearing { descriptor, print: print(&frames, secs), features })
 }
 
 #[cfg(test)]
 fn describe(mono: &[f32], rate: u32) -> Option<Vec<i8>> {
-    hear(mono, rate, false).map(|h| h.0)
+    hear(mono, rate, false).map(|h| h.descriptor)
 }
 
 /// The descriptor (see the module's doc) of trimmed, normalized samples `x`.
@@ -204,6 +216,69 @@ fn descriptor(x: &[f32], sr: f32, frames: &[Frame], voiced: &[&Frame], secs: f32
     );
     out.extend(envelope.iter().chain(character.iter()).map(|v| (v.clamp(-1.0, 1.0) * 127.0).round() as i8));
     out
+}
+
+/// A print's stretches of time.
+const PRINT_SLICES: usize = 16;
+/// A print's bands: pairs of mel bands, up to what a file at 16 kHz holds.
+const PRINT_BANDS: usize = 12;
+/// How far under the print's loudest cell its quietest can be, in dB.
+const PRINT_FLOOR: f32 = 60.0;
+/// Prints whose cells are at most this far apart on average, in dB, are of the same sound...
+const PRINT_DB: f32 = 1.0;
+/// ...when their lengths (less the silence around them) are this close, as a share or in seconds.
+const PRINT_LENGTH: (f32, f32) = (0.015, 0.02);
+
+/// A coarse spectrogram of the sound, to tell another copy of it (another rate or format, louder or quieter, with
+/// more silence around it) from another take: its length in seconds (as an `f32`, little-endian), then
+/// [`PRINT_SLICES`] equal stretches of [`PRINT_BANDS`] bands each, in dB under the loudest (× 4).
+fn print(frames: &[Frame], secs: f32) -> Vec<u8> {
+    let n = frames.len();
+    let mut cells = [[0f32; PRINT_BANDS]; PRINT_SLICES];
+    for (i, row) in cells.iter_mut().enumerate() {
+        let from = (i * n / PRINT_SLICES).min(n - 1);
+        let to = ((i + 1) * n / PRINT_SLICES).clamp(from + 1, n);
+        for f in &frames[from..to] {
+            for (b, cell) in row.iter_mut().enumerate() {
+                *cell += 10f32.powf(f.db[2 * b] / 10.0) + 10f32.powf(f.db[2 * b + 1] / 10.0);
+            }
+        }
+        for cell in row.iter_mut() {
+            *cell = 10.0 * (*cell / (to - from) as f32 + 1e-12).log10();
+        }
+    }
+    let top = cells.iter().flatten().fold(f32::MIN, |m, &c| m.max(c));
+    let mut out = secs.to_le_bytes().to_vec();
+    out.extend(cells.iter().flatten().map(|&c| ((c - top + PRINT_FLOOR).max(0.0) * 4.0).round() as u8));
+    out
+}
+
+/// Whether two prints are of the same sound (see [`print`]).
+pub(crate) fn same_print(a: &[u8], b: &[u8]) -> bool {
+    let len = 4 + PRINT_SLICES * PRINT_BANDS;
+    if a.len() != len || b.len() != len {
+        return false;
+    }
+    let secs = |p: &[u8]| f32::from_le_bytes([p[0], p[1], p[2], p[3]]);
+    let (x, y) = (secs(a), secs(b));
+    let off = (x - y).abs();
+    if off > PRINT_LENGTH.1 && off > PRINT_LENGTH.0 * x.max(y) {
+        return false;
+    }
+    // Only cells loud enough in either count: the quiet ones are what a format or noise floor changes.
+    let (mut sum, mut cells) = (0f32, 0usize);
+    for (p, q) in a[4..].iter().zip(&b[4..]) {
+        if f32::from((*p).max(*q)) > (PRINT_FLOOR - 40.0) * 4.0 {
+            sum += (f32::from(*p) - f32::from(*q)).abs() / 4.0;
+            cells += 1;
+        }
+    }
+    cells == 0 || sum / cells as f32 <= PRINT_DB
+}
+
+/// The length a print was taken over (less the silence around it), in seconds.
+pub(crate) fn print_secs(p: &[u8]) -> Option<f32> {
+    (p.len() == 4 + PRINT_SLICES * PRINT_BANDS).then(|| f32::from_le_bytes([p[0], p[1], p[2], p[3]]))
 }
 
 /// The loudness envelope's step, for the attack and the tail.
@@ -567,6 +642,20 @@ fn timbre_alike(a: &[i8], b: &[i8]) -> f32 {
 pub(crate) struct Index(RwLock<Option<HashMap<String, Box<[i8]>>>>);
 
 impl Index {
+    /// An empty index that's loaded, for tests.
+    #[cfg(test)]
+    pub(crate) fn loaded() -> Self {
+        Self(RwLock::new(Some(HashMap::new())))
+    }
+
+    /// Add a file's descriptor, for tests.
+    #[cfg(test)]
+    pub(crate) fn insert(&self, hash: &str, descriptor: Vec<i8>) {
+        self.write(|m| {
+            m.insert(hash.to_owned(), descriptor.into_boxed_slice());
+        });
+    }
+
     fn read<R>(&self, f: impl FnOnce(&HashMap<String, Box<[i8]>>) -> R) -> Option<R> {
         self.0.read().unwrap_or_else(PoisonError::into_inner).as_ref().map(f)
     }
@@ -602,6 +691,26 @@ impl Index {
         Ok(())
     }
 
+    /// Files that could be the same sound as `hash`'s, by their descriptors; their prints decide (see [`same_print`]).
+    pub(crate) fn near(&self, hash: &str) -> Vec<String> {
+        self.read(|m| {
+            let Some(target) = m.get(hash) else { return Vec::new() };
+            m.iter()
+                .filter(|(h, d)| h.as_str() != hash && similarity(target, d) >= NEAR_FLOOR)
+                .map(|(h, _)| h.clone())
+                .collect()
+        })
+        .unwrap_or_default()
+    }
+
+    /// Whether two files could be the same sound (see [`Index::near`]).
+    pub(crate) fn close(&self, a: &str, b: &str) -> bool {
+        a == b
+            || self
+                .read(|m| m.get(a).zip(m.get(b)).is_some_and(|(x, y)| similarity(x, y) >= NEAR_FLOOR))
+                .unwrap_or(false)
+    }
+
     /// Files that sound like `hash`'s, best first.
     pub(crate) fn similar(&self, hash: &str) -> Vec<(String, f32)> {
         self.read(|m| {
@@ -623,7 +732,8 @@ impl Index {
 // ---------------------------------------------------------------------------------------------
 // Background job
 
-const MISSING_SQL: &str = "NOT EXISTS (SELECT 1 FROM sounds s WHERE s.hash = a.blob_hash AND s.version = ?1)";
+const MISSING_SQL: &str =
+    "NOT EXISTS (SELECT 1 FROM sounds s WHERE s.hash = a.blob_hash AND s.version = ?1 AND s.print IS NOT NULL)";
 const ORPHAN_SQL: &str = "NOT EXISTS (SELECT 1 FROM assets a WHERE a.blob_hash = s.hash AND a.kind = 'audio')";
 
 /// Queue a sounds job when some sound has no descriptor yet (or one no longer belongs to any sound).
@@ -715,8 +825,8 @@ pub(crate) async fn run_job(state: &AppState) -> Result<()> {
             done += chunk.len();
             state.sounds.write(|m| {
                 for (hash, heard) in computed {
-                    if let Some((d, _)) = heard {
-                        m.insert(hash, d.into_boxed_slice());
+                    if let Some(h) = heard {
+                        m.insert(hash, h.descriptor.into_boxed_slice());
                     }
                 }
             });
@@ -733,13 +843,14 @@ async fn save(state: &AppState, computed: &[Heard]) -> Result<()> {
         let tx = c.transaction()?;
         {
             let mut stmt =
-                tx.prepare("INSERT OR REPLACE INTO sounds (hash, version, descriptor) VALUES (?1, ?2, ?3)")?;
+                tx.prepare("INSERT OR REPLACE INTO sounds (hash, version, descriptor, print) VALUES (?1, ?2, ?3, ?4)")?;
             for (hash, heard) in &rows {
                 // Not a sound this can decode: an empty row, so it isn't tried again.
-                let d: Vec<u8> = heard.as_ref().map_or_default(|(d, _)| d.iter().map(|&v| v as u8).collect());
-                stmt.execute(params![hash, VERSION, d])?;
-                if let Some((_, features)) = heard {
-                    put_features(&tx, hash, features)?;
+                let d: Vec<u8> = heard.as_ref().map_or_default(|h| h.descriptor.iter().map(|&v| v as u8).collect());
+                let print: &[u8] = heard.as_ref().map_or(&[], |h| &h.print);
+                stmt.execute(params![hash, VERSION, d, print])?;
+                if let Some(h) = heard {
+                    put_features(&tx, hash, &h.features)?;
                 }
             }
         }
@@ -787,8 +898,8 @@ fn put_features(c: &rusqlite::Connection, hash: &str, features: &Map<String, Val
     Ok(())
 }
 
-/// A file's hash, and its descriptor and measured features when it could be listened to.
-type Heard = (String, Option<(Vec<i8>, Map<String, Value>)>);
+/// A file's hash, and what listening to it gave when it could be listened to.
+type Heard = (String, Option<Hearing>);
 
 /// Listen on a few threads (half the cores: this is background work).
 fn analyze_all(files: &[(String, String, bytes::Bytes)]) -> Vec<Heard> {
@@ -907,6 +1018,38 @@ mod tests {
     }
 
     #[test]
+    fn prints_tell_a_copy_from_another_take() {
+        let p = |x: &[f32], rate: u32| hear(x, rate, true).expect("a print").print;
+        let half = |x: &[f32]| -> Vec<f32> { x.chunks(2).map(|c| c.iter().sum::<f32>() / c.len() as f32).collect() };
+        let eight_bit = |x: &[f32]| -> Vec<f32> { x.iter().map(|s| (s * 127.0).round() / 127.0).collect() };
+        let padded = |x: &[f32]| -> Vec<f32> {
+            let mut out = vec![0.0; RATE as usize / 3];
+            out.extend(x.iter().map(|s| s * 0.25));
+            out.extend(vec![0.0; RATE as usize / 5]);
+            out
+        };
+        for (what, sound) in [("thud", thud(1, 0.4, 300.0)), ("zap", zap(2000.0, 300.0, 0.6)), ("rain", rain(3, 4.0))] {
+            let original = p(&sound, RATE);
+            for (how, copy, rate) in [
+                ("half the rate", half(&sound), RATE / 2),
+                ("8-bit", eight_bit(&sound), RATE),
+                ("quieter, with silence around it", padded(&sound), RATE),
+            ] {
+                assert!(same_print(&original, &p(&copy, rate)), "{what} at {how}");
+            }
+        }
+
+        let step = p(&thud(1, 0.4, 300.0), RATE);
+        let laser = p(&zap(2000.0, 300.0, 0.6), RATE);
+        // Another take: another length, or the same length but brighter.
+        assert!(!same_print(&step, &p(&thud(7, 0.45, 300.0), RATE)), "a longer step");
+        assert!(!same_print(&step, &p(&thud(1, 0.4, 900.0), RATE)), "a brighter step");
+        assert!(!same_print(&laser, &p(&zap(1500.0, 300.0, 0.6), RATE)), "a lower laser");
+        assert!(!same_print(&laser, &p(&zap(300.0, 2000.0, 0.6), RATE)), "a laser turned around");
+        assert!(!same_print(&step, &laser));
+    }
+
+    #[test]
     fn silence_and_the_shortest_sounds() {
         assert!(describe(&vec![0.0; 1000], RATE).is_none());
         assert_eq!(describe(&[0.5, -0.5, 0.25], RATE).map(|d| d.len()), Some(DIMS));
@@ -918,8 +1061,8 @@ mod tests {
         let wav = crate::audio::write_wav(&crate::audio::Audio { samples, channels: 1, rate: RATE, bits: 16 });
         let whole = analyze(bytes::Bytes::from(wav.clone()), Some("wav")).expect("the whole file");
         let cut = analyze(bytes::Bytes::from(wav[..wav.len() * 2 / 3].to_vec()), Some("wav")).expect("its start");
-        assert_eq!(whole.0.len(), DIMS);
-        assert_eq!(cut.0.len(), DIMS);
+        assert_eq!(whole.descriptor.len(), DIMS);
+        assert_eq!(cut.descriptor.len(), DIMS);
         assert!(analyze(bytes::Bytes::from_static(b"not a sound at all"), Some("wav")).is_none());
     }
 
@@ -944,7 +1087,7 @@ mod tests {
     }
 
     fn f(x: &[f32]) -> Map<String, Value> {
-        hear(x, RATE, true).expect("features").1
+        hear(x, RATE, true).expect("features").features
     }
 
     #[test]
@@ -981,7 +1124,7 @@ mod tests {
         assert_eq!(f(&whole)["loops_cleanly"], true);
         assert_eq!(num(&f(&whole), "brightness_hz"), 440.0);
         assert!(f(&tone(441.0, RATE as usize + 25)).get("loops_cleanly").is_none());
-        assert!(hear(&whole, RATE, false).unwrap().1.get("loops_cleanly").is_none());
+        assert!(hear(&whole, RATE, false).unwrap().features.get("loops_cleanly").is_none());
     }
 
     #[test]

@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "b0d7dd201105b6da38b5de865a3e77a6c2f5d5ac2b3ab437da4b9b494bf2d0f8"
+source = "c6262505c2e6f7d3de91fb52af12e9fcb0e0a1eb7c63595921d1a6e793628485"
 translation = "530e3768e270ecc495434269d0aa7741f64471672a3fe92dbc9787949d17edcc"
 
 [messages.account-add]
@@ -2246,6 +2246,22 @@ translation = "更多类似内容"
 source = "Name"
 translation = "名称"
 
+[messages.asset-near-best]
+source = "best"
+translation = "最佳"
+
+[messages.asset-near-copies]
+source = "Near copies"
+translation = "近似副本"
+
+[messages.asset-near-copies-best]
+source = "The same thing at another size, rate or format. This one is the best copy."
+translation = "只是尺寸、采样率或格式不同的同一内容。这个就是最佳副本。"
+
+[messages.asset-near-copies-note]
+source = "The same thing at another size, rate or format. The best copy is marked."
+translation = "只是尺寸、采样率或格式不同的同一内容。最佳副本已标出。"
+
 [messages.asset-needs]
 source = "Needs"
 translation = "依赖"
@@ -3122,6 +3138,38 @@ translation = '{ " " }的身份搜索、下载、描述和标注此 Hoard 中的
 [messages.connect-title]
 source = "Connect { $app }?"
 translation = "连接 { $app }？"
+
+[messages.copies-load-failed]
+source = "Couldn’t list near copies: { $error }"
+translation = "无法列出近似副本：{ $error }"
+
+[messages.copies-loading]
+source = "Looking for near copies…"
+translation = "正在查找近似副本…"
+
+[messages.copies-more]
+source = "Show more ({ $count } left)"
+translation = "显示更多（还剩 { $count }）"
+
+[messages.copies-none]
+source = "No near copies: every picture, sound and model is only here once."
+translation = "没有近似副本：每张图片、每个声音和模型在这里都只有一份。"
+
+[messages.copies-set]
+source = "Set { $n }"
+translation = "第 { $n } 组"
+
+[messages.copies-set-wasted]
+source = "{ $size } in the copies that aren’t the best"
+translation = "非最佳副本占用 { $size }"
+
+[messages.copies-sum]
+source = """
+{ $count ->
+        [one] One set of near copies. The copies that aren’t the best take { $size }.
+       *[other] { $count } sets of near copies. The copies that aren’t the best take { $size }.
+    }"""
+translation = "近似副本组：{ $count }。非最佳副本占用 { $size }。"
 
 [messages.error-account-exists]
 source = "There's already an account with that name"
@@ -7283,6 +7331,14 @@ translation = "重置 reset"
 source = "Clear the selection"
 translation = "清除选择"
 
+[messages.palette-copies]
+source = "Near copies"
+translation = "近似副本"
+
+[messages.palette-copies-keywords]
+source = "duplicates same similar resized converted wasted space dedupe"
+translation = "重复 相同 相似 缩放 转换 浪费 空间 duplicates same similar resized converted wasted space dedupe"
+
 [messages.palette-dark-theme]
 source = "Dark theme: { $name }"
 translation = "深色主题：{ $name }"
@@ -9008,6 +9064,14 @@ translation = "连接"
 [messages.settings-page-connection-blurb]
 source = "How browsers and apps reach Hoard: the address it’s known by, and HTTPS, which some browser features need."
 translation = "浏览器和应用如何访问 Hoard：它对外使用的地址，以及某些浏览器功能所需的 HTTPS。"
+
+[messages.settings-page-copies]
+source = "Near copies"
+translation = "近似副本"
+
+[messages.settings-page-copies-blurb]
+source = "Files that are the same picture, sound or model at another size, rate or format, the most space taken first. The best of each set is marked; nothing is deleted."
+translation = "只是尺寸、采样率或格式不同的同一图片、声音或模型文件，占用空间最多的排在前面。每组的最佳副本已标出；不会删除任何内容。"
 
 [messages.settings-page-downloads]
 source = "Downloads"

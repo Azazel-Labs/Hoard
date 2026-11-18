@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "b0d7dd201105b6da38b5de865a3e77a6c2f5d5ac2b3ab437da4b9b494bf2d0f8"
+source = "c6262505c2e6f7d3de91fb52af12e9fcb0e0a1eb7c63595921d1a6e793628485"
 translation = "4153ba96d36b94b3768217f18b9520b9cc368f6074756e2f4f8bad12b6fcaaa8"
 
 [messages.account-add]
@@ -2387,6 +2387,22 @@ translation = "Mai multe ca aceasta"
 source = "Name"
 translation = "Nume"
 
+[messages.asset-near-best]
+source = "best"
+translation = "cea mai bună"
+
+[messages.asset-near-copies]
+source = "Near copies"
+translation = "Aproape copii"
+
+[messages.asset-near-copies-best]
+source = "The same thing at another size, rate or format. This one is the best copy."
+translation = "Același lucru la altă dimensiune, frecvență de eșantionare sau în alt format. Aceasta este cea mai bună copie."
+
+[messages.asset-near-copies-note]
+source = "The same thing at another size, rate or format. The best copy is marked."
+translation = "Același lucru la altă dimensiune, frecvență de eșantionare sau în alt format. Cea mai bună copie este marcată."
+
 [messages.asset-needs]
 source = "Needs"
 translation = "Are nevoie de"
@@ -3275,6 +3291,38 @@ translation = ". Nu poate gestiona conturi sau tokenuri de acces."
 [messages.connect-title]
 source = "Connect { $app }?"
 translation = "Conectați { $app }?"
+
+[messages.copies-load-failed]
+source = "Couldn’t list near copies: { $error }"
+translation = "Nu s-au putut lista aproape copiile: { $error }"
+
+[messages.copies-loading]
+source = "Looking for near copies…"
+translation = "Se caută aproape copii…"
+
+[messages.copies-more]
+source = "Show more ({ $count } left)"
+translation = "Arată mai multe (mai sunt { $count })"
+
+[messages.copies-none]
+source = "No near copies: every picture, sound and model is only here once."
+translation = "Nicio aproape copie: fiecare imagine, sunet și model este aici o singură dată."
+
+[messages.copies-set]
+source = "Set { $n }"
+translation = "Setul { $n }"
+
+[messages.copies-set-wasted]
+source = "{ $size } in the copies that aren’t the best"
+translation = "{ $size } în copiile care nu sunt cele mai bune"
+
+[messages.copies-sum]
+source = """
+{ $count ->
+        [one] One set of near copies. The copies that aren’t the best take { $size }.
+       *[other] { $count } sets of near copies. The copies that aren’t the best take { $size }.
+    }"""
+translation = "Seturi de aproape copii: { $count }. Copiile care nu sunt cele mai bune ocupă { $size }."
 
 [messages.error-account-exists]
 source = "There's already an account with that name"
@@ -7572,6 +7620,14 @@ translation = "resetare reset"
 source = "Clear the selection"
 translation = "Goliți selecția"
 
+[messages.palette-copies]
+source = "Near copies"
+translation = "Aproape copii"
+
+[messages.palette-copies-keywords]
+source = "duplicates same similar resized converted wasted space dedupe"
+translation = "duplicate identice asemănătoare redimensionate convertite spațiu irosit duplicates same similar resized converted wasted space dedupe"
+
 [messages.palette-dark-theme]
 source = "Dark theme: { $name }"
 translation = "Temă întunecată: { $name }"
@@ -9348,6 +9404,14 @@ translation = "Conexiune"
 [messages.settings-page-connection-blurb]
 source = "How browsers and apps reach Hoard: the address it’s known by, and HTTPS, which some browser features need."
 translation = "Cum ajung browserele și aplicațiile la Hoard: adresa sub care este cunoscut și HTTPS, de care au nevoie unele funcții ale browserului."
+
+[messages.settings-page-copies]
+source = "Near copies"
+translation = "Aproape copii"
+
+[messages.settings-page-copies-blurb]
+source = "Files that are the same picture, sound or model at another size, rate or format, the most space taken first. The best of each set is marked; nothing is deleted."
+translation = "Fișiere care sunt aceeași imagine, același sunet sau model la altă dimensiune, frecvență de eșantionare sau în alt format, întâi cele care ocupă cel mai mult spațiu. Cea mai bună din fiecare set este marcată; nu se șterge nimic."
 
 [messages.settings-page-downloads]
 source = "Downloads"

@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "b0d7dd201105b6da38b5de865a3e77a6c2f5d5ac2b3ab437da4b9b494bf2d0f8"
+source = "c6262505c2e6f7d3de91fb52af12e9fcb0e0a1eb7c63595921d1a6e793628485"
 translation = "6f9499cf3e70a4041b6c9fea0d9cf5c43379d423cbd36a9e19dc5da429eed428"
 
 [messages.account-add]
@@ -2330,6 +2330,22 @@ translation = "Mehr davon"
 source = "Name"
 translation = "Name"
 
+[messages.asset-near-best]
+source = "best"
+translation = "beste"
+
+[messages.asset-near-copies]
+source = "Near copies"
+translation = "Beinahe-Kopien"
+
+[messages.asset-near-copies-best]
+source = "The same thing at another size, rate or format. This one is the best copy."
+translation = "Dasselbe in anderer Größe, Abtastrate oder einem anderen Format. Diese hier ist die beste Kopie."
+
+[messages.asset-near-copies-note]
+source = "The same thing at another size, rate or format. The best copy is marked."
+translation = "Dasselbe in anderer Größe, Abtastrate oder einem anderen Format. Die beste Kopie ist markiert."
+
 [messages.asset-needs]
 source = "Needs"
 translation = "Benötigt"
@@ -3211,6 +3227,38 @@ translation = ". Konten und Zugriffstokens kann es nicht verwalten."
 [messages.connect-title]
 source = "Connect { $app }?"
 translation = "{ $app } verbinden?"
+
+[messages.copies-load-failed]
+source = "Couldn’t list near copies: { $error }"
+translation = "Beinahe-Kopien konnten nicht aufgelistet werden: { $error }"
+
+[messages.copies-loading]
+source = "Looking for near copies…"
+translation = "Suche nach Beinahe-Kopien…"
+
+[messages.copies-more]
+source = "Show more ({ $count } left)"
+translation = "Mehr anzeigen (noch { $count })"
+
+[messages.copies-none]
+source = "No near copies: every picture, sound and model is only here once."
+translation = "Keine Beinahe-Kopien: Jedes Bild, jeder Sound und jedes Modell ist nur einmal da."
+
+[messages.copies-set]
+source = "Set { $n }"
+translation = "Gruppe { $n }"
+
+[messages.copies-set-wasted]
+source = "{ $size } in the copies that aren’t the best"
+translation = "{ $size } in den Kopien, die nicht die besten sind"
+
+[messages.copies-sum]
+source = """
+{ $count ->
+        [one] One set of near copies. The copies that aren’t the best take { $size }.
+       *[other] { $count } sets of near copies. The copies that aren’t the best take { $size }.
+    }"""
+translation = "Gruppen von Beinahe-Kopien: { $count }. Die Kopien, die nicht die besten sind, belegen { $size }."
 
 [messages.error-account-exists]
 source = "There's already an account with that name"
@@ -7436,6 +7484,14 @@ translation = "zurücksetzen löschen reset"
 source = "Clear the selection"
 translation = "Auswahl aufheben"
 
+[messages.palette-copies]
+source = "Near copies"
+translation = "Beinahe-Kopien"
+
+[messages.palette-copies-keywords]
+source = "duplicates same similar resized converted wasted space dedupe"
+translation = "duplikate gleich ähnlich skaliert konvertiert verschwendeter speicherplatz duplicates same similar resized converted wasted space dedupe"
+
 [messages.palette-dark-theme]
 source = "Dark theme: { $name }"
 translation = "Dunkles Design: { $name }"
@@ -9185,6 +9241,14 @@ translation = "Verbindung"
 [messages.settings-page-connection-blurb]
 source = "How browsers and apps reach Hoard: the address it’s known by, and HTTPS, which some browser features need."
 translation = "Wie Browser und Apps Hoard erreichen: die Adresse, unter der es bekannt ist, und HTTPS, das manche Browserfunktionen brauchen."
+
+[messages.settings-page-copies]
+source = "Near copies"
+translation = "Beinahe-Kopien"
+
+[messages.settings-page-copies-blurb]
+source = "Files that are the same picture, sound or model at another size, rate or format, the most space taken first. The best of each set is marked; nothing is deleted."
+translation = "Dateien, die dasselbe Bild, derselbe Sound oder dasselbe Modell in anderer Größe, Abtastrate oder einem anderen Format sind, die mit dem meisten Platz zuerst. Die beste jeder Gruppe ist markiert; nichts wird gelöscht."
 
 [messages.settings-page-downloads]
 source = "Downloads"

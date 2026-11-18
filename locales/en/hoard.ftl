@@ -812,6 +812,8 @@ palette-archive = Archive
 palette-archive-keywords = trash recycle bin deleted restore
 palette-stats = Library stats
 palette-stats-keywords = statistics numbers size disk space count
+palette-copies = Near copies
+palette-copies-keywords = duplicates same similar resized converted wasted space dedupe
 palette-search = Search
 palette-add-files = Add files…
 palette-add-files-keywords = upload import
@@ -1714,6 +1716,10 @@ asset-material-maps-aria = { $name }: maps
 asset-variants = Variants ({ $count } takes)
 asset-copies = Identical copies
 asset-copies-note = The same bytes are stored once; these packs ship this file too.
+asset-near-copies = Near copies
+asset-near-copies-note = The same thing at another size, rate or format. The best copy is marked.
+asset-near-copies-best = The same thing at another size, rate or format. This one is the best copy.
+asset-near-best = best
 asset-unreal-converted = Converted from Unreal
 asset-rule-converted = Converted by a rule
 # Followed by the original file's name: "A conversion rule made this GLB on 3 May 2026 from tree.obj".
@@ -2538,6 +2544,19 @@ settings-page-appearance = Appearance
 settings-page-appearance-blurb = The themes this browser wears when it’s light and when it’s dark. Saved in this browser only.
 settings-page-library = Library
 settings-page-library-blurb = What’s in the hoard: how big it is, what it’s made of, how it grew and how well it’s tagged. Archived things aren’t counted.
+settings-page-copies = Near copies
+settings-page-copies-blurb = Files that are the same picture, sound or model at another size, rate or format, the most space taken first. The best of each set is marked; nothing is deleted.
+copies-loading = Looking for near copies…
+copies-none = No near copies: every picture, sound and model is only here once.
+copies-load-failed = Couldn’t list near copies: { $error }
+copies-sum =
+    { $count ->
+        [one] One set of near copies. The copies that aren’t the best take { $size }.
+       *[other] { $count } sets of near copies. The copies that aren’t the best take { $size }.
+    }
+copies-set = Set { $n }
+copies-set-wasted = { $size } in the copies that aren’t the best
+copies-more = Show more ({ $count } left)
 settings-page-tags = Tags
 settings-page-tags-blurb = Every tag in the library. Merge ones that mean the same thing, or rename one; the taggers use the new name from then on.
 settings-page-store-files = Store files

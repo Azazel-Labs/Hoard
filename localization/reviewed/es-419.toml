@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "b0d7dd201105b6da38b5de865a3e77a6c2f5d5ac2b3ab437da4b9b494bf2d0f8"
+source = "c6262505c2e6f7d3de91fb52af12e9fcb0e0a1eb7c63595921d1a6e793628485"
 translation = "7b1541614c38bf97b6a7a72048a6e85b4a2718296422d3e2c9e3df375ad1b985"
 
 [messages.account-add]
@@ -2330,6 +2330,22 @@ translation = "Más como este"
 source = "Name"
 translation = "Nombre"
 
+[messages.asset-near-best]
+source = "best"
+translation = "la mejor"
+
+[messages.asset-near-copies]
+source = "Near copies"
+translation = "Casi copias"
+
+[messages.asset-near-copies-best]
+source = "The same thing at another size, rate or format. This one is the best copy."
+translation = "Lo mismo en otro tamaño, frecuencia de muestreo o formato. Esta es la mejor copia."
+
+[messages.asset-near-copies-note]
+source = "The same thing at another size, rate or format. The best copy is marked."
+translation = "Lo mismo en otro tamaño, frecuencia de muestreo o formato. La mejor copia está marcada."
+
 [messages.asset-needs]
 source = "Needs"
 translation = "Necesita"
@@ -3211,6 +3227,38 @@ translation = ". No puede administrar cuentas ni tokens de acceso."
 [messages.connect-title]
 source = "Connect { $app }?"
 translation = "¿Conectar { $app }?"
+
+[messages.copies-load-failed]
+source = "Couldn’t list near copies: { $error }"
+translation = "No se pudieron mostrar las casi copias: { $error }"
+
+[messages.copies-loading]
+source = "Looking for near copies…"
+translation = "Buscando casi copias…"
+
+[messages.copies-more]
+source = "Show more ({ $count } left)"
+translation = "Mostrar más (quedan { $count })"
+
+[messages.copies-none]
+source = "No near copies: every picture, sound and model is only here once."
+translation = "No hay casi copias: cada imagen, sonido y modelo está aquí una sola vez."
+
+[messages.copies-set]
+source = "Set { $n }"
+translation = "Grupo { $n }"
+
+[messages.copies-set-wasted]
+source = "{ $size } in the copies that aren’t the best"
+translation = "{ $size } en las copias que no son la mejor"
+
+[messages.copies-sum]
+source = """
+{ $count ->
+        [one] One set of near copies. The copies that aren’t the best take { $size }.
+       *[other] { $count } sets of near copies. The copies that aren’t the best take { $size }.
+    }"""
+translation = "Grupos de casi copias: { $count }. Las copias que no son la mejor ocupan { $size }."
 
 [messages.error-account-exists]
 source = "There's already an account with that name"
@@ -7445,6 +7493,14 @@ translation = "restablecer reiniciar reset"
 source = "Clear the selection"
 translation = "Borrar la selección"
 
+[messages.palette-copies]
+source = "Near copies"
+translation = "Casi copias"
+
+[messages.palette-copies-keywords]
+source = "duplicates same similar resized converted wasted space dedupe"
+translation = "duplicados iguales parecidos redimensionados convertidos espacio desperdiciado duplicates same similar resized converted wasted space dedupe"
+
 [messages.palette-dark-theme]
 source = "Dark theme: { $name }"
 translation = "Tema oscuro: { $name }"
@@ -9194,6 +9250,14 @@ translation = "Conexión"
 [messages.settings-page-connection-blurb]
 source = "How browsers and apps reach Hoard: the address it’s known by, and HTTPS, which some browser features need."
 translation = "Cómo llegan a Hoard los navegadores y las apps: la dirección con la que se le conoce, y HTTPS, que algunas funciones del navegador necesitan."
+
+[messages.settings-page-copies]
+source = "Near copies"
+translation = "Casi copias"
+
+[messages.settings-page-copies-blurb]
+source = "Files that are the same picture, sound or model at another size, rate or format, the most space taken first. The best of each set is marked; nothing is deleted."
+translation = "Archivos que son la misma imagen, sonido o modelo en otro tamaño, frecuencia de muestreo o formato, primero los que más espacio ocupan. La mejor de cada grupo está marcada; no se elimina nada."
 
 [messages.settings-page-downloads]
 source = "Downloads"

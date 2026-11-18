@@ -757,6 +757,9 @@ const MIGRATIONS: &[&str] = &[
          AND NOT EXISTS (SELECT 1 FROM jobs j WHERE j.pack_id = p.id AND j.status IN ('queued', 'running'));",
     // 71: sound search (CLAP): each sound file's embedding.
     "CREATE TABLE sound_embeddings (hash TEXT PRIMARY KEY, model TEXT NOT NULL, vector BLOB NOT NULL) WITHOUT ROWID;",
+    // 72: near copies (see `nearcopies`): a coarse print of each thumbnail and sound, filled in by their jobs.
+    "ALTER TABLE looks ADD COLUMN print BLOB;
+     ALTER TABLE sounds ADD COLUMN print BLOB;",
 ];
 
 /// How many automatic pre-upgrade backups to keep in `<data dir>/backups`.
@@ -1353,6 +1356,7 @@ fn asset_from_row(r: &Row<'_>) -> rusqlite::Result<Asset> {
         derivatives: Vec::new(),
         family: None,
         duplicates: Vec::new(),
+        near_copies: Vec::new(),
         collections: Vec::new(),
         origin: None,
         unreal: None,

@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "b0d7dd201105b6da38b5de865a3e77a6c2f5d5ac2b3ab437da4b9b494bf2d0f8"
+source = "c6262505c2e6f7d3de91fb52af12e9fcb0e0a1eb7c63595921d1a6e793628485"
 translation = "72f8bea74267d1a6341481bb8f995cf690d50c49c33ba6825335f86fe2349868"
 
 [messages.account-add]
@@ -2342,6 +2342,22 @@ translation = "Περισσότερα σαν αυτό"
 source = "Name"
 translation = "Όνομα"
 
+[messages.asset-near-best]
+source = "best"
+translation = "καλύτερο"
+
+[messages.asset-near-copies]
+source = "Near copies"
+translation = "Σχεδόν αντίγραφα"
+
+[messages.asset-near-copies-best]
+source = "The same thing at another size, rate or format. This one is the best copy."
+translation = "Το ίδιο σε άλλο μέγεθος, ρυθμό δειγματοληψίας ή μορφή. Αυτό είναι το καλύτερο αντίγραφο."
+
+[messages.asset-near-copies-note]
+source = "The same thing at another size, rate or format. The best copy is marked."
+translation = "Το ίδιο σε άλλο μέγεθος, ρυθμό δειγματοληψίας ή μορφή. Το καλύτερο αντίγραφο είναι σημειωμένο."
+
 [messages.asset-needs]
 source = "Needs"
 translation = "Χρειάζεται"
@@ -3223,6 +3239,38 @@ translation = ". Δεν μπορεί να διαχειρίζεται λογαρ�
 [messages.connect-title]
 source = "Connect { $app }?"
 translation = "Να συνδεθεί το { $app };"
+
+[messages.copies-load-failed]
+source = "Couldn’t list near copies: { $error }"
+translation = "Δεν ήταν δυνατή η εμφάνιση των σχεδόν αντιγράφων: { $error }"
+
+[messages.copies-loading]
+source = "Looking for near copies…"
+translation = "Αναζήτηση σχεδόν αντιγράφων…"
+
+[messages.copies-more]
+source = "Show more ({ $count } left)"
+translation = "Εμφάνιση περισσότερων (απομένουν { $count })"
+
+[messages.copies-none]
+source = "No near copies: every picture, sound and model is only here once."
+translation = "Κανένα σχεδόν αντίγραφο: κάθε εικόνα, ήχος και μοντέλο υπάρχει εδώ μόνο μία φορά."
+
+[messages.copies-set]
+source = "Set { $n }"
+translation = "Ομάδα { $n }"
+
+[messages.copies-set-wasted]
+source = "{ $size } in the copies that aren’t the best"
+translation = "{ $size } στα αντίγραφα που δεν είναι τα καλύτερα"
+
+[messages.copies-sum]
+source = """
+{ $count ->
+        [one] One set of near copies. The copies that aren’t the best take { $size }.
+       *[other] { $count } sets of near copies. The copies that aren’t the best take { $size }.
+    }"""
+translation = "Ομάδες σχεδόν αντιγράφων: { $count }. Τα αντίγραφα που δεν είναι τα καλύτερα πιάνουν { $size }."
 
 [messages.error-account-exists]
 source = "There's already an account with that name"
@@ -7495,6 +7543,14 @@ translation = "επαναφορά μηδενισμός reset"
 source = "Clear the selection"
 translation = "Απαλοιφή επιλογής"
 
+[messages.palette-copies]
+source = "Near copies"
+translation = "Σχεδόν αντίγραφα"
+
+[messages.palette-copies-keywords]
+source = "duplicates same similar resized converted wasted space dedupe"
+translation = "διπλότυπα ίδια παρόμοια σμίκρυνση μετατροπή χαμένος χώρος duplicates same similar resized converted wasted space dedupe"
+
 [messages.palette-dark-theme]
 source = "Dark theme: { $name }"
 translation = "Σκοτεινό θέμα: { $name }"
@@ -9244,6 +9300,14 @@ translation = "Συνδεσιμότητα"
 [messages.settings-page-connection-blurb]
 source = "How browsers and apps reach Hoard: the address it’s known by, and HTTPS, which some browser features need."
 translation = "Πώς φτάνουν στο Hoard τα προγράμματα περιήγησης και οι εφαρμογές: η διεύθυνση με την οποία είναι γνωστό και το HTTPS, που χρειάζονται ορισμένες λειτουργίες των προγραμμάτων περιήγησης."
+
+[messages.settings-page-copies]
+source = "Near copies"
+translation = "Σχεδόν αντίγραφα"
+
+[messages.settings-page-copies-blurb]
+source = "Files that are the same picture, sound or model at another size, rate or format, the most space taken first. The best of each set is marked; nothing is deleted."
+translation = "Αρχεία που είναι η ίδια εικόνα, ο ίδιος ήχος ή το ίδιο μοντέλο σε άλλο μέγεθος, ρυθμό δειγματοληψίας ή μορφή, πρώτα όσα πιάνουν τον περισσότερο χώρο. Το καλύτερο κάθε ομάδας είναι σημειωμένο· τίποτα δεν διαγράφεται."
 
 [messages.settings-page-downloads]
 source = "Downloads"

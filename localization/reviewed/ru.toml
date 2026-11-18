@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "b0d7dd201105b6da38b5de865a3e77a6c2f5d5ac2b3ab437da4b9b494bf2d0f8"
+source = "c6262505c2e6f7d3de91fb52af12e9fcb0e0a1eb7c63595921d1a6e793628485"
 translation = "bb45e4d0d59bdf1a2181c1158501e66a0c57e8041d0a982d6aed7e82f49657fa"
 
 [messages.account-add]
@@ -2404,6 +2404,22 @@ translation = "Похожие"
 source = "Name"
 translation = "Название"
 
+[messages.asset-near-best]
+source = "best"
+translation = "лучшая"
+
+[messages.asset-near-copies]
+source = "Near copies"
+translation = "Почти копии"
+
+[messages.asset-near-copies-best]
+source = "The same thing at another size, rate or format. This one is the best copy."
+translation = "То же самое в другом размере, частоте дискретизации или формате. Это лучшая копия."
+
+[messages.asset-near-copies-note]
+source = "The same thing at another size, rate or format. The best copy is marked."
+translation = "То же самое в другом размере, частоте дискретизации или формате. Лучшая копия отмечена."
+
 [messages.asset-needs]
 source = "Needs"
 translation = "Нужны"
@@ -3289,6 +3305,38 @@ translation = ". Управлять учётными записями и ток�
 [messages.connect-title]
 source = "Connect { $app }?"
 translation = "Подключить { $app }?"
+
+[messages.copies-load-failed]
+source = "Couldn’t list near copies: { $error }"
+translation = "Не удалось показать почти копии: { $error }"
+
+[messages.copies-loading]
+source = "Looking for near copies…"
+translation = "Поиск почти копий…"
+
+[messages.copies-more]
+source = "Show more ({ $count } left)"
+translation = "Показать ещё (осталось { $count })"
+
+[messages.copies-none]
+source = "No near copies: every picture, sound and model is only here once."
+translation = "Почти копий нет: каждое изображение, звук и модель здесь только один раз."
+
+[messages.copies-set]
+source = "Set { $n }"
+translation = "Набор { $n }"
+
+[messages.copies-set-wasted]
+source = "{ $size } in the copies that aren’t the best"
+translation = "{ $size } в копиях, которые не лучшие"
+
+[messages.copies-sum]
+source = """
+{ $count ->
+        [one] One set of near copies. The copies that aren’t the best take { $size }.
+       *[other] { $count } sets of near copies. The copies that aren’t the best take { $size }.
+    }"""
+translation = "Наборов почти копий: { $count }. Копии, которые не лучшие, занимают { $size }."
 
 [messages.error-account-exists]
 source = "There's already an account with that name"
@@ -7614,6 +7662,14 @@ translation = "сброс очистить reset"
 source = "Clear the selection"
 translation = "Снять выделение"
 
+[messages.palette-copies]
+source = "Near copies"
+translation = "Почти копии"
+
+[messages.palette-copies-keywords]
+source = "duplicates same similar resized converted wasted space dedupe"
+translation = "дубликаты одинаковые похожие уменьшенные сконвертированные потерянное место duplicates same similar resized converted wasted space dedupe"
+
 [messages.palette-dark-theme]
 source = "Dark theme: { $name }"
 translation = "Тёмная тема: { $name }"
@@ -9410,6 +9466,14 @@ translation = "Подключение"
 [messages.settings-page-connection-blurb]
 source = "How browsers and apps reach Hoard: the address it’s known by, and HTTPS, which some browser features need."
 translation = "Как браузеры и приложения обращаются к Hoard: адрес, по которому он известен, и HTTPS, который нужен некоторым функциям браузера."
+
+[messages.settings-page-copies]
+source = "Near copies"
+translation = "Почти копии"
+
+[messages.settings-page-copies-blurb]
+source = "Files that are the same picture, sound or model at another size, rate or format, the most space taken first. The best of each set is marked; nothing is deleted."
+translation = "Файлы, которые являются тем же изображением, звуком или моделью в другом размере, частоте дискретизации или формате; сначала те, что занимают больше всего места. Лучшая в каждом наборе отмечена; ничего не удаляется."
 
 [messages.settings-page-downloads]
 source = "Downloads"

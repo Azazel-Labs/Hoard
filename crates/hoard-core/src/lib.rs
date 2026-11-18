@@ -218,6 +218,9 @@ pub struct Asset {
     /// The identical file (same bytes) elsewhere in the library, usually in other packs. Detail view only.
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub duplicates: Vec<Duplicate>,
+    /// The same picture, sound or model in other files (see [`NearCopy`]), the best first. Detail view only.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub near_copies: Vec<NearCopy>,
     /// Collections this asset is in (detail view only).
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub collections: Vec<CollectionRef>,
@@ -424,6 +427,49 @@ pub struct Duplicate {
     pub pack_id: String,
     pub pack_name: String,
     pub path: String,
+}
+
+/// The same picture, sound or model as an asset, in another file: another size, rate or format. Detail view and the
+/// duplicates page.
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+pub struct NearCopy {
+    pub id: String,
+    pub name: String,
+    pub pack_id: String,
+    pub pack_name: String,
+    pub path: String,
+    pub ext: String,
+    /// Bytes.
+    pub size: i64,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub width: Option<u32>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub height: Option<u32>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub sample_rate: Option<u32>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub bit_depth: Option<u32>,
+    /// The best of the copies: the biggest, lossless, most complete.
+    #[serde(default)]
+    pub best: bool,
+}
+
+/// A set of near copies across the library, the best first.
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+pub struct CopyGroup {
+    /// Bytes taken by the copies that aren't the best.
+    pub wasted: i64,
+    pub copies: Vec<NearCopy>,
+}
+
+/// A page of the library's near copies, the most space taken first.
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+pub struct CopyGroups {
+    pub groups: Vec<CopyGroup>,
+    /// How many sets there are in all.
+    pub total: usize,
+    /// Bytes taken by the copies that aren't the best, in all of them.
+    pub wasted: i64,
 }
 
 /// A named set of assets put together by hand ("Forest level props"), across packs.

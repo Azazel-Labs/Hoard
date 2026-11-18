@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "b0d7dd201105b6da38b5de865a3e77a6c2f5d5ac2b3ab437da4b9b494bf2d0f8"
+source = "c6262505c2e6f7d3de91fb52af12e9fcb0e0a1eb7c63595921d1a6e793628485"
 translation = "cb51eeebee58ce4e694b9c22ec1e26a19090d24e80d9b74b0e431ca3fa274b7f"
 
 [messages.account-add]
@@ -2243,6 +2243,22 @@ translation = "비슷한 것 더 보기"
 source = "Name"
 translation = "이름"
 
+[messages.asset-near-best]
+source = "best"
+translation = "최상"
+
+[messages.asset-near-copies]
+source = "Near copies"
+translation = "거의 같은 사본"
+
+[messages.asset-near-copies-best]
+source = "The same thing at another size, rate or format. This one is the best copy."
+translation = "크기, 샘플 레이트 또는 형식만 다른 같은 것입니다. 이것이 가장 좋은 사본입니다."
+
+[messages.asset-near-copies-note]
+source = "The same thing at another size, rate or format. The best copy is marked."
+translation = "크기, 샘플 레이트 또는 형식만 다른 같은 것입니다. 가장 좋은 사본에 표시가 있습니다."
+
 [messages.asset-needs]
 source = "Needs"
 translation = "필요한 파일"
@@ -3116,6 +3132,38 @@ translation = '{ " " }계정으로 이 Hoard의 모든 것을 검색, 다운로�
 [messages.connect-title]
 source = "Connect { $app }?"
 translation = "{ $app }을(를) 연결할까요?"
+
+[messages.copies-load-failed]
+source = "Couldn’t list near copies: { $error }"
+translation = "거의 같은 사본을 나열하지 못했습니다: { $error }"
+
+[messages.copies-loading]
+source = "Looking for near copies…"
+translation = "거의 같은 사본을 찾는 중…"
+
+[messages.copies-more]
+source = "Show more ({ $count } left)"
+translation = "더 보기 ({ $count }개 남음)"
+
+[messages.copies-none]
+source = "No near copies: every picture, sound and model is only here once."
+translation = "거의 같은 사본이 없습니다. 모든 그림, 소리, 모델이 한 번씩만 있습니다."
+
+[messages.copies-set]
+source = "Set { $n }"
+translation = "묶음 { $n }"
+
+[messages.copies-set-wasted]
+source = "{ $size } in the copies that aren’t the best"
+translation = "가장 좋은 것이 아닌 사본: { $size }"
+
+[messages.copies-sum]
+source = """
+{ $count ->
+        [one] One set of near copies. The copies that aren’t the best take { $size }.
+       *[other] { $count } sets of near copies. The copies that aren’t the best take { $size }.
+    }"""
+translation = "거의 같은 사본 묶음: { $count }개. 가장 좋은 것이 아닌 사본이 차지하는 공간: { $size }."
 
 [messages.error-account-exists]
 source = "There's already an account with that name"
@@ -7245,6 +7293,14 @@ translation = "초기화 재설정 reset"
 source = "Clear the selection"
 translation = "선택 해제"
 
+[messages.palette-copies]
+source = "Near copies"
+translation = "거의 같은 사본"
+
+[messages.palette-copies-keywords]
+source = "duplicates same similar resized converted wasted space dedupe"
+translation = "중복 같은 비슷한 크기변경 변환 낭비 공간 duplicates same similar resized converted wasted space dedupe"
+
 [messages.palette-dark-theme]
 source = "Dark theme: { $name }"
 translation = "어두운 테마: { $name }"
@@ -8964,6 +9020,14 @@ translation = "연결"
 [messages.settings-page-connection-blurb]
 source = "How browsers and apps reach Hoard: the address it’s known by, and HTTPS, which some browser features need."
 translation = "브라우저와 앱이 Hoard에 접속하는 방식: Hoard의 주소와, 일부 브라우저 기능에 필요한 HTTPS입니다."
+
+[messages.settings-page-copies]
+source = "Near copies"
+translation = "거의 같은 사본"
+
+[messages.settings-page-copies-blurb]
+source = "Files that are the same picture, sound or model at another size, rate or format, the most space taken first. The best of each set is marked; nothing is deleted."
+translation = "크기, 샘플 레이트 또는 형식만 다른 같은 그림, 소리, 모델 파일입니다. 공간을 가장 많이 차지하는 것부터 보여 줍니다. 각 묶음에서 가장 좋은 것에 표시가 있으며, 아무것도 삭제하지 않습니다."
 
 [messages.settings-page-downloads]
 source = "Downloads"

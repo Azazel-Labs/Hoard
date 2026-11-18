@@ -69,18 +69,9 @@ Spine skeletons exported as JSON play on their atlas in Hoard's own player. Stil
 
 ## Near copies and a better "More like this"
 
-Byte-identical files are already stored once and listed as "Identical copies". More like this already catches
-near-copies by a perceptual hash, then ranks by colors and grain, and by what pictures show when image search (CLIP)
-is on. Still to come:
+Near copies are listed on each asset and on their own Settings page. More like this ranks by colors and grain, and
+by what pictures show when image search (CLIP) is on. Still to come:
 
-- **Near copies, listed.** Beside "Identical copies", an asset's details list its near copies: the same picture at
-  another size or in another format (`rock_4k.png`, `rock_2k.jpg`, `rock.tga`), the same sound at another sample
-  rate or in another format, the same model in another format (an FBX and a GLB of one mesh: the same triangle and
-  bone counts, and renders that look alike). The best copy is marked (the biggest, lossless, most complete), so it's
-  clear which to download.
-- **A page of duplicates.** Groups of near copies across the library, the most wasted space first, so a bundle bought
-  twice, or the same CC0 set arriving in five bundles, shows up. Hoard points them out and never deletes anything on
-  its own, and watched folders are never touched.
 - **A better picture model.** SigLIP 2 in place of CLIP ViT-B/32: better at finding pictures from words and at
   telling what's alike. Still run on the server through candle, and still off until an admin turns it on. After the
   switch, what CLIP learned is relearned in the background, and search keeps using it until then.
@@ -89,4 +80,4 @@ is on. Still to come:
   from the server.
 
 Still open: which SigLIP 2 size (download and memory against how much better it finds things, measured on a real
-library), and how alike counts as a near copy for each kind. A recolored texture is a variant, not a copy.
+library).

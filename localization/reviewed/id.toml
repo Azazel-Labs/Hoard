@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "b0d7dd201105b6da38b5de865a3e77a6c2f5d5ac2b3ab437da4b9b494bf2d0f8"
+source = "c6262505c2e6f7d3de91fb52af12e9fcb0e0a1eb7c63595921d1a6e793628485"
 translation = "30056587d254fe6b8f2576dc61dbda0e0d1f814731977073ac18b1c1a33112d6"
 
 [messages.account-add]
@@ -2249,6 +2249,22 @@ translation = "Lainnya yang mirip ini"
 source = "Name"
 translation = "Nama"
 
+[messages.asset-near-best]
+source = "best"
+translation = "terbaik"
+
+[messages.asset-near-copies]
+source = "Near copies"
+translation = "Salinan hampir sama"
+
+[messages.asset-near-copies-best]
+source = "The same thing at another size, rate or format. This one is the best copy."
+translation = "Hal yang sama dalam ukuran, laju sampel, atau format lain. Ini salinan terbaik."
+
+[messages.asset-near-copies-note]
+source = "The same thing at another size, rate or format. The best copy is marked."
+translation = "Hal yang sama dalam ukuran, laju sampel, atau format lain. Salinan terbaik ditandai."
+
 [messages.asset-needs]
 source = "Needs"
 translation = "Memerlukan"
@@ -3122,6 +3138,38 @@ translation = ". Aplikasi ini tidak dapat mengelola akun atau token akses."
 [messages.connect-title]
 source = "Connect { $app }?"
 translation = "Hubungkan { $app }?"
+
+[messages.copies-load-failed]
+source = "Couldn’t list near copies: { $error }"
+translation = "Tidak dapat menampilkan salinan hampir sama: { $error }"
+
+[messages.copies-loading]
+source = "Looking for near copies…"
+translation = "Mencari salinan hampir sama…"
+
+[messages.copies-more]
+source = "Show more ({ $count } left)"
+translation = "Tampilkan lebih banyak ({ $count } lagi)"
+
+[messages.copies-none]
+source = "No near copies: every picture, sound and model is only here once."
+translation = "Tidak ada salinan hampir sama: setiap gambar, suara, dan model hanya ada sekali di sini."
+
+[messages.copies-set]
+source = "Set { $n }"
+translation = "Kelompok { $n }"
+
+[messages.copies-set-wasted]
+source = "{ $size } in the copies that aren’t the best"
+translation = "{ $size } di salinan yang bukan terbaik"
+
+[messages.copies-sum]
+source = """
+{ $count ->
+        [one] One set of near copies. The copies that aren’t the best take { $size }.
+       *[other] { $count } sets of near copies. The copies that aren’t the best take { $size }.
+    }"""
+translation = "Kelompok salinan hampir sama: { $count }. Salinan yang bukan terbaik memakan { $size }."
 
 [messages.error-account-exists]
 source = "There's already an account with that name"
@@ -7273,6 +7321,14 @@ translation = "setel ulang reset"
 source = "Clear the selection"
 translation = "Kosongkan pilihan"
 
+[messages.palette-copies]
+source = "Near copies"
+translation = "Salinan hampir sama"
+
+[messages.palette-copies-keywords]
+source = "duplicates same similar resized converted wasted space dedupe"
+translation = "duplikat sama mirip diubah-ukuran dikonversi ruang terbuang duplicates same similar resized converted wasted space dedupe"
+
 [messages.palette-dark-theme]
 source = "Dark theme: { $name }"
 translation = "Tema gelap: { $name }"
@@ -8998,6 +9054,14 @@ translation = "Koneksi"
 [messages.settings-page-connection-blurb]
 source = "How browsers and apps reach Hoard: the address it’s known by, and HTTPS, which some browser features need."
 translation = "Cara browser dan aplikasi menjangkau Hoard: alamat yang dikenalnya, dan HTTPS, yang diperlukan sebagian fitur browser."
+
+[messages.settings-page-copies]
+source = "Near copies"
+translation = "Salinan hampir sama"
+
+[messages.settings-page-copies-blurb]
+source = "Files that are the same picture, sound or model at another size, rate or format, the most space taken first. The best of each set is marked; nothing is deleted."
+translation = "File yang merupakan gambar, suara, atau model yang sama dalam ukuran, laju sampel, atau format lain, yang paling banyak memakan ruang lebih dulu. Yang terbaik di setiap kelompok ditandai; tidak ada yang dihapus."
 
 [messages.settings-page-downloads]
 source = "Downloads"

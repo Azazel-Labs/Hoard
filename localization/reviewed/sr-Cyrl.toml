@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "b0d7dd201105b6da38b5de865a3e77a6c2f5d5ac2b3ab437da4b9b494bf2d0f8"
+source = "c6262505c2e6f7d3de91fb52af12e9fcb0e0a1eb7c63595921d1a6e793628485"
 translation = "c2a4a8051502263df10866a7bb372ad5cdada115fb8d6449130cdd2d1752dd61"
 
 [messages.account-add]
@@ -2342,6 +2342,22 @@ translation = "Још сличних"
 source = "Name"
 translation = "Назив"
 
+[messages.asset-near-best]
+source = "best"
+translation = "најбоља"
+
+[messages.asset-near-copies]
+source = "Near copies"
+translation = "Скоро копије"
+
+[messages.asset-near-copies-best]
+source = "The same thing at another size, rate or format. This one is the best copy."
+translation = "Исто у другој величини, фреквенцији узорковања или формату. Ово је најбоља копија."
+
+[messages.asset-near-copies-note]
+source = "The same thing at another size, rate or format. The best copy is marked."
+translation = "Исто у другој величини, фреквенцији узорковања или формату. Најбоља копија је означена."
+
 [messages.asset-needs]
 source = "Needs"
 translation = "Потребно"
@@ -3225,6 +3241,38 @@ translation = ". Не може да управља налозима ни при�
 [messages.connect-title]
 source = "Connect { $app }?"
 translation = "Повезати { $app }?"
+
+[messages.copies-load-failed]
+source = "Couldn’t list near copies: { $error }"
+translation = "Није било могуће приказати скоро копије: { $error }"
+
+[messages.copies-loading]
+source = "Looking for near copies…"
+translation = "Тражење скоро копија…"
+
+[messages.copies-more]
+source = "Show more ({ $count } left)"
+translation = "Прикажи још (преостало: { $count })"
+
+[messages.copies-none]
+source = "No near copies: every picture, sound and model is only here once."
+translation = "Нема скоро копија: свака слика, звук и модел су овде само једном."
+
+[messages.copies-set]
+source = "Set { $n }"
+translation = "Скуп { $n }"
+
+[messages.copies-set-wasted]
+source = "{ $size } in the copies that aren’t the best"
+translation = "{ $size } у копијама које нису најбоље"
+
+[messages.copies-sum]
+source = """
+{ $count ->
+        [one] One set of near copies. The copies that aren’t the best take { $size }.
+       *[other] { $count } sets of near copies. The copies that aren’t the best take { $size }.
+    }"""
+translation = "Скупова скоро копија: { $count }. Копије које нису најбоље заузимају { $size }."
 
 [messages.error-account-exists]
 source = "There's already an account with that name"
@@ -7497,6 +7545,14 @@ translation = "ресетуј reset"
 source = "Clear the selection"
 translation = "Поништи избор"
 
+[messages.palette-copies]
+source = "Near copies"
+translation = "Скоро копије"
+
+[messages.palette-copies-keywords]
+source = "duplicates same similar resized converted wasted space dedupe"
+translation = "дупликати исти слични смањени претворени изгубљен простор duplicates same similar resized converted wasted space dedupe"
+
 [messages.palette-dark-theme]
 source = "Dark theme: { $name }"
 translation = "Тамна тема: { $name }"
@@ -9273,6 +9329,14 @@ translation = "Веза"
 [messages.settings-page-connection-blurb]
 source = "How browsers and apps reach Hoard: the address it’s known by, and HTTPS, which some browser features need."
 translation = "Како прегледачи и апликације приступају Hoard-у: адреса по којој је познат и HTTPS, који је потребан неким функцијама прегледача."
+
+[messages.settings-page-copies]
+source = "Near copies"
+translation = "Скоро копије"
+
+[messages.settings-page-copies-blurb]
+source = "Files that are the same picture, sound or model at another size, rate or format, the most space taken first. The best of each set is marked; nothing is deleted."
+translation = "Датотеке које су иста слика, звук или модел у другој величини, фреквенцији узорковања или формату, прво оне које заузимају највише места. Најбоља у сваком скупу је означена; ништа се не брише."
 
 [messages.settings-page-downloads]
 source = "Downloads"

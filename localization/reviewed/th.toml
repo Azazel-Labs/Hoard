@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "b0d7dd201105b6da38b5de865a3e77a6c2f5d5ac2b3ab437da4b9b494bf2d0f8"
+source = "c6262505c2e6f7d3de91fb52af12e9fcb0e0a1eb7c63595921d1a6e793628485"
 translation = "07555d54b3ba6bc94b6fcbf55672d1be5e77ca134c96e30754ee929b3a902828"
 
 [messages.account-add]
@@ -2249,6 +2249,22 @@ translation = "เพิ่มเติมที่คล้ายกัน"
 source = "Name"
 translation = "ชื่อ"
 
+[messages.asset-near-best]
+source = "best"
+translation = "ดีที่สุด"
+
+[messages.asset-near-copies]
+source = "Near copies"
+translation = "สำเนาที่เกือบเหมือนกัน"
+
+[messages.asset-near-copies-best]
+source = "The same thing at another size, rate or format. This one is the best copy."
+translation = "สิ่งเดียวกันในขนาด อัตราสุ่มตัวอย่าง หรือรูปแบบอื่น ไฟล์นี้คือสำเนาที่ดีที่สุด"
+
+[messages.asset-near-copies-note]
+source = "The same thing at another size, rate or format. The best copy is marked."
+translation = "สิ่งเดียวกันในขนาด อัตราสุ่มตัวอย่าง หรือรูปแบบอื่น สำเนาที่ดีที่สุดมีเครื่องหมายไว้"
+
 [messages.asset-needs]
 source = "Needs"
 translation = "ต้องใช้"
@@ -3122,6 +3138,38 @@ translation = '{ " " }แต่จัดการบัญชีหรือโ�
 [messages.connect-title]
 source = "Connect { $app }?"
 translation = "เชื่อมต่อ { $app } หรือไม่?"
+
+[messages.copies-load-failed]
+source = "Couldn’t list near copies: { $error }"
+translation = "แสดงรายการสำเนาที่เกือบเหมือนกันไม่ได้: { $error }"
+
+[messages.copies-loading]
+source = "Looking for near copies…"
+translation = "กำลังค้นหาสำเนาที่เกือบเหมือนกัน…"
+
+[messages.copies-more]
+source = "Show more ({ $count } left)"
+translation = "แสดงเพิ่ม (เหลืออีก { $count })"
+
+[messages.copies-none]
+source = "No near copies: every picture, sound and model is only here once."
+translation = "ไม่มีสำเนาที่เกือบเหมือนกัน: ภาพ เสียง และโมเดลทุกชิ้นมีอยู่ที่นี่เพียงครั้งเดียว"
+
+[messages.copies-set]
+source = "Set { $n }"
+translation = "ชุดที่ { $n }"
+
+[messages.copies-set-wasted]
+source = "{ $size } in the copies that aren’t the best"
+translation = "{ $size } ในสำเนาที่ไม่ใช่ตัวดีที่สุด"
+
+[messages.copies-sum]
+source = """
+{ $count ->
+        [one] One set of near copies. The copies that aren’t the best take { $size }.
+       *[other] { $count } sets of near copies. The copies that aren’t the best take { $size }.
+    }"""
+translation = "ชุดสำเนาที่เกือบเหมือนกัน: { $count } สำเนาที่ไม่ใช่ตัวดีที่สุดใช้พื้นที่ { $size }"
 
 [messages.error-account-exists]
 source = "There's already an account with that name"
@@ -7272,6 +7320,14 @@ translation = "รีเซ็ต reset"
 source = "Clear the selection"
 translation = "ล้างการเลือก"
 
+[messages.palette-copies]
+source = "Near copies"
+translation = "สำเนาที่เกือบเหมือนกัน"
+
+[messages.palette-copies-keywords]
+source = "duplicates same similar resized converted wasted space dedupe"
+translation = "ซ้ำ เหมือนกัน คล้าย ย่อขนาด แปลง พื้นที่เปลือง duplicates same similar resized converted wasted space dedupe"
+
 [messages.palette-dark-theme]
 source = "Dark theme: { $name }"
 translation = "ธีมมืด: { $name }"
@@ -8997,6 +9053,14 @@ translation = "การเชื่อมต่อ"
 [messages.settings-page-connection-blurb]
 source = "How browsers and apps reach Hoard: the address it’s known by, and HTTPS, which some browser features need."
 translation = "วิธีที่เบราว์เซอร์และแอปเข้าถึง Hoard: ที่อยู่ที่ใช้เรียก Hoard และ HTTPS ซึ่งฟีเจอร์บางอย่างของเบราว์เซอร์ต้องใช้"
+
+[messages.settings-page-copies]
+source = "Near copies"
+translation = "สำเนาที่เกือบเหมือนกัน"
+
+[messages.settings-page-copies-blurb]
+source = "Files that are the same picture, sound or model at another size, rate or format, the most space taken first. The best of each set is marked; nothing is deleted."
+translation = "ไฟล์ที่เป็นภาพ เสียง หรือโมเดลเดียวกันในขนาด อัตราสุ่มตัวอย่าง หรือรูปแบบอื่น เรียงจากที่ใช้พื้นที่มากที่สุดก่อน สำเนาที่ดีที่สุดของแต่ละชุดมีเครื่องหมายไว้ ไม่มีการลบสิ่งใด"
 
 [messages.settings-page-downloads]
 source = "Downloads"

@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "b0d7dd201105b6da38b5de865a3e77a6c2f5d5ac2b3ab437da4b9b494bf2d0f8"
+source = "c6262505c2e6f7d3de91fb52af12e9fcb0e0a1eb7c63595921d1a6e793628485"
 translation = "9bd6df5ffb27941fd7574669812413d7eaa17a0920718334cfd6ce3df12e13f5"
 
 [messages.account-add]
@@ -2334,6 +2334,22 @@ translation = "Lisää samankaltaisia"
 source = "Name"
 translation = "Nimi"
 
+[messages.asset-near-best]
+source = "best"
+translation = "paras"
+
+[messages.asset-near-copies]
+source = "Near copies"
+translation = "Lähes samat kopiot"
+
+[messages.asset-near-copies-best]
+source = "The same thing at another size, rate or format. This one is the best copy."
+translation = "Sama asia eri koossa, näytteenottotaajuudella tai muodossa. Tämä on paras kopio."
+
+[messages.asset-near-copies-note]
+source = "The same thing at another size, rate or format. The best copy is marked."
+translation = "Sama asia eri koossa, näytteenottotaajuudella tai muodossa. Paras kopio on merkitty."
+
 [messages.asset-needs]
 source = "Needs"
 translation = "Tarvitsee"
@@ -3219,6 +3235,38 @@ translation = ". Se ei voi hallita tilejä eikä käyttöoikeustunnuksia."
 [messages.connect-title]
 source = "Connect { $app }?"
 translation = "Yhdistetäänkö { $app }?"
+
+[messages.copies-load-failed]
+source = "Couldn’t list near copies: { $error }"
+translation = "Lähes samoja kopioita ei voitu listata: { $error }"
+
+[messages.copies-loading]
+source = "Looking for near copies…"
+translation = "Etsitään lähes samoja kopioita…"
+
+[messages.copies-more]
+source = "Show more ({ $count } left)"
+translation = "Näytä lisää ({ $count } jäljellä)"
+
+[messages.copies-none]
+source = "No near copies: every picture, sound and model is only here once."
+translation = "Ei lähes samoja kopioita: jokainen kuva, ääni ja malli on täällä vain kerran."
+
+[messages.copies-set]
+source = "Set { $n }"
+translation = "Joukko { $n }"
+
+[messages.copies-set-wasted]
+source = "{ $size } in the copies that aren’t the best"
+translation = "{ $size } kopioissa, jotka eivät ole parhaita"
+
+[messages.copies-sum]
+source = """
+{ $count ->
+        [one] One set of near copies. The copies that aren’t the best take { $size }.
+       *[other] { $count } sets of near copies. The copies that aren’t the best take { $size }.
+    }"""
+translation = "Lähes samojen kopioiden joukkoja: { $count }. Kopiot, jotka eivät ole parhaita, vievät { $size }."
 
 [messages.error-account-exists]
 source = "There's already an account with that name"
@@ -7477,6 +7525,14 @@ translation = "nollaa reset"
 source = "Clear the selection"
 translation = "Tyhjennä valinta"
 
+[messages.palette-copies]
+source = "Near copies"
+translation = "Lähes samat kopiot"
+
+[messages.palette-copies-keywords]
+source = "duplicates same similar resized converted wasted space dedupe"
+translation = "kaksoiskappaleet samat samankaltaiset skaalatut muunnetut hukattu tila duplicates same similar resized converted wasted space dedupe"
+
 [messages.palette-dark-theme]
 source = "Dark theme: { $name }"
 translation = "Tumma teema: { $name }"
@@ -9234,6 +9290,14 @@ translation = "Yhteys"
 [messages.settings-page-connection-blurb]
 source = "How browsers and apps reach Hoard: the address it’s known by, and HTTPS, which some browser features need."
 translation = "Miten selaimet ja sovellukset tavoittavat Hoardin: osoite, jolla se tunnetaan, ja HTTPS, jota jotkin selaimen ominaisuudet tarvitsevat."
+
+[messages.settings-page-copies]
+source = "Near copies"
+translation = "Lähes samat kopiot"
+
+[messages.settings-page-copies-blurb]
+source = "Files that are the same picture, sound or model at another size, rate or format, the most space taken first. The best of each set is marked; nothing is deleted."
+translation = "Tiedostot, jotka ovat sama kuva, ääni tai malli eri koossa, näytteenottotaajuudella tai muodossa, eniten tilaa vievät ensin. Kunkin joukon paras on merkitty; mitään ei poisteta."
 
 [messages.settings-page-downloads]
 source = "Downloads"

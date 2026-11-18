@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "b0d7dd201105b6da38b5de865a3e77a6c2f5d5ac2b3ab437da4b9b494bf2d0f8"
+source = "c6262505c2e6f7d3de91fb52af12e9fcb0e0a1eb7c63595921d1a6e793628485"
 translation = "eb892fd468da0132017d254b1ce31fa8af7e6f4331de9f469e15c94a37a8f607"
 
 [messages.account-add]
@@ -2330,6 +2330,22 @@ translation = "Mere som dette"
 source = "Name"
 translation = "Navn"
 
+[messages.asset-near-best]
+source = "best"
+translation = "bedst"
+
+[messages.asset-near-copies]
+source = "Near copies"
+translation = "Næsten-kopier"
+
+[messages.asset-near-copies-best]
+source = "The same thing at another size, rate or format. This one is the best copy."
+translation = "Det samme i en anden størrelse, samplingfrekvens eller et andet format. Denne er den bedste kopi."
+
+[messages.asset-near-copies-note]
+source = "The same thing at another size, rate or format. The best copy is marked."
+translation = "Det samme i en anden størrelse, samplingfrekvens eller et andet format. Den bedste kopi er markeret."
+
 [messages.asset-needs]
 source = "Needs"
 translation = "Kræver"
@@ -3211,6 +3227,38 @@ translation = ". Den kan ikke administrere konti eller adgangstokens."
 [messages.connect-title]
 source = "Connect { $app }?"
 translation = "Forbind { $app }?"
+
+[messages.copies-load-failed]
+source = "Couldn’t list near copies: { $error }"
+translation = "Kunne ikke vise næsten-kopier: { $error }"
+
+[messages.copies-loading]
+source = "Looking for near copies…"
+translation = "Leder efter næsten-kopier…"
+
+[messages.copies-more]
+source = "Show more ({ $count } left)"
+translation = "Vis flere ({ $count } tilbage)"
+
+[messages.copies-none]
+source = "No near copies: every picture, sound and model is only here once."
+translation = "Ingen næsten-kopier: hvert billede, hver lyd og hver model findes kun én gang."
+
+[messages.copies-set]
+source = "Set { $n }"
+translation = "Sæt { $n }"
+
+[messages.copies-set-wasted]
+source = "{ $size } in the copies that aren’t the best"
+translation = "{ $size } i kopierne, der ikke er de bedste"
+
+[messages.copies-sum]
+source = """
+{ $count ->
+        [one] One set of near copies. The copies that aren’t the best take { $size }.
+       *[other] { $count } sets of near copies. The copies that aren’t the best take { $size }.
+    }"""
+translation = "Sæt af næsten-kopier: { $count }. Kopierne, der ikke er de bedste, fylder { $size }."
 
 [messages.error-account-exists]
 source = "There's already an account with that name"
@@ -7438,6 +7486,14 @@ translation = "nulstil reset"
 source = "Clear the selection"
 translation = "Ryd markeringen"
 
+[messages.palette-copies]
+source = "Near copies"
+translation = "Næsten-kopier"
+
+[messages.palette-copies-keywords]
+source = "duplicates same similar resized converted wasted space dedupe"
+translation = "dubletter samme lignende skaleret konverteret spildt plads duplicates same similar resized converted wasted space dedupe"
+
 [messages.palette-dark-theme]
 source = "Dark theme: { $name }"
 translation = "Mørkt tema: { $name }"
@@ -9185,6 +9241,14 @@ translation = "Forbindelse"
 [messages.settings-page-connection-blurb]
 source = "How browsers and apps reach Hoard: the address it’s known by, and HTTPS, which some browser features need."
 translation = "Hvordan browsere og apps når Hoard: den adresse, den er kendt under, og HTTPS, som nogle browserfunktioner kræver."
+
+[messages.settings-page-copies]
+source = "Near copies"
+translation = "Næsten-kopier"
+
+[messages.settings-page-copies-blurb]
+source = "Files that are the same picture, sound or model at another size, rate or format, the most space taken first. The best of each set is marked; nothing is deleted."
+translation = "Filer, der er det samme billede, den samme lyd eller model i en anden størrelse, samplingfrekvens eller et andet format, dem der fylder mest først. Den bedste i hvert sæt er markeret; intet slettes."
 
 [messages.settings-page-downloads]
 source = "Downloads"

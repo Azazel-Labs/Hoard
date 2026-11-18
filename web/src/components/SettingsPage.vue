@@ -50,6 +50,7 @@ import AuthPanel from './AuthPanel.vue'
 import HttpsPanel from './HttpsPanel.vue'
 import ProfilerPanel from './ProfilerPanel.vue'
 import TagsPanel from './TagsPanel.vue'
+import CopiesPanel from './CopiesPanel.vue'
 import StoreFormatsPanel from './StoreFormatsPanel.vue'
 import ResetButton from './ResetButton.vue'
 import ConversionRules from './ConversionRules.vue'
@@ -77,6 +78,7 @@ const ALL_PAGES: { id: string; readonly label: string; readonly blurb: string; n
   { id: 'general', need: 'admin', get label() { return t('settings-page-general') }, get blurb() { return t('settings-page-general-blurb') } },
   { id: 'appearance', get label() { return t('settings-page-appearance') }, get blurb() { return t('settings-page-appearance-blurb') } },
   { id: 'library', get label() { return t('settings-page-library') }, get blurb() { return t('settings-page-library-blurb') } },
+  { id: 'copies', get label() { return t('settings-page-copies') }, get blurb() { return t('settings-page-copies-blurb') } },
   { id: 'tags', need: 'edit', get label() { return t('settings-page-tags') }, get blurb() { return t('settings-page-tags-blurb') } },
   { id: 'store-files', need: 'admin', get label() { return t('settings-page-store-files') }, get blurb() { return t('settings-page-store-files-blurb') } },
   { id: 'locations', sep: true, need: 'admin', get label() { return t('settings-page-locations') }, get blurb() { return t('settings-page-locations-blurb') } },
@@ -925,6 +927,7 @@ onBeforeUnmount(() => {
         />
         <AccountPanel v-else-if="current === 'account'" />
         <AuthPanel v-else-if="current === 'auth'" />
+        <CopiesPanel v-else-if="current === 'copies'" @open="(id) => emit('open', id)" @unauthorized="emit('unauthorized')" />
         <TagsPanel v-else-if="current === 'tags'" @tag="(t) => emit('tag', t)" @changed="emit('changed')" />
         <StoreFormatsPanel v-else-if="current === 'store-files'" />
 

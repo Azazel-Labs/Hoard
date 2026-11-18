@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "b0d7dd201105b6da38b5de865a3e77a6c2f5d5ac2b3ab437da4b9b494bf2d0f8"
+source = "c6262505c2e6f7d3de91fb52af12e9fcb0e0a1eb7c63595921d1a6e793628485"
 translation = "492346de275ddfb98a7c980cda9c461c7c8cf91addc47e4b748e7c38ce659fb3"
 
 [messages.account-add]
@@ -2330,6 +2330,22 @@ translation = "Més com aquest"
 source = "Name"
 translation = "Nom"
 
+[messages.asset-near-best]
+source = "best"
+translation = "la millor"
+
+[messages.asset-near-copies]
+source = "Near copies"
+translation = "Còpies gairebé idèntiques"
+
+[messages.asset-near-copies-best]
+source = "The same thing at another size, rate or format. This one is the best copy."
+translation = "El mateix en una altra mida, freqüència de mostreig o format. Aquesta és la millor còpia."
+
+[messages.asset-near-copies-note]
+source = "The same thing at another size, rate or format. The best copy is marked."
+translation = "El mateix en una altra mida, freqüència de mostreig o format. La millor còpia està marcada."
+
 [messages.asset-needs]
 source = "Needs"
 translation = "Necessita"
@@ -3211,6 +3227,38 @@ translation = ". No pot gestionar comptes ni testimonis d'accés."
 [messages.connect-title]
 source = "Connect { $app }?"
 translation = "Voleu connectar { $app }?"
+
+[messages.copies-load-failed]
+source = "Couldn’t list near copies: { $error }"
+translation = "No s’han pogut llistar les còpies gairebé idèntiques: { $error }"
+
+[messages.copies-loading]
+source = "Looking for near copies…"
+translation = "Cercant còpies gairebé idèntiques…"
+
+[messages.copies-more]
+source = "Show more ({ $count } left)"
+translation = "Mostra’n més (en queden { $count })"
+
+[messages.copies-none]
+source = "No near copies: every picture, sound and model is only here once."
+translation = "No hi ha còpies gairebé idèntiques: cada imatge, so i model només hi és una vegada."
+
+[messages.copies-set]
+source = "Set { $n }"
+translation = "Conjunt { $n }"
+
+[messages.copies-set-wasted]
+source = "{ $size } in the copies that aren’t the best"
+translation = "{ $size } en les còpies que no són la millor"
+
+[messages.copies-sum]
+source = """
+{ $count ->
+        [one] One set of near copies. The copies that aren’t the best take { $size }.
+       *[other] { $count } sets of near copies. The copies that aren’t the best take { $size }.
+    }"""
+translation = "Conjunts de còpies gairebé idèntiques: { $count }. Les còpies que no són la millor ocupen { $size }."
 
 [messages.error-account-exists]
 source = "There's already an account with that name"
@@ -7442,6 +7490,14 @@ translation = "restableix reinicia reset"
 source = "Clear the selection"
 translation = "Esborra la selecció"
 
+[messages.palette-copies]
+source = "Near copies"
+translation = "Còpies gairebé idèntiques"
+
+[messages.palette-copies-keywords]
+source = "duplicates same similar resized converted wasted space dedupe"
+translation = "duplicats iguals semblants redimensionats convertits espai malgastat duplicates same similar resized converted wasted space dedupe"
+
 [messages.palette-dark-theme]
 source = "Dark theme: { $name }"
 translation = "Tema fosc: { $name }"
@@ -9189,6 +9245,14 @@ translation = "Connexió"
 [messages.settings-page-connection-blurb]
 source = "How browsers and apps reach Hoard: the address it’s known by, and HTTPS, which some browser features need."
 translation = "Com arriben a Hoard els navegadors i les aplicacions: l'adreça amb què se'l coneix, i HTTPS, que algunes funcions del navegador necessiten."
+
+[messages.settings-page-copies]
+source = "Near copies"
+translation = "Còpies gairebé idèntiques"
+
+[messages.settings-page-copies-blurb]
+source = "Files that are the same picture, sound or model at another size, rate or format, the most space taken first. The best of each set is marked; nothing is deleted."
+translation = "Fitxers que són la mateixa imatge, so o model en una altra mida, freqüència de mostreig o format, primer els que ocupen més espai. La millor de cada conjunt està marcada; no s’esborra res."
 
 [messages.settings-page-downloads]
 source = "Downloads"

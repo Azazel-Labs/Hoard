@@ -16,6 +16,7 @@ import { canStar, mine, toggleFavorite } from '../mine'
 import { MAX_STORE_FILE, TEXT_EXTS } from '../storeFormats'
 import { lazy } from '../lazy'
 import { formatDate, formatNumber, t } from '../i18n'
+import { copyFacts } from '../copies'
 import { findKey, keyName } from '../keys'
 import { isSkeletonAsset, isLottieAsset, isModelAsset, isRiveAsset, isTextAsset, takeViewRequest, viewRequest, viewerFor, type ViewerKind } from '../viewers'
 import { isMaterialAsset, resolutions, ROLE_LABEL, ROLE_NAME, sizeLabel } from '../materials'
@@ -205,6 +206,7 @@ const bundleBytes = computed(() => {
 const family = computed(() => props.asset.family ?? null)
 const applyToFamily = ref(true)
 const duplicates = computed(() => props.asset.duplicates ?? [])
+const nearCopies = computed(() => props.asset.near_copies ?? [])
 const showViews = ref(false)
 const hasViews = computed(() => props.asset.derivatives.includes('views'))
 
@@ -1274,6 +1276,22 @@ onBeforeUnmount(() => unswipe())
       </button>
     </section>
 
+    <section v-if="nearCopies.length" data-testid="near-copies">
+      <h3>{{ t('asset-near-copies') }}</h3>
+      <p class="legend dupnote">{{ nearCopies.some((n) => n.best) ? t('asset-near-copies-note') : t('asset-near-copies-best') }}</p>
+      <ul class="links">
+        <li v-for="n in peek('near', nearCopies)" :key="n.id">
+          <button type="button" class="link dup near" :title="n.path" @click="$emit('open', n.id)">
+            <span class="lname">{{ n.pack_name }}<span v-if="n.best" class="best">{{ t('asset-near-best') }}</span></span>
+            <span class="lrel">{{ copyFacts(n) }}</span>
+          </button>
+        </li>
+      </ul>
+      <button v-if="peek('near', nearCopies).length < nearCopies.length" type="button" class="linkish small showmore" @click="unfold('near')">
+        {{ t('asset-show-more', { count: nearCopies.length - LIST_PEEK }) }}
+      </button>
+    </section>
+
     <section v-if="origin || ueStatus || recovered || ueTags.length" class="unreal">
       <h3>{{ byRule ? t('asset-rule-converted') : origin ? t('asset-unreal-converted') : t('asset-unreal-package') }}</h3>
       <div v-if="origin && byRule" data-testid="rule-origin">
@@ -1653,4 +1671,9 @@ footer {
 .dupnote { margin: 0 0 0.4rem; }
 .link.dup { grid-template-columns: 1fr auto; }
 .link.dup .lrel { max-width: 22ch; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; direction: rtl; }
+.link.near .lrel { max-width: none; direction: ltr; }
+.best {
+  margin-left: 0.45rem; font-size: 0.85em; font-weight: 500; padding: 0 0.45rem; border-radius: 999px;
+  background: color-mix(in srgb, var(--ok) 16%, transparent); color: var(--ok);
+}
 </style>

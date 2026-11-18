@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "fb5ec7daf9d146bc33a22186078826834eba8ed33fe73d21a95f8148c742f29d"
+source = "68780bc44a5ad891be9dc4abd064c3b75b73dba4170c37bf12c409b8b7cc4295"
 translation = "233736fce877dd72d5c0840b380752036aeadf00268c938b28bf55f6d4bddad5"
 
 [messages.account-add]

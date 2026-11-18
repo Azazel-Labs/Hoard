@@ -833,6 +833,9 @@ fn analyze_converted_json(path: &Path, a: &mut Analysis) -> anyhow::Result<()> {
     } else if let Some(facts) = crate::lottie::facts(&doc) {
         a.kind = Some(AssetKind::Vector);
         m.extend(facts);
+    } else if let Some(facts) = crate::dragonbones::facts(&doc) {
+        a.kind = Some(AssetKind::Animation);
+        m.extend(facts);
     } else if format.starts_with("hoard-datatable/") {
         m.insert("rows".into(), json!(doc.get("rows").and_then(Value::as_object).map_or(0, Map::len)));
         if let Some(s) = doc.get("row_struct").and_then(Value::as_str) {

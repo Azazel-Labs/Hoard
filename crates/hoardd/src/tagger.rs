@@ -949,6 +949,12 @@ pub(crate) fn meta_tags(
         }
         AssetKind::Texture => texture_tags(ext, meta, tags),
         AssetKind::Vector => vector_tags(meta, tags),
+        // A DragonBones skeleton: a rigged 2D character.
+        AssetKind::Animation if meta.contains_key("dragonbones") => {
+            tags.add("dragonbones", TagSource::Meta, 1.0);
+            tags.add("rigged", TagSource::Meta, 0.9);
+            tags.add("2d", TagSource::Meta, 0.9);
+        }
         AssetKind::Model => {
             if let Some(v) = meta.get("blender_version").and_then(|v| v.as_str()) {
                 tags.add(&format!("blender:{v}"), TagSource::Meta, 1.0);

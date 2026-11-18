@@ -1441,6 +1441,16 @@ async function postDownload(path: string, body: unknown, file: string): Promise<
   setTimeout(() => URL.revokeObjectURL(url), 10_000)
 }
 
+/** `rel` from the folder `dir` (both pack paths), with `.` and `..` worked out. */
+export function joinPath(dir: string, rel: string): string {
+  const out = dir ? dir.split('/') : []
+  for (const part of rel.split('/')) {
+    if (part === '..') out.pop()
+    else if (part && part !== '.') out.push(part)
+  }
+  return out.join('/')
+}
+
 /** A pack file by its original path; relative references inside model files resolve against this URL. */
 export const packFileUrl = (packId: string, path: string) =>
   `/api/packs/${packId}/files/${path.split('/').map(encodeURIComponent).join('/')}`

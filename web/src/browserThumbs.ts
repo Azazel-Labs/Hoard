@@ -5,7 +5,7 @@
 import { reactive } from 'vue'
 import { api, type Asset, type ThumbSource, type ThumbUpload } from './api'
 import { auth } from './auth'
-import { isLottieAsset, isModelAsset, isRiveAsset } from './viewers'
+import { isDragonBonesAsset, isLottieAsset, isModelAsset, isRiveAsset } from './viewers'
 // Types only: three.js loads with the viewer, not with this module.
 import type { ModelStage } from './modelStage'
 
@@ -19,7 +19,7 @@ export function canDrawThumbs(): boolean {
 
 /** Whether a drawing from this browser could improve on the thumbnail the asset has. */
 export function wantsBrowserThumb(a: Asset): boolean {
-  return canDrawThumbs() && (isModelAsset(a) || isLottieAsset(a) || isRiveAsset(a)) && a.thumb_source !== 'browser'
+  return canDrawThumbs() && (isModelAsset(a) || isLottieAsset(a) || isRiveAsset(a) || isDragonBonesAsset(a)) && a.thumb_source !== 'browser'
 }
 
 /** How much of a canvas is drawn on, to tell a picture from an empty frame (many animations start empty). */
@@ -89,7 +89,7 @@ async function packModels(packId: string): Promise<Asset[]> {
 }
 
 /**
- * Draw every model (and Lottie animation) in a pack that hasn't a full browser thumbnail yet, one at a time, in a viewer kept out of sight.
+ * Draw every model (and Lottie, Rive and DragonBones animation) in a pack that hasn't a full browser thumbnail yet, one at a time, in a viewer kept out of sight.
  * `cancelThumbRun` stops it after the model being drawn.
  */
 export async function makePackThumbs(packId: string, packName: string): Promise<void> {
@@ -108,9 +108,13 @@ export async function makePackThumbs(packId: string, packName: string): Promise<
     for (const a of models) {
       if (canceled) break
       thumbRun.current = a.name
-      if (isLottieAsset(a) || isRiveAsset(a)) {
+      if (isLottieAsset(a) || isRiveAsset(a) || isDragonBonesAsset(a)) {
         try {
-          const draw = isLottieAsset(a) ? (await import('./lottie')).drawLottieThumb : (await import('./rive')).drawRiveThumb
+          const draw = isLottieAsset(a)
+            ? (await import('./lottie')).drawLottieThumb
+            : isRiveAsset(a)
+              ? (await import('./rive')).drawRiveThumb
+              : (await import('./dragonbones')).drawDragonBonesThumb
           if ((await draw(a))?.replaced) thumbRun.improved++
         } catch {
           thumbRun.failed++

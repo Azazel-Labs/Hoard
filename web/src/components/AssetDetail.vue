@@ -16,7 +16,7 @@ import { canStar, mine, toggleFavorite } from '../mine'
 import { MAX_STORE_FILE, TEXT_EXTS } from '../storeFormats'
 import { lazy } from '../lazy'
 import { formatDate, formatNumber, t } from '../i18n'
-import { isLottieAsset, isModelAsset, isRiveAsset, isTextAsset, takeViewRequest, viewRequest, viewerFor, type ViewerKind } from '../viewers'
+import { isDragonBonesAsset, isLottieAsset, isModelAsset, isRiveAsset, isTextAsset, takeViewRequest, viewRequest, viewerFor, type ViewerKind } from '../viewers'
 import { isMaterialAsset, resolutions, ROLE_LABEL, ROLE_NAME, sizeLabel } from '../materials'
 import { withThumb } from '../browserThumbs'
 import { animatedAseprite, animatedSrc, PLAY_IN_PANEL, spriteSheet } from '../sprites'
@@ -32,6 +32,7 @@ const MaterialViewer = lazy(() => import('./MaterialViewer.vue'), () => t('asset
 const SpritePlayer = lazy(() => import('./SpritePlayer.vue'), () => t('asset-lazy-sprite-player'))
 const SheetView = lazy(() => import('./SheetView.vue'), () => t('asset-lazy-sheet-view'))
 const LottieViewer = lazy(() => import('./LottieViewer.vue'), () => t('asset-lazy-sprite-player'))
+const DragonBonesViewer = lazy(() => import('./DragonBonesViewer.vue'), () => t('asset-lazy-sprite-player'))
 const RiveViewer = lazy(() => import('./RiveViewer.vue'), () => t('asset-lazy-sprite-player'))
 
 const props = defineProps<{
@@ -955,6 +956,7 @@ onBeforeUnmount(() => unswipe())
     <SheetView v-else-if="isSheet" :asset="asset" :pixelated="pixelated" />
     <SpritePlayer v-else-if="spritePlayable && animate" :asset="asset" :pixelated="pixelated" />
     <LottieViewer v-else-if="isLottieAsset(asset)" :asset="asset" @thumb="(r) => emit('updated', withThumb(asset, r))" />
+    <DragonBonesViewer v-else-if="isDragonBonesAsset(asset)" :asset="asset" @thumb="(r) => emit('updated', withThumb(asset, r))" />
     <RiveViewer v-else-if="isRiveAsset(asset)" :asset="asset" @thumb="(r) => emit('updated', withThumb(asset, r))" />
     <button
       v-else-if="isImage"

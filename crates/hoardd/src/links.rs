@@ -6,6 +6,7 @@
 //! - DAE: `<init_from>` image paths
 //! - .blend: external image paths and linked libraries (other .blend files)
 //! - SFZ: the samples it plays
+//! - DragonBones skeletons: their atlas (`hero_ske.json` → `hero_tex.json`, `hero_tex.png`)
 //! - animations: clips and the characters they fit, by skeleton or `Model@Clip.fbx` name (see [`crate::animations`])
 //! - guesses: textures whose name starts with the model's name, for models that reference nothing, from the model's
 //!   own part of the pack (its folder's parent and below: `Models/` and `Textures/` side by side)
@@ -154,6 +155,12 @@ fn json_refs(local: &Path) -> Option<Vec<Ref>> {
     let doc: Value = serde_json::from_str(&text_file(local)?).ok()?;
     let mut out = Vec::new();
     walk(&doc, &mut out, 0);
+    // A DragonBones skeleton names no files: its atlas is the `_tex.json` and `_tex.png` beside it.
+    let name = local.file_name().and_then(|n| n.to_str()).unwrap_or_default();
+    if let (true, Some([sheet, image])) = (doc.get("armature").is_some(), crate::dragonbones::atlas_files(name)) {
+        out.push(Ref { target: sheet, rel: LinkRel::Library });
+        out.push(Ref { target: image, rel: LinkRel::Texture });
+    }
     Some(out)
 }
 

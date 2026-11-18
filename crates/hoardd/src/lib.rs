@@ -28,6 +28,7 @@ mod directory;
 #[cfg(not(feature = "ldap"))]
 #[path = "directory_off.rs"]
 mod directory;
+mod dragonbones;
 mod error;
 mod extract;
 mod ffmpeg;

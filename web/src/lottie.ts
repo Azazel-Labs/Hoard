@@ -2,7 +2,7 @@
 // `eval`). The server hands over the animation's JSON (a .lottie's with its images inlined); a .json's images are
 // fetched from beside it in the pack. The server can't draw these, so the browser makes their thumbnails.
 import lottie, { type AnimationItem } from 'lottie-web/build/player/lottie_light_canvas'
-import { api, packFileUrl, type Asset, type ThumbUpload } from './api'
+import { api, joinPath, packFileUrl, type Asset, type ThumbUpload } from './api'
 import { coverage } from './browserThumbs'
 
 type LottieImage = { u?: string; p?: string; e?: number }
@@ -10,16 +10,6 @@ export type LottieDoc = { assets?: LottieImage[]; [k: string]: unknown }
 
 /** How long to wait for an animation's images and fonts before giving up on it. */
 const LOAD_WAIT_MS = 15_000
-
-/** `rel` from the folder `dir`, with `.` and `..` worked out. */
-function joinPath(dir: string, rel: string): string {
-  const out = dir ? dir.split('/') : []
-  for (const part of rel.split('/')) {
-    if (part === '..') out.pop()
-    else if (part && part !== '.') out.push(part)
-  }
-  return out.join('/')
-}
 
 /** The animation to play: images it names but doesn't hold are pointed at the pack's copies. */
 export async function lottieData(a: Asset): Promise<LottieDoc> {

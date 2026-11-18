@@ -5537,20 +5537,20 @@ source = "Libraries Hoard keeps"
 translation = "Hoard가 관리하는 라이브러리"
 
 [messages.locations-mode-managed]
-source = "Keep my library here"
-translation = "여기에 라이브러리 보관"
+source = "Claim it: Hoard keeps my packs here"
+translation = "차지하기: Hoard가 여기에 팩을 보관"
 
 [messages.locations-mode-managed-hint]
-source = "Packs you upload or import are copied into this folder. Hoard looks after it, so leave its contents alone."
-translation = "업로드하거나 가져온 팩이 이 폴더에 복사됩니다. Hoard가 관리하므로 내용을 직접 건드리지 마세요."
+source = "Packs you upload or import are copied in, and Hoard keeps them in order. The folder is Hoard’s now, so leave its contents alone."
+translation = "업로드하거나 가져온 팩이 여기에 복사되고, Hoard가 정리해 둡니다. 이제 이 폴더는 Hoard의 것이므로 내용을 직접 건드리지 마세요."
 
 [messages.locations-mode-question]
 source = "What should Hoard do with this folder?"
 translation = "Hoard가 이 폴더를 어떻게 사용할까요?"
 
 [messages.locations-mode-watched]
-source = "Index a folder I already have"
-translation = "이미 있는 폴더 색인"
+source = "Watch it: my packs are already here"
+translation = "지켜보기: 팩이 이미 여기에 있음"
 
 [messages.locations-mode-watched-hint]
 source = "Each folder inside it becomes a pack. Hoard reads the files where they are and never changes, moves or deletes them, and picks up new folders as they appear."

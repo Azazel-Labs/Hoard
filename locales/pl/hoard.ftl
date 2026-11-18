@@ -893,9 +893,9 @@ folders-none = Brak folderów.
 ## LocationForm.vue
 
 locations-mode-question = Co Hoard ma zrobić z tym folderem?
-locations-mode-managed = Przechowywać tu bibliotekę
-locations-mode-managed-hint = Przesyłane lub importowane paczki są kopiowane do tego folderu. Hoard nim zarządza, więc nie należy ruszać jego zawartości.
-locations-mode-watched = Indeksować istniejący folder
+locations-mode-managed = Zająć go: Hoard przechowuje tu moje paczki
+locations-mode-managed-hint = Przesyłane lub importowane paczki są tu kopiowane, a Hoard utrzymuje w nich porządek. Folder należy teraz do Hoard, więc nie należy ruszać jego zawartości.
+locations-mode-watched = Pilnować go: moje paczki już tu są
 locations-mode-watched-hint = Każdy folder w nim staje się paczką. Hoard odczytuje pliki tam, gdzie są, nigdy ich nie zmienia, nie przenosi ani nie usuwa i wykrywa nowe foldery, gdy się pojawiają.
 locations-folder = Folder na serwerze
 locations-folder-desktop = Folder

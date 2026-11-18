@@ -5741,20 +5741,20 @@ source = "Libraries Hoard keeps"
 translation = "Knihovny, které Hoard spravuje"
 
 [messages.locations-mode-managed]
-source = "Keep my library here"
-translation = "Uchovávat tu mou knihovnu"
+source = "Claim it: Hoard keeps my packs here"
+translation = "Zabrat ji: Hoard tu uchovává mé balíčky"
 
 [messages.locations-mode-managed-hint]
-source = "Packs you upload or import are copied into this folder. Hoard looks after it, so leave its contents alone."
-translation = "Balíčky, které nahrajete nebo importujete, se zkopírují do této složky. Hoard se o ni stará, takže její obsah neměňte."
+source = "Packs you upload or import are copied in, and Hoard keeps them in order. The folder is Hoard’s now, so leave its contents alone."
+translation = "Balíčky, které nahrajete nebo importujete, se sem zkopírují a Hoard v nich udržuje pořádek. Složka teď patří Hoardu, takže její obsah neměňte."
 
 [messages.locations-mode-question]
 source = "What should Hoard do with this folder?"
 translation = "Co má Hoard s touto složkou dělat?"
 
 [messages.locations-mode-watched]
-source = "Index a folder I already have"
-translation = "Indexovat složku, kterou už mám"
+source = "Watch it: my packs are already here"
+translation = "Hlídat ji: mé balíčky už tu jsou"
 
 [messages.locations-mode-watched-hint]
 source = "Each folder inside it becomes a pack. Hoard reads the files where they are and never changes, moves or deletes them, and picks up new folders as they appear."

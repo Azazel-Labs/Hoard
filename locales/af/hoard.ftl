@@ -851,9 +851,9 @@ folders-none = Geen vouers hierin nie.
 ## LocationForm.vue
 
 locations-mode-question = Wat moet Hoard met hierdie vouer doen?
-locations-mode-managed = Hou my biblioteek hier
-locations-mode-managed-hint = Pakke wat jy oplaai of invoer, word na hierdie vouer gekopieer. Hoard sorg daarvoor, so los die inhoud daarvan uit.
-locations-mode-watched = Indekseer 'n vouer wat ek reeds het
+locations-mode-managed = Eis dit op: Hoard hou my pakke hier
+locations-mode-managed-hint = Pakke wat jy oplaai of invoer, word hierheen gekopieer, en Hoard hou hulle in orde. Die vouer behoort nou aan Hoard, so los die inhoud daarvan uit.
+locations-mode-watched = Hou dit dop: my pakke is reeds hier
 locations-mode-watched-hint = Elke vouer daarbinne word 'n pak. Hoard lees die lêers waar hulle is en verander, skuif of vee hulle nooit uit nie, en tel nuwe vouers op soos hulle verskyn.
 locations-folder = Vouer op die bediener
 locations-folder-desktop = Vouer

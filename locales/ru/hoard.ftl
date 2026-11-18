@@ -899,9 +899,9 @@ folders-none = Здесь нет папок.
 ## LocationForm.vue
 
 locations-mode-question = Что Hoard должен делать с этой папкой?
-locations-mode-managed = Хранить здесь мою библиотеку
-locations-mode-managed-hint = Паки, которые вы загружаете или импортируете, копируются в эту папку. Hoard сам следит за ней, поэтому не трогайте её содержимое.
-locations-mode-watched = Индексировать уже существующую папку
+locations-mode-managed = Забрать себе: Hoard хранит здесь мои паки
+locations-mode-managed-hint = Паки, которые вы загружаете или импортируете, копируются сюда, и Hoard держит их в порядке. Теперь папка принадлежит Hoard, поэтому не трогайте её содержимое.
+locations-mode-watched = Следить: мои паки уже здесь
 locations-mode-watched-hint = Каждая папка внутри неё становится паком. Hoard читает файлы на месте и никогда не изменяет, не перемещает и не удаляет их, а новые папки подхватывает по мере появления.
 locations-folder = Папка на сервере
 locations-folder-desktop = Папка

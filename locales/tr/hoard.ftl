@@ -819,9 +819,9 @@ folders-none = Burada klasör yok.
 ## LocationForm.vue
 
 locations-mode-question = Hoard bu klasörle ne yapsın?
-locations-mode-managed = Kütüphanemi burada tut
-locations-mode-managed-hint = Yüklediğiniz ya da içe aktardığınız paketler bu klasöre kopyalanır. Klasörle Hoard ilgilenir, bu yüzden içeriğine dokunmayın.
-locations-mode-watched = Zaten var olan bir klasörü dizinle
+locations-mode-managed = Sahiplen: Hoard paketlerimi burada tutsun
+locations-mode-managed-hint = Yüklediğiniz ya da içe aktardığınız paketler buraya kopyalanır ve Hoard onları düzenli tutar. Klasör artık Hoard’un, bu yüzden içeriğine dokunmayın.
+locations-mode-watched = Göz kulak ol: paketlerim zaten burada
 locations-mode-watched-hint = İçindeki her klasör bir paket olur. Hoard dosyaları bulundukları yerde okur, onları asla değiştirmez, taşımaz ya da silmez ve yeni klasörleri ortaya çıktıkça algılar.
 locations-folder = Sunucudaki klasör
 locations-folder-desktop = Klasör

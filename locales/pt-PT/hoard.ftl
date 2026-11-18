@@ -851,9 +851,9 @@ folders-none = Não há pastas aqui.
 ## LocationForm.vue
 
 locations-mode-question = O que deve o Hoard fazer com esta pasta?
-locations-mode-managed = Guardar aqui a minha biblioteca
-locations-mode-managed-hint = Os pacotes que carregar ou importar são copiados para esta pasta. O Hoard trata dela, por isso não mexa no conteúdo.
-locations-mode-watched = Indexar uma pasta que já tenho
+locations-mode-managed = Tomar posse: o Hoard guarda aqui os meus pacotes
+locations-mode-managed-hint = Os pacotes que carregar ou importar são copiados para aqui, e o Hoard mantém-nos em ordem. A pasta passa a ser do Hoard, por isso não mexa no conteúdo.
+locations-mode-watched = Vigiar: os meus pacotes já estão aqui
 locations-mode-watched-hint = Cada pasta lá dentro torna-se um pacote. O Hoard lê os ficheiros onde estão e nunca os altera, move ou elimina, e deteta pastas novas à medida que aparecem.
 locations-folder = Pasta no servidor
 locations-folder-desktop = Pasta

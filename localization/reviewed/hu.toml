@@ -5553,20 +5553,20 @@ source = "Libraries Hoard keeps"
 translation = "A Hoard által kezelt könyvtárak"
 
 [messages.locations-mode-managed]
-source = "Keep my library here"
-translation = "Itt tárolja a könyvtáramat"
+source = "Claim it: Hoard keeps my packs here"
+translation = "Lefoglalja: a Hoard itt tárolja a csomagjaimat"
 
 [messages.locations-mode-managed-hint]
-source = "Packs you upload or import are copied into this folder. Hoard looks after it, so leave its contents alone."
-translation = "A feltöltött vagy importált csomagok ebbe a mappába másolódnak. A Hoard gondozza, ezért ne nyúljon a tartalmához."
+source = "Packs you upload or import are copied in, and Hoard keeps them in order. The folder is Hoard’s now, so leave its contents alone."
+translation = "A feltöltött vagy importált csomagok ide másolódnak, és a Hoard rendben tartja őket. A mappa mostantól a Hoardé, ezért ne nyúljon a tartalmához."
 
 [messages.locations-mode-question]
 source = "What should Hoard do with this folder?"
 translation = "Mit kezdjen a Hoard ezzel a mappával?"
 
 [messages.locations-mode-watched]
-source = "Index a folder I already have"
-translation = "Egy meglévő mappám indexelése"
+source = "Watch it: my packs are already here"
+translation = "Figyeli: a csomagjaim már itt vannak"
 
 [messages.locations-mode-watched-hint]
 source = "Each folder inside it becomes a pack. Hoard reads the files where they are and never changes, moves or deletes them, and picks up new folders as they appear."

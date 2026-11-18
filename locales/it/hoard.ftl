@@ -859,9 +859,9 @@ folders-none = Nessuna cartella qui.
 ## LocationForm.vue
 
 locations-mode-question = Cosa deve fare Hoard con questa cartella?
-locations-mode-managed = Tieni qui la mia libreria
-locations-mode-managed-hint = I pacchetti che carichi o importi vengono copiati in questa cartella. Se ne occupa Hoard, quindi non toccarne il contenuto.
-locations-mode-watched = Indicizza una cartella che ho già
+locations-mode-managed = Rivendicala: Hoard tiene qui i miei pacchetti
+locations-mode-managed-hint = I pacchetti che carichi o importi vengono copiati qui, e Hoard li tiene in ordine. Ora la cartella è di Hoard, quindi non toccarne il contenuto.
+locations-mode-watched = Sorvegliala: i miei pacchetti sono già qui
 locations-mode-watched-hint = Ogni cartella al suo interno diventa un pacchetto. Hoard legge i file dove si trovano e non li modifica, sposta o elimina mai, e rileva le nuove cartelle man mano che compaiono.
 locations-folder = Cartella sul server
 locations-folder-desktop = Cartella

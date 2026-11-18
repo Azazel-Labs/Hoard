@@ -851,9 +851,9 @@ folders-none = Geen mappen hierin.
 ## LocationForm.vue
 
 locations-mode-question = Wat moet Hoard met deze map doen?
-locations-mode-managed = Mijn bibliotheek hier bewaren
-locations-mode-managed-hint = Pakketten die je uploadt of importeert, worden naar deze map gekopieerd. Hoard beheert hem, dus laat de inhoud met rust.
-locations-mode-watched = Een map indexeren die ik al heb
+locations-mode-managed = Claimen: Hoard bewaart mijn pakketten hier
+locations-mode-managed-hint = Pakketten die je uploadt of importeert, worden hierheen gekopieerd, en Hoard houdt ze op orde. De map is nu van Hoard, dus laat de inhoud met rust.
+locations-mode-watched = In de gaten houden: mijn pakketten staan hier al
 locations-mode-watched-hint = Elke map erin wordt een pakket. Hoard leest de bestanden waar ze staan en wijzigt, verplaatst of verwijdert ze nooit, en pikt nieuwe mappen op zodra ze verschijnen.
 locations-folder = Map op de server
 locations-folder-desktop = Map

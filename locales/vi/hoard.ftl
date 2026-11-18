@@ -818,9 +818,9 @@ folders-none = Không có thư mục nào ở đây.
 ## Biểu mẫu vị trí
 
 locations-mode-question = Hoard nên làm gì với thư mục này?
-locations-mode-managed = Giữ thư viện của tôi ở đây
-locations-mode-managed-hint = Các gói bạn tải lên hoặc nhập sẽ được sao chép vào thư mục này. Hoard quản lý nó, nên đừng động vào nội dung bên trong.
-locations-mode-watched = Lập chỉ mục một thư mục tôi đã có
+locations-mode-managed = Chiếm lấy: Hoard giữ các gói của tôi ở đây
+locations-mode-managed-hint = Các gói bạn tải lên hoặc nhập sẽ được sao chép vào đây, và Hoard giữ chúng ngăn nắp. Giờ thư mục này là của Hoard, nên đừng động vào nội dung bên trong.
+locations-mode-watched = Canh chừng: các gói của tôi đã ở đây
 locations-mode-watched-hint = Mỗi thư mục bên trong sẽ thành một gói. Hoard đọc tệp tại chỗ và không bao giờ thay đổi, di chuyển hay xóa chúng, đồng thời nhận các thư mục mới khi chúng xuất hiện.
 locations-folder = Thư mục trên máy chủ
 locations-folder-desktop = Thư mục

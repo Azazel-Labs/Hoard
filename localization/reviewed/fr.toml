@@ -5678,20 +5678,20 @@ source = "Libraries Hoard keeps"
 translation = "Bibliothèques gérées par Hoard"
 
 [messages.locations-mode-managed]
-source = "Keep my library here"
-translation = "Y conserver ma bibliothèque"
+source = "Claim it: Hoard keeps my packs here"
+translation = "Le revendiquer : Hoard y garde mes packs"
 
 [messages.locations-mode-managed-hint]
-source = "Packs you upload or import are copied into this folder. Hoard looks after it, so leave its contents alone."
-translation = "Les packs que vous envoyez ou importez sont copiés dans ce dossier. Hoard s’en occupe : ne touchez pas à son contenu."
+source = "Packs you upload or import are copied in, and Hoard keeps them in order. The folder is Hoard’s now, so leave its contents alone."
+translation = "Les packs que vous envoyez ou importez y sont copiés, et Hoard les tient en ordre. Le dossier appartient désormais à Hoard : ne touchez pas à son contenu."
 
 [messages.locations-mode-question]
 source = "What should Hoard do with this folder?"
 translation = "Que doit faire Hoard de ce dossier ?"
 
 [messages.locations-mode-watched]
-source = "Index a folder I already have"
-translation = "Indexer un dossier que j’ai déjà"
+source = "Watch it: my packs are already here"
+translation = "Le surveiller : mes packs y sont déjà"
 
 [messages.locations-mode-watched-hint]
 source = "Each folder inside it becomes a pack. Hoard reads the files where they are and never changes, moves or deletes them, and picks up new folders as they appear."

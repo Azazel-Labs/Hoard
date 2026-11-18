@@ -815,9 +815,9 @@ folders-none = ไม่มีโฟลเดอร์ในนี้
 ## LocationForm.vue
 
 locations-mode-question = Hoard ควรทำอะไรกับโฟลเดอร์นี้?
-locations-mode-managed = เก็บคลังของฉันไว้ที่นี่
-locations-mode-managed-hint = แพ็กที่คุณอัปโหลดหรือนำเข้าจะถูกคัดลอกมาไว้ในโฟลเดอร์นี้ Hoard เป็นผู้ดูแลโฟลเดอร์ จึงอย่าแตะต้องสิ่งที่อยู่ข้างใน
-locations-mode-watched = จัดทำดัชนีโฟลเดอร์ที่ฉันมีอยู่แล้ว
+locations-mode-managed = ยึดไว้: Hoard เก็บแพ็กของฉันไว้ที่นี่
+locations-mode-managed-hint = แพ็กที่คุณอัปโหลดหรือนำเข้าจะถูกคัดลอกมาไว้ที่นี่ และ Hoard จะจัดให้เป็นระเบียบ ตอนนี้โฟลเดอร์เป็นของ Hoard แล้ว จึงอย่าแตะต้องสิ่งที่อยู่ข้างใน
+locations-mode-watched = เฝ้าดู: แพ็กของฉันอยู่ที่นี่แล้ว
 locations-mode-watched-hint = แต่ละโฟลเดอร์ข้างในจะกลายเป็นแพ็ก Hoard อ่านไฟล์จากที่เดิมและไม่เปลี่ยน ย้าย หรือลบไฟล์เลย และจะรับโฟลเดอร์ใหม่เมื่อปรากฏขึ้น
 locations-folder = โฟลเดอร์บนเซิร์ฟเวอร์
 locations-folder-desktop = โฟลเดอร์

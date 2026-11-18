@@ -890,9 +890,9 @@ folders-none = Niciun dosar aici.
 ## LocationForm.vue
 
 locations-mode-question = Ce să facă Hoard cu acest dosar?
-locations-mode-managed = Păstrează-mi biblioteca aici
-locations-mode-managed-hint = Pachetele pe care le încărcați sau le importați sunt copiate în acest dosar. Hoard se ocupă de el, așa că nu îi modificați conținutul.
-locations-mode-watched = Indexează un dosar pe care îl am deja
+locations-mode-managed = Îl revendică: Hoard îmi păstrează pachetele aici
+locations-mode-managed-hint = Pachetele pe care le încărcați sau le importați sunt copiate aici, iar Hoard le ține în ordine. Dosarul este acum al lui Hoard, așa că nu îi modificați conținutul.
+locations-mode-watched = Îl urmărește: pachetele mele sunt deja aici
 locations-mode-watched-hint = Fiecare dosar din interior devine un pachet. Hoard citește fișierele acolo unde sunt și nu le modifică, nu le mută și nu le șterge niciodată, iar dosarele noi sunt preluate pe măsură ce apar.
 locations-folder = Dosar pe server
 locations-folder-desktop = Dosar

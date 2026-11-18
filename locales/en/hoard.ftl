@@ -964,9 +964,9 @@ folders-none = No folders in here.
 ## LocationForm.vue
 
 locations-mode-question = What should Hoard do with this folder?
-locations-mode-managed = Keep my library here
-locations-mode-managed-hint = Packs you upload or import are copied into this folder. Hoard looks after it, so leave its contents alone.
-locations-mode-watched = Index a folder I already have
+locations-mode-managed = Claim it: Hoard keeps my packs here
+locations-mode-managed-hint = Packs you upload or import are copied in, and Hoard keeps them in order. The folder is Hoard’s now, so leave its contents alone.
+locations-mode-watched = Watch it: my packs are already here
 locations-mode-watched-hint = Each folder inside it becomes a pack. Hoard reads the files where they are and never changes, moves or deletes them, and picks up new folders as they appear.
 locations-folder = Folder on the server
 locations-folder-desktop = Folder

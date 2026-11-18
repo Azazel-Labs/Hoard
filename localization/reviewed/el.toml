@@ -5692,20 +5692,20 @@ source = "Libraries Hoard keeps"
 translation = "Βιβλιοθήκες που κρατά το Hoard"
 
 [messages.locations-mode-managed]
-source = "Keep my library here"
-translation = "Να κρατά τη βιβλιοθήκη μου εδώ"
+source = "Claim it: Hoard keeps my packs here"
+translation = "Να τον διεκδικήσει: το Hoard κρατά εδώ τα πακέτα μου"
 
 [messages.locations-mode-managed-hint]
-source = "Packs you upload or import are copied into this folder. Hoard looks after it, so leave its contents alone."
-translation = "Τα πακέτα που μεταφορτώνετε ή εισάγετε αντιγράφονται σε αυτόν τον φάκελο. Το Hoard τον φροντίζει, οπότε μην πειράζετε το περιεχόμενό του."
+source = "Packs you upload or import are copied in, and Hoard keeps them in order. The folder is Hoard’s now, so leave its contents alone."
+translation = "Τα πακέτα που μεταφορτώνετε ή εισάγετε αντιγράφονται εδώ και το Hoard τα κρατά τακτοποιημένα. Ο φάκελος ανήκει πλέον στο Hoard, οπότε μην πειράζετε το περιεχόμενό του."
 
 [messages.locations-mode-question]
 source = "What should Hoard do with this folder?"
 translation = "Τι να κάνει το Hoard με αυτόν τον φάκελο;"
 
 [messages.locations-mode-watched]
-source = "Index a folder I already have"
-translation = "Να ευρετηριάσει έναν φάκελο που ήδη έχω"
+source = "Watch it: my packs are already here"
+translation = "Να τον παρακολουθεί: τα πακέτα μου είναι ήδη εδώ"
 
 [messages.locations-mode-watched-hint]
 source = "Each folder inside it becomes a pack. Hoard reads the files where they are and never changes, moves or deletes them, and picks up new folders as they appear."

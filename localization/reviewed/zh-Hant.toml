@@ -5549,20 +5549,20 @@ source = "Libraries Hoard keeps"
 translation = "Hoard 管理的素材庫"
 
 [messages.locations-mode-managed]
-source = "Keep my library here"
-translation = "將我的素材庫存放在這裡"
+source = "Claim it: Hoard keeps my packs here"
+translation = "占為己有：Hoard 把我的素材包存放在這裡"
 
 [messages.locations-mode-managed-hint]
-source = "Packs you upload or import are copied into this folder. Hoard looks after it, so leave its contents alone."
-translation = "你上傳或匯入的素材包會複製到這個資料夾。Hoard 會負責管理，請不要變動其中的內容。"
+source = "Packs you upload or import are copied in, and Hoard keeps them in order. The folder is Hoard’s now, so leave its contents alone."
+translation = "你上傳或匯入的素材包會複製到這裡，由 Hoard 整理妥當。這個資料夾現在歸 Hoard 所有，請不要變動其中的內容。"
 
 [messages.locations-mode-question]
 source = "What should Hoard do with this folder?"
 translation = "Hoard 應該如何處理這個資料夾？"
 
 [messages.locations-mode-watched]
-source = "Index a folder I already have"
-translation = "為我現有的資料夾建立索引"
+source = "Watch it: my packs are already here"
+translation = "看守：我的素材包已經在這裡"
 
 [messages.locations-mode-watched-hint]
 source = "Each folder inside it becomes a pack. Hoard reads the files where they are and never changes, moves or deletes them, and picks up new folders as they appear."

@@ -815,9 +815,9 @@ folders-none = Tidak ada folder di sini.
 ## LocationForm.vue
 
 locations-mode-question = Apa yang harus dilakukan Hoard dengan folder ini?
-locations-mode-managed = Simpan pustaka saya di sini
-locations-mode-managed-hint = Paket yang Anda unggah atau impor disalin ke folder ini. Hoard yang mengurusnya, jadi jangan ubah isinya.
-locations-mode-watched = Indeks folder yang sudah saya punya
+locations-mode-managed = Klaim: Hoard menyimpan paket saya di sini
+locations-mode-managed-hint = Paket yang Anda unggah atau impor disalin ke sini, dan Hoard menjaganya tetap rapi. Folder ini sekarang milik Hoard, jadi jangan ubah isinya.
+locations-mode-watched = Pantau: paket saya sudah ada di sini
 locations-mode-watched-hint = Setiap folder di dalamnya menjadi paket. Hoard membaca berkas di tempatnya dan tidak pernah mengubah, memindahkan, atau menghapusnya, serta mengambil folder baru saat muncul.
 locations-folder = Folder di server
 locations-folder-desktop = Folder

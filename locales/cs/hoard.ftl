@@ -885,9 +885,9 @@ folders-none = Nejsou tu žádné složky.
 ## LocationForm.vue
 
 locations-mode-question = Co má Hoard s touto složkou dělat?
-locations-mode-managed = Uchovávat tu mou knihovnu
-locations-mode-managed-hint = Balíčky, které nahrajete nebo importujete, se zkopírují do této složky. Hoard se o ni stará, takže její obsah neměňte.
-locations-mode-watched = Indexovat složku, kterou už mám
+locations-mode-managed = Zabrat ji: Hoard tu uchovává mé balíčky
+locations-mode-managed-hint = Balíčky, které nahrajete nebo importujete, se sem zkopírují a Hoard v nich udržuje pořádek. Složka teď patří Hoardu, takže její obsah neměňte.
+locations-mode-watched = Hlídat ji: mé balíčky už tu jsou
 locations-mode-watched-hint = Každá složka uvnitř se stane balíčkem. Hoard čte soubory tam, kde jsou, nikdy je nemění, nepřesouvá ani nemaže a zachytí nové složky, jakmile se objeví.
 locations-folder = Složka na serveru
 locations-folder-desktop = Složka

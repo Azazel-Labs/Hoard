@@ -5750,20 +5750,20 @@ source = "Libraries Hoard keeps"
 translation = "Biblioteci păstrate de Hoard"
 
 [messages.locations-mode-managed]
-source = "Keep my library here"
-translation = "Păstrează-mi biblioteca aici"
+source = "Claim it: Hoard keeps my packs here"
+translation = "Îl revendică: Hoard îmi păstrează pachetele aici"
 
 [messages.locations-mode-managed-hint]
-source = "Packs you upload or import are copied into this folder. Hoard looks after it, so leave its contents alone."
-translation = "Pachetele pe care le încărcați sau le importați sunt copiate în acest dosar. Hoard se ocupă de el, așa că nu îi modificați conținutul."
+source = "Packs you upload or import are copied in, and Hoard keeps them in order. The folder is Hoard’s now, so leave its contents alone."
+translation = "Pachetele pe care le încărcați sau le importați sunt copiate aici, iar Hoard le ține în ordine. Dosarul este acum al lui Hoard, așa că nu îi modificați conținutul."
 
 [messages.locations-mode-question]
 source = "What should Hoard do with this folder?"
 translation = "Ce să facă Hoard cu acest dosar?"
 
 [messages.locations-mode-watched]
-source = "Index a folder I already have"
-translation = "Indexează un dosar pe care îl am deja"
+source = "Watch it: my packs are already here"
+translation = "Îl urmărește: pachetele mele sunt deja aici"
 
 [messages.locations-mode-watched-hint]
 source = "Each folder inside it becomes a pack. Hoard reads the files where they are and never changes, moves or deletes them, and picks up new folders as they appear."

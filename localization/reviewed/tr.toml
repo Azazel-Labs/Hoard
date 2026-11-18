@@ -5557,20 +5557,20 @@ source = "Libraries Hoard keeps"
 translation = "Hoard’un tuttuğu kütüphaneler"
 
 [messages.locations-mode-managed]
-source = "Keep my library here"
-translation = "Kütüphanemi burada tut"
+source = "Claim it: Hoard keeps my packs here"
+translation = "Sahiplen: Hoard paketlerimi burada tutsun"
 
 [messages.locations-mode-managed-hint]
-source = "Packs you upload or import are copied into this folder. Hoard looks after it, so leave its contents alone."
-translation = "Yüklediğiniz ya da içe aktardığınız paketler bu klasöre kopyalanır. Klasörle Hoard ilgilenir, bu yüzden içeriğine dokunmayın."
+source = "Packs you upload or import are copied in, and Hoard keeps them in order. The folder is Hoard’s now, so leave its contents alone."
+translation = "Yüklediğiniz ya da içe aktardığınız paketler buraya kopyalanır ve Hoard onları düzenli tutar. Klasör artık Hoard’un, bu yüzden içeriğine dokunmayın."
 
 [messages.locations-mode-question]
 source = "What should Hoard do with this folder?"
 translation = "Hoard bu klasörle ne yapsın?"
 
 [messages.locations-mode-watched]
-source = "Index a folder I already have"
-translation = "Zaten var olan bir klasörü dizinle"
+source = "Watch it: my packs are already here"
+translation = "Göz kulak ol: paketlerim zaten burada"
 
 [messages.locations-mode-watched-hint]
 source = "Each folder inside it becomes a pack. Hoard reads the files where they are and never changes, moves or deletes them, and picks up new folders as they appear."

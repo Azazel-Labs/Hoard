@@ -815,9 +815,9 @@ folders-none = ここにはフォルダーがありません。
 ## LocationForm.vue
 
 locations-mode-question = Hoard はこのフォルダーをどう扱いますか？
-locations-mode-managed = ライブラリをここに置く
-locations-mode-managed-hint = アップロードやインポートしたパックは、このフォルダーにコピーされます。Hoard が管理するので、中身には手を触れないでください。
-locations-mode-watched = 既存のフォルダーをインデックスする
+locations-mode-managed = 自分のものにする: Hoard がここにパックを保管する
+locations-mode-managed-hint = アップロードやインポートしたパックはここにコピーされ、Hoard が整理して保ちます。このフォルダーはもう Hoard のものなので、中身には手を触れないでください。
+locations-mode-watched = 見張る: パックはもうここにある
 locations-mode-watched-hint = 中の各フォルダーが 1 つのパックになります。Hoard はファイルをその場で読み取り、変更、移動、削除は一切せず、新しいフォルダーが現れると取り込みます。
 locations-folder = サーバー上のフォルダー
 locations-folder-desktop = フォルダー

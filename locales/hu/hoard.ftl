@@ -819,9 +819,9 @@ folders-none = Itt nincsenek mappák.
 ## Tárolási hely űrlap
 
 locations-mode-question = Mit kezdjen a Hoard ezzel a mappával?
-locations-mode-managed = Itt tárolja a könyvtáramat
-locations-mode-managed-hint = A feltöltött vagy importált csomagok ebbe a mappába másolódnak. A Hoard gondozza, ezért ne nyúljon a tartalmához.
-locations-mode-watched = Egy meglévő mappám indexelése
+locations-mode-managed = Lefoglalja: a Hoard itt tárolja a csomagjaimat
+locations-mode-managed-hint = A feltöltött vagy importált csomagok ide másolódnak, és a Hoard rendben tartja őket. A mappa mostantól a Hoardé, ezért ne nyúljon a tartalmához.
+locations-mode-watched = Figyeli: a csomagjaim már itt vannak
 locations-mode-watched-hint = A benne lévő minden mappa külön csomag lesz. A Hoard a helyükön olvassa a fájlokat, és soha nem módosítja, helyezi át vagy törli őket, az új mappákat pedig megjelenésükkor felveszi.
 locations-folder = Mappa a szerveren
 locations-folder-desktop = Mappa

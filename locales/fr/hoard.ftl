@@ -867,9 +867,9 @@ folders-none = Aucun dossier ici.
 ## LocationForm.vue
 
 locations-mode-question = Que doit faire Hoard de ce dossier ?
-locations-mode-managed = Y conserver ma bibliothèque
-locations-mode-managed-hint = Les packs que vous envoyez ou importez sont copiés dans ce dossier. Hoard s’en occupe : ne touchez pas à son contenu.
-locations-mode-watched = Indexer un dossier que j’ai déjà
+locations-mode-managed = Le revendiquer : Hoard y garde mes packs
+locations-mode-managed-hint = Les packs que vous envoyez ou importez y sont copiés, et Hoard les tient en ordre. Le dossier appartient désormais à Hoard : ne touchez pas à son contenu.
+locations-mode-watched = Le surveiller : mes packs y sont déjà
 locations-mode-watched-hint = Chaque dossier qu’il contient devient un pack. Hoard lit les fichiers là où ils sont, sans jamais les modifier, déplacer ni supprimer, et prend en compte les nouveaux dossiers dès qu’ils apparaissent.
 locations-folder = Dossier sur le serveur
 locations-folder-desktop = Dossier

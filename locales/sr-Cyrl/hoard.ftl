@@ -870,9 +870,9 @@ folders-none = Овде нема фасцикли.
 ## LocationForm.vue
 
 locations-mode-question = Шта Hoard треба да ради с овом фасциклом?
-locations-mode-managed = Чувај моју библиотеку овде
-locations-mode-managed-hint = Пакети које отпремите или увезете копирају се у ову фасциклу. Hoard се брине о њој, зато не дирајте њен садржај.
-locations-mode-watched = Индексирај фасциклу коју већ имам
+locations-mode-managed = Присвоји је: Hoard овде чува моје пакете
+locations-mode-managed-hint = Пакети које отпремите или увезете копирају се овде, а Hoard их држи у реду. Фасцикла сада припада Hoard-у, зато не дирајте њен садржај.
+locations-mode-watched = Прати је: моји пакети су већ овде
 locations-mode-watched-hint = Свака фасцикла у њој постаје пакет. Hoard чита датотеке тамо где јесу и никад их не мења, не премешта нити брише, а нове фасцикле преузима чим се појаве.
 locations-folder = Фасцикла на серверу
 locations-folder-desktop = Фасцикла

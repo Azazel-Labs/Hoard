@@ -5557,20 +5557,20 @@ source = "Libraries Hoard keeps"
 translation = "由 Hoard 管理的资源库"
 
 [messages.locations-mode-managed]
-source = "Keep my library here"
-translation = "将我的资源库存放在这里"
+source = "Claim it: Hoard keeps my packs here"
+translation = "占为己有：Hoard 把我的资源包存放在这里"
 
 [messages.locations-mode-managed-hint]
-source = "Packs you upload or import are copied into this folder. Hoard looks after it, so leave its contents alone."
-translation = "你上传或导入的资源包会被复制到此文件夹。由 Hoard 负责管理，请不要改动其中的内容。"
+source = "Packs you upload or import are copied in, and Hoard keeps them in order. The folder is Hoard’s now, so leave its contents alone."
+translation = "你上传或导入的资源包会复制到这里，由 Hoard 整理妥当。这个文件夹现在归 Hoard 所有，请不要改动其中的内容。"
 
 [messages.locations-mode-question]
 source = "What should Hoard do with this folder?"
 translation = "Hoard 应如何处理此文件夹？"
 
 [messages.locations-mode-watched]
-source = "Index a folder I already have"
-translation = "为我已有的文件夹建立索引"
+source = "Watch it: my packs are already here"
+translation = "看守：我的资源包已经在这里"
 
 [messages.locations-mode-watched-hint]
 source = "Each folder inside it becomes a pack. Hoard reads the files where they are and never changes, moves or deletes them, and picks up new folders as they appear."

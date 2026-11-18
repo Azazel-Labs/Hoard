@@ -818,9 +818,9 @@ folders-none = 这里没有文件夹。
 ## LocationForm.vue
 
 locations-mode-question = Hoard 应如何处理此文件夹？
-locations-mode-managed = 将我的资源库存放在这里
-locations-mode-managed-hint = 你上传或导入的资源包会被复制到此文件夹。由 Hoard 负责管理，请不要改动其中的内容。
-locations-mode-watched = 为我已有的文件夹建立索引
+locations-mode-managed = 占为己有：Hoard 把我的资源包存放在这里
+locations-mode-managed-hint = 你上传或导入的资源包会复制到这里，由 Hoard 整理妥当。这个文件夹现在归 Hoard 所有，请不要改动其中的内容。
+locations-mode-watched = 看守：我的资源包已经在这里
 locations-mode-watched-hint = 其中的每个文件夹都会成为一个资源包。Hoard 就地读取文件，从不更改、移动或删除它们，并会在出现新文件夹时自动收录。
 locations-folder = 服务器上的文件夹
 locations-folder-desktop = 文件夹

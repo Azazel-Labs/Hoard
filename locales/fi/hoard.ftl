@@ -875,9 +875,9 @@ folders-none = Täällä ei ole kansioita.
 ## Sijaintilomake
 
 locations-mode-question = Mitä Hoardin pitäisi tehdä tällä kansiolla?
-locations-mode-managed = Säilytä kirjastoni täällä
-locations-mode-managed-hint = Lähettämäsi tai tuomasi paketit kopioidaan tähän kansioon. Hoard hoitaa sitä, joten älä koske sen sisältöön.
-locations-mode-watched = Indeksoi kansio, joka minulla jo on
+locations-mode-managed = Ota se haltuun: Hoard säilyttää pakettini täällä
+locations-mode-managed-hint = Lähettämäsi tai tuomasi paketit kopioidaan tänne, ja Hoard pitää ne järjestyksessä. Kansio on nyt Hoardin, joten älä koske sen sisältöön.
+locations-mode-watched = Valvo sitä: pakettini ovat jo täällä
 locations-mode-watched-hint = Jokaisesta sen sisällä olevasta kansiosta tulee paketti. Hoard lukee tiedostot paikoillaan eikä koskaan muuta, siirrä tai poista niitä, ja se huomaa uudet kansiot niiden ilmestyessä.
 locations-folder = Kansio palvelimella
 locations-folder-desktop = Kansio

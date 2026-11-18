@@ -1081,6 +1081,13 @@ export const api = {
       headers: { 'Content-Type': png.type || 'image/png' },
       body: png,
     }),
+  /** A noise made into the microphone (WAV), read as the shape of a sound: what `imitation` takes to find sounds like it. */
+  imitation: (wav: Blob) =>
+    request<{ imitation: string; seconds: number }>('/api/imitation', {
+      method: 'POST',
+      headers: { 'Content-Type': 'audio/wav' },
+      body: wav,
+    }),
   /** A Lottie animation's JSON, a .lottie's with its images inlined. */
   lottie: (id: string) => request<import('./lottie').LottieDoc>(`/api/assets/${id}/lottie.json`),
   stats: () => request<Stats>('/api/stats'),

@@ -918,6 +918,12 @@ cuts it off. Capitals are loud. Sounds whose measurements fit that shape best co
 lasers and `shhhhhh` long hiss. It's a reading of English spelling, not a model, and works with a pack, a folder or
 other filters set. In the API it's `imitation=<word>`.
 
+The microphone button beside the box takes the noise itself: make it, up to six seconds, and press it again. The
+browser asks for the microphone first, and only gives it to a page on HTTPS or this computer. Hoard measures the
+recording the way it measures every sound, without the room's noise either side, and finds the sounds shaped like
+it. The recording isn't kept. In the API, `POST /api/imitation` with a WAV file answers with the `imitation` value
+to search with.
+
 ### Image search
 
 Settings → Image and sound search adds a model that knows what pictures show (OpenAI's CLIP, ViT-B/32). It's off

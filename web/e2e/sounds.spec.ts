@@ -22,14 +22,14 @@ test('a sound’s More like this finds what sounds like it, whatever it’s call
     await expect
       .poll(
         async () => {
-          const r = (await (await api.get(`/api/assets?similar=${thud.id}&limit=20`)).json()) as { items: { path: string }[] }
+          const r = (await (await api.get(`/api/assets?similar=${thud.id}&pack=${pack.id}&limit=20`)).json()) as { items: { path: string }[] }
           found = r.items.map((a) => a.path)
-          return found.length
+          // Until every sound has been listened to, the ones still waiting are missing.
+          return found.slice(0, 2).sort()
         },
         { timeout: 60_000 },
       )
-      .toBeGreaterThan(0)
-    expect(found.slice(0, 2).sort()).toEqual(['thud/take_2.wav', 'thud/take_3.wav'])
+      .toEqual(['thud/take_2.wav', 'thud/take_3.wav'])
     expect(found).not.toContain('rain/take_6.wav')
     expect(found).not.toContain('thud/take_1.wav')
 

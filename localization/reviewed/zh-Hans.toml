@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "31ff17dd465157b51caccbf9730b3a2b32749550e20e205f3a51f4da2ecf16f8"
+source = "89c1f805d748052f18ce37863dc5e0588d6ce3930ffd633d759f9cd9d7f88a66"
 translation = "530e3768e270ecc495434269d0aa7741f64471672a3fe92dbc9787949d17edcc"
 
 [messages.account-add]
@@ -891,9 +891,25 @@ translation = "Hoard { $version } — 返回资源库"
 source = "Sounds like"
 translation = "听起来像"
 
+[messages.app-imitation-heard]
+source = "Your noise"
+translation = "你的声音"
+
+[messages.app-imitation-mic-failed]
+source = "Couldn't record from the microphone: { $error }"
+translation = "无法从麦克风录音：{ $error }"
+
 [messages.app-imitation-placeholder]
 source = "whooom, pew, krssh"
 translation = "whooom, pew, krssh"
+
+[messages.app-imitation-record]
+source = "Make the noise into the microphone: sounds shaped like it come first"
+translation = "对着麦克风发出声音：形状相近的声音排在前面"
+
+[messages.app-imitation-stop]
+source = "Stop recording"
+translation = "停止录音"
 
 [messages.app-imitation-title]
 source = "Write the noise a sound makes the way you'd spell it: sounds shaped like it come first"
@@ -946,6 +962,10 @@ translation = "没有匹配项。"
 [messages.app-none-filters]
 source = "Nothing matches with these filters."
 translation = "在这些筛选条件下没有匹配项。"
+
+[messages.app-none-heard]
+source = "No measured sound is shaped much like your noise yet."
+translation = "还没有已测量的声音听起来像你的声音。"
 
 [messages.app-none-imitation]
 source = "No measured sound is shaped much like “{ $word }” yet."
@@ -3550,6 +3570,10 @@ translation = "这不是 Hoard 能读取的证书"
 [messages.error-https-unusable]
 source = "The certificate or key can't be used"
 translation = "证书或密钥无法使用"
+
+[messages.error-imitation-silent]
+source = "Nothing in the recording stands out from the background. Try again nearer the microphone."
+translation = "录音中没有比背景更突出的声音。请靠近麦克风再试一次。"
 
 [messages.error-keep-catch-all]
 source = "make another location the catch-all instead"

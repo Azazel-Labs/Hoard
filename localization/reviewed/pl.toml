@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "31ff17dd465157b51caccbf9730b3a2b32749550e20e205f3a51f4da2ecf16f8"
+source = "89c1f805d748052f18ce37863dc5e0588d6ce3930ffd633d759f9cd9d7f88a66"
 translation = "5db71bb64547d674ae74798bc03b5a157ea563cee11208b1525b9e891805fb61"
 
 [messages.account-add]
@@ -942,9 +942,25 @@ translation = "Hoard { $version } — wróć do biblioteki"
 source = "Sounds like"
 translation = "Brzmi jak"
 
+[messages.app-imitation-heard]
+source = "Your noise"
+translation = "Twój dźwięk"
+
+[messages.app-imitation-mic-failed]
+source = "Couldn't record from the microphone: { $error }"
+translation = "Nie udało się nagrać z mikrofonu: { $error }"
+
 [messages.app-imitation-placeholder]
 source = "whooom, pew, krssh"
 translation = "whooom, pew, krssh"
+
+[messages.app-imitation-record]
+source = "Make the noise into the microphone: sounds shaped like it come first"
+translation = "Wydaj dźwięk do mikrofonu: najpierw pojawią się podobnie brzmiące"
+
+[messages.app-imitation-stop]
+source = "Stop recording"
+translation = "Zatrzymaj nagrywanie"
 
 [messages.app-imitation-title]
 source = "Write the noise a sound makes the way you'd spell it: sounds shaped like it come first"
@@ -997,6 +1013,10 @@ translation = "Brak wyników."
 [messages.app-none-filters]
 source = "Nothing matches with these filters."
 translation = "Brak wyników przy tych filtrach."
+
+[messages.app-none-heard]
+source = "No measured sound is shaped much like your noise yet."
+translation = "Żaden zmierzony dźwięk nie brzmi jeszcze zbytnio jak twój dźwięk."
 
 [messages.app-none-imitation]
 source = "No measured sound is shaped much like “{ $word }” yet."
@@ -3699,6 +3719,10 @@ translation = "To nie jest certyfikat, który Hoard potrafi odczytać"
 [messages.error-https-unusable]
 source = "The certificate or key can't be used"
 translation = "Nie można użyć certyfikatu lub klucza"
+
+[messages.error-imitation-silent]
+source = "Nothing in the recording stands out from the background. Try again nearer the microphone."
+translation = "Nic w nagraniu nie wybija się ponad tło. Spróbuj ponownie bliżej mikrofonu."
 
 [messages.error-keep-catch-all]
 source = "make another location the catch-all instead"

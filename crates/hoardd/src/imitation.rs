@@ -4,9 +4,16 @@
 //! that move from one to the other are a pitch that rises or falls; hiss and air (s, sh, f, h) are noise; a hum at the
 //! end (m, n, ng) rings on, a stop (k, t, p) cuts off; capitals are loud. Every sound's measured features (see
 //! `sounds`) are scored against that shape. Nothing here is learned; it is a reading of English-style spelling.
+//!
+//! The noise can be made into a microphone instead ([`hear`]): the recording is measured the way every sound is, and
+//! what it measured is the shape. It travels as `imitation` like a word, as [`HEARD`] and the shape's numbers.
 
+use crate::error::{ApiResult, AppError};
+use crate::i18n::tr;
 use crate::{AppState, db};
 use anyhow::Result;
+use axum::Json;
+use serde_json::{Value, json};
 
 /// What a word says about the sound it imitates, or what someone says it's like; nothing where it says nothing.
 #[derive(Debug, Clone, Default, PartialEq)]
@@ -195,8 +202,8 @@ pub(crate) struct Measured {
 
 impl Measured {
     #[cfg(test)]
-    pub(crate) fn from_meta(m: &serde_json::Map<String, serde_json::Value>) -> Option<Self> {
-        let n = |k: &str| m.get(k).and_then(serde_json::Value::as_f64).map(|v| v as f32);
+    pub(crate) fn from_meta(m: &serde_json::Map<String, Value>) -> Option<Self> {
+        let n = |k: &str| m.get(k).and_then(Value::as_f64).map(|v| v as f32);
         Some(Self {
             secs: n("duration_secs")?,
             attack_ms: n("attack_ms"),
@@ -260,9 +267,14 @@ const FLOOR: f32 = 0.3;
 /// At most this many sounds match.
 const MAX: usize = 2000;
 
-/// Every measured sound's file that fits the word, with how well, best first.
+/// Every measured sound's file that fits the word (or a recording's shape, as [`Shape::token`] gives it), with how
+/// well, best first.
 pub(crate) async fn rank(state: &AppState, word: &str) -> Result<Vec<(String, f32)>> {
-    match read(word) {
+    let shape = match word.strip_prefix(HEARD) {
+        Some(numbers) => Shape::from_token(numbers),
+        None => read(word),
+    };
+    match shape {
         Some(shape) => rank_shape(state, shape).await,
         None => Ok(Vec::new()),
     }
@@ -310,9 +322,177 @@ pub(crate) async fn rank_shape(state: &AppState, shape: Shape) -> Result<Vec<(St
     .await
 }
 
+// ---------------------------------------------------------------------------------------------
+// A recording
+
+/// What a recording's shape starts with as `imitation`.
+pub(crate) const HEARD: &str = "heard:";
+/// How much of a recording is listened to.
+const MAX_RECORDING_SECS: f32 = 10.0;
+/// The largest recording taken: ten seconds of 48 kHz 16-bit mono WAV, and some.
+pub(crate) const MAX_RECORDING_BYTES: usize = 2 << 20;
+
+/// The shape of a noise made into a microphone: how long it is without the room's noise either side, how sharply it
+/// starts and whether it rings on, and how bright, noisy and sweeping it is, as `sounds` measures every sound. How
+/// loud it was says nothing (that's how near the microphone was). Nothing when nothing stands out from the room.
+pub(crate) fn hear(bytes: bytes::Bytes) -> Option<Shape> {
+    let (mut mono, rate, _) = crate::sounds::decode_mono(bytes, None)?;
+    let sr = rate as f32;
+    mono.truncate((MAX_RECORDING_SECS * sr) as usize);
+    // How loud it is every 10 ms. The room is the level a twentieth of the recording is quieter than; the noise is
+    // what is well above it.
+    let step = ((sr * 0.01) as usize).max(1);
+    let env: Vec<f32> =
+        mono.chunks(step).map(|c| (c.iter().map(|s| s * s).sum::<f32>() / c.len() as f32).sqrt()).collect();
+    let mut sorted = env.clone();
+    sorted.sort_by(f32::total_cmp);
+    let (room, top) = (sorted[sorted.len() / 20], *sorted.last()?);
+    if top < 1e-3 || top < room * 3.0 {
+        return None;
+    }
+    let gate = (room * 4.0).max(top * 0.05);
+    let first = env.iter().position(|&e| e > gate)?;
+    let last = env.iter().rposition(|&e| e > gate)? + 1;
+    let noise = &mono[first * step..(last * step).min(mono.len())];
+    let f = crate::sounds::listen(noise, rate)?;
+    let n = |k: &str| f.get(k).and_then(Value::as_f64).map(|v| v as f32);
+    let (attack, tail) = (n("attack_ms")?, n("tail_ms")?);
+    Some(Shape {
+        secs: Some(noise.len() as f32 / sr),
+        // What `score` takes for sharp and soft, ringing and cut off, with room between for neither.
+        sharp: if attack <= 30.0 { Some(true) } else { (attack >= 80.0).then_some(false) },
+        rings: if tail >= 150.0 { Some(true) } else { (tail <= 60.0).then_some(false) },
+        brightness_hz: n("brightness_hz"),
+        noisiness: n("noisiness"),
+        sweep_octaves: Some(n("sweep_octaves").unwrap_or(0.0)),
+        loud: false,
+    })
+}
+
+impl Shape {
+    /// As `imitation` carries it: [`HEARD`] then its numbers, `-` for what it doesn't say.
+    pub(crate) fn token(&self) -> String {
+        fn num(v: Option<f32>, places: usize) -> String {
+            v.map_or_else(|| "-".into(), |v| format!("{v:.places$}"))
+        }
+        let flag = |v: Option<bool>, yes: &str, no: &str| v.map_or("-", |v| if v { yes } else { no }).to_owned();
+        let parts = [
+            num(self.secs, 2),
+            flag(self.sharp, "s", "f"),
+            num(self.brightness_hz, 0),
+            num(self.noisiness, 2),
+            num(self.sweep_octaves, 1),
+            flag(self.rings, "r", "c"),
+            flag(Some(self.loud), "l", "q"),
+        ];
+        format!("{HEARD}{}", parts.join(","))
+    }
+
+    /// The shape [`Shape::token`] gave, from its numbers (after [`HEARD`]); nothing if they aren't its.
+    fn from_token(numbers: &str) -> Option<Self> {
+        let p: Vec<&str> = numbers.split(',').collect();
+        let [secs, sharp, hz, noise, sweep, rings, loud] = p[..] else { return None };
+        let num = |v: &str, lo: f32, hi: f32| -> Option<Option<f32>> {
+            if v == "-" {
+                return Some(None);
+            }
+            let x: f32 = v.parse().ok()?;
+            (lo..=hi).contains(&x).then_some(Some(x))
+        };
+        let flag = |v: &str, yes: &str, no: &str| -> Option<Option<bool>> {
+            match v {
+                "-" => Some(None),
+                _ if v == yes => Some(Some(true)),
+                _ if v == no => Some(Some(false)),
+                _ => None,
+            }
+        };
+        Some(Self {
+            secs: num(secs, 0.01, 600.0)?,
+            sharp: flag(sharp, "s", "f")?,
+            brightness_hz: num(hz, 20.0, 24_000.0)?,
+            noisiness: num(noise, 0.0, 1.0)?,
+            sweep_octaves: num(sweep, -10.0, 10.0)?,
+            rings: flag(rings, "r", "c")?,
+            loud: flag(loud, "l", "q")?.unwrap_or(false),
+        })
+    }
+}
+
+/// `POST /api/imitation`: a recording of someone making a noise (WAV), read as the shape of a sound. Answers
+/// `{imitation, seconds}`: what `imitation=` takes to find sounds shaped like it, and how long the noise was.
+pub(crate) async fn heard_route(body: axum::body::Bytes) -> ApiResult<Json<Value>> {
+    if body.is_empty() {
+        return Err(AppError::bad_request(tr!("error-empty-file")));
+    }
+    let shape = tokio::task::spawn_blocking(move || hear(body))
+        .await?
+        .ok_or_else(|| AppError::bad_request(tr!("error-imitation-silent")))?;
+    Ok(Json(json!({ "imitation": shape.token(), "seconds": shape.secs })))
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    /// A WAV file of mono samples at `rate`.
+    fn wav(samples: &[f32], rate: u32) -> bytes::Bytes {
+        let mut out = Vec::new();
+        let data = (samples.len() * 2) as u32;
+        out.extend_from_slice(b"RIFF");
+        out.extend_from_slice(&(36 + data).to_le_bytes());
+        out.extend_from_slice(b"WAVEfmt ");
+        out.extend_from_slice(&16u32.to_le_bytes());
+        out.extend_from_slice(&1u16.to_le_bytes());
+        out.extend_from_slice(&1u16.to_le_bytes());
+        out.extend_from_slice(&rate.to_le_bytes());
+        out.extend_from_slice(&(rate * 2).to_le_bytes());
+        out.extend_from_slice(&2u16.to_le_bytes());
+        out.extend_from_slice(&16u16.to_le_bytes());
+        out.extend_from_slice(b"data");
+        out.extend_from_slice(&data.to_le_bytes());
+        for s in samples {
+            out.extend_from_slice(&((s.clamp(-1.0, 1.0) * 32767.0) as i16).to_le_bytes());
+        }
+        out.into()
+    }
+
+    #[test]
+    fn recordings_read_as_shapes() {
+        let rate = 32_000u32;
+        let sr = rate as f32;
+        // Room hiss, half a second of it either side of a falling tone that starts at once and dies away.
+        let mut seed = 1u32;
+        let mut hiss = move || {
+            seed = seed.wrapping_mul(1_664_525).wrapping_add(1_013_904_223);
+            (seed >> 8) as f32 / (1u32 << 24) as f32 - 0.5
+        };
+        let mut x: Vec<f32> = (0..rate / 2).map(|_| 0.004 * hiss()).collect();
+        let n = (0.6 * sr) as usize;
+        let mut phase = 0f32;
+        for i in 0..n {
+            let t = i as f32 / n as f32;
+            phase += 2.0 * std::f32::consts::PI * 2000.0 * (-2.0 * t).exp2() / sr;
+            x.push(0.8 * (1.0 - t).powi(2) * phase.sin() + 0.004 * hiss());
+        }
+        x.extend((0..rate / 2).map(|_| 0.004 * hiss()));
+        let pew = hear(wav(&x, rate)).unwrap();
+        assert!((0.3..0.7).contains(&pew.secs.unwrap()), "{pew:?}");
+        assert_eq!(pew.sharp, Some(true), "{pew:?}");
+        assert!(pew.sweep_octaves.unwrap() < -0.5 && pew.noisiness.unwrap() < 0.3, "{pew:?}");
+
+        // It travels as its numbers and comes back the same.
+        let token = pew.token();
+        let back = Shape::from_token(token.strip_prefix(HEARD).unwrap()).unwrap();
+        assert_eq!(back.token(), token);
+        assert_eq!(back.sharp, pew.sharp);
+        assert_eq!(Shape::from_token("1,s,500"), None);
+        assert_eq!(Shape::from_token("1,x,500,0.1,0,-,q"), None);
+
+        // Only the room: nothing.
+        let room: Vec<f32> = (0..rate).map(|_| 0.004 * hiss()).collect();
+        assert_eq!(hear(wav(&room, rate)), None);
+    }
 
     #[test]
     fn words_read_as_sounds() {

@@ -48,6 +48,7 @@ error-conversion-failed = couldn't convert to { $format }: { $reason }
 error-max-size = max must be a power of two from 64 to 16384
 error-replace-ext = ext must be a short file extension
 error-empty-file = empty file
+error-imitation-silent = Nothing in the recording stands out from the background. Try again nearer the microphone.
 error-replace-duplicate = the converted file duplicates one already in the pack; the package was merged into it
 error-ai-address = The AI address should start with http:// or https://
 error-local-llm-action = action is list, download or delete, and the last two need a model
@@ -522,6 +523,11 @@ app-imitation = Sounds like
 # Examples of imitation words; the reading is of English-style spelling, so keep them as they are.
 app-imitation-placeholder = whooom, pew, krssh
 app-imitation-title = Write the noise a sound makes the way you'd spell it: sounds shaped like it come first
+app-imitation-record = Make the noise into the microphone: sounds shaped like it come first
+app-imitation-stop = Stop recording
+# Shown in the "Sounds like" box while it's searching by a noise made into the microphone.
+app-imitation-heard = Your noise
+app-imitation-mic-failed = Couldn't record from the microphone: { $error }
 app-retry = Retry
 app-undo = Undo
 app-search-failed = Search failed: { $error }
@@ -717,6 +723,7 @@ app-none = Nothing matches.
 app-none-query = Nothing matches “{ $query }”.
 # $word is what was typed in the Sounds like box.
 app-none-imitation = No measured sound is shaped much like “{ $word }” yet.
+app-none-heard = No measured sound is shaped much like your noise yet.
 app-none-filters = Nothing matches with these filters.
 app-none-query-filters = Nothing matches “{ $query }” with these filters.
 app-clear-search-filters = Clear search and filters

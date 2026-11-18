@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "31ff17dd465157b51caccbf9730b3a2b32749550e20e205f3a51f4da2ecf16f8"
+source = "89c1f805d748052f18ce37863dc5e0588d6ce3930ffd633d759f9cd9d7f88a66"
 translation = "492346de275ddfb98a7c980cda9c461c7c8cf91addc47e4b748e7c38ce659fb3"
 
 [messages.account-add]
@@ -920,9 +920,25 @@ translation = "Hoard { $version } — torna a la biblioteca"
 source = "Sounds like"
 translation = "Sona com"
 
+[messages.app-imitation-heard]
+source = "Your noise"
+translation = "El teu soroll"
+
+[messages.app-imitation-mic-failed]
+source = "Couldn't record from the microphone: { $error }"
+translation = "No s'ha pogut enregistrar del micròfon: { $error }"
+
 [messages.app-imitation-placeholder]
 source = "whooom, pew, krssh"
 translation = "whooom, pew, krssh"
+
+[messages.app-imitation-record]
+source = "Make the noise into the microphone: sounds shaped like it come first"
+translation = "Fes el soroll al micròfon: primer surten els sons que s'hi assemblen"
+
+[messages.app-imitation-stop]
+source = "Stop recording"
+translation = "Atura l'enregistrament"
 
 [messages.app-imitation-title]
 source = "Write the noise a sound makes the way you'd spell it: sounds shaped like it come first"
@@ -975,6 +991,10 @@ translation = "No hi ha cap coincidència."
 [messages.app-none-filters]
 source = "Nothing matches with these filters."
 translation = "No hi ha cap coincidència amb aquests filtres."
+
+[messages.app-none-heard]
+source = "No measured sound is shaped much like your noise yet."
+translation = "Encara no hi ha cap so mesurat que soni gaire com el teu soroll."
 
 [messages.app-none-imitation]
 source = "No measured sound is shaped much like “{ $word }” yet."
@@ -3639,6 +3659,10 @@ translation = "Això no és un certificat que Hoard pugui llegir"
 [messages.error-https-unusable]
 source = "The certificate or key can't be used"
 translation = "El certificat o la clau no es poden fer servir"
+
+[messages.error-imitation-silent]
+source = "Nothing in the recording stands out from the background. Try again nearer the microphone."
+translation = "No hi ha res a l'enregistrament que destaqui del soroll de fons. Torna-ho a provar més a prop del micròfon."
 
 [messages.error-keep-catch-all]
 source = "make another location the catch-all instead"

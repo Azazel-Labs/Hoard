@@ -452,6 +452,21 @@ export function sound(sort: 'thud' | 'zap' | 'rain', seed: number, rate = 22_050
   return wav(out, rate)
 }
 
+/** Someone saying "pew" into a microphone, more or less: a falling whistle that starts at once and dies away, with
+ * half a second of the room's hiss before it and a second after. */
+export function pew(rate = 48_000): Buffer {
+  const next = noise(7)
+  const room = (n: number) => Array.from({ length: n }, () => next() * 0.003)
+  const len = Math.round(rate * 0.45)
+  let phase = 0
+  const voice = Array.from({ length: len }, (_, i) => {
+    const t = i / len
+    phase += (2 * Math.PI * (2400 - 2000 * t)) / rate
+    return 0.7 * Math.sin(phase) * (1 - t) ** 2 + next() * 0.003
+  })
+  return wav([...room(rate / 2), ...voice, ...room(rate)], rate)
+}
+
 /** An animated PNG: one picture per frame (`pixel(frame, x, y)`), each shown for `delayMs`, looping. */
 export function apng(
   width: number,

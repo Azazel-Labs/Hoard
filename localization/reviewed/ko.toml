@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "31ff17dd465157b51caccbf9730b3a2b32749550e20e205f3a51f4da2ecf16f8"
+source = "89c1f805d748052f18ce37863dc5e0588d6ce3930ffd633d759f9cd9d7f88a66"
 translation = "cb51eeebee58ce4e694b9c22ec1e26a19090d24e80d9b74b0e431ca3fa274b7f"
 
 [messages.account-add]
@@ -888,9 +888,25 @@ translation = "Hoard { $version } — 라이브러리로 돌아가기"
 source = "Sounds like"
 translation = "이런 소리"
 
+[messages.app-imitation-heard]
+source = "Your noise"
+translation = "내 소리"
+
+[messages.app-imitation-mic-failed]
+source = "Couldn't record from the microphone: { $error }"
+translation = "마이크로 녹음할 수 없습니다: { $error }"
+
 [messages.app-imitation-placeholder]
 source = "whooom, pew, krssh"
 translation = "whooom, pew, krssh"
+
+[messages.app-imitation-record]
+source = "Make the noise into the microphone: sounds shaped like it come first"
+translation = "마이크에 대고 소리를 내세요. 모양이 비슷한 소리가 먼저 나옵니다"
+
+[messages.app-imitation-stop]
+source = "Stop recording"
+translation = "녹음 중지"
 
 [messages.app-imitation-title]
 source = "Write the noise a sound makes the way you'd spell it: sounds shaped like it come first"
@@ -943,6 +959,10 @@ translation = "일치하는 항목이 없습니다."
 [messages.app-none-filters]
 source = "Nothing matches with these filters."
 translation = "이 필터와 일치하는 항목이 없습니다."
+
+[messages.app-none-heard]
+source = "No measured sound is shaped much like your noise yet."
+translation = "아직 내 소리와 비슷한 측정된 소리가 없습니다."
 
 [messages.app-none-imitation]
 source = "No measured sound is shaped much like “{ $word }” yet."
@@ -3544,6 +3564,10 @@ translation = "Hoard가 읽을 수 있는 인증서가 아닙니다"
 [messages.error-https-unusable]
 source = "The certificate or key can't be used"
 translation = "인증서나 키를 사용할 수 없습니다"
+
+[messages.error-imitation-silent]
+source = "Nothing in the recording stands out from the background. Try again nearer the microphone."
+translation = "녹음에서 배경 소음보다 두드러지는 소리가 없습니다. 마이크에 더 가까이 대고 다시 해 보세요."
 
 [messages.error-keep-catch-all]
 source = "make another location the catch-all instead"

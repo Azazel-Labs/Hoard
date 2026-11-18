@@ -133,6 +133,10 @@ pub(crate) fn router(state: &AppState) -> Router<AppState> {
         .route("/api/manifest", post(manifest))
         .route("/api/credits", post(crate::credits::credits))
         .route("/api/check", post(crate::check::check_handler))
+        .route(
+            "/api/imitation",
+            post(crate::imitation::heard_route).layer(DefaultBodyLimit::max(crate::imitation::MAX_RECORDING_BYTES)),
+        )
         .route("/api/packs/{id}/credits", get(crate::credits::pack_credits))
         .route("/api/collections/{id}/credits", get(crate::credits::collection_credits))
         .route("/api/assets/{id}/bundle.zip", get(asset_bundle))

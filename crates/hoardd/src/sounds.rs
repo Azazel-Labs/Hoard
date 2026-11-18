@@ -84,6 +84,11 @@ pub(crate) fn measure(path: &std::path::Path, ext: &str) -> Option<Map<String, V
     analyze(bytes::Bytes::from(head), Some(ext)).map(|(_, f)| f)
 }
 
+/// The measured features (see [`FEATURES`]) of mono samples at `rate`, taken as the start of something longer.
+pub(crate) fn listen(mono: &[f32], rate: u32) -> Option<Map<String, Value>> {
+    hear(mono, rate, false).map(|(_, f)| f)
+}
+
 /// Up to [`MAX_SECS`] of a file, mixed to mono, and whether that's all of it.
 pub(crate) fn decode_mono(bytes: bytes::Bytes, ext: Option<&str>) -> Option<(Vec<f32>, u32, bool)> {
     let mut mono = Vec::new();

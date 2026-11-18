@@ -124,7 +124,7 @@ on its own:
 - [x] **MCP**: `search_sounds` — the calling AI passes the raw word as `imitation` and its own reading of it ("a
   deep whoosh, about a second, rising") as `shape`, which overrides that part of Hoard's reading — returning each
   sound's measured features, the same in words and a link to listen, plus `describe_sound(id)` and `sounds_like(id)`.
-- [ ] **Search by imitation**: make the noise into the microphone, and sounds with that envelope and pitch shape are
+- [x] **Search by imitation**: make the noise into the microphone, and sounds with that envelope and pitch shape are
   found.
 
 ## Ideas

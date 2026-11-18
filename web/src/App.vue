@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import { computed, nextTick, onBeforeUnmount, onMounted, reactive, ref, shallowRef, watch } from 'vue'
 import {
-  api, downloadCredits, filesFromDrop, KIND_LABEL, KIND_NAME, selectionZipUrl,
+  api, ApiError, downloadCredits, filesFromDrop, KIND_LABEL, KIND_NAME, selectionZipUrl,
   type Asset, type AssetKind, type BulkEdit, type Collection, type Facet, type Pack, type Project, type Stats, type UploadFile,
 } from './api'
 import { canPreview, stop as stopPreview, toggle as togglePreview } from './player'
+import { canRecord, record, type Recording } from './record'
 import { prefs, toggleIn } from './prefs'
 import { askToSignIn, auth, isDesktop, may, mayEdit, signOut, siteName } from './auth'
 import { forgetSearch, mine, saveSearch, setFavorite, toggleFavorite } from './mine'
@@ -388,7 +389,7 @@ async function startNaming() {
   saveName.value = [
     filters.q.trim(), filters.kind, ...filters.tags, filters.pack?.name, filters.collection?.name,
     filters.similar && t('app-save-name-like', { name: filters.similar.name }), filters.color,
-    filters.imitation, filters.favorites && t('app-save-name-favorites'), filters.project,
+    heardNoise.value ? t('app-imitation-heard') : filters.imitation, filters.favorites && t('app-save-name-favorites'), filters.project,
   ].filter(Boolean).join(' · ').slice(0, 80)
   naming.value = true
   await nextTick()
@@ -567,13 +568,35 @@ function pickColor(hex: string) {
   filters.color = filters.color === hex ? '' : hex
   if (filters.color) filters.imitation = ''
 }
+/** How a noise made into the microphone travels as `imitation` (its shape, as the server measured it). */
+const HEARD = 'heard:'
+const heardNoise = computed(() => filters.imitation.startsWith(HEARD))
 /** What's typed in the sidebar's "Sounds like" box, set as the filter when it's sent. */
 const imitationDraft = ref('')
-watch(() => filters.imitation, (w) => (imitationDraft.value = w), { immediate: true })
+watch(() => filters.imitation, (w) => (imitationDraft.value = w.startsWith(HEARD) ? '' : w), { immediate: true })
 /** A word imitating a sound ("whooom"): the sounds shaped like it, most alike first. */
 function imitate() {
   const word = imitationDraft.value.trim()
   Object.assign(filters, word ? { imitation: word, similar: null, color: '', sort: '' } : { imitation: '' })
+}
+/** The noise being made into the microphone, while it's recorded. */
+const listening = shallowRef<Recording | null>(null)
+const canListen = canRecord()
+/** Records a noise from the microphone (or stops recording it): the sounds shaped like it, most alike first. */
+async function listen() {
+  if (listening.value) {
+    listening.value.stop()
+    return
+  }
+  try {
+    const recording = await record()
+    listening.value = recording
+    const wav = await recording.done.finally(() => (listening.value = null))
+    const heard = await api.imitation(wav)
+    Object.assign(filters, { imitation: heard.imitation, similar: null, color: '', sort: '' })
+  } catch (e) {
+    showError(e instanceof ApiError ? e.message : t('app-imitation-mic-failed', { error: (e as Error).message }))
+  }
 }
 const rankLabel = computed(() =>
   filters.imitation ? t('app-rank-imitation') : filters.similar ? t('app-rank-alike') : filters.color ? t('app-rank-color') : filters.q ? t('app-rank-match') : t('app-sort-newest'),
@@ -1265,6 +1288,7 @@ const firstLoad = computed(() => loading.value && !items.value.length)
 const noneText = computed(() => {
   const query = filters.q.trim()
   const narrowed = hasFilters.value && !!(filters.tags.length || filters.kind || filters.pack)
+  if (heardNoise.value) return t('app-none-heard')
   if (filters.imitation) return t('app-none-imitation', { word: filters.imitation })
   if (filters.q) return narrowed ? t('app-none-query-filters', { query }) : t('app-none-query', { query })
   return narrowed ? t('app-none-filters') : t('app-none')
@@ -1589,10 +1613,28 @@ const commands = computed<Command[]>(() => {
               maxlength="40"
               autocomplete="off"
               spellcheck="false"
-              :placeholder="t('app-imitation-placeholder')"
+              :placeholder="heardNoise ? t('app-imitation-heard') : t('app-imitation-placeholder')"
               :title="t('app-imitation-title')"
               @search="imitate"
             />
+            <button
+              v-if="canListen"
+              type="button"
+              class="btn ghost mic"
+              :class="{ on: listening }"
+              :aria-pressed="!!listening"
+              :title="listening ? t('app-imitation-stop') : t('app-imitation-record')"
+              @click="listen"
+            >
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <rect v-if="listening" x="7" y="7" width="10" height="10" rx="1.5" />
+                <template v-else>
+                  <rect x="9" y="3" width="6" height="11" rx="3" />
+                  <path d="M5 11a7 7 0 0 0 14 0M12 18v3" />
+                </template>
+              </svg>
+              <span class="visually-hidden">{{ listening ? t('app-imitation-stop') : t('app-imitation-record') }}</span>
+            </button>
           </form>
         </section>
         <p v-if="!kindFacets.length && !loading" class="side-empty">{{ t('app-no-filters') }}</p>
@@ -1671,7 +1713,7 @@ const commands = computed<Command[]>(() => {
             <TagChip v-if="filters.project" :tag="`project:${filters.project}`" removable @remove="filters.project = ''" />
             <TagChip v-if="filters.similar" :tag="`like:${filters.similar.name}`" removable @remove="filters.similar = null" />
             <TagChip v-if="filters.color" :tag="`color:${filters.color}`" :swatch="filters.color" removable @remove="filters.color = ''" />
-            <TagChip v-if="filters.imitation" :tag="`sounds-like:${filters.imitation}`" removable @remove="filters.imitation = ''" />
+            <TagChip v-if="filters.imitation" :tag="`sounds-like:${heardNoise ? t('app-imitation-heard') : filters.imitation}`" removable @remove="filters.imitation = ''" />
             <TagChip v-if="filters.kind" :tag="`kind:${filters.kind}`" removable @remove="filters.kind = ''" />
             <TagChip v-for="t in filters.tags" :key="t" :tag="t" removable @remove="toggleTag(t)" />
             <button v-if="hasFilters" type="button" class="linkbtn" @click="clearFilters">{{ t('app-clear-all') }}</button>
@@ -2060,7 +2102,12 @@ const commands = computed<Command[]>(() => {
 .side section + section { margin-top: 1rem; }
 .side h3 { margin: 0 0 0.4rem; font-size: 0.75rem; font-weight: 650; color: var(--faint); }
 .imitate + .side-empty { margin-top: 1rem; }
-.imitate .field { width: 100%; }
+.imitate form { display: flex; gap: 0.3rem; align-items: center; }
+.imitate .field { flex: 1; min-width: 0; }
+.imitate .mic { flex: none; padding: 0.35rem; line-height: 0; }
+.imitate .mic.on { color: var(--danger); animation: mic-pulse 1.2s ease-in-out infinite; }
+@keyframes mic-pulse { 50% { opacity: 0.45; } }
+@media (prefers-reduced-motion: reduce) { .imitate .mic.on { animation: none; } }
 .swatches { display: grid; grid-template-columns: repeat(auto-fill, minmax(1.45rem, 1fr)); gap: 0.3rem; }
 .sw {
   position: relative; aspect-ratio: 1; border: 0; padding: 0; border-radius: 50%; cursor: pointer;

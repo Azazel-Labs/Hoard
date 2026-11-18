@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "31ff17dd465157b51caccbf9730b3a2b32749550e20e205f3a51f4da2ecf16f8"
+source = "89c1f805d748052f18ce37863dc5e0588d6ce3930ffd633d759f9cd9d7f88a66"
 translation = "973d5a6f0a6763be6bbc6bb0a4a118df31a18ed5e5823c6c023d2d871324479b"
 
 [messages.account-add]
@@ -949,9 +949,25 @@ translation = "Hoard { $version } — назад до бібліотеки"
 source = "Sounds like"
 translation = "Звучить як"
 
+[messages.app-imitation-heard]
+source = "Your noise"
+translation = "Ваш звук"
+
+[messages.app-imitation-mic-failed]
+source = "Couldn't record from the microphone: { $error }"
+translation = "Не вдалося записати з мікрофона: { $error }"
+
 [messages.app-imitation-placeholder]
 source = "whooom, pew, krssh"
 translation = "whooom, pew, krssh"
+
+[messages.app-imitation-record]
+source = "Make the noise into the microphone: sounds shaped like it come first"
+translation = "Зобразіть звук у мікрофон: схожі звуки будуть першими"
+
+[messages.app-imitation-stop]
+source = "Stop recording"
+translation = "Зупинити запис"
 
 [messages.app-imitation-title]
 source = "Write the noise a sound makes the way you'd spell it: sounds shaped like it come first"
@@ -1004,6 +1020,10 @@ translation = "Нічого не знайдено."
 [messages.app-none-filters]
 source = "Nothing matches with these filters."
 translation = "З цими фільтрами нічого не знайдено."
+
+[messages.app-none-heard]
+source = "No measured sound is shaped much like your noise yet."
+translation = "Жоден виміряний звук поки не схожий на ваш."
 
 [messages.app-none-imitation]
 source = "No measured sound is shaped much like “{ $word }” yet."
@@ -3718,6 +3738,10 @@ translation = "Hoard не може прочитати цей сертифіка�
 [messages.error-https-unusable]
 source = "The certificate or key can't be used"
 translation = "Сертифікат або ключ не можна використати"
+
+[messages.error-imitation-silent]
+source = "Nothing in the recording stands out from the background. Try again nearer the microphone."
+translation = "У записі ніщо не виділяється на тлі. Спробуйте ще раз ближче до мікрофона."
 
 [messages.error-keep-catch-all]
 source = "make another location the catch-all instead"

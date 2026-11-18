@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "31ff17dd465157b51caccbf9730b3a2b32749550e20e205f3a51f4da2ecf16f8"
+source = "89c1f805d748052f18ce37863dc5e0588d6ce3930ffd633d759f9cd9d7f88a66"
 translation = "707089ce5f6ccea59af638ba8b3791160383452602af287d2ea5c47aeff1dd42"
 
 [messages.account-add]
@@ -928,9 +928,25 @@ translation = "Hoard { $version } — retour à la bibliothèque"
 source = "Sounds like"
 translation = "Sonne comme"
 
+[messages.app-imitation-heard]
+source = "Your noise"
+translation = "Votre bruit"
+
+[messages.app-imitation-mic-failed]
+source = "Couldn't record from the microphone: { $error }"
+translation = "Impossible d’enregistrer depuis le micro : { $error }"
+
 [messages.app-imitation-placeholder]
 source = "whooom, pew, krssh"
 translation = "whooom, pew, krssh"
+
+[messages.app-imitation-record]
+source = "Make the noise into the microphone: sounds shaped like it come first"
+translation = "Faites le bruit dans le micro : les sons qui lui ressemblent viennent en premier"
+
+[messages.app-imitation-stop]
+source = "Stop recording"
+translation = "Arrêter l’enregistrement"
 
 [messages.app-imitation-title]
 source = "Write the noise a sound makes the way you'd spell it: sounds shaped like it come first"
@@ -983,6 +999,10 @@ translation = "Aucun résultat."
 [messages.app-none-filters]
 source = "Nothing matches with these filters."
 translation = "Aucun résultat avec ces filtres."
+
+[messages.app-none-heard]
+source = "No measured sound is shaped much like your noise yet."
+translation = "Aucun son mesuré ne ressemble encore vraiment à votre bruit."
 
 [messages.app-none-imitation]
 source = "No measured sound is shaped much like “{ $word }” yet."
@@ -3651,6 +3671,10 @@ translation = "Ce n’est pas un certificat que Hoard peut lire"
 [messages.error-https-unusable]
 source = "The certificate or key can't be used"
 translation = "Le certificat ou la clé est inutilisable"
+
+[messages.error-imitation-silent]
+source = "Nothing in the recording stands out from the background. Try again nearer the microphone."
+translation = "Rien dans l’enregistrement ne ressort du bruit de fond. Réessayez plus près du micro."
 
 [messages.error-keep-catch-all]
 source = "make another location the catch-all instead"

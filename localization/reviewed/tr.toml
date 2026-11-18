@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "31ff17dd465157b51caccbf9730b3a2b32749550e20e205f3a51f4da2ecf16f8"
+source = "89c1f805d748052f18ce37863dc5e0588d6ce3930ffd633d759f9cd9d7f88a66"
 translation = "365b0fc7ff648476ee75c67213c00d18e7b3e0fb9f940664032b9c834c675ffb"
 
 [messages.account-add]
@@ -892,9 +892,25 @@ translation = "Hoard { $version } — kütüphaneye dön"
 source = "Sounds like"
 translation = "Şöyle ses"
 
+[messages.app-imitation-heard]
+source = "Your noise"
+translation = "Senin sesin"
+
+[messages.app-imitation-mic-failed]
+source = "Couldn't record from the microphone: { $error }"
+translation = "Mikrofondan kayıt yapılamadı: { $error }"
+
 [messages.app-imitation-placeholder]
 source = "whooom, pew, krssh"
 translation = "whooom, pew, krssh"
+
+[messages.app-imitation-record]
+source = "Make the noise into the microphone: sounds shaped like it come first"
+translation = "Sesi mikrofona çıkar: ona benzeyen sesler önce gelir"
+
+[messages.app-imitation-stop]
+source = "Stop recording"
+translation = "Kaydı durdur"
 
 [messages.app-imitation-title]
 source = "Write the noise a sound makes the way you'd spell it: sounds shaped like it come first"
@@ -947,6 +963,10 @@ translation = "Eşleşen bir şey yok."
 [messages.app-none-filters]
 source = "Nothing matches with these filters."
 translation = "Bu filtrelerle eşleşen bir şey yok."
+
+[messages.app-none-heard]
+source = "No measured sound is shaped much like your noise yet."
+translation = "Ölçülmüş hiçbir ses henüz senin sesine pek benzemiyor."
 
 [messages.app-none-imitation]
 source = "No measured sound is shaped much like “{ $word }” yet."
@@ -3560,6 +3580,10 @@ translation = "Bu, Hoard’un okuyabildiği bir sertifika değil"
 [messages.error-https-unusable]
 source = "The certificate or key can't be used"
 translation = "Sertifika ya da anahtar kullanılamıyor"
+
+[messages.error-imitation-silent]
+source = "Nothing in the recording stands out from the background. Try again nearer the microphone."
+translation = "Kayıtta arka plandan ayrılan bir şey yok. Mikrofona daha yakın durup yeniden dene."
 
 [messages.error-keep-catch-all]
 source = "make another location the catch-all instead"

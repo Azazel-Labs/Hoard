@@ -392,6 +392,24 @@ pub(crate) fn encode_wav(
     convert(tool, wav, "wav", format, output, duration, progress)
 }
 
+/// The first picture in an AVIF or HEIC file (a HEIC photo in tiles comes out whole), through a temporary PNG.
+pub(crate) fn decode_image(tool: &Tool, input: &Path) -> Result<image::DynamicImage> {
+    let dir = tempfile::tempdir()?;
+    let png = dir.path().join("decoded.png");
+    let mut args: Vec<std::ffi::OsString> =
+        ["-nostdin", "-hide_banner", "-loglevel", "error", "-protocol_whitelist", "file", "-f", "mov", "-i"]
+            .iter()
+            .map(Into::into)
+            .collect();
+    args.push(input.as_os_str().to_owned());
+    for a in ["-frames:v", "1", "-an", "-f", "image2", "-c:v", "png", "-y"] {
+        args.push(a.into());
+    }
+    args.push(png.as_os_str().to_owned());
+    run(tool, &args, None, &|_| {})?;
+    Ok(image::open(&png)?)
+}
+
 /// Run ffmpeg with a time limit, reading `-progress` output.
 fn run(tool: &Tool, args: &[std::ffi::OsString], duration: Option<f64>, progress: &(dyn Fn(f32) + Sync)) -> Result<()> {
     // Generous: ffmpeg is far faster than real time, but the machine may be busy ingesting.
@@ -511,6 +529,26 @@ mod tests {
         let fake = dir.path().join("fake.m4a");
         std::fs::write(&fake, b"#EXTM3U\n#EXTINF:1,\n/etc/passwd\n").unwrap();
         assert!(decode_to_wav(&tool, &fake, "m4a", &dir.path().join("x.wav")).is_err());
+    }
+
+    #[test]
+    fn decodes_avif_with_a_system_ffmpeg() {
+        let Some(tool) = system() else { return };
+        let dir = tempfile::tempdir().unwrap();
+        let avif = dir.path().join("t.avif");
+        // Only a build with an AV1 encoder can make one to read.
+        let made = std::process::Command::new(&tool.path)
+            .args(["-nostdin", "-loglevel", "error", "-f", "lavfi", "-i", "testsrc=size=64x48", "-frames:v", "1"])
+            .args(["-c:v", "libaom-av1", "-still-picture", "1", "-y"])
+            .arg(&avif)
+            .status()
+            .is_ok_and(|s| s.success());
+        if !made {
+            return;
+        }
+        assert_eq!(decode_image(&tool, &avif).unwrap().width(), 64);
+        std::fs::write(&avif, b"not a picture").unwrap();
+        assert!(decode_image(&tool, &avif).is_err());
     }
 
     /// A fake build served locally: the download must follow a redirect, check the published SHA-256 (both

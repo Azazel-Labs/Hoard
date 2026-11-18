@@ -79,8 +79,8 @@ tile sheets that come with only a note of their grid (Kenney's `Tilesheet.txt`).
 
 ## Images: more formats
 
-Hoard previews PNG, JPEG, GIF, BMP, TGA, WebP, TIFF, HDR, EXR, PSD/PSB, Krita, OpenRaster, GIMP, DDS, KTX and
-KTX2, PowerVR, VTF, Basis, ICO/CUR, QOI, PNM, PCX, SVG, Illustrator, Aseprite, the previews inside Clip Studio,
+Hoard previews PNG, JPEG, GIF, BMP, TGA, WebP, AVIF, HEIC, JPEG XL, TIFF, HDR, EXR, PSD/PSB, Krita, OpenRaster,
+GIMP, DDS, KTX and KTX2, PowerVR, VTF, Basis, ICO/CUR, QOI, PNM, PCX, SVG, Illustrator, Aseprite, the previews inside Clip Studio,
 Procreate, Affinity and EPS files, and camera raw photos. The formats added lately, and those still to come, the
 most common first:
 
@@ -89,8 +89,8 @@ most common first:
   (a TIFF preview in its header, when it has one).
 - [x] **GIMP** (`.xcf`): there's no flattened copy inside, so Hoard composites the layers itself, each at its
   offset with its opacity, mask and visibility, blended as Normal. 8- and 16-bit integer pixels.
-- [ ] **AVIF, HEIC and JPEG XL**: newer formats, rare in asset packs so far. JPEG XL has a pure-Rust decoder.
-  AVIF and HEIC would need dav1d and libheif, or could go through ffmpeg once it's downloaded.
+- [x] **AVIF, HEIC and JPEG XL**: newer formats, rare in asset packs so far. JPEG XL is decoded in pure Rust
+  (jxl-oxide); AVIF and HEIC go through ffmpeg once it's downloaded.
 - [x] **Small ones**: ICO/CUR, QOI and PNM (`.ppm`, `.pgm`, `.pbm`) through the image library, PCX read by Hoard,
   and KTX 1, PowerVR and Valve's VTF textures decoded like DDS.
 - [x] Camera raw files (`.dng`, `.cr2`, `.nef`, `.arw`, `.raf` and the rest) by their embedded JPEG. These are

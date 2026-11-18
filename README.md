@@ -330,7 +330,8 @@ software rasterizer (`apt install mesa-vulkan-drivers`). Without any adapter, ev
      are KTX 1, PowerVR (`.pvr`, with PVRTC and ETC1 too) and Valve's VTF. Basis Universal (KTX2 with BasisLZ/ETC1S
      or UASTC, and `.basis` files) is transcoded in pure Rust too. Aseprite files show their first frame with frame,
      layer and animation-tag counts. Icons and cursors (ICO, CUR), QOI, PNM (`.ppm`, `.pgm`, `.pbm`) and PCX are
-     pictures too.
+     pictures too, and so is JPEG XL, decoded in pure Rust. AVIF and HEIC (iPhone photos) are read by ffmpeg once
+     it's ready.
    - Vector art (SVG, Illustrator, Affinity Designer, EPS) is a kind of its own, filtered apart from pictures made of
      pixels, and goes wherever a library location takes textures. SVGs render with their text (system fonts, DejaVu
      in the Docker image). Illustrator files (`.ai`) render their first artboard from the PDF inside them, or show
@@ -614,7 +615,7 @@ and Opus use ffmpeg's reference encoders (LAME, libvorbis, libopus), as do sourc
 
 | From | To |
 |---|---|
-| PNG, JPEG, WebP, TGA, TIFF, BMP, GIF, EXR, HDR, PSD/PSB (full composite), Krita, OpenRaster, DDS, KTX, KTX2, PowerVR, VTF, ICO, QOI, PNM, PCX, SVG, Illustrator, Aseprite | PNG, JPEG, WebP (lossless), TGA, TIFF, plus EXR for HDR sources; optionally scaled down to 4096…64 px, including in the original format |
+| PNG, JPEG, WebP, TGA, TIFF, BMP, GIF, EXR, HDR, PSD/PSB (full composite), Krita, OpenRaster, GIMP, DDS, KTX, KTX2, PowerVR, VTF, ICO, QOI, PNM, PCX, JPEG XL, AVIF and HEIC (with ffmpeg), SVG, Illustrator, Aseprite | PNG, JPEG, WebP (lossless), TGA, TIFF, plus EXR for HDR sources; optionally scaled down to 4096…64 px, including in the original format |
 | WAV, FLAC, OGG Vorbis, MP3, AIFF, and with ffmpeg also AAC/M4A, Opus, WMA, CAF, WavPack, APE, MKA | WAV (16 or 24-bit, as the source), FLAC, MP3 (VBR ~190 kbps), OGG Vorbis (q5), Opus (128 kbps) |
 | MOD, XM, S3M, IT, MIDI | the same audio formats, rendered |
 | glTF, GLB | GLB + textures (zipped) |

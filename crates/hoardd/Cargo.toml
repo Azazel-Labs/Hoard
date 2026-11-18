@@ -83,6 +83,7 @@ rustysynth = "1"
 polysmelt = "0.13.0"
 ddsfile = "0.6"
 texture2ddecoder = "0.1"
+jxl-oxide = { version = "0.12.6", default-features = false, features = ["image"] }
 ktx2 = "0.5"
 resvg = { version = "0.50", default-features = false, features = ["svgz", "text", "system-fonts"] }
 hayro = "0.9"

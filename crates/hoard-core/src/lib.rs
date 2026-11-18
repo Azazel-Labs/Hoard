@@ -87,7 +87,8 @@ impl AssetKind {
             | "afphoto" | "procreate" | "pvr" | "vtf" | "pcx" | "ico" | "cur" | "qoi" | "ppm" | "pgm" | "pbm"
             | "pnm" | "pam"
             // Camera raw photos, shown by the JPEG inside.
-            | "dng" | "cr2" | "nef" | "nrw" | "arw" | "pef" | "orf" | "rw2" | "srw" | "raf" => AssetKind::Texture,
+            | "dng" | "cr2" | "nef" | "nrw" | "arw" | "pef" | "orf" | "rw2" | "srw" | "raf"
+            | "jxl" | "avif" | "heic" | "heif" => AssetKind::Texture,
             // Vector art: SVG, Illustrator, Affinity Designer, EPS, dotLottie animations.
             "svg" | "svgz" | "ai" | "afdesign" | "eps" | "lottie" | "riv" => AssetKind::Vector,
             // Audio, including DAW projects (Ableton, FL Studio, Reaper, Pro Tools, Logic, Cubase, Studio One).

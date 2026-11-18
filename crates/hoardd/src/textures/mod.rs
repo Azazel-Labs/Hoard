@@ -4,6 +4,7 @@
 
 mod embedded;
 mod ktx1;
+mod newer;
 mod pcx;
 mod pvr;
 mod raw;
@@ -35,13 +36,14 @@ pub(crate) const VECTOR: &[&str] = &["svg", "svgz", "ai"];
 
 /// Whether [`decode`] reads `.ext`.
 pub(crate) fn handles(ext: &str) -> bool {
-    EXTS.contains(&ext) || embedded::EXTS.contains(&ext) || raw::EXTS.contains(&ext)
+    [EXTS, embedded::EXTS, raw::EXTS, newer::EXTS].iter().any(|list| list.contains(&ext))
 }
 
 pub(crate) fn decode(path: &Path, ext: &str) -> Result<Decoded> {
     match ext {
         e if embedded::EXTS.contains(&e) => embedded::decode(path, e),
         e if raw::EXTS.contains(&e) => raw::decode(&std::fs::read(path)?),
+        e if newer::EXTS.contains(&e) => newer::decode(path, e),
         "dds" => dds(path),
         "ktx" => ktx1::decode(&std::fs::read(path)?),
         "ktx2" => ktx2(path),

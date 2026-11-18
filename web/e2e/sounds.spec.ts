@@ -124,3 +124,50 @@ test('a word imitating a sound finds the sounds shaped like it', async ({ page, 
     await api.post('/api/archive/purge', { data: { packs: [pack.id] } })
   }
 })
+
+test('an AI finds a sound over MCP by the word for it or by its own reading of it', async ({ api }) => {
+  const name = `E2E Sound tools ${unique()}`
+  const pack = await uploadPack(api, name, [
+    { relpath: 'take_1.wav', data: sound('thud', 1) },
+    { relpath: 'take_2.wav', data: sound('zap', 1) },
+    { relpath: 'take_3.wav', data: sound('rain', 1) },
+  ])
+  type Sound = { id: string; path: string; sounds: string; measured: Record<string, unknown>; urls: { listen: string } }
+  type Result = { isError: boolean; content: { text: string }[]; structuredContent: { sounds: Sound[]; reading?: Record<string, unknown> } & Sound }
+  const call = async (tool: string, args: object) => {
+    const r = await api.post('/mcp', { data: { jsonrpc: '2.0', id: 1, method: 'tools/call', params: { name: tool, arguments: args } } })
+    return ((await r.json()) as { result: Result }).result
+  }
+  try {
+    await waitReady(api, [pack.id])
+    const list = await api.post('/mcp', { data: { jsonrpc: '2.0', id: 1, method: 'tools/list' } })
+    const tools = ((await list.json()) as { result: { tools: { name: string }[] } }).result.tools.map((t) => t.name)
+    expect(tools).toEqual(expect.arrayContaining(['search_sounds', 'describe_sound', 'sounds_like']))
+
+    // The word, read by Hoard: a sharp start and a falling vowel is the laser.
+    const pew = (await call('search_sounds', { imitation: 'pew', pack_id: pack.id })).structuredContent
+    expect(pew.reading).toMatchObject({ attack: 'sharp', pitch: 'falling' })
+    const zap = pew.sounds[0]
+    expect(zap.path).toBe('take_2.wav')
+    expect(zap.sounds).toContain('pitch falls')
+    expect(typeof zap.measured.brightness_hz).toBe('number')
+    expect(zap.urls.listen).toMatch(/\/api\/assets\/[^/]+\/file$/)
+
+    // Or the caller's own reading, with no word at all.
+    const long = (await call('search_sounds', { shape: { texture: 'noisy', seconds: 3 }, pack_id: pack.id })).structuredContent
+    expect(long.sounds[0].path).toBe('take_3.wav')
+    const words = await call('search_sounds', { shape: { pitch: 'up' } })
+    expect(words.isError).toBe(true)
+    expect(words.content[0].text).toContain('falling, steady, rising')
+
+    const described = (await call('describe_sound', { id: zap.id })).structuredContent
+    expect(described.path).toBe('take_2.wav')
+    expect(described.sounds).toContain('starts sharply')
+
+    const alike = (await call('sounds_like', { id: zap.id })).structuredContent
+    expect(alike.sounds.map((s) => s.id)).not.toContain(zap.id)
+  } finally {
+    await api.post('/api/archive', { data: { packs: [pack.id] } })
+    await api.post('/api/archive/purge', { data: { packs: [pack.id] } })
+  }
+})

@@ -983,6 +983,9 @@ both connect.
 | `search_assets` | full-text + kind/tag/pack filters, with thumbnail and download URLs; `include_previews` returns the first 8 thumbnails as images |
 | `find_similar` | assets that look like a given one (colors, surface, near-copies), across every pack; same result shape as `search_assets` |
 | `find_by_color` | assets with much of a hex color in them, most of it first |
+| `search_sounds` | sounds ranked by how well what was measured of them fits a word imitating them (`imitation`: "WHOOOM", "pew") and the agent's own reading of it (`shape`: seconds, a sharp or soft attack, ringing on or cutting off, dark or bright, tonal or noisy, pitch falling or rising, loud), with how Hoard read the word; each sound comes with its measurements, the same in words and a link to listen |
+| `describe_sound` | what one sound sounds like, as measured, in numbers and words |
+| `sounds_like` | the sounds that sound like a given one, described the same way |
 | `get_asset` | full detail: metadata, tags with sources, links, what uses it, variants, identical copies, the thumbnail's colors |
 | `get_bundle` | download URLs and save-as paths for an asset and everything it needs, plus a zip URL |
 | `list_packs`, `list_tags`, `list_collections` | browse the library, its tag vocabulary and collections (`search_assets` takes `collection` too) |

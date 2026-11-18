@@ -103,9 +103,9 @@ on its own:
 - [ ] **CLAP embeddings**: sounds and text in one space, as CLIP does for images, so "glassy UI blip" or "distant
   thunder roll" find sounds whatever they're called. Off until an admin turns it on, like CLIP. The model's size and
   license are still to check.
-- [ ] **MCP**: `search_sounds(query, imitation, filters)` — the calling AI passes the raw word as `imitation` and its
-  own reading of it ("deep low whoosh, about a second, swelling") as `query` — returning each sound's measured
-  features and a preview link, plus `describe_sound(id)` and `sounds_like(id)`.
+- [x] **MCP**: `search_sounds` — the calling AI passes the raw word as `imitation` and its own reading of it ("a
+  deep whoosh, about a second, rising") as `shape`, which overrides that part of Hoard's reading — returning each
+  sound's measured features, the same in words and a link to listen, plus `describe_sound(id)` and `sounds_like(id)`.
 - [ ] **Search by imitation**: make the noise into the microphone, and sounds with that envelope and pitch shape are
   found.
 

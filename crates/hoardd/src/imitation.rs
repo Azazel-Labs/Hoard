@@ -8,23 +8,30 @@
 use crate::{AppState, db};
 use anyhow::Result;
 
-/// What a word says about the sound it imitates.
-#[derive(Debug, Clone, PartialEq)]
+/// What a word says about the sound it imitates, or what someone says it's like; nothing where it says nothing.
+#[derive(Debug, Clone, Default, PartialEq)]
 pub(crate) struct Shape {
     /// About how long, in seconds.
-    pub(crate) secs: f32,
+    pub(crate) secs: Option<f32>,
     /// A sharp attack (`true`) or a soft one; nothing for a start that says neither (a vowel, a hum).
     pub(crate) sharp: Option<bool>,
     /// How bright its sounds average to, in Hz.
-    pub(crate) brightness_hz: f32,
+    pub(crate) brightness_hz: Option<f32>,
     /// How much of it is hiss and air, as `sounds` measures noisiness (0 a pure tone, 1 white noise).
-    pub(crate) noisiness: f32,
+    pub(crate) noisiness: Option<f32>,
     /// How far its pitch moves, in octaves: vowels that move from dark to bright rise; anything else is steady.
-    pub(crate) sweep_octaves: f32,
+    pub(crate) sweep_octaves: Option<f32>,
     /// Rings on at the end (`true`) or cuts off.
     pub(crate) rings: Option<bool>,
     /// Written in capitals.
     pub(crate) loud: bool,
+}
+
+impl Shape {
+    /// Says nothing about a sound.
+    pub(crate) fn is_empty(&self) -> bool {
+        *self == Self::default()
+    }
 }
 
 /// One sound of the word.
@@ -155,16 +162,16 @@ pub(crate) fn read(word: &str) -> Option<Shape> {
     let letters: Vec<char> = word.chars().filter(char::is_ascii_alphabetic).collect();
     let upper = letters.iter().filter(|c| c.is_ascii_uppercase()).count();
     Some(Shape {
-        secs,
+        secs: Some(secs),
         sharp: match first {
             Part::Stop(_) => Some(true),
             // Breath fades in; a hiss can start at full ("shhh" is rain as much as a swell).
             Part::Air | Part::Hiss(2500.0) => Some(false),
             _ => None,
         },
-        brightness_hz: (log_hz / weight).exp2(),
-        noisiness: 0.12 + 0.6 * noise / weight,
-        sweep_octaves,
+        brightness_hz: Some((log_hz / weight).exp2()),
+        noisiness: Some(0.12 + 0.6 * noise / weight),
+        sweep_octaves: Some(sweep_octaves),
         rings: match last {
             Part::Hum => Some(true),
             Part::Stop(_) => Some(false),
@@ -213,28 +220,38 @@ fn past(x: f32, limit: f32, above: bool) -> f32 {
     if (octaves >= 0.0) == above { 1.0 } else { near(octaves, 0.0, 1.5) }
 }
 
-/// How well a sound fits the shape, 0 to 1.
+/// How well a sound fits the shape, 0 to 1, over what the shape says.
 pub(crate) fn score(shape: &Shape, m: &Measured) -> f32 {
-    let mut fits: Vec<(f32, f32)> = vec![
-        (1.0, near(m.secs.max(0.01).log2(), shape.secs.log2(), 1.2)),
-        (1.0, near(m.brightness_hz.max(20.0).log2(), shape.brightness_hz.log2(), 1.3)),
-        (0.8, near(m.noisiness, shape.noisiness, 0.18)),
-    ];
+    let mut fits: Vec<(f32, f32)> = Vec::new();
+    if let Some(secs) = shape.secs {
+        fits.push((1.0, near(m.secs.max(0.01).log2(), secs.max(0.01).log2(), 1.2)));
+    }
+    if let Some(hz) = shape.brightness_hz {
+        fits.push((1.0, near(m.brightness_hz.max(20.0).log2(), hz.max(20.0).log2(), 1.3)));
+    }
+    if let Some(noisiness) = shape.noisiness {
+        fits.push((0.8, near(m.noisiness, noisiness, 0.18)));
+    }
     if let (Some(sharp), Some(attack)) = (shape.sharp, m.attack_ms) {
         fits.push((1.0, if sharp { past(attack, 15.0, false) } else { past(attack, 60.0, true) }));
     }
     if let (Some(rings), Some(tail)) = (shape.rings, m.tail_ms) {
         fits.push((0.7, if rings { past(tail, 150.0, true) } else { past(tail, 80.0, false) }));
     }
-    let (sweep, measured) = (shape.sweep_octaves, m.sweep_octaves.unwrap_or(0.0));
-    // A word that stays put says less than vowels that move.
-    fits.push(if sweep == 0.0 { (0.5, near(measured, 0.0, 1.0)) } else { (1.0, near(measured, sweep, 0.8)) });
+    if let Some(sweep) = shape.sweep_octaves {
+        let measured = m.sweep_octaves.unwrap_or(0.0);
+        // A word that stays put says less than vowels that move.
+        fits.push(if sweep == 0.0 { (0.5, near(measured, 0.0, 1.0)) } else { (1.0, near(measured, sweep, 0.8)) });
+    }
     if shape.loud
         && let Some(rms) = m.rms_dbfs
     {
         fits.push((0.4, if rms >= -18.0 { 1.0 } else { near(rms, -18.0, 8.0) }));
     }
     let weight: f32 = fits.iter().map(|f| f.0).sum();
+    if weight == 0.0 {
+        return 0.0;
+    }
     fits.iter().map(|(w, f)| w * f).sum::<f32>() / weight
 }
 
@@ -245,7 +262,17 @@ const MAX: usize = 2000;
 
 /// Every measured sound's file that fits the word, with how well, best first.
 pub(crate) async fn rank(state: &AppState, word: &str) -> Result<Vec<(String, f32)>> {
-    let Some(shape) = read(word) else { return Ok(Vec::new()) };
+    match read(word) {
+        Some(shape) => rank_shape(state, shape).await,
+        None => Ok(Vec::new()),
+    }
+}
+
+/// Every measured sound's file that fits the shape, with how well, best first.
+pub(crate) async fn rank_shape(state: &AppState, shape: Shape) -> Result<Vec<(String, f32)>> {
+    if shape.is_empty() {
+        return Ok(Vec::new());
+    }
     db::call(&state.pool, move |c| {
         let mut stmt = c.prepare(
             "SELECT a.blob_hash, json_extract(a.meta, '$.duration_secs'), json_extract(a.meta, '$.attack_ms'),
@@ -293,24 +320,27 @@ mod tests {
         let whoom = read("WHOOOM").unwrap();
         assert_eq!(whoom.sharp, Some(false));
         assert_eq!(whoom.rings, Some(true));
-        assert!(whoom.loud && (0.7..1.5).contains(&whoom.secs) && whoom.brightness_hz < 800.0, "{whoom:?}");
-        assert_eq!(whoom.sweep_octaves, 0.0);
+        assert!(whoom.loud && (0.7..1.5).contains(&whoom.secs.unwrap()), "{whoom:?}");
+        assert!(whoom.brightness_hz.unwrap() < 800.0, "{whoom:?}");
+        assert_eq!(whoom.sweep_octaves, Some(0.0));
 
         // A sharp start and a vowel that falls; short.
         let pew = read("pew").unwrap();
         assert_eq!((pew.sharp, pew.loud), (Some(true), false));
-        assert!(pew.sweep_octaves < -1.0 && pew.secs < 0.5, "{pew:?}");
+        assert!(pew.sweep_octaves.unwrap() < -1.0 && pew.secs.unwrap() < 0.5, "{pew:?}");
         // Rising, the other way.
-        assert!(read("bweee").unwrap().sweep_octaves > 1.0);
+        assert!(read("bweee").unwrap().sweep_octaves.unwrap() > 1.0);
 
         // Hiss: bright and noisy, and drawn out it's long.
         let krssh = read("krssh").unwrap();
-        assert!(krssh.brightness_hz > 3000.0 && krssh.noisiness > 0.45 && krssh.sweep_octaves == 0.0, "{krssh:?}");
-        assert!(read("shhhhhh").unwrap().secs > 2.0);
+        assert!(krssh.brightness_hz.unwrap() > 3000.0 && krssh.noisiness.unwrap() > 0.45, "{krssh:?}");
+        assert_eq!(krssh.sweep_octaves, Some(0.0));
+        assert!(read("shhhhhh").unwrap().secs.unwrap() > 2.0);
 
         // A beep: sharp, bright, tonal, cut off.
         let beep = read("beep").unwrap();
-        assert!(beep.brightness_hz > 1500.0 && beep.noisiness < 0.25 && beep.rings == Some(false), "{beep:?}");
+        assert!(beep.brightness_hz.unwrap() > 1500.0 && beep.noisiness.unwrap() < 0.25, "{beep:?}");
+        assert_eq!(beep.rings, Some(false));
 
         assert_eq!(read("!!! 123"), None);
         assert_eq!(read("ka-BOOM").map(|s| s.loud), Some(true));

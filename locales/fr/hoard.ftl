@@ -422,6 +422,10 @@ root-unreachable-desktop = Hoard ne répond pas : { $error }
 root-desktop-reopen = Cette fenêtre a été déconnectée. Fermez Hoard et rouvrez-le pour continuer.
 root-try-again = Réessayer
 root-lazy-connect = la connexion de l’application
+window-minimize = Réduire
+window-maximize = Agrandir
+window-restore = Restaurer
+window-close = Fermer
 
 ## Application : la bibliothèque, sa barre supérieure et ses filtres
 

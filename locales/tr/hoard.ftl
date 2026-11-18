@@ -422,6 +422,10 @@ root-unreachable-desktop = Hoard yanıt vermiyor: { $error }
 root-desktop-reopen = Bu pencerenin oturumu kapatıldı. Devam etmek için Hoard'u kapatıp yeniden açın.
 root-try-again = Yeniden dene
 root-lazy-connect = uygulama bağlantısı
+window-minimize = Simge durumuna küçült
+window-maximize = Ekranı kapla
+window-restore = Önceki boyut
+window-close = Kapat
 
 ## Uygulama: kütüphane, üst çubuk ve filtreler
 

@@ -11140,3 +11140,19 @@ translation = "Subido, descomprimiendo"
 [messages.upload-waiting]
 source = "Waiting"
 translation = "En espera"
+
+[messages.window-close]
+source = "Close"
+translation = "Cerrar"
+
+[messages.window-maximize]
+source = "Maximize"
+translation = "Maximizar"
+
+[messages.window-minimize]
+source = "Minimize"
+translation = "Minimizar"
+
+[messages.window-restore]
+source = "Restore"
+translation = "Restaurar"

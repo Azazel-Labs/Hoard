@@ -430,6 +430,10 @@ root-unreachable-desktop = Hoard non risponde: { $error }
 root-desktop-reopen = Questa finestra è stata disconnessa. Chiudi Hoard e riaprilo per continuare.
 root-try-again = Riprova
 root-lazy-connect = la connessione dell'app
+window-minimize = Riduci a icona
+window-maximize = Ingrandisci
+window-restore = Ripristina
+window-close = Chiudi
 
 ## App: la libreria, la barra superiore e i filtri
 

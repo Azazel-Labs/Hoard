@@ -432,6 +432,10 @@ root-unreachable-desktop = Hoard neodpovídá: { $error }
 root-desktop-reopen = Toto okno bylo odhlášeno. Zavřete Hoard a znovu ho otevřete, abyste mohli pokračovat.
 root-try-again = Zkusit znovu
 root-lazy-connect = připojení aplikace
+window-minimize = Minimalizovat
+window-maximize = Maximalizovat
+window-restore = Obnovit
+window-close = Zavřít
 
 ## Aplikace: knihovna, horní lišta a filtry
 

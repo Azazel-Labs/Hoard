@@ -11105,3 +11105,19 @@ translation = "Caricato, ora in estrazione"
 [messages.upload-waiting]
 source = "Waiting"
 translation = "In attesa"
+
+[messages.window-close]
+source = "Close"
+translation = "Chiudi"
+
+[messages.window-maximize]
+source = "Maximize"
+translation = "Ingrandisci"
+
+[messages.window-minimize]
+source = "Minimize"
+translation = "Riduci a icona"
+
+[messages.window-restore]
+source = "Restore"
+translation = "Ripristina"

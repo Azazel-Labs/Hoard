@@ -11088,3 +11088,19 @@ translation = "Hochgeladen, wird entpackt"
 [messages.upload-waiting]
 source = "Waiting"
 translation = "Wartet"
+
+[messages.window-close]
+source = "Close"
+translation = "Schließen"
+
+[messages.window-maximize]
+source = "Maximize"
+translation = "Maximieren"
+
+[messages.window-minimize]
+source = "Minimize"
+translation = "Minimieren"
+
+[messages.window-restore]
+source = "Restore"
+translation = "Wiederherstellen"

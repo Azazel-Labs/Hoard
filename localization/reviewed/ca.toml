@@ -11094,3 +11094,19 @@ translation = "Pujat, ara s'està descomprimint"
 [messages.upload-waiting]
 source = "Waiting"
 translation = "En espera"
+
+[messages.window-close]
+source = "Close"
+translation = "Tanca"
+
+[messages.window-maximize]
+source = "Maximize"
+translation = "Maximitza"
+
+[messages.window-minimize]
+source = "Minimize"
+translation = "Minimitza"
+
+[messages.window-restore]
+source = "Restore"
+translation = "Restaura"

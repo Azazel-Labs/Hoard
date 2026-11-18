@@ -22,10 +22,22 @@
       .failed svg rect.tile { animation: none; opacity: 0.35; }
       #error { display: none; margin: 0; color: var(--danger); white-space: pre-wrap; overflow-wrap: anywhere; }
       .failed #error { display: block; }
+      /* The window has no frame of the system's: the page moves it, and these stand in for its buttons. */
+      nav { position: fixed; top: 0; right: 0; display: flex; height: 40px; }
+      .mac nav { display: none; }
+      nav button { display: grid; place-items: center; width: 46px; padding: 0; border: 0; background: transparent; color: var(--text); }
+      nav button:hover { background: color-mix(in srgb, var(--text) 10%, transparent); }
+      nav button.close:hover { background: #c42b1c; color: #fff; }
+      nav svg { width: 10px; height: 10px; fill: none; stroke: currentColor; stroke-width: 1; shape-rendering: crispEdges; }
     </style>
   </head>
-  <body>
-    <main>
+  <body data-tauri-drag-region>
+    <nav>
+      <button type="button" data-window="minimize"><svg viewBox="0 0 10 10"><path d="M0 5.5h10" /></svg></button>
+      <button type="button" data-window="toggle_maximize"><svg viewBox="0 0 10 10"><path d="M.5.5h9v9h-9z" /></svg></button>
+      <button type="button" data-window="close" class="close"><svg viewBox="0 0 10 10"><path d="M0 0l10 10M10 0L0 10" /></svg></button>
+    </nav>
+    <main data-tauri-drag-region="deep">
       <svg viewBox="0 0 32 32" aria-hidden="true">
         <rect width="32" height="32" rx="7" fill="#1c2230" />
         <rect class="tile" x="6" y="6" width="9" height="9" rx="2" fill="#5fb3a1" />
@@ -41,6 +53,9 @@
         document.getElementById('error').textContent = message
         document.body.classList.add('failed')
       }
+      if (navigator.userAgent.includes('Mac')) document.body.classList.add('mac')
+      for (const b of document.querySelectorAll('[data-window]'))
+        b.onclick = () => window.__TAURI_INTERNALS__?.invoke(`plugin:window|${b.dataset.window}`, { label: 'main' })
     </script>
   </body>
 </html>

@@ -11176,3 +11176,19 @@ translation = "Μεταφορτώθηκε, αποσυμπίεση"
 [messages.upload-waiting]
 source = "Waiting"
 translation = "Σε αναμονή"
+
+[messages.window-close]
+source = "Close"
+translation = "Κλείσιμο"
+
+[messages.window-maximize]
+source = "Maximize"
+translation = "Μεγιστοποίηση"
+
+[messages.window-minimize]
+source = "Minimize"
+translation = "Ελαχιστοποίηση"
+
+[messages.window-restore]
+source = "Restore"
+translation = "Επαναφορά"

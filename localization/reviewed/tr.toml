@@ -10906,3 +10906,19 @@ translation = "Yüklendi, şimdi açılıyor"
 [messages.upload-waiting]
 source = "Waiting"
 translation = "Bekliyor"
+
+[messages.window-close]
+source = "Close"
+translation = "Kapat"
+
+[messages.window-maximize]
+source = "Maximize"
+translation = "Ekranı kapla"
+
+[messages.window-minimize]
+source = "Minimize"
+translation = "Simge durumuna küçült"
+
+[messages.window-restore]
+source = "Restore"
+translation = "Önceki boyut"

@@ -426,6 +426,10 @@ root-unreachable-desktop = Το Hoard δεν απαντά: { $error }
 root-desktop-reopen = Αυτό το παράθυρο αποσυνδέθηκε. Κλείστε το Hoard και ανοίξτε το ξανά για να συνεχίσετε.
 root-try-again = Δοκιμάστε ξανά
 root-lazy-connect = σύνδεσης εφαρμογής
+window-minimize = Ελαχιστοποίηση
+window-maximize = Μεγιστοποίηση
+window-restore = Επαναφορά
+window-close = Κλείσιμο
 
 ## Εφαρμογή: η βιβλιοθήκη, η επάνω γραμμή και τα φίλτρα
 

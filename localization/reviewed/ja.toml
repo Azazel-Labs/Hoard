@@ -10892,3 +10892,19 @@ translation = "アップロード完了、展開中"
 [messages.upload-waiting]
 source = "Waiting"
 translation = "待機中"
+
+[messages.window-close]
+source = "Close"
+translation = "閉じる"
+
+[messages.window-maximize]
+source = "Maximize"
+translation = "最大化"
+
+[messages.window-minimize]
+source = "Minimize"
+translation = "最小化"
+
+[messages.window-restore]
+source = "Restore"
+translation = "元に戻す (縮小)"

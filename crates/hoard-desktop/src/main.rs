@@ -22,6 +22,7 @@ use std::thread::JoinHandle;
 use std::time::Duration;
 
 use anyhow::{Context as _, Result};
+use tauri::ipc::CapabilityBuilder;
 use tauri::webview::{DownloadEvent, NewWindowResponse};
 use tauri::{AppHandle, Manager as _, RunEvent, Url, WebviewUrl, WebviewWindow, WebviewWindowBuilder};
 use tauri_plugin_opener::OpenerExt as _;
@@ -33,6 +34,9 @@ const FIRST_PORT: u16 = 4627;
 const STOP_WAIT: Duration = Duration::from_secs(10);
 /// How often the app looks for an update while it's open, after looking when it starts.
 const UPDATE_CHECK: Duration = Duration::from_hours(6);
+/// Where macOS's window buttons go, from the window's top left, in the middle of the portal's header.
+#[cfg(target_os = "macos")]
+const TRAFFIC_LIGHTS: (f64, f64) = (18.0, 24.0);
 /// A log bigger than this starts over when the app does.
 const LOG_LIMIT: u64 = 16 * 1024 * 1024;
 
@@ -75,6 +79,8 @@ fn start(app: &AppHandle) -> Result<()> {
     let listen = SocketAddr::from((Ipv4Addr::LOCALHOST, port(&data)));
     tracing::info!(version = env!("CARGO_PKG_VERSION"), %listen, data = %data.display(), "starting Hoard");
 
+    // The page draws the window's title bar itself, with the portal's header in it (see `framed` below).
+    app.add_capability(framed(listen))?;
     let window = WebviewWindowBuilder::new(app, "main", WebviewUrl::App("index.html".into()))
         .title("Hoard")
         .inner_size(1440.0, 900.0)
@@ -98,8 +104,16 @@ fn start(app: &AppHandle) -> Result<()> {
         .on_download({
             let app = app.clone();
             move |_, event| download(&app, event)
-        })
-        .build()?;
+        });
+    // macOS keeps its own buttons, over the page's header; elsewhere the page draws them too.
+    #[cfg(target_os = "macos")]
+    let window = window
+        .title_bar_style(tauri::TitleBarStyle::Overlay)
+        .hidden_title(true)
+        .traffic_light_position(tauri::LogicalPosition::new(TRAFFIC_LIGHTS.0, TRAFFIC_LIGHTS.1));
+    #[cfg(not(target_os = "macos"))]
+    let window = window.decorations(false);
+    let window = window.build()?;
 
     let server = std::thread::Builder::new().name("hoardd".into()).spawn({
         let window = window.clone();
@@ -182,6 +196,24 @@ fn stop() {
             tracing::warn!(error = %e, "couldn't install the update");
         }
     }
+}
+
+/// What the window's pages may do to it, drawing their own title bar: drag it, double-click to maximize, and the
+/// minimize, maximize and close buttons. The app's own pages and the server's (at `listen`), in this window only.
+fn framed(listen: SocketAddr) -> CapabilityBuilder {
+    [
+        "core:window:allow-start-dragging",
+        "core:window:allow-internal-toggle-maximize",
+        "core:window:allow-minimize",
+        "core:window:allow-toggle-maximize",
+        "core:window:allow-is-maximized",
+        "core:window:allow-close",
+    ]
+    .into_iter()
+    .fold(
+        CapabilityBuilder::new("framed").window("main").remote(format!("http://{listen}/*")),
+        CapabilityBuilder::permission,
+    )
 }
 
 /// Bring the window forward (another copy of the app was started).

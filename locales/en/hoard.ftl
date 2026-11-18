@@ -480,6 +480,11 @@ root-desktop-reopen = This window was signed out. Close Hoard and open it again 
 root-try-again = Try again
 # Fills “Loading { $what }…” and “Couldn’t load { $what }.” while a page's code downloads.
 root-lazy-connect = the app connection
+# The desktop app's own buttons for its window, at the top right where the system's would be (Windows' words).
+window-minimize = Minimize
+window-maximize = Maximize
+window-restore = Restore
+window-close = Close
 
 ## App: the library, its top bar and filters
 

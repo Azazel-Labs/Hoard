@@ -11174,3 +11174,19 @@ translation = "Lähetetty, puretaan"
 [messages.upload-waiting]
 source = "Waiting"
 translation = "Odottaa"
+
+[messages.window-close]
+source = "Close"
+translation = "Sulje"
+
+[messages.window-maximize]
+source = "Maximize"
+translation = "Suurenna"
+
+[messages.window-minimize]
+source = "Minimize"
+translation = "Pienennä"
+
+[messages.window-restore]
+source = "Restore"
+translation = "Palauta"

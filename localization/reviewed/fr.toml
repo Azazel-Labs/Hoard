@@ -11134,3 +11134,19 @@ translation = "Envoyé, décompression en cours"
 [messages.upload-waiting]
 source = "Waiting"
 translation = "En attente"
+
+[messages.window-close]
+source = "Close"
+translation = "Fermer"
+
+[messages.window-maximize]
+source = "Maximize"
+translation = "Agrandir"
+
+[messages.window-minimize]
+source = "Minimize"
+translation = "Réduire"
+
+[messages.window-restore]
+source = "Restore"
+translation = "Restaurer"

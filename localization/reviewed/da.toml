@@ -11089,3 +11089,19 @@ translation = "Uploadet, pakker nu ud"
 [messages.upload-waiting]
 source = "Waiting"
 translation = "Venter"
+
+[messages.window-close]
+source = "Close"
+translation = "Luk"
+
+[messages.window-maximize]
+source = "Maximize"
+translation = "Maksimer"
+
+[messages.window-minimize]
+source = "Minimize"
+translation = "Minimer"
+
+[messages.window-restore]
+source = "Restore"
+translation = "Gendan"

@@ -26,7 +26,7 @@ onMounted(load)
 </script>
 
 <template>
-  <div class="setup" role="dialog" aria-modal="true" aria-labelledby="setup-title">
+  <div class="setup" data-tauri-drag-region role="dialog" aria-modal="true" aria-labelledby="setup-title">
     <div class="card">
       <p class="brand">{{ siteName() }}</p>
 

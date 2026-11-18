@@ -10845,3 +10845,19 @@ translation = "업로드 완료, 압축 푸는 중"
 [messages.upload-waiting]
 source = "Waiting"
 translation = "대기 중"
+
+[messages.window-close]
+source = "Close"
+translation = "닫기"
+
+[messages.window-maximize]
+source = "Maximize"
+translation = "최대화"
+
+[messages.window-minimize]
+source = "Minimize"
+translation = "최소화"
+
+[messages.window-restore]
+source = "Restore"
+translation = "이전 크기로 복원"

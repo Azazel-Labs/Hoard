@@ -422,6 +422,10 @@ root-unreachable-desktop = Hoard antwoord nie: { $error }
 root-desktop-reopen = Hierdie venster is afgemeld. Maak Hoard toe en maak dit weer oop om voort te gaan.
 root-try-again = Probeer weer
 root-lazy-connect = die toepverbinding
+window-minimize = Minimeer
+window-maximize = Maksimeer
+window-restore = Herstel
+window-close = Maak toe
 
 ## Toep: die biblioteek, sy boonste balk en filters
 

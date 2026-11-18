@@ -422,6 +422,10 @@ root-unreachable-desktop = Hoard 没有响应：{ $error }
 root-desktop-reopen = 此窗口已退出登录。请关闭 Hoard 并重新打开以继续。
 root-try-again = 重试
 root-lazy-connect = 应用连接
+window-minimize = 最小化
+window-maximize = 最大化
+window-restore = 还原
+window-close = 关闭
 
 ## 应用：资源库、顶栏和筛选
 

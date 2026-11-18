@@ -422,6 +422,10 @@ root-unreachable-desktop = Hoard reageert niet: { $error }
 root-desktop-reopen = Dit venster is afgemeld. Sluit Hoard en open het opnieuw om verder te gaan.
 root-try-again = Opnieuw proberen
 root-lazy-connect = de appverbinding
+window-minimize = Minimaliseren
+window-maximize = Maximaliseren
+window-restore = Vorige grootte
+window-close = Sluiten
 
 ## App: de bibliotheek, de bovenbalk en filters
 

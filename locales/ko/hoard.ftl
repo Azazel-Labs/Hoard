@@ -422,6 +422,10 @@ root-unreachable-desktop = Hoard가 응답하지 않습니다: { $error }
 root-desktop-reopen = 이 창은 로그아웃되었습니다. 계속하려면 Hoard를 닫았다가 다시 여세요.
 root-try-again = 다시 시도
 root-lazy-connect = 앱 연결
+window-minimize = 최소화
+window-maximize = 최대화
+window-restore = 이전 크기로 복원
+window-close = 닫기
 
 ## 앱: 라이브러리, 상단 바, 필터
 

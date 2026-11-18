@@ -422,6 +422,10 @@ root-unreachable-desktop = Hoard không phản hồi: { $error }
 root-desktop-reopen = Cửa sổ này đã bị đăng xuất. Hãy đóng Hoard rồi mở lại để tiếp tục.
 root-try-again = Thử lại
 root-lazy-connect = kết nối ứng dụng
+window-minimize = Thu nhỏ
+window-maximize = Phóng to
+window-restore = Khôi phục
+window-close = Đóng
 
 ## Ứng dụng: thư viện, thanh trên cùng và bộ lọc
 

@@ -422,6 +422,10 @@ root-unreachable-desktop = O Hoard não está respondendo: { $error }
 root-desktop-reopen = Esta janela foi desconectada. Feche o Hoard e abra-o de novo para continuar.
 root-try-again = Tentar de novo
 root-lazy-connect = a conexão do app
+window-minimize = Minimizar
+window-maximize = Maximizar
+window-restore = Restaurar
+window-close = Fechar
 
 ## App: a biblioteca, a barra superior e os filtros
 

@@ -422,6 +422,10 @@ root-unreachable-desktop = Hoard 沒有回應：{ $error }
 root-desktop-reopen = 此視窗已登出。請關閉 Hoard 並重新開啟以繼續。
 root-try-again = 再試一次
 root-lazy-connect = 應用程式連線
+window-minimize = 最小化
+window-maximize = 最大化
+window-restore = 還原
+window-close = 關閉
 
 ## 應用程式：素材庫、頂端列與篩選條件
 

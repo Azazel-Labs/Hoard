@@ -11323,3 +11323,19 @@ translation = "Nahráno, teď se rozbaluje"
 [messages.upload-waiting]
 source = "Waiting"
 translation = "Čeká"
+
+[messages.window-close]
+source = "Close"
+translation = "Zavřít"
+
+[messages.window-maximize]
+source = "Maximize"
+translation = "Maximalizovat"
+
+[messages.window-minimize]
+source = "Minimize"
+translation = "Minimalizovat"
+
+[messages.window-restore]
+source = "Restore"
+translation = "Obnovit"

@@ -432,6 +432,10 @@ root-unreachable-desktop = Hoard nu răspunde: { $error }
 root-desktop-reopen = Această fereastră a fost deconectată. Închide Hoard și deschide-l din nou pentru a continua.
 root-try-again = Încercați din nou
 root-lazy-connect = conexiunea aplicației
+window-minimize = Minimizare
+window-maximize = Maximizare
+window-restore = Restabilire
+window-close = Închidere
 
 ## Aplicația: biblioteca, bara de sus și filtrele
 

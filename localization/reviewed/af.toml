@@ -11087,3 +11087,19 @@ translation = "Opgelaai, pak nou uit"
 [messages.upload-waiting]
 source = "Waiting"
 translation = "Wag"
+
+[messages.window-close]
+source = "Close"
+translation = "Maak toe"
+
+[messages.window-maximize]
+source = "Maximize"
+translation = "Maksimeer"
+
+[messages.window-minimize]
+source = "Minimize"
+translation = "Minimeer"
+
+[messages.window-restore]
+source = "Restore"
+translation = "Herstel"

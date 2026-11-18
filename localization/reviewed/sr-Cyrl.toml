@@ -11215,3 +11215,19 @@ translation = "Отпремљено, сада се распакује"
 [messages.upload-waiting]
 source = "Waiting"
 translation = "На чекању"
+
+[messages.window-close]
+source = "Close"
+translation = "Затвори"
+
+[messages.window-maximize]
+source = "Maximize"
+translation = "Увећај"
+
+[messages.window-minimize]
+source = "Minimize"
+translation = "Умањи"
+
+[messages.window-restore]
+source = "Restore"
+translation = "Врати"

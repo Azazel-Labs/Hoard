@@ -430,6 +430,10 @@ root-unreachable-desktop = Hoard no responde: { $error }
 root-desktop-reopen = Se ha cerrado la sesión de esta ventana. Cierra Hoard y vuelve a abrirlo para continuar.
 root-try-again = Volver a intentarlo
 root-lazy-connect = la conexión de la aplicación
+window-minimize = Minimizar
+window-maximize = Maximizar
+window-restore = Restaurar
+window-close = Cerrar
 
 ## Aplicación: la biblioteca, su barra superior y los filtros
 

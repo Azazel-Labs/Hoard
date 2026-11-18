@@ -422,6 +422,10 @@ root-unreachable-desktop = A Hoard nem válaszol: { $error }
 root-desktop-reopen = Ez az ablak kijelentkezett. A folytatáshoz zárd be a Hoardot, majd nyisd meg újra.
 root-try-again = Újra
 root-lazy-connect = alkalmazáskapcsolat
+window-minimize = Kis méret
+window-maximize = Teljes méret
+window-restore = Előző méret
+window-close = Bezárás
 
 ## Alkalmazás: a könyvtár, a felső sáv és a szűrők
 

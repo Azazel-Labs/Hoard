@@ -430,6 +430,10 @@ root-unreachable-desktop = Hoard ei vastaa: { $error }
 root-desktop-reopen = Tämä ikkuna kirjattiin ulos. Sulje Hoard ja avaa se uudelleen jatkaaksesi.
 root-try-again = Yritä uudelleen
 root-lazy-connect = sovellusyhteys
+window-minimize = Pienennä
+window-maximize = Suurenna
+window-restore = Palauta
+window-close = Sulje
 
 ## Sovellus: kirjasto, yläpalkki ja suodattimet
 

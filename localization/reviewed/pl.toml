@@ -11344,3 +11344,19 @@ translation = "Przesłano, trwa rozpakowywanie"
 [messages.upload-waiting]
 source = "Waiting"
 translation = "Oczekiwanie"
+
+[messages.window-close]
+source = "Close"
+translation = "Zamknij"
+
+[messages.window-maximize]
+source = "Maximize"
+translation = "Maksymalizuj"
+
+[messages.window-minimize]
+source = "Minimize"
+translation = "Minimalizuj"
+
+[messages.window-restore]
+source = "Restore"
+translation = "Przywróć"

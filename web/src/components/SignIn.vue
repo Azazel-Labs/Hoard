@@ -61,7 +61,7 @@ async function submit() {
 </script>
 
 <template>
-  <div class="signin" :class="{ overlay }" role="dialog" aria-modal="true" :aria-labelledby="`${f}-title`" @keydown.esc="overlay && emit('close')">
+  <div class="signin" data-tauri-drag-region :class="{ overlay }" role="dialog" aria-modal="true" :aria-labelledby="`${f}-title`" @keydown.esc="overlay && emit('close')">
     <form :id="`${f}-form`" :name="f" class="card" method="post" :action="setup ? '/api/auth/setup' : '/api/auth/login'" @submit.prevent="submit">
       <p class="brand">{{ siteName() }}</p>
       <h1 :id="`${f}-title`">{{ setup ? t('signin-create-title') : t('signin-title') }}</h1>

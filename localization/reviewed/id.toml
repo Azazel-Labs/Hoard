@@ -10879,3 +10879,19 @@ translation = "Sudah diunggah, sekarang dibongkar"
 [messages.upload-waiting]
 source = "Waiting"
 translation = "Menunggu"
+
+[messages.window-close]
+source = "Close"
+translation = "Tutup"
+
+[messages.window-maximize]
+source = "Maximize"
+translation = "Maksimalkan"
+
+[messages.window-minimize]
+source = "Minimize"
+translation = "Minimalkan"
+
+[messages.window-restore]
+source = "Restore"
+translation = "Pulihkan"

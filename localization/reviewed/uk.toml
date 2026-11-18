@@ -11417,3 +11417,19 @@ translation = "Вивантажено, триває розпакування"
 [messages.upload-waiting]
 source = "Waiting"
 translation = "Очікування"
+
+[messages.window-close]
+source = "Close"
+translation = "Закрити"
+
+[messages.window-maximize]
+source = "Maximize"
+translation = "Розгорнути"
+
+[messages.window-minimize]
+source = "Minimize"
+translation = "Згорнути"
+
+[messages.window-restore]
+source = "Restore"
+translation = "Відновити"

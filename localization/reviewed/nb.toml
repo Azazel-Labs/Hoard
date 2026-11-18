@@ -11091,3 +11091,19 @@ translation = "Lastet opp, pakker nå ut"
 [messages.upload-waiting]
 source = "Waiting"
 translation = "Venter"
+
+[messages.window-close]
+source = "Close"
+translation = "Lukk"
+
+[messages.window-maximize]
+source = "Maximize"
+translation = "Maksimer"
+
+[messages.window-minimize]
+source = "Minimize"
+translation = "Minimer"
+
+[messages.window-restore]
+source = "Restore"
+translation = "Gjenopprett"

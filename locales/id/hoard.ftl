@@ -422,6 +422,10 @@ root-unreachable-desktop = Hoard tidak merespons: { $error }
 root-desktop-reopen = Jendela ini telah keluar. Tutup Hoard lalu buka lagi untuk melanjutkan.
 root-try-again = Coba lagi
 root-lazy-connect = koneksi aplikasi
+window-minimize = Minimalkan
+window-maximize = Maksimalkan
+window-restore = Pulihkan
+window-close = Tutup
 
 ## Aplikasi: pustaka, bilah atas, dan filter
 

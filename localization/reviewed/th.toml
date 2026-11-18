@@ -10878,3 +10878,19 @@ translation = "อัปโหลดแล้ว กำลังแตกไฟ�
 [messages.upload-waiting]
 source = "Waiting"
 translation = "กำลังรอ"
+
+[messages.window-close]
+source = "Close"
+translation = "ปิด"
+
+[messages.window-maximize]
+source = "Maximize"
+translation = "ขยายใหญ่สุด"
+
+[messages.window-minimize]
+source = "Minimize"
+translation = "ย่อเล็กสุด"
+
+[messages.window-restore]
+source = "Restore"
+translation = "คืนค่าลง"

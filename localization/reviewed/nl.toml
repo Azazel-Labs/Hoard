@@ -11091,3 +11091,19 @@ translation = "Geüpload, nu uitpakken"
 [messages.upload-waiting]
 source = "Waiting"
 translation = "Wachten"
+
+[messages.window-close]
+source = "Close"
+translation = "Sluiten"
+
+[messages.window-maximize]
+source = "Maximize"
+translation = "Maximaliseren"
+
+[messages.window-minimize]
+source = "Minimize"
+translation = "Minimaliseren"
+
+[messages.window-restore]
+source = "Restore"
+translation = "Vorige grootte"

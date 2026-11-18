@@ -422,6 +422,10 @@ root-unreachable-desktop = Hoard ไม่ตอบสนอง: { $error }
 root-desktop-reopen = หน้าต่างนี้ออกจากระบบแล้ว ปิด Hoard แล้วเปิดใหม่อีกครั้งเพื่อใช้งานต่อ
 root-try-again = ลองอีกครั้ง
 root-lazy-connect = การเชื่อมต่อแอป
+window-minimize = ย่อเล็กสุด
+window-maximize = ขยายใหญ่สุด
+window-restore = คืนค่าลง
+window-close = ปิด
 
 ## แอป: คลัง แถบด้านบน และตัวกรอง
 

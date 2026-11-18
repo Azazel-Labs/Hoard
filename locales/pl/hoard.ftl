@@ -434,6 +434,10 @@ root-unreachable-desktop = Hoard nie odpowiada: { $error }
 root-desktop-reopen = To okno zostało wylogowane. Zamknij Hoarda i otwórz go ponownie, aby kontynuować.
 root-try-again = Spróbuj ponownie
 root-lazy-connect = połączenia aplikacji
+window-minimize = Minimalizuj
+window-maximize = Maksymalizuj
+window-restore = Przywróć
+window-close = Zamknij
 
 ## Aplikacja: biblioteka, górny pasek i filtry
 

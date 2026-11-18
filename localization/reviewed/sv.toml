@@ -11092,3 +11092,19 @@ translation = "Uppladdat, packar upp"
 [messages.upload-waiting]
 source = "Waiting"
 translation = "Väntar"
+
+[messages.window-close]
+source = "Close"
+translation = "Stäng"
+
+[messages.window-maximize]
+source = "Maximize"
+translation = "Maximera"
+
+[messages.window-minimize]
+source = "Minimize"
+translation = "Minimera"
+
+[messages.window-restore]
+source = "Restore"
+translation = "Återställ"

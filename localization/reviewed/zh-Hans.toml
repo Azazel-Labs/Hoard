@@ -10892,3 +10892,19 @@ translation = "已上传，正在解压"
 [messages.upload-waiting]
 source = "Waiting"
 translation = "等待中"
+
+[messages.window-close]
+source = "Close"
+translation = "关闭"
+
+[messages.window-maximize]
+source = "Maximize"
+translation = "最大化"
+
+[messages.window-minimize]
+source = "Minimize"
+translation = "最小化"
+
+[messages.window-restore]
+source = "Restore"
+translation = "还原"

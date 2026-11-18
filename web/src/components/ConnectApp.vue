@@ -32,7 +32,7 @@ async function answer(allow: boolean) {
 </script>
 
 <template>
-  <div class="connect">
+  <div class="connect" data-tauri-drag-region>
     <div class="card" role="dialog" aria-labelledby="connect-title">
       <p class="brand">{{ siteName() }}</p>
       <template v-if="info">

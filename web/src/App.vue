@@ -1312,7 +1312,7 @@ const commands = computed<Command[]>(() => {
     @dragleave="onDragLeave"
     @drop.prevent="onDrop"
   >
-    <header class="top">
+    <header class="top" data-tauri-drag-region="deep">
       <a href="#" class="brand" :title="stats?.version ? t('app-home-version', { version: stats.version }) : t('app-home')" @click.prevent="goHome">
         <svg viewBox="0 0 32 32" width="24" height="24" aria-hidden="true">
           <rect x="3" y="3" width="12" height="12" rx="2.5" fill="var(--k-texture)" />
@@ -1885,6 +1885,8 @@ const commands = computed<Command[]>(() => {
   display: flex; align-items: center; gap: 1rem;
   padding: 0.6rem 1rem; border-bottom: 1px solid var(--line); background: var(--panel);
 }
+:global(html.framed .top) { padding-right: calc(3 * 46px + 0.5rem); }
+:global(html.framed-mac .top) { padding-left: 84px; }
 .brand {
   display: flex; align-items: center; gap: 0.5rem; font-weight: 750; font-size: var(--step-1); font-variation-settings: 'CASL' 1;
   color: inherit; text-decoration: none; border-radius: 6px;
@@ -2150,6 +2152,8 @@ const commands = computed<Command[]>(() => {
   .app, .app.with-detail { grid-template-columns: minmax(0, 1fr); grid-template-areas: 'top' 'token' 'main'; }
   .top { flex-wrap: wrap; gap: 0.6rem; padding: 0.55rem 0.75rem; }
   .search { order: 3; flex-basis: 100%; max-width: none; }
+  /* The search's own row runs under the window's buttons, to the edge. */
+  :global(html.framed .top .search) { margin-right: calc(-3 * 46px); }
   .slash { display: none; }
   .brand span { display: inline; }
   .views { margin-left: auto; }

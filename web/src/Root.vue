@@ -3,11 +3,15 @@
 import { onMounted } from 'vue'
 import App from './App.vue'
 import SignIn from './components/SignIn.vue'
+import WindowControls from './components/WindowControls.vue'
 import { auth, canBrowse, isDesktop, refreshAuth } from './auth'
 import { lazy } from './lazy'
 import { t } from './i18n'
 
 const ConnectApp = lazy(() => import('./components/ConnectApp.vue'), () => t('root-lazy-connect'))
+
+/** Inside the desktop app's window, which has no frame of the system's (any other browser on its server has one). */
+const framed = '__TAURI_INTERNALS__' in window
 
 /** An app signing in over OAuth (see `oauth.rs`): sign in if need be, then allow or cancel. */
 const connecting = location.pathname === '/oauth/authorize'
@@ -21,6 +25,7 @@ async function signedIn() {
 </script>
 
 <template>
+  <WindowControls v-if="framed" />
   <div v-if="!auth.status && auth.error" class="unreachable" role="alert">
     <p>{{ t('root-unreachable', { error: auth.error }) }}</p>
     <button type="button" class="btn" @click="refreshAuth">{{ t('root-try-again') }}</button>

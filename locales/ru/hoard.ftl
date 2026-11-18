@@ -434,6 +434,10 @@ root-unreachable-desktop = Hoard не отвечает: { $error }
 root-desktop-reopen = В этом окне выполнен выход. Закройте Hoard и откройте его снова, чтобы продолжить.
 root-try-again = Попробовать снова
 root-lazy-connect = подключение приложения
+window-minimize = Свернуть
+window-maximize = Развернуть
+window-restore = Свернуть в окно
+window-close = Закрыть
 
 ## Приложение: библиотека, верхняя панель и фильтры
 

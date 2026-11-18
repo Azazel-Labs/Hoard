@@ -11098,3 +11098,19 @@ translation = "Carregado, agora a descomprimir"
 [messages.upload-waiting]
 source = "Waiting"
 translation = "À espera"
+
+[messages.window-close]
+source = "Close"
+translation = "Fechar"
+
+[messages.window-maximize]
+source = "Maximize"
+translation = "Maximizar"
+
+[messages.window-minimize]
+source = "Minimize"
+translation = "Minimizar"
+
+[messages.window-restore]
+source = "Restore"
+translation = "Restaurar"

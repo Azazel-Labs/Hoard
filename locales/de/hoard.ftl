@@ -426,6 +426,10 @@ root-unreachable-desktop = Hoard antwortet nicht: { $error }
 root-desktop-reopen = Dieses Fenster wurde abgemeldet. Schließen Sie Hoard und öffnen Sie es erneut, um weiterzumachen.
 root-try-again = Erneut versuchen
 root-lazy-connect = App-Verbindung
+window-minimize = Minimieren
+window-maximize = Maximieren
+window-restore = Wiederherstellen
+window-close = Schließen
 
 ## App: die Bibliothek, ihre obere Leiste und Filter
 

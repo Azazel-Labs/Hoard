@@ -422,6 +422,10 @@ root-unreachable-desktop = Hoard no respon: { $error }
 root-desktop-reopen = Aquesta finestra ha tancat la sessió. Tanqueu Hoard i torneu-lo a obrir per continuar.
 root-try-again = Torna-ho a provar
 root-lazy-connect = la connexió de l'aplicació
+window-minimize = Minimitza
+window-maximize = Maximitza
+window-restore = Restaura
+window-close = Tanca
 
 ## Aplicació: la biblioteca, la barra superior i els filtres
 

@@ -11320,3 +11320,19 @@ translation = "Încărcat, acum se dezarhivează"
 [messages.upload-waiting]
 source = "Waiting"
 translation = "În așteptare"
+
+[messages.window-close]
+source = "Close"
+translation = "Închidere"
+
+[messages.window-maximize]
+source = "Maximize"
+translation = "Maximizare"
+
+[messages.window-minimize]
+source = "Minimize"
+translation = "Minimizare"
+
+[messages.window-restore]
+source = "Restore"
+translation = "Restabilire"

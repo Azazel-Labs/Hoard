@@ -422,6 +422,10 @@ root-unreachable-desktop = Hoard svarer ikke: { $error }
 root-desktop-reopen = Dette vinduet er logget ut. Lukk Hoard og åpne det igjen for å fortsette.
 root-try-again = Prøv igjen
 root-lazy-connect = app-tilkoblingen
+window-minimize = Minimer
+window-maximize = Maksimer
+window-restore = Gjenopprett
+window-close = Lukk
 
 ## App: biblioteket, topplinjen og filtrene
 

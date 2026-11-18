@@ -422,6 +422,10 @@ root-unreachable-desktop = Hoard svarar inte: { $error }
 root-desktop-reopen = Det här fönstret har loggats ut. Stäng Hoard och öppna det igen för att fortsätta.
 root-try-again = Försök igen
 root-lazy-connect = appanslutningen
+window-minimize = Minimera
+window-maximize = Maximera
+window-restore = Återställ
+window-close = Stäng
 
 ## App: biblioteket, dess övre fält och filter
 

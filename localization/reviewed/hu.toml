@@ -10902,3 +10902,19 @@ translation = "Feltöltve, kicsomagolás folyamatban"
 [messages.upload-waiting]
 source = "Waiting"
 translation = "Várakozás"
+
+[messages.window-close]
+source = "Close"
+translation = "Bezárás"
+
+[messages.window-maximize]
+source = "Maximize"
+translation = "Teljes méret"
+
+[messages.window-minimize]
+source = "Minimize"
+translation = "Kis méret"
+
+[messages.window-restore]
+source = "Restore"
+translation = "Előző méret"

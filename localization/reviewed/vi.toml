@@ -10875,3 +10875,19 @@ translation = "Đã tải lên, đang giải nén"
 [messages.upload-waiting]
 source = "Waiting"
 translation = "Đang chờ"
+
+[messages.window-close]
+source = "Close"
+translation = "Đóng"
+
+[messages.window-maximize]
+source = "Maximize"
+translation = "Phóng to"
+
+[messages.window-minimize]
+source = "Minimize"
+translation = "Thu nhỏ"
+
+[messages.window-restore]
+source = "Restore"
+translation = "Khôi phục"

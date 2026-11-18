@@ -422,6 +422,10 @@ root-unreachable-desktop = Hoard が応答していません: { $error }
 root-desktop-reopen = このウィンドウはサインアウトされました。続けるには Hoard を閉じてもう一度開いてください。
 root-try-again = 再試行
 root-lazy-connect = アプリ接続
+window-minimize = 最小化
+window-maximize = 最大化
+window-restore = 元に戻す (縮小)
+window-close = 閉じる
 
 ## アプリ: ライブラリ、上部バー、フィルター
 

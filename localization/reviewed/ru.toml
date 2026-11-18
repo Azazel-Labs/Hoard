@@ -11384,3 +11384,19 @@ translation = "Загружено, распаковываем"
 [messages.upload-waiting]
 source = "Waiting"
 translation = "Ожидание"
+
+[messages.window-close]
+source = "Close"
+translation = "Закрыть"
+
+[messages.window-maximize]
+source = "Maximize"
+translation = "Развернуть"
+
+[messages.window-minimize]
+source = "Minimize"
+translation = "Свернуть"
+
+[messages.window-restore]
+source = "Restore"
+translation = "Свернуть в окно"

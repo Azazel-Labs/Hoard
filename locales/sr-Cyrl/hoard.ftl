@@ -432,6 +432,10 @@ root-unreachable-desktop = Hoard не одговара: { $error }
 root-desktop-reopen = Овај прозор је одјављен. Затворите Hoard и поново га отворите да бисте наставили.
 root-try-again = Покушај поново
 root-lazy-connect = веза апликације
+window-minimize = Умањи
+window-maximize = Увећај
+window-restore = Врати
+window-close = Затвори
 
 ## Апликација: библиотека, горња трака и филтери
 

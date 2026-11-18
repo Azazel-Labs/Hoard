@@ -1,10 +1,11 @@
 // Thumbnails drawn by this browser. The 3D viewer draws a model with its textures, which the server's renderer can't
 // always find or read; once it has, the picture it makes replaces the server's thumbnail. The server keeps the best
-// one it's been given: a drawing with every texture beats one with some missing, which beats its own.
+// one it's been given: a drawing with every texture beats one with some missing, which beats its own. Lottie
+// animations, which the server can't draw at all, get theirs here too.
 import { reactive } from 'vue'
 import { api, type Asset, type ThumbSource, type ThumbUpload } from './api'
 import { auth } from './auth'
-import { isModelAsset } from './viewers'
+import { isLottieAsset, isModelAsset } from './viewers'
 // Types only: three.js loads with the viewer, not with this module.
 import type { ModelStage } from './modelStage'
 
@@ -18,7 +19,7 @@ export function canDrawThumbs(): boolean {
 
 /** Whether a drawing from this browser could improve on the thumbnail the asset has. */
 export function wantsBrowserThumb(a: Asset): boolean {
-  return canDrawThumbs() && isModelAsset(a) && a.thumb_source !== 'browser'
+  return canDrawThumbs() && (isModelAsset(a) || isLottieAsset(a)) && a.thumb_source !== 'browser'
 }
 
 /**
@@ -66,7 +67,7 @@ export function cancelThumbRun() {
 
 async function packModels(packId: string): Promise<Asset[]> {
   const out: Asset[] = []
-  for (const kind of ['model', 'animation']) {
+  for (const kind of ['model', 'animation', 'vector']) {
     for (let offset = 0; ; ) {
       const r = await api.search({ pack: packId, kind, limit: 500, offset, sort: 'name' })
       out.push(...r.items)
@@ -78,7 +79,7 @@ async function packModels(packId: string): Promise<Asset[]> {
 }
 
 /**
- * Draw every model in a pack that hasn't a full browser thumbnail yet, one at a time, in a viewer kept out of sight.
+ * Draw every model (and Lottie animation) in a pack that hasn't a full browser thumbnail yet, one at a time, in a viewer kept out of sight.
  * `cancelThumbRun` stops it after the model being drawn.
  */
 export async function makePackThumbs(packId: string, packName: string): Promise<void> {
@@ -97,6 +98,16 @@ export async function makePackThumbs(packId: string, packName: string): Promise<
     for (const a of models) {
       if (canceled) break
       thumbRun.current = a.name
+      if (isLottieAsset(a)) {
+        try {
+          const { drawLottieThumb } = await import('./lottie')
+          if ((await drawLottieThumb(a))?.replaced) thumbRun.improved++
+        } catch {
+          thumbRun.failed++
+        }
+        thumbRun.done++
+        continue
+      }
       const stage = new ModelStage(host)
       try {
         await stage.load(a)

@@ -7,7 +7,8 @@
 //! - **Frame sheets** of Aseprite files: every frame side by side, for the portal to play (see
 //!   `textures::aseprite_sheet`). Made on first request and stored as the `frames` derivative.
 //! - **Thumbnails drawn by a browser**: the 3D viewer draws a model with all its textures, lit as it shows it, and a
-//!   signed-in person's browser sends that picture to replace the server's. Where a thumbnail came from is kept, so
+//!   signed-in person's browser sends that picture to replace the server's. A Lottie animation's only thumbnail is
+//!   the one a browser draws. Where a thumbnail came from is kept, so
 //!   a worse one never replaces a better one and re-analysis leaves it be.
 
 use crate::i18n::tr;
@@ -205,7 +206,12 @@ pub(crate) async fn asset_frames(
 }
 
 /// Keep a picture made from an asset as its derivative of this kind; returns the picture's hash.
-async fn save_derivative(state: &AppState, id: String, kind: &'static str, bytes: Vec<u8>) -> ApiResult<String> {
+pub(crate) async fn save_derivative(
+    state: &AppState,
+    id: String,
+    kind: &'static str,
+    bytes: Vec<u8>,
+) -> ApiResult<String> {
     let blob = state.blobs.put_cache_bytes(bytes).await?;
     let (hash, size) = (blob.hash.clone(), i64::try_from(blob.size).unwrap_or(i64::MAX));
     db::call(&state.pool, move |c| {
@@ -262,15 +268,25 @@ pub(crate) async fn put_thumb(
         return Err(AppError::bad_request(tr!("error-thumbnail-too-big")));
     }
     let id2 = id.clone();
-    let (kind, current, old) = db::call(&state.pool, move |c| {
-        Ok(c.query_row("SELECT kind, thumb_source, thumb_hash FROM assets WHERE id = ?1", [&id2], |r| {
-            Ok((r.get::<_, String>(0)?, r.get::<_, Option<String>>(1)?, r.get::<_, Option<String>>(2)?))
-        })
+    let (kind, current, old, lottie) = db::call(&state.pool, move |c| {
+        Ok(c.query_row(
+            "SELECT kind, thumb_source, thumb_hash, json_extract(meta, '$.lottie') IS NOT NULL FROM assets WHERE id = ?1",
+            [&id2],
+            |r| {
+                Ok((
+                    r.get::<_, String>(0)?,
+                    r.get::<_, Option<String>>(1)?,
+                    r.get::<_, Option<String>>(2)?,
+                    r.get::<_, bool>(3)?,
+                ))
+            },
+        )
         .optional()?)
     })
     .await?
     .ok_or_else(|| AppError::not_found(tr!("error-asset-not-found", id = id)))?;
-    if !matches!(kind.as_str(), "model" | "animation") {
+    // Models, and Lottie animations, which only a browser draws.
+    if !matches!(kind.as_str(), "model" | "animation") && !lottie {
         return Err(AppError::bad_request(tr!("error-thumbnail-models-only")));
     }
     if rank(current.as_deref()) > rank(Some(source)) {

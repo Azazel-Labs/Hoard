@@ -70,8 +70,8 @@ tile sheets that come with only a note of their grid (Kenney's `Tilesheet.txt`).
   `.meta` is kept in the pack and becomes the sheet, its image the page.
 - [x] **DragonBones texture atlases** (`_tex.json`) as sheets.
 - [ ] **DragonBones skeletons** (`_ske.json`) played on their atlas.
-- [ ] **Lottie / Bodymovin** (`.json`, `.lottie`): vector animations, common for UI. Played in the details panel
-  (lottie-web or dotLottie), the thumbnail drawn by the browser as the 3D viewer's is.
+- [x] **Lottie / Bodymovin** (`.json`, `.lottie`): vector animations, common for UI. Played in the details panel
+  with lottie-web, the thumbnail drawn by the browser as the 3D viewer's is.
 - [ ] **Rive** (`.riv`), played with its free web runtime.
 - [ ] **Spine skeletons** (`.json`, `.skel`): the atlas is read already. Playing the rig needs Spine's runtime, whose
   license only covers people who hold a Spine license, which is the open question.

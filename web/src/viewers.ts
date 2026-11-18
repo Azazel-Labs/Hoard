@@ -26,12 +26,19 @@ export function isModelAsset(a: Asset): boolean {
   return (a.kind === 'model' || a.kind === 'animation') && (VIEWABLE_EXTS.has(a.ext) || a.derivatives.includes('glb'))
 }
 
+/** A Lottie animation, which the side panel plays. */
+export function isLottieAsset(a: Asset): boolean {
+  return a.kind === 'vector' && a.meta?.lottie != null
+}
+
 export function isTextAsset(a: Asset): boolean {
   return TEXT_EXTS.has(a.ext.toLowerCase())
 }
 
 /** The viewer a double-click opens, or null when the side panel is all there is. */
 export function viewerFor(a: Asset): ViewerKind | null {
+  // Played in the side panel; full screen would only show its thumbnail.
+  if (isLottieAsset(a)) return null
   if ((a.kind === 'texture' || a.kind === 'vector') && a.has_thumb) return 'image'
   if (isMaterialAsset(a)) return 'material'
   // A .gltf is JSON too, but the model viewer is what anyone wants.

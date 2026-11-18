@@ -296,6 +296,7 @@ pub(crate) fn analyze(path: &Path, root: &Path, kind: AssetKind, ext: &str) -> A
         AssetKind::Model if ext == "blend" => analyze_blend(path, &mut a),
         AssetKind::Texture if crate::textures::EXTS.contains(&ext) => analyze_decoded(path, ext, &mut a),
         AssetKind::Texture => analyze_image(path, ext, &mut a),
+        AssetKind::Vector if ext == "lottie" => analyze_dotlottie(path, &mut a),
         AssetKind::Vector if crate::textures::VECTOR.contains(&ext) => analyze_decoded(path, ext, &mut a),
         AssetKind::Audio if crate::music::EXTS.contains(&ext) => analyze_music(path, ext, &mut a),
         AssetKind::Audio => analyze_sound(path, ext, &mut a),
@@ -797,7 +798,8 @@ fn tileability(img: &DynamicImage) -> (bool, bool) {
 
 /// Unreal packages: class, engine version, the editor's thumbnail, registry tags, and any source file that was
 /// kept inside (a `SoundWave`'s WAV, a UE4 texture's PNG), which then gets analyzed like the real thing.
-/// JSON written by Hoard's Unreal converter: a material (parameters, PBR slots) or a data table.
+/// JSON written by Hoard's Unreal converter (a material's parameters and PBR slots, or a data table), or a Lottie
+/// animation, a vector drawing that plays.
 fn analyze_converted_json(path: &Path, a: &mut Analysis) -> anyhow::Result<()> {
     if std::fs::metadata(path)?.len() > 8 << 20 {
         return Ok(());
@@ -815,12 +817,23 @@ fn analyze_converted_json(path: &Path, a: &mut Analysis) -> anyhow::Result<()> {
         if let Some(p) = doc.get("parent").and_then(Value::as_str) {
             m.insert("parent".into(), json!(p));
         }
+    } else if let Some(facts) = crate::lottie::facts(&doc) {
+        a.kind = Some(AssetKind::Vector);
+        m.extend(facts);
     } else if format.starts_with("hoard-datatable/") {
         m.insert("rows".into(), json!(doc.get("rows").and_then(Value::as_object).map_or(0, Map::len)));
         if let Some(s) = doc.get("row_struct").and_then(Value::as_str) {
             m.insert("row_struct".into(), json!(s));
         }
     }
+    Ok(())
+}
+
+fn analyze_dotlottie(path: &Path, a: &mut Analysis) -> anyhow::Result<()> {
+    anyhow::ensure!(std::fs::metadata(path)?.len() <= crate::lottie::MAX_FILE, "too big to read");
+    let doc = crate::lottie::from_dotlottie(&std::fs::read(path)?)?;
+    let facts = crate::lottie::facts(&doc).ok_or_else(|| anyhow::anyhow!("not a Lottie animation"))?;
+    a.meta.extend(facts);
     Ok(())
 }
 

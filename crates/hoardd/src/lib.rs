@@ -53,6 +53,7 @@ mod llm;
 mod local_llm;
 mod locations;
 mod looks;
+mod lottie;
 mod maintenance;
 mod materials;
 mod mcp;

@@ -333,6 +333,8 @@ software rasterizer (`apt install mesa-vulkan-drivers`). Without any adapter, ev
      pixels, and goes wherever a library location takes textures. SVGs render with their text (system fonts, DejaVu
      in the Docker image). Illustrator files (`.ai`) render their first artboard from the PDF inside them, or show
      the preview they carry when they have none (Illustrator 8 and earlier, or saved without PDF content).
+     Lottie animations (Bodymovin's `.json`, and dotLottie's `.lottie`) are vector art too, with their size, frame
+     rate, length and layer count, and play in their details, images and all; the browser draws their thumbnails.
    - Pictures that move: an animated GIF, PNG or WebP says how many frames it has and how long it plays (`frames`,
      `duration_ms`), and plays in its details (up to 16 MB) and on its tile while the pointer is over it (up to
      4 MB). An Aseprite file of more than one frame plays in its details too, at each frame's own time and through
@@ -571,7 +573,8 @@ New packs are looked through as they come in, and packs already in the library o
 signed in and open a model, once it's shown with its textures, the viewer's picture (same angle and framing as the
 server's) becomes the asset's thumbnail. A picture with every texture is never replaced by one with some missing,
 and neither is replaced by the server's, including when the pack is re-analyzed. For a whole pack, More → Make
-thumbnails in this browser opens each model out of sight, one at a time, with progress and Cancel.
+thumbnails in this browser opens each model out of sight, one at a time, with progress and Cancel. Lottie
+animations, which the server doesn't draw, get their thumbnails the same way.
 
 **Big textures.** The image viewer opens a big texture as its light preview and shows both sizes (pixels and bytes).
 Zooming in past the preview's pixels, Full resolution or F loads the file itself. The 3D viewers load light previews
@@ -1217,6 +1220,7 @@ browser session's changes must also carry an `X-Hoard` header, which pages on ot
 | GET | `/api/assets/{id}/thumb` | thumbnail (`?v=` its `thumb_rev`, for a URL that's cached for good) |
 | PUT 🔒 | `/api/assets/{id}/thumb` | a model's thumbnail drawn by a browser (PNG/JPEG/WebP body, `?source=browser` or `browser-partial`); kept only if it's no worse than the one there |
 | GET | `/api/assets/{id}/lite` | a texture's light preview (at most 2048 px), made on first request if it has none |
+| GET | `/api/assets/{id}/lottie.json` | a Lottie animation to play: a `.json` as it is, a `.lottie`'s first animation with its images inlined |
 | GET | `/api/assets/{id}/frames.png` | an Aseprite file's frames on one sheet, as many columns as rows, each its `width`×`height`, to play with its `frame_ms` |
 | GET | `/api/assets/{id}/original` | the file as it came in, when it was converted on ingest |
 | GET | `/api/assets/{id}/derivative/{kind}` | `glb`, `views`, or `source` (a recovered WAV/PNG) |
@@ -1409,8 +1413,8 @@ What's planned next is in [docs/roadmap.md](docs/roadmap.md).
 
 | | |
 |---|---|
-| File types recognized | 156 extensions in 13 kinds, from PNG and WAV to `.uasset` and `.skp` |
-| Read natively, no other app | glTF/GLB, FBX (binary and ASCII), OBJ, STL, PLY, 3DS, MagicaVoxel, 3MF, USD/USDA/USDC/USDZ, SketchUp 3 to today, Unreal packages from UE 4.x to 5.7, PSD/PSB, Krita, OpenRaster, Aseprite, DDS, KTX2, Basis, EXR, HDR, SVG, Illustrator, TTF/OTF/WOFF2, WAV/BWF/RF64, OGG, FLAC, MP3, AIFF, MIDI, MOD/XM/S3M/IT |
+| File types recognized | 157 extensions in 13 kinds, from PNG and WAV to `.uasset` and `.skp` |
+| Read natively, no other app | glTF/GLB, FBX (binary and ASCII), OBJ, STL, PLY, 3DS, MagicaVoxel, 3MF, USD/USDA/USDC/USDZ, SketchUp 3 to today, Unreal packages from UE 4.x to 5.7, PSD/PSB, Krita, OpenRaster, Aseprite, DDS, KTX2, Basis, EXR, HDR, SVG, Illustrator, Lottie, TTF/OTF/WOFF2, WAV/BWF/RF64, OGG, FLAC, MP3, AIFF, MIDI, MOD/XM/S3M/IT |
 | Archives unpacked | zip, tar, tar.gz and `.unitypackage`, nested up to 3 deep |
 | Download as | 6 image formats, 5 audio formats, GLB or glTF for models, TTF, WOFF or WOFF2 for fonts, 10 sprite sheet formats |
 | Engine plugins | Godot 4, Unity 2021.3+, Unreal Engine 5 |

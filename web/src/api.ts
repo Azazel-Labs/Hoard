@@ -1070,13 +1070,15 @@ export interface SheetSprite {
 export interface ThumbUpload { replaced: boolean; thumb_source: ThumbSource | null; thumb_rev?: string; palette?: Swatch[] }
 
 export const api = {
-  /** A model's thumbnail as this browser's 3D viewer drew it; kept unless the one there came from a better source. */
+  /** A thumbnail this browser drew (a model in its 3D viewer, a Lottie animation); kept unless the one there came from a better source. */
   putThumb: (id: string, png: Blob, source: ThumbSource) =>
     request<ThumbUpload>(`/api/assets/${id}/thumb?source=${source}`, {
       method: 'PUT',
       headers: { 'Content-Type': png.type || 'image/png' },
       body: png,
     }),
+  /** A Lottie animation's JSON, a .lottie's with its images inlined. */
+  lottie: (id: string) => request<import('./lottie').LottieDoc>(`/api/assets/${id}/lottie.json`),
   stats: () => request<Stats>('/api/stats'),
   sheet: (id: string) => request<SheetData>(`/api/assets/${id}/derivative/sheet`),
   libraryStats: () => request<LibraryStats>('/api/stats/library'),

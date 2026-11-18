@@ -85,8 +85,8 @@ impl AssetKind {
             "png" | "jpg" | "jpeg" | "tga" | "bmp" | "gif" | "webp" | "tif" | "tiff" | "psd" | "psb" | "dds"
             | "ktx" | "ktx2" | "exr" | "hdr" | "basis" | "aseprite" | "ase" | "kra" | "ora" | "xcf" | "clip"
             | "afphoto" | "procreate" => AssetKind::Texture,
-            // Vector art: SVG, Illustrator, Affinity Designer, EPS.
-            "svg" | "svgz" | "ai" | "afdesign" | "eps" => AssetKind::Vector,
+            // Vector art: SVG, Illustrator, Affinity Designer, EPS, dotLottie animations.
+            "svg" | "svgz" | "ai" | "afdesign" | "eps" | "lottie" => AssetKind::Vector,
             // Audio, including DAW projects (Ableton, FL Studio, Reaper, Pro Tools, Logic, Cubase, Studio One).
             "wav" | "ogg" | "oga" | "mp3" | "flac" | "aif" | "aiff" | "aifc" | "opus" | "m4a" | "aac" | "wma"
             | "caf" | "wv" | "ape" | "mka" | "w64" | "au" | "mid" | "midi" | "xm" | "it" | "mod" | "s3m" | "als"

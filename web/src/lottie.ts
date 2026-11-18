@@ -1,0 +1,108 @@
+// Lottie animations, played with lottie-web's canvas renderer (the build without expressions, which would need
+// `eval`). The server hands over the animation's JSON (a .lottie's with its images inlined); a .json's images are
+// fetched from beside it in the pack. The server can't draw these, so the browser makes their thumbnails.
+import lottie, { type AnimationItem } from 'lottie-web/build/player/lottie_light_canvas'
+import { api, packFileUrl, type Asset, type ThumbUpload } from './api'
+
+type LottieImage = { u?: string; p?: string; e?: number }
+export type LottieDoc = { assets?: LottieImage[]; [k: string]: unknown }
+
+/** How long to wait for an animation's images and fonts before giving up on it. */
+const LOAD_WAIT_MS = 15_000
+
+/** `rel` from the folder `dir`, with `.` and `..` worked out. */
+function joinPath(dir: string, rel: string): string {
+  const out = dir ? dir.split('/') : []
+  for (const part of rel.split('/')) {
+    if (part === '..') out.pop()
+    else if (part && part !== '.') out.push(part)
+  }
+  return out.join('/')
+}
+
+/** The animation to play: images it names but doesn't hold are pointed at the pack's copies. */
+export async function lottieData(a: Asset): Promise<LottieDoc> {
+  const doc = await api.lottie(a.id)
+  const dir = a.path.includes('/') ? a.path.slice(0, a.path.lastIndexOf('/')) : ''
+  for (const img of doc.assets ?? []) {
+    if (!img.p || img.e === 1 || /^(data:|[a-z]+:\/\/|\/)/i.test(img.p)) continue
+    img.p = packFileUrl(a.pack_id, joinPath(dir, `${img.u ?? ''}${img.p}`))
+    img.u = ''
+    img.e = 1
+  }
+  return doc
+}
+
+/** Play the animation in `container`, drawn by canvas. Resolves once it's ready to show (images and fonts in). */
+export function mountLottie(container: HTMLElement, doc: LottieDoc, autoplay: boolean): Promise<AnimationItem> {
+  const anim = lottie.loadAnimation({
+    container,
+    renderer: 'canvas',
+    loop: true,
+    autoplay,
+    // lottie-web writes into the data it plays, so each player gets its own copy.
+    animationData: structuredClone(doc),
+    rendererSettings: { preserveAspectRatio: 'xMidYMid meet', clearCanvas: true, progressiveLoad: false },
+  })
+  return new Promise((resolve, reject) => {
+    const timer = window.setTimeout(() => fail(new Error('timed out')), LOAD_WAIT_MS)
+    const fail = (e: Error) => {
+      clearTimeout(timer)
+      anim.destroy()
+      reject(e)
+    }
+    anim.addEventListener('DOMLoaded', () => {
+      clearTimeout(timer)
+      resolve(anim)
+    })
+    anim.addEventListener('data_failed', () => fail(new Error('data_failed')))
+    anim.addEventListener('error', () => fail(new Error('error')))
+  })
+}
+
+/** How much of the picture is drawn on, to pick a frame that shows something (many animations start empty). */
+function coverage(canvas: HTMLCanvasElement): number {
+  const ctx = canvas.getContext('2d')
+  if (!ctx || !canvas.width || !canvas.height) return 0
+  const px = ctx.getImageData(0, 0, canvas.width, canvas.height).data
+  let n = 0
+  for (let i = 3; i < px.length; i += 16) if (px[i] > 16) n++
+  return n
+}
+
+/**
+ * Draw the animation 256 px across, at whichever of a few frames covers the most, and send it as the asset's
+ * thumbnail.
+ */
+export async function drawLottieThumb(a: Asset, doc?: LottieDoc): Promise<ThumbUpload | null> {
+  doc ??= await lottieData(a)
+  const w = Number(a.meta.width) || 256
+  const h = Number(a.meta.height) || 256
+  const s = 256 / Math.max(w, h)
+  const host = document.createElement('div')
+  host.setAttribute('aria-hidden', 'true')
+  host.style.cssText = `position:fixed;left:-10000px;top:0;pointer-events:none;width:${Math.max(1, Math.round(w * s))}px;height:${Math.max(1, Math.round(h * s))}px`
+  document.body.appendChild(host)
+  try {
+    const anim = await mountLottie(host, doc, false)
+    try {
+      const canvas = host.querySelector('canvas')
+      if (!canvas) return null
+      const n = Math.max(1, Math.floor(anim.totalFrames))
+      let best = { at: 0, cover: -1 }
+      for (const f of [0.5, 0.25, 0.75, 0, 0.99]) {
+        const at = Math.min(n - 1, Math.floor(n * f))
+        anim.goToAndStop(at, true)
+        const cover = coverage(canvas)
+        if (cover > best.cover) best = { at, cover }
+      }
+      anim.goToAndStop(best.at, true)
+      const png = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, 'image/png'))
+      return png ? api.putThumb(a.id, png, 'browser') : null
+    } finally {
+      anim.destroy()
+    }
+  } finally {
+    host.remove()
+  }
+}

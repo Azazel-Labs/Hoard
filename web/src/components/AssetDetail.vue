@@ -16,7 +16,7 @@ import { canStar, mine, toggleFavorite } from '../mine'
 import { MAX_STORE_FILE, TEXT_EXTS } from '../storeFormats'
 import { lazy } from '../lazy'
 import { formatDate, formatNumber, t } from '../i18n'
-import { isModelAsset, isTextAsset, takeViewRequest, viewRequest, viewerFor, type ViewerKind } from '../viewers'
+import { isLottieAsset, isModelAsset, isTextAsset, takeViewRequest, viewRequest, viewerFor, type ViewerKind } from '../viewers'
 import { isMaterialAsset, resolutions, ROLE_LABEL, ROLE_NAME, sizeLabel } from '../materials'
 import { withThumb } from '../browserThumbs'
 import { animatedAseprite, animatedSrc, PLAY_IN_PANEL, spriteSheet } from '../sprites'
@@ -31,6 +31,7 @@ const MaterialPreview = lazy(() => import('./MaterialPreview.vue'), () => t('ass
 const MaterialViewer = lazy(() => import('./MaterialViewer.vue'), () => t('asset-lazy-material-viewer'), 'overlay')
 const SpritePlayer = lazy(() => import('./SpritePlayer.vue'), () => t('asset-lazy-sprite-player'))
 const SheetView = lazy(() => import('./SheetView.vue'), () => t('asset-lazy-sheet-view'))
+const LottieViewer = lazy(() => import('./LottieViewer.vue'), () => t('asset-lazy-sprite-player'))
 
 const props = defineProps<{
   asset: Asset
@@ -927,6 +928,7 @@ onBeforeUnmount(() => unswipe())
     />
     <SheetView v-else-if="isSheet" :asset="asset" :pixelated="pixelated" />
     <SpritePlayer v-else-if="spritePlayable && animate" :asset="asset" :pixelated="pixelated" />
+    <LottieViewer v-else-if="isLottieAsset(asset)" :asset="asset" @thumb="(r) => emit('updated', withThumb(asset, r))" />
     <button
       v-else-if="isImage"
       type="button"

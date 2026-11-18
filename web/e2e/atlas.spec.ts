@@ -212,3 +212,46 @@ test('a tile sheet described by a note of its grid becomes a sprite sheet of its
     await api.post('/api/archive/purge', { data: { packs: [pack.id] } })
   }
 })
+
+// A Tiled tileset is a sprite sheet of its tiles: its image is the page, its empty tiles are left out and its tiles'
+// animations play.
+test('a Tiled tileset becomes a sprite sheet of its tiles', async ({ api }) => {
+  test.setTimeout(120_000)
+  const name = `E2E Tiled ${unique()}`
+  // Two by two 8 px tiles, 2 px apart round a 1 px margin; the last tile empty.
+  const color = (cell: number): [number, number, number, number] => (cell < 3 ? [...hue(cell, 3), 255] : [0, 0, 0, 0])
+  const image = png(19, 19, (x, y) => {
+    const [cx, cy] = [Math.floor((x - 1) / 10), Math.floor((y - 1) / 10)]
+    const inside = x >= 1 && y >= 1 && (x - 1) % 10 < 8 && (y - 1) % 10 < 8
+    return inside ? color(cy * 2 + cx) : [0, 0, 0, 0]
+  })
+  const tsx = `<?xml version="1.0" encoding="UTF-8"?>
+<tileset version="1.10" name="kit" tilewidth="8" tileheight="8" spacing="2" margin="1" tilecount="4" columns="2">
+ <image source="../Tilemap/tiles.png" width="19" height="19"/>
+ <tile id="0" type="flicker"><animation><frame tileid="0" duration="150"/><frame tileid="1" duration="150"/></animation></tile>
+</tileset>`
+  const pack = await uploadPack(api, name, [
+    { relpath: 'Kit/Tiled/kit.tsx', data: Buffer.from(tsx) },
+    { relpath: 'Kit/Tilemap/tiles.png', data: image },
+  ])
+  try {
+    await waitReady(api, [pack.id])
+    let assets: Asset[] = []
+    await expect
+      .poll(async () => (assets = await assetsOf(api, pack.id)).find((a) => a.path.endsWith('kit.tsx'))?.kind, { timeout: 60_000 })
+      .toBe('sheet')
+    const sheet = assets.find((a) => a.path.endsWith('kit.tsx'))!
+    const detail = (await (await api.get(`/api/assets/${sheet.id}`)).json()) as { meta: Record<string, unknown> }
+    expect(detail.meta.sheet).toMatchObject({ format: 'tiled', sprites: 3, pages: 1, animations: 1 })
+    const kept = await (await api.get(`/api/assets/${sheet.id}/derivative/sheet`)).json()
+    expect(kept.sprites.map((s: { name: string; rect: number[] }) => [s.name, s.rect])).toEqual([
+      ['tile_0000', [1, 1, 8, 8]],
+      ['tile_0001', [11, 1, 8, 8]],
+      ['tile_0002', [1, 11, 8, 8]],
+    ])
+    expect(kept.animations).toEqual([expect.objectContaining({ name: 'flicker', frames: [expect.objectContaining({ sprite: 0 }), expect.objectContaining({ sprite: 1 })] })])
+  } finally {
+    await api.post('/api/archive', { data: { packs: [pack.id] } })
+    await api.post('/api/archive/purge', { data: { packs: [pack.id] } })
+  }
+})

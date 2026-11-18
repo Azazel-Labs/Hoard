@@ -58,10 +58,58 @@ for one clip, becomes an animation linked to the characters it fits nearby. What
 Still open: whether the root travels or a clip plays in place, and whether each clip in a many-take file should be
 an entry of its own in search.
 
+## Sprite sheets and 2D animation: more formats
+
+Atlases from TexturePacker (and Aseprite), Starling, libGDX/Spine, Cocos2d and Godot become sprite sheets, and so do
+tile sheets that come with only a note of their grid (Kenney's `Tilesheet.txt`). Still to read, the most common first:
+
+- [x] **Tiled tilesets** (`.tsx`, `.tsj`, or a tileset saved as `.json`): the image, tile size, spacing and margin
+  are given exactly, so each becomes a sheet of its tiles, empty ones left out, its tiles' animations kept. Tilesets
+  embedded in a `.tmx` map stay part of the map.
+- [ ] **Unity sprite slicing**: Asset Store packs keep each sprite's rectangle in the image's `.png.meta`.
+- [ ] **DragonBones texture atlases** (`_tex.json`) as sheets. Playing their skeletons (`_ske.json`) would come after.
+- [ ] **Lottie / Bodymovin** (`.json`, `.lottie`): vector animations, common for UI. Played in the details panel
+  (lottie-web or dotLottie), the thumbnail drawn by the browser as the 3D viewer's is.
+- [ ] **Rive** (`.riv`), played with its free web runtime.
+- [ ] **Spine skeletons** (`.json`, `.skel`): the atlas is read already. Playing the rig needs Spine's runtime, whose
+  license only covers people who hold a Spine license, which is the open question.
+- [ ] Rarer: Spriter `.scml`, Live2D `.moc3`, GameMaker `.yy`, Defold atlases.
+
+## Sounds: more formats
+
+Hoard decodes WAV, FLAC, MP3, OGG Vorbis, AIFF and ADPCM itself, AAC/M4A, Opus, WMA, CAF, WavPack, APE and more through
+ffmpeg, and plays MOD, XM, S3M, IT and MIDI. What's missing is mostly containers rather than codecs:
+
+- [ ] **SFZ instruments and SF2 SoundFonts**: a set of samples and how they map to notes, common in music packs. One
+  asset, its samples kept with it, its preview a few notes played on it.
+- [ ] **Opus without ffmpeg**: a built-in decoder, so Opus plays before ffmpeg is downloaded, or without it.
+- [ ] More tracker and chiptune formats (`.mptm`, `.umx`, `.nsf`, `.vgm`).
+- [ ] FMOD and Wwise banks (`.bank`, `.fsb`, `.wem`): found in game files more than in asset packs.
+
+## Search sounds by what they sound like
+
+So that "find me a sound that goes WHOOOM", typed or asked through MCP, finds deep whooshes. In layers, each useful
+on its own:
+
+- [ ] **Measured features**: each sound's duration, envelope (a sharp attack or a swell, how long the tail is),
+  brightness, how noisy or tonal it is, whether its pitch rises or falls, its loudness and whether it loops cleanly.
+  Kept with the sound, shown in its details, filterable in search and the API.
+- [ ] **Onomatopoeia**: a word read as the shape of a sound and scored against those features. A plosive start
+  (b, p, k, t) is a sharp attack; long or repeated vowels are length; "oo"/"o" low and dark, "ee"/"i" high and
+  bright; "sh", "s", "wh", "f" are noise and air; a trailing "m" or "n" a hum that fades; capitals are loud.
+  "WHOOOM": airy start, long low middle, fading hum, loud.
+- [ ] **CLAP embeddings**: sounds and text in one space, as CLIP does for images, so "glassy UI blip" or "distant
+  thunder roll" find sounds whatever they're called. Off until an admin turns it on, like CLIP. The model's size and
+  license are still to check.
+- [ ] **MCP**: `search_sounds(query, imitation, filters)` — the calling AI passes the raw word as `imitation` and its
+  own reading of it ("deep low whoosh, about a second, swelling") as `query` — returning each sound's measured
+  features and a preview link, plus `describe_sound(id)` and `sounds_like(id)`.
+- [ ] **Search by imitation**: make the noise into the microphone, and sounds with that envelope and pitch shape are
+  found.
+
 ## Ideas
 
-- Embeddings for "find more like this" and near-duplicates (CLAP for audio, SigLIP 2 for images, or a multimodal
-  embedding API).
+- Embeddings for "find more like this" and near-duplicates (SigLIP 2 for images, or a multimodal embedding API).
 - BPM and key detection for music (Essentia).
 - Previews for more source formats (GIMP, Substance).
 - An Unreal-friendly export layout.

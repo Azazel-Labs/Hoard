@@ -50,8 +50,8 @@ map switched on and off.
 
 ### Sprite sheets that play
 
-Atlases from TexturePacker, Starling, libGDX, Cocos2d and Godot, and tile sheets that come with only a note of their
-grid, become one sprite sheet that plays its animations and lists its sprites. Download it repacked for whichever engine you're using: ten formats, each told only what it
+Atlases from TexturePacker, Starling, libGDX, Cocos2d and Godot, Tiled tilesets, and tile sheets that come with only a
+note of their grid, become one sprite sheet that plays its animations and lists its sprites. Download it repacked for whichever engine you're using: ten formats, each told only what it
 can hold.
 
 <picture>
@@ -341,7 +341,8 @@ software rasterizer (`apt install mesa-vulkan-drivers`). Without any adapter, ev
      or where the see-through gutters between its frames are, skipping empty cells; the columns, rows and speed can be
      changed. With reduced motion asked for, they wait to be played.
    - Sprite sheets (Starling/Sparrow XML, TexturePacker JSON including multipack, libGDX `.atlas`, Cocos2d `.plist`,
-     and Godot `.tres` `SpriteFrames` and `TileSet` resources): the atlas file becomes a sprite sheet,
+     Godot `.tres` `SpriteFrames` and `TileSet` resources, and Tiled tilesets, `.tsx` or JSON, their empty tiles left
+     out and their tiles' animations kept): the atlas file becomes a sprite sheet,
      kept as a Hoard sheet (`.hoardsheet`, JSON) that names its pages, where each sprite is on them, how it's turned
      and trimmed, and its animations (the file's own, or numbered names such as `walk_0`, `walk_1`). The pages stay
      textures in the pack, hidden with the sheet, and the sprites aren't assets of their own. Loose images in the pack

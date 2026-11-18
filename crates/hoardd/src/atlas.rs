@@ -96,7 +96,12 @@ pub(crate) fn parse(ext: &str, text: &str) -> Option<Atlas> {
     let text = text.trim_start_matches('\u{feff}');
     let atlas = match ext {
         "xml" => starling(text),
-        "json" => texture_packer(&serde_json::from_str(text).ok()?),
+        "json" => {
+            let v: Value = serde_json::from_str(text).ok()?;
+            texture_packer(&v).or_else(|| tiled_json(&v))
+        }
+        "tsj" => tiled_json(&serde_json::from_str(text).ok()?),
+        "tsx" => tiled(text),
         "atlas" => libgdx(text),
         "plist" => cocos(&plist(text)?),
         "tres" => godot(text),
@@ -159,7 +164,142 @@ fn trim_of(size: [u32; 2], at: [i64; 2], upright: [u32; 2]) -> Option<Trim> {
     (size != upright || at != [0, 0]).then_some(Trim { size, at })
 }
 
-/// Starling and Sparrow: `<TextureAtlas imagePath="…"><SubTexture name x y width height [frameX frameY frameWidth
+/// A Tiled tileset's grid: its image, tile size, the space between tiles and round the edge, and how many columns and
+/// tiles.
+struct Tileset {
+    image: String,
+    tile: [u32; 2],
+    spacing: u32,
+    margin: u32,
+    columns: u32,
+    count: u32,
+    /// Tiles that play an animation: the tile, what it's called (its class, if it has one) and its frames (tile and
+    /// how long it shows).
+    anims: Vec<TileAnim>,
+}
+
+/// A tile's animation: the tile, its class and its frames (tile, and milliseconds).
+type TileAnim = (u32, Option<String>, Vec<(u32, u32)>);
+
+/// A tileset as an atlas of one page, its tiles named as Kenney names his loose tiles (`tile_0000`, by tile id) and
+/// its tiles' animations each named after its class or the tile it's on.
+fn tileset_atlas(t: Tileset) -> Option<Atlas> {
+    let [tw, th] = t.tile;
+    if tw == 0 || th == 0 || t.columns == 0 || t.count == 0 || t.count as usize > MAX_SPRITES || t.image.is_empty() {
+        return None;
+    }
+    let sprites = (0..t.count)
+        .map(|id| Sprite {
+            name: format!("tile_{id:04}"),
+            rect: [t.margin + id % t.columns * (tw + t.spacing), t.margin + id / t.columns * (th + t.spacing), tw, th],
+            turn: Turn::Upright,
+            trim: None,
+        })
+        .collect();
+    let animations = t
+        .anims
+        .into_iter()
+        .filter(|(_, _, frames)| !frames.is_empty())
+        .map(|(id, class, frames)| Anim {
+            name: class.filter(|c| !c.trim().is_empty()).unwrap_or_else(|| format!("tile_{id:04}")),
+            frames: frames
+                .into_iter()
+                .filter(|&(tile, _)| tile < t.count)
+                .map(|(tile, ms)| Frame { page: 0, sprite: tile as usize, ms: if ms == 0 { FRAME_MS } else { ms } })
+                .collect(),
+            looped: true,
+        })
+        .collect();
+    Some(Atlas { format: "tiled", pages: vec![Page { image: t.image, sprites }], animations, tile: Some(t.tile) })
+}
+
+/// Tiled's tileset (`.tsx`): `<tileset tilewidth tileheight spacing margin tilecount columns><image source/>` and
+/// `<tile id [type|class]><animation><frame tileid duration/>…`. A tileset of separate images has no grid to cut.
+fn tiled(text: &str) -> Option<Atlas> {
+    let mut reader = quick_xml::Reader::from_str(text);
+    let mut set: Option<Tileset> = None;
+    let mut current: Option<TileAnim> = None;
+    loop {
+        let (e, empty) = match reader.read_event() {
+            Ok(Event::Start(e)) => (e, false),
+            Ok(Event::Empty(e)) => (e, true),
+            Ok(Event::End(e)) => {
+                if e.local_name().as_ref() == b"tile"
+                    && let (Some(s), Some(c)) = (&mut set, current.take())
+                {
+                    s.anims.push(c);
+                }
+                continue;
+            }
+            Ok(Event::Eof) => break,
+            Err(_) => return None,
+            _ => continue,
+        };
+        let a = attrs(&e);
+        let get = |k: &str| a.get(k).and_then(|v| v.trim().parse::<u32>().ok());
+        match (e.local_name().as_ref(), &mut set) {
+            (b"tileset", None) => {
+                set = Some(Tileset {
+                    image: String::new(),
+                    tile: [get("tilewidth")?, get("tileheight")?],
+                    spacing: get("spacing").unwrap_or(0),
+                    margin: get("margin").unwrap_or(0),
+                    columns: get("columns").unwrap_or(0),
+                    count: get("tilecount").unwrap_or(0),
+                    anims: Vec::new(),
+                });
+            }
+            (_, None) => return None,
+            // A tile's own image: a tileset of separate images.
+            (b"image", Some(_)) if current.is_some() => return None,
+            (b"image", Some(s)) => s.image.clone_from(a.get("source")?),
+            (b"tile", Some(_)) if !empty => {
+                let class = a.get("class").or_else(|| a.get("type")).cloned();
+                current = get("id").map(|id| (id, class, Vec::new()));
+            }
+            (b"frame", Some(_)) => {
+                if let (Some(c), Some(tile)) = (&mut current, get("tileid")) {
+                    c.2.push((tile, get("duration").unwrap_or(0)));
+                }
+            }
+            _ => {}
+        }
+    }
+    tileset_atlas(set?)
+}
+
+/// Tiled's tileset as JSON (`.tsj`, or `.json`): `{"tilewidth", "tileheight", "image", "columns", "tilecount",
+/// "spacing", "margin", "tiles": [{"id", "class"|"type", "animation": [{"tileid", "duration"}]}]}`.
+fn tiled_json(v: &Value) -> Option<Atlas> {
+    let n = |o: &Value, k: &str| o.get(k).and_then(Value::as_u64).and_then(|n| u32::try_from(n).ok());
+    let anims = v
+        .get("tiles")
+        .and_then(Value::as_array)
+        .into_iter()
+        .flatten()
+        .filter_map(|t| {
+            let frames: Vec<(u32, u32)> = t
+                .get("animation")?
+                .as_array()?
+                .iter()
+                .filter_map(|f| Some((n(f, "tileid")?, n(f, "duration").unwrap_or(0))))
+                .collect();
+            let class = t.get("class").or_else(|| t.get("type")).and_then(Value::as_str).map(str::to_owned);
+            Some((n(t, "id")?, class, frames))
+        })
+        .collect();
+    tileset_atlas(Tileset {
+        image: v.get("image")?.as_str()?.to_owned(),
+        tile: [n(v, "tilewidth")?, n(v, "tileheight")?],
+        spacing: n(v, "spacing").unwrap_or(0),
+        margin: n(v, "margin").unwrap_or(0),
+        columns: n(v, "columns")?,
+        count: n(v, "tilecount")?,
+        anims,
+    })
+}
+
+/// Starling and Sparrow:`<TextureAtlas imagePath="…"><SubTexture name x y width height [frameX frameY frameWidth
 /// frameHeight] [rotated]/>`. The rectangle is the region as stored; `frameX` and `frameY` are where the canvas starts
 /// relative to the sprite, so negative.
 fn starling(text: &str) -> Option<Atlas> {
@@ -868,7 +1008,7 @@ fn find_page(by_path: &HashMap<String, usize>, file_path: &str, image: &str, one
 // The library side
 
 /// The files atlases are read from, as SQL.
-const EXTS: &str = "'xml', 'json', 'atlas', 'plist', 'tres'";
+const EXTS: &str = "'xml', 'json', 'atlas', 'plist', 'tres', 'tsx', 'tsj'";
 
 #[derive(Debug)]
 struct Texture {
@@ -898,6 +1038,48 @@ struct New {
     summary: Value,
     words: String,
     thumb: Option<crate::blobs::StoredBlob>,
+}
+
+/// Leave out a tile set's empty tiles (see [`crate::grid`]), its animations following the tiles that stay.
+fn drop_empty(atlas: &mut Atlas, imgs: &[Option<RgbaImage>]) {
+    let mut moved: Vec<Vec<Option<usize>>> = Vec::new();
+    for (p, img) in atlas.pages.iter_mut().zip(imgs) {
+        let Some(img) = img else {
+            moved.push((0..p.sprites.len()).map(Some).collect());
+            continue;
+        };
+        // The colour between tiles, when there's space between them.
+        let background = match (p.sprites.first(), p.sprites.get(1)) {
+            (Some(a), Some(b)) if b.rect[1] == a.rect[1] && b.rect[0] > a.rect[0] + a.rect[2] => {
+                let (x, y) = (a.rect[0] + a.rect[2], a.rect[1]);
+                (x < img.width() && y < img.height()).then(|| *img.get_pixel(x, y))
+            }
+            _ => None,
+        };
+        let mut map = Vec::with_capacity(p.sprites.len());
+        let mut kept = Vec::new();
+        for s in p.sprites.drain(..) {
+            let [x, y, w, h] = s.rect;
+            if x + w <= img.width() && y + h <= img.height() && !crate::grid::empty(img, s.rect, background) {
+                map.push(Some(kept.len()));
+                kept.push(s);
+            } else {
+                map.push(None);
+            }
+        }
+        p.sprites = kept;
+        moved.push(map);
+    }
+    for a in &mut atlas.animations {
+        a.frames.retain_mut(|f| match moved.get(f.page).and_then(|m| m.get(f.sprite)).copied().flatten() {
+            Some(i) => {
+                f.sprite = i;
+                true
+            }
+            None => false,
+        });
+    }
+    atlas.animations.retain(|a| !a.frames.is_empty());
 }
 
 /// A file that may be a sheet: an atlas, or a note of a grid.
@@ -1160,7 +1342,7 @@ pub(crate) fn detect_pack(state: &AppState, rt: &Handle, conn: &mut Connection, 
             found.push(f);
             continue;
         }
-        let Some(atlas) = parse(&c.ext, &text) else { continue };
+        let Some(mut atlas) = parse(&c.ext, &text) else { continue };
         if atlas.pages.iter().map(|p| p.sprites.len()).sum::<usize>() > MAX_SPRITES {
             tracing::debug!(atlas = %c.path, "atlas has too many sprites to read");
             continue;
@@ -1177,6 +1359,11 @@ pub(crate) fn detect_pack(state: &AppState, rt: &Handle, conn: &mut Connection, 
                 found
             })
             .collect();
+        if atlas.format == "tiled" {
+            let imgs: Vec<Option<RgbaImage>> =
+                page_textures.iter().map(|&i| i.and_then(|i| load_texture(state, rt, &textures[i]))).collect();
+            drop_empty(&mut atlas, &imgs);
+        }
         let pages: Vec<Option<crate::spritesheet::Page>> = page_textures
             .iter()
             .map(|&i| {
@@ -1485,6 +1672,63 @@ mod tests {
             }
         );
         assert!(parse("xml", "<root><SubTexture x='0'/></root>").is_none());
+    }
+
+    #[test]
+    fn tiled_tilesets_xml_and_json() {
+        let tsx = r#"<?xml version="1.0" encoding="UTF-8"?>
+<tileset version="1.10" tiledversion="1.10.2" name="town" tilewidth="16" tileheight="16" spacing="1" margin="2" tilecount="6" columns="3">
+ <image source="../Tilemap/tilemap.png" width="54" height="37"/>
+ <tile id="1" type="water">
+  <animation>
+   <frame tileid="1" duration="200"/>
+   <frame tileid="2" duration="200"/>
+  </animation>
+ </tile>
+ <tile id="4"/>
+</tileset>"#;
+        let a = parse("tsx", tsx).unwrap();
+        assert_eq!(a.format, "tiled");
+        assert_eq!(a.tile, Some([16, 16]));
+        assert_eq!(a.pages[0].image, "../Tilemap/tilemap.png");
+        let s = &a.pages[0].sprites;
+        assert_eq!(s.len(), 6);
+        assert_eq!((s[0].name.as_str(), s[0].rect), ("tile_0000", [2, 2, 16, 16]));
+        assert_eq!((s[4].name.as_str(), s[4].rect), ("tile_0004", [19, 19, 16, 16]));
+        assert_eq!(a.animations.len(), 1);
+        assert_eq!(a.animations[0].name, "water");
+        assert_eq!(a.animations[0].frames.iter().map(|f| (f.sprite, f.ms)).collect::<Vec<_>>(), [(1, 200), (2, 200)]);
+        // A tileset of separate images, a map and a TypeScript file aren't sheets.
+        let collection = r#"<tileset tilewidth="64" tileheight="64" tilecount="2" columns="0"><tile id="0"><image source="a.png"/></tile></tileset>"#;
+        assert_eq!(parse("tsx", collection), None);
+        assert_eq!(parse("tsx", "export const App = () => <div className=\"app\" />;"), None);
+
+        let json = r#"{"type": "tileset", "image": "tiles.png", "tilewidth": 8, "tileheight": 8, "columns": 2, "tilecount": 4,
+            "tiles": [{"id": 3, "animation": [{"tileid": 3, "duration": 0}, {"tileid": 0, "duration": 50}]}]}"#;
+        let a = parse("json", json).unwrap();
+        assert_eq!(a.format, "tiled");
+        assert_eq!(a.pages[0].sprites[3].rect, [8, 8, 8, 8]);
+        assert_eq!(a.animations[0].name, "tile_0003");
+        assert_eq!(
+            a.animations[0].frames.iter().map(|f| (f.sprite, f.ms)).collect::<Vec<_>>(),
+            [(3, FRAME_MS), (0, 50)]
+        );
+        assert_eq!(parse("tsj", json).map(|a| a.pages[0].sprites.len()), Some(4));
+        assert_eq!(parse("json", r#"{"type": "map", "layers": [], "tilewidth": 8, "tileheight": 8}"#), None);
+
+        // Empty tiles are left out once the image is read, and the animations follow.
+        let mut a = parse("json", json).unwrap();
+        let mut img = RgbaImage::new(16, 16);
+        for (x, y) in [(0, 0), (8, 8)] {
+            for yy in y..y + 8 {
+                for xx in x..x + 8 {
+                    img.put_pixel(xx, yy, Rgba([200, 50, 50, 255]));
+                }
+            }
+        }
+        drop_empty(&mut a, &[Some(img)]);
+        assert_eq!(a.pages[0].sprites.iter().map(|s| s.name.as_str()).collect::<Vec<_>>(), ["tile_0000", "tile_0003"]);
+        assert_eq!(a.animations[0].frames.iter().map(|f| f.sprite).collect::<Vec<_>>(), [1, 0]);
     }
 
     #[test]

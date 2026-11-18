@@ -161,7 +161,7 @@ pub(crate) fn fit(note: &Note, name: &str, size: [u32; 2]) -> Option<Grid> {
 }
 
 /// A cell with nothing in it: all transparent, or all the sheet's background (magenta, or the colour between tiles).
-fn empty(img: &RgbaImage, [x0, y0, w, h]: [u32; 4], background: Option<Rgba<u8>>) -> bool {
+pub(crate) fn empty(img: &RgbaImage, [x0, y0, w, h]: [u32; 4], background: Option<Rgba<u8>>) -> bool {
     let first = *img.get_pixel(x0, y0);
     let mut flat = true;
     let mut clear = true;

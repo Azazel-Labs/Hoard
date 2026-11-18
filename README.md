@@ -421,9 +421,15 @@ software rasterizer (`apt install mesa-vulkan-drivers`). Without any adapter, ev
        used; with Blender switched on, the thumbnail is drawn from the converted model instead.
      - `.psd`/`.psb`: size, bit depth, color mode, layer count, and Photoshop's embedded preview.
      - `.kra`/`.ora`: the flattened image and layer count.
+     - `.xcf` (GIMP): the layers composited by Hoard, each with its offset, opacity, mask and visibility, and the
+       layer count.
      - `.exr`/`.hdr`: tone-mapped previews.
-     - Recognized by kind, without previews yet: GIMP, Clip Studio, Affinity, Procreate, Substance, ZBrush, Maya/Max,
-       Houdini, C4D, DAW projects, and video.
+     - Clip Studio, Procreate, Affinity Photo and Designer, and EPS: the picture of itself the file keeps inside
+       (Clip Studio's canvas preview, Procreate's thumbnail, the PNG among Affinity's data, the TIFF preview an EPS
+       names in its header).
+     - Camera raw photos (DNG, Canon, Nikon, Sony, Fujifilm, Pentax, Olympus, Panasonic, Samsung): the largest JPEG
+       the camera kept inside, turned the way the camera was held, with the camera's name.
+     - Recognized by kind, without previews yet: Substance, ZBrush, Maya/Max, Houdini, C4D, DAW projects, and video.
    - One asset in several formats: a model, sound or font the pack has more than once under the same name, beside
      itself (`house.skp` and `house.obj`) or in folders named after each format (Kenney's `Models/FBX format/` and
      `Models/OBJ format/`), is shown once, in the format Hoard reads best or that loses least (GLB, then glTF, FBX,

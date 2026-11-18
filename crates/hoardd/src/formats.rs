@@ -203,7 +203,7 @@ pub(crate) fn load_image(path: &Path, ext: &str) -> Result<DynamicImage> {
     Ok(match ext {
         "psd" | "psb" => sources::psd_composite(path)?,
         "kra" | "ora" => sources::read_layered_zip(path)?.composite.context("no flattened image inside")?,
-        e if crate::textures::EXTS.contains(&e) => crate::textures::decode(path, e)?.image,
+        e if crate::textures::handles(e) => crate::textures::decode(path, e)?.image,
         _ => image::ImageReader::open(path)?.with_guessed_format()?.decode()?,
     })
 }

@@ -1,5 +1,5 @@
 import { assetsOf, uploadPack, waitReady } from './support/api'
-import { png } from './support/files'
+import { png, zip } from './support/files'
 import { expect, openPack, test, tile, unique } from './support/test'
 
 const W = 8
@@ -69,8 +69,90 @@ function vtf(): Buffer {
   return Buffer.concat([head, pixels(([r, g, b, a]) => [b, g, r, a])])
 }
 
+/** GIMP: one uncompressed RGB layer of the gradient, laid out by hand (offsets in the comments). */
+function xcf(): Buffer {
+  const be = (...v: number[]) => Buffer.concat(v.map((n) => { const b = Buffer.alloc(4); b.writeUInt32BE(n); return b }))
+  return Buffer.concat([
+    Buffer.from('gimp xcf v003\0'), // 0
+    be(W, H, 0), // 14: size, RGB
+    be(17, 1), Buffer.from([0]), be(0, 0), // 26: no compression, end of properties
+    be(55, 0, 0), // 43: the layer, end of layers, end of channels
+    be(W, H, 0, 2), Buffer.from('L\0'), be(0, 0), // 55: the layer, named "L", no properties
+    be(89, 0), // 81: its pixels, no mask
+    be(W, H, 3, 109, 0), // 89: three bytes a pixel, one level
+    be(W, H, 125, 0), // 109: one tile
+    pixels(([r, g, b]) => [r, g, b]), // 125
+  ])
+}
+
+/** A little-endian TIFF of `entries` (tag, type 3 short or 4 long, values), each value list over one placed after. */
+function tiff(entries: [number, 3 | 4, number[]][], data: Buffer): { file: Buffer; dataAt: number } {
+  const ifd = 8
+  let extra = ifd + 2 + entries.length * 12 + 4
+  const tail: Buffer[] = []
+  const rows = entries.map(([tag, type, values]) => {
+    const e = Buffer.alloc(12)
+    e.writeUInt16LE(tag, 0)
+    e.writeUInt16LE(type, 2)
+    e.writeUInt32LE(values.length, 4)
+    const packed = Buffer.concat(values.map((v) => (type === 3 ? u16(v) : u32(v))))
+    if (packed.length <= 4) packed.copy(e, 8)
+    else {
+      e.writeUInt32LE(extra, 8)
+      tail.push(packed)
+      extra += packed.length
+    }
+    return e
+  })
+  const head = Buffer.concat([Buffer.from('II*\0'), u32(ifd), u16(entries.length), ...rows, u32(0), ...tail])
+  return { file: Buffer.concat([head, data]), dataAt: head.length }
+}
+
+/** An uncompressed RGB TIFF of the gradient. */
+function rgbTiff(): Buffer {
+  const data = pixels(([r, g, b]) => [r, g, b])
+  // The strip offset is known only once the header is laid out, which doesn't depend on its value.
+  const entries = (at: number): [number, 3 | 4, number[]][] => [
+    [256, 3, [W]],
+    [257, 3, [H]],
+    [258, 3, [8, 8, 8]],
+    [259, 3, [1]],
+    [262, 3, [2]],
+    [273, 4, [at]],
+    [277, 3, [3]],
+    [278, 3, [H]],
+    [279, 4, [data.length]],
+  ]
+  return tiff(entries(tiff(entries(0), data).dataAt), data).file
+}
+
+/** EPS with a binary header pointing at a TIFF preview after the PostScript. */
+function eps(): Buffer {
+  const ps = Buffer.from('%!PS-Adobe-3.0 EPSF-3.0\n%%BoundingBox: 0 0 8 8\n')
+  const preview = rgbTiff()
+  return Buffer.concat([Buffer.from([0xc5, 0xd0, 0xd3, 0xc6]), u32(30, ps.length, 0, 0, 30 + ps.length, preview.length), u16(0xffff), ps, preview])
+}
+
+/** A DNG-like raw: IFD0 naming the camera and pointing at a JPEG thumbnail. */
+function dng(jpeg: Buffer): Buffer {
+  // Header (8), then four entries (2 + 4 * 12 + 4 = 54), then the make at 62, the model at 70 and the JPEG at 78.
+  const entry = (tag: number, type: number, n: number, value: number) => Buffer.concat([u16(tag), u16(type), u32(n, value)])
+  return Buffer.concat([
+    Buffer.from('II*\0'),
+    u32(8),
+    u16(4),
+    entry(0x010f, 2, 6, 62),
+    entry(0x0110, 2, 7, 70),
+    entry(0x0201, 4, 1, 78),
+    entry(0x0202, 4, 1, jpeg.length),
+    u32(0),
+    Buffer.from('Canon\0\0\0EOS R5\0\0'),
+    jpeg,
+  ])
+}
+
 // Formats Hoard reads itself or with the image library's smaller decoders, each a picture with a thumbnail.
-test('icons, cursors, QOI, PNM, PCX and older GPU textures are pictures with thumbnails', async ({ page, api }) => {
+test('icons, cursors, QOI, PNM, PCX, GIMP and older GPU textures are pictures with thumbnails', async ({ page, api }) => {
   const name = `E2E Images ${unique()}`
   const files = [
     { relpath: 'icon.ico', data: icon(1) },
@@ -81,6 +163,7 @@ test('icons, cursors, QOI, PNM, PCX and older GPU textures are pictures with thu
     { relpath: 'khronos.ktx', data: ktx() },
     { relpath: 'powervr.pvr', data: pvr() },
     { relpath: 'valve.vtf', data: vtf() },
+    { relpath: 'layers.xcf', data: xcf() },
   ]
   const pack = await uploadPack(api, name, files)
   try {
@@ -99,6 +182,49 @@ test('icons, cursors, QOI, PNM, PCX and older GPU textures are pictures with thu
     await tile(page, vtfAsset.name).click()
     const panel = page.getByRole('complementary', { name: 'Asset details' })
     await expect(panel.locator('img').first()).toBeVisible()
+  } finally {
+    await api.post('/api/archive', { data: { packs: [pack.id] } })
+    await api.post('/api/archive/purge', { data: { packs: [pack.id] } })
+  }
+})
+
+// Files whose own contents Hoard can't draw, shown by the picture kept inside them.
+test('Procreate, Affinity, EPS and camera raw files show the picture inside', async ({ page, api }) => {
+  // A JPEG from the browser, for the raw file to carry.
+  await page.goto('/')
+  const jpeg = Buffer.from(
+    await page.evaluate(([w, h]) => {
+      const c = document.createElement('canvas')
+      c.width = w
+      c.height = h
+      const g = c.getContext('2d')!
+      g.fillStyle = '#4080c0'
+      g.fillRect(0, 0, w, h)
+      return c.toDataURL('image/jpeg').split(',')[1]
+    }, [W, H]),
+    'base64',
+  )
+  const name = `E2E Previews ${unique()}`
+  const picture = png(W, H, color)
+  const files = [
+    { relpath: 'painting.procreate', data: zip([{ path: 'Document.archive', data: Buffer.from('bplist00') }, { path: 'QuickLook/Thumbnail.png', data: picture }]) },
+    { relpath: 'photo.afphoto', data: Buffer.concat([Buffer.from('\0\xffKInAf'), Buffer.alloc(64, 7), picture, Buffer.alloc(32, 9)]) },
+    { relpath: 'logo.eps', data: eps() },
+    { relpath: 'shot.dng', data: dng(jpeg) },
+  ]
+  const pack = await uploadPack(api, name, files)
+  try {
+    await waitReady(api, [pack.id])
+    const assets = await assetsOf(api, pack.id)
+    expect(assets.map((a) => a.path).sort()).toEqual(files.map((f) => f.relpath).sort())
+    for (const a of assets) {
+      expect(a.kind, a.path).toBe(a.path === 'logo.eps' ? 'vector' : 'texture')
+      const detail = (await (await api.get(`/api/assets/${a.id}`)).json()) as { has_thumb?: boolean; meta: Record<string, unknown> }
+      expect(detail.has_thumb, a.path).toBe(true)
+      expect([detail.meta.width, detail.meta.height], a.path).toEqual([W, H])
+      expect(detail.meta.embedded_preview, a.path).toBe(true)
+      if (a.path === 'shot.dng') expect(detail.meta.camera).toBe('Canon EOS R5')
+    }
   } finally {
     await api.post('/api/archive', { data: { packs: [pack.id] } })
     await api.post('/api/archive/purge', { data: { packs: [pack.id] } })

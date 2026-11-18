@@ -294,11 +294,11 @@ pub(crate) fn analyze(path: &Path, root: &Path, kind: AssetKind, ext: &str) -> A
         AssetKind::Texture if matches!(ext, "psd" | "psb") => analyze_psd(path, &mut a),
         AssetKind::Texture if matches!(ext, "kra" | "ora") => analyze_layered_zip(path, &mut a),
         AssetKind::Model if ext == "blend" => analyze_blend(path, &mut a),
-        AssetKind::Texture if crate::textures::EXTS.contains(&ext) => analyze_decoded(path, ext, &mut a),
+        AssetKind::Texture if crate::textures::handles(ext) => analyze_decoded(path, ext, &mut a),
         AssetKind::Texture => analyze_image(path, ext, &mut a),
         AssetKind::Vector if ext == "lottie" => analyze_dotlottie(path, &mut a),
         AssetKind::Vector if ext == "riv" => analyze_rive(path, &mut a),
-        AssetKind::Vector if crate::textures::VECTOR.contains(&ext) => analyze_decoded(path, ext, &mut a),
+        AssetKind::Vector if crate::textures::handles(ext) => analyze_decoded(path, ext, &mut a),
         AssetKind::Audio if crate::music::EXTS.contains(&ext) => analyze_music(path, ext, &mut a),
         AssetKind::Audio => analyze_sound(path, ext, &mut a),
         AssetKind::Font if crate::fonts::EXTS.contains(&ext) => crate::fonts::analyze(path, ext, THUMB_SIZE).map(|f| {
@@ -528,10 +528,12 @@ fn render_mesh(mesh: &crate::meshes::Mesh, path: &Path, ext: &str, a: &mut Analy
     Ok(())
 }
 
-/// GPU containers, vector art and Aseprite: decoded by `textures`, then analyzed like any image.
+/// GPU containers, vector art, Aseprite, and the pictures kept inside source files and camera raws: decoded by
+/// `textures`, then analyzed like any image.
 fn analyze_decoded(path: &Path, ext: &str, a: &mut Analysis) -> anyhow::Result<()> {
     let d = crate::textures::decode(path, ext)?;
-    let vector = d.facts.contains_key("vector");
+    // Rendered vector art and a file's own small picture of itself aren't real pixels.
+    let drawn = d.facts.contains_key("vector") || d.facts.contains_key("embedded_preview");
     let (w, h) = match (d.facts.get("vector_width"), d.facts.get("vector_height")) {
         (Some(w), Some(h)) => (w.clone(), h.clone()),
         _ => (json!(d.image.width()), json!(d.image.height())),
@@ -552,8 +554,8 @@ fn analyze_decoded(path: &Path, ext: &str, a: &mut Analysis) -> anyhow::Result<(
     } else {
         d.image
     };
-    // Rendered vector art isn't real pixels: skip the pixel-art and tiling tests.
-    analyze_pixels(&img, a, !vector)
+    // Skip the pixel-art and tiling tests for what isn't real pixels.
+    analyze_pixels(&img, a, !drawn)
 }
 
 pub(crate) fn is_float(img: &DynamicImage) -> bool {

@@ -1,11 +1,14 @@
 //! Texture formats `image` doesn't read: GPU containers (DDS, KTX and KTX2, PVR, Valve's VTF) with
-//! block-compressed data, vector art (SVG, Illustrator), pixel-art sources (Aseprite) and old paint formats (PCX). Each decodes to an ordinary image (mip 0 of the first layer or face) for
+//! block-compressed data, vector art (SVG, Illustrator), pixel-art sources (Aseprite), GIMP's layers and old paint formats (PCX). Each decodes to an ordinary image (mip 0 of the first layer or face) for
 //! thumbnails, color analysis and "download as", plus the container's own facts.
 
+mod embedded;
 mod ktx1;
 mod pcx;
 mod pvr;
+mod raw;
 mod vtf;
+mod xcf;
 
 use std::io::Read;
 use std::path::Path;
@@ -23,21 +26,29 @@ pub(crate) struct Decoded {
     pub(crate) facts: Map<String, Value>,
 }
 
-/// Extensions handled here.
-pub(crate) const EXTS: &[&str] =
-    &["dds", "ktx", "ktx2", "basis", "pvr", "vtf", "svg", "svgz", "ai", "aseprite", "ase", "pcx", "cur"];
+/// GPU containers, vector art and the rest handled in this file.
+const EXTS: &[&str] =
+    &["dds", "ktx", "ktx2", "basis", "pvr", "vtf", "svg", "svgz", "ai", "aseprite", "ase", "pcx", "cur", "xcf"];
 
 /// Vector art: drawn at whatever size it's asked for.
 pub(crate) const VECTOR: &[&str] = &["svg", "svgz", "ai"];
 
+/// Whether [`decode`] reads `.ext`.
+pub(crate) fn handles(ext: &str) -> bool {
+    EXTS.contains(&ext) || embedded::EXTS.contains(&ext) || raw::EXTS.contains(&ext)
+}
+
 pub(crate) fn decode(path: &Path, ext: &str) -> Result<Decoded> {
     match ext {
+        e if embedded::EXTS.contains(&e) => embedded::decode(path, e),
+        e if raw::EXTS.contains(&e) => raw::decode(&std::fs::read(path)?),
         "dds" => dds(path),
         "ktx" => ktx1::decode(&std::fs::read(path)?),
         "ktx2" => ktx2(path),
         "pvr" => pvr::decode(&std::fs::read(path)?),
         "vtf" => vtf::decode(&std::fs::read(path)?),
         "pcx" => pcx::decode(&std::fs::read(path)?),
+        "xcf" => xcf::decode(&std::fs::read(path)?),
         // Cursors are icons with a hotspot; the image library only knows them by the icon's signature.
         "cur" => Ok(Decoded {
             image: image::load_from_memory_with_format(&std::fs::read(path)?, image::ImageFormat::Ico)?,

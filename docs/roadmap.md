@@ -79,21 +79,22 @@ tile sheets that come with only a note of their grid (Kenney's `Tilesheet.txt`).
 
 ## Images: more formats
 
-Hoard previews PNG, JPEG, GIF, BMP, TGA, WebP, TIFF, HDR, EXR, PSD/PSB, Krita, OpenRaster, DDS, KTX and KTX2,
-PowerVR, VTF, Basis, ICO/CUR, QOI, PNM, PCX, SVG, Illustrator and Aseprite. Some formats are filed as images but get no thumbnail, and some aren't recognized at
-all. The most common first:
+Hoard previews PNG, JPEG, GIF, BMP, TGA, WebP, TIFF, HDR, EXR, PSD/PSB, Krita, OpenRaster, GIMP, DDS, KTX and
+KTX2, PowerVR, VTF, Basis, ICO/CUR, QOI, PNM, PCX, SVG, Illustrator, Aseprite, the previews inside Clip Studio,
+Procreate, Affinity and EPS files, and camera raw photos. The formats added lately, and those still to come, the
+most common first:
 
-- [ ] **Source files with a preview inside**: Clip Studio (`.clip`, a SQLite database with a canvas preview),
+- [x] **Source files with a preview inside**: Clip Studio (`.clip`, a SQLite database with a canvas preview),
   Procreate (`.procreate`, a zip with a thumbnail), Affinity Photo and Designer (`.afphoto`, `.afdesign`) and EPS
-  (a TIFF preview in its header, when it has one). All of these are recognized now, but none gets a picture.
-- [ ] **GIMP** (`.xcf`): recognized, but nothing is drawn. The format is documented, and Hoard would composite
-  the layers itself, as it does for Krita.
+  (a TIFF preview in its header, when it has one).
+- [x] **GIMP** (`.xcf`): there's no flattened copy inside, so Hoard composites the layers itself, each at its
+  offset with its opacity, mask and visibility, blended as Normal. 8- and 16-bit integer pixels.
 - [ ] **AVIF, HEIC and JPEG XL**: newer formats, rare in asset packs so far. JPEG XL has a pure-Rust decoder.
   AVIF and HEIC would need dav1d and libheif, or could go through ffmpeg once it's downloaded.
 - [x] **Small ones**: ICO/CUR, QOI and PNM (`.ppm`, `.pgm`, `.pbm`) through the image library, PCX read by Hoard,
   and KTX 1, PowerVR and Valve's VTF textures decoded like DDS.
-- [ ] Camera raw files (`.dng`, `.cr2`, `.nef`) by their embedded JPEG. These are reference photos rather than
-  game art.
+- [x] Camera raw files (`.dng`, `.cr2`, `.nef`, `.arw`, `.raf` and the rest) by their embedded JPEG. These are
+  reference photos rather than game art.
 
 ## Sounds: more formats
 

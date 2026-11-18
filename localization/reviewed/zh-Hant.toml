@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "c6262505c2e6f7d3de91fb52af12e9fcb0e0a1eb7c63595921d1a6e793628485"
+source = "f1669a81c6df0aa65b7d1254acbfe377ffe38ce4f61e820fd439a52d951e4242"
 translation = "7d4815ead7ae4f48f80531d797b527d64fdb08460c91b5ac34cf8cada118334a"
 
 [messages.account-add]
@@ -8480,12 +8480,12 @@ source = "Search by what pictures show"
 translation = "依圖片內容搜尋"
 
 [messages.settings-clip-hint]
-source = "Uses OpenAI’s CLIP model, run on this server’s processor: nothing leaves it. Turning it on downloads the model ({ $size } MB) from Hugging Face, then learns every picture in the background at low priority. It takes 300 to 600 MB of memory while it works or someone searches. Turning it off deletes the model and keeps what it learned, for next time."
-translation = "使用 OpenAI 的 CLIP 模型，在這台伺服器的處理器上執行：任何資料都不會離開伺服器。開啟後會從 Hugging Face 下載模型（{ $size } MB），然後以低優先順序在背景學習每張圖片。在它工作或有人搜尋時，會使用 300 到 600 MB 的記憶體。關閉後會刪除模型，但保留它學到的內容，供下次使用。"
+source = "Uses Google’s SigLIP 2 model, run on this server’s processor: nothing leaves it. Turning it on downloads the model ({ $size } MB) from Hugging Face, then learns every picture in the background at low priority. It takes 350 to 750 MB of memory while it works or someone searches. Turning it off deletes the model and keeps what it learned, for next time."
+translation = "使用 Google 的 SigLIP 2 模型，在這台伺服器的處理器上執行：任何資料都不會離開伺服器。開啟後會從 Hugging Face 下載模型（{ $size } MB），然後以低優先順序在背景學習每張圖片。在它工作或有人搜尋時，會使用 350 到 750 MB 的記憶體。關閉後會刪除模型，但保留它學到的內容，供下次使用。"
 
 [messages.settings-clip-hint-desktop]
-source = "Uses OpenAI’s CLIP model, run on this computer’s processor: nothing leaves it. Turning it on downloads the model ({ $size } MB) from Hugging Face, then learns every picture in the background at low priority. It takes 300 to 600 MB of memory while it works or you search. Turning it off deletes the model and keeps what it learned, for next time."
-translation = "使用 OpenAI 的 CLIP 模型，在這台電腦的處理器上執行：任何資料都不會離開這台電腦。開啟後會從 Hugging Face 下載模型（{ $size } MB），然後以低優先順序在背景學習每張圖片。在它工作或你搜尋時，會使用 300 到 600 MB 的記憶體。關閉後會刪除模型，但保留它學到的內容，供下次使用。"
+source = "Uses Google’s SigLIP 2 model, run on this computer’s processor: nothing leaves it. Turning it on downloads the model ({ $size } MB) from Hugging Face, then learns every picture in the background at low priority. It takes 350 to 750 MB of memory while it works or you search. Turning it off deletes the model and keeps what it learned, for next time."
+translation = "使用 Google 的 SigLIP 2 模型，在這台電腦的處理器上執行：任何資料都不會離開這台電腦。開啟後會從 Hugging Face 下載模型（{ $size } MB），然後以低優先順序在背景學習每張圖片。在它工作或你搜尋時，會使用 350 到 750 MB 的記憶體。關閉後會刪除模型，但保留它學到的內容，供下次使用。"
 
 [messages.settings-clip-learning]
 source = "Ready: learning pictures, { $done } of { $total } so far"
@@ -8508,6 +8508,10 @@ translation = """
 [messages.settings-clip-ready-empty]
 source = "Ready. Pictures are learned as packs are added."
 translation = "就緒。新增素材包時會學習其中的圖片。"
+
+[messages.settings-clip-relearning]
+source = "Until the new model has learned every picture, searches use what the old one learned."
+translation = "在新模型學完所有圖片之前，搜尋使用舊模型學到的內容。"
 
 [messages.settings-clip-reset]
 source = "Image search: back to the default"

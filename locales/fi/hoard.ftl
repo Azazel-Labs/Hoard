@@ -2437,8 +2437,8 @@ settings-clip-saved-on = Kuvahaku: päällä
 settings-clip-saved-off = Kuvahaku: pois
 settings-clip-what = Kirjoita, mitä etsit (”mossy rock”, ”sci-fi door”, ”wooden barrel”), niin sitä esittävät kuvat näkyvät sanat sisältävien nimien rinnalla. ”Lisää samankaltaisia” löytää samantyyppisiä asioita, ei vain samanvärisiä.
 settings-clip-toggle = Ota kuvahaku käyttöön
-settings-clip-hint = Käyttää OpenAI:n CLIP-mallia, jota ajetaan tämän palvelimen suorittimella: mitään ei lähde palvelimelta. Käyttöönotto lataa mallin ({ $size } Mt) Hugging Facesta ja opettelee sitten jokaisen kuvan taustalla matalalla prioriteetilla. Se vie 300–600 Mt muistia työskennellessään tai kun joku hakee. Käytöstä poisto poistaa mallin mutta säilyttää opitun seuraavaa kertaa varten.
-settings-clip-hint-desktop = Käyttää OpenAI:n CLIP-mallia, jota ajetaan tämän tietokoneen suorittimella: mitään ei lähde tietokoneelta. Käyttöönotto lataa mallin ({ $size } Mt) Hugging Facesta ja opettelee sitten jokaisen kuvan taustalla matalalla prioriteetilla. Se vie 300–600 Mt muistia työskennellessään tai kun haet. Käytöstä poisto poistaa mallin mutta säilyttää opitun seuraavaa kertaa varten.
+settings-clip-hint = Käyttää Googlen SigLIP 2 -mallia, jota ajetaan tämän palvelimen suorittimella: mitään ei lähde palvelimelta. Käyttöönotto lataa mallin ({ $size } Mt) Hugging Facesta ja opettelee sitten jokaisen kuvan taustalla matalalla prioriteetilla. Se vie 350–750 Mt muistia työskennellessään tai kun joku hakee. Käytöstä poisto poistaa mallin mutta säilyttää opitun seuraavaa kertaa varten.
+settings-clip-hint-desktop = Käyttää Googlen SigLIP 2 -mallia, jota ajetaan tämän tietokoneen suorittimella: mitään ei lähde tietokoneelta. Käyttöönotto lataa mallin ({ $size } Mt) Hugging Facesta ja opettelee sitten jokaisen kuvan taustalla matalalla prioriteetilla. Se vie 350–750 Mt muistia työskennellessään tai kun haet. Käytöstä poisto poistaa mallin mutta säilyttää opitun seuraavaa kertaa varten.
 settings-clip-looking = Etsitään mallia…
 settings-clip-downloading = Ladataan mallia… edistyminen näkyy toimintailmaisimessa
 settings-clip-ready-empty = Valmis. Kuvat opitaan, kun paketteja lisätään.
@@ -2448,6 +2448,7 @@ settings-clip-ready-all =
        *[other] Valmis: tuntee kaikki { $count } kuvaa
     }
 settings-clip-learning = Valmis: opetellaan kuvia, { $done }/{ $total } tähän mennessä
+settings-clip-relearning = Kunnes uusi malli on oppinut jokaisen kuvan, haut käyttävät sitä, mitä vanha oppi.
 settings-clip-unavailable = Mallia ei saatu: { $detail }. Yritetään uudelleen tunnin välein.
 settings-clap-heading = Hae ääniä sen mukaan, miltä ne kuulostavat
 settings-clap-reset = Äänihaku: palauta oletus

@@ -2358,8 +2358,8 @@ settings-clip-saved-on = Cerca d'imatges: activada
 settings-clip-saved-off = Cerca d'imatges: desactivada
 settings-clip-what = Escriviu el que busqueu («roca molsosa», «porta de ciència-ficció», «barril de fusta») i les imatges que ho mostren apareixen al costat dels noms que contenen les paraules. «Més com aquest» troba coses del mateix tipus, no només dels mateixos colors.
 settings-clip-toggle = Activa la cerca d'imatges
-settings-clip-hint = Fa servir el model CLIP d'OpenAI, executat al processador d'aquest servidor: no en surt res. En activar-la, es baixa el model ({ $size } MB) de Hugging Face i després aprèn cada imatge en segon pla amb prioritat baixa. Ocupa de 300 a 600 MB de memòria mentre treballa o algú cerca. En desactivar-la, se suprimeix el model i es conserva el que ha après, per a la propera vegada.
-settings-clip-hint-desktop = Fa servir el model CLIP d'OpenAI, executat al processador d'aquest ordinador: no en surt res. En activar-la, es baixa el model ({ $size } MB) de Hugging Face i després aprèn cada imatge en segon pla amb prioritat baixa. Ocupa de 300 a 600 MB de memòria mentre treballa o mentre cerqueu. En desactivar-la, se suprimeix el model i es conserva el que ha après, per a la propera vegada.
+settings-clip-hint = Fa servir el model SigLIP 2 de Google, executat al processador d'aquest servidor: no en surt res. En activar-la, es baixa el model ({ $size } MB) de Hugging Face i després aprèn cada imatge en segon pla amb prioritat baixa. Ocupa de 350 a 750 MB de memòria mentre treballa o algú cerca. En desactivar-la, se suprimeix el model i es conserva el que ha après, per a la propera vegada.
+settings-clip-hint-desktop = Fa servir el model SigLIP 2 de Google, executat al processador d'aquest ordinador: no en surt res. En activar-la, es baixa el model ({ $size } MB) de Hugging Face i després aprèn cada imatge en segon pla amb prioritat baixa. Ocupa de 350 a 750 MB de memòria mentre treballa o mentre cerqueu. En desactivar-la, se suprimeix el model i es conserva el que ha après, per a la propera vegada.
 settings-clip-looking = S'està cercant el model…
 settings-clip-downloading = S'està baixant el model… el progrés es mostra a l'indicador d'activitat
 settings-clip-ready-empty = A punt. Les imatges s'aprenen a mesura que s'afegeixen paquets.
@@ -2368,6 +2368,7 @@ settings-clip-ready-all =
        *[other] A punt: coneix totes les { $count } imatges
     }
 settings-clip-learning = A punt: aprenent imatges, { $done } de { $total } fins ara
+settings-clip-relearning = Fins que el model nou hagi après totes les imatges, les cerques fan servir el que va aprendre l’antic.
 settings-clip-unavailable = No s'ha pogut obtenir el model: { $detail }. Es torna a provar cada hora.
 settings-clap-heading = Cerca per com sonen els sons
 settings-clap-reset = Cerca de sons: torna al valor per defecte

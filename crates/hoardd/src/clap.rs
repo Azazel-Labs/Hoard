@@ -39,7 +39,7 @@ const FILES: [(&str, u64, &str); 2] = [
 /// The whole download, for the Settings page.
 pub(crate) const DOWNLOAD_BYTES: u64 = FILES[0].1 + FILES[1].1;
 
-const DIMS: usize = crate::clip::DIMS;
+const DIMS: usize = 512;
 
 // ---------------------------------------------------------------------------------------------
 // What the model hears: a log-mel spectrogram of ten seconds at 48 kHz (as `ClapFeatureExtractor` makes it)
@@ -642,7 +642,11 @@ static TEXT: Text<TextModel> = Text::new("sound search", TextModel::load, TextMo
 pub(crate) static SPEC: Spec = Spec {
     load: "SELECT hash, vector FROM sound_embeddings WHERE model = ?1",
     model: MODEL,
+    dims: DIMS,
     what: "sound search",
+    // A sound's "more like this" listens instead (see `sounds`).
+    unrelated: 0.5,
+    same: 0.95,
     lift: 0.24,
     margin: 0.12,
     sure: 0.33,

@@ -85,6 +85,7 @@ mod server;
 mod settings;
 mod sheet;
 mod sidecar;
+mod siglip;
 #[cfg(any(feature = "ldap", feature = "https"))]
 mod signature_only;
 mod signin;
@@ -135,7 +136,9 @@ pub(crate) struct Inner {
     pub(crate) settings: settings::Store,
     /// Every thumbnail's look, for "find by color" and "more like this".
     pub(crate) looks: looks::Index,
-    /// Every thumbnail's CLIP embedding, for image search.
+    /// Every thumbnail's SigLIP 2 embedding, for image search.
+    pub(crate) pictures: clip::Index,
+    /// Every thumbnail's CLIP embedding, which image search uses until SigLIP 2 has relearned them.
     pub(crate) clip: clip::Index,
     /// Every sound's CLAP embedding, for searching sounds by what they sound like, in words.
     pub(crate) clap: clip::Index,
@@ -211,7 +214,8 @@ pub async fn run(cfg: Config) -> Result<()> {
         http,
         settings,
         looks: looks::Index::default(),
-        clip: clip::Index::new(&clip::SPEC),
+        pictures: clip::Index::new(&clip::SPEC),
+        clip: clip::Index::new(&clip::CLIP_SPEC),
         clap: clip::Index::new(&clap::SPEC),
         sounds: sounds::Index::default(),
         near_copies: nearcopies::Cache::default(),

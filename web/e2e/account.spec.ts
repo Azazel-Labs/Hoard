@@ -222,7 +222,7 @@ test.describe('account', () => {
 
           await page.goto('/#settings/account')
           const nav = page.getByRole('navigation', { name: 'Settings' })
-          await expect(nav.getByRole('button')).toHaveText(['Appearance', 'Library', 'Account'])
+          await expect(nav.getByRole('button')).toHaveText(['Appearance', 'Library', 'Near copies', 'Account'])
           await expect(page.getByText('can look but not change anything')).toBeVisible()
           await expect(page.getByRole('heading', { name: 'People' })).toHaveCount(0)
           await expect(page.getByLabel('What it can do').locator('option')).toHaveText(['Can look'])

@@ -2176,8 +2176,8 @@ settings-clip-saved-on = Pencarian gambar: aktif
 settings-clip-saved-off = Pencarian gambar: mati
 settings-clip-what = Ketik apa yang Anda cari (“mossy rock”, “sci-fi door”, “wooden barrel”) dan gambar yang menampilkannya muncul di samping nama yang mengandung kata-kata itu. “Lainnya yang mirip ini” menemukan hal yang sejenis, bukan hanya yang warnanya sama.
 settings-clip-toggle = Aktifkan pencarian gambar
-settings-clip-hint = Memakai model CLIP dari OpenAI, dijalankan di prosesor server ini: tidak ada yang keluar dari server. Mengaktifkannya akan mengunduh model ({ $size } MB) dari Hugging Face, lalu mempelajari setiap gambar di latar belakang dengan prioritas rendah. Butuh memori 300 sampai 600 MB selagi bekerja atau saat seseorang mencari. Mematikannya akan menghapus model dan menyimpan apa yang sudah dipelajari, untuk lain kali.
-settings-clip-hint-desktop = Memakai model CLIP dari OpenAI, dijalankan di prosesor komputer ini: tidak ada yang keluar dari komputer. Mengaktifkannya akan mengunduh model ({ $size } MB) dari Hugging Face, lalu mempelajari setiap gambar di latar belakang dengan prioritas rendah. Butuh memori 300 sampai 600 MB selagi bekerja atau saat Anda mencari. Mematikannya akan menghapus model dan menyimpan apa yang sudah dipelajari, untuk lain kali.
+settings-clip-hint = Memakai model SigLIP 2 dari Google, dijalankan di prosesor server ini: tidak ada yang keluar dari server. Mengaktifkannya akan mengunduh model ({ $size } MB) dari Hugging Face, lalu mempelajari setiap gambar di latar belakang dengan prioritas rendah. Butuh memori 350 sampai 750 MB selagi bekerja atau saat seseorang mencari. Mematikannya akan menghapus model dan menyimpan apa yang sudah dipelajari, untuk lain kali.
+settings-clip-hint-desktop = Memakai model SigLIP 2 dari Google, dijalankan di prosesor komputer ini: tidak ada yang keluar dari komputer. Mengaktifkannya akan mengunduh model ({ $size } MB) dari Hugging Face, lalu mempelajari setiap gambar di latar belakang dengan prioritas rendah. Butuh memori 350 sampai 750 MB selagi bekerja atau saat Anda mencari. Mematikannya akan menghapus model dan menyimpan apa yang sudah dipelajari, untuk lain kali.
 settings-clip-looking = Mencari model…
 settings-clip-downloading = Mengunduh model… kemajuannya ada di indikator aktivitas
 settings-clip-ready-empty = Siap. Gambar dipelajari saat paket ditambahkan.
@@ -2186,6 +2186,7 @@ settings-clip-ready-all =
        *[other] Siap: mengenal semua { $count } gambar
     }
 settings-clip-learning = Siap: mempelajari gambar, { $done } dari { $total } sejauh ini
+settings-clip-relearning = Sampai model baru mempelajari setiap gambar, pencarian memakai apa yang dipelajari model lama.
 settings-clip-unavailable = Tidak dapat mengambil model: { $detail }. Mencoba lagi setiap jam.
 settings-clap-heading = Cari berdasarkan bunyi suara
 settings-clap-reset = Pencarian suara: kembali ke bawaan

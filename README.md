@@ -991,9 +991,9 @@ unless that's unticked. In the API they're `bpm_min`, `bpm_max`, `key` (written 
 
 ### Image search
 
-Settings → Image and sound search adds a model that knows what pictures show (OpenAI's CLIP, ViT-B/32). It's off
-until an admin turns it on, because the model is a 605 MB download (from Hugging Face, pinned to one revision and
-checked against its SHA-256, into the cache folder's `models`). It runs on the server's processor, and nothing leaves
+Settings → Image and sound search adds a model that knows what pictures show (Google's SigLIP 2, base size, 32-pixel
+patches). It's off until an admin turns it on, because the model is a 1.5 GB download (from Hugging Face, pinned to
+one revision and checked against its SHA-256, into the cache folder's `models`). It runs on the server's processor, and nothing leaves
 the server. A background job, "Learning what pictures show", then works through every thumbnail at low priority, at
 roughly 5–10 pictures a second, and keeps up with new packs. Settings shows how far it has got.
 
@@ -1003,9 +1003,13 @@ roughly 5–10 pictures a second, and keeps up with new packs. Settings shows ho
 - **More like this** weighs what the pictures show above their colors and grain, so a barrel brings up barrels
   rather than anything brown.
 
-The model takes 300–600 MB of memory while it works: the picture half during the job, the words half from the first
+The model takes 350–750 MB of memory while it works: the picture half during the job, the words half from the first
 search until 15 minutes after the last. Turning image search off deletes the model and keeps what it learned, so
 turning it back on only downloads the model again.
+
+A library that learned its pictures with OpenAI's CLIP, the model Hoard used before, keeps searching with what CLIP
+learned while SigLIP 2 learns every picture again in the background. Then CLIP's embeddings and model files are
+deleted.
 
 ### Sound search
 

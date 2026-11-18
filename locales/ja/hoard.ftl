@@ -2172,8 +2172,8 @@ settings-clip-saved-on = 画像検索: オン
 settings-clip-saved-off = 画像検索: オフ
 settings-clip-what = 探しているもの（「mossy rock」「sci-fi door」「wooden barrel」など）を入力すると、その語句を含む名前のものと並んで、それが写っている画像が表示されます。「これに似たもの」は、同じ色だけでなく同じ種類のものを見つけます。
 settings-clip-toggle = 画像検索をオンにする
-settings-clip-hint = OpenAI の CLIP モデルをこのサーバーのプロセッサーで実行するので、外部には何も送られません。オンにすると Hugging Face からモデル（{ $size } MB）をダウンロードし、すべての画像をバックグラウンドで低い優先度で学習します。学習中や検索中は 300～600 MB のメモリを使います。オフにするとモデルは削除されますが、学習した内容は次回のために残ります。
-settings-clip-hint-desktop = OpenAI の CLIP モデルをこのコンピューターのプロセッサーで実行するので、外部には何も送られません。オンにすると Hugging Face からモデル（{ $size } MB）をダウンロードし、すべての画像をバックグラウンドで低い優先度で学習します。学習中や検索中は 300～600 MB のメモリを使います。オフにするとモデルは削除されますが、学習した内容は次回のために残ります。
+settings-clip-hint = Google の SigLIP 2 モデルをこのサーバーのプロセッサーで実行するので、外部には何も送られません。オンにすると Hugging Face からモデル（{ $size } MB）をダウンロードし、すべての画像をバックグラウンドで低い優先度で学習します。学習中や検索中は 350～750 MB のメモリを使います。オフにするとモデルは削除されますが、学習した内容は次回のために残ります。
+settings-clip-hint-desktop = Google の SigLIP 2 モデルをこのコンピューターのプロセッサーで実行するので、外部には何も送られません。オンにすると Hugging Face からモデル（{ $size } MB）をダウンロードし、すべての画像をバックグラウンドで低い優先度で学習します。学習中や検索中は 350～750 MB のメモリを使います。オフにするとモデルは削除されますが、学習した内容は次回のために残ります。
 settings-clip-looking = モデルを探しています…
 settings-clip-downloading = モデルをダウンロード中… 進行状況はアクティビティインジケーターに表示されます
 settings-clip-ready-empty = 準備完了。画像はパックの追加に合わせて学習されます。
@@ -2182,6 +2182,7 @@ settings-clip-ready-all =
        *[other] 準備完了: { $count } 枚の画像をすべて学習済みです
     }
 settings-clip-learning = 準備完了: 画像を学習中です（{ $total } 枚中 { $done } 枚）
+settings-clip-relearning = 新しいモデルがすべての画像を学習するまで、検索には古いモデルが学習した内容を使います。
 settings-clip-unavailable = モデルを取得できませんでした: { $detail }。1 時間ごとに再試行します。
 settings-clap-heading = 聞こえ方でサウンドを検索
 settings-clap-reset = サウンド検索: 既定値に戻す

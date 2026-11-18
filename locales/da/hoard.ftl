@@ -2353,8 +2353,8 @@ settings-clip-saved-on = Billedsøgning: til
 settings-clip-saved-off = Billedsøgning: fra
 settings-clip-what = Skriv, hvad du leder efter (»mossy rock«, »sci-fi door«, »wooden barrel«), så dukker billeder, der viser det, op ved siden af navne, der indeholder ordene. »Mere som dette« finder ting af samme slags, ikke kun med de samme farver.
 settings-clip-toggle = Slå billedsøgning til
-settings-clip-hint = Bruger OpenAIs CLIP-model, som køres på denne servers processor: intet forlader den. Når du slår det til, downloades modellen ({ $size } MB) fra Hugging Face, og derefter lærer den alle billeder i baggrunden med lav prioritet. Den bruger 300 til 600 MB hukommelse, mens den arbejder, eller nogen søger. Når du slår det fra, slettes modellen, men det, den har lært, beholdes til næste gang.
-settings-clip-hint-desktop = Bruger OpenAIs CLIP-model, som køres på denne computers processor: intet forlader den. Når du slår det til, downloades modellen ({ $size } MB) fra Hugging Face, og derefter lærer den alle billeder i baggrunden med lav prioritet. Den bruger 300 til 600 MB hukommelse, mens den arbejder, eller du søger. Når du slår det fra, slettes modellen, men det, den har lært, beholdes til næste gang.
+settings-clip-hint = Bruger Googles SigLIP 2-model, som køres på denne servers processor: intet forlader den. Når du slår det til, downloades modellen ({ $size } MB) fra Hugging Face, og derefter lærer den alle billeder i baggrunden med lav prioritet. Den bruger 350 til 750 MB hukommelse, mens den arbejder, eller nogen søger. Når du slår det fra, slettes modellen, men det, den har lært, beholdes til næste gang.
+settings-clip-hint-desktop = Bruger Googles SigLIP 2-model, som køres på denne computers processor: intet forlader den. Når du slår det til, downloades modellen ({ $size } MB) fra Hugging Face, og derefter lærer den alle billeder i baggrunden med lav prioritet. Den bruger 350 til 750 MB hukommelse, mens den arbejder, eller du søger. Når du slår det fra, slettes modellen, men det, den har lært, beholdes til næste gang.
 settings-clip-looking = Leder efter modellen…
 settings-clip-downloading = Downloader modellen… fremskridtet vises i aktivitetsindikatoren
 settings-clip-ready-empty = Klar. Billeder læres, efterhånden som pakker tilføjes.
@@ -2363,6 +2363,7 @@ settings-clip-ready-all =
        *[other] Klar: kender alle { $count } billeder
     }
 settings-clip-learning = Klar: lærer billeder, { $done } af { $total } indtil nu
+settings-clip-relearning = Indtil den nye model har lært alle billeder, bruger søgninger det, den gamle lærte.
 settings-clip-unavailable = Kunne ikke hente modellen: { $detail }. Prøver igen hver time.
 settings-clap-heading = Søg efter, hvordan lyde lyder
 settings-clap-reset = Lydsøgning: tilbage til standard

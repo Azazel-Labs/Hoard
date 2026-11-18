@@ -760,6 +760,17 @@ const MIGRATIONS: &[&str] = &[
     // 72: near copies (see `nearcopies`): a coarse print of each thumbnail and sound, filled in by their jobs.
     "ALTER TABLE looks ADD COLUMN print BLOB;
      ALTER TABLE sounds ADD COLUMN print BLOB;",
+    // 73: image search moves to SigLIP 2, and searches keep using CLIP's embeddings until every thumbnail is
+    // relearned, so a thumbnail can have one of each.
+    "CREATE TABLE embeddings_by_model (
+       thumb_hash TEXT NOT NULL,
+       model      TEXT NOT NULL,
+       vector     BLOB NOT NULL,
+       PRIMARY KEY (thumb_hash, model)
+     ) WITHOUT ROWID;
+     INSERT INTO embeddings_by_model (thumb_hash, model, vector) SELECT thumb_hash, model, vector FROM embeddings;
+     DROP TABLE embeddings;
+     ALTER TABLE embeddings_by_model RENAME TO embeddings;",
 ];
 
 /// How many automatic pre-upgrade backups to keep in `<data dir>/backups`.

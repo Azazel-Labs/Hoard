@@ -2172,8 +2172,8 @@ settings-clip-saved-on = 图像搜索：开启
 settings-clip-saved-off = 图像搜索：关闭
 settings-clip-what = 输入你要找的内容（“mossy rock”“sci-fi door”“wooden barrel”），显示这些内容的图片会与名称含有这些词的结果一起出现。“更多类似内容”会查找同类的东西，而不仅是颜色相同的。
 settings-clip-toggle = 开启图像搜索
-settings-clip-hint = 使用 OpenAI 的 CLIP 模型，在此服务器的处理器上运行：任何数据都不会离开服务器。开启后会从 Hugging Face 下载模型（{ $size } MB），然后在后台以低优先级识别每张图片。工作或有人搜索时会占用 300 到 600 MB 内存。关闭后会删除模型，但保留已识别的内容，供下次使用。
-settings-clip-hint-desktop = 使用 OpenAI 的 CLIP 模型，在这台电脑的处理器上运行：任何数据都不会离开这台电脑。开启后会从 Hugging Face 下载模型（{ $size } MB），然后在后台以低优先级识别每张图片。工作或你搜索时会占用 300 到 600 MB 内存。关闭后会删除模型，但保留已识别的内容，供下次使用。
+settings-clip-hint = 使用 Google 的 SigLIP 2 模型，在此服务器的处理器上运行：任何数据都不会离开服务器。开启后会从 Hugging Face 下载模型（{ $size } MB），然后在后台以低优先级识别每张图片。工作或有人搜索时会占用 350 到 750 MB 内存。关闭后会删除模型，但保留已识别的内容，供下次使用。
+settings-clip-hint-desktop = 使用 Google 的 SigLIP 2 模型，在这台电脑的处理器上运行：任何数据都不会离开这台电脑。开启后会从 Hugging Face 下载模型（{ $size } MB），然后在后台以低优先级识别每张图片。工作或你搜索时会占用 350 到 750 MB 内存。关闭后会删除模型，但保留已识别的内容，供下次使用。
 settings-clip-looking = 正在查找模型…
 settings-clip-downloading = 正在下载模型… 进度显示在活动指示器中
 settings-clip-ready-empty = 就绪。添加资源包时会识别其中的图片。
@@ -2182,6 +2182,7 @@ settings-clip-ready-all =
        *[other] 就绪：已识别全部 { $count } 张图片
     }
 settings-clip-learning = 就绪：正在识别图片，目前已完成 { $done } / { $total }
+settings-clip-relearning = 在新模型学完所有图片之前，搜索使用旧模型学到的内容。
 settings-clip-unavailable = 无法获取模型：{ $detail }。每小时重试一次。
 settings-clap-heading = 按声音听起来像什么搜索
 settings-clap-reset = 声音搜索：恢复默认值

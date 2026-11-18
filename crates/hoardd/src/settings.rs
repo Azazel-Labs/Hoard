@@ -109,7 +109,7 @@ pub(crate) struct Saved {
     /// Search the stores for new packs' pages in the background, attaching the ones that are certain.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub(crate) store_lookup: Option<bool>,
-    /// Image search (CLIP): search pictures by what they show. Off until turned on, as the model is a big download.
+    /// Image search (SigLIP 2): search pictures by what they show. Off until turned on, as the model is a big download.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub(crate) clip: Option<bool>,
     /// Sound search (CLAP): search sounds by what they sound like, in words. Off until turned on, like image search.

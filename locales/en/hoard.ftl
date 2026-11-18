@@ -2665,8 +2665,8 @@ settings-clip-saved-off = Image search: off
 settings-clip-what = Type what you’re after (“mossy rock”, “sci-fi door”, “wooden barrel”) and pictures that show it turn up beside names that have the words. “More like this” finds things of the same kind, not only the same colors.
 settings-clip-toggle = Turn on image search
 # $size is the model's download size in MB.
-settings-clip-hint = Uses OpenAI’s CLIP model, run on this server’s processor: nothing leaves it. Turning it on downloads the model ({ $size } MB) from Hugging Face, then learns every picture in the background at low priority. It takes 300 to 600 MB of memory while it works or someone searches. Turning it off deletes the model and keeps what it learned, for next time.
-settings-clip-hint-desktop = Uses OpenAI’s CLIP model, run on this computer’s processor: nothing leaves it. Turning it on downloads the model ({ $size } MB) from Hugging Face, then learns every picture in the background at low priority. It takes 300 to 600 MB of memory while it works or you search. Turning it off deletes the model and keeps what it learned, for next time.
+settings-clip-hint = Uses Google’s SigLIP 2 model, run on this server’s processor: nothing leaves it. Turning it on downloads the model ({ $size } MB) from Hugging Face, then learns every picture in the background at low priority. It takes 350 to 750 MB of memory while it works or someone searches. Turning it off deletes the model and keeps what it learned, for next time.
+settings-clip-hint-desktop = Uses Google’s SigLIP 2 model, run on this computer’s processor: nothing leaves it. Turning it on downloads the model ({ $size } MB) from Hugging Face, then learns every picture in the background at low priority. It takes 350 to 750 MB of memory while it works or you search. Turning it off deletes the model and keeps what it learned, for next time.
 settings-clip-looking = Looking for the model…
 settings-clip-downloading = Downloading the model… progress is in the activity indicator
 settings-clip-ready-empty = Ready. Pictures are learned as packs are added.
@@ -2675,6 +2675,7 @@ settings-clip-ready-all =
        *[other] Ready: knows all { $count } pictures
     }
 settings-clip-learning = Ready: learning pictures, { $done } of { $total } so far
+settings-clip-relearning = Until the new model has learned every picture, searches use what the old one learned.
 # $detail is why, from the server.
 settings-clip-unavailable = Couldn’t get the model: { $detail }. Trying again every hour.
 settings-clap-heading = Search by what sounds sound like

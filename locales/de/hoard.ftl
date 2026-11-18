@@ -2351,8 +2351,8 @@ settings-clip-saved-on = Bildsuche: an
 settings-clip-saved-off = Bildsuche: aus
 settings-clip-what = Geben Sie ein, was Sie suchen („mossy rock“, „sci-fi door“, „wooden barrel“), und Bilder, die das zeigen, erscheinen neben Namen, die die Wörter enthalten. „Mehr davon“ findet Dinge derselben Art, nicht nur mit denselben Farben.
 settings-clip-toggle = Bildsuche einschalten
-settings-clip-hint = Verwendet das CLIP-Modell von OpenAI, ausgeführt auf dem Prozessor dieses Servers: Nichts verlässt ihn. Beim Einschalten wird das Modell ({ $size } MB) von Hugging Face heruntergeladen, das dann im Hintergrund mit niedriger Priorität jedes Bild lernt. Während es arbeitet oder jemand sucht, belegt es 300 bis 600 MB Arbeitsspeicher. Beim Ausschalten wird das Modell gelöscht, das Gelernte aber für das nächste Mal behalten.
-settings-clip-hint-desktop = Verwendet das CLIP-Modell von OpenAI, ausgeführt auf dem Prozessor dieses Computers: Nichts verlässt ihn. Beim Einschalten wird das Modell ({ $size } MB) von Hugging Face heruntergeladen, das dann im Hintergrund mit niedriger Priorität jedes Bild lernt. Während es arbeitet oder Sie suchen, belegt es 300 bis 600 MB Arbeitsspeicher. Beim Ausschalten wird das Modell gelöscht, das Gelernte aber für das nächste Mal behalten.
+settings-clip-hint = Verwendet das SigLIP-2-Modell von Google, ausgeführt auf dem Prozessor dieses Servers: Nichts verlässt ihn. Beim Einschalten wird das Modell ({ $size } MB) von Hugging Face heruntergeladen, das dann im Hintergrund mit niedriger Priorität jedes Bild lernt. Während es arbeitet oder jemand sucht, belegt es 350 bis 750 MB Arbeitsspeicher. Beim Ausschalten wird das Modell gelöscht, das Gelernte aber für das nächste Mal behalten.
+settings-clip-hint-desktop = Verwendet das SigLIP-2-Modell von Google, ausgeführt auf dem Prozessor dieses Computers: Nichts verlässt ihn. Beim Einschalten wird das Modell ({ $size } MB) von Hugging Face heruntergeladen, das dann im Hintergrund mit niedriger Priorität jedes Bild lernt. Während es arbeitet oder Sie suchen, belegt es 350 bis 750 MB Arbeitsspeicher. Beim Ausschalten wird das Modell gelöscht, das Gelernte aber für das nächste Mal behalten.
 settings-clip-looking = Modell wird gesucht…
 settings-clip-downloading = Modell wird heruntergeladen… den Fortschritt zeigt die Aktivitätsanzeige
 settings-clip-ready-empty = Bereit. Bilder werden gelernt, sobald Pakete hinzukommen.
@@ -2362,6 +2362,7 @@ settings-clip-ready-all =
        *[other] Bereit: kennt alle { $count } Bilder
     }
 settings-clip-learning = Bereit: lernt Bilder, bisher { $done } von { $total }
+settings-clip-relearning = Bis das neue Modell jedes Bild gelernt hat, nutzen Suchen, was das alte gelernt hat.
 settings-clip-unavailable = Das Modell konnte nicht geholt werden: { $detail }. Neuer Versuch jede Stunde.
 settings-clap-heading = Nach Klang suchen
 settings-clap-reset = Soundsuche: auf Standard zurücksetzen

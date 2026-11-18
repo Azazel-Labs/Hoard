@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "c6262505c2e6f7d3de91fb52af12e9fcb0e0a1eb7c63595921d1a6e793628485"
+source = "f1669a81c6df0aa65b7d1254acbfe377ffe38ce4f61e820fd439a52d951e4242"
 translation = "07555d54b3ba6bc94b6fcbf55672d1be5e77ca134c96e30754ee929b3a902828"
 
 [messages.account-add]
@@ -8477,12 +8477,12 @@ source = "Search by what pictures show"
 translation = "ค้นหาจากสิ่งที่ปรากฏในภาพ"
 
 [messages.settings-clip-hint]
-source = "Uses OpenAI’s CLIP model, run on this server’s processor: nothing leaves it. Turning it on downloads the model ({ $size } MB) from Hugging Face, then learns every picture in the background at low priority. It takes 300 to 600 MB of memory while it works or someone searches. Turning it off deletes the model and keeps what it learned, for next time."
-translation = "ใช้โมเดล CLIP ของ OpenAI ที่ทำงานบนโปรเซสเซอร์ของเซิร์ฟเวอร์นี้: ไม่มีข้อมูลใดออกไปภายนอก การเปิดจะดาวน์โหลดโมเดล ({ $size } MB) จาก Hugging Face แล้วเรียนรู้รูปภาพทุกภาพในเบื้องหลังด้วยลำดับความสำคัญต่ำ ใช้หน่วยความจำ 300 ถึง 600 MB ขณะทำงานหรือขณะมีคนค้นหา การปิดจะลบโมเดลแต่เก็บสิ่งที่เรียนรู้ไว้ใช้ครั้งหน้า"
+source = "Uses Google’s SigLIP 2 model, run on this server’s processor: nothing leaves it. Turning it on downloads the model ({ $size } MB) from Hugging Face, then learns every picture in the background at low priority. It takes 350 to 750 MB of memory while it works or someone searches. Turning it off deletes the model and keeps what it learned, for next time."
+translation = "ใช้โมเดล SigLIP 2 ของ Google ที่ทำงานบนโปรเซสเซอร์ของเซิร์ฟเวอร์นี้: ไม่มีข้อมูลใดออกไปภายนอก การเปิดจะดาวน์โหลดโมเดล ({ $size } MB) จาก Hugging Face แล้วเรียนรู้รูปภาพทุกภาพในเบื้องหลังด้วยลำดับความสำคัญต่ำ ใช้หน่วยความจำ 350 ถึง 750 MB ขณะทำงานหรือขณะมีคนค้นหา การปิดจะลบโมเดลแต่เก็บสิ่งที่เรียนรู้ไว้ใช้ครั้งหน้า"
 
 [messages.settings-clip-hint-desktop]
-source = "Uses OpenAI’s CLIP model, run on this computer’s processor: nothing leaves it. Turning it on downloads the model ({ $size } MB) from Hugging Face, then learns every picture in the background at low priority. It takes 300 to 600 MB of memory while it works or you search. Turning it off deletes the model and keeps what it learned, for next time."
-translation = "ใช้โมเดล CLIP ของ OpenAI ที่ทำงานบนโปรเซสเซอร์ของคอมพิวเตอร์เครื่องนี้: ไม่มีข้อมูลใดออกไปภายนอก การเปิดจะดาวน์โหลดโมเดล ({ $size } MB) จาก Hugging Face แล้วเรียนรู้รูปภาพทุกภาพในเบื้องหลังด้วยลำดับความสำคัญต่ำ ใช้หน่วยความจำ 300 ถึง 600 MB ขณะทำงานหรือขณะที่คุณค้นหา การปิดจะลบโมเดลแต่เก็บสิ่งที่เรียนรู้ไว้ใช้ครั้งหน้า"
+source = "Uses Google’s SigLIP 2 model, run on this computer’s processor: nothing leaves it. Turning it on downloads the model ({ $size } MB) from Hugging Face, then learns every picture in the background at low priority. It takes 350 to 750 MB of memory while it works or you search. Turning it off deletes the model and keeps what it learned, for next time."
+translation = "ใช้โมเดล SigLIP 2 ของ Google ที่ทำงานบนโปรเซสเซอร์ของคอมพิวเตอร์เครื่องนี้: ไม่มีข้อมูลใดออกไปภายนอก การเปิดจะดาวน์โหลดโมเดล ({ $size } MB) จาก Hugging Face แล้วเรียนรู้รูปภาพทุกภาพในเบื้องหลังด้วยลำดับความสำคัญต่ำ ใช้หน่วยความจำ 350 ถึง 750 MB ขณะทำงานหรือขณะที่คุณค้นหา การปิดจะลบโมเดลแต่เก็บสิ่งที่เรียนรู้ไว้ใช้ครั้งหน้า"
 
 [messages.settings-clip-learning]
 source = "Ready: learning pictures, { $done } of { $total } so far"
@@ -8505,6 +8505,10 @@ translation = """
 [messages.settings-clip-ready-empty]
 source = "Ready. Pictures are learned as packs are added."
 translation = "พร้อม รูปภาพจะถูกเรียนรู้เมื่อมีการเพิ่มแพ็ก"
+
+[messages.settings-clip-relearning]
+source = "Until the new model has learned every picture, searches use what the old one learned."
+translation = "จนกว่าโมเดลใหม่จะเรียนรู้ภาพทุกภาพ การค้นหาจะใช้สิ่งที่โมเดลเก่าเรียนรู้ไว้"
 
 [messages.settings-clip-reset]
 source = "Image search: back to the default"

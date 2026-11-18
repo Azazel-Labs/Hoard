@@ -2172,8 +2172,8 @@ settings-clip-saved-on = Tìm kiếm hình ảnh: bật
 settings-clip-saved-off = Tìm kiếm hình ảnh: tắt
 settings-clip-what = Nhập thứ bạn đang tìm (“mossy rock”, “sci-fi door”, “wooden barrel”) và những ảnh thể hiện nó sẽ hiện ra cạnh những tên có các từ đó. “Thêm nữa giống thế này” tìm những thứ cùng loại, không chỉ cùng màu.
 settings-clip-toggle = Bật tìm kiếm hình ảnh
-settings-clip-hint = Dùng mô hình CLIP của OpenAI, chạy trên bộ xử lý của máy chủ này: không có gì rời khỏi máy chủ. Khi bật, mô hình ({ $size } MB) sẽ được tải từ Hugging Face, rồi học mọi ảnh trong nền với mức ưu tiên thấp. Nó dùng 300 đến 600 MB bộ nhớ khi đang làm việc hoặc khi có người tìm kiếm. Khi tắt, mô hình bị xóa nhưng những gì nó đã học được giữ lại cho lần sau.
-settings-clip-hint-desktop = Dùng mô hình CLIP của OpenAI, chạy trên bộ xử lý của máy tính này: không có gì rời khỏi máy. Khi bật, mô hình ({ $size } MB) sẽ được tải từ Hugging Face, rồi học mọi ảnh trong nền với mức ưu tiên thấp. Nó dùng 300 đến 600 MB bộ nhớ khi đang làm việc hoặc khi bạn tìm kiếm. Khi tắt, mô hình bị xóa nhưng những gì nó đã học được giữ lại cho lần sau.
+settings-clip-hint = Dùng mô hình SigLIP 2 của Google, chạy trên bộ xử lý của máy chủ này: không có gì rời khỏi máy chủ. Khi bật, mô hình ({ $size } MB) sẽ được tải từ Hugging Face, rồi học mọi ảnh trong nền với mức ưu tiên thấp. Nó dùng 350 đến 750 MB bộ nhớ khi đang làm việc hoặc khi có người tìm kiếm. Khi tắt, mô hình bị xóa nhưng những gì nó đã học được giữ lại cho lần sau.
+settings-clip-hint-desktop = Dùng mô hình SigLIP 2 của Google, chạy trên bộ xử lý của máy tính này: không có gì rời khỏi máy. Khi bật, mô hình ({ $size } MB) sẽ được tải từ Hugging Face, rồi học mọi ảnh trong nền với mức ưu tiên thấp. Nó dùng 350 đến 750 MB bộ nhớ khi đang làm việc hoặc khi bạn tìm kiếm. Khi tắt, mô hình bị xóa nhưng những gì nó đã học được giữ lại cho lần sau.
 settings-clip-looking = Đang tìm mô hình…
 settings-clip-downloading = Đang tải mô hình xuống… tiến độ hiện ở chỉ báo hoạt động
 settings-clip-ready-empty = Sẵn sàng. Ảnh sẽ được học khi gói được thêm vào.
@@ -2182,6 +2182,7 @@ settings-clip-ready-all =
        *[other] Sẵn sàng: đã biết cả { $count } ảnh
     }
 settings-clip-learning = Sẵn sàng: đang học ảnh, đến giờ được { $done } / { $total }
+settings-clip-relearning = Cho đến khi mô hình mới học xong mọi ảnh, tìm kiếm dùng những gì mô hình cũ đã học.
 settings-clip-unavailable = Không lấy được mô hình: { $detail }. Sẽ thử lại mỗi giờ.
 settings-clap-heading = Tìm theo âm thanh nghe ra sao
 settings-clap-reset = Tìm kiếm âm thanh: về mặc định

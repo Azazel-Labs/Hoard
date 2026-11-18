@@ -2559,8 +2559,8 @@ settings-clip-saved-on = Căutare după imagine: activată
 settings-clip-saved-off = Căutare după imagine: dezactivată
 settings-clip-what = Tastați ce căutați („mossy rock”, „sci-fi door”, „wooden barrel”), iar imaginile care arată asta apar lângă numele care conțin cuvintele. „Mai multe ca aceasta” găsește lucruri de același fel, nu doar de aceleași culori.
 settings-clip-toggle = Activați căutarea după imagine
-settings-clip-hint = Folosește modelul CLIP de la OpenAI, rulat pe procesorul acestui server: nimic nu pleacă de pe el. Activarea descarcă modelul ({ $size } MB) de pe Hugging Face, apoi învață fiecare imagine în fundal, cu prioritate scăzută. Ocupă între 300 și 600 MB de memorie cât timp lucrează sau cât timp caută cineva. Dezactivarea șterge modelul și păstrează ce a învățat, pentru data viitoare.
-settings-clip-hint-desktop = Folosește modelul CLIP de la OpenAI, rulat pe procesorul acestui computer: nimic nu pleacă de pe el. Activarea descarcă modelul ({ $size } MB) de pe Hugging Face, apoi învață fiecare imagine în fundal, cu prioritate scăzută. Ocupă între 300 și 600 MB de memorie cât timp lucrează sau cât timp căutați. Dezactivarea șterge modelul și păstrează ce a învățat, pentru data viitoare.
+settings-clip-hint = Folosește modelul SigLIP 2 de la Google, rulat pe procesorul acestui server: nimic nu pleacă de pe el. Activarea descarcă modelul ({ $size } MB) de pe Hugging Face, apoi învață fiecare imagine în fundal, cu prioritate scăzută. Ocupă între 350 și 750 MB de memorie cât timp lucrează sau cât timp caută cineva. Dezactivarea șterge modelul și păstrează ce a învățat, pentru data viitoare.
+settings-clip-hint-desktop = Folosește modelul SigLIP 2 de la Google, rulat pe procesorul acestui computer: nimic nu pleacă de pe el. Activarea descarcă modelul ({ $size } MB) de pe Hugging Face, apoi învață fiecare imagine în fundal, cu prioritate scăzută. Ocupă între 350 și 750 MB de memorie cât timp lucrează sau cât timp căutați. Dezactivarea șterge modelul și păstrează ce a învățat, pentru data viitoare.
 settings-clip-looking = Se caută modelul…
 settings-clip-downloading = Se descarcă modelul… progresul apare în indicatorul de activitate
 settings-clip-ready-empty = Gata. Imaginile sunt învățate pe măsură ce se adaugă pachete.
@@ -2571,6 +2571,7 @@ settings-clip-ready-all =
        *[other] Gata: cunoaște toate cele { $count } de imagini
     }
 settings-clip-learning = Gata: se învață imaginile, { $done } din { $total } până acum
+settings-clip-relearning = Până când noul model învață fiecare imagine, căutările folosesc ce a învățat cel vechi.
 settings-clip-unavailable = Modelul nu a putut fi obținut: { $detail }. Se încearcă din nou în fiecare oră.
 settings-clap-heading = Căutare după cum sună sunetele
 settings-clap-reset = Căutare după sunet: înapoi la valoarea implicită

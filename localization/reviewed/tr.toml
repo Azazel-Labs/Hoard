@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "c6262505c2e6f7d3de91fb52af12e9fcb0e0a1eb7c63595921d1a6e793628485"
+source = "f1669a81c6df0aa65b7d1254acbfe377ffe38ce4f61e820fd439a52d951e4242"
 translation = "365b0fc7ff648476ee75c67213c00d18e7b3e0fb9f940664032b9c834c675ffb"
 
 [messages.account-add]
@@ -8490,12 +8490,12 @@ source = "Search by what pictures show"
 translation = "Resimlerin gösterdiğine göre ara"
 
 [messages.settings-clip-hint]
-source = "Uses OpenAI’s CLIP model, run on this server’s processor: nothing leaves it. Turning it on downloads the model ({ $size } MB) from Hugging Face, then learns every picture in the background at low priority. It takes 300 to 600 MB of memory while it works or someone searches. Turning it off deletes the model and keeps what it learned, for next time."
-translation = "OpenAI’nin CLIP modelini kullanır ve bu sunucunun işlemcisinde çalışır: hiçbir şey dışarı çıkmaz. Açmak, modeli ({ $size } MB) Hugging Face’ten indirir, ardından her resmi arka planda düşük öncelikle öğrenir. Çalışırken ya da biri arama yaparken 300 ile 600 MB bellek kullanır. Kapatmak modeli siler, öğrendiklerini bir dahaki sefer için saklar."
+source = "Uses Google’s SigLIP 2 model, run on this server’s processor: nothing leaves it. Turning it on downloads the model ({ $size } MB) from Hugging Face, then learns every picture in the background at low priority. It takes 350 to 750 MB of memory while it works or someone searches. Turning it off deletes the model and keeps what it learned, for next time."
+translation = "Google’ın SigLIP 2 modelini kullanır ve bu sunucunun işlemcisinde çalışır: hiçbir şey dışarı çıkmaz. Açmak, modeli ({ $size } MB) Hugging Face’ten indirir, ardından her resmi arka planda düşük öncelikle öğrenir. Çalışırken ya da biri arama yaparken 350 ile 750 MB bellek kullanır. Kapatmak modeli siler, öğrendiklerini bir dahaki sefer için saklar."
 
 [messages.settings-clip-hint-desktop]
-source = "Uses OpenAI’s CLIP model, run on this computer’s processor: nothing leaves it. Turning it on downloads the model ({ $size } MB) from Hugging Face, then learns every picture in the background at low priority. It takes 300 to 600 MB of memory while it works or you search. Turning it off deletes the model and keeps what it learned, for next time."
-translation = "OpenAI’nin CLIP modelini kullanır ve bu bilgisayarın işlemcisinde çalışır: hiçbir şey dışarı çıkmaz. Açmak, modeli ({ $size } MB) Hugging Face’ten indirir, ardından her resmi arka planda düşük öncelikle öğrenir. Çalışırken ya da siz arama yaparken 300 ile 600 MB bellek kullanır. Kapatmak modeli siler, öğrendiklerini bir dahaki sefer için saklar."
+source = "Uses Google’s SigLIP 2 model, run on this computer’s processor: nothing leaves it. Turning it on downloads the model ({ $size } MB) from Hugging Face, then learns every picture in the background at low priority. It takes 350 to 750 MB of memory while it works or you search. Turning it off deletes the model and keeps what it learned, for next time."
+translation = "Google’ın SigLIP 2 modelini kullanır ve bu bilgisayarın işlemcisinde çalışır: hiçbir şey dışarı çıkmaz. Açmak, modeli ({ $size } MB) Hugging Face’ten indirir, ardından her resmi arka planda düşük öncelikle öğrenir. Çalışırken ya da siz arama yaparken 350 ile 750 MB bellek kullanır. Kapatmak modeli siler, öğrendiklerini bir dahaki sefer için saklar."
 
 [messages.settings-clip-learning]
 source = "Ready: learning pictures, { $done } of { $total } so far"
@@ -8518,6 +8518,10 @@ translation = """
 [messages.settings-clip-ready-empty]
 source = "Ready. Pictures are learned as packs are added."
 translation = "Hazır. Resimler, paketler eklendikçe öğrenilir."
+
+[messages.settings-clip-relearning]
+source = "Until the new model has learned every picture, searches use what the old one learned."
+translation = "Yeni model her resmi öğrenene kadar aramalar eskisinin öğrendiklerini kullanır."
 
 [messages.settings-clip-reset]
 source = "Image search: back to the default"

@@ -2203,6 +2203,8 @@ async fn settings_json(state: &AppState) -> Value {
     let sounds = db::call(&state.pool, |c| crate::clap::progress(c)).await.unwrap_or((0, 0));
     let image_search = &crate::clip::describe();
     out["clip"] = model_json(now.clip, saved.clip.is_some(), image_search, crate::clip::DOWNLOAD_BYTES, pictures);
+    // Searches use what the model before learned until every picture is relearned.
+    out["clip"]["relearning"] = json!(crate::clip::relearning());
     let sound_search = &crate::clap::describe();
     out["clap"] = model_json(now.clap, saved.clap.is_some(), sound_search, crate::clap::DOWNLOAD_BYTES, sounds);
     out

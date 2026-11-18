@@ -2394,8 +2394,8 @@ settings-clip-saved-on = Recherche d’images : activée
 settings-clip-saved-off = Recherche d’images : désactivée
 settings-clip-what = Tapez ce que vous cherchez (« rocher moussu », « porte de science-fiction », « tonneau en bois ») et les images qui le montrent apparaissent à côté des noms qui contiennent ces mots. « Plus comme ceci » trouve des choses de même nature, pas seulement de mêmes couleurs.
 settings-clip-toggle = Activer la recherche d’images
-settings-clip-hint = Utilise le modèle CLIP d’OpenAI, exécuté sur le processeur de ce serveur : rien n’en sort. L’activer télécharge le modèle ({ $size } Mo) depuis Hugging Face, puis apprend chaque image en arrière-plan, en basse priorité. Il occupe de 300 à 600 Mo de mémoire pendant qu’il travaille ou que quelqu’un cherche. Le désactiver supprime le modèle et garde ce qu’il a appris, pour la prochaine fois.
-settings-clip-hint-desktop = Utilise le modèle CLIP d’OpenAI, exécuté sur le processeur de cet ordinateur : rien n’en sort. L’activer télécharge le modèle ({ $size } Mo) depuis Hugging Face, puis apprend chaque image en arrière-plan, en basse priorité. Il occupe de 300 à 600 Mo de mémoire pendant qu’il travaille ou que vous cherchez. Le désactiver supprime le modèle et garde ce qu’il a appris, pour la prochaine fois.
+settings-clip-hint = Utilise le modèle SigLIP 2 de Google, exécuté sur le processeur de ce serveur : rien n’en sort. L’activer télécharge le modèle ({ $size } Mo) depuis Hugging Face, puis apprend chaque image en arrière-plan, en basse priorité. Il occupe de 350 à 750 Mo de mémoire pendant qu’il travaille ou que quelqu’un cherche. Le désactiver supprime le modèle et garde ce qu’il a appris, pour la prochaine fois.
+settings-clip-hint-desktop = Utilise le modèle SigLIP 2 de Google, exécuté sur le processeur de cet ordinateur : rien n’en sort. L’activer télécharge le modèle ({ $size } Mo) depuis Hugging Face, puis apprend chaque image en arrière-plan, en basse priorité. Il occupe de 350 à 750 Mo de mémoire pendant qu’il travaille ou que vous cherchez. Le désactiver supprime le modèle et garde ce qu’il a appris, pour la prochaine fois.
 settings-clip-looking = Recherche du modèle…
 settings-clip-downloading = Téléchargement du modèle… la progression s’affiche dans l’indicateur d’activité
 settings-clip-ready-empty = Prêt. Les images sont apprises à mesure que des packs sont ajoutés.
@@ -2405,6 +2405,7 @@ settings-clip-ready-all =
        *[other] Prêt : connaît les { $count } images
     }
 settings-clip-learning = Prêt : apprentissage des images, { $done } sur { $total } jusqu’ici
+settings-clip-relearning = Tant que le nouveau modèle n’a pas appris toutes les images, les recherches utilisent ce que l’ancien a appris.
 settings-clip-unavailable = Impossible d’obtenir le modèle : { $detail }. Nouvel essai toutes les heures.
 settings-clap-heading = Chercher d’après ce à quoi ressemblent les sons
 settings-clap-reset = Recherche de sons : retour à la valeur par défaut

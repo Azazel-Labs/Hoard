@@ -2550,8 +2550,8 @@ settings-clip-saved-on = Hledání obrázků: zapnuto
 settings-clip-saved-off = Hledání obrázků: vypnuto
 settings-clip-what = Napište, co hledáte („mossy rock“, „sci-fi door“, „wooden barrel“), a obrázky, které to zobrazují, se objeví vedle názvů obsahujících tato slova. „Další podobné“ najde věci stejného druhu, nejen stejných barev.
 settings-clip-toggle = Zapnout hledání obrázků
-settings-clip-hint = Používá model CLIP od OpenAI spuštěný na procesoru tohoto serveru: nic ho neopouští. Zapnutí stáhne model ({ $size } MB) z Hugging Face a pak se na pozadí s nízkou prioritou naučí každý obrázek. Během práce nebo hledání zabere 300 až 600 MB paměti. Vypnutí model smaže a to, co se naučil, si ponechá na příště.
-settings-clip-hint-desktop = Používá model CLIP od OpenAI spuštěný na procesoru tohoto počítače: nic ho neopouští. Zapnutí stáhne model ({ $size } MB) z Hugging Face a pak se na pozadí s nízkou prioritou naučí každý obrázek. Zatímco pracuje nebo když hledáte, zabere 300 až 600 MB paměti. Vypnutí model smaže a to, co se naučil, si ponechá na příště.
+settings-clip-hint = Používá model SigLIP 2 od Googlu spuštěný na procesoru tohoto serveru: nic ho neopouští. Zapnutí stáhne model ({ $size } MB) z Hugging Face a pak se na pozadí s nízkou prioritou naučí každý obrázek. Během práce nebo hledání zabere 350 až 750 MB paměti. Vypnutí model smaže a to, co se naučil, si ponechá na příště.
+settings-clip-hint-desktop = Používá model SigLIP 2 od Googlu spuštěný na procesoru tohoto počítače: nic ho neopouští. Zapnutí stáhne model ({ $size } MB) z Hugging Face a pak se na pozadí s nízkou prioritou naučí každý obrázek. Zatímco pracuje nebo když hledáte, zabere 350 až 750 MB paměti. Vypnutí model smaže a to, co se naučil, si ponechá na příště.
 settings-clip-looking = Hledám model…
 settings-clip-downloading = Stahuji model… průběh je v indikátoru aktivity
 settings-clip-ready-empty = Připraveno. Obrázky se učí, jak se přidávají balíčky.
@@ -2562,6 +2562,7 @@ settings-clip-ready-all =
        *[other] Připraveno: zná všech { $count } obrázků
     }
 settings-clip-learning = Připraveno: učí se obrázky, zatím { $done } z { $total }
+settings-clip-relearning = Dokud se nový model nenaučí všechny obrázky, hledání používá to, co se naučil ten starý.
 settings-clip-unavailable = Model se nepodařilo získat: { $detail }. Zkouší se to znovu každou hodinu.
 settings-clap-heading = Hledání podle toho, jak zvuky znějí
 settings-clap-reset = Hledání zvuků: zpět na výchozí

@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "c6262505c2e6f7d3de91fb52af12e9fcb0e0a1eb7c63595921d1a6e793628485"
+source = "f1669a81c6df0aa65b7d1254acbfe377ffe38ce4f61e820fd439a52d951e4242"
 translation = "230aa92a6033cfd0e81420ca5ef21ba788bfd9cbf50cc6964032f8c9499222bf"
 
 [messages.account-add]
@@ -8486,12 +8486,12 @@ source = "Search by what pictures show"
 translation = "Keresés a képek tartalma szerint"
 
 [messages.settings-clip-hint]
-source = "Uses OpenAI’s CLIP model, run on this server’s processor: nothing leaves it. Turning it on downloads the model ({ $size } MB) from Hugging Face, then learns every picture in the background at low priority. It takes 300 to 600 MB of memory while it works or someone searches. Turning it off deletes the model and keeps what it learned, for next time."
-translation = "Az OpenAI CLIP modelljét használja, a szerver processzorán futtatva: semmi sem hagyja el a szervert. Bekapcsoláskor letölti a modellt ({ $size } MB) a Hugging Face-ről, majd a háttérben, alacsony prioritással megtanul minden képet. Munka vagy keresés közben 300–600 MB memóriát foglal. Kikapcsoláskor törli a modellt, de megtartja, amit megtanult, a következő alkalomra."
+source = "Uses Google’s SigLIP 2 model, run on this server’s processor: nothing leaves it. Turning it on downloads the model ({ $size } MB) from Hugging Face, then learns every picture in the background at low priority. It takes 350 to 750 MB of memory while it works or someone searches. Turning it off deletes the model and keeps what it learned, for next time."
+translation = "A Google SigLIP 2 modelljét használja, a szerver processzorán futtatva: semmi sem hagyja el a szervert. Bekapcsoláskor letölti a modellt ({ $size } MB) a Hugging Face-ről, majd a háttérben, alacsony prioritással megtanul minden képet. Munka vagy keresés közben 350–750 MB memóriát foglal. Kikapcsoláskor törli a modellt, de megtartja, amit megtanult, a következő alkalomra."
 
 [messages.settings-clip-hint-desktop]
-source = "Uses OpenAI’s CLIP model, run on this computer’s processor: nothing leaves it. Turning it on downloads the model ({ $size } MB) from Hugging Face, then learns every picture in the background at low priority. It takes 300 to 600 MB of memory while it works or you search. Turning it off deletes the model and keeps what it learned, for next time."
-translation = "Az OpenAI CLIP modelljét használja, ennek a számítógépnek a processzorán futtatva: semmi sem hagyja el a gépet. Bekapcsoláskor letölti a modellt ({ $size } MB) a Hugging Face-ről, majd a háttérben, alacsony prioritással megtanul minden képet. Munka vagy keresés közben 300–600 MB memóriát foglal. Kikapcsoláskor törli a modellt, de megtartja, amit megtanult, a következő alkalomra."
+source = "Uses Google’s SigLIP 2 model, run on this computer’s processor: nothing leaves it. Turning it on downloads the model ({ $size } MB) from Hugging Face, then learns every picture in the background at low priority. It takes 350 to 750 MB of memory while it works or you search. Turning it off deletes the model and keeps what it learned, for next time."
+translation = "A Google SigLIP 2 modelljét használja, ennek a számítógépnek a processzorán futtatva: semmi sem hagyja el a gépet. Bekapcsoláskor letölti a modellt ({ $size } MB) a Hugging Face-ről, majd a háttérben, alacsony prioritással megtanul minden képet. Munka vagy keresés közben 350–750 MB memóriát foglal. Kikapcsoláskor törli a modellt, de megtartja, amit megtanult, a következő alkalomra."
 
 [messages.settings-clip-learning]
 source = "Ready: learning pictures, { $done } of { $total } so far"
@@ -8514,6 +8514,10 @@ translation = """
 [messages.settings-clip-ready-empty]
 source = "Ready. Pictures are learned as packs are added."
 translation = "Kész. A képeket a csomagok hozzáadásakor tanulja meg."
+
+[messages.settings-clip-relearning]
+source = "Until the new model has learned every picture, searches use what the old one learned."
+translation = "Amíg az új modell meg nem tanul minden képet, a keresések azt használják, amit a régi tanult."
 
 [messages.settings-clip-reset]
 source = "Image search: back to the default"

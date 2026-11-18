@@ -2189,8 +2189,8 @@ settings-clip-saved-on = Görsel arama: açık
 settings-clip-saved-off = Görsel arama: kapalı
 settings-clip-what = Aradığınızı yazın (“mossy rock”, “sci-fi door”, “wooden barrel”); onu gösteren resimler, adında bu sözcükler geçenlerin yanında çıkar. “Buna benzer daha fazla”, yalnızca aynı renkleri değil, aynı türden şeyleri bulur.
 settings-clip-toggle = Görsel aramayı aç
-settings-clip-hint = OpenAI’nin CLIP modelini kullanır ve bu sunucunun işlemcisinde çalışır: hiçbir şey dışarı çıkmaz. Açmak, modeli ({ $size } MB) Hugging Face’ten indirir, ardından her resmi arka planda düşük öncelikle öğrenir. Çalışırken ya da biri arama yaparken 300 ile 600 MB bellek kullanır. Kapatmak modeli siler, öğrendiklerini bir dahaki sefer için saklar.
-settings-clip-hint-desktop = OpenAI’nin CLIP modelini kullanır ve bu bilgisayarın işlemcisinde çalışır: hiçbir şey dışarı çıkmaz. Açmak, modeli ({ $size } MB) Hugging Face’ten indirir, ardından her resmi arka planda düşük öncelikle öğrenir. Çalışırken ya da siz arama yaparken 300 ile 600 MB bellek kullanır. Kapatmak modeli siler, öğrendiklerini bir dahaki sefer için saklar.
+settings-clip-hint = Google’ın SigLIP 2 modelini kullanır ve bu sunucunun işlemcisinde çalışır: hiçbir şey dışarı çıkmaz. Açmak, modeli ({ $size } MB) Hugging Face’ten indirir, ardından her resmi arka planda düşük öncelikle öğrenir. Çalışırken ya da biri arama yaparken 350 ile 750 MB bellek kullanır. Kapatmak modeli siler, öğrendiklerini bir dahaki sefer için saklar.
+settings-clip-hint-desktop = Google’ın SigLIP 2 modelini kullanır ve bu bilgisayarın işlemcisinde çalışır: hiçbir şey dışarı çıkmaz. Açmak, modeli ({ $size } MB) Hugging Face’ten indirir, ardından her resmi arka planda düşük öncelikle öğrenir. Çalışırken ya da siz arama yaparken 350 ile 750 MB bellek kullanır. Kapatmak modeli siler, öğrendiklerini bir dahaki sefer için saklar.
 settings-clip-looking = Model aranıyor…
 settings-clip-downloading = Model indiriliyor… ilerleme etkinlik göstergesinde
 settings-clip-ready-empty = Hazır. Resimler, paketler eklendikçe öğrenilir.
@@ -2199,6 +2199,7 @@ settings-clip-ready-all =
        *[other] Hazır: { $count } resmin tümünü tanıyor
     }
 settings-clip-learning = Hazır: resimler öğreniliyor, şimdiye kadar { $done } / { $total }
+settings-clip-relearning = Yeni model her resmi öğrenene kadar aramalar eskisinin öğrendiklerini kullanır.
 settings-clip-unavailable = Model alınamadı: { $detail }. Her saat yeniden deneniyor.
 settings-clap-heading = Seslerin neye benzediğine göre ara
 settings-clap-reset = Ses arama: varsayılana dön

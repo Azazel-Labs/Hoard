@@ -916,7 +916,7 @@ export interface UpdateHookCall {
   result: string
 }
 
-/** Image search (CLIP) or sound search (CLAP): its switch, its model, and how many pictures or sounds it has learned. */
+/** Image search (SigLIP 2) or sound search (CLAP): its switch, its model, and how many pictures or sounds it has learned. */
 export interface SearchModelSetting {
   value: boolean
   default: boolean
@@ -928,6 +928,8 @@ export interface SearchModelSetting {
   /** Pictures or sounds with an embedding, of all that could have one. */
   done: number
   total: number
+  /** Image search only: searches use what the model before learned until every picture is learned again. */
+  relearning?: boolean
 }
 
 /** The S3 service `s3://bucket` locations are in. The secret key and the headers are never sent back. */

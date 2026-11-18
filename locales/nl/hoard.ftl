@@ -2351,8 +2351,8 @@ settings-clip-saved-on = Zoeken op beeld: aan
 settings-clip-saved-off = Zoeken op beeld: uit
 settings-clip-what = Typ wat je zoekt (“mossy rock”, “sci-fi door”, “wooden barrel”) en afbeeldingen die het tonen verschijnen naast namen met die woorden. “Meer zoals dit” vindt dingen van dezelfde soort, niet alleen met dezelfde kleuren.
 settings-clip-toggle = Zoeken op beeld inschakelen
-settings-clip-hint = Gebruikt het CLIP-model van OpenAI, uitgevoerd op de processor van deze server: er gaat niets naar buiten. Inschakelen downloadt het model ({ $size } MB) van Hugging Face en leert daarna elke afbeelding op de achtergrond met lage prioriteit. Het gebruikt 300 tot 600 MB geheugen terwijl het werkt of iemand zoekt. Uitschakelen verwijdert het model en bewaart wat het heeft geleerd, voor de volgende keer.
-settings-clip-hint-desktop = Gebruikt het CLIP-model van OpenAI, uitgevoerd op de processor van deze computer: er gaat niets naar buiten. Inschakelen downloadt het model ({ $size } MB) van Hugging Face en leert daarna elke afbeelding op de achtergrond met lage prioriteit. Het gebruikt 300 tot 600 MB geheugen terwijl het werkt of je zoekt. Uitschakelen verwijdert het model en bewaart wat het heeft geleerd, voor de volgende keer.
+settings-clip-hint = Gebruikt het SigLIP 2-model van Google, uitgevoerd op de processor van deze server: er gaat niets naar buiten. Inschakelen downloadt het model ({ $size } MB) van Hugging Face en leert daarna elke afbeelding op de achtergrond met lage prioriteit. Het gebruikt 350 tot 750 MB geheugen terwijl het werkt of iemand zoekt. Uitschakelen verwijdert het model en bewaart wat het heeft geleerd, voor de volgende keer.
+settings-clip-hint-desktop = Gebruikt het SigLIP 2-model van Google, uitgevoerd op de processor van deze computer: er gaat niets naar buiten. Inschakelen downloadt het model ({ $size } MB) van Hugging Face en leert daarna elke afbeelding op de achtergrond met lage prioriteit. Het gebruikt 350 tot 750 MB geheugen terwijl het werkt of je zoekt. Uitschakelen verwijdert het model en bewaart wat het heeft geleerd, voor de volgende keer.
 settings-clip-looking = Het model zoeken…
 settings-clip-downloading = Het model downloaden… de voortgang staat in de activiteitsindicator
 settings-clip-ready-empty = Klaar. Afbeeldingen worden geleerd zodra pakketten worden toegevoegd.
@@ -2362,6 +2362,7 @@ settings-clip-ready-all =
        *[other] Klaar: kent alle { $count } afbeeldingen
     }
 settings-clip-learning = Klaar: afbeeldingen leren, tot nu toe { $done } van { $total }
+settings-clip-relearning = Tot het nieuwe model elke afbeelding heeft geleerd, gebruiken zoekopdrachten wat het oude heeft geleerd.
 settings-clip-unavailable = Kon het model niet ophalen: { $detail }. Elk uur wordt het opnieuw geprobeerd.
 settings-clap-heading = Zoeken op hoe geluiden klinken
 settings-clap-reset = Zoeken op geluid: terug naar de standaardwaarde

@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "c6262505c2e6f7d3de91fb52af12e9fcb0e0a1eb7c63595921d1a6e793628485"
+source = "f1669a81c6df0aa65b7d1254acbfe377ffe38ce4f61e820fd439a52d951e4242"
 translation = "cb51eeebee58ce4e694b9c22ec1e26a19090d24e80d9b74b0e431ca3fa274b7f"
 
 [messages.account-add]
@@ -8447,12 +8447,12 @@ source = "Search by what pictures show"
 translation = "그림 내용으로 검색"
 
 [messages.settings-clip-hint]
-source = "Uses OpenAI’s CLIP model, run on this server’s processor: nothing leaves it. Turning it on downloads the model ({ $size } MB) from Hugging Face, then learns every picture in the background at low priority. It takes 300 to 600 MB of memory while it works or someone searches. Turning it off deletes the model and keeps what it learned, for next time."
-translation = "OpenAI의 CLIP 모델을 이 서버의 프로세서에서 실행하므로 아무것도 밖으로 나가지 않습니다. 켜면 Hugging Face에서 모델({ $size } MB)을 다운로드한 다음, 낮은 우선순위로 백그라운드에서 모든 그림을 학습합니다. 학습하거나 누군가 검색하는 동안 메모리를 300~600 MB 사용합니다. 끄면 모델은 삭제되지만 학습한 내용은 다음을 위해 남겨 둡니다."
+source = "Uses Google’s SigLIP 2 model, run on this server’s processor: nothing leaves it. Turning it on downloads the model ({ $size } MB) from Hugging Face, then learns every picture in the background at low priority. It takes 350 to 750 MB of memory while it works or someone searches. Turning it off deletes the model and keeps what it learned, for next time."
+translation = "Google의 SigLIP 2 모델을 이 서버의 프로세서에서 실행하므로 아무것도 밖으로 나가지 않습니다. 켜면 Hugging Face에서 모델({ $size } MB)을 다운로드한 다음, 낮은 우선순위로 백그라운드에서 모든 그림을 학습합니다. 학습하거나 누군가 검색하는 동안 메모리를 350~750 MB 사용합니다. 끄면 모델은 삭제되지만 학습한 내용은 다음을 위해 남겨 둡니다."
 
 [messages.settings-clip-hint-desktop]
-source = "Uses OpenAI’s CLIP model, run on this computer’s processor: nothing leaves it. Turning it on downloads the model ({ $size } MB) from Hugging Face, then learns every picture in the background at low priority. It takes 300 to 600 MB of memory while it works or you search. Turning it off deletes the model and keeps what it learned, for next time."
-translation = "OpenAI의 CLIP 모델을 이 컴퓨터의 프로세서에서 실행하므로 아무것도 밖으로 나가지 않습니다. 켜면 Hugging Face에서 모델({ $size } MB)을 다운로드한 다음, 낮은 우선순위로 백그라운드에서 모든 그림을 학습합니다. 학습하거나 검색하는 동안 메모리를 300~600 MB 사용합니다. 끄면 모델은 삭제되지만 학습한 내용은 다음을 위해 남겨 둡니다."
+source = "Uses Google’s SigLIP 2 model, run on this computer’s processor: nothing leaves it. Turning it on downloads the model ({ $size } MB) from Hugging Face, then learns every picture in the background at low priority. It takes 350 to 750 MB of memory while it works or you search. Turning it off deletes the model and keeps what it learned, for next time."
+translation = "Google의 SigLIP 2 모델을 이 컴퓨터의 프로세서에서 실행하므로 아무것도 밖으로 나가지 않습니다. 켜면 Hugging Face에서 모델({ $size } MB)을 다운로드한 다음, 낮은 우선순위로 백그라운드에서 모든 그림을 학습합니다. 학습하거나 검색하는 동안 메모리를 350~750 MB 사용합니다. 끄면 모델은 삭제되지만 학습한 내용은 다음을 위해 남겨 둡니다."
 
 [messages.settings-clip-learning]
 source = "Ready: learning pictures, { $done } of { $total } so far"
@@ -8472,6 +8472,10 @@ translation = "준비됨: 그림 { $count }개를 모두 학습했습니다"
 [messages.settings-clip-ready-empty]
 source = "Ready. Pictures are learned as packs are added."
 translation = "준비됨. 팩이 추가되면 그림을 학습합니다."
+
+[messages.settings-clip-relearning]
+source = "Until the new model has learned every picture, searches use what the old one learned."
+translation = "새 모델이 모든 그림을 학습할 때까지 검색은 이전 모델이 학습한 내용을 사용합니다."
 
 [messages.settings-clip-reset]
 source = "Image search: back to the default"

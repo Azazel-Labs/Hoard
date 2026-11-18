@@ -70,14 +70,8 @@ Spine skeletons exported as JSON play on their atlas in Hoard's own player. Stil
 ## Near copies and a better "More like this"
 
 Near copies are listed on each asset and on their own Settings page. More like this ranks by colors and grain, and
-by what pictures show when image search (CLIP) is on. Still to come:
+by what pictures show when image search (SigLIP 2) is on. Still to come:
 
-- **A better picture model.** SigLIP 2 in place of CLIP ViT-B/32: better at finding pictures from words and at
-  telling what's alike. Still run on the server through candle, and still off until an admin turns it on. After the
-  switch, what CLIP learned is relearned in the background, and search keeps using it until then.
 - **A hosted embedding service, as an option.** For a server too small to run the model: thumbnails go to a
   multimodal embedding API the admin picks. Off by default, and Settings says plainly that it sends pictures away
   from the server.
-
-Still open: which SigLIP 2 size (download and memory against how much better it finds things, measured on a real
-library).

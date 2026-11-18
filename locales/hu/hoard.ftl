@@ -2185,8 +2185,8 @@ settings-clip-saved-on = Képkeresés: bekapcsolva
 settings-clip-saved-off = Képkeresés: kikapcsolva
 settings-clip-what = Írja be, amit keres (angolul, pl. „mossy rock”, „sci-fi door”, „wooden barrel”), és az ezt ábrázoló képek megjelennek a szavakat tartalmazó nevek mellett. A „Több ilyen” ugyanolyan fajtájú dolgokat talál, nem csak ugyanolyan színűeket.
 settings-clip-toggle = Képkeresés bekapcsolása
-settings-clip-hint = Az OpenAI CLIP modelljét használja, a szerver processzorán futtatva: semmi sem hagyja el a szervert. Bekapcsoláskor letölti a modellt ({ $size } MB) a Hugging Face-ről, majd a háttérben, alacsony prioritással megtanul minden képet. Munka vagy keresés közben 300–600 MB memóriát foglal. Kikapcsoláskor törli a modellt, de megtartja, amit megtanult, a következő alkalomra.
-settings-clip-hint-desktop = Az OpenAI CLIP modelljét használja, ennek a számítógépnek a processzorán futtatva: semmi sem hagyja el a gépet. Bekapcsoláskor letölti a modellt ({ $size } MB) a Hugging Face-ről, majd a háttérben, alacsony prioritással megtanul minden képet. Munka vagy keresés közben 300–600 MB memóriát foglal. Kikapcsoláskor törli a modellt, de megtartja, amit megtanult, a következő alkalomra.
+settings-clip-hint = A Google SigLIP 2 modelljét használja, a szerver processzorán futtatva: semmi sem hagyja el a szervert. Bekapcsoláskor letölti a modellt ({ $size } MB) a Hugging Face-ről, majd a háttérben, alacsony prioritással megtanul minden képet. Munka vagy keresés közben 350–750 MB memóriát foglal. Kikapcsoláskor törli a modellt, de megtartja, amit megtanult, a következő alkalomra.
+settings-clip-hint-desktop = A Google SigLIP 2 modelljét használja, ennek a számítógépnek a processzorán futtatva: semmi sem hagyja el a gépet. Bekapcsoláskor letölti a modellt ({ $size } MB) a Hugging Face-ről, majd a háttérben, alacsony prioritással megtanul minden képet. Munka vagy keresés közben 350–750 MB memóriát foglal. Kikapcsoláskor törli a modellt, de megtartja, amit megtanult, a következő alkalomra.
 settings-clip-looking = A modell keresése…
 settings-clip-downloading = A modell letöltése… a folyamat az aktivitásjelzőn követhető
 settings-clip-ready-empty = Kész. A képeket a csomagok hozzáadásakor tanulja meg.
@@ -2195,6 +2195,7 @@ settings-clip-ready-all =
        *[other] Kész: mind a { $count } képet ismeri
     }
 settings-clip-learning = Kész: képek tanulása, eddig { $done } / { $total }
+settings-clip-relearning = Amíg az új modell meg nem tanul minden képet, a keresések azt használják, amit a régi tanult.
 settings-clip-unavailable = Nem sikerült beszerezni a modellt: { $detail }. Óránként újrapróbálja.
 settings-clap-heading = Keresés a hangok hangzása szerint
 settings-clap-reset = Hangkeresés: vissza az alapértelmezéshez

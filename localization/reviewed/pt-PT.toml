@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "c6262505c2e6f7d3de91fb52af12e9fcb0e0a1eb7c63595921d1a6e793628485"
+source = "f1669a81c6df0aa65b7d1254acbfe377ffe38ce4f61e820fd439a52d951e4242"
 translation = "453fced2edd251d540ef1cbda5dd936dc5f8b6a9cace7301f90dc74d2bc38f81"
 
 [messages.account-add]
@@ -8661,12 +8661,12 @@ source = "Search by what pictures show"
 translation = "Pesquisar pelo que as imagens mostram"
 
 [messages.settings-clip-hint]
-source = "Uses OpenAI’s CLIP model, run on this server’s processor: nothing leaves it. Turning it on downloads the model ({ $size } MB) from Hugging Face, then learns every picture in the background at low priority. It takes 300 to 600 MB of memory while it works or someone searches. Turning it off deletes the model and keeps what it learned, for next time."
-translation = "Usa o modelo CLIP da OpenAI, executado no processador deste servidor: nada sai dele. Ligá-la transfere o modelo ({ $size } MB) do Hugging Face e depois aprende todas as imagens em segundo plano, com baixa prioridade. Ocupa 300 a 600 MB de memória enquanto trabalha ou enquanto alguém pesquisa. Desligá-la elimina o modelo e mantém o que aprendeu, para a próxima vez."
+source = "Uses Google’s SigLIP 2 model, run on this server’s processor: nothing leaves it. Turning it on downloads the model ({ $size } MB) from Hugging Face, then learns every picture in the background at low priority. It takes 350 to 750 MB of memory while it works or someone searches. Turning it off deletes the model and keeps what it learned, for next time."
+translation = "Usa o modelo SigLIP 2 da Google, executado no processador deste servidor: nada sai dele. Ligá-la transfere o modelo ({ $size } MB) do Hugging Face e depois aprende todas as imagens em segundo plano, com baixa prioridade. Ocupa 350 a 750 MB de memória enquanto trabalha ou enquanto alguém pesquisa. Desligá-la elimina o modelo e mantém o que aprendeu, para a próxima vez."
 
 [messages.settings-clip-hint-desktop]
-source = "Uses OpenAI’s CLIP model, run on this computer’s processor: nothing leaves it. Turning it on downloads the model ({ $size } MB) from Hugging Face, then learns every picture in the background at low priority. It takes 300 to 600 MB of memory while it works or you search. Turning it off deletes the model and keeps what it learned, for next time."
-translation = "Usa o modelo CLIP da OpenAI, executado no processador deste computador: nada sai dele. Ligá-la transfere o modelo ({ $size } MB) do Hugging Face e depois aprende todas as imagens em segundo plano, com baixa prioridade. Ocupa 300 a 600 MB de memória enquanto trabalha ou enquanto pesquisa. Desligá-la elimina o modelo e mantém o que aprendeu, para a próxima vez."
+source = "Uses Google’s SigLIP 2 model, run on this computer’s processor: nothing leaves it. Turning it on downloads the model ({ $size } MB) from Hugging Face, then learns every picture in the background at low priority. It takes 350 to 750 MB of memory while it works or you search. Turning it off deletes the model and keeps what it learned, for next time."
+translation = "Usa o modelo SigLIP 2 da Google, executado no processador deste computador: nada sai dele. Ligá-la transfere o modelo ({ $size } MB) do Hugging Face e depois aprende todas as imagens em segundo plano, com baixa prioridade. Ocupa 350 a 750 MB de memória enquanto trabalha ou enquanto pesquisa. Desligá-la elimina o modelo e mantém o que aprendeu, para a próxima vez."
 
 [messages.settings-clip-learning]
 source = "Ready: learning pictures, { $done } of { $total } so far"
@@ -8690,6 +8690,10 @@ translation = """
 [messages.settings-clip-ready-empty]
 source = "Ready. Pictures are learned as packs are added."
 translation = "Pronto. As imagens são aprendidas à medida que os pacotes são adicionados."
+
+[messages.settings-clip-relearning]
+source = "Until the new model has learned every picture, searches use what the old one learned."
+translation = "Até o novo modelo aprender todas as imagens, as pesquisas usam o que o antigo aprendeu."
 
 [messages.settings-clip-reset]
 source = "Image search: back to the default"

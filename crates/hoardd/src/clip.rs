@@ -1,66 +1,62 @@
-//! Search by meaning with CLIP (`OpenAI`'s ViT-B/32): every thumbnail gets a 512-number embedding, and so does what's
-//! typed in the search box, so "mossy rock" finds mossy rocks whatever the files are called, and "more like this"
-//! knows a barrel from a crate rather than only matching colors and grain.
+//! Search by meaning: every thumbnail gets an embedding from a model that knows what pictures show (Google's SigLIP 2,
+//! see `siglip`), and so does what's typed in the search box, so "mossy rock" finds mossy rocks whatever the files are
+//! called, and "more like this" knows a barrel from a crate rather than only matching colors and grain.
 //!
-//! It's off until an admin turns it on in Settings, because the model is a 605 MB download and takes 250–350 MB of
+//! It's off until an admin turns it on in Settings, because the model is a 1.5 GB download and takes 300–600 MB of
 //! memory while it runs. Turned on, the model is fetched (pinned to one revision, checked against its SHA-256) into
 //! `<cache>/models`, and a background job works through the thumbnails at low priority. The text half is loaded on
 //! the first search and dropped after a while without one; the image half only lives while the job runs.
 //!
-//! Embeddings are stored per thumbnail blob (`embeddings`, keyed by its hash) as 512 signed bytes, scaled per
-//! vector, which cosine similarity doesn't mind. Searching is brute force over an in-memory index, like `looks`.
+//! Embeddings are stored per thumbnail blob and model (`embeddings`) as signed bytes, scaled per vector, which cosine
+//! similarity doesn't mind. Searching is brute force over an in-memory index, like `looks`.
+//!
+//! Image search ran CLIP (`OpenAI`'s ViT-B/32) before. Where a library has CLIP's embeddings, searches keep using them,
+//! and CLIP's words half while its files are still there, until SigLIP 2 has relearned every thumbnail; then they and
+//! CLIP's files go.
 
 use std::collections::HashMap;
 use std::io::{Read, Seek, SeekFrom};
 use std::path::{Path, PathBuf};
+use std::sync::atomic::{AtomicBool, AtomicU64, Ordering};
 use std::sync::{Arc, LazyLock, Mutex, PoisonError, RwLock};
 use std::time::{Duration, Instant};
 
 use anyhow::{Context, Result, ensure};
 use candle_core::{DType, Device, IndexOp, Module, Tensor};
-use candle_nn::{Conv2d, Embedding, LayerNorm, Linear, VarBuilder};
+use candle_nn::{Embedding, LayerNorm, Linear, VarBuilder};
 use rusqlite::params;
 use serde::Deserialize;
 
 use crate::tools::{self, Slot, Status};
-use crate::{AppState, db};
+use crate::{AppState, db, siglip};
 
-/// Stored with each embedding; rows from another model are redone.
-pub(crate) const MODEL: &str = "clip-vit-b32";
+/// What image search runs, stored with each embedding.
+pub(crate) const MODEL: &str = siglip::MODEL;
+/// The whole download, for the Settings page.
+pub(crate) const DOWNLOAD_BYTES: u64 = siglip::FILES[0].1 + siglip::FILES[1].1;
 
-/// Where the files come from: one revision of the model, pinned, so a change upstream can't change what's run.
-const REPO: &str =
-    "https://huggingface.co/openai/clip-vit-base-patch32/resolve/b33cedfd0df4e43b8238760678fcc89e1a0d38b3";
+/// CLIP's embeddings, used until SigLIP 2 has relearned every thumbnail.
+const CLIP_MODEL: &str = "clip-vit-b32";
+const CLIP_DIMS: usize = 512;
 const WEIGHTS: &str = "model.safetensors";
 const TOKENIZER: &str = "tokenizer.json";
-/// Name, size and SHA-256 of each file.
-const FILES: [(&str, u64, &str); 2] = [
-    (TOKENIZER, 2_224_041, "b556ac8c99757ffb677208af34bc8c6721572114111a6e0aaf5fa69ff0b8d842"),
-    (WEIGHTS, 605_157_884, "99d28a652e6ec46629ab7047a0ac82c69b1fe11e0ce672c43af65d3a9a3fc05d"),
-];
-/// The whole download, for the Settings page.
-pub(crate) const DOWNLOAD_BYTES: u64 = FILES[0].1 + FILES[1].1;
-
-pub(crate) const DIMS: usize = 512;
+/// CLIP's files, by name and size, in its folder from before.
+const CLIP_FILES: [(&str, u64, &str); 2] = [(TOKENIZER, 2_224_041, ""), (WEIGHTS, 605_157_884, "")];
 
 // ---------------------------------------------------------------------------------------------
-// The model (adapted from candle-transformers' CLIP, MIT/Apache-2.0)
+// CLIP's words half, for searching what it learned (adapted from candle-transformers' CLIP, MIT/Apache-2.0)
 
-const IMAGE: usize = 224;
-const PATCH: usize = 32;
-const POSITIONS: usize = (IMAGE / PATCH) * (IMAGE / PATCH) + 1;
 const MAX_TOKENS: usize = 77;
 const VOCAB: usize = 49_408;
 const EOS: u32 = 49_407;
-const MEAN: [f32; 3] = [0.481_454_66, 0.457_827_5, 0.408_210_73];
-const STD: [f32; 3] = [0.268_629_54, 0.261_302_6, 0.275_777_1];
 
 fn quick_gelu(xs: &Tensor) -> candle_core::Result<Tensor> {
     xs * candle_nn::ops::sigmoid(&(xs * 1.702)?)?
 }
 
+/// Multi-head self-attention, as CLIP and SigLIP have it.
 #[derive(Debug)]
-struct Attention {
+pub(crate) struct Attention {
     q: Linear,
     k: Linear,
     v: Linear,
@@ -69,13 +65,13 @@ struct Attention {
 }
 
 impl Attention {
-    fn new(vb: &VarBuilder, dim: usize, heads: usize) -> candle_core::Result<Self> {
+    pub(crate) fn new(vb: &VarBuilder, dim: usize, heads: usize) -> candle_core::Result<Self> {
         let l = |name: &str| candle_nn::linear(dim, dim, vb.pp(name));
         Ok(Self { q: l("q_proj")?, k: l("k_proj")?, v: l("v_proj")?, out: l("out_proj")?, heads })
     }
 
     #[expect(clippy::many_single_char_names, reason = "the usual names in attention: batch, tokens, q, k, v, w, o")]
-    fn forward(&self, xs: &Tensor, mask: Option<&Tensor>) -> candle_core::Result<Tensor> {
+    pub(crate) fn forward(&self, xs: &Tensor, mask: Option<&Tensor>) -> candle_core::Result<Tensor> {
         let (b, n, dim) = xs.dims3()?;
         let hd = dim / self.heads;
         let split = |t: Tensor| t.reshape((b, n, self.heads, hd))?.transpose(1, 2)?.reshape((b * self.heads, n, hd));
@@ -149,7 +145,7 @@ impl TextModel {
             positions: t.pp("embeddings.position_embedding").get((MAX_TOKENS, 512), "weight")?,
             layers: encoder(&t, 512, 8, 2048)?,
             final_ln: candle_nn::layer_norm(512, 1e-5, t.pp("final_layer_norm"))?,
-            projection: candle_nn::linear_no_bias(512, DIMS, vb.pp("text_projection"))?,
+            projection: candle_nn::linear_no_bias(512, CLIP_DIMS, vb.pp("text_projection"))?,
         })
     }
 
@@ -181,68 +177,44 @@ fn tokens(tokenizer: &tokenizers::Tokenizer, text: &str) -> Result<Vec<u32>> {
     Ok(ids)
 }
 
-/// The image half: 224×224 pictures in, embeddings out.
-#[derive(Debug)]
-struct VisionModel {
-    patches: Conv2d,
-    class: Tensor,
-    positions: Tensor,
-    pre_ln: LayerNorm,
-    layers: Vec<Layer>,
-    post_ln: LayerNorm,
-    projection: Linear,
-}
-
-impl VisionModel {
-    fn load(dir: &Path) -> Result<Self> {
-        let vb = VarBuilder::from_tensors(
-            read_tensors(&dir.join(WEIGHTS), &["vision_model.", "visual_projection."])?,
-            DType::F32,
-            &Device::Cpu,
-        );
-        let v = vb.pp("vision_model");
-        let conv = candle_nn::Conv2dConfig { stride: PATCH, ..Default::default() };
-        Ok(Self {
-            patches: candle_nn::conv2d_no_bias(3, 768, PATCH, conv, v.pp("embeddings.patch_embedding"))?,
-            class: v.pp("embeddings").get(768, "class_embedding")?,
-            positions: v.pp("embeddings.position_embedding").get((POSITIONS, 768), "weight")?,
-            pre_ln: candle_nn::layer_norm(768, 1e-5, v.pp("pre_layrnorm"))?,
-            layers: encoder(&v, 768, 12, 3072)?,
-            post_ln: candle_nn::layer_norm(768, 1e-5, v.pp("post_layernorm"))?,
-            projection: candle_nn::linear_no_bias(768, DIMS, vb.pp("visual_projection"))?,
-        })
-    }
-
-    /// Embeddings of pictures made by [`pixels`].
-    fn embed(&self, pictures: &[Vec<f32>]) -> Result<Vec<Vec<f32>>> {
-        let b = pictures.len();
-        if b == 0 {
-            return Ok(Vec::new());
-        }
-        let flat: Vec<f32> = pictures.iter().flatten().copied().collect();
-        let input = Tensor::from_vec(flat, (b, 3, IMAGE, IMAGE), &Device::Cpu)?;
-        let patches = self.patches.forward(&input)?.flatten_from(2)?.transpose(1, 2)?;
-        let class = self.class.reshape((1, 1, 768))?.broadcast_as((b, 1, 768))?.contiguous()?;
-        let mut xs = Tensor::cat(&[&class, &patches], 1)?.broadcast_add(&self.positions)?;
-        xs = self.pre_ln.forward(&xs)?;
-        for layer in &self.layers {
-            xs = layer.forward(&xs, None)?;
-        }
-        let pooled = self.post_ln.forward(&xs.i((.., 0, ..))?)?;
-        let out = self.projection.forward(&pooled)?.to_vec2::<f32>()?;
-        Ok(out.into_iter().map(normalized).collect())
-    }
-}
-
 /// The tensors whose names start with one of `prefixes`, read from a safetensors file one at a time (so loading half
 /// the model never holds the other half, or the whole file, in memory).
 pub(crate) fn read_tensors(path: &Path, prefixes: &[&str]) -> Result<HashMap<String, Tensor>> {
-    #[derive(Deserialize)]
-    struct Info {
-        dtype: String,
-        shape: Vec<usize>,
-        data_offsets: [u64; 2],
+    let (base, header) = safetensors_header(path)?;
+    let mut file = std::fs::File::open(path).with_context(|| format!("open {}", path.display()))?;
+    let mut out = HashMap::new();
+    for (name, info) in header {
+        if !prefixes.iter().any(|p| name.starts_with(p)) {
+            continue;
+        }
+        // Position ids (I64) are buffers the model doesn't need; every weight is F32.
+        if info.dtype != "F32" {
+            continue;
+        }
+        let [start, end] = info.data_offsets;
+        let count: usize = info.shape.iter().product();
+        ensure!(end >= start && (end - start) as usize == count * 4, "tensor {name} has the wrong size");
+        file.seek(SeekFrom::Start(base + start))?;
+        let mut bytes = vec![0u8; count * 4];
+        file.read_exact(&mut bytes)?;
+        let values: Vec<f32> = bytes.as_chunks::<4>().0.iter().map(|b| f32::from_le_bytes(*b)).collect();
+        out.insert(name, Tensor::from_vec(values, info.shape, &Device::Cpu)?);
     }
+    ensure!(!out.is_empty(), "the model file has none of the tensors needed");
+    Ok(out)
+}
+
+/// A tensor in a safetensors file.
+#[derive(Debug, Deserialize)]
+pub(crate) struct TensorInfo {
+    pub(crate) dtype: String,
+    pub(crate) shape: Vec<usize>,
+    /// From `base`, see [`safetensors_header`].
+    pub(crate) data_offsets: [u64; 2],
+}
+
+/// Where a safetensors file's data starts, and its tensors.
+pub(crate) fn safetensors_header(path: &Path) -> Result<(u64, HashMap<String, TensorInfo>)> {
     let mut file = std::fs::File::open(path).with_context(|| format!("open {}", path.display()))?;
     let mut len = [0u8; 8];
     file.read_exact(&mut len)?;
@@ -251,27 +223,15 @@ pub(crate) fn read_tensors(path: &Path, prefixes: &[&str]) -> Result<HashMap<Str
     let mut header = vec![0u8; len as usize];
     file.read_exact(&mut header)?;
     let header: HashMap<String, serde_json::Value> = serde_json::from_slice(&header)?;
-    let mut out = HashMap::new();
-    for (name, info) in header {
-        if !prefixes.iter().any(|p| name.starts_with(p)) {
-            continue;
-        }
-        let info: Info = serde_json::from_value(info).with_context(|| format!("tensor {name}"))?;
-        // Position ids (I64) are buffers the model doesn't need; every weight is F32.
-        if info.dtype != "F32" {
-            continue;
-        }
-        let [start, end] = info.data_offsets;
-        let count: usize = info.shape.iter().product();
-        ensure!(end >= start && (end - start) as usize == count * 4, "tensor {name} has the wrong size");
-        file.seek(SeekFrom::Start(8 + len + start))?;
-        let mut bytes = vec![0u8; count * 4];
-        file.read_exact(&mut bytes)?;
-        let values: Vec<f32> = bytes.as_chunks::<4>().0.iter().map(|b| f32::from_le_bytes(*b)).collect();
-        out.insert(name, Tensor::from_vec(values, info.shape, &Device::Cpu)?);
-    }
-    ensure!(!out.is_empty(), "the model file has none of the tensors needed");
-    Ok(out)
+    let tensors = header
+        .into_iter()
+        .filter(|(name, _)| name != "__metadata__")
+        .map(|(name, info)| {
+            let info = serde_json::from_value(info).with_context(|| format!("tensor {name}"))?;
+            Ok((name, info))
+        })
+        .collect::<Result<_>>()?;
+    Ok((8 + len, tensors))
 }
 
 pub(crate) fn normalized(mut v: Vec<f32>) -> Vec<f32> {
@@ -284,37 +244,7 @@ pub(crate) fn normalized(mut v: Vec<f32>) -> Vec<f32> {
     v
 }
 
-/// A thumbnail as the model wants it: transparency over white, the short side scaled to 224 (bicubic), the middle
-/// 224×224, normalized per channel, channels first. `None` when it can't be decoded or is all transparent.
-pub(crate) fn pixels(bytes: &[u8]) -> Option<Vec<f32>> {
-    let img = image::load_from_memory(bytes).ok()?.to_rgba8();
-    let (w, h) = img.dimensions();
-    if w == 0 || h == 0 || img.pixels().all(|p| p[3] < 8) {
-        return None;
-    }
-    let rgb = image::RgbImage::from_fn(w, h, |x, y| {
-        let p = img.get_pixel(x, y);
-        let a = f32::from(p[3]) / 255.0;
-        image::Rgb([0, 1, 2].map(|i| (f32::from(p[i]) * a + 255.0 * (1.0 - a)).round() as u8))
-    });
-    let side = IMAGE as f32 / w.min(h) as f32;
-    let (nw, nh) =
-        (((w as f32 * side).round() as u32).max(IMAGE as u32), ((h as f32 * side).round() as u32).max(IMAGE as u32));
-    let resized = image::imageops::resize(&rgb, nw, nh, image::imageops::FilterType::CatmullRom);
-    let (x0, y0) = ((nw as usize - IMAGE) / 2, (nh as usize - IMAGE) / 2);
-    let mut out = vec![0.0f32; 3 * IMAGE * IMAGE];
-    for y in 0..IMAGE {
-        for x in 0..IMAGE {
-            let p = resized.get_pixel((x0 + x) as u32, (y0 + y) as u32);
-            for c in 0..3 {
-                out[c * IMAGE * IMAGE + y * IMAGE + x] = (f32::from(p[c]) / 255.0 - MEAN[c]) / STD[c];
-            }
-        }
-    }
-    Some(out)
-}
-
-/// 512 signed bytes scaled so the largest is ±127.
+/// Signed bytes scaled so the largest is ±127.
 pub(crate) fn quantize(v: &[f32]) -> Vec<i8> {
     let max = v.iter().fold(0.0f32, |m, x| m.max(x.abs()));
     let k = if max > 0.0 { 127.0 / max } else { 0.0 };
@@ -422,12 +352,29 @@ fn files_present(dir: &Path, files: &Files) -> bool {
     files.iter().all(|(name, size, _)| std::fs::metadata(dir.join(name)).is_ok_and(|m| m.len() == *size))
 }
 
-static CLIP: Model = Model { name: MODEL, repo: REPO, files: &FILES, what: "image search", activity: "clip" };
+static SIGLIP: Model =
+    Model { name: siglip::MODEL, repo: siglip::REPO, files: &siglip::FILES, what: "image search", activity: "clip" };
 
 static SLOT: Slot<PathBuf> = Slot::new();
 
+/// Searches still use CLIP's embeddings: some are kept, and SigLIP 2 hasn't relearned every thumbnail yet.
+static RELEARNING: AtomicBool = AtomicBool::new(false);
+/// How many times image search was turned on or off, so an older start can't set [`RELEARNING`].
+static STARTS: AtomicU64 = AtomicU64::new(0);
+/// CLIP's embeddings were deleted, and nothing writes them any more, so searches never go back to them.
+static CLIP_GONE: AtomicBool = AtomicBool::new(false);
+
 pub(crate) fn is_ready() -> bool {
     SLOT.ready().is_some()
+}
+
+fn is_on() -> bool {
+    SLOT.describe(|_| String::new()) != "off"
+}
+
+/// Whether searches still use what CLIP learned, while SigLIP 2 relearns it.
+pub(crate) fn relearning() -> bool {
+    RELEARNING.load(Ordering::Relaxed) && !CLIP_GONE.load(Ordering::Relaxed) && is_on()
 }
 
 /// `off`, `looking`, `downloading`, `ready` or `unavailable: <why>`.
@@ -435,22 +382,73 @@ pub(crate) fn describe() -> String {
     SLOT.describe(|_| "ready".into())
 }
 
+/// CLIP's folder from before.
+fn clip_dir(state: &AppState) -> PathBuf {
+    state.cfg.models_dir().join(CLIP_MODEL)
+}
+
 /// Turn image search on (find the model, downloading it if need be) or off. Calling it again drops whatever the
 /// last call was doing.
 pub(crate) fn start(state: &AppState, enabled: bool) {
     TEXT.clear();
+    CLIP_TEXT.clear();
+    let generation = STARTS.fetch_add(1, Ordering::Relaxed) + 1;
+    RELEARNING.store(false, Ordering::Relaxed);
     if !enabled {
         SLOT.restart(Status::Off);
         return;
     }
-    CLIP.fetch(state, &SLOT, |st| async move {
+    let st = Arc::clone(state);
+    tokio::spawn(async move {
+        let kept = db::call(&st.pool, |c| {
+            Ok(c.query_row("SELECT EXISTS (SELECT 1 FROM embeddings WHERE model = ?1)", [CLIP_MODEL], |r| r.get(0))?)
+        })
+        .await
+        .unwrap_or_else(|e| {
+            tracing::warn!(error = ?e, "couldn't tell whether CLIP's embeddings are kept");
+            false
+        });
+        if STARTS.load(Ordering::Relaxed) == generation {
+            RELEARNING.store(kept, Ordering::Relaxed);
+            CLIP_TEXT.unload_when_idle();
+        }
+    });
+    SIGLIP.fetch(state, &SLOT, |st| async move {
         TEXT.unload_when_idle();
         schedule(&st).await;
     });
 }
 
+/// Image search was switched off: the models go (the embeddings stay, for when it's back on).
 pub(crate) async fn remove_files(state: &AppState) {
-    CLIP.remove_files(state).await;
+    SIGLIP.remove_files(state).await;
+    remove_clip_files(state).await;
+}
+
+async fn remove_clip_files(state: &AppState) {
+    let dir = clip_dir(state);
+    if dir.is_dir()
+        && let Err(e) = tokio::fs::remove_dir_all(&dir).await
+    {
+        tracing::warn!(dir = %dir.display(), error = %e, "couldn't remove CLIP");
+    }
+}
+
+/// SigLIP 2 has every thumbnail: what CLIP learned, and CLIP itself, go.
+async fn relearned(state: &AppState) -> Result<()> {
+    if CLIP_GONE.load(Ordering::Relaxed) {
+        return Ok(());
+    }
+    let n = db::call(&state.pool, |c| Ok(c.execute("DELETE FROM embeddings WHERE model = ?1", [CLIP_MODEL])?)).await?;
+    CLIP_GONE.store(true, Ordering::Relaxed);
+    RELEARNING.store(false, Ordering::Relaxed);
+    CLIP_TEXT.clear();
+    state.clip.forget();
+    remove_clip_files(state).await;
+    if n > 0 {
+        tracing::info!(pictures = n, "image search relearned every picture with SigLIP 2; CLIP's embeddings are gone");
+    }
+    Ok(())
 }
 
 // ---------------------------------------------------------------------------------------------
@@ -541,13 +539,25 @@ impl<M: Send + Sync + 'static> Text<M> {
     }
 }
 
-static TEXT: Text<TextModel> = Text::new("image search", TextModel::load, TextModel::embed);
+static TEXT: Text<siglip::TextModel> = Text::new("image search", siglip::TextModel::load, siglip::TextModel::embed);
+static CLIP_TEXT: Text<TextModel> = Text::new("image search (CLIP)", TextModel::load, TextModel::embed);
 
 /// The embedding of what was typed, or `None` while the model isn't ready.
 async fn embed_text(text: &str) -> Result<Option<Arc<Vec<f32>>>> {
     let Some(dir) = SLOT.ready() else { return Ok(None) };
+    // Said the way it was taught, which matches pictures better than the bare words.
+    let v = TEXT.embed(dir, format!("this is a photo of {}.", text.trim().to_lowercase())).await?;
+    Ok(Some(v))
+}
+
+/// The same with CLIP, while its files are still there.
+async fn embed_text_clip(state: &AppState, text: &str) -> Result<Option<Arc<Vec<f32>>>> {
+    let dir = clip_dir(state);
+    if !files_present(&dir, &CLIP_FILES) {
+        return Ok(None);
+    }
     // "a photo of …" matches pictures a little better than the bare words.
-    let v = TEXT.embed(dir, format!("a photo of {}", text.trim().to_lowercase())).await?;
+    let v = CLIP_TEXT.embed(dir, format!("a photo of {}", text.trim().to_lowercase())).await?;
     Ok(Some(v))
 }
 
@@ -562,9 +572,10 @@ pub(crate) struct Entry {
 }
 
 impl Entry {
+    /// `None` for an empty vector, kept for what isn't a picture (or a sound) after all.
     pub(crate) fn new(v: Vec<i8>) -> Option<Self> {
         let norm = v.iter().map(|&x| f32::from(x) * f32::from(x)).sum::<f32>().sqrt();
-        (v.len() == DIMS && norm > 0.0).then(|| Self { v: v.into_boxed_slice(), inv_norm: 1.0 / norm })
+        (norm > 0.0).then(|| Self { v: v.into_boxed_slice(), inv_norm: 1.0 / norm })
     }
 
     fn cosine(&self, other: &Self) -> f32 {
@@ -583,8 +594,13 @@ pub(crate) struct Spec {
     /// Selects each hash and its vector, `?1` being the model.
     pub(crate) load: &'static str,
     pub(crate) model: &'static str,
+    /// How many numbers each embedding has.
+    pub(crate) dims: usize,
     /// What it searches, for the log.
     pub(crate) what: &'static str,
+    /// The cosines of two unrelated pictures and of the same thing from another angle, for "more like this".
+    pub(crate) unrelated: f32,
+    pub(crate) same: f32,
     /// How far above the median a text match must score, and how close to the best.
     pub(crate) lift: f32,
     pub(crate) margin: f32,
@@ -599,9 +615,27 @@ pub(crate) struct Spec {
 pub(crate) static SPEC: Spec = Spec {
     load: "SELECT thumb_hash, vector FROM embeddings WHERE model = ?1",
     model: MODEL,
+    dims: siglip::DIMS,
     what: "image search",
-    lift: TEXT_LIFT,
-    margin: TEXT_MARGIN,
+    unrelated: SIGLIP_UNRELATED,
+    same: SIGLIP_SAME,
+    lift: SIGLIP_LIFT,
+    margin: SIGLIP_MARGIN,
+    sure: f32::INFINITY,
+    weak: SIGLIP_WEAK,
+    strong: SIGLIP_STRONG,
+};
+
+/// CLIP's, until SigLIP 2 has relearned every thumbnail.
+pub(crate) static CLIP_SPEC: Spec = Spec {
+    load: "SELECT thumb_hash, vector FROM embeddings WHERE model = ?1",
+    model: CLIP_MODEL,
+    dims: CLIP_DIMS,
+    what: "image search (CLIP)",
+    unrelated: 0.5,
+    same: 0.95,
+    lift: CLIP_LIFT,
+    margin: CLIP_MARGIN,
     sure: f32::INFINITY,
     weak: 0.03,
     strong: 0.1,
@@ -640,6 +674,7 @@ impl Index {
                 .query_map([spec.model], |r| Ok((r.get::<_, String>(0)?, r.get::<_, Vec<u8>>(1)?)))?
                 .filter_map(|row| {
                     let (hash, v) = row.ok()?;
+                    (v.len() == spec.dims).then_some(())?;
                     Some((hash, Entry::new(v.into_iter().map(|b| b as i8).collect())?))
                 })
                 .collect::<HashMap<_, _>>();
@@ -658,11 +693,18 @@ impl Index {
         self.read(HashMap::len).unwrap_or(0)
     }
 
+    /// Let go of every embedding (they'll be loaded again if wanted).
+    pub(crate) fn forget(&self) {
+        *self.map.write().unwrap_or_else(PoisonError::into_inner) = None;
+    }
+
     /// How much every thumbnail looks like `hash`'s by meaning, about 0..=1, or `None` when it has no embedding.
     pub(crate) fn similar(&self, hash: &str) -> Option<HashMap<String, f32>> {
         self.read(|m| {
             let target = m.get(hash)?;
-            Some(m.iter().map(|(h, e)| (h.clone(), image_score(target.cosine(e)))).collect())
+            let score =
+                |cosine: f32| ((cosine - self.spec.unrelated) / (self.spec.same - self.spec.unrelated)).clamp(0.0, 1.0);
+            Some(m.iter().map(|(h, e)| (h.clone(), score(target.cosine(e)))).collect())
         })
         .flatten()
     }
@@ -693,42 +735,58 @@ impl Index {
     }
 }
 
-/// Two pictures' cosine (unrelated ones sit around 0.5, the same thing from another angle near 0.9) as 0..=1.
-fn image_score(cosine: f32) -> f32 {
-    ((cosine - 0.5) / 0.45).clamp(0.0, 1.0)
-}
-
 /// How far above the median picture a match must score. Words score far lower against pictures than pictures do
 /// against each other: on a mixed library, a true match stands 0.05–0.1 above the median, and words with nothing
 /// to find (a car among rocks and furniture) peak around 0.03.
-const TEXT_LIFT: f32 = 0.045;
+const CLIP_LIFT: f32 = 0.045;
 /// Keep only what's within this of the best match.
-const TEXT_MARGIN: f32 = 0.04;
+const CLIP_MARGIN: f32 = 0.04;
 const TEXT_MAX: usize = 300;
+
+/// The same for SigLIP 2, measured on a mixed library of sprites, tiles and model renders. Unrelated pictures score
+/// about 0.7 against each other, the same thing from another angle or in another format 0.85 and up. A true text
+/// match stands 0.04–0.11 above the median, and words with nothing to find peak around 0.035–0.06.
+const SIGLIP_UNRELATED: f32 = 0.7;
+const SIGLIP_SAME: f32 = 0.95;
+const SIGLIP_LIFT: f32 = 0.045;
+const SIGLIP_MARGIN: f32 = 0.035;
+const SIGLIP_WEAK: f32 = 0.035;
+const SIGLIP_STRONG: f32 = 0.08;
+
+/// The index searches use: SigLIP 2's, or CLIP's while it's relearned.
+fn index(state: &AppState) -> Option<&Index> {
+    if relearning() {
+        Some(&state.clip)
+    } else if is_ready() {
+        Some(&state.pictures)
+    } else {
+        None
+    }
+}
 
 /// How much every thumbnail shows what `hash`'s does, about 0..=1, when image search is on and it has an embedding.
 pub(crate) async fn similar(state: &AppState, hash: &str) -> Option<HashMap<String, f32>> {
-    if !is_ready() {
-        return None;
-    }
-    if let Err(e) = state.clip.ensure(state).await {
+    let index = index(state)?;
+    if let Err(e) = index.ensure(state).await {
         tracing::warn!(error = %format!("{e:#}"), "couldn't load image search's index");
         return None;
     }
-    state.clip.similar(hash)
+    index.similar(hash)
 }
 
 /// Thumbnails that match what was typed, best first; empty when image search is off or has nothing yet.
 pub(crate) async fn search_text(state: &AppState, text: &str) -> Result<Vec<(String, f32)>> {
-    if !is_ready() || text.trim().is_empty() {
+    let Some(index) = index(state) else { return Ok(Vec::new()) };
+    if text.trim().is_empty() {
         return Ok(Vec::new());
     }
-    state.clip.ensure(state).await?;
-    if state.clip.len() == 0 {
+    index.ensure(state).await?;
+    if index.len() == 0 {
         return Ok(Vec::new());
     }
-    let Some(q) = embed_text(text).await? else { return Ok(Vec::new()) };
-    Ok(state.clip.matching(&q))
+    let q = if relearning() { embed_text_clip(state, text).await? } else { embed_text(text).await? };
+    let Some(q) = q else { return Ok(Vec::new()) };
+    Ok(index.matching(&q))
 }
 
 // ---------------------------------------------------------------------------------------------
@@ -787,7 +845,11 @@ pub(crate) async fn schedule(state: &AppState) {
     .await;
     match queued {
         Ok(true) => state.wake.notify_one(),
-        Ok(false) => {}
+        Ok(false) => {
+            if let Err(e) = relearned(state).await {
+                tracing::warn!(error = ?e, "couldn't let CLIP's embeddings go");
+            }
+        }
         Err(e) => tracing::warn!(error = ?e, "could not queue the image search job"),
     }
 }
@@ -817,7 +879,7 @@ pub(crate) fn in_pool<T: Send>(f: impl FnOnce() -> T + Send) -> T {
 /// Embed every thumbnail that has no embedding, and forget the ones nothing uses.
 pub(crate) async fn run_job(state: &AppState) -> Result<()> {
     let Some(dir) = SLOT.ready() else { return Ok(()) };
-    state.clip.ensure(state).await?;
+    state.pictures.ensure(state).await?;
     let gone: Vec<String> = db::call(&state.pool, |c| {
         let gone = c
             .prepare(&format!("SELECT thumb_hash FROM embeddings e WHERE {ORPHAN_SQL}"))?
@@ -827,14 +889,16 @@ pub(crate) async fn run_job(state: &AppState) -> Result<()> {
         Ok(gone)
     })
     .await?;
-    state.clip.write(|m| {
-        for h in &gone {
-            m.remove(h);
-        }
-    });
+    for index in [&state.pictures, &state.clip] {
+        index.write(|m| {
+            for h in &gone {
+                m.remove(h);
+            }
+        });
+    }
 
     let kinds = crate::looks::KINDS_SQL;
-    let mut model: Option<Arc<VisionModel>> = None;
+    let mut model: Option<Arc<siglip::VisionModel>> = None;
     let mut unreadable = std::collections::HashSet::new();
     let mut done = 0usize;
     loop {
@@ -851,13 +915,13 @@ pub(crate) async fn run_job(state: &AppState) -> Result<()> {
         })
         .await?;
         if todo.is_empty() {
-            return Ok(());
+            return relearned(state).await;
         }
         let model = if let Some(m) = &model {
             Arc::clone(m)
         } else {
             let d = dir.clone();
-            let m = Arc::new(crate::heavy::run("clip-load", move || VisionModel::load(&d)).await??);
+            let m = Arc::new(crate::heavy::run("clip-load", move || siglip::VisionModel::load(&d)).await??);
             Arc::clone(model.insert(m))
         };
         let total = done + todo.len();
@@ -881,7 +945,7 @@ pub(crate) async fn run_job(state: &AppState) -> Result<()> {
             let computed = crate::heavy::run("clip", move || in_pool(|| embed_all(&m, &pictures))).await??;
             save(state, &computed).await?;
             done += chunk.len();
-            state.clip.write(|m| {
+            state.pictures.write(|m| {
                 for (hash, v) in computed {
                     if let Some(e) = v.and_then(Entry::new) {
                         m.insert(hash, e);
@@ -893,9 +957,13 @@ pub(crate) async fn run_job(state: &AppState) -> Result<()> {
     }
 }
 
-fn embed_all(model: &VisionModel, pictures: &[(String, bytes::Bytes)]) -> Result<Vec<(String, Option<Vec<i8>>)>> {
+fn embed_all(
+    model: &siglip::VisionModel,
+    pictures: &[(String, bytes::Bytes)],
+) -> Result<Vec<(String, Option<Vec<i8>>)>> {
     use rayon::prelude::*;
-    let prepared: Vec<(String, Option<Vec<f32>>)> = pictures.par_iter().map(|(h, b)| (h.clone(), pixels(b))).collect();
+    let prepared: Vec<(String, Option<Vec<f32>>)> =
+        pictures.par_iter().map(|(h, b)| (h.clone(), siglip::pixels(b))).collect();
     let inputs: Vec<Vec<f32>> = prepared.iter().filter_map(|(_, p)| p.clone()).collect();
     let mut embedded = model.embed(&inputs)?.into_iter();
     Ok(prepared.into_iter().map(|(h, p)| (h, p.and_then(|_| embedded.next()).map(|v| quantize(&v)))).collect())
@@ -926,57 +994,30 @@ async fn save(state: &AppState, computed: &[(String, Option<Vec<i8>>)]) -> Resul
 mod tests {
     use super::*;
 
-    fn png(w: u32, h: u32, f: impl Fn(u32, u32) -> image::Rgba<u8>) -> Vec<u8> {
-        let img = image::RgbaImage::from_fn(w, h, f);
-        let mut out = std::io::Cursor::new(Vec::new());
-        img.write_to(&mut out, image::ImageFormat::Png).unwrap();
-        out.into_inner()
-    }
-
-    #[test]
-    fn pixels_are_cropped_normalized_and_over_white() {
-        // Wide: left half red, right half transparent. The crop is the middle, so both show.
-        let bytes =
-            png(512, 256, |x, _| if x < 256 { image::Rgba([255, 0, 0, 255]) } else { image::Rgba([0, 0, 0, 0]) });
-        let p = pixels(&bytes).unwrap();
-        assert_eq!(p.len(), 3 * IMAGE * IMAGE);
-        let at = |c: usize, x: usize, y: usize| p[c * IMAGE * IMAGE + y * IMAGE + x];
-        let norm = |c: usize, v: f32| (v - MEAN[c]) / STD[c];
-        assert!((at(0, 0, 100) - norm(0, 1.0)).abs() < 1e-3, "red on the left");
-        assert!((at(1, 0, 100) - norm(1, 0.0)).abs() < 1e-3);
-        assert!((at(1, IMAGE - 1, 100) - norm(1, 1.0)).abs() < 1e-3, "white where it was transparent");
-        assert!(pixels(&png(8, 8, |_, _| image::Rgba([0, 0, 0, 0]))).is_none(), "all transparent");
-        assert!(pixels(b"not a picture").is_none());
-    }
-
     #[test]
     fn quantized_vectors_keep_their_cosine() {
-        let a = normalized((0..DIMS).map(|i| ((i * 7) % 13) as f32 - 6.0).collect());
-        let b = normalized((0..DIMS).map(|i| ((i * 5) % 11) as f32 - 5.0 + (i % 3) as f32).collect());
+        let a = normalized((0..CLIP_DIMS).map(|i| ((i * 7) % 13) as f32 - 6.0).collect());
+        let b = normalized((0..CLIP_DIMS).map(|i| ((i * 5) % 11) as f32 - 5.0 + (i % 3) as f32).collect());
         let exact: f32 = a.iter().zip(&b).map(|(x, y)| x * y).sum();
         let (qa, qb) = (Entry::new(quantize(&a)).unwrap(), Entry::new(quantize(&b)).unwrap());
         assert!((qa.cosine(&qb) - exact).abs() < 0.01, "{} vs {exact}", qa.cosine(&qb));
         assert!((qa.cosine_f32(&b) - exact).abs() < 0.01);
         assert!((qa.cosine(&qa) - 1.0).abs() < 1e-4);
-        assert!(Entry::new(vec![0; DIMS]).is_none(), "an unreadable thumbnail's empty vector");
+        assert!(Entry::new(vec![0; CLIP_DIMS]).is_none(), "an unreadable thumbnail's empty vector");
         assert!(Entry::new(Vec::new()).is_none());
-    }
-
-    #[test]
-    fn scores() {
-        assert!(image_score(0.5).abs() < 1e-6);
-        assert!((image_score(0.95) - 1.0).abs() < 1e-6);
     }
 
     #[test]
     fn text_matches_stand_above_the_median() {
         // One strong match, one borderline, the rest typical.
-        let index = Index::new(&SPEC);
+        let index = Index::new(&CLIP_SPEC);
         let entry = |x: f32| {
-            Entry::new(quantize(&normalized(vec![x, 1.0 - x]).into_iter().chain([0.0; DIMS - 2]).collect::<Vec<_>>()))
-                .unwrap()
+            Entry::new(quantize(
+                &normalized(vec![x, 1.0 - x]).into_iter().chain([0.0; CLIP_DIMS - 2]).collect::<Vec<_>>(),
+            ))
+            .unwrap()
         };
-        let q = normalized([1.0f32, 0.0].into_iter().chain([0.0; DIMS - 2]).collect());
+        let q = normalized([1.0f32, 0.0].into_iter().chain([0.0; CLIP_DIMS - 2]).collect());
         let mut m: HashMap<String, Entry> = (0..20).map(|i| (format!("t{i}"), entry(0.3))).collect();
         m.insert("strong".into(), entry(0.6));
         m.insert("faint".into(), entry(0.32));
@@ -985,32 +1026,5 @@ mod tests {
         assert_eq!(hits.len(), 1, "{hits:?}");
         assert_eq!(hits[0].0, "strong");
         assert!(hits[0].1 > 0.25, "a strong text match beats a name match alone");
-    }
-
-    /// The real model, when it's been downloaded: `HOARD_CLIP_DIR=<folder with the two files> cargo test -- --ignored`.
-    #[test]
-    #[ignore = "needs the 605 MB model"]
-    fn real_model_matches_words_to_pictures() {
-        let dir = PathBuf::from(std::env::var("HOARD_CLIP_DIR").expect("HOARD_CLIP_DIR"));
-        let text = TextModel::load(&dir).unwrap();
-        assert_eq!(tokens(&text.tokenizer, "a photo of a cat").unwrap(), [49406, 320, 1125, 539, 320, 2368, 49407]);
-        let vision = VisionModel::load(&dir).unwrap();
-        let red = png(256, 256, |_, _| image::Rgba([220, 20, 20, 255]));
-        let stripes =
-            png(256, 256, |x, _| if (x / 16) % 2 == 0 { image::Rgba([0, 0, 0, 255]) } else { image::Rgba([255; 4]) });
-        let started = Instant::now();
-        let pics = vision.embed(&[pixels(&red).unwrap(), pixels(&stripes).unwrap()]).unwrap();
-        eprintln!("2 pictures in {:?}", started.elapsed());
-        let cos = |a: &[f32], b: &[f32]| a.iter().zip(b).map(|(x, y)| x * y).sum::<f32>();
-        let (t_red, t_stripes) = (text.embed("a red square").unwrap(), text.embed("black and white stripes").unwrap());
-        eprintln!(
-            "red: {:.3} / {:.3}, stripes: {:.3} / {:.3}",
-            cos(&pics[0], &t_red),
-            cos(&pics[0], &t_stripes),
-            cos(&pics[1], &t_stripes),
-            cos(&pics[1], &t_red)
-        );
-        assert!(cos(&pics[0], &t_red) > cos(&pics[0], &t_stripes));
-        assert!(cos(&pics[1], &t_stripes) > cos(&pics[1], &t_red));
     }
 }

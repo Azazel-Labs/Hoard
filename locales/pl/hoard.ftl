@@ -2557,8 +2557,8 @@ settings-clip-saved-on = Wyszukiwanie obrazów: włączone
 settings-clip-saved-off = Wyszukiwanie obrazów: wyłączone
 settings-clip-what = Wystarczy wpisać, czego się szuka („omszała skała”, „drzwi sci-fi”, „drewniana beczka”), a obok nazw zawierających te słowa pojawią się obrazy, które to przedstawiają. „Więcej podobnych” znajduje rzeczy tego samego rodzaju, a nie tylko w tych samych kolorach.
 settings-clip-toggle = Włącz wyszukiwanie obrazów
-settings-clip-hint = Używa modelu CLIP od OpenAI, uruchamianego na procesorze tego serwera: nic go nie opuszcza. Włączenie pobiera model ({ $size } MB) z Hugging Face, a następnie w tle, z niskim priorytetem, poznaje każdy obraz. Podczas pracy lub wyszukiwania zajmuje od 300 do 600 MB pamięci. Wyłączenie usuwa model, ale zachowuje to, czego się nauczył, na następny raz.
-settings-clip-hint-desktop = Używa modelu CLIP od OpenAI, uruchamianego na procesorze tego komputera: nic go nie opuszcza. Włączenie pobiera model ({ $size } MB) z Hugging Face, a następnie w tle, z niskim priorytetem, poznaje każdy obraz. Podczas pracy lub wyszukiwania zajmuje od 300 do 600 MB pamięci. Wyłączenie usuwa model, ale zachowuje to, czego się nauczył, na następny raz.
+settings-clip-hint = Używa modelu SigLIP 2 od Google, uruchamianego na procesorze tego serwera: nic go nie opuszcza. Włączenie pobiera model ({ $size } MB) z Hugging Face, a następnie w tle, z niskim priorytetem, poznaje każdy obraz. Podczas pracy lub wyszukiwania zajmuje od 350 do 750 MB pamięci. Wyłączenie usuwa model, ale zachowuje to, czego się nauczył, na następny raz.
+settings-clip-hint-desktop = Używa modelu SigLIP 2 od Google, uruchamianego na procesorze tego komputera: nic go nie opuszcza. Włączenie pobiera model ({ $size } MB) z Hugging Face, a następnie w tle, z niskim priorytetem, poznaje każdy obraz. Podczas pracy lub wyszukiwania zajmuje od 350 do 750 MB pamięci. Wyłączenie usuwa model, ale zachowuje to, czego się nauczył, na następny raz.
 settings-clip-looking = Wyszukiwanie modelu…
 settings-clip-downloading = Pobieranie modelu… postęp widać we wskaźniku aktywności
 settings-clip-ready-empty = Gotowe. Obrazy są poznawane w miarę dodawania paczek.
@@ -2570,6 +2570,7 @@ settings-clip-ready-all =
        *[other] Gotowe: zna wszystkie { $count } obrazu
     }
 settings-clip-learning = Gotowe: poznawanie obrazów, na razie { $done } z { $total }
+settings-clip-relearning = Dopóki nowy model nie nauczy się wszystkich obrazów, wyszukiwanie korzysta z tego, czego nauczył się stary.
 settings-clip-unavailable = Nie udało się pobrać modelu: { $detail }. Ponowna próba co godzinę.
 settings-clap-heading = Wyszukiwanie według brzmienia dźwięków
 settings-clap-reset = Wyszukiwanie dźwięków: przywrócono wartość domyślną

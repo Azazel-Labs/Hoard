@@ -2351,8 +2351,8 @@ settings-clip-saved-on = Beeldsoektog: aan
 settings-clip-saved-off = Beeldsoektog: af
 settings-clip-what = Tik waarna jy soek (“mossy rock”, “sci-fi door”, “wooden barrel”) en prente wat dit wys, verskyn langs name wat die woorde bevat. “Meer soos hierdie” vind dinge van dieselfde soort, nie net dieselfde kleure nie.
 settings-clip-toggle = Skakel beeldsoektog aan
-settings-clip-hint = Gebruik OpenAI se CLIP-model, wat op hierdie bediener se verwerker loop: niks verlaat dit nie. Om dit aan te skakel laai die model ({ $size } MB) van Hugging Face af, en leer dan elke prent in die agtergrond teen lae prioriteit. Dit neem 300 tot 600 MB geheue terwyl dit werk of iemand soek. Om dit af te skakel vee die model uit en hou wat dit geleer het, vir volgende keer.
-settings-clip-hint-desktop = Gebruik OpenAI se CLIP-model, wat op hierdie rekenaar se verwerker loop: niks verlaat dit nie. Om dit aan te skakel laai die model ({ $size } MB) van Hugging Face af, en leer dan elke prent in die agtergrond teen lae prioriteit. Dit neem 300 tot 600 MB geheue terwyl dit werk of jy soek. Om dit af te skakel vee die model uit en hou wat dit geleer het, vir volgende keer.
+settings-clip-hint = Gebruik Google se SigLIP 2-model, wat op hierdie bediener se verwerker loop: niks verlaat dit nie. Om dit aan te skakel laai die model ({ $size } MB) van Hugging Face af, en leer dan elke prent in die agtergrond teen lae prioriteit. Dit neem 350 tot 750 MB geheue terwyl dit werk of iemand soek. Om dit af te skakel vee die model uit en hou wat dit geleer het, vir volgende keer.
+settings-clip-hint-desktop = Gebruik Google se SigLIP 2-model, wat op hierdie rekenaar se verwerker loop: niks verlaat dit nie. Om dit aan te skakel laai die model ({ $size } MB) van Hugging Face af, en leer dan elke prent in die agtergrond teen lae prioriteit. Dit neem 350 tot 750 MB geheue terwyl dit werk of jy soek. Om dit af te skakel vee die model uit en hou wat dit geleer het, vir volgende keer.
 settings-clip-looking = Soek die model…
 settings-clip-downloading = Laai die model af… vordering is in die aktiwiteitsaanwyser
 settings-clip-ready-empty = Gereed. Prente word geleer soos pakke bygevoeg word.
@@ -2361,6 +2361,7 @@ settings-clip-ready-all =
        *[other] Gereed: ken al { $count } prente
     }
 settings-clip-learning = Gereed: leer prente, { $done } van { $total } tot dusver
+settings-clip-relearning = Tot die nuwe model elke prent geleer het, gebruik soektogte wat die ou een geleer het.
 settings-clip-unavailable = Kon nie die model kry nie: { $detail }. Probeer elke uur weer.
 settings-clap-heading = Soek volgens hoe klanke klink
 settings-clap-reset = Klanksoektog: terug na die verstek

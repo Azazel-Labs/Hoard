@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "c6262505c2e6f7d3de91fb52af12e9fcb0e0a1eb7c63595921d1a6e793628485"
+source = "f1669a81c6df0aa65b7d1254acbfe377ffe38ce4f61e820fd439a52d951e4242"
 translation = "d3e5845d6d4178bd5edbc2277e0e916981a0ddba412230b00124f99958cb1526"
 
 [messages.account-add]
@@ -8655,12 +8655,12 @@ source = "Search by what pictures show"
 translation = "Zoeken op wat afbeeldingen tonen"
 
 [messages.settings-clip-hint]
-source = "Uses OpenAI’s CLIP model, run on this server’s processor: nothing leaves it. Turning it on downloads the model ({ $size } MB) from Hugging Face, then learns every picture in the background at low priority. It takes 300 to 600 MB of memory while it works or someone searches. Turning it off deletes the model and keeps what it learned, for next time."
-translation = "Gebruikt het CLIP-model van OpenAI, uitgevoerd op de processor van deze server: er gaat niets naar buiten. Inschakelen downloadt het model ({ $size } MB) van Hugging Face en leert daarna elke afbeelding op de achtergrond met lage prioriteit. Het gebruikt 300 tot 600 MB geheugen terwijl het werkt of iemand zoekt. Uitschakelen verwijdert het model en bewaart wat het heeft geleerd, voor de volgende keer."
+source = "Uses Google’s SigLIP 2 model, run on this server’s processor: nothing leaves it. Turning it on downloads the model ({ $size } MB) from Hugging Face, then learns every picture in the background at low priority. It takes 350 to 750 MB of memory while it works or someone searches. Turning it off deletes the model and keeps what it learned, for next time."
+translation = "Gebruikt het SigLIP 2-model van Google, uitgevoerd op de processor van deze server: er gaat niets naar buiten. Inschakelen downloadt het model ({ $size } MB) van Hugging Face en leert daarna elke afbeelding op de achtergrond met lage prioriteit. Het gebruikt 350 tot 750 MB geheugen terwijl het werkt of iemand zoekt. Uitschakelen verwijdert het model en bewaart wat het heeft geleerd, voor de volgende keer."
 
 [messages.settings-clip-hint-desktop]
-source = "Uses OpenAI’s CLIP model, run on this computer’s processor: nothing leaves it. Turning it on downloads the model ({ $size } MB) from Hugging Face, then learns every picture in the background at low priority. It takes 300 to 600 MB of memory while it works or you search. Turning it off deletes the model and keeps what it learned, for next time."
-translation = "Gebruikt het CLIP-model van OpenAI, uitgevoerd op de processor van deze computer: er gaat niets naar buiten. Inschakelen downloadt het model ({ $size } MB) van Hugging Face en leert daarna elke afbeelding op de achtergrond met lage prioriteit. Het gebruikt 300 tot 600 MB geheugen terwijl het werkt of je zoekt. Uitschakelen verwijdert het model en bewaart wat het heeft geleerd, voor de volgende keer."
+source = "Uses Google’s SigLIP 2 model, run on this computer’s processor: nothing leaves it. Turning it on downloads the model ({ $size } MB) from Hugging Face, then learns every picture in the background at low priority. It takes 350 to 750 MB of memory while it works or you search. Turning it off deletes the model and keeps what it learned, for next time."
+translation = "Gebruikt het SigLIP 2-model van Google, uitgevoerd op de processor van deze computer: er gaat niets naar buiten. Inschakelen downloadt het model ({ $size } MB) van Hugging Face en leert daarna elke afbeelding op de achtergrond met lage prioriteit. Het gebruikt 350 tot 750 MB geheugen terwijl het werkt of je zoekt. Uitschakelen verwijdert het model en bewaart wat het heeft geleerd, voor de volgende keer."
 
 [messages.settings-clip-learning]
 source = "Ready: learning pictures, { $done } of { $total } so far"
@@ -8684,6 +8684,10 @@ translation = """
 [messages.settings-clip-ready-empty]
 source = "Ready. Pictures are learned as packs are added."
 translation = "Klaar. Afbeeldingen worden geleerd zodra pakketten worden toegevoegd."
+
+[messages.settings-clip-relearning]
+source = "Until the new model has learned every picture, searches use what the old one learned."
+translation = "Tot het nieuwe model elke afbeelding heeft geleerd, gebruiken zoekopdrachten wat het oude heeft geleerd."
 
 [messages.settings-clip-reset]
 source = "Image search: back to the default"

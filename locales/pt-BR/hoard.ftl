@@ -2358,8 +2358,8 @@ settings-clip-saved-on = Busca por imagem: ligada
 settings-clip-saved-off = Busca por imagem: desligada
 settings-clip-what = Digite o que você procura (“mossy rock”, “sci-fi door”, “wooden barrel”) e as imagens que mostram isso aparecem junto com os nomes que têm essas palavras. “Mais como este” encontra coisas do mesmo tipo, não só das mesmas cores.
 settings-clip-toggle = Ativar a busca por imagem
-settings-clip-hint = Usa o modelo CLIP da OpenAI, executado no processador deste servidor: nada sai dele. Ativar baixa o modelo ({ $size } MB) do Hugging Face e depois aprende cada imagem em segundo plano, com baixa prioridade. Ele ocupa de 300 a 600 MB de memória enquanto trabalha ou alguém busca. Desativar exclui o modelo e mantém o que ele aprendeu, para a próxima vez.
-settings-clip-hint-desktop = Usa o modelo CLIP da OpenAI, executado no processador deste computador: nada sai dele. Ativar baixa o modelo ({ $size } MB) do Hugging Face e depois aprende cada imagem em segundo plano, com baixa prioridade. Ele ocupa de 300 a 600 MB de memória enquanto trabalha ou você busca. Desativar exclui o modelo e mantém o que ele aprendeu, para a próxima vez.
+settings-clip-hint = Usa o modelo SigLIP 2 do Google, executado no processador deste servidor: nada sai dele. Ativar baixa o modelo ({ $size } MB) do Hugging Face e depois aprende cada imagem em segundo plano, com baixa prioridade. Ele ocupa de 350 a 750 MB de memória enquanto trabalha ou alguém busca. Desativar exclui o modelo e mantém o que ele aprendeu, para a próxima vez.
+settings-clip-hint-desktop = Usa o modelo SigLIP 2 do Google, executado no processador deste computador: nada sai dele. Ativar baixa o modelo ({ $size } MB) do Hugging Face e depois aprende cada imagem em segundo plano, com baixa prioridade. Ele ocupa de 350 a 750 MB de memória enquanto trabalha ou você busca. Desativar exclui o modelo e mantém o que ele aprendeu, para a próxima vez.
 settings-clip-looking = Procurando o modelo…
 settings-clip-downloading = Baixando o modelo… o progresso está no indicador de atividade
 settings-clip-ready-empty = Pronto. As imagens são aprendidas conforme os pacotes são adicionados.
@@ -2369,6 +2369,7 @@ settings-clip-ready-all =
        *[other] Pronto: conhece todas as { $count } imagens
     }
 settings-clip-learning = Pronto: aprendendo imagens, { $done } de { $total } até agora
+settings-clip-relearning = Até o novo modelo aprender todas as imagens, as buscas usam o que o antigo aprendeu.
 settings-clip-unavailable = Não foi possível obter o modelo: { $detail }. Tentando de novo a cada hora.
 settings-clap-heading = Buscar sons pelo jeito que soam
 settings-clap-reset = Busca por som: voltar ao padrão

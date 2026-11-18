@@ -1028,6 +1028,7 @@ onBeforeUnmount(() => {
               <span class="text">{{ modelStatus(s.clip, 'clip') }}</span>
             </p>
             <progress v-if="s.clip.state === 'ready' && s.clip.total && s.clip.done < s.clip.total" class="learn" :value="s.clip.done" :max="s.clip.total" />
+            <p v-if="s.clip.relearning" class="hint" data-testid="clip-relearning">{{ t('settings-clip-relearning') }}</p>
             <div class="sh second">
               <h3>{{ t('settings-clap-heading') }}</h3>
               <ResetButton v-if="s.clap.saved" :to="onOff(s.clap.default)" :disabled="busy" @reset="save({ clap: null }, t('settings-clap-reset'))" />

@@ -54,3 +54,23 @@ test('a pack browses folder by folder, and a path opens its folder', async ({ pa
     await api.post('/api/archive/purge', { data: { packs: [pack.id] } })
   }
 })
+
+// Adding a library location asks whether Hoard claims the folder or watches it, each with its dragon: one on treasure
+// it keeps in order, one eyeing a heap it leaves as it is.
+test('adding a location shows a dragon for claiming the folder and one for watching it', async ({ page }) => {
+  await page.goto('/#settings/locations')
+  await page.getByRole('button', { name: 'Add a location…' }).click()
+  const choices = page.getByRole('group', { name: 'What should Hoard do with this folder?' })
+  const claim = choices.getByRole('radio', { name: /^Claim it/ })
+  const watchIt = choices.getByRole('radio', { name: /^Watch it/ })
+  await expect(claim).toBeChecked()
+  const art = choices.locator('img')
+  await expect(art).toHaveCount(2)
+  for (const img of await art.all()) {
+    await expect.poll(() => img.evaluate((el: HTMLImageElement) => el.complete && el.naturalWidth)).toBe(160)
+  }
+  // The pictures are part of the choice: clicking one picks it.
+  await art.nth(1).click()
+  await expect(watchIt).toBeChecked()
+  await page.getByRole('button', { name: 'Cancel' }).click()
+})

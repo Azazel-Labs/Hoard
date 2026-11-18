@@ -4,6 +4,8 @@ import { computed, ref, watch } from 'vue'
 import { api, ApiError, type AssetKind, type LibraryLocation, type LocationMode } from '../api'
 import FolderPicker from './FolderPicker.vue'
 import KindChips from './KindChips.vue'
+import claimArt from '../assets/dragon-claim.png'
+import watchArt from '../assets/dragon-watch.png'
 import { t } from '../i18n'
 
 const props = defineProps<{
@@ -63,18 +65,25 @@ async function submit() {
   <form class="locform" @submit.prevent="submit">
     <fieldset class="choices">
       <legend class="lbl">{{ t('locations-mode-question') }}</legend>
+      <!-- A dragon on its treasure, sorted into chests and racks; a dragon eyeing a heap it never sorted. -->
       <label :class="{ on: mode === 'managed' }">
-        <input v-model="mode" type="radio" name="mode" value="managed" />
-        <span>
-          <strong>{{ t('locations-mode-managed') }}</strong>
-          <small>{{ t('locations-mode-managed-hint') }}</small>
+        <img :src="claimArt" alt="" width="160" height="112" />
+        <span class="pick">
+          <input v-model="mode" type="radio" name="mode" value="managed" />
+          <span>
+            <strong>{{ t('locations-mode-managed') }}</strong>
+            <small>{{ t('locations-mode-managed-hint') }}</small>
+          </span>
         </span>
       </label>
       <label :class="{ on: mode === 'watched' }">
-        <input v-model="mode" type="radio" name="mode" value="watched" />
-        <span>
-          <strong>{{ t('locations-mode-watched') }}</strong>
-          <small>{{ t('locations-mode-watched-hint') }}</small>
+        <img :src="watchArt" alt="" width="160" height="112" />
+        <span class="pick">
+          <input v-model="mode" type="radio" name="mode" value="watched" />
+          <span>
+            <strong>{{ t('locations-mode-watched') }}</strong>
+            <small>{{ t('locations-mode-watched-hint') }}</small>
+          </span>
         </span>
       </label>
     </fieldset>
@@ -126,15 +135,22 @@ async function submit() {
 fieldset { margin: 0; padding: 0; border: 0; min-width: 0; }
 .lbl { color: var(--muted); }
 legend.lbl { margin-bottom: 0.45rem; padding: 0; }
-.choices { display: grid; gap: 0.4rem; }
+.choices { display: grid; grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr)); gap: 0.6rem; }
 .choices label {
-  display: flex; gap: 0.6rem; align-items: flex-start; padding: 0.6rem 0.75rem; border: 1px solid var(--line);
+  display: grid; gap: 0.6rem; align-content: start; padding: 0.6rem; border: 1px solid var(--line);
   border-radius: var(--r-chip); cursor: pointer; transition: border-color var(--dur-1), background-color var(--dur-1);
 }
 .choices label:hover { border-color: color-mix(in srgb, var(--muted) 60%, var(--line)); }
 .choices label.on { border-color: var(--muted); background: var(--raised); }
+/* Pixel art: drawn at 160×112 and scaled up whole, never smoothed. */
+.choices img {
+  display: block; width: 100%; height: auto; image-rendering: pixelated; border-radius: calc(var(--r-chip) - 2px);
+  filter: saturate(0.55) brightness(0.85); transition: filter var(--dur-1);
+}
+.choices label:hover img, .choices label.on img { filter: none; }
+.choices .pick { display: flex; gap: 0.6rem; align-items: flex-start; padding: 0 0.15rem 0.1rem; }
 .choices input { margin: 0.2rem 0 0; }
-.choices span { display: grid; gap: 0.15rem; }
+.choices .pick > span { display: grid; gap: 0.15rem; }
 .choices small { color: var(--muted); font-size: inherit; line-height: 1.45; }
 .grid { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 0.7rem 0.9rem; align-items: baseline; }
 .grid > .field { max-width: 22rem; }

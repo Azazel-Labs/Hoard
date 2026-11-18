@@ -1,4 +1,4 @@
-import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs'
+import { mkdirSync, mkdtempSync, renameSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 
@@ -43,6 +43,38 @@ test('a file edited in a watched folder is read again at the next scan', async (
     await expect.poll(async () => (await detail()).has_thumb, { timeout: 60_000 }).toBe(true)
     expect(await (await api.get(`/api/assets/${asset.id}/file`)).text()).toBe(edited)
     expect((await assetsOf(api, pack!.id)).map((a) => a.id)).toEqual([asset.id])
+  } finally {
+    await api.delete(`/api/admin/locations/${loc.id}`)
+    rmSync(root, { recursive: true, force: true })
+  }
+})
+
+// A watched folder renamed is the same pack under its new name, found by the files it holds, so its tags and notes stay.
+test('a watched folder renamed keeps its pack', async ({ api }) => {
+  const root = mkdtempSync(join(tmpdir(), 'hoard-e2e-watched-'))
+  const folder = `E2E Renamed ${unique()}`
+  mkdirSync(join(root, folder))
+  for (const f of ['one.txt', 'two.txt', 'three.txt']) writeFileSync(join(root, folder, f), `${f}\n`)
+  const created = await api.post('/api/admin/locations', {
+    data: { name: folder, mode: 'watched', path: root, kinds: [], catch_all: false },
+  })
+  expect(created.ok(), await created.text()).toBe(true)
+  const loc = (await created.json()) as { id: number }
+  const packNamed = async (name: string) =>
+    ((await (await api.get('/api/packs')).json()) as Pack[]).find((p) => p.name === name)
+  try {
+    await expect.poll(async () => (await packNamed(folder))?.id, { timeout: 60_000 }).toBeTruthy()
+    const pack = (await packNamed(folder))!
+    await waitReady(api, [pack.id])
+    const before = (await assetsOf(api, pack.id)).map((a) => a.id).sort()
+    expect(before).toHaveLength(3)
+
+    const renamed = `${folder} (2)`
+    renameSync(join(root, folder), join(root, renamed))
+    expect((await api.post(`/api/admin/locations/${loc.id}/scan`)).ok()).toBe(true)
+    await expect.poll(async () => (await packNamed(renamed))?.id, { timeout: 60_000 }).toBe(pack.id)
+    expect(await packNamed(folder)).toBeUndefined()
+    expect((await assetsOf(api, pack.id)).map((a) => a.id).sort()).toEqual(before)
   } finally {
     await api.delete(`/api/admin/locations/${loc.id}`)
     rmSync(root, { recursive: true, force: true })

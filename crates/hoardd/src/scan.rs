@@ -91,6 +91,8 @@ pub(crate) struct Changes {
     pub(crate) added: usize,
     pub(crate) removed: usize,
     pub(crate) updated: usize,
+    /// Packs whose folder was renamed, found under the new name.
+    pub(crate) renamed: usize,
 }
 
 pub(crate) fn scan(state: &AppState, location: i64) -> Result<Changes> {
@@ -149,8 +151,38 @@ fn sweep(conn: &mut Connection, location: i64) -> Result<Changes> {
     }
 
     let mut changes = Changes::default();
+    let mut new: Vec<&String> = folders.iter().filter(|f| !existing.contains_key(*f)).collect();
+    new.sort();
+    // A new folder holding the files of a pack whose folder is gone is that folder renamed: the pack (with its tags
+    // and notes) follows it rather than being dropped for a new one.
+    let mut renamed: HashSet<&str> = HashSet::new();
+    let mut gone: Vec<(&String, &Existing)> =
+        existing.iter().filter(|(f, p)| !folders.contains(*f) && p.status == "ready").collect();
+    gone.sort_by_key(|(f, _)| f.as_str());
+    new.retain(|folder| {
+        if gone.is_empty() {
+            return true;
+        }
+        let Some(at) = renamed_from(conn, &root.join(folder), &gone) else { return true };
+        let (old, pack) = gone.remove(at);
+        match follow_rename(conn, &pack.id, old, folder, &root.join(folder)) {
+            Ok(()) => {
+                tracing::info!(location = %loc.name, from = %old, to = %folder, "watched pack folder renamed");
+                renamed.insert(pack.id.as_str());
+                changes.renamed += 1;
+                false
+            }
+            Err(e) => {
+                tracing::warn!(from = %old, to = %folder, error = %format!("{e:#}"), "couldn't follow a renamed folder");
+                true
+            }
+        }
+    });
     let now = OffsetDateTime::now_utc();
     for (folder, pack) in &existing {
+        if renamed.contains(pack.id.as_str()) {
+            continue;
+        }
         if folders.contains(folder) {
             if pack.missing_since.is_some() {
                 conn.execute("UPDATE packs SET missing_since = NULL WHERE id = ?1", [&pack.id])?;
@@ -171,8 +203,6 @@ fn sweep(conn: &mut Connection, location: i64) -> Result<Changes> {
             }
         }
     }
-    let mut new: Vec<&String> = folders.iter().filter(|f| !existing.contains_key(*f)).collect();
-    new.sort();
     for folder in new {
         if add_pack(conn, location, folder)? {
             changes.added += 1;
@@ -197,9 +227,41 @@ fn sweep(conn: &mut Connection, location: i64) -> Result<Changes> {
     }
     conn.execute("UPDATE locations SET scanned_at = ?2 WHERE id = ?1", params![location, db::now()])?;
     if changes != Changes::default() {
-        tracing::info!(location = %loc.name, added = changes.added, removed = changes.removed, updated = changes.updated, "watched folder scanned");
+        tracing::info!(location = %loc.name, added = changes.added, removed = changes.removed, updated = changes.updated, renamed = changes.renamed, "watched folder scanned");
     }
     Ok(changes)
+}
+
+/// Of the packs whose folder is gone, the one this new folder is a rename of: the one whose files it mostly holds
+/// (at least [`SAME_FILES`] of the two lists of files together are in both).
+fn renamed_from(c: &Connection, dir: &Path, gone: &[(&String, &Existing)]) -> Option<usize> {
+    let on_disk = ingest::pack_rels(dir).ok().filter(|f| !f.is_empty())?;
+    let mut best = None;
+    for (i, (_, pack)) in gone.iter().enumerate() {
+        let Ok(known) = db::known_paths(c, &pack.id) else { continue };
+        let both = on_disk.iter().filter(|p| known.contains(*p)).count();
+        let either = on_disk.len() + known.len() - both;
+        let share = both as f64 / either.max(1) as f64;
+        if share >= SAME_FILES && best.is_none_or(|(_, b)| share > b) {
+            best = Some((i, share));
+        }
+    }
+    best.map(|(i, _)| i)
+}
+
+/// How much of two folders' files must be the same for one to be taken for the other renamed.
+const SAME_FILES: f64 = 0.8;
+
+/// Point a pack at its folder's new name (and name it after it, unless it was named otherwise), then catch it up
+/// with whatever else changed in the folder.
+fn follow_rename(c: &Connection, pack_id: &str, old: &str, new: &str, dir: &Path) -> Result<()> {
+    c.execute(
+        "UPDATE packs SET folder = ?3, name = CASE WHEN name = ?2 THEN ?3 ELSE name END, missing_since = NULL
+          WHERE id = ?1",
+        params![pack_id, old, new],
+    )?;
+    catch_up(c, pack_id, dir)?;
+    Ok(())
 }
 
 /// A pack of a watched location, as a scan finds it in the database.
@@ -466,6 +528,56 @@ mod tests {
 
         c.execute("DELETE FROM jobs", []).unwrap();
         assert_eq!(sweep(&mut c, loc).unwrap(), Changes::default(), "and neither is read again until it changes again");
+    }
+
+    #[test]
+    fn a_renamed_folder_keeps_its_pack_and_one_with_other_files_is_new() {
+        let dir = tempfile::tempdir().unwrap();
+        let (_cfg, pool) = setup(dir.path());
+        let loc = watched(&pool, dir.path(), &["Kit"]);
+        let packs = dir.path().join("packs");
+        let files = ["a.png", "b.png", "c.png", "d.png", "e.png"];
+        for f in files {
+            std::fs::write(packs.join("Kit").join(f), f).unwrap();
+        }
+        let mut c = pool.get().unwrap();
+        sweep(&mut c, loc).unwrap();
+        let pack = ingested(&c, "Kit");
+        for f in files {
+            asset(&c, &pack, f, f);
+        }
+        let folder_and_name = |c: &Connection| -> (String, String, Option<String>) {
+            c.query_row("SELECT folder, name, missing_since FROM packs WHERE id = ?1", [&pack], |r| {
+                Ok((r.get(0)?, r.get(1)?, r.get(2)?))
+            })
+            .unwrap()
+        };
+        let pack_count =
+            |c: &Connection| -> i64 { c.query_row("SELECT COUNT(*) FROM packs", [], |r| r.get(0)).unwrap() };
+
+        // Renamed, with one file gone on the way: still mostly the same files.
+        std::fs::rename(packs.join("Kit"), packs.join("Kit 2")).unwrap();
+        std::fs::remove_file(packs.join("Kit 2/e.png")).unwrap();
+        assert_eq!(sweep(&mut c, loc).unwrap(), Changes { renamed: 1, ..Changes::default() });
+        assert_eq!(folder_and_name(&c), ("Kit 2".to_owned(), "Kit 2".to_owned(), None));
+        assert_eq!(pack_count(&c), 1);
+        assert_eq!(ids(&c, &pack), ["a.png", "b.png", "c.png", "d.png"], "the missing file goes with the catch-up");
+
+        // A pack named otherwise keeps its name.
+        c.execute("UPDATE packs SET name = 'My kit' WHERE id = ?1", [&pack]).unwrap();
+        std::fs::rename(packs.join("Kit 2"), packs.join("Kit 3")).unwrap();
+        assert_eq!(sweep(&mut c, loc).unwrap(), Changes { renamed: 1, ..Changes::default() });
+        assert_eq!(folder_and_name(&c), ("Kit 3".to_owned(), "My kit".to_owned(), None));
+
+        // A folder gone while another with other files turns up: the first is missing, the second a pack of its own.
+        std::fs::remove_dir_all(packs.join("Kit 3")).unwrap();
+        std::fs::create_dir_all(packs.join("Other")).unwrap();
+        for f in ["a.png", "x.png", "y.png"] {
+            std::fs::write(packs.join("Other").join(f), f).unwrap();
+        }
+        assert_eq!(sweep(&mut c, loc).unwrap(), Changes { added: 1, ..Changes::default() });
+        assert_eq!(pack_count(&c), 2);
+        assert!(folder_and_name(&c).2.is_some(), "the old pack waits in case its folder comes back");
     }
 
     #[test]

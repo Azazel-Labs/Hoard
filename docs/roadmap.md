@@ -58,80 +58,11 @@ for one clip, becomes an animation linked to the characters it fits nearby. What
 Still open: whether the root travels or a clip plays in place, and whether each clip in a many-take file should be
 an entry of its own in search.
 
-## Sprite sheets and 2D animation: more formats
+## Spine binary skeletons
 
-Atlases from TexturePacker (and Aseprite), Starling, libGDX/Spine, Cocos2d and Godot become sprite sheets, and so do
-tile sheets that come with only a note of their grid (Kenney's `Tilesheet.txt`). Still to read, the most common first:
+Spine skeletons exported as JSON play on their atlas in Hoard's own player. Still to read:
 
-- [x] **Tiled tilesets** (`.tsx`, `.tsj`, or a tileset saved as `.json`): the image, tile size, spacing and margin
-  are given exactly, so each becomes a sheet of its tiles, empty ones left out, its tiles' animations kept. Tilesets
-  embedded in a `.tmx` map stay part of the map.
-- [x] **Unity sprite slicing**: Asset Store packs keep each sprite's rectangle in the image's `.png.meta`. That
-  `.meta` is kept in the pack and becomes the sheet, its image the page.
-- [x] **DragonBones texture atlases** (`_tex.json`) as sheets.
-- [x] **DragonBones skeletons** (`_ske.json`) played on their atlas, meshes, IK and nested armatures
-  included, the thumbnail drawn by the browser.
-- [x] **Lottie / Bodymovin** (`.json`, `.lottie`): vector animations, common for UI. Played in the details panel
-  with lottie-web, the thumbnail drawn by the browser as the 3D viewer's is.
-- [x] **Rive** (`.riv`), played with its free web runtime, served with the app; the thumbnail drawn by the browser.
-- [x] **Spine skeletons** (`.json`, 3.8 on) played on their atlas by Hoard's own player, written from Spine's
-  published format rather than Spine's runtime (whose license covers only Spine licensees): meshes, IK, transform
-  constraints, clipping and skins included, the thumbnail drawn by the browser.
-- [ ] **Spine binary skeletons** (`.skel`): the same rig in Spine's binary export, read into the same player.
-
-## Images: more formats
-
-Hoard previews PNG, JPEG, GIF, BMP, TGA, WebP, AVIF, HEIC, JPEG XL, TIFF, HDR, EXR, PSD/PSB, Krita, OpenRaster,
-GIMP, DDS, KTX and KTX2, PowerVR, VTF, Basis, ICO/CUR, QOI, PNM, PCX, SVG, Illustrator, Aseprite, the previews inside Clip Studio,
-Procreate, Affinity and EPS files, and camera raw photos. The formats added lately, and those still to come, the
-most common first:
-
-- [x] **Source files with a preview inside**: Clip Studio (`.clip`, a SQLite database with a canvas preview),
-  Procreate (`.procreate`, a zip with a thumbnail), Affinity Photo and Designer (`.afphoto`, `.afdesign`) and EPS
-  (a TIFF preview in its header, when it has one).
-- [x] **GIMP** (`.xcf`): there's no flattened copy inside, so Hoard composites the layers itself, each at its
-  offset with its opacity, mask and visibility, blended as Normal. 8- and 16-bit integer pixels.
-- [x] **AVIF, HEIC and JPEG XL**: newer formats, rare in asset packs so far. JPEG XL is decoded in pure Rust
-  (jxl-oxide); AVIF and HEIC go through ffmpeg once it's downloaded.
-- [x] **Small ones**: ICO/CUR, QOI and PNM (`.ppm`, `.pgm`, `.pbm`) through the image library, PCX read by Hoard,
-  and KTX 1, PowerVR and Valve's VTF textures decoded like DDS.
-- [x] Camera raw files (`.dng`, `.cr2`, `.nef`, `.arw`, `.raf` and the rest) by their embedded JPEG. These are
-  reference photos rather than game art.
-
-## Sounds: more formats
-
-Hoard decodes WAV, FLAC, MP3, OGG Vorbis, Opus, AIFF and ADPCM itself, AAC/M4A, WMA, CAF, WavPack, APE and more
-through ffmpeg, plays MOD, XM, S3M, IT, MPTM, UMX, MIDI, NSF, VGM and FMOD and Wwise banks, and plays a few notes on SFZ and SF2
-instruments. What's missing is mostly containers rather than codecs:
-
-- [x] **SFZ instruments and SF2 SoundFonts**: a set of samples and how they map to notes, common in music packs. One
-  asset, its samples linked to it, its preview a few notes played on it.
-- [x] **Opus without ffmpeg**: a built-in decoder, so Opus plays before ffmpeg is downloaded, or without it.
-- [x] **More tracker and chiptune formats**: OpenMPT's MPTM, Unreal's UMX, NES NSF and NSFe, VGM and VGZ (Yamaha FM
-  chips, the SN76489 and the AY-3-8910; other chips in a VGM stay silent).
-- [x] **FMOD and Wwise banks** (`.fsb`, `.bank`, `.wem`, `.bnk`): a bank plays its sounds in turn, with their names
-  when FMOD keeps them. PCM, Vorbis, MP3 and the ADPCM codecs play; console codecs and encrypted banks are named only.
-
-## Search sounds by what they sound like
-
-So that "find me a sound that goes WHOOOM", typed or asked through MCP, finds deep whooshes. In layers, each useful
-on its own:
-
-- [x] **Measured features**: each sound's duration, envelope (a sharp attack or a swell, how long the tail is),
-  brightness, how noisy or tonal it is, whether its pitch rises or falls, its loudness and whether it loops cleanly.
-  Kept with the sound, shown in its details, filterable in search and the API.
-- [x] **Onomatopoeia**: a word read as the shape of a sound and scored against those features. A plosive start
-  (b, p, k, t) is a sharp attack; long or repeated vowels are length; "oo"/"o" low and dark, "ee"/"i" high and
-  bright; "sh", "s", "wh", "f" are noise and air; a trailing "m" or "n" a hum that fades; capitals are loud.
-  "WHOOOM": airy start, long low middle, fading hum, loud.
-- [x] **CLAP embeddings**: sounds and text in one space, as CLIP does for images, so "glassy UI blip" or "distant
-  thunder roll" find sounds whatever they're called. Off until an admin turns it on, like CLIP: LAION's HTSAT
-  unfused model, 614 MB, Apache-2.0.
-- [x] **MCP**: `search_sounds` — the calling AI passes the raw word as `imitation` and its own reading of it ("a
-  deep whoosh, about a second, rising") as `shape`, which overrides that part of Hoard's reading — returning each
-  sound's measured features, the same in words and a link to listen, plus `describe_sound(id)` and `sounds_like(id)`.
-- [x] **Search by imitation**: make the noise into the microphone, and sounds with that envelope and pitch shape are
-  found.
+- **Spine binary skeletons** (`.skel`): the same rig in Spine's binary export, read into the same player.
 
 ## Ideas
 

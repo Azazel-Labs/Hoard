@@ -1,6 +1,6 @@
 //! Settings → Authentication: how people sign in to the portal besides Hoard's own accounts.
 //!
-//! - **Internal**: names and passwords kept by Hoard (`auth.rs`). These always work, whatever is chosen here, so an
+//! - **Internal**: names and passwords kept by Hoard (the `auth` module). These always work, whatever is chosen here, so an
 //!   admin can't be locked out by a directory that's down or set up wrong.
 //! - **LDAP** (a custom server or `OpenLDAP`) and **Microsoft Active Directory**: the name and password typed on the
 //!   sign-in page are checked by the directory. Hoard finds the person's entry (as a service account, or anonymously),

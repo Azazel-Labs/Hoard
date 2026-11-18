@@ -13,7 +13,9 @@
 //! Tokens can't manage accounts or tokens, so a leaked one can be revoked and can't mint more. Apps that sign in over
 //! OAuth (`oauth.rs`) act with the role of the person who let them in.
 
-use crate::i18n::tr;
+mod accounts;
+mod signing_in;
+
 use std::collections::HashMap;
 use std::sync::{LazyLock, Mutex, PoisonError};
 use std::time::{Duration, Instant};
@@ -21,21 +23,22 @@ use std::time::{Duration, Instant};
 use anyhow::{Result, anyhow};
 use argon2::Argon2;
 use argon2::password_hash::{PasswordHasher as _, PasswordVerifier as _};
-use axum::extract::{Path, Request, State};
-use axum::http::{HeaderMap, HeaderValue, Method, StatusCode, header};
+use axum::extract::{Request, State};
+use axum::http::{HeaderMap, HeaderValue, Method, header};
 use axum::middleware::Next;
-use axum::response::{IntoResponse, Response};
-use axum::routing::{get, post};
-use axum::{Extension, Json, Router};
+use axum::response::Response;
 use rusqlite::{Connection, OptionalExtension as _, params};
-use serde::Deserialize;
 use serde_json::{Value, json};
 use sha2::Digest as _;
 
 use crate::AppState;
 use crate::error::{ApiResult, AppError};
-use crate::signin::{Gate, Source};
+use crate::i18n::tr;
+use crate::signin::Gate;
 use crate::{db, tools};
+
+pub(crate) use accounts::{account_router, admin_router};
+pub(crate) use signing_in::router;
 
 /// The session cookie over plain `http://`.
 const COOKIE: &str = "hoard_session";
@@ -321,9 +324,6 @@ pub(crate) async fn require_reader(State(state): State<AppState>, mut req: Reque
     Ok(next.run(req).await)
 }
 
-// ---------------------------------------------------------------------------------------------
-// Sign-in throttling
-
 /// Failed sign-ins in a row per name (lowercased), and when the last one was.
 static FAILURES: LazyLock<Mutex<HashMap<String, (u32, Instant)>>> = LazyLock::new(Mutex::default);
 
@@ -345,96 +345,6 @@ fn note_attempt(name: &str, ok: bool) {
     }
     let entry = failures.entry(name.to_lowercase()).or_insert((0, Instant::now()));
     *entry = (entry.0 + 1, Instant::now());
-}
-
-// ---------------------------------------------------------------------------------------------
-// Routes
-
-/// Open to everyone: what the portal needs to show the sign-in or first-account screen.
-pub(crate) fn router() -> Router<AppState> {
-    let posts = Router::new()
-        .route("/api/auth/setup", post(setup))
-        .route("/api/auth/login", post(login))
-        .route("/api/auth/logout", post(logout))
-        .route_layer(axum::middleware::from_fn(from_portal));
-    Router::new().route("/api/auth/status", get(status)).merge(posts)
-}
-
-/// Signing in, making the first account and signing out only come from the portal: another site can't make a browser
-/// claim a fresh server, or sign it in as someone else.
-async fn from_portal(req: Request, next: Next) -> Response {
-    if req.headers().contains_key(CSRF_HEADER) {
-        next.run(req).await
-    } else {
-        AppError::forbidden(tr!("error-not-from-portal")).into_response()
-    }
-}
-
-/// Behind [`require_user`]: everyone's own password and tokens. An admin sees and can revoke everyone's tokens.
-pub(crate) fn account_router() -> Router<AppState> {
-    Router::new()
-        .route("/api/auth/password", post(change_password))
-        .route("/api/admin/tokens", get(list_tokens).post(create_token))
-        .route("/api/admin/tokens/{id}", axum::routing::delete(delete_token))
-}
-
-/// Behind [`require_admin`].
-pub(crate) fn admin_router() -> Router<AppState> {
-    Router::new()
-        .route("/api/admin/users", get(list_users).post(create_user))
-        .route("/api/admin/users/{id}", axum::routing::delete(delete_user).patch(patch_user))
-}
-
-async fn status(State(state): State<AppState>, headers: HeaderMap) -> ApiResult<Json<Value>> {
-    let cred = credential(&headers);
-    let settings = state.settings.get();
-    let gate = settings.auth.gate();
-    let (accounts, who) = db::call(&state.pool, move |c| {
-        let n: i64 = c.query_row("SELECT COUNT(*) FROM users", [], |r| r.get(0))?;
-        let who = match cred {
-            Some(cred) => lookup(c, &cred, gate)?,
-            None => None,
-        };
-        let source: Option<String> = match &who {
-            Some(Who::User { id, .. }) => {
-                c.query_row("SELECT source FROM users WHERE id = ?1", [id], |r| r.get(0)).optional()?
-            }
-            _ => None,
-        };
-        Ok((n, who.map(|w| (w, source))))
-    })
-    .await?;
-    let user = who.as_ref().map(|(w, source)| {
-        let mut j = w.json();
-        if let (Some(source), Some(o)) = (source, j.as_object_mut()) {
-            o.insert("source".into(), json!(source));
-        }
-        j
-    });
-    Ok(Json(json!({
-        "setup_needed": accounts == 0,
-        "setup_code": accounts == 0 && setup_code(&state).is_some(),
-        "signed_in": who.is_some(),
-        "user": user,
-        "guest_browsing": settings.guest_browsing,
-        "name": settings.name,
-        "sign_in": crate::signin::sign_in_options(&settings.auth),
-        "desktop": state.cfg.desktop,
-    })))
-}
-
-#[derive(Deserialize)]
-struct Credentials {
-    username: String,
-    password: String,
-}
-
-#[derive(Deserialize)]
-struct SetupBody {
-    username: String,
-    password: String,
-    #[serde(default)]
-    code: String,
 }
 
 /// A name and password fit to save, or what's wrong with them.
@@ -491,296 +401,6 @@ pub(crate) fn session_cookie(headers: &HeaderMap, token: &str) -> Result<HeaderV
     cookie(headers, token, 400 * 86_400)
 }
 
-fn signed_in(headers: &HeaderMap, token: &str, name: &str, role: Role) -> ApiResult<Response> {
-    let set = session_cookie(headers, token)?;
-    let user = json!({ "name": name, "kind": "user", "role": role.as_str() });
-    Ok(([(header::SET_COOKIE, set)], Json(json!({ "user": user }))).into_response())
-}
-
-/// `HOARD_SETUP_CODE`, when it's set: then only someone who knows it can make the first account.
-fn setup_code(state: &AppState) -> Option<&str> {
-    state.cfg.setup_code.as_deref().map(str::trim).filter(|s| !s.is_empty())
-}
-
-/// The first account: whoever comes first, or with `HOARD_SETUP_CODE` when that's set. Refused once there is one.
-async fn setup(State(state): State<AppState>, headers: HeaderMap, Json(body): Json<SetupBody>) -> ApiResult<Response> {
-    let name = check_new(&body.username, &body.password)?;
-    if let Some(expected) = setup_code(&state) {
-        const TRIES: &str = "\u{1}setup";
-        if let Some(wait) = wait_for(TRIES) {
-            return Err(AppError::too_many(tr!("error-too-many-codes", seconds = wait.as_secs().max(1))));
-        }
-        // Compared as digests, so how long it takes says nothing about how much of the code was right.
-        let right = digest(body.code.trim()) == digest(expected);
-        note_attempt(TRIES, right);
-        if !right {
-            return Err(AppError { status: StatusCode::FORBIDDEN, err: anyhow!(tr!("error-wrong-setup-code")) });
-        }
-    }
-    let made = name.clone();
-    let token = db::call(&state.pool, move |c| {
-        let hash = hash_password(&body.password)?;
-        let added = c.execute(
-            "INSERT INTO users (username, password_hash, role, created_at)
-             SELECT ?1, ?2, 'admin', ?3 WHERE NOT EXISTS (SELECT 1 FROM users)",
-            params![made, hash, db::now()],
-        )?;
-        if added == 0 {
-            return Ok(None);
-        }
-        new_session(c, c.last_insert_rowid()).map(Some)
-    })
-    .await?
-    .ok_or_else(|| AppError::conflict(tr!("error-already-set-up")))?;
-    tracing::info!(user = %name, "first account made");
-    signed_in(&headers, &token, &name, Role::Admin)
-}
-
-async fn login(
-    State(state): State<AppState>,
-    headers: HeaderMap,
-    Json(body): Json<Credentials>,
-) -> ApiResult<Response> {
-    let name = body.username.trim().to_owned();
-    if let Some(wait) = wait_for(&name) {
-        return Err(AppError::too_many(tr!("error-too-many-tries", seconds = wait.as_secs().max(1))));
-    }
-    let auth = state.settings.get().auth.clone();
-    let directory = auth.directory().is_some();
-    let (lookup_name, password) = (name.clone(), body.password.clone());
-    // Hoard's own accounts always sign in with their own password, whatever Settings → Authentication says, so a
-    // directory that's down or set up wrong can't lock an admin out. Anyone else goes to the directory, if there is one.
-    let found = db::call(&state.pool, move |c| {
-        let row: Option<(i64, String, String, String, String)> = c
-            .query_row(
-                "SELECT id, username, password_hash, role, source FROM users WHERE username = ?1",
-                [&lookup_name],
-                |r| Ok((r.get(0)?, r.get(1)?, r.get(2)?, r.get(3)?, r.get(4)?)),
-            )
-            .optional()?;
-        if directory && row.as_ref().is_none_or(|r| r.4 == "ldap") {
-            return Ok(Err(()));
-        }
-        let internal = row.filter(|r| r.4 == "internal");
-        let hash = internal.as_ref().map_or(DUMMY_HASH.as_str(), |r| r.2.as_str());
-        if !password_matches(&password, hash) {
-            return Ok(Ok(None));
-        }
-        let Some((id, username, _, role, _)) = internal else { return Ok(Ok(None)) };
-        Ok(Ok(Some((new_session(c, id)?, username, Role::stored(&role)))))
-    })
-    .await?;
-    let found = match found {
-        Ok(found) => found,
-        Err(()) => directory_login(&state, &auth, &name, &body.password).await?,
-    };
-    note_attempt(&name, found.is_some());
-    let Some((token, username, role)) = found else {
-        tracing::info!(user = %name, "failed sign-in");
-        return Err(AppError { status: StatusCode::UNAUTHORIZED, err: anyhow!(tr!("error-wrong-password")) });
-    };
-    signed_in(&headers, &token, &username, role)
-}
-
-/// Sign in through LDAP or Active Directory. `None`: not someone the directory knows with that password.
-async fn directory_login(
-    state: &AppState,
-    auth: &crate::signin::AuthConfig,
-    name: &str,
-    password: &str,
-) -> ApiResult<Option<(String, String, Role)>> {
-    let Some(dir) = auth.directory() else { return Ok(None) };
-    let person = crate::directory::directory_sign_in(dir, name, password).await.map_err(|e| {
-        tracing::warn!(user = %name, "the directory couldn't check a sign-in: {e:#}");
-        AppError::unavailable(tr!("error-directory-unavailable", reason = format!("{e:#}")))
-    })?;
-    let Some(person) = person else { return Ok(None) };
-    let auth = auth.clone();
-    let made = db::call(&state.pool, move |c| {
-        Ok(match crate::signin::account_for(c, &auth, Source::Ldap, &person.name, None, &person.groups)? {
-            Ok((id, username, role)) => Ok((new_session(c, id)?, username, role)),
-            Err(msg) => Err(msg),
-        })
-    })
-    .await?;
-    match made {
-        Ok(signed_in) => Ok(Some(signed_in)),
-        Err(msg) => Err(AppError::forbidden(msg)),
-    }
-}
-
-async fn logout(State(state): State<AppState>, headers: HeaderMap) -> ApiResult<Response> {
-    // Over HTTPS the browser may hold both cookies (from before and after HTTPS was turned on): end both.
-    let secure = over_https(&headers);
-    let tokens: Vec<String> =
-        [secure.then(|| cookie_value(&headers, SECURE_COOKIE)).flatten(), cookie_value(&headers, COOKIE)]
-            .into_iter()
-            .flatten()
-            .collect();
-    db::call(&state.pool, move |c| {
-        for token in &tokens {
-            c.execute("DELETE FROM sessions WHERE token_hash = ?1", [digest(token)])?;
-        }
-        Ok(())
-    })
-    .await?;
-    let mut res = StatusCode::NO_CONTENT.into_response();
-    res.headers_mut().append(header::SET_COOKIE, set_cookie(false, "", 0)?);
-    if secure {
-        res.headers_mut().append(header::SET_COOKIE, set_cookie(true, "", 0)?);
-    }
-    Ok(res)
-}
-
-#[derive(Deserialize)]
-struct PasswordChange {
-    current: String,
-    new: String,
-}
-
-/// Change your own password. Signs out your other sessions.
-async fn change_password(
-    State(state): State<AppState>,
-    Extension(who): Extension<Who>,
-    headers: HeaderMap,
-    Json(body): Json<PasswordChange>,
-) -> ApiResult<StatusCode> {
-    let id = who.person()?;
-    check_password(&body.new)?;
-    let keep = session_token(&headers).map_or_default(|t| digest(&t));
-    let changed = db::call(&state.pool, move |c| {
-        let (hash, source): (String, String) =
-            c.query_row("SELECT password_hash, source FROM users WHERE id = ?1", [id], |r| Ok((r.get(0)?, r.get(1)?)))?;
-        if source != "internal" {
-            return Ok(None);
-        }
-        if !password_matches(&body.current, &hash) {
-            return Ok(Some(false));
-        }
-        c.execute("UPDATE users SET password_hash = ?2 WHERE id = ?1", params![id, hash_password(&body.new)?])?;
-        c.execute("DELETE FROM sessions WHERE user_id = ?1 AND token_hash != ?2", params![id, keep])?;
-        Ok(Some(true))
-    })
-    .await?;
-    match changed {
-        None => Err(AppError::bad_request(tr!("error-password-elsewhere"))),
-        Some(false) => Err(AppError::bad_request(tr!("error-current-password"))),
-        Some(true) => Ok(StatusCode::NO_CONTENT),
-    }
-}
-
-async fn list_users(State(state): State<AppState>, Extension(who): Extension<Who>) -> ApiResult<Json<Value>> {
-    let me = who.person()?;
-    let users = db::call(&state.pool, move |c| {
-        let mut stmt = c.prepare("SELECT id, username, created_at, role, source FROM users ORDER BY username")?;
-        let rows = stmt
-            .query_map([], |r| {
-                let id: i64 = r.get(0)?;
-                Ok(json!({
-                    "id": id,
-                    "username": r.get::<_, String>(1)?,
-                    "created_at": r.get::<_, String>(2)?,
-                    "role": Role::stored(&r.get::<_, String>(3)?).as_str(),
-                    "source": r.get::<_, String>(4)?,
-                    "you": id == me,
-                }))
-            })?
-            .collect::<rusqlite::Result<Vec<_>>>()?;
-        Ok(rows)
-    })
-    .await?;
-    Ok(Json(json!({ "users": users })))
-}
-
-#[derive(Deserialize)]
-struct NewAccount {
-    username: String,
-    /// Not for accounts that sign in through a directory or OAuth.
-    #[serde(default)]
-    password: String,
-    /// `internal` (the default), `ldap` or `oauth`: who checks the account's sign-in.
-    source: Option<String>,
-    /// `view`, `edit` (the default) or `admin`.
-    role: Option<String>,
-}
-
-async fn create_user(
-    State(state): State<AppState>,
-    Extension(who): Extension<Who>,
-    Json(body): Json<NewAccount>,
-) -> ApiResult<(StatusCode, Json<Value>)> {
-    who.person()?;
-    let source = match body.source.as_deref() {
-        None => Source::Internal,
-        Some(s) => Source::parse(s).ok_or_else(|| AppError::bad_request(tr!("error-account-source")))?,
-    };
-    let internal = source == Source::Internal;
-    let name = if internal { check_new(&body.username, &body.password)? } else { check_name(&body.username)? };
-    let role = Role::requested(body.role.as_deref(), Role::Edit)?;
-    let username = name.clone();
-    let added = db::call(&state.pool, move |c| {
-        let hash = if internal { hash_password(&body.password)? } else { String::new() };
-        let n = c.execute(
-            "INSERT INTO users (username, password_hash, role, source, created_at) VALUES (?1, ?2, ?3, ?4, ?5)
-             ON CONFLICT DO NOTHING",
-            params![username, hash, role.as_str(), source.as_str(), db::now()],
-        )?;
-        Ok((n == 1).then(|| c.last_insert_rowid()))
-    })
-    .await?;
-    let Some(id) = added else {
-        return Err(AppError::conflict(tr!("error-account-exists")));
-    };
-    let made = json!({ "id": id, "username": name, "role": role.as_str(), "source": source.as_str() });
-    Ok((StatusCode::CREATED, Json(made)))
-}
-
-#[derive(Deserialize)]
-struct AccountChange {
-    role: String,
-}
-
-/// Give an account another role. Not your own: there's always an admin, because the one doing this is one.
-async fn patch_user(
-    State(state): State<AppState>,
-    Extension(who): Extension<Who>,
-    Path(id): Path<i64>,
-    Json(body): Json<AccountChange>,
-) -> ApiResult<StatusCode> {
-    if who.person()? == id {
-        return Err(AppError::bad_request(tr!("error-own-role")));
-    }
-    let role = Role::requested(Some(&body.role), Role::View)?;
-    let n = db::call(&state.pool, move |c| {
-        Ok(c.execute("UPDATE users SET role = ?2 WHERE id = ?1", params![id, role.as_str()])?)
-    })
-    .await?;
-    if n == 0 {
-        return Err(AppError::not_found(tr!("error-account-not-found")));
-    }
-    Ok(StatusCode::NO_CONTENT)
-}
-
-async fn delete_user(
-    State(state): State<AppState>,
-    Extension(who): Extension<Who>,
-    Path(id): Path<i64>,
-) -> ApiResult<StatusCode> {
-    if who.person()? == id {
-        return Err(AppError::bad_request(tr!("error-remove-self")));
-    }
-    // Their tokens and connected apps go with them.
-    let n = db::call(&state.pool, move |c| {
-        sign_out_everywhere(c, id)?;
-        Ok(c.execute("DELETE FROM users WHERE id = ?1", [id])?)
-    })
-    .await?;
-    if n == 0 {
-        return Err(AppError::not_found(tr!("error-account-not-found")));
-    }
-    Ok(StatusCode::NO_CONTENT)
-}
-
 /// End everything `user_id` is signed in with: sessions, access tokens and connected apps.
 pub(crate) fn sign_out_everywhere(c: &Connection, user_id: i64) -> rusqlite::Result<()> {
     c.execute("DELETE FROM sessions WHERE user_id = ?1", [user_id])?;
@@ -794,86 +414,6 @@ pub(crate) fn owner_filter(who: &Who) -> ApiResult<Option<i64>> {
     let me = who.person()?;
     Ok((who.role() < Role::Admin).then_some(me))
 }
-
-async fn list_tokens(State(state): State<AppState>, Extension(who): Extension<Who>) -> ApiResult<Json<Value>> {
-    let only = owner_filter(&who)?;
-    let tokens = db::call(&state.pool, move |c| {
-        let mut stmt = c.prepare(
-            "SELECT t.id, t.name, t.created_at, t.last_used_at, u.username, t.role
-               FROM access_tokens t LEFT JOIN users u ON u.id = t.created_by
-              WHERE ?1 IS NULL OR t.created_by = ?1 ORDER BY t.created_at DESC",
-        )?;
-        let rows = stmt
-            .query_map([only], |r| {
-                Ok(json!({
-                    "id": r.get::<_, i64>(0)?,
-                    "name": r.get::<_, String>(1)?,
-                    "created_at": r.get::<_, String>(2)?,
-                    "last_used_at": r.get::<_, Option<String>>(3)?,
-                    "created_by": r.get::<_, Option<String>>(4)?,
-                    "role": Role::stored(&r.get::<_, String>(5)?).as_str(),
-                }))
-            })?
-            .collect::<rusqlite::Result<Vec<_>>>()?;
-        Ok(rows)
-    })
-    .await?;
-    Ok(Json(json!({ "tokens": tokens })))
-}
-
-#[derive(Deserialize)]
-struct NewToken {
-    name: String,
-    /// Up to the maker's own role, which is the default.
-    role: Option<String>,
-}
-
-/// A new access token. The token itself is in this response and nowhere else: only its hash is kept.
-async fn create_token(
-    State(state): State<AppState>,
-    Extension(who): Extension<Who>,
-    Json(body): Json<NewToken>,
-) -> ApiResult<Json<Value>> {
-    let me = who.person()?;
-    let name = body.name.trim().to_owned();
-    if name.is_empty() || name.chars().count() > 80 {
-        return Err(AppError::bad_request(tr!("error-token-name")));
-    }
-    let role = Role::requested(body.role.as_deref(), who.role())?;
-    if role > who.role() {
-        return Err(AppError::forbidden(tr!("error-token-role")));
-    }
-    let token = format!("hoard_{}", tools::hex(&random_bytes::<32>()?));
-    let (hash, label) = (digest(&token), name.clone());
-    let id = db::call(&state.pool, move |c| {
-        c.execute(
-            "INSERT INTO access_tokens (name, token_hash, created_by, role, created_at) VALUES (?1, ?2, ?3, ?4, ?5)",
-            params![label, hash, me, role.as_str(), db::now()],
-        )?;
-        Ok(c.last_insert_rowid())
-    })
-    .await?;
-    Ok(Json(json!({ "id": id, "name": name, "token": token, "role": role.as_str() })))
-}
-
-async fn delete_token(
-    State(state): State<AppState>,
-    Extension(who): Extension<Who>,
-    Path(id): Path<i64>,
-) -> ApiResult<StatusCode> {
-    let only = owner_filter(&who)?;
-    let n = db::call(&state.pool, move |c| {
-        Ok(c.execute("DELETE FROM access_tokens WHERE id = ?1 AND (?2 IS NULL OR created_by = ?2)", params![id, only])?)
-    })
-    .await?;
-    if n == 0 {
-        return Err(AppError::not_found(tr!("error-token-not-found")));
-    }
-    Ok(StatusCode::NO_CONTENT)
-}
-
-// ---------------------------------------------------------------------------------------------
-// Password reset from the server's shell
 
 /// For reset passwords: no look-alikes (0/O, 1/l/I). 16 of them is about 90 bits.
 const ALPHABET: &[u8] = b"abcdefghijkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789";

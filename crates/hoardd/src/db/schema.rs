@@ -74,7 +74,7 @@ pub(super) const MIGRATIONS: &[&str] = &[
        ok          INTEGER,
        summary     TEXT
      );",
-    // 16: accounts, replacing the shared HOARD_TOKEN (see `auth.rs`). Sessions and access tokens are stored as
+    // 16: accounts, replacing the shared HOARD_TOKEN (see the `auth` module). Sessions and access tokens are stored as
     // SHA-256 hashes, so a copy of the database doesn't let anyone in.
     "CREATE TABLE users (
        id            INTEGER PRIMARY KEY AUTOINCREMENT,

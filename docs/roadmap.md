@@ -66,7 +66,8 @@ tile sheets that come with only a note of their grid (Kenney's `Tilesheet.txt`).
 - [x] **Tiled tilesets** (`.tsx`, `.tsj`, or a tileset saved as `.json`): the image, tile size, spacing and margin
   are given exactly, so each becomes a sheet of its tiles, empty ones left out, its tiles' animations kept. Tilesets
   embedded in a `.tmx` map stay part of the map.
-- [ ] **Unity sprite slicing**: Asset Store packs keep each sprite's rectangle in the image's `.png.meta`.
+- [x] **Unity sprite slicing**: Asset Store packs keep each sprite's rectangle in the image's `.png.meta`. That
+  `.meta` is kept in the pack and becomes the sheet, its image the page.
 - [ ] **DragonBones texture atlases** (`_tex.json`) as sheets. Playing their skeletons (`_ske.json`) would come after.
 - [ ] **Lottie / Bodymovin** (`.json`, `.lottie`): vector animations, common for UI. Played in the details panel
   (lottie-web or dotLottie), the thumbnail drawn by the browser as the 3D viewer's is.

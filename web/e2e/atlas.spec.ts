@@ -255,3 +255,56 @@ test('a Tiled tileset becomes a sprite sheet of its tiles', async ({ api }) => {
     await api.post('/api/archive/purge', { data: { packs: [pack.id] } })
   }
 })
+
+test("a Unity image cut into sprites becomes a sprite sheet of them", async ({ api }) => {
+  test.setTimeout(120_000)
+  const name = `E2E Unity sprites ${unique()}`
+  // A 32 px square: the top-left quarter red, the bottom strip blue.
+  const image = png(32, 32, (x, y) => (x < 16 && y < 16 ? [255, 0, 0, 255] : y >= 24 && x >= 16 ? [0, 0, 255, 255] : [0, 0, 0, 0]))
+  const sprite = (n: string, x: number, y: number, w: number, h: number) => `    - serializedVersion: 2
+      name: ${n}
+      rect:
+        serializedVersion: 2
+        x: ${x}
+        y: ${y}
+        width: ${w}
+        height: ${h}
+      pivot: {x: 0.5, y: 0.5}
+`
+  const meta = `fileFormatVersion: 2
+guid: 7e1a2e907c7a4339be186c6b102fde95
+TextureImporter:
+  spriteMode: 2
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+${sprite('hero_0', 0, 16, 16, 16)}${sprite('hero_1', 16, 0, 16, 8)}    outline: []
+`
+  const pack = await uploadPack(api, name, [
+    { relpath: 'Assets/Sprites/hero.png', data: image },
+    { relpath: 'Assets/Sprites/hero.png.meta', data: Buffer.from(meta) },
+    { relpath: 'Assets/Sprites/plain.png', data: image },
+    { relpath: 'Assets/Sprites/plain.png.meta', data: Buffer.from('fileFormatVersion: 2\nguid: 0123456789abcdef0123456789abcdef\nTextureImporter:\n  spriteMode: 1\n') },
+  ])
+  try {
+    await waitReady(api, [pack.id])
+    let assets: Asset[] = []
+    await expect
+      .poll(async () => (assets = await assetsOf(api, pack.id)).find((a) => a.path.endsWith('hero.png.meta'))?.kind, { timeout: 60_000 })
+      .toBe('sheet')
+    // Only the .meta that cuts its image into sprites is kept.
+    expect(assets.some((a) => a.path.endsWith('plain.png.meta'))).toBe(false)
+    const sheet = assets.find((a) => a.path.endsWith('hero.png.meta'))!
+    const detail = (await (await api.get(`/api/assets/${sheet.id}`)).json()) as { meta: Record<string, unknown> }
+    expect(detail.meta.sheet).toMatchObject({ format: 'unity', sprites: 2, pages: 1 })
+    const kept = await (await api.get(`/api/assets/${sheet.id}/derivative/sheet`)).json()
+    // Measured from the top, where Unity measures from the bottom.
+    expect(kept.sprites.map((s: { name: string; rect: number[] }) => [s.name, s.rect])).toEqual([
+      ['hero_0', [0, 0, 16, 16]],
+      ['hero_1', [16, 24, 16, 8]],
+    ])
+  } finally {
+    await api.post('/api/archive', { data: { packs: [pack.id] } })
+    await api.post('/api/archive/purge', { data: { packs: [pack.id] } })
+  }
+})

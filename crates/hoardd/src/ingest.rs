@@ -54,6 +54,22 @@ fn is_sidecar(rel: &str) -> bool {
     Path::new(rel).extension().is_some_and(|e| e.eq_ignore_ascii_case("meta") || e.eq_ignore_ascii_case("import"))
 }
 
+/// A Unity `.meta` that cuts its image into sprites: kept in the pack (unlike other sidecars), as the sheet of its
+/// image's sprites.
+fn sprite_meta(local: &Path, rel: &str) -> bool {
+    let lower = rel.to_ascii_lowercase();
+    let Some(image) = lower.strip_suffix(".meta") else { return false };
+    matches!(ext_of(image).as_str(), "png" | "psd" | "tga" | "jpg" | "jpeg" | "gif" | "bmp" | "tif" | "tiff" | "webp")
+        && fs::metadata(local).is_ok_and(|m| m.len() <= 8 << 20)
+        && fs::read_to_string(local).is_ok_and(|t| crate::atlas::unity(&t, "").is_some())
+}
+
+/// Whether a file of the pack folder becomes one of its assets: not junk left by an engine.
+fn kept(root: &Path, f: &Path) -> bool {
+    let rel = rel_of(root, f);
+    !is_sidecar(&rel) || sprite_meta(f, &rel)
+}
+
 /// The GUID in a Unity `.meta` file (`guid: 0123…`, 32 hex digits).
 pub(crate) fn unity_guid(text: &str) -> Option<&str> {
     let line = text.lines().take(8).find_map(|l| l.trim().strip_prefix("guid:"))?.trim();
@@ -273,7 +289,7 @@ fn pack_gltfs(root: &Path, files: &[PathBuf], keep: &HashSet<String>) -> usize {
 
 /// The relative paths a pack folder would give its assets: what a rescan compares the pack against.
 pub(crate) fn pack_rels(root: &Path) -> Result<HashSet<String>> {
-    Ok(listed(root)?.iter().map(|f| rel_of(root, f)).filter(|rel| !is_sidecar(rel)).collect())
+    Ok(listed(root)?.iter().filter(|f| kept(root, f)).map(|f| rel_of(root, f)).collect())
 }
 
 fn rel_of(root: &Path, path: &Path) -> String {
@@ -885,7 +901,7 @@ pub(crate) fn ingest_pack(state: &AppState, rt: &Handle, pack_id: &str, auto_nam
             files = listed(&root)?;
         }
     }
-    files.retain(|f| !is_sidecar(&rel_of(&root, f)));
+    files.retain(|f| kept(&root, f));
     files.sort();
     let license = detect_pack_license(&root, &files);
     let readme = context::read_readmes(&root, &files);

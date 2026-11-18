@@ -299,6 +299,88 @@ fn tiled_json(v: &Value) -> Option<Atlas> {
     })
 }
 
+/// A Unity image's `.meta` when the image is cut into sprites (`spriteMode: 2`): each sprite's name and rectangle in
+/// `spriteSheet.sprites`. `image` is the image the `.meta` sits beside. Unity measures from the bottom of the image,
+/// so the rectangles are turned over once the image's height is known ([`flip_unity`]).
+pub(crate) fn unity(text: &str, image: &str) -> Option<Atlas> {
+    let text = text.trim_start_matches('\u{feff}');
+    if !text.lines().any(|l| l.trim() == "spriteMode: 2") {
+        return None;
+    }
+    let indent = |l: &str| l.len() - l.trim_start().len();
+    let mut lines = text.lines().skip_while(|l| l.trim() != "spriteSheet:").skip(1);
+    let list = lines.find(|l| l.trim_start().starts_with("sprites:"))?;
+    let at = indent(list);
+    let mut sprites = Vec::new();
+    // The sprite being read: its name, and x, y, width and height.
+    let mut cur: Option<(Option<String>, [Option<f64>; 4])> = None;
+    let mut in_rect = false;
+    let done = |cur: Option<(Option<String>, [Option<f64>; 4])>, sprites: &mut Vec<Sprite>| {
+        let Some((Some(name), [Some(x), Some(y), Some(w), Some(h)])) = cur else { return };
+        if let (Some(x), Some(y), Some(w), Some(h)) = (px(x), px(y), px(w), px(h))
+            && w > 0
+            && h > 0
+        {
+            sprites.push(Sprite { name, rect: [x, y, w, h], turn: Turn::Upright, trim: None });
+        }
+    };
+    for line in lines {
+        let t = line.trim();
+        if t.is_empty() {
+            continue;
+        }
+        let i = indent(line);
+        let field = if i == at && t.starts_with("- ") {
+            done(cur.take(), &mut sprites);
+            cur = Some((None, [None; 4]));
+            in_rect = false;
+            &t[2..]
+        } else if i <= at {
+            break;
+        } else if i == at + 2 {
+            in_rect = false;
+            t
+        } else {
+            if in_rect && let (Some((_, rect)), Some((k, v))) = (cur.as_mut(), t.split_once(':')) {
+                let slot = match k {
+                    "x" => 0,
+                    "y" => 1,
+                    "width" => 2,
+                    "height" => 3,
+                    _ => continue,
+                };
+                rect[slot] = num(v.trim());
+            }
+            continue;
+        };
+        let Some((name, _)) = cur.as_mut() else { continue };
+        if let Some(v) = field.strip_prefix("name:") {
+            let v = v.trim().trim_matches(|c| c == '\'' || c == '"');
+            *name = (!v.is_empty()).then(|| v.to_owned());
+        } else if field.trim_end() == "rect:" {
+            in_rect = true;
+        }
+    }
+    done(cur, &mut sprites);
+    (sprites.len() >= 2).then(|| Atlas {
+        format: "unity",
+        pages: vec![Page { image: image.to_owned(), sprites }],
+        ..Atlas::default()
+    })
+}
+
+/// Turn a Unity sheet's rectangles over, from measured from the bottom to from the top, by its pages' heights.
+fn flip_unity(atlas: &mut Atlas, heights: &[Option<u32>]) {
+    for (p, h) in atlas.pages.iter_mut().zip(heights) {
+        let Some(h) = *h else { continue };
+        p.sprites.retain_mut(|s| {
+            let Some(y) = h.checked_sub(s.rect[1] + s.rect[3]) else { return false };
+            s.rect[1] = y;
+            true
+        });
+    }
+}
+
 /// Starling and Sparrow:`<TextureAtlas imagePath="…"><SubTexture name x y width height [frameX frameY frameWidth
 /// frameHeight] [rotated]/>`. The rectangle is the region as stored; `frameX` and `frameY` are where the canvas starts
 /// relative to the sprite, so negative.
@@ -1008,7 +1090,7 @@ fn find_page(by_path: &HashMap<String, usize>, file_path: &str, image: &str, one
 // The library side
 
 /// The files atlases are read from, as SQL.
-const EXTS: &str = "'xml', 'json', 'atlas', 'plist', 'tres', 'tsx', 'tsj'";
+const EXTS: &str = "'xml', 'json', 'atlas', 'plist', 'tres', 'tsx', 'tsj', 'meta'";
 
 #[derive(Debug)]
 struct Texture {
@@ -1342,7 +1424,11 @@ pub(crate) fn detect_pack(state: &AppState, rt: &Handle, conn: &mut Connection, 
             found.push(f);
             continue;
         }
-        let Some(mut atlas) = parse(&c.ext, &text) else { continue };
+        let parsed = match c.path.strip_suffix(".meta").filter(|_| c.ext == "meta") {
+            Some(image) => unity(&text, image.rsplit('/').next().unwrap_or(image)),
+            None => parse(&c.ext, &text),
+        };
+        let Some(mut atlas) = parsed else { continue };
         if atlas.pages.iter().map(|p| p.sprites.len()).sum::<usize>() > MAX_SPRITES {
             tracing::debug!(atlas = %c.path, "atlas has too many sprites to read");
             continue;
@@ -1390,6 +1476,10 @@ pub(crate) fn detect_pack(state: &AppState, rt: &Handle, conn: &mut Connection, 
                 })
             })
             .collect();
+        if atlas.format == "unity" {
+            let heights: Vec<Option<u32>> = pages.iter().map(|p| p.as_ref().map(|p| p.size[1])).collect();
+            flip_unity(&mut atlas, &heights);
+        }
         let Some(sheet) = crate::spritesheet::Sheet::from_atlas(&atlas, &pages) else { continue };
         let sheet_path = c.path.clone();
         let f = finish(state, rt, c, &atlas, &sheet, &by_path, || {
@@ -1672,6 +1762,62 @@ mod tests {
             }
         );
         assert!(parse("xml", "<root><SubTexture x='0'/></root>").is_none());
+    }
+
+    #[test]
+    fn unity_sprite_slicing() {
+        let meta = "fileFormatVersion: 2
+guid: 7e1a2e907c7a4339be186c6b102fde95
+TextureImporter:
+  spriteMode: 2
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: hero_0
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 16
+        width: 16
+        height: 16
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      outline:
+      - - {x: 1, y: 2}
+      bones:
+      - name: root
+        length: 3
+    - serializedVersion: 2
+      name: 'hero 1'
+      rect:
+        serializedVersion: 2
+        x: 16
+        y: 0
+        width: 16
+        height: 8
+    outline: []
+    nameFileIdTable:
+      hero_0: 21300000
+  spritePackingTag:
+";
+        let mut atlas = unity(meta, "hero.png").unwrap();
+        assert_eq!(atlas.format, "unity");
+        assert_eq!(atlas.pages[0].image, "hero.png");
+        let names: Vec<&str> = atlas.pages[0].sprites.iter().map(|s| s.name.as_str()).collect();
+        assert_eq!(names, ["hero_0", "hero 1"]);
+        flip_unity(&mut atlas, &[Some(32)]);
+        let rects: Vec<[u32; 4]> = atlas.pages[0].sprites.iter().map(|s| s.rect).collect();
+        assert_eq!(rects, [[0, 0, 16, 16], [16, 24, 16, 8]]);
+        // One sprite, or an image not cut into sprites, isn't a sheet.
+        assert!(unity(&meta.replace("spriteMode: 2", "spriteMode: 1"), "hero.png").is_none());
+        assert!(
+            unity(
+                "fileFormatVersion: 2\nTextureImporter:\n  spriteMode: 2\n  spriteSheet:\n    sprites: []\n",
+                "a.png"
+            )
+            .is_none()
+        );
     }
 
     #[test]

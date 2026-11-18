@@ -1,6 +1,7 @@
 //! On-the-fly zip bundles: an asset plus everything it links to, laid out with their original relative paths
 //! so a .gltf still finds its .bin and textures after unzipping.
 
+use std::collections::HashSet;
 use std::io::Write;
 
 use bytes::Bytes;
@@ -155,9 +156,12 @@ fn write_zip(sink: &mut Sink<'_>, extra: Vec<(String, Vec<u8>)>, entries: Vec<En
     for (name, data) in extra {
         sink.bytes(&name, &data)?;
     }
+    // `.meta` files the pack kept (a sliced sprite sheet's), which say more than a minimal one would.
+    let names: HashSet<String> = entries.iter().map(|e| e.name.clone()).collect();
     for Entry { name, hash, size, unity_guid } in entries {
         if let Some(guid) = unity_guid
             && !sink.has(&name)
+            && !names.contains(&format!("{name}.meta"))
         {
             // A minimal .meta: Unity keeps the GUID (so materials still find their textures) and fills in the
             // importer settings itself.
@@ -176,7 +180,7 @@ pub(crate) struct Sink<'a> {
     zip: zip::ZipWriter<zip::write::StreamWriter<ChannelWriter>>,
     rt: &'a tokio::runtime::Handle,
     blobs: &'a crate::blobs::BlobStore,
-    seen: std::collections::HashSet<String>,
+    seen: HashSet<String>,
     pub(crate) activity: &'a crate::activity::Handle,
 }
 
@@ -187,7 +191,7 @@ impl<'a> Sink<'a> {
         out: ChannelWriter,
         activity: &'a crate::activity::Handle,
     ) -> Self {
-        Self { zip: zip::ZipWriter::new_stream(out), rt, blobs, seen: std::collections::HashSet::new(), activity }
+        Self { zip: zip::ZipWriter::new_stream(out), rt, blobs, seen: HashSet::new(), activity }
     }
 
     /// The runtime, for waiting on async work from the zipping thread.

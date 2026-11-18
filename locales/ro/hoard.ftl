@@ -402,6 +402,7 @@ server-job-relocate = Se mută fișiere între locațiile bibliotecii
 server-job-looks = Se determină culorile și aspectul
 server-job-sounds = Se ascultă sunetele
 server-job-embed = Se învață ce arată imaginile
+server-job-hear = Se învață cum sună sunetele
 server-job-materials = Se caută materialele din { $pack }
 server-job-read-files = Se citesc fișierele din { $pack }
 server-job-store-lookup = Se caută o pagină de magazin
@@ -2429,8 +2430,8 @@ settings-page-tools = Instrumente
 settings-page-tools-blurb = Programe externe pe care Hoard le folosește pentru a converti și a citi fișiere.
 settings-page-ai = Etichetare AI
 settings-page-ai-blurb = Un model AI denumește, descrie și etichetează pachetele noi, pe lângă regulile integrate. Etichetele lui sunt marcate ca sugerate.
-settings-page-search = Căutare după imagine
-settings-page-search-blurb = Căutați imagini după ce arată, nu doar după nume, și găsiți lucruri asemănătoare ca fel, nu doar ca culoare.
+settings-page-search = Căutare după imagine și sunet
+settings-page-search-blurb = Căutați imagini după ce arată și sunete după cum sună, nu doar după nume, și găsiți lucruri asemănătoare ca fel, nu doar ca culoare.
 settings-page-adding = Adăugarea pachetelor
 settings-page-adding-blurb = Ce face Hoard cu un pachet când este adăugat, pe lângă citirea și etichetarea lui.
 settings-page-downloads = Descărcări
@@ -2530,6 +2531,22 @@ settings-clip-ready-all =
     }
 settings-clip-learning = Gata: se învață imaginile, { $done } din { $total } până acum
 settings-clip-unavailable = Modelul nu a putut fi obținut: { $detail }. Se încearcă din nou în fiecare oră.
+settings-clap-heading = Căutare după cum sună sunetele
+settings-clap-reset = Căutare după sunet: înapoi la valoarea implicită
+settings-clap-saved-on = Căutare după sunet: activată
+settings-clap-saved-off = Căutare după sunet: dezactivată
+settings-clap-what = Tastați ce căutați („distant thunder”, „glassy UI blip”, „footsteps on gravel”), iar sunetele care sună așa apar lângă numele care conțin cuvintele.
+settings-clap-toggle = Activați căutarea după sunet
+settings-clap-hint = Folosește modelul CLAP de la LAION, rulat pe procesorul acestui server: nimic nu pleacă de pe el. Activarea descarcă modelul ({ $size } MB) de pe Hugging Face, apoi ascultă începutul fiecărui sunet în fundal, cu prioritate scăzută. Ocupă până la aproximativ 1 GB de memorie cât timp lucrează sau cât timp caută cineva. Dezactivarea șterge modelul și păstrează ce a învățat, pentru data viitoare.
+settings-clap-hint-desktop = Folosește modelul CLAP de la LAION, rulat pe procesorul acestui computer: nimic nu pleacă de pe el. Activarea descarcă modelul ({ $size } MB) de pe Hugging Face, apoi ascultă începutul fiecărui sunet în fundal, cu prioritate scăzută. Ocupă până la aproximativ 1 GB de memorie cât timp lucrează sau cât timp căutați. Dezactivarea șterge modelul și păstrează ce a învățat, pentru data viitoare.
+settings-clap-ready-empty = Gata. Sunetele sunt învățate pe măsură ce se adaugă pachete.
+settings-clap-ready-all =
+    { $count ->
+        [one] Gata: cunoaște { $count } sunet
+        [few] Gata: cunoaște toate cele { $count } sunete
+       *[other] Gata: cunoaște toate cele { $count } de sunete
+    }
+settings-clap-learning = Gata: se învață sunetele, { $done } din { $total } până acum
 
 ## SettingsPage.vue: Etichetare AI
 

@@ -236,7 +236,7 @@ impl VisionModel {
 
 /// The tensors whose names start with one of `prefixes`, read from a safetensors file one at a time (so loading half
 /// the model never holds the other half, or the whole file, in memory).
-fn read_tensors(path: &Path, prefixes: &[&str]) -> Result<HashMap<String, Tensor>> {
+pub(crate) fn read_tensors(path: &Path, prefixes: &[&str]) -> Result<HashMap<String, Tensor>> {
     #[derive(Deserialize)]
     struct Info {
         dtype: String,
@@ -274,7 +274,7 @@ fn read_tensors(path: &Path, prefixes: &[&str]) -> Result<HashMap<String, Tensor
     Ok(out)
 }
 
-fn normalized(mut v: Vec<f32>) -> Vec<f32> {
+pub(crate) fn normalized(mut v: Vec<f32>) -> Vec<f32> {
     let norm = v.iter().map(|x| x * x).sum::<f32>().sqrt();
     if norm > 0.0 {
         for x in &mut v {
@@ -322,17 +322,112 @@ pub(crate) fn quantize(v: &[f32]) -> Vec<i8> {
 }
 
 // ---------------------------------------------------------------------------------------------
-// Model files and status
+// Model files and status (shared with sound search, see `crate::clap`)
+
+/// A model that's downloaded when its search is turned on.
+#[derive(Debug)]
+pub(crate) struct Model {
+    /// Its folder in `<cache>/models`.
+    pub(crate) name: &'static str,
+    pub(crate) repo: &'static str,
+    pub(crate) files: &'static Files,
+    /// What it's for, as the log and the activity say it.
+    pub(crate) what: &'static str,
+    /// The activity's kind while it downloads.
+    pub(crate) activity: &'static str,
+}
+
+/// A model's files: name, size and SHA-256 of each.
+pub(crate) type Files = [(&'static str, u64, &'static str)];
+
+impl Model {
+    fn dir(&self, state: &AppState) -> PathBuf {
+        state.cfg.models_dir().join(self.name)
+    }
+
+    /// Find the model, downloading it if need be, and run `ready` once it's there. Retries hourly while it can't be
+    /// had, until `slot` is restarted.
+    pub(crate) fn fetch<F>(&'static self, state: &AppState, slot: &'static Slot<PathBuf>, ready: fn(AppState) -> F)
+    where
+        F: Future<Output = ()> + Send + 'static,
+    {
+        let generation = slot.restart(Status::Looking);
+        let st = Arc::clone(state);
+        tokio::spawn(async move {
+            let dir = self.dir(&st);
+            loop {
+                if files_present(&dir, self.files) {
+                    if slot.set(generation, Status::Ready(dir.clone())) {
+                        tracing::info!(dir = %dir.display(), what = self.what, "model ready");
+                        ready(st).await;
+                    }
+                    return;
+                }
+                if !slot.set(generation, Status::Downloading) {
+                    return;
+                }
+                if let Err(e) = self.download(&dir, &|| !slot.current(generation)).await {
+                    if !slot.current(generation) {
+                        return;
+                    }
+                    let msg = format!("{e:#}");
+                    tracing::warn!(error = %msg, what = self.what, "couldn't download the model; retrying in an hour");
+                    slot.set(generation, Status::Unavailable(msg));
+                    tokio::time::sleep(Duration::from_secs(3600)).await;
+                    if !slot.current(generation) {
+                        return;
+                    }
+                }
+            }
+        });
+    }
+
+    /// The search was switched off: the model goes (the embeddings stay, for when it's back on).
+    pub(crate) async fn remove_files(&self, state: &AppState) {
+        let dir = self.dir(state);
+        if dir.is_dir()
+            && let Err(e) = tokio::fs::remove_dir_all(&dir).await
+        {
+            tracing::warn!(dir = %dir.display(), error = %e, "couldn't remove a model");
+        }
+    }
+
+    /// Fetch whichever files aren't there yet, each checked against its SHA-256.
+    async fn download(&self, dir: &Path, canceled: &(dyn Fn() -> bool + Sync)) -> Result<()> {
+        let http = tools::client()?;
+        tokio::fs::create_dir_all(dir).await?;
+        let activity = crate::activity::start(self.activity, format!("Downloading the {} model", self.what), None);
+        for &(name, size, sha256) in self.files {
+            let dest = dir.join(name);
+            if std::fs::metadata(&dest).is_ok_and(|m| m.len() == size) {
+                continue;
+            }
+            activity.detail(name);
+            let part = dir.join(format!("{name}.part"));
+            let fetched = tools::fetch(&http, &format!("{}/{name}", self.repo), &part, size, &activity, canceled)
+                .await
+                .with_context(|| format!("downloading {name}"))?;
+            if fetched.sha256 != sha256 {
+                tokio::fs::remove_file(&part).await.ok();
+                anyhow::bail!("{name} doesn't match its SHA-256");
+            }
+            tokio::fs::rename(&part, &dest).await?;
+        }
+        Ok(())
+    }
+}
+
+/// All the files, at their sizes (their hashes were checked when they were downloaded).
+fn files_present(dir: &Path, files: &Files) -> bool {
+    files.iter().all(|(name, size, _)| std::fs::metadata(dir.join(name)).is_ok_and(|m| m.len() == *size))
+}
+
+static CLIP: Model = Model { name: MODEL, repo: REPO, files: &FILES, what: "image search", activity: "clip" };
 
 static SLOT: Slot<PathBuf> = Slot::new();
 
-/// Where the model is, once it's downloaded and checked.
-fn ready_dir() -> Option<PathBuf> {
-    SLOT.ready()
-}
-
 pub(crate) fn is_ready() -> bool {
-    ready_dir().is_some()
+    SLOT.ready().is_some()
 }
 
 /// `off`, `looking`, `downloading`, `ready` or `unavailable: <why>`.
@@ -340,158 +435,119 @@ pub(crate) fn describe() -> String {
     SLOT.describe(|_| "ready".into())
 }
 
-fn model_dir(state: &AppState) -> PathBuf {
-    state.cfg.models_dir().join(MODEL)
-}
-
 /// Turn image search on (find the model, downloading it if need be) or off. Calling it again drops whatever the
 /// last call was doing.
 pub(crate) fn start(state: &AppState, enabled: bool) {
-    *TEXT.lock().unwrap_or_else(PoisonError::into_inner) = None;
+    TEXT.clear();
     if !enabled {
         SLOT.restart(Status::Off);
         return;
     }
-    let generation = SLOT.restart(Status::Looking);
-    let st = Arc::clone(state);
-    tokio::spawn(async move {
-        let dir = model_dir(&st);
-        loop {
-            if files_present(&dir) {
-                if SLOT.set(generation, Status::Ready(dir.clone())) {
-                    tracing::info!(dir = %dir.display(), "image search model ready");
-                    spawn_unloader();
-                    schedule(&st).await;
-                }
-                return;
-            }
-            if !SLOT.set(generation, Status::Downloading) {
-                return;
-            }
-            match download(&dir, &|| !SLOT.current(generation)).await {
-                Ok(()) => {}
-                Err(e) => {
-                    if !SLOT.current(generation) {
-                        return;
-                    }
-                    let msg = format!("{e:#}");
-                    tracing::warn!(error = %msg, "couldn't download the image search model; retrying in an hour");
-                    SLOT.set(generation, Status::Unavailable(msg));
-                    tokio::time::sleep(Duration::from_secs(3600)).await;
-                    if !SLOT.current(generation) {
-                        return;
-                    }
-                }
-            }
-        }
+    CLIP.fetch(state, &SLOT, |st| async move {
+        TEXT.unload_when_idle();
+        schedule(&st).await;
     });
 }
 
-/// Image search was switched off: the model goes (the embeddings stay, for when it's back on).
 pub(crate) async fn remove_files(state: &AppState) {
-    let dir = model_dir(state);
-    if dir.is_dir()
-        && let Err(e) = tokio::fs::remove_dir_all(&dir).await
-    {
-        tracing::warn!(dir = %dir.display(), error = %e, "couldn't remove the image search model");
-    }
-}
-
-/// Both files, at their sizes (their hashes were checked when they were downloaded).
-fn files_present(dir: &Path) -> bool {
-    FILES.iter().all(|(name, size, _)| std::fs::metadata(dir.join(name)).is_ok_and(|m| m.len() == *size))
-}
-
-async fn download(dir: &Path, canceled: &(dyn Fn() -> bool + Sync)) -> Result<()> {
-    let http = tools::client()?;
-    tokio::fs::create_dir_all(dir).await?;
-    let activity = crate::activity::start("clip", "Downloading the image search model", None);
-    for (name, size, sha256) in FILES {
-        let dest = dir.join(name);
-        if std::fs::metadata(&dest).is_ok_and(|m| m.len() == size) {
-            continue;
-        }
-        activity.detail(name);
-        let part = dir.join(format!("{name}.part"));
-        let fetched = tools::fetch(&http, &format!("{REPO}/{name}"), &part, size, &activity, canceled)
-            .await
-            .with_context(|| format!("downloading {name}"))?;
-        if fetched.sha256 != sha256 {
-            tokio::fs::remove_file(&part).await.ok();
-            anyhow::bail!("{name} doesn't match its SHA-256");
-        }
-        tokio::fs::rename(&part, &dest).await?;
-    }
-    Ok(())
+    CLIP.remove_files(state).await;
 }
 
 // ---------------------------------------------------------------------------------------------
 // Text embeddings for searches
 
-/// How long the text half stays loaded after the last search.
+/// How long a text half stays loaded after the last search.
 const TEXT_IDLE: Duration = Duration::from_mins(15);
 
 #[derive(Debug)]
-struct Loaded {
-    model: Arc<TextModel>,
+struct Loaded<M> {
+    model: Arc<M>,
     used: Instant,
     /// Recent searches' embeddings, as people scroll through the same results.
     recent: HashMap<String, Arc<Vec<f32>>>,
 }
 
-static TEXT: Mutex<Option<Loaded>> = Mutex::new(None);
-
-/// Drop the text half once nobody has searched for a while.
-fn spawn_unloader() {
-    static STARTED: std::sync::Once = std::sync::Once::new();
-    STARTED.call_once(|| {
-        tokio::spawn(async {
-            loop {
-                tokio::time::sleep(Duration::from_secs(60)).await;
-                let mut guard = TEXT.lock().unwrap_or_else(PoisonError::into_inner);
-                if guard.as_ref().is_some_and(|l| l.used.elapsed() > TEXT_IDLE) {
-                    *guard = None;
-                    tracing::debug!("image search text model unloaded");
-                }
-            }
-        });
-    });
+/// A model's text half, loaded on the first search and dropped after a while without one.
+#[derive(Debug)]
+pub(crate) struct Text<M> {
+    loaded: Mutex<Option<Loaded<M>>>,
+    unloader: std::sync::Once,
+    what: &'static str,
+    load: fn(&Path) -> Result<M>,
+    embed: fn(&M, &str) -> Result<Vec<f32>>,
 }
+
+impl<M: Send + Sync + 'static> Text<M> {
+    pub(crate) const fn new(
+        what: &'static str,
+        load: fn(&Path) -> Result<M>,
+        embed: fn(&M, &str) -> Result<Vec<f32>>,
+    ) -> Self {
+        Self { loaded: Mutex::new(None), unloader: std::sync::Once::new(), what, load, embed }
+    }
+
+    pub(crate) fn clear(&self) {
+        *self.loaded.lock().unwrap_or_else(PoisonError::into_inner) = None;
+    }
+
+    /// Drop the model once nobody has searched for a while.
+    pub(crate) fn unload_when_idle(&'static self) {
+        self.unloader.call_once(|| {
+            tokio::spawn(async move {
+                loop {
+                    tokio::time::sleep(Duration::from_secs(60)).await;
+                    let mut guard = self.loaded.lock().unwrap_or_else(PoisonError::into_inner);
+                    if guard.as_ref().is_some_and(|l| l.used.elapsed() > TEXT_IDLE) {
+                        *guard = None;
+                        tracing::debug!(what = self.what, "text model unloaded");
+                    }
+                }
+            });
+        });
+    }
+
+    /// The embedding of `text` with the model in `dir`.
+    pub(crate) async fn embed(&'static self, dir: PathBuf, text: String) -> Result<Arc<Vec<f32>>> {
+        let model = {
+            let mut guard = self.loaded.lock().unwrap_or_else(PoisonError::into_inner);
+            if let Some(l) = guard.as_mut() {
+                l.used = Instant::now();
+                if let Some(v) = l.recent.get(&text) {
+                    return Ok(Arc::clone(v));
+                }
+                Some(Arc::clone(&l.model))
+            } else {
+                None
+            }
+        };
+        let model = if let Some(m) = model {
+            m
+        } else {
+            let started = Instant::now();
+            let load = self.load;
+            let m = Arc::new(tokio::task::spawn_blocking(move || load(&dir)).await??);
+            tracing::info!(ms = started.elapsed().as_millis(), what = self.what, "text model loaded");
+            m
+        };
+        let (m, t, embed) = (Arc::clone(&model), text.clone(), self.embed);
+        let v = Arc::new(tokio::task::spawn_blocking(move || embed(&m, &t)).await??);
+        let mut guard = self.loaded.lock().unwrap_or_else(PoisonError::into_inner);
+        let loaded = guard.get_or_insert_with(|| Loaded { model, used: Instant::now(), recent: HashMap::new() });
+        if loaded.recent.len() >= 64 {
+            loaded.recent.clear();
+        }
+        loaded.recent.insert(text, Arc::clone(&v));
+        Ok(v)
+    }
+}
+
+static TEXT: Text<TextModel> = Text::new("image search", TextModel::load, TextModel::embed);
 
 /// The embedding of what was typed, or `None` while the model isn't ready.
 async fn embed_text(text: &str) -> Result<Option<Arc<Vec<f32>>>> {
-    let Some(dir) = ready_dir() else { return Ok(None) };
-    let key = text.trim().to_lowercase();
-    let model = {
-        let mut guard = TEXT.lock().unwrap_or_else(PoisonError::into_inner);
-        if let Some(l) = guard.as_mut() {
-            l.used = Instant::now();
-            if let Some(v) = l.recent.get(&key) {
-                return Ok(Some(Arc::clone(v)));
-            }
-            Some(Arc::clone(&l.model))
-        } else {
-            None
-        }
-    };
-    let model = if let Some(m) = model {
-        m
-    } else {
-        let started = Instant::now();
-        let m = Arc::new(tokio::task::spawn_blocking(move || TextModel::load(&dir)).await??);
-        tracing::info!(ms = started.elapsed().as_millis(), "image search text model loaded");
-        m
-    };
-    let m = Arc::clone(&model);
-    let k = key.clone();
+    let Some(dir) = SLOT.ready() else { return Ok(None) };
     // "a photo of …" matches pictures a little better than the bare words.
-    let v = Arc::new(tokio::task::spawn_blocking(move || m.embed(&format!("a photo of {k}"))).await??);
-    let mut guard = TEXT.lock().unwrap_or_else(PoisonError::into_inner);
-    let loaded = guard.get_or_insert_with(|| Loaded { model, used: Instant::now(), recent: HashMap::new() });
-    if loaded.recent.len() >= 64 {
-        loaded.recent.clear();
-    }
-    loaded.recent.insert(key, Arc::clone(&v));
+    let v = TEXT.embed(dir, format!("a photo of {}", text.trim().to_lowercase())).await?;
     Ok(Some(v))
 }
 
@@ -499,14 +555,14 @@ async fn embed_text(text: &str) -> Result<Option<Arc<Vec<f32>>>> {
 // Index and ranking
 
 #[derive(Debug)]
-struct Entry {
+pub(crate) struct Entry {
     v: Box<[i8]>,
     /// 1 / the vector's length, so a dot product becomes a cosine.
     inv_norm: f32,
 }
 
 impl Entry {
-    fn new(v: Vec<i8>) -> Option<Self> {
+    pub(crate) fn new(v: Vec<i8>) -> Option<Self> {
         let norm = v.iter().map(|&x| f32::from(x) * f32::from(x)).sum::<f32>().sqrt();
         (v.len() == DIMS && norm > 0.0).then(|| Self { v: v.into_boxed_slice(), inv_norm: 1.0 / norm })
     }
@@ -516,22 +572,59 @@ impl Entry {
         dot as f32 * self.inv_norm * other.inv_norm
     }
 
-    fn cosine_f32(&self, q: &[f32]) -> f32 {
+    pub(crate) fn cosine_f32(&self, q: &[f32]) -> f32 {
         self.v.iter().zip(q).map(|(a, b)| f32::from(*a) * b).sum::<f32>() * self.inv_norm
     }
 }
 
-/// Every thumbnail's embedding, in memory, loaded from `embeddings` on first use and kept up to date by the job.
-#[derive(Debug, Default)]
-pub(crate) struct Index(RwLock<Option<HashMap<String, Entry>>>);
+/// Where an [`Index`]'s embeddings are kept and how its text matches are judged.
+#[derive(Debug)]
+pub(crate) struct Spec {
+    /// Selects each hash and its vector, `?1` being the model.
+    pub(crate) load: &'static str,
+    pub(crate) model: &'static str,
+    /// What it searches, for the log.
+    pub(crate) what: &'static str,
+    /// How far above the median a text match must score, and how close to the best.
+    pub(crate) lift: f32,
+    pub(crate) margin: f32,
+    /// How far above the median a match always counts, however far ahead the best one is.
+    pub(crate) sure: f32,
+    /// The lift where a text match starts to count, and how much more makes it a strong one.
+    pub(crate) weak: f32,
+    pub(crate) strong: f32,
+}
+
+/// Image search's embeddings: per thumbnail.
+pub(crate) static SPEC: Spec = Spec {
+    load: "SELECT thumb_hash, vector FROM embeddings WHERE model = ?1",
+    model: MODEL,
+    what: "image search",
+    lift: TEXT_LIFT,
+    margin: TEXT_MARGIN,
+    sure: f32::INFINITY,
+    weak: 0.03,
+    strong: 0.1,
+};
+
+/// Every embedding, in memory, loaded on first use and kept up to date by the job.
+#[derive(Debug)]
+pub(crate) struct Index {
+    spec: &'static Spec,
+    map: RwLock<Option<HashMap<String, Entry>>>,
+}
 
 impl Index {
-    fn read<R>(&self, f: impl FnOnce(&HashMap<String, Entry>) -> R) -> Option<R> {
-        self.0.read().unwrap_or_else(PoisonError::into_inner).as_ref().map(f)
+    pub(crate) const fn new(spec: &'static Spec) -> Self {
+        Self { spec, map: RwLock::new(None) }
     }
 
-    fn write(&self, f: impl FnOnce(&mut HashMap<String, Entry>)) {
-        if let Some(m) = self.0.write().unwrap_or_else(PoisonError::into_inner).as_mut() {
+    fn read<R>(&self, f: impl FnOnce(&HashMap<String, Entry>) -> R) -> Option<R> {
+        self.map.read().unwrap_or_else(PoisonError::into_inner).as_ref().map(f)
+    }
+
+    pub(crate) fn write(&self, f: impl FnOnce(&mut HashMap<String, Entry>)) {
+        if let Some(m) = self.map.write().unwrap_or_else(PoisonError::into_inner).as_mut() {
             f(m);
         }
     }
@@ -540,10 +633,11 @@ impl Index {
         if self.read(|_| ()).is_some() {
             return Ok(());
         }
-        let loaded = db::call(&state.pool, |c| {
-            let mut stmt = c.prepare("SELECT thumb_hash, vector FROM embeddings WHERE model = ?1")?;
+        let spec = self.spec;
+        let loaded = db::call(&state.pool, move |c| {
+            let mut stmt = c.prepare(spec.load)?;
             let rows = stmt
-                .query_map([MODEL], |r| Ok((r.get::<_, String>(0)?, r.get::<_, Vec<u8>>(1)?)))?
+                .query_map([spec.model], |r| Ok((r.get::<_, String>(0)?, r.get::<_, Vec<u8>>(1)?)))?
                 .filter_map(|row| {
                     let (hash, v) = row.ok()?;
                     Some((hash, Entry::new(v.into_iter().map(|b| b as i8).collect())?))
@@ -552,15 +646,15 @@ impl Index {
             Ok(rows)
         })
         .await?;
-        let mut guard = self.0.write().unwrap_or_else(PoisonError::into_inner);
+        let mut guard = self.map.write().unwrap_or_else(PoisonError::into_inner);
         if guard.is_none() {
-            tracing::debug!(embeddings = loaded.len(), "image search index loaded");
+            tracing::debug!(embeddings = loaded.len(), what = spec.what, "embeddings loaded");
             *guard = Some(loaded);
         }
         Ok(())
     }
 
-    fn len(&self) -> usize {
+    pub(crate) fn len(&self) -> usize {
         self.read(HashMap::len).unwrap_or(0)
     }
 
@@ -573,8 +667,9 @@ impl Index {
         .flatten()
     }
 
-    /// Thumbnails that match a text embedding, best first, scored about 0..=0.5.
-    fn matching(&self, q: &[f32]) -> Vec<(String, f32)> {
+    /// What matches a text embedding, best first, scored about 0..=0.5.
+    pub(crate) fn matching(&self, q: &[f32]) -> Vec<(String, f32)> {
+        let spec = self.spec;
         self.read(|m| {
             let scored: Vec<(&String, f32)> = m.iter().map(|(h, e)| (h, e.cosine_f32(q))).collect();
             if scored.is_empty() {
@@ -586,11 +681,13 @@ impl Index {
             let mid = all.len() / 2;
             let median = *all.select_nth_unstable_by(mid, f32::total_cmp).1;
             let best = scored.iter().map(|s| s.1).fold(f32::MIN, f32::max);
-            let floor = (median + TEXT_LIFT).max(best - TEXT_MARGIN);
+            let floor = (median + spec.lift).max((best - spec.margin).min(median + spec.sure));
             let mut hits: Vec<(&String, f32)> = scored.into_iter().filter(|s| s.1 >= floor).collect();
             hits.sort_by(|a, b| b.1.total_cmp(&a.1));
             hits.truncate(TEXT_MAX);
-            hits.into_iter().map(|(h, c)| (h.clone(), text_score(c - median))).collect()
+            // A strong match counts double a word match in the name (0.25), a borderline one well under it.
+            let score = |lift: f32| ((lift - spec.weak) / (spec.strong - spec.weak)).clamp(0.0, 1.0) * 0.5;
+            hits.into_iter().map(|(h, c)| (h.clone(), score(c - median))).collect()
         })
         .unwrap_or_default()
     }
@@ -608,12 +705,6 @@ const TEXT_LIFT: f32 = 0.045;
 /// Keep only what's within this of the best match.
 const TEXT_MARGIN: f32 = 0.04;
 const TEXT_MAX: usize = 300;
-
-/// A text match as a rank score, from how far it stands above the median: a strong one (0.1 up) counts double a
-/// word match in the name (0.25), a borderline one well under it.
-fn text_score(lift: f32) -> f32 {
-    ((lift - 0.03) / 0.07).clamp(0.0, 1.0) * 0.5
-}
 
 /// How much every thumbnail shows what `hash`'s does, about 0..=1, when image search is on and it has an embedding.
 pub(crate) async fn similar(state: &AppState, hash: &str) -> Option<HashMap<String, f32>> {
@@ -716,7 +807,7 @@ static POOL: LazyLock<Option<rayon::ThreadPool>> = LazyLock::new(|| {
         .ok()
 });
 
-fn in_pool<T: Send>(f: impl FnOnce() -> T + Send) -> T {
+pub(crate) fn in_pool<T: Send>(f: impl FnOnce() -> T + Send) -> T {
     match POOL.as_ref() {
         Some(pool) => pool.install(f),
         None => f(),
@@ -725,7 +816,7 @@ fn in_pool<T: Send>(f: impl FnOnce() -> T + Send) -> T {
 
 /// Embed every thumbnail that has no embedding, and forget the ones nothing uses.
 pub(crate) async fn run_job(state: &AppState) -> Result<()> {
-    let Some(dir) = ready_dir() else { return Ok(()) };
+    let Some(dir) = SLOT.ready() else { return Ok(()) };
     state.clip.ensure(state).await?;
     let gone: Vec<String> = db::call(&state.pool, |c| {
         let gone = c
@@ -875,9 +966,25 @@ mod tests {
     fn scores() {
         assert!(image_score(0.5).abs() < 1e-6);
         assert!((image_score(0.95) - 1.0).abs() < 1e-6);
-        assert!(text_score(0.1) > 0.25, "a strong text match beats a name match alone");
-        assert!(text_score(TEXT_LIFT) < 0.25, "a borderline one doesn't");
-        assert!(text_score(0.02).abs() < 1e-6);
+    }
+
+    #[test]
+    fn text_matches_stand_above_the_median() {
+        // One strong match, one borderline, the rest typical.
+        let index = Index::new(&SPEC);
+        let entry = |x: f32| {
+            Entry::new(quantize(&normalized(vec![x, 1.0 - x]).into_iter().chain([0.0; DIMS - 2]).collect::<Vec<_>>()))
+                .unwrap()
+        };
+        let q = normalized([1.0f32, 0.0].into_iter().chain([0.0; DIMS - 2]).collect());
+        let mut m: HashMap<String, Entry> = (0..20).map(|i| (format!("t{i}"), entry(0.3))).collect();
+        m.insert("strong".into(), entry(0.6));
+        m.insert("faint".into(), entry(0.32));
+        *index.map.write().unwrap() = Some(m);
+        let hits = index.matching(&q);
+        assert_eq!(hits.len(), 1, "{hits:?}");
+        assert_eq!(hits[0].0, "strong");
+        assert!(hits[0].1 > 0.25, "a strong text match beats a name match alone");
     }
 
     /// The real model, when it's been downloaded: `HOARD_CLIP_DIR=<folder with the two files> cargo test -- --ignored`.

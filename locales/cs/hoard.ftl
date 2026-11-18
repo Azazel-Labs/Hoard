@@ -402,6 +402,7 @@ server-job-relocate = Přesouvání souborů mezi umístěními knihovny
 server-job-looks = Zjišťování barev a vzhledu
 server-job-sounds = Poslech zvuků
 server-job-embed = Učení, co zobrazují obrázky
+server-job-hear = Učení, jak zní zvuky
 server-job-materials = Hledání materiálů: { $pack }
 server-job-read-files = Čtení souborů: { $pack }
 server-job-store-lookup = Vyhledávání stránky v obchodě
@@ -2420,8 +2421,8 @@ settings-page-tools = Nástroje
 settings-page-tools-blurb = Externí programy, které Hoard používá k převodu a čtení souborů.
 settings-page-ai = Štítkování pomocí AI
 settings-page-ai-blurb = Model AI pojmenovává, popisuje a štítkuje nové balíčky navíc k vestavěným pravidlům. Jeho štítky jsou označené jako navržené.
-settings-page-search = Hledání obrázků
-settings-page-search-blurb = Hledejte obrázky podle toho, co zobrazují, nejen podle názvů, a nacházejte věci, které jsou si podobné druhem, nejen barvou.
+settings-page-search = Hledání obrázků a zvuků
+settings-page-search-blurb = Hledejte obrázky podle toho, co zobrazují, a zvuky podle toho, jak znějí, nejen podle názvů, a nacházejte věci, které jsou si podobné druhem, nejen barvou.
 settings-page-adding = Přidávání balíčků
 settings-page-adding-blurb = Co Hoard s balíčkem při přidání dělá kromě čtení a štítkování.
 settings-page-downloads = Stahování
@@ -2521,6 +2522,22 @@ settings-clip-ready-all =
     }
 settings-clip-learning = Připraveno: učí se obrázky, zatím { $done } z { $total }
 settings-clip-unavailable = Model se nepodařilo získat: { $detail }. Zkouší se to znovu každou hodinu.
+settings-clap-heading = Hledání podle toho, jak zvuky znějí
+settings-clap-reset = Hledání zvuků: zpět na výchozí
+settings-clap-saved-on = Hledání zvuků: zapnuto
+settings-clap-saved-off = Hledání zvuků: vypnuto
+settings-clap-what = Napište, co hledáte („distant thunder“, „glassy UI blip“, „footsteps on gravel“), a zvuky, které tak znějí, se objeví vedle názvů obsahujících tato slova.
+settings-clap-toggle = Zapnout hledání zvuků
+settings-clap-hint = Používá model CLAP od LAION spuštěný na procesoru tohoto serveru: nic ho neopouští. Zapnutí stáhne model ({ $size } MB) z Hugging Face a pak si na pozadí s nízkou prioritou poslechne začátek každého zvuku. Během práce nebo hledání zabere až zhruba 1 GB paměti. Vypnutí model smaže a to, co se naučil, si ponechá na příště.
+settings-clap-hint-desktop = Používá model CLAP od LAION spuštěný na procesoru tohoto počítače: nic ho neopouští. Zapnutí stáhne model ({ $size } MB) z Hugging Face a pak si na pozadí s nízkou prioritou poslechne začátek každého zvuku. Zatímco pracuje nebo když hledáte, zabere až zhruba 1 GB paměti. Vypnutí model smaže a to, co se naučil, si ponechá na příště.
+settings-clap-ready-empty = Připraveno. Zvuky se učí, jak se přidávají balíčky.
+settings-clap-ready-all =
+    { $count ->
+        [one] Připraveno: zná { $count } zvuk
+        [few] Připraveno: zná všechny { $count } zvuky
+       *[other] Připraveno: zná všech { $count } zvuků
+    }
+settings-clap-learning = Připraveno: učí se zvuky, zatím { $done } z { $total }
 
 ## SettingsPage.vue: Štítkování pomocí AI
 

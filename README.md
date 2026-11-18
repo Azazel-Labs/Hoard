@@ -920,10 +920,10 @@ other filters set. In the API it's `imitation=<word>`.
 
 ### Image search
 
-Settings → Image search adds a model that does know what pictures show (OpenAI's CLIP, ViT-B/32). It's off until an
-admin turns it on, because the model is a 605 MB download (from Hugging Face, pinned to one revision and checked
-against its SHA-256, into the cache folder's `models`). It runs on the server's processor, and nothing leaves the
-server. A background job, "Learning what pictures show", then works through every thumbnail at low priority, at
+Settings → Image and sound search adds a model that knows what pictures show (OpenAI's CLIP, ViT-B/32). It's off
+until an admin turns it on, because the model is a 605 MB download (from Hugging Face, pinned to one revision and
+checked against its SHA-256, into the cache folder's `models`). It runs on the server's processor, and nothing leaves
+the server. A background job, "Learning what pictures show", then works through every thumbnail at low priority, at
 roughly 5–10 pictures a second, and keeps up with new packs. Settings shows how far it has got.
 
 - **Words.** The main search box finds pictures that show what you typed ("mossy rock", "brick wall", "ceiling
@@ -935,6 +935,23 @@ roughly 5–10 pictures a second, and keeps up with new packs. Settings shows ho
 The model takes 300–600 MB of memory while it works: the picture half during the job, the words half from the first
 search until 15 minutes after the last. Turning image search off deletes the model and keeps what it learned, so
 turning it back on only downloads the model again.
+
+### Sound search
+
+Settings → Image and sound search has a second model, for sounds (LAION's CLAP, HTSAT unfused). Like image search,
+it's off until an admin turns it on: the model is a 614 MB download (Apache-2.0, from Hugging Face, pinned and
+checked the same way), and it runs on the server's processor. A background job, "Learning what sounds sound like",
+listens to the first ten seconds of every sound at low priority, about one a second, and keeps up with new packs.
+
+- **Words.** The main search box finds sounds that sound like what you typed ("an explosion", "a laser gun",
+  "distant thunder roll", "glassy UI blip"), beside pictures that show it and assets named for it. A name match
+  still ranks first. Words with nothing to hear return only the name and picture matches, though a sound that comes
+  close now and then gets in.
+- **Agents.** `search_sounds` over MCP with only a `query` searches the same way.
+
+The model takes up to about 1 GB of memory while it works: the listening half during the job, the words half from
+the first search until 15 minutes after the last. Turning sound search off deletes the model and keeps what it
+learned.
 
 ## Credits
 

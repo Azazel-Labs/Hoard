@@ -445,6 +445,7 @@ server-job-relocate = Moving files between library locations
 server-job-looks = Working out colors and looks
 server-job-sounds = Listening to sounds
 server-job-embed = Learning what pictures show
+server-job-hear = Learning what sounds sound like
 server-job-materials = Finding materials in { $pack }
 server-job-read-files = Reading the files of { $pack }
 server-job-store-lookup = Looking up a store page
@@ -2519,8 +2520,8 @@ settings-page-tools = Tools
 settings-page-tools-blurb = Outside programs Hoard uses to convert and read files.
 settings-page-ai = AI tagging
 settings-page-ai-blurb = An AI model names, describes and tags new packs, on top of the built-in rules. Its tags are marked as suggested.
-settings-page-search = Image search
-settings-page-search-blurb = Search pictures by what they show, not only by their names, and find things that are alike in kind, not only in color.
+settings-page-search = Image and sound search
+settings-page-search-blurb = Search pictures by what they show and sounds by what they sound like, not only by their names, and find things that are alike in kind, not only in color.
 settings-page-adding = Adding packs
 settings-page-adding-blurb = What Hoard does with a pack when it’s added, besides reading and tagging it.
 settings-page-downloads = Downloads
@@ -2628,6 +2629,21 @@ settings-clip-ready-all =
 settings-clip-learning = Ready: learning pictures, { $done } of { $total } so far
 # $detail is why, from the server.
 settings-clip-unavailable = Couldn’t get the model: { $detail }. Trying again every hour.
+settings-clap-heading = Search by what sounds sound like
+settings-clap-reset = Sound search: back to the default
+settings-clap-saved-on = Sound search: on
+settings-clap-saved-off = Sound search: off
+settings-clap-what = Type what you’re after (“distant thunder”, “glassy UI blip”, “footsteps on gravel”) and sounds that sound like it turn up beside names that have the words.
+settings-clap-toggle = Turn on sound search
+# $size is the model's download size in MB.
+settings-clap-hint = Uses LAION’s CLAP model, run on this server’s processor: nothing leaves it. Turning it on downloads the model ({ $size } MB) from Hugging Face, then listens to the start of every sound in the background at low priority. It takes up to about 1 GB of memory while it works or someone searches. Turning it off deletes the model and keeps what it learned, for next time.
+settings-clap-hint-desktop = Uses LAION’s CLAP model, run on this computer’s processor: nothing leaves it. Turning it on downloads the model ({ $size } MB) from Hugging Face, then listens to the start of every sound in the background at low priority. It takes up to about 1 GB of memory while it works or you search. Turning it off deletes the model and keeps what it learned, for next time.
+settings-clap-ready-empty = Ready. Sounds are learned as packs are added.
+settings-clap-ready-all =
+    { $count ->
+       *[other] Ready: knows all { $count } sounds
+    }
+settings-clap-learning = Ready: learning sounds, { $done } of { $total } so far
 
 ## SettingsPage.vue: AI tagging
 

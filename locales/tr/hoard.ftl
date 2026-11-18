@@ -392,6 +392,7 @@ server-job-relocate = Dosyalar kütüphane konumları arasında taşınıyor
 server-job-looks = Renkler ve görünümler çıkarılıyor
 server-job-sounds = Sesler dinleniyor
 server-job-embed = Resimlerin ne gösterdiği öğreniliyor
+server-job-hear = Seslerin neye benzediği öğreniliyor
 server-job-materials = Malzemeler aranıyor: { $pack }
 server-job-read-files = Dosyalar okunuyor: { $pack }
 server-job-store-lookup = Bir mağaza sayfası aranıyor
@@ -2059,8 +2060,8 @@ settings-page-tools = Araçlar
 settings-page-tools-blurb = Hoard’un dosyaları dönüştürmek ve okumak için kullandığı dış programlar.
 settings-page-ai = Yapay zekâ etiketleme
 settings-page-ai-blurb = Yerleşik kuralların üstüne, bir yapay zekâ modeli yeni paketlere ad verir, onları tanımlar ve etiketler. Onun etiketleri önerilen olarak işaretlenir.
-settings-page-search = Görsel arama
-settings-page-search-blurb = Resimleri yalnızca adlarına göre değil, gösterdiklerine göre arayın; yalnızca renkte değil, türde de benzeyen şeyleri bulun.
+settings-page-search = Görsel ve ses arama
+settings-page-search-blurb = Resimleri gösterdiklerine, sesleri de neye benzediklerine göre arayın, yalnızca adlarına göre değil; yalnızca renkte değil, türde de benzeyen şeyleri bulun.
 settings-page-adding = Paket ekleme
 settings-page-adding-blurb = Bir paket eklendiğinde, okuyup etiketlemenin yanı sıra Hoard’un onunla ne yaptığı.
 settings-page-downloads = İndirmeler
@@ -2158,6 +2159,20 @@ settings-clip-ready-all =
     }
 settings-clip-learning = Hazır: resimler öğreniliyor, şimdiye kadar { $done } / { $total }
 settings-clip-unavailable = Model alınamadı: { $detail }. Her saat yeniden deneniyor.
+settings-clap-heading = Seslerin neye benzediğine göre ara
+settings-clap-reset = Ses arama: varsayılana dön
+settings-clap-saved-on = Ses arama: açık
+settings-clap-saved-off = Ses arama: kapalı
+settings-clap-what = Aradığınızı yazın (“distant thunder”, “glassy UI blip”, “footsteps on gravel”); ona benzeyen sesler, adında bu sözcükler geçenlerin yanında çıkar.
+settings-clap-toggle = Ses aramayı aç
+settings-clap-hint = LAION’un CLAP modelini kullanır ve bu sunucunun işlemcisinde çalışır: hiçbir şey dışarı çıkmaz. Açmak, modeli ({ $size } MB) Hugging Face’ten indirir, ardından her sesin başını arka planda düşük öncelikle dinler. Çalışırken ya da biri arama yaparken yaklaşık 1 GB’a kadar bellek kullanır. Kapatmak modeli siler, öğrendiklerini bir dahaki sefer için saklar.
+settings-clap-hint-desktop = LAION’un CLAP modelini kullanır ve bu bilgisayarın işlemcisinde çalışır: hiçbir şey dışarı çıkmaz. Açmak, modeli ({ $size } MB) Hugging Face’ten indirir, ardından her sesin başını arka planda düşük öncelikle dinler. Çalışırken ya da siz arama yaparken yaklaşık 1 GB’a kadar bellek kullanır. Kapatmak modeli siler, öğrendiklerini bir dahaki sefer için saklar.
+settings-clap-ready-empty = Hazır. Sesler, paketler eklendikçe öğrenilir.
+settings-clap-ready-all =
+    { $count ->
+       *[other] Hazır: { $count } sesin tümünü tanıyor
+    }
+settings-clap-learning = Hazır: sesler öğreniliyor, şimdiye kadar { $done } / { $total }
 
 ## SettingsPage.vue: AI tagging
 

@@ -392,6 +392,7 @@ server-job-relocate = Đang chuyển tệp giữa các vị trí thư viện
 server-job-looks = Đang xác định màu sắc và diện mạo
 server-job-sounds = Đang nghe âm thanh
 server-job-embed = Đang tìm hiểu nội dung hình ảnh
+server-job-hear = Đang tìm hiểu âm thanh nghe ra sao
 server-job-materials = Đang tìm vật liệu trong { $pack }
 server-job-read-files = Đang đọc các tệp của { $pack }
 server-job-store-lookup = Đang tra cứu trang cửa hàng
@@ -2042,8 +2043,8 @@ settings-page-tools = Công cụ
 settings-page-tools-blurb = Các chương trình bên ngoài mà Hoard dùng để chuyển đổi và đọc tệp.
 settings-page-ai = Gắn thẻ AI
 settings-page-ai-blurb = Một mô hình AI đặt tên, mô tả và gắn thẻ cho gói mới, bổ sung cho các quy tắc có sẵn. Thẻ của nó được đánh dấu là gợi ý.
-settings-page-search = Tìm kiếm hình ảnh
-settings-page-search-blurb = Tìm ảnh theo nội dung trong ảnh, không chỉ theo tên, và tìm những thứ giống nhau về loại, không chỉ về màu.
+settings-page-search = Tìm kiếm hình ảnh và âm thanh
+settings-page-search-blurb = Tìm ảnh theo nội dung trong ảnh và tìm âm thanh theo cách chúng nghe ra sao, không chỉ theo tên, và tìm những thứ giống nhau về loại, không chỉ về màu.
 settings-page-adding = Thêm gói
 settings-page-adding-blurb = Những gì Hoard làm với một gói khi nó được thêm vào, ngoài việc đọc và gắn thẻ.
 settings-page-downloads = Tải xuống
@@ -2141,6 +2142,20 @@ settings-clip-ready-all =
     }
 settings-clip-learning = Sẵn sàng: đang học ảnh, đến giờ được { $done } / { $total }
 settings-clip-unavailable = Không lấy được mô hình: { $detail }. Sẽ thử lại mỗi giờ.
+settings-clap-heading = Tìm theo âm thanh nghe ra sao
+settings-clap-reset = Tìm kiếm âm thanh: về mặc định
+settings-clap-saved-on = Tìm kiếm âm thanh: bật
+settings-clap-saved-off = Tìm kiếm âm thanh: tắt
+settings-clap-what = Nhập thứ bạn đang tìm (“distant thunder”, “glassy UI blip”, “footsteps on gravel”) và những âm thanh nghe giống vậy sẽ hiện ra cạnh những tên có các từ đó.
+settings-clap-toggle = Bật tìm kiếm âm thanh
+settings-clap-hint = Dùng mô hình CLAP của LAION, chạy trên bộ xử lý của máy chủ này: không có gì rời khỏi máy chủ. Khi bật, mô hình ({ $size } MB) sẽ được tải từ Hugging Face, rồi nghe phần đầu của mọi âm thanh trong nền với mức ưu tiên thấp. Nó dùng tối đa khoảng 1 GB bộ nhớ khi đang làm việc hoặc khi có người tìm kiếm. Khi tắt, mô hình bị xóa nhưng những gì nó đã học được giữ lại cho lần sau.
+settings-clap-hint-desktop = Dùng mô hình CLAP của LAION, chạy trên bộ xử lý của máy tính này: không có gì rời khỏi máy. Khi bật, mô hình ({ $size } MB) sẽ được tải từ Hugging Face, rồi nghe phần đầu của mọi âm thanh trong nền với mức ưu tiên thấp. Nó dùng tối đa khoảng 1 GB bộ nhớ khi đang làm việc hoặc khi bạn tìm kiếm. Khi tắt, mô hình bị xóa nhưng những gì nó đã học được giữ lại cho lần sau.
+settings-clap-ready-empty = Sẵn sàng. Âm thanh sẽ được học khi gói được thêm vào.
+settings-clap-ready-all =
+    { $count ->
+       *[other] Sẵn sàng: đã biết cả { $count } âm thanh
+    }
+settings-clap-learning = Sẵn sàng: đang học âm thanh, đến giờ được { $done } / { $total }
 
 ## Cài đặt: Gắn thẻ AI
 

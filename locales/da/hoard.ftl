@@ -392,6 +392,7 @@ server-job-relocate = Flytter filer mellem biblioteksplaceringer
 server-job-looks = Finder farver og udseende
 server-job-sounds = Lytter til lyde
 server-job-embed = Lærer, hvad billeder viser
+server-job-hear = Lærer, hvordan lyde lyder
 server-job-materials = Finder materialer i { $pack }
 server-job-read-files = Læser filerne i { $pack }
 server-job-store-lookup = Slår en butiksside op
@@ -2223,8 +2224,8 @@ settings-page-tools = Værktøjer
 settings-page-tools-blurb = Eksterne programmer, Hoard bruger til at konvertere og læse filer.
 settings-page-ai = AI-tagging
 settings-page-ai-blurb = En AI-model navngiver, beskriver og tagger nye pakker oven i de indbyggede regler. Dens tags er markeret som forslag.
-settings-page-search = Billedsøgning
-settings-page-search-blurb = Søg i billeder efter det, de viser, ikke kun efter deres navne, og find ting, der ligner hinanden i art, ikke kun i farve.
+settings-page-search = Billed- og lydsøgning
+settings-page-search-blurb = Søg i billeder efter det, de viser, og i lyde efter, hvordan de lyder, ikke kun efter deres navne, og find ting, der ligner hinanden i art, ikke kun i farve.
 settings-page-adding = Tilføjelse af pakker
 settings-page-adding-blurb = Hvad Hoard gør med en pakke, når den tilføjes, ud over at læse og tagge den.
 settings-page-downloads = Downloads
@@ -2322,6 +2323,20 @@ settings-clip-ready-all =
     }
 settings-clip-learning = Klar: lærer billeder, { $done } af { $total } indtil nu
 settings-clip-unavailable = Kunne ikke hente modellen: { $detail }. Prøver igen hver time.
+settings-clap-heading = Søg efter, hvordan lyde lyder
+settings-clap-reset = Lydsøgning: tilbage til standard
+settings-clap-saved-on = Lydsøgning: til
+settings-clap-saved-off = Lydsøgning: fra
+settings-clap-what = Skriv, hvad du leder efter (»distant thunder«, »glassy UI blip«, »footsteps on gravel«), så dukker lyde, der lyder sådan, op ved siden af navne, der indeholder ordene.
+settings-clap-toggle = Slå lydsøgning til
+settings-clap-hint = Bruger LAIONs CLAP-model, som køres på denne servers processor: intet forlader den. Når du slår det til, downloades modellen ({ $size } MB) fra Hugging Face, og derefter lytter den til begyndelsen af hver lyd i baggrunden med lav prioritet. Den bruger op til omkring 1 GB hukommelse, mens den arbejder, eller nogen søger. Når du slår det fra, slettes modellen, men det, den har lært, beholdes til næste gang.
+settings-clap-hint-desktop = Bruger LAIONs CLAP-model, som køres på denne computers processor: intet forlader den. Når du slår det til, downloades modellen ({ $size } MB) fra Hugging Face, og derefter lytter den til begyndelsen af hver lyd i baggrunden med lav prioritet. Den bruger op til omkring 1 GB hukommelse, mens den arbejder, eller du søger. Når du slår det fra, slettes modellen, men det, den har lært, beholdes til næste gang.
+settings-clap-ready-empty = Klar. Lyde læres, efterhånden som pakker tilføjes.
+settings-clap-ready-all =
+    { $count ->
+       *[other] Klar: kender alle { $count } lyde
+    }
+settings-clap-learning = Klar: lærer lyde, { $done } af { $total } indtil nu
 
 ## SettingsPage.vue: AI-tagging
 

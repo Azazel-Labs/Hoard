@@ -392,6 +392,7 @@ server-job-relocate = 라이브러리 위치 간에 파일 옮기는 중
 server-job-looks = 색상과 외형 분석하는 중
 server-job-sounds = 사운드 듣는 중
 server-job-embed = 그림 내용 학습하는 중
+server-job-hear = 사운드가 어떻게 들리는지 학습하는 중
 server-job-materials = { $pack }에서 머티리얼 찾는 중
 server-job-read-files = { $pack }의 파일 읽는 중
 server-job-store-lookup = 스토어 페이지 찾는 중
@@ -2015,8 +2016,8 @@ settings-page-tools = 도구
 settings-page-tools-blurb = Hoard가 파일을 변환하고 읽을 때 쓰는 외부 프로그램입니다.
 settings-page-ai = AI 태깅
 settings-page-ai-blurb = 기본 규칙에 더해 AI 모델이 새 팩의 이름을 짓고, 설명하고, 태그를 붙입니다. AI가 붙인 태그는 제안으로 표시됩니다.
-settings-page-search = 이미지 검색
-settings-page-search-blurb = 이름뿐 아니라 그림에 나타난 내용으로 검색하고, 색상뿐 아니라 종류가 비슷한 것을 찾습니다.
+settings-page-search = 이미지 및 사운드 검색
+settings-page-search-blurb = 이름뿐 아니라 그림은 나타난 내용으로, 사운드는 들리는 소리로 검색하고, 색상뿐 아니라 종류가 비슷한 것을 찾습니다.
 settings-page-adding = 팩 추가
 settings-page-adding-blurb = 팩이 추가될 때 읽고 태그하는 것 말고 Hoard가 하는 일입니다.
 settings-page-downloads = 다운로드
@@ -2111,6 +2112,17 @@ settings-clip-ready-empty = 준비됨. 팩이 추가되면 그림을 학습합�
 settings-clip-ready-all = 준비됨: 그림 { $count }개를 모두 학습했습니다
 settings-clip-learning = 준비됨: 그림 학습 중, 지금까지 { $total }개 중 { $done }개
 settings-clip-unavailable = 모델을 가져오지 못했습니다: { $detail }. 1시간마다 다시 시도합니다.
+settings-clap-heading = 들리는 소리로 사운드 검색
+settings-clap-reset = 사운드 검색: 기본값으로
+settings-clap-saved-on = 사운드 검색: 켜짐
+settings-clap-saved-off = 사운드 검색: 꺼짐
+settings-clap-what = 찾는 것을 입력하면(“distant thunder”, “glassy UI blip”, “footsteps on gravel”) 이름에 그 단어가 들어간 것과 함께 그렇게 들리는 사운드가 나타납니다.
+settings-clap-toggle = 사운드 검색 켜기
+settings-clap-hint = LAION의 CLAP 모델을 이 서버의 프로세서에서 실행하므로 아무것도 밖으로 나가지 않습니다. 켜면 Hugging Face에서 모델({ $size } MB)을 다운로드한 다음, 낮은 우선순위로 백그라운드에서 모든 사운드의 앞부분을 들어 봅니다. 학습하거나 누군가 검색하는 동안 메모리를 최대 1 GB 정도 사용합니다. 끄면 모델은 삭제되지만 학습한 내용은 다음을 위해 남겨 둡니다.
+settings-clap-hint-desktop = LAION의 CLAP 모델을 이 컴퓨터의 프로세서에서 실행하므로 아무것도 밖으로 나가지 않습니다. 켜면 Hugging Face에서 모델({ $size } MB)을 다운로드한 다음, 낮은 우선순위로 백그라운드에서 모든 사운드의 앞부분을 들어 봅니다. 학습하거나 검색하는 동안 메모리를 최대 1 GB 정도 사용합니다. 끄면 모델은 삭제되지만 학습한 내용은 다음을 위해 남겨 둡니다.
+settings-clap-ready-empty = 준비됨. 팩이 추가되면 사운드를 학습합니다.
+settings-clap-ready-all = 준비됨: 사운드 { $count }개를 모두 학습했습니다
+settings-clap-learning = 준비됨: 사운드 학습 중, 지금까지 { $total }개 중 { $done }개
 
 ## SettingsPage.vue: AI 태깅
 

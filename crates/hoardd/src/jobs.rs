@@ -27,6 +27,8 @@ pub(crate) const SOUNDS: &str = "sounds";
 pub(crate) const MATERIALS: &str = "materials";
 /// Image search: embed thumbnails that have no embedding yet (see [`crate::clip`]).
 pub(crate) const EMBED: &str = "embed";
+/// Sound search: embed sounds that have no embedding yet (see [`crate::clap`]).
+pub(crate) const HEAR: &str = "hear";
 /// Read the store's files in a pack again (a Megascans JSON): name, tags and description.
 pub(crate) const READ_FILES: &str = "read_files";
 /// Look up the next pack's store page (see [`crate::store_lookup`]).
@@ -86,6 +88,7 @@ pub(crate) fn job_label(kind: &str, pack: Option<&str>) -> String {
         LOOKS => tr!("server-job-looks"),
         SOUNDS => tr!("server-job-sounds"),
         EMBED => tr!("server-job-embed"),
+        HEAR => tr!("server-job-hear"),
         MATERIALS => tr!("server-job-materials", pack = pack),
         READ_FILES => tr!("server-job-read-files", pack = pack),
         STORE_LOOKUP => tr!("server-job-store-lookup"),
@@ -116,6 +119,7 @@ async fn run(state: &AppState, job: db::JobRow) {
         LOOKS => LOOKS,
         SOUNDS => SOUNDS,
         EMBED => EMBED,
+        HEAR => HEAR,
         MATERIALS => MATERIALS,
         READ_FILES => READ_FILES,
         STORE_LOOKUP => STORE_LOOKUP,
@@ -160,6 +164,7 @@ async fn run(state: &AppState, job: db::JobRow) {
         LOOKS => crate::looks::run_job(state).await,
         SOUNDS => crate::sounds::run_job(state).await,
         EMBED => crate::clip::run_job(state).await,
+        HEAR => crate::clap::run_job(state).await,
         MATERIALS => blocking(state, move |s, rt| crate::materials::run_job(s, rt, &pack_id)).await,
         READ_FILES => read_files(state, &pack_id).await,
         STORE_LOOKUP => crate::store_lookup::run(state, &activity).await,

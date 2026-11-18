@@ -2131,22 +2131,20 @@ fn tool_setting(value: &str, flag: &str, saved: bool, describe: &str, can_downlo
     })
 }
 
-/// Image search's switch, where its model is (off, downloading, ready…), and how many pictures it has learned.
-async fn clip_json(state: &AppState) -> Value {
-    let saved = state.settings.saved();
-    let describe = crate::clip::describe();
-    let (status, detail) = match describe.as_str() {
+/// Image search's or sound search's switch, where its model is (off, downloading, ready…), and how much of the
+/// library it has learned.
+fn model_json(value: bool, saved: bool, describe: &str, download_bytes: u64, (done, total): (u64, u64)) -> Value {
+    let (status, detail) = match describe {
         s @ ("off" | "looking" | "downloading" | "ready") => (s, ""),
         s => s.strip_prefix("unavailable: ").map_or(("ready", s), |why| ("unavailable", why)),
     };
-    let (done, total) = db::call(&state.pool, |c| crate::clip::progress(c)).await.unwrap_or((0, 0));
     json!({
-        "value": state.settings.get().clip,
+        "value": value,
         "default": false,
-        "saved": saved.clip.is_some(),
+        "saved": saved,
         "state": status,
         "detail": detail,
-        "download_bytes": crate::clip::DOWNLOAD_BYTES,
+        "download_bytes": download_bytes,
         "done": done,
         "total": total,
     })
@@ -2154,7 +2152,13 @@ async fn clip_json(state: &AppState) -> Value {
 
 async fn settings_json(state: &AppState) -> Value {
     let mut out = settings_json_sync(state);
-    out["clip"] = clip_json(state).await;
+    let (saved, now) = (state.settings.saved(), state.settings.get());
+    let pictures = db::call(&state.pool, |c| crate::clip::progress(c)).await.unwrap_or((0, 0));
+    let sounds = db::call(&state.pool, |c| crate::clap::progress(c)).await.unwrap_or((0, 0));
+    let image_search = &crate::clip::describe();
+    out["clip"] = model_json(now.clip, saved.clip.is_some(), image_search, crate::clip::DOWNLOAD_BYTES, pictures);
+    let sound_search = &crate::clap::describe();
+    out["clap"] = model_json(now.clap, saved.clap.is_some(), sound_search, crate::clap::DOWNLOAD_BYTES, sounds);
     out
 }
 
@@ -2367,6 +2371,12 @@ async fn put_settings(State(state): State<AppState>, Json(patch): Json<Value>) -
         crate::clip::start(&state, after.clip);
         if !after.clip {
             crate::clip::remove_files(&state).await;
+        }
+    }
+    if before.clap != after.clap {
+        crate::clap::start(&state, after.clap);
+        if !after.clap {
+            crate::clap::remove_files(&state).await;
         }
     }
     if after.motion_thumbs && !before.motion_thumbs {

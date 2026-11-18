@@ -755,6 +755,8 @@ const MIGRATIONS: &[&str] = &[
               strftime('%Y-%m-%dT%H:%M:%SZ', 'now'), strftime('%Y-%m-%dT%H:%M:%SZ', 'now')
        FROM packs p WHERE p.status = 'ingesting'
          AND NOT EXISTS (SELECT 1 FROM jobs j WHERE j.pack_id = p.id AND j.status IN ('queued', 'running'));",
+    // 71: sound search (CLAP): each sound file's embedding.
+    "CREATE TABLE sound_embeddings (hash TEXT PRIMARY KEY, model TEXT NOT NULL, vector BLOB NOT NULL) WITHOUT ROWID;",
 ];
 
 /// How many automatic pre-upgrade backups to keep in `<data dir>/backups`.
@@ -1860,17 +1862,31 @@ pub(crate) struct LookRank {
     /// With a text query: match either the words or the look, and rank by both (text-to-image search). Without
     /// it, only assets in `scores` match.
     pub(crate) blend: bool,
-    /// The hashes are of the assets' files (sounds, see `sounds`), not their thumbnails.
-    pub(crate) by_file: bool,
+    /// What the hashes are of.
+    pub(crate) keys: Keys,
+}
+
+/// What a [`LookRank`]'s hashes are of.
+#[derive(Debug, Default, Clone, Copy, PartialEq, Eq)]
+pub(crate) enum Keys {
+    /// The assets' thumbnails (pictures, see `looks` and `clip`).
+    #[default]
+    Thumbs,
+    /// The assets' files (sounds, see `sounds` and `clap`).
+    Files,
+    /// Sounds by their files, everything else by its thumbnail: image and sound search together.
+    Mixed,
 }
 
 const FTS_JOIN: &str = "JOIN (SELECT asset_id, bm25(assets_fts, 0.0, 8.0, 4.0, 3.0, 1.0, 5.0) AS rank
           FROM assets_fts WHERE assets_fts MATCH ?) f ON f.asset_id = a.id";
 fn look_join(look: &LookRank) -> &'static str {
-    if look.by_file {
-        "JOIN temp.look_rank lr ON lr.hash = a.blob_hash"
-    } else {
-        "JOIN temp.look_rank lr ON lr.hash = a.thumb_hash"
+    match look.keys {
+        Keys::Thumbs => "JOIN temp.look_rank lr ON lr.hash = a.thumb_hash",
+        Keys::Files => "JOIN temp.look_rank lr ON lr.hash = a.blob_hash",
+        Keys::Mixed => {
+            "JOIN temp.look_rank lr ON lr.hash = CASE WHEN a.kind = 'audio' THEN a.blob_hash ELSE a.thumb_hash END"
+        }
     }
 }
 
@@ -3001,7 +3017,7 @@ mod tests {
             scores: vec![("t3".into(), 0.9), ("t2".into(), 0.8), ("t1".into(), 0.7)],
             exclude: Some("a1".into()),
             blend: false,
-            by_file: false,
+            keys: Keys::Thumbs,
         };
         let q = SearchQuery::default();
         assert_eq!(ids(search_ranked(&conn, &q, true, Some(&rank)).unwrap()), ["a3", "a2"], "best first, minus a1");
@@ -3011,7 +3027,7 @@ mod tests {
         assert_eq!(ids(page), ["a2"]);
 
         // Blended (text-to-image): word matches and look matches both count.
-        let rank = LookRank { scores: vec![("t3".into(), 0.2)], exclude: None, blend: true, by_file: false };
+        let rank = LookRank { scores: vec![("t3".into(), 0.2)], exclude: None, blend: true, keys: Keys::Thumbs };
         let q = SearchQuery { q: Some("mossy".into()), ..Default::default() };
         assert_eq!(ids(search_ranked(&conn, &q, false, Some(&rank)).unwrap()), ["a2", "a3"]);
         assert_eq!(ids(search(&conn, &q, false).unwrap()), ["a2"], "a plain search is unchanged");

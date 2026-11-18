@@ -392,6 +392,7 @@ server-job-relocate = 正在素材庫位置之間移動檔案
 server-job-looks = 正在分析顏色與外觀
 server-job-sounds = 正在聆聽音效
 server-job-embed = 正在學習圖片的內容
+server-job-hear = 正在學習音效聽起來像什麼
 server-job-materials = 正在尋找 { $pack } 中的材質
 server-job-read-files = 正在讀取 { $pack } 的檔案
 server-job-store-lookup = 正在查詢商店頁面
@@ -2048,8 +2049,8 @@ settings-page-tools = 工具
 settings-page-tools-blurb = Hoard 用來轉換與讀取檔案的外部程式。
 settings-page-ai = AI 標記
 settings-page-ai-blurb = 除了內建規則之外，由 AI 模型為新素材包命名、撰寫描述並加上標籤。它加上的標籤會標示為建議。
-settings-page-search = 圖片搜尋
-settings-page-search-blurb = 依圖片顯示的內容搜尋，而不只是依名稱，並找出種類相似、而不只是顏色相似的項目。
+settings-page-search = 圖片與音效搜尋
+settings-page-search-blurb = 依圖片顯示的內容搜尋圖片、依聽起來像什麼搜尋音效，而不只是依名稱，並找出種類相似、而不只是顏色相似的項目。
 settings-page-adding = 新增素材包
 settings-page-adding-blurb = 新增素材包時，除了讀取與加上標籤之外，Hoard 還會做什麼。
 settings-page-downloads = 下載
@@ -2147,6 +2148,20 @@ settings-clip-ready-all =
     }
 settings-clip-learning = 就緒：正在學習圖片，目前已完成 { $done }／{ $total }
 settings-clip-unavailable = 無法取得模型：{ $detail }。每小時會再試一次。
+settings-clap-heading = 依音效聽起來像什麼搜尋
+settings-clap-reset = 音效搜尋：恢復預設值
+settings-clap-saved-on = 音效搜尋：開啟
+settings-clap-saved-off = 音效搜尋：關閉
+settings-clap-what = 輸入你要找的東西（「distant thunder」、「glassy UI blip」、「footsteps on gravel」），聽起來像這樣的音效就會和名稱含有這些字詞的項目一起出現。
+settings-clap-toggle = 開啟音效搜尋
+settings-clap-hint = 使用 LAION 的 CLAP 模型，在這台伺服器的處理器上執行：任何資料都不會離開伺服器。開啟後會從 Hugging Face 下載模型（{ $size } MB），然後以低優先順序在背景聆聽每個音效的開頭。在它工作或有人搜尋時，最多會使用約 1 GB 的記憶體。關閉後會刪除模型，但保留它學到的內容，供下次使用。
+settings-clap-hint-desktop = 使用 LAION 的 CLAP 模型，在這台電腦的處理器上執行：任何資料都不會離開這台電腦。開啟後會從 Hugging Face 下載模型（{ $size } MB），然後以低優先順序在背景聆聽每個音效的開頭。在它工作或你搜尋時，最多會使用約 1 GB 的記憶體。關閉後會刪除模型，但保留它學到的內容，供下次使用。
+settings-clap-ready-empty = 就緒。新增素材包時會學習其中的音效。
+settings-clap-ready-all =
+    { $count ->
+       *[other] 就緒：已認識全部 { $count } 個音效
+    }
+settings-clap-learning = 就緒：正在學習音效，目前已完成 { $done }／{ $total }
 
 ## 設定：AI 標記
 

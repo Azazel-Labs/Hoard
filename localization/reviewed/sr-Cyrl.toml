@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "10f28906b4e30bd8144d107941fae25fa74dbd0adad636f8055c3f66c4be43e4"
+source = "31ff17dd465157b51caccbf9730b3a2b32749550e20e205f3a51f4da2ecf16f8"
 translation = "c2a4a8051502263df10866a7bb372ad5cdada115fb8d6449130cdd2d1752dd61"
 
 [messages.account-add]
@@ -8033,6 +8033,10 @@ translation = "Претварање помоћу Blender-а: { $pack }"
 source = "Learning what pictures show"
 translation = "Учење шта слике приказују"
 
+[messages.server-job-hear]
+source = "Learning what sounds sound like"
+translation = "Учење како звуци звуче"
+
 [messages.server-job-ingest]
 source = "Ingesting { $pack }"
 translation = "Увоз: { $pack }"
@@ -8497,6 +8501,58 @@ translation = "Пријављени сте као { $email }"
 [messages.settings-chatgpt-usage]
 source = "Tagging requests count toward your ChatGPT plan’s usage. Manage usage shows what Hoard has used and lets you limit it. To disconnect Hoard from ChatGPT itself, go to Settings → Security and login → Sign in with ChatGPT on chatgpt.com."
 translation = "Захтеви за означавање рачунају се у потрошњу вашег ChatGPT плана. „Управљај потрошњом“ показује колико је Hoard потрошио и омогућава вам да то ограничите. Да бисте Hoard искључили из самог ChatGPT-а, идите на Settings → Security and login → Sign in with ChatGPT на chatgpt.com."
+
+[messages.settings-clap-heading]
+source = "Search by what sounds sound like"
+translation = "Претрага по томе како звуци звуче"
+
+[messages.settings-clap-hint]
+source = "Uses LAION’s CLAP model, run on this server’s processor: nothing leaves it. Turning it on downloads the model ({ $size } MB) from Hugging Face, then listens to the start of every sound in the background at low priority. It takes up to about 1 GB of memory while it works or someone searches. Turning it off deletes the model and keeps what it learned, for next time."
+translation = "Користи LAION-ов модел CLAP, који ради на процесору овог сервера: ништа не напушта сервер. Укључивање преузима модел ({ $size } MB) са Hugging Face-а, а затим у позадини, ниским приоритетом, преслушава почетак сваког звука. Заузима до око 1 GB меморије док ради или док неко претражује. Искључивање брише модел и чува оно што је научио, за следећи пут."
+
+[messages.settings-clap-hint-desktop]
+source = "Uses LAION’s CLAP model, run on this computer’s processor: nothing leaves it. Turning it on downloads the model ({ $size } MB) from Hugging Face, then listens to the start of every sound in the background at low priority. It takes up to about 1 GB of memory while it works or you search. Turning it off deletes the model and keeps what it learned, for next time."
+translation = "Користи LAION-ов модел CLAP, који ради на процесору овог рачунара: ништа не напушта рачунар. Укључивање преузима модел ({ $size } MB) са Hugging Face-а, а затим у позадини, ниским приоритетом, преслушава почетак сваког звука. Заузима до око 1 GB меморије док ради или док претражујете. Искључивање брише модел и чува оно што је научио, за следећи пут."
+
+[messages.settings-clap-learning]
+source = "Ready: learning sounds, { $done } of { $total } so far"
+translation = "Спремно: учи звукове, до сада { $done } од { $total }"
+
+[messages.settings-clap-ready-all]
+source = """
+{ $count ->
+       *[other] Ready: knows all { $count } sounds
+    }"""
+translation = """
+{ $count ->
+        [one] Спремно: познаје { $count } звук
+        [few] Спремно: познаје сва { $count } звука
+       *[other] Спремно: познаје свих { $count } звукова
+    }"""
+
+[messages.settings-clap-ready-empty]
+source = "Ready. Sounds are learned as packs are added."
+translation = "Спремно. Звуци се уче како се пакети додају."
+
+[messages.settings-clap-reset]
+source = "Sound search: back to the default"
+translation = "Претрага звукова: врати на подразумевано"
+
+[messages.settings-clap-saved-off]
+source = "Sound search: off"
+translation = "Претрага звукова: искључена"
+
+[messages.settings-clap-saved-on]
+source = "Sound search: on"
+translation = "Претрага звукова: укључена"
+
+[messages.settings-clap-toggle]
+source = "Turn on sound search"
+translation = "Укључи претрагу звукова"
+
+[messages.settings-clap-what]
+source = "Type what you’re after (“distant thunder”, “glassy UI blip”, “footsteps on gravel”) and sounds that sound like it turn up beside names that have the words."
+translation = "Унесите шта тражите („distant thunder“, „glassy UI blip“, „footsteps on gravel“) и звуци који тако звуче појавиће се поред назива који садрже те речи."
 
 [messages.settings-clip-downloading]
 source = "Downloading the model… progress is in the activity indicator"
@@ -9183,12 +9239,12 @@ source = "How hard Hoard works, how thumbnails are made and kept, and the most i
 translation = "Колико се Hoard напреже, како се праве и чувају сличице и колико највише прима."
 
 [messages.settings-page-search]
-source = "Image search"
-translation = "Претрага слика"
+source = "Image and sound search"
+translation = "Претрага слика и звукова"
 
 [messages.settings-page-search-blurb]
-source = "Search pictures by what they show, not only by their names, and find things that are alike in kind, not only in color."
-translation = "Претражујте слике по ономе што приказују, а не само по називима, и проналазите ствари сличне по врсти, а не само по боји."
+source = "Search pictures by what they show and sounds by what they sound like, not only by their names, and find things that are alike in kind, not only in color."
+translation = "Претражујте слике по ономе што приказују и звукове по томе како звуче, а не само по називима, и проналазите ствари сличне по врсти, а не само по боји."
 
 [messages.settings-page-store-files]
 source = "Store files"

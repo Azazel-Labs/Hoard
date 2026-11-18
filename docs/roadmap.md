@@ -118,9 +118,9 @@ on its own:
   (b, p, k, t) is a sharp attack; long or repeated vowels are length; "oo"/"o" low and dark, "ee"/"i" high and
   bright; "sh", "s", "wh", "f" are noise and air; a trailing "m" or "n" a hum that fades; capitals are loud.
   "WHOOOM": airy start, long low middle, fading hum, loud.
-- [ ] **CLAP embeddings**: sounds and text in one space, as CLIP does for images, so "glassy UI blip" or "distant
-  thunder roll" find sounds whatever they're called. Off until an admin turns it on, like CLIP. The model's size and
-  license are still to check.
+- [x] **CLAP embeddings**: sounds and text in one space, as CLIP does for images, so "glassy UI blip" or "distant
+  thunder roll" find sounds whatever they're called. Off until an admin turns it on, like CLIP: LAION's HTSAT
+  unfused model, 614 MB, Apache-2.0.
 - [x] **MCP**: `search_sounds` — the calling AI passes the raw word as `imitation` and its own reading of it ("a
   deep whoosh, about a second, rising") as `shape`, which overrides that part of Hoard's reading — returning each
   sound's measured features, the same in words and a link to listen, plus `describe_sound(id)` and `sounds_like(id)`.

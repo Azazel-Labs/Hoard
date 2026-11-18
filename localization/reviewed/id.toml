@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "10f28906b4e30bd8144d107941fae25fa74dbd0adad636f8055c3f66c4be43e4"
+source = "31ff17dd465157b51caccbf9730b3a2b32749550e20e205f3a51f4da2ecf16f8"
 translation = "30056587d254fe6b8f2576dc61dbda0e0d1f814731977073ac18b1c1a33112d6"
 
 [messages.account-add]
@@ -7795,6 +7795,10 @@ translation = "Mengonversi { $pack } dengan Blender"
 source = "Learning what pictures show"
 translation = "Mempelajari isi gambar"
 
+[messages.server-job-hear]
+source = "Learning what sounds sound like"
+translation = "Mempelajari bunyi suara"
+
 [messages.server-job-ingest]
 source = "Ingesting { $pack }"
 translation = "Memasukkan { $pack }"
@@ -8254,6 +8258,56 @@ translation = "Masuk sebagai { $email }"
 [messages.settings-chatgpt-usage]
 source = "Tagging requests count toward your ChatGPT plan’s usage. Manage usage shows what Hoard has used and lets you limit it. To disconnect Hoard from ChatGPT itself, go to Settings → Security and login → Sign in with ChatGPT on chatgpt.com."
 translation = "Permintaan pemberian tag dihitung dalam pemakaian langganan ChatGPT Anda. Kelola pemakaian menampilkan apa yang sudah dipakai Hoard dan memungkinkan Anda membatasinya. Untuk memutuskan Hoard dari ChatGPT itu sendiri, buka Settings → Security and login → Sign in with ChatGPT di chatgpt.com."
+
+[messages.settings-clap-heading]
+source = "Search by what sounds sound like"
+translation = "Cari berdasarkan bunyi suara"
+
+[messages.settings-clap-hint]
+source = "Uses LAION’s CLAP model, run on this server’s processor: nothing leaves it. Turning it on downloads the model ({ $size } MB) from Hugging Face, then listens to the start of every sound in the background at low priority. It takes up to about 1 GB of memory while it works or someone searches. Turning it off deletes the model and keeps what it learned, for next time."
+translation = "Memakai model CLAP dari LAION, dijalankan di prosesor server ini: tidak ada yang keluar dari server. Mengaktifkannya akan mengunduh model ({ $size } MB) dari Hugging Face, lalu mendengarkan bagian awal setiap suara di latar belakang dengan prioritas rendah. Butuh memori hingga sekitar 1 GB selagi bekerja atau saat seseorang mencari. Mematikannya akan menghapus model dan menyimpan apa yang sudah dipelajari, untuk lain kali."
+
+[messages.settings-clap-hint-desktop]
+source = "Uses LAION’s CLAP model, run on this computer’s processor: nothing leaves it. Turning it on downloads the model ({ $size } MB) from Hugging Face, then listens to the start of every sound in the background at low priority. It takes up to about 1 GB of memory while it works or you search. Turning it off deletes the model and keeps what it learned, for next time."
+translation = "Memakai model CLAP dari LAION, dijalankan di prosesor komputer ini: tidak ada yang keluar dari komputer. Mengaktifkannya akan mengunduh model ({ $size } MB) dari Hugging Face, lalu mendengarkan bagian awal setiap suara di latar belakang dengan prioritas rendah. Butuh memori hingga sekitar 1 GB selagi bekerja atau saat Anda mencari. Mematikannya akan menghapus model dan menyimpan apa yang sudah dipelajari, untuk lain kali."
+
+[messages.settings-clap-learning]
+source = "Ready: learning sounds, { $done } of { $total } so far"
+translation = "Siap: mempelajari suara, { $done } dari { $total } sejauh ini"
+
+[messages.settings-clap-ready-all]
+source = """
+{ $count ->
+       *[other] Ready: knows all { $count } sounds
+    }"""
+translation = """
+{ $count ->
+       *[other] Siap: mengenal semua { $count } suara
+    }"""
+
+[messages.settings-clap-ready-empty]
+source = "Ready. Sounds are learned as packs are added."
+translation = "Siap. Suara dipelajari saat paket ditambahkan."
+
+[messages.settings-clap-reset]
+source = "Sound search: back to the default"
+translation = "Pencarian suara: kembali ke bawaan"
+
+[messages.settings-clap-saved-off]
+source = "Sound search: off"
+translation = "Pencarian suara: mati"
+
+[messages.settings-clap-saved-on]
+source = "Sound search: on"
+translation = "Pencarian suara: aktif"
+
+[messages.settings-clap-toggle]
+source = "Turn on sound search"
+translation = "Aktifkan pencarian suara"
+
+[messages.settings-clap-what]
+source = "Type what you’re after (“distant thunder”, “glassy UI blip”, “footsteps on gravel”) and sounds that sound like it turn up beside names that have the words."
+translation = "Ketik apa yang Anda cari (“distant thunder”, “glassy UI blip”, “footsteps on gravel”) dan suara yang terdengar seperti itu muncul di samping nama yang mengandung kata-kata itu."
 
 [messages.settings-clip-downloading]
 source = "Downloading the model… progress is in the activity indicator"
@@ -8910,12 +8964,12 @@ source = "How hard Hoard works, how thumbnails are made and kept, and the most i
 translation = "Seberapa keras Hoard bekerja, cara gambar mini dibuat dan disimpan, dan batas maksimum yang diterimanya."
 
 [messages.settings-page-search]
-source = "Image search"
-translation = "Pencarian gambar"
+source = "Image and sound search"
+translation = "Pencarian gambar dan suara"
 
 [messages.settings-page-search-blurb]
-source = "Search pictures by what they show, not only by their names, and find things that are alike in kind, not only in color."
-translation = "Cari gambar berdasarkan isinya, bukan hanya namanya, dan temukan hal yang sejenis, bukan hanya yang sewarna."
+source = "Search pictures by what they show and sounds by what they sound like, not only by their names, and find things that are alike in kind, not only in color."
+translation = "Cari gambar berdasarkan isinya dan suara berdasarkan bunyinya, bukan hanya namanya, dan temukan hal yang sejenis, bukan hanya yang sewarna."
 
 [messages.settings-page-store-files]
 source = "Store files"

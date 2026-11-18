@@ -392,6 +392,7 @@ server-job-relocate = Memindahkan berkas antarlokasi pustaka
 server-job-looks = Menentukan warna dan tampilan
 server-job-sounds = Mendengarkan suara
 server-job-embed = Mempelajari isi gambar
+server-job-hear = Mempelajari bunyi suara
 server-job-materials = Mencari material di { $pack }
 server-job-read-files = Membaca berkas { $pack }
 server-job-store-lookup = Mencari halaman toko
@@ -2046,8 +2047,8 @@ settings-page-tools = Alat
 settings-page-tools-blurb = Program luar yang dipakai Hoard untuk mengonversi dan membaca berkas.
 settings-page-ai = Penandaan AI
 settings-page-ai-blurb = Model AI menamai, mendeskripsikan, dan memberi tag paket baru, di samping aturan bawaan. Tag-nya ditandai sebagai saran.
-settings-page-search = Pencarian gambar
-settings-page-search-blurb = Cari gambar berdasarkan isinya, bukan hanya namanya, dan temukan hal yang sejenis, bukan hanya yang sewarna.
+settings-page-search = Pencarian gambar dan suara
+settings-page-search-blurb = Cari gambar berdasarkan isinya dan suara berdasarkan bunyinya, bukan hanya namanya, dan temukan hal yang sejenis, bukan hanya yang sewarna.
 settings-page-adding = Menambahkan paket
 settings-page-adding-blurb = Apa yang dilakukan Hoard dengan paket saat ditambahkan, selain membaca dan memberinya tag.
 settings-page-downloads = Unduhan
@@ -2145,6 +2146,20 @@ settings-clip-ready-all =
     }
 settings-clip-learning = Siap: mempelajari gambar, { $done } dari { $total } sejauh ini
 settings-clip-unavailable = Tidak dapat mengambil model: { $detail }. Mencoba lagi setiap jam.
+settings-clap-heading = Cari berdasarkan bunyi suara
+settings-clap-reset = Pencarian suara: kembali ke bawaan
+settings-clap-saved-on = Pencarian suara: aktif
+settings-clap-saved-off = Pencarian suara: mati
+settings-clap-what = Ketik apa yang Anda cari (“distant thunder”, “glassy UI blip”, “footsteps on gravel”) dan suara yang terdengar seperti itu muncul di samping nama yang mengandung kata-kata itu.
+settings-clap-toggle = Aktifkan pencarian suara
+settings-clap-hint = Memakai model CLAP dari LAION, dijalankan di prosesor server ini: tidak ada yang keluar dari server. Mengaktifkannya akan mengunduh model ({ $size } MB) dari Hugging Face, lalu mendengarkan bagian awal setiap suara di latar belakang dengan prioritas rendah. Butuh memori hingga sekitar 1 GB selagi bekerja atau saat seseorang mencari. Mematikannya akan menghapus model dan menyimpan apa yang sudah dipelajari, untuk lain kali.
+settings-clap-hint-desktop = Memakai model CLAP dari LAION, dijalankan di prosesor komputer ini: tidak ada yang keluar dari komputer. Mengaktifkannya akan mengunduh model ({ $size } MB) dari Hugging Face, lalu mendengarkan bagian awal setiap suara di latar belakang dengan prioritas rendah. Butuh memori hingga sekitar 1 GB selagi bekerja atau saat Anda mencari. Mematikannya akan menghapus model dan menyimpan apa yang sudah dipelajari, untuk lain kali.
+settings-clap-ready-empty = Siap. Suara dipelajari saat paket ditambahkan.
+settings-clap-ready-all =
+    { $count ->
+       *[other] Siap: mengenal semua { $count } suara
+    }
+settings-clap-learning = Siap: mempelajari suara, { $done } dari { $total } sejauh ini
 
 ## SettingsPage.vue: Penandaan AI
 

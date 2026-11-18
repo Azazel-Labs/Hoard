@@ -391,7 +391,7 @@ fn search_tools() -> Value {
                             "loud": { "type": "boolean" }
                         }
                     },
-                    "query": { "type": "string", "description": "Optional words the sounds must also have." },
+                    "query": { "type": "string", "description": "Optional words the sounds must also have. Given alone, with sound search on (an admin setting), it's also a description of the sound ('distant thunder roll', 'glassy UI blip'), matching sounds that sound like it whatever they're called." },
                     "tags": { "type": "array", "items": { "type": "string" }, "description": "All must match, e.g. ['sfx']." },
                     "pack_id": { "type": "string" },
                     "collection": { "type": "string", "description": "Only sounds in this collection (id or name)." },
@@ -924,11 +924,20 @@ async fn sounds_call(state: &AppState, name: &str, args: &Value, base: &str) -> 
             if shape.is_empty() && q.q.is_none() && q.tags.is_empty() {
                 return Err(ToolError::Failed("give `imitation` (a word with letters), `shape` or `query`".into()));
             }
-            let rank = if shape.is_empty() {
-                None
-            } else {
+            let rank = if !shape.is_empty() {
                 let scores = imitation::rank_shape(state, shape.clone()).await?;
-                Some(db::LookRank { scores, exclude: None, blend: false, by_file: true })
+                Some(db::LookRank { scores, exclude: None, blend: false, keys: db::Keys::Files })
+            } else if let Some(text) = q.q.as_deref() {
+                // Words alone: with sound search on, sounds that sound like them, beside names that have them.
+                let scores = crate::clap::search_text(state, text).await.unwrap_or_default();
+                (!scores.is_empty()).then_some(db::LookRank {
+                    scores,
+                    exclude: None,
+                    blend: true,
+                    keys: db::Keys::Files,
+                })
+            } else {
+                None
             };
             let page = db::call(&state.pool, move |c| db::search_ranked(c, &q, false, rank.as_ref())).await?;
             let mut out = json!({ "total": page.total, "returned": page.items.len(), "sounds": sounds(&page) });

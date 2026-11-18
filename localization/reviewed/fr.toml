@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "10f28906b4e30bd8144d107941fae25fa74dbd0adad636f8055c3f66c4be43e4"
+source = "31ff17dd465157b51caccbf9730b3a2b32749550e20e205f3a51f4da2ecf16f8"
 translation = "707089ce5f6ccea59af638ba8b3791160383452602af287d2ea5c47aeff1dd42"
 
 [messages.account-add]
@@ -7993,6 +7993,10 @@ translation = "Conversion de { $pack } avec Blender"
 source = "Learning what pictures show"
 translation = "Apprentissage du contenu des images"
 
+[messages.server-job-hear]
+source = "Learning what sounds sound like"
+translation = "Apprentissage de ce à quoi ressemblent les sons"
+
 [messages.server-job-ingest]
 source = "Ingesting { $pack }"
 translation = "Intégration de { $pack }"
@@ -8456,6 +8460,57 @@ translation = "Connecté en tant que { $email }"
 [messages.settings-chatgpt-usage]
 source = "Tagging requests count toward your ChatGPT plan’s usage. Manage usage shows what Hoard has used and lets you limit it. To disconnect Hoard from ChatGPT itself, go to Settings → Security and login → Sign in with ChatGPT on chatgpt.com."
 translation = "Les requêtes d’étiquetage sont décomptées de l’utilisation de votre abonnement ChatGPT. Gérer l’utilisation montre ce que Hoard a consommé et permet de le limiter. Pour déconnecter Hoard de ChatGPT lui-même, allez dans Paramètres → Sécurité et connexion → Se connecter avec ChatGPT sur chatgpt.com."
+
+[messages.settings-clap-heading]
+source = "Search by what sounds sound like"
+translation = "Chercher d’après ce à quoi ressemblent les sons"
+
+[messages.settings-clap-hint]
+source = "Uses LAION’s CLAP model, run on this server’s processor: nothing leaves it. Turning it on downloads the model ({ $size } MB) from Hugging Face, then listens to the start of every sound in the background at low priority. It takes up to about 1 GB of memory while it works or someone searches. Turning it off deletes the model and keeps what it learned, for next time."
+translation = "Utilise le modèle CLAP de LAION, exécuté sur le processeur de ce serveur : rien n’en sort. L’activer télécharge le modèle ({ $size } Mo) depuis Hugging Face, puis écoute le début de chaque son en arrière-plan, en basse priorité. Il occupe jusqu’à 1 Go de mémoire environ pendant qu’il travaille ou que quelqu’un cherche. Le désactiver supprime le modèle et garde ce qu’il a appris, pour la prochaine fois."
+
+[messages.settings-clap-hint-desktop]
+source = "Uses LAION’s CLAP model, run on this computer’s processor: nothing leaves it. Turning it on downloads the model ({ $size } MB) from Hugging Face, then listens to the start of every sound in the background at low priority. It takes up to about 1 GB of memory while it works or you search. Turning it off deletes the model and keeps what it learned, for next time."
+translation = "Utilise le modèle CLAP de LAION, exécuté sur le processeur de cet ordinateur : rien n’en sort. L’activer télécharge le modèle ({ $size } Mo) depuis Hugging Face, puis écoute le début de chaque son en arrière-plan, en basse priorité. Il occupe jusqu’à 1 Go de mémoire environ pendant qu’il travaille ou que vous cherchez. Le désactiver supprime le modèle et garde ce qu’il a appris, pour la prochaine fois."
+
+[messages.settings-clap-learning]
+source = "Ready: learning sounds, { $done } of { $total } so far"
+translation = "Prêt : apprentissage des sons, { $done } sur { $total } jusqu’ici"
+
+[messages.settings-clap-ready-all]
+source = """
+{ $count ->
+       *[other] Ready: knows all { $count } sounds
+    }"""
+translation = """
+{ $count ->
+        [one] Prêt : connaît { $count } son
+       *[other] Prêt : connaît les { $count } sons
+    }"""
+
+[messages.settings-clap-ready-empty]
+source = "Ready. Sounds are learned as packs are added."
+translation = "Prêt. Les sons sont appris à mesure que des packs sont ajoutés."
+
+[messages.settings-clap-reset]
+source = "Sound search: back to the default"
+translation = "Recherche de sons : retour à la valeur par défaut"
+
+[messages.settings-clap-saved-off]
+source = "Sound search: off"
+translation = "Recherche de sons : désactivée"
+
+[messages.settings-clap-saved-on]
+source = "Sound search: on"
+translation = "Recherche de sons : activée"
+
+[messages.settings-clap-toggle]
+source = "Turn on sound search"
+translation = "Activer la recherche de sons"
+
+[messages.settings-clap-what]
+source = "Type what you’re after (“distant thunder”, “glassy UI blip”, “footsteps on gravel”) and sounds that sound like it turn up beside names that have the words."
+translation = "Tapez ce que vous cherchez (« tonnerre lointain », « bip d’interface cristallin », « pas sur du gravier ») et les sons qui y ressemblent apparaissent à côté des noms qui contiennent ces mots."
 
 [messages.settings-clip-downloading]
 source = "Downloading the model… progress is in the activity indicator"
@@ -9125,12 +9180,12 @@ source = "How hard Hoard works, how thumbnails are made and kept, and the most i
 translation = "L’intensité de travail de Hoard, la façon dont les miniatures sont créées et conservées, et le maximum qu’il accepte."
 
 [messages.settings-page-search]
-source = "Image search"
-translation = "Recherche d’images"
+source = "Image and sound search"
+translation = "Recherche d’images et de sons"
 
 [messages.settings-page-search-blurb]
-source = "Search pictures by what they show, not only by their names, and find things that are alike in kind, not only in color."
-translation = "Cherchez des images d’après ce qu’elles montrent, pas seulement d’après leur nom, et trouvez des choses de même nature, pas seulement de même couleur."
+source = "Search pictures by what they show and sounds by what they sound like, not only by their names, and find things that are alike in kind, not only in color."
+translation = "Cherchez des images d’après ce qu’elles montrent et des sons d’après ce à quoi ils ressemblent, pas seulement d’après leur nom, et trouvez des choses de même nature, pas seulement de même couleur."
 
 [messages.settings-page-store-files]
 source = "Store files"

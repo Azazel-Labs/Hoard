@@ -392,6 +392,7 @@ server-job-relocate = Fájlok áthelyezése a tárolási helyek között
 server-job-looks = Színek és megjelenés elemzése
 server-job-sounds = Hangok meghallgatása
 server-job-embed = A képek tartalmának megtanulása
+server-job-hear = A hangok hangzásának megtanulása
 server-job-materials = Anyagok keresése: { $pack }
 server-job-read-files = Fájlok beolvasása: { $pack }
 server-job-store-lookup = Áruházi oldal keresése
@@ -2055,8 +2056,8 @@ settings-page-tools = Eszközök
 settings-page-tools-blurb = Külső programok, amelyekkel a Hoard fájlokat alakít át és olvas be.
 settings-page-ai = MI-címkézés
 settings-page-ai-blurb = Egy MI-modell elnevezi, leírja és felcímkézi az új csomagokat a beépített szabályokon felül. A címkéi javasoltként vannak megjelölve.
-settings-page-search = Képkeresés
-settings-page-search-blurb = Keressen a képek között aszerint, hogy mit ábrázolnak, ne csak a nevük szerint, és találjon fajtájukban hasonló dolgokat, ne csak színükben hasonlókat.
+settings-page-search = Kép- és hangkeresés
+settings-page-search-blurb = Keressen a képek között aszerint, hogy mit ábrázolnak, a hangok között pedig aszerint, hogyan szólnak, ne csak a nevük szerint, és találjon fajtájukban hasonló dolgokat, ne csak színükben hasonlókat.
 settings-page-adding = Csomagok hozzáadása
 settings-page-adding-blurb = Mit csinál a Hoard egy csomaggal hozzáadáskor, a beolvasásán és felcímkézésén kívül.
 settings-page-downloads = Letöltések
@@ -2154,6 +2155,20 @@ settings-clip-ready-all =
     }
 settings-clip-learning = Kész: képek tanulása, eddig { $done } / { $total }
 settings-clip-unavailable = Nem sikerült beszerezni a modellt: { $detail }. Óránként újrapróbálja.
+settings-clap-heading = Keresés a hangok hangzása szerint
+settings-clap-reset = Hangkeresés: vissza az alapértelmezéshez
+settings-clap-saved-on = Hangkeresés: bekapcsolva
+settings-clap-saved-off = Hangkeresés: kikapcsolva
+settings-clap-what = Írja be, amit keres (angolul, pl. „distant thunder”, „glassy UI blip”, „footsteps on gravel”), és az így szóló hangok megjelennek a szavakat tartalmazó nevek mellett.
+settings-clap-toggle = Hangkeresés bekapcsolása
+settings-clap-hint = A LAION CLAP modelljét használja, a szerver processzorán futtatva: semmi sem hagyja el a szervert. Bekapcsoláskor letölti a modellt ({ $size } MB) a Hugging Face-ről, majd a háttérben, alacsony prioritással meghallgatja minden hang elejét. Munka vagy keresés közben legfeljebb nagyjából 1 GB memóriát foglal. Kikapcsoláskor törli a modellt, de megtartja, amit megtanult, a következő alkalomra.
+settings-clap-hint-desktop = A LAION CLAP modelljét használja, ennek a számítógépnek a processzorán futtatva: semmi sem hagyja el a gépet. Bekapcsoláskor letölti a modellt ({ $size } MB) a Hugging Face-ről, majd a háttérben, alacsony prioritással meghallgatja minden hang elejét. Munka vagy keresés közben legfeljebb nagyjából 1 GB memóriát foglal. Kikapcsoláskor törli a modellt, de megtartja, amit megtanult, a következő alkalomra.
+settings-clap-ready-empty = Kész. A hangokat a csomagok hozzáadásakor tanulja meg.
+settings-clap-ready-all =
+    { $count ->
+       *[other] Kész: mind a { $count } hangot ismeri
+    }
+settings-clap-learning = Kész: hangok tanulása, eddig { $done } / { $total }
 
 ## SettingsPage.vue: MI-címkézés
 

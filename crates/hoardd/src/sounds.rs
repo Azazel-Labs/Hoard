@@ -85,7 +85,7 @@ pub(crate) fn measure(path: &std::path::Path, ext: &str) -> Option<Map<String, V
 }
 
 /// Up to [`MAX_SECS`] of a file, mixed to mono, and whether that's all of it.
-fn decode_mono(bytes: bytes::Bytes, ext: Option<&str>) -> Option<(Vec<f32>, u32, bool)> {
+pub(crate) fn decode_mono(bytes: bytes::Bytes, ext: Option<&str>) -> Option<(Vec<f32>, u32, bool)> {
     let mut mono = Vec::new();
     let mut rate = 0u32;
     let decoded = crate::audio::decode_each(Box::new(std::io::Cursor::new(bytes)), ext, |pcm, channels, r, _| {
@@ -437,7 +437,7 @@ fn mel_edges() -> Vec<f32> {
 
 /// An in-place radix-2 FFT of a fixed power-of-two size.
 #[derive(Debug)]
-struct Fft {
+pub(crate) struct Fft {
     n: usize,
     rev: Vec<usize>,
     cos: Vec<f32>,
@@ -445,7 +445,7 @@ struct Fft {
 }
 
 impl Fft {
-    fn new(n: usize) -> Self {
+    pub(crate) fn new(n: usize) -> Self {
         let bits = n.trailing_zeros();
         Self {
             n,
@@ -455,7 +455,7 @@ impl Fft {
         }
     }
 
-    fn run(&self, re: &mut [f32], im: &mut [f32]) {
+    pub(crate) fn run(&self, re: &mut [f32], im: &mut [f32]) {
         for (i, &j) in self.rev.iter().enumerate() {
             if j > i {
                 re.swap(i, j);

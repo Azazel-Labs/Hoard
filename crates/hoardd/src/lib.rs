@@ -14,6 +14,7 @@ mod blobs;
 mod bundle;
 mod chatgpt;
 mod check;
+mod clap;
 mod clip;
 mod config;
 mod context;
@@ -129,6 +130,8 @@ pub(crate) struct Inner {
     pub(crate) looks: looks::Index,
     /// Every thumbnail's CLIP embedding, for image search.
     pub(crate) clip: clip::Index,
+    /// Every sound's CLAP embedding, for searching sounds by what they sound like, in words.
+    pub(crate) clap: clip::Index,
     /// Every sound's acoustic descriptor, for "more like this" on sounds.
     pub(crate) sounds: sounds::Index,
 }
@@ -199,7 +202,8 @@ pub async fn run(cfg: Config) -> Result<()> {
         http,
         settings,
         looks: looks::Index::default(),
-        clip: clip::Index::default(),
+        clip: clip::Index::new(&clip::SPEC),
+        clap: clip::Index::new(&clap::SPEC),
         sounds: sounds::Index::default(),
     });
     tokio::spawn(signin::recheck_loop(Arc::clone(&state)));
@@ -210,6 +214,7 @@ pub async fn run(cfg: Config) -> Result<()> {
     }
     ffmpeg::start(&effective.ffmpeg, state.cfg.tools_dir());
     clip::start(&state, effective.clip);
+    clap::start(&state, effective.clap);
     convert::start_blender(&state, false);
     updates::start(effective.update_check && !state.cfg.desktop);
     updates::start_hook(&state);

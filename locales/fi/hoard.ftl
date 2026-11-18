@@ -400,6 +400,7 @@ server-job-relocate = Siirretään tiedostoja kirjaston sijaintien välillä
 server-job-looks = Selvitetään värejä ja ulkonäköä
 server-job-sounds = Kuunnellaan ääniä
 server-job-embed = Opetellaan, mitä kuvat esittävät
+server-job-hear = Opetellaan, miltä äänet kuulostavat
 server-job-materials = Etsitään materiaaleja: { $pack }
 server-job-read-files = Luetaan tiedostoja: { $pack }
 server-job-store-lookup = Haetaan kauppasivua
@@ -2307,8 +2308,8 @@ settings-page-tools = Työkalut
 settings-page-tools-blurb = Ulkoiset ohjelmat, joilla Hoard muuntaa ja lukee tiedostoja.
 settings-page-ai = Tekoälytunnisteet
 settings-page-ai-blurb = Tekoälymalli nimeää, kuvailee ja merkitsee uudet paketit tunnisteilla sisäänrakennettujen sääntöjen lisäksi. Sen tunnisteet merkitään ehdotetuiksi.
-settings-page-search = Kuvahaku
-settings-page-search-blurb = Hae kuvia sen mukaan, mitä ne esittävät, eikä vain nimen perusteella, ja löydä tyypiltään eikä vain väriltään samankaltaisia.
+settings-page-search = Kuva- ja äänihaku
+settings-page-search-blurb = Hae kuvia sen mukaan, mitä ne esittävät, ja ääniä sen mukaan, miltä ne kuulostavat, eikä vain nimen perusteella, ja löydä tyypiltään eikä vain väriltään samankaltaisia.
 settings-page-adding = Pakettien lisäys
 settings-page-adding-blurb = Mitä Hoard tekee paketille, kun se lisätään, lukemisen ja tunnisteiden lisäämisen lisäksi.
 settings-page-downloads = Lataukset
@@ -2407,6 +2408,21 @@ settings-clip-ready-all =
     }
 settings-clip-learning = Valmis: opetellaan kuvia, { $done }/{ $total } tähän mennessä
 settings-clip-unavailable = Mallia ei saatu: { $detail }. Yritetään uudelleen tunnin välein.
+settings-clap-heading = Hae ääniä sen mukaan, miltä ne kuulostavat
+settings-clap-reset = Äänihaku: palauta oletus
+settings-clap-saved-on = Äänihaku: päällä
+settings-clap-saved-off = Äänihaku: pois
+settings-clap-what = Kirjoita, mitä etsit (”distant thunder”, ”glassy UI blip”, ”footsteps on gravel”), niin siltä kuulostavat äänet näkyvät sanat sisältävien nimien rinnalla.
+settings-clap-toggle = Ota äänihaku käyttöön
+settings-clap-hint = Käyttää LAIONin CLAP-mallia, jota ajetaan tämän palvelimen suorittimella: mitään ei lähde palvelimelta. Käyttöönotto lataa mallin ({ $size } Mt) Hugging Facesta ja kuuntelee sitten jokaisen äänen alun taustalla matalalla prioriteetilla. Se vie enintään noin 1 Gt muistia työskennellessään tai kun joku hakee. Käytöstä poisto poistaa mallin mutta säilyttää opitun seuraavaa kertaa varten.
+settings-clap-hint-desktop = Käyttää LAIONin CLAP-mallia, jota ajetaan tämän tietokoneen suorittimella: mitään ei lähde tietokoneelta. Käyttöönotto lataa mallin ({ $size } Mt) Hugging Facesta ja kuuntelee sitten jokaisen äänen alun taustalla matalalla prioriteetilla. Se vie enintään noin 1 Gt muistia työskennellessään tai kun haet. Käytöstä poisto poistaa mallin mutta säilyttää opitun seuraavaa kertaa varten.
+settings-clap-ready-empty = Valmis. Äänet opitaan, kun paketteja lisätään.
+settings-clap-ready-all =
+    { $count ->
+        [one] Valmis: tuntee { $count } äänen
+       *[other] Valmis: tuntee kaikki { $count } ääntä
+    }
+settings-clap-learning = Valmis: opetellaan ääniä, { $done }/{ $total } tähän mennessä
 
 ## Asetukset: Tekoälytunnisteet
 

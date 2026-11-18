@@ -159,7 +159,7 @@ fn stereo_or_mono(pcm: &[f32], channels: usize) -> (Vec<f32>, usize) {
 }
 
 /// Windowed-sinc resampling of interleaved audio, good enough for delivery formats.
-fn resample(pcm: &[f32], channels: usize, from: u32, to: u32) -> Vec<f32> {
+pub(crate) fn resample(pcm: &[f32], channels: usize, from: u32, to: u32) -> Vec<f32> {
     if from == to {
         return pcm.to_vec();
     }

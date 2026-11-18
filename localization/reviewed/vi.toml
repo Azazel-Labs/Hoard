@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "10f28906b4e30bd8144d107941fae25fa74dbd0adad636f8055c3f66c4be43e4"
+source = "31ff17dd465157b51caccbf9730b3a2b32749550e20e205f3a51f4da2ecf16f8"
 translation = "42d6d2350a51c56e55a07a75988a6748d9e232912ffffb903defbf54bfd56e2e"
 
 [messages.account-add]
@@ -7791,6 +7791,10 @@ translation = "Đang chuyển đổi { $pack } bằng Blender"
 source = "Learning what pictures show"
 translation = "Đang tìm hiểu nội dung hình ảnh"
 
+[messages.server-job-hear]
+source = "Learning what sounds sound like"
+translation = "Đang tìm hiểu âm thanh nghe ra sao"
+
 [messages.server-job-ingest]
 source = "Ingesting { $pack }"
 translation = "Đang nhập { $pack }"
@@ -8250,6 +8254,56 @@ translation = "Đã đăng nhập dưới tên { $email }"
 [messages.settings-chatgpt-usage]
 source = "Tagging requests count toward your ChatGPT plan’s usage. Manage usage shows what Hoard has used and lets you limit it. To disconnect Hoard from ChatGPT itself, go to Settings → Security and login → Sign in with ChatGPT on chatgpt.com."
 translation = "Các yêu cầu gắn thẻ được tính vào mức sử dụng của gói ChatGPT. Quản lý mức sử dụng cho biết Hoard đã dùng bao nhiêu và cho phép bạn giới hạn. Để ngắt kết nối Hoard khỏi chính ChatGPT, hãy vào Settings → Security and login → Sign in with ChatGPT trên chatgpt.com."
+
+[messages.settings-clap-heading]
+source = "Search by what sounds sound like"
+translation = "Tìm theo âm thanh nghe ra sao"
+
+[messages.settings-clap-hint]
+source = "Uses LAION’s CLAP model, run on this server’s processor: nothing leaves it. Turning it on downloads the model ({ $size } MB) from Hugging Face, then listens to the start of every sound in the background at low priority. It takes up to about 1 GB of memory while it works or someone searches. Turning it off deletes the model and keeps what it learned, for next time."
+translation = "Dùng mô hình CLAP của LAION, chạy trên bộ xử lý của máy chủ này: không có gì rời khỏi máy chủ. Khi bật, mô hình ({ $size } MB) sẽ được tải từ Hugging Face, rồi nghe phần đầu của mọi âm thanh trong nền với mức ưu tiên thấp. Nó dùng tối đa khoảng 1 GB bộ nhớ khi đang làm việc hoặc khi có người tìm kiếm. Khi tắt, mô hình bị xóa nhưng những gì nó đã học được giữ lại cho lần sau."
+
+[messages.settings-clap-hint-desktop]
+source = "Uses LAION’s CLAP model, run on this computer’s processor: nothing leaves it. Turning it on downloads the model ({ $size } MB) from Hugging Face, then listens to the start of every sound in the background at low priority. It takes up to about 1 GB of memory while it works or you search. Turning it off deletes the model and keeps what it learned, for next time."
+translation = "Dùng mô hình CLAP của LAION, chạy trên bộ xử lý của máy tính này: không có gì rời khỏi máy. Khi bật, mô hình ({ $size } MB) sẽ được tải từ Hugging Face, rồi nghe phần đầu của mọi âm thanh trong nền với mức ưu tiên thấp. Nó dùng tối đa khoảng 1 GB bộ nhớ khi đang làm việc hoặc khi bạn tìm kiếm. Khi tắt, mô hình bị xóa nhưng những gì nó đã học được giữ lại cho lần sau."
+
+[messages.settings-clap-learning]
+source = "Ready: learning sounds, { $done } of { $total } so far"
+translation = "Sẵn sàng: đang học âm thanh, đến giờ được { $done } / { $total }"
+
+[messages.settings-clap-ready-all]
+source = """
+{ $count ->
+       *[other] Ready: knows all { $count } sounds
+    }"""
+translation = """
+{ $count ->
+       *[other] Sẵn sàng: đã biết cả { $count } âm thanh
+    }"""
+
+[messages.settings-clap-ready-empty]
+source = "Ready. Sounds are learned as packs are added."
+translation = "Sẵn sàng. Âm thanh sẽ được học khi gói được thêm vào."
+
+[messages.settings-clap-reset]
+source = "Sound search: back to the default"
+translation = "Tìm kiếm âm thanh: về mặc định"
+
+[messages.settings-clap-saved-off]
+source = "Sound search: off"
+translation = "Tìm kiếm âm thanh: tắt"
+
+[messages.settings-clap-saved-on]
+source = "Sound search: on"
+translation = "Tìm kiếm âm thanh: bật"
+
+[messages.settings-clap-toggle]
+source = "Turn on sound search"
+translation = "Bật tìm kiếm âm thanh"
+
+[messages.settings-clap-what]
+source = "Type what you’re after (“distant thunder”, “glassy UI blip”, “footsteps on gravel”) and sounds that sound like it turn up beside names that have the words."
+translation = "Nhập thứ bạn đang tìm (“distant thunder”, “glassy UI blip”, “footsteps on gravel”) và những âm thanh nghe giống vậy sẽ hiện ra cạnh những tên có các từ đó."
 
 [messages.settings-clip-downloading]
 source = "Downloading the model… progress is in the activity indicator"
@@ -8906,12 +8960,12 @@ source = "How hard Hoard works, how thumbnails are made and kept, and the most i
 translation = "Hoard làm việc nặng đến đâu, ảnh thu nhỏ được tạo và lưu thế nào, và mức tối đa nó nhận vào."
 
 [messages.settings-page-search]
-source = "Image search"
-translation = "Tìm kiếm hình ảnh"
+source = "Image and sound search"
+translation = "Tìm kiếm hình ảnh và âm thanh"
 
 [messages.settings-page-search-blurb]
-source = "Search pictures by what they show, not only by their names, and find things that are alike in kind, not only in color."
-translation = "Tìm ảnh theo nội dung trong ảnh, không chỉ theo tên, và tìm những thứ giống nhau về loại, không chỉ về màu."
+source = "Search pictures by what they show and sounds by what they sound like, not only by their names, and find things that are alike in kind, not only in color."
+translation = "Tìm ảnh theo nội dung trong ảnh và tìm âm thanh theo cách chúng nghe ra sao, không chỉ theo tên, và tìm những thứ giống nhau về loại, không chỉ về màu."
 
 [messages.settings-page-store-files]
 source = "Store files"

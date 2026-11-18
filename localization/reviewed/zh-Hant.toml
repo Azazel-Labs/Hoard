@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "10f28906b4e30bd8144d107941fae25fa74dbd0adad636f8055c3f66c4be43e4"
+source = "31ff17dd465157b51caccbf9730b3a2b32749550e20e205f3a51f4da2ecf16f8"
 translation = "7d4815ead7ae4f48f80531d797b527d64fdb08460c91b5ac34cf8cada118334a"
 
 [messages.account-add]
@@ -7797,6 +7797,10 @@ translation = "正在用 Blender 轉換 { $pack }"
 source = "Learning what pictures show"
 translation = "正在學習圖片的內容"
 
+[messages.server-job-hear]
+source = "Learning what sounds sound like"
+translation = "正在學習音效聽起來像什麼"
+
 [messages.server-job-ingest]
 source = "Ingesting { $pack }"
 translation = "正在匯入 { $pack }"
@@ -8256,6 +8260,56 @@ translation = "已以 { $email } 登入"
 [messages.settings-chatgpt-usage]
 source = "Tagging requests count toward your ChatGPT plan’s usage. Manage usage shows what Hoard has used and lets you limit it. To disconnect Hoard from ChatGPT itself, go to Settings → Security and login → Sign in with ChatGPT on chatgpt.com."
 translation = "標記請求會計入你的 ChatGPT 方案用量。「管理用量」會顯示 Hoard 已使用的量，並讓你設定上限。若要從 ChatGPT 本身中斷 Hoard 的連線，請到 chatgpt.com 的「設定 → 安全性與登入 → 使用 ChatGPT 登入」。"
+
+[messages.settings-clap-heading]
+source = "Search by what sounds sound like"
+translation = "依音效聽起來像什麼搜尋"
+
+[messages.settings-clap-hint]
+source = "Uses LAION’s CLAP model, run on this server’s processor: nothing leaves it. Turning it on downloads the model ({ $size } MB) from Hugging Face, then listens to the start of every sound in the background at low priority. It takes up to about 1 GB of memory while it works or someone searches. Turning it off deletes the model and keeps what it learned, for next time."
+translation = "使用 LAION 的 CLAP 模型，在這台伺服器的處理器上執行：任何資料都不會離開伺服器。開啟後會從 Hugging Face 下載模型（{ $size } MB），然後以低優先順序在背景聆聽每個音效的開頭。在它工作或有人搜尋時，最多會使用約 1 GB 的記憶體。關閉後會刪除模型，但保留它學到的內容，供下次使用。"
+
+[messages.settings-clap-hint-desktop]
+source = "Uses LAION’s CLAP model, run on this computer’s processor: nothing leaves it. Turning it on downloads the model ({ $size } MB) from Hugging Face, then listens to the start of every sound in the background at low priority. It takes up to about 1 GB of memory while it works or you search. Turning it off deletes the model and keeps what it learned, for next time."
+translation = "使用 LAION 的 CLAP 模型，在這台電腦的處理器上執行：任何資料都不會離開這台電腦。開啟後會從 Hugging Face 下載模型（{ $size } MB），然後以低優先順序在背景聆聽每個音效的開頭。在它工作或你搜尋時，最多會使用約 1 GB 的記憶體。關閉後會刪除模型，但保留它學到的內容，供下次使用。"
+
+[messages.settings-clap-learning]
+source = "Ready: learning sounds, { $done } of { $total } so far"
+translation = "就緒：正在學習音效，目前已完成 { $done }／{ $total }"
+
+[messages.settings-clap-ready-all]
+source = """
+{ $count ->
+       *[other] Ready: knows all { $count } sounds
+    }"""
+translation = """
+{ $count ->
+       *[other] 就緒：已認識全部 { $count } 個音效
+    }"""
+
+[messages.settings-clap-ready-empty]
+source = "Ready. Sounds are learned as packs are added."
+translation = "就緒。新增素材包時會學習其中的音效。"
+
+[messages.settings-clap-reset]
+source = "Sound search: back to the default"
+translation = "音效搜尋：恢復預設值"
+
+[messages.settings-clap-saved-off]
+source = "Sound search: off"
+translation = "音效搜尋：關閉"
+
+[messages.settings-clap-saved-on]
+source = "Sound search: on"
+translation = "音效搜尋：開啟"
+
+[messages.settings-clap-toggle]
+source = "Turn on sound search"
+translation = "開啟音效搜尋"
+
+[messages.settings-clap-what]
+source = "Type what you’re after (“distant thunder”, “glassy UI blip”, “footsteps on gravel”) and sounds that sound like it turn up beside names that have the words."
+translation = "輸入你要找的東西（「distant thunder」、「glassy UI blip」、「footsteps on gravel」），聽起來像這樣的音效就會和名稱含有這些字詞的項目一起出現。"
 
 [messages.settings-clip-downloading]
 source = "Downloading the model… progress is in the activity indicator"
@@ -8912,12 +8966,12 @@ source = "How hard Hoard works, how thumbnails are made and kept, and the most i
 translation = "Hoard 的工作量、縮圖如何製作與保存，以及它可接收的上限。"
 
 [messages.settings-page-search]
-source = "Image search"
-translation = "圖片搜尋"
+source = "Image and sound search"
+translation = "圖片與音效搜尋"
 
 [messages.settings-page-search-blurb]
-source = "Search pictures by what they show, not only by their names, and find things that are alike in kind, not only in color."
-translation = "依圖片顯示的內容搜尋，而不只是依名稱，並找出種類相似、而不只是顏色相似的項目。"
+source = "Search pictures by what they show and sounds by what they sound like, not only by their names, and find things that are alike in kind, not only in color."
+translation = "依圖片顯示的內容搜尋圖片、依聽起來像什麼搜尋音效，而不只是依名稱，並找出種類相似、而不只是顏色相似的項目。"
 
 [messages.settings-page-store-files]
 source = "Store files"

@@ -392,6 +392,7 @@ server-job-relocate = Déplacement de fichiers entre emplacements de la biblioth
 server-job-looks = Analyse des couleurs et de l’aspect
 server-job-sounds = Écoute des sons
 server-job-embed = Apprentissage du contenu des images
+server-job-hear = Apprentissage de ce à quoi ressemblent les sons
 server-job-materials = Recherche des matériaux de { $pack }
 server-job-read-files = Lecture des fichiers de { $pack }
 server-job-store-lookup = Recherche d’une page de boutique
@@ -2264,8 +2265,8 @@ settings-page-tools = Outils
 settings-page-tools-blurb = Les programmes externes que Hoard utilise pour convertir et lire les fichiers.
 settings-page-ai = Étiquetage par IA
 settings-page-ai-blurb = Un modèle d’IA nomme, décrit et étiquette les nouveaux packs, en plus des règles intégrées. Ses étiquettes sont marquées comme suggérées.
-settings-page-search = Recherche d’images
-settings-page-search-blurb = Cherchez des images d’après ce qu’elles montrent, pas seulement d’après leur nom, et trouvez des choses de même nature, pas seulement de même couleur.
+settings-page-search = Recherche d’images et de sons
+settings-page-search-blurb = Cherchez des images d’après ce qu’elles montrent et des sons d’après ce à quoi ils ressemblent, pas seulement d’après leur nom, et trouvez des choses de même nature, pas seulement de même couleur.
 settings-page-adding = Ajout de packs
 settings-page-adding-blurb = Ce que Hoard fait d’un pack quand il est ajouté, en plus de le lire et de l’étiqueter.
 settings-page-downloads = Téléchargements
@@ -2364,6 +2365,21 @@ settings-clip-ready-all =
     }
 settings-clip-learning = Prêt : apprentissage des images, { $done } sur { $total } jusqu’ici
 settings-clip-unavailable = Impossible d’obtenir le modèle : { $detail }. Nouvel essai toutes les heures.
+settings-clap-heading = Chercher d’après ce à quoi ressemblent les sons
+settings-clap-reset = Recherche de sons : retour à la valeur par défaut
+settings-clap-saved-on = Recherche de sons : activée
+settings-clap-saved-off = Recherche de sons : désactivée
+settings-clap-what = Tapez ce que vous cherchez (« tonnerre lointain », « bip d’interface cristallin », « pas sur du gravier ») et les sons qui y ressemblent apparaissent à côté des noms qui contiennent ces mots.
+settings-clap-toggle = Activer la recherche de sons
+settings-clap-hint = Utilise le modèle CLAP de LAION, exécuté sur le processeur de ce serveur : rien n’en sort. L’activer télécharge le modèle ({ $size } Mo) depuis Hugging Face, puis écoute le début de chaque son en arrière-plan, en basse priorité. Il occupe jusqu’à 1 Go de mémoire environ pendant qu’il travaille ou que quelqu’un cherche. Le désactiver supprime le modèle et garde ce qu’il a appris, pour la prochaine fois.
+settings-clap-hint-desktop = Utilise le modèle CLAP de LAION, exécuté sur le processeur de cet ordinateur : rien n’en sort. L’activer télécharge le modèle ({ $size } Mo) depuis Hugging Face, puis écoute le début de chaque son en arrière-plan, en basse priorité. Il occupe jusqu’à 1 Go de mémoire environ pendant qu’il travaille ou que vous cherchez. Le désactiver supprime le modèle et garde ce qu’il a appris, pour la prochaine fois.
+settings-clap-ready-empty = Prêt. Les sons sont appris à mesure que des packs sont ajoutés.
+settings-clap-ready-all =
+    { $count ->
+        [one] Prêt : connaît { $count } son
+       *[other] Prêt : connaît les { $count } sons
+    }
+settings-clap-learning = Prêt : apprentissage des sons, { $done } sur { $total } jusqu’ici
 
 ## SettingsPage.vue : Étiquetage par IA
 

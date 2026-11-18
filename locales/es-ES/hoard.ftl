@@ -400,6 +400,7 @@ server-job-relocate = Moviendo archivos entre ubicaciones de la biblioteca
 server-job-looks = Analizando colores y aspecto
 server-job-sounds = Escuchando sonidos
 server-job-embed = Aprendiendo qué muestran las imágenes
+server-job-hear = Aprendiendo cómo suenan los sonidos
 server-job-materials = Buscando materiales en { $pack }
 server-job-read-files = Leyendo los archivos de { $pack }
 server-job-store-lookup = Consultando una página de tienda
@@ -2273,8 +2274,8 @@ settings-page-tools = Herramientas
 settings-page-tools-blurb = Programas externos que Hoard usa para convertir y leer archivos.
 settings-page-ai = Etiquetado con IA
 settings-page-ai-blurb = Un modelo de IA pone nombre, describe y etiqueta los paquetes nuevos, además de las reglas integradas. Sus etiquetas se marcan como sugeridas.
-settings-page-search = Búsqueda de imágenes
-settings-page-search-blurb = Busca imágenes por lo que muestran, no solo por su nombre, y encuentra cosas parecidas en su naturaleza, no solo en su color.
+settings-page-search = Búsqueda de imágenes y sonidos
+settings-page-search-blurb = Busca imágenes por lo que muestran y sonidos por cómo suenan, no solo por su nombre, y encuentra cosas parecidas en su naturaleza, no solo en su color.
 settings-page-adding = Añadir paquetes
 settings-page-adding-blurb = Lo que hace Hoard con un paquete cuando se añade, además de leerlo y etiquetarlo.
 settings-page-downloads = Descargas
@@ -2373,6 +2374,21 @@ settings-clip-ready-all =
     }
 settings-clip-learning = Lista: aprendiendo imágenes, { $done } de { $total } hasta ahora
 settings-clip-unavailable = No se ha podido obtener el modelo: { $detail }. Se vuelve a intentar cada hora.
+settings-clap-heading = Buscar por cómo suenan los sonidos
+settings-clap-reset = Búsqueda de sonidos: se ha vuelto al valor predeterminado
+settings-clap-saved-on = Búsqueda de sonidos: activada
+settings-clap-saved-off = Búsqueda de sonidos: desactivada
+settings-clap-what = Escribe lo que buscas («distant thunder», «glassy UI blip», «footsteps on gravel») y los sonidos que suenan así aparecen junto a los nombres que tienen esas palabras.
+settings-clap-toggle = Activar la búsqueda de sonidos
+settings-clap-hint = Usa el modelo CLAP de LAION, ejecutado en el procesador de este servidor: no sale nada de él. Al activarla se descarga el modelo ({ $size } MB) de Hugging Face y luego escucha el principio de cada sonido en segundo plano con baja prioridad. Ocupa hasta cerca de 1 GB de memoria mientras trabaja o alguien busca. Al desactivarla se elimina el modelo y se conserva lo aprendido para la próxima vez.
+settings-clap-hint-desktop = Usa el modelo CLAP de LAION, ejecutado en el procesador de este ordenador: no sale nada de él. Al activarla se descarga el modelo ({ $size } MB) de Hugging Face y luego escucha el principio de cada sonido en segundo plano con baja prioridad. Ocupa hasta cerca de 1 GB de memoria mientras trabaja o mientras buscas. Al desactivarla se elimina el modelo y se conserva lo aprendido para la próxima vez.
+settings-clap-ready-empty = Lista. Los sonidos se aprenden a medida que se añaden paquetes.
+settings-clap-ready-all =
+    { $count ->
+        [one] Lista: conoce { $count } sonido
+       *[other] Lista: conoce los { $count } sonidos
+    }
+settings-clap-learning = Lista: aprendiendo sonidos, { $done } de { $total } hasta ahora
 
 ## SettingsPage.vue: Etiquetado con IA
 

@@ -17,7 +17,7 @@ import {
   type SettingsPatch,
   type Stats,
   type ThumbQuality,
-  type ImageSearchSetting,
+  type SearchModelSetting,
   type ToolSetting,
   type UnrealConvert,
   humanBytes,
@@ -673,6 +673,7 @@ async function save(patch: SettingsPatch, done?: string) {
 }
 
 const toggleClip = (on: boolean) => save({ clip: on }, on ? t('settings-clip-saved-on') : t('settings-clip-saved-off'))
+const toggleClap = (on: boolean) => save({ clap: on }, on ? t('settings-clap-saved-on') : t('settings-clap-saved-off'))
 
 function pick(k: ToolKey, m: Mode) {
   chosen[k] = m
@@ -729,14 +730,14 @@ let timer: number | undefined
 function schedulePoll() {
   window.clearTimeout(timer)
   const v = s.value
-  const busyTool = v && [v.blender, v.ffmpeg, v.clip].some((t) => t.state === 'looking' || t.state === 'downloading')
-  const learning = v?.clip.state === 'ready' && v.clip.done < v.clip.total
+  const busyTool = v && [v.blender, v.ffmpeg, v.clip, v.clap].some((t) => t.state === 'looking' || t.state === 'downloading')
+  const learning = !!v && [v.clip, v.clap].some((m) => m.state === 'ready' && m.done < m.total)
   if (busyTool || learning) {
     timer = window.setTimeout(async () => {
       try {
         const next = await api.settings()
         // Don't clobber a path or AI setting someone is typing.
-        if (s.value) s.value = { ...s.value, blender: next.blender, ffmpeg: next.ffmpeg, clip: next.clip }
+        if (s.value) s.value = { ...s.value, blender: next.blender, ffmpeg: next.ffmpeg, clip: next.clip, clap: next.clap }
       } catch {
         // Try again on the next tick.
       }
@@ -761,15 +762,19 @@ const TOOLS: { key: ToolKey; title: string; readonly what: string; readonly down
   },
 ]
 
-function clipStatus(c: ImageSearchSetting): string {
+function modelStatus(c: SearchModelSetting, which: 'clip' | 'clap'): string {
   switch (c.state) {
     case 'off': return t('settings-status-off')
     case 'looking': return t('settings-clip-looking')
     case 'downloading': return t('settings-clip-downloading')
     case 'ready':
-      if (!c.total) return t('settings-clip-ready-empty')
-      if (c.done >= c.total) return t('settings-clip-ready-all', { count: c.total })
-      return t('settings-clip-learning', { done: c.done, total: c.total })
+      if (!c.total) return which === 'clip' ? t('settings-clip-ready-empty') : t('settings-clap-ready-empty')
+      if (c.done >= c.total) {
+        const count = c.total
+        return which === 'clip' ? t('settings-clip-ready-all', { count }) : t('settings-clap-ready-all', { count })
+      }
+      const { done, total } = c
+      return which === 'clip' ? t('settings-clip-learning', { done, total }) : t('settings-clap-learning', { done, total })
     case 'unavailable': return t('settings-clip-unavailable', { detail: c.detail })
   }
 }
@@ -1017,9 +1022,34 @@ onBeforeUnmount(() => {
             <p class="hint">{{ t('settings-clip-hint', { size: Math.round(s.clip.download_bytes / 1e6) }) }}</p>
             <p class="status" :data-state="s.clip.state" role="status" data-testid="clip-status">
               <span class="dot" aria-hidden="true" />
-              <span class="text">{{ clipStatus(s.clip) }}</span>
+              <span class="text">{{ modelStatus(s.clip, 'clip') }}</span>
             </p>
             <progress v-if="s.clip.state === 'ready' && s.clip.total && s.clip.done < s.clip.total" class="learn" :value="s.clip.done" :max="s.clip.total" />
+            <div class="sh second">
+              <h3>{{ t('settings-clap-heading') }}</h3>
+              <ResetButton v-if="s.clap.saved" :to="onOff(s.clap.default)" :disabled="busy" @reset="save({ clap: null }, t('settings-clap-reset'))" />
+            </div>
+            <p class="what">{{ t('settings-clap-what') }}</p>
+            <div class="switches">
+              <div class="opt-row">
+                <label class="check">
+                  <input
+                    type="checkbox"
+                    data-testid="clap-toggle"
+                    :checked="s.clap.value"
+                    :disabled="busy"
+                    @change="toggleClap(($event.target as HTMLInputElement).checked)"
+                  />
+                  {{ t('settings-clap-toggle') }}
+                </label>
+              </div>
+            </div>
+            <p class="hint">{{ t('settings-clap-hint', { size: Math.round(s.clap.download_bytes / 1e6) }) }}</p>
+            <p class="status" :data-state="s.clap.state" role="status" data-testid="clap-status">
+              <span class="dot" aria-hidden="true" />
+              <span class="text">{{ modelStatus(s.clap, 'clap') }}</span>
+            </p>
+            <progress v-if="s.clap.state === 'ready' && s.clap.total && s.clap.done < s.clap.total" class="learn" :value="s.clap.done" :max="s.clap.total" />
           </section>
 
           <section v-else-if="current === 'ai'">
@@ -1652,6 +1682,8 @@ onBeforeUnmount(() => {
 
 .body { display: grid; gap: 1rem; }
 .sh { display: flex; align-items: center; gap: 0.4rem; min-height: 1.75rem; margin-bottom: 0.2rem; }
+/* A second setting in the same section (sound search under image search). */
+.sh.second { margin-top: 1.6rem; }
 .hint.preview .btn { margin-left: 0.4rem; }
 .what, .hint { margin: 0 0 0.55rem; font-size: var(--step--1); color: var(--muted); line-height: 1.45; }
 section > .what { margin-bottom: 0.9rem; max-width: 40rem; }

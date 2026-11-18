@@ -824,7 +824,8 @@ export interface Settings {
     soundfont: OptionSetting<string>
   }
   max_workers: number
-  clip: ImageSearchSetting
+  clip: SearchModelSetting
+  clap: SearchModelSetting
   /** Called once a newer release is out and the server is idle. The Authorization header is never sent back. */
   update_hook: { url: string; has_auth: boolean }
   s3: S3Setting
@@ -890,8 +891,8 @@ export interface UpdateHookCall {
   result: string
 }
 
-/** Image search (CLIP): its switch, its model, and how many pictures it has learned. */
-export interface ImageSearchSetting {
+/** Image search (CLIP) or sound search (CLAP): its switch, its model, and how many pictures or sounds it has learned. */
+export interface SearchModelSetting {
   value: boolean
   default: boolean
   saved: boolean
@@ -899,7 +900,7 @@ export interface ImageSearchSetting {
   /** Why, when unavailable. */
   detail: string
   download_bytes: number
-  /** Pictures with an embedding, of all that could have one. */
+  /** Pictures or sounds with an embedding, of all that could have one. */
   done: number
   total: number
 }
@@ -947,6 +948,7 @@ export interface SettingsPatch {
   public_url?: string | null
   soundfont?: string | null
   clip?: boolean | null
+  clap?: boolean | null
   texture_names?: TextureNames | null
   conversion_rules?: ConversionRules | null
   s3_endpoint?: string | null

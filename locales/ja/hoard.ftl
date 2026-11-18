@@ -392,6 +392,7 @@ server-job-relocate = ライブラリの保存場所の間でファイルを移�
 server-job-looks = 色と見た目を分析中
 server-job-sounds = サウンドを聴いて分析中
 server-job-embed = 画像の内容を学習中
+server-job-hear = サウンドの聞こえ方を学習中
 server-job-materials = { $pack } のマテリアルを検出中
 server-job-read-files = { $pack } のファイルを読み取り中
 server-job-store-lookup = ストアページを検索中
@@ -2042,8 +2043,8 @@ settings-page-tools = ツール
 settings-page-tools-blurb = Hoard がファイルの変換と読み取りに使う外部プログラムです。
 settings-page-ai = AI タグ付け
 settings-page-ai-blurb = 組み込みのルールに加えて、AI モデルが新しいパックに名前、説明、タグを付けます。そのタグは提案として示されます。
-settings-page-search = 画像検索
-settings-page-search-blurb = 画像を名前だけでなく写っている内容で検索し、色だけでなく種類の似たものを見つけます。
+settings-page-search = 画像とサウンドの検索
+settings-page-search-blurb = 画像を名前だけでなく写っている内容で、サウンドを聞こえ方で検索し、色だけでなく種類の似たものを見つけます。
 settings-page-adding = パックの追加
 settings-page-adding-blurb = パックが追加されたとき、読み取りとタグ付けのほかに Hoard が行うことです。
 settings-page-downloads = ダウンロード
@@ -2141,6 +2142,20 @@ settings-clip-ready-all =
     }
 settings-clip-learning = 準備完了: 画像を学習中です（{ $total } 枚中 { $done } 枚）
 settings-clip-unavailable = モデルを取得できませんでした: { $detail }。1 時間ごとに再試行します。
+settings-clap-heading = 聞こえ方でサウンドを検索
+settings-clap-reset = サウンド検索: 既定値に戻す
+settings-clap-saved-on = サウンド検索: オン
+settings-clap-saved-off = サウンド検索: オフ
+settings-clap-what = 探しているもの（「distant thunder」「glassy UI blip」「footsteps on gravel」など）を入力すると、その語句を含む名前のものと並んで、そのように聞こえるサウンドが表示されます。
+settings-clap-toggle = サウンド検索をオンにする
+settings-clap-hint = LAION の CLAP モデルをこのサーバーのプロセッサーで実行するので、外部には何も送られません。オンにすると Hugging Face からモデル（{ $size } MB）をダウンロードし、すべてのサウンドの冒頭をバックグラウンドで低い優先度で聴き取ります。学習中や検索中は最大で約 1 GB のメモリを使います。オフにするとモデルは削除されますが、学習した内容は次回のために残ります。
+settings-clap-hint-desktop = LAION の CLAP モデルをこのコンピューターのプロセッサーで実行するので、外部には何も送られません。オンにすると Hugging Face からモデル（{ $size } MB）をダウンロードし、すべてのサウンドの冒頭をバックグラウンドで低い優先度で聴き取ります。学習中や検索中は最大で約 1 GB のメモリを使います。オフにするとモデルは削除されますが、学習した内容は次回のために残ります。
+settings-clap-ready-empty = 準備完了。サウンドはパックの追加に合わせて学習されます。
+settings-clap-ready-all =
+    { $count ->
+       *[other] 準備完了: { $count } 件のサウンドをすべて学習済みです
+    }
+settings-clap-learning = 準備完了: サウンドを学習中です（{ $total } 件中 { $done } 件）
 
 ## SettingsPage.vue: AI タグ付け
 

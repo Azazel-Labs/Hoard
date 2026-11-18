@@ -392,6 +392,7 @@ server-job-relocate = Skuif lêers tussen biblioteekliggings
 server-job-looks = Werk kleure en voorkoms uit
 server-job-sounds = Luister na klanke
 server-job-embed = Leer wat prente wys
+server-job-hear = Leer hoe klanke klink
 server-job-materials = Soek materiale in { $pack }
 server-job-read-files = Lees die lêers van { $pack }
 server-job-store-lookup = Soek 'n winkelbladsy op
@@ -2221,8 +2222,8 @@ settings-page-tools = Gereedskap
 settings-page-tools-blurb = Eksterne programme wat Hoard gebruik om lêers om te skakel en te lees.
 settings-page-ai = KI-etikettering
 settings-page-ai-blurb = 'n KI-model benoem, beskryf en etiketteer nuwe pakke, bo en behalwe die ingeboude reëls. Sy etikette word as voorgestel gemerk.
-settings-page-search = Beeldsoektog
-settings-page-search-blurb = Soek prente volgens wat hulle wys, nie net volgens hul name nie, en vind dinge wat in soort eenders is, nie net in kleur nie.
+settings-page-search = Beeld- en klanksoektog
+settings-page-search-blurb = Soek prente volgens wat hulle wys en klanke volgens hoe hulle klink, nie net volgens hul name nie, en vind dinge wat in soort eenders is, nie net in kleur nie.
 settings-page-adding = Pakke byvoeg
 settings-page-adding-blurb = Wat Hoard met 'n pak doen wanneer dit bygevoeg word, behalwe om dit te lees en te etiketteer.
 settings-page-downloads = Aflaaie
@@ -2320,6 +2321,20 @@ settings-clip-ready-all =
     }
 settings-clip-learning = Gereed: leer prente, { $done } van { $total } tot dusver
 settings-clip-unavailable = Kon nie die model kry nie: { $detail }. Probeer elke uur weer.
+settings-clap-heading = Soek volgens hoe klanke klink
+settings-clap-reset = Klanksoektog: terug na die verstek
+settings-clap-saved-on = Klanksoektog: aan
+settings-clap-saved-off = Klanksoektog: af
+settings-clap-what = Tik waarna jy soek (“distant thunder”, “glassy UI blip”, “footsteps on gravel”) en klanke wat so klink, verskyn langs name wat die woorde bevat.
+settings-clap-toggle = Skakel klanksoektog aan
+settings-clap-hint = Gebruik LAION se CLAP-model, wat op hierdie bediener se verwerker loop: niks verlaat dit nie. Om dit aan te skakel laai die model ({ $size } MB) van Hugging Face af, en luister dan na die begin van elke klank in die agtergrond teen lae prioriteit. Dit neem tot sowat 1 GB geheue terwyl dit werk of iemand soek. Om dit af te skakel vee die model uit en hou wat dit geleer het, vir volgende keer.
+settings-clap-hint-desktop = Gebruik LAION se CLAP-model, wat op hierdie rekenaar se verwerker loop: niks verlaat dit nie. Om dit aan te skakel laai die model ({ $size } MB) van Hugging Face af, en luister dan na die begin van elke klank in die agtergrond teen lae prioriteit. Dit neem tot sowat 1 GB geheue terwyl dit werk of jy soek. Om dit af te skakel vee die model uit en hou wat dit geleer het, vir volgende keer.
+settings-clap-ready-empty = Gereed. Klanke word geleer soos pakke bygevoeg word.
+settings-clap-ready-all =
+    { $count ->
+       *[other] Gereed: ken al { $count } klanke
+    }
+settings-clap-learning = Gereed: leer klanke, { $done } van { $total } tot dusver
 
 ## SettingsPage.vue: KI-etikettering
 

@@ -738,7 +738,7 @@ async fn rank(state: &AppState, q: &SearchQuery) -> Result<Option<db::LookRank>>
     // A word imitating a sound: the sounds shaped like it.
     if let Some(word) = q.imitation.as_deref().filter(|w| !w.trim().is_empty()) {
         let scores = crate::imitation::rank(state, word).await?;
-        return Ok(Some(db::LookRank { scores, exclude: None, blend: false, by_file: true }));
+        return Ok(Some(db::LookRank { scores, exclude: None, blend: false, keys: db::Keys::Files }));
     }
     let similar = q.similar.clone().filter(|s| !s.is_empty());
     let color = q.color.as_deref().filter(|c| !c.is_empty()).map(parse_hex);
@@ -748,19 +748,26 @@ async fn rank(state: &AppState, q: &SearchQuery) -> Result<Option<db::LookRank>>
         if text.is_empty() {
             return Ok(None);
         }
-        let hits = match crate::clip::search_text(state, text).await {
-            Ok(hits) => hits,
-            Err(e) => {
-                tracing::warn!(error = %format!("{e:#}"), "image search failed; searching names only");
-                Vec::new()
-            }
+        // And with sound search on, sounds that sound like them.
+        let (pictures, sounds) =
+            tokio::join!(crate::clip::search_text(state, text), crate::clap::search_text(state, text));
+        let pictures = pictures.unwrap_or_else(|e| {
+            tracing::warn!(error = %format!("{e:#}"), "image search failed; searching names only");
+            Vec::new()
+        });
+        let sounds = sounds.unwrap_or_else(|e| {
+            tracing::warn!(error = %format!("{e:#}"), "sound search failed; searching names only");
+            Vec::new()
+        });
+        let keys = match (pictures.is_empty(), sounds.is_empty()) {
+            (true, true) => return Ok(None),
+            (false, true) => db::Keys::Thumbs,
+            (true, false) => db::Keys::Files,
+            (false, false) => db::Keys::Mixed,
         };
-        return Ok((!hits.is_empty()).then_some(db::LookRank {
-            scores: hits,
-            exclude: None,
-            blend: true,
-            by_file: false,
-        }));
+        let mut scores = pictures;
+        scores.extend(sounds);
+        return Ok(Some(db::LookRank { scores, exclude: None, blend: true, keys }));
     }
     let mut scores: Option<Vec<(String, f32)>> = None;
     if let Some(id) = &similar {
@@ -777,7 +784,7 @@ async fn rank(state: &AppState, q: &SearchQuery) -> Result<Option<db::LookRank>>
         if kind == "audio" {
             state.sounds.ensure(state).await?;
             let scores = state.sounds.similar(&file);
-            return Ok(Some(db::LookRank { scores, exclude: similar, blend: false, by_file: true }));
+            return Ok(Some(db::LookRank { scores, exclude: similar, blend: false, keys: db::Keys::Files }));
         }
         state.looks.ensure(state).await?;
         scores = Some(match thumb {
@@ -801,7 +808,12 @@ async fn rank(state: &AppState, q: &SearchQuery) -> Result<Option<db::LookRank>>
             None => by_color,
         });
     }
-    Ok(Some(db::LookRank { scores: scores.unwrap_or_default(), exclude: similar, blend: false, by_file: false }))
+    Ok(Some(db::LookRank {
+        scores: scores.unwrap_or_default(),
+        exclude: similar,
+        blend: false,
+        keys: db::Keys::Thumbs,
+    }))
 }
 
 // ---------------------------------------------------------------------------------------------
@@ -842,6 +854,7 @@ pub(crate) async fn schedule(state: &AppState) {
     }
     crate::clip::schedule(state).await;
     crate::sounds::schedule(state).await;
+    crate::clap::schedule(state).await;
 }
 
 /// Thumbnails done per round (read, analyzed, written).

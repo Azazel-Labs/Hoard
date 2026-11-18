@@ -112,6 +112,9 @@ pub(crate) struct Saved {
     /// Image search (CLIP): search pictures by what they show. Off until turned on, as the model is a big download.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub(crate) clip: Option<bool>,
+    /// Sound search (CLAP): search sounds by what they sound like, in words. Off until turned on, like image search.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub(crate) clap: Option<bool>,
     /// Animations' tiles play them when pointed at (`motion`): off until turned on, as each takes room and rendering.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub(crate) motion_thumbs: Option<bool>,
@@ -175,6 +178,7 @@ pub(crate) struct Effective {
     pub(crate) guest_browsing: bool,
     pub(crate) store_lookup: bool,
     pub(crate) clip: bool,
+    pub(crate) clap: bool,
     pub(crate) motion_thumbs: bool,
     pub(crate) thumb_quality: ThumbQuality,
     pub(crate) conversion_cache_mb: u64,
@@ -252,6 +256,7 @@ impl Saved {
             guest_browsing: self.guest_browsing.unwrap_or(false),
             store_lookup: self.store_lookup.unwrap_or(true),
             clip: self.clip.unwrap_or(false),
+            clap: self.clap.unwrap_or(false),
             motion_thumbs: self.motion_thumbs.unwrap_or(false),
             thumb_quality: self.thumb_quality.unwrap_or_default(),
             conversion_cache_mb: self.conversion_cache_mb.unwrap_or(DEFAULT_CONVERSION_CACHE_MB),

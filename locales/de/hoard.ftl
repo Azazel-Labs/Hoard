@@ -396,6 +396,7 @@ server-job-relocate = Dateien werden zwischen Speicherorten verschoben
 server-job-looks = Farben und Aussehen werden ermittelt
 server-job-sounds = Sounds werden angehört
 server-job-embed = Bildinhalte werden gelernt
+server-job-hear = Klang der Sounds wird gelernt
 server-job-materials = Materialien in { $pack } werden gesucht
 server-job-read-files = Die Dateien von { $pack } werden gelesen
 server-job-store-lookup = Eine Store-Seite wird nachgeschlagen
@@ -2221,8 +2222,8 @@ settings-page-tools = Werkzeuge
 settings-page-tools-blurb = Externe Programme, mit denen Hoard Dateien umwandelt und liest.
 settings-page-ai = KI-Tagging
 settings-page-ai-blurb = Ein KI-Modell benennt, beschreibt und taggt neue Pakete, zusätzlich zu den eingebauten Regeln. Seine Tags werden als vorgeschlagen markiert.
-settings-page-search = Bildsuche
-settings-page-search-blurb = Bilder nach ihrem Inhalt suchen, nicht nur nach ihrem Namen, und Dinge finden, die sich in der Art ähneln, nicht nur in der Farbe.
+settings-page-search = Bild- und Soundsuche
+settings-page-search-blurb = Bilder nach ihrem Inhalt und Sounds nach ihrem Klang suchen, nicht nur nach ihrem Namen, und Dinge finden, die sich in der Art ähneln, nicht nur in der Farbe.
 settings-page-adding = Pakete hinzufügen
 settings-page-adding-blurb = Was Hoard mit einem Paket macht, wenn es hinzugefügt wird, außer es zu lesen und zu taggen.
 settings-page-downloads = Downloads
@@ -2321,6 +2322,21 @@ settings-clip-ready-all =
     }
 settings-clip-learning = Bereit: lernt Bilder, bisher { $done } von { $total }
 settings-clip-unavailable = Das Modell konnte nicht geholt werden: { $detail }. Neuer Versuch jede Stunde.
+settings-clap-heading = Nach Klang suchen
+settings-clap-reset = Soundsuche: auf Standard zurücksetzen
+settings-clap-saved-on = Soundsuche: an
+settings-clap-saved-off = Soundsuche: aus
+settings-clap-what = Geben Sie ein, was Sie suchen („distant thunder“, „glassy UI blip“, „footsteps on gravel“), und Sounds, die so klingen, erscheinen neben Namen, die die Wörter enthalten.
+settings-clap-toggle = Soundsuche einschalten
+settings-clap-hint = Verwendet das CLAP-Modell von LAION, ausgeführt auf dem Prozessor dieses Servers: Nichts verlässt ihn. Beim Einschalten wird das Modell ({ $size } MB) von Hugging Face heruntergeladen, das dann im Hintergrund mit niedriger Priorität in den Anfang jedes Sounds hineinhört. Während es arbeitet oder jemand sucht, belegt es bis zu etwa 1 GB Arbeitsspeicher. Beim Ausschalten wird das Modell gelöscht, das Gelernte aber für das nächste Mal behalten.
+settings-clap-hint-desktop = Verwendet das CLAP-Modell von LAION, ausgeführt auf dem Prozessor dieses Computers: Nichts verlässt ihn. Beim Einschalten wird das Modell ({ $size } MB) von Hugging Face heruntergeladen, das dann im Hintergrund mit niedriger Priorität in den Anfang jedes Sounds hineinhört. Während es arbeitet oder Sie suchen, belegt es bis zu etwa 1 GB Arbeitsspeicher. Beim Ausschalten wird das Modell gelöscht, das Gelernte aber für das nächste Mal behalten.
+settings-clap-ready-empty = Bereit. Sounds werden gelernt, sobald Pakete hinzukommen.
+settings-clap-ready-all =
+    { $count ->
+        [one] Bereit: kennt { $count } Sound
+       *[other] Bereit: kennt alle { $count } Sounds
+    }
+settings-clap-learning = Bereit: lernt Sounds, bisher { $done } von { $total }
 
 ## SettingsPage.vue: KI-Tagging
 

@@ -544,6 +544,10 @@ software rasterizer (`apt install mesa-vulkan-drivers`). Without any adapter, ev
 Tags carry their source (`meta`, `rule`, `ai`, `human`). Human tags always win, and re-running the offline
 tagger after improving the vocabulary (`POST /api/packs/{id}/retag`) replaces only `rule`/`meta` tags.
 
+A tag is kept lower case with dashes between words, as `prefix:name` or just `name`, and either half can be in any
+script: `楽器:ドラム`, `संगीत:ताल-वाद्य` and `звук:барабан` are all tags, kept with the marks written on their letters.
+An accent typed as its own character is the same tag as one typed with its letter. A tag is at most 64 characters.
+
 **Tidying tags.** Settings → Tags lists every tag with its count. Pick tags that mean the same thing and merge
 them, or pick one to rename it (a rename that leaves off the prefix keeps it, so renaming `set:rock-000` to
 "granite" gives `set:granite`). The old names are remembered: when a tagger comes up with one later, the asset gets

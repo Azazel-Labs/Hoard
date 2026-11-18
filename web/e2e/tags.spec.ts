@@ -67,6 +67,27 @@ test.describe('settings: tags', () => {
     await expect(page.locator('li').filter({ hasText: `set:e2eold${u} → set:e2enew${u}` })).toBeVisible()
   })
 
+  test('tags can be written in any script, both before and after the colon', async ({ page, api, seed }) => {
+    const u = unique()
+    const id = seed.assets[`${BIG}/Img 130`]
+    // Japanese, Hindi (whose vowel signs are marks on the letters), Thai (tone marks), Russian, and an accent typed
+    // apart from its letter.
+    await addTags(api, id, [`楽器${u}:ドラム`, `संगीत${u}:क्षेत्र`, `เสียง${u}:ไม้กลอง`, `Звук${u}: Барабан`, `Café${u}`])
+    const tags = await tagsOf(api, id)
+    for (const t of [`楽器${u}:ドラム`, `संगीत${u}:क्षेत्र`, `เสียง${u}:ไม้กลอง`, `звук${u}:барабан`, `café${u}`]) {
+      expect(tags).toContain(t)
+      const found = (await (await api.get('/api/assets', { params: { tags: t, facets: false } })).json()) as { items: { id: string }[] }
+      expect(found.items.map((a) => a.id)).toEqual([id])
+    }
+
+    // Renaming one shows the name as the server will keep it, marks and all.
+    await page.goto('/#settings/tags')
+    await page.getByLabel('Find tags').fill(`संगीत${u}`)
+    await page.locator('.tags .list').first().getByLabel(`संगीत${u}:क्षेत्र`).check()
+    await page.getByLabel('New name').fill(`संगीत${u}: ताल वाद्य`)
+    await expect(page.getByText(`Saved as संगीत${u}:ताल-वाद्य`)).toBeVisible()
+  })
+
   test('canceling a merge changes nothing', async ({ page, api, seed }) => {
     const u = unique()
     const id = seed.assets[`${BIG}/Img 120`]

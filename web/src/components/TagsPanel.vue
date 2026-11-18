@@ -55,8 +55,16 @@ const prefix = computed(() => {
 // The name as the server will keep it: lower case, words joined by dashes. A rename that leaves off the prefix keeps it,
 // so renaming a set gives a set.
 const target = computed(() => {
-  const t = into.value.trim().toLowerCase().replace(/[^\p{L}\p{N}/.+:]+/gu, '-').replace(/^-+|-+$/g, '')
-  return t && !t.includes(':') && prefix.value ? prefix.value + t : t
+  // Each side of the colon on its own: letters and digits in any script, with their marks and joiners.
+  const part = (s: string) => s.replace(/[^\p{L}\p{M}\p{N}‌‍/.+]+/gu, '-').replace(/^-+|-+$/g, '')
+  const raw = into.value.trim().toLowerCase().normalize('NFC')
+  const colon = raw.indexOf(':')
+  if (colon < 0) {
+    const t = part(raw)
+    return t && prefix.value ? prefix.value + t : t
+  }
+  const [ns, v] = [part(raw.slice(0, colon)), part(raw.slice(colon + 1))]
+  return ns && v ? `${ns}:${v}` : ''
 })
 const ready = computed(() => !!target.value && picked.value.some((t) => t !== target.value))
 const affected = computed(() => picked.value.reduce((n, t) => n + (count.value.get(t) ?? 0), 0))

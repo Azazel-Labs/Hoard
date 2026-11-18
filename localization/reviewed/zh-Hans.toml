@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "fdade8b2a0a47eaf5e9d94cd1c6d23c07280b4d418c7b1fceea411686bd31c20"
+source = "43ac7cfb222bc79dc1a06c9610721ba4c7281b36f01dfdc5721d8596f67b982c"
 translation = "530e3768e270ecc495434269d0aa7741f64471672a3fe92dbc9787949d17edcc"
 
 [messages.account-add]
@@ -1260,8 +1260,8 @@ source = "Including supporting files"
 translation = "包括辅助文件"
 
 [messages.app-supporting-title]
-source = "glTF buffers, material libraries, the maps of materials, materials only one model wears and the store files describing models. They come along when you download what uses them. A sprite sheet’s pages, and its sprites the pack has as separate images too, are shown with the sheet."
-translation = "glTF 缓冲区、材质库、材质的贴图、仅由一个模型使用的材质，以及描述模型的商店文件。下载使用它们的内容时会一并带上。 精灵图集的页面，以及包中也作为单独图片存在的精灵，会与图集一起显示。"
+source = "glTF buffers, material libraries, the maps of materials, materials only one model wears and the store files describing models. They come along when you download what uses them. A sprite sheet’s pages, and its sprites the pack has as separate images too, are shown with the sheet. An asset the pack has in several formats is shown once, in the format Hoard reads best."
+translation = "glTF 缓冲区、材质库、材质的贴图、仅由一个模型使用的材质，以及描述模型的商店文件。下载使用它们的内容时会一并带上。 精灵图集的页面，以及包中也作为单独图片存在的精灵，会与图集一起显示。 包中有多种格式的资源只显示一次，使用 Hoard 读取得最好的格式。"
 
 [messages.app-theme]
 source = "Theme"
@@ -1557,6 +1557,10 @@ translation = "下载为"
 [messages.asset-as-original]
 source = "{ $format } (original format)"
 translation = "{ $format }（原始格式）"
+
+[messages.asset-as-pack-files]
+source = "The pack’s own files"
+translation = "包内的文件"
 
 [messages.asset-as-queued]
 source = "Queued…"
@@ -2134,6 +2138,10 @@ translation = "由 Hoard 于 { $date } 从包中读出。"
 source = "Hoard read it out of the package on { $date } ({ $notes })."
 translation = "由 Hoard 于 { $date } 从包中读出（{ $notes }）。"
 
+[messages.asset-other-formats]
+source = "Other formats"
+translation = "其他格式"
+
 [messages.asset-palette]
 source = "Colors in the picture"
 translation = "图片中的颜色"
@@ -2281,6 +2289,10 @@ translation = "再显示 { $count } 个"
 [messages.asset-show-views]
 source = "Show the four-view sheet the tagger saw"
 translation = "显示标注器看到的四视图"
+
+[messages.asset-shown-as]
+source = "Shown in the library as"
+translation = "在资源库中显示为"
 
 [messages.asset-source]
 source = "Source"

@@ -613,7 +613,7 @@ app-save-search = Tallenna haku
 app-select-title = Valitse useita resursseja lisätäksesi tunnisteita, luokitellaksesi, kerätäksesi, ladataksesi tai arkistoidaksesi ne yhdessä (X tai Ctrl-napsautus)
 app-select = Valitse
 app-tile-size = Ruutujen koko
-app-supporting-title = glTF-puskurit, materiaalikirjastot, materiaalien kartat, vain yhden mallin käyttämät materiaalit ja malleja kuvaavat kauppatiedostot. Ne tulevat mukana, kun lataat niitä käyttävän resurssin. Sprite-arkin sivut ja sen spritet, jotka paketissa on myös erillisinä kuvina, näytetään arkin yhteydessä.
+app-supporting-title = glTF-puskurit, materiaalikirjastot, materiaalien kartat, vain yhden mallin käyttämät materiaalit ja malleja kuvaavat kauppatiedostot. Ne tulevat mukana, kun lataat niitä käyttävän resurssin. Sprite-arkin sivut ja sen spritet, jotka paketissa on myös erillisinä kuvina, näytetään arkin yhteydessä. Resurssi, joka paketissa on useassa muodossa, näytetään kerran, siinä muodossa, jonka Hoard lukee parhaiten.
 app-supporting-hidden =
     { $count ->
         [one] { $count } tukitiedosto piilotettu
@@ -1346,6 +1346,8 @@ asset-sprites = Spritet
 asset-used-by = Käyttäjät
 asset-loose-sprites = Myös erillisinä tiedostoina
 asset-in-sheet = Sprite-arkissa
+asset-other-formats = Muut muodot
+asset-shown-as = Näytetään kirjastossa muodossa
 asset-conversion-failed = muunnos epäonnistui
 asset-as-converting = Muunnetaan…
 asset-as-converting-percent = Muunnetaan… { $percent } %
@@ -1353,6 +1355,7 @@ asset-as-queued = Jonossa…
 asset-download = Lataa
 asset-as-label = Lataa muodossa
 asset-as-original = { $format } (alkuperäinen muoto)
+asset-as-pack-files = Paketin omat tiedostot
 asset-as-size = Koko
 asset-as-full-size = Täysi koko
 asset-as-up-to = Enintään { $size } px

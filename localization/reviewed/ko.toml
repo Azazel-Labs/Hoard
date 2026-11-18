@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "fdade8b2a0a47eaf5e9d94cd1c6d23c07280b4d418c7b1fceea411686bd31c20"
+source = "43ac7cfb222bc79dc1a06c9610721ba4c7281b36f01dfdc5721d8596f67b982c"
 translation = "cb51eeebee58ce4e694b9c22ec1e26a19090d24e80d9b74b0e431ca3fa274b7f"
 
 [messages.account-add]
@@ -1257,8 +1257,8 @@ source = "Including supporting files"
 translation = "보조 파일 포함"
 
 [messages.app-supporting-title]
-source = "glTF buffers, material libraries, the maps of materials, materials only one model wears and the store files describing models. They come along when you download what uses them. A sprite sheet’s pages, and its sprites the pack has as separate images too, are shown with the sheet."
-translation = "glTF 버퍼, 머티리얼 라이브러리, 머티리얼의 맵, 모델 하나만 쓰는 머티리얼, 모델을 설명하는 스토어 파일입니다. 이 파일들을 사용하는 것을 다운로드하면 함께 받아집니다. 스프라이트 시트의 페이지와, 팩에 별도 이미지로도 있는 그 스프라이트는 시트와 함께 표시됩니다."
+source = "glTF buffers, material libraries, the maps of materials, materials only one model wears and the store files describing models. They come along when you download what uses them. A sprite sheet’s pages, and its sprites the pack has as separate images too, are shown with the sheet. An asset the pack has in several formats is shown once, in the format Hoard reads best."
+translation = "glTF 버퍼, 머티리얼 라이브러리, 머티리얼의 맵, 모델 하나만 쓰는 머티리얼, 모델을 설명하는 스토어 파일입니다. 이 파일들을 사용하는 것을 다운로드하면 함께 받아집니다. 스프라이트 시트의 페이지와, 팩에 별도 이미지로도 있는 그 스프라이트는 시트와 함께 표시됩니다. 팩에 여러 형식으로 있는 에셋은 Hoard가 가장 잘 읽는 형식으로 한 번만 표시됩니다."
 
 [messages.app-theme]
 source = "Theme"
@@ -1554,6 +1554,10 @@ translation = "다른 형식으로 다운로드"
 [messages.asset-as-original]
 source = "{ $format } (original format)"
 translation = "{ $format }(원본 형식)"
+
+[messages.asset-as-pack-files]
+source = "The pack’s own files"
+translation = "팩에 있는 파일"
 
 [messages.asset-as-queued]
 source = "Queued…"
@@ -2131,6 +2135,10 @@ translation = "{ $date }에 Hoard가 패키지에서 읽어 냈습니다."
 source = "Hoard read it out of the package on { $date } ({ $notes })."
 translation = "{ $date }에 Hoard가 패키지에서 읽어 냈습니다({ $notes })."
 
+[messages.asset-other-formats]
+source = "Other formats"
+translation = "다른 형식"
+
 [messages.asset-palette]
 source = "Colors in the picture"
 translation = "그림의 색상"
@@ -2278,6 +2286,10 @@ translation = "{ $count }개 더 보기"
 [messages.asset-show-views]
 source = "Show the four-view sheet the tagger saw"
 translation = "태거가 본 네 방향 시트 표시"
+
+[messages.asset-shown-as]
+source = "Shown in the library as"
+translation = "라이브러리에 표시되는 형식"
 
 [messages.asset-source]
 source = "Source"

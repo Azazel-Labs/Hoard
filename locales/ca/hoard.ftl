@@ -601,7 +601,7 @@ app-save-search = Desa la cerca
 app-select-title = Trieu diversos recursos per etiquetar-los, categoritzar-los, afegir-los a una col·lecció, baixar-los o arxivar-los alhora (X, o Ctrl+clic)
 app-select = Selecciona
 app-tile-size = Mida de les miniatures
-app-supporting-title = Memòries intermèdies de glTF, biblioteques de materials, els mapes dels materials, materials que només porta un model i els fitxers de botiga que descriuen models. S'inclouen quan baixeu el que els fa servir. Les pàgines d’un full de sprites, i els sprites que el paquet també té com a imatges soltes, es mostren amb el full.
+app-supporting-title = Memòries intermèdies de glTF, biblioteques de materials, els mapes dels materials, materials que només porta un model i els fitxers de botiga que descriuen models. S'inclouen quan baixeu el que els fa servir. Les pàgines d’un full de sprites, i els sprites que el paquet també té com a imatges soltes, es mostren amb el full. Un recurs que el paquet té en diversos formats es mostra un sol cop, en el format que Hoard llegeix millor.
 app-supporting-hidden =
     { $count ->
         [one] { $count } fitxer auxiliar amagat
@@ -1302,6 +1302,8 @@ asset-sprites = Sprites
 asset-used-by = Utilitzat per
 asset-loose-sprites = També com a fitxers separats
 asset-in-sheet = En un full de sprites
+asset-other-formats = Altres formats
+asset-shown-as = Es mostra a la biblioteca com a
 asset-conversion-failed = la conversió ha fallat
 asset-as-converting = S'està convertint…
 asset-as-converting-percent = S'està convertint… { $percent } %
@@ -1309,6 +1311,7 @@ asset-as-queued = En cua…
 asset-download = Baixa
 asset-as-label = Baixa com a
 asset-as-original = { $format } (format original)
+asset-as-pack-files = Els fitxers del paquet
 asset-as-size = Mida
 asset-as-full-size = Mida completa
 asset-as-up-to = Fins a { $size } px

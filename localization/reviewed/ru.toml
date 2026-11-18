@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "fdade8b2a0a47eaf5e9d94cd1c6d23c07280b4d418c7b1fceea411686bd31c20"
+source = "43ac7cfb222bc79dc1a06c9610721ba4c7281b36f01dfdc5721d8596f67b982c"
 translation = "bb45e4d0d59bdf1a2181c1158501e66a0c57e8041d0a982d6aed7e82f49657fa"
 
 [messages.account-add]
@@ -1329,8 +1329,8 @@ source = "Including supporting files"
 translation = "Со вспомогательными файлами"
 
 [messages.app-supporting-title]
-source = "glTF buffers, material libraries, the maps of materials, materials only one model wears and the store files describing models. They come along when you download what uses them. A sprite sheet’s pages, and its sprites the pack has as separate images too, are shown with the sheet."
-translation = "Буферы glTF, библиотеки материалов, карты материалов, материалы, которые носит только одна модель, и файлы магазинов с описанием моделей. Они скачиваются вместе с тем, что их использует. Страницы спрайт-листа и его спрайты, которые есть в наборе и отдельными картинками, показываются вместе с листом."
+source = "glTF buffers, material libraries, the maps of materials, materials only one model wears and the store files describing models. They come along when you download what uses them. A sprite sheet’s pages, and its sprites the pack has as separate images too, are shown with the sheet. An asset the pack has in several formats is shown once, in the format Hoard reads best."
+translation = "Буферы glTF, библиотеки материалов, карты материалов, материалы, которые носит только одна модель, и файлы магазинов с описанием моделей. Они скачиваются вместе с тем, что их использует. Страницы спрайт-листа и его спрайты, которые есть в наборе и отдельными картинками, показываются вместе с листом. Ресурс, который есть в наборе в нескольких форматах, показывается один раз, в формате, который Hoard читает лучше всего."
 
 [messages.app-theme]
 source = "Theme"
@@ -1667,6 +1667,10 @@ translation = "Скачать как"
 [messages.asset-as-original]
 source = "{ $format } (original format)"
 translation = "{ $format } (исходный формат)"
+
+[messages.asset-as-pack-files]
+source = "The pack’s own files"
+translation = "Файлы из набора"
 
 [messages.asset-as-queued]
 source = "Queued…"
@@ -2280,6 +2284,10 @@ translation = "Hoard извлёк его из пакета { $date }."
 source = "Hoard read it out of the package on { $date } ({ $notes })."
 translation = "Hoard извлёк его из пакета { $date } ({ $notes })."
 
+[messages.asset-other-formats]
+source = "Other formats"
+translation = "Другие форматы"
+
 [messages.asset-palette]
 source = "Colors in the picture"
 translation = "Цвета на картинке"
@@ -2427,6 +2435,10 @@ translation = "Показать ещё { $count }"
 [messages.asset-show-views]
 source = "Show the four-view sheet the tagger saw"
 translation = "Показать лист с четырьмя видами, который видел разметчик"
+
+[messages.asset-shown-as]
+source = "Shown in the library as"
+translation = "В библиотеке показан как"
 
 [messages.asset-source]
 source = "Source"

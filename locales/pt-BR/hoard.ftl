@@ -601,7 +601,7 @@ app-save-search = Salvar busca
 app-select-title = Escolha vários assets para dar tags, categorizar, colecionar, baixar ou arquivar juntos (X, ou Ctrl+clique)
 app-select = Selecionar
 app-tile-size = Tamanho dos blocos
-app-supporting-title = Buffers glTF, bibliotecas de materiais, os mapas dos materiais, materiais que só um modelo usa e os arquivos de loja que descrevem modelos. Eles vêm junto quando você baixa o que os usa. As páginas de uma folha de sprites, e os sprites que o pacote também tem como imagens separadas, aparecem com a folha.
+app-supporting-title = Buffers glTF, bibliotecas de materiais, os mapas dos materiais, materiais que só um modelo usa e os arquivos de loja que descrevem modelos. Eles vêm junto quando você baixa o que os usa. As páginas de uma folha de sprites, e os sprites que o pacote também tem como imagens separadas, aparecem com a folha. Um recurso que o pacote tem em vários formatos aparece uma vez, no formato que o Hoard lê melhor.
 app-supporting-hidden =
     { $count ->
         [one] { $count } arquivo de apoio oculto
@@ -1302,6 +1302,8 @@ asset-sprites = Sprites
 asset-used-by = Usado por
 asset-loose-sprites = Também como arquivos separados
 asset-in-sheet = Em uma folha de sprites
+asset-other-formats = Outros formatos
+asset-shown-as = Mostrado na biblioteca como
 asset-conversion-failed = a conversão falhou
 asset-as-converting = Convertendo…
 asset-as-converting-percent = Convertendo… { $percent }%
@@ -1309,6 +1311,7 @@ asset-as-queued = Na fila…
 asset-download = Baixar
 asset-as-label = Baixar como
 asset-as-original = { $format } (formato original)
+asset-as-pack-files = Os arquivos do pacote
 asset-as-size = Tamanho
 asset-as-full-size = Tamanho original
 asset-as-up-to = Até { $size } px

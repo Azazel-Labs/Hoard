@@ -601,7 +601,7 @@ app-save-search = Stoor soektog
 app-select-title = Kies etlike bates om saam te etiketteer, te kategoriseer, te versamel, af te laai of te argiveer (X, of Ctrl-klik)
 app-select = Kies
 app-tile-size = Teëlgrootte
-app-supporting-title = glTF-buffers, materiaalbiblioteke, die kaarte van materiale, materiale wat net een model dra en die winkellêers wat modelle beskryf. Hulle kom saam wanneer jy aflaai wat hulle gebruik. ’n Spritevel se bladsye, en sy sprites wat die pak ook as aparte prente het, word saam met die vel gewys.
+app-supporting-title = glTF-buffers, materiaalbiblioteke, die kaarte van materiale, materiale wat net een model dra en die winkellêers wat modelle beskryf. Hulle kom saam wanneer jy aflaai wat hulle gebruik. ’n Spritevel se bladsye, en sy sprites wat die pak ook as aparte prente het, word saam met die vel gewys. ’n Bate wat die pak in verskeie formate het, word een keer gewys, in die formaat wat Hoard die beste lees.
 app-supporting-hidden =
     { $count } ondersteunende { $count ->
         [one] lêer
@@ -1296,6 +1296,8 @@ asset-sprites = Sprites
 asset-used-by = Gebruik deur
 asset-loose-sprites = Ook as aparte lêers
 asset-in-sheet = In ’n spritevel
+asset-other-formats = Ander formate
+asset-shown-as = In die biblioteek gewys as
 asset-conversion-failed = omskakeling het misluk
 asset-as-converting = Skakel om…
 asset-as-converting-percent = Skakel om… { $percent }%
@@ -1303,6 +1305,7 @@ asset-as-queued = In die tou…
 asset-download = Laai af
 asset-as-label = Laai af as
 asset-as-original = { $format } (oorspronklike formaat)
+asset-as-pack-files = Die pak se eie lêers
 asset-as-size = Grootte
 asset-as-full-size = Volle grootte
 asset-as-up-to = Tot { $size } px

@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "fdade8b2a0a47eaf5e9d94cd1c6d23c07280b4d418c7b1fceea411686bd31c20"
+source = "43ac7cfb222bc79dc1a06c9610721ba4c7281b36f01dfdc5721d8596f67b982c"
 translation = "d3e5845d6d4178bd5edbc2277e0e916981a0ddba412230b00124f99958cb1526"
 
 [messages.account-add]
@@ -1293,8 +1293,8 @@ source = "Including supporting files"
 translation = "Inclusief ondersteunende bestanden"
 
 [messages.app-supporting-title]
-source = "glTF buffers, material libraries, the maps of materials, materials only one model wears and the store files describing models. They come along when you download what uses them. A sprite sheet’s pages, and its sprites the pack has as separate images too, are shown with the sheet."
-translation = "glTF-buffers, materiaalbibliotheken, de maps van materialen, materialen die maar één model draagt en de storebestanden die modellen beschrijven. Ze gaan mee als je downloadt wat ze gebruikt. De pagina’s van een spritesheet, en de sprites die het pakket ook als losse afbeeldingen heeft, worden bij de spritesheet getoond."
+source = "glTF buffers, material libraries, the maps of materials, materials only one model wears and the store files describing models. They come along when you download what uses them. A sprite sheet’s pages, and its sprites the pack has as separate images too, are shown with the sheet. An asset the pack has in several formats is shown once, in the format Hoard reads best."
+translation = "glTF-buffers, materiaalbibliotheken, de maps van materialen, materialen die maar één model draagt en de storebestanden die modellen beschrijven. Ze gaan mee als je downloadt wat ze gebruikt. De pagina’s van een spritesheet, en de sprites die het pakket ook als losse afbeeldingen heeft, worden bij de spritesheet getoond. Een asset die het pakket in meerdere formaten heeft, wordt één keer getoond, in het formaat dat Hoard het best leest."
 
 [messages.app-theme]
 source = "Theme"
@@ -1613,6 +1613,10 @@ translation = "Downloaden als"
 [messages.asset-as-original]
 source = "{ $format } (original format)"
 translation = "{ $format } (origineel formaat)"
+
+[messages.asset-as-pack-files]
+source = "The pack’s own files"
+translation = "De eigen bestanden van het pakket"
 
 [messages.asset-as-queued]
 source = "Queued…"
@@ -2210,6 +2214,10 @@ translation = "Hoard heeft het uit de package gelezen op { $date }."
 source = "Hoard read it out of the package on { $date } ({ $notes })."
 translation = "Hoard heeft het uit de package gelezen op { $date } ({ $notes })."
 
+[messages.asset-other-formats]
+source = "Other formats"
+translation = "Andere formaten"
+
 [messages.asset-palette]
 source = "Colors in the picture"
 translation = "Kleuren in de afbeelding"
@@ -2357,6 +2365,10 @@ translation = "Nog { $count } tonen"
 [messages.asset-show-views]
 source = "Show the four-view sheet the tagger saw"
 translation = "Het blad met vier aanzichten tonen dat de tagger zag"
+
+[messages.asset-shown-as]
+source = "Shown in the library as"
+translation = "In de bibliotheek getoond als"
 
 [messages.asset-source]
 source = "Source"

@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "fdade8b2a0a47eaf5e9d94cd1c6d23c07280b4d418c7b1fceea411686bd31c20"
+source = "43ac7cfb222bc79dc1a06c9610721ba4c7281b36f01dfdc5721d8596f67b982c"
 translation = "d2d82856aba060f1fca3b326d63684dcbaa143f941e3bdd05f930d4179bd4d37"
 
 [messages.account-add]
@@ -1317,8 +1317,8 @@ source = "Including supporting files"
 translation = "Včetně podpůrných souborů"
 
 [messages.app-supporting-title]
-source = "glTF buffers, material libraries, the maps of materials, materials only one model wears and the store files describing models. They come along when you download what uses them. A sprite sheet’s pages, and its sprites the pack has as separate images too, are shown with the sheet."
-translation = "Buffery glTF, knihovny materiálů, mapy materiálů, materiály, které nosí jen jeden model, a soubory obchodů popisující modely. Stáhnou se spolu s tím, co je používá. Stránky spritesheetu a jeho sprity, které balíček má i jako samostatné obrázky, se zobrazují u spritesheetu."
+source = "glTF buffers, material libraries, the maps of materials, materials only one model wears and the store files describing models. They come along when you download what uses them. A sprite sheet’s pages, and its sprites the pack has as separate images too, are shown with the sheet. An asset the pack has in several formats is shown once, in the format Hoard reads best."
+translation = "Buffery glTF, knihovny materiálů, mapy materiálů, materiály, které nosí jen jeden model, a soubory obchodů popisující modely. Stáhnou se spolu s tím, co je používá. Stránky spritesheetu a jeho sprity, které balíček má i jako samostatné obrázky, se zobrazují u spritesheetu. Asset, který balíček má v několika formátech, se zobrazí jednou, ve formátu, který Hoard čte nejlépe."
 
 [messages.app-theme]
 source = "Theme"
@@ -1643,6 +1643,10 @@ translation = "Stáhnout jako"
 [messages.asset-as-original]
 source = "{ $format } (original format)"
 translation = "{ $format } (původní formát)"
+
+[messages.asset-as-pack-files]
+source = "The pack’s own files"
+translation = "Vlastní soubory balíčku"
 
 [messages.asset-as-queued]
 source = "Queued…"
@@ -2245,6 +2249,10 @@ translation = "Hoard ho vyčetl ze souboru Unrealu { $date }."
 source = "Hoard read it out of the package on { $date } ({ $notes })."
 translation = "Hoard ho vyčetl ze souboru Unrealu { $date } ({ $notes })."
 
+[messages.asset-other-formats]
+source = "Other formats"
+translation = "Další formáty"
+
 [messages.asset-palette]
 source = "Colors in the picture"
 translation = "Barvy na obrázku"
@@ -2392,6 +2400,10 @@ translation = "Zobrazit další ({ $count })"
 [messages.asset-show-views]
 source = "Show the four-view sheet the tagger saw"
 translation = "Zobrazit čtyřpohledový list, který viděl štítkovač"
+
+[messages.asset-shown-as]
+source = "Shown in the library as"
+translation = "V knihovně zobrazeno jako"
 
 [messages.asset-source]
 source = "Source"

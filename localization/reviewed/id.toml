@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "fdade8b2a0a47eaf5e9d94cd1c6d23c07280b4d418c7b1fceea411686bd31c20"
+source = "43ac7cfb222bc79dc1a06c9610721ba4c7281b36f01dfdc5721d8596f67b982c"
 translation = "30056587d254fe6b8f2576dc61dbda0e0d1f814731977073ac18b1c1a33112d6"
 
 [messages.account-add]
@@ -1257,8 +1257,8 @@ source = "Including supporting files"
 translation = "Termasuk berkas pendukung"
 
 [messages.app-supporting-title]
-source = "glTF buffers, material libraries, the maps of materials, materials only one model wears and the store files describing models. They come along when you download what uses them. A sprite sheet’s pages, and its sprites the pack has as separate images too, are shown with the sheet."
-translation = "Buffer glTF, pustaka material, map dari material, material yang hanya dipakai satu model, dan berkas toko yang menjelaskan model. Semuanya ikut terunduh saat Anda mengunduh yang memakainya. Halaman lembar sprite, dan sprite-nya yang juga ada di paket sebagai gambar terpisah, ditampilkan bersama lembarnya."
+source = "glTF buffers, material libraries, the maps of materials, materials only one model wears and the store files describing models. They come along when you download what uses them. A sprite sheet’s pages, and its sprites the pack has as separate images too, are shown with the sheet. An asset the pack has in several formats is shown once, in the format Hoard reads best."
+translation = "Buffer glTF, pustaka material, map dari material, material yang hanya dipakai satu model, dan berkas toko yang menjelaskan model. Semuanya ikut terunduh saat Anda mengunduh yang memakainya. Halaman lembar sprite, dan sprite-nya yang juga ada di paket sebagai gambar terpisah, ditampilkan bersama lembarnya. Aset yang ada di paket dalam beberapa format ditampilkan sekali, dalam format yang paling baik dibaca Hoard."
 
 [messages.app-theme]
 source = "Theme"
@@ -1554,6 +1554,10 @@ translation = "Unduh sebagai"
 [messages.asset-as-original]
 source = "{ $format } (original format)"
 translation = "{ $format } (format asli)"
+
+[messages.asset-as-pack-files]
+source = "The pack’s own files"
+translation = "File milik paket"
 
 [messages.asset-as-queued]
 source = "Queued…"
@@ -2137,6 +2141,10 @@ translation = "Hoard membacanya dari paket Unreal pada { $date }."
 source = "Hoard read it out of the package on { $date } ({ $notes })."
 translation = "Hoard membacanya dari paket Unreal pada { $date } ({ $notes })."
 
+[messages.asset-other-formats]
+source = "Other formats"
+translation = "Format lain"
+
 [messages.asset-palette]
 source = "Colors in the picture"
 translation = "Warna dalam gambar"
@@ -2284,6 +2292,10 @@ translation = "Tampilkan { $count } lagi"
 [messages.asset-show-views]
 source = "Show the four-view sheet the tagger saw"
 translation = "Tampilkan lembar empat sisi yang dilihat pemberi tag"
+
+[messages.asset-shown-as]
+source = "Shown in the library as"
+translation = "Ditampilkan di pustaka sebagai"
 
 [messages.asset-source]
 source = "Source"

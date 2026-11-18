@@ -514,6 +514,8 @@ pub enum LinkRel {
     /// A loose image that is one of this sheet's sprites, saved on its own as well. Not something the sheet needs:
     /// each sprite is in it already.
     Sprite,
+    /// The same asset in another format, which the pack has as well (the `.obj` beside a `.skp`).
+    Format,
 }
 
 impl LinkRel {
@@ -528,6 +530,7 @@ impl LinkRel {
             LinkRel::Sidecar => "sidecar",
             LinkRel::Variant => "variant",
             LinkRel::Sprite => "sprite",
+            LinkRel::Format => "format",
         }
     }
     pub fn parse(s: &str) -> Option<Self> {
@@ -541,6 +544,7 @@ impl LinkRel {
             "sidecar" => LinkRel::Sidecar,
             "variant" => LinkRel::Variant,
             "sprite" => LinkRel::Sprite,
+            "format" => LinkRel::Format,
             _ => return None,
         })
     }

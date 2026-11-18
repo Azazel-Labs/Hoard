@@ -609,7 +609,7 @@ app-save-search = Enregistrer la recherche
 app-select-title = Choisir plusieurs ressources pour les étiqueter, catégoriser, mettre en collection, télécharger ou archiver ensemble (X, ou Ctrl-clic)
 app-select = Sélectionner
 app-tile-size = Taille des vignettes
-app-supporting-title = Tampons glTF, bibliothèques de matériaux, cartes des matériaux, matériaux portés par un seul modèle et fichiers de boutique décrivant des modèles. Ils sont inclus quand vous téléchargez ce qui les utilise. Les pages d’une feuille de sprites, et ses sprites que le pack contient aussi en images séparées, sont montrés avec la feuille.
+app-supporting-title = Tampons glTF, bibliothèques de matériaux, cartes des matériaux, matériaux portés par un seul modèle et fichiers de boutique décrivant des modèles. Ils sont inclus quand vous téléchargez ce qui les utilise. Les pages d’une feuille de sprites, et ses sprites que le pack contient aussi en images séparées, sont montrés avec la feuille. Un asset que le pack contient en plusieurs formats est montré une fois, dans le format que Hoard lit le mieux.
 app-supporting-hidden =
     { $count ->
         [one] { $count } fichier annexe masqué
@@ -1326,6 +1326,8 @@ asset-sprites = Sprites
 asset-used-by = Utilisé par
 asset-loose-sprites = Aussi en fichiers séparés
 asset-in-sheet = Dans une feuille de sprites
+asset-other-formats = Autres formats
+asset-shown-as = Montré dans la bibliothèque en
 asset-conversion-failed = échec de la conversion
 asset-as-converting = Conversion…
 asset-as-converting-percent = Conversion… { $percent } %
@@ -1333,6 +1335,7 @@ asset-as-queued = En attente…
 asset-download = Télécharger
 asset-as-label = Télécharger en
 asset-as-original = { $format } (format d’origine)
+asset-as-pack-files = Les fichiers du pack
 asset-as-size = Taille
 asset-as-full-size = Taille réelle
 asset-as-up-to = Jusqu’à { $size } px

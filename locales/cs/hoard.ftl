@@ -629,7 +629,7 @@ app-save-search = Uložit hledání
 app-select-title = Vyberte několik assetů, které chcete společně oštítkovat, zařadit do kategorie, přidat do kolekce, stáhnout nebo archivovat (X nebo Ctrl+klik)
 app-select = Vybrat
 app-tile-size = Velikost dlaždic
-app-supporting-title = Buffery glTF, knihovny materiálů, mapy materiálů, materiály, které nosí jen jeden model, a soubory obchodů popisující modely. Stáhnou se spolu s tím, co je používá. Stránky spritesheetu a jeho sprity, které balíček má i jako samostatné obrázky, se zobrazují u spritesheetu.
+app-supporting-title = Buffery glTF, knihovny materiálů, mapy materiálů, materiály, které nosí jen jeden model, a soubory obchodů popisující modely. Stáhnou se spolu s tím, co je používá. Stránky spritesheetu a jeho sprity, které balíček má i jako samostatné obrázky, se zobrazují u spritesheetu. Asset, který balíček má v několika formátech, se zobrazí jednou, ve formátu, který Hoard čte nejlépe.
 app-supporting-hidden =
     { $count ->
         [one] { $count } podpůrný soubor je skrytý
@@ -1399,6 +1399,8 @@ asset-sprites = Sprity
 asset-used-by = Používá ho
 asset-loose-sprites = Také jako samostatné soubory
 asset-in-sheet = Ve spritesheetu
+asset-other-formats = Další formáty
+asset-shown-as = V knihovně zobrazeno jako
 asset-conversion-failed = převod selhal
 asset-as-converting = Převádím…
 asset-as-converting-percent = Převádím… { $percent } %
@@ -1406,6 +1408,7 @@ asset-as-queued = Ve frontě…
 asset-download = Stáhnout
 asset-as-label = Stáhnout jako
 asset-as-original = { $format } (původní formát)
+asset-as-pack-files = Vlastní soubory balíčku
 asset-as-size = Velikost
 asset-as-full-size = Plná velikost
 asset-as-up-to = Až { $size } px

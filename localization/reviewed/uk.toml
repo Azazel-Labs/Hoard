@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "fdade8b2a0a47eaf5e9d94cd1c6d23c07280b4d418c7b1fceea411686bd31c20"
+source = "43ac7cfb222bc79dc1a06c9610721ba4c7281b36f01dfdc5721d8596f67b982c"
 translation = "973d5a6f0a6763be6bbc6bb0a4a118df31a18ed5e5823c6c023d2d871324479b"
 
 [messages.account-add]
@@ -1330,8 +1330,8 @@ source = "Including supporting files"
 translation = "Разом із допоміжними файлами"
 
 [messages.app-supporting-title]
-source = "glTF buffers, material libraries, the maps of materials, materials only one model wears and the store files describing models. They come along when you download what uses them. A sprite sheet’s pages, and its sprites the pack has as separate images too, are shown with the sheet."
-translation = "Буфери glTF, бібліотеки матеріалів, карти матеріалів, матеріали лише однієї моделі та файли магазинів, що описують моделі. Вони завантажуються разом із тим, що їх використовує. Сторінки спрайт-аркуша та його спрайти, що є в наборі й окремими зображеннями, показуються разом з аркушем."
+source = "glTF buffers, material libraries, the maps of materials, materials only one model wears and the store files describing models. They come along when you download what uses them. A sprite sheet’s pages, and its sprites the pack has as separate images too, are shown with the sheet. An asset the pack has in several formats is shown once, in the format Hoard reads best."
+translation = "Буфери glTF, бібліотеки матеріалів, карти матеріалів, матеріали лише однієї моделі та файли магазинів, що описують моделі. Вони завантажуються разом із тим, що їх використовує. Сторінки спрайт-аркуша та його спрайти, що є в наборі й окремими зображеннями, показуються разом з аркушем. Ресурс, що є в наборі в кількох форматах, показується один раз, у форматі, який Hoard читає найкраще."
 
 [messages.app-theme]
 source = "Theme"
@@ -1668,6 +1668,10 @@ translation = "Завантажити як"
 [messages.asset-as-original]
 source = "{ $format } (original format)"
 translation = "{ $format } (оригінальний формат)"
+
+[messages.asset-as-pack-files]
+source = "The pack’s own files"
+translation = "Файли з набору"
 
 [messages.asset-as-queued]
 source = "Queued…"
@@ -2281,6 +2285,10 @@ translation = "Hoard витягнув його з пакунка { $date }."
 source = "Hoard read it out of the package on { $date } ({ $notes })."
 translation = "Hoard витягнув його з пакунка { $date } ({ $notes })."
 
+[messages.asset-other-formats]
+source = "Other formats"
+translation = "Інші формати"
+
 [messages.asset-palette]
 source = "Colors in the picture"
 translation = "Кольори на зображенні"
@@ -2428,6 +2436,10 @@ translation = "Показати ще { $count }"
 [messages.asset-show-views]
 source = "Show the four-view sheet the tagger saw"
 translation = "Показати аркуш із чотирма виглядами, який бачив тегувальник"
+
+[messages.asset-shown-as]
+source = "Shown in the library as"
+translation = "У бібліотеці показано як"
 
 [messages.asset-source]
 source = "Source"

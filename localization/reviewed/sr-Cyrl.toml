@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "fdade8b2a0a47eaf5e9d94cd1c6d23c07280b4d418c7b1fceea411686bd31c20"
+source = "43ac7cfb222bc79dc1a06c9610721ba4c7281b36f01dfdc5721d8596f67b982c"
 translation = "c2a4a8051502263df10866a7bb372ad5cdada115fb8d6449130cdd2d1752dd61"
 
 [messages.account-add]
@@ -1297,8 +1297,8 @@ source = "Including supporting files"
 translation = "Укључујући пратеће датотеке"
 
 [messages.app-supporting-title]
-source = "glTF buffers, material libraries, the maps of materials, materials only one model wears and the store files describing models. They come along when you download what uses them. A sprite sheet’s pages, and its sprites the pack has as separate images too, are shown with the sheet."
-translation = "glTF бафери, библиотеке материјала, мапе материјала, материјали које носи само један модел и датотеке продавница које описују моделе. Долазе уз оно што их користи када то преузмете. Странице листа спрајтова, и његови спрајтови које пакет има и као засебне слике, приказују се уз лист."
+source = "glTF buffers, material libraries, the maps of materials, materials only one model wears and the store files describing models. They come along when you download what uses them. A sprite sheet’s pages, and its sprites the pack has as separate images too, are shown with the sheet. An asset the pack has in several formats is shown once, in the format Hoard reads best."
+translation = "glTF бафери, библиотеке материјала, мапе материјала, материјали које носи само један модел и датотеке продавница које описују моделе. Долазе уз оно што их користи када то преузмете. Странице листа спрајтова, и његови спрајтови које пакет има и као засебне слике, приказују се уз лист. Ресурс који пакет има у више формата приказује се једном, у формату који Hoard најбоље чита."
 
 [messages.app-theme]
 source = "Theme"
@@ -1618,6 +1618,10 @@ translation = "Преузми као"
 [messages.asset-as-original]
 source = "{ $format } (original format)"
 translation = "{ $format } (оригинални формат)"
+
+[messages.asset-as-pack-files]
+source = "The pack’s own files"
+translation = "Датотеке из пакета"
 
 [messages.asset-as-queued]
 source = "Queued…"
@@ -2220,6 +2224,10 @@ translation = "Hoard ју је прочитао из пакета { $date }."
 source = "Hoard read it out of the package on { $date } ({ $notes })."
 translation = "Hoard ју је прочитао из пакета { $date } ({ $notes })."
 
+[messages.asset-other-formats]
+source = "Other formats"
+translation = "Други формати"
+
 [messages.asset-palette]
 source = "Colors in the picture"
 translation = "Боје на слици"
@@ -2367,6 +2375,10 @@ translation = "Прикажи још { $count }"
 [messages.asset-show-views]
 source = "Show the four-view sheet the tagger saw"
 translation = "Прикажи лист с четири погледа који је видео означивач"
+
+[messages.asset-shown-as]
+source = "Shown in the library as"
+translation = "У библиотеци приказан као"
 
 [messages.asset-source]
 source = "Source"

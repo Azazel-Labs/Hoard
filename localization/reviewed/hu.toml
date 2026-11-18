@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "fdade8b2a0a47eaf5e9d94cd1c6d23c07280b4d418c7b1fceea411686bd31c20"
+source = "43ac7cfb222bc79dc1a06c9610721ba4c7281b36f01dfdc5721d8596f67b982c"
 translation = "230aa92a6033cfd0e81420ca5ef21ba788bfd9cbf50cc6964032f8c9499222bf"
 
 [messages.account-add]
@@ -1261,8 +1261,8 @@ source = "Including supporting files"
 translation = "Kiegészítő fájlokkal együtt"
 
 [messages.app-supporting-title]
-source = "glTF buffers, material libraries, the maps of materials, materials only one model wears and the store files describing models. They come along when you download what uses them. A sprite sheet’s pages, and its sprites the pack has as separate images too, are shown with the sheet."
-translation = "glTF-pufferek, anyagkönyvtárak, az anyagok térképei, csak egy modell által használt anyagok és a modelleket leíró áruházi fájlok. Velük együtt töltődnek le, amikor letölti az őket használó elemet. A sprite-lap oldalai és azon spritejai, amelyek a csomagban külön képként is megvannak, a lappal együtt jelennek meg."
+source = "glTF buffers, material libraries, the maps of materials, materials only one model wears and the store files describing models. They come along when you download what uses them. A sprite sheet’s pages, and its sprites the pack has as separate images too, are shown with the sheet. An asset the pack has in several formats is shown once, in the format Hoard reads best."
+translation = "glTF-pufferek, anyagkönyvtárak, az anyagok térképei, csak egy modell által használt anyagok és a modelleket leíró áruházi fájlok. Velük együtt töltődnek le, amikor letölti az őket használó elemet. A sprite-lap oldalai és azon spritejai, amelyek a csomagban külön képként is megvannak, a lappal együtt jelennek meg. Egy elem, amely a csomagban több formátumban is megvan, egyszer jelenik meg, abban a formátumban, amelyet a Hoard a legjobban olvas."
 
 [messages.app-theme]
 source = "Theme"
@@ -1558,6 +1558,10 @@ translation = "Letöltés másként"
 [messages.asset-as-original]
 source = "{ $format } (original format)"
 translation = "{ $format } (eredeti formátum)"
+
+[messages.asset-as-pack-files]
+source = "The pack’s own files"
+translation = "A csomag saját fájljai"
 
 [messages.asset-as-queued]
 source = "Queued…"
@@ -2143,6 +2147,10 @@ translation = "A Hoard olvasta ki a csomagfájlból ekkor: { $date }."
 source = "Hoard read it out of the package on { $date } ({ $notes })."
 translation = "A Hoard olvasta ki a csomagfájlból ekkor: { $date } ({ $notes })."
 
+[messages.asset-other-formats]
+source = "Other formats"
+translation = "Más formátumok"
+
 [messages.asset-palette]
 source = "Colors in the picture"
 translation = "A kép színei"
@@ -2290,6 +2298,10 @@ translation = "További { $count } megjelenítése"
 [messages.asset-show-views]
 source = "Show the four-view sheet the tagger saw"
 translation = "A címkéző által látott négynézetes lap megjelenítése"
+
+[messages.asset-shown-as]
+source = "Shown in the library as"
+translation = "A könyvtárban így látszik"
 
 [messages.asset-source]
 source = "Source"

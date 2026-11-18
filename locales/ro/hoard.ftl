@@ -634,7 +634,7 @@ app-save-search = Salvați căutarea
 app-select-title = Alegeți mai multe resurse pentru a le eticheta, categorisi, colecta, descărca sau arhiva împreună (X sau Ctrl-clic)
 app-select = Selectați
 app-tile-size = Mărimea dalelor
-app-supporting-title = Buffere glTF, biblioteci de materiale, hărțile materialelor, materiale purtate de un singur model și fișierele de magazin care descriu modele. Vin împreună cu ce le folosește atunci când descărcați. Paginile unei foi de sprite-uri și sprite-urile ei pe care pachetul le are și ca imagini separate sunt afișate împreună cu foaia.
+app-supporting-title = Buffere glTF, biblioteci de materiale, hărțile materialelor, materiale purtate de un singur model și fișierele de magazin care descriu modele. Vin împreună cu ce le folosește atunci când descărcați. Paginile unei foi de sprite-uri și sprite-urile ei pe care pachetul le are și ca imagini separate sunt afișate împreună cu foaia. Un element pe care pachetul îl are în mai multe formate este afișat o dată, în formatul pe care Hoard îl citește cel mai bine.
 app-supporting-hidden =
     { $count ->
         [one] { $count } fișier auxiliar ascuns
@@ -1404,6 +1404,8 @@ asset-sprites = Sprite-uri
 asset-used-by = Folosit de
 asset-loose-sprites = Și ca fișiere separate
 asset-in-sheet = Într-o foaie de sprite-uri
+asset-other-formats = Alte formate
+asset-shown-as = Afișat în bibliotecă ca
 asset-conversion-failed = conversia a eșuat
 asset-as-converting = Se convertește…
 asset-as-converting-percent = Se convertește… { $percent }%
@@ -1411,6 +1413,7 @@ asset-as-queued = În așteptare…
 asset-download = Descărcați
 asset-as-label = Descărcați ca
 asset-as-original = { $format } (formatul original)
+asset-as-pack-files = Fișierele pachetului
 asset-as-size = Mărime
 asset-as-full-size = Mărime completă
 asset-as-up-to = Până la { $size } px

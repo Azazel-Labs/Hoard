@@ -688,6 +688,20 @@ const MIGRATIONS: &[&str] = &[
          AND (SELECT COUNT(*) FROM assets a WHERE a.pack_id = p.id AND a.kind = 'texture') > 1
          AND NOT EXISTS (SELECT 1 FROM jobs j WHERE j.kind = 'materials' AND j.pack_id = p.id
                            AND j.status IN ('queued', 'running'));",
+    // 65: an asset the pack has in several formats (`house.skp` and `house.obj`, `click.wav` and `click.ogg`) is
+    // one asset, its other formats linked from it (`format`) and hidden with it. Packs with files of one kind and
+    // name in more than one format are looked through again.
+    "INSERT INTO jobs (kind, pack_id, payload, run_after, created_at, updated_at)
+       SELECT 'materials', p.id, '{}', strftime('%Y-%m-%dT%H:%M:%SZ', 'now'), strftime('%Y-%m-%dT%H:%M:%SZ', 'now'),
+              strftime('%Y-%m-%dT%H:%M:%SZ', 'now')
+       FROM packs p WHERE p.status = 'ready'
+         AND EXISTS (SELECT 1 FROM (SELECT a.kind, lower(substr(a.path, length(rtrim(a.path, replace(a.path, '/', ''))) + 1,
+                                          length(a.path) - length(rtrim(a.path, replace(a.path, '/', ''))) - length(a.ext) - 1)) AS stem,
+                                          lower(a.ext) AS ext
+                                     FROM assets a WHERE a.pack_id = p.id AND a.kind IN ('model', 'audio', 'font'))
+                     GROUP BY kind, stem HAVING COUNT(DISTINCT ext) > 1)
+         AND NOT EXISTS (SELECT 1 FROM jobs j WHERE j.kind = 'materials' AND j.pack_id = p.id
+                           AND j.status IN ('queued', 'running'));",
 ];
 
 /// How many automatic pre-upgrade backups to keep in `<data dir>/backups`.
@@ -1380,6 +1394,9 @@ pub(crate) fn get_asset(conn: &Connection, id: &str) -> Result<Option<Asset>> {
     Ok(Some(asset))
 }
 
+/// A family member that isn't another format of one: that's the same member, not one more of the family.
+const ONE_FORMAT: &str = "NOT EXISTS (SELECT 1 FROM asset_links l WHERE l.to_id = f.asset_id AND l.rel = 'format')";
+
 /// The variant family an asset belongs to (if any), with up to 60 other members.
 pub(crate) fn family(conn: &Connection, id: &str) -> Result<Option<hoard_core::Family>> {
     let Some(key): Option<String> =
@@ -1387,12 +1404,16 @@ pub(crate) fn family(conn: &Connection, id: &str) -> Result<Option<hoard_core::F
     else {
         return Ok(None);
     };
-    let size: i64 = conn.query_row("SELECT COUNT(*) FROM asset_family WHERE family_key = ?1", [&key], |r| r.get(0))?;
-    let mut stmt = conn.prepare(
+    let size: i64 = conn.query_row(
+        &format!("SELECT COUNT(*) FROM asset_family f WHERE f.family_key = ?1 AND {ONE_FORMAT}"),
+        [&key],
+        |r| r.get(0),
+    )?;
+    let mut stmt = conn.prepare(&format!(
         "SELECT a.id, a.name, a.path, a.kind, a.thumb_hash IS NOT NULL, b.size FROM asset_family f
          JOIN assets a ON a.id = f.asset_id JOIN blobs b ON b.hash = a.blob_hash
-         WHERE f.family_key = ?1 AND a.id != ?2 ORDER BY a.path LIMIT 60",
-    )?;
+         WHERE f.family_key = ?1 AND a.id != ?2 AND {ONE_FORMAT} ORDER BY a.path LIMIT 60"
+    ))?;
     let members = stmt
         .query_map(params![key, id], |r| {
             Ok(AssetLink {
@@ -1949,7 +1970,7 @@ pub(crate) const LIVE: &str =
 /// one object only (`owned_by`, see `materials::mark_owned`): then it's part of that model, which shows it.
 /// A sprite sheet's pages, and the loose images it has its sprites as too, are shown with the sheet.
 pub(crate) const SUPPORTING: &str = "(EXISTS (SELECT 1 FROM asset_links l WHERE l.to_id = a.id
-     AND (l.rel IN ('buffer', 'sidecar', 'sprite') OR (l.rel = 'material' AND a.ext = 'mtl')
+     AND (l.rel IN ('buffer', 'sidecar', 'sprite', 'format') OR (l.rel = 'material' AND a.ext = 'mtl')
           OR (l.rel = 'texture' AND a.kind = 'texture'
               AND EXISTS (SELECT 1 FROM assets s WHERE s.id = l.from_id AND s.kind = 'sheet'))))
      OR EXISTS (SELECT 1 FROM material_maps m WHERE m.texture_id = a.id)

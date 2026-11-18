@@ -605,7 +605,7 @@ app-save-search = Suche speichern
 app-select-title = Mehrere Assets auswählen, um sie gemeinsam zu taggen, zu kategorisieren, zu sammeln, herunterzuladen oder zu archivieren (X oder Ctrl-Klick)
 app-select = Auswählen
 app-tile-size = Kachelgröße
-app-supporting-title = glTF-Buffer, Materialbibliotheken, die Maps von Materialien, Materialien, die nur ein Modell trägt, und die Store-Dateien, die Modelle beschreiben. Sie kommen mit, wenn Sie herunterladen, was sie verwendet. Die Seiten eines Spritesheets und seine Sprites, die das Paket auch als einzelne Bilder hat, werden mit dem Spritesheet gezeigt.
+app-supporting-title = glTF-Buffer, Materialbibliotheken, die Maps von Materialien, Materialien, die nur ein Modell trägt, und die Store-Dateien, die Modelle beschreiben. Sie kommen mit, wenn Sie herunterladen, was sie verwendet. Die Seiten eines Spritesheets und seine Sprites, die das Paket auch als einzelne Bilder hat, werden mit dem Spritesheet gezeigt. Ein Asset, das das Paket in mehreren Formaten hat, wird einmal gezeigt, im Format, das Hoard am besten liest.
 app-supporting-hidden =
     { $count } { $count ->
         [one] Begleitdatei
@@ -1296,6 +1296,8 @@ asset-sprites = Sprites
 asset-used-by = Verwendet von
 asset-loose-sprites = Auch als einzelne Dateien
 asset-in-sheet = In einem Spritesheet
+asset-other-formats = Andere Formate
+asset-shown-as = In der Bibliothek gezeigt als
 asset-conversion-failed = Umwandlung fehlgeschlagen
 asset-as-converting = Wird umgewandelt…
 asset-as-converting-percent = Wird umgewandelt… { $percent } %
@@ -1303,6 +1305,7 @@ asset-as-queued = In der Warteschlange…
 asset-download = Herunterladen
 asset-as-label = Herunterladen als
 asset-as-original = { $format } (Originalformat)
+asset-as-pack-files = Die Dateien des Pakets
 asset-as-size = Größe
 asset-as-full-size = Volle Größe
 asset-as-up-to = Bis { $size } px

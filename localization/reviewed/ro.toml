@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "fdade8b2a0a47eaf5e9d94cd1c6d23c07280b4d418c7b1fceea411686bd31c20"
+source = "43ac7cfb222bc79dc1a06c9610721ba4c7281b36f01dfdc5721d8596f67b982c"
 translation = "4153ba96d36b94b3768217f18b9520b9cc368f6074756e2f4f8bad12b6fcaaa8"
 
 [messages.account-add]
@@ -1322,8 +1322,8 @@ source = "Including supporting files"
 translation = "Inclusiv fișierele auxiliare"
 
 [messages.app-supporting-title]
-source = "glTF buffers, material libraries, the maps of materials, materials only one model wears and the store files describing models. They come along when you download what uses them. A sprite sheet’s pages, and its sprites the pack has as separate images too, are shown with the sheet."
-translation = "Buffere glTF, biblioteci de materiale, hărțile materialelor, materiale purtate de un singur model și fișierele de magazin care descriu modele. Vin împreună cu ce le folosește atunci când descărcați. Paginile unei foi de sprite-uri și sprite-urile ei pe care pachetul le are și ca imagini separate sunt afișate împreună cu foaia."
+source = "glTF buffers, material libraries, the maps of materials, materials only one model wears and the store files describing models. They come along when you download what uses them. A sprite sheet’s pages, and its sprites the pack has as separate images too, are shown with the sheet. An asset the pack has in several formats is shown once, in the format Hoard reads best."
+translation = "Buffere glTF, biblioteci de materiale, hărțile materialelor, materiale purtate de un singur model și fișierele de magazin care descriu modele. Vin împreună cu ce le folosește atunci când descărcați. Paginile unei foi de sprite-uri și sprite-urile ei pe care pachetul le are și ca imagini separate sunt afișate împreună cu foaia. Un element pe care pachetul îl are în mai multe formate este afișat o dată, în formatul pe care Hoard îl citește cel mai bine."
 
 [messages.app-theme]
 source = "Theme"
@@ -1653,6 +1653,10 @@ translation = "Descărcați ca"
 [messages.asset-as-original]
 source = "{ $format } (original format)"
 translation = "{ $format } (formatul original)"
+
+[messages.asset-as-pack-files]
+source = "The pack’s own files"
+translation = "Fișierele pachetului"
 
 [messages.asset-as-queued]
 source = "Queued…"
@@ -2265,6 +2269,10 @@ translation = "Hoard l-a extras din pachet pe { $date }."
 source = "Hoard read it out of the package on { $date } ({ $notes })."
 translation = "Hoard l-a extras din pachet pe { $date } ({ $notes })."
 
+[messages.asset-other-formats]
+source = "Other formats"
+translation = "Alte formate"
+
 [messages.asset-palette]
 source = "Colors in the picture"
 translation = "Culorile din imagine"
@@ -2412,6 +2420,10 @@ translation = "Afișați încă { $count }"
 [messages.asset-show-views]
 source = "Show the four-view sheet the tagger saw"
 translation = "Afișați foaia cu cele patru vederi pe care a văzut-o etichetatorul"
+
+[messages.asset-shown-as]
+source = "Shown in the library as"
+translation = "Afișat în bibliotecă ca"
 
 [messages.asset-source]
 source = "Source"

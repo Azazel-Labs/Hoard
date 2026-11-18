@@ -408,6 +408,11 @@ software rasterizer (`apt install mesa-vulkan-drivers`). Without any adapter, ev
      - `.exr`/`.hdr`: tone-mapped previews.
      - Recognized by kind, without previews yet: GIMP, Clip Studio, Affinity, Procreate, Substance, ZBrush, Maya/Max,
        Houdini, C4D, DAW projects, and video.
+   - One asset in several formats: a model, sound or font the pack has more than once under the same name, beside
+     itself (`house.skp` and `house.obj`) or in folders named after each format (Kenney's `Models/FBX format/` and
+     `Models/OBJ format/`), is shown once, in the format Hoard reads best or that loses least (GLB, then glTF, FBX,
+     OBJ…; FLAC and WAV before OGG and MP3; OTF before TTF and WOFF). The others are hidden with it, listed in its
+     details under "Other formats", and downloadable as the pack's own files from its "Download as".
 4. **Tag (offline).** A deterministic tagger tokenizes paths (`FootstepGrass_01` → `footstep grass`), applies a
    game-asset vocabulary (audio-only words such as "run" only apply to audio), adds measured facts (`res:2k`, `pot`,
    `tileable`, `duration:short`, `poly:low`, `rigged`), groups PBR maps into sets (`Rock_Cliff_Normal.png` →

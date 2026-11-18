@@ -601,7 +601,7 @@ app-save-search = Zoekopdracht opslaan
 app-select-title = Kies meerdere assets om ze samen te taggen, te categoriseren, in een collectie te zetten, te downloaden of te archiveren (X, of Ctrl-klik)
 app-select = Selecteren
 app-tile-size = Tegelgrootte
-app-supporting-title = glTF-buffers, materiaalbibliotheken, de maps van materialen, materialen die maar één model draagt en de storebestanden die modellen beschrijven. Ze gaan mee als je downloadt wat ze gebruikt. De pagina’s van een spritesheet, en de sprites die het pakket ook als losse afbeeldingen heeft, worden bij de spritesheet getoond.
+app-supporting-title = glTF-buffers, materiaalbibliotheken, de maps van materialen, materialen die maar één model draagt en de storebestanden die modellen beschrijven. Ze gaan mee als je downloadt wat ze gebruikt. De pagina’s van een spritesheet, en de sprites die het pakket ook als losse afbeeldingen heeft, worden bij de spritesheet getoond. Een asset die het pakket in meerdere formaten heeft, wordt één keer getoond, in het formaat dat Hoard het best leest.
 app-supporting-hidden =
     { $count } ondersteunende { $count ->
         [one] bestand
@@ -1296,6 +1296,8 @@ asset-sprites = Sprites
 asset-used-by = Gebruikt door
 asset-loose-sprites = Ook als losse bestanden
 asset-in-sheet = In een spritesheet
+asset-other-formats = Andere formaten
+asset-shown-as = In de bibliotheek getoond als
 asset-conversion-failed = conversie mislukt
 asset-as-converting = Converteren…
 asset-as-converting-percent = Converteren… { $percent }%
@@ -1303,6 +1305,7 @@ asset-as-queued = In de wachtrij…
 asset-download = Downloaden
 asset-as-label = Downloaden als
 asset-as-original = { $format } (origineel formaat)
+asset-as-pack-files = De eigen bestanden van het pakket
 asset-as-size = Grootte
 asset-as-full-size = Volledige grootte
 asset-as-up-to = Tot { $size } px

@@ -601,7 +601,7 @@ app-save-search = Gem søgning
 app-select-title = Vælg flere assets, der skal tagges, kategoriseres, samles, downloades eller arkiveres sammen (X eller Ctrl-klik)
 app-select = Vælg
 app-tile-size = Feltstørrelse
-app-supporting-title = glTF-buffere, materialebiblioteker, materialers maps, materialer, som kun én model bærer, og de butiksfiler, der beskriver modeller. De kommer med, når du downloader det, der bruger dem. Et sprite-arks sider og de sprites, pakken også har som separate billeder, vises sammen med arket.
+app-supporting-title = glTF-buffere, materialebiblioteker, materialers maps, materialer, som kun én model bærer, og de butiksfiler, der beskriver modeller. De kommer med, når du downloader det, der bruger dem. Et sprite-arks sider og de sprites, pakken også har som separate billeder, vises sammen med arket. Et asset, som pakken har i flere formater, vises én gang, i det format Hoard læser bedst.
 app-supporting-hidden =
     { $count } { $count ->
         [one] understøttende fil
@@ -1298,6 +1298,8 @@ asset-sprites = Sprites
 asset-used-by = Bruges af
 asset-loose-sprites = Også som separate filer
 asset-in-sheet = I et spriteark
+asset-other-formats = Andre formater
+asset-shown-as = Vist i biblioteket som
 asset-conversion-failed = konverteringen mislykkedes
 asset-as-converting = Konverterer…
 asset-as-converting-percent = Konverterer… { $percent } %
@@ -1305,6 +1307,7 @@ asset-as-queued = I kø…
 asset-download = Download
 asset-as-label = Download som
 asset-as-original = { $format } (originalt format)
+asset-as-pack-files = Pakkens egne filer
 asset-as-size = Størrelse
 asset-as-full-size = Fuld størrelse
 asset-as-up-to = Op til { $size } px

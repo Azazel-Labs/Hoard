@@ -579,6 +579,11 @@ fn detect_turned(state: &AppState, rt: &Handle, conn: &mut Connection, pack_id: 
         Ok(atlases) => tracing::info!(pack = pack_id, atlases, "sprite atlases found"),
         Err(e) => tracing::warn!(pack = pack_id, error = %format!("{e:#}"), "could not read sprite atlases"),
     }
+    match crate::alternates::detect_pack(conn, pack_id) {
+        Ok(0) => {}
+        Ok(assets) => tracing::info!(pack = pack_id, assets, "assets in several formats found"),
+        Err(e) => tracing::warn!(pack = pack_id, error = %format!("{e:#}"), "could not find assets in several formats"),
+    }
     // Before dressing, which then redraws the dressed ones among them.
     if let Err(e) = redraw_glass(state, rt, conn, pack_id) {
         tracing::warn!(pack = pack_id, error = %format!("{e:#}"), "could not redraw thumbnails of models with glass");

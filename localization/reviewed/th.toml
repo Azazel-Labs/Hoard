@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "fdade8b2a0a47eaf5e9d94cd1c6d23c07280b4d418c7b1fceea411686bd31c20"
+source = "43ac7cfb222bc79dc1a06c9610721ba4c7281b36f01dfdc5721d8596f67b982c"
 translation = "07555d54b3ba6bc94b6fcbf55672d1be5e77ca134c96e30754ee929b3a902828"
 
 [messages.account-add]
@@ -1257,8 +1257,8 @@ source = "Including supporting files"
 translation = "รวมไฟล์ประกอบด้วย"
 
 [messages.app-supporting-title]
-source = "glTF buffers, material libraries, the maps of materials, materials only one model wears and the store files describing models. They come along when you download what uses them. A sprite sheet’s pages, and its sprites the pack has as separate images too, are shown with the sheet."
-translation = "บัฟเฟอร์ glTF, ไลบรารีแมทีเรียล, แมปของแมทีเรียล, แมทีเรียลที่มีโมเดลเดียวใช้ และไฟล์ร้านค้าที่อธิบายโมเดล ไฟล์เหล่านี้จะมาด้วยเมื่อคุณดาวน์โหลดสิ่งที่ใช้ไฟล์เหล่านี้ หน้าของสไปรต์ชีต และสไปรต์ของชีตที่แพ็กมีเป็นภาพแยกด้วย จะแสดงร่วมกับชีต"
+source = "glTF buffers, material libraries, the maps of materials, materials only one model wears and the store files describing models. They come along when you download what uses them. A sprite sheet’s pages, and its sprites the pack has as separate images too, are shown with the sheet. An asset the pack has in several formats is shown once, in the format Hoard reads best."
+translation = "บัฟเฟอร์ glTF, ไลบรารีแมทีเรียล, แมปของแมทีเรียล, แมทีเรียลที่มีโมเดลเดียวใช้ และไฟล์ร้านค้าที่อธิบายโมเดล ไฟล์เหล่านี้จะมาด้วยเมื่อคุณดาวน์โหลดสิ่งที่ใช้ไฟล์เหล่านี้ หน้าของสไปรต์ชีต และสไปรต์ของชีตที่แพ็กมีเป็นภาพแยกด้วย จะแสดงร่วมกับชีต แอสเซ็ตที่แพ็กมีหลายรูปแบบจะแสดงครั้งเดียว ในรูปแบบที่ Hoard อ่านได้ดีที่สุด"
 
 [messages.app-theme]
 source = "Theme"
@@ -1554,6 +1554,10 @@ translation = "ดาวน์โหลดเป็น"
 [messages.asset-as-original]
 source = "{ $format } (original format)"
 translation = "{ $format } (รูปแบบต้นฉบับ)"
+
+[messages.asset-as-pack-files]
+source = "The pack’s own files"
+translation = "ไฟล์ของแพ็กเอง"
 
 [messages.asset-as-queued]
 source = "Queued…"
@@ -2137,6 +2141,10 @@ translation = "Hoard อ่านออกมาจากแพ็กเกจ�
 source = "Hoard read it out of the package on { $date } ({ $notes })."
 translation = "Hoard อ่านออกมาจากแพ็กเกจเมื่อ { $date } ({ $notes })"
 
+[messages.asset-other-formats]
+source = "Other formats"
+translation = "รูปแบบอื่น"
+
 [messages.asset-palette]
 source = "Colors in the picture"
 translation = "สีในภาพ"
@@ -2284,6 +2292,10 @@ translation = "แสดงเพิ่มอีก { $count } รายกา�
 [messages.asset-show-views]
 source = "Show the four-view sheet the tagger saw"
 translation = "แสดงแผ่นภาพสี่มุมมองที่ตัวติดแท็กเห็น"
+
+[messages.asset-shown-as]
+source = "Shown in the library as"
+translation = "แสดงในคลังเป็น"
 
 [messages.asset-source]
 source = "Source"

@@ -609,7 +609,7 @@ app-save-search = Salva ricerca
 app-select-title = Scegli più asset per assegnare tag, categorizzarli, raccoglierli, scaricarli o archiviarli insieme (X, o Ctrl+clic)
 app-select = Seleziona
 app-tile-size = Dimensione riquadri
-app-supporting-title = Buffer glTF, librerie di materiali, le mappe dei materiali, i materiali usati da un solo modello e i file degli store che descrivono i modelli. Vengono inclusi quando scarichi ciò che li usa. Le pagine di uno sprite sheet, e i suoi sprite che il pacchetto ha anche come immagini separate, sono mostrati con lo sheet.
+app-supporting-title = Buffer glTF, librerie di materiali, le mappe dei materiali, i materiali usati da un solo modello e i file degli store che descrivono i modelli. Vengono inclusi quando scarichi ciò che li usa. Le pagine di uno sprite sheet, e i suoi sprite che il pacchetto ha anche come immagini separate, sono mostrati con lo sheet. Un asset che il pacchetto ha in più formati è mostrato una volta, nel formato che Hoard legge meglio.
 app-supporting-hidden =
     { $count ->
         [one] { $count } file di supporto nascosto
@@ -1310,6 +1310,8 @@ asset-sprites = Sprite
 asset-used-by = Usato da
 asset-loose-sprites = Anche come file separati
 asset-in-sheet = In uno sprite sheet
+asset-other-formats = Altri formati
+asset-shown-as = Mostrato nella libreria come
 asset-conversion-failed = conversione non riuscita
 asset-as-converting = Conversione…
 asset-as-converting-percent = Conversione… { $percent }%
@@ -1317,6 +1319,7 @@ asset-as-queued = In coda…
 asset-download = Scarica
 asset-as-label = Scarica come
 asset-as-original = { $format } (formato originale)
+asset-as-pack-files = I file del pacchetto
 asset-as-size = Dimensione
 asset-as-full-size = Dimensione piena
 asset-as-up-to = Fino a { $size } px

@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "fdade8b2a0a47eaf5e9d94cd1c6d23c07280b4d418c7b1fceea411686bd31c20"
+source = "43ac7cfb222bc79dc1a06c9610721ba4c7281b36f01dfdc5721d8596f67b982c"
 translation = "233736fce877dd72d5c0840b380752036aeadf00268c938b28bf55f6d4bddad5"
 
 [messages.account-add]
@@ -1293,8 +1293,8 @@ source = "Including supporting files"
 translation = "Inkluderer støttefiler"
 
 [messages.app-supporting-title]
-source = "glTF buffers, material libraries, the maps of materials, materials only one model wears and the store files describing models. They come along when you download what uses them. A sprite sheet’s pages, and its sprites the pack has as separate images too, are shown with the sheet."
-translation = "glTF-buffere, materialbiblioteker, kartene til materialer, materialer som bare én modell bruker, og butikkfilene som beskriver modeller. De følger med når du laster ned det som bruker dem. Et spritearks sider, og spritene pakken også har som egne bilder, vises sammen med arket."
+source = "glTF buffers, material libraries, the maps of materials, materials only one model wears and the store files describing models. They come along when you download what uses them. A sprite sheet’s pages, and its sprites the pack has as separate images too, are shown with the sheet. An asset the pack has in several formats is shown once, in the format Hoard reads best."
+translation = "glTF-buffere, materialbiblioteker, kartene til materialer, materialer som bare én modell bruker, og butikkfilene som beskriver modeller. De følger med når du laster ned det som bruker dem. Et spritearks sider, og spritene pakken også har som egne bilder, vises sammen med arket. En ressurs pakken har i flere formater, vises én gang, i formatet Hoard leser best."
 
 [messages.app-theme]
 source = "Theme"
@@ -1613,6 +1613,10 @@ translation = "Last ned som"
 [messages.asset-as-original]
 source = "{ $format } (original format)"
 translation = "{ $format } (opprinnelig format)"
+
+[messages.asset-as-pack-files]
+source = "The pack’s own files"
+translation = "Pakkens egne filer"
 
 [messages.asset-as-queued]
 source = "Queued…"
@@ -2210,6 +2214,10 @@ translation = "Hoard leste den ut av pakkefilen { $date }."
 source = "Hoard read it out of the package on { $date } ({ $notes })."
 translation = "Hoard leste den ut av pakkefilen { $date } ({ $notes })."
 
+[messages.asset-other-formats]
+source = "Other formats"
+translation = "Andre formater"
+
 [messages.asset-palette]
 source = "Colors in the picture"
 translation = "Farger i bildet"
@@ -2357,6 +2365,10 @@ translation = "Vis { $count } til"
 [messages.asset-show-views]
 source = "Show the four-view sheet the tagger saw"
 translation = "Vis arket med fire visninger som taggeren så"
+
+[messages.asset-shown-as]
+source = "Shown in the library as"
+translation = "Vist i biblioteket som"
 
 [messages.asset-source]
 source = "Source"

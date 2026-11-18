@@ -2,6 +2,7 @@
 //! from the command line, and the desktop app runs it inside its window.
 
 mod activity;
+mod alternates;
 mod analyze;
 mod animations;
 mod api;

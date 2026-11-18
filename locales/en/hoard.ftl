@@ -681,7 +681,7 @@ app-save-search = Save search
 app-select-title = Pick several assets to tag, categorize, collect, download or archive together (X, or Ctrl-click)
 app-select = Select
 app-tile-size = Tile size
-app-supporting-title = glTF buffers, material libraries, the maps of materials, materials only one model wears and the store files describing models. They come along when you download what uses them. A sprite sheet’s pages, and its sprites the pack has as separate images too, are shown with the sheet.
+app-supporting-title = glTF buffers, material libraries, the maps of materials, materials only one model wears and the store files describing models. They come along when you download what uses them. A sprite sheet’s pages, and its sprites the pack has as separate images too, are shown with the sheet. An asset the pack has in several formats is shown once, in the format Hoard reads best.
 app-supporting-hidden =
     { $count } supporting { $count ->
         [one] file
@@ -1453,6 +1453,9 @@ asset-used-by = Used by
 # On a sprite sheet, its sprites the pack has as separate images too; on one of those, the sheet it is in.
 asset-loose-sprites = Also as separate files
 asset-in-sheet = In sprite sheet
+# On an asset the pack has in several formats, its other formats; on one of those, the format it is shown as.
+asset-other-formats = Other formats
+asset-shown-as = Shown in the library as
 # "Download as": converting the file on the server.
 asset-conversion-failed = conversion failed
 asset-as-converting = Converting…
@@ -1462,6 +1465,8 @@ asset-download = Download
 asset-as-label = Download as
 # The first "Download as" choice; $format is the file's own format, like PNG.
 asset-as-original = { $format } (original format)
+# In "Download as", the group of the asset's other formats the pack has as files of their own.
+asset-as-pack-files = The pack’s own files
 asset-as-size = Size
 asset-as-full-size = Full size
 # $size is a number of pixels, like 2048.

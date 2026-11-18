@@ -10,7 +10,7 @@ export type TagSource = 'meta' | 'rule' | 'ai' | 'human'
 
 export interface Tag { tag: string; source: TagSource; confidence: number }
 
-export type LinkRel = 'texture' | 'buffer' | 'material' | 'animation' | 'library' | 'guess' | 'sidecar' | 'variant' | 'sprite'
+export type LinkRel = 'texture' | 'buffer' | 'material' | 'animation' | 'library' | 'guess' | 'sidecar' | 'variant' | 'sprite' | 'format'
 
 export interface AssetLink {
   id: string
@@ -1356,7 +1356,7 @@ export interface ConversionStatus {
   error?: string
 }
 
-export const fileUrl = (a: Asset, download = false) => `/api/assets/${a.id}/file${download ? '?download=1' : ''}`
+export const fileUrl = (a: { id: string }, download = false) => `/api/assets/${a.id}/file${download ? '?download=1' : ''}`
 /** The asset converted to another format (made on first request, then cached), optionally scaled down. */
 export const asUrl = (a: { id: string }, format: string, max?: number) =>
   `/api/assets/${a.id}/as/${format}${max ? `?max=${max}` : ''}`

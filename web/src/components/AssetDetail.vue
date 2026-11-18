@@ -114,7 +114,7 @@ const withAnimations = ref(false)
 const isModel = computed(() => isModelAsset(props.asset))
 const isText = computed(() => isTextAsset(props.asset))
 // Getters, so the words are read at render time in the current language.
-const REL_LABEL: Record<LinkRel, string> = {
+const REL_LABEL: Record<Exclude<LinkRel, 'format'>, string> = {
   get texture() { return t('asset-rel-texture') },
   get buffer() { return t('asset-rel-buffer') },
   get material() { return t('asset-rel-material') },
@@ -125,7 +125,7 @@ const REL_LABEL: Record<LinkRel, string> = {
   get variant() { return t('asset-rel-variant') },
   get sprite() { return t('asset-rel-sprite') },
 }
-const needs = computed(() => props.asset.links.filter((l) => l.rel !== 'animation' && l.rel !== 'sprite'))
+const needs = computed(() => props.asset.links.filter((l) => l.rel !== 'animation' && l.rel !== 'sprite' && l.rel !== 'format'))
 // A material made from texture maps lists its maps by role instead of as "Needs"; a texture or model that belongs
 // to one names it.
 const isMaterial = computed(() => isMaterialAsset(props.asset))
@@ -144,21 +144,27 @@ const mapsBytes = computed(() => material.value?.maps.reduce((n, m) => n + m.siz
 const anims = computed(() => props.asset.links.filter((l) => l.rel === 'animation'))
 // The materials it belongs to have a section of their own.
 const usedBy = computed(() =>
-  props.asset.linked_from.filter((l) => l.rel !== 'sprite' && !partOf.value.some((m) => m.id === l.id)),
+  props.asset.linked_from.filter((l) => l.rel !== 'sprite' && l.rel !== 'format' && !partOf.value.some((m) => m.id === l.id)),
 )
 // A sheet's sprites the pack has as loose images too, and on one of those, the sheet it's a sprite of.
 const looseSprites = computed(() => props.asset.links.filter((l) => l.rel === 'sprite'))
 const inSheets = computed(() => props.asset.linked_from.filter((l) => l.rel === 'sprite'))
+// The same asset in the pack's other formats, and on one of those, the format it's shown as.
+const otherFormats = computed(() => props.asset.links.filter((l) => l.rel === 'format'))
+const shownAs = computed(() => props.asset.linked_from.filter((l) => l.rel === 'format'))
+const extOf = (path: string) => (path.includes('.') ? path.slice(path.lastIndexOf('.') + 1).toUpperCase() : '')
 const linkGroups = computed(() =>
   [
     { key: 'needs', title: t('asset-needs'), items: isMaterial.value ? [] : needs.value.filter((l) => !inMaterials.value.has(l.id)) },
     { key: 'animations', title: t('asset-animations'), items: anims.value },
     { key: 'loose', title: t('asset-loose-sprites'), items: looseSprites.value },
     { key: 'in-sheet', title: t('asset-in-sheet'), items: inSheets.value },
+    { key: 'formats', title: t('asset-other-formats'), items: otherFormats.value },
+    { key: 'shown-as', title: t('asset-shown-as'), items: shownAs.value },
     { key: 'used-by', title: t('asset-used-by'), items: usedBy.value },
   ].filter((g) => g.items.length),
 )
-const linkLabel = (l: AssetLink) => REL_LABEL[l.rel]
+const linkLabel = (l: AssetLink) => (l.rel === 'format' ? extOf(l.path) : REL_LABEL[l.rel])
 /** Long lists show their first few: the panel is about one asset, and a 40-texture "Needs" pushed the rest of it
  *  out of reach. A list only a couple longer than that shows whole, rather than hiding two behind a button. */
 const LIST_PEEK = 6
@@ -233,18 +239,29 @@ const ueTags = computed(() => {
   return tags && typeof tags === 'object' ? Object.entries(tags as Record<string, string>) : []
 })
 // "Download as": another format, or the same one scaled down. '' = the original format.
-const asFormats = computed(() => props.asset.formats ?? [])
+// A conversion to a format the pack has the asset in already is left out: its own file is offered instead.
+const asFormats = computed(() => {
+  const own = new Set(otherFormats.value.map((l) => extOf(l.path).toLowerCase()))
+  return (props.asset.formats ?? []).filter((f) => !own.has(f.format))
+})
+const PACK_FILE = 'file:'
+const packFile = computed(() =>
+  asFormat.value.startsWith(PACK_FILE) ? (otherFormats.value.find((l) => PACK_FILE + l.id === asFormat.value) ?? null) : null,
+)
 const sameFormat = computed(() => RESIZABLE_AS_ITSELF[props.asset.ext.toLowerCase()] ?? null)
 const asFormat = ref('')
 const asMax = ref(0)
+const defaultAs = () =>
+  sameFormat.value ? '' : (asFormats.value[0]?.format ?? (otherFormats.value[0] ? PACK_FILE + otherFormats.value[0].id : ''))
 watch(() => props.asset.id, () => {
-  asFormat.value = sameFormat.value ? '' : (asFormats.value[0]?.format ?? '')
+  asFormat.value = defaultAs()
   asMax.value = 0
 }, { immediate: true })
 // The format list arrives with the full asset detail, after the tile's summary: pick a default once it's there.
 watch(asFormats, (list) => {
-  const valid = asFormat.value === '' ? sameFormat.value !== null : list.some((f) => f.format === asFormat.value)
-  if (!valid) asFormat.value = sameFormat.value ? '' : (list[0]?.format ?? '')
+  const valid =
+    asFormat.value === '' ? sameFormat.value !== null : list.some((f) => f.format === asFormat.value) || packFile.value !== null
+  if (!valid) asFormat.value = defaultAs()
 })
 const asResizable = computed(() =>
   asFormat.value === '' ? sameFormat.value !== null : asFormats.value.some((f) => f.format === asFormat.value && f.resizable),
@@ -258,6 +275,7 @@ const sizeChoices = computed(() => {
   return out.slice(0, 6)
 })
 const asHref = computed(() => {
+  if (packFile.value) return fileUrl(packFile.value, true)
   const max = asResizable.value ? asMax.value : 0
   if (asFormat.value === '') return sameFormat.value && max ? asUrl(props.asset, sameFormat.value, max) : null
   return asUrl(props.asset, asFormat.value, max || undefined)
@@ -273,7 +291,7 @@ watch([() => props.asset.id, asFormat, asMax], () => {
 })
 async function downloadAs(ev: MouseEvent) {
   const href = asHref.value
-  if (!href || ev.ctrlKey || ev.metaKey || ev.shiftKey || ev.button !== 0) return
+  if (!href || packFile.value || ev.ctrlKey || ev.metaKey || ev.shiftKey || ev.button !== 0) return
   ev.preventDefault()
   if (asState.value) return
   const run = ++asRun
@@ -326,7 +344,9 @@ const SHEET_NOTE: Record<string, () => string> = {
   'sheet-frames': () => t('sheet-note-frames'),
 }
 const asNote = computed(() => SHEET_NOTE[asFormat.value]?.() ?? '')
-const showAs = computed(() => asFormats.value.length > 0 || (sameFormat.value !== null && sizeChoices.value.length > 0))
+const showAs = computed(
+  () => asFormats.value.length > 0 || otherFormats.value.length > 0 || (sameFormat.value !== null && sizeChoices.value.length > 0),
+)
 
 const origin = computed(() => props.asset.origin ?? null)
 const ueStatus = computed(() => props.asset.unreal ?? null)
@@ -1333,6 +1353,11 @@ onBeforeUnmount(() => unswipe())
         <select id="as-format" v-model="asFormat" class="field">
           <option v-if="sameFormat" value="">{{ t('asset-as-original', { format: asset.ext.toUpperCase() }) }}</option>
           <option v-for="f in asFormats" :key="f.format" :value="f.format">{{ f.label }}</option>
+          <optgroup v-if="otherFormats.length" :label="t('asset-as-pack-files')">
+            <option v-for="l in otherFormats" :key="l.id" :value="PACK_FILE + l.id">
+              {{ extOf(l.path) }} · {{ humanBytes(l.size ?? 0) }}
+            </option>
+          </optgroup>
         </select>
         <select v-if="asResizable && sizeChoices.length" v-model.number="asMax" class="field size" :aria-label="t('asset-as-size')">
           <option :value="0">{{ t('asset-as-full-size') }}</option>

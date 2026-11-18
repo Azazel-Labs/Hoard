@@ -635,7 +635,7 @@ app-save-search = Zapisz wyszukiwanie
 app-select-title = Zaznacz kilka zasobów, by razem je otagować, skategoryzować, dodać do kolekcji, pobrać lub zarchiwizować (X lub Ctrl+kliknięcie)
 app-select = Zaznacz
 app-tile-size = Rozmiar kafelków
-app-supporting-title = Bufory glTF, biblioteki materiałów, mapy materiałów, materiały używane tylko przez jeden model i pliki sklepów opisujące modele. Są pobierane razem z tym, co ich używa. Strony arkusza sprite’ów oraz jego sprite’y, które paczka ma też jako osobne obrazy, są pokazywane razem z arkuszem.
+app-supporting-title = Bufory glTF, biblioteki materiałów, mapy materiałów, materiały używane tylko przez jeden model i pliki sklepów opisujące modele. Są pobierane razem z tym, co ich używa. Strony arkusza sprite’ów oraz jego sprite’y, które paczka ma też jako osobne obrazy, są pokazywane razem z arkuszem. Zasób, który paczka ma w kilku formatach, jest pokazywany raz, w formacie, który Hoard czyta najlepiej.
 app-supporting-hidden =
     { $count ->
         [one] Ukryto { $count } plik pomocniczy
@@ -1411,6 +1411,8 @@ asset-sprites = Sprite’y
 asset-used-by = Używany przez
 asset-loose-sprites = Także jako osobne pliki
 asset-in-sheet = W arkuszu sprite’ów
+asset-other-formats = Inne formaty
+asset-shown-as = W bibliotece pokazany jako
 asset-conversion-failed = konwersja nie powiodła się
 asset-as-converting = Konwertowanie…
 asset-as-converting-percent = Konwertowanie… { $percent }%
@@ -1418,6 +1420,7 @@ asset-as-queued = W kolejce…
 asset-download = Pobierz
 asset-as-label = Pobierz jako
 asset-as-original = { $format } (format oryginalny)
+asset-as-pack-files = Pliki z paczki
 asset-as-size = Rozmiar
 asset-as-full-size = Pełny rozmiar
 asset-as-up-to = Do { $size } px

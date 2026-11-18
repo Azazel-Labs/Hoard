@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "fdade8b2a0a47eaf5e9d94cd1c6d23c07280b4d418c7b1fceea411686bd31c20"
+source = "43ac7cfb222bc79dc1a06c9610721ba4c7281b36f01dfdc5721d8596f67b982c"
 translation = "72f8bea74267d1a6341481bb8f995cf690d50c49c33ba6825335f86fe2349868"
 
 [messages.account-add]
@@ -1305,8 +1305,8 @@ source = "Including supporting files"
 translation = "Με τα βοηθητικά αρχεία"
 
 [messages.app-supporting-title]
-source = "glTF buffers, material libraries, the maps of materials, materials only one model wears and the store files describing models. They come along when you download what uses them. A sprite sheet’s pages, and its sprites the pack has as separate images too, are shown with the sheet."
-translation = "Buffers glTF, βιβλιοθήκες υλικών, οι χάρτες των υλικών, υλικά που φοράει μόνο ένα μοντέλο και τα αρχεία καταστημάτων που περιγράφουν μοντέλα. Συμπεριλαμβάνονται όταν κατεβάζετε ό,τι τα χρησιμοποιεί. Οι σελίδες ενός φύλλου sprite, και τα sprite του που το πακέτο έχει και ως ξεχωριστές εικόνες, εμφανίζονται μαζί με το φύλλο."
+source = "glTF buffers, material libraries, the maps of materials, materials only one model wears and the store files describing models. They come along when you download what uses them. A sprite sheet’s pages, and its sprites the pack has as separate images too, are shown with the sheet. An asset the pack has in several formats is shown once, in the format Hoard reads best."
+translation = "Buffers glTF, βιβλιοθήκες υλικών, οι χάρτες των υλικών, υλικά που φοράει μόνο ένα μοντέλο και τα αρχεία καταστημάτων που περιγράφουν μοντέλα. Συμπεριλαμβάνονται όταν κατεβάζετε ό,τι τα χρησιμοποιεί. Οι σελίδες ενός φύλλου sprite, και τα sprite του που το πακέτο έχει και ως ξεχωριστές εικόνες, εμφανίζονται μαζί με το φύλλο. Ένα στοιχείο που το πακέτο έχει σε πολλές μορφές εμφανίζεται μία φορά, στη μορφή που το Hoard διαβάζει καλύτερα."
 
 [messages.app-theme]
 source = "Theme"
@@ -1625,6 +1625,10 @@ translation = "Λήψη ως"
 [messages.asset-as-original]
 source = "{ $format } (original format)"
 translation = "{ $format } (αρχική μορφή)"
+
+[messages.asset-as-pack-files]
+source = "The pack’s own files"
+translation = "Τα αρχεία του πακέτου"
 
 [messages.asset-as-queued]
 source = "Queued…"
@@ -2222,6 +2226,10 @@ translation = "Το Hoard το διάβασε από το πακέτο στις 
 source = "Hoard read it out of the package on { $date } ({ $notes })."
 translation = "Το Hoard το διάβασε από το πακέτο στις { $date } ({ $notes })."
 
+[messages.asset-other-formats]
+source = "Other formats"
+translation = "Άλλες μορφές"
+
 [messages.asset-palette]
 source = "Colors in the picture"
 translation = "Χρώματα στην εικόνα"
@@ -2369,6 +2377,10 @@ translation = "Εμφάνιση { $count } ακόμη"
 [messages.asset-show-views]
 source = "Show the four-view sheet the tagger saw"
 translation = "Εμφάνιση του φύλλου τεσσάρων όψεων που είδε ο μηχανισμός ετικετών"
+
+[messages.asset-shown-as]
+source = "Shown in the library as"
+translation = "Εμφανίζεται στη βιβλιοθήκη ως"
 
 [messages.asset-source]
 source = "Source"

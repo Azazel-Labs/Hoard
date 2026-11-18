@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "201238d1f1316ec4b4b570518b01e5a32a97d7310f43d0956dd827f42f6d5000"
+source = "2235081ab15c646057416458fa3f3b8e357859d17ba776ecef2a615dd3b3e7ec"
 translation = "9bd6df5ffb27941fd7574669812413d7eaa17a0920718334cfd6ce3df12e13f5"
 
 [messages.account-add]
@@ -1986,6 +1986,26 @@ translation = "Cooked (pelikäännös): esikatselut ja lähteet on poistettu"
 source = "Cue markers"
 translation = "Cue-merkit"
 
+[messages.asset-meta-envelope]
+source = "Envelope"
+translation = "Verhokäyrä"
+
+[messages.asset-meta-envelope-hit]
+source = "hit"
+translation = "isku"
+
+[messages.asset-meta-envelope-sustained]
+source = "sustained"
+translation = "kestävä"
+
+[messages.asset-meta-envelope-swell]
+source = "swell"
+translation = "paisuva"
+
+[messages.asset-meta-envelope-times]
+source = "attack { $attack }, tail { $tail }"
+translation = "nousu { $attack }, häivytys { $tail }"
+
 [messages.asset-meta-everything-with]
 source = "Show everything tagged { $tag }"
 translation = "Näytä kaikki, joilla on tunniste { $tag }"
@@ -2046,6 +2066,10 @@ translation = "Silmukka"
 source = "{ $start } to { $end }"
 translation = "{ $start }–{ $end }"
 
+[messages.asset-meta-loops-cleanly]
+source = "Loops cleanly"
+translation = "Toistuu saumattomasti"
+
 [messages.asset-meta-maps]
 source = "Maps"
 translation = "Kartat"
@@ -2073,6 +2097,34 @@ translation = "Kertatoisto"
 [messages.asset-meta-package]
 source = "Package"
 translation = "Paketti"
+
+[messages.asset-meta-pitch]
+source = "Pitch"
+translation = "Sävelkorkeus"
+
+[messages.asset-meta-pitch-falls]
+source = """
+{ $octaves ->
+        [one] falls { $octaves } octave
+       *[other] falls { $octaves } octaves
+    }"""
+translation = """
+{ $octaves ->
+        [one] laskee { $octaves } oktaavin
+       *[other] laskee { $octaves } oktaavia
+    }"""
+
+[messages.asset-meta-pitch-rises]
+source = """
+{ $octaves ->
+        [one] rises { $octaves } octave
+       *[other] rises { $octaves } octaves
+    }"""
+translation = """
+{ $octaves ->
+        [one] nousee { $octaves } oktaavin
+       *[other] nousee { $octaves } oktaavia
+    }"""
 
 [messages.asset-meta-playback]
 source = "Playback"
@@ -2137,6 +2189,14 @@ translation = "Toistuvuus"
 [messages.asset-meta-title]
 source = "Title"
 translation = "Nimi"
+
+[messages.asset-meta-tone]
+source = "Tone"
+translation = "Sävy"
+
+[messages.asset-meta-tone-value]
+source = "brightness { $khz } kHz, noise { $noise }%"
+translation = "kirkkaus { $khz } kHz, kohina { $noise } %"
 
 [messages.asset-meta-triangles]
 source = "Triangles"

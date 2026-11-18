@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "201238d1f1316ec4b4b570518b01e5a32a97d7310f43d0956dd827f42f6d5000"
+source = "2235081ab15c646057416458fa3f3b8e357859d17ba776ecef2a615dd3b3e7ec"
 translation = "230aa92a6033cfd0e81420ca5ef21ba788bfd9cbf50cc6964032f8c9499222bf"
 
 [messages.account-add]
@@ -1915,6 +1915,26 @@ translation = "Cookolt (játékbuild): az előnézetek és a források el vannak
 source = "Cue markers"
 translation = "Jelölők"
 
+[messages.asset-meta-envelope]
+source = "Envelope"
+translation = "Burkológörbe"
+
+[messages.asset-meta-envelope-hit]
+source = "hit"
+translation = "ütés"
+
+[messages.asset-meta-envelope-sustained]
+source = "sustained"
+translation = "kitartott"
+
+[messages.asset-meta-envelope-swell]
+source = "swell"
+translation = "erősödő"
+
+[messages.asset-meta-envelope-times]
+source = "attack { $attack }, tail { $tail }"
+translation = "felfutás { $attack }, lecsengés { $tail }"
+
 [messages.asset-meta-everything-with]
 source = "Show everything tagged { $tag }"
 translation = "Minden { $tag } címkéjű elem megjelenítése"
@@ -1975,6 +1995,10 @@ translation = "Hurok"
 source = "{ $start } to { $end }"
 translation = "{ $start } – { $end }"
 
+[messages.asset-meta-loops-cleanly]
+source = "Loops cleanly"
+translation = "Hézagmentesen ismételhető"
+
 [messages.asset-meta-maps]
 source = "Maps"
 translation = "Térképek"
@@ -2002,6 +2026,26 @@ translation = "Egyszeri"
 [messages.asset-meta-package]
 source = "Package"
 translation = "Csomagfájl"
+
+[messages.asset-meta-pitch]
+source = "Pitch"
+translation = "Hangmagasság"
+
+[messages.asset-meta-pitch-falls]
+source = """
+{ $octaves ->
+        [one] falls { $octaves } octave
+       *[other] falls { $octaves } octaves
+    }"""
+translation = "{ $octaves } oktávval süllyed"
+
+[messages.asset-meta-pitch-rises]
+source = """
+{ $octaves ->
+        [one] rises { $octaves } octave
+       *[other] rises { $octaves } octaves
+    }"""
+translation = "{ $octaves } oktávval emelkedik"
 
 [messages.asset-meta-playback]
 source = "Playback"
@@ -2066,6 +2110,14 @@ translation = "Csempézés"
 [messages.asset-meta-title]
 source = "Title"
 translation = "Cím"
+
+[messages.asset-meta-tone]
+source = "Tone"
+translation = "Hangszín"
+
+[messages.asset-meta-tone-value]
+source = "brightness { $khz } kHz, noise { $noise }%"
+translation = "fényesség { $khz } kHz, zaj { $noise }%"
 
 [messages.asset-meta-triangles]
 source = "Triangles"

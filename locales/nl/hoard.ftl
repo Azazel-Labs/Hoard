@@ -1325,6 +1325,25 @@ asset-meta-loop = Loop
 asset-meta-loop-value = { $start } tot { $end }
 asset-meta-playback = Afspelen
 asset-meta-one-shot = One-shot
+asset-meta-envelope = Envelop
+asset-meta-envelope-times = aanzet { $attack }, uitsterven { $tail }
+asset-meta-envelope-hit = klap
+asset-meta-envelope-swell = aanzwellend
+asset-meta-envelope-sustained = aangehouden
+asset-meta-tone = Klankkleur
+asset-meta-tone-value = helderheid { $khz } kHz, ruis { $noise }%
+asset-meta-pitch = Toonhoogte
+asset-meta-pitch-rises =
+    { $octaves ->
+        [one] stijgt { $octaves } octaaf
+       *[other] stijgt { $octaves } octaven
+    }
+asset-meta-pitch-falls =
+    { $octaves ->
+        [one] daalt { $octaves } octaaf
+       *[other] daalt { $octaves } octaven
+    }
+asset-meta-loops-cleanly = Loopt naadloos rond
 asset-meta-tempo = Tempo
 asset-meta-root-note = Grondtoon
 asset-meta-cue-markers = Cuemarkeringen

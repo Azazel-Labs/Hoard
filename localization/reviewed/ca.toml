@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "201238d1f1316ec4b4b570518b01e5a32a97d7310f43d0956dd827f42f6d5000"
+source = "2235081ab15c646057416458fa3f3b8e357859d17ba776ecef2a615dd3b3e7ec"
 translation = "492346de275ddfb98a7c980cda9c461c7c8cf91addc47e4b748e7c38ce659fb3"
 
 [messages.account-add]
@@ -1982,6 +1982,26 @@ translation = "Cuinat (versió de joc): no té previsualitzacions ni fonts"
 source = "Cue markers"
 translation = "Marcadors"
 
+[messages.asset-meta-envelope]
+source = "Envelope"
+translation = "Envolupant"
+
+[messages.asset-meta-envelope-hit]
+source = "hit"
+translation = "cop"
+
+[messages.asset-meta-envelope-sustained]
+source = "sustained"
+translation = "sostingut"
+
+[messages.asset-meta-envelope-swell]
+source = "swell"
+translation = "creixent"
+
+[messages.asset-meta-envelope-times]
+source = "attack { $attack }, tail { $tail }"
+translation = "atac { $attack }, cua { $tail }"
+
 [messages.asset-meta-everything-with]
 source = "Show everything tagged { $tag }"
 translation = "Mostra tot el que té l’etiqueta { $tag }"
@@ -2042,6 +2062,10 @@ translation = "Bucle"
 source = "{ $start } to { $end }"
 translation = "de { $start } a { $end }"
 
+[messages.asset-meta-loops-cleanly]
+source = "Loops cleanly"
+translation = "Es repeteix sense talls"
+
 [messages.asset-meta-maps]
 source = "Maps"
 translation = "Mapes"
@@ -2069,6 +2093,34 @@ translation = "D'un sol cop"
 [messages.asset-meta-package]
 source = "Package"
 translation = "Paquet"
+
+[messages.asset-meta-pitch]
+source = "Pitch"
+translation = "Altura"
+
+[messages.asset-meta-pitch-falls]
+source = """
+{ $octaves ->
+        [one] falls { $octaves } octave
+       *[other] falls { $octaves } octaves
+    }"""
+translation = """
+{ $octaves ->
+        [one] baixa { $octaves } octava
+       *[other] baixa { $octaves } octaves
+    }"""
+
+[messages.asset-meta-pitch-rises]
+source = """
+{ $octaves ->
+        [one] rises { $octaves } octave
+       *[other] rises { $octaves } octaves
+    }"""
+translation = """
+{ $octaves ->
+        [one] puja { $octaves } octava
+       *[other] puja { $octaves } octaves
+    }"""
 
 [messages.asset-meta-playback]
 source = "Playback"
@@ -2133,6 +2185,14 @@ translation = "Mosaic"
 [messages.asset-meta-title]
 source = "Title"
 translation = "Títol"
+
+[messages.asset-meta-tone]
+source = "Tone"
+translation = "Timbre"
+
+[messages.asset-meta-tone-value]
+source = "brightness { $khz } kHz, noise { $noise }%"
+translation = "brillantor { $khz } kHz, soroll { $noise } %"
 
 [messages.asset-meta-triangles]
 source = "Triangles"

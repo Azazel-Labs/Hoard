@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "201238d1f1316ec4b4b570518b01e5a32a97d7310f43d0956dd827f42f6d5000"
+source = "2235081ab15c646057416458fa3f3b8e357859d17ba776ecef2a615dd3b3e7ec"
 translation = "707089ce5f6ccea59af638ba8b3791160383452602af287d2ea5c47aeff1dd42"
 
 [messages.account-add]
@@ -1994,6 +1994,26 @@ translation = "Cuit (build de jeu) : aperçus et sources supprimés"
 source = "Cue markers"
 translation = "Marqueurs"
 
+[messages.asset-meta-envelope]
+source = "Envelope"
+translation = "Enveloppe"
+
+[messages.asset-meta-envelope-hit]
+source = "hit"
+translation = "impact"
+
+[messages.asset-meta-envelope-sustained]
+source = "sustained"
+translation = "tenu"
+
+[messages.asset-meta-envelope-swell]
+source = "swell"
+translation = "crescendo"
+
+[messages.asset-meta-envelope-times]
+source = "attack { $attack }, tail { $tail }"
+translation = "attaque { $attack }, queue { $tail }"
+
 [messages.asset-meta-everything-with]
 source = "Show everything tagged { $tag }"
 translation = "Afficher tout ce qui porte l’étiquette { $tag }"
@@ -2054,6 +2074,10 @@ translation = "Boucle"
 source = "{ $start } to { $end }"
 translation = "de { $start } à { $end }"
 
+[messages.asset-meta-loops-cleanly]
+source = "Loops cleanly"
+translation = "Boucle sans raccord"
+
 [messages.asset-meta-maps]
 source = "Maps"
 translation = "Cartes"
@@ -2081,6 +2105,34 @@ translation = "Lecture unique"
 [messages.asset-meta-package]
 source = "Package"
 translation = "Paquet"
+
+[messages.asset-meta-pitch]
+source = "Pitch"
+translation = "Hauteur"
+
+[messages.asset-meta-pitch-falls]
+source = """
+{ $octaves ->
+        [one] falls { $octaves } octave
+       *[other] falls { $octaves } octaves
+    }"""
+translation = """
+{ $octaves ->
+        [one] descend de { $octaves } octave
+       *[other] descend de { $octaves } octaves
+    }"""
+
+[messages.asset-meta-pitch-rises]
+source = """
+{ $octaves ->
+        [one] rises { $octaves } octave
+       *[other] rises { $octaves } octaves
+    }"""
+translation = """
+{ $octaves ->
+        [one] monte de { $octaves } octave
+       *[other] monte de { $octaves } octaves
+    }"""
 
 [messages.asset-meta-playback]
 source = "Playback"
@@ -2145,6 +2197,14 @@ translation = "Répétition"
 [messages.asset-meta-title]
 source = "Title"
 translation = "Titre"
+
+[messages.asset-meta-tone]
+source = "Tone"
+translation = "Timbre"
+
+[messages.asset-meta-tone-value]
+source = "brightness { $khz } kHz, noise { $noise }%"
+translation = "brillance { $khz } kHz, bruit { $noise } %"
 
 [messages.asset-meta-triangles]
 source = "Triangles"

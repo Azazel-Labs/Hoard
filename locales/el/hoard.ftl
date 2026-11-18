@@ -1375,6 +1375,25 @@ asset-meta-loop = Βρόχος
 asset-meta-loop-value = { $start } έως { $end }
 asset-meta-playback = Αναπαραγωγή
 asset-meta-one-shot = Μία φορά (one-shot)
+asset-meta-envelope = Περιβάλλουσα
+asset-meta-envelope-times = επίθεση { $attack }, ουρά { $tail }
+asset-meta-envelope-hit = χτύπημα
+asset-meta-envelope-swell = κρεσέντο
+asset-meta-envelope-sustained = σταθερό
+asset-meta-tone = Χροιά
+asset-meta-tone-value = φωτεινότητα { $khz } kHz, θόρυβος { $noise }%
+asset-meta-pitch = Τονικό ύψος
+asset-meta-pitch-rises =
+    { $octaves ->
+        [one] ανεβαίνει { $octaves } οκτάβα
+       *[other] ανεβαίνει { $octaves } οκτάβες
+    }
+asset-meta-pitch-falls =
+    { $octaves ->
+        [one] κατεβαίνει { $octaves } οκτάβα
+       *[other] κατεβαίνει { $octaves } οκτάβες
+    }
+asset-meta-loops-cleanly = Κάνει βρόχο ομαλά
 asset-meta-tempo = Τέμπο
 asset-meta-root-note = Τονική
 asset-meta-cue-markers = Δείκτες cue

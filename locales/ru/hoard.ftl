@@ -1455,6 +1455,29 @@ asset-meta-loop = Петля
 asset-meta-loop-value = от { $start } до { $end }
 asset-meta-playback = Воспроизведение
 asset-meta-one-shot = Однократно
+asset-meta-envelope = Огибающая
+asset-meta-envelope-times = атака { $attack }, затухание { $tail }
+asset-meta-envelope-hit = удар
+asset-meta-envelope-swell = нарастание
+asset-meta-envelope-sustained = протяжный
+asset-meta-tone = Тембр
+asset-meta-tone-value = яркость { $khz } кГц, шум { $noise } %
+asset-meta-pitch = Высота
+asset-meta-pitch-rises =
+    { $octaves ->
+        [one] повышается на { $octaves } октаву
+        [few] повышается на { $octaves } октавы
+        [many] повышается на { $octaves } октав
+       *[other] повышается на { $octaves } октавы
+    }
+asset-meta-pitch-falls =
+    { $octaves ->
+        [one] понижается на { $octaves } октаву
+        [few] понижается на { $octaves } октавы
+        [many] понижается на { $octaves } октав
+       *[other] понижается на { $octaves } октавы
+    }
+asset-meta-loops-cleanly = Бесшовно зацикливается
 asset-meta-tempo = Темп
 asset-meta-root-note = Основной тон
 asset-meta-cue-markers = Маркеры

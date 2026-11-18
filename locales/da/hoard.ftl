@@ -1327,6 +1327,25 @@ asset-meta-loop = Loop
 asset-meta-loop-value = { $start } til { $end }
 asset-meta-playback = Afspilning
 asset-meta-one-shot = One-shot
+asset-meta-envelope = Forløb
+asset-meta-envelope-times = anslag { $attack }, efterklang { $tail }
+asset-meta-envelope-hit = slag
+asset-meta-envelope-swell = opbygning
+asset-meta-envelope-sustained = vedvarende
+asset-meta-tone = Klang
+asset-meta-tone-value = lysstyrke { $khz } kHz, støj { $noise } %
+asset-meta-pitch = Tonehøjde
+asset-meta-pitch-rises =
+    { $octaves ->
+        [one] stiger { $octaves } oktav
+       *[other] stiger { $octaves } oktaver
+    }
+asset-meta-pitch-falls =
+    { $octaves ->
+        [one] falder { $octaves } oktav
+       *[other] falder { $octaves } oktaver
+    }
+asset-meta-loops-cleanly = Looper sømløst
 asset-meta-tempo = Tempo
 asset-meta-root-note = Grundtone
 asset-meta-cue-markers = Cue-markører

@@ -1331,6 +1331,25 @@ asset-meta-loop = Bucle
 asset-meta-loop-value = de { $start } a { $end }
 asset-meta-playback = Reproducció
 asset-meta-one-shot = D'un sol cop
+asset-meta-envelope = Envolupant
+asset-meta-envelope-times = atac { $attack }, cua { $tail }
+asset-meta-envelope-hit = cop
+asset-meta-envelope-swell = creixent
+asset-meta-envelope-sustained = sostingut
+asset-meta-tone = Timbre
+asset-meta-tone-value = brillantor { $khz } kHz, soroll { $noise } %
+asset-meta-pitch = Altura
+asset-meta-pitch-rises =
+    { $octaves ->
+        [one] puja { $octaves } octava
+       *[other] puja { $octaves } octaves
+    }
+asset-meta-pitch-falls =
+    { $octaves ->
+        [one] baixa { $octaves } octava
+       *[other] baixa { $octaves } octaves
+    }
+asset-meta-loops-cleanly = Es repeteix sense talls
 asset-meta-tempo = Tempo
 asset-meta-root-note = Nota fonamental
 asset-meta-cue-markers = Marcadors

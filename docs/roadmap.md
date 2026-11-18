@@ -93,7 +93,7 @@ ffmpeg, and plays MOD, XM, S3M, IT and MIDI. What's missing is mostly containers
 So that "find me a sound that goes WHOOOM", typed or asked through MCP, finds deep whooshes. In layers, each useful
 on its own:
 
-- [ ] **Measured features**: each sound's duration, envelope (a sharp attack or a swell, how long the tail is),
+- [x] **Measured features**: each sound's duration, envelope (a sharp attack or a swell, how long the tail is),
   brightness, how noisy or tonal it is, whether its pitch rises or falls, its loudness and whether it loops cleanly.
   Kept with the sound, shown in its details, filterable in search and the API.
 - [ ] **Onomatopoeia**: a word read as the shape of a sound and scored against those features. A plosive start

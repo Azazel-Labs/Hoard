@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "201238d1f1316ec4b4b570518b01e5a32a97d7310f43d0956dd827f42f6d5000"
+source = "2235081ab15c646057416458fa3f3b8e357859d17ba776ecef2a615dd3b3e7ec"
 translation = "d2d82856aba060f1fca3b326d63684dcbaa143f941e3bdd05f930d4179bd4d37"
 
 [messages.account-add]
@@ -2016,6 +2016,26 @@ translation = "Cooked (herní build): náhledy a zdroje jsou odstraněné"
 source = "Cue markers"
 translation = "Značky"
 
+[messages.asset-meta-envelope]
+source = "Envelope"
+translation = "Obálka"
+
+[messages.asset-meta-envelope-hit]
+source = "hit"
+translation = "úder"
+
+[messages.asset-meta-envelope-sustained]
+source = "sustained"
+translation = "držený"
+
+[messages.asset-meta-envelope-swell]
+source = "swell"
+translation = "zesilující"
+
+[messages.asset-meta-envelope-times]
+source = "attack { $attack }, tail { $tail }"
+translation = "náběh { $attack }, doznívání { $tail }"
+
 [messages.asset-meta-everything-with]
 source = "Show everything tagged { $tag }"
 translation = "Zobrazit vše se štítkem { $tag }"
@@ -2076,6 +2096,10 @@ translation = "Smyčka"
 source = "{ $start } to { $end }"
 translation = "{ $start } až { $end }"
 
+[messages.asset-meta-loops-cleanly]
+source = "Loops cleanly"
+translation = "Plynule se opakuje"
+
 [messages.asset-meta-maps]
 source = "Maps"
 translation = "Mapy"
@@ -2103,6 +2127,38 @@ translation = "Jednorázově"
 [messages.asset-meta-package]
 source = "Package"
 translation = "Soubor Unrealu"
+
+[messages.asset-meta-pitch]
+source = "Pitch"
+translation = "Výška tónu"
+
+[messages.asset-meta-pitch-falls]
+source = """
+{ $octaves ->
+        [one] falls { $octaves } octave
+       *[other] falls { $octaves } octaves
+    }"""
+translation = """
+{ $octaves ->
+        [one] klesá o { $octaves } oktávu
+        [few] klesá o { $octaves } oktávy
+        [many] klesá o { $octaves } oktávy
+       *[other] klesá o { $octaves } oktáv
+    }"""
+
+[messages.asset-meta-pitch-rises]
+source = """
+{ $octaves ->
+        [one] rises { $octaves } octave
+       *[other] rises { $octaves } octaves
+    }"""
+translation = """
+{ $octaves ->
+        [one] stoupá o { $octaves } oktávu
+        [few] stoupá o { $octaves } oktávy
+        [many] stoupá o { $octaves } oktávy
+       *[other] stoupá o { $octaves } oktáv
+    }"""
 
 [messages.asset-meta-playback]
 source = "Playback"
@@ -2168,6 +2224,14 @@ translation = "Opakování"
 [messages.asset-meta-title]
 source = "Title"
 translation = "Název"
+
+[messages.asset-meta-tone]
+source = "Tone"
+translation = "Zabarvení"
+
+[messages.asset-meta-tone-value]
+source = "brightness { $khz } kHz, noise { $noise }%"
+translation = "jas { $khz } kHz, šum { $noise } %"
 
 [messages.asset-meta-triangles]
 source = "Triangles"

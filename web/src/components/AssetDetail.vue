@@ -376,6 +376,13 @@ const COUNT_LABEL: Record<string, () => string> = {
   skins: () => t('asset-meta-skins'),
 }
 
+/** A sound's measured envelope, as `meta.envelope` names it. */
+const ENVELOPE: Record<string, () => string> = {
+  hit: () => t('asset-meta-envelope-hit'),
+  swell: () => t('asset-meta-envelope-swell'),
+  sustained: () => t('asset-meta-envelope-sustained'),
+}
+
 /** A fact the file states that's also a tag (its artist, its genre): the value searches for everything with it. */
 const factTag = (key: string) => props.asset.tags.find((x) => x.tag.startsWith(`${key}:`))?.tag
 
@@ -400,6 +407,23 @@ const metaRows = computed(() => {
     const sr = num('sample_rate')!
     rows.push([t('asset-meta-loop'), t('asset-meta-loop-value', { start: formatDuration(num('loop_start')! / sr), end: formatDuration(num('loop_end')! / sr) })])
   } else if (m.one_shot === true) rows.push([t('asset-meta-playback'), t('asset-meta-one-shot')])
+  else if (m.loops_cleanly === true) rows.push([t('asset-meta-playback'), t('asset-meta-loops-cleanly')])
+  // What was measured of how it sounds.
+  if (num('attack_ms') !== undefined) {
+    const time = (ms: number) => (ms < 1000 ? `${formatNumber(ms)} ms` : `${oneDecimal(ms / 1000)} s`)
+    const shape = ENVELOPE[m.envelope as string]?.()
+    const times = t('asset-meta-envelope-times', { attack: time(num('attack_ms')!), tail: time(num('tail_ms') ?? 0) })
+    rows.push([t('asset-meta-envelope'), shape ? `${shape}, ${times}` : times])
+  }
+  if (num('brightness_hz') !== undefined) {
+    const noise = Math.round((num('noisiness') ?? 0) * 100)
+    rows.push([t('asset-meta-tone'), t('asset-meta-tone-value', { khz: oneDecimal(num('brightness_hz')! / 1000), noise })])
+  }
+  const sweep = num('sweep_octaves')
+  if (sweep !== undefined && Math.abs(sweep) >= 0.5) {
+    const octaves = Math.abs(sweep)
+    rows.push([t('asset-meta-pitch'), sweep > 0 ? t('asset-meta-pitch-rises', { octaves }) : t('asset-meta-pitch-falls', { octaves })])
+  }
   if (num('tempo_bpm') !== undefined) rows.push([t('asset-meta-tempo'), `${m.tempo_bpm} BPM`])
   if (typeof m.root_note === 'string') rows.push([t('asset-meta-root-note'), m.root_note as string])
   if (num('cue_points')) rows.push([t('asset-meta-cue-markers'), String(m.cue_points)])

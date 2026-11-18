@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "201238d1f1316ec4b4b570518b01e5a32a97d7310f43d0956dd827f42f6d5000"
+source = "2235081ab15c646057416458fa3f3b8e357859d17ba776ecef2a615dd3b3e7ec"
 translation = "33cd08db8c788b60f7d38799a27fa29813fa65c6c3025e9967d656790fb2435e"
 
 [messages.account-add]
@@ -1982,6 +1982,26 @@ translation = "Cookad (spelbygge): förhandsvisningar och källor är borttagna"
 source = "Cue markers"
 translation = "Cue-markörer"
 
+[messages.asset-meta-envelope]
+source = "Envelope"
+translation = "Förlopp"
+
+[messages.asset-meta-envelope-hit]
+source = "hit"
+translation = "slag"
+
+[messages.asset-meta-envelope-sustained]
+source = "sustained"
+translation = "ihållande"
+
+[messages.asset-meta-envelope-swell]
+source = "swell"
+translation = "crescendo"
+
+[messages.asset-meta-envelope-times]
+source = "attack { $attack }, tail { $tail }"
+translation = "attack { $attack }, avklingning { $tail }"
+
 [messages.asset-meta-everything-with]
 source = "Show everything tagged { $tag }"
 translation = "Visa allt med taggen { $tag }"
@@ -2042,6 +2062,10 @@ translation = "Loop"
 source = "{ $start } to { $end }"
 translation = "{ $start } till { $end }"
 
+[messages.asset-meta-loops-cleanly]
+source = "Loops cleanly"
+translation = "Loopar sömlöst"
+
 [messages.asset-meta-maps]
 source = "Maps"
 translation = "Kartor"
@@ -2069,6 +2093,34 @@ translation = "Engångsljud"
 [messages.asset-meta-package]
 source = "Package"
 translation = "Paketfil"
+
+[messages.asset-meta-pitch]
+source = "Pitch"
+translation = "Tonhöjd"
+
+[messages.asset-meta-pitch-falls]
+source = """
+{ $octaves ->
+        [one] falls { $octaves } octave
+       *[other] falls { $octaves } octaves
+    }"""
+translation = """
+{ $octaves ->
+        [one] sjunker { $octaves } oktav
+       *[other] sjunker { $octaves } oktaver
+    }"""
+
+[messages.asset-meta-pitch-rises]
+source = """
+{ $octaves ->
+        [one] rises { $octaves } octave
+       *[other] rises { $octaves } octaves
+    }"""
+translation = """
+{ $octaves ->
+        [one] stiger { $octaves } oktav
+       *[other] stiger { $octaves } oktaver
+    }"""
 
 [messages.asset-meta-playback]
 source = "Playback"
@@ -2133,6 +2185,14 @@ translation = "Upprepning"
 [messages.asset-meta-title]
 source = "Title"
 translation = "Titel"
+
+[messages.asset-meta-tone]
+source = "Tone"
+translation = "Klang"
+
+[messages.asset-meta-tone-value]
+source = "brightness { $khz } kHz, noise { $noise }%"
+translation = "ljushet { $khz } kHz, brus { $noise } %"
 
 [messages.asset-meta-triangles]
 source = "Triangles"

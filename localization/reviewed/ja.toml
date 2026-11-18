@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "201238d1f1316ec4b4b570518b01e5a32a97d7310f43d0956dd827f42f6d5000"
+source = "2235081ab15c646057416458fa3f3b8e357859d17ba776ecef2a615dd3b3e7ec"
 translation = "869ed1fc3b055273469332423634413363dc2f8fea2bf697f2d9d0791df51865"
 
 [messages.account-add]
@@ -1910,6 +1910,26 @@ translation = "クック済み（ゲームビルド）: プレビューとソー
 source = "Cue markers"
 translation = "キューマーカー"
 
+[messages.asset-meta-envelope]
+source = "Envelope"
+translation = "エンベロープ"
+
+[messages.asset-meta-envelope-hit]
+source = "hit"
+translation = "打撃音"
+
+[messages.asset-meta-envelope-sustained]
+source = "sustained"
+translation = "持続音"
+
+[messages.asset-meta-envelope-swell]
+source = "swell"
+translation = "盛り上がり"
+
+[messages.asset-meta-envelope-times]
+source = "attack { $attack }, tail { $tail }"
+translation = "アタック { $attack }、テール { $tail }"
+
 [messages.asset-meta-everything-with]
 source = "Show everything tagged { $tag }"
 translation = "タグ { $tag } が付いたものをすべて表示"
@@ -1970,6 +1990,10 @@ translation = "ループ"
 source = "{ $start } to { $end }"
 translation = "{ $start }～{ $end }"
 
+[messages.asset-meta-loops-cleanly]
+source = "Loops cleanly"
+translation = "継ぎ目なくループ"
+
 [messages.asset-meta-maps]
 source = "Maps"
 translation = "マップ"
@@ -1997,6 +2021,26 @@ translation = "ワンショット"
 [messages.asset-meta-package]
 source = "Package"
 translation = "パッケージ"
+
+[messages.asset-meta-pitch]
+source = "Pitch"
+translation = "ピッチ"
+
+[messages.asset-meta-pitch-falls]
+source = """
+{ $octaves ->
+        [one] falls { $octaves } octave
+       *[other] falls { $octaves } octaves
+    }"""
+translation = "{ $octaves } オクターブ下降"
+
+[messages.asset-meta-pitch-rises]
+source = """
+{ $octaves ->
+        [one] rises { $octaves } octave
+       *[other] rises { $octaves } octaves
+    }"""
+translation = "{ $octaves } オクターブ上昇"
 
 [messages.asset-meta-playback]
 source = "Playback"
@@ -2060,6 +2104,14 @@ translation = "タイリング"
 [messages.asset-meta-title]
 source = "Title"
 translation = "タイトル"
+
+[messages.asset-meta-tone]
+source = "Tone"
+translation = "音色"
+
+[messages.asset-meta-tone-value]
+source = "brightness { $khz } kHz, noise { $noise }%"
+translation = "明るさ { $khz } kHz、ノイズ { $noise }%"
 
 [messages.asset-meta-triangles]
 source = "Triangles"

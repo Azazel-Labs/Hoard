@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "201238d1f1316ec4b4b570518b01e5a32a97d7310f43d0956dd827f42f6d5000"
+source = "2235081ab15c646057416458fa3f3b8e357859d17ba776ecef2a615dd3b3e7ec"
 translation = "30056587d254fe6b8f2576dc61dbda0e0d1f814731977073ac18b1c1a33112d6"
 
 [messages.account-add]
@@ -1910,6 +1910,26 @@ translation = "Cooked (build game): pratinjau dan sumber dihapus"
 source = "Cue markers"
 translation = "Penanda cue"
 
+[messages.asset-meta-envelope]
+source = "Envelope"
+translation = "Selubung"
+
+[messages.asset-meta-envelope-hit]
+source = "hit"
+translation = "pukulan"
+
+[messages.asset-meta-envelope-sustained]
+source = "sustained"
+translation = "bertahan"
+
+[messages.asset-meta-envelope-swell]
+source = "swell"
+translation = "membesar"
+
+[messages.asset-meta-envelope-times]
+source = "attack { $attack }, tail { $tail }"
+translation = "serangan { $attack }, ekor { $tail }"
+
 [messages.asset-meta-everything-with]
 source = "Show everything tagged { $tag }"
 translation = "Tampilkan semua yang bertag { $tag }"
@@ -1970,6 +1990,10 @@ translation = "Loop"
 source = "{ $start } to { $end }"
 translation = "{ $start } sampai { $end }"
 
+[messages.asset-meta-loops-cleanly]
+source = "Loops cleanly"
+translation = "Berulang mulus"
+
 [messages.asset-meta-maps]
 source = "Maps"
 translation = "Map"
@@ -1997,6 +2021,26 @@ translation = "Sekali putar"
 [messages.asset-meta-package]
 source = "Package"
 translation = "Paket Unreal"
+
+[messages.asset-meta-pitch]
+source = "Pitch"
+translation = "Tinggi nada"
+
+[messages.asset-meta-pitch-falls]
+source = """
+{ $octaves ->
+        [one] falls { $octaves } octave
+       *[other] falls { $octaves } octaves
+    }"""
+translation = "turun { $octaves } oktaf"
+
+[messages.asset-meta-pitch-rises]
+source = """
+{ $octaves ->
+        [one] rises { $octaves } octave
+       *[other] rises { $octaves } octaves
+    }"""
+translation = "naik { $octaves } oktaf"
 
 [messages.asset-meta-playback]
 source = "Playback"
@@ -2060,6 +2104,14 @@ translation = "Tiling"
 [messages.asset-meta-title]
 source = "Title"
 translation = "Judul"
+
+[messages.asset-meta-tone]
+source = "Tone"
+translation = "Warna nada"
+
+[messages.asset-meta-tone-value]
+source = "brightness { $khz } kHz, noise { $noise }%"
+translation = "kecerahan { $khz } kHz, derau { $noise }%"
 
 [messages.asset-meta-triangles]
 source = "Triangles"

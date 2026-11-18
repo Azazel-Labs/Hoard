@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "201238d1f1316ec4b4b570518b01e5a32a97d7310f43d0956dd827f42f6d5000"
+source = "2235081ab15c646057416458fa3f3b8e357859d17ba776ecef2a615dd3b3e7ec"
 translation = "07555d54b3ba6bc94b6fcbf55672d1be5e77ca134c96e30754ee929b3a902828"
 
 [messages.account-add]
@@ -1910,6 +1910,26 @@ translation = "ผ่านการ cook (บิลด์เกม): ตัว�
 source = "Cue markers"
 translation = "เครื่องหมายคิว"
 
+[messages.asset-meta-envelope]
+source = "Envelope"
+translation = "เอนเวโลป"
+
+[messages.asset-meta-envelope-hit]
+source = "hit"
+translation = "กระแทก"
+
+[messages.asset-meta-envelope-sustained]
+source = "sustained"
+translation = "คงที่"
+
+[messages.asset-meta-envelope-swell]
+source = "swell"
+translation = "ค่อยๆ ดังขึ้น"
+
+[messages.asset-meta-envelope-times]
+source = "attack { $attack }, tail { $tail }"
+translation = "ช่วงเริ่ม { $attack }, ช่วงท้าย { $tail }"
+
 [messages.asset-meta-everything-with]
 source = "Show everything tagged { $tag }"
 translation = "แสดงทุกอย่างที่มีแท็ก { $tag }"
@@ -1970,6 +1990,10 @@ translation = "ลูป"
 source = "{ $start } to { $end }"
 translation = "{ $start } ถึง { $end }"
 
+[messages.asset-meta-loops-cleanly]
+source = "Loops cleanly"
+translation = "วนซ้ำได้อย่างไร้รอยต่อ"
+
 [messages.asset-meta-maps]
 source = "Maps"
 translation = "แมป"
@@ -1997,6 +2021,26 @@ translation = "เล่นครั้งเดียว"
 [messages.asset-meta-package]
 source = "Package"
 translation = "แพ็กเกจ"
+
+[messages.asset-meta-pitch]
+source = "Pitch"
+translation = "ระดับเสียง"
+
+[messages.asset-meta-pitch-falls]
+source = """
+{ $octaves ->
+        [one] falls { $octaves } octave
+       *[other] falls { $octaves } octaves
+    }"""
+translation = "ต่ำลง { $octaves } ออกเทฟ"
+
+[messages.asset-meta-pitch-rises]
+source = """
+{ $octaves ->
+        [one] rises { $octaves } octave
+       *[other] rises { $octaves } octaves
+    }"""
+translation = "สูงขึ้น { $octaves } ออกเทฟ"
 
 [messages.asset-meta-playback]
 source = "Playback"
@@ -2060,6 +2104,14 @@ translation = "การเรียงต่อ"
 [messages.asset-meta-title]
 source = "Title"
 translation = "ชื่อเรื่อง"
+
+[messages.asset-meta-tone]
+source = "Tone"
+translation = "โทนเสียง"
+
+[messages.asset-meta-tone-value]
+source = "brightness { $khz } kHz, noise { $noise }%"
+translation = "ความสว่าง { $khz } kHz, เสียงรบกวน { $noise }%"
 
 [messages.asset-meta-triangles]
 source = "Triangles"

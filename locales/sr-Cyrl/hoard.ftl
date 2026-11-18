@@ -1374,6 +1374,27 @@ asset-meta-loop = Петља
 asset-meta-loop-value = { $start } до { $end }
 asset-meta-playback = Репродукција
 asset-meta-one-shot = Једнократно
+asset-meta-envelope = Анвелопа
+asset-meta-envelope-times = атака { $attack }, реп { $tail }
+asset-meta-envelope-hit = удар
+asset-meta-envelope-swell = нарастање
+asset-meta-envelope-sustained = одржан
+asset-meta-tone = Боја тона
+asset-meta-tone-value = осветљеност { $khz } kHz, шум { $noise } %
+asset-meta-pitch = Висина тона
+asset-meta-pitch-rises =
+    { $octaves ->
+        [one] расте за { $octaves } октаву
+        [few] расте за { $octaves } октаве
+       *[other] расте за { $octaves } октава
+    }
+asset-meta-pitch-falls =
+    { $octaves ->
+        [one] опада за { $octaves } октаву
+        [few] опада за { $octaves } октаве
+       *[other] опада за { $octaves } октава
+    }
+asset-meta-loops-cleanly = Понавља се без прекида
 asset-meta-tempo = Темпо
 asset-meta-root-note = Основни тон
 asset-meta-cue-markers = Ознаке позиција

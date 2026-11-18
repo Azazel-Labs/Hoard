@@ -811,6 +811,54 @@ fn vector_tags(meta: &serde_json::Map<String, serde_json::Value>, tags: &mut Tag
 }
 
 /// Metadata-derived facts and heuristics per kind.
+/// The tags a sound's measured features (see `sounds::FEATURES`) can bring, besides `loop`.
+pub(crate) const MEASURED_SOUND_TAGS: [&str; 9] = [
+    "envelope:hit",
+    "envelope:swell",
+    "envelope:sustained",
+    "tone:bright",
+    "tone:dark",
+    "tone:noisy",
+    "tone:tonal",
+    "pitch:rising",
+    "pitch:falling",
+];
+
+/// The tags a sound's measured features bring: its envelope, whether it's bright or dark, noisy or tonal, whether its
+/// pitch rises or falls by an octave or more, and `loop` (a guess) when it loops cleanly.
+pub(crate) fn measured_sound_tags(
+    meta: &serde_json::Map<String, serde_json::Value>,
+) -> Vec<(&'static str, TagSource, f32)> {
+    let num = |k: &str| meta.get(k).and_then(serde_json::Value::as_f64);
+    let mut out = Vec::new();
+    match meta.get("envelope").and_then(|v| v.as_str()) {
+        Some("hit") => out.push(MEASURED_SOUND_TAGS[0]),
+        Some("swell") => out.push(MEASURED_SOUND_TAGS[1]),
+        Some("sustained") => out.push(MEASURED_SOUND_TAGS[2]),
+        _ => {}
+    }
+    match num("brightness_hz") {
+        Some(hz) if hz >= 4000.0 => out.push("tone:bright"),
+        Some(hz) if hz <= 800.0 => out.push("tone:dark"),
+        _ => {}
+    }
+    match num("noisiness") {
+        Some(n) if n >= 0.45 => out.push("tone:noisy"),
+        Some(n) if n <= 0.15 => out.push("tone:tonal"),
+        _ => {}
+    }
+    match num("sweep_octaves") {
+        Some(o) if o >= 1.0 => out.push("pitch:rising"),
+        Some(o) if o <= -1.0 => out.push("pitch:falling"),
+        _ => {}
+    }
+    let mut out: Vec<_> = out.into_iter().map(|t| (t, TagSource::Meta, 1.0)).collect();
+    if meta.get("loops_cleanly").and_then(serde_json::Value::as_bool) == Some(true) {
+        out.push(("loop", TagSource::Rule, 0.6));
+    }
+    out
+}
+
 pub(crate) fn meta_tags(
     kind: AssetKind,
     ext: &str,
@@ -887,6 +935,9 @@ pub(crate) fn meta_tags(
             }
             if meta.get("clipped").and_then(serde_json::Value::as_bool) == Some(true) {
                 tags.add("clipped", TagSource::Meta, 1.0);
+            }
+            for (tag, source, confidence) in measured_sound_tags(meta) {
+                tags.add(tag, source, confidence);
             }
             ucs_from_rules(tags);
         }

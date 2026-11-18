@@ -1325,6 +1325,25 @@ asset-meta-loop = Schleife
 asset-meta-loop-value = { $start } bis { $end }
 asset-meta-playback = Wiedergabe
 asset-meta-one-shot = One-Shot
+asset-meta-envelope = Hüllkurve
+asset-meta-envelope-times = Anstieg { $attack }, Ausklang { $tail }
+asset-meta-envelope-hit = Schlag
+asset-meta-envelope-swell = anschwellend
+asset-meta-envelope-sustained = gehalten
+asset-meta-tone = Klang
+asset-meta-tone-value = Helligkeit { $khz } kHz, Rauschen { $noise } %
+asset-meta-pitch = Tonhöhe
+asset-meta-pitch-rises =
+    { $octaves ->
+        [one] steigt um { $octaves } Oktave
+       *[other] steigt um { $octaves } Oktaven
+    }
+asset-meta-pitch-falls =
+    { $octaves ->
+        [one] fällt um { $octaves } Oktave
+       *[other] fällt um { $octaves } Oktaven
+    }
+asset-meta-loops-cleanly = Nahtlos loopbar
 asset-meta-tempo = Tempo
 asset-meta-root-note = Grundton
 asset-meta-cue-markers = Cue-Marker

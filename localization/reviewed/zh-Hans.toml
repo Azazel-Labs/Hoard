@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "201238d1f1316ec4b4b570518b01e5a32a97d7310f43d0956dd827f42f6d5000"
+source = "2235081ab15c646057416458fa3f3b8e357859d17ba776ecef2a615dd3b3e7ec"
 translation = "530e3768e270ecc495434269d0aa7741f64471672a3fe92dbc9787949d17edcc"
 
 [messages.account-add]
@@ -1910,6 +1910,26 @@ translation = "已烘焙（游戏构建）：预览和源数据已被剥离"
 source = "Cue markers"
 translation = "提示标记"
 
+[messages.asset-meta-envelope]
+source = "Envelope"
+translation = "包络"
+
+[messages.asset-meta-envelope-hit]
+source = "hit"
+translation = "打击"
+
+[messages.asset-meta-envelope-sustained]
+source = "sustained"
+translation = "持续"
+
+[messages.asset-meta-envelope-swell]
+source = "swell"
+translation = "渐强"
+
+[messages.asset-meta-envelope-times]
+source = "attack { $attack }, tail { $tail }"
+translation = "起音 { $attack }，尾音 { $tail }"
+
 [messages.asset-meta-everything-with]
 source = "Show everything tagged { $tag }"
 translation = "显示所有带有标签 { $tag } 的内容"
@@ -1970,6 +1990,10 @@ translation = "循环"
 source = "{ $start } to { $end }"
 translation = "{ $start } 至 { $end }"
 
+[messages.asset-meta-loops-cleanly]
+source = "Loops cleanly"
+translation = "可无缝循环"
+
 [messages.asset-meta-maps]
 source = "Maps"
 translation = "贴图"
@@ -1997,6 +2021,26 @@ translation = "单次"
 [messages.asset-meta-package]
 source = "Package"
 translation = "包"
+
+[messages.asset-meta-pitch]
+source = "Pitch"
+translation = "音高"
+
+[messages.asset-meta-pitch-falls]
+source = """
+{ $octaves ->
+        [one] falls { $octaves } octave
+       *[other] falls { $octaves } octaves
+    }"""
+translation = "下降 { $octaves } 个八度"
+
+[messages.asset-meta-pitch-rises]
+source = """
+{ $octaves ->
+        [one] rises { $octaves } octave
+       *[other] rises { $octaves } octaves
+    }"""
+translation = "上升 { $octaves } 个八度"
 
 [messages.asset-meta-playback]
 source = "Playback"
@@ -2057,6 +2101,14 @@ translation = "平铺"
 [messages.asset-meta-title]
 source = "Title"
 translation = "标题"
+
+[messages.asset-meta-tone]
+source = "Tone"
+translation = "音色"
+
+[messages.asset-meta-tone-value]
+source = "brightness { $khz } kHz, noise { $noise }%"
+translation = "亮度 { $khz } kHz，噪声 { $noise }%"
 
 [messages.asset-meta-triangles]
 source = "Triangles"

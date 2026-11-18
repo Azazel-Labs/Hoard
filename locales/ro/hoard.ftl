@@ -1438,6 +1438,27 @@ asset-meta-loop = Buclă
 asset-meta-loop-value = de la { $start } la { $end }
 asset-meta-playback = Redare
 asset-meta-one-shot = O singură dată
+asset-meta-envelope = Anvelopă
+asset-meta-envelope-times = atac { $attack }, coadă { $tail }
+asset-meta-envelope-hit = lovitură
+asset-meta-envelope-swell = crescendo
+asset-meta-envelope-sustained = susținut
+asset-meta-tone = Timbru
+asset-meta-tone-value = strălucire { $khz } kHz, zgomot { $noise } %
+asset-meta-pitch = Înălțime
+asset-meta-pitch-rises =
+    { $octaves ->
+        [one] urcă { $octaves } octavă
+        [few] urcă { $octaves } octave
+       *[other] urcă { $octaves } de octave
+    }
+asset-meta-pitch-falls =
+    { $octaves ->
+        [one] coboară { $octaves } octavă
+        [few] coboară { $octaves } octave
+       *[other] coboară { $octaves } de octave
+    }
+asset-meta-loops-cleanly = Se repetă fără întrerupere
 asset-meta-tempo = Tempo
 asset-meta-root-note = Notă fundamentală
 asset-meta-cue-markers = Marcaje cue

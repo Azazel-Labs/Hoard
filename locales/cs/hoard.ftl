@@ -1428,6 +1428,29 @@ asset-meta-loop = Smyčka
 asset-meta-loop-value = { $start } až { $end }
 asset-meta-playback = Přehrávání
 asset-meta-one-shot = Jednorázově
+asset-meta-envelope = Obálka
+asset-meta-envelope-times = náběh { $attack }, doznívání { $tail }
+asset-meta-envelope-hit = úder
+asset-meta-envelope-swell = zesilující
+asset-meta-envelope-sustained = držený
+asset-meta-tone = Zabarvení
+asset-meta-tone-value = jas { $khz } kHz, šum { $noise } %
+asset-meta-pitch = Výška tónu
+asset-meta-pitch-rises =
+    { $octaves ->
+        [one] stoupá o { $octaves } oktávu
+        [few] stoupá o { $octaves } oktávy
+        [many] stoupá o { $octaves } oktávy
+       *[other] stoupá o { $octaves } oktáv
+    }
+asset-meta-pitch-falls =
+    { $octaves ->
+        [one] klesá o { $octaves } oktávu
+        [few] klesá o { $octaves } oktávy
+        [many] klesá o { $octaves } oktávy
+       *[other] klesá o { $octaves } oktáv
+    }
+asset-meta-loops-cleanly = Plynule se opakuje
 asset-meta-tempo = Tempo
 asset-meta-root-note = Základní tón
 asset-meta-cue-markers = Značky

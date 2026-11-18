@@ -433,7 +433,9 @@ software rasterizer (`apt install mesa-vulkan-drivers`). Without any adapter, ev
    `map:normal`, `set:rock-cliff`), detects the pack license from LICENSE/README files (`license:cc0`, `cc-by`, …),
    and picks a category from a fixed tree (`sfx/footsteps`, `textures/pbr`, `models/props`, …). Sounds get a UCS
    category (`ucs:footsteps`, `ucs:swooshes/swish`) from embedded metadata or confident rules, plus `loop`,
-   `one-shot`, `bpm:120`, `root:a3`, `level:quiet`/`level:loud` and `clipped` where measured. A sound's genre
+   `one-shot`, `bpm:120`, `root:a3`, `level:quiet`/`level:loud` and `clipped` where measured, and tags for how they
+   sound: `envelope:hit`, `envelope:swell` or `envelope:sustained`, `tone:bright`/`tone:dark`,
+   `tone:noisy`/`tone:tonal` and `pitch:rising`/`pitch:falling`. A sound's genre
    and artist are tags too (`genre:ambient`, `artist:kenney`), and clicking either in the details shows everything
    with it. Words in brackets in a folder or file name are tags: everything in `Audio (Female)/` is tagged `female`
    (a copy number like `(1)`, a year or a whole sentence isn't).
@@ -902,6 +904,11 @@ files are called, so one footstep finds the other footsteps and one laser the ot
 with new packs. It compares the spectrum's shape, how the sound rises and dies away, and its character: how long,
 bright, noisy, busy and bass-heavy it is and how much it changes. How loud a file is, the silence around it and the
 rate it was recorded at don't count. Like the pictures, it all runs on the server and needs no model.
+
+The same listening measures each sound, and its details show what it found: its envelope (a hit, a swell or a
+sustained sound, with how fast it starts and how long its tail rings), its tone (how bright and how noisy it is),
+whether its pitch rises or falls and by how many octaves, and whether it loops cleanly. These are kept in the sound's
+metadata in the API and become the tags above, so `pitch:falling tone:tonal` finds falling zaps.
 
 ### Image search
 

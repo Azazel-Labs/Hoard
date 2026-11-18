@@ -1375,6 +1375,25 @@ asset-meta-loop = Silmukka
 asset-meta-loop-value = { $start }–{ $end }
 asset-meta-playback = Toisto
 asset-meta-one-shot = Kertatoisto
+asset-meta-envelope = Verhokäyrä
+asset-meta-envelope-times = nousu { $attack }, häivytys { $tail }
+asset-meta-envelope-hit = isku
+asset-meta-envelope-swell = paisuva
+asset-meta-envelope-sustained = kestävä
+asset-meta-tone = Sävy
+asset-meta-tone-value = kirkkaus { $khz } kHz, kohina { $noise } %
+asset-meta-pitch = Sävelkorkeus
+asset-meta-pitch-rises =
+    { $octaves ->
+        [one] nousee { $octaves } oktaavin
+       *[other] nousee { $octaves } oktaavia
+    }
+asset-meta-pitch-falls =
+    { $octaves ->
+        [one] laskee { $octaves } oktaavin
+       *[other] laskee { $octaves } oktaavia
+    }
+asset-meta-loops-cleanly = Toistuu saumattomasti
 asset-meta-tempo = Tempo
 asset-meta-root-note = Pohjasävel
 asset-meta-cue-markers = Cue-merkit

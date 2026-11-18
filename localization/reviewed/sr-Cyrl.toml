@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "201238d1f1316ec4b4b570518b01e5a32a97d7310f43d0956dd827f42f6d5000"
+source = "2235081ab15c646057416458fa3f3b8e357859d17ba776ecef2a615dd3b3e7ec"
 translation = "c2a4a8051502263df10866a7bb372ad5cdada115fb8d6449130cdd2d1752dd61"
 
 [messages.account-add]
@@ -1991,6 +1991,26 @@ translation = "Cooked (верзија игре): прегледи и извор�
 source = "Cue markers"
 translation = "Ознаке позиција"
 
+[messages.asset-meta-envelope]
+source = "Envelope"
+translation = "Анвелопа"
+
+[messages.asset-meta-envelope-hit]
+source = "hit"
+translation = "удар"
+
+[messages.asset-meta-envelope-sustained]
+source = "sustained"
+translation = "одржан"
+
+[messages.asset-meta-envelope-swell]
+source = "swell"
+translation = "нарастање"
+
+[messages.asset-meta-envelope-times]
+source = "attack { $attack }, tail { $tail }"
+translation = "атака { $attack }, реп { $tail }"
+
 [messages.asset-meta-everything-with]
 source = "Show everything tagged { $tag }"
 translation = "Прикажи све са ознаком { $tag }"
@@ -2051,6 +2071,10 @@ translation = "Петља"
 source = "{ $start } to { $end }"
 translation = "{ $start } до { $end }"
 
+[messages.asset-meta-loops-cleanly]
+source = "Loops cleanly"
+translation = "Понавља се без прекида"
+
 [messages.asset-meta-maps]
 source = "Maps"
 translation = "Мапе"
@@ -2078,6 +2102,36 @@ translation = "Једнократно"
 [messages.asset-meta-package]
 source = "Package"
 translation = "Пакет"
+
+[messages.asset-meta-pitch]
+source = "Pitch"
+translation = "Висина тона"
+
+[messages.asset-meta-pitch-falls]
+source = """
+{ $octaves ->
+        [one] falls { $octaves } octave
+       *[other] falls { $octaves } octaves
+    }"""
+translation = """
+{ $octaves ->
+        [one] опада за { $octaves } октаву
+        [few] опада за { $octaves } октаве
+       *[other] опада за { $octaves } октава
+    }"""
+
+[messages.asset-meta-pitch-rises]
+source = """
+{ $octaves ->
+        [one] rises { $octaves } octave
+       *[other] rises { $octaves } octaves
+    }"""
+translation = """
+{ $octaves ->
+        [one] расте за { $octaves } октаву
+        [few] расте за { $octaves } октаве
+       *[other] расте за { $octaves } октава
+    }"""
 
 [messages.asset-meta-playback]
 source = "Playback"
@@ -2143,6 +2197,14 @@ translation = "Поплочавање"
 [messages.asset-meta-title]
 source = "Title"
 translation = "Наслов"
+
+[messages.asset-meta-tone]
+source = "Tone"
+translation = "Боја тона"
+
+[messages.asset-meta-tone-value]
+source = "brightness { $khz } kHz, noise { $noise }%"
+translation = "осветљеност { $khz } kHz, шум { $noise } %"
 
 [messages.asset-meta-triangles]
 source = "Triangles"

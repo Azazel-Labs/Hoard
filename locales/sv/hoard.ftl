@@ -1328,6 +1328,25 @@ asset-meta-loop = Loop
 asset-meta-loop-value = { $start } till { $end }
 asset-meta-playback = Uppspelning
 asset-meta-one-shot = Engångsljud
+asset-meta-envelope = Förlopp
+asset-meta-envelope-times = attack { $attack }, avklingning { $tail }
+asset-meta-envelope-hit = slag
+asset-meta-envelope-swell = crescendo
+asset-meta-envelope-sustained = ihållande
+asset-meta-tone = Klang
+asset-meta-tone-value = ljushet { $khz } kHz, brus { $noise } %
+asset-meta-pitch = Tonhöjd
+asset-meta-pitch-rises =
+    { $octaves ->
+        [one] stiger { $octaves } oktav
+       *[other] stiger { $octaves } oktaver
+    }
+asset-meta-pitch-falls =
+    { $octaves ->
+        [one] sjunker { $octaves } oktav
+       *[other] sjunker { $octaves } oktaver
+    }
+asset-meta-loops-cleanly = Loopar sömlöst
 asset-meta-tempo = Tempo
 asset-meta-root-note = Grundton
 asset-meta-cue-markers = Cue-markörer

@@ -1490,6 +1490,35 @@ asset-meta-loop = Loop
 asset-meta-loop-value = { $start } to { $end }
 asset-meta-playback = Playback
 asset-meta-one-shot = One-shot
+# How a sound starts and ends, as measured.
+asset-meta-envelope = Envelope
+# $attack is how long a sound takes to reach its loudest, $tail how long it goes on after, both like "5 ms" or
+# "1.2 s". Shown after a shape (hit, swell, sustained) when it has one.
+asset-meta-envelope-times = attack { $attack }, tail { $tail }
+# A sound that starts sharply and dies away.
+asset-meta-envelope-hit = hit
+# A sound that builds up to its loudest.
+asset-meta-envelope-swell = swell
+# A sound that starts quickly and holds its level.
+asset-meta-envelope-sustained = sustained
+asset-meta-tone = Tone
+# How bright a sound is ($khz, its spectral centroid in kilohertz, like 1.5) and how noisy ($noise: 0 for a pure tone,
+# 100 for white noise).
+asset-meta-tone-value = brightness { $khz } kHz, noise { $noise }%
+asset-meta-pitch = Pitch
+# How far a sound's pitch rises (or, below, falls) from start to end; $octaves is a number like 1.5.
+asset-meta-pitch-rises =
+    { $octaves ->
+        [one] rises { $octaves } octave
+       *[other] rises { $octaves } octaves
+    }
+asset-meta-pitch-falls =
+    { $octaves ->
+        [one] falls { $octaves } octave
+       *[other] falls { $octaves } octaves
+    }
+# Under Playback: the file's end runs into its start without a click, so it can be played in a loop.
+asset-meta-loops-cleanly = Loops cleanly
 asset-meta-tempo = Tempo
 asset-meta-root-note = Root note
 asset-meta-cue-markers = Cue markers

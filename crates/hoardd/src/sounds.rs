@@ -11,6 +11,10 @@
 //! - **Character**: ten numbers, each scaled to 0..=1: length, brightness, how much the brightness moves, noisiness,
 //!   zero crossings, onsets per second after the first, how much the spectrum changes, how much of it is sound rather
 //!   than near-silence, loudness range, and how much of it is bass.
+//!
+//! The same listening gives the measured features kept in the asset's meta (see [`FEATURES`]), shown in its details
+//! and made into tags: how it starts and ends, how bright and how noisy it is, whether its pitch rises or falls, and
+//! whether it loops cleanly. These are what a description of a sound ("a deep whoosh that swells") is matched with.
 
 use std::collections::{HashMap, HashSet};
 use std::f32::consts::PI;
@@ -18,11 +22,12 @@ use std::sync::{PoisonError, RwLock};
 
 use anyhow::Result;
 use rusqlite::params;
+use serde_json::{Map, Value, json};
 
 use crate::{AppState, db};
 
 /// Bump when the features change; rows from another version are worked out again by the next sounds job.
-pub(crate) const VERSION: i64 = 1;
+pub(crate) const VERSION: i64 = 2;
 /// The assets this covers.
 pub(crate) const KINDS_SQL: &str = "a.kind = 'audio'";
 
@@ -59,14 +64,28 @@ const BASS_HZ: f32 = 200.0;
 // ---------------------------------------------------------------------------------------------
 // Analysis
 
-/// A file's descriptor, or None if it isn't audio this can decode (or is silent).
-pub(crate) fn analyze(bytes: bytes::Bytes, ext: Option<&str>) -> Option<Vec<i8>> {
-    let (mono, rate) = decode_mono(bytes, ext)?;
-    describe(&mono, rate)
+/// The meta keys of the measured features.
+pub(crate) const FEATURES: [&str; 7] =
+    ["attack_ms", "tail_ms", "envelope", "brightness_hz", "noisiness", "sweep_octaves", "loops_cleanly"];
+
+/// A file's descriptor and measured features, or None if it isn't audio this can decode (or is silent). `bytes` is
+/// the whole file or its first [`MAX_BYTES`].
+pub(crate) fn analyze(bytes: bytes::Bytes, ext: Option<&str>) -> Option<(Vec<i8>, Map<String, Value>)> {
+    let cut = bytes.len() as u64 >= MAX_BYTES;
+    let (mono, rate, whole) = decode_mono(bytes, ext)?;
+    hear(&mono, rate, whole && !cut)
 }
 
-/// Up to [`MAX_SECS`] of a file, mixed to mono.
-fn decode_mono(bytes: bytes::Bytes, ext: Option<&str>) -> Option<(Vec<f32>, u32)> {
+/// The measured features of a sound file (see [`FEATURES`]), from its first [`MAX_BYTES`].
+pub(crate) fn measure(path: &std::path::Path, ext: &str) -> Option<Map<String, Value>> {
+    use std::io::Read;
+    let mut head = Vec::new();
+    std::fs::File::open(path).ok()?.take(MAX_BYTES).read_to_end(&mut head).ok()?;
+    analyze(bytes::Bytes::from(head), Some(ext)).map(|(_, f)| f)
+}
+
+/// Up to [`MAX_SECS`] of a file, mixed to mono, and whether that's all of it.
+fn decode_mono(bytes: bytes::Bytes, ext: Option<&str>) -> Option<(Vec<f32>, u32, bool)> {
     let mut mono = Vec::new();
     let mut rate = 0u32;
     let decoded = crate::audio::decode_each(Box::new(std::io::Cursor::new(bytes)), ext, |pcm, channels, r, _| {
@@ -88,12 +107,13 @@ fn decode_mono(bytes: bytes::Bytes, ext: Option<&str>) -> Option<(Vec<f32>, u32)
     if rate == 0 || mono.is_empty() {
         return None;
     }
+    let whole = decoded.is_ok() && (mono.len() as f32) < MAX_SECS * rate as f32;
     mono.truncate((MAX_SECS * rate as f32) as usize);
-    Some((mono, rate))
+    Some((mono, rate, whole))
 }
 
-/// The descriptor of mono samples at `rate`.
-fn describe(mono: &[f32], rate: u32) -> Option<Vec<i8>> {
+/// The descriptor and measured features of mono samples at `rate`; `whole` when they're the whole file, not its start.
+fn hear(mono: &[f32], rate: u32, whole: bool) -> Option<(Vec<i8>, Map<String, Value>)> {
     let sr = rate as f32;
     let peak = mono.iter().fold(0f32, |m, s| m.max(s.abs()));
     if peak < 1e-4 {
@@ -112,12 +132,24 @@ fn describe(mono: &[f32], rate: u32) -> Option<Vec<i8>> {
     if voiced.is_empty() {
         return None;
     }
+    let descriptor = descriptor(&x, sr, &frames, &voiced, secs);
+    let features = features(mono, &x, sr, &frames, loudest, whole);
+    Some((descriptor, features))
+}
+
+#[cfg(test)]
+fn describe(mono: &[f32], rate: u32) -> Option<Vec<i8>> {
+    hear(mono, rate, false).map(|h| h.0)
+}
+
+/// The descriptor (see the module's doc) of trimmed, normalized samples `x`.
+fn descriptor(x: &[f32], sr: f32, frames: &[Frame], voiced: &[&Frame], secs: f32) -> Vec<i8> {
     let nv = voiced.len() as f32;
 
     // Timbre: the mean spectrum in dB, floored 80 dB under its loudest band, less its mean. Bands above what the
     // file's rate can hold are unknown, not silent, so two files recorded at a low rate don't match on what neither has.
     let mut timbre = [0f32; BANDS];
-    for f in &voiced {
+    for f in voiced {
         for (t, d) in timbre.iter_mut().zip(f.db.iter()) {
             *t += d / nv;
         }
@@ -144,14 +176,111 @@ fn describe(mono: &[f32], rate: u32) -> Option<Vec<i8>> {
         *e /= most;
     }
 
-    let character = character(&frames, &voiced, secs);
+    let character = character(frames, voiced, secs);
 
     let mut out = Vec::with_capacity(DIMS);
     out.extend(
         timbre.iter().map(|&t| if t.is_finite() { (t.clamp(-1.0, 1.0) * 127.0).round() as i8 } else { i8::MIN }),
     );
     out.extend(envelope.iter().chain(character.iter()).map(|v| (v.clamp(-1.0, 1.0) * 127.0).round() as i8));
-    Some(out)
+    out
+}
+
+/// The loudness envelope's step, for the attack and the tail.
+const STEP_SECS: f32 = 0.005;
+
+fn rms(x: &[f32]) -> f32 {
+    (x.iter().map(|s| s * s).sum::<f32>() / x.len().max(1) as f32).sqrt()
+}
+
+/// The measured features (see [`FEATURES`]) of `x`, the trimmed and normalized `mono`, whose `frames` peak at
+/// `loudest`.
+///
+/// - `attack_ms`: how long it takes to get within 3 dB of its loudest.
+/// - `tail_ms`: how long it goes on after it was last within 6 dB of its loudest.
+/// - `envelope`: `hit` (a sharp attack that dies away), `swell` (it builds up to its loudest), or `sustained` (it
+///   starts quickly and holds); none when it's none of those.
+/// - `brightness_hz`: its spectral centroid, the louder moments counting more.
+/// - `noisiness`: 0 for a pure tone, near 1 for white noise.
+/// - `sweep_octaves`: how far its brightness rises (or, below zero, falls) from start to end.
+/// - `loops_cleanly`: its end runs into its start without a jump in level or a click (only known for a whole file).
+fn features(mono: &[f32], x: &[f32], sr: f32, frames: &[Frame], loudest: f32, whole: bool) -> Map<String, Value> {
+    let mut m = Map::new();
+    let secs = x.len() as f32 / sr;
+    let ms = secs * 1000.0;
+
+    let step = ((sr * STEP_SECS) as usize).max(1);
+    let step_ms = step as f32 * 1000.0 / sr;
+    let env: Vec<f32> = x.chunks(step).map(rms).collect();
+    let top = env.iter().fold(0f32, |a, &b| a.max(b)).max(1e-9);
+    let attack = env.iter().position(|&e| e >= top * 0.708).map_or(0.0, |i| ((i + 1) as f32 * step_ms).min(ms));
+    let last_loud = env.iter().rposition(|&e| e >= top * 0.5).unwrap_or(0);
+    let tail = (ms - (last_loud + 1) as f32 * step_ms).max(0.0);
+    m.insert("attack_ms".into(), json!(attack.round() as u32));
+    m.insert("tail_ms".into(), json!(tail.round() as u32));
+    // How loud its last quarter is, against its loudest.
+    let quarter = &env[env.len() - (env.len() / 4).max(1)..];
+    let end = quarter.iter().sum::<f32>() / quarter.len() as f32 / top;
+    let envelope = if attack <= 25.0 && end < 0.25 {
+        Some("hit")
+    } else if attack >= 150.0 && attack >= 0.4 * ms {
+        Some("swell")
+    } else if attack <= 100.0 && end >= 0.35 && secs >= 0.5 {
+        Some("sustained")
+    } else {
+        None
+    };
+    if let Some(e) = envelope {
+        m.insert("envelope".into(), json!(e));
+    }
+
+    let voiced: Vec<&Frame> = frames.iter().filter(|f| f.rms > loudest * 0.03).collect();
+    let weight: f32 = voiced.iter().map(|f| f.rms * f.rms).sum::<f32>().max(1e-12);
+    let brightness = voiced.iter().map(|f| f.centroid * f.rms * f.rms).sum::<f32>() / weight;
+    m.insert("brightness_hz".into(), json!((brightness / 10.0).round() as u32 * 10));
+    let flatness = voiced.iter().map(|f| f.flatness).sum::<f32>() / voiced.len().max(1) as f32;
+    m.insert("noisiness".into(), json!((f64::from(flatness.sqrt()) * 100.0).round() / 100.0));
+
+    // The slope of the brightness, in octaves, the louder moments counting more, over how long it's loud: a sound that
+    // dies away quickly hardly sweeps, however its brightness moves in its quiet tail.
+    if secs >= 0.2 && voiced.len() >= 4 {
+        let w = |f: &Frame| f.rms;
+        let y = |f: &Frame| f.centroid.max(20.0).log2();
+        let weight: f32 = voiced.iter().map(|f| w(f)).sum();
+        let mt = voiced.iter().map(|f| w(f) * f.at).sum::<f32>() / weight;
+        let my = voiced.iter().map(|f| w(f) * y(f)).sum::<f32>() / weight;
+        let (mut ty, mut tt) = (0.0, 0.0);
+        for f in &voiced {
+            ty += w(f) * (f.at - mt) * (y(f) - my);
+            tt += w(f) * (f.at - mt) * (f.at - mt);
+        }
+        if tt > 1e-12 {
+            // As long as the times would be if they were spread evenly, from their spread.
+            let span = (12.0 * tt / weight).sqrt();
+            m.insert("sweep_octaves".into(), json!((f64::from(ty / tt * span) * 10.0).round() / 10.0 + 0.0));
+        }
+    }
+
+    if whole && mono.len() as f32 >= 0.5 * sr && loops_cleanly(mono, sr) {
+        m.insert("loops_cleanly".into(), json!(true));
+    }
+    m
+}
+
+/// Whether a whole file's end runs into its start: both sound (within 30 dB of its peak), at levels within 6 dB of
+/// each other, and the step from the last sample to the first is no bigger than the steps either side of it.
+fn loops_cleanly(mono: &[f32], sr: f32) -> bool {
+    let peak = mono.iter().fold(0f32, |m, s| m.max(s.abs()));
+    let edge = ((0.05 * sr) as usize).min(mono.len() / 2).max(2);
+    let (head, tail) = (rms(&mono[..edge]), rms(&mono[mono.len() - edge..]));
+    if head.min(tail) < peak * 0.0316 || head.max(tail) > 2.0 * head.min(tail) {
+        return false;
+    }
+    let near = ((0.01 * sr) as usize).clamp(2, edge);
+    let steps = |s: &[f32]| s.windows(2).map(|w| (w[1] - w[0]).abs()).sum::<f32>() / (s.len() - 1) as f32;
+    let typical = steps(&mono[..near]).max(steps(&mono[mono.len() - near..]));
+    let jump = (mono[0] - mono[mono.len() - 1]).abs();
+    jump <= 3.0 * typical + peak * 1e-3
 }
 
 /// What one analysis frame (about 46 ms) holds.
@@ -168,6 +297,8 @@ struct Frame {
     zcr: f32,
     /// Share of the energy under [`BASS_HZ`].
     bass: f32,
+    /// Its middle, in seconds from the start.
+    at: f32,
 }
 
 /// The frames of `x`, half overlapping.
@@ -213,6 +344,7 @@ fn frames(x: &[f32], sr: f32) -> Vec<Frame> {
                 flatness,
                 zcr: crossings as f32 * sr / raw.len().max(2) as f32,
                 bass,
+                at: (at + raw.len() / 2) as f32 / sr,
             }
         })
         .collect()
@@ -556,8 +688,8 @@ pub(crate) async fn run_job(state: &AppState) -> Result<()> {
             save(state, &computed).await?;
             done += chunk.len();
             state.sounds.write(|m| {
-                for (hash, d) in computed {
-                    if let Some(d) = d {
+                for (hash, heard) in computed {
+                    if let Some((d, _)) = heard {
                         m.insert(hash, d.into_boxed_slice());
                     }
                 }
@@ -567,19 +699,22 @@ pub(crate) async fn run_job(state: &AppState) -> Result<()> {
     }
 }
 
-async fn save(state: &AppState, computed: &[(String, Option<Vec<i8>>)]) -> Result<()> {
-    let rows: Vec<(String, Vec<u8>)> = computed
-        .iter()
-        // Not a sound this can decode: an empty row, so it isn't tried again.
-        .map(|(hash, d)| (hash.clone(), d.as_ref().map_or_default(|d| d.iter().map(|&v| v as u8).collect())))
-        .collect();
+/// Keep the descriptors, and put the measured features in the meta of every sound with that file (unless they're
+/// there already, as for a file analyzed since they were added), with the tags they bring.
+async fn save(state: &AppState, computed: &[Heard]) -> Result<()> {
+    let rows = computed.to_vec();
     db::call(&state.pool, move |c| {
         let tx = c.transaction()?;
         {
             let mut stmt =
                 tx.prepare("INSERT OR REPLACE INTO sounds (hash, version, descriptor) VALUES (?1, ?2, ?3)")?;
-            for (hash, d) in &rows {
+            for (hash, heard) in &rows {
+                // Not a sound this can decode: an empty row, so it isn't tried again.
+                let d: Vec<u8> = heard.as_ref().map_or_default(|(d, _)| d.iter().map(|&v| v as u8).collect());
                 stmt.execute(params![hash, VERSION, d])?;
+                if let Some((_, features)) = heard {
+                    put_features(&tx, hash, features)?;
+                }
             }
         }
         tx.commit()?;
@@ -588,8 +723,42 @@ async fn save(state: &AppState, computed: &[(String, Option<Vec<i8>>)]) -> Resul
     .await
 }
 
+/// Put a file's measured features in the meta of every sound with it, taking out those not measured, and give them the
+/// tags the features bring in place of those the old ones brought. Sounds that have them already are left alone.
+fn put_features(c: &rusqlite::Connection, hash: &str, features: &Map<String, Value>) -> Result<()> {
+    let mut patch: Map<String, Value> = FEATURES.iter().map(|k| ((*k).to_owned(), Value::Null)).collect();
+    patch.extend(features.clone());
+    let changed = c
+        .prepare_cached(&format!(
+            "UPDATE assets AS a SET meta = json_patch(meta, ?2)
+              WHERE a.blob_hash = ?1 AND {KINDS_SQL} AND json_patch(meta, ?2) IS NOT json(meta)
+              RETURNING id, meta"
+        ))?
+        .query_map(params![hash, Value::Object(patch).to_string()], |r| {
+            Ok((r.get::<_, String>(0)?, r.get::<_, String>(1)?))
+        })?
+        .collect::<rusqlite::Result<Vec<_>>>()?;
+    let measured = crate::tagger::MEASURED_SOUND_TAGS;
+    let forget = format!(
+        "DELETE FROM asset_tags WHERE asset_id = ? AND source != 'human' AND tag IN ({})",
+        measured.map(|_| "?").join(", ")
+    );
+    for (id, meta) in changed {
+        c.execute(&forget, rusqlite::params_from_iter(std::iter::once(id.as_str()).chain(measured)))?;
+        let meta: Map<String, Value> = serde_json::from_str(&meta).unwrap_or_default();
+        for (tag, source, confidence) in crate::tagger::measured_sound_tags(&meta) {
+            db::upsert_tag(c, &id, tag, source, confidence)?;
+        }
+        db::reindex_asset(c, &id)?;
+    }
+    Ok(())
+}
+
+/// A file's hash, and its descriptor and measured features when it could be listened to.
+type Heard = (String, Option<(Vec<i8>, Map<String, Value>)>);
+
 /// Listen on a few threads (half the cores: this is background work).
-fn analyze_all(files: &[(String, String, bytes::Bytes)]) -> Vec<(String, Option<Vec<i8>>)> {
+fn analyze_all(files: &[(String, String, bytes::Bytes)]) -> Vec<Heard> {
     let threads = std::thread::available_parallelism().map_or(1, |n| (n.get() / 2).max(1));
     let per = files.len().div_ceil(threads).max(1);
     std::thread::scope(|scope| {
@@ -716,9 +885,126 @@ mod tests {
         let wav = crate::audio::write_wav(&crate::audio::Audio { samples, channels: 1, rate: RATE, bits: 16 });
         let whole = analyze(bytes::Bytes::from(wav.clone()), Some("wav")).expect("the whole file");
         let cut = analyze(bytes::Bytes::from(wav[..wav.len() * 2 / 3].to_vec()), Some("wav")).expect("its start");
-        assert_eq!(whole.len(), DIMS);
-        assert_eq!(cut.len(), DIMS);
+        assert_eq!(whole.0.len(), DIMS);
+        assert_eq!(cut.0.len(), DIMS);
         assert!(analyze(bytes::Bytes::from_static(b"not a sound at all"), Some("wav")).is_none());
+    }
+
+    /// A riser: noise that gets louder and brighter for two seconds.
+    fn riser(seed: u32) -> Vec<f32> {
+        let mut n = Noise(seed);
+        let len = 2 * RATE as usize;
+        let mut y = 0.0;
+        (0..len)
+            .map(|i| {
+                let t = i as f32 / len as f32;
+                let a = (-2.0 * PI * (200.0 * 32f32.powf(t)) / RATE as f32).exp();
+                y = a * y + (1.0 - a) * n.next();
+                y * t * t * 4.0
+            })
+            .collect()
+    }
+
+    /// A steady tone, `secs` long.
+    fn tone(hz: f32, len: usize) -> Vec<f32> {
+        (0..len).map(|i| (2.0 * PI * hz * i as f32 / RATE as f32).sin() * 0.5).collect()
+    }
+
+    fn f(x: &[f32]) -> Map<String, Value> {
+        hear(x, RATE, true).expect("features").1
+    }
+
+    #[test]
+    fn measured_features() {
+        let num = |m: &Map<String, Value>, k: &str| m[k].as_f64().unwrap();
+        let tags =
+            |m: &Map<String, Value>| crate::tagger::measured_sound_tags(m).into_iter().map(|t| t.0).collect::<Vec<_>>();
+
+        // A thud: a hit that's gone in a fifth of a second, neither bright nor dark, and doesn't loop.
+        let thud = f(&thud(1, 0.3, 300.0));
+        assert_eq!(thud["envelope"], "hit");
+        assert!(num(&thud, "attack_ms") <= 10.0 && (100.0..300.0).contains(&num(&thud, "tail_ms")), "{thud:?}");
+        assert!(num(&thud, "sweep_octaves").abs() < 1.0 && thud.get("loops_cleanly").is_none(), "{thud:?}");
+        assert_eq!(tags(&thud), ["envelope:hit"]);
+
+        // A laser: a hit, a pure tone, falling.
+        let zap = f(&zap(2000.0, 300.0, 0.4));
+        assert!(num(&zap, "sweep_octaves") < -1.0 && num(&zap, "noisiness") < 0.05, "{zap:?}");
+        assert_eq!(tags(&zap), ["envelope:hit", "tone:tonal", "pitch:falling"]);
+
+        // Rain: steady, bright, noise, and a file of it loops (white noise has no seam to hear).
+        let rain = f(&rain(3, 4.0));
+        assert!(num(&rain, "brightness_hz") > 8000.0 && num(&rain, "noisiness") > 0.6, "{rain:?}");
+        assert_eq!(tags(&rain), ["envelope:sustained", "tone:bright", "tone:noisy", "loop"]);
+
+        // A riser: it swells, louder and brighter to its end.
+        let riser = f(&riser(5));
+        assert!(num(&riser, "attack_ms") > 1000.0 && num(&riser, "tail_ms") < 50.0, "{riser:?}");
+        assert_eq!(tags(&riser), ["envelope:swell", "tone:bright", "tone:noisy", "pitch:rising"]);
+
+        // A tone of whole cycles loops; cut off mid-cycle it clicks, so it doesn't; nor does the start of a file.
+        let whole = tone(441.0, RATE as usize);
+        assert_eq!(f(&whole)["loops_cleanly"], true);
+        assert_eq!(num(&f(&whole), "brightness_hz"), 440.0);
+        assert!(f(&tone(441.0, RATE as usize + 25)).get("loops_cleanly").is_none());
+        assert!(hear(&whole, RATE, false).unwrap().1.get("loops_cleanly").is_none());
+    }
+
+    #[test]
+    fn features_measured_later_reach_the_sounds_and_their_tags() {
+        let c = db::test_library();
+        c.execute_batch(
+            "PRAGMA foreign_keys = OFF;
+             INSERT INTO assets (id, pack_id, blob_hash, path, name, ext, kind, meta, created_at, updated_at) VALUES
+               ('a', 'p', 'h', 'laser.wav', 'laser', 'wav', 'audio', '{\"duration_secs\":0.4,\"envelope\":\"swell\"}', 'x', 'x'),
+               ('b', 'p', 'h', 'copy/laser.wav', 'laser', 'wav', 'audio', '{}', 'x', 'x'),
+               ('c', 'p', 'other', 'rain.wav', 'rain', 'wav', 'audio', '{}', 'x', 'x');
+             INSERT INTO asset_tags (asset_id, tag, source, confidence) VALUES
+               ('a', 'envelope:swell', 'meta', 1.0), ('a', 'laser', 'rule', 0.8), ('b', 'tone:tonal', 'human', 1.0);",
+        )
+        .unwrap();
+        let laser = f(&zap(2000.0, 300.0, 0.4));
+        put_features(&c, "h", &laser).unwrap();
+        let meta = |id: &str| -> Map<String, Value> {
+            serde_json::from_str(
+                &c.query_row("SELECT meta FROM assets WHERE id = ?1", [id], |r| r.get::<_, String>(0)).unwrap(),
+            )
+            .unwrap()
+        };
+        let tags = |id: &str| -> Vec<(String, String)> {
+            c.prepare("SELECT tag, source FROM asset_tags WHERE asset_id = ?1 ORDER BY tag")
+                .unwrap()
+                .query_map([id], |r| Ok((r.get(0)?, r.get(1)?)))
+                .unwrap()
+                .collect::<rusqlite::Result<_>>()
+                .unwrap()
+        };
+        let pair = |t: &str, s: &str| (t.to_owned(), s.to_owned());
+        // Both copies of the file get the features, the old envelope's tag goes, and what else they had stays.
+        assert_eq!(meta("a")["envelope"], "hit");
+        assert_eq!(meta("a")["duration_secs"], 0.4);
+        assert_eq!(meta("b")["sweep_octaves"], laser["sweep_octaves"]);
+        assert!(meta("c").is_empty());
+        assert_eq!(
+            tags("a"),
+            [
+                pair("envelope:hit", "meta"),
+                pair("laser", "rule"),
+                pair("pitch:falling", "meta"),
+                pair("tone:tonal", "meta")
+            ]
+        );
+        assert_eq!(
+            tags("b"),
+            [pair("envelope:hit", "meta"), pair("pitch:falling", "meta"), pair("tone:tonal", "human")]
+        );
+        let words: String = c.query_row("SELECT tags FROM assets_fts WHERE asset_id = 'a'", [], |r| r.get(0)).unwrap();
+        assert!(words.contains("pitch falling"), "{words}");
+
+        // Measured again the same, nothing changes; a person's removal of a tag isn't undone either.
+        c.execute("DELETE FROM asset_tags WHERE asset_id = 'a' AND tag = 'pitch:falling'", []).unwrap();
+        put_features(&c, "h", &laser).unwrap();
+        assert!(!tags("a").contains(&pair("pitch:falling", "meta")));
     }
 
     #[test]

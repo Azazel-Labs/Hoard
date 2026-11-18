@@ -1355,6 +1355,25 @@ asset-meta-loop = Boucle
 asset-meta-loop-value = de { $start } à { $end }
 asset-meta-playback = Lecture
 asset-meta-one-shot = Lecture unique
+asset-meta-envelope = Enveloppe
+asset-meta-envelope-times = attaque { $attack }, queue { $tail }
+asset-meta-envelope-hit = impact
+asset-meta-envelope-swell = crescendo
+asset-meta-envelope-sustained = tenu
+asset-meta-tone = Timbre
+asset-meta-tone-value = brillance { $khz } kHz, bruit { $noise } %
+asset-meta-pitch = Hauteur
+asset-meta-pitch-rises =
+    { $octaves ->
+        [one] monte de { $octaves } octave
+       *[other] monte de { $octaves } octaves
+    }
+asset-meta-pitch-falls =
+    { $octaves ->
+        [one] descend de { $octaves } octave
+       *[other] descend de { $octaves } octaves
+    }
+asset-meta-loops-cleanly = Boucle sans raccord
 asset-meta-tempo = Tempo
 asset-meta-root-note = Note fondamentale
 asset-meta-cue-markers = Marqueurs

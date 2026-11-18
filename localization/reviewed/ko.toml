@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "201238d1f1316ec4b4b570518b01e5a32a97d7310f43d0956dd827f42f6d5000"
+source = "2235081ab15c646057416458fa3f3b8e357859d17ba776ecef2a615dd3b3e7ec"
 translation = "cb51eeebee58ce4e694b9c22ec1e26a19090d24e80d9b74b0e431ca3fa274b7f"
 
 [messages.account-add]
@@ -1907,6 +1907,26 @@ translation = "쿠킹됨(게임 빌드): 미리보기와 원본이 제거되어 
 source = "Cue markers"
 translation = "큐 마커"
 
+[messages.asset-meta-envelope]
+source = "Envelope"
+translation = "엔벨로프"
+
+[messages.asset-meta-envelope-hit]
+source = "hit"
+translation = "타격"
+
+[messages.asset-meta-envelope-sustained]
+source = "sustained"
+translation = "지속"
+
+[messages.asset-meta-envelope-swell]
+source = "swell"
+translation = "점점 커짐"
+
+[messages.asset-meta-envelope-times]
+source = "attack { $attack }, tail { $tail }"
+translation = "어택 { $attack }, 테일 { $tail }"
+
 [messages.asset-meta-everything-with]
 source = "Show everything tagged { $tag }"
 translation = "{ $tag } 태그가 있는 항목 모두 보기"
@@ -1967,6 +1987,10 @@ translation = "루프"
 source = "{ $start } to { $end }"
 translation = "{ $start } ~ { $end }"
 
+[messages.asset-meta-loops-cleanly]
+source = "Loops cleanly"
+translation = "끊김 없이 반복"
+
 [messages.asset-meta-maps]
 source = "Maps"
 translation = "맵"
@@ -1994,6 +2018,26 @@ translation = "원샷"
 [messages.asset-meta-package]
 source = "Package"
 translation = "패키지"
+
+[messages.asset-meta-pitch]
+source = "Pitch"
+translation = "음높이"
+
+[messages.asset-meta-pitch-falls]
+source = """
+{ $octaves ->
+        [one] falls { $octaves } octave
+       *[other] falls { $octaves } octaves
+    }"""
+translation = "{ $octaves }옥타브 하강"
+
+[messages.asset-meta-pitch-rises]
+source = """
+{ $octaves ->
+        [one] rises { $octaves } octave
+       *[other] rises { $octaves } octaves
+    }"""
+translation = "{ $octaves }옥타브 상승"
 
 [messages.asset-meta-playback]
 source = "Playback"
@@ -2054,6 +2098,14 @@ translation = "타일링"
 [messages.asset-meta-title]
 source = "Title"
 translation = "제목"
+
+[messages.asset-meta-tone]
+source = "Tone"
+translation = "음색"
+
+[messages.asset-meta-tone-value]
+source = "brightness { $khz } kHz, noise { $noise }%"
+translation = "밝기 { $khz } kHz, 노이즈 { $noise }%"
 
 [messages.asset-meta-triangles]
 source = "Triangles"

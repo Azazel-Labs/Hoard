@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "201238d1f1316ec4b4b570518b01e5a32a97d7310f43d0956dd827f42f6d5000"
+source = "2235081ab15c646057416458fa3f3b8e357859d17ba776ecef2a615dd3b3e7ec"
 translation = "42d6d2350a51c56e55a07a75988a6748d9e232912ffffb903defbf54bfd56e2e"
 
 [messages.account-add]
@@ -1910,6 +1910,26 @@ translation = "Đã cook (bản build game): bản xem trước và nguồn đã
 source = "Cue markers"
 translation = "Điểm đánh dấu cue"
 
+[messages.asset-meta-envelope]
+source = "Envelope"
+translation = "Đường bao"
+
+[messages.asset-meta-envelope-hit]
+source = "hit"
+translation = "cú đánh"
+
+[messages.asset-meta-envelope-sustained]
+source = "sustained"
+translation = "kéo dài"
+
+[messages.asset-meta-envelope-swell]
+source = "swell"
+translation = "tăng dần"
+
+[messages.asset-meta-envelope-times]
+source = "attack { $attack }, tail { $tail }"
+translation = "độ bật { $attack }, đuôi { $tail }"
+
 [messages.asset-meta-everything-with]
 source = "Show everything tagged { $tag }"
 translation = "Hiện mọi thứ có thẻ { $tag }"
@@ -1970,6 +1990,10 @@ translation = "Vòng lặp"
 source = "{ $start } to { $end }"
 translation = "{ $start } đến { $end }"
 
+[messages.asset-meta-loops-cleanly]
+source = "Loops cleanly"
+translation = "Lặp liền mạch"
+
 [messages.asset-meta-maps]
 source = "Maps"
 translation = "Map"
@@ -1997,6 +2021,26 @@ translation = "Phát một lần"
 [messages.asset-meta-package]
 source = "Package"
 translation = "Package"
+
+[messages.asset-meta-pitch]
+source = "Pitch"
+translation = "Cao độ"
+
+[messages.asset-meta-pitch-falls]
+source = """
+{ $octaves ->
+        [one] falls { $octaves } octave
+       *[other] falls { $octaves } octaves
+    }"""
+translation = "giảm { $octaves } quãng tám"
+
+[messages.asset-meta-pitch-rises]
+source = """
+{ $octaves ->
+        [one] rises { $octaves } octave
+       *[other] rises { $octaves } octaves
+    }"""
+translation = "tăng { $octaves } quãng tám"
 
 [messages.asset-meta-playback]
 source = "Playback"
@@ -2057,6 +2101,14 @@ translation = "Lát"
 [messages.asset-meta-title]
 source = "Title"
 translation = "Tiêu đề"
+
+[messages.asset-meta-tone]
+source = "Tone"
+translation = "Âm sắc"
+
+[messages.asset-meta-tone-value]
+source = "brightness { $khz } kHz, noise { $noise }%"
+translation = "độ sáng { $khz } kHz, nhiễu { $noise }%"
 
 [messages.asset-meta-triangles]
 source = "Triangles"

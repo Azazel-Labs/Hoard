@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "201238d1f1316ec4b4b570518b01e5a32a97d7310f43d0956dd827f42f6d5000"
+source = "2235081ab15c646057416458fa3f3b8e357859d17ba776ecef2a615dd3b3e7ec"
 translation = "5db71bb64547d674ae74798bc03b5a157ea563cee11208b1525b9e891805fb61"
 
 [messages.account-add]
@@ -2032,6 +2032,26 @@ translation = "Skompilowany (build gry): podglądy i źródła są usunięte"
 source = "Cue markers"
 translation = "Znaczniki cue"
 
+[messages.asset-meta-envelope]
+source = "Envelope"
+translation = "Obwiednia"
+
+[messages.asset-meta-envelope-hit]
+source = "hit"
+translation = "uderzenie"
+
+[messages.asset-meta-envelope-sustained]
+source = "sustained"
+translation = "podtrzymany"
+
+[messages.asset-meta-envelope-swell]
+source = "swell"
+translation = "narastanie"
+
+[messages.asset-meta-envelope-times]
+source = "attack { $attack }, tail { $tail }"
+translation = "atak { $attack }, wybrzmiewanie { $tail }"
+
 [messages.asset-meta-everything-with]
 source = "Show everything tagged { $tag }"
 translation = "Pokaż wszystko z tagiem { $tag }"
@@ -2092,6 +2112,10 @@ translation = "Pętla"
 source = "{ $start } to { $end }"
 translation = "od { $start } do { $end }"
 
+[messages.asset-meta-loops-cleanly]
+source = "Loops cleanly"
+translation = "Zapętla się płynnie"
+
 [messages.asset-meta-maps]
 source = "Maps"
 translation = "Mapy"
@@ -2119,6 +2143,38 @@ translation = "Jednorazowe"
 [messages.asset-meta-package]
 source = "Package"
 translation = "Pakiet"
+
+[messages.asset-meta-pitch]
+source = "Pitch"
+translation = "Wysokość"
+
+[messages.asset-meta-pitch-falls]
+source = """
+{ $octaves ->
+        [one] falls { $octaves } octave
+       *[other] falls { $octaves } octaves
+    }"""
+translation = """
+{ $octaves ->
+        [one] opada o { $octaves } oktawę
+        [few] opada o { $octaves } oktawy
+        [many] opada o { $octaves } oktaw
+       *[other] opada o { $octaves } oktawy
+    }"""
+
+[messages.asset-meta-pitch-rises]
+source = """
+{ $octaves ->
+        [one] rises { $octaves } octave
+       *[other] rises { $octaves } octaves
+    }"""
+translation = """
+{ $octaves ->
+        [one] wznosi się o { $octaves } oktawę
+        [few] wznosi się o { $octaves } oktawy
+        [many] wznosi się o { $octaves } oktaw
+       *[other] wznosi się o { $octaves } oktawy
+    }"""
 
 [messages.asset-meta-playback]
 source = "Playback"
@@ -2185,6 +2241,14 @@ translation = "Kafelkowanie"
 [messages.asset-meta-title]
 source = "Title"
 translation = "Tytuł"
+
+[messages.asset-meta-tone]
+source = "Tone"
+translation = "Barwa"
+
+[messages.asset-meta-tone-value]
+source = "brightness { $khz } kHz, noise { $noise }%"
+translation = "jasność { $khz } kHz, szum { $noise }%"
 
 [messages.asset-meta-triangles]
 source = "Triangles"

@@ -472,6 +472,10 @@ fn analyze_sound(path: &Path, ext: &str, a: &mut Analysis) -> anyhow::Result<()>
         }
         Err(e) => tracing::debug!(path = %path.display(), error = %e, "no waveform"),
     }
+    // How it starts and ends, how bright and noisy it is (see `sounds::FEATURES`): also measured by the sounds job.
+    let features =
+        crate::sounds::measure(path, ext).or_else(|| via_ffmpeg().and_then(|wav| crate::sounds::measure(&wav, "wav")));
+    a.meta.extend(features.into_iter().flatten());
     Ok(())
 }
 

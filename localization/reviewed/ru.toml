@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "201238d1f1316ec4b4b570518b01e5a32a97d7310f43d0956dd827f42f6d5000"
+source = "2235081ab15c646057416458fa3f3b8e357859d17ba776ecef2a615dd3b3e7ec"
 translation = "bb45e4d0d59bdf1a2181c1158501e66a0c57e8041d0a982d6aed7e82f49657fa"
 
 [messages.account-add]
@@ -2050,6 +2050,26 @@ translation = "Cooked (сборка игры): превью и исходник�
 source = "Cue markers"
 translation = "Маркеры"
 
+[messages.asset-meta-envelope]
+source = "Envelope"
+translation = "Огибающая"
+
+[messages.asset-meta-envelope-hit]
+source = "hit"
+translation = "удар"
+
+[messages.asset-meta-envelope-sustained]
+source = "sustained"
+translation = "протяжный"
+
+[messages.asset-meta-envelope-swell]
+source = "swell"
+translation = "нарастание"
+
+[messages.asset-meta-envelope-times]
+source = "attack { $attack }, tail { $tail }"
+translation = "атака { $attack }, затухание { $tail }"
+
 [messages.asset-meta-everything-with]
 source = "Show everything tagged { $tag }"
 translation = "Показать всё с тегом { $tag }"
@@ -2110,6 +2130,10 @@ translation = "Петля"
 source = "{ $start } to { $end }"
 translation = "от { $start } до { $end }"
 
+[messages.asset-meta-loops-cleanly]
+source = "Loops cleanly"
+translation = "Бесшовно зацикливается"
+
 [messages.asset-meta-maps]
 source = "Maps"
 translation = "Карты"
@@ -2137,6 +2161,38 @@ translation = "Однократно"
 [messages.asset-meta-package]
 source = "Package"
 translation = "Пакет"
+
+[messages.asset-meta-pitch]
+source = "Pitch"
+translation = "Высота"
+
+[messages.asset-meta-pitch-falls]
+source = """
+{ $octaves ->
+        [one] falls { $octaves } octave
+       *[other] falls { $octaves } octaves
+    }"""
+translation = """
+{ $octaves ->
+        [one] понижается на { $octaves } октаву
+        [few] понижается на { $octaves } октавы
+        [many] понижается на { $octaves } октав
+       *[other] понижается на { $octaves } октавы
+    }"""
+
+[messages.asset-meta-pitch-rises]
+source = """
+{ $octaves ->
+        [one] rises { $octaves } octave
+       *[other] rises { $octaves } octaves
+    }"""
+translation = """
+{ $octaves ->
+        [one] повышается на { $octaves } октаву
+        [few] повышается на { $octaves } октавы
+        [many] повышается на { $octaves } октав
+       *[other] повышается на { $octaves } октавы
+    }"""
 
 [messages.asset-meta-playback]
 source = "Playback"
@@ -2203,6 +2259,14 @@ translation = "Тайлинг"
 [messages.asset-meta-title]
 source = "Title"
 translation = "Название"
+
+[messages.asset-meta-tone]
+source = "Tone"
+translation = "Тембр"
+
+[messages.asset-meta-tone-value]
+source = "brightness { $khz } kHz, noise { $noise }%"
+translation = "яркость { $khz } кГц, шум { $noise } %"
 
 [messages.asset-meta-triangles]
 source = "Triangles"

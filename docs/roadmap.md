@@ -55,8 +55,11 @@ for one clip, becomes an animation linked to the characters it fits nearby. What
 - **Download them either way.** An animation comes with or without its character's mesh, and a character with or
   without its animations, as `?animations=1` does now.
 
-Still open: whether the root travels or a clip plays in place, and whether each clip in a many-take file should be
-an entry of its own in search.
+A clip whose root travels (a walk, a run, a jump forward) is shown traveling, without leaving the frame: the camera
+follows the character, and a ground grid beneath it scrolls the other way, so root motion and a clip made to play in
+place look different at a glance. A clip that stays put gets no grid.
+
+Still open: whether each clip in a many-take file should be an entry of its own in search.
 
 ## Spine binary skeletons
 

@@ -1,26 +1,28 @@
 <script setup lang="ts">
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import {
-  api, asUrl, bundleUrl, fileUrl, formatDuration, humanBytes, looksAlike, originalUrl, RESIZABLE_AS_ITSELF, thumbUrl,
-  type Asset, type AssetLink, type Collection, type CollectionRef, type ConversionStatus, type Facet, type LinkRel,
-  type MaterialInfo,
-  type MaterialMap, type ProjectUse,
+  api, bundleUrl, fileUrl, humanBytes, looksAlike, thumbUrl,
+  type Asset, type Collection, type CollectionRef, type Facet, type ProjectUse,
 } from '../api'
 import CollectionPicker from './CollectionPicker.vue'
-import { playableUrl, player, sourceExt, sourceUrl, stop as stopPreview } from '../player'
+import { playableUrl } from '../player'
+import AssetLinks from './AssetLinks.vue'
+import AssetOrigin from './AssetOrigin.vue'
+import AudioPreview from './AudioPreview.vue'
+import DownloadAs from './DownloadAs.vue'
 import KindGlyph from './KindGlyph.vue'
 import TagChip from './TagChip.vue'
-import { confirmDialog, copyText, daysAgo, showOk, swipeToClose } from '../ui'
+import { copyText, daysAgo, showOk, swipeToClose } from '../ui'
 import { may, mayEdit } from '../auth'
 import { canStar, mine, toggleFavorite } from '../mine'
 import { MAX_STORE_FILE, TEXT_EXTS } from '../storeFormats'
 import { lazy } from '../lazy'
-import { formatDate, formatNumber, t } from '../i18n'
-import { copyFacts } from '../copies'
-import { findKey, keyName } from '../keys'
+import { t } from '../i18n'
 import { isSkeletonAsset, isLottieAsset, isModelAsset, isRiveAsset, isTextAsset, takeViewRequest, viewRequest, viewerFor, type ViewerKind } from '../viewers'
-import { isMaterialAsset, resolutions, ROLE_LABEL, ROLE_NAME, sizeLabel } from '../materials'
+import { isMaterialAsset } from '../materials'
 import { withThumb } from '../browserThumbs'
+import { animsOf, needsOf } from '../assetLinks'
+import { fileFacts } from '../fileFacts'
 import { animatedAseprite, animatedSrc, PLAY_IN_PANEL, spriteSheet } from '../sprites'
 
 // three.js is big; only load it when someone opens a model.
@@ -109,77 +111,18 @@ watch(
  *  sections arriving one by one don't push each other (and what's being read) down the panel. */
 const settled = computed(() => props.full !== false && usageKnown.value)
 
-// The grid's quick preview and this panel's player shouldn't talk over each other.
-const audioEl = ref<HTMLAudioElement | null>(null)
-watch(() => player.playing, (on) => {
-  if (on) audioEl.value?.pause()
-})
 
 const withAnimations = ref(false)
 const isModel = computed(() => isModelAsset(props.asset))
 const isText = computed(() => isTextAsset(props.asset))
-// Getters, so the words are read at render time in the current language.
-const REL_LABEL: Record<Exclude<LinkRel, 'format'>, string> = {
-  get texture() { return t('asset-rel-texture') },
-  get buffer() { return t('asset-rel-buffer') },
-  get material() { return t('asset-rel-material') },
-  get animation() { return t('asset-rel-animation') },
-  get library() { return t('asset-rel-library') },
-  get guess() { return t('asset-rel-guess') },
-  get sidecar() { return t('asset-rel-sidecar') },
-  get variant() { return t('asset-rel-variant') },
-  get sprite() { return t('asset-rel-sprite') },
-  get sample() { return t('asset-rel-sample') },
-}
-const needs = computed(() => props.asset.links.filter((l) => l.rel !== 'animation' && l.rel !== 'sprite' && l.rel !== 'format'))
+const needs = computed(() => needsOf(props.asset))
 // A material made from texture maps lists its maps by role instead of as "Needs"; a texture or model that belongs
 // to one names it.
 const isMaterial = computed(() => isMaterialAsset(props.asset))
 const material = computed(() => props.asset.material ?? null)
 const partOf = computed(() => props.asset.materials ?? [])
-const roleOfHere = (m: MaterialInfo) => {
-  const own = m.maps.find((x) => x.id === props.asset.id)
-  return own ? t('asset-role-map', { role: ROLE_NAME[own.role] }) : t('asset-maps-count', { count: m.maps.length })
-}
-/** A model wears these materials: each lists its maps under it by what they're for, not by their long file names. */
-const wears = (m: MaterialInfo) => !m.maps.some((x) => x.id === props.asset.id)
-/** Files shown under a material already, so "Needs" doesn't list them again. */
-const inMaterials = computed(() => new Set(partOf.value.flatMap((m) => [m.id, ...m.maps.map((x) => x.id)])))
-const mapSize = (m: MaterialMap) => (m.resolution ? sizeLabel(m.resolution) : m.width ? `${m.width}×${m.height}` : m.ext)
 const mapsBytes = computed(() => material.value?.maps.reduce((n, m) => n + m.size, 0) ?? 0)
-const anims = computed(() => props.asset.links.filter((l) => l.rel === 'animation'))
-// The materials it belongs to have a section of their own.
-const usedBy = computed(() =>
-  props.asset.linked_from.filter((l) => l.rel !== 'sprite' && l.rel !== 'format' && !partOf.value.some((m) => m.id === l.id)),
-)
-// A sheet's sprites the pack has as loose images too, and on one of those, the sheet it's a sprite of.
-const looseSprites = computed(() => props.asset.links.filter((l) => l.rel === 'sprite'))
-const inSheets = computed(() => props.asset.linked_from.filter((l) => l.rel === 'sprite'))
-// The same asset in the pack's other formats, and on one of those, the format it's shown as.
-const otherFormats = computed(() => props.asset.links.filter((l) => l.rel === 'format'))
-const shownAs = computed(() => props.asset.linked_from.filter((l) => l.rel === 'format'))
-const extOf = (path: string) => (path.includes('.') ? path.slice(path.lastIndexOf('.') + 1).toUpperCase() : '')
-const linkGroups = computed(() =>
-  [
-    { key: 'needs', title: t('asset-needs'), items: isMaterial.value ? [] : needs.value.filter((l) => !inMaterials.value.has(l.id)) },
-    { key: 'animations', title: t('asset-animations'), items: anims.value },
-    { key: 'loose', title: t('asset-loose-sprites'), items: looseSprites.value },
-    { key: 'in-sheet', title: t('asset-in-sheet'), items: inSheets.value },
-    { key: 'formats', title: t('asset-other-formats'), items: otherFormats.value },
-    { key: 'shown-as', title: t('asset-shown-as'), items: shownAs.value },
-    { key: 'used-by', title: t('asset-used-by'), items: usedBy.value },
-  ].filter((g) => g.items.length),
-)
-const linkLabel = (l: AssetLink) => (l.rel === 'format' ? extOf(l.path) : REL_LABEL[l.rel])
-/** Long lists show their first few: the panel is about one asset, and a 40-texture "Needs" pushed the rest of it
- *  out of reach. A list only a couple longer than that shows whole, rather than hiding two behind a button. */
-const LIST_PEEK = 6
-const unfolded = ref(new Set<string>())
-watch(() => props.asset.id, () => (unfolded.value = new Set()))
-function peek<T>(key: string, items: T[]): T[] {
-  return unfolded.value.has(key) || items.length <= LIST_PEEK + 2 ? items : items.slice(0, LIST_PEEK)
-}
-const unfold = (key: string) => (unfolded.value = new Set(unfolded.value).add(key))
+const anims = computed(() => animsOf(props.asset))
 // A material made from maps comes as its maps, not as a file of its own.
 const linkedCount = computed(() => {
   const files = new Set<string>()
@@ -205,8 +148,6 @@ const bundleBytes = computed(() => {
 // Variant families: tag edits can fan out to every take.
 const family = computed(() => props.asset.family ?? null)
 const applyToFamily = ref(true)
-const duplicates = computed(() => props.asset.duplicates ?? [])
-const nearCopies = computed(() => props.asset.near_copies ?? [])
 const showViews = ref(false)
 const hasViews = computed(() => props.asset.derivatives.includes('views'))
 
@@ -215,9 +156,6 @@ const nameEl = ref<HTMLElement | null>(null)
 const newTag = ref('')
 const suggestions = ref<Facet[]>([])
 const copied = ref('')
-const canvas = ref<HTMLCanvasElement | null>(null)
-const canvasTop = ref<HTMLCanvasElement | null>(null)
-const waveState = ref<'idle' | 'loading' | 'done' | 'skipped'>('idle')
 /** The full-screen viewer that's open, if any. */
 const inspecting = ref<ViewerKind | ''>('')
 watch(() => props.asset.id, () => (inspecting.value = ''))
@@ -238,252 +176,15 @@ const isSheet = computed(() => props.asset.kind === 'sheet' && props.asset.deriv
 const spritePlayable = computed(() => isImage.value && (animatedAseprite(props.asset) || spriteSheet(props.asset)))
 const animate = ref(false)
 watch(() => props.asset.id, () => (animate.value = animatedAseprite(props.asset)), { immediate: true })
-const audioUrl = computed(() => playableUrl(props.asset))
-const isAudio = computed(() => audioUrl.value !== null)
-const recovered = computed(() => sourceExt(props.asset))
-const ueTags = computed(() => {
-  const tags = props.asset.meta.ue_tags
-  return tags && typeof tags === 'object' ? Object.entries(tags as Record<string, string>) : []
-})
-// "Download as": another format, or the same one scaled down. '' = the original format.
-// A conversion to a format the pack has the asset in already is left out: its own file is offered instead.
-const asFormats = computed(() => {
-  const own = new Set(otherFormats.value.map((l) => extOf(l.path).toLowerCase()))
-  return (props.asset.formats ?? []).filter((f) => !own.has(f.format))
-})
-const PACK_FILE = 'file:'
-const packFile = computed(() =>
-  asFormat.value.startsWith(PACK_FILE) ? (otherFormats.value.find((l) => PACK_FILE + l.id === asFormat.value) ?? null) : null,
-)
-const sameFormat = computed(() => RESIZABLE_AS_ITSELF[props.asset.ext.toLowerCase()] ?? null)
-const asFormat = ref('')
-const asMax = ref(0)
-const defaultAs = () =>
-  sameFormat.value ? '' : (asFormats.value[0]?.format ?? (otherFormats.value[0] ? PACK_FILE + otherFormats.value[0].id : ''))
-watch(() => props.asset.id, () => {
-  asFormat.value = defaultAs()
-  asMax.value = 0
-}, { immediate: true })
-// The format list arrives with the full asset detail, after the tile's summary: pick a default once it's there.
-watch(asFormats, (list) => {
-  const valid =
-    asFormat.value === '' ? sameFormat.value !== null : list.some((f) => f.format === asFormat.value) || packFile.value !== null
-  if (!valid) asFormat.value = defaultAs()
-})
-const asResizable = computed(() =>
-  asFormat.value === '' ? sameFormat.value !== null : asFormats.value.some((f) => f.format === asFormat.value && f.resizable),
-)
-/** Powers of two below the image's longest side, largest first. */
-const sizeChoices = computed(() => {
-  const w = Number(props.asset.meta.width ?? 0)
-  const h = Number(props.asset.meta.height ?? 0)
-  const out: number[] = []
-  for (let m = 8192; m >= 64; m /= 2) if (m < Math.max(w, h)) out.push(m)
-  return out.slice(0, 6)
-})
-const asHref = computed(() => {
-  if (packFile.value) return fileUrl(packFile.value, true)
-  const max = asResizable.value ? asMax.value : 0
-  if (asFormat.value === '') return sameFormat.value && max ? asUrl(props.asset, sameFormat.value, max) : null
-  return asUrl(props.asset, asFormat.value, max || undefined)
-})
-// Conversions run on the server in the background: poll until it's made, then download. Cached ones are instant.
-const asState = ref<ConversionStatus | null>(null)
-const asError = ref('')
-let asRun = 0
-watch([() => props.asset.id, asFormat, asMax], () => {
-  asRun++
-  asState.value = null
-  asError.value = ''
-})
-async function downloadAs(ev: MouseEvent) {
-  const href = asHref.value
-  if (!href || packFile.value || ev.ctrlKey || ev.metaKey || ev.shiftKey || ev.button !== 0) return
-  ev.preventDefault()
-  if (asState.value) return
-  const run = ++asRun
-  const format = asFormat.value || sameFormat.value || ''
-  const max = asResizable.value && asMax.value ? asMax.value : undefined
-  asError.value = ''
-  asState.value = { state: 'queued' }
-  try {
-    for (;;) {
-      const asked = Date.now()
-      const st = await api.asStatus(props.asset, format, max)
-      if (run !== asRun) return
-      if (st.state === 'failed') throw new Error(st.error ?? t('asset-conversion-failed'))
-      if (st.state === 'ready') break
-      asState.value = st
-      // Progress comes back as it moves; a few updates a second is plenty.
-      await new Promise((r) => setTimeout(r, Math.max(0, 300 - (Date.now() - asked))))
-    }
-    const a = document.createElement('a')
-    a.href = href
-    a.download = ''
-    document.body.appendChild(a)
-    a.click()
-    a.remove()
-  } catch (e) {
-    if (run === asRun) asError.value = e instanceof Error ? e.message : String(e)
-  } finally {
-    if (run === asRun) asState.value = null
-  }
-}
-const asLabel = computed(() => {
-  const st = asState.value
-  if (st?.state === 'converting') {
-    return st.progress !== undefined ? t('asset-as-converting-percent', { percent: Math.round(st.progress * 100) }) : t('asset-as-converting')
-  }
-  if (st) return t('asset-as-queued')
-  return t('asset-download')
-})
-/** What a sprite sheet format can say, and so how the sheet comes out in it. */
-const SHEET_NOTE: Record<string, () => string> = {
-  'sheet-hoard': () => t('sheet-note-hoard'),
-  'sheet-tp-hash': () => t('sheet-note-texturepacker'),
-  'sheet-tp-array': () => t('sheet-note-texturepacker'),
-  'sheet-starling': () => t('sheet-note-clockwise'),
-  'sheet-cocos2d': () => t('sheet-note-clockwise'),
-  'sheet-libgdx': () => t('sheet-note-libgdx'),
-  'sheet-godot-frames': () => t('sheet-note-godot-frames'),
-  'sheet-godot-tileset': () => t('sheet-note-godot-tileset'),
-  'sheet-grid': () => t('sheet-note-grid'),
-  'sheet-frames': () => t('sheet-note-frames'),
-}
-const asNote = computed(() => SHEET_NOTE[asFormat.value]?.() ?? '')
-const showAs = computed(
-  () => asFormats.value.length > 0 || otherFormats.value.length > 0 || (sameFormat.value !== null && sizeChoices.value.length > 0),
-)
+const isAudio = computed(() => playableUrl(props.asset) !== null)
 
-const origin = computed(() => props.asset.origin ?? null)
-const ueStatus = computed(() => props.asset.unreal ?? null)
-const originFile = computed(() => origin.value?.path.split('/').pop() ?? '')
 const pixelated = computed(() => props.asset.tags.some((t) => t.tag === 'style:pixel-art'))
 
 const visibleTags = computed(() =>
   props.asset.tags.filter((t) => !t.tag.startsWith('kind:') && !t.tag.startsWith('format:')),
 )
 
-/** A number with one decimal, the reader's way (44.1). */
-const oneDecimal = (n: number) => formatNumber(n, { minimumFractionDigits: 1, maximumFractionDigits: 1 })
-/** Labels for metadata the file names by key. */
-const TEXT_FIELD_LABEL: Record<string, () => string> = {
-  title: () => t('asset-meta-title'),
-  artist: () => t('asset-meta-artist'),
-  album: () => t('asset-meta-album'),
-  genre: () => t('asset-meta-genre'),
-  generator: () => t('asset-meta-generator'),
-}
-const COUNT_LABEL: Record<string, () => string> = {
-  meshes: () => t('asset-meta-meshes'),
-  materials: () => t('asset-meta-materials'),
-  animations: () => t('asset-meta-animations'),
-  skins: () => t('asset-meta-skins'),
-}
-
-/** A sound's measured envelope, as `meta.envelope` names it. */
-const ENVELOPE: Record<string, () => string> = {
-  hit: () => t('asset-meta-envelope-hit'),
-  swell: () => t('asset-meta-envelope-swell'),
-  sustained: () => t('asset-meta-envelope-sustained'),
-}
-
-/** A fact the file states that's also a tag (its artist, its genre): the value searches for everything with it. */
-const factTag = (key: string) => props.asset.tags.find((x) => x.tag.startsWith(`${key}:`))?.tag
-
-const metaRows = computed(() => {
-  const m = props.asset.meta
-  const rows: [string, string, string?][] = []
-  const num = (k: string) => (typeof m[k] === 'number' ? (m[k] as number) : undefined)
-  if (num('width') !== undefined) rows.push([t('asset-meta-size'), `${m.width} × ${m.height} px`])
-  if (num('duration_secs') !== undefined) rows.push([t('asset-meta-length'), formatDuration(num('duration_secs')!)])
-  if (num('sample_rate') !== undefined) rows.push([t('asset-meta-sample-rate'), `${oneDecimal(num('sample_rate')! / 1000)} kHz`])
-  if (num('channels') !== undefined) {
-    const ch = num('channels') === 1 ? t('asset-meta-mono') : num('channels') === 2 ? t('asset-meta-stereo') : String(m.channels)
-    rows.push([t('asset-meta-channels'), ch])
-  }
-  if (num('bit_depth') !== undefined) rows.push([t('asset-meta-bit-depth'), t('asset-meta-bits', { bits: num('bit_depth')! })])
-  if (num('peak_dbfs') !== undefined) {
-    const peak = oneDecimal(num('peak_dbfs')!)
-    const rms = oneDecimal(num('rms_dbfs')!)
-    rows.push([t('asset-meta-level'), m.clipped ? t('asset-meta-level-clips', { peak, rms }) : t('asset-meta-level-value', { peak, rms })])
-  }
-  if (num('loop_start') !== undefined && num('sample_rate')) {
-    const sr = num('sample_rate')!
-    rows.push([t('asset-meta-loop'), t('asset-meta-loop-value', { start: formatDuration(num('loop_start')! / sr), end: formatDuration(num('loop_end')! / sr) })])
-  } else if (m.one_shot === true) rows.push([t('asset-meta-playback'), t('asset-meta-one-shot')])
-  else if (m.loops_cleanly === true) rows.push([t('asset-meta-playback'), t('asset-meta-loops-cleanly')])
-  // What was measured of how it sounds.
-  if (num('attack_ms') !== undefined) {
-    const time = (ms: number) => (ms < 1000 ? `${formatNumber(ms)} ms` : `${oneDecimal(ms / 1000)} s`)
-    const shape = ENVELOPE[m.envelope as string]?.()
-    const times = t('asset-meta-envelope-times', { attack: time(num('attack_ms')!), tail: time(num('tail_ms') ?? 0) })
-    rows.push([t('asset-meta-envelope'), shape ? `${shape}, ${times}` : times])
-  }
-  if (num('brightness_hz') !== undefined) {
-    const noise = Math.round((num('noisiness') ?? 0) * 100)
-    rows.push([t('asset-meta-tone'), t('asset-meta-tone-value', { khz: oneDecimal(num('brightness_hz')! / 1000), noise })])
-  }
-  const sweep = num('sweep_octaves')
-  if (sweep !== undefined && Math.abs(sweep) >= 0.5) {
-    const octaves = Math.abs(sweep)
-    rows.push([t('asset-meta-pitch'), sweep > 0 ? t('asset-meta-pitch-rises', { octaves }) : t('asset-meta-pitch-falls', { octaves })])
-  }
-  if (num('tempo_bpm') !== undefined) rows.push([t('asset-meta-tempo'), `${m.tempo_bpm} BPM`, factTag('bpm')])
-  else if (num('measured_bpm') !== undefined) {
-    const [bpm, alt] = [num('measured_bpm')!, num('measured_bpm_alt')]
-    rows.push([t('asset-meta-tempo'), alt === undefined ? t('asset-meta-tempo-heard', { bpm }) : t('asset-meta-tempo-heard-or', { bpm, alt }), factTag('bpm')])
-  }
-  const key = findKey(String(m.key ?? m.measured_key ?? ''))
-  if (key) {
-    const value = t('asset-meta-key-value', { key: keyName(key), camelot: key.camelot })
-    rows.push([t('asset-meta-key'), m.key ? value : t('asset-meta-key-heard', { key: value }), factTag('key')])
-  }
-  if (typeof m.root_note === 'string') rows.push([t('asset-meta-root-note'), m.root_note as string])
-  if (num('cue_points')) rows.push([t('asset-meta-cue-markers'), String(m.cue_points)])
-  if (typeof m.ucs_category === 'string') {
-    rows.push(['UCS', [m.ucs_category, m.ucs_subcategory].filter(Boolean).join(' / ') + (m.ucs_catid ? ` (${m.ucs_catid})` : '')])
-  }
-  if (typeof m.library === 'string') rows.push([t('asset-meta-library'), m.library as string])
-  if (Array.isArray(m.keywords) && m.keywords.length) rows.push([t('asset-meta-keywords'), (m.keywords as string[]).join(', ')])
-  for (const k of ['title', 'artist', 'album', 'genre', 'generator']) {
-    if (typeof m[k] === 'string') rows.push([TEXT_FIELD_LABEL[k](), m[k] as string, factTag(k)])
-  }
-  if (typeof m.blender_version === 'string') rows.push([t('asset-meta-saved-with'), `Blender ${m.blender_version}`])
-  if (typeof m.color_mode === 'string') rows.push([t('asset-meta-color-mode'), (m.color_mode as string).toUpperCase()])
-  if (num('layers') !== undefined) rows.push([t('asset-meta-layers'), String(m.layers)])
-  if (m.hdr === true) rows.push([t('asset-meta-range'), t('asset-meta-hdr')])
-  if (m.large_document === true) rows.push([t('asset-meta-format'), t('asset-meta-large-document')])
-  const ai = m.ai as { made?: string; by?: string; how?: string } | undefined
-  if (ai?.made) {
-    const made = ai.made === 'edited' ? t('asset-meta-ai-edited') : t('asset-meta-ai-made')
-    // The server names where it read this with one of a few fixed English phrases.
-    const how = ai.how === 'generator settings' ? t('asset-meta-ai-how-generator')
-      : ai.how === 'IPTC digital source type' ? t('asset-meta-ai-how-iptc')
-      : ai.how ?? t('asset-meta-ai-how-metadata')
-    rows.push([t('asset-meta-ai'), ai.by ? t('asset-meta-ai-by-says', { made, by: ai.by, how }) : t('asset-meta-ai-says', { made, how })])
-  } else if (m.content_credentials === true) rows.push([t('asset-meta-provenance'), t('asset-meta-c2pa')])
-  if (typeof m.compression === 'string') rows.push([t('asset-meta-compression'), m.compression as string])
-  if (typeof m.note === 'string') rows.push([t('asset-meta-note'), m.note as string])
-  if (material.value) {
-    rows.push([t('asset-meta-maps'), String(material.value.maps.length)])
-    const sizes = resolutions(material.value)
-    if (sizes.length) rows.push([t('asset-meta-sizes', { count: sizes.length }), sizes.map(sizeLabel).join(', ')])
-  }
-  if (num('triangles') !== undefined) rows.push([t('asset-meta-triangles'), formatNumber(num('triangles')!)])
-  if (num('vertices') !== undefined) rows.push([t('asset-meta-vertices'), formatNumber(num('vertices')!)])
-  for (const k of ['meshes', 'materials', 'animations', 'skins']) {
-    if (num(k)) rows.push([COUNT_LABEL[k](), String(m[k])])
-  }
-  if (typeof m.ue_class === 'string') {
-    const cls = m.ue_class as string
-    rows.push([t('asset-meta-unreal-asset'), typeof m.ue_engine === 'string' ? t('asset-meta-unreal-saved-with', { class: cls, engine: m.ue_engine }) : cls])
-    if (m.ue_cooked === true) rows.push([t('asset-meta-package'), t('asset-meta-cooked')])
-  }
-  if (m.tileable === true) rows.push([t('asset-meta-tiling'), t('asset-meta-seamless')])
-  if (typeof m.analysis_error === 'string') rows.push([t('asset-meta-note'), t('asset-meta-analysis-error', { error: m.analysis_error })])
-  return rows
-})
+const metaRows = computed(() => fileFacts(props.asset))
 
 const tomlSnippet = computed(
   () => `[[select]]\nids = ["${props.asset.id}"]  # ${props.asset.name}\ndest = "${props.asset.category ?? props.asset.kind}"`,
@@ -500,48 +201,6 @@ function copiedNote(what: string): string {
     default: return ''
   }
 }
-
-/** The end of "This file was X…": its class and the engine version that saved it, as far as they're known. */
-const originTail = computed(() => {
-  const o = origin.value
-  if (!o) return ''
-  if (o.class && o.engine) return t('asset-origin-class-engine', { class: o.class, engine: o.engine })
-  if (o.class) return t('asset-origin-class', { class: o.class })
-  if (o.engine) return t('asset-origin-engine', { engine: o.engine })
-  return t('asset-origin-end')
-})
-/** A conversion rule made it (Settings → Adding packs), rather than Unreal's packages. */
-const byRule = computed(() => origin.value?.method === 'rule')
-const puttingBack = ref(false)
-/** Undo the conversion rule: the original file takes the asset back, and the rules leave it alone from then on. */
-async function putBack() {
-  const o = origin.value
-  if (!o) return
-  const ok = await confirmDialog({
-    title: t('asset-rule-put-back-title', { file: originFile.value }),
-    body: t('asset-rule-put-back-body'),
-    confirm: t('asset-rule-put-back'),
-  })
-  if (!ok) return
-  puttingBack.value = true
-  try {
-    await api.unconvert(props.asset.id)
-    emit('updated', await api.asset(props.asset.id))
-    showOk(t('asset-rule-put-back-done', { file: originFile.value }))
-  } catch (e) {
-    emit('error', (e as Error).message)
-  } finally {
-    puttingBack.value = false
-  }
-}
-/** Who converted it, when, and any notes. */
-const originHow = computed(() => {
-  const o = origin.value
-  if (!o) return ''
-  const date = formatDate(o.converted_at)
-  if (o.method === 'editor') return o.notes ? t('asset-origin-editor-notes', { date, notes: o.notes }) : t('asset-origin-editor', { date })
-  return o.notes ? t('asset-origin-hoard-notes', { date, notes: o.notes }) : t('asset-origin-hoard', { date })
-})
 
 /**
  * Shares a link that opens this asset: the share sheet on a phone or tablet, the clipboard elsewhere (where a share
@@ -703,158 +362,6 @@ watch(newTag, (v) => {
   }, 150)
 })
 
-/** Draw a min/max waveform from the decoded audio. Skipped for big files to keep the tab responsive. */
-async function drawWaveform() {
-  waveState.value = 'idle'
-  if (!isAudio.value) return
-  if (props.asset.size > 25 * 1024 * 1024) {
-    waveState.value = 'skipped'
-    return
-  }
-  waveState.value = 'loading'
-  const id = props.asset.id
-  try {
-    const buf = await (await fetch(audioUrl.value!)).arrayBuffer()
-    const ctx = new OfflineAudioContext(1, 1, 44100)
-    const audio = await ctx.decodeAudioData(buf)
-    if (id !== props.asset.id) return
-    if (!duration.value) duration.value = audio.duration
-    await nextTick()
-    const base = canvas.value
-    const top = canvasTop.value
-    if (!base || !top) return
-    // Bars two device pixels wide with a one-pixel gap: reads as a waveform rather than a smear.
-    const w = (base.width = top.width = Math.round(base.clientWidth * devicePixelRatio))
-    const h = (base.height = top.height = Math.round(base.clientHeight * devicePixelRatio))
-    const data = audio.getChannelData(0)
-    const bar = Math.max(2, Math.round(2 * devicePixelRatio))
-    const gap = Math.max(1, Math.round(devicePixelRatio))
-    const bars = Math.floor(w / (bar + gap))
-    const step = Math.max(1, Math.floor(data.length / bars))
-    // Canvas can't resolve light-dark() or variables; the computed `color` comes back as plain rgb().
-    const color = getComputedStyle(top).color
-    const paint = (g: CanvasRenderingContext2D) => {
-      g.fillStyle = color
-      for (let b = 0; b < bars; b++) {
-        let peak = 0
-        for (let i = b * step; i < (b + 1) * step && i < data.length; i++) peak = Math.max(peak, Math.abs(data[i]))
-        const bh = Math.max(gap, peak * h * 0.95)
-        g.fillRect(b * (bar + gap), (h - bh) / 2, bar, bh)
-      }
-    }
-    paint(base.getContext('2d')!)
-    paint(top.getContext('2d')!)
-    waveState.value = 'done'
-  } catch {
-    waveState.value = 'skipped'
-  }
-}
-
-watch(() => props.asset.id, drawWaveform, { immediate: true })
-
-// The player: a hidden <audio> driven by a play button and the waveform, which doubles as the scrubber.
-const playing = ref(false)
-const current = ref(0)
-const duration = ref(0)
-/** Where the pointer is over the waveform, 0..1, or null. */
-const hoverAt = ref<number | null>(null)
-let scrubbing = false
-let frame = 0
-watch(() => props.asset.id, () => {
-  playing.value = false
-  current.value = 0
-  const d = props.asset.meta.duration_secs
-  duration.value = typeof d === 'number' ? d : 0
-}, { immediate: true })
-const progress = computed(() => (duration.value ? Math.min(1, current.value / duration.value) : 0))
-
-/** m:ss, with tenths for short sounds where a second is a lot. */
-function clock(secs: number) {
-  if (!Number.isFinite(secs) || secs < 0) secs = 0
-  const m = Math.floor(secs / 60)
-  const s = secs - m * 60
-  return duration.value < 10 ? `${m}:${s.toFixed(1).padStart(4, '0')}` : `${m}:${String(Math.floor(s)).padStart(2, '0')}`
-}
-
-// timeupdate only fires a few times a second; follow the playhead every frame while it moves.
-function follow() {
-  cancelAnimationFrame(frame)
-  const tick = () => {
-    const el = audioEl.value
-    if (!el || el.paused) return
-    if (!scrubbing) current.value = el.currentTime
-    frame = requestAnimationFrame(tick)
-  }
-  frame = requestAnimationFrame(tick)
-}
-function onPlay() {
-  playing.value = true
-  stopPreview()
-  follow()
-}
-function onPause() {
-  playing.value = false
-  cancelAnimationFrame(frame)
-  if (audioEl.value) current.value = audioEl.value.currentTime
-}
-function onMeta() {
-  const d = audioEl.value?.duration
-  if (d && Number.isFinite(d)) duration.value = d
-}
-function togglePlay() {
-  const el = audioEl.value
-  if (!el) return
-  if (el.paused) {
-    if (el.ended || progress.value >= 1) el.currentTime = 0
-    void el.play().catch((e) => emit('error', t('asset-play-error', { error: (e as Error).message })))
-  } else el.pause()
-}
-function seekTo(f: number) {
-  const el = audioEl.value
-  if (!el || !duration.value) return
-  const at = Math.min(1, Math.max(0, f)) * duration.value
-  el.currentTime = at
-  current.value = at
-}
-const fractionAt = (e: PointerEvent) => {
-  const r = (e.currentTarget as HTMLElement).getBoundingClientRect()
-  return Math.min(1, Math.max(0, (e.clientX - r.left) / r.width))
-}
-function scrubDown(e: PointerEvent) {
-  if (e.button !== 0) return
-  ;(e.currentTarget as HTMLElement).setPointerCapture(e.pointerId)
-  scrubbing = true
-  seekTo(fractionAt(e))
-}
-function scrubMove(e: PointerEvent) {
-  hoverAt.value = fractionAt(e)
-  if (scrubbing) seekTo(hoverAt.value)
-}
-function scrubUp() {
-  if (!scrubbing) return
-  scrubbing = false
-  if (audioEl.value?.paused) togglePlay()
-}
-function scrubKey(e: KeyboardEvent) {
-  const nudge = Math.max(1, duration.value / 20)
-  const map: Record<string, () => void> = {
-    ArrowLeft: () => seekTo((current.value - nudge) / duration.value),
-    ArrowDown: () => seekTo((current.value - nudge) / duration.value),
-    ArrowRight: () => seekTo((current.value + nudge) / duration.value),
-    ArrowUp: () => seekTo((current.value + nudge) / duration.value),
-    Home: () => seekTo(0),
-    End: () => seekTo(1),
-    ' ': togglePlay,
-    Enter: togglePlay,
-  }
-  const f = map[e.key]
-  if (!f) return
-  e.preventDefault()
-  e.stopPropagation()
-  f()
-}
-onBeforeUnmount(() => cancelAnimationFrame(frame))
-
 // On a phone the panel covers the screen: swipe it away to the right.
 const root = ref<HTMLElement | null>(null)
 let unswipe = () => {}
@@ -985,52 +492,7 @@ onBeforeUnmount(() => unswipe())
         </svg>
       </span>
     </button>
-    <div v-else-if="isAudio" class="preview audio">
-      <div
-        class="scrub"
-        :class="{ flat: waveState !== 'done' }"
-        role="slider"
-        tabindex="0"
-        :aria-label="t('asset-playback-position')"
-        :aria-valuemin="0"
-        :aria-valuemax="Math.round(duration)"
-        :aria-valuenow="Math.round(current)"
-        :aria-valuetext="t('asset-playback-value', { current: clock(current), duration: clock(duration) })"
-        :style="{ '--p': progress }"
-        @pointerdown="scrubDown"
-        @pointermove="scrubMove"
-        @pointerup="scrubUp"
-        @pointercancel="scrubUp"
-        @pointerleave="hoverAt = null"
-        @keydown="scrubKey"
-      >
-        <canvas ref="canvas" class="wave" />
-        <canvas ref="canvasTop" class="wave top" />
-        <span class="head" aria-hidden="true" />
-        <span v-if="hoverAt !== null && duration" class="hover" :style="{ '--h': hoverAt }" aria-hidden="true">
-          <span class="mono">{{ clock(hoverAt * duration) }}</span>
-        </span>
-      </div>
-      <div class="transport">
-        <button type="button" class="play" :aria-label="playing ? t('asset-pause') : t('asset-play')" @click="togglePlay">
-          <svg v-if="playing" viewBox="0 0 16 16" width="14" height="14" fill="currentColor" aria-hidden="true"><rect x="3.5" y="2.5" width="3" height="11" rx="1" /><rect x="9.5" y="2.5" width="3" height="11" rx="1" /></svg>
-          <svg v-else viewBox="0 0 16 16" width="14" height="14" fill="currentColor" aria-hidden="true"><path d="M4.5 2.8v10.4a.8.8 0 0 0 1.2.7l8.3-5.2a.8.8 0 0 0 0-1.4L5.7 2.1a.8.8 0 0 0-1.2.7Z" /></svg>
-        </button>
-        <span class="mono time">{{ clock(current) }} <span class="of">/ {{ clock(duration) }}</span></span>
-        <span v-if="waveState === 'loading'" class="wavenote">{{ t('asset-waveform-drawing') }}</span>
-        <span v-else-if="waveState === 'skipped'" class="wavenote">{{ t('asset-waveform-skipped') }}</span>
-      </div>
-      <audio
-        ref="audioEl"
-        :src="audioUrl ?? undefined"
-        preload="none"
-        @play="onPlay"
-        @pause="onPause"
-        @ended="onPause"
-        @loadedmetadata="onMeta"
-        @durationchange="onMeta"
-      />
-    </div>
+    <AudioPreview v-else-if="isAudio" :asset="asset" @error="(m) => emit('error', m)" />
     <TextPreview v-else-if="isText" :asset="asset" @expand="inspecting = 'text'" />
     <div v-else class="preview checker">
       <img v-if="asset.has_thumb" :src="thumbUrl(asset)" alt="" :class="{ pixelated, glyphs: asset.kind === 'font' }" />
@@ -1167,187 +629,9 @@ onBeforeUnmount(() => unswipe())
       </ul>
     </section>
 
-    <section v-if="material">
-      <h3>{{ t('asset-maps') }}</h3>
-      <ul class="links">
-        <li v-for="m in peek('maps', material.maps)" :key="m.id">
-          <button type="button" class="link" style="--kind: var(--k-texture)" :title="m.path" @click="$emit('open', m.id)">
-            <span class="lthumb checker">
-              <img v-if="m.has_thumb" :src="thumbUrl(m)" alt="" loading="lazy" />
-              <KindGlyph v-else kind="texture" :size="22" />
-            </span>
-            <span class="lname">{{ ROLE_LABEL[m.role] }}</span>
-            <span class="lrel mono">{{ mapSize(m) }}</span>
-          </button>
-        </li>
-      </ul>
-      <button v-if="peek('maps', material.maps).length < material.maps.length" type="button" class="linkish small showmore" @click="unfold('maps')">
-        {{ t('asset-show-more', { count: material.maps.length - LIST_PEEK }) }}
-      </button>
-    </section>
+    <AssetLinks :asset="asset" @open="(id) => emit('open', id)" />
 
-    <section v-if="partOf.length">
-      <h3>{{ t('asset-materials-heading', { count: partOf.length }) }}</h3>
-      <ul class="links">
-        <li v-for="m in partOf" :key="m.id">
-          <button type="button" class="link" style="--kind: var(--k-material)" @click="$emit('open', m.id)">
-            <span class="lthumb checker">
-              <img v-if="m.has_thumb" :src="thumbUrl(m)" alt="" loading="lazy" />
-              <KindGlyph v-else kind="material" :size="22" />
-            </span>
-            <span class="lname">{{ m.name }}</span>
-            <span class="lrel">{{ roleOfHere(m) }}</span>
-          </button>
-          <ul v-if="wears(m)" class="links maps" :aria-label="t('asset-material-maps-aria', { name: m.name })">
-            <li v-for="x in peek(`maps-${m.id}`, m.maps)" :key="x.id">
-              <button type="button" class="link" style="--kind: var(--k-texture)" :title="x.path" @click="$emit('open', x.id)">
-                <span class="lthumb checker">
-                  <img v-if="x.has_thumb" :src="thumbUrl(x)" alt="" loading="lazy" />
-                  <KindGlyph v-else kind="texture" :size="22" />
-                </span>
-                <span class="lname">{{ ROLE_LABEL[x.role] }}</span>
-                <span class="lrel mono">{{ mapSize(x) }}</span>
-              </button>
-            </li>
-          </ul>
-          <button
-            v-if="wears(m) && peek(`maps-${m.id}`, m.maps).length < m.maps.length"
-            type="button"
-            class="linkish small showmore"
-            @click="unfold(`maps-${m.id}`)"
-          >
-            {{ t('asset-show-more', { count: m.maps.length - LIST_PEEK }) }}
-          </button>
-        </li>
-      </ul>
-    </section>
-
-    <section v-for="g in linkGroups" :key="g.key">
-      <h3>{{ g.title }}</h3>
-      <ul class="links">
-        <li v-for="l in peek(g.key, g.items)" :key="l.id + l.rel">
-          <button type="button" class="link" :style="{ '--kind': `var(--k-${l.kind})` }" @click="$emit('open', l.id)">
-            <span class="lthumb checker">
-              <img v-if="l.has_thumb" :src="thumbUrl(l)" :class="{ glyphs: l.kind === 'font' }" alt="" loading="lazy" />
-              <KindGlyph v-else :kind="l.kind" :size="22" />
-            </span>
-            <span class="lname">{{ l.name }}</span>
-            <span class="lrel">{{ linkLabel(l) }}<template v-if="l.size != null"> · {{ humanBytes(l.size) }}</template></span>
-          </button>
-        </li>
-      </ul>
-      <button v-if="peek(g.key, g.items).length < g.items.length" type="button" class="linkish small showmore" @click="unfold(g.key)">
-        {{ t('asset-show-more', { count: g.items.length - LIST_PEEK }) }}
-      </button>
-    </section>
-
-    <section v-if="family">
-      <h3>{{ t('asset-variants', { count: family.size }) }}</h3>
-      <ul class="links">
-        <li v-for="l in peek('variants', family.members)" :key="l.id">
-          <button type="button" class="link" :style="{ '--kind': `var(--k-${l.kind})` }" @click="$emit('open', l.id)">
-            <span class="lthumb checker">
-              <img v-if="l.has_thumb" :src="thumbUrl(l)" :class="{ glyphs: l.kind === 'font' }" alt="" loading="lazy" />
-              <KindGlyph v-else :kind="l.kind" :size="22" />
-            </span>
-            <span class="lname">{{ l.name }}</span>
-            <span class="lrel">{{ l.path.split('/').pop() }}</span>
-          </button>
-        </li>
-      </ul>
-      <button v-if="peek('variants', family.members).length < family.members.length" type="button" class="linkish small showmore" @click="unfold('variants')">
-        {{ t('asset-show-more', { count: family.members.length - LIST_PEEK }) }}
-      </button>
-    </section>
-
-    <section v-if="duplicates.length">
-      <h3>{{ t('asset-copies') }}</h3>
-      <p class="legend dupnote">{{ t('asset-copies-note') }}</p>
-      <ul class="links">
-        <li v-for="d in peek('copies', duplicates)" :key="d.id">
-          <button type="button" class="link dup" @click="$emit('open', d.id)">
-            <span class="lname">{{ d.pack_name }}</span>
-            <span class="lrel">{{ d.path }}</span>
-          </button>
-        </li>
-      </ul>
-      <button v-if="peek('copies', duplicates).length < duplicates.length" type="button" class="linkish small showmore" @click="unfold('copies')">
-        {{ t('asset-show-more', { count: duplicates.length - LIST_PEEK }) }}
-      </button>
-    </section>
-
-    <section v-if="nearCopies.length" data-testid="near-copies">
-      <h3>{{ t('asset-near-copies') }}</h3>
-      <p class="legend dupnote">{{ nearCopies.some((n) => n.best) ? t('asset-near-copies-note') : t('asset-near-copies-best') }}</p>
-      <ul class="links">
-        <li v-for="n in peek('near', nearCopies)" :key="n.id">
-          <button type="button" class="link dup near" :title="n.path" @click="$emit('open', n.id)">
-            <span class="lname">{{ n.pack_name }}<span v-if="n.best" class="best">{{ t('asset-near-best') }}</span></span>
-            <span class="lrel">{{ copyFacts(n) }}</span>
-          </button>
-        </li>
-      </ul>
-      <button v-if="peek('near', nearCopies).length < nearCopies.length" type="button" class="linkish small showmore" @click="unfold('near')">
-        {{ t('asset-show-more', { count: nearCopies.length - LIST_PEEK }) }}
-      </button>
-    </section>
-
-    <section v-if="origin || ueStatus || recovered || ueTags.length" class="unreal">
-      <h3>{{ byRule ? t('asset-rule-converted') : origin ? t('asset-unreal-converted') : t('asset-unreal-package') }}</h3>
-      <div v-if="origin && byRule" data-testid="rule-origin">
-        <p class="origin-note">
-          {{ t('asset-rule-was', { date: formatDate(origin.converted_at), format: asset.ext.toUpperCase() }) }}
-          <span class="mono">{{ originFile }}</span>
-        </p>
-        <p class="legend">
-          <template v-if="origin.original_kept">
-            {{ origin.kept_until ? t('asset-rule-kept-until', { date: formatDate(origin.kept_until) }) : '' }}
-            <a class="btn" :href="originalUrl(asset)">{{ t('asset-origin-download', { ext: origin.ext }) }}</a>
-            <button v-if="may('admin')" type="button" class="btn" :disabled="puttingBack" data-testid="rule-put-back" @click="putBack">
-              {{ t('asset-rule-put-back') }}
-            </button>
-          </template>
-          <template v-else>{{ t('asset-rule-let-go') }}</template>
-        </p>
-      </div>
-      <template v-else-if="origin">
-        <p class="origin-note">
-          {{ t('asset-origin-before') }} <span class="mono">{{ originFile }}</span>{{ originTail }}
-          {{ originHow }}
-        </p>
-        <p class="legend">
-          <a v-if="origin.original_kept" class="btn" :href="originalUrl(asset)">{{ t('asset-origin-download', { ext: origin.ext }) }}</a>
-          <template v-else>{{ t('asset-origin-discarded') }}</template>
-        </p>
-      </template>
-      <p v-else-if="ueStatus?.status === 'needs_editor'" class="legend">
-        {{ t('asset-ue-needs-editor-before', { reason: ueStatus.reason }) }}
-        <span class="mono">hoard unreal-worker --editor &lt;{{ t('asset-ue-editor-path') }}&gt;</span> {{ t('asset-ue-needs-editor-after') }}
-      </p>
-      <p v-else-if="ueStatus?.status === 'unsupported'" class="legend">
-        {{ t('asset-ue-unsupported', { reason: ueStatus.reason }) }}
-      </p>
-      <p v-else-if="ueStatus?.status === 'failed'" class="legend bad">
-        {{ t('asset-ue-failed', { reason: ueStatus.reason }) }}
-      </p>
-      <p v-if="recovered && !origin" class="recovered">
-        {{ t('asset-recovered', { ext: recovered }) }}
-        <a class="btn" :href="sourceUrl(asset, true)">{{ t('asset-recovered-download', { ext: recovered }) }}</a>
-      </p>
-      <p v-else-if="!origin && !ueStatus && (asset.kind === 'model' || asset.kind === 'animation')" class="legend">
-        {{ t('asset-ue-meshes-before') }}
-        <span class="mono">hoard unreal-worker</span> {{ t('asset-ue-meshes-after') }}
-      </p>
-      <details v-if="ueTags.length">
-        <summary>{{ t('asset-ue-registry-tags', { count: ueTags.length }) }}</summary>
-        <dl>
-          <template v-for="[k, v] in ueTags" :key="k">
-            <dt>{{ k }}</dt>
-            <dd class="mono">{{ v }}</dd>
-          </template>
-        </dl>
-      </details>
-    </section>
+    <AssetOrigin :asset="asset" @updated="(a) => emit('updated', a)" @error="(m) => emit('error', m)" />
 
     <section v-if="metaRows.length">
       <h3>{{ t('asset-file') }}</h3>
@@ -1407,26 +691,7 @@ onBeforeUnmount(() => unswipe())
       <label v-if="anims.length && !(isMaterial && needs.length)" class="animcheck">
         <input v-model="withAnimations" type="checkbox" /> {{ t('asset-include-animations') }}
       </label>
-      <div v-if="showAs" class="asrow">
-        <label for="as-format">{{ t('asset-as-label') }}</label>
-        <select id="as-format" v-model="asFormat" class="field">
-          <option v-if="sameFormat" value="">{{ t('asset-as-original', { format: asset.ext.toUpperCase() }) }}</option>
-          <option v-for="f in asFormats" :key="f.format" :value="f.format">{{ f.label }}</option>
-          <optgroup v-if="otherFormats.length" :label="t('asset-as-pack-files')">
-            <option v-for="l in otherFormats" :key="l.id" :value="PACK_FILE + l.id">
-              {{ extOf(l.path) }} · {{ humanBytes(l.size ?? 0) }}
-            </option>
-          </optgroup>
-        </select>
-        <select v-if="asResizable && sizeChoices.length" v-model.number="asMax" class="field size" :aria-label="t('asset-as-size')">
-          <option :value="0">{{ t('asset-as-full-size') }}</option>
-          <option v-for="m in sizeChoices" :key="m" :value="m">{{ t('asset-as-up-to', { size: String(m) }) }}</option>
-        </select>
-        <a v-if="asHref" class="btn" :href="asHref" :aria-busy="asState ? 'true' : 'false'" @click="downloadAs">{{ asLabel }}</a>
-        <span v-else class="ashint">{{ t('asset-as-hint') }}</span>
-        <span v-if="asError" class="aserror" role="alert">{{ asError }}</span>
-      </div>
-      <p v-if="showAs && asNote" class="asnote">{{ asNote }}</p>
+      <DownloadAs :asset="asset" />
       <div class="tools">
         <span class="copywrap">
           <button class="btn ghost" type="button" @click="copy(tomlSnippet, 'toml')">{{ t('asset-copy-toml') }}</button>
@@ -1525,38 +790,6 @@ onBeforeUnmount(() => unswipe())
   display: flex; flex-direction: column; aspect-ratio: auto; place-items: stretch; gap: 0.4rem; padding: 0.75rem 0.75rem 0.5rem;
   background: var(--bg);
 }
-.scrub { position: relative; height: 8.5rem; cursor: pointer; touch-action: none; border-radius: 3px; --p: 0; }
-.scrub:focus-visible { outline-offset: 4px; }
-.wave { position: absolute; inset: 0; width: 100%; height: 100%; color: var(--k-audio); opacity: 0.32; }
-.wave.top { opacity: 1; clip-path: inset(0 calc((1 - var(--p)) * 100%) 0 0); }
-.scrub.flat::before, .scrub.flat::after {
-  content: ''; position: absolute; left: 0; top: calc(50% - 2px); height: 4px; border-radius: 2px; background: var(--k-audio);
-}
-.scrub.flat::before { right: 0; opacity: 0.25; }
-.scrub.flat::after { width: calc(var(--p) * 100%); }
-.head {
-  position: absolute; top: -4px; bottom: -4px; left: calc(var(--p) * 100%); width: 2px; margin-left: -1px;
-  background: var(--text); border-radius: 1px; pointer-events: none;
-}
-.hover {
-  position: absolute; top: 0; bottom: 0; left: calc(var(--h) * 100%); width: 1px;
-  background: color-mix(in srgb, var(--text) 45%, transparent); pointer-events: none;
-}
-.hover span {
-  position: absolute; bottom: calc(100% + 2px); left: 50%; translate: -50% 0; padding: 0 0.3rem; border-radius: 3px;
-  background: var(--raised); box-shadow: var(--elev-1); font-size: 0.7rem; white-space: nowrap;
-}
-.transport { display: flex; align-items: center; gap: 0.6rem; }
-.play {
-  display: grid; place-items: center; width: 2.25rem; height: 2.25rem; border-radius: 50%; cursor: pointer;
-  border: 0; background: var(--k-audio); color: var(--bg); box-shadow: var(--elev-1);
-  transition: scale var(--dur-2) var(--ease-pop), box-shadow var(--dur-2) var(--ease-out);
-}
-.play:hover { scale: 1.06; box-shadow: var(--elev-2); }
-.play:active { scale: 0.92; transition-duration: 60ms; }
-.time { font-size: 0.78rem; font-variant-numeric: tabular-nums; }
-.time .of { color: var(--faint); }
-.wavenote { margin-left: auto; font-size: 0.72rem; color: var(--faint); }
 .desc { margin: 0; color: var(--muted); max-width: 60ch; white-space: pre-line; }
 .desc.mine { color: var(--text); }
 .descs { display: grid; gap: 0.6rem; justify-items: start; }
@@ -1568,10 +801,6 @@ onBeforeUnmount(() => unswipe())
 .descedit textarea { resize: vertical; font: inherit; }
 .descbtns { display: flex; gap: 0.4rem; align-items: center; }
 .hint { font-size: 0.75rem; color: var(--faint); }
-.linkish.small { font-size: 0.8rem; }
-.showmore { margin-top: 0.45rem; color: var(--muted); }
-.showmore:hover { color: var(--text); }
-h3 { margin: 0 0 0.5rem; font-size: var(--step--1); font-weight: 650; color: var(--muted); }
 .tags { position: relative; display: flex; flex-wrap: wrap; gap: 0.35rem; }
 .tags :deep(.chip) { cursor: pointer; }
 .chip-enter-active { transition: opacity var(--dur-2) var(--ease-out), scale var(--dur-3) var(--ease-pop); }
@@ -1579,24 +808,8 @@ h3 { margin: 0 0 0.5rem; font-size: var(--step--1); font-weight: 650; color: var
 .chip-enter-from, .chip-leave-to { opacity: 0; scale: 0.6; }
 .chip-move { transition: translate var(--dur-2) var(--ease-out); }
 .addtag { display: flex; gap: 0.4rem; margin-top: 0.6rem; }
-.legend { margin: 0.5rem 0 0; font-size: 0.75rem; color: var(--faint); max-width: 52ch; }
-.asrow { display: flex; flex-wrap: wrap; align-items: center; gap: 0.4rem; font-size: var(--step--1); color: var(--muted); }
-.asrow > label { flex: none; margin-right: 0.15rem; }
-.asrow .field { flex: 1 1 7rem; width: auto; min-width: 0; font-size: var(--step--1); padding: 0.42em 0.55em; }
-.asrow .field.size { flex: 0 1 8.5rem; }
-.asrow .btn { flex: none; }
-.ashint { color: var(--faint); }
-.asnote { margin: -0.2rem 0 0; font-size: var(--step--1); color: var(--muted); }
-.aserror { flex-basis: 100%; color: var(--danger); }
-.asrow .btn[aria-busy='true'] { cursor: progress; font-variant-numeric: tabular-nums; }
-.origin-note { margin: 0; font-size: var(--step--1); color: var(--muted); max-width: 52ch; }
-.unreal .bad { color: var(--danger); }
-dl { display: grid; grid-template-columns: max-content 1fr; gap: 0.3rem 1rem; margin: 0; font-size: var(--step--1); }
-dt { color: var(--muted); }
-dd { margin: 0; min-width: 0; }
 .path { word-break: break-all; }
 .path .sep { color: var(--faint); padding: 0 0.1em; }
-.linkish { border: 0; background: none; padding: 0; cursor: pointer; color: var(--text); text-decoration: underline dotted var(--faint); font: inherit; }
 .btn .bytes { font-weight: 400; opacity: 0.75; font-variant-numeric: tabular-nums; }
 /* The download actions stay in reach while the panel scrolls. */
 footer {
@@ -1628,21 +841,6 @@ footer {
 .alike { white-space: nowrap; flex: none; display: inline-flex; gap: 0.4rem; align-items: center; }
 .looks:not(:has(.palette)) .alike { margin-right: auto; }
 .animcheck { display: inline-flex; gap: 0.35rem; align-items: center; font-size: var(--step--1); color: var(--muted); }
-.links { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.3rem; }
-/* A material's maps, under it. */
-.links.maps { margin: 0.3rem 0 0.2rem 1.4rem; padding-left: 0.7rem; border-left: 1px solid var(--line); }
-.link {
-  display: grid; grid-template-columns: 32px 1fr auto; gap: 0.6rem; align-items: center; width: 100%;
-  padding: 0.25rem; border: 1px solid transparent; border-radius: var(--r-chip); background: none; cursor: pointer; text-align: left;
-}
-.link:hover { border-color: var(--line); background: var(--raised); }
-.lthumb {
-  width: 32px; height: 32px; border-radius: 3px; overflow: hidden; display: grid; place-items: center;
-  box-shadow: inset 0 2px 0 var(--kind);
-}
-.lthumb img { width: 100%; height: 100%; object-fit: contain; }
-.lname { font-size: var(--step--1); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.lrel { font-size: 0.75rem; color: var(--faint); }
 /* "Copied" pops up above the button that was pressed, over whatever is there, so nothing moves. */
 .copywrap { position: relative; display: inline-flex; }
 .copytip {
@@ -1665,15 +863,5 @@ footer {
 .colchip .x { border: 0; background: none; cursor: pointer; color: var(--faint); padding: 0; font: inherit; }
 .colchip .x:hover { color: var(--text); }
 .cols :deep(.picker .btn) { padding: 0.2em 0.6em; }
-.recovered { margin: 0 0 0.6rem; display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; font-size: var(--step--1); color: var(--muted); }
-.unreal summary { cursor: pointer; font-size: var(--step--1); color: var(--muted); margin-bottom: 0.4rem; }
-.unreal dd { word-break: break-word; }
-.dupnote { margin: 0 0 0.4rem; }
-.link.dup { grid-template-columns: 1fr auto; }
-.link.dup .lrel { max-width: 22ch; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; direction: rtl; }
-.link.near .lrel { max-width: none; direction: ltr; }
-.best {
-  margin-left: 0.45rem; font-size: 0.85em; font-weight: 500; padding: 0 0.45rem; border-radius: 999px;
-  background: color-mix(in srgb, var(--ok) 16%, transparent); color: var(--ok);
-}
 </style>
+<style scoped src="./detailSection.css"></style>

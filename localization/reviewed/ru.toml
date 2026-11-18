@@ -886,6 +886,18 @@ translation = "Избранное"
 source = "Filters"
 translation = "Фильтры"
 
+[messages.app-folders]
+source = "Folders"
+translation = "Папки"
+
+[messages.app-folders-label]
+source = "Folders of the pack"
+translation = "Папки набора"
+
+[messages.app-folders-title]
+source = "See the pack as it was on disk, a folder at a time"
+translation = "Смотреть набор так, как он лежал на диске, папка за папкой"
+
 [messages.app-forget-project]
 source = "Forget this project"
 translation = "Забыть этот проект"
@@ -2267,6 +2279,10 @@ translation = "Цвета на картинке"
 [messages.asset-path]
 source = "Path"
 translation = "Путь"
+
+[messages.asset-path-open-folder]
+source = "See what else is in { $folder }"
+translation = "Что ещё лежит в { $folder }"
 
 [messages.asset-pause]
 source = "Pause"

@@ -877,6 +877,18 @@ translation = "Oblíbené"
 source = "Filters"
 translation = "Filtry"
 
+[messages.app-folders]
+source = "Folders"
+translation = "Složky"
+
+[messages.app-folders-label]
+source = "Folders of the pack"
+translation = "Složky balíčku"
+
+[messages.app-folders-title]
+source = "See the pack as it was on disk, a folder at a time"
+translation = "Procházet balíček tak, jak byl na disku, složku po složce"
+
 [messages.app-forget-project]
 source = "Forget this project"
 translation = "Zapomenout tento projekt"
@@ -2232,6 +2244,10 @@ translation = "Barvy na obrázku"
 [messages.asset-path]
 source = "Path"
 translation = "Cesta"
+
+[messages.asset-path-open-folder]
+source = "See what else is in { $folder }"
+translation = "Co dalšího je ve složce { $folder }"
 
 [messages.asset-pause]
 source = "Pause"

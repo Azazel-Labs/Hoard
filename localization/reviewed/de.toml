@@ -864,6 +864,18 @@ translation = "Favoriten"
 source = "Filters"
 translation = "Filter"
 
+[messages.app-folders]
+source = "Folders"
+translation = "Ordner"
+
+[messages.app-folders-label]
+source = "Folders of the pack"
+translation = "Ordner des Pakets"
+
+[messages.app-folders-title]
+source = "See the pack as it was on disk, a folder at a time"
+translation = "Das Paket so durchsehen, wie es auf der Festplatte lag, Ordner für Ordner"
+
 [messages.app-forget-project]
 source = "Forget this project"
 translation = "Dieses Projekt vergessen"
@@ -2197,6 +2209,10 @@ translation = "Farben im Bild"
 [messages.asset-path]
 source = "Path"
 translation = "Pfad"
+
+[messages.asset-path-open-folder]
+source = "See what else is in { $folder }"
+translation = "Zeigen, was sonst in { $folder } liegt"
 
 [messages.asset-pause]
 source = "Pause"

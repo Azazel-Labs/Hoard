@@ -690,6 +690,10 @@ app-supporting-hidden =
 app-supporting-show = Show
 app-supporting-shown = Including supporting files
 app-supporting-hide = Hide
+# Browsing a pack as the folders it had on disk: the toggle, its tooltip, and the label of the folder path above the grid.
+app-folders = Folders
+app-folders-title = See the pack as it was on disk, a folder at a time
+app-folders-label = Folders of the pack
 app-welcome-title = Drop an asset pack anywhere on this page
 # The welcome text is app-welcome-before, a search example, app-welcome-or, another example and app-welcome-after.
 app-welcome-before = Zips, tarballs, folders or loose files all work. Hoard unpacks them, stores every file once by its hash, reads sizes, lengths and poly counts, and tags everything so you can search for things like{ " " }
@@ -1666,6 +1670,8 @@ asset-file = File
 asset-bytes = Bytes
 asset-source = Source
 asset-path = Path
+# The tooltip of a folder in the asset's path, which opens that folder of its pack.
+asset-path-open-folder = See what else is in { $folder }
 asset-download-maps =
     { $count ->
         [one] Download all { $count } map

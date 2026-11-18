@@ -836,6 +836,18 @@ translation = "Favoriler"
 source = "Filters"
 translation = "Filtreler"
 
+[messages.app-folders]
+source = "Folders"
+translation = "Klasörler"
+
+[messages.app-folders-label]
+source = "Folders of the pack"
+translation = "Paketin klasörleri"
+
+[messages.app-folders-title]
+source = "See the pack as it was on disk, a folder at a time"
+translation = "Paketi diskteki hâliyle, klasör klasör gör"
+
 [messages.app-forget-project]
 source = "Forget this project"
 translation = "Bu projeyi unut"
@@ -2134,6 +2146,10 @@ translation = "Resimdeki renkler"
 [messages.asset-path]
 source = "Path"
 translation = "Yol"
+
+[messages.asset-path-open-folder]
+source = "See what else is in { $folder }"
+translation = "{ $folder } içinde başka neler olduğunu gör"
 
 [messages.asset-pause]
 source = "Pause"

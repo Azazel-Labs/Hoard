@@ -626,6 +626,9 @@ app-supporting-hidden =
 app-supporting-show = Εμφάνιση
 app-supporting-shown = Με τα βοηθητικά αρχεία
 app-supporting-hide = Απόκρυψη
+app-folders = Φάκελοι
+app-folders-title = Δείτε το πακέτο όπως ήταν στον δίσκο, έναν φάκελο τη φορά
+app-folders-label = Φάκελοι του πακέτου
 app-welcome-title = Αφήστε ένα πακέτο στοιχείων οπουδήποτε σε αυτή τη σελίδα
 app-welcome-before = Zip, tarball, φάκελοι ή μεμονωμένα αρχεία, όλα λειτουργούν. Το Hoard τα αποσυμπιέζει, αποθηκεύει κάθε αρχείο μία φορά βάσει του hash του, διαβάζει μεγέθη, διάρκειες και αριθμούς πολυγώνων και δίνει ετικέτες σε όλα, ώστε να μπορείτε να αναζητάτε πράγματα όπως{ " " }
 app-welcome-example-1 = grass footsteps
@@ -1532,6 +1535,7 @@ asset-file = Αρχείο
 asset-bytes = Byte
 asset-source = Πηγή
 asset-path = Διαδρομή
+asset-path-open-folder = Δείτε τι άλλο υπάρχει στο { $folder }
 asset-download-maps =
     { $count ->
         [one] Λήψη του { $count } χάρτη

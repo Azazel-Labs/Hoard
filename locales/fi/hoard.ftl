@@ -622,6 +622,9 @@ app-supporting-hidden =
 app-supporting-show = Näytä
 app-supporting-shown = Tukitiedostot mukana
 app-supporting-hide = Piilota
+app-folders = Kansiot
+app-folders-title = Selaa pakettia kansio kerrallaan, niin kuin se oli levyllä
+app-folders-label = Paketin kansiot
 app-welcome-title = Pudota resurssipaketti mihin tahansa tälle sivulle
 app-welcome-before = Zipit, tar-arkistot, kansiot ja irralliset tiedostot käyvät. Hoard purkaa ne, tallentaa jokaisen tiedoston kerran sen tiivisteen perusteella, lukee koot, kestot ja polygonimäärät ja lisää kaikkeen tunnisteet, jotta voit hakea esimerkiksi{ " " }
 app-welcome-example-1 = grass footsteps
@@ -1536,6 +1539,7 @@ asset-file = Tiedosto
 asset-bytes = Tavut
 asset-source = Lähde
 asset-path = Polku
+asset-path-open-folder = Katso, mitä muuta kansiossa { $folder } on
 asset-download-maps =
     { $count ->
         [one] Lataa { $count } kartta

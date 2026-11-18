@@ -61,7 +61,15 @@ const emit = defineEmits<{
   layout: []
   /** Open the format wizard on this file (Settings → Store files). */
   teach: []
+  /** Browse this folder of its pack (`a/b`), as it was on disk. */
+  folder: [string]
 }>()
+/** The folders the file sits in, from the pack's top, each with the path that opens it; then the file's name. */
+const pathParts = computed(() => {
+  const parts = props.asset.path.split('/')
+  const file = parts.pop() ?? ''
+  return { folders: parts.map((name, i) => ({ name, path: parts.slice(0, i + 1).join('/') })), file }
+})
 const palette = computed(() => props.asset.palette ?? [])
 /** A text file that may be a store's, which a signed-in user can teach Hoard to read. */
 /** May change it (a guest is asked to sign in when they try). */
@@ -1275,7 +1283,11 @@ onBeforeUnmount(() => unswipe())
       <h3>{{ t('asset-source') }}</h3>
       <dl>
         <dt>{{ t('asset-path') }}</dt>
-        <dd class="mono path">{{ asset.path }}</dd>
+        <dd class="mono path">
+          <template v-for="f in pathParts.folders" :key="f.path">
+            <button type="button" class="linkish" :title="t('asset-path-open-folder', { folder: f.name })" @click="$emit('folder', f.path)">{{ f.name }}</button><span class="sep">/</span>
+          </template>{{ pathParts.file }}
+        </dd>
         <dt>BLAKE3</dt>
         <dd class="mono hash">
           <span class="copywrap">
@@ -1493,6 +1505,7 @@ dl { display: grid; grid-template-columns: max-content 1fr; gap: 0.3rem 1rem; ma
 dt { color: var(--muted); }
 dd { margin: 0; min-width: 0; }
 .path { word-break: break-all; }
+.path .sep { color: var(--faint); padding: 0 0.1em; }
 .linkish { border: 0; background: none; padding: 0; cursor: pointer; color: var(--text); text-decoration: underline dotted var(--faint); font: inherit; }
 .btn .bytes { font-weight: 400; opacity: 0.75; font-variant-numeric: tabular-nums; }
 /* The download actions stay in reach while the panel scrolls. */

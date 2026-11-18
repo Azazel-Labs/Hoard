@@ -652,6 +652,9 @@ struct AssetsParams {
     /// Comma-separated; all must match.
     tags: Option<String>,
     pack: Option<String>,
+    /// With `pack`: one folder of it (see [`SearchQuery::folder`]).
+    #[serde(default)]
+    folder: Option<String>,
     ext: Option<String>,
     sort: Option<String>,
     limit: Option<u32>,
@@ -686,6 +689,7 @@ impl From<AssetsParams> for SearchQuery {
             kind: p.kind,
             tags: p.tags.map_or_default(|t| t.split(',').filter_map(hoard_core::normalize_tag).collect()),
             pack: p.pack,
+            folder: p.folder,
             ext: p.ext,
             sort: p.sort,
             limit: p.limit,
@@ -720,6 +724,7 @@ async fn search_assets(
         kinds: page.kinds,
         tags: page.tags,
         supporting_hidden: page.supporting_hidden,
+        folders: page.folders,
     }))
 }
 

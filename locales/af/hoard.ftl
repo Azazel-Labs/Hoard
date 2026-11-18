@@ -610,6 +610,9 @@ app-supporting-hidden =
 app-supporting-show = Wys
 app-supporting-shown = Ondersteunende lêers ingesluit
 app-supporting-hide = Versteek
+app-folders = Vouers
+app-folders-title = Sien die pak soos dit op die skyf was, een vouer op ’n slag
+app-folders-label = Vouers van die pak
 app-welcome-title = Laat val 'n batepak enige plek op hierdie bladsy
 app-welcome-before = Zips, tarballs, vouers of los lêers werk almal. Hoard pak hulle uit, stoor elke lêer een keer volgens sy hash, lees groottes, lengtes en poligoontellings, en etiketteer alles sodat jy kan soek na dinge soos{ " " }
 app-welcome-example-1 = grass footsteps
@@ -1482,6 +1485,7 @@ asset-file = Lêer
 asset-bytes = Grepe
 asset-source = Bron
 asset-path = Pad
+asset-path-open-folder = Sien wat nog in { $folder } is
 asset-download-maps =
     { $count ->
         [one] Laai die { $count } kaart af

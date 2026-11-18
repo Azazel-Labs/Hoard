@@ -618,6 +618,9 @@ app-supporting-hidden =
 app-supporting-show = Mostra
 app-supporting-shown = File di supporto inclusi
 app-supporting-hide = Nascondi
+app-folders = Cartelle
+app-folders-title = Sfoglia il pacchetto com’era sul disco, una cartella alla volta
+app-folders-label = Cartelle del pacchetto
 app-welcome-title = Trascina un pacchetto di asset in un punto qualsiasi di questa pagina
 app-welcome-before = Vanno bene zip, tarball, cartelle o file sparsi. Hoard li estrae, salva ogni file una sola volta in base al suo hash, legge dimensioni, durate e numero di poligoni, e assegna tag a tutto così puoi cercare cose come{ " " }
 app-welcome-example-1 = grass footsteps
@@ -1496,6 +1499,7 @@ asset-file = File
 asset-bytes = Byte
 asset-source = Origine
 asset-path = Percorso
+asset-path-open-folder = Vedi cos’altro c’è in { $folder }
 asset-download-maps =
     { $count ->
         [one] Scarica { $count } mappa

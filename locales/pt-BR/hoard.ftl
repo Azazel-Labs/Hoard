@@ -610,6 +610,9 @@ app-supporting-hidden =
 app-supporting-show = Mostrar
 app-supporting-shown = Incluindo arquivos de apoio
 app-supporting-hide = Ocultar
+app-folders = Pastas
+app-folders-title = Ver o pacote como estava no disco, uma pasta por vez
+app-folders-label = Pastas do pacote
 app-welcome-title = Solte um pacote de assets em qualquer lugar desta página
 app-welcome-before = Zips, tarballs, pastas ou arquivos soltos, tudo funciona. O Hoard os extrai, guarda cada arquivo uma vez pelo hash, lê tamanhos, durações e contagens de polígonos, e dá tags a tudo para você buscar coisas como{ " " }
 app-welcome-example-1 = grass footsteps
@@ -1488,6 +1491,7 @@ asset-file = Arquivo
 asset-bytes = Bytes
 asset-source = Origem
 asset-path = Caminho
+asset-path-open-folder = Ver o que mais há em { $folder }
 asset-download-maps =
     { $count ->
         [one] Baixar { $count } mapa

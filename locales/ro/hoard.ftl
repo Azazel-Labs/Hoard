@@ -644,6 +644,9 @@ app-supporting-hidden =
 app-supporting-show = Afișați
 app-supporting-shown = Inclusiv fișierele auxiliare
 app-supporting-hide = Ascundeți
+app-folders = Dosare
+app-folders-title = Vezi pachetul așa cum era pe disc, câte un dosar
+app-folders-label = Dosarele pachetului
 app-welcome-title = Plasați un pachet de resurse oriunde pe această pagină
 app-welcome-before = Merg arhive zip, tarballuri, dosare sau fișiere separate. Hoard le dezarhivează, stochează fiecare fișier o singură dată după hash, citește mărimi, durate și număr de poligoane și etichetează totul ca să puteți căuta lucruri precum{ " " }
 app-welcome-example-1 = grass footsteps
@@ -1613,6 +1616,7 @@ asset-file = Fișier
 asset-bytes = Octeți
 asset-source = Sursă
 asset-path = Cale
+asset-path-open-folder = Vezi ce mai e în { $folder }
 asset-download-maps =
     { $count ->
         [one] Descărcați { $count } hartă

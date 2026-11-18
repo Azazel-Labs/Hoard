@@ -882,6 +882,18 @@ translation = "Favorite"
 source = "Filters"
 translation = "Filtre"
 
+[messages.app-folders]
+source = "Folders"
+translation = "Dosare"
+
+[messages.app-folders-label]
+source = "Folders of the pack"
+translation = "Dosarele pachetului"
+
+[messages.app-folders-title]
+source = "See the pack as it was on disk, a folder at a time"
+translation = "Vezi pachetul așa cum era pe disc, câte un dosar"
+
 [messages.app-forget-project]
 source = "Forget this project"
 translation = "Uitați acest proiect"
@@ -2252,6 +2264,10 @@ translation = "Culorile din imagine"
 [messages.asset-path]
 source = "Path"
 translation = "Cale"
+
+[messages.asset-path-open-folder]
+source = "See what else is in { $folder }"
+translation = "Vezi ce mai e în { $folder }"
 
 [messages.asset-pause]
 source = "Pause"

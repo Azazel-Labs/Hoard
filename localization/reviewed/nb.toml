@@ -864,6 +864,18 @@ translation = "Favoritter"
 source = "Filters"
 translation = "Filtre"
 
+[messages.app-folders]
+source = "Folders"
+translation = "Mapper"
+
+[messages.app-folders-label]
+source = "Folders of the pack"
+translation = "Pakkens mapper"
+
+[messages.app-folders-title]
+source = "See the pack as it was on disk, a folder at a time"
+translation = "Se pakken slik den lå på disken, én mappe om gangen"
+
 [messages.app-forget-project]
 source = "Forget this project"
 translation = "Glem dette prosjektet"
@@ -2197,6 +2209,10 @@ translation = "Farger i bildet"
 [messages.asset-path]
 source = "Path"
 translation = "Bane"
+
+[messages.asset-path-open-folder]
+source = "See what else is in { $folder }"
+translation = "Se hva mer som ligger i { $folder }"
 
 [messages.asset-pause]
 source = "Pause"

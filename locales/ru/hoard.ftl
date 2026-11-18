@@ -652,6 +652,9 @@ app-supporting-hidden =
 app-supporting-show = Показать
 app-supporting-shown = Со вспомогательными файлами
 app-supporting-hide = Скрыть
+app-folders = Папки
+app-folders-title = Смотреть набор так, как он лежал на диске, папка за папкой
+app-folders-label = Папки набора
 app-welcome-title = Перетащите пак ассетов в любое место этой страницы
 app-welcome-before = Подойдут zip, tar-архивы, папки или отдельные файлы. Hoard распакует их, сохранит каждый файл один раз по его хешу, прочитает размеры, длительность и число полигонов и расставит теги, чтобы вы могли искать что-нибудь вроде{ " " }
 app-welcome-example-1 = grass footsteps
@@ -1630,6 +1633,7 @@ asset-file = Файл
 asset-bytes = Байты
 asset-source = Источник
 asset-path = Путь
+asset-path-open-folder = Что ещё лежит в { $folder }
 asset-download-maps =
     { $count ->
         [one] Скачать { $count } карту

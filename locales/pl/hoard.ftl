@@ -646,6 +646,9 @@ app-supporting-hidden =
 app-supporting-show = Pokaż
 app-supporting-shown = Z plikami pomocniczymi
 app-supporting-hide = Ukryj
+app-folders = Foldery
+app-folders-title = Przeglądaj paczkę tak, jak była na dysku, folder po folderze
+app-folders-label = Foldery paczki
 app-welcome-title = Upuść paczkę zasobów w dowolnym miejscu tej strony
 app-welcome-before = Działają pliki zip, archiwa tar, foldery i luźne pliki. Hoard je rozpakowuje, przechowuje każdy plik tylko raz według skrótu, odczytuje rozmiary, długości i liczby wielokątów, a wszystko taguje, by można było wyszukiwać np.{ " " }
 app-welcome-example-1 = grass footsteps
@@ -1609,6 +1612,7 @@ asset-file = Plik
 asset-bytes = Bajty
 asset-source = Źródło
 asset-path = Ścieżka
+asset-path-open-folder = Zobacz, co jeszcze jest w { $folder }
 asset-download-maps =
     { $count ->
         [one] Pobierz { $count } mapę

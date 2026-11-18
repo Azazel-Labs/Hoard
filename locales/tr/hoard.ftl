@@ -578,6 +578,9 @@ app-supporting-hidden = { $count } yardımcı dosya gizlendi
 app-supporting-show = Göster
 app-supporting-shown = Yardımcı dosyalar dahil
 app-supporting-hide = Gizle
+app-folders = Klasörler
+app-folders-title = Paketi diskteki hâliyle, klasör klasör gör
+app-folders-label = Paketin klasörleri
 app-welcome-title = Bir varlık paketini bu sayfada herhangi bir yere bırakın
 app-welcome-before = Zip’ler, tarball’lar, klasörler ya da tek tek dosyalar; hepsi olur. Hoard bunları açar, her dosyayı özetine göre bir kez saklar, boyutları, süreleri ve poligon sayılarını okur ve her şeyi etiketler; böylece şunlar gibi aramalar yapabilirsiniz:{ " " }
 app-welcome-example-1 = grass footsteps
@@ -1383,6 +1386,7 @@ asset-file = Dosya
 asset-bytes = Bayt
 asset-source = Kaynak
 asset-path = Yol
+asset-path-open-folder = { $folder } içinde başka neler olduğunu gör
 asset-download-maps =
     { $count ->
         [one] Haritayı indir

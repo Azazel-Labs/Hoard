@@ -835,6 +835,18 @@ translation = "Yêu thích"
 source = "Filters"
 translation = "Bộ lọc"
 
+[messages.app-folders]
+source = "Folders"
+translation = "Thư mục"
+
+[messages.app-folders-label]
+source = "Folders of the pack"
+translation = "Các thư mục của gói"
+
+[messages.app-folders-title]
+source = "See the pack as it was on disk, a folder at a time"
+translation = "Xem gói như khi còn trên đĩa, từng thư mục một"
+
 [messages.app-forget-project]
 source = "Forget this project"
 translation = "Quên dự án này"
@@ -2121,6 +2133,10 @@ translation = "Màu trong ảnh"
 [messages.asset-path]
 source = "Path"
 translation = "Đường dẫn"
+
+[messages.asset-path-open-folder]
+source = "See what else is in { $folder }"
+translation = "Xem còn gì khác trong { $folder }"
 
 [messages.asset-pause]
 source = "Pause"

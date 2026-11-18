@@ -23,10 +23,12 @@ export interface Prefs {
   detailPage: boolean
   /** The portal's language: `auto` follows the browser, or a code from LANGUAGES in i18n.ts. */
   language: string
+  /** Browse a pack folder by folder, as it was on disk, rather than everything in it at once. */
+  packFolders: boolean
 }
 
 const KEY = 'hoard.prefs'
-const DEFAULTS: Prefs = { tile: 156, showSupporting: false, collapsed: ['license', 'format', 'blender'], expanded: [], theme: 'system', lightTheme: 'slate', darkTheme: 'graphite', detailWidth: null, detailPage: false, language: 'auto' }
+const DEFAULTS: Prefs = { tile: 156, showSupporting: false, collapsed: ['license', 'format', 'blender'], expanded: [], theme: 'system', lightTheme: 'slate', darkTheme: 'graphite', detailWidth: null, detailPage: false, language: 'auto', packFolders: false }
 
 function load(): Prefs {
   try {

@@ -639,6 +639,9 @@ app-supporting-hidden =
 app-supporting-show = Zobrazit
 app-supporting-shown = Včetně podpůrných souborů
 app-supporting-hide = Skrýt
+app-folders = Složky
+app-folders-title = Procházet balíček tak, jak byl na disku, složku po složce
+app-folders-label = Složky balíčku
 app-welcome-title = Přetáhněte balíček assetů kamkoli na tuto stránku
 app-welcome-before = Funguje zip, tarball, složka i jednotlivé soubory. Hoard je rozbalí, každý soubor uloží jen jednou podle jeho hashe, zjistí velikosti, délky a počty polygonů a všechno oštítkuje, takže můžete hledat třeba{ " " }
 app-welcome-example-1 = grass footsteps
@@ -1588,6 +1591,7 @@ asset-file = Soubor
 asset-bytes = Bajty
 asset-source = Zdroj
 asset-path = Cesta
+asset-path-open-folder = Co dalšího je ve složce { $folder }
 asset-download-maps =
     { $count ->
         [one] Stáhnout { $count } mapu

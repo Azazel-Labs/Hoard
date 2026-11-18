@@ -624,6 +624,9 @@ app-supporting-hidden =
 app-supporting-show = Прикажи
 app-supporting-shown = Укључујући пратеће датотеке
 app-supporting-hide = Сакриј
+app-folders = Фасцикле
+app-folders-title = Прегледај пакет онако како је био на диску, фасциклу по фасциклу
+app-folders-label = Фасцикле пакета
 app-welcome-title = Превуците пакет ресурса било где на ову страницу
 app-welcome-before = Раде zip и tar архиве, фасцикле или појединачне датотеке. Hoard их распакује, сваку датотеку чува једном према њеном хешу, чита величине, трајања и број полигона и све означава, тако да можете тражити нпр.{ " " }
 app-welcome-example-1 = grass footsteps
@@ -1534,6 +1537,7 @@ asset-file = Датотека
 asset-bytes = Бајтови
 asset-source = Извор
 asset-path = Путања
+asset-path-open-folder = Погледај шта још има у { $folder }
 asset-download-maps =
     { $count ->
         [one] Преузми { $count } мапу

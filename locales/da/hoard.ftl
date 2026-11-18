@@ -610,6 +610,9 @@ app-supporting-hidden =
 app-supporting-show = Vis
 app-supporting-shown = Inklusive understøttende filer
 app-supporting-hide = Skjul
+app-folders = Mapper
+app-folders-title = Se pakken, som den lå på disken, én mappe ad gangen
+app-folders-label = Pakkens mapper
 app-welcome-title = Slip en asset-pakke hvor som helst på denne side
 app-welcome-before = Zip-filer, tarballs, mapper eller løse filer virker alle sammen. Hoard pakker dem ud, gemmer hver fil én gang efter dens hash, læser størrelser, længder og antal polygoner og tagger det hele, så du kan søge efter ting som{ " " }
 app-welcome-example-1 = grass footsteps
@@ -1484,6 +1487,7 @@ asset-file = Fil
 asset-bytes = Bytes
 asset-source = Kilde
 asset-path = Sti
+asset-path-open-folder = Se, hvad der ellers er i { $folder }
 asset-download-maps =
     { $count ->
         [one] Download { $count } map

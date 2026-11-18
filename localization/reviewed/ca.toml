@@ -864,6 +864,18 @@ translation = "Preferits"
 source = "Filters"
 translation = "Filtres"
 
+[messages.app-folders]
+source = "Folders"
+translation = "Carpetes"
+
+[messages.app-folders-label]
+source = "Folders of the pack"
+translation = "Carpetes del paquet"
+
+[messages.app-folders-title]
+source = "See the pack as it was on disk, a folder at a time"
+translation = "Mostra el paquet com era al disc, carpeta per carpeta"
+
 [messages.app-forget-project]
 source = "Forget this project"
 translation = "Oblida aquest projecte"
@@ -2197,6 +2209,10 @@ translation = "Colors de la imatge"
 [messages.asset-path]
 source = "Path"
 translation = "Camí"
+
+[messages.asset-path-open-folder]
+source = "See what else is in { $folder }"
+translation = "Mostra què més hi ha a { $folder }"
 
 [messages.asset-pause]
 source = "Pause"

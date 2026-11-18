@@ -1822,6 +1822,19 @@ fn build_filter(q: &SearchQuery, include_kind: bool, look: Option<&LookRank>) ->
         f.clauses.push("a.pack_id = ?".to_owned());
         f.params.push(SqlValue::Text(pack.to_owned()));
     }
+    if let Some(folder) = browsed_folder(q) {
+        // Under the folder: a range of the (pack_id, path) index, '/' + 1 being '0'.
+        if !folder.is_empty() {
+            f.clauses.push("a.path > ? AND a.path < ?".to_owned());
+            f.params.push(SqlValue::Text(format!("{folder}/")));
+            f.params.push(SqlValue::Text(format!("{folder}0")));
+        }
+        // Directly in it, unless searching it.
+        if fts_query_of(q).is_none() {
+            f.clauses.push("instr(substr(a.path, ?), '/') = 0".to_owned());
+            f.params.push(SqlValue::Integer(folder_skip(folder)));
+        }
+    }
     if let Some(ext) = q.ext.as_deref().filter(|e| !e.is_empty()) {
         f.clauses.push("a.ext = ?".to_owned());
         f.params.push(SqlValue::Text(ext.trim_start_matches('.').to_lowercase()));
@@ -1872,6 +1885,49 @@ fn build_filter(q: &SearchQuery, include_kind: bool, look: Option<&LookRank>) ->
     f
 }
 
+/// The folder of a pack being browsed, without slashes at either end (`""` for its top).
+fn browsed_folder(q: &SearchQuery) -> Option<&str> {
+    q.pack.as_deref().filter(|p| !p.is_empty())?;
+    q.folder.as_deref().map(|f| f.trim_matches('/'))
+}
+
+fn fts_query_of(q: &SearchQuery) -> Option<String> {
+    q.q.as_deref().and_then(fts_query)
+}
+
+/// Where a path's part below `folder` starts, counting from 1 in characters as SQLite's `substr` does.
+fn folder_skip(folder: &str) -> i64 {
+    if folder.is_empty() { 1 } else { folder.chars().count() as i64 + 2 }
+}
+
+/// The folders directly in the one being browsed, each with how many matches are under it.
+fn subfolders(conn: &Connection, q: &SearchQuery, look: Option<&LookRank>) -> Result<Vec<Facet>> {
+    let Some(folder) = browsed_folder(q) else { return Ok(Vec::new()) };
+    if fts_query_of(q).is_some() {
+        return Ok(Vec::new());
+    }
+    let everything = SearchQuery { folder: None, ..q.clone() };
+    let mut f = build_filter(&everything, true, look);
+    if !folder.is_empty() {
+        f.clauses.push("a.path > ? AND a.path < ?".to_owned());
+        f.params.push(SqlValue::Text(format!("{folder}/")));
+        f.params.push(SqlValue::Text(format!("{folder}0")));
+    }
+    let mut params = vec![SqlValue::Integer(folder_skip(folder))];
+    params.extend(f.params.iter().cloned());
+    let mut stmt = conn.prepare(&format!(
+        "SELECT substr(rest, 1, instr(rest, '/') - 1) AS name, COUNT(*)
+           FROM (SELECT substr(a.path, ?) AS rest FROM assets a {} {})
+          WHERE instr(rest, '/') > 0 GROUP BY name ORDER BY name COLLATE NOCASE",
+        f.join,
+        f.where_sql()
+    ))?;
+    let rows = stmt
+        .query_map(params_from_iter(&params), |r| Ok(Facet { value: r.get(0)?, count: r.get::<_, i64>(1)? as u64 }))?
+        .collect::<rusqlite::Result<Vec<_>>>()?;
+    Ok(rows)
+}
+
 /// In the library rather than the archive: neither the asset nor its pack is archived. Expects the asset as `a`.
 pub(crate) const LIVE: &str =
     "a.archived_at IS NULL AND a.pack_id NOT IN (SELECT id FROM packs WHERE archived_at IS NOT NULL)";
@@ -1897,6 +1953,7 @@ pub(crate) struct SearchPage {
     pub(crate) kinds: Vec<Facet>,
     pub(crate) tags: Vec<Facet>,
     pub(crate) supporting_hidden: u64,
+    pub(crate) folders: Vec<Facet>,
 }
 
 pub(crate) fn search(conn: &Connection, q: &SearchQuery, with_facets: bool) -> Result<SearchPage> {
@@ -1995,7 +2052,8 @@ pub(crate) fn search_ranked(
             .collect::<rusqlite::Result<Vec<_>>>()?;
     }
 
-    Ok(SearchPage { items, total: total as u64, kinds, tags, supporting_hidden: supporting_hidden as u64 })
+    let folders = subfolders(conn, q, look)?;
+    Ok(SearchPage { items, total: total as u64, kinds, tags, supporting_hidden: supporting_hidden as u64, folders })
 }
 
 /// Tags in use and how many assets have each, most used first: those starting with `prefix`, or with `anywhere`
@@ -2785,6 +2843,54 @@ mod tests {
         );
         let q = SearchQuery { q: Some("rock".into()), ..Default::default() };
         assert_eq!(search(&conn, &q, false).unwrap().total, 2, "search finds the new name");
+    }
+
+    #[test]
+    fn a_pack_browses_as_folders() {
+        let dir = tempfile::tempdir().unwrap();
+        let pool = open(&dir.path().join("hoard.db"), &dir.path().join("backups")).unwrap();
+        let conn = pool.get().unwrap();
+        conn.execute_batch(
+            "INSERT INTO blobs (hash, size, created_at) VALUES ('h', 1, 'x');
+             INSERT INTO packs (id, name, status, created_at) VALUES ('p1', 'Kit', 'ready', 'x'), ('p2', 'Other', 'ready', 'x');
+             INSERT INTO assets (id, pack_id, blob_hash, path, name, ext, kind, created_at, updated_at) VALUES
+               ('top', 'p1', 'h', 'License.txt', 'License', 'txt', 'text', 'x', 'x'),
+               ('a', 'p1', 'h', 'UI/Sheet/ui.png', 'ui', 'png', 'texture', 'x', 'x'),
+               ('b', 'p1', 'h', 'UI/Sheet/ui.xml', 'ui', 'xml', 'text', 'x', 'x'),
+               ('c', 'p1', 'h', 'UI/PNG/Blue/button.png', 'button', 'png', 'texture', 'x', 'x'),
+               ('d', 'p1', 'h', 'UI/readme.txt', 'readme', 'txt', 'text', 'x', 'x'),
+               ('e', 'p1', 'h', 'UI0/odd.png', 'odd', 'png', 'texture', 'x', 'x'),
+               ('f', 'p1', 'h', 'Ünï/x.png', 'x', 'png', 'texture', 'x', 'x'),
+               ('g', 'p1', 'h', 'Ünï/deeper/y.png', 'y', 'png', 'texture', 'x', 'x'),
+               ('o', 'p2', 'h', 'UI/other.png', 'other', 'png', 'texture', 'x', 'x');",
+        )
+        .unwrap();
+        let browse = |folder: &str, kind: Option<&str>| {
+            let q = SearchQuery {
+                pack: Some("p1".into()),
+                folder: Some(folder.into()),
+                kind: kind.map(Into::into),
+                sort: Some("name".into()),
+                ..Default::default()
+            };
+            let page = search(&conn, &q, false).unwrap();
+            let ids = page.items.into_iter().map(|a| a.id).collect::<Vec<_>>();
+            let folders = page.folders.into_iter().map(|f| (f.value, f.count)).collect::<Vec<_>>();
+            (ids, folders)
+        };
+        let f = |v: &[(&str, u64)]| v.iter().map(|(n, c)| ((*n).to_owned(), *c)).collect::<Vec<_>>();
+        assert_eq!(browse("", None), (vec!["top".to_owned()], f(&[("UI", 4), ("UI0", 1), ("Ünï", 2)])));
+        assert_eq!(browse("UI", None), (vec!["d".to_owned()], f(&[("PNG", 1), ("Sheet", 2)])));
+        assert_eq!(
+            browse("/UI/Sheet/", None).0,
+            vec!["a".to_owned(), "b".to_owned()],
+            "slashes at the ends don't matter"
+        );
+        assert_eq!(browse("UI", Some("texture")), (vec![], f(&[("PNG", 1), ("Sheet", 1)])), "folders count matches");
+        assert_eq!(browse("Ünï", None), (vec!["f".to_owned()], f(&[("deeper", 1)])));
+        // Without a pack, a folder means nothing.
+        let q = SearchQuery { folder: Some("UI".into()), ..Default::default() };
+        assert_eq!(search(&conn, &q, false).unwrap().total, 9);
     }
 
     #[test]

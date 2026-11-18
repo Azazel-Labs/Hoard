@@ -862,6 +862,18 @@ translation = "Омиљени"
 source = "Filters"
 translation = "Филтери"
 
+[messages.app-folders]
+source = "Folders"
+translation = "Фасцикле"
+
+[messages.app-folders-label]
+source = "Folders of the pack"
+translation = "Фасцикле пакета"
+
+[messages.app-folders-title]
+source = "See the pack as it was on disk, a folder at a time"
+translation = "Прегледај пакет онако како је био на диску, фасциклу по фасциклу"
+
 [messages.app-forget-project]
 source = "Forget this project"
 translation = "Заборави овај пројекат"
@@ -2207,6 +2219,10 @@ translation = "Боје на слици"
 [messages.asset-path]
 source = "Path"
 translation = "Путања"
+
+[messages.asset-path-open-folder]
+source = "See what else is in { $folder }"
+translation = "Погледај шта још има у { $folder }"
 
 [messages.asset-pause]
 source = "Pause"

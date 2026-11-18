@@ -687,6 +687,10 @@ pub struct SearchQuery {
     pub tags: Vec<String>,
     #[serde(default)]
     pub pack: Option<String>,
+    /// With `pack`: only what's directly in this folder of it (`""` for its top, `a/b` for a folder in that), as if
+    /// the pack were still a folder on disk; with a text query, anything under it.
+    #[serde(default)]
+    pub folder: Option<String>,
     #[serde(default)]
     pub ext: Option<String>,
     /// Best match first (default; newest first without a text, color or similar query), or "new", "old", "name",
@@ -737,6 +741,10 @@ pub struct SearchResult {
     /// Matches left out by `hide_supporting`.
     #[serde(default)]
     pub supporting_hidden: u64,
+    /// Browsing a folder of a pack (`folder`, without a text query): the folders in it, each with how many matches
+    /// are somewhere under it, by name.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub folders: Vec<Facet>,
 }
 
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]

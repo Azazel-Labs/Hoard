@@ -610,6 +610,9 @@ app-supporting-hidden =
 app-supporting-show = Mostra
 app-supporting-shown = S'inclouen els fitxers auxiliars
 app-supporting-hide = Amaga
+app-folders = Carpetes
+app-folders-title = Mostra el paquet com era al disc, carpeta per carpeta
+app-folders-label = Carpetes del paquet
 app-welcome-title = Deixeu anar un paquet de recursos a qualsevol lloc d'aquesta pàgina
 app-welcome-before = Funcionen zips, tarballs, carpetes o fitxers solts. Hoard els descomprimeix, desa cada fitxer un sol cop pel seu hash, llegeix mides, durades i nombres de polígons, i ho etiqueta tot perquè pugueu cercar coses com ara{ " " }
 app-welcome-example-1 = grass footsteps
@@ -1488,6 +1491,7 @@ asset-file = Fitxer
 asset-bytes = Bytes
 asset-source = Origen
 asset-path = Camí
+asset-path-open-folder = Mostra què més hi ha a { $folder }
 asset-download-maps =
     { $count ->
         [one] Baixa { $count } mapa

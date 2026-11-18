@@ -832,6 +832,18 @@ translation = "즐겨찾기"
 source = "Filters"
 translation = "필터"
 
+[messages.app-folders]
+source = "Folders"
+translation = "폴더"
+
+[messages.app-folders-label]
+source = "Folders of the pack"
+translation = "팩의 폴더"
+
+[messages.app-folders-title]
+source = "See the pack as it was on disk, a folder at a time"
+translation = "팩을 디스크에 있던 그대로 폴더별로 보기"
+
 [messages.app-forget-project]
 source = "Forget this project"
 translation = "이 프로젝트 잊기"
@@ -2118,6 +2130,10 @@ translation = "그림의 색상"
 [messages.asset-path]
 source = "Path"
 translation = "경로"
+
+[messages.asset-path-open-folder]
+source = "See what else is in { $folder }"
+translation = "{ $folder }에 있는 다른 항목 보기"
 
 [messages.asset-pause]
 source = "Pause"

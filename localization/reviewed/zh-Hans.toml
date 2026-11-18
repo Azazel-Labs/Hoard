@@ -835,6 +835,18 @@ translation = "收藏"
 source = "Filters"
 translation = "筛选"
 
+[messages.app-folders]
+source = "Folders"
+translation = "文件夹"
+
+[messages.app-folders-label]
+source = "Folders of the pack"
+translation = "包的文件夹"
+
+[messages.app-folders-title]
+source = "See the pack as it was on disk, a folder at a time"
+translation = "按磁盘上的原样逐个文件夹浏览此包"
+
 [messages.app-forget-project]
 source = "Forget this project"
 translation = "忘记此项目"
@@ -2121,6 +2133,10 @@ translation = "图片中的颜色"
 [messages.asset-path]
 source = "Path"
 translation = "路径"
+
+[messages.asset-path-open-folder]
+source = "See what else is in { $folder }"
+translation = "查看 { $folder } 中的其他内容"
 
 [messages.asset-pause]
 source = "Pause"

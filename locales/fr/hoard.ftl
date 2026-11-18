@@ -618,6 +618,9 @@ app-supporting-hidden =
 app-supporting-show = Afficher
 app-supporting-shown = Fichiers annexes inclus
 app-supporting-hide = Masquer
+app-folders = Dossiers
+app-folders-title = Parcourir le pack tel qu’il était sur le disque, dossier par dossier
+app-folders-label = Dossiers du pack
 app-welcome-title = Déposez un pack de ressources n’importe où sur cette page
 app-welcome-before = Zips, tarballs, dossiers ou fichiers isolés : tout fonctionne. Hoard les décompresse, stocke chaque fichier une seule fois d’après son hachage, lit les tailles, durées et nombres de polygones, et étiquette tout pour que vous puissiez chercher par exemple{ " " }
 app-welcome-example-1 = grass footsteps
@@ -1512,6 +1515,7 @@ asset-file = Fichier
 asset-bytes = Octets
 asset-source = Source
 asset-path = Chemin
+asset-path-open-folder = Voir ce qu’il y a d’autre dans { $folder }
 asset-download-maps =
     { $count ->
         [one] Télécharger la { $count } carte

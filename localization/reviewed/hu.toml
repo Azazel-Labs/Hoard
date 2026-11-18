@@ -836,6 +836,18 @@ translation = "Kedvencek"
 source = "Filters"
 translation = "Szűrők"
 
+[messages.app-folders]
+source = "Folders"
+translation = "Mappák"
+
+[messages.app-folders-label]
+source = "Folders of the pack"
+translation = "A csomag mappái"
+
+[messages.app-folders-title]
+source = "See the pack as it was on disk, a folder at a time"
+translation = "A csomag böngészése mappánként, ahogy a lemezen volt"
+
 [messages.app-forget-project]
 source = "Forget this project"
 translation = "Projekt elfelejtése"
@@ -2130,6 +2142,10 @@ translation = "A kép színei"
 [messages.asset-path]
 source = "Path"
 translation = "Elérési út"
+
+[messages.asset-path-open-folder]
+source = "See what else is in { $folder }"
+translation = "Mi van még ebben: { $folder }"
 
 [messages.asset-pause]
 source = "Pause"

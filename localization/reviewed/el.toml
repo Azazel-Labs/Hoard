@@ -868,6 +868,18 @@ translation = "Αγαπημένα"
 source = "Filters"
 translation = "Φίλτρα"
 
+[messages.app-folders]
+source = "Folders"
+translation = "Φάκελοι"
+
+[messages.app-folders-label]
+source = "Folders of the pack"
+translation = "Φάκελοι του πακέτου"
+
+[messages.app-folders-title]
+source = "See the pack as it was on disk, a folder at a time"
+translation = "Δείτε το πακέτο όπως ήταν στον δίσκο, έναν φάκελο τη φορά"
+
 [messages.app-forget-project]
 source = "Forget this project"
 translation = "Ξεχάστε αυτό το έργο"
@@ -2209,6 +2221,10 @@ translation = "Χρώματα στην εικόνα"
 [messages.asset-path]
 source = "Path"
 translation = "Διαδρομή"
+
+[messages.asset-path-open-folder]
+source = "See what else is in { $folder }"
+translation = "Δείτε τι άλλο υπάρχει στο { $folder }"
 
 [messages.asset-pause]
 source = "Pause"

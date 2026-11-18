@@ -610,6 +610,9 @@ app-supporting-hidden =
 app-supporting-show = Tonen
 app-supporting-shown = Inclusief ondersteunende bestanden
 app-supporting-hide = Verbergen
+app-folders = Mappen
+app-folders-title = Het pakket bekijken zoals het op de schijf stond, map voor map
+app-folders-label = Mappen van het pakket
 app-welcome-title = Zet een assetpakket ergens op deze pagina neer
 app-welcome-before = Zips, tarballs, mappen of losse bestanden werken allemaal. Hoard pakt ze uit, slaat elk bestand één keer op aan de hand van de hash, leest afmetingen, lengtes en aantallen polygonen, en tagt alles zodat je kunt zoeken naar dingen als{ " " }
 app-welcome-example-1 = grass footsteps
@@ -1482,6 +1485,7 @@ asset-file = Bestand
 asset-bytes = Bytes
 asset-source = Bron
 asset-path = Pad
+asset-path-open-folder = Bekijken wat er nog meer in { $folder } staat
 asset-download-maps =
     { $count ->
         [one] De { $count } map downloaden

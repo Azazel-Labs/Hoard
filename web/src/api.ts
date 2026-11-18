@@ -374,6 +374,8 @@ export interface SearchResult {
   tags: Facet[]
   /** Matches left out because `hide_supporting` was on (glTF buffers, .mtl files). */
   supporting_hidden: number
+  /** Browsing a folder of a pack: the folders in it, each with how many matches are under it. */
+  folders?: Facet[]
 }
 
 export interface Stats {
@@ -960,6 +962,8 @@ export interface SearchParams {
   kind?: string
   tags?: string[]
   pack?: string
+  /** With `pack`: only what's directly in this folder of it (`''` for its top), or with `q`, anything under it. */
+  folder?: string
   sort?: string
   limit?: number
   offset?: number
@@ -1112,6 +1116,7 @@ export const api = {
     if (p.kind) qs.set('kind', p.kind)
     if (p.tags?.length) qs.set('tags', p.tags.join(','))
     if (p.pack) qs.set('pack', p.pack)
+    if (p.pack && p.folder !== undefined) qs.set('folder', p.folder)
     if (p.sort) qs.set('sort', p.sort)
     qs.set('limit', String(p.limit ?? 60))
     if (p.offset) qs.set('offset', String(p.offset))

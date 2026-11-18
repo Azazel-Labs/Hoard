@@ -864,6 +864,18 @@ translation = "Gunstelinge"
 source = "Filters"
 translation = "Filters"
 
+[messages.app-folders]
+source = "Folders"
+translation = "Vouers"
+
+[messages.app-folders-label]
+source = "Folders of the pack"
+translation = "Vouers van die pak"
+
+[messages.app-folders-title]
+source = "See the pack as it was on disk, a folder at a time"
+translation = "Sien die pak soos dit op die skyf was, een vouer op ’n slag"
+
 [messages.app-forget-project]
 source = "Forget this project"
 translation = "Vergeet hierdie projek"
@@ -2197,6 +2209,10 @@ translation = "Kleure in die prent"
 [messages.asset-path]
 source = "Path"
 translation = "Pad"
+
+[messages.asset-path-open-folder]
+source = "See what else is in { $folder }"
+translation = "Sien wat nog in { $folder } is"
 
 [messages.asset-pause]
 source = "Pause"

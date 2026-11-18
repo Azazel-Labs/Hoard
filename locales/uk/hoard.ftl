@@ -653,6 +653,9 @@ app-supporting-hidden =
 app-supporting-show = Показати
 app-supporting-shown = Разом із допоміжними файлами
 app-supporting-hide = Сховати
+app-folders = Теки
+app-folders-title = Переглядати набір так, як він лежав на диску, теку за текою
+app-folders-label = Теки набору
 app-welcome-title = Перетягніть пакет ресурсів будь-куди на цій сторінці
 app-welcome-before = Підходять zip, tar-архіви, теки чи окремі файли. Hoard розпаковує їх, зберігає кожен файл один раз за його хешем, зчитує розміри, тривалість і кількість полігонів та додає теги до всього, щоб ви могли шукати, наприклад,{ " " }
 app-welcome-example-1 = grass footsteps
@@ -1662,6 +1665,7 @@ asset-file = Файл
 asset-bytes = Байти
 asset-source = Джерело
 asset-path = Шлях
+asset-path-open-folder = Що ще лежить у { $folder }
 asset-download-maps =
     { $count ->
         [one] Завантажити { $count } карту

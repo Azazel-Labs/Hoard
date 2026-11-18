@@ -63,8 +63,8 @@ can hold.
 
 Every sound gets a waveform colored by how bright it sounds, so a sharp hit and a long ambience look different
 before you play them. Sound library metadata is read (UCS categories, Soundminer and BaseHead fields, loop points,
-tempo, root note), MIDI and tracker music are rendered so they play like any other sound, and instruments (SFZ, SF2)
-play a few notes.
+tempo, root note), MIDI, tracker music and chiptunes are rendered so they play like any other sound, and instruments
+(SFZ, SF2) play a few notes.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/img/sound-dark.webp">
@@ -379,10 +379,16 @@ software rasterizer (`apt install mesa-vulkan-drivers`). Without any adapter, ev
      core at the loudness and a halo to the peak, colored by how bright each moment sounds (azure bass, violet and
      orchid mids, orange hiss and cymbals). Formats Hoard doesn't decode
      itself (WMA, CAF, AAC/M4A, WavPack, APE, …) are decoded through ffmpeg (see below) for the same treatment.
-   - Music: tracker modules (MOD, XM, S3M, IT) and MIDI are rendered to audio, so they get a waveform, a duration and
-     an MP3 preview that plays in the grid like any other sound. Modules list their title, channels, patterns and
+   - Music: tracker modules (MOD, XM, S3M, IT, OpenMPT's MPTM, and the module inside an Unreal UMX package), MIDI and
+     chiptunes (NES NSF and NSFe, VGM and VGZ) are rendered to audio, so they get a waveform, a duration and an MP3
+     preview that plays in the grid like any other sound. Modules list their title, channels, patterns and
      instruments; MIDI lists tempo, tracks and General MIDI instruments. MIDI plays through a SoundFont
      (the one picked in Settings, or a GM SoundFont found in the usual system places), falling back to a simple built-in synth.
+   - Chiptunes: an NSF runs the game's own music code on an emulated NES, cartridge sound chips included, and plays
+     its first song (for two and a half minutes when the file doesn't say how long). A VGM replays the writes a game
+     made to its sound chips: Yamaha's FM chips (Mega Drive, arcade boards, MSX, PC-88/98, AdLib and Sound Blaster
+     cards), the SN76489 and the AY-3-8910. Other chips are listed but stay silent. Both list the title, game,
+     composer and the chips used.
    - Instruments: an SFZ (a text file mapping samples to keys) or an SF2 SoundFont plays a rising arpeggio and a chord
      (a beat, for a drum kit), for its waveform and preview, and lists the keys it covers, its regions or presets and
      its velocity layers. An SFZ's samples are linked to it, so they're downloaded with it and stay out of the grid.
@@ -621,7 +627,7 @@ and Opus use ffmpeg's reference encoders (LAME, libvorbis, libopus), as do sourc
 |---|---|
 | PNG, JPEG, WebP, TGA, TIFF, BMP, GIF, EXR, HDR, PSD/PSB (full composite), Krita, OpenRaster, GIMP, DDS, KTX, KTX2, PowerVR, VTF, ICO, QOI, PNM, PCX, JPEG XL, AVIF and HEIC (with ffmpeg), SVG, Illustrator, Aseprite | PNG, JPEG, WebP (lossless), TGA, TIFF, plus EXR for HDR sources; optionally scaled down to 4096…64 px, including in the original format |
 | WAV, FLAC, OGG Vorbis, Opus, MP3, AIFF, and with ffmpeg also AAC/M4A, WMA, CAF, WavPack, APE, MKA | WAV (16 or 24-bit, as the source), FLAC, MP3 (VBR ~190 kbps), OGG Vorbis (q5), Opus (128 kbps) |
-| MOD, XM, S3M, IT, MIDI | the same audio formats, rendered |
+| MOD, XM, S3M, IT, MPTM, UMX, MIDI, NSF, VGM | the same audio formats, rendered |
 | glTF, GLB | GLB + textures (zipped) |
 | GLB | glTF + .bin (zipped) |
 | OBJ (with MTL and textures), FBX (binary and ASCII), 3DS, STL, PLY, MagicaVoxel, 3MF (with its colors), USD, SketchUp | GLB + textures (zipped) |
@@ -1471,7 +1477,7 @@ What's planned next is in [docs/roadmap.md](docs/roadmap.md).
 | | |
 |---|---|
 | File types recognized | 158 extensions in 13 kinds, from PNG and WAV to `.uasset` and `.skp` |
-| Read natively, no other app | glTF/GLB, FBX (binary and ASCII), OBJ, STL, PLY, 3DS, MagicaVoxel, 3MF, USD/USDA/USDC/USDZ, SketchUp 3 to today, Unreal packages from UE 4.x to 5.7, PSD/PSB, Krita, OpenRaster, Aseprite, DDS, KTX, KTX2, PowerVR, VTF, Basis, ICO, QOI, PNM, PCX, EXR, HDR, SVG, Illustrator, Lottie, Rive, TTF/OTF/WOFF2, WAV/BWF/RF64, OGG, Opus, FLAC, MP3, AIFF, MIDI, MOD/XM/S3M/IT, SFZ, SF2 |
+| Read natively, no other app | glTF/GLB, FBX (binary and ASCII), OBJ, STL, PLY, 3DS, MagicaVoxel, 3MF, USD/USDA/USDC/USDZ, SketchUp 3 to today, Unreal packages from UE 4.x to 5.7, PSD/PSB, Krita, OpenRaster, Aseprite, DDS, KTX, KTX2, PowerVR, VTF, Basis, ICO, QOI, PNM, PCX, EXR, HDR, SVG, Illustrator, Lottie, Rive, TTF/OTF/WOFF2, WAV/BWF/RF64, OGG, Opus, FLAC, MP3, AIFF, MIDI, MOD/XM/S3M/IT/MPTM/UMX, NSF, VGM, SFZ, SF2 |
 | Archives unpacked | zip, tar, tar.gz and `.unitypackage`, nested up to 3 deep |
 | Download as | 6 image formats, 5 audio formats, GLB or glTF for models, TTF, WOFF or WOFF2 for fonts, 10 sprite sheet formats |
 | Engine plugins | Godot 4, Unity 2021.3+, Unreal Engine 5 |

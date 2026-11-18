@@ -18,6 +18,8 @@ RUN npm run build
 
 # The compiler (stable, from rust-toolchain.toml) and cargo-chef, which change almost never.
 FROM rust:1-slim-trixie AS chef
+# A C++ compiler for ymfm, which plays the Yamaha chips in VGM files.
+RUN apt-get update && apt-get install -y --no-install-recommends g++ && rm -rf /var/lib/apt/lists/*
 WORKDIR /src
 COPY rust-toolchain.toml ./
 RUN rustup update --no-self-update stable && rustup toolchain install

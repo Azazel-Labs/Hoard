@@ -230,3 +230,44 @@ test('an Opus file gets a waveform and converts to WAV, ffmpeg or not', async ({
     await api.post('/api/archive/purge', { data: { packs } })
   }
 })
+
+/** A VGM file logging a tune on the SN76489 of Sega's consoles: an A, then an E, half a second each. */
+function vgm(): Buffer {
+  const header = Buffer.alloc(0x40)
+  header.write('Vgm ', 0)
+  header.writeUInt32LE(0x150, 0x08)
+  header.writeUInt32LE(3_579_545, 0x0c)
+  header.writeUInt32LE(2 * 30 * 735, 0x18)
+  header.writeUInt32LE(0x40 - 0x34, 0x34)
+  const tone = (period: number) => [0x50, 0x80 | (period & 0x0f), 0x50, period >> 4, 0x50, 0x90]
+  const halfSecond = Array<number>(30).fill(0x62)
+  const body = Buffer.from([...tone(254), ...halfSecond, ...tone(170), ...halfSecond, 0x50, 0x9f, 0x66])
+  const file = Buffer.concat([header, body])
+  file.writeUInt32LE(file.length - 4, 0x04)
+  return file
+}
+
+test('a VGM chiptune plays through its emulated sound chip and converts to WAV', async ({ api }) => {
+  const pack = await uploadPack(api, `E2E Chiptune ${unique()}`, [{ relpath: 'title-theme.vgm', data: vgm() }])
+  try {
+    await waitReady(api, [pack.id])
+    const [asset] = await assetsOf(api, pack.id)
+    const detail = (await (await api.get(`/api/assets/${asset.id}`)).json()) as {
+      kind: string
+      has_thumb: boolean
+      meta: Record<string, unknown>
+      tags: { tag: string }[]
+    }
+    expect(detail.kind).toBe('audio')
+    expect(detail.has_thumb).toBe(true)
+    expect(detail.meta).toMatchObject({ chips: ['SN76489'], preview: 'mp3' })
+    expect(detail.meta.duration_secs).toBeCloseTo(1, 1)
+    expect(detail.tags.map((t) => t.tag)).toContain('chiptune')
+    const wav = await api.get(`/api/assets/${asset.id}/as/wav?wait=60`)
+    expect(wav.status()).toBe(200)
+    expect((await wav.body()).subarray(0, 4).toString()).toBe('RIFF')
+  } finally {
+    await api.post('/api/archive', { data: { packs: [pack.id] } })
+    await api.post('/api/archive/purge', { data: { packs: [pack.id] } })
+  }
+})

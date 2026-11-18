@@ -666,16 +666,20 @@ pub(crate) fn map_suffix(stem: &str) -> Option<MapHit> {
     None
 }
 
-/// MIDI and tracker modules are music by nature.
+/// MIDI, tracker modules and chiptunes are music by nature.
 fn music_tags(ext: &str, tags: &mut TagSet) {
     match ext {
-        "mod" | "xm" | "s3m" | "it" => {
+        "mod" | "xm" | "s3m" | "it" | "mptm" | "umx" => {
             tags.add("music", TagSource::Meta, 0.9);
             tags.add("tracker-module", TagSource::Meta, 1.0);
         }
         "mid" | "midi" => {
             tags.add("music", TagSource::Meta, 0.8);
             tags.add("midi", TagSource::Meta, 1.0);
+        }
+        "nsf" | "nsfe" | "vgm" | "vgz" => {
+            tags.add("music", TagSource::Meta, 0.9);
+            tags.add("chiptune", TagSource::Meta, 1.0);
         }
         _ => {}
     }

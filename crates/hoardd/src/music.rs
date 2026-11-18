@@ -1,5 +1,6 @@
-//! Note-based music: tracker modules (MOD, XM, S3M, IT) and MIDI. Both are rendered to audio, which gives them a
-//! waveform thumbnail, a playable preview and "download as" WAV/FLAC/MP3/OGG/Opus, plus facts about the song.
+//! Note-based music: tracker modules (MOD, XM, S3M, IT, MPTM), MIDI, and the chiptunes in [`crate::chiptune`]. All are
+//! rendered to audio, which gives them a waveform thumbnail, a playable preview and "download as"
+//! WAV/FLAC/MP3/OGG/Opus, plus facts about the song.
 //!
 //! Modules play through `xmrsplayer` (pure Rust). MIDI renders with `rustysynth` (pure Rust) and a General MIDI
 //! SoundFont: the one picked in Settings, or one found in the usual system places. Without a SoundFont a small built-in
@@ -14,7 +15,7 @@ use serde_json::{Map, Value, json};
 
 use crate::audio::Audio;
 
-pub(crate) const EXTS: &[&str] = &["mod", "xm", "s3m", "it", "mid", "midi"];
+pub(crate) const EXTS: &[&str] = &["mod", "xm", "s3m", "it", "mptm", "mid", "midi", "nsf", "nsfe", "vgm", "vgz", "umx"];
 const RATE: u32 = 44_100;
 
 /// Where to look for a General MIDI SoundFont when Settings doesn't name one (Debian/Ubuntu packages, macOS
@@ -84,15 +85,16 @@ pub(crate) fn render(path: &Path, ext: &str, max_secs: f32) -> Result<Rendered> 
     let data = std::fs::read(path)?;
     match ext {
         "mid" | "midi" => midi(&data, path, max_secs),
+        _ if crate::chiptune::EXTS.contains(&ext) => crate::chiptune::render(&data, ext, max_secs),
         _ => module(&data, max_secs),
     }
 }
 
-fn clip_text(s: &str, n: usize) -> String {
+pub(crate) fn clip_text(s: &str, n: usize) -> String {
     s.chars().filter(|c| !c.is_control() || *c == '\n').take(n).collect::<String>().trim().to_owned()
 }
 
-fn module(data: &[u8], max_secs: f32) -> Result<Rendered> {
+pub(crate) fn module(data: &[u8], max_secs: f32) -> Result<Rendered> {
     use xmrsplayer::prelude::*;
     let module =
         xmrs::prelude::Module::load(data).map_err(|e| anyhow::anyhow!("not a readable tracker module: {e:?}"))?;
@@ -506,7 +508,7 @@ pub(crate) fn render_full(path: &Path, ext: &str) -> Result<Audio> {
 }
 
 #[cfg(test)]
-mod tests {
+pub(crate) mod tests {
     use super::*;
 
     /// A one-track MIDI file: tempo, a name, a program change, C-E-G as quarter notes, a kick on the drum channel.
@@ -625,4 +627,7 @@ fn write_music_fixtures() {
     std::fs::create_dir_all(&out).unwrap();
     std::fs::write(out.join("theme.mid"), tests::tiny_midi()).unwrap();
     std::fs::write(out.join("chip.mod"), tests::tiny_mod()).unwrap();
+    std::fs::write(out.join("overworld.nsf"), crate::chiptune::tests::tiny_nsf()).unwrap();
+    std::fs::write(out.join("green-hill.vgm"), crate::chiptune::tests::tiny_vgm()).unwrap();
+    std::fs::write(out.join("level.umx"), crate::chiptune::tests::tiny_umx()).unwrap();
 }

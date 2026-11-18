@@ -99,12 +99,14 @@ most common first:
 ## Sounds: more formats
 
 Hoard decodes WAV, FLAC, MP3, OGG Vorbis, Opus, AIFF and ADPCM itself, AAC/M4A, WMA, CAF, WavPack, APE and more
-through ffmpeg, plays MOD, XM, S3M, IT and MIDI, and plays a few notes on SFZ and SF2 instruments. What's missing is mostly containers rather than codecs:
+through ffmpeg, plays MOD, XM, S3M, IT, MPTM, UMX, MIDI, NSF and VGM, and plays a few notes on SFZ and SF2
+instruments. What's missing is mostly containers rather than codecs:
 
 - [x] **SFZ instruments and SF2 SoundFonts**: a set of samples and how they map to notes, common in music packs. One
   asset, its samples linked to it, its preview a few notes played on it.
 - [x] **Opus without ffmpeg**: a built-in decoder, so Opus plays before ffmpeg is downloaded, or without it.
-- [ ] More tracker and chiptune formats (`.mptm`, `.umx`, `.nsf`, `.vgm`).
+- [x] **More tracker and chiptune formats**: OpenMPT's MPTM, Unreal's UMX, NES NSF and NSFe, VGM and VGZ (Yamaha FM
+  chips, the SN76489 and the AY-3-8910; other chips in a VGM stay silent).
 - [ ] FMOD and Wwise banks (`.bank`, `.fsb`, `.wem`): found in game files more than in asset packs.
 
 ## Search sounds by what they sound like

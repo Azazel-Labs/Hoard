@@ -14,6 +14,7 @@ mod blobs;
 mod bundle;
 mod chatgpt;
 mod check;
+mod chiptune;
 mod clap;
 mod clip;
 mod config;

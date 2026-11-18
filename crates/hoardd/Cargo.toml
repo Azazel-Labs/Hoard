@@ -79,6 +79,9 @@ xmrs = "0.15"
 xmrsplayer = "0.15"
 midly = "0.5"
 rustysynth = "1"
+# Chiptunes: NES music (NSF) emulated in pure Rust, and the Yamaha FM chips VGM files log writes to (ymfm, C++).
+oxideav-nsf = { version = "0.0.5", default-features = false }
+ymfm-sys = "0.2"
 # Model formats (STL, PLY, VOX, OBJ, FBX, 3DS, 3MF, USD, and glTF with Draco) read natively for thumbnails and GLB copies.
 polysmelt = "0.13.0"
 ddsfile = "0.6"

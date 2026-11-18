@@ -1,5 +1,5 @@
 //! ffmpeg, for the parts of audio that aren't worth writing ourselves: MP3, Vorbis and Opus encoding with the
-//! reference encoders (LAME, libvorbis, libopus), and reading formats Hoard's own decoder doesn't (AAC/M4A, Opus,
+//! reference encoders (LAME, libvorbis, libopus), and reading formats Hoard's own decoder doesn't (AAC/M4A,
 //! WMA, CAF, `WavPack`, …).
 //!
 //! Nothing waits for it. At startup a background task finds a usable ffmpeg (the one in Settings, one downloaded

@@ -201,3 +201,32 @@ test('an SFZ instrument plays a few notes on its samples, which go with it', asy
     await api.post('/api/archive/purge', { data: { packs: [pack.id] } })
   }
 })
+
+test('an Opus file gets a waveform and converts to WAV, ffmpeg or not', async ({ api }) => {
+  const name = `E2E Opus ${unique()}`
+  const source = await uploadPack(api, `${name} source`, [{ relpath: 'laser.wav', data: sound('zap', 1) }])
+  let pack: { id: string } | undefined
+  try {
+    await waitReady(api, [source.id])
+    const [wav] = await assetsOf(api, source.id)
+    const opus = await api.get(`/api/assets/${wav.id}/as/opus?wait=60`)
+    expect(opus.status()).toBe(200)
+    const bytes = await opus.body()
+    expect(bytes.subarray(0, 4).toString()).toBe('OggS')
+
+    pack = await uploadPack(api, name, [{ relpath: 'laser.opus', data: bytes }])
+    await waitReady(api, [pack.id])
+    const [asset] = await assetsOf(api, pack.id)
+    const detail = (await (await api.get(`/api/assets/${asset.id}`)).json()) as { kind: string; has_thumb: boolean; meta: Record<string, unknown> }
+    expect(detail.kind).toBe('audio')
+    expect(detail.has_thumb).toBe(true)
+    expect(detail.meta.peak_dbfs).toEqual(expect.any(Number))
+    const back = await api.get(`/api/assets/${asset.id}/as/wav?wait=60`)
+    expect(back.status()).toBe(200)
+    expect((await back.body()).subarray(0, 4).toString()).toBe('RIFF')
+  } finally {
+    const packs = [source.id, ...(pack ? [pack.id] : [])]
+    await api.post('/api/archive', { data: { packs } })
+    await api.post('/api/archive/purge', { data: { packs } })
+  }
+})

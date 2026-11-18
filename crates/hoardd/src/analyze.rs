@@ -435,7 +435,7 @@ fn analyze_music(path: &Path, ext: &str, a: &mut Analysis) -> anyhow::Result<()>
 }
 
 /// Sound files: tags and properties, a waveform thumbnail, peak/RMS level and clipping. Formats Hoard can't decode
-/// (WMA, CAF, AAC/M4A, Opus, …) are decoded by ffmpeg into a temporary WAV, when ffmpeg is ready.
+/// (WMA, CAF, AAC/M4A, …) are decoded by ffmpeg into a temporary WAV, when ffmpeg is ready.
 fn analyze_sound(path: &Path, ext: &str, a: &mut Analysis) -> anyhow::Result<()> {
     let dir = tempfile::tempdir()?;
     let mut decoded: Option<Option<PathBuf>> = None;
@@ -1041,51 +1041,21 @@ fn analyze_audio(path: &Path, ext: &str, a: &mut Analysis) -> anyhow::Result<()>
 /// Decode audio and draw its peak envelope as a transparent PNG, so a library of SFX can be scanned by eye
 /// (a sharp hit and a long swell look nothing alike). Decoding stops after `MAX_WAVEFORM_SECS`.
 fn waveform_png(path: &Path, duration_secs: f64) -> anyhow::Result<(Vec<u8>, Levels)> {
-    use symphonia::core::codecs::audio::AudioDecoderOptions;
-    use symphonia::core::formats::probe::Hint;
-    use symphonia::core::formats::{FormatOptions, TrackType};
-    use symphonia::core::io::MediaSourceStream;
-    use symphonia::core::meta::MetadataOptions;
-
     const MAX_WAVEFORM_SECS: f64 = 15.0 * 60.0;
-
-    let mss =
-        MediaSourceStream::new(Box::new(File::open(path)?), symphonia::core::io::MediaSourceStreamOptions::default());
-    let mut hint = Hint::new();
-    if let Some(ext) = path.extension().and_then(|e| e.to_str()) {
-        hint.with_extension(ext);
-    }
-    let mut format =
-        symphonia::default::get_probe().probe(&hint, mss, FormatOptions::default(), MetadataOptions::default())?;
-    let track = format.default_track(TrackType::Audio).context("no audio track")?;
-    let params = track.codec_params.as_ref().and_then(|p| p.audio()).context("no audio codec parameters")?;
-    let mut decoder = symphonia::default::get_codecs().make_audio_decoder(params, &AudioDecoderOptions::default())?;
-    let track_id = track.id;
 
     let mut bars = vec![Bar::default(); WAVE_BARS];
     let mut last_sign = 0i8;
     let mut frames_per_col = 0usize;
     let mut frame_idx = 0usize;
-    let mut scratch: Vec<f32> = Vec::new();
     let mut levels = Levels::default();
-    while let Some(packet) = format.next_packet()? {
-        if packet.track_id != track_id {
-            continue;
-        }
-        let buf = match decoder.decode(&packet) {
-            Ok(b) => b,
-            Err(symphonia::core::errors::Error::DecodeError(_)) => continue,
-            Err(e) => return Err(e.into()),
-        };
-        let rate = buf.spec().rate().max(1) as usize;
-        let channels = buf.spec().channels().count().max(1);
+    let ext = path.extension().and_then(|e| e.to_str());
+    crate::audio::decode_each(Box::new(File::open(path)?), ext, |pcm, channels, rate, _| {
+        let (rate, channels) = (rate.max(1) as usize, usize::from(channels.max(1)));
         if frames_per_col == 0 {
             let total = (duration_secs.min(MAX_WAVEFORM_SECS) * rate as f64).ceil() as usize;
             frames_per_col = (total / WAVE_BARS).max(1);
         }
-        scratch.resize(buf.samples_interleaved(), 0.0);
-        buf.copy_to_slice_interleaved(&mut scratch);
-        for frame in scratch.chunks_exact(channels) {
+        for frame in pcm.chunks_exact(channels) {
             let col = frame_idx / frames_per_col;
             if col >= WAVE_BARS {
                 break;
@@ -1120,10 +1090,8 @@ fn waveform_png(path: &Path, duration_secs: f64) -> anyhow::Result<(Vec<u8>, Lev
             levels.peak = levels.peak.max(peak);
             frame_idx += 1;
         }
-        if frame_idx / frames_per_col >= WAVE_BARS {
-            break;
-        }
-    }
+        Ok(frame_idx / frames_per_col < WAVE_BARS)
+    })?;
     anyhow::ensure!(frame_idx > 0, "no audio decoded");
     let used = frame_idx.div_ceil(frames_per_col).clamp(1, WAVE_BARS);
     bars.truncate(used);

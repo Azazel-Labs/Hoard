@@ -3,7 +3,7 @@
 //!
 //! Images go through `image` (plus Hoard's PSD/Krita/OpenRaster composites), fonts, meshes and glTF through Hoard's
 //! own code. Audio Hoard decodes itself becomes WAV or FLAC here; MP3, OGG Vorbis and Opus use ffmpeg's reference
-//! encoders when ffmpeg is ready (pure-Rust MP3 and Opus otherwise), and formats only ffmpeg reads (AAC/M4A, Opus,
+//! encoders when ffmpeg is ready (pure-Rust MP3 and Opus otherwise), and formats only ffmpeg reads (AAC/M4A,
 //! WMA, …) are offered once it is. Models Blender converted also offer that GLB.
 
 use std::collections::BTreeMap;
@@ -28,8 +28,8 @@ pub(crate) const IMAGE_IN: &[&str] = &[
 /// Rendered size for vector art when no size is asked for.
 const SVG_DEFAULT: u32 = 2048;
 const HDR_IN: &[&str] = &["hdr", "exr"];
-/// Audio formats symphonia decodes here.
-const AUDIO_IN: &[&str] = &["wav", "wave", "ogg", "oga", "flac", "mp3", "aif", "aiff"];
+/// Audio formats decoded here (symphonia, and opus-pure for Opus).
+const AUDIO_IN: &[&str] = &["wav", "wave", "ogg", "oga", "opus", "flac", "mp3", "aif", "aiff"];
 
 fn opt(format: &str, label: &str, resizable: bool) -> FormatOption {
     FormatOption { format: format.to_owned(), label: label.to_owned(), resizable }
@@ -256,7 +256,7 @@ fn convert_audio(local: &Path, src: &str, format: &str, progress: &Progress<'_>)
     }
     match decode_audio(local) {
         Ok(audio) => ours(&audio),
-        // An Ogg holding Opus, an MP4 called .mp3, … : ffmpeg reads what symphonia can't.
+        // An MP4 called .mp3, … : ffmpeg reads what symphonia can't.
         Err(e) if ffmpeg_reads => {
             tracing::debug!(error = %format!("{e:#}"), "Hoard couldn't decode this audio; trying ffmpeg");
             via_ffmpeg(local, src, progress.duration)

@@ -103,7 +103,7 @@ pub struct Config {
     #[arg(skip)]
     pub(crate) soundfont: Option<PathBuf>,
 
-    /// ffmpeg, for MP3/OGG/Opus encoding and for reading audio Hoard can't decode itself (AAC/M4A, Opus, WMA, …):
+    /// ffmpeg, for MP3/OGG/Opus encoding and for reading audio Hoard can't decode itself (AAC/M4A, WMA, …):
     /// `auto` uses a system ffmpeg that has LAME, libopus and libvorbis, otherwise downloads a static build into
     /// `<data dir>/tools` in the background; a path uses that binary; `off` never runs ffmpeg.
     #[arg(skip = String::from("auto"))]

@@ -1,4 +1,4 @@
-//! Audio in and out, all pure Rust: decoding with `symphonia`, and writing WAV, FLAC (`flacenc`), MP3 (`rusty_mp3`)
+//! Audio in and out, all pure Rust: decoding with `symphonia` (and Opus with `opus-pure`), and writing WAV, FLAC (`flacenc`), MP3 (`rusty_mp3`)
 //! and Opus (`opus-pure`). MP3, OGG Vorbis and Opus downloads prefer ffmpeg's reference encoders when ffmpeg is
 //! ready (see `ffmpeg`); the MP3 and Opus encoders here are the fallback.
 
@@ -45,6 +45,11 @@ pub(crate) fn decode_each(
     use symphonia::core::io::MediaSourceStream;
     use symphonia::core::meta::MetadataOptions;
 
+    let mut source = source;
+    if is_ogg_opus(&mut source)? {
+        return decode_opus(source, each);
+    }
+
     let mss = MediaSourceStream::new(source, symphonia::core::io::MediaSourceStreamOptions::default());
     let mut hint = Hint::new();
     if let Some(ext) = ext {
@@ -82,6 +87,55 @@ pub(crate) fn decode_each(
         scratch.resize(buf.samples_interleaved(), 0.0);
         buf.copy_to_slice_interleaved(&mut scratch);
         if !each(&scratch, channels, rate, bits)? {
+            break;
+        }
+    }
+    Ok(())
+}
+
+/// An Ogg stream whose first packet is an Opus header, whatever the file is called.
+fn is_ogg_opus(source: &mut Box<dyn symphonia::core::io::MediaSource>) -> Result<bool> {
+    use std::io::{Read, Seek, SeekFrom};
+    let mut head = Vec::with_capacity(64);
+    source.by_ref().take(64).read_to_end(&mut head)?;
+    source.seek(SeekFrom::Start(0))?;
+    Ok(head.starts_with(b"OggS") && head.windows(8).any(|w| w == b"OpusHead"))
+}
+
+/// A mono or stereo Opus stream, or a surround one.
+enum Decoder {
+    One(Box<opus_pure::OpusDecoder>),
+    Surround(opus_pure::OpusMSDecoder),
+}
+
+/// Ogg Opus, which symphonia doesn't decode: at 48 kHz, its pre-skip and end trim taken off, surround included.
+fn decode_opus(
+    source: Box<dyn symphonia::core::io::MediaSource>,
+    mut each: impl FnMut(&[f32], u16, u32, u16) -> Result<bool>,
+) -> Result<()> {
+    use opus_pure::{MAX_PACKET_SAMPLES, OggOpusReader, OpusMSDecoder, Trim};
+    const RATE: i32 = 48_000;
+    let mut reader = OggOpusReader::new(std::io::BufReader::new(source))?;
+    let head = reader.head().clone();
+    let channels = usize::from(head.channel_count);
+    ensure!(channels > 0, "an Opus stream with no channels");
+    let mut decoder = if head.mapping_family == 0 {
+        Decoder::One(Box::new(head.decoder(RATE)?))
+    } else {
+        Decoder::Surround(OpusMSDecoder::new(RATE, channels, head.mapping_family)?)
+    };
+    let mut trim = Trim::new(&head, RATE, channels)?;
+    let mut block = vec![0.0f32; MAX_PACKET_SAMPLES * channels];
+    for packet in reader.packets() {
+        let packet = packet?;
+        // A damaged packet is skipped, the way symphonia skips one.
+        let n = match &mut decoder {
+            Decoder::One(d) => d.decode(&packet.data, MAX_PACKET_SAMPLES, &mut block),
+            Decoder::Surround(d) => d.decode(&packet.data, MAX_PACKET_SAMPLES, &mut block),
+        };
+        let Ok(n) = n else { continue };
+        let kept = trim.keep(&packet, &block[..n * channels]);
+        if !kept.is_empty() && !each(kept, u16::from(head.channel_count), RATE.cast_unsigned(), 16)? {
             break;
         }
     }
@@ -289,6 +343,25 @@ mod tests {
         assert!((10_500..=13_000).contains(&frames), "{frames}");
         let opus = write_opus(&a).unwrap();
         assert!(opus.starts_with(b"OggS") && opus.windows(8).any(|w| w == b"OpusHead"));
+    }
+
+    #[test]
+    fn opus_decodes_back() {
+        let a = tone(44_100, 2, 1.0);
+        let opus = write_opus(&a).unwrap();
+        // Named .opus or .ogg, it's found by its header.
+        for ext in ["opus", "ogg"] {
+            let dir = tempfile::tempdir().unwrap();
+            let p = dir.path().join(format!("x.{ext}"));
+            std::fs::write(&p, &opus).unwrap();
+            let back = decode_audio(&p).unwrap();
+            assert_eq!((back.rate, back.channels), (48_000, 2));
+            let frames = back.samples.len() / 2;
+            assert!((47_000..=49_000).contains(&frames), "{frames}");
+            // Still loud: a tone came back, not silence.
+            let peak = back.samples.iter().map(|s| s.abs()).max().unwrap();
+            assert!(peak > 6_000, "{peak}");
+        }
     }
 
     #[test]

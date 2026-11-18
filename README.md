@@ -63,7 +63,8 @@ can hold.
 
 Every sound gets a waveform colored by how bright it sounds, so a sharp hit and a long ambience look different
 before you play them. Sound library metadata is read (UCS categories, Soundminer and BaseHead fields, loop points,
-tempo, root note), and MIDI and tracker music are rendered so they play like any other sound.
+tempo, root note), MIDI and tracker music are rendered so they play like any other sound, and instruments (SFZ, SF2)
+play a few notes.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/img/sound-dark.webp">
@@ -382,6 +383,9 @@ software rasterizer (`apt install mesa-vulkan-drivers`). Without any adapter, ev
      an MP3 preview that plays in the grid like any other sound. Modules list their title, channels, patterns and
      instruments; MIDI lists tempo, tracks and General MIDI instruments. MIDI plays through a SoundFont
      (the one picked in Settings, or a GM SoundFont found in the usual system places), falling back to a simple built-in synth.
+   - Instruments: an SFZ (a text file mapping samples to keys) or an SF2 SoundFont plays a rising arpeggio and a chord
+     (a beat, for a drum kit), for its waveform and preview, and lists the keys it covers, its regions or presets and
+     its velocity layers. An SFZ's samples are linked to it, so they're downloaded with it and stay out of the grid.
    - Metadata inside WAVs, as sound libraries ship it: BWF `bext` descriptions, `LIST/INFO` titles and keywords, iXML
      from Soundminer/BaseHead with Universal Category System (UCS) category, subcategory and CatID, `smpl` loop
      points, ACID tempo, root note and one-shot flag, cue markers, and RF64 for files over 4 GB. Embedded titles
@@ -1467,7 +1471,7 @@ What's planned next is in [docs/roadmap.md](docs/roadmap.md).
 | | |
 |---|---|
 | File types recognized | 158 extensions in 13 kinds, from PNG and WAV to `.uasset` and `.skp` |
-| Read natively, no other app | glTF/GLB, FBX (binary and ASCII), OBJ, STL, PLY, 3DS, MagicaVoxel, 3MF, USD/USDA/USDC/USDZ, SketchUp 3 to today, Unreal packages from UE 4.x to 5.7, PSD/PSB, Krita, OpenRaster, Aseprite, DDS, KTX, KTX2, PowerVR, VTF, Basis, ICO, QOI, PNM, PCX, EXR, HDR, SVG, Illustrator, Lottie, Rive, TTF/OTF/WOFF2, WAV/BWF/RF64, OGG, FLAC, MP3, AIFF, MIDI, MOD/XM/S3M/IT |
+| Read natively, no other app | glTF/GLB, FBX (binary and ASCII), OBJ, STL, PLY, 3DS, MagicaVoxel, 3MF, USD/USDA/USDC/USDZ, SketchUp 3 to today, Unreal packages from UE 4.x to 5.7, PSD/PSB, Krita, OpenRaster, Aseprite, DDS, KTX, KTX2, PowerVR, VTF, Basis, ICO, QOI, PNM, PCX, EXR, HDR, SVG, Illustrator, Lottie, Rive, TTF/OTF/WOFF2, WAV/BWF/RF64, OGG, FLAC, MP3, AIFF, MIDI, MOD/XM/S3M/IT, SFZ, SF2 |
 | Archives unpacked | zip, tar, tar.gz and `.unitypackage`, nested up to 3 deep |
 | Download as | 6 image formats, 5 audio formats, GLB or glTF for models, TTF, WOFF or WOFF2 for fonts, 10 sprite sheet formats |
 | Engine plugins | Godot 4, Unity 2021.3+, Unreal Engine 5 |

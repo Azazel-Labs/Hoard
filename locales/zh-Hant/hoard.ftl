@@ -1203,6 +1203,7 @@ asset-rel-guess = 可能搭配使用
 asset-rel-sidecar = 商店詳細資訊
 asset-rel-variant = 變體
 asset-rel-sprite = 精靈
+asset-rel-sample = 取樣
 asset-role-map = { $role }貼圖
 asset-maps-count = { $count } 張貼圖
 asset-needs = 需要

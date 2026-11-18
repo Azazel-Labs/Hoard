@@ -48,6 +48,7 @@ mod https;
 mod i18n;
 mod imitation;
 mod ingest;
+mod instruments;
 mod issues;
 mod jobs;
 mod links;

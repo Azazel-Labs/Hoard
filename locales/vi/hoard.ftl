@@ -1203,6 +1203,7 @@ asset-rel-guess = có lẽ đi kèm với
 asset-rel-sidecar = thông tin cửa hàng
 asset-rel-variant = biến thể
 asset-rel-sprite = sprite
+asset-rel-sample = mẫu âm thanh
 asset-role-map = map { $role }
 asset-maps-count = { $count } map
 asset-needs = Cần

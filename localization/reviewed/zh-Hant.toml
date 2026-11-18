@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "4adadca582e460681422236b72524c1cf5c8ead11cf3b1b7bd76ac895d47cafd"
+source = "0dc244f6468edb8686d783f359a288bd8b09d1d75401bf7f226eb5c9c8eeab23"
 translation = "7d4815ead7ae4f48f80531d797b527d64fdb08460c91b5ac34cf8cada118334a"
 
 [messages.account-add]
@@ -2307,6 +2307,10 @@ translation = "連結的檔案"
 [messages.asset-rel-material]
 source = "material file"
 translation = "材質檔"
+
+[messages.asset-rel-sample]
+source = "sample"
+translation = "取樣"
 
 [messages.asset-rel-sidecar]
 source = "store details"

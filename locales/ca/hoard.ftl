@@ -1302,6 +1302,7 @@ asset-rel-guess = probablement va amb
 asset-rel-sidecar = detalls de botiga
 asset-rel-variant = variant
 asset-rel-sprite = sprite
+asset-rel-sample = mostra
 asset-role-map = mapa: { $role }
 asset-maps-count =
     { $count ->

@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "4adadca582e460681422236b72524c1cf5c8ead11cf3b1b7bd76ac895d47cafd"
+source = "0dc244f6468edb8686d783f359a288bd8b09d1d75401bf7f226eb5c9c8eeab23"
 translation = "eb892fd468da0132017d254b1ce31fa8af7e6f4331de9f469e15c94a37a8f607"
 
 [messages.account-add]
@@ -2385,6 +2385,10 @@ translation = "linket fil"
 [messages.asset-rel-material]
 source = "material file"
 translation = "materialefil"
+
+[messages.asset-rel-sample]
+source = "sample"
+translation = "sample"
 
 [messages.asset-rel-sidecar]
 source = "store details"

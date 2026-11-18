@@ -1346,6 +1346,7 @@ asset-rel-guess = μάλλον συνοδεύει
 asset-rel-sidecar = στοιχεία καταστήματος
 asset-rel-variant = παραλλαγή
 asset-rel-sprite = sprite
+asset-rel-sample = δείγμα
 asset-role-map = χάρτης { $role }
 asset-maps-count =
     { $count ->

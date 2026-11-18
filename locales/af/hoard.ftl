@@ -1296,6 +1296,7 @@ asset-rel-guess = hoort waarskynlik by
 asset-rel-sidecar = winkelbesonderhede
 asset-rel-variant = variant
 asset-rel-sprite = sprite
+asset-rel-sample = klankmonster
 asset-role-map = kaart vir { $role }
 asset-maps-count =
     { $count ->

@@ -94,7 +94,7 @@ impl AssetKind {
             // Audio, including DAW projects (Ableton, FL Studio, Reaper, Pro Tools, Logic, Cubase, Studio One).
             "wav" | "ogg" | "oga" | "mp3" | "flac" | "aif" | "aiff" | "aifc" | "opus" | "m4a" | "aac" | "wma"
             | "caf" | "wv" | "ape" | "mka" | "w64" | "au" | "mid" | "midi" | "xm" | "it" | "mod" | "s3m" | "als"
-            | "flp" | "rpp" | "ptx" | "logicx" | "cpr" | "song" | "aup3" | "sfz" => AssetKind::Audio,
+            | "flp" | "rpp" | "ptx" | "logicx" | "cpr" | "song" | "aup3" | "sfz" | "sf2" => AssetKind::Audio,
             // Models, including DCC scenes (Blender, Max, Maya, ZBrush, Cinema 4D, Houdini, Modo, SketchUp).
             "fbx" | "obj" | "gltf" | "glb" | "dae" | "blend" | "3ds" | "stl" | "ply" | "usd" | "usda" | "usdc"
             | "usdz" | "vox" | "max" | "ma" | "mb" | "ztl" | "zpr" | "c4d" | "hip" | "hiplc" | "hipnc" | "lxo"
@@ -520,6 +520,8 @@ pub enum LinkRel {
     Sprite,
     /// The same asset in another format, which the pack has as well (the `.obj` beside a `.skp`).
     Format,
+    /// A sound an instrument plays (an SFZ's samples): part of it, not an asset on its own.
+    Sample,
 }
 
 impl LinkRel {
@@ -535,6 +537,7 @@ impl LinkRel {
             LinkRel::Variant => "variant",
             LinkRel::Sprite => "sprite",
             LinkRel::Format => "format",
+            LinkRel::Sample => "sample",
         }
     }
     pub fn parse(s: &str) -> Option<Self> {
@@ -549,12 +552,21 @@ impl LinkRel {
             "variant" => LinkRel::Variant,
             "sprite" => LinkRel::Sprite,
             "format" => LinkRel::Format,
+            "sample" => LinkRel::Sample,
             _ => return None,
         })
     }
     /// Whether a bundle download should include the target by default.
     pub fn is_dependency(&self) -> bool {
-        matches!(self, LinkRel::Texture | LinkRel::Buffer | LinkRel::Material | LinkRel::Library | LinkRel::Guess)
+        matches!(
+            self,
+            LinkRel::Texture
+                | LinkRel::Buffer
+                | LinkRel::Material
+                | LinkRel::Library
+                | LinkRel::Guess
+                | LinkRel::Sample
+        )
     }
 }
 

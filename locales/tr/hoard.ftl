@@ -1205,6 +1205,7 @@ asset-rel-guess = muhtemelen birlikte kullanılır
 asset-rel-sidecar = mağaza ayrıntıları
 asset-rel-variant = varyant
 asset-rel-sprite = sprite
+asset-rel-sample = örnek
 asset-role-map = { $role } haritası
 asset-maps-count = { $count } harita
 asset-needs = Gerektirdikleri

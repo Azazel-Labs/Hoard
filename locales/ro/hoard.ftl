@@ -1403,6 +1403,7 @@ asset-rel-guess = probabil merge cu
 asset-rel-sidecar = detalii de magazin
 asset-rel-variant = variantă
 asset-rel-sprite = sprite
+asset-rel-sample = eșantion
 asset-role-map = hartă de { $role }
 asset-maps-count =
     { $count ->

@@ -1453,6 +1453,7 @@ asset-rel-sidecar = store details
 asset-rel-variant = variant
 # A sprite sheet and a loose image that is one of its sprites, saved on its own as well.
 asset-rel-sprite = sprite
+asset-rel-sample = sample
 # Beside a material this texture belongs to: what kind of map it is in it. $role is the map's role, lowercase ("normal").
 asset-role-map = { $role } map
 # Beside a material a model wears: how many maps it has.

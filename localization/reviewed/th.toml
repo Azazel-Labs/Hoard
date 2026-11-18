@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "4adadca582e460681422236b72524c1cf5c8ead11cf3b1b7bd76ac895d47cafd"
+source = "0dc244f6468edb8686d783f359a288bd8b09d1d75401bf7f226eb5c9c8eeab23"
 translation = "07555d54b3ba6bc94b6fcbf55672d1be5e77ca134c96e30754ee929b3a902828"
 
 [messages.account-add]
@@ -2304,6 +2304,10 @@ translation = "ไฟล์ที่ลิงก์"
 [messages.asset-rel-material]
 source = "material file"
 translation = "ไฟล์แมทีเรียล"
+
+[messages.asset-rel-sample]
+source = "sample"
+translation = "แซมเปิล"
 
 [messages.asset-rel-sidecar]
 source = "store details"

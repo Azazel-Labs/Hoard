@@ -1424,6 +1424,7 @@ asset-rel-guess = вероятно, относится
 asset-rel-sidecar = сведения из магазина
 asset-rel-variant = вариант
 asset-rel-sprite = спрайт
+asset-rel-sample = сэмпл
 asset-role-map = карта { $role }
 asset-maps-count =
     { $count ->

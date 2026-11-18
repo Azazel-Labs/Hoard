@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "4adadca582e460681422236b72524c1cf5c8ead11cf3b1b7bd76ac895d47cafd"
+source = "0dc244f6468edb8686d783f359a288bd8b09d1d75401bf7f226eb5c9c8eeab23"
 translation = "cb51eeebee58ce4e694b9c22ec1e26a19090d24e80d9b74b0e431ca3fa274b7f"
 
 [messages.account-add]
@@ -2298,6 +2298,10 @@ translation = "연결된 파일"
 [messages.asset-rel-material]
 source = "material file"
 translation = "머티리얼 파일"
+
+[messages.asset-rel-sample]
+source = "sample"
+translation = "샘플"
 
 [messages.asset-rel-sidecar]
 source = "store details"

@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "4adadca582e460681422236b72524c1cf5c8ead11cf3b1b7bd76ac895d47cafd"
+source = "0dc244f6468edb8686d783f359a288bd8b09d1d75401bf7f226eb5c9c8eeab23"
 translation = "230aa92a6033cfd0e81420ca5ef21ba788bfd9cbf50cc6964032f8c9499222bf"
 
 [messages.account-add]
@@ -2310,6 +2310,10 @@ translation = "kapcsolt fájl"
 [messages.asset-rel-material]
 source = "material file"
 translation = "anyagfájl"
+
+[messages.asset-rel-sample]
+source = "sample"
+translation = "minta"
 
 [messages.asset-rel-sidecar]
 source = "store details"

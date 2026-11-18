@@ -1197,6 +1197,7 @@ asset-rel-guess = น่าจะใช้คู่กัน
 asset-rel-sidecar = รายละเอียดร้านค้า
 asset-rel-variant = รูปแบบย่อย
 asset-rel-sprite = สไปรต์
+asset-rel-sample = แซมเปิล
 asset-role-map = แมป { $role }
 asset-maps-count = { $count } แมป
 asset-needs = ต้องใช้

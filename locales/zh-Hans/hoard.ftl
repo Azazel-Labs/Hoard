@@ -1203,6 +1203,7 @@ asset-rel-guess = 可能相关
 asset-rel-sidecar = 商店详情
 asset-rel-variant = 变体
 asset-rel-sprite = 精灵
+asset-rel-sample = 采样
 asset-role-map = { $role }贴图
 asset-maps-count = { $count } 张贴图
 asset-needs = 依赖

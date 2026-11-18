@@ -299,7 +299,9 @@ pub(crate) fn analyze(path: &Path, root: &Path, kind: AssetKind, ext: &str) -> A
         AssetKind::Vector if ext == "lottie" => analyze_dotlottie(path, &mut a),
         AssetKind::Vector if ext == "riv" => analyze_rive(path, &mut a),
         AssetKind::Vector if crate::textures::handles(ext) => analyze_decoded(path, ext, &mut a),
-        AssetKind::Audio if crate::music::EXTS.contains(&ext) => analyze_music(path, ext, &mut a),
+        AssetKind::Audio if crate::music::EXTS.contains(&ext) || crate::instruments::EXTS.contains(&ext) => {
+            analyze_music(path, ext, &mut a)
+        }
         AssetKind::Audio => analyze_sound(path, ext, &mut a),
         AssetKind::Font if crate::fonts::EXTS.contains(&ext) => crate::fonts::analyze(path, ext, THUMB_SIZE).map(|f| {
             a.meta.extend(f.facts);
@@ -405,10 +407,14 @@ fn animation(path: &Path, ext: &str) -> Option<(usize, u64)> {
     (n > 1).then_some((n, ms))
 }
 
-/// MIDI and tracker modules: rendered to audio for the facts a sound gets (duration, levels), a waveform and a
-/// playable MP3 preview.
+/// MIDI, tracker modules and instruments (SFZ, SF2): rendered to audio for the facts a sound gets (duration,
+/// levels), a waveform and a playable MP3 preview. An instrument plays a few notes.
 fn analyze_music(path: &Path, ext: &str, a: &mut Analysis) -> anyhow::Result<()> {
-    let (facts, audio) = crate::music::analyze(path, ext)?;
+    let (facts, audio) = if crate::instruments::EXTS.contains(&ext) {
+        crate::instruments::analyze(path, ext)?
+    } else {
+        crate::music::analyze(path, ext)?
+    };
     let secs = facts.get("duration_secs").and_then(Value::as_f64).unwrap_or(60.0);
     // Tracker modules carry a real song title; a MIDI track name ("Piano") rarely is one.
     if !matches!(ext, "mid" | "midi") {

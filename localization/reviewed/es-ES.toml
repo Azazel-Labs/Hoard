@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "4adadca582e460681422236b72524c1cf5c8ead11cf3b1b7bd76ac895d47cafd"
+source = "0dc244f6468edb8686d783f359a288bd8b09d1d75401bf7f226eb5c9c8eeab23"
 translation = "8b5fa45772f1b768715bb243cf724d7c57dc2f5208043d87b201e40c17dc1980"
 
 [messages.account-add]
@@ -2393,6 +2393,10 @@ translation = "archivo vinculado"
 [messages.asset-rel-material]
 source = "material file"
 translation = "archivo de material"
+
+[messages.asset-rel-sample]
+source = "sample"
+translation = "muestra"
 
 [messages.asset-rel-sidecar]
 source = "store details"

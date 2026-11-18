@@ -126,6 +126,7 @@ const REL_LABEL: Record<Exclude<LinkRel, 'format'>, string> = {
   get sidecar() { return t('asset-rel-sidecar') },
   get variant() { return t('asset-rel-variant') },
   get sprite() { return t('asset-rel-sprite') },
+  get sample() { return t('asset-rel-sample') },
 }
 const needs = computed(() => props.asset.links.filter((l) => l.rel !== 'animation' && l.rel !== 'sprite' && l.rel !== 'format'))
 // A material made from texture maps lists its maps by role instead of as "Needs"; a texture or model that belongs

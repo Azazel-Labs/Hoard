@@ -1197,6 +1197,7 @@ asset-rel-guess = 関連している可能性
 asset-rel-sidecar = ストア情報
 asset-rel-variant = バリエーション
 asset-rel-sprite = スプライト
+asset-rel-sample = サンプル
 asset-role-map = { $role } マップ
 asset-maps-count = { $count } 個のマップ
 asset-needs = 必要なもの

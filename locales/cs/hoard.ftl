@@ -1398,6 +1398,7 @@ asset-rel-guess = nejspíš patří k
 asset-rel-sidecar = údaje z obchodu
 asset-rel-variant = varianta
 asset-rel-sprite = sprite
+asset-rel-sample = vzorek
 asset-role-map = mapa typu { $role }
 asset-maps-count =
     { $count ->

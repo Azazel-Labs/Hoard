@@ -171,3 +171,33 @@ test('an AI finds a sound over MCP by the word for it or by its own reading of i
     await api.post('/api/archive/purge', { data: { packs: [pack.id] } })
   }
 })
+
+test('an SFZ instrument plays a few notes on its samples, which go with it', async ({ api }) => {
+  const name = `E2E Instrument ${unique()}`
+  const sfz = '<control> default_path=Samples\\\n<region> sample=Hit.wav pitch_keycenter=60 lokey=c3 hikey=c6\n'
+  const pack = await uploadPack(api, name, [
+    { relpath: 'kalimba.sfz', data: Buffer.from(sfz) },
+    { relpath: 'Samples/Hit.wav', data: sound('zap', 1) },
+  ])
+  try {
+    await waitReady(api, [pack.id])
+    const assets = await assetsOf(api, pack.id)
+    const at = (path: string) => assets.find((a) => a.path === path)!
+    const detail = (await (await api.get(`/api/assets/${at('kalimba.sfz').id}`)).json()) as {
+      kind: string
+      has_thumb: boolean
+      meta: Record<string, unknown>
+      links: { path: string; rel: string }[]
+    }
+    expect(detail.kind).toBe('audio')
+    expect(detail.has_thumb).toBe(true)
+    expect(detail.meta).toMatchObject({ preview: 'mp3', key_range: 'C3–C6', regions: 1, samples: 1 })
+    expect(detail.links).toEqual([expect.objectContaining({ path: 'Samples/Hit.wav', rel: 'sample' })])
+    // The sample is part of the instrument, so it stays out of the grid with the other supporting files.
+    const shown = await api.get('/api/assets', { params: { pack: pack.id, limit: 500, facets: false, hide_supporting: true } })
+    expect(((await shown.json()) as { items: { path: string }[] }).items.map((a) => a.path)).toEqual(['kalimba.sfz'])
+  } finally {
+    await api.post('/api/archive', { data: { packs: [pack.id] } })
+    await api.post('/api/archive/purge', { data: { packs: [pack.id] } })
+  }
+})

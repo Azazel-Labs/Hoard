@@ -1179,6 +1179,7 @@ asset-rel-guess = 함께 쓰는 것으로 보임
 asset-rel-sidecar = 스토어 정보
 asset-rel-variant = 변형
 asset-rel-sprite = 스프라이트
+asset-rel-sample = 샘플
 asset-role-map = { $role } 맵
 asset-maps-count = 맵 { $count }개
 asset-needs = 필요한 파일

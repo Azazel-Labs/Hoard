@@ -5,6 +5,7 @@
 //! - FBX: texture file names embedded in the binary (absolute artist paths are matched by file name)
 //! - DAE: `<init_from>` image paths
 //! - .blend: external image paths and linked libraries (other .blend files)
+//! - SFZ: the samples it plays
 //! - animations: clips and the characters they fit, by skeleton or `Model@Clip.fbx` name (see [`crate::animations`])
 //! - guesses: textures whose name starts with the model's name, for models that reference nothing, from the model's
 //!   own part of the pack (its folder's parent and below: `Models/` and `Textures/` side by side)
@@ -67,6 +68,9 @@ pub(crate) fn extract_refs(local: &Path, ext: &str) -> Vec<Ref> {
                 .collect()
         }),
         "atlas" => text_file(local).map(|t| atlas_refs(&t)),
+        "sfz" => crate::instruments::sfz_samples(local)
+            .ok()
+            .map(|samples| samples.into_iter().map(|t| Ref { target: t, rel: LinkRel::Sample }).collect()),
         "mat" | "prefab" | "unity" | "asset" | "controller" | "overridecontroller" | "physicmaterial" | "mask"
         | "anim" => unity_refs(local),
         "uasset" | "umap" => hoard_unreal::read(local)

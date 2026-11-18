@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "4adadca582e460681422236b72524c1cf5c8ead11cf3b1b7bd76ac895d47cafd"
+source = "0dc244f6468edb8686d783f359a288bd8b09d1d75401bf7f226eb5c9c8eeab23"
 translation = "72f8bea74267d1a6341481bb8f995cf690d50c49c33ba6825335f86fe2349868"
 
 [messages.account-add]
@@ -2397,6 +2397,10 @@ translation = "συνδεδεμένο αρχείο"
 [messages.asset-rel-material]
 source = "material file"
 translation = "αρχείο υλικού"
+
+[messages.asset-rel-sample]
+source = "sample"
+translation = "δείγμα"
 
 [messages.asset-rel-sidecar]
 source = "store details"

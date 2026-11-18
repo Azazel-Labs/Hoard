@@ -1298,6 +1298,7 @@ asset-rel-guess = hører trolig til
 asset-rel-sidecar = butikkdetaljer
 asset-rel-variant = variant
 asset-rel-sprite = sprite
+asset-rel-sample = sample
 asset-role-map = { $role }-kart
 asset-maps-count =
     { $count ->

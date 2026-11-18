@@ -1326,6 +1326,7 @@ asset-rel-guess = va probablement avec
 asset-rel-sidecar = informations de boutique
 asset-rel-variant = variante
 asset-rel-sprite = sprite
+asset-rel-sample = échantillon
 asset-role-map = carte { $role }
 asset-maps-count =
     { $count ->

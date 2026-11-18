@@ -1201,6 +1201,7 @@ asset-rel-guess = mungkin terkait
 asset-rel-sidecar = detail toko
 asset-rel-variant = varian
 asset-rel-sprite = sprite
+asset-rel-sample = sampel
 asset-role-map = map { $role }
 asset-maps-count = { $count } map
 asset-needs = Memerlukan

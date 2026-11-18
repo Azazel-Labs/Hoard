@@ -1205,6 +1205,7 @@ asset-rel-guess = valószínűleg hozzá tartozik
 asset-rel-sidecar = áruházi adatok
 asset-rel-variant = változat
 asset-rel-sprite = sprite
+asset-rel-sample = minta
 asset-role-map = térkép: { $role }
 asset-maps-count = { $count } térkép
 asset-needs = Igényli

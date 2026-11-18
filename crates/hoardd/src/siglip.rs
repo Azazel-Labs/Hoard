@@ -12,7 +12,8 @@ use anyhow::{Context, Result, ensure};
 use candle_core::{DType, Device, IndexOp, Module, Tensor};
 use candle_nn::{Conv2d, LayerNorm, Linear, VarBuilder};
 
-use crate::clip::{Attention, normalized, read_tensors, safetensors_header};
+use crate::clip::Attention;
+use crate::embed::{normalized, read_tensors, safetensors_header};
 
 /// Stored with each embedding.
 pub(crate) const MODEL: &str = "siglip2-b32-256";

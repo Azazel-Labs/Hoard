@@ -19,19 +19,18 @@
 //! switching back and forth keeps what each learned.
 
 use std::collections::HashMap;
-use std::io::{Read, Seek, SeekFrom};
 use std::path::{Path, PathBuf};
 use std::sync::atomic::{AtomicBool, AtomicU64, Ordering};
-use std::sync::{Arc, LazyLock, Mutex, PoisonError, RwLock};
-use std::time::{Duration, Instant};
+use std::sync::{Arc, Mutex, PoisonError, RwLock};
 
 use anyhow::{Context, Result, ensure};
 use candle_core::{DType, Device, IndexOp, Module, Tensor};
 use candle_nn::{Embedding, LayerNorm, Linear, VarBuilder};
-use rusqlite::params;
-use serde::Deserialize;
 
-use crate::tools::{self, Slot, Status};
+use crate::embed::{
+    Entry, Index, Model, Spec, Table, Text, files_present, in_pool, normalized, quantize, read_tensors,
+};
+use crate::tools::{Slot, Status};
 use crate::{AppState, db, hosted, siglip};
 
 /// What image search runs, stored with each embedding.
@@ -181,180 +180,8 @@ fn tokens(tokenizer: &tokenizers::Tokenizer, text: &str) -> Result<Vec<u32>> {
     Ok(ids)
 }
 
-/// The tensors whose names start with one of `prefixes`, read from a safetensors file one at a time (so loading half
-/// the model never holds the other half, or the whole file, in memory).
-pub(crate) fn read_tensors(path: &Path, prefixes: &[&str]) -> Result<HashMap<String, Tensor>> {
-    let (base, header) = safetensors_header(path)?;
-    let mut file = std::fs::File::open(path).with_context(|| format!("open {}", path.display()))?;
-    let mut out = HashMap::new();
-    for (name, info) in header {
-        if !prefixes.iter().any(|p| name.starts_with(p)) {
-            continue;
-        }
-        // Position ids (I64) are buffers the model doesn't need; every weight is F32.
-        if info.dtype != "F32" {
-            continue;
-        }
-        let [start, end] = info.data_offsets;
-        let count: usize = info.shape.iter().product();
-        ensure!(end >= start && (end - start) as usize == count * 4, "tensor {name} has the wrong size");
-        file.seek(SeekFrom::Start(base + start))?;
-        let mut bytes = vec![0u8; count * 4];
-        file.read_exact(&mut bytes)?;
-        let values: Vec<f32> = bytes.as_chunks::<4>().0.iter().map(|b| f32::from_le_bytes(*b)).collect();
-        out.insert(name, Tensor::from_vec(values, info.shape, &Device::Cpu)?);
-    }
-    ensure!(!out.is_empty(), "the model file has none of the tensors needed");
-    Ok(out)
-}
-
-/// A tensor in a safetensors file.
-#[derive(Debug, Deserialize)]
-pub(crate) struct TensorInfo {
-    pub(crate) dtype: String,
-    pub(crate) shape: Vec<usize>,
-    /// From `base`, see [`safetensors_header`].
-    pub(crate) data_offsets: [u64; 2],
-}
-
-/// Where a safetensors file's data starts, and its tensors.
-pub(crate) fn safetensors_header(path: &Path) -> Result<(u64, HashMap<String, TensorInfo>)> {
-    let mut file = std::fs::File::open(path).with_context(|| format!("open {}", path.display()))?;
-    let mut len = [0u8; 8];
-    file.read_exact(&mut len)?;
-    let len = u64::from_le_bytes(len);
-    ensure!(len < 16 << 20, "the model file's header is unexpectedly large");
-    let mut header = vec![0u8; len as usize];
-    file.read_exact(&mut header)?;
-    let header: HashMap<String, serde_json::Value> = serde_json::from_slice(&header)?;
-    let tensors = header
-        .into_iter()
-        .filter(|(name, _)| name != "__metadata__")
-        .map(|(name, info)| {
-            let info = serde_json::from_value(info).with_context(|| format!("tensor {name}"))?;
-            Ok((name, info))
-        })
-        .collect::<Result<_>>()?;
-    Ok((8 + len, tensors))
-}
-
-pub(crate) fn normalized(mut v: Vec<f32>) -> Vec<f32> {
-    let norm = v.iter().map(|x| x * x).sum::<f32>().sqrt();
-    if norm > 0.0 {
-        for x in &mut v {
-            *x /= norm;
-        }
-    }
-    v
-}
-
-/// Signed bytes scaled so the largest is ±127.
-pub(crate) fn quantize(v: &[f32]) -> Vec<i8> {
-    let max = v.iter().fold(0.0f32, |m, x| m.max(x.abs()));
-    let k = if max > 0.0 { 127.0 / max } else { 0.0 };
-    v.iter().map(|x| (x * k).round().clamp(-127.0, 127.0) as i8).collect()
-}
-
 // ---------------------------------------------------------------------------------------------
-// Model files and status (shared with sound search, see `crate::clap`)
-
-/// A model that's downloaded when its search is turned on.
-#[derive(Debug)]
-pub(crate) struct Model {
-    /// Its folder in `<cache>/models`.
-    pub(crate) name: &'static str,
-    pub(crate) repo: &'static str,
-    pub(crate) files: &'static Files,
-    /// What it's for, as the log and the activity say it.
-    pub(crate) what: &'static str,
-    /// The activity's kind while it downloads.
-    pub(crate) activity: &'static str,
-}
-
-/// A model's files: name, size and SHA-256 of each.
-pub(crate) type Files = [(&'static str, u64, &'static str)];
-
-impl Model {
-    fn dir(&self, state: &AppState) -> PathBuf {
-        state.cfg.models_dir().join(self.name)
-    }
-
-    /// Find the model, downloading it if need be, and run `ready` once it's there. Retries hourly while it can't be
-    /// had, until `slot` is restarted.
-    pub(crate) fn fetch<F>(&'static self, state: &AppState, slot: &'static Slot<PathBuf>, ready: fn(AppState) -> F)
-    where
-        F: Future<Output = ()> + Send + 'static,
-    {
-        let generation = slot.restart(Status::Looking);
-        let st = Arc::clone(state);
-        tokio::spawn(async move {
-            let dir = self.dir(&st);
-            loop {
-                if files_present(&dir, self.files) {
-                    if slot.set(generation, Status::Ready(dir.clone())) {
-                        tracing::info!(dir = %dir.display(), what = self.what, "model ready");
-                        ready(st).await;
-                    }
-                    return;
-                }
-                if !slot.set(generation, Status::Downloading) {
-                    return;
-                }
-                if let Err(e) = self.download(&dir, &|| !slot.current(generation)).await {
-                    if !slot.current(generation) {
-                        return;
-                    }
-                    let msg = format!("{e:#}");
-                    tracing::warn!(error = %msg, what = self.what, "couldn't download the model; retrying in an hour");
-                    slot.set(generation, Status::Unavailable(msg));
-                    tokio::time::sleep(Duration::from_secs(3600)).await;
-                    if !slot.current(generation) {
-                        return;
-                    }
-                }
-            }
-        });
-    }
-
-    /// The search was switched off: the model goes (the embeddings stay, for when it's back on).
-    pub(crate) async fn remove_files(&self, state: &AppState) {
-        let dir = self.dir(state);
-        if dir.is_dir()
-            && let Err(e) = tokio::fs::remove_dir_all(&dir).await
-        {
-            tracing::warn!(dir = %dir.display(), error = %e, "couldn't remove a model");
-        }
-    }
-
-    /// Fetch whichever files aren't there yet, each checked against its SHA-256.
-    async fn download(&self, dir: &Path, canceled: &(dyn Fn() -> bool + Sync)) -> Result<()> {
-        let http = tools::client()?;
-        tokio::fs::create_dir_all(dir).await?;
-        let activity = crate::activity::start(self.activity, format!("Downloading the {} model", self.what), None);
-        for &(name, size, sha256) in self.files {
-            let dest = dir.join(name);
-            if std::fs::metadata(&dest).is_ok_and(|m| m.len() == size) {
-                continue;
-            }
-            activity.detail(name);
-            let part = dir.join(format!("{name}.part"));
-            let fetched = tools::fetch(&http, &format!("{}/{name}", self.repo), &part, size, &activity, canceled)
-                .await
-                .with_context(|| format!("downloading {name}"))?;
-            if fetched.sha256 != sha256 {
-                tokio::fs::remove_file(&part).await.ok();
-                anyhow::bail!("{name} doesn't match its SHA-256");
-            }
-            tokio::fs::rename(&part, &dest).await?;
-        }
-        Ok(())
-    }
-}
-
-/// All the files, at their sizes (their hashes were checked when they were downloaded).
-fn files_present(dir: &Path, files: &Files) -> bool {
-    files.iter().all(|(name, size, _)| std::fs::metadata(dir.join(name)).is_ok_and(|m| m.len() == *size))
-}
+// Model files and status
 
 static SIGLIP: Model =
     Model { name: siglip::MODEL, repo: siglip::REPO, files: &siglip::FILES, what: "image search", activity: "clip" };
@@ -505,91 +332,6 @@ async fn relearned(state: &AppState) -> Result<()> {
 // ---------------------------------------------------------------------------------------------
 // Text embeddings for searches
 
-/// How long a text half stays loaded after the last search.
-const TEXT_IDLE: Duration = Duration::from_mins(15);
-
-#[derive(Debug)]
-struct Loaded<M> {
-    model: Arc<M>,
-    used: Instant,
-    /// Recent searches' embeddings, as people scroll through the same results.
-    recent: HashMap<String, Arc<Vec<f32>>>,
-}
-
-/// A model's text half, loaded on the first search and dropped after a while without one.
-#[derive(Debug)]
-pub(crate) struct Text<M> {
-    loaded: Mutex<Option<Loaded<M>>>,
-    unloader: std::sync::Once,
-    what: &'static str,
-    load: fn(&Path) -> Result<M>,
-    embed: fn(&M, &str) -> Result<Vec<f32>>,
-}
-
-impl<M: Send + Sync + 'static> Text<M> {
-    pub(crate) const fn new(
-        what: &'static str,
-        load: fn(&Path) -> Result<M>,
-        embed: fn(&M, &str) -> Result<Vec<f32>>,
-    ) -> Self {
-        Self { loaded: Mutex::new(None), unloader: std::sync::Once::new(), what, load, embed }
-    }
-
-    pub(crate) fn clear(&self) {
-        *self.loaded.lock().unwrap_or_else(PoisonError::into_inner) = None;
-    }
-
-    /// Drop the model once nobody has searched for a while.
-    pub(crate) fn unload_when_idle(&'static self) {
-        self.unloader.call_once(|| {
-            tokio::spawn(async move {
-                loop {
-                    tokio::time::sleep(Duration::from_secs(60)).await;
-                    let mut guard = self.loaded.lock().unwrap_or_else(PoisonError::into_inner);
-                    if guard.as_ref().is_some_and(|l| l.used.elapsed() > TEXT_IDLE) {
-                        *guard = None;
-                        tracing::debug!(what = self.what, "text model unloaded");
-                    }
-                }
-            });
-        });
-    }
-
-    /// The embedding of `text` with the model in `dir`.
-    pub(crate) async fn embed(&'static self, dir: PathBuf, text: String) -> Result<Arc<Vec<f32>>> {
-        let model = {
-            let mut guard = self.loaded.lock().unwrap_or_else(PoisonError::into_inner);
-            if let Some(l) = guard.as_mut() {
-                l.used = Instant::now();
-                if let Some(v) = l.recent.get(&text) {
-                    return Ok(Arc::clone(v));
-                }
-                Some(Arc::clone(&l.model))
-            } else {
-                None
-            }
-        };
-        let model = if let Some(m) = model {
-            m
-        } else {
-            let started = Instant::now();
-            let load = self.load;
-            let m = Arc::new(tokio::task::spawn_blocking(move || load(&dir)).await??);
-            tracing::info!(ms = started.elapsed().as_millis(), what = self.what, "text model loaded");
-            m
-        };
-        let (m, t, embed) = (Arc::clone(&model), text.clone(), self.embed);
-        let v = Arc::new(tokio::task::spawn_blocking(move || embed(&m, &t)).await??);
-        let mut guard = self.loaded.lock().unwrap_or_else(PoisonError::into_inner);
-        let loaded = guard.get_or_insert_with(|| Loaded { model, used: Instant::now(), recent: HashMap::new() });
-        if loaded.recent.len() >= 64 {
-            loaded.recent.clear();
-        }
-        loaded.recent.insert(text, Arc::clone(&v));
-        Ok(v)
-    }
-}
-
 static TEXT: Text<siglip::TextModel> = Text::new("image search", siglip::TextModel::load, siglip::TextModel::embed);
 static CLIP_TEXT: Text<TextModel> = Text::new("image search (CLIP)", TextModel::load, TextModel::embed);
 
@@ -617,56 +359,6 @@ async fn embed_text_clip(state: &AppState, text: &str) -> Result<Option<Arc<Vec<
 
 // ---------------------------------------------------------------------------------------------
 // Index and ranking
-
-#[derive(Debug)]
-pub(crate) struct Entry {
-    v: Box<[i8]>,
-    /// 1 / the vector's length, so a dot product becomes a cosine.
-    inv_norm: f32,
-}
-
-impl Entry {
-    /// `None` for an empty vector, kept for what isn't a picture (or a sound) after all.
-    pub(crate) fn new(v: Vec<i8>) -> Option<Self> {
-        let norm = v.iter().map(|&x| f32::from(x) * f32::from(x)).sum::<f32>().sqrt();
-        (norm > 0.0).then(|| Self { v: v.into_boxed_slice(), inv_norm: 1.0 / norm })
-    }
-
-    fn cosine(&self, other: &Self) -> f32 {
-        let dot: i32 = self.v.iter().zip(other.v.iter()).map(|(a, b)| i32::from(*a) * i32::from(*b)).sum();
-        dot as f32 * self.inv_norm * other.inv_norm
-    }
-
-    pub(crate) fn cosine_f32(&self, q: &[f32]) -> f32 {
-        self.v.iter().zip(q).map(|(a, b)| f32::from(*a) * b).sum::<f32>() * self.inv_norm
-    }
-}
-
-/// Where an [`Index`]'s embeddings are kept and how its text matches are judged.
-#[derive(Debug)]
-pub(crate) struct Spec {
-    /// Selects each hash and its vector, `?1` being the model.
-    pub(crate) load: &'static str,
-    pub(crate) model: &'static str,
-    /// How many numbers each embedding has; 0 for any.
-    pub(crate) dims: usize,
-    /// What it searches, for the log.
-    pub(crate) what: &'static str,
-    /// The cosines of two unrelated pictures and of the same thing from another angle, for "more like this"; NaN to
-    /// measure them against each picture.
-    pub(crate) unrelated: f32,
-    pub(crate) same: f32,
-    /// The text thresholds below are in standard deviations of each search's scores rather than in cosines.
-    pub(crate) relative: bool,
-    /// How far above the median a text match must score, and how close to the best.
-    pub(crate) lift: f32,
-    pub(crate) margin: f32,
-    /// How far above the median a match always counts, however far ahead the best one is.
-    pub(crate) sure: f32,
-    /// The lift where a text match starts to count, and how much more makes it a strong one.
-    pub(crate) weak: f32,
-    pub(crate) strong: f32,
-}
 
 /// Image search's embeddings: per thumbnail.
 pub(crate) static SPEC: Spec = Spec {
@@ -726,145 +418,12 @@ fn hosted_spec(id: &str) -> &'static Spec {
     spec
 }
 
-/// Every embedding, in memory, loaded on first use and kept up to date by the job.
-#[derive(Debug)]
-pub(crate) struct Index {
-    spec: RwLock<&'static Spec>,
-    map: RwLock<Option<HashMap<String, Entry>>>,
-}
-
-impl Index {
-    pub(crate) const fn new(spec: &'static Spec) -> Self {
-        Self { spec: RwLock::new(spec), map: RwLock::new(None) }
-    }
-
-    fn spec(&self) -> &'static Spec {
-        *self.spec.read().unwrap_or_else(PoisonError::into_inner)
-    }
-
-    /// Search another model's embeddings from now on.
-    pub(crate) fn respec(&self, spec: &'static Spec) {
-        let changed = {
-            let mut cur = self.spec.write().unwrap_or_else(PoisonError::into_inner);
-            let old: &'static Spec = std::mem::replace(&mut *cur, spec);
-            !std::ptr::eq(old, spec)
-        };
-        if changed {
-            self.forget();
-        }
-    }
-
-    fn read<R>(&self, f: impl FnOnce(&HashMap<String, Entry>) -> R) -> Option<R> {
-        self.map.read().unwrap_or_else(PoisonError::into_inner).as_ref().map(f)
-    }
-
-    pub(crate) fn write(&self, f: impl FnOnce(&mut HashMap<String, Entry>)) {
-        if let Some(m) = self.map.write().unwrap_or_else(PoisonError::into_inner).as_mut() {
-            f(m);
-        }
-    }
-
-    pub(crate) async fn ensure(&self, state: &AppState) -> Result<()> {
-        if self.read(|_| ()).is_some() {
-            return Ok(());
-        }
-        let spec = self.spec();
-        let loaded = db::call(&state.pool, move |c| {
-            let mut stmt = c.prepare(spec.load)?;
-            let rows = stmt
-                .query_map([spec.model], |r| Ok((r.get::<_, String>(0)?, r.get::<_, Vec<u8>>(1)?)))?
-                .filter_map(|row| {
-                    let (hash, v) = row.ok()?;
-                    (spec.dims == 0 || v.len() == spec.dims).then_some(())?;
-                    Some((hash, Entry::new(v.into_iter().map(|b| b as i8).collect())?))
-                })
-                .collect::<HashMap<_, _>>();
-            Ok(rows)
-        })
-        .await?;
-        let mut guard = self.map.write().unwrap_or_else(PoisonError::into_inner);
-        // Unless another model's were asked for meanwhile.
-        if guard.is_none() && std::ptr::eq(self.spec(), spec) {
-            tracing::debug!(embeddings = loaded.len(), what = spec.what, "embeddings loaded");
-            *guard = Some(loaded);
-        }
-        Ok(())
-    }
-
-    pub(crate) fn len(&self) -> usize {
-        self.read(HashMap::len).unwrap_or(0)
-    }
-
-    /// Let go of every embedding (they'll be loaded again if wanted).
-    pub(crate) fn forget(&self) {
-        *self.map.write().unwrap_or_else(PoisonError::into_inner) = None;
-    }
-
-    /// How much every thumbnail looks like `hash`'s by meaning, about 0..=1, or `None` when it has no embedding.
-    pub(crate) fn similar(&self, hash: &str) -> Option<HashMap<String, f32>> {
-        let spec = self.spec();
-        self.read(|m| {
-            let target = m.get(hash)?;
-            let cosines: Vec<(&String, f32)> = m.iter().map(|(h, e)| (h, target.cosine(e))).collect();
-            let (unrelated, same) = if spec.unrelated.is_nan() {
-                // The typical picture's score against this one is what unrelated looks like.
-                let mut all: Vec<f32> = cosines.iter().map(|c| c.1).collect();
-                let mid = all.len() / 2;
-                let typical = *all.select_nth_unstable_by(mid, f32::total_cmp).1;
-                (typical, typical + HOSTED_SAME * (1.0 - typical))
-            } else {
-                (spec.unrelated, spec.same)
-            };
-            let score = |cosine: f32| ((cosine - unrelated) / (same - unrelated).max(1e-6)).clamp(0.0, 1.0);
-            Some(cosines.into_iter().map(|(h, c)| (h.clone(), score(c))).collect())
-        })
-        .flatten()
-    }
-
-    /// What matches a text embedding, best first, scored about 0..=0.5.
-    pub(crate) fn matching(&self, q: &[f32]) -> Vec<(String, f32)> {
-        let spec = self.spec();
-        self.read(|m| {
-            let scored: Vec<(&String, f32)> = m.iter().map(|(h, e)| (h, e.cosine_f32(q))).collect();
-            if scored.is_empty() {
-                return Vec::new();
-            }
-            // Each query has its own level (some words sit closer to every picture), so a match is judged by how far
-            // it stands above the typical picture's score for the same words.
-            let mut all: Vec<f32> = scored.iter().map(|s| s.1).collect();
-            let mid = all.len() / 2;
-            let median = *all.select_nth_unstable_by(mid, f32::total_cmp).1;
-            let unit = if spec.relative {
-                let mean = all.iter().sum::<f32>() / all.len() as f32;
-                (all.iter().map(|x| (x - mean) * (x - mean)).sum::<f32>() / all.len() as f32).sqrt()
-            } else {
-                1.0
-            };
-            if unit <= 0.0 || unit.is_nan() {
-                return Vec::new();
-            }
-            let [lift, margin, sure, weak, strong] =
-                [spec.lift, spec.margin, spec.sure, spec.weak, spec.strong].map(|x| x * unit);
-            let best = scored.iter().map(|s| s.1).fold(f32::MIN, f32::max);
-            let floor = (median + lift).max((best - margin).min(median + sure));
-            let mut hits: Vec<(&String, f32)> = scored.into_iter().filter(|s| s.1 >= floor).collect();
-            hits.sort_by(|a, b| b.1.total_cmp(&a.1));
-            hits.truncate(TEXT_MAX);
-            // A strong match counts double a word match in the name (0.25), a borderline one well under it.
-            let score = |above: f32| ((above - weak) / (strong - weak)).clamp(0.0, 1.0) * 0.5;
-            hits.into_iter().map(|(h, c)| (h.clone(), score(c - median))).collect()
-        })
-        .unwrap_or_default()
-    }
-}
-
 /// How far above the median picture a match must score. Words score far lower against pictures than pictures do
 /// against each other: on a mixed library, a true match stands 0.05–0.1 above the median, and words with nothing
 /// to find (a car among rocks and furniture) peak around 0.03.
 const CLIP_LIFT: f32 = 0.045;
 /// Keep only what's within this of the best match.
 const CLIP_MARGIN: f32 = 0.04;
-const TEXT_MAX: usize = 300;
 
 /// The same for SigLIP 2, measured on a mixed library of sprites, tiles and model renders. Unrelated pictures score
 /// about 0.7 against each other, the same thing from another angle or in another format 0.85 and up. A true text
@@ -883,8 +442,6 @@ const HOSTED_LIFT: f32 = 3.0;
 const HOSTED_MARGIN: f32 = 2.2;
 const HOSTED_WEAK: f32 = 2.8;
 const HOSTED_STRONG: f32 = 4.5;
-/// How far from a picture's typical score to a perfect one the same thing from another angle scores, from SigLIP 2's.
-const HOSTED_SAME: f32 = 0.83;
 
 /// The index searches use: SigLIP 2's (or the hosted model's), or CLIP's while it's relearned.
 fn index(state: &AppState) -> Option<&Index> {
@@ -925,26 +482,19 @@ pub(crate) async fn search_text(state: &AppState, text: &str) -> Result<Vec<(Str
 // ---------------------------------------------------------------------------------------------
 // Background job
 
-const MISSING_SQL: &str = "NOT EXISTS (SELECT 1 FROM embeddings e WHERE e.thumb_hash = a.thumb_hash AND e.model = ?1)";
-const ORPHAN_SQL: &str = "NOT EXISTS (SELECT 1 FROM assets a WHERE a.thumb_hash = e.thumb_hash)";
+/// Embeddings are per thumbnail, of what has a look.
+static TABLE: Table = Table {
+    name: "embeddings",
+    key: "thumb_hash",
+    asset_key: "thumb_hash",
+    kinds: crate::looks::KINDS_SQL,
+    orphan: "NOT EXISTS (SELECT 1 FROM assets a WHERE a.thumb_hash = e.thumb_hash)",
+    job: crate::jobs::EMBED,
+};
 
 /// How many thumbnails have an embedding, and how many could, for the Settings page.
 pub(crate) fn progress(conn: &rusqlite::Connection) -> Result<(u64, u64)> {
-    let kinds = crate::looks::KINDS_SQL;
-    let total: i64 = conn.query_row(
-        &format!("SELECT COUNT(DISTINCT a.thumb_hash) FROM assets a WHERE a.thumb_hash IS NOT NULL AND {kinds}"),
-        [],
-        |r| r.get(0),
-    )?;
-    let done: i64 = conn.query_row(
-        &format!(
-            "SELECT COUNT(*) FROM embeddings e WHERE e.model = ?1
-               AND EXISTS (SELECT 1 FROM assets a WHERE a.thumb_hash = e.thumb_hash AND {kinds})"
-        ),
-        [model_id()],
-        |r| r.get(0),
-    )?;
-    Ok((done as u64, total as u64))
+    TABLE.progress(conn, &model_id())
 }
 
 /// Queue an embedding job when image search is on and some thumbnail has no embedding yet.
@@ -952,33 +502,8 @@ pub(crate) async fn schedule(state: &AppState) {
     if !is_ready() {
         return;
     }
-    let kinds = crate::looks::KINDS_SQL;
-    let model = model_id();
-    let queued = db::call(&state.pool, move |c| {
-        let waiting: bool = c.query_row(
-            "SELECT EXISTS (SELECT 1 FROM jobs WHERE kind = ?1 AND status = 'queued')",
-            [crate::jobs::EMBED],
-            |r| r.get(0),
-        )?;
-        if waiting {
-            return Ok(false);
-        }
-        let work: bool = c.query_row(
-            &format!(
-                "SELECT EXISTS (SELECT 1 FROM assets a WHERE a.thumb_hash IS NOT NULL AND {kinds} AND {MISSING_SQL})
-                     OR EXISTS (SELECT 1 FROM embeddings e WHERE {ORPHAN_SQL})"
-            ),
-            [&model],
-            |r| r.get(0),
-        )?;
-        if work {
-            db::enqueue(c, crate::jobs::EMBED, None, &serde_json::json!({}))?;
-        }
-        Ok(work)
-    })
-    .await;
-    match queued {
-        Ok(true) => state.wake.notify_one(),
+    match TABLE.queue(state, model_id()).await {
+        Ok(true) => {}
         Ok(false) => {
             if let Err(e) = relearned(state).await {
                 tracing::warn!(error = ?e, "couldn't let CLIP's embeddings go");
@@ -991,25 +516,6 @@ pub(crate) async fn schedule(state: &AppState) {
 /// Thumbnails read and embedded per round.
 const BATCH: usize = 32;
 
-/// Background threads for the model's arithmetic: half the cores, at low priority.
-static POOL: LazyLock<Option<rayon::ThreadPool>> = LazyLock::new(|| {
-    let threads = std::thread::available_parallelism().map_or(1, |n| (n.get() / 2).max(1));
-    rayon::ThreadPoolBuilder::new()
-        .num_threads(threads)
-        .thread_name(|i| format!("hoard-clip-{i}"))
-        .start_handler(|_| crate::heavy::lower_priority())
-        .build()
-        .map_err(|e| tracing::warn!(error = %e, "couldn't start the image search threads"))
-        .ok()
-});
-
-pub(crate) fn in_pool<T: Send>(f: impl FnOnce() -> T + Send) -> T {
-    match POOL.as_ref() {
-        Some(pool) => pool.install(f),
-        None => f(),
-    }
-}
-
 /// Embed every thumbnail that has no embedding, and forget the ones nothing uses.
 pub(crate) async fn run_job(state: &AppState) -> Result<()> {
     let (remote, dir) = (hosted(), SLOT.ready());
@@ -1018,15 +524,7 @@ pub(crate) async fn run_job(state: &AppState) -> Result<()> {
     }
     let id = model_id();
     state.pictures.ensure(state).await?;
-    let gone: Vec<String> = db::call(&state.pool, |c| {
-        let gone = c
-            .prepare(&format!("SELECT thumb_hash FROM embeddings e WHERE {ORPHAN_SQL}"))?
-            .query_map([], |r| r.get(0))?
-            .collect::<rusqlite::Result<Vec<String>>>()?;
-        c.execute(&format!("DELETE FROM embeddings AS e WHERE {ORPHAN_SQL}"), [])?;
-        Ok(gone)
-    })
-    .await?;
+    let gone = TABLE.forget_orphans(state).await?;
     for index in [&state.pictures, &state.clip] {
         index.write(|m| {
             for h in &gone {
@@ -1035,7 +533,6 @@ pub(crate) async fn run_job(state: &AppState) -> Result<()> {
         });
     }
 
-    let kinds = crate::looks::KINDS_SQL;
     let mut model: Option<Arc<siglip::VisionModel>> = None;
     let mut unreadable = std::collections::HashSet::new();
     let mut done = 0usize;
@@ -1044,8 +541,9 @@ pub(crate) async fn run_job(state: &AppState) -> Result<()> {
         let todo: Vec<String> = db::call(&state.pool, move |c| {
             let rows = c
                 .prepare(&format!(
-                    "SELECT DISTINCT a.thumb_hash FROM assets a
-                      WHERE a.thumb_hash IS NOT NULL AND {kinds} AND {MISSING_SQL}"
+                    "SELECT DISTINCT a.thumb_hash FROM assets a WHERE {} AND {}",
+                    TABLE.wanted(),
+                    TABLE.missing()
                 ))?
                 .query_map([want], |r| r.get(0))?
                 .collect::<rusqlite::Result<Vec<String>>>()?;
@@ -1086,7 +584,7 @@ pub(crate) async fn run_job(state: &AppState) -> Result<()> {
                 };
                 crate::heavy::run("clip", move || in_pool(|| embed_all(&m, &pictures))).await??
             };
-            save(state, &computed, &id).await?;
+            TABLE.save(state, &id, &computed).await?;
             done += chunk.len();
             state.pictures.write(|m| {
                 for (hash, v) in computed {
@@ -1112,44 +610,9 @@ fn embed_all(
     Ok(prepared.into_iter().map(|(h, p)| (h, p.and_then(|_| embedded.next()).map(|v| quantize(&v)))).collect())
 }
 
-async fn save(state: &AppState, computed: &[(String, Option<Vec<i8>>)], model: &str) -> Result<()> {
-    let rows: Vec<(String, Vec<u8>)> = computed
-        .iter()
-        // Not a picture after all: an empty row, so it isn't tried again.
-        .map(|(h, v)| (h.clone(), v.as_ref().map_or_default(|v| v.iter().map(|&x| x as u8).collect())))
-        .collect();
-    let model = model.to_owned();
-    db::call(&state.pool, move |c| {
-        let tx = c.transaction()?;
-        {
-            let mut stmt =
-                tx.prepare("INSERT OR REPLACE INTO embeddings (thumb_hash, model, vector) VALUES (?1, ?2, ?3)")?;
-            for (hash, v) in &rows {
-                stmt.execute(params![hash, model, v])?;
-            }
-        }
-        tx.commit()?;
-        Ok(())
-    })
-    .await
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
-
-    #[test]
-    fn quantized_vectors_keep_their_cosine() {
-        let a = normalized((0..CLIP_DIMS).map(|i| ((i * 7) % 13) as f32 - 6.0).collect());
-        let b = normalized((0..CLIP_DIMS).map(|i| ((i * 5) % 11) as f32 - 5.0 + (i % 3) as f32).collect());
-        let exact: f32 = a.iter().zip(&b).map(|(x, y)| x * y).sum();
-        let (qa, qb) = (Entry::new(quantize(&a)).unwrap(), Entry::new(quantize(&b)).unwrap());
-        assert!((qa.cosine(&qb) - exact).abs() < 0.01, "{} vs {exact}", qa.cosine(&qb));
-        assert!((qa.cosine_f32(&b) - exact).abs() < 0.01);
-        assert!((qa.cosine(&qa) - 1.0).abs() < 1e-4);
-        assert!(Entry::new(vec![0; CLIP_DIMS]).is_none(), "an unreadable thumbnail's empty vector");
-        assert!(Entry::new(Vec::new()).is_none());
-    }
 
     #[test]
     fn text_matches_stand_above_the_median() {
@@ -1165,7 +628,7 @@ mod tests {
         let mut m: HashMap<String, Entry> = (0..20).map(|i| (format!("t{i}"), entry(0.3))).collect();
         m.insert("strong".into(), entry(0.6));
         m.insert("faint".into(), entry(0.32));
-        *index.map.write().unwrap() = Some(m);
+        index.set(m);
         let hits = index.matching(&q);
         assert_eq!(hits.len(), 1, "{hits:?}");
         assert_eq!(hits[0].0, "strong");
@@ -1182,7 +645,7 @@ mod tests {
             let mut m: HashMap<String, Entry> =
                 (0..60).map(|i| (format!("t{i}"), entry(base + (i % 10) as f32 * 0.004))).collect();
             m.insert("strong".into(), entry(base + 0.2));
-            *index.map.write().unwrap() = Some(m);
+            index.set(m);
             let hits = index.matching(&q);
             assert_eq!(hits.iter().map(|h| h.0.as_str()).collect::<Vec<_>>(), ["strong"], "{base}: {hits:?}");
             assert!(hits[0].1 > 0.25);

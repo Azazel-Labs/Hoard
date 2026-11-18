@@ -136,7 +136,7 @@ pub(super) const MIGRATIONS: &[&str] = &[
        vector     BLOB NOT NULL,
        PRIMARY KEY (thumb_hash, model)
      ) WITHOUT ROWID;",
-    // 21: materials made from texture maps (see `materials.rs`): which textures each one uses, and as what. Every
+    // 21: materials made from texture maps (see `materials`): which textures each one uses, and as what. Every
     // pack gets a look for them.
     "CREATE TABLE material_maps (
        material_id TEXT NOT NULL REFERENCES assets(id) ON DELETE CASCADE,

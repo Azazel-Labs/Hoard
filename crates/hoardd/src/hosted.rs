@@ -284,7 +284,7 @@ impl Client {
         }
         let r = request(http, &self.hosted, &Batch::Words(text), 1).await;
         self.note(&r);
-        let v = std::sync::Arc::new(crate::clip::normalized(r?.swap_remove(0)));
+        let v = std::sync::Arc::new(crate::embed::normalized(r?.swap_remove(0)));
         let mut recent = self.recent.lock().unwrap_or_else(PoisonError::into_inner);
         if recent.len() >= 64 {
             recent.clear();

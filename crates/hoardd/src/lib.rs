@@ -29,6 +29,7 @@ mod directory;
 #[path = "directory_off.rs"]
 mod directory;
 mod dragonbones;
+mod embed;
 mod error;
 mod extract;
 mod ffmpeg;
@@ -138,11 +139,11 @@ pub(crate) struct Inner {
     /// Every thumbnail's look, for "find by color" and "more like this".
     pub(crate) looks: looks::Index,
     /// Every thumbnail's SigLIP 2 embedding, for image search.
-    pub(crate) pictures: clip::Index,
+    pub(crate) pictures: embed::Index,
     /// Every thumbnail's CLIP embedding, which image search uses until SigLIP 2 has relearned them.
-    pub(crate) clip: clip::Index,
+    pub(crate) clip: embed::Index,
     /// Every sound's CLAP embedding, for searching sounds by what they sound like, in words.
-    pub(crate) clap: clip::Index,
+    pub(crate) clap: embed::Index,
     /// The library's sets of near copies, for the duplicates page.
     pub(crate) near_copies: nearcopies::Cache,
     /// Every sound's acoustic descriptor, for "more like this" on sounds.
@@ -215,9 +216,9 @@ pub async fn run(cfg: Config) -> Result<()> {
         http,
         settings,
         looks: looks::Index::default(),
-        pictures: clip::Index::new(&clip::SPEC),
-        clip: clip::Index::new(&clip::CLIP_SPEC),
-        clap: clip::Index::new(&clap::SPEC),
+        pictures: embed::Index::new(&clip::SPEC),
+        clip: embed::Index::new(&clip::CLIP_SPEC),
+        clap: embed::Index::new(&clap::SPEC),
         sounds: sounds::Index::default(),
         near_copies: nearcopies::Cache::default(),
     });

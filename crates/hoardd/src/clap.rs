@@ -18,9 +18,8 @@ use std::sync::Arc;
 use anyhow::{Result, ensure};
 use candle_core::{DType, Device, IndexOp, Module, Tensor};
 use candle_nn::{Conv2d, Embedding, LayerNorm, Linear, VarBuilder};
-use rusqlite::params;
 
-use crate::clip::{Entry, Model, Spec, Text, normalized, quantize, read_tensors};
+use crate::embed::{Entry, Model, Spec, Table, Text, in_pool, normalized, quantize, read_tensors};
 use crate::tools::{Slot, Status};
 use crate::{AppState, db};
 
@@ -673,59 +672,27 @@ pub(crate) async fn search_text(state: &AppState, text: &str) -> Result<Vec<(Str
 // ---------------------------------------------------------------------------------------------
 // Background job
 
-const KINDS_SQL: &str = crate::sounds::KINDS_SQL;
-const MISSING_SQL: &str = "NOT EXISTS (SELECT 1 FROM sound_embeddings e WHERE e.hash = a.blob_hash AND e.model = ?1)";
-const ORPHAN_SQL: &str = "NOT EXISTS (SELECT 1 FROM assets a WHERE a.blob_hash = e.hash AND a.kind = 'audio')";
+/// Embeddings are per sound file.
+static TABLE: Table = Table {
+    name: "sound_embeddings",
+    key: "hash",
+    asset_key: "blob_hash",
+    kinds: crate::sounds::KINDS_SQL,
+    orphan: "NOT EXISTS (SELECT 1 FROM assets a WHERE a.blob_hash = e.hash AND a.kind = 'audio')",
+    job: crate::jobs::HEAR,
+};
 
 /// How many sound files have an embedding, and how many could, for the Settings page.
 pub(crate) fn progress(conn: &rusqlite::Connection) -> Result<(u64, u64)> {
-    let total: i64 =
-        conn.query_row(&format!("SELECT COUNT(DISTINCT a.blob_hash) FROM assets a WHERE {KINDS_SQL}"), [], |r| {
-            r.get(0)
-        })?;
-    let done: i64 = conn.query_row(
-        &format!(
-            "SELECT COUNT(*) FROM sound_embeddings e WHERE e.model = ?1
-               AND EXISTS (SELECT 1 FROM assets a WHERE a.blob_hash = e.hash AND {KINDS_SQL})"
-        ),
-        [MODEL],
-        |r| r.get(0),
-    )?;
-    Ok((done as u64, total as u64))
+    TABLE.progress(conn, MODEL)
 }
 
 /// Queue a job when sound search is on and some sound has no embedding yet.
 pub(crate) async fn schedule(state: &AppState) {
-    if !is_ready() {
-        return;
-    }
-    let queued = db::call(&state.pool, |c| {
-        let waiting: bool = c.query_row(
-            "SELECT EXISTS (SELECT 1 FROM jobs WHERE kind = ?1 AND status = 'queued')",
-            [crate::jobs::HEAR],
-            |r| r.get(0),
-        )?;
-        if waiting {
-            return Ok(false);
-        }
-        let work: bool = c.query_row(
-            &format!(
-                "SELECT EXISTS (SELECT 1 FROM assets a WHERE {KINDS_SQL} AND {MISSING_SQL})
-                     OR EXISTS (SELECT 1 FROM sound_embeddings e WHERE {ORPHAN_SQL})"
-            ),
-            [MODEL],
-            |r| r.get(0),
-        )?;
-        if work {
-            db::enqueue(c, crate::jobs::HEAR, None, &serde_json::json!({}))?;
-        }
-        Ok(work)
-    })
-    .await;
-    match queued {
-        Ok(true) => state.wake.notify_one(),
-        Ok(false) => {}
-        Err(e) => tracing::warn!(error = ?e, "could not queue the sound search job"),
+    if is_ready()
+        && let Err(e) = TABLE.queue(state, MODEL.to_owned()).await
+    {
+        tracing::warn!(error = ?e, "could not queue the sound search job");
     }
 }
 
@@ -738,15 +705,7 @@ const MAX_BYTES: u64 = 12 << 20;
 pub(crate) async fn run_job(state: &AppState) -> Result<()> {
     let Some(dir) = SLOT.ready() else { return Ok(()) };
     state.clap.ensure(state).await?;
-    let gone: Vec<String> = db::call(&state.pool, |c| {
-        let gone = c
-            .prepare(&format!("SELECT hash FROM sound_embeddings e WHERE {ORPHAN_SQL}"))?
-            .query_map([], |r| r.get(0))?
-            .collect::<rusqlite::Result<Vec<String>>>()?;
-        c.execute(&format!("DELETE FROM sound_embeddings AS e WHERE {ORPHAN_SQL}"), [])?;
-        Ok(gone)
-    })
-    .await?;
+    let gone = TABLE.forget_orphans(state).await?;
     state.clap.write(|m| {
         for h in &gone {
             m.remove(h);
@@ -761,7 +720,9 @@ pub(crate) async fn run_job(state: &AppState) -> Result<()> {
         let todo: Vec<(String, String)> = db::call(&state.pool, move |c| {
             let rows = c
                 .prepare(&format!(
-                    "SELECT a.blob_hash, MIN(a.ext) FROM assets a WHERE {KINDS_SQL} AND {MISSING_SQL} GROUP BY a.blob_hash"
+                    "SELECT a.blob_hash, MIN(a.ext) FROM assets a WHERE {} AND {} GROUP BY a.blob_hash",
+                    TABLE.wanted(),
+                    TABLE.missing()
                 ))?
                 .query_map([MODEL], |r| Ok((r.get(0)?, r.get(1)?)))?
                 .collect::<rusqlite::Result<Vec<(String, String)>>>()?;
@@ -796,8 +757,8 @@ pub(crate) async fn run_job(state: &AppState) -> Result<()> {
                 }
             }
             let m = Arc::clone(&model);
-            let computed = crate::heavy::run("clap", move || crate::clip::in_pool(|| embed_all(&m, &files))).await??;
-            save(state, &computed).await?;
+            let computed = crate::heavy::run("clap", move || in_pool(|| embed_all(&m, &files))).await??;
+            TABLE.save(state, MODEL, &computed).await?;
             done += chunk.len();
             state.clap.write(|m| {
                 for (hash, v) in computed {
@@ -824,27 +785,6 @@ fn embed_all(model: &AudioModel, files: &[(String, String, bytes::Bytes)]) -> Re
     let inputs: Vec<Vec<f32>> = prepared.iter().filter_map(|(_, p)| p.clone()).collect();
     let mut embedded = model.embed(&inputs)?.into_iter();
     Ok(prepared.into_iter().map(|(h, p)| (h, p.and_then(|_| embedded.next()).map(|v| quantize(&v)))).collect())
-}
-
-async fn save(state: &AppState, computed: &[(String, Option<Vec<i8>>)]) -> Result<()> {
-    let rows: Vec<(String, Vec<u8>)> = computed
-        .iter()
-        // Not a sound this can decode, or silent: an empty row, so it isn't tried again.
-        .map(|(h, v)| (h.clone(), v.as_ref().map_or_default(|v| v.iter().map(|&x| x as u8).collect())))
-        .collect();
-    db::call(&state.pool, move |c| {
-        let tx = c.transaction()?;
-        {
-            let mut stmt =
-                tx.prepare("INSERT OR REPLACE INTO sound_embeddings (hash, model, vector) VALUES (?1, ?2, ?3)")?;
-            for (hash, v) in &rows {
-                stmt.execute(params![hash, MODEL, v])?;
-            }
-        }
-        tx.commit()?;
-        Ok(())
-    })
-    .await
 }
 
 #[cfg(test)]

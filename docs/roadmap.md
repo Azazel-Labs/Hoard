@@ -78,7 +78,6 @@ tile sheets that come with only a note of their grid (Kenney's `Tilesheet.txt`).
   published format rather than Spine's runtime (whose license covers only Spine licensees): meshes, IK, transform
   constraints, clipping and skins included, the thumbnail drawn by the browser.
 - [ ] **Spine binary skeletons** (`.skel`): the same rig in Spine's binary export, read into the same player.
-- [ ] Rarer: Spriter `.scml`, Live2D `.moc3`, GameMaker `.yy`, Defold atlases.
 
 ## Images: more formats
 

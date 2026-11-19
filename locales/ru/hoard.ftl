@@ -1309,6 +1309,7 @@ packs-state-any = Любое состояние
 packs-state-working = В работе
 packs-state-failed = С ошибкой
 packs-state-untagged = Ещё без описания
+packs-state-unlicensed = Лицензия не указана
 packs-store = Магазин
 packs-store-any = Любой магазин
 packs-store-from = Из { $store }

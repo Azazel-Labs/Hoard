@@ -7417,6 +7417,10 @@ translation = "Οποιαδήποτε κατάσταση"
 source = "Failed"
 translation = "Απέτυχαν"
 
+[messages.packs-state-unlicensed]
+source = "No license noted"
+translation = "Χωρίς σημειωμένη άδεια χρήσης"
+
 [messages.packs-state-untagged]
 source = "Not described yet"
 translation = "Χωρίς περιγραφή ακόμη"

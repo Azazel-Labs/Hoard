@@ -61,6 +61,11 @@ test.describe('packs page', () => {
     await expect(packNames(page).filter({ hasText: TEXTURES })).toBeVisible()
     await page.getByLabel('Store').selectOption({ label: 'Any store' })
 
+    // Packs no license was found or noted for: the zip's LICENSE.txt gave it one.
+    await page.getByLabel('Status').selectOption({ label: 'No license noted' })
+    await expect(packNames(page).filter({ hasText: TEXTURES })).toBeVisible()
+    await expect(packNames(page).filter({ hasText: ZIPPED })).toHaveCount(0)
+
     await page.getByLabel('Status').selectOption({ label: 'Failed' })
     await expect(page.getByText('No packs match.')).toBeVisible()
     await page.getByRole('button', { name: 'Clear', exact: true }).click()

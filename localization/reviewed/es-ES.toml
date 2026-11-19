@@ -7396,6 +7396,10 @@ translation = "Cualquier estado"
 source = "Failed"
 translation = "Con errores"
 
+[messages.packs-state-unlicensed]
+source = "No license noted"
+translation = "Sin licencia indicada"
+
 [messages.packs-state-untagged]
 source = "Not described yet"
 translation = "Sin describir todavía"

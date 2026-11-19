@@ -1106,6 +1106,7 @@ packs-state-any = Mọi trạng thái
 packs-state-working = Đang xử lý
 packs-state-failed = Thất bại
 packs-state-untagged = Chưa được mô tả
+packs-state-unlicensed = Chưa ghi giấy phép
 packs-store = Cửa hàng
 packs-store-any = Mọi cửa hàng
 packs-store-from = Từ { $store }

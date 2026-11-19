@@ -7488,6 +7488,10 @@ translation = "Orice stare"
 source = "Failed"
 translation = "Eșuate"
 
+[messages.packs-state-unlicensed]
+source = "No license noted"
+translation = "Fără licență notată"
+
 [messages.packs-state-untagged]
 source = "Not described yet"
 translation = "Încă nedescrise"

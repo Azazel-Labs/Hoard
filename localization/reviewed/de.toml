@@ -7368,6 +7368,10 @@ translation = "Jeder Status"
 source = "Failed"
 translation = "Fehlgeschlagen"
 
+[messages.packs-state-unlicensed]
+source = "No license noted"
+translation = "Keine Lizenz vermerkt"
+
 [messages.packs-state-untagged]
 source = "Not described yet"
 translation = "Noch nicht beschrieben"

@@ -1100,6 +1100,7 @@ packs-state-any = すべての状態
 packs-state-working = 処理中
 packs-state-failed = 失敗
 packs-state-untagged = 説明がまだないもの
+packs-state-unlicensed = ライセンス未記入
 packs-store = ストア
 packs-store-any = すべてのストア
 packs-store-from = { $store } から

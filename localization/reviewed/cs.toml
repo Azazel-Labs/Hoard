@@ -7480,6 +7480,10 @@ translation = "Jakýkoli stav"
 source = "Failed"
 translation = "Selhaly"
 
+[messages.packs-state-unlicensed]
+source = "No license noted"
+translation = "Bez uvedené licence"
+
 [messages.packs-state-untagged]
 source = "Not described yet"
 translation = "Zatím bez popisu"

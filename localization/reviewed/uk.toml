@@ -7528,6 +7528,10 @@ translation = "Будь-який стан"
 source = "Failed"
 translation = "З помилкою"
 
+[messages.packs-state-unlicensed]
+source = "No license noted"
+translation = "Ліцензію не вказано"
+
 [messages.packs-state-untagged]
 source = "Not described yet"
 translation = "Ще не описані"

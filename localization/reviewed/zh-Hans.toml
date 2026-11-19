@@ -7231,6 +7231,10 @@ translation = "任意状态"
 source = "Failed"
 translation = "失败"
 
+[messages.packs-state-unlicensed]
+source = "No license noted"
+translation = "未注明许可证"
+
 [messages.packs-state-untagged]
 source = "Not described yet"
 translation = "尚未描述"

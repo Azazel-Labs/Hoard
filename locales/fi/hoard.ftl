@@ -1243,6 +1243,7 @@ packs-state-any = Mikä tahansa tila
 packs-state-working = Työn alla
 packs-state-failed = Epäonnistuneet
 packs-state-untagged = Ei vielä kuvattu
+packs-state-unlicensed = Ei merkittyä lisenssiä
 packs-store = Kauppa
 packs-store-any = Mikä tahansa kauppa
 packs-store-from = Kaupasta { $store }

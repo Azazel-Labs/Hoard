@@ -7223,6 +7223,10 @@ translation = "任何狀態"
 source = "Failed"
 translation = "失敗"
 
+[messages.packs-state-unlicensed]
+source = "No license noted"
+translation = "未註明授權"
+
 [messages.packs-state-untagged]
 source = "Not described yet"
 translation = "尚未描述"

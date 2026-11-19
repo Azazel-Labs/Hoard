@@ -1106,6 +1106,7 @@ packs-state-any = 任何狀態
 packs-state-working = 處理中
 packs-state-failed = 失敗
 packs-state-untagged = 尚未描述
+packs-state-unlicensed = 未註明授權
 packs-store = 商店
 packs-store-any = 任何商店
 packs-store-from = 來自 { $store }

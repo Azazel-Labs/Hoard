@@ -1289,6 +1289,7 @@ packs-state-any = Jakýkoli stav
 packs-state-working = Zpracovávají se
 packs-state-failed = Selhaly
 packs-state-untagged = Zatím bez popisu
+packs-state-unlicensed = Bez uvedené licence
 packs-store = Obchod
 packs-store-any = Jakýkoli obchod
 packs-store-from = Z { $store }

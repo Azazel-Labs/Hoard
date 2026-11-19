@@ -7211,6 +7211,10 @@ translation = "모든 상태"
 source = "Failed"
 translation = "실패"
 
+[messages.packs-state-unlicensed]
+source = "No license noted"
+translation = "라이선스 기록 없음"
+
 [messages.packs-state-untagged]
 source = "Not described yet"
 translation = "아직 설명 없음"

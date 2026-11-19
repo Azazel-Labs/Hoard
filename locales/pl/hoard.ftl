@@ -1297,6 +1297,7 @@ packs-state-any = Dowolny stan
 packs-state-working = W toku
 packs-state-failed = Niepowodzenie
 packs-state-untagged = Jeszcze bez opisu
+packs-state-unlicensed = Bez podanej licencji
 packs-store = Sklep
 packs-store-any = Dowolny sklep
 packs-store-from = Z { $store }

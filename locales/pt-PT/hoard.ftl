@@ -1199,6 +1199,7 @@ packs-state-any = Qualquer estado
 packs-state-working = Em curso
 packs-state-failed = Falhados
 packs-state-untagged = Ainda sem descrição
+packs-state-unlicensed = Sem licença indicada
 packs-store = Loja
 packs-store-any = Qualquer loja
 packs-store-from = De { $store }

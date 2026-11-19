@@ -1199,6 +1199,7 @@ packs-state-any = Alle statuser
 packs-state-working = Under arbeid
 packs-state-failed = Mislyktes
 packs-state-untagged = Ikke beskrevet ennå
+packs-state-unlicensed = Ingen lisens notert
 packs-store = Butikk
 packs-store-any = Alle butikker
 packs-store-from = Fra { $store }

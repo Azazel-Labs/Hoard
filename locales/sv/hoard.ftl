@@ -1199,6 +1199,7 @@ packs-state-any = Valfri status
 packs-state-working = Pågår
 packs-state-failed = Misslyckades
 packs-state-untagged = Inte beskrivna än
+packs-state-unlicensed = Ingen licens angiven
 packs-store = Butik
 packs-store-any = Valfri butik
 packs-store-from = Från { $store }

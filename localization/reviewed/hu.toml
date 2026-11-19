@@ -7227,6 +7227,10 @@ translation = "Bármilyen állapot"
 source = "Failed"
 translation = "Sikertelen"
 
+[messages.packs-state-unlicensed]
+source = "No license noted"
+translation = "Nincs megadott licenc"
+
 [messages.packs-state-untagged]
 source = "Not described yet"
 translation = "Még nincs leírva"

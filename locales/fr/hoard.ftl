@@ -1223,6 +1223,7 @@ packs-state-any = Tous les états
 packs-state-working = En cours de traitement
 packs-state-failed = En échec
 packs-state-untagged = Pas encore décrits
+packs-state-unlicensed = Sans licence indiquée
 packs-store = Boutique
 packs-store-any = Toutes les boutiques
 packs-store-from = De { $store }

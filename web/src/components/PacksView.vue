@@ -61,7 +61,7 @@ const visibleCollections = computed(() => props.collections.filter((c) => !hidde
 // ---- finding packs: words, what's in them, where they're at, where they came from, and an order.
 const query = ref('')
 const kind = ref<AssetKind | ''>('')
-const state = ref<'' | 'working' | 'failed' | 'untagged'>('')
+const state = ref<'' | 'working' | 'failed' | 'untagged' | 'unlicensed'>('')
 /** A store's name, `none` for packs with no store page, or empty for any. */
 const store = ref('')
 const sort = ref<'new' | 'old' | 'name' | 'size' | 'assets'>('new')
@@ -92,6 +92,7 @@ const shown = computed(() => {
     if (state.value === 'working' && !working(p)) return false
     if (state.value === 'failed' && p.status !== 'failed') return false
     if (state.value === 'untagged' && (p.description || p.tags.length)) return false
+    if (state.value === 'unlicensed' && (p.license?.trim() || p.license_tier)) return false
     if (store.value === 'none' ? !!p.store_url : store.value && p.store !== store.value) return false
     if (!words.length) return true
     const hay = [p.name, p.store, p.license, p.license_tier, p.description, ...p.tags].filter(Boolean).join(' ').toLowerCase()
@@ -372,6 +373,7 @@ async function archive(p: Pack) {
           <option value="working">{{ t('packs-state-working') }}</option>
           <option value="failed">{{ t('packs-state-failed') }}</option>
           <option value="untagged">{{ t('packs-state-untagged') }}</option>
+          <option value="unlicensed">{{ t('packs-state-unlicensed') }}</option>
         </select>
         <label class="visually-hidden" for="pack-store">{{ t('packs-store') }}</label>
         <select id="pack-store" v-model="store" class="field narrow">

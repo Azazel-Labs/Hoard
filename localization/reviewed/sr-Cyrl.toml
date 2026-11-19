@@ -7413,6 +7413,10 @@ translation = "Било које стање"
 source = "Failed"
 translation = "Није успело"
 
+[messages.packs-state-unlicensed]
+source = "No license noted"
+translation = "Без наведене лиценце"
+
 [messages.packs-state-untagged]
 source = "Not described yet"
 translation = "Још нису описани"

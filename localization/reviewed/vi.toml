@@ -7217,6 +7217,10 @@ translation = "Mọi trạng thái"
 source = "Failed"
 translation = "Thất bại"
 
+[messages.packs-state-unlicensed]
+source = "No license noted"
+translation = "Chưa ghi giấy phép"
+
 [messages.packs-state-untagged]
 source = "Not described yet"
 translation = "Chưa được mô tả"

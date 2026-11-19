@@ -1199,6 +1199,7 @@ packs-state-any = Qualsevol estat
 packs-state-working = En curs
 packs-state-failed = Han fallat
 packs-state-untagged = Encara sense descripció
+packs-state-unlicensed = Sense llicència indicada
 packs-store = Botiga
 packs-store-any = Qualsevol botiga
 packs-store-from = De { $store }

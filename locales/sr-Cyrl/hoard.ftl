@@ -1235,6 +1235,7 @@ packs-state-any = Било које стање
 packs-state-working = У обради
 packs-state-failed = Није успело
 packs-state-untagged = Још нису описани
+packs-state-unlicensed = Без наведене лиценце
 packs-store = Продавница
 packs-store-any = Било која продавница
 packs-store-from = Из продавнице { $store }

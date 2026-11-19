@@ -1108,6 +1108,7 @@ packs-state-any = Bármilyen állapot
 packs-state-working = Folyamatban
 packs-state-failed = Sikertelen
 packs-state-untagged = Még nincs leírva
+packs-state-unlicensed = Nincs megadott licenc
 packs-store = Áruház
 packs-store-any = Bármelyik áruház
 packs-store-from = Forrás: { $store }

@@ -7368,6 +7368,10 @@ translation = "Valfri status"
 source = "Failed"
 translation = "Misslyckades"
 
+[messages.packs-state-unlicensed]
+source = "No license noted"
+translation = "Ingen licens angiven"
+
 [messages.packs-state-untagged]
 source = "Not described yet"
 translation = "Inte beskrivna än"

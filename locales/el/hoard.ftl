@@ -1243,6 +1243,7 @@ packs-state-any = Οποιαδήποτε κατάσταση
 packs-state-working = Σε επεξεργασία
 packs-state-failed = Απέτυχαν
 packs-state-untagged = Χωρίς περιγραφή ακόμη
+packs-state-unlicensed = Χωρίς σημειωμένη άδεια χρήσης
 packs-store = Κατάστημα
 packs-store-any = Οποιοδήποτε κατάστημα
 packs-store-from = Από { $store }

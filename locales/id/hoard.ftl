@@ -1104,6 +1104,7 @@ packs-state-any = Status apa saja
 packs-state-working = Sedang diproses
 packs-state-failed = Gagal
 packs-state-untagged = Belum dideskripsikan
+packs-state-unlicensed = Tanpa lisensi tercatat
 packs-store = Toko
 packs-store-any = Toko apa saja
 packs-store-from = Dari { $store }

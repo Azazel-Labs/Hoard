@@ -1100,6 +1100,7 @@ packs-state-any = สถานะใดก็ได้
 packs-state-working = กำลังดำเนินการ
 packs-state-failed = ล้มเหลว
 packs-state-untagged = ยังไม่มีคำอธิบาย
+packs-state-unlicensed = ไม่ได้ระบุสัญญาอนุญาต
 packs-store = ร้านค้า
 packs-store-any = ร้านค้าใดก็ได้
 packs-store-from = จาก { $store }

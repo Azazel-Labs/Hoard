@@ -1108,6 +1108,7 @@ packs-state-any = Herhangi bir durum
 packs-state-working = İşleniyor
 packs-state-failed = Başarısız
 packs-state-untagged = Henüz tanımlanmamış
+packs-state-unlicensed = Lisans belirtilmemiş
 packs-store = Mağaza
 packs-store-any = Herhangi bir mağaza
 packs-store-from = Kaynak: { $store }

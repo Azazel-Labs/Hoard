@@ -1294,6 +1294,7 @@ packs-state-any = Orice stare
 packs-state-working = În lucru
 packs-state-failed = Eșuate
 packs-state-untagged = Încă nedescrise
+packs-state-unlicensed = Fără licență notată
 packs-store = Magazin
 packs-store-any = Orice magazin
 packs-store-from = De pe { $store }

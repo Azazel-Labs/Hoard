@@ -1100,6 +1100,7 @@ packs-state-any = 모든 상태
 packs-state-working = 처리 중
 packs-state-failed = 실패
 packs-state-untagged = 아직 설명 없음
+packs-state-unlicensed = 라이선스 기록 없음
 packs-store = 스토어
 packs-store-any = 모든 스토어
 packs-store-from = { $store }에서 받음

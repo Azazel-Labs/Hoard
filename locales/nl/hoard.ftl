@@ -1199,6 +1199,7 @@ packs-state-any = Elke status
 packs-state-working = Bezig
 packs-state-failed = Mislukt
 packs-state-untagged = Nog niet beschreven
+packs-state-unlicensed = Geen licentie vermeld
 packs-store = Store
 packs-store-any = Elke store
 packs-store-from = Van { $store }

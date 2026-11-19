@@ -1350,6 +1350,7 @@ packs-state-any = Any status
 packs-state-working = Working on
 packs-state-failed = Failed
 packs-state-untagged = Not described yet
+packs-state-unlicensed = No license noted
 packs-store = Store
 packs-store-any = Any store
 packs-store-from = From { $store }

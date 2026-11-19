@@ -329,7 +329,7 @@ function onKey(e: KeyboardEvent) {
             <option v-for="c in info.clips" :key="c" :value="c">{{ c }}</option>
           </select>
         </label>
-        <label v-if="info.wearers.length > 1">
+        <label v-if="info.wearers.length > 1 || info.wearers[0]?.away">
           <span class="visually-hidden">{{ t('model-plays-on') }}</span>
           <select :value="info.on" @change="playOn(($event.target as HTMLSelectElement).value)">
             <option v-for="w in info.wearers" :key="w.id" :value="w.id">{{ w.name }}</option>

@@ -539,7 +539,8 @@ software rasterizer (`apt install mesa-vulkan-drivers`). Without any adapter, ev
    copy of a character gets the copies of the clips beside it; so does `Model@Clip.fbx`. Across the library, a
    character's details list the "Animations that fit" it and an animation's the "Characters it fits": those with its
    skeleton (at least ten of the bones it moves, named the same once `mixamorig:` or `Armature|` is off, and not just
-   Blender's `Bone.001`), so a Mixamo clip fits every Mixamo character; its own pack's come first. With Settings →
+   Blender's `Bone.001`), so a Mixamo clip fits every Mixamo character; its own pack's come first. An animation
+   plays in the 3D viewer on a character it fits, Plays on picking any other of them. With Settings →
    Performance → Thumbnails → "Moving thumbnails for animations" on (it's off: they take space and time to make), each
    animation also gets a three-second looping WebP of it playing on its character, which its tile plays while the
    pointer is over it; turning it off deletes them. Game-engine

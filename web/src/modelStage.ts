@@ -61,8 +61,9 @@ export interface StageInfo {
   guessed: number
   /** How the model is turned, as its pack's models are. */
   facing: Facing
-  /** For an animation: the characters it fits, and the one it plays on (`LoadOptions.on`), or none. */
-  wearers: AssetLink[]
+  /** For an animation: the characters it fits, its pack's first, and the one it plays on (`LoadOptions.on`), or
+   *  none. One from another pack (`away`) is named with its pack. */
+  wearers: { id: string; name: string; away?: boolean }[]
   on: string
 }
 
@@ -205,9 +206,17 @@ export class ModelStage {
     // path, or point at a PSD where the pack ships a PNG.
     let { named, guesses, full } = await textureLinks(asset)
     // An animation plays on a character it fits: the character is what's drawn, and only the animation's clips play.
+    // Those its pack ships it for come first, then any other with its skeleton, in any pack.
     let clipLinks = full.links.filter((l) => l.rel === 'animation')
     const wearers =
-      full.kind === 'animation' ? full.linked_from.filter((l) => l.rel === 'animation' && l.kind === 'model') : []
+      full.kind === 'animation'
+        ? [
+            ...full.linked_from.filter((l) => l.rel === 'animation' && l.kind === 'model'),
+            ...(full.fits ?? []).map((f) =>
+              f.pack_id === full.pack_id ? { id: f.id, name: f.name } : { id: f.id, name: `${f.name} · ${f.pack_name}`, away: true },
+            ),
+          ]
+        : []
     const wearer = wearers.find((w) => w.id === opts.on) ?? wearers[0]
     const body = wearer && (await api.asset(wearer.id).catch(() => null))
     if (this.disposed) throw new Error('closed')

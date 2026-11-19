@@ -85,6 +85,10 @@ test('an animation fits the characters with its skeleton in other packs, and eac
     await expect(panel.getByRole('heading', { name: run.name })).toBeVisible()
     await expect(section.getByRole('heading', { name: 'Characters it fits (1)' })).toBeVisible()
     await expect(section.getByRole('button', { name: new RegExp(`${hero.name}.*${heroes}`) })).toBeVisible()
+    // Its own pack has no character for it, so it plays on the one from the other pack, which says so.
+    const playsOn = panel.getByRole('combobox', { name: 'Plays on' })
+    await expect(playsOn).toBeVisible({ timeout: 30_000 })
+    await expect(playsOn.locator('option:checked')).toHaveText(`${hero.name} · ${heroes}`)
   } finally {
     await api.post('/api/archive', { data: { packs: [a.id, b.id] } })
     await api.post('/api/archive/purge', { data: { packs: [a.id, b.id] } })

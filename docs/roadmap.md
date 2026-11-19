@@ -41,12 +41,12 @@ Hoard keeps the skeleton and clips of every rigged model (`rigs`: bone names wit
 `Armature|` prefixes, and each clip's name, length and the bones it moves), from glTF, from FBX through polysmelt and
 from the GLB Blender makes of a .blend. Within a pack, a file of clips with no mesh, or a copy of a character saved
 for one clip, becomes an animation linked to the characters it fits nearby, and across the library characters list
-"Animations that fit" and animations "Characters it fits". What's left:
+"Animations that fit" and animations "Characters it fits". An animation plays on any character it fits, picked
+under Plays on. What's left:
 
-- **Show them as animations.** An animation's details play it in a loop on its character, with a picker to put it
-  on any other character it fits; three.js plays a clip on any skinned mesh whose bones have the same names. Its
-  thumbnail is drawn mid-clip, not in the rest pose, so a grid of them isn't a grid of the same pose, and its tile
-  shows the length. A character's details list its animations, each played in the viewer when picked.
+- **Show them as animations.** An animation's thumbnail is drawn mid-clip, not in the rest pose, so a grid of them
+  isn't a grid of the same pose, and its tile shows the length. A character's viewer plays any animation that fits
+  it, from any pack, each loaded when picked.
 - **Download them either way.** An animation comes with or without its character's mesh, and a character with or
   without its animations, as `?animations=1` does now.
 

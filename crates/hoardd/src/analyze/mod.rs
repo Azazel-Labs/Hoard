@@ -47,7 +47,7 @@ pub(crate) fn renderer() -> Option<&'static Mutex<hoard_render::Renderer>> {
         return None;
     }
     RENDERER
-        .get_or_init(|| match hoard_render::Renderer::new() {
+        .get_or_init(|| match new_renderer() {
             Ok(r) => {
                 let kind = if r.is_hardware() { "gpu" } else { "cpu" };
                 tracing::info!(adapter = r.adapter_name(), backend = r.backend(), kind, "model thumbnails enabled");
@@ -72,6 +72,21 @@ pub(crate) fn renderer() -> Option<&'static Mutex<hoard_render::Renderer>> {
             }
         })
         .as_ref()
+}
+
+/// Make the renderer on a thread of its own at low priority. A software rasterizer (lavapipe, WARP) starts its own
+/// threads to draw with when it's made, and where threads take the priority of the one starting them (Linux) that
+/// keeps its drawing behind the server's requests like the rest of the heavy work. (Every render is on a heavy thread
+/// already, and one at a time: the renderer is behind a lock.)
+fn new_renderer() -> anyhow::Result<hoard_render::Renderer> {
+    std::thread::Builder::new()
+        .name("renderer".into())
+        .spawn(|| {
+            crate::heavy::lower_priority();
+            hoard_render::Renderer::new()
+        })?
+        .join()
+        .map_err(|_| anyhow::anyhow!("the renderer panicked while starting"))?
 }
 
 /// Create the renderer in the background at startup, so the server page can say whether a GPU is in use before the

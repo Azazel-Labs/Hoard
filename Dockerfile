@@ -68,6 +68,9 @@ COPY --chmod=755 deploy/entrypoint.sh /usr/local/bin/hoard-entrypoint
 # `runtime: nvidia` passes nothing in. Ignored on hosts without the toolkit.
 ENV NVIDIA_VISIBLE_DEVICES=all \
     NVIDIA_DRIVER_CAPABILITIES=graphics,compute,utility
+# Without a GPU, model thumbnails are drawn by Mesa's lavapipe, which otherwise starts a thread for every core: four
+# draw a thumbnail about as fast and leave the rest of the machine to the server and whatever else runs on it.
+ENV LP_NUM_THREADS=4
 ENV HOARD_LISTEN=0.0.0.0:4627 \
     HOARD_DATA_DIR=/config \
     HOARD_FILES_DIR=/library \

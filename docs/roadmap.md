@@ -3,13 +3,6 @@
 What's planned or being weighed, roughly in order. Nothing here is promised; each item says what's settled and what
 isn't yet.
 
-## Maintainability: what's left
-
-The largest files have been split into folder modules. The rest are big but each about one thing; splitting them
-waits until they're next changed: `db/schema.rs` (1,620 lines, mostly the migrations, in order), `store_formats.rs`,
-`unitymat.rs`, `sidecar.rs`, `sources.rs`, `links.rs` and `materials/models.rs` (750 to 900 lines each), and on the
-web side `App.vue` (1,750), `AssetDetail.vue`, `PacksView.vue`, `skeleton2d.ts` and `AiPanel.vue` (700 to 870).
-
 ## Store details for the Unity Asset Store and Humble Bundle
 
 Store details searches Fab, itch.io, Kenney and OpenGameArt, and a pack whose files name its listing gets it filled

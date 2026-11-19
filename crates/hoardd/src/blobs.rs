@@ -406,7 +406,9 @@ impl BlobStore {
         let hash = blake3::hash(&bytes).to_hex().to_string();
         let size = bytes.len() as u64;
         if !exists_in(&*self.cache, &hash).await? {
-            self.cache.put(&key(&hash), PutPayload::from(bytes)).await?;
+            let bytes = Bytes::from(bytes);
+            let at = key(&hash);
+            again_if_stale(|| self.cache.put(&at, PutPayload::from(bytes.clone()))).await?;
         }
         Ok(StoredBlob { hash, size })
     }
@@ -414,7 +416,8 @@ impl BlobStore {
     /// Open a blob for streaming, optionally a byte range (for HTTP `Range`, so audio/video can seek).
     pub(crate) async fn read(&self, hash: &str, range: Option<GetRange>) -> Result<Option<BlobRead>> {
         let opts = GetOptions { range, ..Default::default() };
-        match self.cache.get_opts(&key(hash), opts.clone()).await {
+        let at = key(hash);
+        match again_if_stale(|| self.cache.get_opts(&at, opts.clone())).await {
             Ok(res) => return Ok(Some(blob_read(res))),
             Err(object_store::Error::NotFound { .. }) => {}
             Err(e) => tracing::warn!(hash, error = %e, "could not read the cache store; trying the library"),
@@ -601,11 +604,44 @@ async fn link_into(dir: &FsPath, path: &FsPath, hash: &str) -> bool {
 }
 
 pub(crate) async fn exists_in(store: &dyn ObjectStore, hash: &str) -> Result<bool> {
-    match store.head(&key(hash)).await {
+    let at = key(hash);
+    match again_if_stale(|| store.head(&at)).await {
         Ok(_) => Ok(true),
         Err(object_store::Error::NotFound { .. }) => Ok(false),
         Err(e) => Err(e.into()),
     }
+}
+
+/// Run a store operation, again if a network file system called the file stale. NFS does when a file is replaced
+/// while it's being opened: two thumbnails alike are stored at once, one checks for the file just as the other puts
+/// it in place. Looked up again, it's there.
+async fn again_if_stale<T, F, Fut>(mut op: F) -> object_store::Result<T>
+where
+    F: FnMut() -> Fut,
+    Fut: Future<Output = object_store::Result<T>>,
+{
+    let mut tries = 0;
+    loop {
+        match op().await {
+            Err(e) if tries < 4 && is_stale(&e) => {
+                tries += 1;
+                tokio::time::sleep(std::time::Duration::from_millis(25 * tries)).await;
+            }
+            out => return out,
+        }
+    }
+}
+
+/// Whether an error is a network file system's "stale file handle".
+fn is_stale(e: &(dyn std::error::Error + 'static)) -> bool {
+    let mut at = Some(e);
+    while let Some(e) = at {
+        if e.downcast_ref::<std::io::Error>().is_some_and(|e| e.kind() == std::io::ErrorKind::StaleNetworkFileHandle) {
+            return true;
+        }
+        at = e.source();
+    }
+    false
 }
 
 #[cfg(test)]
@@ -621,6 +657,35 @@ pub(crate) mod tests {
         std::fs::create_dir_all(&cfg.data_dir).unwrap();
         let pool = db::open(&cfg.db_path(), &cfg.backups_dir()).unwrap();
         (cfg, pool)
+    }
+
+    /// A thumbnail stored over a network share as another alike lands is looked up again, not failed: NFS calls the
+    /// file handle stale for a moment.
+    #[tokio::test]
+    async fn a_stale_file_handle_is_tried_again() {
+        let stale = || object_store::Error::Generic {
+            store: "LocalFileSystem",
+            source: Box::new(std::io::Error::from(std::io::ErrorKind::StaleNetworkFileHandle)),
+        };
+        assert!(is_stale(&stale()));
+        assert!(!is_stale(&object_store::Error::NotImplemented { operation: "x".into(), implementer: "y".into() }));
+        let mut calls = 0;
+        let out = again_if_stale(|| {
+            calls += 1;
+            let n = calls;
+            async move { if n < 3 { Err(stale()) } else { Ok(n) } }
+        })
+        .await
+        .unwrap();
+        assert_eq!(out, 3);
+        let mut calls = 0;
+        let gave_up = again_if_stale(|| {
+            calls += 1;
+            async { Err::<(), _>(stale()) }
+        })
+        .await;
+        assert!(gave_up.is_err());
+        assert_eq!(calls, 5);
     }
 
     pub(crate) fn add(pool: &db::Pool, dir: &FsPath, name: &str, kinds: &[&str], catch_all: bool) -> i64 {

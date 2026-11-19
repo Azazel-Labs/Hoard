@@ -227,7 +227,9 @@ it's the `update` field.
 
 Hoard uses a GPU for 3D model thumbnails (wgpu over Vulkan) when the container can see one. Otherwise it falls back
 to Mesa's software renderer (lavapipe), which is already in the image, so a GPU is optional and only makes model
-thumbnails faster. Settings → Performance shows what Hoard found under "3D thumbnails": `On the GPU: <adapter>
+thumbnails faster. In software it draws one thumbnail at a time, at low priority, with four threads
+(`LP_NUM_THREADS=4`, set in the image), so it doesn't crowd out the server on a machine without a GPU. Settings →
+Performance shows what Hoard found under "3D thumbnails": `On the GPU: <adapter>
 (vulkan)`, `No GPU found, so in software`, or no renderer at all. The same is in `GET /api/stats` (`renderer`) and
 in the startup log.
 

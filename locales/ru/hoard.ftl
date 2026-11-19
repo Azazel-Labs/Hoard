@@ -184,6 +184,7 @@ error-token-account-gone = учётной записи этого токена �
 error-favorites-too-many = не больше 10 000 за раз
 error-saved-search-name = у сохранённого поиска должно быть название не длиннее 80 символов
 error-saved-search-too-long = этот поиск слишком длинный, чтобы его сохранить
+error-hoard-seen = клад может хранить не более 32 видов ассетов, каждый с названием из строчных букв
 error-texture-pattern-map = В шаблоне названия текстуры нужен { "{" }map{ "}" }, иначе все карты материала получат одно и то же название
 error-texture-pattern-fields = В шаблоне названия текстуры можно использовать { "{" }name{ "}" }, { "{" }map{ "}" } и { "{" }size{ "}" }
 error-texture-name-chars = В названиях текстур не может быть < > : " / \ | ? или *
@@ -2403,6 +2404,26 @@ stats-largest-files = Самые большие файлы
 stats-open-file = Открыть { $name }
 stats-empty = В библиотеке пока ничего нет. Добавьте пак, и здесь появятся его цифры.
 
+## HoardPanel.vue
+
+hoard-title = Ваш клад
+hoard-what = Каждый ассет в библиотеке — это предмет клада, и его вид определяет, какой. Соберите новое, чтобы добавить его в свою груду.
+hoard-sign-in = Войдите, чтобы собирать собственный клад.
+hoard-new = Новая добыча для сбора: { $count }
+hoard-none-new = Собирать пока нечего.
+hoard-collect = Собрать
+hoard-unavailable = Этот браузер не может нарисовать клад: { $error }
+hoard-collect-failed = Не удалось сохранить собранное: { $error }
+hoard-label = Дракон охраняет свой клад. Сокровищ: { $count }
+hoard-gold = Золото
+hoard-gems = Самоцветы
+hoard-books = Книги
+hoard-weapons = Оружие
+hoard-bones = Кости
+hoard-tablets = Рунические таблички
+hoard-paintings = Картины
+hoard-potions = Зелья
+
 ## UpdatesPanel.vue
 
 updates-saved = Hoard вызовет его, когда будет готово обновление
@@ -2504,8 +2525,8 @@ settings-title = Настройки
 settings-loading = Загрузка…
 settings-load-failed = Не удалось загрузить настройки: { $error }
 settings-page-general = Общие
-settings-page-general-blurb = Как называется этот сервер — для всех, кто им пользуется.
-settings-page-general-blurb-desktop = Как называется эта библиотека.
+settings-page-general-blurb = Клад вашего дракона и название этого сервера.
+settings-page-general-blurb-desktop = Клад вашего дракона и название этой библиотеки.
 settings-page-appearance = Оформление
 settings-page-appearance-blurb = Темы, которые этот браузер использует в светлом и в тёмном режиме. Сохраняется только в этом браузере.
 settings-page-library = Библиотека

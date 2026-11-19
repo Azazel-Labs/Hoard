@@ -184,6 +184,7 @@ error-token-account-gone = kontot för den här token finns inte längre, så de
 error-favorites-too-many = högst 10 000 åt gången
 error-saved-search-name = en sparad sökning behöver ett namn på högst 80 tecken
 error-saved-search-too-long = sökningen är för lång för att sparas
+error-hoard-seen = skatten kan registrera högst 32 typer av tillgångar, var och en namngiven med små bokstäver
 error-texture-pattern-map = Mönstret för texturnamn behöver { "{" }map{ "}" }, annars skulle alla kartor i ett material få samma namn
 error-texture-pattern-fields = Mönstret för texturnamn kan använda { "{" }name{ "}" }, { "{" }map{ "}" } och { "{" }size{ "}" }
 error-texture-name-chars = Texturnamn får inte innehålla < > : " / \ | ? eller *
@@ -2160,6 +2161,26 @@ stats-largest-files = Största filerna
 stats-open-file = Öppna { $name }
 stats-empty = Inget i biblioteket än. Lägg till ett paket så visas siffrorna här.
 
+## HoardPanel.vue
+
+hoard-title = Din skatt
+hoard-what = Varje tillgång i biblioteket är en bit skatt, och dess typ avgör vilken. Samla in det nya för att lägga det på din hög.
+hoard-sign-in = Logga in för att samla en egen skatt.
+hoard-new = Nytt byte att samla in: { $count }
+hoard-none-new = Inget nytt att samla in.
+hoard-collect = Samla in
+hoard-unavailable = Den här webbläsaren kan inte rita skatten: { $error }
+hoard-collect-failed = Det du samlade in kunde inte sparas: { $error }
+hoard-label = En drake som vaktar sin skatt. Skatter: { $count }
+hoard-gold = Guld
+hoard-gems = Ädelstenar
+hoard-books = Böcker
+hoard-weapons = Vapen
+hoard-bones = Ben
+hoard-tablets = Runtavlor
+hoard-paintings = Målningar
+hoard-potions = Elixir
+
 ## UpdatesPanel.vue
 
 updates-saved = Hoard anropar den när en uppdatering är klar
@@ -2257,8 +2278,8 @@ settings-title = Inställningar
 settings-loading = Läser in…
 settings-load-failed = Kunde inte läsa in inställningarna: { $error }
 settings-page-general = Allmänt
-settings-page-general-blurb = Vad den här servern heter, för alla som använder den.
-settings-page-general-blurb-desktop = Vad det här biblioteket heter.
+settings-page-general-blurb = Din drakes skatt och vad den här servern heter.
+settings-page-general-blurb-desktop = Din drakes skatt och vad det här biblioteket heter.
 settings-page-appearance = Utseende
 settings-page-appearance-blurb = Teman som den här webbläsaren använder när den är ljus och när den är mörk. Sparas bara i den här webbläsaren.
 settings-page-library = Bibliotek

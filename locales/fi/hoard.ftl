@@ -184,6 +184,7 @@ error-token-account-gone = tämän tunnuksen tiliä ei enää ole, joten sillä 
 error-favorites-too-many = enintään 10 000 kerrallaan
 error-saved-search-name = tallennettu haku tarvitsee enintään 80 merkin nimen
 error-saved-search-too-long = haku on liian pitkä tallennettavaksi
+error-hoard-seen = aarre voi tallentaa enintään 32 resurssilajia, kunkin nimettynä pienin kirjaimin
 error-texture-pattern-map = Tekstuurin nimimallissa on oltava { "{" }map{ "}" }, muuten materiaalin jokainen kartta saisi saman nimen
 error-texture-pattern-fields = Tekstuurin nimimallissa voi käyttää kenttiä { "{" }name{ "}" }, { "{" }map{ "}" } ja { "{" }size{ "}" }
 error-texture-name-chars = Tekstuurien nimissä ei voi olla merkkejä < > : " / \ | ? tai *
@@ -2238,6 +2239,26 @@ stats-largest-files = Suurimmat tiedostot
 stats-open-file = Avaa { $name }
 stats-empty = Kirjastossa ei ole vielä mitään. Lisää paketti, niin sen luvut näkyvät täällä.
 
+## HoardPanel.vue
+
+hoard-title = Aarteesi
+hoard-what = Jokainen kirjaston resurssi on aarteen kappale, ja sen laji ratkaisee, mikä. Kerää uudet, niin ne lisätään kasaasi.
+hoard-sign-in = Kirjaudu sisään kerätäksesi oman aarteen.
+hoard-new = Uutta saalista kerättävänä: { $count }
+hoard-none-new = Ei mitään uutta kerättävää.
+hoard-collect = Kerää
+hoard-unavailable = Tämä selain ei pysty piirtämään aarretta: { $error }
+hoard-collect-failed = Keräämiäsi ei voitu tallentaa: { $error }
+hoard-label = Lohikäärme vartioi aarrettaan. Aarteita: { $count }
+hoard-gold = Kultaa
+hoard-gems = Jalokiviä
+hoard-books = Kirjoja
+hoard-weapons = Aseita
+hoard-bones = Luita
+hoard-tablets = Riimutauluja
+hoard-paintings = Maalauksia
+hoard-potions = Juomia
+
 ## Päivitykset
 
 updates-saved = Hoard kutsuu sitä, kun päivitys on valmis
@@ -2339,8 +2360,8 @@ settings-title = Asetukset
 settings-loading = Ladataan…
 settings-load-failed = Asetusten lataus epäonnistui: { $error }
 settings-page-general = Yleiset
-settings-page-general-blurb = Mikä tämän palvelimen nimi on kaikille sen käyttäjille.
-settings-page-general-blurb-desktop = Mikä tämän kirjaston nimi on.
+settings-page-general-blurb = Lohikäärmeesi aarre ja tämän palvelimen nimi.
+settings-page-general-blurb-desktop = Lohikäärmeesi aarre ja tämän kirjaston nimi.
 settings-page-appearance = Ulkoasu
 settings-page-appearance-blurb = Teemat, joita tämä selain käyttää vaaleassa ja tummassa tilassa. Tallennetaan vain tähän selaimeen.
 settings-page-library = Kirjasto

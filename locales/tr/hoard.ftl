@@ -184,6 +184,7 @@ error-token-account-gone = bu belirtecin hesabı artık yok, bu yüzden favorile
 error-favorites-too-many = bir seferde en fazla 10.000
 error-saved-search-name = kayıtlı aramanın en fazla 80 karakterlik bir adı olmalı
 error-saved-search-too-long = bu arama kaydedilemeyecek kadar uzun
+error-hoard-seen = hazine en fazla 32 varlık türü kaydedebilir, her biri küçük harflerle adlandırılmış olmalıdır
 error-texture-pattern-map = Doku adı kalıbında { "{" }map{ "}" } olmalı, yoksa bir malzemenin tüm haritaları aynı adı alır
 error-texture-pattern-fields = Doku adı kalıbı { "{" }name{ "}" }, { "{" }map{ "}" } ve { "{" }size{ "}" } kullanabilir
 error-texture-name-chars = Doku adlarında < > : " / \ | ? ya da * olamaz
@@ -2002,6 +2003,26 @@ stats-largest-files = En büyük dosyalar
 stats-open-file = Aç: { $name }
 stats-empty = Kütüphanede henüz bir şey yok. Bir paket ekleyin, sayıları burada görünür.
 
+## HoardPanel.vue
+
+hoard-title = Hazineniz
+hoard-what = Kütüphanedeki her varlık bir hazine parçasıdır ve türü hangisi olduğunu belirler. Yenileri toplayarak yığınınıza ekleyin.
+hoard-sign-in = Kendi hazinenizi toplamak için oturum açın.
+hoard-new = Toplanacak yeni ganimet: { $count }
+hoard-none-new = Toplanacak yeni bir şey yok.
+hoard-collect = Topla
+hoard-unavailable = Bu tarayıcı hazineyi çizemiyor: { $error }
+hoard-collect-failed = Topladıklarınız kaydedilemedi: { $error }
+hoard-label = Hazinesini koruyan bir ejderha. Hazine: { $count }
+hoard-gold = Altın
+hoard-gems = Mücevherler
+hoard-books = Kitaplar
+hoard-weapons = Silahlar
+hoard-bones = Kemikler
+hoard-tablets = Rün tabletleri
+hoard-paintings = Tablolar
+hoard-potions = İksirler
+
 ## UpdatesPanel.vue
 
 updates-saved = Bir güncelleme hazır olduğunda Hoard bu adresi çağıracak
@@ -2091,8 +2112,8 @@ settings-title = Ayarlar
 settings-loading = Yükleniyor…
 settings-load-failed = Ayarlar yüklenemedi: { $error }
 settings-page-general = Genel
-settings-page-general-blurb = Bu sunucunun, onu kullanan herkes için adı.
-settings-page-general-blurb-desktop = Bu kütüphanenin adı.
+settings-page-general-blurb = Ejderhanızın hazinesi ve bu sunucunun adı.
+settings-page-general-blurb-desktop = Ejderhanızın hazinesi ve bu kütüphanenin adı.
 settings-page-appearance = Görünüm
 settings-page-appearance-blurb = Bu tarayıcının açık ve koyu moddayken giydiği temalar. Yalnızca bu tarayıcıda kaydedilir.
 settings-page-library = Kütüphane

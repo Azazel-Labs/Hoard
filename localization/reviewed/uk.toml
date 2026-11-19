@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "d8dbfdf558614e792298e9f2143a889d3ce34cc24a0fe019b1acdcd7d98ba317"
+source = "4d93dc5d1285fff368850baed9eb7ace4cc4de3024361da1caffbeb82bc9dfe7"
 translation = "973d5a6f0a6763be6bbc6bb0a4a118df31a18ed5e5823c6c023d2d871324479b"
 
 [messages.account-add]
@@ -3791,6 +3791,10 @@ translation = "тут лише один кадр або забагато кад�
 source = "give a full path"
 translation = "вкажіть повний шлях"
 
+[messages.error-hoard-seen]
+source = "the hoard can record at most 32 kinds of asset, each named in lowercase letters"
+translation = "скарб може зберігати не більше 32 видів ресурсів, кожен із назвою з малих літер"
+
 [messages.error-hosted-address]
 source = "The image search service’s address should start with http:// or https://"
 translation = "Адреса сервісу пошуку зображень має починатися з http:// або https://"
@@ -4921,6 +4925,74 @@ translation = "Що він читає"
 [messages.formatwizard-zip-failed]
 source = "Couldn’t make the zip: { $error }"
 translation = "Не вдалося створити zip: { $error }"
+
+[messages.hoard-bones]
+source = "Bones"
+translation = "Кістки"
+
+[messages.hoard-books]
+source = "Books"
+translation = "Книги"
+
+[messages.hoard-collect]
+source = "Collect"
+translation = "Зібрати"
+
+[messages.hoard-collect-failed]
+source = "Couldn’t record what you collected: { $error }"
+translation = "Не вдалося зберегти зібране: { $error }"
+
+[messages.hoard-gems]
+source = "Gems"
+translation = "Самоцвіти"
+
+[messages.hoard-gold]
+source = "Gold"
+translation = "Золото"
+
+[messages.hoard-label]
+source = "A dragon guarding its hoard. Treasure: { $count }"
+translation = "Дракон стереже свій скарб. Скарбів: { $count }"
+
+[messages.hoard-new]
+source = "New loot to collect: { $count }"
+translation = "Нова здобич для збору: { $count }"
+
+[messages.hoard-none-new]
+source = "Nothing new to collect."
+translation = "Збирати поки нічого."
+
+[messages.hoard-paintings]
+source = "Paintings"
+translation = "Картини"
+
+[messages.hoard-potions]
+source = "Potions"
+translation = "Зілля"
+
+[messages.hoard-sign-in]
+source = "Sign in to collect a hoard of your own."
+translation = "Увійдіть, щоб збирати власний скарб."
+
+[messages.hoard-tablets]
+source = "Rune tablets"
+translation = "Рунічні таблички"
+
+[messages.hoard-title]
+source = "Your hoard"
+translation = "Ваш скарб"
+
+[messages.hoard-unavailable]
+source = "This browser can’t draw the hoard: { $error }"
+translation = "Цей браузер не може намалювати скарб: { $error }"
+
+[messages.hoard-weapons]
+source = "Weapons"
+translation = "Зброя"
+
+[messages.hoard-what]
+source = "Every asset in the library is a piece of treasure, and its kind decides which. Collect what’s new to add it to your pile."
+translation = "Кожен ресурс у бібліотеці — це частина скарбу, і його вид визначає, яка саме. Зберіть нове, щоб додати його до своєї купи."
 
 [messages.https-add]
 source = "Add"
@@ -9571,12 +9643,12 @@ source = "General"
 translation = "Загальні"
 
 [messages.settings-page-general-blurb]
-source = "What this server is called, for everyone who uses it."
-translation = "Як називається цей сервер — для всіх, хто ним користується."
+source = "Your dragon’s hoard, and what this server is called."
+translation = "Скарб вашого дракона й назва цього сервера."
 
 [messages.settings-page-general-blurb-desktop]
-source = "What this library is called."
-translation = "Як називається ця бібліотека."
+source = "Your dragon’s hoard, and what this library is called."
+translation = "Скарб вашого дракона й назва цієї бібліотеки."
 
 [messages.settings-page-issues]
 source = "Issues"

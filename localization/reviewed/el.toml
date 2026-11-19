@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "d8dbfdf558614e792298e9f2143a889d3ce34cc24a0fe019b1acdcd7d98ba317"
+source = "4d93dc5d1285fff368850baed9eb7ace4cc4de3024361da1caffbeb82bc9dfe7"
 translation = "72f8bea74267d1a6341481bb8f995cf690d50c49c33ba6825335f86fe2349868"
 
 [messages.account-add]
@@ -3724,6 +3724,10 @@ translation = "έχει ένα μόνο καρέ ή υπερβολικά πολ�
 source = "give a full path"
 translation = "δώστε πλήρη διαδρομή"
 
+[messages.error-hoard-seen]
+source = "the hoard can record at most 32 kinds of asset, each named in lowercase letters"
+translation = "ο θησαυρός μπορεί να καταγράψει έως 32 είδη στοιχείων, το καθένα με όνομα σε πεζά γράμματα"
+
 [messages.error-hosted-address]
 source = "The image search service’s address should start with http:// or https://"
 translation = "Η διεύθυνση της υπηρεσίας αναζήτησης εικόνων πρέπει να αρχίζει με http:// ή https://"
@@ -4850,6 +4854,74 @@ translation = "Τι διαβάζει"
 [messages.formatwizard-zip-failed]
 source = "Couldn’t make the zip: { $error }"
 translation = "Δεν ήταν δυνατή η δημιουργία του zip: { $error }"
+
+[messages.hoard-bones]
+source = "Bones"
+translation = "Κόκαλα"
+
+[messages.hoard-books]
+source = "Books"
+translation = "Βιβλία"
+
+[messages.hoard-collect]
+source = "Collect"
+translation = "Μαζέψτε"
+
+[messages.hoard-collect-failed]
+source = "Couldn’t record what you collected: { $error }"
+translation = "Δεν ήταν δυνατή η καταγραφή όσων μαζέψατε: { $error }"
+
+[messages.hoard-gems]
+source = "Gems"
+translation = "Πολύτιμοι λίθοι"
+
+[messages.hoard-gold]
+source = "Gold"
+translation = "Χρυσός"
+
+[messages.hoard-label]
+source = "A dragon guarding its hoard. Treasure: { $count }"
+translation = "Ένας δράκος φυλάει τον θησαυρό του. Κομμάτια: { $count }"
+
+[messages.hoard-new]
+source = "New loot to collect: { $count }"
+translation = "Νέα λάφυρα για μάζεμα: { $count }"
+
+[messages.hoard-none-new]
+source = "Nothing new to collect."
+translation = "Δεν υπάρχει τίποτα καινούργιο για μάζεμα."
+
+[messages.hoard-paintings]
+source = "Paintings"
+translation = "Πίνακες"
+
+[messages.hoard-potions]
+source = "Potions"
+translation = "Φίλτρα"
+
+[messages.hoard-sign-in]
+source = "Sign in to collect a hoard of your own."
+translation = "Συνδεθείτε για να μαζέψετε δικό σας θησαυρό."
+
+[messages.hoard-tablets]
+source = "Rune tablets"
+translation = "Ρουνικές πλάκες"
+
+[messages.hoard-title]
+source = "Your hoard"
+translation = "Ο θησαυρός σας"
+
+[messages.hoard-unavailable]
+source = "This browser can’t draw the hoard: { $error }"
+translation = "Αυτό το πρόγραμμα περιήγησης δεν μπορεί να σχεδιάσει τον θησαυρό: { $error }"
+
+[messages.hoard-weapons]
+source = "Weapons"
+translation = "Όπλα"
+
+[messages.hoard-what]
+source = "Every asset in the library is a piece of treasure, and its kind decides which. Collect what’s new to add it to your pile."
+translation = "Κάθε στοιχείο της βιβλιοθήκης είναι ένα κομμάτι θησαυρού, και το είδος του καθορίζει ποιο. Μαζέψτε ό,τι είναι καινούργιο για να το προσθέσετε στον σωρό σας."
 
 [messages.https-add]
 source = "Add"
@@ -9390,12 +9462,12 @@ source = "General"
 translation = "Γενικά"
 
 [messages.settings-page-general-blurb]
-source = "What this server is called, for everyone who uses it."
-translation = "Πώς λέγεται αυτός ο διακομιστής, για όλους όσοι τον χρησιμοποιούν."
+source = "Your dragon’s hoard, and what this server is called."
+translation = "Ο θησαυρός του δράκου σας και το όνομα αυτού του διακομιστή."
 
 [messages.settings-page-general-blurb-desktop]
-source = "What this library is called."
-translation = "Πώς λέγεται αυτή η βιβλιοθήκη."
+source = "Your dragon’s hoard, and what this library is called."
+translation = "Ο θησαυρός του δράκου σας και το όνομα αυτής της βιβλιοθήκης."
 
 [messages.settings-page-issues]
 source = "Issues"

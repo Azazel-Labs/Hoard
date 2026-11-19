@@ -184,6 +184,7 @@ error-token-account-gone = налог овог токена више не пос
 error-favorites-too-many = највише 10.000 одједном
 error-saved-search-name = сачувана претрага мора имати назив од највише 80 знакова
 error-saved-search-too-long = та претрага је предугачка да би се сачувала
+error-hoard-seen = благо може да бележи највише 32 врсте ресурса, свака названа малим словима
 error-texture-pattern-map = Шаблон назива текстуре мора да садржи { "{" }map{ "}" }, иначе би све мапе једног материјала добиле исти назив
 error-texture-pattern-fields = Шаблон назива текстуре може да користи { "{" }name{ "}" }, { "{" }map{ "}" } и { "{" }size{ "}" }
 error-texture-name-chars = Називи текстура не могу да садрже < > : " / \ | ? или *
@@ -2257,6 +2258,26 @@ stats-largest-files = Највеће датотеке
 stats-open-file = Отвори { $name }
 stats-empty = У библиотеци још нема ничега. Додајте пакет и његови бројеви ће се појавити овде.
 
+## HoardPanel.vue
+
+hoard-title = Ваше благо
+hoard-what = Сваки ресурс у библиотеци је комад блага, а његова врста одређује који. Сакупите оно што је ново да бисте га додали на своју гомилу.
+hoard-sign-in = Пријавите се да бисте сакупљали своје благо.
+hoard-new = Нови плен за сакупљање: { $count }
+hoard-none-new = Нема ништа ново за сакупљање.
+hoard-collect = Сакупи
+hoard-unavailable = Овај прегледач не може да нацрта благо: { $error }
+hoard-collect-failed = Није могуће сачувати оно што сте сакупили: { $error }
+hoard-label = Змај чува своје благо. Комада блага: { $count }
+hoard-gold = Злато
+hoard-gems = Драгуљи
+hoard-books = Књиге
+hoard-weapons = Оружје
+hoard-bones = Кости
+hoard-tablets = Рунске плочице
+hoard-paintings = Слике
+hoard-potions = Напици
+
 ## UpdatesPanel.vue
 
 updates-saved = Hoard ће је позвати кад ажурирање буде спремно
@@ -2356,8 +2377,8 @@ settings-title = Подешавања
 settings-loading = Учитавање…
 settings-load-failed = Није могуће учитати подешавања: { $error }
 settings-page-general = Опште
-settings-page-general-blurb = Како се овај сервер зове, за све који га користе.
-settings-page-general-blurb-desktop = Како се ова библиотека зове.
+settings-page-general-blurb = Благо вашег змаја и назив овог сервера.
+settings-page-general-blurb-desktop = Благо вашег змаја и назив ове библиотеке.
 settings-page-appearance = Изглед
 settings-page-appearance-blurb = Теме које овај прегледач носи кад је светао и кад је таман. Чува се само у овом прегледачу.
 settings-page-library = Библиотека

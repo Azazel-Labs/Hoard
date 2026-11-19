@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "d8dbfdf558614e792298e9f2143a889d3ce34cc24a0fe019b1acdcd7d98ba317"
+source = "4d93dc5d1285fff368850baed9eb7ace4cc4de3024361da1caffbeb82bc9dfe7"
 translation = "30056587d254fe6b8f2576dc61dbda0e0d1f814731977073ac18b1c1a33112d6"
 
 [messages.account-add]
@@ -3623,6 +3623,10 @@ translation = "ini hanya punya satu bingkai, atau terlalu banyak untuk ditata"
 source = "give a full path"
 translation = "berikan path lengkap"
 
+[messages.error-hoard-seen]
+source = "the hoard can record at most 32 kinds of asset, each named in lowercase letters"
+translation = "harta karun dapat mencatat paling banyak 32 jenis aset, masing-masing dinamai dengan huruf kecil"
+
 [messages.error-hosted-address]
 source = "The image search service’s address should start with http:// or https://"
 translation = "Alamat layanan pencarian gambar harus diawali http:// atau https://"
@@ -4729,6 +4733,74 @@ translation = "Yang dibacanya"
 [messages.formatwizard-zip-failed]
 source = "Couldn’t make the zip: { $error }"
 translation = "Tidak dapat membuat zip: { $error }"
+
+[messages.hoard-bones]
+source = "Bones"
+translation = "Tulang"
+
+[messages.hoard-books]
+source = "Books"
+translation = "Buku"
+
+[messages.hoard-collect]
+source = "Collect"
+translation = "Kumpulkan"
+
+[messages.hoard-collect-failed]
+source = "Couldn’t record what you collected: { $error }"
+translation = "Tidak bisa mencatat yang Anda kumpulkan: { $error }"
+
+[messages.hoard-gems]
+source = "Gems"
+translation = "Permata"
+
+[messages.hoard-gold]
+source = "Gold"
+translation = "Emas"
+
+[messages.hoard-label]
+source = "A dragon guarding its hoard. Treasure: { $count }"
+translation = "Seekor naga menjaga harta karunnya. Harta: { $count }"
+
+[messages.hoard-new]
+source = "New loot to collect: { $count }"
+translation = "Jarahan baru untuk dikumpulkan: { $count }"
+
+[messages.hoard-none-new]
+source = "Nothing new to collect."
+translation = "Tidak ada yang baru untuk dikumpulkan."
+
+[messages.hoard-paintings]
+source = "Paintings"
+translation = "Lukisan"
+
+[messages.hoard-potions]
+source = "Potions"
+translation = "Ramuan"
+
+[messages.hoard-sign-in]
+source = "Sign in to collect a hoard of your own."
+translation = "Masuk untuk mengumpulkan harta karun Anda sendiri."
+
+[messages.hoard-tablets]
+source = "Rune tablets"
+translation = "Lempeng rune"
+
+[messages.hoard-title]
+source = "Your hoard"
+translation = "Harta karun Anda"
+
+[messages.hoard-unavailable]
+source = "This browser can’t draw the hoard: { $error }"
+translation = "Browser ini tidak bisa menggambar harta karun: { $error }"
+
+[messages.hoard-weapons]
+source = "Weapons"
+translation = "Senjata"
+
+[messages.hoard-what]
+source = "Every asset in the library is a piece of treasure, and its kind decides which. Collect what’s new to add it to your pile."
+translation = "Setiap aset di pustaka adalah sepotong harta, dan jenisnya menentukan yang mana. Kumpulkan yang baru untuk menambahkannya ke tumpukan Anda."
 
 [messages.https-add]
 source = "Add"
@@ -9144,12 +9216,12 @@ source = "General"
 translation = "Umum"
 
 [messages.settings-page-general-blurb]
-source = "What this server is called, for everyone who uses it."
-translation = "Nama server ini, untuk semua orang yang memakainya."
+source = "Your dragon’s hoard, and what this server is called."
+translation = "Harta karun naga Anda, dan nama server ini."
 
 [messages.settings-page-general-blurb-desktop]
-source = "What this library is called."
-translation = "Nama pustaka ini."
+source = "Your dragon’s hoard, and what this library is called."
+translation = "Harta karun naga Anda, dan nama pustaka ini."
 
 [messages.settings-page-issues]
 source = "Issues"

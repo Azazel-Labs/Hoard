@@ -184,6 +184,7 @@ error-token-account-gone = hierdie token se rekening bestaan nie meer nie, dus h
 error-favorites-too-many = hoogstens 10 000 op 'n slag
 error-saved-search-name = 'n gestoorde soektog het 'n naam van hoogstens 80 karakters nodig
 error-saved-search-too-long = daardie soektog is te lank om te stoor
+error-hoard-seen = die skat kan hoogstens 32 soorte bates hou, elk benoem in kleinletters
 error-texture-pattern-map = Die tekstuurnaampatroon het { "{" }map{ "}" } nodig, anders kry elke kaart van 'n materiaal dieselfde naam
 error-texture-pattern-fields = Die tekstuurnaampatroon kan { "{" }name{ "}" }, { "{" }map{ "}" } en { "{" }size{ "}" } gebruik
 error-texture-name-chars = Tekstuurname kan nie < > : " / \ | ? of * bevat nie
@@ -2156,6 +2157,26 @@ stats-largest-files = Grootste lêers
 stats-open-file = Maak { $name } oop
 stats-empty = Nog niks in die biblioteek nie. Voeg 'n pak by en sy syfers verskyn hier.
 
+## HoardPanel.vue
+
+hoard-title = Jou skat
+hoard-what = Elke bate in die biblioteek is ’n stuk skat, en sy soort bepaal watter. Versamel wat nuut is om dit by jou hoop te voeg.
+hoard-sign-in = Meld aan om ’n skat van jou eie te versamel.
+hoard-new = Nuwe buit om te versamel: { $count }
+hoard-none-new = Niks nuuts om te versamel nie.
+hoard-collect = Versamel
+hoard-unavailable = Hierdie blaaier kan nie die skat teken nie: { $error }
+hoard-collect-failed = Kon nie stoor wat jy versamel het nie: { $error }
+hoard-label = ’n Draak wat sy skat bewaak. Skat: { $count }
+hoard-gold = Goud
+hoard-gems = Edelstene
+hoard-books = Boeke
+hoard-weapons = Wapens
+hoard-bones = Bene
+hoard-tablets = Runeplate
+hoard-paintings = Skilderye
+hoard-potions = Drankies
+
 ## UpdatesPanel.vue
 
 updates-saved = Hoard sal dit roep wanneer 'n bywerking gereed is
@@ -2253,8 +2274,8 @@ settings-title = Instellings
 settings-loading = Laai…
 settings-load-failed = Kon nie die instellings laai nie: { $error }
 settings-page-general = Algemeen
-settings-page-general-blurb = Wat hierdie bediener genoem word, vir almal wat dit gebruik.
-settings-page-general-blurb-desktop = Wat hierdie biblioteek genoem word.
+settings-page-general-blurb = Jou draak se skat, en wat hierdie bediener genoem word.
+settings-page-general-blurb-desktop = Jou draak se skat, en wat hierdie biblioteek genoem word.
 settings-page-appearance = Voorkoms
 settings-page-appearance-blurb = Die temas wat hierdie blaaier dra wanneer dit lig en wanneer dit donker is. Net in hierdie blaaier gestoor.
 settings-page-library = Biblioteek

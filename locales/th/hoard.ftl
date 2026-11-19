@@ -184,6 +184,7 @@ error-token-account-gone = บัญชีของโทเค็นนี้�
 error-favorites-too-many = ครั้งละไม่เกิน 10,000 รายการ
 error-saved-search-name = การค้นหาที่บันทึกไว้ต้องมีชื่อยาวไม่เกิน 80 ตัวอักษร
 error-saved-search-too-long = การค้นหานี้ยาวเกินกว่าจะบันทึกได้
+error-hoard-seen = ขุมทรัพย์บันทึกแอสเซ็ตได้สูงสุด 32 ชนิด แต่ละชนิดตั้งชื่อด้วยตัวพิมพ์เล็ก
 error-texture-pattern-map = รูปแบบชื่อเท็กซ์เจอร์ต้องมี { "{" }map{ "}" } ไม่เช่นนั้นทุกแมปของแมทีเรียลจะได้ชื่อเดียวกัน
 error-texture-pattern-fields = รูปแบบชื่อเท็กซ์เจอร์ใช้ { "{" }name{ "}" }, { "{" }map{ "}" } และ { "{" }size{ "}" } ได้
 error-texture-name-chars = ชื่อเท็กซ์เจอร์ต้องไม่มี < > : " / \ | ? หรือ *
@@ -1988,6 +1989,26 @@ stats-largest-files = ไฟล์ที่ใหญ่ที่สุด
 stats-open-file = เปิด { $name }
 stats-empty = ยังไม่มีอะไรในคลัง เพิ่มแพ็กแล้วตัวเลขจะแสดงที่นี่
 
+## HoardPanel.vue
+
+hoard-title = ขุมทรัพย์ของคุณ
+hoard-what = แอสเซ็ตทุกชิ้นในคลังคือสมบัติหนึ่งชิ้น และชนิดของแอสเซ็ตกำหนดว่าเป็นสมบัติแบบใด เก็บของใหม่เพื่อเพิ่มลงในกองของคุณ
+hoard-sign-in = ลงชื่อเข้าใช้เพื่อสะสมขุมทรัพย์ของคุณเอง
+hoard-new = ของรางวัลใหม่ที่เก็บได้: { $count }
+hoard-none-new = ไม่มีของใหม่ให้เก็บ
+hoard-collect = เก็บ
+hoard-unavailable = เบราว์เซอร์นี้วาดขุมทรัพย์ไม่ได้: { $error }
+hoard-collect-failed = บันทึกสิ่งที่คุณเก็บไม่ได้: { $error }
+hoard-label = มังกรเฝ้าขุมทรัพย์ของมัน สมบัติ: { $count }
+hoard-gold = ทองคำ
+hoard-gems = อัญมณี
+hoard-books = หนังสือ
+hoard-weapons = อาวุธ
+hoard-bones = กระดูก
+hoard-tablets = แผ่นจารึกรูน
+hoard-paintings = ภาพวาด
+hoard-potions = ยา
+
 ## UpdatesPanel.vue
 
 updates-saved = Hoard จะเรียกที่อยู่นี้เมื่อมีอัปเดตพร้อม
@@ -2077,8 +2098,8 @@ settings-title = การตั้งค่า
 settings-loading = กำลังโหลด…
 settings-load-failed = โหลดการตั้งค่าไม่ได้: { $error }
 settings-page-general = ทั่วไป
-settings-page-general-blurb = ชื่อที่เรียกเซิร์ฟเวอร์นี้ สำหรับทุกคนที่ใช้งาน
-settings-page-general-blurb-desktop = ชื่อที่เรียกคลังนี้
+settings-page-general-blurb = ขุมทรัพย์ของมังกรของคุณ และชื่อของเซิร์ฟเวอร์นี้
+settings-page-general-blurb-desktop = ขุมทรัพย์ของมังกรของคุณ และชื่อของคลังนี้
 settings-page-appearance = รูปลักษณ์
 settings-page-appearance-blurb = ธีมที่เบราว์เซอร์นี้ใช้เมื่อเป็นโหมดสว่างและโหมดมืด บันทึกไว้ในเบราว์เซอร์นี้เท่านั้น
 settings-page-library = คลัง

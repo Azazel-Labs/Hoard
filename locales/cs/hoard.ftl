@@ -184,6 +184,7 @@ error-token-account-gone = účet tohoto tokenu už neexistuje, takže nemá ž�
 error-favorites-too-many = nejvýše 10 000 najednou
 error-saved-search-name = uložené hledání potřebuje název o nejvýše 80 znacích
 error-saved-search-too-long = toto hledání je příliš dlouhé na uložení
+error-hoard-seen = poklad může zaznamenat nejvýše 32 druhů assetů, každý pojmenovaný malými písmeny
 error-texture-pattern-map = Vzor názvu textury potřebuje { "{" }map{ "}" }, jinak by všechny mapy materiálu dostaly stejný název
 error-texture-pattern-fields = Vzor názvu textury může používat { "{" }name{ "}" }, { "{" }map{ "}" } a { "{" }size{ "}" }
 error-texture-name-chars = Názvy textur nemohou obsahovat < > : " / \ | ? ani *
@@ -2348,6 +2349,26 @@ stats-largest-files = Největší soubory
 stats-open-file = Otevřít { $name }
 stats-empty = Knihovna je zatím prázdná. Přidejte balíček a jeho čísla se objeví tady.
 
+## HoardPanel.vue
+
+hoard-title = Váš poklad
+hoard-what = Každý asset v knihovně je kus pokladu a jeho druh určuje jaký. Seberte, co je nové, a přidejte to na svou hromadu.
+hoard-sign-in = Přihlaste se a sbírejte vlastní poklad.
+hoard-new = Nová kořist ke sběru: { $count }
+hoard-none-new = Nic nového ke sběru.
+hoard-collect = Sebrat
+hoard-unavailable = Tento prohlížeč neumí poklad vykreslit: { $error }
+hoard-collect-failed = Nepodařilo se uložit, co jste sebrali: { $error }
+hoard-label = Drak střežící svůj poklad. Kusů pokladu: { $count }
+hoard-gold = Zlato
+hoard-gems = Drahokamy
+hoard-books = Knihy
+hoard-weapons = Zbraně
+hoard-bones = Kosti
+hoard-tablets = Runové destičky
+hoard-paintings = Obrazy
+hoard-potions = Lektvary
+
 ## UpdatesPanel.vue
 
 updates-saved = Hoard ji zavolá, až bude připravená aktualizace
@@ -2452,8 +2473,8 @@ settings-title = Nastavení
 settings-loading = Načítám…
 settings-load-failed = Nastavení se nepodařilo načíst: { $error }
 settings-page-general = Obecné
-settings-page-general-blurb = Jak se tento server jmenuje, pro všechny, kdo ho používají.
-settings-page-general-blurb-desktop = Jak se tato knihovna jmenuje.
+settings-page-general-blurb = Poklad vašeho draka a jak se tento server jmenuje.
+settings-page-general-blurb-desktop = Poklad vašeho draka a jak se tato knihovna jmenuje.
 settings-page-appearance = Vzhled
 settings-page-appearance-blurb = Motivy, které tento prohlížeč používá, když je světlý a když je tmavý. Ukládá se jen v tomto prohlížeči.
 settings-page-library = Knihovna

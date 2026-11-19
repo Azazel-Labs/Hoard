@@ -184,6 +184,7 @@ error-token-account-gone = ο λογαριασμός αυτού του διακ�
 error-favorites-too-many = το πολύ 10.000 τη φορά
 error-saved-search-name = μια αποθηκευμένη αναζήτηση χρειάζεται όνομα έως 80 χαρακτήρων
 error-saved-search-too-long = αυτή η αναζήτηση είναι πολύ μεγάλη για να αποθηκευτεί
+error-hoard-seen = ο θησαυρός μπορεί να καταγράψει έως 32 είδη στοιχείων, το καθένα με όνομα σε πεζά γράμματα
 error-texture-pattern-map = Το μοτίβο ονομάτων υφών χρειάζεται το { "{" }map{ "}" }, αλλιώς όλοι οι χάρτες ενός υλικού θα έπαιρναν το ίδιο όνομα
 error-texture-pattern-fields = Το μοτίβο ονομάτων υφών μπορεί να χρησιμοποιεί τα { "{" }name{ "}" }, { "{" }map{ "}" } και { "{" }size{ "}" }
 error-texture-name-chars = Τα ονόματα υφών δεν μπορούν να περιέχουν < > : " / \ | ? ή *
@@ -2239,6 +2240,26 @@ stats-largest-files = Μεγαλύτερα αρχεία
 stats-open-file = Άνοιγμα: { $name }
 stats-empty = Δεν υπάρχει ακόμη τίποτα στη βιβλιοθήκη. Προσθέστε ένα πακέτο και τα νούμερά του θα εμφανιστούν εδώ.
 
+## HoardPanel.vue
+
+hoard-title = Ο θησαυρός σας
+hoard-what = Κάθε στοιχείο της βιβλιοθήκης είναι ένα κομμάτι θησαυρού, και το είδος του καθορίζει ποιο. Μαζέψτε ό,τι είναι καινούργιο για να το προσθέσετε στον σωρό σας.
+hoard-sign-in = Συνδεθείτε για να μαζέψετε δικό σας θησαυρό.
+hoard-new = Νέα λάφυρα για μάζεμα: { $count }
+hoard-none-new = Δεν υπάρχει τίποτα καινούργιο για μάζεμα.
+hoard-collect = Μαζέψτε
+hoard-unavailable = Αυτό το πρόγραμμα περιήγησης δεν μπορεί να σχεδιάσει τον θησαυρό: { $error }
+hoard-collect-failed = Δεν ήταν δυνατή η καταγραφή όσων μαζέψατε: { $error }
+hoard-label = Ένας δράκος φυλάει τον θησαυρό του. Κομμάτια: { $count }
+hoard-gold = Χρυσός
+hoard-gems = Πολύτιμοι λίθοι
+hoard-books = Βιβλία
+hoard-weapons = Όπλα
+hoard-bones = Κόκαλα
+hoard-tablets = Ρουνικές πλάκες
+hoard-paintings = Πίνακες
+hoard-potions = Φίλτρα
+
 ## UpdatesPanel.vue
 
 updates-saved = Το Hoard θα την καλέσει όταν υπάρχει διαθέσιμη ενημέρωση
@@ -2336,8 +2357,8 @@ settings-title = Ρυθμίσεις
 settings-loading = Φόρτωση…
 settings-load-failed = Δεν ήταν δυνατή η φόρτωση των ρυθμίσεων: { $error }
 settings-page-general = Γενικά
-settings-page-general-blurb = Πώς λέγεται αυτός ο διακομιστής, για όλους όσοι τον χρησιμοποιούν.
-settings-page-general-blurb-desktop = Πώς λέγεται αυτή η βιβλιοθήκη.
+settings-page-general-blurb = Ο θησαυρός του δράκου σας και το όνομα αυτού του διακομιστή.
+settings-page-general-blurb-desktop = Ο θησαυρός του δράκου σας και το όνομα αυτής της βιβλιοθήκης.
 settings-page-appearance = Εμφάνιση
 settings-page-appearance-blurb = Τα θέματα που φοράει αυτό το πρόγραμμα περιήγησης όταν είναι φωτεινό και όταν είναι σκοτεινό. Αποθηκεύονται μόνο σε αυτό το πρόγραμμα περιήγησης.
 settings-page-library = Βιβλιοθήκη

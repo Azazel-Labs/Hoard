@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "d8dbfdf558614e792298e9f2143a889d3ce34cc24a0fe019b1acdcd7d98ba317"
+source = "4d93dc5d1285fff368850baed9eb7ace4cc4de3024361da1caffbeb82bc9dfe7"
 translation = "869ed1fc3b055273469332423634413363dc2f8fea2bf697f2d9d0791df51865"
 
 [messages.account-add]
@@ -3626,6 +3626,10 @@ translation = "フレームが 1 つだけか、多すぎて並べられませ�
 source = "give a full path"
 translation = "フルパスを指定してください"
 
+[messages.error-hoard-seen]
+source = "the hoard can record at most 32 kinds of asset, each named in lowercase letters"
+translation = "宝の山に記録できるアセットの種類は 32 種類までで、それぞれ小文字の名前が必要です"
+
 [messages.error-hosted-address]
 source = "The image search service’s address should start with http:// or https://"
 translation = "画像検索サービスのアドレスは http:// または https:// で始めてください"
@@ -4740,6 +4744,74 @@ translation = "読み取る内容"
 [messages.formatwizard-zip-failed]
 source = "Couldn’t make the zip: { $error }"
 translation = "zip を作成できませんでした: { $error }"
+
+[messages.hoard-bones]
+source = "Bones"
+translation = "骨"
+
+[messages.hoard-books]
+source = "Books"
+translation = "本"
+
+[messages.hoard-collect]
+source = "Collect"
+translation = "集める"
+
+[messages.hoard-collect-failed]
+source = "Couldn’t record what you collected: { $error }"
+translation = "集めたものを記録できませんでした: { $error }"
+
+[messages.hoard-gems]
+source = "Gems"
+translation = "宝石"
+
+[messages.hoard-gold]
+source = "Gold"
+translation = "金貨"
+
+[messages.hoard-label]
+source = "A dragon guarding its hoard. Treasure: { $count }"
+translation = "宝の山を守るドラゴン。宝物: { $count }"
+
+[messages.hoard-new]
+source = "New loot to collect: { $count }"
+translation = "集められる新しい戦利品: { $count }"
+
+[messages.hoard-none-new]
+source = "Nothing new to collect."
+translation = "新しく集めるものはありません。"
+
+[messages.hoard-paintings]
+source = "Paintings"
+translation = "絵画"
+
+[messages.hoard-potions]
+source = "Potions"
+translation = "薬瓶"
+
+[messages.hoard-sign-in]
+source = "Sign in to collect a hoard of your own."
+translation = "サインインすると、自分だけの宝の山を集められます。"
+
+[messages.hoard-tablets]
+source = "Rune tablets"
+translation = "ルーン石板"
+
+[messages.hoard-title]
+source = "Your hoard"
+translation = "あなたの宝の山"
+
+[messages.hoard-unavailable]
+source = "This browser can’t draw the hoard: { $error }"
+translation = "このブラウザーでは宝の山を描画できません: { $error }"
+
+[messages.hoard-weapons]
+source = "Weapons"
+translation = "武器"
+
+[messages.hoard-what]
+source = "Every asset in the library is a piece of treasure, and its kind decides which. Collect what’s new to add it to your pile."
+translation = "ライブラリのアセットはそれぞれ宝物ひとつで、種類によってどの宝物かが決まります。新しいものを集めると、あなたの山に加わります。"
 
 [messages.https-add]
 source = "Add"
@@ -9154,12 +9226,12 @@ source = "General"
 translation = "一般"
 
 [messages.settings-page-general-blurb]
-source = "What this server is called, for everyone who uses it."
-translation = "このサーバーの名前です。使う人全員に表示されます。"
+source = "Your dragon’s hoard, and what this server is called."
+translation = "あなたのドラゴンの宝の山と、このサーバーの名前。"
 
 [messages.settings-page-general-blurb-desktop]
-source = "What this library is called."
-translation = "このライブラリの名前です。"
+source = "Your dragon’s hoard, and what this library is called."
+translation = "あなたのドラゴンの宝の山と、このライブラリの名前。"
 
 [messages.settings-page-issues]
 source = "Issues"

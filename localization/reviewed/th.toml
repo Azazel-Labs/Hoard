@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "d8dbfdf558614e792298e9f2143a889d3ce34cc24a0fe019b1acdcd7d98ba317"
+source = "4d93dc5d1285fff368850baed9eb7ace4cc4de3024361da1caffbeb82bc9dfe7"
 translation = "07555d54b3ba6bc94b6fcbf55672d1be5e77ca134c96e30754ee929b3a902828"
 
 [messages.account-add]
@@ -3623,6 +3623,10 @@ translation = "ไฟล์นี้มีเฟรมเดียว หรื�
 source = "give a full path"
 translation = "ระบุพาธเต็ม"
 
+[messages.error-hoard-seen]
+source = "the hoard can record at most 32 kinds of asset, each named in lowercase letters"
+translation = "ขุมทรัพย์บันทึกแอสเซ็ตได้สูงสุด 32 ชนิด แต่ละชนิดตั้งชื่อด้วยตัวพิมพ์เล็ก"
+
 [messages.error-hosted-address]
 source = "The image search service’s address should start with http:// or https://"
 translation = "ที่อยู่ของบริการค้นหาด้วยภาพควรขึ้นต้นด้วย http:// หรือ https://"
@@ -4729,6 +4733,74 @@ translation = "สิ่งที่อ่านได้"
 [messages.formatwizard-zip-failed]
 source = "Couldn’t make the zip: { $error }"
 translation = "สร้างไฟล์ zip ไม่ได้: { $error }"
+
+[messages.hoard-bones]
+source = "Bones"
+translation = "กระดูก"
+
+[messages.hoard-books]
+source = "Books"
+translation = "หนังสือ"
+
+[messages.hoard-collect]
+source = "Collect"
+translation = "เก็บ"
+
+[messages.hoard-collect-failed]
+source = "Couldn’t record what you collected: { $error }"
+translation = "บันทึกสิ่งที่คุณเก็บไม่ได้: { $error }"
+
+[messages.hoard-gems]
+source = "Gems"
+translation = "อัญมณี"
+
+[messages.hoard-gold]
+source = "Gold"
+translation = "ทองคำ"
+
+[messages.hoard-label]
+source = "A dragon guarding its hoard. Treasure: { $count }"
+translation = "มังกรเฝ้าขุมทรัพย์ของมัน สมบัติ: { $count }"
+
+[messages.hoard-new]
+source = "New loot to collect: { $count }"
+translation = "ของรางวัลใหม่ที่เก็บได้: { $count }"
+
+[messages.hoard-none-new]
+source = "Nothing new to collect."
+translation = "ไม่มีของใหม่ให้เก็บ"
+
+[messages.hoard-paintings]
+source = "Paintings"
+translation = "ภาพวาด"
+
+[messages.hoard-potions]
+source = "Potions"
+translation = "ยา"
+
+[messages.hoard-sign-in]
+source = "Sign in to collect a hoard of your own."
+translation = "ลงชื่อเข้าใช้เพื่อสะสมขุมทรัพย์ของคุณเอง"
+
+[messages.hoard-tablets]
+source = "Rune tablets"
+translation = "แผ่นจารึกรูน"
+
+[messages.hoard-title]
+source = "Your hoard"
+translation = "ขุมทรัพย์ของคุณ"
+
+[messages.hoard-unavailable]
+source = "This browser can’t draw the hoard: { $error }"
+translation = "เบราว์เซอร์นี้วาดขุมทรัพย์ไม่ได้: { $error }"
+
+[messages.hoard-weapons]
+source = "Weapons"
+translation = "อาวุธ"
+
+[messages.hoard-what]
+source = "Every asset in the library is a piece of treasure, and its kind decides which. Collect what’s new to add it to your pile."
+translation = "แอสเซ็ตทุกชิ้นในคลังคือสมบัติหนึ่งชิ้น และชนิดของแอสเซ็ตกำหนดว่าเป็นสมบัติแบบใด เก็บของใหม่เพื่อเพิ่มลงในกองของคุณ"
 
 [messages.https-add]
 source = "Add"
@@ -9143,12 +9215,12 @@ source = "General"
 translation = "ทั่วไป"
 
 [messages.settings-page-general-blurb]
-source = "What this server is called, for everyone who uses it."
-translation = "ชื่อที่เรียกเซิร์ฟเวอร์นี้ สำหรับทุกคนที่ใช้งาน"
+source = "Your dragon’s hoard, and what this server is called."
+translation = "ขุมทรัพย์ของมังกรของคุณ และชื่อของเซิร์ฟเวอร์นี้"
 
 [messages.settings-page-general-blurb-desktop]
-source = "What this library is called."
-translation = "ชื่อที่เรียกคลังนี้"
+source = "Your dragon’s hoard, and what this library is called."
+translation = "ขุมทรัพย์ของมังกรของคุณ และชื่อของคลังนี้"
 
 [messages.settings-page-issues]
 source = "Issues"

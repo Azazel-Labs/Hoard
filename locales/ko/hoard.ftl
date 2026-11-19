@@ -184,6 +184,7 @@ error-token-account-gone = 이 토큰의 계정이 없어져서 즐겨찾기나 
 error-favorites-too-many = 한 번에 최대 10,000개까지 가능합니다
 error-saved-search-name = 저장된 검색에는 80자 이하의 이름이 필요합니다
 error-saved-search-too-long = 검색이 너무 길어서 저장할 수 없습니다
+error-hoard-seen = 보물 더미에는 에셋 종류를 최대 32개까지 기록할 수 있으며, 각각 소문자 이름이어야 합니다
 error-texture-pattern-map = 텍스처 이름 패턴에는 { "{" }map{ "}" }이 있어야 합니다. 그렇지 않으면 머티리얼의 모든 맵이 같은 이름을 갖게 됩니다
 error-texture-pattern-fields = 텍스처 이름 패턴에는 { "{" }name{ "}" }, { "{" }map{ "}" }, { "{" }size{ "}" }를 사용할 수 있습니다
 error-texture-name-chars = 텍스처 이름에는 < > : " / \ | ? * 를 쓸 수 없습니다
@@ -1958,6 +1959,26 @@ stats-largest-files = 가장 큰 파일
 stats-open-file = { $name } 열기
 stats-empty = 라이브러리가 아직 비어 있습니다. 팩을 추가하면 여기에 수치가 표시됩니다.
 
+## HoardPanel.vue
+
+hoard-title = 나의 보물 더미
+hoard-what = 라이브러리의 모든 에셋은 보물 한 조각이며, 종류에 따라 어떤 보물인지 정해집니다. 새것을 모으면 내 더미에 더해집니다.
+hoard-sign-in = 로그인하면 나만의 보물 더미를 모을 수 있습니다.
+hoard-new = 모을 수 있는 새 전리품: { $count }
+hoard-none-new = 새로 모을 것이 없습니다.
+hoard-collect = 모으기
+hoard-unavailable = 이 브라우저에서는 보물 더미를 그릴 수 없습니다: { $error }
+hoard-collect-failed = 모은 것을 기록하지 못했습니다: { $error }
+hoard-label = 보물 더미를 지키는 용. 보물: { $count }
+hoard-gold = 금
+hoard-gems = 보석
+hoard-books = 책
+hoard-weapons = 무기
+hoard-bones = 뼈
+hoard-tablets = 룬 석판
+hoard-paintings = 그림
+hoard-potions = 물약
+
 ## UpdatesPanel.vue
 
 updates-saved = 업데이트가 준비되면 Hoard가 이 주소를 호출합니다
@@ -2047,8 +2068,8 @@ settings-title = 설정
 settings-loading = 불러오는 중…
 settings-load-failed = 설정을 불러오지 못했습니다: { $error }
 settings-page-general = 일반
-settings-page-general-blurb = 이 서버를 사용하는 모든 사람에게 보이는 서버 이름입니다.
-settings-page-general-blurb-desktop = 이 라이브러리의 이름입니다.
+settings-page-general-blurb = 내 용의 보물 더미와 이 서버의 이름.
+settings-page-general-blurb-desktop = 내 용의 보물 더미와 이 라이브러리의 이름.
 settings-page-appearance = 모양
 settings-page-appearance-blurb = 이 브라우저가 밝을 때와 어두울 때 사용하는 테마입니다. 이 브라우저에만 저장됩니다.
 settings-page-library = 라이브러리

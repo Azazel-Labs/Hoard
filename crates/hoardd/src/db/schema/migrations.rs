@@ -758,4 +758,6 @@ pub(in crate::db) const MIGRATIONS: &[&str] = &[
     "ALTER TABLE packs ADD COLUMN dir_times TEXT;",
     // 75: each take of a file of many is an asset of its own (see `takes`), found by the file it came from.
     "CREATE INDEX assets_take_of ON assets (json_extract(meta, '$.take_of'));",
+    // 76: each person's dragon hoard (see `me`): how many assets of each kind they've collected, as JSON.
+    "ALTER TABLE users ADD COLUMN hoard_seen TEXT;",
 ];

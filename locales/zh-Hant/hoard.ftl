@@ -184,6 +184,7 @@ error-token-account-gone = 這個權杖的帳號已不存在，因此沒有最�
 error-favorites-too-many = 一次最多 10,000 個
 error-saved-search-name = 已儲存的搜尋需要最多 80 個字元的名稱
 error-saved-search-too-long = 這個搜尋太長，無法儲存
+error-hoard-seen = 寶藏最多可記錄 32 種素材，每種都須以小寫字母命名
 error-texture-pattern-map = 貼圖名稱樣式需要包含 { "{" }map{ "}" }，否則材質的每張貼圖都會得到相同的名稱
 error-texture-pattern-fields = 貼圖名稱樣式可以使用 { "{" }name{ "}" }、{ "{" }map{ "}" } 和 { "{" }size{ "}" }
 error-texture-name-chars = 貼圖名稱不能包含 < > : " / \ | ? 或 *
@@ -1991,6 +1992,26 @@ stats-largest-files = 最大的檔案
 stats-open-file = 開啟 { $name }
 stats-empty = 素材庫中還沒有任何內容。新增素材包後，它的數據就會顯示在這裡。
 
+## HoardPanel.vue
+
+hoard-title = 你的寶藏
+hoard-what = 素材庫中的每個素材都是一件寶物，素材的種類決定是哪種寶物。收集新內容，把它們加進你的寶堆。
+hoard-sign-in = 登入後即可收集屬於你自己的寶藏。
+hoard-new = 可收集的新戰利品：{ $count }
+hoard-none-new = 沒有可收集的新內容。
+hoard-collect = 收集
+hoard-unavailable = 此瀏覽器無法繪製寶藏：{ $error }
+hoard-collect-failed = 無法記錄你收集的內容：{ $error }
+hoard-label = 一條守護寶藏的龍。寶物：{ $count }
+hoard-gold = 金幣
+hoard-gems = 寶石
+hoard-books = 書籍
+hoard-weapons = 武器
+hoard-bones = 骨頭
+hoard-tablets = 符文石板
+hoard-paintings = 畫作
+hoard-potions = 藥水
+
 ## 更新面板
 
 updates-saved = 有可用的更新時，Hoard 會呼叫這個網址
@@ -2080,8 +2101,8 @@ settings-title = 設定
 settings-loading = 載入中…
 settings-load-failed = 無法載入設定：{ $error }
 settings-page-general = 一般
-settings-page-general-blurb = 這台伺服器的名稱，所有使用者都會看到。
-settings-page-general-blurb-desktop = 這個素材庫的名稱。
+settings-page-general-blurb = 你的龍的寶藏，以及這台伺服器的名稱。
+settings-page-general-blurb-desktop = 你的龍的寶藏，以及這個素材庫的名稱。
 settings-page-appearance = 外觀
 settings-page-appearance-blurb = 這個瀏覽器在淺色與深色模式下使用的主題。只儲存在這個瀏覽器中。
 settings-page-library = 素材庫

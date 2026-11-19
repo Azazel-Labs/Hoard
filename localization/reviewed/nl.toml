@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "d8dbfdf558614e792298e9f2143a889d3ce34cc24a0fe019b1acdcd7d98ba317"
+source = "4d93dc5d1285fff368850baed9eb7ace4cc4de3024361da1caffbeb82bc9dfe7"
 translation = "d3e5845d6d4178bd5edbc2277e0e916981a0ddba412230b00124f99958cb1526"
 
 [messages.account-add]
@@ -3712,6 +3712,10 @@ translation = "dit heeft één frame, of te veel om naast elkaar te zetten"
 source = "give a full path"
 translation = "geef een volledig pad op"
 
+[messages.error-hoard-seen]
+source = "the hoard can record at most 32 kinds of asset, each named in lowercase letters"
+translation = "de schat kan hoogstens 32 soorten assets bijhouden, elk met een naam in kleine letters"
+
 [messages.error-hosted-address]
 source = "The image search service’s address should start with http:// or https://"
 translation = "Het adres van de dienst voor zoeken op beeld moet beginnen met http:// of https://"
@@ -4832,6 +4836,74 @@ translation = "Wat het leest"
 [messages.formatwizard-zip-failed]
 source = "Couldn’t make the zip: { $error }"
 translation = "Kon de zip niet maken: { $error }"
+
+[messages.hoard-bones]
+source = "Bones"
+translation = "Botten"
+
+[messages.hoard-books]
+source = "Books"
+translation = "Boeken"
+
+[messages.hoard-collect]
+source = "Collect"
+translation = "Verzamelen"
+
+[messages.hoard-collect-failed]
+source = "Couldn’t record what you collected: { $error }"
+translation = "Kon niet opslaan wat je hebt verzameld: { $error }"
+
+[messages.hoard-gems]
+source = "Gems"
+translation = "Edelstenen"
+
+[messages.hoard-gold]
+source = "Gold"
+translation = "Goud"
+
+[messages.hoard-label]
+source = "A dragon guarding its hoard. Treasure: { $count }"
+translation = "Een draak die zijn schat bewaakt. Schatten: { $count }"
+
+[messages.hoard-new]
+source = "New loot to collect: { $count }"
+translation = "Nieuwe buit om te verzamelen: { $count }"
+
+[messages.hoard-none-new]
+source = "Nothing new to collect."
+translation = "Niets nieuws om te verzamelen."
+
+[messages.hoard-paintings]
+source = "Paintings"
+translation = "Schilderijen"
+
+[messages.hoard-potions]
+source = "Potions"
+translation = "Drankjes"
+
+[messages.hoard-sign-in]
+source = "Sign in to collect a hoard of your own."
+translation = "Meld je aan om een eigen schat te verzamelen."
+
+[messages.hoard-tablets]
+source = "Rune tablets"
+translation = "Runentabletten"
+
+[messages.hoard-title]
+source = "Your hoard"
+translation = "Jouw schat"
+
+[messages.hoard-unavailable]
+source = "This browser can’t draw the hoard: { $error }"
+translation = "Deze browser kan de schat niet tekenen: { $error }"
+
+[messages.hoard-weapons]
+source = "Weapons"
+translation = "Wapens"
+
+[messages.hoard-what]
+source = "Every asset in the library is a piece of treasure, and its kind decides which. Collect what’s new to add it to your pile."
+translation = "Elk asset in de bibliotheek is een stuk schat, en de soort bepaalt welk. Verzamel wat nieuw is om het aan je stapel toe te voegen."
 
 [messages.https-add]
 source = "Add"
@@ -9334,12 +9406,12 @@ source = "General"
 translation = "Algemeen"
 
 [messages.settings-page-general-blurb]
-source = "What this server is called, for everyone who uses it."
-translation = "Hoe deze server heet, voor iedereen die hem gebruikt."
+source = "Your dragon’s hoard, and what this server is called."
+translation = "De schat van je draak, en hoe deze server heet."
 
 [messages.settings-page-general-blurb-desktop]
-source = "What this library is called."
-translation = "Hoe deze bibliotheek heet."
+source = "Your dragon’s hoard, and what this library is called."
+translation = "De schat van je draak, en hoe deze bibliotheek heet."
 
 [messages.settings-page-issues]
 source = "Issues"

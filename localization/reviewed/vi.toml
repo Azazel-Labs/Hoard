@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "d8dbfdf558614e792298e9f2143a889d3ce34cc24a0fe019b1acdcd7d98ba317"
+source = "4d93dc5d1285fff368850baed9eb7ace4cc4de3024361da1caffbeb82bc9dfe7"
 translation = "42d6d2350a51c56e55a07a75988a6748d9e232912ffffb903defbf54bfd56e2e"
 
 [messages.account-add]
@@ -3620,6 +3620,10 @@ translation = "tệp này chỉ có một khung hình, hoặc có quá nhiều k
 source = "give a full path"
 translation = "hãy đưa đường dẫn đầy đủ"
 
+[messages.error-hoard-seen]
+source = "the hoard can record at most 32 kinds of asset, each named in lowercase letters"
+translation = "kho báu chỉ ghi được tối đa 32 loại tài nguyên, mỗi loại đặt tên bằng chữ thường"
+
 [messages.error-hosted-address]
 source = "The image search service’s address should start with http:// or https://"
 translation = "Địa chỉ của dịch vụ tìm kiếm hình ảnh phải bắt đầu bằng http:// hoặc https://"
@@ -4726,6 +4730,74 @@ translation = "Những gì nó đọc được"
 [messages.formatwizard-zip-failed]
 source = "Couldn’t make the zip: { $error }"
 translation = "Không thể tạo tệp zip: { $error }"
+
+[messages.hoard-bones]
+source = "Bones"
+translation = "Xương"
+
+[messages.hoard-books]
+source = "Books"
+translation = "Sách"
+
+[messages.hoard-collect]
+source = "Collect"
+translation = "Thu thập"
+
+[messages.hoard-collect-failed]
+source = "Couldn’t record what you collected: { $error }"
+translation = "Không thể ghi lại những gì bạn đã thu thập: { $error }"
+
+[messages.hoard-gems]
+source = "Gems"
+translation = "Đá quý"
+
+[messages.hoard-gold]
+source = "Gold"
+translation = "Vàng"
+
+[messages.hoard-label]
+source = "A dragon guarding its hoard. Treasure: { $count }"
+translation = "Một con rồng canh giữ kho báu của nó. Báu vật: { $count }"
+
+[messages.hoard-new]
+source = "New loot to collect: { $count }"
+translation = "Chiến lợi phẩm mới để thu thập: { $count }"
+
+[messages.hoard-none-new]
+source = "Nothing new to collect."
+translation = "Không có gì mới để thu thập."
+
+[messages.hoard-paintings]
+source = "Paintings"
+translation = "Tranh"
+
+[messages.hoard-potions]
+source = "Potions"
+translation = "Bình thuốc"
+
+[messages.hoard-sign-in]
+source = "Sign in to collect a hoard of your own."
+translation = "Đăng nhập để thu thập kho báu của riêng bạn."
+
+[messages.hoard-tablets]
+source = "Rune tablets"
+translation = "Phiến đá rune"
+
+[messages.hoard-title]
+source = "Your hoard"
+translation = "Kho báu của bạn"
+
+[messages.hoard-unavailable]
+source = "This browser can’t draw the hoard: { $error }"
+translation = "Trình duyệt này không vẽ được kho báu: { $error }"
+
+[messages.hoard-weapons]
+source = "Weapons"
+translation = "Vũ khí"
+
+[messages.hoard-what]
+source = "Every asset in the library is a piece of treasure, and its kind decides which. Collect what’s new to add it to your pile."
+translation = "Mỗi tài nguyên trong thư viện là một món báu vật, và loại của nó quyết định là món nào. Thu thập những gì mới để thêm vào đống của bạn."
 
 [messages.https-add]
 source = "Add"
@@ -9140,12 +9212,12 @@ source = "General"
 translation = "Chung"
 
 [messages.settings-page-general-blurb]
-source = "What this server is called, for everyone who uses it."
-translation = "Tên của máy chủ này, cho mọi người dùng nó."
+source = "Your dragon’s hoard, and what this server is called."
+translation = "Kho báu của rồng của bạn, và tên của máy chủ này."
 
 [messages.settings-page-general-blurb-desktop]
-source = "What this library is called."
-translation = "Tên của thư viện này."
+source = "Your dragon’s hoard, and what this library is called."
+translation = "Kho báu của rồng của bạn, và tên của thư viện này."
 
 [messages.settings-page-issues]
 source = "Issues"

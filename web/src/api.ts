@@ -315,6 +315,14 @@ export const api = {
   savedSearches: () => request<{ searches: SavedSearch[] }>('/api/me/searches'),
   saveSearch: (name: string, query: string) => post<{ searches: SavedSearch[] }>('/api/me/searches', { name, query }),
   deleteSearch: (id: number) => request<void>(`/api/me/searches/${id}`, { method: 'DELETE' }),
+  /** How many assets of each kind this account has collected into its hoard, or null before it has collected any. */
+  hoard: () => request<{ seen: Record<string, number> | null }>('/api/me/hoard'),
+  setHoard: (seen: Record<string, number>) =>
+    request<{ seen: Record<string, number> }>('/api/me/hoard', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ seen }),
+    }),
   connections: () => request<{ connections: Connection[] }>('/api/admin/connections'),
   disconnect: (id: number) => request<void>(`/api/admin/connections/${id}`, { method: 'DELETE' }),
   oauthRequest: (search: string) => request<{ client: string; redirect_host: string }>(`/api/oauth/request${search}`),

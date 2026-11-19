@@ -213,6 +213,7 @@ error-token-account-gone = this token's account is gone, so it has no favorites 
 error-favorites-too-many = at most 10,000 at a time
 error-saved-search-name = a saved search needs a name of at most 80 characters
 error-saved-search-too-long = that search is too long to save
+error-hoard-seen = the hoard can record at most 32 kinds of asset, each named in lowercase letters
 # Settings → Textures. {"{"}name{"}"}, {"{"}map{"}"} and {"{"}size{"}"} are placeholders people type in the pattern: keep them as they are.
 error-texture-pattern-map = The texture name pattern needs { "{" }map{ "}" }, or every map of a material would get the same name
 error-texture-pattern-fields = The texture name pattern can use { "{" }name{ "}" }, { "{" }map{ "}" } and { "{" }size{ "}" }
@@ -2442,6 +2443,28 @@ stats-largest-files = Largest files
 stats-open-file = Open { $name }
 stats-empty = Nothing in the library yet. Add a pack and its numbers show up here.
 
+## HoardPanel.vue
+
+hoard-title = Your hoard
+hoard-what = Every asset in the library is a piece of treasure, and its kind decides which. Collect what’s new to add it to your pile.
+hoard-sign-in = Sign in to collect a hoard of your own.
+hoard-new = New loot to collect: { $count }
+hoard-none-new = Nothing new to collect.
+hoard-collect = Collect
+hoard-unavailable = This browser can’t draw the hoard: { $error }
+hoard-collect-failed = Couldn’t record what you collected: { $error }
+# The picture's text alternative: $count is how many pieces of treasure the pile holds.
+hoard-label = A dragon guarding its hoard. Treasure: { $count }
+# The kinds of treasure in the hoard, each standing for some kinds of asset.
+hoard-gold = Gold
+hoard-gems = Gems
+hoard-books = Books
+hoard-weapons = Weapons
+hoard-bones = Bones
+hoard-tablets = Rune tablets
+hoard-paintings = Paintings
+hoard-potions = Potions
+
 ## UpdatesPanel.vue
 
 updates-saved = Hoard will call it when an update is ready
@@ -2561,8 +2584,8 @@ settings-loading = Loading…
 settings-load-failed = Couldn't load the settings: { $error }
 # The pages down the side of Settings, each with the sentence under its heading.
 settings-page-general = General
-settings-page-general-blurb = What this server is called, for everyone who uses it.
-settings-page-general-blurb-desktop = What this library is called.
+settings-page-general-blurb = Your dragon’s hoard, and what this server is called.
+settings-page-general-blurb-desktop = Your dragon’s hoard, and what this library is called.
 settings-page-appearance = Appearance
 settings-page-appearance-blurb = The themes this browser wears when it’s light and when it’s dark. Saved in this browser only.
 settings-page-library = Library

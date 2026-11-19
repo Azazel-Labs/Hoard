@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "d8dbfdf558614e792298e9f2143a889d3ce34cc24a0fe019b1acdcd7d98ba317"
+source = "4d93dc5d1285fff368850baed9eb7ace4cc4de3024361da1caffbeb82bc9dfe7"
 translation = "9bd6df5ffb27941fd7574669812413d7eaa17a0920718334cfd6ce3df12e13f5"
 
 [messages.account-add]
@@ -3720,6 +3720,10 @@ translation = "tässä on yksi ruutu tai liian monta asetettavaksi arkkiin"
 source = "give a full path"
 translation = "anna koko polku"
 
+[messages.error-hoard-seen]
+source = "the hoard can record at most 32 kinds of asset, each named in lowercase letters"
+translation = "aarre voi tallentaa enintään 32 resurssilajia, kunkin nimettynä pienin kirjaimin"
+
 [messages.error-hosted-address]
 source = "The image search service’s address should start with http:// or https://"
 translation = "Kuvahakupalvelun osoitteen pitää alkaa http:// tai https://"
@@ -4845,6 +4849,74 @@ translation = "Mitä se lukee"
 [messages.formatwizard-zip-failed]
 source = "Couldn’t make the zip: { $error }"
 translation = "Zipin luonti epäonnistui: { $error }"
+
+[messages.hoard-bones]
+source = "Bones"
+translation = "Luita"
+
+[messages.hoard-books]
+source = "Books"
+translation = "Kirjoja"
+
+[messages.hoard-collect]
+source = "Collect"
+translation = "Kerää"
+
+[messages.hoard-collect-failed]
+source = "Couldn’t record what you collected: { $error }"
+translation = "Keräämiäsi ei voitu tallentaa: { $error }"
+
+[messages.hoard-gems]
+source = "Gems"
+translation = "Jalokiviä"
+
+[messages.hoard-gold]
+source = "Gold"
+translation = "Kultaa"
+
+[messages.hoard-label]
+source = "A dragon guarding its hoard. Treasure: { $count }"
+translation = "Lohikäärme vartioi aarrettaan. Aarteita: { $count }"
+
+[messages.hoard-new]
+source = "New loot to collect: { $count }"
+translation = "Uutta saalista kerättävänä: { $count }"
+
+[messages.hoard-none-new]
+source = "Nothing new to collect."
+translation = "Ei mitään uutta kerättävää."
+
+[messages.hoard-paintings]
+source = "Paintings"
+translation = "Maalauksia"
+
+[messages.hoard-potions]
+source = "Potions"
+translation = "Juomia"
+
+[messages.hoard-sign-in]
+source = "Sign in to collect a hoard of your own."
+translation = "Kirjaudu sisään kerätäksesi oman aarteen."
+
+[messages.hoard-tablets]
+source = "Rune tablets"
+translation = "Riimutauluja"
+
+[messages.hoard-title]
+source = "Your hoard"
+translation = "Aarteesi"
+
+[messages.hoard-unavailable]
+source = "This browser can’t draw the hoard: { $error }"
+translation = "Tämä selain ei pysty piirtämään aarretta: { $error }"
+
+[messages.hoard-weapons]
+source = "Weapons"
+translation = "Aseita"
+
+[messages.hoard-what]
+source = "Every asset in the library is a piece of treasure, and its kind decides which. Collect what’s new to add it to your pile."
+translation = "Jokainen kirjaston resurssi on aarteen kappale, ja sen laji ratkaisee, mikä. Kerää uudet, niin ne lisätään kasaasi."
 
 [messages.https-add]
 source = "Add"
@@ -9380,12 +9452,12 @@ source = "General"
 translation = "Yleiset"
 
 [messages.settings-page-general-blurb]
-source = "What this server is called, for everyone who uses it."
-translation = "Mikä tämän palvelimen nimi on kaikille sen käyttäjille."
+source = "Your dragon’s hoard, and what this server is called."
+translation = "Lohikäärmeesi aarre ja tämän palvelimen nimi."
 
 [messages.settings-page-general-blurb-desktop]
-source = "What this library is called."
-translation = "Mikä tämän kirjaston nimi on."
+source = "Your dragon’s hoard, and what this library is called."
+translation = "Lohikäärmeesi aarre ja tämän kirjaston nimi."
 
 [messages.settings-page-issues]
 source = "Issues"

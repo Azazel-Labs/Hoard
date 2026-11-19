@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "d8dbfdf558614e792298e9f2143a889d3ce34cc24a0fe019b1acdcd7d98ba317"
+source = "4d93dc5d1285fff368850baed9eb7ace4cc4de3024361da1caffbeb82bc9dfe7"
 translation = "492346de275ddfb98a7c980cda9c461c7c8cf91addc47e4b748e7c38ce659fb3"
 
 [messages.account-add]
@@ -3712,6 +3712,10 @@ translation = "té un sol fotograma, o massa per disposar-los"
 source = "give a full path"
 translation = "indiqueu un camí complet"
 
+[messages.error-hoard-seen]
+source = "the hoard can record at most 32 kinds of asset, each named in lowercase letters"
+translation = "el tresor pot registrar com a màxim 32 tipus de recurs, cadascun amb un nom en minúscules"
+
 [messages.error-hosted-address]
 source = "The image search service’s address should start with http:// or https://"
 translation = "L'adreça del servei de cerca d'imatges ha de començar per http:// o https://"
@@ -4829,6 +4833,74 @@ translation = "Què llegeix"
 [messages.formatwizard-zip-failed]
 source = "Couldn’t make the zip: { $error }"
 translation = "No s'ha pogut crear el zip: { $error }"
+
+[messages.hoard-bones]
+source = "Bones"
+translation = "Ossos"
+
+[messages.hoard-books]
+source = "Books"
+translation = "Llibres"
+
+[messages.hoard-collect]
+source = "Collect"
+translation = "Recull"
+
+[messages.hoard-collect-failed]
+source = "Couldn’t record what you collected: { $error }"
+translation = "No s’ha pogut desar el que heu recollit: { $error }"
+
+[messages.hoard-gems]
+source = "Gems"
+translation = "Gemmes"
+
+[messages.hoard-gold]
+source = "Gold"
+translation = "Or"
+
+[messages.hoard-label]
+source = "A dragon guarding its hoard. Treasure: { $count }"
+translation = "Un drac que guarda el seu tresor. Peces: { $count }"
+
+[messages.hoard-new]
+source = "New loot to collect: { $count }"
+translation = "Botí nou per recollir: { $count }"
+
+[messages.hoard-none-new]
+source = "Nothing new to collect."
+translation = "No hi ha res de nou per recollir."
+
+[messages.hoard-paintings]
+source = "Paintings"
+translation = "Quadres"
+
+[messages.hoard-potions]
+source = "Potions"
+translation = "Pocions"
+
+[messages.hoard-sign-in]
+source = "Sign in to collect a hoard of your own."
+translation = "Inicieu la sessió per reunir un tresor propi."
+
+[messages.hoard-tablets]
+source = "Rune tablets"
+translation = "Tauletes rúniques"
+
+[messages.hoard-title]
+source = "Your hoard"
+translation = "El vostre tresor"
+
+[messages.hoard-unavailable]
+source = "This browser can’t draw the hoard: { $error }"
+translation = "Aquest navegador no pot dibuixar el tresor: { $error }"
+
+[messages.hoard-weapons]
+source = "Weapons"
+translation = "Armes"
+
+[messages.hoard-what]
+source = "Every asset in the library is a piece of treasure, and its kind decides which. Collect what’s new to add it to your pile."
+translation = "Cada recurs de la biblioteca és una peça del tresor, i el seu tipus decideix quina. Recolliu el que és nou per afegir-ho a la vostra pila."
 
 [messages.https-add]
 source = "Add"
@@ -9335,12 +9407,12 @@ source = "General"
 translation = "General"
 
 [messages.settings-page-general-blurb]
-source = "What this server is called, for everyone who uses it."
-translation = "Com s'anomena aquest servidor, per a tothom que el fa servir."
+source = "Your dragon’s hoard, and what this server is called."
+translation = "El tresor del vostre drac i el nom d’aquest servidor."
 
 [messages.settings-page-general-blurb-desktop]
-source = "What this library is called."
-translation = "Com s'anomena aquesta biblioteca."
+source = "Your dragon’s hoard, and what this library is called."
+translation = "El tresor del vostre drac i el nom d’aquesta biblioteca."
 
 [messages.settings-page-issues]
 source = "Issues"

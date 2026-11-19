@@ -184,6 +184,7 @@ error-token-account-gone = kontoen til dette tokenet finnes ikke lenger, så det
 error-favorites-too-many = maks 10 000 om gangen
 error-saved-search-name = et lagret søk må ha et navn på maks 80 tegn
 error-saved-search-too-long = det søket er for langt til å lagres
+error-hoard-seen = skatten kan registrere høyst 32 typer ressurser, hver med et navn i små bokstaver
 error-texture-pattern-map = Mønsteret for teksturnavn må ha { "{" }map{ "}" }, ellers ville alle kartene til et materiale få samme navn
 error-texture-pattern-fields = Mønsteret for teksturnavn kan bruke { "{" }name{ "}" }, { "{" }map{ "}" } og { "{" }size{ "}" }
 error-texture-name-chars = Teksturnavn kan ikke inneholde < > : " / \ | ? eller *
@@ -2159,6 +2160,26 @@ stats-largest-files = Største filer
 stats-open-file = Åpne { $name }
 stats-empty = Ingenting i biblioteket ennå. Legg til en pakke, så dukker tallene opp her.
 
+## HoardPanel.vue
+
+hoard-title = Skatten din
+hoard-what = Hver ressurs i biblioteket er et stykke skatt, og typen avgjør hvilket. Samle inn det nye for å legge det på haugen din.
+hoard-sign-in = Logg inn for å samle en egen skatt.
+hoard-new = Nytt bytte å samle inn: { $count }
+hoard-none-new = Ingenting nytt å samle inn.
+hoard-collect = Samle inn
+hoard-unavailable = Denne nettleseren kan ikke tegne skatten: { $error }
+hoard-collect-failed = Kunne ikke lagre det du samlet inn: { $error }
+hoard-label = En drage som vokter skatten sin. Skatter: { $count }
+hoard-gold = Gull
+hoard-gems = Edelsteiner
+hoard-books = Bøker
+hoard-weapons = Våpen
+hoard-bones = Knokler
+hoard-tablets = Runetavler
+hoard-paintings = Malerier
+hoard-potions = Eliksirer
+
 ## UpdatesPanel.vue
 
 updates-saved = Hoard kaller den når en oppdatering er klar
@@ -2256,8 +2277,8 @@ settings-title = Innstillinger
 settings-loading = Laster …
 settings-load-failed = Kunne ikke laste innstillingene: { $error }
 settings-page-general = Generelt
-settings-page-general-blurb = Hva denne serveren heter, for alle som bruker den.
-settings-page-general-blurb-desktop = Hva dette biblioteket heter.
+settings-page-general-blurb = Dragens skatt, og hva denne serveren heter.
+settings-page-general-blurb-desktop = Dragens skatt, og hva dette biblioteket heter.
 settings-page-appearance = Utseende
 settings-page-appearance-blurb = Temaene denne nettleseren bruker når den er lys og når den er mørk. Lagres bare i denne nettleseren.
 settings-page-library = Bibliotek

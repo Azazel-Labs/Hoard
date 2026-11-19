@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "d8dbfdf558614e792298e9f2143a889d3ce34cc24a0fe019b1acdcd7d98ba317"
+source = "4d93dc5d1285fff368850baed9eb7ace4cc4de3024361da1caffbeb82bc9dfe7"
 translation = "98b77849b047ba15c3fafc62f630455aa81fbcc62eed2bd82d45ed46bbdb7f90"
 
 [messages.account-add]
@@ -3712,6 +3712,10 @@ translation = "ha un solo fotogramma, o troppi da disporre"
 source = "give a full path"
 translation = "indica un percorso completo"
 
+[messages.error-hoard-seen]
+source = "the hoard can record at most 32 kinds of asset, each named in lowercase letters"
+translation = "il tesoro può registrare al massimo 32 tipi di risorse, ciascuno con un nome in lettere minuscole"
+
 [messages.error-hosted-address]
 source = "The image search service’s address should start with http:// or https://"
 translation = "L'indirizzo del servizio di ricerca per immagini deve iniziare con http:// o https://"
@@ -4840,6 +4844,74 @@ translation = "Cosa legge"
 [messages.formatwizard-zip-failed]
 source = "Couldn’t make the zip: { $error }"
 translation = "Impossibile creare lo zip: { $error }"
+
+[messages.hoard-bones]
+source = "Bones"
+translation = "Ossa"
+
+[messages.hoard-books]
+source = "Books"
+translation = "Libri"
+
+[messages.hoard-collect]
+source = "Collect"
+translation = "Raccogli"
+
+[messages.hoard-collect-failed]
+source = "Couldn’t record what you collected: { $error }"
+translation = "Impossibile registrare ciò che hai raccolto: { $error }"
+
+[messages.hoard-gems]
+source = "Gems"
+translation = "Gemme"
+
+[messages.hoard-gold]
+source = "Gold"
+translation = "Oro"
+
+[messages.hoard-label]
+source = "A dragon guarding its hoard. Treasure: { $count }"
+translation = "Un drago che custodisce il suo tesoro. Pezzi: { $count }"
+
+[messages.hoard-new]
+source = "New loot to collect: { $count }"
+translation = "Nuovo bottino da raccogliere: { $count }"
+
+[messages.hoard-none-new]
+source = "Nothing new to collect."
+translation = "Niente di nuovo da raccogliere."
+
+[messages.hoard-paintings]
+source = "Paintings"
+translation = "Dipinti"
+
+[messages.hoard-potions]
+source = "Potions"
+translation = "Pozioni"
+
+[messages.hoard-sign-in]
+source = "Sign in to collect a hoard of your own."
+translation = "Accedi per accumulare un tesoro tutto tuo."
+
+[messages.hoard-tablets]
+source = "Rune tablets"
+translation = "Tavolette runiche"
+
+[messages.hoard-title]
+source = "Your hoard"
+translation = "Il tuo tesoro"
+
+[messages.hoard-unavailable]
+source = "This browser can’t draw the hoard: { $error }"
+translation = "Questo browser non riesce a disegnare il tesoro: { $error }"
+
+[messages.hoard-weapons]
+source = "Weapons"
+translation = "Armi"
+
+[messages.hoard-what]
+source = "Every asset in the library is a piece of treasure, and its kind decides which. Collect what’s new to add it to your pile."
+translation = "Ogni risorsa della libreria è un pezzo del tesoro, e il suo tipo decide quale. Raccogli le novità per aggiungerle al tuo mucchio."
 
 [messages.https-add]
 source = "Add"
@@ -9348,12 +9420,12 @@ source = "General"
 translation = "Generali"
 
 [messages.settings-page-general-blurb]
-source = "What this server is called, for everyone who uses it."
-translation = "Come si chiama questo server, per tutti quelli che lo usano."
+source = "Your dragon’s hoard, and what this server is called."
+translation = "Il tesoro del tuo drago e il nome di questo server."
 
 [messages.settings-page-general-blurb-desktop]
-source = "What this library is called."
-translation = "Come si chiama questa libreria."
+source = "Your dragon’s hoard, and what this library is called."
+translation = "Il tesoro del tuo drago e il nome di questa libreria."
 
 [messages.settings-page-issues]
 source = "Issues"

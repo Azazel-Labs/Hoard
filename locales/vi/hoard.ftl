@@ -184,6 +184,7 @@ error-token-account-gone = tài khoản của token này không còn, nên nó k
 error-favorites-too-many = tối đa 10.000 mục mỗi lần
 error-saved-search-name = tìm kiếm đã lưu cần có tên dài tối đa 80 ký tự
 error-saved-search-too-long = tìm kiếm đó quá dài để lưu
+error-hoard-seen = kho báu chỉ ghi được tối đa 32 loại tài nguyên, mỗi loại đặt tên bằng chữ thường
 error-texture-pattern-map = Mẫu tên texture cần có { "{" }map{ "}" }, nếu không mọi map của một vật liệu sẽ có cùng tên
 error-texture-pattern-fields = Mẫu tên texture có thể dùng { "{" }name{ "}" }, { "{" }map{ "}" } và { "{" }size{ "}" }
 error-texture-name-chars = Tên texture không được chứa < > : " / \ | ? hoặc *
@@ -1985,6 +1986,26 @@ stats-largest-files = Tệp lớn nhất
 stats-open-file = Mở { $name }
 stats-empty = Thư viện chưa có gì. Hãy thêm một gói và số liệu của nó sẽ hiện ở đây.
 
+## HoardPanel.vue
+
+hoard-title = Kho báu của bạn
+hoard-what = Mỗi tài nguyên trong thư viện là một món báu vật, và loại của nó quyết định là món nào. Thu thập những gì mới để thêm vào đống của bạn.
+hoard-sign-in = Đăng nhập để thu thập kho báu của riêng bạn.
+hoard-new = Chiến lợi phẩm mới để thu thập: { $count }
+hoard-none-new = Không có gì mới để thu thập.
+hoard-collect = Thu thập
+hoard-unavailable = Trình duyệt này không vẽ được kho báu: { $error }
+hoard-collect-failed = Không thể ghi lại những gì bạn đã thu thập: { $error }
+hoard-label = Một con rồng canh giữ kho báu của nó. Báu vật: { $count }
+hoard-gold = Vàng
+hoard-gems = Đá quý
+hoard-books = Sách
+hoard-weapons = Vũ khí
+hoard-bones = Xương
+hoard-tablets = Phiến đá rune
+hoard-paintings = Tranh
+hoard-potions = Bình thuốc
+
 ## Cập nhật
 
 updates-saved = Hoard sẽ gọi địa chỉ này khi có bản cập nhật
@@ -2074,8 +2095,8 @@ settings-title = Cài đặt
 settings-loading = Đang tải…
 settings-load-failed = Không thể tải cài đặt: { $error }
 settings-page-general = Chung
-settings-page-general-blurb = Tên của máy chủ này, cho mọi người dùng nó.
-settings-page-general-blurb-desktop = Tên của thư viện này.
+settings-page-general-blurb = Kho báu của rồng của bạn, và tên của máy chủ này.
+settings-page-general-blurb-desktop = Kho báu của rồng của bạn, và tên của thư viện này.
 settings-page-appearance = Giao diện
 settings-page-appearance-blurb = Chủ đề trình duyệt này dùng khi ở chế độ sáng và khi ở chế độ tối. Chỉ lưu trong trình duyệt này.
 settings-page-library = Thư viện

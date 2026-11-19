@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "d8dbfdf558614e792298e9f2143a889d3ce34cc24a0fe019b1acdcd7d98ba317"
+source = "4d93dc5d1285fff368850baed9eb7ace4cc4de3024361da1caffbeb82bc9dfe7"
 translation = "bb45e4d0d59bdf1a2181c1158501e66a0c57e8041d0a982d6aed7e82f49657fa"
 
 [messages.account-add]
@@ -3790,6 +3790,10 @@ translation = "здесь один кадр или слишком много, ч
 source = "give a full path"
 translation = "укажите полный путь"
 
+[messages.error-hoard-seen]
+source = "the hoard can record at most 32 kinds of asset, each named in lowercase letters"
+translation = "клад может хранить не более 32 видов ассетов, каждый с названием из строчных букв"
+
 [messages.error-hosted-address]
 source = "The image search service’s address should start with http:// or https://"
 translation = "Адрес сервиса поиска по картинкам должен начинаться с http:// или https://"
@@ -4925,6 +4929,74 @@ translation = "Что он читает"
 [messages.formatwizard-zip-failed]
 source = "Couldn’t make the zip: { $error }"
 translation = "Не удалось создать zip: { $error }"
+
+[messages.hoard-bones]
+source = "Bones"
+translation = "Кости"
+
+[messages.hoard-books]
+source = "Books"
+translation = "Книги"
+
+[messages.hoard-collect]
+source = "Collect"
+translation = "Собрать"
+
+[messages.hoard-collect-failed]
+source = "Couldn’t record what you collected: { $error }"
+translation = "Не удалось сохранить собранное: { $error }"
+
+[messages.hoard-gems]
+source = "Gems"
+translation = "Самоцветы"
+
+[messages.hoard-gold]
+source = "Gold"
+translation = "Золото"
+
+[messages.hoard-label]
+source = "A dragon guarding its hoard. Treasure: { $count }"
+translation = "Дракон охраняет свой клад. Сокровищ: { $count }"
+
+[messages.hoard-new]
+source = "New loot to collect: { $count }"
+translation = "Новая добыча для сбора: { $count }"
+
+[messages.hoard-none-new]
+source = "Nothing new to collect."
+translation = "Собирать пока нечего."
+
+[messages.hoard-paintings]
+source = "Paintings"
+translation = "Картины"
+
+[messages.hoard-potions]
+source = "Potions"
+translation = "Зелья"
+
+[messages.hoard-sign-in]
+source = "Sign in to collect a hoard of your own."
+translation = "Войдите, чтобы собирать собственный клад."
+
+[messages.hoard-tablets]
+source = "Rune tablets"
+translation = "Рунические таблички"
+
+[messages.hoard-title]
+source = "Your hoard"
+translation = "Ваш клад"
+
+[messages.hoard-unavailable]
+source = "This browser can’t draw the hoard: { $error }"
+translation = "Этот браузер не может нарисовать клад: { $error }"
+
+[messages.hoard-weapons]
+source = "Weapons"
+translation = "Оружие"
+
+[messages.hoard-what]
+source = "Every asset in the library is a piece of treasure, and its kind decides which. Collect what’s new to add it to your pile."
+translation = "Каждый ассет в библиотеке — это предмет клада, и его вид определяет, какой. Соберите новое, чтобы добавить его в свою груду."
 
 [messages.https-add]
 source = "Add"
@@ -9556,12 +9628,12 @@ source = "General"
 translation = "Общие"
 
 [messages.settings-page-general-blurb]
-source = "What this server is called, for everyone who uses it."
-translation = "Как называется этот сервер — для всех, кто им пользуется."
+source = "Your dragon’s hoard, and what this server is called."
+translation = "Клад вашего дракона и название этого сервера."
 
 [messages.settings-page-general-blurb-desktop]
-source = "What this library is called."
-translation = "Как называется эта библиотека."
+source = "Your dragon’s hoard, and what this library is called."
+translation = "Клад вашего дракона и название этой библиотеки."
 
 [messages.settings-page-issues]
 source = "Issues"

@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "d8dbfdf558614e792298e9f2143a889d3ce34cc24a0fe019b1acdcd7d98ba317"
+source = "4d93dc5d1285fff368850baed9eb7ace4cc4de3024361da1caffbeb82bc9dfe7"
 translation = "7d4815ead7ae4f48f80531d797b527d64fdb08460c91b5ac34cf8cada118334a"
 
 [messages.account-add]
@@ -3626,6 +3626,10 @@ translation = "這個檔案只有一個影格，或影格太多而無法排列"
 source = "give a full path"
 translation = "請提供完整路徑"
 
+[messages.error-hoard-seen]
+source = "the hoard can record at most 32 kinds of asset, each named in lowercase letters"
+translation = "寶藏最多可記錄 32 種素材，每種都須以小寫字母命名"
+
 [messages.error-hosted-address]
 source = "The image search service’s address should start with http:// or https://"
 translation = "圖片搜尋服務的網址應以 http:// 或 https:// 開頭"
@@ -4732,6 +4736,74 @@ translation = "讀取結果"
 [messages.formatwizard-zip-failed]
 source = "Couldn’t make the zip: { $error }"
 translation = "無法建立 zip：{ $error }"
+
+[messages.hoard-bones]
+source = "Bones"
+translation = "骨頭"
+
+[messages.hoard-books]
+source = "Books"
+translation = "書籍"
+
+[messages.hoard-collect]
+source = "Collect"
+translation = "收集"
+
+[messages.hoard-collect-failed]
+source = "Couldn’t record what you collected: { $error }"
+translation = "無法記錄你收集的內容：{ $error }"
+
+[messages.hoard-gems]
+source = "Gems"
+translation = "寶石"
+
+[messages.hoard-gold]
+source = "Gold"
+translation = "金幣"
+
+[messages.hoard-label]
+source = "A dragon guarding its hoard. Treasure: { $count }"
+translation = "一條守護寶藏的龍。寶物：{ $count }"
+
+[messages.hoard-new]
+source = "New loot to collect: { $count }"
+translation = "可收集的新戰利品：{ $count }"
+
+[messages.hoard-none-new]
+source = "Nothing new to collect."
+translation = "沒有可收集的新內容。"
+
+[messages.hoard-paintings]
+source = "Paintings"
+translation = "畫作"
+
+[messages.hoard-potions]
+source = "Potions"
+translation = "藥水"
+
+[messages.hoard-sign-in]
+source = "Sign in to collect a hoard of your own."
+translation = "登入後即可收集屬於你自己的寶藏。"
+
+[messages.hoard-tablets]
+source = "Rune tablets"
+translation = "符文石板"
+
+[messages.hoard-title]
+source = "Your hoard"
+translation = "你的寶藏"
+
+[messages.hoard-unavailable]
+source = "This browser can’t draw the hoard: { $error }"
+translation = "此瀏覽器無法繪製寶藏：{ $error }"
+
+[messages.hoard-weapons]
+source = "Weapons"
+translation = "武器"
+
+[messages.hoard-what]
+source = "Every asset in the library is a piece of treasure, and its kind decides which. Collect what’s new to add it to your pile."
+translation = "素材庫中的每個素材都是一件寶物，素材的種類決定是哪種寶物。收集新內容，把它們加進你的寶堆。"
 
 [messages.https-add]
 source = "Add"
@@ -9146,12 +9218,12 @@ source = "General"
 translation = "一般"
 
 [messages.settings-page-general-blurb]
-source = "What this server is called, for everyone who uses it."
-translation = "這台伺服器的名稱，所有使用者都會看到。"
+source = "Your dragon’s hoard, and what this server is called."
+translation = "你的龍的寶藏，以及這台伺服器的名稱。"
 
 [messages.settings-page-general-blurb-desktop]
-source = "What this library is called."
-translation = "這個素材庫的名稱。"
+source = "Your dragon’s hoard, and what this library is called."
+translation = "你的龍的寶藏，以及這個素材庫的名稱。"
 
 [messages.settings-page-issues]
 source = "Issues"

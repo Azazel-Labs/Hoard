@@ -184,6 +184,7 @@ error-token-account-gone = 此令牌所属的账户已不存在，因此没有�
 error-favorites-too-many = 一次最多 10,000 个
 error-saved-search-name = 已保存的搜索需要一个不超过 80 个字符的名称
 error-saved-search-too-long = 该搜索太长，无法保存
+error-hoard-seen = 宝藏最多可记录 32 种资源，每种都须以小写字母命名
 error-texture-pattern-map = 纹理命名模式需要包含 { "{" }map{ "}" }，否则同一材质的所有贴图都会得到相同的名称
 error-texture-pattern-fields = 纹理命名模式可以使用 { "{" }name{ "}" }、{ "{" }map{ "}" } 和 { "{" }size{ "}" }
 error-texture-name-chars = 纹理名称不能包含 < > : " / \ | ? 或 *
@@ -1985,6 +1986,26 @@ stats-largest-files = 最大的文件
 stats-open-file = 打开 { $name }
 stats-empty = 资源库中还没有内容。添加一个资源包，它的数据就会显示在这里。
 
+## HoardPanel.vue
+
+hoard-title = 你的宝藏
+hoard-what = 资源库中的每个资源都是一件宝物，资源的种类决定是哪种宝物。收集新内容，把它们加进你的宝堆。
+hoard-sign-in = 登录后即可收集属于你自己的宝藏。
+hoard-new = 可收集的新战利品：{ $count }
+hoard-none-new = 没有可收集的新内容。
+hoard-collect = 收集
+hoard-unavailable = 此浏览器无法绘制宝藏：{ $error }
+hoard-collect-failed = 无法记录你收集的内容：{ $error }
+hoard-label = 一条守护宝藏的龙。宝物：{ $count }
+hoard-gold = 金币
+hoard-gems = 宝石
+hoard-books = 书籍
+hoard-weapons = 武器
+hoard-bones = 骨头
+hoard-tablets = 符文石板
+hoard-paintings = 画作
+hoard-potions = 药水
+
 ## UpdatesPanel.vue
 
 updates-saved = 有可用更新时，Hoard 会调用此地址
@@ -2074,8 +2095,8 @@ settings-title = 设置
 settings-loading = 正在加载…
 settings-load-failed = 无法加载设置：{ $error }
 settings-page-general = 常规
-settings-page-general-blurb = 此服务器的名称，所有使用者都会看到。
-settings-page-general-blurb-desktop = 此资源库的名称。
+settings-page-general-blurb = 你的龙的宝藏，以及这台服务器的名称。
+settings-page-general-blurb-desktop = 你的龙的宝藏，以及这个资源库的名称。
 settings-page-appearance = 外观
 settings-page-appearance-blurb = 此浏览器在浅色和深色模式下使用的主题。仅保存在此浏览器中。
 settings-page-library = 资源库

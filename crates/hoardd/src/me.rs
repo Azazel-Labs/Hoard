@@ -1,15 +1,16 @@
-//! What's each person's own in the library: the assets they've starred (favorites) and the searches they've saved.
-//! Looking is enough for both, since neither changes the library. An access token or connected app acts for the
-//! account that made it.
+//! What's each person's own in the library: the assets they've starred (favorites), the searches they've saved, and
+//! their dragon hoard (how much of the library they've collected). Looking is enough for all of them, since none
+//! changes the library. An access token or connected app acts for the account that made it.
 
 use crate::i18n::tr;
 use axum::extract::{Path, State};
 use axum::http::StatusCode;
 use axum::routing::{delete, get};
 use axum::{Extension, Json, Router};
-use rusqlite::{Connection, params};
+use rusqlite::{Connection, OptionalExtension, params};
 use serde::Deserialize;
 use serde_json::{Value, json};
+use std::collections::BTreeMap;
 
 use crate::AppState;
 use crate::auth::Who;
@@ -22,6 +23,7 @@ pub(crate) fn router() -> Router<AppState> {
         .route("/api/me/favorites", get(list_favorites).post(change_favorites))
         .route("/api/me/searches", get(list_searches).post(save_search))
         .route("/api/me/searches/{id}", delete(delete_search))
+        .route("/api/me/hoard", get(get_hoard).put(set_hoard))
 }
 
 /// The person `who` is, or acts for.
@@ -146,4 +148,71 @@ async fn delete_search(
         return Err(AppError::not_found(tr!("error-saved-search-not-found", id = id)));
     }
     Ok(StatusCode::NO_CONTENT)
+}
+
+/// How many assets of each kind (`texture`, `model`…) a person has collected into their hoard. The portal shows the
+/// difference between this and what the library holds as loot still to collect.
+type Hoard = BTreeMap<String, u64>;
+
+/// The most kinds a hoard records, and the longest name one may have: far more than there are kinds of asset.
+const HOARD_KINDS: usize = 32;
+const HOARD_KIND_LEN: usize = 32;
+
+fn valid_hoard(seen: &Hoard) -> bool {
+    seen.len() <= HOARD_KINDS
+        && seen.keys().all(|k| !k.is_empty() && k.len() <= HOARD_KIND_LEN && k.bytes().all(|b| b.is_ascii_lowercase()))
+}
+
+/// What a person has collected, or `null` before they've collected anything.
+async fn get_hoard(State(state): State<AppState>, Extension(who): Extension<Who>) -> ApiResult<Json<Value>> {
+    let user = owner(&who)?;
+    let seen = db::call(&state.pool, move |c| {
+        let raw: Option<String> =
+            c.query_row("SELECT hoard_seen FROM users WHERE id = ?1", [user], |r| r.get(0)).optional()?.flatten();
+        // A record that no longer reads is as good as none: the hoard starts again.
+        Ok(raw.and_then(|r| serde_json::from_str::<Hoard>(&r).ok()))
+    })
+    .await?;
+    Ok(Json(json!({ "seen": seen })))
+}
+
+#[derive(Debug, Deserialize)]
+struct HoardChange {
+    seen: Hoard,
+}
+
+/// Record what a person has collected, replacing what was recorded. Answers with it.
+async fn set_hoard(
+    State(state): State<AppState>,
+    Extension(who): Extension<Who>,
+    Json(change): Json<HoardChange>,
+) -> ApiResult<Json<Value>> {
+    let user = owner(&who)?;
+    if !valid_hoard(&change.seen) {
+        return Err(AppError::bad_request(tr!("error-hoard-seen")));
+    }
+    let text = serde_json::to_string(&change.seen).map_err(anyhow::Error::from)?;
+    db::call(&state.pool, move |c| {
+        c.execute("UPDATE users SET hoard_seen = ?2 WHERE id = ?1", params![user, text])?;
+        Ok(())
+    })
+    .await?;
+    Ok(Json(json!({ "seen": change.seen })))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn a_hoard_names_a_few_short_kinds() {
+        let ok: Hoard = [("texture".to_owned(), 12), ("model".to_owned(), 0)].into();
+        assert!(valid_hoard(&ok));
+        assert!(valid_hoard(&Hoard::new()));
+        for bad in ["", "Texture", "two words", &"x".repeat(HOARD_KIND_LEN + 1)] {
+            assert!(!valid_hoard(&[(bad.to_owned(), 1)].into()), "{bad:?}");
+        }
+        let many: Hoard = (0..=HOARD_KINDS).map(|i| ("k".repeat(i % 8 + 1) + &"x".repeat(i / 8), 1)).collect();
+        assert!(!valid_hoard(&many));
+    }
 }

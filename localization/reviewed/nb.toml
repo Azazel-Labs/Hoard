@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "d8dbfdf558614e792298e9f2143a889d3ce34cc24a0fe019b1acdcd7d98ba317"
+source = "4d93dc5d1285fff368850baed9eb7ace4cc4de3024361da1caffbeb82bc9dfe7"
 translation = "233736fce877dd72d5c0840b380752036aeadf00268c938b28bf55f6d4bddad5"
 
 [messages.account-add]
@@ -3712,6 +3712,10 @@ translation = "denne har ett bilde, eller for mange til å legge ut"
 source = "give a full path"
 translation = "oppgi en full bane"
 
+[messages.error-hoard-seen]
+source = "the hoard can record at most 32 kinds of asset, each named in lowercase letters"
+translation = "skatten kan registrere høyst 32 typer ressurser, hver med et navn i små bokstaver"
+
 [messages.error-hosted-address]
 source = "The image search service’s address should start with http:// or https://"
 translation = "Adressen til bildesøktjenesten må begynne med http:// eller https://"
@@ -4829,6 +4833,74 @@ translation = "Hva det leser"
 [messages.formatwizard-zip-failed]
 source = "Couldn’t make the zip: { $error }"
 translation = "Kunne ikke lage zip-filen: { $error }"
+
+[messages.hoard-bones]
+source = "Bones"
+translation = "Knokler"
+
+[messages.hoard-books]
+source = "Books"
+translation = "Bøker"
+
+[messages.hoard-collect]
+source = "Collect"
+translation = "Samle inn"
+
+[messages.hoard-collect-failed]
+source = "Couldn’t record what you collected: { $error }"
+translation = "Kunne ikke lagre det du samlet inn: { $error }"
+
+[messages.hoard-gems]
+source = "Gems"
+translation = "Edelsteiner"
+
+[messages.hoard-gold]
+source = "Gold"
+translation = "Gull"
+
+[messages.hoard-label]
+source = "A dragon guarding its hoard. Treasure: { $count }"
+translation = "En drage som vokter skatten sin. Skatter: { $count }"
+
+[messages.hoard-new]
+source = "New loot to collect: { $count }"
+translation = "Nytt bytte å samle inn: { $count }"
+
+[messages.hoard-none-new]
+source = "Nothing new to collect."
+translation = "Ingenting nytt å samle inn."
+
+[messages.hoard-paintings]
+source = "Paintings"
+translation = "Malerier"
+
+[messages.hoard-potions]
+source = "Potions"
+translation = "Eliksirer"
+
+[messages.hoard-sign-in]
+source = "Sign in to collect a hoard of your own."
+translation = "Logg inn for å samle en egen skatt."
+
+[messages.hoard-tablets]
+source = "Rune tablets"
+translation = "Runetavler"
+
+[messages.hoard-title]
+source = "Your hoard"
+translation = "Skatten din"
+
+[messages.hoard-unavailable]
+source = "This browser can’t draw the hoard: { $error }"
+translation = "Denne nettleseren kan ikke tegne skatten: { $error }"
+
+[messages.hoard-weapons]
+source = "Weapons"
+translation = "Våpen"
+
+[messages.hoard-what]
+source = "Every asset in the library is a piece of treasure, and its kind decides which. Collect what’s new to add it to your pile."
+translation = "Hver ressurs i biblioteket er et stykke skatt, og typen avgjør hvilket. Samle inn det nye for å legge det på haugen din."
 
 [messages.https-add]
 source = "Add"
@@ -9333,12 +9405,12 @@ source = "General"
 translation = "Generelt"
 
 [messages.settings-page-general-blurb]
-source = "What this server is called, for everyone who uses it."
-translation = "Hva denne serveren heter, for alle som bruker den."
+source = "Your dragon’s hoard, and what this server is called."
+translation = "Dragens skatt, og hva denne serveren heter."
 
 [messages.settings-page-general-blurb-desktop]
-source = "What this library is called."
-translation = "Hva dette biblioteket heter."
+source = "Your dragon’s hoard, and what this library is called."
+translation = "Dragens skatt, og hva dette biblioteket heter."
 
 [messages.settings-page-issues]
 source = "Issues"

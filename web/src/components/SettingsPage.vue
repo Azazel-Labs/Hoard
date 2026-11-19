@@ -1,9 +1,10 @@
 <script setup lang="ts">
 // The Settings page: a list of pages down the side, one open at a time (its id is in the address, #settings/<id>).
-// Appearance is this browser's (light and dark themes, saved here); Library is the hoard in numbers; the rest are the
-// server's: Blender and ffmpeg (downloaded if need be), the AI service that tags packs, what happens to Unreal
-// packages, and the server's switches and limits. Those are saved on the server and in effect at once. Anything not
-// at its default has a turn-back arrow beside it that resets it.
+// General opens first: everyone's dragon hoard, and (for an admin) the server's name. Appearance is this browser's
+// (light and dark themes, saved here); Library is the hoard in numbers; the rest are the server's: Blender and ffmpeg
+// (downloaded if need be), the AI service that tags packs, what happens to Unreal packages, and the server's switches
+// and limits. Those are saved on the server and in effect at once. Anything not at its default has a turn-back arrow
+// beside it that resets it.
 // Each page is a panel of its own; they share the settings, saving, and the options that save on their own
 // (settingsContext).
 import { computed, onBeforeUnmount, onMounted, provide, reactive, ref } from 'vue'
@@ -18,6 +19,7 @@ import AiPanel from './AiPanel.vue'
 import AppearancePanel from './AppearancePanel.vue'
 import AuthPanel from './AuthPanel.vue'
 import CopiesPanel from './CopiesPanel.vue'
+import HoardPanel from './HoardPanel.vue'
 import HttpsPanel from './HttpsPanel.vue'
 import IssuesPanel from './IssuesPanel.vue'
 import LibraryStats from './LibraryStats.vue'
@@ -51,7 +53,7 @@ const s = ref<Settings | null>(null)
 // Labels and blurbs are getters, so they're in the language of the moment. `sep` starts a group in the list: what's
 // in the library, how things get into it, who gets in, and how the server is doing.
 const ALL_PAGES: { id: string; readonly label: string; readonly blurb: string; need?: Role; sep?: boolean; server?: boolean }[] = [
-  { id: 'general', need: 'admin', get label() { return t('settings-page-general') }, get blurb() { return t('settings-page-general-blurb') } },
+  { id: 'general', get label() { return t('settings-page-general') }, get blurb() { return t('settings-page-general-blurb') } },
   { id: 'appearance', get label() { return t('settings-page-appearance') }, get blurb() { return t('settings-page-appearance-blurb') } },
   { id: 'library', get label() { return t('settings-page-library') }, get blurb() { return t('settings-page-library-blurb') } },
   { id: 'copies', get label() { return t('settings-page-copies') }, get blurb() { return t('settings-page-copies-blurb') } },
@@ -72,7 +74,7 @@ const ALL_PAGES: { id: string; readonly label: string; readonly blurb: string; n
 ]
 /** The pages this account may see: an admin sees them all (but the desktop app has no server to set up). */
 const PAGES = computed(() => ALL_PAGES.filter((p) => (!p.need || may(p.need)) && !(p.server && isDesktop())))
-const current = computed(() => (PAGES.value.some((p) => p.id === props.section) ? props.section : 'appearance'))
+const current = computed(() => (PAGES.value.some((p) => p.id === props.section) ? props.section : 'general'))
 const page = computed(() => PAGES.value.find((p) => p.id === current.value)!)
 const paneEl = ref<HTMLElement | null>(null)
 function go(id: string) {
@@ -251,17 +253,9 @@ onBeforeUnmount(() => window.clearTimeout(timer))
         <CopiesPanel v-else-if="current === 'copies'" @open="(id) => emit('open', id)" @unauthorized="emit('unauthorized')" />
         <TagsPanel v-else-if="current === 'tags'" @tag="(t) => emit('tag', t)" @changed="emit('changed')" />
         <StoreFormatsPanel v-else-if="current === 'store-files'" />
-
-        <p v-else-if="!s" class="loading">{{ t('settings-loading') }}</p>
-
-        <div v-else class="body">
-          <ToolsPanel v-if="current === 'tools'" />
-          <SearchPanel v-else-if="current === 'search'" />
-          <AiPanel v-else-if="current === 'ai'" />
-          <AddingPanel v-else-if="current === 'adding'" />
-          <TextureNamesPanel v-else-if="current === 'downloads'" />
-
-          <template v-else-if="current === 'general'">
+        <template v-else-if="current === 'general'">
+          <HoardPanel @unauthorized="emit('unauthorized')" />
+          <div v-if="s" class="body">
             <section>
               <div class="sh"><h3>{{ t('settings-name') }}</h3></div>
               <p class="what">{{ t('settings-name-what') }}</p>
@@ -282,7 +276,17 @@ onBeforeUnmount(() => window.clearTimeout(timer))
                 </div>
               </div>
             </section>
-          </template>
+          </div>
+        </template>
+
+        <p v-else-if="!s" class="loading">{{ t('settings-loading') }}</p>
+
+        <div v-else class="body">
+          <ToolsPanel v-if="current === 'tools'" />
+          <SearchPanel v-else-if="current === 'search'" />
+          <AiPanel v-else-if="current === 'ai'" />
+          <AddingPanel v-else-if="current === 'adding'" />
+          <TextureNamesPanel v-else-if="current === 'downloads'" />
 
           <template v-else-if="current === 'connection'">
             <section>

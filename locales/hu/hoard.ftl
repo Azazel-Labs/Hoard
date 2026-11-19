@@ -184,6 +184,7 @@ error-token-account-gone = ennek a tokennek a fiókja már nem létezik, így ni
 error-favorites-too-many = egyszerre legfeljebb 10 000
 error-saved-search-name = a mentett keresésnek legfeljebb 80 karakteres név kell
 error-saved-search-too-long = ez a keresés túl hosszú a mentéshez
+error-hoard-seen = a kincs legfeljebb 32 assetfajtát tarthat nyilván, mindegyiket kisbetűs névvel
 error-texture-pattern-map = A textúranév-mintában szerepelnie kell ennek: { "{" }map{ "}" }, különben egy anyag minden térképe ugyanazt a nevet kapná
 error-texture-pattern-fields = A textúranév-minta ezeket használhatja: { "{" }name{ "}" }, { "{" }map{ "}" } és { "{" }size{ "}" }
 error-texture-name-chars = A textúranevek nem tartalmazhatják ezeket: < > : " / \ | ? vagy *
@@ -1998,6 +1999,26 @@ stats-largest-files = Legnagyobb fájlok
 stats-open-file = Megnyitás: { $name }
 stats-empty = A könyvtár még üres. Adjon hozzá egy csomagot, és itt megjelennek a számai.
 
+## HoardPanel.vue
+
+hoard-title = Az Ön kincse
+hoard-what = A könyvtár minden assetje egy kincsdarab, és a fajtája dönti el, melyik. Gyűjtse be az újakat, hogy a kupacához kerüljenek.
+hoard-sign-in = Jelentkezzen be, hogy saját kincset gyűjthessen.
+hoard-new = Begyűjthető új zsákmány: { $count }
+hoard-none-new = Nincs új begyűjtenivaló.
+hoard-collect = Begyűjtés
+hoard-unavailable = Ez a böngésző nem tudja megrajzolni a kincset: { $error }
+hoard-collect-failed = Nem sikerült menteni, amit begyűjtött: { $error }
+hoard-label = Egy sárkány őrzi a kincsét. Kincsdarabok: { $count }
+hoard-gold = Arany
+hoard-gems = Drágakövek
+hoard-books = Könyvek
+hoard-weapons = Fegyverek
+hoard-bones = Csontok
+hoard-tablets = Rúnatáblák
+hoard-paintings = Festmények
+hoard-potions = Bájitalok
+
 ## UpdatesPanel.vue
 
 updates-saved = A Hoard meghívja, amikor frissítés érhető el
@@ -2087,8 +2108,8 @@ settings-title = Beállítások
 settings-loading = Betöltés…
 settings-load-failed = Nem sikerült betölteni a beállításokat: { $error }
 settings-page-general = Általános
-settings-page-general-blurb = A szerver neve mindenki számára, aki használja.
-settings-page-general-blurb-desktop = A könyvtár neve.
+settings-page-general-blurb = Az Ön sárkányának kincse, és ennek a szervernek a neve.
+settings-page-general-blurb-desktop = Az Ön sárkányának kincse, és ennek a könyvtárnak a neve.
 settings-page-appearance = Megjelenés
 settings-page-appearance-blurb = A témák, amelyeket ez a böngésző világos és sötét módban használ. Csak ebben a böngészőben mentődnek.
 settings-page-library = Könyvtár

@@ -184,6 +184,7 @@ error-token-account-gone = el compte d'aquest testimoni ja no existeix, així qu
 error-favorites-too-many = com a màxim 10.000 alhora
 error-saved-search-name = una cerca desada necessita un nom de 80 caràcters com a màxim
 error-saved-search-too-long = aquesta cerca és massa llarga per desar-la
+error-hoard-seen = el tresor pot registrar com a màxim 32 tipus de recurs, cadascun amb un nom en minúscules
 error-texture-pattern-map = El patró de nom de textura necessita { "{" }map{ "}" }, o tots els mapes d'un material tindrien el mateix nom
 error-texture-pattern-fields = El patró de nom de textura pot fer servir { "{" }name{ "}" }, { "{" }map{ "}" } i { "{" }size{ "}" }
 error-texture-name-chars = Els noms de textura no poden contenir < > : " / \ | ? ni *
@@ -2163,6 +2164,26 @@ stats-largest-files = Fitxers més grans
 stats-open-file = Obre { $name }
 stats-empty = Encara no hi ha res a la biblioteca. Afegiu un paquet i les xifres apareixeran aquí.
 
+## HoardPanel.vue
+
+hoard-title = El vostre tresor
+hoard-what = Cada recurs de la biblioteca és una peça del tresor, i el seu tipus decideix quina. Recolliu el que és nou per afegir-ho a la vostra pila.
+hoard-sign-in = Inicieu la sessió per reunir un tresor propi.
+hoard-new = Botí nou per recollir: { $count }
+hoard-none-new = No hi ha res de nou per recollir.
+hoard-collect = Recull
+hoard-unavailable = Aquest navegador no pot dibuixar el tresor: { $error }
+hoard-collect-failed = No s’ha pogut desar el que heu recollit: { $error }
+hoard-label = Un drac que guarda el seu tresor. Peces: { $count }
+hoard-gold = Or
+hoard-gems = Gemmes
+hoard-books = Llibres
+hoard-weapons = Armes
+hoard-bones = Ossos
+hoard-tablets = Tauletes rúniques
+hoard-paintings = Quadres
+hoard-potions = Pocions
+
 ## UpdatesPanel.vue
 
 updates-saved = Hoard la cridarà quan hi hagi una actualització a punt
@@ -2260,8 +2281,8 @@ settings-title = Configuració
 settings-loading = S'està carregant…
 settings-load-failed = No s'ha pogut carregar la configuració: { $error }
 settings-page-general = General
-settings-page-general-blurb = Com s'anomena aquest servidor, per a tothom que el fa servir.
-settings-page-general-blurb-desktop = Com s'anomena aquesta biblioteca.
+settings-page-general-blurb = El tresor del vostre drac i el nom d’aquest servidor.
+settings-page-general-blurb-desktop = El tresor del vostre drac i el nom d’aquesta biblioteca.
 settings-page-appearance = Aparença
 settings-page-appearance-blurb = Els temes que fa servir aquest navegador quan està en mode clar i en mode fosc. Només es desa en aquest navegador.
 settings-page-library = Biblioteca

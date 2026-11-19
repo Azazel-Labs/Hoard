@@ -184,6 +184,7 @@ error-token-account-gone = akun token ini sudah tidak ada, jadi token ini tidak 
 error-favorites-too-many = paling banyak 10.000 sekaligus
 error-saved-search-name = pencarian tersimpan perlu nama paling banyak 80 karakter
 error-saved-search-too-long = pencarian itu terlalu panjang untuk disimpan
+error-hoard-seen = harta karun dapat mencatat paling banyak 32 jenis aset, masing-masing dinamai dengan huruf kecil
 error-texture-pattern-map = Pola nama tekstur perlu { "{" }map{ "}" }, atau semua map dari satu material akan mendapat nama yang sama
 error-texture-pattern-fields = Pola nama tekstur dapat memakai { "{" }name{ "}" }, { "{" }map{ "}" } dan { "{" }size{ "}" }
 error-texture-name-chars = Nama tekstur tidak boleh berisi < > : " / \ | ? atau *
@@ -1989,6 +1990,26 @@ stats-largest-files = Berkas terbesar
 stats-open-file = Buka { $name }
 stats-empty = Pustaka masih kosong. Tambahkan paket dan angkanya muncul di sini.
 
+## HoardPanel.vue
+
+hoard-title = Harta karun Anda
+hoard-what = Setiap aset di pustaka adalah sepotong harta, dan jenisnya menentukan yang mana. Kumpulkan yang baru untuk menambahkannya ke tumpukan Anda.
+hoard-sign-in = Masuk untuk mengumpulkan harta karun Anda sendiri.
+hoard-new = Jarahan baru untuk dikumpulkan: { $count }
+hoard-none-new = Tidak ada yang baru untuk dikumpulkan.
+hoard-collect = Kumpulkan
+hoard-unavailable = Browser ini tidak bisa menggambar harta karun: { $error }
+hoard-collect-failed = Tidak bisa mencatat yang Anda kumpulkan: { $error }
+hoard-label = Seekor naga menjaga harta karunnya. Harta: { $count }
+hoard-gold = Emas
+hoard-gems = Permata
+hoard-books = Buku
+hoard-weapons = Senjata
+hoard-bones = Tulang
+hoard-tablets = Lempeng rune
+hoard-paintings = Lukisan
+hoard-potions = Ramuan
+
 ## UpdatesPanel.vue
 
 updates-saved = Hoard akan memanggilnya saat pembaruan siap
@@ -2078,8 +2099,8 @@ settings-title = Pengaturan
 settings-loading = Memuat…
 settings-load-failed = Tidak dapat memuat pengaturan: { $error }
 settings-page-general = Umum
-settings-page-general-blurb = Nama server ini, untuk semua orang yang memakainya.
-settings-page-general-blurb-desktop = Nama pustaka ini.
+settings-page-general-blurb = Harta karun naga Anda, dan nama server ini.
+settings-page-general-blurb-desktop = Harta karun naga Anda, dan nama pustaka ini.
 settings-page-appearance = Tampilan
 settings-page-appearance-blurb = Tema yang dipakai browser ini saat terang dan saat gelap. Hanya disimpan di browser ini.
 settings-page-library = Pustaka

@@ -184,6 +184,7 @@ error-token-account-gone = l'account di questo token non esiste più, quindi non
 error-favorites-too-many = al massimo 10.000 alla volta
 error-saved-search-name = una ricerca salvata ha bisogno di un nome di massimo 80 caratteri
 error-saved-search-too-long = questa ricerca è troppo lunga per essere salvata
+error-hoard-seen = il tesoro può registrare al massimo 32 tipi di risorse, ciascuno con un nome in lettere minuscole
 error-texture-pattern-map = Lo schema dei nomi delle texture ha bisogno di { "{" }map{ "}" }, altrimenti tutte le mappe di un materiale avrebbero lo stesso nome
 error-texture-pattern-fields = Lo schema dei nomi delle texture può usare { "{" }name{ "}" }, { "{" }map{ "}" } e { "{" }size{ "}" }
 error-texture-name-chars = I nomi delle texture non possono contenere < > : " / \ | ? o *
@@ -2170,6 +2171,26 @@ stats-largest-files = File più grandi
 stats-open-file = Apri { $name }
 stats-empty = Ancora niente nella libreria. Aggiungi un pacchetto e i suoi numeri compariranno qui.
 
+## HoardPanel.vue
+
+hoard-title = Il tuo tesoro
+hoard-what = Ogni risorsa della libreria è un pezzo del tesoro, e il suo tipo decide quale. Raccogli le novità per aggiungerle al tuo mucchio.
+hoard-sign-in = Accedi per accumulare un tesoro tutto tuo.
+hoard-new = Nuovo bottino da raccogliere: { $count }
+hoard-none-new = Niente di nuovo da raccogliere.
+hoard-collect = Raccogli
+hoard-unavailable = Questo browser non riesce a disegnare il tesoro: { $error }
+hoard-collect-failed = Impossibile registrare ciò che hai raccolto: { $error }
+hoard-label = Un drago che custodisce il suo tesoro. Pezzi: { $count }
+hoard-gold = Oro
+hoard-gems = Gemme
+hoard-books = Libri
+hoard-weapons = Armi
+hoard-bones = Ossa
+hoard-tablets = Tavolette runiche
+hoard-paintings = Dipinti
+hoard-potions = Pozioni
+
 ## UpdatesPanel.vue
 
 updates-saved = Hoard lo chiamerà quando un aggiornamento sarà pronto
@@ -2267,8 +2288,8 @@ settings-title = Impostazioni
 settings-loading = Caricamento…
 settings-load-failed = Impossibile caricare le impostazioni: { $error }
 settings-page-general = Generali
-settings-page-general-blurb = Come si chiama questo server, per tutti quelli che lo usano.
-settings-page-general-blurb-desktop = Come si chiama questa libreria.
+settings-page-general-blurb = Il tesoro del tuo drago e il nome di questo server.
+settings-page-general-blurb-desktop = Il tesoro del tuo drago e il nome di questa libreria.
 settings-page-appearance = Aspetto
 settings-page-appearance-blurb = I temi che questo browser usa quando è chiaro e quando è scuro. Salvati solo in questo browser.
 settings-page-library = Libreria

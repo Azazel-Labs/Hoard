@@ -184,6 +184,7 @@ error-token-account-gone = le compte de ce jeton n’existe plus, il n’a donc 
 error-favorites-too-many = au plus 10 000 à la fois
 error-saved-search-name = une recherche enregistrée doit avoir un nom de 80 caractères au plus
 error-saved-search-too-long = cette recherche est trop longue pour être enregistrée
+error-hoard-seen = le trésor peut enregistrer au plus 32 types de ressources, chacun nommé en lettres minuscules
 error-texture-pattern-map = Le modèle de nom des textures doit contenir { "{" }map{ "}" }, sinon toutes les cartes d’un matériau porteraient le même nom
 error-texture-pattern-fields = Le modèle de nom des textures peut utiliser { "{" }name{ "}" }, { "{" }map{ "}" } et { "{" }size{ "}" }
 error-texture-name-chars = Les noms de textures ne peuvent pas contenir < > : " / \ | ? ou *
@@ -2199,6 +2200,26 @@ stats-largest-files = Plus gros fichiers
 stats-open-file = Ouvrir { $name }
 stats-empty = Rien dans la bibliothèque pour l’instant. Ajoutez un pack et ses chiffres apparaîtront ici.
 
+## HoardPanel.vue
+
+hoard-title = Votre trésor
+hoard-what = Chaque ressource de la bibliothèque est une pièce du trésor, et son type décide laquelle. Ramassez les nouveautés pour les ajouter à votre tas.
+hoard-sign-in = Connectez-vous pour amasser votre propre trésor.
+hoard-new = Nouveau butin à ramasser : { $count }
+hoard-none-new = Rien de nouveau à ramasser.
+hoard-collect = Ramasser
+hoard-unavailable = Ce navigateur ne peut pas dessiner le trésor : { $error }
+hoard-collect-failed = Impossible d’enregistrer ce que vous avez ramassé : { $error }
+hoard-label = Un dragon qui garde son trésor. Pièces : { $count }
+hoard-gold = Or
+hoard-gems = Gemmes
+hoard-books = Livres
+hoard-weapons = Armes
+hoard-bones = Ossements
+hoard-tablets = Tablettes runiques
+hoard-paintings = Tableaux
+hoard-potions = Potions
+
 ## UpdatesPanel.vue
 
 updates-saved = Hoard l’appellera quand une mise à jour sera prête
@@ -2296,8 +2317,8 @@ settings-title = Paramètres
 settings-loading = Chargement…
 settings-load-failed = Impossible de charger les paramètres : { $error }
 settings-page-general = Général
-settings-page-general-blurb = Le nom de ce serveur, pour tous ceux qui l’utilisent.
-settings-page-general-blurb-desktop = Le nom de cette bibliothèque.
+settings-page-general-blurb = Le trésor de votre dragon, et le nom de ce serveur.
+settings-page-general-blurb-desktop = Le trésor de votre dragon, et le nom de cette bibliothèque.
 settings-page-appearance = Apparence
 settings-page-appearance-blurb = Les thèmes que ce navigateur porte en mode clair et en mode sombre. Enregistrés dans ce navigateur uniquement.
 settings-page-library = Bibliothèque

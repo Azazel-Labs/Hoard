@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "d8dbfdf558614e792298e9f2143a889d3ce34cc24a0fe019b1acdcd7d98ba317"
+source = "4d93dc5d1285fff368850baed9eb7ace4cc4de3024361da1caffbeb82bc9dfe7"
 translation = "230aa92a6033cfd0e81420ca5ef21ba788bfd9cbf50cc6964032f8c9499222bf"
 
 [messages.account-add]
@@ -3629,6 +3629,10 @@ translation = "ennek egyetlen képkockája van, vagy túl sok ahhoz, hogy el leh
 source = "give a full path"
 translation = "adjon meg teljes elérési utat"
 
+[messages.error-hoard-seen]
+source = "the hoard can record at most 32 kinds of asset, each named in lowercase letters"
+translation = "a kincs legfeljebb 32 assetfajtát tarthat nyilván, mindegyiket kisbetűs névvel"
+
 [messages.error-hosted-address]
 source = "The image search service’s address should start with http:// or https://"
 translation = "A képkereső szolgáltatás címe http:// vagy https:// kezdetű legyen"
@@ -4735,6 +4739,74 @@ translation = "Amit beolvas"
 [messages.formatwizard-zip-failed]
 source = "Couldn’t make the zip: { $error }"
 translation = "Nem sikerült elkészíteni a zipet: { $error }"
+
+[messages.hoard-bones]
+source = "Bones"
+translation = "Csontok"
+
+[messages.hoard-books]
+source = "Books"
+translation = "Könyvek"
+
+[messages.hoard-collect]
+source = "Collect"
+translation = "Begyűjtés"
+
+[messages.hoard-collect-failed]
+source = "Couldn’t record what you collected: { $error }"
+translation = "Nem sikerült menteni, amit begyűjtött: { $error }"
+
+[messages.hoard-gems]
+source = "Gems"
+translation = "Drágakövek"
+
+[messages.hoard-gold]
+source = "Gold"
+translation = "Arany"
+
+[messages.hoard-label]
+source = "A dragon guarding its hoard. Treasure: { $count }"
+translation = "Egy sárkány őrzi a kincsét. Kincsdarabok: { $count }"
+
+[messages.hoard-new]
+source = "New loot to collect: { $count }"
+translation = "Begyűjthető új zsákmány: { $count }"
+
+[messages.hoard-none-new]
+source = "Nothing new to collect."
+translation = "Nincs új begyűjtenivaló."
+
+[messages.hoard-paintings]
+source = "Paintings"
+translation = "Festmények"
+
+[messages.hoard-potions]
+source = "Potions"
+translation = "Bájitalok"
+
+[messages.hoard-sign-in]
+source = "Sign in to collect a hoard of your own."
+translation = "Jelentkezzen be, hogy saját kincset gyűjthessen."
+
+[messages.hoard-tablets]
+source = "Rune tablets"
+translation = "Rúnatáblák"
+
+[messages.hoard-title]
+source = "Your hoard"
+translation = "Az Ön kincse"
+
+[messages.hoard-unavailable]
+source = "This browser can’t draw the hoard: { $error }"
+translation = "Ez a böngésző nem tudja megrajzolni a kincset: { $error }"
+
+[messages.hoard-weapons]
+source = "Weapons"
+translation = "Fegyverek"
+
+[messages.hoard-what]
+source = "Every asset in the library is a piece of treasure, and its kind decides which. Collect what’s new to add it to your pile."
+translation = "A könyvtár minden assetje egy kincsdarab, és a fajtája dönti el, melyik. Gyűjtse be az újakat, hogy a kupacához kerüljenek."
 
 [messages.https-add]
 source = "Add"
@@ -9164,12 +9236,12 @@ source = "General"
 translation = "Általános"
 
 [messages.settings-page-general-blurb]
-source = "What this server is called, for everyone who uses it."
-translation = "A szerver neve mindenki számára, aki használja."
+source = "Your dragon’s hoard, and what this server is called."
+translation = "Az Ön sárkányának kincse, és ennek a szervernek a neve."
 
 [messages.settings-page-general-blurb-desktop]
-source = "What this library is called."
-translation = "A könyvtár neve."
+source = "Your dragon’s hoard, and what this library is called."
+translation = "Az Ön sárkányának kincse, és ennek a könyvtárnak a neve."
 
 [messages.settings-page-issues]
 source = "Issues"

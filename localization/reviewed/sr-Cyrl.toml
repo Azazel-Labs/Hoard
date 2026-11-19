@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "d8dbfdf558614e792298e9f2143a889d3ce34cc24a0fe019b1acdcd7d98ba317"
+source = "4d93dc5d1285fff368850baed9eb7ace4cc4de3024361da1caffbeb82bc9dfe7"
 translation = "c2a4a8051502263df10866a7bb372ad5cdada115fb8d6449130cdd2d1752dd61"
 
 [messages.account-add]
@@ -3726,6 +3726,10 @@ translation = "ово има једну сличицу или превише д�
 source = "give a full path"
 translation = "наведите пуну путању"
 
+[messages.error-hoard-seen]
+source = "the hoard can record at most 32 kinds of asset, each named in lowercase letters"
+translation = "благо може да бележи највише 32 врсте ресурса, свака названа малим словима"
+
 [messages.error-hosted-address]
 source = "The image search service’s address should start with http:// or https://"
 translation = "Адреса услуге за претрагу слика треба да почиње са http:// или https://"
@@ -4856,6 +4860,74 @@ translation = "Шта чита"
 [messages.formatwizard-zip-failed]
 source = "Couldn’t make the zip: { $error }"
 translation = "Није могуће направити zip: { $error }"
+
+[messages.hoard-bones]
+source = "Bones"
+translation = "Кости"
+
+[messages.hoard-books]
+source = "Books"
+translation = "Књиге"
+
+[messages.hoard-collect]
+source = "Collect"
+translation = "Сакупи"
+
+[messages.hoard-collect-failed]
+source = "Couldn’t record what you collected: { $error }"
+translation = "Није могуће сачувати оно што сте сакупили: { $error }"
+
+[messages.hoard-gems]
+source = "Gems"
+translation = "Драгуљи"
+
+[messages.hoard-gold]
+source = "Gold"
+translation = "Злато"
+
+[messages.hoard-label]
+source = "A dragon guarding its hoard. Treasure: { $count }"
+translation = "Змај чува своје благо. Комада блага: { $count }"
+
+[messages.hoard-new]
+source = "New loot to collect: { $count }"
+translation = "Нови плен за сакупљање: { $count }"
+
+[messages.hoard-none-new]
+source = "Nothing new to collect."
+translation = "Нема ништа ново за сакупљање."
+
+[messages.hoard-paintings]
+source = "Paintings"
+translation = "Слике"
+
+[messages.hoard-potions]
+source = "Potions"
+translation = "Напици"
+
+[messages.hoard-sign-in]
+source = "Sign in to collect a hoard of your own."
+translation = "Пријавите се да бисте сакупљали своје благо."
+
+[messages.hoard-tablets]
+source = "Rune tablets"
+translation = "Рунске плочице"
+
+[messages.hoard-title]
+source = "Your hoard"
+translation = "Ваше благо"
+
+[messages.hoard-unavailable]
+source = "This browser can’t draw the hoard: { $error }"
+translation = "Овај прегледач не може да нацрта благо: { $error }"
+
+[messages.hoard-weapons]
+source = "Weapons"
+translation = "Оружје"
+
+[messages.hoard-what]
+source = "Every asset in the library is a piece of treasure, and its kind decides which. Collect what’s new to add it to your pile."
+translation = "Сваки ресурс у библиотеци је комад блага, а његова врста одређује који. Сакупите оно што је ново да бисте га додали на своју гомилу."
 
 [messages.https-add]
 source = "Add"
@@ -9419,12 +9491,12 @@ source = "General"
 translation = "Опште"
 
 [messages.settings-page-general-blurb]
-source = "What this server is called, for everyone who uses it."
-translation = "Како се овај сервер зове, за све који га користе."
+source = "Your dragon’s hoard, and what this server is called."
+translation = "Благо вашег змаја и назив овог сервера."
 
 [messages.settings-page-general-blurb-desktop]
-source = "What this library is called."
-translation = "Како се ова библиотека зове."
+source = "Your dragon’s hoard, and what this library is called."
+translation = "Благо вашег змаја и назив ове библиотеке."
 
 [messages.settings-page-issues]
 source = "Issues"

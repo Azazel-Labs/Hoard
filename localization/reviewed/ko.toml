@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "d8dbfdf558614e792298e9f2143a889d3ce34cc24a0fe019b1acdcd7d98ba317"
+source = "4d93dc5d1285fff368850baed9eb7ace4cc4de3024361da1caffbeb82bc9dfe7"
 translation = "cb51eeebee58ce4e694b9c22ec1e26a19090d24e80d9b74b0e431ca3fa274b7f"
 
 [messages.account-add]
@@ -3617,6 +3617,10 @@ translation = "프레임이 하나뿐이거나 너무 많아서 배치할 수 �
 source = "give a full path"
 translation = "전체 경로를 입력하세요"
 
+[messages.error-hoard-seen]
+source = "the hoard can record at most 32 kinds of asset, each named in lowercase letters"
+translation = "보물 더미에는 에셋 종류를 최대 32개까지 기록할 수 있으며, 각각 소문자 이름이어야 합니다"
+
 [messages.error-hosted-address]
 source = "The image search service’s address should start with http:// or https://"
 translation = "이미지 검색 서비스 주소는 http:// 또는 https://로 시작해야 합니다"
@@ -4723,6 +4727,74 @@ translation = "읽어 낸 내용"
 [messages.formatwizard-zip-failed]
 source = "Couldn’t make the zip: { $error }"
 translation = "zip을 만들지 못했습니다: { $error }"
+
+[messages.hoard-bones]
+source = "Bones"
+translation = "뼈"
+
+[messages.hoard-books]
+source = "Books"
+translation = "책"
+
+[messages.hoard-collect]
+source = "Collect"
+translation = "모으기"
+
+[messages.hoard-collect-failed]
+source = "Couldn’t record what you collected: { $error }"
+translation = "모은 것을 기록하지 못했습니다: { $error }"
+
+[messages.hoard-gems]
+source = "Gems"
+translation = "보석"
+
+[messages.hoard-gold]
+source = "Gold"
+translation = "금"
+
+[messages.hoard-label]
+source = "A dragon guarding its hoard. Treasure: { $count }"
+translation = "보물 더미를 지키는 용. 보물: { $count }"
+
+[messages.hoard-new]
+source = "New loot to collect: { $count }"
+translation = "모을 수 있는 새 전리품: { $count }"
+
+[messages.hoard-none-new]
+source = "Nothing new to collect."
+translation = "새로 모을 것이 없습니다."
+
+[messages.hoard-paintings]
+source = "Paintings"
+translation = "그림"
+
+[messages.hoard-potions]
+source = "Potions"
+translation = "물약"
+
+[messages.hoard-sign-in]
+source = "Sign in to collect a hoard of your own."
+translation = "로그인하면 나만의 보물 더미를 모을 수 있습니다."
+
+[messages.hoard-tablets]
+source = "Rune tablets"
+translation = "룬 석판"
+
+[messages.hoard-title]
+source = "Your hoard"
+translation = "나의 보물 더미"
+
+[messages.hoard-unavailable]
+source = "This browser can’t draw the hoard: { $error }"
+translation = "이 브라우저에서는 보물 더미를 그릴 수 없습니다: { $error }"
+
+[messages.hoard-weapons]
+source = "Weapons"
+translation = "무기"
+
+[messages.hoard-what]
+source = "Every asset in the library is a piece of treasure, and its kind decides which. Collect what’s new to add it to your pile."
+translation = "라이브러리의 모든 에셋은 보물 한 조각이며, 종류에 따라 어떤 보물인지 정해집니다. 새것을 모으면 내 더미에 더해집니다."
 
 [messages.https-add]
 source = "Add"
@@ -9110,12 +9182,12 @@ source = "General"
 translation = "일반"
 
 [messages.settings-page-general-blurb]
-source = "What this server is called, for everyone who uses it."
-translation = "이 서버를 사용하는 모든 사람에게 보이는 서버 이름입니다."
+source = "Your dragon’s hoard, and what this server is called."
+translation = "내 용의 보물 더미와 이 서버의 이름."
 
 [messages.settings-page-general-blurb-desktop]
-source = "What this library is called."
-translation = "이 라이브러리의 이름입니다."
+source = "Your dragon’s hoard, and what this library is called."
+translation = "내 용의 보물 더미와 이 라이브러리의 이름."
 
 [messages.settings-page-issues]
 source = "Issues"

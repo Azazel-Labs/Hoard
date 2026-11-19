@@ -184,6 +184,7 @@ error-token-account-gone = la cuenta de este token ya no existe, así que no tie
 error-favorites-too-many = como máximo 10.000 a la vez
 error-saved-search-name = una búsqueda guardada necesita un nombre de 80 caracteres como máximo
 error-saved-search-too-long = esa búsqueda es demasiado larga para guardarla
+error-hoard-seen = el tesoro puede registrar como máximo 32 tipos de recurso, cada uno con un nombre en minúsculas
 error-texture-pattern-map = El patrón de nombres de texturas necesita { "{" }map{ "}" }, o todos los mapas de un material tendrían el mismo nombre
 error-texture-pattern-fields = El patrón de nombres de texturas puede usar { "{" }name{ "}" }, { "{" }map{ "}" } y { "{" }size{ "}" }
 error-texture-name-chars = Los nombres de texturas no pueden tener < > : " / \ | ? ni *
@@ -2208,6 +2209,26 @@ stats-largest-files = Archivos más grandes
 stats-open-file = Abrir { $name }
 stats-empty = Todavía no hay nada en la biblioteca. Añade un paquete y sus cifras aparecerán aquí.
 
+## HoardPanel.vue
+
+hoard-title = Tu tesoro
+hoard-what = Cada recurso de la biblioteca es una pieza del tesoro, y su tipo decide cuál. Recoge lo nuevo para añadirlo a tu montón.
+hoard-sign-in = Inicia sesión para reunir un tesoro propio.
+hoard-new = Botín nuevo por recoger: { $count }
+hoard-none-new = No hay nada nuevo por recoger.
+hoard-collect = Recoger
+hoard-unavailable = Este navegador no puede dibujar el tesoro: { $error }
+hoard-collect-failed = No se ha podido guardar lo que has recogido: { $error }
+hoard-label = Un dragón que custodia su tesoro. Piezas: { $count }
+hoard-gold = Oro
+hoard-gems = Gemas
+hoard-books = Libros
+hoard-weapons = Armas
+hoard-bones = Huesos
+hoard-tablets = Tablillas rúnicas
+hoard-paintings = Cuadros
+hoard-potions = Pociones
+
 ## UpdatesPanel.vue
 
 updates-saved = Hoard llamará a esa dirección cuando haya una actualización lista
@@ -2305,8 +2326,8 @@ settings-title = Ajustes
 settings-loading = Cargando…
 settings-load-failed = No se han podido cargar los ajustes: { $error }
 settings-page-general = General
-settings-page-general-blurb = Cómo se llama este servidor, para todos los que lo usan.
-settings-page-general-blurb-desktop = Cómo se llama esta biblioteca.
+settings-page-general-blurb = El tesoro de tu dragón y el nombre de este servidor.
+settings-page-general-blurb-desktop = El tesoro de tu dragón y el nombre de esta biblioteca.
 settings-page-appearance = Apariencia
 settings-page-appearance-blurb = Los temas que usa este navegador cuando está en modo claro y en modo oscuro. Se guarda solo en este navegador.
 settings-page-library = Biblioteca

@@ -1217,8 +1217,12 @@ Where the server keeps things, how it listens and how it's protected are set whe
 thumbnails, the update check, workers, limits, the public address, HTTPS, sign-in, the SoundFont) is changed in
 **Settings** in the portal header (by an admin), takes effect at once, and is kept in the database, so it survives restarts and backups.
 
-**Settings → General** names the server: the name is shown in the top bar, the browser tab and on the sign-in page,
-for telling several hoards apart.
+**Settings → General** opens on your dragon's hoard: every asset in the library is a piece of treasure (gold for
+textures and materials, gems for models, weapons for sounds, bones for animations, rune tablets for fonts, paintings
+for vector art and video, potions for sprite sheets, books for the rest). Each account keeps its own pile: what's been
+added since you last looked is loot to collect, and **Collect** pours it in. Under it are the library's totals. For an
+admin, the page also names the server: the name is shown in the top bar, the browser tab and on the sign-in page, for
+telling several hoards apart.
 
 Set before starting (these need a restart):
 
@@ -1442,13 +1446,14 @@ browser session's changes must also carry an `X-Hoard` header, which pages on ot
 | DELETE 🔒 | `/api/projects/{name}` | forget it |
 | POST | `/api/usage` | `{packs?, assets?, archived?}`: the projects using any of these, with how many and a few of their paths |
 
-**Favorites and saved searches** (each person's own, so a guest has none; looking is enough)
+**Favorites, saved searches and the hoard** (each person's own, so a guest has none; looking is enough)
 
 | Method | Path | |
 |---|---|---|
 | GET, POST | `/api/me/favorites` | your favorite asset ids, or change them: `{add?: [ids], remove?: [ids]}` |
 | GET, POST | `/api/me/searches` | your saved searches, or save one: `{name, query}` (the portal's query string, like `q=rock&kind=texture`) |
 | DELETE | `/api/me/searches/{id}` | forget one |
+| GET, PUT | `/api/me/hoard` | how many assets of each kind you've collected into your hoard (`{seen: {kind: count}}`, `null` before you have), or record it |
 
 **Unreal**
 

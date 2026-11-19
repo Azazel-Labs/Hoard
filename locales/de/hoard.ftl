@@ -184,6 +184,7 @@ error-token-account-gone = das Konto dieses Tokens existiert nicht mehr, daher h
 error-favorites-too-many = höchstens 10.000 auf einmal
 error-saved-search-name = eine gespeicherte Suche braucht einen Namen mit höchstens 80 Zeichen
 error-saved-search-too-long = diese Suche ist zu lang zum Speichern
+error-hoard-seen = der Hort kann höchstens 32 Arten von Assets festhalten, jede mit einem Namen aus Kleinbuchstaben
 error-texture-pattern-map = Das Muster für Texturnamen braucht { "{" }map{ "}" }, sonst bekämen alle Maps eines Materials denselben Namen
 error-texture-pattern-fields = Das Muster für Texturnamen kann { "{" }name{ "}" }, { "{" }map{ "}" } und { "{" }size{ "}" } verwenden
 error-texture-name-chars = Texturnamen dürfen kein < > : " / \ | ? oder * enthalten
@@ -2156,6 +2157,26 @@ stats-largest-files = Größte Dateien
 stats-open-file = { $name } öffnen
 stats-empty = Noch nichts in der Bibliothek. Fügen Sie ein Paket hinzu, dann erscheinen seine Zahlen hier.
 
+## HoardPanel.vue
+
+hoard-title = Ihr Hort
+hoard-what = Jedes Asset in der Bibliothek ist ein Schatzstück, und seine Art bestimmt, welches. Sammeln Sie das Neue ein, um es Ihrem Haufen hinzuzufügen.
+hoard-sign-in = Melden Sie sich an, um einen eigenen Hort zu sammeln.
+hoard-new = Neue Beute zum Einsammeln: { $count }
+hoard-none-new = Nichts Neues zum Einsammeln.
+hoard-collect = Einsammeln
+hoard-unavailable = Dieser Browser kann den Hort nicht zeichnen: { $error }
+hoard-collect-failed = Was Sie eingesammelt haben, konnte nicht gespeichert werden: { $error }
+hoard-label = Ein Drache bewacht seinen Hort. Schätze: { $count }
+hoard-gold = Gold
+hoard-gems = Edelsteine
+hoard-books = Bücher
+hoard-weapons = Waffen
+hoard-bones = Knochen
+hoard-tablets = Runentafeln
+hoard-paintings = Gemälde
+hoard-potions = Tränke
+
 ## UpdatesPanel.vue
 
 updates-saved = Hoard ruft sie auf, wenn ein Update bereitsteht
@@ -2253,8 +2274,8 @@ settings-title = Einstellungen
 settings-loading = Wird geladen…
 settings-load-failed = Die Einstellungen konnten nicht geladen werden: { $error }
 settings-page-general = Allgemein
-settings-page-general-blurb = Wie dieser Server heißt, für alle, die ihn nutzen.
-settings-page-general-blurb-desktop = Wie diese Bibliothek heißt.
+settings-page-general-blurb = Der Hort Ihres Drachen und wie dieser Server heißt.
+settings-page-general-blurb-desktop = Der Hort Ihres Drachen und wie diese Bibliothek heißt.
 settings-page-appearance = Darstellung
 settings-page-appearance-blurb = Die Designs, die dieser Browser im hellen und im dunklen Modus trägt. Nur in diesem Browser gespeichert.
 settings-page-library = Bibliothek

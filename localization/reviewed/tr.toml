@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "d8dbfdf558614e792298e9f2143a889d3ce34cc24a0fe019b1acdcd7d98ba317"
+source = "4d93dc5d1285fff368850baed9eb7ace4cc4de3024361da1caffbeb82bc9dfe7"
 translation = "365b0fc7ff648476ee75c67213c00d18e7b3e0fb9f940664032b9c834c675ffb"
 
 [messages.account-add]
@@ -3633,6 +3633,10 @@ translation = "bunun tek karesi var ya da yerleştirilemeyecek kadar çok karesi
 source = "give a full path"
 translation = "tam bir yol verin"
 
+[messages.error-hoard-seen]
+source = "the hoard can record at most 32 kinds of asset, each named in lowercase letters"
+translation = "hazine en fazla 32 varlık türü kaydedebilir, her biri küçük harflerle adlandırılmış olmalıdır"
+
 [messages.error-hosted-address]
 source = "The image search service’s address should start with http:// or https://"
 translation = "Görsel arama hizmetinin adresi http:// ya da https:// ile başlamalı"
@@ -4739,6 +4743,74 @@ translation = "Ne okuyor"
 [messages.formatwizard-zip-failed]
 source = "Couldn’t make the zip: { $error }"
 translation = "Zip oluşturulamadı: { $error }"
+
+[messages.hoard-bones]
+source = "Bones"
+translation = "Kemikler"
+
+[messages.hoard-books]
+source = "Books"
+translation = "Kitaplar"
+
+[messages.hoard-collect]
+source = "Collect"
+translation = "Topla"
+
+[messages.hoard-collect-failed]
+source = "Couldn’t record what you collected: { $error }"
+translation = "Topladıklarınız kaydedilemedi: { $error }"
+
+[messages.hoard-gems]
+source = "Gems"
+translation = "Mücevherler"
+
+[messages.hoard-gold]
+source = "Gold"
+translation = "Altın"
+
+[messages.hoard-label]
+source = "A dragon guarding its hoard. Treasure: { $count }"
+translation = "Hazinesini koruyan bir ejderha. Hazine: { $count }"
+
+[messages.hoard-new]
+source = "New loot to collect: { $count }"
+translation = "Toplanacak yeni ganimet: { $count }"
+
+[messages.hoard-none-new]
+source = "Nothing new to collect."
+translation = "Toplanacak yeni bir şey yok."
+
+[messages.hoard-paintings]
+source = "Paintings"
+translation = "Tablolar"
+
+[messages.hoard-potions]
+source = "Potions"
+translation = "İksirler"
+
+[messages.hoard-sign-in]
+source = "Sign in to collect a hoard of your own."
+translation = "Kendi hazinenizi toplamak için oturum açın."
+
+[messages.hoard-tablets]
+source = "Rune tablets"
+translation = "Rün tabletleri"
+
+[messages.hoard-title]
+source = "Your hoard"
+translation = "Hazineniz"
+
+[messages.hoard-unavailable]
+source = "This browser can’t draw the hoard: { $error }"
+translation = "Bu tarayıcı hazineyi çizemiyor: { $error }"
+
+[messages.hoard-weapons]
+source = "Weapons"
+translation = "Silahlar"
+
+[messages.hoard-what]
+source = "Every asset in the library is a piece of treasure, and its kind decides which. Collect what’s new to add it to your pile."
+translation = "Kütüphanedeki her varlık bir hazine parçasıdır ve türü hangisi olduğunu belirler. Yenileri toplayarak yığınınıza ekleyin."
 
 [messages.https-add]
 source = "Add"
@@ -9168,12 +9240,12 @@ source = "General"
 translation = "Genel"
 
 [messages.settings-page-general-blurb]
-source = "What this server is called, for everyone who uses it."
-translation = "Bu sunucunun, onu kullanan herkes için adı."
+source = "Your dragon’s hoard, and what this server is called."
+translation = "Ejderhanızın hazinesi ve bu sunucunun adı."
 
 [messages.settings-page-general-blurb-desktop]
-source = "What this library is called."
-translation = "Bu kütüphanenin adı."
+source = "Your dragon’s hoard, and what this library is called."
+translation = "Ejderhanızın hazinesi ve bu kütüphanenin adı."
 
 [messages.settings-page-issues]
 source = "Issues"

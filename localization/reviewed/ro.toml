@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "d8dbfdf558614e792298e9f2143a889d3ce34cc24a0fe019b1acdcd7d98ba317"
+source = "4d93dc5d1285fff368850baed9eb7ace4cc4de3024361da1caffbeb82bc9dfe7"
 translation = "4153ba96d36b94b3768217f18b9520b9cc368f6074756e2f4f8bad12b6fcaaa8"
 
 [messages.account-add]
@@ -3776,6 +3776,10 @@ translation = "are un singur cadru sau prea multe pentru a fi așezate"
 source = "give a full path"
 translation = "dați o cale completă"
 
+[messages.error-hoard-seen]
+source = "the hoard can record at most 32 kinds of asset, each named in lowercase letters"
+translation = "comoara poate înregistra cel mult 32 de tipuri de resurse, fiecare numit cu litere mici"
+
 [messages.error-hosted-address]
 source = "The image search service’s address should start with http:// or https://"
 translation = "Adresa serviciului de căutare după imagine trebuie să înceapă cu http:// sau https://"
@@ -4906,6 +4910,74 @@ translation = "Ce citește"
 [messages.formatwizard-zip-failed]
 source = "Couldn’t make the zip: { $error }"
 translation = "Arhiva zip nu a putut fi creată: { $error }"
+
+[messages.hoard-bones]
+source = "Bones"
+translation = "Oase"
+
+[messages.hoard-books]
+source = "Books"
+translation = "Cărți"
+
+[messages.hoard-collect]
+source = "Collect"
+translation = "Adună"
+
+[messages.hoard-collect-failed]
+source = "Couldn’t record what you collected: { $error }"
+translation = "Nu s-a putut înregistra ce ați adunat: { $error }"
+
+[messages.hoard-gems]
+source = "Gems"
+translation = "Pietre prețioase"
+
+[messages.hoard-gold]
+source = "Gold"
+translation = "Aur"
+
+[messages.hoard-label]
+source = "A dragon guarding its hoard. Treasure: { $count }"
+translation = "Un dragon care își păzește comoara. Bucăți: { $count }"
+
+[messages.hoard-new]
+source = "New loot to collect: { $count }"
+translation = "Pradă nouă de adunat: { $count }"
+
+[messages.hoard-none-new]
+source = "Nothing new to collect."
+translation = "Nimic nou de adunat."
+
+[messages.hoard-paintings]
+source = "Paintings"
+translation = "Picturi"
+
+[messages.hoard-potions]
+source = "Potions"
+translation = "Poțiuni"
+
+[messages.hoard-sign-in]
+source = "Sign in to collect a hoard of your own."
+translation = "Conectați-vă ca să adunați o comoară proprie."
+
+[messages.hoard-tablets]
+source = "Rune tablets"
+translation = "Tăblițe runice"
+
+[messages.hoard-title]
+source = "Your hoard"
+translation = "Comoara dumneavoastră"
+
+[messages.hoard-unavailable]
+source = "This browser can’t draw the hoard: { $error }"
+translation = "Acest browser nu poate desena comoara: { $error }"
+
+[messages.hoard-weapons]
+source = "Weapons"
+translation = "Arme"
+
+[messages.hoard-what]
+source = "Every asset in the library is a piece of treasure, and its kind decides which. Collect what’s new to add it to your pile."
+translation = "Fiecare resursă din bibliotecă este o bucată de comoară, iar tipul ei decide care. Adunați ce e nou ca să adăugați la grămada dumneavoastră."
 
 [messages.https-add]
 source = "Add"
@@ -9494,12 +9566,12 @@ source = "General"
 translation = "General"
 
 [messages.settings-page-general-blurb]
-source = "What this server is called, for everyone who uses it."
-translation = "Cum se numește acest server, pentru toți cei care îl folosesc."
+source = "Your dragon’s hoard, and what this server is called."
+translation = "Comoara dragonului dumneavoastră și numele acestui server."
 
 [messages.settings-page-general-blurb-desktop]
-source = "What this library is called."
-translation = "Cum se numește această bibliotecă."
+source = "Your dragon’s hoard, and what this library is called."
+translation = "Comoara dragonului dumneavoastră și numele acestei biblioteci."
 
 [messages.settings-page-issues]
 source = "Issues"

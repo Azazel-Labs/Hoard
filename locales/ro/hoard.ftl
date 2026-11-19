@@ -184,6 +184,7 @@ error-token-account-gone = contul acestui token nu mai există, așa că nu are 
 error-favorites-too-many = cel mult 10.000 odată
 error-saved-search-name = o căutare salvată are nevoie de un nume de cel mult 80 de caractere
 error-saved-search-too-long = căutarea este prea lungă pentru a fi salvată
+error-hoard-seen = comoara poate înregistra cel mult 32 de tipuri de resurse, fiecare numit cu litere mici
 error-texture-pattern-map = Șablonul pentru numele texturilor are nevoie de { "{" }map{ "}" }, altfel toate hărțile unui material ar primi același nume
 error-texture-pattern-fields = Șablonul pentru numele texturilor poate folosi { "{" }name{ "}" }, { "{" }map{ "}" } și { "{" }size{ "}" }
 error-texture-name-chars = Numele texturilor nu pot conține < > : " / \ | ? sau *
@@ -2362,6 +2363,26 @@ stats-largest-files = Cele mai mari fișiere
 stats-open-file = Deschideți { $name }
 stats-empty = Încă nimic în bibliotecă. Adăugați un pachet și cifrele lui apar aici.
 
+## HoardPanel.vue
+
+hoard-title = Comoara dumneavoastră
+hoard-what = Fiecare resursă din bibliotecă este o bucată de comoară, iar tipul ei decide care. Adunați ce e nou ca să adăugați la grămada dumneavoastră.
+hoard-sign-in = Conectați-vă ca să adunați o comoară proprie.
+hoard-new = Pradă nouă de adunat: { $count }
+hoard-none-new = Nimic nou de adunat.
+hoard-collect = Adună
+hoard-unavailable = Acest browser nu poate desena comoara: { $error }
+hoard-collect-failed = Nu s-a putut înregistra ce ați adunat: { $error }
+hoard-label = Un dragon care își păzește comoara. Bucăți: { $count }
+hoard-gold = Aur
+hoard-gems = Pietre prețioase
+hoard-books = Cărți
+hoard-weapons = Arme
+hoard-bones = Oase
+hoard-tablets = Tăblițe runice
+hoard-paintings = Picturi
+hoard-potions = Poțiuni
+
 ## UpdatesPanel.vue
 
 updates-saved = Hoard o va apela când este gata o actualizare
@@ -2461,8 +2482,8 @@ settings-title = Setări
 settings-loading = Se încarcă…
 settings-load-failed = Setările nu au putut fi încărcate: { $error }
 settings-page-general = General
-settings-page-general-blurb = Cum se numește acest server, pentru toți cei care îl folosesc.
-settings-page-general-blurb-desktop = Cum se numește această bibliotecă.
+settings-page-general-blurb = Comoara dragonului dumneavoastră și numele acestui server.
+settings-page-general-blurb-desktop = Comoara dragonului dumneavoastră și numele acestei biblioteci.
 settings-page-appearance = Aspect
 settings-page-appearance-blurb = Temele pe care le folosește acest browser când este luminos și când este întunecat. Salvate doar în acest browser.
 settings-page-library = Bibliotecă

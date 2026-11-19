@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "d8dbfdf558614e792298e9f2143a889d3ce34cc24a0fe019b1acdcd7d98ba317"
+source = "4d93dc5d1285fff368850baed9eb7ace4cc4de3024361da1caffbeb82bc9dfe7"
 translation = "d2d82856aba060f1fca3b326d63684dcbaa143f941e3bdd05f930d4179bd4d37"
 
 [messages.account-add]
@@ -3753,6 +3753,10 @@ translation = "tento soubor má jen jeden snímek, nebo jich má příliš mnoho
 source = "give a full path"
 translation = "zadejte úplnou cestu"
 
+[messages.error-hoard-seen]
+source = "the hoard can record at most 32 kinds of asset, each named in lowercase letters"
+translation = "poklad může zaznamenat nejvýše 32 druhů assetů, každý pojmenovaný malými písmeny"
+
 [messages.error-hosted-address]
 source = "The image search service’s address should start with http:// or https://"
 translation = "Adresa služby pro hledání obrázků by měla začínat http:// nebo https://"
@@ -4887,6 +4891,74 @@ translation = "Co přečte"
 [messages.formatwizard-zip-failed]
 source = "Couldn’t make the zip: { $error }"
 translation = "Zip se nepodařilo vytvořit: { $error }"
+
+[messages.hoard-bones]
+source = "Bones"
+translation = "Kosti"
+
+[messages.hoard-books]
+source = "Books"
+translation = "Knihy"
+
+[messages.hoard-collect]
+source = "Collect"
+translation = "Sebrat"
+
+[messages.hoard-collect-failed]
+source = "Couldn’t record what you collected: { $error }"
+translation = "Nepodařilo se uložit, co jste sebrali: { $error }"
+
+[messages.hoard-gems]
+source = "Gems"
+translation = "Drahokamy"
+
+[messages.hoard-gold]
+source = "Gold"
+translation = "Zlato"
+
+[messages.hoard-label]
+source = "A dragon guarding its hoard. Treasure: { $count }"
+translation = "Drak střežící svůj poklad. Kusů pokladu: { $count }"
+
+[messages.hoard-new]
+source = "New loot to collect: { $count }"
+translation = "Nová kořist ke sběru: { $count }"
+
+[messages.hoard-none-new]
+source = "Nothing new to collect."
+translation = "Nic nového ke sběru."
+
+[messages.hoard-paintings]
+source = "Paintings"
+translation = "Obrazy"
+
+[messages.hoard-potions]
+source = "Potions"
+translation = "Lektvary"
+
+[messages.hoard-sign-in]
+source = "Sign in to collect a hoard of your own."
+translation = "Přihlaste se a sbírejte vlastní poklad."
+
+[messages.hoard-tablets]
+source = "Rune tablets"
+translation = "Runové destičky"
+
+[messages.hoard-title]
+source = "Your hoard"
+translation = "Váš poklad"
+
+[messages.hoard-unavailable]
+source = "This browser can’t draw the hoard: { $error }"
+translation = "Tento prohlížeč neumí poklad vykreslit: { $error }"
+
+[messages.hoard-weapons]
+source = "Weapons"
+translation = "Zbraně"
+
+[messages.hoard-what]
+source = "Every asset in the library is a piece of treasure, and its kind decides which. Collect what’s new to add it to your pile."
+translation = "Každý asset v knihovně je kus pokladu a jeho druh určuje jaký. Seberte, co je nové, a přidejte to na svou hromadu."
 
 [messages.https-add]
 source = "Add"
@@ -9501,12 +9573,12 @@ source = "General"
 translation = "Obecné"
 
 [messages.settings-page-general-blurb]
-source = "What this server is called, for everyone who uses it."
-translation = "Jak se tento server jmenuje, pro všechny, kdo ho používají."
+source = "Your dragon’s hoard, and what this server is called."
+translation = "Poklad vašeho draka a jak se tento server jmenuje."
 
 [messages.settings-page-general-blurb-desktop]
-source = "What this library is called."
-translation = "Jak se tato knihovna jmenuje."
+source = "Your dragon’s hoard, and what this library is called."
+translation = "Poklad vašeho draka a jak se tato knihovna jmenuje."
 
 [messages.settings-page-issues]
 source = "Issues"

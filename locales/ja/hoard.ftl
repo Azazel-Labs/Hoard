@@ -184,6 +184,7 @@ error-token-account-gone = このトークンのアカウントは削除され�
 error-favorites-too-many = 一度に 10,000 件までです
 error-saved-search-name = 保存する検索には 80 文字以内の名前が必要です
 error-saved-search-too-long = その検索は長すぎて保存できません
+error-hoard-seen = 宝の山に記録できるアセットの種類は 32 種類までで、それぞれ小文字の名前が必要です
 error-texture-pattern-map = テクスチャ名のパターンには { "{" }map{ "}" } が必要です。ないと、マテリアルのすべてのマップが同じ名前になります
 error-texture-pattern-fields = テクスチャ名のパターンには { "{" }name{ "}" }、{ "{" }map{ "}" }、{ "{" }size{ "}" } を使えます
 error-texture-name-chars = テクスチャ名に < > : " / \ | ? * は使えません
@@ -1985,6 +1986,26 @@ stats-largest-files = 大きいファイル
 stats-open-file = { $name } を開く
 stats-empty = ライブラリにはまだ何もありません。パックを追加すると、ここに数字が表示されます。
 
+## HoardPanel.vue
+
+hoard-title = あなたの宝の山
+hoard-what = ライブラリのアセットはそれぞれ宝物ひとつで、種類によってどの宝物かが決まります。新しいものを集めると、あなたの山に加わります。
+hoard-sign-in = サインインすると、自分だけの宝の山を集められます。
+hoard-new = 集められる新しい戦利品: { $count }
+hoard-none-new = 新しく集めるものはありません。
+hoard-collect = 集める
+hoard-unavailable = このブラウザーでは宝の山を描画できません: { $error }
+hoard-collect-failed = 集めたものを記録できませんでした: { $error }
+hoard-label = 宝の山を守るドラゴン。宝物: { $count }
+hoard-gold = 金貨
+hoard-gems = 宝石
+hoard-books = 本
+hoard-weapons = 武器
+hoard-bones = 骨
+hoard-tablets = ルーン石板
+hoard-paintings = 絵画
+hoard-potions = 薬瓶
+
 ## UpdatesPanel.vue
 
 updates-saved = 更新の準備ができたら Hoard がこのアドレスを呼び出します
@@ -2074,8 +2095,8 @@ settings-title = 設定
 settings-loading = 読み込み中…
 settings-load-failed = 設定を読み込めませんでした: { $error }
 settings-page-general = 一般
-settings-page-general-blurb = このサーバーの名前です。使う人全員に表示されます。
-settings-page-general-blurb-desktop = このライブラリの名前です。
+settings-page-general-blurb = あなたのドラゴンの宝の山と、このサーバーの名前。
+settings-page-general-blurb-desktop = あなたのドラゴンの宝の山と、このライブラリの名前。
 settings-page-appearance = 外観
 settings-page-appearance-blurb = このブラウザーがライトのときとダークのときに使うテーマです。このブラウザーにだけ保存されます。
 settings-page-library = ライブラリ

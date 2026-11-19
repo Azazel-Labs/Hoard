@@ -184,6 +184,7 @@ error-token-account-gone = konto tego tokenu już nie istnieje, więc nie ma on 
 error-favorites-too-many = maksymalnie 10 000 naraz
 error-saved-search-name = zapisane wyszukiwanie musi mieć nazwę o długości maksymalnie 80 znaków
 error-saved-search-too-long = to wyszukiwanie jest zbyt długie, by je zapisać
+error-hoard-seen = skarb może zapisać najwyżej 32 rodzaje zasobów, każdy nazwany małymi literami
 error-texture-pattern-map = Wzorzec nazw tekstur musi zawierać { "{" }map{ "}" }, inaczej każda mapa materiału dostanie tę samą nazwę
 error-texture-pattern-fields = Wzorzec nazw tekstur może zawierać { "{" }name{ "}" }, { "{" }map{ "}" } i { "{" }size{ "}" }
 error-texture-name-chars = Nazwy tekstur nie mogą zawierać znaków < > : " / \ | ? ani *
@@ -2358,6 +2359,26 @@ stats-largest-files = Największe pliki
 stats-open-file = Otwórz { $name }
 stats-empty = Biblioteka jest jeszcze pusta. Po dodaniu paczki pojawią się tu jej liczby.
 
+## HoardPanel.vue
+
+hoard-title = Twój skarb
+hoard-what = Każdy zasób w bibliotece to kawałek skarbu, a jego rodzaj decyduje, który. Zbierz nowości, aby dodać je do swojego stosu.
+hoard-sign-in = Zaloguj się, aby zbierać własny skarb.
+hoard-new = Nowe łupy do zebrania: { $count }
+hoard-none-new = Nie ma nic nowego do zebrania.
+hoard-collect = Zbierz
+hoard-unavailable = Ta przeglądarka nie potrafi narysować skarbu: { $error }
+hoard-collect-failed = Nie udało się zapisać tego, co zebrano: { $error }
+hoard-label = Smok strzegący swojego skarbu. Skarby: { $count }
+hoard-gold = Złoto
+hoard-gems = Klejnoty
+hoard-books = Księgi
+hoard-weapons = Broń
+hoard-bones = Kości
+hoard-tablets = Tabliczki runiczne
+hoard-paintings = Obrazy
+hoard-potions = Mikstury
+
 ## UpdatesPanel.vue
 
 updates-saved = Hoard wywoła ten adres, gdy aktualizacja będzie gotowa
@@ -2459,8 +2480,8 @@ settings-title = Ustawienia
 settings-loading = Ładowanie…
 settings-load-failed = Nie udało się załadować ustawień: { $error }
 settings-page-general = Ogólne
-settings-page-general-blurb = Nazwa tego serwera, widoczna dla wszystkich jego użytkowników.
-settings-page-general-blurb-desktop = Nazwa tej biblioteki.
+settings-page-general-blurb = Skarb Twojego smoka i nazwa tego serwera.
+settings-page-general-blurb-desktop = Skarb Twojego smoka i nazwa tej biblioteki.
 settings-page-appearance = Wygląd
 settings-page-appearance-blurb = Motywy tej przeglądarki w trybie jasnym i ciemnym. Zapisywane tylko w tej przeglądarce.
 settings-page-library = Biblioteka

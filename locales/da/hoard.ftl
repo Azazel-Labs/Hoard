@@ -184,6 +184,7 @@ error-token-account-gone = dette tokens konto findes ikke længere, så det har 
 error-favorites-too-many = højst 10.000 ad gangen
 error-saved-search-name = en gemt søgning skal have et navn på højst 80 tegn
 error-saved-search-too-long = den søgning er for lang til at gemme
+error-hoard-seen = skatten kan højst registrere 32 slags assets, hver navngivet med små bogstaver
 error-texture-pattern-map = Mønsteret for teksturnavne skal indeholde { "{" }map{ "}" }, ellers ville alle et materiales maps få samme navn
 error-texture-pattern-fields = Mønsteret for teksturnavne kan bruge { "{" }name{ "}" }, { "{" }map{ "}" } og { "{" }size{ "}" }
 error-texture-name-chars = Teksturnavne må ikke indeholde < > : " / \ | ? eller *
@@ -2158,6 +2159,26 @@ stats-largest-files = Største filer
 stats-open-file = Åbn { $name }
 stats-empty = Intet i biblioteket endnu. Tilføj en pakke, så dukker dens tal op her.
 
+## HoardPanel.vue
+
+hoard-title = Din skat
+hoard-what = Hvert asset i biblioteket er et stykke skat, og dets art afgør hvilket. Saml det nye op for at lægge det på din bunke.
+hoard-sign-in = Log ind for at samle din egen skat.
+hoard-new = Nyt bytte at samle: { $count }
+hoard-none-new = Intet nyt at samle.
+hoard-collect = Saml
+hoard-unavailable = Denne browser kan ikke tegne skatten: { $error }
+hoard-collect-failed = Kunne ikke gemme det, du samlede: { $error }
+hoard-label = En drage, der vogter sin skat. Skatte: { $count }
+hoard-gold = Guld
+hoard-gems = Ædelsten
+hoard-books = Bøger
+hoard-weapons = Våben
+hoard-bones = Knogler
+hoard-tablets = Runetavler
+hoard-paintings = Malerier
+hoard-potions = Eliksirer
+
 ## UpdatesPanel.vue
 
 updates-saved = Hoard kalder den, når en opdatering er klar
@@ -2255,8 +2276,8 @@ settings-title = Indstillinger
 settings-loading = Indlæser…
 settings-load-failed = Kunne ikke indlæse indstillingerne: { $error }
 settings-page-general = Generelt
-settings-page-general-blurb = Hvad denne server hedder, for alle, der bruger den.
-settings-page-general-blurb-desktop = Hvad dette bibliotek hedder.
+settings-page-general-blurb = Din drages skat, og hvad denne server hedder.
+settings-page-general-blurb-desktop = Din drages skat, og hvad dette bibliotek hedder.
 settings-page-appearance = Udseende
 settings-page-appearance-blurb = De temaer, denne browser bruger, når den er lys, og når den er mørk. Gemmes kun i denne browser.
 settings-page-library = Bibliotek

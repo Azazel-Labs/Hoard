@@ -184,6 +184,7 @@ error-token-account-gone = het account van dit token bestaat niet meer, dus het 
 error-favorites-too-many = maximaal 10.000 tegelijk
 error-saved-search-name = een opgeslagen zoekopdracht heeft een naam nodig van maximaal 80 tekens
 error-saved-search-too-long = die zoekopdracht is te lang om op te slaan
+error-hoard-seen = de schat kan hoogstens 32 soorten assets bijhouden, elk met een naam in kleine letters
 error-texture-pattern-map = Het patroon voor textuurnamen heeft { "{" }map{ "}" } nodig, anders krijgt elke map van een materiaal dezelfde naam
 error-texture-pattern-fields = Het patroon voor textuurnamen kan { "{" }name{ "}" }, { "{" }map{ "}" } en { "{" }size{ "}" } gebruiken
 error-texture-name-chars = Textuurnamen mogen geen < > : " / \ | ? of * bevatten
@@ -2156,6 +2157,26 @@ stats-largest-files = Grootste bestanden
 stats-open-file = { $name } openen
 stats-empty = Nog niets in de bibliotheek. Voeg een pakket toe en de cijfers verschijnen hier.
 
+## HoardPanel.vue
+
+hoard-title = Jouw schat
+hoard-what = Elk asset in de bibliotheek is een stuk schat, en de soort bepaalt welk. Verzamel wat nieuw is om het aan je stapel toe te voegen.
+hoard-sign-in = Meld je aan om een eigen schat te verzamelen.
+hoard-new = Nieuwe buit om te verzamelen: { $count }
+hoard-none-new = Niets nieuws om te verzamelen.
+hoard-collect = Verzamelen
+hoard-unavailable = Deze browser kan de schat niet tekenen: { $error }
+hoard-collect-failed = Kon niet opslaan wat je hebt verzameld: { $error }
+hoard-label = Een draak die zijn schat bewaakt. Schatten: { $count }
+hoard-gold = Goud
+hoard-gems = Edelstenen
+hoard-books = Boeken
+hoard-weapons = Wapens
+hoard-bones = Botten
+hoard-tablets = Runentabletten
+hoard-paintings = Schilderijen
+hoard-potions = Drankjes
+
 ## UpdatesPanel.vue
 
 updates-saved = Hoard roept het aan zodra er een update klaarstaat
@@ -2253,8 +2274,8 @@ settings-title = Instellingen
 settings-loading = Laden…
 settings-load-failed = Kon de instellingen niet laden: { $error }
 settings-page-general = Algemeen
-settings-page-general-blurb = Hoe deze server heet, voor iedereen die hem gebruikt.
-settings-page-general-blurb-desktop = Hoe deze bibliotheek heet.
+settings-page-general-blurb = De schat van je draak, en hoe deze server heet.
+settings-page-general-blurb-desktop = De schat van je draak, en hoe deze bibliotheek heet.
 settings-page-appearance = Weergave
 settings-page-appearance-blurb = De thema’s die deze browser draagt als hij licht is en als hij donker is. Alleen in deze browser opgeslagen.
 settings-page-library = Bibliotheek

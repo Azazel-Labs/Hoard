@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "73a37e0ec4c988c2d944720b9d9b556d1bc036cfbbcca2fbe2573ed59c31def6"
+source = "d8dbfdf558614e792298e9f2143a889d3ce34cc24a0fe019b1acdcd7d98ba317"
 translation = "9bd6df5ffb27941fd7574669812413d7eaa17a0920718334cfd6ce3df12e13f5"
 
 [messages.account-add]
@@ -11518,6 +11518,10 @@ translation = "{ $min } min jäljellä"
 source = "{ $s } s left"
 translation = "{ $s } s jäljellä"
 
+[messages.upload-expand]
+source = "Show imports"
+translation = "Näytä tuonnit"
+
 [messages.upload-failed-plain]
 source = "failed"
 translation = "epäonnistui"
@@ -11546,13 +11550,37 @@ translation = """
        *[other] Tuodaan { $count } pakettia
     }"""
 
+[messages.upload-interrupted]
+source = "Interrupted"
+translation = "Keskeytynyt"
+
+[messages.upload-minimize]
+source = "Minimize"
+translation = "Pienennä"
+
 [messages.upload-network-error]
 source = "network error"
 translation = "verkkovirhe"
 
+[messages.upload-not-same]
+source = "Those aren’t the same files, so nothing was resumed."
+translation = "Nämä eivät ole samat tiedostot, joten mitään ei jatkettu."
+
 [messages.upload-part-failed]
 source = "upload failed ({ $status })"
 translation = "lähetys epäonnistui ({ $status })"
+
+[messages.upload-permission-denied]
+source = "The browser wasn’t allowed to read the files again. Pick them instead."
+translation = "Selain ei saanut lukea tiedostoja uudelleen. Valitse ne sen sijaan."
+
+[messages.upload-pill]
+source = "Importing { $count } · { $percent }%"
+translation = "Tuodaan { $count } · { $percent } %"
+
+[messages.upload-pill-stopped]
+source = "Stopped: { $count }"
+translation = "Pysähtyneet: { $count }"
 
 [messages.upload-queue]
 source = "Imports"
@@ -11561,6 +11589,22 @@ translation = "Tuonnit"
 [messages.upload-rate]
 source = "{ $size }/s"
 translation = "{ $size }/s"
+
+[messages.upload-resume]
+source = "Resume"
+translation = "Jatka"
+
+[messages.upload-resume-all]
+source = "Resume all"
+translation = "Jatka kaikkia"
+
+[messages.upload-resume-hint-file]
+source = "Pick the same file again, or drop it on the page, to carry on where it stopped."
+translation = "Valitse sama tiedosto uudelleen tai pudota se sivulle, niin tuonti jatkuu siitä, mihin se jäi."
+
+[messages.upload-resume-hint-folder]
+source = "Pick the same folder again, or drop it on the page, to carry on where it stopped."
+translation = "Valitse sama kansio uudelleen tai pudota se sivulle, niin tuonti jatkuu siitä, mihin se jäi."
 
 [messages.upload-resumed]
 source = "resumed, { $size } were already there"

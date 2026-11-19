@@ -1035,6 +1035,17 @@ upload-retry = 重試
 upload-import-again = 仍要再次匯入
 upload-dismiss = 略過
 upload-cancel = 取消
+upload-minimize = 最小化
+upload-expand = 顯示匯入
+upload-pill = 正在匯入 { $count } 個 · { $percent }%
+upload-pill-stopped = 已停止：{ $count }
+upload-interrupted = 已中斷
+upload-resume = 繼續
+upload-resume-all = 全部繼續
+upload-resume-hint-folder = 再次選擇同一個資料夾，或把它拖放到頁面上，即可從停下的地方繼續。
+upload-resume-hint-file = 再次選擇同一個檔案，或把它拖放到頁面上，即可從停下的地方繼續。
+upload-not-same = 這些不是相同的檔案，因此沒有繼續任何匯入。
+upload-permission-denied = 瀏覽器未獲准再次讀取這些檔案。請改為手動選擇它們。
 
 ## 素材包檢視
 

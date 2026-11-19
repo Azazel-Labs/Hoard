@@ -1134,6 +1134,17 @@ upload-retry = Покушај поново
 upload-import-again = Ипак увези поново
 upload-dismiss = Одбаци
 upload-cancel = Откажи
+upload-minimize = Умањи
+upload-expand = Прикажи увозе
+upload-pill = Увози се { $count } · { $percent }%
+upload-pill-stopped = Заустављено: { $count }
+upload-interrupted = Прекинуто
+upload-resume = Настави
+upload-resume-all = Настави све
+upload-resume-hint-folder = Изаберите исту фасциклу поново или је превуците на страницу да бисте наставили где је стало.
+upload-resume-hint-file = Изаберите исту датотеку поново или је превуците на страницу да бисте наставили где је стало.
+upload-not-same = То нису исте датотеке, па ништа није настављено.
+upload-permission-denied = Прегледач није добио дозволу да поново прочита датотеке. Изаберите их уместо тога.
 
 ## PacksView.vue
 

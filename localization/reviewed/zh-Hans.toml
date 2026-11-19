@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "73a37e0ec4c988c2d944720b9d9b556d1bc036cfbbcca2fbe2573ed59c31def6"
+source = "d8dbfdf558614e792298e9f2143a889d3ce34cc24a0fe019b1acdcd7d98ba317"
 translation = "530e3768e270ecc495434269d0aa7741f64471672a3fe92dbc9787949d17edcc"
 
 [messages.account-add]
@@ -11231,6 +11231,10 @@ translation = "剩余 { $min } 分钟"
 source = "{ $s } s left"
 translation = "剩余 { $s } 秒"
 
+[messages.upload-expand]
+source = "Show imports"
+translation = "显示导入"
+
 [messages.upload-failed-plain]
 source = "failed"
 translation = "失败"
@@ -11255,13 +11259,37 @@ translation = "仍然重新导入"
 source = "Importing { $count } packs"
 translation = "正在导入 { $count } 个资源包"
 
+[messages.upload-interrupted]
+source = "Interrupted"
+translation = "已中断"
+
+[messages.upload-minimize]
+source = "Minimize"
+translation = "最小化"
+
 [messages.upload-network-error]
 source = "network error"
 translation = "网络错误"
 
+[messages.upload-not-same]
+source = "Those aren’t the same files, so nothing was resumed."
+translation = "这些不是相同的文件，因此没有继续任何导入。"
+
 [messages.upload-part-failed]
 source = "upload failed ({ $status })"
 translation = "上传失败（{ $status }）"
+
+[messages.upload-permission-denied]
+source = "The browser wasn’t allowed to read the files again. Pick them instead."
+translation = "浏览器未获准再次读取这些文件。请改为手动选择它们。"
+
+[messages.upload-pill]
+source = "Importing { $count } · { $percent }%"
+translation = "正在导入 { $count } 个 · { $percent }%"
+
+[messages.upload-pill-stopped]
+source = "Stopped: { $count }"
+translation = "已停止：{ $count }"
 
 [messages.upload-queue]
 source = "Imports"
@@ -11270,6 +11298,22 @@ translation = "导入"
 [messages.upload-rate]
 source = "{ $size }/s"
 translation = "{ $size }/s"
+
+[messages.upload-resume]
+source = "Resume"
+translation = "继续"
+
+[messages.upload-resume-all]
+source = "Resume all"
+translation = "全部继续"
+
+[messages.upload-resume-hint-file]
+source = "Pick the same file again, or drop it on the page, to carry on where it stopped."
+translation = "再次选择同一个文件，或把它拖放到页面上，即可从停下的地方继续。"
+
+[messages.upload-resume-hint-folder]
+source = "Pick the same folder again, or drop it on the page, to carry on where it stopped."
+translation = "再次选择同一个文件夹，或把它拖放到页面上，即可从停下的地方继续。"
 
 [messages.upload-resumed]
 source = "resumed, { $size } were already there"

@@ -1188,6 +1188,17 @@ upload-retry = Reîncercați
 upload-import-again = Importați din nou oricum
 upload-dismiss = Închideți
 upload-cancel = Anulați
+upload-minimize = Minimizează
+upload-expand = Arată importurile
+upload-pill = Se importă { $count } · { $percent }%
+upload-pill-stopped = Oprite: { $count }
+upload-interrupted = Întrerupt
+upload-resume = Reia
+upload-resume-all = Reia tot
+upload-resume-hint-folder = Alege din nou același dosar sau plasează-l pe pagină ca să continue de unde s-a oprit.
+upload-resume-hint-file = Alege din nou același fișier sau plasează-l pe pagină ca să continue de unde s-a oprit.
+upload-not-same = Nu sunt aceleași fișiere, așa că nu s-a reluat nimic.
+upload-permission-denied = Browserul nu a avut voie să citească din nou fișierele. Alege-le tu.
 
 ## PacksView.vue
 

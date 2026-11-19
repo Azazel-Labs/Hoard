@@ -1037,6 +1037,17 @@ upload-retry = Újra
 upload-import-again = Importálás mégis
 upload-dismiss = Elvetés
 upload-cancel = Mégse
+upload-minimize = Kis méret
+upload-expand = Importálások megjelenítése
+upload-pill = { $count } importálása · { $percent }%
+upload-pill-stopped = Leállt: { $count }
+upload-interrupted = Megszakadt
+upload-resume = Folytatás
+upload-resume-all = Mind folytatása
+upload-resume-hint-folder = Válaszd ki újra ugyanazt a mappát, vagy húzd az oldalra, és onnan folytatódik, ahol abbamaradt.
+upload-resume-hint-file = Válaszd ki újra ugyanazt a fájlt, vagy húzd az oldalra, és onnan folytatódik, ahol abbamaradt.
+upload-not-same = Ezek nem ugyanazok a fájlok, így semmi sem folytatódott.
+upload-permission-denied = A böngésző nem kapott engedélyt a fájlok újbóli olvasására. Válaszd ki őket inkább.
 
 ## Csomagok nézet
 

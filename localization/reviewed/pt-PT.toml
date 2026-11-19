@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "73a37e0ec4c988c2d944720b9d9b556d1bc036cfbbcca2fbe2573ed59c31def6"
+source = "d8dbfdf558614e792298e9f2143a889d3ce34cc24a0fe019b1acdcd7d98ba317"
 translation = "453fced2edd251d540ef1cbda5dd936dc5f8b6a9cace7301f90dc74d2bc38f81"
 
 [messages.account-add]
@@ -11446,6 +11446,10 @@ translation = "faltam { $min } min"
 source = "{ $s } s left"
 translation = "faltam { $s } s"
 
+[messages.upload-expand]
+source = "Show imports"
+translation = "Mostrar importações"
+
 [messages.upload-failed-plain]
 source = "failed"
 translation = "falhou"
@@ -11470,13 +11474,37 @@ translation = "Importar de novo mesmo assim"
 source = "Importing { $count } packs"
 translation = "A importar { $count } pacotes"
 
+[messages.upload-interrupted]
+source = "Interrupted"
+translation = "Interrompida"
+
+[messages.upload-minimize]
+source = "Minimize"
+translation = "Minimizar"
+
 [messages.upload-network-error]
 source = "network error"
 translation = "erro de rede"
 
+[messages.upload-not-same]
+source = "Those aren’t the same files, so nothing was resumed."
+translation = "Esses não são os mesmos ficheiros, por isso nada foi retomado."
+
 [messages.upload-part-failed]
 source = "upload failed ({ $status })"
 translation = "o carregamento falhou ({ $status })"
+
+[messages.upload-permission-denied]
+source = "The browser wasn’t allowed to read the files again. Pick them instead."
+translation = "O navegador não teve permissão para voltar a ler os ficheiros. Escolha-os em vez disso."
+
+[messages.upload-pill]
+source = "Importing { $count } · { $percent }%"
+translation = "A importar { $count } · { $percent }%"
+
+[messages.upload-pill-stopped]
+source = "Stopped: { $count }"
+translation = "Paradas: { $count }"
 
 [messages.upload-queue]
 source = "Imports"
@@ -11485,6 +11513,22 @@ translation = "Importações"
 [messages.upload-rate]
 source = "{ $size }/s"
 translation = "{ $size }/s"
+
+[messages.upload-resume]
+source = "Resume"
+translation = "Retomar"
+
+[messages.upload-resume-all]
+source = "Resume all"
+translation = "Retomar todas"
+
+[messages.upload-resume-hint-file]
+source = "Pick the same file again, or drop it on the page, to carry on where it stopped."
+translation = "Escolha novamente o mesmo ficheiro, ou largue-o na página, para continuar de onde parou."
+
+[messages.upload-resume-hint-folder]
+source = "Pick the same folder again, or drop it on the page, to carry on where it stopped."
+translation = "Escolha novamente a mesma pasta, ou largue-a na página, para continuar de onde parou."
 
 [messages.upload-resumed]
 source = "resumed, { $size } were already there"

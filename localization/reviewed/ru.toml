@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "73a37e0ec4c988c2d944720b9d9b556d1bc036cfbbcca2fbe2573ed59c31def6"
+source = "d8dbfdf558614e792298e9f2143a889d3ce34cc24a0fe019b1acdcd7d98ba317"
 translation = "bb45e4d0d59bdf1a2181c1158501e66a0c57e8041d0a982d6aed7e82f49657fa"
 
 [messages.account-add]
@@ -11732,6 +11732,10 @@ translation = "осталось { $min } мин"
 source = "{ $s } s left"
 translation = "осталось { $s } с"
 
+[messages.upload-expand]
+source = "Show imports"
+translation = "Показать импорт"
+
 [messages.upload-failed-plain]
 source = "failed"
 translation = "не удалось"
@@ -11762,13 +11766,37 @@ translation = "Всё равно импортировать снова"
 source = "Importing { $count } packs"
 translation = "Импорт паков: { $count }"
 
+[messages.upload-interrupted]
+source = "Interrupted"
+translation = "Прервано"
+
+[messages.upload-minimize]
+source = "Minimize"
+translation = "Свернуть"
+
 [messages.upload-network-error]
 source = "network error"
 translation = "ошибка сети"
 
+[messages.upload-not-same]
+source = "Those aren’t the same files, so nothing was resumed."
+translation = "Это не те же файлы, поэтому ничего не продолжено."
+
 [messages.upload-part-failed]
 source = "upload failed ({ $status })"
 translation = "загрузка не удалась ({ $status })"
+
+[messages.upload-permission-denied]
+source = "The browser wasn’t allowed to read the files again. Pick them instead."
+translation = "Браузеру не разрешили снова прочитать файлы. Выберите их вручную."
+
+[messages.upload-pill]
+source = "Importing { $count } · { $percent }%"
+translation = "Импорт: { $count } · { $percent }%"
+
+[messages.upload-pill-stopped]
+source = "Stopped: { $count }"
+translation = "Остановлено: { $count }"
 
 [messages.upload-queue]
 source = "Imports"
@@ -11777,6 +11805,22 @@ translation = "Импорт"
 [messages.upload-rate]
 source = "{ $size }/s"
 translation = "{ $size }/с"
+
+[messages.upload-resume]
+source = "Resume"
+translation = "Продолжить"
+
+[messages.upload-resume-all]
+source = "Resume all"
+translation = "Продолжить все"
+
+[messages.upload-resume-hint-file]
+source = "Pick the same file again, or drop it on the page, to carry on where it stopped."
+translation = "Выберите тот же файл снова или перетащите его на страницу, чтобы продолжить с того места, где импорт остановился."
+
+[messages.upload-resume-hint-folder]
+source = "Pick the same folder again, or drop it on the page, to carry on where it stopped."
+translation = "Выберите ту же папку снова или перетащите её на страницу, чтобы продолжить с того места, где импорт остановился."
 
 [messages.upload-resumed]
 source = "resumed, { $size } were already there"

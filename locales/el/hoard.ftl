@@ -1144,6 +1144,17 @@ upload-retry = Επανάληψη
 upload-import-again = Εισαγωγή ξανά παρ' όλα αυτά
 upload-dismiss = Απόρριψη
 upload-cancel = Ακύρωση
+upload-minimize = Ελαχιστοποίηση
+upload-expand = Εμφάνιση εισαγωγών
+upload-pill = Εισάγονται { $count } · { $percent }%
+upload-pill-stopped = Σταματημένες: { $count }
+upload-interrupted = Διακόπηκε
+upload-resume = Συνέχεια
+upload-resume-all = Συνέχεια όλων
+upload-resume-hint-folder = Επιλέξτε ξανά τον ίδιο φάκελο ή αφήστε τον στη σελίδα για να συνεχιστεί από εκεί που σταμάτησε.
+upload-resume-hint-file = Επιλέξτε ξανά το ίδιο αρχείο ή αφήστε το στη σελίδα για να συνεχιστεί από εκεί που σταμάτησε.
+upload-not-same = Δεν είναι τα ίδια αρχεία, οπότε δεν συνεχίστηκε τίποτα.
+upload-permission-denied = Το πρόγραμμα περιήγησης δεν είχε άδεια να διαβάσει ξανά τα αρχεία. Επιλέξτε τα εσείς.
 
 ## PacksView.vue
 

@@ -25,10 +25,12 @@ export interface Prefs {
   language: string
   /** Browse a pack folder by folder, as it was on disk, rather than everything in it at once. */
   packFolders: boolean
+  /** The import queue folded down to a small pill in the corner. */
+  uploadsCollapsed: boolean
 }
 
 const KEY = 'hoard.prefs'
-const DEFAULTS: Prefs = { tile: 156, showSupporting: false, collapsed: ['license', 'format', 'blender'], expanded: [], theme: 'system', lightTheme: 'slate', darkTheme: 'graphite', detailWidth: null, detailPage: false, language: 'auto', packFolders: false }
+const DEFAULTS: Prefs = { tile: 156, showSupporting: false, collapsed: ['license', 'format', 'blender'], expanded: [], theme: 'system', lightTheme: 'slate', darkTheme: 'graphite', detailWidth: null, detailPage: false, language: 'auto', packFolders: false, uploadsCollapsed: false }
 
 function load(): Prefs {
   try {

@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "73a37e0ec4c988c2d944720b9d9b556d1bc036cfbbcca2fbe2573ed59c31def6"
+source = "d8dbfdf558614e792298e9f2143a889d3ce34cc24a0fe019b1acdcd7d98ba317"
 translation = "4153ba96d36b94b3768217f18b9520b9cc368f6074756e2f4f8bad12b6fcaaa8"
 
 [messages.account-add]
@@ -11656,6 +11656,10 @@ translation = "au rămas { $min } min"
 source = "{ $s } s left"
 translation = "au rămas { $s } s"
 
+[messages.upload-expand]
+source = "Show imports"
+translation = "Arată importurile"
+
 [messages.upload-failed-plain]
 source = "failed"
 translation = "eșuat"
@@ -11695,13 +11699,37 @@ translation = """
        *[other] Se importă { $count } de pachete
     }"""
 
+[messages.upload-interrupted]
+source = "Interrupted"
+translation = "Întrerupt"
+
+[messages.upload-minimize]
+source = "Minimize"
+translation = "Minimizează"
+
 [messages.upload-network-error]
 source = "network error"
 translation = "eroare de rețea"
 
+[messages.upload-not-same]
+source = "Those aren’t the same files, so nothing was resumed."
+translation = "Nu sunt aceleași fișiere, așa că nu s-a reluat nimic."
+
 [messages.upload-part-failed]
 source = "upload failed ({ $status })"
 translation = "încărcarea a eșuat ({ $status })"
+
+[messages.upload-permission-denied]
+source = "The browser wasn’t allowed to read the files again. Pick them instead."
+translation = "Browserul nu a avut voie să citească din nou fișierele. Alege-le tu."
+
+[messages.upload-pill]
+source = "Importing { $count } · { $percent }%"
+translation = "Se importă { $count } · { $percent }%"
+
+[messages.upload-pill-stopped]
+source = "Stopped: { $count }"
+translation = "Oprite: { $count }"
 
 [messages.upload-queue]
 source = "Imports"
@@ -11710,6 +11738,22 @@ translation = "Importuri"
 [messages.upload-rate]
 source = "{ $size }/s"
 translation = "{ $size }/s"
+
+[messages.upload-resume]
+source = "Resume"
+translation = "Reia"
+
+[messages.upload-resume-all]
+source = "Resume all"
+translation = "Reia tot"
+
+[messages.upload-resume-hint-file]
+source = "Pick the same file again, or drop it on the page, to carry on where it stopped."
+translation = "Alege din nou același fișier sau plasează-l pe pagină ca să continue de unde s-a oprit."
+
+[messages.upload-resume-hint-folder]
+source = "Pick the same folder again, or drop it on the page, to carry on where it stopped."
+translation = "Alege din nou același dosar sau plasează-l pe pagină ca să continue de unde s-a oprit."
 
 [messages.upload-resumed]
 source = "resumed, { $size } were already there"

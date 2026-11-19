@@ -64,6 +64,9 @@ pub(crate) fn open(path: &Path, backups: &Path) -> Result<Pool> {
     Ok(pool)
 }
 
+/// Database work that takes this long gets a warning in the log naming it.
+const SLOW: std::time::Duration = std::time::Duration::from_secs(5);
+
 /// Run blocking DB work off the async runtime, in the language of the request it's for.
 pub(crate) async fn call<T, F>(pool: &Pool, f: F) -> Result<T>
 where
@@ -72,10 +75,21 @@ where
 {
     let pool = pool.clone();
     let language = crate::i18n::current();
+    // Logs from here carry the request that asked, and work that holds the database for seconds says where it's
+    // from (its closure's name is its caller's), so a "database is locked" can be traced to whoever held the lock.
+    let span = tracing::Span::current();
     crate::profiler::db(tokio::task::spawn_blocking(move || {
-        crate::i18n::blocking(language, || {
-            let mut conn = pool.get()?;
-            f(&mut conn)
+        span.in_scope(|| {
+            crate::i18n::blocking(language, || {
+                let mut conn = pool.get()?;
+                let started = std::time::Instant::now();
+                let out = f(&mut conn);
+                let took = started.elapsed();
+                if took >= SLOW {
+                    tracing::warn!(work = std::any::type_name::<F>(), secs = took.as_secs_f32(), "slow database work");
+                }
+                out
+            })
         })
     }))
     .await?

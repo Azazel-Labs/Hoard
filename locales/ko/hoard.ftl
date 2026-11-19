@@ -1029,6 +1029,17 @@ upload-retry = 다시 시도
 upload-import-again = 그래도 다시 가져오기
 upload-dismiss = 닫기
 upload-cancel = 취소
+upload-minimize = 최소화
+upload-expand = 가져오기 보기
+upload-pill = { $count }개 가져오는 중 · { $percent }%
+upload-pill-stopped = 중지됨: { $count }
+upload-interrupted = 중단됨
+upload-resume = 이어서 하기
+upload-resume-all = 모두 이어서 하기
+upload-resume-hint-folder = 같은 폴더를 다시 고르거나 페이지에 끌어다 놓으면 멈춘 곳부터 이어서 합니다.
+upload-resume-hint-file = 같은 파일을 다시 고르거나 페이지에 끌어다 놓으면 멈춘 곳부터 이어서 합니다.
+upload-not-same = 같은 파일이 아니어서 아무것도 이어서 하지 않았습니다.
+upload-permission-denied = 브라우저가 파일을 다시 읽도록 허용되지 않았습니다. 대신 파일을 직접 고르세요.
 
 ## PacksView.vue
 

@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "73a37e0ec4c988c2d944720b9d9b556d1bc036cfbbcca2fbe2573ed59c31def6"
+source = "d8dbfdf558614e792298e9f2143a889d3ce34cc24a0fe019b1acdcd7d98ba317"
 translation = "cb51eeebee58ce4e694b9c22ec1e26a19090d24e80d9b74b0e431ca3fa274b7f"
 
 [messages.account-add]
@@ -11181,6 +11181,10 @@ translation = "{ $min }분 남음"
 source = "{ $s } s left"
 translation = "{ $s }초 남음"
 
+[messages.upload-expand]
+source = "Show imports"
+translation = "가져오기 보기"
+
 [messages.upload-failed-plain]
 source = "failed"
 translation = "실패"
@@ -11205,13 +11209,37 @@ translation = "그래도 다시 가져오기"
 source = "Importing { $count } packs"
 translation = "팩 { $count }개 가져오는 중"
 
+[messages.upload-interrupted]
+source = "Interrupted"
+translation = "중단됨"
+
+[messages.upload-minimize]
+source = "Minimize"
+translation = "최소화"
+
 [messages.upload-network-error]
 source = "network error"
 translation = "네트워크 오류"
 
+[messages.upload-not-same]
+source = "Those aren’t the same files, so nothing was resumed."
+translation = "같은 파일이 아니어서 아무것도 이어서 하지 않았습니다."
+
 [messages.upload-part-failed]
 source = "upload failed ({ $status })"
 translation = "업로드 실패({ $status })"
+
+[messages.upload-permission-denied]
+source = "The browser wasn’t allowed to read the files again. Pick them instead."
+translation = "브라우저가 파일을 다시 읽도록 허용되지 않았습니다. 대신 파일을 직접 고르세요."
+
+[messages.upload-pill]
+source = "Importing { $count } · { $percent }%"
+translation = "{ $count }개 가져오는 중 · { $percent }%"
+
+[messages.upload-pill-stopped]
+source = "Stopped: { $count }"
+translation = "중지됨: { $count }"
 
 [messages.upload-queue]
 source = "Imports"
@@ -11220,6 +11248,22 @@ translation = "가져오기"
 [messages.upload-rate]
 source = "{ $size }/s"
 translation = "{ $size }/s"
+
+[messages.upload-resume]
+source = "Resume"
+translation = "이어서 하기"
+
+[messages.upload-resume-all]
+source = "Resume all"
+translation = "모두 이어서 하기"
+
+[messages.upload-resume-hint-file]
+source = "Pick the same file again, or drop it on the page, to carry on where it stopped."
+translation = "같은 파일을 다시 고르거나 페이지에 끌어다 놓으면 멈춘 곳부터 이어서 합니다."
+
+[messages.upload-resume-hint-folder]
+source = "Pick the same folder again, or drop it on the page, to carry on where it stopped."
+translation = "같은 폴더를 다시 고르거나 페이지에 끌어다 놓으면 멈춘 곳부터 이어서 합니다."
 
 [messages.upload-resumed]
 source = "resumed, { $size } were already there"

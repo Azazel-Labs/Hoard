@@ -1183,6 +1183,17 @@ upload-retry = Zkusit znovu
 upload-import-again = Přesto importovat znovu
 upload-dismiss = Skrýt
 upload-cancel = Zrušit
+upload-minimize = Minimalizovat
+upload-expand = Zobrazit importy
+upload-pill = Importuje se { $count } · { $percent } %
+upload-pill-stopped = Zastaveno: { $count }
+upload-interrupted = Přerušeno
+upload-resume = Pokračovat
+upload-resume-all = Pokračovat ve všech
+upload-resume-hint-folder = Vyberte znovu stejnou složku nebo ji přetáhněte na stránku a import bude pokračovat, kde skončil.
+upload-resume-hint-file = Vyberte znovu stejný soubor nebo ho přetáhněte na stránku a import bude pokračovat, kde skončil.
+upload-not-same = Nejsou to stejné soubory, takže se nic neobnovilo.
+upload-permission-denied = Prohlížeč nesměl soubory znovu načíst. Vyberte je místo toho ručně.
 
 ## PacksView.vue
 

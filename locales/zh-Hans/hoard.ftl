@@ -1035,6 +1035,17 @@ upload-retry = 重试
 upload-import-again = 仍然重新导入
 upload-dismiss = 忽略
 upload-cancel = 取消
+upload-minimize = 最小化
+upload-expand = 显示导入
+upload-pill = 正在导入 { $count } 个 · { $percent }%
+upload-pill-stopped = 已停止：{ $count }
+upload-interrupted = 已中断
+upload-resume = 继续
+upload-resume-all = 全部继续
+upload-resume-hint-folder = 再次选择同一个文件夹，或把它拖放到页面上，即可从停下的地方继续。
+upload-resume-hint-file = 再次选择同一个文件，或把它拖放到页面上，即可从停下的地方继续。
+upload-not-same = 这些不是相同的文件，因此没有继续任何导入。
+upload-permission-denied = 浏览器未获准再次读取这些文件。请改为手动选择它们。
 
 ## PacksView.vue
 

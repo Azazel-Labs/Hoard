@@ -297,7 +297,10 @@ or a ChatGPT plan through "Sign in with ChatGPT" is picked in the same place. `d
 Imports of many gigabytes work from the browser and the CLI. "Import folder" in the portal (or dropping a folder)
 uploads every file in it; a folder that looks like a folder *of* packs can be split into one pack per subfolder.
 Uploads go through resumable sessions: the file list is registered first, small files travel in batches and big
-ones in 32 MB chunks, and a dropped connection or closed tab picks up where it stopped (drop the same folder again).
+ones in 32 MB chunks, and a dropped connection picks up where it stopped. The browser remembers imports under way,
+so reloading or closing the tab doesn't warn or lose them: they come back as interrupted and carry on with Resume,
+reading a dropped folder again by itself in Chrome or Edge over https or on this machine, or once the same folder is
+picked or dropped again. The import list folds down to a small pill in the corner when it's in the way.
 The server fingerprints each import (paths and sizes), so re-running a bulk import skips packs it already has
 ("Import again anyway" or `hoard upload --force` overrides that).
 

@@ -1252,6 +1252,20 @@ upload-retry = Retry
 upload-import-again = Import again anyway
 upload-dismiss = Dismiss
 upload-cancel = Cancel
+upload-minimize = Minimize
+upload-expand = Show imports
+# The folded-down queue: how many packs are importing and how far along they are, like “Importing 3 · 42%”.
+upload-pill = Importing { $count } · { $percent }%
+# The folded-down queue when nothing is importing but some imports stopped.
+upload-pill-stopped = Stopped: { $count }
+# An import cut short by the page reloading or closing.
+upload-interrupted = Interrupted
+upload-resume = Resume
+upload-resume-all = Resume all
+upload-resume-hint-folder = Pick the same folder again, or drop it on the page, to carry on where it stopped.
+upload-resume-hint-file = Pick the same file again, or drop it on the page, to carry on where it stopped.
+upload-not-same = Those aren’t the same files, so nothing was resumed.
+upload-permission-denied = The browser wasn’t allowed to read the files again. Pick them instead.
 
 ## PacksView.vue
 

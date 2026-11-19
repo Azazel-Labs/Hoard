@@ -3,7 +3,7 @@ import { computed, nextTick, onBeforeUnmount, onMounted, ref, shallowRef, watch 
 import {
   api, downloadCredits, selectionZipUrl, type Asset, type AssetKind, type BulkEdit, type Collection, type Facet, type Pack, type Stats,
 } from './api'
-import { filesFromDrop, type UploadFile } from './drop'
+import { filesFromDrop, groupsFromPicked, type Group } from './drop'
 import { KIND_LABEL, KIND_NAME } from './kinds'
 import { canPreview, stop as stopPreview, toggle as togglePreview } from './player'
 import { prefs, toggleIn } from './prefs'
@@ -97,7 +97,6 @@ const sideBar = ref<InstanceType<typeof FilterSidebar> | null>(null)
 const sideEl = computed(() => (sideBar.value?.$el as HTMLElement | undefined) ?? null)
 let unswipeSide = () => {}
 
-type Group = { name: string; files: UploadFile[] }
 const queue = ref<InstanceType<typeof UploadQueue> | null>(null)
 const folderInput = ref<HTMLInputElement | null>(null)
 /** A dropped/picked folder that contains several packs: ask how to import it. */
@@ -716,7 +715,9 @@ function resolveSplit(split: boolean) {
   const p = pendingSplit.value
   pendingSplit.value = null
   if (!p) return
-  queue.value?.enqueue(split ? splitPerSubfolder(p.group.name, p.group.files) : [p.group])
+  const { name, files, handle } = p.group
+  // Each part keeps the folder it came from, so a reload can read it again and pick its part back out.
+  queue.value?.enqueue(split ? splitPerSubfolder(name, files).map((g) => ({ ...g, handle, root: name })) : [p.group])
 }
 
 function onDragEnter(e: DragEvent) {
@@ -737,15 +738,14 @@ function onPick(e: Event) {
   const input = e.target as HTMLInputElement
   const files = [...(input.files ?? [])]
   input.value = ''
-  importGroups(files.map((f) => ({ name: f.name, files: [{ file: f, path: f.name }] })))
+  importGroups(groupsFromPicked(files))
 }
 /** Folder picker: webkitRelativePath is "Folder/sub/file.png". */
 function onPickFolder(e: Event) {
   const input = e.target as HTMLInputElement
-  const files = [...(input.files ?? [])].map((f) => ({ file: f, path: f.webkitRelativePath || f.name }))
+  const files = [...(input.files ?? [])]
   input.value = ''
-  if (!files.length) return
-  importGroups([{ name: files[0].path.split('/')[0], files }])
+  if (files.length) importGroups(groupsFromPicked(files))
 }
 function onCreated() {
   refreshPacks()

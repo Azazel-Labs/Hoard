@@ -1037,6 +1037,17 @@ upload-retry = Yeniden dene
 upload-import-again = Yine de yeniden içe aktar
 upload-dismiss = Kapat
 upload-cancel = İptal
+upload-minimize = Küçült
+upload-expand = İçe aktarmaları göster
+upload-pill = { $count } içe aktarılıyor · %{ $percent }
+upload-pill-stopped = Durdu: { $count }
+upload-interrupted = Kesildi
+upload-resume = Sürdür
+upload-resume-all = Tümünü sürdür
+upload-resume-hint-folder = Kaldığı yerden devam etmesi için aynı klasörü yeniden seçin ya da sayfaya bırakın.
+upload-resume-hint-file = Kaldığı yerden devam etmesi için aynı dosyayı yeniden seçin ya da sayfaya bırakın.
+upload-not-same = Bunlar aynı dosyalar değil, bu yüzden hiçbir şey sürdürülmedi.
+upload-permission-denied = Tarayıcının dosyaları yeniden okumasına izin verilmedi. Bunun yerine onları seçin.
 
 ## PacksView.vue
 

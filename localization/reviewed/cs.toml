@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "73a37e0ec4c988c2d944720b9d9b556d1bc036cfbbcca2fbe2573ed59c31def6"
+source = "d8dbfdf558614e792298e9f2143a889d3ce34cc24a0fe019b1acdcd7d98ba317"
 translation = "d2d82856aba060f1fca3b326d63684dcbaa143f941e3bdd05f930d4179bd4d37"
 
 [messages.account-add]
@@ -11666,6 +11666,10 @@ translation = "zbývá { $min } min"
 source = "{ $s } s left"
 translation = "zbývá { $s } s"
 
+[messages.upload-expand]
+source = "Show imports"
+translation = "Zobrazit importy"
+
 [messages.upload-failed-plain]
 source = "failed"
 translation = "selhalo"
@@ -11700,13 +11704,37 @@ translation = """
        *[other] Importuji { $count } balíčků
     }"""
 
+[messages.upload-interrupted]
+source = "Interrupted"
+translation = "Přerušeno"
+
+[messages.upload-minimize]
+source = "Minimize"
+translation = "Minimalizovat"
+
 [messages.upload-network-error]
 source = "network error"
 translation = "chyba sítě"
 
+[messages.upload-not-same]
+source = "Those aren’t the same files, so nothing was resumed."
+translation = "Nejsou to stejné soubory, takže se nic neobnovilo."
+
 [messages.upload-part-failed]
 source = "upload failed ({ $status })"
 translation = "nahrávání selhalo ({ $status })"
+
+[messages.upload-permission-denied]
+source = "The browser wasn’t allowed to read the files again. Pick them instead."
+translation = "Prohlížeč nesměl soubory znovu načíst. Vyberte je místo toho ručně."
+
+[messages.upload-pill]
+source = "Importing { $count } · { $percent }%"
+translation = "Importuje se { $count } · { $percent } %"
+
+[messages.upload-pill-stopped]
+source = "Stopped: { $count }"
+translation = "Zastaveno: { $count }"
 
 [messages.upload-queue]
 source = "Imports"
@@ -11715,6 +11743,22 @@ translation = "Importy"
 [messages.upload-rate]
 source = "{ $size }/s"
 translation = "{ $size }/s"
+
+[messages.upload-resume]
+source = "Resume"
+translation = "Pokračovat"
+
+[messages.upload-resume-all]
+source = "Resume all"
+translation = "Pokračovat ve všech"
+
+[messages.upload-resume-hint-file]
+source = "Pick the same file again, or drop it on the page, to carry on where it stopped."
+translation = "Vyberte znovu stejný soubor nebo ho přetáhněte na stránku a import bude pokračovat, kde skončil."
+
+[messages.upload-resume-hint-folder]
+source = "Pick the same folder again, or drop it on the page, to carry on where it stopped."
+translation = "Vyberte znovu stejnou složku nebo ji přetáhněte na stránku a import bude pokračovat, kde skončil."
 
 [messages.upload-resumed]
 source = "resumed, { $size } were already there"

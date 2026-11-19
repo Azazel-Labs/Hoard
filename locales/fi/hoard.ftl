@@ -1144,6 +1144,17 @@ upload-retry = Yritä uudelleen
 upload-import-again = Tuo silti uudelleen
 upload-dismiss = Kuittaa
 upload-cancel = Peruuta
+upload-minimize = Pienennä
+upload-expand = Näytä tuonnit
+upload-pill = Tuodaan { $count } · { $percent } %
+upload-pill-stopped = Pysähtyneet: { $count }
+upload-interrupted = Keskeytynyt
+upload-resume = Jatka
+upload-resume-all = Jatka kaikkia
+upload-resume-hint-folder = Valitse sama kansio uudelleen tai pudota se sivulle, niin tuonti jatkuu siitä, mihin se jäi.
+upload-resume-hint-file = Valitse sama tiedosto uudelleen tai pudota se sivulle, niin tuonti jatkuu siitä, mihin se jäi.
+upload-not-same = Nämä eivät ole samat tiedostot, joten mitään ei jatkettu.
+upload-permission-denied = Selain ei saanut lukea tiedostoja uudelleen. Valitse ne sen sijaan.
 
 ## Paketit
 

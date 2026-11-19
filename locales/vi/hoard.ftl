@@ -1035,6 +1035,17 @@ upload-retry = Thử lại
 upload-import-again = Vẫn nhập lại
 upload-dismiss = Bỏ qua
 upload-cancel = Hủy
+upload-minimize = Thu nhỏ
+upload-expand = Hiện các lần nhập
+upload-pill = Đang nhập { $count } · { $percent }%
+upload-pill-stopped = Đã dừng: { $count }
+upload-interrupted = Bị gián đoạn
+upload-resume = Tiếp tục
+upload-resume-all = Tiếp tục tất cả
+upload-resume-hint-folder = Chọn lại đúng thư mục đó, hoặc thả nó vào trang, để tiếp tục từ chỗ đã dừng.
+upload-resume-hint-file = Chọn lại đúng tệp đó, hoặc thả nó vào trang, để tiếp tục từ chỗ đã dừng.
+upload-not-same = Đó không phải là cùng các tệp, nên không có gì được tiếp tục.
+upload-permission-denied = Trình duyệt không được phép đọc lại các tệp. Hãy chọn chúng thay vào đó.
 
 ## Trang gói
 

@@ -53,3 +53,48 @@ test.describe('resumable uploads', () => {
     expect(createHash('sha256').update(back).digest('hex')).toBe(createHash('sha256').update(text).digest('hex'))
   })
 })
+
+test.describe('the import queue', () => {
+  test('folds down to a pill, and an import a reload cut short carries on when its file is picked again', async ({ page, api }) => {
+    test.setTimeout(120_000)
+    const stem = `resume-${unique()}`
+    const file = { name: `${stem}.txt`, mimeType: 'text/plain', buffer: Buffer.from(`notes for ${stem}\n`) }
+    // Hold the upload's files back, so the import is still going when the page reloads.
+    await page.route('**/api/uploads/*/batch', () => undefined)
+    await page.goto('/')
+    await page.locator('input[type=file]:not([webkitdirectory])').first().setInputFiles(file)
+    const queue = page.getByRole('region', { name: 'Imports' })
+    await expect(queue.getByText(file.name)).toBeVisible()
+
+    await queue.getByRole('button', { name: 'Minimize' }).click()
+    await expect(queue).toBeHidden()
+    const pill = page.getByRole('button', { name: /Importing 1 · \d+%.*Show imports/ })
+    await expect(pill).toBeVisible()
+    await pill.click()
+    await expect(queue.getByText(file.name)).toBeVisible()
+
+    // The reload doesn't warn: the browser remembers the import, and shows it again afterwards.
+    let warned = false
+    page.on('dialog', (d) => {
+      warned = true
+      void d.accept()
+    })
+    await page.reload()
+    expect(warned).toBe(false)
+    await page.unroute('**/api/uploads/*/batch')
+    await expect(queue.getByText('Interrupted')).toBeVisible()
+    await expect(queue.getByText('Pick the same file again')).toBeVisible()
+
+    // A different file doesn't carry it on; the same one does, and lands as one pack.
+    const chooser = page.waitForEvent('filechooser')
+    await queue.getByRole('button', { name: 'Resume' }).click()
+    await (await chooser).setFiles({ ...file, buffer: Buffer.from('other') })
+    await expect(queue.getByText('aren’t the same files')).toBeVisible()
+    await page.locator('input[type=file]:not([webkitdirectory])').first().setInputFiles(file)
+    await expect(queue.getByText('Uploaded, now unpacking')).toBeVisible({ timeout: 30_000 })
+    const packs = (await (await api.get('/api/packs')).json()) as { id: string; name: string }[]
+    const mine = packs.filter((p) => p.name.includes(stem))
+    expect(mine).toHaveLength(1)
+    await api.delete(`/api/packs/${mine[0].id}`)
+  })
+})

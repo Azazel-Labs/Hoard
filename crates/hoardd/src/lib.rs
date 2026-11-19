@@ -295,7 +295,10 @@ pub async fn run(cfg: Config) -> Result<()> {
         .layer(middleware::from_fn(cache_headers))
         .layer(CompressionLayer::new().br(true).zstd(true).gzip(true).compress_when(compressible()))
         .layer(middleware::from_fn(profiler::record))
-        .layer(TraceLayer::new_for_http())
+        // Each request's logs say which request it was (its path only: a query string can carry an OAuth code).
+        .layer(TraceLayer::new_for_http().make_span_with(|req: &Request| {
+            tracing::info_span!("request", method = %req.method(), path = req.uri().path())
+        }))
         .with_state(Arc::clone(&state));
 
     https::init(&state)?;

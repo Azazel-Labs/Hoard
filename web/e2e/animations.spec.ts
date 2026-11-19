@@ -145,9 +145,11 @@ test('an animation fits the characters with its skeleton in other packs, and eac
 test('each take in a file of many is an animation of its own', async ({ api }) => {
   test.setTimeout(120_000)
   const name = `E2E Takes ${unique()}`
+  // Bones of their own, so these fit only each other and not the other tests' characters running alongside.
+  const bones = `Takes${unique()}_`
   const pack = await uploadPack(api, name, [
-    { relpath: 'hero.gltf', data: rigged('mixamorig:', { mesh: true }) },
-    { relpath: 'Clips/moves.gltf', data: rigged('mixamorig:', { clip: { name: 'Moves', secs: 0.8 }, takes: ['Walk', 'Sprint'] }) },
+    { relpath: 'hero.gltf', data: rigged(bones, { mesh: true }) },
+    { relpath: 'Clips/moves.gltf', data: rigged(bones, { clip: { name: 'Moves', secs: 0.8 }, takes: ['Walk', 'Sprint'] }) },
   ])
   try {
     await waitReady(api, [pack.id])

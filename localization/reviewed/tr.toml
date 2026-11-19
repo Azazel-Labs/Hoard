@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "73a37e0ec4c988c2d944720b9d9b556d1bc036cfbbcca2fbe2573ed59c31def6"
+source = "d8dbfdf558614e792298e9f2143a889d3ce34cc24a0fe019b1acdcd7d98ba317"
 translation = "365b0fc7ff648476ee75c67213c00d18e7b3e0fb9f940664032b9c834c675ffb"
 
 [messages.account-add]
@@ -11245,6 +11245,10 @@ translation = "{ $min } dk kaldı"
 source = "{ $s } s left"
 translation = "{ $s } sn kaldı"
 
+[messages.upload-expand]
+source = "Show imports"
+translation = "İçe aktarmaları göster"
+
 [messages.upload-failed-plain]
 source = "failed"
 translation = "başarısız oldu"
@@ -11269,13 +11273,37 @@ translation = "Yine de yeniden içe aktar"
 source = "Importing { $count } packs"
 translation = "{ $count } paket içe aktarılıyor"
 
+[messages.upload-interrupted]
+source = "Interrupted"
+translation = "Kesildi"
+
+[messages.upload-minimize]
+source = "Minimize"
+translation = "Küçült"
+
 [messages.upload-network-error]
 source = "network error"
 translation = "ağ hatası"
 
+[messages.upload-not-same]
+source = "Those aren’t the same files, so nothing was resumed."
+translation = "Bunlar aynı dosyalar değil, bu yüzden hiçbir şey sürdürülmedi."
+
 [messages.upload-part-failed]
 source = "upload failed ({ $status })"
 translation = "yükleme başarısız oldu ({ $status })"
+
+[messages.upload-permission-denied]
+source = "The browser wasn’t allowed to read the files again. Pick them instead."
+translation = "Tarayıcının dosyaları yeniden okumasına izin verilmedi. Bunun yerine onları seçin."
+
+[messages.upload-pill]
+source = "Importing { $count } · { $percent }%"
+translation = "{ $count } içe aktarılıyor · %{ $percent }"
+
+[messages.upload-pill-stopped]
+source = "Stopped: { $count }"
+translation = "Durdu: { $count }"
 
 [messages.upload-queue]
 source = "Imports"
@@ -11284,6 +11312,22 @@ translation = "İçe aktarmalar"
 [messages.upload-rate]
 source = "{ $size }/s"
 translation = "{ $size }/sn"
+
+[messages.upload-resume]
+source = "Resume"
+translation = "Sürdür"
+
+[messages.upload-resume-all]
+source = "Resume all"
+translation = "Tümünü sürdür"
+
+[messages.upload-resume-hint-file]
+source = "Pick the same file again, or drop it on the page, to carry on where it stopped."
+translation = "Kaldığı yerden devam etmesi için aynı dosyayı yeniden seçin ya da sayfaya bırakın."
+
+[messages.upload-resume-hint-folder]
+source = "Pick the same folder again, or drop it on the page, to carry on where it stopped."
+translation = "Kaldığı yerden devam etmesi için aynı klasörü yeniden seçin ya da sayfaya bırakın."
 
 [messages.upload-resumed]
 source = "resumed, { $size } were already there"

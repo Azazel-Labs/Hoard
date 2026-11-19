@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "73a37e0ec4c988c2d944720b9d9b556d1bc036cfbbcca2fbe2573ed59c31def6"
+source = "d8dbfdf558614e792298e9f2143a889d3ce34cc24a0fe019b1acdcd7d98ba317"
 translation = "230aa92a6033cfd0e81420ca5ef21ba788bfd9cbf50cc6964032f8c9499222bf"
 
 [messages.account-add]
@@ -11241,6 +11241,10 @@ translation = "még { $min } perc"
 source = "{ $s } s left"
 translation = "még { $s } mp"
 
+[messages.upload-expand]
+source = "Show imports"
+translation = "Importálások megjelenítése"
+
 [messages.upload-failed-plain]
 source = "failed"
 translation = "sikertelen"
@@ -11265,13 +11269,37 @@ translation = "Importálás mégis"
 source = "Importing { $count } packs"
 translation = "{ $count } csomag importálása"
 
+[messages.upload-interrupted]
+source = "Interrupted"
+translation = "Megszakadt"
+
+[messages.upload-minimize]
+source = "Minimize"
+translation = "Kis méret"
+
 [messages.upload-network-error]
 source = "network error"
 translation = "hálózati hiba"
 
+[messages.upload-not-same]
+source = "Those aren’t the same files, so nothing was resumed."
+translation = "Ezek nem ugyanazok a fájlok, így semmi sem folytatódott."
+
 [messages.upload-part-failed]
 source = "upload failed ({ $status })"
 translation = "a feltöltés sikertelen ({ $status })"
+
+[messages.upload-permission-denied]
+source = "The browser wasn’t allowed to read the files again. Pick them instead."
+translation = "A böngésző nem kapott engedélyt a fájlok újbóli olvasására. Válaszd ki őket inkább."
+
+[messages.upload-pill]
+source = "Importing { $count } · { $percent }%"
+translation = "{ $count } importálása · { $percent }%"
+
+[messages.upload-pill-stopped]
+source = "Stopped: { $count }"
+translation = "Leállt: { $count }"
 
 [messages.upload-queue]
 source = "Imports"
@@ -11280,6 +11308,22 @@ translation = "Importálások"
 [messages.upload-rate]
 source = "{ $size }/s"
 translation = "{ $size }/s"
+
+[messages.upload-resume]
+source = "Resume"
+translation = "Folytatás"
+
+[messages.upload-resume-all]
+source = "Resume all"
+translation = "Mind folytatása"
+
+[messages.upload-resume-hint-file]
+source = "Pick the same file again, or drop it on the page, to carry on where it stopped."
+translation = "Válaszd ki újra ugyanazt a fájlt, vagy húzd az oldalra, és onnan folytatódik, ahol abbamaradt."
+
+[messages.upload-resume-hint-folder]
+source = "Pick the same folder again, or drop it on the page, to carry on where it stopped."
+translation = "Válaszd ki újra ugyanazt a mappát, vagy húzd az oldalra, és onnan folytatódik, ahol abbamaradt."
 
 [messages.upload-resumed]
 source = "resumed, { $size } were already there"

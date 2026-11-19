@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "73a37e0ec4c988c2d944720b9d9b556d1bc036cfbbcca2fbe2573ed59c31def6"
+source = "d8dbfdf558614e792298e9f2143a889d3ce34cc24a0fe019b1acdcd7d98ba317"
 translation = "42d6d2350a51c56e55a07a75988a6748d9e232912ffffb903defbf54bfd56e2e"
 
 [messages.account-add]
@@ -11214,6 +11214,10 @@ translation = "còn { $min } phút"
 source = "{ $s } s left"
 translation = "còn { $s } giây"
 
+[messages.upload-expand]
+source = "Show imports"
+translation = "Hiện các lần nhập"
+
 [messages.upload-failed-plain]
 source = "failed"
 translation = "thất bại"
@@ -11238,13 +11242,37 @@ translation = "Vẫn nhập lại"
 source = "Importing { $count } packs"
 translation = "Đang nhập { $count } gói"
 
+[messages.upload-interrupted]
+source = "Interrupted"
+translation = "Bị gián đoạn"
+
+[messages.upload-minimize]
+source = "Minimize"
+translation = "Thu nhỏ"
+
 [messages.upload-network-error]
 source = "network error"
 translation = "lỗi mạng"
 
+[messages.upload-not-same]
+source = "Those aren’t the same files, so nothing was resumed."
+translation = "Đó không phải là cùng các tệp, nên không có gì được tiếp tục."
+
 [messages.upload-part-failed]
 source = "upload failed ({ $status })"
 translation = "tải lên thất bại ({ $status })"
+
+[messages.upload-permission-denied]
+source = "The browser wasn’t allowed to read the files again. Pick them instead."
+translation = "Trình duyệt không được phép đọc lại các tệp. Hãy chọn chúng thay vào đó."
+
+[messages.upload-pill]
+source = "Importing { $count } · { $percent }%"
+translation = "Đang nhập { $count } · { $percent }%"
+
+[messages.upload-pill-stopped]
+source = "Stopped: { $count }"
+translation = "Đã dừng: { $count }"
 
 [messages.upload-queue]
 source = "Imports"
@@ -11253,6 +11281,22 @@ translation = "Nhập"
 [messages.upload-rate]
 source = "{ $size }/s"
 translation = "{ $size }/s"
+
+[messages.upload-resume]
+source = "Resume"
+translation = "Tiếp tục"
+
+[messages.upload-resume-all]
+source = "Resume all"
+translation = "Tiếp tục tất cả"
+
+[messages.upload-resume-hint-file]
+source = "Pick the same file again, or drop it on the page, to carry on where it stopped."
+translation = "Chọn lại đúng tệp đó, hoặc thả nó vào trang, để tiếp tục từ chỗ đã dừng."
+
+[messages.upload-resume-hint-folder]
+source = "Pick the same folder again, or drop it on the page, to carry on where it stopped."
+translation = "Chọn lại đúng thư mục đó, hoặc thả nó vào trang, để tiếp tục từ chỗ đã dừng."
 
 [messages.upload-resumed]
 source = "resumed, { $size } were already there"

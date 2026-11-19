@@ -1108,6 +1108,17 @@ upload-retry = Probeer weer
 upload-import-again = Voer in elk geval weer in
 upload-dismiss = Wys weg
 upload-cancel = Kanselleer
+upload-minimize = Minimeer
+upload-expand = Wys invoere
+upload-pill = Voer { $count } in · { $percent }%
+upload-pill-stopped = Gestop: { $count }
+upload-interrupted = Onderbreek
+upload-resume = Hervat
+upload-resume-all = Hervat almal
+upload-resume-hint-folder = Kies weer dieselfde vouer, of los dit op die bladsy, om voort te gaan waar dit gestop het.
+upload-resume-hint-file = Kies weer dieselfde lêer, of los dit op die bladsy, om voort te gaan waar dit gestop het.
+upload-not-same = Dit is nie dieselfde lêers nie, so niks is hervat nie.
+upload-permission-denied = Die blaaier is nie toegelaat om die lêers weer te lees nie. Kies hulle eerder.
 
 ## PacksView.vue
 

@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "73a37e0ec4c988c2d944720b9d9b556d1bc036cfbbcca2fbe2573ed59c31def6"
+source = "d8dbfdf558614e792298e9f2143a889d3ce34cc24a0fe019b1acdcd7d98ba317"
 translation = "b9203115cf8b13a0111214aa1af8cf4a9194f497abfd52d839917124a3498329"
 
 [messages.account-add]
@@ -11434,6 +11434,10 @@ translation = "{ $min } min oor"
 source = "{ $s } s left"
 translation = "{ $s } s oor"
 
+[messages.upload-expand]
+source = "Show imports"
+translation = "Wys invoere"
+
 [messages.upload-failed-plain]
 source = "failed"
 translation = "misluk"
@@ -11458,13 +11462,37 @@ translation = "Voer in elk geval weer in"
 source = "Importing { $count } packs"
 translation = "Voer { $count } pakke in"
 
+[messages.upload-interrupted]
+source = "Interrupted"
+translation = "Onderbreek"
+
+[messages.upload-minimize]
+source = "Minimize"
+translation = "Minimeer"
+
 [messages.upload-network-error]
 source = "network error"
 translation = "netwerkfout"
 
+[messages.upload-not-same]
+source = "Those aren’t the same files, so nothing was resumed."
+translation = "Dit is nie dieselfde lêers nie, so niks is hervat nie."
+
 [messages.upload-part-failed]
 source = "upload failed ({ $status })"
 translation = "oplaai het misluk ({ $status })"
+
+[messages.upload-permission-denied]
+source = "The browser wasn’t allowed to read the files again. Pick them instead."
+translation = "Die blaaier is nie toegelaat om die lêers weer te lees nie. Kies hulle eerder."
+
+[messages.upload-pill]
+source = "Importing { $count } · { $percent }%"
+translation = "Voer { $count } in · { $percent }%"
+
+[messages.upload-pill-stopped]
+source = "Stopped: { $count }"
+translation = "Gestop: { $count }"
 
 [messages.upload-queue]
 source = "Imports"
@@ -11473,6 +11501,22 @@ translation = "Invoere"
 [messages.upload-rate]
 source = "{ $size }/s"
 translation = "{ $size }/s"
+
+[messages.upload-resume]
+source = "Resume"
+translation = "Hervat"
+
+[messages.upload-resume-all]
+source = "Resume all"
+translation = "Hervat almal"
+
+[messages.upload-resume-hint-file]
+source = "Pick the same file again, or drop it on the page, to carry on where it stopped."
+translation = "Kies weer dieselfde lêer, of los dit op die bladsy, om voort te gaan waar dit gestop het."
+
+[messages.upload-resume-hint-folder]
+source = "Pick the same folder again, or drop it on the page, to carry on where it stopped."
+translation = "Kies weer dieselfde vouer, of los dit op die bladsy, om voort te gaan waar dit gestop het."
 
 [messages.upload-resumed]
 source = "resumed, { $size } were already there"

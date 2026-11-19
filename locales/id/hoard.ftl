@@ -1033,6 +1033,17 @@ upload-retry = Coba lagi
 upload-import-again = Tetap impor lagi
 upload-dismiss = Abaikan
 upload-cancel = Batal
+upload-minimize = Kecilkan
+upload-expand = Tampilkan impor
+upload-pill = Mengimpor { $count } · { $percent }%
+upload-pill-stopped = Berhenti: { $count }
+upload-interrupted = Terputus
+upload-resume = Lanjutkan
+upload-resume-all = Lanjutkan semua
+upload-resume-hint-folder = Pilih folder yang sama lagi, atau jatuhkan ke halaman, untuk melanjutkan dari tempat berhentinya.
+upload-resume-hint-file = Pilih file yang sama lagi, atau jatuhkan ke halaman, untuk melanjutkan dari tempat berhentinya.
+upload-not-same = Itu bukan file yang sama, jadi tidak ada yang dilanjutkan.
+upload-permission-denied = Peramban tidak diizinkan membaca file itu lagi. Pilih saja file-nya.
 
 ## PacksView.vue
 

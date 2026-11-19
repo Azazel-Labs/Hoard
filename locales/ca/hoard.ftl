@@ -1108,6 +1108,17 @@ upload-retry = Torna-ho a provar
 upload-import-again = Importa igualment
 upload-dismiss = Descarta
 upload-cancel = Cancel·la
+upload-minimize = Minimitza
+upload-expand = Mostra les importacions
+upload-pill = S’estan important { $count } · { $percent } %
+upload-pill-stopped = Aturades: { $count }
+upload-interrupted = Interrompuda
+upload-resume = Reprèn
+upload-resume-all = Reprèn-les totes
+upload-resume-hint-folder = Torneu a triar la mateixa carpeta, o deixeu-la anar a la pàgina, per continuar on es va aturar.
+upload-resume-hint-file = Torneu a triar el mateix fitxer, o deixeu-lo anar a la pàgina, per continuar on es va aturar.
+upload-not-same = No són els mateixos fitxers, així que no s’ha reprès res.
+upload-permission-denied = El navegador no ha tingut permís per tornar a llegir els fitxers. Trieu-los vosaltres.
 
 ## PacksView.vue
 

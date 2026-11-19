@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "73a37e0ec4c988c2d944720b9d9b556d1bc036cfbbcca2fbe2573ed59c31def6"
+source = "d8dbfdf558614e792298e9f2143a889d3ce34cc24a0fe019b1acdcd7d98ba317"
 translation = "33cd08db8c788b60f7d38799a27fa29813fa65c6c3025e9967d656790fb2435e"
 
 [messages.account-add]
@@ -11440,6 +11440,10 @@ translation = "{ $min } min kvar"
 source = "{ $s } s left"
 translation = "{ $s } s kvar"
 
+[messages.upload-expand]
+source = "Show imports"
+translation = "Visa importer"
+
 [messages.upload-failed-plain]
 source = "failed"
 translation = "misslyckades"
@@ -11464,13 +11468,37 @@ translation = "Importera igen ändå"
 source = "Importing { $count } packs"
 translation = "Importerar { $count } paket"
 
+[messages.upload-interrupted]
+source = "Interrupted"
+translation = "Avbruten"
+
+[messages.upload-minimize]
+source = "Minimize"
+translation = "Minimera"
+
 [messages.upload-network-error]
 source = "network error"
 translation = "nätverksfel"
 
+[messages.upload-not-same]
+source = "Those aren’t the same files, so nothing was resumed."
+translation = "Det är inte samma filer, så inget återupptogs."
+
 [messages.upload-part-failed]
 source = "upload failed ({ $status })"
 translation = "uppladdningen misslyckades ({ $status })"
+
+[messages.upload-permission-denied]
+source = "The browser wasn’t allowed to read the files again. Pick them instead."
+translation = "Webbläsaren fick inte läsa filerna igen. Välj dem i stället."
+
+[messages.upload-pill]
+source = "Importing { $count } · { $percent }%"
+translation = "Importerar { $count } · { $percent } %"
+
+[messages.upload-pill-stopped]
+source = "Stopped: { $count }"
+translation = "Stoppade: { $count }"
 
 [messages.upload-queue]
 source = "Imports"
@@ -11479,6 +11507,22 @@ translation = "Importer"
 [messages.upload-rate]
 source = "{ $size }/s"
 translation = "{ $size }/s"
+
+[messages.upload-resume]
+source = "Resume"
+translation = "Återuppta"
+
+[messages.upload-resume-all]
+source = "Resume all"
+translation = "Återuppta alla"
+
+[messages.upload-resume-hint-file]
+source = "Pick the same file again, or drop it on the page, to carry on where it stopped."
+translation = "Välj samma fil igen, eller släpp den på sidan, för att fortsätta där den stannade."
+
+[messages.upload-resume-hint-folder]
+source = "Pick the same folder again, or drop it on the page, to carry on where it stopped."
+translation = "Välj samma mapp igen, eller släpp den på sidan, för att fortsätta där den stannade."
 
 [messages.upload-resumed]
 source = "resumed, { $size } were already there"

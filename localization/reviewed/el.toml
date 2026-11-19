@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "73a37e0ec4c988c2d944720b9d9b556d1bc036cfbbcca2fbe2573ed59c31def6"
+source = "d8dbfdf558614e792298e9f2143a889d3ce34cc24a0fe019b1acdcd7d98ba317"
 translation = "72f8bea74267d1a6341481bb8f995cf690d50c49c33ba6825335f86fe2349868"
 
 [messages.account-add]
@@ -11520,6 +11520,10 @@ translation = "απομένουν { $min } λεπ."
 source = "{ $s } s left"
 translation = "απομένουν { $s } δευτ."
 
+[messages.upload-expand]
+source = "Show imports"
+translation = "Εμφάνιση εισαγωγών"
+
 [messages.upload-failed-plain]
 source = "failed"
 translation = "απέτυχε"
@@ -11548,13 +11552,37 @@ translation = """
        *[other] Εισαγωγή { $count } πακέτων
     }"""
 
+[messages.upload-interrupted]
+source = "Interrupted"
+translation = "Διακόπηκε"
+
+[messages.upload-minimize]
+source = "Minimize"
+translation = "Ελαχιστοποίηση"
+
 [messages.upload-network-error]
 source = "network error"
 translation = "σφάλμα δικτύου"
 
+[messages.upload-not-same]
+source = "Those aren’t the same files, so nothing was resumed."
+translation = "Δεν είναι τα ίδια αρχεία, οπότε δεν συνεχίστηκε τίποτα."
+
 [messages.upload-part-failed]
 source = "upload failed ({ $status })"
 translation = "η μεταφόρτωση απέτυχε ({ $status })"
+
+[messages.upload-permission-denied]
+source = "The browser wasn’t allowed to read the files again. Pick them instead."
+translation = "Το πρόγραμμα περιήγησης δεν είχε άδεια να διαβάσει ξανά τα αρχεία. Επιλέξτε τα εσείς."
+
+[messages.upload-pill]
+source = "Importing { $count } · { $percent }%"
+translation = "Εισάγονται { $count } · { $percent }%"
+
+[messages.upload-pill-stopped]
+source = "Stopped: { $count }"
+translation = "Σταματημένες: { $count }"
 
 [messages.upload-queue]
 source = "Imports"
@@ -11563,6 +11591,22 @@ translation = "Εισαγωγές"
 [messages.upload-rate]
 source = "{ $size }/s"
 translation = "{ $size }/s"
+
+[messages.upload-resume]
+source = "Resume"
+translation = "Συνέχεια"
+
+[messages.upload-resume-all]
+source = "Resume all"
+translation = "Συνέχεια όλων"
+
+[messages.upload-resume-hint-file]
+source = "Pick the same file again, or drop it on the page, to carry on where it stopped."
+translation = "Επιλέξτε ξανά το ίδιο αρχείο ή αφήστε το στη σελίδα για να συνεχιστεί από εκεί που σταμάτησε."
+
+[messages.upload-resume-hint-folder]
+source = "Pick the same folder again, or drop it on the page, to carry on where it stopped."
+translation = "Επιλέξτε ξανά τον ίδιο φάκελο ή αφήστε τον στη σελίδα για να συνεχιστεί από εκεί που σταμάτησε."
 
 [messages.upload-resumed]
 source = "resumed, { $size } were already there"

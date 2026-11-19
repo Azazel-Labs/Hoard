@@ -1108,6 +1108,17 @@ upload-retry = Försök igen
 upload-import-again = Importera igen ändå
 upload-dismiss = Avfärda
 upload-cancel = Avbryt
+upload-minimize = Minimera
+upload-expand = Visa importer
+upload-pill = Importerar { $count } · { $percent } %
+upload-pill-stopped = Stoppade: { $count }
+upload-interrupted = Avbruten
+upload-resume = Återuppta
+upload-resume-all = Återuppta alla
+upload-resume-hint-folder = Välj samma mapp igen, eller släpp den på sidan, för att fortsätta där den stannade.
+upload-resume-hint-file = Välj samma fil igen, eller släpp den på sidan, för att fortsätta där den stannade.
+upload-not-same = Det är inte samma filer, så inget återupptogs.
+upload-permission-denied = Webbläsaren fick inte läsa filerna igen. Välj dem i stället.
 
 ## PacksView.vue
 

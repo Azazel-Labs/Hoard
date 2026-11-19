@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "73a37e0ec4c988c2d944720b9d9b556d1bc036cfbbcca2fbe2573ed59c31def6"
+source = "d8dbfdf558614e792298e9f2143a889d3ce34cc24a0fe019b1acdcd7d98ba317"
 translation = "98b77849b047ba15c3fafc62f630455aa81fbcc62eed2bd82d45ed46bbdb7f90"
 
 [messages.account-add]
@@ -11453,6 +11453,10 @@ translation = "{ $min } min rimanenti"
 source = "{ $s } s left"
 translation = "{ $s } s rimanenti"
 
+[messages.upload-expand]
+source = "Show imports"
+translation = "Mostra importazioni"
+
 [messages.upload-failed-plain]
 source = "failed"
 translation = "non riuscito"
@@ -11477,13 +11481,37 @@ translation = "Importa di nuovo comunque"
 source = "Importing { $count } packs"
 translation = "Importazione di { $count } pacchetti"
 
+[messages.upload-interrupted]
+source = "Interrupted"
+translation = "Interrotta"
+
+[messages.upload-minimize]
+source = "Minimize"
+translation = "Riduci"
+
 [messages.upload-network-error]
 source = "network error"
 translation = "errore di rete"
 
+[messages.upload-not-same]
+source = "Those aren’t the same files, so nothing was resumed."
+translation = "Non sono gli stessi file, quindi non è stato ripreso nulla."
+
 [messages.upload-part-failed]
 source = "upload failed ({ $status })"
 translation = "caricamento non riuscito ({ $status })"
+
+[messages.upload-permission-denied]
+source = "The browser wasn’t allowed to read the files again. Pick them instead."
+translation = "Il browser non ha avuto il permesso di rileggere i file. Sceglili tu."
+
+[messages.upload-pill]
+source = "Importing { $count } · { $percent }%"
+translation = "Importazione di { $count } · { $percent }%"
+
+[messages.upload-pill-stopped]
+source = "Stopped: { $count }"
+translation = "Interrotte: { $count }"
 
 [messages.upload-queue]
 source = "Imports"
@@ -11492,6 +11520,22 @@ translation = "Importazioni"
 [messages.upload-rate]
 source = "{ $size }/s"
 translation = "{ $size }/s"
+
+[messages.upload-resume]
+source = "Resume"
+translation = "Riprendi"
+
+[messages.upload-resume-all]
+source = "Resume all"
+translation = "Riprendi tutte"
+
+[messages.upload-resume-hint-file]
+source = "Pick the same file again, or drop it on the page, to carry on where it stopped."
+translation = "Scegli di nuovo lo stesso file, o trascinalo sulla pagina, per riprendere da dove si è fermato."
+
+[messages.upload-resume-hint-folder]
+source = "Pick the same folder again, or drop it on the page, to carry on where it stopped."
+translation = "Scegli di nuovo la stessa cartella, o trascinala sulla pagina, per riprendere da dove si è fermata."
 
 [messages.upload-resumed]
 source = "resumed, { $size } were already there"

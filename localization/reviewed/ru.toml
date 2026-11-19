@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "44461da0cdeba10d3eb48df78439e34e0a90628ba002b19657dadfec4a46a08c"
+source = "07a5d1b95cc314af0c57106922c41e00f52076f9beab15651598ab669c3d4515"
 translation = "bb45e4d0d59bdf1a2181c1158501e66a0c57e8041d0a982d6aed7e82f49657fa"
 
 [messages.account-add]
@@ -1945,6 +1945,14 @@ translation = "В вашем избранном (F — убрать)"
 [messages.asset-file]
 source = "File"
 translation = "Файл"
+
+[messages.asset-fit-animations]
+source = "Animations that fit ({ $count })"
+translation = "Подходящие анимации ({ $count })"
+
+[messages.asset-fit-characters]
+source = "Characters it fits ({ $count })"
+translation = "Подходящие персонажи ({ $count })"
 
 [messages.asset-in-pack]
 source = "in"

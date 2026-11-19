@@ -65,6 +65,11 @@ export interface Asset {
   duplicates?: Duplicate[]
   /** The same picture, sound or model elsewhere at another size, rate or format; the best of them marked. */
   near_copies?: NearCopy[]
+  /** A character's animations across the library that fit its skeleton, or the characters an animation fits; the
+   *  same pack first, at most 200. */
+  fits?: Fit[]
+  /** How many fit in all, when that's more than `fits` lists. */
+  fits_total?: number | null
   /** Collections this asset is in. */
   collections?: CollectionRef[]
   /** What this file was converted from (an Unreal package). */
@@ -210,6 +215,20 @@ export interface NearCopy {
   bit_depth?: number
   /** The one to keep: biggest, lossless, most complete. */
   best: boolean
+}
+
+/** An animation that plays on a character, or a character an animation plays on. */
+export interface Fit {
+  id: string
+  name: string
+  path: string
+  pack_id: string
+  pack_name: string
+  kind: AssetKind
+  has_thumb: boolean
+  thumb_rev?: string | null
+  /** An animation's length in seconds. */
+  secs?: number | null
 }
 
 /** A set of near copies, the best first; `wasted` is what the rest take. */

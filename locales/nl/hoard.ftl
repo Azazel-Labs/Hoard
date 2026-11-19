@@ -1514,6 +1514,8 @@ asset-materials-heading =
     }
 asset-material-maps-aria = { $name }: maps
 asset-variants = Varianten ({ $count } versies)
+asset-fit-animations = Passende animaties ({ $count })
+asset-fit-characters = Personages waarop hij past ({ $count })
 asset-copies = Identieke kopieën
 asset-copies-note = Dezelfde bytes worden één keer opgeslagen; deze pakketten leveren dit bestand ook mee.
 asset-near-copies = Bijna-kopieën

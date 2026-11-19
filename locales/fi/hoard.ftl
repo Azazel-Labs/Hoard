@@ -1568,6 +1568,8 @@ asset-variants =
         [one] Muunnelmat ({ $count } versio)
        *[other] Muunnelmat ({ $count } versiota)
     }
+asset-fit-animations = Sopivat animaatiot ({ $count })
+asset-fit-characters = Hahmot, joihin se sopii ({ $count })
 asset-copies = Identtiset kopiot
 asset-copies-note = Samat tavut tallennetaan kerran; nämäkin paketit sisältävät tämän tiedoston.
 asset-near-copies = Lähes samat kopiot

@@ -121,7 +121,10 @@ pub(super) async fn get_asset(State(state): State<AppState>, Path(id): Path<Stri
     if let Some(o) = &mut asset.origin {
         o.kept_until = crate::reformat::kept_until(o, state.settings.get().conversion_rules.keep_days);
     }
-    asset.near_copies = crate::nearcopies::for_asset(&state, id).await?;
+    asset.near_copies = crate::nearcopies::for_asset(&state, id.clone()).await?;
+    let (fits, total) = crate::animations::fits_for(&state, id).await?;
+    asset.fits_total = (total > fits.len()).then_some(total as u64);
+    asset.fits = fits;
     Ok(Json(asset))
 }
 

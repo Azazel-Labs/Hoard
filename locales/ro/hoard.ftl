@@ -1646,6 +1646,8 @@ asset-variants =
         [few] Variante ({ $count } versiuni)
        *[other] Variante ({ $count } de versiuni)
     }
+asset-fit-animations = Animații potrivite ({ $count })
+asset-fit-characters = Personaje potrivite ({ $count })
 asset-copies = Copii identice
 asset-copies-note = Aceiași octeți sunt stocați o singură dată; și aceste pachete conțin acest fișier.
 asset-near-copies = Aproape copii

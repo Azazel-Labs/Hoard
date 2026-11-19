@@ -221,6 +221,13 @@ pub struct Asset {
     /// The same picture, sound or model in other files (see [`NearCopy`]), the best first. Detail view only.
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub near_copies: Vec<NearCopy>,
+    /// For a character, the animations across the library that fit its skeleton; for an animation, the characters
+    /// it fits (see [`Fit`]). The same pack first, at most 200. Detail view only.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub fits: Vec<Fit>,
+    /// How many fit in all, when that's more than `fits` lists.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub fits_total: Option<u64>,
     /// Collections this asset is in (detail view only).
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub collections: Vec<CollectionRef>,
@@ -452,6 +459,24 @@ pub struct NearCopy {
     /// The best of the copies: the biggest, lossless, most complete.
     #[serde(default)]
     pub best: bool,
+}
+
+/// An animation that plays on a character, or a character an animation plays on: one whose skeleton has the bones
+/// the clip moves. Detail view.
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+pub struct Fit {
+    pub id: String,
+    pub name: String,
+    pub path: String,
+    pub pack_id: String,
+    pub pack_name: String,
+    pub kind: AssetKind,
+    pub has_thumb: bool,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub thumb_rev: Option<String>,
+    /// An animation's length in seconds, its longest take.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub secs: Option<f64>,
 }
 
 /// A set of near copies across the library, the best first.

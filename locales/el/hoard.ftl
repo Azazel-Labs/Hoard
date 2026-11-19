@@ -1564,6 +1564,8 @@ asset-materials-heading =
     }
 asset-material-maps-aria = { $name }: χάρτες
 asset-variants = Παραλλαγές ({ $count } εκδοχές)
+asset-fit-animations = Κινήσεις που ταιριάζουν ({ $count })
+asset-fit-characters = Χαρακτήρες που ταιριάζει ({ $count })
 asset-copies = Πανομοιότυπα αντίγραφα
 asset-copies-note = Τα ίδια byte αποθηκεύονται μία φορά· αυτά τα πακέτα περιέχουν επίσης αυτό το αρχείο.
 asset-near-copies = Σχεδόν αντίγραφα

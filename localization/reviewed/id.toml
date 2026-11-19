@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "44461da0cdeba10d3eb48df78439e34e0a90628ba002b19657dadfec4a46a08c"
+source = "07a5d1b95cc314af0c57106922c41e00f52076f9beab15651598ab669c3d4515"
 translation = "30056587d254fe6b8f2576dc61dbda0e0d1f814731977073ac18b1c1a33112d6"
 
 [messages.account-add]
@@ -1814,6 +1814,14 @@ translation = "Ada di favorit Anda (F untuk mengeluarkannya)"
 [messages.asset-file]
 source = "File"
 translation = "Berkas"
+
+[messages.asset-fit-animations]
+source = "Animations that fit ({ $count })"
+translation = "Animasi yang cocok ({ $count })"
+
+[messages.asset-fit-characters]
+source = "Characters it fits ({ $count })"
+translation = "Karakter yang cocok ({ $count })"
 
 [messages.asset-in-pack]
 source = "in"

@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "44461da0cdeba10d3eb48df78439e34e0a90628ba002b19657dadfec4a46a08c"
+source = "07a5d1b95cc314af0c57106922c41e00f52076f9beab15651598ab669c3d4515"
 translation = "365b0fc7ff648476ee75c67213c00d18e7b3e0fb9f940664032b9c834c675ffb"
 
 [messages.account-add]
@@ -1822,6 +1822,14 @@ translation = "Favorilerinizde (F ile çıkarılır)"
 [messages.asset-file]
 source = "File"
 translation = "Dosya"
+
+[messages.asset-fit-animations]
+source = "Animations that fit ({ $count })"
+translation = "Uyan animasyonlar ({ $count })"
+
+[messages.asset-fit-characters]
+source = "Characters it fits ({ $count })"
+translation = "Uyduğu karakterler ({ $count })"
 
 [messages.asset-in-pack]
 source = "in"

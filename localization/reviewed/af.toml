@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "44461da0cdeba10d3eb48df78439e34e0a90628ba002b19657dadfec4a46a08c"
+source = "07a5d1b95cc314af0c57106922c41e00f52076f9beab15651598ab669c3d4515"
 translation = "b9203115cf8b13a0111214aa1af8cf4a9194f497abfd52d839917124a3498329"
 
 [messages.account-add]
@@ -1881,6 +1881,14 @@ translation = "In jou gunstelinge (F haal dit uit)"
 [messages.asset-file]
 source = "File"
 translation = "Lêer"
+
+[messages.asset-fit-animations]
+source = "Animations that fit ({ $count })"
+translation = "Animasies wat pas ({ $count })"
+
+[messages.asset-fit-characters]
+source = "Characters it fits ({ $count })"
+translation = "Karakters waarop dit pas ({ $count })"
 
 [messages.asset-in-pack]
 source = "in"

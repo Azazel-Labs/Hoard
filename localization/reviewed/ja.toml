@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "44461da0cdeba10d3eb48df78439e34e0a90628ba002b19657dadfec4a46a08c"
+source = "07a5d1b95cc314af0c57106922c41e00f52076f9beab15651598ab669c3d4515"
 translation = "869ed1fc3b055273469332423634413363dc2f8fea2bf697f2d9d0791df51865"
 
 [messages.account-add]
@@ -1814,6 +1814,14 @@ translation = "お気に入りに追加済み（F で外す）"
 [messages.asset-file]
 source = "File"
 translation = "ファイル"
+
+[messages.asset-fit-animations]
+source = "Animations that fit ({ $count })"
+translation = "合うアニメーション ({ $count })"
+
+[messages.asset-fit-characters]
+source = "Characters it fits ({ $count })"
+translation = "合うキャラクター ({ $count })"
 
 [messages.asset-in-pack]
 source = "in"

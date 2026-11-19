@@ -147,6 +147,8 @@ pub(crate) struct Inner {
     pub(crate) clap: embed::Index,
     /// The library's sets of near copies, for the duplicates page.
     pub(crate) near_copies: nearcopies::Cache,
+    /// Every rigged model's skeleton, for the animations that fit a character and the characters an animation fits.
+    pub(crate) skeletons: animations::Skeletons,
     /// Every sound's acoustic descriptor, for "more like this" on sounds.
     pub(crate) sounds: sounds::Index,
 }
@@ -222,6 +224,7 @@ pub async fn run(cfg: Config) -> Result<()> {
         clap: embed::Index::new(&clap::SPEC),
         sounds: sounds::Index::default(),
         near_copies: nearcopies::Cache::default(),
+        skeletons: animations::Skeletons::default(),
     });
     tokio::spawn(signin::recheck_loop(Arc::clone(&state)));
     match uploads::sweep_stale(&state) {

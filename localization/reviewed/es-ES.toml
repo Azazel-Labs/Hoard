@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "44461da0cdeba10d3eb48df78439e34e0a90628ba002b19657dadfec4a46a08c"
+source = "07a5d1b95cc314af0c57106922c41e00f52076f9beab15651598ab669c3d4515"
 translation = "8b5fa45772f1b768715bb243cf724d7c57dc2f5208043d87b201e40c17dc1980"
 
 [messages.account-add]
@@ -1889,6 +1889,14 @@ translation = "En tus favoritos (F lo quita)"
 [messages.asset-file]
 source = "File"
 translation = "Archivo"
+
+[messages.asset-fit-animations]
+source = "Animations that fit ({ $count })"
+translation = "Animaciones compatibles ({ $count })"
+
+[messages.asset-fit-characters]
+source = "Characters it fits ({ $count })"
+translation = "Personajes compatibles ({ $count })"
 
 [messages.asset-in-pack]
 source = "in"

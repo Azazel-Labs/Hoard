@@ -1407,6 +1407,8 @@ asset-materials-heading =
     }
 asset-material-maps-aria = { $name }：貼圖
 asset-variants = 變體（{ $count } 個版本）
+asset-fit-animations = 適用的動畫 ({ $count })
+asset-fit-characters = 適用的角色 ({ $count })
 asset-copies = 完全相同的副本
 asset-copies-note = 相同的位元組只會儲存一次；這些素材包也附有這個檔案。
 asset-near-copies = 近似副本

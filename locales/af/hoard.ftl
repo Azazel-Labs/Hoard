@@ -1514,6 +1514,8 @@ asset-materials-heading =
     }
 asset-material-maps-aria = { $name }: kaarte
 asset-variants = Variante ({ $count } weergawes)
+asset-fit-animations = Animasies wat pas ({ $count })
+asset-fit-characters = Karakters waarop dit pas ({ $count })
 asset-copies = Identiese kopieë
 asset-copies-note = Dieselfde grepe word een keer gestoor; hierdie pakke bevat ook hierdie lêer.
 asset-near-copies = Byna-kopieë

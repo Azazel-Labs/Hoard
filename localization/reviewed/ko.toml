@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "44461da0cdeba10d3eb48df78439e34e0a90628ba002b19657dadfec4a46a08c"
+source = "07a5d1b95cc314af0c57106922c41e00f52076f9beab15651598ab669c3d4515"
 translation = "cb51eeebee58ce4e694b9c22ec1e26a19090d24e80d9b74b0e431ca3fa274b7f"
 
 [messages.account-add]
@@ -1814,6 +1814,14 @@ translation = "즐겨찾기에 있음(F로 제거)"
 [messages.asset-file]
 source = "File"
 translation = "파일"
+
+[messages.asset-fit-animations]
+source = "Animations that fit ({ $count })"
+translation = "맞는 애니메이션 ({ $count })"
+
+[messages.asset-fit-characters]
+source = "Characters it fits ({ $count })"
+translation = "맞는 캐릭터 ({ $count })"
 
 [messages.asset-in-pack]
 source = "in"

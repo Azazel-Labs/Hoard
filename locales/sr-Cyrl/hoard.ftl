@@ -1567,6 +1567,8 @@ asset-materials-heading =
     }
 asset-material-maps-aria = { $name }: мапе
 asset-variants = Варијанте (верзија: { $count })
+asset-fit-animations = Анимације које одговарају ({ $count })
+asset-fit-characters = Ликови којима одговара ({ $count })
 asset-copies = Идентичне копије
 asset-copies-note = Исти бајтови се чувају једном; ови пакети такође садрже ову датотеку.
 asset-near-copies = Скоро копије

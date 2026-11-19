@@ -1664,6 +1664,8 @@ asset-materials-heading =
     }
 asset-material-maps-aria = { $name }: карты
 asset-variants = Варианты (дублей: { $count })
+asset-fit-animations = Подходящие анимации ({ $count })
+asset-fit-characters = Подходящие персонажи ({ $count })
 asset-copies = Идентичные копии
 asset-copies-note = Одинаковые байты хранятся один раз; этот файл есть и в этих паках.
 asset-near-copies = Почти копии

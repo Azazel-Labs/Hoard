@@ -1411,6 +1411,8 @@ asset-materials-heading =
     }
 asset-material-maps-aria = { $name }: haritalar
 asset-variants = Varyantlar ({ $count } adet)
+asset-fit-animations = Uyan animasyonlar ({ $count })
+asset-fit-characters = Uyduğu karakterler ({ $count })
 asset-copies = Özdeş kopyalar
 asset-copies-note = Aynı baytlar bir kez saklanır; bu paketler de bu dosyayı içeriyor.
 asset-near-copies = Neredeyse kopyalar

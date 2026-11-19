@@ -1696,6 +1696,8 @@ asset-materials-heading =
     }
 asset-material-maps-aria = { $name }: карти
 asset-variants = Варіанти ({ $count })
+asset-fit-animations = Анімації, що підходять ({ $count })
+asset-fit-characters = Персонажі, яким підходить ({ $count })
 asset-copies = Ідентичні копії
 asset-copies-note = Однакові байти зберігаються один раз; цей файл є і в цих пакетах.
 asset-near-copies = Майже копії

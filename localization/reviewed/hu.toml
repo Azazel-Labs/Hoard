@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "44461da0cdeba10d3eb48df78439e34e0a90628ba002b19657dadfec4a46a08c"
+source = "07a5d1b95cc314af0c57106922c41e00f52076f9beab15651598ab669c3d4515"
 translation = "230aa92a6033cfd0e81420ca5ef21ba788bfd9cbf50cc6964032f8c9499222bf"
 
 [messages.account-add]
@@ -1818,6 +1818,14 @@ translation = "A kedvencei között (az F eltávolítja)"
 [messages.asset-file]
 source = "File"
 translation = "Fájl"
+
+[messages.asset-fit-animations]
+source = "Animations that fit ({ $count })"
+translation = "Illeszkedő animációk ({ $count })"
+
+[messages.asset-fit-characters]
+source = "Characters it fits ({ $count })"
+translation = "Karakterek, amelyekre illik ({ $count })"
 
 [messages.asset-in-pack]
 source = "in"

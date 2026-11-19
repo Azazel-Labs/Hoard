@@ -1643,6 +1643,8 @@ asset-materials-heading =
     }
 asset-material-maps-aria = { $name }: mapy
 asset-variants = Warianty ({ $count })
+asset-fit-animations = Pasujące animacje ({ $count })
+asset-fit-characters = Postacie, do których pasuje ({ $count })
 asset-copies = Identyczne kopie
 asset-copies-note = Te same bajty są przechowywane raz; te paczki również zawierają ten plik.
 asset-near-copies = Prawie kopie

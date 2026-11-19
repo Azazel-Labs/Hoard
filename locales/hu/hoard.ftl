@@ -1411,6 +1411,8 @@ asset-materials-heading =
     }
 asset-material-maps-aria = { $name }: térképek
 asset-variants = Változatok ({ $count } verzió)
+asset-fit-animations = Illeszkedő animációk ({ $count })
+asset-fit-characters = Karakterek, amelyekre illik ({ $count })
 asset-copies = Azonos másolatok
 asset-copies-note = Az azonos bájtok egyszer vannak tárolva; ezek a csomagok is tartalmazzák ezt a fájlt.
 asset-near-copies = Majdnem azonos másolatok

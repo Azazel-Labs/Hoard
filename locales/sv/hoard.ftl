@@ -1517,6 +1517,8 @@ asset-materials-heading =
     }
 asset-material-maps-aria = { $name }: kartor
 asset-variants = Varianter ({ $count } tagningar)
+asset-fit-animations = Animationer som passar ({ $count })
+asset-fit-characters = Figurer den passar ({ $count })
 asset-copies = Identiska kopior
 asset-copies-note = Samma byte lagras en gång; de här paketen innehåller också filen.
 asset-near-copies = Nästan-kopior

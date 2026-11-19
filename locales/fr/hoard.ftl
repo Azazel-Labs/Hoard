@@ -1544,6 +1544,8 @@ asset-materials-heading =
     }
 asset-material-maps-aria = { $name } : cartes
 asset-variants = Variantes ({ $count } prises)
+asset-fit-animations = Animations compatibles ({ $count })
+asset-fit-characters = Personnages compatibles ({ $count })
 asset-copies = Copies identiques
 asset-copies-note = Les mêmes octets ne sont stockés qu’une fois ; ces packs contiennent aussi ce fichier.
 asset-near-copies = Quasi-copies

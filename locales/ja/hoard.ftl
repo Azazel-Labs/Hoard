@@ -1401,6 +1401,8 @@ asset-materials-heading =
     }
 asset-material-maps-aria = { $name }: マップ
 asset-variants = バリエーション（{ $count } 種類）
+asset-fit-animations = 合うアニメーション ({ $count })
+asset-fit-characters = 合うキャラクター ({ $count })
 asset-copies = 同一のコピー
 asset-copies-note = 同じバイト列は 1 回だけ保存されます。これらのパックにもこのファイルが含まれています。
 asset-near-copies = ほぼ同じコピー

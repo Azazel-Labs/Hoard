@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "44461da0cdeba10d3eb48df78439e34e0a90628ba002b19657dadfec4a46a08c"
+source = "07a5d1b95cc314af0c57106922c41e00f52076f9beab15651598ab669c3d4515"
 translation = "2e34d91e4f4fa072a59dd9e9162a5d29e11be0c102c21984626feb8d9e7f9017"
 
 [messages.account-add]
@@ -1881,6 +1881,14 @@ translation = "Nos seus favoritos (F tira)"
 [messages.asset-file]
 source = "File"
 translation = "Arquivo"
+
+[messages.asset-fit-animations]
+source = "Animations that fit ({ $count })"
+translation = "Animações compatíveis ({ $count })"
+
+[messages.asset-fit-characters]
+source = "Characters it fits ({ $count })"
+translation = "Personagens compatíveis ({ $count })"
 
 [messages.asset-in-pack]
 source = "in"

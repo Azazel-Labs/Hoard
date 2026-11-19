@@ -44,6 +44,8 @@ pub(super) fn asset_from_row(r: &Row<'_>) -> rusqlite::Result<Asset> {
         family: None,
         duplicates: Vec::new(),
         near_copies: Vec::new(),
+        fits: Vec::new(),
+        fits_total: None,
         collections: Vec::new(),
         origin: None,
         unreal: None,

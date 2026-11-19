@@ -1405,6 +1405,8 @@ asset-materials-heading =
     }
 asset-material-maps-aria = { $name }: map
 asset-variants = Varian ({ $count } versi)
+asset-fit-animations = Animasi yang cocok ({ $count })
+asset-fit-characters = Karakter yang cocok ({ $count })
 asset-copies = Salinan identik
 asset-copies-note = Byte yang sama disimpan sekali; paket-paket ini juga menyertakan berkas ini.
 asset-near-copies = Salinan hampir sama

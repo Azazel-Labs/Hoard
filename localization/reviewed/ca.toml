@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "44461da0cdeba10d3eb48df78439e34e0a90628ba002b19657dadfec4a46a08c"
+source = "07a5d1b95cc314af0c57106922c41e00f52076f9beab15651598ab669c3d4515"
 translation = "492346de275ddfb98a7c980cda9c461c7c8cf91addc47e4b748e7c38ce659fb3"
 
 [messages.account-add]
@@ -1881,6 +1881,14 @@ translation = "Als vostres preferits (F el treu)"
 [messages.asset-file]
 source = "File"
 translation = "Fitxer"
+
+[messages.asset-fit-animations]
+source = "Animations that fit ({ $count })"
+translation = "Animacions que hi encaixen ({ $count })"
+
+[messages.asset-fit-characters]
+source = "Characters it fits ({ $count })"
+translation = "Personatges on encaixa ({ $count })"
 
 [messages.asset-in-pack]
 source = "in"

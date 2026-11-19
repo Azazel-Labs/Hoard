@@ -40,11 +40,9 @@ tagging gets against the plan's weekly cap. Claude is harder (checked 2026-11-12
 Hoard keeps the skeleton and clips of every rigged model (`rigs`: bone names without their `mixamorig:` or
 `Armature|` prefixes, and each clip's name, length and the bones it moves), from glTF, from FBX through polysmelt and
 from the GLB Blender makes of a .blend. Within a pack, a file of clips with no mesh, or a copy of a character saved
-for one clip, becomes an animation linked to the characters it fits nearby. What's left:
+for one clip, becomes an animation linked to the characters it fits nearby, and across the library characters list
+"Animations that fit" and animations "Characters it fits". What's left:
 
-- **Link across packs by skeleton.** An animation fits any character whose skeleton has the bones it moves (same
-  names once the prefixes are off), so a Mixamo clip fits every Mixamo character and an Unreal Mannequin clip every
-  Mannequin. Characters list "Animations that fit"; animations list "Characters it fits". The same pack comes first.
 - **Show them as animations.** An animation's details play it in a loop on its character, with a picker to put it
   on any other character it fits; three.js plays a clip on any skinned mesh whose bones have the same names. Its
   thumbnail is drawn mid-clip, not in the rest pose, so a grid of them isn't a grid of the same pose, and its tile

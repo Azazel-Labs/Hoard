@@ -536,7 +536,10 @@ software rasterizer (`apt install mesa-vulkan-drivers`). Without any adapter, ev
    sprite of the same name, and only painted on a model whose materials have no colors of their own). A file of
    clips with no mesh, or a copy of a character saved for one clip (`run.blend` holding "Run"), becomes an animation
    linked to the characters it fits, those whose bones it moves in its part of the pack, where a Unity package's
-   copy of a character gets the copies of the clips beside it; so does `Model@Clip.fbx`. With Settings →
+   copy of a character gets the copies of the clips beside it; so does `Model@Clip.fbx`. Across the library, a
+   character's details list the "Animations that fit" it and an animation's the "Characters it fits": those with its
+   skeleton (at least ten of the bones it moves, named the same once `mixamorig:` or `Armature|` is off, and not just
+   Blender's `Bone.001`), so a Mixamo clip fits every Mixamo character; its own pack's come first. With Settings →
    Performance → Thumbnails → "Moving thumbnails for animations" on (it's off: they take space and time to make), each
    animation also gets a three-second looping WebP of it playing on its character, which its tile plays while the
    pointer is over it; turning it off deletes them. Game-engine

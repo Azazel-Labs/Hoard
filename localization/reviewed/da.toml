@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "44461da0cdeba10d3eb48df78439e34e0a90628ba002b19657dadfec4a46a08c"
+source = "07a5d1b95cc314af0c57106922c41e00f52076f9beab15651598ab669c3d4515"
 translation = "eb892fd468da0132017d254b1ce31fa8af7e6f4331de9f469e15c94a37a8f607"
 
 [messages.account-add]
@@ -1881,6 +1881,14 @@ translation = "I dine favoritter (F fjerner det)"
 [messages.asset-file]
 source = "File"
 translation = "Fil"
+
+[messages.asset-fit-animations]
+source = "Animations that fit ({ $count })"
+translation = "Animationer der passer ({ $count })"
+
+[messages.asset-fit-characters]
+source = "Characters it fits ({ $count })"
+translation = "Figurer den passer til ({ $count })"
 
 [messages.asset-in-pack]
 source = "in"

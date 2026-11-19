@@ -1717,6 +1717,10 @@ asset-materials-heading =
 # A list of a material's maps, for screen readers; $name is the material's name.
 asset-material-maps-aria = { $name }: maps
 asset-variants = Variants ({ $count } takes)
+# Headings in an asset's details: across the library, the animations that play on this character's skeleton (the
+# same bone names), or the characters this animation plays on. $count is how many there are.
+asset-fit-animations = Animations that fit ({ $count })
+asset-fit-characters = Characters it fits ({ $count })
 asset-copies = Identical copies
 asset-copies-note = The same bytes are stored once; these packs ship this file too.
 asset-near-copies = Near copies

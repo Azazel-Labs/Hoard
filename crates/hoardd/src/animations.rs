@@ -4,13 +4,17 @@
 //!
 //! What a model's skeleton and clips are is read once, during analysis (a [`Rig`], kept in `rigs`); a `.blend`'s is
 //! read from the GLB Blender made of it. [`sort_pack`] then works out, from the rigs, which files are clips and
-//! which characters each one fits: those whose bones it moves, nearest it in the pack.
+//! which characters each one fits: those whose bones it moves, nearest it in the pack. Across the library, an
+//! animation fits every character with its skeleton ([`fits_for`]): a Mixamo clip every Mixamo character.
 
-use std::collections::{BTreeSet, HashMap};
+use std::borrow::Borrow;
+use std::collections::{BTreeSet, HashMap, HashSet};
+use std::sync::atomic::{AtomicU64, Ordering};
+use std::sync::{Arc, Mutex, PoisonError};
 
 use anyhow::Result;
-use hoard_core::{AssetKind, LinkRel, TagSource};
-use rusqlite::{Connection, params};
+use hoard_core::{AssetKind, Fit, LinkRel, TagSource};
+use rusqlite::{Connection, OptionalExtension, params};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
@@ -108,6 +112,7 @@ pub(crate) fn rig_of_glb(glb: &[u8]) -> Option<Rig> {
 
 /// Keep an asset's rig, or forget it.
 pub(crate) fn store(conn: &Connection, asset_id: &str, rig: Option<&Rig>) -> Result<()> {
+    REVISION.fetch_add(1, Ordering::AcqRel);
     match rig {
         Some(r) => conn.execute(
             "INSERT INTO rigs (asset_id, rig) VALUES (?1, ?2) ON CONFLICT (asset_id) DO UPDATE SET rig = excluded.rig",
@@ -120,9 +125,151 @@ pub(crate) fn store(conn: &Connection, asset_id: &str, rig: Option<&Rig>) -> Res
 
 /// Whether `moved` (a clip's bones) plays on a skeleton with `bones`: nearly all of them are its bones, and at least
 /// three. A clip may also move the object its exporter wrapped the skeleton in, which a character needn't share.
-fn fits(moved: &BTreeSet<&str>, bones: &BTreeSet<&str>) -> bool {
-    let shared = moved.iter().filter(|b| bones.contains(*b)).count();
+fn fits<A: AsRef<str>, B: Borrow<str> + Ord>(moved: &BTreeSet<A>, bones: &BTreeSet<B>) -> bool {
+    let shared = moved.iter().filter(|b| bones.contains((*b).as_ref())).count();
     shared >= 3 && shared * 10 >= moved.len() * 9
+}
+
+/// Bones with names of their own a clip from another pack must share with a character, as well as fitting it: a
+/// few names (`hips`, `spine`, `head`) are in most humanoid skeletons, and only most of one says it's the same.
+const ACROSS_PACKS: usize = 10;
+/// The most fits a detail view lists.
+const FITS_LISTED: usize = 200;
+
+/// A name any skeleton might have (`Bone`, `Bone.001`, `joint3`): Blender's and Maya's defaults, which say nothing
+/// about which skeleton it is.
+fn generic(bone: &str) -> bool {
+    let word: String = bone.chars().filter(char::is_ascii_alphabetic).collect();
+    matches!(word.as_str(), "" | "bone" | "joint")
+}
+
+/// Whether a clip in one pack plays on a character in another: it fits, and they share enough bones with names of
+/// their own to be the same skeleton (Mixamo's, the Unreal Mannequin's).
+fn fits_across(moved: &BTreeSet<String>, bones: &BTreeSet<String>) -> bool {
+    fits(moved, bones) && moved.iter().filter(|b| !generic(b) && bones.contains(*b)).count() >= ACROSS_PACKS
+}
+
+/// What fitting needs of a character (its bones) or an animation (the bones its clips move).
+#[derive(Debug)]
+struct Skeleton {
+    id: String,
+    pack_id: String,
+    animation: bool,
+    bones: BTreeSet<String>,
+    /// An animation's longest take.
+    secs: Option<f64>,
+}
+
+/// Bumped whenever a rig or a model's kind changes, so [`Skeletons`] are read again.
+static REVISION: AtomicU64 = AtomicU64::new(0);
+
+/// Every character's and animation's skeleton, kept until a rig or a model's kind changes.
+#[derive(Debug, Default)]
+pub(crate) struct Skeletons(Mutex<Option<(u64, Arc<Vec<Skeleton>>)>>);
+
+/// Every character (a model skinned to its bones) and animation in the library, from their rigs.
+fn skeletons(conn: &Connection) -> Result<Vec<Skeleton>> {
+    let mut stmt = conn.prepare(
+        "SELECT a.id, a.pack_id, a.kind, r.rig FROM rigs r JOIN assets a ON a.id = r.asset_id
+          WHERE a.kind IN ('model', 'animation')",
+    )?;
+    let rows = stmt.query_map([], |r| {
+        Ok((r.get::<_, String>(0)?, r.get::<_, String>(1)?, r.get::<_, String>(2)?, r.get::<_, String>(3)?))
+    })?;
+    let mut out = Vec::new();
+    for row in rows {
+        let (id, pack_id, kind, rig) = row?;
+        let Ok(rig) = serde_json::from_str::<Rig>(&rig) else { continue };
+        let animation = kind == AssetKind::Animation.as_str();
+        let (bones, secs): (BTreeSet<String>, _) = if animation {
+            let secs = rig.takes().map(|c| c.secs).fold(0.0, f64::max);
+            (rig.takes().flat_map(|c| c.bones.iter().cloned()).collect(), Some(secs))
+        } else if rig.meshes > 0 && rig.skinned {
+            (rig.bones.into_iter().collect(), None)
+        } else {
+            continue;
+        };
+        if !bones.is_empty() {
+            out.push(Skeleton { id, pack_id, animation, bones, secs });
+        }
+    }
+    Ok(out)
+}
+
+/// The animations that fit character `id`, or the characters animation `id` fits: every one in its pack it fits,
+/// and in other packs every one it fits closely enough to have the same skeleton. Left out are archived ones,
+/// another format's copy of one, and those it's linked to already (its pack's own clips for it). The same pack
+/// first, then by pack and path; at most [`FITS_LISTED`], with how many there are in all.
+fn fits_of(conn: &Connection, all: &[Skeleton], id: &str) -> Result<(Vec<Fit>, usize)> {
+    let Some(me) = all.iter().find(|s| s.id == id) else { return Ok((Vec::new(), 0)) };
+    let linked: HashSet<String> = conn
+        .prepare(
+            "SELECT to_id FROM asset_links WHERE from_id = ?1 AND rel = 'animation'
+             UNION SELECT from_id FROM asset_links WHERE to_id = ?1 AND rel = 'animation'",
+        )?
+        .query_map([id], |r| r.get(0))?
+        .collect::<rusqlite::Result<_>>()?;
+    let mut details = conn.prepare(
+        "SELECT a.name, a.path, a.pack_id, p.name, a.kind, a.thumb_hash IS NOT NULL, substr(a.thumb_hash, 1, 12)
+           FROM assets a JOIN packs p ON p.id = a.pack_id
+          WHERE a.id = ?1 AND a.archived_at IS NULL AND p.archived_at IS NULL
+            AND NOT EXISTS (SELECT 1 FROM asset_links l WHERE l.to_id = a.id AND l.rel = 'format')",
+    )?;
+    let mut out = Vec::new();
+    for other in all.iter().filter(|o| o.animation != me.animation && !linked.contains(&o.id)) {
+        let (moved, bones) = if me.animation { (&me.bones, &other.bones) } else { (&other.bones, &me.bones) };
+        let fit = if other.pack_id == me.pack_id { fits(moved, bones) } else { fits_across(moved, bones) };
+        if !fit {
+            continue;
+        }
+        let found = details
+            .query_row([&other.id], |r| {
+                Ok(Fit {
+                    id: other.id.clone(),
+                    name: r.get(0)?,
+                    path: r.get(1)?,
+                    pack_id: r.get(2)?,
+                    pack_name: r.get(3)?,
+                    kind: AssetKind::parse(&r.get::<_, String>(4)?).unwrap_or(AssetKind::Model),
+                    has_thumb: r.get(5)?,
+                    thumb_rev: r.get(6)?,
+                    secs: other.secs,
+                })
+            })
+            .optional()?;
+        out.extend(found);
+    }
+    out.sort_by(|a, b| {
+        (a.pack_id != me.pack_id)
+            .cmp(&(b.pack_id != me.pack_id))
+            .then_with(|| a.pack_name.cmp(&b.pack_name))
+            .then_with(|| a.path.cmp(&b.path))
+    });
+    let total = out.len();
+    out.truncate(FITS_LISTED);
+    Ok((out, total))
+}
+
+/// The animations that fit a character, or the characters an animation fits (see [`fits_of`]), with how many in
+/// all. The library's skeletons are read once and kept until a rig or a model's kind changes.
+pub(crate) async fn fits_for(state: &AppState, id: String) -> Result<(Vec<Fit>, usize)> {
+    let kept = {
+        let guard = state.skeletons.0.lock().unwrap_or_else(PoisonError::into_inner);
+        guard.as_ref().filter(|(rev, _)| *rev == REVISION.load(Ordering::Acquire)).map(|(_, s)| Arc::clone(s))
+    };
+    let st = Arc::clone(state);
+    db::call(&state.pool, move |c| {
+        let all = if let Some(all) = kept {
+            all
+        } else {
+            let rev = REVISION.load(Ordering::Acquire);
+            let all = Arc::new(skeletons(c)?);
+            *st.skeletons.0.lock().unwrap_or_else(PoisonError::into_inner) = Some((rev, Arc::clone(&all)));
+            all
+        };
+        fits_of(c, &all, &id)
+    })
+    .await
 }
 
 /// A name as clip and file names are compared: letters and digits, lowercase (`Run`, `run`, `crouch-idle`).
@@ -290,6 +437,7 @@ pub(crate) fn sort_pack(conn: &Connection, pack_id: &str) -> Result<()> {
 
 /// Turn a model into an animation or back: its kind, its `kind:` tag and, unless someone chose one, its category.
 fn set_kind(conn: &Connection, id: &str, kind: AssetKind) -> Result<()> {
+    REVISION.fetch_add(1, Ordering::AcqRel);
     let category = match kind {
         AssetKind::Animation => "animations",
         _ => "models",
@@ -398,6 +546,10 @@ mod tests {
     }
 
     fn add(c: &Connection, id: &str, path: &str, rig_doc: Option<Value>) {
+        add_to(c, "p", id, path, rig_doc);
+    }
+
+    fn add_to(c: &Connection, pack: &str, id: &str, path: &str, rig_doc: Option<Value>) {
         let ext = path.rsplit_once('.').unwrap().1;
         c.execute(
             "INSERT INTO blobs (hash, size, created_at) VALUES (?1, 1, 'x') ON CONFLICT DO NOTHING",
@@ -406,8 +558,8 @@ mod tests {
         .unwrap();
         c.execute(
             "INSERT INTO assets (id, pack_id, blob_hash, path, name, ext, kind, category, created_at, updated_at)
-             VALUES (?1, 'p', ?2, ?3, ?1, ?4, 'model', 'models', 'x', 'x')",
-            params![id, format!("h-{id}"), path, ext],
+             VALUES (?1, ?5, ?2, ?3, ?1, ?4, 'model', 'models', 'x', 'x')",
+            params![id, format!("h-{id}"), path, ext, pack],
         )
         .unwrap();
         db::upsert_tag(c, id, "kind:model", TagSource::Meta, 1.0).unwrap();
@@ -506,5 +658,76 @@ mod tests {
         sort_pack(&c, "p").unwrap();
         assert_eq!(kind("crouch_blend").0, "model", "nothing left that it was shipped with");
         assert_eq!(kind("run_blend").0, "animation", "still named for its clip");
+    }
+
+    #[test]
+    fn animations_fit_characters_with_their_skeleton_in_any_pack() {
+        let (_dir, pool) = pool();
+        let c = pool.get().unwrap();
+        for (id, name) in [("p", "Heroes"), ("q", "Mocap"), ("r", "Robots")] {
+            c.execute("INSERT INTO packs (id, name, status, created_at) VALUES (?1, ?2, 'ready', 'x')", [id, name])
+                .unwrap();
+        }
+        let names = [
+            "Hips",
+            "Spine",
+            "Spine1",
+            "Spine2",
+            "Neck",
+            "Head",
+            "LeftArm",
+            "LeftForeArm",
+            "LeftHand",
+            "RightArm",
+            "RightForeArm",
+            "RightHand",
+        ];
+        let prefixed = |prefix: &str| names.iter().map(|n| format!("{prefix}{n}")).collect::<Vec<_>>();
+        let (mixamo, armature) = (prefixed("mixamorig:"), prefixed("Armature|"));
+        let mixamo: Vec<&str> = mixamo.iter().map(String::as_str).collect();
+        let armature: Vec<&str> = armature.iter().map(String::as_str).collect();
+        let character = |bones: &[&str]| {
+            let mut nodes = bones.to_vec();
+            nodes.push("Body");
+            gltf(&nodes, &["Body"], true, &[])
+        };
+        let clip = |bones: &[&str], secs: f64| gltf(bones, &[], false, &[("Take", secs, bones)]);
+        let generic: Vec<String> =
+            std::iter::once("Bone".to_owned()).chain((1..12).map(|i| format!("Bone.{i:03}"))).collect();
+        let generic: Vec<&str> = generic.iter().map(String::as_str).collect();
+
+        add_to(&c, "p", "hero", "Hero/hero.fbx", Some(character(&mixamo)));
+        add_to(&c, "p", "hero_glb", "Hero/hero.glb", Some(character(&mixamo)));
+        add_to(&c, "p", "wave", "Hero/wave.fbx", Some(clip(&mixamo, 2.0)));
+        add_to(&c, "p", "nod", "Hero/nod.fbx", Some(clip(&mixamo[..5], 1.0)));
+        add_to(&c, "q", "knight", "Knight/knight.fbx", Some(character(&armature)));
+        add_to(&c, "q", "run", "Clips/run.fbx", Some(clip(&armature, 0.8)));
+        add_to(&c, "q", "shrug", "Clips/shrug.fbx", Some(clip(&armature[..5], 1.5)));
+        add_to(&c, "q", "beep", "Clips/beep.fbx", Some(clip(&generic, 1.0)));
+        add_to(&c, "r", "robot", "robot.fbx", Some(character(&generic)));
+        for id in ["wave", "nod", "run", "shrug", "beep"] {
+            c.execute("UPDATE assets SET kind = 'animation' WHERE id = ?1", [id]).unwrap();
+        }
+        // The pack's own clip for the hero is listed with its links, and the GLB is another format of it.
+        for (from, to, rel) in [("hero", "wave", "animation"), ("hero", "hero_glb", "format")] {
+            c.execute("INSERT INTO asset_links (from_id, to_id, rel) VALUES (?1, ?2, ?3)", [from, to, rel]).unwrap();
+        }
+
+        let all = skeletons(&c).unwrap();
+        let fits = |id: &str| -> Vec<String> { fits_of(&c, &all, id).unwrap().0.into_iter().map(|f| f.id).collect() };
+        // A nod moves a few bones every humanoid has: it fits its own pack's hero, but says nothing of the knight's.
+        assert_eq!(fits("hero"), ["nod", "run"]);
+        assert_eq!(fits("run"), ["knight", "hero"], "its own pack first");
+        assert_eq!(fits("knight"), ["run", "shrug", "wave"]);
+        assert_eq!(fits("nod"), ["hero"]);
+        assert_eq!(fits("beep"), Vec::<String>::new(), "Blender's default names say nothing of the skeleton");
+        assert_eq!(fits("robot"), Vec::<String>::new());
+        let (found, total) = fits_of(&c, &all, "run").unwrap();
+        assert_eq!((found[1].pack_name.as_str(), total), ("Heroes", 2));
+        assert_eq!(fits_of(&c, &all, "wave").unwrap().0[0].secs, None, "characters have no length");
+        assert_eq!(fits_of(&c, &all, "knight").unwrap().0[1].secs, Some(1.5));
+
+        c.execute("UPDATE packs SET archived_at = 'x' WHERE id = 'p'", []).unwrap();
+        assert_eq!(fits("run"), ["knight"]);
     }
 }

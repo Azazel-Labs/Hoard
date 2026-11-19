@@ -3,7 +3,7 @@
 // its variants, and its copies elsewhere. Long lists show their first few.
 import { computed, ref, watch } from 'vue'
 import { thumbUrl, type Asset, type MaterialInfo, type MaterialMap } from '../api'
-import { humanBytes } from '../format'
+import { formatDuration, humanBytes } from '../format'
 import { animsOf, formatsOf, linkLabel, needsOf } from '../assetLinks'
 import { copyFacts } from '../copies'
 import { t } from '../i18n'
@@ -57,6 +57,12 @@ function peek<T>(key: string, items: T[]): T[] {
 const unfold = (key: string) => (unfolded.value = new Set(unfolded.value).add(key))
 const duplicates = computed(() => props.asset.duplicates ?? [])
 const nearCopies = computed(() => props.asset.near_copies ?? [])
+// Across the library: the animations that play on this character's skeleton, or the characters this one plays on.
+const fits = computed(() => props.asset.fits ?? [])
+const fitsHeading = computed(() => {
+  const count = props.asset.fits_total ?? fits.value.length
+  return props.asset.kind === 'animation' ? t('asset-fit-characters', { count }) : t('asset-fit-animations', { count })
+})
 </script>
 
 <template>
@@ -131,6 +137,25 @@ const nearCopies = computed(() => props.asset.near_copies ?? [])
     </ul>
     <button v-if="peek(g.key, g.items).length < g.items.length" type="button" class="linkish small showmore" @click="unfold(g.key)">
       {{ t('asset-show-more', { count: g.items.length - LIST_PEEK }) }}
+    </button>
+  </section>
+
+  <section v-if="fits.length" data-testid="fits">
+    <h3>{{ fitsHeading }}</h3>
+    <ul class="links">
+      <li v-for="f in peek('fits', fits)" :key="f.id">
+        <button type="button" class="link" :style="{ '--kind': `var(--k-${f.kind})` }" :title="f.path" @click="$emit('open', f.id)">
+          <span class="lthumb checker">
+            <img v-if="f.has_thumb" :src="thumbUrl(f)" alt="" loading="lazy" />
+            <KindGlyph v-else :kind="f.kind" :size="22" />
+          </span>
+          <span class="lname">{{ f.name }}</span>
+          <span class="lrel">{{ f.pack_name }}<template v-if="f.secs"> · {{ formatDuration(f.secs) }}</template></span>
+        </button>
+      </li>
+    </ul>
+    <button v-if="peek('fits', fits).length < fits.length" type="button" class="linkish small showmore" @click="unfold('fits')">
+      {{ t('asset-show-more', { count: fits.length - LIST_PEEK }) }}
     </button>
   </section>
 

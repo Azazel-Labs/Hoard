@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "44461da0cdeba10d3eb48df78439e34e0a90628ba002b19657dadfec4a46a08c"
+source = "07a5d1b95cc314af0c57106922c41e00f52076f9beab15651598ab669c3d4515"
 translation = "7d4815ead7ae4f48f80531d797b527d64fdb08460c91b5ac34cf8cada118334a"
 
 [messages.account-add]
@@ -1817,6 +1817,14 @@ translation = "已在你的最愛中（按 F 移除）"
 [messages.asset-file]
 source = "File"
 translation = "檔案"
+
+[messages.asset-fit-animations]
+source = "Animations that fit ({ $count })"
+translation = "適用的動畫 ({ $count })"
+
+[messages.asset-fit-characters]
+source = "Characters it fits ({ $count })"
+translation = "適用的角色 ({ $count })"
 
 [messages.asset-in-pack]
 source = "in"

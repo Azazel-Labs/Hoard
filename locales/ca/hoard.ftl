@@ -1520,6 +1520,8 @@ asset-materials-heading =
     }
 asset-material-maps-aria = { $name }: mapes
 asset-variants = Variants ({ $count } preses)
+asset-fit-animations = Animacions que hi encaixen ({ $count })
+asset-fit-characters = Personatges on encaixa ({ $count })
 asset-copies = Còpies idèntiques
 asset-copies-note = Els mateixos bytes es desen un sol cop; aquests paquets també inclouen aquest fitxer.
 asset-near-copies = Còpies gairebé idèntiques

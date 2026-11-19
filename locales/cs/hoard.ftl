@@ -1623,6 +1623,8 @@ asset-materials-heading =
     }
 asset-material-maps-aria = { $name }: mapy
 asset-variants = Varianty (verzí: { $count })
+asset-fit-animations = Animace, které sedí ({ $count })
+asset-fit-characters = Postavy, na které sedí ({ $count })
 asset-copies = Identické kopie
 asset-copies-note = Stejné bajty se ukládají jen jednou; tento soubor obsahují i tyto balíčky.
 asset-near-copies = Téměř shodné kopie

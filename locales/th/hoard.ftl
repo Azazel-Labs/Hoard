@@ -1401,6 +1401,8 @@ asset-materials-heading =
     }
 asset-material-maps-aria = { $name }: แมป
 asset-variants = รูปแบบย่อย ({ $count } เวอร์ชัน)
+asset-fit-animations = แอนิเมชันที่ใช้ได้ ({ $count })
+asset-fit-characters = ตัวละครที่ใช้ได้ ({ $count })
 asset-copies = สำเนาที่เหมือนกันทุกประการ
 asset-copies-note = ข้อมูลชุดเดียวกันจัดเก็บเพียงครั้งเดียว แพ็กเหล่านี้ก็มีไฟล์นี้เช่นกัน
 asset-near-copies = สำเนาที่เกือบเหมือนกัน

@@ -2453,6 +2453,9 @@ hoard-none-new = Nothing new to collect.
 hoard-collect = Collect
 hoard-unavailable = This browser can’t draw the hoard: { $error }
 hoard-collect-failed = Couldn’t record what you collected: { $error }
+hoard-arcade = Arcade screen
+hoard-full-screen = Full screen
+hoard-leave-full-screen = Leave full screen
 # The picture's text alternative: $count is how many pieces of treasure the pile holds.
 hoard-label = A dragon guarding its hoard. Treasure: { $count }
 # The kinds of treasure in the hoard, each standing for some kinds of asset.

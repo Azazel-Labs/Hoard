@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "4d93dc5d1285fff368850baed9eb7ace4cc4de3024361da1caffbeb82bc9dfe7"
+source = "92d6e5805c476b7ac9c6813dd649bd39381184c5acda7fcb3e78390eb6b37523"
 translation = "b9203115cf8b13a0111214aa1af8cf4a9194f497abfd52d839917124a3498329"
 
 [messages.account-add]
@@ -4834,6 +4834,10 @@ translation = "Wat dit lees"
 source = "Couldn’t make the zip: { $error }"
 translation = "Kon nie die zip maak nie: { $error }"
 
+[messages.hoard-arcade]
+source = "Arcade screen"
+translation = "Arkadeskerm"
+
 [messages.hoard-bones]
 source = "Bones"
 translation = "Bene"
@@ -4850,6 +4854,10 @@ translation = "Versamel"
 source = "Couldn’t record what you collected: { $error }"
 translation = "Kon nie stoor wat jy versamel het nie: { $error }"
 
+[messages.hoard-full-screen]
+source = "Full screen"
+translation = "Volskerm"
+
 [messages.hoard-gems]
 source = "Gems"
 translation = "Edelstene"
@@ -4861,6 +4869,10 @@ translation = "Goud"
 [messages.hoard-label]
 source = "A dragon guarding its hoard. Treasure: { $count }"
 translation = "’n Draak wat sy skat bewaak. Skat: { $count }"
+
+[messages.hoard-leave-full-screen]
+source = "Leave full screen"
+translation = "Verlaat volskerm"
 
 [messages.hoard-new]
 source = "New loot to collect: { $count }"

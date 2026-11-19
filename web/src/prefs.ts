@@ -27,10 +27,12 @@ export interface Prefs {
   packFolders: boolean
   /** The import queue folded down to a small pill in the corner. */
   uploadsCollapsed: boolean
+  /** The dragon hoard (Settings → General) seen through an arcade screen. */
+  hoardArcade: boolean
 }
 
 const KEY = 'hoard.prefs'
-const DEFAULTS: Prefs = { tile: 156, showSupporting: false, collapsed: ['license', 'format', 'blender'], expanded: [], theme: 'system', lightTheme: 'slate', darkTheme: 'graphite', detailWidth: null, detailPage: false, language: 'auto', packFolders: false, uploadsCollapsed: false }
+const DEFAULTS: Prefs = { tile: 156, showSupporting: false, collapsed: ['license', 'format', 'blender'], expanded: [], theme: 'system', lightTheme: 'slate', darkTheme: 'graphite', detailWidth: null, detailPage: false, language: 'auto', packFolders: false, uploadsCollapsed: false, hoardArcade: true }
 
 function load(): Prefs {
   try {

@@ -4,7 +4,8 @@
 // library holds beyond that record is loot still to collect: Collect pours it onto the pile and records it. The
 // library is counted again now and then, so what's added while the page is open turns up as more to collect.
 // A guest has no record, so their hoard is the whole library, and new loot pours straight in.
-// The hoard is drawn by `dragonHoard` (three.js), which is loaded only here.
+// The hoard is drawn by `dragonHoard` (three.js), which is loaded only here. It's seen through an arcade screen unless
+// this browser turned that off, and it can fill the screen.
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { ApiError, api, type AssetKind, type Stats } from '../api'
 import { askToSignIn, auth } from '../auth'
@@ -12,6 +13,7 @@ import type { DragonHoardHandle, HoardCounts, TreasureType } from '../dragonHoar
 import { humanBytes } from '../format'
 import { formatNumber, t } from '../i18n'
 import { KIND_LABEL } from '../kinds'
+import { prefs } from '../prefs'
 import { showError } from '../ui'
 
 const emit = defineEmits<{ unauthorized: [] }>()
@@ -89,6 +91,7 @@ const legend = computed(() =>
   }).filter((r) => r.kinds),
 )
 
+const cave = ref<HTMLElement | null>(null)
 const stage = ref<HTMLElement | null>(null)
 let hoard: DragonHoardHandle | null = null
 let closed = false
@@ -102,6 +105,7 @@ async function mount() {
       counts: treasure(shown.value),
       label: (s) => t('hoard-label', { count: s.total }),
       roarOnClick: true,
+      retro: prefs.hoardArcade,
     })
     await hoard.ready
   } catch (e) {
@@ -114,6 +118,22 @@ async function mount() {
 // The pile follows what's shown: it grows when loot is collected (or, for a guest, added), and shrinks at once when
 // the library does.
 watch(shown, (next) => hoard?.setCounts(treasure(next)))
+watch(() => prefs.hoardArcade, (on) => hoard?.setRetro(on))
+
+/** Whether this browser lets the cave fill the screen (iPhones don't), and whether it does now. */
+const canFill = !!document.fullscreenEnabled
+const filling = ref(false)
+function onFullscreen() {
+  filling.value = !!cave.value && document.fullscreenElement === cave.value
+}
+async function toggleFill() {
+  try {
+    if (document.fullscreenElement) await document.exitFullscreen()
+    else await cave.value?.requestFullscreen()
+  } catch {
+    // Refused (no user gesture, or a policy): the cave stays where it is.
+  }
+}
 
 async function count() {
   try {
@@ -161,8 +181,11 @@ onMounted(async () => {
   await mount()
   recount()
 })
+document.addEventListener('fullscreenchange', onFullscreen)
 onBeforeUnmount(() => {
   closed = true
+  document.removeEventListener('fullscreenchange', onFullscreen)
+  if (filling.value) void document.exitFullscreen().catch(() => {})
   window.clearTimeout(timer)
   hoard?.dispose()
   hoard = null
@@ -174,8 +197,35 @@ onBeforeUnmount(() => {
     <div class="sh"><h3 id="hoard-title">{{ t('hoard-title') }}</h3></div>
     <p class="what">{{ t('hoard-what') }}</p>
 
-    <div class="cave">
+    <div ref="cave" class="cave">
       <div ref="stage" class="stage" />
+      <div class="tools">
+        <button
+          type="button"
+          class="tool"
+          :aria-pressed="prefs.hoardArcade"
+          :title="t('hoard-arcade')"
+          :aria-label="t('hoard-arcade')"
+          @click="prefs.hoardArcade = !prefs.hoardArcade"
+        >
+          <svg viewBox="0 0 16 16" width="15" height="15" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="1.75" y="5" width="12.5" height="9" rx="2" /><path d="M5.5 1.75 8 5l2.5-3.25M11.5 8.25v2.5" />
+          </svg>
+        </button>
+        <button
+          v-if="canFill"
+          type="button"
+          class="tool"
+          :title="filling ? t('hoard-leave-full-screen') : t('hoard-full-screen')"
+          :aria-label="filling ? t('hoard-leave-full-screen') : t('hoard-full-screen')"
+          @click="toggleFill"
+        >
+          <svg viewBox="0 0 16 16" width="15" height="15" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path v-if="filling" d="M6 2v4H2M10 2v4h4M6 14v-4H2M10 14v-4h4" />
+            <path v-else d="M2 6V2h4M14 6V2h-4M2 10v4h4M14 10v4h-4" />
+          </svg>
+        </button>
+      </div>
       <p v-if="unavailable" class="off">{{ t('hoard-unavailable', { error: unavailable }) }}</p>
       <div v-if="loaded" class="loot">
         <template v-if="signedIn">
@@ -218,7 +268,17 @@ onBeforeUnmount(() => {
   border: 1px solid var(--line); box-shadow: var(--elev-1);
   background: radial-gradient(ellipse at 50% 70%, #3a2a1c 0%, #1b1410 55%, #0d0a08 100%);
 }
+.cave:fullscreen { border: 0; border-radius: 0; }
 .stage { position: absolute; inset: 0; }
+/* Small buttons in the corner: the arcade screen on or off, and full screen. */
+.tools { position: absolute; top: 0.6rem; right: 0.6rem; display: flex; gap: 0.35rem; }
+.tool {
+  display: grid; place-items: center; width: 2rem; height: 2rem; padding: 0; border: 1px solid #ffffff1f; border-radius: 8px;
+  background: color-mix(in srgb, #0d0a08 65%, transparent); color: #cbbca6; cursor: pointer; backdrop-filter: blur(4px);
+}
+.tool:hover { color: #f3e7d3; border-color: #ffffff40; }
+.tool:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.tool[aria-pressed='true'] { color: #ffd27a; border-color: #ffd27a59; }
 .off { position: absolute; inset: auto 1rem 50% 1rem; margin: 0; text-align: center; color: #e9dcc8; font-size: var(--step--1); }
 .loot {
   position: absolute; left: 0.75rem; bottom: 0.75rem; display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap;

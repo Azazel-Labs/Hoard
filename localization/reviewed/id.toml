@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "4d93dc5d1285fff368850baed9eb7ace4cc4de3024361da1caffbeb82bc9dfe7"
+source = "92d6e5805c476b7ac9c6813dd649bd39381184c5acda7fcb3e78390eb6b37523"
 translation = "30056587d254fe6b8f2576dc61dbda0e0d1f814731977073ac18b1c1a33112d6"
 
 [messages.account-add]
@@ -4734,6 +4734,10 @@ translation = "Yang dibacanya"
 source = "Couldn’t make the zip: { $error }"
 translation = "Tidak dapat membuat zip: { $error }"
 
+[messages.hoard-arcade]
+source = "Arcade screen"
+translation = "Layar arkade"
+
 [messages.hoard-bones]
 source = "Bones"
 translation = "Tulang"
@@ -4750,6 +4754,10 @@ translation = "Kumpulkan"
 source = "Couldn’t record what you collected: { $error }"
 translation = "Tidak bisa mencatat yang Anda kumpulkan: { $error }"
 
+[messages.hoard-full-screen]
+source = "Full screen"
+translation = "Layar penuh"
+
 [messages.hoard-gems]
 source = "Gems"
 translation = "Permata"
@@ -4761,6 +4769,10 @@ translation = "Emas"
 [messages.hoard-label]
 source = "A dragon guarding its hoard. Treasure: { $count }"
 translation = "Seekor naga menjaga harta karunnya. Harta: { $count }"
+
+[messages.hoard-leave-full-screen]
+source = "Leave full screen"
+translation = "Keluar dari layar penuh"
 
 [messages.hoard-new]
 source = "New loot to collect: { $count }"

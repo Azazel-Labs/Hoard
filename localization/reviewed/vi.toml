@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "4d93dc5d1285fff368850baed9eb7ace4cc4de3024361da1caffbeb82bc9dfe7"
+source = "92d6e5805c476b7ac9c6813dd649bd39381184c5acda7fcb3e78390eb6b37523"
 translation = "42d6d2350a51c56e55a07a75988a6748d9e232912ffffb903defbf54bfd56e2e"
 
 [messages.account-add]
@@ -4731,6 +4731,10 @@ translation = "Những gì nó đọc được"
 source = "Couldn’t make the zip: { $error }"
 translation = "Không thể tạo tệp zip: { $error }"
 
+[messages.hoard-arcade]
+source = "Arcade screen"
+translation = "Màn hình máy arcade"
+
 [messages.hoard-bones]
 source = "Bones"
 translation = "Xương"
@@ -4747,6 +4751,10 @@ translation = "Thu thập"
 source = "Couldn’t record what you collected: { $error }"
 translation = "Không thể ghi lại những gì bạn đã thu thập: { $error }"
 
+[messages.hoard-full-screen]
+source = "Full screen"
+translation = "Toàn màn hình"
+
 [messages.hoard-gems]
 source = "Gems"
 translation = "Đá quý"
@@ -4758,6 +4766,10 @@ translation = "Vàng"
 [messages.hoard-label]
 source = "A dragon guarding its hoard. Treasure: { $count }"
 translation = "Một con rồng canh giữ kho báu của nó. Báu vật: { $count }"
+
+[messages.hoard-leave-full-screen]
+source = "Leave full screen"
+translation = "Thoát toàn màn hình"
 
 [messages.hoard-new]
 source = "New loot to collect: { $count }"

@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "4d93dc5d1285fff368850baed9eb7ace4cc4de3024361da1caffbeb82bc9dfe7"
+source = "92d6e5805c476b7ac9c6813dd649bd39381184c5acda7fcb3e78390eb6b37523"
 translation = "869ed1fc3b055273469332423634413363dc2f8fea2bf697f2d9d0791df51865"
 
 [messages.account-add]
@@ -4745,6 +4745,10 @@ translation = "読み取る内容"
 source = "Couldn’t make the zip: { $error }"
 translation = "zip を作成できませんでした: { $error }"
 
+[messages.hoard-arcade]
+source = "Arcade screen"
+translation = "アーケード画面"
+
 [messages.hoard-bones]
 source = "Bones"
 translation = "骨"
@@ -4761,6 +4765,10 @@ translation = "集める"
 source = "Couldn’t record what you collected: { $error }"
 translation = "集めたものを記録できませんでした: { $error }"
 
+[messages.hoard-full-screen]
+source = "Full screen"
+translation = "全画面表示"
+
 [messages.hoard-gems]
 source = "Gems"
 translation = "宝石"
@@ -4772,6 +4780,10 @@ translation = "金貨"
 [messages.hoard-label]
 source = "A dragon guarding its hoard. Treasure: { $count }"
 translation = "宝の山を守るドラゴン。宝物: { $count }"
+
+[messages.hoard-leave-full-screen]
+source = "Leave full screen"
+translation = "全画面表示を終了"
 
 [messages.hoard-new]
 source = "New loot to collect: { $count }"

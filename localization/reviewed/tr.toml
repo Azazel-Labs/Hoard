@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "4d93dc5d1285fff368850baed9eb7ace4cc4de3024361da1caffbeb82bc9dfe7"
+source = "92d6e5805c476b7ac9c6813dd649bd39381184c5acda7fcb3e78390eb6b37523"
 translation = "365b0fc7ff648476ee75c67213c00d18e7b3e0fb9f940664032b9c834c675ffb"
 
 [messages.account-add]
@@ -4744,6 +4744,10 @@ translation = "Ne okuyor"
 source = "Couldn’t make the zip: { $error }"
 translation = "Zip oluşturulamadı: { $error }"
 
+[messages.hoard-arcade]
+source = "Arcade screen"
+translation = "Atari ekranı"
+
 [messages.hoard-bones]
 source = "Bones"
 translation = "Kemikler"
@@ -4760,6 +4764,10 @@ translation = "Topla"
 source = "Couldn’t record what you collected: { $error }"
 translation = "Topladıklarınız kaydedilemedi: { $error }"
 
+[messages.hoard-full-screen]
+source = "Full screen"
+translation = "Tam ekran"
+
 [messages.hoard-gems]
 source = "Gems"
 translation = "Mücevherler"
@@ -4771,6 +4779,10 @@ translation = "Altın"
 [messages.hoard-label]
 source = "A dragon guarding its hoard. Treasure: { $count }"
 translation = "Hazinesini koruyan bir ejderha. Hazine: { $count }"
+
+[messages.hoard-leave-full-screen]
+source = "Leave full screen"
+translation = "Tam ekrandan çıkın"
 
 [messages.hoard-new]
 source = "New loot to collect: { $count }"

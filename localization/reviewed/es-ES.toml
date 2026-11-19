@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "4d93dc5d1285fff368850baed9eb7ace4cc4de3024361da1caffbeb82bc9dfe7"
+source = "92d6e5805c476b7ac9c6813dd649bd39381184c5acda7fcb3e78390eb6b37523"
 translation = "8b5fa45772f1b768715bb243cf724d7c57dc2f5208043d87b201e40c17dc1980"
 
 [messages.account-add]
@@ -4850,6 +4850,10 @@ translation = "Lo que lee"
 source = "Couldn’t make the zip: { $error }"
 translation = "No se ha podido crear el zip: { $error }"
 
+[messages.hoard-arcade]
+source = "Arcade screen"
+translation = "Pantalla de recreativa"
+
 [messages.hoard-bones]
 source = "Bones"
 translation = "Huesos"
@@ -4866,6 +4870,10 @@ translation = "Recoger"
 source = "Couldn’t record what you collected: { $error }"
 translation = "No se ha podido guardar lo que has recogido: { $error }"
 
+[messages.hoard-full-screen]
+source = "Full screen"
+translation = "Pantalla completa"
+
 [messages.hoard-gems]
 source = "Gems"
 translation = "Gemas"
@@ -4877,6 +4885,10 @@ translation = "Oro"
 [messages.hoard-label]
 source = "A dragon guarding its hoard. Treasure: { $count }"
 translation = "Un dragón que custodia su tesoro. Piezas: { $count }"
+
+[messages.hoard-leave-full-screen]
+source = "Leave full screen"
+translation = "Salir de pantalla completa"
 
 [messages.hoard-new]
 source = "New loot to collect: { $count }"

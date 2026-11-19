@@ -19,6 +19,16 @@ test.describe('the dragon hoard', () => {
     const seen = ((await (await api.get('/api/me/hoard')).json()) as Seen).seen!
     expect(Object.values(seen).reduce((a, b) => a + b, 0)).toBeGreaterThan(0)
 
+    // Seen through an arcade screen unless turned off, and it can fill the screen.
+    const arcade = cave.getByRole('button', { name: 'Arcade screen' })
+    await expect(arcade).toHaveAttribute('aria-pressed', 'true')
+    await arcade.click()
+    await expect(arcade).toHaveAttribute('aria-pressed', 'false')
+    await cave.getByRole('button', { name: 'Full screen' }).click()
+    await expect(cave.getByRole('button', { name: 'Leave full screen' })).toBeVisible()
+    await cave.getByRole('button', { name: 'Leave full screen' }).click()
+    await expect(cave.getByRole('button', { name: 'Full screen' })).toBeVisible()
+
     // The record names kinds of asset, in lowercase letters.
     expect((await api.put('/api/me/hoard', { data: { seen: { 'Not A Kind': 1 } } })).status()).toBe(400)
   })

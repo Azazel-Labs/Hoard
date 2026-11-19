@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "4d93dc5d1285fff368850baed9eb7ace4cc4de3024361da1caffbeb82bc9dfe7"
+source = "92d6e5805c476b7ac9c6813dd649bd39381184c5acda7fcb3e78390eb6b37523"
 translation = "530e3768e270ecc495434269d0aa7741f64471672a3fe92dbc9787949d17edcc"
 
 [messages.account-add]
@@ -4742,6 +4742,10 @@ translation = "读取结果"
 source = "Couldn’t make the zip: { $error }"
 translation = "无法生成 zip：{ $error }"
 
+[messages.hoard-arcade]
+source = "Arcade screen"
+translation = "街机屏幕"
+
 [messages.hoard-bones]
 source = "Bones"
 translation = "骨头"
@@ -4758,6 +4762,10 @@ translation = "收集"
 source = "Couldn’t record what you collected: { $error }"
 translation = "无法记录你收集的内容：{ $error }"
 
+[messages.hoard-full-screen]
+source = "Full screen"
+translation = "全屏"
+
 [messages.hoard-gems]
 source = "Gems"
 translation = "宝石"
@@ -4769,6 +4777,10 @@ translation = "金币"
 [messages.hoard-label]
 source = "A dragon guarding its hoard. Treasure: { $count }"
 translation = "一条守护宝藏的龙。宝物：{ $count }"
+
+[messages.hoard-leave-full-screen]
+source = "Leave full screen"
+translation = "退出全屏"
 
 [messages.hoard-new]
 source = "New loot to collect: { $count }"

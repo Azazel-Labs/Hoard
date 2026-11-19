@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "4d93dc5d1285fff368850baed9eb7ace4cc4de3024361da1caffbeb82bc9dfe7"
+source = "92d6e5805c476b7ac9c6813dd649bd39381184c5acda7fcb3e78390eb6b37523"
 translation = "9bd6df5ffb27941fd7574669812413d7eaa17a0920718334cfd6ce3df12e13f5"
 
 [messages.account-add]
@@ -4850,6 +4850,10 @@ translation = "Mitä se lukee"
 source = "Couldn’t make the zip: { $error }"
 translation = "Zipin luonti epäonnistui: { $error }"
 
+[messages.hoard-arcade]
+source = "Arcade screen"
+translation = "Pelihallinäyttö"
+
 [messages.hoard-bones]
 source = "Bones"
 translation = "Luita"
@@ -4866,6 +4870,10 @@ translation = "Kerää"
 source = "Couldn’t record what you collected: { $error }"
 translation = "Keräämiäsi ei voitu tallentaa: { $error }"
 
+[messages.hoard-full-screen]
+source = "Full screen"
+translation = "Koko näyttö"
+
 [messages.hoard-gems]
 source = "Gems"
 translation = "Jalokiviä"
@@ -4877,6 +4885,10 @@ translation = "Kultaa"
 [messages.hoard-label]
 source = "A dragon guarding its hoard. Treasure: { $count }"
 translation = "Lohikäärme vartioi aarrettaan. Aarteita: { $count }"
+
+[messages.hoard-leave-full-screen]
+source = "Leave full screen"
+translation = "Poistu koko näytöstä"
 
 [messages.hoard-new]
 source = "New loot to collect: { $count }"

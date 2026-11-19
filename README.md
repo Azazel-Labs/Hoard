@@ -1220,9 +1220,10 @@ thumbnails, the update check, workers, limits, the public address, HTTPS, sign-i
 **Settings → General** opens on your dragon's hoard: every asset in the library is a piece of treasure (gold for
 textures and materials, gems for models, weapons for sounds, bones for animations, rune tablets for fonts, paintings
 for vector art and video, potions for sprite sheets, books for the rest). Each account keeps its own pile: what's been
-added since you last looked is loot to collect, and **Collect** pours it in. Under it are the library's totals. For an
-admin, the page also names the server: the name is shown in the top bar, the browser tab and on the sign-in page, for
-telling several hoards apart.
+added since you last looked is loot to collect, and **Collect** pours it in. The hoard is seen through an arcade screen
+(the button in its corner turns that off, for this browser) and can fill the screen. Under it are the library's totals.
+For an admin, the page also names the server: the name is shown in the top bar, the browser tab and on the sign-in
+page, for telling several hoards apart.
 
 Set before starting (these need a restart):
 

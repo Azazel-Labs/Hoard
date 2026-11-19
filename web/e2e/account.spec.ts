@@ -222,10 +222,15 @@ test.describe('account', () => {
 
           await page.goto('/#settings/account')
           const nav = page.getByRole('navigation', { name: 'Settings' })
-          await expect(nav.getByRole('button')).toHaveText(['Appearance', 'Library', 'Near copies', 'Account'])
+          await expect(nav.getByRole('button')).toHaveText(['General', 'Appearance', 'Library', 'Near copies', 'Account'])
           await expect(page.getByText('can look but not change anything')).toBeVisible()
           await expect(page.getByRole('heading', { name: 'People' })).toHaveCount(0)
           await expect(page.getByLabel('What it can do').locator('option')).toHaveText(['Can look'])
+
+          // General is everyone's: their own hoard, without the server's name, which only an admin sets.
+          await nav.getByRole('button', { name: 'General' }).click()
+          await expect(page.getByRole('heading', { name: 'Your hoard' })).toBeVisible()
+          await expect(page.locator('.cave').getByRole('button', { name: 'Collect' })).toBeVisible()
         } finally {
           await looker.ctx.dispose()
           await admin.delete(`/api/admin/users/${looker.id}`)

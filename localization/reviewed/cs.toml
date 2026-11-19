@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "4d93dc5d1285fff368850baed9eb7ace4cc4de3024361da1caffbeb82bc9dfe7"
+source = "92d6e5805c476b7ac9c6813dd649bd39381184c5acda7fcb3e78390eb6b37523"
 translation = "d2d82856aba060f1fca3b326d63684dcbaa143f941e3bdd05f930d4179bd4d37"
 
 [messages.account-add]
@@ -4892,6 +4892,10 @@ translation = "Co přečte"
 source = "Couldn’t make the zip: { $error }"
 translation = "Zip se nepodařilo vytvořit: { $error }"
 
+[messages.hoard-arcade]
+source = "Arcade screen"
+translation = "Obrazovka arkádového automatu"
+
 [messages.hoard-bones]
 source = "Bones"
 translation = "Kosti"
@@ -4908,6 +4912,10 @@ translation = "Sebrat"
 source = "Couldn’t record what you collected: { $error }"
 translation = "Nepodařilo se uložit, co jste sebrali: { $error }"
 
+[messages.hoard-full-screen]
+source = "Full screen"
+translation = "Celá obrazovka"
+
 [messages.hoard-gems]
 source = "Gems"
 translation = "Drahokamy"
@@ -4919,6 +4927,10 @@ translation = "Zlato"
 [messages.hoard-label]
 source = "A dragon guarding its hoard. Treasure: { $count }"
 translation = "Drak střežící svůj poklad. Kusů pokladu: { $count }"
+
+[messages.hoard-leave-full-screen]
+source = "Leave full screen"
+translation = "Ukončit celou obrazovku"
 
 [messages.hoard-new]
 source = "New loot to collect: { $count }"

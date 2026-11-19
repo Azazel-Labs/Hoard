@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "4d93dc5d1285fff368850baed9eb7ace4cc4de3024361da1caffbeb82bc9dfe7"
+source = "92d6e5805c476b7ac9c6813dd649bd39381184c5acda7fcb3e78390eb6b37523"
 translation = "230aa92a6033cfd0e81420ca5ef21ba788bfd9cbf50cc6964032f8c9499222bf"
 
 [messages.account-add]
@@ -4740,6 +4740,10 @@ translation = "Amit beolvas"
 source = "Couldn’t make the zip: { $error }"
 translation = "Nem sikerült elkészíteni a zipet: { $error }"
 
+[messages.hoard-arcade]
+source = "Arcade screen"
+translation = "Játéktermi képernyő"
+
 [messages.hoard-bones]
 source = "Bones"
 translation = "Csontok"
@@ -4756,6 +4760,10 @@ translation = "Begyűjtés"
 source = "Couldn’t record what you collected: { $error }"
 translation = "Nem sikerült menteni, amit begyűjtött: { $error }"
 
+[messages.hoard-full-screen]
+source = "Full screen"
+translation = "Teljes képernyő"
+
 [messages.hoard-gems]
 source = "Gems"
 translation = "Drágakövek"
@@ -4767,6 +4775,10 @@ translation = "Arany"
 [messages.hoard-label]
 source = "A dragon guarding its hoard. Treasure: { $count }"
 translation = "Egy sárkány őrzi a kincsét. Kincsdarabok: { $count }"
+
+[messages.hoard-leave-full-screen]
+source = "Leave full screen"
+translation = "Kilépés a teljes képernyőből"
 
 [messages.hoard-new]
 source = "New loot to collect: { $count }"

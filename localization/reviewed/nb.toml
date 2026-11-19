@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "4d93dc5d1285fff368850baed9eb7ace4cc4de3024361da1caffbeb82bc9dfe7"
+source = "92d6e5805c476b7ac9c6813dd649bd39381184c5acda7fcb3e78390eb6b37523"
 translation = "233736fce877dd72d5c0840b380752036aeadf00268c938b28bf55f6d4bddad5"
 
 [messages.account-add]
@@ -4834,6 +4834,10 @@ translation = "Hva det leser"
 source = "Couldn’t make the zip: { $error }"
 translation = "Kunne ikke lage zip-filen: { $error }"
 
+[messages.hoard-arcade]
+source = "Arcade screen"
+translation = "Arkadeskjerm"
+
 [messages.hoard-bones]
 source = "Bones"
 translation = "Knokler"
@@ -4850,6 +4854,10 @@ translation = "Samle inn"
 source = "Couldn’t record what you collected: { $error }"
 translation = "Kunne ikke lagre det du samlet inn: { $error }"
 
+[messages.hoard-full-screen]
+source = "Full screen"
+translation = "Fullskjerm"
+
 [messages.hoard-gems]
 source = "Gems"
 translation = "Edelsteiner"
@@ -4861,6 +4869,10 @@ translation = "Gull"
 [messages.hoard-label]
 source = "A dragon guarding its hoard. Treasure: { $count }"
 translation = "En drage som vokter skatten sin. Skatter: { $count }"
+
+[messages.hoard-leave-full-screen]
+source = "Leave full screen"
+translation = "Avslutt fullskjerm"
 
 [messages.hoard-new]
 source = "New loot to collect: { $count }"

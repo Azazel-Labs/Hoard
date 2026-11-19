@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "4d93dc5d1285fff368850baed9eb7ace4cc4de3024361da1caffbeb82bc9dfe7"
+source = "92d6e5805c476b7ac9c6813dd649bd39381184c5acda7fcb3e78390eb6b37523"
 translation = "07555d54b3ba6bc94b6fcbf55672d1be5e77ca134c96e30754ee929b3a902828"
 
 [messages.account-add]
@@ -4734,6 +4734,10 @@ translation = "สิ่งที่อ่านได้"
 source = "Couldn’t make the zip: { $error }"
 translation = "สร้างไฟล์ zip ไม่ได้: { $error }"
 
+[messages.hoard-arcade]
+source = "Arcade screen"
+translation = "จออาร์เคด"
+
 [messages.hoard-bones]
 source = "Bones"
 translation = "กระดูก"
@@ -4750,6 +4754,10 @@ translation = "เก็บ"
 source = "Couldn’t record what you collected: { $error }"
 translation = "บันทึกสิ่งที่คุณเก็บไม่ได้: { $error }"
 
+[messages.hoard-full-screen]
+source = "Full screen"
+translation = "เต็มจอ"
+
 [messages.hoard-gems]
 source = "Gems"
 translation = "อัญมณี"
@@ -4761,6 +4769,10 @@ translation = "ทองคำ"
 [messages.hoard-label]
 source = "A dragon guarding its hoard. Treasure: { $count }"
 translation = "มังกรเฝ้าขุมทรัพย์ของมัน สมบัติ: { $count }"
+
+[messages.hoard-leave-full-screen]
+source = "Leave full screen"
+translation = "ออกจากโหมดเต็มจอ"
 
 [messages.hoard-new]
 source = "New loot to collect: { $count }"

@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "4d93dc5d1285fff368850baed9eb7ace4cc4de3024361da1caffbeb82bc9dfe7"
+source = "92d6e5805c476b7ac9c6813dd649bd39381184c5acda7fcb3e78390eb6b37523"
 translation = "cb51eeebee58ce4e694b9c22ec1e26a19090d24e80d9b74b0e431ca3fa274b7f"
 
 [messages.account-add]
@@ -4728,6 +4728,10 @@ translation = "읽어 낸 내용"
 source = "Couldn’t make the zip: { $error }"
 translation = "zip을 만들지 못했습니다: { $error }"
 
+[messages.hoard-arcade]
+source = "Arcade screen"
+translation = "아케이드 화면"
+
 [messages.hoard-bones]
 source = "Bones"
 translation = "뼈"
@@ -4744,6 +4748,10 @@ translation = "모으기"
 source = "Couldn’t record what you collected: { $error }"
 translation = "모은 것을 기록하지 못했습니다: { $error }"
 
+[messages.hoard-full-screen]
+source = "Full screen"
+translation = "전체 화면"
+
 [messages.hoard-gems]
 source = "Gems"
 translation = "보석"
@@ -4755,6 +4763,10 @@ translation = "금"
 [messages.hoard-label]
 source = "A dragon guarding its hoard. Treasure: { $count }"
 translation = "보물 더미를 지키는 용. 보물: { $count }"
+
+[messages.hoard-leave-full-screen]
+source = "Leave full screen"
+translation = "전체 화면 종료"
 
 [messages.hoard-new]
 source = "New loot to collect: { $count }"

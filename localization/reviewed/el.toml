@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "4d93dc5d1285fff368850baed9eb7ace4cc4de3024361da1caffbeb82bc9dfe7"
+source = "92d6e5805c476b7ac9c6813dd649bd39381184c5acda7fcb3e78390eb6b37523"
 translation = "72f8bea74267d1a6341481bb8f995cf690d50c49c33ba6825335f86fe2349868"
 
 [messages.account-add]
@@ -4855,6 +4855,10 @@ translation = "Τι διαβάζει"
 source = "Couldn’t make the zip: { $error }"
 translation = "Δεν ήταν δυνατή η δημιουργία του zip: { $error }"
 
+[messages.hoard-arcade]
+source = "Arcade screen"
+translation = "Οθόνη arcade"
+
 [messages.hoard-bones]
 source = "Bones"
 translation = "Κόκαλα"
@@ -4871,6 +4875,10 @@ translation = "Μαζέψτε"
 source = "Couldn’t record what you collected: { $error }"
 translation = "Δεν ήταν δυνατή η καταγραφή όσων μαζέψατε: { $error }"
 
+[messages.hoard-full-screen]
+source = "Full screen"
+translation = "Πλήρης οθόνη"
+
 [messages.hoard-gems]
 source = "Gems"
 translation = "Πολύτιμοι λίθοι"
@@ -4882,6 +4890,10 @@ translation = "Χρυσός"
 [messages.hoard-label]
 source = "A dragon guarding its hoard. Treasure: { $count }"
 translation = "Ένας δράκος φυλάει τον θησαυρό του. Κομμάτια: { $count }"
+
+[messages.hoard-leave-full-screen]
+source = "Leave full screen"
+translation = "Έξοδος από πλήρη οθόνη"
 
 [messages.hoard-new]
 source = "New loot to collect: { $count }"

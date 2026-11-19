@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "4d93dc5d1285fff368850baed9eb7ace4cc4de3024361da1caffbeb82bc9dfe7"
+source = "92d6e5805c476b7ac9c6813dd649bd39381184c5acda7fcb3e78390eb6b37523"
 translation = "973d5a6f0a6763be6bbc6bb0a4a118df31a18ed5e5823c6c023d2d871324479b"
 
 [messages.account-add]
@@ -4926,6 +4926,10 @@ translation = "Що він читає"
 source = "Couldn’t make the zip: { $error }"
 translation = "Не вдалося створити zip: { $error }"
 
+[messages.hoard-arcade]
+source = "Arcade screen"
+translation = "Екран ігрового автомата"
+
 [messages.hoard-bones]
 source = "Bones"
 translation = "Кістки"
@@ -4942,6 +4946,10 @@ translation = "Зібрати"
 source = "Couldn’t record what you collected: { $error }"
 translation = "Не вдалося зберегти зібране: { $error }"
 
+[messages.hoard-full-screen]
+source = "Full screen"
+translation = "На весь екран"
+
 [messages.hoard-gems]
 source = "Gems"
 translation = "Самоцвіти"
@@ -4953,6 +4961,10 @@ translation = "Золото"
 [messages.hoard-label]
 source = "A dragon guarding its hoard. Treasure: { $count }"
 translation = "Дракон стереже свій скарб. Скарбів: { $count }"
+
+[messages.hoard-leave-full-screen]
+source = "Leave full screen"
+translation = "Вийти з повноекранного режиму"
 
 [messages.hoard-new]
 source = "New loot to collect: { $count }"

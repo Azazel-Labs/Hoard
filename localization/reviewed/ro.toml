@@ -4,6 +4,114 @@ version = 2
 source = "e1344c08185f94cb913b7f768b484062e60a7efa9c188f9df6855a10b4845b3c"
 translation = "b55341580f211df7c2e93d7e2151a43b1df4143c95e45daaecdf4cfd924d17fd"
 
+[messages.about-blender]
+source = "Converts 3D models and makes their thumbnails."
+translation = "Convertește modele 3D și le creează miniaturile."
+
+[messages.about-built-with]
+source = "Built with"
+translation = "Construit cu"
+
+[messages.about-built-with-what]
+source = "The open source libraries Hoard is made from, with their licenses."
+translation = "Bibliotecile open source din care este făcut Hoard, cu licențele lor."
+
+[messages.about-clap]
+source = "Finds sounds by what they sound like."
+translation = "Găsește sunete după cum sună."
+
+[messages.about-count]
+source = "{ $shown } of { $total }"
+translation = "{ $shown } din { $total }"
+
+[messages.about-downloaded]
+source = "Downloaded when needed"
+translation = "Descărcate la nevoie"
+
+[messages.about-downloaded-what]
+source = "Hoard doesn’t come with these. It downloads each one the first time something needs it, and each comes under its own license."
+translation = "Hoard nu vine cu acestea. Descarcă fiecare dintre ele prima dată când ceva are nevoie de el, iar fiecare are propria licență."
+
+[messages.about-edition]
+source = "Edition"
+translation = "Ediție"
+
+[messages.about-edition-desktop]
+source = "Desktop app"
+translation = "Aplicație desktop"
+
+[messages.about-edition-server]
+source = "Server"
+translation = "Server"
+
+[messages.about-edition-steam]
+source = "Desktop app from Steam"
+translation = "Aplicație desktop de pe Steam"
+
+[messages.about-ffmpeg]
+source = "Converts sound and video and makes their previews."
+translation = "Convertește sunet și video și le creează previzualizările."
+
+[messages.about-filter]
+source = "Filter by name or license"
+translation = "Filtrați după nume sau licență"
+
+[messages.about-issues]
+source = "Report a problem"
+translation = "Raportați o problemă"
+
+[messages.about-license]
+source = "License"
+translation = "Licență"
+
+[messages.about-license-what]
+source = "Hoard is open source under the MIT No Attribution license: use it, change it and share it however you like."
+translation = "Hoard este open source sub licența MIT No Attribution: îl puteți folosi, modifica și distribui cum doriți."
+
+[messages.about-licenses-failed]
+source = "The list couldn’t be loaded."
+translation = "Lista nu a putut fi încărcată."
+
+[messages.about-licenses-loading]
+source = "Loading the list…"
+translation = "Se încarcă lista…"
+
+[messages.about-made-by]
+source = "Made by"
+translation = "Creat de"
+
+[messages.about-models]
+source = "Models you pick for the local AI server come under their makers’ licenses."
+translation = "Modelele pe care le alegeți pentru serverul AI local sunt supuse licențelor autorilor lor."
+
+[messages.about-no-license]
+source = "No license given"
+translation = "Nicio licență indicată"
+
+[messages.about-siglip]
+source = "Finds pictures by what’s in them."
+translation = "Găsește imagini după ce se vede în ele."
+
+[messages.about-source]
+source = "Source code on GitHub"
+translation = "Codul sursă pe GitHub"
+
+[messages.about-steam]
+source = "Hoard on Steam"
+translation = "Hoard pe Steam"
+
+[messages.about-steamworks]
+source = "The Steam build also includes the Steamworks SDK, © Valve Corporation."
+translation = "Versiunea Steam include și Steamworks SDK, © Valve Corporation."
+
+[messages.about-version]
+source = "Version"
+translation = "Versiune"
+
+[messages.about-what]
+source = "Hoard keeps game assets (models, textures, sounds, music, sprites and more) in one library you can search, preview and take from, shared with everyone you let in."
+translation = "Hoard păstrează resursele pentru jocuri (modele, texturi, sunete, muzică, sprite-uri și altele) într-o singură bibliotecă în care puteți căuta, previzualiza și din care puteți lua, partajată cu toți cei cărora le dați acces."
+
 [messages.account-add]
 source = "Add"
 translation = "Adăugați"
@@ -9512,6 +9620,14 @@ translation = "Cum se numește această bibliotecă în bara de sus."
 [messages.settings-option-saved]
 source = "{ $name }: { $value }"
 translation = "{ $name }: { $value }"
+
+[messages.settings-page-about]
+source = "About"
+translation = "Despre"
+
+[messages.settings-page-about-blurb]
+source = "What Hoard is, which version this is, and the work of others it’s made with."
+translation = "Ce este Hoard, ce versiune este aceasta și munca altora din care este făcut."
 
 [messages.settings-page-account]
 source = "Account"

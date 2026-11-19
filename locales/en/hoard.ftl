@@ -2638,6 +2638,8 @@ settings-page-issues = Issues
 settings-page-issues-blurb = What went wrong opening or processing files: archives that wouldn’t unpack, files that couldn’t be read, jobs that failed. Try them again once the cause is fixed, or dismiss them.
 settings-page-maintenance = Maintenance
 settings-page-maintenance-blurb = Back up, check for damage and tidy up. One of each runs at a time, and you can leave this page while they do.
+settings-page-about = About
+settings-page-about-blurb = What Hoard is, which version this is, and the work of others it’s made with.
 # Shown on a reset button and in the note after a reset: what a setting goes back to.
 settings-the-default = the default
 settings-default-on = on
@@ -3108,6 +3110,38 @@ settings-updates = Updates
 settings-version = This is Hoard { $version }.
 settings-update-check = Check GitHub every few hours for a new release
 settings-desktop-updates = Hoard looks for a new release each time it starts, downloads it in the background, and installs it when you quit.
+
+## AboutPanel.vue (Settings → About)
+
+about-what = Hoard keeps game assets (models, textures, sounds, music, sprites and more) in one library you can search, preview and take from, shared with everyone you let in.
+about-version = Version
+about-edition = Edition
+# Which build this is: the server (in a browser), the desktop app, or the desktop app bought on Steam.
+about-edition-server = Server
+about-edition-desktop = Desktop app
+about-edition-steam = Desktop app from Steam
+about-made-by = Made by
+about-source = Source code on GitHub
+about-issues = Report a problem
+about-steam = Hoard on Steam
+about-license = License
+about-license-what = Hoard is open source under the MIT No Attribution license: use it, change it and share it however you like.
+about-downloaded = Downloaded when needed
+about-downloaded-what = Hoard doesn’t come with these. It downloads each one the first time something needs it, and each comes under its own license.
+about-blender = Converts 3D models and makes their thumbnails.
+about-ffmpeg = Converts sound and video and makes their previews.
+about-siglip = Finds pictures by what’s in them.
+about-clap = Finds sounds by what they sound like.
+about-models = Models you pick for the local AI server come under their makers’ licenses.
+about-built-with = Built with
+about-built-with-what = The open source libraries Hoard is made from, with their licenses.
+about-steamworks = The Steam build also includes the Steamworks SDK, © Valve Corporation.
+about-licenses-loading = Loading the list…
+about-licenses-failed = The list couldn’t be loaded.
+about-filter = Filter by name or license
+# How many libraries the filter leaves, of all of them.
+about-count = { $shown } of { $total }
+about-no-license = No license given
 
 ## Asset kinds (api.ts)
 

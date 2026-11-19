@@ -4,6 +4,114 @@ version = 2
 source = "e1344c08185f94cb913b7f768b484062e60a7efa9c188f9df6855a10b4845b3c"
 translation = "6631e65f7dae2caa7032820d33d84d05c292333c49e0327c9499c7de22d17b3d"
 
+[messages.about-blender]
+source = "Converts 3D models and makes their thumbnails."
+translation = "3D-modelleket alakít át és bélyegképeket készít róluk."
+
+[messages.about-built-with]
+source = "Built with"
+translation = "Felhasznált összetevők"
+
+[messages.about-built-with-what]
+source = "The open source libraries Hoard is made from, with their licenses."
+translation = "A nyílt forráskódú könyvtárak, amelyekből a Hoard készült, a licenceikkel."
+
+[messages.about-clap]
+source = "Finds sounds by what they sound like."
+translation = "Hangokat keres aszerint, hogy milyennek hangzanak."
+
+[messages.about-count]
+source = "{ $shown } of { $total }"
+translation = "{ $shown } / { $total }"
+
+[messages.about-downloaded]
+source = "Downloaded when needed"
+translation = "Szükség esetén letöltve"
+
+[messages.about-downloaded-what]
+source = "Hoard doesn’t come with these. It downloads each one the first time something needs it, and each comes under its own license."
+translation = "Ezek nem részei a Hoardnak. Mindegyiket akkor tölti le, amikor először szükség van rá, és mindegyikre a saját licence vonatkozik."
+
+[messages.about-edition]
+source = "Edition"
+translation = "Kiadás"
+
+[messages.about-edition-desktop]
+source = "Desktop app"
+translation = "Asztali alkalmazás"
+
+[messages.about-edition-server]
+source = "Server"
+translation = "Szerver"
+
+[messages.about-edition-steam]
+source = "Desktop app from Steam"
+translation = "Asztali alkalmazás a Steamről"
+
+[messages.about-ffmpeg]
+source = "Converts sound and video and makes their previews."
+translation = "Hangot és videót alakít át és előnézetet készít róluk."
+
+[messages.about-filter]
+source = "Filter by name or license"
+translation = "Szűrés név vagy licenc szerint"
+
+[messages.about-issues]
+source = "Report a problem"
+translation = "Hiba bejelentése"
+
+[messages.about-license]
+source = "License"
+translation = "Licenc"
+
+[messages.about-license-what]
+source = "Hoard is open source under the MIT No Attribution license: use it, change it and share it however you like."
+translation = "A Hoard nyílt forráskódú, MIT No Attribution licenccel: használhatja, módosíthatja és megoszthatja, ahogy csak szeretné."
+
+[messages.about-licenses-failed]
+source = "The list couldn’t be loaded."
+translation = "A listát nem sikerült betölteni."
+
+[messages.about-licenses-loading]
+source = "Loading the list…"
+translation = "A lista betöltése…"
+
+[messages.about-made-by]
+source = "Made by"
+translation = "Készítette"
+
+[messages.about-models]
+source = "Models you pick for the local AI server come under their makers’ licenses."
+translation = "A helyi MI-szerverhez választott modellekre készítőik licence vonatkozik."
+
+[messages.about-no-license]
+source = "No license given"
+translation = "Nincs megadott licenc"
+
+[messages.about-siglip]
+source = "Finds pictures by what’s in them."
+translation = "Képeket keres aszerint, hogy mi van rajtuk."
+
+[messages.about-source]
+source = "Source code on GitHub"
+translation = "Forráskód a GitHubon"
+
+[messages.about-steam]
+source = "Hoard on Steam"
+translation = "A Hoard a Steamen"
+
+[messages.about-steamworks]
+source = "The Steam build also includes the Steamworks SDK, © Valve Corporation."
+translation = "A Steames kiadás a Steamworks SDK-t is tartalmazza, © Valve Corporation."
+
+[messages.about-version]
+source = "Version"
+translation = "Verzió"
+
+[messages.about-what]
+source = "Hoard keeps game assets (models, textures, sounds, music, sprites and more) in one library you can search, preview and take from, shared with everyone you let in."
+translation = "A Hoard egyetlen könyvtárban tárolja a játékokhoz való asseteket (modelleket, textúrákat, hangokat, zenét, sprite-okat és egyebeket), amelyben kereshet, előnézetet nézhet és amelyből vehet, megosztva mindenkivel, akinek hozzáférést ad."
+
 [messages.account-add]
 source = "Add"
 translation = "Hozzáadás"
@@ -9182,6 +9290,14 @@ translation = "A könyvtár neve a felső sávban."
 [messages.settings-option-saved]
 source = "{ $name }: { $value }"
 translation = "{ $name }: { $value }"
+
+[messages.settings-page-about]
+source = "About"
+translation = "Névjegy"
+
+[messages.settings-page-about-blurb]
+source = "What Hoard is, which version this is, and the work of others it’s made with."
+translation = "Mi a Hoard, melyik verzió ez, és mások munkája, amelyből készült."
 
 [messages.settings-page-account]
 source = "Account"

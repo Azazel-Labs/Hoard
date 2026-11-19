@@ -4,6 +4,114 @@ version = 2
 source = "e1344c08185f94cb913b7f768b484062e60a7efa9c188f9df6855a10b4845b3c"
 translation = "9deaeace081508f1d290fbab5d22fc04945c1de6d7979bd2c698a77c1a668d3f"
 
+[messages.about-blender]
+source = "Converts 3D models and makes their thumbnails."
+translation = "3D modelleri dönüştürür ve küçük resimlerini oluşturur."
+
+[messages.about-built-with]
+source = "Built with"
+translation = "Şunlarla yapıldı"
+
+[messages.about-built-with-what]
+source = "The open source libraries Hoard is made from, with their licenses."
+translation = "Hoard’un yapıldığı açık kaynak kütüphaneler ve lisansları."
+
+[messages.about-clap]
+source = "Finds sounds by what they sound like."
+translation = "Sesleri nasıl duyulduklarına göre bulur."
+
+[messages.about-count]
+source = "{ $shown } of { $total }"
+translation = "{ $shown } / { $total }"
+
+[messages.about-downloaded]
+source = "Downloaded when needed"
+translation = "Gerektiğinde indirilir"
+
+[messages.about-downloaded-what]
+source = "Hoard doesn’t come with these. It downloads each one the first time something needs it, and each comes under its own license."
+translation = "Hoard bunlarla birlikte gelmez. Her birini bir şey ilk kez ihtiyaç duyduğunda indirir ve her birinin kendi lisansı vardır."
+
+[messages.about-edition]
+source = "Edition"
+translation = "Baskı"
+
+[messages.about-edition-desktop]
+source = "Desktop app"
+translation = "Masaüstü uygulaması"
+
+[messages.about-edition-server]
+source = "Server"
+translation = "Sunucu"
+
+[messages.about-edition-steam]
+source = "Desktop app from Steam"
+translation = "Steam’den masaüstü uygulaması"
+
+[messages.about-ffmpeg]
+source = "Converts sound and video and makes their previews."
+translation = "Ses ve videoyu dönüştürür ve önizlemelerini oluşturur."
+
+[messages.about-filter]
+source = "Filter by name or license"
+translation = "Ada veya lisansa göre süzün"
+
+[messages.about-issues]
+source = "Report a problem"
+translation = "Sorun bildirin"
+
+[messages.about-license]
+source = "License"
+translation = "Lisans"
+
+[messages.about-license-what]
+source = "Hoard is open source under the MIT No Attribution license: use it, change it and share it however you like."
+translation = "Hoard, MIT No Attribution lisansıyla açık kaynaklıdır: dilediğiniz gibi kullanın, değiştirin ve paylaşın."
+
+[messages.about-licenses-failed]
+source = "The list couldn’t be loaded."
+translation = "Liste yüklenemedi."
+
+[messages.about-licenses-loading]
+source = "Loading the list…"
+translation = "Liste yükleniyor…"
+
+[messages.about-made-by]
+source = "Made by"
+translation = "Yapımcı"
+
+[messages.about-models]
+source = "Models you pick for the local AI server come under their makers’ licenses."
+translation = "Yerel yapay zekâ sunucusu için seçtiğiniz modeller, yapımcılarının lisanslarına tabidir."
+
+[messages.about-no-license]
+source = "No license given"
+translation = "Lisans belirtilmemiş"
+
+[messages.about-siglip]
+source = "Finds pictures by what’s in them."
+translation = "Resimleri içlerinde ne olduğuna göre bulur."
+
+[messages.about-source]
+source = "Source code on GitHub"
+translation = "GitHub’da kaynak kodu"
+
+[messages.about-steam]
+source = "Hoard on Steam"
+translation = "Steam’de Hoard"
+
+[messages.about-steamworks]
+source = "The Steam build also includes the Steamworks SDK, © Valve Corporation."
+translation = "Steam sürümü ayrıca Steamworks SDK’yı içerir, © Valve Corporation."
+
+[messages.about-version]
+source = "Version"
+translation = "Sürüm"
+
+[messages.about-what]
+source = "Hoard keeps game assets (models, textures, sounds, music, sprites and more) in one library you can search, preview and take from, shared with everyone you let in."
+translation = "Hoard, oyun varlıklarını (modeller, dokular, sesler, müzik, sprite’lar ve daha fazlası) arayabileceğiniz, önizleyebileceğiniz ve alabileceğiniz tek bir kütüphanede, erişim verdiğiniz herkesle paylaşarak tutar."
+
 [messages.account-add]
 source = "Add"
 translation = "Ekle"
@@ -9186,6 +9294,14 @@ translation = "Bu kütüphanenin üst çubukta görünen adı."
 [messages.settings-option-saved]
 source = "{ $name }: { $value }"
 translation = "{ $name }: { $value }"
+
+[messages.settings-page-about]
+source = "About"
+translation = "Hakkında"
+
+[messages.settings-page-about-blurb]
+source = "What Hoard is, which version this is, and the work of others it’s made with."
+translation = "Hoard’un ne olduğu, bunun hangi sürüm olduğu ve yapıldığı başkalarının emeği."
 
 [messages.settings-page-account]
 source = "Account"

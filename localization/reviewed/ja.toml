@@ -4,6 +4,114 @@ version = 2
 source = "e1344c08185f94cb913b7f768b484062e60a7efa9c188f9df6855a10b4845b3c"
 translation = "0ba542b13b0e30e0f64280ba929a44b4a2018aaf0289fda960bb457744e090b0"
 
+[messages.about-blender]
+source = "Converts 3D models and makes their thumbnails."
+translation = "3D モデルを変換し、サムネイルを作成します。"
+
+[messages.about-built-with]
+source = "Built with"
+translation = "使用しているソフトウェア"
+
+[messages.about-built-with-what]
+source = "The open source libraries Hoard is made from, with their licenses."
+translation = "Hoard を構成するオープンソースライブラリとそのライセンス。"
+
+[messages.about-clap]
+source = "Finds sounds by what they sound like."
+translation = "聞こえ方からサウンドを探します。"
+
+[messages.about-count]
+source = "{ $shown } of { $total }"
+translation = "{ $shown } / { $total }"
+
+[messages.about-downloaded]
+source = "Downloaded when needed"
+translation = "必要なときにダウンロード"
+
+[messages.about-downloaded-what]
+source = "Hoard doesn’t come with these. It downloads each one the first time something needs it, and each comes under its own license."
+translation = "これらは Hoard に同梱されていません。初めて必要になったときにそれぞれダウンロードされ、それぞれ独自のライセンスに従います。"
+
+[messages.about-edition]
+source = "Edition"
+translation = "エディション"
+
+[messages.about-edition-desktop]
+source = "Desktop app"
+translation = "デスクトップアプリ"
+
+[messages.about-edition-server]
+source = "Server"
+translation = "サーバー"
+
+[messages.about-edition-steam]
+source = "Desktop app from Steam"
+translation = "Steam 版デスクトップアプリ"
+
+[messages.about-ffmpeg]
+source = "Converts sound and video and makes their previews."
+translation = "サウンドや動画を変換し、プレビューを作成します。"
+
+[messages.about-filter]
+source = "Filter by name or license"
+translation = "名前またはライセンスで絞り込む"
+
+[messages.about-issues]
+source = "Report a problem"
+translation = "問題を報告"
+
+[messages.about-license]
+source = "License"
+translation = "ライセンス"
+
+[messages.about-license-what]
+source = "Hoard is open source under the MIT No Attribution license: use it, change it and share it however you like."
+translation = "Hoard は MIT No Attribution ライセンスのオープンソースです。自由に使い、変更し、共有できます。"
+
+[messages.about-licenses-failed]
+source = "The list couldn’t be loaded."
+translation = "一覧を読み込めませんでした。"
+
+[messages.about-licenses-loading]
+source = "Loading the list…"
+translation = "一覧を読み込み中…"
+
+[messages.about-made-by]
+source = "Made by"
+translation = "制作"
+
+[messages.about-models]
+source = "Models you pick for the local AI server come under their makers’ licenses."
+translation = "ローカル AI サーバー用に選んだモデルには、その作者のライセンスが適用されます。"
+
+[messages.about-no-license]
+source = "No license given"
+translation = "ライセンスの記載なし"
+
+[messages.about-siglip]
+source = "Finds pictures by what’s in them."
+translation = "写っている内容から画像を探します。"
+
+[messages.about-source]
+source = "Source code on GitHub"
+translation = "GitHub のソースコード"
+
+[messages.about-steam]
+source = "Hoard on Steam"
+translation = "Steam の Hoard"
+
+[messages.about-steamworks]
+source = "The Steam build also includes the Steamworks SDK, © Valve Corporation."
+translation = "Steam 版には Steamworks SDK（© Valve Corporation）も含まれています。"
+
+[messages.about-version]
+source = "Version"
+translation = "バージョン"
+
+[messages.about-what]
+source = "Hoard keeps game assets (models, textures, sounds, music, sprites and more) in one library you can search, preview and take from, shared with everyone you let in."
+translation = "Hoard はゲームアセット（モデル、テクスチャ、サウンド、音楽、スプライトなど）を 1 つのライブラリにまとめ、検索・プレビュー・取り出しができるようにします。アクセスを許可した全員と共有できます。"
+
 [messages.account-add]
 source = "Add"
 translation = "追加"
@@ -9172,6 +9280,14 @@ translation = "上部バーに表示されるこのライブラリの名前で�
 [messages.settings-option-saved]
 source = "{ $name }: { $value }"
 translation = "{ $name }: { $value }"
+
+[messages.settings-page-about]
+source = "About"
+translation = "このアプリについて"
+
+[messages.settings-page-about-blurb]
+source = "What Hoard is, which version this is, and the work of others it’s made with."
+translation = "Hoard とは何か、このバージョン、そして Hoard を形作る他の人々の成果。"
 
 [messages.settings-page-account]
 source = "Account"

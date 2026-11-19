@@ -4,6 +4,114 @@ version = 2
 source = "e1344c08185f94cb913b7f768b484062e60a7efa9c188f9df6855a10b4845b3c"
 translation = "8c7b54c942b41968b1c4c36b21c4be4dd991807865ebe8ae47a5038e6b1bc825"
 
+[messages.about-blender]
+source = "Converts 3D models and makes their thumbnails."
+translation = "Chuyển đổi mô hình 3D và tạo hình thu nhỏ."
+
+[messages.about-built-with]
+source = "Built with"
+translation = "Được xây dựng bằng"
+
+[messages.about-built-with-what]
+source = "The open source libraries Hoard is made from, with their licenses."
+translation = "Các thư viện mã nguồn mở tạo nên Hoard, kèm giấy phép của chúng."
+
+[messages.about-clap]
+source = "Finds sounds by what they sound like."
+translation = "Tìm âm thanh theo cách chúng nghe."
+
+[messages.about-count]
+source = "{ $shown } of { $total }"
+translation = "{ $shown } / { $total }"
+
+[messages.about-downloaded]
+source = "Downloaded when needed"
+translation = "Tải về khi cần"
+
+[messages.about-downloaded-what]
+source = "Hoard doesn’t come with these. It downloads each one the first time something needs it, and each comes under its own license."
+translation = "Hoard không đi kèm những thứ này. Mỗi thứ được tải về vào lần đầu có gì đó cần đến, và mỗi thứ có giấy phép riêng."
+
+[messages.about-edition]
+source = "Edition"
+translation = "Ấn bản"
+
+[messages.about-edition-desktop]
+source = "Desktop app"
+translation = "Ứng dụng máy tính"
+
+[messages.about-edition-server]
+source = "Server"
+translation = "Máy chủ"
+
+[messages.about-edition-steam]
+source = "Desktop app from Steam"
+translation = "Ứng dụng máy tính từ Steam"
+
+[messages.about-ffmpeg]
+source = "Converts sound and video and makes their previews."
+translation = "Chuyển đổi âm thanh và video và tạo bản xem trước."
+
+[messages.about-filter]
+source = "Filter by name or license"
+translation = "Lọc theo tên hoặc giấy phép"
+
+[messages.about-issues]
+source = "Report a problem"
+translation = "Báo cáo sự cố"
+
+[messages.about-license]
+source = "License"
+translation = "Giấy phép"
+
+[messages.about-license-what]
+source = "Hoard is open source under the MIT No Attribution license: use it, change it and share it however you like."
+translation = "Hoard là mã nguồn mở theo giấy phép MIT No Attribution: bạn có thể dùng, sửa đổi và chia sẻ tùy ý."
+
+[messages.about-licenses-failed]
+source = "The list couldn’t be loaded."
+translation = "Không tải được danh sách."
+
+[messages.about-licenses-loading]
+source = "Loading the list…"
+translation = "Đang tải danh sách…"
+
+[messages.about-made-by]
+source = "Made by"
+translation = "Tạo bởi"
+
+[messages.about-models]
+source = "Models you pick for the local AI server come under their makers’ licenses."
+translation = "Các mô hình bạn chọn cho máy chủ AI cục bộ tuân theo giấy phép của người tạo ra chúng."
+
+[messages.about-no-license]
+source = "No license given"
+translation = "Không ghi giấy phép"
+
+[messages.about-siglip]
+source = "Finds pictures by what’s in them."
+translation = "Tìm hình ảnh theo nội dung trong ảnh."
+
+[messages.about-source]
+source = "Source code on GitHub"
+translation = "Mã nguồn trên GitHub"
+
+[messages.about-steam]
+source = "Hoard on Steam"
+translation = "Hoard trên Steam"
+
+[messages.about-steamworks]
+source = "The Steam build also includes the Steamworks SDK, © Valve Corporation."
+translation = "Bản Steam còn bao gồm Steamworks SDK, © Valve Corporation."
+
+[messages.about-version]
+source = "Version"
+translation = "Phiên bản"
+
+[messages.about-what]
+source = "Hoard keeps game assets (models, textures, sounds, music, sprites and more) in one library you can search, preview and take from, shared with everyone you let in."
+translation = "Hoard giữ tài nguyên game (mô hình, texture, âm thanh, nhạc, sprite và hơn thế) trong một thư viện mà bạn có thể tìm kiếm, xem trước và lấy ra dùng, được chia sẻ với mọi người bạn cho phép truy cập."
+
 [messages.account-add]
 source = "Add"
 translation = "Thêm"
@@ -9158,6 +9266,14 @@ translation = "Tên của thư viện này trên thanh trên cùng."
 [messages.settings-option-saved]
 source = "{ $name }: { $value }"
 translation = "{ $name }: { $value }"
+
+[messages.settings-page-about]
+source = "About"
+translation = "Giới thiệu"
+
+[messages.settings-page-about-blurb]
+source = "What Hoard is, which version this is, and the work of others it’s made with."
+translation = "Hoard là gì, đây là phiên bản nào, và công sức của những người khác đã góp phần tạo nên nó."
 
 [messages.settings-page-account]
 source = "Account"

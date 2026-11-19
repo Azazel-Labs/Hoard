@@ -175,6 +175,10 @@ pub struct Config {
     /// Run as the desktop app's server (see [`Config::desktop`]).
     #[arg(skip)]
     pub(crate) desktop: bool,
+
+    /// The desktop app as sold on Steam: its Steam app id (see [`Config::on_steam`]).
+    #[arg(skip)]
+    pub(crate) steam_app: Option<u32>,
 }
 
 /// Settings that used to be read from the environment. They're changed in the portal's Settings now; a server
@@ -238,6 +242,13 @@ impl Config {
         "http://127.0.0.1:8080/v1".clone_into(&mut cfg.local_llm_url);
         cfg.desktop = true;
         cfg
+    }
+
+    /// The desktop app from Steam, as Steam app `app`: Settings → About links to its store page.
+    #[must_use]
+    pub fn on_steam(mut self, app: u32) -> Self {
+        self.steam_app = Some(app);
+        self
     }
 
     /// Where an install from before library locations kept its files with `--storage local`.

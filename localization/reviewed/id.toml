@@ -4,6 +4,114 @@ version = 2
 source = "e1344c08185f94cb913b7f768b484062e60a7efa9c188f9df6855a10b4845b3c"
 translation = "fbc35a1a8410de50a6c45c7202153f655026e80b7cc54b4cce17411ed7af58d1"
 
+[messages.about-blender]
+source = "Converts 3D models and makes their thumbnails."
+translation = "Mengonversi model 3D dan membuat gambar mininya."
+
+[messages.about-built-with]
+source = "Built with"
+translation = "Dibuat dengan"
+
+[messages.about-built-with-what]
+source = "The open source libraries Hoard is made from, with their licenses."
+translation = "Pustaka sumber terbuka yang menjadi bahan Hoard, beserta lisensinya."
+
+[messages.about-clap]
+source = "Finds sounds by what they sound like."
+translation = "Menemukan suara berdasarkan bunyinya."
+
+[messages.about-count]
+source = "{ $shown } of { $total }"
+translation = "{ $shown } dari { $total }"
+
+[messages.about-downloaded]
+source = "Downloaded when needed"
+translation = "Diunduh saat diperlukan"
+
+[messages.about-downloaded-what]
+source = "Hoard doesn’t come with these. It downloads each one the first time something needs it, and each comes under its own license."
+translation = "Hoard tidak menyertakan ini. Masing-masing diunduh saat pertama kali diperlukan, dan masing-masing memiliki lisensinya sendiri."
+
+[messages.about-edition]
+source = "Edition"
+translation = "Edisi"
+
+[messages.about-edition-desktop]
+source = "Desktop app"
+translation = "Aplikasi desktop"
+
+[messages.about-edition-server]
+source = "Server"
+translation = "Server"
+
+[messages.about-edition-steam]
+source = "Desktop app from Steam"
+translation = "Aplikasi desktop dari Steam"
+
+[messages.about-ffmpeg]
+source = "Converts sound and video and makes their previews."
+translation = "Mengonversi suara dan video dan membuat pratinjaunya."
+
+[messages.about-filter]
+source = "Filter by name or license"
+translation = "Saring menurut nama atau lisensi"
+
+[messages.about-issues]
+source = "Report a problem"
+translation = "Laporkan masalah"
+
+[messages.about-license]
+source = "License"
+translation = "Lisensi"
+
+[messages.about-license-what]
+source = "Hoard is open source under the MIT No Attribution license: use it, change it and share it however you like."
+translation = "Hoard bersifat sumber terbuka dengan lisensi MIT No Attribution: gunakan, ubah, dan bagikan sesuka Anda."
+
+[messages.about-licenses-failed]
+source = "The list couldn’t be loaded."
+translation = "Daftar tidak dapat dimuat."
+
+[messages.about-licenses-loading]
+source = "Loading the list…"
+translation = "Memuat daftar…"
+
+[messages.about-made-by]
+source = "Made by"
+translation = "Dibuat oleh"
+
+[messages.about-models]
+source = "Models you pick for the local AI server come under their makers’ licenses."
+translation = "Model yang Anda pilih untuk server AI lokal tunduk pada lisensi pembuatnya."
+
+[messages.about-no-license]
+source = "No license given"
+translation = "Tidak ada lisensi"
+
+[messages.about-siglip]
+source = "Finds pictures by what’s in them."
+translation = "Menemukan gambar berdasarkan isinya."
+
+[messages.about-source]
+source = "Source code on GitHub"
+translation = "Kode sumber di GitHub"
+
+[messages.about-steam]
+source = "Hoard on Steam"
+translation = "Hoard di Steam"
+
+[messages.about-steamworks]
+source = "The Steam build also includes the Steamworks SDK, © Valve Corporation."
+translation = "Versi Steam juga menyertakan Steamworks SDK, © Valve Corporation."
+
+[messages.about-version]
+source = "Version"
+translation = "Versi"
+
+[messages.about-what]
+source = "Hoard keeps game assets (models, textures, sounds, music, sprites and more) in one library you can search, preview and take from, shared with everyone you let in."
+translation = "Hoard menyimpan aset game (model, tekstur, suara, musik, sprite, dan lainnya) dalam satu pustaka yang dapat Anda cari, pratinjau, dan ambil isinya, dibagikan dengan semua orang yang Anda beri akses."
+
 [messages.account-add]
 source = "Add"
 translation = "Tambah"
@@ -9162,6 +9270,14 @@ translation = "Nama pustaka ini di bilah atas."
 [messages.settings-option-saved]
 source = "{ $name }: { $value }"
 translation = "{ $name }: { $value }"
+
+[messages.settings-page-about]
+source = "About"
+translation = "Tentang"
+
+[messages.settings-page-about-blurb]
+source = "What Hoard is, which version this is, and the work of others it’s made with."
+translation = "Apa itu Hoard, versi mana ini, dan karya orang lain yang menjadi bahannya."
 
 [messages.settings-page-account]
 source = "Account"

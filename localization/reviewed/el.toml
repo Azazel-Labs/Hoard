@@ -4,6 +4,114 @@ version = 2
 source = "e1344c08185f94cb913b7f768b484062e60a7efa9c188f9df6855a10b4845b3c"
 translation = "e4b92192f4d804869b02782c9b4f93544ef7eb0f436afcb9e2b5c00781986de8"
 
+[messages.about-blender]
+source = "Converts 3D models and makes their thumbnails."
+translation = "Μετατρέπει τρισδιάστατα μοντέλα και φτιάχνει τις μικρογραφίες τους."
+
+[messages.about-built-with]
+source = "Built with"
+translation = "Φτιαγμένο με"
+
+[messages.about-built-with-what]
+source = "The open source libraries Hoard is made from, with their licenses."
+translation = "Οι βιβλιοθήκες ανοιχτού κώδικα από τις οποίες είναι φτιαγμένο το Hoard, με τις άδειές τους."
+
+[messages.about-clap]
+source = "Finds sounds by what they sound like."
+translation = "Βρίσκει ήχους με βάση το πώς ακούγονται."
+
+[messages.about-count]
+source = "{ $shown } of { $total }"
+translation = "{ $shown } από { $total }"
+
+[messages.about-downloaded]
+source = "Downloaded when needed"
+translation = "Λήψη όταν χρειάζεται"
+
+[messages.about-downloaded-what]
+source = "Hoard doesn’t come with these. It downloads each one the first time something needs it, and each comes under its own license."
+translation = "Το Hoard δεν τα περιλαμβάνει. Κατεβάζει το καθένα την πρώτη φορά που κάτι το χρειάζεται, και το καθένα έχει τη δική του άδεια χρήσης."
+
+[messages.about-edition]
+source = "Edition"
+translation = "Εκδοχή"
+
+[messages.about-edition-desktop]
+source = "Desktop app"
+translation = "Εφαρμογή υπολογιστή"
+
+[messages.about-edition-server]
+source = "Server"
+translation = "Διακομιστής"
+
+[messages.about-edition-steam]
+source = "Desktop app from Steam"
+translation = "Εφαρμογή υπολογιστή από το Steam"
+
+[messages.about-ffmpeg]
+source = "Converts sound and video and makes their previews."
+translation = "Μετατρέπει ήχο και βίντεο και φτιάχνει τις προεπισκοπήσεις τους."
+
+[messages.about-filter]
+source = "Filter by name or license"
+translation = "Φιλτράρισμα κατά όνομα ή άδεια"
+
+[messages.about-issues]
+source = "Report a problem"
+translation = "Αναφορά προβλήματος"
+
+[messages.about-license]
+source = "License"
+translation = "Άδεια χρήσης"
+
+[messages.about-license-what]
+source = "Hoard is open source under the MIT No Attribution license: use it, change it and share it however you like."
+translation = "Το Hoard είναι ανοιχτού κώδικα με την άδεια MIT No Attribution: χρησιμοποιήστε το, αλλάξτε το και μοιραστείτε το όπως θέλετε."
+
+[messages.about-licenses-failed]
+source = "The list couldn’t be loaded."
+translation = "Δεν ήταν δυνατή η φόρτωση της λίστας."
+
+[messages.about-licenses-loading]
+source = "Loading the list…"
+translation = "Φόρτωση της λίστας…"
+
+[messages.about-made-by]
+source = "Made by"
+translation = "Δημιουργός"
+
+[messages.about-models]
+source = "Models you pick for the local AI server come under their makers’ licenses."
+translation = "Τα μοντέλα που επιλέγετε για τον τοπικό διακομιστή ΤΝ διέπονται από τις άδειες των δημιουργών τους."
+
+[messages.about-no-license]
+source = "No license given"
+translation = "Δεν δηλώνεται άδεια"
+
+[messages.about-siglip]
+source = "Finds pictures by what’s in them."
+translation = "Βρίσκει εικόνες με βάση το τι δείχνουν."
+
+[messages.about-source]
+source = "Source code on GitHub"
+translation = "Πηγαίος κώδικας στο GitHub"
+
+[messages.about-steam]
+source = "Hoard on Steam"
+translation = "Το Hoard στο Steam"
+
+[messages.about-steamworks]
+source = "The Steam build also includes the Steamworks SDK, © Valve Corporation."
+translation = "Η έκδοση για το Steam περιλαμβάνει επίσης το Steamworks SDK, © Valve Corporation."
+
+[messages.about-version]
+source = "Version"
+translation = "Έκδοση"
+
+[messages.about-what]
+source = "Hoard keeps game assets (models, textures, sounds, music, sprites and more) in one library you can search, preview and take from, shared with everyone you let in."
+translation = "Το Hoard κρατά στοιχεία παιχνιδιών (μοντέλα, υφές, ήχους, μουσική, sprites και άλλα) σε μία βιβλιοθήκη όπου μπορείτε να κάνετε αναζήτηση, να δείτε προεπισκόπηση και να παίρνετε ό,τι χρειάζεστε, κοινόχρηστη με όλους όσους δίνετε πρόσβαση."
+
 [messages.account-add]
 source = "Add"
 translation = "Προσθήκη"
@@ -9408,6 +9516,14 @@ translation = "Πώς λέγεται αυτή η βιβλιοθήκη στην �
 [messages.settings-option-saved]
 source = "{ $name }: { $value }"
 translation = "{ $name }: { $value }"
+
+[messages.settings-page-about]
+source = "About"
+translation = "Πληροφορίες"
+
+[messages.settings-page-about-blurb]
+source = "What Hoard is, which version this is, and the work of others it’s made with."
+translation = "Τι είναι το Hoard, ποια έκδοση είναι αυτή και η δουλειά άλλων με την οποία είναι φτιαγμένο."
 
 [messages.settings-page-account]
 source = "Account"

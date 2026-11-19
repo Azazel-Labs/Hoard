@@ -58,6 +58,11 @@ export function isDesktop(): boolean {
   return !!auth.status?.desktop
 }
 
+/** The desktop app from Steam: its Steam app id, else null. */
+export function steamApp(): number | null {
+  return auth.status?.steam_app ?? null
+}
+
 const RANK = { view: 0, edit: 1, admin: 2 } as const
 
 /** Whoever's signed in may do what `role` can. Guests can only look. */

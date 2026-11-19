@@ -13,6 +13,7 @@ import { isDesktop, may, refreshAuth } from '../auth'
 import { formatNumber, t } from '../i18n'
 import { formatMiB } from '../sizes'
 import { showError, showOk } from '../ui'
+import AboutPanel from './AboutPanel.vue'
 import AccountPanel from './AccountPanel.vue'
 import AddingPanel from './AddingPanel.vue'
 import AiPanel from './AiPanel.vue'
@@ -71,6 +72,7 @@ const ALL_PAGES: { id: string; readonly label: string; readonly blurb: string; n
   { id: 'performance', sep: true, need: 'admin', get label() { return t('settings-page-performance') }, get blurb() { return t('settings-page-performance-blurb') } },
   { id: 'issues', need: 'admin', get label() { return t('settings-page-issues') }, get blurb() { return t('settings-page-issues-blurb') } },
   { id: 'maintenance', need: 'admin', get label() { return t('settings-page-maintenance') }, get blurb() { return t('settings-page-maintenance-blurb') } },
+  { id: 'about', sep: true, get label() { return t('settings-page-about') }, get blurb() { return t('settings-page-about-blurb') } },
 ]
 /** The pages this account may see: an admin sees them all (but the desktop app has no server to set up). */
 const PAGES = computed(() => ALL_PAGES.filter((p) => (!p.need || may(p.need)) && !(p.server && isDesktop())))
@@ -249,6 +251,7 @@ onBeforeUnmount(() => window.clearTimeout(timer))
           @section="go"
         />
         <AccountPanel v-else-if="current === 'account'" />
+        <AboutPanel v-else-if="current === 'about'" :stats="stats" />
         <AuthPanel v-else-if="current === 'auth'" />
         <CopiesPanel v-else-if="current === 'copies'" @open="(id) => emit('open', id)" @unauthorized="emit('unauthorized')" />
         <TagsPanel v-else-if="current === 'tags'" @tag="(t) => emit('tag', t)" @changed="emit('changed')" />

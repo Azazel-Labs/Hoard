@@ -4,6 +4,114 @@ version = 2
 source = "e1344c08185f94cb913b7f768b484062e60a7efa9c188f9df6855a10b4845b3c"
 translation = "2f01f53f6f4de35ca962ca7caf03327f94c4f5927afe968b3151acfb45044ff0"
 
+[messages.about-blender]
+source = "Converts 3D models and makes their thumbnails."
+translation = "转换 3D 模型并生成缩略图。"
+
+[messages.about-built-with]
+source = "Built with"
+translation = "使用的开源软件"
+
+[messages.about-built-with-what]
+source = "The open source libraries Hoard is made from, with their licenses."
+translation = "构成 Hoard 的开源库及其许可证。"
+
+[messages.about-clap]
+source = "Finds sounds by what they sound like."
+translation = "按声音听起来的样子查找音效。"
+
+[messages.about-count]
+source = "{ $shown } of { $total }"
+translation = "{ $shown } / { $total }"
+
+[messages.about-downloaded]
+source = "Downloaded when needed"
+translation = "按需下载"
+
+[messages.about-downloaded-what]
+source = "Hoard doesn’t come with these. It downloads each one the first time something needs it, and each comes under its own license."
+translation = "Hoard 不自带这些组件。它会在首次需要时下载各个组件，每个组件都有各自的许可证。"
+
+[messages.about-edition]
+source = "Edition"
+translation = "发行版"
+
+[messages.about-edition-desktop]
+source = "Desktop app"
+translation = "桌面应用"
+
+[messages.about-edition-server]
+source = "Server"
+translation = "服务器"
+
+[messages.about-edition-steam]
+source = "Desktop app from Steam"
+translation = "Steam 版桌面应用"
+
+[messages.about-ffmpeg]
+source = "Converts sound and video and makes their previews."
+translation = "转换音频和视频并生成预览。"
+
+[messages.about-filter]
+source = "Filter by name or license"
+translation = "按名称或许可证筛选"
+
+[messages.about-issues]
+source = "Report a problem"
+translation = "报告问题"
+
+[messages.about-license]
+source = "License"
+translation = "许可证"
+
+[messages.about-license-what]
+source = "Hoard is open source under the MIT No Attribution license: use it, change it and share it however you like."
+translation = "Hoard 以 MIT No Attribution 许可证开源：你可以随意使用、修改和分享。"
+
+[messages.about-licenses-failed]
+source = "The list couldn’t be loaded."
+translation = "无法加载列表。"
+
+[messages.about-licenses-loading]
+source = "Loading the list…"
+translation = "正在加载列表…"
+
+[messages.about-made-by]
+source = "Made by"
+translation = "开发者"
+
+[messages.about-models]
+source = "Models you pick for the local AI server come under their makers’ licenses."
+translation = "你为本地 AI 服务器选择的模型遵循其作者的许可证。"
+
+[messages.about-no-license]
+source = "No license given"
+translation = "未注明许可证"
+
+[messages.about-siglip]
+source = "Finds pictures by what’s in them."
+translation = "按图片中的内容查找图片。"
+
+[messages.about-source]
+source = "Source code on GitHub"
+translation = "GitHub 上的源代码"
+
+[messages.about-steam]
+source = "Hoard on Steam"
+translation = "Steam 上的 Hoard"
+
+[messages.about-steamworks]
+source = "The Steam build also includes the Steamworks SDK, © Valve Corporation."
+translation = "Steam 版还包含 Steamworks SDK，© Valve Corporation。"
+
+[messages.about-version]
+source = "Version"
+translation = "版本"
+
+[messages.about-what]
+source = "Hoard keeps game assets (models, textures, sounds, music, sprites and more) in one library you can search, preview and take from, shared with everyone you let in."
+translation = "Hoard 把游戏素材（模型、纹理、音效、音乐、精灵图等）放在一个资源库里，供你搜索、预览和取用，并与你允许访问的所有人共享。"
+
 [messages.account-add]
 source = "Add"
 translation = "添加"
@@ -9172,6 +9280,14 @@ translation = "此资源库在顶栏上显示的名称。"
 [messages.settings-option-saved]
 source = "{ $name }: { $value }"
 translation = "{ $name }：{ $value }"
+
+[messages.settings-page-about]
+source = "About"
+translation = "关于"
+
+[messages.settings-page-about-blurb]
+source = "What Hoard is, which version this is, and the work of others it’s made with."
+translation = "Hoard 是什么、这是哪个版本，以及构成它的他人成果。"
 
 [messages.settings-page-account]
 source = "Account"

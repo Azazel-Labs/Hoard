@@ -96,6 +96,10 @@ defineProps<{ page: string; size?: number }>()
       <path d="M13.5 8A5.5 5.5 0 0 1 3.4 11M2.5 8a5.5 5.5 0 0 1 10.1-3" />
       <path d="M12.8 1.8v3.3H9.5M3.2 14.2v-3.3h3.3" />
     </template>
+    <template v-else-if="page === 'about'">
+      <circle cx="8" cy="8" r="6.2" />
+      <path d="M8 7.4v3.8M8 4.9h.01" />
+    </template>
     <template v-else>
       <circle cx="8" cy="8" r="2.2" />
       <path d="M8 1.8v1.8M8 12.4v1.8M1.8 8h1.8M12.4 8h1.8M3.6 3.6l1.3 1.3M11.1 11.1l1.3 1.3M3.6 12.4l1.3-1.3M11.1 4.9l1.3-1.3" />

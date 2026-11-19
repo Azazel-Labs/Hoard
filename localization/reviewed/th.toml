@@ -4,6 +4,114 @@ version = 2
 source = "e1344c08185f94cb913b7f768b484062e60a7efa9c188f9df6855a10b4845b3c"
 translation = "f8eca15f161bf84c02b78453a3188581e4d1030033b8a070437572c1d1c325f3"
 
+[messages.about-blender]
+source = "Converts 3D models and makes their thumbnails."
+translation = "แปลงโมเดล 3D และสร้างภาพขนาดย่อ"
+
+[messages.about-built-with]
+source = "Built with"
+translation = "สร้างด้วย"
+
+[messages.about-built-with-what]
+source = "The open source libraries Hoard is made from, with their licenses."
+translation = "ไลบรารีโอเพนซอร์สที่ใช้สร้าง Hoard พร้อมสัญญาอนุญาต"
+
+[messages.about-clap]
+source = "Finds sounds by what they sound like."
+translation = "ค้นหาเสียงจากลักษณะที่ได้ยิน"
+
+[messages.about-count]
+source = "{ $shown } of { $total }"
+translation = "{ $shown } จาก { $total }"
+
+[messages.about-downloaded]
+source = "Downloaded when needed"
+translation = "ดาวน์โหลดเมื่อจำเป็น"
+
+[messages.about-downloaded-what]
+source = "Hoard doesn’t come with these. It downloads each one the first time something needs it, and each comes under its own license."
+translation = "Hoard ไม่ได้มาพร้อมสิ่งเหล่านี้ แต่จะดาวน์โหลดแต่ละรายการเมื่อมีสิ่งใดต้องใช้เป็นครั้งแรก และแต่ละรายการมีสัญญาอนุญาตของตัวเอง"
+
+[messages.about-edition]
+source = "Edition"
+translation = "ฉบับ"
+
+[messages.about-edition-desktop]
+source = "Desktop app"
+translation = "แอปเดสก์ท็อป"
+
+[messages.about-edition-server]
+source = "Server"
+translation = "เซิร์ฟเวอร์"
+
+[messages.about-edition-steam]
+source = "Desktop app from Steam"
+translation = "แอปเดสก์ท็อปจาก Steam"
+
+[messages.about-ffmpeg]
+source = "Converts sound and video and makes their previews."
+translation = "แปลงเสียงและวิดีโอ และสร้างตัวอย่าง"
+
+[messages.about-filter]
+source = "Filter by name or license"
+translation = "กรองตามชื่อหรือสัญญาอนุญาต"
+
+[messages.about-issues]
+source = "Report a problem"
+translation = "รายงานปัญหา"
+
+[messages.about-license]
+source = "License"
+translation = "สัญญาอนุญาต"
+
+[messages.about-license-what]
+source = "Hoard is open source under the MIT No Attribution license: use it, change it and share it however you like."
+translation = "Hoard เป็นโอเพนซอร์สภายใต้สัญญาอนุญาต MIT No Attribution: ใช้ แก้ไข และแบ่งปันได้ตามต้องการ"
+
+[messages.about-licenses-failed]
+source = "The list couldn’t be loaded."
+translation = "โหลดรายการไม่ได้"
+
+[messages.about-licenses-loading]
+source = "Loading the list…"
+translation = "กำลังโหลดรายการ…"
+
+[messages.about-made-by]
+source = "Made by"
+translation = "สร้างโดย"
+
+[messages.about-models]
+source = "Models you pick for the local AI server come under their makers’ licenses."
+translation = "โมเดลที่คุณเลือกสำหรับเซิร์ฟเวอร์ AI ในเครื่องอยู่ภายใต้สัญญาอนุญาตของผู้สร้าง"
+
+[messages.about-no-license]
+source = "No license given"
+translation = "ไม่ได้ระบุสัญญาอนุญาต"
+
+[messages.about-siglip]
+source = "Finds pictures by what’s in them."
+translation = "ค้นหารูปภาพจากสิ่งที่อยู่ในภาพ"
+
+[messages.about-source]
+source = "Source code on GitHub"
+translation = "ซอร์สโค้ดบน GitHub"
+
+[messages.about-steam]
+source = "Hoard on Steam"
+translation = "Hoard บน Steam"
+
+[messages.about-steamworks]
+source = "The Steam build also includes the Steamworks SDK, © Valve Corporation."
+translation = "รุ่น Steam มี Steamworks SDK ด้วย © Valve Corporation"
+
+[messages.about-version]
+source = "Version"
+translation = "รุ่น"
+
+[messages.about-what]
+source = "Hoard keeps game assets (models, textures, sounds, music, sprites and more) in one library you can search, preview and take from, shared with everyone you let in."
+translation = "Hoard เก็บแอสเซ็ตเกม (โมเดล เท็กซ์เจอร์ เสียง เพลง สไปรต์ และอื่น ๆ) ไว้ในคลังเดียวที่คุณค้นหา ดูตัวอย่าง และหยิบไปใช้ได้ โดยแชร์กับทุกคนที่คุณให้สิทธิ์เข้าถึง"
+
 [messages.account-add]
 source = "Add"
 translation = "เพิ่ม"
@@ -9161,6 +9269,14 @@ translation = "ชื่อที่เรียกคลังนี้ใน�
 [messages.settings-option-saved]
 source = "{ $name }: { $value }"
 translation = "{ $name }: { $value }"
+
+[messages.settings-page-about]
+source = "About"
+translation = "เกี่ยวกับ"
+
+[messages.settings-page-about-blurb]
+source = "What Hoard is, which version this is, and the work of others it’s made with."
+translation = "Hoard คืออะไร รุ่นนี้คือรุ่นใด และผลงานของผู้อื่นที่ใช้สร้าง Hoard"
 
 [messages.settings-page-account]
 source = "Account"

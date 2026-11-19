@@ -95,6 +95,8 @@ export interface AuthStatus {
   sign_in?: { directory: string | null; oauth: string | null }
   /** The desktop app's own server: one person, signed in by the app, on this computer only. */
   desktop?: boolean
+  /** The desktop app as sold on Steam: its Steam app id. */
+  steam_app?: number | null
 }
 
 /** Who checks an account's sign-in: Hoard, a directory (LDAP or Active Directory) or an OAuth provider. */

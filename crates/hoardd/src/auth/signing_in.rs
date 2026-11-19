@@ -78,6 +78,7 @@ async fn status(State(state): State<AppState>, headers: HeaderMap) -> ApiResult<
         "name": settings.name,
         "sign_in": crate::signin::sign_in_options(&settings.auth),
         "desktop": state.cfg.desktop,
+        "steam_app": state.cfg.steam_app,
     })))
 }
 

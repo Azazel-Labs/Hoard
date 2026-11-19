@@ -14,6 +14,7 @@ const PAGES: { name: string; path: string; ready: (page: Page) => ReturnType<Pag
   { name: 'settings: performance', path: '/#settings/performance', ready: (p) => p.getByLabel('Background workers') },
   { name: 'settings: tools', path: '/#settings/tools', ready: (p) => p.getByLabel('SoundFont file') },
   { name: 'settings: maintenance', path: '/#settings/maintenance', ready: (p) => p.getByRole('heading', { name: 'Updates' }) },
+  { name: 'settings: about', path: '/#settings/about', ready: (p) => p.getByTestId('about-built-with').getByRole('searchbox') },
 ]
 
 /** The page's background (the body's, or the root's behind a see-through body) as luminance, 0 black to 1 white. */

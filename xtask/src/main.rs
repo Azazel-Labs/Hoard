@@ -6,9 +6,11 @@
 //! cargo xtask llm                         # just the local model server (llama.cpp in router mode)
 //! cargo xtask ci                          # what CI runs: fmt, clippy, tests, web build
 //! cargo xtask translations check          # the catalogs in locales/ against each other and the code
+//! cargo xtask licenses                    # what Hoard ships and their licenses, for Settings → About
 //! ```
 #![expect(clippy::print_stdout, reason = "a CLI tool: printing is the point")]
 
+mod licenses;
 mod llm;
 mod translations;
 
@@ -64,6 +66,12 @@ enum Cmd {
     /// Check, format and review the translations in locales/ (see docs/translations.md).
     #[command(subcommand)]
     Translations(translations::Action),
+    /// Write web/public/licenses.json: the licenses of every crate and npm package Hoard ships (needs `npm ci` in web).
+    Licenses {
+        /// Only say whether it's current.
+        #[arg(long)]
+        check: bool,
+    },
 }
 
 #[derive(Debug, Args)]
@@ -107,6 +115,7 @@ pub(crate) fn root() -> PathBuf {
 
 fn main() -> Result<()> {
     match Cli::parse().cmd {
+        Cmd::Licenses { check } => licenses::run(check),
         Cmd::Llm { serve, env_file, extra } => {
             let opts = serve.to_serve(extra);
             let mut child = llm::spawn(&opts)?;

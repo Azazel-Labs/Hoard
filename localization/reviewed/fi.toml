@@ -4,6 +4,114 @@ version = 2
 source = "e1344c08185f94cb913b7f768b484062e60a7efa9c188f9df6855a10b4845b3c"
 translation = "f38a9016375389f61904e1c92df6b420783a0cb841e00775d3de14c34fa4df2f"
 
+[messages.about-blender]
+source = "Converts 3D models and makes their thumbnails."
+translation = "Muuntaa 3D-malleja ja tekee niiden pikkukuvat."
+
+[messages.about-built-with]
+source = "Built with"
+translation = "Tehty käyttäen"
+
+[messages.about-built-with-what]
+source = "The open source libraries Hoard is made from, with their licenses."
+translation = "Avoimen lähdekoodin kirjastot, joista Hoard on tehty, lisensseineen."
+
+[messages.about-clap]
+source = "Finds sounds by what they sound like."
+translation = "Löytää ääniä sen perusteella, miltä ne kuulostavat."
+
+[messages.about-count]
+source = "{ $shown } of { $total }"
+translation = "{ $shown } / { $total }"
+
+[messages.about-downloaded]
+source = "Downloaded when needed"
+translation = "Ladataan tarvittaessa"
+
+[messages.about-downloaded-what]
+source = "Hoard doesn’t come with these. It downloads each one the first time something needs it, and each comes under its own license."
+translation = "Nämä eivät tule Hoardin mukana. Se lataa kunkin, kun jokin tarvitsee sitä ensimmäisen kerran, ja kullakin on oma lisenssinsä."
+
+[messages.about-edition]
+source = "Edition"
+translation = "Laitos"
+
+[messages.about-edition-desktop]
+source = "Desktop app"
+translation = "Työpöytäsovellus"
+
+[messages.about-edition-server]
+source = "Server"
+translation = "Palvelin"
+
+[messages.about-edition-steam]
+source = "Desktop app from Steam"
+translation = "Työpöytäsovellus Steamista"
+
+[messages.about-ffmpeg]
+source = "Converts sound and video and makes their previews."
+translation = "Muuntaa ääntä ja videota ja tekee niiden esikatselut."
+
+[messages.about-filter]
+source = "Filter by name or license"
+translation = "Suodata nimen tai lisenssin mukaan"
+
+[messages.about-issues]
+source = "Report a problem"
+translation = "Ilmoita ongelmasta"
+
+[messages.about-license]
+source = "License"
+translation = "Lisenssi"
+
+[messages.about-license-what]
+source = "Hoard is open source under the MIT No Attribution license: use it, change it and share it however you like."
+translation = "Hoard on avointa lähdekoodia MIT No Attribution -lisenssillä: käytä, muuta ja jaa sitä miten haluat."
+
+[messages.about-licenses-failed]
+source = "The list couldn’t be loaded."
+translation = "Luetteloa ei voitu ladata."
+
+[messages.about-licenses-loading]
+source = "Loading the list…"
+translation = "Ladataan luetteloa…"
+
+[messages.about-made-by]
+source = "Made by"
+translation = "Tekijä"
+
+[messages.about-models]
+source = "Models you pick for the local AI server come under their makers’ licenses."
+translation = "Paikalliselle tekoälypalvelimelle valitsemiisi malleihin pätevät niiden tekijöiden lisenssit."
+
+[messages.about-no-license]
+source = "No license given"
+translation = "Lisenssiä ei ilmoitettu"
+
+[messages.about-siglip]
+source = "Finds pictures by what’s in them."
+translation = "Löytää kuvia sen perusteella, mitä niissä on."
+
+[messages.about-source]
+source = "Source code on GitHub"
+translation = "Lähdekoodi GitHubissa"
+
+[messages.about-steam]
+source = "Hoard on Steam"
+translation = "Hoard Steamissa"
+
+[messages.about-steamworks]
+source = "The Steam build also includes the Steamworks SDK, © Valve Corporation."
+translation = "Steam-versio sisältää myös Steamworks SDK:n, © Valve Corporation."
+
+[messages.about-version]
+source = "Version"
+translation = "Versio"
+
+[messages.about-what]
+source = "Hoard keeps game assets (models, textures, sounds, music, sprites and more) in one library you can search, preview and take from, shared with everyone you let in."
+translation = "Hoard säilyttää pelien assetit (mallit, tekstuurit, äänet, musiikin, spritet ja muuta) yhdessä kirjastossa, jota voit hakea, esikatsella ja josta voit ottaa, jaettuna kaikkien kanssa, joille annat pääsyn."
+
 [messages.account-add]
 source = "Add"
 translation = "Lisää"
@@ -9398,6 +9506,14 @@ translation = "Mikä tämän kirjaston nimi on yläpalkissa."
 [messages.settings-option-saved]
 source = "{ $name }: { $value }"
 translation = "{ $name }: { $value }"
+
+[messages.settings-page-about]
+source = "About"
+translation = "Tietoja"
+
+[messages.settings-page-about-blurb]
+source = "What Hoard is, which version this is, and the work of others it’s made with."
+translation = "Mikä Hoard on, mikä versio tämä on ja muiden työ, josta se on tehty."
 
 [messages.settings-page-account]
 source = "Account"

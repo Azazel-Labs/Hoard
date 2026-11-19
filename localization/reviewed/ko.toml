@@ -4,6 +4,114 @@ version = 2
 source = "e1344c08185f94cb913b7f768b484062e60a7efa9c188f9df6855a10b4845b3c"
 translation = "8ff1ce80eee68c3fc301a63c512038e80fbbbd4ad83a377120c24817a0852d35"
 
+[messages.about-blender]
+source = "Converts 3D models and makes their thumbnails."
+translation = "3D 모델을 변환하고 썸네일을 만듭니다."
+
+[messages.about-built-with]
+source = "Built with"
+translation = "사용한 소프트웨어"
+
+[messages.about-built-with-what]
+source = "The open source libraries Hoard is made from, with their licenses."
+translation = "Hoard를 이루는 오픈 소스 라이브러리와 그 라이선스입니다."
+
+[messages.about-clap]
+source = "Finds sounds by what they sound like."
+translation = "들리는 느낌으로 사운드를 찾습니다."
+
+[messages.about-count]
+source = "{ $shown } of { $total }"
+translation = "{ $shown } / { $total }"
+
+[messages.about-downloaded]
+source = "Downloaded when needed"
+translation = "필요할 때 내려받음"
+
+[messages.about-downloaded-what]
+source = "Hoard doesn’t come with these. It downloads each one the first time something needs it, and each comes under its own license."
+translation = "Hoard에는 이것들이 포함되어 있지 않습니다. 처음 필요할 때 각각 내려받으며, 각각 자체 라이선스를 따릅니다."
+
+[messages.about-edition]
+source = "Edition"
+translation = "에디션"
+
+[messages.about-edition-desktop]
+source = "Desktop app"
+translation = "데스크톱 앱"
+
+[messages.about-edition-server]
+source = "Server"
+translation = "서버"
+
+[messages.about-edition-steam]
+source = "Desktop app from Steam"
+translation = "Steam용 데스크톱 앱"
+
+[messages.about-ffmpeg]
+source = "Converts sound and video and makes their previews."
+translation = "사운드와 동영상을 변환하고 미리 보기를 만듭니다."
+
+[messages.about-filter]
+source = "Filter by name or license"
+translation = "이름이나 라이선스로 필터"
+
+[messages.about-issues]
+source = "Report a problem"
+translation = "문제 신고"
+
+[messages.about-license]
+source = "License"
+translation = "라이선스"
+
+[messages.about-license-what]
+source = "Hoard is open source under the MIT No Attribution license: use it, change it and share it however you like."
+translation = "Hoard는 MIT No Attribution 라이선스의 오픈 소스입니다. 원하는 대로 사용하고, 바꾸고, 공유할 수 있습니다."
+
+[messages.about-licenses-failed]
+source = "The list couldn’t be loaded."
+translation = "목록을 불러올 수 없습니다."
+
+[messages.about-licenses-loading]
+source = "Loading the list…"
+translation = "목록을 불러오는 중…"
+
+[messages.about-made-by]
+source = "Made by"
+translation = "만든 곳"
+
+[messages.about-models]
+source = "Models you pick for the local AI server come under their makers’ licenses."
+translation = "로컬 AI 서버용으로 고른 모델에는 만든 사람의 라이선스가 적용됩니다."
+
+[messages.about-no-license]
+source = "No license given"
+translation = "라이선스 표시 없음"
+
+[messages.about-siglip]
+source = "Finds pictures by what’s in them."
+translation = "그림에 담긴 내용으로 그림을 찾습니다."
+
+[messages.about-source]
+source = "Source code on GitHub"
+translation = "GitHub의 소스 코드"
+
+[messages.about-steam]
+source = "Hoard on Steam"
+translation = "Steam의 Hoard"
+
+[messages.about-steamworks]
+source = "The Steam build also includes the Steamworks SDK, © Valve Corporation."
+translation = "Steam 버전에는 Steamworks SDK(© Valve Corporation)도 포함되어 있습니다."
+
+[messages.about-version]
+source = "Version"
+translation = "버전"
+
+[messages.about-what]
+source = "Hoard keeps game assets (models, textures, sounds, music, sprites and more) in one library you can search, preview and take from, shared with everyone you let in."
+translation = "Hoard는 게임 에셋(모델, 텍스처, 사운드, 음악, 스프라이트 등)을 하나의 라이브러리에 모아 검색하고 미리 보고 가져다 쓸 수 있게 하며, 접근을 허용한 모든 사람과 함께 씁니다."
+
 [messages.account-add]
 source = "Add"
 translation = "추가"
@@ -9128,6 +9236,14 @@ translation = "상단 바에 표시되는 이 라이브러리의 이름입니다
 [messages.settings-option-saved]
 source = "{ $name }: { $value }"
 translation = "{ $name }: { $value }"
+
+[messages.settings-page-about]
+source = "About"
+translation = "정보"
+
+[messages.settings-page-about-blurb]
+source = "What Hoard is, which version this is, and the work of others it’s made with."
+translation = "Hoard가 무엇인지, 어떤 버전인지, 그리고 Hoard를 이루는 다른 사람들의 작업."
 
 [messages.settings-page-account]
 source = "Account"

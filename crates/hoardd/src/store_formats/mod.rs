@@ -10,7 +10,6 @@ use std::path::{Path, PathBuf};
 use std::sync::{Arc, LazyLock, OnceLock, PoisonError, RwLock};
 
 use anyhow::{Context as _, Result, bail};
-use regex::Regex;
 use serde::Deserialize;
 use serde_json::Value;
 

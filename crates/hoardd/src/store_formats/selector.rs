@@ -1,6 +1,11 @@
 //! Selectors: where a fact is in a file, as a path into JSON or a regular expression over text.
 
-use super::*;
+use anyhow::{Context as _, Result, bail};
+use regex::Regex;
+use serde_json::Value;
+
+use super::{Node, Syntax};
+use crate::i18n::tr;
 
 /// Selectors tried in order.
 #[derive(Debug, Default)]

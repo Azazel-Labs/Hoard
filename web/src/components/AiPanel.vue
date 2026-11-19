@@ -1,10 +1,11 @@
 <script setup lang="ts">
 // AI tagging: the service that tags packs (a hosted one, a ChatGPT plan, or the local model server), its model,
 // and whether it sees thumbnails.
-import { computed, onBeforeUnmount, onMounted, reactive, ref } from 'vue'
-import { ApiError, api, type ChatGptStatus, type LocalModel, type LocalModels, type ModelInfo, type Settings, type SettingsPatch } from '../api'
-import { formatNumber, t } from '../i18n'
-import { confirmDialog, showError, showOk } from '../ui'
+import { computed, onMounted, reactive, ref } from 'vue'
+import { ApiError, api, type ChatGptStatus, type ModelInfo, type Settings, type SettingsPatch } from '../api'
+import { t } from '../i18n'
+import ChatGptAccount from './ChatGptAccount.vue'
+import LocalModelServer from './LocalModelServer.vue'
 import ResetButton from './ResetButton.vue'
 import { trimUrl, useSettings } from './settingsContext'
 
@@ -187,7 +188,8 @@ function pickProvider(id: ProviderId) {
   llm.removeKey = false
   models.value = []
   modelsState.value = { kind: 'idle', text: '' }
-  local.value = null
+  localReachable.value = null
+  gpt.value = null
   if (id !== 'off' && providerIn(cur) === id) {
     // Back to the one in use: put its settings back.
     Object.assign(llm, { url: cur.url, model: cur.model, vision: cur.vision })
@@ -196,38 +198,26 @@ function pickProvider(id: ProviderId) {
   } else {
     Object.assign(llm, { url: p.url, model: '' })
   }
-  void connect()
+  // The ChatGPT account and the local model server look for themselves as they appear.
+  if (id !== 'chatgpt' && id !== 'local') void loadModels()
 }
 /** Look at the chosen service: the local model server's own list, the ChatGPT account, or a service's models. */
 function connect() {
-  if (llm.provider === 'chatgpt') return loadChatgpt()
-  return llm.provider === 'local' ? loadLocal() : loadModels()
+  if (llm.provider === 'chatgpt') return loadChatgptModels()
+  return llm.provider === 'local' ? localServer.value?.load() : loadModels()
 }
 
-// A ChatGPT plan: the server signs in to the person's ChatGPT account and tags with what the plan includes.
+// A ChatGPT plan: the server signs in to the person's ChatGPT account, and its models are listed once it has.
 const gpt = ref<ChatGptStatus | null>(null)
-const gptBusy = ref(false)
-/** The sign-in address, once "Continue with ChatGPT" was pressed (in case the window didn't open). */
-const gptUrl = ref('')
-const gptPaste = ref('')
-let gptTimer: number | undefined
-let gptUntil = 0
-async function loadChatgpt() {
+function chatgptStatus(st: ChatGptStatus) {
+  gpt.value = st
+  if (st.signed_in && !st.problem) return void loadChatgptModels()
+  modelsAsk++
+  models.value = []
+  modelsState.value = { kind: 'idle', text: '' }
+}
+async function loadChatgptModels() {
   const ask = ++modelsAsk
-  try {
-    const st = await api.chatgpt()
-    if (ask !== modelsAsk) return
-    gpt.value = st
-  } catch (e) {
-    if (e instanceof ApiError && e.status === 401) unauthorized()
-    showError((e as Error).message)
-    return
-  }
-  if (!gpt.value.signed_in || gpt.value.problem) {
-    models.value = []
-    modelsState.value = { kind: 'idle', text: '' }
-    return
-  }
   modelsState.value = { kind: 'loading', text: t('settings-ai-connecting') }
   try {
     const res = await api.chatgptModels()
@@ -239,180 +229,16 @@ async function loadChatgpt() {
     if (!llm.model && n) chooseModel(res.models[0].id)
   } catch (e) {
     if (ask !== modelsAsk) return
+    if (e instanceof ApiError && e.status === 401) unauthorized()
     models.value = []
     modelsState.value = { kind: 'error', text: (e as Error).message }
   }
 }
-async function startChatgpt() {
-  // Open the window while the click still counts; it's sent on once the server has the address ready.
-  const win = window.open('', '_blank')
-  gptBusy.value = true
-  try {
-    // The port this browser reaches Hoard on: on the server's own machine, ChatGPT sends it straight back here.
-    const port = Number(location.port) || (location.protocol === 'https:' ? 443 : 80)
-    const { url } = await api.chatgptStart(port)
-    gptUrl.value = url
-    gptPaste.value = ''
-    if (win) {
-      win.opener = null
-      win.location.href = url
-    }
-    gptUntil = Date.now() + 15 * 60_000
-    pollChatgpt()
-  } catch (e) {
-    win?.close()
-    if (e instanceof ApiError && e.status === 401) unauthorized()
-    showError((e as Error).message)
-  } finally {
-    gptBusy.value = false
-  }
-}
-/** While a sign-in is under way, notice when it finishes in the other window. */
-function pollChatgpt() {
-  window.clearTimeout(gptTimer)
-  if (Date.now() > gptUntil) return
-  gptTimer = window.setTimeout(async () => {
-    try {
-      const st = await api.chatgpt()
-      if (st.signed_in && !st.problem && (!gpt.value?.signed_in || gpt.value.problem)) return signedIn(st)
-      gpt.value = st
-    } catch {
-      // Try again on the next tick.
-    }
-    pollChatgpt()
-  }, 2000)
-}
-function signedIn(st: ChatGptStatus) {
-  window.clearTimeout(gptTimer)
-  gpt.value = st
-  gptUrl.value = ''
-  gptPaste.value = ''
-  showOk(st.email ? t('settings-chatgpt-signed-in-as', { email: st.email }) : t('settings-chatgpt-signed-in'))
-  void loadChatgpt()
-}
-async function finishChatgpt() {
-  const url = gptPaste.value.trim()
-  if (!url) return
-  gptBusy.value = true
-  try {
-    signedIn(await api.chatgptFinish(url))
-  } catch (e) {
-    if (e instanceof ApiError && e.status === 401) unauthorized()
-    showError((e as Error).message)
-  } finally {
-    gptBusy.value = false
-  }
-}
-async function signOutChatgpt() {
-  const ok = await confirmDialog({
-    title: t('settings-chatgpt-sign-out-title'),
-    body: s.value?.llm.chatgpt ? t('settings-chatgpt-sign-out-in-use') : t('settings-chatgpt-sign-out-body'),
-    confirm: t('settings-chatgpt-sign-out'),
-  })
-  if (!ok) return
-  gptBusy.value = true
-  try {
-    const st = await api.chatgptSignOut()
-    gpt.value = st
-    models.value = []
-    modelsState.value = { kind: 'idle', text: '' }
-    if (st.note) showError(st.note)
-    else showOk(t('settings-chatgpt-signed-out'))
-  } catch (e) {
-    if (e instanceof ApiError && e.status === 401) unauthorized()
-    showError((e as Error).message)
-  } finally {
-    gptBusy.value = false
-  }
-}
 
-// The local model server (llama.cpp in router mode): downloads models from Hugging Face and lists what it has.
-const local = ref<LocalModels | null>(null)
-const localState = ref<'idle' | 'loading' | 'ok'>('idle')
-/** The model being downloaded or deleted from here, while the server works on it. */
-const localBusy = ref('')
-const otherModel = ref('')
-let localAsk = 0
-let localTimer: number | undefined
-async function loadLocal(action: 'list' | 'download' | 'delete' = 'list', model?: string): Promise<void> {
-  window.clearTimeout(localTimer)
-  const url = trimUrl(llm.url)
-  const ask = ++localAsk
-  if (!url) {
-    local.value = null
-    localState.value = 'idle'
-    return
-  }
-  if (action === 'list' && !local.value) localState.value = 'loading'
-  if (model) localBusy.value = model
-  try {
-    const res = await api.llmLocal(url, action, model)
-    if (ask !== localAsk) return
-    local.value = res
-    if (action === 'download') otherModel.value = ''
-  } catch (e) {
-    if (ask !== localAsk) return
-    if (e instanceof ApiError && e.status === 401) unauthorized()
-    showError((e as Error).message)
-    if (action !== 'list') {
-      localBusy.value = ''
-      return loadLocal()
-    }
-  }
-  localState.value = 'ok'
-  localBusy.value = ''
-  // Keep progress moving while something downloads or starts up.
-  if (local.value?.models.some((m) => ['downloading', 'loading'].includes(m.status))) {
-    localTimer = window.setTimeout(() => void loadLocal(), 1500)
-  }
-}
-const localIds = computed(() => new Set(local.value?.models.map((m) => m.id) ?? []))
-const notDownloaded = computed(() => local.value?.suggested.filter((m) => !localIds.value.has(m.id)) ?? [])
-const nameOf = (id: string) => local.value?.suggested.find((m) => m.id === id)?.name ?? id
-/** The model AI tagging uses right now, if it's on this server. */
-const inUse = (m: LocalModel) => !!s.value && s.value.llm.model === m.id && trimUrl(s.value.llm.url) === trimUrl(llm.url)
-const gb = (n: number) => {
-  const digits = n >= 1e10 ? 0 : 1
-  return `${formatNumber(n / 1e9, { minimumFractionDigits: digits, maximumFractionDigits: digits })} GB`
-}
-function localStatus(m: LocalModel): string {
-  if (m.status === 'downloading') {
-    const [done, total] = m.progress ?? [0, 0]
-    return total
-      ? t('settings-local-downloading-progress', { percent: Math.floor((done / total) * 100), done: gb(done), total: gb(total) })
-      : t('settings-local-downloading')
-  }
-  if (m.status === 'incomplete') return t('settings-local-incomplete')
-  if (m.failed) return t('settings-local-failed')
-  if (inUse(m)) return m.status === 'loaded' ? t('settings-local-in-use-running') : t('settings-local-in-use')
-  if (m.status === 'loading') return t('settings-local-starting')
-  if (m.status === 'loaded') return t('settings-local-running')
-  return m.vision ? t('settings-local-ready-images') : t('settings-local-ready-text')
-}
-const ready = (m: LocalModel) => !['downloading', 'incomplete'].includes(m.status)
-function useLocal(m: LocalModel) {
-  const patch: SettingsPatch = { llm_url: trimUrl(llm.url), llm_model: m.id, llm_vision: m.vision, llm_api_key: '' }
-  // Small models tag better a few assets at a time; keep a batch size someone chose.
-  if (!s.value?.llm.batch.saved) patch.llm_batch = 12
-  void save(patch, t('settings-ai-saved', { service: nameOf(m.id) }))
-}
-async function deleteLocal(m: LocalModel) {
-  const ok = await confirmDialog({
-    title: t('settings-local-delete-title', { name: nameOf(m.id) }),
-    body: inUse(m)
-      ? t('settings-local-delete-in-use')
-      : m.status === 'downloading'
-        ? t('settings-local-delete-downloading')
-        : t('settings-local-delete-body'),
-    confirm: t('settings-local-delete'),
-    danger: true,
-  })
-  if (ok) void loadLocal('delete', m.id)
-}
-function downloadOther() {
-  const id = otherModel.value.trim()
-  if (id) void loadLocal('download', id)
-}
+// The local model server lists, downloads and deletes its own models; without it, a model is named by hand.
+const localServer = ref<InstanceType<typeof LocalModelServer> | null>(null)
+const localReachable = ref<boolean | null>(null)
+
 const modelLabel = (m: ModelInfo) => [m.name, m.vision ? t('settings-ai-takes-images') : ''].filter(Boolean).join(' · ')
 
 function saveLlm() {
@@ -455,12 +281,7 @@ const llmDefaultText = computed(() => {
 })
 
 onMounted(() => {
-  if (s.value.llm.enabled || llm.provider === 'local') void connect()
-})
-onBeforeUnmount(() => {
-  window.clearTimeout(localTimer)
-  window.clearTimeout(gptTimer)
-  localAsk++
+  if (s.value.llm.enabled && llm.provider !== 'chatgpt' && llm.provider !== 'local') void loadModels()
 })
 </script>
 
@@ -477,46 +298,7 @@ onBeforeUnmount(() => {
       </select>
       <span />
       <p class="hint inline">{{ provider.hint }}</p>
-      <template v-if="llm.provider === 'chatgpt'">
-        <span class="label">{{ t('settings-chatgpt-account') }}</span>
-        <div class="gpt">
-          <p v-if="!gpt" class="status" data-state="looking" role="status">
-            <span class="dot" aria-hidden="true" />
-            <span class="text">{{ t('settings-chatgpt-checking') }}</span>
-          </p>
-          <template v-else>
-            <p v-if="gpt.signed_in || gpt.problem" class="status" :data-state="gpt.problem ? 'unavailable' : 'ready'" role="status">
-              <span class="dot" aria-hidden="true" />
-              <span class="text">{{ gpt.problem ?? (gpt.email ? t('settings-chatgpt-status-as', { email: gpt.email }) : t('settings-chatgpt-status')) }}</span>
-            </p>
-            <div class="row">
-              <button v-if="!gpt.signed_in || gpt.problem" type="button" class="btn primary" :disabled="gptBusy" @click="startChatgpt">
-                {{ t('settings-chatgpt-continue') }}
-              </button>
-              <button v-if="gpt.signed_in" type="button" class="link" :disabled="gptBusy" @click="signOutChatgpt">{{ t('settings-chatgpt-sign-out') }}</button>
-              <a class="link" :href="gpt.manage_url" target="_blank" rel="noopener noreferrer">{{ t('settings-chatgpt-manage') }}</a>
-            </div>
-            <template v-if="gptUrl && (!gpt.signed_in || gpt.problem)">
-              <p class="hint inline">
-                {{ t('settings-chatgpt-finish-before') }}<a :href="gptUrl" target="_blank" rel="noopener noreferrer">{{ t('settings-chatgpt-finish-link') }}</a>{{ t('settings-chatgpt-finish-middle') }}<code>http://127.0.0.1</code>{{ t('settings-chatgpt-finish-after') }}
-              </p>
-              <div class="key">
-                <input
-                  v-model="gptPaste"
-                  class="field mono"
-                  type="url"
-                  spellcheck="false"
-                  :aria-label="t('settings-chatgpt-paste')"
-                  placeholder="http://127.0.0.1:…/auth/callback?code=…"
-                  @keydown.enter.prevent="finishChatgpt"
-                />
-                <button type="button" class="btn" :disabled="!gptPaste.trim() || gptBusy" @click="finishChatgpt">{{ t('settings-chatgpt-finish') }}</button>
-              </div>
-            </template>
-          </template>
-          <p class="hint inline">{{ t('settings-chatgpt-usage') }}</p>
-        </div>
-      </template>
+      <ChatGptAccount v-if="llm.provider === 'chatgpt'" @status="chatgptStatus" />
       <template v-if="llm.provider !== 'off' && (llm.provider !== 'chatgpt' || (gpt?.signed_in && !gpt.problem))">
         <template v-if="provider.editUrl">
           <label for="llm-url">{{ t('settings-ai-url') }}</label>
@@ -547,75 +329,13 @@ onBeforeUnmount(() => {
             <a v-if="provider.keyUrl" class="link" :href="provider.keyUrl" target="_blank" rel="noopener noreferrer">{{ t('settings-ai-get-key') }}</a>
           </div>
         </template>
-        <template v-if="llm.provider === 'local' && !local?.reachable">
-          <span />
-          <p v-if="localState !== 'ok'" class="status" data-state="looking" role="status">
-            <span class="dot" aria-hidden="true" />
-            <span class="text">{{ t('settings-ai-connecting') }}</span>
-          </p>
-          <div v-else-if="local" class="local-off">
-            <p class="status" data-state="unavailable" role="status">
-              <span class="dot" aria-hidden="true" />
-              <span class="text">{{ local.error }}</span>
-            </p>
-            <p class="hint inline">
-              {{ t('settings-local-start-before') }}<code>docker compose up -d llm</code>{{ t('settings-local-start-or') }}<code>cargo xtask llm</code>{{ t('settings-local-start-developing') }}<button type="button" class="link" @click="loadLocal()">{{ t('settings-local-start-retry') }}</button>{{ t('settings-local-start-after') }}
-            </p>
-          </div>
-        </template>
-        <div v-if="llm.provider === 'local' && local?.reachable" class="local">
-          <ul v-if="local.models.length" class="mlist" :aria-label="t('settings-local-list')">
-            <li v-for="m in local.models" :key="m.id" :class="{ on: inUse(m) }">
-              <span class="what">
-                <strong>{{ nameOf(m.id) }}</strong>
-                <small class="mono">{{ m.id }}</small>
-                <span
-                  class="status"
-                  :data-state="m.status === 'downloading' ? 'downloading' : m.status === 'loading' ? 'looking' : m.failed || m.status === 'incomplete' ? 'unavailable' : inUse(m) ? 'ready' : 'off'"
-                >
-                  <span class="dot" aria-hidden="true" />
-                  <span class="text">{{ localStatus(m) }}</span>
-                </span>
-                <progress v-if="m.status === 'downloading' && m.progress?.[1]" :value="m.progress[0]" :max="m.progress[1]" />
-              </span>
-              <span class="acts">
-                <button v-if="m.status === 'incomplete'" type="button" class="btn" :disabled="!!localBusy" @click="loadLocal('download', m.id)">{{ t('settings-local-resume') }}</button>
-                <button v-else-if="ready(m) && !inUse(m)" type="button" class="btn primary" :disabled="busy || !!localBusy" @click="useLocal(m)">{{ t('settings-use') }}</button>
-                <button type="button" class="btn ghost" :disabled="!!localBusy" @click="deleteLocal(m)">
-                  {{ localBusy === m.id ? t('settings-local-deleting') : m.status === 'downloading' ? t('settings-local-cancel') : t('settings-local-delete') }}
-                </button>
-              </span>
-            </li>
-          </ul>
-          <p v-else class="hint inline">{{ t('settings-local-none') }}</p>
-          <ul v-if="notDownloaded.length" class="mlist" :aria-label="t('settings-local-catalog')">
-            <li v-for="m in notDownloaded" :key="m.id">
-              <span class="what">
-                <strong>{{ m.name }}</strong>
-                <small>{{ t('settings-local-size', { size: m.size_gb, license: m.license }) }}</small>
-                <small>{{ m.note }}</small>
-              </span>
-              <span class="acts">
-                <button type="button" class="btn" :disabled="!!localBusy" @click="loadLocal('download', m.id)">
-                  {{ localBusy === m.id ? t('settings-local-starting') : t('settings-local-download') }}
-                </button>
-              </span>
-            </li>
-          </ul>
-          <div class="key">
-            <input
-              v-model="otherModel"
-              class="field mono"
-              type="text"
-              spellcheck="false"
-              :aria-label="t('settings-local-other')"
-              :placeholder="t('settings-local-other-placeholder')"
-              @keydown.enter.prevent="downloadOther"
-            />
-            <button type="button" class="btn" :disabled="!otherModel.trim() || !!localBusy" @click="downloadOther">{{ t('settings-local-download') }}</button>
-          </div>
-        </div>
-        <template v-if="llm.provider !== 'local' || (local && !local.reachable)">
+        <LocalModelServer
+          v-if="llm.provider === 'local'"
+          ref="localServer"
+          :url="llm.url"
+          @reachable="(r) => (localReachable = r)"
+        />
+        <template v-if="llm.provider !== 'local' || localReachable === false">
           <label for="llm-model">{{ t('settings-ai-model') }}</label>
           <div class="key">
             <input
@@ -669,21 +389,3 @@ onBeforeUnmount(() => {
 </template>
 
 <style scoped src="./settingsForm.css"></style>
-
-<style scoped>
-.gpt { display: grid; gap: 0.5rem; justify-items: start; }
-.gpt .key { width: 100%; }
-.local-off { display: grid; gap: 0.35rem; }
-.local { grid-column: 1 / -1; display: grid; gap: 0.6rem; }
-.mlist { display: grid; gap: 0.4rem; margin: 0; padding: 0; list-style: none; }
-.mlist li {
-  display: flex; gap: 0.8rem; align-items: center; padding: 0.6rem 0.75rem; border: 1px solid var(--line); border-radius: 8px;
-}
-.mlist li.on { border-color: var(--card-on-line); background: var(--card-on); }
-.mlist .what { flex: 1; min-width: 0; display: grid; gap: 0.15rem; }
-.mlist small { color: var(--muted); font-size: inherit; overflow-wrap: anywhere; }
-.mlist .status { margin: 0.1rem 0 0; }
-.mlist progress { width: 100%; height: 0.35rem; accent-color: var(--accent); }
-.mlist .acts { display: flex; gap: 0.4rem; flex: none; }
-@media (max-width: 30rem) { .mlist li { flex-direction: column; align-items: stretch; } }
-</style>

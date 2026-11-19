@@ -49,6 +49,8 @@ export interface Asset {
   /** An animation has a short looping movie of it playing (`motionUrl`), made while the Moving thumbnails setting
    *  is on. */
   has_motion?: boolean
+  /** An animation's length in seconds: its longest clip that isn't a pose. */
+  clip_secs?: number
   meta: Record<string, unknown>
   tags: Tag[]
   created_at: string

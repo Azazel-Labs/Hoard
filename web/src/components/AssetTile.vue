@@ -18,6 +18,7 @@ const detail = computed(() => {
   const m = props.asset.meta
   if (typeof m.width === 'number' && typeof m.height === 'number') return `${m.width}×${m.height}`
   if (typeof m.duration_secs === 'number') return formatDuration(m.duration_secs)
+  if (props.asset.clip_secs) return formatDuration(props.asset.clip_secs)
   if (typeof m.triangles === 'number') return t('tile-triangles', { count: m.triangles })
   if (typeof m.material_maps === 'number') return materialSummary(props.asset)
   return ''

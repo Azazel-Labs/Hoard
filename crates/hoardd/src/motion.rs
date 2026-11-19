@@ -1,12 +1,14 @@
-//! Motion thumbnails: an animation's tile plays it when pointed at, a few seconds of the character moving as an
-//! animated WebP (its `motion` derivative). Off until turned on in Settings → Thumbnails, as each takes room and a
-//! few seconds of rendering to make.
+//! Animations drawn moving. Every animation's thumbnail is a still from the middle of its clip (its `still`
+//! derivative marks it drawn), so a grid of them isn't a grid of the same rest pose. Motion thumbnails go further: an
+//! animation's tile plays it when pointed at, a few seconds of the character moving as an animated WebP (its `motion`
+//! derivative), off until turned on in Settings → Thumbnails, as each takes room and a few seconds of rendering.
 //!
-//! A clip shipped without a mesh (`run.fbx`) is played on the first character it fits: its keys are copied onto that
-//! character's bones, matched by name. The character is posed at each frame by polysmelt and drawn by the thumbnail
-//! renderer from one camera for the whole clip, so the character moves in the picture and the picture holds still.
+//! A clip shipped without a mesh (`run.fbx`) is played on a character it fits (the first its pack ships it for, or
+//! else the first with its skeleton in any pack): its keys are copied onto that character's bones, matched by name.
+//! The character is posed at each frame by polysmelt and drawn by the thumbnail renderer from one camera for the whole
+//! clip, so the character moves in the picture and the picture holds still.
 
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 use std::path::{Path, PathBuf};
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::{LazyLock, Mutex, PoisonError};
@@ -31,14 +33,27 @@ const QUALITY: f32 = 70.0;
 /// Whether a fill is running, and whether another was asked for while it ran.
 static BUSY: AtomicBool = AtomicBool::new(false);
 static AGAIN: AtomicBool = AtomicBool::new(false);
-/// Animations a motion thumbnail couldn't be made of since the server started, which aren't tried again until then.
-static FAILED: LazyLock<Mutex<std::collections::HashSet<String>>> = LazyLock::new(Mutex::default);
+/// Animations that couldn't be drawn since the server started, which aren't tried again until then.
+static FAILED: LazyLock<Mutex<HashSet<String>>> = LazyLock::new(Mutex::default);
+/// Clips with no mesh that fit no character yet, tried again when a pack comes in (it may bring one).
+static WAITING: LazyLock<Mutex<HashSet<String>>> = LazyLock::new(Mutex::default);
 
-/// Make the motion thumbnails the library lacks, in the background, when they're turned on. Asked for again while
-/// it runs, it goes round once more when done, for what was added meanwhile.
+/// Why a clip with no mesh of its own can't be drawn: it fits no character.
+#[derive(Debug)]
+struct NoCharacter;
+
+impl std::fmt::Display for NoCharacter {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str("it fits no character to play on")
+    }
+}
+
+impl std::error::Error for NoCharacter {}
+
+/// Draw the mid-clip stills the library's animations lack, and their motion thumbnails when those are turned on, in
+/// the background. Asked for again while it runs, it goes round once more when done, for what was added meanwhile.
 pub(crate) fn kick(state: &AppState) {
-    let settings = state.settings.get();
-    if !settings.motion_thumbs || !settings.render {
+    if !state.settings.get().render {
         return;
     }
     AGAIN.store(true, Ordering::SeqCst);
@@ -62,6 +77,12 @@ pub(crate) fn kick(state: &AppState) {
     });
 }
 
+/// A pack came in: draw what it brought, and try again the clips that fit no character, as it may have brought one.
+pub(crate) fn pack_in(state: &AppState) {
+    WAITING.lock().unwrap_or_else(PoisonError::into_inner).clear();
+    kick(state);
+}
+
 /// Forget every motion thumbnail and delete their files, when they're turned off.
 pub(crate) async fn remove_all(state: &AppState) -> Result<()> {
     let blobs = db::call(&state.pool, |c| {
@@ -81,52 +102,77 @@ pub(crate) async fn remove_all(state: &AppState) -> Result<()> {
     Ok(())
 }
 
-/// An animation to make a motion thumbnail of.
+/// An animation to draw: its motion thumbnail, its mid-clip still, or both.
 struct Todo {
     id: String,
     path: String,
     pack_id: String,
+    motion: bool,
+    still: bool,
 }
 
 async fn fill(state: &AppState) -> Result<()> {
-    let todo: Vec<Todo> = db::call(&state.pool, |c| {
+    let motion_on = state.settings.get().motion_thumbs;
+    // A thumbnail a browser drew is kept: it drew the clip mid-way too, with every texture.
+    let todo: Vec<Todo> = db::call(&state.pool, move |c| {
         let rows = c
             .prepare(
-                "SELECT a.id, a.path, a.pack_id FROM assets a WHERE a.kind = 'animation'
-                 AND NOT EXISTS (SELECT 1 FROM derivatives d WHERE d.asset_id = a.id AND d.kind = 'motion')
-                 ORDER BY a.pack_id, a.path",
+                "SELECT id, path, pack_id, motion, still FROM (
+                   SELECT a.id, a.path, a.pack_id,
+                          ?1 AND NOT EXISTS (SELECT 1 FROM derivatives d WHERE d.asset_id = a.id AND d.kind = 'motion')
+                            AS motion,
+                          a.thumb_source IS NULL
+                            AND NOT EXISTS (SELECT 1 FROM derivatives d WHERE d.asset_id = a.id AND d.kind = 'still')
+                            AS still
+                     FROM assets a WHERE a.kind = 'animation' AND a.archived_at IS NULL)
+                  WHERE motion OR still ORDER BY pack_id, path",
             )?
-            .query_map([], |r| Ok(Todo { id: r.get(0)?, path: r.get(1)?, pack_id: r.get(2)? }))?
+            .query_map([motion_on], |r| {
+                Ok(Todo { id: r.get(0)?, path: r.get(1)?, pack_id: r.get(2)?, motion: r.get(3)?, still: r.get(4)? })
+            })?
             .collect::<rusqlite::Result<_>>()?;
         Ok(rows)
     })
     .await?;
     let todo: Vec<Todo> = {
         let failed = FAILED.lock().unwrap_or_else(PoisonError::into_inner);
-        todo.into_iter().filter(|t| !failed.contains(&t.id)).collect()
+        let waiting = WAITING.lock().unwrap_or_else(PoisonError::into_inner);
+        todo.into_iter().filter(|t| !failed.contains(&t.id) && !waiting.contains(&t.id)).collect()
     };
     if todo.is_empty() {
         return Ok(());
     }
-    let activity =
-        crate::activity::start("motion", format!("Making motion thumbnails of {} animations", todo.len()), None);
+    let label = if todo.iter().any(|t| t.motion) {
+        format!("Making motion thumbnails of {} animations", todo.len())
+    } else {
+        format!("Drawing {} animations mid-clip", todo.len())
+    };
+    let activity = crate::activity::start("motion", label, None);
     let mut made = 0;
     for (i, t) in todo.iter().enumerate() {
-        // Turned off meanwhile: stop.
-        if !state.settings.get().motion_thumbs {
+        let settings = state.settings.get();
+        // Thumbnails turned off meanwhile: stop. Motion thumbnails turned off: only the still.
+        if !settings.render {
             break;
+        }
+        let motion = t.motion && settings.motion_thumbs;
+        if !motion && !t.still {
+            continue;
         }
         #[expect(clippy::cast_precision_loss, reason = "a fraction for a progress bar")]
         activity.progress(i as f32 / todo.len() as f32);
-        match make(state, t).await {
+        match make(state, t, motion).await {
             Ok(()) => made += 1,
+            Err(e) if e.is::<NoCharacter>() => {
+                WAITING.lock().unwrap_or_else(PoisonError::into_inner).insert(t.id.clone());
+            }
             Err(e) => {
-                tracing::info!(path = %t.path, pack = %t.pack_id, error = %format!("{e:#}"), "no motion thumbnail");
+                tracing::info!(path = %t.path, pack = %t.pack_id, error = %format!("{e:#}"), "couldn't draw an animation");
                 FAILED.lock().unwrap_or_else(PoisonError::into_inner).insert(t.id.clone());
             }
         }
     }
-    tracing::info!(made, of = todo.len(), "made motion thumbnails");
+    tracing::info!(made, of = todo.len(), "drew animations");
     Ok(())
 }
 
@@ -169,77 +215,111 @@ async fn fetch(state: &AppState, id: &str, work: &Path) -> Result<Local> {
     Ok(Local { path: local, ext, root: work.to_owned() })
 }
 
-/// Make one animation's motion thumbnail, and its still from the middle of the clip when it has none.
-async fn make(state: &AppState, t: &Todo) -> Result<()> {
+/// Draw one animation: its still from the middle of the clip, which becomes its thumbnail (unless a browser drew
+/// one), and its motion thumbnail when `motion`.
+async fn make(state: &AppState, t: &Todo, motion: bool) -> Result<()> {
     let (id, pack) = (t.id.clone(), t.pack_id.clone());
-    let (body, facings) = db::call(&state.pool, move |c| {
-        let body: Option<String> = c
-            .query_row(
-                "SELECT l.from_id FROM asset_links l JOIN assets m ON m.id = l.from_id
-                 WHERE l.to_id = ?1 AND l.rel = 'animation' ORDER BY m.path LIMIT 1",
-                [&id],
-                |r| r.get(0),
-            )
-            .optional()?;
+    let linked = db::call(&state.pool, move |c| {
+        Ok(c.query_row(
+            "SELECT l.from_id, m.pack_id FROM asset_links l JOIN assets m ON m.id = l.from_id
+             WHERE l.to_id = ?1 AND l.rel = 'animation' ORDER BY m.path LIMIT 1",
+            [&id],
+            |r| Ok((r.get::<_, String>(0)?, r.get::<_, String>(1)?)),
+        )
+        .optional()?)
+    })
+    .await?;
+    // Its pack's character for it, or else the first with its skeleton, as its details play it on.
+    let body = match linked {
+        Some(b) => Some(b),
+        None => crate::animations::fits_for(state, t.id.clone()).await?.0.into_iter().next().map(|f| (f.id, f.pack_id)),
+    };
+    let (id, b) = (t.id.clone(), body.clone());
+    let facings = db::call(&state.pool, move |c| {
         let clip_facing = db::asset_facing(c, &id, &pack)?;
-        let body_facing = match &body {
-            Some(b) => db::asset_facing(c, b, &pack)?,
+        let body_facing = match &b {
+            Some((b, pack)) => db::asset_facing(c, b, pack)?,
             None => clip_facing,
         };
-        Ok((body, (clip_facing, body_facing)))
+        Ok((clip_facing, body_facing))
     })
     .await?;
     let work = state.cfg.tmp_dir().join(format!("motion-{}", uuid::Uuid::now_v7()));
     let result = async {
         let clip = fetch(state, &t.id, &work.join("clip")).await?;
         let body = match &body {
-            Some(b) => Some(fetch(state, b, &work.join("body")).await?),
+            Some((b, _)) => Some(fetch(state, b, &work.join("body")).await?),
             None => None,
         };
-        let (webp, still) = crate::heavy::run("motion", move || draw(&clip, body.as_ref(), facings)).await??;
-        let motion = state.blobs.put_cache_bytes(webp).await?;
+        let (webp, still) =
+            crate::heavy::run("motion", move || draw(&clip, body.as_ref(), facings, motion)).await??;
+        let motion = match webp {
+            Some(webp) => Some(state.blobs.put_cache_bytes(webp).await?),
+            None => None,
+        };
         let still = state.blobs.put_cache_bytes(still).await?;
         let id = t.id.clone();
-        db::call(&state.pool, move |c| {
+        let replaced = db::call(&state.pool, move |c| {
             let now = db::now();
             let tx = c.transaction()?;
-            for b in [&motion, &still] {
+            for b in motion.iter().chain([&still]) {
                 tx.execute(
                     "INSERT INTO blobs (hash, size, created_at) VALUES (?1, ?2, ?3) ON CONFLICT DO NOTHING",
                     params![b.hash, i64::try_from(b.size).unwrap_or(i64::MAX), now],
                 )?;
             }
-            tx.execute(
-                "INSERT INTO derivatives (asset_id, kind, blob_hash, created_at) VALUES (?1, 'motion', ?2, ?3)
-                 ON CONFLICT (asset_id, kind) DO UPDATE SET blob_hash = excluded.blob_hash, created_at = excluded.created_at",
-                params![id, motion.hash, now],
-            )?;
-            tx.execute("UPDATE assets SET thumb_hash = ?2 WHERE id = ?1 AND thumb_hash IS NULL", params![id, still.hash])?;
+            let kinds = motion.iter().map(|m| ("motion", m)).chain([("still", &still)]);
+            for (kind, b) in kinds {
+                tx.execute(
+                    "INSERT INTO derivatives (asset_id, kind, blob_hash, created_at) VALUES (?1, ?2, ?3, ?4)
+                     ON CONFLICT (asset_id, kind) DO UPDATE SET blob_hash = excluded.blob_hash, created_at = excluded.created_at",
+                    params![id, kind, b.hash, now],
+                )?;
+            }
+            // The rest pose it was drawn in goes, unless something still shows it.
+            let old: Option<(String, i64)> = tx
+                .query_row(
+                    "SELECT b.hash, b.size FROM assets a JOIN blobs b ON b.hash = a.thumb_hash
+                     WHERE a.id = ?1 AND a.thumb_source IS NULL AND a.thumb_hash <> ?2",
+                    params![id, still.hash],
+                    |r| Ok((r.get(0)?, r.get(1)?)),
+                )
+                .optional()?;
+            tx.execute("UPDATE assets SET thumb_hash = ?2 WHERE id = ?1 AND thumb_source IS NULL", params![id, still.hash])?;
             tx.commit()?;
-            Ok(())
+            Ok(old)
         })
-        .await
+        .await?;
+        if let Some(old) = replaced {
+            crate::jobs::delete_unused(state, vec![old]).await?;
+        }
+        Ok(())
     }
     .await;
     tokio::fs::remove_dir_all(&work).await.ok();
     result
 }
 
-/// The clip's frames, drawn and encoded: the animated WebP, and its middle frame as a still thumbnail.
+/// The clip drawn: its middle as a still thumbnail, and when `motion` all its frames as an animated WebP.
 /// `facings` turn the clip's own mesh and the character's: each its own way (see [`db::asset_facing`]).
-fn draw(clip: &Local, body: Option<&Local>, facings: (Facing, Facing)) -> Result<(Vec<u8>, Vec<u8>)> {
+fn draw(
+    clip: &Local,
+    body: Option<&Local>,
+    facings: (Facing, Facing),
+    motion: bool,
+) -> Result<(Option<Vec<u8>>, Vec<u8>)> {
     let from = crate::meshes::posable(&clip.path, &clip.ext, &clip.root)?;
     let (index, secs) = take(&from.json).context("it has no clip to play")?;
     let (mut doc, index, facing) = if from.counts().triangles > 0 {
         (from, index, facings.0)
     } else {
-        let body = body.context("it fits no character to play on")?;
+        let body = body.ok_or(NoCharacter)?;
         let mut doc = crate::meshes::posable(&body.path, &body.ext, &body.root)?;
         let index = transplant(&from, index, &mut doc)?.context("it moves none of the character's bones")?;
         (doc, index, facings.1)
     };
     crate::meshes::turn(&mut doc.json, facing);
-    let (frames, ms) = frames(&doc, index, secs)?;
+    let (frames, ms) = if motion { frames(&doc, index, secs)? } else { (vec![posed(&doc, index, middle(secs))?], 0) };
     let renderer = crate::analyze::renderer().context("model thumbnails are off")?;
     let guard = renderer.lock().unwrap_or_else(PoisonError::into_inner);
     // wgpu panics on what it finds invalid; that costs this clip its thumbnail, not the server.
@@ -247,7 +327,8 @@ fn draw(clip: &Local, body: Option<&Local>, facings: (Facing, Facing)) -> Result
         .map_err(|_| anyhow!("the renderer crashed"))??;
     drop(guard);
     let still = drawn.get(drawn.len() / 2).context("no frames")?.clone();
-    Ok((encode(&drawn, ms)?, crate::analyze::thumb_bytes(still, false)?))
+    let webp = if motion { Some(encode(&drawn, ms)?) } else { None };
+    Ok((webp, crate::analyze::thumb_bytes(still, false)?))
 }
 
 /// The clip a motion thumbnail plays, as its index and length: a document's first that isn't a pose.
@@ -261,14 +342,24 @@ fn frames(doc: &Document<'_>, index: usize, secs: f64) -> Result<(Vec<Vec<u8>>, 
     let span = secs.min(MAX_SECS);
     let (count, ms) = timing(span);
     let step = span / f64::from(count);
-    let mut out = Vec::new();
-    for k in 0..count {
-        #[expect(clippy::cast_possible_truncation, reason = "a time in a clip of seconds")]
-        let time = (f64::from(k) * step) as f32;
-        let mesh = doc.flatten(Pose::Animation { index, time })?.context("the posed model draws nothing")?;
-        out.push(crate::meshes::to_glb(&mesh)?);
-    }
+    let out = (0..count).map(|k| posed(doc, index, f64::from(k) * step)).collect::<Result<_>>()?;
     Ok((out, ms))
+}
+
+/// The moment of a clip `secs` long its still shows: the middle of the stretch a motion thumbnail plays, which is the
+/// motion thumbnail's middle frame.
+fn middle(secs: f64) -> f64 {
+    let span = secs.min(MAX_SECS);
+    let (count, _) = timing(span);
+    f64::from(count / 2) * span / f64::from(count)
+}
+
+/// The model posed `time` seconds into clip `index`, as a GLB.
+fn posed(doc: &Document<'_>, index: usize, time: f64) -> Result<Vec<u8>> {
+    #[expect(clippy::cast_possible_truncation, reason = "a time in a clip of seconds")]
+    let time = time as f32;
+    let mesh = doc.flatten(Pose::Animation { index, time })?.context("the posed model draws nothing")?;
+    Ok(crate::meshes::to_glb(&mesh)?)
 }
 
 /// How many frames a stretch of `span` seconds has at [`FPS`] (two at least), and how long each shows.
@@ -520,6 +611,8 @@ mod tests {
     fn a_long_clip_is_cut_and_a_short_one_has_two_frames() {
         assert_eq!(timing(MAX_SECS), (36, 83));
         assert_eq!(timing(0.1), (2, 50));
+        // A still shows the middle of what a motion thumbnail plays.
+        assert_eq!((middle(1.0), middle(10.0), middle(0.1)), (0.5, 1.5, 0.05));
     }
 
     #[test]

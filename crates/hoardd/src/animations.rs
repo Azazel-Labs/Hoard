@@ -726,6 +726,8 @@ mod tests {
         assert_eq!((found[1].pack_name.as_str(), total), ("Heroes", 2));
         assert_eq!(fits_of(&c, &all, "wave").unwrap().0[0].secs, None, "characters have no length");
         assert_eq!(fits_of(&c, &all, "knight").unwrap().0[1].secs, Some(1.5));
+        let length = |id: &str| db::get_asset(&c, id).unwrap().unwrap().clip_secs;
+        assert_eq!((length("run"), length("knight")), (Some(0.8), None), "an animation's tile shows its length");
 
         c.execute("UPDATE packs SET archived_at = 'x' WHERE id = 'p'", []).unwrap();
         assert_eq!(fits("run"), ["knight"]);

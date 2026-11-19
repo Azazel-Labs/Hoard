@@ -11,7 +11,9 @@ use super::asset_facing;
 pub(super) const ASSET_COLS: &str = "a.id, a.pack_id, p.name, a.name, a.path, a.ext, a.kind, a.category, a.description,
     a.blob_hash, b.size, a.thumb_hash IS NOT NULL, a.meta, a.created_at, a.updated_at, a.source_description,
     a.ai_description, COALESCE(a.archived_at, p.archived_at), substr(a.thumb_hash, 1, 12), a.thumb_source,
-    a.kind = 'animation' AND EXISTS (SELECT 1 FROM derivatives d WHERE d.asset_id = a.id AND d.kind = 'motion')";
+    a.kind = 'animation' AND EXISTS (SELECT 1 FROM derivatives d WHERE d.asset_id = a.id AND d.kind = 'motion'),
+    CASE WHEN a.kind = 'animation' THEN (SELECT MAX(json_extract(c.value, '$.secs')) FROM rigs r, json_each(r.rig, '$.clips') c
+      WHERE r.asset_id = a.id AND json_extract(c.value, '$.secs') >= 0.1) END";
 
 pub(super) fn asset_from_row(r: &Row<'_>) -> rusqlite::Result<Asset> {
     let meta: String = r.get(12)?;
@@ -33,6 +35,7 @@ pub(super) fn asset_from_row(r: &Row<'_>) -> rusqlite::Result<Asset> {
         thumb_rev: r.get(18)?,
         thumb_source: r.get(19)?,
         has_motion: r.get(20)?,
+        clip_secs: r.get(21)?,
         meta: serde_json::from_str(&meta).unwrap_or_default(),
         tags: Vec::new(),
         created_at: r.get(13)?,

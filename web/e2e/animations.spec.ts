@@ -74,6 +74,16 @@ test('an animation fits the characters with its skeleton in other packs, and eac
     const fits = async (id: string) => ((await (await api.get(`/api/assets/${id}`)).json()) as Detail).fits ?? []
     expect(await fits(hero.id)).toEqual([expect.objectContaining({ id: run.id, pack_name: mocap, secs: 0.8 })])
     expect(await fits(run.id)).toEqual([expect.objectContaining({ id: hero.id, pack_name: heroes })])
+    // With a renderer, the clip's thumbnail is drawn mid-clip on that character, as it has no mesh of its own.
+    const stats = (await (await api.get('/api/stats')).json()) as { renderer?: string }
+    if (/^(gpu|cpu):/.test(stats.renderer ?? ''))
+      await expect
+        .poll(async () => ((await (await api.get(`/api/assets/${run.id}`)).json()) as { derivatives?: string[] }).derivatives, { timeout: 60_000 })
+        .toContain('still')
+
+    // Its tile shows its length.
+    await openPack(page, b.id, mocap)
+    await expect(tile(page, run.name)).toContainText('0.80 s')
 
     await openPack(page, a.id, heroes)
     await tile(page, hero.name).click()

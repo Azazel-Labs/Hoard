@@ -103,8 +103,10 @@ export class ModelStage {
   private mixer: THREE.AnimationMixer | null = null
   private clips = new Map<string, THREE.AnimationClip>()
   private action: THREE.AnimationAction | null = null
-  /** An animation played on a character: its thumbnail shows it mid-clip. */
+  /** An animation played on a character, rather than a character playing its own clips. */
   private wearing = false
+  /** An animation (on a character or its own mesh): its thumbnail shows it mid-clip. */
+  private animation = false
   private resizeObs: ResizeObserver | null = null
   private timer = new THREE.Timer()
   private materials = new Map<AnyMaterial, Partial<Record<MapSlot, THREE.Texture | null>>>()
@@ -208,6 +210,7 @@ export class ModelStage {
     // An animation plays on a character it fits: the character is what's drawn, and only the animation's clips play.
     // Those its pack ships it for come first, then any other with its skeleton, in any pack.
     let clipLinks = full.links.filter((l) => l.rel === 'animation')
+    this.animation = full.kind === 'animation'
     const wearers =
       full.kind === 'animation'
         ? [
@@ -837,8 +840,8 @@ export class ModelStage {
   /** An animation's character posed halfway through the clip, so a grid of thumbnails isn't a grid of the same
    *  rest pose; the returned function puts it back. */
   private midClip(): (() => void) | null {
-    const clip = this.action?.getClip() ?? this.clips.values().next().value
-    if (!this.wearing || !this.mixer || !clip) return null
+    const clip = this.action?.getClip() ?? [...this.clips.values()].find((c) => c.duration >= POSE_SECS)
+    if (!this.animation || !this.mixer || !clip) return null
     const mixer = this.mixer
     const fresh = !this.action
     const action = this.action ?? mixer.clipAction(clip).play()

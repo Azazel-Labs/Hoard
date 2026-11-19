@@ -287,7 +287,7 @@ pub(super) async fn put_settings(State(state): State<AppState>, Json(patch): Jso
             crate::clap::remove_files(&state).await;
         }
     }
-    if after.motion_thumbs && !before.motion_thumbs {
+    if (after.motion_thumbs && !before.motion_thumbs) || (after.render && !before.render) {
         crate::motion::kick(&state);
     } else if before.motion_thumbs && !after.motion_thumbs {
         let st = std::sync::Arc::clone(&state);

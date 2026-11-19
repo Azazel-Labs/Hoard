@@ -195,6 +195,9 @@ pub struct Asset {
     /// tile is hovered. Made only while the "Moving thumbnails" setting is on.
     #[serde(default, skip_serializing_if = "std::ops::Not::not")]
     pub has_motion: bool,
+    /// An animation's length in seconds: its longest clip that isn't a pose.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub clip_secs: Option<f64>,
     pub meta: Value,
     pub tags: Vec<Tag>,
     pub created_at: String,

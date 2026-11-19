@@ -44,11 +44,8 @@ for one clip, becomes an animation linked to the characters it fits nearby, and 
 "Animations that fit" and animations "Characters it fits". An animation plays on any character it fits, picked
 under Plays on, and its thumbnail and tile show it halfway through the clip, with its length; a character's viewer
 plays any animation that fits it. An animation downloads with the character it plays on, or as its skeleton and
-clips alone, and a character with its animations. What's left:
-
-A clip whose root travels (a walk, a run, a jump forward) is shown traveling, without leaving the frame: the camera
-follows the character, and a ground grid beneath it scrolls the other way, so root motion and a clip made to play in
-place look different at a glance. A clip that stays put gets no grid.
+clips alone, and a character with its animations. A clip whose root travels plays held in the frame over a ground
+grid that scrolls the other way.
 
 Still open: whether each clip in a many-take file should be an entry of its own in search.
 

@@ -4,16 +4,22 @@ import { expect, openPack, test, tile, unique } from './support/test'
 const BONES = ['Hips', 'Spine', 'Spine1', 'Spine2', 'Neck', 'Head', 'LeftArm', 'LeftForeArm', 'LeftHand', 'RightArm', 'RightForeArm', 'RightHand']
 
 /** A glTF skeleton with these bone names in a chain: with a triangle skinned to it (a character), or with a clip
- *  that turns every bone for `secs` (an animation of its own, no mesh). */
-function rigged(prefix: string, opts: { mesh?: boolean; clip?: { name: string; secs: number } }): Buffer {
+ *  that turns every bone for `secs` (an animation of its own, no mesh), carrying the hips `travel` forward. */
+function rigged(prefix: string, opts: { mesh?: boolean; clip?: { name: string; secs: number; travel?: number } }): Buffer {
   const floats = [
     ...[0, 0, 0, 1, 0, 0, 0, 1, 0], // a triangle
     ...[0, opts.clip?.secs ?? 0], // two keyframe times
     ...[0, 0, 0, 1, 0, 0.38, 0, 0.92], // two turns
+    ...[0, 0, 0, 0, 0, opts.clip?.travel ?? 0], // two places for the hips
   ]
   const joints = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
   const weights = [1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0]
-  const bin = Buffer.concat([Buffer.from(new Float32Array(floats).buffer), Buffer.from(new Uint8Array(joints).buffer), Buffer.from(new Float32Array(weights).buffer)])
+  const bin = Buffer.concat([
+    Buffer.from(new Float32Array(floats.slice(0, 19)).buffer),
+    Buffer.from(new Uint8Array(joints).buffer),
+    Buffer.from(new Float32Array(weights).buffer),
+    Buffer.from(new Float32Array(floats.slice(19)).buffer),
+  ])
   const bones = BONES.map((b, i) => ({ name: `${prefix}${b}`, ...(i + 1 < BONES.length ? { children: [i + 1] } : {}) }))
   const nodes: object[] = [...bones]
   if (opts.mesh) nodes.push({ name: 'Body', mesh: 0, skin: 0 })
@@ -29,6 +35,7 @@ function rigged(prefix: string, opts: { mesh?: boolean; clip?: { name: string; s
       { buffer: 0, byteOffset: 44, byteLength: 32 },
       { buffer: 0, byteOffset: 76, byteLength: 12 },
       { buffer: 0, byteOffset: 88, byteLength: 48 },
+      { buffer: 0, byteOffset: 136, byteLength: 24 },
     ],
     accessors: [
       { bufferView: 0, componentType: 5126, count: 3, type: 'VEC3', min: [0, 0, 0], max: [1, 1, 0] },
@@ -36,6 +43,7 @@ function rigged(prefix: string, opts: { mesh?: boolean; clip?: { name: string; s
       { bufferView: 2, componentType: 5126, count: 2, type: 'VEC4' },
       { bufferView: 3, componentType: 5121, count: 3, type: 'VEC4' },
       { bufferView: 4, componentType: 5126, count: 3, type: 'VEC4' },
+      { bufferView: 5, componentType: 5126, count: 2, type: 'VEC3' },
     ],
     ...(opts.mesh
       ? {
@@ -48,8 +56,14 @@ function rigged(prefix: string, opts: { mesh?: boolean; clip?: { name: string; s
           animations: [
             {
               name: opts.clip.name,
-              samplers: [{ input: 1, output: 2 }],
-              channels: BONES.map((_, i) => ({ sampler: 0, target: { node: i, path: 'rotation' } })),
+              samplers: [
+                { input: 1, output: 2 },
+                { input: 1, output: 5 },
+              ],
+              channels: [
+                ...BONES.map((_, i) => ({ sampler: 0, target: { node: i, path: 'rotation' } })),
+                ...(opts.clip.travel ? [{ sampler: 1, target: { node: 0, path: 'translation' } }] : []),
+              ],
             },
           ],
         }
@@ -64,7 +78,7 @@ test('an animation fits the characters with its skeleton in other packs, and eac
   test.setTimeout(180_000)
   const [heroes, mocap] = [`E2E Heroes ${unique()}`, `E2E Mocap ${unique()}`]
   const a = await uploadPack(api, heroes, [{ relpath: 'hero.gltf', data: rigged('mixamorig:', { mesh: true }) }])
-  const b = await uploadPack(api, mocap, [{ relpath: 'Clips/run.gltf', data: rigged('Armature|', { clip: { name: 'Run', secs: 0.8 } }) }])
+  const b = await uploadPack(api, mocap, [{ relpath: 'Clips/run.gltf', data: rigged('Armature|', { clip: { name: 'Run', secs: 0.8, travel: 3 } }) }])
   try {
     await waitReady(api, [a.id, b.id])
     const [hero] = await assetsOf(api, a.id)
@@ -95,6 +109,11 @@ test('an animation fits the characters with its skeleton in other packs, and eac
     const fetched = page.waitForRequest((r) => r.url().includes(`/api/assets/${run.id}/as/view`))
     await clips.selectOption({ label: `${run.name} · ${mocap}` })
     await fetched
+    // Its bones are named for Blender, the character's for Mixamo, and it runs forward: the character is held in the
+    // frame over a scrolling grid; at rest it isn't.
+    await expect(panel.locator('[data-travels]')).toHaveCount(1)
+    await clips.selectOption({ label: 'Rest pose' })
+    await expect(panel.locator('[data-travels]')).toHaveCount(0)
     const section = panel.getByTestId('fits')
     await expect(section.getByRole('heading', { name: 'Animations that fit (1)' })).toBeVisible()
     await expect(section.getByRole('button', { name: new RegExp(`${run.name}.*${mocap}`) })).toContainText('0.80 s')

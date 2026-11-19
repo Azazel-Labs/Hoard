@@ -11,7 +11,7 @@ import { api, asUrl, packFacings, type Asset, type AssetLink, type Facing } from
 import { applyToModel } from './materialMaps'
 import { BLANK_PNG, BROWSER_IMAGES, IMAGE_EXTS, TgaOrImageLoader, extOf, loadModel, nameOf, sourceFor, stemOf, textureLinks, textureUrl } from './modelFiles'
 import { MAP_SLOTS, roleOf, sanitize, toStandard, type AnyMaterial, type MapSlot } from './modelMaterials'
-import { PART_COLOR, disposeObject, mergeStill, snapshotView } from './modelScene'
+import { PART_COLOR, bindClip, disposeObject, mergeStill, snapshotView } from './modelScene'
 
 export type Background = 'checker' | 'dark' | 'gray' | 'light' | 'env'
 export const BACKGROUNDS: Background[] = ['checker', 'dark', 'gray', 'light', 'env']
@@ -78,6 +78,10 @@ export interface LoadOptions {
 /** Clips shorter than this hold a pose ("Targeting Pose"), as the server reckons them (`animations::POSE_SECS`). */
 const POSE_SECS = 0.1
 
+/** A clip whose root travels: the node that carries it, where it starts, how far one play of it goes, and the laps
+ *  played so far. */
+type Travel = { node: THREE.Object3D; start: THREE.Vector3; lap: THREE.Vector3; laps: number; last: number }
+
 export interface StageOptions {
   /** Textures as their files are, however big. Otherwise each comes as its light preview (at most 2048 px, see
    *  `liteUrl`), which loads far faster and looks the same at viewer sizes. */
@@ -100,6 +104,11 @@ export class ModelStage {
   private key = new THREE.DirectionalLight(0xffffff, 2)
   private envMap: THREE.Texture | null = null
   private grid: THREE.GridHelper | null = null
+  /** Whether the grid was asked for; a clip that travels shows it anyway. */
+  private gridOn = false
+  /** Where the grid sits when nothing travels, and the width of one of its squares, for scrolling it by. */
+  private gridHome = new THREE.Vector3()
+  private gridCell = 1
   /** The model, inside a group that turns it as its pack's models face (`setFacing`). */
   private object: THREE.Object3D | null = null
   private facing: Facing = { turn: 0, tilt: 0 }
@@ -110,6 +119,9 @@ export class ModelStage {
   /** The clip last asked for, so one that finishes loading after another is picked doesn't play. */
   private wanted = ''
   private action: THREE.AnimationAction | null = null
+  /** A clip whose root travels (a walk, a run): the node that carries it, where it starts, how far one play of it
+   *  goes, and the laps played, so the character is held in the frame while the grid scrolls the other way. */
+  private travel: Travel | null = null
   /** An animation played on a character, rather than a character playing its own clips. */
   private wearing = false
   /** An animation (on a character or its own mesh): its thumbnail shows it mid-clip. */
@@ -425,7 +437,7 @@ export class ModelStage {
         // A pose saved beside the clip (Blender's "Targeting Pose") isn't one to play.
         const takes = loaded.animations.filter((c) => c.duration >= POSE_SECS)
         const list = takes.length ? takes : loaded.animations
-        list.forEach((c, i) => this.clips.set(list.length > 1 ? `${label} ${i + 1}` : label, c))
+        list.forEach((c, i) => this.clips.set(list.length > 1 ? `${label} ${i + 1}` : label, bindClip(c, object)))
         disposeObject(loaded.object)
       } catch {
         // A clip that won't load shouldn't break the preview.
@@ -466,11 +478,12 @@ export class ModelStage {
   /** Turn the model (to try a facing before giving it to the pack) and look at it afresh from the front. */
   setFacing(facing: Facing) {
     if (!this.object) return
+    this.object.position.set(0, 0, 0)
     this.turn(facing)
-    const grid = this.grid?.visible ?? false
     this.frameHome()
-    if (this.grid) this.grid.visible = grid
     this.bounds().box.getSize(this.size)
+    this.travel = this.action ? this.measureTravel(this.action) : null
+    this.hold()
     this.redraw()
     if (this.paused) this.renderOnce()
   }
@@ -570,10 +583,12 @@ export class ModelStage {
     this.grid?.dispose()
     this.grid = new THREE.GridHelper(size, 20, 0x888888, 0x555555)
     this.grid.position.set(sphere.center.x, box.min.y, sphere.center.z)
+    this.gridHome.copy(this.grid.position)
+    this.gridCell = size / 20
     const gm = this.grid.material as THREE.Material
     gm.transparent = true
     gm.opacity = 0.45
-    this.grid.visible = false
+    this.grid.visible = this.gridOn || !!this.travel
     this.scene.add(this.grid)
   }
 
@@ -849,7 +864,8 @@ export class ModelStage {
   }
 
   setGrid(on: boolean) {
-    if (this.grid) this.grid.visible = on
+    this.gridOn = on
+    if (this.grid) this.grid.visible = on || !!this.travel
     this.redraw()
   }
 
@@ -890,7 +906,79 @@ export class ModelStage {
       this.action.paused = !this.playing
       this.action.play()
     }
+    this.travel = this.action ? this.measureTravel(this.action) : null
+    this.hold()
     this.redraw()
+  }
+
+  /** How far a clip's root goes over one play, from posing its start and its end; null for one that stays put (or
+   *  barely drifts), which is shown as it is, with no grid. */
+  private measureTravel(action: THREE.AnimationAction): Travel | null {
+    const { object, mixer } = this
+    const inner = object?.children[0]
+    if (!object || !mixer || !inner) return null
+    // The root: the highest node the clip moves rather than only turns.
+    let node: THREE.Object3D | null = null
+    let depth = Infinity
+    for (const t of action.getClip().tracks) {
+      if (!t.name.endsWith('.position')) continue
+      let found: THREE.Object3D | null = null
+      try {
+        const name = THREE.PropertyBinding.parseTrackName(t.name).nodeName
+        found = THREE.PropertyBinding.findNode(inner, name) as THREE.Object3D | null
+      } catch {
+        continue
+      }
+      let d = 0
+      for (let o = found; o && o !== inner; o = o.parent) d++
+      if (found && d < depth) [node, depth] = [found, d]
+    }
+    if (!node) return null
+    const root = node
+    const time = action.time
+    object.position.set(0, 0, 0)
+    const at = (t: number) => {
+      action.time = t
+      mixer.update(0)
+      object.updateMatrixWorld(true)
+      return root.getWorldPosition(new THREE.Vector3()).setY(0)
+    }
+    const start = at(0)
+    const lap = at(action.getClip().duration).sub(start)
+    action.time = time
+    mixer.update(0)
+    const reach = Math.max(this.size.x, this.size.y, this.size.z)
+    return lap.length() > reach * 0.2 ? { node: root, start, lap, laps: 0, last: time } : null
+  }
+
+  /** Keep a traveling clip's character in the frame, its root over where the clip starts, and scroll the grid under
+   *  it the other way by how far it has gone, laps and all; put both back for a clip that stays put. */
+  private hold() {
+    const object = this.object
+    if (!object) return
+    const tr = this.travel
+    this.host.toggleAttribute('data-travels', !!tr)
+    if (!tr || !this.action) {
+      object.position.set(0, 0, 0)
+      if (this.grid) {
+        this.grid.position.copy(this.gridHome)
+        this.grid.visible = this.gridOn
+      }
+      return
+    }
+    const time = this.action.time
+    if (time < tr.last) tr.laps++
+    tr.last = time
+    object.updateMatrixWorld(true)
+    const gone = tr.node.getWorldPosition(new THREE.Vector3()).sub(object.position).setY(0).sub(tr.start)
+    object.position.set(-gone.x, 0, -gone.z)
+    if (this.grid) {
+      const total = gone.addScaledVector(tr.lap, tr.laps)
+      const cell = this.gridCell
+      const wrap = (v: number) => ((v % cell) + cell) % cell
+      this.grid.position.set(this.gridHome.x - wrap(total.x), this.gridHome.y, this.gridHome.z - wrap(total.z))
+      this.grid.visible = true
+    }
   }
 
   /** Load an animation that fits as a clip: its longest take, as a pose saved beside it isn't one to play. */
@@ -903,7 +991,7 @@ export class ModelStage {
       const loaded = await loadModel(s.url, s.ext, manager)
       disposeObject(loaded.object)
       const longest = loaded.animations.reduce<THREE.AnimationClip | null>((a, c) => (!a || c.duration > a.duration ? c : a), null)
-      if (longest && !this.disposed) this.clips.set(name, longest)
+      if (longest && !this.disposed && this.object) this.clips.set(name, bindClip(longest, this.object))
     } catch {
       // One that won't load just doesn't play; the next pick tries again.
     }
@@ -1011,7 +1099,10 @@ export class ModelStage {
     this.timer.update(time)
     const dt = Math.min(this.timer.getDelta(), 0.1)
     const animating = !!this.action?.isRunning()
-    if (animating) this.mixer?.update(dt)
+    if (animating) {
+      this.mixer?.update(dt)
+      if (this.travel) this.hold()
+    }
     if (this.glide) this.redraw(100)
     if (this.glide && this.controls) {
       const g = this.glide

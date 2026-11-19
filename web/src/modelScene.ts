@@ -147,3 +147,38 @@ export function disposeObject(root: THREE.Object3D) {
     }
   })
 }
+
+/** A node's name as clips are matched by it across skeletons: without Mixamo's or Blender's prefix, lowercase, as the
+ *  server matches them (`animations::bone`). Three's loaders drop the `:` from `mixamorig:Hips`. */
+function boneKey(name: string): string {
+  return (name.split(/[:|]/).pop() ?? name).replace(/^mixamorig\d*/i, '').trim().toLowerCase()
+}
+
+/** A clip from another file with its tracks renamed to `root`'s nodes: by name, else by bone name without its prefix,
+ *  so an `Armature|Hips` clip moves a `mixamorig:Hips` character. A track for a node it lacks is left as it is. */
+export function bindClip(clip: THREE.AnimationClip, root: THREE.Object3D): THREE.AnimationClip {
+  const exact = new Set<string>()
+  const loose = new Map<string, string>()
+  root.traverse((o) => {
+    if (!o.name) return
+    exact.add(o.name)
+    const k = boneKey(o.name)
+    if (k && !loose.has(k)) loose.set(k, o.name)
+  })
+  let changed = false
+  const tracks = clip.tracks.map((t) => {
+    let node = ''
+    try {
+      node = THREE.PropertyBinding.parseTrackName(t.name).nodeName ?? ''
+    } catch {
+      return t
+    }
+    const to = !node || exact.has(node) || !t.name.startsWith(node) ? undefined : loose.get(boneKey(node))
+    if (!to) return t
+    changed = true
+    const renamed = t.clone()
+    renamed.name = to + t.name.slice(node.length)
+    return renamed
+  })
+  return changed ? new THREE.AnimationClip(clip.name, clip.duration, tracks, clip.blendMode) : clip
+}

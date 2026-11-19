@@ -254,7 +254,6 @@ onBeforeUnmount(() => window.clearTimeout(timer))
         <TagsPanel v-else-if="current === 'tags'" @tag="(t) => emit('tag', t)" @changed="emit('changed')" />
         <StoreFormatsPanel v-else-if="current === 'store-files'" />
         <template v-else-if="current === 'general'">
-          <HoardPanel @unauthorized="emit('unauthorized')" />
           <div v-if="s" class="body">
             <section>
               <div class="sh"><h3>{{ t('settings-name') }}</h3></div>
@@ -277,6 +276,7 @@ onBeforeUnmount(() => window.clearTimeout(timer))
               </div>
             </section>
           </div>
+          <HoardPanel @unauthorized="emit('unauthorized')" />
         </template>
 
         <p v-else-if="!s" class="loading">{{ t('settings-loading') }}</p>
@@ -406,6 +406,8 @@ onBeforeUnmount(() => window.clearTimeout(timer))
 }
 
 .body { display: grid; gap: 1rem; }
+/* General: the server's name, then the hoard (HoardPanel's root) the same gap below it. */
+.body + .hoard { margin-top: 1rem; }
 </style>
 
 <style>

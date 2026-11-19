@@ -18,7 +18,7 @@ import UploadQueue from './components/UploadQueue.vue'
 import AssetDetail from './components/AssetDetail.vue'
 import SelectionBag from './components/SelectionBag.vue'
 import AssetTile from './components/AssetTile.vue'
-import CollectionPicker from './components/CollectionPicker.vue'
+import SelectionBar from './components/SelectionBar.vue'
 import PacksView from './components/PacksView.vue'
 import ActiveFilters from './components/ActiveFilters.vue'
 import FilterSidebar from './components/FilterSidebar.vue'
@@ -566,9 +566,6 @@ function onTileOpen(a: Asset, e: MouseEvent | KeyboardEvent) {
   openAsset(a)
 }
 
-const bulkTag = ref('')
-const bulkCategory = ref('')
-const bulkBusy = ref(false)
 /** Selecting without anything picked yet (the Select button); tiles then check instead of opening. */
 const selectMode = ref(false)
 const selecting = computed(() => selectMode.value || checked.value.length > 0)
@@ -589,55 +586,6 @@ function patchLoaded(ids: string[], edit: Omit<BulkEdit, 'ids'>) {
   }
   slots.value = slots.value.map((a) => a && patch(a))
   if (selected.value && set.has(selected.value.id)) selected.value = patch(selected.value)
-}
-/** One edit to many assets in one go. False if it failed. */
-async function bulkEdit(ids: string[], edit: Omit<BulkEdit, 'ids'>): Promise<boolean> {
-  if (!ids.length) return true
-  bulkBusy.value = true
-  try {
-    await api.bulkAssets({ ids, ...edit })
-  } catch (e) {
-    showError(t('app-bulk-failed', { count: ids.length, error: (e as Error).message }))
-    return false
-  } finally {
-    bulkBusy.value = false
-  }
-  patchLoaded(ids, edit)
-  return true
-}
-async function bulkTagEdit(remove: boolean) {
-  const tag = bulkTag.value.trim().toLowerCase()
-  const ids = [...checked.value]
-  if (!tag || !ids.length) return
-  // Undo only touches the assets this changed.
-  const has = (id: string) => !!items.value.find((a) => a.id === id)?.tags.some((t) => t.tag === tag)
-  const touched = ids.filter((id) => has(id) === remove)
-  if (!(await bulkEdit(ids, remove ? { remove_tags: [tag] } : { add_tags: [tag] }))) return
-  bulkTag.value = ''
-  const undo = remove ? { add_tags: [tag] } : { remove_tags: [tag] }
-  showOk(remove ? t('app-bulk-untagged', { tag, count: touched.length }) : t('app-bulk-tagged', { tag, count: ids.length }), {
-    label: t('app-undo'),
-    run: () => void bulkEdit(touched, undo),
-  })
-}
-async function bulkSetCategory() {
-  const category = bulkCategory.value.trim()
-  const ids = [...checked.value]
-  if (!ids.length) return
-  // Remember each one's old category so Undo can put them back.
-  const before = new Map<string, string[]>()
-  for (const id of ids) {
-    const c = items.value.find((a) => a.id === id)?.category ?? ''
-    before.set(c, [...(before.get(c) ?? []), id])
-  }
-  if (!(await bulkEdit(ids, { category }))) return
-  bulkCategory.value = ''
-  showOk(category ? t('app-bulk-category-set', { category, count: ids.length }) : t('app-bulk-category-cleared', { count: ids.length }), {
-    label: t('app-undo'),
-    run: () => {
-      for (const [c, group] of before) void bulkEdit(group, { category: c })
-    },
-  })
 }
 /** CREDITS.md for the selected assets' packs (and the packs of what they need, as the zip has them). */
 async function creditsForChecked() {
@@ -1433,45 +1381,28 @@ const commands = computed<Command[]>(() => {
       />
 
       <Transition name="rise">
-      <div v-if="selecting" class="selbar" :class="{ beside: sidePanel }" role="region" :aria-label="t('app-selected-label')">
-        <strong>{{ checked.length ? t('app-selected', { count: checked.length }) : t('app-pick-assets') }}</strong>
-        <a v-if="checked.length && !bagShown" class="btn primary" :href="selectionUrl" download>{{ t('app-download-zip') }}</a>
-        <button v-if="checked.length && !bagShown" type="button" class="btn" :title="t('app-credits-title')" @click="creditsForChecked">{{ t('app-credits') }}</button>
-        <label v-if="checkedWithSource && !bagShown" class="srccheck" :title="t('app-prefer-sources-title')">
-          <input v-model="preferSources" type="checkbox" /> {{ t('app-prefer-sources', { count: checkedWithSource }) }}
-        </label>
-        <template v-if="editor">
-        <form class="bulktag" @submit.prevent="bulkTagEdit(false)">
-          <label class="visually-hidden" for="bulk-tag">{{ t('app-bulk-tag-label') }}</label>
-          <input id="bulk-tag" v-model="bulkTag" class="field" :placeholder="t('app-bulk-tag-placeholder')" autocomplete="off" :disabled="bulkBusy || !checked.length" />
-          <button class="btn" type="submit" :disabled="!bulkTag.trim() || bulkBusy" :aria-busy="bulkBusy" :title="t('app-bulk-tag-add-title')">{{ t('app-bulk-tag-add') }}</button>
-          <button class="btn" type="button" :disabled="!bulkTag.trim() || bulkBusy" :title="t('app-bulk-tag-remove-title')" @click="bulkTagEdit(true)">{{ t('app-bulk-tag-remove') }}</button>
-        </form>
-        <form class="bulktag" @submit.prevent="bulkSetCategory">
-          <label class="visually-hidden" for="bulk-cat">{{ t('app-bulk-category-label') }}</label>
-          <input id="bulk-cat" v-model="bulkCategory" class="field cat" :placeholder="t('app-bulk-category-placeholder')" autocomplete="off" :disabled="bulkBusy || !checked.length" />
-          <button class="btn" type="submit" :disabled="bulkBusy || !checked.length" :title="bulkCategory.trim() ? t('app-bulk-category-set-title') : t('app-bulk-category-clear-title')">
-            {{ bulkCategory.trim() ? t('app-bulk-category-set-button') : t('app-bulk-category-clear-button') }}
-          </button>
-        </form>
-        <CollectionPicker
-          v-if="checked.length"
-          :collections="collections"
-          up
-          @add="(id) => addToCollection(checked, { id })"
-          @create="(name) => addToCollection(checked, { create: name })"
-        />
-        <button v-if="filters.collection && checked.length" type="button" class="btn" @click="removeFromCollection(checked, filters.collection.id)">
-          {{ t('app-remove-from-collection', { name: filters.collection.name }) }}
-        </button>
-        </template>
-        <button v-if="member && checked.length" type="button" class="btn" @click="setFavorite(checked, !allStarred)">
-          {{ allStarred ? t('app-unfavorite') : t('app-favorite') }}
-        </button>
-        <button type="button" class="linkbtn" @click="checked = items.map((a) => a.id)">{{ t('app-select-all', { count: items.length }) }}</button>
-        <button v-if="editor" type="button" class="btn danger" :disabled="!checked.length || bulkBusy" :title="t('app-archive-selected-title')" @click="archiveChecked">{{ t('app-archive') }}</button>
-        <button type="button" class="btn ghost" @click="checked = []; selectMode = false">{{ t('app-done') }}</button>
-      </div>
+      <SelectionBar
+        v-if="selecting"
+        v-model:prefer-sources="preferSources"
+        :class="{ beside: sidePanel }"
+        :checked="checked"
+        :items="items"
+        :bag-shown="bagShown"
+        :zip-url="selectionUrl"
+        :with-source="checkedWithSource"
+        :editor="editor"
+        :member="member"
+        :collections="collections"
+        :all-starred="allStarred"
+        @patched="patchLoaded"
+        @credits="creditsForChecked"
+        @collect="(target) => addToCollection(checked, target)"
+        @uncollect="(id) => removeFromCollection(checked, id)"
+        @favorite="(on) => setFavorite(checked, on)"
+        @all="checked = items.map((a) => a.id)"
+        @archive="archiveChecked"
+        @done="checked = []; selectMode = false"
+      />
       </Transition>
     </template>
 
@@ -1669,24 +1600,9 @@ const commands = computed<Command[]>(() => {
 .detail-resize:hover::after, .detail-resize:focus-visible::after, .detail-resize.dragging::after { background: var(--accent); }
 :global(.resizing), :global(.resizing *) { cursor: col-resize !important; user-select: none !important; }
 
-.selbar {
-  position: fixed; left: 50%; bottom: 1rem; translate: -50% 0; z-index: 25;
-  display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap; max-width: calc(100vw - 2rem);
-  padding: 0.6rem 0.75rem 0.6rem 1rem; border: 1px solid var(--muted); border-radius: var(--r-tile);
-  background: var(--raised); box-shadow: 0 10px 30px var(--shadow); font-size: var(--step--1);
-}
-/* With a panel open, the bar centers over the grid so it doesn't cover the panel. */
-@media (min-width: 901px) {
-  .selbar.beside {
-    left: calc(50% - var(--detail-w, 420px) / 2); max-width: calc(100vw - var(--detail-w, 420px) - 2rem);
-  }
-}
 .rise-enter-active { transition: opacity var(--dur-2) var(--ease-out), transform var(--dur-3) var(--ease-pop); }
 .rise-leave-active { transition: opacity var(--dur-2) var(--ease-out), transform var(--dur-2) var(--ease-out); }
 .rise-enter-from, .rise-leave-to { opacity: 0; transform: translateY(18px) scale(0.97); }
-.bulktag { display: flex; gap: 0.35rem; }
-.srccheck { display: inline-flex; gap: 0.35rem; align-items: center; color: var(--muted); }
-.bulktag .field { width: 11rem; padding: 0.35em 0.6em; }
 
 .drop {
   position: fixed; inset: 0; z-index: 20; display: grid; place-items: center;
@@ -1750,9 +1666,6 @@ const commands = computed<Command[]>(() => {
   .grid { grid-template-columns: repeat(auto-fill, minmax(min(var(--tile), 42vw), 1fr)); gap: 0.9rem 0.7rem; }
   .detail-pane { position: fixed; inset: 0; z-index: 15; }
   .hint { display: none; }
-  .selbar { left: 0.5rem; right: 0.5rem; bottom: 0.5rem; translate: none; max-width: none; gap: 0.5rem; justify-content: space-between; }
-  .bulktag { order: 3; flex-basis: 100%; }
-  .bulktag .field { flex: 1; width: auto; }
 }
 /* Fingers need bigger targets than pointers. */
 @media (pointer: coarse) {

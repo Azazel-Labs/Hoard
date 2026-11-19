@@ -1,7 +1,7 @@
 import { MODELS } from './support/seed'
 import { zipNames } from './support/files'
-import { signedIn } from './support/api'
-import { expect, openPack, test } from './support/test'
+import { assetsOf, signedIn, tagsOf } from './support/api'
+import { expect, openPack, test, unique } from './support/test'
 
 // Picking assets swaps the details panel for the bag: what's picked, how big, and ways to download it all.
 test.describe('selection bag', () => {
@@ -44,5 +44,24 @@ test.describe('selection bag', () => {
     // Clearing the selection brings the grid back without a panel.
     await bag.getByRole('button', { name: 'Clear the selection' }).click()
     await expect(bag).toHaveCount(0)
+  })
+
+  test('the bar tags what is picked, and Undo takes the tag back off', async ({ page, seed, baseURL }) => {
+    await openPack(page, seed.packs[MODELS], MODELS)
+    for (const name of [/^crate,/i, /^triangle,/i]) {
+      await page.getByRole('button', { name }).first().click({ modifiers: ['ControlOrMeta'] })
+    }
+    const tag = `bulk-${unique()}`
+    const bar = page.getByRole('region', { name: 'Selected assets' })
+    await bar.getByRole('textbox', { name: /tag to add/i }).fill(tag)
+    await bar.getByRole('button', { name: 'Add', exact: true }).click()
+
+    const api = await signedIn(baseURL!)
+    const picked = (await assetsOf(api, seed.packs[MODELS])).filter((a) => a.kind === 'model' && /^(crate|triangle)$/i.test(a.name))
+    expect(picked).toHaveLength(2)
+    for (const a of picked) expect(await tagsOf(api, a.id)).toContain(tag)
+
+    await page.getByRole('button', { name: 'Undo' }).click()
+    for (const a of picked) await expect.poll(() => tagsOf(api, a.id)).not.toContain(tag)
   })
 })

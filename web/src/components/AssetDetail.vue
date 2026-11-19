@@ -8,6 +8,7 @@ import { looksAlike } from '../kinds'
 import CollectionPicker from './CollectionPicker.vue'
 import { playableUrl } from '../player'
 import AssetLinks from './AssetLinks.vue'
+import AssetDescriptions from './AssetDescriptions.vue'
 import AssetOrigin from './AssetOrigin.vue'
 import AudioPreview from './AudioPreview.vue'
 import DownloadAs from './DownloadAs.vue'
@@ -332,37 +333,6 @@ function onNameKey(e: KeyboardEvent) {
   }
 }
 
-// Descriptions: a person's own (editable here), the AI's, the file's embedded text and the pack's store page.
-const editingDesc = ref(false)
-const descDraft = ref('')
-const storeBlurb = ref<{ pack: string; store: string | null; url: string | null; text: string } | null>(null)
-const storeOpen = ref(false)
-watch(() => props.asset.id, () => (editingDesc.value = false))
-watch(
-  () => props.asset.pack_id,
-  async (pack) => {
-    storeOpen.value = false
-    if (storeBlurb.value?.pack === pack) return
-    storeBlurb.value = null
-    try {
-      const ctx = await api.packContext(pack)
-      if (props.asset.pack_id === pack && ctx.store_text) {
-        storeBlurb.value = { pack, store: ctx.store, url: ctx.store_url, text: ctx.store_text }
-      }
-    } catch {
-      // No context, no blurb.
-    }
-  },
-  { immediate: true },
-)
-function editDescription() {
-  descDraft.value = props.asset.description ?? ''
-  editingDesc.value = true
-}
-async function saveDescription() {
-  if (await patch({ description: descDraft.value.trim() })) editingDesc.value = false
-}
-
 async function addTag() {
   const tag = newTag.value.trim()
   if (!tag) return
@@ -558,44 +528,12 @@ onBeforeUnmount(() => unswipe())
     </div>
 
     <div class="infocol">
-    <section class="descs">
-      <form v-if="editingDesc" class="descedit" @submit.prevent="saveDescription">
-        <label class="visually-hidden" for="asset-desc">{{ t('asset-desc-label') }}</label>
-        <textarea id="asset-desc" v-model="descDraft" class="field" rows="3" maxlength="2000"
-          :placeholder="t('asset-desc-placeholder')" />
-        <div class="descbtns">
-          <button class="btn primary" type="submit">{{ t('asset-save') }}</button>
-          <button class="btn" type="button" @click="editingDesc = false">{{ t('asset-cancel') }}</button>
-          <span v-if="family && applyToFamily" class="hint">{{ t('asset-desc-family', { count: family.size }) }}</span>
-        </div>
-      </form>
-      <template v-else>
-        <p v-if="asset.description" class="desc mine">{{ asset.description }}</p>
-        <button v-if="editor" type="button" class="linkish small" @click="editDescription">
-          {{ asset.description ? t('asset-desc-edit') : t('asset-desc-write') }}
-        </button>
-      </template>
-      <div v-if="asset.ai_description" class="descsrc">
-        <span class="srclabel">{{ t('asset-desc-ai') }}</span>
-        <p class="desc">{{ asset.ai_description }}</p>
-      </div>
-      <div v-if="asset.source_description" class="descsrc">
-        <span class="srclabel">{{ t('asset-desc-file') }}</span>
-        <p class="desc">{{ asset.source_description }}</p>
-      </div>
-      <div v-if="storeBlurb" class="descsrc">
-        <span class="srclabel">
-          {{ t('asset-desc-store-before') }}
-          <a v-if="storeBlurb.url" :href="storeBlurb.url" target="_blank" rel="noopener noreferrer">{{ storeBlurb.store ? t('asset-desc-store-page', { store: storeBlurb.store }) : t('asset-desc-store-page-unnamed') }}</a>
-          <template v-else>{{ storeBlurb.store ? t('asset-desc-store-page', { store: storeBlurb.store }) : t('asset-desc-store-page-unnamed') }}</template>
-          {{ t('asset-desc-store-after') }}
-        </span>
-        <p class="desc store" :class="{ open: storeOpen }">{{ storeBlurb.text }}</p>
-        <button v-if="storeBlurb.text.length > 240" type="button" class="linkish small" @click="storeOpen = !storeOpen">
-          {{ storeOpen ? t('asset-less') : t('asset-more') }}
-        </button>
-      </div>
-    </section>
+    <AssetDescriptions
+      :asset="asset"
+      :editor="editor"
+      :family-size="family && applyToFamily ? family.size : null"
+      :save="(description) => patch({ description })"
+    />
 
     <section>
       <h3>{{ t('asset-tags') }}</h3>
@@ -818,17 +756,6 @@ onBeforeUnmount(() => unswipe())
   display: flex; flex-direction: column; aspect-ratio: auto; place-items: stretch; gap: 0.4rem; padding: 0.75rem 0.75rem 0.5rem;
   background: var(--bg);
 }
-.desc { margin: 0; color: var(--muted); max-width: 60ch; white-space: pre-line; }
-.desc.mine { color: var(--text); }
-.descs { display: grid; gap: 0.6rem; justify-items: start; }
-.descsrc { display: grid; gap: 0.15rem; }
-.srclabel { font-size: 0.72rem; color: var(--faint); }
-.desc.store { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 4; line-clamp: 4; overflow: hidden; }
-.desc.store.open { display: block; }
-.descedit { display: grid; gap: 0.4rem; width: 100%; max-width: 60ch; }
-.descedit textarea { resize: vertical; font: inherit; }
-.descbtns { display: flex; gap: 0.4rem; align-items: center; }
-.hint { font-size: 0.75rem; color: var(--faint); }
 .tags { position: relative; display: flex; flex-wrap: wrap; gap: 0.35rem; }
 .tags :deep(.chip) { cursor: pointer; }
 .chip-enter-active { transition: opacity var(--dur-2) var(--ease-out), scale var(--dur-3) var(--ease-pop); }

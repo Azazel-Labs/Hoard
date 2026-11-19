@@ -57,6 +57,35 @@ test.describe('Asset details', () => {
     expect(await panel.evaluate((el) => el.scrollWidth - el.clientWidth)).toBeLessThanOrEqual(0)
   })
 
+  test('a description written in the panel is kept, and Cancel leaves it as it was', async ({ page, api }) => {
+    const name = `E2E Describe ${unique()}`
+    const { obj, mtl, texture } = crate()
+    const pack = await uploadPack(api, name, [
+      { relpath: 'crate.obj', data: obj },
+      { relpath: 'crate.mtl', data: mtl },
+      { relpath: 'crate_diffuse.png', data: texture },
+    ])
+    await waitReady(api, [pack.id])
+    await openPack(page, pack.id, name, '&sort=name')
+    await tile(page, 'Crate').first().click()
+    const panel = page.getByRole('complementary', { name: 'Asset details' })
+
+    await panel.getByRole('button', { name: 'Write a description' }).click()
+    await panel.getByRole('textbox', { name: 'Your description' }).fill('A sturdy wooden crate.')
+    await panel.getByRole('button', { name: 'Save' }).click()
+    await expect(panel.getByText('A sturdy wooden crate.')).toBeVisible()
+    await expect(panel.getByRole('textbox', { name: 'Your description' })).toHaveCount(0)
+
+    await panel.getByRole('button', { name: 'Edit description' }).click()
+    await panel.getByRole('textbox', { name: 'Your description' }).fill('Something else')
+    await panel.getByRole('button', { name: 'Cancel' }).click()
+    await expect(panel.getByText('A sturdy wooden crate.')).toBeVisible()
+
+    const saved = (await assetsOf(api, pack.id)).find((a) => a.name === 'Crate' && a.kind === 'model')!
+    const read = (await (await api.get(`/api/assets/${saved.id}`)).json()) as { description: string | null }
+    expect(read.description).toBe('A sturdy wooden crate.')
+  })
+
   test('a link in the panel opens the asset at the top; Back returns to the one before, scrolled where it was', async ({ page, seed }) => {
     await page.setViewportSize({ width: 1400, height: 640 })
     await openPack(page, seed.packs[MODELS], MODELS, '&sort=name')

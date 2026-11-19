@@ -32,7 +32,7 @@ import {
   type SlotDef,
   type SlotTimeline,
   type Weighted,
-} from './skeleton2d'
+} from './skeletonModel'
 
 /** The animations a skeleton starts with, when it has one by these names (the server picks the same). */
 const STARTERS = ['idle', 'walk', 'run', 'animation']

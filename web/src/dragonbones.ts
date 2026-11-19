@@ -31,7 +31,7 @@ import {
   type SlotDef,
   type SlotTimeline,
   type Weighted,
-} from './skeleton2d'
+} from './skeletonModel'
 
 function poseOf(t: J): Pose {
   const skX = num(t?.skX, 0) * DEG

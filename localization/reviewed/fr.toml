@@ -7027,6 +7027,22 @@ translation = "{ $note } majeur"
 source = "{ $note } minor"
 translation = "{ $note } mineur"
 
+[messages.pack-panel-all]
+source = "All packs"
+translation = "Tous les packs"
+
+[messages.pack-panel-hide]
+source = "Hide the pack’s details"
+translation = "Masquer les détails du pack"
+
+[messages.pack-panel-kinds]
+source = "What’s in it"
+translation = "Ce qu’il contient"
+
+[messages.pack-panel-label]
+source = "About this pack"
+translation = "À propos de ce pack"
+
 [messages.packs-added]
 source = "Added { $date }"
 translation = "Ajouté le { $date }"

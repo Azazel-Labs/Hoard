@@ -6871,6 +6871,22 @@ translation = "{ $note } 大調"
 source = "{ $note } minor"
 translation = "{ $note } 小調"
 
+[messages.pack-panel-all]
+source = "All packs"
+translation = "所有素材包"
+
+[messages.pack-panel-hide]
+source = "Hide the pack’s details"
+translation = "隱藏素材包詳細資料"
+
+[messages.pack-panel-kinds]
+source = "What’s in it"
+translation = "包含內容"
+
+[messages.pack-panel-label]
+source = "About this pack"
+translation = "關於此素材包"
+
 [messages.packs-added]
 source = "Added { $date }"
 translation = "{ $date } 新增"

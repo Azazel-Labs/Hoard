@@ -6869,6 +6869,22 @@ translation = "{ $note } mayor"
 source = "{ $note } minor"
 translation = "{ $note } minor"
 
+[messages.pack-panel-all]
+source = "All packs"
+translation = "Semua paket"
+
+[messages.pack-panel-hide]
+source = "Hide the pack’s details"
+translation = "Sembunyikan detail paket"
+
+[messages.pack-panel-kinds]
+source = "What’s in it"
+translation = "Isinya"
+
+[messages.pack-panel-label]
+source = "About this pack"
+translation = "Tentang paket ini"
+
 [messages.packs-added]
 source = "Added { $date }"
 translation = "Ditambahkan { $date }"

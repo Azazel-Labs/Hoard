@@ -23,6 +23,7 @@ import DropOverlay from './components/DropOverlay.vue'
 import PacksView from './components/PacksView.vue'
 import ActiveFilters from './components/ActiveFilters.vue'
 import FilterSidebar from './components/FilterSidebar.vue'
+import PackPanel from './components/PackPanel.vue'
 import MicButton from './components/MicButton.vue'
 import FolderBar from './components/FolderBar.vue'
 import NothingHere from './components/NothingHere.vue'
@@ -578,8 +579,19 @@ watch([checked, items], () => {
 const bagAssets = computed(() => [...checkedSeen.value.values()])
 /** With assets picked, the panel shows them all (the bag) instead of one; phones keep the bar's buttons. */
 const bagShown = computed(() => checked.value.length > 0 && view.value === 'library' && !isNarrow.value)
-/** Whether a panel is beside the grid: the open asset's, or the bag. */
-const sidePanel = computed(() => view.value === 'library' && (bagShown.value || (!!selected.value && !prefs.detailPage)))
+/** The pack the grid is showing, as the packs list has it. */
+const browsedPack = computed(() => (filters.pack ? (packs.value.find((p) => p.id === filters.pack!.id) ?? null) : null))
+/** The pack whose panel was put away: browsing another brings the panel back. */
+const packPanelHidden = ref('')
+/** Browsing a pack with nothing open or picked, the panel tells about the pack. Phones keep the grid to itself. */
+const packShown = computed(
+  () => view.value === 'library' && !!browsedPack.value && !selected.value && !bagShown.value && !isNarrow.value &&
+    packPanelHidden.value !== browsedPack.value.id,
+)
+/** Whether a panel is beside the grid: the open asset's, the bag, or the pack's. */
+const sidePanel = computed(
+  () => view.value === 'library' && (bagShown.value || (!!selected.value && !prefs.detailPage) || packShown.value),
+)
 
 // ------------------------------------------------------------------ uploads
 
@@ -1185,6 +1197,12 @@ const commands = computed<Command[]>(() => {
           </button>
           <ActiveFilters :first-load="firstLoad" :total="total" />
           <button
+            v-if="browsedPack && packPanelHidden === browsedPack.id && !selected && !bagShown && !isNarrow"
+            type="button"
+            class="btn ghost"
+            @click="packPanelHidden = ''"
+          >{{ t('pack-panel-label') }}</button>
+          <button
             v-if="items.length"
             type="button"
             class="btn ghost select-btn"
@@ -1315,6 +1333,17 @@ const commands = computed<Command[]>(() => {
         @color="findColor"
         @teach="teachFile(selected!)"
         @folder="(path) => openFolderOf(selected!, path)"
+      />
+      <PackPanel
+        v-else-if="packShown && browsedPack"
+        class="detail-pane"
+        :pack="browsedPack"
+        :kind="filters.kind"
+        :tags="filters.tags"
+        @close="packPanelHidden = browsedPack.id"
+        @kind="setKind"
+        @tag="toggleTag"
+        @packs="setView('packs')"
       />
 
       <Transition name="rise">

@@ -6868,6 +6868,22 @@ translation = "{ $note } เมเจอร์"
 source = "{ $note } minor"
 translation = "{ $note } ไมเนอร์"
 
+[messages.pack-panel-all]
+source = "All packs"
+translation = "แพ็กทั้งหมด"
+
+[messages.pack-panel-hide]
+source = "Hide the pack’s details"
+translation = "ซ่อนรายละเอียดของแพ็ก"
+
+[messages.pack-panel-kinds]
+source = "What’s in it"
+translation = "มีอะไรอยู่ข้างใน"
+
+[messages.pack-panel-label]
+source = "About this pack"
+translation = "เกี่ยวกับแพ็กนี้"
+
 [messages.packs-added]
 source = "Added { $date }"
 translation = "เพิ่มเมื่อ { $date }"

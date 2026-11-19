@@ -7150,6 +7150,22 @@ translation = "{ $note } мажор"
 source = "{ $note } minor"
 translation = "{ $note } минор"
 
+[messages.pack-panel-all]
+source = "All packs"
+translation = "Все паки"
+
+[messages.pack-panel-hide]
+source = "Hide the pack’s details"
+translation = "Скрыть сведения о паке"
+
+[messages.pack-panel-kinds]
+source = "What’s in it"
+translation = "Что внутри"
+
+[messages.pack-panel-label]
+source = "About this pack"
+translation = "Об этом паке"
+
 [messages.packs-added]
 source = "Added { $date }"
 translation = "Добавлен { $date }"

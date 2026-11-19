@@ -7121,6 +7121,22 @@ translation = "{ $note } major"
 source = "{ $note } minor"
 translation = "{ $note } minor"
 
+[messages.pack-panel-all]
+source = "All packs"
+translation = "Toate pachetele"
+
+[messages.pack-panel-hide]
+source = "Hide the pack’s details"
+translation = "Ascunde detaliile pachetului"
+
+[messages.pack-panel-kinds]
+source = "What’s in it"
+translation = "Ce conține"
+
+[messages.pack-panel-label]
+source = "About this pack"
+translation = "Despre acest pachet"
+
 [messages.packs-added]
 source = "Added { $date }"
 translation = "Adăugat { $date }"

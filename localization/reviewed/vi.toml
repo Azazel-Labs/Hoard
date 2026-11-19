@@ -6865,6 +6865,22 @@ translation = "{ $note } trưởng"
 source = "{ $note } minor"
 translation = "{ $note } thứ"
 
+[messages.pack-panel-all]
+source = "All packs"
+translation = "Tất cả các gói"
+
+[messages.pack-panel-hide]
+source = "Hide the pack’s details"
+translation = "Ẩn chi tiết của gói"
+
+[messages.pack-panel-kinds]
+source = "What’s in it"
+translation = "Có gì bên trong"
+
+[messages.pack-panel-label]
+source = "About this pack"
+translation = "Về gói này"
+
 [messages.packs-added]
 source = "Added { $date }"
 translation = "Đã thêm { $date }"

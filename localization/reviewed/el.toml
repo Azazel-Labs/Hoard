@@ -7053,6 +7053,22 @@ translation = "{ $note } μείζονα"
 source = "{ $note } minor"
 translation = "{ $note } ελάσσονα"
 
+[messages.pack-panel-all]
+source = "All packs"
+translation = "Όλα τα πακέτα"
+
+[messages.pack-panel-hide]
+source = "Hide the pack’s details"
+translation = "Απόκρυψη λεπτομερειών πακέτου"
+
+[messages.pack-panel-kinds]
+source = "What’s in it"
+translation = "Τι περιέχει"
+
+[messages.pack-panel-label]
+source = "About this pack"
+translation = "Σχετικά με αυτό το πακέτο"
+
 [messages.packs-added]
 source = "Added { $date }"
 translation = "Προστέθηκε { $date }"

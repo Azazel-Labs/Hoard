@@ -2,7 +2,7 @@ import type { Page } from '@playwright/test'
 import { uploadPack, waitReady, type Pack } from './support/api'
 import { checker } from './support/files'
 import { BIG, MODELS, STORE, TEXTURES, ZIPPED } from './support/seed'
-import { expect, test, unique } from './support/test'
+import { expect, test, tile, unique } from './support/test'
 
 const SEEDED = [BIG, MODELS, TEXTURES, ZIPPED]
 
@@ -72,6 +72,32 @@ test.describe('packs page', () => {
     await expect(page.getByLabel('Status')).toHaveValue('')
     await expect(page.getByText('No packs match.')).toHaveCount(0)
     await expect(packNames(page).filter({ hasText: BIG })).toBeVisible()
+  })
+
+  test('a pack browsed shows what it is beside its assets; a kind narrows them, and it hides until asked back', async ({ page }) => {
+    await packNames(page).filter({ hasText: MODELS }).click()
+    const about = page.getByRole('complementary', { name: 'About this pack' })
+    await expect(about.getByRole('heading', { name: MODELS })).toBeVisible()
+    await expect(tile(page, 'Crate')).toBeVisible()
+    await expect(tile(page, 'Notes')).toBeVisible()
+
+    const kinds = about.getByRole('button', { name: /^Models/ })
+    await kinds.click()
+    await expect(kinds).toHaveAttribute('aria-pressed', 'true')
+    await expect(tile(page, 'Notes')).toHaveCount(0)
+    await expect(tile(page, 'Crate')).toBeVisible()
+
+    await about.getByRole('button', { name: 'Hide the pack’s details' }).click()
+    await expect(about).toHaveCount(0)
+    await page.getByRole('button', { name: 'About this pack' }).click()
+    await expect(page.getByRole('complementary', { name: 'About this pack' })).toBeVisible()
+
+    // An asset opened takes the panel's place; All packs goes back to the list.
+    await tile(page, 'Crate').click()
+    await expect(page.getByRole('complementary', { name: 'About this pack' })).toHaveCount(0)
+    await page.keyboard.press('Escape')
+    await page.getByRole('complementary', { name: 'About this pack' }).getByRole('button', { name: 'All packs' }).click()
+    await expect(page.getByLabel('Find a pack')).toBeVisible()
   })
 
   test('sorts by name and by asset count', async ({ page }) => {

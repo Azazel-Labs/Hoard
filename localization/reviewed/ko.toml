@@ -6859,6 +6859,22 @@ translation = "{ $note } 장조"
 source = "{ $note } minor"
 translation = "{ $note } 단조"
 
+[messages.pack-panel-all]
+source = "All packs"
+translation = "모든 팩"
+
+[messages.pack-panel-hide]
+source = "Hide the pack’s details"
+translation = "팩 세부 정보 숨기기"
+
+[messages.pack-panel-kinds]
+source = "What’s in it"
+translation = "포함된 항목"
+
+[messages.pack-panel-label]
+source = "About this pack"
+translation = "이 팩 정보"
+
 [messages.packs-added]
 source = "Added { $date }"
 translation = "{ $date } 추가됨"

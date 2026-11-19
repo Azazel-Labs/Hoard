@@ -7035,6 +7035,22 @@ translation = "{ $note }-duuri"
 source = "{ $note } minor"
 translation = "{ $note }-molli"
 
+[messages.pack-panel-all]
+source = "All packs"
+translation = "Kaikki paketit"
+
+[messages.pack-panel-hide]
+source = "Hide the pack’s details"
+translation = "Piilota paketin tiedot"
+
+[messages.pack-panel-kinds]
+source = "What’s in it"
+translation = "Mitä siinä on"
+
+[messages.pack-panel-label]
+source = "About this pack"
+translation = "Tietoja tästä paketista"
+
 [messages.packs-added]
 source = "Added { $date }"
 translation = "Lisätty { $date }"

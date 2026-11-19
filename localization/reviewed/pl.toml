@@ -7125,6 +7125,22 @@ translation = "{ $note }-dur"
 source = "{ $note } minor"
 translation = "{ $note }-moll"
 
+[messages.pack-panel-all]
+source = "All packs"
+translation = "Wszystkie paczki"
+
+[messages.pack-panel-hide]
+source = "Hide the pack’s details"
+translation = "Ukryj szczegóły paczki"
+
+[messages.pack-panel-kinds]
+source = "What’s in it"
+translation = "Co zawiera"
+
+[messages.pack-panel-label]
+source = "About this pack"
+translation = "O tej paczce"
+
 [messages.packs-added]
 source = "Added { $date }"
 translation = "Dodano { $date }"

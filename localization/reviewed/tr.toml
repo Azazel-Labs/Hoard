@@ -6879,6 +6879,22 @@ translation = "{ $note } majör"
 source = "{ $note } minor"
 translation = "{ $note } minör"
 
+[messages.pack-panel-all]
+source = "All packs"
+translation = "Tüm paketler"
+
+[messages.pack-panel-hide]
+source = "Hide the pack’s details"
+translation = "Paketin ayrıntılarını gizle"
+
+[messages.pack-panel-kinds]
+source = "What’s in it"
+translation = "İçinde neler var"
+
+[messages.pack-panel-label]
+source = "About this pack"
+translation = "Bu paket hakkında"
+
 [messages.packs-added]
 source = "Added { $date }"
 translation = "Eklendi: { $date }"

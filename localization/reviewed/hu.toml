@@ -6875,6 +6875,22 @@ translation = "{ $note }-dúr"
 source = "{ $note } minor"
 translation = "{ $note }-moll"
 
+[messages.pack-panel-all]
+source = "All packs"
+translation = "Összes csomag"
+
+[messages.pack-panel-hide]
+source = "Hide the pack’s details"
+translation = "A csomag részleteinek elrejtése"
+
+[messages.pack-panel-kinds]
+source = "What’s in it"
+translation = "Mi van benne"
+
+[messages.pack-panel-label]
+source = "About this pack"
+translation = "A csomagról"
+
 [messages.packs-added]
 source = "Added { $date }"
 translation = "Hozzáadva: { $date }"

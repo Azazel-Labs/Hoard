@@ -7113,6 +7113,22 @@ translation = "{ $note } dur"
 source = "{ $note } minor"
 translation = "{ $note } moll"
 
+[messages.pack-panel-all]
+source = "All packs"
+translation = "Všechny balíčky"
+
+[messages.pack-panel-hide]
+source = "Hide the pack’s details"
+translation = "Skrýt podrobnosti balíčku"
+
+[messages.pack-panel-kinds]
+source = "What’s in it"
+translation = "Co obsahuje"
+
+[messages.pack-panel-label]
+source = "About this pack"
+translation = "O tomto balíčku"
+
 [messages.packs-added]
 source = "Added { $date }"
 translation = "Přidáno { $date }"

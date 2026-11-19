@@ -186,7 +186,7 @@ Konum, sunucunun görebildiği herhangi bir klasördür; bu yüzden Docker’da 
 
 **Güncelleme.** Daha yeni bir sürüm olduğunda üst çubukta bir rozet görünür. Almak için `docker compose pull && docker compose up -d`
 komutunu çalıştırın; Hoard başlarken veritabanını yükseltir, önce bir kopyasını `/config/backups` içine kaydeder. Yalnızca
-yama sürümlerini almak için imaj etiketini `:1.2` olarak değiştirin. Hoard’u bir yüklemenin ortasında yeniden başlatmadan
+yama sürümlerini almak için imaj etiketini `:1.3` olarak değiştirin. Hoard’u bir yüklemenin ortasında yeniden başlatmadan
 otomatik olarak güncellemek için **Ayarlar → Bakım → Güncellemeler** bölümüne çağrılacak bir adres verin: bir sürüm
 çıktığında ve hiçbir şey yapılmıyorken Hoard o adresi çağırır (Watchtower’ın HTTP API’si, bir Portainer webhook’u, bir
 betik; bkz. [docs/DEPLOYMENT.md](../DEPLOYMENT.md#updating)).

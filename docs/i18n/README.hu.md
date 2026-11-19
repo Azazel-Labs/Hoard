@@ -186,7 +186,7 @@ Hely bármely mappa lehet, amelyet a szerver lát, ezért Dockerben előbb csato
 
 **Frissítés.** A fejléc jelvényt mutat, ha újabb kiadás érhető el. A frissítéshez futtassa a
 `docker compose pull && docker compose up -d` parancsot; a Hoard induláskor frissíti az adatbázisát, és előtte
-másolatot ment róla a `/config/backups` mappába. Ha csak javítókiadásokat szeretne, változtassa a képcímkét `:1.2`
+másolatot ment róla a `/config/backups` mappába. Ha csak javítókiadásokat szeretne, változtassa a képcímkét `:1.3`
 értékre. Ha automatikusan szeretne frissíteni anélkül, hogy a Hoard feltöltés közben újraindulna, adjon meg egy
 meghívandó címet a **Beállítások → Karbantartás → Frissítések** alatt: a Hoard akkor hívja meg, amikor megjelent egy
 kiadás, és semmi sincs folyamatban (a Watchtower HTTP API-ja, egy Portainer-webhook, egy szkript; lásd:

@@ -183,7 +183,7 @@ En plats är vilken mapp som helst som servern kan se, så i Docker monterar du 
 
 **Uppdatera.** Sidhuvudet visar en markering när det finns en nyare version. Kör `docker compose pull && docker compose up -d`
 för att hämta den; Hoard uppgraderar sin databas vid start och sparar först en kopia i `/config/backups`. Ändra avbildens tagg till
-`:1.2` för att bara få patchversioner. För att uppdatera automatiskt utan att Hoard startas om mitt i en uppladdning ger du
+`:1.3` för att bara få patchversioner. För att uppdatera automatiskt utan att Hoard startas om mitt i en uppladdning ger du
 **Inställningar → Underhåll → Uppdateringar** en adress att anropa: Hoard anropar den när en version har kommit ut och inget pågår
 (Watchtowers HTTP-API, en Portainer-webhook, ett skript; se [docs/DEPLOYMENT.md](../DEPLOYMENT.md#updating)).
 

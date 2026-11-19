@@ -188,7 +188,7 @@ Una posizione è qualsiasi cartella che il server riesce a vedere, quindi in Doc
 
 **Aggiornamenti.** L'intestazione mostra un badge quando esiste una versione più recente. Esegui
 `docker compose pull && docker compose up -d` per installarla; Hoard aggiorna il suo database all'avvio, salvandone
-prima una copia in `/config/backups`. Cambia il tag dell'immagine in `:1.2` per ricevere solo le versioni di patch. Per
+prima una copia in `/config/backups`. Cambia il tag dell'immagine in `:1.3` per ricevere solo le versioni di patch. Per
 aggiornare automaticamente senza riavviare Hoard a metà di un caricamento, dai a
 **Impostazioni → Manutenzione → Aggiornamenti** un indirizzo da chiamare: Hoard lo chiama quando esce una versione e
 non succede niente (l'API HTTP di Watchtower, un webhook di Portainer, uno script; vedi

@@ -158,8 +158,8 @@ takes:
 | In the compose file | Effect |
 |---|---|
 | `image: ghcr.io/azazel-labs/hoard:latest` (as shipped) | every release |
-| `…/hoard:1.2` | patch releases of 1.2 only; change it by hand for 1.3 |
-| `…/hoard:1.2.0` | exactly that version |
+| `…/hoard:1.3` | patch releases of 1.3 only; change it by hand for 1.4 |
+| `…/hoard:1.3.0` | exactly that version |
 | `…/hoard:edge` | every green commit on `main`, between releases |
 
 The server asks GitHub every six hours whether a newer release exists, for the badge in the header; switch that off
@@ -174,7 +174,7 @@ uploads, jobs, conversions, downloads or maintenance, two checks a minute apart)
 `Authorization` header if you gave one and the release in a JSON body:
 
 ```json
-{ "event": "update", "version": "1.2.0", "running": "1.1.61", "notes": "https://github.com/…/releases/tag/v1.2.0" }
+{ "event": "update", "version": "1.3.0", "running": "1.2.52", "notes": "https://github.com/…/releases/tag/v1.3.0" }
 ```
 
 It calls once per release; if the call fails, it tries again an hour later, up to six times. **Call it now** checks the

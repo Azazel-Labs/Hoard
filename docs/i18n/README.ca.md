@@ -188,7 +188,7 @@ Una ubicació és qualsevol carpeta que el servidor pugui veure, així que a Doc
 
 **Actualitzacions.** La capçalera mostra una insígnia quan hi ha una versió més nova. Executeu
 `docker compose pull && docker compose up -d` per instal·lar-la; Hoard actualitza la seva base de dades en iniciar-se, i
-abans en desa una còpia a `/config/backups`. Canvieu l'etiqueta de la imatge a `:1.2` per rebre només versions de
+abans en desa una còpia a `/config/backups`. Canvieu l'etiqueta de la imatge a `:1.3` per rebre només versions de
 correcció. Per actualitzar automàticament sense reiniciar Hoard enmig d'una pujada, doneu a
 **Configuració → Manteniment → Actualitzacions** una adreça a cridar: Hoard la crida quan surt una versió i no passa res
 (l'API HTTP de Watchtower, un webhook de Portainer, un script; vegeu [docs/DEPLOYMENT.md](../DEPLOYMENT.md#updating)).

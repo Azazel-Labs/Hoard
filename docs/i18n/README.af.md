@@ -182,7 +182,7 @@ dit en los 'n pak op die portaal. Meer liggings kom later, vanaf **Instellings �
 
 **Bywerk.** Die kopstrook wys 'n kenteken wanneer daar 'n nuwer weergawe is. Voer `docker compose pull && docker compose up -d`
 uit om dit te kry; Hoard gradeer sy databasis by die begin op, en stoor eers 'n kopie in `/config/backups`. Verander die
-beeld-etiket na `:1.2` om net reggemaakte weergawes te kry. Om outomaties by te werk sonder om Hoard in die middel van
+beeld-etiket na `:1.3` om net reggemaakte weergawes te kry. Om outomaties by te werk sonder om Hoard in die middel van
 'n oplaai te herbegin, gee **Instellings → Instandhouding → Bywerkings** 'n adres om te roep: Hoard roep dit sodra 'n
 weergawe uit is en niks aan die gang is nie (Watchtower se HTTP API, 'n Portainer-webhook, 'n skrip; sien
 [docs/DEPLOYMENT.md](../DEPLOYMENT.md#updating)).

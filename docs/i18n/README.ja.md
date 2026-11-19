@@ -193,7 +193,7 @@ docker compose up -d        # open http://<host>:4627
 
 **更新。** 新しいリリースがあると、ヘッダーにバッジが表示されます。`docker compose pull && docker compose up -d`
 を実行すると更新できます。Hoard は起動時にデータベースをアップグレードし、その前に `/config/backups` にコピーを保存します。パッチリリースだけを受け取るには、イメージのタグを
-`:1.2` に変更してください。アップロードの途中で Hoard を再起動せずに自動で更新するには、
+`:1.3` に変更してください。アップロードの途中で Hoard を再起動せずに自動で更新するには、
 **設定 → メンテナンス → 更新** に呼び出すアドレスを指定してください。リリースが出て何も処理していないときに、Hoard がそれを呼び出します
 （Watchtower の HTTP API、Portainer の Webhook、スクリプトなど。[docs/DEPLOYMENT.md](../DEPLOYMENT.md#updating) を参照）。
 

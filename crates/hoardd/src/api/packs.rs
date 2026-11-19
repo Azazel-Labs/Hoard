@@ -46,11 +46,16 @@ pub(super) async fn put_pack_context(
     if ctx.store.is_none() {
         ctx.store = ctx.store_url.as_deref().and_then(context::store_from_url).map(str::to_owned);
     }
+    // The reader that wrote the text if it was fetched here; text that comes back as it was keeps its own.
+    let mut read = None;
     if ctx.store_text.is_none()
         && let Some(url) = &ctx.store_url
     {
         match context::fetch_store_text(context::web(), url).await {
-            Ok(text) => ctx.store_text = text,
+            Ok(text) => {
+                read = text.is_some().then_some(context::STORE_READER);
+                ctx.store_text = text;
+            }
             Err(e) => tracing::info!(url, error = %format!("{e:#}"), "couldn't fetch store page"),
         }
     }
@@ -61,13 +66,25 @@ pub(super) async fn put_pack_context(
         }
         // A page someone changed is no longer the one found automatically.
         c.execute(
-            "INSERT INTO pack_context (pack_id, store, store_url, store_text, license_tier, seller, store_license)
-             VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7)
+            "INSERT INTO pack_context (pack_id, store, store_url, store_text, license_tier, seller, store_license,
+                 store_text_read)
+             VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8)
              ON CONFLICT (pack_id) DO UPDATE SET store = excluded.store, store_url = excluded.store_url,
                  store_text = excluded.store_text, license_tier = excluded.license_tier, seller = excluded.seller,
                  store_license = excluded.store_license,
-                 store_auto = CASE WHEN store_url IS excluded.store_url THEN store_auto END",
-            params![id2, ctx.store, ctx.store_url, ctx.store_text, ctx.license_tier, ctx.seller, ctx.store_license],
+                 store_auto = CASE WHEN store_url IS excluded.store_url THEN store_auto END,
+                 store_text_read = CASE WHEN ?8 IS NOT NULL THEN ?8
+                     WHEN store_text IS excluded.store_text AND store_url IS excluded.store_url THEN store_text_read END",
+            params![
+                id2,
+                ctx.store,
+                ctx.store_url,
+                ctx.store_text,
+                ctx.license_tier,
+                ctx.seller,
+                ctx.store_license,
+                read
+            ],
         )?;
         Ok(Some(db::pack_context(c, &id2)?))
     })

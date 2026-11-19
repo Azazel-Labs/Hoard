@@ -38,7 +38,7 @@ fn queue(c: &rusqlite::Connection, after_secs: i64, or_running: bool) -> Result<
         params![jobs::STORE_LOOKUP, or_running],
         |r| r.get(0),
     )?;
-    if pending || next_pack(c)?.is_none() {
+    if pending || (next_pack(c)?.is_none() && next_reread(c)?.is_none()) {
         return Ok(false);
     }
     let id = db::enqueue(c, jobs::STORE_LOOKUP, None, &serde_json::json!({}))?;
@@ -63,9 +63,32 @@ fn next_pack(c: &rusqlite::Connection) -> Result<Option<(String, String)>> {
     .optional()?)
 }
 
-/// The lookup job: look up the next pack, then queue the one after it.
+/// The next pack whose store page was read by an older reader than this version's (see `context::STORE_READER`).
+fn next_reread(c: &rusqlite::Connection) -> Result<Option<(String, String)>> {
+    Ok(c.query_row(
+        "SELECT p.id, p.name FROM packs p JOIN pack_context c ON c.pack_id = p.id
+         WHERE c.store_text_read < ?1 AND c.store_url IS NOT NULL
+         ORDER BY p.created_at DESC LIMIT 1",
+        [crate::context::STORE_READER],
+        |r| Ok((r.get(0)?, r.get(1)?)),
+    )
+    .optional()?)
+}
+
+/// The lookup job: read again a store page an older version read, or else look up the next pack; then queue the one
+/// after it.
 pub(crate) async fn run(state: &AppState, activity: &crate::activity::Handle) -> Result<()> {
     if !state.settings.get().store_lookup {
+        return Ok(());
+    }
+    if let Some((id, name)) = db::call(&state.pool, |c| next_reread(c)).await? {
+        activity.detail(name);
+        // Unreachable: likely offline. It's tried again at the next start or ingest.
+        if crate::context::reread_store_text(state, &id).await?
+            && db::call(&state.pool, |c| queue(c, GAP_SECS, false)).await?
+        {
+            state.wake.notify_one();
+        }
         return Ok(());
     }
     let Some((id, name)) = db::call(&state.pool, |c| next_pack(c)).await? else { return Ok(()) };
@@ -131,7 +154,8 @@ fn attach(c: &rusqlite::Connection, pack_id: &str, m: &store_search::StoreMatch,
     let wrote_seller = if seller_was.is_none() { m.author() } else { None };
     let auto = serde_json::json!({ "at": now, "seller": wrote_seller });
     c.execute(
-        "UPDATE pack_context SET store = ?2, store_url = ?3, store_text = NULL, store_license = ?4,
+        "UPDATE pack_context SET store = ?2, store_url = ?3, store_text = NULL, store_text_read = NULL,
+                store_license = ?4,
                 seller = COALESCE(seller, ?5), store_auto = ?6
          WHERE pack_id = ?1",
         params![pack_id, m.store(), m.url(), m.license(), wrote_seller, auto.to_string()],
@@ -144,7 +168,8 @@ fn attach(c: &rusqlite::Connection, pack_id: &str, m: &store_search::StoreMatch,
 /// page wasn't attached automatically.
 pub(crate) fn undo(c: &rusqlite::Connection, pack_id: &str) -> Result<bool> {
     let n = c.execute(
-        "UPDATE pack_context SET store = NULL, store_url = NULL, store_text = NULL, store_license = NULL,
+        "UPDATE pack_context SET store = NULL, store_url = NULL, store_text = NULL, store_text_read = NULL,
+                store_license = NULL,
                 seller = CASE WHEN seller IS json_extract(store_auto, '$.seller') THEN NULL ELSE seller END,
                 store_auto = NULL
          WHERE pack_id = ?1 AND store_auto IS NOT NULL",
@@ -161,7 +186,7 @@ mod tests {
         let c = rusqlite::Connection::open_in_memory().unwrap();
         c.execute_batch(
             "CREATE TABLE pack_context (pack_id TEXT PRIMARY KEY, store TEXT, store_url TEXT, store_text TEXT,
-                 license_tier TEXT, readme TEXT, seller TEXT, store_license TEXT, store_auto TEXT, store_matches TEXT,
+                 store_text_read INTEGER, license_tier TEXT, readme TEXT, seller TEXT, store_license TEXT, store_auto TEXT, store_matches TEXT,
                  store_lookup_at TEXT);
              INSERT INTO pack_context (pack_id) VALUES ('a'), ('b');
              UPDATE pack_context SET seller = 'Quixel Megascans' WHERE pack_id = 'b';",

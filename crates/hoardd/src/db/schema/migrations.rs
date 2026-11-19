@@ -762,4 +762,9 @@ pub(in crate::db) const MIGRATIONS: &[&str] = &[
     "ALTER TABLE users ADD COLUMN hoard_seen TEXT;",
     // 77: browsing newest first reads a page of the library in order instead of sorting all of it.
     "CREATE INDEX assets_created ON assets (created_at DESC, path);",
+    // 78: the version of the store page reader that wrote a pack's store text (`context::STORE_READER`), none where
+    // a person typed it. Text from before is 0: it's read again only if it's still what the first reader made of the
+    // page, so text someone typed or changed stays.
+    "ALTER TABLE pack_context ADD COLUMN store_text_read INTEGER;
+     UPDATE pack_context SET store_text_read = 0 WHERE store_text IS NOT NULL AND store_url IS NOT NULL;",
 ];

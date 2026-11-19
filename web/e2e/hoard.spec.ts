@@ -3,9 +3,10 @@ import { expect, test } from './support/test'
 type Seen = { seen: Record<string, number> | null }
 
 test.describe('the dragon hoard', () => {
+  // The cave is drawn every frame in software WebGL here, so a small window keeps each frame, and each click, quick.
+  test.use({ viewport: { width: 800, height: 600 } })
+
   test('what the library holds beyond what was collected is loot; Collect records it', async ({ page, api }) => {
-    // The cave is drawn in software WebGL in a headless browser, so each click waits on a slow frame.
-    test.setTimeout(90_000)
     // Start from an empty pile, so the whole library is there to collect.
     expect((await api.put('/api/me/hoard', { data: { seen: {} } })).ok()).toBe(true)
     await page.goto('/#settings/general')

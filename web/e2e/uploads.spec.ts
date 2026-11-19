@@ -1,5 +1,6 @@
 import { createHash } from 'node:crypto'
 import { assetsOf, waitReady, type Pack } from './support/api'
+import { zip } from './support/files'
 import { expect, test, unique } from './support/test'
 
 interface Session {
@@ -55,6 +56,39 @@ test.describe('resumable uploads', () => {
 })
 
 test.describe('the import queue', () => {
+  test('an archive picked in pieces is one pack, unpacked from all of them', async ({ page, api }) => {
+    test.setTimeout(120_000)
+    const stem = `pieces-${unique()}`
+    const whole = zip(
+      ['notes', 'more'].map((n) => ({ path: `${stem}/${n}.txt`, data: Buffer.from(`${n} for ${stem}\n`.repeat(40)) })),
+    )
+    const half = Math.ceil(whole.length / 2)
+    const pieces = [whole.subarray(0, half), whole.subarray(half)].map((buffer, i) => ({
+      name: `${stem}.zip.00${i + 1}`,
+      mimeType: 'application/octet-stream',
+      buffer,
+    }))
+    await page.goto('/')
+    await page.locator('input[type=file]:not([webkitdirectory])').first().setInputFiles(pieces)
+    const queue = page.getByRole('region', { name: 'Imports' })
+    await expect(queue.getByText(`${stem}.zip`, { exact: true })).toBeVisible()
+
+    let mine: Pack[] = []
+    await expect
+      .poll(
+        async () => {
+          mine = ((await (await api.get('/api/packs')).json()) as Pack[]).filter((p) => p.name.includes(stem))
+          return mine.length
+        },
+        { timeout: 60_000 },
+      )
+      .toBe(1)
+    await waitReady(api, [mine[0].id])
+    const paths = (await assetsOf(api, mine[0].id)).map((a) => a.path).sort()
+    expect(paths).toEqual(['more.txt', 'notes.txt'])
+    await api.delete(`/api/packs/${mine[0].id}`)
+  })
+
   test('files dragged over the window show where to drop them, counted, until they leave', async ({ page }) => {
     await page.goto('/')
     const files = await page.evaluateHandle(() => {

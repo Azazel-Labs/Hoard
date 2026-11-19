@@ -44,6 +44,9 @@ r2d2_sqlite = "0.36"
 uuid = { version = "1.29", features = ["v4", "v7"] }
 zip = { version = "9", default-features = false, features = ["deflate", "deflate64", "bzip2", "lzma", "zstd", "time"] }
 tar = "0.4"
+# 7z and RAR packs (RAR through the UnRAR library, which reads multipart sets itself).
+sevenz-rust2 = { version = "=0.24.2", default-features = false, features = ["bzip2", "deflate", "ppmd", "zstd"] }
+unrar = "0.5.8"
 quick-xml = "0.41"
 flate2 = "1.1"
 infer = "0.22"
@@ -135,6 +138,8 @@ ldap3_proto = "0.9"
 futures-util = { version = "0.3", features = ["sink"] }
 tokio-util = { version = "0.7", features = ["codec"] }
 lzma-rust2 = { version = "0.25", default-features = false, features = ["std", "xz", "encoder"] }
+# Makes the 7z archives the unpacking tests read.
+sevenz-rust2 = { version = "=0.24.2", default-features = false, features = ["compress", "util"] }
 
 [target.'cfg(windows)'.dependencies.windows-native-keyring-store]
 version = "1.1.0"

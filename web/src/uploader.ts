@@ -7,7 +7,7 @@
 // - The server recognizes a re-sent file list, so if the tab is closed, dropping the same folder again continues
 //   where it stopped, and packs that already finished aren't imported twice.
 import { ApiError, authHeaders, signInNeeded, type Pack } from './api'
-import type { UploadFile } from './drop'
+import { archiveOf, type UploadFile } from './drop'
 import { t } from './i18n'
 
 const SMALL = 4 * 1024 * 1024
@@ -229,10 +229,9 @@ export async function abandonUpload(id: string): Promise<void> {
   await fetch(`/api/uploads/${id}`, { method: 'DELETE', headers: headers() }).catch(() => undefined)
 }
 
-const ARCHIVE = /\.(zip|tar|tgz|tar\.gz)$/i
-
 /**
- * Bulk import: split a folder's contents into one group per subfolder, plus one per archive at the top level.
+ * Bulk import: split a folder's contents into one group per subfolder, plus one per archive at the top level (its
+ * parts together, when it's in parts).
  * Loose non-archive files at the top level become one more group named after the folder.
  */
 export function splitPerSubfolder(rootName: string, files: UploadFile[]): { name: string; files: UploadFile[] }[] {
@@ -245,8 +244,10 @@ export function splitPerSubfolder(rootName: string, files: UploadFile[]): { name
       const key = rel[0]
       if (!groups.has(key)) groups.set(key, [])
       groups.get(key)!.push({ file: f.file, path: rel.join('/') })
-    } else if (rel.length === 1 && ARCHIVE.test(rel[0])) {
-      groups.set(rel[0], [{ file: f.file, path: rel[0] }])
+    } else if (rel.length === 1 && archiveOf(rel[0])) {
+      const key = archiveOf(rel[0])!
+      if (!groups.has(key)) groups.set(key, [])
+      groups.get(key)!.push({ file: f.file, path: rel[0] })
     } else if (rel.length === 1) {
       loose.push({ file: f.file, path: `${rootName}/${rel[0]}` })
     }
@@ -262,7 +263,7 @@ export function looksLikeFolderOfPacks(files: UploadFile[]): number {
   for (const f of files) {
     const rel = f.path.split('/').slice(1)
     if (rel.length >= 2) tops.add(rel[0])
-    else if (rel.length === 1 && ARCHIVE.test(rel[0])) tops.add(rel[0])
+    else if (rel.length === 1 && archiveOf(rel[0])) tops.add(archiveOf(rel[0])!.toLowerCase())
   }
   return tops.size >= 2 ? tops.size : 0
 }

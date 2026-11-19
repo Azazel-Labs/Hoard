@@ -1,15 +1,19 @@
-//! Getting a pack's files out: archives inside it unpacked (zip, tar, `.unitypackage`) within a size budget, its
-//! root found, junk and sidecar files left out, and a glTF's loose buffers and images packed into one GLB.
+//! Getting a pack's files out: archives inside it unpacked (zip, tar, `.unitypackage`, 7z and RAR, whole or in
+//! parts, see `archives`) within a size budget, its root found, junk and sidecar files left out, and a glTF's loose
+//! buffers and images packed into one GLB.
 
 use std::collections::{HashMap, HashSet};
 use std::fs::{self, File};
-use std::io::{self, BufReader, Read, Write};
+use std::io::{self, BufReader, Read, Seek, Write};
 use std::path::{Path, PathBuf};
 use std::sync::atomic::{AtomicBool, AtomicU64, AtomicUsize, Ordering};
 
 use anyhow::{Context, Result};
 
 use super::{ext_of, workers};
+
+mod archives;
+use archives::{Format, Joined};
 
 const MAX_ARCHIVE_DEPTH: u32 = 3;
 /// Clean a client- or archive-supplied relative path. Returns `None` for anything that could escape
@@ -58,16 +62,6 @@ pub(super) fn kept(root: &Path, f: &Path) -> bool {
     !is_sidecar(&rel) || sprite_meta(f, &rel)
 }
 
-fn archive_stem(name: &str) -> Option<&str> {
-    let lower = name.to_lowercase();
-    for ext in [".tar.gz", ".tgz", ".tar", ".zip", ".unitypackage"] {
-        if lower.ends_with(ext) {
-            return Some(&name[..name.len() - ext.len()]);
-        }
-    }
-    None
-}
-
 /// What an upload may still unpack to, shared by the unpacking threads, plus a running file count for progress.
 #[derive(Debug)]
 pub(super) struct Budget {
@@ -97,7 +91,7 @@ impl Budget {
 
     /// Stream `src` to `dest`, a buffer at a time, charging every byte before it's written: a zip bomb stops at
     /// the limit, however many threads are unpacking.
-    fn copy_limited(&self, src: &mut impl Read, dest: &Path) -> Result<()> {
+    fn copy_limited(&self, src: &mut (impl Read + ?Sized), dest: &Path) -> Result<()> {
         if let Some(parent) = dest.parent() {
             fs::create_dir_all(parent)?;
         }
@@ -113,11 +107,16 @@ impl Budget {
             self.reserve(n as u64)?;
             out.write_all(&buf[..n])?;
         }
+        self.placed();
+        Ok(())
+    }
+
+    /// Count a file unpacked, for the progress shown while unpacking.
+    fn placed(&self) {
         let n = self.files.fetch_add(1, Ordering::Relaxed) + 1;
         if n.is_multiple_of(250) {
             crate::activity::job_note(crate::jobs::INGEST, Some(&self.pack_id), &format!("unpacked {n} files"));
         }
-        Ok(())
     }
 }
 
@@ -217,51 +216,75 @@ pub(super) fn rel_of(root: &Path, path: &Path) -> String {
         .join("/")
 }
 
+/// Unpack the archives under `dir` in place, and the archives inside those, down to [`MAX_ARCHIVE_DEPTH`]. An archive
+/// in parts is unpacked once, from all of them. One that won't unpack is kept as it is and noted in the budget.
 pub(super) fn expand_archives(dir: &Path, budget: &Budget, depth: u32) -> Result<()> {
     if depth > MAX_ARCHIVE_DEPTH {
         return Ok(());
     }
     let mut files = Vec::new();
     walk_files(dir, &mut files)?;
-    for file in files {
-        let Some(name) = file.file_name().map(|n| n.to_string_lossy().into_owned()) else { continue };
-        let Some(stem) = archive_stem(&name) else { continue };
-        let mut target = file.with_file_name(stem);
+    for set in archives::sets(&files) {
+        let first = &set.parts[0];
+        let mut target = first.with_file_name(&set.stem);
         while target.exists() {
             target.set_file_name(format!("{}_x", target.file_name().unwrap_or_default().to_string_lossy()));
         }
-        let ext = Path::new(&name).extension().map_or_default(|e| e.to_string_lossy().to_lowercase());
-        let res = match ext.as_str() {
-            "zip" => extract_zip(&file, &target, budget),
-            "gz" | "tgz" => extract_tar(&file, &target, budget, true),
-            "unitypackage" => extract_unitypackage(&file, &target, budget),
-            _ => extract_tar(&file, &target, budget, false),
+        let res = match &set.problem {
+            Some(problem) => Err(anyhow::anyhow!("{problem}")),
+            None => unpack_set(&set, &target, budget),
         };
         match res {
             Ok(()) => {
-                fs::remove_file(&file)?;
+                for part in &set.parts {
+                    fs::remove_file(part)?;
+                }
                 expand_archives(&target, budget, depth + 1)?;
             }
             // A corrupt nested archive is kept as a plain file instead of failing the whole pack,
             // but limit violations must abort.
             Err(e) if e.to_string().contains("size limit") => return Err(e),
             Err(e) => {
-                tracing::warn!(archive = %file.display(), error = %e, "could not unpack; keeping as a file");
+                tracing::warn!(archive = %first.display(), error = %e, "could not unpack; keeping as a file");
+                fs::remove_dir_all(&target).ok();
                 budget
                     .unpack_failures
                     .lock()
                     .unwrap_or_else(std::sync::PoisonError::into_inner)
-                    .push((file.clone(), format!("{e:#}")));
+                    .push((first.clone(), format!("{e:#}")));
             }
         }
     }
     Ok(())
 }
 
+/// Unpack one archive, whole or in parts, into `target`.
+fn unpack_set(set: &archives::Set, target: &Path, budget: &Budget) -> Result<()> {
+    let bytes = set.bytes()?;
+    let open = || Ok(BufReader::new(Joined::new(std::sync::Arc::clone(&bytes))));
+    match set.format {
+        Format::Zip => extract_zip(open, target, budget),
+        Format::Tar => extract_tar(open()?, target, budget, false),
+        Format::Tgz => extract_tar(open()?, target, budget, true),
+        Format::Unity => extract_unitypackage(open()?, target, budget),
+        Format::SevenZ => archives::extract_7z(bytes, target, budget),
+        // The RAR library reads volumes from their files; pieces are joined into one first.
+        Format::Rar if set.pieces() => {
+            let joined = target.with_file_name(format!("{}.joined.rar", set.stem));
+            let res = io::copy(&mut open()?, &mut File::create(&joined)?)
+                .map_err(anyhow::Error::from)
+                .and_then(|_| archives::extract_rar(&joined, target, budget));
+            fs::remove_file(&joined).ok();
+            res
+        }
+        Format::Rar => archives::extract_rar(&set.parts[0], target, budget),
+    }
+}
+
 /// Unpack a zip on several threads, each with its own handle on the file: an all-in-one pack can hold 100,000
 /// small files, and creating them one at a time is what takes the time.
-fn extract_zip(path: &Path, target: &Path, budget: &Budget) -> Result<()> {
-    let open = || zip::ZipArchive::new(BufReader::new(File::open(path)?)).context("read zip");
+fn extract_zip<R: Read + Seek + Send>(open: impl Fn() -> Result<R>, target: &Path, budget: &Budget) -> Result<()> {
+    let open = || zip::ZipArchive::new(open()?).context("read zip");
     let first = open()?;
     let count = first.len();
     let threads = workers().min(count.div_ceil(256)).max(1);
@@ -313,8 +336,7 @@ fn extract_zip(path: &Path, target: &Path, budget: &Budget) -> Result<()> {
     })
 }
 
-fn extract_tar(path: &Path, target: &Path, budget: &Budget, gz: bool) -> Result<()> {
-    let file = BufReader::new(File::open(path)?);
+fn extract_tar(file: impl Read, target: &Path, budget: &Budget, gz: bool) -> Result<()> {
     let reader: Box<dyn Read> = if gz { Box::new(flate2::read::GzDecoder::new(file)) } else { Box::new(file) };
     let mut ar = tar::Archive::new(reader);
     for entry in ar.entries()? {
@@ -333,13 +355,13 @@ fn extract_tar(path: &Path, target: &Path, budget: &Budget, gz: bool) -> Result<
 
 /// A Unity package: a gzipped tar of `<guid>/asset` (the file), `<guid>/pathname` (where it lived, `Assets/…`),
 /// `<guid>/asset.meta` and an optional `<guid>/preview.png`. Rebuilds the original tree, `.meta` files included.
-fn extract_unitypackage(path: &Path, target: &Path, budget: &Budget) -> Result<()> {
+fn extract_unitypackage(file: impl Read, target: &Path, budget: &Budget) -> Result<()> {
     let scratch = target.with_file_name(format!(
         "{}.unity-unpack",
         target.file_name().map_or_default(|n| n.to_string_lossy().into_owned())
     ));
     let result = (|| -> Result<usize> {
-        extract_tar(path, &scratch, budget, true)?;
+        extract_tar(file, &scratch, budget, true)?;
         let mut placed = 0;
         for entry in fs::read_dir(&scratch)? {
             let dir = entry?.path();

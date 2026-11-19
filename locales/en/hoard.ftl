@@ -2037,6 +2037,7 @@ model-play = Play
 model-animation-clip = Animation clip
 model-animation = Animation
 model-plays-on = Plays on
+model-rest-pose = Rest pose
 model-close-title = Close (Esc)
 model-full-screen = Full screen
 model-open-full-screen = Open the full-screen 3D viewer

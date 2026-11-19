@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "dbc440866e4bd79907c44511a39733357b2da4b457ff5001a4a83d2cae77d9ac"
+source = "8bbee040b9a4d02c3fd9e13eef57f83caf0c7d52a6205ce53dc83cd2027b7b24"
 translation = "530e3768e270ecc495434269d0aa7741f64471672a3fe92dbc9787949d17edcc"
 
 [messages.account-add]
@@ -6611,6 +6611,10 @@ translation = "重置"
 [messages.model-reset-title]
 source = "Back to the starting view (R)"
 translation = "回到初始视图（R）"
+
+[messages.model-rest-pose]
+source = "Rest pose"
+translation = "静止姿势"
 
 [messages.model-show-failed]
 source = "Couldn't show this model: { $error }"

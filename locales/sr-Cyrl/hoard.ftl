@@ -1874,6 +1874,7 @@ model-play = Пусти
 model-animation-clip = Анимациони клип
 model-animation = Анимација
 model-plays-on = Пусти на
+model-rest-pose = Поза мировања
 model-close-title = Затвори (Esc)
 model-full-screen = Цео екран
 model-open-full-screen = Отвори 3D прегледач преко целог екрана

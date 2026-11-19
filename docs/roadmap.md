@@ -42,10 +42,9 @@ Hoard keeps the skeleton and clips of every rigged model (`rigs`: bone names wit
 from the GLB Blender makes of a .blend. Within a pack, a file of clips with no mesh, or a copy of a character saved
 for one clip, becomes an animation linked to the characters it fits nearby, and across the library characters list
 "Animations that fit" and animations "Characters it fits". An animation plays on any character it fits, picked
-under Plays on, and its thumbnail and tile show it halfway through the clip, with its length. What's left:
+under Plays on, and its thumbnail and tile show it halfway through the clip, with its length; a character's viewer
+plays any animation that fits it. What's left:
 
-- **Play any of them on a character.** A character's viewer plays any animation that fits it, from any pack, each
-  loaded when picked.
 - **Download them either way.** An animation comes with or without its character's mesh, and a character with or
   without its animations, as `?animations=1` does now.
 

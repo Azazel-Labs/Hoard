@@ -1660,6 +1660,7 @@ model-play = 播放
 model-animation-clip = 動畫片段
 model-animation = 動畫
 model-plays-on = 播放於角色
+model-rest-pose = 靜止姿勢
 model-close-title = 關閉（Esc）
 model-full-screen = 全螢幕
 model-open-full-screen = 開啟全螢幕 3D 檢視器

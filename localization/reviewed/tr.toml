@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "dbc440866e4bd79907c44511a39733357b2da4b457ff5001a4a83d2cae77d9ac"
+source = "8bbee040b9a4d02c3fd9e13eef57f83caf0c7d52a6205ce53dc83cd2027b7b24"
 translation = "365b0fc7ff648476ee75c67213c00d18e7b3e0fb9f940664032b9c834c675ffb"
 
 [messages.account-add]
@@ -6611,6 +6611,10 @@ translation = "Sıfırla"
 [messages.model-reset-title]
 source = "Back to the starting view (R)"
 translation = "Başlangıç görünümüne dön (R)"
+
+[messages.model-rest-pose]
+source = "Rest pose"
+translation = "Dinlenme pozu"
 
 [messages.model-show-failed]
 source = "Couldn't show this model: { $error }"

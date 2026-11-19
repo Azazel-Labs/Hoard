@@ -1949,6 +1949,7 @@ model-play = Redare
 model-animation-clip = Clip de animație
 model-animation = Animație
 model-plays-on = Redă pe
+model-rest-pose = Poză de repaus
 model-close-title = Închideți (Esc)
 model-full-screen = Ecran complet
 model-open-full-screen = Deschideți vizualizatorul 3D pe tot ecranul

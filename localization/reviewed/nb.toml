@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "dbc440866e4bd79907c44511a39733357b2da4b457ff5001a4a83d2cae77d9ac"
+source = "8bbee040b9a4d02c3fd9e13eef57f83caf0c7d52a6205ce53dc83cd2027b7b24"
 translation = "233736fce877dd72d5c0840b380752036aeadf00268c938b28bf55f6d4bddad5"
 
 [messages.account-add]
@@ -6733,6 +6733,10 @@ translation = "Tilbakestill"
 [messages.model-reset-title]
 source = "Back to the starting view (R)"
 translation = "Tilbake til startvisningen (R)"
+
+[messages.model-rest-pose]
+source = "Rest pose"
+translation = "Hvilestilling"
 
 [messages.model-show-failed]
 source = "Couldn't show this model: { $error }"

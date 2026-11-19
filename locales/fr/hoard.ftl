@@ -1835,6 +1835,7 @@ model-play = Lecture
 model-animation-clip = Clip d’animation
 model-animation = Animation
 model-plays-on = Jouée sur
+model-rest-pose = Pose de repos
 model-close-title = Fermer (Esc)
 model-full-screen = Plein écran
 model-open-full-screen = Ouvrir la visionneuse 3D en plein écran

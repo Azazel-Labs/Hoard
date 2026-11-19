@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "dbc440866e4bd79907c44511a39733357b2da4b457ff5001a4a83d2cae77d9ac"
+source = "8bbee040b9a4d02c3fd9e13eef57f83caf0c7d52a6205ce53dc83cd2027b7b24"
 translation = "07555d54b3ba6bc94b6fcbf55672d1be5e77ca134c96e30754ee929b3a902828"
 
 [messages.account-add]
@@ -6600,6 +6600,10 @@ translation = "รีเซ็ต"
 [messages.model-reset-title]
 source = "Back to the starting view (R)"
 translation = "กลับไปที่มุมมองเริ่มต้น (R)"
+
+[messages.model-rest-pose]
+source = "Rest pose"
+translation = "ท่าพัก"
 
 [messages.model-show-failed]
 source = "Couldn't show this model: { $error }"

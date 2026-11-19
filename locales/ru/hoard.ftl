@@ -1979,6 +1979,7 @@ model-play = Воспроизвести
 model-animation-clip = Клип анимации
 model-animation = Анимация
 model-plays-on = Воспроизводить на
+model-rest-pose = Поза покоя
 model-close-title = Закрыть (Esc)
 model-full-screen = На весь экран
 model-open-full-screen = Открыть полноэкранный 3D-просмотрщик

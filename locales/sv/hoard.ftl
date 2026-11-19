@@ -1808,6 +1808,7 @@ model-play = Spela upp
 model-animation-clip = Animationsklipp
 model-animation = Animation
 model-plays-on = Spelas på
+model-rest-pose = Vilopose
 model-close-title = Stäng (Esc)
 model-full-screen = Helskärm
 model-open-full-screen = Öppna 3D-visaren i helskärm

@@ -1862,6 +1862,7 @@ model-play = Toista
 model-animation-clip = Animaatioleike
 model-animation = Animaatio
 model-plays-on = Toista hahmolla
+model-rest-pose = Lepoasento
 model-close-title = Sulje (Esc)
 model-full-screen = Koko näyttö
 model-open-full-screen = Avaa 3D-katselin koko näytölle

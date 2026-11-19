@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "dbc440866e4bd79907c44511a39733357b2da4b457ff5001a4a83d2cae77d9ac"
+source = "8bbee040b9a4d02c3fd9e13eef57f83caf0c7d52a6205ce53dc83cd2027b7b24"
 translation = "98b77849b047ba15c3fafc62f630455aa81fbcc62eed2bd82d45ed46bbdb7f90"
 
 [messages.account-add]
@@ -6744,6 +6744,10 @@ translation = "Reimposta"
 [messages.model-reset-title]
 source = "Back to the starting view (R)"
 translation = "Torna alla vista iniziale (R)"
+
+[messages.model-rest-pose]
+source = "Rest pose"
+translation = "Posa di riposo"
 
 [messages.model-show-failed]
 source = "Couldn't show this model: { $error }"

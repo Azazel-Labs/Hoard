@@ -1658,6 +1658,7 @@ model-play = Putar
 model-animation-clip = Klip animasi
 model-animation = Animasi
 model-plays-on = Diputar pada
+model-rest-pose = Pose diam
 model-close-title = Tutup (Esc)
 model-full-screen = Layar penuh
 model-open-full-screen = Buka penampil 3D layar penuh

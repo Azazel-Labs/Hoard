@@ -1855,6 +1855,7 @@ model-play = Αναπαραγωγή
 model-animation-clip = Κλιπ animation
 model-animation = Animation
 model-plays-on = Αναπαραγωγή σε
+model-rest-pose = Στάση ηρεμίας
 model-close-title = Κλείσιμο (Esc)
 model-full-screen = Πλήρης οθόνη
 model-open-full-screen = Άνοιγμα του προγράμματος προβολής 3D σε πλήρη οθόνη

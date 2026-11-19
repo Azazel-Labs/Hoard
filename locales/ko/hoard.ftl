@@ -1630,6 +1630,7 @@ model-play = 재생
 model-animation-clip = 애니메이션 클립
 model-animation = 애니메이션
 model-plays-on = 재생할 캐릭터
+model-rest-pose = 기본 포즈
 model-close-title = 닫기(Esc)
 model-full-screen = 전체 화면
 model-open-full-screen = 전체 화면 3D 뷰어 열기

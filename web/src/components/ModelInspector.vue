@@ -137,7 +137,7 @@ async function open() {
       s.setAutoRotate(spin.value)
       s.setBackground(bg.value)
       s.setPlaying(playing.value)
-      if (clip.value) s.playClip(clip.value)
+      if (clip.value) void s.playClip(clip.value)
     } else {
       clip.value = i.clips[0] ?? ''
     }
@@ -173,7 +173,7 @@ watch(environment, (on) => {
 watch(grid, (on) => stage?.setGrid(on))
 watch(spin, (on) => stage?.setAutoRotate(on))
 watch(bg, (b) => stage?.setBackground(b))
-watch(clip, (name) => stage?.playClip(name))
+watch(clip, (name) => void stage?.playClip(name))
 watch(playing, (on) => stage?.setPlaying(on))
 watch(mode, (m) => stage?.setMode(m))
 
@@ -313,7 +313,7 @@ function onKey(e: KeyboardEvent) {
           @click="bg = b"
         />
       </div>
-      <div v-if="info?.clips.length" class="group" role="group" :aria-label="t('model-group-animation')">
+      <div v-if="info?.clips.length || info?.fitting.length" class="group" role="group" :aria-label="t('model-group-animation')">
         <button
           type="button"
           :title="playing ? t('model-pause-title') : t('model-play-title')"
@@ -326,7 +326,11 @@ function onKey(e: KeyboardEvent) {
         <label>
           <span class="visually-hidden">{{ t('model-animation-clip') }}</span>
           <select v-model="clip">
+            <option v-if="!info.clips.length" value="">{{ t('model-rest-pose') }}</option>
             <option v-for="c in info.clips" :key="c" :value="c">{{ c }}</option>
+            <optgroup v-if="info.fitting.length" :label="t('asset-fit-animations', { count: info.fitting.length })">
+              <option v-for="f in info.fitting" :key="f.clip" :value="f.clip">{{ f.name }}</option>
+            </optgroup>
           </select>
         </label>
         <label v-if="info.wearers.length > 1 || info.wearers[0]?.away">
@@ -434,7 +438,7 @@ function onKey(e: KeyboardEvent) {
       {{ t('model-keys-mouse') }} · <kbd>F</kbd> {{ t('model-key-frame') }} · <kbd>R</kbd> {{ t('model-key-reset') }} ·
       <kbd>1</kbd>–<kbd>0</kbd> {{ t('model-key-view') }} · <kbd>W</kbd> {{ t('model-key-wireframe') }} · <kbd>I</kbd> {{ t('model-key-info') }} ·
       <kbd>T</kbd> {{ t('model-key-textures') }} · <kbd>H</kbd> {{ t('model-key-full-res') }} · <kbd>E</kbd> {{ t('model-key-light') }} ·
-      <kbd>G</kbd> {{ t('model-key-grid') }} · <kbd>K</kbd> {{ t('model-key-background') }}<template v-if="info?.clips.length"> · <kbd>Space</kbd> {{ t('model-key-play') }}</template>
+      <kbd>G</kbd> {{ t('model-key-grid') }} · <kbd>K</kbd> {{ t('model-key-background') }}<template v-if="info?.clips.length || info?.fitting.length"> · <kbd>Space</kbd> {{ t('model-key-play') }}</template>
     </footer>
   </dialog>
 </template>

@@ -72,7 +72,7 @@ function teardown() {
   stage = null
 }
 
-watch(activeClip, (name) => stage?.playClip(name))
+watch(activeClip, (name) => void stage?.playClip(name))
 watch(() => props.paused, (p) => stage?.setPaused(!!p))
 function playOn(id: string) {
   on.value = id
@@ -102,10 +102,14 @@ onBeforeUnmount(teardown)
     <div class="hud">
       <template v-if="status === 'ready' && info">
       <span class="mono">{{ t('model-triangles', { count: info.triangles }) }}</span>
-      <label v-if="info.clips.length">
+      <label v-if="info.clips.length || info.fitting.length">
         <span class="visually-hidden">{{ t('model-animation') }}</span>
         <select v-model="activeClip" class="field">
+          <option v-if="!info.clips.length" value="">{{ t('model-rest-pose') }}</option>
           <option v-for="c in info.clips" :key="c" :value="c">{{ c }}</option>
+          <optgroup v-if="info.fitting.length" :label="t('asset-fit-animations', { count: info.fitting.length })">
+            <option v-for="f in info.fitting" :key="f.clip" :value="f.clip">{{ f.name }}</option>
+          </optgroup>
         </select>
       </label>
       <label v-if="info.wearers.length > 1 || info.wearers[0]?.away">

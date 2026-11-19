@@ -65,6 +65,9 @@ export interface StageInfo {
    *  none. One from another pack (`away`) is named with its pack. */
   wearers: { id: string; name: string; away?: boolean }[]
   on: string
+  /** For a character: the animations across the library that fit it and aren't among `clips`, each a clip name for
+   *  `playClip` that loads it when first picked. One from another pack is named with its pack. */
+  fitting: { clip: string; name: string }[]
 }
 
 export interface LoadOptions {
@@ -102,6 +105,10 @@ export class ModelStage {
   private facing: Facing = { turn: 0, tilt: 0 }
   private mixer: THREE.AnimationMixer | null = null
   private clips = new Map<string, THREE.AnimationClip>()
+  /** Animations that fit the character, by clip name, not loaded until picked. */
+  private fitting = new Map<string, { link: AssetLink; pack: string }>()
+  /** The clip last asked for, so one that finishes loading after another is picked doesn't play. */
+  private wanted = ''
   private action: THREE.AnimationAction | null = null
   /** An animation played on a character, rather than a character playing its own clips. */
   private wearing = false
@@ -220,6 +227,19 @@ export class ModelStage {
             ),
           ]
         : []
+    // A character plays its own clips, and any animation that fits it once picked.
+    const fitting =
+      full.kind === 'animation'
+        ? []
+        : (full.fits ?? [])
+            .filter((f) => f.kind === 'animation')
+            .map((f) => ({
+              clip: `fit:${f.id}`,
+              name: f.pack_id === full.pack_id ? f.name : `${f.name} · ${f.pack_name}`,
+              link: { id: f.id, name: f.name, path: f.path, kind: f.kind, rel: 'animation', has_thumb: f.has_thumb } as AssetLink,
+              pack: f.pack_id,
+            }))
+    for (const f of fitting) this.fitting.set(f.clip, { link: f.link, pack: f.pack })
     const wearer = wearers.find((w) => w.id === opts.on) ?? wearers[0]
     const body = wearer && (await api.asset(wearer.id).catch(() => null))
     if (this.disposed) throw new Error('closed')
@@ -412,7 +432,7 @@ export class ModelStage {
       }
       if (this.disposed) throw new Error('closed')
     }
-    if (this.clips.size) this.mixer = new THREE.AnimationMixer(object)
+    if (this.clips.size || this.fitting.size) this.mixer = new THREE.AnimationMixer(object)
 
     this.resizeObs = new ResizeObserver(() => this.resize())
     this.resizeObs.observe(el)
@@ -433,6 +453,7 @@ export class ModelStage {
       facing: { ...this.facing },
       wearers,
       on: body ? body.id : '',
+      fitting: fitting.map(({ clip, name }) => ({ clip, name })),
     }
   }
 
@@ -855,9 +876,12 @@ export class ModelStage {
     }
   }
 
-  /** Play a clip by name ('' stops). */
-  playClip(name: string) {
+  /** Play a clip by name ('' stops); an animation that fits is fetched the first time. */
+  async playClip(name: string) {
     if (!this.mixer) return
+    this.wanted = name
+    if (!this.clips.has(name) && this.fitting.has(name)) await this.loadFit(name)
+    if (this.disposed || this.wanted !== name || !this.mixer) return
     this.mixer.stopAllAction()
     this.action = null
     const clip = this.clips.get(name)
@@ -867,6 +891,22 @@ export class ModelStage {
       this.action.play()
     }
     this.redraw()
+  }
+
+  /** Load an animation that fits as a clip: its longest take, as a pose saved beside it isn't one to play. */
+  private async loadFit(name: string) {
+    const { link, pack } = this.fitting.get(name)!
+    const manager = new THREE.LoadingManager()
+    manager.setURLModifier((url) => (IMAGE_EXTS.has(extOf(url.split(/[?#]/)[0])) ? BLANK_PNG : url))
+    try {
+      const s = sourceFor(link, pack)
+      const loaded = await loadModel(s.url, s.ext, manager)
+      disposeObject(loaded.object)
+      const longest = loaded.animations.reduce<THREE.AnimationClip | null>((a, c) => (!a || c.duration > a.duration ? c : a), null)
+      if (longest && !this.disposed) this.clips.set(name, longest)
+    } catch {
+      // One that won't load just doesn't play; the next pick tries again.
+    }
   }
 
   setPlaying(on: boolean) {

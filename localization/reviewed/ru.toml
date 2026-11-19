@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "dbc440866e4bd79907c44511a39733357b2da4b457ff5001a4a83d2cae77d9ac"
+source = "8bbee040b9a4d02c3fd9e13eef57f83caf0c7d52a6205ce53dc83cd2027b7b24"
 translation = "bb45e4d0d59bdf1a2181c1158501e66a0c57e8041d0a982d6aed7e82f49657fa"
 
 [messages.account-add]
@@ -6865,6 +6865,10 @@ translation = "Сброс"
 [messages.model-reset-title]
 source = "Back to the starting view (R)"
 translation = "Вернуться к начальному виду (R)"
+
+[messages.model-rest-pose]
+source = "Rest pose"
+translation = "Поза покоя"
 
 [messages.model-show-failed]
 source = "Couldn't show this model: { $error }"

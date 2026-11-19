@@ -1807,6 +1807,7 @@ model-play = Afspil
 model-animation-clip = Animationsklip
 model-animation = Animation
 model-plays-on = Afspilles på
+model-rest-pose = Hvilestilling
 model-close-title = Luk (Esc)
 model-full-screen = Fuld skærm
 model-open-full-screen = Åbn 3D-fremviseren i fuld skærm

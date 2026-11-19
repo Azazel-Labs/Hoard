@@ -1667,6 +1667,7 @@ model-play = Lejátszás
 model-animation-clip = Animációs klip
 model-animation = Animáció
 model-plays-on = Lejátszás ezen
+model-rest-pose = Alappóz
 model-close-title = Bezárás (Esc)
 model-full-screen = Teljes képernyő
 model-open-full-screen = A teljes képernyős 3D-megjelenítő megnyitása

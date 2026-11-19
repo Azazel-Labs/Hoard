@@ -1811,6 +1811,7 @@ model-play = Tocar
 model-animation-clip = Clipe de animação
 model-animation = Animação
 model-plays-on = Reproduzir em
+model-rest-pose = Pose de repouso
 model-close-title = Fechar (Esc)
 model-full-screen = Tela cheia
 model-open-full-screen = Abrir o visualizador 3D em tela cheia

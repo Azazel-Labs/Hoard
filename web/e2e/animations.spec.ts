@@ -88,6 +88,13 @@ test('an animation fits the characters with its skeleton in other packs, and eac
     await openPack(page, a.id, heroes)
     await tile(page, hero.name).click()
     const panel = page.getByRole('complementary', { name: 'Asset details' })
+    // The character's viewer offers the clip from the other pack, fetched only when picked.
+    const clips = panel.getByRole('combobox', { name: 'Animation', exact: true })
+    await expect(clips).toBeVisible({ timeout: 30_000 })
+    await expect(clips.locator('option:checked')).toHaveText('Rest pose')
+    const fetched = page.waitForRequest((r) => r.url().includes(`/api/assets/${run.id}/as/view`))
+    await clips.selectOption({ label: `${run.name} · ${mocap}` })
+    await fetched
     const section = panel.getByTestId('fits')
     await expect(section.getByRole('heading', { name: 'Animations that fit (1)' })).toBeVisible()
     await expect(section.getByRole('button', { name: new RegExp(`${run.name}.*${mocap}`) })).toContainText('0.80 s')

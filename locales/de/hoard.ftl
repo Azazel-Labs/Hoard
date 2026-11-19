@@ -1805,6 +1805,7 @@ model-play = Abspielen
 model-animation-clip = Animationsclip
 model-animation = Animation
 model-plays-on = Abspielen auf
+model-rest-pose = Ruhepose
 model-close-title = Schließen (Esc)
 model-full-screen = Vollbild
 model-open-full-screen = Den 3D-Viewer im Vollbild öffnen

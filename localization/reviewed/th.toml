@@ -3163,6 +3163,10 @@ translation = "แสดงเพิ่ม (เหลืออีก { $count })
 source = "No near copies: every picture, sound and model is only here once."
 translation = "ไม่มีสำเนาที่เกือบเหมือนกัน: ภาพ เสียง และโมเดลทุกชิ้นมีอยู่ที่นี่เพียงครั้งเดียว"
 
+[messages.copies-refreshing]
+source = "The library has changed since these were found. Looking again…"
+translation = "คลังมีการเปลี่ยนแปลงตั้งแต่พบรายการเหล่านี้ กำลังค้นหาอีกครั้ง…"
+
 [messages.copies-set]
 source = "Set { $n }"
 translation = "ชุดที่ { $n }"

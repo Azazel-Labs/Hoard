@@ -2492,6 +2492,7 @@ settings-page-library-blurb = Co jest w zbiorze: jak jest duży, z czego się sk
 settings-page-copies = Prawie kopie
 settings-page-copies-blurb = Pliki, które są tym samym obrazem, dźwiękiem lub modelem w innym rozmiarze, częstotliwości próbkowania lub formacie, najpierw te, które zajmują najwięcej miejsca. Najlepsza w każdym zestawie jest oznaczona; nic nie jest usuwane.
 copies-loading = Szukanie prawie kopii…
+copies-refreshing = Biblioteka zmieniła się od ich znalezienia. Szukanie od nowa…
 copies-none = Brak prawie kopii: każdy obraz, dźwięk i model jest tu tylko raz.
 copies-load-failed = Nie udało się wyświetlić prawie kopii: { $error }
 copies-sum = Zestawy prawie kopii: { $count }. Kopie, które nie są najlepsze, zajmują { $size }.

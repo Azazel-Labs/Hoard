@@ -236,8 +236,11 @@ export interface Fit {
 /** A set of near copies, the best first; `wasted` is what the rest take. */
 export interface CopyGroup { wasted: number; copies: NearCopy[] }
 
-/** A page of the library's sets of near copies (`GET /api/duplicates`), the most wasted first. */
-export interface CopyGroups { groups: CopyGroup[]; total: number; wasted: number }
+/**
+ * A page of the library's sets of near copies (`GET /api/duplicates`), the most wasted first. `generation` says which
+ * working-out of the sets it's from; `refreshing`, that the library has changed since and they're being worked out again.
+ */
+export interface CopyGroups { groups: CopyGroup[]; total: number; wasted: number; generation: number; refreshing: boolean }
 
 /** A hand-picked set of assets across packs ("Forest level props"). */
 /** A project that `hoard sync`s from here (`GET /api/projects`). */

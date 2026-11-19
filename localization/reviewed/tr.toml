@@ -3173,6 +3173,10 @@ translation = "Daha fazla göster ({ $count } kaldı)"
 source = "No near copies: every picture, sound and model is only here once."
 translation = "Neredeyse kopya yok: her resim, ses ve model burada yalnızca bir kez var."
 
+[messages.copies-refreshing]
+source = "The library has changed since these were found. Looking again…"
+translation = "Bunlar bulunduğundan beri kitaplık değişti. Yeniden aranıyor…"
+
 [messages.copies-set]
 source = "Set { $n }"
 translation = "Küme { $n }"

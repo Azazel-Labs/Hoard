@@ -2293,6 +2293,7 @@ settings-page-library-blurb = Què hi ha a Hoard: com és de gran, de què està
 settings-page-copies = Còpies gairebé idèntiques
 settings-page-copies-blurb = Fitxers que són la mateixa imatge, so o model en una altra mida, freqüència de mostreig o format, primer els que ocupen més espai. La millor de cada conjunt està marcada; no s’esborra res.
 copies-loading = Cercant còpies gairebé idèntiques…
+copies-refreshing = La biblioteca ha canviat des que es van trobar. Tornant a cercar…
 copies-none = No hi ha còpies gairebé idèntiques: cada imatge, so i model només hi és una vegada.
 copies-load-failed = No s’han pogut llistar les còpies gairebé idèntiques: { $error }
 copies-sum = Conjunts de còpies gairebé idèntiques: { $count }. Les còpies que no són la millor ocupen { $size }.

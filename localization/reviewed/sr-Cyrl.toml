@@ -3266,6 +3266,10 @@ translation = "Прикажи још (преостало: { $count })"
 source = "No near copies: every picture, sound and model is only here once."
 translation = "Нема скоро копија: свака слика, звук и модел су овде само једном."
 
+[messages.copies-refreshing]
+source = "The library has changed since these were found. Looking again…"
+translation = "Библиотека се променила откако су пронађене. Поновно тражење…"
+
 [messages.copies-set]
 source = "Set { $n }"
 translation = "Скуп { $n }"

@@ -2290,6 +2290,7 @@ settings-page-library-blurb = Vad som finns i Hoard: hur stort det är, vad det 
 settings-page-copies = Nästan-kopior
 settings-page-copies-blurb = Filer som är samma bild, ljud eller modell i en annan storlek, samplingsfrekvens eller ett annat format, de som tar mest plats först. Den bästa i varje uppsättning är markerad; inget raderas.
 copies-loading = Letar efter nästan-kopior…
+copies-refreshing = Biblioteket har ändrats sedan de här hittades. Letar igen…
 copies-none = Inga nästan-kopior: varje bild, ljud och modell finns här bara en gång.
 copies-load-failed = Kunde inte lista nästan-kopior: { $error }
 copies-sum = Uppsättningar nästan-kopior: { $count }. Kopiorna som inte är bäst tar { $size }.

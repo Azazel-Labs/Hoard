@@ -3169,6 +3169,10 @@ translation = "Több mutatása (még { $count })"
 source = "No near copies: every picture, sound and model is only here once."
 translation = "Nincsenek majdnem azonos másolatok: minden kép, hang és modell csak egyszer van itt."
 
+[messages.copies-refreshing]
+source = "The library has changed since these were found. Looking again…"
+translation = "A könyvtár megváltozott, mióta ezeket megtaláltuk. Újrakeresés…"
+
 [messages.copies-set]
 source = "Set { $n }"
 translation = "{ $n }. csoport"

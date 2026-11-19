@@ -2494,6 +2494,7 @@ settings-page-library-blurb = Ce este în Hoard: cât de mare este, din ce este 
 settings-page-copies = Aproape copii
 settings-page-copies-blurb = Fișiere care sunt aceeași imagine, același sunet sau model la altă dimensiune, frecvență de eșantionare sau în alt format, întâi cele care ocupă cel mai mult spațiu. Cea mai bună din fiecare set este marcată; nu se șterge nimic.
 copies-loading = Se caută aproape copii…
+copies-refreshing = Biblioteca s-a schimbat de când au fost găsite. Se caută din nou…
 copies-none = Nicio aproape copie: fiecare imagine, sunet și model este aici o singură dată.
 copies-load-failed = Nu s-au putut lista aproape copiile: { $error }
 copies-sum = Seturi de aproape copii: { $count }. Copiile care nu sunt cele mai bune ocupă { $size }.

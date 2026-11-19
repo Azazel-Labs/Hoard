@@ -8,6 +8,7 @@
 //! anything, least of all in a watched folder.
 
 use std::collections::{HashMap, HashSet};
+use std::sync::atomic::{AtomicU64, Ordering};
 use std::sync::{Arc, Mutex, PoisonError};
 use std::time::{Duration, Instant};
 
@@ -28,8 +29,10 @@ const MODEL_LOOK: f32 = 0.8;
 const ASPECT: f64 = 0.02;
 /// Near copies listed with one asset at most.
 const MOST: usize = 50;
-/// How long the library's groups are kept before they're worked out again.
+/// How long the library's sets are answered before they're worked out again, even if nothing seems to have changed.
 const FRESH: Duration = Duration::from_secs(300);
+/// How long after start the sets are first worked out, once the start-up work is under way.
+const WARM_AFTER: Duration = Duration::from_secs(20);
 
 /// What's compared with what.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
@@ -441,23 +444,113 @@ fn all(conn: &Connection, looks: &looks::Index, sounds: &sounds::Index) -> Resul
     Ok(groups)
 }
 
-/// The library's sets of near copies, worked out at most every few minutes.
+/// The library's sets of near copies as last worked out, and whether they're being worked out again.
 #[derive(Debug, Default)]
-pub(crate) struct Cache(Mutex<Option<(Instant, Arc<Vec<CopyGroup>>)>>);
+pub(crate) struct Cache {
+    kept: Mutex<Option<Kept>>,
+    /// Held while the sets are worked out, so it's done once at a time.
+    working: tokio::sync::Mutex<()>,
+    /// How many times they've been worked out since the server started.
+    generation: AtomicU64,
+}
 
-/// The library's sets of near copies (see [`all`]), from the cache when it's fresh.
-pub(crate) async fn groups(state: &AppState) -> Result<Arc<Vec<CopyGroup>>> {
-    if let Some((at, groups)) = state.near_copies.0.lock().unwrap_or_else(PoisonError::into_inner).as_ref()
-        && at.elapsed() < FRESH
+#[derive(Clone, Debug)]
+struct Kept {
+    at: Instant,
+    print: Print,
+    generation: u64,
+    sets: Arc<Vec<CopyGroup>>,
+}
+
+/// What would change the library's sets: its live assets and packs, the last change to an asset, and how many
+/// pictures have been looked at and sounds listened to. Cheap to read, unlike the sets.
+type Print = (i64, i64, Option<String>, i64, i64);
+
+fn print(conn: &Connection) -> Result<Print> {
+    Ok(conn.query_row(
+        "SELECT (SELECT COUNT(*) FROM assets WHERE archived_at IS NULL), (SELECT COUNT(*) FROM packs WHERE archived_at IS NULL),
+                (SELECT MAX(updated_at) FROM assets), (SELECT COUNT(*) FROM looks),
+                (SELECT COUNT(*) FROM sounds WHERE print IS NOT NULL)",
+        [],
+        |r| Ok((r.get(0)?, r.get(1)?, r.get(2)?, r.get(3)?, r.get(4)?)),
+    )?)
+}
+
+/// The library's sets of near copies, as they were last worked out.
+#[derive(Clone, Debug)]
+pub(crate) struct Groups {
+    pub(crate) sets: Arc<Vec<CopyGroup>>,
+    /// Which working-out these are; it goes up each time.
+    pub(crate) generation: u64,
+    /// The library has changed since, and they're being worked out again in the background.
+    pub(crate) refreshing: bool,
+}
+
+impl Cache {
+    fn kept(&self) -> Option<Kept> {
+        self.kept.lock().unwrap_or_else(PoisonError::into_inner).clone()
+    }
+}
+
+/// The library's sets of near copies (see [`all`]). Once worked out they're always answered at once: when the library
+/// has changed since, or they're a few minutes old, they're worked out again in the background, and the answer says so.
+/// Only the very first time (they're worked out shortly after start, see [`warm`]) does this wait for them.
+pub(crate) async fn groups(state: &AppState) -> Result<Groups> {
+    let Some(kept) = state.near_copies.kept() else {
+        let kept = work_out(state).await?;
+        return Ok(Groups { sets: kept.sets, generation: kept.generation, refreshing: false });
+    };
+    let current = db::call(&state.pool, |c| print(c)).await?;
+    let outdated = current != kept.print || kept.at.elapsed() >= FRESH;
+    if outdated {
+        refresh(state);
+    }
+    let refreshing = outdated || state.near_copies.working.try_lock().is_err();
+    Ok(Groups { sets: kept.sets, generation: kept.generation, refreshing })
+}
+
+/// Works the sets out again in the background, unless that's happening already.
+fn refresh(state: &AppState) {
+    if state.near_copies.working.try_lock().is_err() {
+        return;
+    }
+    let st = Arc::clone(state);
+    tokio::spawn(async move {
+        if let Err(e) = work_out(&st).await {
+            tracing::warn!(error = %format!("{e:#}"), "could not work out the library's near copies");
+        }
+    });
+}
+
+/// Works the sets out shortly after the server starts, so the Near copies page doesn't wait for them.
+pub(crate) async fn warm(state: &AppState) {
+    tokio::time::sleep(WARM_AFTER).await;
+    if let Err(e) = work_out(state).await {
+        tracing::warn!(error = %format!("{e:#}"), "could not work out the library's near copies");
+    }
+}
+
+/// Works the sets out and keeps them. If they were worked out while this waited its turn, those are taken instead.
+async fn work_out(state: &AppState) -> Result<Kept> {
+    let asked = Instant::now();
+    let _working = state.near_copies.working.lock().await;
+    if let Some(kept) = state.near_copies.kept()
+        && kept.at >= asked
     {
-        return Ok(Arc::clone(groups));
+        return Ok(kept);
     }
     state.looks.ensure(state).await?;
     state.sounds.ensure(state).await?;
     let st = Arc::clone(state);
-    let groups = Arc::new(db::call(&state.pool, move |c| all(c, &st.looks, &st.sounds)).await?);
-    *state.near_copies.0.lock().unwrap_or_else(PoisonError::into_inner) = Some((Instant::now(), Arc::clone(&groups)));
-    Ok(groups)
+    let (seen, sets) = db::call(&state.pool, move |c| Ok((print(c)?, all(c, &st.looks, &st.sounds)?))).await?;
+    let kept = Kept {
+        at: Instant::now(),
+        print: seen,
+        generation: state.near_copies.generation.fetch_add(1, Ordering::Relaxed) + 1,
+        sets: Arc::new(sets),
+    };
+    *state.near_copies.kept.lock().unwrap_or_else(PoisonError::into_inner) = Some(kept.clone());
+    Ok(kept)
 }
 
 /// The near copies of an asset (see [`of_asset`]).

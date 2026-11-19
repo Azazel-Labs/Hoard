@@ -3252,6 +3252,10 @@ translation = "Mostrar mais (faltam { $count })"
 source = "No near copies: every picture, sound and model is only here once."
 translation = "Nenhuma quase cópia: cada imagem, som e modelo está aqui só uma vez."
 
+[messages.copies-refreshing]
+source = "The library has changed since these were found. Looking again…"
+translation = "A biblioteca mudou desde que estas foram encontradas. Procurando de novo…"
+
 [messages.copies-set]
 source = "Set { $n }"
 translation = "Grupo { $n }"

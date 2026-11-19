@@ -2107,6 +2107,7 @@ settings-page-library-blurb = Hoard に入っているもの: 大きさ、内訳
 settings-page-copies = ほぼ同じコピー
 settings-page-copies-blurb = サイズ、サンプルレート、形式だけが違う同じ画像・サウンド・モデルのファイル。容量を多く使っているものから順に表示します。各セットの最良のものに印が付きます。何も削除しません。
 copies-loading = ほぼ同じコピーを探しています…
+copies-refreshing = 見つけた後にライブラリが変更されました。もう一度探しています…
 copies-none = ほぼ同じコピーはありません。どの画像・サウンド・モデルも 1 つだけです。
 copies-load-failed = ほぼ同じコピーを一覧できませんでした: { $error }
 copies-sum = ほぼ同じコピーのセット: { $count }。最良でないコピーが { $size } を使っています。

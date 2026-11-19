@@ -3252,6 +3252,10 @@ translation = "Wys meer (nog { $count })"
 source = "No near copies: every picture, sound and model is only here once."
 translation = "Geen byna-kopieë nie: elke prent, klank en model is net een keer hier."
 
+[messages.copies-refreshing]
+source = "The library has changed since these were found. Looking again…"
+translation = "Die biblioteek het verander sedert hierdie gevind is. Soek weer…"
+
 [messages.copies-set]
 source = "Set { $n }"
 translation = "Stel { $n }"

@@ -3157,6 +3157,10 @@ translation = "더 보기 ({ $count }개 남음)"
 source = "No near copies: every picture, sound and model is only here once."
 translation = "거의 같은 사본이 없습니다. 모든 그림, 소리, 모델이 한 번씩만 있습니다."
 
+[messages.copies-refreshing]
+source = "The library has changed since these were found. Looking again…"
+translation = "찾은 이후 라이브러리가 바뀌었습니다. 다시 찾는 중…"
+
 [messages.copies-set]
 source = "Set { $n }"
 translation = "묶음 { $n }"

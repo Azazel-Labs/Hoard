@@ -2372,6 +2372,7 @@ settings-page-library-blurb = Mitä Hoardissa on: kuinka suuri se on, mistä se 
 settings-page-copies = Lähes samat kopiot
 settings-page-copies-blurb = Tiedostot, jotka ovat sama kuva, ääni tai malli eri koossa, näytteenottotaajuudella tai muodossa, eniten tilaa vievät ensin. Kunkin joukon paras on merkitty; mitään ei poisteta.
 copies-loading = Etsitään lähes samoja kopioita…
+copies-refreshing = Kirjasto on muuttunut näiden löytymisen jälkeen. Etsitään uudelleen…
 copies-none = Ei lähes samoja kopioita: jokainen kuva, ääni ja malli on täällä vain kerran.
 copies-load-failed = Lähes samoja kopioita ei voitu listata: { $error }
 copies-sum = Lähes samojen kopioiden joukkoja: { $count }. Kopiot, jotka eivät ole parhaita, vievät { $size }.

@@ -2113,6 +2113,7 @@ settings-page-library-blurb = Hoard 裡有什麼：有多大、由哪些內容�
 settings-page-copies = 近似副本
 settings-page-copies-blurb = 只是尺寸、取樣率或格式不同的同一圖片、聲音或模型檔案，占用空間最多的排在前面。每組的最佳副本已標出；不會刪除任何內容。
 copies-loading = 正在尋找近似副本…
+copies-refreshing = 找到這些之後素材庫已有變更。正在重新尋找…
 copies-none = 沒有近似副本：每張圖片、每個聲音和模型在這裡都只有一份。
 copies-load-failed = 無法列出近似副本：{ $error }
 copies-sum = 近似副本組：{ $count }。非最佳副本占用 { $size }。

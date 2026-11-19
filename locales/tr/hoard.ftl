@@ -2124,6 +2124,7 @@ settings-page-library-blurb = Hoard’da neler var: ne kadar büyük, nelerden o
 settings-page-copies = Neredeyse kopyalar
 settings-page-copies-blurb = Başka bir boyutta, örnekleme hızında veya biçimde aynı resim, ses ya da model olan dosyalar; en çok yer kaplayanlar önce. Her kümenin en iyisi işaretlidir; hiçbir şey silinmez.
 copies-loading = Neredeyse kopyalar aranıyor…
+copies-refreshing = Bunlar bulunduğundan beri kitaplık değişti. Yeniden aranıyor…
 copies-none = Neredeyse kopya yok: her resim, ses ve model burada yalnızca bir kez var.
 copies-load-failed = Neredeyse kopyalar listelenemedi: { $error }
 copies-sum = Neredeyse kopya kümeleri: { $count }. En iyi olmayan kopyalar { $size } yer kaplıyor.

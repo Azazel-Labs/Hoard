@@ -3293,6 +3293,10 @@ translation = "Zobrazit další (zbývá { $count })"
 source = "No near copies: every picture, sound and model is only here once."
 translation = "Žádné téměř shodné kopie: každý obrázek, zvuk i model je tu jen jednou."
 
+[messages.copies-refreshing]
+source = "The library has changed since these were found. Looking again…"
+translation = "Knihovna se od jejich nalezení změnila. Hledá se znovu…"
+
 [messages.copies-set]
 source = "Set { $n }"
 translation = "Sada { $n }"

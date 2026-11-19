@@ -2329,6 +2329,7 @@ settings-page-library-blurb = Ce que contient Hoard : sa taille, de quoi il est
 settings-page-copies = Quasi-copies
 settings-page-copies-blurb = Les fichiers qui sont la même image, le même son ou le même modèle dans une autre taille, fréquence d’échantillonnage ou un autre format, ceux qui prennent le plus de place d’abord. La meilleure de chaque groupe est signalée ; rien n’est supprimé.
 copies-loading = Recherche des quasi-copies…
+copies-refreshing = La bibliothèque a changé depuis. Nouvelle recherche…
 copies-none = Aucune quasi-copie : chaque image, son et modèle n’est ici qu’une fois.
 copies-load-failed = Impossible de lister les quasi-copies : { $error }
 copies-sum = Groupes de quasi-copies : { $count }. Les copies qui ne sont pas les meilleures occupent { $size }.

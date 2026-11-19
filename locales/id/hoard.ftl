@@ -2111,6 +2111,7 @@ settings-page-library-blurb = Isi Hoard: seberapa besar, terdiri dari apa, bagai
 settings-page-copies = Salinan hampir sama
 settings-page-copies-blurb = File yang merupakan gambar, suara, atau model yang sama dalam ukuran, laju sampel, atau format lain, yang paling banyak memakan ruang lebih dulu. Yang terbaik di setiap kelompok ditandai; tidak ada yang dihapus.
 copies-loading = Mencari salinan hampir sama…
+copies-refreshing = Pustaka telah berubah sejak ini ditemukan. Mencari lagi…
 copies-none = Tidak ada salinan hampir sama: setiap gambar, suara, dan model hanya ada sekali di sini.
 copies-load-failed = Tidak dapat menampilkan salinan hampir sama: { $error }
 copies-sum = Kelompok salinan hampir sama: { $count }. Salinan yang bukan terbaik memakan { $size }.

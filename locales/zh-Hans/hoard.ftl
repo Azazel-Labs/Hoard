@@ -2107,6 +2107,7 @@ settings-page-library-blurb = 资源库里有什么：它有多大、由什么�
 settings-page-copies = 近似副本
 settings-page-copies-blurb = 只是尺寸、采样率或格式不同的同一图片、声音或模型文件，占用空间最多的排在前面。每组的最佳副本已标出；不会删除任何内容。
 copies-loading = 正在查找近似副本…
+copies-refreshing = 找到这些之后资源库已有变化。正在重新查找…
 copies-none = 没有近似副本：每张图片、每个声音和模型在这里都只有一份。
 copies-load-failed = 无法列出近似副本：{ $error }
 copies-sum = 近似副本组：{ $count }。非最佳副本占用 { $size }。

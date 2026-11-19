@@ -3163,6 +3163,10 @@ translation = "显示更多（还剩 { $count }）"
 source = "No near copies: every picture, sound and model is only here once."
 translation = "没有近似副本：每张图片、每个声音和模型在这里都只有一份。"
 
+[messages.copies-refreshing]
+source = "The library has changed since these were found. Looking again…"
+translation = "找到这些之后资源库已有变化。正在重新查找…"
+
 [messages.copies-set]
 source = "Set { $n }"
 translation = "第 { $n } 组"

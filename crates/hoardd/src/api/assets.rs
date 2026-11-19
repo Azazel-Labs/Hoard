@@ -145,11 +145,14 @@ pub(super) async fn duplicates(
     State(state): State<AppState>,
     Query(q): Query<DuplicatesQuery>,
 ) -> ApiResult<Json<hoard_core::CopyGroups>> {
-    let all = crate::nearcopies::groups(&state).await?;
+    let found = crate::nearcopies::groups(&state).await?;
+    let all = &found.sets;
     Ok(Json(hoard_core::CopyGroups {
         groups: all.iter().skip(q.offset).take(q.limit.min(200)).cloned().collect(),
         total: all.len(),
         wasted: all.iter().map(|g| g.wasted).sum(),
+        generation: found.generation,
+        refreshing: found.refreshing,
     }))
 }
 

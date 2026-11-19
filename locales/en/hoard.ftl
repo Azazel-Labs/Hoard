@@ -2596,6 +2596,8 @@ settings-page-library-blurb = What’s in the hoard: how big it is, what it’s 
 settings-page-copies = Near copies
 settings-page-copies-blurb = Files that are the same picture, sound or model at another size, rate or format, the most space taken first. The best of each set is marked; nothing is deleted.
 copies-loading = Looking for near copies…
+# Shown under the list while the sets are worked out again because the library changed; the list is swapped when done.
+copies-refreshing = The library has changed since these were found. Looking again…
 copies-none = No near copies: every picture, sound and model is only here once.
 copies-load-failed = Couldn’t list near copies: { $error }
 copies-sum =

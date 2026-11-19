@@ -3316,6 +3316,10 @@ translation = "Arată mai multe (mai sunt { $count })"
 source = "No near copies: every picture, sound and model is only here once."
 translation = "Nicio aproape copie: fiecare imagine, sunet și model este aici o singură dată."
 
+[messages.copies-refreshing]
+source = "The library has changed since these were found. Looking again…"
+translation = "Biblioteca s-a schimbat de când au fost găsite. Se caută din nou…"
+
 [messages.copies-set]
 source = "Set { $n }"
 translation = "Setul { $n }"

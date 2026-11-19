@@ -3160,6 +3160,10 @@ translation = "Hiện thêm (còn { $count })"
 source = "No near copies: every picture, sound and model is only here once."
 translation = "Không có bản gần giống: mỗi hình, âm thanh và mô hình chỉ có ở đây một lần."
 
+[messages.copies-refreshing]
+source = "The library has changed since these were found. Looking again…"
+translation = "Thư viện đã thay đổi kể từ khi tìm thấy các bản này. Đang tìm lại…"
+
 [messages.copies-set]
 source = "Set { $n }"
 translation = "Bộ { $n }"

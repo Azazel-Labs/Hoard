@@ -2080,6 +2080,7 @@ settings-page-library-blurb = Hoard에 무엇이 있는지: 크기, 구성, 늘�
 settings-page-copies = 거의 같은 사본
 settings-page-copies-blurb = 크기, 샘플 레이트 또는 형식만 다른 같은 그림, 소리, 모델 파일입니다. 공간을 가장 많이 차지하는 것부터 보여 줍니다. 각 묶음에서 가장 좋은 것에 표시가 있으며, 아무것도 삭제하지 않습니다.
 copies-loading = 거의 같은 사본을 찾는 중…
+copies-refreshing = 찾은 이후 라이브러리가 바뀌었습니다. 다시 찾는 중…
 copies-none = 거의 같은 사본이 없습니다. 모든 그림, 소리, 모델이 한 번씩만 있습니다.
 copies-load-failed = 거의 같은 사본을 나열하지 못했습니다: { $error }
 copies-sum = 거의 같은 사본 묶음: { $count }개. 가장 좋은 것이 아닌 사본이 차지하는 공간: { $size }.

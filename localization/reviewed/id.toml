@@ -3163,6 +3163,10 @@ translation = "Tampilkan lebih banyak ({ $count } lagi)"
 source = "No near copies: every picture, sound and model is only here once."
 translation = "Tidak ada salinan hampir sama: setiap gambar, suara, dan model hanya ada sekali di sini."
 
+[messages.copies-refreshing]
+source = "The library has changed since these were found. Looking again…"
+translation = "Pustaka telah berubah sejak ini ditemukan. Mencari lagi…"
+
 [messages.copies-set]
 source = "Set { $n }"
 translation = "Kelompok { $n }"

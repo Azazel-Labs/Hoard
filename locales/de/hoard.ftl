@@ -2286,6 +2286,7 @@ settings-page-library-blurb = Was im Hoard steckt: wie groß er ist, woraus er b
 settings-page-copies = Beinahe-Kopien
 settings-page-copies-blurb = Dateien, die dasselbe Bild, derselbe Sound oder dasselbe Modell in anderer Größe, Abtastrate oder einem anderen Format sind, die mit dem meisten Platz zuerst. Die beste jeder Gruppe ist markiert; nichts wird gelöscht.
 copies-loading = Suche nach Beinahe-Kopien…
+copies-refreshing = Die Bibliothek hat sich geändert, seit diese gefunden wurden. Erneute Suche…
 copies-none = Keine Beinahe-Kopien: Jedes Bild, jeder Sound und jedes Modell ist nur einmal da.
 copies-load-failed = Beinahe-Kopien konnten nicht aufgelistet werden: { $error }
 copies-sum = Gruppen von Beinahe-Kopien: { $count }. Die Kopien, die nicht die besten sind, belegen { $size }.

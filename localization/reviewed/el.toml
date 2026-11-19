@@ -3264,6 +3264,10 @@ translation = "Εμφάνιση περισσότερων (απομένουν { $
 source = "No near copies: every picture, sound and model is only here once."
 translation = "Κανένα σχεδόν αντίγραφο: κάθε εικόνα, ήχος και μοντέλο υπάρχει εδώ μόνο μία φορά."
 
+[messages.copies-refreshing]
+source = "The library has changed since these were found. Looking again…"
+translation = "Η βιβλιοθήκη άλλαξε από τότε που βρέθηκαν. Νέα αναζήτηση…"
+
 [messages.copies-set]
 source = "Set { $n }"
 translation = "Ομάδα { $n }"

@@ -2286,6 +2286,7 @@ settings-page-library-blurb = Wat in die hoard is: hoe groot dit is, waarvan dit
 settings-page-copies = Byna-kopieë
 settings-page-copies-blurb = Lêers wat dieselfde prent, klank of model in ’n ander grootte, monstertempo of formaat is, dié wat die meeste spasie opneem eerste. Die beste van elke stel is gemerk; niks word uitgevee nie.
 copies-loading = Soek byna-kopieë…
+copies-refreshing = Die biblioteek het verander sedert hierdie gevind is. Soek weer…
 copies-none = Geen byna-kopieë nie: elke prent, klank en model is net een keer hier.
 copies-load-failed = Kon nie byna-kopieë lys nie: { $error }
 copies-sum = Stelle byna-kopieë: { $count }. Die kopieë wat nie die beste is nie, neem { $size } op.

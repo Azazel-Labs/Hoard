@@ -2286,6 +2286,7 @@ settings-page-library-blurb = Wat er in de hoard zit: hoe groot hij is, waar hij
 settings-page-copies = Bijna-kopieën
 settings-page-copies-blurb = Bestanden die dezelfde afbeelding, hetzelfde geluid of model zijn in een andere grootte, samplefrequentie of een ander formaat, die met de meeste ruimte eerst. De beste van elke set is gemarkeerd; er wordt niets verwijderd.
 copies-loading = Bijna-kopieën zoeken…
+copies-refreshing = De bibliotheek is veranderd sinds deze zijn gevonden. Opnieuw zoeken…
 copies-none = Geen bijna-kopieën: elke afbeelding, elk geluid en elk model staat hier maar één keer.
 copies-load-failed = Kon bijna-kopieën niet tonen: { $error }
 copies-sum = Sets bijna-kopieën: { $count }. De kopieën die niet de beste zijn, nemen { $size } in.

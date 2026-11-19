@@ -265,6 +265,10 @@ pub async fn run(cfg: Config) -> Result<()> {
     }
     {
         let st = Arc::clone(&state);
+        tokio::spawn(async move { nearcopies::warm(&st).await });
+    }
+    {
+        let st = Arc::clone(&state);
         tokio::spawn(async move {
             if let Err(e) = text_thumbs::draw_missing(&st).await {
                 tracing::warn!(error = %format!("{e:#}"), "could not draw the thumbnails of text added before Hoard drew them");

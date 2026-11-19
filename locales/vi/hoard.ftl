@@ -2107,6 +2107,7 @@ settings-page-library-blurb = Những gì có trong kho: lớn cỡ nào, gồm 
 settings-page-copies = Bản gần giống
 settings-page-copies-blurb = Các tệp là cùng một hình, âm thanh hoặc mô hình ở kích thước, tần số lấy mẫu hoặc định dạng khác, tệp chiếm nhiều dung lượng nhất trước. Bản tốt nhất của mỗi bộ được đánh dấu; không có gì bị xóa.
 copies-loading = Đang tìm bản gần giống…
+copies-refreshing = Thư viện đã thay đổi kể từ khi tìm thấy các bản này. Đang tìm lại…
 copies-none = Không có bản gần giống: mỗi hình, âm thanh và mô hình chỉ có ở đây một lần.
 copies-load-failed = Không thể liệt kê bản gần giống: { $error }
 copies-sum = Bộ bản gần giống: { $count }. Các bản không phải tốt nhất chiếm { $size }.

@@ -3166,6 +3166,10 @@ translation = "さらに表示 (残り { $count })"
 source = "No near copies: every picture, sound and model is only here once."
 translation = "ほぼ同じコピーはありません。どの画像・サウンド・モデルも 1 つだけです。"
 
+[messages.copies-refreshing]
+source = "The library has changed since these were found. Looking again…"
+translation = "見つけた後にライブラリが変更されました。もう一度探しています…"
+
 [messages.copies-set]
 source = "Set { $n }"
 translation = "セット { $n }"

@@ -2120,6 +2120,7 @@ settings-page-library-blurb = Mi van a hoardban: mekkora, miből áll, hogyan n�
 settings-page-copies = Majdnem azonos másolatok
 settings-page-copies-blurb = Fájlok, amelyek ugyanaz a kép, hang vagy modell más méretben, mintavételezési frekvenciával vagy formátumban; elöl azok, amelyek a legtöbb helyet foglalják. Minden csoport legjobbja meg van jelölve; semmi sem törlődik.
 copies-loading = Majdnem azonos másolatok keresése…
+copies-refreshing = A könyvtár megváltozott, mióta ezeket megtaláltuk. Újrakeresés…
 copies-none = Nincsenek majdnem azonos másolatok: minden kép, hang és modell csak egyszer van itt.
 copies-load-failed = Nem sikerült listázni a majdnem azonos másolatokat: { $error }
 copies-sum = Majdnem azonos másolatok csoportjai: { $count }. A nem legjobb másolatok { $size } helyet foglalnak.

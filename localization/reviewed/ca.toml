@@ -3252,6 +3252,10 @@ translation = "Mostra’n més (en queden { $count })"
 source = "No near copies: every picture, sound and model is only here once."
 translation = "No hi ha còpies gairebé idèntiques: cada imatge, so i model només hi és una vegada."
 
+[messages.copies-refreshing]
+source = "The library has changed since these were found. Looking again…"
+translation = "La biblioteca ha canviat des que es van trobar. Tornant a cercar…"
+
 [messages.copies-set]
 source = "Set { $n }"
 translation = "Conjunt { $n }"

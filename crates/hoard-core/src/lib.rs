@@ -498,6 +498,11 @@ pub struct CopyGroups {
     pub total: usize,
     /// Bytes taken by the copies that aren't the best, in all of them.
     pub wasted: i64,
+    /// Which working-out of the library's sets this page is from; it goes up each time they're worked out again.
+    pub generation: u64,
+    /// The library has changed since these were worked out, and they're being worked out again: ask again for the next
+    /// generation.
+    pub refreshing: bool,
 }
 
 /// A named set of assets put together by hand ("Forest level props"), across packs.

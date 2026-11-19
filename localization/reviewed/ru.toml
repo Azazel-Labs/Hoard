@@ -3330,6 +3330,10 @@ translation = "Показать ещё (осталось { $count })"
 source = "No near copies: every picture, sound and model is only here once."
 translation = "Почти копий нет: каждое изображение, звук и модель здесь только один раз."
 
+[messages.copies-refreshing]
+source = "The library has changed since these were found. Looking again…"
+translation = "Библиотека изменилась с тех пор, как они были найдены. Повторный поиск…"
+
 [messages.copies-set]
 source = "Set { $n }"
 translation = "Набор { $n }"

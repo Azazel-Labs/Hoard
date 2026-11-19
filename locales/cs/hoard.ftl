@@ -2485,6 +2485,7 @@ settings-page-library-blurb = Co je v Hoardu: jak je velký, z čeho se skládá
 settings-page-copies = Téměř shodné kopie
 settings-page-copies-blurb = Soubory, které jsou stejným obrázkem, zvukem nebo modelem v jiné velikosti, vzorkovací frekvenci nebo formátu, nejdřív ty, které zabírají nejvíc místa. Nejlepší z každé sady je označena; nic se nemaže.
 copies-loading = Hledání téměř shodných kopií…
+copies-refreshing = Knihovna se od jejich nalezení změnila. Hledá se znovu…
 copies-none = Žádné téměř shodné kopie: každý obrázek, zvuk i model je tu jen jednou.
 copies-load-failed = Téměř shodné kopie se nepodařilo vypsat: { $error }
 copies-sum = Sady téměř shodných kopií: { $count }. Kopie, které nejsou nejlepší, zabírají { $size }.

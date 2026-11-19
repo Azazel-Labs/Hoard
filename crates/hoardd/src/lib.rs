@@ -156,10 +156,30 @@ pub(crate) struct Inner {
 
 pub(crate) type AppState = Arc<Inner>;
 
+/// Which build this is, where it runs and the SQLite it has.
+fn log_build(cfg: &Config) {
+    let edition = match (cfg.steam_app, cfg.desktop) {
+        (Some(_), _) => "desktop app from Steam",
+        (None, true) => "desktop app",
+        (None, false) => "server",
+    };
+    tracing::info!(
+        version = hoard_core::VERSION,
+        edition,
+        os = std::env::consts::OS,
+        arch = std::env::consts::ARCH,
+        sqlite = rusqlite::version(),
+        "Hoard {}",
+        hoard_core::VERSION
+    );
+}
+
 /// Serves the library `cfg` describes until the process is told to stop (Ctrl+C, or SIGTERM on Unix).
 ///
 /// `--reset-password` and `--https-off` do their one thing and return instead.
 pub async fn run(cfg: Config) -> Result<()> {
+    // First, so every log (and every bug report pasted from one) says which build it's from.
+    log_build(&cfg);
     config::warn_retired_env();
     for dir in [cfg.data_dir.clone(), cfg.staging_dir(), cfg.tmp_dir()] {
         std::fs::create_dir_all(&dir).with_context(|| format!("create {}", dir.display()))?;

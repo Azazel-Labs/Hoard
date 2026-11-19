@@ -80,14 +80,22 @@ pub(super) struct PacksParams {
     /// The archive's packs instead of the library's.
     #[serde(default)]
     archived: Option<bool>,
+    /// Only the packs being uploaded, ingested or analyzed: what the portal asks after while they are, every couple of
+    /// seconds, which costs little however big the library is.
+    #[serde(default)]
+    busy: Option<bool>,
 }
 
 pub(super) async fn list_packs(
     State(state): State<AppState>,
     Query(p): Query<PacksParams>,
 ) -> ApiResult<Json<Vec<Pack>>> {
-    let archived = p.archived.unwrap_or(false);
-    Ok(Json(db::call(&state.pool, move |c| db::list_packs(c, archived)).await?))
+    let which = match (p.archived.unwrap_or(false), p.busy.unwrap_or(false)) {
+        (true, _) => db::Packs::Archived,
+        (false, true) => db::Packs::Busy,
+        (false, false) => db::Packs::Library,
+    };
+    Ok(Json(db::read(&state.pool, move |c| db::list_packs(c, which)).await?))
 }
 
 pub(super) async fn get_pack(State(state): State<AppState>, Path(id): Path<String>) -> ApiResult<Json<Pack>> {

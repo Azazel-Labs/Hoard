@@ -99,6 +99,8 @@ export const api = {
   libraryStats: () => request<LibraryStats>('/api/stats/library'),
   duplicates: (offset = 0, limit = 50) => request<CopyGroups>(`/api/duplicates?offset=${offset}&limit=${limit}`),
   packs: (archived = false) => request<Pack[]>(`/api/packs${archived ? '?archived=true' : ''}`),
+  /** Only the packs being uploaded, ingested or analyzed: cheap to ask after while they are. */
+  busyPacks: () => request<Pack[]>('/api/packs?busy=true'),
   archive: (items: ArchiveItems) => post<ArchiveCount>('/api/archive', items),
   restore: (items: ArchiveItems) => post<ArchiveCount>('/api/archive/restore', items),
   /** Delete for good: these, or with `all` everything in the archive. Only archived things are deleted. */
@@ -128,7 +130,8 @@ export const api = {
       body: JSON.stringify(body),
     }),
   readPackFiles: (id: string) => request<void>(`/api/packs/${id}/read-files`, { method: 'POST' }),
-  search(p: SearchParams): Promise<SearchResult> {
+  /** `signal` stops it when the results are no longer wanted, and the server stops working them out. */
+  search(p: SearchParams, signal?: AbortSignal): Promise<SearchResult> {
     const qs = new URLSearchParams()
     if (p.q) qs.set('q', p.q)
     if (p.kind) qs.set('kind', p.kind)
@@ -151,7 +154,7 @@ export const api = {
     if (p.key) qs.set('key', p.key)
     if (p.compatible_keys) qs.set('compatible_keys', 'true')
     if (p.favorites) qs.set('favorites', 'true')
-    return request<SearchResult>(`/api/assets?${qs}`).then((r) => ({ ...r, items: r.items.map(normalize) }))
+    return request<SearchResult>(`/api/assets?${qs}`, { signal }).then((r) => ({ ...r, items: r.items.map(normalize) }))
   },
   asset: (id: string) => request<Asset>(`/api/assets/${id}`).then(normalize),
   patchAsset: (id: string, patch: {

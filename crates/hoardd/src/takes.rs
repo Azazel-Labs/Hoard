@@ -273,7 +273,7 @@ pub(crate) async fn backfill(state: &AppState) {
             "SELECT DISTINCT a.pack_id FROM assets a JOIN rigs r ON r.asset_id = a.id
               WHERE a.kind IN ('model', 'animation') AND NOT {IS_TAKE}
                 AND (SELECT COUNT(*) FROM json_each(r.rig, '$.clips') c WHERE json_extract(c.value, '$.secs') >= ?1) >= 2
-                AND NOT EXISTS (SELECT 1 FROM assets t WHERE json_extract(t.meta, '$.take_of') = a.id)
+                AND NOT EXISTS (SELECT 1 FROM assets t WHERE json_extract(t.meta, '$.take_of') = +a.id)
                 AND a.pack_id IN (SELECT id FROM packs WHERE status = 'ready')"
         ))?;
         Ok(stmt.query_map([POSE_SECS], |r| r.get::<_, String>(0))?.collect::<rusqlite::Result<Vec<_>>>()?)

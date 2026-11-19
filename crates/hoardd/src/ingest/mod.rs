@@ -31,7 +31,44 @@ pub(crate) use unpack::{is_junk, pack_rels, safe_rel_path};
 
 /// Threads for per-file work: every core, up to 8.
 fn workers() -> usize {
-    std::thread::available_parallelism().map_or(2, std::num::NonZero::get).min(8)
+    cores().min(8)
+}
+
+fn cores() -> usize {
+    std::thread::available_parallelism().map_or(2, std::num::NonZero::get)
+}
+
+/// Files analyzed at once across every pack ingesting, however many are: every core but one, which is left for
+/// requests, the database and the machine's other programs (heavy work runs at a lower priority too, but a core kept
+/// free keeps the portal quick even on a small machine importing hundreds of packs).
+fn analysis_slots() -> usize {
+    cores().saturating_sub(1).clamp(1, 12)
+}
+
+/// The slots [`analysis_slots`] counts: how many are taken, and a wakeup for a worker waiting for one.
+static ANALYZING: (std::sync::Mutex<usize>, std::sync::Condvar) = (std::sync::Mutex::new(0), std::sync::Condvar::new());
+
+/// One of the [`analysis_slots`], held while a file is analyzed.
+struct Slot;
+
+impl Slot {
+    fn take() -> Self {
+        let (taken, freed) = &ANALYZING;
+        let mut n = taken.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
+        while *n >= analysis_slots() {
+            n = freed.wait(n).unwrap_or_else(std::sync::PoisonError::into_inner);
+        }
+        *n += 1;
+        Self
+    }
+}
+
+impl Drop for Slot {
+    fn drop(&mut self) {
+        let (taken, freed) = &ANALYZING;
+        *taken.lock().unwrap_or_else(std::sync::PoisonError::into_inner) -= 1;
+        freed.notify_one();
+    }
 }
 
 /// One file moving through analysis.
@@ -125,7 +162,10 @@ fn pipeline<J: Sync>(
             s.spawn(move || {
                 crate::heavy::lower_priority();
                 while let Some(job) = jobs.get(next.fetch_add(1, Ordering::Relaxed)) {
-                    let item = make(job);
+                    let item = {
+                        let _slot = Slot::take();
+                        make(job)
+                    };
                     let n = done.fetch_add(1, Ordering::Relaxed) + 1;
                     for kind in [crate::jobs::INGEST, crate::jobs::RETAG] {
                         crate::activity::job_progress(kind, Some(pack_id), n, jobs.len(), "files");

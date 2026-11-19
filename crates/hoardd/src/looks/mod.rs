@@ -165,8 +165,54 @@ fn shown(stored: &[u8]) -> Vec<hoard_core::Swatch> {
 /// A library search, ranked by look when it asks for "more like this" (`similar`) or a color (`color`), or by sound
 /// for a word imitating one (`imitation`).
 pub(crate) async fn search(state: &AppState, q: SearchQuery, facets: bool) -> Result<db::SearchPage> {
-    let rank = rank(state, &q).await?;
-    db::call(&state.pool, move |c| db::search_ranked(c, &q, facets, rank.as_ref())).await
+    let rank = ranked(state, &q).await?;
+    db::read(&state.pool, move |c| db::search_ranked(c, &q, facets, rank.as_deref())).await
+}
+
+/// How long a ranking is kept for the next pages of the same search.
+const RANK_KEPT: std::time::Duration = std::time::Duration::from_secs(90);
+/// How many rankings are kept.
+const RANKS_KEPT: usize = 8;
+
+/// What a ranking by words depends on: the words, the kind searched, how many pictures and sounds have embeddings (so
+/// one that's been added to since isn't kept), and whether image and sound search are on.
+type RankKey = (String, Option<String>, [usize; 3], [bool; 2]);
+/// A kept ranking: what it's for, when it was worked out, and the ranking (none when the words matched nothing).
+type Kept = (RankKey, std::time::Instant, Option<std::sync::Arc<db::LookRank>>);
+
+/// Recent rankings by words, newest last: scrolling through the results asks for them a page at a time, and working
+/// one out again for each page (the words turned into embeddings, every picture and sound scored against them) is
+/// most of a search. Rankings by look, color or a noise are quick to work out, so they aren't kept.
+static RANKS: std::sync::Mutex<Vec<Kept>> = std::sync::Mutex::new(Vec::new());
+
+/// [`rank`], kept for a while for the next pages of the same search by words.
+async fn ranked(state: &AppState, q: &SearchQuery) -> Result<Option<std::sync::Arc<db::LookRank>>> {
+    let set = |v: &Option<String>| v.as_deref().is_some_and(|s| !s.trim().is_empty());
+    let text = q.q.as_deref().unwrap_or("").trim();
+    if text.is_empty() || set(&q.similar) || set(&q.color) || set(&q.imitation) {
+        return Ok(rank(state, q).await?.map(std::sync::Arc::new));
+    }
+    let key: RankKey = (
+        text.to_owned(),
+        q.kind.clone(),
+        [state.pictures.len(), state.clip.len(), state.clap.len()],
+        [crate::clip::is_ready(), crate::clap::is_ready()],
+    );
+    {
+        let mut kept = RANKS.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
+        kept.retain(|(_, at, _)| at.elapsed() < RANK_KEPT);
+        if let Some((_, _, rank)) = kept.iter().find(|(k, _, _)| *k == key) {
+            return Ok(rank.clone());
+        }
+    }
+    let rank = rank(state, q).await?.map(std::sync::Arc::new);
+    let mut kept = RANKS.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
+    kept.retain(|(k, _, _)| *k != key);
+    if kept.len() >= RANKS_KEPT {
+        kept.remove(0);
+    }
+    kept.push((key, std::time::Instant::now(), rank.clone()));
+    Ok(rank)
 }
 
 async fn rank(state: &AppState, q: &SearchQuery) -> Result<Option<db::LookRank>> {

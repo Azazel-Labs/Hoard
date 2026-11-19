@@ -760,4 +760,6 @@ pub(in crate::db) const MIGRATIONS: &[&str] = &[
     "CREATE INDEX assets_take_of ON assets (json_extract(meta, '$.take_of'));",
     // 76: each person's dragon hoard (see `me`): how many assets of each kind they've collected, as JSON.
     "ALTER TABLE users ADD COLUMN hoard_seen TEXT;",
+    // 77: browsing newest first reads a page of the library in order instead of sorting all of it.
+    "CREATE INDEX assets_created ON assets (created_at DESC, path);",
 ];

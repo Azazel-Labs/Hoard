@@ -38,7 +38,7 @@ tracing-subscriber.workspace = true
 reqwest.workspace = true
 axum = { version = "0.8", features = ["multipart", "http2"] }
 tower-http = { version = "0.7", features = ["fs", "cors", "trace", "compression-gzip", "compression-br", "compression-zstd", "set-header"] }
-rusqlite = { version = "0.41", features = ["bundled"] }
+rusqlite = { version = "0.41", features = ["bundled", "hooks"] }
 r2d2 = "0.8"
 r2d2_sqlite = "0.36"
 uuid = { version = "1.29", features = ["v4", "v7"] }

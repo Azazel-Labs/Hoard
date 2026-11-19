@@ -11,7 +11,7 @@ pub(super) async fn stats(State(state): State<AppState>) -> ApiResult<Json<Stats
     let llm_enabled = state.settings.get().llm_enabled();
     let conversion_cache_limit = state.settings.get().conversion_cache_bytes();
     let storage = state.blobs.label();
-    let s = db::call(&state.pool, move |c| {
+    let s = db::read(&state.pool, move |c| {
         let one = |sql: &str| -> anyhow::Result<u64> { Ok(c.query_row(sql, [], |r| r.get::<_, i64>(0))? as u64) };
         // Counts are of the library; the archive has its own two.
         let live = db::LIVE;
@@ -62,7 +62,7 @@ pub(super) async fn stats(State(state): State<AppState>) -> ApiResult<Json<Stats
 /// The library in numbers, for Settings' Library page: what kinds and file types take the space, how tagged and
 /// described things are, the biggest packs and files, and how it grew. Archived things aren't counted.
 pub(super) async fn library_stats(State(state): State<AppState>) -> ApiResult<Json<Value>> {
-    let v = db::call(&state.pool, move |c| {
+    let v = db::read(&state.pool, move |c| {
         let live = db::LIVE;
         let one = |sql: &str| -> anyhow::Result<u64> { Ok(c.query_row(sql, [], |r| r.get::<_, i64>(0))? as u64) };
         // Rows of (text, count, number), as JSON objects with the given keys for the text and the number.

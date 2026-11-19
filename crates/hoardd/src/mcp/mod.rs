@@ -309,7 +309,7 @@ async fn call_tool(state: &AppState, name: &str, args: Value, base: &str) -> Res
             }))
         }
         "list_packs" => {
-            let packs = db::call(&state.pool, |c| db::list_packs(c, false)).await?;
+            let packs = db::call(&state.pool, |c| db::list_packs(c, db::Packs::Library)).await?;
             Ok(json!({ "packs": packs }))
         }
         "get_credits" => credits_call(state, &args).await,

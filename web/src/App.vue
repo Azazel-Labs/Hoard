@@ -110,6 +110,8 @@ const dragCount = ref(0)
 // ------------------------------------------------------------------ data
 
 let searchSeq = 0
+/** Stops the requests of the search on screen when another takes its place, so the server doesn't go on with them. */
+let searchAbort = new AbortController()
 /** Pages of the current results that have arrived, and those on their way. */
 let pagesIn = new Set<number>()
 let pagesOnTheWay = new Map<number, Promise<void>>()
@@ -138,13 +140,15 @@ function searchPage(page: number) {
       hide_supporting: !prefs.showSupporting,
       // The sidebar's counts come with the first page; the rest are just tiles.
       facets: page === 0,
-    })
+    }, searchAbort.signal)
 }
 
 /** Search from the top. `keep` (the same search again, after something changed) leaves the tiles showing in place
  *  while their pages are fetched again, instead of turning them back into placeholders. */
 async function runSearch(opts: { keep?: boolean } = {}) {
   const seq = ++searchSeq
+  searchAbort.abort()
+  searchAbort = new AbortController()
   pagesIn = new Set()
   pagesOnTheWay = new Map()
   fetchingPages.value = 0
@@ -168,6 +172,7 @@ async function runSearch(opts: { keep?: boolean } = {}) {
     rising.value = opts.keep ? 0 : res.items.length
     setTimeout(() => seq === searchSeq && (rising.value = 0), 1000)
   } catch (e) {
+    if (seq !== searchSeq) return
     showError(t('app-search-failed', { error: (e as Error).message }), { label: t('app-retry'), run: () => runSearch(opts) })
   } finally {
     if (seq === searchSeq) {
@@ -248,30 +253,58 @@ watch(() => [
   runSearch()
 })
 
-async function refreshPacks() {
+/** Packs, the library's numbers, collections and projects, after a change. Says whether a pack had just finished. */
+async function refreshPacks(): Promise<boolean> {
   try {
     const [p, s, c] = await Promise.all([api.packs(), api.stats(), api.collections(), loadProjects()])
     const wasBusy = packs.value.some(busy)
     packs.value = p
     stats.value = s
     collections.value = c
+    caughtUp = Date.now()
     // A pack just finished: its assets are now searchable.
-    if (wasBusy && !p.some(busy)) runSearch({ keep: true })
+    if (wasBusy && !p.some(busy)) {
+      runSearch({ keep: true })
+      return true
+    }
   } catch (e) {
     showError(t('app-unreachable', { error: (e as Error).message }), { label: t('app-retry'), run: refreshPacks })
   }
+  return false
 }
 const busy = (p: Pack) => p.status === 'ingesting' || p.status === 'analyzing' || p.status === 'uploading'
 
-let poll: ReturnType<typeof setInterval> | undefined
+// While packs import, the portal asks after just those every couple of seconds (more slowly from a tab in the
+// background), and only once the last answer is in, so a server busy importing hundreds of packs is never asked
+// again before it has answered. Everything else (the library's numbers, collections, the grid as the new assets get
+// their pictures and tags) follows when a pack finishes, at most every ten seconds, and at once when the last does.
+const POLL = 2000
+const POLL_HIDDEN = 15_000
+const CATCH_UP = 10_000
+let poll: ReturnType<typeof setTimeout> | undefined
+let caughtUp = 0
+let behind = false
 function schedulePoll() {
-  clearInterval(poll)
-  poll = setInterval(() => {
-    if (packs.value.some(busy)) {
-      refreshPacks()
-      if (packs.value.some((p) => p.status === 'analyzing')) runSearch({ keep: true })
-    }
-  }, 1500)
+  clearTimeout(poll)
+  poll = setTimeout(async () => {
+    await pollPacks().catch(() => {})
+    schedulePoll()
+  }, document.hidden ? POLL_HIDDEN : POLL)
+}
+async function pollPacks() {
+  const before = packs.value.filter(busy)
+  if (!before.length) return
+  const now = await api.busyPacks()
+  const fresh = new Map(now.map((p) => [p.id, p]))
+  const known = new Set(packs.value.map((p) => p.id))
+  packs.value = [...now.filter((p) => !known.has(p.id)), ...packs.value.map((p) => fresh.get(p.id) ?? p)]
+  if (before.some((p) => !fresh.has(p.id)) || now.some((p) => !known.has(p.id))) behind = true
+  const analyzing = now.some((p) => p.status === 'analyzing')
+  if (!now.length || ((behind || analyzing) && Date.now() - caughtUp >= CATCH_UP)) {
+    behind = false
+    // The last pack finishing searches again by itself.
+    if (!(await refreshPacks())) runSearch({ keep: true })
+  }
 }
 
 
@@ -865,7 +898,7 @@ onMounted(() => {
 })
 onBeforeUnmount(() => {
   unswipeSide()
-  clearInterval(poll)
+  clearTimeout(poll)
   clearTimeout(fillTimer)
   window.removeEventListener('keydown', onKey)
   window.removeEventListener('popstate', onHistory)

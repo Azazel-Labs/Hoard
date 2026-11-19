@@ -84,12 +84,25 @@ fn fill_kinds(conn: &Connection, packs: &mut [Pack]) -> Result<()> {
     Ok(())
 }
 
-/// The packs in the library, newest first, or with `archived` the ones in the archive, most recently archived first.
-pub(crate) fn list_packs(conn: &Connection, archived: bool) -> Result<Vec<Pack>> {
-    let filter = if archived {
-        "WHERE p.archived_at IS NOT NULL ORDER BY p.archived_at DESC"
-    } else {
-        "WHERE p.archived_at IS NULL ORDER BY p.created_at DESC"
+/// Which packs [`list_packs`] lists.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub(crate) enum Packs {
+    /// The library's, newest first.
+    Library,
+    /// The library's that are being uploaded, ingested or analyzed, newest first.
+    Busy,
+    /// The archive's, most recently archived first.
+    Archived,
+}
+
+/// The packs `which` names.
+pub(crate) fn list_packs(conn: &Connection, which: Packs) -> Result<Vec<Pack>> {
+    let filter = match which {
+        Packs::Library => "WHERE p.archived_at IS NULL ORDER BY p.created_at DESC",
+        Packs::Busy => {
+            "WHERE p.archived_at IS NULL AND p.status IN ('uploading', 'ingesting', 'analyzing') ORDER BY p.created_at DESC"
+        }
+        Packs::Archived => "WHERE p.archived_at IS NOT NULL ORDER BY p.archived_at DESC",
     };
     let mut stmt = conn
         .prepare(&format!("SELECT {PACK_COLS} FROM packs p LEFT JOIN pack_context c ON c.pack_id = p.id {filter}"))?;
@@ -300,7 +313,10 @@ mod tests {
         assert_eq!(ids(&conn, true), s(&["a1"]), "archived packs are listed on their own");
         let q = SearchQuery { archived: true, pack: Some("p2".into()), ..Default::default() };
         assert_eq!(search(&conn, &q, false).unwrap().total, 1, "an archived pack's assets open from the archive");
-        assert_eq!(list_packs(&conn, false).unwrap().iter().map(|p| p.id.clone()).collect::<Vec<_>>(), s(&["p1"]));
+        assert_eq!(
+            list_packs(&conn, Packs::Library).unwrap().iter().map(|p| p.id.clone()).collect::<Vec<_>>(),
+            s(&["p1"])
+        );
         assert!(
             tag_counts(&conn, "", false, 100).unwrap().iter().all(|f| f.value != "stone"),
             "archived tags leave the tag list"

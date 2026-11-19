@@ -51,6 +51,31 @@ pub(crate) enum Keys {
 
 const FTS_JOIN: &str = "JOIN (SELECT asset_id, bm25(assets_fts, 0.0, 8.0, 4.0, 3.0, 1.0, 5.0) AS rank
           FROM assets_fts WHERE assets_fts MATCH ?) f ON f.asset_id = a.id";
+/// The word matches of a search by words and look together, worked out once into `temp.word_rank` (see
+/// [`search_ranked`]): joined as a subquery, SQLite can run the match again for every asset in the library.
+const WORD_RANK: &str = "INSERT INTO temp.word_rank (asset_id, rank)
+     SELECT asset_id, bm25(assets_fts, 0.0, 8.0, 4.0, 3.0, 1.0, 5.0) FROM assets_fts WHERE assets_fts MATCH ?1";
+
+/// The assets a search by words and look together can find, the word matches and those the look ranks, worked out
+/// into `temp.blend` so the search goes through them alone. (Joined as a subquery, SQLite can go through the whole
+/// library and look each asset up in it instead.)
+fn blend_candidates(look: &LookRank) -> &'static str {
+    match look.keys {
+        Keys::Thumbs => {
+            "INSERT OR IGNORE INTO temp.blend (id) SELECT asset_id FROM temp.word_rank
+               UNION SELECT m.id FROM temp.look_rank r JOIN assets m ON m.thumb_hash = r.hash"
+        }
+        Keys::Files => {
+            "INSERT OR IGNORE INTO temp.blend (id) SELECT asset_id FROM temp.word_rank
+               UNION SELECT m.id FROM temp.look_rank r JOIN assets m ON m.blob_hash = r.hash"
+        }
+        Keys::Mixed => {
+            "INSERT OR IGNORE INTO temp.blend (id) SELECT asset_id FROM temp.word_rank
+               UNION SELECT m.id FROM temp.look_rank r JOIN assets m ON m.blob_hash = r.hash WHERE m.kind = 'audio'
+               UNION SELECT m.id FROM temp.look_rank r JOIN assets m ON m.thumb_hash = r.hash WHERE m.kind != 'audio'"
+        }
+    }
+}
 fn look_join(look: &LookRank) -> &'static str {
     match look.keys {
         Keys::Thumbs => "JOIN temp.look_rank lr ON lr.hash = a.thumb_hash",
@@ -95,10 +120,10 @@ fn build_filter(q: &SearchQuery, include_kind: bool, look: Option<&LookRank>) ->
     let mut f = Filter { join: String::new(), clauses: Vec::new(), params: Vec::new(), ranked: false };
     let fts = q.q.as_deref().and_then(fts_query);
     match (fts, look) {
-        (Some(fts), Some(look)) if look.blend => {
-            f.join = format!("LEFT {FTS_JOIN} LEFT {}", look_join(look));
-            f.clauses.push("(f.asset_id IS NOT NULL OR lr.hash IS NOT NULL)".to_owned());
-            f.params.push(SqlValue::Text(fts));
+        // The word matches are in temp.word_rank already, and with the look's in temp.blend (see search_ranked).
+        (Some(_), Some(look)) if look.blend => {
+            f.join = format!("LEFT JOIN temp.word_rank f ON f.asset_id = a.id LEFT {}", look_join(look));
+            f.clauses.push("a.id IN (SELECT id FROM temp.blend)".to_owned());
             f.ranked = true;
         }
         (fts, look) => {
@@ -240,14 +265,15 @@ pub(crate) const LIVE: &str =
 /// map, say): not something you'd browse for. The material is, and it shows its maps, unless it's the material of
 /// one object only (`owned_by`, see `materials::mark_owned`): then it's part of that model, which shows it.
 /// A sprite sheet's pages, and the loose images it has its sprites as too, are shown with the sheet. A file of clips
-/// whose takes are animations of their own (see `takes`) is shown by them.
+/// whose takes are animations of their own (see `takes`) is shown by them. (`+a.id` drops the column's text affinity,
+/// so the lookup can use the `take_of` index instead of reading all of it for every animation.)
 pub(crate) const SUPPORTING: &str = "(EXISTS (SELECT 1 FROM asset_links l WHERE l.to_id = a.id
      AND (l.rel IN ('buffer', 'sidecar', 'sprite', 'format', 'sample') OR (l.rel = 'material' AND a.ext = 'mtl')
           OR (l.rel = 'texture' AND a.kind = 'texture'
               AND EXISTS (SELECT 1 FROM assets s WHERE s.id = l.from_id AND s.kind = 'sheet'))))
      OR EXISTS (SELECT 1 FROM material_maps m WHERE m.texture_id = a.id)
      OR (a.ext = 'material' AND EXISTS (SELECT 1 FROM assets o WHERE o.id = json_extract(a.meta, '$.owned_by')))
-     OR (a.kind = 'animation' AND EXISTS (SELECT 1 FROM assets t WHERE json_extract(t.meta, '$.take_of') = a.id)))";
+     OR (a.kind = 'animation' AND EXISTS (SELECT 1 FROM assets t WHERE json_extract(t.meta, '$.take_of') = +a.id)))";
 
 impl Filter {
     fn where_sql(&self) -> String {
@@ -287,6 +313,20 @@ pub(crate) fn search_ranked(
         for (hash, score) in &look.scores {
             insert.execute(params![hash, f64::from(*score)])?;
         }
+        if look.blend
+            && let Some(fts) = fts_query_of(q)
+        {
+            conn.execute_batch(
+                "CREATE TEMP TABLE IF NOT EXISTS word_rank (asset_id TEXT PRIMARY KEY, rank REAL NOT NULL) WITHOUT ROWID;
+                 DELETE FROM temp.word_rank;",
+            )?;
+            conn.prepare_cached(WORD_RANK)?.execute([fts])?;
+            conn.execute_batch(
+                "CREATE TEMP TABLE IF NOT EXISTS blend (id TEXT PRIMARY KEY) WITHOUT ROWID;
+                 DELETE FROM temp.blend;",
+            )?;
+            conn.prepare_cached(blend_candidates(look))?.execute([])?;
+        }
     }
     let f = build_filter(q, true, look);
     let where_sql = f.where_sql();
@@ -309,21 +349,28 @@ pub(crate) fn search_ranked(
         _ => "a.created_at DESC, a.path ASC",
     };
 
-    let total: i64 = conn.query_row(&format!("SELECT COUNT(*) {base}"), params_from_iter(&f.params), |r| r.get(0))?;
-    let supporting_hidden: i64 = if q.hide_supporting {
-        let shown = SearchQuery { hide_supporting: false, ..q.clone() };
-        let fs = build_filter(&shown, true, look);
-        let mut clauses = fs.clauses.clone();
-        clauses.push(SUPPORTING.to_owned());
-        conn.query_row(
-            &format!("SELECT COUNT(*) FROM assets a {} WHERE {}", fs.join, clauses.join(" AND ")),
-            params_from_iter(&fs.params),
-            |r| r.get(0),
-        )?
+    // Kept for the next pages of the same search while the library stays the same (a ranking by look is worked out
+    // afresh each time, so its counts aren't). Read before counting, so a write while counting makes them stale.
+    let writes = super::writes();
+    let key = if look.is_none() { counts_key(conn, q) } else { None };
+    let counts = if let Some(counts) = key.as_deref().and_then(|k| kept_counts(k, writes, with_facets)) {
+        counts
     } else {
-        0
+        // Counted without the pack and file each asset has (the filters don't look at them): joining them is work
+        // too.
+        let total: i64 = conn.query_row(
+            &format!("SELECT COUNT(*) FROM assets a {} {where_sql}", f.join),
+            params_from_iter(&f.params),
+            |r| r.get(0),
+        )?;
+        let supporting_hidden = if q.hide_supporting { supporting_hidden(conn, q, look)? } else { 0 };
+        let sidebar = if with_facets { Some(sidebar(conn, q, look, &f)?) } else { None };
+        let counts = Counts { total, supporting_hidden, sidebar };
+        if let Some(key) = key {
+            keep_counts(key, writes, &counts);
+        }
+        counts
     };
-
     let mut page_params = f.params.clone();
     page_params.push(SqlValue::Integer(limit));
     page_params.push(SqlValue::Integer(offset));
@@ -332,36 +379,103 @@ pub(crate) fn search_ranked(
         stmt.query_map(params_from_iter(&page_params), asset_from_row)?.collect::<rusqlite::Result<Vec<_>>>()?;
     attach_tags(conn, &mut items)?;
 
-    let (mut kinds, mut tags) = (Vec::new(), Vec::new());
-    if with_facets {
-        // Kind facet ignores the kind filter so the sidebar can show "switch to audio (42)".
-        let fk = build_filter(q, false, look);
-        let mut stmt = conn.prepare(&format!(
+    let folders = subfolders(conn, q, look)?;
+    let Counts { total, supporting_hidden, sidebar } = counts;
+    let Sidebar { kinds, tags } = sidebar.unwrap_or_default();
+    Ok(SearchPage { items, total: total as u64, kinds, tags, supporting_hidden: supporting_hidden as u64, folders })
+}
+
+/// How many assets a search finds and how many more hiding supporting files left out, and with the sidebar, how many
+/// of each kind and with each tag.
+#[derive(Clone)]
+struct Counts {
+    total: i64,
+    supporting_hidden: i64,
+    sidebar: Option<Sidebar>,
+}
+
+#[derive(Clone, Default)]
+struct Sidebar {
+    kinds: Vec<Facet>,
+    tags: Vec<Facet>,
+}
+
+/// How many assets the search would find too if it didn't hide supporting files.
+fn supporting_hidden(conn: &Connection, q: &SearchQuery, look: Option<&LookRank>) -> Result<i64> {
+    let shown = SearchQuery { hide_supporting: false, ..q.clone() };
+    let fs = build_filter(&shown, true, look);
+    let mut clauses = fs.clauses.clone();
+    clauses.push(SUPPORTING.to_owned());
+    Ok(conn.query_row(
+        &format!("SELECT COUNT(*) FROM assets a {} WHERE {}", fs.join, clauses.join(" AND ")),
+        params_from_iter(&fs.params),
+        |r| r.get(0),
+    )?)
+}
+
+/// The sidebar's counts: how many assets of each kind (ignoring the kind asked for, so it can offer "switch to
+/// audio (42)") and with each tag.
+fn sidebar(conn: &Connection, q: &SearchQuery, look: Option<&LookRank>, f: &Filter) -> Result<Sidebar> {
+    let facet = |r: &rusqlite::Row<'_>| Ok(Facet { value: r.get(0)?, count: r.get::<_, i64>(1)? as u64 });
+    let fk = build_filter(q, false, look);
+    let kinds = conn
+        .prepare(&format!(
             "SELECT a.kind, COUNT(*) FROM assets a {} {} GROUP BY a.kind ORDER BY 2 DESC",
             fk.join,
             fk.where_sql()
-        ))?;
-        kinds = stmt
-            .query_map(params_from_iter(&fk.params), |r| {
-                Ok(Facet { value: r.get(0)?, count: r.get::<_, i64>(1)? as u64 })
-            })?
-            .collect::<rusqlite::Result<Vec<_>>>()?;
-
-        let mut stmt = conn.prepare(&format!(
+        ))?
+        .query_map(params_from_iter(&fk.params), facet)?
+        .collect::<rusqlite::Result<Vec<_>>>()?;
+    let tags = conn
+        .prepare(&format!(
             "SELECT t.tag, COUNT(*) FROM asset_tags t WHERE t.tag NOT LIKE 'set:%' AND t.asset_id IN
-               (SELECT a.id FROM assets a {} {where_sql})
+               (SELECT a.id FROM assets a {} {})
              GROUP BY t.tag ORDER BY 2 DESC, 1 ASC LIMIT 60",
-            f.join
-        ))?;
-        tags = stmt
-            .query_map(params_from_iter(&f.params), |r| {
-                Ok(Facet { value: r.get(0)?, count: r.get::<_, i64>(1)? as u64 })
-            })?
-            .collect::<rusqlite::Result<Vec<_>>>()?;
-    }
+            f.join,
+            f.where_sql()
+        ))?
+        .query_map(params_from_iter(&f.params), facet)?
+        .collect::<rusqlite::Result<Vec<_>>>()?;
+    Ok(Sidebar { kinds, tags })
+}
 
-    let folders = subfolders(conn, q, look)?;
-    Ok(SearchPage { items, total: total as u64, kinds, tags, supporting_hidden: supporting_hidden as u64, folders })
+/// How many recent searches' counts are kept.
+const COUNTS_KEPT: usize = 16;
+
+/// What a search's counts depend on: the library's file and the search, but not which page or in what order.
+fn counts_key(conn: &Connection, q: &SearchQuery) -> Option<String> {
+    // An in-memory library (a test's) has no [`super::WRITES`] kept for it.
+    let path = conn.path().filter(|p| !p.is_empty())?;
+    let q = SearchQuery { limit: None, offset: None, sort: None, ..q.clone() };
+    Some(format!(
+        "{path}
+{}",
+        serde_json::to_string(&q).ok()?
+    ))
+}
+
+/// Recent searches' counts, newest last, with how many writes the library had had when they were counted. Counting
+/// goes through everything the search finds, which in a big library takes as long as the rest of the search
+/// together, while the next pages of the same search, and going back to one, are asked for far more often than the
+/// library changes.
+static COUNTS: std::sync::Mutex<Vec<(String, u64, Counts)>> = std::sync::Mutex::new(Vec::new());
+
+fn kept_counts(key: &str, writes: u64, with_facets: bool) -> Option<Counts> {
+    let kept = COUNTS.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
+    kept.iter()
+        .find(|(k, at, c)| *k == key && *at == writes && (c.sidebar.is_some() || !with_facets))
+        .map(|(_, _, c)| c.clone())
+}
+
+/// Keeps `counts` as of `writes`, read before they were worked out: a write since makes them stale at once.
+fn keep_counts(key: String, writes: u64, counts: &Counts) {
+    let mut kept = COUNTS.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
+    // Those counted before a write are stale for good.
+    kept.retain(|(k, at, _)| *k != key && *at == writes);
+    if kept.len() >= COUNTS_KEPT {
+        kept.remove(0);
+    }
+    kept.push((key, writes, counts.clone()));
 }
 
 /// Tags in use and how many assets have each, most used first: those starting with `prefix`, or with `anywhere`
@@ -386,6 +500,36 @@ pub(crate) fn tag_counts(conn: &Connection, prefix: &str, anywhere: bool, limit:
 mod tests {
     use super::*;
     use crate::db::{open, test_library};
+
+    #[test]
+    fn counts_are_kept_until_the_library_changes() {
+        let dir = tempfile::tempdir().unwrap();
+        let pool = open(&dir.path().join("hoard.db"), &dir.path().join("backups")).unwrap();
+        let conn = pool.get().unwrap();
+        conn.execute_batch(
+            "INSERT INTO blobs (hash, size, created_at) VALUES ('h', 1, 'x');
+             INSERT INTO packs (id, name, status, created_at) VALUES ('p1', 'Kit', 'ready', 'x');
+             INSERT INTO assets (id, pack_id, blob_hash, path, name, ext, kind, created_at, updated_at) VALUES
+               ('a', 'p1', 'h', 'a.png', 'a', 'png', 'texture', 'x', 'x');",
+        )
+        .unwrap();
+        let q = SearchQuery { kind: Some("texture".into()), ..Default::default() };
+        let counted = |page: u32| {
+            let found = search(&conn, &SearchQuery { offset: Some(page), ..q.clone() }, true).unwrap();
+            (found.total, found.kinds.iter().map(|k| (k.value.clone(), k.count)).collect::<Vec<_>>())
+        };
+        assert_eq!(counted(0), (1, vec![("texture".to_owned(), 1)]));
+        // Written on another connection: the next page counts again.
+        pool.get()
+            .unwrap()
+            .execute(
+                "INSERT INTO assets (id, pack_id, blob_hash, path, name, ext, kind, created_at, updated_at) VALUES
+                   ('b', 'p1', 'h', 'b.png', 'b', 'png', 'texture', 'x', 'x')",
+                [],
+            )
+            .unwrap();
+        assert_eq!(counted(60), (2, vec![("texture".to_owned(), 2)]));
+    }
 
     #[test]
     fn a_pack_browses_as_folders() {
@@ -511,5 +655,61 @@ mod tests {
         let q = SearchQuery { q: Some("mossy".into()), ..Default::default() };
         assert_eq!(ids(search_ranked(&conn, &q, false, Some(&rank)).unwrap()), ["a2", "a3"]);
         assert_eq!(ids(search(&conn, &q, false).unwrap()), ["a2"], "a plain search is unchanged");
+    }
+
+    /// How long searching a big library takes, step by step: `cargo test -p hoardd --release --lib big_library -- --ignored --nocapture`.
+    #[test]
+    #[ignore = "a timing, not a test"]
+    #[expect(clippy::print_stdout, reason = "the timings are its output")]
+    fn big_library() {
+        let dir = tempfile::tempdir().unwrap();
+        let pool = open(&dir.path().join("hoard.db"), &dir.path().join("backups")).unwrap();
+        let conn = pool.get().unwrap();
+        let n = 300_000;
+        let started = std::time::Instant::now();
+        conn.execute_batch(&format!(
+            "BEGIN;
+             WITH RECURSIVE k(i) AS (SELECT 0 UNION ALL SELECT i + 1 FROM k WHERE i < 199)
+             INSERT INTO packs (id, name, status, created_at) SELECT 'p' || i, 'Pack ' || i, 'ready', 'x' FROM k;
+             WITH RECURSIVE k(i) AS (SELECT 0 UNION ALL SELECT i + 1 FROM k WHERE i < {n} - 1)
+             INSERT INTO blobs (hash, size, created_at) SELECT 'b' || i, i, 'x' FROM k;
+             WITH RECURSIVE k(i) AS (SELECT 0 UNION ALL SELECT i + 1 FROM k WHERE i < {n} - 1)
+             INSERT INTO assets (id, pack_id, blob_hash, path, name, ext, kind, words, thumb_hash, created_at, updated_at)
+             SELECT 'a' || i, 'p' || (i % 200), 'b' || i, 'Dir' || (i % 37) || '/file' || i || '.png',
+                    CASE i % 50 WHEN 0 THEN 'rock wall ' || i ELSE 'thing ' || i END, 'png',
+                    CASE i % 4 WHEN 0 THEN 'texture' WHEN 1 THEN 'model' WHEN 2 THEN 'material' ELSE 'audio' END,
+                    'dir file', 't' || i, printf('2026-01-01T00:%06d', i), 'x' FROM k;
+             INSERT INTO asset_tags (asset_id, tag, source) SELECT id, 'kind:' || kind, 'x' FROM assets;
+             INSERT INTO asset_tags (asset_id, tag, source) SELECT id, 'color:' || (rowid % 12), 'x' FROM assets;
+             INSERT INTO asset_tags (asset_id, tag, source) SELECT id, 'set:' || (rowid % 9000), 'x' FROM assets;
+             INSERT INTO asset_links (from_id, to_id, rel) SELECT 'a' || (rowid - 1), id, 'texture' FROM assets
+               WHERE kind = 'texture' AND rowid % 3 = 0;
+             INSERT INTO material_maps (material_id, texture_id, role) SELECT 'a' || (rowid - 2), id, 'albedo' FROM assets
+               WHERE kind = 'texture' AND rowid % 5 = 0;
+             INSERT INTO assets_fts (asset_id, name, words, tags) SELECT id, name, words, '' FROM assets;
+             COMMIT;
+             ANALYZE;"
+        ))
+        .unwrap();
+        println!("made {n} assets in {:.1?}", started.elapsed());
+        let pictures: Vec<(String, f32)> = (0..300).map(|i| (format!("t{}", i * 997), 0.4)).collect();
+        let look = LookRank { scores: pictures, exclude: None, blend: true, keys: Keys::Thumbs };
+        let time = |label: &str, q: SearchQuery, facets: bool, look: Option<&LookRank>| {
+            let started = std::time::Instant::now();
+            let page = search_ranked(&conn, &q, facets, look).unwrap();
+            println!("{label}: {} of {} in {:.1?}", page.items.len(), page.total, started.elapsed());
+        };
+        let words = || SearchQuery { q: Some("rock".into()), hide_supporting: true, ..Default::default() };
+        time("browse everything", SearchQuery { hide_supporting: true, ..Default::default() }, true, None);
+        time("browse everything, no facets", SearchQuery { hide_supporting: true, ..Default::default() }, false, None);
+        time("words", words(), true, None);
+        time("words and pictures", words(), true, Some(&look));
+        time("words and pictures, no facets", words(), false, Some(&look));
+        time(
+            "words and pictures, textures",
+            SearchQuery { kind: Some("texture".into()), ..words() },
+            true,
+            Some(&look),
+        );
     }
 }

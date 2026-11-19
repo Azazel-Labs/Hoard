@@ -6,10 +6,12 @@
 //! The schema and its upgrades are in `schema`; the queries are in a module per table they mostly read.
 
 use std::path::Path;
+use std::sync::Arc;
+use std::sync::atomic::{AtomicBool, AtomicU64, Ordering};
 
-use anyhow::{Context, Result};
+use anyhow::{Context, Result, bail};
 use r2d2_sqlite::SqliteConnectionManager;
-use rusqlite::{Connection, TransactionBehavior};
+use rusqlite::{Connection, InterruptHandle, TransactionBehavior};
 
 mod assets;
 mod collections;
@@ -56,12 +58,33 @@ pub(crate) fn open(path: &Path, backups: &Path) -> Result<Pool> {
              PRAGMA synchronous = NORMAL;
              PRAGMA foreign_keys = ON;
              PRAGMA temp_store = MEMORY;",
-        )
+        )?;
+        // Every write counts, on whichever connection (see `writes`), once it's there for others to read: unlike a
+        // commit hook, which runs just before. Taking the place of SQLite's own hook, this checkpoints the log the
+        // way that does (at 1000 pages, without waiting on readers).
+        c.wal_hook(Some(|wal: &mut rusqlite::hooks::Wal, pages| {
+            WRITES.fetch_add(1, Ordering::AcqRel);
+            if pages >= 1000 {
+                // As SQLite's own: a checkpoint that can't finish now is done by a later one.
+                wal.checkpoint().ok();
+            }
+            Ok(())
+        }))
     });
-    let pool = r2d2::Pool::builder().max_size(12).build(manager).context("open sqlite pool")?;
+    // Readers don't wait for each other or for the writer (WAL), so there's room for many: searches (at most
+    // READ_LANE of them, see `read`), the job workers and every other request at once.
+    let pool = r2d2::Pool::builder().max_size(24).build(manager).context("open sqlite pool")?;
     let mut conn = pool.get()?;
     migrate(&mut conn, backups, MIGRATIONS)?;
     Ok(pool)
+}
+
+/// How many times the library has been written to since the server started.
+static WRITES: AtomicU64 = AtomicU64::new(0);
+
+/// [`WRITES`]: what's worked out from the library and kept (a search's counts, say) is good while this stays the same.
+pub(crate) fn writes() -> u64 {
+    WRITES.load(Ordering::Acquire)
 }
 
 /// Database work that takes this long gets a warning in the log naming it.
@@ -82,17 +105,88 @@ where
         span.in_scope(|| {
             crate::i18n::blocking(language, || {
                 let mut conn = pool.get()?;
-                let started = std::time::Instant::now();
-                let out = f(&mut conn);
-                let took = started.elapsed();
-                if took >= SLOW {
-                    tracing::warn!(work = std::any::type_name::<F>(), secs = took.as_secs_f32(), "slow database work");
-                }
-                out
+                timed(&mut conn, f)
             })
         })
     }))
     .await?
+}
+
+/// Run `f`, warning in the log when it held the database for [`SLOW`] or more.
+fn timed<T, F: FnOnce(&mut Conn) -> Result<T>>(conn: &mut Conn, f: F) -> Result<T> {
+    let started = std::time::Instant::now();
+    let out = f(conn);
+    let took = started.elapsed();
+    if took >= SLOW {
+        tracing::warn!(work = std::any::type_name::<F>(), secs = took.as_secs_f32(), "slow database work");
+    }
+    out
+}
+
+/// How many searches run at once. Past that they wait their turn, so however many a browser asks for (scrolling a
+/// big library asks for a page of tiles at a time) they never take every connection: the other requests and the
+/// imports always find one.
+const READ_LANE: usize = 6;
+static READS: tokio::sync::Semaphore = tokio::sync::Semaphore::const_new(READ_LANE);
+
+/// [`call`] for reading that a request can walk away from, like a search: it waits its turn (see [`READ_LANE`]),
+/// and once the request is gone (the browser moved on to another search, or was closed) it's stopped where it is,
+/// or never started. Only for reading: work stopped halfway is undone.
+pub(crate) async fn read<T, F>(pool: &Pool, f: F) -> Result<T>
+where
+    T: Send + 'static,
+    F: FnOnce(&mut Conn) -> Result<T> + Send + 'static,
+{
+    let _turn = READS.acquire().await?;
+    let pool = pool.clone();
+    let language = crate::i18n::current();
+    let span = tracing::Span::current();
+    let mut walked = Walked(Arc::new(Watch::default()), false);
+    let watch = Arc::clone(&walked.0);
+    let out = crate::profiler::db(tokio::task::spawn_blocking(move || {
+        span.in_scope(|| {
+            crate::i18n::blocking(language, || {
+                let mut conn = pool.get()?;
+                *watch.handle.lock().unwrap_or_else(std::sync::PoisonError::into_inner) =
+                    Some(conn.get_interrupt_handle());
+                // Gone before the handle was there to stop it with: don't start.
+                let out = if watch.gone.load(Ordering::Acquire) {
+                    bail!("the request was dropped")
+                } else {
+                    timed(&mut conn, f)
+                };
+                // Taken back before the connection goes back to the pool, so a late stop can't land on someone
+                // else's work.
+                watch.handle.lock().unwrap_or_else(std::sync::PoisonError::into_inner).take();
+                out
+            })
+        })
+    }))
+    .await;
+    walked.1 = true;
+    out?
+}
+
+/// Whether the request a [`read`] is for went away, and how to stop the work it was doing.
+#[derive(Default)]
+struct Watch {
+    gone: AtomicBool,
+    handle: std::sync::Mutex<Option<InterruptHandle>>,
+}
+
+/// Dropped with its request: unless the work finished (`.1`), it's stopped.
+struct Walked(Arc<Watch>, bool);
+
+impl Drop for Walked {
+    fn drop(&mut self) {
+        if self.1 {
+            return;
+        }
+        self.0.gone.store(true, Ordering::Release);
+        if let Some(h) = self.0.handle.lock().unwrap_or_else(std::sync::PoisonError::into_inner).as_ref() {
+            h.interrupt();
+        }
+    }
 }
 
 /// An empty library with the whole schema, for other modules' tests.

@@ -26,14 +26,14 @@ the other turns away non-browser clients.
 
 A ChatGPT plan can already be used for tagging ("Sign in with ChatGPT", see
 [DEPLOYMENT.md](DEPLOYMENT.md#with-a-chatgpt-plan)). Still to find out there is how far a library's worth of
-tagging gets against the plan's weekly cap. Claude is harder (checked 2026-11-12):
+tagging gets against the plan's weekly cap. Claude is harder:
 
-- **Claude: only by running Claude Code itself.** Anthropic doesn't allow third-party apps to offer claude.ai login,
-  collect or store the session tokens, or send requests with Pro or Max credentials, so Hoard can't do the OAuth
-  itself. Running the unmodified `claude` binary, signed into by the user through
-  Anthropic's own flow, is allowed. Hoard could install it on demand like Blender and run `claude -p` with the
-  thumbnails. Plan limits assume ordinary individual use, so tagging a large library this way may run into them.
-  Policy: <https://code.claude.com/docs/en/legal-and-compliance>
+- **Claude: waiting on a ruling from Anthropic.** Its policy doesn't let third-party apps offer claude.ai login,
+  collect or store its tokens, or route requests through Pro or Max plans on their users' behalf, and running Claude
+  Code in a product needs its Commercial Terms. A person signing in to the unmodified `claude` binary themselves is
+  allowed, but whether Hoard may then run `claude -p` on the thumbnails for them isn't spelled out, so it waits until
+  Anthropic says (<https://www.anthropic.com/contact-sales>). Tagging with an Anthropic API key works now.
+  Policy: <https://code.claude.com/docs/en/legal-and-compliance> (checked 2026-11-18)
 
 ## Animations as their own thing
 

@@ -228,32 +228,70 @@ fn folder_skip(folder: &str) -> i64 {
     if folder.is_empty() { 1 } else { folder.chars().count() as i64 + 2 }
 }
 
-/// The folders directly in the one being browsed, each with how many matches are under it.
-fn subfolders(conn: &Connection, q: &SearchQuery, look: Option<&LookRank>) -> Result<Vec<Facet>> {
-    let Some(folder) = browsed_folder(q) else { return Ok(Vec::new()) };
-    if fts_query_of(q).is_some() {
-        return Ok(Vec::new());
+/// What a search counts, in one pass through what it finds: how many it finds, how many more it would without hiding
+/// supporting files, how many of each kind (whatever kind is asked for, so the sidebar can offer "switch to audio
+/// (42)"), and browsing a folder, the folders in it with how many matches are under each. Each of these used to be a
+/// pass of its own, which in a big pack meant asking whether every file in it was a supporting one four times over.
+/// The sidebar's tags take one more pass, when asked for.
+fn count(conn: &Connection, q: &SearchQuery, look: Option<&LookRank>, f: &Filter, with_facets: bool) -> Result<Counts> {
+    // The search without the three things told apart by the grouping: the kind, whether a file supports another,
+    // and in a folder, whether it's directly in it or in a folder of its own.
+    let wide = SearchQuery { kind: None, hide_supporting: false, folder: None, ..q.clone() };
+    let mut w = build_filter(&wide, false, look);
+    if let Some(folder) = browsed_folder(q).filter(|f| !f.is_empty()) {
+        w.clauses.push("a.path > ? AND a.path < ?".to_owned());
+        w.params.push(SqlValue::Text(format!("{folder}/")));
+        w.params.push(SqlValue::Text(format!("{folder}0")));
     }
-    let everything = SearchQuery { folder: None, ..q.clone() };
-    let mut f = build_filter(&everything, true, look);
-    if !folder.is_empty() {
-        f.clauses.push("a.path > ? AND a.path < ?".to_owned());
-        f.params.push(SqlValue::Text(format!("{folder}/")));
-        f.params.push(SqlValue::Text(format!("{folder}0")));
-    }
-    let mut params = vec![SqlValue::Integer(folder_skip(folder))];
-    params.extend(f.params.iter().cloned());
+    // Searching words in a folder finds what's anywhere under it, so there are no folders to show.
+    let mut params = Vec::new();
+    let rest = match browsed_folder(q).filter(|_| fts_query_of(q).is_none()) {
+        Some(folder) => {
+            params.push(SqlValue::Integer(folder_skip(folder)));
+            "substr(a.path, ?)"
+        }
+        None => "''",
+    };
+    let supporting = if q.hide_supporting { SUPPORTING } else { "0" };
+    params.extend(w.params.iter().cloned());
     let mut stmt = conn.prepare(&format!(
-        "SELECT substr(rest, 1, instr(rest, '/') - 1) AS name, COUNT(*)
-           FROM (SELECT substr(a.path, ?) AS rest FROM assets a {} {})
-          WHERE instr(rest, '/') > 0 GROUP BY name ORDER BY name COLLATE NOCASE",
-        f.join,
-        f.where_sql()
+        "SELECT kind, supporting, CASE WHEN instr(rest, '/') > 0 THEN substr(rest, 1, instr(rest, '/') - 1) END AS folder,
+                COUNT(*)
+           FROM (SELECT a.kind, {supporting} AS supporting, {rest} AS rest FROM assets a {} {})
+          GROUP BY 1, 2, 3",
+        w.join,
+        w.where_sql()
     ))?;
-    let rows = stmt
-        .query_map(params_from_iter(&params), |r| Ok(Facet { value: r.get(0)?, count: r.get::<_, i64>(1)? as u64 }))?
+    let groups = stmt
+        .query_map(params_from_iter(&params), |r| {
+            Ok((r.get::<_, String>(0)?, r.get::<_, bool>(1)?, r.get::<_, Option<String>>(2)?, r.get::<_, i64>(3)?))
+        })?
         .collect::<rusqlite::Result<Vec<_>>>()?;
-    Ok(rows)
+
+    let asked = q.kind.as_deref().filter(|k| !k.is_empty());
+    let (mut total, mut supporting_hidden) = (0, 0);
+    let mut kinds = std::collections::HashMap::<String, i64>::new();
+    let mut folders = std::collections::BTreeMap::<String, i64>::new();
+    for (kind, supports, folder, n) in groups {
+        let of_kind = asked.is_none_or(|k| k == kind);
+        // Kinds count every kind; the rest only the kind asked for. Supporting files count only as hidden ones.
+        match folder {
+            None if supports => supporting_hidden += if of_kind { n } else { 0 },
+            None => {
+                total += if of_kind { n } else { 0 };
+                *kinds.entry(kind).or_default() += n;
+            }
+            Some(folder) if of_kind && !supports => *folders.entry(folder).or_default() += n,
+            Some(_) => {}
+        }
+    }
+    let facet = |(value, count): (String, i64)| Facet { value, count: count as u64 };
+    let mut kinds = kinds.into_iter().map(facet).collect::<Vec<_>>();
+    kinds.sort_by(|a, b| b.count.cmp(&a.count).then_with(|| a.value.cmp(&b.value)));
+    let mut folders = folders.into_iter().map(facet).collect::<Vec<_>>();
+    folders.sort_by_cached_key(|f| f.value.to_ascii_lowercase());
+    let tags = if with_facets { Some(tags(conn, f)?) } else { None };
+    Ok(Counts { total, supporting_hidden, kinds, folders, tags })
 }
 
 /// In the library rather than the archive: neither the asset nor its pack is archived. Expects the asset as `a`.
@@ -353,24 +391,16 @@ pub(crate) fn search_ranked(
     // afresh each time, so its counts aren't). Read before counting, so a write while counting makes them stale.
     let writes = super::writes();
     let key = if look.is_none() { counts_key(conn, q) } else { None };
-    let counts = if let Some(counts) = key.as_deref().and_then(|k| kept_counts(k, writes, with_facets)) {
-        counts
-    } else {
-        // Counted without the pack and file each asset has (the filters don't look at them): joining them is work
-        // too.
-        let total: i64 = conn.query_row(
-            &format!("SELECT COUNT(*) FROM assets a {} {where_sql}", f.join),
-            params_from_iter(&f.params),
-            |r| r.get(0),
-        )?;
-        let supporting_hidden = if q.hide_supporting { supporting_hidden(conn, q, look)? } else { 0 };
-        let sidebar = if with_facets { Some(sidebar(conn, q, look, &f)?) } else { None };
-        let counts = Counts { total, supporting_hidden, sidebar };
-        if let Some(key) = key {
-            keep_counts(key, writes, &counts);
-        }
-        counts
+    let counts = match key.as_deref().and_then(|k| kept_counts(k, writes)) {
+        // The next page of a search, or the same search again, while the library is the same.
+        Some(counts) if counts.tags.is_some() || !with_facets => counts,
+        // The sidebar asked for after the first page came without it: only the tags are left to count.
+        Some(counts) => Counts { tags: Some(tags(conn, &f)?), ..counts },
+        None => count(conn, q, look, &f, with_facets)?,
     };
+    if let Some(key) = key {
+        keep_counts(key, writes, &counts);
+    }
     let mut page_params = f.params.clone();
     page_params.push(SqlValue::Integer(limit));
     page_params.push(SqlValue::Integer(offset));
@@ -379,54 +409,25 @@ pub(crate) fn search_ranked(
         stmt.query_map(params_from_iter(&page_params), asset_from_row)?.collect::<rusqlite::Result<Vec<_>>>()?;
     attach_tags(conn, &mut items)?;
 
-    let folders = subfolders(conn, q, look)?;
-    let Counts { total, supporting_hidden, sidebar } = counts;
-    let Sidebar { kinds, tags } = sidebar.unwrap_or_default();
+    let Counts { total, supporting_hidden, kinds, folders, tags } = counts;
+    let (kinds, tags) = if with_facets { (kinds, tags.unwrap_or_default()) } else { (Vec::new(), Vec::new()) };
     Ok(SearchPage { items, total: total as u64, kinds, tags, supporting_hidden: supporting_hidden as u64, folders })
 }
 
-/// How many assets a search finds and how many more hiding supporting files left out, and with the sidebar, how many
-/// of each kind and with each tag.
+/// How many assets a search finds and how many more hiding supporting files left out, how many of each kind, the
+/// folders in the one browsed, and once the sidebar has asked, the tags. See [`count`].
 #[derive(Clone)]
 struct Counts {
     total: i64,
     supporting_hidden: i64,
-    sidebar: Option<Sidebar>,
-}
-
-#[derive(Clone, Default)]
-struct Sidebar {
     kinds: Vec<Facet>,
-    tags: Vec<Facet>,
+    folders: Vec<Facet>,
+    tags: Option<Vec<Facet>>,
 }
 
-/// How many assets the search would find too if it didn't hide supporting files.
-fn supporting_hidden(conn: &Connection, q: &SearchQuery, look: Option<&LookRank>) -> Result<i64> {
-    let shown = SearchQuery { hide_supporting: false, ..q.clone() };
-    let fs = build_filter(&shown, true, look);
-    let mut clauses = fs.clauses.clone();
-    clauses.push(SUPPORTING.to_owned());
-    Ok(conn.query_row(
-        &format!("SELECT COUNT(*) FROM assets a {} WHERE {}", fs.join, clauses.join(" AND ")),
-        params_from_iter(&fs.params),
-        |r| r.get(0),
-    )?)
-}
-
-/// The sidebar's counts: how many assets of each kind (ignoring the kind asked for, so it can offer "switch to
-/// audio (42)") and with each tag.
-fn sidebar(conn: &Connection, q: &SearchQuery, look: Option<&LookRank>, f: &Filter) -> Result<Sidebar> {
-    let facet = |r: &rusqlite::Row<'_>| Ok(Facet { value: r.get(0)?, count: r.get::<_, i64>(1)? as u64 });
-    let fk = build_filter(q, false, look);
-    let kinds = conn
-        .prepare(&format!(
-            "SELECT a.kind, COUNT(*) FROM assets a {} {} GROUP BY a.kind ORDER BY 2 DESC",
-            fk.join,
-            fk.where_sql()
-        ))?
-        .query_map(params_from_iter(&fk.params), facet)?
-        .collect::<rusqlite::Result<Vec<_>>>()?;
-    let tags = conn
+/// The sidebar's tags: the most common among what the search finds.
+fn tags(conn: &Connection, f: &Filter) -> Result<Vec<Facet>> {
+    Ok(conn
         .prepare(&format!(
             "SELECT t.tag, COUNT(*) FROM asset_tags t WHERE t.tag NOT LIKE 'set:%' AND t.asset_id IN
                (SELECT a.id FROM assets a {} {})
@@ -434,9 +435,8 @@ fn sidebar(conn: &Connection, q: &SearchQuery, look: Option<&LookRank>, f: &Filt
             f.join,
             f.where_sql()
         ))?
-        .query_map(params_from_iter(&f.params), facet)?
-        .collect::<rusqlite::Result<Vec<_>>>()?;
-    Ok(Sidebar { kinds, tags })
+        .query_map(params_from_iter(&f.params), |r| Ok(Facet { value: r.get(0)?, count: r.get::<_, i64>(1)? as u64 }))?
+        .collect::<rusqlite::Result<Vec<_>>>()?)
 }
 
 /// How many recent searches' counts are kept.
@@ -460,14 +460,13 @@ fn counts_key(conn: &Connection, q: &SearchQuery) -> Option<String> {
 /// library changes.
 static COUNTS: std::sync::Mutex<Vec<(String, u64, Counts)>> = std::sync::Mutex::new(Vec::new());
 
-fn kept_counts(key: &str, writes: u64, with_facets: bool) -> Option<Counts> {
+fn kept_counts(key: &str, writes: u64) -> Option<Counts> {
     let kept = COUNTS.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
-    kept.iter()
-        .find(|(k, at, c)| *k == key && *at == writes && (c.sidebar.is_some() || !with_facets))
-        .map(|(_, _, c)| c.clone())
+    kept.iter().find(|(k, at, _)| *k == key && *at == writes).map(|(_, _, c)| c.clone())
 }
 
-/// Keeps `counts` as of `writes`, read before they were worked out: a write since makes them stale at once.
+/// Keeps `counts` as of `writes`, read before they were worked out: a write since makes them stale at once. Kept
+/// again, the search is the newest kept, the last to go.
 fn keep_counts(key: String, writes: u64, counts: &Counts) {
     let mut kept = COUNTS.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
     // Those counted before a write are stale for good.
@@ -675,7 +674,8 @@ mod tests {
              INSERT INTO blobs (hash, size, created_at) SELECT 'b' || i, i, 'x' FROM k;
              WITH RECURSIVE k(i) AS (SELECT 0 UNION ALL SELECT i + 1 FROM k WHERE i < {n} - 1)
              INSERT INTO assets (id, pack_id, blob_hash, path, name, ext, kind, words, thumb_hash, created_at, updated_at)
-             SELECT 'a' || i, 'p' || (i % 200), 'b' || i, 'Dir' || (i % 37) || '/file' || i || '.png',
+             SELECT 'a' || i, CASE WHEN i % 5 < 2 THEN 'p0' ELSE 'p' || (i % 200) END, 'b' || i,
+                    'Dir' || (i % 9) || '/Sub' || (i % 160) || '/file' || i || '.png',
                     CASE i % 50 WHEN 0 THEN 'rock wall ' || i ELSE 'thing ' || i END, 'png',
                     CASE i % 4 WHEN 0 THEN 'texture' WHEN 1 THEN 'model' WHEN 2 THEN 'material' ELSE 'audio' END,
                     'dir file', 't' || i, printf('2026-01-01T00:%06d', i), 'x' FROM k;
@@ -703,6 +703,16 @@ mod tests {
         time("browse everything", SearchQuery { hide_supporting: true, ..Default::default() }, true, None);
         time("browse everything, no facets", SearchQuery { hide_supporting: true, ..Default::default() }, false, None);
         time("words", words(), true, None);
+        let pack = |folder: Option<&str>| SearchQuery {
+            pack: Some("p0".into()),
+            folder: folder.map(Into::into),
+            hide_supporting: true,
+            ..Default::default()
+        };
+        time("a big pack", pack(None), true, None);
+        time("a big pack's top folder", pack(Some("")), true, None);
+        time("a folder in it", pack(Some("Dir3")), true, None);
+        time("a folder in that", pack(Some("Dir3/Sub12")), true, None);
         time("words and pictures", words(), true, Some(&look));
         time("words and pictures, no facets", words(), false, Some(&look));
         time(

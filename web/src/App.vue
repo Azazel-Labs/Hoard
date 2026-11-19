@@ -327,7 +327,14 @@ function browsePack(p: Named) {
     pack: { id: p.id, name: p.name }, folder: prefs.packFolders ? '' : null, collection: null, favorites: false, project: '',
     kind: '', tags: [], q: '', similar: null, color: '', imitation: '', ...NO_MUSIC,
   })
+  leaveDetailFor(p.id)
   setView('library')
+}
+/** Going to a pack's files: an asset of another pack, or one shown full-page over the grid, is put away. */
+function leaveDetailFor(packId: string) {
+  if (!selected.value || (selected.value.pack_id === packId && !prefs.detailPage)) return
+  opening = ''
+  selected.value = null
 }
 /** A folder of a pack, as it was on disk: what's in it, and the folders in that. */
 function openFolder(pack: Named, folder: string) {
@@ -336,12 +343,13 @@ function openFolder(pack: Named, folder: string) {
     similar: null, color: '', imitation: '', ...NO_MUSIC,
   })
   prefs.packFolders = true
+  leaveDetailFor(pack.id)
   setView('library')
 }
 /** The asset's folder `path` in its pack, leaving the full-page view of it for the grid. */
 function openFolderOf(a: Asset, path: string) {
-  openFolder({ id: a.pack_id, name: a.pack_name }, path)
   if (prefs.detailPage) closeDetail()
+  openFolder({ id: a.pack_id, name: a.pack_name }, path)
 }
 function browseCollection(c: Collection | Named) {
   const same = filters.collection?.id === c.id

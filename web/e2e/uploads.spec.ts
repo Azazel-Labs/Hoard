@@ -55,6 +55,20 @@ test.describe('resumable uploads', () => {
 })
 
 test.describe('the import queue', () => {
+  test('files dragged over the window show where to drop them, counted, until they leave', async ({ page }) => {
+    await page.goto('/')
+    const files = await page.evaluateHandle(() => {
+      const dt = new DataTransfer()
+      dt.items.add(new File(['a'], 'a.png', { type: 'image/png' }))
+      dt.items.add(new File(['b'], 'b.png', { type: 'image/png' }))
+      return dt
+    })
+    await page.locator('.app').dispatchEvent('dragenter', { dataTransfer: files })
+    await expect(page.getByText('Drop 2 items to add them')).toBeVisible()
+    await page.locator('.app').dispatchEvent('dragleave', { dataTransfer: files })
+    await expect(page.getByText('Drop 2 items to add them')).toHaveCount(0)
+  })
+
   test('folds down to a pill, and an import a reload cut short carries on when its file is picked again', async ({ page, api }) => {
     test.setTimeout(120_000)
     const stem = `resume-${unique()}`

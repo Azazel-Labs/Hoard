@@ -4437,6 +4437,10 @@ translation = "{ $tool }: válassza a Ki vagy az Automatikus lehetőséget, vagy
 source = "unknown asset kind { $kind }"
 translation = "ismeretlen assettípus: { $kind }"
 
+[messages.error-unreal-image]
+source = "Enter an Unreal 5 version, an Epic dev/dev-slim version tag, or an Epic SHA-256 image reference."
+translation = "Adjon meg Unreal 5-verziót, Epic dev/dev-slim verziócímkét vagy Epic SHA-256 képhivatkozást."
+
 [messages.error-update-hook-address]
 source = "The address to call for updates should start with http:// or https://"
 translation = "A frissítésekkor hívandó cím http:// vagy https:// kezdetű legyen"
@@ -9079,6 +9083,10 @@ translation = "bekapcsolva"
 source = "Hoard looks for a new release each time it starts, downloads it in the background, and installs it when you quit."
 translation = "A Hoard minden indításkor új kiadást keres, a háttérben letölti, és kilépéskor telepíti."
 
+[messages.settings-editor-path]
+source = "Enter the executable path of your installed { $tool }. Automatic installation is available only in Docker."
+translation = "Adja meg a telepített { $tool } futtatható fájljának útvonalát. Az automatikus telepítés csak Dockerben érhető el."
+
 [messages.settings-ffmpeg-download]
 source = "Uses a system ffmpeg with the right encoders, or downloads a static build (about 80 MB)."
 translation = "A rendszer megfelelő kódolókkal rendelkező ffmpeg-jét használja, vagy letölt egy statikus buildet (kb. 80 MB)."
@@ -9778,6 +9786,18 @@ translation = "{ $tool }: vissza az alapértelmezéshez"
 [messages.settings-unreal]
 source = "Unreal packages"
 translation = "Unreal-csomagfájlok"
+
+[messages.settings-unreal-download]
+source = "Downloads Epic’s Linux x86-64 editor. Requires linked GitHub access and tens of GB of disk space."
+translation = "Letölti az Epic Linux x86-64 szerkesztőjét. Összekapcsolt GitHub-hozzáférést és több tíz GB lemezterületet igényel."
+
+[messages.settings-unreal-editor-what]
+source = "Installs Unreal Editor for the export worker. Run the worker separately to export assets."
+translation = "Telepíti az Unreal Editort az exportáló folyamathoz. Az elemek exportálásához külön indítsa el a folyamatot."
+
+[messages.settings-unreal-image]
+source = "Unreal version or image"
+translation = "Unreal-verzió vagy konténerkép"
 
 [messages.settings-unreal-keep]
 source = "Convert, keep originals"

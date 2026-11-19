@@ -4605,6 +4605,10 @@ translation = "{ $tool }: виберіть «вимкнено», «автома�
 source = "unknown asset kind { $kind }"
 translation = "невідомий тип ресурсу { $kind }"
 
+[messages.error-unreal-image]
+source = "Enter an Unreal 5 version, an Epic dev/dev-slim version tag, or an Epic SHA-256 image reference."
+translation = "Вкажіть версію Unreal 5, тег версії Epic dev/dev-slim або посилання на образ Epic із SHA-256."
+
 [messages.error-update-hook-address]
 source = "The address to call for updates should start with http:// or https://"
 translation = "Адреса для сповіщень про оновлення має починатися з http:// або https://"
@@ -9486,6 +9490,10 @@ translation = "увімкнено"
 source = "Hoard looks for a new release each time it starts, downloads it in the background, and installs it when you quit."
 translation = "Hoard шукає нову версію під час кожного запуску, завантажує її у фоні та встановлює, коли ви виходите."
 
+[messages.settings-editor-path]
+source = "Enter the executable path of your installed { $tool }. Automatic installation is available only in Docker."
+translation = "Вкажіть шлях до виконуваного файлу встановленого { $tool }. Автоматичне встановлення доступне лише в Docker."
+
 [messages.settings-ffmpeg-download]
 source = "Uses a system ffmpeg with the right encoders, or downloads a static build (about 80 MB)."
 translation = "Використовує системний ffmpeg із потрібними кодувальниками або завантажує статичну збірку (близько 80 МБ)."
@@ -10185,6 +10193,18 @@ translation = "{ $tool }: повернуто типове значення"
 [messages.settings-unreal]
 source = "Unreal packages"
 translation = "Пакунки Unreal"
+
+[messages.settings-unreal-download]
+source = "Downloads Epic’s Linux x86-64 editor. Requires linked GitHub access and tens of GB of disk space."
+translation = "Завантажує редактор Linux x86-64 від Epic. Потрібні пов’язаний доступ до GitHub і десятки ГБ на диску."
+
+[messages.settings-unreal-editor-what]
+source = "Installs Unreal Editor for the export worker. Run the worker separately to export assets."
+translation = "Встановлює Unreal Editor для процесу експорту. Для експорту ресурсів запустіть його окремо."
+
+[messages.settings-unreal-image]
+source = "Unreal version or image"
+translation = "Версія або образ Unreal"
 
 [messages.settings-unreal-keep]
 source = "Convert, keep originals"

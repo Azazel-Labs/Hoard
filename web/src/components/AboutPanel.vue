@@ -22,6 +22,7 @@ const edition = computed(() =>
 /** What Hoard fetches the first time it needs it, rather than shipping. */
 const DOWNLOADED = (): { name: string; license: string; url: string; what: string }[] => [
   { name: 'Blender', license: 'GPL-2.0-or-later', url: 'https://www.blender.org', what: t('about-blender') },
+  { name: 'Unreal Editor', license: 'Epic Unreal Engine EULA', url: 'https://www.unrealengine.com/eula/unreal', what: t('settings-unreal-editor-what') },
   { name: 'FFmpeg', license: 'GPL-3.0-or-later', url: 'https://ffmpeg.org', what: t('about-ffmpeg') },
   {
     name: 'SigLIP 2',

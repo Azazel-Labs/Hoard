@@ -4566,6 +4566,10 @@ translation = "{ $tool }: zvolte vypnuto, automaticky, nebo zadejte cestu"
 source = "unknown asset kind { $kind }"
 translation = "neznámý druh assetu { $kind }"
 
+[messages.error-unreal-image]
+source = "Enter an Unreal 5 version, an Epic dev/dev-slim version tag, or an Epic SHA-256 image reference."
+translation = "Zadejte verzi Unreal 5, značku verze Epic dev/dev-slim nebo odkaz na obraz Epic se SHA-256."
+
 [messages.error-update-hook-address]
 source = "The address to call for updates should start with http:// or https://"
 translation = "Adresa volaná při aktualizacích by měla začínat http:// nebo https://"
@@ -9416,6 +9420,10 @@ translation = "zapnuto"
 source = "Hoard looks for a new release each time it starts, downloads it in the background, and installs it when you quit."
 translation = "Hoard při každém spuštění hledá novou verzi, stáhne ji na pozadí a nainstaluje ji, když ho ukončíte."
 
+[messages.settings-editor-path]
+source = "Enter the executable path of your installed { $tool }. Automatic installation is available only in Docker."
+translation = "Zadejte cestu ke spustitelnému souboru nainstalovaného programu { $tool }. Automatická instalace je dostupná pouze v Dockeru."
+
 [messages.settings-ffmpeg-download]
 source = "Uses a system ffmpeg with the right encoders, or downloads a static build (about 80 MB)."
 translation = "Použije systémový ffmpeg se správnými enkodéry, nebo stáhne statický build (asi 80 MB)."
@@ -10115,6 +10123,18 @@ translation = "{ $tool }: zpět na výchozí"
 [messages.settings-unreal]
 source = "Unreal packages"
 translation = "Soubory Unrealu"
+
+[messages.settings-unreal-download]
+source = "Downloads Epic’s Linux x86-64 editor. Requires linked GitHub access and tens of GB of disk space."
+translation = "Stáhne editor Linux x86-64 od Epicu. Vyžaduje propojený přístup ke GitHubu a desítky GB na disku."
+
+[messages.settings-unreal-editor-what]
+source = "Installs Unreal Editor for the export worker. Run the worker separately to export assets."
+translation = "Nainstaluje Unreal Editor pro exportní proces. Pro export assetů jej spusťte samostatně."
+
+[messages.settings-unreal-image]
+source = "Unreal version or image"
+translation = "Verze nebo obraz Unreal"
 
 [messages.settings-unreal-keep]
 source = "Convert, keep originals"

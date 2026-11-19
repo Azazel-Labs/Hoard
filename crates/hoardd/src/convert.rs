@@ -86,21 +86,26 @@ fn blender_error(stderr: &str) -> String {
 pub(crate) fn start_blender(state: &AppState, changed: bool) {
     let st = std::sync::Arc::clone(state);
     let setting = state.settings.get().blender.clone();
-    crate::blender::start(&setting, state.cfg.tools_dir(), move |downloaded| {
-        if !(changed || downloaded) {
-            return;
-        }
-        tokio::spawn(async move {
-            match db::call(&st.pool, |c| backfill(c)).await {
-                Ok(0) => {}
-                Ok(n) => {
-                    tracing::info!(packs = n, "queued Blender conversions for packs that waited for it");
-                    st.wake.notify_one();
-                }
-                Err(e) => tracing::warn!(error = %format!("{e:#}"), "could not queue Blender conversions"),
+    crate::blender::start(
+        &setting,
+        state.cfg.tools_dir(),
+        crate::tools::editor_downloads(&state.cfg),
+        move |downloaded| {
+            if !(changed || downloaded) {
+                return;
             }
-        });
-    });
+            tokio::spawn(async move {
+                match db::call(&st.pool, |c| backfill(c)).await {
+                    Ok(0) => {}
+                    Ok(n) => {
+                        tracing::info!(packs = n, "queued Blender conversions for packs that waited for it");
+                        st.wake.notify_one();
+                    }
+                    Err(e) => tracing::warn!(error = %format!("{e:#}"), "could not queue Blender conversions"),
+                }
+            });
+        },
+    );
 }
 
 /// Queue a conversion for every ready pack with a convertible file that has no GLB yet and no conversion pending.

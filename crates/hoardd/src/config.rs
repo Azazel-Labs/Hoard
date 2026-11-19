@@ -88,10 +88,18 @@ pub struct Config {
 
     /// Blender, for converting .blend/.fbx/.dae/.usd/.ply/.stl/.3ds models to .glb in the background (stored next to
     /// the original), which gives them thumbnails and a browser preview: `auto` uses an installed Blender, otherwise
-    /// downloads Blender 4.5 LTS into `<data dir>/tools` (Linux and Windows x64); a path uses that binary; `off`
+    /// downloads Blender 4.5 LTS into `<data dir>/tools` (Docker only); a path uses that binary; `off`
     /// never runs it.
     #[arg(skip = String::from("off"))]
     pub(crate) blender: String,
+
+    /// Unreal Editor installation: off, auto (Linux x86-64 image), or a native editor path.
+    #[arg(skip = String::from("off"))]
+    pub(crate) unreal: String,
+
+    /// Unreal version or Epic development image to download when enabled in Settings.
+    #[arg(long, env = "HOARD_UNREAL_IMAGE", default_value = crate::unreal_editor::DEFAULT_IMAGE)]
+    pub(crate) unreal_image: String,
 
     /// Convert Unreal packages to common formats after ingest: textures to PNG/EXR, sounds to WAV, materials to
     /// JSON, all with Hoard's own reader. Meshes and animations wait for `hoard unreal-worker` (Unreal Editor).

@@ -4428,6 +4428,10 @@ translation = "{ $tool }: hãy chọn tắt, tự động, hoặc đưa đườn
 source = "unknown asset kind { $kind }"
 translation = "loại tài nguyên không xác định { $kind }"
 
+[messages.error-unreal-image]
+source = "Enter an Unreal 5 version, an Epic dev/dev-slim version tag, or an Epic SHA-256 image reference."
+translation = "Nhập phiên bản Unreal 5, thẻ phiên bản Epic dev/dev-slim hoặc tham chiếu image Epic SHA-256."
+
 [messages.error-update-hook-address]
 source = "The address to call for updates should start with http:// or https://"
 translation = "Địa chỉ gọi khi có cập nhật phải bắt đầu bằng http:// hoặc https://"
@@ -9055,6 +9059,10 @@ translation = "bật"
 source = "Hoard looks for a new release each time it starts, downloads it in the background, and installs it when you quit."
 translation = "Mỗi lần khởi động, Hoard tìm bản phát hành mới, tải về ở chế độ nền và cài đặt khi bạn thoát."
 
+[messages.settings-editor-path]
+source = "Enter the executable path of your installed { $tool }. Automatic installation is available only in Docker."
+translation = "Nhập đường dẫn tệp thực thi của { $tool } đã cài đặt. Chỉ hỗ trợ cài đặt tự động trong Docker."
+
 [messages.settings-ffmpeg-download]
 source = "Uses a system ffmpeg with the right encoders, or downloads a static build (about 80 MB)."
 translation = "Dùng ffmpeg của hệ thống có đủ bộ mã hóa, hoặc tải một bản build tĩnh (khoảng 80 MB)."
@@ -9754,6 +9762,18 @@ translation = "{ $tool }: về mặc định"
 [messages.settings-unreal]
 source = "Unreal packages"
 translation = "Package Unreal"
+
+[messages.settings-unreal-download]
+source = "Downloads Epic’s Linux x86-64 editor. Requires linked GitHub access and tens of GB of disk space."
+translation = "Tải trình biên tập Linux x86-64 của Epic. Cần quyền GitHub đã liên kết và hàng chục GB dung lượng đĩa."
+
+[messages.settings-unreal-editor-what]
+source = "Installs Unreal Editor for the export worker. Run the worker separately to export assets."
+translation = "Cài đặt Unreal Editor cho tiến trình xuất. Chạy tiến trình riêng để xuất tài nguyên."
+
+[messages.settings-unreal-image]
+source = "Unreal version or image"
+translation = "Phiên bản hoặc image Unreal"
 
 [messages.settings-unreal-keep]
 source = "Convert, keep originals"

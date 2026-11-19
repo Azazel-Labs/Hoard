@@ -4532,6 +4532,10 @@ translation = "{ $tool }: valitse pois, automaattinen tai anna polku"
 source = "unknown asset kind { $kind }"
 translation = "tuntematon resurssityyppi { $kind }"
 
+[messages.error-unreal-image]
+source = "Enter an Unreal 5 version, an Epic dev/dev-slim version tag, or an Epic SHA-256 image reference."
+translation = "Anna Unreal 5 -versio, Epicin dev/dev-slim-versiotunniste tai Epicin SHA-256-kuvaviite."
+
 [messages.error-update-hook-address]
 source = "The address to call for updates should start with http:// or https://"
 translation = "Päivityksiä varten kutsuttavan osoitteen pitää alkaa http:// tai https://"
@@ -9295,6 +9299,10 @@ translation = "päällä"
 source = "Hoard looks for a new release each time it starts, downloads it in the background, and installs it when you quit."
 translation = "Hoard etsii uutta versiota aina käynnistyessään, lataa sen taustalla ja asentaa sen, kun suljet sovelluksen."
 
+[messages.settings-editor-path]
+source = "Enter the executable path of your installed { $tool }. Automatic installation is available only in Docker."
+translation = "Anna asennetun { $tool } -ohjelman suoritettavan tiedoston polku. Automaattinen asennus on käytettävissä vain Dockerissa."
+
 [messages.settings-ffmpeg-download]
 source = "Uses a system ffmpeg with the right encoders, or downloads a static build (about 80 MB)."
 translation = "Käyttää järjestelmän ffmpegiä, jossa on oikeat kooderit, tai lataa staattisen version (noin 80 Mt)."
@@ -9994,6 +10002,18 @@ translation = "{ $tool }: palauta oletus"
 [messages.settings-unreal]
 source = "Unreal packages"
 translation = "Unreal-paketit"
+
+[messages.settings-unreal-download]
+source = "Downloads Epic’s Linux x86-64 editor. Requires linked GitHub access and tens of GB of disk space."
+translation = "Lataa Epicin Linux x86-64 -editorin. Vaatii yhdistetyn GitHub-käyttöoikeuden ja kymmeniä gigatavuja levytilaa."
+
+[messages.settings-unreal-editor-what]
+source = "Installs Unreal Editor for the export worker. Run the worker separately to export assets."
+translation = "Asentaa Unreal Editorin vientityöntekijää varten. Vie aineistoa käynnistämällä työntekijä erikseen."
+
+[messages.settings-unreal-image]
+source = "Unreal version or image"
+translation = "Unreal-versio tai levykuva"
 
 [messages.settings-unreal-keep]
 source = "Convert, keep originals"

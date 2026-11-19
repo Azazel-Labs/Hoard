@@ -4441,6 +4441,10 @@ translation = "{ $tool }: kapalı ya da otomatik seçin veya bir yol verin"
 source = "unknown asset kind { $kind }"
 translation = "bilinmeyen varlık türü: { $kind }"
 
+[messages.error-unreal-image]
+source = "Enter an Unreal 5 version, an Epic dev/dev-slim version tag, or an Epic SHA-256 image reference."
+translation = "Bir Unreal 5 sürümü, Epic dev/dev-slim sürüm etiketi veya Epic SHA-256 imaj başvurusu girin."
+
 [messages.error-update-hook-address]
 source = "The address to call for updates should start with http:// or https://"
 translation = "Güncellemeler için çağrılacak adres http:// ya da https:// ile başlamalı"
@@ -9083,6 +9087,10 @@ translation = "açık"
 source = "Hoard looks for a new release each time it starts, downloads it in the background, and installs it when you quit."
 translation = "Hoard her açılışta yeni bir sürüm arar, arka planda indirir ve çıktığınızda kurar."
 
+[messages.settings-editor-path]
+source = "Enter the executable path of your installed { $tool }. Automatic installation is available only in Docker."
+translation = "Kurulu { $tool } uygulamasının çalıştırılabilir dosya yolunu girin. Otomatik kurulum yalnızca Docker’da kullanılabilir."
+
 [messages.settings-ffmpeg-download]
 source = "Uses a system ffmpeg with the right encoders, or downloads a static build (about 80 MB)."
 translation = "Doğru kodlayıcılara sahip bir sistem ffmpeg’i kullanır ya da statik bir derleme (yaklaşık 80 MB) indirir."
@@ -9782,6 +9790,18 @@ translation = "{ $tool }: varsayılana dön"
 [messages.settings-unreal]
 source = "Unreal packages"
 translation = "Unreal paketleri"
+
+[messages.settings-unreal-download]
+source = "Downloads Epic’s Linux x86-64 editor. Requires linked GitHub access and tens of GB of disk space."
+translation = "Epic’in Linux x86-64 düzenleyicisini indirir. Bağlı GitHub erişimi ve onlarca GB disk alanı gerektirir."
+
+[messages.settings-unreal-editor-what]
+source = "Installs Unreal Editor for the export worker. Run the worker separately to export assets."
+translation = "Dışa aktarma işlemi için Unreal Editor kurar. Varlıkları dışa aktarmak için işlemi ayrıca çalıştırın."
+
+[messages.settings-unreal-image]
+source = "Unreal version or image"
+translation = "Unreal sürümü veya imajı"
 
 [messages.settings-unreal-keep]
 source = "Convert, keep originals"

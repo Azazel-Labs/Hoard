@@ -104,6 +104,7 @@ mod text_thumbs;
 mod textures;
 mod tools;
 mod unitymat;
+mod unreal_editor;
 mod updates;
 mod uploads;
 mod webglb;
@@ -253,6 +254,12 @@ pub async fn run(cfg: Config) -> Result<()> {
     clip::start(&state, effective.clip, effective.clip_hosted.clone());
     clap::start(&state, effective.clap);
     convert::start_blender(&state, false);
+    unreal_editor::start(
+        &effective.unreal,
+        &effective.unreal_image,
+        state.cfg.tools_dir(),
+        tools::editor_downloads(&state.cfg),
+    );
     updates::start(effective.update_check && !state.cfg.desktop);
     updates::start_hook(&state);
     analyze::warm_renderer();

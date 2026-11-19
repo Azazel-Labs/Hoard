@@ -4431,6 +4431,10 @@ translation = "{ $tool }：请选择关闭、自动，或提供路径"
 source = "unknown asset kind { $kind }"
 translation = "未知的资源类型 { $kind }"
 
+[messages.error-unreal-image]
+source = "Enter an Unreal 5 version, an Epic dev/dev-slim version tag, or an Epic SHA-256 image reference."
+translation = "请输入 Unreal 5 版本、Epic dev/dev-slim 版本标签或 Epic SHA-256 镜像引用。"
+
 [messages.error-update-hook-address]
 source = "The address to call for updates should start with http:// or https://"
 translation = "用于更新通知的地址应以 http:// 或 https:// 开头"
@@ -9069,6 +9073,10 @@ translation = "开启"
 source = "Hoard looks for a new release each time it starts, downloads it in the background, and installs it when you quit."
 translation = "Hoard 每次启动时都会查找新版本，在后台下载，并在你退出时安装。"
 
+[messages.settings-editor-path]
+source = "Enter the executable path of your installed { $tool }. Automatic installation is available only in Docker."
+translation = "输入已安装的 { $tool } 可执行文件路径。仅在 Docker 中支持自动安装。"
+
 [messages.settings-ffmpeg-download]
 source = "Uses a system ffmpeg with the right encoders, or downloads a static build (about 80 MB)."
 translation = "使用带有所需编码器的系统 ffmpeg，或下载静态构建版本（约 80 MB）。"
@@ -9768,6 +9776,18 @@ translation = "{ $tool }：恢复默认值"
 [messages.settings-unreal]
 source = "Unreal packages"
 translation = "Unreal 包"
+
+[messages.settings-unreal-download]
+source = "Downloads Epic’s Linux x86-64 editor. Requires linked GitHub access and tens of GB of disk space."
+translation = "下载 Epic 的 Linux x86-64 编辑器。需要已关联的 GitHub 访问权限和数十 GB 的磁盘空间。"
+
+[messages.settings-unreal-editor-what]
+source = "Installs Unreal Editor for the export worker. Run the worker separately to export assets."
+translation = "为导出工作进程安装 Unreal Editor。请单独运行该进程以导出资源。"
+
+[messages.settings-unreal-image]
+source = "Unreal version or image"
+translation = "Unreal 版本或镜像"
 
 [messages.settings-unreal-keep]
 source = "Convert, keep originals"

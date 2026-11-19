@@ -4431,6 +4431,10 @@ translation = "{ $tool }: เลือก ปิด, อัตโนมัติ
 source = "unknown asset kind { $kind }"
 translation = "ไม่รู้จักประเภทแอสเซ็ต { $kind }"
 
+[messages.error-unreal-image]
+source = "Enter an Unreal 5 version, an Epic dev/dev-slim version tag, or an Epic SHA-256 image reference."
+translation = "ป้อนเวอร์ชัน Unreal 5 แท็กเวอร์ชัน Epic dev/dev-slim หรือการอ้างอิงอิมเมจ Epic แบบ SHA-256"
+
 [messages.error-update-hook-address]
 source = "The address to call for updates should start with http:// or https://"
 translation = "ที่อยู่ที่จะเรียกเมื่อมีการอัปเดตควรขึ้นต้นด้วย http:// หรือ https://"
@@ -9058,6 +9062,10 @@ translation = "เปิด"
 source = "Hoard looks for a new release each time it starts, downloads it in the background, and installs it when you quit."
 translation = "Hoard จะหารุ่นใหม่ทุกครั้งที่เปิด ดาวน์โหลดไว้เบื้องหลัง และติดตั้งเมื่อคุณปิดโปรแกรม"
 
+[messages.settings-editor-path]
+source = "Enter the executable path of your installed { $tool }. Automatic installation is available only in Docker."
+translation = "ป้อนเส้นทางไฟล์ปฏิบัติการของ { $tool } ที่ติดตั้งไว้ การติดตั้งอัตโนมัติใช้ได้เฉพาะใน Docker"
+
 [messages.settings-ffmpeg-download]
 source = "Uses a system ffmpeg with the right encoders, or downloads a static build (about 80 MB)."
 translation = "ใช้ ffmpeg ของระบบที่มีตัวเข้ารหัสที่ถูกต้อง หรือดาวน์โหลดบิลด์แบบสแตติก (ประมาณ 80 MB)"
@@ -9757,6 +9765,18 @@ translation = "{ $tool }: กลับเป็นค่าเริ่มต้
 [messages.settings-unreal]
 source = "Unreal packages"
 translation = "แพ็กเกจ Unreal"
+
+[messages.settings-unreal-download]
+source = "Downloads Epic’s Linux x86-64 editor. Requires linked GitHub access and tens of GB of disk space."
+translation = "ดาวน์โหลดเอดิเตอร์ Linux x86-64 ของ Epic ต้องมีสิทธิ์เข้าถึง GitHub ที่เชื่อมโยงไว้และพื้นที่ดิสก์หลายสิบ GB"
+
+[messages.settings-unreal-editor-what]
+source = "Installs Unreal Editor for the export worker. Run the worker separately to export assets."
+translation = "ติดตั้ง Unreal Editor สำหรับกระบวนการส่งออก เรียกใช้กระบวนการแยกต่างหากเพื่อส่งออกแอสเซ็ต"
+
+[messages.settings-unreal-image]
+source = "Unreal version or image"
+translation = "เวอร์ชันหรืออิมเมจ Unreal"
 
 [messages.settings-unreal-keep]
 source = "Convert, keep originals"

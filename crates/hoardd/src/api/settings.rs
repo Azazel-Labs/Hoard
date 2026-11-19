@@ -75,11 +75,15 @@ fn settings_json_sync(state: &AppState) -> Value {
     let now = state.settings.get();
     json!({
         "blender": tool_setting(
-            &now.blender, &cfg.blender, saved.blender.is_some(), &crate::blender::describe(), crate::blender::can_download(),
+            &now.blender, &cfg.blender, saved.blender.is_some(), &crate::blender::describe(), crate::blender::can_download() && crate::tools::editor_downloads(cfg),
         ),
         "ffmpeg": tool_setting(
             &now.ffmpeg, &cfg.ffmpeg, saved.ffmpeg.is_some(), &crate::ffmpeg::describe(), crate::ffmpeg::can_download(),
         ),
+        "unreal": tool_setting(
+            &now.unreal, &cfg.unreal, saved.unreal.is_some(), &crate::unreal_editor::describe(), crate::unreal_editor::can_download() && crate::tools::editor_downloads(cfg),
+        ),
+        "unreal_image": option(&now.unreal_image, &cfg.unreal_image, saved.unreal_image.is_some()),
         "unreal_convert": {
             "value": now.unreal_convert,
             "default": cfg.unreal_convert,
@@ -264,6 +268,14 @@ pub(super) async fn put_settings(State(state): State<AppState>, Json(patch): Jso
     .map_err(AppError::bad_request)?;
     if before.blender != after.blender {
         crate::convert::start_blender(&state, true);
+    }
+    if before.unreal != after.unreal || before.unreal_image != after.unreal_image {
+        crate::unreal_editor::start(
+            &after.unreal,
+            &after.unreal_image,
+            state.cfg.tools_dir(),
+            crate::tools::editor_downloads(&state.cfg),
+        );
     }
     if before.ffmpeg != after.ffmpeg {
         crate::ffmpeg::start(&after.ffmpeg, state.cfg.tools_dir());

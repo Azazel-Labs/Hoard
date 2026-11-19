@@ -48,9 +48,14 @@ COPY tools/unreal_export.py ./tools/unreal_export.py
 ARG HOARD_VERSION=
 RUN cargo build --release --locked -p hoardd -p hoard
 
+# Registry client: exports merged OCI layers without a Docker daemon or socket.
+FROM golang:1.26 AS crane
+RUN CGO_ENABLED=0 GOBIN=/out go install github.com/google/go-containerregistry/cmd/crane@v0.22.1
+
 FROM debian:trixie-slim
 RUN apt-get update \
  && apt-get install -y --no-install-recommends ca-certificates mesa-vulkan-drivers libvulkan1 fonts-dejavu-core timgm6mb-soundfont \
+    tar libc-bin libnss3 libasound2t64 libxrandr2 libxcursor1 libxinerama1 libglib2.0-0t64 \
     libx11-6 libxi6 libxxf86vm1 libxfixes3 libxrender1 libxext6 libxkbcommon0 libsm6 libice6 libgl1 libegl1 \
  && rm -rf /var/lib/apt/lists/* \
  && mkdir -p /config /library /cache
@@ -59,6 +64,8 @@ RUN apt-get update \
 # With no NVIDIA GPU passed in, the libraries they name aren't there and the loaders skip them.
 COPY deploy/nvidia/nvidia_icd.json /usr/share/vulkan/icd.d/nvidia_icd.json
 COPY deploy/nvidia/10_nvidia.json /usr/share/glvnd/egl_vendor.d/10_nvidia.json
+COPY --from=crane /out/crane /usr/local/bin/crane
+COPY --from=crane /go/pkg/mod/github.com/google/go-containerregistry@v0.22.1/LICENSE /usr/share/doc/crane/LICENSE
 COPY --from=build /src/target/release/hoardd /src/target/release/hoard /usr/local/bin/
 COPY --from=web /web/dist /srv/hoard/web
 # Fixes up the mounted folders' owners, then runs hoardd as an ordinary user (see the script).

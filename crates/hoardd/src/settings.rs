@@ -64,6 +64,10 @@ pub(crate) struct Saved {
     /// `off`, `auto` or a path.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub(crate) blender: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub(crate) unreal: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub(crate) unreal_image: Option<String>,
     /// `off`, `auto` or a path.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub(crate) ffmpeg: Option<String>,
@@ -183,6 +187,8 @@ fn ignore<'de, D: serde::Deserializer<'de>>(d: D) -> Result<(), D::Error> {
 #[expect(clippy::struct_excessive_bools, reason = "each bool is an independent setting")]
 pub(crate) struct Effective {
     pub(crate) blender: String,
+    pub(crate) unreal: String,
+    pub(crate) unreal_image: String,
     pub(crate) ffmpeg: String,
     pub(crate) unreal_convert: UnrealConvert,
     pub(crate) llm_url: Option<String>,
@@ -262,6 +268,8 @@ impl Saved {
         };
         Effective {
             blender: self.blender.clone().unwrap_or_else(|| cfg.blender.clone()),
+            unreal: self.unreal.clone().unwrap_or_else(|| cfg.unreal.clone()),
+            unreal_image: self.unreal_image.clone().unwrap_or_else(|| cfg.unreal_image.clone()),
             ffmpeg: self.ffmpeg.clone().unwrap_or_else(|| cfg.ffmpeg.clone()),
             unreal_convert: self.unreal_convert.unwrap_or(cfg.unreal_convert),
             llm_url: pick(&self.llm_url, &cfg.llm_url),
@@ -326,10 +334,13 @@ impl Saved {
     /// Problems a person can fix, in their words.
     fn check(&self, effective: &Effective) -> Result<(), String> {
         effective.auth.check()?;
+        if crate::unreal_editor::image_ref(&effective.unreal_image).is_err() {
+            return Err(tr!("error-unreal-image"));
+        }
         if effective.name.chars().count() > MAX_NAME || effective.name.chars().any(char::is_control) {
             return Err(tr!("error-server-name", max = MAX_NAME));
         }
-        for (name, v) in [("Blender", &self.blender), ("ffmpeg", &self.ffmpeg)] {
+        for (name, v) in [("Blender", &self.blender), ("ffmpeg", &self.ffmpeg), ("Unreal Editor", &self.unreal)] {
             if v.as_deref().is_some_and(|s| s.trim().is_empty()) {
                 return Err(tr!("error-tool-setting", tool = name));
             }

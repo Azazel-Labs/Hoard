@@ -1,6 +1,6 @@
 <script setup lang="ts">
 // Tools: Blender and ffmpeg (off, found or downloaded, or a program of your own), and the SoundFont MIDI plays with.
-import { reactive } from 'vue'
+import { reactive, ref } from 'vue'
 import type { ToolSetting } from '../api'
 import { t } from '../i18n'
 import ResetButton from './ResetButton.vue'
@@ -8,7 +8,7 @@ import { useSettings } from './settingsContext'
 
 const { s, busy, save, onTake, opts, saveOpt, resetOpt, changed } = useSettings()
 
-type ToolKey = 'blender' | 'ffmpeg'
+type ToolKey = 'blender' | 'ffmpeg' | 'unreal'
 type Mode = 'off' | 'auto' | 'path'
 const modeOf = (v: string): Mode => {
   const t = v.trim().toLowerCase()
@@ -17,8 +17,8 @@ const modeOf = (v: string): Mode => {
   return 'path'
 }
 /** The path being typed for each tool, before it's applied. */
-const paths = reactive<Record<ToolKey, string>>({ blender: '', ffmpeg: '' })
-const chosen = reactive<Record<ToolKey, Mode>>({ blender: 'off', ffmpeg: 'auto' })
+const paths = reactive<Record<ToolKey, string>>({ blender: '', ffmpeg: '', unreal: '' })
+const chosen = reactive<Record<ToolKey, Mode>>({ blender: 'off', ffmpeg: 'auto', unreal: 'off' })
 
 /** A tool set to something other than its default (off / automatic / a different program). */
 function toolChanged(tool: ToolSetting): boolean {
@@ -26,17 +26,19 @@ function toolChanged(tool: ToolSetting): boolean {
   return tool.saved && (a !== modeOf(tool.default) || (a === 'path' && tool.value.trim() !== tool.default.trim()))
 }
 
+const unrealImage = ref('5.8')
 onTake((next) => {
-  for (const k of ['blender', 'ffmpeg'] as const) {
-    chosen[k] = modeOf(next[k].value)
-    paths[k] = chosen[k] === 'path' ? next[k].value : ''
+  unrealImage.value = next.unreal_image.value
+  for (const k of ['blender', 'ffmpeg', 'unreal'] as const) {
+    chosen[k] = k !== 'ffmpeg' && !next[k].can_download && modeOf(next[k].value) === 'auto' ? 'path' : modeOf(next[k].value)
+    paths[k] = modeOf(next[k].value) === 'path' ? next[k].value : ''
   }
 })
 
 function pick(k: ToolKey, m: Mode) {
   chosen[k] = m
   if (m === 'off') void save({ [k]: 'off' })
-  else if (m === 'auto') void save({ [k]: 'auto' })
+  else if (m === 'auto') void save({ [k]: 'auto', ...(k === 'unreal' ? { unreal_image: unrealImage.value.trim() } : {}) })
   // A path waits for "Use".
 }
 function usePath(k: ToolKey) {
@@ -51,6 +53,12 @@ const TOOLS: { key: ToolKey; title: string; readonly what: string; readonly down
     title: 'Blender',
     get what() { return t('settings-blender-what') },
     get download() { return t('settings-blender-download') },
+  },
+  {
+    key: 'unreal',
+    title: 'Unreal Editor',
+    get what() { return t('settings-unreal-editor-what') },
+    get download() { return t('settings-unreal-download') },
   },
   {
     key: 'ffmpeg',
@@ -83,13 +91,20 @@ const defaultText = (v: string) => (modeOf(v) === 'off' ? t('settings-default-of
         @reset="save({ [tool.key]: null }, t('settings-tool-reset', { tool: tool.title }))"
       />
     </div>
-    <p class="what">{{ tool.what }}</p>
+    <p class="what">{{ tool.key === 'unreal' && !s.unreal.can_download ? t('settings-editor-path', { tool: tool.title }) : tool.what }}</p>
+    <p v-if="tool.key === 'blender' && !s.blender.can_download" class="hint">{{ t('settings-editor-path', { tool: tool.title }) }}</p>
+    <form v-if="tool.key === 'unreal' && s.unreal.can_download" class="path" @submit.prevent="save({ unreal_image: unrealImage.trim() })">
+      <label for="unreal-image">{{ t('settings-unreal-image') }}</label>
+      <input id="unreal-image" v-model="unrealImage" class="field mono" type="text" spellcheck="false" placeholder="5.8" :disabled="busy" />
+      <button class="btn" type="submit" :disabled="busy || !unrealImage.trim() || unrealImage.trim() === s.unreal_image.value">{{ t('settings-use') }}</button>
+      <ResetButton v-if="s.unreal_image.saved" :to="s.unreal_image.default" :disabled="busy" @reset="save({ unreal_image: null })" />
+    </form>
     <div class="modes" role="radiogroup" :aria-label="tool.title">
       <label>
         <input type="radio" :name="tool.key" :checked="chosen[tool.key] === 'off'" :disabled="busy" @change="pick(tool.key, 'off')" />
         {{ t('settings-mode-off') }}
       </label>
-      <label>
+      <label v-if="tool.key === 'ffmpeg' || s[tool.key].can_download">
         <input type="radio" :name="tool.key" :checked="chosen[tool.key] === 'auto'" :disabled="busy" @change="pick(tool.key, 'auto')" />
         {{ t('settings-mode-auto') }}
       </label>
@@ -108,7 +123,7 @@ const defaultText = (v: string) => (modeOf(v) === 'off' ? t('settings-default-of
         type="text"
         spellcheck="false"
         :aria-label="t('settings-tool-path', { tool: tool.title })"
-        :placeholder="tool.key === 'blender' ? '/opt/blender/blender' : '/usr/bin/ffmpeg'"
+        :placeholder="tool.key === 'unreal' ? '/opt/UnrealEngine/Engine/Binaries/Linux/UnrealEditor' : tool.key === 'blender' ? '/opt/blender/blender' : '/usr/bin/ffmpeg'"
       />
       <button class="btn" type="submit" :disabled="busy || !paths[tool.key].trim() || paths[tool.key].trim() === s[tool.key].value">{{ t('settings-use') }}</button>
     </form>

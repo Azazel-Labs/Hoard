@@ -75,6 +75,11 @@ impl<T: Clone> Slot<T> {
     }
 }
 
+/// Blender and Unreal downloads belong to the Docker server, never the embedded desktop server.
+pub(crate) fn editor_downloads(cfg: &crate::config::Config) -> bool {
+    !cfg.desktop && cfg!(target_os = "linux") && Path::new("/.dockerenv").is_file()
+}
+
 /// Whether a tool setting means "never run it".
 pub(crate) fn is_off(setting: &str) -> bool {
     matches!(setting.trim().to_ascii_lowercase().as_str(), "off" | "false" | "0" | "none" | "no")

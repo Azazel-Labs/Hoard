@@ -1,7 +1,7 @@
 //! Blender, for converting authoring formats to GLB (see `convert.rs`).
 //!
 //! Like ffmpeg, nothing waits for it. Switched on (`auto`, from Settings in the portal), a
-//! background task uses a Blender downloaded earlier, then an installed one, and otherwise downloads the newest
+//! Docker-only background task uses a Blender downloaded earlier, then an installed one, and otherwise downloads the newest
 //! Blender 4.5 LTS build from Blender's official mirrors into `<data dir>/tools/blender`. The build is checked
 //! against the SHA-256 list Blender publishes, read from a different mirror than the build came from. A path uses
 //! that Blender as it is.
@@ -47,10 +47,22 @@ pub(crate) fn can_download() -> bool {
 /// Find or fetch Blender in the background. `setting` is `auto`, `off` or a path. `on_ready` runs once Blender is
 /// usable, told whether it was downloaded just now. Calling this again drops whatever the last call was doing,
 /// including a download in progress.
-pub(crate) fn start(setting: &str, tools_dir: PathBuf, on_ready: impl FnOnce(bool) + Send + 'static) {
+pub(crate) fn start(
+    setting: &str,
+    tools_dir: PathBuf,
+    allow_download: bool,
+    on_ready: impl FnOnce(bool) + Send + 'static,
+) {
     let setting = setting.trim().to_owned();
     if tools::is_off(&setting) {
         SLOT.restart(Status::Off);
+        return;
+    }
+    if tools::is_auto(&setting) && !allow_download {
+        SLOT.restart(Status::Unavailable(
+            "Give the path to your installed Blender in Settings; automatic installation is available only in Docker"
+                .into(),
+        ));
         return;
     }
     let generation = SLOT.restart(Status::Looking);
@@ -531,5 +543,15 @@ mod tests {
         let err = download_from(&mirrors, "windows-x64.zip", Archive::Zip, dir.path(), &|| false).await.unwrap_err();
         assert!(format!("{err:#}").contains("SHA-256"), "{err:#}");
         assert_eq!(std::fs::read_dir(dir.path()).unwrap().count(), 0, "the bad download is cleaned up");
+    }
+
+    #[tokio::test]
+    async fn desktop_auto_requires_a_path_without_downloading() {
+        let dir = tempfile::tempdir().unwrap();
+        start("auto", dir.path().into(), false, |_| panic!("Desktop must not auto-install Blender"));
+        assert!(describe().contains("only in Docker"));
+        assert!(std::fs::read_dir(dir.path()).unwrap().next().is_none());
+        start("off", dir.path().into(), false, |_| {});
+        assert_eq!(describe(), "off");
     }
 }

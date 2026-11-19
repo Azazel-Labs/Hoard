@@ -4434,6 +4434,10 @@ translation = "{ $tool }: オフ、自動、またはパスの指定から選ん
 source = "unknown asset kind { $kind }"
 translation = "不明なアセットの種類 { $kind }"
 
+[messages.error-unreal-image]
+source = "Enter an Unreal 5 version, an Epic dev/dev-slim version tag, or an Epic SHA-256 image reference."
+translation = "Unreal 5 のバージョン、Epic の dev/dev-slim バージョンタグ、または Epic の SHA-256 イメージ参照を入力してください。"
+
 [messages.error-update-hook-address]
 source = "The address to call for updates should start with http:// or https://"
 translation = "更新時に呼び出すアドレスは http:// または https:// で始めてください"
@@ -9069,6 +9073,10 @@ translation = "オン"
 source = "Hoard looks for a new release each time it starts, downloads it in the background, and installs it when you quit."
 translation = "Hoard は起動するたびに新しいリリースを探し、バックグラウンドでダウンロードして、終了するときにインストールします。"
 
+[messages.settings-editor-path]
+source = "Enter the executable path of your installed { $tool }. Automatic installation is available only in Docker."
+translation = "インストール済みの { $tool } の実行ファイルのパスを入力してください。自動インストールは Docker でのみ利用できます。"
+
 [messages.settings-ffmpeg-download]
 source = "Uses a system ffmpeg with the right encoders, or downloads a static build (about 80 MB)."
 translation = "必要なエンコーダーを備えたシステムの ffmpeg を使うか、静的ビルド（約 80 MB）をダウンロードします。"
@@ -9768,6 +9776,18 @@ translation = "{ $tool }: 既定値に戻す"
 [messages.settings-unreal]
 source = "Unreal packages"
 translation = "Unreal パッケージ"
+
+[messages.settings-unreal-download]
+source = "Downloads Epic’s Linux x86-64 editor. Requires linked GitHub access and tens of GB of disk space."
+translation = "Epic の Linux x86-64 エディターをダウンロードします。連携済みの GitHub アクセス権と数十 GB のディスク容量が必要です。"
+
+[messages.settings-unreal-editor-what]
+source = "Installs Unreal Editor for the export worker. Run the worker separately to export assets."
+translation = "エクスポートワーカー用に Unreal Editor をインストールします。アセットをエクスポートするにはワーカーを別途実行してください。"
+
+[messages.settings-unreal-image]
+source = "Unreal version or image"
+translation = "Unreal のバージョンまたはイメージ"
 
 [messages.settings-unreal-keep]
 source = "Convert, keep originals"

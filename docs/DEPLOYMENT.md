@@ -330,9 +330,9 @@ stored in Hoard's database and are never sent to the browser.
 
 ## Model conversion with Blender
 
-Open **Settings** in the portal and set Blender to **Automatic**: Hoard uses a Blender already on the PATH, or
+In the Docker version, open **Settings → Tools** and set Blender to **Automatic**: Hoard uses a Blender already on the PATH, or
 downloads Blender 4.5 LTS from Blender's mirrors into `<data>/tools/blender` (about 350 MB, checksum verified), and
-queues conversion for packs ingested before it was on. **This program** points at a Blender you installed yourself.
+queues conversion for packs ingested before it was on. Desktop and native server builds offer **This program** instead: enter the executable path of a Blender you installed yourself. They never download Blender automatically.
 Blender 4.5 is used because Blender 5 dropped
 Collada (.dae) import. After each ingest, a `convert` job exports .blend/.fbx/.dae/.usd*/.ply/.stl/.abc/.x3d to GLB with the asset's linked textures laid out
 beside it, stores the GLB as a derivative, and renders a thumbnail from it. An ASCII FBX is rewritten as binary
@@ -351,4 +351,41 @@ when asked from the pack page.
 Meshes, animations and textures imported from uncompressed formats (which UE5 stores Oodle-compressed) wait for
 Unreal Editor. Run `hoard unreal-worker --editor <UnrealEditor-Cmd>` on a
 workstation with Unreal installed and network access to the server (with an access token from Settings → Account in `HOARD_TOKEN`); it
-can run as a service and polls every minute. The server never needs Unreal.
+can run as a service and polls every minute. The server does not require Unreal for its built-in readers.
+
+
+### Installing Unreal Editor in Docker
+
+In **Settings → Tools → Unreal Editor**, enter a version such as `5.8` (the default) or `5.8.0`, then choose
+**Automatic**. You can also specify `ghcr.io/epicgames/unreal-engine:dev-slim-5.8`, a versioned `dev` tag, or an
+immutable `ghcr.io/epicgames/unreal-engine@sha256:<64 hex digits>` reference. The tag must exist in Epic's private
+registry; Hoard reports an unavailable image or missing access in Settings. Switching versions keeps previous installs.
+
+Automatic installation is offered only in Linux x86-64 Docker servers. A Linux/amd64 Hoard container on a Windows
+or macOS Docker host follows the same path. Native Windows, macOS and Linux desktop builds ask for an installed
+editor executable via **This program**; they never automatically download Blender or Unreal. Linux ARM containers
+cannot install the x86-64 editor natively. Epic publishes Linux development images; Windows runtime images do not
+contain an editor. See [Epic's image overview](https://dev.epicgames.com/documentation/unreal-engine/overview-of-containers-in-unreal-engine).
+
+Before enabling it, link your Epic and GitHub accounts and grant the GitHub token `read:packages` access. Mount a
+read-only token file readable by Hoard's service account and set `GHCR_USER` and `GHCR_TOKEN_FILE` on the container.
+Alternatively, mount the service account's existing Docker credentials and set `DOCKER_CONFIG` to their directory.
+Hoard uses crane's normal credential lookup when no token file is supplied. Tokens are never stored in portal settings.
+The Docker image includes crane, GNU tar and common loader dependencies; no Docker socket or daemon is needed inside it.
+
+The download can consume tens of GB. The merged image filesystem streams into the persistent cache; only
+`home/ue4/UnrealEngine` is extracted. Installs are locked across processes, validated with `ldd` and `Build.version`,
+then published under `<cache>/tools/unreal/<image-digest>/home/ue4/UnrealEngine`. A completed installation is reused
+offline. Tags remain pinned to their cached digest; use a new version tag or explicit digest to change the build.
+Settings shows the installed editor path. `HOARD_UNREAL_IMAGE` / `--unreal-image` changes the default version without
+turning installation on. The portal's saved version overrides that default.
+
+Turning the tool off or changing versions cancels its current download. Errors leave existing installations intact;
+fix the reported issue, then switch off and back to Automatic to retry. An installation with a missing completion
+marker or editor is refused: move that digest directory aside before retrying. The loader check reports missing
+libraries, but cannot check libraries that plugins load later.
+
+This setting installs the editor only. Export still requires running `hoard unreal-worker --editor <installed-path>`
+with server credentials, for example as a separate process in the same container. It does not automatically process
+pending assets. On desktop, point at `UnrealEditor-Cmd.exe` (Windows) or the native Unreal Editor executable.
+On macOS that executable is inside `UnrealEditor.app/Contents/MacOS/` under the engine's `Engine/Binaries/Mac` folder.

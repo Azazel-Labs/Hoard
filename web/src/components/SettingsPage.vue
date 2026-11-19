@@ -167,14 +167,14 @@ let timer: number | undefined
 function schedulePoll() {
   window.clearTimeout(timer)
   const v = s.value
-  const busyTool = v && [v.blender, v.ffmpeg, v.clip, v.clap].some((t) => t.state === 'looking' || t.state === 'downloading')
+  const busyTool = v && [v.blender, v.unreal, v.ffmpeg, v.clip, v.clap].some((t) => t.state === 'looking' || t.state === 'downloading')
   const learning = !!v && [v.clip, v.clap].some((m) => m.state === 'ready' && m.done < m.total)
   if (busyTool || learning) {
     timer = window.setTimeout(async () => {
       try {
         const next = await api.settings()
         // Don't clobber a path or AI setting someone is typing.
-        if (s.value) s.value = { ...s.value, blender: next.blender, ffmpeg: next.ffmpeg, clip: next.clip, clap: next.clap }
+        if (s.value) s.value = { ...s.value, blender: next.blender, unreal: next.unreal, ffmpeg: next.ffmpeg, clip: next.clip, clap: next.clap }
       } catch {
         // Try again on the next tick.
       }

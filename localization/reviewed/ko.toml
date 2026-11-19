@@ -4425,6 +4425,10 @@ translation = "{ $tool }: 끄기, 자동 중에서 고르거나 경로를 입력
 source = "unknown asset kind { $kind }"
 translation = "알 수 없는 에셋 종류 { $kind }"
 
+[messages.error-unreal-image]
+source = "Enter an Unreal 5 version, an Epic dev/dev-slim version tag, or an Epic SHA-256 image reference."
+translation = "Unreal 5 버전, Epic dev/dev-slim 버전 태그 또는 Epic SHA-256 이미지 참조를 입력하세요."
+
 [messages.error-update-hook-address]
 source = "The address to call for updates should start with http:// or https://"
 translation = "업데이트 시 호출할 주소는 http:// 또는 https://로 시작해야 합니다"
@@ -9025,6 +9029,10 @@ translation = "켜짐"
 source = "Hoard looks for a new release each time it starts, downloads it in the background, and installs it when you quit."
 translation = "Hoard는 시작할 때마다 새 릴리스를 찾아 백그라운드에서 내려받고, 종료할 때 설치합니다."
 
+[messages.settings-editor-path]
+source = "Enter the executable path of your installed { $tool }. Automatic installation is available only in Docker."
+translation = "설치된 { $tool }의 실행 파일 경로를 입력하세요. 자동 설치는 Docker에서만 사용할 수 있습니다."
+
 [messages.settings-ffmpeg-download]
 source = "Uses a system ffmpeg with the right encoders, or downloads a static build (about 80 MB)."
 translation = "필요한 인코더가 있는 시스템 ffmpeg를 사용하거나, 정적 빌드(약 80 MB)를 다운로드합니다."
@@ -9724,6 +9732,18 @@ translation = "{ $tool }: 기본값으로"
 [messages.settings-unreal]
 source = "Unreal packages"
 translation = "Unreal 패키지"
+
+[messages.settings-unreal-download]
+source = "Downloads Epic’s Linux x86-64 editor. Requires linked GitHub access and tens of GB of disk space."
+translation = "Epic의 Linux x86-64 에디터를 다운로드합니다. 연결된 GitHub 접근 권한과 수십 GB의 디스크 공간이 필요합니다."
+
+[messages.settings-unreal-editor-what]
+source = "Installs Unreal Editor for the export worker. Run the worker separately to export assets."
+translation = "내보내기 작업자용 Unreal Editor를 설치합니다. 에셋을 내보내려면 작업자를 별도로 실행하세요."
+
+[messages.settings-unreal-image]
+source = "Unreal version or image"
+translation = "Unreal 버전 또는 이미지"
 
 [messages.settings-unreal-keep]
 source = "Convert, keep originals"

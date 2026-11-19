@@ -252,6 +252,32 @@ pub(crate) fn clip_glb(path: &Path, ext: &str, root: &Path) -> Result<Vec<u8>> {
     crate::webglb::repack(&doc.to_glb()?)
 }
 
+/// Each take of a model (each clip that isn't a pose) as a GLB of its own, with its name: the nodes and that one clip,
+/// as [`clip_glb`] keeps them all.
+pub(crate) fn take_glbs(path: &Path, ext: &str, root: &Path) -> Result<Vec<(String, Vec<u8>)>> {
+    let pack = Pack { guess: false, ..Pack::new(root) };
+    let mut doc = open(path, ext, &pack, Keep::ALL)?;
+    doc.decode()?;
+    let whole = doc.json.clone();
+    let rig =
+        crate::animations::rig(&Value::Object(whole.clone())).ok_or_else(|| anyhow::anyhow!("it has no clips"))?;
+    let mut out = Vec::new();
+    for (i, clip) in rig.clips.iter().enumerate() {
+        if clip.secs < crate::animations::POSE_SECS {
+            continue;
+        }
+        let mut json = whole.clone();
+        if let Some(Value::Array(clips)) = json.get_mut("animations") {
+            let one = clips.swap_remove(i);
+            *clips = vec![one];
+        }
+        strip_to_clips(&mut json)?;
+        doc.json = json;
+        out.push((clip.name.clone(), crate::webglb::repack(&doc.to_glb()?)?));
+    }
+    Ok(out)
+}
+
 /// Extensions only a mesh, material or texture uses.
 const DRAWING_EXTENSIONS: &[&str] = &["KHR_materials_", "KHR_texture_", "EXT_texture_", "KHR_draco_", "EXT_mesh_"];
 

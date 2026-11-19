@@ -99,6 +99,7 @@ mod store_formats;
 mod store_lookup;
 mod store_search;
 mod tagger;
+mod takes;
 mod text_thumbs;
 mod textures;
 mod tools;
@@ -241,6 +242,10 @@ pub async fn run(cfg: Config) -> Result<()> {
     analyze::warm_renderer();
     jobs::spawn_workers(&state);
     motion::kick(&state);
+    {
+        let state = Arc::clone(&state);
+        tokio::spawn(async move { takes::backfill(&state).await });
+    }
     {
         let st = Arc::clone(&state);
         tokio::spawn(async move { looks::schedule(&st).await });

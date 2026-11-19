@@ -239,13 +239,15 @@ pub(crate) const LIVE: &str =
 /// (a Megascans `<id>.json`) or a map of a material (its roughness
 /// map, say): not something you'd browse for. The material is, and it shows its maps, unless it's the material of
 /// one object only (`owned_by`, see `materials::mark_owned`): then it's part of that model, which shows it.
-/// A sprite sheet's pages, and the loose images it has its sprites as too, are shown with the sheet.
+/// A sprite sheet's pages, and the loose images it has its sprites as too, are shown with the sheet. A file of clips
+/// whose takes are animations of their own (see `takes`) is shown by them.
 pub(crate) const SUPPORTING: &str = "(EXISTS (SELECT 1 FROM asset_links l WHERE l.to_id = a.id
      AND (l.rel IN ('buffer', 'sidecar', 'sprite', 'format', 'sample') OR (l.rel = 'material' AND a.ext = 'mtl')
           OR (l.rel = 'texture' AND a.kind = 'texture'
               AND EXISTS (SELECT 1 FROM assets s WHERE s.id = l.from_id AND s.kind = 'sheet'))))
      OR EXISTS (SELECT 1 FROM material_maps m WHERE m.texture_id = a.id)
-     OR (a.ext = 'material' AND EXISTS (SELECT 1 FROM assets o WHERE o.id = json_extract(a.meta, '$.owned_by'))))";
+     OR (a.ext = 'material' AND EXISTS (SELECT 1 FROM assets o WHERE o.id = json_extract(a.meta, '$.owned_by')))
+     OR (a.kind = 'animation' AND EXISTS (SELECT 1 FROM assets t WHERE json_extract(t.meta, '$.take_of') = a.id)))";
 
 impl Filter {
     fn where_sql(&self) -> String {

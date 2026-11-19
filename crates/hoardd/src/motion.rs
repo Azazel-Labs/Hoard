@@ -183,15 +183,15 @@ async fn fill(state: &AppState) -> Result<()> {
 }
 
 /// A model's files laid out in a folder of its own, and the one to read.
-struct Local {
-    path: PathBuf,
-    ext: String,
-    root: PathBuf,
+pub(crate) struct Local {
+    pub(crate) path: PathBuf,
+    pub(crate) ext: String,
+    pub(crate) root: PathBuf,
 }
 
 /// Lay out an asset's file, and those it needs (a model's textures), under `work`. A model only Blender reads is laid
 /// out as the GLB Blender made of it.
-async fn fetch(state: &AppState, id: &str, work: &Path) -> Result<Local> {
+pub(crate) async fn fetch(state: &AppState, id: &str, work: &Path) -> Result<Local> {
     let id2 = id.to_owned();
     let (path, ext, files) = db::call(&state.pool, move |c| {
         let (path, ext): (String, String) =

@@ -188,6 +188,36 @@ pub(crate) fn read(word: &str) -> Option<Shape> {
     })
 }
 
+/// Written noises common enough to know on sight, though spelled like words.
+const NOISES: &[&str] = &[
+    "bam", "bang", "beep", "blip", "bloop", "boing", "bonk", "boom", "boop", "bzzt", "chirp", "clang", "clank", "clap",
+    "click", "clink", "clonk", "clunk", "crack", "crash", "creak", "crunch", "ding", "dong", "drip", "fizz", "fwoosh",
+    "honk", "hiss", "kaboom", "kapow", "kerplunk", "ping", "plink", "plop", "pop", "pow", "pew", "rumble", "screech",
+    "sizzle", "slam", "smack", "snap", "splash", "splat", "squeak", "squelch", "swish", "swoosh", "thud", "thump",
+    "thwack", "tick", "tock", "twang", "vroom", "wham", "whack", "whir", "whirr", "whizz", "whoosh", "woosh", "zap",
+    "zing", "zip", "zoom",
+];
+
+/// Whether a word is spelled like a noise rather than a name: a written noise everyone knows ("whoosh", "boom"), a
+/// letter drawn out ("whooom", "aaah"), or a hiss or hum with no vowel to it ("pfft", "krssh", "hmm"). A search not
+/// limited to sounds offers the sounds shaped like such a word.
+pub(crate) fn spells_like_noise(word: &str) -> bool {
+    let word = word.trim_end_matches(['!', '?', '.']);
+    if !(2..=24).contains(&word.len()) || !word.chars().all(|c| c.is_ascii_alphabetic()) {
+        return false;
+    }
+    let w = word.to_ascii_lowercase();
+    if NOISES.contains(&w.as_str()) {
+        return true;
+    }
+    let b = w.as_bytes();
+    if b.windows(3).any(|t| t[0] == t[1] && t[1] == t[2]) {
+        return true;
+    }
+    let vowel = b.iter().any(|c| b"aeiouy".contains(c));
+    !vowel && b.windows(2).any(|t| t[0] == t[1] && b"fhmrsz".contains(&t[0]))
+}
+
 /// What `sounds` measured of a sound, as far as scoring needs.
 #[derive(Debug, Clone, Default)]
 pub(crate) struct Measured {
@@ -492,6 +522,16 @@ mod tests {
         // Only the room: nothing.
         let room: Vec<f32> = (0..rate).map(|_| 0.004 * hiss()).collect();
         assert_eq!(hear(wav(&room, rate)), None);
+    }
+
+    #[test]
+    fn noises_are_told_from_names() {
+        for noise in ["whoosh", "BOOM!", "whooom", "aaah", "pfft", "krssh", "shh", "hmm", "brrr", "Kaboom"] {
+            assert!(spells_like_noise(noise), "{noise}");
+        }
+        for name in ["sword", "tree", "png", "sfx", "hdr", "door", "grass", "wall", "x", "crate01", "rock-big"] {
+            assert!(!spells_like_noise(name), "{name}");
+        }
     }
 
     #[test]

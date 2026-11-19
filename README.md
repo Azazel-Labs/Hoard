@@ -546,7 +546,9 @@ software rasterizer (`apt install mesa-vulkan-drivers`). Without any adapter, ev
    one from another pack goes in a folder named for it), and it downloads as "Clip only, no mesh (GLB)", its skeleton
    and clips without the mesh it was saved on. A clip whose root travels (a walk, a run) plays with the character held
    in the frame over a ground grid that scrolls the other way, so it looks different from one made to play in place,
-   which gets no grid. With Settings →
+   which gets no grid. A file of many takes (an FBX of a character's every clip) has each take as an animation of
+   its own, `hero@Run.glb` beside it, named for the take, found by it, drawn mid-take and downloaded alone; a file of
+   clips with no mesh is shown by its takes, and a character keeps its clips as well. With Settings →
    Performance → Thumbnails → "Moving thumbnails for animations" on (it's off: they take space and time to make), each
    animation also gets a three-second looping WebP of it playing on its character, which its tile plays while the
    pointer is over it; turning it off deletes them. Game-engine
@@ -982,8 +984,10 @@ Drawn-out letters make it longer. "oo" and "u" are low and dark, "ee" and "i" hi
 from one to the other make the pitch rise or fall. s, sh and f are hiss. An m or n at the end rings on, and a k, t or p
 cuts it off. Capitals are loud. Sounds whose measurements fit that shape best come first, so `pew` finds falling
 lasers and `shhhhhh` long hiss, after the sounds whose names, tags or sound match the word. It's a reading of English
-spelling, not a model, and works with a pack, a folder or other filters set. In the API it's `imitation=<word>` for
-the shape alone.
+spelling, not a model, and works with a pack, a folder or other filters set. With no Kind set, a word spelled like a
+noise does the same: one everyone knows (`whoosh`, `boom`), a letter drawn out (`whooom`, `aaah`), or a hiss or hum
+with no vowel (`pfft`, `hmm`); the sounds shaped like it come after whatever its name finds. In the API it's
+`imitation=<word>` for the shape alone.
 
 The microphone button in the search field takes the noise itself: make it, up to six seconds, and press it again. The
 browser asks for the microphone first, and only gives it to a page on HTTPS or this computer. Hoard measures the

@@ -158,6 +158,8 @@ struct Skeleton {
     bones: BTreeSet<String>,
     /// An animation's longest take.
     secs: Option<f64>,
+    /// The file of many takes it's one of (see `takes`).
+    take_of: Option<String>,
 }
 
 /// Bumped whenever a rig or a model's kind changes, so [`Skeletons`] are read again.
@@ -170,15 +172,22 @@ pub(crate) struct Skeletons(Mutex<Option<(u64, Arc<Vec<Skeleton>>)>>);
 /// Every character (a model skinned to its bones) and animation in the library, from their rigs.
 fn skeletons(conn: &Connection) -> Result<Vec<Skeleton>> {
     let mut stmt = conn.prepare(
-        "SELECT a.id, a.pack_id, a.kind, r.rig FROM rigs r JOIN assets a ON a.id = r.asset_id
+        "SELECT a.id, a.pack_id, a.kind, r.rig, json_extract(a.meta, '$.take_of') FROM rigs r
+           JOIN assets a ON a.id = r.asset_id
           WHERE a.kind IN ('model', 'animation')",
     )?;
     let rows = stmt.query_map([], |r| {
-        Ok((r.get::<_, String>(0)?, r.get::<_, String>(1)?, r.get::<_, String>(2)?, r.get::<_, String>(3)?))
+        Ok((
+            r.get::<_, String>(0)?,
+            r.get::<_, String>(1)?,
+            r.get::<_, String>(2)?,
+            r.get::<_, String>(3)?,
+            r.get::<_, Option<String>>(4)?,
+        ))
     })?;
     let mut out = Vec::new();
     for row in rows {
-        let (id, pack_id, kind, rig) = row?;
+        let (id, pack_id, kind, rig, take_of) = row?;
         let Ok(rig) = serde_json::from_str::<Rig>(&rig) else { continue };
         let animation = kind == AssetKind::Animation.as_str();
         let (bones, secs): (BTreeSet<String>, _) = if animation {
@@ -190,9 +199,12 @@ fn skeletons(conn: &Connection) -> Result<Vec<Skeleton>> {
             continue;
         };
         if !bones.is_empty() {
-            out.push(Skeleton { id, pack_id, animation, bones, secs });
+            out.push(Skeleton { id, pack_id, animation, bones, secs, take_of });
         }
     }
+    // A file of clips whose takes are animations of their own fits as them.
+    let split: HashSet<String> = out.iter().filter_map(|s| s.take_of.clone()).collect();
+    out.retain(|s| !(s.animation && split.contains(&s.id)));
     Ok(out)
 }
 
@@ -216,7 +228,9 @@ fn fits_of(conn: &Connection, all: &[Skeleton], id: &str) -> Result<(Vec<Fit>, u
             AND NOT EXISTS (SELECT 1 FROM asset_links l WHERE l.to_id = a.id AND l.rel = 'format')",
     )?;
     let mut out = Vec::new();
-    for other in all.iter().filter(|o| o.animation != me.animation && !linked.contains(&o.id)) {
+    // A character's own takes, or those of a clip it's linked to, are what it has as clips already.
+    let had = |o: &Skeleton| o.take_of.as_ref().is_some_and(|f| *f == me.id || linked.contains(f));
+    for other in all.iter().filter(|o| o.animation != me.animation && !linked.contains(&o.id) && !had(o)) {
         let (moved, bones) = if me.animation { (&me.bones, &other.bones) } else { (&other.bones, &me.bones) };
         let fit = if other.pack_id == me.pack_id { fits(moved, bones) } else { fits_across(moved, bones) };
         if !fit {
@@ -311,7 +325,8 @@ pub(crate) fn sort_pack(conn: &Connection, pack_id: &str) -> Result<()> {
     let entries: Vec<Entry> = {
         let mut stmt = conn.prepare(
             "SELECT a.id, a.path, a.ext, a.kind, r.rig FROM assets a LEFT JOIN rigs r ON r.asset_id = a.id
-              WHERE a.pack_id = ?1 AND a.kind IN ('model', 'animation')",
+              WHERE a.pack_id = ?1 AND a.kind IN ('model', 'animation')
+                AND json_extract(a.meta, '$.take_of') IS NULL",
         )?;
         let rows = stmt.query_map([pack_id], |r| {
             Ok((r.get::<_, String>(0)?, r.get::<_, String>(1)?, r.get::<_, String>(2)?, r.get::<_, String>(3)?, {

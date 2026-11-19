@@ -767,6 +767,8 @@ pub(super) const MIGRATIONS: &[&str] = &[
     // 74: watched packs: the modified time of each folder in them, so a rescan can tell the packs whose files were
     // added, removed or renamed without listing them.
     "ALTER TABLE packs ADD COLUMN dir_times TEXT;",
+    // 75: each take of a file of many is an asset of its own (see `takes`), found by the file it came from.
+    "CREATE INDEX assets_take_of ON assets (json_extract(meta, '$.take_of'));",
 ];
 
 /// How many automatic pre-upgrade backups to keep in `<data dir>/backups`.

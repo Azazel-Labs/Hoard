@@ -3,12 +3,6 @@
 What's planned or being weighed, roughly in order. Nothing here is promised; each item says what's settled and what
 isn't yet.
 
-## Written noises outside sound searches
-
-Searching sounds (Kind is Audio), a word in the search field also finds the sounds shaped like it ("whooom", "pew"),
-and the microphone is in the search field. Still open: whether a search not limited to sounds should notice a written
-noise by itself (a word that matches nothing and spells like one) and offer the sounds shaped like it.
-
 ## Maintainability: what's left
 
 The largest files have been split into folder modules. The rest are big but each about one thing; splitting them
@@ -47,7 +41,7 @@ plays any animation that fits it. An animation downloads with the character it p
 clips alone, and a character with its animations. A clip whose root travels plays held in the frame over a ground
 grid that scrolls the other way.
 
-Still open: whether each clip in a many-take file should be an entry of its own in search.
+Each take in a file of many is an animation of its own, beside the file as `file@Take.glb`.
 
 ## Spine binary skeletons
 

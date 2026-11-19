@@ -170,6 +170,13 @@ test('a word imitating a sound finds the sounds shaped like it', async ({ page, 
     expect(await first('pew')).toBe('take_2.wav')
     expect(await first('doom')).toBe('take_1.wav')
     expect(await first('shhhhhhh')).toBe('take_3.wav')
+    // Searching everything, a word spelled like a noise finds them too; one spelled like a name doesn't.
+    const searched = async (word: string) => {
+      const r = await api.get(`/api/assets?q=${encodeURIComponent(word)}&pack=${pack.id}`)
+      return ((await r.json()) as { items: { path: string }[] }).items.map((i) => i.path)
+    }
+    expect((await searched('pew'))[0]).toBe('take_2.wav')
+    expect(await searched('wall')).toEqual([])
 
     // Searching sounds, a word in the search field is also a written noise.
     await openPack(page, pack.id, name, '&kind=audio')

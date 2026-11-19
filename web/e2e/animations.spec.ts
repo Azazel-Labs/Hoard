@@ -4,8 +4,9 @@ import { expect, openPack, test, tile, unique } from './support/test'
 const BONES = ['Hips', 'Spine', 'Spine1', 'Spine2', 'Neck', 'Head', 'LeftArm', 'LeftForeArm', 'LeftHand', 'RightArm', 'RightForeArm', 'RightHand']
 
 /** A glTF skeleton with these bone names in a chain: with a triangle skinned to it (a character), or with a clip
- *  that turns every bone for `secs` (an animation of its own, no mesh), carrying the hips `travel` forward. */
-function rigged(prefix: string, opts: { mesh?: boolean; clip?: { name: string; secs: number; travel?: number } }): Buffer {
+ *  that turns every bone for `secs` (an animation of its own, no mesh), carrying the hips `travel` forward, once
+ *  for each of `takes` when the file has more than one. */
+function rigged(prefix: string, opts: { mesh?: boolean; clip?: { name: string; secs: number; travel?: number }; takes?: string[] }): Buffer {
   const floats = [
     ...[0, 0, 0, 1, 0, 0, 0, 1, 0], // a triangle
     ...[0, opts.clip?.secs ?? 0], // two keyframe times
@@ -53,19 +54,17 @@ function rigged(prefix: string, opts: { mesh?: boolean; clip?: { name: string; s
       : {}),
     ...(opts.clip
       ? {
-          animations: [
-            {
-              name: opts.clip.name,
-              samplers: [
-                { input: 1, output: 2 },
-                { input: 1, output: 5 },
-              ],
-              channels: [
-                ...BONES.map((_, i) => ({ sampler: 0, target: { node: i, path: 'rotation' } })),
-                ...(opts.clip.travel ? [{ sampler: 1, target: { node: 0, path: 'translation' } }] : []),
-              ],
-            },
-          ],
+          animations: (opts.takes ?? [opts.clip.name]).map((name) => ({
+            name,
+            samplers: [
+              { input: 1, output: 2 },
+              { input: 1, output: 5 },
+            ],
+            channels: [
+              ...BONES.map((_, i) => ({ sampler: 0, target: { node: i, path: 'rotation' } })),
+              ...(opts.clip?.travel ? [{ sampler: 1, target: { node: 0, path: 'translation' } }] : []),
+            ],
+          })),
         }
       : {}),
   }
@@ -138,5 +137,43 @@ test('an animation fits the characters with its skeleton in other packs, and eac
   } finally {
     await api.post('/api/archive', { data: { packs: [a.id, b.id] } })
     await api.post('/api/archive/purge', { data: { packs: [a.id, b.id] } })
+  }
+})
+
+// A file of many takes has each as an animation of its own, named for it, found by it and fitting what the file
+// fits; the file of clips itself is shown by them.
+test('each take in a file of many is an animation of its own', async ({ api }) => {
+  test.setTimeout(120_000)
+  const name = `E2E Takes ${unique()}`
+  const pack = await uploadPack(api, name, [
+    { relpath: 'hero.gltf', data: rigged('mixamorig:', { mesh: true }) },
+    { relpath: 'Clips/moves.gltf', data: rigged('mixamorig:', { clip: { name: 'Moves', secs: 0.8 }, takes: ['Walk', 'Sprint'] }) },
+  ])
+  try {
+    await waitReady(api, [pack.id])
+    const all = await assetsOf(api, pack.id)
+    const byPath = (p: string) => all.find((a) => a.path === p)
+    const [walk, sprint, file] = [byPath('Clips/moves@Walk.glb'), byPath('Clips/moves@Sprint.glb'), all.find((a) => a.path.startsWith('Clips/moves.'))]
+    expect([walk?.kind, walk?.name, sprint?.kind, sprint?.name]).toEqual(['animation', 'Walk', 'animation', 'Sprint'])
+    expect(file).toBeTruthy()
+    const hero = all.find((a) => a.path.startsWith('hero.'))!
+    // The grid shows the takes, not the file they're in.
+    const shown = await api.get('/api/assets', { params: { pack: pack.id, limit: 500, facets: false, hide_supporting: true } })
+    const paths = ((await shown.json()) as { items: { path: string }[] }).items.map((a) => a.path)
+    expect(paths).toEqual(expect.arrayContaining(['Clips/moves@Walk.glb', 'Clips/moves@Sprint.glb', hero.path]))
+    expect(paths).not.toContain(file!.path)
+    // Searching for one finds it.
+    const found = await api.get('/api/assets', { params: { pack: pack.id, q: 'sprint', limit: 10, facets: false, hide_supporting: true } })
+    expect(((await found.json()) as { items: { id: string }[] }).items.map((a) => a.id)).toEqual([sprint!.id])
+    // Each holds its one clip, and plays on the pack's character; the character has them as its clips already.
+    type Detail = { fits?: { id: string }[] }
+    const fits = async (id: string) => ((await (await api.get(`/api/assets/${id}`)).json()) as Detail).fits ?? []
+    expect((await fits(sprint!.id)).map((f) => f.id)).toEqual([hero.id])
+    expect((await fits(hero.id)).map((f) => f.id)).not.toContain(file!.id)
+    const clip = await api.get(`/api/assets/${sprint!.id}/as/clip?wait=60`)
+    expect(clip.status()).toBe(200)
+  } finally {
+    await api.post('/api/archive', { data: { packs: [pack.id] } })
+    await api.post('/api/archive/purge', { data: { packs: [pack.id] } })
   }
 })

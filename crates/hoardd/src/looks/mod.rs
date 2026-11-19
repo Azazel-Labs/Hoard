@@ -194,8 +194,14 @@ async fn rank(state: &AppState, q: &SearchQuery) -> Result<Option<db::LookRank>>
             tracing::warn!(error = %format!("{e:#}"), "sound search failed; searching names only");
             Vec::new()
         });
-        // Searching sounds, a single word may be a written noise ("whooom"): sounds shaped like it match too.
-        if q.kind.as_deref() == Some("audio") && !text.contains(char::is_whitespace) {
+        // Searching sounds, a single word may be a written noise ("whooom"): sounds shaped like it match too. Searching
+        // everything, so they do for a word spelled like one ("whoosh", "pfft").
+        let noise = match q.kind.as_deref() {
+            Some("audio") => true,
+            None | Some("") => crate::imitation::spells_like_noise(text),
+            Some(_) => false,
+        };
+        if noise && !text.contains(char::is_whitespace) {
             let shaped = crate::imitation::rank(state, text).await?;
             sounds = with_shapes(sounds, shaped);
         }

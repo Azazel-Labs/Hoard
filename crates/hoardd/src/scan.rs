@@ -319,8 +319,9 @@ fn catch_up(c: &Connection, pack_id: &str, dir: &Path) -> Result<bool> {
     let assets: Vec<(String, String, Option<String>)> = {
         let mut stmt = c.prepare(&format!(
             "SELECT a.id, a.path, o.path FROM assets a LEFT JOIN asset_origin o ON o.asset_id = a.id
-                  WHERE a.pack_id = ?1 AND NOT {}",
-            crate::materials::IS_MATERIAL
+                  WHERE a.pack_id = ?1 AND NOT {} AND NOT {}",
+            crate::materials::IS_MATERIAL,
+            crate::takes::IS_TAKE
         ))?;
         stmt.query_map([pack_id], |r| Ok((r.get(0)?, r.get(1)?, r.get(2)?)))?.collect::<rusqlite::Result<_>>()?
     };
@@ -332,6 +333,12 @@ fn catch_up(c: &Connection, pack_id: &str, dir: &Path) -> Result<bool> {
     let known = db::known_paths(c, pack_id)?;
     let added = on_disk.iter().any(|p| !known.contains(p));
     for id in &gone {
+        // With its takes, if it had them.
+        c.execute(
+            "DELETE FROM assets_fts WHERE asset_id IN (SELECT id FROM assets WHERE json_extract(meta, '$.take_of') = ?1)",
+            [id],
+        )?;
+        c.execute("DELETE FROM assets WHERE json_extract(meta, '$.take_of') = ?1", [id])?;
         c.execute("DELETE FROM assets_fts WHERE asset_id = ?1", [id])?;
         c.execute("DELETE FROM assets WHERE id = ?1", [id])?;
     }
@@ -401,9 +408,10 @@ fn changed_in_place(c: &Connection, pack_id: &str, dir: &Path) -> Result<Vec<Str
     let assets: Vec<(String, String, String, i64, String)> = {
         let mut stmt = c.prepare(&format!(
             "SELECT a.id, a.path, a.blob_hash, b.size, a.updated_at FROM assets a JOIN blobs b ON b.hash = a.blob_hash
-              WHERE a.pack_id = ?1 AND NOT {}
+              WHERE a.pack_id = ?1 AND NOT {} AND NOT {}
                 AND NOT EXISTS (SELECT 1 FROM asset_origin o WHERE o.asset_id = a.id)",
-            crate::materials::IS_MATERIAL
+            crate::materials::IS_MATERIAL,
+            crate::takes::IS_TAKE
         ))?;
         stmt.query_map([pack_id], |r| Ok((r.get(0)?, r.get(1)?, r.get(2)?, r.get(3)?, r.get(4)?)))?
             .collect::<rusqlite::Result<_>>()?

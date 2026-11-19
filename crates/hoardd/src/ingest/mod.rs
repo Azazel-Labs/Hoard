@@ -295,10 +295,7 @@ pub(crate) fn ingest_pack(state: &AppState, rt: &Handle, pack_id: &str, auto_nam
     tx.execute("UPDATE packs SET files_done = files_total WHERE id = ?1", [pack_id])?;
     tx.commit()?;
     tracing::info!(pack = pack_id, links = n_links, families = n_families, "pack ingested");
-    {
-        let _in_runtime = rt.enter();
-        crate::motion::pack_in(state);
-    }
+    animations_in(state, rt, pack_id);
     crate::materials::detect_logged(state, rt, &mut conn, pack_id);
     read_pack_files(state, rt, pack_id, auto_name, wrapper_name);
 
@@ -381,9 +378,10 @@ pub(crate) fn retag_pack(state: &AppState, rt: &Handle, pack_id: &str, only: Opt
     let upright = db::upright_models(&conn, pack_id)?;
     let rows: Vec<Row> = {
         let mut stmt = conn.prepare(&format!(
-            "SELECT id, path, blob_hash, human_edited, kind FROM assets a WHERE pack_id = ?1 AND NOT {}
+            "SELECT id, path, blob_hash, human_edited, kind FROM assets a WHERE pack_id = ?1 AND NOT {} AND NOT {}
                  ORDER BY path",
-            crate::materials::IS_MATERIAL
+            crate::materials::IS_MATERIAL,
+            crate::takes::IS_TAKE
         ))?;
         stmt.query_map([pack_id], |r| {
             Ok(Row { id: r.get(0)?, rel: r.get(1)?, hash: r.get(2)?, human: r.get::<_, i64>(3)? != 0, kind: r.get(4)? })
@@ -521,13 +519,17 @@ pub(crate) fn retag_pack(state: &AppState, rt: &Handle, pack_id: &str, only: Opt
     fs::remove_dir_all(&work).ok();
     convert::thumbs_from_conversions(state, rt, pack_id)?;
     crate::animations::rigs_from_conversions(state, rt, pack_id)?;
-    {
-        let _in_runtime = rt.enter();
-        crate::motion::pack_in(state);
-    }
+    animations_in(state, rt, pack_id);
     crate::materials::detect_logged(state, rt, &mut conn, pack_id);
     read_pack_files(state, rt, pack_id, false, None);
     Ok(())
+}
+
+/// With a pack read (again): its files of many takes made into an animation each, and its animations drawn.
+fn animations_in(state: &AppState, rt: &Handle, pack_id: &str) {
+    rt.block_on(crate::takes::make_logged(state, pack_id));
+    let _in_runtime = rt.enter();
+    crate::motion::pack_in(state);
 }
 
 /// Name, tag and describe the pack from the store's files in it (a Megascans `<id>.json`). A file that can't be

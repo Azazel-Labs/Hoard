@@ -199,6 +199,13 @@ pub(crate) async fn convert_pack(state: &AppState, pack_id: &str) -> Result<()> 
         Ok(())
     })
     .await?;
+    // A .blend of many clips has its takes once it's a GLB.
+    if crate::takes::make(state, pack_id).await.unwrap_or_else(|e| {
+        tracing::warn!(pack = pack_id, error = %format!("{e:#}"), "couldn't make the pack's takes");
+        false
+    }) {
+        crate::motion::kick(state);
+    }
     let failures = n_failed;
     tracing::info!(pack = pack_id, converted = todo.len() - failures, failures, "conversion finished");
     Ok(())

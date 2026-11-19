@@ -1,3 +1,4 @@
+
 use super::*;
 
 fn json(sel: &str, doc: &str) -> Vec<String> {
@@ -8,8 +9,8 @@ fn json(sel: &str, doc: &str) -> Vec<String> {
 #[test]
 fn paths_find_values() {
     let doc = r##"{"a": {"name": "N", "minSize": "1 m", "Tags": ["x", "y"], "flag": true},
-                  "meta": [{"key": "scanArea", "value": "2x2 m"}, {"key": "Height", "value": "2cm"}],
-                  "list": [{"uri": "a.jpg"}, {"uri": "b.jpg"}], "color": "#fff", "cats": ["surface_x", "soil"]}"##;
+                      "meta": [{"key": "scanArea", "value": "2x2 m"}, {"key": "Height", "value": "2cm"}],
+                      "list": [{"uri": "a.jpg"}, {"uri": "b.jpg"}], "color": "#fff", "cats": ["surface_x", "soil"]}"##;
     assert_eq!(json("a.name", doc), ["N"]);
     assert_eq!(json("a.tags", doc), ["x", "y"], "keys ignore case when no key matches exactly");
     assert_eq!(json("a.*size*", doc), ["1 m"]);

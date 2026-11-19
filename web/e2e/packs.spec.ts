@@ -80,6 +80,39 @@ test.describe('packs page', () => {
     await expect.poll(() => seededOrder(page)).toEqual([TEXTURES, MODELS, ZIPPED, BIG])
   })
 
+  test('store details: a match found in the stores fills the form, and Save keeps it', async ({ page, api }) => {
+    const name = `E2E Store ${unique()}`
+    const pack: Pack = await uploadPack(api, name, [{ relpath: 'thing.png', data: checker(8, [1, 2, 3], [4, 5, 6], 2) }])
+    await waitReady(api, [pack.id])
+    // The stores themselves aren't asked: the lookup answers with one match.
+    await page.route(`**/api/packs/${pack.id}/store-matches*`, (route) =>
+      route.fulfill({
+        json: {
+          searched_at: new Date().toISOString(),
+          query: name,
+          also: [],
+          clues: [],
+          matches: [{ store: 'Example Store', title: `${name} on sale`, url: 'https://store.example/thing', author: 'Some Seller', license: 'CC0', score: 0.9 }],
+          links: [],
+          failed: [],
+        },
+      }),
+    )
+    await page.reload()
+    await page.getByLabel('Find a pack').fill(name)
+    await expect(packNames(page)).toHaveText([name])
+
+    await page.getByRole('button', { name: 'Store details' }).click()
+    await expect(page.getByLabel('Search the stores for')).toHaveValue(name)
+    await page.getByRole('button', { name: 'Use', exact: true }).click()
+    await expect(page.getByLabel('Seller')).toHaveValue('Some Seller')
+    await page.getByRole('button', { name: 'Save', exact: true }).click()
+    await expect(page.getByLabel('Seller')).toHaveCount(0)
+
+    const ctx = (await (await api.get(`/api/packs/${pack.id}/context`)).json()) as { store: string; store_url: string; seller: string }
+    expect(ctx).toMatchObject({ store: 'Example Store', store_url: 'https://store.example/thing', seller: 'Some Seller' })
+  })
+
   test('renames a pack from its More menu', async ({ page, api }) => {
     const name = `E2E Rename ${unique()}`
     const pack: Pack = await uploadPack(api, name, [{ relpath: 'thing.png', data: checker(8, [1, 2, 3], [4, 5, 6], 2) }])

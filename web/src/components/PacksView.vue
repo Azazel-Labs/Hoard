@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue'
 import {
-  api, collectionCreditsUrl, collectionZipUrl, packCreditsUrl, packZipUrl, thumbUrl, type AssetKind, type Collection, type Pack, type PackContext, type Stats, type StoreMatch, type StoreMatches, type UnrealPackStatus,
+  api, collectionCreditsUrl, collectionZipUrl, packCreditsUrl, packZipUrl, thumbUrl, type AssetKind, type Collection, type Pack, type Stats, type UnrealPackStatus,
 } from '../api'
 import { humanBytes } from '../format'
 import { KIND_LABEL } from '../kinds'
@@ -10,6 +10,7 @@ import { archiveWithUndo } from '../archive'
 import { mayEdit } from '../auth'
 import { canDrawThumbs, cancelThumbRun, makePackThumbs, thumbRun } from '../browserThumbs'
 import { formatDate, t } from '../i18n'
+import PackContextForm from './PackContextForm.vue'
 
 const props = defineProps<{ packs: Pack[]; stats: Stats | null; collections: Collection[] }>()
 
@@ -213,95 +214,10 @@ async function readFiles(p: Pack) {
   }
 }
 
-// Pack context editor: one pack open at a time.
+// The store details form: one pack open at a time.
 const editing = ref<string | null>(null)
-const saving = ref(false)
-const draft = reactive<PackContext>({
-  store: null,
-  store_url: null,
-  store_text: null,
-  license_tier: null,
-  readme: null,
-  seller: null,
-  store_license: null,
-  store_auto: null,
-})
-
-async function editContext(p: Pack) {
-  if (editing.value === p.id) {
-    editing.value = null
-    return
-  }
-  try {
-    Object.assign(draft, await api.packContext(p.id))
-    editing.value = p.id
-    Object.assign(lookup, { q: '', result: null, error: '', open: !draft.store_url })
-    // No store page yet: look for one straight away.
-    if (!draft.store_url) findInStores(p)
-  } catch (e) {
-    emit('error', t('packs-context-load-failed', { error: (e as Error).message }))
-  }
-}
-
-// Store lookup: the pack's name searched in the stores, best matches first.
-const lookup = reactive({ q: '', loading: false, open: false, error: '', result: null as StoreMatches | null })
-let lookupAsked = 0
-
-async function findInStores(p: Pack, q?: string, fresh = false) {
-  const n = ++lookupAsked
-  lookup.loading = true
-  lookup.open = true
-  lookup.error = ''
-  try {
-    const r = await api.storeMatches(p.id, q?.trim() || undefined, fresh)
-    if (n !== lookupAsked || editing.value !== p.id) return
-    lookup.result = r
-    if (!lookup.q) lookup.q = r.query
-  } catch (e) {
-    if (n === lookupAsked) lookup.error = (e as Error).message
-  } finally {
-    if (n === lookupAsked) lookup.loading = false
-  }
-}
-
-/** Fill the form from a match; Save fetches the page's description. */
-function useMatch(m: StoreMatch) {
-  draft.store = m.store
-  draft.store_url = m.url
-  draft.store_text = null
-  if (m.author) draft.seller = m.author
-  draft.store_license = m.license ?? null
-  lookup.open = false
-}
-
-/** The store page found automatically isn't this pack's: take it off and show the other suggestions. */
-async function notThisOne(p: Pack) {
-  try {
-    Object.assign(draft, await api.undoStorePage(p.id))
-    emit('changed')
-    findInStores(p)
-  } catch (e) {
-    emit('error', t('packs-undo-store-failed', { error: (e as Error).message }))
-  }
-}
-
-function day(at: string) {
-  return formatDate(at, { day: 'numeric', month: 'short', year: 'numeric' })
-}
-
-async function saveContext(p: Pack, thenRetag: boolean) {
-  saving.value = true
-  try {
-    const { readme: _readme, store_auto: _auto, ...ctx } = draft
-    Object.assign(draft, await api.setPackContext(p.id, ctx))
-    if (thenRetag) await api.retagPack(p.id, { rules: false, llm: true })
-    editing.value = null
-    emit('changed')
-  } catch (e) {
-    emit('error', t('packs-context-save-failed', { error: (e as Error).message }))
-  } finally {
-    saving.value = false
-  }
+function editContext(p: Pack) {
+  editing.value = editing.value === p.id ? null : p.id
 }
 
 // Unreal conversion panel: one pack open at a time, like the store details.
@@ -605,95 +521,14 @@ async function archive(p: Pack) {
             <button class="btn ghost" type="button" @click="unrealOpen = null">{{ t('packs-cancel') }}</button>
           </div>
         </form>
-        <form v-if="editing === p.id" class="context" @submit.prevent="saveContext(p, false)">
-          <p class="hint">
-            {{ t('packs-context-hint-before') }} <span class="mono">spell35.wav</span>{{ t('packs-context-hint-after') }}
-          </p>
-          <p v-if="draft.store_auto" class="auto">
-            <span>{{ t('packs-store-auto') }}</span>
-            <button class="btn ghost" type="button" @click="notThisOne(p)">{{ t('packs-store-not-this') }}</button>
-          </p>
-          <section v-if="lookup.open" class="lookup" :aria-busy="lookup.loading">
-            <div class="find">
-              <input
-                v-model="lookup.q"
-                class="field"
-                type="search"
-                :aria-label="t('packs-lookup-label')"
-                :placeholder="t('packs-lookup-placeholder')"
-                @keydown.enter.prevent="findInStores(p, lookup.q)"
-              />
-              <button class="btn" type="button" :disabled="lookup.loading" @click="findInStores(p, lookup.q)">
-                {{ lookup.loading ? t('packs-lookup-searching') : t('packs-lookup-search') }}
-              </button>
-              <button class="btn ghost" type="button" @click="lookup.open = false">{{ t('packs-lookup-hide') }}</button>
-            </div>
-            <p v-if="lookup.error" class="err">{{ lookup.error }}</p>
-            <template v-else-if="lookup.result">
-              <p v-if="lookup.result.clues.length || lookup.result.also.length" class="hint">
-                <template v-if="lookup.result.clues.length">{{ t('packs-lookup-clues', { clues: lookup.result.clues.join(' · ') }) }} </template>
-                <template v-if="lookup.result.also.length">{{ t('packs-lookup-also', { queries: lookup.result.also.map((q) => t('packs-lookup-quoted', { query: q })).join(', ') }) }}</template>
-              </p>
-              <p v-if="!lookup.result.matches.length" class="hint">
-                {{ t('packs-lookup-nothing') }}
-              </p>
-              <ul v-else class="matches">
-                <li v-for="m in lookup.result.matches" :key="m.url">
-                  <img v-if="m.thumb" :src="m.thumb" alt="" loading="lazy" referrerpolicy="no-referrer" />
-                  <span v-else class="noimg" aria-hidden="true" />
-                  <div class="what">
-                    <a :href="m.url" target="_blank" rel="noopener noreferrer" class="title">{{ m.title }}</a>
-                    <span class="meta">{{ [m.store, m.author, m.price].filter(Boolean).join(' · ') }}</span>
-                    <span v-if="m.summary" class="meta clamp">{{ m.summary }}</span>
-                    <span v-for="w in m.why ?? []" :key="w" class="why">{{ w }}</span>
-                  </div>
-                  <button class="btn" type="button" @click="useMatch(m)">{{ t('packs-lookup-use') }}</button>
-                </li>
-              </ul>
-              <p class="hint">
-                <template v-if="lookup.result.searched_at">
-                  {{ t('packs-lookup-searched', { date: day(lookup.result.searched_at) }) }}
-                  <button class="again" type="button" :disabled="lookup.loading" @click="findInStores(p, undefined, true)">{{ t('packs-lookup-again') }}</button>{{ t('packs-lookup-again-after') }}
-                </template>
-                <template v-if="lookup.result.failed.length">{{ t('packs-lookup-unreachable', { stores: lookup.result.failed.join(', ') }) }} </template>
-                {{ t('packs-lookup-also-look') }}
-                <template v-for="(l, i) in lookup.result.links" :key="l.store">
-                  <a :href="l.url" target="_blank" rel="noopener noreferrer">{{ l.store }}</a>{{ i < lookup.result.links.length - 1 ? t('packs-lookup-links-and') : '' }}
-                </template>
-                {{ t('packs-lookup-browser-only') }}
-              </p>
-            </template>
-          </section>
-          <button v-else class="btn ghost find-again" type="button" @click="lookup.result ? (lookup.open = true) : findInStores(p)">
-            {{ t('packs-lookup-open') }}
-          </button>
-          <div class="row">
-            <label>{{ t('packs-store') }} <input v-model="draft.store" class="field" :placeholder="t('packs-store-placeholder')" /></label>
-            <label>{{ t('packs-seller') }} <input v-model="draft.seller" class="field" :placeholder="t('packs-seller-placeholder')" /></label>
-          </div>
-          <div class="row">
-            <label>{{ t('packs-license-label') }} <input v-model="draft.store_license" class="field" :placeholder="t('packs-license-placeholder')" /></label>
-            <label>{{ t('packs-license-tier-label') }} <input v-model="draft.license_tier" class="field" :placeholder="t('packs-license-tier-placeholder')" /></label>
-          </div>
-          <label>{{ t('packs-store-page') }}
-            <input v-model="draft.store_url" class="field" type="url" placeholder="https://…" />
-          </label>
-          <label>{{ t('packs-store-text') }}
-            <textarea v-model="draft.store_text" class="field" rows="5" :placeholder="t('packs-store-text-placeholder')" />
-          </label>
-          <p v-if="draft.store_url && !draft.store_text" class="hint">{{ t('packs-store-text-fetch') }}</p>
-          <details v-if="draft.readme">
-            <summary>{{ t('packs-readme') }}</summary>
-            <pre>{{ draft.readme }}</pre>
-          </details>
-          <div class="actions">
-            <button class="btn primary" type="submit" :disabled="saving">{{ t('packs-save') }}</button>
-            <button v-if="stats?.llm_enabled" class="btn" type="button" :disabled="saving || p.status !== 'ready'" @click="saveContext(p, true)">
-              {{ t('packs-save-retag') }}
-            </button>
-            <button class="btn ghost" type="button" @click="editing = null">{{ t('packs-cancel') }}</button>
-          </div>
-        </form>
+        <PackContextForm
+          v-if="editing === p.id"
+          :pack="p"
+          :llm="!!stats?.llm_enabled"
+          @close="editing = null"
+          @changed="emit('changed')"
+          @error="(m) => emit('error', m)"
+        />
         </div>
       </li>
     </ul>
@@ -819,38 +654,9 @@ li.flash .status { animation: ready-pop var(--dur-3) var(--ease-pop); }
   border: 1px solid var(--line); border-radius: var(--r-tile); background: var(--raised);
 }
 .context label { display: flex; flex-direction: column; gap: 0.3rem; font-size: var(--step--1); color: var(--muted); }
-.context .row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.7rem; }
-.context textarea { resize: vertical; font: inherit; }
 .hint { margin: 0; font-size: var(--step--1); color: var(--muted); max-width: 70ch; }
-.context pre { white-space: pre-wrap; font-size: 0.8rem; max-height: 14rem; overflow: auto; margin: 0.4rem 0 0; color: var(--muted); }
-.context summary { cursor: pointer; font-size: var(--step--1); color: var(--muted); }
-@media (max-width: 560px) { .context .row { grid-template-columns: 1fr; } }
-.lookup { display: grid; gap: 0.5rem; padding: 0.7rem; border: 1px solid var(--line); border-radius: var(--r-tile); background: var(--bg); }
-.lookup[aria-busy='true'] .matches { opacity: 0.6; }
 .find { display: flex; gap: 0.5rem; flex-wrap: wrap; }
 .find .field { flex: 1 1 14rem; min-width: 0; }
-.lookup .err { margin: 0; color: var(--danger); font-size: var(--step--1); }
-.lookup .hint { margin: 0; }
-.matches { gap: 0; max-height: 24rem; overflow-y: auto; }
-.matches li { padding: 0.5rem 0; gap: 0.7rem; align-items: center; }
-.matches li:first-child { border-top: 0; }
-.matches img, .matches .noimg {
-  flex: none; width: 64px; height: 40px; object-fit: cover; border-radius: var(--r-chip); background: var(--raised);
-}
-.matches .what { display: flex; flex-direction: column; gap: 0.1rem; flex: 1; min-width: 0; }
-.matches .title { color: var(--text); font-size: var(--step--1); font-weight: 600; overflow-wrap: anywhere; }
-.matches .meta { color: var(--muted); font-size: 0.75rem; overflow-wrap: anywhere; }
-.matches .why { color: var(--ok, var(--accent)); font-size: 0.75rem; }
-.matches .why::before { content: '✓ '; }
-.matches .clamp { display: -webkit-box; -webkit-line-clamp: 1; line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; }
-.find-again { align-self: flex-start; }
-.again { padding: 0; border: 0; background: none; color: var(--accent); font: inherit; cursor: pointer; text-decoration: underline; }
-.again:disabled { color: var(--muted); cursor: default; }
-.auto {
-  display: flex; flex-wrap: wrap; align-items: center; gap: 0.3rem 0.7rem; margin: 0; padding: 0.5rem 0.7rem;
-  border: 1px solid var(--line); border-radius: var(--r-tile); font-size: var(--step--1);
-}
-.auto span::before { content: '✓ '; color: var(--ok, var(--accent)); }
 .ustats { flex-direction: row; flex-wrap: wrap; gap: 0.3rem 1.25rem; font-size: var(--step--1); color: var(--muted); }
 .ustats li, .reasons li { padding: 0; border: 0; display: block; }
 .ustats strong { color: var(--text); font-variant-numeric: tabular-nums; }

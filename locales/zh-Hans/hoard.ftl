@@ -1440,6 +1440,7 @@ asset-download-linked = 连同 { $count } 个链接文件一起下载
 asset-download-only-title = 只下载此文件，不包括它使用的文件
 asset-download-only = 仅此文件
 asset-include-animations = 在 .zip 中包含动画
+asset-include-character = 包含角色 { $name }
 asset-copy-toml = 复制 hoard.toml 条目
 asset-copy-id = 复制 ID
 asset-teach = 让 Hoard 学会读取此文件

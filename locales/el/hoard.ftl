@@ -1615,6 +1615,7 @@ asset-download-linked =
 asset-download-only-title = Μόνο αυτό το αρχείο, χωρίς τα αρχεία που χρησιμοποιεί
 asset-download-only = Μόνο αυτό το αρχείο
 asset-include-animations = Συμπερίληψη των animation στο .zip
+asset-include-character = Συμπερίληψη του χαρακτήρα { $name }
 asset-copy-toml = Αντιγραφή καταχώρισης hoard.toml
 asset-copy-id = Αντιγραφή ID
 asset-teach = Μάθετε στο Hoard αυτό το αρχείο

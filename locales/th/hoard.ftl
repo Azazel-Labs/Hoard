@@ -1440,6 +1440,7 @@ asset-download-linked = ดาวน์โหลดพร้อมไฟล์�
 asset-download-only-title = เฉพาะไฟล์นี้ โดยไม่รวมไฟล์ที่ไฟล์นี้ใช้
 asset-download-only = เฉพาะไฟล์นี้
 asset-include-animations = รวมแอนิเมชันไว้ใน .zip
+asset-include-character = รวมตัวละคร { $name }
 asset-copy-toml = คัดลอกรายการ hoard.toml
 asset-copy-id = คัดลอก ID
 asset-teach = สอนให้ Hoard รู้จักไฟล์นี้

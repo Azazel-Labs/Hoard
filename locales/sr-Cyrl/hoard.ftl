@@ -1621,6 +1621,7 @@ asset-download-linked =
 asset-download-only-title = Само ова датотека, без датотека које користи
 asset-download-only = Само ова датотека
 asset-include-animations = Укључи анимације у .zip
+asset-include-character = Укључи лик { $name }
 asset-copy-toml = Копирај hoard.toml унос
 asset-copy-id = Копирај ID
 asset-teach = Научи Hoard ову датотеку

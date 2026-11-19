@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "8bbee040b9a4d02c3fd9e13eef57f83caf0c7d52a6205ce53dc83cd2027b7b24"
+source = "650297059628ba8bbedff80d99b7553983a967f45f4d6f43d1bb6ee10853c7f2"
 translation = "869ed1fc3b055273469332423634413363dc2f8fea2bf697f2d9d0791df51865"
 
 [messages.account-add]
@@ -1834,6 +1834,10 @@ translation = "スプライトシート内"
 [messages.asset-include-animations]
 source = "Include animations in the .zip"
 translation = ".zip にアニメーションを含める"
+
+[messages.asset-include-character]
+source = "Include the character { $name }"
+translation = "キャラクター { $name } を含める"
 
 [messages.asset-inspect-aria]
 source = "Inspect { $name } full screen"

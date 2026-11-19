@@ -124,6 +124,29 @@ const material = computed(() => props.asset.material ?? null)
 const partOf = computed(() => props.asset.materials ?? [])
 const mapsBytes = computed(() => material.value?.maps.reduce((n, m) => n + m.size, 0) ?? 0)
 const anims = computed(() => animsOf(props.asset))
+/** For an animation: the character it plays on first (one its pack ships it for, else the first that fits), which
+ *  its zip can take along with what that needs. */
+const character = computed(() => {
+  if (props.asset.kind !== 'animation') return null
+  const own = props.asset.linked_from.find((l) => l.rel === 'animation' && l.kind === 'model')
+  if (own) return { id: own.id, name: own.name }
+  const fit = props.asset.fits?.find((f) => f.kind === 'model')
+  if (!fit) return null
+  return { id: fit.id, name: fit.pack_id === props.asset.pack_id ? fit.name : `${fit.name} · ${fit.pack_name}` }
+})
+const withCharacter = ref(false)
+/** The character's full record, for what it needs: fetched once it's asked for. */
+const characterFull = ref<Asset | null>(null)
+watch([withCharacter, () => character.value?.id], async ([on, id]) => {
+  characterFull.value = null
+  if (!on || !id) return
+  const a = await api.asset(id).catch(() => null)
+  if (withCharacter.value && character.value?.id === id) characterFull.value = a
+})
+/** The character's files the zip adds: itself and what it needs. */
+const characterFiles = computed(() =>
+  withCharacter.value && characterFull.value ? [characterFull.value, ...needsOf(characterFull.value)] : [],
+)
 // A material made from maps comes as its maps, not as a file of its own.
 const linkedCount = computed(() => {
   const files = new Set<string>()
@@ -132,13 +155,14 @@ const linkedCount = computed(() => {
     if (m) m.maps.forEach((x) => files.add(x.id))
     else files.add(l.id)
   }
+  for (const l of characterFiles.value) files.add(l.id)
   return files.size + (withAnimations.value ? anims.value.length : 0)
 })
 /** What the zip holds before compression: this file and each linked one once (sizes the server didn't give count 0). A
  * material counts as its maps. */
 const bundleBytes = computed(() => {
   const seen = new Map<string, number>()
-  for (const l of [...needs.value, ...(withAnimations.value ? anims.value : [])]) seen.set(l.id, l.size ?? 0)
+  for (const l of [...needs.value, ...(withAnimations.value ? anims.value : []), ...characterFiles.value]) seen.set(l.id, l.size ?? 0)
   for (const m of partOf.value) {
     if (!seen.delete(m.id)) continue
     for (const x of m.maps) seen.set(x.id, x.size)
@@ -674,8 +698,8 @@ onBeforeUnmount(() => unswipe())
           <span>{{ t('asset-download-maps', { count: needs.length }) }}</span>
           <span class="bytes">.zip · {{ humanBytes(bundleBytes) }}</span>
         </a>
-        <template v-else-if="needs.length || anims.length">
-          <a class="btn primary whole" :href="bundleUrl(asset, withAnimations)">
+        <template v-else-if="needs.length || anims.length || character">
+          <a class="btn primary whole" :href="bundleUrl(asset, withAnimations, withCharacter ? character?.id : '')">
             <span>{{ t('asset-download-linked', { count: linkedCount }) }}</span>
             <span class="bytes">.zip · {{ humanBytes(bundleBytes) }}</span>
           </a>
@@ -691,6 +715,9 @@ onBeforeUnmount(() => unswipe())
       </div>
       <label v-if="anims.length && !(isMaterial && needs.length)" class="animcheck">
         <input v-model="withAnimations" type="checkbox" /> {{ t('asset-include-animations') }}
+      </label>
+      <label v-if="character" class="animcheck">
+        <input v-model="withCharacter" type="checkbox" /> {{ t('asset-include-character', { name: character.name }) }}
       </label>
       <DownloadAs :asset="asset" />
       <div class="tools">

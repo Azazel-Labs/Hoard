@@ -1444,6 +1444,7 @@ asset-download-linked = Unduh bersama { $count } berkas tertaut
 asset-download-only-title = Hanya berkas ini, tanpa berkas yang dipakainya
 asset-download-only = Hanya berkas ini
 asset-include-animations = Sertakan animasi dalam .zip
+asset-include-character = Sertakan karakter { $name }
 asset-copy-toml = Salin entri hoard.toml
 asset-copy-id = Salin ID
 asset-teach = Ajari Hoard berkas ini

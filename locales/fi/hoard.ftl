@@ -1619,6 +1619,7 @@ asset-download-linked =
 asset-download-only-title = Vain tämä tiedosto ilman tiedostoja, joita se käyttää
 asset-download-only = Vain tämä tiedosto
 asset-include-animations = Sisällytä animaatiot .zip-tiedostoon
+asset-include-character = Sisällytä hahmo { $name }
 asset-copy-toml = Kopioi hoard.toml-merkintä
 asset-copy-id = Kopioi ID
 asset-teach = Opeta Hoardille tämä tiedosto

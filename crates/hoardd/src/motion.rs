@@ -10,7 +10,7 @@
 
 use std::collections::{HashMap, HashSet};
 use std::path::{Path, PathBuf};
-use std::sync::atomic::{AtomicBool, Ordering};
+use std::sync::atomic::{AtomicBool, AtomicU64, Ordering};
 use std::sync::{LazyLock, Mutex, PoisonError};
 
 use anyhow::{Context, Result, anyhow};
@@ -37,6 +37,8 @@ static AGAIN: AtomicBool = AtomicBool::new(false);
 static FAILED: LazyLock<Mutex<HashSet<String>>> = LazyLock::new(Mutex::default);
 /// Clips with no mesh that fit no character yet, tried again when a pack comes in (it may bring one).
 static WAITING: LazyLock<Mutex<HashSet<String>>> = LazyLock::new(Mutex::default);
+/// How many packs have come in, so a clip found to fit nothing while one came in is tried again rather than put aside.
+static PACKS_IN: AtomicU64 = AtomicU64::new(0);
 
 /// Why a clip with no mesh of its own can't be drawn: it fits no character.
 #[derive(Debug)]
@@ -79,6 +81,7 @@ pub(crate) fn kick(state: &AppState) {
 
 /// A pack came in: draw what it brought, and try again the clips that fit no character, as it may have brought one.
 pub(crate) fn pack_in(state: &AppState) {
+    PACKS_IN.fetch_add(1, Ordering::SeqCst);
     WAITING.lock().unwrap_or_else(PoisonError::into_inner).clear();
     kick(state);
 }
@@ -161,8 +164,11 @@ async fn fill(state: &AppState) -> Result<()> {
         }
         #[expect(clippy::cast_precision_loss, reason = "a fraction for a progress bar")]
         activity.progress(i as f32 / todo.len() as f32);
+        let packs = PACKS_IN.load(Ordering::SeqCst);
         match make(state, t, motion).await {
             Ok(()) => made += 1,
+            // A pack that came in meanwhile asked for another round, which tries it again.
+            Err(e) if e.is::<NoCharacter>() && PACKS_IN.load(Ordering::SeqCst) != packs => {}
             Err(e) if e.is::<NoCharacter>() => {
                 WAITING.lock().unwrap_or_else(PoisonError::into_inner).insert(t.id.clone());
             }

@@ -1571,6 +1571,7 @@ asset-download-linked =
 asset-download-only-title = Només aquest fitxer, sense els fitxers que fa servir
 asset-download-only = Només aquest fitxer
 asset-include-animations = Inclou les animacions al .zip
+asset-include-character = Inclou el personatge { $name }
 asset-copy-toml = Copia l'entrada de hoard.toml
 asset-copy-id = Copia l'ID
 asset-teach = Ensenya aquest fitxer a Hoard

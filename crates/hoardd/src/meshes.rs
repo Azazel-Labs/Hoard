@@ -241,6 +241,64 @@ pub(crate) fn view_glb(path: &Path, ext: &str, root: &Path) -> Result<Vec<u8>> {
     crate::webglb::repack(&doc.to_glb()?)
 }
 
+/// An animation's skeleton and clips as a GLB without its meshes, materials or textures: a clip saved on a copy of its
+/// character ("Download as" → Clip only), to put on another character, or a clip file read into a GLB.
+pub(crate) fn clip_glb(path: &Path, ext: &str, root: &Path) -> Result<Vec<u8>> {
+    let pack = Pack { guess: false, ..Pack::new(root) };
+    let mut doc = open(path, ext, &pack, Keep::ALL)?;
+    doc.decode()?;
+    strip_to_clips(&mut doc.json)?;
+    // Repacking drops the bytes only the meshes and images used.
+    crate::webglb::repack(&doc.to_glb()?)
+}
+
+/// Extensions only a mesh, material or texture uses.
+const DRAWING_EXTENSIONS: &[&str] = &["KHR_materials_", "KHR_texture_", "EXT_texture_", "KHR_draco_", "EXT_mesh_"];
+
+/// Drop everything but the nodes and the clips: what draws (meshes, skins, materials, textures, images, cameras) and
+/// every accessor no clip reads, the rest renumbered.
+fn strip_to_clips(json: &mut Map<String, Value>) -> Result<()> {
+    anyhow::ensure!(json.get("animations").and_then(Value::as_array).is_some_and(|a| !a.is_empty()), "it has no clips");
+    for k in ["meshes", "skins", "materials", "textures", "images", "samplers", "cameras"] {
+        json.remove(k);
+    }
+    for node in json.get_mut("nodes").and_then(Value::as_array_mut).into_iter().flatten() {
+        if let Some(n) = node.as_object_mut() {
+            for k in ["mesh", "skin", "camera", "weights"] {
+                n.remove(k);
+            }
+        }
+    }
+    let accessors = json.remove("accessors").and_then(|a| if let Value::Array(a) = a { Some(a) } else { None });
+    let accessors = accessors.unwrap_or_default();
+    let mut moved = BTreeMap::new();
+    let mut kept = Vec::new();
+    for anim in json.get_mut("animations").and_then(Value::as_array_mut).into_iter().flatten() {
+        for sampler in anim.get_mut("samplers").and_then(Value::as_array_mut).into_iter().flatten() {
+            for key in ["input", "output"] {
+                let Some(i) = sampler.get(key).and_then(Value::as_u64).and_then(|i| usize::try_from(i).ok()) else {
+                    continue;
+                };
+                let to = *moved.entry(i).or_insert_with(|| {
+                    kept.push(accessors.get(i).cloned().unwrap_or(Value::Null));
+                    kept.len() - 1
+                });
+                sampler[key] = Value::from(to);
+            }
+        }
+    }
+    json.insert("accessors".into(), Value::Array(kept));
+    for list in ["extensionsUsed", "extensionsRequired"] {
+        if let Some(a) = json.get_mut(list).and_then(Value::as_array_mut) {
+            a.retain(|n| !n.as_str().is_some_and(|n| DRAWING_EXTENSIONS.iter().any(|p| n.starts_with(p))));
+            if a.is_empty() {
+                json.remove(list);
+            }
+        }
+    }
+    Ok(())
+}
+
 /// Texture bytes (a file, or embedded in an FBX) as PNG or JPEG: those as they are, anything else Hoard can
 /// decode (TGA, BMP, DDS, PSD, …) re-encoded as PNG.
 fn image_from_bytes(bytes: &[u8], hint: &Path) -> Option<Image> {
@@ -275,6 +333,48 @@ fn image_from_bytes(bytes: &[u8], hint: &Path) -> Option<Image> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn clip_only_keeps_the_skeleton_and_clips() {
+        let dir = tempfile::tempdir().unwrap();
+        // A triangle, two keyframe times, two turns.
+        let floats: [f32; 19] = [0., 0., 0., 1., 0., 0., 0., 1., 0., 0., 1., 0., 0., 0., 1., 0., 0.38, 0., 0.92];
+        let bin: Vec<u8> = floats.iter().flat_map(|f| f.to_le_bytes()).collect();
+        std::fs::write(dir.path().join("m.bin"), &bin).unwrap();
+        let gltf = serde_json::json!({
+            "asset": { "version": "2.0" },
+            "scene": 0,
+            "scenes": [{ "nodes": [0] }],
+            "nodes": [{ "name": "Hips", "children": [1] }, { "name": "Body", "mesh": 0 }],
+            "meshes": [{ "primitives": [{ "attributes": { "POSITION": 0 } }] }],
+            "buffers": [{ "byteLength": bin.len(), "uri": "m.bin" }],
+            "bufferViews": [
+                { "buffer": 0, "byteOffset": 0, "byteLength": 36 },
+                { "buffer": 0, "byteOffset": 36, "byteLength": 8 },
+                { "buffer": 0, "byteOffset": 44, "byteLength": 32 },
+            ],
+            "accessors": [
+                { "bufferView": 0, "componentType": 5126, "count": 3, "type": "VEC3", "min": [0, 0, 0], "max": [1, 1, 0] },
+                { "bufferView": 1, "componentType": 5126, "count": 2, "type": "SCALAR", "min": [0], "max": [1] },
+                { "bufferView": 2, "componentType": 5126, "count": 2, "type": "VEC4" },
+            ],
+            "animations": [{
+                "name": "Run",
+                "samplers": [{ "input": 1, "output": 2 }],
+                "channels": [{ "sampler": 0, "target": { "node": 0, "path": "rotation" } }],
+            }],
+        });
+        let path = dir.path().join("run.gltf");
+        std::fs::write(&path, gltf.to_string()).unwrap();
+        let glb = clip_glb(&path, "gltf", dir.path()).unwrap();
+        let (json, bin) = crate::formats::read_glb(&glb).unwrap();
+        assert!(
+            json.get("meshes").is_none() && json["nodes"].as_array().unwrap().iter().all(|n| n.get("mesh").is_none())
+        );
+        assert_eq!(json["accessors"].as_array().unwrap().len(), 2, "only what the clip reads");
+        assert_eq!(json["animations"][0]["samplers"][0], serde_json::json!({ "input": 0, "output": 1 }));
+        assert!(bin.len() < 48, "the triangle's bytes are gone: {}", bin.len());
+    }
 
     #[test]
     fn textures_polysmelt_wont_embed_are_converted_to_png() {

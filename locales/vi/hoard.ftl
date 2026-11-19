@@ -1440,6 +1440,7 @@ asset-download-linked = Tải xuống cùng { $count } tệp liên kết
 asset-download-only-title = Chỉ tệp này, không kèm các tệp nó dùng
 asset-download-only = Chỉ tệp này
 asset-include-animations = Kèm hoạt ảnh trong tệp .zip
+asset-include-character = Kèm nhân vật { $name }
 asset-copy-toml = Sao chép mục hoard.toml
 asset-copy-id = Sao chép ID
 asset-teach = Dạy Hoard đọc tệp này

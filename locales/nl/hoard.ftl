@@ -1565,6 +1565,7 @@ asset-download-linked =
 asset-download-only-title = Alleen dit bestand, zonder de bestanden die het gebruikt
 asset-download-only = Alleen dit bestand
 asset-include-animations = Animaties in de .zip opnemen
+asset-include-character = Personage { $name } meenemen
 asset-copy-toml = hoard.toml-regel kopiëren
 asset-copy-id = ID kopiëren
 asset-teach = Hoard dit bestand leren

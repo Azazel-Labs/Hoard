@@ -1454,6 +1454,7 @@ asset-download-linked = { $count } bağlantılı dosyayla birlikte indir
 asset-download-only-title = Yalnızca bu dosya, kullandığı dosyalar olmadan
 asset-download-only = Yalnızca bu dosya
 asset-include-animations = Animasyonları .zip’e dahil et
+asset-include-character = { $name } karakterini ekle
 asset-copy-toml = hoard.toml girdisini kopyala
 asset-copy-id = Kimliği kopyala
 asset-teach = Bu dosyayı Hoard’a öğret

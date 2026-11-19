@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "8bbee040b9a4d02c3fd9e13eef57f83caf0c7d52a6205ce53dc83cd2027b7b24"
+source = "650297059628ba8bbedff80d99b7553983a967f45f4d6f43d1bb6ee10853c7f2"
 translation = "530e3768e270ecc495434269d0aa7741f64471672a3fe92dbc9787949d17edcc"
 
 [messages.account-add]
@@ -1837,6 +1837,10 @@ translation = "所在的精灵图集"
 [messages.asset-include-animations]
 source = "Include animations in the .zip"
 translation = "在 .zip 中包含动画"
+
+[messages.asset-include-character]
+source = "Include the character { $name }"
+translation = "包含角色 { $name }"
 
 [messages.asset-inspect-aria]
 source = "Inspect { $name } full screen"

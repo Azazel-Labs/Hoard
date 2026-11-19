@@ -89,6 +89,10 @@ fn manifest_entry(a: Asset, bundle: Option<(String, String)>, file_name: Option<
 pub(super) struct BundleParams {
     #[serde(default)]
     animations: Option<u8>,
+    /// For an animation: a character (model) to put in with it, and what it needs; one from another pack goes in a
+    /// folder named for its pack.
+    #[serde(default)]
+    character: Option<String>,
 }
 
 /// An asset and everything it needs, zipped on the fly.
@@ -98,6 +102,7 @@ pub(super) async fn asset_bundle(
     Query(p): Query<BundleParams>,
 ) -> ApiResult<Response> {
     let with_anims = p.animations.is_some_and(|a| a != 0);
+    let character = p.character;
     let id2 = id.clone();
     let names = state.settings.get();
     let (files, root_name) = db::call(&state.pool, move |c| {
@@ -106,12 +111,44 @@ pub(super) async fn asset_bundle(
         let stem =
             path.rsplit('/').next().unwrap_or(&path).rsplit_once('.').map_or(path.as_str(), |(s, _)| s).to_owned();
         let mut files = db::bundle_files(c, &ids)?;
+        if let Some(character) = &character {
+            files.extend(character_files(c, &id2, character, &ids)?);
+        }
         crate::naming::apply(c, &names.texture_names, &mut files)?;
         Ok(Some((files, stem)))
     })
     .await?
     .ok_or_else(|| AppError::not_found(tr!("error-asset-not-found", id = id)))?;
     Ok(crate::bundle::zip_files(&state, &root_name, &files, None)?)
+}
+
+/// A character to put in an animation's zip and the files it needs, those not already in (`have`); under its pack's
+/// name when it's from another pack than the animation. Nothing for an id that isn't a model.
+fn character_files(
+    c: &rusqlite::Connection,
+    animation: &str,
+    character: &str,
+    have: &[String],
+) -> anyhow::Result<Vec<db::BundleFile>> {
+    let packs: Option<(String, String, String)> = c
+        .query_row(
+            "SELECT ch.pack_id, p.name, an.pack_id FROM assets ch JOIN packs p ON p.id = ch.pack_id, assets an
+             WHERE ch.id = ?1 AND ch.kind = 'model' AND an.id = ?2",
+            [character, animation],
+            |r| Ok((r.get(0)?, r.get(1)?, r.get(2)?)),
+        )
+        .optional()?;
+    let Some((pack, pack_name, own)) = packs else { return Ok(Vec::new()) };
+    let ids: Vec<String> =
+        db::dependency_closure(c, character, false)?.into_iter().filter(|id| !have.contains(id)).collect();
+    let mut files = db::bundle_files(c, &ids)?;
+    if pack != own {
+        let folder = pack_name.replace(['/', '\\'], "_");
+        for f in &mut files {
+            f.path = format!("{folder}/{}", f.path);
+        }
+    }
+    Ok(files)
 }
 
 #[derive(Debug, Deserialize)]

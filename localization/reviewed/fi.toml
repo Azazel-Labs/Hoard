@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "8bbee040b9a4d02c3fd9e13eef57f83caf0c7d52a6205ce53dc83cd2027b7b24"
+source = "650297059628ba8bbedff80d99b7553983a967f45f4d6f43d1bb6ee10853c7f2"
 translation = "9bd6df5ffb27941fd7574669812413d7eaa17a0920718334cfd6ce3df12e13f5"
 
 [messages.account-add]
@@ -1905,6 +1905,10 @@ translation = "Sprite-arkissa"
 [messages.asset-include-animations]
 source = "Include animations in the .zip"
 translation = "Sisällytä animaatiot .zip-tiedostoon"
+
+[messages.asset-include-character]
+source = "Include the character { $name }"
+translation = "Sisällytä hahmo { $name }"
 
 [messages.asset-inspect-aria]
 source = "Inspect { $name } full screen"

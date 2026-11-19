@@ -1677,6 +1677,7 @@ asset-download-linked =
 asset-download-only-title = Jen tento soubor, bez souborů, které používá
 asset-download-only = Jen tento soubor
 asset-include-animations = Zahrnout animace do .zip
+asset-include-character = Přidat postavu { $name }
 asset-copy-toml = Kopírovat záznam do hoard.toml
 asset-copy-id = Kopírovat ID
 asset-teach = Naučit Hoard tento soubor

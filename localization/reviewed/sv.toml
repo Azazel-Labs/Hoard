@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "8bbee040b9a4d02c3fd9e13eef57f83caf0c7d52a6205ce53dc83cd2027b7b24"
+source = "650297059628ba8bbedff80d99b7553983a967f45f4d6f43d1bb6ee10853c7f2"
 translation = "33cd08db8c788b60f7d38799a27fa29813fa65c6c3025e9967d656790fb2435e"
 
 [messages.account-add]
@@ -1901,6 +1901,10 @@ translation = "I ett spriteark"
 [messages.asset-include-animations]
 source = "Include animations in the .zip"
 translation = "Ta med animationer i .zip-filen"
+
+[messages.asset-include-character]
+source = "Include the character { $name }"
+translation = "Ta med figuren { $name }"
 
 [messages.asset-inspect-aria]
 source = "Inspect { $name } full screen"

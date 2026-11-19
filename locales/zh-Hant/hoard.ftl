@@ -1446,6 +1446,7 @@ asset-download-linked = 連同 { $count } 個連結的檔案一起下載
 asset-download-only-title = 只下載這個檔案，不含它使用的檔案
 asset-download-only = 只下載這個檔案
 asset-include-animations = 在 .zip 中包含動畫
+asset-include-character = 包含角色 { $name }
 asset-copy-toml = 複製 hoard.toml 項目
 asset-copy-id = 複製 ID
 asset-teach = 教 Hoard 讀取這個檔案

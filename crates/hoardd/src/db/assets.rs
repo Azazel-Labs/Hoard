@@ -109,6 +109,9 @@ pub(crate) fn get_asset(conn: &Connection, id: &str) -> Result<Option<Asset>> {
         conn.prepare("SELECT kind FROM derivatives WHERE asset_id = ?1 AND kind NOT LIKE 'as:%' ORDER BY kind")?;
     asset.derivatives = stmt.query_map([&asset.id], |r| r.get(0))?.collect::<rusqlite::Result<_>>()?;
     asset.formats = crate::formats::options(&asset.ext, &asset.derivatives);
+    if crate::formats::offers_clip(asset.kind == AssetKind::Animation, &asset.ext, &asset.derivatives) {
+        asset.formats.push(crate::formats::clip_option());
+    }
     asset.family = family(conn, &asset.id)?;
     if asset.kind == AssetKind::Model {
         asset.facing = Some(asset_facing(conn, &asset.id, &asset.pack_id)?).filter(|f| !f.is_upright());

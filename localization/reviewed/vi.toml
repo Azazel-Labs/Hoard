@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "8bbee040b9a4d02c3fd9e13eef57f83caf0c7d52a6205ce53dc83cd2027b7b24"
+source = "650297059628ba8bbedff80d99b7553983a967f45f4d6f43d1bb6ee10853c7f2"
 translation = "42d6d2350a51c56e55a07a75988a6748d9e232912ffffb903defbf54bfd56e2e"
 
 [messages.account-add]
@@ -1837,6 +1837,10 @@ translation = "Trong sprite sheet"
 [messages.asset-include-animations]
 source = "Include animations in the .zip"
 translation = "Kèm hoạt ảnh trong tệp .zip"
+
+[messages.asset-include-character]
+source = "Include the character { $name }"
+translation = "Kèm nhân vật { $name }"
 
 [messages.asset-inspect-aria]
 source = "Inspect { $name } full screen"

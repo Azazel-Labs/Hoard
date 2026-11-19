@@ -1450,6 +1450,7 @@ asset-download-linked = Letöltés { $count } kapcsolt fájllal
 asset-download-only-title = Csak ez a fájl, az általa használt fájlok nélkül
 asset-download-only = Csak ez a fájl
 asset-include-animations = Animációk hozzáadása a .zip fájlhoz
+asset-include-character = A(z) { $name } karakter hozzáadása
 asset-copy-toml = hoard.toml-bejegyzés másolása
 asset-copy-id = Azonosító másolása
 asset-teach = A fájl megtanítása a Hoardnak

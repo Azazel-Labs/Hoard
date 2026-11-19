@@ -1700,6 +1700,7 @@ asset-download-linked =
 asset-download-only-title = Doar acest fișier, fără fișierele pe care le folosește
 asset-download-only = Doar acest fișier
 asset-include-animations = Includeți animațiile în .zip
+asset-include-character = Include personajul { $name }
 asset-copy-toml = Copiați intrarea hoard.toml
 asset-copy-id = Copiați ID-ul
 asset-teach = Învățați Hoard acest fișier

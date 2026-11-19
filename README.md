@@ -542,7 +542,9 @@ software rasterizer (`apt install mesa-vulkan-drivers`). Without any adapter, ev
    Blender's `Bone.001`), so a Mixamo clip fits every Mixamo character; its own pack's come first. An animation
    plays in the 3D viewer on a character it fits, Plays on picking any other of them. Its thumbnail is drawn halfway
    through the clip, on that character when it has no mesh of its own, and its tile shows its length. A character's
-   viewer plays its own clips and, under "Animations that fit", any of those, each fetched when picked. With Settings →
+   viewer plays its own clips and, under "Animations that fit", any of those, each fetched when picked. An animation's zip can take its character along ("Include the character":
+   one from another pack goes in a folder named for it), and it downloads as "Clip only, no mesh (GLB)", its skeleton
+   and clips without the mesh it was saved on. With Settings →
    Performance → Thumbnails → "Moving thumbnails for animations" on (it's off: they take space and time to make), each
    animation also gets a three-second looping WebP of it playing on its character, which its tile plays while the
    pointer is over it; turning it off deletes them. Game-engine

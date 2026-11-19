@@ -1565,6 +1565,7 @@ asset-download-linked =
 asset-download-only-title = Net hierdie lêer, sonder die lêers wat dit gebruik
 asset-download-only = Net hierdie lêer
 asset-include-animations = Sluit animasies by die .zip in
+asset-include-character = Sluit die karakter { $name } in
 asset-copy-toml = Kopieer hoard.toml-inskrywing
 asset-copy-id = Kopieer ID
 asset-teach = Leer Hoard hierdie lêer

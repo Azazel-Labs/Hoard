@@ -1440,6 +1440,7 @@ asset-download-linked = リンクされた { $count } 個のファイルと一�
 asset-download-only-title = 使っているファイルを含めず、このファイルだけ
 asset-download-only = このファイルだけ
 asset-include-animations = .zip にアニメーションを含める
+asset-include-character = キャラクター { $name } を含める
 asset-copy-toml = hoard.toml のエントリーをコピー
 asset-copy-id = ID をコピー
 asset-teach = このファイルを Hoard に教える

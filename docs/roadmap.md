@@ -43,10 +43,8 @@ from the GLB Blender makes of a .blend. Within a pack, a file of clips with no m
 for one clip, becomes an animation linked to the characters it fits nearby, and across the library characters list
 "Animations that fit" and animations "Characters it fits". An animation plays on any character it fits, picked
 under Plays on, and its thumbnail and tile show it halfway through the clip, with its length; a character's viewer
-plays any animation that fits it. What's left:
-
-- **Download them either way.** An animation comes with or without its character's mesh, and a character with or
-  without its animations, as `?animations=1` does now.
+plays any animation that fits it. An animation downloads with the character it plays on, or as its skeleton and
+clips alone, and a character with its animations. What's left:
 
 A clip whose root travels (a walk, a run, a jump forward) is shown traveling, without leaving the frame: the camera
 follows the character, and a ground grid beneath it scrolls the other way, so root motion and a clip made to play in

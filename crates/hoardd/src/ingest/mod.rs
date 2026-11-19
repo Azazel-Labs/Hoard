@@ -295,6 +295,10 @@ pub(crate) fn ingest_pack(state: &AppState, rt: &Handle, pack_id: &str, auto_nam
     tx.execute("UPDATE packs SET files_done = files_total WHERE id = ?1", [pack_id])?;
     tx.commit()?;
     tracing::info!(pack = pack_id, links = n_links, families = n_families, "pack ingested");
+    {
+        let _in_runtime = rt.enter();
+        crate::motion::pack_in(state);
+    }
     crate::materials::detect_logged(state, rt, &mut conn, pack_id);
     read_pack_files(state, rt, pack_id, auto_name, wrapper_name);
 

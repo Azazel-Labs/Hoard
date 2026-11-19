@@ -44,6 +44,18 @@ fn opt(format: &str, label: &str, resizable: bool) -> FormatOption {
 /// A model as a GLB with its textures as files beside it, turned the way its pack's models face.
 const GLB_LABEL: &str = "GLB + textures (zip)";
 
+/// An animation's skeleton and clips without the mesh it was saved on, as a GLB (see [`crate::meshes::clip_glb`]).
+pub(crate) const CLIP: &str = "clip";
+
+/// Whether an asset can be downloaded as [`CLIP`]: an animation polysmelt reads, or Blender made a GLB of.
+pub(crate) fn offers_clip(animation: bool, ext: &str, derivatives: &[String]) -> bool {
+    animation && (crate::meshes::reads(&ext.to_ascii_lowercase()) || derivatives.iter().any(|d| d == "glb"))
+}
+
+pub(crate) fn clip_option() -> FormatOption {
+    opt(CLIP, "Clip only, no mesh (GLB)", false)
+}
+
 /// What this asset can be downloaded as, besides itself.
 pub(crate) fn options(ext: &str, derivatives: &[String]) -> Vec<FormatOption> {
     let ext = ext.to_ascii_lowercase();
@@ -197,6 +209,9 @@ pub(crate) fn convert(
                 "woff2" => Output { bytes: crate::fonts::to_woff2(&sfnt)?, ext: "woff2" },
                 _ => Output { ext: if crate::fonts::is_cff(&sfnt) { "otf" } else { "ttf" }, bytes: sfnt },
             })
+        }
+        CLIP if crate::meshes::reads(&src) => {
+            Ok(Output { bytes: crate::meshes::clip_glb(local, &src, root)?, ext: "glb" })
         }
         "view" if crate::meshes::reads(&src) => {
             Ok(Output { bytes: crate::meshes::view_glb(local, &src, root)?, ext: "glb" })

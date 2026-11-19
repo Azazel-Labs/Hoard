@@ -1579,6 +1579,7 @@ asset-download-linked =
 asset-download-only-title = Solo questo file, senza i file che usa
 asset-download-only = Solo questo file
 asset-include-animations = Includi le animazioni nello .zip
+asset-include-character = Includi il personaggio { $name }
 asset-copy-toml = Copia la voce di hoard.toml
 asset-copy-id = Copia ID
 asset-teach = Insegna questo file a Hoard

@@ -102,6 +102,16 @@ test('an animation fits the characters with its skeleton in other packs, and eac
     await expect(panel.getByRole('heading', { name: run.name })).toBeVisible()
     await expect(section.getByRole('heading', { name: 'Characters it fits (1)' })).toBeVisible()
     await expect(section.getByRole('button', { name: new RegExp(`${hero.name}.*${heroes}`) })).toBeVisible()
+    // Its zip can take that character along, in a folder named for its pack, and it downloads as a clip on its own.
+    await panel.getByRole('checkbox', { name: `Include the character ${hero.name} · ${heroes}` }).check()
+    await expect(panel.locator('a[href*="bundle.zip"]')).toHaveAttribute('href', new RegExp(`character=${hero.id}`))
+    await expect(panel.locator('a[href*="bundle.zip"]')).toContainText('1 linked file')
+    const zip = await api.get(`/api/assets/${run.id}/bundle.zip?character=${hero.id}`)
+    expect((await zip.body()).toString('latin1')).toContain(`${heroes}/hero.glb`)
+    await expect(panel.locator('#as-format option', { hasText: 'Clip only, no mesh (GLB)' })).toHaveCount(1)
+    const clip = await api.get(`/api/assets/${run.id}/as/clip?wait=60`)
+    expect(clip.status()).toBe(200)
+    expect((await clip.body()).subarray(0, 4).toString()).toBe('glTF')
     // Its own pack has no character for it, so it plays on the one from the other pack, which says so.
     const playsOn = panel.getByRole('combobox', { name: 'Plays on' })
     await expect(playsOn).toBeVisible({ timeout: 30_000 })

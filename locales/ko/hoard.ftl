@@ -1416,6 +1416,7 @@ asset-download-linked = 연결된 파일 { $count }개와 함께 다운로드
 asset-download-only-title = 사용하는 파일 없이 이 파일만
 asset-download-only = 이 파일만
 asset-include-animations = .zip에 애니메이션 포함
+asset-include-character = 캐릭터 { $name } 포함
 asset-copy-toml = hoard.toml 항목 복사
 asset-copy-id = ID 복사
 asset-teach = 이 파일을 Hoard에 가르치기

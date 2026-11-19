@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "8bbee040b9a4d02c3fd9e13eef57f83caf0c7d52a6205ce53dc83cd2027b7b24"
+source = "650297059628ba8bbedff80d99b7553983a967f45f4d6f43d1bb6ee10853c7f2"
 translation = "492346de275ddfb98a7c980cda9c461c7c8cf91addc47e4b748e7c38ce659fb3"
 
 [messages.account-add]
@@ -1901,6 +1901,10 @@ translation = "En un full de sprites"
 [messages.asset-include-animations]
 source = "Include animations in the .zip"
 translation = "Inclou les animacions al .zip"
+
+[messages.asset-include-character]
+source = "Include the character { $name }"
+translation = "Inclou el personatge { $name }"
 
 [messages.asset-inspect-aria]
 source = "Inspect { $name } full screen"

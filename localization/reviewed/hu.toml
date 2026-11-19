@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "8bbee040b9a4d02c3fd9e13eef57f83caf0c7d52a6205ce53dc83cd2027b7b24"
+source = "650297059628ba8bbedff80d99b7553983a967f45f4d6f43d1bb6ee10853c7f2"
 translation = "230aa92a6033cfd0e81420ca5ef21ba788bfd9cbf50cc6964032f8c9499222bf"
 
 [messages.account-add]
@@ -1838,6 +1838,10 @@ translation = "Sprite-lapon"
 [messages.asset-include-animations]
 source = "Include animations in the .zip"
 translation = "Animációk hozzáadása a .zip fájlhoz"
+
+[messages.asset-include-character]
+source = "Include the character { $name }"
+translation = "A(z) { $name } karakter hozzáadása"
 
 [messages.asset-inspect-aria]
 source = "Inspect { $name } full screen"

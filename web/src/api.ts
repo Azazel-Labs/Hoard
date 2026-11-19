@@ -375,7 +375,13 @@ export const motionUrl = (a: { id: string; has_motion?: boolean; thumb_rev?: str
   a.has_motion ? `/api/assets/${a.id}/derivative/motion${a.thumb_rev ? `?v=${a.thumb_rev}` : ''}` : null
 /** An image at most 2048 px on its longer side (the image itself when it's that small and browsers read it). */
 export const liteUrl = (a: { id: string }) => `/api/assets/${a.id}/lite`
-export const bundleUrl = (a: Asset, animations = false) => `/api/assets/${a.id}/bundle.zip${animations ? '?animations=1' : ''}`
+/** An asset and what it needs, zipped; with its animations, or (for an animation) with a character by id. */
+export function bundleUrl(a: Asset, animations = false, character = '') {
+  const q = new URLSearchParams()
+  if (animations) q.set('animations', '1')
+  if (character) q.set('character', character)
+  return `/api/assets/${a.id}/bundle.zip${q.size ? `?${q}` : ''}`
+}
 export const packZipUrl = (packId: string) => `/api/packs/${packId}/bundle.zip`
 export const collectionZipUrl = (id: string, sources = false) =>
   `/api/collections/${id}/bundle.zip${sources ? '?sources=1' : ''}`

@@ -73,12 +73,12 @@ pub(crate) async fn request(
     let id = asset_id.to_owned();
     let (settings, glb) = (state.settings.get(), format == "glb");
     let info = db::call(&state.pool, move |c| {
-        let row: Option<(String, String, String, String, String)> = rusqlite::OptionalExtension::optional(
-            c.query_row("SELECT path, ext, blob_hash, meta, pack_id FROM assets WHERE id = ?1", [&id], |r| {
-                Ok((r.get(0)?, r.get(1)?, r.get(2)?, r.get(3)?, r.get(4)?))
+        let row: Option<(String, String, String, String, String, String)> = rusqlite::OptionalExtension::optional(
+            c.query_row("SELECT path, ext, blob_hash, meta, pack_id, kind FROM assets WHERE id = ?1", [&id], |r| {
+                Ok((r.get(0)?, r.get(1)?, r.get(2)?, r.get(3)?, r.get(4)?, r.get(5)?))
             }),
         )?;
-        let Some((path, ext, hash, meta, pack_id)) = row else { return Ok(None) };
+        let Some((path, ext, hash, meta, pack_id, kind)) = row else { return Ok(None) };
         let mut stmt = c.prepare("SELECT kind, blob_hash FROM derivatives WHERE asset_id = ?1")?;
         let derivs: Vec<(String, String)> =
             stmt.query_map([&id], |r| Ok((r.get(0)?, r.get(1)?)))?.collect::<rusqlite::Result<_>>()?;
@@ -88,12 +88,12 @@ pub(crate) async fn request(
         } else {
             crate::naming::ForDownload::default()
         };
-        Ok(Some((path, ext, hash, meta, derivs, db::asset_facing(c, &id, &pack_id)?, naming)))
+        Ok(Some((path, ext, hash, meta, derivs, db::asset_facing(c, &id, &pack_id)?, naming, kind == "animation")))
     })
     .await
     .map_err(fail)?
     .ok_or(Refused::NotFound)?;
-    let (mut path, mut ext, mut hash, meta, derivs, facing, naming) = info;
+    let (mut path, mut ext, mut hash, meta, derivs, facing, naming, animation) = info;
     let file = path.rsplit('/').next().unwrap_or(&path).to_owned();
     let stem = file.rsplit_once('.').map_or(file.as_str(), |(s, _)| s).to_owned();
     let names: Vec<String> = derivs.iter().map(|(k, _)| k.clone()).collect();
@@ -102,6 +102,7 @@ pub(crate) async fn request(
     let view = format == "view" && max.is_none() && (readable || names.iter().any(|n| n == "glb"));
     let allowed = view
         || options(&ext, &names).iter().any(|o| o.format == format)
+        || (format == super::CLIP && super::offers_clip(animation, &ext, &names))
         || (max.is_some() && resizable_as_itself(&ext) == Some(format));
     if !allowed {
         return Err(Refused::Unsupported(tr!("error-cant-download-as", ext = ext, format = format)));
@@ -128,7 +129,7 @@ pub(crate) async fn request(
         hash.clone_from(h);
     }
     // A model only Blender reads is shown, and downloaded as a GLB, from the GLB Blender made of it.
-    if (view || format == "glb") && !readable {
+    if (view || format == "glb" || format == super::CLIP) && !readable {
         let glb = derivs.iter().find(|(k, _)| k == "glb").ok_or(Refused::NotFound)?;
         path = format!("{}.glb", path.rsplit_once('.').map_or(path.as_str(), |(s, _)| s));
         ext = "glb".into();
@@ -201,6 +202,7 @@ fn format_name(format: &str) -> String {
         "tiff" => "TIFF".into(),
         "exr" => "OpenEXR".into(),
         "view" => "GLB for the viewer".into(),
+        super::CLIP => "GLB clip".into(),
         other => crate::spritesheet::label(other).map_or_else(|| other.to_ascii_uppercase(), str::to_owned),
     }
 }

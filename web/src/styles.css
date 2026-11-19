@@ -224,8 +224,10 @@ input.field:focus, textarea.field:focus {
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 22%, transparent);
 }
 
+/* Read out but not seen. Pinned to the corner of what it's positioned against: left where it would sit, at the foot of
+   a page that scrolls inside the window (Settings), it would stretch the window itself and give it a second scrollbar. */
 .visually-hidden {
-  position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap;
+  position: absolute; top: 0; left: 0; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap;
 }
 
 /* What a part of the app that loads on first use shows meanwhile (see lazy.ts). */

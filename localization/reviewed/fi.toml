@@ -9811,6 +9811,14 @@ translation = "Teemat"
 source = "Thumbnails"
 translation = "Pikkukuvat"
 
+[messages.settings-thumbs-avif]
+source = "Send thumbnails as AVIF"
+translation = "Lähetä pikkukuvat AVIF-muodossa"
+
+[messages.settings-thumbs-avif-what]
+source = "Browsers that show AVIF get smaller thumbnails, often less than half the size. Each is made from the stored thumbnail the first time it’s shown and kept with the conversions; until then the stored one is sent. Making them keeps up to two cores busy while a big library is first browsed. Lossless thumbnails and pixel art are sent as they are."
+translation = "AVIF-kuvia näyttävät selaimet saavat pienempiä pikkukuvia, usein alle puolet koosta. Kukin tehdään tallennetusta pikkukuvasta, kun se näytetään ensimmäisen kerran, ja säilytetään muunnosten kanssa; siihen asti lähetetään tallennettu. Niiden tekeminen pitää enintään kaksi ydintä kiireisenä, kun suurta kirjastoa selataan ensimmäistä kertaa. Häviöttömät pikkukuvat ja pikselitaide lähetetään sellaisinaan."
+
 [messages.settings-thumbs-balanced]
 source = "Balanced"
 translation = "Tasapainoinen"

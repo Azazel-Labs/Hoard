@@ -9762,6 +9762,14 @@ translation = "Temaer"
 source = "Thumbnails"
 translation = "Miniaturer"
 
+[messages.settings-thumbs-avif]
+source = "Send thumbnails as AVIF"
+translation = "Send miniaturer som AVIF"
+
+[messages.settings-thumbs-avif-what]
+source = "Browsers that show AVIF get smaller thumbnails, often less than half the size. Each is made from the stored thumbnail the first time it’s shown and kept with the conversions; until then the stored one is sent. Making them keeps up to two cores busy while a big library is first browsed. Lossless thumbnails and pixel art are sent as they are."
+translation = "Browsere, der kan vise AVIF, får mindre miniaturer, ofte under halvdelen af størrelsen. Hver laves ud fra den gemte miniature første gang, den vises, og gemmes sammen med konverteringerne; indtil da sendes den gemte. At lave dem holder op til to kerner beskæftiget, mens et stort bibliotek gennemses første gang. Tabsfri miniaturer og pixelkunst sendes, som de er."
+
 [messages.settings-thumbs-balanced]
 source = "Balanced"
 translation = "Balanceret"

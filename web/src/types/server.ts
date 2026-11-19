@@ -408,6 +408,7 @@ export interface Settings {
     /** Search the stores for packs' pages in the background. */
     store_lookup: OptionSetting<boolean>
     thumb_quality: OptionSetting<ThumbQuality>
+    thumb_avif: OptionSetting<boolean>
     /** Make a short looping movie of each animation for its tile. Off by default: it takes space and time. */
     motion_thumbs: OptionSetting<boolean>
     /** Most space cached "Download as" conversions may take, in MiB. */
@@ -551,6 +552,7 @@ export interface SettingsPatch {
   guest_browsing?: boolean | null
   store_lookup?: boolean | null
   thumb_quality?: ThumbQuality | null
+  thumb_avif?: boolean | null
   motion_thumbs?: boolean | null
   conversion_cache_mb?: number | null
   name?: string | null

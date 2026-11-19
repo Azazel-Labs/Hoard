@@ -44,6 +44,17 @@ impl ThumbQuality {
             Self::Lossless => None,
         }
     }
+
+    /// The AVIF quality thumbnails are sent at when Settings asks for AVIF (about as sharp as the JPEG, and smaller);
+    /// none for Lossless, which keeps them exact.
+    pub(crate) fn avif_quality(self) -> Option<u8> {
+        match self {
+            Self::Small => Some(55),
+            Self::Balanced => Some(68),
+            Self::Sharp => Some(80),
+            Self::Lossless => None,
+        }
+    }
 }
 
 /// What's been saved from the portal. `None` means "use the flag".
@@ -106,6 +117,9 @@ pub(crate) struct Saved {
     pub(crate) guest_browsing: Option<bool>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub(crate) thumb_quality: Option<ThumbQuality>,
+    /// Send browsers that read AVIF their thumbnails as AVIF, made from the stored ones and kept with the conversions.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub(crate) thumb_avif: Option<bool>,
     /// Search the stores for new packs' pages in the background, attaching the ones that are certain.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub(crate) store_lookup: Option<bool>,
@@ -196,6 +210,7 @@ pub(crate) struct Effective {
     pub(crate) clap: bool,
     pub(crate) motion_thumbs: bool,
     pub(crate) thumb_quality: ThumbQuality,
+    pub(crate) thumb_avif: bool,
     pub(crate) conversion_cache_mb: u64,
     pub(crate) texture_names: crate::naming::TextureNames,
     pub(crate) conversion_rules: crate::reformat::Rules,
@@ -290,6 +305,7 @@ impl Saved {
             clap: self.clap.unwrap_or(false),
             motion_thumbs: self.motion_thumbs.unwrap_or(false),
             thumb_quality: self.thumb_quality.unwrap_or_default(),
+            thumb_avif: self.thumb_avif.unwrap_or(false),
             conversion_cache_mb: self.conversion_cache_mb.unwrap_or(DEFAULT_CONVERSION_CACHE_MB),
             texture_names: self.texture_names.clone().unwrap_or_default(),
             conversion_rules: self.conversion_rules.clone().unwrap_or_default(),

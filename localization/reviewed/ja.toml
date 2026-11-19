@@ -9585,6 +9585,14 @@ translation = "テーマ"
 source = "Thumbnails"
 translation = "サムネイル"
 
+[messages.settings-thumbs-avif]
+source = "Send thumbnails as AVIF"
+translation = "サムネイルを AVIF で送る"
+
+[messages.settings-thumbs-avif-what]
+source = "Browsers that show AVIF get smaller thumbnails, often less than half the size. Each is made from the stored thumbnail the first time it’s shown and kept with the conversions; until then the stored one is sent. Making them keeps up to two cores busy while a big library is first browsed. Lossless thumbnails and pixel art are sent as they are."
+translation = "AVIF を表示できるブラウザには、より小さい（多くは半分以下の）サムネイルが送られます。各サムネイルは初めて表示されたときに保存済みのサムネイルから作られ、変換と一緒に保管されます。それまでは保存済みのものが送られます。大きなライブラリを初めて閲覧する間、作成のために最大 2 コアが使われます。ロスレスのサムネイルとピクセルアートはそのまま送られます。"
+
 [messages.settings-thumbs-balanced]
 source = "Balanced"
 translation = "バランス"

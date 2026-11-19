@@ -9574,6 +9574,14 @@ translation = "ธีม"
 source = "Thumbnails"
 translation = "ภาพย่อ"
 
+[messages.settings-thumbs-avif]
+source = "Send thumbnails as AVIF"
+translation = "ส่งภาพย่อเป็น AVIF"
+
+[messages.settings-thumbs-avif-what]
+source = "Browsers that show AVIF get smaller thumbnails, often less than half the size. Each is made from the stored thumbnail the first time it’s shown and kept with the conversions; until then the stored one is sent. Making them keeps up to two cores busy while a big library is first browsed. Lossless thumbnails and pixel art are sent as they are."
+translation = "เบราว์เซอร์ที่แสดง AVIF ได้จะได้รับภาพย่อที่เล็กลง มักเหลือไม่ถึงครึ่ง ภาพย่อแต่ละภาพจะสร้างจากภาพย่อที่เก็บไว้เมื่อแสดงครั้งแรก และเก็บไว้กับไฟล์ที่แปลงแล้ว ระหว่างนั้นจะส่งภาพที่เก็บไว้แทน การสร้างจะใช้ได้ถึงสองคอร์ขณะที่เปิดดูคลังขนาดใหญ่เป็นครั้งแรก ภาพย่อแบบไม่สูญเสียคุณภาพและพิกเซลอาร์ตจะส่งไปตามเดิม"
+
 [messages.settings-thumbs-balanced]
 source = "Balanced"
 translation = "สมดุล"

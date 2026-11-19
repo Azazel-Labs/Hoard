@@ -9599,6 +9599,14 @@ translation = "Temalar"
 source = "Thumbnails"
 translation = "Küçük resimler"
 
+[messages.settings-thumbs-avif]
+source = "Send thumbnails as AVIF"
+translation = "Küçük resimleri AVIF olarak gönder"
+
+[messages.settings-thumbs-avif-what]
+source = "Browsers that show AVIF get smaller thumbnails, often less than half the size. Each is made from the stored thumbnail the first time it’s shown and kept with the conversions; until then the stored one is sent. Making them keeps up to two cores busy while a big library is first browsed. Lossless thumbnails and pixel art are sent as they are."
+translation = "AVIF gösterebilen tarayıcılar daha küçük küçük resimler alır, çoğu zaman boyutun yarısından da az. Her biri ilk gösterildiğinde saklanan küçük resimden yapılır ve dönüştürmelerle birlikte tutulur; o zamana kadar saklanan gönderilir. Bunları yapmak, büyük bir kitaplığa ilk kez göz atılırken en fazla iki çekirdeği meşgul eder. Kayıpsız küçük resimler ve piksel sanatı olduğu gibi gönderilir."
+
 [messages.settings-thumbs-balanced]
 source = "Balanced"
 translation = "Dengeli"

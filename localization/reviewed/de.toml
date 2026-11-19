@@ -9762,6 +9762,14 @@ translation = "Designs"
 source = "Thumbnails"
 translation = "Vorschaubilder"
 
+[messages.settings-thumbs-avif]
+source = "Send thumbnails as AVIF"
+translation = "Vorschaubilder als AVIF senden"
+
+[messages.settings-thumbs-avif-what]
+source = "Browsers that show AVIF get smaller thumbnails, often less than half the size. Each is made from the stored thumbnail the first time it’s shown and kept with the conversions; until then the stored one is sent. Making them keeps up to two cores busy while a big library is first browsed. Lossless thumbnails and pixel art are sent as they are."
+translation = "Browser, die AVIF anzeigen, bekommen kleinere Vorschaubilder, oft weniger als halb so groß. Jedes wird beim ersten Anzeigen aus dem gespeicherten Vorschaubild erstellt und bei den Umwandlungen aufbewahrt; bis dahin wird das gespeicherte gesendet. Das Erstellen hält bis zu zwei Kerne beschäftigt, während eine große Bibliothek zum ersten Mal durchgesehen wird. Verlustfreie Vorschaubilder und Pixel-Art werden unverändert gesendet."
+
 [messages.settings-thumbs-balanced]
 source = "Balanced"
 translation = "Ausgewogen"

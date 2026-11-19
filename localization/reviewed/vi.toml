@@ -9571,6 +9571,14 @@ translation = "Chủ đề"
 source = "Thumbnails"
 translation = "Ảnh thu nhỏ"
 
+[messages.settings-thumbs-avif]
+source = "Send thumbnails as AVIF"
+translation = "Gửi ảnh thu nhỏ dưới dạng AVIF"
+
+[messages.settings-thumbs-avif-what]
+source = "Browsers that show AVIF get smaller thumbnails, often less than half the size. Each is made from the stored thumbnail the first time it’s shown and kept with the conversions; until then the stored one is sent. Making them keeps up to two cores busy while a big library is first browsed. Lossless thumbnails and pixel art are sent as they are."
+translation = "Trình duyệt hiển thị được AVIF sẽ nhận ảnh thu nhỏ nhỏ hơn, thường chưa tới một nửa kích thước. Mỗi ảnh được tạo từ ảnh thu nhỏ đã lưu vào lần đầu hiển thị và được giữ cùng các bản chuyển đổi; trước đó ảnh đã lưu sẽ được gửi. Việc tạo chúng chiếm tới hai lõi trong khi một thư viện lớn được duyệt lần đầu. Ảnh thu nhỏ không mất dữ liệu và pixel art được gửi nguyên trạng."
+
 [messages.settings-thumbs-balanced]
 source = "Balanced"
 translation = "Cân bằng"

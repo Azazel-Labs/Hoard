@@ -1,4 +1,4 @@
-import { assetsOf, uploadPack, waitReady } from './support/api'
+import { assetsOf, HOARD_HEADERS, uploadPack, waitReady } from './support/api'
 import { png, zip } from './support/files'
 import { expect, openPack, test, tile, unique } from './support/test'
 
@@ -229,4 +229,46 @@ test('Procreate, Affinity, EPS and camera raw files show the picture inside', as
     await api.post('/api/archive', { data: { packs: [pack.id] } })
     await api.post('/api/archive/purge', { data: { packs: [pack.id] } })
   }
+})
+
+test('with AVIF on, a browser that reads it gets thumbnails as AVIF, made once the stored one has been sent', async ({ page, api }) => {
+  test.setTimeout(120_000)
+  // Smooth color with detail, like a render: its thumbnail is a JPEG that AVIF shrinks.
+  const photo = png(256, 256, (x, y) => {
+    const ripple = Math.sin(x / 11) * Math.cos(y / 15) * 40
+    const c = (v: number) => Math.max(0, Math.min(255, Math.round(v * 200 + ripple)))
+    return [c(x / 256), c(y / 256), c(1 - (x * y) / 65_536), 255]
+  })
+  const pack = await uploadPack(api, `E2E AVIF ${unique()}`, [{ relpath: 'render.png', data: photo }])
+  await waitReady(api, [pack.id])
+  const [render] = await assetsOf(api, pack.id)
+  const thumb = (accept: string) => api.get(`/api/assets/${render.id}/thumb`, { headers: { Accept: accept } })
+
+  await page.goto('/#settings/performance')
+  const avif = page.getByRole('checkbox', { name: 'Send thumbnails as AVIF' })
+  await expect(avif).not.toBeChecked()
+  await avif.check()
+  await expect.poll(async () => (await (await api.get('/api/admin/settings')).json()).options.thumb_avif.value).toBe(true)
+  try {
+    // The stored picture goes out while the AVIF is made, not to be kept by the browser.
+    const first = await thumb('image/avif,image/webp,*/*')
+    expect(first.headers()['content-type']).toBe('image/jpeg')
+    expect(first.headers()['cache-control']).toContain('no-cache')
+    expect(first.headers()['vary']).toBe('Accept')
+    let made = first
+    await expect
+      .poll(async () => (made = await thumb('image/avif,image/webp,*/*')).headers()['content-type'], { timeout: 60_000 })
+      .toBe('image/avif')
+    expect(made.headers()['vary']).toBe('Accept')
+    const body = await made.body()
+    expect(body.subarray(4, 12).toString('latin1')).toBe('ftypavif')
+    expect(body.length).toBeLessThan((await first.body()).length)
+
+    // One that doesn't read AVIF still gets the JPEG.
+    expect((await thumb('image/webp,*/*')).headers()['content-type']).toBe('image/jpeg')
+  } finally {
+    await api.put('/api/admin/settings', { headers: HOARD_HEADERS, data: { thumb_avif: null } })
+  }
+  await page.reload()
+  await expect(page.getByRole('checkbox', { name: 'Send thumbnails as AVIF' })).not.toBeChecked()
 })

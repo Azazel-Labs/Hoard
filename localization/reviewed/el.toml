@@ -9821,6 +9821,14 @@ translation = "Θέματα"
 source = "Thumbnails"
 translation = "Μικρογραφίες"
 
+[messages.settings-thumbs-avif]
+source = "Send thumbnails as AVIF"
+translation = "Αποστολή μικρογραφιών ως AVIF"
+
+[messages.settings-thumbs-avif-what]
+source = "Browsers that show AVIF get smaller thumbnails, often less than half the size. Each is made from the stored thumbnail the first time it’s shown and kept with the conversions; until then the stored one is sent. Making them keeps up to two cores busy while a big library is first browsed. Lossless thumbnails and pixel art are sent as they are."
+translation = "Τα προγράμματα περιήγησης που εμφανίζουν AVIF παίρνουν μικρότερες μικρογραφίες, συχνά κάτω από το μισό μέγεθος. Η καθεμία φτιάχνεται από την αποθηκευμένη μικρογραφία την πρώτη φορά που εμφανίζεται και κρατιέται μαζί με τις μετατροπές· μέχρι τότε στέλνεται η αποθηκευμένη. Η δημιουργία τους απασχολεί έως δύο πυρήνες όσο μια μεγάλη βιβλιοθήκη περιηγείται για πρώτη φορά. Οι μικρογραφίες χωρίς απώλειες και το pixel art στέλνονται όπως είναι."
+
 [messages.settings-thumbs-balanced]
 source = "Balanced"
 translation = "Ισορροπημένες"

@@ -9595,6 +9595,14 @@ translation = "Témák"
 source = "Thumbnails"
 translation = "Bélyegképek"
 
+[messages.settings-thumbs-avif]
+source = "Send thumbnails as AVIF"
+translation = "Bélyegképek küldése AVIF formátumban"
+
+[messages.settings-thumbs-avif-what]
+source = "Browsers that show AVIF get smaller thumbnails, often less than half the size. Each is made from the stored thumbnail the first time it’s shown and kept with the conversions; until then the stored one is sent. Making them keeps up to two cores busy while a big library is first browsed. Lossless thumbnails and pixel art are sent as they are."
+translation = "Az AVIF-et megjelenítő böngészők kisebb bélyegképeket kapnak, gyakran a méret felénél is kisebbet. Mindegyik a tárolt bélyegképből készül az első megjelenítéskor, és az átalakítások mellett marad meg; addig a tárolt kerül elküldésre. Az elkészítésük legfeljebb két magot foglal le, amíg egy nagy könyvtárat először böngésznek. A veszteségmentes bélyegképek és a pixel art változatlanul mennek ki."
+
 [messages.settings-thumbs-balanced]
 source = "Balanced"
 translation = "Kiegyensúlyozott"

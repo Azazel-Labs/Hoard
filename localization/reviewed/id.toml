@@ -9575,6 +9575,14 @@ translation = "Tema"
 source = "Thumbnails"
 translation = "Gambar mini"
 
+[messages.settings-thumbs-avif]
+source = "Send thumbnails as AVIF"
+translation = "Kirim gambar mini sebagai AVIF"
+
+[messages.settings-thumbs-avif-what]
+source = "Browsers that show AVIF get smaller thumbnails, often less than half the size. Each is made from the stored thumbnail the first time it’s shown and kept with the conversions; until then the stored one is sent. Making them keeps up to two cores busy while a big library is first browsed. Lossless thumbnails and pixel art are sent as they are."
+translation = "Browser yang bisa menampilkan AVIF mendapat gambar mini yang lebih kecil, sering kali kurang dari separuh ukurannya. Masing-masing dibuat dari gambar mini tersimpan saat pertama kali ditampilkan dan disimpan bersama hasil konversi; sampai saat itu yang tersimpan yang dikirim. Membuatnya menyibukkan hingga dua inti selagi pustaka besar dijelajahi pertama kali. Gambar mini lossless dan pixel art dikirim apa adanya."
+
 [messages.settings-thumbs-balanced]
 source = "Balanced"
 translation = "Seimbang"

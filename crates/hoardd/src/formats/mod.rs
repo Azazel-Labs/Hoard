@@ -19,7 +19,7 @@ use hoard_core::FormatOption;
 use image::DynamicImage;
 
 use crate::sources;
-pub(crate) use cache::{conversion_cache_bytes, log_trim};
+pub(crate) use cache::{conversion_cache_bytes, log_trim, touch_conversion};
 use encode::{convert_audio, encode_image};
 pub(crate) use gltf::{build_glb, gltf_buffer_files, gltf_buffers_to_glb, gltf_image_files, read_glb};
 use gltf::{file_stem, glb_to_gltf_zip, gltf_image_files_found};

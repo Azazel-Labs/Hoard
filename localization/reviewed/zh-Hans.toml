@@ -9585,6 +9585,14 @@ translation = "主题"
 source = "Thumbnails"
 translation = "缩略图"
 
+[messages.settings-thumbs-avif]
+source = "Send thumbnails as AVIF"
+translation = "以 AVIF 发送缩略图"
+
+[messages.settings-thumbs-avif-what]
+source = "Browsers that show AVIF get smaller thumbnails, often less than half the size. Each is made from the stored thumbnail the first time it’s shown and kept with the conversions; until then the stored one is sent. Making them keeps up to two cores busy while a big library is first browsed. Lossless thumbnails and pixel art are sent as they are."
+translation = "能显示 AVIF 的浏览器会收到更小的缩略图，常常不到一半大小。每张缩略图在第一次显示时由已存的缩略图生成，并与转换结果一起保存；在此之前发送已存的那张。首次浏览大型资源库时，生成它们最多会占用两个核心。无损缩略图和像素画按原样发送。"
+
 [messages.settings-thumbs-balanced]
 source = "Balanced"
 translation = "均衡"

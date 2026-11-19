@@ -13,7 +13,7 @@ fn ago(d: time::Duration) -> String {
 }
 
 /// Note that a cached conversion was just handed out, in the background.
-pub(super) fn touch_conversion(state: &crate::AppState, asset_id: &str, kind: &str) {
+pub(crate) fn touch_conversion(state: &crate::AppState, asset_id: &str, kind: &str) {
     let (pool, id, kind) = (state.pool.clone(), asset_id.to_owned(), kind.to_owned());
     tokio::spawn(async move {
         let r = crate::db::call(&pool, move |c| {

@@ -138,6 +138,7 @@ fn settings_json_sync(state: &AppState) -> Value {
                 crate::settings::ThumbQuality::default(),
                 saved.thumb_quality.is_some(),
             ),
+            "thumb_avif": option(now.thumb_avif, false, saved.thumb_avif.is_some()),
             "conversion_cache_mb": option(
                 now.conversion_cache_mb,
                 crate::settings::DEFAULT_CONVERSION_CACHE_MB,

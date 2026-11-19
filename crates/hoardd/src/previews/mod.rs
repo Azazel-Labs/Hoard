@@ -10,6 +10,10 @@
 //!   signed-in person's browser sends that picture to replace the server's. A Lottie animation's only thumbnail is
 //!   the one a browser draws. Where a thumbnail came from is kept, so
 //!   a worse one never replaces a better one and re-analysis leaves it be.
+//! - **AVIF thumbnails** for browsers that read them, when Settings asks: see [`avif`].
+
+mod avif;
+pub(crate) use avif::{AvifThumb, avif_thumb, vary};
 
 use crate::i18n::tr;
 use axum::Json;
@@ -206,14 +210,10 @@ pub(crate) async fn asset_frames(
 }
 
 /// Keep a picture made from an asset as its derivative of this kind; returns the picture's hash.
-pub(crate) async fn save_derivative(
-    state: &AppState,
-    id: String,
-    kind: &'static str,
-    bytes: Vec<u8>,
-) -> ApiResult<String> {
+pub(crate) async fn save_derivative(state: &AppState, id: String, kind: &str, bytes: Vec<u8>) -> ApiResult<String> {
     let blob = state.blobs.put_cache_bytes(bytes).await?;
     let (hash, size) = (blob.hash.clone(), i64::try_from(blob.size).unwrap_or(i64::MAX));
+    let kind = kind.to_owned();
     db::call(&state.pool, move |c| {
         let now = db::now();
         c.execute(

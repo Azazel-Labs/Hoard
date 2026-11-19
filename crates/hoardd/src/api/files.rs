@@ -14,6 +14,7 @@ use crate::blobs::is_valid_hash;
 use crate::db;
 use crate::error::{ApiResult, AppError};
 use crate::i18n::tr;
+use crate::previews::AvifThumb;
 
 #[derive(Debug, Deserialize)]
 pub(super) struct FileParams {
@@ -63,16 +64,28 @@ pub(super) async fn asset_thumb(
     let hash = db::call(&state.pool, move |c| db::asset_thumb(c, &id2))
         .await?
         .ok_or_else(|| AppError::not_found(tr!("error-thumbnail-not-found", id = id)))?;
+    let (resp, versioned) = match crate::previews::avif_thumb(&state, &id, &hash, &headers).await? {
+        AvifThumb::Made(resp) => (resp, q.v.is_some()),
+        // Checked again next time, when the AVIF may be there.
+        AvifThumb::Making => (stored_thumb(&state, &hash, &headers).await?, false),
+        AvifThumb::Stored => (stored_thumb(&state, &hash, &headers).await?, q.v.is_some()),
+    };
+    let resp = if versioned { resp } else { crate::previews::unversioned(resp) };
+    // With AVIF on, what's sent depends on what the browser says it reads.
+    Ok(if state.settings.get().thumb_avif { crate::previews::vary(resp) } else { resp })
+}
+
+/// A thumbnail as it's stored.
+async fn stored_thumb(state: &AppState, hash: &str, headers: &HeaderMap) -> ApiResult<Response> {
     // Thumbnails are JPEG or PNG; the first bytes say which. A browser revalidating its copy gets a 304 without them.
     let revalidating =
         headers.get(header::IF_NONE_MATCH).is_some_and(|v| v.as_bytes() == format!("\"{hash}\"").as_bytes());
     let mime = if revalidating {
         "image/png"
     } else {
-        crate::analyze::thumb_mime(&state.blobs.head(&hash, 4).await.unwrap_or_default())
+        crate::analyze::thumb_mime(&state.blobs.head(hash, 4).await.unwrap_or_default())
     };
-    let resp = serve_blob(&state, &hash, &headers, mime, None).await?;
-    Ok(if q.v.is_some() { resp } else { crate::previews::unversioned(resp) })
+    serve_blob(state, hash, headers, mime, None).await
 }
 
 pub(super) async fn blob(

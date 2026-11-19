@@ -9760,6 +9760,14 @@ translation = "Temas"
 source = "Thumbnails"
 translation = "Duimnaels"
 
+[messages.settings-thumbs-avif]
+source = "Send thumbnails as AVIF"
+translation = "Stuur duimnaels as AVIF"
+
+[messages.settings-thumbs-avif-what]
+source = "Browsers that show AVIF get smaller thumbnails, often less than half the size. Each is made from the stored thumbnail the first time it’s shown and kept with the conversions; until then the stored one is sent. Making them keeps up to two cores busy while a big library is first browsed. Lossless thumbnails and pixel art are sent as they are."
+translation = "Blaaiers wat AVIF wys, kry kleiner duimnaels, dikwels minder as die helfte van die grootte. Elkeen word van die gestoorde duimnael gemaak die eerste keer dat dit gewys word en saam met die omskakelings bewaar; tot dan word die gestoorde een gestuur. Om hulle te maak hou tot twee kerne besig terwyl ’n groot biblioteek die eerste keer deurblaai word. Verlieslose duimnaels en pixelkuns word gestuur soos hulle is."
+
 [messages.settings-thumbs-balanced]
 source = "Balanced"
 translation = "Gebalanseer"

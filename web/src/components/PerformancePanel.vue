@@ -98,6 +98,21 @@ watch(
         <label class="check">
           <input
             type="checkbox"
+            :checked="s.options.thumb_avif.value"
+            :disabled="busy"
+            @change="save({ thumb_avif: ($event.target as HTMLInputElement).checked })"
+          />
+          {{ t('settings-thumbs-avif') }}
+        </label>
+        <ResetButton v-if="changed('thumb_avif')" :to="onOff(s.options.thumb_avif.default)" :disabled="busy" @reset="resetOpt('thumb_avif')" />
+      </div>
+    </div>
+    <p class="what">{{ t('settings-thumbs-avif-what') }}</p>
+    <div class="switches motion">
+      <div class="opt-row">
+        <label class="check">
+          <input
+            type="checkbox"
             :checked="s.options.motion_thumbs.value"
             :disabled="busy"
             @change="save({ motion_thumbs: ($event.target as HTMLInputElement).checked })"

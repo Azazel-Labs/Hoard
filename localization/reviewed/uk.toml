@@ -10002,6 +10002,14 @@ translation = "Теми"
 source = "Thumbnails"
 translation = "Мініатюри"
 
+[messages.settings-thumbs-avif]
+source = "Send thumbnails as AVIF"
+translation = "Надсилати мініатюри як AVIF"
+
+[messages.settings-thumbs-avif-what]
+source = "Browsers that show AVIF get smaller thumbnails, often less than half the size. Each is made from the stored thumbnail the first time it’s shown and kept with the conversions; until then the stored one is sent. Making them keeps up to two cores busy while a big library is first browsed. Lossless thumbnails and pixel art are sent as they are."
+translation = "Браузери, що показують AVIF, отримують менші мініатюри, часто менше половини розміру. Кожна створюється зі збереженої мініатюри під час першого показу й зберігається разом із перетвореннями; доти надсилається збережена. Їх створення займає до двох ядер, поки велику бібліотеку переглядають уперше. Мініатюри без втрат і піксель-арт надсилаються як є."
+
 [messages.settings-thumbs-balanced]
 source = "Balanced"
 translation = "Збалансовані"

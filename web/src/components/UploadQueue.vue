@@ -34,6 +34,7 @@ interface Job {
   error?: string
   controller?: AbortController
   sessionId?: string
+  claim?: string
   force?: boolean
   existing?: string
   /** Whether the browser is remembering it, so a reload loses nothing. */
@@ -79,6 +80,7 @@ function remember(j: Job) {
     handle: j.handle,
     force: j.force,
     sessionId: j.sessionId,
+    claim: j.claim,
     sent: j.sent,
     total: j.total,
     filesTotal: j.filesTotal,
@@ -94,8 +96,8 @@ function enqueue(groups: Group[]) {
   for (const g of groups) {
     if (!g.files.length) continue
     const sig = signature(g.files)
-    // The same files as an import a reload interrupted carry that one on.
-    const old = jobs.value.find((j) => j.state === 'interrupted' && j.sig === sig)
+    // The same files as an import a reload interrupted, or one that failed, carry that one on.
+    const old = jobs.value.find((j) => (j.state === 'interrupted' || j.state === 'failed') && j.sig === sig)
     if (old) {
       if (g.handle) {
         old.handle = markRaw(g.handle)
@@ -174,10 +176,11 @@ async function pump() {
       next.controller.signal,
       {
         force: next.force,
-        onSession: (sid) => {
+        onSession: (sid, claim) => {
           const j = job(id)
           if (!j) return
           j.sessionId = sid
+          j.claim = claim
           remember(j)
         },
       },
@@ -209,7 +212,9 @@ async function cancel(j: Job) {
   if (j.state === 'uploading') j.controller?.abort()
   jobs.value = jobs.value.filter((x) => x.id !== j.id)
   void forget(j.key)
-  if (j.state !== 'queued' && j.state !== 'skipped' && j.sessionId) await abandonUpload(j.sessionId)
+  // The same files dropped again pick up the same session: that one's carrying on with it.
+  const taken = jobs.value.some((x) => x.sessionId === j.sessionId && (x.state === 'uploading' || x.state === 'done'))
+  if (j.state !== 'queued' && j.state !== 'skipped' && j.sessionId && !taken) await abandonUpload(j.sessionId, j.claim)
   pump()
 }
 
@@ -320,6 +325,7 @@ onMounted(async () => {
       resumed: 0,
       rate: 0,
       sessionId: s.sessionId,
+      claim: s.claim,
       force: s.force,
       saved: true,
     })

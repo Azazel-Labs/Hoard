@@ -45,8 +45,9 @@ pub(crate) const MAX_REQUEST_BYTES: usize = 96 << 20;
 /// The size of each part of a big file. Small enough that a lost connection costs little and several are in flight at
 /// once, big enough that a round trip per part doesn't matter.
 const PART_BYTES: u64 = 8 << 20;
-/// Sessions with no activity for this long are removed at startup.
-const STALE_DAYS: i64 = 7;
+/// Uploads nothing has arrived for in this long are removed, with what they staged (looked for at startup and every
+/// hour).
+const STALE_HOURS: i64 = 24;
 /// A request body that sends nothing for this long is abandoned, releasing its file for a retry. Without this, a
 /// client that vanished mid-chunk (closed laptop, dead wifi) could hold a file's write slot indefinitely.
 const BODY_IDLE: std::time::Duration = std::time::Duration::from_secs(60);
@@ -113,6 +114,9 @@ struct SessionStatus {
     part_bytes: u64,
     /// True when this call picked up an existing session instead of starting one.
     resumed: bool,
+    /// This registration's hold on the session, for cancelling it (see `abort`); only in the answer to registering.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    claim: Option<String>,
 }
 
 fn staging(state: &AppState, id: &str) -> PathBuf {
@@ -157,6 +161,7 @@ async fn session_status(state: &AppState, id: &str) -> ApiResult<SessionStatus> 
         max_request_bytes: MAX_REQUEST_BYTES,
         part_bytes: PART_BYTES,
         resumed: false,
+        claim: None,
     })
 }
 
@@ -193,8 +198,20 @@ async fn create(State(state): State<AppState>, Json(body): Json<CreateBody>) -> 
     .await?;
     match existing {
         Some(Existing::Open(id)) => {
+            // It's this registration's now: whoever registered it before can no longer cancel it.
+            let claim = uuid::Uuid::new_v4().to_string();
+            let (id2, c2) = (id.clone(), claim.clone());
+            db::call(&state.pool, move |c| {
+                c.execute(
+                    "UPDATE upload_meta SET claim = ?2, touched_at = ?3 WHERE pack_id = ?1",
+                    params![id2, c2, db::now()],
+                )?;
+                Ok(())
+            })
+            .await?;
             let mut s = session_status(&state, &id).await?;
             s.resumed = true;
+            s.claim = Some(claim);
             return Ok((StatusCode::OK, Json(s)).into_response());
         }
         Some(Existing::Imported(pack)) if !body.force => {
@@ -209,17 +226,31 @@ async fn create(State(state): State<AppState>, Json(body): Json<CreateBody>) -> 
     let paths: Vec<String> = files.iter().map(|(p, _)| p.clone()).collect();
     let auto_name = body.name.as_deref().is_none_or(|n| n.trim().is_empty());
     let name = body.name.filter(|n| !n.trim().is_empty()).unwrap_or_else(|| crate::api::default_pack_name(&paths));
-    let id2 = id.clone();
+    let claim = uuid::Uuid::new_v4().to_string();
+    let (id2, c2) = (id.clone(), claim.clone());
     db::call(&state.pool, move |c| {
         let tx = c.transaction()?;
         tx.execute(
-            "INSERT INTO packs (id, name, status, source, files_total, created_at) VALUES (?1, ?2, 'uploading', ?3, ?4, ?5)",
-            params![id2, name, body.source, files.len() as i64, db::now()],
+            // Empty files are there already.
+            "INSERT INTO packs (id, name, status, source, files_total, files_done, created_at)
+             VALUES (?1, ?2, 'uploading', ?3, ?4, ?5, ?6)",
+            params![
+                id2,
+                name,
+                body.source,
+                files.len() as i64,
+                files.iter().filter(|(_, size)| *size == 0).count() as i64,
+                db::now()
+            ],
         )?;
-        tx.execute("INSERT INTO upload_meta (pack_id, auto_name, touched_at) VALUES (?1, ?2, ?3)", params![id2, auto_name, db::now()])?;
+        tx.execute(
+            "INSERT INTO upload_meta (pack_id, auto_name, touched_at, claim) VALUES (?1, ?2, ?3, ?4)",
+            params![id2, auto_name, db::now(), c2],
+        )?;
         tx.execute("INSERT INTO import_keys (import_key, pack_id) VALUES (?1, ?2)", params![key, id2])?;
         {
-            let mut stmt = tx.prepare("INSERT INTO upload_files (pack_id, path, size, received) VALUES (?1, ?2, ?3, 0)")?;
+            let mut stmt =
+                tx.prepare("INSERT INTO upload_files (pack_id, path, size, received) VALUES (?1, ?2, ?3, 0)")?;
             for (path, size) in &files {
                 stmt.execute(params![id2, path, *size as i64])?;
             }
@@ -228,7 +259,9 @@ async fn create(State(state): State<AppState>, Json(body): Json<CreateBody>) -> 
         Ok(())
     })
     .await?;
-    Ok((StatusCode::CREATED, Json(session_status(&state, &id).await?)).into_response())
+    let mut s = session_status(&state, &id).await?;
+    s.claim = Some(claim);
+    Ok((StatusCode::CREATED, Json(s)).into_response())
 }
 
 async fn status(State(state): State<AppState>, Path(id): Path<String>) -> ApiResult<Json<SessionStatus>> {
@@ -265,6 +298,10 @@ async fn record(state: &AppState, id: &str, path: &str, part: Option<u64>, bytes
     let (id2, p2) = (id.to_owned(), path.to_owned());
     let received = db::call(&state.pool, move |c| {
         let tx = c.transaction()?;
+        let before =
+            tx.query_row("SELECT received FROM upload_files WHERE pack_id = ?1 AND path = ?2", params![id2, p2], |r| {
+                r.get::<_, i64>(0)
+            })? as u64;
         if let Some(part) = part {
             // A part that was already counted (sent twice by a retry) adds nothing.
             let new = tx.execute(
@@ -283,18 +320,14 @@ async fn record(state: &AppState, id: &str, path: &str, part: Option<u64>, bytes
                 params![id2, p2, bytes as i64],
             )?;
         }
-        let received = tx.query_row(
-            "SELECT received FROM upload_files WHERE pack_id = ?1 AND path = ?2",
-            params![id2, p2],
-            |r| r.get::<_, i64>(0),
-        )? as u64;
+        let received =
+            tx.query_row("SELECT received FROM upload_files WHERE pack_id = ?1 AND path = ?2", params![id2, p2], |r| {
+                r.get::<_, i64>(0)
+            })? as u64;
         tx.execute("UPDATE upload_meta SET touched_at = ?2 WHERE pack_id = ?1", params![id2, db::now()])?;
-        if received == size {
-            tx.execute(
-                "UPDATE packs SET files_done = (SELECT COUNT(*) FROM upload_files WHERE pack_id = ?1 AND received = size)
-                 WHERE id = ?1",
-                [&id2],
-            )?;
+        // Counted as it completes: counting them all again took longer the more files the upload had.
+        if received == size && before < size {
+            tx.execute("UPDATE packs SET files_done = files_done + 1 WHERE id = ?1", [&id2])?;
         }
         tx.commit()?;
         Ok(received)
@@ -512,27 +545,67 @@ async fn complete(State(state): State<AppState>, Path(id): Path<String>) -> ApiR
     Ok((StatusCode::ACCEPTED, Json(pack)))
 }
 
-async fn abort(State(state): State<AppState>, Path(id): Path<String>) -> ApiResult<StatusCode> {
+#[derive(Deserialize)]
+struct AbortParams {
+    /// The claim registering the upload gave. If the same files were registered again since (dropped again to retry),
+    /// the upload is the later registration's, and cancelling the earlier one leaves it be. Without one, it's cancelled
+    /// whoever registered it.
+    claim: Option<String>,
+}
+
+enum Abort {
+    Removed,
+    NotOpen,
+    TakenOver,
+}
+
+async fn abort(
+    State(state): State<AppState>,
+    Path(id): Path<String>,
+    Query(p): Query<AbortParams>,
+) -> ApiResult<StatusCode> {
     let id2 = id.clone();
-    let removed = db::call(&state.pool, move |c| {
-        let status: Option<String> =
-            c.query_row("SELECT status FROM packs WHERE id = ?1", [&id2], |r| r.get(0)).optional()?;
-        if status.as_deref() != Some("uploading") {
-            return Ok(false);
-        }
-        db::delete_pack(c, &id2)
+    let outcome = db::call(&state.pool, move |c| {
+        let tx = c.transaction()?;
+        let row: Option<(String, Option<String>)> = tx
+            .query_row(
+                "SELECT p.status, m.claim FROM packs p LEFT JOIN upload_meta m ON m.pack_id = p.id WHERE p.id = ?1",
+                [&id2],
+                |r| Ok((r.get(0)?, r.get(1)?)),
+            )
+            .optional()?;
+        let outcome = match row {
+            Some((status, held)) if status == "uploading" => {
+                if p.claim.is_some() && p.claim != held {
+                    Abort::TakenOver
+                } else if db::delete_pack_in(&tx, &id2)? {
+                    Abort::Removed
+                } else {
+                    Abort::NotOpen
+                }
+            }
+            _ => Abort::NotOpen,
+        };
+        tx.commit()?;
+        Ok(outcome)
     })
     .await?;
-    if !removed {
-        return Err(AppError::not_found(tr!("error-open-upload-not-found", id = id)));
+    match outcome {
+        Abort::Removed => {}
+        Abort::NotOpen => return Err(AppError::not_found(tr!("error-open-upload-not-found", id = id))),
+        Abort::TakenOver => {
+            tracing::info!(id, "kept an upload cancelled by an earlier registration of it");
+            return Ok(StatusCode::NO_CONTENT);
+        }
     }
     tokio::fs::remove_dir_all(staging(&state, &id)).await.ok();
     Ok(StatusCode::NO_CONTENT)
 }
 
-/// Drop upload sessions nobody has touched in a week, with their staged bytes.
+/// Drop uploads nothing has arrived for in a day, with their staged bytes: sessions never resumed, and folders left by
+/// single uploads that never became a pack (the server stopped partway).
 pub(crate) fn sweep_stale(state: &AppState) -> anyhow::Result<usize> {
-    let cutoff = (time::OffsetDateTime::now_utc() - time::Duration::days(STALE_DAYS))
+    let cutoff = (time::OffsetDateTime::now_utc() - time::Duration::hours(STALE_HOURS))
         .format(&time::format_description::well_known::Rfc3339)
         .unwrap_or_default();
     let mut conn = state.pool.get()?;
@@ -543,9 +616,44 @@ pub(crate) fn sweep_stale(state: &AppState) -> anyhow::Result<usize> {
         )?;
         stmt.query_map([&cutoff], |r| r.get(0))?.collect::<rusqlite::Result<_>>()?
     };
-    for id in &ids {
+    let receiving = |id: &str| {
+        let prefix = format!("{id}\0");
+        state
+            .uploads_in_flight
+            .lock()
+            .unwrap_or_else(std::sync::PoisonError::into_inner)
+            .iter()
+            .any(|k| k.starts_with(&prefix))
+    };
+    let mut removed = 0;
+    for id in ids.iter().filter(|id| !receiving(id)) {
         db::delete_pack(&mut conn, id)?;
         std::fs::remove_dir_all(staging(state, id)).ok();
+        removed += 1;
     }
-    Ok(ids.len())
+    let max_age = std::time::Duration::from_secs(STALE_HOURS.unsigned_abs() * 3600);
+    for entry in std::fs::read_dir(state.cfg.staging_dir()).into_iter().flatten().flatten() {
+        let name = entry.file_name().to_string_lossy().into_owned();
+        let old = entry.metadata().and_then(|m| m.modified()).is_ok_and(|t| t.elapsed().is_ok_and(|age| age > max_age));
+        if old && db::get_pack(&conn, &name)?.is_none() {
+            std::fs::remove_dir_all(entry.path()).ok();
+            removed += 1;
+        }
+    }
+    Ok(removed)
+}
+
+/// Sweep abandoned uploads now and every hour.
+pub(crate) async fn sweep_loop(state: AppState) {
+    let mut every = tokio::time::interval(std::time::Duration::from_secs(3600));
+    loop {
+        every.tick().await;
+        let st = std::sync::Arc::clone(&state);
+        match tokio::task::spawn_blocking(move || sweep_stale(&st)).await {
+            Ok(Ok(0)) => {}
+            Ok(Ok(n)) => tracing::info!(removed = n, "removed abandoned uploads"),
+            Ok(Err(e)) => tracing::warn!(error = %e, "could not sweep abandoned uploads"),
+            Err(e) => tracing::warn!(error = %e, "the upload sweep stopped"),
+        }
+    }
 }

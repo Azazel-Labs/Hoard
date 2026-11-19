@@ -340,7 +340,6 @@ fn find_materials(state: &AppState, rt: &Handle, conn: &mut Connection, pack_id:
     // Materials whose maps are gone (or no longer form a set).
     for (id, _, _, synthetic) in existing.values() {
         if *synthetic && !kept.contains(id) {
-            tx.execute("DELETE FROM assets_fts WHERE asset_id = ?1", [id])?;
             tx.execute("DELETE FROM assets WHERE id = ?1", [id])?;
         }
     }

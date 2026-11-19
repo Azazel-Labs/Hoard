@@ -588,3 +588,43 @@ fn only_the_newest_upgrade_backups_are_kept() {
     assert!(!left.contains(&"hoard-pre-upgrade-v1-20200100-000000.db".to_owned()), "oldest kept: {left:?}");
     assert!(left.contains(&"hoard-20260101-000000.db".to_owned()), "manual backups are never pruned");
 }
+
+/// Search index rows are found by number from then on: an asset's row is noted, rows of assets that are gone and
+/// second rows of one are dropped, and deleting an asset, or its pack, takes its row with it.
+#[test]
+fn search_rows_are_kept_by_number() {
+    let dir = tempfile::tempdir().unwrap();
+    let mut conn = baseline_db(dir.path());
+    migrate(&mut conn, &dir.path().join("backups"), &MIGRATIONS[..MIGRATIONS.len() - 1]).unwrap();
+    conn.execute_batch(
+        "PRAGMA foreign_keys = OFF;
+             INSERT INTO assets (id, pack_id, blob_hash, path, name, ext, kind, created_at, updated_at) VALUES
+               ('rock', 'p1', 'h1', 'rock.png', 'rock', 'png', 'texture', 'x', 'x'),
+               ('moss', 'p1', 'h2', 'moss.png', 'moss', 'png', 'texture', 'x', 'x'),
+               ('bare', 'p1', 'h3', 'bare.png', 'bare', 'png', 'texture', 'x', 'x');
+             INSERT INTO assets_fts (asset_id, name) VALUES ('rock', 'rock'), ('gone', 'gone'), ('moss', 'old moss'),
+               ('moss', 'moss');",
+    )
+    .unwrap();
+    migrate(&mut conn, &dir.path().join("backups"), MIGRATIONS).unwrap();
+    conn.execute_batch("PRAGMA foreign_keys = ON").unwrap();
+    let rows = |c: &Connection| -> Vec<(String, String)> {
+        let mut stmt = c.prepare("SELECT asset_id, name FROM assets_fts ORDER BY asset_id").unwrap();
+        stmt.query_map([], |r| Ok((r.get(0)?, r.get(1)?))).unwrap().collect::<rusqlite::Result<_>>().unwrap()
+    };
+    let pair = |a: &str, b: &str| (a.to_owned(), b.to_owned());
+    assert_eq!(rows(&conn), [pair("moss", "moss"), pair("rock", "rock")]);
+    let noted: i64 = conn.query_row("SELECT count(fts_row) FROM assets", [], |r| r.get(0)).unwrap();
+    assert_eq!(noted, 2);
+
+    // Reindexing replaces the row it has, or adds one; deleting takes it away.
+    conn.execute("UPDATE assets SET name = 'boulder' WHERE id = 'rock'", []).unwrap();
+    crate::db::reindex_asset(&conn, "rock").unwrap();
+    crate::db::reindex_asset(&conn, "bare").unwrap();
+    crate::db::reindex_asset(&conn, "bare").unwrap();
+    assert_eq!(rows(&conn), [pair("bare", "bare"), pair("moss", "moss"), pair("rock", "boulder")]);
+    conn.execute("DELETE FROM assets WHERE id = 'moss'", []).unwrap();
+    assert_eq!(rows(&conn), [pair("bare", "bare"), pair("rock", "boulder")]);
+    conn.execute("DELETE FROM packs WHERE id = 'p1'", []).unwrap();
+    assert_eq!(rows(&conn), []);
+}

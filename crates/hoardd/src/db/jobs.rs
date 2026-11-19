@@ -51,6 +51,15 @@ pub(crate) struct JobRow {
 
 pub(crate) fn claim_job(conn: &Connection) -> Result<Option<JobRow>> {
     let now = now();
+    // Looked for first: an UPDATE waits its turn to write even when it finds nothing, and the workers ask often.
+    let waiting: bool = conn.query_row(
+        "SELECT EXISTS (SELECT 1 FROM jobs WHERE status = 'queued' AND run_after <= ?1)",
+        [&now],
+        |r| r.get(0),
+    )?;
+    if !waiting {
+        return Ok(None);
+    }
     Ok(conn
         .query_row(
             "UPDATE jobs SET status = 'running', attempts = attempts + 1, updated_at = ?1

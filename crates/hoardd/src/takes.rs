@@ -250,7 +250,6 @@ fn write(
         crate::animations::store(&tx, &id, t.rig.as_ref())?;
     }
     for (id, blob) in gone {
-        tx.execute("DELETE FROM assets_fts WHERE asset_id = ?1", [id])?;
         tx.execute("DELETE FROM assets WHERE id = ?1", [id])?;
         replaced.push((blob.clone(), size_of(&tx, blob)?));
     }

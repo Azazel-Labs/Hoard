@@ -767,4 +767,19 @@ pub(in crate::db) const MIGRATIONS: &[&str] = &[
     // page, so text someone typed or changed stays.
     "ALTER TABLE pack_context ADD COLUMN store_text_read INTEGER;
      UPDATE pack_context SET store_text_read = 0 WHERE store_text IS NOT NULL AND store_url IS NOT NULL;",
+    // 79: who registered an upload last (see `uploads::abort`): cancelling an older registration of it leaves it be.
+    "ALTER TABLE upload_meta ADD COLUMN claim TEXT;",
+    // 80: each asset's row in the search index, by number (see `reindex_asset`). Its asset_id column can't be looked
+    // up, so finding the row by that read the whole index, once per asset written. Rows of assets that are gone, or
+    // a second row of one, are dropped; and an asset's row goes with it.
+    "ALTER TABLE assets ADD COLUMN fts_row INTEGER;
+     CREATE TEMP TABLE fts_rows AS
+         SELECT f.asset_id AS id, max(f.rowid) AS row FROM assets_fts f JOIN assets a ON a.id = f.asset_id
+         GROUP BY f.asset_id;
+     DELETE FROM assets_fts WHERE rowid NOT IN (SELECT row FROM temp.fts_rows);
+     UPDATE assets SET fts_row = r.row FROM temp.fts_rows r WHERE r.id = assets.id;
+     DROP TABLE temp.fts_rows;
+     CREATE TRIGGER assets_fts_gone AFTER DELETE ON assets WHEN old.fts_row IS NOT NULL BEGIN
+         DELETE FROM assets_fts WHERE rowid = old.fts_row;
+     END;",
 ];

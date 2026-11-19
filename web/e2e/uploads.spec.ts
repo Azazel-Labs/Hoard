@@ -7,6 +7,8 @@ interface Session {
   pack: Pack
   part_bytes: number
   files: { path: string; size: number; received: number; parts?: number[] }[]
+  resumed?: boolean
+  claim?: string
 }
 
 test.describe('resumable uploads', () => {
@@ -52,6 +54,44 @@ test.describe('resumable uploads', () => {
     const back = await (await api.get(`/api/assets/${asset.id}/file`)).body()
     expect(back.length).toBe(size)
     expect(createHash('sha256').update(back).digest('hex')).toBe(createHash('sha256').update(text).digest('hex'))
+  })
+
+  test('cancelling an upload the same files were dropped again for leaves it to the new one', async ({ api }) => {
+    // A failed upload, retried by dropping the same files again: the server picks the same session back up.
+    const stem = `retried-${unique()}`
+    const files = [`${stem}/a.txt`, `${stem}/b.txt`].map((path) => ({ path, data: Buffer.from(`${path}
+`) }))
+    const list = { name: stem, files: files.map((f) => ({ path: f.path, size: f.data.length })) }
+    const first = (await (await api.post('/api/uploads', { data: list })).json()) as Session
+    const base = `/api/uploads/${first.pack.id}`
+    expect((await api.put(`${base}/chunk`, { params: { path: files[0].path, offset: 0 }, data: files[0].data })).status()).toBe(200)
+    const again = await api.post('/api/uploads', { data: list })
+    expect(again.status()).toBe(200)
+    const second = (await again.json()) as Session
+    expect(second.resumed).toBe(true)
+    expect(second.pack.id).toBe(first.pack.id)
+    expect(second.claim).toBeTruthy()
+    expect(second.claim).not.toBe(first.claim)
+
+    // The first one's cancelled, as a person tidying up the failed row would: the second carries on regardless.
+    expect((await api.delete(base, { params: { claim: first.claim! } })).status()).toBe(204)
+    const status = (await (await api.get(base)).json()) as Session
+    expect(status.files.map((f) => f.received)).toEqual([files[0].data.length, 0])
+    expect((await api.put(`${base}/chunk`, { params: { path: files[1].path, offset: 0 }, data: files[1].data })).status()).toBe(200)
+    expect((await api.post(`${base}/complete`)).status()).toBe(202)
+    await waitReady(api, [first.pack.id])
+    expect(await assetsOf(api, first.pack.id)).toHaveLength(2)
+    await api.delete(`/api/packs/${first.pack.id}`)
+
+    // The latest registration cancels it, and so does a client that doesn't say which it is.
+    for (const claim of [true, false]) {
+      const files = [{ path: `${stem}-${claim}.txt`, size: 3 }]
+      await api.post('/api/uploads', { data: { files } })
+      const latest = (await (await api.post('/api/uploads', { data: { files } })).json()) as Session
+      const at = `/api/uploads/${latest.pack.id}`
+      expect((await api.delete(at, claim ? { params: { claim: latest.claim! } } : {})).status()).toBe(204)
+      expect((await api.get(at)).status()).toBe(404)
+    }
   })
 })
 
@@ -101,6 +141,32 @@ test.describe('the import queue', () => {
     await expect(page.getByText('Drop 2 items to add them')).toBeVisible()
     await page.locator('.app').dispatchEvent('dragleave', { dataTransfer: files })
     await expect(page.getByText('Drop 2 items to add them')).toHaveCount(0)
+  })
+
+  test('a failed import dropped again carries on in its own row', async ({ page, api }) => {
+    test.setTimeout(120_000)
+    const stem = `failed-${unique()}`
+    const file = { name: `${stem}.txt`, mimeType: 'text/plain', buffer: Buffer.from(`notes for ${stem}
+`) }
+    // The first try at its files is turned away, for good as far as the queue knows.
+    let refused = false
+    await page.route('**/api/uploads/*/batch', (route) => {
+      if (refused) return route.continue()
+      refused = true
+      return route.fulfill({ status: 400, contentType: 'application/json', body: JSON.stringify({ error: 'held back' }) })
+    })
+    await page.goto('/')
+    const input = page.locator('input[type=file]:not([webkitdirectory])').first()
+    await input.setInputFiles(file)
+    const queue = page.getByRole('region', { name: 'Imports' })
+    await expect(queue.getByText('held back')).toBeVisible()
+
+    await input.setInputFiles(file)
+    await expect(queue.getByText('Uploaded, now unpacking')).toBeVisible({ timeout: 30_000 })
+    await expect(queue.getByText(file.name)).toHaveCount(1)
+    const mine = ((await (await api.get('/api/packs')).json()) as Pack[]).filter((p) => p.name.includes(stem))
+    expect(mine).toHaveLength(1)
+    await api.delete(`/api/packs/${mine[0].id}`)
   })
 
   test('folds down to a pill, and an import a reload cut short carries on when its file is picked again', async ({ page, api }) => {

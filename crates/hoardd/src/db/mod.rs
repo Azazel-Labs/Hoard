@@ -5,9 +5,11 @@
 //!
 //! The schema and its upgrades are in `schema`; the queries are in a module per table they mostly read.
 
+use std::cell::Cell;
 use std::path::Path;
-use std::sync::Arc;
 use std::sync::atomic::{AtomicBool, AtomicU64, Ordering};
+use std::sync::{Arc, Condvar, Mutex};
+use std::time::{Duration, Instant};
 
 use anyhow::{Context, Result, bail};
 use r2d2_sqlite::SqliteConnectionManager;
@@ -19,6 +21,8 @@ mod jobs;
 mod packs;
 mod schema;
 mod search;
+#[cfg(test)]
+mod stress;
 mod tags;
 
 pub(crate) use assets::*;
@@ -50,11 +54,12 @@ pub(crate) fn open(path: &Path, backups: &Path) -> Result<Pool> {
         // another writer (SQLite would deadlock), so it fails at once with "database is locked", busy_timeout or not:
         // two tag edits at the same moment did.
         c.set_transaction_behavior(TransactionBehavior::Immediate);
-        // busy_timeout first: switching to WAL takes a lock, and connections opened at once must wait for it
-        // rather than fail with "database is locked".
+        // Waiting first: switching to WAL takes a lock, and connections opened at once must wait for it rather than
+        // fail with "database is locked".
+        c.busy_handler(Some(wait_turn))?;
+        c.rollback_hook(Some(turn_over))?;
         c.execute_batch(
-            "PRAGMA busy_timeout = 10000;
-             PRAGMA journal_mode = WAL;
+            "PRAGMA journal_mode = WAL;
              PRAGMA synchronous = NORMAL;
              PRAGMA foreign_keys = ON;
              PRAGMA temp_store = MEMORY;",
@@ -64,6 +69,7 @@ pub(crate) fn open(path: &Path, backups: &Path) -> Result<Pool> {
         // way that does (at 1000 pages, without waiting on readers).
         c.wal_hook(Some(|wal: &mut rusqlite::hooks::Wal, pages| {
             WRITES.fetch_add(1, Ordering::AcqRel);
+            turn_over();
             if pages >= 1000 {
                 // As SQLite's own: a checkpoint that can't finish now is done by a later one.
                 wal.checkpoint().ok();
@@ -79,6 +85,46 @@ pub(crate) fn open(path: &Path, backups: &Path) -> Result<Pool> {
     Ok(pool)
 }
 
+/// How long a write waits for the one before it to finish before giving up with "database is locked".
+const WAIT_FOR_WRITE: Duration = Duration::from_secs(30);
+
+/// Writes since the server started (bumped as each finishes), and a signal for the writers waiting their turn.
+static TURN: (Mutex<u64>, Condvar) = (Mutex::new(0), Condvar::new());
+
+thread_local! {
+    /// When the write this thread is trying to start began waiting.
+    static WAITING_SINCE: Cell<Option<Instant>> = const { Cell::new(None) };
+}
+
+/// Waiting for another connection's write to finish (SQLite's busy handler; `tries` counts from 0 per write). A
+/// write that finishes wakes the waiters at once, where SQLite's busy timeout sleeps up to 100 ms between looks, so
+/// under a steady run of short writes a waiter could miss every gap between them.
+fn wait_turn(tries: i32) -> bool {
+    let now = Instant::now();
+    let since = WAITING_SINCE.with(|w| {
+        if tries == 0 || w.get().is_none() {
+            w.set(Some(now));
+        }
+        w.get().unwrap_or(now)
+    });
+    if now - since >= WAIT_FOR_WRITE {
+        return false;
+    }
+    let (writes, freed) = &TURN;
+    let seen = writes.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
+    // A write that finished just before this began waiting, or one by another process, wakes nobody: look again
+    // soon regardless.
+    drop(freed.wait_timeout(seen, Duration::from_millis(20)));
+    true
+}
+
+/// A write finished (or was undone): whoever's waiting can go.
+fn turn_over() {
+    let (writes, freed) = &TURN;
+    *writes.lock().unwrap_or_else(std::sync::PoisonError::into_inner) += 1;
+    freed.notify_all();
+}
+
 /// How many times the library has been written to since the server started.
 static WRITES: AtomicU64 = AtomicU64::new(0);
 
@@ -88,7 +134,7 @@ pub(crate) fn writes() -> u64 {
 }
 
 /// Database work that takes this long gets a warning in the log naming it.
-const SLOW: std::time::Duration = std::time::Duration::from_secs(5);
+const SLOW: Duration = Duration::from_secs(5);
 
 /// Run blocking DB work off the async runtime, in the language of the request it's for.
 pub(crate) async fn call<T, F>(pool: &Pool, f: F) -> Result<T>
@@ -114,7 +160,7 @@ where
 
 /// Run `f`, warning in the log when it held the database for [`SLOW`] or more.
 fn timed<T, F: FnOnce(&mut Conn) -> Result<T>>(conn: &mut Conn, f: F) -> Result<T> {
-    let started = std::time::Instant::now();
+    let started = Instant::now();
     let out = f(conn);
     let took = started.elapsed();
     if took >= SLOW {
@@ -171,7 +217,7 @@ where
 #[derive(Default)]
 struct Watch {
     gone: AtomicBool,
-    handle: std::sync::Mutex<Option<InterruptHandle>>,
+    handle: Mutex<Option<InterruptHandle>>,
 }
 
 /// Dropped with its request: unless the work finished (`.1`), it's stopped.

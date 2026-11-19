@@ -248,11 +248,7 @@ pub async fn run(cfg: Config) -> Result<()> {
         skeletons: animations::Skeletons::default(),
     });
     tokio::spawn(signin::recheck_loop(Arc::clone(&state)));
-    match uploads::sweep_stale(&state) {
-        Ok(0) => {}
-        Ok(n) => tracing::info!(removed = n, "removed abandoned upload sessions"),
-        Err(e) => tracing::warn!(error = %e, "could not sweep old upload sessions"),
-    }
+    tokio::spawn(uploads::sweep_loop(Arc::clone(&state)));
     ffmpeg::start(&effective.ffmpeg, state.cfg.tools_dir());
     clip::start(&state, effective.clip, effective.clip_hosted.clone());
     clap::start(&state, effective.clap);

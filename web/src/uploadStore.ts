@@ -15,6 +15,8 @@ export interface Saved {
   handle?: FileSystemHandle
   force?: boolean
   sessionId?: string
+  /** The hold registering it gave on its session, to cancel it with (see `abandonUpload`). */
+  claim?: string
   sent: number
   total: number
   filesTotal: number

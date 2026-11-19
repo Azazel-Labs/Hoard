@@ -146,11 +146,15 @@ pub(crate) fn set_pack_status(conn: &Connection, id: &str, status: PackStatus, e
 
 pub(crate) fn delete_pack(conn: &mut Connection, id: &str) -> Result<bool> {
     let tx = conn.transaction()?;
-    tx.execute("DELETE FROM assets_fts WHERE asset_id IN (SELECT id FROM assets WHERE pack_id = ?1)", [id])?;
-    tx.execute("DELETE FROM jobs WHERE pack_id = ?1 AND status IN ('queued', 'failed')", [id])?;
-    let n = tx.execute("DELETE FROM packs WHERE id = ?1", [id])?;
+    let removed = delete_pack_in(&tx, id)?;
     tx.commit()?;
-    Ok(n > 0)
+    Ok(removed)
+}
+
+/// `delete_pack` as part of a transaction of the caller's.
+pub(crate) fn delete_pack_in(tx: &rusqlite::Transaction<'_>, id: &str) -> Result<bool> {
+    tx.execute("DELETE FROM jobs WHERE pack_id = ?1 AND status IN ('queued', 'failed')", [id])?;
+    Ok(tx.execute("DELETE FROM packs WHERE id = ?1", [id])? > 0)
 }
 
 // Watched folders
@@ -248,7 +252,6 @@ pub(crate) fn purge_archived(
         if archived != Some(true) {
             continue;
         }
-        tx.execute("DELETE FROM assets_fts WHERE asset_id IN (SELECT id FROM assets WHERE pack_id = ?1)", [id])?;
         tx.execute("DELETE FROM jobs WHERE pack_id = ?1 AND status IN ('queued', 'failed')", [id])?;
         tx.execute(
             "INSERT OR IGNORE INTO skipped_folders (location_id, folder)
@@ -268,7 +271,6 @@ pub(crate) fn purge_archived(
             continue;
         }
         skip_on_rescan(&tx, id)?;
-        tx.execute("DELETE FROM assets_fts WHERE asset_id = ?1", [id])?;
         n.assets += tx.execute("DELETE FROM assets WHERE id = ?1 AND archived_at IS NOT NULL", [id])? as u64;
     }
     tx.commit()?;

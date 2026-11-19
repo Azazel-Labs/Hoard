@@ -334,12 +334,7 @@ fn catch_up(c: &Connection, pack_id: &str, dir: &Path) -> Result<bool> {
     let added = on_disk.iter().any(|p| !known.contains(p));
     for id in &gone {
         // With its takes, if it had them.
-        c.execute(
-            "DELETE FROM assets_fts WHERE asset_id IN (SELECT id FROM assets WHERE json_extract(meta, '$.take_of') = ?1)",
-            [id],
-        )?;
         c.execute("DELETE FROM assets WHERE json_extract(meta, '$.take_of') = ?1", [id])?;
-        c.execute("DELETE FROM assets_fts WHERE asset_id = ?1", [id])?;
         c.execute("DELETE FROM assets WHERE id = ?1", [id])?;
     }
     if added {

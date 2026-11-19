@@ -25,7 +25,15 @@ export interface Progress {
 }
 
 interface FileStatus { path: string; size: number; received: number; parts?: number[] }
-interface Session { pack: Pack; files: FileStatus[]; total_bytes: number; received_bytes: number; part_bytes: number }
+interface Session {
+  pack: Pack
+  files: FileStatus[]
+  total_bytes: number
+  received_bytes: number
+  part_bytes: number
+  /** This registration's hold on the session, to cancel it with. */
+  claim?: string
+}
 
 function headers(extra: Record<string, string> = {}): Record<string, string> {
   return { ...authHeaders(), ...extra }
@@ -107,7 +115,7 @@ export async function uploadPackResumable(
   name: string | undefined,
   onProgress: (p: Progress) => void,
   signal: AbortSignal,
-  options: { force?: boolean; onSession?: (id: string) => void } = {},
+  options: { force?: boolean; onSession?: (id: string, claim?: string) => void } = {},
 ): Promise<Pack> {
   const force = options.force ?? false
   const onSession = options.onSession ?? (() => undefined)
@@ -124,7 +132,7 @@ export async function uploadPackResumable(
     if (body.pack) throw new AlreadyImported(body.pack, body.error ?? t('upload-already-imported'))
   }
   const session = await json<Session & { resumed: boolean }>(res)
-  onSession(session.pack.id)
+  onSession(session.pack.id, session.claim)
   const id = session.pack.id
   const base = `/api/uploads/${id}`
 
@@ -224,9 +232,13 @@ export async function uploadPackResumable(
   return pack
 }
 
-/** Abandon a session (server deletes the staged bytes). */
-export async function abandonUpload(id: string): Promise<void> {
-  await fetch(`/api/uploads/${id}`, { method: 'DELETE', headers: headers() }).catch(() => undefined)
+/**
+ * Abandon a session (server deletes the staged bytes). With the claim registering it gave, a session the same files
+ * were registered for again since (dropped again to retry) is left to that later upload.
+ */
+export async function abandonUpload(id: string, claim?: string): Promise<void> {
+  const query = claim ? `?claim=${encodeURIComponent(claim)}` : ''
+  await fetch(`/api/uploads/${id}${query}`, { method: 'DELETE', headers: headers() }).catch(() => undefined)
 }
 
 /**

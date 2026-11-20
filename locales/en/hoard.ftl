@@ -2427,6 +2427,10 @@ stats-distinct-tags = Different tags
 stats-archive = In the archive
 stats-load-failed = Couldn't load the details: { $error }
 stats-counting = Counting…
+# When the library report shown was made: $time is a date and time.
+stats-as-of = As of { $time }
+# A newer library report is being made and will replace the one shown.
+stats-updating = Updating…
 stats-by-kind = Space by kind
 # A bar's tooltip: $name is a kind of asset or a file extension, $count how many files, $size how much space.
 stats-files-size = { $name }: { $count } files, { $size }

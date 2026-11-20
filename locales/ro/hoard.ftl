@@ -2334,6 +2334,8 @@ stats-distinct-tags = Etichete diferite
 stats-archive = În arhivă
 stats-load-failed = Detaliile nu au putut fi încărcate: { $error }
 stats-counting = Se numără…
+stats-as-of = La { $time }
+stats-updating = Se actualizează…
 stats-by-kind = Spațiu după tip
 stats-files-size =
     { $count ->

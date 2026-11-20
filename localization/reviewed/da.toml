@@ -10446,6 +10446,10 @@ translation = "Rækker"
 source = "In the archive"
 translation = "I arkivet"
 
+[messages.stats-as-of]
+source = "As of { $time }"
+translation = "Pr. { $time }"
+
 [messages.stats-assets]
 source = "Assets"
 translation = "Assets"
@@ -10579,6 +10583,10 @@ translation = "Tagging"
 [messages.stats-untagged]
 source = "{ $count } with no tags"
 translation = "{ $count } uden tags"
+
+[messages.stats-updating]
+source = "Updating…"
+translation = "Opdaterer…"
 
 [messages.storefiles-built-in]
 source = "Built in"

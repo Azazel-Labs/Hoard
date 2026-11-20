@@ -10256,6 +10256,10 @@ translation = "Baris"
 source = "In the archive"
 translation = "Di arsip"
 
+[messages.stats-as-of]
+source = "As of { $time }"
+translation = "Per { $time }"
+
 [messages.stats-assets]
 source = "Assets"
 translation = "Aset"
@@ -10389,6 +10393,10 @@ translation = "Pemberian tag"
 [messages.stats-untagged]
 source = "{ $count } with no tags"
 translation = "{ $count } tanpa tag"
+
+[messages.stats-updating]
+source = "Updating…"
+translation = "Memperbarui…"
 
 [messages.storefiles-built-in]
 source = "Built in"

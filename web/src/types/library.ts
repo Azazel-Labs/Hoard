@@ -452,6 +452,10 @@ export interface LibraryStats {
   untagged: number
   described: number
   human_edited: number
+  /** When the report was made: it's kept, and made again in the background once the library changes. */
+  made_at?: string
+  /** A newer report is being made; asking again shortly gets it. */
+  refreshing?: boolean
 }
 
 export interface SearchParams {

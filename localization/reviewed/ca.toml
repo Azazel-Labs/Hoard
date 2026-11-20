@@ -10450,6 +10450,10 @@ translation = "Files"
 source = "In the archive"
 translation = "A l'arxiu"
 
+[messages.stats-as-of]
+source = "As of { $time }"
+translation = "A { $time }"
+
 [messages.stats-assets]
 source = "Assets"
 translation = "Recursos"
@@ -10584,6 +10588,10 @@ translation = "Etiquetatge"
 [messages.stats-untagged]
 source = "{ $count } with no tags"
 translation = "{ $count } sense etiquetes"
+
+[messages.stats-updating]
+source = "Updating…"
+translation = "S’està actualitzant…"
 
 [messages.storefiles-built-in]
 source = "Built in"

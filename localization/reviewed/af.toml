@@ -10444,6 +10444,10 @@ translation = "Rye"
 source = "In the archive"
 translation = "In die argief"
 
+[messages.stats-as-of]
+source = "As of { $time }"
+translation = "Soos op { $time }"
+
 [messages.stats-assets]
 source = "Assets"
 translation = "Bates"
@@ -10577,6 +10581,10 @@ translation = "Etikettering"
 [messages.stats-untagged]
 source = "{ $count } with no tags"
 translation = "{ $count } sonder etikette"
+
+[messages.stats-updating]
+source = "Updating…"
+translation = "Word bygewerk…"
 
 [messages.storefiles-built-in]
 source = "Built in"

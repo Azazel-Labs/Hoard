@@ -10255,6 +10255,10 @@ translation = "แถว"
 source = "In the archive"
 translation = "ในที่เก็บถาวร"
 
+[messages.stats-as-of]
+source = "As of { $time }"
+translation = "ณ { $time }"
+
 [messages.stats-assets]
 source = "Assets"
 translation = "แอสเซ็ต"
@@ -10388,6 +10392,10 @@ translation = "การติดแท็ก"
 [messages.stats-untagged]
 source = "{ $count } with no tags"
 translation = "ไม่มีแท็ก { $count } รายการ"
+
+[messages.stats-updating]
+source = "Updating…"
+translation = "กำลังอัปเดต…"
 
 [messages.storefiles-built-in]
 source = "Built in"

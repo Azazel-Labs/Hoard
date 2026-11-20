@@ -10495,6 +10495,10 @@ translation = "Rivit"
 source = "In the archive"
 translation = "Arkistossa"
 
+[messages.stats-as-of]
+source = "As of { $time }"
+translation = "Tilanne { $time }"
+
 [messages.stats-assets]
 source = "Assets"
 translation = "Resurssit"
@@ -10649,6 +10653,10 @@ translation = "Tunnisteet"
 [messages.stats-untagged]
 source = "{ $count } with no tags"
 translation = "{ $count } ilman tunnisteita"
+
+[messages.stats-updating]
+source = "Updating…"
+translation = "Päivitetään…"
 
 [messages.storefiles-built-in]
 source = "Built in"

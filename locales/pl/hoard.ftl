@@ -2326,6 +2326,8 @@ stats-distinct-tags = Różne tagi
 stats-archive = W archiwum
 stats-load-failed = Nie udało się załadować szczegółów: { $error }
 stats-counting = Liczenie…
+stats-as-of = Stan na { $time }
+stats-updating = Aktualizowanie…
 stats-by-kind = Miejsce według rodzaju
 stats-files-size =
     { $count ->

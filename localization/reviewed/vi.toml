@@ -10252,6 +10252,10 @@ translation = "Hàng"
 source = "In the archive"
 translation = "Trong kho lưu trữ"
 
+[messages.stats-as-of]
+source = "As of { $time }"
+translation = "Tính đến { $time }"
+
 [messages.stats-assets]
 source = "Assets"
 translation = "Tài nguyên"
@@ -10385,6 +10389,10 @@ translation = "Gắn thẻ"
 [messages.stats-untagged]
 source = "{ $count } with no tags"
 translation = "{ $count } chưa có thẻ"
+
+[messages.stats-updating]
+source = "Updating…"
+translation = "Đang cập nhật…"
 
 [messages.storefiles-built-in]
 source = "Built in"

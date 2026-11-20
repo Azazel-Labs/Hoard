@@ -10537,6 +10537,10 @@ translation = "Редови"
 source = "In the archive"
 translation = "У архиви"
 
+[messages.stats-as-of]
+source = "As of { $time }"
+translation = "Стање на дан { $time }"
+
 [messages.stats-assets]
 source = "Assets"
 translation = "Ресурси"
@@ -10697,6 +10701,10 @@ translation = "Означавање"
 [messages.stats-untagged]
 source = "{ $count } with no tags"
 translation = "{ $count } без ознака"
+
+[messages.stats-updating]
+source = "Updating…"
+translation = "Ажурира се…"
 
 [messages.storefiles-built-in]
 source = "Built in"

@@ -2315,6 +2315,8 @@ stats-distinct-tags = Různé štítky
 stats-archive = V archivu
 stats-load-failed = Podrobnosti se nepodařilo načíst: { $error }
 stats-counting = Počítám…
+stats-as-of = Stav k { $time }
+stats-updating = Aktualizuje se…
 stats-by-kind = Místo podle druhu
 stats-files-size =
     { $count ->

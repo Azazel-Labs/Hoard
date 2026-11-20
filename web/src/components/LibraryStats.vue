@@ -2,7 +2,7 @@
 // The library in numbers, on the Settings page: totals up top, then where the space goes (kinds, file types, packs,
 // the biggest files), how it grew month by month, and how well it's tagged. Archived things aren't counted.
 // Bars are one series each and every one carries its name and value as text, so color is never the only label.
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { api, type AssetKind, type LibraryStats, type Stats, type TagSource } from '../api'
 import { humanBytes } from '../format'
 import { KIND_LABEL } from '../kinds'
@@ -12,15 +12,26 @@ import KindGlyph from './KindGlyph.vue'
 const props = defineProps<{ stats: Stats | null }>()
 const emit = defineEmits<{ tag: [string]; pack: [{ id: string; name: string }]; open: [string]; archive: [] }>()
 
+// The server keeps the report as last made and makes it again in the background once the library has changed, so it
+// opens at once; while a new one is being made, it's asked for again every couple of seconds and shown when ready.
 const lib = ref<LibraryStats | null>(null)
 const failed = ref('')
-onMounted(async () => {
+let timer: ReturnType<typeof setTimeout> | undefined
+let tries = 0
+async function load() {
   try {
     lib.value = await api.libraryStats()
+    failed.value = ''
   } catch (e) {
-    failed.value = (e as Error).message
+    if (!lib.value) failed.value = (e as Error).message
   }
-})
+  if (lib.value?.refreshing && tries++ < 60) timer = setTimeout(load, 2000)
+}
+onMounted(load)
+onUnmounted(() => clearTimeout(timer))
+const madeAt = computed(() =>
+  lib.value?.made_at ? formatDate(lib.value.made_at, { dateStyle: 'medium', timeStyle: 'short' }) : '',
+)
 
 const n = (v: number) => formatNumber(v)
 const pct = (part: number, whole: number) => formatNumber(whole ? part / whole : 0, { style: 'percent', maximumFractionDigits: 0 })
@@ -176,6 +187,9 @@ const assets = computed(() => props.stats?.assets ?? 0)
       </section>
     </template>
     <p v-else class="note">{{ t('stats-empty') }}</p>
+    <p v-if="lib && madeAt" class="note asof" data-testid="stats-as-of">
+      {{ t('stats-as-of', { time: madeAt }) }}<template v-if="lib.refreshing"> · {{ t('stats-updating') }}</template>
+    </p>
   </div>
 </template>
 

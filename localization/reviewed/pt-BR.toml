@@ -10455,6 +10455,10 @@ translation = "Linhas"
 source = "In the archive"
 translation = "Arquivados"
 
+[messages.stats-as-of]
+source = "As of { $time }"
+translation = "Em { $time }"
+
 [messages.stats-assets]
 source = "Assets"
 translation = "Assets"
@@ -10589,6 +10593,10 @@ translation = "Tags"
 [messages.stats-untagged]
 source = "{ $count } with no tags"
 translation = "{ $count } sem tags"
+
+[messages.stats-updating]
+source = "Updating…"
+translation = "Atualizando…"
 
 [messages.storefiles-built-in]
 source = "Built in"

@@ -109,3 +109,18 @@ test.describe('library grid', () => {
     await expect(page).toHaveURL(/[?&]q=water/)
   })
 })
+
+test.describe('library report', () => {
+  test('Settings → Library opens with the report as last made and says when that was', async ({ page }) => {
+    // The report is kept: asked for twice in a row, it's the same one, not made again.
+    const first = await (await page.request.get('/api/stats/library')).json()
+    expect(first.made_at).toMatch(/^\d{4}-\d\d-\d\dT/)
+    expect(typeof first.refreshing).toBe('boolean')
+    const again = await (await page.request.get('/api/stats/library')).json()
+    if (!first.refreshing) expect(again.made_at).toBe(first.made_at)
+
+    await page.goto('/#settings/library')
+    await expect(page.getByRole('heading', { name: 'Space by kind' })).toBeVisible()
+    await expect(page.getByTestId('stats-as-of')).toContainText(/^As of /)
+  })
+})

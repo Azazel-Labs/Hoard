@@ -10643,6 +10643,10 @@ translation = "Wiersze"
 source = "In the archive"
 translation = "W archiwum"
 
+[messages.stats-as-of]
+source = "As of { $time }"
+translation = "Stan na { $time }"
+
 [messages.stats-assets]
 source = "Assets"
 translation = "Zasoby"
@@ -10803,6 +10807,10 @@ translation = "Tagowanie"
 [messages.stats-untagged]
 source = "{ $count } with no tags"
 translation = "Bez tagów: { $count }"
+
+[messages.stats-updating]
+source = "Updating…"
+translation = "Aktualizowanie…"
 
 [messages.storefiles-built-in]
 source = "Built in"

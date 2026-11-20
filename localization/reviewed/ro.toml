@@ -10612,6 +10612,10 @@ translation = "Rânduri"
 source = "In the archive"
 translation = "În arhivă"
 
+[messages.stats-as-of]
+source = "As of { $time }"
+translation = "La { $time }"
+
 [messages.stats-assets]
 source = "Assets"
 translation = "Resurse"
@@ -10767,6 +10771,10 @@ translation = "Etichetare"
 [messages.stats-untagged]
 source = "{ $count } with no tags"
 translation = "{ $count } fără etichete"
+
+[messages.stats-updating]
+source = "Updating…"
+translation = "Se actualizează…"
 
 [messages.storefiles-built-in]
 source = "Built in"

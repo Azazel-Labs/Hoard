@@ -2224,6 +2224,8 @@ stats-distinct-tags = Различите ознаке
 stats-archive = У архиви
 stats-load-failed = Није могуће учитати детаље: { $error }
 stats-counting = Бројање…
+stats-as-of = Стање на дан { $time }
+stats-updating = Ажурира се…
 stats-by-kind = Простор по врсти
 stats-files-size =
     { $count ->

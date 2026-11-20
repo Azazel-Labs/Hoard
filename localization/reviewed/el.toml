@@ -10505,6 +10505,10 @@ translation = "Γραμμές"
 source = "In the archive"
 translation = "Στην αρχειοθήκη"
 
+[messages.stats-as-of]
+source = "As of { $time }"
+translation = "Στις { $time }"
+
 [messages.stats-assets]
 source = "Assets"
 translation = "Στοιχεία"
@@ -10655,6 +10659,10 @@ translation = "Ετικέτες"
 [messages.stats-untagged]
 source = "{ $count } with no tags"
 translation = "{ $count } χωρίς ετικέτες"
+
+[messages.stats-updating]
+source = "Updating…"
+translation = "Ενημέρωση…"
 
 [messages.storefiles-built-in]
 source = "Built in"

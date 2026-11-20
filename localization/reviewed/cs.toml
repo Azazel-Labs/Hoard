@@ -10622,6 +10622,10 @@ translation = "Řádky"
 source = "In the archive"
 translation = "V archivu"
 
+[messages.stats-as-of]
+source = "As of { $time }"
+translation = "Stav k { $time }"
+
 [messages.stats-assets]
 source = "Assets"
 translation = "Assety"
@@ -10782,6 +10786,10 @@ translation = "Štítkování"
 [messages.stats-untagged]
 source = "{ $count } with no tags"
 translation = "Bez štítků: { $count }"
+
+[messages.stats-updating]
+source = "Updating…"
+translation = "Aktualizuje se…"
 
 [messages.storefiles-built-in]
 source = "Built in"

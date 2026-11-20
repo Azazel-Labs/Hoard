@@ -10258,6 +10258,10 @@ translation = "列"
 source = "In the archive"
 translation = "在封存區中"
 
+[messages.stats-as-of]
+source = "As of { $time }"
+translation = "截至 { $time }"
+
 [messages.stats-assets]
 source = "Assets"
 translation = "素材"
@@ -10391,6 +10395,10 @@ translation = "標記"
 [messages.stats-untagged]
 source = "{ $count } with no tags"
 translation = "{ $count } 個沒有標籤"
+
+[messages.stats-updating]
+source = "Updating…"
+translation = "正在更新…"
 
 [messages.storefiles-built-in]
 source = "Built in"

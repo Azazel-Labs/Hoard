@@ -10446,6 +10446,10 @@ translation = "Zeilen"
 source = "In the archive"
 translation = "Im Archiv"
 
+[messages.stats-as-of]
+source = "As of { $time }"
+translation = "Stand: { $time }"
+
 [messages.stats-assets]
 source = "Assets"
 translation = "Assets"
@@ -10579,6 +10583,10 @@ translation = "Tagging"
 [messages.stats-untagged]
 source = "{ $count } with no tags"
 translation = "{ $count } ohne Tags"
+
+[messages.stats-updating]
+source = "Updating…"
+translation = "Wird aktualisiert…"
 
 [messages.storefiles-built-in]
 source = "Built in"

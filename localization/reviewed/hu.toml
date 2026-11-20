@@ -10279,6 +10279,10 @@ translation = "Sorok"
 source = "In the archive"
 translation = "Az archívumban"
 
+[messages.stats-as-of]
+source = "As of { $time }"
+translation = "Állapot: { $time }"
+
 [messages.stats-assets]
 source = "Assets"
 translation = "Assetek"
@@ -10412,6 +10416,10 @@ translation = "Címkézés"
 [messages.stats-untagged]
 source = "{ $count } with no tags"
 translation = "{ $count } címke nélkül"
+
+[messages.stats-updating]
+source = "Updating…"
+translation = "Frissítés…"
 
 [messages.storefiles-built-in]
 source = "Built in"

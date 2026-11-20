@@ -2408,6 +2408,8 @@ stats-distinct-tags = Різні теги
 stats-archive = В архіві
 stats-load-failed = Не вдалося завантажити відомості: { $error }
 stats-counting = Підрахунок…
+stats-as-of = Станом на { $time }
+stats-updating = Оновлюється…
 stats-by-kind = Місце за типами
 stats-files-size =
     { $count ->

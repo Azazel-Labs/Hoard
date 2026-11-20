@@ -10283,6 +10283,10 @@ translation = "Satırlar"
 source = "In the archive"
 translation = "Arşivde"
 
+[messages.stats-as-of]
+source = "As of { $time }"
+translation = "{ $time } itibarıyla"
+
 [messages.stats-assets]
 source = "Assets"
 translation = "Varlıklar"
@@ -10416,6 +10420,10 @@ translation = "Etiketleme"
 [messages.stats-untagged]
 source = "{ $count } with no tags"
 translation = "{ $count } tanesi etiketsiz"
+
+[messages.stats-updating]
+source = "Updating…"
+translation = "Güncelleniyor…"
 
 [messages.storefiles-built-in]
 source = "Built in"

@@ -10222,6 +10222,10 @@ translation = "행"
 source = "In the archive"
 translation = "보관함에 있음"
 
+[messages.stats-as-of]
+source = "As of { $time }"
+translation = "{ $time } 기준"
+
 [messages.stats-assets]
 source = "Assets"
 translation = "에셋"
@@ -10352,6 +10356,10 @@ translation = "태깅"
 [messages.stats-untagged]
 source = "{ $count } with no tags"
 translation = "{ $count }개는 태그 없음"
+
+[messages.stats-updating]
+source = "Updating…"
+translation = "업데이트 중…"
 
 [messages.storefiles-built-in]
 source = "Built in"

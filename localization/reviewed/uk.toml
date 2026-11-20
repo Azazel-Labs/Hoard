@@ -10692,6 +10692,10 @@ translation = "Рядки"
 source = "In the archive"
 translation = "В архіві"
 
+[messages.stats-as-of]
+source = "As of { $time }"
+translation = "Станом на { $time }"
+
 [messages.stats-assets]
 source = "Assets"
 translation = "Ресурси"
@@ -10858,6 +10862,10 @@ translation = "Тегування"
 [messages.stats-untagged]
 source = "{ $count } with no tags"
 translation = "Без тегів: { $count }"
+
+[messages.stats-updating]
+source = "Updating…"
+translation = "Оновлюється…"
 
 [messages.storefiles-built-in]
 source = "Built in"

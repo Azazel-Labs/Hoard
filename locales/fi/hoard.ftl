@@ -2210,6 +2210,8 @@ stats-distinct-tags = Eri tunnisteita
 stats-archive = Arkistossa
 stats-load-failed = Tietojen lataus epäonnistui: { $error }
 stats-counting = Lasketaan…
+stats-as-of = Tilanne { $time }
+stats-updating = Päivitetään…
 stats-by-kind = Tila tyypeittäin
 stats-files-size =
     { $count ->

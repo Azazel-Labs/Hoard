@@ -2215,6 +2215,8 @@ stats-distinct-tags = Διαφορετικές ετικέτες
 stats-archive = Στην αρχειοθήκη
 stats-load-failed = Δεν ήταν δυνατή η φόρτωση των λεπτομερειών: { $error }
 stats-counting = Καταμέτρηση…
+stats-as-of = Στις { $time }
+stats-updating = Ενημέρωση…
 stats-by-kind = Χώρος ανά τύπο
 stats-files-size =
     { $count ->

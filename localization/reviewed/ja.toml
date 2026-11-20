@@ -10266,6 +10266,10 @@ translation = "行"
 source = "In the archive"
 translation = "アーカイブ内"
 
+[messages.stats-as-of]
+source = "As of { $time }"
+translation = "{ $time } 時点"
+
 [messages.stats-assets]
 source = "Assets"
 translation = "アセット"
@@ -10399,6 +10403,10 @@ translation = "タグ付け"
 [messages.stats-untagged]
 source = "{ $count } with no tags"
 translation = "{ $count } 件はタグなし"
+
+[messages.stats-updating]
+source = "Updating…"
+translation = "更新中…"
 
 [messages.storefiles-built-in]
 source = "Built in"

@@ -1,8 +1,6 @@
 //! The library's numbers, and what it has been doing.
 
-use std::sync::atomic::{AtomicBool, Ordering};
-use std::sync::{Arc, Mutex, PoisonError};
-use std::time::{Duration, Instant};
+use std::time::Duration;
 
 use crate::error::ApiResult;
 use crate::{AppState, db, jobs};
@@ -12,10 +10,38 @@ use hoard_core::Stats;
 use rusqlite::Connection;
 use serde_json::{Value, json};
 
+/// What takes the space: these read every file the library has (most of a second, on a big one), so they're kept
+/// and made again in the background once it changes. The counts are always current.
+struct Sizes {
+    stored_bytes: u64,
+    logical_bytes: u64,
+    duplicate_assets: u64,
+    preview_bytes: u64,
+    conversion_cache_bytes: u64,
+}
+
+static SIZES: db::Kept<Sizes> = db::Kept::new("the library's sizes", sizes, Duration::from_secs(10));
+
+fn sizes(c: &Connection) -> anyhow::Result<Sizes> {
+    let one = |sql: &str| -> anyhow::Result<u64> { Ok(c.query_row(sql, [], |r| r.get::<_, i64>(0))? as u64) };
+    Ok(Sizes {
+        stored_bytes: one("SELECT COALESCE(SUM(size), 0) FROM blobs")?,
+        logical_bytes: one("SELECT COALESCE(SUM(b.size), 0) FROM assets a JOIN blobs b ON b.hash = a.blob_hash")?,
+        duplicate_assets: one(
+            "SELECT COALESCE(SUM(n - 1), 0) FROM (SELECT COUNT(*) AS n FROM assets GROUP BY blob_hash HAVING n > 1)",
+        )?,
+        preview_bytes: one("SELECT COALESCE(SUM(size), 0) FROM blobs WHERE hash IN (
+               SELECT thumb_hash FROM assets WHERE thumb_hash IS NOT NULL
+               UNION SELECT blob_hash FROM derivatives WHERE kind IN ('views', 'preview', 'motion'))")?,
+        conversion_cache_bytes: crate::formats::conversion_cache_bytes(c)?,
+    })
+}
+
 pub(super) async fn stats(State(state): State<AppState>) -> ApiResult<Json<Stats>> {
     let llm_enabled = state.settings.get().llm_enabled();
     let conversion_cache_limit = state.settings.get().conversion_cache_bytes();
     let storage = state.blobs.label();
+    let sizes = SIZES.get(&state.pool).await?.value;
     let s = db::read(&state.pool, move |c| {
         let one = |sql: &str| -> anyhow::Result<u64> { Ok(c.query_row(sql, [], |r| r.get::<_, i64>(0))? as u64) };
         // Counts are of the library; the archive has its own two.
@@ -26,24 +52,20 @@ pub(super) async fn stats(State(state): State<AppState>) -> ApiResult<Json<Stats
             .query_map([], |r| Ok(hoard_core::Facet { value: r.get(0)?, count: r.get::<_, i64>(1)? as u64 }))?
             .collect::<rusqlite::Result<Vec<_>>>()?;
         Ok(Stats {
-            assets: one(&format!("SELECT COUNT(*) FROM assets a WHERE {live}"))?,
+            assets: kinds.iter().map(|k| k.count).sum(),
             packs: one("SELECT COUNT(*) FROM packs WHERE archived_at IS NULL")?,
             archived_packs: one("SELECT COUNT(*) FROM packs WHERE archived_at IS NOT NULL")?,
-            archived_assets: one(
-                "SELECT COUNT(*) FROM assets a WHERE a.archived_at IS NOT NULL
-                   AND a.pack_id NOT IN (SELECT id FROM packs WHERE archived_at IS NOT NULL)",
-            )?,
+            archived_assets: one("SELECT COUNT(*) FROM assets a WHERE a.archived_at IS NOT NULL
+                   AND a.pack_id NOT IN (SELECT id FROM packs WHERE archived_at IS NOT NULL)")?,
             blobs: one("SELECT COUNT(*) FROM blobs")?,
             blobs_bad: one("SELECT COUNT(*) FROM blobs WHERE status != 'ok'")?,
-            stored_bytes: one("SELECT COALESCE(SUM(size), 0) FROM blobs")?,
-            logical_bytes: one("SELECT COALESCE(SUM(b.size), 0) FROM assets a JOIN blobs b ON b.hash = a.blob_hash")?,
+            stored_bytes: sizes.stored_bytes,
+            logical_bytes: sizes.logical_bytes,
             jobs_pending: one("SELECT COUNT(*) FROM jobs WHERE status IN ('queued', 'running')")?,
             llm_enabled,
             storage,
             kinds,
-            duplicate_assets: one(
-                "SELECT COALESCE(SUM(n - 1), 0) FROM (SELECT COUNT(*) AS n FROM assets GROUP BY blob_hash HAVING n > 1)",
-            )?,
+            duplicate_assets: sizes.duplicate_assets,
             version: hoard_core::VERSION.to_owned(),
             ffmpeg: crate::ffmpeg::describe(),
             blender: crate::blender::describe(),
@@ -51,95 +73,43 @@ pub(super) async fn stats(State(state): State<AppState>) -> ApiResult<Json<Stats
             renderer: crate::analyze::describe_renderer(),
             renderer_hint: crate::analyze::renderer_hint(),
             setup_needed: one("SELECT COUNT(*) FROM locations")? == 0,
-            conversion_cache_bytes: crate::formats::conversion_cache_bytes(c)?,
+            conversion_cache_bytes: sizes.conversion_cache_bytes,
             conversion_cache_limit,
-            preview_bytes: one(
-                "SELECT COALESCE(SUM(size), 0) FROM blobs WHERE hash IN (
-                   SELECT thumb_hash FROM assets WHERE thumb_hash IS NOT NULL
-                   UNION SELECT blob_hash FROM derivatives WHERE kind IN ('views', 'preview', 'motion'))",
-            )?,
+            preview_bytes: sizes.preview_bytes,
         })
     })
     .await?;
     Ok(Json(s))
 }
 
-/// The library report as last worked out: what it said, when, and the database's write count then.
-struct Report {
-    value: Arc<Value>,
-    made: Instant,
-    made_at: String,
-    writes: u64,
-}
+/// The library report, for Settings' Library page. Working it out reads the whole library (seconds, on a big one),
+/// so it's kept: the page is answered at once with the one last made, and when the library has changed since, a new
+/// one is made in the background; `refreshing` says so, and the page asks again for it.
+static LIBRARY: db::Kept<Value> = db::Kept::new("the library report", library_report, Duration::from_secs(30));
 
-static REPORT: Mutex<Option<Report>> = Mutex::new(None);
-static REFRESHING: AtomicBool = AtomicBool::new(false);
-
-/// A report this new isn't worked out again when it's opened, whatever has changed since.
-const FRESH_ENOUGH: Duration = Duration::from_secs(30);
-/// How often the report is looked at in the background, and worked out again if the library has changed.
+/// How often what's kept is looked at in the background, and made again if the library has changed.
 const EVERY: Duration = Duration::from_hours(1);
 
-/// The library in numbers, for Settings' Library page. Working it out reads the whole library (seconds, on a big
-/// one), so the page is answered at once with the report as last made, and when the library has changed since, a
-/// new one is made in the background: `refreshing` says so, and the page asks again for it.
 pub(super) async fn library_stats(State(state): State<AppState>) -> ApiResult<Json<Value>> {
-    let kept = || {
-        REPORT.lock().unwrap_or_else(PoisonError::into_inner).as_ref().map(|r| {
-            (Arc::clone(&r.value), r.made_at.clone(), r.writes != db::writes() && r.made.elapsed() >= FRESH_ENOUGH)
-        })
-    };
-    let (value, made_at, outdated) = if let Some(k) = kept() {
-        k
-    } else {
-        // The first since the server started: there's nothing to show until it's made.
-        refresh_report(&state).await?;
-        kept().ok_or_else(|| anyhow::anyhow!("the library report couldn't be made"))?
-    };
-    if outdated && !REFRESHING.load(Ordering::Acquire) {
-        let st = Arc::clone(&state);
-        tokio::spawn(async move {
-            if let Err(e) = refresh_report(&st).await {
-                tracing::warn!(error = %format!("{e:#}"), "could not make the library report");
-            }
-        });
-    }
-    let mut out = (*value).clone();
+    let got = LIBRARY.get(&state.pool).await?;
+    let mut out = (*got.value).clone();
     if let Value::Object(m) = &mut out {
-        m.insert("made_at".into(), json!(made_at));
-        m.insert("refreshing".into(), json!(outdated || REFRESHING.load(Ordering::Acquire)));
+        m.insert("made_at".into(), json!(got.made_at));
+        m.insert("refreshing".into(), json!(got.refreshing));
     }
     Ok(Json(out))
 }
 
-/// Work the report out again and keep it, unless that's being done already.
-async fn refresh_report(state: &AppState) -> anyhow::Result<()> {
-    if REFRESHING.swap(true, Ordering::AcqRel) {
-        // Made by whoever started it; the first visit waits for that one.
-        while REFRESHING.load(Ordering::Acquire) {
-            tokio::time::sleep(Duration::from_millis(100)).await;
-        }
-        return Ok(());
-    }
-    let writes = db::writes();
-    let made = db::call(&state.pool, |c| library_report(c)).await;
-    if let Ok(value) = &made {
-        *REPORT.lock().unwrap_or_else(PoisonError::into_inner) =
-            Some(Report { value: Arc::new(value.clone()), made: Instant::now(), made_at: db::now(), writes });
-    }
-    REFRESHING.store(false, Ordering::Release);
-    made.map(|_| ())
-}
-
-/// Make the library report soon after the server starts, so the first visit needn't wait, then once an hour when the
-/// library has changed.
-pub(crate) async fn keep_library_report(state: AppState) {
+/// Make the reports soon after the server starts, so the first visit needn't wait, then once an hour when the library
+/// has changed.
+pub(crate) async fn keep_reports(state: AppState) {
     tokio::time::sleep(Duration::from_secs(20)).await;
     loop {
-        let changed =
-            REPORT.lock().unwrap_or_else(PoisonError::into_inner).as_ref().is_none_or(|r| r.writes != db::writes());
-        if changed && let Err(e) = refresh_report(&state).await {
-            tracing::warn!(error = %format!("{e:#}"), "could not make the library report");
+        if SIZES.changed() {
+            SIZES.refresh_logged(&state.pool).await;
+        }
+        if LIBRARY.changed() {
+            LIBRARY.refresh_logged(&state.pool).await;
         }
         tokio::time::sleep(EVERY).await;
     }

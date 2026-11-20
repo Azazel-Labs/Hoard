@@ -28,7 +28,7 @@ mod stats;
 
 pub(crate) use files::serve_blob;
 pub(crate) use packs::default_pack_name;
-pub(crate) use stats::keep_library_report;
+pub(crate) use stats::keep_reports;
 
 pub(crate) fn router(state: &AppState) -> Router<AppState> {
     // The upload limit is a setting that can change while the server runs, so it's checked per request.

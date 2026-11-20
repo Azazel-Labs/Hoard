@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "d9d0c739f4c7e6741f2ad3eb66a5542e133eec4e662af87c199e651c80a85cc8"
+source = "d707e8ce5d41663e6b570559ca45a362135bc4f4edb2325a0803b64d9954ae2a"
 translation = "6f4557dd5f31f8afe5c91c474f05da592644ebb228916da12c10bbb5f0b255d8"
 
 [messages.about-blender]
@@ -5684,6 +5684,14 @@ translation = "保存場所を追加"
 source = "Added { $name }"
 translation = "{ $name } を追加しました"
 
+[messages.locations-bucket]
+source = "Bucket"
+translation = "バケット"
+
+[messages.locations-bucket-hint]
+source = "The name of a bucket that’s there already. The keys above need to be able to list, read and write it."
+translation = "すでに存在するバケットの名前。上のキーで、一覧の取得、読み取り、書き込みができる必要があります。"
+
 [messages.locations-cancel]
 source = "Cancel"
 translation = "キャンセル"
@@ -5740,10 +5748,6 @@ translation = "アップロードには Hoard が管理するライブラリが�
 source = "Folder"
 translation = "フォルダー"
 
-[messages.locations-folder-hint-cloud]
-source = "A folder that Dropbox, Google Drive, OneDrive or iCloud Drive keeps in sync works too, and so does s3://bucket-name for a bucket in S3 storage."
-translation = "Dropbox、Google Drive、OneDrive、iCloud Drive が同期しているフォルダーも使えます。S3 ストレージのバケットなら s3://bucket-name も使えます。"
-
 [messages.locations-folder-hint-managed]
 source = "Hoard creates it if it isn't there. In Docker, this is a folder you've mounted into the container."
 translation = "フォルダーがなければ Hoard が作成します。Docker では、コンテナーにマウントしたフォルダーを指定します。"
@@ -5763,6 +5767,26 @@ translation = "Hoard は読み取るだけで、中のものは何も変更し�
 [messages.locations-folder-placeholder]
 source = "The folder your packs are in"
 translation = "パックが入っているフォルダー"
+
+[messages.locations-kind-folder]
+source = "A folder"
+translation = "フォルダー"
+
+[messages.locations-kind-folder-hint]
+source = "On a disk or NAS share mounted into the container, or one that Dropbox, Google Drive, OneDrive or iCloud Drive keeps in sync. Hoard can keep files there, or watch packs you already have."
+translation = "コンテナーにマウントしたディスクや NAS の共有フォルダー、または Dropbox、Google Drive、OneDrive、iCloud Drive が同期しているフォルダー。Hoard はそこにファイルを保管することも、すでにあるパックを見守ることもできます。"
+
+[messages.locations-kind-folder-hint-desktop]
+source = "On this computer, another disk or a NAS share, or one that Dropbox, Google Drive, OneDrive or iCloud Drive keeps in sync. Hoard can keep files there, or watch packs you already have."
+translation = "このコンピューター、別のディスク、NAS の共有フォルダー、または Dropbox、Google Drive、OneDrive、iCloud Drive が同期しているフォルダー。Hoard はそこにファイルを保管することも、すでにあるパックを見守ることもできます。"
+
+[messages.locations-kind-question]
+source = "What kind of location is it?"
+translation = "どんな保存場所ですか？"
+
+[messages.locations-kind-s3-hint]
+source = "A bucket in Amazon S3 or a service like it: Backblaze B2, Cloudflare R2, Wasabi, MinIO, Garage. Hoard keeps files there."
+translation = "Amazon S3 または同様のサービスのバケット: Backblaze B2, Cloudflare R2, Wasabi, MinIO, Garage。Hoard はそこにファイルを保管します。"
 
 [messages.locations-kinds-hint]
 source = "A new pack's files go to the location that ticks their kind. The rest go to the catch-all."

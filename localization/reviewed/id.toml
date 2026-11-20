@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "d9d0c739f4c7e6741f2ad3eb66a5542e133eec4e662af87c199e651c80a85cc8"
+source = "d707e8ce5d41663e6b570559ca45a362135bc4f4edb2325a0803b64d9954ae2a"
 translation = "9000490baf0f6c5652bff234ab079cb5865b1c73471f7b8ad86c41a4a35d4c68"
 
 [messages.about-blender]
@@ -5674,6 +5674,14 @@ translation = "Tambahkan lokasi"
 source = "Added { $name }"
 translation = "{ $name } ditambahkan"
 
+[messages.locations-bucket]
+source = "Bucket"
+translation = "Bucket"
+
+[messages.locations-bucket-hint]
+source = "The name of a bucket that’s there already. The keys above need to be able to list, read and write it."
+translation = "Nama bucket yang sudah ada. Kunci di atas harus bisa mencantumkan, membaca, dan menulis ke bucket itu."
+
 [messages.locations-cancel]
 source = "Cancel"
 translation = "Batal"
@@ -5730,10 +5738,6 @@ translation = "Mengunggah memerlukan pustaka yang disimpan Hoard. Anda dapat men
 source = "Folder"
 translation = "Folder"
 
-[messages.locations-folder-hint-cloud]
-source = "A folder that Dropbox, Google Drive, OneDrive or iCloud Drive keeps in sync works too, and so does s3://bucket-name for a bucket in S3 storage."
-translation = "Folder yang disinkronkan oleh Dropbox, Google Drive, OneDrive, atau iCloud Drive juga bisa, begitu pula s3://bucket-name untuk bucket di penyimpanan S3."
-
 [messages.locations-folder-hint-managed]
 source = "Hoard creates it if it isn't there. In Docker, this is a folder you've mounted into the container."
 translation = "Hoard membuatnya jika belum ada. Di Docker, ini adalah folder yang sudah Anda pasang ke dalam container."
@@ -5753,6 +5757,26 @@ translation = "Hoard hanya membacanya: tidak ada isinya yang diubah."
 [messages.locations-folder-placeholder]
 source = "The folder your packs are in"
 translation = "Folder tempat paket Anda berada"
+
+[messages.locations-kind-folder]
+source = "A folder"
+translation = "Sebuah folder"
+
+[messages.locations-kind-folder-hint]
+source = "On a disk or NAS share mounted into the container, or one that Dropbox, Google Drive, OneDrive or iCloud Drive keeps in sync. Hoard can keep files there, or watch packs you already have."
+translation = "Di disk atau share NAS yang dipasang ke dalam container, atau folder yang disinkronkan oleh Dropbox, Google Drive, OneDrive, atau iCloud Drive. Hoard bisa menyimpan file di sana, atau memantau paket yang sudah Anda miliki."
+
+[messages.locations-kind-folder-hint-desktop]
+source = "On this computer, another disk or a NAS share, or one that Dropbox, Google Drive, OneDrive or iCloud Drive keeps in sync. Hoard can keep files there, or watch packs you already have."
+translation = "Di komputer ini, disk lain atau share NAS, atau folder yang disinkronkan oleh Dropbox, Google Drive, OneDrive, atau iCloud Drive. Hoard bisa menyimpan file di sana, atau memantau paket yang sudah Anda miliki."
+
+[messages.locations-kind-question]
+source = "What kind of location is it?"
+translation = "Lokasi jenis apa ini?"
+
+[messages.locations-kind-s3-hint]
+source = "A bucket in Amazon S3 or a service like it: Backblaze B2, Cloudflare R2, Wasabi, MinIO, Garage. Hoard keeps files there."
+translation = "Bucket di Amazon S3 atau layanan serupa: Backblaze B2, Cloudflare R2, Wasabi, MinIO, Garage. Hoard menyimpan file di sana."
 
 [messages.locations-kinds-hint]
 source = "A new pack's files go to the location that ticks their kind. The rest go to the catch-all."

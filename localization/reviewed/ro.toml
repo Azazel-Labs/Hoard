@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "d9d0c739f4c7e6741f2ad3eb66a5542e133eec4e662af87c199e651c80a85cc8"
+source = "d707e8ce5d41663e6b570559ca45a362135bc4f4edb2325a0803b64d9954ae2a"
 translation = "ce4c416087cb6d2fb8e905c6194c792fbd5bb5777164b444d684dfd92a83af43"
 
 [messages.about-blender]
@@ -5877,6 +5877,14 @@ translation = "Adăugați o locație"
 source = "Added { $name }"
 translation = "{ $name } a fost adăugată"
 
+[messages.locations-bucket]
+source = "Bucket"
+translation = "Bucket"
+
+[messages.locations-bucket-hint]
+source = "The name of a bucket that’s there already. The keys above need to be able to list, read and write it."
+translation = "Numele unui bucket care există deja. Cheile de mai sus trebuie să-l poată lista, citi și scrie."
+
 [messages.locations-cancel]
 source = "Cancel"
 translation = "Anulați"
@@ -5933,10 +5941,6 @@ translation = "Încărcarea are nevoie de o bibliotecă păstrată de Hoard. Put
 source = "Folder"
 translation = "Dosar"
 
-[messages.locations-folder-hint-cloud]
-source = "A folder that Dropbox, Google Drive, OneDrive or iCloud Drive keeps in sync works too, and so does s3://bucket-name for a bucket in S3 storage."
-translation = "Merge și un dosar sincronizat de Dropbox, Google Drive, OneDrive sau iCloud Drive, la fel și s3://bucket-name pentru un bucket din stocarea S3."
-
 [messages.locations-folder-hint-managed]
 source = "Hoard creates it if it isn't there. In Docker, this is a folder you've mounted into the container."
 translation = "Hoard îl creează dacă nu există. În Docker, acesta este un dosar pe care l-ați montat în container."
@@ -5956,6 +5960,26 @@ translation = "Hoard doar îl citește: nimic din el nu este modificat."
 [messages.locations-folder-placeholder]
 source = "The folder your packs are in"
 translation = "Dosarul în care sunt pachetele dvs."
+
+[messages.locations-kind-folder]
+source = "A folder"
+translation = "Un dosar"
+
+[messages.locations-kind-folder-hint]
+source = "On a disk or NAS share mounted into the container, or one that Dropbox, Google Drive, OneDrive or iCloud Drive keeps in sync. Hoard can keep files there, or watch packs you already have."
+translation = "Pe un disc sau o partajare NAS montată în container, ori un dosar sincronizat de Dropbox, Google Drive, OneDrive sau iCloud Drive. Hoard poate păstra fișiere acolo sau poate urmări pachete pe care le aveți deja."
+
+[messages.locations-kind-folder-hint-desktop]
+source = "On this computer, another disk or a NAS share, or one that Dropbox, Google Drive, OneDrive or iCloud Drive keeps in sync. Hoard can keep files there, or watch packs you already have."
+translation = "Pe acest computer, pe alt disc sau pe o partajare NAS, ori un dosar sincronizat de Dropbox, Google Drive, OneDrive sau iCloud Drive. Hoard poate păstra fișiere acolo sau poate urmări pachete pe care le aveți deja."
+
+[messages.locations-kind-question]
+source = "What kind of location is it?"
+translation = "Ce fel de locație este?"
+
+[messages.locations-kind-s3-hint]
+source = "A bucket in Amazon S3 or a service like it: Backblaze B2, Cloudflare R2, Wasabi, MinIO, Garage. Hoard keeps files there."
+translation = "Un bucket în Amazon S3 sau într-un serviciu asemănător: Backblaze B2, Cloudflare R2, Wasabi, MinIO, Garage. Hoard păstrează fișiere acolo."
 
 [messages.locations-kinds-hint]
 source = "A new pack's files go to the location that ticks their kind. The rest go to the catch-all."

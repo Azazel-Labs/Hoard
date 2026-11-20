@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "d9d0c739f4c7e6741f2ad3eb66a5542e133eec4e662af87c199e651c80a85cc8"
+source = "d707e8ce5d41663e6b570559ca45a362135bc4f4edb2325a0803b64d9954ae2a"
 translation = "48b91021e8ab72d74293b13e1175ec85edcf56c59510524f10635679bb042ed2"
 
 [messages.about-blender]
@@ -5680,6 +5680,14 @@ translation = "Hely hozzáadása"
 source = "Added { $name }"
 translation = "Hozzáadva: { $name }"
 
+[messages.locations-bucket]
+source = "Bucket"
+translation = "Bucket"
+
+[messages.locations-bucket-hint]
+source = "The name of a bucket that’s there already. The keys above need to be able to list, read and write it."
+translation = "Egy már létező bucket neve. A fenti kulcsoknak listázniuk, olvasniuk és írniuk kell tudniuk."
+
 [messages.locations-cancel]
 source = "Cancel"
 translation = "Mégse"
@@ -5736,10 +5744,6 @@ translation = "A feltöltéshez olyan könyvtár kell, amelyet a Hoard kezel. K�
 source = "Folder"
 translation = "Mappa"
 
-[messages.locations-folder-hint-cloud]
-source = "A folder that Dropbox, Google Drive, OneDrive or iCloud Drive keeps in sync works too, and so does s3://bucket-name for a bucket in S3 storage."
-translation = "Egy Dropbox, Google Drive, OneDrive vagy iCloud Drive által szinkronizált mappa is megfelel, ahogy egy S3-tárhely bucketjéhez az s3://bucket-name is."
-
 [messages.locations-folder-hint-managed]
 source = "Hoard creates it if it isn't there. In Docker, this is a folder you've mounted into the container."
 translation = "Ha nem létezik, a Hoard létrehozza. Dockerben ez egy olyan mappa, amelyet a konténerbe csatolt."
@@ -5759,6 +5763,26 @@ translation = "A Hoard csak olvassa: semmi sem változik benne."
 [messages.locations-folder-placeholder]
 source = "The folder your packs are in"
 translation = "A mappa, amelyben a csomagjai vannak"
+
+[messages.locations-kind-folder]
+source = "A folder"
+translation = "Egy mappa"
+
+[messages.locations-kind-folder-hint]
+source = "On a disk or NAS share mounted into the container, or one that Dropbox, Google Drive, OneDrive or iCloud Drive keeps in sync. Hoard can keep files there, or watch packs you already have."
+translation = "Egy lemezen vagy a konténerbe csatolt NAS-megosztáson, vagy egy mappa, amelyet a Dropbox, a Google Drive, a OneDrive vagy az iCloud Drive szinkronban tart. A Hoard fájlokat tárolhat benne, vagy figyelheti a már meglévő csomagjait."
+
+[messages.locations-kind-folder-hint-desktop]
+source = "On this computer, another disk or a NAS share, or one that Dropbox, Google Drive, OneDrive or iCloud Drive keeps in sync. Hoard can keep files there, or watch packs you already have."
+translation = "Ezen a számítógépen, egy másik lemezen vagy NAS-megosztáson, vagy egy mappa, amelyet a Dropbox, a Google Drive, a OneDrive vagy az iCloud Drive szinkronban tart. A Hoard fájlokat tárolhat benne, vagy figyelheti a már meglévő csomagjait."
+
+[messages.locations-kind-question]
+source = "What kind of location is it?"
+translation = "Milyen hely ez?"
+
+[messages.locations-kind-s3-hint]
+source = "A bucket in Amazon S3 or a service like it: Backblaze B2, Cloudflare R2, Wasabi, MinIO, Garage. Hoard keeps files there."
+translation = "Egy bucket az Amazon S3-ban vagy egy hasonló szolgáltatásban: Backblaze B2, Cloudflare R2, Wasabi, MinIO, Garage. A Hoard fájlokat tárol benne."
 
 [messages.locations-kinds-hint]
 source = "A new pack's files go to the location that ticks their kind. The rest go to the catch-all."

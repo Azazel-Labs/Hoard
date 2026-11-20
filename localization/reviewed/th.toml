@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "d9d0c739f4c7e6741f2ad3eb66a5542e133eec4e662af87c199e651c80a85cc8"
+source = "d707e8ce5d41663e6b570559ca45a362135bc4f4edb2325a0803b64d9954ae2a"
 translation = "92d047ab1bff2edef716312bfed1516adf04715aa76810de834f2305512a7e5f"
 
 [messages.about-blender]
@@ -5670,6 +5670,14 @@ translation = "เพิ่มตำแหน่ง"
 source = "Added { $name }"
 translation = "เพิ่ม { $name } แล้ว"
 
+[messages.locations-bucket]
+source = "Bucket"
+translation = "บักเก็ต"
+
+[messages.locations-bucket-hint]
+source = "The name of a bucket that’s there already. The keys above need to be able to list, read and write it."
+translation = "ชื่อบักเก็ตที่มีอยู่แล้ว คีย์ด้านบนต้องแสดงรายการ อ่าน และเขียนบักเก็ตนั้นได้"
+
 [messages.locations-cancel]
 source = "Cancel"
 translation = "ยกเลิก"
@@ -5726,10 +5734,6 @@ translation = "การอัปโหลดต้องมีคลังท�
 source = "Folder"
 translation = "โฟลเดอร์"
 
-[messages.locations-folder-hint-cloud]
-source = "A folder that Dropbox, Google Drive, OneDrive or iCloud Drive keeps in sync works too, and so does s3://bucket-name for a bucket in S3 storage."
-translation = "ใช้โฟลเดอร์ที่ Dropbox, Google Drive, OneDrive หรือ iCloud Drive ซิงค์ไว้ก็ได้ และใช้ s3://bucket-name สำหรับบักเก็ตในที่เก็บข้อมูล S3 ก็ได้เช่นกัน"
-
 [messages.locations-folder-hint-managed]
 source = "Hoard creates it if it isn't there. In Docker, this is a folder you've mounted into the container."
 translation = "Hoard จะสร้างโฟลเดอร์ให้หากยังไม่มี ใน Docker นี่คือโฟลเดอร์ที่คุณเมานต์เข้าไปในคอนเทนเนอร์"
@@ -5749,6 +5753,26 @@ translation = "Hoard อ่านโฟลเดอร์นี้อย่า�
 [messages.locations-folder-placeholder]
 source = "The folder your packs are in"
 translation = "โฟลเดอร์ที่แพ็กของคุณอยู่"
+
+[messages.locations-kind-folder]
+source = "A folder"
+translation = "โฟลเดอร์"
+
+[messages.locations-kind-folder-hint]
+source = "On a disk or NAS share mounted into the container, or one that Dropbox, Google Drive, OneDrive or iCloud Drive keeps in sync. Hoard can keep files there, or watch packs you already have."
+translation = "บนดิสก์หรือโฟลเดอร์แชร์ของ NAS ที่เมานต์เข้าไปในคอนเทนเนอร์ หรือโฟลเดอร์ที่ Dropbox, Google Drive, OneDrive หรือ iCloud Drive ซิงค์ไว้ Hoard เก็บไฟล์ไว้ที่นั่นได้ หรือคอยดูแพ็กที่คุณมีอยู่แล้วก็ได้"
+
+[messages.locations-kind-folder-hint-desktop]
+source = "On this computer, another disk or a NAS share, or one that Dropbox, Google Drive, OneDrive or iCloud Drive keeps in sync. Hoard can keep files there, or watch packs you already have."
+translation = "บนคอมพิวเตอร์เครื่องนี้ ดิสก์อื่น หรือโฟลเดอร์แชร์ของ NAS หรือโฟลเดอร์ที่ Dropbox, Google Drive, OneDrive หรือ iCloud Drive ซิงค์ไว้ Hoard เก็บไฟล์ไว้ที่นั่นได้ หรือคอยดูแพ็กที่คุณมีอยู่แล้วก็ได้"
+
+[messages.locations-kind-question]
+source = "What kind of location is it?"
+translation = "ตำแหน่งแบบไหน"
+
+[messages.locations-kind-s3-hint]
+source = "A bucket in Amazon S3 or a service like it: Backblaze B2, Cloudflare R2, Wasabi, MinIO, Garage. Hoard keeps files there."
+translation = "บักเก็ตใน Amazon S3 หรือบริการที่คล้ายกัน: Backblaze B2, Cloudflare R2, Wasabi, MinIO, Garage Hoard จะเก็บไฟล์ไว้ที่นั่น"
 
 [messages.locations-kinds-hint]
 source = "A new pack's files go to the location that ticks their kind. The rest go to the catch-all."

@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "d9d0c739f4c7e6741f2ad3eb66a5542e133eec4e662af87c199e651c80a85cc8"
+source = "d707e8ce5d41663e6b570559ca45a362135bc4f4edb2325a0803b64d9954ae2a"
 translation = "44c14591a95068aeb93ac3b44bf9c9907dc70d2d553d802b52b04da4b5c2b3c1"
 
 [messages.about-blender]
@@ -5823,6 +5823,14 @@ translation = "Додај локацију"
 source = "Added { $name }"
 translation = "Додато: { $name }"
 
+[messages.locations-bucket]
+source = "Bucket"
+translation = "Бакет"
+
+[messages.locations-bucket-hint]
+source = "The name of a bucket that’s there already. The keys above need to be able to list, read and write it."
+translation = "Име бакета који већ постоји. Кључеви изнад морају моћи да га излистају, читају и пишу у њега."
+
 [messages.locations-cancel]
 source = "Cancel"
 translation = "Откажи"
@@ -5879,10 +5887,6 @@ translation = "За отпремање је потребна библиотек�
 source = "Folder"
 translation = "Фасцикла"
 
-[messages.locations-folder-hint-cloud]
-source = "A folder that Dropbox, Google Drive, OneDrive or iCloud Drive keeps in sync works too, and so does s3://bucket-name for a bucket in S3 storage."
-translation = "Може и фасцикла коју синхронизује Dropbox, Google Drive, OneDrive или iCloud Drive, као и s3://bucket-name за бакет у S3 складишту."
-
 [messages.locations-folder-hint-managed]
 source = "Hoard creates it if it isn't there. In Docker, this is a folder you've mounted into the container."
 translation = "Hoard је прави ако не постоји. У Docker-у, ово је фасцикла коју сте монтирали у контејнер."
@@ -5902,6 +5906,26 @@ translation = "Hoard је само чита: ништа у њој се не ме
 [messages.locations-folder-placeholder]
 source = "The folder your packs are in"
 translation = "Фасцикла у којој су ваши пакети"
+
+[messages.locations-kind-folder]
+source = "A folder"
+translation = "Фасцикла"
+
+[messages.locations-kind-folder-hint]
+source = "On a disk or NAS share mounted into the container, or one that Dropbox, Google Drive, OneDrive or iCloud Drive keeps in sync. Hoard can keep files there, or watch packs you already have."
+translation = "На диску или NAS дељеној фасцикли монтираној у контејнер, или фасцикла коју синхронизује Dropbox, Google Drive, OneDrive или iCloud Drive. Hoard ту може да чува датотеке или да прати пакете које већ имате."
+
+[messages.locations-kind-folder-hint-desktop]
+source = "On this computer, another disk or a NAS share, or one that Dropbox, Google Drive, OneDrive or iCloud Drive keeps in sync. Hoard can keep files there, or watch packs you already have."
+translation = "На овом рачунару, другом диску или NAS дељеној фасцикли, или фасцикла коју синхронизује Dropbox, Google Drive, OneDrive или iCloud Drive. Hoard ту може да чува датотеке или да прати пакете које већ имате."
+
+[messages.locations-kind-question]
+source = "What kind of location is it?"
+translation = "Која је ово врста локације?"
+
+[messages.locations-kind-s3-hint]
+source = "A bucket in Amazon S3 or a service like it: Backblaze B2, Cloudflare R2, Wasabi, MinIO, Garage. Hoard keeps files there."
+translation = "Бакет у Amazon S3 или сличној услузи: Backblaze B2, Cloudflare R2, Wasabi, MinIO, Garage. Hoard ту чува датотеке."
 
 [messages.locations-kinds-hint]
 source = "A new pack's files go to the location that ticks their kind. The rest go to the catch-all."

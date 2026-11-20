@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "d9d0c739f4c7e6741f2ad3eb66a5542e133eec4e662af87c199e651c80a85cc8"
+source = "d707e8ce5d41663e6b570559ca45a362135bc4f4edb2325a0803b64d9954ae2a"
 translation = "54db7a8b2776b518b5b7f9903cf54c52cf30df365a4334f881ce45382f97ad63"
 
 [messages.about-blender]
@@ -5899,6 +5899,14 @@ translation = "Додати розташування"
 source = "Added { $name }"
 translation = "Додано { $name }"
 
+[messages.locations-bucket]
+source = "Bucket"
+translation = "Бакет"
+
+[messages.locations-bucket-hint]
+source = "The name of a bucket that’s there already. The keys above need to be able to list, read and write it."
+translation = "Назва бакета, який уже існує. Ключі вище мають дозволяти переглядати його вміст, читати й записувати в нього."
+
 [messages.locations-cancel]
 source = "Cancel"
 translation = "Скасувати"
@@ -5955,10 +5963,6 @@ translation = "Для вивантаження потрібна бібліоте
 source = "Folder"
 translation = "Тека"
 
-[messages.locations-folder-hint-cloud]
-source = "A folder that Dropbox, Google Drive, OneDrive or iCloud Drive keeps in sync works too, and so does s3://bucket-name for a bucket in S3 storage."
-translation = "Підійде й тека, яку синхронізує Dropbox, Google Drive, OneDrive чи iCloud Drive, а також s3://bucket-name для бакета у сховищі S3."
-
 [messages.locations-folder-hint-managed]
 source = "Hoard creates it if it isn't there. In Docker, this is a folder you've mounted into the container."
 translation = "Hoard створить її, якщо її немає. У Docker це тека, яку ви змонтували в контейнер."
@@ -5978,6 +5982,26 @@ translation = "Hoard лише читає її: нічого в ній не зм�
 [messages.locations-folder-placeholder]
 source = "The folder your packs are in"
 translation = "Тека, де лежать ваші пакети"
+
+[messages.locations-kind-folder]
+source = "A folder"
+translation = "Тека"
+
+[messages.locations-kind-folder-hint]
+source = "On a disk or NAS share mounted into the container, or one that Dropbox, Google Drive, OneDrive or iCloud Drive keeps in sync. Hoard can keep files there, or watch packs you already have."
+translation = "На диску чи мережевій теці NAS, змонтованій у контейнер, або тека, яку синхронізує Dropbox, Google Drive, OneDrive чи iCloud Drive. Hoard може зберігати там файли або стежити за пакетами, які у вас уже є."
+
+[messages.locations-kind-folder-hint-desktop]
+source = "On this computer, another disk or a NAS share, or one that Dropbox, Google Drive, OneDrive or iCloud Drive keeps in sync. Hoard can keep files there, or watch packs you already have."
+translation = "На цьому комп’ютері, іншому диску чи мережевій теці NAS, або тека, яку синхронізує Dropbox, Google Drive, OneDrive чи iCloud Drive. Hoard може зберігати там файли або стежити за пакетами, які у вас уже є."
+
+[messages.locations-kind-question]
+source = "What kind of location is it?"
+translation = "Яке це розташування?"
+
+[messages.locations-kind-s3-hint]
+source = "A bucket in Amazon S3 or a service like it: Backblaze B2, Cloudflare R2, Wasabi, MinIO, Garage. Hoard keeps files there."
+translation = "Бакет в Amazon S3 або схожому сервісі: Backblaze B2, Cloudflare R2, Wasabi, MinIO, Garage. Hoard зберігає там файли."
 
 [messages.locations-kinds-hint]
 source = "A new pack's files go to the location that ticks their kind. The rest go to the catch-all."

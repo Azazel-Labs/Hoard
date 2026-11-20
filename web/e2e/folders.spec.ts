@@ -60,6 +60,7 @@ test('a pack browses folder by folder, and a path opens its folder', async ({ pa
 test('adding a location shows a dragon for claiming the folder and one for watching it', async ({ page }) => {
   await page.goto('/#settings/locations')
   await page.getByRole('button', { name: 'Add a location…' }).click()
+  await page.getByRole('dialog', { name: 'Add a location' }).getByRole('button', { name: /^A folder/ }).click()
   const choices = page.getByRole('group', { name: 'What should Hoard do with this folder?' })
   const claim = choices.getByRole('radio', { name: /^Claim it/ })
   const watchIt = choices.getByRole('radio', { name: /^Watch it/ })

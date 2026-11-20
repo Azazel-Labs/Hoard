@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "d9d0c739f4c7e6741f2ad3eb66a5542e133eec4e662af87c199e651c80a85cc8"
+source = "d707e8ce5d41663e6b570559ca45a362135bc4f4edb2325a0803b64d9954ae2a"
 translation = "d4ffe23624a8e2ed08874041f259b7b861d9b7c2778156c6ed0d63ae2ed8ce2d"
 
 [messages.about-blender]
@@ -5790,6 +5790,14 @@ translation = "Lägg till en plats"
 source = "Added { $name }"
 translation = "Lade till { $name }"
 
+[messages.locations-bucket]
+source = "Bucket"
+translation = "Bucket"
+
+[messages.locations-bucket-hint]
+source = "The name of a bucket that’s there already. The keys above need to be able to list, read and write it."
+translation = "Namnet på en bucket som redan finns. Nycklarna ovan måste kunna lista, läsa och skriva i den."
+
 [messages.locations-cancel]
 source = "Cancel"
 translation = "Avbryt"
@@ -5846,10 +5854,6 @@ translation = "Uppladdning kräver ett bibliotek som Hoard sköter. Du kan lägg
 source = "Folder"
 translation = "Mapp"
 
-[messages.locations-folder-hint-cloud]
-source = "A folder that Dropbox, Google Drive, OneDrive or iCloud Drive keeps in sync works too, and so does s3://bucket-name for a bucket in S3 storage."
-translation = "En mapp som Dropbox, Google Drive, OneDrive eller iCloud Drive synkroniserar fungerar också, och likaså s3://bucket-name för en bucket i S3-lagringen."
-
 [messages.locations-folder-hint-managed]
 source = "Hoard creates it if it isn't there. In Docker, this is a folder you've mounted into the container."
 translation = "Hoard skapar den om den inte finns. I Docker är det här en mapp som du har monterat i containern."
@@ -5869,6 +5873,26 @@ translation = "Hoard läser bara den: inget i den ändras."
 [messages.locations-folder-placeholder]
 source = "The folder your packs are in"
 translation = "Mappen som dina paket ligger i"
+
+[messages.locations-kind-folder]
+source = "A folder"
+translation = "En mapp"
+
+[messages.locations-kind-folder-hint]
+source = "On a disk or NAS share mounted into the container, or one that Dropbox, Google Drive, OneDrive or iCloud Drive keeps in sync. Hoard can keep files there, or watch packs you already have."
+translation = "På en disk eller en NAS-utdelning som är monterad i containern, eller en som Dropbox, Google Drive, OneDrive eller iCloud Drive synkroniserar. Hoard kan spara filer där, eller bevaka paket du redan har."
+
+[messages.locations-kind-folder-hint-desktop]
+source = "On this computer, another disk or a NAS share, or one that Dropbox, Google Drive, OneDrive or iCloud Drive keeps in sync. Hoard can keep files there, or watch packs you already have."
+translation = "På den här datorn, en annan disk eller en NAS-utdelning, eller en som Dropbox, Google Drive, OneDrive eller iCloud Drive synkroniserar. Hoard kan spara filer där, eller bevaka paket du redan har."
+
+[messages.locations-kind-question]
+source = "What kind of location is it?"
+translation = "Vilken sorts plats är det?"
+
+[messages.locations-kind-s3-hint]
+source = "A bucket in Amazon S3 or a service like it: Backblaze B2, Cloudflare R2, Wasabi, MinIO, Garage. Hoard keeps files there."
+translation = "En bucket i Amazon S3 eller en liknande tjänst: Backblaze B2, Cloudflare R2, Wasabi, MinIO, Garage. Hoard sparar filer där."
 
 [messages.locations-kinds-hint]
 source = "A new pack's files go to the location that ticks their kind. The rest go to the catch-all."

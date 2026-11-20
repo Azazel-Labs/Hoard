@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "d9d0c739f4c7e6741f2ad3eb66a5542e133eec4e662af87c199e651c80a85cc8"
+source = "d707e8ce5d41663e6b570559ca45a362135bc4f4edb2325a0803b64d9954ae2a"
 translation = "e5f3f7db07b8d100748035cc5c5db381f2b0ac74ef4784aefc515dc35bb050a8"
 
 [messages.about-blender]
@@ -5670,6 +5670,14 @@ translation = "Thêm vị trí"
 source = "Added { $name }"
 translation = "Đã thêm { $name }"
 
+[messages.locations-bucket]
+source = "Bucket"
+translation = "Bucket"
+
+[messages.locations-bucket-hint]
+source = "The name of a bucket that’s there already. The keys above need to be able to list, read and write it."
+translation = "Tên một bucket đã có sẵn. Các khóa ở trên phải liệt kê, đọc và ghi được vào bucket đó."
+
 [messages.locations-cancel]
 source = "Cancel"
 translation = "Hủy"
@@ -5726,10 +5734,6 @@ translation = "Tải lên cần một thư viện do Hoard quản lý. Bạn có
 source = "Folder"
 translation = "Thư mục"
 
-[messages.locations-folder-hint-cloud]
-source = "A folder that Dropbox, Google Drive, OneDrive or iCloud Drive keeps in sync works too, and so does s3://bucket-name for a bucket in S3 storage."
-translation = "Thư mục được Dropbox, Google Drive, OneDrive hoặc iCloud Drive đồng bộ cũng được, và s3://bucket-name cho một bucket trong kho lưu trữ S3 cũng vậy."
-
 [messages.locations-folder-hint-managed]
 source = "Hoard creates it if it isn't there. In Docker, this is a folder you've mounted into the container."
 translation = "Hoard sẽ tạo thư mục nếu chưa có. Trong Docker, đây là thư mục bạn đã gắn vào container."
@@ -5749,6 +5753,26 @@ translation = "Hoard chỉ đọc thư mục: không có gì trong đó bị tha
 [messages.locations-folder-placeholder]
 source = "The folder your packs are in"
 translation = "Thư mục chứa các gói của bạn"
+
+[messages.locations-kind-folder]
+source = "A folder"
+translation = "Một thư mục"
+
+[messages.locations-kind-folder-hint]
+source = "On a disk or NAS share mounted into the container, or one that Dropbox, Google Drive, OneDrive or iCloud Drive keeps in sync. Hoard can keep files there, or watch packs you already have."
+translation = "Trên ổ đĩa hoặc thư mục chia sẻ NAS đã gắn vào container, hoặc thư mục được Dropbox, Google Drive, OneDrive hay iCloud Drive đồng bộ. Hoard có thể giữ tệp ở đó, hoặc theo dõi các gói bạn đã có."
+
+[messages.locations-kind-folder-hint-desktop]
+source = "On this computer, another disk or a NAS share, or one that Dropbox, Google Drive, OneDrive or iCloud Drive keeps in sync. Hoard can keep files there, or watch packs you already have."
+translation = "Trên máy tính này, một ổ đĩa khác hoặc thư mục chia sẻ NAS, hoặc thư mục được Dropbox, Google Drive, OneDrive hay iCloud Drive đồng bộ. Hoard có thể giữ tệp ở đó, hoặc theo dõi các gói bạn đã có."
+
+[messages.locations-kind-question]
+source = "What kind of location is it?"
+translation = "Đây là loại vị trí nào?"
+
+[messages.locations-kind-s3-hint]
+source = "A bucket in Amazon S3 or a service like it: Backblaze B2, Cloudflare R2, Wasabi, MinIO, Garage. Hoard keeps files there."
+translation = "Một bucket trong Amazon S3 hoặc dịch vụ tương tự: Backblaze B2, Cloudflare R2, Wasabi, MinIO, Garage. Hoard giữ tệp ở đó."
 
 [messages.locations-kinds-hint]
 source = "A new pack's files go to the location that ticks their kind. The rest go to the catch-all."

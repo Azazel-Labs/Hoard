@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "d9d0c739f4c7e6741f2ad3eb66a5542e133eec4e662af87c199e651c80a85cc8"
+source = "d707e8ce5d41663e6b570559ca45a362135bc4f4edb2325a0803b64d9954ae2a"
 translation = "b1a2713c2acc2d665383ad63d82b67d896f7efeabb3cc5c38eb8418e41d7aa97"
 
 [messages.about-blender]
@@ -5793,6 +5793,14 @@ translation = "Een locatie toevoegen"
 source = "Added { $name }"
 translation = "{ $name } toegevoegd"
 
+[messages.locations-bucket]
+source = "Bucket"
+translation = "Bucket"
+
+[messages.locations-bucket-hint]
+source = "The name of a bucket that’s there already. The keys above need to be able to list, read and write it."
+translation = "De naam van een bucket die al bestaat. De sleutels hierboven moeten hem kunnen opsommen, lezen en beschrijven."
+
 [messages.locations-cancel]
 source = "Cancel"
 translation = "Annuleren"
@@ -5849,10 +5857,6 @@ translation = "Voor uploaden is een bibliotheek nodig die Hoard beheert. Je kunt
 source = "Folder"
 translation = "Map"
 
-[messages.locations-folder-hint-cloud]
-source = "A folder that Dropbox, Google Drive, OneDrive or iCloud Drive keeps in sync works too, and so does s3://bucket-name for a bucket in S3 storage."
-translation = "Een map die Dropbox, Google Drive, OneDrive of iCloud Drive synchroniseert werkt ook, net als s3://bucket-name voor een bucket in S3-opslag."
-
 [messages.locations-folder-hint-managed]
 source = "Hoard creates it if it isn't there. In Docker, this is a folder you've mounted into the container."
 translation = "Hoard maakt hem aan als hij er niet is. In Docker is dit een map die je in de container hebt gekoppeld."
@@ -5872,6 +5876,26 @@ translation = "Hoard leest hem alleen: er wordt niets in gewijzigd."
 [messages.locations-folder-placeholder]
 source = "The folder your packs are in"
 translation = "De map waarin je pakketten staan"
+
+[messages.locations-kind-folder]
+source = "A folder"
+translation = "Een map"
+
+[messages.locations-kind-folder-hint]
+source = "On a disk or NAS share mounted into the container, or one that Dropbox, Google Drive, OneDrive or iCloud Drive keeps in sync. Hoard can keep files there, or watch packs you already have."
+translation = "Op een schijf of NAS-share die in de container is gekoppeld, of een map die Dropbox, Google Drive, OneDrive of iCloud Drive synchroniseert. Hoard kan er bestanden bewaren, of pakketten in de gaten houden die je al hebt."
+
+[messages.locations-kind-folder-hint-desktop]
+source = "On this computer, another disk or a NAS share, or one that Dropbox, Google Drive, OneDrive or iCloud Drive keeps in sync. Hoard can keep files there, or watch packs you already have."
+translation = "Op deze computer, een andere schijf of een NAS-share, of een map die Dropbox, Google Drive, OneDrive of iCloud Drive synchroniseert. Hoard kan er bestanden bewaren, of pakketten in de gaten houden die je al hebt."
+
+[messages.locations-kind-question]
+source = "What kind of location is it?"
+translation = "Wat voor locatie is het?"
+
+[messages.locations-kind-s3-hint]
+source = "A bucket in Amazon S3 or a service like it: Backblaze B2, Cloudflare R2, Wasabi, MinIO, Garage. Hoard keeps files there."
+translation = "Een bucket in Amazon S3 of een vergelijkbare dienst: Backblaze B2, Cloudflare R2, Wasabi, MinIO, Garage. Hoard bewaart er bestanden."
 
 [messages.locations-kinds-hint]
 source = "A new pack's files go to the location that ticks their kind. The rest go to the catch-all."

@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "d9d0c739f4c7e6741f2ad3eb66a5542e133eec4e662af87c199e651c80a85cc8"
+source = "d707e8ce5d41663e6b570559ca45a362135bc4f4edb2325a0803b64d9954ae2a"
 translation = "4890422f21c71087236199437be3f5ec0bf500d828f121f3861539f632d6bf93"
 
 [messages.about-blender]
@@ -5819,6 +5819,14 @@ translation = "Προσθήκη τοποθεσίας"
 source = "Added { $name }"
 translation = "Προστέθηκε: { $name }"
 
+[messages.locations-bucket]
+source = "Bucket"
+translation = "Bucket"
+
+[messages.locations-bucket-hint]
+source = "The name of a bucket that’s there already. The keys above need to be able to list, read and write it."
+translation = "Το όνομα ενός bucket που υπάρχει ήδη. Τα κλειδιά παραπάνω πρέπει να μπορούν να το απαριθμούν, να το διαβάζουν και να γράφουν σε αυτό."
+
 [messages.locations-cancel]
 source = "Cancel"
 translation = "Ακύρωση"
@@ -5875,10 +5883,6 @@ translation = "Η μεταφόρτωση χρειάζεται μια βιβλι�
 source = "Folder"
 translation = "Φάκελος"
 
-[messages.locations-folder-hint-cloud]
-source = "A folder that Dropbox, Google Drive, OneDrive or iCloud Drive keeps in sync works too, and so does s3://bucket-name for a bucket in S3 storage."
-translation = "Λειτουργεί επίσης ένας φάκελος που συγχρονίζει το Dropbox, το Google Drive, το OneDrive ή το iCloud Drive, όπως και το s3://bucket-name για ένα bucket στον χώρο αποθήκευσης S3."
-
 [messages.locations-folder-hint-managed]
 source = "Hoard creates it if it isn't there. In Docker, this is a folder you've mounted into the container."
 translation = "Το Hoard τον δημιουργεί αν δεν υπάρχει. Στο Docker, είναι ένας φάκελος που έχετε προσαρτήσει στο container."
@@ -5898,6 +5902,26 @@ translation = "Το Hoard μόνο τον διαβάζει: τίποτα μέσ�
 [messages.locations-folder-placeholder]
 source = "The folder your packs are in"
 translation = "Ο φάκελος όπου βρίσκονται τα πακέτα σας"
+
+[messages.locations-kind-folder]
+source = "A folder"
+translation = "Ένας φάκελος"
+
+[messages.locations-kind-folder-hint]
+source = "On a disk or NAS share mounted into the container, or one that Dropbox, Google Drive, OneDrive or iCloud Drive keeps in sync. Hoard can keep files there, or watch packs you already have."
+translation = "Σε δίσκο ή κοινόχρηστο φάκελο NAS προσαρτημένο στο container, ή ένας φάκελος που συγχρονίζει το Dropbox, το Google Drive, το OneDrive ή το iCloud Drive. Το Hoard μπορεί να κρατά αρχεία εκεί ή να παρακολουθεί πακέτα που έχετε ήδη."
+
+[messages.locations-kind-folder-hint-desktop]
+source = "On this computer, another disk or a NAS share, or one that Dropbox, Google Drive, OneDrive or iCloud Drive keeps in sync. Hoard can keep files there, or watch packs you already have."
+translation = "Σε αυτόν τον υπολογιστή, σε άλλον δίσκο ή σε κοινόχρηστο φάκελο NAS, ή ένας φάκελος που συγχρονίζει το Dropbox, το Google Drive, το OneDrive ή το iCloud Drive. Το Hoard μπορεί να κρατά αρχεία εκεί ή να παρακολουθεί πακέτα που έχετε ήδη."
+
+[messages.locations-kind-question]
+source = "What kind of location is it?"
+translation = "Τι είδους τοποθεσία είναι;"
+
+[messages.locations-kind-s3-hint]
+source = "A bucket in Amazon S3 or a service like it: Backblaze B2, Cloudflare R2, Wasabi, MinIO, Garage. Hoard keeps files there."
+translation = "Ένα bucket στο Amazon S3 ή σε παρόμοια υπηρεσία: Backblaze B2, Cloudflare R2, Wasabi, MinIO, Garage. Το Hoard κρατά αρχεία εκεί."
 
 [messages.locations-kinds-hint]
 source = "A new pack's files go to the location that ticks their kind. The rest go to the catch-all."

@@ -17,11 +17,21 @@ const props = defineProps<{
   /** Label for the button that adds it. */
   submitLabel?: string
   cancelable?: boolean
+  /** A bucket in S3 storage rather than a folder: Hoard keeps files there, it can't watch one. */
+  bucket?: boolean
+  /** Runs before the location is added (saving the S3 storage it's in); false stops it. */
+  beforeAdd?: () => Promise<boolean>
 }>()
 const emit = defineEmits<{ created: [LibraryLocation]; cancel: []; unauthorized: [] }>()
 
 const mode = ref<LocationMode>('managed')
-const path = ref(props.suggested)
+const folder = ref(props.bucket ? '' : props.suggested)
+const bucketName = ref('')
+/** What's sent: the folder, or the bucket as s3://name. */
+const path = computed({
+  get: () => (props.bucket ? (bucketName.value.trim() ? `s3://${bucketName.value.trim().replace(/^s3:\/\//, '')}` : '') : folder.value),
+  set: (v: string) => (folder.value = v),
+})
 const name = ref('')
 const picked = ref<AssetKind[]>([])
 const catchAll = ref(!!props.first)
@@ -43,6 +53,7 @@ async function submit() {
   busy.value = true
   error.value = ''
   try {
+    if (props.beforeAdd && !(await props.beforeAdd())) return
     const managed = mode.value === 'managed'
     const loc = await api.addLocation({
       name: name.value.trim() || undefined,
@@ -63,7 +74,7 @@ async function submit() {
 
 <template>
   <form class="locform" @submit.prevent="submit">
-    <fieldset class="choices">
+    <fieldset v-if="!bucket" class="choices">
       <legend class="lbl">{{ t('locations-mode-question') }}</legend>
       <!-- A dragon on its treasure, sorted into chests and racks; a dragon eyeing a heap it never sorted. -->
       <label :class="{ on: mode === 'managed' }">
@@ -89,14 +100,26 @@ async function submit() {
     </fieldset>
 
     <div class="grid">
-      <label class="lbl" for="loc-path">{{ t('locations-folder-desktop') }}</label>
-      <div>
-        <FolderPicker id="loc-path" v-model="path" :placeholder="mode === 'managed' ? suggested : t('locations-folder-placeholder')" @unauthorized="emit('unauthorized')" />
-        <p class="hint">
-          <template v-if="mode === 'managed'">{{ t('locations-folder-hint-managed') }} {{ t('locations-folder-hint-cloud') }}</template>
-          <template v-else>{{ t('locations-folder-hint-watched') }}</template>
-        </p>
-      </div>
+      <template v-if="bucket">
+        <label class="lbl" for="loc-bucket">{{ t('locations-bucket') }}</label>
+        <div>
+          <div class="s3url">
+            <span class="mono" aria-hidden="true">s3://</span>
+            <input id="loc-bucket" v-model="bucketName" class="field mono" type="text" spellcheck="false" autocomplete="off" maxlength="63" />
+          </div>
+          <p class="hint">{{ t('locations-bucket-hint') }}</p>
+        </div>
+      </template>
+      <template v-else>
+        <label class="lbl" for="loc-path">{{ t('locations-folder-desktop') }}</label>
+        <div>
+          <FolderPicker id="loc-path" v-model="folder" :placeholder="mode === 'managed' ? suggested : t('locations-folder-placeholder')" @unauthorized="emit('unauthorized')" />
+          <p class="hint">
+            <template v-if="mode === 'managed'">{{ t('locations-folder-hint-managed') }}</template>
+            <template v-else>{{ t('locations-folder-hint-watched') }}</template>
+          </p>
+        </div>
+      </template>
 
       <label class="lbl" for="loc-name">{{ t('locations-name') }}</label>
       <input id="loc-name" v-model="name" class="field" type="text" maxlength="80" :placeholder="folderName || (mode === 'managed' ? t('locations-name-placeholder-managed') : t('locations-name-placeholder-watched'))" />
@@ -160,5 +183,8 @@ legend.lbl { margin-bottom: 0.45rem; padding: 0; }
 .check { display: inline-flex; gap: 0.45rem; align-items: center; }
 .err { margin: 0; color: var(--danger); overflow-wrap: anywhere; }
 .acts { display: flex; gap: 0.5rem; }
+.s3url { display: flex; align-items: baseline; gap: 0.3rem; max-width: 22rem; }
+.s3url > span { color: var(--muted); }
+.s3url .field { flex: 1; min-width: 0; }
 @media (max-width: 30rem) { .grid { grid-template-columns: minmax(0, 1fr); gap: 0.35rem; } .grid > .lbl:not(:first-child) { margin-top: 0.5rem; } }
 </style>

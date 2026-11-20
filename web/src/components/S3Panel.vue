@@ -5,6 +5,10 @@ import { ApiError, api, type S3Setting, type SettingsPatch } from '../api'
 import { t } from '../i18n'
 import { showError, showOk } from '../ui'
 
+const props = defineProps<{
+  /** Part of adding a bucket location: no card or heading of its own, and it's saved when the location is added. */
+  embedded?: boolean
+}>()
 const emit = defineEmits<{ unauthorized: []; changed: [] }>()
 
 const s3 = ref<S3Setting | null>(null)
@@ -48,7 +52,14 @@ const dirty = computed(() => {
   )
 })
 
-async function save() {
+/** Saves what's been typed, if anything has; false if it couldn't be (the reason is shown). */
+async function saveIfDirty(): Promise<boolean> {
+  if (!s3.value?.built) return false
+  return !dirty.value || (await save())
+}
+defineExpose({ saveIfDirty })
+
+async function save(): Promise<boolean> {
   busy.value = true
   try {
     const patch: SettingsPatch = {
@@ -61,11 +72,13 @@ async function save() {
     if (form.headers.trim()) patch.s3_headers = form.headers.trim()
     else if (form.removeHeaders) patch.s3_headers = ''
     take((await api.saveSettings(patch)).s3)
-    showOk(t('locations-s3-saved'))
+    if (!props.embedded) showOk(t('locations-s3-saved'))
     emit('changed')
+    return true
   } catch (e) {
     if (e instanceof ApiError && e.status === 401) emit('unauthorized')
     showError(t('locations-failed', { what: t('locations-s3-save-failed'), error: (e as Error).message }))
+    return false
   } finally {
     busy.value = false
   }
@@ -73,11 +86,11 @@ async function save() {
 </script>
 
 <template>
-  <section v-if="s3" data-testid="s3-storage">
-    <div class="sh"><h3>{{ t('locations-s3-title') }}</h3></div>
+  <component :is="embedded ? 'div' : 'section'" v-if="s3" data-testid="s3-storage" :class="{ embedded }">
+    <div v-if="!embedded" class="sh"><h3>{{ t('locations-s3-title') }}</h3></div>
     <p class="hint">{{ t('locations-s3-hint') }}</p>
     <p v-if="!s3.built" class="hint">{{ t('error-not-built', { feature: 'S3' }) }}</p>
-    <form v-else class="grid" @submit.prevent="save">
+    <component :is="embedded ? 'div' : 'form'" v-else class="grid" @submit.prevent="save">
       <label class="lbl" for="s3-endpoint">{{ t('locations-s3-endpoint') }}</label>
       <input id="s3-endpoint" v-model="form.endpoint" class="field mono" type="url" spellcheck="false" :placeholder="t('locations-s3-endpoint-placeholder')" :disabled="busy" />
 
@@ -121,12 +134,14 @@ async function save() {
       <span />
       <p class="hint flat">{{ t('locations-s3-secrets') }}</p>
 
-      <span />
-      <div>
-        <button class="btn primary" type="submit" :disabled="busy || !dirty">{{ t('locations-save') }}</button>
-      </div>
-    </form>
-  </section>
+      <template v-if="!embedded">
+        <span />
+        <div>
+          <button class="btn primary" type="submit" :disabled="busy || !dirty">{{ t('locations-save') }}</button>
+        </div>
+      </template>
+    </component>
+  </component>
 </template>
 
 <style scoped>

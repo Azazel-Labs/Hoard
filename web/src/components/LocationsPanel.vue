@@ -7,12 +7,18 @@ import { confirmDialog, showError, showOk } from '../ui'
 import { formatDate, t } from '../i18n'
 import KindChips from './KindChips.vue'
 import LocationForm from './LocationForm.vue'
+import LocationKindDialog from './LocationKindDialog.vue'
 import S3Panel from './S3Panel.vue'
 
 const emit = defineEmits<{ unauthorized: []; changed: [] }>()
 
 const data = ref<LocationList | null>(null)
-const adding = ref(false)
+/** Adding a location: choosing what kind, then the folder's form or the bucket's. */
+const adding = ref<'' | 'choose' | 'folder' | 's3'>('')
+const s3Keys = ref<InstanceType<typeof S3Panel> | null>(null)
+const saveS3 = async () => (await s3Keys.value?.saveIfDirty()) ?? false
+/** The S3 storage settings get a card of their own once a location is in a bucket. */
+const inBucket = computed(() => data.value?.locations.some((l) => l.path.startsWith('s3://')) ?? false)
 const editing = ref<number | null>(null)
 const draft = reactive({ name: '', kinds: [] as AssetKind[], catch_all: false })
 const busy = ref(false)
@@ -162,7 +168,7 @@ async function scanNow(l: LibraryLocation) {
 }
 
 async function created(l: LibraryLocation) {
-  adding.value = false
+  adding.value = ''
   showOk(l.mode === 'watched' ? t('locations-watching', { name: l.name }) : t('locations-added', { name: l.name }))
   await load()
   emit('changed')
@@ -233,22 +239,37 @@ async function created(l: LibraryLocation) {
       <section>
         <div class="sh"><h3>{{ t('locations-add-title') }}</h3></div>
         <LocationForm
-          v-if="adding"
+          v-if="adding === 'folder'"
           :suggested="managed.length ? '' : data.suggested"
           :kinds="data.kinds"
           :first="!data.locations.length"
           cancelable
           @created="created"
-          @cancel="adding = false"
+          @cancel="adding = ''"
           @unauthorized="emit('unauthorized')"
         />
+        <div v-else-if="adding === 's3'" class="bucket">
+          <S3Panel ref="s3Keys" embedded @unauthorized="emit('unauthorized')" />
+          <LocationForm
+            bucket
+            suggested=""
+            :kinds="data.kinds"
+            :first="!data.locations.length"
+            :before-add="saveS3"
+            cancelable
+            @created="created"
+            @cancel="adding = ''"
+            @unauthorized="emit('unauthorized')"
+          />
+        </div>
         <template v-else>
           <p class="hint">{{ t('locations-add-hint') }}</p>
-          <button type="button" class="btn" @click="adding = true">{{ t('locations-add-more') }}</button>
+          <button type="button" class="btn" @click="adding = 'choose'">{{ t('locations-add-more') }}</button>
+          <LocationKindDialog v-if="adding === 'choose'" @pick="adding = $event" @close="adding = ''" />
         </template>
       </section>
 
-      <S3Panel @unauthorized="emit('unauthorized')" @changed="load" />
+      <S3Panel v-if="inBucket" @unauthorized="emit('unauthorized')" @changed="load" />
     </template>
   </div>
 </template>
@@ -279,6 +300,7 @@ section:empty { display: none; }
 .lbl { color: var(--muted); }
 .eacts { display: flex; gap: 0.5rem; }
 .check { display: inline-flex; gap: 0.45rem; align-items: center; }
+.bucket { display: grid; gap: 1rem; }
 .rebal { display: flex; gap: 0.7rem; align-items: center; margin-top: 0.6rem; }
 .rebal small { color: var(--muted); font-size: var(--step--1); line-height: 1.4; }
 @media (max-width: 30rem) {

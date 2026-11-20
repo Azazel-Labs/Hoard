@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "d9d0c739f4c7e6741f2ad3eb66a5542e133eec4e662af87c199e651c80a85cc8"
+source = "d707e8ce5d41663e6b570559ca45a362135bc4f4edb2325a0803b64d9954ae2a"
 translation = "9b658642e0200ba66efa386171fcbdde924e04ae57e4d1149258a48611dc8acd"
 
 [messages.about-blender]
@@ -5676,6 +5676,14 @@ translation = "新增位置"
 source = "Added { $name }"
 translation = "已新增 { $name }"
 
+[messages.locations-bucket]
+source = "Bucket"
+translation = "儲存貯體"
+
+[messages.locations-bucket-hint]
+source = "The name of a bucket that’s there already. The keys above need to be able to list, read and write it."
+translation = "一個已經存在的儲存貯體的名稱。上面的金鑰需要能列出、讀取和寫入它。"
+
 [messages.locations-cancel]
 source = "Cancel"
 translation = "取消"
@@ -5732,10 +5740,6 @@ translation = "上傳需要由 Hoard 管理的素材庫。你之後可以從「�
 source = "Folder"
 translation = "資料夾"
 
-[messages.locations-folder-hint-cloud]
-source = "A folder that Dropbox, Google Drive, OneDrive or iCloud Drive keeps in sync works too, and so does s3://bucket-name for a bucket in S3 storage."
-translation = "也可以使用由 Dropbox、Google Drive、OneDrive 或 iCloud Drive 同步的資料夾；S3 儲存空間中的儲存貯體則可使用 s3://bucket-name。"
-
 [messages.locations-folder-hint-managed]
 source = "Hoard creates it if it isn't there. In Docker, this is a folder you've mounted into the container."
 translation = "如果資料夾不存在，Hoard 會建立它。在 Docker 中，這是你掛載到容器內的資料夾。"
@@ -5755,6 +5759,26 @@ translation = "Hoard 只會讀取這個資料夾，不會變更其中的任何�
 [messages.locations-folder-placeholder]
 source = "The folder your packs are in"
 translation = "存放素材包的資料夾"
+
+[messages.locations-kind-folder]
+source = "A folder"
+translation = "資料夾"
+
+[messages.locations-kind-folder-hint]
+source = "On a disk or NAS share mounted into the container, or one that Dropbox, Google Drive, OneDrive or iCloud Drive keeps in sync. Hoard can keep files there, or watch packs you already have."
+translation = "在掛載到容器內的磁碟或 NAS 共用資料夾上，或由 Dropbox、Google Drive、OneDrive 或 iCloud Drive 同步的資料夾。Hoard 可以在那裡存放檔案，也可以關注你已有的資源包。"
+
+[messages.locations-kind-folder-hint-desktop]
+source = "On this computer, another disk or a NAS share, or one that Dropbox, Google Drive, OneDrive or iCloud Drive keeps in sync. Hoard can keep files there, or watch packs you already have."
+translation = "在這台電腦、另一顆磁碟或 NAS 共用資料夾上，或由 Dropbox、Google Drive、OneDrive 或 iCloud Drive 同步的資料夾。Hoard 可以在那裡存放檔案，也可以關注你已有的資源包。"
+
+[messages.locations-kind-question]
+source = "What kind of location is it?"
+translation = "是哪種位置？"
+
+[messages.locations-kind-s3-hint]
+source = "A bucket in Amazon S3 or a service like it: Backblaze B2, Cloudflare R2, Wasabi, MinIO, Garage. Hoard keeps files there."
+translation = "Amazon S3 或類似服務中的儲存貯體：Backblaze B2, Cloudflare R2, Wasabi, MinIO, Garage。Hoard 在那裡存放檔案。"
 
 [messages.locations-kinds-hint]
 source = "A new pack's files go to the location that ticks their kind. The rest go to the catch-all."

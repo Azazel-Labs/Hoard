@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "d9d0c739f4c7e6741f2ad3eb66a5542e133eec4e662af87c199e651c80a85cc8"
+source = "d707e8ce5d41663e6b570559ca45a362135bc4f4edb2325a0803b64d9954ae2a"
 translation = "69f01639647ec94d71cdb3668111c233bf33f40252c42dacec1a9e8e8ec3a19b"
 
 [messages.about-blender]
@@ -5868,6 +5868,14 @@ translation = "Přidat umístění"
 source = "Added { $name }"
 translation = "Přidáno: { $name }"
 
+[messages.locations-bucket]
+source = "Bucket"
+translation = "Bucket"
+
+[messages.locations-bucket-hint]
+source = "The name of a bucket that’s there already. The keys above need to be able to list, read and write it."
+translation = "Název bucketu, který už existuje. Klíče výše ho musí umět vypsat, číst a zapisovat do něj."
+
 [messages.locations-cancel]
 source = "Cancel"
 translation = "Zrušit"
@@ -5924,10 +5932,6 @@ translation = "Nahrávání potřebuje knihovnu, kterou Hoard spravuje. Můžete
 source = "Folder"
 translation = "Složka"
 
-[messages.locations-folder-hint-cloud]
-source = "A folder that Dropbox, Google Drive, OneDrive or iCloud Drive keeps in sync works too, and so does s3://bucket-name for a bucket in S3 storage."
-translation = "Funguje i složka, kterou synchronizuje Dropbox, Google Drive, OneDrive nebo iCloud Drive, a také s3://bucket-name pro bucket v úložišti S3."
-
 [messages.locations-folder-hint-managed]
 source = "Hoard creates it if it isn't there. In Docker, this is a folder you've mounted into the container."
 translation = "Hoard ji vytvoří, pokud neexistuje. V Dockeru je to složka, kterou jste připojili do kontejneru."
@@ -5947,6 +5951,26 @@ translation = "Hoard ji jen čte: nic v ní se nemění."
 [messages.locations-folder-placeholder]
 source = "The folder your packs are in"
 translation = "Složka, ve které jsou vaše balíčky"
+
+[messages.locations-kind-folder]
+source = "A folder"
+translation = "Složka"
+
+[messages.locations-kind-folder-hint]
+source = "On a disk or NAS share mounted into the container, or one that Dropbox, Google Drive, OneDrive or iCloud Drive keeps in sync. Hoard can keep files there, or watch packs you already have."
+translation = "Na disku nebo sdílené složce NAS připojené do kontejneru, nebo složka, kterou synchronizuje Dropbox, Google Drive, OneDrive nebo iCloud Drive. Hoard do ní může ukládat soubory, nebo sledovat balíčky, které už máte."
+
+[messages.locations-kind-folder-hint-desktop]
+source = "On this computer, another disk or a NAS share, or one that Dropbox, Google Drive, OneDrive or iCloud Drive keeps in sync. Hoard can keep files there, or watch packs you already have."
+translation = "Na tomto počítači, jiném disku nebo sdílené složce NAS, nebo složka, kterou synchronizuje Dropbox, Google Drive, OneDrive nebo iCloud Drive. Hoard do ní může ukládat soubory, nebo sledovat balíčky, které už máte."
+
+[messages.locations-kind-question]
+source = "What kind of location is it?"
+translation = "Jaký druh umístění to je?"
+
+[messages.locations-kind-s3-hint]
+source = "A bucket in Amazon S3 or a service like it: Backblaze B2, Cloudflare R2, Wasabi, MinIO, Garage. Hoard keeps files there."
+translation = "Bucket v Amazon S3 nebo v podobné službě: Backblaze B2, Cloudflare R2, Wasabi, MinIO, Garage. Hoard do něj ukládá soubory."
 
 [messages.locations-kinds-hint]
 source = "A new pack's files go to the location that ticks their kind. The rest go to the catch-all."

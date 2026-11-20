@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "d9d0c739f4c7e6741f2ad3eb66a5542e133eec4e662af87c199e651c80a85cc8"
+source = "d707e8ce5d41663e6b570559ca45a362135bc4f4edb2325a0803b64d9954ae2a"
 translation = "7e91a85d0b5328865a9bbf9956da077518809d861d62dab74e65d6631bb669ed"
 
 [messages.about-blender]
@@ -5684,6 +5684,14 @@ translation = "Bir konum ekle"
 source = "Added { $name }"
 translation = "Eklendi: { $name }"
 
+[messages.locations-bucket]
+source = "Bucket"
+translation = "Bucket"
+
+[messages.locations-bucket-hint]
+source = "The name of a bucket that’s there already. The keys above need to be able to list, read and write it."
+translation = "Zaten var olan bir bucket’ın adı. Yukarıdaki anahtarlar onu listeleyebilmeli, okuyabilmeli ve ona yazabilmeli."
+
 [messages.locations-cancel]
 source = "Cancel"
 translation = "İptal"
@@ -5740,10 +5748,6 @@ translation = "Yükleme yapabilmek için Hoard’un tuttuğu bir kütüphane ger
 source = "Folder"
 translation = "Klasör"
 
-[messages.locations-folder-hint-cloud]
-source = "A folder that Dropbox, Google Drive, OneDrive or iCloud Drive keeps in sync works too, and so does s3://bucket-name for a bucket in S3 storage."
-translation = "Dropbox, Google Drive, OneDrive ya da iCloud Drive’ın eşitlediği bir klasör de olur; S3 depolamadaki bir bucket için s3://bucket-name de."
-
 [messages.locations-folder-hint-managed]
 source = "Hoard creates it if it isn't there. In Docker, this is a folder you've mounted into the container."
 translation = "Yoksa Hoard onu oluşturur. Docker’da bu, kapsayıcıya bağladığınız bir klasördür."
@@ -5763,6 +5767,26 @@ translation = "Hoard onu yalnızca okur: içindeki hiçbir şey değiştirilmez.
 [messages.locations-folder-placeholder]
 source = "The folder your packs are in"
 translation = "Paketlerinizin bulunduğu klasör"
+
+[messages.locations-kind-folder]
+source = "A folder"
+translation = "Bir klasör"
+
+[messages.locations-kind-folder-hint]
+source = "On a disk or NAS share mounted into the container, or one that Dropbox, Google Drive, OneDrive or iCloud Drive keeps in sync. Hoard can keep files there, or watch packs you already have."
+translation = "Kapsayıcıya bağlanmış bir diskte ya da NAS paylaşımında veya Dropbox, Google Drive, OneDrive ya da iCloud Drive’ın eşitlediği bir klasör. Hoard oraya dosya koyabilir ya da zaten sahip olduğunuz paketleri izleyebilir."
+
+[messages.locations-kind-folder-hint-desktop]
+source = "On this computer, another disk or a NAS share, or one that Dropbox, Google Drive, OneDrive or iCloud Drive keeps in sync. Hoard can keep files there, or watch packs you already have."
+translation = "Bu bilgisayarda, başka bir diskte ya da NAS paylaşımında veya Dropbox, Google Drive, OneDrive ya da iCloud Drive’ın eşitlediği bir klasör. Hoard oraya dosya koyabilir ya da zaten sahip olduğunuz paketleri izleyebilir."
+
+[messages.locations-kind-question]
+source = "What kind of location is it?"
+translation = "Ne tür bir konum?"
+
+[messages.locations-kind-s3-hint]
+source = "A bucket in Amazon S3 or a service like it: Backblaze B2, Cloudflare R2, Wasabi, MinIO, Garage. Hoard keeps files there."
+translation = "Amazon S3’te ya da benzeri bir hizmette bir bucket: Backblaze B2, Cloudflare R2, Wasabi, MinIO, Garage. Hoard dosyaları orada tutar."
 
 [messages.locations-kinds-hint]
 source = "A new pack's files go to the location that ticks their kind. The rest go to the catch-all."

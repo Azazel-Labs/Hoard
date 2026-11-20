@@ -981,7 +981,6 @@ locations-folder-hint-managed = Hoard creates it if it isn't there. In Docker, t
 locations-folder-hint-managed-desktop = Hoard creates it if it isn't there.
 locations-folder-hint-watched = In Docker, mount the folder into the container first (read-only is fine), then pick it here.
 locations-folder-hint-watched-desktop = Hoard only reads it: nothing in it is changed.
-locations-folder-hint-cloud = A folder that Dropbox, Google Drive, OneDrive or iCloud Drive keeps in sync works too, and so does s3://bucket-name for a bucket in S3 storage.
 locations-name = Name
 # Example names for a new location, shown grayed out in its name field.
 locations-name-placeholder-managed = Library
@@ -1063,8 +1062,16 @@ locations-rebalance = Move stored files to match
 locations-rebalance-hint = After changing what a location takes: files already stored move to the location their kind goes to now.
 locations-add-title = Add a location
 locations-add-hint = Another disk for some kinds of files, or a folder of packs you already have.
+# Adding a location starts with a choice of two cards: a folder, or a bucket in S3 storage (titled locations-s3-title).
+locations-kind-question = What kind of location is it?
+locations-kind-folder = A folder
+locations-kind-folder-hint = On a disk or NAS share mounted into the container, or one that Dropbox, Google Drive, OneDrive or iCloud Drive keeps in sync. Hoard can keep files there, or watch packs you already have.
+locations-kind-folder-hint-desktop = On this computer, another disk or a NAS share, or one that Dropbox, Google Drive, OneDrive or iCloud Drive keeps in sync. Hoard can keep files there, or watch packs you already have.
+locations-kind-s3-hint = A bucket in Amazon S3 or a service like it: Backblaze B2, Cloudflare R2, Wasabi, MinIO, Garage. Hoard keeps files there.
 locations-s3-title = S3 storage
 locations-s3-hint = A location at s3://bucket-name is a bucket in this service: AWS, or any S3-compatible one (Backblaze B2, Cloudflare R2, Wasabi, MinIO, Garage on a NAS).
+locations-bucket = Bucket
+locations-bucket-hint = The name of a bucket that’s there already. The keys above need to be able to list, read and write it.
 locations-s3-endpoint = Address
 locations-s3-endpoint-placeholder = Empty for AWS; e.g. https://s3.eu-central-003.backblazeb2.com
 locations-s3-region = Region

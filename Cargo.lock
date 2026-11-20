@@ -6365,9 +6365,9 @@ dependencies = [
 
 [[package]]
 name = "polysmelt"
-version = "0.13.0"
+version = "0.13.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "989b0b3a96270688f0fd2d598e87c5ce2323277b72d9768f0613a19f364b70c5"
+checksum = "faa0b7d887ca235a954f57bfbdf5829043c0bfa393f4c49892816dbac62ad7b5"
 dependencies = [
  "base64 0.22.1",
  "bytemuck",

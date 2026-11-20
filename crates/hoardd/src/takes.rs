@@ -264,15 +264,18 @@ pub(crate) async fn make_logged(state: &AppState, pack_id: &str) {
     }
 }
 
-/// Make the takes of every pack that has files of many takes and none made yet: the library as it was before takes
-/// were made, once, in the background.
+/// Make the takes of every pack that has files of many takes with none made yet, or some made from other contents
+/// than the file has: the library as it was before takes were made, or before a fix to how they're made (a migration
+/// marks those out of date), in the background.
 pub(crate) async fn backfill(state: &AppState) {
     let packs = db::call(&state.pool, |c| {
         let mut stmt = c.prepare(&format!(
             "SELECT DISTINCT a.pack_id FROM assets a JOIN rigs r ON r.asset_id = a.id
               WHERE a.kind IN ('model', 'animation') AND NOT {IS_TAKE}
                 AND (SELECT COUNT(*) FROM json_each(r.rig, '$.clips') c WHERE json_extract(c.value, '$.secs') >= ?1) >= 2
-                AND NOT EXISTS (SELECT 1 FROM assets t WHERE json_extract(t.meta, '$.take_of') = +a.id)
+                AND (NOT EXISTS (SELECT 1 FROM assets t WHERE json_extract(t.meta, '$.take_of') = +a.id)
+                     OR EXISTS (SELECT 1 FROM assets t WHERE json_extract(t.meta, '$.take_of') = +a.id
+                                   AND COALESCE(json_extract(t.meta, '$.take_from'), '') <> a.blob_hash))
                 AND a.pack_id IN (SELECT id FROM packs WHERE status = 'ready')"
         ))?;
         Ok(stmt.query_map([POSE_SECS], |r| r.get::<_, String>(0))?.collect::<rusqlite::Result<Vec<_>>>()?)

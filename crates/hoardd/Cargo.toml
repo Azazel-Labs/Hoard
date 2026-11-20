@@ -88,7 +88,7 @@ ymfm-sys = "0.2"
 ww2ogg = "0.1"
 lewton = "0.10"
 # Model formats (STL, PLY, VOX, OBJ, FBX, 3DS, 3MF, USD, and glTF with Draco) read natively for thumbnails and GLB copies.
-polysmelt = "0.13.0"
+polysmelt = "0.13.2"
 ddsfile = "0.6"
 texture2ddecoder = "0.1"
 jxl-oxide = { version = "0.12.6", default-features = false, features = ["image"] }

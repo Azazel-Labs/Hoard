@@ -660,3 +660,60 @@ fn takes_drawn_by_a_browser_get_their_files_picture_back() {
     assert_eq!(thumb("walk"), (Some("served".into()), None));
     assert_eq!(thumb("hero"), (Some("hero-pic".into()), Some("browser".into())));
 }
+
+#[test]
+fn what_was_made_from_an_animated_fbx_is_made_again() {
+    let dir = tempfile::tempdir().unwrap();
+    let mut conn = baseline_db(dir.path());
+    let fix = MIGRATIONS.iter().position(|m| m.contains("as:thumb.avif:%")).unwrap();
+    migrate(&mut conn, &dir.path().join("backups"), &MIGRATIONS[..fix]).unwrap();
+    // A character with clips, its take, a still FBX, a clip-less FBX animation's row and a GLB animation.
+    conn.execute_batch(
+        "PRAGMA foreign_keys = OFF;
+         INSERT INTO assets (id, pack_id, blob_hash, path, name, ext, kind, meta, created_at, updated_at) VALUES
+           ('hero', 'p1', 'h1', 'hero.fbx', 'hero', 'fbx', 'model', '{}', 'x', 'x'),
+           ('run', 'p1', 'h2', 'hero@Run.glb', 'Run', 'glb', 'animation',
+              '{\"take_of\":\"hero\",\"take\":\"Run\",\"take_from\":\"h1\"}', 'x', 'x'),
+           ('crate', 'p1', 'h3', 'crate.fbx', 'crate', 'fbx', 'model', '{}', 'x', 'x'),
+           ('wave', 'p1', 'h4', 'wave.fbx', 'wave', 'fbx', 'animation', '{}', 'x', 'x'),
+           ('jump', 'p1', 'h5', 'jump.glb', 'jump', 'glb', 'animation', '{}', 'x', 'x');
+         INSERT INTO rigs (asset_id, rig) VALUES
+           ('hero', '{\"clips\":[{\"name\":\"Run\",\"secs\":1.0},{\"name\":\"Walk\",\"secs\":1.0}]}'),
+           ('crate', '{\"clips\":[]}'),
+           ('wave', '{\"clips\":[{\"name\":\"Wave\",\"secs\":2.0}]}'),
+           ('jump', '{\"clips\":[{\"name\":\"Jump\",\"secs\":1.0}]}');
+         INSERT INTO derivatives (asset_id, kind, blob_hash, created_at) VALUES
+           ('hero', 'as:view:0:glb', 'd1', 'x'), ('hero', 'as:glb~0~0~n:0', 'd2', 'x'),
+           ('hero', 'as:thumb.avif:abc', 'd3', 'x'),
+           ('crate', 'as:view:0:glb', 'd4', 'x'),
+           ('wave', 'as:view:0:glb', 'd5', 'x'), ('wave', 'as:clip:0', 'd6', 'x'),
+           ('wave', 'motion', 'd7', 'x'), ('wave', 'still', 'd8', 'x'),
+           ('run', 'as:view:0:glb', 'd9', 'x'), ('run', 'motion', 'd10', 'x'),
+           ('jump', 'as:view:0:glb', 'd11', 'x'), ('jump', 'motion', 'd12', 'x');",
+    )
+    .unwrap();
+    migrate(&mut conn, &dir.path().join("backups"), MIGRATIONS).unwrap();
+    let strings = |sql: &str| -> Vec<String> {
+        conn.prepare(sql).unwrap().query_map([], |r| r.get(0)).unwrap().flatten().collect()
+    };
+    // The still FBX, the GLB animation and the thumbnail keep theirs. The take's are dropped when it's made again,
+    // which its file's contents, no longer the ones it was made from, will have happen.
+    assert_eq!(
+        strings("SELECT asset_id || ' ' || kind FROM derivatives ORDER BY asset_id, kind"),
+        [
+            "crate as:view:0:glb",
+            "hero as:thumb.avif:abc",
+            "jump as:view:0:glb",
+            "jump motion",
+            "run as:view:0:glb",
+            "run motion"
+        ]
+    );
+    assert_eq!(
+        strings(
+            "SELECT json_extract(meta, '$.take_of') || ' ' || json_extract(meta, '$.take_from') FROM assets
+                  WHERE id = 'run'"
+        ),
+        ["hero "]
+    );
+}

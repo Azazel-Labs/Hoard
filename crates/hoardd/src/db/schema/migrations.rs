@@ -897,4 +897,18 @@ pub(in crate::db) const MIGRATIONS: &[&str] = &[
      CREATE INDEX unreal_status_failed ON unreal_status (updated_at) WHERE status = 'failed';",
     // 85: the achievements earned, handed again at each start to whatever embeds the server and passes them on.
     "CREATE TABLE achievements (id TEXT PRIMARY KEY, unlocked_at TEXT NOT NULL) WITHOUT ROWID;",
+    // 86: browsing a pack newest first reads a page of the pack in order (as 77 does the library's) instead of sorting
+    // all of it: a pack of 120,000 took 0.63 s.
+    "CREATE INDEX assets_pack_created ON assets (pack_id, created_at DESC, path);",
+    // 87: polysmelt 0.13.2 turns an FBX's rotation keys the short way, as Blender and Maya do, where 0.13.0 read a
+    // key baked past ±180° as written and swung the long way round between two keys. What was made from an animated
+    // FBX is made again: its viewer and downloads when next asked for, its motion thumbnail and still when the
+    // drawing next runs, and its takes when the server next starts (see `takes::backfill`).
+    "DELETE FROM derivatives WHERE kind LIKE 'as:%' AND kind NOT LIKE 'as:thumb.avif:%'
+       AND asset_id IN (SELECT a.id FROM assets a JOIN rigs r ON r.asset_id = a.id
+                         WHERE a.ext = 'fbx' AND json_array_length(r.rig, '$.clips') > 0);
+     DELETE FROM derivatives WHERE kind IN ('motion', 'still')
+       AND asset_id IN (SELECT id FROM assets WHERE kind = 'animation' AND ext = 'fbx');
+     UPDATE assets SET meta = json_set(meta, '$.take_from', '')
+       WHERE json_extract(meta, '$.take_of') IN (SELECT id FROM assets WHERE ext = 'fbx');",
 ];

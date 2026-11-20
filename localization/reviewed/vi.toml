@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "ec811590205e4e64387af6e16bbaf48e03adb4bdb3b0180c6d7abaf323eaf3e0"
+source = "d9d0c739f4c7e6741f2ad3eb66a5542e133eec4e662af87c199e651c80a85cc8"
 translation = "e5f3f7db07b8d100748035cc5c5db381f2b0ac74ef4784aefc515dc35bb050a8"
 
 [messages.about-blender]
@@ -4335,6 +4335,10 @@ translation = "địa chỉ của trang này đã hết hạn; hãy mở lại t
 [messages.error-site-not-a-page]
 source = "only web pages open as pages"
 translation = "chỉ trang web mới mở dưới dạng trang"
+
+[messages.error-soundfont-bad]
+source = "{ $name } isn’t a SoundFont MIDI can play with: { $reason }"
+translation = "{ $name } không phải SoundFont mà MIDI có thể dùng để phát: { $reason }"
 
 [messages.error-store-search-empty]
 source = "nothing to search for; type the pack's name"
@@ -9566,6 +9570,14 @@ translation = "Tìm thấy trên máy chủ, hoặc có sẵn"
 [messages.settings-soundfont-placeholder-desktop]
 source = "Found on this computer, or built-in"
 translation = "Tìm thấy trên máy tính này, hoặc có sẵn"
+
+[messages.settings-soundfont-send]
+source = "Choose a file…"
+translation = "Chọn tệp…"
+
+[messages.settings-soundfont-sent]
+source = "MIDI plays with { $name } now"
+translation = "Giờ MIDI phát bằng { $name }"
 
 [messages.settings-soundfont-what]
 source = "The instruments MIDI files are played and converted with."

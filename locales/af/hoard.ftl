@@ -236,6 +236,7 @@ error-update-hook-address = Die adres om vir bywerkings te roep moet met http://
 error-update-hook-auth = Die Authorization-kopreël kan nie reëlbreuke of ander beheerkarakters bevat nie
 error-no-soundfont = Daar is geen SoundFont by { $path } op die bediener nie
 error-no-soundfont-desktop = Daar is geen SoundFont by { $path } nie
+error-soundfont-bad = { $name } is nie ’n SoundFont waarmee MIDI kan speel nie: { $reason }
 error-workers = Agtergrondwerkers: tussen 1 en { $max }
 error-ai-batch = Bates per KI-versoek: tussen 1 en 200
 error-conversion-cache = Omgeskakelde aflaaie: minstens 100 MB
@@ -2401,6 +2402,8 @@ settings-soundfont-placeholder = Op die bediener gevind, of ingebou
 settings-soundfont-placeholder-desktop = Op hierdie rekenaar gevind, of ingebou
 settings-soundfont-default = op die bediener gevind, of ingebou
 settings-soundfont-default-desktop = op hierdie rekenaar gevind, of ingebou
+settings-soundfont-send = Kies ’n lêer…
+settings-soundfont-sent = MIDI speel nou met { $name }
 
 ## SettingsPage.vue: Beeldsoektog
 

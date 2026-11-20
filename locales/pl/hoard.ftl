@@ -236,6 +236,7 @@ error-update-hook-address = Adres wywoływany przy aktualizacjach powinien zaczy
 error-update-hook-auth = Nagłówek Authorization nie może zawierać podziałów wiersza ani innych znaków sterujących
 error-no-soundfont = Na serwerze nie ma pliku SoundFont pod ścieżką { $path }
 error-no-soundfont-desktop = Nie ma pliku SoundFont pod ścieżką { $path }
+error-soundfont-bad = { $name } nie jest SoundFontem, z którym MIDI może grać: { $reason }
 error-workers = Procesy w tle: od 1 do { $max }
 error-ai-batch = Zasoby na jedno żądanie AI: od 1 do 200
 error-conversion-cache = Przekonwertowane pliki do pobrania: co najmniej 100 MB
@@ -2607,6 +2608,8 @@ settings-soundfont-placeholder = Znaleziony na serwerze lub wbudowany
 settings-soundfont-placeholder-desktop = Znaleziony na tym komputerze lub wbudowany
 settings-soundfont-default = znaleziony na serwerze lub wbudowany
 settings-soundfont-default-desktop = znaleziony na tym komputerze lub wbudowany
+settings-soundfont-send = Wybierz plik…
+settings-soundfont-sent = MIDI gra teraz z { $name }
 
 ## SettingsPage.vue: Image search
 

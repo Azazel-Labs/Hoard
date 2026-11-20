@@ -404,7 +404,8 @@ software rasterizer (`apt install mesa-vulkan-drivers`). Without any adapter, ev
      chiptunes (NES NSF and NSFe, VGM and VGZ) are rendered to audio, so they get a waveform, a duration and an MP3
      preview that plays in the grid like any other sound. Modules list their title, channels, patterns and
      instruments; MIDI lists tempo, key, tracks and General MIDI instruments. MIDI plays through a SoundFont
-     (the one picked in Settings, or a GM SoundFont found in the usual system places), falling back to a simple built-in synth.
+     (the one picked in Settings, a path or a file sent from the browser and kept in the data folder's
+     `soundfonts`, or a GM SoundFont found in the usual system places), falling back to a simple built-in synth.
    - Chiptunes: an NSF runs the game's own music code on an emulated NES, cartridge sound chips included, and plays
      its first song (for two and a half minutes when the file doesn't say how long). A VGM replays the writes a game
      made to its sound chips: Yamaha's FM chips (Mega Drive, arcade boards, MSX, PC-88/98, AdLib and Sound Blaster

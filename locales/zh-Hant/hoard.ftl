@@ -236,6 +236,7 @@ error-update-hook-address = 更新時要呼叫的網址應以 http:// 或 https:
 error-update-hook-auth = Authorization 標頭不能包含換行或其他控制字元
 error-no-soundfont = 伺服器上的 { $path } 沒有 SoundFont
 error-no-soundfont-desktop = { $path } 沒有 SoundFont
+error-soundfont-bad = { $name } 不是 MIDI 能用來播放的 SoundFont：{ $reason }
 error-workers = 背景工作程序：1 到 { $max } 個
 error-ai-batch = 每次 AI 請求的素材數：1 到 200 個
 error-conversion-cache = 轉換後的下載檔案：至少 100 MB
@@ -2228,6 +2229,8 @@ settings-soundfont-placeholder = 在伺服器上找到的，或內建的
 settings-soundfont-placeholder-desktop = 在這台電腦上找到的，或內建的
 settings-soundfont-default = 在伺服器上找到的，或內建的
 settings-soundfont-default-desktop = 在這台電腦上找到的，或內建的
+settings-soundfont-send = 選擇檔案…
+settings-soundfont-sent = MIDI 現在使用 { $name } 播放
 
 ## 設定：圖片搜尋
 

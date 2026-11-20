@@ -236,6 +236,7 @@ error-update-hook-address = Päivityksiä varten kutsuttavan osoitteen pitää a
 error-update-hook-auth = Authorization-otsakkeessa ei voi olla rivinvaihtoja tai muita ohjausmerkkejä
 error-no-soundfont = Palvelimella ei ole SoundFontia polussa { $path }
 error-no-soundfont-desktop = Polussa { $path } ei ole SoundFontia
+error-soundfont-bad = { $name } ei ole SoundFont, jolla MIDI voi soida: { $reason }
 error-workers = Taustatyöntekijät: 1–{ $max }
 error-ai-batch = Resursseja tekoälypyyntöä kohden: 1–200
 error-conversion-cache = Muunnetut lataukset: vähintään 100 Mt
@@ -2487,6 +2488,8 @@ settings-soundfont-placeholder = Palvelimelta löytyvä tai sisäänrakennettu
 settings-soundfont-placeholder-desktop = Tältä tietokoneelta löytyvä tai sisäänrakennettu
 settings-soundfont-default = palvelimelta löytyvä tai sisäänrakennettu
 settings-soundfont-default-desktop = tältä tietokoneelta löytyvä tai sisäänrakennettu
+settings-soundfont-send = Valitse tiedosto…
+settings-soundfont-sent = MIDI soi nyt fontilla { $name }
 
 ## Asetukset: Kuvahaku
 

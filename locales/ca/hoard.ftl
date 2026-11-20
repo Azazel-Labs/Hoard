@@ -236,6 +236,7 @@ error-update-hook-address = L'adreça a cridar per a les actualitzacions ha de c
 error-update-hook-auth = La capçalera Authorization no pot contenir salts de línia ni altres caràcters de control
 error-no-soundfont = No hi ha cap SoundFont a { $path } al servidor
 error-no-soundfont-desktop = No hi ha cap SoundFont a { $path }
+error-soundfont-bad = { $name } no és un SoundFont amb què el MIDI pugui sonar: { $reason }
 error-workers = Processos en segon pla: entre 1 i { $max }
 error-ai-batch = Recursos per sol·licitud d'IA: entre 1 i 200
 error-conversion-cache = Baixades convertides: almenys 100 MB
@@ -2408,6 +2409,8 @@ settings-soundfont-placeholder = El que es trobi al servidor, o l'integrat
 settings-soundfont-placeholder-desktop = El que es trobi en aquest ordinador, o l'integrat
 settings-soundfont-default = el que es trobi al servidor, o l'integrat
 settings-soundfont-default-desktop = el que es trobi en aquest ordinador, o l'integrat
+settings-soundfont-send = Tria un fitxer…
+settings-soundfont-sent = Ara el MIDI sona amb { $name }
 
 ## SettingsPage.vue: Cerca d'imatges
 

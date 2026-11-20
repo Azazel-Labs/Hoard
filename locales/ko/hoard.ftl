@@ -236,6 +236,7 @@ error-update-hook-address = 업데이트 시 호출할 주소는 http:// 또는 
 error-update-hook-auth = Authorization 헤더에는 줄바꿈이나 다른 제어 문자를 넣을 수 없습니다
 error-no-soundfont = 서버의 { $path }에 SoundFont가 없습니다
 error-no-soundfont-desktop = { $path }에 SoundFont가 없습니다
+error-soundfont-bad = { $name }은(는) MIDI 재생에 쓸 수 있는 SoundFont가 아닙니다: { $reason }
 error-workers = 백그라운드 작업자: 1에서 { $max } 사이
 error-ai-batch = AI 요청당 에셋 수: 1에서 200 사이
 error-conversion-cache = 변환된 다운로드: 100 MB 이상
@@ -2195,6 +2196,8 @@ settings-soundfont-placeholder = 서버에서 찾거나 기본 제공
 settings-soundfont-placeholder-desktop = 이 컴퓨터에서 찾거나 기본 제공
 settings-soundfont-default = 서버에서 찾거나 기본 제공
 settings-soundfont-default-desktop = 이 컴퓨터에서 찾거나 기본 제공
+settings-soundfont-send = 파일 선택…
+settings-soundfont-sent = 이제 MIDI는 { $name }(으)로 재생됩니다
 
 ## SettingsPage.vue: 이미지 검색
 

@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "ec811590205e4e64387af6e16bbaf48e03adb4bdb3b0180c6d7abaf323eaf3e0"
+source = "d9d0c739f4c7e6741f2ad3eb66a5542e133eec4e662af87c199e651c80a85cc8"
 translation = "54db7a8b2776b518b5b7f9903cf54c52cf30df365a4334f881ce45382f97ad63"
 
 [messages.about-blender]
@@ -4512,6 +4512,10 @@ translation = "адреса цієї сторінки застаріла; від
 [messages.error-site-not-a-page]
 source = "only web pages open as pages"
 translation = "сторінками відкриваються лише вебсторінки"
+
+[messages.error-soundfont-bad]
+source = "{ $name } isn’t a SoundFont MIDI can play with: { $reason }"
+translation = "{ $name } — не SoundFont, з яким може грати MIDI: { $reason }"
 
 [messages.error-store-search-empty]
 source = "nothing to search for; type the pack's name"
@@ -9997,6 +10001,14 @@ translation = "Знайдений на сервері або вбудовани�
 [messages.settings-soundfont-placeholder-desktop]
 source = "Found on this computer, or built-in"
 translation = "Знайдений на цьому комп’ютері або вбудований"
+
+[messages.settings-soundfont-send]
+source = "Choose a file…"
+translation = "Вибрати файл…"
+
+[messages.settings-soundfont-sent]
+source = "MIDI plays with { $name } now"
+translation = "Тепер MIDI грає з { $name }"
 
 [messages.settings-soundfont-what]
 source = "The instruments MIDI files are played and converted with."

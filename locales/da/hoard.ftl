@@ -236,6 +236,7 @@ error-update-hook-address = Adressen, der skal kaldes ved opdateringer, skal sta
 error-update-hook-auth = Authorization-headeren må ikke indeholde linjeskift eller andre kontroltegn
 error-no-soundfont = Der er ingen SoundFont på { $path } på serveren
 error-no-soundfont-desktop = Der er ingen SoundFont på { $path }
+error-soundfont-bad = { $name } er ikke en SoundFont, MIDI kan spille med: { $reason }
 error-workers = Baggrundsarbejdere: mellem 1 og { $max }
 error-ai-batch = Assets pr. AI-forespørgsel: mellem 1 og 200
 error-conversion-cache = Konverterede downloads: mindst 100 MB
@@ -2403,6 +2404,8 @@ settings-soundfont-placeholder = Fundet på serveren, eller indbygget
 settings-soundfont-placeholder-desktop = Fundet på denne computer, eller indbygget
 settings-soundfont-default = fundet på serveren, eller indbygget
 settings-soundfont-default-desktop = fundet på denne computer, eller indbygget
+settings-soundfont-send = Vælg en fil…
+settings-soundfont-sent = MIDI spiller nu med { $name }
 
 ## SettingsPage.vue: Billedsøgning
 

@@ -233,6 +233,13 @@ export const api = {
   runConversions: () => request<{ packs: number }>('/api/admin/conversions/run', { method: 'POST' }),
   /** Put back the file a conversion rule replaced. */
   unconvert: (id: string) => request<{ pack_id: string }>(`/api/assets/${id}/unconvert`, { method: 'POST' }),
+  /** A SoundFont from this computer, kept on the server and made the one MIDI plays with. */
+  uploadSoundFont: (file: File) =>
+    request<Settings>(`/api/admin/soundfont?name=${encodeURIComponent(file.name)}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/octet-stream' },
+      body: file,
+    }),
   saveSettings: (patch: SettingsPatch) =>
     request<Settings>('/api/admin/settings', {
       method: 'PUT',

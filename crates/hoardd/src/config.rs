@@ -284,6 +284,10 @@ impl Config {
     pub(crate) fn backups_dir(&self) -> PathBuf {
         self.data_dir.join("backups")
     }
+    /// SoundFonts uploaded in Settings.
+    pub(crate) fn soundfonts_dir(&self) -> PathBuf {
+        std::path::absolute(self.data_dir.join("soundfonts")).unwrap_or_else(|_| self.data_dir.join("soundfonts"))
+    }
     pub(crate) fn db_path(&self) -> PathBuf {
         self.data_dir.join("hoard.db")
     }

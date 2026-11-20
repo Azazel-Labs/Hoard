@@ -236,6 +236,7 @@ error-update-hook-address = Địa chỉ gọi khi có cập nhật phải bắt
 error-update-hook-auth = Header Authorization không được chứa dấu xuống dòng hay ký tự điều khiển khác
 error-no-soundfont = Không có SoundFont tại { $path } trên máy chủ
 error-no-soundfont-desktop = Không có SoundFont tại { $path }
+error-soundfont-bad = { $name } không phải SoundFont mà MIDI có thể dùng để phát: { $reason }
 error-workers = Tiến trình nền: từ 1 đến { $max }
 error-ai-batch = Số tài nguyên mỗi yêu cầu AI: từ 1 đến 200
 error-conversion-cache = Bản tải xuống đã chuyển đổi: ít nhất 100 MB
@@ -2222,6 +2223,8 @@ settings-soundfont-placeholder = Tìm thấy trên máy chủ, hoặc có sẵn
 settings-soundfont-placeholder-desktop = Tìm thấy trên máy tính này, hoặc có sẵn
 settings-soundfont-default = tìm thấy trên máy chủ, hoặc có sẵn
 settings-soundfont-default-desktop = tìm thấy trên máy tính này, hoặc có sẵn
+settings-soundfont-send = Chọn tệp…
+settings-soundfont-sent = Giờ MIDI phát bằng { $name }
 
 ## Cài đặt: Tìm kiếm hình ảnh
 

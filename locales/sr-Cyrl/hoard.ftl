@@ -236,6 +236,7 @@ error-update-hook-address = Адреса која се позива за ажу�
 error-update-hook-auth = Заглавље Authorization не може да садржи преломе редова ни друге контролне знакове
 error-no-soundfont = На серверу нема SoundFont-а на { $path }
 error-no-soundfont-desktop = Нема SoundFont-а на { $path }
+error-soundfont-bad = { $name } није SoundFont са којим MIDI може да свира: { $reason }
 error-workers = Позадински радници: између 1 и { $max }
 error-ai-batch = Ресурса по ВИ захтеву: између 1 и 200
 error-conversion-cache = Претворена преузимања: најмање 100 MB
@@ -2504,6 +2505,8 @@ settings-soundfont-placeholder = Пронађен на серверу или у�
 settings-soundfont-placeholder-desktop = Пронађен на овом рачунару или уграђен
 settings-soundfont-default = пронађен на серверу или уграђен
 settings-soundfont-default-desktop = пронађен на овом рачунару или уграђен
+settings-soundfont-send = Изабери датотеку…
+settings-soundfont-sent = MIDI сада свира са { $name }
 
 ## SettingsPage.vue: Претрага слика
 

@@ -236,6 +236,7 @@ error-update-hook-address = Η διεύθυνση που καλείται για
 error-update-hook-auth = Η κεφαλίδα Authorization δεν μπορεί να περιέχει αλλαγές γραμμής ή άλλους χαρακτήρες ελέγχου
 error-no-soundfont = Δεν υπάρχει SoundFont στο { $path } στον διακομιστή
 error-no-soundfont-desktop = Δεν υπάρχει SoundFont στο { $path }
+error-soundfont-bad = Το { $name } δεν είναι SoundFont με το οποίο μπορεί να παίξει το MIDI: { $reason }
 error-workers = Εργάτες παρασκηνίου: από 1 έως { $max }
 error-ai-batch = Στοιχεία ανά αίτημα AI: από 1 έως 200
 error-conversion-cache = Λήψεις που μετατράπηκαν: τουλάχιστον 100 MB
@@ -2484,6 +2485,8 @@ settings-soundfont-placeholder = Από τον διακομιστή ή το εν
 settings-soundfont-placeholder-desktop = Από αυτόν τον υπολογιστή ή το ενσωματωμένο
 settings-soundfont-default = από τον διακομιστή ή το ενσωματωμένο
 settings-soundfont-default-desktop = από αυτόν τον υπολογιστή ή το ενσωματωμένο
+settings-soundfont-send = Επιλογή αρχείου…
+settings-soundfont-sent = Το MIDI παίζει τώρα με το { $name }
 
 ## SettingsPage.vue: Image search
 

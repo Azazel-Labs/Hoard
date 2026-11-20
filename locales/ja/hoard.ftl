@@ -236,6 +236,7 @@ error-update-hook-address = 更新時に呼び出すアドレスは http:// ま�
 error-update-hook-auth = Authorization ヘッダーに改行などの制御文字は使えません
 error-no-soundfont = サーバーの { $path } に SoundFont がありません
 error-no-soundfont-desktop = { $path } に SoundFont がありません
+error-soundfont-bad = { $name } は MIDI の再生に使える SoundFont ではありません: { $reason }
 error-workers = バックグラウンドワーカー: 1～{ $max }
 error-ai-batch = AI リクエストあたりのアセット数: 1～200
 error-conversion-cache = 変換済みダウンロード: 100 MB 以上
@@ -2222,6 +2223,8 @@ settings-soundfont-placeholder = サーバー上で見つかったもの、ま�
 settings-soundfont-placeholder-desktop = このコンピューターで見つかったもの、または組み込み
 settings-soundfont-default = サーバー上で見つかったもの、または組み込み
 settings-soundfont-default-desktop = このコンピューターで見つかったもの、または組み込み
+settings-soundfont-send = ファイルを選ぶ…
+settings-soundfont-sent = MIDI は { $name } で再生されるようになりました
 
 ## SettingsPage.vue: 画像検索
 

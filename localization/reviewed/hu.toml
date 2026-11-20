@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "ec811590205e4e64387af6e16bbaf48e03adb4bdb3b0180c6d7abaf323eaf3e0"
+source = "d9d0c739f4c7e6741f2ad3eb66a5542e133eec4e662af87c199e651c80a85cc8"
 translation = "48b91021e8ab72d74293b13e1175ec85edcf56c59510524f10635679bb042ed2"
 
 [messages.about-blender]
@@ -4344,6 +4344,10 @@ translation = "az oldal címe lejárt; nyissa meg újra a Hoardból"
 [messages.error-site-not-a-page]
 source = "only web pages open as pages"
 translation = "csak weboldalak nyílnak meg oldalként"
+
+[messages.error-soundfont-bad]
+source = "{ $name } isn’t a SoundFont MIDI can play with: { $reason }"
+translation = "A(z) { $name } nem olyan SoundFont, amellyel a MIDI szólni tud: { $reason }"
 
 [messages.error-store-search-empty]
 source = "nothing to search for; type the pack's name"
@@ -9590,6 +9594,14 @@ translation = "A szerveren talált vagy a beépített"
 [messages.settings-soundfont-placeholder-desktop]
 source = "Found on this computer, or built-in"
 translation = "Ezen a számítógépen talált vagy a beépített"
+
+[messages.settings-soundfont-send]
+source = "Choose a file…"
+translation = "Fájl kiválasztása…"
+
+[messages.settings-soundfont-sent]
+source = "MIDI plays with { $name } now"
+translation = "A MIDI mostantól ezzel szól: { $name }"
 
 [messages.settings-soundfont-what]
 source = "The instruments MIDI files are played and converted with."

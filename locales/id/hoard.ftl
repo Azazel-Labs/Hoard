@@ -236,6 +236,7 @@ error-update-hook-address = Alamat yang dipanggil untuk pembaruan harus diawali 
 error-update-hook-auth = Header Authorization tidak boleh berisi baris baru atau karakter kontrol lainnya
 error-no-soundfont = Tidak ada SoundFont di { $path } pada server
 error-no-soundfont-desktop = Tidak ada SoundFont di { $path }
+error-soundfont-bad = { $name } bukan SoundFont yang bisa dipakai MIDI: { $reason }
 error-workers = Pekerja latar belakang: antara 1 dan { $max }
 error-ai-batch = Aset per permintaan AI: antara 1 dan 200
 error-conversion-cache = Unduhan hasil konversi: minimal 100 MB
@@ -2226,6 +2227,8 @@ settings-soundfont-placeholder = Ditemukan di server, atau bawaan
 settings-soundfont-placeholder-desktop = Ditemukan di komputer ini, atau bawaan
 settings-soundfont-default = ditemukan di server, atau bawaan
 settings-soundfont-default-desktop = ditemukan di komputer ini, atau bawaan
+settings-soundfont-send = Pilih file…
+settings-soundfont-sent = MIDI kini dimainkan dengan { $name }
 
 ## SettingsPage.vue: Pencarian gambar
 

@@ -83,6 +83,7 @@ pub(crate) fn router(state: &AppState) -> Router<AppState> {
         .route("/api/admin/issues/retry", post(crate::issues::retry))
         .route("/api/admin/issues/dismiss", post(crate::issues::dismiss))
         .route("/api/admin/settings", get(settings::get_settings).put(settings::put_settings))
+        .route("/api/admin/soundfont", post(settings::upload_soundfont).layer(upload_limit()))
         .route("/api/admin/conversions/preview", post(convert::conversions_preview))
         .route("/api/admin/conversions/run", post(convert::conversions_run))
         .route("/api/assets/{id}/unconvert", post(convert::unconvert_asset))

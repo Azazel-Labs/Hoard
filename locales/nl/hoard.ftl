@@ -236,6 +236,7 @@ error-update-hook-address = Het adres dat bij updates wordt aangeroepen moet beg
 error-update-hook-auth = De Authorization-header mag geen regeleinden of andere stuurtekens bevatten
 error-no-soundfont = Er staat geen SoundFont op { $path } op de server
 error-no-soundfont-desktop = Er staat geen SoundFont op { $path }
+error-soundfont-bad = { $name } is geen SoundFont waarmee MIDI kan spelen: { $reason }
 error-workers = Achtergrondprocessen: tussen 1 en { $max }
 error-ai-batch = Assets per AI-verzoek: tussen 1 en 200
 error-conversion-cache = Geconverteerde downloads: minstens 100 MB
@@ -2401,6 +2402,8 @@ settings-soundfont-placeholder = Gevonden op de server, of ingebouwd
 settings-soundfont-placeholder-desktop = Gevonden op deze computer, of ingebouwd
 settings-soundfont-default = gevonden op de server, of ingebouwd
 settings-soundfont-default-desktop = gevonden op deze computer, of ingebouwd
+settings-soundfont-send = Bestand kiezen…
+settings-soundfont-sent = MIDI speelt nu met { $name }
 
 ## SettingsPage.vue: Zoeken op beeld
 

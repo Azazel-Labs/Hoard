@@ -236,6 +236,7 @@ error-update-hook-address = Adresa apelată pentru actualizări trebuie să înc
 error-update-hook-auth = Antetul Authorization nu poate conține rânduri noi sau alte caractere de control
 error-no-soundfont = Nu există niciun SoundFont la { $path } pe server
 error-no-soundfont-desktop = Nu există niciun SoundFont la { $path }
+error-soundfont-bad = { $name } nu e un SoundFont cu care MIDI poate cânta: { $reason }
 error-workers = Procese de fundal: între 1 și { $max }
 error-ai-batch = Resurse per cerere AI: între 1 și 200
 error-conversion-cache = Descărcări convertite: cel puțin 100 MB
@@ -2609,6 +2610,8 @@ settings-soundfont-placeholder = Găsit pe server sau integrat
 settings-soundfont-placeholder-desktop = Găsit pe acest computer sau integrat
 settings-soundfont-default = găsit pe server sau integrat
 settings-soundfont-default-desktop = găsit pe acest computer sau integrat
+settings-soundfont-send = Alege un fișier…
+settings-soundfont-sent = MIDI cântă acum cu { $name }
 
 ## SettingsPage.vue: Căutare după imagine
 

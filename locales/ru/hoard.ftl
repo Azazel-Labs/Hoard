@@ -236,6 +236,7 @@ error-update-hook-address = Адрес для вызова при обновле
 error-update-hook-auth = В заголовке Authorization не может быть переносов строк и других управляющих символов
 error-no-soundfont = На сервере нет SoundFont по пути { $path }
 error-no-soundfont-desktop = Нет SoundFont по пути { $path }
+error-soundfont-bad = { $name } — не SoundFont, с которым может играть MIDI: { $reason }
 error-workers = Фоновые обработчики: от 1 до { $max }
 error-ai-batch = Ассетов в одном запросе к ИИ: от 1 до 200
 error-conversion-cache = Преобразованные загрузки: не меньше 100 МБ
@@ -2652,6 +2653,8 @@ settings-soundfont-placeholder = Найденный на сервере или �
 settings-soundfont-placeholder-desktop = Найденный на этом компьютере или встроенный
 settings-soundfont-default = найденный на сервере или встроенный
 settings-soundfont-default-desktop = найденный на этом компьютере или встроенный
+settings-soundfont-send = Выбрать файл…
+settings-soundfont-sent = Теперь MIDI играет с { $name }
 
 ## SettingsPage.vue: поиск по картинкам
 

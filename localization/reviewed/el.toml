@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "ec811590205e4e64387af6e16bbaf48e03adb4bdb3b0180c6d7abaf323eaf3e0"
+source = "d9d0c739f4c7e6741f2ad3eb66a5542e133eec4e662af87c199e651c80a85cc8"
 translation = "4890422f21c71087236199437be3f5ec0bf500d828f121f3861539f632d6bf93"
 
 [messages.about-blender]
@@ -4439,6 +4439,10 @@ translation = "η διεύθυνση αυτής της σελίδας έληξε
 [messages.error-site-not-a-page]
 source = "only web pages open as pages"
 translation = "μόνο οι ιστοσελίδες ανοίγουν ως σελίδες"
+
+[messages.error-soundfont-bad]
+source = "{ $name } isn’t a SoundFont MIDI can play with: { $reason }"
+translation = "Το { $name } δεν είναι SoundFont με το οποίο μπορεί να παίξει το MIDI: { $reason }"
 
 [messages.error-store-search-empty]
 source = "nothing to search for; type the pack's name"
@@ -9816,6 +9820,14 @@ translation = "Από τον διακομιστή ή το ενσωματωμέν
 [messages.settings-soundfont-placeholder-desktop]
 source = "Found on this computer, or built-in"
 translation = "Από αυτόν τον υπολογιστή ή το ενσωματωμένο"
+
+[messages.settings-soundfont-send]
+source = "Choose a file…"
+translation = "Επιλογή αρχείου…"
+
+[messages.settings-soundfont-sent]
+source = "MIDI plays with { $name } now"
+translation = "Το MIDI παίζει τώρα με το { $name }"
 
 [messages.settings-soundfont-what]
 source = "The instruments MIDI files are played and converted with."

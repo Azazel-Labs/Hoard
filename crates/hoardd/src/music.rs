@@ -60,6 +60,12 @@ fn soundfont() -> Font {
     font
 }
 
+/// Why this file isn't a SoundFont MIDI can be played with, if it isn't.
+pub(crate) fn check_soundfont(path: &Path) -> std::result::Result<(), String> {
+    let mut f = std::io::BufReader::new(std::fs::File::open(path).map_err(|e| e.to_string())?);
+    rustysynth::SoundFont::new(&mut f).map(drop).map_err(|e| e.to_string())
+}
+
 fn load_soundfont(configured: Option<PathBuf>) -> Font {
     let path = configured.or_else(|| SOUNDFONT_PATHS.iter().map(PathBuf::from).find(|p| p.is_file()))?;
     let mut f = std::io::BufReader::new(std::fs::File::open(&path).ok()?);

@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "ec811590205e4e64387af6e16bbaf48e03adb4bdb3b0180c6d7abaf323eaf3e0"
+source = "d9d0c739f4c7e6741f2ad3eb66a5542e133eec4e662af87c199e651c80a85cc8"
 translation = "7e91a85d0b5328865a9bbf9956da077518809d861d62dab74e65d6631bb669ed"
 
 [messages.about-blender]
@@ -4348,6 +4348,10 @@ translation = "bu sayfanın adresinin süresi doldu; sayfayı Hoard’dan yenide
 [messages.error-site-not-a-page]
 source = "only web pages open as pages"
 translation = "yalnızca web sayfaları sayfa olarak açılır"
+
+[messages.error-soundfont-bad]
+source = "{ $name } isn’t a SoundFont MIDI can play with: { $reason }"
+translation = "{ $name }, MIDI’nin çalabileceği bir SoundFont değil: { $reason }"
 
 [messages.error-store-search-empty]
 source = "nothing to search for; type the pack's name"
@@ -9594,6 +9598,14 @@ translation = "Sunucuda bulunan ya da yerleşik"
 [messages.settings-soundfont-placeholder-desktop]
 source = "Found on this computer, or built-in"
 translation = "Bu bilgisayarda bulunan ya da yerleşik"
+
+[messages.settings-soundfont-send]
+source = "Choose a file…"
+translation = "Dosya seç…"
+
+[messages.settings-soundfont-sent]
+source = "MIDI plays with { $name } now"
+translation = "MIDI artık { $name } ile çalıyor"
 
 [messages.settings-soundfont-what]
 source = "The instruments MIDI files are played and converted with."

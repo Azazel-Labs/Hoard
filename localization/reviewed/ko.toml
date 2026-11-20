@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "ec811590205e4e64387af6e16bbaf48e03adb4bdb3b0180c6d7abaf323eaf3e0"
+source = "d9d0c739f4c7e6741f2ad3eb66a5542e133eec4e662af87c199e651c80a85cc8"
 translation = "13ede832ea7fc967c9ec7a1d4ce19f3b71776609213795e5d64758ffe8286e51"
 
 [messages.about-blender]
@@ -4332,6 +4332,10 @@ translation = "이 페이지의 주소가 만료되었습니다. Hoard에서 페
 [messages.error-site-not-a-page]
 source = "only web pages open as pages"
 translation = "웹 페이지만 페이지로 열립니다"
+
+[messages.error-soundfont-bad]
+source = "{ $name } isn’t a SoundFont MIDI can play with: { $reason }"
+translation = "{ $name }은(는) MIDI 재생에 쓸 수 있는 SoundFont가 아닙니다: { $reason }"
 
 [messages.error-store-search-empty]
 source = "nothing to search for; type the pack's name"
@@ -9536,6 +9540,14 @@ translation = "서버에서 찾거나 기본 제공"
 [messages.settings-soundfont-placeholder-desktop]
 source = "Found on this computer, or built-in"
 translation = "이 컴퓨터에서 찾거나 기본 제공"
+
+[messages.settings-soundfont-send]
+source = "Choose a file…"
+translation = "파일 선택…"
+
+[messages.settings-soundfont-sent]
+source = "MIDI plays with { $name } now"
+translation = "이제 MIDI는 { $name }(으)로 재생됩니다"
 
 [messages.settings-soundfont-what]
 source = "The instruments MIDI files are played and converted with."

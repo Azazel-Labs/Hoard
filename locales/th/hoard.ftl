@@ -236,6 +236,7 @@ error-update-hook-address = ที่อยู่ที่จะเรียก�
 error-update-hook-auth = ส่วนหัว Authorization ต้องไม่มีการขึ้นบรรทัดใหม่หรืออักขระควบคุมอื่น ๆ
 error-no-soundfont = ไม่มี SoundFont ที่ { $path } บนเซิร์ฟเวอร์
 error-no-soundfont-desktop = ไม่มี SoundFont ที่ { $path }
+error-soundfont-bad = { $name } ไม่ใช่ SoundFont ที่ MIDI ใช้เล่นได้: { $reason }
 error-workers = ตัวทำงานเบื้องหลัง: ตั้งแต่ 1 ถึง { $max }
 error-ai-batch = แอสเซ็ตต่อคำขอ AI: ตั้งแต่ 1 ถึง 200
 error-conversion-cache = การดาวน์โหลดที่แปลงแล้ว: อย่างน้อย 100 MB
@@ -2225,6 +2226,8 @@ settings-soundfont-placeholder = ที่พบบนเซิร์ฟเว�
 settings-soundfont-placeholder-desktop = ที่พบบนคอมพิวเตอร์เครื่องนี้ หรือแบบในตัว
 settings-soundfont-default = ที่พบบนเซิร์ฟเวอร์ หรือแบบในตัว
 settings-soundfont-default-desktop = ที่พบบนคอมพิวเตอร์เครื่องนี้ หรือแบบในตัว
+settings-soundfont-send = เลือกไฟล์…
+settings-soundfont-sent = ตอนนี้ MIDI เล่นด้วย { $name }
 
 ## SettingsPage.vue: Image search
 

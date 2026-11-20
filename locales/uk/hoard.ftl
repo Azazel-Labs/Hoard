@@ -236,6 +236,7 @@ error-update-hook-address = Адреса для сповіщень про оно
 error-update-hook-auth = Заголовок Authorization не може містити розривів рядка чи інших керівних символів
 error-no-soundfont = На сервері немає SoundFont за шляхом { $path }
 error-no-soundfont-desktop = Немає SoundFont за шляхом { $path }
+error-soundfont-bad = { $name } — не SoundFont, з яким може грати MIDI: { $reason }
 error-workers = Фонові обробники: від 1 до { $max }
 error-ai-batch = Ресурсів на запит до ШІ: від 1 до 200
 error-conversion-cache = Перетворені завантаження: щонайменше 100 МБ
@@ -2695,6 +2696,8 @@ settings-soundfont-placeholder = Знайдений на сервері або �
 settings-soundfont-placeholder-desktop = Знайдений на цьому комп’ютері або вбудований
 settings-soundfont-default = знайдений на сервері або вбудований
 settings-soundfont-default-desktop = знайдений на цьому комп’ютері або вбудований
+settings-soundfont-send = Вибрати файл…
+settings-soundfont-sent = Тепер MIDI грає з { $name }
 
 ## SettingsPage.vue: Пошук зображень
 

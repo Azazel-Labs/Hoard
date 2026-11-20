@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "ec811590205e4e64387af6e16bbaf48e03adb4bdb3b0180c6d7abaf323eaf3e0"
+source = "d9d0c739f4c7e6741f2ad3eb66a5542e133eec4e662af87c199e651c80a85cc8"
 translation = "69f01639647ec94d71cdb3668111c233bf33f40252c42dacec1a9e8e8ec3a19b"
 
 [messages.about-blender]
@@ -4473,6 +4473,10 @@ translation = "adresa této stránky vypršela; otevřete stránku znovu z Hoard
 [messages.error-site-not-a-page]
 source = "only web pages open as pages"
 translation = "jako stránky se otevírají jen webové stránky"
+
+[messages.error-soundfont-bad]
+source = "{ $name } isn’t a SoundFont MIDI can play with: { $reason }"
+translation = "{ $name } není SoundFont, se kterým může MIDI hrát: { $reason }"
 
 [messages.error-store-search-empty]
 source = "nothing to search for; type the pack's name"
@@ -9927,6 +9931,14 @@ translation = "Nalezený na serveru, nebo vestavěný"
 [messages.settings-soundfont-placeholder-desktop]
 source = "Found on this computer, or built-in"
 translation = "Nalezený v tomto počítači, nebo vestavěný"
+
+[messages.settings-soundfont-send]
+source = "Choose a file…"
+translation = "Vybrat soubor…"
+
+[messages.settings-soundfont-sent]
+source = "MIDI plays with { $name } now"
+translation = "MIDI teď hraje s { $name }"
 
 [messages.settings-soundfont-what]
 source = "The instruments MIDI files are played and converted with."

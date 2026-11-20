@@ -251,6 +251,62 @@ fn option(value: impl serde::Serialize, default: impl serde::Serialize, saved: b
     json!({ "value": value, "default": default, "saved": saved })
 }
 
+#[derive(Deserialize)]
+pub(super) struct SoundFontAsk {
+    /// The file's name where it came from.
+    name: String,
+}
+
+/// A SoundFont sent from the browser (the file is the body): kept in the data folder's `soundfonts`, and made the one
+/// MIDI plays with, in place of one sent before.
+pub(super) async fn upload_soundfont(
+    State(state): State<AppState>,
+    axum::extract::Query(ask): axum::extract::Query<SoundFontAsk>,
+    body: axum::body::Body,
+) -> ApiResult<Json<Value>> {
+    use futures_util::StreamExt as _;
+    use tokio::io::AsyncWriteExt as _;
+    let dir = state.cfg.soundfonts_dir();
+    tokio::fs::create_dir_all(&dir).await?;
+    let part = dir.join(format!(".{}.part", uuid::Uuid::now_v7()));
+    let received: anyhow::Result<()> = async {
+        let mut out = tokio::io::BufWriter::with_capacity(1 << 20, tokio::fs::File::create(&part).await?);
+        let mut body = body.into_data_stream();
+        while let Some(bytes) = body.next().await {
+            out.write_all(&bytes?).await?;
+        }
+        out.flush().await?;
+        Ok(())
+    }
+    .await;
+    if let Err(e) = received {
+        tokio::fs::remove_file(&part).await.ok();
+        return Err(AppError::bad_request(tr!("error-upload-failed", reason = format!("{e:#}"))));
+    }
+    let name = soundfont_name(&ask.name);
+    let p = part.clone();
+    let checked = tokio::task::spawn_blocking(move || crate::music::check_soundfont(&p)).await;
+    if let Err(reason) = checked.map_err(|e| e.to_string()).and_then(|c| c) {
+        tokio::fs::remove_file(&part).await.ok();
+        return Err(AppError::bad_request(tr!("error-soundfont-bad", name = name, reason = reason)));
+    }
+    let dest = dir.join(&name);
+    tokio::fs::rename(&part, &dest).await?;
+    put_settings(State(state), Json(json!({ "soundfont": dest.display().to_string() }))).await
+}
+
+/// A sent file's name to keep it under: its own name without folders or odd characters, ending in .sf2.
+fn soundfont_name(sent: &str) -> String {
+    let base = sent.rsplit(['/', '\\']).next().unwrap_or_default();
+    let stem = base.strip_suffix(".sf2").or_else(|| base.strip_suffix(".SF2")).unwrap_or(base);
+    let stem: String = stem
+        .chars()
+        .map(|c| if c.is_alphanumeric() || matches!(c, ' ' | '-' | '_' | '.' | '(' | ')') { c } else { '_' })
+        .collect();
+    let stem = stem.trim_matches(|c: char| c == '.' || c.is_whitespace());
+    format!("{}.sf2", if stem.is_empty() { "soundfont" } else { stem })
+}
+
 pub(super) async fn get_settings(State(state): State<AppState>) -> Json<Value> {
     Json(settings_json(&state).await)
 }
@@ -314,6 +370,13 @@ pub(super) async fn put_settings(State(state): State<AppState>, Json(patch): Jso
         crate::store_lookup::start(&state).await;
     }
     crate::music::configure(after.soundfont.clone());
+    // An uploaded SoundFont no longer used goes.
+    if before.soundfont != after.soundfont
+        && let Some(old) = &before.soundfont
+        && old.parent() == Some(state.cfg.soundfonts_dir().as_path())
+    {
+        tokio::fs::remove_file(old).await.ok();
+    }
     if after.s3 != before.s3
         && let Err(e) = state.blobs.set_s3(after.s3.clone()).await
     {
@@ -330,4 +393,18 @@ pub(super) async fn put_settings(State(state): State<AppState>, Json(patch): Jso
         "settings changed"
     );
     Ok(Json(settings_json(&state).await))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::soundfont_name;
+
+    #[test]
+    fn a_sent_soundfont_keeps_its_own_name() {
+        assert_eq!(soundfont_name("FluidR3_GM.sf2"), "FluidR3_GM.sf2");
+        assert_eq!(soundfont_name(r"C:\fonts\Piano (Grand).SF2"), "Piano (Grand).sf2");
+        assert_eq!(soundfont_name("../../etc/passwd"), "passwd.sf2");
+        assert_eq!(soundfont_name("..sf2"), "soundfont.sf2");
+        assert_eq!(soundfont_name("a:b*c?.sf2"), "a_b_c_.sf2");
+    }
 }

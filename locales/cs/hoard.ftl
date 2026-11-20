@@ -236,6 +236,7 @@ error-update-hook-address = Adresa volaná při aktualizacích by měla začína
 error-update-hook-auth = Hlavička Authorization nemůže obsahovat zalomení řádků ani jiné řídicí znaky
 error-no-soundfont = Na serveru není na { $path } žádný SoundFont
 error-no-soundfont-desktop = Na { $path } není žádný SoundFont
+error-soundfont-bad = { $name } není SoundFont, se kterým může MIDI hrát: { $reason }
 error-workers = Úlohy na pozadí: 1 až { $max }
 error-ai-batch = Assetů na jeden požadavek AI: 1 až 200
 error-conversion-cache = Převedená stahování: alespoň 100 MB
@@ -2600,6 +2601,8 @@ settings-soundfont-placeholder = Nalezený na serveru, nebo vestavěný
 settings-soundfont-placeholder-desktop = Nalezený v tomto počítači, nebo vestavěný
 settings-soundfont-default = nalezený na serveru, nebo vestavěný
 settings-soundfont-default-desktop = nalezený v tomto počítači, nebo vestavěný
+settings-soundfont-send = Vybrat soubor…
+settings-soundfont-sent = MIDI teď hraje s { $name }
 
 ## SettingsPage.vue: Hledání obrázků
 

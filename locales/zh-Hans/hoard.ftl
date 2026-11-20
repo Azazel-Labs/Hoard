@@ -236,6 +236,7 @@ error-update-hook-address = 用于更新通知的地址应以 http:// 或 https:
 error-update-hook-auth = Authorization 标头不能包含换行符或其他控制字符
 error-no-soundfont = 服务器上的 { $path } 处没有 SoundFont
 error-no-soundfont-desktop = { $path } 处没有 SoundFont
+error-soundfont-bad = { $name } 不是 MIDI 能用来播放的 SoundFont：{ $reason }
 error-workers = 后台工作线程：1 到 { $max } 之间
 error-ai-batch = 每次 AI 请求的资源数：1 到 200 之间
 error-conversion-cache = 转换后的下载：至少 100 MB
@@ -2222,6 +2223,8 @@ settings-soundfont-placeholder = 在服务器上查找，或使用内置的
 settings-soundfont-placeholder-desktop = 在这台电脑上查找，或使用内置的
 settings-soundfont-default = 在服务器上查找，或使用内置的
 settings-soundfont-default-desktop = 在这台电脑上查找，或使用内置的
+settings-soundfont-send = 选择文件…
+settings-soundfont-sent = MIDI 现在使用 { $name } 播放
 
 ## SettingsPage.vue: 图像搜索
 

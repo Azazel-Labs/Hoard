@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "ec811590205e4e64387af6e16bbaf48e03adb4bdb3b0180c6d7abaf323eaf3e0"
+source = "d9d0c739f4c7e6741f2ad3eb66a5542e133eec4e662af87c199e651c80a85cc8"
 translation = "9b658642e0200ba66efa386171fcbdde924e04ae57e4d1149258a48611dc8acd"
 
 [messages.about-blender]
@@ -4341,6 +4341,10 @@ translation = "此頁面的網址已過期，請從 Hoard 重新開啟該頁面"
 [messages.error-site-not-a-page]
 source = "only web pages open as pages"
 translation = "只有網頁才能以頁面方式開啟"
+
+[messages.error-soundfont-bad]
+source = "{ $name } isn’t a SoundFont MIDI can play with: { $reason }"
+translation = "{ $name } 不是 MIDI 能用來播放的 SoundFont：{ $reason }"
 
 [messages.error-store-search-empty]
 source = "nothing to search for; type the pack's name"
@@ -9572,6 +9576,14 @@ translation = "在伺服器上找到的，或內建的"
 [messages.settings-soundfont-placeholder-desktop]
 source = "Found on this computer, or built-in"
 translation = "在這台電腦上找到的，或內建的"
+
+[messages.settings-soundfont-send]
+source = "Choose a file…"
+translation = "選擇檔案…"
+
+[messages.settings-soundfont-sent]
+source = "MIDI plays with { $name } now"
+translation = "MIDI 現在使用 { $name } 播放"
 
 [messages.settings-soundfont-what]
 source = "The instruments MIDI files are played and converted with."

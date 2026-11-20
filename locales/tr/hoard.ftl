@@ -236,6 +236,7 @@ error-update-hook-address = Güncellemeler için çağrılacak adres http:// ya 
 error-update-hook-auth = Authorization üst bilgisinde satır sonu ya da başka denetim karakterleri olamaz
 error-no-soundfont = Sunucuda şu yolda SoundFont yok: { $path }
 error-no-soundfont-desktop = Şu yolda SoundFont yok: { $path }
+error-soundfont-bad = { $name }, MIDI’nin çalabileceği bir SoundFont değil: { $reason }
 error-workers = Arka plan çalışanları: 1 ile { $max } arası
 error-ai-batch = Yapay zekâ isteği başına varlık: 1 ile 200 arası
 error-conversion-cache = Dönüştürülmüş indirmeler: en az 100 MB
@@ -2239,6 +2240,8 @@ settings-soundfont-placeholder = Sunucuda bulunan ya da yerleşik
 settings-soundfont-placeholder-desktop = Bu bilgisayarda bulunan ya da yerleşik
 settings-soundfont-default = sunucuda bulunan ya da yerleşik
 settings-soundfont-default-desktop = bu bilgisayarda bulunan ya da yerleşik
+settings-soundfont-send = Dosya seç…
+settings-soundfont-sent = MIDI artık { $name } ile çalıyor
 
 ## SettingsPage.vue: Image search
 

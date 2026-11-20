@@ -236,6 +236,7 @@ error-update-hook-address = O endereço a chamar para atualizações deve começ
 error-update-hook-auth = O cabeçalho Authorization não pode conter quebras de linha nem outros caracteres de controle
 error-no-soundfont = Não há SoundFont em { $path } no servidor
 error-no-soundfont-desktop = Não há SoundFont em { $path }
+error-soundfont-bad = { $name } não é um SoundFont com que o MIDI possa tocar: { $reason }
 error-workers = Trabalhadores em segundo plano: entre 1 e { $max }
 error-ai-batch = Assets por solicitação à IA: entre 1 e 200
 error-conversion-cache = Downloads convertidos: pelo menos 100 MB
@@ -2408,6 +2409,8 @@ settings-soundfont-placeholder = Encontrado no servidor, ou embutido
 settings-soundfont-placeholder-desktop = Encontrado neste computador, ou embutido
 settings-soundfont-default = encontrado no servidor, ou embutido
 settings-soundfont-default-desktop = encontrado neste computador, ou embutido
+settings-soundfont-send = Escolher um arquivo…
+settings-soundfont-sent = O MIDI agora toca com { $name }
 
 ## SettingsPage.vue: Busca por imagem
 

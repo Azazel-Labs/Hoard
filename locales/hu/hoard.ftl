@@ -236,6 +236,7 @@ error-update-hook-address = A frissítésekkor hívandó cím http:// vagy https
 error-update-hook-auth = Az Authorization fejléc nem tartalmazhat sortörést vagy más vezérlőkaraktert
 error-no-soundfont = Nincs SoundFont a szerveren ezen az útvonalon: { $path }
 error-no-soundfont-desktop = Nincs SoundFont ezen az útvonalon: { $path }
+error-soundfont-bad = A(z) { $name } nem olyan SoundFont, amellyel a MIDI szólni tud: { $reason }
 error-workers = Háttérfolyamatok: 1 és { $max } között
 error-ai-batch = Assetek MI-kérésenként: 1 és 200 között
 error-conversion-cache = Átalakított letöltések: legalább 100 MB
@@ -2235,6 +2236,8 @@ settings-soundfont-placeholder = A szerveren talált vagy a beépített
 settings-soundfont-placeholder-desktop = Ezen a számítógépen talált vagy a beépített
 settings-soundfont-default = a szerveren talált vagy a beépített
 settings-soundfont-default-desktop = ezen a számítógépen talált vagy a beépített
+settings-soundfont-send = Fájl kiválasztása…
+settings-soundfont-sent = A MIDI mostantól ezzel szól: { $name }
 
 ## SettingsPage.vue: Képkeresés
 

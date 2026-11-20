@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "ec811590205e4e64387af6e16bbaf48e03adb4bdb3b0180c6d7abaf323eaf3e0"
+source = "d9d0c739f4c7e6741f2ad3eb66a5542e133eec4e662af87c199e651c80a85cc8"
 translation = "52d2a80ae9b2c4cd26d5e469c552c2206c964c8a9988b1d1ebe66f8ea42078f7"
 
 [messages.about-blender]
@@ -4439,6 +4439,10 @@ translation = "l’adresse de cette page a expiré ; rouvrez la page depuis Hoar
 [messages.error-site-not-a-page]
 source = "only web pages open as pages"
 translation = "seules les pages web s’ouvrent comme des pages"
+
+[messages.error-soundfont-bad]
+source = "{ $name } isn’t a SoundFont MIDI can play with: { $reason }"
+translation = "{ $name } n’est pas un SoundFont avec lequel le MIDI peut jouer : { $reason }"
 
 [messages.error-store-search-empty]
 source = "nothing to search for; type the pack's name"
@@ -9786,6 +9790,14 @@ translation = "Trouvé sur le serveur, ou intégré"
 [messages.settings-soundfont-placeholder-desktop]
 source = "Found on this computer, or built-in"
 translation = "Trouvé sur cet ordinateur, ou intégré"
+
+[messages.settings-soundfont-send]
+source = "Choose a file…"
+translation = "Choisir un fichier…"
+
+[messages.settings-soundfont-sent]
+source = "MIDI plays with { $name } now"
+translation = "Le MIDI joue maintenant avec { $name }"
 
 [messages.settings-soundfont-what]
 source = "The instruments MIDI files are played and converted with."

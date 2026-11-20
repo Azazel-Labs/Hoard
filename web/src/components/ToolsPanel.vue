@@ -1,12 +1,31 @@
 <script setup lang="ts">
 // Tools: Blender and ffmpeg (off, found or downloaded, or a program of your own), and the SoundFont MIDI plays with.
 import { reactive, ref } from 'vue'
-import type { ToolSetting } from '../api'
+import { ApiError, type ToolSetting, api } from '../api'
 import { t } from '../i18n'
+import { showError, showOk } from '../ui'
 import ResetButton from './ResetButton.vue'
 import { useSettings } from './settingsContext'
 
-const { s, busy, save, onTake, opts, saveOpt, resetOpt, changed } = useSettings()
+const { s, busy, save, take, onTake, opts, saveOpt, resetOpt, changed, unauthorized } = useSettings()
+
+/** A SoundFont chosen on this computer, sent to the server, which keeps it and plays MIDI with it. */
+const fontInput = ref<HTMLInputElement | null>(null)
+async function sendFont() {
+  const file = fontInput.value?.files?.[0]
+  if (fontInput.value) fontInput.value.value = ''
+  if (!file) return
+  busy.value = true
+  try {
+    take(await api.uploadSoundFont(file))
+    showOk(t('settings-soundfont-sent', { name: file.name }))
+  } catch (e) {
+    if (e instanceof ApiError && e.status === 401) unauthorized()
+    showError((e as Error).message)
+  } finally {
+    busy.value = false
+  }
+}
 
 type ToolKey = 'blender' | 'ffmpeg' | 'unreal'
 type Mode = 'off' | 'auto' | 'path'
@@ -150,6 +169,10 @@ const defaultText = (v: string) => (modeOf(v) === 'off' ? t('settings-default-of
           @keydown.enter.prevent="saveOpt('soundfont')"
         />
         <ResetButton v-if="changed('soundfont')" :to="s.options.soundfont.default || t('settings-soundfont-default')" :disabled="busy" @reset="resetOpt('soundfont')" />
+        <button class="btn" type="button" :disabled="busy" data-testid="soundfont-send" @click="fontInput?.click()">
+          {{ t('settings-soundfont-send') }}
+        </button>
+        <input ref="fontInput" type="file" accept=".sf2" hidden data-testid="soundfont-file" @change="sendFont" />
       </div>
     </div>
   </section>

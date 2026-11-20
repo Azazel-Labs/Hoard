@@ -236,6 +236,7 @@ error-update-hook-address = L'indirizzo da chiamare per gli aggiornamenti deve i
 error-update-hook-auth = L'intestazione Authorization non può contenere interruzioni di riga o altri caratteri di controllo
 error-no-soundfont = Non c'è nessun SoundFont in { $path } sul server
 error-no-soundfont-desktop = Non c'è nessun SoundFont in { $path }
+error-soundfont-bad = { $name } non è un SoundFont con cui il MIDI possa suonare: { $reason }
 error-workers = Processi in background: da 1 a { $max }
 error-ai-batch = Asset per richiesta all'IA: da 1 a 200
 error-conversion-cache = Download convertiti: almeno 100 MB
@@ -2415,6 +2416,8 @@ settings-soundfont-placeholder = Trovato sul server, o integrato
 settings-soundfont-placeholder-desktop = Trovato su questo computer, o integrato
 settings-soundfont-default = trovato sul server, o integrato
 settings-soundfont-default-desktop = trovato su questo computer, o integrato
+settings-soundfont-send = Scegli un file…
+settings-soundfont-sent = Ora il MIDI suona con { $name }
 
 ## SettingsPage.vue: Ricerca per immagini
 

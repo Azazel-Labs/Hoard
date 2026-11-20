@@ -272,6 +272,7 @@ error-update-hook-address = The address to call for updates should start with ht
 error-update-hook-auth = The Authorization header can't contain line breaks or other control characters
 error-no-soundfont = There's no SoundFont at { $path } on the server
 error-no-soundfont-desktop = There's no SoundFont at { $path }
+error-soundfont-bad = { $name } isn’t a SoundFont MIDI can play with: { $reason }
 error-workers = Background workers: between 1 and { $max }
 error-ai-batch = Assets per AI request: between 1 and 200
 error-conversion-cache = Converted downloads: at least 100 MB
@@ -2728,6 +2729,8 @@ settings-soundfont-placeholder = Found on the server, or built-in
 settings-soundfont-placeholder-desktop = Found on this computer, or built-in
 settings-soundfont-default = found on the server, or built-in
 settings-soundfont-default-desktop = found on this computer, or built-in
+settings-soundfont-send = Choose a file…
+settings-soundfont-sent = MIDI plays with { $name } now
 
 ## SettingsPage.vue: Image search
 

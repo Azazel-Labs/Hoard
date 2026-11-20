@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "ec811590205e4e64387af6e16bbaf48e03adb4bdb3b0180c6d7abaf323eaf3e0"
+source = "d9d0c739f4c7e6741f2ad3eb66a5542e133eec4e662af87c199e651c80a85cc8"
 translation = "44c14591a95068aeb93ac3b44bf9c9907dc70d2d553d802b52b04da4b5c2b3c1"
 
 [messages.about-blender]
@@ -4446,6 +4446,10 @@ translation = "адреса ове странице је истекла; отв�
 [messages.error-site-not-a-page]
 source = "only web pages open as pages"
 translation = "као странице се отварају само веб-странице"
+
+[messages.error-soundfont-bad]
+source = "{ $name } isn’t a SoundFont MIDI can play with: { $reason }"
+translation = "{ $name } није SoundFont са којим MIDI може да свира: { $reason }"
 
 [messages.error-store-search-empty]
 source = "nothing to search for; type the pack's name"
@@ -9845,6 +9849,14 @@ translation = "Пронађен на серверу или уграђен"
 [messages.settings-soundfont-placeholder-desktop]
 source = "Found on this computer, or built-in"
 translation = "Пронађен на овом рачунару или уграђен"
+
+[messages.settings-soundfont-send]
+source = "Choose a file…"
+translation = "Изабери датотеку…"
+
+[messages.settings-soundfont-sent]
+source = "MIDI plays with { $name } now"
+translation = "MIDI сада свира са { $name }"
 
 [messages.settings-soundfont-what]
 source = "The instruments MIDI files are played and converted with."

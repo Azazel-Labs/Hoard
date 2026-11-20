@@ -865,7 +865,6 @@ locations-mode-managed = Rivendicala: Hoard tiene qui i miei pacchetti
 locations-mode-managed-hint = I pacchetti che carichi o importi vengono copiati qui, e Hoard li tiene in ordine. Ora la cartella è di Hoard, quindi non toccarne il contenuto.
 locations-mode-watched = Sorvegliala: i miei pacchetti sono già qui
 locations-mode-watched-hint = Ogni cartella al suo interno diventa un pacchetto. Hoard legge i file dove si trovano e non li modifica, sposta o elimina mai, e rileva le nuove cartelle man mano che compaiono.
-locations-folder = Cartella sul server
 locations-folder-desktop = Cartella
 locations-folder-placeholder = La cartella in cui si trovano i tuoi pacchetti
 locations-folder-hint-managed = Hoard la crea se non esiste. In Docker, è una cartella che hai montato nel container.

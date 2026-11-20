@@ -5716,10 +5716,6 @@ translation = "Şimdilik hepsi. Bazı türleri (örneğin müziği) başka bir d
 source = "Uploading needs a library Hoard keeps. You can add one later from Settings → Library locations."
 translation = "Yükleme yapabilmek için Hoard’un tuttuğu bir kütüphane gerekir. Bunu daha sonra Ayarlar → Kütüphane konumları bölümünden ekleyebilirsiniz."
 
-[messages.locations-folder]
-source = "Folder on the server"
-translation = "Sunucudaki klasör"
-
 [messages.locations-folder-desktop]
 source = "Folder"
 translation = "Klasör"

@@ -824,7 +824,6 @@ locations-mode-managed = 占為己有：Hoard 把我的素材包存放在這裡
 locations-mode-managed-hint = 你上傳或匯入的素材包會複製到這裡，由 Hoard 整理妥當。這個資料夾現在歸 Hoard 所有，請不要變動其中的內容。
 locations-mode-watched = 看守：我的素材包已經在這裡
 locations-mode-watched-hint = 其中的每個資料夾都會成為一個素材包。Hoard 會直接讀取原位置的檔案，絕不會變更、移動或刪除它們，並會在新資料夾出現時自動加入。
-locations-folder = 伺服器上的資料夾
 locations-folder-desktop = 資料夾
 locations-folder-placeholder = 存放素材包的資料夾
 locations-folder-hint-managed = 如果資料夾不存在，Hoard 會建立它。在 Docker 中，這是你掛載到容器內的資料夾。

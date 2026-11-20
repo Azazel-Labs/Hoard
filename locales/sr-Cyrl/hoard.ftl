@@ -876,7 +876,6 @@ locations-mode-managed = Присвоји је: Hoard овде чува моје
 locations-mode-managed-hint = Пакети које отпремите или увезете копирају се овде, а Hoard их држи у реду. Фасцикла сада припада Hoard-у, зато не дирајте њен садржај.
 locations-mode-watched = Прати је: моји пакети су већ овде
 locations-mode-watched-hint = Свака фасцикла у њој постаје пакет. Hoard чита датотеке тамо где јесу и никад их не мења, не премешта нити брише, а нове фасцикле преузима чим се појаве.
-locations-folder = Фасцикла на серверу
 locations-folder-desktop = Фасцикла
 locations-folder-placeholder = Фасцикла у којој су ваши пакети
 locations-folder-hint-managed = Hoard је прави ако не постоји. У Docker-у, ово је фасцикла коју сте монтирали у контејнер.

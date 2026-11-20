@@ -5900,10 +5900,6 @@ translation = "Zatím všechny. Později můžete v Nastavení přidat další u
 source = "Uploading needs a library Hoard keeps. You can add one later from Settings → Library locations."
 translation = "Nahrávání potřebuje knihovnu, kterou Hoard spravuje. Můžete ji přidat později v Nastavení → Umístění knihovny."
 
-[messages.locations-folder]
-source = "Folder on the server"
-translation = "Složka na serveru"
-
 [messages.locations-folder-desktop]
 source = "Folder"
 translation = "Složka"

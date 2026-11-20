@@ -924,7 +924,6 @@ locations-mode-managed = Забрати собі: Hoard зберігає тут 
 locations-mode-managed-hint = Пакети, які ви вивантажуєте або імпортуєте, копіюються сюди, і Hoard тримає їх у порядку. Тепер тека належить Hoard, тож не змінюйте її вміст.
 locations-mode-watched = Стежити: мої пакети вже тут
 locations-mode-watched-hint = Кожна тека всередині стає пакетом. Hoard читає файли там, де вони є, ніколи не змінює, не переміщує й не видаляє їх і підхоплює нові теки, щойно вони з’являються.
-locations-folder = Тека на сервері
 locations-folder-desktop = Тека
 locations-folder-placeholder = Тека, де лежать ваші пакети
 locations-folder-hint-managed = Hoard створить її, якщо її немає. У Docker це тека, яку ви змонтували в контейнер.

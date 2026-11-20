@@ -857,7 +857,6 @@ locations-mode-managed = Reclama-la: Hoard hi guarda els meus paquets
 locations-mode-managed-hint = Els paquets que pugeu o importeu s'hi copien, i Hoard els manté en ordre. Ara la carpeta és de Hoard, així que no en toqueu el contingut.
 locations-mode-watched = Vigila-la: els meus paquets ja hi són
 locations-mode-watched-hint = Cada carpeta que conté es converteix en un paquet. Hoard llegeix els fitxers on són i no els canvia, mou ni suprimeix mai, i incorpora les carpetes noves a mesura que apareixen.
-locations-folder = Carpeta del servidor
 locations-folder-desktop = Carpeta
 locations-folder-placeholder = La carpeta on són els vostres paquets
 locations-folder-hint-managed = Hoard la crea si no existeix. A Docker, és una carpeta que heu muntat al contenidor.

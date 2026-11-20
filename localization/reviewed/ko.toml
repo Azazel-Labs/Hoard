@@ -5696,10 +5696,6 @@ translation = "지금은 전부입니다. 나중에 설정에서 위치를 더 �
 source = "Uploading needs a library Hoard keeps. You can add one later from Settings → Library locations."
 translation = "업로드하려면 Hoard가 관리하는 라이브러리가 필요합니다. 나중에 설정 → 라이브러리 위치에서 추가할 수 있습니다."
 
-[messages.locations-folder]
-source = "Folder on the server"
-translation = "서버의 폴더"
-
 [messages.locations-folder-desktop]
 source = "Folder"
 translation = "폴더"

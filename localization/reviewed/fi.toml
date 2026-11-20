@@ -5842,10 +5842,6 @@ translation = "Toistaiseksi kaikki. Lisää myöhemmin sijainteja asetuksista l�
 source = "Uploading needs a library Hoard keeps. You can add one later from Settings → Library locations."
 translation = "Lähettäminen vaatii kirjaston, jota Hoard hoitaa. Voit lisätä sellaisen myöhemmin kohdassa Asetukset → Kirjaston sijainnit."
 
-[messages.locations-folder]
-source = "Folder on the server"
-translation = "Kansio palvelimella"
-
 [messages.locations-folder-desktop]
 source = "Folder"
 translation = "Kansio"

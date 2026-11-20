@@ -5716,10 +5716,6 @@ translation = "暂时存放所有文件。以后可以在“设置”中添加�
 source = "Uploading needs a library Hoard keeps. You can add one later from Settings → Library locations."
 translation = "上传需要一个由 Hoard 管理的资源库。你可以稍后在“设置 → 资源库位置”中添加。"
 
-[messages.locations-folder]
-source = "Folder on the server"
-translation = "服务器上的文件夹"
-
 [messages.locations-folder-desktop]
 source = "Folder"
 translation = "文件夹"

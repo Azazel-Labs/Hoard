@@ -821,7 +821,6 @@ locations-mode-managed = 自分のものにする: Hoard がここにパック�
 locations-mode-managed-hint = アップロードやインポートしたパックはここにコピーされ、Hoard が整理して保ちます。このフォルダーはもう Hoard のものなので、中身には手を触れないでください。
 locations-mode-watched = 見張る: パックはもうここにある
 locations-mode-watched-hint = 中の各フォルダーが 1 つのパックになります。Hoard はファイルをその場で読み取り、変更、移動、削除は一切せず、新しいフォルダーが現れると取り込みます。
-locations-folder = サーバー上のフォルダー
 locations-folder-desktop = フォルダー
 locations-folder-placeholder = パックが入っているフォルダー
 locations-folder-hint-managed = フォルダーがなければ Hoard が作成します。Docker では、コンテナーにマウントしたフォルダーを指定します。

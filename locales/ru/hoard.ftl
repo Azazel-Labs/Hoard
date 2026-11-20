@@ -905,7 +905,6 @@ locations-mode-managed = Забрать себе: Hoard хранит здесь 
 locations-mode-managed-hint = Паки, которые вы загружаете или импортируете, копируются сюда, и Hoard держит их в порядке. Теперь папка принадлежит Hoard, поэтому не трогайте её содержимое.
 locations-mode-watched = Следить: мои паки уже здесь
 locations-mode-watched-hint = Каждая папка внутри неё становится паком. Hoard читает файлы на месте и никогда не изменяет, не перемещает и не удаляет их, а новые папки подхватывает по мере появления.
-locations-folder = Папка на сервере
 locations-folder-desktop = Папка
 locations-folder-placeholder = Папка, в которой лежат ваши паки
 locations-folder-hint-managed = Hoard создаст её, если её нет. В Docker это папка, которую вы подключили в контейнер.

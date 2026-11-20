@@ -891,7 +891,6 @@ locations-mode-managed = Zabrat ji: Hoard tu uchovává mé balíčky
 locations-mode-managed-hint = Balíčky, které nahrajete nebo importujete, se sem zkopírují a Hoard v nich udržuje pořádek. Složka teď patří Hoardu, takže její obsah neměňte.
 locations-mode-watched = Hlídat ji: mé balíčky už tu jsou
 locations-mode-watched-hint = Každá složka uvnitř se stane balíčkem. Hoard čte soubory tam, kde jsou, nikdy je nemění, nepřesouvá ani nemaže a zachytí nové složky, jakmile se objeví.
-locations-folder = Složka na serveru
 locations-folder-desktop = Složka
 locations-folder-placeholder = Složka, ve které jsou vaše balíčky
 locations-folder-hint-managed = Hoard ji vytvoří, pokud neexistuje. V Dockeru je to složka, kterou jste připojili do kontejneru.

@@ -5716,10 +5716,6 @@ translation = "今のところはすべてです。後で設定から保存場�
 source = "Uploading needs a library Hoard keeps. You can add one later from Settings → Library locations."
 translation = "アップロードには Hoard が管理するライブラリが必要です。後で 設定 → ライブラリの保存場所 から追加できます。"
 
-[messages.locations-folder]
-source = "Folder on the server"
-translation = "サーバー上のフォルダー"
-
 [messages.locations-folder-desktop]
 source = "Folder"
 translation = "フォルダー"

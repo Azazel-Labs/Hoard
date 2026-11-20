@@ -899,7 +899,6 @@ locations-mode-managed = Zająć go: Hoard przechowuje tu moje paczki
 locations-mode-managed-hint = Przesyłane lub importowane paczki są tu kopiowane, a Hoard utrzymuje w nich porządek. Folder należy teraz do Hoard, więc nie należy ruszać jego zawartości.
 locations-mode-watched = Pilnować go: moje paczki już tu są
 locations-mode-watched-hint = Każdy folder w nim staje się paczką. Hoard odczytuje pliki tam, gdzie są, nigdy ich nie zmienia, nie przenosi ani nie usuwa i wykrywa nowe foldery, gdy się pojawiają.
-locations-folder = Folder na serwerze
 locations-folder-desktop = Folder
 locations-folder-placeholder = Folder z paczkami
 locations-folder-hint-managed = Hoard utworzy go, jeśli nie istnieje. W Dockerze jest to folder zamontowany w kontenerze.

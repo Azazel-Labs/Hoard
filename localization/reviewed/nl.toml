@@ -5825,10 +5825,6 @@ translation = "Voorlopig allemaal. Voeg later meer locaties toe via Instellingen
 source = "Uploading needs a library Hoard keeps. You can add one later from Settings → Library locations."
 translation = "Voor uploaden is een bibliotheek nodig die Hoard beheert. Je kunt er later een toevoegen via Instellingen → Bibliotheeklocaties."
 
-[messages.locations-folder]
-source = "Folder on the server"
-translation = "Map op de server"
-
 [messages.locations-folder-desktop]
 source = "Folder"
 translation = "Map"

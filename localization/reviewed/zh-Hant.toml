@@ -5708,10 +5708,6 @@ translation = "目前是全部。之後可以從「設定」新增更多位置�
 source = "Uploading needs a library Hoard keeps. You can add one later from Settings → Library locations."
 translation = "上傳需要由 Hoard 管理的素材庫。你之後可以從「設定 → 素材庫位置」新增。"
 
-[messages.locations-folder]
-source = "Folder on the server"
-translation = "伺服器上的資料夾"
-
 [messages.locations-folder-desktop]
 source = "Folder"
 translation = "資料夾"

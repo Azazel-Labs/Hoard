@@ -857,7 +857,6 @@ locations-mode-managed = Gør krav på den: Hoard har mine pakker her
 locations-mode-managed-hint = Pakker, du uploader eller importerer, kopieres herind, og Hoard holder orden på dem. Mappen er Hoards nu, så lad dens indhold være.
 locations-mode-watched = Hold øje med den: mine pakker er her allerede
 locations-mode-watched-hint = Hver mappe i den bliver en pakke. Hoard læser filerne, hvor de ligger, og ændrer, flytter eller sletter dem aldrig, og opfanger nye mapper, efterhånden som de dukker op.
-locations-folder = Mappe på serveren
 locations-folder-desktop = Mappe
 locations-folder-placeholder = Den mappe, dine pakker ligger i
 locations-folder-hint-managed = Hoard opretter den, hvis den ikke findes. I Docker er det en mappe, du har monteret i containeren.

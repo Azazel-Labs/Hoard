@@ -5706,10 +5706,6 @@ translation = "Semuanya, untuk saat ini. Tambahkan lokasi lain nanti dari Pengat
 source = "Uploading needs a library Hoard keeps. You can add one later from Settings → Library locations."
 translation = "Mengunggah memerlukan pustaka yang disimpan Hoard. Anda dapat menambahkannya nanti dari Pengaturan → Lokasi pustaka."
 
-[messages.locations-folder]
-source = "Folder on the server"
-translation = "Folder di server"
-
 [messages.locations-folder-desktop]
 source = "Folder"
 translation = "Folder"

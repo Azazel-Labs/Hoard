@@ -821,7 +821,6 @@ locations-mode-managed = Klaim: Hoard menyimpan paket saya di sini
 locations-mode-managed-hint = Paket yang Anda unggah atau impor disalin ke sini, dan Hoard menjaganya tetap rapi. Folder ini sekarang milik Hoard, jadi jangan ubah isinya.
 locations-mode-watched = Pantau: paket saya sudah ada di sini
 locations-mode-watched-hint = Setiap folder di dalamnya menjadi paket. Hoard membaca berkas di tempatnya dan tidak pernah mengubah, memindahkan, atau menghapusnya, serta mengambil folder baru saat muncul.
-locations-folder = Folder di server
 locations-folder-desktop = Folder
 locations-folder-placeholder = Folder tempat paket Anda berada
 locations-folder-hint-managed = Hoard membuatnya jika belum ada. Di Docker, ini adalah folder yang sudah Anda pasang ke dalam container.

@@ -5931,10 +5931,6 @@ translation = "Поки що всі. Пізніше в налаштування�
 source = "Uploading needs a library Hoard keeps. You can add one later from Settings → Library locations."
 translation = "Для вивантаження потрібна бібліотека, якою опікується Hoard. Її можна додати пізніше в «Налаштування → Розташування бібліотеки»."
 
-[messages.locations-folder]
-source = "Folder on the server"
-translation = "Тека на сервері"
-
 [messages.locations-folder-desktop]
 source = "Folder"
 translation = "Тека"

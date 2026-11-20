@@ -5822,10 +5822,6 @@ translation = "Almal, vir eers. Voeg later meer liggings by vanuit Instellings o
 source = "Uploading needs a library Hoard keeps. You can add one later from Settings → Library locations."
 translation = "Oplaai het 'n biblioteek nodig wat Hoard hou. Jy kan later een byvoeg vanuit Instellings → Biblioteekliggings."
 
-[messages.locations-folder]
-source = "Folder on the server"
-translation = "Vouer op die bediener"
-
 [messages.locations-folder-desktop]
 source = "Folder"
 translation = "Vouer"

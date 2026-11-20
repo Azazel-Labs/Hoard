@@ -5822,10 +5822,6 @@ translation = "Alle sammen, inntil videre. Legg til flere plasseringer senere fr
 source = "Uploading needs a library Hoard keeps. You can add one later from Settings → Library locations."
 translation = "Opplasting krever et bibliotek som Hoard tar vare på. Du kan legge til et senere fra Innstillinger → Biblioteksplasseringer."
 
-[messages.locations-folder]
-source = "Folder on the server"
-translation = "Mappe på serveren"
-
 [messages.locations-folder-desktop]
 source = "Folder"
 translation = "Mappe"

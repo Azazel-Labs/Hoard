@@ -821,7 +821,6 @@ locations-mode-managed = ยึดไว้: Hoard เก็บแพ็กข�
 locations-mode-managed-hint = แพ็กที่คุณอัปโหลดหรือนำเข้าจะถูกคัดลอกมาไว้ที่นี่ และ Hoard จะจัดให้เป็นระเบียบ ตอนนี้โฟลเดอร์เป็นของ Hoard แล้ว จึงอย่าแตะต้องสิ่งที่อยู่ข้างใน
 locations-mode-watched = เฝ้าดู: แพ็กของฉันอยู่ที่นี่แล้ว
 locations-mode-watched-hint = แต่ละโฟลเดอร์ข้างในจะกลายเป็นแพ็ก Hoard อ่านไฟล์จากที่เดิมและไม่เปลี่ยน ย้าย หรือลบไฟล์เลย และจะรับโฟลเดอร์ใหม่เมื่อปรากฏขึ้น
-locations-folder = โฟลเดอร์บนเซิร์ฟเวอร์
 locations-folder-desktop = โฟลเดอร์
 locations-folder-placeholder = โฟลเดอร์ที่แพ็กของคุณอยู่
 locations-folder-hint-managed = Hoard จะสร้างโฟลเดอร์ให้หากยังไม่มี ใน Docker นี่คือโฟลเดอร์ที่คุณเมานต์เข้าไปในคอนเทนเนอร์

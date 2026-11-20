@@ -5702,10 +5702,6 @@ translation = "Tạm thời là tất cả. Sau này hãy thêm vị trí từ C
 source = "Uploading needs a library Hoard keeps. You can add one later from Settings → Library locations."
 translation = "Tải lên cần một thư viện do Hoard quản lý. Bạn có thể thêm sau từ Cài đặt → Vị trí thư viện."
 
-[messages.locations-folder]
-source = "Folder on the server"
-translation = "Thư mục trên máy chủ"
-
 [messages.locations-folder-desktop]
 source = "Folder"
 translation = "Thư mục"

@@ -5909,10 +5909,6 @@ translation = "Toate, deocamdată. Adăugați mai târziu alte locații din Set�
 source = "Uploading needs a library Hoard keeps. You can add one later from Settings → Library locations."
 translation = "Încărcarea are nevoie de o bibliotecă păstrată de Hoard. Puteți adăuga una mai târziu din Setări → Locații ale bibliotecii."
 
-[messages.locations-folder]
-source = "Folder on the server"
-translation = "Dosar pe server"
-
 [messages.locations-folder-desktop]
 source = "Folder"
 translation = "Dosar"

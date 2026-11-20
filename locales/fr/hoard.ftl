@@ -873,7 +873,6 @@ locations-mode-managed = Le revendiquer : Hoard y garde mes packs
 locations-mode-managed-hint = Les packs que vous envoyez ou importez y sont copiés, et Hoard les tient en ordre. Le dossier appartient désormais à Hoard : ne touchez pas à son contenu.
 locations-mode-watched = Le surveiller : mes packs y sont déjà
 locations-mode-watched-hint = Chaque dossier qu’il contient devient un pack. Hoard lit les fichiers là où ils sont, sans jamais les modifier, déplacer ni supprimer, et prend en compte les nouveaux dossiers dès qu’ils apparaissent.
-locations-folder = Dossier sur le serveur
 locations-folder-desktop = Dossier
 locations-folder-placeholder = Le dossier où se trouvent vos packs
 locations-folder-hint-managed = Hoard le crée s’il n’existe pas. Avec Docker, c’est un dossier que vous avez monté dans le conteneur.

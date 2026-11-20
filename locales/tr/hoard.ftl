@@ -825,7 +825,6 @@ locations-mode-managed = Sahiplen: Hoard paketlerimi burada tutsun
 locations-mode-managed-hint = Yüklediğiniz ya da içe aktardığınız paketler buraya kopyalanır ve Hoard onları düzenli tutar. Klasör artık Hoard’un, bu yüzden içeriğine dokunmayın.
 locations-mode-watched = Göz kulak ol: paketlerim zaten burada
 locations-mode-watched-hint = İçindeki her klasör bir paket olur. Hoard dosyaları bulundukları yerde okur, onları asla değiştirmez, taşımaz ya da silmez ve yeni klasörleri ortaya çıktıkça algılar.
-locations-folder = Sunucudaki klasör
 locations-folder-desktop = Klasör
 locations-folder-placeholder = Paketlerinizin bulunduğu klasör
 locations-folder-hint-managed = Yoksa Hoard onu oluşturur. Docker’da bu, kapsayıcıya bağladığınız bir klasördür.

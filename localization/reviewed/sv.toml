@@ -5822,10 +5822,6 @@ translation = "Alla, tills vidare. Lägg till fler platser senare från Inställ
 source = "Uploading needs a library Hoard keeps. You can add one later from Settings → Library locations."
 translation = "Uppladdning kräver ett bibliotek som Hoard sköter. Du kan lägga till ett senare från Inställningar → Biblioteksplatser."
 
-[messages.locations-folder]
-source = "Folder on the server"
-translation = "Mapp på servern"
-
 [messages.locations-folder-desktop]
 source = "Folder"
 translation = "Mapp"

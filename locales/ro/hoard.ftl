@@ -896,7 +896,6 @@ locations-mode-managed = Îl revendică: Hoard îmi păstrează pachetele aici
 locations-mode-managed-hint = Pachetele pe care le încărcați sau le importați sunt copiate aici, iar Hoard le ține în ordine. Dosarul este acum al lui Hoard, așa că nu îi modificați conținutul.
 locations-mode-watched = Îl urmărește: pachetele mele sunt deja aici
 locations-mode-watched-hint = Fiecare dosar din interior devine un pachet. Hoard citește fișierele acolo unde sunt și nu le modifică, nu le mută și nu le șterge niciodată, iar dosarele noi sunt preluate pe măsură ce apar.
-locations-folder = Dosar pe server
 locations-folder-desktop = Dosar
 locations-folder-placeholder = Dosarul în care sunt pachetele dvs.
 locations-folder-hint-managed = Hoard îl creează dacă nu există. În Docker, acesta este un dosar pe care l-ați montat în container.

@@ -825,7 +825,6 @@ locations-mode-managed = Lefoglalja: a Hoard itt tárolja a csomagjaimat
 locations-mode-managed-hint = A feltöltött vagy importált csomagok ide másolódnak, és a Hoard rendben tartja őket. A mappa mostantól a Hoardé, ezért ne nyúljon a tartalmához.
 locations-mode-watched = Figyeli: a csomagjaim már itt vannak
 locations-mode-watched-hint = A benne lévő minden mappa külön csomag lesz. A Hoard a helyükön olvassa a fájlokat, és soha nem módosítja, helyezi át vagy törli őket, az új mappákat pedig megjelenésükkor felveszi.
-locations-folder = Mappa a szerveren
 locations-folder-desktop = Mappa
 locations-folder-placeholder = A mappa, amelyben a csomagjai vannak
 locations-folder-hint-managed = Ha nem létezik, a Hoard létrehozza. Dockerben ez egy olyan mappa, amelyet a konténerbe csatolt.

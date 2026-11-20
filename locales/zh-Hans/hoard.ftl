@@ -824,7 +824,6 @@ locations-mode-managed = 占为己有：Hoard 把我的资源包存放在这里
 locations-mode-managed-hint = 你上传或导入的资源包会复制到这里，由 Hoard 整理妥当。这个文件夹现在归 Hoard 所有，请不要改动其中的内容。
 locations-mode-watched = 看守：我的资源包已经在这里
 locations-mode-watched-hint = 其中的每个文件夹都会成为一个资源包。Hoard 就地读取文件，从不更改、移动或删除它们，并会在出现新文件夹时自动收录。
-locations-folder = 服务器上的文件夹
 locations-folder-desktop = 文件夹
 locations-folder-placeholder = 资源包所在的文件夹
 locations-folder-hint-managed = 如果文件夹不存在，Hoard 会创建它。在 Docker 中，这是你挂载到容器中的文件夹。

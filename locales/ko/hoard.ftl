@@ -821,7 +821,6 @@ locations-mode-managed = 차지하기: Hoard가 여기에 팩을 보관
 locations-mode-managed-hint = 업로드하거나 가져온 팩이 여기에 복사되고, Hoard가 정리해 둡니다. 이제 이 폴더는 Hoard의 것이므로 내용을 직접 건드리지 마세요.
 locations-mode-watched = 지켜보기: 팩이 이미 여기에 있음
 locations-mode-watched-hint = 그 안의 폴더 하나하나가 팩이 됩니다. Hoard는 파일을 제자리에서 읽기만 하고 절대 바꾸거나 옮기거나 삭제하지 않으며, 새 폴더가 생기면 가져옵니다.
-locations-folder = 서버의 폴더
 locations-folder-desktop = 폴더
 locations-folder-placeholder = 팩이 들어 있는 폴더
 locations-folder-hint-managed = 폴더가 없으면 Hoard가 만듭니다. Docker에서는 컨테이너에 마운트한 폴더입니다.

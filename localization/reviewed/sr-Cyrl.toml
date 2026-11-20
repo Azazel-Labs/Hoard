@@ -5855,10 +5855,6 @@ translation = "Засад све. Касније из Подешавања до�
 source = "Uploading needs a library Hoard keeps. You can add one later from Settings → Library locations."
 translation = "За отпремање је потребна библиотека коју Hoard чува. Можете је додати касније у Подешавања → Локације библиотеке."
 
-[messages.locations-folder]
-source = "Folder on the server"
-translation = "Фасцикла на серверу"
-
 [messages.locations-folder-desktop]
 source = "Folder"
 translation = "Фасцикла"

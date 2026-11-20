@@ -857,7 +857,6 @@ locations-mode-managed = Claimen: Hoard bewaart mijn pakketten hier
 locations-mode-managed-hint = Pakketten die je uploadt of importeert, worden hierheen gekopieerd, en Hoard houdt ze op orde. De map is nu van Hoard, dus laat de inhoud met rust.
 locations-mode-watched = In de gaten houden: mijn pakketten staan hier al
 locations-mode-watched-hint = Elke map erin wordt een pakket. Hoard leest de bestanden waar ze staan en wijzigt, verplaatst of verwijdert ze nooit, en pikt nieuwe mappen op zodra ze verschijnen.
-locations-folder = Map op de server
 locations-folder-desktop = Map
 locations-folder-placeholder = De map waarin je pakketten staan
 locations-folder-hint-managed = Hoard maakt hem aan als hij er niet is. In Docker is dit een map die je in de container hebt gekoppeld.

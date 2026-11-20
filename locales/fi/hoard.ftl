@@ -881,7 +881,6 @@ locations-mode-managed = Ota se haltuun: Hoard säilyttää pakettini täällä
 locations-mode-managed-hint = Lähettämäsi tai tuomasi paketit kopioidaan tänne, ja Hoard pitää ne järjestyksessä. Kansio on nyt Hoardin, joten älä koske sen sisältöön.
 locations-mode-watched = Valvo sitä: pakettini ovat jo täällä
 locations-mode-watched-hint = Jokaisesta sen sisällä olevasta kansiosta tulee paketti. Hoard lukee tiedostot paikoillaan eikä koskaan muuta, siirrä tai poista niitä, ja se huomaa uudet kansiot niiden ilmestyessä.
-locations-folder = Kansio palvelimella
 locations-folder-desktop = Kansio
 locations-folder-placeholder = Kansio, jossa pakettisi ovat
 locations-folder-hint-managed = Hoard luo sen, jos sitä ei ole. Dockerissa tämä on kansio, jonka olet liittänyt konttiin.

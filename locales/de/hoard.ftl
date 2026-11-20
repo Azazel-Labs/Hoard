@@ -861,7 +861,6 @@ locations-mode-managed = Beanspruchen: Hoard bewahrt meine Pakete hier auf
 locations-mode-managed-hint = Pakete, die Sie hochladen oder importieren, werden hierher kopiert, und Hoard hält sie in Ordnung. Der Ordner gehört jetzt Hoard, lassen Sie seinen Inhalt also unberührt.
 locations-mode-watched = Beobachten: Meine Pakete liegen schon hier
 locations-mode-watched-hint = Jeder Ordner darin wird zu einem Paket. Hoard liest die Dateien dort, wo sie liegen, und ändert, verschiebt oder löscht sie nie; neue Ordner werden erkannt, sobald sie erscheinen.
-locations-folder = Ordner auf dem Server
 locations-folder-desktop = Ordner
 locations-folder-placeholder = Der Ordner mit Ihren Paketen
 locations-folder-hint-managed = Hoard erstellt ihn, falls er nicht existiert. In Docker ist das ein Ordner, den Sie in den Container eingehängt haben.

@@ -5851,10 +5851,6 @@ translation = "Όλα, προς το παρόν. Προσθέστε αργότε
 source = "Uploading needs a library Hoard keeps. You can add one later from Settings → Library locations."
 translation = "Η μεταφόρτωση χρειάζεται μια βιβλιοθήκη που κρατά το Hoard. Μπορείτε να προσθέσετε μία αργότερα από τις Ρυθμίσεις → Τοποθεσίες βιβλιοθήκης."
 
-[messages.locations-folder]
-source = "Folder on the server"
-translation = "Φάκελος στον διακομιστή"
-
 [messages.locations-folder-desktop]
 source = "Folder"
 translation = "Φάκελος"

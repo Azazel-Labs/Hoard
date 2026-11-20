@@ -5702,10 +5702,6 @@ translation = "ทั้งหมดไปก่อน เพิ่มตำแ�
 source = "Uploading needs a library Hoard keeps. You can add one later from Settings → Library locations."
 translation = "การอัปโหลดต้องมีคลังที่ Hoard ดูแล คุณเพิ่มได้ภายหลังจาก การตั้งค่า → ตำแหน่งคลัง"
 
-[messages.locations-folder]
-source = "Folder on the server"
-translation = "โฟลเดอร์บนเซิร์ฟเวอร์"
-
 [messages.locations-folder-desktop]
 source = "Folder"
 translation = "โฟลเดอร์"

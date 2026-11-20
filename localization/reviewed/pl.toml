@@ -5921,10 +5921,6 @@ translation = "Na razie wszystkie. Później w Ustawieniach można dodać kolejn
 source = "Uploading needs a library Hoard keeps. You can add one later from Settings → Library locations."
 translation = "Przesyłanie wymaga biblioteki zarządzanej przez Hoard. Można ją dodać później w Ustawienia → Lokalizacje biblioteki."
 
-[messages.locations-folder]
-source = "Folder on the server"
-translation = "Folder na serwerze"
-
 [messages.locations-folder-desktop]
 source = "Folder"
 translation = "Folder"

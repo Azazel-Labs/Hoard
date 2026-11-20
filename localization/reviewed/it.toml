@@ -5833,10 +5833,6 @@ translation = "Tutti, per ora. Aggiungi altre posizioni più avanti dalle Impost
 source = "Uploading needs a library Hoard keeps. You can add one later from Settings → Library locations."
 translation = "Per caricare serve una libreria gestita da Hoard. Puoi aggiungerne una più avanti da Impostazioni → Posizioni della libreria."
 
-[messages.locations-folder]
-source = "Folder on the server"
-translation = "Cartella sul server"
-
 [messages.locations-folder-desktop]
 source = "Folder"
 translation = "Cartella"

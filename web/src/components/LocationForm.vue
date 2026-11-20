@@ -89,7 +89,7 @@ async function submit() {
     </fieldset>
 
     <div class="grid">
-      <label class="lbl" for="loc-path">{{ t('locations-folder') }}</label>
+      <label class="lbl" for="loc-path">{{ t('locations-folder-desktop') }}</label>
       <div>
         <FolderPicker id="loc-path" v-model="path" :placeholder="mode === 'managed' ? suggested : t('locations-folder-placeholder')" @unauthorized="emit('unauthorized')" />
         <p class="hint">

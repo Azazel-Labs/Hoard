@@ -857,7 +857,6 @@ locations-mode-managed = Eis dit op: Hoard hou my pakke hier
 locations-mode-managed-hint = Pakke wat jy oplaai of invoer, word hierheen gekopieer, en Hoard hou hulle in orde. Die vouer behoort nou aan Hoard, so los die inhoud daarvan uit.
 locations-mode-watched = Hou dit dop: my pakke is reeds hier
 locations-mode-watched-hint = Elke vouer daarbinne word 'n pak. Hoard lees die lêers waar hulle is en verander, skuif of vee hulle nooit uit nie, en tel nuwe vouers op soos hulle verskyn.
-locations-folder = Vouer op die bediener
 locations-folder-desktop = Vouer
 locations-folder-placeholder = Die vouer waarin jou pakke is
 locations-folder-hint-managed = Hoard skep dit as dit nie daar is nie. In Docker is dit 'n vouer wat jy in die houer gekoppel het.

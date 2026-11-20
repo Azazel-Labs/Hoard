@@ -5712,10 +5712,6 @@ translation = "Egyelőre mind. Később a Beállításokban további helyeket ad
 source = "Uploading needs a library Hoard keeps. You can add one later from Settings → Library locations."
 translation = "A feltöltéshez olyan könyvtár kell, amelyet a Hoard kezel. Később hozzáadhat egyet a Beállítások → Tárolási helyek oldalon."
 
-[messages.locations-folder]
-source = "Folder on the server"
-translation = "Mappa a szerveren"
-
 [messages.locations-folder-desktop]
 source = "Folder"
 translation = "Mappa"

@@ -41,6 +41,11 @@ export function isSkeletonAsset(a: Asset): boolean {
   return a.kind === 'animation' && (a.meta?.dragonbones != null || a.meta?.spine != null)
 }
 
+/** A web page, which opens as a browser would show it from its folder (sandboxed), or as its source. */
+export function isPageAsset(a: Asset): boolean {
+  return ['html', 'htm', 'xhtml'].includes(a.ext.toLowerCase())
+}
+
 export function isTextAsset(a: Asset): boolean {
   // Or a file of no extension Hoard knows that the server found to be plain text.
   return TEXT_EXTS.has(a.ext.toLowerCase()) || a.meta?.text === true

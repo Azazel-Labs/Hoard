@@ -23,6 +23,7 @@ mod convert;
 mod files;
 mod packs;
 mod settings;
+mod site;
 mod stats;
 
 pub(crate) use files::serve_blob;
@@ -154,6 +155,7 @@ pub(crate) fn router(state: &AppState) -> Router<AppState> {
         .route("/api/packs/{id}/unreal", get(convert::unreal_status))
         .route("/api/unreal/pending", get(convert::unreal_pending))
         .route("/api/assets/{id}/original", get(files::asset_original))
+        .route("/api/assets/{id}/site", get(site::asset_site))
         .route("/api/assets/{id}/as/{format}", get(convert::asset_as))
         .route("/api/assets/{id}/as/{format}/status", get(convert::asset_as_status))
         .route("/api/activity", get(stats::activity))
@@ -164,6 +166,9 @@ pub(crate) fn router(state: &AppState) -> Router<AppState> {
     // Hoard's certificate authority (to install on a phone before signing in).
     Router::new()
         .route("/api/health", get(|| async { Json(json!({ "ok": true })) }))
+        // A page in a pack and its files: the address is signed, since a sandboxed page sends no cookies.
+        .route("/api/site/{token}/", get(site::site_root))
+        .route("/api/site/{token}/{*path}", get(site::site_file))
         .route("/auth/callback", get(crate::chatgpt::callback))
         .merge(crate::auth::router())
         .merge(crate::oauth::router())

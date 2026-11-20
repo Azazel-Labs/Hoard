@@ -1,8 +1,8 @@
 version = 2
 
 [readme]
-source = "e1344c08185f94cb913b7f768b484062e60a7efa9c188f9df6855a10b4845b3c"
-translation = "6631e65f7dae2caa7032820d33d84d05c292333c49e0327c9499c7de22d17b3d"
+source = "084e079ba02b3b116ead09bb84910ed14e42507015fbed18a48eb501fa655442"
+translation = "140b49c82b29a7b87bfa06010e3a94d40634c2ef179e321edcfb823a8ba3e24f"
 
 [messages.about-blender]
 source = "Converts 3D models and makes their thumbnails."
@@ -4328,6 +4328,14 @@ translation = "Már létezik ilyen nevű Hoard-fiók, amely másként jelentkezi
 [messages.error-signin-other-subject]
 source = "There's already a Hoard account called { $name } for someone else at the provider"
 translation = "Már létezik ilyen nevű Hoard-fiók, amely a szolgáltatónál valaki máshoz tartozik: { $name }"
+
+[messages.error-site-link-expired]
+source = "this page’s address has run out; open the page again from Hoard"
+translation = "az oldal címe lejárt; nyissa meg újra a Hoardból"
+
+[messages.error-site-not-a-page]
+source = "only web pages open as pages"
+translation = "csak weboldalak nyílnak meg oldalként"
 
 [messages.error-store-search-empty]
 source = "nothing to search for; type the pack's name"
@@ -10945,6 +10953,10 @@ translation = "dokumentum"
 source = "find"
 translation = "keresés"
 
+[messages.text-key-page]
+source = "page"
+translation = "oldal"
+
 [messages.text-key-pretty]
 source = "pretty"
 translation = "formázott"
@@ -11000,6 +11012,26 @@ translation = "Nem sikerült betölteni ezt a fájlt: { $error }"
 [messages.text-loading]
 source = "Loading…"
 translation = "Betöltés…"
+
+[messages.text-page]
+source = "Page"
+translation = "Oldal"
+
+[messages.text-page-aria]
+source = "{ $name } as a page"
+translation = "{ $name } oldalként"
+
+[messages.text-page-error]
+source = "Couldn’t open this page: { $error }"
+translation = "Nem sikerült megnyitni ezt az oldalt: { $error }"
+
+[messages.text-page-source-title]
+source = "The page as written (R)"
+translation = "Az oldal, ahogy meg van írva (R)"
+
+[messages.text-page-title]
+source = "As a browser shows it from its folder, kept apart from Hoard (P)"
+translation = "Ahogy egy böngésző mutatja a mappájából, a Hoardtól elkülönítve (P)"
 
 [messages.text-pretty]
 source = "Pretty"

@@ -157,6 +157,8 @@ export const api = {
     return request<SearchResult>(`/api/assets?${qs}`, { signal }).then((r) => ({ ...r, items: r.items.map(normalize) }))
   },
   asset: (id: string) => request<Asset>(`/api/assets/${id}`).then(normalize),
+  /** Where a web page in a pack opens sandboxed, with its pictures, styles and scripts loading from beside it. */
+  assetSite: (id: string) => request<{ url: string; expires: number }>(`/api/assets/${id}/site`),
   patchAsset: (id: string, patch: {
     name?: string; category?: string; description?: string; add_tags?: string[]; remove_tags?: string[]
     apply_to_family?: boolean

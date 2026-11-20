@@ -1,8 +1,8 @@
 version = 2
 
 [readme]
-source = "e1344c08185f94cb913b7f768b484062e60a7efa9c188f9df6855a10b4845b3c"
-translation = "2a17de74e28d0e6a8750d3c129b2d6d30f38bfea72d20460ec228505e9b58ece"
+source = "084e079ba02b3b116ead09bb84910ed14e42507015fbed18a48eb501fa655442"
+translation = "21b6e3be0c0b540bb88b0cacbbfc64268bc05d7485cfe7668c7c245738720538"
 
 [messages.about-blender]
 source = "Converts 3D models and makes their thumbnails."
@@ -4411,6 +4411,14 @@ translation = "Er is al een Hoard-account met de naam { $name } dat op een ander
 [messages.error-signin-other-subject]
 source = "There's already a Hoard account called { $name } for someone else at the provider"
 translation = "Er is al een Hoard-account met de naam { $name } voor iemand anders bij de provider"
+
+[messages.error-site-link-expired]
+source = "this page’s address has run out; open the page again from Hoard"
+translation = "het adres van deze pagina is verlopen; open de pagina opnieuw vanuit Hoard"
+
+[messages.error-site-not-a-page]
+source = "only web pages open as pages"
+translation = "alleen webpagina’s openen als pagina"
 
 [messages.error-store-search-empty]
 source = "nothing to search for; type the pack's name"
@@ -11127,6 +11135,10 @@ translation = "document"
 source = "find"
 translation = "zoeken"
 
+[messages.text-key-page]
+source = "page"
+translation = "pagina"
+
 [messages.text-key-pretty]
 source = "pretty"
 translation = "netjes"
@@ -11186,6 +11198,26 @@ translation = "Kon dit bestand niet laden: { $error }"
 [messages.text-loading]
 source = "Loading…"
 translation = "Laden…"
+
+[messages.text-page]
+source = "Page"
+translation = "Pagina"
+
+[messages.text-page-aria]
+source = "{ $name } as a page"
+translation = "{ $name } als pagina"
+
+[messages.text-page-error]
+source = "Couldn’t open this page: { $error }"
+translation = "Kon deze pagina niet openen: { $error }"
+
+[messages.text-page-source-title]
+source = "The page as written (R)"
+translation = "De pagina zoals hij geschreven is (R)"
+
+[messages.text-page-title]
+source = "As a browser shows it from its folder, kept apart from Hoard (P)"
+translation = "Zoals een browser hem uit zijn map toont, los van Hoard (P)"
 
 [messages.text-pretty]
 source = "Pretty"

@@ -328,6 +328,74 @@ test.describe('full-screen viewers', () => {
     }
   })
 
+  test('a web page shows as it would from its folder, sandboxed, and its source on request', async ({ page, api }) => {
+    test.setTimeout(90_000)
+    const name = `E2E Site ${unique()}`
+    const home = [
+      '<!doctype html><html><head><meta charset="utf-8"><link rel="stylesheet" href="css/look.css">',
+      '<script src="js/app.js"></script></head>',
+      '<body><h1 id="t">Static</h1><img id="pic" src="img/dot.svg" alt="dot">',
+      '<p id="iso">?</p><p id="api">?</p><a id="next" href="about">About</a></body></html>',
+    ].join('\n')
+    // Run as the page: did it run, can it reach the page around it, can it read Hoard's answers?
+    const app = [
+      "addEventListener('DOMContentLoaded', () => {",
+      "  document.getElementById('t').textContent = 'Ran'",
+      "  let iso = 'isolated'",
+      '  try { if (parent.document) iso = \'reached\' } catch { iso = \'isolated\' }',
+      "  document.getElementById('iso').textContent = iso",
+      "  fetch('/api/packs').then((r) => r.status).catch(() => 'blocked').then((s) => (document.getElementById('api').textContent = String(s)))",
+      '})',
+    ].join('\n')
+    const pack = await uploadPack(api, name, [
+      { relpath: 'site/home.html', data: Buffer.from(home) },
+      { relpath: 'site/css/look.css', data: Buffer.from('h1 { color: rgb(200, 10, 10) }\n') },
+      { relpath: 'site/js/app.js', data: Buffer.from(app) },
+      { relpath: 'site/img/dot.svg', data: Buffer.from('<svg xmlns="http://www.w3.org/2000/svg" width="8" height="8"><rect width="8" height="8" fill="red"/></svg>') },
+      { relpath: 'site/about/index.html', data: Buffer.from('<!doctype html><p id="a">About page</p><a href="../home.html">Back</a>') },
+    ])
+    try {
+      await waitReady(api, [pack.id])
+      const all = await assetsOf(api, pack.id)
+      const asset = all.find((a) => a.path.endsWith('home.html'))!
+
+      // The address is signed for the pack: it serves the pack's files sandboxed, and a forged one serves nothing.
+      const { url } = (await (await api.get(`/api/assets/${asset.id}/site`)).json()) as { url: string }
+      const res = await api.get(url)
+      expect(res.status()).toBe(200)
+      expect(res.headers()['content-security-policy']).toContain('sandbox allow-scripts')
+      const parts = url.split('/')
+      parts[3] = parts[3].slice(0, -1) + (parts[3].endsWith('0') ? '1' : '0')
+      const forged = parts.join('/')
+      expect((await api.get(forged)).status()).toBe(403)
+
+      await openPack(page, pack.id, name)
+      await tile(page, asset.name).click()
+      const panel = page.getByRole('complementary', { name: 'Asset details' })
+      await expect(panel.frameLocator('iframe').locator('#t')).toHaveText('Ran')
+
+      await doubleClick(page, tile(page, asset.name))
+      const viewer = page.getByRole('dialog', { name: `Read ${asset.name}` })
+      const site = viewer.frameLocator('iframe')
+      await expect(site.locator('#t')).toHaveText('Ran')
+      await expect(site.locator('#t')).toHaveCSS('color', 'rgb(200, 10, 10)')
+      await expect.poll(() => site.locator('#pic').evaluate((img: HTMLImageElement) => img.naturalWidth)).toBeGreaterThan(0)
+      await expect(site.locator('#iso')).toHaveText('isolated')
+      await expect(site.locator('#api')).toHaveText('blocked')
+      // A folder named without its slash opens its index, and its links resolve inside it.
+      await site.locator('#next').click()
+      await expect(site.locator('#a')).toHaveText('About page')
+
+      await viewer.getByRole('button', { name: 'Source', exact: true }).click()
+      await expect(viewer.getByLabel(`${asset.name} contents`)).toContainText('<h1 id="t">Static</h1>')
+      await viewer.getByRole('button', { name: 'Close (Esc)' }).click()
+      await expect(viewer).toBeHidden()
+    } finally {
+      await api.post('/api/archive', { data: { packs: [pack.id] } })
+      await api.post('/api/archive/purge', { data: { packs: [pack.id] } })
+    }
+  })
+
   test('markdown reads as a document, in the panel and full screen, and shows its source on request', async ({ page, api }) => {
     const name = `E2E Readme ${unique()}`
     const md = [

@@ -1,12 +1,13 @@
 <script setup lang="ts">
 // The side panel's peek at a text file, and a click opens the full-screen viewer. Markdown shows as a document,
 // prose wraps, code and data show their first lines colored. Only the first few kilobytes are fetched, however
-// big the file.
+// big the file. A web page shows as the page, small, sandboxed as in the full-screen viewer.
 import { computed, nextTick, ref, watch } from 'vue'
-import type { Asset } from '../api'
+import { api, type Asset } from '../api'
 import { t } from '../i18n'
 import { renderMarkdown } from '../markdown'
 import { fetchText, highlightLines, langOf, reflowJson, type TextFile } from '../text'
+import { isPageAsset } from '../viewers'
 
 const props = defineProps<{ asset: Asset }>()
 const emit = defineEmits<{ expand: [] }>()
@@ -14,13 +15,21 @@ const emit = defineEmits<{ expand: [] }>()
 const LINES = 18
 const file = ref<TextFile | null>(null)
 const failed = ref(false)
+const page = computed(() => isPageAsset(props.asset))
+const siteUrl = ref('')
 
 watch(
   () => props.asset.id,
   async (id) => {
     file.value = null
     failed.value = false
+    siteUrl.value = ''
     try {
+      if (page.value) {
+        const r = await api.assetSite(id)
+        if (id === props.asset.id) siteUrl.value = r.url
+        return
+      }
       const f = await fetchText(props.asset, 16 * 1024)
       if (id === props.asset.id) file.value = f
     } catch {
@@ -58,7 +67,18 @@ const more = computed(() => peek.value.more || overflows.value)
 </script>
 
 <template>
-  <button v-if="!file?.binary && !failed" ref="box" type="button" class="peek" :class="{ more, doc: isMarkdown }" :aria-label="t('text-preview-aria', { name: asset.name })" @click="emit('expand')">
+  <div v-if="page && !failed" class="peek site">
+    <!-- Someone else's page: it runs without an origin, so it can't reach Hoard, and loads only the pack's files. -->
+    <iframe v-if="siteUrl" :src="siteUrl" :title="t('text-page-aria', { name: asset.name })" sandbox="allow-scripts" referrerpolicy="no-referrer" tabindex="-1" loading="lazy" />
+    <p v-else class="wait">{{ t('text-loading') }}</p>
+    <button type="button" class="open" :aria-label="t('text-preview-aria', { name: asset.name })" @click="emit('expand')">
+      <span class="badge">
+        <svg viewBox="0 0 16 16" width="12" height="12" aria-hidden="true"><path d="M2.5 6V2.5H6M10 2.5h3.5V6M13.5 10v3.5H10M6 13.5H2.5V10" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" /></svg>
+        {{ t('text-preview-read') }}
+      </span>
+    </button>
+  </div>
+  <button v-else-if="!page && !file?.binary && !failed" ref="box" type="button" class="peek" :class="{ more, doc: isMarkdown }" :aria-label="t('text-preview-aria', { name: asset.name })" @click="emit('expand')">
     <p v-if="!file" class="wait">{{ t('text-loading') }}</p>
     <!-- eslint-disable-next-line vue/no-v-html -- markdown.ts renders with raw HTML off, so the file can't add markup. -->
     <div v-else-if="isMarkdown" class="md-body" v-html="doc" />
@@ -92,6 +112,15 @@ const more = computed(() => peek.value.more || overflows.value)
 .md-body { font-size: 0.85rem; }
 /* It's a preview: a click anywhere opens the reader, links included. */
 .md-body :deep(a) { pointer-events: none; }
+/* The page at twice the panel's width, shrunk to fit, so it lays out as on a small screen rather than a sliver. */
+.peek.site { height: 15rem; padding: 0; overflow: hidden; background: #fff; }
+.peek.site iframe {
+  width: 200%; height: 200%; border: 0; transform: scale(0.5); transform-origin: 0 0; pointer-events: none;
+  background: #fff; color-scheme: light;
+}
+.peek.site .wait { padding: 0.6rem 0.7rem; }
+.open { position: absolute; inset: 0; padding: 0; border: 0; background: none; cursor: zoom-in; }
+.open:hover .badge, .open:focus-visible .badge { opacity: 1; }
 .wait { margin: 0; color: var(--muted); font-size: var(--step--1); }
 .badge {
   position: absolute; z-index: 1; top: 0.45rem; right: 0.45rem; display: inline-flex; align-items: center; gap: 0.3rem;

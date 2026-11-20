@@ -1,8 +1,8 @@
 version = 2
 
 [readme]
-source = "e1344c08185f94cb913b7f768b484062e60a7efa9c188f9df6855a10b4845b3c"
-translation = "8c7b54c942b41968b1c4c36b21c4be4dd991807865ebe8ae47a5038e6b1bc825"
+source = "084e079ba02b3b116ead09bb84910ed14e42507015fbed18a48eb501fa655442"
+translation = "4c7546a10fc59ba83d92bfd1b61befc180ba8fdd8a36afa8aadf1e7533965a06"
 
 [messages.about-blender]
 source = "Converts 3D models and makes their thumbnails."
@@ -4319,6 +4319,14 @@ translation = "Đã có tài khoản Hoard tên { $name } đăng nhập theo cá
 [messages.error-signin-other-subject]
 source = "There's already a Hoard account called { $name } for someone else at the provider"
 translation = "Đã có tài khoản Hoard tên { $name } thuộc về người khác ở nhà cung cấp"
+
+[messages.error-site-link-expired]
+source = "this page’s address has run out; open the page again from Hoard"
+translation = "địa chỉ của trang này đã hết hạn; hãy mở lại trang từ Hoard"
+
+[messages.error-site-not-a-page]
+source = "only web pages open as pages"
+translation = "chỉ trang web mới mở dưới dạng trang"
 
 [messages.error-store-search-empty]
 source = "nothing to search for; type the pack's name"
@@ -10918,6 +10926,10 @@ translation = "tài liệu"
 source = "find"
 translation = "tìm"
 
+[messages.text-key-page]
+source = "page"
+translation = "trang"
+
 [messages.text-key-pretty]
 source = "pretty"
 translation = "đẹp"
@@ -10973,6 +10985,26 @@ translation = "Không thể tải tệp này: { $error }"
 [messages.text-loading]
 source = "Loading…"
 translation = "Đang tải…"
+
+[messages.text-page]
+source = "Page"
+translation = "Trang"
+
+[messages.text-page-aria]
+source = "{ $name } as a page"
+translation = "{ $name } dưới dạng trang"
+
+[messages.text-page-error]
+source = "Couldn’t open this page: { $error }"
+translation = "Không mở được trang này: { $error }"
+
+[messages.text-page-source-title]
+source = "The page as written (R)"
+translation = "Trang như được viết (R)"
+
+[messages.text-page-title]
+source = "As a browser shows it from its folder, kept apart from Hoard (P)"
+translation = "Như trình duyệt hiển thị từ thư mục của nó, tách biệt khỏi Hoard (P)"
 
 [messages.text-pretty]
 source = "Pretty"

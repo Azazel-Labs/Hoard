@@ -1,13 +1,15 @@
 <script setup lang="ts">
 // Full-screen text viewer: JSON as a foldable tree (or re-indented, or as written), markdown as a document (or its
-// source), everything else with line numbers and light coloring. Big files show their first megabyte until asked for the rest.
+// source), a web page as a browser shows it from its folder (or its source), everything else with line numbers and
+// light coloring. Big files show their first megabyte until asked for the rest.
 import { computed, onMounted, provide, ref } from 'vue'
-import { fileUrl, type Asset } from '../api'
+import { api, fileUrl, type Asset } from '../api'
 import { humanBytes } from '../format'
 import { renderMarkdown } from '../markdown'
 import { t } from '../i18n'
 import { LANG_LABEL, fetchText, highlightLines, langOf, reflowJson, type TextFile } from '../text'
 import { copyText, showError } from '../ui'
+import { isPageAsset } from '../viewers'
 import JsonTree from './JsonTree.vue'
 
 const props = defineProps<{ asset: Asset }>()
@@ -18,7 +20,7 @@ const CAP = 1024 * 1024
 /** JSON that follows the spec (no comments), which can be parsed and re-indented. */
 const STRICT_JSON = new Set(['json', 'ldtk', 'gltf'])
 
-type Mode = 'tree' | 'pretty' | 'raw' | 'doc'
+type Mode = 'tree' | 'pretty' | 'raw' | 'doc' | 'page'
 
 const dlg = ref<HTMLDialogElement | null>(null)
 const file = ref<TextFile | null>(null)
@@ -29,7 +31,11 @@ const lang = computed(() => langOf(ext.value))
 // Code and scripts say which language (GLSL, CS, PY) rather than the generic name of their highlighter.
 const label = computed(() => (['c', 'hash', 'plain'].includes(lang.value) && ext.value ? ext.value.toUpperCase() : LANG_LABEL[lang.value]))
 const strict = computed(() => STRICT_JSON.has(ext.value))
-const mode = ref<Mode>(lang.value === 'markdown' ? 'doc' : 'raw')
+const page = computed(() => isPageAsset(props.asset))
+const mode = ref<Mode>(page.value ? 'page' : lang.value === 'markdown' ? 'doc' : 'raw')
+/** Where the page opens: sandboxed, its pictures, styles and scripts loading from beside it in the pack. */
+const siteUrl = ref('')
+const siteError = ref('')
 // Prose reads best wrapped; code and data keep their lines.
 const wrap = ref(lang.value === 'plain' || lang.value === 'markdown')
 const copied = ref(false)
@@ -99,6 +105,10 @@ function onKey(e: KeyboardEvent) {
     act.d = () => (mode.value = 'doc')
     act.r = () => (mode.value = 'raw')
   }
+  if (page.value) {
+    act.p = () => (mode.value = 'page')
+    act.r = () => (mode.value = 'raw')
+  }
   const f = act[e.key.toLowerCase()]
   if (!f) return
   e.preventDefault()
@@ -108,6 +118,12 @@ function onKey(e: KeyboardEvent) {
 onMounted(() => {
   dlg.value?.showModal()
   load()
+  if (page.value) {
+    api
+      .assetSite(props.asset.id)
+      .then((r) => (siteUrl.value = r.url))
+      .catch((e: Error) => (siteError.value = e.message))
+  }
 })
 </script>
 
@@ -117,7 +133,7 @@ onMounted(() => {
       <div class="title">
         <strong>{{ asset.name }}</strong>
         <span class="mono dim">
-          {{ label }} · {{ humanBytes(asset.size) }}<template v-if="file && mode !== 'tree' && mode !== 'doc'"> · {{ t('text-lines', { count: lineCount }) }}</template>
+          {{ label }} · {{ humanBytes(asset.size) }}<template v-if="file && mode !== 'tree' && mode !== 'doc' && mode !== 'page'"> · {{ t('text-lines', { count: lineCount }) }}</template>
         </span>
       </div>
       <div v-if="lang === 'json' && file && !file.binary" class="group" role="group" :aria-label="t('text-show-as')">
@@ -139,8 +155,12 @@ onMounted(() => {
           <span class="wide">{{ t('text-collapse-all') }}</span>
         </button>
       </div>
+      <div v-if="page" class="group" role="group" :aria-label="t('text-show-as')">
+        <button type="button" :title="t('text-page-title')" :aria-pressed="mode === 'page'" @click="mode = 'page'">{{ t('text-page') }}</button>
+        <button type="button" :title="t('text-page-source-title')" :aria-pressed="mode === 'raw'" @click="mode = 'raw'">{{ t('text-source') }}</button>
+      </div>
       <div class="group" role="group" :aria-label="t('text-group-text')">
-        <button v-if="mode !== 'tree' && mode !== 'doc'" type="button" :title="t('text-wrap-title')" :aria-pressed="wrap" :disabled="!file || file.binary" @click="wrap = !wrap">
+        <button v-if="mode !== 'tree' && mode !== 'doc' && mode !== 'page'" type="button" :title="t('text-wrap-title')" :aria-pressed="wrap" :disabled="!file || file.binary" @click="wrap = !wrap">
           <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M2 4h12M2 8h9.5a2.25 2.25 0 0 1 0 4.5H8m1.6-1.8L7.8 12.5l1.8 1.8M2 12.5h3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /></svg>
           <span class="wide">{{ t('text-wrap') }}</span>
         </button>
@@ -158,13 +178,19 @@ onMounted(() => {
       </button>
     </header>
 
-    <p v-if="file?.truncated && status === 'ready'" class="banner">
+    <p v-if="mode !== 'page' && file?.truncated && status === 'ready'" class="banner">
       {{ lang === 'json' ? t('text-truncated-json', { shown: humanBytes(CAP), total: humanBytes(file.total) }) : t('text-truncated', { shown: humanBytes(CAP), total: humanBytes(file.total) }) }}
       <button type="button" class="linkish" @click="load(true)">{{ t('text-show-all') }}</button>
     </p>
-    <p v-else-if="parsed && !parsed.ok && status === 'ready'" class="banner">{{ t('text-json-error', { error: parsed.error }) }}</p>
+    <p v-else-if="mode !== 'page' && parsed && !parsed.ok && status === 'ready'" class="banner">{{ t('text-json-error', { error: parsed.error }) }}</p>
 
-    <div class="stage scroll" tabindex="0" :aria-label="t('text-contents-aria', { name: asset.name })">
+    <div v-if="mode === 'page'" class="stage site">
+      <p v-if="siteError" class="msg err">{{ t('text-page-error', { error: siteError }) }}</p>
+      <p v-else-if="!siteUrl" class="msg">{{ t('text-loading') }}</p>
+      <!-- Someone else's page: it runs without an origin, so it can't reach Hoard, and loads only the pack's files. -->
+      <iframe v-else :src="siteUrl" :title="t('text-page-aria', { name: asset.name })" sandbox="allow-scripts" referrerpolicy="no-referrer" />
+    </div>
+    <div v-else class="stage scroll" tabindex="0" :aria-label="t('text-contents-aria', { name: asset.name })">
       <p v-if="status === 'loading'" class="msg">{{ t('text-loading') }}</p>
       <p v-else-if="status === 'error'" class="msg err">{{ t('text-load-error', { error }) }}</p>
       <p v-else-if="file?.binary" class="msg">{{ t('text-binary') }}</p>
@@ -179,7 +205,8 @@ onMounted(() => {
     <footer class="keys" aria-hidden="true">
       <template v-if="lang === 'json'"><kbd>T</kbd> {{ t('text-key-tree') }} · <template v-if="strict"><kbd>P</kbd> {{ t('text-key-pretty') }} · </template><kbd>R</kbd> {{ t('text-key-raw') }} · </template>
       <template v-if="lang === 'markdown'"><kbd>D</kbd> {{ t('text-key-document') }} · <kbd>R</kbd> {{ t('text-key-source') }} · </template>
-      <template v-if="mode !== 'doc'"><kbd>W</kbd> {{ t('text-key-wrap') }} · </template><kbd>C</kbd> {{ t('text-key-copy') }} · <kbd>Ctrl</kbd>+<kbd>F</kbd> {{ t('text-key-find') }} · <kbd>Esc</kbd> {{ t('text-key-close') }}
+      <template v-if="page"><kbd>P</kbd> {{ t('text-key-page') }} · <kbd>R</kbd> {{ t('text-key-source') }} · </template>
+      <template v-if="mode !== 'doc' && mode !== 'page'"><kbd>W</kbd> {{ t('text-key-wrap') }} · </template><kbd>C</kbd> {{ t('text-key-copy') }} · <kbd>Ctrl</kbd>+<kbd>F</kbd> {{ t('text-key-find') }} · <kbd>Esc</kbd> {{ t('text-key-close') }}
     </footer>
   </dialog>
 </template>
@@ -193,6 +220,9 @@ onMounted(() => {
 /* A line length that reads well, centered, however wide the screen. */
 .doc { max-width: 46rem; margin: 1.25rem auto 0; font-size: 1rem; }
 .err { color: var(--danger); }
+/* A browser's own page: white unless it says otherwise, whatever Hoard's theme. */
+.site { display: grid; background: var(--panel); }
+.site iframe { width: 100%; height: 100%; border: 0; background: #fff; color-scheme: light; }
 .banner {
   margin: 0; padding: 0.4rem 0.75rem; border-bottom: 1px solid var(--line); background: var(--raised);
   color: var(--muted); font-size: var(--step--1);

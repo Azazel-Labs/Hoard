@@ -1,8 +1,8 @@
 version = 2
 
 [readme]
-source = "e1344c08185f94cb913b7f768b484062e60a7efa9c188f9df6855a10b4845b3c"
-translation = "58b5ea8aaf2a8b427146ad5e06b6177e2c64d7fdee85bfceb24dd12d6f7a81c8"
+source = "084e079ba02b3b116ead09bb84910ed14e42507015fbed18a48eb501fa655442"
+translation = "a78b39b743886d4a336a90c031fa09f4487e81efc3446370b77f7bd6a6dcdd9f"
 
 [messages.about-blender]
 source = "Converts 3D models and makes their thumbnails."
@@ -4411,6 +4411,14 @@ translation = "Ja hi ha un compte de Hoard anomenat { $name } que inicia la sess
 [messages.error-signin-other-subject]
 source = "There's already a Hoard account called { $name } for someone else at the provider"
 translation = "Ja hi ha un compte de Hoard anomenat { $name } per a una altra persona del proveïdor"
+
+[messages.error-site-link-expired]
+source = "this page’s address has run out; open the page again from Hoard"
+translation = "l’adreça d’aquesta pàgina ha caducat; torna-la a obrir des del Hoard"
+
+[messages.error-site-not-a-page]
+source = "only web pages open as pages"
+translation = "només les pàgines web s’obren com a pàgines"
 
 [messages.error-store-search-empty]
 source = "nothing to search for; type the pack's name"
@@ -11129,6 +11137,10 @@ translation = "document"
 source = "find"
 translation = "cerca"
 
+[messages.text-key-page]
+source = "page"
+translation = "pàgina"
+
 [messages.text-key-pretty]
 source = "pretty"
 translation = "formatat"
@@ -11188,6 +11200,26 @@ translation = "No s'ha pogut carregar aquest fitxer: { $error }"
 [messages.text-loading]
 source = "Loading…"
 translation = "S'està carregant…"
+
+[messages.text-page]
+source = "Page"
+translation = "Pàgina"
+
+[messages.text-page-aria]
+source = "{ $name } as a page"
+translation = "{ $name } com a pàgina"
+
+[messages.text-page-error]
+source = "Couldn’t open this page: { $error }"
+translation = "No s’ha pogut obrir aquesta pàgina: { $error }"
+
+[messages.text-page-source-title]
+source = "The page as written (R)"
+translation = "La pàgina tal com està escrita (R)"
+
+[messages.text-page-title]
+source = "As a browser shows it from its folder, kept apart from Hoard (P)"
+translation = "Com la mostra un navegador des de la seva carpeta, separada del Hoard (P)"
 
 [messages.text-pretty]
 source = "Pretty"

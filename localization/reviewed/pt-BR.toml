@@ -1,8 +1,8 @@
 version = 2
 
 [readme]
-source = "e1344c08185f94cb913b7f768b484062e60a7efa9c188f9df6855a10b4845b3c"
-translation = "0d6798de88a865b76acc36b4a858fd17320961dd8215a531c66afbeecd17dd92"
+source = "084e079ba02b3b116ead09bb84910ed14e42507015fbed18a48eb501fa655442"
+translation = "457fd50cca4c8b876cc20fa9c0df13206ff1092b6ca0b8ab14ff6544fbb4a159"
 
 [messages.about-blender]
 source = "Converts 3D models and makes their thumbnails."
@@ -4411,6 +4411,14 @@ translation = "Já existe uma conta do Hoard chamada { $name } que entra de outr
 [messages.error-signin-other-subject]
 source = "There's already a Hoard account called { $name } for someone else at the provider"
 translation = "Já existe uma conta do Hoard chamada { $name } para outra pessoa no provedor"
+
+[messages.error-site-link-expired]
+source = "this page’s address has run out; open the page again from Hoard"
+translation = "o endereço desta página expirou; abra a página de novo pelo Hoard"
+
+[messages.error-site-not-a-page]
+source = "only web pages open as pages"
+translation = "só páginas da web abrem como páginas"
 
 [messages.error-store-search-empty]
 source = "nothing to search for; type the pack's name"
@@ -11134,6 +11142,10 @@ translation = "documento"
 source = "find"
 translation = "localizar"
 
+[messages.text-key-page]
+source = "page"
+translation = "página"
+
 [messages.text-key-pretty]
 source = "pretty"
 translation = "formatado"
@@ -11193,6 +11205,26 @@ translation = "Não foi possível carregar este arquivo: { $error }"
 [messages.text-loading]
 source = "Loading…"
 translation = "Carregando…"
+
+[messages.text-page]
+source = "Page"
+translation = "Página"
+
+[messages.text-page-aria]
+source = "{ $name } as a page"
+translation = "{ $name } como página"
+
+[messages.text-page-error]
+source = "Couldn’t open this page: { $error }"
+translation = "Não foi possível abrir esta página: { $error }"
+
+[messages.text-page-source-title]
+source = "The page as written (R)"
+translation = "A página como foi escrita (R)"
+
+[messages.text-page-title]
+source = "As a browser shows it from its folder, kept apart from Hoard (P)"
+translation = "Como um navegador a mostra a partir da pasta dela, separada do Hoard (P)"
 
 [messages.text-pretty]
 source = "Pretty"

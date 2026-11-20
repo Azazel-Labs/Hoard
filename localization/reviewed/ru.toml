@@ -1,8 +1,8 @@
 version = 2
 
 [readme]
-source = "e1344c08185f94cb913b7f768b484062e60a7efa9c188f9df6855a10b4845b3c"
-translation = "d771936d52a65ee3e0a10431c6dfc37892eb34ac99caea9b95e8ab3ea66614e7"
+source = "084e079ba02b3b116ead09bb84910ed14e42507015fbed18a48eb501fa655442"
+translation = "741a85d8cb1a9e877a85a02c7ce8c24124462ccaf40180a80f4e895cfdd13ff4"
 
 [messages.about-blender]
 source = "Converts 3D models and makes their thumbnails."
@@ -4495,6 +4495,14 @@ translation = "Учётная запись Hoard с именем { $name } уж�
 [messages.error-signin-other-subject]
 source = "There's already a Hoard account called { $name } for someone else at the provider"
 translation = "Учётная запись Hoard с именем { $name } уже есть, но у провайдера она принадлежит другому человеку"
+
+[messages.error-site-link-expired]
+source = "this page’s address has run out; open the page again from Hoard"
+translation = "адрес этой страницы устарел; откройте страницу заново из Hoard"
+
+[messages.error-site-not-a-page]
+source = "only web pages open as pages"
+translation = "страницами открываются только веб-страницы"
 
 [messages.error-store-search-empty]
 source = "nothing to search for; type the pack's name"
@@ -11406,6 +11414,10 @@ translation = "документ"
 source = "find"
 translation = "найти"
 
+[messages.text-key-page]
+source = "page"
+translation = "страница"
+
 [messages.text-key-pretty]
 source = "pretty"
 translation = "форматировать"
@@ -11467,6 +11479,26 @@ translation = "Не удалось загрузить этот файл: { $erro
 [messages.text-loading]
 source = "Loading…"
 translation = "Загрузка…"
+
+[messages.text-page]
+source = "Page"
+translation = "Страница"
+
+[messages.text-page-aria]
+source = "{ $name } as a page"
+translation = "{ $name } как страница"
+
+[messages.text-page-error]
+source = "Couldn’t open this page: { $error }"
+translation = "Не удалось открыть эту страницу: { $error }"
+
+[messages.text-page-source-title]
+source = "The page as written (R)"
+translation = "Страница как она написана (R)"
+
+[messages.text-page-title]
+source = "As a browser shows it from its folder, kept apart from Hoard (P)"
+translation = "Как её показывает браузер из её папки, отдельно от Hoard (P)"
 
 [messages.text-pretty]
 source = "Pretty"

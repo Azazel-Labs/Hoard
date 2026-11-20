@@ -92,6 +92,10 @@ translation = "I modelli che scegli per il server IA locale sono soggetti alle l
 source = "No license given"
 translation = "Nessuna licenza indicata"
 
+[messages.about-report]
+source = "Report a problem…"
+translation = "Segnala un problema…"
+
 [messages.about-siglip]
 source = "Finds pictures by what’s in them."
 translation = "Trova le immagini in base a ciò che mostrano."
@@ -8196,6 +8200,46 @@ translation = "{ $name } ({ $files })"
 [messages.projects-use-more]
 source = "{ $count } more"
 translation = "altri { $count }"
+
+[messages.report-close]
+source = "Close"
+translation = "Chiudi"
+
+[messages.report-copied]
+source = "Copied the report."
+translation = "Rapporto copiato."
+
+[messages.report-copy]
+source = "Copy"
+translation = "Copia"
+
+[messages.report-failed]
+source = "The report couldn’t be gathered: { $error }"
+translation = "Impossibile raccogliere il rapporto: { $error }"
+
+[messages.report-github]
+source = "Open an issue on GitHub"
+translation = "Apri una issue su GitHub"
+
+[messages.report-github-hint]
+source = "The new issue is filled in with this. When the log is too long for that, only its last lines go in; Copy has all of it."
+translation = "La nuova issue viene compilata con questo. Se il registro è troppo lungo, vengono inserite solo le ultime righe; Copia contiene tutto."
+
+[messages.report-loading]
+source = "Gathering the report…"
+translation = "Raccolta del rapporto…"
+
+[messages.report-log]
+source = "What the server logged lately"
+translation = "Ciò che il server ha registrato di recente"
+
+[messages.report-title]
+source = "Report a problem"
+translation = "Segnala un problema"
+
+[messages.report-what]
+source = "This is what an issue on GitHub needs for the problem to be looked into. Nothing private is in it: access tokens, passwords, keys, email addresses and your name in folder paths are taken out. Read it over before you send it."
+translation = "Ecco ciò che serve a una issue su GitHub perché il problema possa essere esaminato. Non contiene nulla di privato: token di accesso, password, chiavi, indirizzi email e il tuo nome nei percorsi delle cartelle vengono rimossi. Rileggilo prima di inviarlo."
 
 [messages.reset-label]
 source = "Reset to the default, { $value }"

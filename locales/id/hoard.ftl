@@ -2620,6 +2620,17 @@ about-licenses-failed = Daftar tidak dapat dimuat.
 about-filter = Saring menurut nama atau lisensi
 about-count = { $shown } dari { $total }
 about-no-license = Tidak ada lisensi
+about-report = Laporkan masalah…
+report-title = Laporkan masalah
+report-what = Inilah yang dibutuhkan issue di GitHub agar masalahnya bisa diselidiki. Tidak ada yang pribadi di dalamnya: token akses, kata sandi, kunci, alamat email, dan nama Anda di jalur folder dihapus. Baca dulu sebelum mengirimnya.
+report-loading = Mengumpulkan laporan…
+report-failed = Laporan tidak dapat dikumpulkan: { $error }
+report-log = Yang baru-baru ini dicatat server
+report-copy = Salin
+report-copied = Laporan disalin.
+report-github = Buka issue di GitHub
+report-github-hint = Issue baru diisi dengan ini. Jika log terlalu panjang untuk itu, hanya baris terakhirnya yang dimasukkan; Salin berisi semuanya.
+report-close = Tutup
 
 ## Jenis aset (api.ts)
 

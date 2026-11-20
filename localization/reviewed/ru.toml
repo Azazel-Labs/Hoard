@@ -92,6 +92,10 @@ translation = "На модели, которые вы выбираете для 
 source = "No license given"
 translation = "Лицензия не указана"
 
+[messages.about-report]
+source = "Report a problem…"
+translation = "Сообщить о проблеме…"
+
 [messages.about-siglip]
 source = "Finds pictures by what’s in them."
 translation = "Находит изображения по тому, что на них."
@@ -8369,6 +8373,46 @@ translation = "{ $name } ({ $files })"
 [messages.projects-use-more]
 source = "{ $count } more"
 translation = "ещё { $count }"
+
+[messages.report-close]
+source = "Close"
+translation = "Закрыть"
+
+[messages.report-copied]
+source = "Copied the report."
+translation = "Отчёт скопирован."
+
+[messages.report-copy]
+source = "Copy"
+translation = "Копировать"
+
+[messages.report-failed]
+source = "The report couldn’t be gathered: { $error }"
+translation = "Не удалось собрать отчёт: { $error }"
+
+[messages.report-github]
+source = "Open an issue on GitHub"
+translation = "Открыть issue на GitHub"
+
+[messages.report-github-hint]
+source = "The new issue is filled in with this. When the log is too long for that, only its last lines go in; Copy has all of it."
+translation = "Новый issue заполняется этим. Если журнал для этого слишком длинный, туда попадают только последние строки; в «Копировать» есть всё."
+
+[messages.report-loading]
+source = "Gathering the report…"
+translation = "Сбор отчёта…"
+
+[messages.report-log]
+source = "What the server logged lately"
+translation = "Что сервер записал в журнал недавно"
+
+[messages.report-title]
+source = "Report a problem"
+translation = "Сообщить о проблеме"
+
+[messages.report-what]
+source = "This is what an issue on GitHub needs for the problem to be looked into. Nothing private is in it: access tokens, passwords, keys, email addresses and your name in folder paths are taken out. Read it over before you send it."
+translation = "Это то, что нужно issue на GitHub, чтобы проблему можно было изучить. Ничего личного здесь нет: токены доступа, пароли, ключи, адреса электронной почты и ваше имя в путях к папкам удаляются. Прочитайте перед отправкой."
 
 [messages.reset-label]
 source = "Reset to the default, { $value }"

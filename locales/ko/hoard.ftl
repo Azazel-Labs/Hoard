@@ -2583,6 +2583,17 @@ about-licenses-failed = 목록을 불러올 수 없습니다.
 about-filter = 이름이나 라이선스로 필터
 about-count = { $shown } / { $total }
 about-no-license = 라이선스 표시 없음
+about-report = 문제 신고…
+report-title = 문제 신고
+report-what = 문제를 살펴보려면 GitHub 이슈에 필요한 정보입니다. 개인적인 내용은 없습니다. 액세스 토큰, 비밀번호, 키, 이메일 주소, 폴더 경로에 있는 사용자 이름은 제거됩니다. 보내기 전에 읽어 보세요.
+report-loading = 보고서를 모으는 중…
+report-failed = 보고서를 모을 수 없습니다: { $error }
+report-log = 서버가 최근에 기록한 로그
+report-copy = 복사
+report-copied = 보고서를 복사했습니다.
+report-github = GitHub에서 이슈 열기
+report-github-hint = 새 이슈가 이 내용으로 채워집니다. 로그가 너무 길면 마지막 줄만 들어가며, 복사에는 전체가 담깁니다.
+report-close = 닫기
 
 ## Asset kinds (api.ts)
 

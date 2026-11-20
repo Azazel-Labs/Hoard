@@ -92,6 +92,10 @@ translation = "Modele wybrane dla lokalnego serwera AI podlegają licencjom ich 
 source = "No license given"
 translation = "Nie podano licencji"
 
+[messages.about-report]
+source = "Report a problem…"
+translation = "Zgłoś problem…"
+
 [messages.about-siglip]
 source = "Finds pictures by what’s in them."
 translation = "Znajduje obrazy według tego, co na nich jest."
@@ -8335,6 +8339,46 @@ translation = "{ $name } ({ $files })"
 [messages.projects-use-more]
 source = "{ $count } more"
 translation = "jeszcze { $count }"
+
+[messages.report-close]
+source = "Close"
+translation = "Zamknij"
+
+[messages.report-copied]
+source = "Copied the report."
+translation = "Skopiowano raport."
+
+[messages.report-copy]
+source = "Copy"
+translation = "Kopiuj"
+
+[messages.report-failed]
+source = "The report couldn’t be gathered: { $error }"
+translation = "Nie udało się zebrać raportu: { $error }"
+
+[messages.report-github]
+source = "Open an issue on GitHub"
+translation = "Otwórz zgłoszenie na GitHubie"
+
+[messages.report-github-hint]
+source = "The new issue is filled in with this. When the log is too long for that, only its last lines go in; Copy has all of it."
+translation = "Nowe zgłoszenie zostanie tym wypełnione. Jeśli dziennik jest na to za długi, trafią do niego tylko ostatnie wiersze; Kopiuj zawiera wszystko."
+
+[messages.report-loading]
+source = "Gathering the report…"
+translation = "Zbieranie raportu…"
+
+[messages.report-log]
+source = "What the server logged lately"
+translation = "Co serwer ostatnio zapisał w dzienniku"
+
+[messages.report-title]
+source = "Report a problem"
+translation = "Zgłoś problem"
+
+[messages.report-what]
+source = "This is what an issue on GitHub needs for the problem to be looked into. Nothing private is in it: access tokens, passwords, keys, email addresses and your name in folder paths are taken out. Read it over before you send it."
+translation = "Tyle potrzebuje zgłoszenie na GitHubie, żeby można było zbadać problem. Nie ma w nim nic prywatnego: tokeny dostępu, hasła, klucze, adresy e-mail i Twoja nazwa w ścieżkach folderów są usuwane. Przeczytaj je przed wysłaniem."
 
 [messages.reset-label]
 source = "Reset to the default, { $value }"

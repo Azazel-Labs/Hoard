@@ -3044,6 +3044,17 @@ about-licenses-failed = Lista nu a putut fi încărcată.
 about-filter = Filtrați după nume sau licență
 about-count = { $shown } din { $total }
 about-no-license = Nicio licență indicată
+about-report = Raportează o problemă…
+report-title = Raportează o problemă
+report-what = Iată de ce are nevoie un issue pe GitHub ca problema să poată fi cercetată. Nu conține nimic privat: tokenurile de acces, parolele, cheile, adresele de e-mail și numele tău din căile folderelor sunt eliminate. Citește-l înainte să-l trimiți.
+report-loading = Se adună raportul…
+report-failed = Raportul nu a putut fi adunat: { $error }
+report-log = Ce a înregistrat serverul în ultima vreme
+report-copy = Copiază
+report-copied = Raportul a fost copiat.
+report-github = Deschide un issue pe GitHub
+report-github-hint = Noul issue se completează cu acestea. Dacă jurnalul e prea lung, intră doar ultimele lui rânduri; Copiază le are pe toate.
+report-close = Închide
 
 ## Asset kinds (api.ts)
 

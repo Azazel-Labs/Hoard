@@ -2815,6 +2815,17 @@ about-licenses-failed = De lijst kon niet worden geladen.
 about-filter = Filteren op naam of licentie
 about-count = { $shown } van { $total }
 about-no-license = Geen licentie opgegeven
+about-report = Een probleem melden…
+report-title = Een probleem melden
+report-what = Dit heeft een issue op GitHub nodig om het probleem te kunnen onderzoeken. Er staat niets privés in: toegangstokens, wachtwoorden, sleutels, e-mailadressen en je naam in mappaden worden eruit gehaald. Lees het door voordat je het verstuurt.
+report-loading = Rapport wordt verzameld…
+report-failed = Het rapport kon niet worden verzameld: { $error }
+report-log = Wat de server onlangs heeft gelogd
+report-copy = Kopiëren
+report-copied = Rapport gekopieerd.
+report-github = Een issue openen op GitHub
+report-github-hint = Het nieuwe issue wordt hiermee ingevuld. Is het logboek daarvoor te lang, dan gaan alleen de laatste regels mee; Kopiëren heeft alles.
+report-close = Sluiten
 
 ## Asset kinds (api.ts)
 

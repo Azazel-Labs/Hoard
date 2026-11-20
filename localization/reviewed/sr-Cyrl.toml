@@ -92,6 +92,10 @@ translation = "На моделе које изаберете за локални
 source = "No license given"
 translation = "Лиценца није наведена"
 
+[messages.about-report]
+source = "Report a problem…"
+translation = "Пријави проблем…"
+
 [messages.about-siglip]
 source = "Finds pictures by what’s in them."
 translation = "Проналази слике по ономе што је на њима."
@@ -8248,6 +8252,46 @@ translation = "{ $name } ({ $files })"
 [messages.projects-use-more]
 source = "{ $count } more"
 translation = "још { $count }"
+
+[messages.report-close]
+source = "Close"
+translation = "Затвори"
+
+[messages.report-copied]
+source = "Copied the report."
+translation = "Извештај је копиран."
+
+[messages.report-copy]
+source = "Copy"
+translation = "Копирај"
+
+[messages.report-failed]
+source = "The report couldn’t be gathered: { $error }"
+translation = "Извештај није могао да се прикупи: { $error }"
+
+[messages.report-github]
+source = "Open an issue on GitHub"
+translation = "Отвори issue на GitHub-у"
+
+[messages.report-github-hint]
+source = "The new issue is filled in with this. When the log is too long for that, only its last lines go in; Copy has all of it."
+translation = "Нови issue се попуњава овим. Ако је дневник предугачак, улазе само његови последњи редови; Копирај садржи све."
+
+[messages.report-loading]
+source = "Gathering the report…"
+translation = "Прикупља се извештај…"
+
+[messages.report-log]
+source = "What the server logged lately"
+translation = "Шта је сервер недавно забележио"
+
+[messages.report-title]
+source = "Report a problem"
+translation = "Пријави проблем"
+
+[messages.report-what]
+source = "This is what an issue on GitHub needs for the problem to be looked into. Nothing private is in it: access tokens, passwords, keys, email addresses and your name in folder paths are taken out. Read it over before you send it."
+translation = "Ово је оно што issue на GitHub-у треба да би се проблем истражио. Нема ничег приватног: приступни токени, лозинке, кључеви, адресе е-поште и ваше име у путањама фасцикли се уклањају. Прочитајте пре слања."
 
 [messages.reset-label]
 source = "Reset to the default, { $value }"

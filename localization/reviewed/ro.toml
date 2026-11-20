@@ -92,6 +92,10 @@ translation = "Modelele pe care le alegeți pentru serverul AI local sunt supuse
 source = "No license given"
 translation = "Nicio licență indicată"
 
+[messages.about-report]
+source = "Report a problem…"
+translation = "Raportează o problemă…"
+
 [messages.about-siglip]
 source = "Finds pictures by what’s in them."
 translation = "Găsește imagini după ce se vede în ele."
@@ -8323,6 +8327,46 @@ translation = "{ $name } ({ $files })"
 [messages.projects-use-more]
 source = "{ $count } more"
 translation = "încă { $count }"
+
+[messages.report-close]
+source = "Close"
+translation = "Închide"
+
+[messages.report-copied]
+source = "Copied the report."
+translation = "Raportul a fost copiat."
+
+[messages.report-copy]
+source = "Copy"
+translation = "Copiază"
+
+[messages.report-failed]
+source = "The report couldn’t be gathered: { $error }"
+translation = "Raportul nu a putut fi adunat: { $error }"
+
+[messages.report-github]
+source = "Open an issue on GitHub"
+translation = "Deschide un issue pe GitHub"
+
+[messages.report-github-hint]
+source = "The new issue is filled in with this. When the log is too long for that, only its last lines go in; Copy has all of it."
+translation = "Noul issue se completează cu acestea. Dacă jurnalul e prea lung, intră doar ultimele lui rânduri; Copiază le are pe toate."
+
+[messages.report-loading]
+source = "Gathering the report…"
+translation = "Se adună raportul…"
+
+[messages.report-log]
+source = "What the server logged lately"
+translation = "Ce a înregistrat serverul în ultima vreme"
+
+[messages.report-title]
+source = "Report a problem"
+translation = "Raportează o problemă"
+
+[messages.report-what]
+source = "This is what an issue on GitHub needs for the problem to be looked into. Nothing private is in it: access tokens, passwords, keys, email addresses and your name in folder paths are taken out. Read it over before you send it."
+translation = "Iată de ce are nevoie un issue pe GitHub ca problema să poată fi cercetată. Nu conține nimic privat: tokenurile de acces, parolele, cheile, adresele de e-mail și numele tău din căile folderelor sunt eliminate. Citește-l înainte să-l trimiți."
 
 [messages.reset-label]
 source = "Reset to the default, { $value }"

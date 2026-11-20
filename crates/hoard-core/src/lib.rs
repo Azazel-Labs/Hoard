@@ -998,6 +998,10 @@ pub struct Stats {
     /// Space taken by thumbnails, model views and audio previews (the local cache).
     #[serde(default)]
     pub preview_bytes: u64,
+    /// The editors this build fetches itself when a conversion needs one (`blender`, `unreal`; the Docker image);
+    /// elsewhere they are found where they are installed.
+    #[serde(default)]
+    pub editor_downloads: Vec<String>,
 }
 
 /// A Hoard release newer than the running server.

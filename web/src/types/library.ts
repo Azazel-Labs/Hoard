@@ -419,6 +419,8 @@ export interface Stats {
   conversion_cache_limit?: number
   /** Space thumbnails, model views and audio previews take. */
   preview_bytes?: number
+  /** The editors this build fetches when a conversion needs one: `blender`, `unreal`. */
+  editor_downloads?: string[]
 }
 
 /** An app (Claude, another MCP client) someone let sign in over OAuth. */

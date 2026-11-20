@@ -2619,6 +2619,17 @@ about-licenses-failed = โหลดรายการไม่ได้
 about-filter = กรองตามชื่อหรือสัญญาอนุญาต
 about-count = { $shown } จาก { $total }
 about-no-license = ไม่ได้ระบุสัญญาอนุญาต
+about-report = รายงานปัญหา…
+report-title = รายงานปัญหา
+report-what = นี่คือสิ่งที่ issue บน GitHub ต้องใช้เพื่อตรวจสอบปัญหา ไม่มีข้อมูลส่วนตัวอยู่ในนี้ โทเค็นการเข้าถึง รหัสผ่าน คีย์ ที่อยู่อีเมล และชื่อของคุณในพาธโฟลเดอร์จะถูกนำออก อ่านทวนก่อนส่ง
+report-loading = กำลังรวบรวมรายงาน…
+report-failed = รวบรวมรายงานไม่ได้: { $error }
+report-log = สิ่งที่เซิร์ฟเวอร์บันทึกไว้ล่าสุด
+report-copy = คัดลอก
+report-copied = คัดลอกรายงานแล้ว
+report-github = เปิด issue บน GitHub
+report-github-hint = issue ใหม่จะถูกกรอกด้วยข้อมูลนี้ ถ้าบันทึกยาวเกินไป จะใส่เฉพาะบรรทัดท้ายๆ ส่วนคัดลอกมีครบทั้งหมด
+report-close = ปิด
 
 ## Asset kinds (api.ts)
 

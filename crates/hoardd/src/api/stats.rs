@@ -41,6 +41,13 @@ pub(super) async fn stats(State(state): State<AppState>) -> ApiResult<Json<Stats
     let llm_enabled = state.settings.get().llm_enabled();
     let conversion_cache_limit = state.settings.get().conversion_cache_bytes();
     let storage = state.blobs.label();
+    let downloads = crate::tools::editor_downloads(&state.cfg);
+    let editor_downloads =
+        [("blender", crate::blender::can_download()), ("unreal", crate::unreal_editor::can_download())]
+            .into_iter()
+            .filter(|&(_, can)| downloads && can)
+            .map(|(name, _)| name.to_owned())
+            .collect();
     let sizes = SIZES.get(&state.pool).await?.value;
     let s = db::read(&state.pool, move |c| {
         let one = |sql: &str| -> anyhow::Result<u64> { Ok(c.query_row(sql, [], |r| r.get::<_, i64>(0))? as u64) };
@@ -76,6 +83,7 @@ pub(super) async fn stats(State(state): State<AppState>) -> ApiResult<Json<Stats
             conversion_cache_bytes: sizes.conversion_cache_bytes,
             conversion_cache_limit,
             preview_bytes: sizes.preview_bytes,
+            editor_downloads,
         })
     })
     .await?;

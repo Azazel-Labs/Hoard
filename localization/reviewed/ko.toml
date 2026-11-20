@@ -92,6 +92,10 @@ translation = "로컬 AI 서버용으로 고른 모델에는 만든 사람의 �
 source = "No license given"
 translation = "라이선스 표시 없음"
 
+[messages.about-report]
+source = "Report a problem…"
+translation = "문제 신고…"
+
 [messages.about-siglip]
 source = "Finds pictures by what’s in them."
 translation = "그림에 담긴 내용으로 그림을 찾습니다."
@@ -7982,6 +7986,46 @@ translation = "{ $name }({ $files })"
 [messages.projects-use-more]
 source = "{ $count } more"
 translation = "그 밖의 { $count }개"
+
+[messages.report-close]
+source = "Close"
+translation = "닫기"
+
+[messages.report-copied]
+source = "Copied the report."
+translation = "보고서를 복사했습니다."
+
+[messages.report-copy]
+source = "Copy"
+translation = "복사"
+
+[messages.report-failed]
+source = "The report couldn’t be gathered: { $error }"
+translation = "보고서를 모을 수 없습니다: { $error }"
+
+[messages.report-github]
+source = "Open an issue on GitHub"
+translation = "GitHub에서 이슈 열기"
+
+[messages.report-github-hint]
+source = "The new issue is filled in with this. When the log is too long for that, only its last lines go in; Copy has all of it."
+translation = "새 이슈가 이 내용으로 채워집니다. 로그가 너무 길면 마지막 줄만 들어가며, 복사에는 전체가 담깁니다."
+
+[messages.report-loading]
+source = "Gathering the report…"
+translation = "보고서를 모으는 중…"
+
+[messages.report-log]
+source = "What the server logged lately"
+translation = "서버가 최근에 기록한 로그"
+
+[messages.report-title]
+source = "Report a problem"
+translation = "문제 신고"
+
+[messages.report-what]
+source = "This is what an issue on GitHub needs for the problem to be looked into. Nothing private is in it: access tokens, passwords, keys, email addresses and your name in folder paths are taken out. Read it over before you send it."
+translation = "문제를 살펴보려면 GitHub 이슈에 필요한 정보입니다. 개인적인 내용은 없습니다. 액세스 토큰, 비밀번호, 키, 이메일 주소, 폴더 경로에 있는 사용자 이름은 제거됩니다. 보내기 전에 읽어 보세요."
 
 [messages.reset-label]
 source = "Reset to the default, { $value }"

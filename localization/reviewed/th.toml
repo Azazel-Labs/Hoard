@@ -92,6 +92,10 @@ translation = "โมเดลที่คุณเลือกสำหรั�
 source = "No license given"
 translation = "ไม่ได้ระบุสัญญาอนุญาต"
 
+[messages.about-report]
+source = "Report a problem…"
+translation = "รายงานปัญหา…"
+
 [messages.about-siglip]
 source = "Finds pictures by what’s in them."
 translation = "ค้นหารูปภาพจากสิ่งที่อยู่ในภาพ"
@@ -8009,6 +8013,46 @@ translation = "{ $name } ({ $files })"
 [messages.projects-use-more]
 source = "{ $count } more"
 translation = "อีก { $count } รายการ"
+
+[messages.report-close]
+source = "Close"
+translation = "ปิด"
+
+[messages.report-copied]
+source = "Copied the report."
+translation = "คัดลอกรายงานแล้ว"
+
+[messages.report-copy]
+source = "Copy"
+translation = "คัดลอก"
+
+[messages.report-failed]
+source = "The report couldn’t be gathered: { $error }"
+translation = "รวบรวมรายงานไม่ได้: { $error }"
+
+[messages.report-github]
+source = "Open an issue on GitHub"
+translation = "เปิด issue บน GitHub"
+
+[messages.report-github-hint]
+source = "The new issue is filled in with this. When the log is too long for that, only its last lines go in; Copy has all of it."
+translation = "issue ใหม่จะถูกกรอกด้วยข้อมูลนี้ ถ้าบันทึกยาวเกินไป จะใส่เฉพาะบรรทัดท้ายๆ ส่วนคัดลอกมีครบทั้งหมด"
+
+[messages.report-loading]
+source = "Gathering the report…"
+translation = "กำลังรวบรวมรายงาน…"
+
+[messages.report-log]
+source = "What the server logged lately"
+translation = "สิ่งที่เซิร์ฟเวอร์บันทึกไว้ล่าสุด"
+
+[messages.report-title]
+source = "Report a problem"
+translation = "รายงานปัญหา"
+
+[messages.report-what]
+source = "This is what an issue on GitHub needs for the problem to be looked into. Nothing private is in it: access tokens, passwords, keys, email addresses and your name in folder paths are taken out. Read it over before you send it."
+translation = "นี่คือสิ่งที่ issue บน GitHub ต้องใช้เพื่อตรวจสอบปัญหา ไม่มีข้อมูลส่วนตัวอยู่ในนี้ โทเค็นการเข้าถึง รหัสผ่าน คีย์ ที่อยู่อีเมล และชื่อของคุณในพาธโฟลเดอร์จะถูกนำออก อ่านทวนก่อนส่ง"
 
 [messages.reset-label]
 source = "Reset to the default, { $value }"

@@ -92,6 +92,10 @@ translation = "Paikalliselle tekoälypalvelimelle valitsemiisi malleihin pätev�
 source = "No license given"
 translation = "Lisenssiä ei ilmoitettu"
 
+[messages.about-report]
+source = "Report a problem…"
+translation = "Ilmoita ongelmasta…"
+
 [messages.about-siglip]
 source = "Finds pictures by what’s in them."
 translation = "Löytää kuvia sen perusteella, mitä niissä on."
@@ -8228,6 +8232,46 @@ translation = """
         [one] { $count } muu
        *[other] { $count } muuta
     }"""
+
+[messages.report-close]
+source = "Close"
+translation = "Sulje"
+
+[messages.report-copied]
+source = "Copied the report."
+translation = "Raportti kopioitu."
+
+[messages.report-copy]
+source = "Copy"
+translation = "Kopioi"
+
+[messages.report-failed]
+source = "The report couldn’t be gathered: { $error }"
+translation = "Raporttia ei voitu koota: { $error }"
+
+[messages.report-github]
+source = "Open an issue on GitHub"
+translation = "Avaa issue GitHubissa"
+
+[messages.report-github-hint]
+source = "The new issue is filled in with this. When the log is too long for that, only its last lines go in; Copy has all of it."
+translation = "Uusi issue täytetään tällä. Jos loki on siihen liian pitkä, mukaan tulevat vain sen viimeiset rivit; Kopioi sisältää kaiken."
+
+[messages.report-loading]
+source = "Gathering the report…"
+translation = "Kootaan raporttia…"
+
+[messages.report-log]
+source = "What the server logged lately"
+translation = "Mitä palvelin on viime aikoina kirjannut"
+
+[messages.report-title]
+source = "Report a problem"
+translation = "Ilmoita ongelmasta"
+
+[messages.report-what]
+source = "This is what an issue on GitHub needs for the problem to be looked into. Nothing private is in it: access tokens, passwords, keys, email addresses and your name in folder paths are taken out. Read it over before you send it."
+translation = "Tämä on se, mitä GitHubin issue tarvitsee, jotta ongelmaa voidaan selvittää. Siinä ei ole mitään yksityistä: käyttötunnukset, salasanat, avaimet, sähköpostiosoitteet ja nimesi kansiopoluissa poistetaan. Lue se läpi ennen lähettämistä."
 
 [messages.reset-label]
 source = "Reset to the default, { $value }"

@@ -2819,6 +2819,17 @@ about-licenses-failed = Listan kunde inte läsas in.
 about-filter = Filtrera efter namn eller licens
 about-count = { $shown } av { $total }
 about-no-license = Ingen licens angiven
+about-report = Rapportera ett problem…
+report-title = Rapportera ett problem
+report-what = Det här är vad ett issue på GitHub behöver för att problemet ska kunna undersökas. Inget privat finns med: åtkomsttoken, lösenord, nycklar, e-postadresser och ditt namn i mappsökvägar tas bort. Läs igenom det innan du skickar det.
+report-loading = Samlar rapporten…
+report-failed = Rapporten kunde inte samlas: { $error }
+report-log = Vad servern har loggat på sistone
+report-copy = Kopiera
+report-copied = Rapporten har kopierats.
+report-github = Öppna ett issue på GitHub
+report-github-hint = Det nya issuet fylls i med detta. Är loggen för lång för det kommer bara de sista raderna med; Kopiera har allt.
+report-close = Stäng
 
 ## Resurstyper (api.ts)
 

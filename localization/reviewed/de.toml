@@ -92,6 +92,10 @@ translation = "Modelle, die Sie für den lokalen KI-Server auswählen, stehen un
 source = "No license given"
 translation = "Keine Lizenz angegeben"
 
+[messages.about-report]
+source = "Report a problem…"
+translation = "Problem melden…"
+
 [messages.about-siglip]
 source = "Finds pictures by what’s in them."
 translation = "Findet Bilder anhand dessen, was darauf zu sehen ist."
@@ -8179,6 +8183,46 @@ translation = "{ $name } ({ $files })"
 [messages.projects-use-more]
 source = "{ $count } more"
 translation = "{ $count } weitere"
+
+[messages.report-close]
+source = "Close"
+translation = "Schließen"
+
+[messages.report-copied]
+source = "Copied the report."
+translation = "Bericht kopiert."
+
+[messages.report-copy]
+source = "Copy"
+translation = "Kopieren"
+
+[messages.report-failed]
+source = "The report couldn’t be gathered: { $error }"
+translation = "Der Bericht konnte nicht zusammengestellt werden: { $error }"
+
+[messages.report-github]
+source = "Open an issue on GitHub"
+translation = "Issue auf GitHub eröffnen"
+
+[messages.report-github-hint]
+source = "The new issue is filled in with this. When the log is too long for that, only its last lines go in; Copy has all of it."
+translation = "Das neue Issue wird damit ausgefüllt. Ist das Protokoll dafür zu lang, kommen nur seine letzten Zeilen hinein; Kopieren enthält alles."
+
+[messages.report-loading]
+source = "Gathering the report…"
+translation = "Bericht wird zusammengestellt…"
+
+[messages.report-log]
+source = "What the server logged lately"
+translation = "Was der Server zuletzt protokolliert hat"
+
+[messages.report-title]
+source = "Report a problem"
+translation = "Problem melden"
+
+[messages.report-what]
+source = "This is what an issue on GitHub needs for the problem to be looked into. Nothing private is in it: access tokens, passwords, keys, email addresses and your name in folder paths are taken out. Read it over before you send it."
+translation = "Das braucht ein Issue auf GitHub, damit dem Problem nachgegangen werden kann. Nichts Privates ist darin: Zugriffstokens, Passwörter, Schlüssel, E-Mail-Adressen und dein Name in Ordnerpfaden werden entfernt. Lies es durch, bevor du es abschickst."
 
 [messages.reset-label]
 source = "Reset to the default, { $value }"

@@ -92,6 +92,10 @@ translation = "Modelle wat jy vir die plaaslike KI-bediener kies, val onder hul 
 source = "No license given"
 translation = "Geen lisensie gegee nie"
 
+[messages.about-report]
+source = "Report a problem…"
+translation = "Rapporteer ’n probleem…"
+
 [messages.about-siglip]
 source = "Finds pictures by what’s in them."
 translation = "Vind prente volgens wat daarin is."
@@ -8179,6 +8183,46 @@ translation = "{ $name } ({ $files })"
 [messages.projects-use-more]
 source = "{ $count } more"
 translation = "nog { $count }"
+
+[messages.report-close]
+source = "Close"
+translation = "Maak toe"
+
+[messages.report-copied]
+source = "Copied the report."
+translation = "Verslag gekopieer."
+
+[messages.report-copy]
+source = "Copy"
+translation = "Kopieer"
+
+[messages.report-failed]
+source = "The report couldn’t be gathered: { $error }"
+translation = "Die verslag kon nie saamgestel word nie: { $error }"
+
+[messages.report-github]
+source = "Open an issue on GitHub"
+translation = "Open ’n issue op GitHub"
+
+[messages.report-github-hint]
+source = "The new issue is filled in with this. When the log is too long for that, only its last lines go in; Copy has all of it."
+translation = "Die nuwe issue word hiermee ingevul. As die log te lank daarvoor is, gaan net sy laaste reëls in; Kopieer het alles."
+
+[messages.report-loading]
+source = "Gathering the report…"
+translation = "Stel die verslag saam…"
+
+[messages.report-log]
+source = "What the server logged lately"
+translation = "Wat die bediener onlangs gelog het"
+
+[messages.report-title]
+source = "Report a problem"
+translation = "Rapporteer ’n probleem"
+
+[messages.report-what]
+source = "This is what an issue on GitHub needs for the problem to be looked into. Nothing private is in it: access tokens, passwords, keys, email addresses and your name in folder paths are taken out. Read it over before you send it."
+translation = "Dit is wat ’n issue op GitHub nodig het sodat die probleem nagegaan kan word. Niks privaats is daarin nie: toegangstokens, wagwoorde, sleutels, e-posadresse en jou naam in vouerpaaie word uitgehaal. Lees dit deur voor jy dit stuur."
 
 [messages.reset-label]
 source = "Reset to the default, { $value }"

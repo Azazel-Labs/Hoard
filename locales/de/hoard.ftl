@@ -2815,6 +2815,17 @@ about-licenses-failed = Die Liste konnte nicht geladen werden.
 about-filter = Nach Name oder Lizenz filtern
 about-count = { $shown } von { $total }
 about-no-license = Keine Lizenz angegeben
+about-report = Problem melden…
+report-title = Problem melden
+report-what = Das braucht ein Issue auf GitHub, damit dem Problem nachgegangen werden kann. Nichts Privates ist darin: Zugriffstokens, Passwörter, Schlüssel, E-Mail-Adressen und dein Name in Ordnerpfaden werden entfernt. Lies es durch, bevor du es abschickst.
+report-loading = Bericht wird zusammengestellt…
+report-failed = Der Bericht konnte nicht zusammengestellt werden: { $error }
+report-log = Was der Server zuletzt protokolliert hat
+report-copy = Kopieren
+report-copied = Bericht kopiert.
+report-github = Issue auf GitHub eröffnen
+report-github-hint = Das neue Issue wird damit ausgefüllt. Ist das Protokoll dafür zu lang, kommen nur seine letzten Zeilen hinein; Kopieren enthält alles.
+report-close = Schließen
 
 ## Asset-Arten (api.ts)
 

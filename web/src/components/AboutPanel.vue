@@ -5,10 +5,11 @@
 // those to licenses.json, loaded only when this page is opened).
 import { computed, onMounted, reactive, ref } from 'vue'
 import type { Stats } from '../api'
-import { isDesktop, steamApp } from '../auth'
+import { isDesktop, may, steamApp } from '../auth'
 import { formatNumber, t } from '../i18n'
+import ReportDialog from './ReportDialog.vue'
 
-defineProps<{ stats: Stats | null }>()
+const props = defineProps<{ stats: Stats | null }>()
 
 interface Package { name: string; version: string; license: string | null; url: string | null; texts: number[] }
 interface Licenses { hoard: string; crates: Package[]; npm: Package[]; texts: string[] }
@@ -16,14 +17,28 @@ interface Licenses { hoard: string; crates: Package[]; npm: Package[]; texts: st
 const REPO = 'https://github.com/Azazel-Labs/Hoard'
 const DISCORD = 'https://discord.gg/zf9ncS4EW'
 const steam = steamApp()
+const reporting = ref(false)
 const edition = computed(() =>
   steam ? t('about-edition-steam') : isDesktop() ? t('about-edition-desktop') : t('about-edition-server'),
 )
 
-/** What Hoard fetches the first time it needs it, rather than shipping. */
-const DOWNLOADED = (): { name: string; license: string; url: string; what: string }[] => [
-  { name: 'Blender', license: 'GPL-2.0-or-later', url: 'https://www.blender.org', what: t('about-blender') },
-  { name: 'Unreal Editor', license: 'Epic Unreal Engine EULA', url: 'https://www.unrealengine.com/eula/unreal', what: t('settings-unreal-editor-what') },
+/** What Hoard fetches the first time it needs it, rather than shipping. The editors are fetched only by builds that do
+ * (the Docker image); everywhere else they're found where they're installed, so they aren't listed. */
+const DOWNLOADED = (): { name: string; license: string; url: string; what: string; editor?: string }[] => [
+  {
+    name: 'Blender',
+    license: 'GPL-2.0-or-later',
+    url: 'https://www.blender.org',
+    what: t('about-blender'),
+    editor: 'blender',
+  },
+  {
+    name: 'Unreal Editor',
+    license: 'Epic Unreal Engine EULA',
+    url: 'https://www.unrealengine.com/eula/unreal',
+    what: t('settings-unreal-editor-what'),
+    editor: 'unreal',
+  },
   { name: 'FFmpeg', license: 'GPL-3.0-or-later', url: 'https://ffmpeg.org', what: t('about-ffmpeg') },
   {
     name: 'SigLIP 2',
@@ -33,6 +48,9 @@ const DOWNLOADED = (): { name: string; license: string; url: string; what: strin
   },
   { name: 'CLAP', license: 'Apache-2.0', url: 'https://huggingface.co/laion/clap-htsat-unfused', what: t('about-clap') },
 ]
+const downloaded = computed(() =>
+  DOWNLOADED().filter((d) => !d.editor || props.stats?.editor_downloads?.includes(d.editor)),
+)
 
 const licenses = ref<Licenses | null>(null)
 const failed = ref(false)
@@ -86,7 +104,12 @@ onMounted(async () => {
       </dl>
       <ul class="links">
         <li><a :href="REPO" target="_blank" rel="noopener">{{ t('about-source') }}</a></li>
-        <li><a :href="`${REPO}/issues`" target="_blank" rel="noopener">{{ t('about-issues') }}</a></li>
+        <li v-if="may('admin')">
+          <button type="button" class="linkish" data-testid="about-report" @click="reporting = true">
+            {{ t('about-report') }}
+          </button>
+        </li>
+        <li v-else><a :href="`${REPO}/issues`" target="_blank" rel="noopener">{{ t('about-issues') }}</a></li>
         <li><a :href="DISCORD" target="_blank" rel="noopener" data-testid="about-discord">{{ t('about-discord') }}</a></li>
         <li v-if="steam">
           <a :href="`https://store.steampowered.com/app/${steam}`" target="_blank" rel="noopener" data-testid="about-steam">
@@ -108,8 +131,8 @@ onMounted(async () => {
     <section>
       <div class="sh"><h3>{{ t('about-downloaded') }}</h3></div>
       <p class="what">{{ t('about-downloaded-what') }}</p>
-      <ul class="plain">
-        <li v-for="d in DOWNLOADED()" :key="d.name">
+      <ul class="plain" data-testid="about-downloaded">
+        <li v-for="d in downloaded" :key="d.name">
           <a :href="d.url" target="_blank" rel="noopener">{{ d.name }}</a> <small>{{ d.license }}</small>
           <span class="muted">{{ d.what }}</span>
         </li>
@@ -153,6 +176,7 @@ onMounted(async () => {
         </ul>
       </template>
     </section>
+    <ReportDialog v-if="reporting" :repo="REPO" @close="reporting = false" />
   </div>
 </template>
 
@@ -166,6 +190,7 @@ section { display: grid; gap: 0.6rem; min-width: 0; }
 .facts dt { color: var(--muted); }
 .facts dd { margin: 0; overflow-wrap: anywhere; }
 .links { display: flex; flex-wrap: wrap; gap: 0.4rem 1.2rem; margin: 0; padding: 0; list-style: none; }
+.linkish { padding: 0; border: 0; background: none; color: LinkText; font: inherit; text-decoration: underline; cursor: pointer; }
 .plain { display: grid; gap: 0.35rem; margin: 0; padding: 0; list-style: none; }
 .plain small, .muted { color: var(--muted); }
 .muted { display: block; }

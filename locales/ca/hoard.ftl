@@ -2820,6 +2820,17 @@ about-licenses-failed = No s’ha pogut carregar la llista.
 about-filter = Filtreu per nom o llicència
 about-count = { $shown } de { $total }
 about-no-license = Sense llicència indicada
+about-report = Informa d’un problema…
+report-title = Informa d’un problema
+report-what = Això és el que necessita una incidència a GitHub perquè s’hi pugui investigar el problema. No hi ha res privat: se’n treuen els testimonis d’accés, les contrasenyes, les claus, les adreces electròniques i el vostre nom als camins de carpeta. Repasseu-ho abans d’enviar-ho.
+report-loading = S’està recollint l’informe…
+report-failed = No s’ha pogut recollir l’informe: { $error }
+report-log = El que el servidor ha registrat darrerament
+report-copy = Copia
+report-copied = S’ha copiat l’informe.
+report-github = Obre una incidència a GitHub
+report-github-hint = La incidència nova s’omple amb això. Si el registre hi és massa llarg, només s’hi posen les darreres línies; Copia ho té tot.
+report-close = Tanca
 
 ## Asset kinds (api.ts)
 

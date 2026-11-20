@@ -92,6 +92,10 @@ translation = "Các mô hình bạn chọn cho máy chủ AI cục bộ tuân th
 source = "No license given"
 translation = "Không ghi giấy phép"
 
+[messages.about-report]
+source = "Report a problem…"
+translation = "Báo cáo sự cố…"
+
 [messages.about-siglip]
 source = "Finds pictures by what’s in them."
 translation = "Tìm hình ảnh theo nội dung trong ảnh."
@@ -8006,6 +8010,46 @@ translation = "{ $name } ({ $files })"
 [messages.projects-use-more]
 source = "{ $count } more"
 translation = "{ $count } tệp khác"
+
+[messages.report-close]
+source = "Close"
+translation = "Đóng"
+
+[messages.report-copied]
+source = "Copied the report."
+translation = "Đã sao chép báo cáo."
+
+[messages.report-copy]
+source = "Copy"
+translation = "Sao chép"
+
+[messages.report-failed]
+source = "The report couldn’t be gathered: { $error }"
+translation = "Không thể thu thập báo cáo: { $error }"
+
+[messages.report-github]
+source = "Open an issue on GitHub"
+translation = "Mở issue trên GitHub"
+
+[messages.report-github-hint]
+source = "The new issue is filled in with this. When the log is too long for that, only its last lines go in; Copy has all of it."
+translation = "Issue mới được điền sẵn bằng nội dung này. Nếu nhật ký quá dài, chỉ những dòng cuối được đưa vào; Sao chép có tất cả."
+
+[messages.report-loading]
+source = "Gathering the report…"
+translation = "Đang thu thập báo cáo…"
+
+[messages.report-log]
+source = "What the server logged lately"
+translation = "Những gì máy chủ ghi nhật ký gần đây"
+
+[messages.report-title]
+source = "Report a problem"
+translation = "Báo cáo sự cố"
+
+[messages.report-what]
+source = "This is what an issue on GitHub needs for the problem to be looked into. Nothing private is in it: access tokens, passwords, keys, email addresses and your name in folder paths are taken out. Read it over before you send it."
+translation = "Đây là những gì một issue trên GitHub cần để sự cố được xem xét. Không có gì riêng tư trong đó: token truy cập, mật khẩu, khóa, địa chỉ email và tên của bạn trong đường dẫn thư mục đều được loại bỏ. Hãy đọc lại trước khi gửi."
 
 [messages.reset-label]
 source = "Reset to the default, { $value }"

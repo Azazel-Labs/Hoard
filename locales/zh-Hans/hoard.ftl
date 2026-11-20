@@ -2616,6 +2616,17 @@ about-licenses-failed = 无法加载列表。
 about-filter = 按名称或许可证筛选
 about-count = { $shown } / { $total }
 about-no-license = 未注明许可证
+about-report = 报告问题…
+report-title = 报告问题
+report-what = 这是 GitHub 上的 issue 调查问题所需的信息。其中没有任何隐私内容：访问令牌、密码、密钥、电子邮件地址以及文件夹路径中的用户名都会被去除。发送前请通读一遍。
+report-loading = 正在收集报告…
+report-failed = 无法收集报告：{ $error }
+report-log = 服务器最近记录的日志
+report-copy = 复制
+report-copied = 已复制报告。
+report-github = 在 GitHub 上新建 issue
+report-github-hint = 新 issue 会自动填入这些内容。日志太长时只放入最后几行；“复制”包含全部内容。
+report-close = 关闭
 
 ## 资源类型（api.ts）
 

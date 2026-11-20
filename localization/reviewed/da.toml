@@ -92,6 +92,10 @@ translation = "Modeller, du vælger til den lokale AI-server, er underlagt deres
 source = "No license given"
 translation = "Ingen licens angivet"
 
+[messages.about-report]
+source = "Report a problem…"
+translation = "Rapportér et problem…"
+
 [messages.about-siglip]
 source = "Finds pictures by what’s in them."
 translation = "Finder billeder ud fra, hvad der er på dem."
@@ -8181,6 +8185,46 @@ translation = "{ $name } ({ $files })"
 [messages.projects-use-more]
 source = "{ $count } more"
 translation = "{ $count } mere"
+
+[messages.report-close]
+source = "Close"
+translation = "Luk"
+
+[messages.report-copied]
+source = "Copied the report."
+translation = "Rapporten er kopieret."
+
+[messages.report-copy]
+source = "Copy"
+translation = "Kopiér"
+
+[messages.report-failed]
+source = "The report couldn’t be gathered: { $error }"
+translation = "Rapporten kunne ikke samles: { $error }"
+
+[messages.report-github]
+source = "Open an issue on GitHub"
+translation = "Opret et issue på GitHub"
+
+[messages.report-github-hint]
+source = "The new issue is filled in with this. When the log is too long for that, only its last lines go in; Copy has all of it."
+translation = "Det nye issue udfyldes med dette. Er loggen for lang til det, kommer kun de sidste linjer med; Kopiér har det hele."
+
+[messages.report-loading]
+source = "Gathering the report…"
+translation = "Samler rapporten…"
+
+[messages.report-log]
+source = "What the server logged lately"
+translation = "Hvad serveren har logget for nylig"
+
+[messages.report-title]
+source = "Report a problem"
+translation = "Rapportér et problem"
+
+[messages.report-what]
+source = "This is what an issue on GitHub needs for the problem to be looked into. Nothing private is in it: access tokens, passwords, keys, email addresses and your name in folder paths are taken out. Read it over before you send it."
+translation = "Det her er, hvad et issue på GitHub skal bruge, for at problemet kan undersøges. Der er intet privat i det: adgangstokens, adgangskoder, nøgler, e-mailadresser og dit navn i mappestier er fjernet. Læs det igennem, før du sender det."
 
 [messages.reset-label]
 source = "Reset to the default, { $value }"

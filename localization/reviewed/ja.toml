@@ -92,6 +92,10 @@ translation = "ローカル AI サーバー用に選んだモデルには、そ�
 source = "No license given"
 translation = "ライセンスの記載なし"
 
+[messages.about-report]
+source = "Report a problem…"
+translation = "問題を報告…"
+
 [messages.about-siglip]
 source = "Finds pictures by what’s in them."
 translation = "写っている内容から画像を探します。"
@@ -8020,6 +8024,46 @@ translation = "{ $name }（{ $files }）"
 [messages.projects-use-more]
 source = "{ $count } more"
 translation = "ほか { $count } 件"
+
+[messages.report-close]
+source = "Close"
+translation = "閉じる"
+
+[messages.report-copied]
+source = "Copied the report."
+translation = "レポートをコピーしました。"
+
+[messages.report-copy]
+source = "Copy"
+translation = "コピー"
+
+[messages.report-failed]
+source = "The report couldn’t be gathered: { $error }"
+translation = "レポートを集められませんでした: { $error }"
+
+[messages.report-github]
+source = "Open an issue on GitHub"
+translation = "GitHub で issue を作成"
+
+[messages.report-github-hint]
+source = "The new issue is filled in with this. When the log is too long for that, only its last lines go in; Copy has all of it."
+translation = "新しい issue にはこの内容が入力されます。ログが長すぎる場合は最後の数行だけが入ります。すべてはコピーで取得できます。"
+
+[messages.report-loading]
+source = "Gathering the report…"
+translation = "レポートを集めています…"
+
+[messages.report-log]
+source = "What the server logged lately"
+translation = "サーバーの最近のログ"
+
+[messages.report-title]
+source = "Report a problem"
+translation = "問題を報告"
+
+[messages.report-what]
+source = "This is what an issue on GitHub needs for the problem to be looked into. Nothing private is in it: access tokens, passwords, keys, email addresses and your name in folder paths are taken out. Read it over before you send it."
+translation = "問題を調べるために GitHub の issue に必要な情報です。個人的な情報は含まれません。アクセストークン、パスワード、キー、メールアドレス、フォルダーパス内のユーザー名は取り除かれます。送信する前に内容を確認してください。"
 
 [messages.reset-label]
 source = "Reset to the default, { $value }"

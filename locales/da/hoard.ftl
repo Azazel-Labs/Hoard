@@ -2815,6 +2815,17 @@ about-licenses-failed = Listen kunne ikke indlæses.
 about-filter = Filtrér efter navn eller licens
 about-count = { $shown } af { $total }
 about-no-license = Ingen licens angivet
+about-report = Rapportér et problem…
+report-title = Rapportér et problem
+report-what = Det her er, hvad et issue på GitHub skal bruge, for at problemet kan undersøges. Der er intet privat i det: adgangstokens, adgangskoder, nøgler, e-mailadresser og dit navn i mappestier er fjernet. Læs det igennem, før du sender det.
+report-loading = Samler rapporten…
+report-failed = Rapporten kunne ikke samles: { $error }
+report-log = Hvad serveren har logget for nylig
+report-copy = Kopiér
+report-copied = Rapporten er kopieret.
+report-github = Opret et issue på GitHub
+report-github-hint = Det nye issue udfyldes med dette. Er loggen for lang til det, kommer kun de sidste linjer med; Kopiér har det hele.
+report-close = Luk
 
 ## Asset kinds (api.ts)
 

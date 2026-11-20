@@ -2901,6 +2901,17 @@ about-licenses-failed = Luetteloa ei voitu ladata.
 about-filter = Suodata nimen tai lisenssin mukaan
 about-count = { $shown } / { $total }
 about-no-license = Lisenssiä ei ilmoitettu
+about-report = Ilmoita ongelmasta…
+report-title = Ilmoita ongelmasta
+report-what = Tämä on se, mitä GitHubin issue tarvitsee, jotta ongelmaa voidaan selvittää. Siinä ei ole mitään yksityistä: käyttötunnukset, salasanat, avaimet, sähköpostiosoitteet ja nimesi kansiopoluissa poistetaan. Lue se läpi ennen lähettämistä.
+report-loading = Kootaan raporttia…
+report-failed = Raporttia ei voitu koota: { $error }
+report-log = Mitä palvelin on viime aikoina kirjannut
+report-copy = Kopioi
+report-copied = Raportti kopioitu.
+report-github = Avaa issue GitHubissa
+report-github-hint = Uusi issue täytetään tällä. Jos loki on siihen liian pitkä, mukaan tulevat vain sen viimeiset rivit; Kopioi sisältää kaiken.
+report-close = Sulje
 
 ## Resurssityypit
 

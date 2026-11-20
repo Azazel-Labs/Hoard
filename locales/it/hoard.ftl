@@ -2829,6 +2829,17 @@ about-licenses-failed = Impossibile caricare l’elenco.
 about-filter = Filtra per nome o licenza
 about-count = { $shown } di { $total }
 about-no-license = Nessuna licenza indicata
+about-report = Segnala un problema…
+report-title = Segnala un problema
+report-what = Ecco ciò che serve a una issue su GitHub perché il problema possa essere esaminato. Non contiene nulla di privato: token di accesso, password, chiavi, indirizzi email e il tuo nome nei percorsi delle cartelle vengono rimossi. Rileggilo prima di inviarlo.
+report-loading = Raccolta del rapporto…
+report-failed = Impossibile raccogliere il rapporto: { $error }
+report-log = Ciò che il server ha registrato di recente
+report-copy = Copia
+report-copied = Rapporto copiato.
+report-github = Apri una issue su GitHub
+report-github-hint = La nuova issue viene compilata con questo. Se il registro è troppo lungo, vengono inserite solo le ultime righe; Copia contiene tutto.
+report-close = Chiudi
 
 ## Tipi di asset (api.ts)
 

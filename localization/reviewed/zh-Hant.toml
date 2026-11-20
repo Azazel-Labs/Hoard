@@ -92,6 +92,10 @@ translation = "你為本機 AI 伺服器選擇的模型適用其作者的授權�
 source = "No license given"
 translation = "未註明授權條款"
 
+[messages.about-report]
+source = "Report a problem…"
+translation = "回報問題…"
+
 [messages.about-siglip]
 source = "Finds pictures by what’s in them."
 translation = "依圖片中的內容尋找圖片。"
@@ -8012,6 +8016,46 @@ translation = "{ $name }（{ $files }）"
 [messages.projects-use-more]
 source = "{ $count } more"
 translation = "另外 { $count } 個"
+
+[messages.report-close]
+source = "Close"
+translation = "關閉"
+
+[messages.report-copied]
+source = "Copied the report."
+translation = "已複製報告。"
+
+[messages.report-copy]
+source = "Copy"
+translation = "複製"
+
+[messages.report-failed]
+source = "The report couldn’t be gathered: { $error }"
+translation = "無法收集報告：{ $error }"
+
+[messages.report-github]
+source = "Open an issue on GitHub"
+translation = "在 GitHub 上建立 issue"
+
+[messages.report-github-hint]
+source = "The new issue is filled in with this. When the log is too long for that, only its last lines go in; Copy has all of it."
+translation = "新的 issue 會自動填入這些內容。日誌太長時只會放入最後幾行；「複製」包含全部內容。"
+
+[messages.report-loading]
+source = "Gathering the report…"
+translation = "正在收集報告…"
+
+[messages.report-log]
+source = "What the server logged lately"
+translation = "伺服器最近記錄的日誌"
+
+[messages.report-title]
+source = "Report a problem"
+translation = "回報問題"
+
+[messages.report-what]
+source = "This is what an issue on GitHub needs for the problem to be looked into. Nothing private is in it: access tokens, passwords, keys, email addresses and your name in folder paths are taken out. Read it over before you send it."
+translation = "這是 GitHub 上的 issue 調查問題所需的資訊。其中沒有任何隱私內容：存取權杖、密碼、金鑰、電子郵件地址以及資料夾路徑中的使用者名稱都會被移除。送出前請先讀過一遍。"
 
 [messages.reset-label]
 source = "Reset to the default, { $value }"

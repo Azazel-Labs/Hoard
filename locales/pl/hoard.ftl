@@ -3060,6 +3060,17 @@ about-licenses-failed = Nie udało się wczytać listy.
 about-filter = Filtruj według nazwy lub licencji
 about-count = { $shown } z { $total }
 about-no-license = Nie podano licencji
+about-report = Zgłoś problem…
+report-title = Zgłoś problem
+report-what = Tyle potrzebuje zgłoszenie na GitHubie, żeby można było zbadać problem. Nie ma w nim nic prywatnego: tokeny dostępu, hasła, klucze, adresy e-mail i Twoja nazwa w ścieżkach folderów są usuwane. Przeczytaj je przed wysłaniem.
+report-loading = Zbieranie raportu…
+report-failed = Nie udało się zebrać raportu: { $error }
+report-log = Co serwer ostatnio zapisał w dzienniku
+report-copy = Kopiuj
+report-copied = Skopiowano raport.
+report-github = Otwórz zgłoszenie na GitHubie
+report-github-hint = Nowe zgłoszenie zostanie tym wypełnione. Jeśli dziennik jest na to za długi, trafią do niego tylko ostatnie wiersze; Kopiuj zawiera wszystko.
+report-close = Zamknij
 
 ## Asset kinds (api.ts)
 

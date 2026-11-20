@@ -2858,6 +2858,17 @@ about-licenses-failed = Impossible de charger la liste.
 about-filter = Filtrer par nom ou licence
 about-count = { $shown } sur { $total }
 about-no-license = Aucune licence indiquée
+about-report = Signaler un problème…
+report-title = Signaler un problème
+report-what = Voici ce dont un ticket sur GitHub a besoin pour que le problème soit examiné. Rien de privé n’y figure : les jetons d’accès, mots de passe, clés, adresses e-mail et votre nom dans les chemins de dossiers sont retirés. Relisez-le avant de l’envoyer.
+report-loading = Préparation du rapport…
+report-failed = Le rapport n’a pas pu être préparé : { $error }
+report-log = Ce que le serveur a journalisé dernièrement
+report-copy = Copier
+report-copied = Rapport copié.
+report-github = Ouvrir un ticket sur GitHub
+report-github-hint = Le nouveau ticket est rempli avec ceci. Si le journal est trop long, seules ses dernières lignes y vont ; Copier contient tout.
+report-close = Fermer
 
 ## Types de ressources (api.ts)
 

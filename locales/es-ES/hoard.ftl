@@ -2867,6 +2867,17 @@ about-licenses-failed = No se ha podido cargar la lista.
 about-filter = Filtrar por nombre o licencia
 about-count = { $shown } de { $total }
 about-no-license = Sin licencia indicada
+about-report = Informar de un problema…
+report-title = Informar de un problema
+report-what = Esto es lo que necesita una incidencia en GitHub para poder investigar el problema. No contiene nada privado: se quitan los tokens de acceso, las contraseñas, las claves, las direcciones de correo y tu nombre en las rutas de carpetas. Revísalo antes de enviarlo.
+report-loading = Reuniendo el informe…
+report-failed = No se ha podido reunir el informe: { $error }
+report-log = Lo que el servidor ha registrado últimamente
+report-copy = Copiar
+report-copied = Informe copiado.
+report-github = Abrir una incidencia en GitHub
+report-github-hint = La incidencia nueva se rellena con esto. Si el registro es demasiado largo, solo van sus últimas líneas; Copiar lo tiene todo.
+report-close = Cerrar
 
 ## Asset kinds (api.ts)
 

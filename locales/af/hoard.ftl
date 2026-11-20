@@ -2813,6 +2813,17 @@ about-licenses-failed = Die lys kon nie gelaai word nie.
 about-filter = Filtreer volgens naam of lisensie
 about-count = { $shown } van { $total }
 about-no-license = Geen lisensie gegee nie
+about-report = Rapporteer ’n probleem…
+report-title = Rapporteer ’n probleem
+report-what = Dit is wat ’n issue op GitHub nodig het sodat die probleem nagegaan kan word. Niks privaats is daarin nie: toegangstokens, wagwoorde, sleutels, e-posadresse en jou naam in vouerpaaie word uitgehaal. Lees dit deur voor jy dit stuur.
+report-loading = Stel die verslag saam…
+report-failed = Die verslag kon nie saamgestel word nie: { $error }
+report-log = Wat die bediener onlangs gelog het
+report-copy = Kopieer
+report-copied = Verslag gekopieer.
+report-github = Open ’n issue op GitHub
+report-github-hint = Die nuwe issue word hiermee ingevul. As die log te lank daarvoor is, gaan net sy laaste reëls in; Kopieer het alles.
+report-close = Maak toe
 
 ## Batesoorte (api.ts)
 

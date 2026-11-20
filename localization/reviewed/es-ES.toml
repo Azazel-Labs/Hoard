@@ -92,6 +92,10 @@ translation = "Los modelos que elijas para el servidor de IA local tienen las li
 source = "No license given"
 translation = "Sin licencia indicada"
 
+[messages.about-report]
+source = "Report a problem…"
+translation = "Informar de un problema…"
+
 [messages.about-siglip]
 source = "Finds pictures by what’s in them."
 translation = "Encuentra imágenes por lo que aparece en ellas."
@@ -8214,6 +8218,46 @@ translation = "{ $name } ({ $files })"
 [messages.projects-use-more]
 source = "{ $count } more"
 translation = "{ $count } más"
+
+[messages.report-close]
+source = "Close"
+translation = "Cerrar"
+
+[messages.report-copied]
+source = "Copied the report."
+translation = "Informe copiado."
+
+[messages.report-copy]
+source = "Copy"
+translation = "Copiar"
+
+[messages.report-failed]
+source = "The report couldn’t be gathered: { $error }"
+translation = "No se ha podido reunir el informe: { $error }"
+
+[messages.report-github]
+source = "Open an issue on GitHub"
+translation = "Abrir una incidencia en GitHub"
+
+[messages.report-github-hint]
+source = "The new issue is filled in with this. When the log is too long for that, only its last lines go in; Copy has all of it."
+translation = "La incidencia nueva se rellena con esto. Si el registro es demasiado largo, solo van sus últimas líneas; Copiar lo tiene todo."
+
+[messages.report-loading]
+source = "Gathering the report…"
+translation = "Reuniendo el informe…"
+
+[messages.report-log]
+source = "What the server logged lately"
+translation = "Lo que el servidor ha registrado últimamente"
+
+[messages.report-title]
+source = "Report a problem"
+translation = "Informar de un problema"
+
+[messages.report-what]
+source = "This is what an issue on GitHub needs for the problem to be looked into. Nothing private is in it: access tokens, passwords, keys, email addresses and your name in folder paths are taken out. Read it over before you send it."
+translation = "Esto es lo que necesita una incidencia en GitHub para poder investigar el problema. No contiene nada privado: se quitan los tokens de acceso, las contraseñas, las claves, las direcciones de correo y tu nombre en las rutas de carpetas. Revísalo antes de enviarlo."
 
 [messages.reset-label]
 source = "Reset to the default, { $value }"

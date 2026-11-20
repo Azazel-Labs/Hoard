@@ -92,6 +92,10 @@ translation = "Yerel yapay zekâ sunucusu için seçtiğiniz modeller, yapımcı
 source = "No license given"
 translation = "Lisans belirtilmemiş"
 
+[messages.about-report]
+source = "Report a problem…"
+translation = "Sorun bildir…"
+
 [messages.about-siglip]
 source = "Finds pictures by what’s in them."
 translation = "Resimleri içlerinde ne olduğuna göre bulur."
@@ -8022,6 +8026,46 @@ translation = "{ $name } ({ $files })"
 [messages.projects-use-more]
 source = "{ $count } more"
 translation = "{ $count } tane daha"
+
+[messages.report-close]
+source = "Close"
+translation = "Kapat"
+
+[messages.report-copied]
+source = "Copied the report."
+translation = "Rapor kopyalandı."
+
+[messages.report-copy]
+source = "Copy"
+translation = "Kopyala"
+
+[messages.report-failed]
+source = "The report couldn’t be gathered: { $error }"
+translation = "Rapor toplanamadı: { $error }"
+
+[messages.report-github]
+source = "Open an issue on GitHub"
+translation = "GitHub’da issue aç"
+
+[messages.report-github-hint]
+source = "The new issue is filled in with this. When the log is too long for that, only its last lines go in; Copy has all of it."
+translation = "Yeni issue bununla doldurulur. Günlük bunun için çok uzunsa yalnızca son satırları girer; Kopyala hepsini içerir."
+
+[messages.report-loading]
+source = "Gathering the report…"
+translation = "Rapor toplanıyor…"
+
+[messages.report-log]
+source = "What the server logged lately"
+translation = "Sunucunun son zamanlarda günlüğe yazdıkları"
+
+[messages.report-title]
+source = "Report a problem"
+translation = "Sorun bildir"
+
+[messages.report-what]
+source = "This is what an issue on GitHub needs for the problem to be looked into. Nothing private is in it: access tokens, passwords, keys, email addresses and your name in folder paths are taken out. Read it over before you send it."
+translation = "Sorunun incelenebilmesi için GitHub’daki bir issue’nun ihtiyaç duyduğu bilgiler bunlar. İçinde özel bir şey yok: erişim belirteçleri, parolalar, anahtarlar, e-posta adresleri ve klasör yollarındaki adınız çıkarılır. Göndermeden önce okuyun."
 
 [messages.reset-label]
 source = "Reset to the default, { $value }"

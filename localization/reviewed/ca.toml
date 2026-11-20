@@ -92,6 +92,10 @@ translation = "Els models que trieu per al servidor d’IA local tenen les llic�
 source = "No license given"
 translation = "Sense llicència indicada"
 
+[messages.about-report]
+source = "Report a problem…"
+translation = "Informa d’un problema…"
+
 [messages.about-siglip]
 source = "Finds pictures by what’s in them."
 translation = "Troba imatges pel que hi surt."
@@ -8185,6 +8189,46 @@ translation = "{ $name } ({ $files })"
 [messages.projects-use-more]
 source = "{ $count } more"
 translation = "{ $count } més"
+
+[messages.report-close]
+source = "Close"
+translation = "Tanca"
+
+[messages.report-copied]
+source = "Copied the report."
+translation = "S’ha copiat l’informe."
+
+[messages.report-copy]
+source = "Copy"
+translation = "Copia"
+
+[messages.report-failed]
+source = "The report couldn’t be gathered: { $error }"
+translation = "No s’ha pogut recollir l’informe: { $error }"
+
+[messages.report-github]
+source = "Open an issue on GitHub"
+translation = "Obre una incidència a GitHub"
+
+[messages.report-github-hint]
+source = "The new issue is filled in with this. When the log is too long for that, only its last lines go in; Copy has all of it."
+translation = "La incidència nova s’omple amb això. Si el registre hi és massa llarg, només s’hi posen les darreres línies; Copia ho té tot."
+
+[messages.report-loading]
+source = "Gathering the report…"
+translation = "S’està recollint l’informe…"
+
+[messages.report-log]
+source = "What the server logged lately"
+translation = "El que el servidor ha registrat darrerament"
+
+[messages.report-title]
+source = "Report a problem"
+translation = "Informa d’un problema"
+
+[messages.report-what]
+source = "This is what an issue on GitHub needs for the problem to be looked into. Nothing private is in it: access tokens, passwords, keys, email addresses and your name in folder paths are taken out. Read it over before you send it."
+translation = "Això és el que necessita una incidència a GitHub perquè s’hi pugui investigar el problema. No hi ha res privat: se’n treuen els testimonis d’accés, les contrasenyes, les claus, les adreces electròniques i el vostre nom als camins de carpeta. Repasseu-ho abans d’enviar-ho."
 
 [messages.reset-label]
 source = "Reset to the default, { $value }"

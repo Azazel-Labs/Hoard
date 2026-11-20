@@ -10,7 +10,8 @@ import type {
 import type {
   AccessToken, Account, AccountSource, ActivityItem, AuthConfig, AuthSettings, AuthStatus, CertCheck, ChatGptStatus,
   Connection, ExampleFile, FormatTrial, HttpsChange, HttpsStatus, IssuePick, Issues, LdapConfig, LdapTestResult,
-  LibraryLocation, LocalModels, LocationList, Maintenance, ModelInfo, NewLocation, OAuthConfig, Profile, Role,
+  LibraryLocation, LocalModels, LocationList, Maintenance, ModelInfo, NewLocation, OAuthConfig, ProblemReport, Profile,
+  Role,
   Settings, SettingsPatch, StoreFormats, UnreadFiles, UpdateHookCall, UpdateStatus,
 } from './types/server'
 
@@ -220,6 +221,8 @@ export const api = {
   activity: () => request<{ items: ActivityItem[] }>('/api/activity'),
   settings: () => request<Settings>('/api/admin/settings'),
   profile: (after: number) => request<Profile>(`/api/admin/profile?after=${after}`),
+  /** What an issue on GitHub needs for a problem to be looked into, with nothing private in it. */
+  report: () => request<ProblemReport>('/api/admin/report'),
   updateStatus: () => request<UpdateStatus>('/api/admin/update'),
   /** Call the update address now, to see that it's wired up. */
   callUpdateHook: () => request<UpdateHookCall>('/api/admin/update/hook', { method: 'POST' }),

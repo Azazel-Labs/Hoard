@@ -92,6 +92,10 @@ translation = "Modeller du väljer för den lokala AI-servern omfattas av sina s
 source = "No license given"
 translation = "Ingen licens angiven"
 
+[messages.about-report]
+source = "Report a problem…"
+translation = "Rapportera ett problem…"
+
 [messages.about-siglip]
 source = "Finds pictures by what’s in them."
 translation = "Hittar bilder utifrån vad som finns på dem."
@@ -8182,6 +8186,46 @@ translation = "{ $name } ({ $files })"
 [messages.projects-use-more]
 source = "{ $count } more"
 translation = "{ $count } till"
+
+[messages.report-close]
+source = "Close"
+translation = "Stäng"
+
+[messages.report-copied]
+source = "Copied the report."
+translation = "Rapporten har kopierats."
+
+[messages.report-copy]
+source = "Copy"
+translation = "Kopiera"
+
+[messages.report-failed]
+source = "The report couldn’t be gathered: { $error }"
+translation = "Rapporten kunde inte samlas: { $error }"
+
+[messages.report-github]
+source = "Open an issue on GitHub"
+translation = "Öppna ett issue på GitHub"
+
+[messages.report-github-hint]
+source = "The new issue is filled in with this. When the log is too long for that, only its last lines go in; Copy has all of it."
+translation = "Det nya issuet fylls i med detta. Är loggen för lång för det kommer bara de sista raderna med; Kopiera har allt."
+
+[messages.report-loading]
+source = "Gathering the report…"
+translation = "Samlar rapporten…"
+
+[messages.report-log]
+source = "What the server logged lately"
+translation = "Vad servern har loggat på sistone"
+
+[messages.report-title]
+source = "Report a problem"
+translation = "Rapportera ett problem"
+
+[messages.report-what]
+source = "This is what an issue on GitHub needs for the problem to be looked into. Nothing private is in it: access tokens, passwords, keys, email addresses and your name in folder paths are taken out. Read it over before you send it."
+translation = "Det här är vad ett issue på GitHub behöver för att problemet ska kunna undersökas. Inget privat finns med: åtkomsttoken, lösenord, nycklar, e-postadresser och ditt namn i mappsökvägar tas bort. Läs igenom det innan du skickar det."
 
 [messages.reset-label]
 source = "Reset to the default, { $value }"

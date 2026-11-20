@@ -1,0 +1,41 @@
+name: Report a problem
+description: Something in Hoard doesn’t work as it should.
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for telling us. In Hoard, **Settings → About → Report a problem** fills in the version, where it runs and
+        the server’s recent log for you, with nothing private in it.
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened?
+      description: And what you expected to happen instead. Screenshots help.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: How can it be made to happen again?
+      placeholder: |
+        1. Open …
+        2. Click …
+  - type: input
+    id: version
+    attributes:
+      label: Hoard version
+      description: Settings → About.
+      placeholder: 0.9.0
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Where it runs
+      placeholder: server on linux x86_64 (Docker)
+  - type: textarea
+    id: report
+    attributes:
+      label: Report from Hoard
+      description: From Settings → About → Report a problem.

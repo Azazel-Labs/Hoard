@@ -2622,6 +2622,17 @@ about-licenses-failed = 無法載入清單。
 about-filter = 依名稱或授權條款篩選
 about-count = { $shown } / { $total }
 about-no-license = 未註明授權條款
+about-report = 回報問題…
+report-title = 回報問題
+report-what = 這是 GitHub 上的 issue 調查問題所需的資訊。其中沒有任何隱私內容：存取權杖、密碼、金鑰、電子郵件地址以及資料夾路徑中的使用者名稱都會被移除。送出前請先讀過一遍。
+report-loading = 正在收集報告…
+report-failed = 無法收集報告：{ $error }
+report-log = 伺服器最近記錄的日誌
+report-copy = 複製
+report-copied = 已複製報告。
+report-github = 在 GitHub 上建立 issue
+report-github-hint = 新的 issue 會自動填入這些內容。日誌太長時只會放入最後幾行；「複製」包含全部內容。
+report-close = 關閉
 
 ## 素材類型
 

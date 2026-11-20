@@ -3045,6 +3045,17 @@ about-licenses-failed = Seznam se nepodařilo načíst.
 about-filter = Filtrovat podle názvu nebo licence
 about-count = { $shown } z { $total }
 about-no-license = Licence neuvedena
+about-report = Nahlásit problém…
+report-title = Nahlásit problém
+report-what = Toto potřebuje issue na GitHubu, aby se dal problém prošetřit. Není v tom nic soukromého: přístupové tokeny, hesla, klíče, e-mailové adresy a vaše jméno v cestách ke složkám jsou odstraněny. Před odesláním si to přečtěte.
+report-loading = Shromažďuje se hlášení…
+report-failed = Hlášení se nepodařilo shromáždit: { $error }
+report-log = Co server nedávno zaznamenal
+report-copy = Kopírovat
+report-copied = Hlášení zkopírováno.
+report-github = Otevřít issue na GitHubu
+report-github-hint = Nové issue se tímto vyplní. Když je na to záznam příliš dlouhý, vloží se jen jeho poslední řádky; Kopírovat obsahuje všechno.
+report-close = Zavřít
 
 ## Druhy assetů (api.ts)
 

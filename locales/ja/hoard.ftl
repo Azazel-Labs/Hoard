@@ -2616,6 +2616,17 @@ about-licenses-failed = 一覧を読み込めませんでした。
 about-filter = 名前またはライセンスで絞り込む
 about-count = { $shown } / { $total }
 about-no-license = ライセンスの記載なし
+about-report = 問題を報告…
+report-title = 問題を報告
+report-what = 問題を調べるために GitHub の issue に必要な情報です。個人的な情報は含まれません。アクセストークン、パスワード、キー、メールアドレス、フォルダーパス内のユーザー名は取り除かれます。送信する前に内容を確認してください。
+report-loading = レポートを集めています…
+report-failed = レポートを集められませんでした: { $error }
+report-log = サーバーの最近のログ
+report-copy = コピー
+report-copied = レポートをコピーしました。
+report-github = GitHub で issue を作成
+report-github-hint = 新しい issue にはこの内容が入力されます。ログが長すぎる場合は最後の数行だけが入ります。すべてはコピーで取得できます。
+report-close = 閉じる
 
 ## アセットの種類（api.ts）
 

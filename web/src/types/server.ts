@@ -477,6 +477,14 @@ export interface FormatTrial {
 export interface ExampleFile { path: string; text: string }
 
 /** GET /api/admin/update: whether a newer release is out and what's keeping the server busy. */
+/** Settings → About → Report a problem: the build, where it runs and what’s on, and the server’s last log lines. */
+export interface ProblemReport {
+  version: string
+  environment: string
+  facts: { name: string; value: string }[]
+  log: string[]
+}
+
 export interface UpdateStatus {
   version: string
   update: { version: string; url: string } | null

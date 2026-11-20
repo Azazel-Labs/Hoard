@@ -2643,6 +2643,17 @@ about-licenses-failed = A listát nem sikerült betölteni.
 about-filter = Szűrés név vagy licenc szerint
 about-count = { $shown } / { $total }
 about-no-license = Nincs megadott licenc
+about-report = Probléma jelentése…
+report-title = Probléma jelentése
+report-what = Ennyi kell egy GitHub-issue-hoz, hogy a problémát ki lehessen vizsgálni. Semmi személyes nincs benne: a hozzáférési tokeneket, jelszavakat, kulcsokat, e-mail-címeket és a nevedet a mappaútvonalakban eltávolítjuk. Küldés előtt olvasd át.
+report-loading = A jelentés összeállítása…
+report-failed = A jelentést nem sikerült összeállítani: { $error }
+report-log = Amit a szerver az utóbbi időben naplózott
+report-copy = Másolás
+report-copied = A jelentés kimásolva.
+report-github = Issue nyitása a GitHubon
+report-github-hint = Az új issue ezzel lesz kitöltve. Ha a napló ehhez túl hosszú, csak az utolsó sorai kerülnek bele; a Másolás mindent tartalmaz.
+report-close = Bezárás
 
 ## Assettípusok (api.ts)
 

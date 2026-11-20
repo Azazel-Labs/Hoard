@@ -92,6 +92,10 @@ translation = "Modellen die je kiest voor de lokale AI-server vallen onder de li
 source = "No license given"
 translation = "Geen licentie opgegeven"
 
+[messages.about-report]
+source = "Report a problem…"
+translation = "Een probleem melden…"
+
 [messages.about-siglip]
 source = "Finds pictures by what’s in them."
 translation = "Vindt afbeeldingen op basis van wat erop staat."
@@ -8182,6 +8186,46 @@ translation = "{ $name } ({ $files })"
 [messages.projects-use-more]
 source = "{ $count } more"
 translation = "nog { $count }"
+
+[messages.report-close]
+source = "Close"
+translation = "Sluiten"
+
+[messages.report-copied]
+source = "Copied the report."
+translation = "Rapport gekopieerd."
+
+[messages.report-copy]
+source = "Copy"
+translation = "Kopiëren"
+
+[messages.report-failed]
+source = "The report couldn’t be gathered: { $error }"
+translation = "Het rapport kon niet worden verzameld: { $error }"
+
+[messages.report-github]
+source = "Open an issue on GitHub"
+translation = "Een issue openen op GitHub"
+
+[messages.report-github-hint]
+source = "The new issue is filled in with this. When the log is too long for that, only its last lines go in; Copy has all of it."
+translation = "Het nieuwe issue wordt hiermee ingevuld. Is het logboek daarvoor te lang, dan gaan alleen de laatste regels mee; Kopiëren heeft alles."
+
+[messages.report-loading]
+source = "Gathering the report…"
+translation = "Rapport wordt verzameld…"
+
+[messages.report-log]
+source = "What the server logged lately"
+translation = "Wat de server onlangs heeft gelogd"
+
+[messages.report-title]
+source = "Report a problem"
+translation = "Een probleem melden"
+
+[messages.report-what]
+source = "This is what an issue on GitHub needs for the problem to be looked into. Nothing private is in it: access tokens, passwords, keys, email addresses and your name in folder paths are taken out. Read it over before you send it."
+translation = "Dit heeft een issue op GitHub nodig om het probleem te kunnen onderzoeken. Er staat niets privés in: toegangstokens, wachtwoorden, sleutels, e-mailadressen en je naam in mappaden worden eruit gehaald. Lees het door voordat je het verstuurt."
 
 [messages.reset-label]
 source = "Reset to the default, { $value }"

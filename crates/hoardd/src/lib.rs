@@ -78,6 +78,7 @@ mod previews;
 mod profiler;
 mod projects;
 mod provenance;
+mod recent_log;
 mod reformat;
 mod relocate;
 mod rhythm;
@@ -127,6 +128,7 @@ use tower_http::trace::TraceLayer;
 use crate::blobs::BlobStore;
 pub use crate::config::Config;
 pub use crate::desktop::{launch_url, listening, shut_down};
+pub use crate::recent_log::layer as recent_log;
 
 #[derive(Debug)]
 pub(crate) struct Inner {
@@ -158,13 +160,18 @@ pub(crate) struct Inner {
 
 pub(crate) type AppState = Arc<Inner>;
 
-/// Which build this is, where it runs and the SQLite it has.
-fn log_build(cfg: &Config) {
-    let edition = match (cfg.steam_app, cfg.desktop) {
+/// Which build this is.
+pub(crate) fn edition(cfg: &Config) -> &'static str {
+    match (cfg.steam_app, cfg.desktop) {
         (Some(_), _) => "desktop app from Steam",
         (None, true) => "desktop app",
         (None, false) => "server",
-    };
+    }
+}
+
+/// Which build this is, where it runs and the SQLite it has.
+fn log_build(cfg: &Config) {
+    let edition = edition(cfg);
     tracing::info!(
         version = hoard_core::VERSION,
         edition,

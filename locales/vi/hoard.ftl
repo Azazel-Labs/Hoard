@@ -2616,6 +2616,17 @@ about-licenses-failed = Không tải được danh sách.
 about-filter = Lọc theo tên hoặc giấy phép
 about-count = { $shown } / { $total }
 about-no-license = Không ghi giấy phép
+about-report = Báo cáo sự cố…
+report-title = Báo cáo sự cố
+report-what = Đây là những gì một issue trên GitHub cần để sự cố được xem xét. Không có gì riêng tư trong đó: token truy cập, mật khẩu, khóa, địa chỉ email và tên của bạn trong đường dẫn thư mục đều được loại bỏ. Hãy đọc lại trước khi gửi.
+report-loading = Đang thu thập báo cáo…
+report-failed = Không thể thu thập báo cáo: { $error }
+report-log = Những gì máy chủ ghi nhật ký gần đây
+report-copy = Sao chép
+report-copied = Đã sao chép báo cáo.
+report-github = Mở issue trên GitHub
+report-github-hint = Issue mới được điền sẵn bằng nội dung này. Nếu nhật ký quá dài, chỉ những dòng cuối được đưa vào; Sao chép có tất cả.
+report-close = Đóng
 
 ## Loại tài nguyên (api.ts)
 

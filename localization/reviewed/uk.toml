@@ -92,6 +92,10 @@ translation = "На моделі, які ви обираєте для локал
 source = "No license given"
 translation = "Ліцензію не вказано"
 
+[messages.about-report]
+source = "Report a problem…"
+translation = "Повідомити про проблему…"
+
 [messages.about-siglip]
 source = "Finds pictures by what’s in them."
 translation = "Знаходить зображення за тим, що на них."
@@ -8389,6 +8393,46 @@ translation = "{ $name } ({ $files })"
 [messages.projects-use-more]
 source = "{ $count } more"
 translation = "ще { $count }"
+
+[messages.report-close]
+source = "Close"
+translation = "Закрити"
+
+[messages.report-copied]
+source = "Copied the report."
+translation = "Звіт скопійовано."
+
+[messages.report-copy]
+source = "Copy"
+translation = "Копіювати"
+
+[messages.report-failed]
+source = "The report couldn’t be gathered: { $error }"
+translation = "Не вдалося зібрати звіт: { $error }"
+
+[messages.report-github]
+source = "Open an issue on GitHub"
+translation = "Відкрити issue на GitHub"
+
+[messages.report-github-hint]
+source = "The new issue is filled in with this. When the log is too long for that, only its last lines go in; Copy has all of it."
+translation = "Новий issue заповнюється цим. Якщо журнал задовгий, туди потрапляють лише останні рядки; у «Копіювати» є все."
+
+[messages.report-loading]
+source = "Gathering the report…"
+translation = "Збирання звіту…"
+
+[messages.report-log]
+source = "What the server logged lately"
+translation = "Що сервер нещодавно записав у журнал"
+
+[messages.report-title]
+source = "Report a problem"
+translation = "Повідомити про проблему"
+
+[messages.report-what]
+source = "This is what an issue on GitHub needs for the problem to be looked into. Nothing private is in it: access tokens, passwords, keys, email addresses and your name in folder paths are taken out. Read it over before you send it."
+translation = "Це те, що потрібно issue на GitHub, щоб проблему можна було дослідити. Нічого приватного тут немає: токени доступу, паролі, ключі, адреси електронної пошти та ваше ім’я в шляхах до тек вилучаються. Перечитайте перед надсиланням."
 
 [messages.reset-label]
 source = "Reset to the default, { $value }"

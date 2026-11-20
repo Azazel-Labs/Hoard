@@ -314,7 +314,13 @@ fn log_to(dir: &Path) {
         .unwrap_or_else(|_| tracing_subscriber::EnvFilter::new("info,tower_http=warn"));
     let file = std::fs::create_dir_all(dir).ok().and_then(|()| log_file(&dir.join("hoard.log")).ok());
     let file_layer = file.map(|f| tracing_subscriber::fmt::layer().with_ansi(false).with_writer(Mutex::new(f)));
-    tracing_subscriber::registry().with(filter).with(tracing_subscriber::fmt::layer()).with(file_layer).try_init().ok();
+    tracing_subscriber::registry()
+        .with(filter)
+        .with(tracing_subscriber::fmt::layer())
+        .with(file_layer)
+        .with(hoardd::recent_log())
+        .try_init()
+        .ok();
 }
 
 fn log_file(path: &Path) -> std::io::Result<File> {

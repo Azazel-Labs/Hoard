@@ -92,6 +92,10 @@ translation = "Modely, které vyberete pro místní server AI, mají licence sv�
 source = "No license given"
 translation = "Licence neuvedena"
 
+[messages.about-report]
+source = "Report a problem…"
+translation = "Nahlásit problém…"
+
 [messages.about-siglip]
 source = "Finds pictures by what’s in them."
 translation = "Hledá obrázky podle toho, co na nich je."
@@ -8322,6 +8326,46 @@ translation = """
         [few] { $count } další
        *[other] { $count } dalších
     }"""
+
+[messages.report-close]
+source = "Close"
+translation = "Zavřít"
+
+[messages.report-copied]
+source = "Copied the report."
+translation = "Hlášení zkopírováno."
+
+[messages.report-copy]
+source = "Copy"
+translation = "Kopírovat"
+
+[messages.report-failed]
+source = "The report couldn’t be gathered: { $error }"
+translation = "Hlášení se nepodařilo shromáždit: { $error }"
+
+[messages.report-github]
+source = "Open an issue on GitHub"
+translation = "Otevřít issue na GitHubu"
+
+[messages.report-github-hint]
+source = "The new issue is filled in with this. When the log is too long for that, only its last lines go in; Copy has all of it."
+translation = "Nové issue se tímto vyplní. Když je na to záznam příliš dlouhý, vloží se jen jeho poslední řádky; Kopírovat obsahuje všechno."
+
+[messages.report-loading]
+source = "Gathering the report…"
+translation = "Shromažďuje se hlášení…"
+
+[messages.report-log]
+source = "What the server logged lately"
+translation = "Co server nedávno zaznamenal"
+
+[messages.report-title]
+source = "Report a problem"
+translation = "Nahlásit problém"
+
+[messages.report-what]
+source = "This is what an issue on GitHub needs for the problem to be looked into. Nothing private is in it: access tokens, passwords, keys, email addresses and your name in folder paths are taken out. Read it over before you send it."
+translation = "Toto potřebuje issue na GitHubu, aby se dal problém prošetřit. Není v tom nic soukromého: přístupové tokeny, hesla, klíče, e-mailové adresy a vaše jméno v cestách ke složkám jsou odstraněny. Před odesláním si to přečtěte."
 
 [messages.reset-label]
 source = "Reset to the default, { $value }"

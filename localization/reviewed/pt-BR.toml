@@ -92,6 +92,10 @@ translation = "Os modelos que você escolher para o servidor de IA local seguem 
 source = "No license given"
 translation = "Nenhuma licença informada"
 
+[messages.about-report]
+source = "Report a problem…"
+translation = "Relatar um problema…"
+
 [messages.about-siglip]
 source = "Finds pictures by what’s in them."
 translation = "Encontra imagens pelo que aparece nelas."
@@ -8188,6 +8192,46 @@ translation = "{ $name } ({ $files })"
 [messages.projects-use-more]
 source = "{ $count } more"
 translation = "mais { $count }"
+
+[messages.report-close]
+source = "Close"
+translation = "Fechar"
+
+[messages.report-copied]
+source = "Copied the report."
+translation = "Relatório copiado."
+
+[messages.report-copy]
+source = "Copy"
+translation = "Copiar"
+
+[messages.report-failed]
+source = "The report couldn’t be gathered: { $error }"
+translation = "Não foi possível reunir o relatório: { $error }"
+
+[messages.report-github]
+source = "Open an issue on GitHub"
+translation = "Abrir uma issue no GitHub"
+
+[messages.report-github-hint]
+source = "The new issue is filled in with this. When the log is too long for that, only its last lines go in; Copy has all of it."
+translation = "A nova issue é preenchida com isto. Se o log for longo demais, só as últimas linhas entram; Copiar tem tudo."
+
+[messages.report-loading]
+source = "Gathering the report…"
+translation = "Reunindo o relatório…"
+
+[messages.report-log]
+source = "What the server logged lately"
+translation = "O que o servidor registrou recentemente"
+
+[messages.report-title]
+source = "Report a problem"
+translation = "Relatar um problema"
+
+[messages.report-what]
+source = "This is what an issue on GitHub needs for the problem to be looked into. Nothing private is in it: access tokens, passwords, keys, email addresses and your name in folder paths are taken out. Read it over before you send it."
+translation = "Isto é o que uma issue no GitHub precisa para o problema ser investigado. Não há nada privado: tokens de acesso, senhas, chaves, endereços de e-mail e seu nome nos caminhos de pastas são removidos. Leia antes de enviar."
 
 [messages.reset-label]
 source = "Reset to the default, { $value }"

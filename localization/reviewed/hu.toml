@@ -92,6 +92,10 @@ translation = "A helyi MI-szerverhez választott modellekre készítőik licence
 source = "No license given"
 translation = "Nincs megadott licenc"
 
+[messages.about-report]
+source = "Report a problem…"
+translation = "Probléma jelentése…"
+
 [messages.about-siglip]
 source = "Finds pictures by what’s in them."
 translation = "Képeket keres aszerint, hogy mi van rajtuk."
@@ -8018,6 +8022,46 @@ translation = "{ $name } ({ $files })"
 [messages.projects-use-more]
 source = "{ $count } more"
 translation = "további { $count }"
+
+[messages.report-close]
+source = "Close"
+translation = "Bezárás"
+
+[messages.report-copied]
+source = "Copied the report."
+translation = "A jelentés kimásolva."
+
+[messages.report-copy]
+source = "Copy"
+translation = "Másolás"
+
+[messages.report-failed]
+source = "The report couldn’t be gathered: { $error }"
+translation = "A jelentést nem sikerült összeállítani: { $error }"
+
+[messages.report-github]
+source = "Open an issue on GitHub"
+translation = "Issue nyitása a GitHubon"
+
+[messages.report-github-hint]
+source = "The new issue is filled in with this. When the log is too long for that, only its last lines go in; Copy has all of it."
+translation = "Az új issue ezzel lesz kitöltve. Ha a napló ehhez túl hosszú, csak az utolsó sorai kerülnek bele; a Másolás mindent tartalmaz."
+
+[messages.report-loading]
+source = "Gathering the report…"
+translation = "A jelentés összeállítása…"
+
+[messages.report-log]
+source = "What the server logged lately"
+translation = "Amit a szerver az utóbbi időben naplózott"
+
+[messages.report-title]
+source = "Report a problem"
+translation = "Probléma jelentése"
+
+[messages.report-what]
+source = "This is what an issue on GitHub needs for the problem to be looked into. Nothing private is in it: access tokens, passwords, keys, email addresses and your name in folder paths are taken out. Read it over before you send it."
+translation = "Ennyi kell egy GitHub-issue-hoz, hogy a problémát ki lehessen vizsgálni. Semmi személyes nincs benne: a hozzáférési tokeneket, jelszavakat, kulcsokat, e-mail-címeket és a nevedet a mappaútvonalakban eltávolítjuk. Küldés előtt olvasd át."
 
 [messages.reset-label]
 source = "Reset to the default, { $value }"

@@ -2647,6 +2647,17 @@ about-licenses-failed = Liste yüklenemedi.
 about-filter = Ada veya lisansa göre süzün
 about-count = { $shown } / { $total }
 about-no-license = Lisans belirtilmemiş
+about-report = Sorun bildir…
+report-title = Sorun bildir
+report-what = Sorunun incelenebilmesi için GitHub’daki bir issue’nun ihtiyaç duyduğu bilgiler bunlar. İçinde özel bir şey yok: erişim belirteçleri, parolalar, anahtarlar, e-posta adresleri ve klasör yollarındaki adınız çıkarılır. Göndermeden önce okuyun.
+report-loading = Rapor toplanıyor…
+report-failed = Rapor toplanamadı: { $error }
+report-log = Sunucunun son zamanlarda günlüğe yazdıkları
+report-copy = Kopyala
+report-copied = Rapor kopyalandı.
+report-github = GitHub’da issue aç
+report-github-hint = Yeni issue bununla doldurulur. Günlük bunun için çok uzunsa yalnızca son satırları girer; Kopyala hepsini içerir.
+report-close = Kapat
 
 ## Asset kinds (api.ts)
 

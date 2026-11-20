@@ -2818,6 +2818,17 @@ about-licenses-failed = Kunne ikke laste inn listen.
 about-filter = Filtrer etter navn eller lisens
 about-count = { $shown } av { $total }
 about-no-license = Ingen lisens oppgitt
+about-report = Rapporter et problem…
+report-title = Rapporter et problem
+report-what = Dette er det et issue på GitHub trenger for at problemet skal kunne undersøkes. Ingenting privat er med: tilgangstokener, passord, nøkler, e-postadresser og navnet ditt i mappestier er fjernet. Les gjennom før du sender det.
+report-loading = Samler rapporten…
+report-failed = Rapporten kunne ikke samles: { $error }
+report-log = Hva serveren har logget i det siste
+report-copy = Kopier
+report-copied = Rapporten er kopiert.
+report-github = Opprett et issue på GitHub
+report-github-hint = Det nye issuet fylles ut med dette. Er loggen for lang for det, kommer bare de siste linjene med; Kopier har alt.
+report-close = Lukk
 
 ## Ressurstyper (api.ts)
 

@@ -3177,6 +3177,21 @@ about-filter = Filter by name or license
 # How many libraries the filter leaves, of all of them.
 about-count = { $shown } of { $total }
 about-no-license = No license given
+about-report = Report a problem…
+
+## Report a problem (ReportDialog.vue)
+
+report-title = Report a problem
+report-what = This is what an issue on GitHub needs for the problem to be looked into. Nothing private is in it: access tokens, passwords, keys, email addresses and your name in folder paths are taken out. Read it over before you send it.
+report-loading = Gathering the report…
+# $error is why, as the server said it.
+report-failed = The report couldn’t be gathered: { $error }
+report-log = What the server logged lately
+report-copy = Copy
+report-copied = Copied the report.
+report-github = Open an issue on GitHub
+report-github-hint = The new issue is filled in with this. When the log is too long for that, only its last lines go in; Copy has all of it.
+report-close = Close
 
 ## Asset kinds (api.ts)
 

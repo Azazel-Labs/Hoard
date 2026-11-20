@@ -1,6 +1,7 @@
 //! The Hoard asset server, as a library: [`run`] serves a library from a [`Config`]. The `hoardd` binary runs it
 //! from the command line, and the desktop app runs it inside its window.
 
+mod achievements;
 mod activity;
 mod alternates;
 mod analyze;
@@ -125,6 +126,7 @@ use tower_http::compression::predicate::{DefaultPredicate, NotForContentType, Pr
 use tower_http::services::{ServeDir, ServeFile};
 use tower_http::trace::TraceLayer;
 
+pub use crate::achievements::{all as achievements, on_achievement};
 use crate::blobs::BlobStore;
 pub use crate::config::Config;
 pub use crate::desktop::{launch_url, listening, shut_down};
@@ -256,6 +258,7 @@ pub async fn run(cfg: Config) -> Result<()> {
         near_copies: nearcopies::Cache::default(),
         skeletons: animations::Skeletons::default(),
     });
+    achievements::start(&state).await;
     tokio::spawn(signin::recheck_loop(Arc::clone(&state)));
     tokio::spawn(uploads::sweep_loop(Arc::clone(&state)));
     tokio::spawn(api::keep_reports(Arc::clone(&state)));
@@ -274,14 +277,10 @@ pub async fn run(cfg: Config) -> Result<()> {
     analyze::warm_renderer();
     jobs::spawn_workers(&state);
     motion::kick(&state);
-    {
-        let state = Arc::clone(&state);
-        tokio::spawn(async move { takes::backfill(&state).await });
-    }
-    {
-        let st = Arc::clone(&state);
-        tokio::spawn(async move { looks::schedule(&st).await });
-    }
+    let st = Arc::clone(&state);
+    tokio::spawn(async move { takes::backfill(&st).await });
+    let st = Arc::clone(&state);
+    tokio::spawn(async move { looks::schedule(&st).await });
     {
         let st = Arc::clone(&state);
         tokio::spawn(async move {

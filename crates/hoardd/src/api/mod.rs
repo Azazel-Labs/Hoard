@@ -182,6 +182,8 @@ pub(crate) fn router(state: &AppState) -> Router<AppState> {
         .merge(edits)
         .merge(admin)
         .merge(own)
+        // The first time each tool is used earns its achievement.
+        .route_layer(middleware::from_fn(crate::achievements::watch))
 }
 
 /// Holds an upload to the "Largest upload" setting as it is now: refused up front when it says it's bigger, and

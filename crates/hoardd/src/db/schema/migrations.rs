@@ -895,4 +895,6 @@ pub(in crate::db) const MIGRATIONS: &[&str] = &[
     // Settings → Issues looked for both each time it was opened.
     "CREATE INDEX blobs_bad ON blobs (hash) WHERE status <> 'ok';
      CREATE INDEX unreal_status_failed ON unreal_status (updated_at) WHERE status = 'failed';",
+    // 85: the achievements earned, handed again at each start to whatever embeds the server and passes them on.
+    "CREATE TABLE achievements (id TEXT PRIMARY KEY, unlocked_at TEXT NOT NULL) WITHOUT ROWID;",
 ];

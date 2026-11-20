@@ -1,5 +1,7 @@
 //! Search: the filters a query becomes, full-text and look-ranked, and folder browsing.
 
+use std::sync::Arc;
+
 use anyhow::Result;
 use hoard_core::{Asset, Facet, SearchQuery};
 use rusqlite::types::Value as SqlValue;
@@ -507,20 +509,67 @@ fn keep_counts(key: String, writes: u64, counts: &Counts) {
 /// Tags in use and how many assets have each, most used first: those starting with `prefix`, or with `anywhere`
 /// those containing it.
 pub(crate) fn tag_counts(conn: &Connection, prefix: &str, anywhere: bool, limit: u32) -> Result<Vec<Facet>> {
-    let lead = if anywhere { "'%' || " } else { "" };
-    let mut stmt = conn.prepare(&format!(
-        "SELECT tag, COUNT(*) FROM asset_tags WHERE tag LIKE {lead}?1 || '%' ESCAPE '\\'
-           AND asset_id IN (SELECT a.id FROM assets a WHERE {LIVE})
-         GROUP BY tag ORDER BY 2 DESC, 1 LIMIT ?2",
-    ))?;
-    let escaped = prefix.replace('\\', "\\\\").replace('%', "\\%").replace('_', "\\_");
-    let rows = stmt
-        .query_map(params![escaped, i64::from(limit)], |r| {
-            Ok(Facet { value: r.get(0)?, count: r.get::<_, i64>(1)? as u64 })
-        })?
-        .collect::<rusqlite::Result<Vec<_>>>()?;
-    Ok(rows)
+    // Read before counting, so a write while counting leaves them stale.
+    let writes = super::writes();
+    // An in-memory library (a test's) has no [`super::WRITES`] kept for it.
+    let path = conn.path().filter(|p| !p.is_empty());
+    let kept = path.and_then(|path| {
+        let kept = TAG_COUNTS.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
+        kept.as_ref().filter(|(p, at, _)| p == path && *at == writes).map(|(_, _, all)| Arc::clone(all))
+    });
+    let all = if let Some(all) = kept {
+        all
+    } else {
+        let all = Arc::new(count_tags(conn)?);
+        if let Some(path) = path {
+            *TAG_COUNTS.lock().unwrap_or_else(std::sync::PoisonError::into_inner) =
+                Some((path.to_owned(), writes, Arc::clone(&all)));
+        }
+        all
+    };
+    let prefix = prefix.to_lowercase();
+    Ok(all
+        .iter()
+        .filter(|t| {
+            let tag = t.value.to_lowercase();
+            if anywhere { tag.contains(&prefix) } else { tag.starts_with(&prefix) }
+        })
+        .take(limit as usize)
+        .cloned()
+        .collect())
 }
+
+/// Every tag on an asset in the library (not the archive) and how many have it, most used first. All are counted along
+/// the tags' index, without going to the assets, and the archive's taken off after: it holds far fewer.
+fn count_tags(conn: &Connection) -> Result<Vec<Facet>> {
+    let mut counts: std::collections::HashMap<String, i64> = std::collections::HashMap::new();
+    let all = "SELECT tag, COUNT(*) FROM asset_tags GROUP BY tag";
+    let archived = "SELECT tag, COUNT(*) FROM asset_tags WHERE asset_id IN (
+                      SELECT id FROM assets WHERE archived_at IS NOT NULL
+                      UNION ALL
+                      SELECT a.id FROM packs p JOIN assets a ON a.pack_id = p.id
+                       WHERE p.archived_at IS NOT NULL AND a.archived_at IS NULL)
+                    GROUP BY tag";
+    for (sql, sign) in [(all, 1), (archived, -1)] {
+        let mut stmt = conn.prepare_cached(sql)?;
+        let mut rows = stmt.query([])?;
+        while let Some(r) = rows.next()? {
+            *counts.entry(r.get(0)?).or_default() += sign * r.get::<_, i64>(1)?;
+        }
+    }
+    let mut tags: Vec<Facet> =
+        counts.into_iter().filter(|(_, n)| *n > 0).map(|(value, n)| Facet { value, count: n as u64 }).collect();
+    tags.sort_by(|a, b| b.count.cmp(&a.count).then_with(|| a.value.cmp(&b.value)));
+    Ok(tags)
+}
+
+/// Every tag in use and how many assets have each, most used first, with the library's path and how many writes it
+/// had had when they were counted: suggesting tags as a name is typed went through all of every asset's tags for each
+/// letter, while there are only a few hundred tags.
+static TAG_COUNTS: std::sync::Mutex<Option<KeptTags>> = std::sync::Mutex::new(None);
+
+/// The library's path, its write count and [`TAG_COUNTS`]' tags.
+type KeptTags = (String, u64, Arc<Vec<Facet>>);
 
 #[cfg(test)]
 mod tests {
@@ -800,5 +849,16 @@ mod tests {
             true,
             Some(&look),
         );
+        let started = std::time::Instant::now();
+        let packs = crate::db::list_packs(&conn, crate::db::Packs::Library).unwrap();
+        println!("the pack list: {} in {:.1?}", packs.len(), started.elapsed());
+        let started = std::time::Instant::now();
+        let p0 = crate::db::get_pack(&conn, "p0").unwrap().unwrap();
+        println!("a big pack's card: {} assets in {:.1?}", p0.asset_count, started.elapsed());
+        for (prefix, anywhere) in [("", false), ("co", false), ("lo", true), ("co", false)] {
+            let started = std::time::Instant::now();
+            let tags = tag_counts(&conn, prefix, anywhere, 12).unwrap();
+            println!("tags like {prefix:?}: {} in {:.1?}", tags.len(), started.elapsed());
+        }
     }
 }

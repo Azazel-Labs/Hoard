@@ -848,4 +848,47 @@ pub(in crate::db) const MIGRATIONS: &[&str] = &[
          CREATE INDEX assets_fts_row ON assets (fts_row);
          CREATE INDEX blobs_size ON blobs (size);"
     ),
+    // 83: how many assets of each kind a pack has, their bytes and how many are Unreal packages, kept by the assets
+    // as they come and go: the pack list counted them all again for every pack each time it was shown. And an index
+    // to pick a pack's cover from (`db::list_packs`).
+    "CREATE TABLE pack_kinds (
+         pack_id TEXT NOT NULL,
+         kind    TEXT NOT NULL,
+         assets  INTEGER NOT NULL,
+         bytes   INTEGER NOT NULL,
+         unreal  INTEGER NOT NULL,
+         PRIMARY KEY (pack_id, kind)
+     ) WITHOUT ROWID;
+     INSERT INTO pack_kinds (pack_id, kind, assets, bytes, unreal)
+       SELECT a.pack_id, a.kind, COUNT(*), COALESCE(SUM(b.size), 0), SUM(a.ext IN ('uasset', 'umap'))
+         FROM assets a LEFT JOIN blobs b ON b.hash = a.blob_hash GROUP BY a.pack_id, a.kind;
+     CREATE TRIGGER pack_kinds_added AFTER INSERT ON assets BEGIN
+         INSERT INTO pack_kinds (pack_id, kind, assets, bytes, unreal)
+           VALUES (new.pack_id, new.kind, 1, COALESCE((SELECT size FROM blobs WHERE hash = new.blob_hash), 0),
+                   new.ext IN ('uasset', 'umap'))
+           ON CONFLICT (pack_id, kind) DO UPDATE SET
+             assets = assets + 1, bytes = bytes + excluded.bytes, unreal = unreal + excluded.unreal;
+     END;
+     CREATE TRIGGER pack_kinds_gone AFTER DELETE ON assets BEGIN
+         UPDATE pack_kinds SET assets = assets - 1,
+             bytes = bytes - COALESCE((SELECT size FROM blobs WHERE hash = old.blob_hash), 0),
+             unreal = unreal - (old.ext IN ('uasset', 'umap'))
+           WHERE pack_id = old.pack_id AND kind = old.kind;
+         DELETE FROM pack_kinds WHERE pack_id = old.pack_id AND kind = old.kind AND assets <= 0;
+     END;
+     CREATE TRIGGER pack_kinds_changed AFTER UPDATE OF pack_id, kind, blob_hash, ext ON assets
+       WHEN old.pack_id IS NOT new.pack_id OR old.kind IS NOT new.kind OR old.blob_hash IS NOT new.blob_hash
+         OR old.ext IS NOT new.ext BEGIN
+         UPDATE pack_kinds SET assets = assets - 1,
+             bytes = bytes - COALESCE((SELECT size FROM blobs WHERE hash = old.blob_hash), 0),
+             unreal = unreal - (old.ext IN ('uasset', 'umap'))
+           WHERE pack_id = old.pack_id AND kind = old.kind;
+         DELETE FROM pack_kinds WHERE pack_id = old.pack_id AND kind = old.kind AND assets <= 0;
+         INSERT INTO pack_kinds (pack_id, kind, assets, bytes, unreal)
+           VALUES (new.pack_id, new.kind, 1, COALESCE((SELECT size FROM blobs WHERE hash = new.blob_hash), 0),
+                   new.ext IN ('uasset', 'umap'))
+           ON CONFLICT (pack_id, kind) DO UPDATE SET
+             assets = assets + 1, bytes = bytes + excluded.bytes, unreal = unreal + excluded.unreal;
+     END;
+     CREATE INDEX assets_cover ON assets (pack_id, kind, path) WHERE thumb_hash IS NOT NULL;",
 ];

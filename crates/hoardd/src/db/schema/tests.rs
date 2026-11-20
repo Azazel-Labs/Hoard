@@ -507,6 +507,8 @@ fn packs_face_their_models_forward_until_turned() {
     assert!(pack_facing(&conn, "p1").unwrap().is_upright());
     conn.execute("UPDATE packs SET model_turn = 180, model_tilt = 270 WHERE id = 'p1'", []).unwrap();
     assert_eq!(pack_facing(&conn, "p1").unwrap(), hoard_core::Facing { turn: 180, tilt: 270 });
+    // A pack's card counts what it holds from what later steps keep.
+    migrate(&mut conn, &dir.path().join("backups"), MIGRATIONS).unwrap();
     assert_eq!(get_pack(&conn, "p1").unwrap().unwrap().facing.turn, 180);
     assert!(pack_facing(&conn, "missing").unwrap().is_upright());
 }

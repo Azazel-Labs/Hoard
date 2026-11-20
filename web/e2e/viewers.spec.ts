@@ -17,6 +17,9 @@ test.describe('full-screen viewers', () => {
     await expect(viewer).toBeHidden()
     const panel = page.getByRole('complementary', { name: 'Asset details' })
     await expect(panel.getByRole('heading', { name: 'Brick wall' })).toBeVisible()
+    // The panel trades its stretched thumbnail for the picture's light preview.
+    await expect(panel.locator('button.zoomable img')).toHaveAttribute('src', /\/lite$/)
+    await expect(panel.locator('button.zoomable .spinner')).toHaveCount(0)
     await page.keyboard.press('Escape')
     await expect(panel).toHaveCount(0)
   })
@@ -296,6 +299,33 @@ test.describe('full-screen viewers', () => {
     await expect(viewer.getByRole('group', { name: 'Show as' })).toHaveCount(0)
     await page.keyboard.press('Escape')
     await expect(viewer).toBeHidden()
+  })
+
+  test('a file of no known kind that is plainly text reads as text', async ({ page, api }) => {
+    test.setTimeout(90_000)
+    const name = `E2E Sniffed ${unique()}`
+    const pack = await uploadPack(api, name, [
+      { relpath: 'Visit Kenney.url', data: Buffer.from('[InternetShortcut]\r\nURL=https://kenney.nl/\r\n') },
+      { relpath: 'CREDITS', data: Buffer.from('Made by the e2e crew.\nThanks for playing.\n') },
+      { relpath: 'level.bin3', data: Buffer.from([0x00, 0x01, 0x02, 0x03, 0xff, 0xfe, 0x10, 0x00]) },
+    ])
+    try {
+      await waitReady(api, [pack.id])
+      const all = await assetsOf(api, pack.id)
+      const kind = (p: string) => all.find((a) => a.path === p)?.kind
+      expect([kind('Visit Kenney.url'), kind('CREDITS'), kind('level.bin3')]).toEqual(['document', 'document', 'other'])
+      const credits = all.find((a) => a.path === 'CREDITS')!
+      expect(((await (await api.get(`/api/assets/${credits.id}`)).json()) as { has_thumb: boolean }).has_thumb).toBe(true)
+      await openPack(page, pack.id, name)
+      await doubleClick(page, tile(page, credits.name))
+      const viewer = page.getByRole('dialog', { name: `Read ${credits.name}` })
+      await expect(viewer.getByLabel(`${credits.name} contents`)).toContainText('Made by the e2e crew.')
+      await page.keyboard.press('Escape')
+      await expect(viewer).toBeHidden()
+    } finally {
+      await api.post('/api/archive', { data: { packs: [pack.id] } })
+      await api.post('/api/archive/purge', { data: { packs: [pack.id] } })
+    }
   })
 
   test('markdown reads as a document, in the panel and full screen, and shows its source on request', async ({ page, api }) => {

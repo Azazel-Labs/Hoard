@@ -296,6 +296,9 @@ pub async fn run(cfg: Config) -> Result<()> {
             if let Err(e) = text_thumbs::draw_missing(&st).await {
                 tracing::warn!(error = %format!("{e:#}"), "could not draw the thumbnails of text added before Hoard drew them");
             }
+            if let Err(e) = text_thumbs::sniff_others(&st).await {
+                tracing::warn!(error = %format!("{e:#}"), "could not look for text among files of no known kind");
+            }
         });
     }
     scan::spawn_rescans(&state);

@@ -88,7 +88,7 @@ const EXTS: &[(Lang, &[&str])] = &[
     (Lang::Lua, &["lua"]),
     (Lang::Json, &["json", "ldtk", "shadergraph", "shadersubgraph"]),
     (Lang::Markup, &["xml", "html", "htm", "tmx", "tsx", "plist"]),
-    (Lang::Ini, &["ini", "toml", "cfg", "tscn", "godot"]),
+    (Lang::Ini, &["ini", "toml", "cfg", "tscn", "godot", "url", "inf", "desktop"]),
     (
         Lang::Yaml,
         &["yaml", "yml", "prefab", "unity", "asset", "controller", "overridecontroller", "physicmaterial", "mask"],
@@ -101,6 +101,32 @@ const EXTS: &[(Lang, &[&str])] = &[
 /// How a file with this extension is read, if it's text Hoard draws.
 fn lang(ext: &str) -> Option<Lang> {
     EXTS.iter().find(|(_, exts)| exts.contains(&ext)).map(|(lang, _)| *lang)
+}
+
+/// How much of a file with an unfamiliar extension is read to tell whether it's text.
+pub(crate) const SNIFF: u64 = 8 << 10;
+
+/// Whether the start of a file is clearly text: UTF-8 with no NULs and next to no control characters. A file cut off
+/// mid-character still counts.
+pub(crate) fn looks_like_text(head: &[u8]) -> bool {
+    let head = head.strip_prefix(b"\xef\xbb\xbf").unwrap_or(head);
+    if head.is_empty() || head.contains(&0) {
+        return false;
+    }
+    let text = match std::str::from_utf8(head) {
+        Ok(t) => t,
+        // Only a character cut off at the end of what was read is forgiven.
+        Err(e) if e.error_len().is_none() => std::str::from_utf8(&head[..e.valid_up_to()]).unwrap_or_default(),
+        Err(_) => return false,
+    };
+    let (mut chars, mut odd) = (0usize, 0usize);
+    for c in text.chars() {
+        chars += 1;
+        if c.is_control() && !matches!(c, '\n' | '\r' | '\t' | '\u{c}') {
+            odd += 1;
+        }
+    }
+    odd * 100 <= chars && text.chars().any(|c| !c.is_whitespace())
 }
 
 /// Whether a file with this extension is text drawn as a silhouette.
@@ -118,6 +144,15 @@ pub(crate) fn is_silhouette(path: &str, kind: &str) -> bool {
 /// The file drawn `size` pixels square, or `None` when it isn't text after all (a binary Unity asset) or is empty.
 pub(crate) fn thumbnail(path: &Path, ext: &str, size: u32) -> anyhow::Result<Option<RgbaImage>> {
     let Some(lang) = lang(ext) else { return Ok(None) };
+    thumbnail_as(path, lang, size)
+}
+
+/// A file with an unfamiliar extension that turned out to be text, drawn as plain prose.
+pub(crate) fn thumbnail_prose(path: &Path, size: u32) -> anyhow::Result<Option<RgbaImage>> {
+    thumbnail_as(path, Lang::Prose, size)
+}
+
+fn thumbnail_as(path: &Path, lang: Lang, size: u32) -> anyhow::Result<Option<RgbaImage>> {
     let mut head = Vec::new();
     std::fs::File::open(path)?.take(HEAD).read_to_end(&mut head)?;
     Ok(draw(&head, lang, size))
@@ -193,6 +228,76 @@ pub(crate) async fn draw_missing(state: &AppState) -> anyhow::Result<()> {
     .await?;
     if drawn > 0 {
         tracing::info!(drawn, "drew the thumbnails of text and PDFs added before Hoard drew them");
+    }
+    Ok(())
+}
+
+/// Settings key marking that files of no known kind have been looked at for plain text.
+const SNIFFED_KEY: &str = "text_sniffed";
+
+/// Once: files added as of no kind Hoard knew (an Internet shortcut, a README with no extension) that are plainly text
+/// become documents, read and drawn as text, as they are when added now.
+pub(crate) async fn sniff_others(state: &AppState) -> anyhow::Result<()> {
+    use rusqlite::OptionalExtension as _;
+    let todo: Option<Vec<(String, String)>> = db::call(&state.pool, |c| {
+        if c.query_row("SELECT 1 FROM settings WHERE key = ?1", [SNIFFED_KEY], |_| Ok(())).optional()?.is_some() {
+            return Ok(None);
+        }
+        let rows = c
+            .prepare("SELECT id, blob_hash FROM assets WHERE kind = 'other'")?
+            .query_map([], |r| Ok((r.get(0)?, r.get(1)?)))?
+            .collect::<rusqlite::Result<_>>()?;
+        Ok(Some(rows))
+    })
+    .await?;
+    let Some(todo) = todo else { return Ok(()) };
+    let category = crate::tagger::categorize(hoard_core::AssetKind::Document, &crate::tagger::TagSet::default());
+    let mut found = 0;
+    for (id, hash) in todo {
+        // A file that can't be read now (a watched folder's drive gone) stays as it is.
+        let Ok(head) = state.blobs.head(&hash, HEAD).await else { continue };
+        if !looks_like_text(&head[..head.len().min(SNIFF as usize)]) {
+            continue;
+        }
+        let picture = tokio::task::spawn_blocking(move || draw(&head, Lang::Prose, THUMB_SIZE)).await?;
+        let thumb = match picture {
+            Some(img) => Some(state.blobs.put_cache_bytes(crate::analyze::thumb_bytes(img, true)?).await?),
+            None => None,
+        };
+        let category = category.clone();
+        db::call(&state.pool, move |c| {
+            let tx = c.transaction()?;
+            if let Some(b) = &thumb {
+                tx.execute(
+                    "INSERT INTO blobs (hash, size, created_at) VALUES (?1, ?2, ?3) ON CONFLICT DO NOTHING",
+                    rusqlite::params![b.hash, b.size as i64, db::now()],
+                )?;
+            }
+            let n = tx.execute(
+                "UPDATE assets SET kind = 'document', meta = json_set(meta, '$.text', json('true')),
+                     category = CASE WHEN human_edited THEN category ELSE ?2 END,
+                     thumb_hash = COALESCE(thumb_hash, ?3)
+                   WHERE id = ?1 AND kind = 'other'",
+                rusqlite::params![id, category, thumb.as_ref().map(|b| b.hash.clone())],
+            )?;
+            if n > 0 {
+                tx.execute("DELETE FROM asset_tags WHERE asset_id = ?1 AND tag = 'kind:other'", [&id])?;
+                db::upsert_tag(&tx, &id, "kind:document", hoard_core::TagSource::Meta, 1.0)?;
+                db::reindex_asset(&tx, &id)?;
+            }
+            tx.commit()?;
+            Ok(())
+        })
+        .await?;
+        found += 1;
+    }
+    db::call(&state.pool, |c| {
+        c.execute("INSERT INTO settings (key, value) VALUES (?1, '1') ON CONFLICT DO NOTHING", [SNIFFED_KEY])?;
+        Ok(())
+    })
+    .await?;
+    if found > 0 {
+        tracing::info!(found, "files of no known kind turned out to be text");
     }
     Ok(())
 }
@@ -533,6 +638,19 @@ fn next_is(c: &[char], i: usize, want: char) -> bool {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn text_is_told_from_binary() {
+        assert!(looks_like_text(b"[InternetShortcut]\r\nURL=https://kenney.nl/\r\n"));
+        assert!(looks_like_text("\u{feff}Caf\u{e9} cr\u{e8}me\n".as_bytes()));
+        // Cut off mid-character by the read.
+        assert!(looks_like_text(&"na\u{ef}ve".as_bytes()[..3]));
+        assert!(!looks_like_text(b"PK\x03\x04\x14\x00\x00\x00"));
+        assert!(!looks_like_text(b"\x89PNG\r\n\x1a\n"));
+        assert!(!looks_like_text(b"\x01\x02\x03\x04 header \x05\x06\x07"));
+        assert!(!looks_like_text(b"  \n\t "));
+        assert!(!looks_like_text(b""));
+    }
 
     fn inks(lang: Lang, text: &str) -> Vec<Vec<Ink>> {
         let mut lexer = Lexer::new(lang);

@@ -40,7 +40,7 @@ pub(crate) const VERSION: i64 = 1;
 pub(crate) const KINDS_SQL: &str = "(a.kind IN ('texture', 'vector', 'model', 'material', 'animation', 'video')
      OR (a.kind = 'other' AND a.ext NOT IN ('c', 'h', 'cc', 'cpp', 'cxx', 'hpp', 'hh', 'cs', 'java', 'js', 'mjs', 'ts',
          'rs', 'go', 'swift', 'kt', 'compute', 'fx', 'py', 'gd', 'sh', 'rb', 'ps1', 'lua', 'plist', 'cfg', 'godot', 'tsv',
-         'markdown', 'nfo', 'log')))";
+         'markdown', 'nfo', 'log', 'inf', 'desktop')))";
 
 /// One color of a palette, in `OKLab`, with the share of the (opaque part of the) picture it covers.
 #[derive(Clone, Copy, Debug, PartialEq)]

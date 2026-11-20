@@ -18,7 +18,7 @@ export const TEXT_EXTS = new Set([
   'glsl', 'hlsl', 'wgsl', 'shader', 'vert', 'frag', 'comp', 'geom', 'tesc', 'tese', 'gdshader', 'usf', 'ush',
   'metal', 'cginc', 'fx', 'fxh', 'compute',
   // Documents and code that ships in packs.
-  'txt', 'md', 'markdown', 'log', 'nfo', 'readme', 'license', 'html', 'htm', 'mtl', 'gltf',
+  'txt', 'md', 'markdown', 'log', 'nfo', 'readme', 'license', 'html', 'htm', 'mtl', 'gltf', 'url', 'inf', 'desktop',
   'lua', 'js', 'ts', 'cs', 'gd', 'py', 'c', 'h', 'cpp', 'hpp', 'sh', 'bat', 'ps1', 'cmake',
 ])
 
@@ -42,7 +42,8 @@ export function isSkeletonAsset(a: Asset): boolean {
 }
 
 export function isTextAsset(a: Asset): boolean {
-  return TEXT_EXTS.has(a.ext.toLowerCase())
+  // Or a file of no extension Hoard knows that the server found to be plain text.
+  return TEXT_EXTS.has(a.ext.toLowerCase()) || a.meta?.text === true
 }
 
 /** The viewer a double-click opens, or null when the side panel is all there is. */

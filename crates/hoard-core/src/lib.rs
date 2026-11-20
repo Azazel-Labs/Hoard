@@ -106,7 +106,7 @@ impl AssetKind {
             // Materials, including Substance Designer/Painter sources.
             "mat" | "mtl" | "sbsar" | "sbs" | "spp" | "spsm" | "tres" => AssetKind::Material,
             "mp4" | "webm" | "mov" | "mkv" | "avi" | "ogv" => AssetKind::Video,
-            "txt" | "md" | "pdf" | "html" | "htm" | "rtf" => AssetKind::Document,
+            "txt" | "md" | "pdf" | "html" | "htm" | "rtf" | "url" => AssetKind::Document,
             // Unreal packages (`uasset`, `umap`) start as data; the server refines the kind from the asset's class.
             // Unity scenes, prefabs and serialized assets are YAML (or binary) data.
             "json" | "xml" | "csv" | "yaml" | "yml" | "toml" | "tmx" | "tsx" | "ldtk" | "ini" | "uasset" | "umap"

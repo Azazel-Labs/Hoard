@@ -217,9 +217,20 @@ pub(crate) fn detect_kind(path: &Path, ext: &str) -> AssetKind {
         Some(infer::MatcherType::Audio) => AssetKind::Audio,
         Some(infer::MatcherType::Video) => AssetKind::Video,
         Some(infer::MatcherType::Font) => AssetKind::Font,
+        // Or nothing recognizable, but plainly text (an Internet shortcut, a README with no extension).
         Some(infer::MatcherType::Doc | infer::MatcherType::Text) => AssetKind::Document,
+        None if sniff_text(path) => AssetKind::Document,
         _ => AssetKind::Other,
     }
+}
+
+/// Whether a file starts out as plain text.
+fn sniff_text(path: &Path) -> bool {
+    use std::io::Read as _;
+    let mut head = Vec::new();
+    std::fs::File::open(path)
+        .and_then(|f| f.take(crate::text_thumbs::SNIFF).read_to_end(&mut head))
+        .is_ok_and(|_| crate::text_thumbs::looks_like_text(&head))
 }
 
 /// `root` is the folder laid out like the pack that holds `path`, where a model's textures are looked for.
@@ -275,8 +286,18 @@ pub(crate) fn analyze(path: &Path, root: &Path, kind: AssetKind, ext: &str) -> A
     // Text with no picture of its own (code, data, prose): drawn as a silhouette of its lines.
     let text_kind =
         matches!(a.kind.unwrap_or(kind), AssetKind::Document | AssetKind::Data | AssetKind::Shader | AssetKind::Other);
-    if a.thumb.is_none() && text_kind && crate::text_thumbs::handles(ext) {
-        match crate::text_thumbs::thumbnail(path, ext, THUMB_SIZE) {
+    // Text found by reading it rather than by its extension: the viewers show it as text.
+    let sniffed = kind == AssetKind::Document && AssetKind::from_ext(ext) == AssetKind::Other && sniff_text(path);
+    if sniffed {
+        a.meta.insert("text".into(), json!(true));
+    }
+    if a.thumb.is_none() && text_kind && (sniffed || crate::text_thumbs::handles(ext)) {
+        let drawn = if crate::text_thumbs::handles(ext) {
+            crate::text_thumbs::thumbnail(path, ext, THUMB_SIZE)
+        } else {
+            crate::text_thumbs::thumbnail_prose(path, THUMB_SIZE)
+        };
+        match drawn {
             Ok(drawn) => a.thumb = drawn.and_then(|img| thumb_bytes(img, true).ok()),
             Err(e) => tracing::debug!(path = %path.display(), error = %format!("{e:#}"), "no text thumbnail"),
         }

@@ -1695,6 +1695,7 @@ asset-rule-converted = Преобразован правилом
 # Followed by the original file's name: "A conversion rule made this GLB on 3 May 2026 from tree.obj".
 asset-rule-was = Правило преобразования создало этот файл { $format } { $date } из
 asset-rule-kept-until = Оригинал хранится до { $date }.
+asset-rule-rebuilt = FLAC хранит всё, что было в WAV, так что WAV можно в любой момент скачать или вернуть точно таким, каким он был.
 asset-rule-put-back = Вернуть оригинал
 asset-rule-put-back-title = Вернуть { $file }?
 asset-rule-put-back-body = Преобразованный файл удаляется, а его место занимает оригинал — с тегами, коллекциями и ссылками. После этого правила преобразования его больше не трогают.
@@ -2826,7 +2827,7 @@ settings-conv-remove = Удалить
 settings-conv-remove-label = Удалить правило { $n }
 settings-conv-taken = Этот формат уже преобразует другое правило
 settings-conv-upright = Ставить модели вертикально при преобразовании (Y вверх, лицом к +Z), так, как показываются модели пака
-settings-conv-flac-what = Звук остаётся точно таким же, а места занимает примерно вдвое меньше. WAV с точками петли, маркерами cue, сэмплами с плавающей точкой или другими данными, которые FLAC не может сохранить, остаются WAV.
+settings-conv-flac-what = Звук остаётся точно таким же, а места занимает примерно вдвое меньше, и всё остальное из WAV (точки петли, маркеры cue, теги) сохраняется во FLAC, так что WAV можно в любой момент вернуть точно таким, каким он был. WAV с сэмплами с плавающей точкой или 32-битными сэмплами остаются WAV.
 settings-conv-add = Добавить правило
 # Before a number of days: "Keep originals for [30] days".
 settings-conv-keep = Хранить оригиналы

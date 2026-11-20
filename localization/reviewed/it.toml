@@ -2642,6 +2642,10 @@ translation = "{ $file } è stato ripristinato"
 source = "Put back { $file }?"
 translation = "Ripristinare { $file }?"
 
+[messages.asset-rule-rebuilt]
+source = "The FLAC keeps everything that was in the WAV, so the WAV can be downloaded or put back exactly as it was at any time."
+translation = "Il FLAC conserva tutto ciò che c’era nel WAV, quindi il WAV può essere scaricato o ripristinato esattamente com’era in qualsiasi momento."
+
 [messages.asset-rule-was]
 source = "A conversion rule made this { $format } on { $date } from"
 translation = "Una regola di conversione ha creato questo { $format } il { $date } da"
@@ -9116,8 +9120,8 @@ source = "Convert files already in the library"
 translation = "Converti i file già presenti nella libreria"
 
 [messages.settings-conv-flac-what]
-source = "The sound stays exactly the same, in about half the space. WAVs with loop points, cue markers, floating-point samples or other details a FLAC can’t keep stay WAV."
-translation = "Il suono resta esattamente uguale, in circa metà dello spazio. I WAV con punti di loop, marcatori cue, campioni in virgola mobile o altri dettagli che un FLAC non può conservare restano WAV."
+source = "The sound stays exactly the same, in about half the space, and everything else in the WAV (loop points, cue markers, tags) is kept in the FLAC, so the WAV can be put back exactly as it was at any time. WAVs with floating-point or 32-bit samples stay WAV."
+translation = "Il suono resta esattamente uguale, in circa metà dello spazio, e tutto il resto del WAV (punti di loop, marcatori cue, tag) viene conservato nel FLAC, quindi il WAV può essere ripristinato esattamente com’era in qualsiasi momento. I WAV con campioni in virgola mobile o a 32 bit restano WAV."
 
 [messages.settings-conv-from]
 source = "From"

@@ -2555,6 +2555,10 @@ translation = "{ $file }을(를) 되돌렸습니다"
 source = "Put back { $file }?"
 translation = "{ $file }을(를) 되돌릴까요?"
 
+[messages.asset-rule-rebuilt]
+source = "The FLAC keeps everything that was in the WAV, so the WAV can be downloaded or put back exactly as it was at any time."
+translation = "FLAC에 WAV의 모든 내용이 보관되어 있으므로 언제든 WAV를 원래 모습 그대로 다운로드하거나 되돌릴 수 있습니다."
+
 [messages.asset-rule-was]
 source = "A conversion rule made this { $format } on { $date } from"
 translation = "{ $date }에 변환 규칙이 이 { $format } 파일을 만들었습니다. 원본:"
@@ -8884,8 +8888,8 @@ source = "Convert files already in the library"
 translation = "라이브러리에 이미 있는 파일 변환"
 
 [messages.settings-conv-flac-what]
-source = "The sound stays exactly the same, in about half the space. WAVs with loop points, cue markers, floating-point samples or other details a FLAC can’t keep stay WAV."
-translation = "소리는 정확히 그대로이고 공간은 절반 정도만 차지합니다. 루프 지점, 큐 마커, 부동소수점 샘플 등 FLAC이 담을 수 없는 정보가 있는 WAV는 WAV로 남습니다."
+source = "The sound stays exactly the same, in about half the space, and everything else in the WAV (loop points, cue markers, tags) is kept in the FLAC, so the WAV can be put back exactly as it was at any time. WAVs with floating-point or 32-bit samples stay WAV."
+translation = "소리는 정확히 그대로이고 공간은 절반 정도만 차지하며, 루프 지점, 큐 마커, 태그 등 WAV의 나머지 정보도 모두 FLAC 안에 보관되므로 언제든 WAV를 원래 모습 그대로 되돌릴 수 있습니다. 부동소수점 또는 32비트 샘플이 있는 WAV는 WAV로 남습니다."
 
 [messages.settings-conv-from]
 source = "From"

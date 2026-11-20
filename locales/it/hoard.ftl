@@ -1559,6 +1559,7 @@ asset-rule-converted = Convertito da una regola
 # Followed by the original file's name: "A conversion rule made this GLB on 3 May 2026 from tree.obj".
 asset-rule-was = Una regola di conversione ha creato questo { $format } il { $date } da
 asset-rule-kept-until = L'originale è conservato fino al { $date }.
+asset-rule-rebuilt = Il FLAC conserva tutto ciò che c’era nel WAV, quindi il WAV può essere scaricato o ripristinato esattamente com’era in qualsiasi momento.
 asset-rule-put-back = Ripristina l'originale
 asset-rule-put-back-title = Ripristinare { $file }?
 asset-rule-put-back-body = Il file convertito viene eliminato e l'originale riprende il suo posto, con i suoi tag, le raccolte e i collegamenti. Da quel momento le regole di conversione non lo toccano più.
@@ -2583,7 +2584,7 @@ settings-conv-remove = Rimuovi
 settings-conv-remove-label = Rimuovi la regola { $n }
 settings-conv-taken = Un'altra regola converte già questo formato
 settings-conv-upright = Raddrizza i modelli durante la conversione (Y in alto, rivolti verso +Z), come vengono mostrati i modelli del pacchetto
-settings-conv-flac-what = Il suono resta esattamente uguale, in circa metà dello spazio. I WAV con punti di loop, marcatori cue, campioni in virgola mobile o altri dettagli che un FLAC non può conservare restano WAV.
+settings-conv-flac-what = Il suono resta esattamente uguale, in circa metà dello spazio, e tutto il resto del WAV (punti di loop, marcatori cue, tag) viene conservato nel FLAC, quindi il WAV può essere ripristinato esattamente com’era in qualsiasi momento. I WAV con campioni in virgola mobile o a 32 bit restano WAV.
 settings-conv-add = Aggiungi una regola
 # Before a number of days: "Keep originals for [30] days".
 settings-conv-keep = Conserva gli originali per

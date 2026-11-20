@@ -405,8 +405,12 @@ pub(crate) fn pending(conn: &Connection, limit: u32) -> Result<Vec<PendingPackag
 pub(crate) fn origin_of(conn: &Connection, asset_id: &str) -> Result<Option<AssetOrigin>> {
     Ok(conn
         .query_row(
-            "SELECT path, ext, blob_hash IS NOT NULL, class, engine, dependencies, method, notes, converted_at
-             FROM asset_origin WHERE asset_id = ?1",
+            &format!(
+                "SELECT o.path, o.ext, o.blob_hash IS NOT NULL OR ({}), o.class, o.engine, o.dependencies, o.method,
+                        o.notes, o.converted_at
+                   FROM asset_origin o JOIN assets a ON a.id = o.asset_id WHERE o.asset_id = ?1",
+                crate::reformat::REBUILDS
+            ),
             [asset_id],
             |r| {
                 let deps: String = r.get(5)?;

@@ -74,7 +74,13 @@ const shown = computed(() => !!(origin.value || ueStatus.value || recovered.valu
       </p>
       <p class="legend">
         <template v-if="origin.original_kept">
-          {{ origin.kept_until ? t('asset-rule-kept-until', { date: formatDate(origin.kept_until) }) : '' }}
+          {{
+            origin.kept_until
+              ? t('asset-rule-kept-until', { date: formatDate(origin.kept_until) })
+              : origin.ext.toLowerCase() === 'wav'
+                ? t('asset-rule-rebuilt')
+                : ''
+          }}
           <a class="btn" :href="originalUrl(asset)">{{ t('asset-origin-download', { ext: origin.ext }) }}</a>
           <button v-if="may('admin')" type="button" class="btn" :disabled="puttingBack" data-testid="rule-put-back" @click="putBack">
             {{ t('asset-rule-put-back') }}

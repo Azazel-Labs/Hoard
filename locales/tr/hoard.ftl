@@ -1442,6 +1442,7 @@ asset-rule-converted = Bir kuralla dönüştürüldü
 # Followed by the original file's name: "A conversion rule made this GLB on 3 May 2026 from tree.obj".
 asset-rule-was = Bir dönüştürme kuralı bu { $format } dosyasını { $date } tarihinde şu dosyadan oluşturdu:
 asset-rule-kept-until = Özgün dosya { $date } tarihine kadar tutulur.
+asset-rule-rebuilt = FLAC, WAV’da olan her şeyi saklar; böylece WAV istendiği anda tam olarak eski hâliyle indirilebilir ya da geri getirilebilir.
 asset-rule-put-back = Özgün dosyayı geri koy
 asset-rule-put-back-title = { $file } geri konsun mu?
 asset-rule-put-back-body = Dönüştürülen dosya silinir ve özgün dosya; etiketleri, koleksiyonları ve bağlantılarıyla birlikte onun yerini alır. Dönüştürme kuralları bundan sonra ona dokunmaz.
@@ -2401,7 +2402,7 @@ settings-conv-remove = Kaldır
 settings-conv-remove-label = { $n }. kuralı kaldır
 settings-conv-taken = Bu biçimi başka bir kural dönüştürüyor
 settings-conv-upright = Modelleri dönüştürürken paketin modellerinin gösterildiği gibi dik çevir (Y yukarı, +Z’ye bakan)
-settings-conv-flac-what = Ses tamamen aynı kalır, yaklaşık yarı yer kaplar. Döngü noktaları, cue işaretleri, kayan noktalı örnekler ya da bir FLAC’ın tutamayacağı başka ayrıntılar içeren WAV’lar WAV olarak kalır.
+settings-conv-flac-what = Ses tamamen aynı kalır, yaklaşık yarı yer kaplar ve WAV’daki diğer her şey (döngü noktaları, cue işaretleri, etiketler) FLAC’ın içinde saklanır; böylece WAV istendiği anda tam olarak eski hâliyle geri getirilebilir. Kayan noktalı ya da 32 bit örnekler içeren WAV’lar WAV olarak kalır.
 settings-conv-add = Kural ekle
 # Before a number of days: "Keep originals for [30] days".
 settings-conv-keep = Özgünleri sakla:

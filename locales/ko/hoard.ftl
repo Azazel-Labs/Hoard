@@ -1408,6 +1408,7 @@ asset-rule-converted = 규칙으로 변환됨
 # Followed by the original file's name: "A conversion rule made this GLB on 3 May 2026 from tree.obj".
 asset-rule-was = { $date }에 변환 규칙이 이 { $format } 파일을 만들었습니다. 원본:
 asset-rule-kept-until = 원본은 { $date }까지 보관됩니다.
+asset-rule-rebuilt = FLAC에 WAV의 모든 내용이 보관되어 있으므로 언제든 WAV를 원래 모습 그대로 다운로드하거나 되돌릴 수 있습니다.
 asset-rule-put-back = 원본 되돌리기
 asset-rule-put-back-title = { $file }을(를) 되돌릴까요?
 asset-rule-put-back-body = 변환된 파일은 삭제되고 원본이 태그, 컬렉션, 링크와 함께 그 자리로 돌아옵니다. 그 후로는 변환 규칙이 이 파일을 건드리지 않습니다.
@@ -2351,7 +2352,7 @@ settings-conv-remove = 제거
 settings-conv-remove-label = 규칙 { $n } 제거
 settings-conv-taken = 다른 규칙이 이미 이 형식을 변환합니다
 settings-conv-upright = 변환할 때 팩의 모델을 표시하는 방식대로 모델을 똑바로 세우기(Y 위쪽, +Z 방향)
-settings-conv-flac-what = 소리는 정확히 그대로이고 공간은 절반 정도만 차지합니다. 루프 지점, 큐 마커, 부동소수점 샘플 등 FLAC이 담을 수 없는 정보가 있는 WAV는 WAV로 남습니다.
+settings-conv-flac-what = 소리는 정확히 그대로이고 공간은 절반 정도만 차지하며, 루프 지점, 큐 마커, 태그 등 WAV의 나머지 정보도 모두 FLAC 안에 보관되므로 언제든 WAV를 원래 모습 그대로 되돌릴 수 있습니다. 부동소수점 또는 32비트 샘플이 있는 WAV는 WAV로 남습니다.
 settings-conv-add = 규칙 추가
 # Before a number of days: "Keep originals for [30] days".
 settings-conv-keep = 원본 보관 기간

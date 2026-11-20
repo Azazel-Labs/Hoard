@@ -1674,6 +1674,7 @@ asset-rule-converted = Przekonwertowano regułą
 # Followed by the original file's name: "A conversion rule made this GLB on 3 May 2026 from tree.obj".
 asset-rule-was = Reguła konwersji utworzyła ten plik { $format } dnia { $date } z pliku
 asset-rule-kept-until = Oryginał jest przechowywany do { $date }.
+asset-rule-rebuilt = Plik FLAC zachowuje wszystko, co było w pliku WAV, więc WAV można w każdej chwili pobrać lub przywrócić dokładnie w pierwotnej postaci.
 asset-rule-put-back = Przywróć oryginał
 asset-rule-put-back-title = Przywrócić { $file }?
 asset-rule-put-back-body = Przekonwertowany plik zostanie usunięty, a jego miejsce zajmie oryginał, z jego tagami, kolekcjami i powiązaniami. Od tej pory reguły konwersji go pomijają.
@@ -2781,7 +2782,7 @@ settings-conv-remove = Usuń
 settings-conv-remove-label = Usuń regułę { $n }
 settings-conv-taken = Ten format konwertuje już inna reguła
 settings-conv-upright = Ustawiaj modele pionowo podczas konwersji (Y w górę, przodem do +Z), tak jak są wyświetlane modele paczki
-settings-conv-flac-what = Dźwięk pozostaje dokładnie taki sam, zajmując mniej więcej połowę miejsca. Pliki WAV z punktami pętli, znacznikami cue, próbkami zmiennoprzecinkowymi lub innymi szczegółami, których FLAC nie zachowa, pozostają WAV.
+settings-conv-flac-what = Dźwięk pozostaje dokładnie taki sam, zajmując mniej więcej połowę miejsca, a wszystko inne z pliku WAV (punkty pętli, znaczniki cue, tagi) jest zachowywane w pliku FLAC, więc WAV można w każdej chwili przywrócić dokładnie w pierwotnej postaci. Pliki WAV z próbkami zmiennoprzecinkowymi lub 32-bitowymi pozostają WAV.
 settings-conv-add = Dodaj regułę
 # Before a number of days: "Keep originals for [30] days".
 settings-conv-keep = Przechowuj oryginały przez

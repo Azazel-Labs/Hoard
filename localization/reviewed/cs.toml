@@ -2681,6 +2681,10 @@ translation = "{ $file } je zpět"
 source = "Put back { $file }?"
 translation = "Vrátit { $file }?"
 
+[messages.asset-rule-rebuilt]
+source = "The FLAC keeps everything that was in the WAV, so the WAV can be downloaded or put back exactly as it was at any time."
+translation = "FLAC uchovává vše, co bylo ve WAV, takže WAV lze kdykoli stáhnout nebo vrátit přesně v původní podobě."
+
 [messages.asset-rule-was]
 source = "A conversion rule made this { $format } on { $date } from"
 translation = "Toto { $format } vytvořilo pravidlo převodu { $date } ze souboru"
@@ -9257,8 +9261,8 @@ source = "Convert files already in the library"
 translation = "Převést soubory, které už jsou v knihovně"
 
 [messages.settings-conv-flac-what]
-source = "The sound stays exactly the same, in about half the space. WAVs with loop points, cue markers, floating-point samples or other details a FLAC can’t keep stay WAV."
-translation = "Zvuk zůstane přesně stejný, zhruba v polovičním místě. Soubory WAV se smyčkami, značkami cue, vzorky s plovoucí čárkou nebo jinými údaji, které FLAC neudrží, zůstanou jako WAV."
+source = "The sound stays exactly the same, in about half the space, and everything else in the WAV (loop points, cue markers, tags) is kept in the FLAC, so the WAV can be put back exactly as it was at any time. WAVs with floating-point or 32-bit samples stay WAV."
+translation = "Zvuk zůstane přesně stejný, zhruba v polovičním místě, a vše ostatní z WAV (smyčky, značky cue, štítky) se uchová ve FLAC, takže WAV lze kdykoli vrátit přesně v původní podobě. Soubory WAV se vzorky s plovoucí čárkou nebo 32bitovými vzorky zůstanou jako WAV."
 
 [messages.settings-conv-from]
 source = "From"

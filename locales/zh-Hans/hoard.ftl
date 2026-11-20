@@ -1432,6 +1432,7 @@ asset-rule-converted = 由规则转换
 # Followed by the original file's name: "A conversion rule made this GLB on 3 May 2026 from tree.obj".
 asset-rule-was = 转换规则于 { $date } 生成了此 { $format }，来源：
 asset-rule-kept-until = 原始文件保留至 { $date }。
+asset-rule-rebuilt = FLAC 保留了 WAV 中的所有内容，因此随时可以原样下载或恢复 WAV。
 asset-rule-put-back = 恢复原始文件
 asset-rule-put-back-title = 恢复 { $file }？
 asset-rule-put-back-body = 转换后的文件会被删除，原始文件连同其标签、合集和链接回到原位。此后转换规则不会再处理它。
@@ -2384,7 +2385,7 @@ settings-conv-remove = 移除
 settings-conv-remove-label = 移除规则 { $n }
 settings-conv-taken = 另一条规则已在转换此格式
 settings-conv-upright = 转换时将模型摆正（Y 轴朝上，面向 +Z），与资源包中模型的显示方式一致
-settings-conv-flac-what = 声音完全不变，空间约为一半。带有循环点、cue 标记、浮点采样或其他 FLAC 无法保留的信息的 WAV 会保持为 WAV。
+settings-conv-flac-what = 声音完全不变，空间约为一半；WAV 中的其他所有内容（循环点、cue 标记、标签）都保留在 FLAC 里，因此随时可以把 WAV 原样恢复。带有浮点或 32 位采样的 WAV 会保持为 WAV。
 settings-conv-add = 添加规则
 # Before a number of days: "Keep originals for [30] days".
 settings-conv-keep = 原始文件保留

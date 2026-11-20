@@ -1677,6 +1677,7 @@ asset-rule-converted = Convertit de o regulă
 # Followed by the original file's name: "A conversion rule made this GLB on 3 May 2026 from tree.obj".
 asset-rule-was = O regulă de conversie a creat acest { $format } pe { $date } din
 asset-rule-kept-until = Originalul este păstrat până pe { $date }.
+asset-rule-rebuilt = FLAC-ul păstrează tot ce era în WAV, așa că WAV-ul poate fi descărcat sau pus înapoi exact cum era oricând.
 asset-rule-put-back = Restaurați originalul
 asset-rule-put-back-title = Restaurați { $file }?
 asset-rule-put-back-body = Fișierul convertit este șters, iar originalul îi ia locul, cu etichetele, colecțiile și linkurile sale. De atunci încolo, regulile de conversie nu se mai ating de el.
@@ -2780,7 +2781,7 @@ settings-conv-remove = Eliminați
 settings-conv-remove-label = Eliminați regula { $n }
 settings-conv-taken = O altă regulă convertește deja acest format
 settings-conv-upright = Îndreptați modelele la conversie (Y în sus, cu fața spre +Z), așa cum sunt afișate modelele pachetului
-settings-conv-flac-what = Sunetul rămâne exact la fel, în aproximativ jumătate din spațiu. Fișierele WAV cu puncte de buclă, marcaje cue, eșantioane în virgulă mobilă sau alte detalii pe care un FLAC nu le poate păstra rămân WAV.
+settings-conv-flac-what = Sunetul rămâne exact la fel, în aproximativ jumătate din spațiu, iar tot restul din WAV (puncte de buclă, marcaje cue, etichete) este păstrat în FLAC, așa că WAV-ul poate fi pus înapoi exact cum era oricând. Fișierele WAV cu eșantioane în virgulă mobilă sau pe 32 de biți rămân WAV.
 settings-conv-add = Adăugați o regulă
 # Before a number of days: "Keep originals for [30] days".
 settings-conv-keep = Păstrați originalele timp de

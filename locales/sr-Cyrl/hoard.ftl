@@ -1598,6 +1598,7 @@ asset-rule-converted = Претворено правилом
 # Followed by the original file's name: "A conversion rule made this GLB on 3 May 2026 from tree.obj".
 asset-rule-was = Правило претварања направило је ову датотеку { $format } { $date } од
 asset-rule-kept-until = Оригинал се чува до { $date }.
+asset-rule-rebuilt = FLAC чува све што је било у WAV датотеци, па се WAV у сваком тренутку може преузети или вратити тачно онакав какав је био.
 asset-rule-put-back = Врати оригинал
 asset-rule-put-back-title = Вратити { $file }?
 asset-rule-put-back-body = Претворена датотека се брише, а њено место заузима оригинал, с његовим ознакама, колекцијама и везама. Правила претварања га од тада не дирају.
@@ -2675,7 +2676,7 @@ settings-conv-remove = Уклони
 settings-conv-remove-label = Уклони правило { $n }
 settings-conv-taken = Овај формат већ претвара друго правило
 settings-conv-upright = Усправи моделе при претварању (Y нагоре, окренути ка +Z), онако како се приказују модели пакета
-settings-conv-flac-what = Звук остаје потпуно исти, на отприлике половини простора. WAV датотеке са тачкама петље, cue ознакама, узорцима у покретном зарезу или другим подацима које FLAC не може да задржи остају WAV.
+settings-conv-flac-what = Звук остаје потпуно исти, на отприлике половини простора, а све остало из WAV датотеке (тачке петље, cue ознаке, ознаке) чува се у FLAC датотеци, па се WAV у сваком тренутку може вратити тачно онакав какав је био. WAV датотеке са узорцима у покретном зарезу или 32-битним узорцима остају WAV.
 settings-conv-add = Додај правило
 # Before a number of days: "Keep originals for [30] days".
 settings-conv-keep = Чувај оригинале

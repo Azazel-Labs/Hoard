@@ -1436,6 +1436,7 @@ asset-rule-converted = Dikonversi oleh aturan
 # Followed by the original file's name: "A conversion rule made this GLB on 3 May 2026 from tree.obj".
 asset-rule-was = Aturan konversi membuat { $format } ini pada { $date } dari
 asset-rule-kept-until = Berkas asli disimpan sampai { $date }.
+asset-rule-rebuilt = FLAC menyimpan semua yang ada di WAV, sehingga WAV bisa diunduh atau dikembalikan persis seperti semula kapan saja.
 asset-rule-put-back = Kembalikan berkas asli
 asset-rule-put-back-title = Kembalikan { $file }?
 asset-rule-put-back-body = Berkas hasil konversi dihapus dan berkas asli kembali ke tempatnya, beserta tag, koleksi, dan tautannya. Sejak itu aturan konversi tidak akan mengubahnya lagi.
@@ -2388,7 +2389,7 @@ settings-conv-remove = Hapus
 settings-conv-remove-label = Hapus aturan { $n }
 settings-conv-taken = Aturan lain sudah mengonversi format ini
 settings-conv-upright = Tegakkan model saat dikonversi (Y ke atas, menghadap +Z), seperti cara model paket ditampilkan
-settings-conv-flac-what = Suaranya tetap sama persis, dalam sekitar setengah ruang. WAV dengan titik loop, penanda cue, sampel floating-point, atau detail lain yang tidak bisa disimpan FLAC tetap menjadi WAV.
+settings-conv-flac-what = Suaranya tetap sama persis, dalam sekitar setengah ruang, dan semua hal lain dalam WAV (titik loop, penanda cue, tag) disimpan di dalam FLAC, sehingga WAV bisa dikembalikan persis seperti semula kapan saja. WAV dengan sampel floating-point atau 32-bit tetap menjadi WAV.
 settings-conv-add = Tambah aturan
 # Before a number of days: "Keep originals for [30] days".
 settings-conv-keep = Simpan berkas asli selama

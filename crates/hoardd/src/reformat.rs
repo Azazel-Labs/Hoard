@@ -3,8 +3,10 @@
 //! pack's models are shown. The converted file takes over the asset (same id, tags, collections and links), and
 //! `asset_origin` keeps the original for [`Rules::keep_days`], during which the asset's page can put it back; after
 //! that it's deleted. A model's textures aren't copied into it: the GLB points at the image files beside it in the
-//! pack. WAV files become FLAC: the same samples in about half the space, only for a WAV a FLAC can hold whole (see
-//! `flac`); one it can't stays a WAV, and the rules leave it alone. Watched folders are never changed.
+//! pack. WAV files become FLAC: the same samples in about half the space, with every other chunk of the WAV kept in
+//! it (see `flac`), so the WAV isn't kept: it's made again from the FLAC, exactly, to download or put back, at any
+//! time. A WAV with samples a FLAC doesn't hold stays a WAV, and the rules leave it alone. Watched folders are never
+//! changed.
 //!
 //! A rule applies by itself to packs added from then on. Files already in the library are converted only when asked
 //! (`POST /api/admin/conversions/run`), after Settings has shown what that would change
@@ -407,7 +409,9 @@ fn convert_pack(state: &AppState, rt: &Handle, pack_id: &str) -> Result<usize> {
         };
         let mut conn = state.pool.get()?;
         let tx = conn.transaction()?;
-        if crate::extract::replace_asset(&tx, &t.file.id, &blob, &rule.to, &origin, true)? {
+        // A FLAC gives back the WAV it was made from.
+        let keep = rule.to != "flac";
+        if crate::extract::replace_asset(&tx, &t.file.id, &blob, &rule.to, &origin, keep)? {
             tx.execute("UPDATE asset_origin SET upright = ?2 WHERE asset_id = ?1", params![t.file.id, rule.upright])?;
         }
         tx.commit()?;
@@ -469,8 +473,8 @@ fn convert_one(
     Ok(glb)
 }
 
-/// A WAV file as a FLAC of the same samples. One a FLAC can't hold whole (`None`) stays as it is, and the rules
-/// leave it alone from then on.
+/// A WAV file as a FLAC that gives it back. One a FLAC can't (`None`) stays as it is, and the rules leave it alone
+/// from then on.
 fn wav_to_flac(state: &AppState, rt: &Handle, conn: &Connection, file: &Candidate) -> Result<Option<Vec<u8>>> {
     let hash: String = conn.query_row("SELECT blob_hash FROM assets WHERE id = ?1", [&file.id], |r| r.get(0))?;
     let wav = rt.block_on(state.blobs.read_all(&hash))?;
@@ -482,6 +486,47 @@ fn wav_to_flac(state: &AppState, rt: &Handle, conn: &Connection, file: &Candidat
             Ok(None)
         }
     }
+}
+
+/// An `asset_origin o` joined to its asset `a` whose original is in it: a WAV a rule made FLAC.
+pub(crate) const REBUILDS: &str = "o.method = 'rule' AND lower(o.ext) = 'wav' AND lower(a.ext) = 'flac'";
+
+/// The WAV a rule made a FLAC, made again from the FLAC, with its path: for an asset whose original isn't kept but
+/// is in it. `None` for any other.
+pub(crate) async fn rebuilt_original(state: &AppState, asset_id: &str) -> Result<Option<(Vec<u8>, String)>> {
+    let id = asset_id.to_owned();
+    let row = db::call(&state.pool, move |c| {
+        Ok(c.query_row(
+            &format!(
+                "SELECT a.blob_hash, o.path FROM asset_origin o JOIN assets a ON a.id = o.asset_id
+                  WHERE o.asset_id = ?1 AND o.blob_hash IS NULL AND {REBUILDS}"
+            ),
+            [&id],
+            |r| Ok((r.get::<_, String>(0)?, r.get::<_, String>(1)?)),
+        )
+        .optional()?)
+    })
+    .await?;
+    let Some((hash, path)) = row else { return Ok(None) };
+    let flac = state.blobs.read_all(&hash).await?;
+    let wav = tokio::task::spawn_blocking(move || crate::flac::to_wav(&flac)).await??;
+    Ok(wav.map(|w| (w, path)))
+}
+
+/// Keep the WAV a rule made a FLAC as the asset's original again, made from the FLAC, so it can be put back.
+pub(crate) async fn restore_original(state: &AppState, asset_id: &str) -> Result<()> {
+    let Some((wav, _)) = rebuilt_original(state, asset_id).await? else { return Ok(()) };
+    let blob = state.blobs.put_bytes(wav, AssetKind::Audio).await?;
+    let id = asset_id.to_owned();
+    db::call(&state.pool, move |c| {
+        c.execute(
+            "INSERT INTO blobs (hash, size, created_at) VALUES (?1, ?2, ?3) ON CONFLICT DO NOTHING",
+            params![blob.hash, blob.size as i64, db::now()],
+        )?;
+        c.execute("UPDATE asset_origin SET blob_hash = ?2 WHERE asset_id = ?1", params![id, blob.hash])?;
+        Ok(())
+    })
+    .await
 }
 
 /// `POST /api/assets/{id}/unconvert`: put back the file a rule converted, while its original is kept. The rules
@@ -549,10 +594,11 @@ pub(crate) fn expire(conn: &Connection, keep_days: u32) -> Result<usize> {
     )?)
 }
 
-/// When the original of a file a rule converted is let go, while it's kept.
+/// When the original of a file a rule converted is let go, while it's kept. A WAV made FLAC never is: it's made
+/// again from the FLAC.
 pub(crate) fn kept_until(origin: &hoard_core::AssetOrigin, keep_days: u32) -> Option<String> {
     use time::format_description::well_known::Rfc3339;
-    if origin.method != "rule" || !origin.original_kept {
+    if origin.method != "rule" || !origin.original_kept || origin.ext.eq_ignore_ascii_case("wav") {
         return None;
     }
     let at = time::OffsetDateTime::parse(&origin.converted_at, &Rfc3339).ok()?;

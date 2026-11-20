@@ -1432,6 +1432,7 @@ asset-rule-converted = แปลงโดยกฎ
 # Followed by the original file's name: "A conversion rule made this GLB on 3 May 2026 from tree.obj".
 asset-rule-was = กฎการแปลงสร้าง { $format } นี้เมื่อ { $date } จาก
 asset-rule-kept-until = เก็บต้นฉบับไว้จนถึง { $date }
+asset-rule-rebuilt = FLAC เก็บทุกอย่างที่อยู่ใน WAV ไว้ จึงดาวน์โหลดหรือนำ WAV กลับมาได้ตรงตามเดิมทุกเมื่อ
 asset-rule-put-back = นำต้นฉบับกลับมา
 asset-rule-put-back-title = นำ { $file } กลับมาหรือไม่?
 asset-rule-put-back-body = ไฟล์ที่แปลงแล้วจะถูกลบ และต้นฉบับจะกลับมาแทนที่ พร้อมแท็ก คอลเลกชัน และลิงก์ของไฟล์ หลังจากนี้กฎการแปลงจะไม่แตะต้องไฟล์นี้อีก
@@ -2387,7 +2388,7 @@ settings-conv-remove = นำออก
 settings-conv-remove-label = นำกฎข้อที่ { $n } ออก
 settings-conv-taken = มีกฎอื่นแปลงรูปแบบนี้อยู่แล้ว
 settings-conv-upright = ตั้งโมเดลให้ตรงขณะแปลง (Y ขึ้น หันไปทาง +Z) แบบเดียวกับที่แสดงโมเดลของแพ็ก
-settings-conv-flac-what = เสียงยังเหมือนเดิมทุกประการ ในพื้นที่ราวครึ่งหนึ่ง WAV ที่มีจุดวนซ้ำ เครื่องหมาย cue ตัวอย่างแบบจุดลอยตัว หรือรายละเอียดอื่นที่ FLAC เก็บไว้ไม่ได้ จะยังเป็น WAV
+settings-conv-flac-what = เสียงยังเหมือนเดิมทุกประการ ในพื้นที่ราวครึ่งหนึ่ง และทุกอย่างใน WAV (จุดวนซ้ำ เครื่องหมาย cue แท็ก) จะเก็บไว้ใน FLAC จึงนำ WAV กลับมาได้ตรงตามเดิมทุกเมื่อ WAV ที่มีตัวอย่างแบบจุดลอยตัวหรือ 32 บิตจะยังเป็น WAV
 settings-conv-add = เพิ่มกฎ
 # Before a number of days: "Keep originals for [30] days".
 settings-conv-keep = เก็บต้นฉบับไว้

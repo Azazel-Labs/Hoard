@@ -309,6 +309,8 @@ pub(super) async fn conversions_run(State(state): State<AppState>) -> ApiResult<
 
 /// Put back the file a conversion rule replaced, while its original is kept.
 pub(super) async fn unconvert_asset(State(state): State<AppState>, Path(id): Path<String>) -> ApiResult<Json<Value>> {
+    // A WAV made FLAC is made again first.
+    crate::reformat::restore_original(&state, &id).await?;
     let pack = db::call(&state.pool, move |c| {
         Ok(match crate::reformat::put_back(c, &id) {
             Ok(p) => Ok(p),

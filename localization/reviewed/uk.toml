@@ -2717,6 +2717,10 @@ translation = "{ $file } повернуто"
 source = "Put back { $file }?"
 translation = "Повернути { $file }?"
 
+[messages.asset-rule-rebuilt]
+source = "The FLAC keeps everything that was in the WAV, so the WAV can be downloaded or put back exactly as it was at any time."
+translation = "FLAC зберігає все, що було у WAV, тож WAV можна будь-коли завантажити або повернути точно таким, яким він був."
+
 [messages.asset-rule-was]
 source = "A conversion rule made this { $format } on { $date } from"
 translation = "Правило перетворення створило цей { $format } { $date } з файлу"
@@ -9327,8 +9331,8 @@ source = "Convert files already in the library"
 translation = "Перетворити файли, що вже є в бібліотеці"
 
 [messages.settings-conv-flac-what]
-source = "The sound stays exactly the same, in about half the space. WAVs with loop points, cue markers, floating-point samples or other details a FLAC can’t keep stay WAV."
-translation = "Звук залишається точно таким самим, а місця займає приблизно вдвічі менше. WAV із точками петлі, маркерами cue, семплами з рухомою комою чи іншими даними, які FLAC не може зберегти, залишаються WAV."
+source = "The sound stays exactly the same, in about half the space, and everything else in the WAV (loop points, cue markers, tags) is kept in the FLAC, so the WAV can be put back exactly as it was at any time. WAVs with floating-point or 32-bit samples stay WAV."
+translation = "Звук залишається точно таким самим, а місця займає приблизно вдвічі менше, і все інше з WAV (точки петлі, маркери cue, теги) зберігається у FLAC, тож WAV можна будь-коли повернути точно таким, яким він був. WAV із семплами з рухомою комою або 32-бітними семплами залишаються WAV."
 
 [messages.settings-conv-from]
 source = "From"

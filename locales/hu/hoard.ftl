@@ -1442,6 +1442,7 @@ asset-rule-converted = Szabály alakította át
 # Followed by the original file's name: "A conversion rule made this GLB on 3 May 2026 from tree.obj".
 asset-rule-was = Egy átalakítási szabály készítette ezt a { $format } fájlt ({ $date }) ebből:
 asset-rule-kept-until = Az eredeti megmarad eddig: { $date }.
+asset-rule-rebuilt = A FLAC mindent megőriz, ami a WAV-ban volt, így a WAV bármikor pontosan az eredeti formájában letölthető vagy visszaállítható.
 asset-rule-put-back = Az eredeti visszaállítása
 asset-rule-put-back-title = Visszaállítja ezt: { $file }?
 asset-rule-put-back-body = Az átalakított fájl törlődik, és az eredeti visszakerül a helyére a címkéivel, gyűjteményeivel és hivatkozásaival együtt. Az átalakítási szabályok ezután nem nyúlnak hozzá.
@@ -2397,7 +2398,7 @@ settings-conv-remove = Eltávolítás
 settings-conv-remove-label = { $n }. szabály eltávolítása
 settings-conv-taken = Ezt a formátumot egy másik szabály alakítja át
 settings-conv-upright = A modellek felállítása átalakításkor (Y felfelé, előre +Z irányba), ahogy a csomag modelljei megjelennek
-settings-conv-flac-what = A hang pontosan ugyanaz marad, nagyjából feleakkora helyen. A hurokpontokat, cue-jelölőket, lebegőpontos mintákat vagy más, FLAC-ban meg nem tartható részleteket tartalmazó WAV-ok WAV-ok maradnak.
+settings-conv-flac-what = A hang pontosan ugyanaz marad, nagyjából feleakkora helyen, és a WAV minden más része (hurokpontok, cue-jelölők, címkék) megmarad a FLAC-ban, így a WAV bármikor pontosan az eredeti formájában visszaállítható. A lebegőpontos vagy 32 bites mintákat tartalmazó WAV-ok WAV-ok maradnak.
 settings-conv-add = Szabály hozzáadása
 # Before a number of days: "Keep originals for [30] days".
 settings-conv-keep = Az eredetiek megőrzése

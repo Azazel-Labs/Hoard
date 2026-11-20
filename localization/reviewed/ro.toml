@@ -2699,6 +2699,10 @@ translation = "{ $file } a fost restaurat"
 source = "Put back { $file }?"
 translation = "Restaurați { $file }?"
 
+[messages.asset-rule-rebuilt]
+source = "The FLAC keeps everything that was in the WAV, so the WAV can be downloaded or put back exactly as it was at any time."
+translation = "FLAC-ul păstrează tot ce era în WAV, așa că WAV-ul poate fi descărcat sau pus înapoi exact cum era oricând."
+
 [messages.asset-rule-was]
 source = "A conversion rule made this { $format } on { $date } from"
 translation = "O regulă de conversie a creat acest { $format } pe { $date } din"
@@ -9256,8 +9260,8 @@ source = "Convert files already in the library"
 translation = "Convertiți fișierele aflate deja în bibliotecă"
 
 [messages.settings-conv-flac-what]
-source = "The sound stays exactly the same, in about half the space. WAVs with loop points, cue markers, floating-point samples or other details a FLAC can’t keep stay WAV."
-translation = "Sunetul rămâne exact la fel, în aproximativ jumătate din spațiu. Fișierele WAV cu puncte de buclă, marcaje cue, eșantioane în virgulă mobilă sau alte detalii pe care un FLAC nu le poate păstra rămân WAV."
+source = "The sound stays exactly the same, in about half the space, and everything else in the WAV (loop points, cue markers, tags) is kept in the FLAC, so the WAV can be put back exactly as it was at any time. WAVs with floating-point or 32-bit samples stay WAV."
+translation = "Sunetul rămâne exact la fel, în aproximativ jumătate din spațiu, iar tot restul din WAV (puncte de buclă, marcaje cue, etichete) este păstrat în FLAC, așa că WAV-ul poate fi pus înapoi exact cum era oricând. Fișierele WAV cu eșantioane în virgulă mobilă sau pe 32 de biți rămân WAV."
 
 [messages.settings-conv-from]
 source = "From"

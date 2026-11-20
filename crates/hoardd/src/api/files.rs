@@ -247,7 +247,7 @@ pub(super) async fn asset_original(
     headers: HeaderMap,
 ) -> ApiResult<Response> {
     let id2 = id.clone();
-    let (hash, path) = db::call(&state.pool, move |c| {
+    let kept = db::call(&state.pool, move |c| {
         Ok(c.query_row(
             "SELECT blob_hash, path FROM asset_origin WHERE asset_id = ?1 AND blob_hash IS NOT NULL",
             [&id2],
@@ -255,11 +255,24 @@ pub(super) async fn asset_original(
         )
         .optional()?)
     })
-    .await?
-    .ok_or_else(|| AppError::not_found(tr!("error-original-not-found", id = id)))?;
-    let file = path.rsplit('/').next().unwrap_or(&path).replace(['"', '\\'], "_");
-    serve_blob(&state, &hash, &headers, "application/octet-stream", Some(format!("attachment; filename=\"{file}\"")))
-        .await
+    .await?;
+    let attachment = |path: &str| {
+        let file = path.rsplit('/').next().unwrap_or(path).replace(['"', '\\'], "_");
+        format!("attachment; filename=\"{file}\"")
+    };
+    if let Some((hash, path)) = kept {
+        return serve_blob(&state, &hash, &headers, "application/octet-stream", Some(attachment(&path))).await;
+    }
+    // A WAV made FLAC, made again.
+    let (wav, path) = crate::reformat::rebuilt_original(&state, &id)
+        .await?
+        .ok_or_else(|| AppError::not_found(tr!("error-original-not-found", id = id)))?;
+    let disposition = HeaderValue::from_str(&attachment(&path)).map_err(anyhow::Error::from)?;
+    Ok((
+        [(header::CONTENT_TYPE, HeaderValue::from_static("audio/wav")), (header::CONTENT_DISPOSITION, disposition)],
+        wav,
+    )
+        .into_response())
 }
 
 #[cfg(test)]

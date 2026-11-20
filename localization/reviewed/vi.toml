@@ -2558,6 +2558,10 @@ translation = "Đã đưa { $file } trở lại"
 source = "Put back { $file }?"
 translation = "Đưa { $file } trở lại?"
 
+[messages.asset-rule-rebuilt]
+source = "The FLAC keeps everything that was in the WAV, so the WAV can be downloaded or put back exactly as it was at any time."
+translation = "FLAC giữ mọi thứ có trong WAV, nên có thể tải xuống hoặc đưa WAV trở lại y như cũ bất cứ lúc nào."
+
 [messages.asset-rule-was]
 source = "A conversion rule made this { $format } on { $date } from"
 translation = "Một quy tắc chuyển đổi đã tạo tệp { $format } này vào { $date } từ"
@@ -8914,8 +8918,8 @@ source = "Convert files already in the library"
 translation = "Chuyển đổi các tệp đã có trong thư viện"
 
 [messages.settings-conv-flac-what]
-source = "The sound stays exactly the same, in about half the space. WAVs with loop points, cue markers, floating-point samples or other details a FLAC can’t keep stay WAV."
-translation = "Âm thanh giữ nguyên hoàn toàn, chỉ chiếm khoảng một nửa dung lượng. Các WAV có điểm lặp, dấu cue, mẫu dấu phẩy động hoặc chi tiết khác mà FLAC không giữ được sẽ vẫn là WAV."
+source = "The sound stays exactly the same, in about half the space, and everything else in the WAV (loop points, cue markers, tags) is kept in the FLAC, so the WAV can be put back exactly as it was at any time. WAVs with floating-point or 32-bit samples stay WAV."
+translation = "Âm thanh giữ nguyên hoàn toàn, chỉ chiếm khoảng một nửa dung lượng, và mọi thứ khác trong WAV (điểm lặp, dấu cue, thẻ) đều được giữ trong FLAC, nên có thể đưa WAV trở lại y như cũ bất cứ lúc nào. Các WAV có mẫu dấu phẩy động hoặc 32 bit sẽ vẫn là WAV."
 
 [messages.settings-conv-from]
 source = "From"

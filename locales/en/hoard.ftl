@@ -1753,6 +1753,8 @@ asset-rule-converted = Converted by a rule
 # Followed by the original file's name: "A conversion rule made this GLB on 3 May 2026 from tree.obj".
 asset-rule-was = A conversion rule made this { $format } on { $date } from
 asset-rule-kept-until = The original is kept until { $date }.
+# Under a FLAC a conversion rule made from a WAV. The WAV isn’t stored separately: it’s made again from the FLAC, byte for byte.
+asset-rule-rebuilt = The FLAC keeps everything that was in the WAV, so the WAV can be downloaded or put back exactly as it was at any time.
 asset-rule-put-back = Put the original back
 asset-rule-put-back-title = Put back { $file }?
 asset-rule-put-back-body = The converted file is deleted and the original takes its place, with its tags, collections and links. The conversion rules leave it alone from then on.
@@ -2909,8 +2911,8 @@ settings-conv-remove = Remove
 settings-conv-remove-label = Remove rule { $n }
 settings-conv-taken = Another rule converts this format
 settings-conv-upright = Turn models upright as they’re converted (Y up, facing +Z), the way the pack’s models are shown
-# Under a rule converting to FLAC. A FLAC holds the same sound in about half the space; a WAV is left as it is when converting would lose something.
-settings-conv-flac-what = The sound stays exactly the same, in about half the space. WAVs with loop points, cue markers, floating-point samples or other details a FLAC can’t keep stay WAV.
+# Under a rule converting to FLAC. A FLAC holds the same sound in about half the space, with the rest of the WAV kept in it, so the WAV can be made again byte for byte; only a WAV whose samples a FLAC can’t hold is left as it is.
+settings-conv-flac-what = The sound stays exactly the same, in about half the space, and everything else in the WAV (loop points, cue markers, tags) is kept in the FLAC, so the WAV can be put back exactly as it was at any time. WAVs with floating-point or 32-bit samples stay WAV.
 settings-conv-add = Add a rule
 # Before a number of days: "Keep originals for [30] days".
 settings-conv-keep = Keep originals for

@@ -1432,6 +1432,7 @@ asset-rule-converted = Đã chuyển đổi bởi quy tắc
 # Followed by the original file's name: "A conversion rule made this GLB on 3 May 2026 from tree.obj".
 asset-rule-was = Một quy tắc chuyển đổi đã tạo tệp { $format } này vào { $date } từ
 asset-rule-kept-until = Tệp gốc được giữ đến { $date }.
+asset-rule-rebuilt = FLAC giữ mọi thứ có trong WAV, nên có thể tải xuống hoặc đưa WAV trở lại y như cũ bất cứ lúc nào.
 asset-rule-put-back = Đưa tệp gốc trở lại
 asset-rule-put-back-title = Đưa { $file } trở lại?
 asset-rule-put-back-body = Tệp đã chuyển đổi bị xóa và tệp gốc thế chỗ, kèm theo thẻ, bộ sưu tập và liên kết của nó. Từ đó trở đi, các quy tắc chuyển đổi không động đến nó nữa.
@@ -2384,7 +2385,7 @@ settings-conv-remove = Gỡ
 settings-conv-remove-label = Gỡ quy tắc { $n }
 settings-conv-taken = Một quy tắc khác đã chuyển đổi định dạng này
 settings-conv-upright = Dựng thẳng mô hình khi chuyển đổi (Y hướng lên, quay về +Z), theo cách các mô hình của gói được hiển thị
-settings-conv-flac-what = Âm thanh giữ nguyên hoàn toàn, chỉ chiếm khoảng một nửa dung lượng. Các WAV có điểm lặp, dấu cue, mẫu dấu phẩy động hoặc chi tiết khác mà FLAC không giữ được sẽ vẫn là WAV.
+settings-conv-flac-what = Âm thanh giữ nguyên hoàn toàn, chỉ chiếm khoảng một nửa dung lượng, và mọi thứ khác trong WAV (điểm lặp, dấu cue, thẻ) đều được giữ trong FLAC, nên có thể đưa WAV trở lại y như cũ bất cứ lúc nào. Các WAV có mẫu dấu phẩy động hoặc 32 bit sẽ vẫn là WAV.
 settings-conv-add = Thêm quy tắc
 # Before a number of days: "Keep originals for [30] days".
 settings-conv-keep = Giữ tệp gốc trong

@@ -2654,6 +2654,10 @@ translation = "Враћено: { $file }"
 source = "Put back { $file }?"
 translation = "Вратити { $file }?"
 
+[messages.asset-rule-rebuilt]
+source = "The FLAC keeps everything that was in the WAV, so the WAV can be downloaded or put back exactly as it was at any time."
+translation = "FLAC чува све што је било у WAV датотеци, па се WAV у сваком тренутку може преузети или вратити тачно онакав какав је био."
+
 [messages.asset-rule-was]
 source = "A conversion rule made this { $format } on { $date } from"
 translation = "Правило претварања направило је ову датотеку { $format } { $date } од"
@@ -9181,8 +9185,8 @@ source = "Convert files already in the library"
 translation = "Претвори датотеке које су већ у библиотеци"
 
 [messages.settings-conv-flac-what]
-source = "The sound stays exactly the same, in about half the space. WAVs with loop points, cue markers, floating-point samples or other details a FLAC can’t keep stay WAV."
-translation = "Звук остаје потпуно исти, на отприлике половини простора. WAV датотеке са тачкама петље, cue ознакама, узорцима у покретном зарезу или другим подацима које FLAC не може да задржи остају WAV."
+source = "The sound stays exactly the same, in about half the space, and everything else in the WAV (loop points, cue markers, tags) is kept in the FLAC, so the WAV can be put back exactly as it was at any time. WAVs with floating-point or 32-bit samples stay WAV."
+translation = "Звук остаје потпуно исти, на отприлике половини простора, а све остало из WAV датотеке (тачке петље, cue ознаке, ознаке) чува се у FLAC датотеци, па се WAV у сваком тренутку може вратити тачно онакав какав је био. WAV датотеке са узорцима у покретном зарезу или 32-битним узорцима остају WAV."
 
 [messages.settings-conv-from]
 source = "From"

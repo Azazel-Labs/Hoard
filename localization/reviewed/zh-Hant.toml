@@ -2564,6 +2564,10 @@ translation = "已還原 { $file }"
 source = "Put back { $file }?"
 translation = "要還原 { $file } 嗎？"
 
+[messages.asset-rule-rebuilt]
+source = "The FLAC keeps everything that was in the WAV, so the WAV can be downloaded or put back exactly as it was at any time."
+translation = "FLAC 保留了 WAV 中的所有內容，因此隨時可以原樣下載或還原 WAV。"
+
 [messages.asset-rule-was]
 source = "A conversion rule made this { $format } on { $date } from"
 translation = "轉換規則於 { $date } 產生了此 { $format }，來源："
@@ -8920,8 +8924,8 @@ source = "Convert files already in the library"
 translation = "轉換素材庫中已有的檔案"
 
 [messages.settings-conv-flac-what]
-source = "The sound stays exactly the same, in about half the space. WAVs with loop points, cue markers, floating-point samples or other details a FLAC can’t keep stay WAV."
-translation = "聲音完全不變，空間約為一半。帶有循環點、cue 標記、浮點取樣或其他 FLAC 無法保留之資訊的 WAV 會維持為 WAV。"
+source = "The sound stays exactly the same, in about half the space, and everything else in the WAV (loop points, cue markers, tags) is kept in the FLAC, so the WAV can be put back exactly as it was at any time. WAVs with floating-point or 32-bit samples stay WAV."
+translation = "聲音完全不變，空間約為一半；WAV 中的其他所有內容（循環點、cue 標記、標籤）都保留在 FLAC 裡，因此隨時可以把 WAV 原樣還原。帶有浮點或 32 位元取樣的 WAV 會維持為 WAV。"
 
 [messages.settings-conv-from]
 source = "From"

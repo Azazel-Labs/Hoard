@@ -1545,6 +1545,7 @@ asset-rule-converted = Deur 'n reël omgeskakel
 # Followed by the original file's name: "A conversion rule made this GLB on 3 May 2026 from tree.obj".
 asset-rule-was = 'n Omskakelreël het hierdie { $format } op { $date } gemaak uit
 asset-rule-kept-until = Die oorspronklike word tot { $date } gehou.
+asset-rule-rebuilt = Die FLAC hou alles wat in die WAV was, sodat die WAV enige tyd presies soos dit was afgelaai of teruggesit kan word.
 asset-rule-put-back = Sit die oorspronklike terug
 asset-rule-put-back-title = Sit { $file } terug?
 asset-rule-put-back-body = Die omgeskakelde lêer word uitgevee en die oorspronklike neem sy plek in, met sy etikette, versamelings en skakels. Die omskakelreëls los dit voortaan uit.
@@ -2567,7 +2568,7 @@ settings-conv-remove = Verwyder
 settings-conv-remove-label = Verwyder reël { $n }
 settings-conv-taken = 'n Ander reël skakel hierdie formaat reeds om
 settings-conv-upright = Rig modelle regop terwyl hulle omgeskakel word (Y op, wys na +Z), soos die pak se modelle gewys word
-settings-conv-flac-what = Die klank bly presies dieselfde, in omtrent die helfte van die spasie. WAV’s met lusmerke, aanwysmerkers, swewendepunt-monsters of ander besonderhede wat ’n FLAC nie kan hou nie, bly WAV.
+settings-conv-flac-what = Die klank bly presies dieselfde, in omtrent die helfte van die spasie, en alles anders in die WAV (lusmerke, aanwysmerkers, etikette) word in die FLAC gehou, sodat die WAV enige tyd presies soos dit was teruggesit kan word. WAV’s met swewendepunt- of 32-bis-monsters bly WAV.
 settings-conv-add = Voeg 'n reël by
 # Before a number of days: "Keep originals for [30] days".
 settings-conv-keep = Hou oorspronklikes vir

@@ -2654,6 +2654,10 @@ translation = "Το { $file } επανήλθε"
 source = "Put back { $file }?"
 translation = "Να επανέλθει το { $file };"
 
+[messages.asset-rule-rebuilt]
+source = "The FLAC keeps everything that was in the WAV, so the WAV can be downloaded or put back exactly as it was at any time."
+translation = "Το FLAC κρατά ό,τι υπήρχε στο WAV, ώστε το WAV να μπορεί να ληφθεί ή να επανέλθει ακριβώς όπως ήταν οποιαδήποτε στιγμή."
+
 [messages.asset-rule-was]
 source = "A conversion rule made this { $format } on { $date } from"
 translation = "Ένας κανόνας μετατροπής δημιούργησε αυτό το { $format } στις { $date } από το"
@@ -9158,8 +9162,8 @@ source = "Convert files already in the library"
 translation = "Μετατροπή αρχείων που υπάρχουν ήδη στη βιβλιοθήκη"
 
 [messages.settings-conv-flac-what]
-source = "The sound stays exactly the same, in about half the space. WAVs with loop points, cue markers, floating-point samples or other details a FLAC can’t keep stay WAV."
-translation = "Ο ήχος μένει ακριβώς ίδιος, σε περίπου τον μισό χώρο. Τα WAV με σημεία επανάληψης, δείκτες cue, δείγματα κινητής υποδιαστολής ή άλλες λεπτομέρειες που ένα FLAC δεν μπορεί να κρατήσει μένουν WAV."
+source = "The sound stays exactly the same, in about half the space, and everything else in the WAV (loop points, cue markers, tags) is kept in the FLAC, so the WAV can be put back exactly as it was at any time. WAVs with floating-point or 32-bit samples stay WAV."
+translation = "Ο ήχος μένει ακριβώς ίδιος, σε περίπου τον μισό χώρο, και ό,τι άλλο έχει το WAV (σημεία επανάληψης, δείκτες cue, ετικέτες) κρατιέται μέσα στο FLAC, ώστε το WAV να μπορεί να επανέλθει ακριβώς όπως ήταν οποιαδήποτε στιγμή. Τα WAV με δείγματα κινητής υποδιαστολής ή 32 bit μένουν WAV."
 
 [messages.settings-conv-from]
 source = "From"

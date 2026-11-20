@@ -2646,6 +2646,10 @@ translation = "{ $file } on palautettu"
 source = "Put back { $file }?"
 translation = "Palautetaanko { $file }?"
 
+[messages.asset-rule-rebuilt]
+source = "The FLAC keeps everything that was in the WAV, so the WAV can be downloaded or put back exactly as it was at any time."
+translation = "FLAC säilyttää kaiken, mitä WAV-tiedostossa oli, joten WAV voidaan milloin tahansa ladata tai palauttaa täsmälleen sellaisena kuin se oli."
+
 [messages.asset-rule-was]
 source = "A conversion rule made this { $format } on { $date } from"
 translation = "Muunnossääntö teki tämän { $format }-tiedoston { $date } tiedostosta"
@@ -9148,8 +9152,8 @@ source = "Convert files already in the library"
 translation = "Muunna kirjastossa jo olevat tiedostot"
 
 [messages.settings-conv-flac-what]
-source = "The sound stays exactly the same, in about half the space. WAVs with loop points, cue markers, floating-point samples or other details a FLAC can’t keep stay WAV."
-translation = "Ääni pysyy täsmälleen samana noin puolessa tilasta. WAV-tiedostot, joissa on silmukkapisteitä, cue-merkkejä, liukulukunäytteitä tai muita tietoja, joita FLAC ei voi säilyttää, jäävät WAV-muotoon."
+source = "The sound stays exactly the same, in about half the space, and everything else in the WAV (loop points, cue markers, tags) is kept in the FLAC, so the WAV can be put back exactly as it was at any time. WAVs with floating-point or 32-bit samples stay WAV."
+translation = "Ääni pysyy täsmälleen samana noin puolessa tilasta, ja kaikki muu WAV-tiedoston sisältö (silmukkapisteet, cue-merkit, tunnisteet) säilyy FLAC-tiedostossa, joten WAV voidaan palauttaa milloin tahansa täsmälleen sellaisena kuin se oli. WAV-tiedostot, joissa on liukuluku- tai 32-bittisiä näytteitä, jäävät WAV-muotoon."
 
 [messages.settings-conv-from]
 source = "From"

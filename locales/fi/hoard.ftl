@@ -1599,6 +1599,7 @@ asset-rule-converted = Muunnettu säännöllä
 # Followed by the original file's name: "A conversion rule made this GLB on 3 May 2026 from tree.obj".
 asset-rule-was = Muunnossääntö teki tämän { $format }-tiedoston { $date } tiedostosta
 asset-rule-kept-until = Alkuperäinen säilytetään { $date } asti.
+asset-rule-rebuilt = FLAC säilyttää kaiken, mitä WAV-tiedostossa oli, joten WAV voidaan milloin tahansa ladata tai palauttaa täsmälleen sellaisena kuin se oli.
 asset-rule-put-back = Palauta alkuperäinen
 asset-rule-put-back-title = Palautetaanko { $file }?
 asset-rule-put-back-body = Muunnettu tiedosto poistetaan, ja alkuperäinen palaa sen paikalle tunnisteineen, kokoelmineen ja linkkeineen. Muunnossäännöt eivät sen jälkeen enää koske siihen.
@@ -2655,7 +2656,7 @@ settings-conv-remove = Poista
 settings-conv-remove-label = Poista sääntö { $n }
 settings-conv-taken = Toinen sääntö muuntaa jo tämän muodon
 settings-conv-upright = Käännä mallit pystyyn muunnettaessa (Y ylös, etupuoli kohti +Z) samalla tavalla kuin paketin mallit näytetään
-settings-conv-flac-what = Ääni pysyy täsmälleen samana noin puolessa tilasta. WAV-tiedostot, joissa on silmukkapisteitä, cue-merkkejä, liukulukunäytteitä tai muita tietoja, joita FLAC ei voi säilyttää, jäävät WAV-muotoon.
+settings-conv-flac-what = Ääni pysyy täsmälleen samana noin puolessa tilasta, ja kaikki muu WAV-tiedoston sisältö (silmukkapisteet, cue-merkit, tunnisteet) säilyy FLAC-tiedostossa, joten WAV voidaan palauttaa milloin tahansa täsmälleen sellaisena kuin se oli. WAV-tiedostot, joissa on liukuluku- tai 32-bittisiä näytteitä, jäävät WAV-muotoon.
 settings-conv-add = Lisää sääntö
 # Before a number of days: "Keep originals for [30] days".
 settings-conv-keep = Säilytä alkuperäiset

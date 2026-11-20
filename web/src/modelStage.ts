@@ -929,11 +929,14 @@ export class ModelStage {
     const { object, mixer } = this
     const inner = object?.children[0]
     if (!object || !mixer || !inner) return null
-    // The root: the highest node the clip moves rather than only turns.
+    // The root: the highest node the clip moves rather than only turns. A track that holds one place (Blender keys
+    // its armature so) moves nothing.
     let node: THREE.Object3D | null = null
     let depth = Infinity
     for (const t of action.getClip().tracks) {
       if (!t.name.endsWith('.position')) continue
+      const v = t.values
+      if (v.every((x, i) => Math.abs(x - v[i % 3]) < 1e-6)) continue
       let found: THREE.Object3D | null = null
       try {
         const name = THREE.PropertyBinding.parseTrackName(t.name).nodeName

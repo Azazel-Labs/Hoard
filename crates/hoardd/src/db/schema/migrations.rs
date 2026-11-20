@@ -891,4 +891,8 @@ pub(in crate::db) const MIGRATIONS: &[&str] = &[
              assets = assets + 1, bytes = bytes + excluded.bytes, unreal = unreal + excluded.unreal;
      END;
      CREATE INDEX assets_cover ON assets (pack_id, kind, path) WHERE thumb_hash IS NOT NULL;",
+    // 84: the few damaged or missing files and failed Unreal conversions, found without going through every file:
+    // Settings → Issues looked for both each time it was opened.
+    "CREATE INDEX blobs_bad ON blobs (hash) WHERE status <> 'ok';
+     CREATE INDEX unreal_status_failed ON unreal_status (updated_at) WHERE status = 'failed';",
 ];

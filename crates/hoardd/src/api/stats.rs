@@ -65,7 +65,7 @@ pub(super) async fn stats(State(state): State<AppState>) -> ApiResult<Json<Stats
             archived_assets: one("SELECT COUNT(*) FROM assets a WHERE a.archived_at IS NOT NULL
                    AND a.pack_id NOT IN (SELECT id FROM packs WHERE archived_at IS NOT NULL)")?,
             blobs: one("SELECT COUNT(*) FROM blobs")?,
-            blobs_bad: one("SELECT COUNT(*) FROM blobs WHERE status != 'ok'")?,
+            blobs_bad: one("SELECT COUNT(*) FROM blobs WHERE status <> 'ok'")?,
             stored_bytes: sizes.stored_bytes,
             logical_bytes: sizes.logical_bytes,
             jobs_pending: one("SELECT COUNT(*) FROM jobs WHERE status IN ('queued', 'running')")?,

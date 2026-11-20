@@ -370,7 +370,7 @@ fn items(c: &Connection, kind: &str) -> Result<(Vec<Item>, i64)> {
         ),
         "unreal" => (
             "SELECT u.asset_id, a.pack_id, p.name, a.path, u.reason, u.updated_at
-               FROM unreal_status u JOIN assets a ON a.id = u.asset_id JOIN packs p ON p.id = a.pack_id
+               FROM unreal_status u CROSS JOIN assets a ON a.id = u.asset_id JOIN packs p ON p.id = a.pack_id
               WHERE u.status = 'failed' ORDER BY u.updated_at DESC",
             |r| {
                 Ok(Item {
@@ -684,5 +684,41 @@ mod tests {
             let (rows, total) = items(&c, g.kind).unwrap();
             assert!(rows.is_empty() && total == 0, "{}", g.kind);
         }
+    }
+
+    /// A damaged file and a failed Unreal conversion are listed, each found from the few there are, not by going
+    /// through every file.
+    #[test]
+    fn damaged_files_and_failed_conversions_are_listed() {
+        let (_dir, pool) = pool();
+        let c = pool.get().unwrap();
+        c.execute_batch(
+            "INSERT INTO packs (id, name, status, created_at) VALUES ('p1', 'Kit', 'ready', 'x');
+             INSERT INTO blobs (hash, size, created_at, status) VALUES ('ok', 1, 'x', 'ok'), ('bad', 1, 'x', 'missing');
+             INSERT INTO assets (id, pack_id, blob_hash, path, name, ext, kind, created_at, updated_at) VALUES
+               ('a', 'p1', 'ok', 'a.uasset', 'a', 'uasset', 'other', 'x', 'x'),
+               ('b', 'p1', 'bad', 'b.png', 'b', 'png', 'texture', 'x', 'x');
+             INSERT INTO unreal_status (asset_id, status, reason, updated_at) VALUES ('a', 'failed', 'no editor', 'x');",
+        )
+        .unwrap();
+        let (rows, total) = items(&c, "damaged").unwrap();
+        assert_eq!((total, rows[0].asset_id.as_deref()), (1, Some("b")));
+        let (rows, total) = items(&c, "unreal").unwrap();
+        assert_eq!((total, rows[0].message.as_str()), (1, "no editor"));
+        let plan = |sql: &str| -> String {
+            c.prepare(&format!("EXPLAIN QUERY PLAN {sql}"))
+                .unwrap()
+                .query_map([], |r| r.get::<_, String>(3))
+                .unwrap()
+                .map(Result::unwrap)
+                .collect::<Vec<_>>()
+                .join(" | ")
+        };
+        assert!(plan("SELECT hash FROM blobs b WHERE b.status <> 'ok'").contains("blobs_bad"));
+        let unreal = plan(
+            "SELECT u.asset_id FROM unreal_status u CROSS JOIN assets a ON a.id = u.asset_id
+              WHERE u.status = 'failed' ORDER BY u.updated_at DESC",
+        );
+        assert!(unreal.contains("unreal_status_failed"), "{unreal}");
     }
 }

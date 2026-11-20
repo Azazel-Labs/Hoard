@@ -782,4 +782,9 @@ pub(in crate::db) const MIGRATIONS: &[&str] = &[
      CREATE TRIGGER assets_fts_gone AFTER DELETE ON assets WHEN old.fts_row IS NOT NULL BEGIN
          DELETE FROM assets_fts WHERE rowid = old.fts_row;
      END;",
+    // 81: a take that has no mesh of its own was played on another pack's character, or on nothing, and a browser
+    // drew it so (often blank). Its file's picture stands in again until it's drawn on the file it came from.
+    "UPDATE assets SET thumb_source = NULL,
+         thumb_hash = (SELECT f.thumb_hash FROM assets f WHERE f.id = json_extract(assets.meta, '$.take_of'))
+       WHERE json_extract(meta, '$.take_of') IS NOT NULL AND thumb_source IN ('browser', 'browser-partial');",
 ];

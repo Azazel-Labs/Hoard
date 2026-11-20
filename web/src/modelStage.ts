@@ -183,6 +183,11 @@ export class ModelStage {
     return [...this.missing]
   }
 
+  /** Whether there's nothing to draw (a clip with no character to play it on), so no picture to take. */
+  get drawsNothing(): boolean {
+    return this.meshCount === 0
+  }
+
   /** Set up the renderer and load the asset. Resolves once the first frame can draw. */
   async load(asset: Asset, opts: LoadOptions = {}): Promise<StageInfo> {
     const el = this.host
@@ -230,13 +235,20 @@ export class ModelStage {
     // Those its pack ships it for come first, then any other with its skeleton, in any pack.
     let clipLinks = full.links.filter((l) => l.rel === 'animation')
     this.animation = full.kind === 'animation'
+    // A take of a file of many plays on that file, the character it was made for, when it has a mesh to draw.
+    const takeOf = typeof full.meta?.take_of === 'string' ? full.meta.take_of : ''
+    const source = takeOf ? await api.asset(takeOf).catch(() => null) : null
+    if (this.disposed) throw new Error('closed')
     const wearers =
       full.kind === 'animation'
         ? [
-            ...full.linked_from.filter((l) => l.rel === 'animation' && l.kind === 'model'),
-            ...(full.fits ?? []).map((f) =>
-              f.pack_id === full.pack_id ? { id: f.id, name: f.name } : { id: f.id, name: `${f.name} · ${f.pack_name}`, away: true },
-            ),
+            ...(source?.kind === 'model' ? [{ id: source.id, name: source.name }] : []),
+            ...full.linked_from.filter((l) => l.rel === 'animation' && l.kind === 'model' && l.id !== takeOf),
+            ...(full.fits ?? [])
+              .filter((f) => f.id !== takeOf)
+              .map((f) =>
+                f.pack_id === full.pack_id ? { id: f.id, name: f.name } : { id: f.id, name: `${f.name} · ${f.pack_name}`, away: true },
+              ),
           ]
         : []
     // A character plays its own clips, and any animation that fits it once picked.
@@ -253,7 +265,7 @@ export class ModelStage {
             }))
     for (const f of fitting) this.fitting.set(f.clip, { link: f.link, pack: f.pack })
     const wearer = wearers.find((w) => w.id === opts.on) ?? wearers[0]
-    const body = wearer && (await api.asset(wearer.id).catch(() => null))
+    const body = wearer && (wearer.id === source?.id ? source : await api.asset(wearer.id).catch(() => null))
     if (this.disposed) throw new Error('closed')
     if (body) {
       const { id, name, path, kind, has_thumb } = full

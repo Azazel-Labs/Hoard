@@ -179,3 +179,31 @@ test('each take in a file of many is an animation of its own', async ({ api }) =
     await api.post('/api/archive/purge', { data: { packs: [pack.id] } })
   }
 })
+
+// A take of a character's own file plays on that character, not on another that merely fits its skeleton.
+test('a take plays on the character it was split from', async ({ page, api }) => {
+  test.setTimeout(150_000)
+  const name = `E2E Own Takes ${unique()}`
+  const bones = `Own${unique()}_`
+  const pack = await uploadPack(api, name, [
+    { relpath: 'Other/buddy.gltf', data: rigged(bones, { mesh: true }) },
+    { relpath: 'hero.gltf', data: rigged(bones, { mesh: true, clip: { name: 'Moves', secs: 0.8 }, takes: ['Walk', 'Kick'] }) },
+  ])
+  try {
+    await waitReady(api, [pack.id])
+    const all = await assetsOf(api, pack.id)
+    const kick = all.find((a) => a.path === 'hero@Kick.glb')!
+    const hero = all.find((a) => a.path.startsWith('hero.'))!
+    expect(kick?.kind).toBe('animation')
+    await openPack(page, pack.id, name)
+    await tile(page, kick.name).click()
+    const panel = page.getByRole('complementary', { name: 'Asset details' })
+    const playsOn = panel.getByRole('combobox', { name: 'Plays on' })
+    await expect(playsOn).toBeVisible({ timeout: 30_000 })
+    await expect(playsOn.locator('option:checked')).toHaveText(hero.name)
+    await expect(playsOn.locator('option')).toHaveCount(2)
+  } finally {
+    await api.post('/api/archive', { data: { packs: [pack.id] } })
+    await api.post('/api/archive/purge', { data: { packs: [pack.id] } })
+  }
+})

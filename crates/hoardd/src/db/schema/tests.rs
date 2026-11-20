@@ -595,7 +595,8 @@ fn only_the_newest_upgrade_backups_are_kept() {
 fn search_rows_are_kept_by_number() {
     let dir = tempfile::tempdir().unwrap();
     let mut conn = baseline_db(dir.path());
-    migrate(&mut conn, &dir.path().join("backups"), &MIGRATIONS[..MIGRATIONS.len() - 1]).unwrap();
+    let numbered = MIGRATIONS.iter().position(|m| m.contains("ADD COLUMN fts_row")).unwrap();
+    migrate(&mut conn, &dir.path().join("backups"), &MIGRATIONS[..numbered]).unwrap();
     conn.execute_batch(
         "PRAGMA foreign_keys = OFF;
              INSERT INTO assets (id, pack_id, blob_hash, path, name, ext, kind, created_at, updated_at) VALUES
@@ -627,4 +628,33 @@ fn search_rows_are_kept_by_number() {
     assert_eq!(rows(&conn), [pair("bare", "bare"), pair("rock", "boulder")]);
     conn.execute("DELETE FROM packs WHERE id = 'p1'", []).unwrap();
     assert_eq!(rows(&conn), []);
+}
+
+/// A take a browser drew (on another character, or on nothing) has its file's picture back, to be drawn again; one the
+/// server drew, and files that aren't takes, keep theirs.
+#[test]
+fn takes_drawn_by_a_browser_get_their_files_picture_back() {
+    let dir = tempfile::tempdir().unwrap();
+    let mut conn = baseline_db(dir.path());
+    let reset = MIGRATIONS.iter().position(|m| m.contains("take_of') IS NOT NULL AND thumb_source IN")).unwrap();
+    migrate(&mut conn, &dir.path().join("backups"), &MIGRATIONS[..reset]).unwrap();
+    conn.execute_batch(
+        "PRAGMA foreign_keys = OFF;
+         INSERT INTO assets (id, pack_id, blob_hash, path, name, ext, kind, meta, thumb_hash, thumb_source,
+                             created_at, updated_at) VALUES
+           ('hero', 'p1', 'h1', 'hero.fbx', 'hero', 'fbx', 'model', '{}', 'hero-pic', 'browser', 'x', 'x'),
+           ('kick', 'p1', 'h2', 'hero@Kick.glb', 'Kick', 'glb', 'animation', '{\"take_of\":\"hero\"}', 'blank', 'browser', 'x', 'x'),
+           ('walk', 'p1', 'h3', 'hero@Walk.glb', 'Walk', 'glb', 'animation', '{\"take_of\":\"hero\"}', 'served', NULL, 'x', 'x');",
+    )
+    .unwrap();
+    migrate(&mut conn, &dir.path().join("backups"), MIGRATIONS).unwrap();
+    let thumb = |id: &str| -> (Option<String>, Option<String>) {
+        conn.query_row("SELECT thumb_hash, thumb_source FROM assets WHERE id = ?1", [id], |r| {
+            Ok((r.get(0)?, r.get(1)?))
+        })
+        .unwrap()
+    };
+    assert_eq!(thumb("kick"), (Some("hero-pic".into()), None));
+    assert_eq!(thumb("walk"), (Some("served".into()), None));
+    assert_eq!(thumb("hero"), (Some("hero-pic".into()), Some("browser".into())));
 }

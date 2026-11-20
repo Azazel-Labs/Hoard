@@ -43,6 +43,7 @@ export async function drawThumb(stage: ModelStage, a: Asset): Promise<ThumbUploa
     new Promise<boolean>((resolve) => (timer = window.setTimeout(() => resolve(false), TEXTURE_WAIT_MS))),
   ])
   clearTimeout(timer)
+  if (stage.drawsNothing) return null
   const source: ThumbSource = settled && !stage.missingTextures.length ? 'browser' : 'browser-partial'
   if (source === 'browser-partial' && a.thumb_source === 'browser-partial') return null
   const png = await stage.snapshot(256)

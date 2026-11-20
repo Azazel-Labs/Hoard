@@ -23,6 +23,8 @@ jobs:
       - run: cargo test --workspace --locked
       # The server with every feature left out (no LDAP, HTTPS, S3 or keychain); the workspace build above has them all.
       - run: cargo clippy -p hoardd --all-targets --no-default-features --locked -- -D warnings
+      # The desktop app without its updater, for a build something else updates.
+      - run: cargo clippy -p hoard-desktop --no-default-features --locked -- -D warnings
       # Every message the server and portal use is in English with the same variables, every translation's review
       # record is current, and the catalogs are formatted (see docs/translations.md).
       - run: cargo xtask translations check

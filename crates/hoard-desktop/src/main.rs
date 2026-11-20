@@ -11,6 +11,8 @@
 //! it in the background, and installs it with no window when the app quits, so the next start is the new version. On
 //! Windows the app is installed for the one user, in their own folders, so installing an update doesn't ask for an
 //! administrator. A copy installed from the .deb is left to the package manager.
+//!
+//! Built without the default `updater` feature, it leaves updating to whatever installed it.
 
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
@@ -26,6 +28,7 @@ use tauri::ipc::CapabilityBuilder;
 use tauri::webview::{DownloadEvent, NewWindowResponse};
 use tauri::{AppHandle, Manager as _, RunEvent, Url, WebviewUrl, WebviewWindow, WebviewWindowBuilder};
 use tauri_plugin_opener::OpenerExt as _;
+#[cfg(feature = "updater")]
 use tauri_plugin_updater::{Update, UpdaterExt as _};
 
 /// The port the app asks for the first time: a server's, so the plugins' default address finds it.
@@ -33,6 +36,7 @@ const FIRST_PORT: u16 = 4627;
 /// How long quitting waits for the server to finish what it's doing.
 const STOP_WAIT: Duration = Duration::from_secs(10);
 /// How often the app looks for an update while it's open, after looking when it starts.
+#[cfg(feature = "updater")]
 const UPDATE_CHECK: Duration = Duration::from_hours(6);
 /// Where macOS's window buttons go, from the window's top left, in the middle of the portal's header.
 #[cfg(target_os = "macos")]
@@ -43,13 +47,16 @@ const LOG_LIMIT: u64 = 16 * 1024 * 1024;
 /// The server's thread, joined when the app quits.
 static SERVER: Mutex<Option<JoinHandle<()>>> = Mutex::new(None);
 /// An update downloaded and waiting for the app to quit.
+#[cfg(feature = "updater")]
 static PENDING: Mutex<Option<(Update, Vec<u8>)>> = Mutex::new(None);
 
 fn main() {
     let app = tauri::Builder::default()
         .plugin(tauri_plugin_single_instance::init(|app, _args, _cwd| show(app)))
-        .plugin(tauri_plugin_opener::init())
-        .plugin(tauri_plugin_updater::Builder::new().build())
+        .plugin(tauri_plugin_opener::init());
+    #[cfg(feature = "updater")]
+    let app = app.plugin(tauri_plugin_updater::Builder::new().build());
+    let app = app
         .setup(|app| {
             start(app.handle())?;
             Ok(())
@@ -131,7 +138,9 @@ fn start(app: &AppHandle) -> Result<()> {
             }
         }
     });
+    #[cfg(feature = "updater")]
     let app = app.clone();
+    #[cfg(feature = "updater")]
     tauri::async_runtime::spawn(async move {
         // A .deb is updated by the package manager, with the next .deb.
         if tauri::utils::platform::bundle_type() == Some(tauri::utils::config::BundleType::Deb) {
@@ -188,6 +197,13 @@ fn stop() {
             tracing::warn!("the server didn't stop in time");
         }
     }
+    #[cfg(feature = "updater")]
+    install_pending();
+}
+
+/// Install the update that's waiting, if one is.
+#[cfg(feature = "updater")]
+fn install_pending() {
     let pending = PENDING.lock().unwrap_or_else(PoisonError::into_inner).take();
     if let Some((update, bytes)) = pending {
         tracing::info!(version = %update.version, "installing the update");
@@ -328,8 +344,8 @@ fn log_file(path: &Path) -> std::io::Result<File> {
     OpenOptions::new().create(true).append(!big).write(true).truncate(big).open(path)
 }
 
-/// Download an update, if there is one, to install when the app quits.
 /// Look for an update and download it, to install when the app quits. True if there was one.
+#[cfg(feature = "updater")]
 async fn fetch_update(app: &AppHandle) -> Result<bool> {
     let Some(update) = app.updater()?.check().await? else {
         return Ok(false);

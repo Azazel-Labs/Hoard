@@ -21,7 +21,12 @@ tracing-subscriber.workspace = true
 tauri = { version = "2.12.6", features = [] }
 tauri-plugin-opener = "2.7.3"
 tauri-plugin-single-instance = "2.5.5"
-tauri-plugin-updater = "2.14.1"
+tauri-plugin-updater = { version = "2.14.1", optional = true }
+
+[features]
+default = ["updater"]
+# Updating itself from the GitHub releases: left out of a build that something else updates.
+updater = ["dep:tauri-plugin-updater"]
 
 [build-dependencies]
 tauri-build = { version = "2.7.5", features = [] }

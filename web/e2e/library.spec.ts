@@ -15,13 +15,12 @@ test.describe('library grid', () => {
     // Hundreds of thumbnails on a busy machine: give it room.
     test.slow()
     const offsets: number[] = []
-    const facetless: number[] = []
+    const sidebar: string[] = []
     page.on('request', (r) => {
       const u = new URL(r.url())
       if (u.pathname === '/api/assets' && u.searchParams.get('pack') === seed.packs[BIG]) {
-        const offset = Number(u.searchParams.get('offset') ?? 0)
-        offsets.push(offset)
-        if (u.searchParams.get('facets') === 'false') facetless.push(offset)
+        if (u.searchParams.get('facets') === 'false') offsets.push(Number(u.searchParams.get('offset') ?? 0))
+        else sidebar.push(`${u.searchParams.get('offset') ?? 0}+${u.searchParams.get('limit')}`)
       }
     })
     await openPack(page, seed.packs[BIG], BIG, '&sort=name')
@@ -44,8 +43,9 @@ test.describe('library grid', () => {
 
     const later = new Set(offsets.filter((o) => o > 0))
     expect(later.size, 'pages fetched past the first').toBeGreaterThanOrEqual(2)
-    // Only the first page asks for the sidebar's counts.
-    expect(new Set(facetless)).toEqual(later)
+    expect(offsets, 'the first page').toContain(0)
+    // The sidebar's tags come after the first page, in a request of their own that asks for one tile at most.
+    expect(sidebar).toEqual(['0+1'])
     // The grid is virtual: the first rows are gone and far fewer than all 300 tiles exist.
     await expect(tile(page, 'Img 000')).toHaveCount(0)
     expect(await page.locator('.grid button.hit').count()).toBeLessThan(BIG_COUNT / 2)

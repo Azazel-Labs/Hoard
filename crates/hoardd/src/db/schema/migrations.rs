@@ -1,5 +1,18 @@
 //! Every change to the schema since the baseline, in order.
 
+/// Whether another asset needs the asset being updated as its data, by a link or as a material's map: what step 82
+/// keeps in `assets.supports` (see [`SUPPORTING`](crate::db::SUPPORTING)). Frozen with that step, like it.
+macro_rules! needed_82 {
+    () => {
+        "(EXISTS (SELECT 1 FROM asset_links l WHERE l.to_id = assets.id
+              AND (l.rel IN ('buffer', 'sidecar', 'sprite', 'format', 'sample')
+                   OR (l.rel = 'material' AND assets.ext = 'mtl')
+                   OR (l.rel = 'texture' AND assets.kind = 'texture'
+                       AND EXISTS (SELECT 1 FROM assets s WHERE s.id = l.from_id AND s.kind = 'sheet'))))
+           OR EXISTS (SELECT 1 FROM material_maps m WHERE m.texture_id = assets.id))"
+    };
+}
+
 /// Changes since the baseline, oldest first. Step `i` takes the database from `BASELINE_VERSION + i` to
 /// `BASELINE_VERSION + i + 1`, inside one transaction, so a failing step leaves the database untouched.
 ///
@@ -787,4 +800,52 @@ pub(in crate::db) const MIGRATIONS: &[&str] = &[
     "UPDATE assets SET thumb_source = NULL,
          thumb_hash = (SELECT f.thumb_hash FROM assets f WHERE f.id = json_extract(assets.meta, '$.take_of'))
        WHERE json_extract(meta, '$.take_of') IS NOT NULL AND thumb_source IN ('browser', 'browser-partial');",
+    // 82: whether another asset needs an asset as its data, by a link or as a material's map, kept with it, the links
+    // and maps keeping it up to date: a search hiding supporting files (see `db::SUPPORTING`) asked that of every asset
+    // it went through. And indexes to sort by name and by size, and to find an asset by its row in the search index.
+    concat!(
+        "ALTER TABLE assets ADD COLUMN supports INTEGER NOT NULL DEFAULT 0;
+         UPDATE assets SET supports = 1 WHERE ",
+        needed_82!(),
+        ";
+         CREATE TRIGGER asset_links_added AFTER INSERT ON asset_links BEGIN
+             UPDATE assets SET supports = ",
+        needed_82!(),
+        " WHERE id = new.to_id;
+         END;
+         CREATE TRIGGER asset_links_gone AFTER DELETE ON asset_links BEGIN
+             UPDATE assets SET supports = ",
+        needed_82!(),
+        " WHERE id = old.to_id;
+         END;
+         CREATE TRIGGER asset_links_changed AFTER UPDATE ON asset_links BEGIN
+             UPDATE assets SET supports = ",
+        needed_82!(),
+        " WHERE id IN (old.to_id, new.to_id);
+         END;
+         CREATE TRIGGER material_maps_added AFTER INSERT ON material_maps BEGIN
+             UPDATE assets SET supports = ",
+        needed_82!(),
+        " WHERE id = new.texture_id;
+         END;
+         CREATE TRIGGER material_maps_gone AFTER DELETE ON material_maps BEGIN
+             UPDATE assets SET supports = ",
+        needed_82!(),
+        " WHERE id = old.texture_id;
+         END;
+         CREATE TRIGGER material_maps_changed AFTER UPDATE ON material_maps BEGIN
+             UPDATE assets SET supports = ",
+        needed_82!(),
+        " WHERE id IN (old.texture_id, new.texture_id);
+         END;
+         CREATE TRIGGER assets_supports_kind AFTER UPDATE OF kind, ext ON assets
+           WHEN old.kind IS NOT new.kind OR old.ext IS NOT new.ext BEGIN
+             UPDATE assets SET supports = ",
+        needed_82!(),
+        " WHERE id = new.id OR id IN (SELECT to_id FROM asset_links WHERE from_id = new.id AND rel = 'texture');
+         END;
+         CREATE INDEX assets_name ON assets (name COLLATE NOCASE);
+         CREATE INDEX assets_fts_row ON assets (fts_row);
+         CREATE INDEX blobs_size ON blobs (size);"
+    ),
 ];

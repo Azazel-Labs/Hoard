@@ -118,7 +118,7 @@ let pagesIn = new Set<number>()
 let pagesOnTheWay = new Map<number, Promise<void>>()
 const fetchingPages = ref(0)
 
-function searchPage(page: number) {
+function searchPage(page: number, sidebar = false) {
   return api.search({
       q: filters.q.trim() || undefined,
       kind: filters.kind || undefined,
@@ -136,11 +136,11 @@ function searchPage(page: number) {
       compatible_keys: (filters.key && filters.mixKeys) || undefined,
       favorites: filters.favorites || undefined,
       project: filters.project || undefined,
-      limit: PAGE,
+      // The sidebar's tags only need the count, not the tiles again.
+      limit: sidebar ? 1 : PAGE,
       offset: page * PAGE,
       hide_supporting: !prefs.showSupporting,
-      // The sidebar's counts come with the first page; the rest are just tiles.
-      facets: page === 0,
+      facets: sidebar,
     }, searchAbort.signal)
 }
 
@@ -168,7 +168,10 @@ async function runSearch(opts: { keep?: boolean } = {}) {
     supportingHidden.value = res.supporting_hidden ?? 0
     folders.value = res.folders ?? []
     kindFacets.value = res.kinds
-    tagFacets.value = res.tags
+    // Counting the tags goes through everything found once more: they follow the tiles instead of holding them up.
+    searchPage(0, true)
+      .then((sidebar) => seq === searchSeq && (tagFacets.value = sidebar.tags))
+      .catch(() => {})
     // A new search's first tiles rise in, once: scrolled back to later, they just appear.
     rising.value = opts.keep ? 0 : res.items.length
     setTimeout(() => seq === searchSeq && (rising.value = 0), 1000)

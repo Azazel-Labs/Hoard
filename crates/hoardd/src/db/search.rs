@@ -49,12 +49,16 @@ pub(crate) enum Keys {
     Mixed,
 }
 
-const FTS_JOIN: &str = "JOIN (SELECT asset_id, bm25(assets_fts, 0.0, 8.0, 4.0, 3.0, 1.0, 5.0) AS rank
-          FROM assets_fts WHERE assets_fts MATCH ?) f ON f.asset_id = a.id";
+/// The word matches, joined by their rows in the index (`assets.fts_row`): joined by its `asset_id` column, each
+/// match's contents were read for it. (`+` keeps SQLite from going through the library matching the words again
+/// for each asset, the row being something the index could look up.)
+const FTS_JOIN: &str = "JOIN (SELECT rowid AS row, bm25(assets_fts, 0.0, 8.0, 4.0, 3.0, 1.0, 5.0) AS rank
+          FROM assets_fts WHERE assets_fts MATCH ?) f ON a.fts_row = +f.row";
 /// The word matches of a search by words and look together, worked out once into `temp.word_rank` (see
 /// [`search_ranked`]): joined as a subquery, SQLite can run the match again for every asset in the library.
 const WORD_RANK: &str = "INSERT INTO temp.word_rank (asset_id, rank)
-     SELECT asset_id, bm25(assets_fts, 0.0, 8.0, 4.0, 3.0, 1.0, 5.0) FROM assets_fts WHERE assets_fts MATCH ?1";
+     SELECT a.id, bm25(assets_fts, 0.0, 8.0, 4.0, 3.0, 1.0, 5.0)
+       FROM assets_fts JOIN assets a ON a.fts_row = +assets_fts.rowid WHERE assets_fts MATCH ?1";
 
 /// The assets a search by words and look together can find, the word matches and those the look ranks, worked out
 /// into `temp.blend` so the search goes through them alone. (Joined as a subquery, SQLite can go through the whole
@@ -305,11 +309,11 @@ pub(crate) const LIVE: &str =
 /// A sprite sheet's pages, and the loose images it has its sprites as too, are shown with the sheet. A file of clips
 /// whose takes are animations of their own (see `takes`) is shown by them. (`+a.id` drops the column's text affinity,
 /// so the lookup can use the `take_of` index instead of reading all of it for every animation.)
-pub(crate) const SUPPORTING: &str = "(EXISTS (SELECT 1 FROM asset_links l WHERE l.to_id = a.id
-     AND (l.rel IN ('buffer', 'sidecar', 'sprite', 'format', 'sample') OR (l.rel = 'material' AND a.ext = 'mtl')
-          OR (l.rel = 'texture' AND a.kind = 'texture'
-              AND EXISTS (SELECT 1 FROM assets s WHERE s.id = l.from_id AND s.kind = 'sheet'))))
-     OR EXISTS (SELECT 1 FROM material_maps m WHERE m.texture_id = a.id)
+///
+/// What the links and material maps say is kept in `assets.supports` (migration 82, whose triggers keep it up to
+/// date): asked of every asset each time, it was most of a search's work. A new kind of link that makes a supporting
+/// file needs a migration that works it out afresh, and triggers that know it.
+pub(crate) const SUPPORTING: &str = "(a.supports
      OR (a.ext = 'material' AND EXISTS (SELECT 1 FROM assets o WHERE o.id = json_extract(a.meta, '$.owned_by')))
      OR (a.kind = 'animation' AND EXISTS (SELECT 1 FROM assets t WHERE json_extract(t.meta, '$.take_of') = +a.id)))";
 
@@ -368,10 +372,9 @@ pub(crate) fn search_ranked(
     }
     let f = build_filter(q, true, look);
     let where_sql = f.where_sql();
-    let base = format!(
-        "FROM assets a JOIN packs p ON p.id = a.pack_id JOIN blobs b ON b.hash = a.blob_hash {} {where_sql}",
-        f.join
-    );
+    // Only the sizes are needed to put the page in order: the rest of each asset is read once it's on the page, not for
+    // everything the search finds.
+    let blobs = if q.sort.as_deref() == Some("size") { "JOIN blobs b ON b.hash = a.blob_hash" } else { "" };
 
     let order = match q.sort.as_deref() {
         Some("name") => "a.name COLLATE NOCASE ASC",
@@ -404,14 +407,38 @@ pub(crate) fn search_ranked(
     let mut page_params = f.params.clone();
     page_params.push(SqlValue::Integer(limit));
     page_params.push(SqlValue::Integer(offset));
-    let mut stmt = conn.prepare(&format!("SELECT {ASSET_COLS} {base} ORDER BY {order} LIMIT ? OFFSET ?"))?;
-    let mut items =
-        stmt.query_map(params_from_iter(&page_params), asset_from_row)?.collect::<rusqlite::Result<Vec<_>>>()?;
+    let ids = conn
+        .prepare(&format!(
+            "SELECT a.id FROM assets a {blobs} {} {where_sql} ORDER BY {order} LIMIT ? OFFSET ?",
+            f.join
+        ))?
+        .query_map(params_from_iter(&page_params), |r| r.get::<_, String>(0))?
+        .collect::<rusqlite::Result<Vec<_>>>()?;
+    let mut items = assets_in_order(conn, &ids)?;
     attach_tags(conn, &mut items)?;
 
     let Counts { total, supporting_hidden, kinds, folders, tags } = counts;
-    let (kinds, tags) = if with_facets { (kinds, tags.unwrap_or_default()) } else { (Vec::new(), Vec::new()) };
+    // The kinds are counted anyway; the tags take a pass of their own.
+    let tags = if with_facets { tags.unwrap_or_default() } else { Vec::new() };
     Ok(SearchPage { items, total: total as u64, kinds, tags, supporting_hidden: supporting_hidden as u64, folders })
+}
+
+/// The assets with these ids, in their order.
+fn assets_in_order(conn: &Connection, ids: &[String]) -> Result<Vec<Asset>> {
+    if ids.is_empty() {
+        return Ok(Vec::new());
+    }
+    let mut items = conn
+        .prepare_cached(&format!(
+            "SELECT {ASSET_COLS} FROM assets a JOIN packs p ON p.id = a.pack_id JOIN blobs b ON b.hash = a.blob_hash
+              WHERE a.id IN (SELECT value FROM json_each(?1))"
+        ))?
+        .query_map([serde_json::to_string(ids)?], asset_from_row)?
+        .collect::<rusqlite::Result<Vec<_>>>()?;
+    let place: std::collections::HashMap<&str, usize> =
+        ids.iter().enumerate().map(|(i, id)| (id.as_str(), i)).collect();
+    items.sort_by_key(|a| place.get(a.id.as_str()).copied().unwrap_or(usize::MAX));
+    Ok(items)
 }
 
 /// How many assets a search finds and how many more hiding supporting files left out, how many of each kind, the
@@ -620,6 +647,48 @@ mod tests {
         assert_eq!(key("H minor", true), Vec::<String>::new(), "a key that isn't one matches nothing");
     }
 
+    /// Whether an asset supports another is kept with it as links and maps come and go, and as kinds change.
+    #[test]
+    fn supporting_follows_links_and_maps() {
+        let dir = tempfile::tempdir().unwrap();
+        let pool = open(&dir.path().join("hoard.db"), &dir.path().join("backups")).unwrap();
+        let conn = pool.get().unwrap();
+        conn.execute_batch(
+            "INSERT INTO blobs (hash, size, created_at) VALUES ('h', 1, 'x');
+             INSERT INTO packs (id, name, status, tags, created_at) VALUES ('p', 'P', 'ready', '[]', 'x');
+             INSERT INTO assets (id, pack_id, blob_hash, path, name, ext, kind, created_at, updated_at) VALUES
+               ('gltf', 'p', 'h', 'a.gltf', 'a', 'gltf', 'model', 'x', 'x'),
+               ('bin', 'p', 'h', 'a.bin', 'a', 'bin', 'other', 'x', 'x'),
+               ('mat', 'p', 'h', 'm.material', 'm', 'material', 'material', 'x', 'x'),
+               ('tex', 'p', 'h', 't.png', 't', 'png', 'texture', 'x', 'x'),
+               ('sheet', 'p', 'h', 's.json', 's', 'json', 'other', 'x', 'x'),
+               ('page', 'p', 'h', 's.png', 's', 'png', 'texture', 'x', 'x');",
+        )
+        .unwrap();
+        let supporting = || {
+            conn.prepare(&format!("SELECT a.id FROM assets a WHERE {SUPPORTING} ORDER BY a.id"))
+                .unwrap()
+                .query_map([], |r| r.get::<_, String>(0))
+                .unwrap()
+                .collect::<rusqlite::Result<Vec<_>>>()
+                .unwrap()
+        };
+        assert_eq!(supporting(), Vec::<String>::new());
+        conn.execute_batch(
+            "INSERT INTO asset_links (from_id, to_id, rel) VALUES ('gltf', 'bin', 'buffer'), ('sheet', 'page', 'texture');
+             INSERT INTO material_maps (material_id, texture_id, role) VALUES ('mat', 'tex', 'albedo');",
+        )
+        .unwrap();
+        assert_eq!(supporting(), ["bin", "tex"], "a texture linked from something that isn't a sheet stays");
+        conn.execute("UPDATE assets SET kind = 'sheet' WHERE id = 'sheet'", []).unwrap();
+        assert_eq!(supporting(), ["bin", "page", "tex"], "a sheet's pages go with it");
+        conn.execute("DELETE FROM material_maps", []).unwrap();
+        conn.execute("UPDATE asset_links SET rel = 'guess' WHERE to_id = 'bin'", []).unwrap();
+        assert_eq!(supporting(), ["page"]);
+        conn.execute("DELETE FROM assets WHERE id = 'sheet'", []).unwrap();
+        assert_eq!(supporting(), Vec::<String>::new(), "the links of an asset that's gone go with it");
+    }
+
     #[test]
     fn look_ranked_search_keeps_filters_and_order() {
         let dir = tempfile::tempdir().unwrap();
@@ -632,7 +701,8 @@ mod tests {
                ('a1', 'p1', 'h1', 'gray rock.png', 'gray rock', 'png', 'texture', 't1', 'x', 'x'),
                ('a2', 'p1', 'h2', 'mossy rock.png', 'mossy rock', 'png', 'texture', 't2', 'x', 'x'),
                ('a3', 'p1', 'h3', 'rock.glb', 'rock', 'glb', 'model', 't3', 'x', 'x');
-             INSERT INTO assets_fts (asset_id, name) VALUES ('a1', 'gray rock'), ('a2', 'mossy rock'), ('a3', 'rock');",
+             INSERT INTO assets_fts (asset_id, name) VALUES ('a1', 'gray rock'), ('a2', 'mossy rock'), ('a3', 'rock');
+             UPDATE assets SET fts_row = (SELECT f.rowid FROM assets_fts f WHERE f.asset_id = assets.id);",
         )
         .unwrap();
         let ids = |page: SearchPage| page.items.into_iter().map(|a| a.id).collect::<Vec<_>>();
@@ -686,7 +756,8 @@ mod tests {
                WHERE kind = 'texture' AND rowid % 3 = 0;
              INSERT INTO material_maps (material_id, texture_id, role) SELECT 'a' || (rowid - 2), id, 'albedo' FROM assets
                WHERE kind = 'texture' AND rowid % 5 = 0;
-             INSERT INTO assets_fts (asset_id, name, words, tags) SELECT id, name, words, '' FROM assets;
+             INSERT INTO assets_fts (rowid, asset_id, name, words, tags) SELECT rowid, id, name, words, '' FROM assets;
+             UPDATE assets SET fts_row = rowid;
              COMMIT;
              ANALYZE;"
         ))
@@ -703,6 +774,14 @@ mod tests {
         time("browse everything", SearchQuery { hide_supporting: true, ..Default::default() }, true, None);
         time("browse everything, no facets", SearchQuery { hide_supporting: true, ..Default::default() }, false, None);
         time("words", words(), true, None);
+        let letter = || SearchQuery { q: Some("t".into()), hide_supporting: true, ..Default::default() };
+        time("the first letter typed", letter(), true, None);
+        time("the first letter typed, its next page", SearchQuery { offset: Some(60), ..letter() }, true, None);
+        let by_name = SearchQuery { sort: Some("name".into()), hide_supporting: true, ..Default::default() };
+        time("everything by name", by_name.clone(), true, None);
+        time("everything by name, its next page", SearchQuery { offset: Some(60), ..by_name }, true, None);
+        let by_size = SearchQuery { sort: Some("size".into()), hide_supporting: true, ..Default::default() };
+        time("everything by size, its next page", SearchQuery { offset: Some(60), ..by_size }, true, None);
         let pack = |folder: Option<&str>| SearchQuery {
             pack: Some("p0".into()),
             folder: folder.map(Into::into),

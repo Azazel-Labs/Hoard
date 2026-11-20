@@ -209,8 +209,16 @@ fn password_matches(password: &str, hash: &str) -> bool {
 /// Checked against when there's no such name, so a wrong name takes as long as a wrong password.
 static DUMMY_HASH: LazyLock<String> = LazyLock::new(|| hash_password("not a password").unwrap_or_default());
 
-/// An access token's id, name and role, and its maker's role, id and where they sign in.
-type TokenRow = (i64, String, String, String, i64, String);
+/// An access token's id, name and role, its maker's role, id and where they sign in, and whether its use is due to
+/// be noted.
+type TokenRow = (i64, String, String, String, i64, String, bool);
+
+/// Whether a use noted in `column` is old enough to note again: at most once a minute. Asked in the `SELECT`,
+/// because any `UPDATE`, even one whose `WHERE` matches nothing, waits for the write lock, so a request that only
+/// reads would wait out an import's write.
+pub(crate) fn use_due(column: &str) -> String {
+    format!("({column} IS NULL OR unixepoch({column}) < unixepoch('now') - 60)")
+}
 
 /// Who `cred` belongs to, if anyone. Notes the use (at most once a minute for tokens, once an hour for sessions).
 /// Sessions end after [`SESSION_DAYS`] unused, or when `gate` says so. Nothing gets in for an account whose way of
@@ -222,13 +230,16 @@ fn lookup(c: &Connection, cred: &Credential, gate: Gate) -> Result<Option<Who>> 
             let hash = digest(token);
             let row: Option<TokenRow> = c
                 .query_row(
-                    "SELECT t.id, t.name, t.role, u.role, u.id, u.source
-                       FROM access_tokens t JOIN users u ON u.id = t.created_by WHERE t.token_hash = ?1",
+                    &format!(
+                        "SELECT t.id, t.name, t.role, u.role, u.id, u.source, {}
+                           FROM access_tokens t JOIN users u ON u.id = t.created_by WHERE t.token_hash = ?1",
+                        use_due("t.last_used_at")
+                    ),
                     [&hash],
-                    |r| Ok((r.get(0)?, r.get(1)?, r.get(2)?, r.get(3)?, r.get(4)?, r.get(5)?)),
+                    |r| Ok((r.get(0)?, r.get(1)?, r.get(2)?, r.get(3)?, r.get(4)?, r.get(5)?, r.get(6)?)),
                 )
                 .optional()?;
-            let Some((id, name, own, maker, owner, source)) = row else {
+            let Some((id, name, own, maker, owner, source, due)) = row else {
                 let who = crate::oauth::lookup(c, &hash)?;
                 if let Some(Who::Token { owner: Some(owner), .. }) = &who {
                     let source: Option<String> =
@@ -242,11 +253,9 @@ fn lookup(c: &Connection, cred: &Credential, gate: Gate) -> Result<Option<Who>> 
             if !gate.lets_in(&source) {
                 return Ok(None);
             }
-            c.execute(
-                "UPDATE access_tokens SET last_used_at = ?2
-                  WHERE id = ?1 AND (last_used_at IS NULL OR unixepoch(last_used_at) < unixepoch('now') - 60)",
-                params![id, db::now()],
-            )?;
+            if due {
+                c.execute("UPDATE access_tokens SET last_used_at = ?2 WHERE id = ?1", params![id, db::now()])?;
+            }
             let role = Role::stored(&own).min(Role::stored(&maker));
             Ok(Some(Who::Token { name, role, owner: Some(owner) }))
         }
@@ -473,6 +482,33 @@ mod tests {
         assert!(password_matches("correct horse", &hash));
         assert!(!password_matches("wrong horse", &hash));
         assert!(!password_matches("anything", "not a hash"));
+    }
+
+    /// A token used a moment ago signs in without writing, so it doesn't wait for an import holding the write lock.
+    #[test]
+    fn a_token_signs_in_while_something_else_writes() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("hoard.db");
+        let pool = db::open(&path, &dir.path().join("backups")).unwrap();
+        let token = "hoard_0123456789abcdef0123456789abcdef";
+        pool.get()
+            .unwrap()
+            .execute_batch(&format!(
+                "INSERT INTO users (id, username, password_hash, created_at, role) VALUES (1, 'a', 'x', 'x', 'admin');
+                 INSERT INTO access_tokens (name, token_hash, created_by, created_at, last_used_at, role)
+                 VALUES ('engine', '{}', 1, 'x', '{}', 'view');",
+                digest(token),
+                db::now()
+            ))
+            .unwrap();
+        let writer = Connection::open(&path).unwrap();
+        writer.execute_batch("BEGIN IMMEDIATE").unwrap();
+        let started = Instant::now();
+        let gate = crate::signin::AuthConfig::default().gate();
+        let who = lookup(&pool.get().unwrap(), &Credential::Bearer(token.into()), gate).unwrap();
+        assert!(matches!(who, Some(Who::Token { ref name, .. }) if name == "engine"));
+        assert!(started.elapsed() < Duration::from_secs(1), "waited {:?}", started.elapsed());
+        writer.execute_batch("ROLLBACK").unwrap();
     }
 
     #[test]

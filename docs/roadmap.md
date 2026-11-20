@@ -3,6 +3,27 @@
 What's planned or being weighed, roughly in order. Nothing here is promised; each item says what's settled and what
 isn't yet.
 
+## Performance in a big library
+
+Measured against a generated library of 300,000 assets in 200 packs (`cargo test -p hoardd --lib big_library --
+--ignored --nocapture`, which prints a timing for each step). Quick already: the pack list (30 ms), a pack's card
+(under a millisecond), tag suggestions, Settings → Issues, sorting by name or size (a few milliseconds), and the
+library's numbers, report and near copies, which are kept and worked out again in the background. Still slow, worst
+first:
+
+- **The first letter typed in search: 1.6 s**, its next page 0.36 s. Most of it is ranking every match (85,000 for
+  one letter) and counting them for the total. A query's ranked ids could be kept until the library changes, so the
+  next page and the total come from them instead of searching again, and one or two letters could rank a capped
+  number of matches.
+- **The sidebar's tag counts while searching: about 0.8 s.** They no longer hold the tiles up. With no words or
+  filters they are the same as the tags in use, which are already kept, so that case can reuse them; with a query
+  they could be kept with its ranked ids.
+- **Browsing a big pack: 0.63 s** for a pack of 120,000, with its counts beside the grid. Counts by kind are
+  already kept per pack (`pack_kinds`), so the facets with no other filter can come from there.
+- **Kept results start cold after a restart.** The library's numbers, report, near copies and store files' unread
+  list live in memory, so the first visit after a restart works them out again (the unread list took 11 s on one
+  server). Saving the last one in the database would let them answer at once, refreshing behind.
+
 ## Store details for the Unity Asset Store and Humble Bundle
 
 Store details searches Fab, itch.io, Kenney and OpenGameArt, and a pack whose files name its listing gets it filled

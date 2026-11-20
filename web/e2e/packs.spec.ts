@@ -55,21 +55,21 @@ test.describe('packs page', () => {
     await kinds.getByRole('button', { name: 'Models' }).click()
     await expect(packNames(page).filter({ hasText: TEXTURES })).toBeVisible()
 
-    await page.getByLabel('Store').selectOption({ label: `From ${STORE}` })
+    await page.getByLabel('Store', { exact: true }).selectOption({ label: `From ${STORE}` })
     await expect(packNames(page)).toHaveText([ZIPPED])
-    await page.getByLabel('Store').selectOption({ label: 'No store page' })
+    await page.getByLabel('Store', { exact: true }).selectOption({ label: 'No store page' })
     await expect(packNames(page).filter({ hasText: TEXTURES })).toBeVisible()
-    await page.getByLabel('Store').selectOption({ label: 'Any store' })
+    await page.getByLabel('Store', { exact: true }).selectOption({ label: 'Any store' })
 
     // Packs no license was found or noted for: the zip's LICENSE.txt gave it one.
-    await page.getByLabel('Status').selectOption({ label: 'No license noted' })
+    await page.getByLabel('Status', { exact: true }).selectOption({ label: 'No license noted' })
     await expect(packNames(page).filter({ hasText: TEXTURES })).toBeVisible()
     await expect(packNames(page).filter({ hasText: ZIPPED })).toHaveCount(0)
 
-    await page.getByLabel('Status').selectOption({ label: 'Failed' })
+    await page.getByLabel('Status', { exact: true }).selectOption({ label: 'Failed' })
     await expect(page.getByText('No packs match.')).toBeVisible()
     await page.getByRole('button', { name: 'Clear', exact: true }).click()
-    await expect(page.getByLabel('Status')).toHaveValue('')
+    await expect(page.getByLabel('Status', { exact: true })).toHaveValue('')
     await expect(page.getByText('No packs match.')).toHaveCount(0)
     await expect(packNames(page).filter({ hasText: BIG })).toBeVisible()
   })
@@ -95,6 +95,16 @@ test.describe('packs page', () => {
     // An asset opened takes the panel's place; All packs goes back to the list.
     await tile(page, 'Crate').click()
     await expect(page.getByRole('complementary', { name: 'About this pack' })).toHaveCount(0)
+    // Its pack's name takes the asset's place with the pack again.
+    await page.getByRole('complementary', { name: 'Asset details' }).getByRole('button', { name: MODELS, exact: true }).click()
+    await expect(page.getByRole('complementary', { name: 'About this pack' })).toBeVisible()
+    await tile(page, 'Crate').click()
+    await expect(page.getByRole('complementary', { name: 'About this pack' })).toHaveCount(0)
+    // Picking the pack from Packs with its asset open shows the pack, too.
+    await page.locator('header.top').getByRole('button', { name: /^Packs/ }).click()
+    await packNames(page).filter({ hasText: MODELS }).click()
+    await expect(page.getByRole('complementary', { name: 'About this pack' })).toBeVisible()
+    await tile(page, 'Crate').click()
     await page.keyboard.press('Escape')
     await page.getByRole('complementary', { name: 'About this pack' }).getByRole('button', { name: 'All packs' }).click()
     await expect(page.getByLabel('Find a pack')).toBeVisible()

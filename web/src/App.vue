@@ -328,7 +328,10 @@ function browsePack(p: Named) {
     pack: { id: p.id, name: p.name }, folder: prefs.packFolders ? '' : null, collection: null, favorites: false, project: '',
     kind: '', tags: [], q: '', similar: null, color: '', imitation: '', ...NO_MUSIC,
   })
-  leaveDetailFor(p.id)
+  // A pack picked is the pack to see: the asset open makes way for what the pack is.
+  opening = ''
+  selected.value = null
+  packPanelHidden.value = ''
   setView('library')
 }
 /** Going to a pack's files: an asset of another pack, or one shown full-page over the grid, is put away. */
@@ -617,8 +620,12 @@ function resolveSplit(split: boolean) {
   queue.value?.enqueue(split ? splitPerSubfolder(name, files).map((g) => ({ ...g, handle, root: name })) : [p.group])
 }
 
+// Something dragged from the page itself (a picture, a tile) isn't files to add, though a browser offers a picture as one.
+let draggingOwn = false
+document.addEventListener('dragstart', () => (draggingOwn = true))
+document.addEventListener('dragend', () => (draggingOwn = false))
 function onDragEnter(e: DragEvent) {
-  if (!editor.value || !e.dataTransfer?.types.includes('Files')) return
+  if (draggingOwn || !editor.value || !e.dataTransfer?.types.includes('Files')) return
   if (!dragDepth.value) dragCount.value = e.dataTransfer.items?.length ?? 0
   dragDepth.value++
 }
@@ -627,7 +634,9 @@ function onDragLeave() {
 }
 async function onDrop(e: DragEvent) {
   dragDepth.value = 0
-  if (!e.dataTransfer) return
+  const own = draggingOwn
+  draggingOwn = false
+  if (!e.dataTransfer || own) return
   const groups = await filesFromDrop(e.dataTransfer)
   if (groups.length) importGroups(groups)
 }
@@ -1323,6 +1332,7 @@ const commands = computed<Command[]>(() => {
         @uncollect="(id) => removeFromCollection([selected!.id], id)"
         @browse-collection="browseCollection"
         @browse-project="browseProject"
+        @browse-pack="browsePack"
         @updated="onUpdated"
         @tag="toggleTag"
         @error="showError"

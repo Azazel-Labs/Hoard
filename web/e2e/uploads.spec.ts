@@ -143,6 +143,22 @@ test.describe('the import queue', () => {
     await expect(page.getByText('Drop 2 items to add them')).toHaveCount(0)
   })
 
+  test('a picture dragged within the page is not offered as files to add', async ({ page }) => {
+    await page.goto('/')
+    const files = await page.evaluateHandle(() => {
+      const dt = new DataTransfer()
+      dt.items.add(new File(['a'], 'a.png', { type: 'image/png' }))
+      return dt
+    })
+    // A browser offers a picture dragged from the page as a file; the drag started here, so it's ignored.
+    await page.locator('.brand').dispatchEvent('dragstart', { dataTransfer: files })
+    await page.locator('.app').dispatchEvent('dragenter', { dataTransfer: files })
+    await expect(page.locator('.drop .well')).toHaveCount(0)
+    await page.locator('.brand').dispatchEvent('dragend', { dataTransfer: files })
+    await page.locator('.app').dispatchEvent('dragenter', { dataTransfer: files })
+    await expect(page.locator('.drop .well')).toBeVisible()
+  })
+
   test('a failed import dropped again carries on in its own row', async ({ page, api }) => {
     test.setTimeout(120_000)
     const stem = `failed-${unique()}`

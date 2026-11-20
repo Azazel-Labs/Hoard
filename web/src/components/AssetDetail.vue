@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import {
-  api, bundleUrl, fileUrl, thumbUrl, type Asset, type Collection, type CollectionRef, type Facet, type ProjectUse,
+  api, bundleUrl, fileUrl, liteUrl, thumbUrl, type Asset, type Collection, type CollectionRef, type Facet, type ProjectUse,
 } from '../api'
 import { humanBytes } from '../format'
 import { looksAlike } from '../kinds'
@@ -62,6 +62,7 @@ const emit = defineEmits<{
   browseCollection: [CollectionRef]
   /** Show what this project (its name) has. */
   browseProject: [string]
+  browsePack: [{ id: string; name: string }]
   /** Find assets that look like this one. */
   similar: []
   /** Find assets with much of this color (hex). */
@@ -197,6 +198,38 @@ watch(
 )
 
 const isImage = computed(() => (props.asset.kind === 'texture' || props.asset.kind === 'vector') && props.asset.has_thumb)
+// The panel's picture: the thumbnail stretched to the size the picture will have, then the light preview once it's in.
+const sharpSrc = ref('')
+const sharpening = ref(false)
+watch(
+  () => (isImage.value && !animatedSrc(props.asset, PLAY_IN_PANEL) ? thumbUrl(props.asset) : ''),
+  (key) => {
+    sharpSrc.value = ''
+    sharpening.value = !!key
+    if (!key) return
+    const url = liteUrl(props.asset)
+    const img = new Image()
+    img.src = url
+    const current = () => key === thumbUrl(props.asset)
+    img.decode().then(
+      () => {
+        if (!current()) return
+        sharpSrc.value = url
+        sharpening.value = false
+      },
+      () => current() && (sharpening.value = false),
+    )
+  },
+  { immediate: true },
+)
+/** Keeps the stretched thumbnail within the picture's own pixels, so the swap doesn't change its size. */
+const thumbBox = computed(() => {
+  const dim = (k: string) => {
+    const v = props.asset.meta?.[k]
+    return typeof v === 'number' && v > 0 ? `${v}px` : 'none'
+  }
+  return { maxWidth: dim('width'), maxHeight: dim('height') }
+})
 const isSheet = computed(() => props.asset.kind === 'sheet' && props.asset.derivatives.includes('sheet'))
 // Aseprite animations play from the start; a sprite sheet does when asked.
 const spritePlayable = computed(() => isImage.value && (animatedAseprite(props.asset) || spriteSheet(props.asset)))
@@ -373,7 +406,7 @@ onBeforeUnmount(() => unswipe())
         <p class="where">
           <span>{{ asset.category ?? asset.kind }}</span>
           <span class="sep" aria-hidden="true">{{ t('asset-in-pack') }}</span>
-          <span class="pack">{{ asset.pack_name }}</span>
+          <button type="button" class="pack linkish" @click="$emit('browsePack', { id: asset.pack_id, name: asset.pack_name })">{{ asset.pack_name }}</button>
         </p>
         <div class="nav">
           <!-- Stepping through results by button is for the full page; the side panel steps with the arrow keys. -->
@@ -480,7 +513,10 @@ onBeforeUnmount(() => unswipe())
       :title="t('asset-inspect-title')"
       @click="inspecting = 'image'"
     >
-      <img :src="animatedSrc(asset, PLAY_IN_PANEL) ?? thumbUrl(asset)" alt="" :class="{ pixelated }" />
+      <img v-if="animatedSrc(asset, PLAY_IN_PANEL)" :src="animatedSrc(asset, PLAY_IN_PANEL)!" alt="" :class="{ pixelated }" />
+      <img v-else-if="sharpSrc" :src="sharpSrc" alt="" :class="{ pixelated }" />
+      <img v-else :src="thumbUrl(asset)" alt="" class="stretched" :class="{ pixelated }" :style="pixelated ? undefined : thumbBox" />
+      <span v-if="sharpening" class="spinner" aria-hidden="true" />
       <span class="zoombadge" aria-hidden="true">
         <svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round">
           <circle cx="7" cy="7" r="4.5" /><path d="m10.5 10.5 3.5 3.5M5 7h4M7 5v4" />
@@ -742,6 +778,13 @@ onBeforeUnmount(() => unswipe())
 .preview img { max-width: 100%; max-height: 100%; object-fit: contain; }
 .preview img.pixelated { image-rendering: pixelated; width: 100%; height: 100%; }
 /* Images open in the inspector. */
+.preview img.stretched { width: 100%; height: 100%; }
+.preview .spinner {
+  position: absolute; top: 0.6rem; right: 0.6rem; width: 14px; height: 14px; border-radius: 50%;
+  border: 2px solid color-mix(in srgb, var(--panel) 70%, transparent); border-top-color: var(--accent);
+  animation: spin 0.7s linear infinite;
+}
+@keyframes spin { to { rotate: 1turn; } }
 .zoomable { position: relative; width: 100%; padding: 0; cursor: zoom-in; color: inherit; }
 .zoomable img { transition: scale var(--dur-3) var(--ease-out); }
 .zoomable:hover img { scale: 1.03; }

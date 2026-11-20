@@ -6,6 +6,7 @@
 [![Release](https://img.shields.io/github/v/release/Azazel-Labs/Hoard)](https://github.com/Azazel-Labs/Hoard/releases/latest)
 [![Rust 1.100+](https://img.shields.io/badge/rust-1.100%2B-orange?logo=rust)](https://www.rust-lang.org)
 [![License: MIT-0](https://img.shields.io/badge/license-MIT--0-blue)](../../LICENSE)
+[![Discord](https://img.shields.io/badge/discord-join-5865F2?logo=discord&logoColor=white)](https://discord.gg/zf9ncS4EW)
 
 [English](../../README.md) · [Afrikaans](README.af.md) · [Català](README.ca.md) · [Čeština](README.cs.md) · [Dansk](README.da.md) · Deutsch · [Ελληνικά](README.el.md) · [Español (Latinoamérica)](README.es-419.md) · [Español (España)](README.es-ES.md) · [Suomi](README.fi.md) · [Français](README.fr.md) · [Magyar](README.hu.md) · [Bahasa Indonesia](README.id.md) · [Italiano](README.it.md) · [日本語](README.ja.md) · [한국어](README.ko.md) · [Norsk bokmål](README.nb.md) · [Nederlands](README.nl.md) · [Polski](README.pl.md) · [Português (Brasil)](README.pt-BR.md) · [Português (Portugal)](README.pt-PT.md) · [Română](README.ro.md) · [Русский](README.ru.md) · [Српски](README.sr-Cyrl.md) · [Svenska](README.sv.md) · [ไทย](README.th.md) · [Türkçe](README.tr.md) · [Українська](README.uk.md) · [Tiếng Việt](README.vi.md) · [简体中文](README.zh-Hans.md) · [繁體中文](README.zh-Hant.md)
 
@@ -245,6 +246,10 @@ beschrieben.
 Das Portal und die Servermeldungen von Hoard gibt es in 31 Sprachen, auswählbar unter Einstellungen → Darstellung
 (standardmäßig die Sprache des Browsers). Die ersten Übersetzungen entstanden maschinengestützt; Korrekturen von
 Muttersprachlern sind willkommen. [docs/translations.md](../translations.md) erklärt, wie es geht.
+
+## Community
+
+Fragen, Ideen oder etwas zum Herzeigen? Sag Hallo auf dem [Discord von Azazel Labs](https://discord.gg/zf9ncS4EW). Fehler und Funktionswünsche meldest du am besten als [GitHub-Issues](https://github.com/Azazel-Labs/Hoard/issues), dort gehen sie nicht verloren.
 
 ## Lizenz
 

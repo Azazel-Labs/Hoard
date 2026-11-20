@@ -2591,6 +2591,7 @@ about-edition-steam = Aplikasi desktop dari Steam
 about-made-by = Dibuat oleh
 about-source = Kode sumber di GitHub
 about-issues = Laporkan masalah
+about-discord = Ngobrol dengan kami di Discord
 about-steam = Hoard di Steam
 about-license = Lisensi
 about-license-what = Hoard bersifat sumber terbuka dengan lisensi MIT No Attribution: gunakan, ubah, dan bagikan sesuka Anda.

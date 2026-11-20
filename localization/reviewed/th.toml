@@ -1,8 +1,8 @@
 version = 2
 
 [readme]
-source = "084e079ba02b3b116ead09bb84910ed14e42507015fbed18a48eb501fa655442"
-translation = "75006b9487c9c952eeca3289fe8cc5e839f9df81835c13c5edbce16af2dfe68d"
+source = "784687813ffc36b7323d5f6f6162af0826b640f29e1eda034584bda64d776e5f"
+translation = "92d047ab1bff2edef716312bfed1516adf04715aa76810de834f2305512a7e5f"
 
 [messages.about-blender]
 source = "Converts 3D models and makes their thumbnails."
@@ -23,6 +23,10 @@ translation = "ค้นหาเสียงจากลักษณะที�
 [messages.about-count]
 source = "{ $shown } of { $total }"
 translation = "{ $shown } จาก { $total }"
+
+[messages.about-discord]
+source = "Chat with us on Discord"
+translation = "คุยกับเราบน Discord"
 
 [messages.about-downloaded]
 source = "Downloaded when needed"

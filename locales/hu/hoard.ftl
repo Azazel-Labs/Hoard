@@ -2614,6 +2614,7 @@ about-edition-steam = Asztali alkalmazás a Steamről
 about-made-by = Készítette
 about-source = Forráskód a GitHubon
 about-issues = Hiba bejelentése
+about-discord = Beszélgess velünk a Discordon
 about-steam = A Hoard a Steamen
 about-license = Licenc
 about-license-what = A Hoard nyílt forráskódú, MIT No Attribution licenccel: használhatja, módosíthatja és megoszthatja, ahogy csak szeretné.

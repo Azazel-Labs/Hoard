@@ -1,8 +1,8 @@
 version = 2
 
 [readme]
-source = "084e079ba02b3b116ead09bb84910ed14e42507015fbed18a48eb501fa655442"
-translation = "52ee464616c515d995484776ca20c3dcef62d0b38c8fb1b0edad5aa137d1ddcc"
+source = "784687813ffc36b7323d5f6f6162af0826b640f29e1eda034584bda64d776e5f"
+translation = "307855b3f17db1f84ce8e7d8ee9a10c495a05b43d100508addd2b3f76de43ce2"
 
 [messages.about-blender]
 source = "Converts 3D models and makes their thumbnails."
@@ -23,6 +23,10 @@ translation = "Löytää ääniä sen perusteella, miltä ne kuulostavat."
 [messages.about-count]
 source = "{ $shown } of { $total }"
 translation = "{ $shown } / { $total }"
+
+[messages.about-discord]
+source = "Chat with us on Discord"
+translation = "Juttele kanssamme Discordissa"
 
 [messages.about-downloaded]
 source = "Downloaded when needed"

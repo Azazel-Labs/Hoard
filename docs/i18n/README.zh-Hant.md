@@ -6,6 +6,7 @@
 [![Release](https://img.shields.io/github/v/release/Azazel-Labs/Hoard)](https://github.com/Azazel-Labs/Hoard/releases/latest)
 [![Rust 1.100+](https://img.shields.io/badge/rust-1.100%2B-orange?logo=rust)](https://www.rust-lang.org)
 [![License: MIT-0](https://img.shields.io/badge/license-MIT--0-blue)](../../LICENSE)
+[![Discord](https://img.shields.io/badge/discord-join-5865F2?logo=discord&logoColor=white)](https://discord.gg/zf9ncS4EW)
 
 [English](../../README.md) · [Afrikaans](README.af.md) · [Català](README.ca.md) · [Čeština](README.cs.md) · [Dansk](README.da.md) · [Deutsch](README.de.md) · [Ελληνικά](README.el.md) · [Español (Latinoamérica)](README.es-419.md) · [Español (España)](README.es-ES.md) · [Suomi](README.fi.md) · [Français](README.fr.md) · [Magyar](README.hu.md) · [Bahasa Indonesia](README.id.md) · [Italiano](README.it.md) · [日本語](README.ja.md) · [한국어](README.ko.md) · [Norsk bokmål](README.nb.md) · [Nederlands](README.nl.md) · [Polski](README.pl.md) · [Português (Brasil)](README.pt-BR.md) · [Português (Portugal)](README.pt-PT.md) · [Română](README.ro.md) · [Русский](README.ru.md) · [Српски](README.sr-Cyrl.md) · [Svenska](README.sv.md) · [ไทย](README.th.md) · [Türkçe](README.tr.md) · [Українська](README.uk.md) · [Tiếng Việt](README.vi.md) · [简体中文](README.zh-Hans.md) · 繁體中文
 
@@ -178,6 +179,10 @@ python3 tools/make_sample_pack.py /tmp/sample       # needs Pillow + numpy; ffmp
 ## 翻譯
 
 Hoard 的入口網頁與伺服器訊息提供 31 種語言，可在「設定 → 外觀」中選擇（預設使用瀏覽器的語言）。最初的翻譯由機器輔助完成；歡迎母語人士提供修正。[docs/translations.md](../translations.md) 說明了如何參與。
+
+## 社群
+
+有問題、想法，或想展示些什麼？歡迎來 [Azazel Labs 的 Discord](https://discord.gg/zf9ncS4EW) 打聲招呼。Bug 和功能請求最好提交為 [GitHub issue](https://github.com/Azazel-Labs/Hoard/issues)，這樣不會被遺漏。
 
 ## 授權
 

@@ -14,6 +14,7 @@ interface Package { name: string; version: string; license: string | null; url: 
 interface Licenses { hoard: string; crates: Package[]; npm: Package[]; texts: string[] }
 
 const REPO = 'https://github.com/Azazel-Labs/Hoard'
+const DISCORD = 'https://discord.gg/zf9ncS4EW'
 const steam = steamApp()
 const edition = computed(() =>
   steam ? t('about-edition-steam') : isDesktop() ? t('about-edition-desktop') : t('about-edition-server'),
@@ -86,6 +87,7 @@ onMounted(async () => {
       <ul class="links">
         <li><a :href="REPO" target="_blank" rel="noopener">{{ t('about-source') }}</a></li>
         <li><a :href="`${REPO}/issues`" target="_blank" rel="noopener">{{ t('about-issues') }}</a></li>
+        <li><a :href="DISCORD" target="_blank" rel="noopener" data-testid="about-discord">{{ t('about-discord') }}</a></li>
         <li v-if="steam">
           <a :href="`https://store.steampowered.com/app/${steam}`" target="_blank" rel="noopener" data-testid="about-steam">
             {{ t('about-steam') }}

@@ -1,8 +1,8 @@
 version = 2
 
 [readme]
-source = "084e079ba02b3b116ead09bb84910ed14e42507015fbed18a48eb501fa655442"
-translation = "140b49c82b29a7b87bfa06010e3a94d40634c2ef179e321edcfb823a8ba3e24f"
+source = "784687813ffc36b7323d5f6f6162af0826b640f29e1eda034584bda64d776e5f"
+translation = "48b91021e8ab72d74293b13e1175ec85edcf56c59510524f10635679bb042ed2"
 
 [messages.about-blender]
 source = "Converts 3D models and makes their thumbnails."
@@ -23,6 +23,10 @@ translation = "Hangokat keres aszerint, hogy milyennek hangzanak."
 [messages.about-count]
 source = "{ $shown } of { $total }"
 translation = "{ $shown } / { $total }"
+
+[messages.about-discord]
+source = "Chat with us on Discord"
+translation = "Beszélgess velünk a Discordon"
 
 [messages.about-downloaded]
 source = "Downloaded when needed"

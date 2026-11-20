@@ -2789,6 +2789,7 @@ about-edition-steam = Skrivebordsapp fra Steam
 about-made-by = Laget av
 about-source = Kildekode på GitHub
 about-issues = Rapporter et problem
+about-discord = Chat med oss på Discord
 about-steam = Hoard på Steam
 about-license = Lisens
 about-license-what = Hoard er åpen kildekode under MIT No Attribution-lisensen: bruk den, endre den og del den som du vil.

@@ -1,8 +1,8 @@
 version = 2
 
 [readme]
-source = "084e079ba02b3b116ead09bb84910ed14e42507015fbed18a48eb501fa655442"
-translation = "cd4f3c722806389a6bf36b599c38c7526a78c370b013c864d4472761b3087300"
+source = "784687813ffc36b7323d5f6f6162af0826b640f29e1eda034584bda64d776e5f"
+translation = "13ede832ea7fc967c9ec7a1d4ce19f3b71776609213795e5d64758ffe8286e51"
 
 [messages.about-blender]
 source = "Converts 3D models and makes their thumbnails."
@@ -23,6 +23,10 @@ translation = "들리는 느낌으로 사운드를 찾습니다."
 [messages.about-count]
 source = "{ $shown } of { $total }"
 translation = "{ $shown } / { $total }"
+
+[messages.about-discord]
+source = "Chat with us on Discord"
+translation = "Discord에서 대화하기"
 
 [messages.about-downloaded]
 source = "Downloaded when needed"

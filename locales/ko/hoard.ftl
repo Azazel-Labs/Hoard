@@ -2554,6 +2554,7 @@ about-edition-steam = Steam용 데스크톱 앱
 about-made-by = 만든 곳
 about-source = GitHub의 소스 코드
 about-issues = 문제 신고
+about-discord = Discord에서 대화하기
 about-steam = Steam의 Hoard
 about-license = 라이선스
 about-license-what = Hoard는 MIT No Attribution 라이선스의 오픈 소스입니다. 원하는 대로 사용하고, 바꾸고, 공유할 수 있습니다.

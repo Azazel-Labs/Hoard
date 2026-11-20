@@ -2869,6 +2869,7 @@ about-edition-steam = Εφαρμογή υπολογιστή από το Steam
 about-made-by = Δημιουργός
 about-source = Πηγαίος κώδικας στο GitHub
 about-issues = Αναφορά προβλήματος
+about-discord = Συζητήστε μαζί μας στο Discord
 about-steam = Το Hoard στο Steam
 about-license = Άδεια χρήσης
 about-license-what = Το Hoard είναι ανοιχτού κώδικα με την άδεια MIT No Attribution: χρησιμοποιήστε το, αλλάξτε το και μοιραστείτε το όπως θέλετε.

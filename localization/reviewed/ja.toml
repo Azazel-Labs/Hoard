@@ -1,8 +1,8 @@
 version = 2
 
 [readme]
-source = "084e079ba02b3b116ead09bb84910ed14e42507015fbed18a48eb501fa655442"
-translation = "b044bdb8a49994b11b27d9e5edcd3411e864d82b3ef432484deb84dedd08c0ef"
+source = "784687813ffc36b7323d5f6f6162af0826b640f29e1eda034584bda64d776e5f"
+translation = "6f4557dd5f31f8afe5c91c474f05da592644ebb228916da12c10bbb5f0b255d8"
 
 [messages.about-blender]
 source = "Converts 3D models and makes their thumbnails."
@@ -23,6 +23,10 @@ translation = "聞こえ方からサウンドを探します。"
 [messages.about-count]
 source = "{ $shown } of { $total }"
 translation = "{ $shown } / { $total }"
+
+[messages.about-discord]
+source = "Chat with us on Discord"
+translation = "Discord で話しかける"
 
 [messages.about-downloaded]
 source = "Downloaded when needed"

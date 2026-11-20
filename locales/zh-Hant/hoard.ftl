@@ -2593,6 +2593,7 @@ about-edition-steam = Steam 版桌面應用程式
 about-made-by = 開發者
 about-source = GitHub 上的原始碼
 about-issues = 回報問題
+about-discord = 在 Discord 上和我們聊天
 about-steam = Steam 上的 Hoard
 about-license = 授權條款
 about-license-what = Hoard 以 MIT No Attribution 授權條款開源：你可以隨意使用、修改和分享。

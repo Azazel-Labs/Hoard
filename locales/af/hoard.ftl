@@ -2784,6 +2784,7 @@ about-edition-steam = Rekenaartoep van Steam
 about-made-by = Gemaak deur
 about-source = Bronkode op GitHub
 about-issues = Rapporteer ’n probleem
+about-discord = Gesels met ons op Discord
 about-steam = Hoard op Steam
 about-license = Lisensie
 about-license-what = Hoard is oopbron onder die MIT No Attribution-lisensie: gebruik dit, verander dit en deel dit net soos jy wil.

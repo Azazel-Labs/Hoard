@@ -2587,6 +2587,7 @@ about-edition-steam = Steam 版桌面应用
 about-made-by = 开发者
 about-source = GitHub 上的源代码
 about-issues = 报告问题
+about-discord = 在 Discord 上和我们聊天
 about-steam = Steam 上的 Hoard
 about-license = 许可证
 about-license-what = Hoard 以 MIT No Attribution 许可证开源：你可以随意使用、修改和分享。

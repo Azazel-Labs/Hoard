@@ -3016,6 +3016,7 @@ about-edition-steam = Desktopová aplikace ze Steamu
 about-made-by = Vytvořil
 about-source = Zdrojový kód na GitHubu
 about-issues = Nahlásit problém
+about-discord = Napište nám na Discordu
 about-steam = Hoard na Steamu
 about-license = Licence
 about-license-what = Hoard je open source pod licencí MIT No Attribution: můžete jej používat, měnit a sdílet, jak chcete.

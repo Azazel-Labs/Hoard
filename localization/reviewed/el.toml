@@ -1,8 +1,8 @@
 version = 2
 
 [readme]
-source = "084e079ba02b3b116ead09bb84910ed14e42507015fbed18a48eb501fa655442"
-translation = "e3238fbf950d5b1a8c04080371cd6b89f4614ad49ae27ecffd3633722ce11e30"
+source = "784687813ffc36b7323d5f6f6162af0826b640f29e1eda034584bda64d776e5f"
+translation = "4890422f21c71087236199437be3f5ec0bf500d828f121f3861539f632d6bf93"
 
 [messages.about-blender]
 source = "Converts 3D models and makes their thumbnails."
@@ -23,6 +23,10 @@ translation = "Βρίσκει ήχους με βάση το πώς ακούγο�
 [messages.about-count]
 source = "{ $shown } of { $total }"
 translation = "{ $shown } από { $total }"
+
+[messages.about-discord]
+source = "Chat with us on Discord"
+translation = "Συζητήστε μαζί μας στο Discord"
 
 [messages.about-downloaded]
 source = "Downloaded when needed"

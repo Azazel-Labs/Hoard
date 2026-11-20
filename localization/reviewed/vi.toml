@@ -1,8 +1,8 @@
 version = 2
 
 [readme]
-source = "084e079ba02b3b116ead09bb84910ed14e42507015fbed18a48eb501fa655442"
-translation = "4c7546a10fc59ba83d92bfd1b61befc180ba8fdd8a36afa8aadf1e7533965a06"
+source = "784687813ffc36b7323d5f6f6162af0826b640f29e1eda034584bda64d776e5f"
+translation = "e5f3f7db07b8d100748035cc5c5db381f2b0ac74ef4784aefc515dc35bb050a8"
 
 [messages.about-blender]
 source = "Converts 3D models and makes their thumbnails."
@@ -23,6 +23,10 @@ translation = "Tìm âm thanh theo cách chúng nghe."
 [messages.about-count]
 source = "{ $shown } of { $total }"
 translation = "{ $shown } / { $total }"
+
+[messages.about-discord]
+source = "Chat with us on Discord"
+translation = "Trò chuyện với chúng tôi trên Discord"
 
 [messages.about-downloaded]
 source = "Downloaded when needed"

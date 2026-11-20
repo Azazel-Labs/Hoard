@@ -2791,6 +2791,7 @@ about-edition-steam = Aplicació d’escriptori de Steam
 about-made-by = Fet per
 about-source = Codi font a GitHub
 about-issues = Informeu d’un problema
+about-discord = Xateja amb nosaltres a Discord
 about-steam = Hoard a Steam
 about-license = Llicència
 about-license-what = Hoard és de codi obert amb la llicència MIT No Attribution: feu-lo servir, canvieu-lo i compartiu-lo com vulgueu.

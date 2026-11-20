@@ -1,8 +1,8 @@
 version = 2
 
 [readme]
-source = "084e079ba02b3b116ead09bb84910ed14e42507015fbed18a48eb501fa655442"
-translation = "4e3e799f0e6f313af1c8ad01b76ffe0e6d7c22cfdfc1e27c63364423b78c1fcd"
+source = "784687813ffc36b7323d5f6f6162af0826b640f29e1eda034584bda64d776e5f"
+translation = "7e91a85d0b5328865a9bbf9956da077518809d861d62dab74e65d6631bb669ed"
 
 [messages.about-blender]
 source = "Converts 3D models and makes their thumbnails."
@@ -23,6 +23,10 @@ translation = "Sesleri nasıl duyulduklarına göre bulur."
 [messages.about-count]
 source = "{ $shown } of { $total }"
 translation = "{ $shown } / { $total }"
+
+[messages.about-discord]
+source = "Chat with us on Discord"
+translation = "Discord’da bizimle sohbet edin"
 
 [messages.about-downloaded]
 source = "Downloaded when needed"

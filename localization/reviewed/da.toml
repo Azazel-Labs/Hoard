@@ -1,8 +1,8 @@
 version = 2
 
 [readme]
-source = "084e079ba02b3b116ead09bb84910ed14e42507015fbed18a48eb501fa655442"
-translation = "2e0f804cd3a0f9aaacabd400259f6f4142beb0dd0b7386f04d29083b76ad5d53"
+source = "784687813ffc36b7323d5f6f6162af0826b640f29e1eda034584bda64d776e5f"
+translation = "3db7deb1305580e111d3f3fa96521d160b09c0757aa04d4016275b2de5cc8b13"
 
 [messages.about-blender]
 source = "Converts 3D models and makes their thumbnails."
@@ -23,6 +23,10 @@ translation = "Finder lyde ud fra, hvordan de lyder."
 [messages.about-count]
 source = "{ $shown } of { $total }"
 translation = "{ $shown } af { $total }"
+
+[messages.about-discord]
+source = "Chat with us on Discord"
+translation = "Chat med os på Discord"
 
 [messages.about-downloaded]
 source = "Downloaded when needed"

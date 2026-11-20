@@ -2618,6 +2618,7 @@ about-edition-steam = Steam’den masaüstü uygulaması
 about-made-by = Yapımcı
 about-source = GitHub’da kaynak kodu
 about-issues = Sorun bildirin
+about-discord = Discord’da bizimle sohbet edin
 about-steam = Steam’de Hoard
 about-license = Lisans
 about-license-what = Hoard, MIT No Attribution lisansıyla açık kaynaklıdır: dilediğiniz gibi kullanın, değiştirin ve paylaşın.

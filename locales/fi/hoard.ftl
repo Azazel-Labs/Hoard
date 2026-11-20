@@ -2872,6 +2872,7 @@ about-edition-steam = Työpöytäsovellus Steamista
 about-made-by = Tekijä
 about-source = Lähdekoodi GitHubissa
 about-issues = Ilmoita ongelmasta
+about-discord = Juttele kanssamme Discordissa
 about-steam = Hoard Steamissa
 about-license = Lisenssi
 about-license-what = Hoard on avointa lähdekoodia MIT No Attribution -lisenssillä: käytä, muuta ja jaa sitä miten haluat.

@@ -2587,6 +2587,7 @@ about-edition-steam = Ứng dụng máy tính từ Steam
 about-made-by = Tạo bởi
 about-source = Mã nguồn trên GitHub
 about-issues = Báo cáo sự cố
+about-discord = Trò chuyện với chúng tôi trên Discord
 about-steam = Hoard trên Steam
 about-license = Giấy phép
 about-license-what = Hoard là mã nguồn mở theo giấy phép MIT No Attribution: bạn có thể dùng, sửa đổi và chia sẻ tùy ý.

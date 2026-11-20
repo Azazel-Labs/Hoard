@@ -1,8 +1,8 @@
 version = 2
 
 [readme]
-source = "084e079ba02b3b116ead09bb84910ed14e42507015fbed18a48eb501fa655442"
-translation = "373ff61e241a927fa7b324f383fa395ac12ae0cd2f19baa1d6dbec5a914cd271"
+source = "784687813ffc36b7323d5f6f6162af0826b640f29e1eda034584bda64d776e5f"
+translation = "ce4c416087cb6d2fb8e905c6194c792fbd5bb5777164b444d684dfd92a83af43"
 
 [messages.about-blender]
 source = "Converts 3D models and makes their thumbnails."
@@ -23,6 +23,10 @@ translation = "Găsește sunete după cum sună."
 [messages.about-count]
 source = "{ $shown } of { $total }"
 translation = "{ $shown } din { $total }"
+
+[messages.about-discord]
+source = "Chat with us on Discord"
+translation = "Vorbește cu noi pe Discord"
 
 [messages.about-downloaded]
 source = "Downloaded when needed"

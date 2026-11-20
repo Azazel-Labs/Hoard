@@ -2793,6 +2793,7 @@ about-edition-steam = Aplicação de computador da Steam
 about-made-by = Feito por
 about-source = Código-fonte no GitHub
 about-issues = Comunicar um problema
+about-discord = Converse connosco no Discord
 about-steam = Hoard na Steam
 about-license = Licença
 about-license-what = O Hoard é de código aberto com a licença MIT No Attribution: utilize-o, altere-o e partilhe-o como quiser.

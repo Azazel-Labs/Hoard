@@ -2590,6 +2590,7 @@ about-edition-steam = แอปเดสก์ท็อปจาก Steam
 about-made-by = สร้างโดย
 about-source = ซอร์สโค้ดบน GitHub
 about-issues = รายงานปัญหา
+about-discord = คุยกับเราบน Discord
 about-steam = Hoard บน Steam
 about-license = สัญญาอนุญาต
 about-license-what = Hoard เป็นโอเพนซอร์สภายใต้สัญญาอนุญาต MIT No Attribution: ใช้ แก้ไข และแบ่งปันได้ตามต้องการ

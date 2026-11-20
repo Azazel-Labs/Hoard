@@ -2910,6 +2910,7 @@ about-edition-steam = Апликација за рачунар са Steam-а
 about-made-by = Аутор
 about-source = Изворни код на GitHub-у
 about-issues = Пријавите проблем
+about-discord = Ћаскајте са нама на Discord-у
 about-steam = Hoard на Steam-у
 about-license = Лиценца
 about-license-what = Hoard је отвореног кода под лиценцом MIT No Attribution: користите га, мењајте и делите како желите.

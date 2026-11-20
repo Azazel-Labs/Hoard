@@ -6,6 +6,7 @@
 [![Release](https://img.shields.io/github/v/release/Azazel-Labs/Hoard)](https://github.com/Azazel-Labs/Hoard/releases/latest)
 [![Rust 1.100+](https://img.shields.io/badge/rust-1.100%2B-orange?logo=rust)](https://www.rust-lang.org)
 [![License: MIT-0](https://img.shields.io/badge/license-MIT--0-blue)](../../LICENSE)
+[![Discord](https://img.shields.io/badge/discord-join-5865F2?logo=discord&logoColor=white)](https://discord.gg/zf9ncS4EW)
 
 [English](../../README.md) · [Afrikaans](README.af.md) · [Català](README.ca.md) · [Čeština](README.cs.md) · [Dansk](README.da.md) · [Deutsch](README.de.md) · [Ελληνικά](README.el.md) · [Español (Latinoamérica)](README.es-419.md) · [Español (España)](README.es-ES.md) · [Suomi](README.fi.md) · [Français](README.fr.md) · [Magyar](README.hu.md) · [Bahasa Indonesia](README.id.md) · [Italiano](README.it.md) · [日本語](README.ja.md) · 한국어 · [Norsk bokmål](README.nb.md) · [Nederlands](README.nl.md) · [Polski](README.pl.md) · [Português (Brasil)](README.pt-BR.md) · [Português (Portugal)](README.pt-PT.md) · [Română](README.ro.md) · [Русский](README.ru.md) · [Српски](README.sr-Cyrl.md) · [Svenska](README.sv.md) · [ไทย](README.th.md) · [Türkçe](README.tr.md) · [Українська](README.uk.md) · [Tiếng Việt](README.vi.md) · [简体中文](README.zh-Hans.md) · [繁體中文](README.zh-Hant.md)
 
@@ -223,6 +224,10 @@ python3 tools/make_sample_pack.py /tmp/sample       # needs Pillow + numpy; ffmp
 
 Hoard의 포털과 서버 메시지는 31개 언어로 제공되며, 설정 → 모양에서 고를 수 있습니다(기본값은 브라우저 언어).
 첫 번역은 기계의 도움을 받았습니다. 원어민의 수정을 환영합니다. 방법은 [docs/translations.md](../translations.md)에 설명되어 있습니다.
+
+## 커뮤니티
+
+질문이나 아이디어, 자랑하고 싶은 것이 있나요? [Azazel Labs Discord](https://discord.gg/zf9ncS4EW)에 들러 인사해 주세요. 버그와 기능 요청은 묻히지 않도록 [GitHub 이슈](https://github.com/Azazel-Labs/Hoard/issues)로 올려 주세요.
 
 ## 라이선스
 

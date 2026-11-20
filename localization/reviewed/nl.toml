@@ -1,8 +1,8 @@
 version = 2
 
 [readme]
-source = "084e079ba02b3b116ead09bb84910ed14e42507015fbed18a48eb501fa655442"
-translation = "21b6e3be0c0b540bb88b0cacbbfc64268bc05d7485cfe7668c7c245738720538"
+source = "784687813ffc36b7323d5f6f6162af0826b640f29e1eda034584bda64d776e5f"
+translation = "b1a2713c2acc2d665383ad63d82b67d896f7efeabb3cc5c38eb8418e41d7aa97"
 
 [messages.about-blender]
 source = "Converts 3D models and makes their thumbnails."
@@ -23,6 +23,10 @@ translation = "Vindt geluiden op basis van hoe ze klinken."
 [messages.about-count]
 source = "{ $shown } of { $total }"
 translation = "{ $shown } van { $total }"
+
+[messages.about-discord]
+source = "Chat with us on Discord"
+translation = "Chat met ons op Discord"
 
 [messages.about-downloaded]
 source = "Downloaded when needed"

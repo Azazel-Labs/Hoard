@@ -1,8 +1,8 @@
 version = 2
 
 [readme]
-source = "084e079ba02b3b116ead09bb84910ed14e42507015fbed18a48eb501fa655442"
-translation = "722338c74e1d3edd55e306eee2e15db773fe1e1489c6f5d1585a07dec8e85b54"
+source = "784687813ffc36b7323d5f6f6162af0826b640f29e1eda034584bda64d776e5f"
+translation = "69f01639647ec94d71cdb3668111c233bf33f40252c42dacec1a9e8e8ec3a19b"
 
 [messages.about-blender]
 source = "Converts 3D models and makes their thumbnails."
@@ -23,6 +23,10 @@ translation = "Hledá zvuky podle toho, jak znějí."
 [messages.about-count]
 source = "{ $shown } of { $total }"
 translation = "{ $shown } z { $total }"
+
+[messages.about-discord]
+source = "Chat with us on Discord"
+translation = "Napište nám na Discordu"
 
 [messages.about-downloaded]
 source = "Downloaded when needed"

@@ -1,8 +1,8 @@
 version = 2
 
 [readme]
-source = "084e079ba02b3b116ead09bb84910ed14e42507015fbed18a48eb501fa655442"
-translation = "ab694c342a6615c727964ca9a9ed1084135bb108841432a083682132ef97e8c2"
+source = "784687813ffc36b7323d5f6f6162af0826b640f29e1eda034584bda64d776e5f"
+translation = "44c14591a95068aeb93ac3b44bf9c9907dc70d2d553d802b52b04da4b5c2b3c1"
 
 [messages.about-blender]
 source = "Converts 3D models and makes their thumbnails."
@@ -23,6 +23,10 @@ translation = "Проналази звукове по томе како звуч
 [messages.about-count]
 source = "{ $shown } of { $total }"
 translation = "{ $shown } од { $total }"
+
+[messages.about-discord]
+source = "Chat with us on Discord"
+translation = "Ћаскајте са нама на Discord-у"
 
 [messages.about-downloaded]
 source = "Downloaded when needed"

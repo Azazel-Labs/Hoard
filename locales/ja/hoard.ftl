@@ -2587,6 +2587,7 @@ about-edition-steam = Steam 版デスクトップアプリ
 about-made-by = 制作
 about-source = GitHub のソースコード
 about-issues = 問題を報告
+about-discord = Discord で話しかける
 about-steam = Steam の Hoard
 about-license = ライセンス
 about-license-what = Hoard は MIT No Attribution ライセンスのオープンソースです。自由に使い、変更し、共有できます。

@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "fa0387d425e4db1bad254dc742b635231af121ed833fef99ebf9e388aa6f663a"
+source = "eec901aac0065f35e55d79ad01f1aedf9200f7221afccc25228f377c409a0406"
 translation = "3890c90fa88633a6ab70ef57bf24cb23df5f0ca93b1323895034945b5971b327"
 
 [messages.about-blender]
@@ -3395,6 +3395,14 @@ translation = "Phiên đăng nhập kéo dài từ 1 giờ đến một năm"
 [messages.error-auth-settings]
 source = "bad authentication settings: { $reason }"
 translation = "cài đặt xác thực không hợp lệ: { $reason }"
+
+[messages.error-backup-copy-to]
+source = "Scheduled backups: { $path } isn’t a folder on the server (give its full path)"
+translation = "Sao lưu theo lịch: { $path } không phải là thư mục trên máy chủ (hãy ghi đường dẫn đầy đủ)"
+
+[messages.error-backup-keep]
+source = "Scheduled backups: keep 1 to { $max }"
+translation = "Sao lưu theo lịch: giữ từ 1 đến { $max }"
 
 [messages.error-bad-path]
 source = "bad path"
@@ -8662,6 +8670,50 @@ translation = "Gửi kèm ảnh thu nhỏ (cần mô hình nhận hình ảnh)"
 [messages.settings-back-to-default]
 source = "Back to the default"
 translation = "Về mặc định"
+
+[messages.settings-backup-copy-to]
+source = "Also copy to"
+translation = "Cũng sao chép vào"
+
+[messages.settings-backup-copy-to-none]
+source = "No other folder"
+translation = "Không có thư mục khác"
+
+[messages.settings-backup-daily]
+source = "Every day"
+translation = "Mỗi ngày"
+
+[messages.settings-backup-every]
+source = "Back up"
+translation = "Sao lưu"
+
+[messages.settings-backup-keep]
+source = "Keep"
+translation = "Giữ"
+
+[messages.settings-backup-keep-unit]
+source = "newest scheduled backups"
+translation = "bản sao lưu theo lịch mới nhất"
+
+[messages.settings-backup-off]
+source = "Never"
+translation = "Không bao giờ"
+
+[messages.settings-backup-weekly]
+source = "Every week"
+translation = "Mỗi tuần"
+
+[messages.settings-backups]
+source = "Scheduled backups"
+translation = "Sao lưu theo lịch"
+
+[messages.settings-backups-kept]
+source = "Each goes in the backups folder as hoard-auto-…db, and to the other folder (another disk, or one a sync app backs up) when there’s one, given by its full path on the server. Only older scheduled backups are removed; ones made by hand stay."
+translation = "Mỗi bản được lưu vào thư mục sao lưu với tên hoard-auto-…db, và vào thư mục khác (ổ đĩa khác, hoặc thư mục được ứng dụng đồng bộ sao lưu) nếu có, ghi bằng đường dẫn đầy đủ trên máy chủ. Chỉ các bản sao lưu theo lịch cũ hơn bị xóa; bản tạo thủ công vẫn giữ lại."
+
+[messages.settings-backups-what]
+source = "The database backs itself up on its own; each backup shows in the history below."
+translation = "Cơ sở dữ liệu tự sao lưu; mỗi bản sao lưu hiện trong lịch sử bên dưới."
 
 [messages.settings-blender-download]
 source = "Uses an installed Blender, or downloads Blender 4.5 LTS (about 400 MB) from a blender.org mirror."

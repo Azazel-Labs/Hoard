@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "fa0387d425e4db1bad254dc742b635231af121ed833fef99ebf9e388aa6f663a"
+source = "eec901aac0065f35e55d79ad01f1aedf9200f7221afccc25228f377c409a0406"
 translation = "955c23a7138a5ba41f6b7dfa547d832b52e51ee8626b20728b493cc8fc6a3e51"
 
 [messages.about-blender]
@@ -3408,6 +3408,14 @@ translation = "Oturumlar 1 saat ile bir yıl arasında sürer"
 [messages.error-auth-settings]
 source = "bad authentication settings: { $reason }"
 translation = "hatalı kimlik doğrulama ayarları: { $reason }"
+
+[messages.error-backup-copy-to]
+source = "Scheduled backups: { $path } isn’t a folder on the server (give its full path)"
+translation = "Zamanlanmış yedekler: { $path } sunucuda bir klasör değil (tam yolunu verin)"
+
+[messages.error-backup-keep]
+source = "Scheduled backups: keep 1 to { $max }"
+translation = "Zamanlanmış yedekler: 1 ile { $max } arası saklanır"
 
 [messages.error-bad-path]
 source = "bad path"
@@ -8678,6 +8686,50 @@ translation = "Küçük resimleri de gönder (resim alan bir model gerekir)"
 [messages.settings-back-to-default]
 source = "Back to the default"
 translation = "Varsayılana dön"
+
+[messages.settings-backup-copy-to]
+source = "Also copy to"
+translation = "Ayrıca şuraya kopyala"
+
+[messages.settings-backup-copy-to-none]
+source = "No other folder"
+translation = "Başka klasör yok"
+
+[messages.settings-backup-daily]
+source = "Every day"
+translation = "Her gün"
+
+[messages.settings-backup-every]
+source = "Back up"
+translation = "Yedekle"
+
+[messages.settings-backup-keep]
+source = "Keep"
+translation = "Sakla"
+
+[messages.settings-backup-keep-unit]
+source = "newest scheduled backups"
+translation = "en yeni zamanlanmış yedek"
+
+[messages.settings-backup-off]
+source = "Never"
+translation = "Hiçbir zaman"
+
+[messages.settings-backup-weekly]
+source = "Every week"
+translation = "Her hafta"
+
+[messages.settings-backups]
+source = "Scheduled backups"
+translation = "Zamanlanmış yedekler"
+
+[messages.settings-backups-kept]
+source = "Each goes in the backups folder as hoard-auto-…db, and to the other folder (another disk, or one a sync app backs up) when there’s one, given by its full path on the server. Only older scheduled backups are removed; ones made by hand stay."
+translation = "Her biri yedekler klasörüne hoard-auto-…db adıyla, varsa sunucudaki tam yoluyla verilen öteki klasöre de (başka bir disk ya da bir eşitleme uygulamasının yedeklediği bir klasör) gider. Yalnızca daha eski zamanlanmış yedekler silinir; elle alınanlar kalır."
+
+[messages.settings-backups-what]
+source = "The database backs itself up on its own; each backup shows in the history below."
+translation = "Veritabanı kendi kendini yedekler; her yedek aşağıdaki geçmişte görünür."
 
 [messages.settings-blender-download]
 source = "Uses an installed Blender, or downloads Blender 4.5 LTS (about 400 MB) from a blender.org mirror."

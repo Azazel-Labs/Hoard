@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "fa0387d425e4db1bad254dc742b635231af121ed833fef99ebf9e388aa6f663a"
+source = "eec901aac0065f35e55d79ad01f1aedf9200f7221afccc25228f377c409a0406"
 translation = "ba53414f761bfe22b8de76cd70f11c6ffe1e1dd97c499b1280e56b909a994a6c"
 
 [messages.about-blender]
@@ -3551,6 +3551,14 @@ translation = "Sesiunile durează între o oră și un an"
 [messages.error-auth-settings]
 source = "bad authentication settings: { $reason }"
 translation = "setări de autentificare greșite: { $reason }"
+
+[messages.error-backup-copy-to]
+source = "Scheduled backups: { $path } isn’t a folder on the server (give its full path)"
+translation = "Copii de rezervă programate: { $path } nu este un dosar pe server (dă calea completă)"
+
+[messages.error-backup-keep]
+source = "Scheduled backups: keep 1 to { $max }"
+translation = "Copii de rezervă programate: păstrează între 1 și { $max }"
 
 [messages.error-bad-path]
 source = "bad path"
@@ -8984,6 +8992,50 @@ translation = "Trimiteți și miniaturi (necesită un model care acceptă imagin
 [messages.settings-back-to-default]
 source = "Back to the default"
 translation = "Înapoi la valoarea implicită"
+
+[messages.settings-backup-copy-to]
+source = "Also copy to"
+translation = "Copiază și în"
+
+[messages.settings-backup-copy-to-none]
+source = "No other folder"
+translation = "Niciun alt dosar"
+
+[messages.settings-backup-daily]
+source = "Every day"
+translation = "În fiecare zi"
+
+[messages.settings-backup-every]
+source = "Back up"
+translation = "Fă copie"
+
+[messages.settings-backup-keep]
+source = "Keep"
+translation = "Păstrează"
+
+[messages.settings-backup-keep-unit]
+source = "newest scheduled backups"
+translation = "cele mai noi copii programate"
+
+[messages.settings-backup-off]
+source = "Never"
+translation = "Niciodată"
+
+[messages.settings-backup-weekly]
+source = "Every week"
+translation = "În fiecare săptămână"
+
+[messages.settings-backups]
+source = "Scheduled backups"
+translation = "Copii de rezervă programate"
+
+[messages.settings-backups-kept]
+source = "Each goes in the backups folder as hoard-auto-…db, and to the other folder (another disk, or one a sync app backs up) when there’s one, given by its full path on the server. Only older scheduled backups are removed; ones made by hand stay."
+translation = "Fiecare ajunge în dosarul de copii ca hoard-auto-…db și, dacă există, în celălalt dosar (alt disc sau unul pe care îl salvează o aplicație de sincronizare), dat prin calea completă de pe server. Se șterg doar copiile programate mai vechi; cele făcute de mână rămân."
+
+[messages.settings-backups-what]
+source = "The database backs itself up on its own; each backup shows in the history below."
+translation = "Baza de date își face singură copii de rezervă; fiecare apare în istoricul de mai jos."
 
 [messages.settings-blender-download]
 source = "Uses an installed Blender, or downloads Blender 4.5 LTS (about 400 MB) from a blender.org mirror."

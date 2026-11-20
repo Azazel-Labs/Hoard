@@ -105,8 +105,8 @@ browser ─> (Cloudflare) ─> VPS: hoard + SQLite ──tailscale──> NAS: g
 - Garage's S3 port is only reachable on the tailnet (`network_mode: service:tailscale`).
 - Uploads land on the VPS and are pushed to the NAS. Size the VPS disk for the largest pack you'll upload at once
   (staging), not for the library.
-- Back up the VPS's `/config/hoard.db` with `POST /api/admin/backup` (cron + `curl` with an access token), and the NAS bucket with the NAS's
-  own snapshots.
+- Back up the VPS's `/config/hoard.db` with Settings → Maintenance → Scheduled backups (or `POST /api/admin/backup`
+  from cron with an access token), and the NAS bucket with the NAS's own snapshots.
 
 Instead of Tailscale you can publish Garage through a Cloudflare Tunnel too (`s3.example.com → http://garage:3900`),
 protected by Access, and give Hoard the service token:

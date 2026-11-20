@@ -290,10 +290,8 @@ pub async fn run(cfg: Config) -> Result<()> {
             store_lookup::start(&st).await;
         });
     }
-    {
-        let st = Arc::clone(&state);
-        tokio::spawn(async move { formats::log_trim(&st).await });
-    }
+    let st = Arc::clone(&state);
+    tokio::spawn(async move { formats::log_trim(&st).await });
     {
         let st = Arc::clone(&state);
         tokio::spawn(async move { nearcopies::warm(&st).await });
@@ -311,6 +309,7 @@ pub async fn run(cfg: Config) -> Result<()> {
     }
     scan::spawn_rescans(&state);
     reformat::spawn_expiry(&state);
+    tokio::spawn(maintenance::schedule_backups(Arc::clone(&state)));
     profiler::start();
 
     let mut app = api::router(&state);

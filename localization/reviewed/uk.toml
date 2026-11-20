@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "fa0387d425e4db1bad254dc742b635231af121ed833fef99ebf9e388aa6f663a"
+source = "eec901aac0065f35e55d79ad01f1aedf9200f7221afccc25228f377c409a0406"
 translation = "dbfdb160954897a3050083ea51198e41df631fe78dd356d68112fc6eb1484d1a"
 
 [messages.about-blender]
@@ -3566,6 +3566,14 @@ translation = "Сеанси тривають від 1 години до року
 [messages.error-auth-settings]
 source = "bad authentication settings: { $reason }"
 translation = "неправильні налаштування автентифікації: { $reason }"
+
+[messages.error-backup-copy-to]
+source = "Scheduled backups: { $path } isn’t a folder on the server (give its full path)"
+translation = "Резервні копії за розкладом: { $path } — не тека на сервері (вкажіть повний шлях)"
+
+[messages.error-backup-keep]
+source = "Scheduled backups: keep 1 to { $max }"
+translation = "Резервні копії за розкладом: зберігати від 1 до { $max }"
 
 [messages.error-bad-path]
 source = "bad path"
@@ -9051,6 +9059,50 @@ translation = "Надсилати й мініатюри (потрібна мод
 [messages.settings-back-to-default]
 source = "Back to the default"
 translation = "Повернути типове значення"
+
+[messages.settings-backup-copy-to]
+source = "Also copy to"
+translation = "Також копіювати в"
+
+[messages.settings-backup-copy-to-none]
+source = "No other folder"
+translation = "Без іншої теки"
+
+[messages.settings-backup-daily]
+source = "Every day"
+translation = "Щодня"
+
+[messages.settings-backup-every]
+source = "Back up"
+translation = "Резервна копія"
+
+[messages.settings-backup-keep]
+source = "Keep"
+translation = "Зберігати"
+
+[messages.settings-backup-keep-unit]
+source = "newest scheduled backups"
+translation = "останніх копій за розкладом"
+
+[messages.settings-backup-off]
+source = "Never"
+translation = "Ніколи"
+
+[messages.settings-backup-weekly]
+source = "Every week"
+translation = "Щотижня"
+
+[messages.settings-backups]
+source = "Scheduled backups"
+translation = "Резервні копії за розкладом"
+
+[messages.settings-backups-kept]
+source = "Each goes in the backups folder as hoard-auto-…db, and to the other folder (another disk, or one a sync app backs up) when there’s one, given by its full path on the server. Only older scheduled backups are removed; ones made by hand stay."
+translation = "Кожна зберігається в теці резервних копій як hoard-auto-…db і, якщо вказано, в іншій теці (інший диск або тека, яку зберігає застосунок синхронізації), заданій повним шляхом на сервері. Видаляються лише старіші копії за розкладом; зроблені вручну залишаються."
+
+[messages.settings-backups-what]
+source = "The database backs itself up on its own; each backup shows in the history below."
+translation = "База даних сама робить резервні копії; кожна з’являється в історії нижче."
 
 [messages.settings-blender-download]
 source = "Uses an installed Blender, or downloads Blender 4.5 LTS (about 400 MB) from a blender.org mirror."

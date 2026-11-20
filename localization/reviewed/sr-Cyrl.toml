@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "fa0387d425e4db1bad254dc742b635231af121ed833fef99ebf9e388aa6f663a"
+source = "eec901aac0065f35e55d79ad01f1aedf9200f7221afccc25228f377c409a0406"
 translation = "c57db96716344aa847d7559e1fe2d5e482ceb243539e41e9ff1ff7eff455c08a"
 
 [messages.about-blender]
@@ -3501,6 +3501,14 @@ translation = "Сесије трају између 1 сата и године �
 [messages.error-auth-settings]
 source = "bad authentication settings: { $reason }"
 translation = "неисправна подешавања аутентификације: { $reason }"
+
+[messages.error-backup-copy-to]
+source = "Scheduled backups: { $path } isn’t a folder on the server (give its full path)"
+translation = "Заказане резервне копије: { $path } није фасцикла на серверу (унесите пуну путању)"
+
+[messages.error-backup-keep]
+source = "Scheduled backups: keep 1 to { $max }"
+translation = "Заказане резервне копије: чувај од 1 до { $max }"
 
 [messages.error-bad-path]
 source = "bad path"
@@ -8909,6 +8917,50 @@ translation = "Шаљи и сличице (потребан је модел ко
 [messages.settings-back-to-default]
 source = "Back to the default"
 translation = "Врати на подразумевано"
+
+[messages.settings-backup-copy-to]
+source = "Also copy to"
+translation = "Копирај и у"
+
+[messages.settings-backup-copy-to-none]
+source = "No other folder"
+translation = "Без друге фасцикле"
+
+[messages.settings-backup-daily]
+source = "Every day"
+translation = "Сваког дана"
+
+[messages.settings-backup-every]
+source = "Back up"
+translation = "Резервна копија"
+
+[messages.settings-backup-keep]
+source = "Keep"
+translation = "Чувај"
+
+[messages.settings-backup-keep-unit]
+source = "newest scheduled backups"
+translation = "најновијих заказаних копија"
+
+[messages.settings-backup-off]
+source = "Never"
+translation = "Никад"
+
+[messages.settings-backup-weekly]
+source = "Every week"
+translation = "Сваке недеље"
+
+[messages.settings-backups]
+source = "Scheduled backups"
+translation = "Заказане резервне копије"
+
+[messages.settings-backups-kept]
+source = "Each goes in the backups folder as hoard-auto-…db, and to the other folder (another disk, or one a sync app backs up) when there’s one, given by its full path on the server. Only older scheduled backups are removed; ones made by hand stay."
+translation = "Свака иде у фасциклу резервних копија као hoard-auto-…db, и у другу фасциклу (други диск или фасциклу коју чува апликација за синхронизацију) ако постоји, задату пуном путањом на серверу. Уклањају се само старије заказане копије; оне направљене ручно остају."
+
+[messages.settings-backups-what]
+source = "The database backs itself up on its own; each backup shows in the history below."
+translation = "База података сама прави резервне копије; свака се види у историји испод."
 
 [messages.settings-blender-download]
 source = "Uses an installed Blender, or downloads Blender 4.5 LTS (about 400 MB) from a blender.org mirror."

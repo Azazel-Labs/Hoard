@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "fa0387d425e4db1bad254dc742b635231af121ed833fef99ebf9e388aa6f663a"
+source = "eec901aac0065f35e55d79ad01f1aedf9200f7221afccc25228f377c409a0406"
 translation = "5233f0609e7721ae824ccf9f7322ac9190df0638f3f2e758257bc57e3fa1c214"
 
 [messages.about-blender]
@@ -3401,6 +3401,14 @@ translation = "セッションの長さは 1 時間～1 年です"
 [messages.error-auth-settings]
 source = "bad authentication settings: { $reason }"
 translation = "不正な認証設定: { $reason }"
+
+[messages.error-backup-copy-to]
+source = "Scheduled backups: { $path } isn’t a folder on the server (give its full path)"
+translation = "定期バックアップ：{ $path } はサーバー上のフォルダーではありません（フルパスで指定してください）"
+
+[messages.error-backup-keep]
+source = "Scheduled backups: keep 1 to { $max }"
+translation = "定期バックアップ：保持数は 1〜{ $max } です"
 
 [messages.error-bad-path]
 source = "bad path"
@@ -8676,6 +8684,50 @@ translation = "サムネイルも送る（画像を扱えるモデルが必要�
 [messages.settings-back-to-default]
 source = "Back to the default"
 translation = "既定値に戻す"
+
+[messages.settings-backup-copy-to]
+source = "Also copy to"
+translation = "コピー先"
+
+[messages.settings-backup-copy-to-none]
+source = "No other folder"
+translation = "ほかのフォルダーなし"
+
+[messages.settings-backup-daily]
+source = "Every day"
+translation = "毎日"
+
+[messages.settings-backup-every]
+source = "Back up"
+translation = "バックアップ"
+
+[messages.settings-backup-keep]
+source = "Keep"
+translation = "保持数"
+
+[messages.settings-backup-keep-unit]
+source = "newest scheduled backups"
+translation = "件の最新の定期バックアップ"
+
+[messages.settings-backup-off]
+source = "Never"
+translation = "しない"
+
+[messages.settings-backup-weekly]
+source = "Every week"
+translation = "毎週"
+
+[messages.settings-backups]
+source = "Scheduled backups"
+translation = "定期バックアップ"
+
+[messages.settings-backups-kept]
+source = "Each goes in the backups folder as hoard-auto-…db, and to the other folder (another disk, or one a sync app backs up) when there’s one, given by its full path on the server. Only older scheduled backups are removed; ones made by hand stay."
+translation = "各バックアップは hoard-auto-…db としてバックアップフォルダーに保存され、ほかのフォルダー（別のディスクや、同期アプリがバックアップするフォルダー）を指定していればそこにもコピーされます。フォルダーはサーバー上のフルパスで指定してください。削除されるのは古い定期バックアップだけで、手動で作ったものは残ります。"
+
+[messages.settings-backups-what]
+source = "The database backs itself up on its own; each backup shows in the history below."
+translation = "データベースが自動でバックアップされます。各バックアップは下の履歴に表示されます。"
 
 [messages.settings-blender-download]
 source = "Uses an installed Blender, or downloads Blender 4.5 LTS (about 400 MB) from a blender.org mirror."

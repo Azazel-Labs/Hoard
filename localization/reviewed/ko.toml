@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "fa0387d425e4db1bad254dc742b635231af121ed833fef99ebf9e388aa6f663a"
+source = "eec901aac0065f35e55d79ad01f1aedf9200f7221afccc25228f377c409a0406"
 translation = "7f6892f0bfee70f5d6d340a4b003aed721e533f627426e91a3f9c1603cb956bd"
 
 [messages.about-blender]
@@ -3392,6 +3392,14 @@ translation = "세션은 1시간에서 1년 사이로 유지됩니다"
 [messages.error-auth-settings]
 source = "bad authentication settings: { $reason }"
 translation = "잘못된 인증 설정: { $reason }"
+
+[messages.error-backup-copy-to]
+source = "Scheduled backups: { $path } isn’t a folder on the server (give its full path)"
+translation = "예약 백업: { $path }은(는) 서버의 폴더가 아닙니다(전체 경로를 입력하세요)"
+
+[messages.error-backup-keep]
+source = "Scheduled backups: keep 1 to { $max }"
+translation = "예약 백업: 1~{ $max }개를 보관할 수 있습니다"
 
 [messages.error-bad-path]
 source = "bad path"
@@ -8638,6 +8646,50 @@ translation = "썸네일도 보내기(이미지를 받는 모델 필요)"
 [messages.settings-back-to-default]
 source = "Back to the default"
 translation = "기본값으로"
+
+[messages.settings-backup-copy-to]
+source = "Also copy to"
+translation = "다음에도 복사"
+
+[messages.settings-backup-copy-to-none]
+source = "No other folder"
+translation = "다른 폴더 없음"
+
+[messages.settings-backup-daily]
+source = "Every day"
+translation = "매일"
+
+[messages.settings-backup-every]
+source = "Back up"
+translation = "백업"
+
+[messages.settings-backup-keep]
+source = "Keep"
+translation = "보관"
+
+[messages.settings-backup-keep-unit]
+source = "newest scheduled backups"
+translation = "개의 최신 예약 백업"
+
+[messages.settings-backup-off]
+source = "Never"
+translation = "안 함"
+
+[messages.settings-backup-weekly]
+source = "Every week"
+translation = "매주"
+
+[messages.settings-backups]
+source = "Scheduled backups"
+translation = "예약 백업"
+
+[messages.settings-backups-kept]
+source = "Each goes in the backups folder as hoard-auto-…db, and to the other folder (another disk, or one a sync app backs up) when there’s one, given by its full path on the server. Only older scheduled backups are removed; ones made by hand stay."
+translation = "각 백업은 백업 폴더에 hoard-auto-…db로 저장되고, 다른 폴더(다른 디스크나 동기화 앱이 백업하는 폴더)가 있으면 그곳에도 복사됩니다. 폴더는 서버의 전체 경로로 지정하세요. 오래된 예약 백업만 삭제되며, 직접 만든 백업은 그대로 남습니다."
+
+[messages.settings-backups-what]
+source = "The database backs itself up on its own; each backup shows in the history below."
+translation = "데이터베이스가 스스로 백업합니다. 각 백업은 아래 기록에 표시됩니다."
 
 [messages.settings-blender-download]
 source = "Uses an installed Blender, or downloads Blender 4.5 LTS (about 400 MB) from a blender.org mirror."

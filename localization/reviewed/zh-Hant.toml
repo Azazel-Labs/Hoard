@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "fa0387d425e4db1bad254dc742b635231af121ed833fef99ebf9e388aa6f663a"
+source = "eec901aac0065f35e55d79ad01f1aedf9200f7221afccc25228f377c409a0406"
 translation = "929b1679e1e3d56c7bee2ef626c703af1e4424772a8b07378b4cce80a92ad981"
 
 [messages.about-blender]
@@ -3401,6 +3401,14 @@ translation = "工作階段的有效期間為 1 小時到 1 年"
 [messages.error-auth-settings]
 source = "bad authentication settings: { $reason }"
 translation = "無效的驗證設定：{ $reason }"
+
+[messages.error-backup-copy-to]
+source = "Scheduled backups: { $path } isn’t a folder on the server (give its full path)"
+translation = "排程備份：{ $path } 不是伺服器上的資料夾（請填寫完整路徑）"
+
+[messages.error-backup-keep]
+source = "Scheduled backups: keep 1 to { $max }"
+translation = "排程備份：可保留 1 到 { $max } 份"
 
 [messages.error-bad-path]
 source = "bad path"
@@ -8668,6 +8676,50 @@ translation = "一併傳送縮圖（需要可接收圖片的模型）"
 [messages.settings-back-to-default]
 source = "Back to the default"
 translation = "恢復預設值"
+
+[messages.settings-backup-copy-to]
+source = "Also copy to"
+translation = "同時複製到"
+
+[messages.settings-backup-copy-to-none]
+source = "No other folder"
+translation = "不複製到其他資料夾"
+
+[messages.settings-backup-daily]
+source = "Every day"
+translation = "每天"
+
+[messages.settings-backup-every]
+source = "Back up"
+translation = "備份"
+
+[messages.settings-backup-keep]
+source = "Keep"
+translation = "保留"
+
+[messages.settings-backup-keep-unit]
+source = "newest scheduled backups"
+translation = "份最新的排程備份"
+
+[messages.settings-backup-off]
+source = "Never"
+translation = "永不"
+
+[messages.settings-backup-weekly]
+source = "Every week"
+translation = "每週"
+
+[messages.settings-backups]
+source = "Scheduled backups"
+translation = "排程備份"
+
+[messages.settings-backups-kept]
+source = "Each goes in the backups folder as hoard-auto-…db, and to the other folder (another disk, or one a sync app backs up) when there’s one, given by its full path on the server. Only older scheduled backups are removed; ones made by hand stay."
+translation = "每份備份以 hoard-auto-…db 存放在備份資料夾中；如果填了其他資料夾（另一顆磁碟，或同步應用程式會備份的資料夾），也會複製一份過去，請填寫它在伺服器上的完整路徑。只會刪除較舊的排程備份，手動建立的備份會保留。"
+
+[messages.settings-backups-what]
+source = "The database backs itself up on its own; each backup shows in the history below."
+translation = "資料庫會自動備份，每次備份都會顯示在下方的歷史紀錄中。"
 
 [messages.settings-blender-download]
 source = "Uses an installed Blender, or downloads Blender 4.5 LTS (about 400 MB) from a blender.org mirror."

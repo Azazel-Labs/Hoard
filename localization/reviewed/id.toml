@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "fa0387d425e4db1bad254dc742b635231af121ed833fef99ebf9e388aa6f663a"
+source = "eec901aac0065f35e55d79ad01f1aedf9200f7221afccc25228f377c409a0406"
 translation = "5c145ad92a4f48b6321a4514298f54705660673c84778e6e1e3be88d52788269"
 
 [messages.about-blender]
@@ -3398,6 +3398,14 @@ translation = "Sesi berlangsung antara 1 jam dan satu tahun"
 [messages.error-auth-settings]
 source = "bad authentication settings: { $reason }"
 translation = "pengaturan autentikasi tidak valid: { $reason }"
+
+[messages.error-backup-copy-to]
+source = "Scheduled backups: { $path } isn’t a folder on the server (give its full path)"
+translation = "Cadangan terjadwal: { $path } bukan folder di server (tulis jalur lengkapnya)"
+
+[messages.error-backup-keep]
+source = "Scheduled backups: keep 1 to { $max }"
+translation = "Cadangan terjadwal: simpan 1 sampai { $max }"
 
 [messages.error-bad-path]
 source = "bad path"
@@ -8666,6 +8674,50 @@ translation = "Kirim juga gambar mini (memerlukan model yang menerima gambar)"
 [messages.settings-back-to-default]
 source = "Back to the default"
 translation = "Kembali ke bawaan"
+
+[messages.settings-backup-copy-to]
+source = "Also copy to"
+translation = "Salin juga ke"
+
+[messages.settings-backup-copy-to-none]
+source = "No other folder"
+translation = "Tidak ada folder lain"
+
+[messages.settings-backup-daily]
+source = "Every day"
+translation = "Setiap hari"
+
+[messages.settings-backup-every]
+source = "Back up"
+translation = "Cadangkan"
+
+[messages.settings-backup-keep]
+source = "Keep"
+translation = "Simpan"
+
+[messages.settings-backup-keep-unit]
+source = "newest scheduled backups"
+translation = "cadangan terjadwal terbaru"
+
+[messages.settings-backup-off]
+source = "Never"
+translation = "Tidak pernah"
+
+[messages.settings-backup-weekly]
+source = "Every week"
+translation = "Setiap minggu"
+
+[messages.settings-backups]
+source = "Scheduled backups"
+translation = "Cadangan terjadwal"
+
+[messages.settings-backups-kept]
+source = "Each goes in the backups folder as hoard-auto-…db, and to the other folder (another disk, or one a sync app backs up) when there’s one, given by its full path on the server. Only older scheduled backups are removed; ones made by hand stay."
+translation = "Setiap cadangan masuk ke folder cadangan sebagai hoard-auto-…db, dan ke folder lain (disk lain, atau folder yang dicadangkan aplikasi sinkronisasi) bila ada, ditulis dengan jalur lengkapnya di server. Hanya cadangan terjadwal yang lebih lama yang dihapus; yang dibuat manual tetap ada."
+
+[messages.settings-backups-what]
+source = "The database backs itself up on its own; each backup shows in the history below."
+translation = "Database mencadangkan dirinya sendiri; setiap cadangan muncul di riwayat di bawah."
 
 [messages.settings-blender-download]
 source = "Uses an installed Blender, or downloads Blender 4.5 LTS (about 400 MB) from a blender.org mirror."

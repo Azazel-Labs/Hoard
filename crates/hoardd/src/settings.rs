@@ -57,6 +57,33 @@ impl ThumbQuality {
     }
 }
 
+/// How often the database backs itself up (Settings → Maintenance).
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "lowercase")]
+pub(crate) enum BackupEvery {
+    #[default]
+    Off,
+    Daily,
+    Weekly,
+}
+
+impl BackupEvery {
+    /// How long after the last scheduled backup the next is due; none when they're off.
+    pub(crate) fn interval(self) -> Option<std::time::Duration> {
+        const DAY: u64 = 24 * 60 * 60;
+        match self {
+            Self::Off => None,
+            Self::Daily => Some(std::time::Duration::from_secs(DAY)),
+            Self::Weekly => Some(std::time::Duration::from_secs(7 * DAY)),
+        }
+    }
+}
+
+/// How many scheduled backups are kept unless Settings says otherwise.
+pub(crate) const DEFAULT_BACKUP_KEEP: u32 = 7;
+/// Most scheduled backups Settings can ask to keep.
+pub(crate) const MAX_BACKUP_KEEP: u32 = 365;
+
 /// What's been saved from the portal. `None` means "use the flag".
 #[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(default, deny_unknown_fields)]
@@ -150,6 +177,16 @@ pub(crate) struct Saved {
     pub(crate) motion_thumbs: Option<bool>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub(crate) conversion_cache_mb: Option<u64>,
+    /// Back the database up on a schedule, as `hoard-auto-<time>.db` in the backups folder.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub(crate) backup_every: Option<BackupEvery>,
+    /// How many scheduled backups are kept: older ones go. Backups made by hand are never removed.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub(crate) backup_keep: Option<u32>,
+    /// A folder each scheduled backup is also copied to (another disk, a synced folder), kept to the same number.
+    /// Empty: none.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub(crate) backup_copy_to: Option<String>,
     /// How texture maps are named in downloads, bundles and manifests.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub(crate) texture_names: Option<crate::naming::TextureNames>,
@@ -218,6 +255,9 @@ pub(crate) struct Effective {
     pub(crate) thumb_quality: ThumbQuality,
     pub(crate) thumb_avif: bool,
     pub(crate) conversion_cache_mb: u64,
+    pub(crate) backup_every: BackupEvery,
+    pub(crate) backup_keep: u32,
+    pub(crate) backup_copy_to: Option<PathBuf>,
     pub(crate) texture_names: crate::naming::TextureNames,
     pub(crate) conversion_rules: crate::reformat::Rules,
     pub(crate) auth: crate::signin::AuthConfig,
@@ -315,6 +355,9 @@ impl Saved {
             thumb_quality: self.thumb_quality.unwrap_or_default(),
             thumb_avif: self.thumb_avif.unwrap_or(false),
             conversion_cache_mb: self.conversion_cache_mb.unwrap_or(DEFAULT_CONVERSION_CACHE_MB),
+            backup_every: self.backup_every.unwrap_or_default(),
+            backup_keep: self.backup_keep.unwrap_or(DEFAULT_BACKUP_KEEP).clamp(1, MAX_BACKUP_KEEP),
+            backup_copy_to: self.backup_copy_to.as_deref().and_then(non_empty).map(PathBuf::from),
             texture_names: self.texture_names.clone().unwrap_or_default(),
             conversion_rules: self.conversion_rules.clone().unwrap_or_default(),
             auth: self.auth.clone().unwrap_or_default(),
@@ -396,6 +439,14 @@ impl Saved {
         }
         if self.conversion_cache_mb.is_some_and(|n| n < 100) {
             return Err(tr!("error-conversion-cache"));
+        }
+        if self.backup_keep.is_some_and(|n| !(1..=MAX_BACKUP_KEEP).contains(&n)) {
+            return Err(tr!("error-backup-keep", max = MAX_BACKUP_KEEP));
+        }
+        if let Some(dir) = &effective.backup_copy_to
+            && !(dir.is_absolute() && dir.is_dir())
+        {
+            return Err(tr!("error-backup-copy-to", path = dir.display().to_string()));
         }
         if self.max_upload_mb == Some(0) || self.max_expand_mb == Some(0) {
             return Err(tr!("error-limits-zero"));
@@ -637,6 +688,29 @@ lines" }))
         let (_, blank) = store.update(&cfg, &c, &json!({ "name": " " })).unwrap();
         assert_eq!(blank.name, "Hoard", "an empty name goes back to Hoard");
         assert_eq!(store.get().workers, 6, "a refusal changes nothing");
+    }
+
+    #[test]
+    fn scheduled_backups_keep_some_and_copy_to_a_folder_that_exists() {
+        let cfg = cfg(&[]);
+        let c = db();
+        let store = Store::load(&cfg, &c).unwrap();
+        assert_eq!((store.get().backup_every, store.get().backup_keep), (BackupEvery::Off, DEFAULT_BACKUP_KEEP));
+        let msg = |v: Value| match store.update(&cfg, &c, &v) {
+            Err(Ok(m)) => m,
+            other => panic!("expected a refusal, got {other:?}"),
+        };
+        assert!(msg(json!({ "backup_keep": 0 })).contains("365"));
+        assert!(msg(json!({ "backup_copy_to": "relative/folder" })).contains("relative/folder"));
+        let dir = tempfile::tempdir().unwrap();
+        assert!(msg(json!({ "backup_copy_to": dir.path().join("missing") })).contains("missing"));
+        let (_, after) = store
+            .update(&cfg, &c, &json!({ "backup_every": "weekly", "backup_keep": 3, "backup_copy_to": dir.path() }))
+            .unwrap();
+        assert_eq!(after.backup_every.interval(), Some(std::time::Duration::from_hours(7 * 24)));
+        assert_eq!((after.backup_keep, after.backup_copy_to.as_deref()), (3, Some(dir.path())));
+        let (_, after) = store.update(&cfg, &c, &json!({ "backup_copy_to": " " })).unwrap();
+        assert_eq!(after.backup_copy_to, None, "empty: no copy");
     }
 
     #[test]

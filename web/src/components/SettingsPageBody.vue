@@ -2,9 +2,9 @@
 // What one Settings page shows below its heading: on its own when it's open, or one of several when settings are
 // searched (SettingsPage hides the sections that don't match). The settings and saving are SettingsPage's
 // (settingsContext).
-import type { Stats } from '../api'
+import type { BackupEvery, Stats } from '../api'
 import { isDesktop, may } from '../auth'
-import { t } from '../i18n'
+import { formatNumber, t } from '../i18n'
 import AboutPanel from './AboutPanel.vue'
 import AccountPanel from './AccountPanel.vue'
 import AddingPanel from './AddingPanel.vue'
@@ -161,6 +161,63 @@ const { s: settings, ready, busy, save, take, opts, saveOpt, resetOpt, changed }
           </div>
         </div>
         <UpdatesPanel v-if="!isDesktop()" :settings="settings" @saved="take" @unauthorized="emit('unauthorized')" />
+      </section>
+      <section>
+        <div class="sh"><h3>{{ t('settings-backups') }}</h3></div>
+        <p class="what">{{ t('settings-backups-what') }}</p>
+        <div class="llm opts">
+          <label for="opt-backup-every">{{ t('settings-backup-every') }}</label>
+          <div class="key">
+            <select
+              id="opt-backup-every"
+              class="field"
+              :value="settings.options.backup_every.value"
+              :disabled="busy"
+              @change="save({ backup_every: ($event.target as HTMLSelectElement).value as BackupEvery })"
+            >
+              <option value="off">{{ t('settings-backup-off') }}</option>
+              <option value="daily">{{ t('settings-backup-daily') }}</option>
+              <option value="weekly">{{ t('settings-backup-weekly') }}</option>
+            </select>
+            <ResetButton v-if="changed('backup_every')" :to="t('settings-backup-off')" :disabled="busy" @reset="resetOpt('backup_every')" />
+          </div>
+          <label for="opt-backup-keep">{{ t('settings-backup-keep') }}</label>
+          <div class="key">
+            <input
+              id="opt-backup-keep"
+              v-model.number="opts.backup_keep"
+              class="field num"
+              type="number"
+              min="1"
+              max="365"
+              :disabled="busy"
+              @change="saveOpt('backup_keep')"
+              @keydown.enter.prevent="saveOpt('backup_keep')"
+            />
+            <span class="unit">{{ t('settings-backup-keep-unit') }}</span>
+            <ResetButton
+              v-if="changed('backup_keep')"
+              :to="formatNumber(settings.options.backup_keep.default)"
+              :disabled="busy"
+              @reset="resetOpt('backup_keep')"
+            />
+          </div>
+          <label for="opt-backup-copy-to">{{ t('settings-backup-copy-to') }}</label>
+          <div class="key">
+            <input
+              id="opt-backup-copy-to"
+              v-model="opts.backup_copy_to"
+              class="field"
+              :placeholder="t('settings-backup-copy-to-none')"
+              :disabled="busy"
+              spellcheck="false"
+              @change="saveOpt('backup_copy_to')"
+              @keydown.enter.prevent="saveOpt('backup_copy_to')"
+            />
+            <ResetButton v-if="changed('backup_copy_to')" :to="t('settings-backup-copy-to-none')" :disabled="busy" @reset="resetOpt('backup_copy_to')" />
+          </div>
+        </div>
+        <p class="what">{{ t('settings-backups-kept') }}</p>
       </section>
       <MaintenancePanel @unauthorized="emit('unauthorized')" />
     </template>

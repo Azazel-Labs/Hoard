@@ -425,6 +425,12 @@ export interface Settings {
     motion_thumbs: OptionSetting<boolean>
     /** Most space cached "Download as" conversions may take, in MiB. */
     conversion_cache_mb: OptionSetting<number>
+    /** How often the database backs itself up. */
+    backup_every: OptionSetting<BackupEvery>
+    /** How many scheduled backups are kept. */
+    backup_keep: OptionSetting<number>
+    /** A folder on the server each scheduled backup is also copied to. Empty: none. */
+    backup_copy_to: OptionSetting<string>
     /** What the portal calls this server. */
     name: OptionSetting<string>
     /** Empty: from the request's Host header. */
@@ -553,6 +559,7 @@ export interface S3Setting {
 
 /** How thumbnails are stored: JPEG at three qualities, or PNG. Transparent ones and pixel art are always PNG. */
 export type ThumbQuality = 'small' | 'balanced' | 'sharp' | 'lossless'
+export type BackupEvery = 'off' | 'daily' | 'weekly'
 
 /** Settings to change; `null` goes back to the server's default. */
 export interface SettingsPatch {
@@ -580,6 +587,9 @@ export interface SettingsPatch {
   thumb_avif?: boolean | null
   motion_thumbs?: boolean | null
   conversion_cache_mb?: number | null
+  backup_every?: BackupEvery | null
+  backup_keep?: number | null
+  backup_copy_to?: string | null
   name?: string | null
   public_url?: string | null
   soundfont?: string | null

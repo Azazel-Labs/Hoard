@@ -148,6 +148,13 @@ fn settings_json_sync(state: &AppState) -> Value {
                 crate::settings::DEFAULT_CONVERSION_CACHE_MB,
                 saved.conversion_cache_mb.is_some(),
             ),
+            "backup_every": option(now.backup_every, crate::settings::BackupEvery::Off, saved.backup_every.is_some()),
+            "backup_keep": option(now.backup_keep, crate::settings::DEFAULT_BACKUP_KEEP, saved.backup_keep.is_some()),
+            "backup_copy_to": option(
+                now.backup_copy_to.as_deref().map_or_default(|p| p.display().to_string()),
+                "",
+                saved.backup_copy_to.is_some(),
+            ),
             "name": option(&now.name, crate::settings::DEFAULT_NAME, saved.name.is_some()),
             "public_url": option(
                 now.public_url.as_deref().unwrap_or(""),
@@ -384,6 +391,11 @@ pub(super) async fn put_settings(State(state): State<AppState>, Json(patch): Jso
     }
     if after.workers > before.workers {
         state.wake.notify_waiters();
+    }
+    if (after.backup_every, after.backup_keep, &after.backup_copy_to)
+        != (before.backup_every, before.backup_keep, &before.backup_copy_to)
+    {
+        crate::maintenance::reschedule_backups();
     }
     tracing::info!(
         blender = %after.blender,

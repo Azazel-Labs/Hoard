@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "fa0387d425e4db1bad254dc742b635231af121ed833fef99ebf9e388aa6f663a"
+source = "eec901aac0065f35e55d79ad01f1aedf9200f7221afccc25228f377c409a0406"
 translation = "9a0139bda043fb41090f30a54f857812603e79d615f0ac1d488dc04e9ad73d79"
 
 [messages.about-blender]
@@ -3487,6 +3487,14 @@ translation = "Sitzungen dauern zwischen 1 Stunde und einem Jahr"
 [messages.error-auth-settings]
 source = "bad authentication settings: { $reason }"
 translation = "ungültige Authentifizierungseinstellungen: { $reason }"
+
+[messages.error-backup-copy-to]
+source = "Scheduled backups: { $path } isn’t a folder on the server (give its full path)"
+translation = "Geplante Sicherungen: { $path } ist kein Ordner auf dem Server (vollständigen Pfad angeben)"
+
+[messages.error-backup-keep]
+source = "Scheduled backups: keep 1 to { $max }"
+translation = "Geplante Sicherungen: 1 bis { $max } behalten"
 
 [messages.error-bad-path]
 source = "bad path"
@@ -8839,6 +8847,50 @@ translation = "Auch Vorschaubilder senden (braucht ein Modell, das Bilder annimm
 [messages.settings-back-to-default]
 source = "Back to the default"
 translation = "Auf Standard zurücksetzen"
+
+[messages.settings-backup-copy-to]
+source = "Also copy to"
+translation = "Auch kopieren nach"
+
+[messages.settings-backup-copy-to-none]
+source = "No other folder"
+translation = "Kein weiterer Ordner"
+
+[messages.settings-backup-daily]
+source = "Every day"
+translation = "Jeden Tag"
+
+[messages.settings-backup-every]
+source = "Back up"
+translation = "Sichern"
+
+[messages.settings-backup-keep]
+source = "Keep"
+translation = "Behalten"
+
+[messages.settings-backup-keep-unit]
+source = "newest scheduled backups"
+translation = "neueste geplante Sicherungen"
+
+[messages.settings-backup-off]
+source = "Never"
+translation = "Nie"
+
+[messages.settings-backup-weekly]
+source = "Every week"
+translation = "Jede Woche"
+
+[messages.settings-backups]
+source = "Scheduled backups"
+translation = "Geplante Sicherungen"
+
+[messages.settings-backups-kept]
+source = "Each goes in the backups folder as hoard-auto-…db, and to the other folder (another disk, or one a sync app backs up) when there’s one, given by its full path on the server. Only older scheduled backups are removed; ones made by hand stay."
+translation = "Jede kommt als hoard-auto-…db in den Sicherungsordner und, falls angegeben, in den weiteren Ordner (eine andere Festplatte oder einen, den eine Sync-App sichert), angegeben mit seinem vollständigen Pfad auf dem Server. Nur ältere geplante Sicherungen werden entfernt; von Hand erstellte bleiben."
+
+[messages.settings-backups-what]
+source = "The database backs itself up on its own; each backup shows in the history below."
+translation = "Die Datenbank sichert sich selbst; jede Sicherung erscheint im Verlauf unten."
 
 [messages.settings-blender-download]
 source = "Uses an installed Blender, or downloads Blender 4.5 LTS (about 400 MB) from a blender.org mirror."

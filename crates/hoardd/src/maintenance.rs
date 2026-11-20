@@ -146,10 +146,10 @@ async fn begin(state: &AppState, t: &'static Task) -> ApiResult<i64> {
 }
 
 /// Do the task, record how it went and let it go.
-async fn execute(state: &AppState, t: &'static Task, run: i64) -> Result<String> {
+async fn execute(state: &AppState, t: &'static Task, run: i64, scheduled: bool) -> Result<String> {
     let report = Report { task: t.id, activity: activity::start("maintenance", (t.label)(), None) };
     let result = match t.id {
-        BACKUP => backup(state).await,
+        BACKUP => backup(state, scheduled).await,
         SCRUB => scrub(state, &report).await,
         REANALYZE => reanalyze(state, &report).await,
         CLEAR_CACHE => clear_cache(state).await,
@@ -186,7 +186,7 @@ pub(crate) async fn start(state: &AppState, id: &str) -> ApiResult<i64> {
     let run = begin(state, t).await?;
     let state = std::sync::Arc::clone(state);
     tokio::spawn(async move {
-        let _ = execute(&state, t, run).await;
+        let _ = execute(&state, t, run, false).await;
     });
     Ok(run)
 }
@@ -195,7 +195,7 @@ pub(crate) async fn start(state: &AppState, id: &str) -> ApiResult<i64> {
 pub(crate) async fn run_now(state: &AppState, id: &str) -> ApiResult<String> {
     let t = task(id).ok_or_else(|| AppError::not_found(tr!("error-maintenance-task-not-found", id = id)))?;
     let run = begin(state, t).await?;
-    Ok(execute(state, t, run).await?)
+    Ok(execute(state, t, run, false).await?)
 }
 
 #[derive(Debug, Serialize)]
@@ -271,13 +271,19 @@ fn plural(n: usize, one: &str, many: &str) -> String {
     format!("{n} {}", if n == 1 { one } else { many })
 }
 
-async fn backup(state: &AppState) -> Result<String> {
+/// What scheduled backups are called, ahead of their time: the only backups removed to keep the newest few.
+const AUTO: &str = "hoard-auto-";
+
+/// Back the database up. A scheduled one is named [`AUTO`], copied to the folder Settings names, and the oldest
+/// scheduled ones go to keep the number asked for; a backup made by hand (or from cron) is never removed.
+async fn backup(state: &AppState, scheduled: bool) -> Result<String> {
     let dir = state.cfg.backups_dir();
     tokio::fs::create_dir_all(&dir).await?;
     let stamp = time::OffsetDateTime::now_utc()
         .format(time::macros::format_description!("[year][month][day]-[hour][minute][second]"))
         .context("timestamp")?;
-    let path = dir.join(format!("hoard-{stamp}.db"));
+    let name = format!("{}{stamp}.db", if scheduled { AUTO } else { "hoard-" });
+    let path = dir.join(&name);
     let p = path.to_string_lossy().into_owned();
     db::call(&state.pool, move |c| {
         c.execute("VACUUM INTO ?1", [&p])?;
@@ -285,7 +291,108 @@ async fn backup(state: &AppState) -> Result<String> {
     })
     .await?;
     let size = tokio::fs::metadata(&path).await.map_or(0, |m| m.len());
-    Ok(format!("Saved {} ({})", path.display(), human_bytes(size)))
+    let mut summary = format!("Saved {} ({})", path.display(), human_bytes(size));
+    if !scheduled {
+        return Ok(summary);
+    }
+    let (keep, copy_to) = {
+        let s = state.settings.get();
+        (s.backup_keep as usize, s.backup_copy_to.clone())
+    };
+    let mut removed = prune(&dir, keep);
+    if let Some(to) = copy_to {
+        let partial = to.join(format!("{name}.partial"));
+        let copied = async {
+            tokio::fs::copy(&path, &partial).await?;
+            tokio::fs::rename(&partial, to.join(&name)).await
+        }
+        .await;
+        if let Err(e) = copied {
+            let _ = tokio::fs::remove_file(&partial).await;
+            anyhow::bail!("{summary}, but couldn't copy it to {}: {e}", to.display());
+        }
+        summary = format!("{summary}, copied to {}", to.display());
+        removed += prune(&to, keep);
+    }
+    if removed > 0 {
+        summary = format!("{summary}; removed {} older", plural(removed, "backup", "backups"));
+    }
+    Ok(summary)
+}
+
+/// The scheduled backups in a folder, oldest first (their names sort by time).
+fn scheduled_backups(dir: &std::path::Path) -> Vec<std::path::PathBuf> {
+    let mut found: Vec<_> = std::fs::read_dir(dir)
+        .into_iter()
+        .flatten()
+        .flatten()
+        .map(|e| e.path())
+        .filter(|p| {
+            p.extension().is_some_and(|e| e == "db")
+                && p.file_name().and_then(|n| n.to_str()).is_some_and(|n| n.starts_with(AUTO))
+        })
+        .collect();
+    found.sort();
+    found
+}
+
+/// Remove all but the newest `keep` scheduled backups in a folder; how many went.
+fn prune(dir: &std::path::Path, keep: usize) -> usize {
+    let found = scheduled_backups(dir);
+    let extra = found.len().saturating_sub(keep);
+    found[..extra]
+        .iter()
+        .filter(|p| match std::fs::remove_file(p) {
+            Ok(()) => true,
+            Err(e) => {
+                tracing::warn!(path = %p.display(), error = %e, "could not remove an old backup");
+                false
+            }
+        })
+        .count()
+}
+
+/// Whether a scheduled backup is due: none made yet, or the newest is `every` old.
+fn backup_due(dir: &std::path::Path, every: Duration, now: std::time::SystemTime) -> bool {
+    let newest = scheduled_backups(dir).pop().and_then(|p| std::fs::metadata(p).ok()?.modified().ok());
+    newest.is_none_or(|at| now.duration_since(at).unwrap_or_default() >= every)
+}
+
+static RESCHEDULE: LazyLock<tokio::sync::Notify> = LazyLock::new(tokio::sync::Notify::new);
+
+/// The backup settings changed: look again at once (turning a schedule on backs up now when one is due).
+pub(crate) fn reschedule_backups() {
+    RESCHEDULE.notify_one();
+}
+
+/// Back the database up on the schedule Settings gives, each as a Maintenance run. Looked at every few minutes, so
+/// a server that was off when one was due makes it soon after it starts.
+pub(crate) async fn schedule_backups(state: AppState) {
+    const CHECK: Duration = Duration::from_mins(10);
+    const AFTER_FAILING: Duration = Duration::from_hours(1);
+    let Some(t) = task(BACKUP) else { return };
+    let mut failed: Option<std::time::Instant> = None;
+    loop {
+        let (every, copy_to) = {
+            let s = state.settings.get();
+            (s.backup_every.interval(), s.backup_copy_to.clone())
+        };
+        let now = std::time::SystemTime::now();
+        // A folder to copy to that has none yet (a disk just chosen) gets one at once too.
+        if let Some(every) = every
+            && failed.is_none_or(|at| at.elapsed() >= AFTER_FAILING)
+            && (backup_due(&state.cfg.backups_dir(), every, now)
+                || copy_to.is_some_and(|to| backup_due(&to, every, now)))
+            // Busy with one made by hand: look again later.
+            && let Ok(run) = begin(&state, t).await
+        {
+            failed = execute(&state, t, run, true).await.err().map(|_| std::time::Instant::now());
+        }
+        tokio::select! {
+            () = RESCHEDULE.notified() => failed = None,
+            () = tokio::time::sleep(CHECK) => {}
+        }
+    }
 }
 
 async fn scrub(state: &AppState, report: &Report) -> Result<String> {
@@ -504,6 +611,36 @@ mod tests {
         assert_eq!(human_bytes(900), "900 bytes");
         assert_eq!(human_bytes(1536), "1.5 KB");
         assert_eq!(human_bytes(5 * 1024 * 1024 * 1024), "5.0 GB");
+    }
+
+    #[test]
+    fn only_the_oldest_scheduled_backups_go() {
+        let dir = tempfile::tempdir().unwrap();
+        let by_hand = ["hoard-20261001-120000.db", "hoard-pre-upgrade-v80.db", "hoard-auto-20261104-030000.db.partial"];
+        let auto = ["hoard-auto-20261101-030000.db", "hoard-auto-20261102-030000.db", "hoard-auto-20261103-030000.db"];
+        for n in by_hand.iter().chain(&auto) {
+            std::fs::write(dir.path().join(n), b"x").unwrap();
+        }
+        assert_eq!(prune(dir.path(), 2), 1);
+        assert!(!dir.path().join(auto[0]).exists(), "the oldest scheduled one went");
+        for n in by_hand.iter().chain(&auto[1..]) {
+            assert!(dir.path().join(n).exists(), "{n} stays");
+        }
+        assert_eq!(prune(dir.path(), 2), 0, "nothing more to remove");
+    }
+
+    #[test]
+    fn a_scheduled_backup_is_due_once_the_last_is_old_enough() {
+        let dir = tempfile::tempdir().unwrap();
+        let day = Duration::from_hours(24);
+        let now = std::time::SystemTime::now();
+        assert!(backup_due(dir.path(), day, now), "none yet");
+        std::fs::write(dir.path().join("hoard-20261001-120000.db"), b"x").unwrap();
+        assert!(backup_due(dir.path(), day, now), "one made by hand doesn't count");
+        std::fs::write(dir.path().join("hoard-auto-20261101-030000.db"), b"x").unwrap();
+        assert!(!backup_due(dir.path(), day, now));
+        assert!(!backup_due(dir.path(), day, now + day / 2));
+        assert!(backup_due(dir.path(), day, now + day + Duration::from_secs(60)));
     }
 
     #[test]

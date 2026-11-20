@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "fa0387d425e4db1bad254dc742b635231af121ed833fef99ebf9e388aa6f663a"
+source = "eec901aac0065f35e55d79ad01f1aedf9200f7221afccc25228f377c409a0406"
 translation = "bd7cd34aed4768345a5f9fea614ee34f51ffb924aa266c18a1b392a66b52d3b0"
 
 [messages.about-blender]
@@ -3487,6 +3487,14 @@ translation = "Les sessions duren entre 1 hora i un any"
 [messages.error-auth-settings]
 source = "bad authentication settings: { $reason }"
 translation = "configuració d'autenticació incorrecta: { $reason }"
+
+[messages.error-backup-copy-to]
+source = "Scheduled backups: { $path } isn’t a folder on the server (give its full path)"
+translation = "Còpies de seguretat programades: { $path } no és una carpeta al servidor (indica’n el camí complet)"
+
+[messages.error-backup-keep]
+source = "Scheduled backups: keep 1 to { $max }"
+translation = "Còpies de seguretat programades: conserva’n d’1 a { $max }"
 
 [messages.error-bad-path]
 source = "bad path"
@@ -8845,6 +8853,50 @@ translation = "Envia també les miniatures (cal un model que accepti imatges)"
 [messages.settings-back-to-default]
 source = "Back to the default"
 translation = "Torna al valor per defecte"
+
+[messages.settings-backup-copy-to]
+source = "Also copy to"
+translation = "Copia també a"
+
+[messages.settings-backup-copy-to-none]
+source = "No other folder"
+translation = "Cap altra carpeta"
+
+[messages.settings-backup-daily]
+source = "Every day"
+translation = "Cada dia"
+
+[messages.settings-backup-every]
+source = "Back up"
+translation = "Fes una còpia"
+
+[messages.settings-backup-keep]
+source = "Keep"
+translation = "Conserva"
+
+[messages.settings-backup-keep-unit]
+source = "newest scheduled backups"
+translation = "còpies programades més recents"
+
+[messages.settings-backup-off]
+source = "Never"
+translation = "Mai"
+
+[messages.settings-backup-weekly]
+source = "Every week"
+translation = "Cada setmana"
+
+[messages.settings-backups]
+source = "Scheduled backups"
+translation = "Còpies de seguretat programades"
+
+[messages.settings-backups-kept]
+source = "Each goes in the backups folder as hoard-auto-…db, and to the other folder (another disk, or one a sync app backs up) when there’s one, given by its full path on the server. Only older scheduled backups are removed; ones made by hand stay."
+translation = "Cada còpia va a la carpeta de còpies com a hoard-auto-…db, i a l’altra carpeta (un altre disc, o una que una aplicació de sincronització desa) si n’hi ha, indicada amb el camí complet al servidor. Només s’eliminen les còpies programades més antigues; les fetes a mà es queden."
+
+[messages.settings-backups-what]
+source = "The database backs itself up on its own; each backup shows in the history below."
+translation = "La base de dades en fa còpies de seguretat tota sola; cada còpia surt a l’historial de sota."
 
 [messages.settings-blender-download]
 source = "Uses an installed Blender, or downloads Blender 4.5 LTS (about 400 MB) from a blender.org mirror."

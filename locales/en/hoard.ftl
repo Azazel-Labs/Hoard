@@ -276,6 +276,8 @@ error-soundfont-bad = { $name } isn’t a SoundFont MIDI can play with: { $reaso
 error-workers = Background workers: between 1 and { $max }
 error-ai-batch = Assets per AI request: between 1 and 200
 error-conversion-cache = Converted downloads: at least 100 MB
+error-backup-keep = Scheduled backups: keep 1 to { $max }
+error-backup-copy-to = Scheduled backups: { $path } isn’t a folder on the server (give its full path)
 error-conversion-keep-days = Conversion rules: keep originals for 1 to { $max } days
 error-conversion-target = Conversion rules: Hoard can’t convert files to { $format }
 error-conversion-no-source = Conversion rules: each rule needs at least one format to convert
@@ -3144,6 +3146,17 @@ settings-updates = Updates
 settings-version = This is Hoard { $version }.
 settings-update-check = Check GitHub every few hours for a new release
 settings-desktop-updates = Hoard looks for a new release each time it starts, downloads it in the background, and installs it when you quit.
+settings-backups = Scheduled backups
+settings-backups-what = The database backs itself up on its own; each backup shows in the history below.
+settings-backup-every = Back up
+settings-backup-off = Never
+settings-backup-daily = Every day
+settings-backup-weekly = Every week
+settings-backup-keep = Keep
+settings-backup-keep-unit = newest scheduled backups
+settings-backup-copy-to = Also copy to
+settings-backup-copy-to-none = No other folder
+settings-backups-kept = Each goes in the backups folder as hoard-auto-…db, and to the other folder (another disk, or one a sync app backs up) when there’s one, given by its full path on the server. Only older scheduled backups are removed; ones made by hand stay.
 
 ## AboutPanel.vue (Settings → About)
 

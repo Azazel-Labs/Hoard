@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "fa0387d425e4db1bad254dc742b635231af121ed833fef99ebf9e388aa6f663a"
+source = "eec901aac0065f35e55d79ad01f1aedf9200f7221afccc25228f377c409a0406"
 translation = "ac32481da99b685200b599a0b42111713ba8e1daf08ea7fad7d1e37e027f0a2c"
 
 [messages.about-blender]
@@ -3487,6 +3487,14 @@ translation = "Sessies duur tussen 1 uur en 'n jaar"
 [messages.error-auth-settings]
 source = "bad authentication settings: { $reason }"
 translation = "foutiewe verifikasie-instellings: { $reason }"
+
+[messages.error-backup-copy-to]
+source = "Scheduled backups: { $path } isn’t a folder on the server (give its full path)"
+translation = "Geskeduleerde rugsteun: { $path } is nie ’n gids op die bediener nie (gee sy volle pad)"
+
+[messages.error-backup-keep]
+source = "Scheduled backups: keep 1 to { $max }"
+translation = "Geskeduleerde rugsteun: hou 1 tot { $max }"
 
 [messages.error-bad-path]
 source = "bad path"
@@ -8839,6 +8847,50 @@ translation = "Stuur ook duimnaels (het 'n model nodig wat prente aanvaar)"
 [messages.settings-back-to-default]
 source = "Back to the default"
 translation = "Terug na die verstek"
+
+[messages.settings-backup-copy-to]
+source = "Also copy to"
+translation = "Kopieer ook na"
+
+[messages.settings-backup-copy-to-none]
+source = "No other folder"
+translation = "Geen ander gids nie"
+
+[messages.settings-backup-daily]
+source = "Every day"
+translation = "Elke dag"
+
+[messages.settings-backup-every]
+source = "Back up"
+translation = "Maak rugsteun"
+
+[messages.settings-backup-keep]
+source = "Keep"
+translation = "Hou"
+
+[messages.settings-backup-keep-unit]
+source = "newest scheduled backups"
+translation = "nuutste geskeduleerde rugsteune"
+
+[messages.settings-backup-off]
+source = "Never"
+translation = "Nooit"
+
+[messages.settings-backup-weekly]
+source = "Every week"
+translation = "Elke week"
+
+[messages.settings-backups]
+source = "Scheduled backups"
+translation = "Geskeduleerde rugsteun"
+
+[messages.settings-backups-kept]
+source = "Each goes in the backups folder as hoard-auto-…db, and to the other folder (another disk, or one a sync app backs up) when there’s one, given by its full path on the server. Only older scheduled backups are removed; ones made by hand stay."
+translation = "Elkeen gaan in die rugsteungids as hoard-auto-…db, en na die ander gids (’n ander skyf, of een wat ’n sinkroniseer-app rugsteun) as daar een is, gegee deur sy volle pad op die bediener. Net ouer geskeduleerde rugsteune word verwyder; dié wat met die hand gemaak is, bly."
+
+[messages.settings-backups-what]
+source = "The database backs itself up on its own; each backup shows in the history below."
+translation = "Die databasis maak self rugsteun; elke rugsteun wys in die geskiedenis hieronder."
 
 [messages.settings-blender-download]
 source = "Uses an installed Blender, or downloads Blender 4.5 LTS (about 400 MB) from a blender.org mirror."

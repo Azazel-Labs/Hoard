@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "fa0387d425e4db1bad254dc742b635231af121ed833fef99ebf9e388aa6f663a"
+source = "eec901aac0065f35e55d79ad01f1aedf9200f7221afccc25228f377c409a0406"
 translation = "4419cbdf5af1c5cd73dfc82dacc541ce70f5f08fd0dcf749135fda34c793eedf"
 
 [messages.about-blender]
@@ -3499,6 +3499,14 @@ translation = "Οι περίοδοι σύνδεσης διαρκούν από 1 
 [messages.error-auth-settings]
 source = "bad authentication settings: { $reason }"
 translation = "λανθασμένες ρυθμίσεις ελέγχου ταυτότητας: { $reason }"
+
+[messages.error-backup-copy-to]
+source = "Scheduled backups: { $path } isn’t a folder on the server (give its full path)"
+translation = "Προγραμματισμένα αντίγραφα ασφαλείας: το { $path } δεν είναι φάκελος στον διακομιστή (δώστε την πλήρη διαδρομή)"
+
+[messages.error-backup-keep]
+source = "Scheduled backups: keep 1 to { $max }"
+translation = "Προγραμματισμένα αντίγραφα ασφαλείας: διατήρηση 1 έως { $max }"
 
 [messages.error-bad-path]
 source = "bad path"
@@ -8898,6 +8906,50 @@ translation = "Αποστολή και των μικρογραφιών (χρει
 [messages.settings-back-to-default]
 source = "Back to the default"
 translation = "Επαναφορά στην προεπιλογή"
+
+[messages.settings-backup-copy-to]
+source = "Also copy to"
+translation = "Αντιγραφή και σε"
+
+[messages.settings-backup-copy-to-none]
+source = "No other folder"
+translation = "Κανένας άλλος φάκελος"
+
+[messages.settings-backup-daily]
+source = "Every day"
+translation = "Κάθε μέρα"
+
+[messages.settings-backup-every]
+source = "Back up"
+translation = "Αντίγραφο ασφαλείας"
+
+[messages.settings-backup-keep]
+source = "Keep"
+translation = "Διατήρηση"
+
+[messages.settings-backup-keep-unit]
+source = "newest scheduled backups"
+translation = "πιο πρόσφατων προγραμματισμένων αντιγράφων"
+
+[messages.settings-backup-off]
+source = "Never"
+translation = "Ποτέ"
+
+[messages.settings-backup-weekly]
+source = "Every week"
+translation = "Κάθε εβδομάδα"
+
+[messages.settings-backups]
+source = "Scheduled backups"
+translation = "Προγραμματισμένα αντίγραφα ασφαλείας"
+
+[messages.settings-backups-kept]
+source = "Each goes in the backups folder as hoard-auto-…db, and to the other folder (another disk, or one a sync app backs up) when there’s one, given by its full path on the server. Only older scheduled backups are removed; ones made by hand stay."
+translation = "Κάθε αντίγραφο μπαίνει στον φάκελο αντιγράφων ως hoard-auto-…db, και στον άλλο φάκελο (άλλος δίσκος ή ένας που αντιγράφει μια εφαρμογή συγχρονισμού) αν υπάρχει, δοσμένος με την πλήρη διαδρομή του στον διακομιστή. Αφαιρούνται μόνο τα παλαιότερα προγραμματισμένα αντίγραφα· όσα έγιναν με το χέρι μένουν."
+
+[messages.settings-backups-what]
+source = "The database backs itself up on its own; each backup shows in the history below."
+translation = "Η βάση δεδομένων κρατά μόνη της αντίγραφα ασφαλείας· κάθε αντίγραφο φαίνεται στο ιστορικό παρακάτω."
 
 [messages.settings-blender-download]
 source = "Uses an installed Blender, or downloads Blender 4.5 LTS (about 400 MB) from a blender.org mirror."

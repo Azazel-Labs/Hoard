@@ -10,6 +10,8 @@ export interface Opts {
   max_upload_mb: number
   max_expand_mb: number
   conversion_cache_mb: number
+  backup_keep: number
+  backup_copy_to: string
   name: string
   public_url: string
   soundfont: string

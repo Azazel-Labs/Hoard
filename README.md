@@ -1283,6 +1283,9 @@ Maintenance → Shrink thumbnails re-stores the existing PNG ones.
 - `POST /api/admin/backup` writes a consistent SQLite snapshot (`VACUUM INTO`) to `backups/` next to the database
   and answers `{"summary": "Saved <path> (<size>)"}`. Back up that file plus the blob store; blobs never change, so
   incremental sync is trivial.
+- Settings → Maintenance → Scheduled backups makes one every day or every week without cron (`hoard-auto-<time>.db`),
+  keeps the newest few (7 unless you change it; only scheduled ones are removed) and can copy each to another folder on
+  the server, such as another disk or one a sync app backs up. Each shows in the Maintenance history.
 - `POST /api/admin/gc` deletes blobs no asset, thumbnail, derivative or kept original references (after deleting
   packs).
 - Uploads: path traversal rejected, archive expansion capped, symlinks in tarballs ignored. A file opened on its own

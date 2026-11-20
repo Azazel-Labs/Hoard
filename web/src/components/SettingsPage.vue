@@ -113,7 +113,7 @@ watch(query, () => void nextTick(refilter))
 const busy = ref(false)
 
 // Server options: each saves on its own when it's entered (Enter, or leaving the field); switches at once.
-const opts = reactive<Opts>({ workers: 1, max_upload_mb: 1, max_expand_mb: 1, conversion_cache_mb: 1, name: '', public_url: '', soundfont: '' })
+const opts = reactive<Opts>({ workers: 1, max_upload_mb: 1, max_expand_mb: 1, conversion_cache_mb: 1, backup_keep: 1, backup_copy_to: '', name: '', public_url: '', soundfont: '' })
 const OPT_KEYS = Object.keys(opts) as OptKey[]
 /** An option's name, for the note that it's saved. */
 const optLabel = (k: OptKey): string =>
@@ -122,6 +122,8 @@ const optLabel = (k: OptKey): string =>
     max_upload_mb: t('settings-max-upload'),
     max_expand_mb: t('settings-max-expand'),
     conversion_cache_mb: t('settings-conversion-cache'),
+    backup_keep: t('settings-backup-keep'),
+    backup_copy_to: t('settings-backup-copy-to'),
     name: t('settings-name'),
     public_url: t('settings-public-url'),
     soundfont: t('settings-soundfont'),

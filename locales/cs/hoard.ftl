@@ -2771,6 +2771,7 @@ settings-conv-remove = Odebrat
 settings-conv-remove-label = Odebrat pravidlo { $n }
 settings-conv-taken = Tento formát už převádí jiné pravidlo
 settings-conv-upright = Při převodu postavit modely nastojato (osou Y nahoru, otočené k +Z), tak jak se zobrazují modely balíčku
+settings-conv-flac-what = Zvuk zůstane přesně stejný, zhruba v polovičním místě. Soubory WAV se smyčkami, značkami cue, vzorky s plovoucí čárkou nebo jinými údaji, které FLAC neudrží, zůstanou jako WAV.
 settings-conv-add = Přidat pravidlo
 # Before a number of days: "Keep originals for [30] days".
 settings-conv-keep = Uchovávat originály

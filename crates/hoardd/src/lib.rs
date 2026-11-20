@@ -33,6 +33,7 @@ mod embed;
 mod error;
 mod extract;
 mod ffmpeg;
+mod flac;
 mod fonts;
 mod format_wizard;
 mod formats;

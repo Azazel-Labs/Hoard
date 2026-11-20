@@ -2780,6 +2780,7 @@ settings-conv-remove = Eliminați
 settings-conv-remove-label = Eliminați regula { $n }
 settings-conv-taken = O altă regulă convertește deja acest format
 settings-conv-upright = Îndreptați modelele la conversie (Y în sus, cu fața spre +Z), așa cum sunt afișate modelele pachetului
+settings-conv-flac-what = Sunetul rămâne exact la fel, în aproximativ jumătate din spațiu. Fișierele WAV cu puncte de buclă, marcaje cue, eșantioane în virgulă mobilă sau alte detalii pe care un FLAC nu le poate păstra rămân WAV.
 settings-conv-add = Adăugați o regulă
 # Before a number of days: "Keep originals for [30] days".
 settings-conv-keep = Păstrați originalele timp de

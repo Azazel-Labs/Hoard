@@ -2397,6 +2397,7 @@ settings-conv-remove = Eltávolítás
 settings-conv-remove-label = { $n }. szabály eltávolítása
 settings-conv-taken = Ezt a formátumot egy másik szabály alakítja át
 settings-conv-upright = A modellek felállítása átalakításkor (Y felfelé, előre +Z irányba), ahogy a csomag modelljei megjelennek
+settings-conv-flac-what = A hang pontosan ugyanaz marad, nagyjából feleakkora helyen. A hurokpontokat, cue-jelölőket, lebegőpontos mintákat vagy más, FLAC-ban meg nem tartható részleteket tartalmazó WAV-ok WAV-ok maradnak.
 settings-conv-add = Szabály hozzáadása
 # Before a number of days: "Keep originals for [30] days".
 settings-conv-keep = Az eredetiek megőrzése

@@ -3,7 +3,8 @@
 //! pack's models are shown. The converted file takes over the asset (same id, tags, collections and links), and
 //! `asset_origin` keeps the original for [`Rules::keep_days`], during which the asset's page can put it back; after
 //! that it's deleted. A model's textures aren't copied into it: the GLB points at the image files beside it in the
-//! pack. Watched folders are never changed.
+//! pack. WAV files become FLAC: the same samples in about half the space, only for a WAV a FLAC can hold whole (see
+//! `flac`); one it can't stays a WAV, and the rules leave it alone. Watched folders are never changed.
 //!
 //! A rule applies by itself to packs added from then on. Files already in the library are converted only when asked
 //! (`POST /api/admin/conversions/run`), after Settings has shown what that would change
@@ -30,7 +31,7 @@ const MAX_KEEP_DAYS: u32 = 365;
 const SAMPLE: usize = 200;
 
 /// The formats rules convert to.
-pub(crate) const TARGETS: &[&str] = &["glb"];
+pub(crate) const TARGETS: &[&str] = &["glb", "flac"];
 
 /// The formats a rule converting to `to` can convert from.
 pub(crate) fn sources(to: &str) -> Vec<&'static str> {
@@ -42,6 +43,7 @@ pub(crate) fn sources(to: &str) -> Vec<&'static str> {
             .copied()
             .filter(|e| *e != "glb")
             .collect(),
+        "flac" => vec!["wav"],
         _ => Vec::new(),
     }
 }
@@ -190,7 +192,7 @@ fn candidates(conn: &Connection, exts: &[String], pack: Option<&str>) -> Result<
                 (SELECT d.blob_hash FROM derivatives d WHERE d.asset_id = a.id AND d.kind = 'glb'),
                 p.status = 'ready'
            FROM assets a JOIN packs p ON p.id = a.pack_id LEFT JOIN locations l ON l.id = p.location_id
-          WHERE lower(a.ext) IN ({marks}) AND a.kind IN ('model', 'animation')
+          WHERE lower(a.ext) IN ({marks}) AND a.kind IN ('model', 'animation', 'audio')
             AND a.archived_at IS NULL AND p.archived_at IS NULL
             AND NOT EXISTS (SELECT 1 FROM asset_origin o WHERE o.asset_id = a.id)
             AND NOT EXISTS (SELECT 1 FROM kept_formats k WHERE k.asset_id = a.id)
@@ -240,7 +242,7 @@ fn plan(conn: &Connection, rules: &Rules, pack: Option<&str>) -> Result<Plan> {
             continue;
         };
         let to = renamed(&file.path, &r.to);
-        let blender_only = !crate::meshes::reads(&file.ext);
+        let blender_only = r.to == "glb" && !crate::meshes::reads(&file.ext);
         let skip = if file.watched {
             Some(Skip::Watched)
         } else if file.unity {
@@ -381,10 +383,15 @@ fn convert_pack(state: &AppState, rt: &Handle, pack_id: &str) -> Result<usize> {
         crate::activity::job_progress(jobs::REFORMAT, Some(pack_id), n, todo.len(), "files");
         let rule = &rules.rules[t.rule];
         let dir = work.path().join(n.to_string());
-        let made = convert_one(state, rt, &conn, &t.file, rule, facing, &images, &dir);
+        let made = if rule.to == "flac" {
+            wav_to_flac(state, rt, &conn, &t.file)
+        } else {
+            convert_one(state, rt, &conn, &t.file, rule, facing, &images, &dir).map(Some)
+        };
         std::fs::remove_dir_all(&dir).ok();
         let bytes = match made {
-            Ok(b) => b,
+            Ok(Some(b)) => b,
+            Ok(None) => continue,
             Err(e) => {
                 let why = format!("{e:#}");
                 tracing::warn!(pack = pack_id, file = %t.file.path, error = %why, "conversion rule failed");
@@ -460,6 +467,21 @@ fn convert_one(
     let facing = if rule.upright { facing } else { Facing::default() };
     let (glb, _) = crate::glbfiles::link(&glb, facing, &files).context("pointing the model at its textures")?;
     Ok(glb)
+}
+
+/// A WAV file as a FLAC of the same samples. One a FLAC can't hold whole (`None`) stays as it is, and the rules
+/// leave it alone from then on.
+fn wav_to_flac(state: &AppState, rt: &Handle, conn: &Connection, file: &Candidate) -> Result<Option<Vec<u8>>> {
+    let hash: String = conn.query_row("SELECT blob_hash FROM assets WHERE id = ?1", [&file.id], |r| r.get(0))?;
+    let wav = rt.block_on(state.blobs.read_all(&hash))?;
+    match crate::flac::from_wav(&wav)? {
+        Ok(flac) => Ok(Some(flac)),
+        Err(why) => {
+            tracing::info!(pack = %file.pack_id, file = %file.path, why, "kept as WAV");
+            conn.execute("INSERT INTO kept_formats (asset_id) VALUES (?1) ON CONFLICT DO NOTHING", [&file.id])?;
+            Ok(None)
+        }
+    }
 }
 
 /// `POST /api/assets/{id}/unconvert`: put back the file a rule converted, while its original is kept. The rules

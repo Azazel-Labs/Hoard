@@ -2572,6 +2572,7 @@ settings-conv-remove = Fjern
 settings-conv-remove-label = Fjern regel { $n }
 settings-conv-taken = En annen regel konverterer dette formatet
 settings-conv-upright = Snu modellene opprett når de konverteres (Y opp, vendt mot +Z), slik pakkens modeller vises
+settings-conv-flac-what = Lyden forblir nøyaktig den samme, på omtrent halve plassen. WAV-filer med looppunkter, cue-markører, flyttallssampler eller andre detaljer en FLAC ikke kan beholde, forblir WAV.
 settings-conv-add = Legg til en regel
 # Before a number of days: "Keep originals for [30] days".
 settings-conv-keep = Behold originaler i

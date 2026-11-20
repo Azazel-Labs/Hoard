@@ -2583,6 +2583,7 @@ settings-conv-remove = Rimuovi
 settings-conv-remove-label = Rimuovi la regola { $n }
 settings-conv-taken = Un'altra regola converte già questo formato
 settings-conv-upright = Raddrizza i modelli durante la conversione (Y in alto, rivolti verso +Z), come vengono mostrati i modelli del pacchetto
+settings-conv-flac-what = Il suono resta esattamente uguale, in circa metà dello spazio. I WAV con punti di loop, marcatori cue, campioni in virgola mobile o altri dettagli che un FLAC non può conservare restano WAV.
 settings-conv-add = Aggiungi una regola
 # Before a number of days: "Keep originals for [30] days".
 settings-conv-keep = Conserva gli originali per

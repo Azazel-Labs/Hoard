@@ -2384,6 +2384,7 @@ settings-conv-remove = 削除
 settings-conv-remove-label = ルール { $n } を削除
 settings-conv-taken = この形式は別のルールで変換されます
 settings-conv-upright = 変換時に、パックのモデルの表示と同じようにモデルを立てる（Y が上、+Z 向き）
+settings-conv-flac-what = 音はまったく同じまま、容量はおよそ半分になります。ループポイント、キューマーカー、浮動小数点サンプルなど、FLAC が保持できない情報を含む WAV は WAV のまま残ります。
 settings-conv-add = ルールを追加
 # Before a number of days: "Keep originals for [30] days".
 settings-conv-keep = 元のファイルの保存期間

@@ -8931,6 +8931,10 @@ translation = """
 source = "Convert files already in the library"
 translation = "A könyvtárban már meglévő fájlok átalakítása"
 
+[messages.settings-conv-flac-what]
+source = "The sound stays exactly the same, in about half the space. WAVs with loop points, cue markers, floating-point samples or other details a FLAC can’t keep stay WAV."
+translation = "A hang pontosan ugyanaz marad, nagyjából feleakkora helyen. A hurokpontokat, cue-jelölőket, lebegőpontos mintákat vagy más, FLAC-ban meg nem tartható részleteket tartalmazó WAV-ok WAV-ok maradnak."
+
 [messages.settings-conv-from]
 source = "From"
 translation = "Forrásformátumok"

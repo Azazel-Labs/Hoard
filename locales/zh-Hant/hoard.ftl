@@ -2390,6 +2390,7 @@ settings-conv-remove = 移除
 settings-conv-remove-label = 移除規則 { $n }
 settings-conv-taken = 另一條規則已在轉換此格式
 settings-conv-upright = 轉換時將模型擺正（Y 軸朝上，面向 +Z），與素材包中模型的顯示方式一致
+settings-conv-flac-what = 聲音完全不變，空間約為一半。帶有循環點、cue 標記、浮點取樣或其他 FLAC 無法保留之資訊的 WAV 會維持為 WAV。
 settings-conv-add = 新增規則
 # Before a number of days: "Keep originals for [30] days".
 settings-conv-keep = 原始檔案保留

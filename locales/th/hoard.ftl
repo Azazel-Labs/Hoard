@@ -2387,6 +2387,7 @@ settings-conv-remove = นำออก
 settings-conv-remove-label = นำกฎข้อที่ { $n } ออก
 settings-conv-taken = มีกฎอื่นแปลงรูปแบบนี้อยู่แล้ว
 settings-conv-upright = ตั้งโมเดลให้ตรงขณะแปลง (Y ขึ้น หันไปทาง +Z) แบบเดียวกับที่แสดงโมเดลของแพ็ก
+settings-conv-flac-what = เสียงยังเหมือนเดิมทุกประการ ในพื้นที่ราวครึ่งหนึ่ง WAV ที่มีจุดวนซ้ำ เครื่องหมาย cue ตัวอย่างแบบจุดลอยตัว หรือรายละเอียดอื่นที่ FLAC เก็บไว้ไม่ได้ จะยังเป็น WAV
 settings-conv-add = เพิ่มกฎ
 # Before a number of days: "Keep originals for [30] days".
 settings-conv-keep = เก็บต้นฉบับไว้

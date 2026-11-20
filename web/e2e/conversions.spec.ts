@@ -1,4 +1,5 @@
 import { assetsOf, HOARD_HEADERS, uploadPack, waitReady, type Asset } from './support/api'
+import { sound } from './support/files'
 import { expect, test } from './support/test'
 
 /** One triangle as ASCII PLY. No other test uploads PLY, so a rule converting it touches only this test's pack. */
@@ -66,5 +67,40 @@ test.describe('Conversion rules', () => {
     } finally {
       await api.put('/api/admin/settings', { headers: HOARD_HEADERS, data: { conversion_rules: null } })
     }
+  })
+
+  // Other tests' WAVs share the library, so this one only asks, and doesn't save a rule that would convert them.
+  test('a rule to FLAC takes WAVs, says what it keeps, and would convert the WAVs in the library', async ({ page, api }) => {
+    // Named to sort first, so the dialog's list of files shows it.
+    const pack = await uploadPack(api, '0 E2E FLAC', [{ relpath: 'tone.wav', data: sound('zap', 4) }])
+    await waitReady(api, [pack.id])
+
+    await page.goto('/#settings/adding')
+    const rules = page.getByTestId('conversion-rules')
+    await rules.getByTestId('conv-add').click()
+    const rule = rules.locator('[data-testid^="conv-rule-"]').last()
+    await expect(rule.getByLabel('.obj', { exact: true })).toBeVisible()
+    await expect(rule.getByText('Turn models upright')).toBeVisible()
+
+    await rule.getByTestId('conv-to').selectOption('flac')
+    // Only what a FLAC is made from, chosen for it, and nothing about models.
+    await expect(rule.getByLabel('.wav', { exact: true })).toBeChecked()
+    await expect(rule.getByLabel('.obj', { exact: true })).toHaveCount(0)
+    await expect(rule.getByText('Turn models upright')).toHaveCount(0)
+    await expect(rule.getByTestId('conv-flac-what')).toContainText('The sound stays exactly the same')
+
+    await rules.getByTestId('conv-save').click()
+    const ask = page.getByTestId('conv-dialog')
+    const sample = ask.getByRole('list', { name: 'Files that would be converted' })
+    await expect(sample).toContainText('tone.wav')
+    await expect(sample).toContainText('→ tone.flac')
+    await ask.getByRole('button', { name: 'Cancel' }).click()
+    await expect(ask).toBeHidden()
+
+    // Nothing was saved or converted. (The other test saves rules of its own meanwhile.)
+    const after = (await (await api.get('/api/admin/settings')).json()).conversion_rules
+    expect(after.rules.filter((r: { to: string }) => r.to === 'flac')).toEqual([])
+    const [tone] = await assetsOf(api, pack.id)
+    expect(tone.path).toBe('tone.wav')
   })
 })

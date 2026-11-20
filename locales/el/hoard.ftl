@@ -2652,6 +2652,7 @@ settings-conv-remove = Κατάργηση
 settings-conv-remove-label = Κατάργηση κανόνα { $n }
 settings-conv-taken = Άλλος κανόνας μετατρέπει ήδη αυτή τη μορφή
 settings-conv-upright = Όρθωση των μοντέλων κατά τη μετατροπή (με τον Y προς τα πάνω, στραμμένα προς +Z), όπως εμφανίζονται τα μοντέλα του πακέτου
+settings-conv-flac-what = Ο ήχος μένει ακριβώς ίδιος, σε περίπου τον μισό χώρο. Τα WAV με σημεία επανάληψης, δείκτες cue, δείγματα κινητής υποδιαστολής ή άλλες λεπτομέρειες που ένα FLAC δεν μπορεί να κρατήσει μένουν WAV.
 settings-conv-add = Προσθήκη κανόνα
 # Before a number of days: "Keep originals for [30] days".
 settings-conv-keep = Διατήρηση πρωτοτύπων για

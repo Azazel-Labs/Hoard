@@ -2384,6 +2384,7 @@ settings-conv-remove = Gỡ
 settings-conv-remove-label = Gỡ quy tắc { $n }
 settings-conv-taken = Một quy tắc khác đã chuyển đổi định dạng này
 settings-conv-upright = Dựng thẳng mô hình khi chuyển đổi (Y hướng lên, quay về +Z), theo cách các mô hình của gói được hiển thị
+settings-conv-flac-what = Âm thanh giữ nguyên hoàn toàn, chỉ chiếm khoảng một nửa dung lượng. Các WAV có điểm lặp, dấu cue, mẫu dấu phẩy động hoặc chi tiết khác mà FLAC không giữ được sẽ vẫn là WAV.
 settings-conv-add = Thêm quy tắc
 # Before a number of days: "Keep originals for [30] days".
 settings-conv-keep = Giữ tệp gốc trong

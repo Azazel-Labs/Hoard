@@ -9326,6 +9326,10 @@ translation = """
 source = "Convert files already in the library"
 translation = "Перетворити файли, що вже є в бібліотеці"
 
+[messages.settings-conv-flac-what]
+source = "The sound stays exactly the same, in about half the space. WAVs with loop points, cue markers, floating-point samples or other details a FLAC can’t keep stay WAV."
+translation = "Звук залишається точно таким самим, а місця займає приблизно вдвічі менше. WAV із точками петлі, маркерами cue, семплами з рухомою комою чи іншими даними, які FLAC не може зберегти, залишаються WAV."
+
 [messages.settings-conv-from]
 source = "From"
 translation = "З форматів"

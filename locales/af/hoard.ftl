@@ -2567,6 +2567,7 @@ settings-conv-remove = Verwyder
 settings-conv-remove-label = Verwyder reël { $n }
 settings-conv-taken = 'n Ander reël skakel hierdie formaat reeds om
 settings-conv-upright = Rig modelle regop terwyl hulle omgeskakel word (Y op, wys na +Z), soos die pak se modelle gewys word
+settings-conv-flac-what = Die klank bly presies dieselfde, in omtrent die helfte van die spasie. WAV’s met lusmerke, aanwysmerkers, swewendepunt-monsters of ander besonderhede wat ’n FLAC nie kan hou nie, bly WAV.
 settings-conv-add = Voeg 'n reël by
 # Before a number of days: "Keep originals for [30] days".
 settings-conv-keep = Hou oorspronklikes vir

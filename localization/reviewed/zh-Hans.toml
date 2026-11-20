@@ -8927,6 +8927,10 @@ translation = """
 source = "Convert files already in the library"
 translation = "转换资源库中已有的文件"
 
+[messages.settings-conv-flac-what]
+source = "The sound stays exactly the same, in about half the space. WAVs with loop points, cue markers, floating-point samples or other details a FLAC can’t keep stay WAV."
+translation = "声音完全不变，空间约为一半。带有循环点、cue 标记、浮点采样或其他 FLAC 无法保留的信息的 WAV 会保持为 WAV。"
+
 [messages.settings-conv-from]
 source = "From"
 translation = "源格式"

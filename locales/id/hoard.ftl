@@ -2388,6 +2388,7 @@ settings-conv-remove = Hapus
 settings-conv-remove-label = Hapus aturan { $n }
 settings-conv-taken = Aturan lain sudah mengonversi format ini
 settings-conv-upright = Tegakkan model saat dikonversi (Y ke atas, menghadap +Z), seperti cara model paket ditampilkan
+settings-conv-flac-what = Suaranya tetap sama persis, dalam sekitar setengah ruang. WAV dengan titik loop, penanda cue, sampel floating-point, atau detail lain yang tidak bisa disimpan FLAC tetap menjadi WAV.
 settings-conv-add = Tambah aturan
 # Before a number of days: "Keep originals for [30] days".
 settings-conv-keep = Simpan berkas asli selama

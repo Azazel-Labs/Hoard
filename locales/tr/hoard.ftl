@@ -2401,6 +2401,7 @@ settings-conv-remove = Kaldır
 settings-conv-remove-label = { $n }. kuralı kaldır
 settings-conv-taken = Bu biçimi başka bir kural dönüştürüyor
 settings-conv-upright = Modelleri dönüştürürken paketin modellerinin gösterildiği gibi dik çevir (Y yukarı, +Z’ye bakan)
+settings-conv-flac-what = Ses tamamen aynı kalır, yaklaşık yarı yer kaplar. Döngü noktaları, cue işaretleri, kayan noktalı örnekler ya da bir FLAC’ın tutamayacağı başka ayrıntılar içeren WAV’lar WAV olarak kalır.
 settings-conv-add = Kural ekle
 # Before a number of days: "Keep originals for [30] days".
 settings-conv-keep = Özgünleri sakla:

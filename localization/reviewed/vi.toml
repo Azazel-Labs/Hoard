@@ -8913,6 +8913,10 @@ translation = """
 source = "Convert files already in the library"
 translation = "Chuyển đổi các tệp đã có trong thư viện"
 
+[messages.settings-conv-flac-what]
+source = "The sound stays exactly the same, in about half the space. WAVs with loop points, cue markers, floating-point samples or other details a FLAC can’t keep stay WAV."
+translation = "Âm thanh giữ nguyên hoàn toàn, chỉ chiếm khoảng một nửa dung lượng. Các WAV có điểm lặp, dấu cue, mẫu dấu phẩy động hoặc chi tiết khác mà FLAC không giữ được sẽ vẫn là WAV."
+
 [messages.settings-conv-from]
 source = "From"
 translation = "Từ"

@@ -32,6 +32,13 @@ function toggle(i: number, ext: string, on: boolean) {
   if (on && !from.includes(ext)) from.push(ext)
   if (!on) from.splice(from.indexOf(ext), 1)
 }
+/** A rule given another target keeps the formats that target takes, or those of them no other rule has. */
+function retarget(i: number) {
+  const rule = draft.value.rules[i]
+  const takes = sourcesOf(rule.to)
+  rule.from = rule.from.filter((e) => takes.includes(e))
+  if (!rule.from.length) rule.from = takes.filter((e) => !takenBy(e, i))
+}
 function addRule() {
   const to = props.settings.targets[0]?.to ?? 'glb'
   const free = ['obj', 'fbx'].filter((e) => !draft.value.rules.some((r) => r.on && r.from.includes(e)))
@@ -125,7 +132,7 @@ async function convertExisting() {
           </label>
           <label class="to">
             {{ t('settings-conv-to') }}
-            <select v-model="rule.to" class="field" :disabled="disabled">
+            <select v-model="rule.to" class="field" :disabled="disabled" data-testid="conv-to" @change="retarget(i)">
               <option v-for="x in settings.targets" :key="x.to" :value="x.to">{{ x.to.toUpperCase() }}</option>
             </select>
           </label>
@@ -151,10 +158,11 @@ async function convertExisting() {
             <span class="mono">.{{ ext }}</span>
           </label>
         </fieldset>
-        <label class="check">
+        <label v-if="rule.to === 'glb'" class="check">
           <input v-model="rule.upright" type="checkbox" :disabled="disabled" />
           {{ t('settings-conv-upright') }}
         </label>
+        <p v-else-if="rule.to === 'flac'" class="what" data-testid="conv-flac-what">{{ t('settings-conv-flac-what') }}</p>
       </li>
     </ol>
     <div class="bar">

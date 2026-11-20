@@ -2869,6 +2869,7 @@ settings-conv-remove = Вилучити
 settings-conv-remove-label = Вилучити правило { $n }
 settings-conv-taken = Цей формат уже перетворює інше правило
 settings-conv-upright = Ставити моделі вертикально під час перетворення (Y вгору, обличчям до +Z), як показано моделі пакета
+settings-conv-flac-what = Звук залишається точно таким самим, а місця займає приблизно вдвічі менше. WAV із точками петлі, маркерами cue, семплами з рухомою комою чи іншими даними, які FLAC не може зберегти, залишаються WAV.
 settings-conv-add = Додати правило
 # Before a number of days: "Keep originals for [30] days".
 settings-conv-keep = Зберігати оригінали

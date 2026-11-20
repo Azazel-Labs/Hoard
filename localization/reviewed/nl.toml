@@ -9101,6 +9101,10 @@ translation = """
 source = "Convert files already in the library"
 translation = "Bestanden converteren die al in de bibliotheek staan"
 
+[messages.settings-conv-flac-what]
+source = "The sound stays exactly the same, in about half the space. WAVs with loop points, cue markers, floating-point samples or other details a FLAC can’t keep stay WAV."
+translation = "Het geluid blijft precies hetzelfde, in ongeveer de helft van de ruimte. WAV’s met looppunten, cuemarkeringen, floating-point-samples of andere details die een FLAC niet kan bewaren, blijven WAV."
+
 [messages.settings-conv-from]
 source = "From"
 translation = "Van"

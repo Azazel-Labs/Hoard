@@ -2655,6 +2655,7 @@ settings-conv-remove = Poista
 settings-conv-remove-label = Poista sääntö { $n }
 settings-conv-taken = Toinen sääntö muuntaa jo tämän muodon
 settings-conv-upright = Käännä mallit pystyyn muunnettaessa (Y ylös, etupuoli kohti +Z) samalla tavalla kuin paketin mallit näytetään
+settings-conv-flac-what = Ääni pysyy täsmälleen samana noin puolessa tilasta. WAV-tiedostot, joissa on silmukkapisteitä, cue-merkkejä, liukulukunäytteitä tai muita tietoja, joita FLAC ei voi säilyttää, jäävät WAV-muotoon.
 settings-conv-add = Lisää sääntö
 # Before a number of days: "Keep originals for [30] days".
 settings-conv-keep = Säilytä alkuperäiset

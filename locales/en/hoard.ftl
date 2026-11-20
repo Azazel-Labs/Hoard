@@ -2909,6 +2909,8 @@ settings-conv-remove = Remove
 settings-conv-remove-label = Remove rule { $n }
 settings-conv-taken = Another rule converts this format
 settings-conv-upright = Turn models upright as they’re converted (Y up, facing +Z), the way the pack’s models are shown
+# Under a rule converting to FLAC. A FLAC holds the same sound in about half the space; a WAV is left as it is when converting would lose something.
+settings-conv-flac-what = The sound stays exactly the same, in about half the space. WAVs with loop points, cue markers, floating-point samples or other details a FLAC can’t keep stay WAV.
 settings-conv-add = Add a rule
 # Before a number of days: "Keep originals for [30] days".
 settings-conv-keep = Keep originals for

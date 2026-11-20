@@ -1,8 +1,8 @@
 version = 2
 
 [readme]
-source = "d707e8ce5d41663e6b570559ca45a362135bc4f4edb2325a0803b64d9954ae2a"
-translation = "05a37930dfbda158b23324a8615c548632f12160a71a2142d1c2e04f708f6e5c"
+source = "fa0387d425e4db1bad254dc742b635231af121ed833fef99ebf9e388aa6f663a"
+translation = "28645fe38a171a6cf88b99cb15215f65c97bfe3c0ff110a4b0d227c9311a1187"
 
 [messages.about-blender]
 source = "Converts 3D models and makes their thumbnails."

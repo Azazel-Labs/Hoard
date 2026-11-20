@@ -1024,7 +1024,7 @@ unless that's unticked. In the API they're `bpm_min`, `bpm_max`, `key` (written 
 
 ### Image search
 
-Settings → Image and sound search adds a model that knows what pictures show (Google's SigLIP 2, base size, 32-pixel
+Settings → Search adds a model that knows what pictures show (Google's SigLIP 2, base size, 32-pixel
 patches). It's off until an admin turns it on, because the model is a 1.5 GB download (from Hugging Face, pinned to
 one revision and checked against its SHA-256, into the cache folder's `models`). It runs on the server's processor, and nothing leaves
 the server. A background job, "Learning what pictures show", then works through every thumbnail at low priority, at
@@ -1054,7 +1054,7 @@ instant. The key stays on the server and is never sent to the browser.
 
 ### Sound search
 
-Settings → Image and sound search has a second model, for sounds (LAION's CLAP, HTSAT unfused). Like image search,
+Settings → Search has a second model, for sounds (LAION's CLAP, HTSAT unfused). Like image search,
 it's off until an admin turns it on: the model is a 614 MB download (Apache-2.0, from Hugging Face, pinned and
 checked the same way), and it runs on the server's processor. A background job, "Learning what sounds sound like",
 listens to the first ten seconds of every sound at low priority, about one a second, and keeps up with new packs.
@@ -1222,13 +1222,16 @@ Where the server keeps things, how it listens and how it's protected are set whe
 thumbnails, the update check, workers, limits, the public address, HTTPS, sign-in, the SoundFont) is changed in
 **Settings** in the portal header (by an admin), takes effect at once, and is kept in the database, so it survives restarts and backups.
 
-**Settings → General** opens on your dragon's hoard: every asset in the library is a piece of treasure (gold for
+**Settings** opens on Appearance: for an admin, the server's name first (shown in the top bar, the browser tab and
+on the sign-in page, for telling several hoards apart), then this browser's light and dark themes. The box above the
+list of pages finds a setting: every page with settings is shown at once, with only its sections that have the words
+typed, and they can be changed right there.
+
+**Settings → Dragon** is your dragon's hoard: every asset in the library is a piece of treasure (gold for
 textures and materials, gems for models, weapons for sounds, bones for animations, rune tablets for fonts, paintings
 for vector art and video, potions for sprite sheets, books for the rest). Each account keeps its own pile: what's been
 added since you last looked is loot to collect, and **Collect** pours it in. The hoard is seen through an arcade screen
 (the button in its corner turns that off, for this browser) and can fill the screen. Under it are the library's totals.
-For an admin, the page also names the server: the name is shown in the top bar, the browser tab and on the sign-in
-page, for telling several hoards apart.
 
 Set before starting (these need a restart):
 

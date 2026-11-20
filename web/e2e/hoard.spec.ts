@@ -9,7 +9,7 @@ test.describe('the dragon hoard', () => {
   test('what the library holds beyond what was collected is loot; Collect records it', async ({ page, api }) => {
     // Start from an empty pile, so the whole library is there to collect.
     expect((await api.put('/api/me/hoard', { data: { seen: {} } })).ok()).toBe(true)
-    await page.goto('/#settings/general')
+    await page.goto('/#settings/dragon')
 
     const cave = page.locator('.cave')
     await expect(cave.getByText(/^New loot to collect: [\d,]+$/)).toBeVisible()

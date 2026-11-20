@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "784687813ffc36b7323d5f6f6162af0826b640f29e1eda034584bda64d776e5f"
+source = "ec811590205e4e64387af6e16bbaf48e03adb4bdb3b0180c6d7abaf323eaf3e0"
 translation = "05a37930dfbda158b23324a8615c548632f12160a71a2142d1c2e04f708f6e5c"
 
 [messages.about-blender]
@@ -9287,6 +9287,14 @@ translation = "Usa um ffmpeg do sistema com os codificadores certos, ou transfer
 source = "Encodes MP3, OGG and Opus downloads, and reads audio Hoard can’t decode itself (AAC, M4A, WMA, …)."
 translation = "Codifica as transferências em MP3, OGG e Opus, e lê áudio que o Hoard não consegue descodificar sozinho (AAC, M4A, WMA, …)."
 
+[messages.settings-find]
+source = "Find a setting"
+translation = "Encontrar uma definição"
+
+[messages.settings-find-none]
+source = "No setting matches “{ $query }”."
+translation = "Nenhuma definição corresponde a «{ $query }»."
+
 [messages.settings-gpu-none]
 source = "No GPU or software renderer found, so models get no thumbnails"
 translation = "Nenhuma GPU nem renderizador por software encontrado, por isso os modelos não têm miniaturas"
@@ -9583,17 +9591,13 @@ translation = "Transferências"
 source = "How files are named in what Hoard sends: downloads, zips, the hoard tool and AI assistants. Files in the library stay as they are."
 translation = "Como os ficheiros são nomeados no que o Hoard envia: transferências, zips, a ferramenta hoard e assistentes de IA. Os ficheiros na biblioteca ficam como estão."
 
-[messages.settings-page-general]
-source = "General"
-translation = "Geral"
+[messages.settings-page-dragon]
+source = "Dragon"
+translation = "Dragão"
 
-[messages.settings-page-general-blurb]
-source = "Your dragon’s hoard, and what this server is called."
-translation = "O tesouro do seu dragão e o nome deste servidor."
-
-[messages.settings-page-general-blurb-desktop]
-source = "Your dragon’s hoard, and what this library is called."
-translation = "O tesouro do seu dragão e o nome desta biblioteca."
+[messages.settings-page-dragon-blurb]
+source = "Your dragon’s hoard: every asset in the library is a piece of its treasure."
+translation = "O tesouro do seu dragão: cada recurso da biblioteca é uma peça dele."
 
 [messages.settings-page-issues]
 source = "Issues"
@@ -9643,13 +9647,13 @@ translation = "O esforço que o servidor faz, como as miniaturas são feitas e g
 source = "How hard Hoard works, how thumbnails are made and kept, and the most it takes in."
 translation = "O esforço que o Hoard faz, como as miniaturas são feitas e guardadas, e o máximo que aceita."
 
-[messages.settings-page-search]
-source = "Image and sound search"
-translation = "Pesquisa de imagens e sons"
-
 [messages.settings-page-search-blurb]
 source = "Search pictures by what they show and sounds by what they sound like, not only by their names, and find things that are alike in kind, not only in color."
 translation = "Pesquise imagens pelo que mostram e sons pela forma como soam, não só pelos nomes, e encontre coisas semelhantes no tipo, não só na cor."
+
+[messages.settings-page-search-tab]
+source = "Search"
+translation = "Pesquisa"
 
 [messages.settings-page-store-files]
 source = "Store files"

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-// Image and sound search: each off until turned on, and image search on this server or a hosted service.
+// Search: image and sound search, each off until turned on, and image search on this server or a hosted service.
 import { computed, reactive } from 'vue'
 import type { HostedSearch, SearchModelSetting, SettingsPatch } from '../api'
 import { t } from '../i18n'

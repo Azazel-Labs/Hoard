@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "784687813ffc36b7323d5f6f6162af0826b640f29e1eda034584bda64d776e5f"
+source = "ec811590205e4e64387af6e16bbaf48e03adb4bdb3b0180c6d7abaf323eaf3e0"
 translation = "44c14591a95068aeb93ac3b44bf9c9907dc70d2d553d802b52b04da4b5c2b3c1"
 
 [messages.about-blender]
@@ -9366,6 +9366,14 @@ translation = "Користи системски ffmpeg с одговарају�
 source = "Encodes MP3, OGG and Opus downloads, and reads audio Hoard can’t decode itself (AAC, M4A, WMA, …)."
 translation = "Кодира MP3, OGG и Opus преузимања и чита звук који Hoard не може сам да декодира (AAC, M4A, WMA, …)."
 
+[messages.settings-find]
+source = "Find a setting"
+translation = "Пронађи подешавање"
+
+[messages.settings-find-none]
+source = "No setting matches “{ $query }”."
+translation = "Ниједно подешавање не одговара „{ $query }“."
+
 [messages.settings-gpu-none]
 source = "No GPU or software renderer found, so models get no thumbnails"
 translation = "Није пронађен ни GPU ни софтверски рендерер, па модели не добијају сличице"
@@ -9662,17 +9670,13 @@ translation = "Преузимања"
 source = "How files are named in what Hoard sends: downloads, zips, the hoard tool and AI assistants. Files in the library stay as they are."
 translation = "Како се датотеке зову у ономе што Hoard шаље: преузимања, zip архиве, алат hoard и ВИ асистенти. Датотеке у библиотеци остају какве јесу."
 
-[messages.settings-page-general]
-source = "General"
-translation = "Опште"
+[messages.settings-page-dragon]
+source = "Dragon"
+translation = "Змај"
 
-[messages.settings-page-general-blurb]
-source = "Your dragon’s hoard, and what this server is called."
-translation = "Благо вашег змаја и назив овог сервера."
-
-[messages.settings-page-general-blurb-desktop]
-source = "Your dragon’s hoard, and what this library is called."
-translation = "Благо вашег змаја и назив ове библиотеке."
+[messages.settings-page-dragon-blurb]
+source = "Your dragon’s hoard: every asset in the library is a piece of its treasure."
+translation = "Благо вашег змаја: сваки ресурс у библиотеци је део њега."
 
 [messages.settings-page-issues]
 source = "Issues"
@@ -9722,13 +9726,13 @@ translation = "Колико се сервер напреже, како се пр
 source = "How hard Hoard works, how thumbnails are made and kept, and the most it takes in."
 translation = "Колико се Hoard напреже, како се праве и чувају сличице и колико највише прима."
 
-[messages.settings-page-search]
-source = "Image and sound search"
-translation = "Претрага слика и звукова"
-
 [messages.settings-page-search-blurb]
 source = "Search pictures by what they show and sounds by what they sound like, not only by their names, and find things that are alike in kind, not only in color."
 translation = "Претражујте слике по ономе што приказују и звукове по томе како звуче, а не само по називима, и проналазите ствари сличне по врсти, а не само по боји."
+
+[messages.settings-page-search-tab]
+source = "Search"
+translation = "Претрага"
 
 [messages.settings-page-store-files]
 source = "Store files"

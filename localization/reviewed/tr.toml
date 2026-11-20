@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "784687813ffc36b7323d5f6f6162af0826b640f29e1eda034584bda64d776e5f"
+source = "ec811590205e4e64387af6e16bbaf48e03adb4bdb3b0180c6d7abaf323eaf3e0"
 translation = "7e91a85d0b5328865a9bbf9956da077518809d861d62dab74e65d6631bb669ed"
 
 [messages.about-blender]
@@ -9115,6 +9115,14 @@ translation = "Doğru kodlayıcılara sahip bir sistem ffmpeg’i kullanır ya d
 source = "Encodes MP3, OGG and Opus downloads, and reads audio Hoard can’t decode itself (AAC, M4A, WMA, …)."
 translation = "MP3, OGG ve Opus indirmelerini kodlar ve Hoard’un kendisinin çözemediği sesleri (AAC, M4A, WMA, …) okur."
 
+[messages.settings-find]
+source = "Find a setting"
+translation = "Ayar bul"
+
+[messages.settings-find-none]
+source = "No setting matches “{ $query }”."
+translation = "“{ $query }” ile eşleşen ayar yok."
+
 [messages.settings-gpu-none]
 source = "No GPU or software renderer found, so models get no thumbnails"
 translation = "GPU ya da yazılım çizici bulunamadı, bu yüzden modeller küçük resim almaz"
@@ -9411,17 +9419,13 @@ translation = "İndirmeler"
 source = "How files are named in what Hoard sends: downloads, zips, the hoard tool and AI assistants. Files in the library stay as they are."
 translation = "Hoard’un gönderdiklerinde dosyaların nasıl adlandırıldığı: indirmeler, zip’ler, hoard aracı ve yapay zekâ asistanları. Kütüphanedeki dosyalar olduğu gibi kalır."
 
-[messages.settings-page-general]
-source = "General"
-translation = "Genel"
+[messages.settings-page-dragon]
+source = "Dragon"
+translation = "Ejderha"
 
-[messages.settings-page-general-blurb]
-source = "Your dragon’s hoard, and what this server is called."
-translation = "Ejderhanızın hazinesi ve bu sunucunun adı."
-
-[messages.settings-page-general-blurb-desktop]
-source = "Your dragon’s hoard, and what this library is called."
-translation = "Ejderhanızın hazinesi ve bu kütüphanenin adı."
+[messages.settings-page-dragon-blurb]
+source = "Your dragon’s hoard: every asset in the library is a piece of its treasure."
+translation = "Ejderhanın hazinesi: kütüphanedeki her varlık hazinenin bir parçası."
 
 [messages.settings-page-issues]
 source = "Issues"
@@ -9471,13 +9475,13 @@ translation = "Sunucunun ne kadar yoğun çalıştığı, küçük resimlerin na
 source = "How hard Hoard works, how thumbnails are made and kept, and the most it takes in."
 translation = "Hoard’un ne kadar yoğun çalıştığı, küçük resimlerin nasıl oluşturulup saklandığı ve alabileceği en büyük boyutlar."
 
-[messages.settings-page-search]
-source = "Image and sound search"
-translation = "Görsel ve ses arama"
-
 [messages.settings-page-search-blurb]
 source = "Search pictures by what they show and sounds by what they sound like, not only by their names, and find things that are alike in kind, not only in color."
 translation = "Resimleri gösterdiklerine, sesleri de neye benzediklerine göre arayın, yalnızca adlarına göre değil; yalnızca renkte değil, türde de benzeyen şeyleri bulun."
+
+[messages.settings-page-search-tab]
+source = "Search"
+translation = "Arama"
 
 [messages.settings-page-store-files]
 source = "Store files"

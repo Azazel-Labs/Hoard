@@ -16,10 +16,11 @@ defineProps<{ page: string; size?: number }>()
     stroke-linejoin="round"
     aria-hidden="true"
   >
-    <template v-if="page === 'general'">
-      <rect x="2" y="2.5" width="12" height="4.5" rx="1" />
-      <rect x="2" y="9" width="12" height="4.5" rx="1" />
-      <path d="M4.5 4.75h.01M4.5 11.25h.01M8 4.75h3.5M8 11.25h3.5" />
+    <template v-if="page === 'dragon'">
+      <!-- A pile of coins with a gem on top: the dragon's hoard. -->
+      <ellipse cx="8" cy="12" rx="5.5" ry="1.8" />
+      <path d="M3.5 10.6c1-1.3 2.6-2 4.5-2s3.5.7 4.5 2" />
+      <path d="M6 5.5 8 2.5l2 3-2 2.5-2-2.5ZM6 5.5h4" />
     </template>
     <template v-else-if="page === 'appearance'">
       <path d="M8 1.8a6.2 6.2 0 1 0 0 12.4c1 0 1.4-.6 1.4-1.3 0-1.1-1-1.4-1-2.3 0-.8.6-1.3 1.4-1.3h1.7a2.7 2.7 0 0 0 2.7-2.7C14.2 4 11.4 1.8 8 1.8Z" />

@@ -166,7 +166,7 @@ test.describe('naming the server', () => {
   })
 
   test('an admin names it, and the top bar, tab and sign-in page say so', async ({ page, browser, baseURL }) => {
-    await page.goto('/#settings/general')
+    await page.goto('/#settings/appearance')
     await page.getByLabel('Name', { exact: true }).fill('Studio art')
     await page.getByLabel('Name', { exact: true }).press('Enter')
     await expect(page.locator('header .brand')).toHaveText('Studio art')

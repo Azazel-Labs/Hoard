@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "784687813ffc36b7323d5f6f6162af0826b640f29e1eda034584bda64d776e5f"
+source = "ec811590205e4e64387af6e16bbaf48e03adb4bdb3b0180c6d7abaf323eaf3e0"
 translation = "54db7a8b2776b518b5b7f9903cf54c52cf30df365a4334f881ce45382f97ad63"
 
 [messages.about-blender]
@@ -9518,6 +9518,14 @@ translation = "Використовує системний ffmpeg із потр�
 source = "Encodes MP3, OGG and Opus downloads, and reads audio Hoard can’t decode itself (AAC, M4A, WMA, …)."
 translation = "Кодує завантаження в MP3, OGG та Opus і читає аудіо, яке Hoard не може декодувати сам (AAC, M4A, WMA, …)."
 
+[messages.settings-find]
+source = "Find a setting"
+translation = "Знайти налаштування"
+
+[messages.settings-find-none]
+source = "No setting matches “{ $query }”."
+translation = "Немає налаштувань, що відповідають «{ $query }»."
+
 [messages.settings-gpu-none]
 source = "No GPU or software renderer found, so models get no thumbnails"
 translation = "Не знайдено ні GPU, ні програмного рендерера, тож моделі не отримують мініатюр"
@@ -9814,17 +9822,13 @@ translation = "Завантаження"
 source = "How files are named in what Hoard sends: downloads, zips, the hoard tool and AI assistants. Files in the library stay as they are."
 translation = "Як називаються файли в тому, що надсилає Hoard: завантаженнях, zip-архівах, інструменті hoard і для ШІ-асистентів. Файли в бібліотеці залишаються як є."
 
-[messages.settings-page-general]
-source = "General"
-translation = "Загальні"
+[messages.settings-page-dragon]
+source = "Dragon"
+translation = "Дракон"
 
-[messages.settings-page-general-blurb]
-source = "Your dragon’s hoard, and what this server is called."
-translation = "Скарб вашого дракона й назва цього сервера."
-
-[messages.settings-page-general-blurb-desktop]
-source = "Your dragon’s hoard, and what this library is called."
-translation = "Скарб вашого дракона й назва цієї бібліотеки."
+[messages.settings-page-dragon-blurb]
+source = "Your dragon’s hoard: every asset in the library is a piece of its treasure."
+translation = "Скарбниця вашого дракона: кожен ресурс у бібліотеці — частина його скарбу."
 
 [messages.settings-page-issues]
 source = "Issues"
@@ -9874,13 +9878,13 @@ translation = "Наскільки інтенсивно працює сервер
 source = "How hard Hoard works, how thumbnails are made and kept, and the most it takes in."
 translation = "Наскільки інтенсивно працює Hoard, як створюються й зберігаються мініатюри і скільки він щонайбільше приймає."
 
-[messages.settings-page-search]
-source = "Image and sound search"
-translation = "Пошук зображень і звуків"
-
 [messages.settings-page-search-blurb]
 source = "Search pictures by what they show and sounds by what they sound like, not only by their names, and find things that are alike in kind, not only in color."
 translation = "Шукайте зображення за тим, що на них зображено, а звуки — за тим, як вони звучать, а не лише за назвами, і знаходьте речі, схожі за суттю, а не лише за кольором."
+
+[messages.settings-page-search-tab]
+source = "Search"
+translation = "Пошук"
 
 [messages.settings-page-store-files]
 source = "Store files"

@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "784687813ffc36b7323d5f6f6162af0826b640f29e1eda034584bda64d776e5f"
+source = "ec811590205e4e64387af6e16bbaf48e03adb4bdb3b0180c6d7abaf323eaf3e0"
 translation = "69f01639647ec94d71cdb3668111c233bf33f40252c42dacec1a9e8e8ec3a19b"
 
 [messages.about-blender]
@@ -9448,6 +9448,14 @@ translation = "Použije systémový ffmpeg se správnými enkodéry, nebo stáhn
 source = "Encodes MP3, OGG and Opus downloads, and reads audio Hoard can’t decode itself (AAC, M4A, WMA, …)."
 translation = "Kóduje stahování v MP3, OGG a Opus a čte zvuk, který Hoard sám dekódovat neumí (AAC, M4A, WMA, …)."
 
+[messages.settings-find]
+source = "Find a setting"
+translation = "Najít nastavení"
+
+[messages.settings-find-none]
+source = "No setting matches “{ $query }”."
+translation = "Žádné nastavení neodpovídá „{ $query }“."
+
 [messages.settings-gpu-none]
 source = "No GPU or software renderer found, so models get no thumbnails"
 translation = "Nenalezena žádná GPU ani softwarový renderer, takže modely nedostanou miniatury"
@@ -9744,17 +9752,13 @@ translation = "Stahování"
 source = "How files are named in what Hoard sends: downloads, zips, the hoard tool and AI assistants. Files in the library stay as they are."
 translation = "Jak se jmenují soubory v tom, co Hoard posílá: stahování, zipy, nástroj hoard a AI asistenti. Soubory v knihovně zůstávají, jak jsou."
 
-[messages.settings-page-general]
-source = "General"
-translation = "Obecné"
+[messages.settings-page-dragon]
+source = "Dragon"
+translation = "Drak"
 
-[messages.settings-page-general-blurb]
-source = "Your dragon’s hoard, and what this server is called."
-translation = "Poklad vašeho draka a jak se tento server jmenuje."
-
-[messages.settings-page-general-blurb-desktop]
-source = "Your dragon’s hoard, and what this library is called."
-translation = "Poklad vašeho draka a jak se tato knihovna jmenuje."
+[messages.settings-page-dragon-blurb]
+source = "Your dragon’s hoard: every asset in the library is a piece of its treasure."
+translation = "Poklad tvého draka: každý asset v knihovně je jeho kouskem."
 
 [messages.settings-page-issues]
 source = "Issues"
@@ -9804,13 +9808,13 @@ translation = "Jak usilovně server pracuje, jak se vytvářejí a uchovávají 
 source = "How hard Hoard works, how thumbnails are made and kept, and the most it takes in."
 translation = "Jak usilovně Hoard pracuje, jak se vytvářejí a uchovávají miniatury a kolik nejvýše přijme."
 
-[messages.settings-page-search]
-source = "Image and sound search"
-translation = "Hledání obrázků a zvuků"
-
 [messages.settings-page-search-blurb]
 source = "Search pictures by what they show and sounds by what they sound like, not only by their names, and find things that are alike in kind, not only in color."
 translation = "Hledejte obrázky podle toho, co zobrazují, a zvuky podle toho, jak znějí, nejen podle názvů, a nacházejte věci, které jsou si podobné druhem, nejen barvou."
+
+[messages.settings-page-search-tab]
+source = "Search"
+translation = "Hledání"
 
 [messages.settings-page-store-files]
 source = "Store files"

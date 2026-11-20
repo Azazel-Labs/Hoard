@@ -1,10 +1,10 @@
 import { expect, test } from './support/test'
 
 // Only looks: turning image or sound search on downloads a model of 0.6–1.5 GB, which a test run mustn't.
-test.describe('Image and sound search settings', () => {
+test.describe('Search settings', () => {
   test('are off until turned on, and say what turning them on costs', async ({ page }) => {
     await page.goto('/#settings/search')
-    await expect(page.getByRole('heading', { name: 'Image and sound search', level: 2 })).toBeVisible()
+    await expect(page.getByRole('heading', { name: 'Search', level: 2 })).toBeVisible()
     await expect(page.getByLabel('Turn on image search')).not.toBeChecked()
     await expect(page.getByTestId('clip-status')).toHaveText('Off')
     await expect(page.getByLabel('Turn on sound search')).not.toBeChecked()

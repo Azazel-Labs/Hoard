@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "784687813ffc36b7323d5f6f6162af0826b640f29e1eda034584bda64d776e5f"
+source = "ec811590205e4e64387af6e16bbaf48e03adb4bdb3b0180c6d7abaf323eaf3e0"
 translation = "307855b3f17db1f84ce8e7d8ee9a10c495a05b43d100508addd2b3f76de43ce2"
 
 [messages.about-blender]
@@ -9327,6 +9327,14 @@ translation = "Käyttää järjestelmän ffmpegiä, jossa on oikeat kooderit, ta
 source = "Encodes MP3, OGG and Opus downloads, and reads audio Hoard can’t decode itself (AAC, M4A, WMA, …)."
 translation = "Koodaa MP3-, OGG- ja Opus-lataukset ja lukee äänen, jota Hoard ei itse osaa purkaa (AAC, M4A, WMA, …)."
 
+[messages.settings-find]
+source = "Find a setting"
+translation = "Etsi asetus"
+
+[messages.settings-find-none]
+source = "No setting matches “{ $query }”."
+translation = "Mikään asetus ei vastaa hakua ”{ $query }”."
+
 [messages.settings-gpu-none]
 source = "No GPU or software renderer found, so models get no thumbnails"
 translation = "Näytönohjainta tai ohjelmallista renderöijää ei löytynyt, joten mallit eivät saa pikkukuvia"
@@ -9623,17 +9631,13 @@ translation = "Lataukset"
 source = "How files are named in what Hoard sends: downloads, zips, the hoard tool and AI assistants. Files in the library stay as they are."
 translation = "Miten tiedostot nimetään siinä, mitä Hoard lähettää: lataukset, zipit, hoard-työkalu ja tekoälyavustajat. Kirjaston tiedostot pysyvät ennallaan."
 
-[messages.settings-page-general]
-source = "General"
-translation = "Yleiset"
+[messages.settings-page-dragon]
+source = "Dragon"
+translation = "Lohikäärme"
 
-[messages.settings-page-general-blurb]
-source = "Your dragon’s hoard, and what this server is called."
-translation = "Lohikäärmeesi aarre ja tämän palvelimen nimi."
-
-[messages.settings-page-general-blurb-desktop]
-source = "Your dragon’s hoard, and what this library is called."
-translation = "Lohikäärmeesi aarre ja tämän kirjaston nimi."
+[messages.settings-page-dragon-blurb]
+source = "Your dragon’s hoard: every asset in the library is a piece of its treasure."
+translation = "Lohikäärmeesi aarre: jokainen kirjaston tiedosto on palanen sitä."
 
 [messages.settings-page-issues]
 source = "Issues"
@@ -9683,13 +9687,13 @@ translation = "Kuinka kovasti palvelin työskentelee, miten pikkukuvat tehdään
 source = "How hard Hoard works, how thumbnails are made and kept, and the most it takes in."
 translation = "Kuinka kovasti Hoard työskentelee, miten pikkukuvat tehdään ja säilytetään ja paljonko se enintään ottaa vastaan."
 
-[messages.settings-page-search]
-source = "Image and sound search"
-translation = "Kuva- ja äänihaku"
-
 [messages.settings-page-search-blurb]
 source = "Search pictures by what they show and sounds by what they sound like, not only by their names, and find things that are alike in kind, not only in color."
 translation = "Hae kuvia sen mukaan, mitä ne esittävät, ja ääniä sen mukaan, miltä ne kuulostavat, eikä vain nimen perusteella, ja löydä tyypiltään eikä vain väriltään samankaltaisia."
+
+[messages.settings-page-search-tab]
+source = "Search"
+translation = "Haku"
 
 [messages.settings-page-store-files]
 source = "Store files"

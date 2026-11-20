@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "784687813ffc36b7323d5f6f6162af0826b640f29e1eda034584bda64d776e5f"
+source = "ec811590205e4e64387af6e16bbaf48e03adb4bdb3b0180c6d7abaf323eaf3e0"
 translation = "9b658642e0200ba66efa386171fcbdde924e04ae57e4d1149258a48611dc8acd"
 
 [messages.about-blender]
@@ -9093,6 +9093,14 @@ translation = "使用系統中具備所需編碼器的 ffmpeg，或下載靜態�
 source = "Encodes MP3, OGG and Opus downloads, and reads audio Hoard can’t decode itself (AAC, M4A, WMA, …)."
 translation = "編碼 MP3、OGG 與 Opus 下載檔案，並讀取 Hoard 本身無法解碼的音訊（AAC、M4A、WMA…）。"
 
+[messages.settings-find]
+source = "Find a setting"
+translation = "尋找設定"
+
+[messages.settings-find-none]
+source = "No setting matches “{ $query }”."
+translation = "沒有與「{ $query }」相符的設定。"
+
 [messages.settings-gpu-none]
 source = "No GPU or software renderer found, so models get no thumbnails"
 translation = "找不到 GPU 或軟體算繪器，因此模型不會有縮圖"
@@ -9389,17 +9397,13 @@ translation = "下載"
 source = "How files are named in what Hoard sends: downloads, zips, the hoard tool and AI assistants. Files in the library stay as they are."
 translation = "Hoard 傳送的檔案如何命名：包括下載、zip、hoard 工具與 AI 助理。素材庫中的檔案維持原樣。"
 
-[messages.settings-page-general]
-source = "General"
-translation = "一般"
+[messages.settings-page-dragon]
+source = "Dragon"
+translation = "巨龍"
 
-[messages.settings-page-general-blurb]
-source = "Your dragon’s hoard, and what this server is called."
-translation = "你的龍的寶藏，以及這台伺服器的名稱。"
-
-[messages.settings-page-general-blurb-desktop]
-source = "Your dragon’s hoard, and what this library is called."
-translation = "你的龍的寶藏，以及這個素材庫的名稱。"
+[messages.settings-page-dragon-blurb]
+source = "Your dragon’s hoard: every asset in the library is a piece of its treasure."
+translation = "你的巨龍的寶藏：資源庫裡的每個資源都是其中一件寶物。"
 
 [messages.settings-page-issues]
 source = "Issues"
@@ -9449,13 +9453,13 @@ translation = "伺服器的工作量、縮圖如何製作與保存，以及它�
 source = "How hard Hoard works, how thumbnails are made and kept, and the most it takes in."
 translation = "Hoard 的工作量、縮圖如何製作與保存，以及它可接收的上限。"
 
-[messages.settings-page-search]
-source = "Image and sound search"
-translation = "圖片與音效搜尋"
-
 [messages.settings-page-search-blurb]
 source = "Search pictures by what they show and sounds by what they sound like, not only by their names, and find things that are alike in kind, not only in color."
 translation = "依圖片顯示的內容搜尋圖片、依聽起來像什麼搜尋音效，而不只是依名稱，並找出種類相似、而不只是顏色相似的項目。"
+
+[messages.settings-page-search-tab]
+source = "Search"
+translation = "搜尋"
 
 [messages.settings-page-store-files]
 source = "Store files"

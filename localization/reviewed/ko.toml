@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "784687813ffc36b7323d5f6f6162af0826b640f29e1eda034584bda64d776e5f"
+source = "ec811590205e4e64387af6e16bbaf48e03adb4bdb3b0180c6d7abaf323eaf3e0"
 translation = "13ede832ea7fc967c9ec7a1d4ce19f3b71776609213795e5d64758ffe8286e51"
 
 [messages.about-blender]
@@ -9057,6 +9057,14 @@ translation = "필요한 인코더가 있는 시스템 ffmpeg를 사용하거나
 source = "Encodes MP3, OGG and Opus downloads, and reads audio Hoard can’t decode itself (AAC, M4A, WMA, …)."
 translation = "MP3, OGG, Opus 다운로드를 인코딩하고, Hoard가 직접 디코딩할 수 없는 오디오(AAC, M4A, WMA 등)를 읽습니다."
 
+[messages.settings-find]
+source = "Find a setting"
+translation = "설정 찾기"
+
+[messages.settings-find-none]
+source = "No setting matches “{ $query }”."
+translation = "“{ $query }”에 맞는 설정이 없습니다."
+
 [messages.settings-gpu-none]
 source = "No GPU or software renderer found, so models get no thumbnails"
 translation = "GPU나 소프트웨어 렌더러가 없어서 모델에 썸네일이 생기지 않습니다"
@@ -9353,17 +9361,13 @@ translation = "다운로드"
 source = "How files are named in what Hoard sends: downloads, zips, the hoard tool and AI assistants. Files in the library stay as they are."
 translation = "Hoard가 보내는 파일(다운로드, zip, hoard 도구, AI 어시스턴트)의 이름을 짓는 방식입니다. 라이브러리의 파일은 그대로 둡니다."
 
-[messages.settings-page-general]
-source = "General"
-translation = "일반"
+[messages.settings-page-dragon]
+source = "Dragon"
+translation = "드래곤"
 
-[messages.settings-page-general-blurb]
-source = "Your dragon’s hoard, and what this server is called."
-translation = "내 용의 보물 더미와 이 서버의 이름."
-
-[messages.settings-page-general-blurb-desktop]
-source = "Your dragon’s hoard, and what this library is called."
-translation = "내 용의 보물 더미와 이 라이브러리의 이름."
+[messages.settings-page-dragon-blurb]
+source = "Your dragon’s hoard: every asset in the library is a piece of its treasure."
+translation = "당신의 드래곤이 모은 보물: 라이브러리의 에셋 하나하나가 그 보물입니다."
 
 [messages.settings-page-issues]
 source = "Issues"
@@ -9413,13 +9417,13 @@ translation = "서버가 얼마나 일하는지, 썸네일을 만들고 보관�
 source = "How hard Hoard works, how thumbnails are made and kept, and the most it takes in."
 translation = "Hoard가 얼마나 일하는지, 썸네일을 만들고 보관하는 방식, 받을 수 있는 최대 크기입니다."
 
-[messages.settings-page-search]
-source = "Image and sound search"
-translation = "이미지 및 사운드 검색"
-
 [messages.settings-page-search-blurb]
 source = "Search pictures by what they show and sounds by what they sound like, not only by their names, and find things that are alike in kind, not only in color."
 translation = "이름뿐 아니라 그림은 나타난 내용으로, 사운드는 들리는 소리로 검색하고, 색상뿐 아니라 종류가 비슷한 것을 찾습니다."
+
+[messages.settings-page-search-tab]
+source = "Search"
+translation = "검색"
 
 [messages.settings-page-store-files]
 source = "Store files"

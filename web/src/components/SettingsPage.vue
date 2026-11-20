@@ -1,41 +1,22 @@
 <script setup lang="ts">
 // The Settings page: a list of pages down the side, one open at a time (its id is in the address, #settings/<id>).
-// General opens first: everyone's dragon hoard, and (for an admin) the server's name. Appearance is this browser's
-// (light and dark themes, saved here); Library is the hoard in numbers; the rest are the server's: Blender and ffmpeg
+// Appearance opens first: (for an admin) the server's name, then this browser's light and dark themes, saved here.
+// Dragon is everyone's dragon hoard; Library is the hoard in numbers; the rest are the server's: Blender and ffmpeg
 // (downloaded if need be), the AI service that tags packs, what happens to Unreal packages, and the server's switches
 // and limits. Those are saved on the server and in effect at once. Anything not at its default has a turn-back arrow
 // beside it that resets it.
-// Each page is a panel of its own; they share the settings, saving, and the options that save on their own
-// (settingsContext).
-import { computed, onBeforeUnmount, onMounted, provide, reactive, ref } from 'vue'
+// Each page is a panel of its own (SettingsPageBody); they share the settings, saving, and the options that save on
+// their own (settingsContext). The box above the list finds settings: the pages with settings are shown one after
+// another, with only their sections that have every word typed.
+import { computed, nextTick, onBeforeUnmount, onMounted, provide, reactive, ref, watch } from 'vue'
 import { ApiError, api, type Role, type Settings, type SettingsPatch, type Stats } from '../api'
 import { isDesktop, may, refreshAuth } from '../auth'
 import { formatNumber, t } from '../i18n'
 import { formatMiB } from '../sizes'
 import { showError, showOk } from '../ui'
-import AboutPanel from './AboutPanel.vue'
-import AccountPanel from './AccountPanel.vue'
-import AddingPanel from './AddingPanel.vue'
-import AiPanel from './AiPanel.vue'
-import AppearancePanel from './AppearancePanel.vue'
-import AuthPanel from './AuthPanel.vue'
-import CopiesPanel from './CopiesPanel.vue'
-import HoardPanel from './HoardPanel.vue'
-import HttpsPanel from './HttpsPanel.vue'
-import IssuesPanel from './IssuesPanel.vue'
-import LibraryStats from './LibraryStats.vue'
-import LocationsPanel from './LocationsPanel.vue'
-import MaintenancePanel from './MaintenancePanel.vue'
-import PerformancePanel from './PerformancePanel.vue'
-import ResetButton from './ResetButton.vue'
-import SearchPanel from './SearchPanel.vue'
 import SettingsGlyph from './SettingsGlyph.vue'
-import StoreFormatsPanel from './StoreFormatsPanel.vue'
-import TagsPanel from './TagsPanel.vue'
-import TextureNamesPanel from './TextureNamesPanel.vue'
-import ToolsPanel from './ToolsPanel.vue'
-import UpdatesPanel from './UpdatesPanel.vue'
-import { type AnyOpt, type OptKey, type Opts, SETTINGS, onOff } from './settingsContext'
+import SettingsPageBody from './SettingsPageBody.vue'
+import { type AnyOpt, type OptKey, type Opts, SETTINGS } from './settingsContext'
 
 const props = defineProps<{ section: string; stats: Stats | null }>()
 const emit = defineEmits<{
@@ -54,8 +35,8 @@ const s = ref<Settings | null>(null)
 // Labels and blurbs are getters, so they're in the language of the moment. `sep` starts a group in the list: what's
 // in the library, how things get into it, who gets in, and how the server is doing.
 const ALL_PAGES: { id: string; readonly label: string; readonly blurb: string; need?: Role; sep?: boolean; server?: boolean }[] = [
-  { id: 'general', get label() { return t('settings-page-general') }, get blurb() { return t('settings-page-general-blurb') } },
   { id: 'appearance', get label() { return t('settings-page-appearance') }, get blurb() { return t('settings-page-appearance-blurb') } },
+  { id: 'dragon', get label() { return t('settings-page-dragon') }, get blurb() { return t('settings-page-dragon-blurb') } },
   { id: 'library', get label() { return t('settings-page-library') }, get blurb() { return t('settings-page-library-blurb') } },
   { id: 'copies', get label() { return t('settings-page-copies') }, get blurb() { return t('settings-page-copies-blurb') } },
   { id: 'tags', need: 'edit', get label() { return t('settings-page-tags') }, get blurb() { return t('settings-page-tags-blurb') } },
@@ -63,7 +44,7 @@ const ALL_PAGES: { id: string; readonly label: string; readonly blurb: string; n
   { id: 'locations', sep: true, need: 'admin', get label() { return t('settings-page-locations') }, get blurb() { return t('settings-page-locations-blurb') } },
   { id: 'tools', need: 'admin', get label() { return t('settings-page-tools') }, get blurb() { return t('settings-page-tools-blurb') } },
   { id: 'ai', need: 'admin', get label() { return t('settings-page-ai') }, get blurb() { return t('settings-page-ai-blurb') } },
-  { id: 'search', need: 'admin', get label() { return t('settings-page-search') }, get blurb() { return t('settings-page-search-blurb') } },
+  { id: 'search', need: 'admin', get label() { return t('settings-page-search-tab') }, get blurb() { return t('settings-page-search-blurb') } },
   { id: 'adding', need: 'admin', get label() { return t('settings-page-adding') }, get blurb() { return t('settings-page-adding-blurb') } },
   { id: 'downloads', need: 'admin', get label() { return t('settings-page-downloads') }, get blurb() { return t('settings-page-downloads-blurb') } },
   { id: 'account', sep: true, get label() { return t('settings-page-account') }, get blurb() { return t('settings-page-account-blurb') } },
@@ -76,13 +57,59 @@ const ALL_PAGES: { id: string; readonly label: string; readonly blurb: string; n
 ]
 /** The pages this account may see: an admin sees them all (but the desktop app has no server to set up). */
 const PAGES = computed(() => ALL_PAGES.filter((p) => (!p.need || may(p.need)) && !(p.server && isDesktop())))
-const current = computed(() => (PAGES.value.some((p) => p.id === props.section) ? props.section : 'general'))
+const current = computed(() => (PAGES.value.some((p) => p.id === props.section) ? props.section : 'appearance'))
 const page = computed(() => PAGES.value.find((p) => p.id === current.value)!)
 const paneEl = ref<HTMLElement | null>(null)
 function go(id: string) {
+  query.value = ''
   emit('update:section', id)
   paneEl.value?.scrollTo({ top: 0 })
 }
+
+// Finding a setting.
+const query = ref('')
+const searching = computed(() => query.value.trim() !== '')
+/** The pages with settings to find; the others show the library or how it's doing. */
+const SEARCHED = ['appearance', 'locations', 'tools', 'ai', 'search', 'adding', 'downloads', 'account', 'auth', 'connection', 'performance', 'maintenance']
+const searched = computed(() => PAGES.value.filter((p) => SEARCHED.includes(p.id)))
+const resultsEl = ref<HTMLElement | null>(null)
+/** Some section has every word. */
+const found = ref(true)
+/** Lowercase without accents, so "resume" finds "résumé". */
+const fold = (text: string) => text.toLocaleLowerCase().normalize('NFD').replace(/\p{M}/gu, '')
+/** Show the sections with every word typed (or on a page whose name has them), and the pages with any. */
+function filter() {
+  const root = resultsEl.value
+  if (!root) return
+  const words = fold(query.value).split(/\s+/).filter(Boolean)
+  let any = false
+  for (const pageEl of root.querySelectorAll<HTMLElement>('[data-found]')) {
+    let shown = 0
+    for (const section of pageEl.querySelectorAll<HTMLElement>('section')) {
+      if (section.parentElement?.closest('section')) continue
+      const text = fold(`${pageEl.dataset.label} ${section.textContent}`)
+      const hit = words.every((w) => text.includes(w))
+      // Only when it changes: the watcher below sees class changes too.
+      if (section.classList.contains('unfound') === hit) section.classList.toggle('unfound', !hit)
+      if (hit) shown++
+    }
+    if (pageEl.hidden !== !shown) pageEl.hidden = !shown
+    if (shown) any = true
+  }
+  found.value = any
+}
+// The pages fill in as what they show arrives, so they're looked through again whenever they change.
+let frame = 0
+const refilter = () => {
+  cancelAnimationFrame(frame)
+  frame = requestAnimationFrame(filter)
+}
+const watcher = new MutationObserver(refilter)
+watch(resultsEl, (el) => {
+  watcher.disconnect()
+  if (el) watcher.observe(el, { childList: true, subtree: true, characterData: true, attributes: true, attributeFilter: ['class'] })
+})
+watch(query, () => void nextTick(refilter))
 const busy = ref(false)
 
 // Server options: each saves on its own when it's entered (Enter, or leaving the field); switches at once.
@@ -185,6 +212,7 @@ function schedulePoll() {
 
 provide(SETTINGS, {
   s: computed(() => s.value!),
+  ready: computed(() => !!s.value),
   busy,
   save,
   take,
@@ -203,16 +231,29 @@ provide(SETTINGS, {
 onMounted(() => {
   if (may('admin')) void load()
 })
-onBeforeUnmount(() => window.clearTimeout(timer))
+onBeforeUnmount(() => {
+  window.clearTimeout(timer)
+  watcher.disconnect()
+  cancelAnimationFrame(frame)
+})
 </script>
 
 <template>
   <div class="settings-page">
     <nav class="snav" :aria-label="t('settings-title')">
       <h2>{{ t('settings-title') }}</h2>
+      <input
+        v-model="query"
+        class="field find"
+        type="search"
+        :placeholder="t('settings-find')"
+        :aria-label="t('settings-find')"
+        data-testid="settings-find"
+        @keydown.esc="query = ''"
+      />
       <ul>
         <li v-for="p in PAGES" :key="p.id" :class="{ sep: p.sep }">
-          <button type="button" :aria-current="current === p.id ? 'page' : undefined" @click="go(p.id)">
+          <button type="button" :aria-current="!searching && current === p.id ? 'page' : undefined" @click="go(p.id)">
             <SettingsGlyph class="ico" :page="p.id" />
             <span class="lbl">{{ p.label }}</span>
             <span v-if="p.id === 'ai' && s" class="pip" :data-on="s.llm.enabled" aria-hidden="true" />
@@ -222,7 +263,23 @@ onBeforeUnmount(() => window.clearTimeout(timer))
     </nav>
 
     <div ref="paneEl" class="pane" :aria-busy="busy">
-      <div class="inner" :class="{ wide: current === 'store-files' }">
+      <div v-if="searching" ref="resultsEl" class="inner" data-testid="settings-found">
+        <p v-if="!found" class="loading">{{ t('settings-find-none', { query: query.trim() }) }}</p>
+        <div v-for="p in searched" :key="p.id" class="found" data-found :data-label="p.label" :data-page="p.id">
+          <button type="button" class="found-h" @click="go(p.id)">
+            <SettingsGlyph :page="p.id" />
+            {{ p.label }}
+          </button>
+          <SettingsPageBody
+            :id="p.id"
+            :stats="stats"
+            @unauthorized="emit('unauthorized')"
+            @changed="emit('changed')"
+            @section="go"
+          />
+        </div>
+      </div>
+      <div v-else class="inner" :class="{ wide: current === 'store-files' }">
         <header class="phead">
           <span class="pglyph" aria-hidden="true"><SettingsGlyph :page="page.id" :size="22" /></span>
           <div class="ptext">
@@ -230,118 +287,17 @@ onBeforeUnmount(() => window.clearTimeout(timer))
             <p class="what">{{ page.blurb }}</p>
           </div>
         </header>
-
-        <AppearancePanel v-if="current === 'appearance'" />
-
-        <LibraryStats
-          v-else-if="current === 'library'"
+        <SettingsPageBody
+          :id="current"
           :stats="stats"
+          @unauthorized="emit('unauthorized')"
           @tag="(t) => emit('tag', t)"
           @pack="(p) => emit('pack', p)"
           @open="(id) => emit('open', id)"
           @archive="emit('archive')"
-        />
-
-        <LocationsPanel v-else-if="current === 'locations'" @unauthorized="emit('unauthorized')" @changed="emit('changed')" />
-        <IssuesPanel
-          v-else-if="current === 'issues'"
-          @unauthorized="emit('unauthorized')"
-          @pack="(p) => emit('pack', p)"
-          @open="(id) => emit('open', id)"
+          @changed="emit('changed')"
           @section="go"
         />
-        <AccountPanel v-else-if="current === 'account'" />
-        <AboutPanel v-else-if="current === 'about'" :stats="stats" />
-        <AuthPanel v-else-if="current === 'auth'" />
-        <CopiesPanel v-else-if="current === 'copies'" @open="(id) => emit('open', id)" @unauthorized="emit('unauthorized')" />
-        <TagsPanel v-else-if="current === 'tags'" @tag="(t) => emit('tag', t)" @changed="emit('changed')" />
-        <StoreFormatsPanel v-else-if="current === 'store-files'" />
-        <template v-else-if="current === 'general'">
-          <div v-if="s" class="body">
-            <section>
-              <div class="sh"><h3>{{ t('settings-name') }}</h3></div>
-              <p class="what">{{ t('settings-name-what') }}</p>
-              <div class="llm opts">
-                <label for="opt-name">{{ t('settings-name') }}</label>
-                <div class="key">
-                  <input
-                    id="opt-name"
-                    v-model="opts.name"
-                    class="field"
-                    maxlength="40"
-                    :placeholder="s.options.name.default"
-                    :disabled="busy"
-                    @change="saveOpt('name')"
-                    @keydown.enter.prevent="saveOpt('name')"
-                  />
-                  <ResetButton v-if="changed('name')" :to="s.options.name.default" :disabled="busy" @reset="resetOpt('name')" />
-                </div>
-              </div>
-            </section>
-          </div>
-          <HoardPanel @unauthorized="emit('unauthorized')" />
-        </template>
-
-        <p v-else-if="!s" class="loading">{{ t('settings-loading') }}</p>
-
-        <div v-else class="body">
-          <ToolsPanel v-if="current === 'tools'" />
-          <SearchPanel v-else-if="current === 'search'" />
-          <AiPanel v-else-if="current === 'ai'" />
-          <AddingPanel v-else-if="current === 'adding'" />
-          <TextureNamesPanel v-else-if="current === 'downloads'" />
-
-          <template v-else-if="current === 'connection'">
-            <section>
-              <div class="sh"><h3>{{ t('settings-address') }}</h3></div>
-              <p class="what">{{ t('settings-address-what') }}</p>
-              <div class="llm opts">
-                <label for="opt-public">{{ t('settings-public-url') }}</label>
-                <div class="key">
-                  <input
-                    id="opt-public"
-                    v-model="opts.public_url"
-                    class="field mono"
-                    type="url"
-                    spellcheck="false"
-                    :placeholder="t('settings-public-url-placeholder')"
-                    :disabled="busy"
-                    @change="saveOpt('public_url')"
-                    @keydown.enter.prevent="saveOpt('public_url')"
-                  />
-                  <ResetButton v-if="changed('public_url')" :to="s.options.public_url.default || t('settings-public-url-default')" :disabled="busy" @reset="resetOpt('public_url')" />
-                </div>
-              </div>
-            </section>
-            <HttpsPanel />
-          </template>
-
-          <PerformancePanel v-else-if="current === 'performance'" :stats="stats" />
-
-          <template v-else-if="current === 'maintenance'">
-            <section>
-              <div class="sh"><h3>{{ t('settings-updates') }}</h3></div>
-              <p v-if="stats?.version" class="what">{{ t('settings-version', { version: stats.version }) }}</p>
-              <p v-if="isDesktop()" class="what">{{ t('settings-desktop-updates') }}</p>
-              <div v-else class="switches">
-                <div class="opt-row">
-                  <label class="check">
-                    <input
-                      type="checkbox"
-                      :checked="s.options.update_check.value"
-                      :disabled="busy"
-                      @change="save({ update_check: ($event.target as HTMLInputElement).checked })"
-                    />
-                    {{ t('settings-update-check') }}
-                  </label>
-                  <ResetButton v-if="changed('update_check')" :to="onOff(s.options.update_check.default)" :disabled="busy" @reset="resetOpt('update_check')" />
-                </div>
-              </div>
-              <UpdatesPanel v-if="!isDesktop()" :settings="s" @saved="take" @unauthorized="emit('unauthorized')" />
-            </section>
-            <MaintenancePanel @unauthorized="emit('unauthorized')" />
-          </template>
-        </div>
       </div>
     </div>
   </div>
@@ -395,10 +351,21 @@ onBeforeUnmount(() => window.clearTimeout(timer))
 .phead h2 { margin: 0 0 0.15rem; font-size: var(--step-2); line-height: 1.2; font-variation-settings: 'CASL' 0.5; }
 .phead .what { margin: 0; max-width: 40rem; }
 .loading { color: var(--muted); font-size: var(--step--1); }
+/* The box that finds settings, above the list. */
+.find { width: 100%; margin: 0 0 0.8rem; }
+/* What's found: each page's name, then its sections that match. */
+.found { display: grid; gap: 1rem; margin-bottom: 1.8rem; }
+.found[hidden] { display: none; }
+.found-h {
+  display: flex; align-items: center; gap: 0.5rem; justify-self: start; padding: 0; border: 0; background: none;
+  color: var(--muted); font: inherit; font-size: var(--step--1); font-weight: 600; cursor: pointer;
+}
+.found-h:hover { color: var(--accent); }
 @media (max-width: 47.99rem) {
   .settings-page { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr); }
   .snav { display: flex; align-items: center; gap: 0.75rem; padding: 0.5rem 0.75rem; overflow-x: auto; border-right: 0; border-bottom: 1px solid var(--line); }
   .snav h2 { display: none; }
+  .find { flex: none; width: 11rem; margin: 0; }
   .snav ul { display: flex; gap: 0.25rem; }
   .snav li.sep:not(:first-child) { margin: 0 0 0 0.3rem; padding: 0 0 0 0.55rem; border-top: 0; border-left: 1px solid var(--line); }
   .snav button { white-space: nowrap; min-height: 40px; gap: 0.45rem; }
@@ -408,9 +375,6 @@ onBeforeUnmount(() => window.clearTimeout(timer))
   .pglyph { width: 2.5rem; height: 2.5rem; border-radius: 10px; }
 }
 
-.body { display: grid; gap: 1rem; }
-/* General: the server's name, then the hoard (HoardPanel's root) the same gap below it. */
-.body + .hoard { margin-top: 1rem; }
 </style>
 
 <style>
@@ -434,6 +398,8 @@ onBeforeUnmount(() => window.clearTimeout(timer))
 @media (max-width: 30rem) {
   .settings-page .inner section { padding: 0.95rem 0.9rem 1rem; }
 }
+/* A section without the words being looked for. */
+.settings-page .inner section.unfound { display: none !important; }
 /* Options that save the moment they're flipped look like switches: still checkboxes underneath. */
 .settings-page .switches input[type='checkbox'],
 .settings-page input[type='checkbox'].switch {

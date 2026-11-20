@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "784687813ffc36b7323d5f6f6162af0826b640f29e1eda034584bda64d776e5f"
+source = "ec811590205e4e64387af6e16bbaf48e03adb4bdb3b0180c6d7abaf323eaf3e0"
 translation = "e5f3f7db07b8d100748035cc5c5db381f2b0ac74ef4784aefc515dc35bb050a8"
 
 [messages.about-blender]
@@ -9087,6 +9087,14 @@ translation = "Dùng ffmpeg của hệ thống có đủ bộ mã hóa, hoặc t
 source = "Encodes MP3, OGG and Opus downloads, and reads audio Hoard can’t decode itself (AAC, M4A, WMA, …)."
 translation = "Mã hóa bản tải xuống MP3, OGG và Opus, và đọc âm thanh mà Hoard không tự giải mã được (AAC, M4A, WMA, …)."
 
+[messages.settings-find]
+source = "Find a setting"
+translation = "Tìm cài đặt"
+
+[messages.settings-find-none]
+source = "No setting matches “{ $query }”."
+translation = "Không có cài đặt nào khớp với “{ $query }”."
+
 [messages.settings-gpu-none]
 source = "No GPU or software renderer found, so models get no thumbnails"
 translation = "Không tìm thấy GPU hay trình kết xuất phần mềm, nên mô hình không có ảnh thu nhỏ"
@@ -9383,17 +9391,13 @@ translation = "Tải xuống"
 source = "How files are named in what Hoard sends: downloads, zips, the hoard tool and AI assistants. Files in the library stay as they are."
 translation = "Cách đặt tên tệp trong những gì Hoard gửi đi: tải xuống, tệp zip, công cụ hoard và trợ lý AI. Tệp trong thư viện vẫn giữ nguyên."
 
-[messages.settings-page-general]
-source = "General"
-translation = "Chung"
+[messages.settings-page-dragon]
+source = "Dragon"
+translation = "Rồng"
 
-[messages.settings-page-general-blurb]
-source = "Your dragon’s hoard, and what this server is called."
-translation = "Kho báu của rồng của bạn, và tên của máy chủ này."
-
-[messages.settings-page-general-blurb-desktop]
-source = "Your dragon’s hoard, and what this library is called."
-translation = "Kho báu của rồng của bạn, và tên của thư viện này."
+[messages.settings-page-dragon-blurb]
+source = "Your dragon’s hoard: every asset in the library is a piece of its treasure."
+translation = "Kho báu của rồng: mỗi tài nguyên trong thư viện là một món trong đó."
 
 [messages.settings-page-issues]
 source = "Issues"
@@ -9443,13 +9447,13 @@ translation = "Máy chủ làm việc nặng đến đâu, ảnh thu nhỏ đư�
 source = "How hard Hoard works, how thumbnails are made and kept, and the most it takes in."
 translation = "Hoard làm việc nặng đến đâu, ảnh thu nhỏ được tạo và lưu thế nào, và mức tối đa nó nhận vào."
 
-[messages.settings-page-search]
-source = "Image and sound search"
-translation = "Tìm kiếm hình ảnh và âm thanh"
-
 [messages.settings-page-search-blurb]
 source = "Search pictures by what they show and sounds by what they sound like, not only by their names, and find things that are alike in kind, not only in color."
 translation = "Tìm ảnh theo nội dung trong ảnh và tìm âm thanh theo cách chúng nghe ra sao, không chỉ theo tên, và tìm những thứ giống nhau về loại, không chỉ về màu."
+
+[messages.settings-page-search-tab]
+source = "Search"
+translation = "Tìm kiếm"
 
 [messages.settings-page-store-files]
 source = "Store files"

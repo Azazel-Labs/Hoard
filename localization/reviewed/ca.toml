@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "784687813ffc36b7323d5f6f6162af0826b640f29e1eda034584bda64d776e5f"
+source = "ec811590205e4e64387af6e16bbaf48e03adb4bdb3b0180c6d7abaf323eaf3e0"
 translation = "dae9663de4ee469cff00d6587036c8ef7c8b455655c1e31930a70aa8a21f42b6"
 
 [messages.about-blender]
@@ -9282,6 +9282,14 @@ translation = "Fa servir un ffmpeg del sistema amb els codificadors adequats, o 
 source = "Encodes MP3, OGG and Opus downloads, and reads audio Hoard can’t decode itself (AAC, M4A, WMA, …)."
 translation = "Codifica les baixades en MP3, OGG i Opus, i llegeix l'àudio que Hoard no pot descodificar per si mateix (AAC, M4A, WMA…)."
 
+[messages.settings-find]
+source = "Find a setting"
+translation = "Troba un paràmetre"
+
+[messages.settings-find-none]
+source = "No setting matches “{ $query }”."
+translation = "Cap paràmetre coincideix amb «{ $query }»."
+
 [messages.settings-gpu-none]
 source = "No GPU or software renderer found, so models get no thumbnails"
 translation = "No s'ha trobat cap GPU ni renderitzador per programari, així que els models no tenen miniatures"
@@ -9578,17 +9586,13 @@ translation = "Baixades"
 source = "How files are named in what Hoard sends: downloads, zips, the hoard tool and AI assistants. Files in the library stay as they are."
 translation = "Com s'anomenen els fitxers del que envia Hoard: baixades, zips, l'eina hoard i els assistents d'IA. Els fitxers de la biblioteca es queden com estan."
 
-[messages.settings-page-general]
-source = "General"
-translation = "General"
+[messages.settings-page-dragon]
+source = "Dragon"
+translation = "Drac"
 
-[messages.settings-page-general-blurb]
-source = "Your dragon’s hoard, and what this server is called."
-translation = "El tresor del vostre drac i el nom d’aquest servidor."
-
-[messages.settings-page-general-blurb-desktop]
-source = "Your dragon’s hoard, and what this library is called."
-translation = "El tresor del vostre drac i el nom d’aquesta biblioteca."
+[messages.settings-page-dragon-blurb]
+source = "Your dragon’s hoard: every asset in the library is a piece of its treasure."
+translation = "El tresor del teu drac: cada recurs de la biblioteca n’és una peça."
 
 [messages.settings-page-issues]
 source = "Issues"
@@ -9638,13 +9642,13 @@ translation = "Com de dur treballa el servidor, com es fan i es conserven les mi
 source = "How hard Hoard works, how thumbnails are made and kept, and the most it takes in."
 translation = "Com de dur treballa Hoard, com es fan i es conserven les miniatures, i el màxim que accepta."
 
-[messages.settings-page-search]
-source = "Image and sound search"
-translation = "Cerca d'imatges i sons"
-
 [messages.settings-page-search-blurb]
 source = "Search pictures by what they show and sounds by what they sound like, not only by their names, and find things that are alike in kind, not only in color."
 translation = "Cerqueu imatges pel que mostren i sons per com sonen, no només pel nom, i trobeu coses semblants pel tipus, no només pel color."
+
+[messages.settings-page-search-tab]
+source = "Search"
+translation = "Cerca"
 
 [messages.settings-page-store-files]
 source = "Store files"

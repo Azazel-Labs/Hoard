@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "784687813ffc36b7323d5f6f6162af0826b640f29e1eda034584bda64d776e5f"
+source = "ec811590205e4e64387af6e16bbaf48e03adb4bdb3b0180c6d7abaf323eaf3e0"
 translation = "0e090698d45a306b6f0a465d36b224e5cf15d2212844de9c676456286efbf687"
 
 [messages.about-blender]
@@ -9276,6 +9276,14 @@ translation = "Gebruik 'n stelsel-ffmpeg met die regte enkodeerders, of laai 'n 
 source = "Encodes MP3, OGG and Opus downloads, and reads audio Hoard can’t decode itself (AAC, M4A, WMA, …)."
 translation = "Enkodeer MP3-, OGG- en Opus-aflaaie, en lees klank wat Hoard nie self kan dekodeer nie (AAC, M4A, WMA, …)."
 
+[messages.settings-find]
+source = "Find a setting"
+translation = "Vind ’n instelling"
+
+[messages.settings-find-none]
+source = "No setting matches “{ $query }”."
+translation = "Geen instelling pas by “{ $query }” nie."
+
 [messages.settings-gpu-none]
 source = "No GPU or software renderer found, so models get no thumbnails"
 translation = "Geen GPU of sagteware-weergewer gevind nie, dus kry modelle geen duimnaels nie"
@@ -9572,17 +9580,13 @@ translation = "Aflaaie"
 source = "How files are named in what Hoard sends: downloads, zips, the hoard tool and AI assistants. Files in the library stay as they are."
 translation = "Hoe lêers benoem word in wat Hoard stuur: aflaaie, zips, die hoard-hulpmiddel en KI-assistente. Lêers in die biblioteek bly soos hulle is."
 
-[messages.settings-page-general]
-source = "General"
-translation = "Algemeen"
+[messages.settings-page-dragon]
+source = "Dragon"
+translation = "Draak"
 
-[messages.settings-page-general-blurb]
-source = "Your dragon’s hoard, and what this server is called."
-translation = "Jou draak se skat, en wat hierdie bediener genoem word."
-
-[messages.settings-page-general-blurb-desktop]
-source = "Your dragon’s hoard, and what this library is called."
-translation = "Jou draak se skat, en wat hierdie biblioteek genoem word."
+[messages.settings-page-dragon-blurb]
+source = "Your dragon’s hoard: every asset in the library is a piece of its treasure."
+translation = "Jou draak se skat: elke bate in die biblioteek is ’n stuk van sy skat."
 
 [messages.settings-page-issues]
 source = "Issues"
@@ -9632,13 +9636,13 @@ translation = "Hoe hard die bediener werk, hoe duimnaels gemaak en gehou word, e
 source = "How hard Hoard works, how thumbnails are made and kept, and the most it takes in."
 translation = "Hoe hard Hoard werk, hoe duimnaels gemaak en gehou word, en die meeste wat dit inneem."
 
-[messages.settings-page-search]
-source = "Image and sound search"
-translation = "Beeld- en klanksoektog"
-
 [messages.settings-page-search-blurb]
 source = "Search pictures by what they show and sounds by what they sound like, not only by their names, and find things that are alike in kind, not only in color."
 translation = "Soek prente volgens wat hulle wys en klanke volgens hoe hulle klink, nie net volgens hul name nie, en vind dinge wat in soort eenders is, nie net in kleur nie."
+
+[messages.settings-page-search-tab]
+source = "Search"
+translation = "Soek"
 
 [messages.settings-page-store-files]
 source = "Store files"

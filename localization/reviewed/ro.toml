@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "784687813ffc36b7323d5f6f6162af0826b640f29e1eda034584bda64d776e5f"
+source = "ec811590205e4e64387af6e16bbaf48e03adb4bdb3b0180c6d7abaf323eaf3e0"
 translation = "ce4c416087cb6d2fb8e905c6194c792fbd5bb5777164b444d684dfd92a83af43"
 
 [messages.about-blender]
@@ -9441,6 +9441,14 @@ translation = "Folosește un ffmpeg de sistem cu codificatoarele potrivite sau d
 source = "Encodes MP3, OGG and Opus downloads, and reads audio Hoard can’t decode itself (AAC, M4A, WMA, …)."
 translation = "Codifică descărcările MP3, OGG și Opus și citește sunetul pe care Hoard nu îl poate decoda singur (AAC, M4A, WMA, …)."
 
+[messages.settings-find]
+source = "Find a setting"
+translation = "Găsește o setare"
+
+[messages.settings-find-none]
+source = "No setting matches “{ $query }”."
+translation = "Nicio setare nu se potrivește cu „{ $query }”."
+
 [messages.settings-gpu-none]
 source = "No GPU or software renderer found, so models get no thumbnails"
 translation = "Nu s-a găsit niciun GPU sau randare software, deci modelele nu primesc miniaturi"
@@ -9737,17 +9745,13 @@ translation = "Descărcări"
 source = "How files are named in what Hoard sends: downloads, zips, the hoard tool and AI assistants. Files in the library stay as they are."
 translation = "Cum sunt denumite fișierele în ce trimite Hoard: descărcări, arhive zip, instrumentul hoard și asistenții AI. Fișierele din bibliotecă rămân cum sunt."
 
-[messages.settings-page-general]
-source = "General"
-translation = "General"
+[messages.settings-page-dragon]
+source = "Dragon"
+translation = "Dragon"
 
-[messages.settings-page-general-blurb]
-source = "Your dragon’s hoard, and what this server is called."
-translation = "Comoara dragonului dumneavoastră și numele acestui server."
-
-[messages.settings-page-general-blurb-desktop]
-source = "Your dragon’s hoard, and what this library is called."
-translation = "Comoara dragonului dumneavoastră și numele acestei biblioteci."
+[messages.settings-page-dragon-blurb]
+source = "Your dragon’s hoard: every asset in the library is a piece of its treasure."
+translation = "Comoara dragonului tău: fiecare resursă din bibliotecă e o bucată din ea."
 
 [messages.settings-page-issues]
 source = "Issues"
@@ -9797,13 +9801,13 @@ translation = "Cât de intens lucrează serverul, cum sunt create și păstrate 
 source = "How hard Hoard works, how thumbnails are made and kept, and the most it takes in."
 translation = "Cât de intens lucrează Hoard, cum sunt create și păstrate miniaturile și cât poate primi cel mult."
 
-[messages.settings-page-search]
-source = "Image and sound search"
-translation = "Căutare după imagine și sunet"
-
 [messages.settings-page-search-blurb]
 source = "Search pictures by what they show and sounds by what they sound like, not only by their names, and find things that are alike in kind, not only in color."
 translation = "Căutați imagini după ce arată și sunete după cum sună, nu doar după nume, și găsiți lucruri asemănătoare ca fel, nu doar ca culoare."
+
+[messages.settings-page-search-tab]
+source = "Search"
+translation = "Căutare"
 
 [messages.settings-page-store-files]
 source = "Store files"

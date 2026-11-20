@@ -20,6 +20,8 @@ export type AnyOpt = keyof Settings['options']
 export interface SettingsContext {
   /** The settings as the server last sent them. */
   s: ComputedRef<Settings>
+  /** The settings have come (an admin's only): `s` is there to read. */
+  ready: ComputedRef<boolean>
   /** A save is under way. */
   busy: Ref<boolean>
   save(patch: SettingsPatch, done?: string): Promise<void>

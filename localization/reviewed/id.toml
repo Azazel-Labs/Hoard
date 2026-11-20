@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "784687813ffc36b7323d5f6f6162af0826b640f29e1eda034584bda64d776e5f"
+source = "ec811590205e4e64387af6e16bbaf48e03adb4bdb3b0180c6d7abaf323eaf3e0"
 translation = "9000490baf0f6c5652bff234ab079cb5865b1c73471f7b8ad86c41a4a35d4c68"
 
 [messages.about-blender]
@@ -9091,6 +9091,14 @@ translation = "Memakai ffmpeg sistem dengan encoder yang sesuai, atau mengunduh 
 source = "Encodes MP3, OGG and Opus downloads, and reads audio Hoard can’t decode itself (AAC, M4A, WMA, …)."
 translation = "Meng-encode unduhan MP3, OGG, dan Opus, serta membaca audio yang tidak dapat didekode Hoard sendiri (AAC, M4A, WMA, …)."
 
+[messages.settings-find]
+source = "Find a setting"
+translation = "Cari pengaturan"
+
+[messages.settings-find-none]
+source = "No setting matches “{ $query }”."
+translation = "Tidak ada pengaturan yang cocok dengan “{ $query }”."
+
 [messages.settings-gpu-none]
 source = "No GPU or software renderer found, so models get no thumbnails"
 translation = "GPU atau perender software tidak ditemukan, jadi model tidak mendapat gambar mini"
@@ -9387,17 +9395,13 @@ translation = "Unduhan"
 source = "How files are named in what Hoard sends: downloads, zips, the hoard tool and AI assistants. Files in the library stay as they are."
 translation = "Cara berkas dinamai dalam kiriman Hoard: unduhan, zip, alat hoard, dan asisten AI. Berkas di pustaka tetap apa adanya."
 
-[messages.settings-page-general]
-source = "General"
-translation = "Umum"
+[messages.settings-page-dragon]
+source = "Dragon"
+translation = "Naga"
 
-[messages.settings-page-general-blurb]
-source = "Your dragon’s hoard, and what this server is called."
-translation = "Harta karun naga Anda, dan nama server ini."
-
-[messages.settings-page-general-blurb-desktop]
-source = "Your dragon’s hoard, and what this library is called."
-translation = "Harta karun naga Anda, dan nama pustaka ini."
+[messages.settings-page-dragon-blurb]
+source = "Your dragon’s hoard: every asset in the library is a piece of its treasure."
+translation = "Timbunan harta nagamu: setiap aset di pustaka adalah sepotong hartanya."
 
 [messages.settings-page-issues]
 source = "Issues"
@@ -9447,13 +9451,13 @@ translation = "Seberapa keras server bekerja, cara gambar mini dibuat dan disimp
 source = "How hard Hoard works, how thumbnails are made and kept, and the most it takes in."
 translation = "Seberapa keras Hoard bekerja, cara gambar mini dibuat dan disimpan, dan batas maksimum yang diterimanya."
 
-[messages.settings-page-search]
-source = "Image and sound search"
-translation = "Pencarian gambar dan suara"
-
 [messages.settings-page-search-blurb]
 source = "Search pictures by what they show and sounds by what they sound like, not only by their names, and find things that are alike in kind, not only in color."
 translation = "Cari gambar berdasarkan isinya dan suara berdasarkan bunyinya, bukan hanya namanya, dan temukan hal yang sejenis, bukan hanya yang sewarna."
+
+[messages.settings-page-search-tab]
+source = "Search"
+translation = "Pencarian"
 
 [messages.settings-page-store-files]
 source = "Store files"

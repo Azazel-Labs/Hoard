@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "784687813ffc36b7323d5f6f6162af0826b640f29e1eda034584bda64d776e5f"
+source = "ec811590205e4e64387af6e16bbaf48e03adb4bdb3b0180c6d7abaf323eaf3e0"
 translation = "48b91021e8ab72d74293b13e1175ec85edcf56c59510524f10635679bb042ed2"
 
 [messages.about-blender]
@@ -9111,6 +9111,14 @@ translation = "A rendszer megfelelő kódolókkal rendelkező ffmpeg-jét haszn�
 source = "Encodes MP3, OGG and Opus downloads, and reads audio Hoard can’t decode itself (AAC, M4A, WMA, …)."
 translation = "MP3-, OGG- és Opus-letöltéseket kódol, és beolvassa azokat a hangokat, amelyeket a Hoard maga nem tud dekódolni (AAC, M4A, WMA, …)."
 
+[messages.settings-find]
+source = "Find a setting"
+translation = "Beállítás keresése"
+
+[messages.settings-find-none]
+source = "No setting matches “{ $query }”."
+translation = "Egy beállítás sem felel meg ennek: „{ $query }”."
+
 [messages.settings-gpu-none]
 source = "No GPU or software renderer found, so models get no thumbnails"
 translation = "Nem található sem GPU, sem szoftveres renderelő, így a modellek nem kapnak bélyegképet"
@@ -9407,17 +9415,13 @@ translation = "Letöltések"
 source = "How files are named in what Hoard sends: downloads, zips, the hoard tool and AI assistants. Files in the library stay as they are."
 translation = "Hogyan nevezi el a Hoard a fájlokat abban, amit küld: letöltésekben, zipekben, a hoard eszközben és az MI-asszisztenseknek. A könyvtár fájljai változatlanok maradnak."
 
-[messages.settings-page-general]
-source = "General"
-translation = "Általános"
+[messages.settings-page-dragon]
+source = "Dragon"
+translation = "Sárkány"
 
-[messages.settings-page-general-blurb]
-source = "Your dragon’s hoard, and what this server is called."
-translation = "Az Ön sárkányának kincse, és ennek a szervernek a neve."
-
-[messages.settings-page-general-blurb-desktop]
-source = "Your dragon’s hoard, and what this library is called."
-translation = "Az Ön sárkányának kincse, és ennek a könyvtárnak a neve."
+[messages.settings-page-dragon-blurb]
+source = "Your dragon’s hoard: every asset in the library is a piece of its treasure."
+translation = "A sárkányod kincse: a könyvtár minden eleme egy darabja."
 
 [messages.settings-page-issues]
 source = "Issues"
@@ -9467,13 +9471,13 @@ translation = "Mennyire dolgozik keményen a szerver, hogyan készülnek és tá
 source = "How hard Hoard works, how thumbnails are made and kept, and the most it takes in."
 translation = "Mennyire dolgozik keményen a Hoard, hogyan készülnek és tárolódnak a bélyegképek, és legfeljebb mennyit fogad be."
 
-[messages.settings-page-search]
-source = "Image and sound search"
-translation = "Kép- és hangkeresés"
-
 [messages.settings-page-search-blurb]
 source = "Search pictures by what they show and sounds by what they sound like, not only by their names, and find things that are alike in kind, not only in color."
 translation = "Keressen a képek között aszerint, hogy mit ábrázolnak, a hangok között pedig aszerint, hogyan szólnak, ne csak a nevük szerint, és találjon fajtájukban hasonló dolgokat, ne csak színükben hasonlókat."
+
+[messages.settings-page-search-tab]
+source = "Search"
+translation = "Keresés"
 
 [messages.settings-page-store-files]
 source = "Store files"

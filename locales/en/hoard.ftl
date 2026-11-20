@@ -2601,14 +2601,16 @@ maintenance-script-after = . Those runs show up here too.
 
 settings-title = Settings
 settings-loading = Loading…
+# The box above the list of Settings pages that finds settings, and what it says when none has the words.
+settings-find = Find a setting
+settings-find-none = No setting matches “{ $query }”.
 # Before a colon and the error.
 settings-load-failed = Couldn't load the settings: { $error }
 # The pages down the side of Settings, each with the sentence under its heading.
-settings-page-general = General
-settings-page-general-blurb = Your dragon’s hoard, and what this server is called.
-settings-page-general-blurb-desktop = Your dragon’s hoard, and what this library is called.
 settings-page-appearance = Appearance
 settings-page-appearance-blurb = The themes this browser wears when it’s light and when it’s dark. Saved in this browser only.
+settings-page-dragon = Dragon
+settings-page-dragon-blurb = Your dragon’s hoard: every asset in the library is a piece of its treasure.
 settings-page-library = Library
 settings-page-library-blurb = What’s in the hoard: how big it is, what it’s made of, how it grew and how well it’s tagged. Archived things aren’t counted.
 settings-page-copies = Near copies
@@ -2637,8 +2639,8 @@ settings-page-tools = Tools
 settings-page-tools-blurb = Outside programs Hoard uses to convert and read files.
 settings-page-ai = AI tagging
 settings-page-ai-blurb = An AI model names, describes and tags new packs, on top of the built-in rules. Its tags are marked as suggested.
-settings-page-search = Image and sound search
 settings-page-search-blurb = Search pictures by what they show and sounds by what they sound like, not only by their names, and find things that are alike in kind, not only in color.
+settings-page-search-tab = Search
 settings-page-adding = Adding packs
 settings-page-adding-blurb = What Hoard does with a pack when it’s added, besides reading and tagging it.
 settings-page-downloads = Downloads

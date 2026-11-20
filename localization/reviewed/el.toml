@@ -1,7 +1,7 @@
 version = 2
 
 [readme]
-source = "784687813ffc36b7323d5f6f6162af0826b640f29e1eda034584bda64d776e5f"
+source = "ec811590205e4e64387af6e16bbaf48e03adb4bdb3b0180c6d7abaf323eaf3e0"
 translation = "4890422f21c71087236199437be3f5ec0bf500d828f121f3861539f632d6bf93"
 
 [messages.about-blender]
@@ -9337,6 +9337,14 @@ translation = "Χρησιμοποιεί ένα ffmpeg του συστήματο�
 source = "Encodes MP3, OGG and Opus downloads, and reads audio Hoard can’t decode itself (AAC, M4A, WMA, …)."
 translation = "Κωδικοποιεί λήψεις MP3, OGG και Opus και διαβάζει ήχο που το Hoard δεν μπορεί να αποκωδικοποιήσει μόνο του (AAC, M4A, WMA, …)."
 
+[messages.settings-find]
+source = "Find a setting"
+translation = "Εύρεση ρύθμισης"
+
+[messages.settings-find-none]
+source = "No setting matches “{ $query }”."
+translation = "Καμία ρύθμιση δεν ταιριάζει με «{ $query }»."
+
 [messages.settings-gpu-none]
 source = "No GPU or software renderer found, so models get no thumbnails"
 translation = "Δεν βρέθηκε GPU ή renderer λογισμικού, οπότε τα μοντέλα δεν αποκτούν μικρογραφίες"
@@ -9633,17 +9641,13 @@ translation = "Λήψεις"
 source = "How files are named in what Hoard sends: downloads, zips, the hoard tool and AI assistants. Files in the library stay as they are."
 translation = "Πώς ονομάζονται τα αρχεία σε ό,τι στέλνει το Hoard: λήψεις, αρχεία zip, το εργαλείο hoard και βοηθοί AI. Τα αρχεία στη βιβλιοθήκη μένουν όπως είναι."
 
-[messages.settings-page-general]
-source = "General"
-translation = "Γενικά"
+[messages.settings-page-dragon]
+source = "Dragon"
+translation = "Δράκος"
 
-[messages.settings-page-general-blurb]
-source = "Your dragon’s hoard, and what this server is called."
-translation = "Ο θησαυρός του δράκου σας και το όνομα αυτού του διακομιστή."
-
-[messages.settings-page-general-blurb-desktop]
-source = "Your dragon’s hoard, and what this library is called."
-translation = "Ο θησαυρός του δράκου σας και το όνομα αυτής της βιβλιοθήκης."
+[messages.settings-page-dragon-blurb]
+source = "Your dragon’s hoard: every asset in the library is a piece of its treasure."
+translation = "Ο θησαυρός του δράκου σας: κάθε στοιχείο της βιβλιοθήκης είναι ένα κομμάτι του."
 
 [messages.settings-page-issues]
 source = "Issues"
@@ -9693,13 +9697,13 @@ translation = "Πόσο εντατικά δουλεύει ο διακομιστ�
 source = "How hard Hoard works, how thumbnails are made and kept, and the most it takes in."
 translation = "Πόσο εντατικά δουλεύει το Hoard, πώς δημιουργούνται και φυλάσσονται οι μικρογραφίες και πόσα δέχεται το πολύ."
 
-[messages.settings-page-search]
-source = "Image and sound search"
-translation = "Αναζήτηση εικόνων και ήχων"
-
 [messages.settings-page-search-blurb]
 source = "Search pictures by what they show and sounds by what they sound like, not only by their names, and find things that are alike in kind, not only in color."
 translation = "Αναζητήστε εικόνες με βάση αυτό που δείχνουν και ήχους με βάση το πώς ακούγονται, όχι μόνο με τα ονόματά τους, και βρείτε πράγματα που μοιάζουν στο είδος, όχι μόνο στο χρώμα."
+
+[messages.settings-page-search-tab]
+source = "Search"
+translation = "Αναζήτηση"
 
 [messages.settings-page-store-files]
 source = "Store files"

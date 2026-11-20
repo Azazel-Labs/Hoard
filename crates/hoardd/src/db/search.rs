@@ -240,15 +240,7 @@ fn folder_skip(folder: &str) -> i64 {
 /// pass of its own, which in a big pack meant asking whether every file in it was a supporting one four times over.
 /// The sidebar's tags take one more pass, when asked for.
 fn count(conn: &Connection, q: &SearchQuery, look: Option<&LookRank>, f: &Filter, with_facets: bool) -> Result<Counts> {
-    // The search without the three things told apart by the grouping: the kind, whether a file supports another,
-    // and in a folder, whether it's directly in it or in a folder of its own.
-    let wide = SearchQuery { kind: None, hide_supporting: false, folder: None, ..q.clone() };
-    let mut w = build_filter(&wide, false, look);
-    if let Some(folder) = browsed_folder(q).filter(|f| !f.is_empty()) {
-        w.clauses.push("a.path > ? AND a.path < ?".to_owned());
-        w.params.push(SqlValue::Text(format!("{folder}/")));
-        w.params.push(SqlValue::Text(format!("{folder}0")));
-    }
+    let w = wide_filter(q, look);
     // Searching words in a folder finds what's anywhere under it, so there are no folders to show.
     let mut params = Vec::new();
     let rest = match browsed_folder(q).filter(|_| fts_query_of(q).is_none()) {
@@ -292,12 +284,68 @@ fn count(conn: &Connection, q: &SearchQuery, look: Option<&LookRank>, f: &Filter
         }
     }
     let facet = |(value, count): (String, i64)| Facet { value, count: count as u64 };
-    let mut kinds = kinds.into_iter().map(facet).collect::<Vec<_>>();
-    kinds.sort_by(|a, b| b.count.cmp(&a.count).then_with(|| a.value.cmp(&b.value)));
     let mut folders = folders.into_iter().map(facet).collect::<Vec<_>>();
     folders.sort_by_cached_key(|f| f.value.to_ascii_lowercase());
     let tags = if with_facets { Some(tags(conn, f)?) } else { None };
-    Ok(Counts { total, supporting_hidden, kinds, folders, tags })
+    Ok(Counts { total, supporting_hidden, kinds: kind_facets(kinds), folders, tags })
+}
+
+/// The search without the three things [`count`] tells apart: the kind, whether a file supports another, and in a
+/// folder, whether it's directly in it or in a folder of its own.
+fn wide_filter(q: &SearchQuery, look: Option<&LookRank>) -> Filter {
+    let wide = SearchQuery { kind: None, hide_supporting: false, folder: None, ..q.clone() };
+    let mut w = build_filter(&wide, false, look);
+    if let Some(folder) = browsed_folder(q).filter(|f| !f.is_empty()) {
+        w.clauses.push("a.path > ? AND a.path < ?".to_owned());
+        w.params.push(SqlValue::Text(format!("{folder}/")));
+        w.params.push(SqlValue::Text(format!("{folder}0")));
+    }
+    w
+}
+
+/// How many of each kind, most first.
+fn kind_facets(kinds: std::collections::HashMap<String, i64>) -> Vec<Facet> {
+    let mut kinds = kinds.into_iter().map(|(value, n)| Facet { value, count: n as u64 }).collect::<Vec<_>>();
+    kinds.sort_by(|a, b| b.count.cmp(&a.count).then_with(|| a.value.cmp(&b.value)));
+    kinds
+}
+
+/// A search by words, in one pass through its matches: what it finds in order (by row, see [`assets_in_order`]),
+/// and its counts but the tags. Ranking the matches goes through all of them anyway, which for the first letter typed
+/// is most of the library, and counting them was a second pass as long. (Searching words finds what's anywhere under
+/// a folder, so there are no folders to count.)
+fn rank_and_count(conn: &Connection, q: &SearchQuery, order: &str, blobs: &str) -> Result<(Vec<i64>, Counts)> {
+    let w = wide_filter(q, None);
+    let supporting = if q.hide_supporting { SUPPORTING } else { "0" };
+    let mut stmt = conn.prepare(&format!(
+        "SELECT a.rowid, a.kind, {supporting} FROM assets a {blobs} {} {} ORDER BY {order}",
+        w.join,
+        w.where_sql()
+    ))?;
+    let mut rows = stmt.query(params_from_iter(&w.params))?;
+    let asked = q.kind.as_deref().filter(|k| !k.is_empty());
+    let (mut found, mut supporting_hidden) = (Vec::new(), 0);
+    let mut kinds = std::collections::HashMap::<String, i64>::new();
+    while let Some(r) = rows.next()? {
+        let kind = r.get_ref(1)?.as_str()?;
+        let of_kind = asked.is_none_or(|k| k == kind);
+        // Kinds count every kind; the rest only the kind asked for. Supporting files count only as hidden ones.
+        if r.get::<_, bool>(2)? {
+            supporting_hidden += i64::from(of_kind);
+            continue;
+        }
+        if of_kind {
+            found.push(r.get::<_, i64>(0)?);
+        }
+        match kinds.get_mut(kind) {
+            Some(n) => *n += 1,
+            None => {
+                kinds.insert(kind.to_owned(), 1);
+            }
+        }
+    }
+    let total = found.len() as i64;
+    Ok((found, Counts { total, supporting_hidden, kinds: kind_facets(kinds), folders: Vec::new(), tags: None }))
 }
 
 /// In the library rather than the archive: neither the asset nor its pack is archived. Expects the asset as `a`.
@@ -396,27 +444,56 @@ pub(crate) fn search_ranked(
     // afresh each time, so its counts aren't). Read before counting, so a write while counting makes them stale.
     let writes = super::writes();
     let key = if look.is_none() { counts_key(conn, q) } else { None };
-    let counts = match key.as_deref().and_then(|k| kept_counts(k, writes)) {
+    // A search by words goes through all it finds to rank them, so what it finds in order is kept too, for its next
+    // pages, and counted on the way.
+    let words = look.is_none() && f.ranked;
+    let order_key = key.as_ref().filter(|_| words).map(|k| format!("{k}\n{}", q.sort.as_deref().unwrap_or_default()));
+    let mut counted = None;
+    let ranked = match order_key.as_deref().and_then(|k| kept_ranked(k, writes)) {
+        Some(ranked) => Some(ranked),
+        None if words => {
+            let (found, counts) = rank_and_count(conn, q, order, blobs)?;
+            counted = Some(counts);
+            let found = Arc::new(found);
+            if let Some(k) = order_key {
+                keep_ranked(k, writes, &found);
+            }
+            Some(found)
+        }
+        None => None,
+    };
+    // A search by words has what it finds already: its tags are counted from those, not by searching again.
+    let sidebar_tags = || match &ranked {
+        Some(found) => tags_of_rows(conn, found),
+        None => tags(conn, &f),
+    };
+    let counts = match (key.as_deref().and_then(|k| kept_counts(k, writes)), counted) {
         // The next page of a search, or the same search again, while the library is the same.
-        Some(counts) if counts.tags.is_some() || !with_facets => counts,
+        (Some(counts), _) if counts.tags.is_some() || !with_facets => counts,
         // The sidebar asked for after the first page came without it: only the tags are left to count.
-        Some(counts) => Counts { tags: Some(tags(conn, &f)?), ..counts },
-        None => count(conn, q, look, &f, with_facets)?,
+        (Some(counts), _) => Counts { tags: Some(sidebar_tags()?), ..counts },
+        (None, Some(counts)) if with_facets => Counts { tags: Some(sidebar_tags()?), ..counts },
+        (None, Some(counts)) => counts,
+        (None, None) => count(conn, q, look, &f, with_facets)?,
     };
     if let Some(key) = key {
         keep_counts(key, writes, &counts);
     }
-    let mut page_params = f.params.clone();
-    page_params.push(SqlValue::Integer(limit));
-    page_params.push(SqlValue::Integer(offset));
-    let ids = conn
-        .prepare(&format!(
-            "SELECT a.id FROM assets a {blobs} {} {where_sql} ORDER BY {order} LIMIT ? OFFSET ?",
+    let rows = if let Some(ranked) = ranked {
+        let from = usize::try_from(offset).unwrap_or(usize::MAX).min(ranked.len());
+        ranked[from..].iter().take(usize::try_from(limit).unwrap_or(usize::MAX)).copied().collect()
+    } else {
+        let mut page_params = f.params.clone();
+        page_params.push(SqlValue::Integer(limit));
+        page_params.push(SqlValue::Integer(offset));
+        conn.prepare(&format!(
+            "SELECT a.rowid FROM assets a {blobs} {} {where_sql} ORDER BY {order} LIMIT ? OFFSET ?",
             f.join
         ))?
-        .query_map(params_from_iter(&page_params), |r| r.get::<_, String>(0))?
-        .collect::<rusqlite::Result<Vec<_>>>()?;
-    let mut items = assets_in_order(conn, &ids)?;
+        .query_map(params_from_iter(&page_params), |r| r.get::<_, i64>(0))?
+        .collect::<rusqlite::Result<Vec<_>>>()?
+    };
+    let mut items = assets_in_order(conn, &rows)?;
     attach_tags(conn, &mut items)?;
 
     let Counts { total, supporting_hidden, kinds, folders, tags } = counts;
@@ -425,22 +502,22 @@ pub(crate) fn search_ranked(
     Ok(SearchPage { items, total: total as u64, kinds, tags, supporting_hidden: supporting_hidden as u64, folders })
 }
 
-/// The assets with these ids, in their order.
-fn assets_in_order(conn: &Connection, ids: &[String]) -> Result<Vec<Asset>> {
-    if ids.is_empty() {
+/// The assets in these rows, in their order. (A search keeps what it finds by row, a number, rather than by id: a
+/// few bytes each for the many thousands the first letter typed finds.)
+fn assets_in_order(conn: &Connection, rows: &[i64]) -> Result<Vec<Asset>> {
+    if rows.is_empty() {
         return Ok(Vec::new());
     }
     let mut items = conn
         .prepare_cached(&format!(
-            "SELECT {ASSET_COLS} FROM assets a JOIN packs p ON p.id = a.pack_id JOIN blobs b ON b.hash = a.blob_hash
-              WHERE a.id IN (SELECT value FROM json_each(?1))"
+            "SELECT {ASSET_COLS}, a.rowid FROM assets a JOIN packs p ON p.id = a.pack_id JOIN blobs b ON b.hash = a.blob_hash
+              WHERE a.rowid IN (SELECT value FROM json_each(?1))"
         ))?
-        .query_map([serde_json::to_string(ids)?], asset_from_row)?
+        .query_map([serde_json::to_string(rows)?], |r| Ok((r.get::<_, i64>(r.as_ref().column_count() - 1)?, asset_from_row(r)?)))?
         .collect::<rusqlite::Result<Vec<_>>>()?;
-    let place: std::collections::HashMap<&str, usize> =
-        ids.iter().enumerate().map(|(i, id)| (id.as_str(), i)).collect();
-    items.sort_by_key(|a| place.get(a.id.as_str()).copied().unwrap_or(usize::MAX));
-    Ok(items)
+    let place: std::collections::HashMap<i64, usize> = rows.iter().enumerate().map(|(i, row)| (*row, i)).collect();
+    items.sort_by_key(|(row, _)| place.get(row).copied().unwrap_or(usize::MAX));
+    Ok(items.into_iter().map(|(_, asset)| asset).collect())
 }
 
 /// How many assets a search finds and how many more hiding supporting files left out, how many of each kind, the
@@ -465,6 +542,26 @@ fn tags(conn: &Connection, f: &Filter) -> Result<Vec<Facet>> {
             f.where_sql()
         ))?
         .query_map(params_from_iter(&f.params), |r| Ok(Facet { value: r.get(0)?, count: r.get::<_, i64>(1)? as u64 }))?
+        .collect::<rusqlite::Result<Vec<_>>>()?)
+}
+
+/// [`tags`] of what a search by words found (see [`rank_and_count`]), by row: what it finds is already worked out,
+/// where [`tags`] matches the words and goes through every filter again for each asset.
+fn tags_of_rows(conn: &Connection, rows: &[i64]) -> Result<Vec<Facet>> {
+    if rows.is_empty() {
+        return Ok(Vec::new());
+    }
+    // CROSS JOIN keeps the order: from the rows found to their assets to their tags, never through every tag.
+    Ok(conn
+        .prepare_cached(
+            "SELECT t.tag, COUNT(*) FROM json_each(?1) j CROSS JOIN assets a ON a.rowid = j.value
+               CROSS JOIN asset_tags t ON t.asset_id = a.id
+              WHERE t.tag NOT LIKE 'set:%'
+              GROUP BY t.tag ORDER BY 2 DESC, 1 ASC LIMIT 60",
+        )?
+        .query_map([serde_json::to_string(rows)?], |r| {
+            Ok(Facet { value: r.get(0)?, count: r.get::<_, i64>(1)? as u64 })
+        })?
         .collect::<rusqlite::Result<Vec<_>>>()?)
 }
 
@@ -504,6 +601,31 @@ fn keep_counts(key: String, writes: u64, counts: &Counts) {
         kept.remove(0);
     }
     kept.push((key, writes, counts.clone()));
+}
+
+/// How many recent searches by words keep what they found in order.
+const RANKED_KEPT: usize = 8;
+
+/// One kept search: its key, the writes it was made at, and what it found.
+type Ranked = (String, u64, Arc<Vec<i64>>);
+
+/// Recent searches by words, what they found in order (see [`rank_and_count`]) under their [`counts_key`] and order,
+/// with how many writes the library had had when they searched: newest last.
+static RANKED: std::sync::Mutex<Vec<Ranked>> = std::sync::Mutex::new(Vec::new());
+
+fn kept_ranked(key: &str, writes: u64) -> Option<Arc<Vec<i64>>> {
+    let kept = RANKED.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
+    kept.iter().find(|(k, at, _)| *k == key && *at == writes).map(|(_, _, found)| Arc::clone(found))
+}
+
+/// Keeps what a search found as of `writes`, read before it searched, as [`keep_counts`] does its counts.
+fn keep_ranked(key: String, writes: u64, found: &Arc<Vec<i64>>) {
+    let mut kept = RANKED.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
+    kept.retain(|(k, at, _)| *k != key && *at == writes);
+    if kept.len() >= RANKED_KEPT {
+        kept.remove(0);
+    }
+    kept.push((key, writes, Arc::clone(found)));
 }
 
 /// Tags in use and how many assets have each, most used first: those starting with `prefix`, or with `anywhere`
@@ -604,6 +726,106 @@ mod tests {
             )
             .unwrap();
         assert_eq!(counted(60), (2, vec![("texture".to_owned(), 2)]));
+    }
+
+    #[test]
+    fn a_search_by_words_is_kept_for_its_next_pages_until_the_library_changes() {
+        let dir = tempfile::tempdir().unwrap();
+        let pool = open(&dir.path().join("hoard.db"), &dir.path().join("backups")).unwrap();
+        let conn = pool.get().unwrap();
+        let add = |c: &Connection, id: &str, name: &str, kind: &str| {
+            c.execute(
+                "INSERT INTO assets (id, pack_id, blob_hash, path, name, ext, kind, created_at, updated_at)
+                 VALUES (?1, 'p1', 'h', ?1 || '.png', ?2, 'png', ?3, 'x', 'x')",
+                params![id, name, kind],
+            )
+            .unwrap();
+            c.execute_batch(&format!(
+                "INSERT INTO assets_fts (rowid, asset_id, name, words, tags) SELECT rowid, id, name, '', '' FROM assets
+                   WHERE id = '{id}';
+                 UPDATE assets SET fts_row = rowid WHERE id = '{id}';"
+            ))
+            .unwrap();
+        };
+        conn.execute_batch(
+            "INSERT INTO blobs (hash, size, created_at) VALUES ('h', 1, 'x');
+             INSERT INTO packs (id, name, status, created_at) VALUES ('p1', 'Kit', 'ready', 'x');",
+        )
+        .unwrap();
+        add(&conn, "r1", "rock one", "texture");
+        add(&conn, "r2", "rock two", "model");
+        add(&conn, "r3", "rock three", "texture");
+        add(&conn, "m", "moss", "texture");
+        // The model needs the third rock as raw data: it's a supporting file.
+        conn.execute("INSERT INTO asset_links (from_id, to_id, rel) VALUES ('r2', 'r3', 'buffer')", []).unwrap();
+        let q = SearchQuery {
+            q: Some("rock".into()),
+            sort: Some("name".into()),
+            hide_supporting: true,
+            limit: Some(1),
+            ..Default::default()
+        };
+        let page = |q: &SearchQuery, offset: u32| {
+            let found = search(&conn, &SearchQuery { offset: Some(offset), ..q.clone() }, false).unwrap();
+            let kinds = found.kinds.iter().map(|k| format!("{} {}", k.value, k.count)).collect::<Vec<_>>();
+            (found.items.iter().map(|a| a.id.clone()).collect::<Vec<_>>(), found.total, found.supporting_hidden, kinds)
+        };
+        let both = vec!["model 1".to_owned(), "texture 1".to_owned()];
+        assert_eq!(page(&q, 0), (vec!["r1".to_owned()], 2, 1, both.clone()));
+        assert_eq!(page(&q, 1), (vec!["r2".to_owned()], 2, 1, both.clone()));
+        assert_eq!(page(&q, 2), (vec![], 2, 1, both.clone()));
+        let textures = SearchQuery { kind: Some("texture".into()), ..q.clone() };
+        assert_eq!(page(&textures, 0), (vec!["r1".to_owned()], 1, 1, both.clone()));
+        // Written on another connection: the next page searches again.
+        add(&pool.get().unwrap(), "r0", "rock a", "texture");
+        assert_eq!(page(&q, 1), (vec!["r1".to_owned()], 3, 1, vec!["texture 2".to_owned(), "model 1".to_owned()]));
+    }
+
+    #[test]
+    fn a_search_by_words_counts_the_tags_of_what_it_found() {
+        let conn = test_library();
+        conn.execute_batch(
+            "INSERT INTO blobs (hash, size, created_at) VALUES ('h', 1, 'x');
+             INSERT INTO packs (id, name, status, created_at) VALUES ('p1', 'Kit', 'ready', 'x');",
+        )
+        .unwrap();
+        for (id, name, kind, tags) in [
+            ("r1", "rock one", "texture", "mossy,grey,set:a"),
+            ("r2", "rock two", "model", "grey,set:a"),
+            ("r3", "rock three", "texture", "grey,dark"),
+            ("r4", "rock four", "texture", "mossy"),
+            ("m", "moss", "texture", "mossy,green"),
+        ] {
+            conn.execute(
+                "INSERT INTO assets (id, pack_id, blob_hash, path, name, ext, kind, created_at, updated_at)
+                 VALUES (?1, 'p1', 'h', ?1 || '.png', ?2, 'png', ?3, 'x', 'x')",
+                params![id, name, kind],
+            )
+            .unwrap();
+            conn.execute_batch(&format!(
+                "INSERT INTO assets_fts (rowid, asset_id, name, words, tags) SELECT rowid, id, name, '', '' FROM assets
+                   WHERE id = '{id}';
+                 UPDATE assets SET fts_row = rowid WHERE id = '{id}';"
+            ))
+            .unwrap();
+            for tag in tags.split(',') {
+                conn.execute("INSERT INTO asset_tags (asset_id, tag, source) VALUES (?1, ?2, 'x')", params![id, tag])
+                    .unwrap();
+            }
+        }
+        // The model needs the third rock as raw data: hidden, its tags aren't counted.
+        conn.execute("INSERT INTO asset_links (from_id, to_id, rel) VALUES ('r2', 'r3', 'buffer')", []).unwrap();
+        let rock = SearchQuery { q: Some("rock".into()), hide_supporting: true, ..Default::default() };
+        let shown = |q: &SearchQuery| {
+            let listed = |tags: &[Facet]| tags.iter().map(|t| format!("{} {}", t.value, t.count)).collect::<Vec<_>>();
+            let found = listed(&search(&conn, q, true).unwrap().tags);
+            assert_eq!(found, listed(&tags(&conn, &build_filter(q, true, None)).unwrap()), "{q:?}");
+            found
+        };
+        assert_eq!(shown(&rock), ["grey 2", "mossy 2"]);
+        assert_eq!(shown(&SearchQuery { kind: Some("texture".into()), ..rock.clone() }), ["mossy 2", "grey 1"]);
+        assert_eq!(shown(&SearchQuery { hide_supporting: false, ..rock.clone() }), ["grey 3", "mossy 2", "dark 1"]);
+        assert_eq!(shown(&SearchQuery { q: Some("nothing".into()), ..rock }), Vec::<String>::new());
     }
 
     #[test]
@@ -819,6 +1041,47 @@ mod tests {
             let page = search_ranked(&conn, &q, facets, look).unwrap();
             println!("{label}: {} of {} in {:.1?}", page.items.len(), page.total, started.elapsed());
         };
+        let alone = |label: &str, q: SearchQuery| {
+            let f = build_filter(&q, true, None);
+            let started = std::time::Instant::now();
+            let counts = count(&conn, &q, None, &f, false).unwrap();
+            let counted = started.elapsed();
+            let started = std::time::Instant::now();
+            let tags = tags(&conn, &f).unwrap();
+            println!(
+                "{label}: counted {} in {counted:.1?}, {} tags in {:.1?}",
+                counts.total,
+                tags.len(),
+                started.elapsed()
+            );
+        };
+        // The page alone, put in order without counting: what's left of a search once its counts are kept.
+        let page_alone = |label: &str, q: SearchQuery| {
+            let f = build_filter(&q, true, None);
+            let started = std::time::Instant::now();
+            let n = conn
+                .prepare(&format!(
+                    "SELECT a.rowid FROM assets a {} {} ORDER BY a.created_at DESC, a.path ASC LIMIT 60",
+                    f.join,
+                    f.where_sql()
+                ))
+                .unwrap()
+                .query_map(params_from_iter(&f.params), |r| r.get::<_, i64>(0))
+                .unwrap()
+                .count();
+            println!("{label}: {n} in order in {:.1?}", started.elapsed());
+        };
+        alone("everything, alone", SearchQuery { hide_supporting: true, ..Default::default() });
+        alone(
+            "the first letter, alone",
+            SearchQuery { q: Some("t".into()), hide_supporting: true, ..Default::default() },
+        );
+        alone("words, alone", SearchQuery { q: Some("rock".into()), hide_supporting: true, ..Default::default() });
+        let big_pack = SearchQuery { pack: Some("p0".into()), hide_supporting: true, ..Default::default() };
+        alone("a big pack, alone", big_pack.clone());
+        page_alone("a big pack's page, alone", big_pack.clone());
+        alone("a big pack's top folder, alone", SearchQuery { folder: Some(String::new()), ..big_pack.clone() });
+        page_alone("a big pack's top folder's page, alone", SearchQuery { folder: Some(String::new()), ..big_pack });
         let words = || SearchQuery { q: Some("rock".into()), hide_supporting: true, ..Default::default() };
         time("browse everything", SearchQuery { hide_supporting: true, ..Default::default() }, true, None);
         time("browse everything, no facets", SearchQuery { hide_supporting: true, ..Default::default() }, false, None);

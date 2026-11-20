@@ -460,7 +460,13 @@ struct Kept {
     print: Print,
     generation: u64,
     sets: Arc<Vec<CopyGroup>>,
+    /// Saved before the server last started (see [`SAVED_AS`]): what's changed since can't be told, so they're worked
+    /// out again.
+    from_before: bool,
 }
+
+/// The file the sets are saved in for the next start, so the Near copies page after a restart is answered at once.
+const SAVED_AS: &str = "near-copies";
 
 /// What would change the library's sets: its live assets and packs, the last change to an asset, and how many
 /// pictures have been looked at and sounds listened to. Cheap to read, unlike the sets.
@@ -490,18 +496,37 @@ impl Cache {
     fn kept(&self) -> Option<Kept> {
         self.kept.lock().unwrap_or_else(PoisonError::into_inner).clone()
     }
+
+    /// The sets saved before the server started, kept unless they've been worked out meanwhile.
+    async fn adopt_saved(&self) {
+        let Some((sets, _)) = db::saved_later::<Vec<CopyGroup>>(SAVED_AS).await else { return };
+        let mut kept = self.kept.lock().unwrap_or_else(PoisonError::into_inner);
+        if kept.is_none() {
+            *kept = Some(Kept {
+                at: Instant::now(),
+                print: Print::default(),
+                generation: self.generation.fetch_add(1, Ordering::Relaxed) + 1,
+                sets: Arc::new(sets),
+                from_before: true,
+            });
+        }
+    }
 }
 
 /// The library's sets of near copies (see [`all`]). Once worked out they're always answered at once: when the library
 /// has changed since, or they're a few minutes old, they're worked out again in the background, and the answer says so.
-/// Only the very first time (they're worked out shortly after start, see [`warm`]) does this wait for them.
+/// After a restart the sets from before are answered with while they're worked out again. Only the very first time,
+/// with none from before (they're worked out shortly after start, see [`warm`]), does this wait for them.
 pub(crate) async fn groups(state: &AppState) -> Result<Groups> {
+    if state.near_copies.kept().is_none() {
+        state.near_copies.adopt_saved().await;
+    }
     let Some(kept) = state.near_copies.kept() else {
         let kept = work_out(state).await?;
         return Ok(Groups { sets: kept.sets, generation: kept.generation, refreshing: false });
     };
     let current = db::call(&state.pool, |c| print(c)).await?;
-    let outdated = current != kept.print || kept.at.elapsed() >= FRESH;
+    let outdated = kept.from_before || current != kept.print || kept.at.elapsed() >= FRESH;
     if outdated {
         refresh(state);
     }
@@ -536,6 +561,7 @@ async fn work_out(state: &AppState) -> Result<Kept> {
     let _working = state.near_copies.working.lock().await;
     if let Some(kept) = state.near_copies.kept()
         && kept.at >= asked
+        && !kept.from_before
     {
         return Ok(kept);
     }
@@ -548,8 +574,11 @@ async fn work_out(state: &AppState) -> Result<Kept> {
         print: seen,
         generation: state.near_copies.generation.fetch_add(1, Ordering::Relaxed) + 1,
         sets: Arc::new(sets),
+        from_before: false,
     };
     *state.near_copies.kept.lock().unwrap_or_else(PoisonError::into_inner) = Some(kept.clone());
+    // Saved while still working, so two can't be saved over each other.
+    db::save_later(SAVED_AS, db::now(), Arc::clone(&kept.sets)).await;
     Ok(kept)
 }
 

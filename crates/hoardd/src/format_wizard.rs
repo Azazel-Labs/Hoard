@@ -65,7 +65,7 @@ struct FormatRow {
     toml: String,
 }
 
-#[derive(Serialize, Clone)]
+#[derive(Serialize, Deserialize, Clone)]
 struct Unread {
     /// The file name, lowercase.
     name: String,
@@ -74,7 +74,7 @@ struct Unread {
     example: Place,
 }
 
-#[derive(Serialize, Clone)]
+#[derive(Serialize, Deserialize, Clone)]
 struct Place {
     asset_id: String,
     pack_id: String,
@@ -97,7 +97,19 @@ struct Looked {
     /// The library's write count and [`FORMATS`] when it was worked out.
     writes: u64,
     formats: u64,
+    /// Saved before the server last started (see [`SAVED_AS`]): what's changed since can't be told, so it's worked
+    /// out again.
+    from_before: bool,
 }
+
+impl Looked {
+    fn current(&self) -> bool {
+        !self.from_before && self.writes == db::writes() && self.formats == FORMATS.load(Ordering::Acquire)
+    }
+}
+
+/// The file it's saved in for the next start: worked out again after a restart, it took 11 s on one server.
+const SAVED_AS: &str = "unread-store-files";
 
 static LOOKED: Mutex<Option<Looked>> = Mutex::new(None);
 /// Held while it's worked out, so it's worked out once however many ask.
@@ -113,14 +125,19 @@ struct UnreadAsk {
 }
 
 /// `GET /api/admin/store-formats/unread`: files in the library that may be a store's but no format reads. The one kept
-/// unless there's none, or `fresh` asks; when it's outdated, `refreshing` says a new one is being worked out.
+/// (after a restart, the one from before) unless there's none, or `fresh` asks; when it's outdated, `refreshing` says
+/// a new one is being worked out.
 async fn unread_files(State(state): State<AppState>, Query(q): Query<UnreadAsk>) -> ApiResult<Json<Value>> {
-    let kept = || {
-        LOOKED.lock().unwrap_or_else(PoisonError::into_inner).as_ref().map(|l| {
-            let current = l.writes == db::writes() && l.formats == FORMATS.load(Ordering::Acquire);
-            (Arc::clone(&l.unread), current)
-        })
-    };
+    let kept =
+        || LOOKED.lock().unwrap_or_else(PoisonError::into_inner).as_ref().map(|l| (Arc::clone(&l.unread), l.current()));
+    if kept().is_none()
+        && let Some((unread, _)) = db::saved_later::<Vec<Unread>>(SAVED_AS).await
+    {
+        let mut looked = LOOKED.lock().unwrap_or_else(PoisonError::into_inner);
+        if looked.is_none() {
+            *looked = Some(Looked { unread: Arc::new(unread), writes: 0, formats: 0, from_before: true });
+        }
+    }
     let (unread, current) = match kept() {
         Some((_, false)) if q.fresh => {
             look(&state).await?;
@@ -151,14 +168,17 @@ async fn look(state: &AppState) -> anyhow::Result<()> {
         .lock()
         .unwrap_or_else(PoisonError::into_inner)
         .as_ref()
-        .is_some_and(|l| l.writes >= writes && l.formats >= formats);
+        .is_some_and(|l| !l.from_before && l.writes >= writes && l.formats >= formats);
     if done {
         return Ok(());
     }
     // Counted before it's worked out, so a write meanwhile leaves it outdated.
     let (writes, formats) = (db::writes(), FORMATS.load(Ordering::Acquire));
     let unread = Arc::new(unread(state).await?);
-    *LOOKED.lock().unwrap_or_else(PoisonError::into_inner) = Some(Looked { unread, writes, formats });
+    *LOOKED.lock().unwrap_or_else(PoisonError::into_inner) =
+        Some(Looked { unread: Arc::clone(&unread), writes, formats, from_before: false });
+    // Saved while still looking, so two can't be saved over each other.
+    db::save_later(SAVED_AS, db::now(), unread).await;
     Ok(())
 }
 

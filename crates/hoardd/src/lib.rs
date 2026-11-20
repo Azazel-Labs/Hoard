@@ -221,6 +221,7 @@ pub async fn run(cfg: Config) -> Result<()> {
         tracing::info!(path = %loc.path, "your files stay where they are, as the library location \"Library\"");
     }
     store_formats::load(&cfg.data_dir.join("formats"));
+    db::keep_in(cfg.kept_dir());
     let settings = settings::Store::load(&cfg, &*pool.get()?)?;
     let effective = settings.get();
     let blobs = BlobStore::open(&cfg, pool.clone(), effective.s3.clone())?;

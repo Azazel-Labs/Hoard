@@ -12,6 +12,7 @@ use serde_json::{Value, json};
 
 /// What takes the space: these read every file the library has (most of a second, on a big one), so they're kept
 /// and made again in the background once it changes. The counts are always current.
+#[derive(serde::Serialize, serde::Deserialize)]
 struct Sizes {
     stored_bytes: u64,
     logical_bytes: u64,
@@ -20,7 +21,7 @@ struct Sizes {
     conversion_cache_bytes: u64,
 }
 
-static SIZES: db::Kept<Sizes> = db::Kept::new("the library's sizes", sizes, Duration::from_secs(10));
+static SIZES: db::Kept<Sizes> = db::Kept::new("the library's sizes", "library-sizes", sizes, Duration::from_secs(10));
 
 fn sizes(c: &Connection) -> anyhow::Result<Sizes> {
     let one = |sql: &str| -> anyhow::Result<u64> { Ok(c.query_row(sql, [], |r| r.get::<_, i64>(0))? as u64) };
@@ -93,7 +94,8 @@ pub(super) async fn stats(State(state): State<AppState>) -> ApiResult<Json<Stats
 /// The library report, for Settings' Library page. Working it out reads the whole library (seconds, on a big one),
 /// so it's kept: the page is answered at once with the one last made, and when the library has changed since, a new
 /// one is made in the background; `refreshing` says so, and the page asks again for it.
-static LIBRARY: db::Kept<Value> = db::Kept::new("the library report", library_report, Duration::from_secs(30));
+static LIBRARY: db::Kept<Value> =
+    db::Kept::new("the library report", "library-report", library_report, Duration::from_secs(30));
 
 /// How often what's kept is looked at in the background, and made again if the library has changed.
 const EVERY: Duration = Duration::from_hours(1);

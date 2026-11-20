@@ -281,6 +281,10 @@ impl Config {
     pub(crate) fn tools_dir(&self) -> PathBuf {
         self.cache_root().join("tools")
     }
+    /// What's slow to work out from the library, saved as last worked out for the next start (`db::Kept`).
+    pub(crate) fn kept_dir(&self) -> PathBuf {
+        self.cache_root().join("kept")
+    }
     pub(crate) fn backups_dir(&self) -> PathBuf {
         self.data_dir.join("backups")
     }

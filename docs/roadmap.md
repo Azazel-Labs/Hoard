@@ -8,7 +8,8 @@ isn't yet.
 Measured against a generated library of 300,000 assets in 200 packs (`cargo test -p hoardd --lib big_library --
 --ignored --nocapture`, which prints a timing for each step). Quick already: the pack list (30 ms), a pack's card
 (under a millisecond), tag suggestions, Settings → Issues, sorting by name or size (a few milliseconds), and the
-library's numbers, report and near copies, which are kept and worked out again in the background. Still slow, worst
+library's numbers, report, near copies and store files no format reads, which are kept, saved for the next start
+and worked out again in the background. Still slow, worst
 first:
 
 - **The first letter typed in search: 1.6 s**, its next page 0.36 s. Most of it is ranking every match (85,000 for
@@ -20,9 +21,6 @@ first:
   they could be kept with its ranked ids.
 - **Browsing a big pack: 0.63 s** for a pack of 120,000, with its counts beside the grid. Counts by kind are
   already kept per pack (`pack_kinds`), so the facets with no other filter can come from there.
-- **Kept results start cold after a restart.** The library's numbers, report, near copies and store files' unread
-  list live in memory, so the first visit after a restart works them out again (the unread list took 11 s on one
-  server). Saving the last one in the database would let them answer at once, refreshing behind.
 
 ## Store details for the Unity Asset Store and Humble Bundle
 

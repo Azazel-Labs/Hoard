@@ -29,7 +29,7 @@ mod tags;
 pub(crate) use assets::*;
 pub(crate) use collections::*;
 pub(crate) use jobs::*;
-pub(crate) use kept::Kept;
+pub(crate) use kept::{Kept, save_in as keep_in, save_later, saved_later};
 pub(crate) use packs::*;
 use schema::{MIGRATIONS, migrate};
 pub(crate) use search::*;

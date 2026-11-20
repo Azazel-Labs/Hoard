@@ -2,16 +2,22 @@
 //! ([`crate::store_formats`]) against a file from the library and tries it here on the other files like it. A saved
 //! format goes in `<data dir>/formats/`, and the packs with files it reads are read again. "Share it" puts the format,
 //! the sample and what the sample reads as in a zip laid out like the repository, to send in for everyone.
+//!
+//! Which files no format reads takes reading files from the store, slow when they aren't in the disk's cache, so it's
+//! kept as last worked out and answered at once, worked out again once the library or the formats change.
 
 use crate::i18n::tr;
 use std::collections::HashMap;
 use std::io::Write as _;
+use std::sync::atomic::{AtomicU64, Ordering};
+use std::sync::{Arc, Mutex, PoisonError};
 
-use axum::extract::{Path, State};
+use axum::extract::{Path, Query, State};
 use axum::http::{StatusCode, header};
 use axum::response::{IntoResponse, Response};
 use axum::routing::{delete, get, post};
 use axum::{Json, Router};
+use futures_util::StreamExt as _;
 use rusqlite::params_from_iter;
 use rusqlite::types::Value as Sql;
 use serde::{Deserialize, Serialize};
@@ -34,6 +40,8 @@ const SOUNDS_LIKE: &[&str] =
 const MAX_UNREAD: usize = 30;
 /// Files of each name looked at before deciding the formats read them all.
 const LOOK_AT: usize = 5;
+/// Names whose files are looked at together.
+const AT_ONCE: usize = 8;
 /// Files the wizard tries a format on.
 const TRY_ON: i64 = 40;
 /// Text files bigger than this aren't read.
@@ -42,6 +50,7 @@ const MAX_TOML: usize = 64 * 1024;
 pub(crate) fn router() -> Router<AppState> {
     Router::new()
         .route("/api/admin/store-formats", get(list).post(save))
+        .route("/api/admin/store-formats/unread", get(unread_files))
         .route("/api/admin/store-formats/try", post(try_format))
         .route("/api/admin/store-formats/share", post(share))
         .route("/api/admin/store-formats/{file}", delete(remove))
@@ -56,7 +65,7 @@ struct FormatRow {
     toml: String,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Clone)]
 struct Unread {
     /// The file name, lowercase.
     name: String,
@@ -73,14 +82,89 @@ struct Place {
     path: String,
 }
 
-/// `GET /api/admin/store-formats`: the formats, and files in the library that may be a store's but no format reads.
-async fn list(State(state): State<AppState>) -> ApiResult<Json<Value>> {
+/// `GET /api/admin/store-formats`: the formats.
+async fn list() -> Json<Value> {
     let formats: Vec<FormatRow> = store_formats::all()
         .iter()
         .map(|f| FormatRow { name: f.name.clone(), file: f.file.clone(), custom: f.custom, toml: f.text.clone() })
         .collect();
-    let unread = unread(&state).await?;
-    Ok(Json(json!({ "formats": formats, "unread": unread, "dir": store_formats::dir() })))
+    Json(json!({ "formats": formats, "dir": store_formats::dir() }))
+}
+
+/// Which files no format reads, as last worked out.
+struct Looked {
+    unread: Arc<Vec<Unread>>,
+    /// The library's write count and [`FORMATS`] when it was worked out.
+    writes: u64,
+    formats: u64,
+}
+
+static LOOKED: Mutex<Option<Looked>> = Mutex::new(None);
+/// Held while it's worked out, so it's worked out once however many ask.
+static LOOKING: tokio::sync::Mutex<()> = tokio::sync::Mutex::const_new(());
+/// Counts the formats saved and removed: what was worked out with others is outdated.
+static FORMATS: AtomicU64 = AtomicU64::new(0);
+
+#[derive(Deserialize)]
+struct UnreadAsk {
+    /// Wait for it to be worked out again when it's outdated, rather than answer with the one kept.
+    #[serde(default)]
+    fresh: bool,
+}
+
+/// `GET /api/admin/store-formats/unread`: files in the library that may be a store's but no format reads. The one kept
+/// unless there's none, or `fresh` asks; when it's outdated, `refreshing` says a new one is being worked out.
+async fn unread_files(State(state): State<AppState>, Query(q): Query<UnreadAsk>) -> ApiResult<Json<Value>> {
+    let kept = || {
+        LOOKED.lock().unwrap_or_else(PoisonError::into_inner).as_ref().map(|l| {
+            let current = l.writes == db::writes() && l.formats == FORMATS.load(Ordering::Acquire);
+            (Arc::clone(&l.unread), current)
+        })
+    };
+    let (unread, current) = match kept() {
+        Some((_, false)) if q.fresh => {
+            look(&state).await?;
+            kept().ok_or_else(|| anyhow::anyhow!("the unread files couldn't be worked out"))?
+        }
+        Some(k) => k,
+        None => {
+            look(&state).await?;
+            kept().ok_or_else(|| anyhow::anyhow!("the unread files couldn't be worked out"))?
+        }
+    };
+    if !current {
+        let state = Arc::clone(&state);
+        tokio::spawn(async move {
+            if let Err(e) = look(&state).await {
+                tracing::warn!(error = %format!("{e:#}"), "could not work out which files no format reads");
+            }
+        });
+    }
+    Ok(Json(json!({ "unread": *unread, "refreshing": !current })))
+}
+
+/// Work out which files no format reads again and keep it, unless that's been done since this was asked.
+async fn look(state: &AppState) -> anyhow::Result<()> {
+    let (writes, formats) = (db::writes(), FORMATS.load(Ordering::Acquire));
+    let _one = LOOKING.lock().await;
+    let done = LOOKED
+        .lock()
+        .unwrap_or_else(PoisonError::into_inner)
+        .as_ref()
+        .is_some_and(|l| l.writes >= writes && l.formats >= formats);
+    if done {
+        return Ok(());
+    }
+    // Counted before it's worked out, so a write meanwhile leaves it outdated.
+    let (writes, formats) = (db::writes(), FORMATS.load(Ordering::Acquire));
+    let unread = Arc::new(unread(state).await?);
+    *LOOKED.lock().unwrap_or_else(PoisonError::into_inner) = Some(Looked { unread, writes, formats });
+    Ok(())
+}
+
+/// The formats changed: which files they don't read is worked out again.
+fn formats_changed() {
+    FORMATS.fetch_add(1, Ordering::AcqRel);
 }
 
 /// Files of one name.
@@ -134,33 +218,38 @@ async fn unread(state: &AppState) -> anyhow::Result<Vec<Unread>> {
     groups.retain(|g| g.packs.len() >= 2 || SOUNDS_LIKE.iter().any(|w| g.name.contains(w)));
     groups.sort_by(|a, b| b.packs.len().cmp(&a.packs.len()).then_with(|| a.name.cmp(&b.name)));
 
-    let mut out = Vec::new();
-    for g in groups {
-        if out.len() >= MAX_UNREAD {
+    // Several names at once, in order, until there are enough.
+    let out = futures_util::stream::iter(groups)
+        .map(|g| async move {
+            let example = unread_example(state, &g).await?;
+            Some(Unread { name: g.name, packs: g.packs.len(), files: g.files.len(), example })
+        })
+        .buffered(AT_ONCE)
+        .filter_map(std::future::ready)
+        .take(MAX_UNREAD)
+        .collect()
+        .await;
+    Ok(out)
+}
+
+/// A file of the name no format reads. One file from each of the first few packs is looked at: a name some format
+/// reads in one pack may be another store's in the next (license.txt).
+async fn unread_example(state: &AppState, g: &Group) -> Option<Place> {
+    let mut seen = Vec::new();
+    for (place, hash) in &g.files {
+        if seen.len() >= LOOK_AT {
             break;
         }
-        // One file from each of the first few packs: a name some format reads in one pack may be another store's in
-        // the next (license.txt).
-        let mut seen = Vec::new();
-        let mut example = None;
-        for (place, hash) in &g.files {
-            if seen.len() >= LOOK_AT || example.is_some() {
-                break;
-            }
-            if seen.contains(&place.pack_id) {
-                continue;
-            }
-            seen.push(place.pack_id.clone());
-            let Ok(bytes) = state.blobs.read_all(hash).await else { continue };
-            if sidecar::read(&place.path, &String::from_utf8_lossy(&bytes)).is_none() {
-                example = Some(place.clone());
-            }
+        if seen.contains(&place.pack_id) {
+            continue;
         }
-        if let Some(example) = example {
-            out.push(Unread { name: g.name, packs: g.packs.len(), files: g.files.len(), example });
+        seen.push(place.pack_id.clone());
+        let Ok(bytes) = state.blobs.read_all(hash).await else { continue };
+        if sidecar::read(&place.path, &String::from_utf8_lossy(&bytes)).is_none() {
+            return Some(place.clone());
         }
     }
-    Ok(out)
+    None
 }
 
 #[derive(Deserialize)]
@@ -249,8 +338,8 @@ async fn try_format(State(state): State<AppState>, Json(t): Json<Trial>) -> ApiR
 }
 
 async fn try_on_library(state: &AppState, f: Format) -> anyhow::Result<LibraryRead> {
-    let f = std::sync::Arc::new(f);
-    let f2 = std::sync::Arc::clone(&f);
+    let f = Arc::new(f);
+    let f2 = Arc::clone(&f);
     let (files, packs, rows) = db::call(&state.pool, move |c| {
         let (filter, patterns) = sidecar::filter_for(std::slice::from_ref(&*f2));
         let from = format!(
@@ -328,6 +417,7 @@ async fn save(State(state): State<AppState>, Json(s): Json<Save>) -> ApiResult<J
         }
     }
     store_formats::reload();
+    formats_changed();
     tracing::info!(format = %f.name, file, "store file format saved");
     let packs = read_again(&state, f).await?;
     Ok(Json(json!({ "file": file, "packs": packs })))
@@ -374,6 +464,7 @@ async fn remove(Path(file): Path<String>) -> ApiResult<StatusCode> {
     }
     tokio::fs::remove_file(&path).await.map_err(anyhow::Error::from)?;
     store_formats::reload();
+    formats_changed();
     tracing::info!(file, "store file format removed");
     Ok(StatusCode::NO_CONTENT)
 }

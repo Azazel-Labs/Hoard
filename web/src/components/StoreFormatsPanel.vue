@@ -2,22 +2,28 @@
 // Settings → Store files: the formats Hoard reads stores' files with (see docs/store-formats.md), the files in the
 // library none of them reads that look like a store's, and the wizard that teaches Hoard one.
 import { onMounted, ref, watch } from 'vue'
-import { api, type FilePlace, type StoreFormat, type StoreFormats } from '../api'
+import { api, type FilePlace, type StoreFormat, type StoreFormats, type UnreadFile } from '../api'
 import { t } from '../i18n'
 import { confirmDialog, showError, showOk } from '../ui'
 import { teach } from '../storeFormats'
 import FormatWizard from './FormatWizard.vue'
 
 const data = ref<StoreFormats | null>(null)
+/** The files no format reads: they take reading files from the store, so they come on their own. */
+const unread = ref<UnreadFile[] | null>(null)
 /** The wizard, when it's open: on a file, on a format, or both. */
 const open = ref<{ place?: FilePlace; format?: StoreFormat } | null>(null)
 
-async function load() {
-  try {
-    data.value = await api.storeFormats()
-  } catch (e) {
-    showError(t('storefiles-load-failed', { error: (e as Error).message }))
-  }
+function load() {
+  const failed = (e: unknown) => showError(t('storefiles-load-failed', { error: (e as Error).message }))
+  api.storeFormats().then((f) => (data.value = f), failed)
+  loadUnread().catch(failed)
+}
+/** The list as last worked out at once, then the new one when the library has changed since. */
+async function loadUnread() {
+  const kept = await api.unreadFiles()
+  unread.value = kept.unread
+  if (kept.refreshing) unread.value = (await api.unreadFiles(true)).unread
 }
 onMounted(load)
 
@@ -34,7 +40,7 @@ watch(
 
 function done(saved: boolean) {
   open.value = null
-  if (saved) void load()
+  if (saved) load()
 }
 
 async function remove(f: StoreFormat) {
@@ -48,7 +54,7 @@ async function remove(f: StoreFormat) {
   try {
     await api.removeStoreFormat(f.file)
     showOk(t('storefiles-removed', { name: f.name }))
-    void load()
+    load()
   } catch (e) {
     showError(t('storefiles-remove-failed', { name: f.name, error: (e as Error).message }))
   }
@@ -61,12 +67,12 @@ async function remove(f: StoreFormat) {
     <template v-else>
       <section>
         <div class="sh"><h3>{{ t('storefiles-unread') }}</h3></div>
-        <p v-if="!data" class="what">{{ t('storefiles-loading') }}</p>
-        <p v-else-if="!data.unread.length" class="what none">{{ t('storefiles-unread-none') }}</p>
+        <p v-if="!unread" class="what">{{ t('storefiles-loading') }}</p>
+        <p v-else-if="!unread.length" class="what none">{{ t('storefiles-unread-none') }}</p>
         <template v-else>
           <p class="what">{{ t('storefiles-unread-what') }}</p>
           <ul class="list">
-            <li v-for="u in data.unread" :key="u.name" :data-file="u.name">
+            <li v-for="u in unread" :key="u.name" :data-file="u.name">
               <span class="mono grow">{{ u.name }}</span>
               <span class="n">{{ t('storefiles-unread-packs', { count: u.packs }) }}</span>
               <span class="ex grow" :title="u.example.path">{{ t('storefiles-unread-example', { pack: u.example.pack_name }) }}</span>

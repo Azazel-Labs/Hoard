@@ -440,7 +440,10 @@ export interface FilePlace { asset_id: string; pack_id: string; pack_name: strin
 /** Files of one name that may be a store's, which no format reads. */
 export interface UnreadFile { name: string; packs: number; files: number; example: FilePlace }
 /** Settings → Store files (`GET /api/admin/store-formats`). */
-export interface StoreFormats { formats: StoreFormat[]; unread: UnreadFile[]; dir: string | null }
+export interface StoreFormats { formats: StoreFormat[]; dir: string | null }
+/** The files no format reads (`GET /api/admin/store-formats/unread`), as last worked out, and whether a newer list is
+ *  being worked out. */
+export interface UnreadFiles { unread: UnreadFile[]; refreshing: boolean }
 /** Why a format didn't read a file: its `files` don't take the name, its `require` says it isn't the store's, or it
  *  finds no title. */
 export type FormatMiss = 'name' | 'not_the_stores' | 'no_title'

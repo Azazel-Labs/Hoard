@@ -45,6 +45,10 @@ test.describe('teaching Hoard a store’s file', () => {
       await wizard.getByRole('button', { name: 'Use it here' }).click()
       await expect(wizard).toBeHidden()
       await expect(page.locator(`[data-format="${store}"]`)).toContainText('Yours')
+      // A format read it, so it's no longer among the files no format reads, once those are worked out again.
+      await expect(page.locator(`[data-file="${file}"]`)).toBeHidden({ timeout: 30_000 })
+      const unread = (await (await api.get('/api/admin/store-formats/unread?fresh=true')).json()) as { unread: { name: string }[] }
+      expect(unread.unread.map((u) => u.name)).not.toContain(file)
 
       // The packs with the file are read again: the title names the pack, which had a name nobody chose.
       await expect

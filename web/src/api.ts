@@ -11,7 +11,7 @@ import type {
   AccessToken, Account, AccountSource, ActivityItem, AuthConfig, AuthSettings, AuthStatus, CertCheck, ChatGptStatus,
   Connection, ExampleFile, FormatTrial, HttpsChange, HttpsStatus, IssuePick, Issues, LdapConfig, LdapTestResult,
   LibraryLocation, LocalModels, LocationList, Maintenance, ModelInfo, NewLocation, OAuthConfig, Profile, Role,
-  Settings, SettingsPatch, StoreFormats, UpdateHookCall, UpdateStatus,
+  Settings, SettingsPatch, StoreFormats, UnreadFiles, UpdateHookCall, UpdateStatus,
 } from './types/server'
 
 export type * from './types/library'
@@ -361,6 +361,8 @@ export const api = {
   /** The folders in `path` on the server; an empty path lists the drives or `/`. */
   browse: (path = '') => request<FolderListing>(`/api/admin/fs?path=${encodeURIComponent(path)}`),
   storeFormats: () => request<StoreFormats>('/api/admin/store-formats'),
+  /** As last worked out, or once worked out again when `fresh`. */
+  unreadFiles: (fresh = false) => request<UnreadFiles>(`/api/admin/store-formats/unread${fresh ? '?fresh=true' : ''}`),
   tryStoreFormat: (toml: string, example?: ExampleFile | null) =>
     post<FormatTrial>('/api/admin/store-formats/try', { toml, example: example ?? null }),
   saveStoreFormat: (toml: string, replaces?: string | null) =>

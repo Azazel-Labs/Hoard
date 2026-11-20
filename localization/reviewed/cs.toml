@@ -252,6 +252,22 @@ translation = "Mohou hledat, zobrazovat náhledy a stahovat, ale nemohou nic př
 source = "How they sign in"
 translation = "Jak se přihlašuje"
 
+[messages.account-live]
+source = "Using Hoard now"
+translation = "Právě používají Hoard"
+
+[messages.account-live-hint]
+source = "Apps that have asked Hoard for something in the last 10 minutes. This keeps itself up to date."
+translation = "Aplikace, které se Hoardu na něco zeptaly za posledních 10 minut. Aktualizuje se samo."
+
+[messages.account-live-last]
+source = "last: { $what } · { $when } · requests: { $calls }"
+translation = "naposledy: { $what } · { $when } · požadavky: { $calls }"
+
+[messages.account-live-none]
+source = "Nothing has asked Hoard for anything in the last 10 minutes."
+translation = "Za posledních 10 minut se Hoardu nic na nic nezeptalo."
+
 [messages.account-load-failed]
 source = "Couldn't load accounts: { $error }"
 translation = "Účty se nepodařilo načíst: { $error }"

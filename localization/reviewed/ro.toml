@@ -252,6 +252,22 @@ translation = "Pot căuta, previzualiza și descărca, dar nu pot adăuga, modif
 source = "How they sign in"
 translation = "Cum se conectează"
 
+[messages.account-live]
+source = "Using Hoard now"
+translation = "Folosesc Hoard acum"
+
+[messages.account-live-hint]
+source = "Apps that have asked Hoard for something in the last 10 minutes. This keeps itself up to date."
+translation = "Aplicațiile care au cerut ceva de la Hoard în ultimele 10 minute. Se actualizează singură."
+
+[messages.account-live-last]
+source = "last: { $what } · { $when } · requests: { $calls }"
+translation = "ultima: { $what } · { $when } · cereri: { $calls }"
+
+[messages.account-live-none]
+source = "Nothing has asked Hoard for anything in the last 10 minutes."
+translation = "Nimic nu a cerut nimic de la Hoard în ultimele 10 minute."
+
 [messages.account-load-failed]
 source = "Couldn't load accounts: { $error }"
 translation = "Conturile nu au putut fi încărcate: { $error }"

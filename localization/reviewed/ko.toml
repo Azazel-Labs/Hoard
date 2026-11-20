@@ -252,6 +252,22 @@ translation = "검색, 미리보기, 다운로드는 할 수 있지만, 무엇�
 source = "How they sign in"
 translation = "로그인 방식"
 
+[messages.account-live]
+source = "Using Hoard now"
+translation = "지금 Hoard를 사용 중"
+
+[messages.account-live-hint]
+source = "Apps that have asked Hoard for something in the last 10 minutes. This keeps itself up to date."
+translation = "최근 10분 안에 Hoard에 무언가를 요청한 앱입니다. 자동으로 업데이트됩니다."
+
+[messages.account-live-last]
+source = "last: { $what } · { $when } · requests: { $calls }"
+translation = "마지막: { $what } · { $when } · 요청: { $calls }"
+
+[messages.account-live-none]
+source = "Nothing has asked Hoard for anything in the last 10 minutes."
+translation = "최근 10분 안에 Hoard에 무언가를 요청한 것이 없습니다."
+
 [messages.account-load-failed]
 source = "Couldn't load accounts: { $error }"
 translation = "계정을 불러오지 못했습니다: { $error }"

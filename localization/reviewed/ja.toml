@@ -252,6 +252,22 @@ translation = "検索、プレビュー、ダウンロードはできますが�
 source = "How they sign in"
 translation = "サインイン方法"
 
+[messages.account-live]
+source = "Using Hoard now"
+translation = "いま Hoard を使っているアプリ"
+
+[messages.account-live-hint]
+source = "Apps that have asked Hoard for something in the last 10 minutes. This keeps itself up to date."
+translation = "直近 10 分以内に Hoard に何かを求めたアプリです。自動で更新されます。"
+
+[messages.account-live-last]
+source = "last: { $what } · { $when } · requests: { $calls }"
+translation = "最後: { $what } · { $when } · リクエスト: { $calls }"
+
+[messages.account-live-none]
+source = "Nothing has asked Hoard for anything in the last 10 minutes."
+translation = "直近 10 分以内に Hoard に何かを求めたものはありません。"
+
 [messages.account-load-failed]
 source = "Couldn't load accounts: { $error }"
 translation = "アカウントを読み込めませんでした: { $error }"

@@ -252,6 +252,22 @@ translation = "Kereshetnek, előnézetet nézhetnek és letölthetnek, de semmit
 source = "How they sign in"
 translation = "Bejelentkezés módja"
 
+[messages.account-live]
+source = "Using Hoard now"
+translation = "Most használják a Hoardot"
+
+[messages.account-live-hint]
+source = "Apps that have asked Hoard for something in the last 10 minutes. This keeps itself up to date."
+translation = "Alkalmazások, amelyek az elmúlt 10 percben kértek valamit a Hoardtól. Magától frissül."
+
+[messages.account-live-last]
+source = "last: { $what } · { $when } · requests: { $calls }"
+translation = "utoljára: { $what } · { $when } · kérések: { $calls }"
+
+[messages.account-live-none]
+source = "Nothing has asked Hoard for anything in the last 10 minutes."
+translation = "Az elmúlt 10 percben semmi nem kért semmit a Hoardtól."
+
 [messages.account-load-failed]
 source = "Couldn't load accounts: { $error }"
 translation = "Nem sikerült betölteni a fiókokat: { $error }"

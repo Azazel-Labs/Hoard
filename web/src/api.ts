@@ -9,7 +9,7 @@ import type {
 } from './types/library'
 import type {
   AccessToken, Account, AccountSource, ActivityItem, AuthConfig, AuthSettings, AuthStatus, CertCheck, ChatGptStatus,
-  Connection, ExampleFile, FormatTrial, HttpsChange, HttpsStatus, IssuePick, Issues, LdapConfig, LdapTestResult,
+  Connection, LiveApp, ExampleFile, FormatTrial, HttpsChange, HttpsStatus, IssuePick, Issues, LdapConfig, LdapTestResult,
   LibraryLocation, LocalModels, LocationList, Maintenance, ModelInfo, NewLocation, OAuthConfig, ProblemReport, Profile,
   Role,
   Settings, SettingsPatch, StoreFormats, UnreadFiles, UpdateHookCall, UpdateStatus,
@@ -339,6 +339,7 @@ export const api = {
       body: JSON.stringify({ seen }),
     }),
   connections: () => request<{ connections: Connection[] }>('/api/admin/connections'),
+  mcpLive: () => request<{ live: LiveApp[] }>('/api/mcp/live'),
   disconnect: (id: number) => request<void>(`/api/admin/connections/${id}`, { method: 'DELETE' }),
   oauthRequest: (search: string) => request<{ client: string; redirect_host: string }>(`/api/oauth/request${search}`),
   oauthApprove: (params: Record<string, string>, allow: boolean) =>

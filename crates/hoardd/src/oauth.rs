@@ -57,6 +57,7 @@ pub(crate) fn portal_router() -> Router<AppState> {
         .route("/api/oauth/request", get(describe_request))
         .route("/api/oauth/approve", post(approve))
         .route("/api/admin/connections", get(list_connections))
+        .route("/api/mcp/live", get(crate::mcp::live::list))
         .route("/api/admin/connections/{id}", axum::routing::delete(disconnect))
 }
 

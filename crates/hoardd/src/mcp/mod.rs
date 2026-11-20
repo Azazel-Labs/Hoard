@@ -9,6 +9,7 @@
 //! Account. Always asking, even when guests may browse the portal, is what makes MCP apps offer to sign in.
 
 mod calls;
+pub(crate) mod live;
 mod sound_tools;
 mod tools;
 
@@ -104,6 +105,7 @@ async fn handle(State(state): State<AppState>, headers: HeaderMap, body: String)
         return StatusCode::ACCEPTED.into_response();
     };
     let params = msg.get("params").cloned().unwrap_or(Value::Null);
+    live::record(&who, method, &params);
 
     // Version: modern requests carry it in _meta (and the header); legacy ones in the header after initialize.
     let meta_version = params.get("_meta").and_then(|m| m.get(META_VERSION)).and_then(Value::as_str);

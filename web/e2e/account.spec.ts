@@ -97,6 +97,41 @@ test.describe('account', () => {
     expect(await bearerSignedIn(baseURL!, token)).toBe(false)
   })
 
+  test('shows the apps using Hoard over MCP right now, each only to its own account and admins', async ({ page, api, baseURL }) => {
+    const name = `E2E agent ${unique()}`
+    const { token } = (await (await api.post('/api/admin/tokens', { data: { name } })).json()) as { token: string }
+    const agent = await request.newContext({ baseURL, extraHTTPHeaders: { Authorization: `Bearer ${token}` } })
+    const other = await person(api, baseURL!, `live-${unique()}`, 'view')
+    try {
+      const rpc = (id: number, method: string, params: object) => agent.post('/mcp', { data: { jsonrpc: '2.0', id, method, params } })
+      const clientInfo = { name: 'e2e-client', title: 'E2E Client', version: '1.2.3' }
+      expect((await rpc(1, 'initialize', { protocolVersion: '2025-11-25', capabilities: {}, clientInfo })).ok()).toBe(true)
+      expect((await rpc(2, 'tools/call', { name: 'search_assets', arguments: { query: 'nothing at all' } })).ok()).toBe(true)
+
+      await page.goto('/#settings/account')
+      const live = page.getByTestId('account-live')
+      await expect(live.getByRole('heading', { name: 'Using Hoard now' })).toBeVisible()
+      const row = live.locator('li').filter({ hasText: name })
+      await expect(row).toContainText('E2E Client 1.2.3')
+      await expect(row).toContainText('last: search_assets')
+      await expect(row).toContainText('requests: 2')
+      await expect(row.locator('.dot.now')).toHaveCount(1)
+
+      // It keeps up by itself as the app goes on.
+      expect((await rpc(3, 'tools/list', {})).ok()).toBe(true)
+      await expect(row).toContainText('last: tools/list')
+      await expect(row).toContainText('requests: 3')
+
+      // Someone else doesn't see another account's apps.
+      const theirs = (await (await other.ctx.get('/api/mcp/live')).json()) as { live: { name: string }[] }
+      expect(theirs.live.map((a) => a.name)).not.toContain(name)
+    } finally {
+      await agent.dispose()
+      await other.ctx.dispose()
+      await api.delete(`/api/admin/users/${other.id}`)
+    }
+  })
+
   test('on plain http, Copy falls back to a selected textarea', async ({ page, api }) => {
     await pretendPlainHttp(page)
     const name = `E2E token ${unique()}`

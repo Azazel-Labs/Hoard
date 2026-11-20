@@ -252,6 +252,22 @@ translation = "访客可以搜索、预览和下载，但不能添加、修改�
 source = "How they sign in"
 translation = "登录方式"
 
+[messages.account-live]
+source = "Using Hoard now"
+translation = "正在使用 Hoard"
+
+[messages.account-live-hint]
+source = "Apps that have asked Hoard for something in the last 10 minutes. This keeps itself up to date."
+translation = "最近 10 分钟内向 Hoard 请求过内容的应用。列表会自动更新。"
+
+[messages.account-live-last]
+source = "last: { $what } · { $when } · requests: { $calls }"
+translation = "最近：{ $what } · { $when } · 请求数：{ $calls }"
+
+[messages.account-live-none]
+source = "Nothing has asked Hoard for anything in the last 10 minutes."
+translation = "最近 10 分钟内没有任何应用向 Hoard 发出请求。"
+
 [messages.account-load-failed]
 source = "Couldn't load accounts: { $error }"
 translation = "无法加载账户：{ $error }"

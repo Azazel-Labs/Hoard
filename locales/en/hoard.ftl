@@ -3591,6 +3591,11 @@ account-claude-ai-local = Settings → Connectors → Add custom connector, past
 # $user is who connected the app; $since and $used are dates, or "never".
 account-connection-meta = for { $user } since { $since } · last used { $used }
 account-no-apps = No apps connected yet.
+account-live = Using Hoard now
+account-live-hint = Apps that have asked Hoard for something in the last 10 minutes. This keeps itself up to date.
+account-live-none = Nothing has asked Hoard for anything in the last 10 minutes.
+# $what is the name of what the app asked for (like search_assets), as it is; $when is like "12 seconds ago".
+account-live-last = last: { $what } · { $when } · requests: { $calls }
 account-tokens = Access tokens
 # In three parts around "hoard" and "Authorization: Bearer <token>", which stay as they are.
 account-tokens-hint-1 = For the{ " " }

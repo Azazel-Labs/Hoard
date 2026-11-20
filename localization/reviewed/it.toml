@@ -252,6 +252,22 @@ translation = "Possono cercare, vedere in anteprima e scaricare, ma non aggiunge
 source = "How they sign in"
 translation = "Come accede"
 
+[messages.account-live]
+source = "Using Hoard now"
+translation = "Stanno usando Hoard ora"
+
+[messages.account-live-hint]
+source = "Apps that have asked Hoard for something in the last 10 minutes. This keeps itself up to date."
+translation = "Le app che hanno chiesto qualcosa a Hoard negli ultimi 10 minuti. Si aggiorna da sola."
+
+[messages.account-live-last]
+source = "last: { $what } · { $when } · requests: { $calls }"
+translation = "ultimo: { $what } · { $when } · richieste: { $calls }"
+
+[messages.account-live-none]
+source = "Nothing has asked Hoard for anything in the last 10 minutes."
+translation = "Niente ha chiesto nulla a Hoard negli ultimi 10 minuti."
+
 [messages.account-load-failed]
 source = "Couldn't load accounts: { $error }"
 translation = "Impossibile caricare gli account: { $error }"

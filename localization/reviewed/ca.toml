@@ -252,6 +252,22 @@ translation = "Poden cercar, previsualitzar i baixar, però no afegir, canviar n
 source = "How they sign in"
 translation = "Com inicia la sessió"
 
+[messages.account-live]
+source = "Using Hoard now"
+translation = "Fan servir Hoard ara"
+
+[messages.account-live-hint]
+source = "Apps that have asked Hoard for something in the last 10 minutes. This keeps itself up to date."
+translation = "Aplicacions que han demanat alguna cosa a Hoard els darrers 10 minuts. S’actualitza tot sol."
+
+[messages.account-live-last]
+source = "last: { $what } · { $when } · requests: { $calls }"
+translation = "darrer: { $what } · { $when } · peticions: { $calls }"
+
+[messages.account-live-none]
+source = "Nothing has asked Hoard for anything in the last 10 minutes."
+translation = "Res no ha demanat res a Hoard els darrers 10 minuts."
+
 [messages.account-load-failed]
 source = "Couldn't load accounts: { $error }"
 translation = "No s'han pogut carregar els comptes: { $error }"

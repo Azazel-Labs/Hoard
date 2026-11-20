@@ -252,6 +252,22 @@ translation = "Μπορούν να αναζητούν, να κάνουν προ�
 source = "How they sign in"
 translation = "Πώς συνδέεται"
 
+[messages.account-live]
+source = "Using Hoard now"
+translation = "Χρησιμοποιούν το Hoard τώρα"
+
+[messages.account-live-hint]
+source = "Apps that have asked Hoard for something in the last 10 minutes. This keeps itself up to date."
+translation = "Εφαρμογές που ζήτησαν κάτι από το Hoard τα τελευταία 10 λεπτά. Ενημερώνεται μόνο του."
+
+[messages.account-live-last]
+source = "last: { $what } · { $when } · requests: { $calls }"
+translation = "τελευταίο: { $what } · { $when } · αιτήματα: { $calls }"
+
+[messages.account-live-none]
+source = "Nothing has asked Hoard for anything in the last 10 minutes."
+translation = "Τίποτα δεν ζήτησε κάτι από το Hoard τα τελευταία 10 λεπτά."
+
 [messages.account-load-failed]
 source = "Couldn't load accounts: { $error }"
 translation = "Δεν ήταν δυνατή η φόρτωση των λογαριασμών: { $error }"

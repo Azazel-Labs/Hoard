@@ -252,6 +252,22 @@ translation = "De kan søge, se forhåndsvisninger og downloade, men ikke tilfø
 source = "How they sign in"
 translation = "Hvordan vedkommende logger ind"
 
+[messages.account-live]
+source = "Using Hoard now"
+translation = "Bruger Hoard nu"
+
+[messages.account-live-hint]
+source = "Apps that have asked Hoard for something in the last 10 minutes. This keeps itself up to date."
+translation = "Apps, der har spurgt Hoard om noget inden for de seneste 10 minutter. Den holder sig selv opdateret."
+
+[messages.account-live-last]
+source = "last: { $what } · { $when } · requests: { $calls }"
+translation = "senest: { $what } · { $when } · forespørgsler: { $calls }"
+
+[messages.account-live-none]
+source = "Nothing has asked Hoard for anything in the last 10 minutes."
+translation = "Intet har spurgt Hoard om noget inden for de seneste 10 minutter."
+
 [messages.account-load-failed]
 source = "Couldn't load accounts: { $error }"
 translation = "Kunne ikke indlæse konti: { $error }"

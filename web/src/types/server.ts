@@ -181,6 +181,16 @@ export interface Connection {
   last_used_at: string | null
 }
 
+/** An app that asked the MCP server something lately (Settings → Account). */
+export interface LiveApp {
+  name: string
+  user: string | null
+  client: string | null
+  last: string
+  seconds_ago: number
+  calls: number
+}
+
 export interface AccessToken {
   id: number
   name: string

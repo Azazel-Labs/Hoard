@@ -1,10 +1,10 @@
 <script setup lang="ts">
 // Settings → Account: your password, the other accounts, connecting Claude and other AI apps, access tokens for
 // scripts and programs, and whether people who aren't signed in may look around.
-import { computed, onMounted, reactive, ref } from 'vue'
-import { api, type AccessToken, type Account, type AccountSource, type Connection, type Role } from '../api'
+import { computed, onMounted, onUnmounted, reactive, ref } from 'vue'
+import { api, type AccessToken, type Account, type AccountSource, type Connection, type LiveApp, type Role } from '../api'
 import { auth, isDesktop, may, refreshAuth, signOut } from '../auth'
-import { formatDate, t } from '../i18n'
+import { formatDate, language, t } from '../i18n'
 import { confirmDialog, copyText, showError, showOk } from '../ui'
 
 const accounts = ref<Account[] | null>(null)
@@ -59,6 +59,28 @@ async function load() {
   }
 }
 onMounted(load)
+
+/** The apps asking Hoard things right now, looked at again every few seconds while the page is open and visible. */
+const live = ref<LiveApp[] | null>(null)
+async function loadLive() {
+  if (document.hidden) return
+  try {
+    live.value = (await api.mcpLive()).live
+  } catch {
+    // Kept as it was; the next look may work.
+  }
+}
+const LIVE_EVERY = 5000
+let liveTimer = 0
+onMounted(() => {
+  void loadLive()
+  liveTimer = window.setInterval(loadLive, LIVE_EVERY)
+})
+onUnmounted(() => window.clearInterval(liveTimer))
+const ago = (seconds: number) => {
+  const rtf = new Intl.RelativeTimeFormat(language(), { numeric: 'auto' })
+  return seconds < 60 ? rtf.format(-seconds, 'second') : rtf.format(-Math.floor(seconds / 60), 'minute')
+}
 
 async function run(what: string, f: () => Promise<unknown>): Promise<boolean> {
   busy.value = true
@@ -276,6 +298,19 @@ const day = (at: string | null) => (at ? formatDate(at, { dateStyle: 'medium' })
         </li>
       </ul>
       <p v-else-if="connections" class="what none">{{ t('account-no-apps') }}</p>
+
+      <div v-if="live" class="live" data-testid="account-live">
+        <h4>{{ t('account-live') }}</h4>
+        <p class="what">{{ t('account-live-hint') }}</p>
+        <ul v-if="live.length" class="list">
+          <li v-for="a in live" :key="`${a.user}/${a.name}`">
+            <span class="dot" :class="{ now: a.seconds_ago < 60 }" aria-hidden="true" />
+            <span class="name">{{ a.name }}<small v-if="a.client || (admin && a.user)"> · {{ [a.client, admin ? a.user : null].filter(Boolean).join(' · ') }}</small></span>
+            <small>{{ t('account-live-last', { what: a.last, when: ago(a.seconds_ago), calls: a.calls }) }}</small>
+          </li>
+        </ul>
+        <p v-else class="what none">{{ t('account-live-none') }}</p>
+      </div>
     </section>
 
     <section>
@@ -364,6 +399,10 @@ select.role { flex: 0 0 auto; width: auto; }
 .steps strong { color: var(--text); }
 .small { padding-block: 0.1rem; font-size: 0.85em; }
 .none { font-style: italic; }
+.live { margin-top: 1.2rem; }
+.live h4 { margin: 0 0 0.2rem; font-size: var(--step-0); }
+.live .dot { flex: none; width: 0.55rem; height: 0.55rem; border-radius: 50%; background: var(--faint); }
+.live .dot.now { background: var(--ok); box-shadow: 0 0 0 3px color-mix(in srgb, var(--ok) 25%, transparent); }
 @media (max-width: 560px) {
   .grid { grid-template-columns: minmax(0, 1fr); }
   .grid > span:empty { display: none; }

@@ -252,6 +252,22 @@ translation = "Hulle kan soek, voorskou en aflaai, maar niks byvoeg, verander of
 source = "How they sign in"
 translation = "Hoe hulle aanmeld"
 
+[messages.account-live]
+source = "Using Hoard now"
+translation = "Gebruik Hoard nou"
+
+[messages.account-live-hint]
+source = "Apps that have asked Hoard for something in the last 10 minutes. This keeps itself up to date."
+translation = "Apps wat Hoard die afgelope 10 minute iets gevra het. Dit hou homself op datum."
+
+[messages.account-live-last]
+source = "last: { $what } · { $when } · requests: { $calls }"
+translation = "laaste: { $what } · { $when } · versoeke: { $calls }"
+
+[messages.account-live-none]
+source = "Nothing has asked Hoard for anything in the last 10 minutes."
+translation = "Niks het Hoard die afgelope 10 minute iets gevra nie."
+
 [messages.account-load-failed]
 source = "Couldn't load accounts: { $error }"
 translation = "Kon nie rekeninge laai nie: { $error }"

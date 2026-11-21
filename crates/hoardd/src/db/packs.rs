@@ -184,14 +184,43 @@ pub(crate) fn set_pack_status(conn: &Connection, id: &str, status: PackStatus, e
     Ok(())
 }
 
+/// Rows deleted per write when deleting a lot at once, and the pause between those writes: other writes wait for
+/// the one going on, so a big pack deleted in one (120,000 assets) held every one of them up for 20 seconds. A batch
+/// takes some tens of milliseconds.
+const DELETE_BATCH: usize = 250;
+const DELETE_PAUSE: std::time::Duration = std::time::Duration::from_millis(5);
+
+/// Delete a pack's assets a batch at a time (see [`DELETE_BATCH`]), leaving the pack; `archived` only while it's
+/// still in the archive, so one restored meanwhile keeps what's left. Searches see it shrink while this goes on.
+fn empty_pack(conn: &mut Connection, id: &str, archived: bool) -> Result<()> {
+    let only =
+        if archived { "AND EXISTS (SELECT 1 FROM packs p WHERE p.id = ?1 AND p.archived_at IS NOT NULL)" } else { "" };
+    let sql = format!(
+        "DELETE FROM assets WHERE rowid IN (SELECT rowid FROM assets WHERE pack_id = ?1 {only} LIMIT {DELETE_BATCH})"
+    );
+    loop {
+        let tx = conn.transaction()?;
+        let gone = tx.execute(&sql, [id])?;
+        tx.commit()?;
+        if gone < DELETE_BATCH {
+            return Ok(());
+        }
+        std::thread::sleep(DELETE_PAUSE);
+    }
+}
+
+/// Delete a pack and everything in it, its assets a batch at a time so other writes get their turn in between.
 pub(crate) fn delete_pack(conn: &mut Connection, id: &str) -> Result<bool> {
+    // Its waiting work first, so none of it starts on what's going.
+    conn.execute("DELETE FROM jobs WHERE pack_id = ?1 AND status IN ('queued', 'failed')", [id])?;
+    empty_pack(conn, id, false)?;
     let tx = conn.transaction()?;
     let removed = delete_pack_in(&tx, id)?;
     tx.commit()?;
     Ok(removed)
 }
 
-/// `delete_pack` as part of a transaction of the caller's.
+/// `delete_pack` as part of a transaction of the caller's, all at once: for packs with no assets yet or only a few.
 pub(crate) fn delete_pack_in(tx: &rusqlite::Transaction<'_>, id: &str) -> Result<bool> {
     tx.execute("DELETE FROM jobs WHERE pack_id = ?1 AND status IN ('queued', 'failed')", [id])?;
     Ok(tx.execute("DELETE FROM packs WHERE id = ?1", [id])? > 0)
@@ -264,16 +293,15 @@ pub(crate) fn set_archived(
 
 /// Delete archived packs and assets for good: these ones, or with `everything` the whole archive. Anything not in
 /// the archive is left alone. Returns the counts and the ids of the packs that went. Their bytes go on the next
-/// blob clean-up (`jobs::gc`).
+/// blob clean-up (`jobs::gc`). A batch at a time, as [`delete_pack`].
 pub(crate) fn purge_archived(
     conn: &mut Connection,
     packs: &[String],
     assets: &[String],
     everything: bool,
 ) -> Result<(ArchiveCount, Vec<String>)> {
-    let tx = conn.transaction()?;
     let ids = |sql: &str| -> Result<Vec<String>> {
-        let mut stmt = tx.prepare(sql)?;
+        let mut stmt = conn.prepare(sql)?;
         Ok(stmt.query_map([], |r| r.get(0))?.collect::<rusqlite::Result<_>>()?)
     };
     let (pack_ids, asset_ids) = if everything {
@@ -287,6 +315,8 @@ pub(crate) fn purge_archived(
     let mut n = ArchiveCount::default();
     let mut gone = Vec::new();
     for id in &pack_ids {
+        empty_pack(conn, id, true)?;
+        let tx = conn.transaction()?;
         let archived: Option<bool> =
             tx.query_row("SELECT archived_at IS NOT NULL FROM packs WHERE id = ?1", [id], |r| r.get(0)).optional()?;
         if archived != Some(true) {
@@ -299,21 +329,28 @@ pub(crate) fn purge_archived(
             [id],
         )?;
         n.packs += tx.execute("DELETE FROM packs WHERE id = ?1", [id])? as u64;
+        tx.commit()?;
         gone.push(id.clone());
     }
-    for id in &asset_ids {
-        let archived: bool = tx.query_row(
-            "SELECT EXISTS (SELECT 1 FROM assets WHERE id = ?1 AND archived_at IS NOT NULL)",
-            [id],
-            |r| r.get(0),
-        )?;
-        if !archived {
-            continue;
+    for (i, batch) in asset_ids.chunks(DELETE_BATCH).enumerate() {
+        if i > 0 {
+            std::thread::sleep(DELETE_PAUSE);
         }
-        skip_on_rescan(&tx, id)?;
-        n.assets += tx.execute("DELETE FROM assets WHERE id = ?1 AND archived_at IS NOT NULL", [id])? as u64;
+        let tx = conn.transaction()?;
+        for id in batch {
+            let archived: bool = tx.query_row(
+                "SELECT EXISTS (SELECT 1 FROM assets WHERE id = ?1 AND archived_at IS NOT NULL)",
+                [id],
+                |r| r.get(0),
+            )?;
+            if !archived {
+                continue;
+            }
+            skip_on_rescan(&tx, id)?;
+            n.assets += tx.execute("DELETE FROM assets WHERE id = ?1 AND archived_at IS NOT NULL", [id])? as u64;
+        }
+        tx.commit()?;
     }
-    tx.commit()?;
     Ok((n, gone))
 }
 
@@ -383,6 +420,37 @@ mod tests {
         assert_eq!((n.packs, gone), (1, s(&["p2"])));
         assert_eq!(ids(&conn, false), s(&["a2"]));
         assert_eq!(ids(&conn, true), Vec::<String>::new());
+    }
+
+    /// A big pack goes a batch at a time, with all of its assets and its waiting work, whether deleted or purged
+    /// from the archive; the rest stays.
+    #[test]
+    fn a_big_pack_goes_a_batch_at_a_time() {
+        let dir = tempfile::tempdir().unwrap();
+        let pool = open(&dir.path().join("hoard.db"), &dir.path().join("backups")).unwrap();
+        let mut conn = pool.get().unwrap();
+        let each = DELETE_BATCH * 2 + 7;
+        conn.execute_batch(&format!(
+            "INSERT INTO packs (id, name, status, created_at, archived_at) VALUES
+               ('big', 'Big', 'ready', 'x', NULL), ('old', 'Old', 'ready', 'x', 'x'), ('kept', 'Kept', 'ready', 'x', NULL);
+             WITH RECURSIVE k(i) AS (SELECT 0 UNION ALL SELECT i + 1 FROM k WHERE i < {each} * 2 + 2)
+             INSERT INTO blobs (hash, size, created_at) SELECT 'h' || i, 1, 'x' FROM k;
+             WITH RECURSIVE k(i) AS (SELECT 0 UNION ALL SELECT i + 1 FROM k WHERE i < {each} * 2 + 2)
+             INSERT INTO assets (id, pack_id, blob_hash, path, name, ext, kind, created_at, updated_at)
+             SELECT 'a' || i, CASE WHEN i < {each} THEN 'big' WHEN i < {each} * 2 THEN 'old' ELSE 'kept' END,
+                    'h' || i, 'f' || i || '.wav', 'f' || i, 'wav', 'audio', 'x', 'x' FROM k;
+             INSERT INTO jobs (kind, pack_id, status, run_after, created_at, updated_at) VALUES
+               ('thumbs', 'big', 'queued', 'x', 'x', 'x'), ('thumbs', 'kept', 'queued', 'x', 'x', 'x');"
+        ))
+        .unwrap();
+        assert!(delete_pack(&mut conn, "big").unwrap());
+        let (n, gone) = purge_archived(&mut conn, &[], &[], true).unwrap();
+        assert_eq!((n.packs, gone), (1, vec!["old".to_owned()]));
+        let count = |sql: &str| conn.query_row(sql, [], |r| r.get::<_, i64>(0)).unwrap();
+        assert_eq!(count("SELECT count(*) FROM assets WHERE pack_id = 'kept'"), 3);
+        assert_eq!(count("SELECT count(*) FROM assets"), 3);
+        assert_eq!(count("SELECT count(*) FROM packs"), 1);
+        assert_eq!(count("SELECT count(*) FROM jobs"), 1, "the kept pack's work stays");
     }
 
     /// The counts kept for each pack stay what counting its assets gives, through assets added, changed, moved and

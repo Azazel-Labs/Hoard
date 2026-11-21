@@ -1264,6 +1264,15 @@ your edits stay, the AI isn't asked again), shrink thumbnails, clear cached "Dow
 and delete unused files. One of each runs at a time. Backup, scrub and gc can also be run from cron (below) and show up in the
 history the same way.
 
+The database looks after itself, a little at a time so nothing waits on it for more than a few milliseconds. Deleting
+a pack or purging the archive goes a batch of assets at a time, with other changes let through in between. Every
+hour, finished jobs older than a month are deleted and the room deleted rows left in the database is given back to
+the disk a megabyte at a time. The write-ahead log (`hoard.db-wal`) is cut back to 64 MB whenever it's reused, rather
+than staying at the size the biggest import grew it to. A library made before this is rewritten once as Hoard starts,
+before it takes requests (a few seconds for a big one), so it can give room back this way. Nothing else is needed to
+keep it quick: on a library of 300,000 assets SQLite's planner statistics (`ANALYZE`) made no search faster, and the
+search index stays in few enough pieces on its own however much it's edited.
+
 **Settings → Issues** lists what went wrong opening or processing files, most serious first: packs that failed to
 ingest, damaged or missing files, watched folders that can't be read or have vanished (an unmounted drive), jobs that
 gave up, archives that wouldn't unpack, files that couldn't be opened or made sense of, models the thumbnail renderer

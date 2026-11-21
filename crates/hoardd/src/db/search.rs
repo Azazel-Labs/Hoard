@@ -1408,4 +1408,155 @@ mod tests {
             println!("tags like {prefix:?}: {} in {:.1?}", tags.len(), started.elapsed());
         }
     }
+
+    /// What upkeep buys a big, much-edited library: `cargo test -p hoardd --release --lib upkeep_timing -- --ignored --nocapture`.
+    #[test]
+    #[ignore = "a timing, not a test"]
+    #[expect(clippy::print_stdout, reason = "the timings are its output")]
+    fn upkeep_timing() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("hoard.db");
+        let pool = open(&path, &dir.path().join("backups")).unwrap();
+        let conn = pool.get().unwrap();
+        let n = 300_000;
+        let started = std::time::Instant::now();
+        conn.execute_batch(&format!(
+            "BEGIN;
+             WITH RECURSIVE k(i) AS (SELECT 0 UNION ALL SELECT i + 1 FROM k WHERE i < 199)
+             INSERT INTO packs (id, name, status, created_at) SELECT 'p' || i, 'Pack ' || i, 'ready', 'x' FROM k;
+             WITH RECURSIVE k(i) AS (SELECT 0 UNION ALL SELECT i + 1 FROM k WHERE i < {n} - 1)
+             INSERT INTO blobs (hash, size, created_at) SELECT 'b' || i, i, 'x' FROM k;
+             WITH RECURSIVE k(i) AS (SELECT 0 UNION ALL SELECT i + 1 FROM k WHERE i < {n} - 1)
+             INSERT INTO assets (id, pack_id, blob_hash, path, name, ext, kind, words, thumb_hash, created_at, updated_at)
+             SELECT 'a' || i, CASE WHEN i % 5 < 2 THEN 'p0' ELSE 'p' || (i % 200) END, 'b' || i,
+                    'Dir' || (i % 9) || '/Sub' || (i % 160) || '/file' || i || '.png',
+                    CASE i % 50 WHEN 0 THEN 'rock wall ' || i ELSE 'thing ' || i END, 'png',
+                    CASE i % 4 WHEN 0 THEN 'texture' WHEN 1 THEN 'model' WHEN 2 THEN 'material' ELSE 'audio' END,
+                    'dir file', 't' || i, printf('2026-01-01T00:%06d', i), 'x' FROM k;
+             INSERT INTO asset_tags (asset_id, tag, source) SELECT id, 'kind:' || kind, 'x' FROM assets;
+             INSERT INTO asset_tags (asset_id, tag, source) SELECT id, 'color:' || (rowid % 12), 'x' FROM assets;
+             INSERT INTO asset_tags (asset_id, tag, source) SELECT id, 'set:' || (rowid % 9000), 'x' FROM assets;
+             COMMIT;"
+        ))
+        .unwrap();
+        // Indexed the way imports do, one asset at a time in batches, so the search index grows as it really does.
+        let ids: Vec<String> = (0..n).map(|i| format!("a{i}")).collect();
+        for chunk in ids.chunks(500) {
+            conn.execute_batch("BEGIN").unwrap();
+            for id in chunk {
+                crate::db::reindex_asset(&conn, id).unwrap();
+            }
+            conn.execute_batch("COMMIT").unwrap();
+        }
+        println!("made {n} assets in {:.1?}", started.elapsed());
+        let size = |label: &str| {
+            let pages: i64 = conn.query_row("PRAGMA page_count", [], |r| r.get(0)).unwrap();
+            let free: i64 = conn.query_row("PRAGMA freelist_count", [], |r| r.get(0)).unwrap();
+            let fts: i64 = conn.query_row("SELECT count(*) FROM assets_fts_data", [], |r| r.get(0)).unwrap();
+            let wal = std::fs::metadata(path.with_extension("db-wal")).map(|m| m.len()).unwrap_or(0);
+            println!(
+                "  [{label}] file {} MB, {} MB free in it, wal {} MB, search index {fts} rows",
+                pages * 4096 / 1_000_000,
+                free * 4096 / 1_000_000,
+                wal / 1_000_000
+            );
+        };
+        let queries = || {
+            let hide = || SearchQuery { hide_supporting: true, ..Default::default() };
+            vec![
+                ("browse", hide()),
+                ("textures", SearchQuery { kind: Some("texture".into()), ..hide() }),
+                ("a tag", SearchQuery { tags: vec!["set:42".into()], ..hide() }),
+                ("two tags", SearchQuery { tags: vec!["color:3".into(), "kind:model".into()], ..hide() }),
+                ("words", SearchQuery { q: Some("rock".into()), ..hide() }),
+                ("a letter", SearchQuery { q: Some("t".into()), ..hide() }),
+                ("words + kind", SearchQuery { q: Some("wall".into()), kind: Some("texture".into()), ..hide() }),
+                ("a pack", SearchQuery { pack: Some("p7".into()), ..hide() }),
+                ("big pack folder", SearchQuery { pack: Some("p0".into()), folder: Some("Dir3".into()), ..hide() }),
+            ]
+        };
+        let run = |label: &str| {
+            println!("{label}:");
+            let mut all = std::time::Duration::ZERO;
+            for (name, q) in queries() {
+                let mut best = std::time::Duration::MAX;
+                for _ in 0..3 {
+                    let started = std::time::Instant::now();
+                    search_ranked(&conn, &q, true, None).unwrap();
+                    best = best.min(started.elapsed());
+                }
+                all += best;
+                println!("  {name}: {best:.1?}");
+            }
+            println!("  all: {all:.1?}");
+        };
+        size("built");
+        run("never analyzed");
+
+        // A year of edits: every asset retagged once, as AI tagging and hand edits do, a few at a time.
+        let started = std::time::Instant::now();
+        for chunk in ids.chunks(20) {
+            conn.execute_batch("BEGIN").unwrap();
+            for id in chunk {
+                conn.execute(
+                    "INSERT OR IGNORE INTO asset_tags (asset_id, tag, source) VALUES (?1, 'mood:calm', 'x')",
+                    [id],
+                )
+                .unwrap();
+                crate::db::reindex_asset(&conn, id).unwrap();
+            }
+            conn.execute_batch("COMMIT").unwrap();
+        }
+        println!("retagged everything in {:.1?}", started.elapsed());
+        size("edited");
+        run("edited, never analyzed");
+
+        let started = std::time::Instant::now();
+        conn.execute_batch("PRAGMA analysis_limit = 1000; PRAGMA optimize = 0x10002;").unwrap();
+        println!("PRAGMA optimize (analysis_limit 1000) in {:.1?}", started.elapsed());
+        run("optimized");
+
+        let started = std::time::Instant::now();
+        conn.execute_batch("ANALYZE;").unwrap();
+        println!("full ANALYZE in {:.1?}", started.elapsed());
+        run("fully analyzed");
+
+        let started = std::time::Instant::now();
+        conn.execute_batch("INSERT INTO assets_fts (assets_fts, rank) VALUES ('merge', 500);").unwrap();
+        println!("FTS merge 500 in {:.1?}", started.elapsed());
+        let started = std::time::Instant::now();
+        conn.execute_batch("INSERT INTO assets_fts (assets_fts) VALUES ('optimize');").unwrap();
+        println!("FTS optimize in {:.1?}", started.elapsed());
+        size("index merged");
+        run("index merged");
+
+        // Deleting a big pack and giving its room back, while someone else keeps making small edits: how long the
+        // longest of those waited is how long the deleting held up everyone else.
+        let stop = Arc::new(std::sync::atomic::AtomicBool::new(false));
+        let editor = {
+            let (pool, stop) = (pool.clone(), Arc::clone(&stop));
+            std::thread::spawn(move || {
+                let c = pool.get().unwrap();
+                let mut longest = std::time::Duration::ZERO;
+                while !stop.load(std::sync::atomic::Ordering::Acquire) {
+                    let started = std::time::Instant::now();
+                    c.execute("UPDATE packs SET name = name WHERE id = 'p1'", []).unwrap();
+                    longest = longest.max(started.elapsed());
+                    std::thread::sleep(std::time::Duration::from_millis(10));
+                }
+                longest
+            })
+        };
+        let started = std::time::Instant::now();
+        let mut c = pool.get().unwrap();
+        crate::db::delete_pack(&mut c, "p0").unwrap();
+        println!("deleted the big pack in {:.1?}", started.elapsed());
+        size("big pack deleted");
+        let started = std::time::Instant::now();
+        let tidied = crate::db::tidy(&c).unwrap();
+        println!("tidied in {:.1?}: {tidied:?}", started.elapsed());
+        size("tidied");
+        stop.store(true, std::sync::atomic::Ordering::Release);
+        println!("the longest an edit waited meanwhile: {:.1?}", editor.join().unwrap());
+    }
 }

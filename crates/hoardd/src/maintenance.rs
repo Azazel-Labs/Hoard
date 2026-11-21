@@ -1,5 +1,6 @@
 //! Settings → Maintenance: the jobs that look after a library (back up, check for damage, re-analyze, clear the
-//! cache, delete unused files), started by hand, with their progress while they run and a history of past runs.
+//! cache, delete unused files), started by hand, with their progress while they run and a history of past runs. The
+//! database also tidies itself every hour (see [`schedule_upkeep`]).
 //!
 //! One of each runs at a time. A run that was going when the server stopped is marked as stopped at the next start.
 
@@ -587,6 +588,42 @@ fn dir_size(dir: &std::path::Path) -> u64 {
             })
             .sum()
     })
+}
+
+/// Start what runs on a schedule: the backups, and the database's upkeep.
+pub(crate) fn spawn_schedules(state: &AppState) {
+    tokio::spawn(schedule_backups(std::sync::Arc::clone(state)));
+    tokio::spawn(schedule_upkeep(std::sync::Arc::clone(state)));
+}
+
+/// Tidy the database without being asked (see [`db::tidy`]): soon after the server starts, then every hour, so the
+/// room a deleted pack leaves goes back to the disk the same day. Not a Maintenance run: there's nothing to see.
+pub(crate) async fn schedule_upkeep(state: AppState) {
+    const FIRST: Duration = Duration::from_mins(10);
+    const EVERY: Duration = Duration::from_hours(1);
+    tokio::time::sleep(FIRST).await;
+    loop {
+        let started = std::time::Instant::now();
+        // Not `db::call`: a tidy that has a lot to give back takes a while, pausing between short steps that hold
+        // nobody up, which isn't the slow work that warns in the log.
+        let pool = state.pool.clone();
+        let tidied = tokio::task::spawn_blocking(move || {
+            let c = pool.get()?;
+            db::tidy(&c)
+        })
+        .await;
+        match tidied.map_err(anyhow::Error::from).and_then(|t| t) {
+            Ok(t) if t.jobs == 0 && t.freed == 0 => {}
+            Ok(t) => tracing::info!(
+                jobs_deleted = t.jobs,
+                freed = %human_bytes(t.freed),
+                took = ?started.elapsed(),
+                "tidied the database"
+            ),
+            Err(e) => tracing::warn!(error = %format!("{e:#}"), "could not tidy the database"),
+        }
+        tokio::time::sleep(EVERY).await;
+    }
 }
 
 async fn gc(state: &AppState) -> Result<String> {

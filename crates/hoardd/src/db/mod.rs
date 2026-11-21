@@ -1,7 +1,7 @@
 //! SQLite (WAL) metadata store with FTS5 search.
 //!
 //! The database only holds metadata. File bytes live in the blob store, so the DB stays small and
-//! can be snapshotted with `VACUUM INTO` at any time (see the backup endpoint).
+//! can be snapshotted with `VACUUM INTO` at any time (see the backup endpoint). It looks after itself (see `upkeep`).
 //!
 //! The schema and its upgrades are in `schema`; the queries are in a module per table they mostly read.
 
@@ -26,6 +26,7 @@ mod search;
 #[cfg(test)]
 mod stress;
 mod tags;
+mod upkeep;
 
 pub(crate) use assets::*;
 pub(crate) use collections::*;
@@ -36,6 +37,7 @@ pub(crate) use packs::*;
 use schema::{MIGRATIONS, migrate};
 pub(crate) use search::*;
 pub(crate) use tags::*;
+pub(crate) use upkeep::tidy;
 
 pub(crate) type Pool = r2d2::Pool<SqliteConnectionManager>;
 pub(crate) type Conn = r2d2::PooledConnection<SqliteConnectionManager>;
@@ -62,11 +64,15 @@ pub(crate) fn open(path: &Path, backups: &Path) -> Result<Pool> {
         // fail with "database is locked".
         c.busy_handler(Some(wait_turn))?;
         c.rollback_hook(Some(turn_over))?;
+        // The log is used again from the start once everything in it is in the database, but never made smaller: after
+        // a big import, or writes while a long search kept it from being reused, it stayed hundreds of megabytes.
+        // `journal_size_limit` cuts it back to 64 MB each time it's reused.
         c.execute_batch(
             "PRAGMA journal_mode = WAL;
              PRAGMA synchronous = NORMAL;
              PRAGMA foreign_keys = ON;
-             PRAGMA temp_store = MEMORY;",
+             PRAGMA temp_store = MEMORY;
+             PRAGMA journal_size_limit = 67108864;",
         )?;
         // Every write counts, on whichever connection (see `writes`), once it's there for others to read: unlike a
         // commit hook, which runs just before. Taking the place of SQLite's own hook, this checkpoints the log the
@@ -86,6 +92,7 @@ pub(crate) fn open(path: &Path, backups: &Path) -> Result<Pool> {
     let pool = r2d2::Pool::builder().max_size(24).build(manager).context("open sqlite pool")?;
     let mut conn = pool.get()?;
     migrate(&mut conn, backups, MIGRATIONS)?;
+    upkeep::give_back_room_over_time(&conn);
     Ok(pool)
 }
 

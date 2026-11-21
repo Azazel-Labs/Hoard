@@ -314,7 +314,7 @@ pub async fn run(cfg: Config) -> Result<()> {
     }
     scan::spawn_rescans(&state);
     reformat::spawn_expiry(&state);
-    tokio::spawn(maintenance::schedule_backups(Arc::clone(&state)));
+    maintenance::spawn_schedules(&state);
     profiler::start();
 
     let mut app = api::router(&state);

@@ -23,10 +23,19 @@ test.describe('finding a setting', () => {
     await expect(find).toHaveValue('')
     await expect(page).toHaveURL(/#settings\/connection$/)
 
+    // Pages without settings to change are found by their name, and what they're for, as a way to them.
+    await find.fill('dragon')
+    await expect(found.locator('[data-page="dragon"]')).toContainText('every asset in the library is a piece of its treasure')
+    await expect(found.getByText(/No setting matches/)).toHaveCount(0)
+    await found.getByRole('button', { name: 'Dragon' }).click()
+    await expect(page.getByRole('heading', { name: 'Dragon', level: 2 })).toBeVisible()
+    await find.fill('treasure')
+    await expect(found.getByRole('button', { name: 'Dragon' })).toBeVisible()
+
     await find.fill('zzqx nothing')
     await expect(found.getByText('No setting matches “zzqx nothing”.')).toBeVisible()
     await find.press('Escape')
     await expect(found).toHaveCount(0)
-    await expect(page.getByRole('heading', { name: 'Connection', level: 2 })).toBeVisible()
+    await expect(page.getByRole('heading', { name: 'Dragon', level: 2 })).toBeVisible()
   })
 })

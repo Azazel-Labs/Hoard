@@ -77,17 +77,27 @@ const resultsEl = ref<HTMLElement | null>(null)
 const found = ref(true)
 /** Lowercase without accents, so "resume" finds "résumé". */
 const fold = (text: string) => text.toLocaleLowerCase().normalize('NFD').replace(/\p{M}/gu, '')
+const queryWords = computed(() => fold(query.value).split(/\s+/).filter(Boolean))
+/** The other pages (the dragon, the library, how it's doing) are found by their name and what they're for, and
+ *  shown as a way to them: what's on them is the library, not settings, and too much to show here. */
+const pagesFound = computed(() =>
+  PAGES.value.filter((p) => {
+    if (SEARCHED.includes(p.id)) return false
+    const text = fold(`${p.label} ${p.blurb}`)
+    return queryWords.value.every((w) => text.includes(w))
+  }),
+)
 /** Show the sections with every word typed (or on a page whose name has them), and the pages with any. */
 function filter() {
   const root = resultsEl.value
   if (!root) return
-  const words = fold(query.value).split(/\s+/).filter(Boolean)
+  const words = queryWords.value
   let any = false
   for (const pageEl of root.querySelectorAll<HTMLElement>('[data-found]')) {
     let shown = 0
     for (const section of pageEl.querySelectorAll<HTMLElement>('section')) {
       if (section.parentElement?.closest('section')) continue
-      const text = fold(`${pageEl.dataset.label} ${section.textContent}`)
+      const text = fold(`${pageEl.dataset.label} ${pageEl.dataset.blurb} ${section.textContent}`)
       const hit = words.every((w) => text.includes(w))
       // Only when it changes: the watcher below sees class changes too.
       if (section.classList.contains('unfound') === hit) section.classList.toggle('unfound', !hit)
@@ -266,8 +276,15 @@ onBeforeUnmount(() => {
 
     <div ref="paneEl" class="pane" :aria-busy="busy">
       <div v-if="searching" ref="resultsEl" class="inner" data-testid="settings-found">
-        <p v-if="!found" class="loading">{{ t('settings-find-none', { query: query.trim() }) }}</p>
-        <div v-for="p in searched" :key="p.id" class="found" data-found :data-label="p.label" :data-page="p.id">
+        <div v-for="p in pagesFound" :key="p.id" class="found" :data-page="p.id">
+          <button type="button" class="found-h" @click="go(p.id)">
+            <SettingsGlyph :page="p.id" />
+            {{ p.label }}
+          </button>
+          <p class="what">{{ p.blurb }}</p>
+        </div>
+        <p v-if="!found && !pagesFound.length" class="loading">{{ t('settings-find-none', { query: query.trim() }) }}</p>
+        <div v-for="p in searched" :key="p.id" class="found" data-found :data-label="p.label" :data-blurb="p.blurb" :data-page="p.id">
           <button type="button" class="found-h" @click="go(p.id)">
             <SettingsGlyph :page="p.id" />
             {{ p.label }}

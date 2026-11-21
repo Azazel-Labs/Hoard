@@ -32,6 +32,8 @@ error-upload-failed = nahrávání selhalo: { $reason }
 error-upload-no-files = v nahrávání nejsou žádné soubory
 error-analyze-nothing-to-do = není co dělat: rules=false a LLM je vypnutý
 error-too-many-assets = příliš mnoho assetů v jednom požadavku
+error-change-not-found = tato změna v historii tohoto assetu není
+error-bulk-by-look = hledání podle vzhledu nelze upravit najednou: vyberte assety ručně
 error-too-many-items = příliš mnoho položek v jednom požadavku
 error-not-a-hash = toto není hexadecimální hash blake3
 error-merge-into-tag = into musí být štítek
@@ -590,6 +592,30 @@ app-bulk-category-cleared =
         [few] { $count } assetů
        *[other] { $count } assetů
     }
+app-bulk-review = Označit jako zkontrolované
+app-bulk-review-title = Označit vybrané assety jako zkontrolované: pravidla a AI pak jejich štítky nechají být
+app-bulk-unreview = Označit jako nezkontrolované
+app-bulk-unreview-title = Odebrat značku zkontrolováno z vybraných assetů
+app-bulk-reviewed =
+    Označeno jako zkontrolované: { $count ->
+        [one] { $count } asset
+        [few] { $count } assety
+       *[other] { $count } assetů
+    }
+app-bulk-unreviewed =
+    Odebrána značka zkontrolováno u { $count ->
+        [one] { $count } assetu
+        [few] { $count } assetů
+       *[other] { $count } assetů
+    }
+app-bulk-accept = Ponechat odhady
+app-bulk-accept-title = Ponechat jako vlastní všechny štítky, které vybraným assetům přidala pravidla a AI
+app-bulk-accepted =
+    Ponechány odhadnuté štítky u { $count ->
+        [one] { $count } assetu
+        [few] { $count } assetů
+       *[other] { $count } assetů
+    }
 app-credits-failed = Nepodařilo se vytvořit poděkování autorům: { $error }
 app-archived-assets =
     { $count ->
@@ -636,6 +662,8 @@ app-filters = Filtry
 app-done = Hotovo
 app-yours = Vaše
 app-favorites = Oblíbené
+app-needs-review = Ke kontrole
+app-needs-review-title = Jen assety, které zatím nikdo nezkontroloval (funguje spolu s ostatními filtry)
 app-forget-search-label = Zapomenout uložené hledání { $name }
 app-forget-search = Zapomenout toto hledání
 app-projects-title = Projekty, které odsud synchronizuje hoard sync, s tím, co měla jejich poslední synchronizace
@@ -819,6 +847,7 @@ shortcuts-open = Otevřít podrobnosti
 shortcuts-play-sound = Přehrát nebo zastavit zvuk
 shortcuts-select = Vybrat nebo zrušit výběr
 shortcuts-favorite = Přidat do oblíbených nebo z nich odebrat
+shortcuts-reviewed = Označit jako zkontrolované, nebo ne
 shortcuts-key-click = klik
 shortcuts-select-range = Vybrat rozsah
 shortcuts-select-all = Vybrat vše zobrazené
@@ -846,6 +875,9 @@ tag-source-rule = z offline štítkovače
 tag-source-meta = změřeno ze souboru
 tag-source-ai = navrženo AI
 tag-remove = Odebrat štítek { $tag }
+tag-accept = Ponechat štítek { $tag }
+tag-accept-title = Ponechat tento odhad jako vlastní štítek
+tag-reject-title = Odebrat; štítkovač ho nevrátí
 
 ## ActivityIndicator.vue
 
@@ -1579,6 +1611,21 @@ asset-meta-analysis-error = Tento soubor se nepodařilo celý přečíst: { $err
 asset-copy-blocked = Nepodařilo se zkopírovat: prohlížeč to zablokoval
 asset-save-error = Nepodařilo se uložit: { $error }
 asset-tag-removed = Odebráno: { $tag }
+asset-tag-restored = Štítek { $tag } vrácen
+asset-tags-accepted =
+    Ponecháno: { $count ->
+        [one] { $count } odhadnutý štítek
+        [few] { $count } odhadnuté štítky
+       *[other] { $count } odhadnutých štítků
+    }
+asset-reviewed = Zkontrolováno
+asset-reviewed-on-title = Zkontrolováno: pravidla a AI jeho štítky nechají být. Kliknutím značku odeberete (R)
+asset-reviewed-off-title = Označit jako zkontrolované, aby pravidla a AI jeho štítky nechaly být (R)
+asset-reviewed-on = Označeno jako zkontrolované
+asset-reviewed-off = Značka zkontrolováno odebrána
+# $name is an asset's name.
+asset-reviewed-on-named = Asset { $name } označen jako zkontrolovaný
+asset-reviewed-off-named = Odebrána značka zkontrolováno u { $name }
 asset-undo = Zpět
 asset-play-error = Tento soubor se nepodařilo přehrát: { $error }
 asset-copied-hash = Hash zkopírován
@@ -1645,7 +1692,49 @@ asset-tags = Štítky
 asset-tag-add-label = Přidat štítek
 asset-tag-add-placeholder = Přidejte štítek, např. mood:tense
 asset-tag-add = Přidat
-asset-apply-family = Použít změny štítků, kategorie a popisu na všechny varianty ({ $count })
+asset-apply-family = Použít změny na všechny varianty ({ $count })
+asset-tags-accept-all =
+    { $count ->
+        [one] Ponechat { $count } odhad
+        [few] Ponechat všechny { $count } odhady
+       *[other] Ponechat všech { $count } odhadů
+    }
+asset-tags-accept-all-title = Ponechat jako vlastní všechny štítky, které pravidla a AI odhadly
+# Before a list of tags someone removed, which the taggers won't put back; each can be clicked to restore it.
+asset-tags-rejected = Zamítnuté:
+asset-tag-restore-title = Vrátit štítek { $tag }
+asset-details-heading = Podrobnosti
+asset-field-category = Kategorie
+asset-field-license = Licence
+asset-field-source = Zdroj
+asset-field-rating = Hodnocení
+# Shown in place of an empty value, to fill it in.
+asset-field-add = Přidat
+asset-field-new = Přidat pole
+asset-field-name = Název pole
+asset-field-value = Hodnota
+# After a license the asset gets from its pack rather than its own.
+asset-field-from-pack = z balíčku
+asset-field-license-placeholder = Například CC0 nebo CC-BY 4.0
+asset-field-remove-placeholder = Prázdné = odebrat
+# $field is a field's name, like "License".
+asset-field-edit-title = Upravit: { $field }
+asset-field-saved = Uloženo: { $field }
+asset-field-cleared = Vymazáno: { $field }
+asset-rate =
+    { $count ->
+        [one] { $count } hvězdička
+        [few] { $count } hvězdičky
+       *[other] { $count } hvězdiček
+    }
+asset-rated =
+    Hodnocení: { $count ->
+        [one] { $count } hvězdička
+        [few] { $count } hvězdičky
+       *[other] { $count } hvězdiček
+    }
+asset-rating-clear-title = Dalším kliknutím hodnocení zrušíte
+asset-rating-cleared = Hodnocení zrušeno
 asset-collections = Kolekce
 asset-collection-remove = Odebrat z { $name }
 asset-collection-add-another = Přidat do další

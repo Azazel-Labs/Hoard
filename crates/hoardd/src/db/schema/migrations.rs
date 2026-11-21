@@ -944,4 +944,45 @@ pub(in crate::db) const MIGRATIONS: &[&str] = &[
     "CREATE INDEX assets_updated ON assets(updated_at DESC, path);",
     // 93: and packs by when anything in them last changed, which is looked up for each pack the list shows.
     "CREATE INDEX assets_pack_updated ON assets(pack_id, updated_at);",
+    // 94: editing an asset. `reviewed_at` is when a person said its details are right: the taggers then leave it
+    // alone. A rating out of 5, its own license and where it came from (for when they differ from its pack's), and
+    // fields of anyone's own (`asset_fields`). A machine's tag a person turned down is remembered (`rejected_tags`,
+    // with the source and confidence it had, to put it back) so retagging doesn't bring it back. Each change a
+    // person, a rule, the AI or an app makes is written down (`asset_history`), to be undone. A tag can say what it
+    // means and have a picture (`tag_info`), and go under broader ones (`tag_parents`). A saved search can be what
+    // the library opens to.
+    "ALTER TABLE assets ADD COLUMN reviewed_at TEXT;
+     ALTER TABLE assets ADD COLUMN rating INTEGER;
+     ALTER TABLE assets ADD COLUMN license TEXT;
+     ALTER TABLE assets ADD COLUMN source_url TEXT;
+     CREATE TABLE asset_fields (
+       asset_id TEXT NOT NULL REFERENCES assets(id) ON DELETE CASCADE,
+       key      TEXT NOT NULL,
+       value    TEXT NOT NULL,
+       PRIMARY KEY (asset_id, key)
+     ) WITHOUT ROWID;
+     CREATE INDEX asset_fields_key ON asset_fields(key, value);
+     CREATE TABLE rejected_tags (
+       asset_id   TEXT NOT NULL REFERENCES assets(id) ON DELETE CASCADE,
+       tag        TEXT NOT NULL,
+       source     TEXT NOT NULL,
+       confidence REAL NOT NULL DEFAULT 1.0,
+       at         TEXT NOT NULL,
+       PRIMARY KEY (asset_id, tag)
+     ) WITHOUT ROWID;
+     CREATE TABLE asset_history (
+       id       INTEGER PRIMARY KEY,
+       asset_id TEXT NOT NULL REFERENCES assets(id) ON DELETE CASCADE,
+       field    TEXT NOT NULL,
+       old      TEXT,
+       new      TEXT,
+       who      TEXT,
+       source   TEXT NOT NULL,
+       at       TEXT NOT NULL
+     );
+     CREATE INDEX asset_history_asset ON asset_history(asset_id, id);
+     CREATE TABLE tag_info (tag TEXT PRIMARY KEY, description TEXT, image_id TEXT) WITHOUT ROWID;
+     CREATE TABLE tag_parents (tag TEXT NOT NULL, parent TEXT NOT NULL, PRIMARY KEY (tag, parent)) WITHOUT ROWID;
+     CREATE INDEX tag_parents_parent ON tag_parents(parent);
+     ALTER TABLE saved_searches ADD COLUMN is_default INTEGER NOT NULL DEFAULT 0;",
 ];

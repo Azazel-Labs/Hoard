@@ -26,6 +26,7 @@ const sections = computed<{ title: string; keys: [string[], string][] }[]>(() =>
       [['Space'], t('shortcuts-play-sound')],
       [['X'], t('shortcuts-select')],
       [['F'], t('shortcuts-favorite')],
+      [['R'], t('shortcuts-reviewed')],
       [['Shift', t('shortcuts-key-click')], t('shortcuts-select-range')],
       [[mod, 'A'], t('shortcuts-select-all')],
     ],

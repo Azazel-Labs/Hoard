@@ -32,6 +32,8 @@ error-upload-failed = încărcarea a eșuat: { $reason }
 error-upload-no-files = niciun fișier în încărcare
 error-analyze-nothing-to-do = nimic de făcut: rules=false și LLM este oprit
 error-too-many-assets = prea multe resurse într-o singură cerere
+error-change-not-found = această modificare nu este în istoricul acestui asset
+error-bulk-by-look = o căutare după aspect nu poate fi editată deodată: selectează asset-urile
 error-too-many-items = prea multe elemente într-o singură cerere
 error-not-a-hash = nu este un hash blake3 hexazecimal
 error-merge-into-tag = into trebuie să fie o etichetă
@@ -595,6 +597,30 @@ app-bulk-category-cleared =
         [few] Categoria pentru { $count } resurse a fost golită
        *[other] Categoria pentru { $count } de resurse a fost golită
     }
+app-bulk-review = Marcați verificate
+app-bulk-review-title = Marcați resursele selectate ca verificate: regulile și AI nu le mai ating etichetele după aceea
+app-bulk-unreview = Marcați neverificate
+app-bulk-unreview-title = Scoateți marcajul de verificat de pe resursele selectate
+app-bulk-reviewed =
+    { $count ->
+        [one] A fost marcată ca verificată { $count } resursă
+        [few] Au fost marcate ca verificate { $count } resurse
+       *[other] Au fost marcate ca verificate { $count } de resurse
+    }
+app-bulk-unreviewed =
+    { $count ->
+        [one] S-a scos marcajul de verificat de pe { $count } resursă
+        [few] S-a scos marcajul de verificat de pe { $count } resurse
+       *[other] S-a scos marcajul de verificat de pe { $count } de resurse
+    }
+app-bulk-accept = Păstrați presupunerile
+app-bulk-accept-title = Păstrați ca ale dvs. toate etichetele puse de reguli și de AI pe resursele selectate
+app-bulk-accepted =
+    { $count ->
+        [one] S-a păstrat presupunerea pentru { $count } resursă
+        [few] S-au păstrat presupunerile pentru { $count } resurse
+       *[other] S-au păstrat presupunerile pentru { $count } de resurse
+    }
 app-credits-failed = Creditele nu au putut fi create: { $error }
 app-archived-assets =
     { $count ->
@@ -641,6 +667,8 @@ app-filters = Filtre
 app-done = Gata
 app-yours = Ale dvs.
 app-favorites = Favorite
+app-needs-review = De verificat
+app-needs-review-title = Doar resursele pe care nu le-a verificat încă nimeni (merge împreună cu celelalte filtre)
 app-forget-search-label = Uitați căutarea salvată { $name }
 app-forget-search = Uitați această căutare
 app-projects-title = Proiectele care rulează hoard sync de aici, cu ce avea ultima lor sincronizare
@@ -824,6 +852,7 @@ shortcuts-open = Deschiderea detaliilor
 shortcuts-play-sound = Redarea sau oprirea unui sunet
 shortcuts-select = Selectare sau deselectare
 shortcuts-favorite = Adăugare la favorite sau scoatere din favorite
+shortcuts-reviewed = Marcare ca verificat sau nu
 shortcuts-key-click = clic
 shortcuts-select-range = Selectarea unui interval
 shortcuts-select-all = Selectarea a tot ce este afișat
@@ -851,6 +880,9 @@ tag-source-rule = de la etichetatorul offline
 tag-source-meta = măsurată din fișier
 tag-source-ai = sugerată de AI
 tag-remove = Eliminați eticheta { $tag }
+tag-accept = Păstrați eticheta { $tag }
+tag-accept-title = Păstrați această presupunere ca etichetă proprie
+tag-reject-title = Eliminați-o; etichetatorul nu o va pune la loc
 
 ## ActivityIndicator.vue
 
@@ -1587,6 +1619,21 @@ asset-meta-analysis-error = Acest fișier nu a putut fi citit complet: { $error 
 asset-copy-blocked = Nu s-a putut copia: browserul a blocat copierea
 asset-save-error = Nu s-a putut salva: { $error }
 asset-tag-removed = S-a eliminat { $tag }
+asset-tag-restored = { $tag } a fost pusă la loc
+asset-tags-accepted =
+    { $count ->
+        [one] S-a păstrat { $count } etichetă presupusă
+        [few] S-au păstrat { $count } etichete presupuse
+       *[other] S-au păstrat { $count } de etichete presupuse
+    }
+asset-reviewed = Verificat
+asset-reviewed-on-title = Verificat: regulile și AI nu îi ating etichetele. Faceți clic pentru a scoate marcajul (R)
+asset-reviewed-off-title = Marcați ca verificat, ca regulile și AI să nu îi atingă etichetele (R)
+asset-reviewed-on = Marcat ca verificat
+asset-reviewed-off = S-a scos marcajul de verificat
+# $name is an asset's name.
+asset-reviewed-on-named = { $name } a fost marcat ca verificat
+asset-reviewed-off-named = S-a scos marcajul de verificat de pe { $name }
 asset-undo = Anulați
 asset-play-error = Acest fișier nu a putut fi redat: { $error }
 asset-copied-hash = Hash copiat
@@ -1658,12 +1705,49 @@ asset-tags = Etichete
 asset-tag-add-label = Adăugați o etichetă
 asset-tag-add-placeholder = Adăugați o etichetă, de ex. mood:tense
 asset-tag-add = Adăugați
-asset-apply-family =
+asset-apply-family = Aplicați modificările la toate cele { $count } variante
+asset-tags-accept-all =
     { $count ->
-        [one] Aplicați modificările de etichete, categorie și descriere la { $count } variantă
-        [few] Aplicați modificările de etichete, categorie și descriere la toate cele { $count } variante
-       *[other] Aplicați modificările de etichete, categorie și descriere la toate cele { $count } de variante
+        [one] Păstrați { $count } presupunere
+        [few] Păstrați toate cele { $count } presupuneri
+       *[other] Păstrați toate cele { $count } de presupuneri
     }
+asset-tags-accept-all-title = Păstrați ca ale dvs. toate etichetele presupuse de reguli și de AI
+# Before a list of tags someone removed, which the taggers won't put back; each can be clicked to restore it.
+asset-tags-rejected = Respinse:
+asset-tag-restore-title = Puneți { $tag } la loc
+asset-details-heading = Detalii
+asset-field-category = Categorie
+asset-field-license = Licență
+asset-field-source = Sursă
+asset-field-rating = Evaluare
+# Shown in place of an empty value, to fill it in.
+asset-field-add = Adăugați
+asset-field-new = Adăugați un câmp
+asset-field-name = Numele câmpului
+asset-field-value = Valoare
+# After a license the asset gets from its pack rather than its own.
+asset-field-from-pack = din pachet
+asset-field-license-placeholder = De exemplu CC0 sau CC-BY 4.0
+asset-field-remove-placeholder = Goliți pentru a elimina
+# $field is a field's name, like "License".
+asset-field-edit-title = Editați { $field }
+asset-field-saved = { $field } a fost salvat
+asset-field-cleared = { $field } a fost golit
+asset-rate =
+    { $count ->
+        [one] { $count } stea
+        [few] { $count } stele
+       *[other] { $count } de stele
+    }
+asset-rated =
+    { $count ->
+        [one] Evaluat cu { $count } stea
+        [few] Evaluat cu { $count } stele
+       *[other] Evaluat cu { $count } de stele
+    }
+asset-rating-clear-title = Faceți din nou clic pentru a șterge evaluarea
+asset-rating-cleared = Evaluarea a fost ștearsă
 asset-collections = Colecții
 asset-collection-remove = Eliminați din { $name }
 asset-collection-add-another = Adăugați în alta

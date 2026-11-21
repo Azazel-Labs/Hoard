@@ -32,6 +32,8 @@ error-upload-failed = o envio falhou: { $reason }
 error-upload-no-files = nenhum arquivo no envio
 error-analyze-nothing-to-do = nada a fazer: rules=false e o LLM está desligado
 error-too-many-assets = assets demais em uma só solicitação
+error-change-not-found = essa alteração não está no histórico deste recurso
+error-bulk-by-look = uma busca por aparência não pode ser editada de uma vez: selecione os recursos
 error-too-many-items = itens demais em uma só solicitação
 error-not-a-hash = não é um hash blake3 em hexadecimal
 error-merge-into-tag = into precisa ser uma tag
@@ -569,6 +571,27 @@ app-bulk-category-cleared =
         [one] { $count } asset foi limpa
        *[other] { $count } assets foi limpa
     }
+app-bulk-review = Marcar revisados
+app-bulk-review-title = Marcar os assets selecionados como revisados: as regras e a IA deixam as tags deles em paz a partir daí
+app-bulk-unreview = Marcar não revisados
+app-bulk-unreview-title = Tirar a marca de revisado dos assets selecionados
+app-bulk-reviewed =
+    { $count ->
+        [one] { $count } asset marcado como revisado
+       *[other] { $count } assets marcados como revisados
+    }
+app-bulk-unreviewed =
+    Marca de revisado tirada de { $count ->
+        [one] { $count } asset
+       *[other] { $count } assets
+    }
+app-bulk-accept = Manter palpites
+app-bulk-accept-title = Manter como suas todas as tags que as regras e a IA puseram nos assets selecionados
+app-bulk-accepted =
+    Palpites mantidos em { $count ->
+        [one] { $count } asset
+       *[other] { $count } assets
+    }
 app-credits-failed = Não foi possível gerar os créditos: { $error }
 app-archived-assets =
     { $count ->
@@ -609,6 +632,8 @@ app-filters = Filtros
 app-done = Concluído
 app-yours = Seus
 app-favorites = Favoritos
+app-needs-review = Precisa de revisão
+app-needs-review-title = Só assets que ninguém revisou ainda (combina com os outros filtros)
 app-forget-search-label = Esquecer a busca salva { $name }
 app-forget-search = Esquecer esta busca
 app-projects-title = Projetos que fazem hoard sync daqui, com o que a última sincronização deles tinha
@@ -785,6 +810,7 @@ shortcuts-open = Abrir os detalhes
 shortcuts-play-sound = Tocar ou parar um som
 shortcuts-select = Selecionar ou desmarcar
 shortcuts-favorite = Adicionar aos favoritos ou tirar deles
+shortcuts-reviewed = Marcar como revisado ou não
 shortcuts-key-click = clique
 shortcuts-select-range = Selecionar um intervalo
 shortcuts-select-all = Selecionar tudo o que é mostrado
@@ -812,6 +838,9 @@ tag-source-rule = do gerador de tags offline
 tag-source-meta = medida a partir do arquivo
 tag-source-ai = sugerida por IA
 tag-remove = Remover a tag { $tag }
+tag-accept = Manter a tag { $tag }
+tag-accept-title = Manter este palpite como tag sua
+tag-reject-title = Remover; o gerador de tags não vai recolocá-la
 
 ## ActivityIndicator.vue
 
@@ -1477,6 +1506,20 @@ asset-meta-analysis-error = Não foi possível ler este arquivo por completo: { 
 asset-copy-blocked = Não foi possível copiar: o navegador bloqueou
 asset-save-error = Não foi possível salvar: { $error }
 asset-tag-removed = { $tag } removida
+asset-tag-restored = { $tag } recolocada
+asset-tags-accepted =
+    { $count ->
+        [one] { $count } palpite mantido
+       *[other] { $count } palpites mantidos
+    }
+asset-reviewed = Revisado
+asset-reviewed-on-title = Revisado: as regras e a IA deixam as tags dele em paz. Clique para tirar a marca (R)
+asset-reviewed-off-title = Marcar como revisado, para que as regras e a IA deixem as tags dele em paz (R)
+asset-reviewed-on = Marcado como revisado
+asset-reviewed-off = Marca de revisado tirada
+# $name is an asset's name.
+asset-reviewed-on-named = { $name } marcado como revisado
+asset-reviewed-off-named = Marca de revisado tirada de { $name }
 asset-undo = Desfazer
 asset-play-error = Não foi possível tocar este arquivo: { $error }
 asset-copied-hash = Hash copiado
@@ -1543,7 +1586,46 @@ asset-tags = Tags
 asset-tag-add-label = Adicionar uma tag
 asset-tag-add-placeholder = Adicione uma tag, por exemplo mood:tense
 asset-tag-add = Adicionar
-asset-apply-family = Aplicar as mudanças de tag, categoria e descrição a todas as { $count } variantes
+asset-apply-family = Aplicar as mudanças a todas as { $count } variantes
+asset-tags-accept-all =
+    Manter { $count ->
+        [one] { $count } palpite
+       *[other] { $count } palpites
+    }
+asset-tags-accept-all-title = Manter como suas todas as tags que as regras e a IA adivinharam
+# Before a list of tags someone removed, which the taggers won't put back; each can be clicked to restore it.
+asset-tags-rejected = Recusadas:
+asset-tag-restore-title = Recolocar { $tag }
+asset-details-heading = Detalhes
+asset-field-category = Categoria
+asset-field-license = Licença
+asset-field-source = Origem
+asset-field-rating = Avaliação
+# Shown in place of an empty value, to fill it in.
+asset-field-add = Adicionar
+asset-field-new = Adicionar um campo
+asset-field-name = Nome do campo
+asset-field-value = Valor
+# After a license the asset gets from its pack rather than its own.
+asset-field-from-pack = do pacote
+asset-field-license-placeholder = Como CC0 ou CC-BY 4.0
+asset-field-remove-placeholder = Vazio para remover
+# $field is a field's name, like "License".
+asset-field-edit-title = Editar { $field }
+asset-field-saved = { $field } salvo
+asset-field-cleared = { $field } limpo
+asset-rate =
+    { $count ->
+        [one] { $count } estrela
+       *[other] { $count } estrelas
+    }
+asset-rated =
+    Avaliado com { $count ->
+        [one] { $count } estrela
+       *[other] { $count } estrelas
+    }
+asset-rating-clear-title = Clique de novo para limpar a avaliação
+asset-rating-cleared = Avaliação limpa
 asset-collections = Coleções
 asset-collection-remove = Remover de { $name }
 asset-collection-add-another = Adicionar a outra

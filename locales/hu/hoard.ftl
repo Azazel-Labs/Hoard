@@ -32,6 +32,8 @@ error-upload-failed = a feltöltés sikertelen: { $reason }
 error-upload-no-files = a feltöltésben nincsenek fájlok
 error-analyze-nothing-to-do = nincs mit tenni: rules=false, és az LLM ki van kapcsolva
 error-too-many-assets = túl sok asset egy kérésben
+error-change-not-found = ez a változás nincs az asset előzményeiben
+error-bulk-by-look = a megjelenés szerinti keresés nem szerkeszthető egyszerre: inkább jelöld ki az asseteket
 error-too-many-items = túl sok elem egy kérésben
 error-not-a-hash = nem blake3 hexadecimális hash
 error-merge-into-tag = az into értéke csak címke lehet
@@ -549,6 +551,27 @@ app-bulk-untagged = Címke eltávolítva { $count } assetről: { $tag }
 app-bulk-tagged = { $count } asset felcímkézve ezzel: { $tag }
 app-bulk-category-set = { $count } asset kategóriája beállítva: { $category }
 app-bulk-category-cleared = { $count } asset kategóriája törölve
+app-bulk-review = Megjelölés átnézettként
+app-bulk-review-title = A kijelölt assetek megjelölése átnézettként: a szabályok és az MI ezután nem nyúlnak a címkéikhez
+app-bulk-unreview = Jelölés levétele
+app-bulk-unreview-title = Az átnézett jelölés levétele a kijelölt assetekről
+app-bulk-reviewed =
+    { $count ->
+        [one] { $count } asset megjelölve átnézettként
+       *[other] { $count } asset megjelölve átnézettként
+    }
+app-bulk-unreviewed =
+    { $count ->
+        [one] Átnézett jelölés levéve { $count } assetről
+       *[other] Átnézett jelölés levéve { $count } assetről
+    }
+app-bulk-accept = Tippelt címkék megtartása
+app-bulk-accept-title = A szabályok és az MI által a kijelölt assetekre tett összes címke megtartása saját címkeként
+app-bulk-accepted =
+    { $count ->
+        [one] Tippelt címkék megtartva { $count } asseten
+       *[other] Tippelt címkék megtartva { $count } asseten
+    }
 app-credits-failed = Nem sikerült elkészíteni a szerzők listáját: { $error }
 app-archived-assets = { $count } asset archiválva
 app-archived-one = Archiválva: { $name }
@@ -585,6 +608,8 @@ app-filters = Szűrők
 app-done = Kész
 app-yours = Saját
 app-favorites = Kedvencek
+app-needs-review = Átnézésre vár
+app-needs-review-title = Csak azok az assetek, amelyeket még senki nem nézett át (a többi szűrővel együtt működik)
 app-forget-search-label = Mentett keresés elfelejtése: { $name }
 app-forget-search = Keresés elfelejtése
 app-projects-title = Projektek, amelyek a hoard sync paranccsal innen szinkronizálnak, a legutóbbi szinkronizálás adataival
@@ -753,6 +778,7 @@ shortcuts-open = Részletek megnyitása
 shortcuts-play-sound = Hang lejátszása vagy leállítása
 shortcuts-select = Kijelölés vagy kijelölés megszüntetése
 shortcuts-favorite = Hozzáadás a kedvencekhez vagy eltávolítás onnan
+shortcuts-reviewed = Megjelölés átnézettként, vagy a jelölés levétele
 shortcuts-key-click = kattintás
 shortcuts-select-range = Tartomány kijelölése
 shortcuts-select-all = Minden látható kijelölése
@@ -780,6 +806,9 @@ tag-source-rule = az offline címkézőtől
 tag-source-meta = a fájlból mérve
 tag-source-ai = MI által javasolt
 tag-remove = Címke eltávolítása: { $tag }
+tag-accept = A(z) { $tag } címke megtartása
+tag-accept-title = A tipp megtartása saját címkeként
+tag-reject-title = Eltávolítás; a címkéző nem teszi vissza
 
 ## Tevékenységjelző
 
@@ -1368,6 +1397,20 @@ asset-meta-analysis-error = Nem sikerült teljesen beolvasni ezt a fájlt: { $er
 asset-copy-blocked = Nem sikerült másolni: a böngésző letiltotta
 asset-save-error = Nem sikerült menteni: { $error }
 asset-tag-removed = Eltávolítva: { $tag }
+asset-tag-restored = Visszatéve: { $tag }
+asset-tags-accepted =
+    { $count ->
+        [one] { $count } tippelt címke megtartva
+       *[other] { $count } tippelt címke megtartva
+    }
+asset-reviewed = Átnézve
+asset-reviewed-on-title = Átnézve: a szabályok és az MI nem nyúlnak a címkéihez. Kattintson a jelölés levételéhez (R)
+asset-reviewed-off-title = Megjelölés átnézettként, hogy a szabályok és az MI ne nyúljanak a címkéihez (R)
+asset-reviewed-on = Megjelölve átnézettként
+asset-reviewed-off = Átnézett jelölés levéve
+# $name is an asset's name.
+asset-reviewed-on-named = { $name } megjelölve átnézettként
+asset-reviewed-off-named = Átnézett jelölés levéve: { $name }
 asset-undo = Visszavonás
 asset-play-error = Nem sikerült lejátszani ezt a fájlt: { $error }
 asset-copied-hash = Hash másolva
@@ -1434,7 +1477,46 @@ asset-tags = Címkék
 asset-tag-add-label = Címke hozzáadása
 asset-tag-add-placeholder = Címke hozzáadása, pl. mood:tense
 asset-tag-add = Hozzáadás
-asset-apply-family = A címke-, kategória- és leírásmódosítások alkalmazása mindegyik változatra ({ $count })
+asset-apply-family = A módosítások alkalmazása mindegyik változatra ({ $count })
+asset-tags-accept-all =
+    { $count ->
+        [one] { $count } tipp megtartása
+       *[other] Mind a(z) { $count } tipp megtartása
+    }
+asset-tags-accept-all-title = A szabályok és az MI által tippelt összes címke megtartása saját címkeként
+# Before a list of tags someone removed, which the taggers won't put back; each can be clicked to restore it.
+asset-tags-rejected = Elutasítva:
+asset-tag-restore-title = Visszatétel: { $tag }
+asset-details-heading = Részletek
+asset-field-category = Kategória
+asset-field-license = Licenc
+asset-field-source = Forrás
+asset-field-rating = Értékelés
+# Shown in place of an empty value, to fill it in.
+asset-field-add = Hozzáadás
+asset-field-new = Mező hozzáadása
+asset-field-name = Mező neve
+asset-field-value = Érték
+# After a license the asset gets from its pack rather than its own.
+asset-field-from-pack = a csomagból
+asset-field-license-placeholder = Például CC0 vagy CC-BY 4.0
+asset-field-remove-placeholder = Üresen hagyva törli
+# $field is a field's name, like "License".
+asset-field-edit-title = { $field } szerkesztése
+asset-field-saved = Mentve: { $field }
+asset-field-cleared = Törölve: { $field }
+asset-rate =
+    { $count ->
+        [one] { $count } csillag
+       *[other] { $count } csillag
+    }
+asset-rated =
+    { $count ->
+        [one] Értékelés: { $count } csillag
+       *[other] Értékelés: { $count } csillag
+    }
+asset-rating-clear-title = Kattintson újra az értékelés törléséhez
+asset-rating-cleared = Értékelés törölve
 asset-collections = Gyűjtemények
 asset-collection-remove = Eltávolítás innen: { $name }
 asset-collection-add-another = Hozzáadás máshoz

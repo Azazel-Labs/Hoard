@@ -179,6 +179,9 @@ fn build_filter(q: &SearchQuery, include_kind: bool, look: Option<&LookRank>) ->
     if q.hide_supporting {
         f.clauses.push(format!("NOT {SUPPORTING}"));
     }
+    if let Some(reviewed) = q.reviewed {
+        f.clauses.push(if reviewed { "a.reviewed_at IS NOT NULL" } else { "a.reviewed_at IS NULL" }.to_owned());
+    }
     music_filter(q, &mut f);
     f.clauses.push(
         match (q.archived, q.pack.as_deref().is_some_and(|p| !p.is_empty())) {
@@ -412,6 +415,15 @@ fn chosen_order(sort: Option<&str>) -> Option<&'static str> {
         ("size", true) => "b.size ASC",
         _ => return None,
     })
+}
+
+/// Every asset a search finds, in no particular order: for doing something to all of them. Not for searches by look
+/// (`similar`, `color`, `imitation`), whose matches are worked out elsewhere.
+pub(crate) fn matching_ids(conn: &Connection, q: &SearchQuery) -> Result<Vec<String>> {
+    let f = build_filter(q, true, None);
+    let mut stmt = conn.prepare(&format!("SELECT a.id FROM assets a {} {}", f.join, f.where_sql()))?;
+    let ids = stmt.query_map(params_from_iter(&f.params), |r| r.get(0))?.collect::<rusqlite::Result<_>>()?;
+    Ok(ids)
 }
 
 pub(crate) fn search(conn: &Connection, q: &SearchQuery, with_facets: bool) -> Result<SearchPage> {
@@ -661,6 +673,16 @@ fn keep_ranked(key: String, writes: u64, found: &Arc<Vec<i64>>) {
 
 /// Tags in use and how many assets have each, most used first: those starting with `prefix`, or with `anywhere`
 /// those containing it.
+/// The categories assets in the library have, the most used first.
+pub(crate) fn category_counts(conn: &Connection, limit: u32) -> Result<Vec<Facet>> {
+    let mut stmt = conn.prepare(&format!(
+        "SELECT a.category, COUNT(*) FROM assets a WHERE a.category IS NOT NULL AND a.category != '' AND {LIVE}
+          GROUP BY a.category ORDER BY 2 DESC, 1 LIMIT ?1"
+    ))?;
+    let rows = stmt.query_map([limit], |r| Ok(Facet { value: r.get(0)?, count: r.get::<_, i64>(1)? as u64 }))?;
+    Ok(rows.collect::<rusqlite::Result<_>>()?)
+}
+
 pub(crate) fn tag_counts(conn: &Connection, prefix: &str, anywhere: bool, limit: u32) -> Result<Vec<Facet>> {
     // Read before counting, so a write while counting leaves them stale.
     let writes = super::writes();

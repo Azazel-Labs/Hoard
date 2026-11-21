@@ -32,6 +32,8 @@ error-upload-failed = η μεταφόρτωση απέτυχε: { $reason }
 error-upload-no-files = η μεταφόρτωση δεν περιέχει αρχεία
 error-analyze-nothing-to-do = τίποτα προς εκτέλεση: rules=false και το LLM είναι ανενεργό
 error-too-many-assets = υπερβολικά πολλά στοιχεία σε ένα αίτημα
+error-change-not-found = αυτή η αλλαγή δεν υπάρχει στο ιστορικό αυτού του στοιχείου
+error-bulk-by-look = μια αναζήτηση κατά εμφάνιση δεν μπορεί να επεξεργαστεί όλη μαζί: επιλέξτε τα στοιχεία
 error-too-many-items = υπερβολικά πολλά αντικείμενα σε ένα αίτημα
 error-not-a-hash = δεν είναι δεκαεξαδικό hash blake3
 error-merge-into-tag = το into πρέπει να είναι ετικέτα
@@ -581,6 +583,27 @@ app-bulk-category-cleared =
         [one] Καταργήθηκε η κατηγορία από { $count } στοιχείο
        *[other] Καταργήθηκε η κατηγορία από { $count } στοιχεία
     }
+app-bulk-review = Σήμανση ως ελεγμένα
+app-bulk-review-title = Σήμανση των επιλεγμένων στοιχείων ως ελεγμένων: οι κανόνες και η AI δεν θα αγγίζουν πλέον τις ετικέτες τους
+app-bulk-unreview = Σήμανση ως μη ελεγμένα
+app-bulk-unreview-title = Αφαίρεση της σήμανσης «ελεγμένο» από τα επιλεγμένα στοιχεία
+app-bulk-reviewed =
+    { $count ->
+        [one] Σημάνθηκε ως ελεγμένο { $count } στοιχείο
+       *[other] Σημάνθηκαν ως ελεγμένα { $count } στοιχεία
+    }
+app-bulk-unreviewed =
+    { $count ->
+        [one] Αφαιρέθηκε η σήμανση «ελεγμένο» από { $count } στοιχείο
+       *[other] Αφαιρέθηκε η σήμανση «ελεγμένο» από { $count } στοιχεία
+    }
+app-bulk-accept = Διατήρηση εικασιών
+app-bulk-accept-title = Διατήρηση ως δικών σας όλων των ετικετών που έβαλαν οι κανόνες και η AI στα επιλεγμένα στοιχεία
+app-bulk-accepted =
+    { $count ->
+        [one] Διατηρήθηκαν οι εικαζόμενες ετικέτες σε { $count } στοιχείο
+       *[other] Διατηρήθηκαν οι εικαζόμενες ετικέτες σε { $count } στοιχεία
+    }
 app-credits-failed = Δεν ήταν δυνατή η δημιουργία των credits: { $error }
 app-archived-assets =
     { $count ->
@@ -625,6 +648,8 @@ app-filters = Φίλτρα
 app-done = Τέλος
 app-yours = Δικά σας
 app-favorites = Αγαπημένα
+app-needs-review = Προς έλεγχο
+app-needs-review-title = Μόνο στοιχεία που δεν τα έχει ελέγξει κανείς ακόμη (λειτουργεί μαζί με τα άλλα φίλτρα)
 app-forget-search-label = Ξεχάστε την αποθηκευμένη αναζήτηση { $name }
 app-forget-search = Ξεχάστε αυτή την αναζήτηση
 app-projects-title = Έργα που κάνουν hoard sync από εδώ, με ό,τι είχε ο τελευταίος συγχρονισμός τους
@@ -805,6 +830,7 @@ shortcuts-open = Άνοιγμα λεπτομερειών
 shortcuts-play-sound = Αναπαραγωγή ή διακοπή ήχου
 shortcuts-select = Επιλογή ή αποεπιλογή
 shortcuts-favorite = Προσθήκη ή αφαίρεση από τα αγαπημένα σας
+shortcuts-reviewed = Σήμανση ως ελεγμένο ή όχι
 shortcuts-key-click = κλικ
 shortcuts-select-range = Επιλογή εύρους
 shortcuts-select-all = Επιλογή όλων όσων εμφανίζονται
@@ -832,6 +858,9 @@ tag-source-rule = από τον εκτός σύνδεσης μηχανισμό �
 tag-source-meta = μετρήθηκε από το αρχείο
 tag-source-ai = πρόταση του AI
 tag-remove = Αφαίρεση ετικέτας { $tag }
+tag-accept = Διατήρηση ετικέτας { $tag }
+tag-accept-title = Διατήρηση αυτής της εικασίας ως δική σας ετικέτα
+tag-reject-title = Αφαίρεση· ο μηχανισμός ετικετών δεν θα την ξαναβάλει
 
 ## ActivityIndicator.vue
 
@@ -1521,6 +1550,20 @@ asset-meta-analysis-error = Δεν ήταν δυνατή η πλήρης ανά�
 asset-copy-blocked = Δεν ήταν δυνατή η αντιγραφή: το πρόγραμμα περιήγησης την απέκλεισε
 asset-save-error = Δεν ήταν δυνατή η αποθήκευση: { $error }
 asset-tag-removed = Αφαιρέθηκε η ετικέτα { $tag }
+asset-tag-restored = Η ετικέτα { $tag } τοποθετήθηκε ξανά
+asset-tags-accepted =
+    { $count ->
+        [one] Διατηρήθηκε { $count } εικαζόμενη ετικέτα
+       *[other] Διατηρήθηκαν { $count } εικαζόμενες ετικέτες
+    }
+asset-reviewed = Ελεγμένο
+asset-reviewed-on-title = Ελεγμένο: οι κανόνες και η AI δεν αγγίζουν τις ετικέτες του. Κάντε κλικ για να αφαιρέσετε τη σήμανση (R)
+asset-reviewed-off-title = Σήμανση ως ελεγμένο, ώστε οι κανόνες και η AI να μην αγγίζουν τις ετικέτες του (R)
+asset-reviewed-on = Σημάνθηκε ως ελεγμένο
+asset-reviewed-off = Αφαιρέθηκε η σήμανση «ελεγμένο»
+# $name is an asset's name.
+asset-reviewed-on-named = Το { $name } σημάνθηκε ως ελεγμένο
+asset-reviewed-off-named = Αφαιρέθηκε η σήμανση «ελεγμένο» από το { $name }
 asset-undo = Αναίρεση
 asset-play-error = Δεν ήταν δυνατή η αναπαραγωγή αυτού του αρχείου: { $error }
 asset-copied-hash = Το hash αντιγράφηκε
@@ -1587,7 +1630,46 @@ asset-tags = Ετικέτες
 asset-tag-add-label = Προσθήκη ετικέτας
 asset-tag-add-placeholder = Προσθέστε ετικέτα, π.χ. mood:tense
 asset-tag-add = Προσθήκη
-asset-apply-family = Εφαρμογή των αλλαγών σε ετικέτες, κατηγορία και περιγραφή και στις { $count } παραλλαγές
+asset-apply-family = Εφαρμογή των αλλαγών και στις { $count } παραλλαγές
+asset-tags-accept-all =
+    { $count ->
+        [one] Διατήρηση { $count } εικασίας
+       *[other] Διατήρηση όλων των { $count } εικασιών
+    }
+asset-tags-accept-all-title = Διατήρηση ως δικών σας όλων των ετικετών που εικάστηκαν από τους κανόνες και την AI
+# Before a list of tags someone removed, which the taggers won't put back; each can be clicked to restore it.
+asset-tags-rejected = Απορρίφθηκαν:
+asset-tag-restore-title = Επαναφορά της { $tag }
+asset-details-heading = Λεπτομέρειες
+asset-field-category = Κατηγορία
+asset-field-license = Άδεια
+asset-field-source = Πηγή
+asset-field-rating = Βαθμολογία
+# Shown in place of an empty value, to fill it in.
+asset-field-add = Προσθήκη
+asset-field-new = Προσθήκη πεδίου
+asset-field-name = Όνομα πεδίου
+asset-field-value = Τιμή
+# After a license the asset gets from its pack rather than its own.
+asset-field-from-pack = από το πακέτο
+asset-field-license-placeholder = Π.χ. CC0 ή CC-BY 4.0
+asset-field-remove-placeholder = Κενό για αφαίρεση
+# $field is a field's name, like "License".
+asset-field-edit-title = Επεξεργασία: { $field }
+asset-field-saved = Αποθηκεύτηκε: { $field }
+asset-field-cleared = Εκκαθαρίστηκε: { $field }
+asset-rate =
+    { $count ->
+        [one] { $count } αστέρι
+       *[other] { $count } αστέρια
+    }
+asset-rated =
+    Βαθμολογήθηκε με { $count ->
+        [one] { $count } αστέρι
+       *[other] { $count } αστέρια
+    }
+asset-rating-clear-title = Κάντε ξανά κλικ για εκκαθάριση της βαθμολογίας
+asset-rating-cleared = Η βαθμολογία εκκαθαρίστηκε
 asset-collections = Συλλογές
 asset-collection-remove = Αφαίρεση από τη συλλογή { $name }
 asset-collection-add-another = Προσθήκη σε άλλη

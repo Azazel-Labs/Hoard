@@ -32,6 +32,8 @@ error-upload-failed = la pujada ha fallat: { $reason }
 error-upload-no-files = la pujada no té fitxers
 error-analyze-nothing-to-do = no hi ha res a fer: rules=false i l'LLM està desactivat
 error-too-many-assets = massa recursos en una sola sol·licitud
+error-change-not-found = aquest canvi no és a l'historial d'aquest recurs
+error-bulk-by-look = una cerca per aspecte no es pot editar tota alhora: selecciona els recursos
 error-too-many-items = massa elements en una sola sol·licitud
 error-not-a-hash = no és un hash blake3 hexadecimal
 error-merge-into-tag = into ha de ser una etiqueta
@@ -569,6 +571,27 @@ app-bulk-category-cleared =
         [one] S'ha esborrat la categoria de { $count } recurs
        *[other] S'ha esborrat la categoria de { $count } recursos
     }
+app-bulk-review = Marca com a revisats
+app-bulk-review-title = Marca els recursos seleccionats com a revisats: les regles i la IA deixaran en pau les seves etiquetes
+app-bulk-unreview = Marca com a no revisats
+app-bulk-unreview-title = Treu la marca de revisat dels recursos seleccionats
+app-bulk-reviewed =
+    { $count ->
+        [one] S'ha marcat com a revisat { $count } recurs
+       *[other] S'han marcat com a revisats { $count } recursos
+    }
+app-bulk-unreviewed =
+    { $count ->
+        [one] S'ha tret la marca de revisat a { $count } recurs
+       *[other] S'ha tret la marca de revisat a { $count } recursos
+    }
+app-bulk-accept = Conserva les proposades
+app-bulk-accept-title = Conserva com a pròpies totes les etiquetes que les regles i la IA han posat als recursos seleccionats
+app-bulk-accepted =
+    { $count ->
+        [one] S'han conservat les etiquetes proposades de { $count } recurs
+       *[other] S'han conservat les etiquetes proposades de { $count } recursos
+    }
 app-credits-failed = No s'han pogut generar els crèdits: { $error }
 app-archived-assets =
     { $count ->
@@ -609,6 +632,8 @@ app-filters = Filtres
 app-done = Fet
 app-yours = Vostres
 app-favorites = Preferits
+app-needs-review = Per revisar
+app-needs-review-title = Només els recursos que ningú no ha revisat encara (funciona amb els altres filtres)
 app-forget-search-label = Oblida la cerca desada { $name }
 app-forget-search = Oblida aquesta cerca
 app-projects-title = Projectes que fan hoard sync des d'aquí, amb el que tenia la seva última sincronització
@@ -785,6 +810,7 @@ shortcuts-open = Obre els detalls
 shortcuts-play-sound = Reprodueix o atura un so
 shortcuts-select = Selecciona o desselecciona
 shortcuts-favorite = Afegeix als preferits o treu-ne
+shortcuts-reviewed = Marca com a revisat o no
 shortcuts-key-click = clic
 shortcuts-select-range = Selecciona un interval
 shortcuts-select-all = Selecciona tot el que es mostra
@@ -812,6 +838,9 @@ tag-source-rule = de l'etiquetador fora de línia
 tag-source-meta = mesurada a partir del fitxer
 tag-source-ai = suggerida per la IA
 tag-remove = Treu l'etiqueta { $tag }
+tag-accept = Conserva l'etiqueta { $tag }
+tag-accept-title = Conserva aquesta proposta com a etiqueta pròpia
+tag-reject-title = Treu-la; l'etiquetador no la tornarà a posar
 
 ## ActivityIndicator.vue
 
@@ -1477,6 +1506,20 @@ asset-meta-analysis-error = No s'ha pogut llegir del tot aquest fitxer: { $error
 asset-copy-blocked = No s'ha pogut copiar: el navegador ho ha bloquejat
 asset-save-error = No s'ha pogut desar: { $error }
 asset-tag-removed = S'ha tret { $tag }
+asset-tag-restored = S'ha tornat a posar { $tag }
+asset-tags-accepted =
+    { $count ->
+        [one] S'ha conservat { $count } etiqueta proposada
+       *[other] S'han conservat { $count } etiquetes proposades
+    }
+asset-reviewed = Revisat
+asset-reviewed-on-title = Revisat: les regles i la IA deixen en pau les seves etiquetes. Feu clic per treure la marca (R)
+asset-reviewed-off-title = Marca com a revisat perquè les regles i la IA deixin en pau les seves etiquetes (R)
+asset-reviewed-on = Marcat com a revisat
+asset-reviewed-off = S'ha tret la marca de revisat
+# $name is an asset's name.
+asset-reviewed-on-named = S'ha marcat { $name } com a revisat
+asset-reviewed-off-named = S'ha tret la marca de revisat a { $name }
 asset-undo = Desfés
 asset-play-error = No s'ha pogut reproduir aquest fitxer: { $error }
 asset-copied-hash = S'ha copiat el hash
@@ -1543,7 +1586,46 @@ asset-tags = Etiquetes
 asset-tag-add-label = Afegeix una etiqueta
 asset-tag-add-placeholder = Afegiu una etiqueta, p. ex. mood:tense
 asset-tag-add = Afegeix
-asset-apply-family = Aplica els canvis d'etiquetes, categoria i descripció a totes les { $count } variants
+asset-apply-family = Aplica els canvis a totes les { $count } variants
+asset-tags-accept-all =
+    { $count ->
+        [one] Conserva { $count } proposta
+       *[other] Conserva les { $count } propostes
+    }
+asset-tags-accept-all-title = Conserva com a pròpies totes les etiquetes proposades per les regles i la IA
+# Before a list of tags someone removed, which the taggers won't put back; each can be clicked to restore it.
+asset-tags-rejected = Rebutjades:
+asset-tag-restore-title = Torna a posar { $tag }
+asset-details-heading = Detalls
+asset-field-category = Categoria
+asset-field-license = Llicència
+asset-field-source = Origen
+asset-field-rating = Valoració
+# Shown in place of an empty value, to fill it in.
+asset-field-add = Afegeix
+asset-field-new = Afegeix un camp
+asset-field-name = Nom del camp
+asset-field-value = Valor
+# After a license the asset gets from its pack rather than its own.
+asset-field-from-pack = del paquet
+asset-field-license-placeholder = Com CC0 o CC-BY 4.0
+asset-field-remove-placeholder = Buit per eliminar-lo
+# $field is a field's name, like "License".
+asset-field-edit-title = Edita { $field }
+asset-field-saved = S'ha desat { $field }
+asset-field-cleared = S'ha esborrat { $field }
+asset-rate =
+    { $count ->
+        [one] { $count } estrella
+       *[other] { $count } estrelles
+    }
+asset-rated =
+    Valorat amb { $count ->
+        [one] { $count } estrella
+       *[other] { $count } estrelles
+    }
+asset-rating-clear-title = Feu clic un altre cop per esborrar la valoració
+asset-rating-cleared = S'ha esborrat la valoració
 asset-collections = Col·leccions
 asset-collection-remove = Treu de { $name }
 asset-collection-add-another = Afegeix a una altra

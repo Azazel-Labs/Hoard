@@ -2,7 +2,7 @@
 // types/, and come from here too.
 import { language } from './i18n'
 import type {
-  ArchiveCount, ArchiveItems, Asset, AssetKind, BulkEdit, Collection, ConversionPreview, ConversionRules,
+  ArchiveCount, ArchiveItems, Asset, AssetKind, AssetPatch, BulkEdit, Change, Collection, ConversionPreview, ConversionRules,
   ConversionStatus, CopyGroups, CreditsRequest, Facet, Facing, FolderListing, LibraryStats, Pack, PackContext,
   Project, ProjectUse, SavedSearch, SearchParams, SearchResult, SheetData, Stats, StoreMatches, ThumbSource,
   ThumbUpload, UnrealPackStatus, UsageItems,
@@ -155,15 +155,18 @@ export const api = {
     if (p.key) qs.set('key', p.key)
     if (p.compatible_keys) qs.set('compatible_keys', 'true')
     if (p.favorites) qs.set('favorites', 'true')
+    if (p.reviewed !== undefined) qs.set('reviewed', String(p.reviewed))
     return request<SearchResult>(`/api/assets?${qs}`, { signal }).then((r) => ({ ...r, items: r.items.map(normalize) }))
   },
   asset: (id: string) => request<Asset>(`/api/assets/${id}`).then(normalize),
   /** Where a web page in a pack opens sandboxed, with its pictures, styles and scripts loading from beside it. */
   assetSite: (id: string) => request<{ url: string; expires: number }>(`/api/assets/${id}/site`),
-  patchAsset: (id: string, patch: {
-    name?: string; category?: string; description?: string; add_tags?: string[]; remove_tags?: string[]
-    apply_to_family?: boolean
-  }) =>
+  /** What's been changed on it, the latest first. */
+  history: (id: string) => request<Change[]>(`/api/assets/${id}/history`),
+  /** Put back what one change changed. */
+  revertChange: (id: string, change: number) =>
+    post<Asset>(`/api/assets/${id}/history/${change}/revert`, {}).then(normalize),
+  patchAsset: (id: string, patch: AssetPatch) =>
     request<Asset>(`/api/assets/${id}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
@@ -210,6 +213,8 @@ export const api = {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(opts),
     }),
+  /** Categories in use, most used first. */
+  categories: () => request<Facet[]>('/api/categories'),
   tags: (prefix: string) => request<Facet[]>(`/api/tags?prefix=${encodeURIComponent(prefix)}&limit=12`),
   /** Every tag in use containing `q`, most used first. */
   allTags: (q: string, limit = 2000) =>

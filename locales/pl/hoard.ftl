@@ -32,6 +32,8 @@ error-upload-failed = przesyłanie nie powiodło się: { $reason }
 error-upload-no-files = brak plików w przesyłaniu
 error-analyze-nothing-to-do = nic do zrobienia: rules=false, a LLM jest wyłączony
 error-too-many-assets = zbyt wiele zasobów w jednym żądaniu
+error-change-not-found = tej zmiany nie ma w historii tego zasobu
+error-bulk-by-look = wyszukiwania według wyglądu nie można edytować naraz: zaznacz zasoby
 error-too-many-items = zbyt wiele elementów w jednym żądaniu
 error-not-a-hash = to nie jest skrót blake3 w zapisie szesnastkowym
 error-merge-into-tag = into musi być tagiem
@@ -593,6 +595,33 @@ app-bulk-category-cleared =
         [many] { $count } zasobów
        *[other] { $count } zasobu
     }
+app-bulk-review = Oznacz jako sprawdzone
+app-bulk-review-title = Oznacz zaznaczone zasoby jako przejrzane: reguły i AI nie ruszają potem ich tagów
+app-bulk-unreview = Oznacz jako niesprawdzone
+app-bulk-unreview-title = Zdejmij oznaczenie „sprawdzone” z zaznaczonych zasobów
+app-bulk-reviewed =
+    Oznaczono jako sprawdzone: { $count ->
+        [one] { $count } zasób
+        [few] { $count } zasoby
+        [many] { $count } zasobów
+       *[other] { $count } zasobu
+    }
+app-bulk-unreviewed =
+    Zdjęto oznaczenie „sprawdzone” z { $count ->
+        [one] { $count } zasobu
+        [few] { $count } zasobów
+        [many] { $count } zasobów
+       *[other] { $count } zasobu
+    }
+app-bulk-accept = Zachowaj podpowiedzi
+app-bulk-accept-title = Zachowaj jako własne wszystkie tagi dodane przez reguły i AI do zaznaczonych zasobów
+app-bulk-accepted =
+    Zachowano podpowiedziane tagi dla { $count ->
+        [one] { $count } zasobu
+        [few] { $count } zasobów
+        [many] { $count } zasobów
+       *[other] { $count } zasobu
+    }
 app-credits-failed = Nie udało się utworzyć listy autorów: { $error }
 app-archived-assets =
     Zarchiwizowano { $count ->
@@ -641,6 +670,8 @@ app-filters = Filtry
 app-done = Gotowe
 app-yours = Moje
 app-favorites = Ulubione
+app-needs-review = Do sprawdzenia
+app-needs-review-title = Tylko zasoby, których nikt jeszcze nie przejrzał (działa razem z innymi filtrami)
 app-forget-search-label = Zapomnij zapisane wyszukiwanie { $name }
 app-forget-search = Zapomnij to wyszukiwanie
 app-projects-title = Projekty synchronizowane stąd przez hoard sync, z tym, co miała ich ostatnia synchronizacja
@@ -827,6 +858,7 @@ shortcuts-open = Otwórz szczegóły
 shortcuts-play-sound = Odtwórz lub zatrzymaj dźwięk
 shortcuts-select = Zaznacz lub odznacz
 shortcuts-favorite = Dodaj do ulubionych lub usuń z ulubionych
+shortcuts-reviewed = Oznacz jako sprawdzone lub nie
 shortcuts-key-click = kliknięcie
 shortcuts-select-range = Zaznacz zakres
 shortcuts-select-all = Zaznacz wszystko, co widoczne
@@ -854,6 +886,9 @@ tag-source-rule = z tagowania offline
 tag-source-meta = zmierzony z pliku
 tag-source-ai = zasugerowany przez AI
 tag-remove = Usuń tag { $tag }
+tag-accept = Zachowaj tag { $tag }
+tag-accept-title = Zachowaj tę podpowiedź jako własny tag
+tag-reject-title = Usuń; tagowanie nie doda go ponownie
 
 ## ActivityIndicator.vue
 
@@ -1598,6 +1633,22 @@ asset-meta-analysis-error = Nie udało się w pełni odczytać tego pliku: { $er
 asset-copy-blocked = Nie udało się skopiować: przeglądarka to zablokowała
 asset-save-error = Nie udało się zapisać: { $error }
 asset-tag-removed = Usunięto { $tag }
+asset-tag-restored = Przywrócono { $tag }
+asset-tags-accepted =
+    Zachowano { $count ->
+        [one] { $count } podpowiedziany tag
+        [few] { $count } podpowiedziane tagi
+        [many] { $count } podpowiedzianych tagów
+       *[other] { $count } podpowiedzianego tagu
+    }
+asset-reviewed = Sprawdzone
+asset-reviewed-on-title = Sprawdzone: reguły i AI nie ruszają jego tagów. Kliknij, aby zdjąć oznaczenie (R)
+asset-reviewed-off-title = Oznacz jako sprawdzone, aby reguły i AI nie ruszały jego tagów (R)
+asset-reviewed-on = Oznaczono jako sprawdzone
+asset-reviewed-off = Zdjęto oznaczenie „sprawdzone”
+# $name is an asset's name.
+asset-reviewed-on-named = Oznaczono { $name } jako sprawdzone
+asset-reviewed-off-named = Zdjęto oznaczenie „sprawdzone” z { $name }
 asset-undo = Cofnij
 asset-play-error = Nie udało się odtworzyć tego pliku: { $error }
 asset-copied-hash = Skopiowano skrót
@@ -1664,7 +1715,52 @@ asset-tags = Tagi
 asset-tag-add-label = Dodaj tag
 asset-tag-add-placeholder = Dodaj tag, np. mood:tense
 asset-tag-add = Dodaj
-asset-apply-family = Zastosuj zmiany tagów, kategorii i opisu do wszystkich wariantów ({ $count })
+asset-apply-family = Zastosuj zmiany do wszystkich wariantów ({ $count })
+asset-tags-accept-all =
+    Zachowaj { $count ->
+        [one] { $count } podpowiedź
+        [few] { $count } podpowiedzi
+        [many] { $count } podpowiedzi
+       *[other] { $count } podpowiedzi
+    }
+asset-tags-accept-all-title = Zachowaj jako własne wszystkie tagi podpowiedziane przez reguły i AI
+# Before a list of tags someone removed, which the taggers won't put back; each can be clicked to restore it.
+asset-tags-rejected = Odrzucone:
+asset-tag-restore-title = Przywróć { $tag }
+asset-details-heading = Szczegóły
+asset-field-category = Kategoria
+asset-field-license = Licencja
+asset-field-source = Źródło
+asset-field-rating = Ocena
+# Shown in place of an empty value, to fill it in.
+asset-field-add = Dodaj
+asset-field-new = Dodaj pole
+asset-field-name = Nazwa pola
+asset-field-value = Wartość
+# After a license the asset gets from its pack rather than its own.
+asset-field-from-pack = z paczki
+asset-field-license-placeholder = Na przykład CC0 lub CC-BY 4.0
+asset-field-remove-placeholder = Puste pole usuwa wartość
+# $field is a field's name, like "License".
+asset-field-edit-title = Edytuj { $field }
+asset-field-saved = Zapisano { $field }
+asset-field-cleared = Wyczyszczono { $field }
+asset-rate =
+    { $count ->
+        [one] { $count } gwiazdka
+        [few] { $count } gwiazdki
+        [many] { $count } gwiazdek
+       *[other] { $count } gwiazdki
+    }
+asset-rated =
+    Oceniono na { $count ->
+        [one] { $count } gwiazdkę
+        [few] { $count } gwiazdki
+        [many] { $count } gwiazdek
+       *[other] { $count } gwiazdki
+    }
+asset-rating-clear-title = Kliknij ponownie, aby wyczyścić ocenę
+asset-rating-cleared = Wyczyszczono ocenę
 asset-collections = Kolekcje
 asset-collection-remove = Usuń z { $name }
 asset-collection-add-another = Dodaj do innej

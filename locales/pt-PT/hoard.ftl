@@ -32,6 +32,8 @@ error-upload-failed = o carregamento falhou: { $reason }
 error-upload-no-files = não há ficheiros no carregamento
 error-analyze-nothing-to-do = nada a fazer: rules=false e o LLM está desligado
 error-too-many-assets = demasiados recursos num só pedido
+error-change-not-found = essa alteração não está no histórico deste recurso
+error-bulk-by-look = uma pesquisa por aspeto não pode ser editada de uma vez: selecione os recursos
 error-too-many-items = demasiados itens num só pedido
 error-not-a-hash = não é um hash blake3 em hexadecimal
 error-merge-into-tag = into tem de ser uma etiqueta
@@ -569,6 +571,27 @@ app-bulk-category-cleared =
         [one] { $count } recurso limpa
        *[other] { $count } recursos limpa
     }
+app-bulk-review = Marcar revistos
+app-bulk-review-title = Marcar os recursos selecionados como revistos: as regras e a IA deixam as etiquetas deles em paz a partir daí
+app-bulk-unreview = Marcar não revistos
+app-bulk-unreview-title = Retirar a marca de revisto dos recursos selecionados
+app-bulk-reviewed =
+    { $count ->
+        [one] { $count } recurso marcado como revisto
+       *[other] { $count } recursos marcados como revistos
+    }
+app-bulk-unreviewed =
+    Marca de revisto retirada de { $count ->
+        [one] { $count } recurso
+       *[other] { $count } recursos
+    }
+app-bulk-accept = Manter palpites
+app-bulk-accept-title = Manter como suas todas as etiquetas que as regras e a IA puseram nos recursos selecionados
+app-bulk-accepted =
+    Palpites mantidos em { $count ->
+        [one] { $count } recurso
+       *[other] { $count } recursos
+    }
 app-credits-failed = Não foi possível criar os créditos: { $error }
 app-archived-assets =
     { $count ->
@@ -609,6 +632,8 @@ app-filters = Filtros
 app-done = Concluído
 app-yours = Seus
 app-favorites = Favoritos
+app-needs-review = Por rever
+app-needs-review-title = Só recursos que ninguém reviu ainda (combina com os outros filtros)
 app-forget-search-label = Esquecer a pesquisa guardada { $name }
 app-forget-search = Esquecer esta pesquisa
 app-projects-title = Projetos que fazem hoard sync a partir daqui, com o que tinha a última sincronização
@@ -785,6 +810,7 @@ shortcuts-open = Abrir os detalhes
 shortcuts-play-sound = Reproduzir ou parar um som
 shortcuts-select = Selecionar ou desmarcar
 shortcuts-favorite = Adicionar aos favoritos ou retirar deles
+shortcuts-reviewed = Marcar como revisado ou não
 shortcuts-key-click = clique
 shortcuts-select-range = Selecionar um intervalo
 shortcuts-select-all = Selecionar tudo o que está visível
@@ -812,6 +838,9 @@ tag-source-rule = do etiquetador offline
 tag-source-meta = medida a partir do ficheiro
 tag-source-ai = sugerida pela IA
 tag-remove = Remover a etiqueta { $tag }
+tag-accept = Manter a etiqueta { $tag }
+tag-accept-title = Manter este palpite como etiqueta sua
+tag-reject-title = Remover; o etiquetador não a volta a colocar
 
 ## ActivityIndicator.vue
 
@@ -1477,6 +1506,20 @@ asset-meta-analysis-error = Não foi possível ler este ficheiro por completo: {
 asset-copy-blocked = Não foi possível copiar: o navegador bloqueou
 asset-save-error = Não foi possível guardar: { $error }
 asset-tag-removed = { $tag } removida
+asset-tag-restored = { $tag } reposta
+asset-tags-accepted =
+    { $count ->
+        [one] { $count } palpite mantido
+       *[other] { $count } palpites mantidos
+    }
+asset-reviewed = Revisto
+asset-reviewed-on-title = Revisto: as regras e a IA deixam as etiquetas dele em paz. Clique para retirar a marca (R)
+asset-reviewed-off-title = Marcar como revisto, para que as regras e a IA deixem as etiquetas dele em paz (R)
+asset-reviewed-on = Marcado como revisto
+asset-reviewed-off = Marca de revisto retirada
+# $name is an asset's name.
+asset-reviewed-on-named = { $name } marcado como revisto
+asset-reviewed-off-named = Marca de revisto retirada de { $name }
 asset-undo = Anular
 asset-play-error = Não foi possível reproduzir este ficheiro: { $error }
 asset-copied-hash = Hash copiado
@@ -1543,7 +1586,46 @@ asset-tags = Etiquetas
 asset-tag-add-label = Adicionar uma etiqueta
 asset-tag-add-placeholder = Adicione uma etiqueta, p. ex. mood:tense
 asset-tag-add = Adicionar
-asset-apply-family = Aplicar as alterações de etiquetas, categoria e descrição às { $count } variantes
+asset-apply-family = Aplicar as alterações a todas as { $count } variantes
+asset-tags-accept-all =
+    Manter { $count ->
+        [one] { $count } palpite
+       *[other] { $count } palpites
+    }
+asset-tags-accept-all-title = Manter como suas todas as etiquetas que as regras e a IA adivinharam
+# Before a list of tags someone removed, which the taggers won't put back; each can be clicked to restore it.
+asset-tags-rejected = Recusadas:
+asset-tag-restore-title = Repor { $tag }
+asset-details-heading = Detalhes
+asset-field-category = Categoria
+asset-field-license = Licença
+asset-field-source = Origem
+asset-field-rating = Classificação
+# Shown in place of an empty value, to fill it in.
+asset-field-add = Adicionar
+asset-field-new = Adicionar um campo
+asset-field-name = Nome do campo
+asset-field-value = Valor
+# After a license the asset gets from its pack rather than its own.
+asset-field-from-pack = do pacote
+asset-field-license-placeholder = Como CC0 ou CC-BY 4.0
+asset-field-remove-placeholder = Vazio para remover
+# $field is a field's name, like "License".
+asset-field-edit-title = Editar { $field }
+asset-field-saved = { $field } guardado
+asset-field-cleared = { $field } limpo
+asset-rate =
+    { $count ->
+        [one] { $count } estrela
+       *[other] { $count } estrelas
+    }
+asset-rated =
+    Classificado com { $count ->
+        [one] { $count } estrela
+       *[other] { $count } estrelas
+    }
+asset-rating-clear-title = Clique outra vez para limpar a classificação
+asset-rating-cleared = Classificação limpa
 asset-collections = Coleções
 asset-collection-remove = Remover de { $name }
 asset-collection-add-another = Adicionar a outra

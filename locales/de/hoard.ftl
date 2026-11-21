@@ -32,6 +32,8 @@ error-upload-failed = Upload fehlgeschlagen: { $reason }
 error-upload-no-files = keine Dateien im Upload
 error-analyze-nothing-to-do = nichts zu tun: rules=false und das LLM ist aus
 error-too-many-assets = zu viele Assets in einer Anfrage
+error-change-not-found = diese Änderung steht nicht im Verlauf dieses Assets
+error-bulk-by-look = eine Suche nach Aussehen lässt sich nicht auf einmal bearbeiten: wähle stattdessen die Assets aus
 error-too-many-items = zu viele Einträge in einer Anfrage
 error-not-a-hash = kein blake3-Hash in Hexadezimalschreibweise
 error-merge-into-tag = into muss ein Tag sein
@@ -573,6 +575,27 @@ app-bulk-category-cleared =
         [one] { $count } Asset
        *[other] { $count } Assets
     } entfernt
+app-bulk-review = Als geprüft markieren
+app-bulk-review-title = Die ausgewählten Assets als geprüft markieren: Regeln und die KI lassen ihre Tags danach in Ruhe
+app-bulk-unreview = Als ungeprüft markieren
+app-bulk-unreview-title = Die Geprüft-Markierung von den ausgewählten Assets entfernen
+app-bulk-reviewed =
+    Als geprüft markiert: { $count ->
+        [one] { $count } Asset
+       *[other] { $count } Assets
+    }
+app-bulk-unreviewed =
+    Geprüft-Markierung entfernt bei { $count ->
+        [one] { $count } Asset
+       *[other] { $count } Assets
+    }
+app-bulk-accept = Vorschläge behalten
+app-bulk-accept-title = Alle Tags, die Regeln und die KI auf den ausgewählten Assets gesetzt haben, als eigene behalten
+app-bulk-accepted =
+    Vorgeschlagene Tags behalten bei { $count ->
+        [one] { $count } Asset
+       *[other] { $count } Assets
+    }
 app-credits-failed = Die Credits konnten nicht erstellt werden: { $error }
 app-archived-assets =
     { $count ->
@@ -613,6 +636,8 @@ app-filters = Filter
 app-done = Fertig
 app-yours = Meine
 app-favorites = Favoriten
+app-needs-review = Zu prüfen
+app-needs-review-title = Nur Assets, die noch niemand geprüft hat (gilt zusammen mit den anderen Filtern)
 app-forget-search-label = Gespeicherte Suche { $name } vergessen
 app-forget-search = Diese Suche vergessen
 app-projects-title = Projekte, die per hoard sync von hier synchronisieren, mit dem Stand ihrer letzten Synchronisierung
@@ -789,6 +814,7 @@ shortcuts-open = Details öffnen
 shortcuts-play-sound = Sound abspielen oder stoppen
 shortcuts-select = Auswählen oder Auswahl aufheben
 shortcuts-favorite = Zu Favoriten hinzufügen oder daraus entfernen
+shortcuts-reviewed = Als geprüft markieren oder nicht
 shortcuts-key-click = Klick
 shortcuts-select-range = Bereich auswählen
 shortcuts-select-all = Alles Angezeigte auswählen
@@ -816,6 +842,9 @@ tag-source-rule = vom Offline-Tagger
 tag-source-meta = aus der Datei gemessen
 tag-source-ai = von der KI vorgeschlagen
 tag-remove = Tag { $tag } entfernen
+tag-accept = Tag { $tag } behalten
+tag-accept-title = Diesen Vorschlag als eigenes Tag behalten
+tag-reject-title = Entfernen; der Tagger setzt es nicht wieder
 
 ## ActivityIndicator.vue
 
@@ -1471,6 +1500,20 @@ asset-meta-analysis-error = Diese Datei konnte nicht vollständig gelesen werden
 asset-copy-blocked = Kopieren nicht möglich: Der Browser hat es blockiert
 asset-save-error = Speichern fehlgeschlagen: { $error }
 asset-tag-removed = { $tag } entfernt
+asset-tag-restored = { $tag } wieder gesetzt
+asset-tags-accepted =
+    { $count ->
+        [one] { $count } vorgeschlagenes Tag behalten
+       *[other] { $count } vorgeschlagene Tags behalten
+    }
+asset-reviewed = Geprüft
+asset-reviewed-on-title = Geprüft: Regeln und die KI lassen die Tags in Ruhe. Klicken, um die Markierung zu entfernen (R)
+asset-reviewed-off-title = Als geprüft markieren, damit Regeln und die KI die Tags in Ruhe lassen (R)
+asset-reviewed-on = Als geprüft markiert
+asset-reviewed-off = Geprüft-Markierung entfernt
+# $name is an asset's name.
+asset-reviewed-on-named = { $name } als geprüft markiert
+asset-reviewed-off-named = Geprüft-Markierung von { $name } entfernt
 asset-undo = Rückgängig
 asset-play-error = Diese Datei kann nicht abgespielt werden: { $error }
 asset-copied-hash = Hash kopiert
@@ -1537,7 +1580,46 @@ asset-tags = Tags
 asset-tag-add-label = Tag hinzufügen
 asset-tag-add-placeholder = Tag hinzufügen, z. B. mood:tense
 asset-tag-add = Hinzufügen
-asset-apply-family = Änderungen an Tags, Kategorie und Beschreibung auf alle { $count } Varianten anwenden
+asset-apply-family = Änderungen auf alle { $count } Varianten anwenden
+asset-tags-accept-all =
+    { $count ->
+        [one] { $count } Vorschlag behalten
+       *[other] Alle { $count } Vorschläge behalten
+    }
+asset-tags-accept-all-title = Alle von Regeln und KI vorgeschlagenen Tags als eigene behalten
+# Before a list of tags someone removed, which the taggers won't put back; each can be clicked to restore it.
+asset-tags-rejected = Abgelehnt:
+asset-tag-restore-title = { $tag } wieder setzen
+asset-details-heading = Details
+asset-field-category = Kategorie
+asset-field-license = Lizenz
+asset-field-source = Quelle
+asset-field-rating = Bewertung
+# Shown in place of an empty value, to fill it in.
+asset-field-add = Hinzufügen
+asset-field-new = Feld hinzufügen
+asset-field-name = Feldname
+asset-field-value = Wert
+# After a license the asset gets from its pack rather than its own.
+asset-field-from-pack = aus dem Paket
+asset-field-license-placeholder = Etwa CC0 oder CC-BY 4.0
+asset-field-remove-placeholder = Leer lassen zum Entfernen
+# $field is a field's name, like "License".
+asset-field-edit-title = { $field } bearbeiten
+asset-field-saved = { $field } gespeichert
+asset-field-cleared = { $field } geleert
+asset-rate =
+    { $count ->
+        [one] { $count } Stern
+       *[other] { $count } Sterne
+    }
+asset-rated =
+    Mit { $count ->
+        [one] { $count } Stern
+       *[other] { $count } Sternen
+    } bewertet
+asset-rating-clear-title = Erneut klicken, um die Bewertung zu entfernen
+asset-rating-cleared = Bewertung entfernt
 asset-collections = Sammlungen
 asset-collection-remove = Aus { $name } entfernen
 asset-collection-add-another = Zu weiterer hinzufügen

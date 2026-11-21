@@ -589,7 +589,12 @@ pub(crate) fn retag_pack(state: &AppState, rt: &Handle, pack_id: &str, only: Opt
                 if let Some(t) = &thumb {
                     insert_blob(&tx, t, &now)?;
                 }
-                tx.execute("DELETE FROM asset_tags WHERE asset_id = ?1 AND source IN ('rule', 'meta')", [&id])?;
+                // A reviewed asset keeps the rule tags it was reviewed with.
+                tx.execute(
+                    "DELETE FROM asset_tags WHERE asset_id = ?1 AND (source = 'meta' OR source = 'rule' AND NOT EXISTS
+                       (SELECT 1 FROM assets WHERE id = ?1 AND reviewed_at IS NOT NULL))",
+                    [&id],
+                )?;
                 tx.execute(
                     // A thumbnail a browser drew stays: it shows the model as the viewer does. A .blend's thumbnail is
                     // its own preview, or one drawn from its conversion (below); analysis that can't draw one

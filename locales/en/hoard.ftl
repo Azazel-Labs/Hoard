@@ -37,6 +37,8 @@ error-upload-no-files = no files in upload
 # Asking for a pack to be analyzed again with neither the rules nor the AI.
 error-analyze-nothing-to-do = nothing to do: rules=false and LLM is off
 error-too-many-assets = too many assets in one request
+error-change-not-found = that change isn't in this asset's history
+error-bulk-by-look = a search by look can't be edited all at once: select the assets instead
 error-too-many-items = too many items in one request
 error-not-a-hash = not a blake3 hex hash
 error-merge-into-tag = into must be a tag
@@ -644,6 +646,27 @@ app-bulk-category-cleared =
         [one] { $count } asset
        *[other] { $count } assets
     }
+app-bulk-review = Mark reviewed
+app-bulk-review-title = Mark the selected assets as gone over: rules and the AI leave their tags alone after this
+app-bulk-unreview = Mark not reviewed
+app-bulk-unreview-title = Take the reviewed mark off the selected assets
+app-bulk-reviewed =
+    Marked { $count ->
+        [one] { $count } asset
+       *[other] { $count } assets
+    } reviewed
+app-bulk-unreviewed =
+    Took the reviewed mark off { $count ->
+        [one] { $count } asset
+       *[other] { $count } assets
+    }
+app-bulk-accept = Keep guessed tags
+app-bulk-accept-title = Keep every tag the rules and the AI put on the selected assets as your own
+app-bulk-accepted =
+    Kept the guessed tags on { $count ->
+        [one] { $count } asset
+       *[other] { $count } assets
+    }
 app-credits-failed = Couldn't make the credits: { $error }
 app-archived-assets =
     Archived { $count ->
@@ -694,6 +717,8 @@ app-done = Done
 # Filters only for you: your favorites and saved searches.
 app-yours = Yours
 app-favorites = Favorites
+app-needs-review = Needs review
+app-needs-review-title = Only assets nobody has gone over yet (goes with the other filters)
 app-forget-search-label = Forget the saved search { $name }
 app-forget-search = Forget this search
 app-projects-title = Projects that hoard sync from here, with what their last sync had
@@ -895,6 +920,7 @@ shortcuts-open = Open the details
 shortcuts-play-sound = Play or stop a sound
 shortcuts-select = Select or deselect
 shortcuts-favorite = Add to or take out of your favorites
+shortcuts-reviewed = Mark as reviewed, or not
 # Shown as a key after Shift: Shift-click.
 shortcuts-key-click = click
 shortcuts-select-range = Select a range
@@ -924,6 +950,9 @@ tag-source-rule = from the offline tagger
 tag-source-meta = measured from the file
 tag-source-ai = suggested by AI
 tag-remove = Remove tag { $tag }
+tag-accept = Keep tag { $tag }
+tag-accept-title = Keep this guess as your own tag
+tag-reject-title = Remove it; the tagger won't put it back
 
 ## ActivityIndicator.vue
 
@@ -1671,6 +1700,20 @@ asset-meta-analysis-error = Couldn't fully read this file: { $error }
 asset-copy-blocked = Couldn’t copy: the browser blocked it
 asset-save-error = Couldn't save: { $error }
 asset-tag-removed = Removed { $tag }
+asset-tag-restored = Put { $tag } back
+asset-tags-accepted =
+    Kept { $count ->
+        [one] { $count } guessed tag
+       *[other] { $count } guessed tags
+    }
+asset-reviewed = Reviewed
+asset-reviewed-on-title = Reviewed: rules and the AI leave its tags alone. Click to take the mark off (R)
+asset-reviewed-off-title = Mark as reviewed, so rules and the AI leave its tags alone (R)
+asset-reviewed-on = Marked reviewed
+asset-reviewed-off = Took the reviewed mark off
+# $name is an asset's name.
+asset-reviewed-on-named = Marked { $name } reviewed
+asset-reviewed-off-named = Took the reviewed mark off { $name }
 asset-undo = Undo
 asset-play-error = Couldn't play this file: { $error }
 # The note after a copy button is used: "Copied" and what was copied.
@@ -1746,7 +1789,46 @@ asset-tags = Tags
 asset-tag-add-label = Add a tag
 asset-tag-add-placeholder = Add a tag, e.g. mood:tense
 asset-tag-add = Add
-asset-apply-family = Apply tag, category and description changes to all { $count } variants
+asset-apply-family = Apply changes to all { $count } variants
+asset-tags-accept-all =
+    Keep all { $count ->
+        [one] { $count } guess
+       *[other] { $count } guesses
+    }
+asset-tags-accept-all-title = Keep every tag the rules and the AI guessed as your own
+# Before a list of tags someone removed, which the taggers won't put back; each can be clicked to restore it.
+asset-tags-rejected = Turned down:
+asset-tag-restore-title = Put { $tag } back
+asset-details-heading = Details
+asset-field-category = Category
+asset-field-license = License
+asset-field-source = Source
+asset-field-rating = Rating
+# Shown in place of an empty value, to fill it in.
+asset-field-add = Add
+asset-field-new = Add a field
+asset-field-name = Field name
+asset-field-value = Value
+# After a license the asset gets from its pack rather than its own.
+asset-field-from-pack = from the pack
+asset-field-license-placeholder = Like CC0 or CC-BY 4.0
+asset-field-remove-placeholder = Empty to remove it
+# $field is a field's name, like "License".
+asset-field-edit-title = Edit { $field }
+asset-field-saved = Saved { $field }
+asset-field-cleared = Cleared { $field }
+asset-rate =
+    { $count ->
+        [one] { $count } star
+       *[other] { $count } stars
+    }
+asset-rated =
+    Rated { $count ->
+        [one] { $count } star
+       *[other] { $count } stars
+    }
+asset-rating-clear-title = Click again to clear the rating
+asset-rating-cleared = Cleared the rating
 asset-collections = Collections
 asset-collection-remove = Remove from { $name }
 asset-collection-add-another = Add to another

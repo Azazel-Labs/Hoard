@@ -436,9 +436,10 @@ pub(crate) async fn tag_pack(state: &AppState, pack_id: &str) -> Result<()> {
     db::call(&state.pool, move |c| db::set_pack_status(c, &pid, PackStatus::Ready, None)).await
 }
 
-/// Not yet described by an AI or a person (SQL over `assets a`). Rule and metadata tags don't count.
+/// Not yet described by an AI or a person (SQL over `assets a`). Rule and metadata tags don't count; an asset a
+/// person has reviewed counts as described.
 const UNTAGGED: &str = "NOT EXISTS (SELECT 1 FROM asset_tags t WHERE t.asset_id = a.id \
-     AND t.source IN ('ai', 'llm', 'human')) AND a.ai_description IS NULL";
+     AND t.source IN ('ai', 'llm', 'human')) AND a.ai_description IS NULL AND a.reviewed_at IS NULL";
 
 /// Find a live pack by id or name: exact (any case) first, then the newest whose name contains `want`.
 fn find_pack(c: &rusqlite::Connection, want: &str) -> Result<Option<String>> {

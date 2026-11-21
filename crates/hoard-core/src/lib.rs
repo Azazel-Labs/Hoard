@@ -206,6 +206,28 @@ pub struct Asset {
     /// archive is where they're restored or deleted for good.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub archived_at: Option<String>,
+    /// When a person said its details are right. Rules and the AI then leave its tags, name and category alone.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub reviewed_at: Option<String>,
+    /// A person's rating, 1 to 5.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub rating: Option<u8>,
+    /// Its own license, when it isn't its pack's (`pack_license`).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub license: Option<String>,
+    /// Where it came from, when that isn't its pack's store page.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub source_url: Option<String>,
+    /// Its pack's license, which is its own unless `license` says otherwise. Detail view only.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub pack_license: Option<String>,
+    /// Fields of the library's own, by name ("Artist": "Kim"). Detail view only.
+    #[serde(default, skip_serializing_if = "std::collections::BTreeMap::is_empty")]
+    pub fields: std::collections::BTreeMap<String, String>,
+    /// Tags a rule or the AI gave it that a person turned down, which retagging won't give it again. Detail view
+    /// only.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub rejected_tags: Vec<String>,
     /// Files this asset needs (textures, buffers, materials) or goes with (animations). Detail view only.
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub links: Vec<AssetLink>,
@@ -843,6 +865,9 @@ pub struct SearchQuery {
     /// With `key`: the keys that mix with it too (its relative major or minor, and the keys a fifth either side).
     #[serde(default, skip_serializing_if = "std::ops::Not::not")]
     pub compatible_keys: bool,
+    /// Only what a person has said is right (`true`), or only what they haven't yet (`false`).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub reviewed: Option<bool>,
     /// Only this account's favorites. Set by the server for whoever asks, never sent.
     #[serde(skip)]
     pub favorites_of: Option<i64>,
@@ -869,16 +894,44 @@ pub struct SearchResult {
     pub folders: Vec<Facet>,
 }
 
+/// A change to an asset. Each field left out stays as it is; an empty text clears what it's for.
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct AssetPatch {
     pub name: Option<String>,
     pub category: Option<String>,
     pub description: Option<String>,
+    /// Its own license, when it isn't its pack's.
+    #[serde(default)]
+    pub license: Option<String>,
+    /// Where it came from.
+    #[serde(default)]
+    pub source_url: Option<String>,
+    /// 1 to 5; 0 clears it.
+    #[serde(default)]
+    pub rating: Option<u8>,
+    /// Its details are right (or not any more).
+    #[serde(default)]
+    pub reviewed: Option<bool>,
+    /// Fields of the library's own to set, by name; an empty value removes one.
+    #[serde(default)]
+    pub fields: std::collections::BTreeMap<String, String>,
     #[serde(default)]
     pub add_tags: Vec<String>,
+    /// Tags to take off. A rule's or the AI's tag taken off stays off: retagging won't add it again, until
+    /// `unreject_tags` puts it back.
     #[serde(default)]
     pub remove_tags: Vec<String>,
-    /// Apply the tag changes to every variant in the asset's family too.
+    /// A rule's or the AI's tags to keep as a person's.
+    #[serde(default)]
+    pub accept_tags: Vec<String>,
+    /// Keep every tag a rule or the AI gave it as a person's.
+    #[serde(default)]
+    pub accept_all_tags: bool,
+    /// A rule's or the AI's tags taken off before, to put back as they were.
+    #[serde(default)]
+    pub unreject_tags: Vec<String>,
+    /// Apply the changes to every variant in the asset's family too (all but its name, rating, fields and whether
+    /// it's reviewed).
     #[serde(default)]
     pub apply_to_family: bool,
 }

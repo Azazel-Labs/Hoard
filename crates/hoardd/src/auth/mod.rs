@@ -138,6 +138,18 @@ impl Who {
         }))
     }
 
+    /// The account's name, or the access token's.
+    pub(crate) fn name(&self) -> &str {
+        match self {
+            Self::User { name, .. } | Self::Token { name, .. } => name,
+        }
+    }
+
+    /// Whether this is an access token or connected app rather than someone signed in.
+    pub(crate) const fn is_token(&self) -> bool {
+        matches!(self, Self::Token { .. })
+    }
+
     /// The account this is or acts for: whose favorites and saved searches are meant.
     pub(crate) const fn owner(&self) -> Option<i64> {
         match self {

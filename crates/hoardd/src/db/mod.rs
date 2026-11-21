@@ -17,6 +17,7 @@ use rusqlite::{Connection, InterruptHandle, TransactionBehavior};
 
 mod assets;
 mod collections;
+mod edits;
 mod jobs;
 mod kept;
 mod packs;
@@ -28,6 +29,7 @@ mod tags;
 
 pub(crate) use assets::*;
 pub(crate) use collections::*;
+pub(crate) use edits::*;
 pub(crate) use jobs::*;
 pub(crate) use kept::{Kept, save_in as keep_in, save_later, saved_later};
 pub(crate) use packs::*;

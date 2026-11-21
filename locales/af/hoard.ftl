@@ -32,6 +32,8 @@ error-upload-failed = oplaai het misluk: { $reason }
 error-upload-no-files = geen lêers in oplaai nie
 error-analyze-nothing-to-do = niks om te doen nie: rules=false en LLM is af
 error-too-many-assets = te veel bates in een versoek
+error-change-not-found = daardie verandering is nie in hierdie bate se geskiedenis nie
+error-bulk-by-look = 'n soektog volgens voorkoms kan nie alles op een slag gewysig word nie: kies eerder die bates
 error-too-many-items = te veel items in een versoek
 error-not-a-hash = nie 'n blake3-hekshash nie
 error-merge-into-tag = into moet 'n etiket wees
@@ -569,6 +571,27 @@ app-bulk-category-cleared =
         [one] { $count } bate
        *[other] { $count } bates
     } skoongemaak
+app-bulk-review = Merk nagegaan
+app-bulk-review-title = Merk die gekose bates as nagegaan: reëls en die KI laat hul etikette hierna met rus
+app-bulk-unreview = Merk nie nagegaan nie
+app-bulk-unreview-title = Haal die nagegaan-merk van die gekose bates af
+app-bulk-reviewed =
+    { $count ->
+        [one] { $count } bate as nagegaan gemerk
+       *[other] { $count } bates as nagegaan gemerk
+    }
+app-bulk-unreviewed =
+    Nagegaan-merk afgehaal van { $count ->
+        [one] { $count } bate
+       *[other] { $count } bates
+    }
+app-bulk-accept = Hou geraaide etikette
+app-bulk-accept-title = Hou elke etiket wat die reëls en die KI op die gekose bates gesit het as jou eie
+app-bulk-accepted =
+    Geraaide etikette behou op { $count ->
+        [one] { $count } bate
+       *[other] { $count } bates
+    }
 app-credits-failed = Kon nie die erkennings maak nie: { $error }
 app-archived-assets =
     { $count ->
@@ -609,6 +632,8 @@ app-filters = Filters
 app-done = Klaar
 app-yours = Joune
 app-favorites = Gunstelinge
+app-needs-review = Moet nagegaan word
+app-needs-review-title = Net bates wat nog niemand nagegaan het nie (werk saam met die ander filters)
 app-forget-search-label = Vergeet die gestoorde soektog { $name }
 app-forget-search = Vergeet hierdie soektog
 app-projects-title = Projekte wat van hier af hoard sync, met wat hul laaste sinkronisering gehad het
@@ -785,6 +810,7 @@ shortcuts-open = Maak die besonderhede oop
 shortcuts-play-sound = Speel of stop 'n klank
 shortcuts-select = Kies of ontkies
 shortcuts-favorite = Voeg by of haal uit jou gunstelinge
+shortcuts-reviewed = Merk as nagegaan, of nie
 shortcuts-key-click = klik
 shortcuts-select-range = Kies 'n reeks
 shortcuts-select-all = Kies alles wat gewys word
@@ -812,6 +838,9 @@ tag-source-rule = van die vanlyn etiketteerder
 tag-source-meta = uit die lêer gemeet
 tag-source-ai = deur KI voorgestel
 tag-remove = Verwyder etiket { $tag }
+tag-accept = Hou etiket { $tag }
+tag-accept-title = Hou hierdie raaiskoot as jou eie etiket
+tag-reject-title = Verwyder dit; die etiketteerder sit dit nie terug nie
 
 ## ActivityIndicator.vue
 
@@ -1471,6 +1500,20 @@ asset-meta-analysis-error = Kon nie hierdie lêer heeltemal lees nie: { $error }
 asset-copy-blocked = Kon nie kopieer nie: die blaaier het dit geblokkeer
 asset-save-error = Kon nie stoor nie: { $error }
 asset-tag-removed = { $tag } verwyder
+asset-tag-restored = { $tag } teruggesit
+asset-tags-accepted =
+    { $count ->
+        [one] { $count } geraaide etiket behou
+       *[other] { $count } geraaide etikette behou
+    }
+asset-reviewed = Nagegaan
+asset-reviewed-on-title = Nagegaan: reëls en die KI laat sy etikette met rus. Klik om die merk af te haal (R)
+asset-reviewed-off-title = Merk as nagegaan, sodat reëls en die KI sy etikette met rus laat (R)
+asset-reviewed-on = As nagegaan gemerk
+asset-reviewed-off = Nagegaan-merk afgehaal
+# $name is an asset's name.
+asset-reviewed-on-named = { $name } as nagegaan gemerk
+asset-reviewed-off-named = Nagegaan-merk afgehaal van { $name }
 asset-undo = Ontdoen
 asset-play-error = Kon nie hierdie lêer speel nie: { $error }
 asset-copied-hash = Hash gekopieer
@@ -1537,7 +1580,46 @@ asset-tags = Etikette
 asset-tag-add-label = Voeg 'n etiket by
 asset-tag-add-placeholder = Voeg 'n etiket by, bv. mood:tense
 asset-tag-add = Voeg by
-asset-apply-family = Pas etiket-, kategorie- en beskrywingveranderings op al { $count } variante toe
+asset-apply-family = Pas veranderinge op al { $count } variante toe
+asset-tags-accept-all =
+    { $count ->
+        [one] Hou { $count } raaiskoot
+       *[other] Hou al { $count } raaiskote
+    }
+asset-tags-accept-all-title = Hou elke etiket wat die reëls en die KI geraai het as jou eie
+# Before a list of tags someone removed, which the taggers won't put back; each can be clicked to restore it.
+asset-tags-rejected = Van die hand gewys:
+asset-tag-restore-title = Sit { $tag } terug
+asset-details-heading = Besonderhede
+asset-field-category = Kategorie
+asset-field-license = Lisensie
+asset-field-source = Bron
+asset-field-rating = Gradering
+# Shown in place of an empty value, to fill it in.
+asset-field-add = Voeg by
+asset-field-new = Voeg 'n veld by
+asset-field-name = Veldnaam
+asset-field-value = Waarde
+# After a license the asset gets from its pack rather than its own.
+asset-field-from-pack = uit die pakket
+asset-field-license-placeholder = Soos CC0 of CC-BY 4.0
+asset-field-remove-placeholder = Leeg om dit te verwyder
+# $field is a field's name, like "License".
+asset-field-edit-title = Wysig { $field }
+asset-field-saved = { $field } gestoor
+asset-field-cleared = { $field } skoongemaak
+asset-rate =
+    { $count ->
+        [one] { $count } ster
+       *[other] { $count } sterre
+    }
+asset-rated =
+    Gegradeer { $count ->
+        [one] { $count } ster
+       *[other] { $count } sterre
+    }
+asset-rating-clear-title = Klik weer om die gradering skoon te maak
+asset-rating-cleared = Gradering skoongemaak
 asset-collections = Versamelings
 asset-collection-remove = Verwyder uit { $name }
 asset-collection-add-another = Voeg by nog een

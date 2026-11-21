@@ -7,8 +7,12 @@ const props = defineProps<{
   tag: string; source?: TagSource; count?: number; removable?: boolean
   /** A color shown before the tag (for a color filter). */
   swatch?: string
+  /** A rule's or the AI's guess that can be kept as a person's (a ✓ before the ×). */
+  acceptable?: boolean
 }>()
-defineEmits<{ remove: [] }>()
+defineEmits<{ remove: []; accept: [] }>()
+/** A guess taken off is remembered, so the tagger won't put it back. */
+const guessed = computed(() => props.source === 'rule' || props.source === 'ai')
 
 const parts = computed(() => {
   const i = props.tag.indexOf(':')
@@ -40,7 +44,17 @@ function sourceLabel(source: TagSource): string {
     <span v-if="parts.ns" class="ns">{{ parts.ns }}:</span>
     <span class="value">{{ parts.value }}</span>
     <span v-if="count !== undefined" class="count">{{ count }}</span>
-    <button v-if="removable" class="x" type="button" :aria-label="t('tag-remove', { tag })" @click.stop="$emit('remove')">
+    <button v-if="acceptable" class="ok" type="button" :aria-label="t('tag-accept', { tag })" :title="t('tag-accept-title')" @click.stop="$emit('accept')">
+      <svg viewBox="0 0 16 16" width="10" height="10" aria-hidden="true"><path d="m3 8.5 3.2 3L13 4.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /></svg>
+    </button>
+    <button
+      v-if="removable"
+      class="x"
+      type="button"
+      :aria-label="t('tag-remove', { tag })"
+      :title="guessed ? t('tag-reject-title') : undefined"
+      @click.stop="$emit('remove')"
+    >
       ×
     </button>
   </span>
@@ -62,4 +76,10 @@ function sourceLabel(source: TagSource): string {
   border: 0; background: none; padding: 0 0 0 0.2em; cursor: pointer; color: var(--faint); line-height: 1;
 }
 .x:hover { color: var(--danger); }
+.ok {
+  border: 0; background: none; padding: 0 0 0 0.35em; cursor: pointer; color: var(--faint); line-height: 0;
+  align-self: center;
+}
+.ok:hover { color: var(--ok); }
+.ok:focus-visible, .x:focus-visible { outline: 2px solid var(--accent); border-radius: 3px; }
 </style>

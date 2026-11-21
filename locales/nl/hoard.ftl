@@ -32,6 +32,8 @@ error-upload-failed = upload mislukt: { $reason }
 error-upload-no-files = geen bestanden in de upload
 error-analyze-nothing-to-do = niets te doen: rules=false en het LLM staat uit
 error-too-many-assets = te veel assets in één verzoek
+error-change-not-found = die wijziging staat niet in de geschiedenis van dit asset
+error-bulk-by-look = een zoekopdracht op uiterlijk kan niet in één keer worden bewerkt: selecteer de assets
 error-too-many-items = te veel items in één verzoek
 error-not-a-hash = geen blake3-hash in hex
 error-merge-into-tag = into moet een tag zijn
@@ -569,6 +571,27 @@ app-bulk-category-cleared =
         [one] { $count } asset
        *[other] { $count } assets
     } gewist
+app-bulk-review = Markeer als nagekeken
+app-bulk-review-title = Markeer de geselecteerde assets als nagekeken: regels en AI laten hun tags daarna met rust
+app-bulk-unreview = Markeer als niet nagekeken
+app-bulk-unreview-title = Haal de markering 'nagekeken' van de geselecteerde assets
+app-bulk-reviewed =
+    { $count ->
+        [one] { $count } asset
+       *[other] { $count } assets
+    } als nagekeken gemarkeerd
+app-bulk-unreviewed =
+    Markering 'nagekeken' weggehaald bij { $count ->
+        [one] { $count } asset
+       *[other] { $count } assets
+    }
+app-bulk-accept = Voorgestelde tags behouden
+app-bulk-accept-title = Alle tags die regels en AI op de geselecteerde assets hebben gezet als eigen tags behouden
+app-bulk-accepted =
+    Voorgestelde tags behouden bij { $count ->
+        [one] { $count } asset
+       *[other] { $count } assets
+    }
 app-credits-failed = Kon de vermeldingen niet maken: { $error }
 app-archived-assets =
     { $count ->
@@ -609,6 +632,8 @@ app-filters = Filters
 app-done = Klaar
 app-yours = Van jou
 app-favorites = Favorieten
+app-needs-review = Nakijken nodig
+app-needs-review-title = Alleen assets die nog niemand heeft nagekeken (werkt samen met de andere filters)
 app-forget-search-label = De opgeslagen zoekopdracht { $name } vergeten
 app-forget-search = Deze zoekopdracht vergeten
 app-projects-title = Projecten die vanaf hier hoard sync gebruiken, met wat hun laatste synchronisatie had
@@ -785,6 +810,7 @@ shortcuts-open = De details openen
 shortcuts-play-sound = Een geluid afspelen of stoppen
 shortcuts-select = Selecteren of deselecteren
 shortcuts-favorite = Aan je favorieten toevoegen of eruit halen
+shortcuts-reviewed = Markeren als nagekeken of niet
 shortcuts-key-click = klik
 shortcuts-select-range = Een reeks selecteren
 shortcuts-select-all = Alles wat getoond wordt selecteren
@@ -812,6 +838,9 @@ tag-source-rule = van de offline tagger
 tag-source-meta = gemeten uit het bestand
 tag-source-ai = voorgesteld door AI
 tag-remove = Tag { $tag } verwijderen
+tag-accept = Tag { $tag } behouden
+tag-accept-title = Deze suggestie als je eigen tag behouden
+tag-reject-title = Verwijderen; de tagger zet hem niet terug
 
 ## ActivityIndicator.vue
 
@@ -1471,6 +1500,20 @@ asset-meta-analysis-error = Kon dit bestand niet volledig lezen: { $error }
 asset-copy-blocked = Kon niet kopiëren: de browser blokkeerde het
 asset-save-error = Kon niet opslaan: { $error }
 asset-tag-removed = { $tag } verwijderd
+asset-tag-restored = { $tag } teruggezet
+asset-tags-accepted =
+    { $count ->
+        [one] { $count } voorgestelde tag
+       *[other] { $count } voorgestelde tags
+    } behouden
+asset-reviewed = Nagekeken
+asset-reviewed-on-title = Nagekeken: regels en AI laten de tags met rust. Klik om de markering weg te halen (R)
+asset-reviewed-off-title = Markeren als nagekeken, zodat regels en AI de tags met rust laten (R)
+asset-reviewed-on = Gemarkeerd als nagekeken
+asset-reviewed-off = Markering 'nagekeken' weggehaald
+# $name is an asset's name.
+asset-reviewed-on-named = { $name } als nagekeken gemarkeerd
+asset-reviewed-off-named = Markering 'nagekeken' weggehaald bij { $name }
 asset-undo = Ongedaan maken
 asset-play-error = Kon dit bestand niet afspelen: { $error }
 asset-copied-hash = Hash gekopieerd
@@ -1537,7 +1580,46 @@ asset-tags = Tags
 asset-tag-add-label = Een tag toevoegen
 asset-tag-add-placeholder = Voeg een tag toe, bijv. mood:tense
 asset-tag-add = Toevoegen
-asset-apply-family = Wijzigingen in tags, categorie en beschrijving toepassen op alle { $count } varianten
+asset-apply-family = Wijzigingen toepassen op alle { $count } varianten
+asset-tags-accept-all =
+    { $count ->
+        [one] { $count } suggestie
+       *[other] { $count } suggesties
+    } behouden
+asset-tags-accept-all-title = Alle tags die regels en AI hebben voorgesteld als eigen tags behouden
+# Before a list of tags someone removed, which the taggers won't put back; each can be clicked to restore it.
+asset-tags-rejected = Afgewezen:
+asset-tag-restore-title = { $tag } terugzetten
+asset-details-heading = Details
+asset-field-category = Categorie
+asset-field-license = Licentie
+asset-field-source = Bron
+asset-field-rating = Beoordeling
+# Shown in place of an empty value, to fill it in.
+asset-field-add = Toevoegen
+asset-field-new = Veld toevoegen
+asset-field-name = Veldnaam
+asset-field-value = Waarde
+# After a license the asset gets from its pack rather than its own.
+asset-field-from-pack = uit het pakket
+asset-field-license-placeholder = Zoals CC0 of CC-BY 4.0
+asset-field-remove-placeholder = Leeg laten om te verwijderen
+# $field is a field's name, like "License".
+asset-field-edit-title = { $field } bewerken
+asset-field-saved = { $field } opgeslagen
+asset-field-cleared = { $field } gewist
+asset-rate =
+    { $count ->
+        [one] { $count } ster
+       *[other] { $count } sterren
+    }
+asset-rated =
+    Beoordeeld met { $count ->
+        [one] { $count } ster
+       *[other] { $count } sterren
+    }
+asset-rating-clear-title = Klik nogmaals om de beoordeling te wissen
+asset-rating-cleared = Beoordeling gewist
 asset-collections = Collecties
 asset-collection-remove = Verwijderen uit { $name }
 asset-collection-add-another = Aan een andere toevoegen

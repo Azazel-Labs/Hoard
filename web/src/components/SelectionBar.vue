@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import { api, type Asset, type BulkEdit, type Collection } from '../api'
 import { filters } from '../filters'
 import { t } from '../i18n'
@@ -90,6 +90,24 @@ async function bulkSetCategory() {
     },
   })
 }
+/** Every checked asset already gone over: the button then takes the mark off instead. */
+const allReviewed = computed(() => props.checked.length > 0 && props.checked.every((id) => !!props.items.find((a) => a.id === id)?.reviewed_at))
+async function bulkReviewed() {
+  const ids = [...props.checked]
+  const to = !allReviewed.value
+  // Undo only touches the ones this changed.
+  const touched = ids.filter((id) => !!props.items.find((a) => a.id === id)?.reviewed_at !== to)
+  if (!(await bulkEdit(ids, { reviewed: to }))) return
+  showOk(to ? t('app-bulk-reviewed', { count: ids.length }) : t('app-bulk-unreviewed', { count: ids.length }), {
+    label: t('app-undo'),
+    run: () => void bulkEdit(touched, { reviewed: !to }),
+  })
+}
+/** Keep the checked assets' rule and AI tags as a person's. */
+async function bulkAccept() {
+  const ids = [...props.checked]
+  if (await bulkEdit(ids, { accept_all_tags: true })) showOk(t('app-bulk-accepted', { count: ids.length }))
+}
 </script>
 
 <template>
@@ -114,6 +132,10 @@ async function bulkSetCategory() {
           {{ bulkCategory.trim() ? t('app-bulk-category-set-button') : t('app-bulk-category-clear-button') }}
         </button>
       </form>
+      <button type="button" class="btn" :disabled="bulkBusy || !checked.length" :title="allReviewed ? t('app-bulk-unreview-title') : t('app-bulk-review-title')" @click="bulkReviewed">
+        {{ allReviewed ? t('app-bulk-unreview') : t('app-bulk-review') }}
+      </button>
+      <button type="button" class="btn" :disabled="bulkBusy || !checked.length" :title="t('app-bulk-accept-title')" @click="bulkAccept">{{ t('app-bulk-accept') }}</button>
       <CollectionPicker
         v-if="checked.length"
         :collections="collections"

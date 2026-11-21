@@ -32,6 +32,8 @@ error-upload-failed = caricamento non riuscito: { $reason }
 error-upload-no-files = nessun file nel caricamento
 error-analyze-nothing-to-do = niente da fare: rules=false e l'LLM è disattivato
 error-too-many-assets = troppi asset in una sola richiesta
+error-change-not-found = questa modifica non è nella cronologia di questo asset
+error-bulk-by-look = una ricerca per aspetto non si può modificare tutta insieme: seleziona invece gli asset
 error-too-many-items = troppi elementi in una sola richiesta
 error-not-a-hash = non è un hash blake3 esadecimale
 error-merge-into-tag = into deve essere un tag
@@ -577,6 +579,27 @@ app-bulk-category-cleared =
         [one] { $count } asset cancellata
        *[other] { $count } asset cancellata
     }
+app-bulk-review = Segna come rivisti
+app-bulk-review-title = Segna gli asset selezionati come già controllati: da ora regole e IA non ne toccano i tag
+app-bulk-unreview = Segna come non rivisti
+app-bulk-unreview-title = Togli il segno di rivisto dagli asset selezionati
+app-bulk-reviewed =
+    { $count ->
+        [one] { $count } asset segnato come rivisto
+       *[other] { $count } asset segnati come rivisti
+    }
+app-bulk-unreviewed =
+    Tolto il segno di rivisto da { $count ->
+        [one] { $count } asset
+       *[other] { $count } asset
+    }
+app-bulk-accept = Tieni i tag suggeriti
+app-bulk-accept-title = Tieni come tuoi tutti i tag messi da regole e IA sugli asset selezionati
+app-bulk-accepted =
+    Tenuti i tag suggeriti su { $count ->
+        [one] { $count } asset
+       *[other] { $count } asset
+    }
 app-credits-failed = Impossibile creare i crediti: { $error }
 app-archived-assets =
     { $count ->
@@ -617,6 +640,8 @@ app-filters = Filtri
 app-done = Fatto
 app-yours = I tuoi
 app-favorites = Preferiti
+app-needs-review = Da rivedere
+app-needs-review-title = Solo gli asset che nessuno ha ancora controllato (vale insieme agli altri filtri)
 app-forget-search-label = Dimentica la ricerca salvata { $name }
 app-forget-search = Dimentica questa ricerca
 app-projects-title = Progetti che eseguono hoard sync da qui, con ciò che conteneva la loro ultima sincronizzazione
@@ -793,6 +818,7 @@ shortcuts-open = Apri i dettagli
 shortcuts-play-sound = Riproduci o ferma un suono
 shortcuts-select = Seleziona o deseleziona
 shortcuts-favorite = Aggiungi ai preferiti o togli dai preferiti
+shortcuts-reviewed = Segna come rivisto o non rivisto
 shortcuts-key-click = clic
 shortcuts-select-range = Seleziona un intervallo
 shortcuts-select-all = Seleziona tutto ciò che è mostrato
@@ -820,6 +846,9 @@ tag-source-rule = dal tagger offline
 tag-source-meta = misurato dal file
 tag-source-ai = suggerito dall'IA
 tag-remove = Rimuovi il tag { $tag }
+tag-accept = Tieni il tag { $tag }
+tag-accept-title = Tieni questo suggerimento come tag tuo
+tag-reject-title = Rimuovilo; il tagger non lo rimetterà
 
 ## ActivityIndicator.vue
 
@@ -1485,6 +1514,20 @@ asset-meta-analysis-error = Impossibile leggere del tutto questo file: { $error 
 asset-copy-blocked = Impossibile copiare: il browser l'ha bloccato
 asset-save-error = Impossibile salvare: { $error }
 asset-tag-removed = { $tag } rimosso
+asset-tag-restored = { $tag } rimesso
+asset-tags-accepted =
+    { $count ->
+        [one] Tenuto { $count } tag suggerito
+       *[other] Tenuti { $count } tag suggeriti
+    }
+asset-reviewed = Rivisto
+asset-reviewed-on-title = Rivisto: regole e IA non ne toccano i tag. Clicca per togliere il segno (R)
+asset-reviewed-off-title = Segna come rivisto, così regole e IA non ne toccano i tag (R)
+asset-reviewed-on = Segnato come rivisto
+asset-reviewed-off = Segno di rivisto tolto
+# $name is an asset's name.
+asset-reviewed-on-named = Segnato { $name } come rivisto
+asset-reviewed-off-named = Tolto il segno di rivisto da { $name }
 asset-undo = Annulla
 asset-play-error = Impossibile riprodurre questo file: { $error }
 asset-copied-hash = Hash copiato
@@ -1551,7 +1594,46 @@ asset-tags = Tag
 asset-tag-add-label = Aggiungi un tag
 asset-tag-add-placeholder = Aggiungi un tag, ad es. mood:tense
 asset-tag-add = Aggiungi
-asset-apply-family = Applica le modifiche a tag, categoria e descrizione a tutte le { $count } varianti
+asset-apply-family = Applica le modifiche a tutte le { $count } varianti
+asset-tags-accept-all =
+    { $count ->
+        [one] Tieni { $count } suggerimento
+       *[other] Tieni tutti i { $count } suggerimenti
+    }
+asset-tags-accept-all-title = Tieni come tuoi tutti i tag suggeriti da regole e IA
+# Before a list of tags someone removed, which the taggers won't put back; each can be clicked to restore it.
+asset-tags-rejected = Rifiutati:
+asset-tag-restore-title = Rimetti { $tag }
+asset-details-heading = Dettagli
+asset-field-category = Categoria
+asset-field-license = Licenza
+asset-field-source = Origine
+asset-field-rating = Valutazione
+# Shown in place of an empty value, to fill it in.
+asset-field-add = Aggiungi
+asset-field-new = Aggiungi un campo
+asset-field-name = Nome del campo
+asset-field-value = Valore
+# After a license the asset gets from its pack rather than its own.
+asset-field-from-pack = dal pacchetto
+asset-field-license-placeholder = Ad esempio CC0 o CC-BY 4.0
+asset-field-remove-placeholder = Vuoto per rimuoverlo
+# $field is a field's name, like "License".
+asset-field-edit-title = Modifica { $field }
+asset-field-saved = { $field } salvato
+asset-field-cleared = { $field } cancellato
+asset-rate =
+    { $count ->
+        [one] { $count } stella
+       *[other] { $count } stelle
+    }
+asset-rated =
+    Valutato con { $count ->
+        [one] { $count } stella
+       *[other] { $count } stelle
+    }
+asset-rating-clear-title = Clicca di nuovo per cancellare la valutazione
+asset-rating-cleared = Valutazione cancellata
 asset-collections = Raccolte
 asset-collection-remove = Rimuovi da { $name }
 asset-collection-add-another = Aggiungi a un'altra

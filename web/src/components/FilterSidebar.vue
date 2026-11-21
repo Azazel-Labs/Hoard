@@ -126,6 +126,13 @@ const facetLabel = (ns: string, value: string) => (ns && ns !== 'tech' ? value.s
             <span class="n mono">{{ mine.favorites.size }}</span>
           </button>
         </li>
+        <li v-if="editor">
+          <!-- Goes with whatever else is chosen: what's left to go over in this pack, say. -->
+          <button type="button" :aria-pressed="filters.reviewed === 'no'" :title="t('app-needs-review-title')" @click="filters.reviewed = filters.reviewed === 'no' ? '' : 'no'">
+            <svg viewBox="0 0 16 16" width="11" height="11" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="6" stroke-dasharray="2.4 2" /><path d="m5.4 8.2 1.8 1.8 3.4-3.7" /></svg>
+            <span class="cname">{{ t('app-needs-review') }}</span>
+          </button>
+        </li>
         <li v-for="s in mine.searches" :key="s.id" class="saved">
           <button type="button" :aria-pressed="savedNow?.id === s.id" :title="s.query" @click="emit('search', s)">
             <svg viewBox="0 0 16 16" width="11" height="11" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="7" cy="7" r="4.5" /><path d="m10.5 10.5 3 3" /></svg>

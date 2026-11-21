@@ -32,6 +32,8 @@ error-upload-failed = загрузка не удалась: { $reason }
 error-upload-no-files = в загрузке нет файлов
 error-analyze-nothing-to-do = нечего делать: rules=false, а LLM выключена
 error-too-many-assets = слишком много ассетов в одном запросе
+error-change-not-found = этого изменения нет в истории этого ассета
+error-bulk-by-look = поиск по виду нельзя изменить целиком: выберите ассеты вручную
 error-too-many-items = слишком много элементов в одном запросе
 error-not-a-hash = это не шестнадцатеричный хеш blake3
 error-merge-into-tag = into должен быть тегом
@@ -599,6 +601,33 @@ app-bulk-category-cleared =
         [many] Категория очищена у { $count } ассетов
        *[other] Категория очищена у { $count } ассета
     }
+app-bulk-review = Отметить просмотренными
+app-bulk-review-title = Отметить выбранные ассеты как просмотренные: после этого правила и ИИ не трогают их теги
+app-bulk-unreview = Снять отметку
+app-bulk-unreview-title = Снять отметку «просмотрено» с выбранных ассетов
+app-bulk-reviewed =
+    Отмечено просмотренными: { $count ->
+        [one] { $count } ассет
+        [few] { $count } ассета
+        [many] { $count } ассетов
+       *[other] { $count } ассета
+    }
+app-bulk-unreviewed =
+    Отметка «просмотрено» снята у { $count ->
+        [one] { $count } ассета
+        [few] { $count } ассетов
+        [many] { $count } ассетов
+       *[other] { $count } ассетов
+    }
+app-bulk-accept = Оставить догадки
+app-bulk-accept-title = Оставить как свои все теги, которые правила и ИИ поставили выбранным ассетам
+app-bulk-accepted =
+    Догадки оставлены у { $count ->
+        [one] { $count } ассета
+        [few] { $count } ассетов
+        [many] { $count } ассетов
+       *[other] { $count } ассетов
+    }
 app-credits-failed = Не удалось составить список авторов: { $error }
 app-archived-assets =
     { $count ->
@@ -647,6 +676,8 @@ app-filters = Фильтры
 app-done = Готово
 app-yours = Ваше
 app-favorites = Избранное
+app-needs-review = Не просмотрено
+app-needs-review-title = Только ассеты, которые ещё никто не просматривал (сочетается с другими фильтрами)
 app-forget-search-label = Забыть сохранённый поиск { $name }
 app-forget-search = Забыть этот поиск
 app-projects-title = Проекты, которые выполняют hoard sync с этого сервера, и что было в их последней синхронизации
@@ -833,6 +864,7 @@ shortcuts-open = Открыть сведения
 shortcuts-play-sound = Проиграть или остановить звук
 shortcuts-select = Выбрать или снять выбор
 shortcuts-favorite = Добавить в избранное или убрать из него
+shortcuts-reviewed = Отметить как просмотренное или снять отметку
 shortcuts-key-click = щелчок
 shortcuts-select-range = Выбрать диапазон
 shortcuts-select-all = Выбрать всё показанное
@@ -860,6 +892,9 @@ tag-source-rule = от офлайн-разметчика
 tag-source-meta = измерен по файлу
 tag-source-ai = предложен ИИ
 tag-remove = Убрать тег { $tag }
+tag-accept = Оставить тег { $tag }
+tag-accept-title = Оставить эту догадку как свой тег
+tag-reject-title = Убрать; теггер не вернёт его
 
 ## ActivityIndicator.vue
 
@@ -1607,6 +1642,22 @@ asset-meta-analysis-error = Не удалось полностью прочит�
 asset-copy-blocked = Не удалось скопировать: браузер это запретил
 asset-save-error = Не удалось сохранить: { $error }
 asset-tag-removed = Тег { $tag } убран
+asset-tag-restored = Тег { $tag } возвращён
+asset-tags-accepted =
+    Оставлено: { $count ->
+        [one] { $count } предложенный тег
+        [few] { $count } предложенных тега
+        [many] { $count } предложенных тегов
+       *[other] { $count } предложенных тега
+    }
+asset-reviewed = Просмотрено
+asset-reviewed-on-title = Просмотрено: правила и ИИ не трогают его теги. Нажмите, чтобы снять отметку (R)
+asset-reviewed-off-title = Отметить как просмотренное, чтобы правила и ИИ не трогали его теги (R)
+asset-reviewed-on = Отмечено как просмотренное
+asset-reviewed-off = Отметка «просмотрено» снята
+# $name is an asset's name.
+asset-reviewed-on-named = { $name } отмечен как просмотренный
+asset-reviewed-off-named = Отметка «просмотрено» снята у { $name }
 asset-undo = Отменить
 asset-play-error = Не удалось воспроизвести этот файл: { $error }
 asset-copied-hash = Хеш скопирован
@@ -1679,13 +1730,52 @@ asset-tags = Теги
 asset-tag-add-label = Добавить тег
 asset-tag-add-placeholder = Добавьте тег, например mood:tense
 asset-tag-add = Добавить
-asset-apply-family =
-    { $count ->
-        [one] Применить изменения тегов, категории и описания ко всем вариантам ({ $count })
-        [few] Применить изменения тегов, категории и описания ко всем { $count } вариантам
-        [many] Применить изменения тегов, категории и описания ко всем { $count } вариантам
-       *[other] Применить изменения тегов, категории и описания ко всем вариантам ({ $count })
+asset-apply-family = Применить изменения ко всем вариантам ({ $count })
+asset-tags-accept-all =
+    Оставить все: { $count ->
+        [one] { $count } догадку
+        [few] { $count } догадки
+        [many] { $count } догадок
+       *[other] { $count } догадки
     }
+asset-tags-accept-all-title = Оставить как свои все теги, которые угадали правила и ИИ
+# Before a list of tags someone removed, which the taggers won't put back; each can be clicked to restore it.
+asset-tags-rejected = Отклонено:
+asset-tag-restore-title = Вернуть { $tag }
+asset-details-heading = Сведения
+asset-field-category = Категория
+asset-field-license = Лицензия
+asset-field-source = Источник
+asset-field-rating = Оценка
+# Shown in place of an empty value, to fill it in.
+asset-field-add = Добавить
+asset-field-new = Добавить поле
+asset-field-name = Название поля
+asset-field-value = Значение
+# After a license the asset gets from its pack rather than its own.
+asset-field-from-pack = из пака
+asset-field-license-placeholder = Например, CC0 или CC-BY 4.0
+asset-field-remove-placeholder = Пусто — удалить
+# $field is a field's name, like "License".
+asset-field-edit-title = Изменить: { $field }
+asset-field-saved = Сохранено: { $field }
+asset-field-cleared = Очищено: { $field }
+asset-rate =
+    { $count ->
+        [one] { $count } звезда
+        [few] { $count } звезды
+        [many] { $count } звёзд
+       *[other] { $count } звезды
+    }
+asset-rated =
+    Оценка: { $count ->
+        [one] { $count } звезда
+        [few] { $count } звезды
+        [many] { $count } звёзд
+       *[other] { $count } звезды
+    }
+asset-rating-clear-title = Нажмите ещё раз, чтобы убрать оценку
+asset-rating-cleared = Оценка убрана
 asset-collections = Коллекции
 asset-collection-remove = Убрать из «{ $name }»
 asset-collection-add-another = Добавить в другую

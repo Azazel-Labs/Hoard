@@ -32,6 +32,8 @@ error-upload-failed = отпремање није успело: { $reason }
 error-upload-no-files = у отпремању нема датотека
 error-analyze-nothing-to-do = нема шта да се ради: rules=false, а LLM је искључен
 error-too-many-assets = превише ресурса у једном захтеву
+error-change-not-found = та измена није у историји овог ресурса
+error-bulk-by-look = претрага по изгледу не може се изменити одједном: изаберите ресурсе
 error-too-many-items = превише ставки у једном захтеву
 error-not-a-hash = ово није blake3 хеш у хексадецималном облику
 error-merge-into-tag = into мора бити ознака
@@ -575,6 +577,30 @@ app-bulk-category-set =
        *[other] { $count } ресурса
     }
 app-bulk-category-cleared = Категорија је уклоњена са { $count } ресурса
+app-bulk-review = Означи прегледаним
+app-bulk-review-title = Означи изабране ресурсе као прегледане: правила и ВИ после тога не дирају њихове ознаке
+app-bulk-unreview = Означи непрегледаним
+app-bulk-unreview-title = Уклони ознаку „прегледано“ са изабраних ресурса
+app-bulk-reviewed =
+    Прегледано: { $count ->
+        [one] { $count } ресурс
+        [few] { $count } ресурса
+       *[other] { $count } ресурса
+    }
+app-bulk-unreviewed =
+    Ознака „прегледано“ уклоњена је са { $count ->
+        [one] { $count } ресурса
+        [few] { $count } ресурса
+       *[other] { $count } ресурса
+    }
+app-bulk-accept = Задржи претпоставке
+app-bulk-accept-title = Задржи као своје све ознаке које су правила и ВИ ставили на изабране ресурсе
+app-bulk-accepted =
+    Претпоставке су задржане на { $count ->
+        [one] { $count } ресурсу
+        [few] { $count } ресурса
+       *[other] { $count } ресурса
+    }
 app-credits-failed = Није могуће направити заслуге: { $error }
 app-archived-assets =
     Архивирано: { $count ->
@@ -621,6 +647,8 @@ app-filters = Филтери
 app-done = Готово
 app-yours = Ваше
 app-favorites = Омиљени
+app-needs-review = За преглед
+app-needs-review-title = Само ресурси које још нико није прегледао (иде уз остале филтере)
 app-forget-search-label = Заборави сачувану претрагу { $name }
 app-forget-search = Заборави ову претрагу
 app-projects-title = Пројекти који се одавде синхронизују помоћу hoard sync, са оним што је имала њихова последња синхронизација
@@ -799,6 +827,7 @@ shortcuts-open = Отвори детаље
 shortcuts-play-sound = Пусти или заустави звук
 shortcuts-select = Изабери или поништи избор
 shortcuts-favorite = Додај у омиљене или уклони из њих
+shortcuts-reviewed = Означи као прегледано или не
 shortcuts-key-click = клик
 shortcuts-select-range = Изабери опсег
 shortcuts-select-all = Изабери све приказано
@@ -826,6 +855,9 @@ tag-source-rule = од офлајн означивача
 tag-source-meta = измерено из датотеке
 tag-source-ai = предлог ВИ
 tag-remove = Уклони ознаку { $tag }
+tag-accept = Задржи ознаку { $tag }
+tag-accept-title = Задржи ову претпоставку као своју ознаку
+tag-reject-title = Уклони; означивач је неће вратити
 
 ## ActivityIndicator.vue
 
@@ -1523,6 +1555,21 @@ asset-meta-analysis-error = Ова датотека није могла у по�
 asset-copy-blocked = Копирање није успело: прегледач га је блокирао
 asset-save-error = Чување није успело: { $error }
 asset-tag-removed = Уклоњено: { $tag }
+asset-tag-restored = Ознака { $tag } је враћена
+asset-tags-accepted =
+    Задржано: { $count ->
+        [one] { $count } претпостављена ознака
+        [few] { $count } претпостављене ознаке
+       *[other] { $count } претпостављених ознака
+    }
+asset-reviewed = Прегледано
+asset-reviewed-on-title = Прегледано: правила и ВИ не дирају његове ознаке. Кликните да уклоните ознаку (R)
+asset-reviewed-off-title = Означи као прегледано да правила и ВИ не дирају његове ознаке (R)
+asset-reviewed-on = Означено као прегледано
+asset-reviewed-off = Ознака „прегледано“ је уклоњена
+# $name is an asset's name.
+asset-reviewed-on-named = { $name } је означен као прегледан
+asset-reviewed-off-named = Ознака „прегледано“ је уклоњена са: { $name }
 asset-undo = Опозови
 asset-play-error = Ова датотека не може да се пусти: { $error }
 asset-copied-hash = Хеш је копиран
@@ -1589,7 +1636,49 @@ asset-tags = Ознаке
 asset-tag-add-label = Додај ознаку
 asset-tag-add-placeholder = Додајте ознаку, нпр. mood:tense
 asset-tag-add = Додај
-asset-apply-family = Примени измене ознака, категорије и описа на све варијанте ({ $count })
+asset-apply-family = Примени измене на све варијанте ({ $count })
+asset-tags-accept-all =
+    Задржи све: { $count ->
+        [one] { $count } претпоставку
+        [few] { $count } претпоставке
+       *[other] { $count } претпоставки
+    }
+asset-tags-accept-all-title = Задржи као своје све ознаке које су правила и ВИ претпоставили
+# Before a list of tags someone removed, which the taggers won't put back; each can be clicked to restore it.
+asset-tags-rejected = Одбијене:
+asset-tag-restore-title = Врати { $tag }
+asset-details-heading = Детаљи
+asset-field-category = Категорија
+asset-field-license = Лиценца
+asset-field-source = Извор
+asset-field-rating = Оцена
+# Shown in place of an empty value, to fill it in.
+asset-field-add = Додај
+asset-field-new = Додај поље
+asset-field-name = Назив поља
+asset-field-value = Вредност
+# After a license the asset gets from its pack rather than its own.
+asset-field-from-pack = из пакета
+asset-field-license-placeholder = Нпр. CC0 или CC-BY 4.0
+asset-field-remove-placeholder = Празно за уклањање
+# $field is a field's name, like "License".
+asset-field-edit-title = Измени: { $field }
+asset-field-saved = Сачувано: { $field }
+asset-field-cleared = Обрисано: { $field }
+asset-rate =
+    { $count ->
+        [one] { $count } звездица
+        [few] { $count } звездице
+       *[other] { $count } звездица
+    }
+asset-rated =
+    Оцена: { $count ->
+        [one] { $count } звездица
+        [few] { $count } звездице
+       *[other] { $count } звездица
+    }
+asset-rating-clear-title = Кликните поново да обришете оцену
+asset-rating-cleared = Оцена је обрисана
 asset-collections = Колекције
 asset-collection-remove = Уклони из { $name }
 asset-collection-add-another = Додај у другу

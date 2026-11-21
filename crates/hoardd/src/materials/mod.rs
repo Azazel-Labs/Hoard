@@ -316,7 +316,12 @@ fn find_materials(state: &AppState, rt: &Handle, conn: &mut Connection, pack_id:
                 now,
             ],
         )?;
-        tx.execute("DELETE FROM asset_tags WHERE asset_id = ?1 AND source IN ('rule', 'meta')", [&id])?;
+        // A reviewed asset keeps the rule tags it was reviewed with.
+        tx.execute(
+            "DELETE FROM asset_tags WHERE asset_id = ?1 AND (source = 'meta' OR source = 'rule' AND NOT EXISTS
+               (SELECT 1 FROM assets WHERE id = ?1 AND reviewed_at IS NOT NULL))",
+            [&id],
+        )?;
         for s in tags.into_vec() {
             db::upsert_tag(&tx, &id, &s.tag, s.source, s.confidence)?;
         }

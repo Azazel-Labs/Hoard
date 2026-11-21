@@ -32,6 +32,8 @@ error-upload-failed = opplastingen mislyktes: { $reason }
 error-upload-no-files = ingen filer i opplastingen
 error-analyze-nothing-to-do = ingenting å gjøre: rules=false og LLM er av
 error-too-many-assets = for mange ressurser i én forespørsel
+error-change-not-found = den endringen finnes ikke i denne ressursens historikk
+error-bulk-by-look = et søk etter utseende kan ikke redigeres samlet: velg ressursene i stedet
 error-too-many-items = for mange elementer i én forespørsel
 error-not-a-hash = ikke en blake3-hash i heks
 error-merge-into-tag = into må være en tagg
@@ -569,6 +571,27 @@ app-bulk-category-cleared =
         [one] { $count } ressurs
        *[other] { $count } ressurser
     }
+app-bulk-review = Merk som gjennomgått
+app-bulk-review-title = Merk de valgte ressursene som gjennomgått: reglene og AI lar taggene deres være etter dette
+app-bulk-unreview = Merk som ikke gjennomgått
+app-bulk-unreview-title = Fjern merket «gjennomgått» fra de valgte ressursene
+app-bulk-reviewed =
+    Merket { $count ->
+        [one] { $count } ressurs
+       *[other] { $count } ressurser
+    } som gjennomgått
+app-bulk-unreviewed =
+    Fjernet merket «gjennomgått» fra { $count ->
+        [one] { $count } ressurs
+       *[other] { $count } ressurser
+    }
+app-bulk-accept = Behold gjettede tagger
+app-bulk-accept-title = Behold alle taggene reglene og AI la på de valgte ressursene som dine egne
+app-bulk-accepted =
+    Beholdt de gjettede taggene på { $count ->
+        [one] { $count } ressurs
+       *[other] { $count } ressurser
+    }
 app-credits-failed = Kunne ikke lage krediteringen: { $error }
 app-archived-assets =
     Arkiverte { $count ->
@@ -609,6 +632,8 @@ app-filters = Filtre
 app-done = Ferdig
 app-yours = Dine
 app-favorites = Favoritter
+app-needs-review = Trenger gjennomgang
+app-needs-review-title = Bare ressurser ingen har gått gjennom ennå (gjelder sammen med de andre filtrene)
 app-forget-search-label = Glem det lagrede søket { $name }
 app-forget-search = Glem dette søket
 app-projects-title = Prosjekter som kjører hoard sync herfra, med det siste synkronisering hadde
@@ -785,6 +810,7 @@ shortcuts-open = Åpne detaljene
 shortcuts-play-sound = Spill av eller stopp en lyd
 shortcuts-select = Velg eller fjern valg
 shortcuts-favorite = Legg til i eller fjern fra favorittene dine
+shortcuts-reviewed = Merk som gjennomgått eller ikke
 shortcuts-key-click = klikk
 shortcuts-select-range = Velg et område
 shortcuts-select-all = Velg alt som vises
@@ -812,6 +838,9 @@ tag-source-rule = fra den lokale taggeren
 tag-source-meta = målt fra filen
 tag-source-ai = foreslått av AI
 tag-remove = Fjern taggen { $tag }
+tag-accept = Behold taggen { $tag }
+tag-accept-title = Behold dette gjettet som din egen tagg
+tag-reject-title = Fjern den; taggeren legger den ikke til igjen
 
 ## ActivityIndicator.vue
 
@@ -1473,6 +1502,20 @@ asset-meta-analysis-error = Kunne ikke lese hele denne filen: { $error }
 asset-copy-blocked = Kunne ikke kopiere: nettleseren blokkerte det
 asset-save-error = Kunne ikke lagre: { $error }
 asset-tag-removed = Fjernet { $tag }
+asset-tag-restored = Satte { $tag } tilbake
+asset-tags-accepted =
+    Beholdt { $count ->
+        [one] { $count } gjettet tagg
+       *[other] { $count } gjettede tagger
+    }
+asset-reviewed = Gjennomgått
+asset-reviewed-on-title = Gjennomgått: reglene og AI lar taggene være. Klikk for å fjerne merket (R)
+asset-reviewed-off-title = Merk som gjennomgått, så reglene og AI lar taggene være (R)
+asset-reviewed-on = Merket som gjennomgått
+asset-reviewed-off = Fjernet merket «gjennomgått»
+# $name is an asset's name.
+asset-reviewed-on-named = Merket { $name } som gjennomgått
+asset-reviewed-off-named = Fjernet merket «gjennomgått» fra { $name }
 asset-undo = Angre
 asset-play-error = Kunne ikke spille av denne filen: { $error }
 asset-copied-hash = Kopierte hashen
@@ -1539,7 +1582,46 @@ asset-tags = Tagger
 asset-tag-add-label = Legg til en tagg
 asset-tag-add-placeholder = Legg til en tagg, f.eks. mood:tense
 asset-tag-add = Legg til
-asset-apply-family = Bruk endringer i tagger, kategori og beskrivelse på alle { $count } variantene
+asset-apply-family = Bruk endringene på alle { $count } variantene
+asset-tags-accept-all =
+    Behold { $count ->
+        [one] { $count } gjetning
+       *[other] alle { $count } gjetninger
+    }
+asset-tags-accept-all-title = Behold alle taggene reglene og AI gjettet som dine egne
+# Before a list of tags someone removed, which the taggers won't put back; each can be clicked to restore it.
+asset-tags-rejected = Avvist:
+asset-tag-restore-title = Sett { $tag } tilbake
+asset-details-heading = Detaljer
+asset-field-category = Kategori
+asset-field-license = Lisens
+asset-field-source = Kilde
+asset-field-rating = Vurdering
+# Shown in place of an empty value, to fill it in.
+asset-field-add = Legg til
+asset-field-new = Legg til et felt
+asset-field-name = Feltnavn
+asset-field-value = Verdi
+# After a license the asset gets from its pack rather than its own.
+asset-field-from-pack = fra pakken
+asset-field-license-placeholder = For eksempel CC0 eller CC-BY 4.0
+asset-field-remove-placeholder = Tomt fjerner det
+# $field is a field's name, like "License".
+asset-field-edit-title = Rediger { $field }
+asset-field-saved = Lagret { $field }
+asset-field-cleared = Tømte { $field }
+asset-rate =
+    { $count ->
+        [one] { $count } stjerne
+       *[other] { $count } stjerner
+    }
+asset-rated =
+    Vurdert til { $count ->
+        [one] { $count } stjerne
+       *[other] { $count } stjerner
+    }
+asset-rating-clear-title = Klikk igjen for å fjerne vurderingen
+asset-rating-cleared = Fjernet vurderingen
 asset-collections = Samlinger
 asset-collection-remove = Fjern fra { $name }
 asset-collection-add-another = Legg til i en annen

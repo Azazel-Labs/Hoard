@@ -13,7 +13,8 @@ pub(super) const ASSET_COLS: &str = "a.id, a.pack_id, p.name, a.name, a.path, a.
     a.ai_description, COALESCE(a.archived_at, p.archived_at), substr(a.thumb_hash, 1, 12), a.thumb_source,
     a.kind = 'animation' AND EXISTS (SELECT 1 FROM derivatives d WHERE d.asset_id = a.id AND d.kind = 'motion'),
     CASE WHEN a.kind = 'animation' THEN (SELECT MAX(json_extract(c.value, '$.secs')) FROM rigs r, json_each(r.rig, '$.clips') c
-      WHERE r.asset_id = a.id AND json_extract(c.value, '$.secs') >= 0.1) END";
+      WHERE r.asset_id = a.id AND json_extract(c.value, '$.secs') >= 0.1) END,
+    a.reviewed_at, a.rating, a.license, a.source_url";
 
 pub(super) fn asset_from_row(r: &Row<'_>) -> rusqlite::Result<Asset> {
     let meta: String = r.get(12)?;
@@ -41,6 +42,13 @@ pub(super) fn asset_from_row(r: &Row<'_>) -> rusqlite::Result<Asset> {
         created_at: r.get(13)?,
         updated_at: r.get(14)?,
         archived_at: r.get(17)?,
+        reviewed_at: r.get(22)?,
+        rating: r.get::<_, Option<i64>>(23)?.and_then(|n| u8::try_from(n).ok()).filter(|n| (1..=5).contains(n)),
+        license: r.get(24)?,
+        source_url: r.get(25)?,
+        pack_license: None,
+        fields: Default::default(),
+        rejected_tags: Vec::new(),
         links: Vec::new(),
         linked_from: Vec::new(),
         derivatives: Vec::new(),
@@ -113,6 +121,14 @@ pub(crate) fn get_asset(conn: &Connection, id: &str) -> Result<Option<Asset>> {
         asset.formats.push(crate::formats::clip_option());
     }
     asset.family = family(conn, &asset.id)?;
+    asset.pack_license = conn
+        .query_row("SELECT NULLIF(trim(license), '') FROM packs WHERE id = ?1", [&asset.pack_id], |r| r.get(0))
+        .optional()?
+        .flatten();
+    let mut stmt = conn.prepare("SELECT key, value FROM asset_fields WHERE asset_id = ?1 ORDER BY key")?;
+    asset.fields = stmt.query_map([&asset.id], |r| Ok((r.get(0)?, r.get(1)?)))?.collect::<rusqlite::Result<_>>()?;
+    let mut stmt = conn.prepare("SELECT tag FROM rejected_tags WHERE asset_id = ?1 ORDER BY tag")?;
+    asset.rejected_tags = stmt.query_map([&asset.id], |r| r.get(0))?.collect::<rusqlite::Result<_>>()?;
     if asset.kind == AssetKind::Model {
         asset.facing = Some(asset_facing(conn, &asset.id, &asset.pack_id)?).filter(|f| !f.is_upright());
     }

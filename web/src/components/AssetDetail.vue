@@ -9,6 +9,7 @@ import CollectionPicker from './CollectionPicker.vue'
 import { playableUrl } from '../player'
 import AssetLinks from './AssetLinks.vue'
 import AssetDescriptions from './AssetDescriptions.vue'
+import AssetFields from './AssetFields.vue'
 import AssetOrigin from './AssetOrigin.vue'
 import AudioPreview from './AudioPreview.vue'
 import DownloadAs from './DownloadAs.vue'
@@ -288,19 +289,26 @@ async function copy(text: string, what: Copyable) {
 }
 
 async function patch(body: Parameters<typeof api.patchAsset>[1]): Promise<boolean> {
-  if (family.value && applyToFamily.value && (body.add_tags || body.remove_tags || body.category || body.description !== undefined)) {
+  // What the variants share goes to all of them (the name, rating, fields and Reviewed are each one's own).
+  const shared = body.add_tags || body.remove_tags || body.accept_tags || body.accept_all_tags || body.unreject_tags
+    || body.category !== undefined || body.description !== undefined || body.license !== undefined || body.source_url !== undefined
+  if (family.value && applyToFamily.value && shared) {
     body = { ...body, apply_to_family: true }
   }
   // Tag edits show at once and are rolled back if the server says no.
   const before = props.asset
-  const optimistic = !!(body.add_tags || body.remove_tags)
+  const optimistic = !!(body.add_tags || body.remove_tags || body.accept_tags || body.accept_all_tags || body.reviewed !== undefined)
   if (optimistic) {
     const drop = new Set(body.remove_tags ?? [])
-    const tags = before.tags.filter((t) => !drop.has(t.tag))
+    const keep = new Set(body.accept_tags ?? [])
+    const tags = before.tags
+      .filter((t) => !drop.has(t.tag))
+      .map((t) => (keep.has(t.tag) || (body.accept_all_tags && guess(t.source)) ? { ...t, source: 'human' as const, confidence: 1 } : t))
     for (const tag of body.add_tags ?? []) {
       if (!tags.some((t) => t.tag === tag)) tags.push({ tag, source: 'human', confidence: 1 })
     }
-    emit('updated', { ...before, tags })
+    const reviewed_at = body.reviewed === undefined ? before.reviewed_at : body.reviewed ? new Date().toISOString() : null
+    emit('updated', { ...before, tags, reviewed_at })
   }
   try {
     emit('updated', await api.patchAsset(props.asset.id, body))
@@ -312,8 +320,35 @@ async function patch(body: Parameters<typeof api.patchAsset>[1]): Promise<boolea
   }
 }
 
+/** A tag a rule or the AI put on, rather than a person or the file itself. */
+function guess(source: string): boolean {
+  return source === 'rule' || source === 'ai'
+}
+const guesses = computed(() => visibleTags.value.filter((t) => guess(t.source)))
+const rejected = computed(() => props.asset.rejected_tags ?? [])
+
 async function removeTag(tag: string) {
-  if (await patch({ remove_tags: [tag] })) showOk(t('asset-tag-removed', { tag }), { label: t('asset-undo'), run: () => void patch({ add_tags: [tag] }) })
+  const was = props.asset.tags.find((t) => t.tag === tag)
+  if (!(await patch({ remove_tags: [tag] }))) return
+  // A guess turned down is remembered: undoing it puts the guess back as it was rather than making it a person's tag.
+  const undo = was && guess(was.source) ? { unreject_tags: [tag] } : { add_tags: [tag] }
+  showOk(t('asset-tag-removed', { tag }), { label: t('asset-undo'), run: () => void patch(undo) })
+}
+async function acceptTags(tags: string[] | 'all') {
+  const n = tags === 'all' ? guesses.value.length : tags.length
+  if (!(await patch(tags === 'all' ? { accept_all_tags: true } : { accept_tags: tags }))) return
+  if (n > 1) showOk(t('asset-tags-accepted', { count: n }))
+}
+async function restoreTag(tag: string) {
+  if (await patch({ unreject_tags: [tag] })) showOk(t('asset-tag-restored', { tag }))
+}
+
+const reviewed = computed(() => !!props.asset.reviewed_at)
+async function toggleReviewed() {
+  const to = !reviewed.value
+  if (await patch({ reviewed: to })) {
+    showOk(to ? t('asset-reviewed-on') : t('asset-reviewed-off'), { label: t('asset-undo'), run: () => void patch({ reviewed: !to }) })
+  }
 }
 
 // Renaming edits the heading itself, so nothing moves: the text just becomes editable where it is.
@@ -419,6 +454,21 @@ onBeforeUnmount(() => unswipe())
               <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="m6 3 5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" /></svg>
             </button>
           </template>
+          <button
+            v-if="editor"
+            class="btn ghost icon reviewed"
+            :class="{ on: reviewed }"
+            type="button"
+            :aria-pressed="reviewed"
+            :aria-label="t('asset-reviewed')"
+            :title="reviewed ? t('asset-reviewed-on-title') : t('asset-reviewed-off-title')"
+            @click="toggleReviewed"
+          >
+            <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true">
+              <circle cx="8" cy="8" r="6.2" :fill="reviewed ? 'currentColor' : 'none'" stroke="currentColor" stroke-width="1.4" />
+              <path d="m5.2 8.2 2 2 3.7-4" fill="none" :stroke="reviewed ? 'var(--panel)' : 'currentColor'" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+          </button>
           <button
             v-if="canStar()"
             class="btn ghost icon star"
@@ -571,8 +621,19 @@ onBeforeUnmount(() => unswipe())
       :save="(description) => patch({ description })"
     />
 
+    <AssetFields :asset="asset" :editor="editor" :save="patch" />
+
     <section>
-      <h3>{{ t('asset-tags') }}</h3>
+      <div class="taghead">
+        <h3>{{ t('asset-tags') }}</h3>
+        <button
+          v-if="editor && guesses.length > 1"
+          type="button"
+          class="linkish small acceptall"
+          :title="t('asset-tags-accept-all-title')"
+          @click="acceptTags('all')"
+        >{{ t('asset-tags-accept-all', { count: guesses.length }) }}</button>
+      </div>
       <TransitionGroup tag="div" name="chip" class="tags">
         <TagChip
           v-for="vt in visibleTags"
@@ -580,10 +641,23 @@ onBeforeUnmount(() => unswipe())
           :tag="vt.tag"
           :source="vt.source"
           :removable="editor"
+          :acceptable="editor && guess(vt.source)"
           @click="$emit('tag', vt.tag)"
           @remove="removeTag(vt.tag)"
+          @accept="acceptTags([vt.tag])"
         />
       </TransitionGroup>
+      <p v-if="editor && rejected.length" class="rejected">
+        <span class="lbl">{{ t('asset-tags-rejected') }}</span>
+        <button
+          v-for="tag in rejected"
+          :key="tag"
+          type="button"
+          class="linkish rej"
+          :title="t('asset-tag-restore-title', { tag })"
+          @click="restoreTag(tag)"
+        >{{ tag }}</button>
+      </p>
       <form v-if="editor" class="addtag" @submit.prevent="addTag">
         <label class="visually-hidden" for="new-tag">{{ t('asset-tag-add-label') }}</label>
         <input id="new-tag" v-model="newTag" class="field" list="tag-suggestions" :placeholder="t('asset-tag-add-placeholder')" autocomplete="off" />
@@ -719,6 +793,14 @@ onBeforeUnmount(() => unswipe())
 .used .where { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--muted); font-size: 0.75rem; }
 .used .when { flex: none; color: var(--faint); font-size: 0.75rem; }
 .star.on { color: var(--star); }
+.reviewed.on { color: var(--ok); }
+.taghead { display: flex; align-items: baseline; justify-content: space-between; gap: 0.5rem; }
+.acceptall { color: var(--muted); font-size: 0.75rem; }
+.acceptall:hover { color: var(--ok); }
+.rejected { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.15rem 0.6rem; margin: 0.55rem 0 0; font-size: 0.75rem; color: var(--faint); }
+.rejected .lbl { margin-right: 0.1rem; }
+.rejected .rej { color: var(--faint); text-decoration: line-through; text-decoration-color: color-mix(in srgb, var(--faint) 60%, transparent); }
+.rejected .rej:hover { color: var(--text); text-decoration: none; }
 .detail {
   display: flex; flex-direction: column; gap: 1rem;
   padding: 1.1rem 1.2rem 1.4rem;

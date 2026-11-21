@@ -32,6 +32,8 @@ error-upload-failed = échec de l’envoi : { $reason }
 error-upload-no-files = aucun fichier dans l’envoi
 error-analyze-nothing-to-do = rien à faire : rules=false et le LLM est désactivé
 error-too-many-assets = trop de ressources dans une seule requête
+error-change-not-found = cette modification n'est pas dans l'historique de cet asset
+error-bulk-by-look = une recherche par apparence ne peut pas être modifiée d'un coup : sélectionnez plutôt les assets
 error-too-many-items = trop d’éléments dans une seule requête
 error-not-a-hash = ce n’est pas un hachage blake3 en hexadécimal
 error-merge-into-tag = into doit être une étiquette
@@ -577,6 +579,27 @@ app-bulk-category-cleared =
         [one] { $count } ressource
        *[other] { $count } ressources
     }
+app-bulk-review = Marquer comme revues
+app-bulk-review-title = Marquer les ressources sélectionnées comme passées en revue : les règles et l’IA ne toucheront plus à leurs étiquettes
+app-bulk-unreview = Retirer la marque
+app-bulk-unreview-title = Retirer la marque « revue » des ressources sélectionnées
+app-bulk-reviewed =
+    { $count ->
+        [one] { $count } ressource marquée comme revue
+       *[other] { $count } ressources marquées comme revues
+    }
+app-bulk-unreviewed =
+    { $count ->
+        [one] Marque « revue » retirée de { $count } ressource
+       *[other] Marque « revue » retirée de { $count } ressources
+    }
+app-bulk-accept = Garder les suggestions
+app-bulk-accept-title = Garder comme étiquettes personnelles toutes celles que les règles et l’IA ont ajoutées aux ressources sélectionnées
+app-bulk-accepted =
+    { $count ->
+        [one] Étiquettes suggérées conservées sur { $count } ressource
+       *[other] Étiquettes suggérées conservées sur { $count } ressources
+    }
 app-credits-failed = Impossible de générer les crédits : { $error }
 app-archived-assets =
     { $count ->
@@ -617,6 +640,8 @@ app-filters = Filtres
 app-done = Terminé
 app-yours = Les vôtres
 app-favorites = Favoris
+app-needs-review = À revoir
+app-needs-review-title = Uniquement les ressources que personne n’a encore passées en revue (se combine avec les autres filtres)
 app-forget-search-label = Oublier la recherche enregistrée { $name }
 app-forget-search = Oublier cette recherche
 app-projects-title = Projets qui font hoard sync depuis ce serveur, avec ce que contenait leur dernière synchronisation
@@ -801,6 +826,7 @@ shortcuts-open = Ouvrir les détails
 shortcuts-play-sound = Lire ou arrêter un son
 shortcuts-select = Sélectionner ou désélectionner
 shortcuts-favorite = Ajouter aux favoris ou en retirer
+shortcuts-reviewed = Marquer comme revue ou non
 shortcuts-key-click = clic
 shortcuts-select-range = Sélectionner une plage
 shortcuts-select-all = Tout sélectionner parmi ce qui est affiché
@@ -828,6 +854,9 @@ tag-source-rule = de l’étiqueteur hors ligne
 tag-source-meta = mesurée à partir du fichier
 tag-source-ai = suggérée par l’IA
 tag-remove = Retirer l’étiquette { $tag }
+tag-accept = Garder l’étiquette { $tag }
+tag-accept-title = Garder cette suggestion comme étiquette personnelle
+tag-reject-title = La retirer ; l’étiqueteur ne la remettra pas
 
 ## ActivityIndicator.vue
 
@@ -1501,6 +1530,20 @@ asset-meta-analysis-error = Impossible de lire entièrement ce fichier : { $err
 asset-copy-blocked = Copie impossible : le navigateur l’a bloquée
 asset-save-error = Impossible d’enregistrer : { $error }
 asset-tag-removed = Étiquette { $tag } retirée
+asset-tag-restored = Étiquette { $tag } remise
+asset-tags-accepted =
+    { $count ->
+        [one] { $count } étiquette suggérée conservée
+       *[other] { $count } étiquettes suggérées conservées
+    }
+asset-reviewed = Revue
+asset-reviewed-on-title = Revue : les règles et l’IA ne touchent pas à ses étiquettes. Cliquez pour retirer la marque (R)
+asset-reviewed-off-title = Marquer comme revue, pour que les règles et l’IA ne touchent pas à ses étiquettes (R)
+asset-reviewed-on = Marquée comme revue
+asset-reviewed-off = Marque « revue » retirée
+# $name is an asset's name.
+asset-reviewed-on-named = { $name } marquée comme revue
+asset-reviewed-off-named = Marque « revue » retirée de { $name }
 asset-undo = Annuler
 asset-play-error = Impossible de lire ce fichier : { $error }
 asset-copied-hash = Hachage copié
@@ -1567,7 +1610,46 @@ asset-tags = Étiquettes
 asset-tag-add-label = Ajouter une étiquette
 asset-tag-add-placeholder = Ajoutez une étiquette, par ex. mood:tense
 asset-tag-add = Ajouter
-asset-apply-family = Appliquer les modifications d’étiquettes, de catégorie et de description aux { $count } variantes
+asset-apply-family = Appliquer les modifications aux { $count } variantes
+asset-tags-accept-all =
+    { $count ->
+        [one] Garder { $count } suggestion
+       *[other] Garder les { $count } suggestions
+    }
+asset-tags-accept-all-title = Garder comme étiquettes personnelles toutes celles suggérées par les règles et l’IA
+# Before a list of tags someone removed, which the taggers won't put back; each can be clicked to restore it.
+asset-tags-rejected = Refusées :
+asset-tag-restore-title = Remettre { $tag }
+asset-details-heading = Détails
+asset-field-category = Catégorie
+asset-field-license = Licence
+asset-field-source = Source
+asset-field-rating = Note
+# Shown in place of an empty value, to fill it in.
+asset-field-add = Ajouter
+asset-field-new = Ajouter un champ
+asset-field-name = Nom du champ
+asset-field-value = Valeur
+# After a license the asset gets from its pack rather than its own.
+asset-field-from-pack = du pack
+asset-field-license-placeholder = Par exemple CC0 ou CC-BY 4.0
+asset-field-remove-placeholder = Vide pour le retirer
+# $field is a field's name, like "License".
+asset-field-edit-title = Modifier { $field }
+asset-field-saved = { $field } enregistré
+asset-field-cleared = { $field } effacé
+asset-rate =
+    { $count ->
+        [one] { $count } étoile
+       *[other] { $count } étoiles
+    }
+asset-rated =
+    { $count ->
+        [one] Noté { $count } étoile
+       *[other] Noté { $count } étoiles
+    }
+asset-rating-clear-title = Cliquez à nouveau pour effacer la note
+asset-rating-cleared = Note effacée
 asset-collections = Collections
 asset-collection-remove = Retirer de { $name }
 asset-collection-add-another = Ajouter à une autre

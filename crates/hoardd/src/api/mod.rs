@@ -58,6 +58,7 @@ pub(crate) fn router(state: &AppState) -> Router<AppState> {
         )
         .route("/api/collections/{id}/assets", post(collections::collection_members))
         .route("/api/assets/{id}", axum::routing::patch(assets::patch_asset))
+        .route("/api/assets/{id}/history/{change}/revert", post(assets::revert_change))
         .route(
             "/api/assets/{id}/thumb",
             axum::routing::put(crate::previews::put_thumb)
@@ -131,6 +132,7 @@ pub(crate) fn router(state: &AppState) -> Router<AppState> {
         .route("/api/packs/{id}/context", get(packs::get_pack_context))
         .route("/api/assets", get(assets::search_assets))
         .route("/api/assets/{id}", get(assets::get_asset))
+        .route("/api/assets/{id}/history", get(assets::asset_history))
         .route("/api/assets/{id}/file", get(files::asset_file))
         .route("/api/assets/{id}/thumb", get(files::asset_thumb))
         .route("/api/assets/{id}/lite", get(crate::previews::asset_lite))
@@ -138,6 +140,7 @@ pub(crate) fn router(state: &AppState) -> Router<AppState> {
         .route("/api/assets/{id}/lottie.json", get(crate::lottie::asset_lottie))
         .route("/api/blobs/{hash}", get(files::blob))
         .route("/api/tags", get(assets::tags))
+        .route("/api/categories", get(assets::categories))
         .route("/api/manifest", post(bundles::manifest))
         .route("/api/credits", post(crate::credits::credits))
         .route("/api/check", post(crate::check::check_handler))

@@ -18,8 +18,6 @@ use axum::http::{HeaderMap, StatusCode, header};
 use axum::response::{IntoResponse, Response};
 use axum::routing::post;
 use axum::{Json, Router};
-use hoard_core::TagSource;
-use rusqlite::params;
 use serde_json::{Value, json};
 
 use crate::{AppState, db};
@@ -162,7 +160,7 @@ async fn handle(State(state): State<AppState>, headers: HeaderMap, body: String)
             let result = if !may_change && CHANGES.contains(&name.as_str()) {
                 Err(ToolError::Failed("this account can look but not change anything".into()))
             } else {
-                call_tool(&state, &name, args, &base).await
+                call_tool(&state, &who, &name, args, &base).await
             };
             match result {
                 Ok(mut value) => {
@@ -243,7 +241,13 @@ impl<E: std::fmt::Display> From<E> for ToolError {
     }
 }
 
-async fn call_tool(state: &AppState, name: &str, args: Value, base: &str) -> Result<Value, ToolError> {
+async fn call_tool(
+    state: &AppState,
+    who: &crate::auth::Who,
+    name: &str,
+    args: Value,
+    base: &str,
+) -> Result<Value, ToolError> {
     if matches!(name, "search_assets" | "find_similar" | "find_by_color") {
         return search_call(state, name, &args, base).await;
     }
@@ -343,27 +347,22 @@ async fn call_tool(state: &AppState, name: &str, args: Value, base: &str) -> Res
             let id = str_arg(&args, "id").ok_or_else(|| ToolError::Failed("`id` is required".into()))?;
             let is_tag = name == "tag_asset";
             let (add, remove) = (str_list(&args, "add"), str_list(&args, "remove"));
-            let (n, cat, desc) = (str_arg(&args, "name"), str_arg(&args, "category"), str_arg(&args, "description"));
+            let patch = if is_tag {
+                hoard_core::AssetPatch { add_tags: add, remove_tags: remove, ..Default::default() }
+            } else {
+                hoard_core::AssetPatch {
+                    name: str_arg(&args, "name"),
+                    category: str_arg(&args, "category"),
+                    description: str_arg(&args, "description"),
+                    ..Default::default()
+                }
+            };
+            let actor = db::Actor::mcp(who);
             let asset = db::call(&state.pool, move |c| {
                 let tx = c.transaction()?;
-                if !tx.query_row("SELECT EXISTS (SELECT 1 FROM assets WHERE id = ?1)", [&id], |r| r.get::<_, bool>(0))? {
+                if !db::apply(&tx, &id, &patch, &actor)? {
                     return Ok(None);
                 }
-                if is_tag {
-                    for t in add.iter().filter_map(|t| hoard_core::normalize_tag(t)) {
-                        db::upsert_tag(&tx, &id, &t, TagSource::Human, 1.0)?;
-                    }
-                    for t in &remove {
-                        tx.execute("DELETE FROM asset_tags WHERE asset_id = ?1 AND tag = ?2", params![id, t])?;
-                    }
-                } else {
-                    tx.execute(
-                        "UPDATE assets SET name = COALESCE(?2, name), category = COALESCE(?3, category),
-                                description = COALESCE(?4, description), human_edited = 1, updated_at = ?5 WHERE id = ?1",
-                        params![id, n, cat, desc, db::now()],
-                    )?;
-                }
-                db::reindex_asset(&tx, &id)?;
                 tx.commit()?;
                 db::get_asset(c, &id)
             })

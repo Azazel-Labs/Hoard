@@ -136,6 +136,7 @@ function searchPage(page: number, sidebar = false) {
       compatible_keys: (filters.key && filters.mixKeys) || undefined,
       favorites: filters.favorites || undefined,
       project: filters.project || undefined,
+      reviewed: filters.reviewed ? filters.reviewed === 'yes' : undefined,
       // The sidebar's tags only need the count, not the tiles again.
       limit: sidebar ? 1 : PAGE,
       offset: page * PAGE,
@@ -550,8 +551,13 @@ function patchLoaded(ids: string[], edit: Omit<BulkEdit, 'ids'>) {
     for (const tag of edit.add_tags ?? []) {
       if (!tags.some((t) => t.tag === tag)) tags = [...tags, { tag, source: 'human', confidence: 1 }]
     }
+    if (edit.accept_all_tags || edit.accept_tags?.length) {
+      const keep = new Set(edit.accept_tags ?? [])
+      tags = tags.map((t) => (keep.has(t.tag) || (edit.accept_all_tags && (t.source === 'rule' || t.source === 'ai')) ? { ...t, source: 'human' as const, confidence: 1 } : t))
+    }
     const category = edit.category === undefined ? a.category : edit.category.trim() || null
-    return { ...a, tags, category }
+    const reviewed_at = edit.reviewed === undefined ? a.reviewed_at : edit.reviewed ? (a.reviewed_at ?? new Date().toISOString()) : null
+    return { ...a, tags, category, reviewed_at }
   }
   slots.value = slots.value.map((a) => a && patch(a))
   if (selected.value && set.has(selected.value.id)) selected.value = patch(selected.value)
@@ -887,6 +893,29 @@ function onKey(e: KeyboardEvent) {
   }
   if (e.key === 'f' && focused && member.value) {
     toggleFavorite(focused.id)
+  }
+  if (e.key === 'r' && focused && mayEdit()) {
+    void toggleReviewed(focused)
+  }
+}
+
+/** Mark one asset gone over, or not (the `r` key), with Undo. */
+async function toggleReviewed(a: Asset) {
+  const to = !a.reviewed_at
+  const set = async (reviewed: boolean) => {
+    patchLoaded([a.id], { reviewed })
+    try {
+      const fresh = await api.patchAsset(a.id, { reviewed })
+      if (selected.value?.id === fresh.id) selected.value = fresh
+      return true
+    } catch (e) {
+      patchLoaded([a.id], { reviewed: !reviewed })
+      showError(t('asset-save-error', { error: (e as Error).message }))
+      return false
+    }
+  }
+  if (await set(to)) {
+    showOk(t(to ? 'asset-reviewed-on-named' : 'asset-reviewed-off-named', { name: a.name }), { label: t('asset-undo'), run: () => void set(!to) })
   }
 }
 

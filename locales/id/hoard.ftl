@@ -32,6 +32,8 @@ error-upload-failed = unggahan gagal: { $reason }
 error-upload-no-files = tidak ada berkas dalam unggahan
 error-analyze-nothing-to-do = tidak ada yang perlu dikerjakan: rules=false dan LLM mati
 error-too-many-assets = terlalu banyak aset dalam satu permintaan
+error-change-not-found = perubahan itu tidak ada di riwayat aset ini
+error-bulk-by-look = pencarian berdasarkan tampilan tidak bisa diedit sekaligus: pilih asetnya saja
 error-too-many-items = terlalu banyak item dalam satu permintaan
 error-not-a-hash = bukan hash hex blake3
 error-merge-into-tag = into harus berupa tag
@@ -545,6 +547,27 @@ app-bulk-untagged = { $tag } dilepas dari { $count } aset
 app-bulk-tagged = { $count } aset diberi tag { $tag }
 app-bulk-category-set = Kategori { $count } aset ditetapkan menjadi { $category }
 app-bulk-category-cleared = Kategori { $count } aset dikosongkan
+app-bulk-review = Tandai ditinjau
+app-bulk-review-title = Tandai aset terpilih sebagai sudah ditinjau: aturan dan AI tidak akan mengubah tag-nya lagi
+app-bulk-unreview = Tandai belum ditinjau
+app-bulk-unreview-title = Hapus tanda ditinjau dari aset terpilih
+app-bulk-reviewed =
+    { $count ->
+        [one] { $count } aset ditandai sudah ditinjau
+       *[other] { $count } aset ditandai sudah ditinjau
+    }
+app-bulk-unreviewed =
+    { $count ->
+        [one] Tanda ditinjau dihapus dari { $count } aset
+       *[other] Tanda ditinjau dihapus dari { $count } aset
+    }
+app-bulk-accept = Pertahankan tag tebakan
+app-bulk-accept-title = Pertahankan semua tag yang dipasang aturan dan AI pada aset terpilih sebagai tag Anda sendiri
+app-bulk-accepted =
+    { $count ->
+        [one] Tag tebakan dipertahankan pada { $count } aset
+       *[other] Tag tebakan dipertahankan pada { $count } aset
+    }
 app-credits-failed = Tidak dapat membuat kredit: { $error }
 app-archived-assets = { $count } aset diarsipkan
 app-archived-one = { $name } diarsipkan
@@ -581,6 +604,8 @@ app-filters = Filter
 app-done = Selesai
 app-yours = Milik Anda
 app-favorites = Favorit
+app-needs-review = Perlu ditinjau
+app-needs-review-title = Hanya aset yang belum pernah ditinjau siapa pun (berlaku bersama filter lain)
 app-forget-search-label = Lupakan pencarian tersimpan { $name }
 app-forget-search = Lupakan pencarian ini
 app-projects-title = Proyek yang menjalankan hoard sync dari sini, beserta isi sinkronisasi terakhirnya
@@ -749,6 +774,7 @@ shortcuts-open = Buka detail
 shortcuts-play-sound = Putar atau hentikan suara
 shortcuts-select = Pilih atau batalkan pilihan
 shortcuts-favorite = Tambahkan ke atau keluarkan dari favorit Anda
+shortcuts-reviewed = Tandai sudah ditinjau, atau tidak
 shortcuts-key-click = klik
 shortcuts-select-range = Pilih rentang
 shortcuts-select-all = Pilih semua yang ditampilkan
@@ -776,6 +802,9 @@ tag-source-rule = dari pemberi tag offline
 tag-source-meta = diukur dari berkas
 tag-source-ai = disarankan oleh AI
 tag-remove = Hapus tag { $tag }
+tag-accept = Pertahankan tag { $tag }
+tag-accept-title = Pertahankan tebakan ini sebagai tag Anda sendiri
+tag-reject-title = Lepas; pemberi tag tidak akan memasangnya lagi
 
 ## ActivityIndicator.vue
 
@@ -1363,6 +1392,20 @@ asset-meta-analysis-error = Tidak dapat membaca berkas ini sepenuhnya: { $error 
 asset-copy-blocked = Tidak dapat menyalin: browser memblokirnya
 asset-save-error = Tidak dapat menyimpan: { $error }
 asset-tag-removed = { $tag } dihapus
+asset-tag-restored = { $tag } dipasang kembali
+asset-tags-accepted =
+    { $count ->
+        [one] { $count } tag tebakan dipertahankan
+       *[other] { $count } tag tebakan dipertahankan
+    }
+asset-reviewed = Ditinjau
+asset-reviewed-on-title = Ditinjau: aturan dan AI tidak mengubah tag-nya. Klik untuk menghapus tanda (R)
+asset-reviewed-off-title = Tandai sudah ditinjau, agar aturan dan AI tidak mengubah tag-nya (R)
+asset-reviewed-on = Ditandai sudah ditinjau
+asset-reviewed-off = Tanda ditinjau dihapus
+# $name is an asset's name.
+asset-reviewed-on-named = { $name } ditandai sudah ditinjau
+asset-reviewed-off-named = Tanda ditinjau dihapus dari { $name }
 asset-undo = Urungkan
 asset-play-error = Tidak dapat memutar berkas ini: { $error }
 asset-copied-hash = Hash disalin
@@ -1429,7 +1472,46 @@ asset-tags = Tag
 asset-tag-add-label = Tambahkan tag
 asset-tag-add-placeholder = Tambahkan tag, mis. mood:tense
 asset-tag-add = Tambah
-asset-apply-family = Terapkan perubahan tag, kategori, dan deskripsi ke semua { $count } varian
+asset-apply-family = Terapkan perubahan ke semua { $count } varian
+asset-tags-accept-all =
+    { $count ->
+        [one] Pertahankan { $count } tebakan
+       *[other] Pertahankan { $count } tebakan
+    }
+asset-tags-accept-all-title = Pertahankan semua tag yang ditebak aturan dan AI sebagai tag Anda sendiri
+# Before a list of tags someone removed, which the taggers won't put back; each can be clicked to restore it.
+asset-tags-rejected = Ditolak:
+asset-tag-restore-title = Pasang kembali { $tag }
+asset-details-heading = Detail
+asset-field-category = Kategori
+asset-field-license = Lisensi
+asset-field-source = Sumber
+asset-field-rating = Peringkat
+# Shown in place of an empty value, to fill it in.
+asset-field-add = Tambah
+asset-field-new = Tambah kolom
+asset-field-name = Nama kolom
+asset-field-value = Nilai
+# After a license the asset gets from its pack rather than its own.
+asset-field-from-pack = dari paket
+asset-field-license-placeholder = Misalnya CC0 atau CC-BY 4.0
+asset-field-remove-placeholder = Kosongkan untuk menghapus
+# $field is a field's name, like "License".
+asset-field-edit-title = Edit { $field }
+asset-field-saved = { $field } disimpan
+asset-field-cleared = { $field } dikosongkan
+asset-rate =
+    { $count ->
+        [one] { $count } bintang
+       *[other] { $count } bintang
+    }
+asset-rated =
+    { $count ->
+        [one] Diberi peringkat { $count } bintang
+       *[other] Diberi peringkat { $count } bintang
+    }
+asset-rating-clear-title = Klik lagi untuk menghapus peringkat
+asset-rating-cleared = Peringkat dikosongkan
 asset-collections = Koleksi
 asset-collection-remove = Keluarkan dari { $name }
 asset-collection-add-another = Tambahkan ke koleksi lain

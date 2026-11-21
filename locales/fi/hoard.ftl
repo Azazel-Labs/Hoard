@@ -32,6 +32,8 @@ error-upload-failed = lähetys epäonnistui: { $reason }
 error-upload-no-files = lähetyksessä ei ole tiedostoja
 error-analyze-nothing-to-do = ei tehtävää: rules=false ja LLM on pois päältä
 error-too-many-assets = liian monta resurssia yhdessä pyynnössä
+error-change-not-found = tätä muutosta ei ole tämän assetin historiassa
+error-bulk-by-look = ulkonäköhakua ei voi muokata kerralla: valitse assetit sen sijaan
 error-too-many-items = liian monta kohdetta yhdessä pyynnössä
 error-not-a-hash = ei ole blake3-heksatiiviste
 error-merge-into-tag = into-kohteen on oltava tunniste
@@ -577,6 +579,27 @@ app-bulk-category-cleared =
         [one] Luokka tyhjennettiin { $count } resurssilta
        *[other] Luokka tyhjennettiin { $count } resurssilta
     }
+app-bulk-review = Merkitse tarkistetuiksi
+app-bulk-review-title = Merkitse valitut resurssit läpikäydyiksi: säännöt ja tekoäly eivät enää koske niiden tunnisteisiin
+app-bulk-unreview = Poista tarkistusmerkintä
+app-bulk-unreview-title = Poista tarkistusmerkintä valituilta resursseilta
+app-bulk-reviewed =
+    { $count ->
+        [one] { $count } resurssi merkitty tarkistetuksi
+       *[other] { $count } resurssia merkitty tarkistetuiksi
+    }
+app-bulk-unreviewed =
+    { $count ->
+        [one] Tarkistusmerkintä poistettu { $count } resurssilta
+       *[other] Tarkistusmerkintä poistettu { $count } resurssilta
+    }
+app-bulk-accept = Säilytä arvatut tunnisteet
+app-bulk-accept-title = Säilytä kaikki sääntöjen ja tekoälyn valittuihin resursseihin lisäämät tunnisteet omina tunnisteinasi
+app-bulk-accepted =
+    { $count ->
+        [one] Arvatut tunnisteet säilytetty { $count } resurssissa
+       *[other] Arvatut tunnisteet säilytetty { $count } resurssissa
+    }
 app-credits-failed = Tekijätietojen luonti epäonnistui: { $error }
 app-archived-assets =
     { $count ->
@@ -621,6 +644,8 @@ app-filters = Suodattimet
 app-done = Valmis
 app-yours = Omat
 app-favorites = Suosikit
+app-needs-review = Tarkistettavat
+app-needs-review-title = Vain resurssit, joita kukaan ei ole vielä käynyt läpi (toimii muiden suodattimien kanssa)
 app-forget-search-label = Unohda tallennettu haku { $name }
 app-forget-search = Unohda tämä haku
 app-projects-title = Projektit, jotka tekevät hoard sync -synkronoinnin täältä, ja mitä niiden viimeisin synkronointi sisälsi
@@ -805,6 +830,7 @@ shortcuts-open = Avaa tiedot
 shortcuts-play-sound = Toista tai pysäytä ääni
 shortcuts-select = Valitse tai poista valinta
 shortcuts-favorite = Lisää suosikkeihin tai poista niistä
+shortcuts-reviewed = Merkitse tarkistetuksi tai poista merkintä
 shortcuts-key-click = napsautus
 shortcuts-select-range = Valitse alue
 shortcuts-select-all = Valitse kaikki näytetyt
@@ -832,6 +858,9 @@ tag-source-rule = sääntöpohjaisen tunnistelijan antama
 tag-source-meta = mitattu tiedostosta
 tag-source-ai = tekoälyn ehdottama
 tag-remove = Poista tunniste { $tag }
+tag-accept = Säilytä tunniste { $tag }
+tag-accept-title = Säilytä tämä arvaus omana tunnisteenasi
+tag-reject-title = Poista se; tunnistelija ei lisää sitä takaisin
 
 ## Taustatoiminta
 
@@ -1521,6 +1550,20 @@ asset-meta-analysis-error = Tiedostoa ei voitu lukea kokonaan: { $error }
 asset-copy-blocked = Kopiointi epäonnistui: selain esti sen
 asset-save-error = Tallennus epäonnistui: { $error }
 asset-tag-removed = Tunniste { $tag } poistettu
+asset-tag-restored = Tunniste { $tag } palautettu
+asset-tags-accepted =
+    { $count ->
+        [one] { $count } arvattu tunniste säilytetty
+       *[other] { $count } arvattua tunnistetta säilytetty
+    }
+asset-reviewed = Tarkistettu
+asset-reviewed-on-title = Tarkistettu: säännöt ja tekoäly eivät koske sen tunnisteisiin. Napsauta poistaaksesi merkinnän (R)
+asset-reviewed-off-title = Merkitse tarkistetuksi, jotta säännöt ja tekoäly eivät koske sen tunnisteisiin (R)
+asset-reviewed-on = Merkitty tarkistetuksi
+asset-reviewed-off = Tarkistusmerkintä poistettu
+# $name is an asset's name.
+asset-reviewed-on-named = { $name } merkitty tarkistetuksi
+asset-reviewed-off-named = Tarkistusmerkintä poistettu: { $name }
 asset-undo = Kumoa
 asset-play-error = Tiedoston toisto epäonnistui: { $error }
 asset-copied-hash = Tiiviste kopioitu
@@ -1587,7 +1630,46 @@ asset-tags = Tunnisteet
 asset-tag-add-label = Lisää tunniste
 asset-tag-add-placeholder = Lisää tunniste, esim. mood:tense
 asset-tag-add = Lisää
-asset-apply-family = Käytä tunnisteen, luokan ja kuvauksen muutoksia kaikkiin { $count } muunnelmaan
+asset-apply-family = Käytä muutoksia kaikkiin { $count } muunnelmaan
+asset-tags-accept-all =
+    { $count ->
+        [one] Säilytä { $count } arvaus
+       *[other] Säilytä kaikki { $count } arvausta
+    }
+asset-tags-accept-all-title = Säilytä kaikki sääntöjen ja tekoälyn arvaamat tunnisteet omina tunnisteinasi
+# Before a list of tags someone removed, which the taggers won't put back; each can be clicked to restore it.
+asset-tags-rejected = Hylätyt:
+asset-tag-restore-title = Palauta { $tag }
+asset-details-heading = Tiedot
+asset-field-category = Luokka
+asset-field-license = Lisenssi
+asset-field-source = Lähde
+asset-field-rating = Arvosana
+# Shown in place of an empty value, to fill it in.
+asset-field-add = Lisää
+asset-field-new = Lisää kenttä
+asset-field-name = Kentän nimi
+asset-field-value = Arvo
+# After a license the asset gets from its pack rather than its own.
+asset-field-from-pack = paketista
+asset-field-license-placeholder = Esimerkiksi CC0 tai CC-BY 4.0
+asset-field-remove-placeholder = Tyhjä poistaa sen
+# $field is a field's name, like "License".
+asset-field-edit-title = Muokkaa kenttää { $field }
+asset-field-saved = Tallennettu: { $field }
+asset-field-cleared = Tyhjennetty: { $field }
+asset-rate =
+    { $count ->
+        [one] { $count } tähti
+       *[other] { $count } tähteä
+    }
+asset-rated =
+    { $count ->
+        [one] Arvosana: { $count } tähti
+       *[other] Arvosana: { $count } tähteä
+    }
+asset-rating-clear-title = Napsauta uudelleen tyhjentääksesi arvosanan
+asset-rating-cleared = Arvosana tyhjennetty
 asset-collections = Kokoelmat
 asset-collection-remove = Poista kokoelmasta { $name }
 asset-collection-add-another = Lisää toiseen

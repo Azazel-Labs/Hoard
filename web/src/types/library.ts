@@ -57,6 +57,20 @@ export interface Asset {
   updated_at: string
   /** When it went to the archive (its own, or its pack's). */
   archived_at?: string | null
+  /** When a person said its details are right. Rules and the AI leave a reviewed asset's tags alone. */
+  reviewed_at?: string | null
+  /** 1 to 5. */
+  rating?: number | null
+  /** Its own license, when it isn't its pack's (`pack_license`). */
+  license?: string | null
+  /** Where it came from. */
+  source_url?: string | null
+  /** Detail view only: its pack's license. */
+  pack_license?: string | null
+  /** Detail view only: the library's own fields, by name. */
+  fields?: Record<string, string>
+  /** Detail view only: tags a rule or the AI gave it that a person took off, which stay off. */
+  rejected_tags?: string[]
   /** Detail view only. */
   links: AssetLink[]
   linked_from: AssetLink[]
@@ -494,14 +508,56 @@ export interface SearchParams {
   compatible_keys?: boolean
   /** Only the favorites of whoever's signed in. */
   favorites?: boolean
+  /** Only what's been reviewed (true), or only what hasn't (false). */
+  reviewed?: boolean
 }
 
 /** Packs and assets to archive, restore or delete for good. */
 export interface ArchiveItems { packs?: string[]; assets?: string[] }
 export interface ArchiveCount { packs: number; assets: number }
 
-/** One edit to many assets at once. */
-export interface BulkEdit { ids: string[]; add_tags?: string[]; remove_tags?: string[]; category?: string }
+/** A change to an asset: each field left out stays as it is, and an empty text clears what it's for. */
+export interface AssetPatch {
+  name?: string
+  category?: string
+  description?: string
+  license?: string
+  source_url?: string
+  /** 1 to 5; 0 clears it. */
+  rating?: number
+  reviewed?: boolean
+  /** By name; an empty value removes one. */
+  fields?: Record<string, string>
+  add_tags?: string[]
+  /** A rule's or the AI's tag taken off stays off, until `unreject_tags` puts it back. */
+  remove_tags?: string[]
+  /** A rule's or the AI's tags to keep as a person's. */
+  accept_tags?: string[]
+  /** Keep all of its rule and AI tags as a person's. */
+  accept_all_tags?: boolean
+  unreject_tags?: string[]
+  /** The family's other variants too (all but the name, rating, fields and whether it's reviewed). */
+  apply_to_family?: boolean
+}
+
+/** One edit to many assets at once: those listed, or everything a search finds. */
+export interface BulkEdit extends Omit<AssetPatch, 'name' | 'apply_to_family'> {
+  ids?: string[]
+  query?: SearchParams
+}
+
+/** One change in an asset's history. `field` is `name`, `category`, `description`, `license`, `source_url`,
+ *  `rating`, `reviewed`, `tag:<tag>` (old and new are its source then: `ai:0.83` with its confidence, or null where
+ *  it didn't have it) or `field:<name>`. `source` is how: `human`, `app`, `mcp`, `rule` or `ai`. */
+export interface Change {
+  id: number
+  field: string
+  old: string | null
+  new: string | null
+  who: string | null
+  source: string
+  at: string
+}
 
 /** A sprite sheet as Hoard keeps it (see crates/hoardd/src/spritesheet/). */
 export interface SheetData {

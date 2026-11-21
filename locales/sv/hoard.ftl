@@ -32,6 +32,8 @@ error-upload-failed = uppladdningen misslyckades: { $reason }
 error-upload-no-files = inga filer i uppladdningen
 error-analyze-nothing-to-do = inget att göra: rules=false och LLM är avstängd
 error-too-many-assets = för många resurser i en begäran
+error-change-not-found = den ändringen finns inte i den här tillgångens historik
+error-bulk-by-look = en sökning efter utseende kan inte redigeras på en gång: markera tillgångarna i stället
 error-too-many-items = för många objekt i en begäran
 error-not-a-hash = inte en blake3-hash i hex
 error-merge-into-tag = into måste vara en tagg
@@ -569,6 +571,27 @@ app-bulk-category-cleared =
         [one] { $count } resurs
        *[other] { $count } resurser
     }
+app-bulk-review = Markera granskade
+app-bulk-review-title = Markera de valda resurserna som genomgångna: regler och AI lämnar deras taggar ifred efter det
+app-bulk-unreview = Markera ogranskade
+app-bulk-unreview-title = Ta bort granskningsmarkeringen från de valda resurserna
+app-bulk-reviewed =
+    Markerade { $count ->
+        [one] { $count } resurs som granskad
+       *[other] { $count } resurser som granskade
+    }
+app-bulk-unreviewed =
+    Tog bort granskningsmarkeringen från { $count ->
+        [one] { $count } resurs
+       *[other] { $count } resurser
+    }
+app-bulk-accept = Behåll gissade taggar
+app-bulk-accept-title = Behåll alla taggar som regler och AI satt på de valda resurserna som dina egna
+app-bulk-accepted =
+    Behöll de gissade taggarna på { $count ->
+        [one] { $count } resurs
+       *[other] { $count } resurser
+    }
 app-credits-failed = Kunde inte skapa krediteringarna: { $error }
 app-archived-assets =
     Arkiverade { $count ->
@@ -609,6 +632,8 @@ app-filters = Filter
 app-done = Klar
 app-yours = Ditt
 app-favorites = Favoriter
+app-needs-review = Behöver granskas
+app-needs-review-title = Bara resurser som ingen har gått igenom ännu (fungerar ihop med de andra filtren)
 app-forget-search-label = Glöm den sparade sökningen { $name }
 app-forget-search = Glöm den här sökningen
 app-projects-title = Projekt som kör hoard sync härifrån, med det som deras senaste synk hade
@@ -785,6 +810,7 @@ shortcuts-open = Öppna detaljerna
 shortcuts-play-sound = Spela upp eller stoppa ett ljud
 shortcuts-select = Markera eller avmarkera
 shortcuts-favorite = Lägg till i eller ta bort från dina favoriter
+shortcuts-reviewed = Markera som granskad eller inte
 shortcuts-key-click = klick
 shortcuts-select-range = Markera ett intervall
 shortcuts-select-all = Markera allt som visas
@@ -812,6 +838,9 @@ tag-source-rule = från offlinetaggaren
 tag-source-meta = uppmätt från filen
 tag-source-ai = föreslagen av AI
 tag-remove = Ta bort taggen { $tag }
+tag-accept = Behåll taggen { $tag }
+tag-accept-title = Behåll den här gissningen som din egen tagg
+tag-reject-title = Ta bort den; taggaren lägger inte tillbaka den
 
 ## ActivityIndicator.vue
 
@@ -1474,6 +1503,20 @@ asset-meta-analysis-error = Kunde inte läsa hela filen: { $error }
 asset-copy-blocked = Kunde inte kopiera: webbläsaren blockerade det
 asset-save-error = Kunde inte spara: { $error }
 asset-tag-removed = Tog bort { $tag }
+asset-tag-restored = Satte tillbaka { $tag }
+asset-tags-accepted =
+    Behöll { $count ->
+        [one] { $count } gissad tagg
+       *[other] { $count } gissade taggar
+    }
+asset-reviewed = Granskad
+asset-reviewed-on-title = Granskad: regler och AI lämnar dess taggar ifred. Klicka för att ta bort markeringen (R)
+asset-reviewed-off-title = Markera som granskad, så att regler och AI lämnar dess taggar ifred (R)
+asset-reviewed-on = Markerad som granskad
+asset-reviewed-off = Tog bort granskningsmarkeringen
+# $name is an asset's name.
+asset-reviewed-on-named = Markerade { $name } som granskad
+asset-reviewed-off-named = Tog bort granskningsmarkeringen från { $name }
 asset-undo = Ångra
 asset-play-error = Kunde inte spela upp filen: { $error }
 asset-copied-hash = Kopierade hash
@@ -1540,7 +1583,46 @@ asset-tags = Taggar
 asset-tag-add-label = Lägg till en tagg
 asset-tag-add-placeholder = Lägg till en tagg, t.ex. mood:tense
 asset-tag-add = Lägg till
-asset-apply-family = Tillämpa ändringar av taggar, kategori och beskrivning på alla { $count } varianter
+asset-apply-family = Tillämpa ändringarna på alla { $count } varianter
+asset-tags-accept-all =
+    Behåll alla { $count ->
+        [one] { $count } gissning
+       *[other] { $count } gissningar
+    }
+asset-tags-accept-all-title = Behåll alla taggar som regler och AI gissade som dina egna
+# Before a list of tags someone removed, which the taggers won't put back; each can be clicked to restore it.
+asset-tags-rejected = Avvisade:
+asset-tag-restore-title = Sätt tillbaka { $tag }
+asset-details-heading = Detaljer
+asset-field-category = Kategori
+asset-field-license = Licens
+asset-field-source = Källa
+asset-field-rating = Betyg
+# Shown in place of an empty value, to fill it in.
+asset-field-add = Lägg till
+asset-field-new = Lägg till ett fält
+asset-field-name = Fältnamn
+asset-field-value = Värde
+# After a license the asset gets from its pack rather than its own.
+asset-field-from-pack = från paketet
+asset-field-license-placeholder = Till exempel CC0 eller CC-BY 4.0
+asset-field-remove-placeholder = Tomt för att ta bort
+# $field is a field's name, like "License".
+asset-field-edit-title = Redigera { $field }
+asset-field-saved = Sparade { $field }
+asset-field-cleared = Rensade { $field }
+asset-rate =
+    { $count ->
+        [one] { $count } stjärna
+       *[other] { $count } stjärnor
+    }
+asset-rated =
+    Betygsatt med { $count ->
+        [one] { $count } stjärna
+       *[other] { $count } stjärnor
+    }
+asset-rating-clear-title = Klicka igen för att rensa betyget
+asset-rating-cleared = Rensade betyget
 asset-collections = Samlingar
 asset-collection-remove = Ta bort från { $name }
 asset-collection-add-another = Lägg till i en annan

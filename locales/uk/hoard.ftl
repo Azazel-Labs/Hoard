@@ -32,6 +32,8 @@ error-upload-failed = вивантаження не вдалося: { $reason }
 error-upload-no-files = у вивантаженні немає файлів
 error-analyze-nothing-to-do = нічого робити: rules=false, а LLM вимкнено
 error-too-many-assets = забагато ресурсів в одному запиті
+error-change-not-found = цієї зміни немає в історії цього ассета
+error-bulk-by-look = пошук за виглядом не можна змінити цілком: виберіть ассети вручну
 error-too-many-items = забагато елементів в одному запиті
 error-not-a-hash = це не хеш blake3 у шістнадцятковому вигляді
 error-merge-into-tag = into має бути тегом
@@ -600,6 +602,33 @@ app-bulk-category-cleared =
         [many] { $count } ресурсів
        *[other] { $count } ресурсу
     } очищено
+app-bulk-review = Позначити переглянутим
+app-bulk-review-title = Позначити вибрані ресурси як переглянуті: після цього правила та ШІ не чіпають їхніх тегів
+app-bulk-unreview = Позначити непереглянутим
+app-bulk-unreview-title = Зняти позначку «переглянуто» з вибраних ресурсів
+app-bulk-reviewed =
+    Позначено переглянутими { $count ->
+        [one] { $count } ресурс
+        [few] { $count } ресурси
+        [many] { $count } ресурсів
+       *[other] { $count } ресурсу
+    }
+app-bulk-unreviewed =
+    Позначку «переглянуто» знято з { $count ->
+        [one] { $count } ресурсу
+        [few] { $count } ресурсів
+        [many] { $count } ресурсів
+       *[other] { $count } ресурсу
+    }
+app-bulk-accept = Залишити припущення
+app-bulk-accept-title = Залишити як власні всі теги, які правила та ШІ поставили вибраним ресурсам
+app-bulk-accepted =
+    Припущені теги залишено в { $count ->
+        [one] { $count } ресурсі
+        [few] { $count } ресурсах
+        [many] { $count } ресурсах
+       *[other] { $count } ресурсі
+    }
 app-credits-failed = Не вдалося скласти список авторів: { $error }
 app-archived-assets =
     { $count ->
@@ -648,6 +677,8 @@ app-filters = Фільтри
 app-done = Готово
 app-yours = Ваше
 app-favorites = Обране
+app-needs-review = Потребує перегляду
+app-needs-review-title = Лише ресурси, які ще ніхто не переглядав (працює разом з іншими фільтрами)
 app-forget-search-label = Забути збережений пошук { $name }
 app-forget-search = Забути цей пошук
 app-projects-title = Проєкти, які виконують hoard sync звідси, з тим, що було в їхній останній синхронізації
@@ -846,6 +877,7 @@ shortcuts-open = Відкрити відомості
 shortcuts-play-sound = Відтворити або зупинити звук
 shortcuts-select = Вибрати або скасувати вибір
 shortcuts-favorite = Додати в обране або прибрати з обраного
+shortcuts-reviewed = Позначити як переглянутий або зняти позначку
 shortcuts-key-click = клацання
 shortcuts-select-range = Вибрати діапазон
 shortcuts-select-all = Вибрати все показане
@@ -873,6 +905,9 @@ tag-source-rule = від офлайн-тегувальника
 tag-source-meta = виміряно з файлу
 tag-source-ai = запропоновано ШІ
 tag-remove = Прибрати тег { $tag }
+tag-accept = Залишити тег { $tag }
+tag-accept-title = Залишити це припущення як власний тег
+tag-reject-title = Прибрати; тегувальник не поверне його
 
 ## ActivityIndicator.vue
 
@@ -1639,6 +1674,22 @@ asset-meta-analysis-error = Не вдалося повністю прочита�
 asset-copy-blocked = Не вдалося скопіювати: браузер заблокував це
 asset-save-error = Не вдалося зберегти: { $error }
 asset-tag-removed = Тег { $tag } прибрано
+asset-tag-restored = Повернуто { $tag }
+asset-tags-accepted =
+    Залишено { $count ->
+        [one] { $count } припущений тег
+        [few] { $count } припущені теги
+        [many] { $count } припущених тегів
+       *[other] { $count } припущеного тега
+    }
+asset-reviewed = Переглянуто
+asset-reviewed-on-title = Переглянуто: правила та ШІ не чіпають його тегів. Клацніть, щоб зняти позначку (R)
+asset-reviewed-off-title = Позначити як переглянутий, щоб правила та ШІ не чіпали його тегів (R)
+asset-reviewed-on = Позначено переглянутим
+asset-reviewed-off = Позначку «переглянуто» знято
+# $name is an asset's name.
+asset-reviewed-on-named = Ресурс { $name } позначено переглянутим
+asset-reviewed-off-named = З ресурсу { $name } знято позначку «переглянуто»
 asset-undo = Скасувати
 asset-play-error = Не вдалося відтворити цей файл: { $error }
 asset-copied-hash = Хеш скопійовано
@@ -1713,11 +1764,56 @@ asset-tag-add-placeholder = Додайте тег, напр. mood:tense
 asset-tag-add = Додати
 asset-apply-family =
     { $count ->
-        [one] Застосувати зміни тегів, категорії та опису до { $count } варіанта
-        [few] Застосувати зміни тегів, категорії та опису до всіх { $count } варіантів
-        [many] Застосувати зміни тегів, категорії та опису до всіх { $count } варіантів
-       *[other] Застосувати зміни тегів, категорії та опису до всіх { $count } варіанта
+        [one] Застосувати зміни до { $count } варіанта
+        [few] Застосувати зміни до всіх { $count } варіантів
+        [many] Застосувати зміни до всіх { $count } варіантів
+       *[other] Застосувати зміни до всіх { $count } варіанта
     }
+asset-tags-accept-all =
+    Залишити { $count ->
+        [one] { $count } припущення
+        [few] { $count } припущення
+        [many] { $count } припущень
+       *[other] { $count } припущення
+    }
+asset-tags-accept-all-title = Залишити як власні всі теги, які припустили правила та ШІ
+# Before a list of tags someone removed, which the taggers won't put back; each can be clicked to restore it.
+asset-tags-rejected = Відхилені:
+asset-tag-restore-title = Повернути { $tag }
+asset-details-heading = Подробиці
+asset-field-category = Категорія
+asset-field-license = Ліцензія
+asset-field-source = Джерело
+asset-field-rating = Оцінка
+# Shown in place of an empty value, to fill it in.
+asset-field-add = Додати
+asset-field-new = Додати поле
+asset-field-name = Назва поля
+asset-field-value = Значення
+# After a license the asset gets from its pack rather than its own.
+asset-field-from-pack = з пакета
+asset-field-license-placeholder = Наприклад, CC0 або CC-BY 4.0
+asset-field-remove-placeholder = Порожнє поле видаляє його
+# $field is a field's name, like "License".
+asset-field-edit-title = Змінити { $field }
+asset-field-saved = Збережено { $field }
+asset-field-cleared = Очищено { $field }
+asset-rate =
+    { $count ->
+        [one] { $count } зірка
+        [few] { $count } зірки
+        [many] { $count } зірок
+       *[other] { $count } зірки
+    }
+asset-rated =
+    Оцінено на { $count ->
+        [one] { $count } зірку
+        [few] { $count } зірки
+        [many] { $count } зірок
+       *[other] { $count } зірки
+    }
+asset-rating-clear-title = Клацніть ще раз, щоб очистити оцінку
+asset-rating-cleared = Оцінку очищено
 asset-collections = Колекції
 asset-collection-remove = Вилучити з { $name }
 asset-collection-add-another = Додати до іншої

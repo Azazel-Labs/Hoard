@@ -39,6 +39,8 @@ error-not-a-hash = ไม่ใช่แฮช blake3 แบบเลขฐา�
 error-merge-into-tag = into ต้องเป็นแท็ก
 # A tag asked about isn't one: $text is what was given.
 error-not-a-tag = "{ $text }" ไม่ใช่แท็ก
+# Putting a tag under a broader one would go round in a circle: $parent is already under $tag (or is it).
+error-tag-parent-loop = { $parent } อยู่ใต้ { $tag } อยู่แล้ว จึงใส่ { $tag } ไว้ใต้แท็กนั้นไม่ได้
 error-nothing-to-merge = ไม่มีอะไรให้รวม
 error-selection-size = ระบุ ID แอสเซ็ตตั้งแต่ 1 ถึง { $max } รายการ
 error-collection-needs-name = คอลเลกชันต้องมีชื่อ
@@ -2134,6 +2136,21 @@ tag-page-rename = เปลี่ยนชื่อ…
 tag-page-rename-title = ตั้งชื่อใหม่ หรือใส่ชื่อแท็กอื่นเพื่อรวมเข้าด้วยกัน
 tag-page-rename-label = ชื่อใหม่
 tag-page-save-failed = บันทึกแท็กไม่ได้: { $error }
+# Above a tag's name on its page: the broader tags it goes under, each a link.
+tag-page-under = อยู่ใต้
+tag-page-parent-add = ใส่ไว้ใต้…
+tag-page-parent-add-title = ใส่แท็กนี้ไว้ใต้แท็กที่กว้างกว่า: ค้นหาแท็กนั้นแล้วจะเจอแท็กเหล่านี้ด้วย
+tag-page-parent-placeholder = แท็กที่กว้างกว่า เช่น ยานพาหนะ
+# The × beside a broader tag on a tag's page.
+tag-page-parent-remove = นำ { $tag } ออกจากใต้ { $parent }
+tag-page-parent-saved = { $tag } อยู่ใต้ { $parent } แล้ว
+tag-page-parent-removed = { $tag } ไม่อยู่ใต้ { $parent } แล้ว
+# Before the narrower tags on a tag's page, each a link with how many assets have it.
+tag-page-narrower = แคบกว่า:
+tag-page-narrower-title = ค้นหา { $tag } จะเจอแท็กเหล่านี้ด้วย
+# Settings → Tags: the tags put under broader ones, as a tree.
+tags-tree-heading = กว้างกว่าและแคบกว่า
+tags-tree-what = แท็กที่ใส่ไว้ใต้แท็กที่กว้างกว่าจากหน้าแท็กของแต่ละแท็ก ค้นหาแท็กแล้วจะเจอทุกอย่างที่อยู่ใต้แท็กนั้นด้วย
 
 ## LibraryStats.vue
 

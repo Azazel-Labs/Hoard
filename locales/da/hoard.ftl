@@ -39,6 +39,8 @@ error-not-a-hash = ikke en blake3-hash i hex
 error-merge-into-tag = into skal være et tag
 # A tag asked about isn't one: $text is what was given.
 error-not-a-tag = "{ $text }" er ikke et tag
+# Putting a tag under a broader one would go round in a circle: $parent is already under $tag (or is it).
+error-tag-parent-loop = { $parent } er allerede under { $tag }, så { $tag } kan ikke komme under det
 error-nothing-to-merge = intet at flette
 error-selection-size = angiv mellem 1 og { $max } asset-id'er
 error-collection-needs-name = en samling skal have et navn
@@ -2361,6 +2363,21 @@ tag-page-rename = Omdøb…
 tag-page-rename-title = Giv det et nyt navn, eller navnet på et andet tag for at flette det ind i det
 tag-page-rename-label = Nyt navn
 tag-page-save-failed = Kunne ikke gemme tagget: { $error }
+# Above a tag's name on its page: the broader tags it goes under, each a link.
+tag-page-under = Under
+tag-page-parent-add = Sæt under…
+tag-page-parent-add-title = Sæt dette tag under et bredere: når du søger efter det, finder du også disse
+tag-page-parent-placeholder = Et bredere tag, fx køretøj
+# The × beside a broader tag on a tag's page.
+tag-page-parent-remove = Tag { $tag } ud fra under { $parent }
+tag-page-parent-saved = { $tag } er nu under { $parent }
+tag-page-parent-removed = { $tag } er ikke længere under { $parent }
+# Before the narrower tags on a tag's page, each a link with how many assets have it.
+tag-page-narrower = Snævrere:
+tag-page-narrower-title = Når du søger efter { $tag }, finder du også disse
+# Settings → Tags: the tags put under broader ones, as a tree.
+tags-tree-heading = Bredere og snævrere
+tags-tree-what = Tags, der er sat under bredere tags fra deres tagsider. Når du søger efter et tag, finder du også alt under det.
 
 ## LibraryStats.vue
 

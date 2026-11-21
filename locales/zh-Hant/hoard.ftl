@@ -39,6 +39,8 @@ error-not-a-hash = 不是 blake3 十六進位雜湊值
 error-merge-into-tag = into 必須是標籤
 # A tag asked about isn't one: $text is what was given.
 error-not-a-tag = 「{ $text }」不是標籤
+# Putting a tag under a broader one would go round in a circle: $parent is already under $tag (or is it).
+error-tag-parent-loop = { $parent } 已在 { $tag } 下，所以 { $tag } 不能放到它下面
 error-nothing-to-merge = 沒有可合併的項目
 error-selection-size = 請提供 1 到 { $max } 個素材 ID
 error-collection-needs-name = 收藏集需要名稱
@@ -2137,6 +2139,21 @@ tag-page-rename = 重新命名…
 tag-page-rename-title = 幫它取個新名稱，或輸入另一個標籤的名稱，把它合併過去
 tag-page-rename-label = 新名稱
 tag-page-save-failed = 無法儲存標籤：{ $error }
+# Above a tag's name on its page: the broader tags it goes under, each a link.
+tag-page-under = 上層標籤
+tag-page-parent-add = 設定上層標籤…
+tag-page-parent-add-title = 把這個標籤放到更廣泛的標籤下：搜尋那個標籤時，也會找到這些
+tag-page-parent-placeholder = 更廣泛的標籤，例如交通工具
+# The × beside a broader tag on a tag's page.
+tag-page-parent-remove = 把 { $tag } 從 { $parent } 下移出
+tag-page-parent-saved = { $tag } 現在位於 { $parent } 下
+tag-page-parent-removed = { $tag } 不再位於 { $parent } 下
+# Before the narrower tags on a tag's page, each a link with how many assets have it.
+tag-page-narrower = 下層標籤：
+tag-page-narrower-title = 搜尋 { $tag } 時，也會找到這些
+# Settings → Tags: the tags put under broader ones, as a tree.
+tags-tree-heading = 上層與下層
+tags-tree-what = 在標籤頁面中放到更廣泛標籤下的標籤。搜尋一個標籤時，也會找到它底下的所有內容。
 
 ## 素材庫統計
 

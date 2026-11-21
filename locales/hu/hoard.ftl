@@ -39,6 +39,8 @@ error-not-a-hash = nem blake3 hexadecimális hash
 error-merge-into-tag = az into értéke csak címke lehet
 # A tag asked about isn't one: $text is what was given.
 error-not-a-tag = A(z) „{ $text }” nem címke
+# Putting a tag under a broader one would go round in a circle: $parent is already under $tag (or is it).
+error-tag-parent-loop = A(z) { $parent } már a(z) { $tag } alá tartozik, ezért a(z) { $tag } nem rendelhető alá
 error-nothing-to-merge = nincs mit összevonni
 error-selection-size = adjon meg 1 és { $max } közötti számú asset-azonosítót
 error-collection-needs-name = a gyűjteménynek nevet kell adni
@@ -2204,6 +2206,21 @@ tag-page-rename = Átnevezés…
 tag-page-rename-title = Adjon neki új nevet, vagy egy másik címke nevét, hogy abba összevonja
 tag-page-rename-label = Új név
 tag-page-save-failed = Nem sikerült menteni a címkét: { $error }
+# Above a tag's name on its page: the broader tags it goes under, each a link.
+tag-page-under = Alá tartozik
+tag-page-parent-add = Alárendelés…
+tag-page-parent-add-title = Rendelje ezt a címkét egy tágabb alá: ha azt keresi, ezeket is megtalálja
+tag-page-parent-placeholder = Egy tágabb címke, például jármű
+# The × beside a broader tag on a tag's page.
+tag-page-parent-remove = A(z) { $tag } kivétele a(z) { $parent } alól
+tag-page-parent-saved = A(z) { $tag } mostantól a(z) { $parent } alá tartozik
+tag-page-parent-removed = A(z) { $tag } már nem tartozik a(z) { $parent } alá
+# Before the narrower tags on a tag's page, each a link with how many assets have it.
+tag-page-narrower = Szűkebbek:
+tag-page-narrower-title = A(z) { $tag } keresése ezeket is megtalálja
+# Settings → Tags: the tags put under broader ones, as a tree.
+tags-tree-heading = Tágabb és szűkebb
+tags-tree-what = A címkeoldalukon tágabb címkék alá rendelt címkék. Ha egy címkére keres, mindent megtalál, ami alatta van.
 
 ## Könyvtárstatisztika
 

@@ -172,8 +172,12 @@ fn build_filter(q: &SearchQuery, include_kind: bool, look: Option<&LookRank>) ->
         f.clauses.push("a.ext = ?".to_owned());
         f.params.push(SqlValue::Text(ext.trim_start_matches('.').to_lowercase()));
     }
+    // A tag finds what has it or any narrower tag under it.
     for tag in &q.tags {
-        f.clauses.push("EXISTS (SELECT 1 FROM asset_tags t WHERE t.asset_id = a.id AND t.tag = ?)".to_owned());
+        f.clauses.push(format!(
+            "EXISTS (SELECT 1 FROM asset_tags t WHERE t.asset_id = a.id AND t.tag IN ({}))",
+            super::TAG_AND_NARROWER
+        ));
         f.params.push(SqlValue::Text(tag.clone()));
     }
     if q.hide_supporting {

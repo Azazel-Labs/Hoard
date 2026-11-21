@@ -77,7 +77,12 @@ pub(crate) fn merge_tags(conn: &mut Connection, from: &[String], into: &str) -> 
             params![old, into],
         )?;
         tx.execute("DELETE FROM tag_info WHERE tag = ?1", [old])?;
+        // So do the broader tags it went under and the narrower ones under it.
+        tx.execute("UPDATE OR IGNORE tag_parents SET tag = ?2 WHERE tag = ?1", params![old, into])?;
+        tx.execute("UPDATE OR IGNORE tag_parents SET parent = ?2 WHERE parent = ?1", params![old, into])?;
+        tx.execute("DELETE FROM tag_parents WHERE tag = ?1 OR parent = ?1", [old])?;
     }
+    tx.execute("DELETE FROM tag_parents WHERE tag = parent", [])?;
     tx.execute("DELETE FROM tag_aliases WHERE tag = ?1", [into])?;
     // Packs keep their (AI-given) tags as a JSON list.
     let packs: Vec<(String, String)> = {
@@ -119,6 +124,44 @@ pub(crate) struct TagInfo {
     /// When `tag` is itself an old name: the tag it was merged into.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub merged_into: Option<String>,
+    /// The broader tags it goes under.
+    pub parents: Vec<String>,
+    /// The narrower tags under it, with how many assets have each.
+    pub children: Vec<hoard_core::Facet>,
+}
+
+/// The SQL for a tag and every tag under it, however deep, for the tag in place of `?`. A loop ends where it
+/// started.
+pub(crate) const TAG_AND_NARROWER: &str = "WITH RECURSIVE narrower(x) AS (VALUES (?) UNION
+     SELECT p.tag FROM tag_parents p JOIN narrower ON p.parent = narrower.x) SELECT x FROM narrower";
+
+/// Every tag under `tag`, however deep (not `tag` itself).
+fn narrower_tags(conn: &Connection, tag: &str) -> Result<Vec<String>> {
+    let mut stmt = conn.prepare(TAG_AND_NARROWER)?;
+    let all = stmt.query_map([tag], |r| r.get::<_, String>(0))?.collect::<rusqlite::Result<Vec<_>>>()?;
+    Ok(all.into_iter().filter(|t| t != tag).collect())
+}
+
+/// Put a tag under broader ones, in place of those it went under before. A tag can't go under itself or under one
+/// of its own narrower tags: that one comes back as `Err`, and nothing changes.
+pub(crate) fn set_tag_parents(conn: &mut Connection, tag: &str, parents: &[String]) -> Result<Result<(), String>> {
+    let below = narrower_tags(conn, tag)?;
+    if let Some(bad) = parents.iter().find(|p| p.as_str() == tag || below.contains(p)) {
+        return Ok(Err(bad.clone()));
+    }
+    let tx = conn.transaction()?;
+    tx.execute("DELETE FROM tag_parents WHERE tag = ?1", [tag])?;
+    for p in parents {
+        tx.execute("INSERT OR IGNORE INTO tag_parents (tag, parent) VALUES (?1, ?2)", params![tag, p])?;
+    }
+    tx.commit()?;
+    Ok(Ok(()))
+}
+
+/// Every tag that goes under another: (tag, the broader one), for drawing them as a tree.
+pub(crate) fn tag_tree(conn: &Connection) -> Result<Vec<(String, String)>> {
+    let mut stmt = conn.prepare("SELECT tag, parent FROM tag_parents ORDER BY parent, tag")?;
+    Ok(stmt.query_map([], |r| Ok((r.get(0)?, r.get(1)?)))?.collect::<rusqlite::Result<_>>()?)
 }
 
 /// The longest description a tag keeps.
@@ -138,11 +181,22 @@ pub(crate) fn tag_info(conn: &Connection, tag: &str) -> Result<TagInfo> {
         }
         _ => None,
     };
-    let count =
-        super::tag_counts(conn, tag, false, u32::MAX)?.into_iter().find(|f| f.value == tag).map_or(0, |f| f.count);
-    let mut stmt = conn.prepare("SELECT tag FROM tag_aliases WHERE into_tag = ?1 ORDER BY tag")?;
-    let aliases = stmt.query_map([tag], |r| r.get(0))?.collect::<rusqlite::Result<_>>()?;
-    Ok(TagInfo { tag: tag.to_owned(), count, description, image_id, aliases, merged_into })
+    // Every tag's count is kept worked out, so looking up a few is cheap.
+    let counts: std::collections::HashMap<String, u64> =
+        super::tag_counts(conn, "", false, u32::MAX)?.into_iter().map(|f| (f.value, f.count)).collect();
+    let count = counts.get(tag).copied().unwrap_or(0);
+    let names = |sql: &str| -> Result<Vec<String>> {
+        let mut stmt = conn.prepare(sql)?;
+        Ok(stmt.query_map([tag], |r| r.get(0))?.collect::<rusqlite::Result<_>>()?)
+    };
+    let aliases = names("SELECT tag FROM tag_aliases WHERE into_tag = ?1 ORDER BY tag")?;
+    let parents = names("SELECT parent FROM tag_parents WHERE tag = ?1 ORDER BY parent")?;
+    let mut children: Vec<hoard_core::Facet> = names("SELECT tag FROM tag_parents WHERE parent = ?1")?
+        .into_iter()
+        .map(|value| hoard_core::Facet { count: counts.get(&value).copied().unwrap_or(0), value })
+        .collect();
+    children.sort_by(|a, b| b.count.cmp(&a.count).then_with(|| a.value.cmp(&b.value)));
+    Ok(TagInfo { tag: tag.to_owned(), count, description, image_id, aliases, merged_into, parents, children })
 }
 
 /// Say what a tag means, or which asset's picture stands for it. `None` leaves either as it is; an empty one clears
@@ -343,6 +397,54 @@ mod tests {
         set_tag_info(&conn, "stone", None, Some("")).unwrap();
         let rows: i64 = conn.query_row("SELECT COUNT(*) FROM tag_info", [], |r| r.get(0)).unwrap();
         assert_eq!(rows, 0);
+    }
+
+    #[test]
+    fn a_broader_tag_finds_what_is_under_it() {
+        let dir = tempfile::tempdir().unwrap();
+        let pool = open(&dir.path().join("hoard.db"), &dir.path().join("backups")).unwrap();
+        let mut conn = pool.get().unwrap();
+        conn.execute_batch(
+            "INSERT INTO blobs (hash, size, created_at) VALUES ('h1', 1, 'x');
+             INSERT INTO packs (id, name, status, tags, created_at) VALUES ('p1', 'Garage', 'ready', '[]', 'x');
+             INSERT INTO assets (id, pack_id, blob_hash, path, name, ext, kind, created_at, updated_at) VALUES
+               ('a1', 'p1', 'h1', 'a1.glb', 'a1', 'glb', 'model', 'x', 'x'),
+               ('a2', 'p1', 'h1', 'a2.glb', 'a2', 'glb', 'model', 'x', 'x'),
+               ('a3', 'p1', 'h1', 'a3.glb', 'a3', 'glb', 'model', 'x', 'x');
+             INSERT INTO asset_tags (asset_id, tag, source, confidence) VALUES
+               ('a1', 'car', 'human', 1.0), ('a2', 'sedan', 'human', 1.0), ('a3', 'tree', 'human', 1.0);",
+        )
+        .unwrap();
+        let found = |conn: &Connection, tag: &str| -> Vec<String> {
+            let q = SearchQuery { tags: vec![tag.to_owned()], ..Default::default() };
+            let mut ids: Vec<String> = search(conn, &q, false).unwrap().items.into_iter().map(|a| a.id).collect();
+            ids.sort();
+            ids
+        };
+        assert_eq!(found(&conn, "vehicle"), Vec::<String>::new());
+
+        // vehicle > car > sedan: each finds everything under it.
+        set_tag_parents(&mut conn, "car", &["vehicle".to_owned()]).unwrap().unwrap();
+        set_tag_parents(&mut conn, "sedan", &["car".to_owned()]).unwrap().unwrap();
+        assert_eq!(found(&conn, "vehicle"), vec!["a1", "a2"]);
+        assert_eq!(found(&conn, "car"), vec!["a1", "a2"]);
+        assert_eq!(found(&conn, "sedan"), vec!["a2"]);
+        let info = tag_info(&conn, "car").unwrap();
+        assert_eq!(info.parents, vec!["vehicle".to_owned()]);
+        assert_eq!(info.children, vec![hoard_core::Facet { value: "sedan".to_owned(), count: 1 }]);
+
+        // Going round in a circle is refused, and changes nothing.
+        assert_eq!(set_tag_parents(&mut conn, "vehicle", &["sedan".to_owned()]).unwrap(), Err("sedan".to_owned()));
+        assert_eq!(set_tag_parents(&mut conn, "car", &["car".to_owned()]).unwrap(), Err("car".to_owned()));
+        assert_eq!(tag_info(&conn, "car").unwrap().parents, vec!["vehicle".to_owned()]);
+
+        // A merged tag's place in the tree goes to the tag it joins.
+        merge_tags(&mut conn, &["car".to_owned()], "automobile").unwrap();
+        assert_eq!(
+            tag_tree(&conn).unwrap(),
+            vec![("sedan".to_owned(), "automobile".to_owned()), ("automobile".to_owned(), "vehicle".to_owned()),]
+        );
+        assert_eq!(found(&conn, "vehicle"), vec!["a1", "a2"]);
     }
 
     #[test]

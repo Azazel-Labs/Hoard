@@ -873,7 +873,7 @@ pub struct SearchQuery {
     pub favorites_of: Option<i64>,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct Facet {
     pub value: String,
     pub count: u64,

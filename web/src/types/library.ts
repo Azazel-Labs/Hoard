@@ -417,6 +417,10 @@ export interface TagInfo {
   aliases: string[]
   /** When the tag asked for is an old name: the tag it was merged into. */
   merged_into?: string
+  /** The broader tags it goes under. */
+  parents: string[]
+  /** The narrower tags under it (searching it finds those too), with how many have each. */
+  children: Facet[]
 }
 
 export interface SearchResult {

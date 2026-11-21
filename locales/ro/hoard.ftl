@@ -39,6 +39,8 @@ error-not-a-hash = nu este un hash blake3 hexazecimal
 error-merge-into-tag = into trebuie să fie o etichetă
 # A tag asked about isn't one: $text is what was given.
 error-not-a-tag = „{ $text }” nu este o etichetă
+# Putting a tag under a broader one would go round in a circle: $parent is already under $tag (or is it).
+error-tag-parent-loop = { $parent } este deja sub { $tag }, deci { $tag } nu poate fi plasată sub ea
 error-nothing-to-merge = nimic de unit
 error-selection-size = dați între 1 și { $max } ID-uri de resurse
 error-collection-needs-name = o colecție are nevoie de un nume
@@ -2555,6 +2557,21 @@ tag-page-rename = Redenumiți…
 tag-page-rename-title = Dați-i un nume nou sau numele altei etichete, ca să fie unită cu aceasta
 tag-page-rename-label = Nume nou
 tag-page-save-failed = Eticheta nu a putut fi salvată: { $error }
+# Above a tag's name on its page: the broader tags it goes under, each a link.
+tag-page-under = Sub
+tag-page-parent-add = Plasați sub…
+tag-page-parent-add-title = Plasați această etichetă sub una mai largă: dacă o căutați pe cea largă, le găsiți și pe acestea
+tag-page-parent-placeholder = O etichetă mai largă, de exemplu vehicul
+# The × beside a broader tag on a tag's page.
+tag-page-parent-remove = Scoateți { $tag } de sub { $parent }
+tag-page-parent-saved = { $tag } este acum sub { $parent }
+tag-page-parent-removed = { $tag } nu mai este sub { $parent }
+# Before the narrower tags on a tag's page, each a link with how many assets have it.
+tag-page-narrower = Mai înguste:
+tag-page-narrower-title = Căutarea după { $tag } le găsește și pe acestea
+# Settings → Tags: the tags put under broader ones, as a tree.
+tags-tree-heading = Mai largi și mai înguste
+tags-tree-what = Etichete plasate sub etichete mai largi din paginile lor. Căutarea după o etichetă găsește și tot ce este sub ea.
 
 ## LibraryStats.vue
 

@@ -39,6 +39,8 @@ error-not-a-hash = nie 'n blake3-hekshash nie
 error-merge-into-tag = into moet 'n etiket wees
 # A tag asked about isn't one: $text is what was given.
 error-not-a-tag = "{ $text }" is nie 'n etiket nie
+# Putting a tag under a broader one would go round in a circle: $parent is already under $tag (or is it).
+error-tag-parent-loop = { $parent } is reeds onder { $tag }, so { $tag } kan nie daaronder gaan nie
 error-nothing-to-merge = niks om saam te voeg nie
 error-selection-size = gee tussen 1 en { $max } bate-ID's
 error-collection-needs-name = 'n versameling het 'n naam nodig
@@ -2359,6 +2361,21 @@ tag-page-rename = Hernoem…
 tag-page-rename-title = Gee dit 'n nuwe naam, of die naam van 'n ander etiket om dit daarmee saam te voeg
 tag-page-rename-label = Nuwe naam
 tag-page-save-failed = Kon nie die etiket stoor nie: { $error }
+# Above a tag's name on its page: the broader tags it goes under, each a link.
+tag-page-under = Onder
+tag-page-parent-add = Plaas onder…
+tag-page-parent-add-title = Plaas hierdie etiket onder 'n breër een: as jy daardie een soek, vind jy ook hierdie
+tag-page-parent-placeholder = 'n Breër etiket, soos voertuig
+# The × beside a broader tag on a tag's page.
+tag-page-parent-remove = Haal { $tag } van onder { $parent } af
+tag-page-parent-saved = { $tag } is nou onder { $parent }
+tag-page-parent-removed = { $tag } is nie meer onder { $parent } nie
+# Before the narrower tags on a tag's page, each a link with how many assets have it.
+tag-page-narrower = Smaller:
+tag-page-narrower-title = As jy { $tag } soek, vind jy ook hierdie
+# Settings → Tags: the tags put under broader ones, as a tree.
+tags-tree-heading = Breër en smaller
+tags-tree-what = Etikette wat vanaf hul etiketbladsye onder breër etikette geplaas is. As jy 'n etiket soek, vind jy ook alles daaronder.
 
 ## LibraryStats.vue
 

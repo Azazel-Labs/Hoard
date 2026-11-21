@@ -4,9 +4,10 @@
 // (giving another tag's name merges into that one).
 import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue'
 import { api, thumbUrl, type Asset, type TagInfo } from '../api'
-import { t } from '../i18n'
+import { formatNumber, t } from '../i18n'
 import { mayEdit } from '../auth'
 import { confirmDialog, showError, showOk } from '../ui'
+import TagInput from './TagInput.vue'
 
 const props = defineProps<{
   tag: string
@@ -139,6 +140,49 @@ function onNameKey(e: KeyboardEvent) {
   }
 }
 
+// Broader tags: searching one of them finds this tag's assets too.
+const addingParent = ref(false)
+const parentBox = ref<InstanceType<typeof TagInput> | null>(null)
+async function setParents(parents: string[], toast: string) {
+  const tag = props.tag
+  const was = info.value?.parents ?? []
+  try {
+    const got = await api.setTagParents(tag, parents)
+    if (props.tag === tag) info.value = got
+    showOk(toast, {
+      label: t('asset-undo'),
+      run: () => void api.setTagParents(tag, was).then((back) => {
+        if (props.tag === tag) info.value = back
+        emit('changed')
+      }),
+    })
+    emit('changed')
+  } catch (e) {
+    showError(t('tag-page-save-failed', { error: (e as Error).message }))
+  }
+}
+function startParent() {
+  addingParent.value = true
+  void nextTick(() => parentBox.value?.focus())
+}
+function addParents(tags: string[]) {
+  const have = info.value?.parents ?? []
+  const added = tags.filter((p) => p !== props.tag && !have.includes(p))
+  addingParent.value = false
+  if (added.length) void setParents([...have, ...added], t('tag-page-parent-saved', { tag: props.tag, parent: added.join(', ') }))
+}
+function dropParent(parent: string) {
+  const have = info.value?.parents ?? []
+  void setParents(have.filter((p) => p !== parent), t('tag-page-parent-removed', { tag: props.tag, parent }))
+}
+function onParentKey(e: KeyboardEvent) {
+  if (e.key === 'Escape') {
+    e.preventDefault()
+    e.stopPropagation()
+    addingParent.value = false
+  }
+}
+
 // Another tag: start over (below everything it resets, since it runs straight away).
 watch(
   () => props.tag,
@@ -147,6 +191,7 @@ watch(
     editing.value = false
     renaming.value = false
     picking.value = false
+    addingParent.value = false
     void load()
   },
   { immediate: true },
@@ -155,7 +200,10 @@ watch(
 /** Whether there's anything to show: someone who edits always gets the page, to fill in. */
 const shown = computed(() => {
   const i = info.value
-  return !!i && (editor.value || !!i.description || !!i.image_id || i.aliases.length > 0 || !!i.merged_into)
+  return (
+    !!i &&
+    (editor.value || !!i.description || !!i.image_id || i.aliases.length > 0 || !!i.merged_into || i.parents.length > 0 || i.children.length > 0)
+  )
 })
 </script>
 
@@ -202,6 +250,25 @@ const shown = computed(() => {
       </div>
 
       <div class="body">
+        <nav v-if="info.parents.length || addingParent" class="crumbs" :aria-label="t('tag-page-under')">
+          <span class="faint">{{ t('tag-page-under') }}</span>
+          <span v-for="p in info.parents" :key="p" class="crumb">
+            <button type="button" class="linkbtn mono" @click="emit('show', p)">{{ p }}</button>
+            <button
+              v-if="editor"
+              type="button"
+              class="x"
+              :title="t('tag-page-parent-remove', { tag: info.tag, parent: p })"
+              :aria-label="t('tag-page-parent-remove', { tag: info.tag, parent: p })"
+              @click="dropParent(p)"
+            >×</button>
+          </span>
+          <span v-if="addingParent" class="addparent" @keydown="onParentKey">
+            <TagInput id="tag-parent" ref="parentBox" :have="[info.tag, ...info.parents]" :placeholder="t('tag-page-parent-placeholder')" @add="addParents" />
+            <button class="btn ghost small" type="button" @click="addingParent = false">{{ t('asset-cancel') }}</button>
+          </span>
+          <span v-if="!addingParent" class="faint" aria-hidden="true">›</span>
+        </nav>
         <div class="titlerow">
           <form v-if="renaming" class="rename" @submit.prevent="rename">
             <label class="visually-hidden" for="tag-rename">{{ t('tag-page-rename-label') }}</label>
@@ -213,6 +280,7 @@ const shown = computed(() => {
             <h2 class="name mono">{{ info.tag }}</h2>
             <span class="count">{{ t('tag-page-count', { count: info.count }) }}</span>
             <button v-if="editor" type="button" class="linkbtn small" :title="t('tag-page-rename-title')" @click="startRename">{{ t('tag-page-rename') }}</button>
+            <button v-if="editor && !addingParent" type="button" class="linkbtn small" :title="t('tag-page-parent-add-title')" @click="startParent">{{ t('tag-page-parent-add') }}</button>
           </template>
         </div>
         <p v-if="renaming" class="hint">{{ t('tag-page-rename-title') }}</p>
@@ -230,6 +298,12 @@ const shown = computed(() => {
         />
         <p v-else-if="info.description" class="desc" :class="{ editable: editor }" :title="editor ? t('tag-page-describe-edit') : undefined" @click="edit">{{ info.description }}</p>
         <button v-else-if="editor" type="button" class="linkbtn describe" @click="edit">{{ t('tag-page-describe') }}</button>
+        <p v-if="info.children.length" class="narrower" :title="t('tag-page-narrower-title', { tag: info.tag })">
+          <span class="faint">{{ t('tag-page-narrower') }}</span>
+          <button v-for="c in info.children" :key="c.value" type="button" class="linkbtn mono" @click="emit('show', c.value)">
+            {{ c.value }}<span class="n">{{ formatNumber(c.count) }}</span>
+          </button>
+        </p>
         <p v-if="info.aliases.length" class="aliases">{{ t('tag-page-aliases', { names: info.aliases.join(', '), count: info.aliases.length }) }}</p>
       </div>
     </template>
@@ -275,4 +349,16 @@ button.pic:hover { border-color: var(--accent); color: var(--accent); }
 .describe { justify-self: start; padding-inline: 0; color: var(--muted); }
 .aliases, .hint { margin: 0; color: var(--faint); font-size: var(--step--1); }
 .small { font-size: var(--step--1); }
+.faint { color: var(--faint); }
+.crumbs, .narrower { display: flex; flex-wrap: wrap; align-items: center; gap: 0.2rem 0.6rem; margin: 0; font-size: var(--step--1); }
+.crumbs .linkbtn, .narrower .linkbtn { padding-inline: 0; color: var(--muted); }
+.crumbs .linkbtn:hover, .narrower .linkbtn:hover { color: var(--accent); }
+.crumb { display: inline-flex; align-items: center; gap: 0.1rem; }
+.x {
+  padding: 0 0.25rem; border: 0; border-radius: 4px; background: none; color: var(--faint); font: inherit; line-height: 1; cursor: pointer;
+}
+.x:hover { color: var(--danger, var(--accent)); background: color-mix(in srgb, var(--text) 6%, transparent); }
+.addparent { display: inline-flex; align-items: center; gap: 0.4rem; min-width: 14rem; }
+.addparent :deep(.taginput), .addparent > :first-child { flex: 1; }
+.narrower .n { margin-inline-start: 0.3rem; color: var(--faint); font-variant-numeric: tabular-nums; }
 </style>

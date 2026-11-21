@@ -39,6 +39,8 @@ error-not-a-hash = ово није blake3 хеш у хексадецимално
 error-merge-into-tag = into мора бити ознака
 # A tag asked about isn't one: $text is what was given.
 error-not-a-tag = „{ $text }“ није ознака
+# Putting a tag under a broader one would go round in a circle: $parent is already under $tag (or is it).
+error-tag-parent-loop = { $parent } је већ испод { $tag }, па { $tag } не може испод ње
 error-nothing-to-merge = нема шта да се споји
 error-selection-size = наведите између 1 и { $max } ID-ова ресурса
 error-collection-needs-name = колекција мора имати назив
@@ -2458,6 +2460,21 @@ tag-page-rename = Преименуј…
 tag-page-rename-title = Дајте јој ново име или име друге ознаке да се споји са њом
 tag-page-rename-label = Ново име
 tag-page-save-failed = Није могуће сачувати ознаку: { $error }
+# Above a tag's name on its page: the broader tags it goes under, each a link.
+tag-page-under = Испод
+tag-page-parent-add = Стави испод…
+tag-page-parent-add-title = Ставите ову ознаку испод шире: претрагом шире ознаке наћи ћете и ове
+tag-page-parent-placeholder = Шира ознака, на пример возило
+# The × beside a broader tag on a tag's page.
+tag-page-parent-remove = Склони { $tag } испод { $parent }
+tag-page-parent-saved = { $tag } је сада испод { $parent }
+tag-page-parent-removed = { $tag } више није испод { $parent }
+# Before the narrower tags on a tag's page, each a link with how many assets have it.
+tag-page-narrower = Уже:
+tag-page-narrower-title = Претрагом { $tag } налазе се и ове
+# Settings → Tags: the tags put under broader ones, as a tree.
+tags-tree-heading = Шире и уже
+tags-tree-what = Ознаке стављене испод ширих на својим страницама. Претрагом ознаке налази се и све испод ње.
 
 ## LibraryStats.vue
 

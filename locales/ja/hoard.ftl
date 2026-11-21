@@ -39,6 +39,8 @@ error-not-a-hash = blake3 の 16 進ハッシュではありません
 error-merge-into-tag = into はタグでなければなりません
 # A tag asked about isn't one: $text is what was given.
 error-not-a-tag = 「{ $text }」はタグではありません
+# Putting a tag under a broader one would go round in a circle: $parent is already under $tag (or is it).
+error-tag-parent-loop = { $parent } はすでに { $tag } の下にあるため、{ $tag } をその下に入れることはできません
 error-nothing-to-merge = 統合するものがありません
 error-selection-size = アセット ID を 1～{ $max } 個指定してください
 error-collection-needs-name = コレクションには名前が必要です
@@ -2131,6 +2133,21 @@ tag-page-rename = 名前を変更…
 tag-page-rename-title = 新しい名前、または統合先にする別のタグの名前を入力してください
 tag-page-rename-label = 新しい名前
 tag-page-save-failed = タグを保存できませんでした: { $error }
+# Above a tag's name on its page: the broader tags it goes under, each a link.
+tag-page-under = 上位タグ
+tag-page-parent-add = 上位タグに入れる…
+tag-page-parent-add-title = このタグを広い意味のタグの下に入れます。そのタグを検索すると、これらも見つかります
+tag-page-parent-placeholder = 上位のタグ（例: 乗り物）
+# The × beside a broader tag on a tag's page.
+tag-page-parent-remove = { $tag } を { $parent } の下から外す
+tag-page-parent-saved = { $tag } を { $parent } の下に入れました
+tag-page-parent-removed = { $tag } を { $parent } の下から外しました
+# Before the narrower tags on a tag's page, each a link with how many assets have it.
+tag-page-narrower = 下位タグ:
+tag-page-narrower-title = { $tag } を検索すると、これらも見つかります
+# Settings → Tags: the tags put under broader ones, as a tree.
+tags-tree-heading = 上位と下位
+tags-tree-what = タグのページで上位タグの下に入れたタグです。タグを検索すると、その下にあるものもすべて見つかります。
 
 ## LibraryStats.vue
 

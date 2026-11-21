@@ -232,6 +232,15 @@ export const api = {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body),
     }),
+  /** Put a tag under broader ones, in place of those it went under. */
+  setTagParents: (tag: string, parents: string[]) =>
+    request<TagInfo>('/api/tags/parents', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ tag, parents }),
+    }),
+  /** Every tag that goes under another. */
+  tagTree: () => request<{ tag: string; parent: string }[]>('/api/tags/tree'),
   tagAliases: () => request<{ tag: string; into: string }[]>('/api/tags/aliases'),
   dropTagAlias: (tag: string) => request<void>(`/api/tags/aliases?tag=${encodeURIComponent(tag)}`, { method: 'DELETE' }),
   activity: () => request<{ items: ActivityItem[] }>('/api/activity'),

@@ -39,6 +39,8 @@ error-not-a-hash = це не хеш blake3 у шістнадцятковому �
 error-merge-into-tag = into має бути тегом
 # A tag asked about isn't one: $text is what was given.
 error-not-a-tag = «{ $text }» не є тегом
+# Putting a tag under a broader one would go round in a circle: $parent is already under $tag (or is it).
+error-tag-parent-loop = { $parent } уже під { $tag }, тому { $tag } не можна помістити під нього
 error-nothing-to-merge = немає чого об’єднувати
 error-selection-size = вкажіть від 1 до { $max } ідентифікаторів ресурсів
 error-collection-needs-name = колекції потрібна назва
@@ -2650,6 +2652,21 @@ tag-page-rename = Перейменувати…
 tag-page-rename-title = Дайте йому нову назву або назву іншого тега, щоб об’єднати з ним
 tag-page-rename-label = Нова назва
 tag-page-save-failed = Не вдалося зберегти тег: { $error }
+# Above a tag's name on its page: the broader tags it goes under, each a link.
+tag-page-under = Під
+tag-page-parent-add = Помістити під…
+tag-page-parent-add-title = Помістіть цей тег під ширший: при пошуку ширшого знайдуться й ці
+tag-page-parent-placeholder = Ширший тег, наприклад транспорт
+# The × beside a broader tag on a tag's page.
+tag-page-parent-remove = Прибрати { $tag } з-під { $parent }
+tag-page-parent-saved = { $tag } тепер під { $parent }
+tag-page-parent-removed = { $tag } більше не під { $parent }
+# Before the narrower tags on a tag's page, each a link with how many assets have it.
+tag-page-narrower = Вужчі:
+tag-page-narrower-title = При пошуку { $tag } знайдуться й ці
+# Settings → Tags: the tags put under broader ones, as a tree.
+tags-tree-heading = Ширші й вужчі
+tags-tree-what = Теги, поміщені під ширші на своїх сторінках. При пошуку тега знаходиться й усе, що під ним.
 
 ## LibraryStats.vue
 

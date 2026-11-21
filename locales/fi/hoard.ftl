@@ -39,6 +39,8 @@ error-not-a-hash = ei ole blake3-heksatiiviste
 error-merge-into-tag = into-kohteen on oltava tunniste
 # A tag asked about isn't one: $text is what was given.
 error-not-a-tag = "{ $text }" ei ole tunniste
+# Putting a tag under a broader one would go round in a circle: $parent is already under $tag (or is it).
+error-tag-parent-loop = { $parent } on jo tunnisteen { $tag } alla, joten { $tag } ei voi mennä sen alle
 error-nothing-to-merge = ei yhdistettävää
 error-selection-size = anna 1–{ $max } resurssin tunnistetta
 error-collection-needs-name = kokoelma tarvitsee nimen
@@ -2420,6 +2422,21 @@ tag-page-rename = Nimeä uudelleen…
 tag-page-rename-title = Anna sille uusi nimi tai toisen tunnisteen nimi, niin se yhdistetään siihen
 tag-page-rename-label = Uusi nimi
 tag-page-save-failed = Tunnistetta ei voitu tallentaa: { $error }
+# Above a tag's name on its page: the broader tags it goes under, each a link.
+tag-page-under = Alla
+tag-page-parent-add = Aseta alle…
+tag-page-parent-add-title = Aseta tämä tunniste laajemman alle: kun haet laajempaa, löydät myös nämä
+tag-page-parent-placeholder = Laajempi tunniste, esim. ajoneuvo
+# The × beside a broader tag on a tag's page.
+tag-page-parent-remove = Poista { $tag } tunnisteen { $parent } alta
+tag-page-parent-saved = { $tag } on nyt tunnisteen { $parent } alla
+tag-page-parent-removed = { $tag } ei ole enää tunnisteen { $parent } alla
+# Before the narrower tags on a tag's page, each a link with how many assets have it.
+tag-page-narrower = Suppeammat:
+tag-page-narrower-title = Kun haet tunnistetta { $tag }, löydät myös nämä
+# Settings → Tags: the tags put under broader ones, as a tree.
+tags-tree-heading = Laajemmat ja suppeammat
+tags-tree-what = Tunnisteet, jotka on asetettu laajempien alle tunnisteiden omilla sivuilla. Tunnistetta hakemalla löydät myös kaiken sen alla olevan.
 
 ## Kirjaston tilastot
 

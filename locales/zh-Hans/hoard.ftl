@@ -39,6 +39,8 @@ error-not-a-hash = 不是 blake3 十六进制哈希
 error-merge-into-tag = into 必须是标签
 # A tag asked about isn't one: $text is what was given.
 error-not-a-tag = “{ $text }”不是标签
+# Putting a tag under a broader one would go round in a circle: $parent is already under $tag (or is it).
+error-tag-parent-loop = { $parent } 已在 { $tag } 下，所以 { $tag } 不能放到它下面
 error-nothing-to-merge = 没有可合并的内容
 error-selection-size = 请提供 1 到 { $max } 个资源 ID
 error-collection-needs-name = 合集需要一个名称
@@ -2131,6 +2133,21 @@ tag-page-rename = 重命名…
 tag-page-rename-title = 给它起个新名称，或输入另一个标签的名称，把它合并过去
 tag-page-rename-label = 新名称
 tag-page-save-failed = 无法保存标签：{ $error }
+# Above a tag's name on its page: the broader tags it goes under, each a link.
+tag-page-under = 上级标签
+tag-page-parent-add = 设置上级标签…
+tag-page-parent-add-title = 把这个标签放到更宽泛的标签下：搜索那个标签时，也会找到这些
+tag-page-parent-placeholder = 更宽泛的标签，例如交通工具
+# The × beside a broader tag on a tag's page.
+tag-page-parent-remove = 把 { $tag } 从 { $parent } 下移出
+tag-page-parent-saved = { $tag } 现在位于 { $parent } 下
+tag-page-parent-removed = { $tag } 不再位于 { $parent } 下
+# Before the narrower tags on a tag's page, each a link with how many assets have it.
+tag-page-narrower = 下级标签：
+tag-page-narrower-title = 搜索 { $tag } 时，也会找到这些
+# Settings → Tags: the tags put under broader ones, as a tree.
+tags-tree-heading = 上级与下级
+tags-tree-what = 在标签页中放到更宽泛标签下的标签。搜索一个标签时，也会找到它下面的所有内容。
 
 ## LibraryStats.vue
 

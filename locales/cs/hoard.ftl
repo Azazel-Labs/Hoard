@@ -39,6 +39,8 @@ error-not-a-hash = toto není hexadecimální hash blake3
 error-merge-into-tag = into musí být štítek
 # A tag asked about isn't one: $text is what was given.
 error-not-a-tag = „{ $text }“ není štítek
+# Putting a tag under a broader one would go round in a circle: $parent is already under $tag (or is it).
+error-tag-parent-loop = { $parent } je už pod { $tag }, takže { $tag } nejde zařadit pod něj
 error-nothing-to-merge = není co sloučit
 error-selection-size = zadejte 1 až { $max } ID assetů
 error-collection-needs-name = kolekce potřebuje název
@@ -2547,6 +2549,21 @@ tag-page-rename = Přejmenovat…
 tag-page-rename-title = Dejte mu nový název, nebo název jiného štítku, do kterého se sloučí
 tag-page-rename-label = Nový název
 tag-page-save-failed = Štítek se nepodařilo uložit: { $error }
+# Above a tag's name on its page: the broader tags it goes under, each a link.
+tag-page-under = Pod
+tag-page-parent-add = Zařadit pod…
+tag-page-parent-add-title = Zařaďte tento štítek pod širší: vyhledáním širšího najdete i tyto
+tag-page-parent-placeholder = Širší štítek, třeba vozidlo
+# The × beside a broader tag on a tag's page.
+tag-page-parent-remove = Odebrat { $tag } zpod { $parent }
+tag-page-parent-saved = Štítek { $tag } je nyní pod { $parent }
+tag-page-parent-removed = Štítek { $tag } už není pod { $parent }
+# Before the narrower tags on a tag's page, each a link with how many assets have it.
+tag-page-narrower = Užší:
+tag-page-narrower-title = Vyhledáním { $tag } najdete i tyto
+# Settings → Tags: the tags put under broader ones, as a tree.
+tags-tree-heading = Širší a užší
+tags-tree-what = Štítky zařazené pod širší štítky na svých stránkách. Vyhledáním štítku najdete i vše, co je pod ním.
 
 ## LibraryStats.vue
 

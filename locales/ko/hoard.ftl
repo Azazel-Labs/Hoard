@@ -39,6 +39,8 @@ error-not-a-hash = blake3 16진수 해시가 아닙니다
 error-merge-into-tag = into는 태그여야 합니다
 # A tag asked about isn't one: $text is what was given.
 error-not-a-tag = "{ $text }"은(는) 태그가 아닙니다
+# Putting a tag under a broader one would go round in a circle: $parent is already under $tag (or is it).
+error-tag-parent-loop = { $parent }이(가) 이미 { $tag } 아래에 있어서 { $tag }을(를) 그 아래에 넣을 수 없습니다
 error-nothing-to-merge = 병합할 것이 없습니다
 error-selection-size = 에셋 ID를 1개에서 { $max }개 사이로 지정하세요
 error-collection-needs-name = 컬렉션에는 이름이 필요합니다
@@ -2107,6 +2109,21 @@ tag-page-rename = 이름 바꾸기…
 tag-page-rename-title = 새 이름이나, 병합할 다른 태그의 이름을 입력하세요
 tag-page-rename-label = 새 이름
 tag-page-save-failed = 태그를 저장하지 못했습니다: { $error }
+# Above a tag's name on its page: the broader tags it goes under, each a link.
+tag-page-under = 상위 태그
+tag-page-parent-add = 아래에 넣기…
+tag-page-parent-add-title = 이 태그를 더 넓은 태그 아래에 넣으세요. 그 태그를 검색하면 이 태그도 함께 찾아요
+tag-page-parent-placeholder = 더 넓은 태그, 예: 탈것
+# The × beside a broader tag on a tag's page.
+tag-page-parent-remove = { $tag }을(를) { $parent } 아래에서 빼기
+tag-page-parent-saved = { $tag }이(가) 이제 { $parent } 아래에 있습니다
+tag-page-parent-removed = { $tag }이(가) 더 이상 { $parent } 아래에 있지 않습니다
+# Before the narrower tags on a tag's page, each a link with how many assets have it.
+tag-page-narrower = 하위 태그:
+tag-page-narrower-title = { $tag }을(를) 검색하면 이 태그도 함께 찾아요
+# Settings → Tags: the tags put under broader ones, as a tree.
+tags-tree-heading = 상위 및 하위
+tags-tree-what = 태그 페이지에서 더 넓은 태그 아래에 넣은 태그입니다. 태그를 검색하면 그 아래에 있는 모든 것도 함께 찾아요.
 
 ## LibraryStats.vue
 

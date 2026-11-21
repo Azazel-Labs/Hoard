@@ -39,6 +39,8 @@ error-not-a-hash = δεν είναι δεκαεξαδικό hash blake3
 error-merge-into-tag = το into πρέπει να είναι ετικέτα
 # A tag asked about isn't one: $text is what was given.
 error-not-a-tag = Το «{ $text }» δεν είναι ετικέτα
+# Putting a tag under a broader one would go round in a circle: $parent is already under $tag (or is it).
+error-tag-parent-loop = Η { $parent } είναι ήδη κάτω από την { $tag }, οπότε η { $tag } δεν μπορεί να μπει κάτω από αυτήν
 error-nothing-to-merge = τίποτα προς συγχώνευση
 error-selection-size = δώστε από 1 έως { $max } αναγνωριστικά στοιχείων
 error-collection-needs-name = μια συλλογή χρειάζεται όνομα
@@ -2425,6 +2427,21 @@ tag-page-rename = Μετονομασία…
 tag-page-rename-title = Δώστε της νέο όνομα ή το όνομα άλλης ετικέτας για να συγχωνευθεί σε αυτήν
 tag-page-rename-label = Νέο όνομα
 tag-page-save-failed = Δεν ήταν δυνατή η αποθήκευση της ετικέτας: { $error }
+# Above a tag's name on its page: the broader tags it goes under, each a link.
+tag-page-under = Κάτω από
+tag-page-parent-add = Τοποθέτηση κάτω από…
+tag-page-parent-add-title = Βάλτε αυτήν την ετικέτα κάτω από μια ευρύτερη: αν αναζητήσετε την ευρύτερη, θα βρείτε και αυτές
+tag-page-parent-placeholder = Μια ευρύτερη ετικέτα, όπως όχημα
+# The × beside a broader tag on a tag's page.
+tag-page-parent-remove = Αφαίρεση της { $tag } από την { $parent }
+tag-page-parent-saved = Η { $tag } είναι τώρα κάτω από την { $parent }
+tag-page-parent-removed = Η { $tag } δεν είναι πια κάτω από την { $parent }
+# Before the narrower tags on a tag's page, each a link with how many assets have it.
+tag-page-narrower = Στενότερες:
+tag-page-narrower-title = Αν αναζητήσετε την { $tag }, θα βρείτε και αυτές
+# Settings → Tags: the tags put under broader ones, as a tree.
+tags-tree-heading = Ευρύτερες και στενότερες
+tags-tree-what = Ετικέτες που μπήκαν κάτω από ευρύτερες από τις σελίδες τους. Η αναζήτηση μιας ετικέτας βρίσκει και ό,τι υπάρχει κάτω από αυτήν.
 
 ## LibraryStats.vue
 

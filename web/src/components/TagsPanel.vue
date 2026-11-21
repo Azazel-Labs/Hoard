@@ -20,9 +20,11 @@ const limit = ref(200)
 
 async function load() {
   try {
-    const [all, a] = await Promise.all([api.allTags(q.value.trim().toLowerCase()), api.tagAliases()])
+    const [all, a, tree] = await Promise.all([api.allTags(q.value.trim().toLowerCase()), api.tagAliases(), api.tagTree()])
     tags.value = all
     aliases.value = a
+    edges.value = tree
+    if (!q.value.trim()) everyCount.value = new Map(all.map((x) => [x.value, x.count]))
   } catch (e) {
     showError(t('tags-load-failed', { error: (e as Error).message }))
   }
@@ -36,6 +38,28 @@ watch(q, () => {
 })
 
 const count = computed(() => new Map((tags.value ?? []).map((t) => [t.value, t.count])))
+
+// Tags put under broader ones (on their tag pages), drawn as a tree: each broader tag with what's under it.
+const edges = ref<{ tag: string; parent: string }[]>([])
+/** Every tag's count, from before anything was typed into the find box: the tree stays as it is meanwhile. */
+const everyCount = ref(new Map<string, number>())
+const tree = computed(() => {
+  const under = new Map<string, string[]>()
+  const isChild = new Set<string>()
+  for (const e of edges.value) {
+    under.set(e.parent, [...(under.get(e.parent) ?? []), e.tag])
+    isChild.add(e.tag)
+  }
+  const rows: { tag: string; depth: number; key: string }[] = []
+  // A tag under two broader ones shows under each; `path` stops a loop going on forever.
+  const walk = (tag: string, depth: number, path: string[]) => {
+    rows.push({ tag, depth, key: [...path, tag].join('>') })
+    if (path.includes(tag)) return
+    for (const c of (under.get(tag) ?? []).sort()) walk(c, depth + 1, [...path, tag])
+  }
+  for (const root of [...under.keys()].filter((p) => !isChild.has(p)).sort()) walk(root, 0, [])
+  return rows
+})
 function toggle(tag: string) {
   picked.value = picked.value.includes(tag) ? picked.value.filter((t) => t !== tag) : [...picked.value, tag]
 }
@@ -119,6 +143,18 @@ watch(moreEl, (el) => {
 
 <template>
   <div class="tags">
+    <section v-if="tree.length">
+      <div class="sh"><h3>{{ t('tags-tree-heading') }}</h3></div>
+      <p class="what">{{ t('tags-tree-what') }}</p>
+      <ul class="list tree">
+        <li v-for="row in tree" :key="row.key" :style="{ paddingInlineStart: `${row.depth * 1.25}rem` }">
+          <span v-if="row.depth" class="branch" aria-hidden="true">└</span>
+          <button type="button" class="linkbtn mono grow" :title="t('tags-browse-title', { tag: row.tag })" @click="emit('tag', row.tag)">{{ row.tag }}</button>
+          <span class="n">{{ formatNumber(everyCount.get(row.tag) ?? 0) }}</span>
+        </li>
+      </ul>
+    </section>
+
     <section>
       <div class="find">
         <label class="visually-hidden" for="tags-q">{{ t('tags-find') }}</label>
@@ -199,5 +235,8 @@ section { display: grid; gap: 0.6rem; }
 .grow { flex: 1; min-width: 0; overflow-wrap: anywhere; }
 .small { padding-block: 0.1rem; font-size: 0.85em; }
 .more { height: 1px; }
+.tree li { gap: 0.4rem; }
+.tree .linkbtn { padding-inline: 0; text-align: start; justify-content: flex-start; }
+.branch { color: var(--faint); }
 @media (max-width: 560px) { .into { flex-direction: column; align-items: stretch; } }
 </style>

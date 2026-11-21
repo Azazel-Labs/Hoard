@@ -39,6 +39,8 @@ error-not-a-hash = no és un hash blake3 hexadecimal
 error-merge-into-tag = into ha de ser una etiqueta
 # A tag asked about isn't one: $text is what was given.
 error-not-a-tag = «{ $text }» no és una etiqueta
+# Putting a tag under a broader one would go round in a circle: $parent is already under $tag (or is it).
+error-tag-parent-loop = { $parent } ja és sota { $tag }, així que { $tag } no hi pot anar
 error-nothing-to-merge = no hi ha res a fusionar
 error-selection-size = indiqueu entre 1 i { $max } identificadors de recurs
 error-collection-needs-name = una col·lecció necessita un nom
@@ -2365,6 +2367,21 @@ tag-page-rename = Canvia el nom…
 tag-page-rename-title = Poseu-li un nom nou, o el nom d'una altra etiqueta per fusionar-la amb aquella
 tag-page-rename-label = Nom nou
 tag-page-save-failed = No s'ha pogut desar l'etiqueta: { $error }
+# Above a tag's name on its page: the broader tags it goes under, each a link.
+tag-page-under = Sota
+tag-page-parent-add = Posa sota…
+tag-page-parent-add-title = Poseu aquesta etiqueta sota una de més àmplia: en cercar-la, també es trobaran aquestes
+tag-page-parent-placeholder = Una etiqueta més àmplia, com ara vehicle
+# The × beside a broader tag on a tag's page.
+tag-page-parent-remove = Treu { $tag } de sota { $parent }
+tag-page-parent-saved = { $tag } ara és sota { $parent }
+tag-page-parent-removed = { $tag } ja no és sota { $parent }
+# Before the narrower tags on a tag's page, each a link with how many assets have it.
+tag-page-narrower = Més específiques:
+tag-page-narrower-title = En cercar { $tag }, també es troben aquestes
+# Settings → Tags: the tags put under broader ones, as a tree.
+tags-tree-heading = Més àmplies i més específiques
+tags-tree-what = Etiquetes posades sota altres de més àmplies des de les seves pàgines. En cercar una etiqueta, també es troba tot el que té a sota.
 
 ## LibraryStats.vue
 

@@ -39,6 +39,8 @@ error-not-a-hash = bukan hash hex blake3
 error-merge-into-tag = into harus berupa tag
 # A tag asked about isn't one: $text is what was given.
 error-not-a-tag = "{ $text }" bukan tag
+# Putting a tag under a broader one would go round in a circle: $parent is already under $tag (or is it).
+error-tag-parent-loop = { $parent } sudah ada di bawah { $tag }, jadi { $tag } tidak bisa ditaruh di bawahnya
 error-nothing-to-merge = tidak ada yang perlu digabungkan
 error-selection-size = berikan antara 1 dan { $max } ID aset
 error-collection-needs-name = koleksi perlu nama
@@ -2163,6 +2165,21 @@ tag-page-rename = Ganti nama…
 tag-page-rename-title = Beri nama baru, atau nama tag lain untuk menggabungkannya ke tag itu
 tag-page-rename-label = Nama baru
 tag-page-save-failed = Tidak dapat menyimpan tag: { $error }
+# Above a tag's name on its page: the broader tags it goes under, each a link.
+tag-page-under = Di bawah
+tag-page-parent-add = Taruh di bawah…
+tag-page-parent-add-title = Taruh tag ini di bawah tag yang lebih luas: mencari tag itu juga akan menemukan ini
+tag-page-parent-placeholder = Tag yang lebih luas, misalnya kendaraan
+# The × beside a broader tag on a tag's page.
+tag-page-parent-remove = Keluarkan { $tag } dari bawah { $parent }
+tag-page-parent-saved = { $tag } sekarang ada di bawah { $parent }
+tag-page-parent-removed = { $tag } tidak lagi di bawah { $parent }
+# Before the narrower tags on a tag's page, each a link with how many assets have it.
+tag-page-narrower = Lebih sempit:
+tag-page-narrower-title = Mencari { $tag } juga menemukan ini
+# Settings → Tags: the tags put under broader ones, as a tree.
+tags-tree-heading = Lebih luas dan lebih sempit
+tags-tree-what = Tag yang ditaruh di bawah tag yang lebih luas dari halaman tag-nya. Mencari sebuah tag juga menemukan semua yang ada di bawahnya.
 
 ## LibraryStats.vue
 

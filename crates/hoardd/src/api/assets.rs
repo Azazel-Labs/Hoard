@@ -430,6 +430,46 @@ pub(super) async fn set_tag_info(
     info.map(Json).ok_or_else(|| AppError::not_found(tr!("error-asset-gone")))
 }
 
+#[derive(Deserialize)]
+pub(super) struct SetTagParents {
+    tag: String,
+    /// The broader tags it goes under, in place of those it had.
+    parents: Vec<String>,
+}
+
+/// Put a tag under broader ones: searching one of those then finds it too.
+pub(super) async fn set_tag_parents(
+    State(state): State<AppState>,
+    Json(b): Json<SetTagParents>,
+) -> ApiResult<Json<db::TagInfo>> {
+    let tag = a_tag(&b.tag)?;
+    let mut parents = Vec::new();
+    for p in b.parents.iter().take(32) {
+        let p = a_tag(p)?;
+        if !parents.contains(&p) {
+            parents.push(p);
+        }
+    }
+    let tag2 = tag.clone();
+    let done = db::call(&state.pool, move |c| match db::set_tag_parents(c, &tag2, &parents)? {
+        Ok(()) => db::tag_info(c, &tag2).map(Ok),
+        Err(bad) => Ok(Err(bad)),
+    })
+    .await?;
+    match done {
+        Ok(info) => Ok(Json(info)),
+        Err(parent) => {
+            Err(AppError::bad_request(tr!("error-tag-parent-loop", tag = tag.as_str(), parent = parent.as_str())))
+        }
+    }
+}
+
+/// Every tag that goes under another, as (tag, parent) pairs.
+pub(super) async fn tag_tree(State(state): State<AppState>) -> ApiResult<Json<Value>> {
+    let rows = db::call(&state.pool, |c| db::tag_tree(c)).await?;
+    Ok(Json(json!(rows.into_iter().map(|(tag, parent)| json!({ "tag": tag, "parent": parent })).collect::<Vec<_>>())))
+}
+
 pub(super) async fn tag_aliases(State(state): State<AppState>) -> ApiResult<Json<Value>> {
     let rows = db::call(&state.pool, |c| db::tag_aliases(c)).await?;
     Ok(Json(json!(rows.into_iter().map(|(tag, into)| json!({ "tag": tag, "into": into })).collect::<Vec<_>>())))

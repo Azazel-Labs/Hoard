@@ -44,6 +44,8 @@ error-not-a-hash = not a blake3 hex hash
 error-merge-into-tag = into must be a tag
 # A tag asked about isn't one: $text is what was given.
 error-not-a-tag = "{ $text }" isn't a tag
+# Putting a tag under a broader one would go round in a circle: $parent is already under $tag (or is it).
+error-tag-parent-loop = { $parent } is already under { $tag }, so { $tag } can't go under it
 error-nothing-to-merge = nothing to merge
 error-selection-size = give between 1 and { $max } asset ids
 error-collection-needs-name = a collection needs a name
@@ -2647,6 +2649,21 @@ tag-page-rename = Rename…
 tag-page-rename-title = Give it a new name, or the name of another tag to merge it into that one
 tag-page-rename-label = New name
 tag-page-save-failed = Couldn't save the tag: { $error }
+# Above a tag's name on its page: the broader tags it goes under, each a link.
+tag-page-under = Under
+tag-page-parent-add = Put under…
+tag-page-parent-add-title = Put this tag under a broader one: searching that one finds these too
+tag-page-parent-placeholder = A broader tag, like vehicle
+# The × beside a broader tag on a tag's page.
+tag-page-parent-remove = Take { $tag } out from under { $parent }
+tag-page-parent-saved = { $tag } is now under { $parent }
+tag-page-parent-removed = { $tag } is no longer under { $parent }
+# Before the narrower tags on a tag's page, each a link with how many assets have it.
+tag-page-narrower = Narrower:
+tag-page-narrower-title = Searching { $tag } finds these too
+# Settings → Tags: the tags put under broader ones, as a tree.
+tags-tree-heading = Broader and narrower
+tags-tree-what = Tags put under broader ones from their tag pages. Searching a tag finds everything under it too.
 
 ## LibraryStats.vue
 

@@ -39,6 +39,8 @@ error-not-a-hash = bu bir blake3 onaltılık özeti değil
 error-merge-into-tag = into bir etiket olmalı
 # A tag asked about isn't one: $text is what was given.
 error-not-a-tag = "{ $text }" bir etiket değil
+# Putting a tag under a broader one would go round in a circle: $parent is already under $tag (or is it).
+error-tag-parent-loop = { $parent } zaten { $tag } altında, bu yüzden { $tag } onun altına konamaz
 error-nothing-to-merge = birleştirilecek bir şey yok
 error-selection-size = 1 ile { $max } arasında varlık kimliği verin
 error-collection-needs-name = bir koleksiyonun adı olmalı
@@ -2176,6 +2178,21 @@ tag-page-rename = Yeniden adlandır…
 tag-page-rename-title = Ona yeni bir ad verin ya da birleştirileceği başka bir etiketin adını yazın
 tag-page-rename-label = Yeni ad
 tag-page-save-failed = Etiket kaydedilemedi: { $error }
+# Above a tag's name on its page: the broader tags it goes under, each a link.
+tag-page-under = Altında
+tag-page-parent-add = Altına koy…
+tag-page-parent-add-title = Bu etiketi daha geniş bir etiketin altına koyun: onu aradığınızda bunlar da bulunur
+tag-page-parent-placeholder = Daha geniş bir etiket, örneğin araç
+# The × beside a broader tag on a tag's page.
+tag-page-parent-remove = { $tag } etiketini { $parent } altından çıkar
+tag-page-parent-saved = { $tag } artık { $parent } altında
+tag-page-parent-removed = { $tag } artık { $parent } altında değil
+# Before the narrower tags on a tag's page, each a link with how many assets have it.
+tag-page-narrower = Daha dar:
+tag-page-narrower-title = { $tag } aranınca bunlar da bulunur
+# Settings → Tags: the tags put under broader ones, as a tree.
+tags-tree-heading = Daha geniş ve daha dar
+tags-tree-what = Etiket sayfalarından daha geniş etiketlerin altına konan etiketler. Bir etiketi aradığınızda altındaki her şey de bulunur.
 
 ## LibraryStats.vue
 

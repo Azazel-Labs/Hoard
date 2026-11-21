@@ -39,6 +39,8 @@ error-not-a-hash = không phải mã băm blake3 dạng hex
 error-merge-into-tag = into phải là một thẻ
 # A tag asked about isn't one: $text is what was given.
 error-not-a-tag = "{ $text }" không phải là thẻ
+# Putting a tag under a broader one would go round in a circle: $parent is already under $tag (or is it).
+error-tag-parent-loop = { $parent } đã nằm dưới { $tag }, nên { $tag } không thể đặt dưới nó
 error-nothing-to-merge = không có gì để gộp
 error-selection-size = hãy đưa từ 1 đến { $max } id tài nguyên
 error-collection-needs-name = bộ sưu tập cần có tên
@@ -2131,6 +2133,21 @@ tag-page-rename = Đổi tên…
 tag-page-rename-title = Đặt tên mới, hoặc tên của một thẻ khác để gộp vào thẻ đó
 tag-page-rename-label = Tên mới
 tag-page-save-failed = Không lưu được thẻ: { $error }
+# Above a tag's name on its page: the broader tags it goes under, each a link.
+tag-page-under = Dưới
+tag-page-parent-add = Đặt dưới…
+tag-page-parent-add-title = Đặt thẻ này dưới một thẻ rộng hơn: tìm thẻ rộng hơn sẽ thấy cả các thẻ này
+tag-page-parent-placeholder = Một thẻ rộng hơn, ví dụ phương tiện
+# The × beside a broader tag on a tag's page.
+tag-page-parent-remove = Gỡ { $tag } khỏi dưới { $parent }
+tag-page-parent-saved = { $tag } giờ nằm dưới { $parent }
+tag-page-parent-removed = { $tag } không còn nằm dưới { $parent }
+# Before the narrower tags on a tag's page, each a link with how many assets have it.
+tag-page-narrower = Hẹp hơn:
+tag-page-narrower-title = Tìm { $tag } cũng sẽ thấy các thẻ này
+# Settings → Tags: the tags put under broader ones, as a tree.
+tags-tree-heading = Rộng hơn và hẹp hơn
+tags-tree-what = Các thẻ được đặt dưới thẻ rộng hơn từ trang thẻ của chúng. Tìm một thẻ cũng sẽ thấy mọi thứ nằm dưới nó.
 
 ## Thống kê thư viện
 

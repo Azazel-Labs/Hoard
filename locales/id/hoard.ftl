@@ -1041,7 +1041,12 @@ upload-resumed = dilanjutkan, { $size } sudah ada
 upload-skipped = Berkas yang persis sama sudah diimpor sebagai “{ $name }”, jadi dilewati.
 upload-error = { $error }. Kemajuan Anda tersimpan: coba lagi, atau jatuhkan lagi berkas yang sama nanti.
 upload-retry = Coba lagi
-upload-import-again = Tetap impor lagi
+# $name is the pack the library has already that these files go into.
+upload-update = Perbarui “{ $name }”
+upload-copy = Impor sebagai salinan
+# $name is the pack the library has already that the upload goes into.
+upload-into = Masuk ke “{ $name }”, yang sudah ada di pustaka: berkas baru ditambahkan dan yang berubah diganti.
+upload-own-pack = Jadikan paket tersendiri
 upload-dismiss = Abaikan
 upload-cancel = Batal
 upload-minimize = Kecilkan

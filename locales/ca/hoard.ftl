@@ -1116,7 +1116,12 @@ upload-resumed = represa, { $size } ja hi eren
 upload-skipped = Aquests mateixos fitxers ja s'havien importat com a «{ $name }», així que s'han omès.
 upload-error = { $error }. El progrés es conserva: torneu-ho a provar, o torneu a deixar anar els mateixos fitxers més tard.
 upload-retry = Torna-ho a provar
-upload-import-again = Importa igualment
+# $name is the pack the library has already that these files go into.
+upload-update = Actualitza «{ $name }»
+upload-copy = Importa com a còpia
+# $name is the pack the library has already that the upload goes into.
+upload-into = Va a «{ $name }», que ja és a la biblioteca: s'hi afegeixen els fitxers nous i se substitueixen els que han canviat.
+upload-own-pack = Fes-ne un paquet propi
 upload-dismiss = Descarta
 upload-cancel = Cancel·la
 upload-minimize = Minimitza

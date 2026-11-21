@@ -1152,7 +1152,12 @@ upload-resumed = jatkettu, { $size } oli jo perillä
 upload-skipped = Täsmälleen nämä tiedostot oli jo tuotu nimellä ”{ $name }”, joten ne ohitettiin.
 upload-error = { $error }. Edistymisesi on tallessa: yritä uudelleen tai pudota samat tiedostot myöhemmin uudelleen.
 upload-retry = Yritä uudelleen
-upload-import-again = Tuo silti uudelleen
+# $name is the pack the library has already that these files go into.
+upload-update = Päivitä ”{ $name }”
+upload-copy = Tuo kopiona
+# $name is the pack the library has already that the upload goes into.
+upload-into = Menee pakettiin ”{ $name }”, joka on jo kirjastossa: uudet tiedostot lisätään ja muuttuneet korvataan.
+upload-own-pack = Tee siitä oma paketti
 upload-dismiss = Kuittaa
 upload-cancel = Peruuta
 upload-minimize = Pienennä

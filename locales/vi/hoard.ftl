@@ -1043,7 +1043,12 @@ upload-resumed = đã tiếp tục, { $size } đã có sẵn
 upload-skipped = Chính những tệp này đã được nhập dưới tên “{ $name }”, nên đã bỏ qua.
 upload-error = { $error }. Tiến độ của bạn được giữ lại: hãy thử lại, hoặc thả lại cùng các tệp đó sau.
 upload-retry = Thử lại
-upload-import-again = Vẫn nhập lại
+# $name is the pack the library has already that these files go into.
+upload-update = Cập nhật “{ $name }”
+upload-copy = Nhập thành bản sao
+# $name is the pack the library has already that the upload goes into.
+upload-into = Đang vào “{ $name }”, gói đã có trong thư viện: tệp mới được thêm và tệp đã đổi được thay thế.
+upload-own-pack = Tách thành gói riêng
 upload-dismiss = Bỏ qua
 upload-cancel = Hủy
 upload-minimize = Thu nhỏ

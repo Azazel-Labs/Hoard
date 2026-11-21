@@ -12191,6 +12191,10 @@ translation = "{ $sent } з { $total }"
 source = "Cancel"
 translation = "Скасувати"
 
+[messages.upload-copy]
+source = "Import as a copy"
+translation = "Імпортувати як копію"
+
 [messages.upload-dismiss]
 source = "Dismiss"
 translation = "Закрити"
@@ -12237,10 +12241,6 @@ translation = """
        *[other] { $attempts } спроби
     }"""
 
-[messages.upload-import-again]
-source = "Import again anyway"
-translation = "Усе одно імпортувати знову"
-
 [messages.upload-importing]
 source = "Importing { $count } packs"
 translation = """
@@ -12255,6 +12255,10 @@ translation = """
 source = "Interrupted"
 translation = "Перервано"
 
+[messages.upload-into]
+source = "Going into “{ $name }”, which is in the library already: new files are added and changed ones replaced."
+translation = "Додається до пакета «{ $name }», який уже є в бібліотеці: нові файли додаються, змінені замінюються."
+
 [messages.upload-minimize]
 source = "Minimize"
 translation = "Згорнути"
@@ -12266,6 +12270,10 @@ translation = "помилка мережі"
 [messages.upload-not-same]
 source = "Those aren’t the same files, so nothing was resumed."
 translation = "Це не ті самі файли, тож нічого не продовжено."
+
+[messages.upload-own-pack]
+source = "Make it a pack of its own"
+translation = "Зробити окремим пакетом"
 
 [messages.upload-part-failed]
 source = "upload failed ({ $status })"
@@ -12326,6 +12334,10 @@ translation = "Зупинено"
 [messages.upload-unpacking]
 source = "Uploaded, now unpacking"
 translation = "Вивантажено, триває розпакування"
+
+[messages.upload-update]
+source = "Update “{ $name }”"
+translation = "Оновити «{ $name }»"
 
 [messages.upload-waiting]
 source = "Waiting"

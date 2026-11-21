@@ -60,12 +60,17 @@ pub(crate) fn claim_job(conn: &Connection) -> Result<Option<JobRow>> {
     if !waiting {
         return Ok(None);
     }
+    // An upload going into a pack the library had already waits for whatever's working on that pack to finish, so
+    // two jobs never add to one pack at once.
     Ok(conn
         .query_row(
             "UPDATE jobs SET status = 'running', attempts = attempts + 1, updated_at = ?1
-             WHERE id = (SELECT id FROM jobs WHERE status = 'queued' AND run_after <= ?1 ORDER BY id LIMIT 1)
+             WHERE id = (SELECT q.id FROM jobs q WHERE q.status = 'queued' AND q.run_after <= ?1
+                           AND NOT (q.kind = ?2 AND json_extract(q.payload, '$.from') IS NOT NULL
+                                    AND EXISTS (SELECT 1 FROM jobs r WHERE r.pack_id = q.pack_id AND r.status = 'running'))
+                          ORDER BY q.id LIMIT 1)
              RETURNING id, kind, pack_id, payload, attempts",
-            [&now],
+            params![&now, crate::jobs::INGEST],
             |r| {
                 let payload: String = r.get(3)?;
                 Ok(JobRow {
@@ -126,6 +131,25 @@ pub(crate) fn requeue_stale_jobs(conn: &Connection) -> Result<usize> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    /// An upload going into a pack waits while another job works on that pack; other jobs carry on past it.
+    #[test]
+    fn an_upload_into_a_busy_pack_waits_its_turn() {
+        let conn = crate::db::test_library();
+        conn.execute_batch(
+            "INSERT INTO packs (id, name, status, created_at) VALUES ('p', 'P', 'analyzing', 'x'), ('q', 'Q', 'ready', 'x');
+             INSERT INTO jobs (kind, pack_id, payload, status, run_after, created_at, updated_at) VALUES
+               ('llm_tag', 'p', '{}', 'running', '0', 'x', 'x'),
+               ('ingest', 'p', '{\"from\":\"u\"}', 'queued', '0', 'x', 'x'),
+               ('ingest', 'q', '{}', 'queued', '0', 'x', 'x');",
+        )
+        .unwrap();
+        assert_eq!(claim_job(&conn).unwrap().unwrap().pack_id.as_deref(), Some("q"));
+        assert!(claim_job(&conn).unwrap().is_none());
+        conn.execute("UPDATE jobs SET status = 'done' WHERE pack_id = 'p' AND kind = 'llm_tag'", []).unwrap();
+        let job = claim_job(&conn).unwrap().unwrap();
+        assert_eq!((job.kind.as_str(), job.pack_id.as_deref()), ("ingest", Some("p")));
+    }
 
     #[test]
     fn a_pack_with_no_job_left_to_finish_it_is_ready() {

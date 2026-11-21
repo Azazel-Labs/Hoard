@@ -11649,6 +11649,10 @@ translation = "{ $sent } จาก { $total }"
 source = "Cancel"
 translation = "ยกเลิก"
 
+[messages.upload-copy]
+source = "Import as a copy"
+translation = "นำเข้าเป็นสำเนา"
+
 [messages.upload-dismiss]
 source = "Dismiss"
 translation = "ปิด"
@@ -11689,10 +11693,6 @@ translation = "การจบการอัปโหลด"
 source = "{ $what }: { $error } after { $attempts } attempts"
 translation = "{ $what }: { $error } หลังจากลอง { $attempts } ครั้ง"
 
-[messages.upload-import-again]
-source = "Import again anyway"
-translation = "นำเข้าอีกครั้งอยู่ดี"
-
 [messages.upload-importing]
 source = "Importing { $count } packs"
 translation = "กำลังนำเข้า { $count } แพ็ก"
@@ -11700,6 +11700,10 @@ translation = "กำลังนำเข้า { $count } แพ็ก"
 [messages.upload-interrupted]
 source = "Interrupted"
 translation = "ถูกขัดจังหวะ"
+
+[messages.upload-into]
+source = "Going into “{ $name }”, which is in the library already: new files are added and changed ones replaced."
+translation = "กำลังเข้าไปใน “{ $name }” ซึ่งมีอยู่ในคลังแล้ว ไฟล์ใหม่จะถูกเพิ่มและไฟล์ที่เปลี่ยนจะถูกแทนที่"
 
 [messages.upload-minimize]
 source = "Minimize"
@@ -11712,6 +11716,10 @@ translation = "ข้อผิดพลาดของเครือข่า�
 [messages.upload-not-same]
 source = "Those aren’t the same files, so nothing was resumed."
 translation = "ไม่ใช่ไฟล์ชุดเดิม จึงไม่มีอะไรทำต่อ"
+
+[messages.upload-own-pack]
+source = "Make it a pack of its own"
+translation = "แยกเป็นแพ็กของตัวเอง"
 
 [messages.upload-part-failed]
 source = "upload failed ({ $status })"
@@ -11772,6 +11780,10 @@ translation = "หยุดแล้ว"
 [messages.upload-unpacking]
 source = "Uploaded, now unpacking"
 translation = "อัปโหลดแล้ว กำลังแตกไฟล์"
+
+[messages.upload-update]
+source = "Update “{ $name }”"
+translation = "อัปเดต “{ $name }”"
 
 [messages.upload-waiting]
 source = "Waiting"

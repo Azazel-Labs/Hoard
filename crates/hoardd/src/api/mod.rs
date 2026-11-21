@@ -27,7 +27,7 @@ mod site;
 mod stats;
 
 pub(crate) use files::serve_blob;
-pub(crate) use packs::default_pack_name;
+pub(crate) use packs::{default_pack_name, pack_name_from_files};
 pub(crate) use stats::keep_reports;
 
 pub(crate) fn router(state: &AppState) -> Router<AppState> {

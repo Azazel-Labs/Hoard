@@ -17,6 +17,10 @@
 //! The server fingerprints each import's file list (paths + sizes). Registering the same list again resumes the open
 //! session, from any browser or machine; registering a list that's already in the library is refused with 409 unless
 //! `force` is set, so re-running an interrupted bulk import doesn't duplicate the packs that already finished.
+//!
+//! A pack uploaded again goes into the pack it already is: the library's pack by the same name (the one the files are
+//! all in, or the one asked for), or the pack these very files made when `force` sends them again. Its new files are
+//! added and the ones that changed are replaced; `copy` makes a pack of its own instead.
 //! What's on disk is the source of truth for progress, so a server restart mid-upload loses nothing.
 
 use crate::i18n::tr;
@@ -78,9 +82,12 @@ struct CreateBody {
     #[serde(default)]
     source: Option<String>,
     files: Vec<NewFile>,
-    /// Import even if a pack with exactly these files already exists.
+    /// Import even if a pack with exactly these files already exists (into that pack, unless `copy`).
     #[serde(default)]
     force: bool,
+    /// Make a pack of its own even when the library has this pack already, instead of adding to it.
+    #[serde(default)]
+    copy: bool,
 }
 
 fn import_key(files: &[(String, u64)]) -> String {
@@ -117,6 +124,9 @@ struct SessionStatus {
     /// This registration's hold on the session, for cancelling it (see `abort`); only in the answer to registering.
     #[serde(skip_serializing_if = "Option::is_none")]
     claim: Option<String>,
+    /// The pack the upload goes into once it's complete, when the library has it already.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    merge_into: Option<Pack>,
 }
 
 fn staging(state: &AppState, id: &str) -> PathBuf {
@@ -147,10 +157,18 @@ async fn session_status(state: &AppState, id: &str) -> ApiResult<SessionStatus> 
         for f in files.iter_mut().filter(|f| f.received < f.size) {
             f.parts = parts.remove(&f.path).unwrap_or_default();
         }
-        Ok(Some((pack, files)))
+        let target: Option<String> = c
+            .query_row("SELECT merge_into FROM upload_meta WHERE pack_id = ?1", [&id2], |r| r.get(0))
+            .optional()?
+            .flatten();
+        let merge_into = match target {
+            Some(t) => db::get_pack(c, &t)?,
+            None => None,
+        };
+        Ok(Some((pack, files, merge_into)))
     })
     .await?;
-    let (pack, files) = found.ok_or_else(|| AppError::not_found(tr!("error-upload-not-found", id = id)))?;
+    let (pack, files, merge_into) = found.ok_or_else(|| AppError::not_found(tr!("error-upload-not-found", id = id)))?;
     let total_bytes = files.iter().map(|f| f.size).sum();
     let received_bytes = files.iter().map(|f| f.received).sum();
     Ok(SessionStatus {
@@ -162,7 +180,23 @@ async fn session_status(state: &AppState, id: &str) -> ApiResult<SessionStatus> 
         part_bytes: PART_BYTES,
         resumed: false,
         claim: None,
+        merge_into,
     })
+}
+
+/// The pack an upload goes into: `same` (the pack these very files made) or else the oldest pack called `name`, if
+/// it's one Hoard keeps the files of itself (not a watched folder's, which is read where it sits) and isn't archived.
+fn merge_target(c: &rusqlite::Connection, same: Option<&str>, name: Option<&str>) -> anyhow::Result<Option<String>> {
+    Ok(c.query_row(
+        "SELECT p.id FROM packs p
+          WHERE p.status <> 'uploading' AND p.archived_at IS NULL
+            AND (p.id = ?1 OR (?1 IS NULL AND p.name = ?2 COLLATE NOCASE))
+            AND NOT EXISTS (SELECT 1 FROM locations l WHERE l.id = p.location_id AND l.mode = 'watched')
+          ORDER BY p.created_at LIMIT 1",
+        params![same, name],
+        |r| r.get(0),
+    )
+    .optional()?)
 }
 
 async fn create(State(state): State<AppState>, Json(body): Json<CreateBody>) -> ApiResult<Response> {
@@ -196,36 +230,50 @@ async fn create(State(state): State<AppState>, Json(body): Json<CreateBody>) -> 
         })
     })
     .await?;
-    match existing {
+    match &existing {
         Some(Existing::Open(id)) => {
-            // It's this registration's now: whoever registered it before can no longer cancel it.
+            // It's this registration's now: whoever registered it before can no longer cancel it. Asked for a copy,
+            // it's a pack of its own after all.
             let claim = uuid::Uuid::new_v4().to_string();
-            let (id2, c2) = (id.clone(), claim.clone());
+            let (id2, c2, copy) = (id.clone(), claim.clone(), body.copy);
             db::call(&state.pool, move |c| {
                 c.execute(
-                    "UPDATE upload_meta SET claim = ?2, touched_at = ?3 WHERE pack_id = ?1",
-                    params![id2, c2, db::now()],
+                    "UPDATE upload_meta SET claim = ?2, touched_at = ?3, merge_into = IIF(?4, NULL, merge_into)
+                      WHERE pack_id = ?1",
+                    params![id2, c2, db::now(), copy],
                 )?;
                 Ok(())
             })
             .await?;
-            let mut s = session_status(&state, &id).await?;
+            let mut s = session_status(&state, id).await?;
             s.resumed = true;
             s.claim = Some(claim);
             return Ok((StatusCode::OK, Json(s)).into_response());
         }
-        Some(Existing::Imported(pack)) if !body.force => {
+        Some(Existing::Imported(pack)) if !body.force && !body.copy => {
             let msg = tr!("error-already-imported", name = pack.name);
             return Ok((StatusCode::CONFLICT, Json(json!({ "error": msg, "pack": pack }))).into_response());
         }
         _ => {}
     }
 
+    let paths: Vec<String> = files.iter().map(|(p, _)| p.clone()).collect();
+    let asked = body.name.filter(|n| !n.trim().is_empty());
+    let auto_name = asked.is_none();
+    // A name made up from the date says nothing about which pack this is, so it goes into none.
+    let telling = asked.or_else(|| crate::api::pack_name_from_files(&paths));
+    let name = telling.clone().unwrap_or_else(|| crate::api::default_pack_name(&paths));
+    let merge_into = if body.copy {
+        None
+    } else {
+        let same = match &existing {
+            Some(Existing::Imported(pack)) => Some(pack.id.clone()),
+            _ => None,
+        };
+        db::call(&state.pool, move |c| merge_target(c, same.as_deref(), telling.as_deref())).await?
+    };
     let id = uuid::Uuid::now_v7().to_string();
     tokio::fs::create_dir_all(staging(&state, &id)).await?;
-    let paths: Vec<String> = files.iter().map(|(p, _)| p.clone()).collect();
-    let auto_name = body.name.as_deref().is_none_or(|n| n.trim().is_empty());
-    let name = body.name.filter(|n| !n.trim().is_empty()).unwrap_or_else(|| crate::api::default_pack_name(&paths));
     let claim = uuid::Uuid::new_v4().to_string();
     let (id2, c2) = (id.clone(), claim.clone());
     db::call(&state.pool, move |c| {
@@ -244,8 +292,8 @@ async fn create(State(state): State<AppState>, Json(body): Json<CreateBody>) -> 
             ],
         )?;
         tx.execute(
-            "INSERT INTO upload_meta (pack_id, auto_name, touched_at, claim) VALUES (?1, ?2, ?3, ?4)",
-            params![id2, auto_name, db::now(), c2],
+            "INSERT INTO upload_meta (pack_id, auto_name, touched_at, claim, merge_into) VALUES (?1, ?2, ?3, ?4, ?5)",
+            params![id2, auto_name, db::now(), c2, merge_into],
         )?;
         tx.execute("INSERT INTO import_keys (import_key, pack_id) VALUES (?1, ?2)", params![key, id2])?;
         {
@@ -527,15 +575,22 @@ async fn complete(State(state): State<AppState>, Path(id): Path<String>) -> ApiR
     }
     let id2 = id.clone();
     let pack = db::call(&state.pool, move |c| {
-        let auto_name: bool = c
-            .query_row("SELECT auto_name FROM upload_meta WHERE pack_id = ?1", [&id2], |r| r.get(0))
+        let (auto_name, target): (bool, Option<String>) = c
+            .query_row("SELECT auto_name, merge_into FROM upload_meta WHERE pack_id = ?1", [&id2], |r| {
+                Ok((r.get(0)?, r.get(1)?))
+            })
             .optional()?
-            .unwrap_or(true);
+            .unwrap_or((true, None));
         let tx = c.transaction()?;
+        if let Some(target) = target
+            && hand_over(&tx, &id2, &target)?
+        {
+            tx.commit()?;
+            tracing::info!(upload = %id2, pack = %target, "an upload goes into the pack it already is");
+            return db::get_pack(c, &target)?.context("pack vanished");
+        }
         tx.execute("UPDATE packs SET status = 'ingesting', files_done = 0 WHERE id = ?1", [&id2])?;
-        tx.execute("DELETE FROM upload_files WHERE pack_id = ?1", [&id2])?;
-        tx.execute("DELETE FROM upload_parts WHERE pack_id = ?1", [&id2])?;
-        tx.execute("DELETE FROM upload_meta WHERE pack_id = ?1", [&id2])?;
+        forget_upload(&tx, &id2)?;
         db::enqueue(&tx, jobs::INGEST, Some(&id2), &json!({ "auto_name": auto_name }))?;
         tx.commit()?;
         db::get_pack(c, &id2)?.context("pack vanished")
@@ -543,6 +598,34 @@ async fn complete(State(state): State<AppState>, Path(id): Path<String>) -> ApiR
     .await?;
     state.wake.notify_one();
     Ok((StatusCode::ACCEPTED, Json(pack)))
+}
+
+/// An upload's own rows, once its files are all there.
+fn forget_upload(tx: &rusqlite::Transaction<'_>, upload: &str) -> rusqlite::Result<()> {
+    for table in ["upload_files", "upload_parts", "upload_meta"] {
+        tx.execute(&format!("DELETE FROM {table} WHERE pack_id = ?1"), [upload])?;
+    }
+    Ok(())
+}
+
+/// A complete upload goes into `target`, if that's still there to go into (it may have been deleted or archived
+/// since): the upload stops being a pack of its own, and the pack reads its files from the upload's staging folder.
+fn hand_over(tx: &rusqlite::Transaction<'_>, upload: &str, target: &str) -> anyhow::Result<bool> {
+    if merge_target(tx, Some(target), None)?.is_none() {
+        return Ok(false);
+    }
+    tx.execute(
+        "INSERT OR IGNORE INTO import_keys (import_key, pack_id) SELECT import_key, ?2 FROM import_keys WHERE pack_id = ?1",
+        params![upload, target],
+    )?;
+    forget_upload(tx, upload)?;
+    db::delete_pack_in(tx, upload)?;
+    tx.execute(
+        "UPDATE packs SET status = 'ingesting', error = NULL WHERE id = ?1 AND status IN ('ready', 'failed')",
+        [target],
+    )?;
+    db::enqueue(tx, jobs::INGEST, Some(target), &json!({ "auto_name": false, "from": upload }))?;
+    Ok(true)
 }
 
 #[derive(Deserialize)]
@@ -635,12 +718,22 @@ pub(crate) fn sweep_stale(state: &AppState) -> anyhow::Result<usize> {
     for entry in std::fs::read_dir(state.cfg.staging_dir()).into_iter().flatten().flatten() {
         let name = entry.file_name().to_string_lossy().into_owned();
         let old = entry.metadata().and_then(|m| m.modified()).is_ok_and(|t| t.elapsed().is_ok_and(|age| age > max_age));
-        if old && db::get_pack(&conn, &name)?.is_none() {
+        if old && db::get_pack(&conn, &name)?.is_none() && !merging(&conn, &name)? {
             std::fs::remove_dir_all(entry.path()).ok();
             removed += 1;
         }
     }
     Ok(removed)
+}
+
+/// Whether an upload's files are waiting to go into a pack the library had already (see `complete`).
+fn merging(c: &rusqlite::Connection, upload: &str) -> anyhow::Result<bool> {
+    Ok(c.query_row(
+        "SELECT EXISTS (SELECT 1 FROM jobs WHERE kind = ?1 AND status IN ('queued', 'running')
+                          AND json_extract(payload, '$.from') = ?2)",
+        params![jobs::INGEST, upload],
+        |r| r.get(0),
+    )?)
 }
 
 /// Sweep abandoned uploads now and every hour.
@@ -655,5 +748,77 @@ pub(crate) async fn sweep_loop(state: AppState) {
             Ok(Err(e)) => tracing::warn!(error = %e, "could not sweep abandoned uploads"),
             Err(e) => tracing::warn!(error = %e, "the upload sweep stopped"),
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn pack(c: &rusqlite::Connection, id: &str, name: &str, status: &str, created: &str) {
+        c.execute(
+            "INSERT INTO packs (id, name, status, created_at) VALUES (?1, ?2, ?3, ?4)",
+            params![id, name, status, created],
+        )
+        .unwrap();
+    }
+
+    /// A pack uploaded again goes into the oldest pack by its name that Hoard keeps the files of, or the pack its very
+    /// files made, and never into an upload, an archived pack or a watched folder's.
+    #[test]
+    fn an_upload_goes_into_the_pack_the_library_has_already() {
+        let c = db::test_library();
+        pack(&c, "old", "Viking Village", "ready", "2026-01-01");
+        pack(&c, "new", "viking village", "failed", "2026-02-01");
+        pack(&c, "sending", "Castle", "uploading", "2026-01-01");
+        pack(&c, "shelved", "Market", "ready", "2026-01-01");
+        pack(&c, "watched", "Cathedral", "ready", "2026-01-01");
+        c.execute("UPDATE packs SET archived_at = 'x' WHERE id = 'shelved'", []).unwrap();
+        c.execute_batch(
+            "INSERT INTO locations (id, name, path, mode, created_at) VALUES (1, 'Disk', '/packs', 'watched', 'x');
+             UPDATE packs SET location_id = 1, folder = 'Cathedral' WHERE id = 'watched';",
+        )
+        .unwrap();
+        let target = |same: Option<&str>, name: Option<&str>| merge_target(&c, same, name).unwrap();
+        assert_eq!(target(None, Some("VIKING VILLAGE")).as_deref(), Some("old"));
+        assert_eq!(target(Some("new"), Some("Viking Village")).as_deref(), Some("new"));
+        for name in ["Castle", "Market", "Cathedral", "Elsewhere"] {
+            assert_eq!(target(None, Some(name)), None, "{name}");
+        }
+        assert_eq!(target(None, None), None);
+        assert_eq!(target(Some("watched"), Some("Viking Village")), None);
+    }
+
+    #[test]
+    fn a_complete_upload_hands_its_files_to_the_pack_it_goes_into() {
+        let mut c = db::test_library();
+        pack(&c, "pack", "Viking Village", "ready", "2026-01-01");
+        pack(&c, "upload", "Viking Village", "uploading", "2026-03-01");
+        c.execute_batch(
+            "INSERT INTO import_keys (import_key, pack_id) VALUES ('first', 'pack'), ('second', 'upload');
+             INSERT INTO upload_meta (pack_id, auto_name, touched_at, merge_into) VALUES ('upload', 1, 'x', 'pack');
+             INSERT INTO upload_files (pack_id, path, size, received) VALUES ('upload', 'a.png', 1, 1);",
+        )
+        .unwrap();
+        let tx = c.transaction().unwrap();
+        assert!(hand_over(&tx, "upload", "pack").unwrap());
+        tx.commit().unwrap();
+        let one = |sql: &str| -> String { c.query_row(sql, [], |r| r.get(0)).unwrap() };
+        assert_eq!(one("SELECT status FROM packs WHERE id = 'pack'"), "ingesting");
+        assert_eq!(one("SELECT count(*) || '' FROM packs WHERE id = 'upload'"), "0");
+        assert_eq!(
+            one("SELECT group_concat(import_key) FROM import_keys WHERE pack_id = 'pack' ORDER BY 1"),
+            "first,second"
+        );
+        assert_eq!(one("SELECT count(*) || '' FROM upload_files"), "0");
+        assert_eq!(
+            one("SELECT json_extract(payload, '$.from') FROM jobs WHERE kind = 'ingest' AND pack_id = 'pack'"),
+            "upload"
+        );
+        assert!(merging(&c, "upload").unwrap());
+        // Gone by the time the upload's done: it stays a pack of its own.
+        pack(&c, "again", "Market", "uploading", "2026-03-01");
+        let tx = c.transaction().unwrap();
+        assert!(!hand_over(&tx, "again", "deleted").unwrap());
     }
 }

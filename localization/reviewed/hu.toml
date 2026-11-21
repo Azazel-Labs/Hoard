@@ -11673,6 +11673,10 @@ translation = "{ $sent } / { $total }"
 source = "Cancel"
 translation = "Mégse"
 
+[messages.upload-copy]
+source = "Import as a copy"
+translation = "Importálás másolatként"
+
 [messages.upload-dismiss]
 source = "Dismiss"
 translation = "Elvetés"
@@ -11713,10 +11717,6 @@ translation = "feltöltés befejezése"
 source = "{ $what }: { $error } after { $attempts } attempts"
 translation = "{ $what }: { $error }, { $attempts } próbálkozás után"
 
-[messages.upload-import-again]
-source = "Import again anyway"
-translation = "Importálás mégis"
-
 [messages.upload-importing]
 source = "Importing { $count } packs"
 translation = "{ $count } csomag importálása"
@@ -11724,6 +11724,10 @@ translation = "{ $count } csomag importálása"
 [messages.upload-interrupted]
 source = "Interrupted"
 translation = "Megszakadt"
+
+[messages.upload-into]
+source = "Going into “{ $name }”, which is in the library already: new files are added and changed ones replaced."
+translation = "A már a könyvtárban lévő „{ $name }” csomagba kerül: az új fájlok hozzáadódnak, a módosultak lecserélődnek."
 
 [messages.upload-minimize]
 source = "Minimize"
@@ -11736,6 +11740,10 @@ translation = "hálózati hiba"
 [messages.upload-not-same]
 source = "Those aren’t the same files, so nothing was resumed."
 translation = "Ezek nem ugyanazok a fájlok, így semmi sem folytatódott."
+
+[messages.upload-own-pack]
+source = "Make it a pack of its own"
+translation = "Legyen külön csomag"
 
 [messages.upload-part-failed]
 source = "upload failed ({ $status })"
@@ -11796,6 +11804,10 @@ translation = "Leállítva"
 [messages.upload-unpacking]
 source = "Uploaded, now unpacking"
 translation = "Feltöltve, kicsomagolás folyamatban"
+
+[messages.upload-update]
+source = "Update “{ $name }”"
+translation = "„{ $name }” frissítése"
 
 [messages.upload-waiting]
 source = "Waiting"

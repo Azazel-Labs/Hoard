@@ -11885,6 +11885,10 @@ translation = "{ $sent } di { $total }"
 source = "Cancel"
 translation = "Annulla"
 
+[messages.upload-copy]
+source = "Import as a copy"
+translation = "Importa come copia"
+
 [messages.upload-dismiss]
 source = "Dismiss"
 translation = "Ignora"
@@ -11925,10 +11929,6 @@ translation = "completamento del caricamento"
 source = "{ $what }: { $error } after { $attempts } attempts"
 translation = "{ $what }: { $error } dopo { $attempts } tentativi"
 
-[messages.upload-import-again]
-source = "Import again anyway"
-translation = "Importa di nuovo comunque"
-
 [messages.upload-importing]
 source = "Importing { $count } packs"
 translation = "Importazione di { $count } pacchetti"
@@ -11936,6 +11936,10 @@ translation = "Importazione di { $count } pacchetti"
 [messages.upload-interrupted]
 source = "Interrupted"
 translation = "Interrotta"
+
+[messages.upload-into]
+source = "Going into “{ $name }”, which is in the library already: new files are added and changed ones replaced."
+translation = "Va in «{ $name }», che è già nella libreria: i file nuovi vengono aggiunti e quelli modificati sostituiti."
 
 [messages.upload-minimize]
 source = "Minimize"
@@ -11948,6 +11952,10 @@ translation = "errore di rete"
 [messages.upload-not-same]
 source = "Those aren’t the same files, so nothing was resumed."
 translation = "Non sono gli stessi file, quindi non è stato ripreso nulla."
+
+[messages.upload-own-pack]
+source = "Make it a pack of its own"
+translation = "Rendilo un pacchetto a sé"
 
 [messages.upload-part-failed]
 source = "upload failed ({ $status })"
@@ -12008,6 +12016,10 @@ translation = "Interrotto"
 [messages.upload-unpacking]
 source = "Uploaded, now unpacking"
 translation = "Caricato, ora in estrazione"
+
+[messages.upload-update]
+source = "Update “{ $name }”"
+translation = "Aggiorna «{ $name }»"
 
 [messages.upload-waiting]
 source = "Waiting"

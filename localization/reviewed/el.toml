@@ -11952,6 +11952,10 @@ translation = "{ $sent } από { $total }"
 source = "Cancel"
 translation = "Ακύρωση"
 
+[messages.upload-copy]
+source = "Import as a copy"
+translation = "Εισαγωγή ως αντίγραφο"
+
 [messages.upload-dismiss]
 source = "Dismiss"
 translation = "Απόρριψη"
@@ -11992,10 +11996,6 @@ translation = "ολοκλήρωση μεταφόρτωσης"
 source = "{ $what }: { $error } after { $attempts } attempts"
 translation = "{ $what }: { $error } μετά από { $attempts } προσπάθειες"
 
-[messages.upload-import-again]
-source = "Import again anyway"
-translation = "Εισαγωγή ξανά παρ' όλα αυτά"
-
 [messages.upload-importing]
 source = "Importing { $count } packs"
 translation = """
@@ -12008,6 +12008,10 @@ translation = """
 source = "Interrupted"
 translation = "Διακόπηκε"
 
+[messages.upload-into]
+source = "Going into “{ $name }”, which is in the library already: new files are added and changed ones replaced."
+translation = "Προστίθεται στο «{ $name }», που υπάρχει ήδη στη βιβλιοθήκη: τα νέα αρχεία προστίθενται και όσα άλλαξαν αντικαθίστανται."
+
 [messages.upload-minimize]
 source = "Minimize"
 translation = "Ελαχιστοποίηση"
@@ -12019,6 +12023,10 @@ translation = "σφάλμα δικτύου"
 [messages.upload-not-same]
 source = "Those aren’t the same files, so nothing was resumed."
 translation = "Δεν είναι τα ίδια αρχεία, οπότε δεν συνεχίστηκε τίποτα."
+
+[messages.upload-own-pack]
+source = "Make it a pack of its own"
+translation = "Να γίνει ξεχωριστό πακέτο"
 
 [messages.upload-part-failed]
 source = "upload failed ({ $status })"
@@ -12079,6 +12087,10 @@ translation = "Διακόπηκε"
 [messages.upload-unpacking]
 source = "Uploaded, now unpacking"
 translation = "Μεταφορτώθηκε, αποσυμπίεση"
+
+[messages.upload-update]
+source = "Update “{ $name }”"
+translation = "Ενημέρωση «{ $name }»"
 
 [messages.upload-waiting]
 source = "Waiting"

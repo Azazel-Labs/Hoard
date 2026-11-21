@@ -11663,6 +11663,10 @@ translation = "{ $sent } / { $total }"
 source = "Cancel"
 translation = "キャンセル"
 
+[messages.upload-copy]
+source = "Import as a copy"
+translation = "コピーとしてインポート"
+
 [messages.upload-dismiss]
 source = "Dismiss"
 translation = "閉じる"
@@ -11703,10 +11707,6 @@ translation = "アップロードの完了処理"
 source = "{ $what }: { $error } after { $attempts } attempts"
 translation = "{ $what }: { $attempts } 回試しましたが失敗しました（{ $error }）"
 
-[messages.upload-import-again]
-source = "Import again anyway"
-translation = "それでもインポートする"
-
 [messages.upload-importing]
 source = "Importing { $count } packs"
 translation = "{ $count } 個のパックをインポート中"
@@ -11714,6 +11714,10 @@ translation = "{ $count } 個のパックをインポート中"
 [messages.upload-interrupted]
 source = "Interrupted"
 translation = "中断されました"
+
+[messages.upload-into]
+source = "Going into “{ $name }”, which is in the library already: new files are added and changed ones replaced."
+translation = "すでにライブラリにある「{ $name }」に入ります。新しいファイルは追加され、変更されたファイルは置き換えられます。"
 
 [messages.upload-minimize]
 source = "Minimize"
@@ -11726,6 +11730,10 @@ translation = "ネットワークエラー"
 [messages.upload-not-same]
 source = "Those aren’t the same files, so nothing was resumed."
 translation = "同じファイルではないため、何も再開されませんでした。"
+
+[messages.upload-own-pack]
+source = "Make it a pack of its own"
+translation = "別のパックにする"
 
 [messages.upload-part-failed]
 source = "upload failed ({ $status })"
@@ -11786,6 +11794,10 @@ translation = "停止しました"
 [messages.upload-unpacking]
 source = "Uploaded, now unpacking"
 translation = "アップロード完了、展開中"
+
+[messages.upload-update]
+source = "Update “{ $name }”"
+translation = "「{ $name }」を更新"
 
 [messages.upload-waiting]
 source = "Waiting"

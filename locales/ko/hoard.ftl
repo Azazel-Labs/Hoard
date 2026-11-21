@@ -1037,7 +1037,12 @@ upload-resumed = 이어서 올림, { $size }는 이미 있었음
 upload-skipped = 똑같은 파일들을 이미 “{ $name }”(으)로 가져와서 건너뛰었습니다.
 upload-error = { $error }. 진행 상황은 유지됩니다. 다시 시도하거나 나중에 같은 파일을 다시 놓으세요.
 upload-retry = 다시 시도
-upload-import-again = 그래도 다시 가져오기
+# $name is the pack the library has already that these files go into.
+upload-update = “{ $name }” 업데이트
+upload-copy = 사본으로 가져오기
+# $name is the pack the library has already that the upload goes into.
+upload-into = 이미 라이브러리에 있는 “{ $name }”에 들어갑니다. 새 파일은 추가되고 변경된 파일은 교체됩니다.
+upload-own-pack = 별도의 팩으로 만들기
 upload-dismiss = 닫기
 upload-cancel = 취소
 upload-minimize = 최소화

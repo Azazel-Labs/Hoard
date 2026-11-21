@@ -1045,7 +1045,12 @@ upload-resumed = devam edildi, { $size } zaten oradaydı
 upload-skipped = Bu dosyaların aynısı zaten “{ $name }” olarak içe aktarılmıştı, bu yüzden atlandı.
 upload-error = { $error }. İlerlemeniz korunuyor: yeniden deneyin ya da aynı dosyaları daha sonra yeniden bırakın.
 upload-retry = Yeniden dene
-upload-import-again = Yine de yeniden içe aktar
+# $name is the pack the library has already that these files go into.
+upload-update = “{ $name }” paketini güncelle
+upload-copy = Kopya olarak içe aktar
+# $name is the pack the library has already that the upload goes into.
+upload-into = Zaten kütüphanede olan “{ $name }” paketine ekleniyor: yeni dosyalar eklenir, değişmiş olanlar yenisiyle değiştirilir.
+upload-own-pack = Ayrı bir paket yap
 upload-dismiss = Kapat
 upload-cancel = İptal
 upload-minimize = Küçült

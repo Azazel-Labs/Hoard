@@ -1261,7 +1261,12 @@ upload-skipped = These exact files were already imported as “{ $name }”, so 
 # $error is why the upload stopped.
 upload-error = { $error }. Your progress is kept: retry, or drop the same files again later.
 upload-retry = Retry
-upload-import-again = Import again anyway
+# $name is the pack the library has already that these files go into.
+upload-update = Update “{ $name }”
+upload-copy = Import as a copy
+# $name is the pack the library has already that the upload goes into.
+upload-into = Going into “{ $name }”, which is in the library already: new files are added and changed ones replaced.
+upload-own-pack = Make it a pack of its own
 upload-dismiss = Dismiss
 upload-cancel = Cancel
 upload-minimize = Minimize

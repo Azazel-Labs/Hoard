@@ -133,8 +133,11 @@ async fn run(state: &AppState, job: db::JobRow) {
         match job.kind.as_str() {
             INGEST => {
                 let auto_name = job.payload.get("auto_name").and_then(serde_json::Value::as_bool).unwrap_or(false);
+                // An upload going into a pack the library had already: its files are in that upload's staging folder.
+                let from = job.payload.get("from").and_then(serde_json::Value::as_str).map(str::to_owned);
                 let pid = pack_id.clone();
-                let done = blocking(state, move |s, rt| ingest::ingest_pack(s, rt, &pid, auto_name)).await;
+                let done =
+                    blocking(state, move |s, rt| ingest::ingest_pack(s, rt, &pid, auto_name, from.as_deref())).await;
                 if done.is_ok() {
                     crate::context::fill_store_text(state, &pack_id).await;
                     crate::store_lookup::start(state).await;

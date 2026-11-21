@@ -1196,7 +1196,12 @@ upload-resumed = reluat, { $size } erau deja acolo
 upload-skipped = Exact aceste fișiere au fost deja importate ca „{ $name }”, așa că au fost omise.
 upload-error = { $error }. Progresul este păstrat: reîncercați sau plasați aceleași fișiere din nou mai târziu.
 upload-retry = Reîncercați
-upload-import-again = Importați din nou oricum
+# $name is the pack the library has already that these files go into.
+upload-update = Actualizați „{ $name }”
+upload-copy = Importați ca copie
+# $name is the pack the library has already that the upload goes into.
+upload-into = Intră în „{ $name }”, care este deja în bibliotecă: fișierele noi se adaugă, iar cele modificate se înlocuiesc.
+upload-own-pack = Faceți-l un pachet separat
 upload-dismiss = Închideți
 upload-cancel = Anulați
 upload-minimize = Minimizează

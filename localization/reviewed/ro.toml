@@ -12088,6 +12088,10 @@ translation = "{ $sent } din { $total }"
 source = "Cancel"
 translation = "Anulați"
 
+[messages.upload-copy]
+source = "Import as a copy"
+translation = "Importați ca copie"
+
 [messages.upload-dismiss]
 source = "Dismiss"
 translation = "Închideți"
@@ -12138,10 +12142,6 @@ translation = """
        *[other] { $what }: { $error } după { $attempts } de încercări
     }"""
 
-[messages.upload-import-again]
-source = "Import again anyway"
-translation = "Importați din nou oricum"
-
 [messages.upload-importing]
 source = "Importing { $count } packs"
 translation = """
@@ -12155,6 +12155,10 @@ translation = """
 source = "Interrupted"
 translation = "Întrerupt"
 
+[messages.upload-into]
+source = "Going into “{ $name }”, which is in the library already: new files are added and changed ones replaced."
+translation = "Intră în „{ $name }”, care este deja în bibliotecă: fișierele noi se adaugă, iar cele modificate se înlocuiesc."
+
 [messages.upload-minimize]
 source = "Minimize"
 translation = "Minimizează"
@@ -12166,6 +12170,10 @@ translation = "eroare de rețea"
 [messages.upload-not-same]
 source = "Those aren’t the same files, so nothing was resumed."
 translation = "Nu sunt aceleași fișiere, așa că nu s-a reluat nimic."
+
+[messages.upload-own-pack]
+source = "Make it a pack of its own"
+translation = "Faceți-l un pachet separat"
 
 [messages.upload-part-failed]
 source = "upload failed ({ $status })"
@@ -12226,6 +12234,10 @@ translation = "Oprit"
 [messages.upload-unpacking]
 source = "Uploaded, now unpacking"
 translation = "Încărcat, acum se dezarhivează"
+
+[messages.upload-update]
+source = "Update “{ $name }”"
+translation = "Actualizați „{ $name }”"
 
 [messages.upload-waiting]
 source = "Waiting"

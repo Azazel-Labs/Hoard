@@ -11652,6 +11652,10 @@ translation = "{ $sent }／{ $total }"
 source = "Cancel"
 translation = "取消"
 
+[messages.upload-copy]
+source = "Import as a copy"
+translation = "匯入為副本"
+
 [messages.upload-dismiss]
 source = "Dismiss"
 translation = "略過"
@@ -11692,10 +11696,6 @@ translation = "完成上傳"
 source = "{ $what }: { $error } after { $attempts } attempts"
 translation = "{ $what }：嘗試 { $attempts } 次後仍失敗：{ $error }"
 
-[messages.upload-import-again]
-source = "Import again anyway"
-translation = "仍要再次匯入"
-
 [messages.upload-importing]
 source = "Importing { $count } packs"
 translation = "正在匯入 { $count } 個素材包"
@@ -11703,6 +11703,10 @@ translation = "正在匯入 { $count } 個素材包"
 [messages.upload-interrupted]
 source = "Interrupted"
 translation = "已中斷"
+
+[messages.upload-into]
+source = "Going into “{ $name }”, which is in the library already: new files are added and changed ones replaced."
+translation = "將併入素材庫中已有的「{ $name }」：新檔案會加入，已變更的檔案會被取代。"
 
 [messages.upload-minimize]
 source = "Minimize"
@@ -11715,6 +11719,10 @@ translation = "網路錯誤"
 [messages.upload-not-same]
 source = "Those aren’t the same files, so nothing was resumed."
 translation = "這些不是相同的檔案，因此沒有繼續任何匯入。"
+
+[messages.upload-own-pack]
+source = "Make it a pack of its own"
+translation = "另成一個素材包"
 
 [messages.upload-part-failed]
 source = "upload failed ({ $status })"
@@ -11775,6 +11783,10 @@ translation = "已停止"
 [messages.upload-unpacking]
 source = "Uploaded, now unpacking"
 translation = "已上傳，正在解壓縮"
+
+[messages.upload-update]
+source = "Update “{ $name }”"
+translation = "更新「{ $name }」"
 
 [messages.upload-waiting]
 source = "Waiting"

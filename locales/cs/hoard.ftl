@@ -1191,7 +1191,12 @@ upload-resumed = obnoveno, { $size } už bylo na serveru
 upload-skipped = Přesně tyto soubory už byly importovány jako „{ $name }“, takže byly přeskočeny.
 upload-error = { $error }. Váš postup zůstává uložený: zkuste to znovu, nebo stejné soubory přetáhněte znovu později.
 upload-retry = Zkusit znovu
-upload-import-again = Přesto importovat znovu
+# $name is the pack the library has already that these files go into.
+upload-update = Aktualizovat „{ $name }“
+upload-copy = Importovat jako kopii
+# $name is the pack the library has already that the upload goes into.
+upload-into = Přidává se do balíčku „{ $name }“, který už v knihovně je: nové soubory se přidají a změněné se nahradí.
+upload-own-pack = Udělat z toho samostatný balíček
 upload-dismiss = Skrýt
 upload-cancel = Zrušit
 upload-minimize = Minimalizovat

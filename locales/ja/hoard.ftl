@@ -1037,7 +1037,12 @@ upload-resumed = 再開しました。{ $size } はすでに送信済みでし�
 upload-skipped = まったく同じファイルが「{ $name }」としてインポート済みのため、スキップしました。
 upload-error = { $error }。進行状況は保存されています。再試行するか、後で同じファイルをもう一度ドロップしてください。
 upload-retry = 再試行
-upload-import-again = それでもインポートする
+# $name is the pack the library has already that these files go into.
+upload-update = 「{ $name }」を更新
+upload-copy = コピーとしてインポート
+# $name is the pack the library has already that the upload goes into.
+upload-into = すでにライブラリにある「{ $name }」に入ります。新しいファイルは追加され、変更されたファイルは置き換えられます。
+upload-own-pack = 別のパックにする
 upload-dismiss = 閉じる
 upload-cancel = キャンセル
 upload-minimize = 最小化

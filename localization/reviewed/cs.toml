@@ -12098,6 +12098,10 @@ translation = "{ $sent } z { $total }"
 source = "Cancel"
 translation = "Zrušit"
 
+[messages.upload-copy]
+source = "Import as a copy"
+translation = "Importovat jako kopii"
+
 [messages.upload-dismiss]
 source = "Dismiss"
 translation = "Skrýt"
@@ -12143,10 +12147,6 @@ translation = """
        *[other] { $attempts } pokusech
     }"""
 
-[messages.upload-import-again]
-source = "Import again anyway"
-translation = "Přesto importovat znovu"
-
 [messages.upload-importing]
 source = "Importing { $count } packs"
 translation = """
@@ -12160,6 +12160,10 @@ translation = """
 source = "Interrupted"
 translation = "Přerušeno"
 
+[messages.upload-into]
+source = "Going into “{ $name }”, which is in the library already: new files are added and changed ones replaced."
+translation = "Přidává se do balíčku „{ $name }“, který už v knihovně je: nové soubory se přidají a změněné se nahradí."
+
 [messages.upload-minimize]
 source = "Minimize"
 translation = "Minimalizovat"
@@ -12171,6 +12175,10 @@ translation = "chyba sítě"
 [messages.upload-not-same]
 source = "Those aren’t the same files, so nothing was resumed."
 translation = "Nejsou to stejné soubory, takže se nic neobnovilo."
+
+[messages.upload-own-pack]
+source = "Make it a pack of its own"
+translation = "Udělat z toho samostatný balíček"
 
 [messages.upload-part-failed]
 source = "upload failed ({ $status })"
@@ -12231,6 +12239,10 @@ translation = "Zastaveno"
 [messages.upload-unpacking]
 source = "Uploaded, now unpacking"
 translation = "Nahráno, teď se rozbaluje"
+
+[messages.upload-update]
+source = "Update “{ $name }”"
+translation = "Aktualizovat „{ $name }“"
 
 [messages.upload-waiting]
 source = "Waiting"

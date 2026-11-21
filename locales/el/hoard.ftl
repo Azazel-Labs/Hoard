@@ -1152,7 +1152,12 @@ upload-resumed = συνέχιση, { $size } υπήρχαν ήδη
 upload-skipped = Αυτά ακριβώς τα αρχεία είχαν ήδη εισαχθεί ως «{ $name }», οπότε παραλείφθηκαν.
 upload-error = { $error }. Η πρόοδός σας διατηρείται: δοκιμάστε ξανά ή αφήστε τα ίδια αρχεία ξανά αργότερα.
 upload-retry = Επανάληψη
-upload-import-again = Εισαγωγή ξανά παρ' όλα αυτά
+# $name is the pack the library has already that these files go into.
+upload-update = Ενημέρωση «{ $name }»
+upload-copy = Εισαγωγή ως αντίγραφο
+# $name is the pack the library has already that the upload goes into.
+upload-into = Προστίθεται στο «{ $name }», που υπάρχει ήδη στη βιβλιοθήκη: τα νέα αρχεία προστίθενται και όσα άλλαξαν αντικαθίστανται.
+upload-own-pack = Να γίνει ξεχωριστό πακέτο
 upload-dismiss = Απόρριψη
 upload-cancel = Ακύρωση
 upload-minimize = Ελαχιστοποίηση

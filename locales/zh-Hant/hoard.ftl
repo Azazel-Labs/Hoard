@@ -1043,7 +1043,12 @@ upload-resumed = 已接續上傳，已有 { $size } 在伺服器上
 upload-skipped = 這些完全相同的檔案已匯入為「{ $name }」，因此已略過。
 upload-error = { $error }。你的進度已保留：請重試，或稍後再次拖放相同的檔案。
 upload-retry = 重試
-upload-import-again = 仍要再次匯入
+# $name is the pack the library has already that these files go into.
+upload-update = 更新「{ $name }」
+upload-copy = 匯入為副本
+# $name is the pack the library has already that the upload goes into.
+upload-into = 將併入素材庫中已有的「{ $name }」：新檔案會加入，已變更的檔案會被取代。
+upload-own-pack = 另成一個素材包
 upload-dismiss = 略過
 upload-cancel = 取消
 upload-minimize = 最小化

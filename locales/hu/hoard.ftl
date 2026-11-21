@@ -1045,7 +1045,12 @@ upload-resumed = folytatva, { $size } már megvolt
 upload-skipped = Pontosan ezeket a fájlokat már importálták „{ $name }” néven, ezért kimaradtak.
 upload-error = { $error }. A haladás megmarad: próbálja újra, vagy húzza ide később ugyanazokat a fájlokat.
 upload-retry = Újra
-upload-import-again = Importálás mégis
+# $name is the pack the library has already that these files go into.
+upload-update = „{ $name }” frissítése
+upload-copy = Importálás másolatként
+# $name is the pack the library has already that the upload goes into.
+upload-into = A már a könyvtárban lévő „{ $name }” csomagba kerül: az új fájlok hozzáadódnak, a módosultak lecserélődnek.
+upload-own-pack = Legyen külön csomag
 upload-dismiss = Elvetés
 upload-cancel = Mégse
 upload-minimize = Kis méret

@@ -911,4 +911,7 @@ pub(in crate::db) const MIGRATIONS: &[&str] = &[
        AND asset_id IN (SELECT id FROM assets WHERE kind = 'animation' AND ext = 'fbx');
      UPDATE assets SET meta = json_set(meta, '$.take_from', '')
        WHERE json_extract(meta, '$.take_of') IN (SELECT id FROM assets WHERE ext = 'fbx');",
+    // 88: a pack uploaded again goes into the pack it already is (new files added, changed ones replaced) instead of
+    // becoming a copy; the upload remembers which pack it's for until it's complete.
+    "ALTER TABLE upload_meta ADD COLUMN merge_into TEXT;",
 ];

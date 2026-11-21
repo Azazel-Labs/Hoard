@@ -33,6 +33,8 @@ interface Session {
   part_bytes: number
   /** This registration's hold on the session, to cancel it with. */
   claim?: string
+  /** The pack the library has already that the upload goes into (new files added, changed ones replaced). */
+  merge_into?: Pack
 }
 
 function headers(extra: Record<string, string> = {}): Record<string, string> {
@@ -115,16 +117,23 @@ export async function uploadPackResumable(
   name: string | undefined,
   onProgress: (p: Progress) => void,
   signal: AbortSignal,
-  options: { force?: boolean; onSession?: (id: string, claim?: string) => void } = {},
+  options: {
+    force?: boolean
+    /** Make a pack of its own even when the library has this pack already. */
+    copy?: boolean
+    onSession?: (id: string, claim?: string, into?: Pack) => void
+  } = {},
 ): Promise<Pack> {
   const force = options.force ?? false
+  const copy = options.copy ?? false
   const onSession = options.onSession ?? (() => undefined)
   // The server fingerprints the file list: the same list resumes its open session (from any browser), and a list
-  // that's already imported is refused unless forced.
+  // that's already imported is refused unless forced. A pack the library has already (by name, or these very files
+  // when forced) is added to rather than copied, unless asked for a copy.
   const res = await fetch('/api/uploads', {
     method: 'POST',
     headers: headers({ 'Content-Type': 'application/json' }),
-    body: JSON.stringify({ name, force, files: files.map((f) => ({ path: f.path, size: f.file.size })) }),
+    body: JSON.stringify({ name, force, copy, files: files.map((f) => ({ path: f.path, size: f.file.size })) }),
     signal,
   })
   if (res.status === 409) {
@@ -132,7 +141,7 @@ export async function uploadPackResumable(
     if (body.pack) throw new AlreadyImported(body.pack, body.error ?? t('upload-already-imported'))
   }
   const session = await json<Session & { resumed: boolean }>(res)
-  onSession(session.pack.id, session.claim)
+  onSession(session.pack.id, session.claim, session.merge_into)
   const id = session.pack.id
   const base = `/api/uploads/${id}`
 

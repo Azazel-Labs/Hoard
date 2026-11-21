@@ -1037,7 +1037,12 @@ upload-resumed = อัปโหลดต่อ มีอยู่แล้ว {
 upload-skipped = ไฟล์ชุดเดียวกันนี้เคยนำเข้าแล้วในชื่อ “{ $name }” จึงข้ามไป
 upload-error = { $error } ความคืบหน้าของคุณยังอยู่: ลองใหม่ หรือวางไฟล์ชุดเดิมอีกครั้งในภายหลัง
 upload-retry = ลองใหม่
-upload-import-again = นำเข้าอีกครั้งอยู่ดี
+# $name is the pack the library has already that these files go into.
+upload-update = อัปเดต “{ $name }”
+upload-copy = นำเข้าเป็นสำเนา
+# $name is the pack the library has already that the upload goes into.
+upload-into = กำลังเข้าไปใน “{ $name }” ซึ่งมีอยู่ในคลังแล้ว ไฟล์ใหม่จะถูกเพิ่มและไฟล์ที่เปลี่ยนจะถูกแทนที่
+upload-own-pack = แยกเป็นแพ็กของตัวเอง
 upload-dismiss = ปิด
 upload-cancel = ยกเลิก
 upload-minimize = ย่อ

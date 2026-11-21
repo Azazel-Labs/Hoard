@@ -11663,6 +11663,10 @@ translation = "{ $sent } / { $total }"
 source = "Cancel"
 translation = "取消"
 
+[messages.upload-copy]
+source = "Import as a copy"
+translation = "作为副本导入"
+
 [messages.upload-dismiss]
 source = "Dismiss"
 translation = "忽略"
@@ -11703,10 +11707,6 @@ translation = "完成上传"
 source = "{ $what }: { $error } after { $attempts } attempts"
 translation = "{ $what }：尝试 { $attempts } 次后仍失败：{ $error }"
 
-[messages.upload-import-again]
-source = "Import again anyway"
-translation = "仍然重新导入"
-
 [messages.upload-importing]
 source = "Importing { $count } packs"
 translation = "正在导入 { $count } 个资源包"
@@ -11714,6 +11714,10 @@ translation = "正在导入 { $count } 个资源包"
 [messages.upload-interrupted]
 source = "Interrupted"
 translation = "已中断"
+
+[messages.upload-into]
+source = "Going into “{ $name }”, which is in the library already: new files are added and changed ones replaced."
+translation = "将并入资源库中已有的“{ $name }”：新文件会被添加，已更改的文件会被替换。"
 
 [messages.upload-minimize]
 source = "Minimize"
@@ -11726,6 +11730,10 @@ translation = "网络错误"
 [messages.upload-not-same]
 source = "Those aren’t the same files, so nothing was resumed."
 translation = "这些不是相同的文件，因此没有继续任何导入。"
+
+[messages.upload-own-pack]
+source = "Make it a pack of its own"
+translation = "单独作为一个资源包"
 
 [messages.upload-part-failed]
 source = "upload failed ({ $status })"
@@ -11786,6 +11794,10 @@ translation = "已停止"
 [messages.upload-unpacking]
 source = "Uploaded, now unpacking"
 translation = "已上传，正在解压"
+
+[messages.upload-update]
+source = "Update “{ $name }”"
+translation = "更新“{ $name }”"
 
 [messages.upload-waiting]
 source = "Waiting"

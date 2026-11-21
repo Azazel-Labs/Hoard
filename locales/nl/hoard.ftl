@@ -1116,7 +1116,12 @@ upload-resumed = hervat, { $size } was er al
 upload-skipped = Precies deze bestanden waren al geïmporteerd als “{ $name }”, dus ze zijn overgeslagen.
 upload-error = { $error }. Je voortgang blijft bewaard: probeer het opnieuw, of zet later dezelfde bestanden nog eens neer.
 upload-retry = Opnieuw proberen
-upload-import-again = Toch opnieuw importeren
+# $name is the pack the library has already that these files go into.
+upload-update = “{ $name }” bijwerken
+upload-copy = Als kopie importeren
+# $name is the pack the library has already that the upload goes into.
+upload-into = Gaat naar “{ $name }”, dat al in de bibliotheek staat: nieuwe bestanden worden toegevoegd en gewijzigde vervangen.
+upload-own-pack = Er een eigen pakket van maken
 upload-dismiss = Sluiten
 upload-cancel = Annuleren
 upload-minimize = Minimaliseren

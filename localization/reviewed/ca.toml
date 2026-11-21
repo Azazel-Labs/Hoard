@@ -11873,6 +11873,10 @@ translation = "{ $sent } de { $total }"
 source = "Cancel"
 translation = "Cancel·la"
 
+[messages.upload-copy]
+source = "Import as a copy"
+translation = "Importa com a còpia"
+
 [messages.upload-dismiss]
 source = "Dismiss"
 translation = "Descarta"
@@ -11913,10 +11917,6 @@ translation = "acabar la pujada"
 source = "{ $what }: { $error } after { $attempts } attempts"
 translation = "{ $what }: { $error } després de { $attempts } intents"
 
-[messages.upload-import-again]
-source = "Import again anyway"
-translation = "Importa igualment"
-
 [messages.upload-importing]
 source = "Importing { $count } packs"
 translation = "S'estan important { $count } paquets"
@@ -11924,6 +11924,10 @@ translation = "S'estan important { $count } paquets"
 [messages.upload-interrupted]
 source = "Interrupted"
 translation = "Interrompuda"
+
+[messages.upload-into]
+source = "Going into “{ $name }”, which is in the library already: new files are added and changed ones replaced."
+translation = "Va a «{ $name }», que ja és a la biblioteca: s'hi afegeixen els fitxers nous i se substitueixen els que han canviat."
 
 [messages.upload-minimize]
 source = "Minimize"
@@ -11936,6 +11940,10 @@ translation = "error de xarxa"
 [messages.upload-not-same]
 source = "Those aren’t the same files, so nothing was resumed."
 translation = "No són els mateixos fitxers, així que no s’ha reprès res."
+
+[messages.upload-own-pack]
+source = "Make it a pack of its own"
+translation = "Fes-ne un paquet propi"
 
 [messages.upload-part-failed]
 source = "upload failed ({ $status })"
@@ -11996,6 +12004,10 @@ translation = "Aturat"
 [messages.upload-unpacking]
 source = "Uploaded, now unpacking"
 translation = "Pujat, ara s'està descomprimint"
+
+[messages.upload-update]
+source = "Update “{ $name }”"
+translation = "Actualitza «{ $name }»"
 
 [messages.upload-waiting]
 source = "Waiting"

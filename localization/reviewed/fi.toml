@@ -11950,6 +11950,10 @@ translation = "{ $sent } / { $total }"
 source = "Cancel"
 translation = "Peruuta"
 
+[messages.upload-copy]
+source = "Import as a copy"
+translation = "Tuo kopiona"
+
 [messages.upload-dismiss]
 source = "Dismiss"
 translation = "Kuittaa"
@@ -11990,10 +11994,6 @@ translation = "lähetyksen viimeistely"
 source = "{ $what }: { $error } after { $attempts } attempts"
 translation = "{ $what }: { $error } ({ $attempts } yrityksen jälkeen)"
 
-[messages.upload-import-again]
-source = "Import again anyway"
-translation = "Tuo silti uudelleen"
-
 [messages.upload-importing]
 source = "Importing { $count } packs"
 translation = """
@@ -12006,6 +12006,10 @@ translation = """
 source = "Interrupted"
 translation = "Keskeytynyt"
 
+[messages.upload-into]
+source = "Going into “{ $name }”, which is in the library already: new files are added and changed ones replaced."
+translation = "Menee pakettiin ”{ $name }”, joka on jo kirjastossa: uudet tiedostot lisätään ja muuttuneet korvataan."
+
 [messages.upload-minimize]
 source = "Minimize"
 translation = "Pienennä"
@@ -12017,6 +12021,10 @@ translation = "verkkovirhe"
 [messages.upload-not-same]
 source = "Those aren’t the same files, so nothing was resumed."
 translation = "Nämä eivät ole samat tiedostot, joten mitään ei jatkettu."
+
+[messages.upload-own-pack]
+source = "Make it a pack of its own"
+translation = "Tee siitä oma paketti"
 
 [messages.upload-part-failed]
 source = "upload failed ({ $status })"
@@ -12077,6 +12085,10 @@ translation = "Pysäytetty"
 [messages.upload-unpacking]
 source = "Uploaded, now unpacking"
 translation = "Lähetetty, puretaan"
+
+[messages.upload-update]
+source = "Update “{ $name }”"
+translation = "Päivitä ”{ $name }”"
 
 [messages.upload-waiting]
 source = "Waiting"

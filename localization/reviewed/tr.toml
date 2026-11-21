@@ -11677,6 +11677,10 @@ translation = "{ $sent } / { $total }"
 source = "Cancel"
 translation = "İptal"
 
+[messages.upload-copy]
+source = "Import as a copy"
+translation = "Kopya olarak içe aktar"
+
 [messages.upload-dismiss]
 source = "Dismiss"
 translation = "Kapat"
@@ -11717,10 +11721,6 @@ translation = "yüklemeyi bitirme"
 source = "{ $what }: { $error } after { $attempts } attempts"
 translation = "{ $what }: { $error } ({ $attempts } denemeden sonra)"
 
-[messages.upload-import-again]
-source = "Import again anyway"
-translation = "Yine de yeniden içe aktar"
-
 [messages.upload-importing]
 source = "Importing { $count } packs"
 translation = "{ $count } paket içe aktarılıyor"
@@ -11728,6 +11728,10 @@ translation = "{ $count } paket içe aktarılıyor"
 [messages.upload-interrupted]
 source = "Interrupted"
 translation = "Kesildi"
+
+[messages.upload-into]
+source = "Going into “{ $name }”, which is in the library already: new files are added and changed ones replaced."
+translation = "Zaten kütüphanede olan “{ $name }” paketine ekleniyor: yeni dosyalar eklenir, değişmiş olanlar yenisiyle değiştirilir."
 
 [messages.upload-minimize]
 source = "Minimize"
@@ -11740,6 +11744,10 @@ translation = "ağ hatası"
 [messages.upload-not-same]
 source = "Those aren’t the same files, so nothing was resumed."
 translation = "Bunlar aynı dosyalar değil, bu yüzden hiçbir şey sürdürülmedi."
+
+[messages.upload-own-pack]
+source = "Make it a pack of its own"
+translation = "Ayrı bir paket yap"
 
 [messages.upload-part-failed]
 source = "upload failed ({ $status })"
@@ -11800,6 +11808,10 @@ translation = "Durduruldu"
 [messages.upload-unpacking]
 source = "Uploaded, now unpacking"
 translation = "Yüklendi, şimdi açılıyor"
+
+[messages.upload-update]
+source = "Update “{ $name }”"
+translation = "“{ $name }” paketini güncelle"
 
 [messages.upload-waiting]
 source = "Waiting"

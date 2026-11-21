@@ -1116,7 +1116,12 @@ upload-resumed = hervat, { $size } was reeds daar
 upload-skipped = Presies hierdie lêers is reeds as “{ $name }” ingevoer, dus is hulle oorgeslaan.
 upload-error = { $error }. Jou vordering word gehou: probeer weer, of laat later dieselfde lêers weer val.
 upload-retry = Probeer weer
-upload-import-again = Voer in elk geval weer in
+# $name is the pack the library has already that these files go into.
+upload-update = Werk “{ $name }” by
+upload-copy = Voer in as 'n kopie
+# $name is the pack the library has already that the upload goes into.
+upload-into = Gaan in “{ $name }” in, wat reeds in die biblioteek is: nuwe lêers word bygevoeg en veranderde lêers vervang.
+upload-own-pack = Maak dit 'n eie pak
 upload-dismiss = Wys weg
 upload-cancel = Kanselleer
 upload-minimize = Minimeer

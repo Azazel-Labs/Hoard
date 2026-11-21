@@ -11998,6 +11998,10 @@ translation = "{ $sent } од { $total }"
 source = "Cancel"
 translation = "Откажи"
 
+[messages.upload-copy]
+source = "Import as a copy"
+translation = "Увези као копију"
+
 [messages.upload-dismiss]
 source = "Dismiss"
 translation = "Одбаци"
@@ -12038,10 +12042,6 @@ translation = "завршетак отпремања"
 source = "{ $what }: { $error } after { $attempts } attempts"
 translation = "{ $what }: { $error } после { $attempts } покушаја"
 
-[messages.upload-import-again]
-source = "Import again anyway"
-translation = "Ипак увези поново"
-
 [messages.upload-importing]
 source = "Importing { $count } packs"
 translation = "Увоз пакета: { $count }"
@@ -12049,6 +12049,10 @@ translation = "Увоз пакета: { $count }"
 [messages.upload-interrupted]
 source = "Interrupted"
 translation = "Прекинуто"
+
+[messages.upload-into]
+source = "Going into “{ $name }”, which is in the library already: new files are added and changed ones replaced."
+translation = "Иде у пакет „{ $name }“, који је већ у библиотеци: нове датотеке се додају, а измењене замењују."
 
 [messages.upload-minimize]
 source = "Minimize"
@@ -12061,6 +12065,10 @@ translation = "грешка мреже"
 [messages.upload-not-same]
 source = "Those aren’t the same files, so nothing was resumed."
 translation = "То нису исте датотеке, па ништа није настављено."
+
+[messages.upload-own-pack]
+source = "Make it a pack of its own"
+translation = "Направи од тога засебан пакет"
 
 [messages.upload-part-failed]
 source = "upload failed ({ $status })"
@@ -12121,6 +12129,10 @@ translation = "Заустављено"
 [messages.upload-unpacking]
 source = "Uploaded, now unpacking"
 translation = "Отпремљено, сада се распакује"
+
+[messages.upload-update]
+source = "Update “{ $name }”"
+translation = "Ажурирај „{ $name }“"
 
 [messages.upload-waiting]
 source = "Waiting"

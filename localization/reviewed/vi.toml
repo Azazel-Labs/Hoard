@@ -11646,6 +11646,10 @@ translation = "{ $sent } / { $total }"
 source = "Cancel"
 translation = "Hủy"
 
+[messages.upload-copy]
+source = "Import as a copy"
+translation = "Nhập thành bản sao"
+
 [messages.upload-dismiss]
 source = "Dismiss"
 translation = "Bỏ qua"
@@ -11686,10 +11690,6 @@ translation = "hoàn tất tải lên"
 source = "{ $what }: { $error } after { $attempts } attempts"
 translation = "{ $what }: { $error } sau { $attempts } lần thử"
 
-[messages.upload-import-again]
-source = "Import again anyway"
-translation = "Vẫn nhập lại"
-
 [messages.upload-importing]
 source = "Importing { $count } packs"
 translation = "Đang nhập { $count } gói"
@@ -11697,6 +11697,10 @@ translation = "Đang nhập { $count } gói"
 [messages.upload-interrupted]
 source = "Interrupted"
 translation = "Bị gián đoạn"
+
+[messages.upload-into]
+source = "Going into “{ $name }”, which is in the library already: new files are added and changed ones replaced."
+translation = "Đang vào “{ $name }”, gói đã có trong thư viện: tệp mới được thêm và tệp đã đổi được thay thế."
 
 [messages.upload-minimize]
 source = "Minimize"
@@ -11709,6 +11713,10 @@ translation = "lỗi mạng"
 [messages.upload-not-same]
 source = "Those aren’t the same files, so nothing was resumed."
 translation = "Đó không phải là cùng các tệp, nên không có gì được tiếp tục."
+
+[messages.upload-own-pack]
+source = "Make it a pack of its own"
+translation = "Tách thành gói riêng"
 
 [messages.upload-part-failed]
 source = "upload failed ({ $status })"
@@ -11769,6 +11777,10 @@ translation = "Đã dừng"
 [messages.upload-unpacking]
 source = "Uploaded, now unpacking"
 translation = "Đã tải lên, đang giải nén"
+
+[messages.upload-update]
+source = "Update “{ $name }”"
+translation = "Cập nhật “{ $name }”"
 
 [messages.upload-waiting]
 source = "Waiting"

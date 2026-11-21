@@ -36,7 +36,10 @@ interface Job {
   sessionId?: string
   claim?: string
   force?: boolean
+  copy?: boolean
   existing?: string
+  /** The pack the library has already that it goes into. */
+  into?: string
   /** Whether the browser is remembering it, so a reload loses nothing. */
   saved?: boolean
 }
@@ -79,6 +82,7 @@ function remember(j: Job) {
     root: j.root,
     handle: j.handle,
     force: j.force,
+    copy: j.copy,
     sessionId: j.sessionId,
     claim: j.claim,
     sent: j.sent,
@@ -176,11 +180,13 @@ async function pump() {
       next.controller.signal,
       {
         force: next.force,
-        onSession: (sid, claim) => {
+        copy: next.copy,
+        onSession: (sid, claim, into) => {
           const j = job(id)
           if (!j) return
           j.sessionId = sid
           j.claim = claim
+          j.into = into?.name
           remember(j)
         },
       },
@@ -223,10 +229,23 @@ function retry(j: Job) {
   pump()
 }
 
-function importAgain(j: Job) {
+/** These exact files again, into the pack they made (`copy` false) or as a pack of their own. */
+function importAgain(j: Job, copy: boolean) {
   j.force = true
+  j.copy = copy
   remember(j)
   retry(j)
+}
+
+/** Going into a pack the library has already, but meant to be one of its own: registered again, it carries on. */
+function ownPack(j: Job) {
+  j.copy = true
+  j.into = undefined
+  remember(j)
+  if (j.state !== 'uploading') return
+  // Queued before it stops, so the stopped upload's end starts it again.
+  j.state = 'queued'
+  j.controller?.abort()
 }
 
 // ------------------------------------------------------------------ carrying on after a reload
@@ -327,6 +346,7 @@ onMounted(async () => {
       sessionId: s.sessionId,
       claim: s.claim,
       force: s.force,
+      copy: s.copy,
       saved: true,
     })
   }
@@ -417,6 +437,7 @@ const pillText = computed(() => {
           <span>{{ eta(j) }}</span>
           <span v-if="j.resumed" class="ok">{{ t('upload-resumed', { size: humanBytes(j.resumed) }) }}</span>
         </div>
+        <p v-if="j.state === 'uploading' && j.into" class="msg hint">{{ t('upload-into', { name: j.into }) }}</p>
         <div v-if="j.state === 'interrupted'" class="sub">
           <span class="mono">{{ t('upload-bytes-of', { sent: humanBytes(j.sent), total: humanBytes(j.total) }) }}</span>
         </div>
@@ -428,7 +449,11 @@ const pillText = computed(() => {
         <div v-if="j.state !== 'done'" class="actions">
           <button v-if="j.state === 'interrupted'" type="button" class="btn" @click="resume(j)">{{ t('upload-resume') }}</button>
           <button v-if="j.state === 'failed'" type="button" class="btn" @click="retry(j)">{{ t('upload-retry') }}</button>
-          <button v-if="j.state === 'skipped'" type="button" class="btn" @click="importAgain(j)">{{ t('upload-import-again') }}</button>
+          <button v-if="j.state === 'skipped'" type="button" class="btn" @click="importAgain(j, false)">
+            {{ t('upload-update', { name: j.existing ?? '' }) }}
+          </button>
+          <button v-if="j.state === 'skipped'" type="button" class="btn" @click="importAgain(j, true)">{{ t('upload-copy') }}</button>
+          <button v-if="j.state === 'uploading' && j.into" type="button" class="btn" @click="ownPack(j)">{{ t('upload-own-pack') }}</button>
           <button type="button" class="btn ghost" @click="cancel(j)">
             {{ j.state === 'queued' || j.state === 'skipped' ? t('upload-dismiss') : t('upload-cancel') }}
           </button>

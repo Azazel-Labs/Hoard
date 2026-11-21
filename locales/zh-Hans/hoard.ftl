@@ -1043,7 +1043,12 @@ upload-resumed = 已续传，{ $size } 已存在
 upload-skipped = 这些完全相同的文件已作为“{ $name }”导入过，因此已跳过。
 upload-error = { $error }。你的进度已保留：可以重试，或稍后再次拖放相同的文件。
 upload-retry = 重试
-upload-import-again = 仍然重新导入
+# $name is the pack the library has already that these files go into.
+upload-update = 更新“{ $name }”
+upload-copy = 作为副本导入
+# $name is the pack the library has already that the upload goes into.
+upload-into = 将并入资源库中已有的“{ $name }”：新文件会被添加，已更改的文件会被替换。
+upload-own-pack = 单独作为一个资源包
 upload-dismiss = 忽略
 upload-cancel = 取消
 upload-minimize = 最小化

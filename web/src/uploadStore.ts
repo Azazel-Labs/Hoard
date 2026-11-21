@@ -14,6 +14,8 @@ export interface Saved {
   /** The dropped file or folder, where the browser hands one out, to read the files again without asking. */
   handle?: FileSystemHandle
   force?: boolean
+  /** Asked to be a pack of its own, not added to the pack the library has already. */
+  copy?: boolean
   sessionId?: string
   /** The hold registering it gave on its session, to cancel it with (see `abandonUpload`). */
   claim?: string

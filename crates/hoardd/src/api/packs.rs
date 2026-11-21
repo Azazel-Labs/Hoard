@@ -265,14 +265,19 @@ pub(super) async fn upload_pack(
 }
 
 pub(crate) fn default_pack_name(files: &[String]) -> String {
+    pack_name_from_files(files).unwrap_or_else(|| format!("Pack {}", &db::now()[..10]))
+}
+
+/// The name the files give a pack: a lone file's (an archive, say), or the one folder they're all in.
+pub(crate) fn pack_name_from_files(files: &[String]) -> Option<String> {
     if let [only] = files {
         let file = only.rsplit('/').next().unwrap_or(only);
-        return file.rsplit_once('.').map_or(file, |(s, _)| s).to_owned();
+        return Some(file.rsplit_once('.').map_or(file, |(s, _)| s).to_owned());
     }
     let tops: BTreeSet<&str> = files.iter().map(|f| f.split('/').next().unwrap_or(f)).collect();
     match tops.into_iter().collect::<Vec<_>>().as_slice() {
-        [one] if files.iter().all(|f| f.contains('/')) => (*one).to_owned(),
-        _ => format!("Pack {}", &db::now()[..10]),
+        [one] if files.iter().all(|f| f.contains('/')) => Some((*one).to_owned()),
+        _ => None,
     }
 }
 

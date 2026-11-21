@@ -11650,6 +11650,10 @@ translation = "{ $sent } dari { $total }"
 source = "Cancel"
 translation = "Batal"
 
+[messages.upload-copy]
+source = "Import as a copy"
+translation = "Impor sebagai salinan"
+
 [messages.upload-dismiss]
 source = "Dismiss"
 translation = "Abaikan"
@@ -11690,10 +11694,6 @@ translation = "selesaikan unggahan"
 source = "{ $what }: { $error } after { $attempts } attempts"
 translation = "{ $what }: { $error } setelah { $attempts } percobaan"
 
-[messages.upload-import-again]
-source = "Import again anyway"
-translation = "Tetap impor lagi"
-
 [messages.upload-importing]
 source = "Importing { $count } packs"
 translation = "Mengimpor { $count } paket"
@@ -11701,6 +11701,10 @@ translation = "Mengimpor { $count } paket"
 [messages.upload-interrupted]
 source = "Interrupted"
 translation = "Terputus"
+
+[messages.upload-into]
+source = "Going into “{ $name }”, which is in the library already: new files are added and changed ones replaced."
+translation = "Masuk ke “{ $name }”, yang sudah ada di pustaka: berkas baru ditambahkan dan yang berubah diganti."
 
 [messages.upload-minimize]
 source = "Minimize"
@@ -11713,6 +11717,10 @@ translation = "galat jaringan"
 [messages.upload-not-same]
 source = "Those aren’t the same files, so nothing was resumed."
 translation = "Itu bukan file yang sama, jadi tidak ada yang dilanjutkan."
+
+[messages.upload-own-pack]
+source = "Make it a pack of its own"
+translation = "Jadikan paket tersendiri"
 
 [messages.upload-part-failed]
 source = "upload failed ({ $status })"
@@ -11773,6 +11781,10 @@ translation = "Dihentikan"
 [messages.upload-unpacking]
 source = "Uploaded, now unpacking"
 translation = "Sudah diunggah, sekarang dibongkar"
+
+[messages.upload-update]
+source = "Update “{ $name }”"
+translation = "Perbarui “{ $name }”"
 
 [messages.upload-waiting]
 source = "Waiting"

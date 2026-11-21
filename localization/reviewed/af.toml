@@ -11866,6 +11866,10 @@ translation = "{ $sent } van { $total }"
 source = "Cancel"
 translation = "Kanselleer"
 
+[messages.upload-copy]
+source = "Import as a copy"
+translation = "Voer in as 'n kopie"
+
 [messages.upload-dismiss]
 source = "Dismiss"
 translation = "Wys weg"
@@ -11906,10 +11910,6 @@ translation = "voltooi oplaai"
 source = "{ $what }: { $error } after { $attempts } attempts"
 translation = "{ $what }: { $error } ná { $attempts } pogings"
 
-[messages.upload-import-again]
-source = "Import again anyway"
-translation = "Voer in elk geval weer in"
-
 [messages.upload-importing]
 source = "Importing { $count } packs"
 translation = "Voer { $count } pakke in"
@@ -11917,6 +11917,10 @@ translation = "Voer { $count } pakke in"
 [messages.upload-interrupted]
 source = "Interrupted"
 translation = "Onderbreek"
+
+[messages.upload-into]
+source = "Going into “{ $name }”, which is in the library already: new files are added and changed ones replaced."
+translation = "Gaan in “{ $name }” in, wat reeds in die biblioteek is: nuwe lêers word bygevoeg en veranderde lêers vervang."
 
 [messages.upload-minimize]
 source = "Minimize"
@@ -11929,6 +11933,10 @@ translation = "netwerkfout"
 [messages.upload-not-same]
 source = "Those aren’t the same files, so nothing was resumed."
 translation = "Dit is nie dieselfde lêers nie, so niks is hervat nie."
+
+[messages.upload-own-pack]
+source = "Make it a pack of its own"
+translation = "Maak dit 'n eie pak"
 
 [messages.upload-part-failed]
 source = "upload failed ({ $status })"
@@ -11989,6 +11997,10 @@ translation = "Gestop"
 [messages.upload-unpacking]
 source = "Uploaded, now unpacking"
 translation = "Opgelaai, pak nou uit"
+
+[messages.upload-update]
+source = "Update “{ $name }”"
+translation = "Werk “{ $name }” by"
 
 [messages.upload-waiting]
 source = "Waiting"

@@ -11872,6 +11872,10 @@ translation = "{ $sent } av { $total }"
 source = "Cancel"
 translation = "Avbryt"
 
+[messages.upload-copy]
+source = "Import as a copy"
+translation = "Importera som kopia"
+
 [messages.upload-dismiss]
 source = "Dismiss"
 translation = "Avfärda"
@@ -11912,10 +11916,6 @@ translation = "slutför uppladdningen"
 source = "{ $what }: { $error } after { $attempts } attempts"
 translation = "{ $what }: { $error } efter { $attempts } försök"
 
-[messages.upload-import-again]
-source = "Import again anyway"
-translation = "Importera igen ändå"
-
 [messages.upload-importing]
 source = "Importing { $count } packs"
 translation = "Importerar { $count } paket"
@@ -11923,6 +11923,10 @@ translation = "Importerar { $count } paket"
 [messages.upload-interrupted]
 source = "Interrupted"
 translation = "Avbruten"
+
+[messages.upload-into]
+source = "Going into “{ $name }”, which is in the library already: new files are added and changed ones replaced."
+translation = "Går in i ”{ $name }”, som redan finns i biblioteket: nya filer läggs till och ändrade ersätts."
 
 [messages.upload-minimize]
 source = "Minimize"
@@ -11935,6 +11939,10 @@ translation = "nätverksfel"
 [messages.upload-not-same]
 source = "Those aren’t the same files, so nothing was resumed."
 translation = "Det är inte samma filer, så inget återupptogs."
+
+[messages.upload-own-pack]
+source = "Make it a pack of its own"
+translation = "Gör det till ett eget paket"
 
 [messages.upload-part-failed]
 source = "upload failed ({ $status })"
@@ -11995,6 +12003,10 @@ translation = "Stoppad"
 [messages.upload-unpacking]
 source = "Uploaded, now unpacking"
 translation = "Uppladdat, packar upp"
+
+[messages.upload-update]
+source = "Update “{ $name }”"
+translation = "Uppdatera ”{ $name }”"
 
 [messages.upload-waiting]
 source = "Waiting"

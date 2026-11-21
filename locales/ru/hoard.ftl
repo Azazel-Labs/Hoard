@@ -1204,7 +1204,12 @@ upload-resumed = докачка, { $size } уже было на месте
 upload-skipped = Точно такие же файлы уже импортированы как «{ $name }», поэтому они пропущены.
 upload-error = { $error }. Прогресс сохранён: повторите или перетащите те же файлы снова позже.
 upload-retry = Повторить
-upload-import-again = Всё равно импортировать снова
+# $name is the pack the library has already that these files go into.
+upload-update = Обновить «{ $name }»
+upload-copy = Импортировать как копию
+# $name is the pack the library has already that the upload goes into.
+upload-into = Добавляется в пак «{ $name }», который уже есть в библиотеке: новые файлы добавляются, изменённые заменяются.
+upload-own-pack = Сделать отдельным паком
 upload-dismiss = Скрыть
 upload-cancel = Отмена
 upload-minimize = Свернуть

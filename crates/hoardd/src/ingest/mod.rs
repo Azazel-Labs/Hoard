@@ -215,10 +215,19 @@ fn pipeline<J: Sync>(
 ///
 /// A pack in a watched folder is read where it sits instead: nothing is unpacked, copied or cleaned up. Files the
 /// pack already has (from an interrupted run, or a watched pack being rescanned) are skipped.
-pub(crate) fn ingest_pack(state: &AppState, rt: &Handle, pack_id: &str, auto_name: bool) -> Result<()> {
+///
+/// `from` is an upload going into a pack the library had already (see `uploads::complete`): its files are in that
+/// upload's staging folder, and a file the pack has whose bytes changed replaces what the pack had.
+pub(crate) fn ingest_pack(
+    state: &AppState,
+    rt: &Handle,
+    pack_id: &str,
+    auto_name: bool,
+    from: Option<&str>,
+) -> Result<()> {
     let mut conn = state.pool.get()?;
     let watched = crate::locations::watched_root(&conn, pack_id)?;
-    let staging = state.cfg.staging_dir().join(pack_id);
+    let staging = state.cfg.staging_dir().join(from.unwrap_or(pack_id));
     match &watched {
         Some(root) => anyhow::ensure!(root.is_dir(), "{} can't be read", root.display()),
         None => anyhow::ensure!(staging.is_dir(), "staging folder for pack {pack_id} is gone"),
@@ -258,6 +267,10 @@ pub(crate) fn ingest_pack(state: &AppState, rt: &Handle, pack_id: &str, auto_nam
     let license = detect_pack_license(&root, &files);
     let readme = context::read_readmes(&root, &files);
     let first = known.is_empty();
+    let replaced = match from {
+        Some(_) if watched.is_none() && !first => replace_changed(state, rt, &conn, pack_id, &root)?,
+        _ => HashSet::new(),
+    };
     files.retain(|f| !known.contains(&rel_of(&root, f)));
     drop(known);
     conn.execute(
@@ -307,6 +320,9 @@ pub(crate) fn ingest_pack(state: &AppState, rt: &Handle, pack_id: &str, auto_nam
     for (rel, why) in &left_out {
         issues::note(&conn, issues::FILE, issues::At::file(pack_id, rel), why);
     }
+    if watched.is_none() && first {
+        came_to_something(&conn, pack_id, &staging, &left_out)?;
+    }
 
     let tx = conn.transaction()?;
     if let Some(l) = license {
@@ -335,6 +351,10 @@ pub(crate) fn ingest_pack(state: &AppState, rt: &Handle, pack_id: &str, auto_nam
     tx.execute("UPDATE packs SET files_done = files_total WHERE id = ?1", [pack_id])?;
     tx.commit()?;
     tracing::info!(pack = pack_id, links = n_links, families = n_families, "pack ingested");
+    if !replaced.is_empty() {
+        tracing::info!(pack = pack_id, files = replaced.len(), "files uploaded again with changes read again");
+        retag_pack(state, rt, pack_id, Some(&replaced))?;
+    }
     animations_in(state, rt, pack_id);
     crate::materials::detect_logged(state, rt, &mut conn, pack_id);
     read_pack_files(state, rt, pack_id, auto_name, wrapper_name);
@@ -360,6 +380,75 @@ pub(crate) fn ingest_pack(state: &AppState, rt: &Handle, pack_id: &str, auto_nam
         return Ok(());
     }
     finish_rules_stage(state, &conn, pack_id, true)
+}
+
+/// An upload that came to nothing is said to have (and its staging folder goes), not shown as a ready pack with
+/// nothing in it.
+fn came_to_something(
+    conn: &rusqlite::Connection,
+    pack_id: &str,
+    staging: &Path,
+    left_out: &[(String, String)],
+) -> Result<()> {
+    let assets: i64 = conn.query_row("SELECT count(*) FROM assets WHERE pack_id = ?1", [pack_id], |r| r.get(0))?;
+    if assets > 0 {
+        return Ok(());
+    }
+    fs::remove_dir_all(staging).ok();
+    match left_out.first() {
+        Some((rel, why)) => {
+            anyhow::bail!("nothing in the upload could be read: {} files were left out ({rel}: {why})", left_out.len())
+        }
+        None => anyhow::bail!("the upload had no files Hoard keeps"),
+    }
+}
+
+/// The pack's files that an upload going into it has with different bytes: each one's asset takes the new file (stored
+/// now), its previews and conversions go, and it's read again (see `retag_pack`). Like a watched file changed where it
+/// sits (`scan::changed_in_place`), only files kept as they are count, not what was made from them.
+fn replace_changed(
+    state: &AppState,
+    rt: &Handle,
+    conn: &rusqlite::Connection,
+    pack_id: &str,
+    root: &Path,
+) -> Result<HashSet<String>> {
+    let assets: Vec<(String, String, String)> = {
+        let mut stmt = conn.prepare(&format!(
+            "SELECT a.id, a.path, a.blob_hash FROM assets a
+              WHERE a.pack_id = ?1 AND NOT {} AND NOT {}
+                AND NOT EXISTS (SELECT 1 FROM asset_origin o WHERE o.asset_id = a.id)",
+            crate::materials::IS_MATERIAL,
+            crate::takes::IS_TAKE
+        ))?;
+        stmt.query_map([pack_id], |r| Ok((r.get(0)?, r.get(1)?, r.get(2)?)))?.collect::<rusqlite::Result<_>>()?
+    };
+    let mut changed = HashSet::new();
+    for (id, rel, hash) in assets {
+        let Some(safe) = safe_rel_path(&rel) else { continue };
+        let file = root.join(safe);
+        if !file.is_file() {
+            continue;
+        }
+        let blob = BlobStore::hash_file(&file).with_context(|| rel.clone())?;
+        if blob.hash == hash {
+            continue;
+        }
+        let ext = rel.rsplit_once('.').map_or("", |(_, e)| e).to_ascii_lowercase();
+        rt.block_on(state.blobs.put_file(&file, &blob, AssetKind::from_ext(&ext))).with_context(|| rel.clone())?;
+        let now = db::now();
+        conn.execute(
+            "INSERT INTO blobs (hash, size, created_at) VALUES (?1, ?2, ?3) ON CONFLICT (hash) DO NOTHING",
+            params![blob.hash, blob.size as i64, now],
+        )?;
+        conn.execute(
+            "UPDATE assets SET blob_hash = ?2, thumb_hash = NULL, thumb_source = NULL, updated_at = ?3 WHERE id = ?1",
+            params![id, blob.hash, now],
+        )?;
+        conn.execute("DELETE FROM derivatives WHERE asset_id = ?1", [&id])?;
+        changed.insert(id);
+    }
+    Ok(changed)
 }
 
 /// After rule tagging: either hand off to the LLM or mark the pack ready.

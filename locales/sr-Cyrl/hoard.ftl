@@ -1142,7 +1142,12 @@ upload-resumed = настављено, { $size } је већ било ту
 upload-skipped = Ове исте датотеке су већ увезене као „{ $name }“, па су прескочене.
 upload-error = { $error }. Ваш напредак је сачуван: покушајте поново или касније поново превуците исте датотеке.
 upload-retry = Покушај поново
-upload-import-again = Ипак увези поново
+# $name is the pack the library has already that these files go into.
+upload-update = Ажурирај „{ $name }“
+upload-copy = Увези као копију
+# $name is the pack the library has already that the upload goes into.
+upload-into = Иде у пакет „{ $name }“, који је већ у библиотеци: нове датотеке се додају, а измењене замењују.
+upload-own-pack = Направи од тога засебан пакет
 upload-dismiss = Одбаци
 upload-cancel = Откажи
 upload-minimize = Умањи

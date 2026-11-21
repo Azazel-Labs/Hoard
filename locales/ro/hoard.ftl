@@ -573,6 +573,36 @@ app-bulk-failed =
         [few] Cele { $count } resurse nu au putut fi modificate: { $error }
        *[other] Cele { $count } de resurse nu au putut fi modificate: { $error }
     }
+# Copying the tags of the asset with the keyboard on it (C), to paste onto others (V).
+app-tags-copied =
+    { $count ->
+        [one] S-a copiat { $count } etichetă
+        [few] S-au copiat { $count } etichete
+       *[other] S-au copiat { $count } de etichete
+    }
+app-tags-copy-none = { $name } nu are etichete de copiat
+# Pasting (V) with nothing copied, or with copied text that isn't a list of tags.
+app-tags-paste-none = Nicio etichetă copiată. Apasă C pe o resursă ca să-i copiezi etichetele.
+# Pasting tags that every one of the assets already has.
+app-tags-paste-had =
+    { $count ->
+        [one] Are deja aceste etichete
+       *[other] Toate cele { $count } au deja aceste etichete
+    }
+# After pasting: $count tags were added to $assets assets.
+app-tags-pasted =
+    { $assets ->
+        [one] { $count ->
+            [one] S-a adăugat { $count } etichetă
+            [few] S-au adăugat { $count } etichete
+           *[other] S-au adăugat { $count } de etichete
+        }
+       *[other] { $count ->
+            [one] S-a adăugat { $count } etichetă la { $assets } resurse
+            [few] S-au adăugat { $count } etichete la { $assets } resurse
+           *[other] S-au adăugat { $count } de etichete la { $assets } resurse
+        }
+    }
 app-bulk-untagged =
     { $count ->
         [one] S-a scos { $tag } de pe { $count } resursă
@@ -852,6 +882,11 @@ palette-archive-selected-keywords = ștergere eliminare coș delete remove trash
 palette-edit-selected = Editează cele { $count } selectate
 # Words that find the action above when typed into the command palette.
 palette-edit-selected-keywords = modificare în masă etichete categorie licență evaluare
+palette-paste-tags =
+    { $count ->
+        [one] Lipește etichetele copiate pe resursa selectată
+       *[other] Lipește etichetele copiate pe cele { $count } selectate
+    }
 palette-clear-selection = Goliți selecția
 palette-clear-filters = Ștergeți filtrele
 palette-clear-filters-keywords = resetare reset
@@ -901,6 +936,8 @@ shortcuts-favorite = Adăugare la favorite sau scoatere din favorite
 shortcuts-reviewed = Marcare ca verificat sau nu
 shortcuts-tag = Adăugarea unei etichete
 shortcuts-edit = Editează selecția
+shortcuts-copy-tags = Copiază-i etichetele
+shortcuts-paste-tags = Lipește etichetele copiate pe selecție
 shortcuts-key-click = clic
 shortcuts-select-range = Selectarea unui interval
 shortcuts-select-all = Selectarea a tot ce este afișat
@@ -1775,6 +1812,9 @@ asset-tags-accept-all-title = Păstrați ca ale dvs. toate etichetele presupuse 
 # Before a list of tags someone removed, which the taggers won't put back; each can be clicked to restore it.
 asset-tags-rejected = Respinse:
 asset-tag-restore-title = Puneți { $tag } la loc
+# Under the tag box: tags that assets which look like this one have and it doesn't, each added with a click.
+asset-tags-from-similar = Cele asemănătoare au:
+asset-tag-suggest-title = Adaugă { $tag }
 asset-details-heading = Detalii
 asset-field-category = Categorie
 asset-field-license = Licență

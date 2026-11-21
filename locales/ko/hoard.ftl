@@ -543,6 +543,15 @@ app-ns-engine = 엔진
 app-ns-extracted = 복구된 원본
 app-ns-script = 문자 체계
 app-bulk-failed = 에셋 { $count }개를 변경하지 못했습니다: { $error }
+# Copying the tags of the asset with the keyboard on it (C), to paste onto others (V).
+app-tags-copied = 태그 { $count }개를 복사했습니다
+app-tags-copy-none = { $name }: 복사할 태그가 없습니다
+# Pasting (V) with nothing copied, or with copied text that isn't a list of tags.
+app-tags-paste-none = 복사된 태그가 없습니다. 에셋에서 C를 눌러 태그를 복사하세요.
+# Pasting tags that every one of the assets already has.
+app-tags-paste-had = 에셋 { $count }개에 이미 해당 태그가 있습니다
+# After pasting: $count tags were added to $assets assets.
+app-tags-pasted = 에셋 { $assets }개에 태그 { $count }개를 추가했습니다
 app-bulk-untagged = 에셋 { $count }개에서 { $tag } 태그를 뗐습니다
 app-bulk-tagged = 에셋 { $count }개에 { $tag } 태그를 붙였습니다
 app-bulk-review = 검토함으로 표시
@@ -760,6 +769,7 @@ palette-archive-selected-keywords = 삭제 제거 휴지통 delete remove trash
 palette-edit-selected = 선택한 { $count }개 편집
 # Words that find the action above when typed into the command palette.
 palette-edit-selected-keywords = 일괄 변경 태그 카테고리 라이선스 평점
+palette-paste-tags = 복사한 태그를 선택한 { $count }개에 붙여넣기
 palette-clear-selection = 선택 해제
 palette-clear-filters = 필터 지우기
 palette-clear-filters-keywords = 초기화 재설정 reset
@@ -809,6 +819,8 @@ shortcuts-favorite = 즐겨찾기에 추가 또는 제거
 shortcuts-reviewed = 검토함으로 표시 또는 해제
 shortcuts-tag = 태그 추가
 shortcuts-edit = 선택 항목 편집
+shortcuts-copy-tags = 태그 복사
+shortcuts-paste-tags = 복사한 태그를 선택 항목에 붙여넣기
 shortcuts-key-click = 클릭
 shortcuts-select-range = 범위 선택
 shortcuts-select-all = 표시된 모든 항목 선택
@@ -1489,6 +1501,9 @@ asset-tags-accept-all-title = 규칙과 AI가 추측한 태그를 모두 내 태
 # Before a list of tags someone removed, which the taggers won't put back; each can be clicked to restore it.
 asset-tags-rejected = 제외한 태그:
 asset-tag-restore-title = { $tag } 태그 되돌리기
+# Under the tag box: tags that assets which look like this one have and it doesn't, each added with a click.
+asset-tags-from-similar = 비슷한 에셋의 태그:
+asset-tag-suggest-title = { $tag } 추가
 asset-details-heading = 세부 정보
 asset-field-category = 분류
 asset-field-license = 라이선스

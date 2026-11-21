@@ -574,6 +574,39 @@ app-bulk-failed =
         [many] ці { $count } ресурсів
        *[other] ці { $count } ресурсу
     }: { $error }
+# Copying the tags of the asset with the keyboard on it (C), to paste onto others (V).
+app-tags-copied =
+    { $count ->
+        [one] Скопійовано { $count } тег
+        [few] Скопійовано { $count } теги
+        [many] Скопійовано { $count } тегів
+       *[other] Скопійовано { $count } тега
+    }
+app-tags-copy-none = У { $name } немає тегів для копіювання
+# Pasting (V) with nothing copied, or with copied text that isn't a list of tags.
+app-tags-paste-none = Теги не скопійовано. Натисніть C на ресурсі, щоб скопіювати його теги.
+# Pasting tags that every one of the assets already has.
+app-tags-paste-had =
+    { $count ->
+        [1] Ці теги в нього вже є
+       *[other] Ці теги вже є в усіх { $count }
+    }
+# After pasting: $count tags were added to $assets assets.
+app-tags-pasted =
+    { $assets ->
+        [1] { $count ->
+            [one] Додано { $count } тег
+            [few] Додано { $count } теги
+            [many] Додано { $count } тегів
+           *[other] Додано { $count } тега
+        }
+       *[other] { $count ->
+            [one] Додано { $count } тег до { $assets } ресурсів
+            [few] Додано { $count } теги до { $assets } ресурсів
+            [many] Додано { $count } тегів до { $assets } ресурсів
+           *[other] Додано { $count } тега до { $assets } ресурсів
+        }
+    }
 app-bulk-untagged =
     Тег { $tag } знято з { $count ->
         [one] { $count } ресурсу
@@ -881,6 +914,11 @@ palette-archive-selected-keywords = видалити прибрати кошик
 palette-edit-selected = Редагувати вибрані ({ $count })
 # Words that find the action above when typed into the command palette.
 palette-edit-selected-keywords = масова зміна теги категорія ліцензія оцінка
+palette-paste-tags =
+    { $count ->
+        [1] Вставити скопійовані теги до вибраного ресурсу
+       *[other] Вставити скопійовані теги до { $count } вибраних
+    }
 palette-clear-selection = Скасувати вибір
 palette-clear-filters = Очистити фільтри
 palette-clear-filters-keywords = скинути reset
@@ -930,6 +968,8 @@ shortcuts-favorite = Додати в обране або прибрати з о�
 shortcuts-reviewed = Позначити як переглянутий або зняти позначку
 shortcuts-tag = Додати тег
 shortcuts-edit = Редагувати вибране
+shortcuts-copy-tags = Скопіювати його теги
+shortcuts-paste-tags = Вставити скопійовані теги до вибраного
 shortcuts-key-click = клацання
 shortcuts-select-range = Вибрати діапазон
 shortcuts-select-all = Вибрати все показане
@@ -1844,6 +1884,9 @@ asset-tags-accept-all-title = Залишити як власні всі теги
 # Before a list of tags someone removed, which the taggers won't put back; each can be clicked to restore it.
 asset-tags-rejected = Відхилені:
 asset-tag-restore-title = Повернути { $tag }
+# Under the tag box: tags that assets which look like this one have and it doesn't, each added with a click.
+asset-tags-from-similar = У схожих є:
+asset-tag-suggest-title = Додати { $tag }
 asset-details-heading = Подробиці
 asset-field-category = Категорія
 asset-field-license = Ліцензія

@@ -551,6 +551,33 @@ app-bulk-failed =
         [one] den resursen
        *[other] de { $count } resurserna
     }: { $error }
+# Copying the tags of the asset with the keyboard on it (C), to paste onto others (V).
+app-tags-copied =
+    { $count ->
+        [one] Kopierade { $count } tagg
+       *[other] Kopierade { $count } taggar
+    }
+app-tags-copy-none = { $name } har inga taggar att kopiera
+# Pasting (V) with nothing copied, or with copied text that isn't a list of tags.
+app-tags-paste-none = Inga taggar kopierade. Tryck på C på en resurs för att kopiera dess taggar.
+# Pasting tags that every one of the assets already has.
+app-tags-paste-had =
+    { $count ->
+        [one] Den har redan de taggarna
+       *[other] Alla { $count } har redan de taggarna
+    }
+# After pasting: $count tags were added to $assets assets.
+app-tags-pasted =
+    { $assets ->
+        [one] { $count ->
+            [one] Lade till { $count } tagg
+           *[other] Lade till { $count } taggar
+        }
+       *[other] { $count ->
+            [one] Lade till { $count } tagg på { $assets } resurser
+           *[other] Lade till { $count } taggar på { $assets } resurser
+        }
+    }
 app-bulk-untagged =
     Tog bort { $tag } från { $count ->
         [one] { $count } resurs
@@ -806,6 +833,11 @@ palette-archive-selected-keywords = radera ta bort papperskorg delete remove tra
 palette-edit-selected = Redigera de { $count } valda
 # Words that find the action above when typed into the command palette.
 palette-edit-selected-keywords = massändring taggar kategori licens betyg
+palette-paste-tags =
+    { $count ->
+        [one] Klistra in de kopierade taggarna på den valda resursen
+       *[other] Klistra in de kopierade taggarna på de { $count } valda
+    }
 palette-clear-selection = Rensa markeringen
 palette-clear-filters = Rensa filter
 palette-clear-filters-keywords = återställ nollställ reset
@@ -855,6 +887,8 @@ shortcuts-favorite = Lägg till i eller ta bort från dina favoriter
 shortcuts-reviewed = Markera som granskad eller inte
 shortcuts-tag = Lägg till en tagg
 shortcuts-edit = Redigera det valda
+shortcuts-copy-tags = Kopiera dess taggar
+shortcuts-paste-tags = Klistra in kopierade taggar på det valda
 shortcuts-key-click = klick
 shortcuts-select-range = Markera ett intervall
 shortcuts-select-all = Markera allt som visas
@@ -1647,6 +1681,9 @@ asset-tags-accept-all-title = Behåll alla taggar som regler och AI gissade som 
 # Before a list of tags someone removed, which the taggers won't put back; each can be clicked to restore it.
 asset-tags-rejected = Avvisade:
 asset-tag-restore-title = Sätt tillbaka { $tag }
+# Under the tag box: tags that assets which look like this one have and it doesn't, each added with a click.
+asset-tags-from-similar = Liknande har:
+asset-tag-suggest-title = Lägg till { $tag }
 asset-details-heading = Detaljer
 asset-field-category = Kategori
 asset-field-license = Licens

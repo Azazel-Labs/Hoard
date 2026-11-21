@@ -543,6 +543,15 @@ app-ns-engine = เอนจิน
 app-ns-extracted = ซอร์สที่กู้คืนได้
 app-ns-script = ระบบการเขียน
 app-bulk-failed = เปลี่ยนแอสเซ็ต { $count } รายการนั้นไม่ได้: { $error }
+# Copying the tags of the asset with the keyboard on it (C), to paste onto others (V).
+app-tags-copied = คัดลอก { $count } แท็กแล้ว
+app-tags-copy-none = { $name } ไม่มีแท็กให้คัดลอก
+# Pasting (V) with nothing copied, or with copied text that isn't a list of tags.
+app-tags-paste-none = ยังไม่ได้คัดลอกแท็ก กด C บนแอสเซ็ตเพื่อคัดลอกแท็กของมัน
+# Pasting tags that every one of the assets already has.
+app-tags-paste-had = แอสเซ็ต { $count } รายการมีแท็กเหล่านั้นอยู่แล้ว
+# After pasting: $count tags were added to $assets assets.
+app-tags-pasted = เพิ่ม { $count } แท็กให้ { $assets } แอสเซ็ตแล้ว
 app-bulk-untagged = นำแท็ก { $tag } ออกจาก { $count } แอสเซ็ตแล้ว
 app-bulk-tagged = ติดแท็ก { $tag } ให้ { $count } แอสเซ็ตแล้ว
 app-bulk-review = ทำเครื่องหมายว่าตรวจแล้ว
@@ -760,6 +769,7 @@ palette-archive-selected-keywords = ลบ นำออก ถังขยะ de
 palette-edit-selected = แก้ไข { $count } รายการที่เลือก
 # Words that find the action above when typed into the command palette.
 palette-edit-selected-keywords = เปลี่ยนจำนวนมาก แท็ก หมวดหมู่ ใบอนุญาต คะแนน
+palette-paste-tags = วางแท็กที่คัดลอกไว้ลงใน { $count } รายการที่เลือก
 palette-clear-selection = ล้างการเลือก
 palette-clear-filters = ล้างตัวกรอง
 palette-clear-filters-keywords = รีเซ็ต reset
@@ -809,6 +819,8 @@ shortcuts-favorite = เพิ่มหรือนำออกจากรา�
 shortcuts-reviewed = ทำเครื่องหมายว่าตรวจแล้ว หรือยกเลิก
 shortcuts-tag = เพิ่มแท็ก
 shortcuts-edit = แก้ไขรายการที่เลือก
+shortcuts-copy-tags = คัดลอกแท็กของมัน
+shortcuts-paste-tags = วางแท็กที่คัดลอกไว้ลงในรายการที่เลือก
 shortcuts-key-click = คลิก
 shortcuts-select-range = เลือกเป็นช่วง
 shortcuts-select-all = เลือกทุกรายการที่แสดง
@@ -1510,6 +1522,9 @@ asset-tags-accept-all-title = เก็บทุกแท็กที่กฎ�
 # Before a list of tags someone removed, which the taggers won't put back; each can be clicked to restore it.
 asset-tags-rejected = ที่ปฏิเสธไว้:
 asset-tag-restore-title = ใส่ { $tag } กลับ
+# Under the tag box: tags that assets which look like this one have and it doesn't, each added with a click.
+asset-tags-from-similar = รายการที่คล้ายกันมี:
+asset-tag-suggest-title = เพิ่ม { $tag }
 asset-details-heading = รายละเอียด
 asset-field-category = หมวดหมู่
 asset-field-license = สัญญาอนุญาต

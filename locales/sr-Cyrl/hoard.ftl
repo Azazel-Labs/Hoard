@@ -563,6 +563,39 @@ app-bulk-failed =
         [few] { $count } ресурса
        *[other] { $count } ресурса
     }: { $error }
+# Copying the tags of the asset with the keyboard on it (C), to paste onto others (V).
+app-tags-copied =
+    { $count ->
+        [one] Копирана је { $count } ознака
+        [few] Копиране су { $count } ознаке
+        [many] Копирано је { $count } ознака
+       *[other] Копирано је { $count } ознаке
+    }
+app-tags-copy-none = { $name } нема ознака за копирање
+# Pasting (V) with nothing copied, or with copied text that isn't a list of tags.
+app-tags-paste-none = Ниједна ознака није копирана. Притисни C на ресурсу да копираш његове ознаке.
+# Pasting tags that every one of the assets already has.
+app-tags-paste-had =
+    { $count ->
+        [1] Већ има те ознаке
+       *[other] Свих { $count } већ има те ознаке
+    }
+# After pasting: $count tags were added to $assets assets.
+app-tags-pasted =
+    { $assets ->
+        [1] { $count ->
+            [one] Додата је { $count } ознака
+            [few] Додате су { $count } ознаке
+            [many] Додато је { $count } ознака
+           *[other] Додато је { $count } ознаке
+        }
+       *[other] { $count ->
+            [one] Додата је { $count } ознака на { $assets } ресурса
+            [few] Додате су { $count } ознаке на { $assets } ресурса
+            [many] Додато је { $count } ознака на { $assets } ресурса
+           *[other] Додато је { $count } ознаке на { $assets } ресурса
+        }
+    }
 app-bulk-untagged = Ознака { $tag } уклоњена је са { $count } ресурса
 app-bulk-tagged =
     Ознака { $tag } додата је на { $count ->
@@ -832,6 +865,11 @@ palette-archive-selected-keywords = обриши уклони отпад delete 
 palette-edit-selected = Измени изабране ({ $count })
 # Words that find the action above when typed into the command palette.
 palette-edit-selected-keywords = масовна измена ознаке категорија лиценца оцена
+palette-paste-tags =
+    { $count ->
+        [1] Налепи копиране ознаке на изабрани ресурс
+       *[other] Налепи копиране ознаке на { $count } изабраних
+    }
 palette-clear-selection = Поништи избор
 palette-clear-filters = Обриши филтере
 palette-clear-filters-keywords = ресетуј reset
@@ -881,6 +919,8 @@ shortcuts-favorite = Додај у омиљене или уклони из њи�
 shortcuts-reviewed = Означи као прегледано или не
 shortcuts-tag = Додај ознаку
 shortcuts-edit = Измени изабрано
+shortcuts-copy-tags = Копирај његове ознаке
+shortcuts-paste-tags = Налепи копиране ознаке на изабрано
 shortcuts-key-click = клик
 shortcuts-select-range = Изабери опсег
 shortcuts-select-all = Изабери све приказано
@@ -1711,6 +1751,9 @@ asset-tags-accept-all-title = Задржи као своје све ознаке
 # Before a list of tags someone removed, which the taggers won't put back; each can be clicked to restore it.
 asset-tags-rejected = Одбијене:
 asset-tag-restore-title = Врати { $tag }
+# Under the tag box: tags that assets which look like this one have and it doesn't, each added with a click.
+asset-tags-from-similar = Слични имају:
+asset-tag-suggest-title = Додај { $tag }
 asset-details-heading = Детаљи
 asset-field-category = Категорија
 asset-field-license = Лиценца

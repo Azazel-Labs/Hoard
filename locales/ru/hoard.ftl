@@ -573,6 +573,39 @@ app-bulk-failed =
         [many] Не удалось изменить эти { $count } ассетов: { $error }
        *[other] Не удалось изменить эти { $count } ассета: { $error }
     }
+# Copying the tags of the asset with the keyboard on it (C), to paste onto others (V).
+app-tags-copied =
+    { $count ->
+        [one] Скопирован { $count } тег
+        [few] Скопировано { $count } тега
+        [many] Скопировано { $count } тегов
+       *[other] Скопировано { $count } тега
+    }
+app-tags-copy-none = У { $name } нет тегов для копирования
+# Pasting (V) with nothing copied, or with copied text that isn't a list of tags.
+app-tags-paste-none = Теги не скопированы. Нажмите C на ассете, чтобы скопировать его теги.
+# Pasting tags that every one of the assets already has.
+app-tags-paste-had =
+    { $count ->
+        [1] Эти теги у него уже есть
+       *[other] Эти теги уже есть у всех { $count }
+    }
+# After pasting: $count tags were added to $assets assets.
+app-tags-pasted =
+    { $assets ->
+        [1] { $count ->
+            [one] Добавлен { $count } тег
+            [few] Добавлено { $count } тега
+            [many] Добавлено { $count } тегов
+           *[other] Добавлено { $count } тега
+        }
+       *[other] { $count ->
+            [one] Добавлен { $count } тег к { $assets } ассетам
+            [few] Добавлено { $count } тега к { $assets } ассетам
+            [many] Добавлено { $count } тегов к { $assets } ассетам
+           *[other] Добавлено { $count } тега к { $assets } ассетам
+        }
+    }
 app-bulk-untagged =
     { $count ->
         [one] Тег { $tag } снят с { $count } ассета
@@ -868,6 +901,11 @@ palette-archive-selected-keywords = удалить убрать корзина d
 palette-edit-selected = Изменить выбранные ({ $count })
 # Words that find the action above when typed into the command palette.
 palette-edit-selected-keywords = массовое изменение теги категория лицензия рейтинг
+palette-paste-tags =
+    { $count ->
+        [1] Вставить скопированные теги в выбранный ассет
+       *[other] Вставить скопированные теги в { $count } выбранных
+    }
 palette-clear-selection = Снять выделение
 palette-clear-filters = Сбросить фильтры
 palette-clear-filters-keywords = сброс очистить reset
@@ -917,6 +955,8 @@ shortcuts-favorite = Добавить в избранное или убрать 
 shortcuts-reviewed = Отметить как просмотренное или снять отметку
 shortcuts-tag = Добавить тег
 shortcuts-edit = Изменить выбранное
+shortcuts-copy-tags = Скопировать его теги
+shortcuts-paste-tags = Вставить скопированные теги в выбранное
 shortcuts-key-click = щелчок
 shortcuts-select-range = Выбрать диапазон
 shortcuts-select-all = Выбрать всё показанное
@@ -1806,6 +1846,9 @@ asset-tags-accept-all-title = Оставить как свои все теги, 
 # Before a list of tags someone removed, which the taggers won't put back; each can be clicked to restore it.
 asset-tags-rejected = Отклонено:
 asset-tag-restore-title = Вернуть { $tag }
+# Under the tag box: tags that assets which look like this one have and it doesn't, each added with a click.
+asset-tags-from-similar = У похожих есть:
+asset-tag-suggest-title = Добавить { $tag }
 asset-details-heading = Сведения
 asset-field-category = Категория
 asset-field-license = Лицензия

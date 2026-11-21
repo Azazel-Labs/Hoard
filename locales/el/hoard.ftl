@@ -563,6 +563,33 @@ app-bulk-failed =
         [one] Δεν ήταν δυνατή η αλλαγή αυτού του στοιχείου: { $error }
        *[other] Δεν ήταν δυνατή η αλλαγή αυτών των { $count } στοιχείων: { $error }
     }
+# Copying the tags of the asset with the keyboard on it (C), to paste onto others (V).
+app-tags-copied =
+    { $count ->
+        [one] Αντιγράφηκε { $count } ετικέτα
+       *[other] Αντιγράφηκαν { $count } ετικέτες
+    }
+app-tags-copy-none = Το { $name } δεν έχει ετικέτες για αντιγραφή
+# Pasting (V) with nothing copied, or with copied text that isn't a list of tags.
+app-tags-paste-none = Δεν αντιγράφηκε καμία ετικέτα. Πάτα C σε ένα στοιχείο για να αντιγράψεις τις ετικέτες του.
+# Pasting tags that every one of the assets already has.
+app-tags-paste-had =
+    { $count ->
+        [one] Έχει ήδη αυτές τις ετικέτες
+       *[other] Και τα { $count } έχουν ήδη αυτές τις ετικέτες
+    }
+# After pasting: $count tags were added to $assets assets.
+app-tags-pasted =
+    { $assets ->
+        [one] { $count ->
+            [one] Προστέθηκε { $count } ετικέτα
+           *[other] Προστέθηκαν { $count } ετικέτες
+        }
+       *[other] { $count ->
+            [one] Προστέθηκε { $count } ετικέτα σε { $assets } στοιχεία
+           *[other] Προστέθηκαν { $count } ετικέτες σε { $assets } στοιχεία
+        }
+    }
 app-bulk-untagged =
     { $count ->
         [one] Αφαιρέθηκε η ετικέτα { $tag } από { $count } στοιχείο
@@ -826,6 +853,11 @@ palette-archive-selected-keywords = διαγραφή αφαίρεση κάδος
 palette-edit-selected = Επεξεργασία των { $count } επιλεγμένων
 # Words that find the action above when typed into the command palette.
 palette-edit-selected-keywords = μαζική αλλαγή ετικέτες κατηγορία άδεια αξιολόγηση
+palette-paste-tags =
+    { $count ->
+        [one] Επικόλληση των αντιγραμμένων ετικετών στο επιλεγμένο στοιχείο
+       *[other] Επικόλληση των αντιγραμμένων ετικετών στα { $count } επιλεγμένα
+    }
 palette-clear-selection = Απαλοιφή επιλογής
 palette-clear-filters = Απαλοιφή φίλτρων
 palette-clear-filters-keywords = επαναφορά μηδενισμός reset
@@ -875,6 +907,8 @@ shortcuts-favorite = Προσθήκη ή αφαίρεση από τα αγαπη
 shortcuts-reviewed = Σήμανση ως ελεγμένο ή όχι
 shortcuts-tag = Προσθήκη ετικέτας
 shortcuts-edit = Επεξεργασία των επιλεγμένων
+shortcuts-copy-tags = Αντιγραφή των ετικετών του
+shortcuts-paste-tags = Επικόλληση των αντιγραμμένων ετικετών στα επιλεγμένα
 shortcuts-key-click = κλικ
 shortcuts-select-range = Επιλογή εύρους
 shortcuts-select-all = Επιλογή όλων όσων εμφανίζονται
@@ -1694,6 +1728,9 @@ asset-tags-accept-all-title = Διατήρηση ως δικών σας όλων
 # Before a list of tags someone removed, which the taggers won't put back; each can be clicked to restore it.
 asset-tags-rejected = Απορρίφθηκαν:
 asset-tag-restore-title = Επαναφορά της { $tag }
+# Under the tag box: tags that assets which look like this one have and it doesn't, each added with a click.
+asset-tags-from-similar = Παρόμοια έχουν:
+asset-tag-suggest-title = Προσθήκη { $tag }
 asset-details-heading = Λεπτομέρειες
 asset-field-category = Κατηγορία
 asset-field-license = Άδεια

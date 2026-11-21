@@ -410,6 +410,40 @@ function removeLastTag() {
   if (last) void removeTag(last.tag)
 }
 
+// The tags the most alike assets share that this one lacks, to add with a click.
+const fromSimilar = ref<string[]>([])
+let similarAsk: AbortController | null = null
+watch(
+  () => [props.asset.id, editor.value && alikeable.value] as const,
+  ([id, want]) => {
+    similarAsk?.abort()
+    fromSimilar.value = []
+    if (!want) return
+    const ask = (similarAsk = new AbortController())
+    api
+      .search({ similar: id, limit: 12, facets: false }, ask.signal)
+      .then((r) => {
+        const near = r.items.filter((a) => a.id !== id)
+        const counts = new Map<string, number>()
+        for (const a of near) {
+          for (const x of a.tags) {
+            if (!x.tag.startsWith('kind:') && !x.tag.startsWith('format:')) counts.set(x.tag, (counts.get(x.tag) ?? 0) + 1)
+          }
+        }
+        // Shared by a quarter of them at least, so one odd neighbour doesn't suggest anything.
+        const least = Math.max(2, Math.ceil(near.length / 4))
+        fromSimilar.value = [...counts].filter(([, n]) => n >= least).sort((x, y) => y[1] - x[1]).map(([tag]) => tag)
+      })
+      .catch(() => {})
+  },
+  { immediate: true },
+)
+onBeforeUnmount(() => similarAsk?.abort())
+const similarTags = computed(() => {
+  const skip = new Set([...props.asset.tags.map((x) => x.tag), ...rejected.value])
+  return fromSimilar.value.filter((tag) => !skip.has(tag)).slice(0, 8)
+})
+
 // On a phone the panel covers the screen: swipe it away to the right.
 const root = ref<HTMLElement | null>(null)
 let unswipe = () => {}
@@ -653,6 +687,17 @@ onBeforeUnmount(() => unswipe())
           @remove-last="removeLastTag"
         />
       </div>
+      <p v-if="editor && similarTags.length" class="rejected suggest">
+        <span class="lbl">{{ t('asset-tags-from-similar') }}</span>
+        <button
+          v-for="tag in similarTags"
+          :key="tag"
+          type="button"
+          class="linkish sug"
+          :title="t('asset-tag-suggest-title', { tag })"
+          @click="addTags([tag])"
+        ><span aria-hidden="true">+</span>{{ tag }}</button>
+      </p>
       <label v-if="family && editor" class="animcheck familycheck">
         <input v-model="applyToFamily" type="checkbox" /> {{ t('asset-apply-family', { count: family.size }) }}
       </label>
@@ -788,6 +833,9 @@ onBeforeUnmount(() => unswipe())
 .rejected .lbl { margin-right: 0.1rem; }
 .rejected .rej { color: var(--faint); text-decoration: line-through; text-decoration-color: color-mix(in srgb, var(--faint) 60%, transparent); }
 .rejected .rej:hover { color: var(--text); text-decoration: none; }
+.suggest .sug { color: var(--muted); }
+.suggest .sug span { margin-right: 0.1em; color: var(--faint); }
+.suggest .sug:hover { color: var(--accent); }
 .detail {
   display: flex; flex-direction: column; gap: 1rem;
   padding: 1.1rem 1.2rem 1.4rem;

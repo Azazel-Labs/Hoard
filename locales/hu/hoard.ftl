@@ -547,6 +547,33 @@ app-bulk-failed =
         [one] Nem sikerült módosítani az assetet
        *[other] Nem sikerült módosítani { $count } assetet
     }: { $error }
+# Copying the tags of the asset with the keyboard on it (C), to paste onto others (V).
+app-tags-copied =
+    { $count ->
+        [one] { $count } címke másolva
+       *[other] { $count } címke másolva
+    }
+app-tags-copy-none = { $name } nem rendelkezik másolható címkével
+# Pasting (V) with nothing copied, or with copied text that isn't a list of tags.
+app-tags-paste-none = Nincs másolt címke. Nyomd meg a C-t egy asseten a címkéi másolásához.
+# Pasting tags that every one of the assets already has.
+app-tags-paste-had =
+    { $count ->
+        [one] Már megvannak rajta ezek a címkék
+       *[other] Mind a { $count } asseten megvannak már ezek a címkék
+    }
+# After pasting: $count tags were added to $assets assets.
+app-tags-pasted =
+    { $assets ->
+        [one] { $count ->
+            [one] { $count } címke hozzáadva
+           *[other] { $count } címke hozzáadva
+        }
+       *[other] { $count ->
+            [one] { $count } címke hozzáadva { $assets } assethez
+           *[other] { $count } címke hozzáadva { $assets } assethez
+        }
+    }
 app-bulk-untagged = Címke eltávolítva { $count } assetről: { $tag }
 app-bulk-tagged = { $count } asset felcímkézve ezzel: { $tag }
 app-bulk-review = Megjelölés átnézettként
@@ -782,6 +809,11 @@ palette-archive-selected-keywords = törlés eltávolítás kuka delete remove t
 palette-edit-selected = A kijelölt { $count } szerkesztése
 # Words that find the action above when typed into the command palette.
 palette-edit-selected-keywords = tömeges módosítás címkék kategória licenc értékelés
+palette-paste-tags =
+    { $count ->
+        [one] A másolt címkék beillesztése a kijelölt assetre
+       *[other] A másolt címkék beillesztése a { $count } kijelölt assetre
+    }
 palette-clear-selection = Kijelölés megszüntetése
 palette-clear-filters = Szűrők törlése
 palette-clear-filters-keywords = visszaállítás alaphelyzet reset
@@ -831,6 +863,8 @@ shortcuts-favorite = Hozzáadás a kedvencekhez vagy eltávolítás onnan
 shortcuts-reviewed = Megjelölés átnézettként, vagy a jelölés levétele
 shortcuts-tag = Címke hozzáadása
 shortcuts-edit = A kijelöltek szerkesztése
+shortcuts-copy-tags = A címkéinek másolása
+shortcuts-paste-tags = A másolt címkék beillesztése a kijelöltekre
 shortcuts-key-click = kattintás
 shortcuts-select-range = Tartomány kijelölése
 shortcuts-select-all = Minden látható kijelölése
@@ -1549,6 +1583,9 @@ asset-tags-accept-all-title = A szabályok és az MI által tippelt összes cím
 # Before a list of tags someone removed, which the taggers won't put back; each can be clicked to restore it.
 asset-tags-rejected = Elutasítva:
 asset-tag-restore-title = Visszatétel: { $tag }
+# Under the tag box: tags that assets which look like this one have and it doesn't, each added with a click.
+asset-tags-from-similar = A hasonlókon ezek vannak:
+asset-tag-suggest-title = { $tag } hozzáadása
 asset-details-heading = Részletek
 asset-field-category = Kategória
 asset-field-license = Licenc

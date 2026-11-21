@@ -547,6 +547,33 @@ app-bulk-failed =
         [one] Bu varlık değiştirilemedi: { $error }
        *[other] Bu { $count } varlık değiştirilemedi: { $error }
     }
+# Copying the tags of the asset with the keyboard on it (C), to paste onto others (V).
+app-tags-copied =
+    { $count ->
+        [one] { $count } etiket kopyalandı
+       *[other] { $count } etiket kopyalandı
+    }
+app-tags-copy-none = { $name } için kopyalanacak etiket yok
+# Pasting (V) with nothing copied, or with copied text that isn't a list of tags.
+app-tags-paste-none = Kopyalanmış etiket yok. Etiketlerini kopyalamak için bir varlıkta C'ye bas.
+# Pasting tags that every one of the assets already has.
+app-tags-paste-had =
+    { $count ->
+        [one] Bu etiketlere zaten sahip
+       *[other] { $count } varlığın hepsinde bu etiketler zaten var
+    }
+# After pasting: $count tags were added to $assets assets.
+app-tags-pasted =
+    { $assets ->
+        [one] { $count ->
+            [one] { $count } etiket eklendi
+           *[other] { $count } etiket eklendi
+        }
+       *[other] { $count ->
+            [one] { $count } etiket { $assets } varlığa eklendi
+           *[other] { $count } etiket { $assets } varlığa eklendi
+        }
+    }
 app-bulk-untagged = { $tag } etiketi { $count } varlıktan kaldırıldı
 app-bulk-tagged = { $count } varlığa { $tag } etiketi eklendi
 app-bulk-review = İncelendi say
@@ -770,6 +797,11 @@ palette-archive-selected-keywords = sil kaldır çöp delete remove trash
 palette-edit-selected = Seçili { $count } öğeyi düzenle
 # Words that find the action above when typed into the command palette.
 palette-edit-selected-keywords = toplu değişiklik etiketler kategori lisans puan
+palette-paste-tags =
+    { $count ->
+        [one] Kopyalanan etiketleri seçili varlığa yapıştır
+       *[other] Kopyalanan etiketleri seçili { $count } varlığa yapıştır
+    }
 palette-clear-selection = Seçimi temizle
 palette-clear-filters = Filtreleri temizle
 palette-clear-filters-keywords = sıfırla reset
@@ -819,6 +851,8 @@ shortcuts-favorite = Favorilere ekle ya da favorilerden çıkar
 shortcuts-reviewed = İncelendi olarak işaretle ya da işareti kaldır
 shortcuts-tag = Etiket ekle
 shortcuts-edit = Seçilenleri düzenle
+shortcuts-copy-tags = Etiketlerini kopyala
+shortcuts-paste-tags = Kopyalanan etiketleri seçililere yapıştır
 shortcuts-key-click = tıklama
 shortcuts-select-range = Bir aralık seç
 shortcuts-select-all = Gösterilen her şeyi seç
@@ -1525,6 +1559,9 @@ asset-tags-accept-all-title = Kuralların ve yapay zekânın tahmin ettiği her 
 # Before a list of tags someone removed, which the taggers won't put back; each can be clicked to restore it.
 asset-tags-rejected = Reddedilenler:
 asset-tag-restore-title = { $tag } etiketini geri ekle
+# Under the tag box: tags that assets which look like this one have and it doesn't, each added with a click.
+asset-tags-from-similar = Benzerlerinde şunlar var:
+asset-tag-suggest-title = { $tag } ekle
 asset-details-heading = Ayrıntılar
 asset-field-category = Kategori
 asset-field-license = Lisans

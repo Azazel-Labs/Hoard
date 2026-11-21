@@ -567,6 +567,39 @@ app-bulk-failed =
         [many] tych { $count } zasobów
        *[other] tych { $count } zasobu
     }: { $error }
+# Copying the tags of the asset with the keyboard on it (C), to paste onto others (V).
+app-tags-copied =
+    { $count ->
+        [one] Skopiowano { $count } tag
+        [few] Skopiowano { $count } tagi
+        [many] Skopiowano { $count } tagów
+       *[other] Skopiowano { $count } tagu
+    }
+app-tags-copy-none = { $name } nie ma tagów do skopiowania
+# Pasting (V) with nothing copied, or with copied text that isn't a list of tags.
+app-tags-paste-none = Nie skopiowano żadnych tagów. Naciśnij C na zasobie, aby skopiować jego tagi.
+# Pasting tags that every one of the assets already has.
+app-tags-paste-had =
+    { $count ->
+        [one] Ma już te tagi
+       *[other] Wszystkie { $count } mają już te tagi
+    }
+# After pasting: $count tags were added to $assets assets.
+app-tags-pasted =
+    { $assets ->
+        [one] { $count ->
+            [one] Dodano { $count } tag
+            [few] Dodano { $count } tagi
+            [many] Dodano { $count } tagów
+           *[other] Dodano { $count } tagu
+        }
+       *[other] { $count ->
+            [one] Dodano { $count } tag do { $assets } zasobów
+            [few] Dodano { $count } tagi do { $assets } zasobów
+            [many] Dodano { $count } tagów do { $assets } zasobów
+           *[other] Dodano { $count } tagu do { $assets } zasobów
+        }
+    }
 app-bulk-untagged =
     Usunięto tag { $tag } z { $count ->
         [one] { $count } zasobu
@@ -862,6 +895,11 @@ palette-archive-selected-keywords = usuń kosz delete remove trash
 palette-edit-selected = Edytuj zaznaczone ({ $count })
 # Words that find the action above when typed into the command palette.
 palette-edit-selected-keywords = zmiana zbiorcza tagi kategoria licencja ocena
+palette-paste-tags =
+    { $count ->
+        [one] Wklej skopiowane tagi do zaznaczonego zasobu
+       *[other] Wklej skopiowane tagi do { $count } zaznaczonych
+    }
 palette-clear-selection = Wyczyść zaznaczenie
 palette-clear-filters = Wyczyść filtry
 palette-clear-filters-keywords = resetuj reset
@@ -911,6 +949,8 @@ shortcuts-favorite = Dodaj do ulubionych lub usuń z ulubionych
 shortcuts-reviewed = Oznacz jako sprawdzone lub nie
 shortcuts-tag = Dodaj tag
 shortcuts-edit = Edytuj zaznaczone
+shortcuts-copy-tags = Skopiuj jego tagi
+shortcuts-paste-tags = Wklej skopiowane tagi do zaznaczonych
 shortcuts-key-click = kliknięcie
 shortcuts-select-range = Zaznacz zakres
 shortcuts-select-all = Zaznacz wszystko, co widoczne
@@ -1791,6 +1831,9 @@ asset-tags-accept-all-title = Zachowaj jako własne wszystkie tagi podpowiedzian
 # Before a list of tags someone removed, which the taggers won't put back; each can be clicked to restore it.
 asset-tags-rejected = Odrzucone:
 asset-tag-restore-title = Przywróć { $tag }
+# Under the tag box: tags that assets which look like this one have and it doesn't, each added with a click.
+asset-tags-from-similar = Podobne mają:
+asset-tag-suggest-title = Dodaj { $tag }
 asset-details-heading = Szczegóły
 asset-field-category = Kategoria
 asset-field-license = Licencja

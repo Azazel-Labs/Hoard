@@ -543,6 +543,15 @@ app-ns-engine = エンジン
 app-ns-extracted = 復元したソース
 app-ns-script = 文字体系
 app-bulk-failed = { $count } 件のアセットを変更できませんでした: { $error }
+# Copying the tags of the asset with the keyboard on it (C), to paste onto others (V).
+app-tags-copied = { $count } 個のタグをコピーしました
+app-tags-copy-none = { $name } にはコピーできるタグがありません
+# Pasting (V) with nothing copied, or with copied text that isn't a list of tags.
+app-tags-paste-none = コピーされたタグがありません。アセットで C を押すと、そのタグをコピーできます。
+# Pasting tags that every one of the assets already has.
+app-tags-paste-had = { $count } 件のアセットにはすでにそのタグがあります
+# After pasting: $count tags were added to $assets assets.
+app-tags-pasted = { $assets } 件のアセットに { $count } 個のタグを追加しました
 app-bulk-untagged = { $count } 件のアセットから { $tag } を外しました
 app-bulk-tagged = { $count } 件のアセットに { $tag } を付けました
 app-bulk-review = 確認済みにする
@@ -760,6 +769,7 @@ palette-archive-selected-keywords = 削除 除去 ゴミ箱 delete remove trash
 palette-edit-selected = 選択した { $count } 件を編集
 # Words that find the action above when typed into the command palette.
 palette-edit-selected-keywords = 一括変更 タグ カテゴリ ライセンス 評価
+palette-paste-tags = コピーしたタグを選択中の { $count } 件に貼り付け
 palette-clear-selection = 選択を解除
 palette-clear-filters = フィルターをクリア
 palette-clear-filters-keywords = リセット reset
@@ -809,6 +819,8 @@ shortcuts-favorite = お気に入りに追加、またはお気に入りから�
 shortcuts-reviewed = 確認済みにする、または解除する
 shortcuts-tag = タグを追加
 shortcuts-edit = 選択中のものを編集
+shortcuts-copy-tags = タグをコピー
+shortcuts-paste-tags = コピーしたタグを選択中のものに貼り付け
 shortcuts-key-click = クリック
 shortcuts-select-range = 範囲を選択
 shortcuts-select-all = 表示中のものをすべて選択
@@ -1510,6 +1522,9 @@ asset-tags-accept-all-title = ルールと AI が推測したタグをすべて�
 # Before a list of tags someone removed, which the taggers won't put back; each can be clicked to restore it.
 asset-tags-rejected = 却下済み:
 asset-tag-restore-title = { $tag } を戻す
+# Under the tag box: tags that assets which look like this one have and it doesn't, each added with a click.
+asset-tags-from-similar = 似たアセットのタグ:
+asset-tag-suggest-title = { $tag } を追加
 asset-details-heading = 詳細
 asset-field-category = カテゴリー
 asset-field-license = ライセンス

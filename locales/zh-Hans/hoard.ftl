@@ -546,6 +546,15 @@ app-bulk-failed =
     无法更改{ $count ->
        *[other] 这 { $count } 个资源
     }：{ $error }
+# Copying the tags of the asset with the keyboard on it (C), to paste onto others (V).
+app-tags-copied = 已复制 { $count } 个标签
+app-tags-copy-none = { $name } 没有可复制的标签
+# Pasting (V) with nothing copied, or with copied text that isn't a list of tags.
+app-tags-paste-none = 还没有复制标签。在资源上按 C 即可复制它的标签。
+# Pasting tags that every one of the assets already has.
+app-tags-paste-had = 这 { $count } 个资源都已有这些标签
+# After pasting: $count tags were added to $assets assets.
+app-tags-pasted = 已为 { $assets } 个资源添加 { $count } 个标签
 app-bulk-untagged = 已从 { $count } 个资源上移除 { $tag }
 app-bulk-tagged = 已为 { $count } 个资源添加标签 { $tag }
 app-bulk-review = 标记已审阅
@@ -763,6 +772,7 @@ palette-archive-selected-keywords = 删除 移除 回收站 delete remove trash
 palette-edit-selected = 编辑已选的 { $count } 个
 # Words that find the action above when typed into the command palette.
 palette-edit-selected-keywords = 批量更改 标签 分类 许可证 评分
+palette-paste-tags = 将复制的标签粘贴到所选的 { $count } 个资源
 palette-clear-selection = 清除选择
 palette-clear-filters = 清除筛选
 palette-clear-filters-keywords = 重置 reset
@@ -812,6 +822,8 @@ shortcuts-favorite = 加入或移出收藏
 shortcuts-reviewed = 标记为已审阅或取消
 shortcuts-tag = 添加标签
 shortcuts-edit = 编辑所选项
+shortcuts-copy-tags = 复制它的标签
+shortcuts-paste-tags = 将复制的标签粘贴到所选项
 shortcuts-key-click = 单击
 shortcuts-select-range = 选择范围
 shortcuts-select-all = 选择显示的全部内容
@@ -1513,6 +1525,9 @@ asset-tags-accept-all-title = 将规则和 AI 推测的所有标签保留为你�
 # Before a list of tags someone removed, which the taggers won't put back; each can be clicked to restore it.
 asset-tags-rejected = 已拒绝：
 asset-tag-restore-title = 恢复 { $tag }
+# Under the tag box: tags that assets which look like this one have and it doesn't, each added with a click.
+asset-tags-from-similar = 相似的有：
+asset-tag-suggest-title = 添加 { $tag }
 asset-details-heading = 详情
 asset-field-category = 类别
 asset-field-license = 许可证

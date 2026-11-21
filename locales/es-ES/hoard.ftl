@@ -563,6 +563,33 @@ app-bulk-failed =
         [one] ese recurso
        *[other] esos { $count } recursos
     }: { $error }
+# Copying the tags of the asset with the keyboard on it (C), to paste onto others (V).
+app-tags-copied =
+    { $count ->
+        [one] Se ha copiado { $count } etiqueta
+       *[other] Se han copiado { $count } etiquetas
+    }
+app-tags-copy-none = { $name } no tiene etiquetas para copiar
+# Pasting (V) with nothing copied, or with copied text that isn't a list of tags.
+app-tags-paste-none = No se ha copiado ninguna etiqueta. Pulsa C en un recurso para copiar sus etiquetas.
+# Pasting tags that every one of the assets already has.
+app-tags-paste-had =
+    { $count ->
+        [one] Ya tiene esas etiquetas
+       *[other] Los { $count } ya tienen esas etiquetas
+    }
+# After pasting: $count tags were added to $assets assets.
+app-tags-pasted =
+    { $assets ->
+        [one] { $count ->
+            [one] Se ha añadido { $count } etiqueta
+           *[other] Se han añadido { $count } etiquetas
+        }
+       *[other] { $count ->
+            [one] Se ha añadido { $count } etiqueta a { $assets } recursos
+           *[other] Se han añadido { $count } etiquetas a { $assets } recursos
+        }
+    }
 app-bulk-untagged =
     Se ha quitado { $tag } de { $count ->
         [one] { $count } recurso
@@ -822,6 +849,11 @@ palette-archive-selected-keywords = eliminar quitar borrar papelera delete remov
 palette-edit-selected = Editar los { $count } seleccionados
 # Words that find the action above when typed into the command palette.
 palette-edit-selected-keywords = cambio masivo etiquetas categoría licencia valoración
+palette-paste-tags =
+    { $count ->
+        [one] Pegar las etiquetas copiadas en el recurso seleccionado
+       *[other] Pegar las etiquetas copiadas en los { $count } seleccionados
+    }
 palette-clear-selection = Borrar la selección
 palette-clear-filters = Borrar filtros
 palette-clear-filters-keywords = restablecer reiniciar reset
@@ -871,6 +903,8 @@ shortcuts-favorite = Añadir a favoritos o quitar de favoritos
 shortcuts-reviewed = Marcar como revisado o no
 shortcuts-tag = Añadir una etiqueta
 shortcuts-edit = Editar lo seleccionado
+shortcuts-copy-tags = Copiar sus etiquetas
+shortcuts-paste-tags = Pegar las etiquetas copiadas en lo seleccionado
 shortcuts-key-click = clic
 shortcuts-select-range = Seleccionar un intervalo
 shortcuts-select-all = Seleccionar todo lo mostrado
@@ -1687,6 +1721,9 @@ asset-tags-accept-all-title = Conservar como propias todas las etiquetas que sug
 # Before a list of tags someone removed, which the taggers won't put back; each can be clicked to restore it.
 asset-tags-rejected = Rechazadas:
 asset-tag-restore-title = Volver a poner { $tag }
+# Under the tag box: tags that assets which look like this one have and it doesn't, each added with a click.
+asset-tags-from-similar = Los parecidos tienen:
+asset-tag-suggest-title = Añadir { $tag }
 asset-details-heading = Detalles
 asset-field-category = Categoría
 asset-field-license = Licencia

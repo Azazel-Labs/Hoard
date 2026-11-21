@@ -568,6 +568,39 @@ app-bulk-failed =
         [few] Tyto { $count } assety se nepodařilo změnit
        *[other] Těchto { $count } assetů se nepodařilo změnit
     }: { $error }
+# Copying the tags of the asset with the keyboard on it (C), to paste onto others (V).
+app-tags-copied =
+    { $count ->
+        [one] Zkopírován { $count } štítek
+        [few] Zkopírovány { $count } štítky
+        [many] Zkopírováno { $count } štítku
+       *[other] Zkopírováno { $count } štítků
+    }
+app-tags-copy-none = { $name } nemá žádné štítky ke zkopírování
+# Pasting (V) with nothing copied, or with copied text that isn't a list of tags.
+app-tags-paste-none = Žádné štítky nejsou zkopírované. Stisknutím C na assetu zkopírujete jeho štítky.
+# Pasting tags that every one of the assets already has.
+app-tags-paste-had =
+    { $count ->
+        [one] Už tyto štítky má
+       *[other] Všechny { $count } už tyto štítky mají
+    }
+# After pasting: $count tags were added to $assets assets.
+app-tags-pasted =
+    { $assets ->
+        [one] { $count ->
+            [one] Přidán { $count } štítek
+            [few] Přidány { $count } štítky
+            [many] Přidáno { $count } štítku
+           *[other] Přidáno { $count } štítků
+        }
+       *[other] { $count ->
+            [one] Přidán { $count } štítek k { $assets } assetům
+            [few] Přidány { $count } štítky k { $assets } assetům
+            [many] Přidáno { $count } štítku k { $assets } assetům
+           *[other] Přidáno { $count } štítků k { $assets } assetům
+        }
+    }
 app-bulk-untagged =
     Štítek { $tag } odebrán z { $count ->
         [one] { $count } assetu
@@ -847,6 +880,11 @@ palette-archive-selected-keywords = smazat odstranit koš delete remove trash
 palette-edit-selected = Upravit vybrané ({ $count })
 # Words that find the action above when typed into the command palette.
 palette-edit-selected-keywords = hromadná změna štítky kategorie licence hodnocení
+palette-paste-tags =
+    { $count ->
+        [one] Vložit zkopírované štítky do vybraného assetu
+       *[other] Vložit zkopírované štítky do { $count } vybraných
+    }
 palette-clear-selection = Zrušit výběr
 palette-clear-filters = Vymazat filtry
 palette-clear-filters-keywords = resetovat obnovit reset
@@ -896,6 +934,8 @@ shortcuts-favorite = Přidat do oblíbených nebo z nich odebrat
 shortcuts-reviewed = Označit jako zkontrolované, nebo ne
 shortcuts-tag = Přidat štítek
 shortcuts-edit = Upravit vybrané
+shortcuts-copy-tags = Zkopírovat jeho štítky
+shortcuts-paste-tags = Vložit zkopírované štítky na vybrané
 shortcuts-key-click = klik
 shortcuts-select-range = Vybrat rozsah
 shortcuts-select-all = Vybrat vše zobrazené
@@ -1763,6 +1803,9 @@ asset-tags-accept-all-title = Ponechat jako vlastní všechny štítky, které p
 # Before a list of tags someone removed, which the taggers won't put back; each can be clicked to restore it.
 asset-tags-rejected = Zamítnuté:
 asset-tag-restore-title = Vrátit štítek { $tag }
+# Under the tag box: tags that assets which look like this one have and it doesn't, each added with a click.
+asset-tags-from-similar = Podobné mají:
+asset-tag-suggest-title = Přidat { $tag }
 asset-details-heading = Podrobnosti
 asset-field-category = Kategorie
 asset-field-license = Licence

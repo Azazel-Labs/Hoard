@@ -555,6 +555,33 @@ app-bulk-failed =
         [one] Dieses Asset konnte
        *[other] Diese { $count } Assets konnten
     } nicht geändert werden: { $error }
+# Copying the tags of the asset with the keyboard on it (C), to paste onto others (V).
+app-tags-copied =
+    { $count ->
+        [one] { $count } Tag kopiert
+       *[other] { $count } Tags kopiert
+    }
+app-tags-copy-none = { $name } hat keine Tags zum Kopieren
+# Pasting (V) with nothing copied, or with copied text that isn't a list of tags.
+app-tags-paste-none = Keine Tags kopiert. Mit C auf einem Asset kopierst du seine Tags.
+# Pasting tags that every one of the assets already has.
+app-tags-paste-had =
+    { $count ->
+        [one] Es hat diese Tags schon
+       *[other] Alle { $count } haben diese Tags schon
+    }
+# After pasting: $count tags were added to $assets assets.
+app-tags-pasted =
+    { $assets ->
+        [one] { $count ->
+            [one] { $count } Tag hinzugefügt
+           *[other] { $count } Tags hinzugefügt
+        }
+       *[other] { $count ->
+            [one] { $count } Tag zu { $assets } Assets hinzugefügt
+           *[other] { $count } Tags zu { $assets } Assets hinzugefügt
+        }
+    }
 app-bulk-untagged =
     { $tag } von { $count ->
         [one] { $count } Asset
@@ -810,6 +837,11 @@ palette-archive-selected-keywords = löschen entfernen papierkorb delete remove 
 palette-edit-selected = Die { $count } ausgewählten bearbeiten
 # Words that find the action above when typed into the command palette.
 palette-edit-selected-keywords = Massenänderung Tags Kategorie Lizenz Bewertung
+palette-paste-tags =
+    { $count ->
+        [one] Kopierte Tags in das ausgewählte Asset einfügen
+       *[other] Kopierte Tags in die { $count } ausgewählten einfügen
+    }
 palette-clear-selection = Auswahl aufheben
 palette-clear-filters = Filter zurücksetzen
 palette-clear-filters-keywords = zurücksetzen löschen reset
@@ -859,6 +891,8 @@ shortcuts-favorite = Zu Favoriten hinzufügen oder daraus entfernen
 shortcuts-reviewed = Als geprüft markieren oder nicht
 shortcuts-tag = Tag hinzufügen
 shortcuts-edit = Auswahl bearbeiten
+shortcuts-copy-tags = Seine Tags kopieren
+shortcuts-paste-tags = Kopierte Tags in die Auswahl einfügen
 shortcuts-key-click = Klick
 shortcuts-select-range = Bereich auswählen
 shortcuts-select-all = Alles Angezeigte auswählen
@@ -1644,6 +1678,9 @@ asset-tags-accept-all-title = Alle von Regeln und KI vorgeschlagenen Tags als ei
 # Before a list of tags someone removed, which the taggers won't put back; each can be clicked to restore it.
 asset-tags-rejected = Abgelehnt:
 asset-tag-restore-title = { $tag } wieder setzen
+# Under the tag box: tags that assets which look like this one have and it doesn't, each added with a click.
+asset-tags-from-similar = Ähnliche haben:
+asset-tag-suggest-title = { $tag } hinzufügen
 asset-details-heading = Details
 asset-field-category = Kategorie
 asset-field-license = Lizenz

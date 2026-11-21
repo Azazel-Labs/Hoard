@@ -551,6 +551,33 @@ app-bulk-failed =
         [one] daardie bate
        *[other] daardie { $count } bates
     } verander nie: { $error }
+# Copying the tags of the asset with the keyboard on it (C), to paste onto others (V).
+app-tags-copied =
+    { $count ->
+        [one] { $count } etiket gekopieer
+       *[other] { $count } etikette gekopieer
+    }
+app-tags-copy-none = { $name } het geen etikette om te kopieer nie
+# Pasting (V) with nothing copied, or with copied text that isn't a list of tags.
+app-tags-paste-none = Geen etikette gekopieer nie. Druk C op 'n bate om sy etikette te kopieer.
+# Pasting tags that every one of the assets already has.
+app-tags-paste-had =
+    { $count ->
+        [one] Dit het reeds daardie etikette
+       *[other] Al { $count } het reeds daardie etikette
+    }
+# After pasting: $count tags were added to $assets assets.
+app-tags-pasted =
+    { $assets ->
+        [one] { $count ->
+            [one] { $count } etiket bygevoeg
+           *[other] { $count } etikette bygevoeg
+        }
+       *[other] { $count ->
+            [one] { $count } etiket by { $assets } bates gevoeg
+           *[other] { $count } etikette by { $assets } bates gevoeg
+        }
+    }
 app-bulk-untagged =
     { $tag } van { $count ->
         [one] { $count } bate
@@ -806,6 +833,11 @@ palette-archive-selected-keywords = uitvee verwyder asblik delete remove trash
 palette-edit-selected = Wysig die { $count } gekose
 # Words that find the action above when typed into the command palette.
 palette-edit-selected-keywords = grootmaat verander etikette kategorie lisensie gradering
+palette-paste-tags =
+    { $count ->
+        [one] Plak die gekopieerde etikette op die gekose bate
+       *[other] Plak die gekopieerde etikette op die { $count } gekose
+    }
 palette-clear-selection = Maak die keuse skoon
 palette-clear-filters = Maak filters skoon
 palette-clear-filters-keywords = terugstel reset
@@ -855,6 +887,8 @@ shortcuts-favorite = Voeg by of haal uit jou gunstelinge
 shortcuts-reviewed = Merk as nagegaan, of nie
 shortcuts-tag = Voeg 'n etiket by
 shortcuts-edit = Wysig wat gekies is
+shortcuts-copy-tags = Kopieer sy etikette
+shortcuts-paste-tags = Plak gekopieerde etikette op wat gekies is
 shortcuts-key-click = klik
 shortcuts-select-range = Kies 'n reeks
 shortcuts-select-all = Kies alles wat gewys word
@@ -1644,6 +1678,9 @@ asset-tags-accept-all-title = Hou elke etiket wat die reëls en die KI geraai he
 # Before a list of tags someone removed, which the taggers won't put back; each can be clicked to restore it.
 asset-tags-rejected = Van die hand gewys:
 asset-tag-restore-title = Sit { $tag } terug
+# Under the tag box: tags that assets which look like this one have and it doesn't, each added with a click.
+asset-tags-from-similar = Soortgelykes het:
+asset-tag-suggest-title = Voeg { $tag } by
 asset-details-heading = Besonderhede
 asset-field-category = Kategorie
 asset-field-license = Lisensie

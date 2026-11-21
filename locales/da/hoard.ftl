@@ -551,6 +551,33 @@ app-bulk-failed =
         [one] det asset
        *[other] de { $count } assets
     }: { $error }
+# Copying the tags of the asset with the keyboard on it (C), to paste onto others (V).
+app-tags-copied =
+    { $count ->
+        [one] Kopierede { $count } tag
+       *[other] Kopierede { $count } tags
+    }
+app-tags-copy-none = { $name } har ingen tags at kopiere
+# Pasting (V) with nothing copied, or with copied text that isn't a list of tags.
+app-tags-paste-none = Ingen tags kopieret. Tryk på C på et asset for at kopiere dets tags.
+# Pasting tags that every one of the assets already has.
+app-tags-paste-had =
+    { $count ->
+        [one] Det har allerede de tags
+       *[other] Alle { $count } har allerede de tags
+    }
+# After pasting: $count tags were added to $assets assets.
+app-tags-pasted =
+    { $assets ->
+        [one] { $count ->
+            [one] Tilføjede { $count } tag
+           *[other] Tilføjede { $count } tags
+        }
+       *[other] { $count ->
+            [one] Tilføjede { $count } tag til { $assets } assets
+           *[other] Tilføjede { $count } tags til { $assets } assets
+        }
+    }
 app-bulk-untagged =
     Fjernede { $tag } fra { $count ->
         [one] { $count } asset
@@ -806,6 +833,11 @@ palette-archive-selected-keywords = slet fjern papirkurv delete remove trash
 palette-edit-selected = Rediger de { $count } valgte
 # Words that find the action above when typed into the command palette.
 palette-edit-selected-keywords = masseændring tags kategori licens vurdering
+palette-paste-tags =
+    { $count ->
+        [one] Indsæt de kopierede tags på det valgte asset
+       *[other] Indsæt de kopierede tags på de { $count } valgte
+    }
 palette-clear-selection = Ryd markeringen
 palette-clear-filters = Ryd filtre
 palette-clear-filters-keywords = nulstil reset
@@ -855,6 +887,8 @@ shortcuts-favorite = Føj til eller fjern fra dine favoritter
 shortcuts-reviewed = Markér som gennemgået, eller ej
 shortcuts-tag = Tilføj et tag
 shortcuts-edit = Rediger det valgte
+shortcuts-copy-tags = Kopiér dets tags
+shortcuts-paste-tags = Indsæt kopierede tags på det valgte
 shortcuts-key-click = klik
 shortcuts-select-range = Vælg et område
 shortcuts-select-all = Vælg alt viste
@@ -1646,6 +1680,9 @@ asset-tags-accept-all-title = Behold alle tags, som reglerne og AI har gættet, 
 # Before a list of tags someone removed, which the taggers won't put back; each can be clicked to restore it.
 asset-tags-rejected = Afvist:
 asset-tag-restore-title = Sæt { $tag } tilbage
+# Under the tag box: tags that assets which look like this one have and it doesn't, each added with a click.
+asset-tags-from-similar = Lignende har:
+asset-tag-suggest-title = Tilføj { $tag }
 asset-details-heading = Detaljer
 asset-field-category = Kategori
 asset-field-license = Licens

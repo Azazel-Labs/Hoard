@@ -33,7 +33,7 @@ import UiLayer from './components/UiLayer.vue'
 import CommandPalette from './components/CommandPalette.vue'
 import InsecureNotice from './components/InsecureNotice.vue'
 import { archiveWithUndo, countText } from './archive'
-import { showError, showOk, swipeToClose, withTransition, type Command } from './ui'
+import { copyText, showError, showOk, swipeToClose, withTransition, type Command } from './ui'
 import { useVirtualGrid } from './virtualGrid'
 import { usePanelFit } from './panelFit'
 import { lazy } from './lazy'
@@ -967,6 +967,13 @@ function onKey(e: KeyboardEvent) {
     e.preventDefault()
     openBulkEdit(focused)
   }
+  if (e.key === 'c' && focused) {
+    void copyTags(focused)
+  }
+  if (e.key === 'v' && (checked.value.length || focused) && mayEdit()) {
+    e.preventDefault()
+    void pasteTags(focused)
+  }
   if (e.key === 't' && focused && mayEdit()) {
     e.preventDefault()
     void focusTagBox(focused)
@@ -1005,6 +1012,83 @@ async function toggleReviewed(a: Asset) {
   if (await set(to)) {
     showOk(t(to ? 'asset-reviewed-on-named' : 'asset-reviewed-off-named', { name: a.name }), { label: t('asset-undo'), run: () => void set(!to) })
   }
+}
+
+/** The tags last copied with `c`, which `v` pastes; the clipboard is only read when nothing's been copied here. */
+const copiedTags = ref<string[]>([])
+function ownTags(a: Asset): string[] {
+  return a.tags.map((x) => x.tag).filter((tag) => !tag.startsWith('kind:') && !tag.startsWith('format:'))
+}
+async function copyTags(a: Asset) {
+  const tags = ownTags(a)
+  if (!tags.length) {
+    showOk(t('app-tags-copy-none', { name: a.name }))
+    return
+  }
+  copiedTags.value = tags
+  await copyText(tags.join(', '))
+  showOk(t('app-tags-copied', { count: tags.length }))
+}
+/** Tags from text copied elsewhere: a short list, not a sentence or a link. */
+async function clipboardTags(): Promise<string[]> {
+  try {
+    const text = await navigator.clipboard.readText()
+    const tags = text.split(/[,;\n]/).map((x) => x.trim()).filter(Boolean)
+    const ok = tags.length <= 40 && tags.every((tag) => tag.length <= 48 && !tag.includes('://'))
+    return ok ? [...new Set(tags)] : []
+  } catch {
+    return []
+  }
+}
+/** Add the copied tags to what's picked, or to the focused asset (the `v` key), with Undo. */
+async function pasteTags(focused?: Asset | null) {
+  if (!mayEdit() || allMatching.value) return
+  const targets = checked.value.length
+    ? checked.value.map((id) => checkedSeen.value.get(id)).filter((a): a is Asset => !!a)
+    : focused ? [focused] : []
+  if (!targets.length) return
+  const tags = copiedTags.value.length ? copiedTags.value : await clipboardTags()
+  if (!tags.length) {
+    showOk(t('app-tags-paste-none'))
+    return
+  }
+  // Each asset gets back exactly what it had: only the tags it didn't have come off again.
+  const undo = new Map<string, string[]>()
+  for (const a of targets) {
+    const had = new Set(a.tags.map((x) => x.tag))
+    const fresh = tags.filter((tag) => !had.has(tag))
+    if (!fresh.length) continue
+    const key = JSON.stringify(fresh)
+    undo.set(key, [...(undo.get(key) ?? []), a.id])
+  }
+  if (!undo.size) {
+    showOk(t('app-tags-paste-had', { count: targets.length }))
+    return
+  }
+  const ids = [...undo.values()].flat()
+  try {
+    await api.bulkAssets({ ids, add_tags: tags })
+  } catch (e) {
+    showError(t('app-bulk-failed', { count: ids.length, error: (e as Error).message }))
+    return
+  }
+  const reopen = () => {
+    if (selected.value && ids.includes(selected.value.id)) openAsset(selected.value.id)
+  }
+  patchLoaded(ids, { add_tags: tags })
+  reopen()
+  showOk(t('app-tags-pasted', { count: tags.length, assets: ids.length }), {
+    label: t('app-undo'),
+    run: async () => {
+      try {
+        for (const [key, group] of undo) await api.bulkAssets({ ids: group, remove_tags: JSON.parse(key) as string[] })
+      } catch (e) {
+        showError(t('app-bulk-failed', { count: ids.length, error: (e as Error).message }))
+      }
+      runSearch({ keep: true })
+      reopen()
+    },
+  })
 }
 
 // ------------------------------------------------------------------ URL
@@ -1153,6 +1237,9 @@ const commands = computed<Command[]>(() => {
   if (checked.value.length && editor.value) {
     const count = allMatching.value ? total.value : checked.value.length
     out.push({ id: 'act:edit', group: actions, label: t('palette-edit-selected', { count }), hint: 'E', keywords: t('palette-edit-selected-keywords'), run: () => openBulkEdit() })
+  }
+  if (checked.value.length && editor.value && copiedTags.value.length && !allMatching.value) {
+    out.push({ id: 'act:paste', group: actions, label: t('palette-paste-tags', { count: checked.value.length }), hint: 'V', keywords: copiedTags.value.join(' '), run: () => void pasteTags() })
   }
   if (view.value === 'library' && canMatchAll.value && total.value > items.value.length && !allMatching.value) {
     out.push({ id: 'act:matching', group: actions, label: t('app-select-matching', { count: total.value }), keywords: t('palette-select-all-keywords'), run: pickAllMatching })

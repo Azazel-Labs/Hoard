@@ -551,6 +551,33 @@ app-bulk-failed =
         [one] die asset
        *[other] die { $count } assets
     } niet wijzigen: { $error }
+# Copying the tags of the asset with the keyboard on it (C), to paste onto others (V).
+app-tags-copied =
+    { $count ->
+        [one] { $count } tag gekopieerd
+       *[other] { $count } tags gekopieerd
+    }
+app-tags-copy-none = { $name } heeft geen tags om te kopiëren
+# Pasting (V) with nothing copied, or with copied text that isn't a list of tags.
+app-tags-paste-none = Geen tags gekopieerd. Druk op C bij een asset om de tags te kopiëren.
+# Pasting tags that every one of the assets already has.
+app-tags-paste-had =
+    { $count ->
+        [one] Heeft die tags al
+       *[other] Alle { $count } hebben die tags al
+    }
+# After pasting: $count tags were added to $assets assets.
+app-tags-pasted =
+    { $assets ->
+        [one] { $count ->
+            [one] { $count } tag toegevoegd
+           *[other] { $count } tags toegevoegd
+        }
+       *[other] { $count ->
+            [one] { $count } tag toegevoegd aan { $assets } assets
+           *[other] { $count } tags toegevoegd aan { $assets } assets
+        }
+    }
 app-bulk-untagged =
     { $tag } verwijderd van { $count ->
         [one] { $count } asset
@@ -806,6 +833,11 @@ palette-archive-selected-keywords = verwijderen weghalen prullenbak delete remov
 palette-edit-selected = De { $count } geselecteerde bewerken
 # Words that find the action above when typed into the command palette.
 palette-edit-selected-keywords = bulkwijziging tags categorie licentie beoordeling
+palette-paste-tags =
+    { $count ->
+        [one] De gekopieerde tags plakken op de geselecteerde asset
+       *[other] De gekopieerde tags plakken op de { $count } geselecteerde
+    }
 palette-clear-selection = Selectie wissen
 palette-clear-filters = Filters wissen
 palette-clear-filters-keywords = resetten herstellen reset
@@ -855,6 +887,8 @@ shortcuts-favorite = Aan je favorieten toevoegen of eruit halen
 shortcuts-reviewed = Markeren als nagekeken of niet
 shortcuts-tag = Een tag toevoegen
 shortcuts-edit = Selectie bewerken
+shortcuts-copy-tags = De tags kopiëren
+shortcuts-paste-tags = Gekopieerde tags plakken op de selectie
 shortcuts-key-click = klik
 shortcuts-select-range = Een reeks selecteren
 shortcuts-select-all = Alles wat getoond wordt selecteren
@@ -1644,6 +1678,9 @@ asset-tags-accept-all-title = Alle tags die regels en AI hebben voorgesteld als 
 # Before a list of tags someone removed, which the taggers won't put back; each can be clicked to restore it.
 asset-tags-rejected = Afgewezen:
 asset-tag-restore-title = { $tag } terugzetten
+# Under the tag box: tags that assets which look like this one have and it doesn't, each added with a click.
+asset-tags-from-similar = Vergelijkbare hebben:
+asset-tag-suggest-title = { $tag } toevoegen
 asset-details-heading = Details
 asset-field-category = Categorie
 asset-field-license = Licentie

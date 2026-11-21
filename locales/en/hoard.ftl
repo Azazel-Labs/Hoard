@@ -625,6 +625,33 @@ app-bulk-failed =
         [one] that asset
        *[other] those { $count } assets
     }: { $error }
+# Copying the tags of the asset with the keyboard on it (C), to paste onto others (V).
+app-tags-copied =
+    { $count ->
+        [one] Copied { $count } tag
+       *[other] Copied { $count } tags
+    }
+app-tags-copy-none = { $name } has no tags to copy
+# Pasting (V) with nothing copied, or with copied text that isn't a list of tags.
+app-tags-paste-none = No tags copied. Press C on an asset to copy its tags.
+# Pasting tags that every one of the assets already has.
+app-tags-paste-had =
+    { $count ->
+        [one] It already has those tags
+       *[other] All { $count } already have those tags
+    }
+# After pasting: $count tags were added to $assets assets.
+app-tags-pasted =
+    { $assets ->
+        [one] { $count ->
+            [one] Added { $count } tag
+           *[other] Added { $count } tags
+        }
+       *[other] { $count ->
+            [one] Added { $count } tag to { $assets } assets
+           *[other] Added { $count } tags to { $assets } assets
+        }
+    }
 # $tag is the tag taken off or added.
 app-bulk-untagged =
     Took { $tag } off { $count ->
@@ -911,6 +938,11 @@ palette-archive-selected-keywords = delete remove trash
 palette-edit-selected = Edit the { $count } selected
 # Words that find the action above when typed into the command palette.
 palette-edit-selected-keywords = bulk change tags category license rating
+palette-paste-tags =
+    { $count ->
+        [one] Paste the copied tags onto the selected asset
+       *[other] Paste the copied tags onto the { $count } selected
+    }
 palette-clear-selection = Clear the selection
 palette-clear-filters = Clear filters
 palette-clear-filters-keywords = reset
@@ -965,6 +997,8 @@ shortcuts-favorite = Add to or take out of your favorites
 shortcuts-reviewed = Mark as reviewed, or not
 shortcuts-tag = Add a tag
 shortcuts-edit = Edit what's selected
+shortcuts-copy-tags = Copy its tags
+shortcuts-paste-tags = Paste copied tags onto what's selected
 # Shown as a key after Shift: Shift-click.
 shortcuts-key-click = click
 shortcuts-select-range = Select a range
@@ -1853,6 +1887,9 @@ asset-tags-accept-all-title = Keep every tag the rules and the AI guessed as you
 # Before a list of tags someone removed, which the taggers won't put back; each can be clicked to restore it.
 asset-tags-rejected = Turned down:
 asset-tag-restore-title = Put { $tag } back
+# Under the tag box: tags that assets which look like this one have and it doesn't, each added with a click.
+asset-tags-from-similar = Similar ones have:
+asset-tag-suggest-title = Add { $tag }
 asset-details-heading = Details
 asset-field-category = Category
 asset-field-license = License

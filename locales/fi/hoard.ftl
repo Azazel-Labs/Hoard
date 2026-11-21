@@ -559,6 +559,33 @@ app-bulk-failed =
         [one] Resurssin muuttaminen epäonnistui: { $error }
        *[other] { $count } resurssin muuttaminen epäonnistui: { $error }
     }
+# Copying the tags of the asset with the keyboard on it (C), to paste onto others (V).
+app-tags-copied =
+    { $count ->
+        [one] Kopioitu { $count } tunniste
+       *[other] Kopioitu { $count } tunnistetta
+    }
+app-tags-copy-none = Kohteella { $name } ei ole kopioitavia tunnisteita
+# Pasting (V) with nothing copied, or with copied text that isn't a list of tags.
+app-tags-paste-none = Tunnisteita ei ole kopioitu. Paina C resurssin kohdalla kopioidaksesi sen tunnisteet.
+# Pasting tags that every one of the assets already has.
+app-tags-paste-had =
+    { $count ->
+        [one] Sillä on jo nuo tunnisteet
+       *[other] Kaikilla { $count } on jo nuo tunnisteet
+    }
+# After pasting: $count tags were added to $assets assets.
+app-tags-pasted =
+    { $assets ->
+        [one] { $count ->
+            [one] Lisätty { $count } tunniste
+           *[other] Lisätty { $count } tunnistetta
+        }
+       *[other] { $count ->
+            [one] Lisätty { $count } tunniste { $assets } resurssiin
+           *[other] Lisätty { $count } tunnistetta { $assets } resurssiin
+        }
+    }
 app-bulk-untagged =
     { $count ->
         [one] Tunniste { $tag } poistettiin { $count } resurssista
@@ -826,6 +853,11 @@ palette-archive-selected-keywords = poista roskakori delete remove trash
 palette-edit-selected = Muokkaa valittuja ({ $count })
 # Words that find the action above when typed into the command palette.
 palette-edit-selected-keywords = massamuutos tunnisteet luokka lisenssi arvosana
+palette-paste-tags =
+    { $count ->
+        [one] Liitä kopioidut tunnisteet valittuun resurssiin
+       *[other] Liitä kopioidut tunnisteet { $count } valittuun
+    }
 palette-clear-selection = Tyhjennä valinta
 palette-clear-filters = Tyhjennä suodattimet
 palette-clear-filters-keywords = nollaa reset
@@ -875,6 +907,8 @@ shortcuts-favorite = Lisää suosikkeihin tai poista niistä
 shortcuts-reviewed = Merkitse tarkistetuksi tai poista merkintä
 shortcuts-tag = Lisää tunniste
 shortcuts-edit = Muokkaa valittuja
+shortcuts-copy-tags = Kopioi sen tunnisteet
+shortcuts-paste-tags = Liitä kopioidut tunnisteet valittuihin
 shortcuts-key-click = napsautus
 shortcuts-select-range = Valitse alue
 shortcuts-select-all = Valitse kaikki näytetyt
@@ -1694,6 +1728,9 @@ asset-tags-accept-all-title = Säilytä kaikki sääntöjen ja tekoälyn arvaama
 # Before a list of tags someone removed, which the taggers won't put back; each can be clicked to restore it.
 asset-tags-rejected = Hylätyt:
 asset-tag-restore-title = Palauta { $tag }
+# Under the tag box: tags that assets which look like this one have and it doesn't, each added with a click.
+asset-tags-from-similar = Samankaltaisilla on:
+asset-tag-suggest-title = Lisää { $tag }
 asset-details-heading = Tiedot
 asset-field-category = Luokka
 asset-field-license = Lisenssi

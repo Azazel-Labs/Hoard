@@ -543,6 +543,15 @@ app-ns-engine = Engine
 app-ns-extracted = Sumber yang dipulihkan
 app-ns-script = Sistem tulisan
 app-bulk-failed = Tidak dapat mengubah { $count } aset itu: { $error }
+# Copying the tags of the asset with the keyboard on it (C), to paste onto others (V).
+app-tags-copied = { $count } tag disalin
+app-tags-copy-none = { $name } tidak punya tag untuk disalin
+# Pasting (V) with nothing copied, or with copied text that isn't a list of tags.
+app-tags-paste-none = Belum ada tag yang disalin. Tekan C pada aset untuk menyalin tagnya.
+# Pasting tags that every one of the assets already has.
+app-tags-paste-had = { $count } aset sudah punya tag itu
+# After pasting: $count tags were added to $assets assets.
+app-tags-pasted = { $count } tag ditambahkan ke { $assets } aset
 app-bulk-untagged = { $tag } dilepas dari { $count } aset
 app-bulk-tagged = { $count } aset diberi tag { $tag }
 app-bulk-review = Tandai ditinjau
@@ -772,6 +781,7 @@ palette-archive-selected-keywords = hapus buang sampah delete remove trash
 palette-edit-selected = Edit { $count } yang dipilih
 # Words that find the action above when typed into the command palette.
 palette-edit-selected-keywords = ubah massal tag kategori lisensi rating
+palette-paste-tags = Tempel tag yang disalin ke { $count } aset terpilih
 palette-clear-selection = Kosongkan pilihan
 palette-clear-filters = Hapus filter
 palette-clear-filters-keywords = setel ulang reset
@@ -821,6 +831,8 @@ shortcuts-favorite = Tambahkan ke atau keluarkan dari favorit Anda
 shortcuts-reviewed = Tandai sudah ditinjau, atau tidak
 shortcuts-tag = Tambah tag
 shortcuts-edit = Edit yang dipilih
+shortcuts-copy-tags = Salin tagnya
+shortcuts-paste-tags = Tempel tag yang disalin ke yang dipilih
 shortcuts-key-click = klik
 shortcuts-select-range = Pilih rentang
 shortcuts-select-all = Pilih semua yang ditampilkan
@@ -1534,6 +1546,9 @@ asset-tags-accept-all-title = Pertahankan semua tag yang ditebak aturan dan AI s
 # Before a list of tags someone removed, which the taggers won't put back; each can be clicked to restore it.
 asset-tags-rejected = Ditolak:
 asset-tag-restore-title = Pasang kembali { $tag }
+# Under the tag box: tags that assets which look like this one have and it doesn't, each added with a click.
+asset-tags-from-similar = Yang mirip punya:
+asset-tag-suggest-title = Tambah { $tag }
 asset-details-heading = Detail
 asset-field-category = Kategori
 asset-field-license = Lisensi

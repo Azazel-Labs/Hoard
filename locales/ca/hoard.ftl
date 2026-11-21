@@ -551,6 +551,33 @@ app-bulk-failed =
         [one] No s'ha pogut canviar aquest recurs: { $error }
        *[other] No s'han pogut canviar aquests { $count } recursos: { $error }
     }
+# Copying the tags of the asset with the keyboard on it (C), to paste onto others (V).
+app-tags-copied =
+    { $count ->
+        [one] S'ha copiat { $count } etiqueta
+       *[other] S'han copiat { $count } etiquetes
+    }
+app-tags-copy-none = { $name } no té etiquetes per copiar
+# Pasting (V) with nothing copied, or with copied text that isn't a list of tags.
+app-tags-paste-none = No s'ha copiat cap etiqueta. Prem C en un recurs per copiar-ne les etiquetes.
+# Pasting tags that every one of the assets already has.
+app-tags-paste-had =
+    { $count ->
+        [one] Ja té aquestes etiquetes
+       *[other] Els { $count } ja tenen aquestes etiquetes
+    }
+# After pasting: $count tags were added to $assets assets.
+app-tags-pasted =
+    { $assets ->
+        [one] { $count ->
+            [one] S'ha afegit { $count } etiqueta
+           *[other] S'han afegit { $count } etiquetes
+        }
+       *[other] { $count ->
+            [one] S'ha afegit { $count } etiqueta a { $assets } recursos
+           *[other] S'han afegit { $count } etiquetes a { $assets } recursos
+        }
+    }
 app-bulk-untagged =
     { $count ->
         [one] S'ha tret { $tag } de { $count } recurs
@@ -806,6 +833,11 @@ palette-archive-selected-keywords = suprimeix elimina treu paperera delete remov
 palette-edit-selected = Edita els { $count } seleccionats
 # Words that find the action above when typed into the command palette.
 palette-edit-selected-keywords = canvi massiu etiquetes categoria llicència valoració
+palette-paste-tags =
+    { $count ->
+        [one] Enganxa les etiquetes copiades al recurs seleccionat
+       *[other] Enganxa les etiquetes copiades als { $count } seleccionats
+    }
 palette-clear-selection = Esborra la selecció
 palette-clear-filters = Esborra els filtres
 palette-clear-filters-keywords = restableix reinicia reset
@@ -855,6 +887,8 @@ shortcuts-favorite = Afegeix als preferits o treu-ne
 shortcuts-reviewed = Marca com a revisat o no
 shortcuts-tag = Afegeix una etiqueta
 shortcuts-edit = Edita la selecció
+shortcuts-copy-tags = Copia'n les etiquetes
+shortcuts-paste-tags = Enganxa les etiquetes copiades a la selecció
 shortcuts-key-click = clic
 shortcuts-select-range = Selecciona un interval
 shortcuts-select-all = Selecciona tot el que es mostra
@@ -1650,6 +1684,9 @@ asset-tags-accept-all-title = Conserva com a pròpies totes les etiquetes propos
 # Before a list of tags someone removed, which the taggers won't put back; each can be clicked to restore it.
 asset-tags-rejected = Rebutjades:
 asset-tag-restore-title = Torna a posar { $tag }
+# Under the tag box: tags that assets which look like this one have and it doesn't, each added with a click.
+asset-tags-from-similar = Els semblants tenen:
+asset-tag-suggest-title = Afegeix { $tag }
 asset-details-heading = Detalls
 asset-field-category = Categoria
 asset-field-license = Llicència

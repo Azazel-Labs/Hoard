@@ -546,6 +546,15 @@ app-ns-engine = Engine
 app-ns-extracted = Nguồn đã khôi phục
 app-ns-script = Hệ chữ viết
 app-bulk-failed = Không thể thay đổi { $count } tài nguyên đó: { $error }
+# Copying the tags of the asset with the keyboard on it (C), to paste onto others (V).
+app-tags-copied = Đã sao chép { $count } thẻ
+app-tags-copy-none = { $name } không có thẻ nào để sao chép
+# Pasting (V) with nothing copied, or with copied text that isn't a list of tags.
+app-tags-paste-none = Chưa sao chép thẻ nào. Nhấn C trên một tài nguyên để sao chép thẻ của nó.
+# Pasting tags that every one of the assets already has.
+app-tags-paste-had = Cả { $count } tài nguyên đều đã có các thẻ đó
+# After pasting: $count tags were added to $assets assets.
+app-tags-pasted = Đã thêm { $count } thẻ vào { $assets } tài nguyên
 app-bulk-untagged = Đã bỏ thẻ { $tag } khỏi { $count } tài nguyên
 app-bulk-tagged = Đã gắn thẻ { $tag } cho { $count } tài nguyên
 app-bulk-review = Đánh dấu đã duyệt
@@ -763,6 +772,7 @@ palette-archive-selected-keywords = xóa gỡ thùng rác delete remove trash
 palette-edit-selected = Sửa { $count } mục đã chọn
 # Words that find the action above when typed into the command palette.
 palette-edit-selected-keywords = thay đổi hàng loạt thẻ danh mục giấy phép xếp hạng
+palette-paste-tags = Dán các thẻ đã sao chép vào { $count } mục đã chọn
 palette-clear-selection = Bỏ chọn
 palette-clear-filters = Xóa bộ lọc
 palette-clear-filters-keywords = đặt lại reset
@@ -812,6 +822,8 @@ shortcuts-favorite = Thêm vào hoặc bỏ khỏi mục yêu thích
 shortcuts-reviewed = Đánh dấu đã duyệt, hoặc bỏ đánh dấu
 shortcuts-tag = Thêm thẻ
 shortcuts-edit = Sửa mục đã chọn
+shortcuts-copy-tags = Sao chép thẻ của nó
+shortcuts-paste-tags = Dán thẻ đã sao chép vào mục đã chọn
 shortcuts-key-click = nhấp
 shortcuts-select-range = Chọn một dải
 shortcuts-select-all = Chọn mọi thứ đang hiện
@@ -1513,6 +1525,9 @@ asset-tags-accept-all-title = Giữ mọi thẻ mà quy tắc và AI đã đoán
 # Before a list of tags someone removed, which the taggers won't put back; each can be clicked to restore it.
 asset-tags-rejected = Đã từ chối:
 asset-tag-restore-title = Đặt lại { $tag }
+# Under the tag box: tags that assets which look like this one have and it doesn't, each added with a click.
+asset-tags-from-similar = Những mục giống có:
+asset-tag-suggest-title = Thêm { $tag }
 asset-details-heading = Chi tiết
 asset-field-category = Danh mục
 asset-field-license = Giấy phép
